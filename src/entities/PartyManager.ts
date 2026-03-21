@@ -2,6 +2,7 @@ import { Character } from './Character.js';
 
 export class PartyManager {
   private members: Character[] = [];
+  private _gold = 0;
   readonly maxSize = 4;
 
   add(character: Character): boolean {
@@ -28,7 +29,17 @@ export class PartyManager {
     return true;
   }
 
-  toJSON(): object[] {
-    return this.members.map(m => m.toJSON());
+  get gold(): number { return this._gold; }
+  addGold(amount: number): void { this._gold += amount; }
+
+  distributeXp(amount: number): boolean[] {
+    const living = this.members.filter(m => m.currentHp > 0);
+    if (living.length === 0) return [];
+    const share = Math.floor(amount / living.length);
+    return living.map(m => m.addXp(share));
+  }
+
+  toJSON(): object {
+    return { members: this.members.map(m => m.toJSON()), gold: this._gold };
   }
 }

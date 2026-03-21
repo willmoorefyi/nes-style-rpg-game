@@ -83,6 +83,16 @@ export interface MapTransition {
   targetY: number;
 }
 
+export interface EncounterEntry {
+  enemies: string[];
+  weight: number;
+}
+
+export interface EncounterRate {
+  min: number;
+  max: number;
+}
+
 export interface MapData {
   id: string;
   width: number;
@@ -92,5 +102,7 @@ export interface MapData {
   collision: number[];
   npcs: MapNPC[];
   transitions: MapTransition[];
+  encounterRate?: EncounterRate;
+  encounters?: EncounterEntry[];
 }
 export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';

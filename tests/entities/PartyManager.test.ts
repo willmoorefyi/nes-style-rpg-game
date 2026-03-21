@@ -89,8 +89,53 @@ describe('PartyManager', () => {
   it('serializes to JSON', () => {
     const party = new PartyManager();
     party.add(createChar('Hero'));
-    const json = party.toJSON();
-    expect(json.length).toBe(1);
-    expect((json[0] as Record<string, unknown>).name).toBe('Hero');
+    const json = party.toJSON() as { members: unknown[]; gold: number };
+    expect(json.members.length).toBe(1);
+    expect((json.members[0] as Record<string, unknown>).name).toBe('Hero');
+  });
+
+  it('starts with 0 gold', () => {
+    const party = new PartyManager();
+    expect(party.gold).toBe(0);
+  });
+
+  it('addGold increases gold', () => {
+    const party = new PartyManager();
+    party.addGold(100);
+    expect(party.gold).toBe(100);
+    party.addGold(50);
+    expect(party.gold).toBe(150);
+  });
+
+  it('distributeXp splits among living members', () => {
+    const party = new PartyManager();
+    const a = createChar('A');
+    const b = createChar('B');
+    party.add(a);
+    party.add(b);
+    party.distributeXp(200);
+    expect(a.xp).toBe(100);
+    expect(b.xp).toBe(100);
+  });
+
+  it('distributeXp skips dead members', () => {
+    const party = new PartyManager();
+    const a = createChar('A');
+    const b = createChar('B');
+    b.currentHp = 0;
+    party.add(a);
+    party.add(b);
+    party.distributeXp(100);
+    expect(a.xp).toBe(100);
+    expect(b.xp).toBe(0);
+  });
+
+  it('distributeXp returns level up flags', () => {
+    const party = new PartyManager();
+    const a = createChar('A');
+    party.add(a);
+    const results = party.distributeXp(100);
+    expect(results.length).toBe(1);
+    expect(results[0]).toBe(true);
   });
 });
