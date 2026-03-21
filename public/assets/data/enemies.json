@@ -1,0 +1,34 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "stats": { "hp": 20, "strength": 4, "agility": 6, "intelligence": 2, "vitality": 3, "luck": 3, "attack": 8, "defense": 4, "magicDefense": 2 },
+    "xpReward": 10,
+    "goldReward": 5,
+    "sprite": "goblin"
+  },
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "stats": { "hp": 18, "strength": 5, "agility": 10, "intelligence": 1, "vitality": 4, "luck": 4, "attack": 10, "defense": 2, "magicDefense": 1 },
+    "xpReward": 12,
+    "goldReward": 3,
+    "sprite": "wolf"
+  },
+  {
+    "id": "skeleton",
+    "name": "Skeleton",
+    "stats": { "hp": 25, "strength": 6, "agility": 4, "intelligence": 1, "vitality": 5, "luck": 2, "attack": 12, "defense": 6, "magicDefense": 3 },
+    "xpReward": 15,
+    "goldReward": 8,
+    "sprite": "skeleton"
+  },
+  {
+    "id": "imp",
+    "name": "Imp",
+    "stats": { "hp": 15, "strength": 3, "agility": 12, "intelligence": 5, "vitality": 2, "luck": 6, "attack": 6, "defense": 2, "magicDefense": 8 },
+    "xpReward": 14,
+    "goldReward": 10,
+    "sprite": "imp"
+  }
+]
