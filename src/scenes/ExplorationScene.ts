@@ -9,6 +9,7 @@ import { NPC, type NPCData } from '../entities/NPC.js';
 import { MapTransitionSystem } from '../systems/MapTransition.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { DialogBox } from '../ui/DialogBox.js';
+import { ErrorDisplay } from '../ui/ErrorDisplay.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -29,6 +30,7 @@ export class ExplorationScene implements Scene {
 
   private tilesetTexture: Texture | null = null;
   private playerTexture: Texture | null = null;
+  private errorDisplay: ErrorDisplay;
 
   constructor(game: Game) {
     this.game = game;
@@ -39,21 +41,25 @@ export class ExplorationScene implements Scene {
       onComplete: () => this.advanceDialog(),
     });
     this.dialogBox.visible = false;
+    this.errorDisplay = new ErrorDisplay();
     this.container.addChild(this.worldContainer);
     this.container.addChild(this.uiContainer);
     this.uiContainer.addChild(this.dialogBox);
+    this.uiContainer.addChild(this.errorDisplay.container);
   }
 
   async enter(): Promise<void> {
     // Load textures - use placeholder if not available
     try {
       this.tilesetTexture = await this.game.assets.load<Texture>('assets/tiles/tileset.png');
-    } catch {
+    } catch (e) {
+      console.warn('Failed to load tileset, using fallback:', e);
       this.tilesetTexture = Texture.WHITE;
     }
     try {
       this.playerTexture = await this.game.assets.load<Texture>('assets/sprites/player.png');
-    } catch {
+    } catch (e) {
+      console.warn('Failed to load player sprite, using fallback:', e);
       this.playerTexture = Texture.WHITE;
     }
     await this.loadMap('test-town');
@@ -63,11 +69,15 @@ export class ExplorationScene implements Scene {
     // Clear old map
     this.worldContainer.removeChildren();
     this.npcs = [];
+    this.errorDisplay.hide();
 
     let mapData: MapData;
     try {
       mapData = await this.game.data.loadMap(`assets/maps/${mapId}.json`);
-    } catch {
+    } catch (e) {
+      const msg = `Failed to load map: ${mapId}`;
+      console.error(msg, e);
+      this.errorDisplay.show(msg);
       return;
     }
 
