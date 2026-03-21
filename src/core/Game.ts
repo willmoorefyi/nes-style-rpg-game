@@ -4,6 +4,7 @@ import { AssetLoader } from './AssetLoader.js';
 import { InputManager } from './InputManager.js';
 import { EventBus } from './EventBus.js';
 import { DataLoader } from './DataLoader.js';
+import { PartyManager } from '../entities/PartyManager.js';
 
 export const WIDTH = 256;
 export const HEIGHT = 240;
@@ -15,6 +16,7 @@ export class Game {
   readonly input: InputManager;
   readonly events: EventBus;
   readonly data: DataLoader;
+  readonly party: PartyManager;
 
   constructor() {
     this.app = new Application();
@@ -23,6 +25,7 @@ export class Game {
     this.input = new InputManager();
     this.events = new EventBus();
     this.data = new DataLoader(this.assets);
+    this.party = new PartyManager();
   }
 
   async init(): Promise<void> {

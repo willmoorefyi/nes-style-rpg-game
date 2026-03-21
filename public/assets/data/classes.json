@@ -1,0 +1,50 @@
+[
+  {
+    "id": "warrior",
+    "name": "Warrior",
+    "baseStats": { "hp": 35, "strength": 10, "agility": 5, "intelligence": 1, "vitality": 8, "luck": 5 },
+    "statGrowth": { "hp": 12, "strength": 3, "agility": 1, "intelligence": 0, "vitality": 2, "luck": 1 },
+    "usableEquipment": ["sword", "axe", "hammer", "heavy_armor", "shield", "helmet"],
+    "spellLevels": { "white": 0, "black": 0 }
+  },
+  {
+    "id": "thief",
+    "name": "Thief",
+    "baseStats": { "hp": 28, "strength": 5, "agility": 10, "intelligence": 2, "vitality": 5, "luck": 10 },
+    "statGrowth": { "hp": 8, "strength": 2, "agility": 3, "intelligence": 0, "vitality": 1, "luck": 2 },
+    "usableEquipment": ["knife", "light_sword", "light_armor"],
+    "spellLevels": { "white": 0, "black": 0 }
+  },
+  {
+    "id": "black_mage",
+    "name": "Black Mage",
+    "baseStats": { "hp": 25, "strength": 1, "agility": 5, "intelligence": 10, "vitality": 3, "luck": 5 },
+    "statGrowth": { "hp": 5, "strength": 0, "agility": 1, "intelligence": 3, "vitality": 1, "luck": 1 },
+    "usableEquipment": ["knife", "staff", "robe"],
+    "spellLevels": { "white": 0, "black": 7 }
+  },
+  {
+    "id": "white_mage",
+    "name": "White Mage",
+    "baseStats": { "hp": 25, "strength": 2, "agility": 5, "intelligence": 10, "vitality": 3, "luck": 5 },
+    "statGrowth": { "hp": 5, "strength": 0, "agility": 1, "intelligence": 3, "vitality": 1, "luck": 1 },
+    "usableEquipment": ["staff", "hammer", "robe"],
+    "spellLevels": { "white": 7, "black": 0 }
+  },
+  {
+    "id": "red_mage",
+    "name": "Red Mage",
+    "baseStats": { "hp": 30, "strength": 5, "agility": 5, "intelligence": 5, "vitality": 5, "luck": 5 },
+    "statGrowth": { "hp": 7, "strength": 2, "agility": 1, "intelligence": 2, "vitality": 1, "luck": 1 },
+    "usableEquipment": ["sword", "staff", "medium_armor", "shield"],
+    "spellLevels": { "white": 5, "black": 5 }
+  },
+  {
+    "id": "monk",
+    "name": "Monk",
+    "baseStats": { "hp": 35, "strength": 8, "agility": 5, "intelligence": 1, "vitality": 8, "luck": 5 },
+    "statGrowth": { "hp": 12, "strength": 3, "agility": 2, "intelligence": 0, "vitality": 2, "luck": 1 },
+    "usableEquipment": ["nunchaku", "light_armor"],
+    "spellLevels": { "white": 0, "black": 0 }
+  }
+]

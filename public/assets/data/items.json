@@ -1,0 +1,20 @@
+[
+  {
+    "id": "iron_sword",
+    "name": "Iron Sword",
+    "type": "weapon",
+    "slot": "weapon",
+    "stats": { "attack": 14 },
+    "price": 175,
+    "usableBy": ["warrior", "red_mage"]
+  },
+  {
+    "id": "chain_mail",
+    "name": "Chain Mail",
+    "type": "armor",
+    "slot": "armor",
+    "stats": { "defense": 15 },
+    "price": 80,
+    "usableBy": ["warrior", "red_mage"]
+  }
+]

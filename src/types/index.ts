@@ -93,3 +93,4 @@ export interface MapData {
   npcs: MapNPC[];
   transitions: MapTransition[];
 }
+export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';
