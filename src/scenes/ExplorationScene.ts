@@ -1,4 +1,4 @@
-import { Container, Texture } from 'pixi.js';
+import { Container } from 'pixi.js';
 import type { Scene, MapData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { TilemapRenderer } from '../rendering/TilemapRenderer.js';
@@ -10,6 +10,7 @@ import { MapTransitionSystem } from '../systems/MapTransition.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { DialogBox } from '../ui/DialogBox.js';
 import { ErrorDisplay } from '../ui/ErrorDisplay.js';
+import { PlaceholderTextures } from '../rendering/PlaceholderTextures.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -27,21 +28,18 @@ export class ExplorationScene implements Scene {
   private currentDialog: string[] = [];
   private dialogIndex = 0;
   private inDialog = false;
-
-  private tilesetTexture: Texture | null = null;
-  private playerTexture: Texture | null = null;
   private errorDisplay: ErrorDisplay;
+  private placeholders: PlaceholderTextures;
 
   constructor(game: Game) {
     this.game = game;
     this.camera = new Camera(this.worldContainer);
     this.mapTransition = new MapTransitionSystem(game.data);
     this.npcInteraction = new NPCInteractionSystem();
-    this.dialogBox = new DialogBox({
-      onComplete: () => this.advanceDialog(),
-    });
+    this.dialogBox = new DialogBox({ onComplete: () => this.advanceDialog() });
     this.dialogBox.visible = false;
     this.errorDisplay = new ErrorDisplay();
+    this.placeholders = new PlaceholderTextures({ app: game.app });
     this.container.addChild(this.worldContainer);
     this.container.addChild(this.uiContainer);
     this.uiContainer.addChild(this.dialogBox);
@@ -49,24 +47,10 @@ export class ExplorationScene implements Scene {
   }
 
   async enter(): Promise<void> {
-    // Load textures - use placeholder if not available
-    try {
-      this.tilesetTexture = await this.game.assets.load<Texture>('assets/tiles/tileset.png');
-    } catch (e) {
-      console.warn('Failed to load tileset, using fallback:', e);
-      this.tilesetTexture = Texture.WHITE;
-    }
-    try {
-      this.playerTexture = await this.game.assets.load<Texture>('assets/sprites/player.png');
-    } catch (e) {
-      console.warn('Failed to load player sprite, using fallback:', e);
-      this.playerTexture = Texture.WHITE;
-    }
     await this.loadMap('test-town');
   }
 
   async loadMap(mapId: string): Promise<void> {
-    // Clear old map
     this.worldContainer.removeChildren();
     this.npcs = [];
     this.errorDisplay.hide();
@@ -81,23 +65,19 @@ export class ExplorationScene implements Scene {
       return;
     }
 
-
-    // Setup tilemap
     this.collisionMap = new CollisionMap(mapData);
-    this.tilemap = new TilemapRenderer(mapData, this.tilesetTexture!, 16);
+    this.tilemap = new TilemapRenderer(mapData, null, 16, this.placeholders);
     this.worldContainer.addChild(this.tilemap.container);
 
-    // Setup camera
     this.camera.setMapBounds(mapData.width, mapData.height);
     this.tilemap.setCamera(this.camera);
 
-    // Setup player
     const spawnX = mapData.width > 1 ? 1 : 0;
     const spawnY = mapData.height > 1 ? 1 : 0;
     this.player = new PlayerController({
       startX: spawnX,
       startY: spawnY,
-      texture: this.playerTexture!,
+      texture: this.placeholders.getPlayerTexture(),
       collisionMap: this.collisionMap,
       input: this.game.input,
       events: this.game.events,
@@ -105,9 +85,8 @@ export class ExplorationScene implements Scene {
     this.worldContainer.addChild(this.player.animation.sprite);
     this.camera.follow(this.player);
 
-    // Setup NPCs
     for (const npcData of mapData.npcs) {
-      const npc = new NPC(npcData as NPCData, Texture.WHITE);
+      const npc = new NPC(npcData as NPCData, this.placeholders.getNPCTexture());
       this.npcs.push(npc);
       this.worldContainer.addChild(npc.sprite);
     }
@@ -116,7 +95,6 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setPlayer(this.player);
     this.npcInteraction.setInput(this.game.input);
 
-    // Setup transitions
     this.mapTransition.setTransitions(mapData.transitions);
 
     this.camera.update();
@@ -134,14 +112,12 @@ export class ExplorationScene implements Scene {
     const wasMoving = this.player.isMoving;
     this.player.update(dt);
 
-    // Check for NPC interaction
     const npc = this.npcInteraction.checkInteraction();
     if (npc && npc.dialog.length > 0) {
       this.startDialog(npc.dialog);
       return;
     }
 
-    // Check for map transition after move completes
     if (wasMoving && !this.player.isMoving) {
       const transition = this.mapTransition.getTransitionAt(this.player.gridX, this.player.gridY);
       if (transition) {

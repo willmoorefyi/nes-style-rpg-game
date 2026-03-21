@@ -1,6 +1,7 @@
 import { Container, Sprite, Texture, Rectangle } from 'pixi.js';
 import type { MapData } from '../types/index.js';
 import { Camera, TILE_SIZE } from './Camera.js';
+import type { PlaceholderTextures } from './PlaceholderTextures.js';
 
 export class TilemapRenderer {
   readonly container: Container;
@@ -9,20 +10,26 @@ export class TilemapRenderer {
   private layerContainers: Container[] = [];
   private spritePool: Sprite[][] = [];
   private camera: Camera | null = null;
+  private placeholders: PlaceholderTextures | null = null;
 
-  constructor(mapData: MapData, tilesetTexture: Texture, tilesPerRow: number) {
+  constructor(mapData: MapData, tilesetTexture: Texture | null, tilesPerRow: number, placeholders?: PlaceholderTextures) {
     this.mapData = mapData;
     this.container = new Container();
+    this.placeholders = placeholders ?? null;
     this.buildTileTextures(tilesetTexture, tilesPerRow);
     this.initLayers();
   }
 
-  private buildTileTextures(tileset: Texture, tilesPerRow: number): void {
+  private buildTileTextures(tileset: Texture | null, tilesPerRow: number): void {
+    // If using placeholders, don't pre-build textures - we'll get them per-tile
+    if (this.placeholders || !tileset) {
+      return;
+    }
+
     const source = tileset.source;
     
     // Handle fallback textures (like Texture.WHITE) that are too small to slice
     if (source.width < TILE_SIZE || source.height < TILE_SIZE) {
-      // Create a single fallback texture for all tiles
       for (let i = 0; i < tilesPerRow * tilesPerRow; i++) {
         this.tileTextures.push(tileset);
       }
@@ -52,6 +59,13 @@ export class TilemapRenderer {
 
   setCamera(camera: Camera): void {
     this.camera = camera;
+  }
+
+  private getTileTexture(tileId: number): Texture {
+    if (this.placeholders) {
+      return this.placeholders.getTileTexture(tileId);
+    }
+    return this.tileTextures[tileId - 1] || Texture.EMPTY;
   }
 
   render(): void {
@@ -90,7 +104,7 @@ export class TilemapRenderer {
             layerContainer.addChild(sprite);
           }
 
-          sprite.texture = this.tileTextures[tileId - 1] || Texture.EMPTY;
+          sprite.texture = this.getTileTexture(tileId);
           sprite.x = x * TILE_SIZE;
           sprite.y = y * TILE_SIZE;
           sprite.visible = true;
