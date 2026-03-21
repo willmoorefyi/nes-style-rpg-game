@@ -19,6 +19,16 @@ export class TilemapRenderer {
 
   private buildTileTextures(tileset: Texture, tilesPerRow: number): void {
     const source = tileset.source;
+    
+    // Handle fallback textures (like Texture.WHITE) that are too small to slice
+    if (source.width < TILE_SIZE || source.height < TILE_SIZE) {
+      // Create a single fallback texture for all tiles
+      for (let i = 0; i < tilesPerRow * tilesPerRow; i++) {
+        this.tileTextures.push(tileset);
+      }
+      return;
+    }
+    
     const tileCount = tilesPerRow * Math.ceil(tileset.height / TILE_SIZE);
     
     for (let i = 0; i < tileCount; i++) {

@@ -30,15 +30,22 @@ export class SpriteAnimation {
   private buildFrames(baseTexture: Texture): void {
     const { frameWidth, frameHeight, frameCount, directions } = this.config;
     const source = baseTexture.source;
+    
+    // Handle fallback textures (like Texture.WHITE) that are too small to slice
+    const isFallback = source.width < frameWidth || source.height < frameHeight;
 
     for (const [dir, row] of Object.entries(directions)) {
       const frames: Texture[] = [];
       for (let i = 0; i < frameCount; i++) {
-        const frame = new Texture({
-          source,
-          frame: new Rectangle(i * frameWidth, row * frameHeight, frameWidth, frameHeight),
-        });
-        frames.push(frame);
+        if (isFallback) {
+          frames.push(baseTexture);
+        } else {
+          const frame = new Texture({
+            source,
+            frame: new Rectangle(i * frameWidth, row * frameHeight, frameWidth, frameHeight),
+          });
+          frames.push(frame);
+        }
       }
       this.textures.set(dir, frames);
     }

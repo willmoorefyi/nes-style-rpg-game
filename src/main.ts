@@ -10,4 +10,4 @@ import { ExplorationScene } from './scenes/ExplorationScene.js';
   game.scenes.register('exploration', new ExplorationScene(game));
   await game.scenes.switchTo('exploration');
   game.app.renderer.background.color = 0x102040;
-})();
+})().catch(console.error);
