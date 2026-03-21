@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Container, Texture } from 'pixi.js';
 import { TilemapRenderer } from '../../src/rendering/TilemapRenderer.js';
 import { Camera } from '../../src/rendering/Camera.js';
@@ -119,5 +119,57 @@ describe('TilemapRenderer', () => {
     const layerContainer = sparseRenderer.container.children[0] as Container;
     const visibleSprites = layerContainer.children.filter((c: any) => c.visible);
     expect(visibleSprites.length).toBe(2); // Only tiles 1 and 2
+  });
+});
+
+describe('TilemapRenderer with PlaceholderTextures', () => {
+  it('renders correctly with null tileset and placeholders', () => {
+    const mockPlaceholders = {
+      getTileTexture: vi.fn().mockReturnValue(Texture.WHITE),
+    };
+
+    const mapData = createTestMap();
+    const renderer = new TilemapRenderer(
+      mapData,
+      null,
+      16,
+      mockPlaceholders as any
+    );
+
+    renderer.render();
+
+    // Should call getTileTexture for each visible tile
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalled();
+  });
+
+  it('uses placeholder textures for each tile ID', () => {
+    const textureMap = new Map<number, Texture>();
+    const mockPlaceholders = {
+      getTileTexture: vi.fn((id: number) => {
+        if (!textureMap.has(id)) {
+          textureMap.set(id, { id } as unknown as Texture);
+        }
+        return textureMap.get(id)!;
+      }),
+    };
+
+    const mapData: MapData = {
+      id: 'mixed',
+      width: 2,
+      height: 2,
+      layers: [[1, 2, 3, 1]],
+      tilesets: [],
+      collision: [0, 0, 0, 0],
+      npcs: [],
+      transitions: [],
+    };
+
+    const renderer = new TilemapRenderer(mapData, null, 16, mockPlaceholders as any);
+    renderer.render();
+
+    // Should have requested textures for tile IDs 1, 2, and 3
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(1);
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(2);
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(3);
   });
 });
