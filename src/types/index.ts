@@ -72,6 +72,7 @@ export interface MapNPC {
   x: number;
   y: number;
   sprite: string;
+  dialog: string[];
 }
 
 export interface MapTransition {
