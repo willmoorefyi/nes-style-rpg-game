@@ -1,0 +1,30 @@
+export interface GameEvents {
+  sceneChange: { from: string | null; to: string };
+  battleStart: { enemies: string[] };
+  battleEnd: { victory: boolean };
+  playerMove: { x: number; y: number };
+  interact: { targetId: string };
+  menuOpen: { menu: string };
+  menuClose: { menu: string };
+}
+
+type Callback<T> = (data: T) => void;
+
+export class EventBus {
+  private listeners = new Map<keyof GameEvents, Set<Callback<unknown>>>();
+
+  on<K extends keyof GameEvents>(event: K, callback: Callback<GameEvents[K]>): void {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set());
+    }
+    this.listeners.get(event)!.add(callback as Callback<unknown>);
+  }
+
+  off<K extends keyof GameEvents>(event: K, callback: Callback<GameEvents[K]>): void {
+    this.listeners.get(event)?.delete(callback as Callback<unknown>);
+  }
+
+  emit<K extends keyof GameEvents>(event: K, data: GameEvents[K]): void {
+    this.listeners.get(event)?.forEach(cb => cb(data));
+  }
+}

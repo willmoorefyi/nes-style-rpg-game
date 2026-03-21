@@ -1,6 +1,9 @@
 import { Application } from 'pixi.js';
 import { SceneManager } from './SceneManager.js';
 import { AssetLoader } from './AssetLoader.js';
+import { InputManager } from './InputManager.js';
+import { EventBus } from './EventBus.js';
+import { DataLoader } from './DataLoader.js';
 
 export const WIDTH = 256;
 export const HEIGHT = 240;
@@ -9,11 +12,17 @@ export class Game {
   readonly app: Application;
   readonly scenes: SceneManager;
   readonly assets: AssetLoader;
+  readonly input: InputManager;
+  readonly events: EventBus;
+  readonly data: DataLoader;
 
   constructor() {
     this.app = new Application();
     this.scenes = new SceneManager(this.app.stage);
     this.assets = new AssetLoader();
+    this.input = new InputManager();
+    this.events = new EventBus();
+    this.data = new DataLoader(this.assets);
   }
 
   async init(): Promise<void> {
@@ -26,9 +35,13 @@ export class Game {
     });
 
     await this.assets.init();
+    this.input.attach();
     this.resize();
     window.addEventListener('resize', () => this.resize());
-    this.app.ticker.add((ticker) => this.scenes.update(ticker.deltaTime));
+    this.app.ticker.add((ticker) => {
+      this.input.update();
+      this.scenes.update(ticker.deltaTime);
+    });
   }
 
   private resize(): void {
