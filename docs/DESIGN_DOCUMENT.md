@@ -30,7 +30,7 @@ Heroic fantasy with a sense of mystery. The world is threatened by elemental cha
 PC (Windows/Mac/Linux). Designed for keyboard/gamepad. Resolution: 256×240 (NES native) scaled up.
 
 ### Engine
-[DECISION NEEDED] Options: Godot 4, LÖVE2D, or Phaser 3. See Section 11 for comparison.
+PixiJS + TypeScript. PixiJS handles WebGL/Canvas rendering (sprites, tilemaps, text). All game systems (battle, exploration, menus, audio) are custom TypeScript. Bundled with Vite for development and distribution as a web app.
 
 ---
 
@@ -443,42 +443,48 @@ Story items that unlock progression:
 
 ## 11. Technical Scaffolding
 
-### Engine Options
+### Technology Stack
 
-| Engine | Pros | Cons |
-|--------|------|------|
-| Godot 4 | Free, 2D-focused, GDScript easy | Larger binary, learning curve |
-| LÖVE2D | Lightweight, Lua, fast iteration | Less built-in UI, manual scene management |
-| Phaser 3 | Web-native, JS ecosystem | Performance on low-end, not desktop-native |
+| Component | Choice | Purpose |
+|-----------|--------|---------|
+| Rendering | PixiJS | WebGL/Canvas sprite rendering, scene graph |
+| Language | TypeScript | Type-safe game logic, all custom systems |
+| Bundler | Vite | Fast dev server, production builds |
+| Audio | Web Audio API | Chiptune music and SFX playback |
 
-[DECISION NEEDED] Final engine choice.
+All game systems (battle, exploration, menus, input, save/load) are custom TypeScript. Distributed as a web app.
 
 ### Project Directory Structure
 
 ```
 project/
-├── assets/
-│   ├── sprites/
-│   ├── tiles/
-│   ├── audio/
-│   │   ├── music/
-│   │   └── sfx/
-│   └── fonts/
-├── data/
-│   ├── enemies.json
-│   ├── items.json
-│   ├── spells.json
-│   ├── classes.json
-│   └── maps/
+├── public/
+│   └── assets/
+│       ├── sprites/
+│       ├── tiles/
+│       ├── audio/
+│       │   ├── music/
+│       │   └── sfx/
+│       └── fonts/
 ├── src/
-│   ├── main
+│   ├── main.ts
 │   ├── battle/
 │   ├── exploration/
 │   ├── ui/
 │   ├── entities/
-│   └── systems/
+│   ├── systems/
+│   └── data/
+│       ├── enemies.json
+│       ├── items.json
+│       ├── spells.json
+│       ├── classes.json
+│       └── maps/
 ├── docs/
 │   └── DESIGN_DOCUMENT.md
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
 └── README.md
 ```
 
