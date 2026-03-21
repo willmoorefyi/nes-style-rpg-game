@@ -55,7 +55,7 @@ A fantasy world with four continents, each tied to an elemental crystal (Earth, 
 - **Final Dungeon**: Temple of Fiends Revisited (past)
 
 ### Towns
-Each town has: Inn, Item Shop, Weapon/Armor Shop, Magic Shop (White/Black), NPCs with hints. [DECISION NEEDED] Exact town count and names beyond core locations.
+Each town has: Inn, Item Shop, Weapon/Armor Shop, Magic Shop (White/Black), NPCs with hints. [DEFERRED: CONTENT PHASE] Exact town count and names beyond core locations will be defined during content creation.
 
 ### Dungeons
 8-12 dungeons of increasing complexity. Each has: multiple floors, treasure chests, random encounters, a boss or key item at the end.
@@ -92,7 +92,7 @@ Stats: HP, Strength, Agility, Intelligence, Vitality, Luck
 | Black Mage | Low | Low | Med | High | Low | Med |
 | Red Mage | Med | Med | Med | Med | Med | Med |
 
-Growth rates are per-level bonuses (tunable). [DECISION NEEDED] Exact numeric growth tables.
+Growth rates are per-level bonuses (tunable). [DEFERRED: PLAYTESTING] Exact numeric growth tables will be tuned during playtesting.
 
 ### Class Upgrades
 At a story milestone (after lighting the Earth Crystal), the party can upgrade classes:
@@ -113,14 +113,14 @@ At a story milestone (after lighting the Earth Crystal), the party can upgrade c
 ### Battle Flow
 1. **Encounter Trigger**: Random encounter on overworld/dungeon tiles, or scripted boss.
 2. **Command Phase**: Player selects action for each party member (Fight, Magic, Item, Run).
-3. **Execution Phase**: Actions resolve in Agility order. If a target is dead, attack retargets (or misses in classic FF1 style). [DECISION NEEDED] Retarget vs. "Ineffective" on dead targets.
+3. **Execution Phase**: Actions resolve in Agility order. If a target is dead before the attacker's turn, the attack auto-retargets to another valid enemy. (A classic FF1 "Ineffective" mode may be added as a toggle in the future.)
 4. **Resolution**: Check for victory (all enemies dead) or defeat (all party dead).
 5. **Rewards**: XP and Gold distributed; return to exploration.
 
 ### Random Encounters
 - Encounter rate varies by zone (overworld lower, dungeons higher)
 - Encounter tables per zone with weighted enemy groups
-- [DECISION NEEDED] Exact step counts / encounter rate formula
+- Step-counter encounter system: overworld ~20-30 steps between encounters, dungeons ~10-20 steps, with random variance. Exact tuning deferred to playtesting.
 
 ### Formations
 - Party has front row (slots 1-2) and back row (slots 3-4)
@@ -131,7 +131,7 @@ At a story milestone (after lighting the Earth Crystal), the party can upgrade c
 ### Enemy Design
 - Enemies have: HP, Attack, Defense, Agility, Magic Defense, Elemental Weaknesses/Resistances, XP, Gold, possible item drop
 - Enemy groups: 1-9 enemies per encounter
-- [DECISION NEEDED] Full bestiary; start with ~64 enemy types
+- Starting target: ~32 enemies across 8 tiers (4 per tier). Enemy data is data-driven and extensible—easy to add more without code changes.
 
 ### Boss Design Philosophy
 - Bosses are scripted encounters (no running)
@@ -160,7 +160,7 @@ FF1 uses a charge-based system:
 | 20 | 7 | 6 | 5 | 5 | 4 | 3 | 2 | 1 |
 | 50 | 9 | 9 | 9 | 9 | 9 | 9 | 9 | 9 |
 
-(Values are illustrative; [DECISION NEEDED] exact progression curve.)
+(Values are illustrative; [DEFERRED: PLAYTESTING] exact progression curve will be tuned during playtesting.)
 
 ### Spell Slots
 - Each spell level has 3 spell slots per character
@@ -223,7 +223,7 @@ Weapons provide Attack bonus and may have elemental/status effects.
 | Flame Sword | 26 | 10000 | Knight | Fire element |
 | Masamune | 56 | — | All | Endgame, found |
 
-[DECISION NEEDED] Full weapon list (~40 weapons).
+[DEFERRED: CONTENT PHASE] Full weapon list (~40 weapons) will be defined during content creation. Weapon data is data-driven and extensible.
 
 ### Armor
 Armor provides Defense bonus and may grant resistances.
@@ -236,7 +236,7 @@ Armor provides Defense bonus and may grant resistances.
 | Iron Armor | 24 | 800 | Warrior, Knight | — |
 | Dragon Armor | 42 | — | Knight | Found, resists fire/ice/lit |
 
-[DECISION NEEDED] Full armor list including shields, helmets, gloves.
+[DEFERRED: CONTENT PHASE] Full armor list including shields, helmets, gloves will be defined during content creation. Armor data is data-driven and extensible.
 
 ### Consumables
 
@@ -273,7 +273,7 @@ Story items that unlock progression:
 - Shops are per-town with fixed inventory
 - Prices fixed (no haggling)
 - Sell price = 50% of buy price
-- [DECISION NEEDED] Per-town shop inventories
+- [DEFERRED: CONTENT PHASE] Per-town shop inventories will be defined during content creation. Shop data is data-driven and extensible.
 
 ---
 
@@ -292,7 +292,7 @@ Story items that unlock progression:
 | 30 | 150,000 | 550 | 250 |
 | 50 | 500,000 | 999 | 450 |
 
-[DECISION NEEDED] Exact XP table and stat growth per level.
+[DEFERRED: PLAYTESTING] Exact XP table and stat growth per level will be tuned during playtesting.
 
 ### Gold Economy
 - Gold is the sole currency
@@ -345,7 +345,7 @@ Story items that unlock progression:
 - NPCs give hints, lore, and advance quests
 - Dialog is short and direct (NES style)
 - Some NPCs are shops/inns
-- [DECISION NEEDED] NPC dialog script
+- [DEFERRED: CONTENT PHASE] NPC dialog script will be written during content creation.
 
 ### Puzzle Philosophy
 - Puzzles are simple: find key, use item, push block
@@ -422,7 +422,7 @@ Story items that unlock progression:
 
 ### Chiptune Music Direction
 - 4 channels (2 pulse, 1 triangle, 1 noise) — NES APU style
-- Tracks needed:
+- Shared track set (~9 tracks):
   - Title theme
   - Overworld
   - Town
@@ -432,12 +432,11 @@ Story items that unlock progression:
   - Victory fanfare
   - Game over
   - Ending
-  - [DECISION NEEDED] Per-area themes vs. generic
+  Per-area variants deferred to content phase.
 
 ### SFX Philosophy
 - Short, punchy sounds (NES style)
-- Categories: menu cursor, confirm, cancel, attack hit, magic cast, damage taken, heal, level up, item get, door open
-- [DECISION NEEDED] Full SFX list
+- Core SFX categories (~10): menu cursor, confirm, cancel, attack hit, magic cast, damage taken, heal, level up, item get, door open. Additional SFX may be added as needed.
 
 ---
 
@@ -506,17 +505,27 @@ Total estimate: 16-22 weeks for a solo developer.
 
 ## Appendix: Open Decisions Summary
 
-Search for `[DECISION NEEDED]` to find all open design questions:
-- Engine choice
-- Exact town count and names
-- Retarget vs. "Ineffective" on dead targets
-- Encounter rate formula
-- Full bestiary (~64 enemies)
+### Resolved
+- Engine choice: PixiJS + TypeScript
+- Retarget vs. "Ineffective" on dead targets: Auto-retarget (classic mode toggle as future option)
+- Encounter rate formula: Step-counter system (~20-30 overworld, ~10-20 dungeon)
+- Full bestiary: ~32 enemies across 8 tiers as starting target
+- Per-area music themes vs. generic: Shared track set (~9 tracks)
+- Full SFX list: ~10 core categories
+
+### Deferred to Playtesting
+Search for `[DEFERRED: PLAYTESTING]`:
 - Exact stat growth tables
-- Exact XP progression table
+- Spell charge progression curve
+- Exact XP table and stat growth per level
+
+### Deferred to Content Phase
+Search for `[DEFERRED: CONTENT PHASE]`:
+- Exact town count and names
 - Full weapon list (~40 weapons)
-- Full armor list (including shields, helmets, gloves)
+- Full armor list (shields, helmets, gloves)
 - Per-town shop inventories
 - NPC dialog script
-- Per-area music themes vs. generic
-- Full SFX list
+
+### Design Principle
+All content systems (enemies, items, spells, shops) are data-driven and extensible—easy to add new entries without code changes.
