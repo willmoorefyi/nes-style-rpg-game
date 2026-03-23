@@ -1,0 +1,119 @@
+# ═══ WARRIOR ═══
+- id: warrior
+  name: Warrior
+  baseStats:
+    hp: 35
+    strength: 20
+    agility: 5
+    intelligence: 1
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 6
+    strength: 3
+    agility: 1
+    intelligence: 0
+    vitality: 2
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield]
+  spellLevels: { white: 0, black: 0 }
+
+# ═══ THIEF ═══
+- id: thief
+  name: Thief
+  baseStats:
+    hp: 25
+    strength: 10
+    agility: 15
+    intelligence: 5
+    vitality: 5
+    luck: 15
+  statGrowth:
+    hp: 4
+    strength: 2
+    agility: 3
+    intelligence: 0
+    vitality: 1
+    luck: 2
+  usableEquipment: [knife, light_sword, light_armor]
+  spellLevels: { white: 0, black: 0 }
+
+# ═══ MONK ═══
+- id: monk
+  name: Monk
+  baseStats:
+    hp: 33
+    strength: 15
+    agility: 8
+    intelligence: 3
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 5
+    strength: 3
+    agility: 2
+    intelligence: 0
+    vitality: 2
+    luck: 1
+  usableEquipment: [nunchaku, light_armor]
+  spellLevels: { white: 0, black: 0 }
+
+# ═══ WHITE MAGE ═══
+- id: white_mage
+  name: White Mage
+  baseStats:
+    hp: 25
+    strength: 5
+    agility: 8
+    intelligence: 15
+    vitality: 3
+    luck: 8
+  statGrowth:
+    hp: 3
+    strength: 1
+    agility: 1
+    intelligence: 3
+    vitality: 1
+    luck: 1
+  usableEquipment: [staff, hammer, robe]
+  spellLevels: { white: 7, black: 0 }
+
+# ═══ BLACK MAGE ═══
+- id: black_mage
+  name: Black Mage
+  baseStats:
+    hp: 25
+    strength: 5
+    agility: 8
+    intelligence: 15
+    vitality: 3
+    luck: 8
+  statGrowth:
+    hp: 3
+    strength: 1
+    agility: 1
+    intelligence: 3
+    vitality: 1
+    luck: 1
+  usableEquipment: [knife, staff, robe]
+  spellLevels: { white: 0, black: 7 }
+
+# ═══ RED MAGE ═══
+- id: red_mage
+  name: Red Mage
+  baseStats:
+    hp: 30
+    strength: 10
+    agility: 10
+    intelligence: 10
+    vitality: 5
+    luck: 10
+  statGrowth:
+    hp: 4
+    strength: 2
+    agility: 2
+    intelligence: 2
+    vitality: 1
+    luck: 1
+  usableEquipment: [sword, staff, medium_armor]
+  spellLevels: { white: 5, black: 5 }

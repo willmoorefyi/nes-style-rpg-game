@@ -1,7 +1,7 @@
 import type { CharacterClassData, CharacterSaveData, EquipmentSlot, ItemData, StatBlock } from '../types/index.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
-import { StatusTracker } from '../battle/StatusEffects.js';
+import { StatusTracker, type StatusEffect } from '../battle/StatusEffects.js';
 
 export interface CharacterData {
   name: string;
@@ -204,7 +204,7 @@ export class Character {
     // Restore status effects
     if (data.statusEffects) {
       for (const { effect, duration } of data.statusEffects) {
-        char.statusTracker.apply(effect as any, duration);
+        char.statusTracker.apply(effect as StatusEffect, duration);
       }
     }
     

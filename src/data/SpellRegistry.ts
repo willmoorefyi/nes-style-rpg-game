@@ -7,7 +7,7 @@ export class SpellRegistry {
 
   static async init(loader: DataLoader): Promise<void> {
     if (this.initialized) return;
-    const data = await loader.loadSpells('assets/data/spells.json');
+    const data = await loader.loadSpells('assets/data/spells.yaml');
     for (const spell of data) {
       this.spells.set(spell.id, spell);
     }

@@ -1,0 +1,35 @@
+# ═══ ENEMIES ═══
+- id: goblin
+  name: Goblin
+  stats:
+    hp: 20
+    strength: 5
+    agility: 4
+    intelligence: 2
+    vitality: 3
+    luck: 2
+    attack: 8
+    defense: 2
+    magicDefense: 1
+  xpReward: 10
+  goldReward: 5
+  sprite: goblin
+  weakness: fire
+
+- id: wolf
+  name: Wolf
+  stats:
+    hp: 15
+    strength: 6
+    agility: 7
+    intelligence: 1
+    vitality: 4
+    luck: 3
+    attack: 10
+    defense: 1
+    magicDefense: 0
+  xpReward: 12
+  goldReward: 3
+  sprite: wolf
+  weakness: fire
+  resist: ice

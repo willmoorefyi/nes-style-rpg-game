@@ -4,21 +4,21 @@ import type { AssetLoader } from '../../src/core/AssetLoader.js';
 
 describe('DataLoader', () => {
   const mockAssetLoader = (data: unknown): AssetLoader => ({
-    load: vi.fn().mockResolvedValue(data),
+    loadYaml: vi.fn().mockResolvedValue(data),
   } as unknown as AssetLoader);
 
   it('should load and validate class data', async () => {
     const classData = [{ id: 'warrior', name: 'Warrior' }];
     const loader = new DataLoader(mockAssetLoader(classData));
     
-    const result = await loader.loadClasses('classes.json');
+    const result = await loader.loadClasses('classes.yaml');
     expect(result).toEqual(classData);
   });
 
   it('should throw on invalid class data', async () => {
     const loader = new DataLoader(mockAssetLoader({ invalid: true }));
     
-    await expect(loader.loadClasses('classes.json')).rejects.toThrow('expected array');
+    await expect(loader.loadClasses('classes.yaml')).rejects.toThrow('expected array');
   });
 
   it('should load enemy data', async () => {
@@ -32,21 +32,21 @@ describe('DataLoader', () => {
     }];
     const loader = new DataLoader(mockAssetLoader(enemyData));
     
-    const result = await loader.loadEnemies('enemies.json');
+    const result = await loader.loadEnemies('enemies.yaml');
     expect(result).toEqual(enemyData);
   });
 
   it('should throw on invalid enemy data', async () => {
     const loader = new DataLoader(mockAssetLoader([{ id: 'bad' }]));
     
-    await expect(loader.loadEnemies('enemies.json')).rejects.toThrow('EnemyData[0]');
+    await expect(loader.loadEnemies('enemies.yaml')).rejects.toThrow('EnemyData[0]');
   });
 
   it('should load item data', async () => {
     const itemData = [{ id: 'potion', name: 'Potion' }];
     const loader = new DataLoader(mockAssetLoader(itemData));
     
-    const result = await loader.loadItems('items.json');
+    const result = await loader.loadItems('items.yaml');
     expect(result).toEqual(itemData);
   });
 
@@ -54,7 +54,7 @@ describe('DataLoader', () => {
     const spellData = [{ id: 'cure', name: 'CURE' }];
     const loader = new DataLoader(mockAssetLoader(spellData));
     
-    const result = await loader.loadSpells('spells.json');
+    const result = await loader.loadSpells('spells.yaml');
     expect(result).toEqual(spellData);
   });
 
@@ -71,20 +71,20 @@ describe('DataLoader', () => {
     };
     const loader = new DataLoader(mockAssetLoader(mapData));
     
-    const result = await loader.loadMap('map.json');
+    const result = await loader.loadMap('map.yaml');
     expect(result).toEqual(mapData);
   });
 
   it('should throw on invalid map data', async () => {
     const loader = new DataLoader(mockAssetLoader(null));
     
-    await expect(loader.loadMap('map.json')).rejects.toThrow('expected object');
+    await expect(loader.loadMap('map.yaml')).rejects.toThrow('expected object');
   });
 });
 
-describe('DataLoader - test-town.json format', () => {
+describe('DataLoader - test-town.yaml format', () => {
   const mockAssetLoader = (data: unknown): AssetLoader => ({
-    load: vi.fn().mockResolvedValue(data),
+    loadYaml: vi.fn().mockResolvedValue(data),
   } as unknown as AssetLoader);
 
   it('should parse complete MapData with all required fields', async () => {
@@ -104,7 +104,7 @@ describe('DataLoader - test-town.json format', () => {
     };
 
     const loader = new DataLoader(mockAssetLoader(testTownData));
-    const result = await loader.loadMap('test-town.json');
+    const result = await loader.loadMap('test-town.yaml');
 
     expect(result.id).toBe('test-town');
     expect(result.width).toBe(16);
@@ -136,7 +136,7 @@ describe('DataLoader - test-town.json format', () => {
     };
 
     const loader = new DataLoader(mockAssetLoader(mapData));
-    const result = await loader.loadMap('multi.json');
+    const result = await loader.loadMap('multi.yaml');
 
     expect(result.npcs).toHaveLength(2);
     expect(result.transitions).toHaveLength(2);

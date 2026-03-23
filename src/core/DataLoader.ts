@@ -13,13 +13,13 @@ export class DataLoader {
   constructor(private assets: AssetLoader) {}
 
   async loadClasses(path: string): Promise<CharacterClassData[]> {
-    const data = await this.assets.load<CharacterClassData[]>(path);
+    const data = await this.assets.loadYaml<CharacterClassData[]>(path);
     this.assertArray(data, 'CharacterClassData');
     return data;
   }
 
   async loadEnemies(path: string): Promise<EnemyData[]> {
-    const data = await this.assets.load<unknown[]>(path);
+    const data = await this.assets.loadYaml<unknown[]>(path);
     this.assertArray(data, 'EnemyData');
     return data.map((item, i) => {
       try {
@@ -31,24 +31,24 @@ export class DataLoader {
   }
 
   async loadItems(path: string): Promise<ItemData[]> {
-    const data = await this.assets.load<ItemData[]>(path);
+    const data = await this.assets.loadYaml<ItemData[]>(path);
     this.assertArray(data, 'ItemData');
     return data;
   }
 
   async loadSpells(path: string): Promise<SpellData[]> {
-    const data = await this.assets.load<SpellData[]>(path);
+    const data = await this.assets.loadYaml<SpellData[]>(path);
     this.assertArray(data, 'SpellData');
     return data;
   }
 
   async loadMap(path: string): Promise<MapData> {
-    const data = await this.assets.load<unknown>(path);
+    const data = await this.assets.loadYaml<unknown>(path);
     return validateMapData(data);
   }
 
   async loadShops(path: string): Promise<ShopData[]> {
-    const data = await this.assets.load<unknown[]>(path);
+    const data = await this.assets.loadYaml<unknown[]>(path);
     this.assertArray(data, 'ShopData');
     return data.map((item, i) => {
       try {

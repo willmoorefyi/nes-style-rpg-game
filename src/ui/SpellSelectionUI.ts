@@ -2,6 +2,7 @@ import { Container } from 'pixi.js';
 import type { SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { EventBus } from '../core/EventBus.js';
+import type { InputManager } from '../core/InputManager.js';
 import { Menu, type MenuItem } from './Menu.js';
 
 export interface SpellSelectionResult {
@@ -172,16 +173,16 @@ export class SpellSelectionUI extends Container {
     this.levelMenu = null;
   }
 
-  update(input: { isJustPressed(action: string): boolean }): void {
+  update(input: InputManager): void {
     switch (this.state) {
       case 'level':
-        this.levelMenu?.update(input as any);
+        this.levelMenu?.update(input);
         break;
       case 'spell':
-        this.spellMenu?.update(input as any);
+        this.spellMenu?.update(input);
         break;
       case 'target':
-        this.targetMenu?.update(input as any);
+        this.targetMenu?.update(input);
         break;
     }
   }

@@ -1,4 +1,5 @@
 import { Assets, type UnresolvedAsset } from 'pixi.js';
+import { parse } from 'yaml';
 import type { AssetManifest } from '../types/index.js';
 
 export class AssetLoader {
@@ -32,5 +33,13 @@ export class AssetLoader {
     const response = await fetch(path);
     if (!response.ok) throw new Error(`Failed to load ${path}`);
     return response.json() as Promise<T>;
+  }
+
+  /** Fetch and parse a YAML file at runtime */
+  async loadYaml<T>(path: string): Promise<T> {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`Failed to load ${path}`);
+    const text = await response.text();
+    return parse(text) as T;
   }
 }

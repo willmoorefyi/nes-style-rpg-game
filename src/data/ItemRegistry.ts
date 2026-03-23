@@ -7,7 +7,7 @@ export class ItemRegistry {
 
   static async init(loader: DataLoader): Promise<void> {
     if (this.initialized) return;
-    const data = await loader.loadItems('assets/data/items.json');
+    const data = await loader.loadItems('assets/data/items.yaml');
     for (const item of data) {
       this.items.set(item.id, item);
     }

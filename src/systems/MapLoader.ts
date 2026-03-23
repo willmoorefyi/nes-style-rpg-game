@@ -22,7 +22,7 @@ export class MapLoader {
   }
 
   async loadMap(mapId: string): Promise<MapLoadResult> {
-    const mapData = await this.dataLoader.loadMap(`assets/maps/${mapId}.json`);
+    const mapData = await this.dataLoader.loadMap(`assets/maps/${mapId}.yaml`);
     const collisionMap = new CollisionMap(mapData);
     const tilemap = new TilemapRenderer(mapData, null, 16, this.placeholders);
     const npcs = mapData.npcs.map(

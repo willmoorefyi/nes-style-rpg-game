@@ -47,6 +47,6 @@ describe('MapLoader', () => {
 
   it('calls dataLoader with correct path', async () => {
     await loader.loadMap('my-map');
-    expect(dataLoader.loadMap).toHaveBeenCalledWith('assets/maps/my-map.json');
+    expect(dataLoader.loadMap).toHaveBeenCalledWith('assets/maps/my-map.yaml');
   });
 });

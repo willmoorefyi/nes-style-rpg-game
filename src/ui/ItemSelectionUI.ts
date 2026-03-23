@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js';
 import type { Inventory } from '../entities/Inventory.js';
 import type { EventBus } from '../core/EventBus.js';
+import type { InputManager } from '../core/InputManager.js';
 import { Menu, type MenuItem } from './Menu.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 
@@ -112,13 +113,13 @@ export class ItemSelectionUI extends Container {
     this.itemMenu = null;
   }
 
-  update(input: { isJustPressed(action: string): boolean }): void {
+  update(input: InputManager): void {
     switch (this.state) {
       case 'item':
-        this.itemMenu?.update(input as any);
+        this.itemMenu?.update(input);
         break;
       case 'target':
-        this.targetMenu?.update(input as any);
+        this.targetMenu?.update(input);
         break;
     }
   }

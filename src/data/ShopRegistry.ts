@@ -7,7 +7,7 @@ export class ShopRegistry {
 
   static async init(loader: DataLoader): Promise<void> {
     if (this.initialized) return;
-    const data = await loader.loadShops('assets/data/shops.json');
+    const data = await loader.loadShops('assets/data/shops.yaml');
     for (const shop of data) {
       this.shops.set(shop.id, shop);
     }

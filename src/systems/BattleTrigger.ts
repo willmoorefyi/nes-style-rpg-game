@@ -53,7 +53,7 @@ export class BattleTrigger {
     for (const id of ids) {
       let data = this.enemyDataCache.get(id);
       if (!data) {
-        const enemies = await this.game.data.loadEnemies('assets/data/enemies.json');
+        const enemies = await this.game.data.loadEnemies('assets/data/enemies.yaml');
         for (const e of enemies) this.enemyDataCache.set(e.id, e);
         data = this.enemyDataCache.get(id);
       }

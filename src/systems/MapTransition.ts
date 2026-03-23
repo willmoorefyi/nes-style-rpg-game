@@ -25,7 +25,7 @@ export class MapTransitionSystem {
 
   async loadMap(mapId: string): Promise<MapData | null> {
     try {
-      return await this.dataLoader.loadMap(`assets/maps/${mapId}.json`);
+      return await this.dataLoader.loadMap(`assets/maps/${mapId}.yaml`);
     } catch (e) {
       console.error(`Failed to load map for transition: ${mapId}`, e);
       return null;

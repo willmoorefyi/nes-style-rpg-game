@@ -7,7 +7,7 @@ export class ClassRegistry {
 
   static async init(loader: DataLoader): Promise<void> {
     if (this.initialized) return;
-    const data = await loader.loadClasses('assets/data/classes.json');
+    const data = await loader.loadClasses('assets/data/classes.yaml');
     for (const cls of data) {
       this.classes.set(cls.id, cls);
     }
