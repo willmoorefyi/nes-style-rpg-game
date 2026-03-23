@@ -9,8 +9,9 @@ import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
-import { ItemRegistry } from '../data/ItemRegistry.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
+import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
+import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -25,7 +26,7 @@ export interface BattleSceneConfig {
   inventory?: Inventory;
 }
 
-type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_level' | 'spell_select' | 'item_select' | 'item_target';
+type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
@@ -38,12 +39,8 @@ export class BattleScene implements Scene {
   private messageWindow!: Window;
   private commandMenu!: Menu;
   private targetMenu!: Menu | null;
-  private spellLevelMenu: Menu | null = null;
-  private spellSelectMenu: Menu | null = null;
-  private itemMenu: Menu | null = null;
-  private currentSpellLevel = 0;
-  private selectedSpellId: string | null = null;
-  private selectedItemId: string | null = null;
+  private spellUI: SpellSelectionUI | null = null;
+  private itemUI: ItemSelectionUI | null = null;
   private spells: SpellData[] = [];
   private inventory: Inventory | undefined;
   private messageText!: TextRenderer;
@@ -159,20 +156,12 @@ export class BattleScene implements Scene {
         if (this.targetMenu) this.targetMenu.update(this.deps.input);
         break;
 
-      case 'spell_level':
-        if (this.spellLevelMenu) this.spellLevelMenu.update(this.deps.input);
+      case 'spell_ui':
+        if (this.spellUI) this.spellUI.update(this.deps.input);
         break;
 
-      case 'spell_select':
-        if (this.spellSelectMenu) this.spellSelectMenu.update(this.deps.input);
-        break;
-
-      case 'item_select':
-        if (this.itemMenu) this.itemMenu.update(this.deps.input);
-        break;
-
-      case 'item_target':
-        if (this.targetMenu) this.targetMenu.update(this.deps.input);
+      case 'item_ui':
+        if (this.itemUI) this.itemUI.update(this.deps.input);
         break;
 
       case 'message':
@@ -209,9 +198,9 @@ export class BattleScene implements Scene {
     if (cmd === 'fight') {
       this.showTargetMenu(actor.name);
     } else if (cmd === 'magic') {
-      this.showSpellLevelMenu(actor);
+      this.showSpellUI(actor);
     } else if (cmd === 'item') {
-      this.showItemMenu();
+      this.showItemUI(actor);
     } else if (cmd === 'run') {
       this.battle.submitCommand({ type: 'run', actorId: actor.name });
       this.commandMenu.visible = false;
@@ -219,15 +208,20 @@ export class BattleScene implements Scene {
     }
   }
 
-  private showSpellLevelMenu(actor: Character): void {
-    const levelsWithCharges: number[] = [];
+  private showSpellUI(actor: Character): void {
+    const enemies = this.battle.livingEnemies.map(e => ({ id: e.id, name: e.data.name }));
+    const partyMembers = this.config.party.map(c => ({ name: c.name }));
+
+    // Check if actor has any spells before creating UI
+    let hasSpells = false;
     for (let lvl = 1; lvl <= 8; lvl++) {
       if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) {
-        levelsWithCharges.push(lvl);
+        hasSpells = true;
+        break;
       }
     }
 
-    if (levelsWithCharges.length === 0) {
+    if (!hasSpells) {
       this.messageText.setText('No spells available.', true);
       this.uiState = 'message';
       this.messageTimer = 30;
@@ -235,160 +229,44 @@ export class BattleScene implements Scene {
       return;
     }
 
-    const items: MenuItem[] = levelsWithCharges.map(lvl => ({
-      label: `Lv${lvl} (${actor.getSpellCharges(lvl)})`,
-      value: String(lvl),
-    }));
-
-    if (this.spellLevelMenu) this.commandWindow.removeChild(this.spellLevelMenu);
-
-    this.spellLevelMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.currentSpellLevel = parseInt(item.value);
-        this.showSpellSelectMenu(actor);
+    this.spellUI = new SpellSelectionUI({
+      character: actor,
+      spells: this.spells,
+      enemies,
+      partyMembers,
+      contentX: this.commandWindow.contentX,
+      contentY: this.commandWindow.contentY,
+      eventBus: this.deps.events,
+      onSelect: (result) => {
+        this.deps.events.emit('spellCast', {});
+        this.battle.submitCommand({
+          type: 'magic',
+          actorId: actor.name,
+          targetId: result.targetId,
+          spellId: result.spellId,
+        });
+        this.cleanupSpellUI();
+        this.startCommandPhase();
       },
       onCancel: () => {
-        this.hideSpellLevelMenu();
+        this.cleanupSpellUI();
         this.uiState = 'command';
       },
-      eventBus: this.deps.events,
     });
-    this.commandWindow.addChild(this.spellLevelMenu);
+    this.commandWindow.addChild(this.spellUI);
     this.commandMenu.visible = false;
-    this.uiState = 'spell_level';
+    this.uiState = 'spell_ui';
   }
 
-  private hideSpellLevelMenu(): void {
-    if (this.spellLevelMenu) {
-      this.commandWindow.removeChild(this.spellLevelMenu);
-      this.spellLevelMenu = null;
+  private cleanupSpellUI(): void {
+    if (this.spellUI) {
+      this.commandWindow.removeChild(this.spellUI);
+      this.spellUI = null;
     }
     this.commandMenu.visible = true;
   }
 
-  private showSpellSelectMenu(actor: Character): void {
-    const spellIds = actor.getSpellsAtLevel(this.currentSpellLevel);
-    const items: MenuItem[] = spellIds.map(id => {
-      const spell = this.spells.find(s => s.id === id);
-      return { label: spell?.name ?? id, value: id };
-    });
-
-    if (this.spellSelectMenu) this.commandWindow.removeChild(this.spellSelectMenu);
-
-    this.spellSelectMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.selectedSpellId = item.value;
-        const spell = this.spells.find(s => s.id === item.value);
-        if (spell?.targeting === 'all') {
-          this.submitSpellCommand(actor.name, undefined);
-        } else if (spell?.targeting === 'self') {
-          this.submitSpellCommand(actor.name, actor.name);
-        } else if (spell?.type === 'white' && spell?.effect === 'heal') {
-          this.showPartyTargetMenu(actor.name);
-        } else {
-          this.showSpellTargetMenu(actor.name);
-        }
-      },
-      onCancel: () => {
-        this.hideSpellSelectMenu();
-        this.uiState = 'spell_level';
-      },
-      eventBus: this.deps.events,
-    });
-    this.commandWindow.addChild(this.spellSelectMenu);
-    if (this.spellLevelMenu) this.spellLevelMenu.visible = false;
-    this.uiState = 'spell_select';
-  }
-
-  private hideSpellSelectMenu(): void {
-    if (this.spellSelectMenu) {
-      this.commandWindow.removeChild(this.spellSelectMenu);
-      this.spellSelectMenu = null;
-    }
-    if (this.spellLevelMenu) this.spellLevelMenu.visible = true;
-  }
-
-  private showSpellTargetMenu(actorName: string): void {
-    const enemies = this.battle.livingEnemies;
-    const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
-
-    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
-
-    this.targetMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => this.submitSpellCommand(actorName, item.value),
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.uiState = 'spell_select';
-      },
-      eventBus: this.deps.events,
-    });
-    this.commandWindow.addChild(this.targetMenu);
-    if (this.spellSelectMenu) this.spellSelectMenu.visible = false;
-    this.uiState = 'target';
-  }
-
-  private showPartyTargetMenu(actorName: string): void {
-    const items: MenuItem[] = this.config.party.map(c => ({ label: c.name, value: c.name }));
-
-    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
-
-    this.targetMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => this.submitSpellCommand(actorName, item.value),
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.uiState = 'spell_select';
-      },
-      eventBus: this.deps.events,
-    });
-    this.commandWindow.addChild(this.targetMenu);
-    if (this.spellSelectMenu) this.spellSelectMenu.visible = false;
-    this.uiState = 'target';
-  }
-
-  private submitSpellCommand(actorName: string, targetId: string | undefined): void {
-    if (this.selectedSpellId) {
-      this.deps.events.emit('spellCast', {});
-      this.battle.submitCommand({
-        type: 'magic',
-        actorId: actorName,
-        targetId,
-        spellId: this.selectedSpellId,
-      });
-    }
-    this.cleanupSpellMenus();
-    this.startCommandPhase();
-  }
-
-  private cleanupSpellMenus(): void {
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-      this.targetMenu = null;
-    }
-    if (this.spellSelectMenu) {
-      this.commandWindow.removeChild(this.spellSelectMenu);
-      this.spellSelectMenu = null;
-    }
-    if (this.spellLevelMenu) {
-      this.commandWindow.removeChild(this.spellLevelMenu);
-      this.spellLevelMenu = null;
-    }
-    this.selectedSpellId = null;
-    this.commandMenu.visible = true;
-  }
-
-  private showItemMenu(): void {
+  private showItemUI(actor: Character): void {
     if (!this.inventory) {
       this.messageText.setText('No items available.', true);
       this.uiState = 'message';
@@ -397,12 +275,28 @@ export class BattleScene implements Scene {
       return;
     }
 
-    const consumables = this.inventory.getAll().filter(entry => {
-      const item = ItemRegistry.getItem(entry.itemId);
-      return item?.type === 'consumable';
+    const partyMembers = this.config.party.map(c => ({ name: c.name }));
+
+    this.itemUI = new ItemSelectionUI({
+      inventory: this.inventory,
+      partyMembers,
+      contentX: this.commandWindow.contentX,
+      contentY: this.commandWindow.contentY,
+      eventBus: this.deps.events,
+      onSelect: (result) => {
+        this.battle.submitCommand(createItemCommand(actor.name, result.targetName, result.itemId));
+        this.cleanupItemUI();
+        this.startCommandPhase();
+      },
+      onCancel: () => {
+        this.cleanupItemUI();
+        this.uiState = 'command';
+      },
     });
 
-    if (consumables.length === 0) {
+    // Check if there are no consumables
+    if (this.itemUI.hasNoItems()) {
+      this.cleanupItemUI();
       this.messageText.setText('No items available.', true);
       this.uiState = 'message';
       this.messageTimer = 30;
@@ -410,88 +304,16 @@ export class BattleScene implements Scene {
       return;
     }
 
-    const items: MenuItem[] = consumables.map(entry => {
-      const item = ItemRegistry.getItem(entry.itemId);
-      return { label: `${item?.name ?? entry.itemId} x${entry.quantity}`, value: entry.itemId };
-    });
-
-    if (this.itemMenu) {
-      this.commandWindow.removeChild(this.itemMenu);
-    }
-
-    this.itemMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      maxVisible: 4,
-      onSelect: (item) => {
-        this.selectedItemId = item.value;
-        this.showItemTargetMenu();
-      },
-      onCancel: () => {
-        this.hideItemMenu();
-        this.uiState = 'command';
-      },
-    });
-    this.commandWindow.addChild(this.itemMenu);
+    this.commandWindow.addChild(this.itemUI);
     this.commandMenu.visible = false;
-    this.uiState = 'item_select';
+    this.uiState = 'item_ui';
   }
 
-  private hideItemMenu(): void {
-    if (this.itemMenu) {
-      this.commandWindow.removeChild(this.itemMenu);
-      this.itemMenu = null;
+  private cleanupItemUI(): void {
+    if (this.itemUI) {
+      this.commandWindow.removeChild(this.itemUI);
+      this.itemUI = null;
     }
-    this.commandMenu.visible = true;
-  }
-
-  private showItemTargetMenu(): void {
-    const actor = this.battle.currentCommandActor;
-    if (!actor) return;
-
-    const items: MenuItem[] = this.config.party.map(c => ({ label: c.name, value: c.name }));
-
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-    }
-
-    this.targetMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.submitItemCommand(actor.name, item.value);
-      },
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.uiState = 'item_select';
-        if (this.itemMenu) this.itemMenu.visible = true;
-      },
-    });
-    this.commandWindow.addChild(this.targetMenu);
-    if (this.itemMenu) this.itemMenu.visible = false;
-    this.uiState = 'item_target';
-  }
-
-  private submitItemCommand(actorName: string, targetName: string): void {
-    if (this.selectedItemId) {
-      this.battle.submitCommand(createItemCommand(actorName, targetName, this.selectedItemId));
-    }
-    this.cleanupItemMenus();
-    this.startCommandPhase();
-  }
-
-  private cleanupItemMenus(): void {
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-      this.targetMenu = null;
-    }
-    if (this.itemMenu) {
-      this.commandWindow.removeChild(this.itemMenu);
-      this.itemMenu = null;
-    }
-    this.selectedItemId = null;
     this.commandMenu.visible = true;
   }
 
