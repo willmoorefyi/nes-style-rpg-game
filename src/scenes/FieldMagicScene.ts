@@ -111,7 +111,7 @@ export class FieldMagicScene implements Scene {
     const spell = SpellRegistry.getSpell(this.selectedSpellId);
     if (!caster || !target || !spell) return;
     if (!caster.useCharge(this.selectedSpellLevel)) return;
-    target.currentHp = Math.min(target.maxHp, target.currentHp + spell.power);
+    target.currentHp = Math.min(target.maxHp, target.currentHp + (spell.power ?? 0));
     this.phase = 'selectCaster';
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;

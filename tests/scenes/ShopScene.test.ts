@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
