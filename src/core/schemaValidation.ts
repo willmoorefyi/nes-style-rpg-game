@@ -1,4 +1,4 @@
-import type { EnemyData, MapData, StatBlock } from '../types/index.js';
+import type { EnemyData, MapData, ShopData, StatBlock } from '../types/index.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -154,4 +154,22 @@ export function validateSpellData(data: unknown): import('../types/index.js').Sp
   }
   assertString('SpellData.description', data.description);
   return data as unknown as import('../types/index.js').SpellData;
+}
+
+const VALID_SHOP_TYPES = ['weapon', 'armor', 'item', 'magic', 'inn'];
+
+export function validateShopData(data: unknown): ShopData {
+  assertObject('ShopData', data);
+  assertString('ShopData.id', data.id);
+  assertString('ShopData.type', data.type);
+  if (!VALID_SHOP_TYPES.includes(data.type as string)) {
+    throw new ValidationError(`ShopData.type: expected one of ${VALID_SHOP_TYPES.join(', ')}, got ${data.type}`);
+  }
+  assertString('ShopData.name', data.name);
+  assertArray('ShopData.inventory', data.inventory);
+  (data.inventory as unknown[]).forEach((e, i) => assertString(`ShopData.inventory[${i}]`, e));
+  if (data.innPrice !== undefined) {
+    assertNumber('ShopData.innPrice', data.innPrice);
+  }
+  return data as unknown as ShopData;
 }

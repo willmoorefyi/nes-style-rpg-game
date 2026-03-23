@@ -1,0 +1,8 @@
+[
+  { "id": "cornelia_weapon", "type": "weapon", "name": "Cornelia Weapons", "inventory": ["rapier", "short_sword", "hammer", "staff"] },
+  { "id": "cornelia_armor", "type": "armor", "name": "Cornelia Armor", "inventory": ["leather_armor", "chain_mail", "wooden_shield", "cap"] },
+  { "id": "cornelia_item", "type": "item", "name": "Cornelia Items", "inventory": ["potion", "antidote", "tent"] },
+  { "id": "cornelia_white", "type": "magic", "name": "White Magic", "inventory": ["cure", "harm", "fog", "ruse"] },
+  { "id": "cornelia_black", "type": "magic", "name": "Black Magic", "inventory": ["fire", "lit", "slep", "lock"] },
+  { "id": "cornelia_inn", "type": "inn", "name": "Cornelia Inn", "inventory": [], "innPrice": 30 }
+]

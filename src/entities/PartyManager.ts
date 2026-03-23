@@ -32,6 +32,11 @@ export class PartyManager {
 
   get gold(): number { return this._gold; }
   addGold(amount: number): void { this._gold += amount; }
+  spendGold(amount: number): boolean {
+    if (this._gold < amount) return false;
+    this._gold -= amount;
+    return true;
+  }
 
   distributeXp(amount: number): boolean[] {
     const living = this.members.filter(m => m.currentHp > 0);

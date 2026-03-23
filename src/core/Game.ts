@@ -5,6 +5,8 @@ import { InputManager } from './InputManager.js';
 import { EventBus } from './EventBus.js';
 import { DataLoader } from './DataLoader.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
+import { SpellRegistry } from '../data/SpellRegistry.js';
+import { ShopRegistry } from '../data/ShopRegistry.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
@@ -51,6 +53,8 @@ export class Game {
 
     await this.assets.init();
     await ItemRegistry.init(this.data);
+    await SpellRegistry.init(this.data);
+    await ShopRegistry.init(this.data);
     
     // Initialize audio
     try {

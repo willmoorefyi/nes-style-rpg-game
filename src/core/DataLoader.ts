@@ -3,10 +3,11 @@ import type {
   CharacterClassData,
   EnemyData,
   ItemData,
+  ShopData,
   SpellData,
   MapData,
 } from '../types/index.js';
-import { validateEnemyData, validateMapData } from './schemaValidation.js';
+import { validateEnemyData, validateMapData, validateShopData } from './schemaValidation.js';
 
 export class DataLoader {
   constructor(private assets: AssetLoader) {}
@@ -44,6 +45,18 @@ export class DataLoader {
   async loadMap(path: string): Promise<MapData> {
     const data = await this.assets.load<unknown>(path);
     return validateMapData(data);
+  }
+
+  async loadShops(path: string): Promise<ShopData[]> {
+    const data = await this.assets.load<unknown[]>(path);
+    this.assertArray(data, 'ShopData');
+    return data.map((item, i) => {
+      try {
+        return validateShopData(item);
+      } catch (e) {
+        throw new Error(`ShopData[${i}]: ${(e as Error).message}`);
+      }
+    });
   }
 
   private assertArray(data: unknown, typeName: string): void {

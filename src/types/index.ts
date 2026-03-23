@@ -58,6 +58,16 @@ export interface ItemData {
   usableBy: string[];
 }
 
+export type ShopType = 'weapon' | 'armor' | 'item' | 'magic' | 'inn';
+
+export interface ShopData {
+  id: string;
+  type: ShopType;
+  name: string;
+  inventory: string[];
+  innPrice?: number;
+}
+
 export type SpellType = 'white' | 'black';
 export type SpellTargeting = 'single' | 'all' | 'self';
 
@@ -79,6 +89,7 @@ export interface MapNPC {
   y: number;
   sprite: string;
   dialog: string[];
+  shopId?: string;
 }
 
 export interface MapTransition {
