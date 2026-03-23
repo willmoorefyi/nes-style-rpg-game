@@ -43,6 +43,8 @@ export interface EnemyData {
   xpReward: number;
   goldReward: number;
   sprite: string;
+  weakness?: string;
+  resist?: string;
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';
@@ -67,6 +69,8 @@ export interface SpellData {
   effect: string;
   targeting: SpellTargeting;
   description: string;
+  power?: number;
+  element?: string;
 }
 
 export interface MapNPC {

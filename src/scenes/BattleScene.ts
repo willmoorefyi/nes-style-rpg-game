@@ -1,5 +1,5 @@
 import { Container, Text, TextStyle, Graphics } from 'pixi.js';
-import type { Scene, EnemyData } from '../types/index.js';
+import type { Scene, EnemyData, SpellData } from '../types/index.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { Character } from '../entities/Character.js';
@@ -16,9 +16,10 @@ export interface BattleSceneDeps {
 export interface BattleSceneConfig {
   party: Character[];
   enemies: EnemyData[];
+  spells?: SpellData[];
 }
 
-type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end';
+type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_level' | 'spell_select';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
@@ -31,6 +32,11 @@ export class BattleScene implements Scene {
   private messageWindow!: Window;
   private commandMenu!: Menu;
   private targetMenu!: Menu | null;
+  private spellLevelMenu: Menu | null = null;
+  private spellSelectMenu: Menu | null = null;
+  private currentSpellLevel = 0;
+  private selectedSpellId: string | null = null;
+  private spells: SpellData[] = [];
   private messageText!: TextRenderer;
   private enemySprites: Graphics[] = [];
 
@@ -42,7 +48,8 @@ export class BattleScene implements Scene {
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
     this.config = config;
-    this.battle = new BattleStateMachine(config);
+    this.spells = config.spells ?? [];
+    this.battle = new BattleStateMachine({ ...config, spells: this.spells });
   }
 
   enter(): void {
@@ -144,6 +151,14 @@ export class BattleScene implements Scene {
         if (this.targetMenu) this.targetMenu.update(this.deps.input);
         break;
 
+      case 'spell_level':
+        if (this.spellLevelMenu) this.spellLevelMenu.update(this.deps.input);
+        break;
+
+      case 'spell_select':
+        if (this.spellSelectMenu) this.spellSelectMenu.update(this.deps.input);
+        break;
+
       case 'message':
         this.messageTimer -= dt;
         if (this.messageTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
@@ -178,10 +193,7 @@ export class BattleScene implements Scene {
     if (cmd === 'fight') {
       this.showTargetMenu(actor.name);
     } else if (cmd === 'magic') {
-      this.messageText.setText('No spells available.', true);
-      this.uiState = 'message';
-      this.messageTimer = 30;
-      this.currentMessageIndex = -1;
+      this.showSpellLevelMenu(actor);
     } else if (cmd === 'item') {
       this.messageText.setText('No items available.', true);
       this.uiState = 'message';
@@ -192,6 +204,194 @@ export class BattleScene implements Scene {
       this.commandMenu.visible = false;
       this.startCommandPhase();
     }
+  }
+
+  private showSpellLevelMenu(actor: Character): void {
+    // Get levels with charges
+    const levelsWithCharges: number[] = [];
+    for (let lvl = 1; lvl <= 8; lvl++) {
+      if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) {
+        levelsWithCharges.push(lvl);
+      }
+    }
+
+    if (levelsWithCharges.length === 0) {
+      this.messageText.setText('No spells available.', true);
+      this.uiState = 'message';
+      this.messageTimer = 30;
+      this.currentMessageIndex = -1;
+      return;
+    }
+
+    const items: MenuItem[] = levelsWithCharges.map(lvl => ({
+      label: `Lv${lvl} (${actor.getSpellCharges(lvl)})`,
+      value: String(lvl),
+    }));
+
+    if (this.spellLevelMenu) {
+      this.commandWindow.removeChild(this.spellLevelMenu);
+    }
+
+    this.spellLevelMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      onSelect: (item) => {
+        this.currentSpellLevel = parseInt(item.value);
+        this.showSpellSelectMenu(actor);
+      },
+      onCancel: () => {
+        this.hideSpellLevelMenu();
+        this.uiState = 'command';
+      },
+    });
+    this.commandWindow.addChild(this.spellLevelMenu);
+    this.commandMenu.visible = false;
+    this.uiState = 'spell_level';
+  }
+
+  private hideSpellLevelMenu(): void {
+    if (this.spellLevelMenu) {
+      this.commandWindow.removeChild(this.spellLevelMenu);
+      this.spellLevelMenu = null;
+    }
+    this.commandMenu.visible = true;
+  }
+
+  private showSpellSelectMenu(actor: Character): void {
+    const spellIds = actor.getSpellsAtLevel(this.currentSpellLevel);
+    const items: MenuItem[] = spellIds.map(id => {
+      const spell = this.spells.find(s => s.id === id);
+      return { label: spell?.name ?? id, value: id };
+    });
+
+    if (this.spellSelectMenu) {
+      this.commandWindow.removeChild(this.spellSelectMenu);
+    }
+
+    this.spellSelectMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      onSelect: (item) => {
+        this.selectedSpellId = item.value;
+        const spell = this.spells.find(s => s.id === item.value);
+        if (spell?.targeting === 'all') {
+          // Submit immediately for all-target spells
+          this.submitSpellCommand(actor.name, undefined);
+        } else if (spell?.targeting === 'self') {
+          this.submitSpellCommand(actor.name, actor.name);
+        } else if (spell?.type === 'white' && spell?.effect === 'heal') {
+          // Healing targets party
+          this.showPartyTargetMenu(actor.name);
+        } else {
+          // Damage targets enemies
+          this.showSpellTargetMenu(actor.name);
+        }
+      },
+      onCancel: () => {
+        this.hideSpellSelectMenu();
+        this.uiState = 'spell_level';
+      },
+    });
+    this.commandWindow.addChild(this.spellSelectMenu);
+    if (this.spellLevelMenu) {
+      this.spellLevelMenu.visible = false;
+    }
+    this.uiState = 'spell_select';
+  }
+
+  private hideSpellSelectMenu(): void {
+    if (this.spellSelectMenu) {
+      this.commandWindow.removeChild(this.spellSelectMenu);
+      this.spellSelectMenu = null;
+    }
+    if (this.spellLevelMenu) {
+      this.spellLevelMenu.visible = true;
+    }
+  }
+
+  private showSpellTargetMenu(actorName: string): void {
+    const enemies = this.battle.livingEnemies;
+    const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
+
+    if (this.targetMenu) {
+      this.commandWindow.removeChild(this.targetMenu);
+    }
+
+    this.targetMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      onSelect: (item) => {
+        this.submitSpellCommand(actorName, item.value);
+      },
+      onCancel: () => {
+        this.hideTargetMenu();
+        this.uiState = 'spell_select';
+      },
+    });
+    this.commandWindow.addChild(this.targetMenu);
+    if (this.spellSelectMenu) {
+      this.spellSelectMenu.visible = false;
+    }
+    this.uiState = 'target';
+  }
+
+  private showPartyTargetMenu(actorName: string): void {
+    const items: MenuItem[] = this.config.party.map(c => ({ label: c.name, value: c.name }));
+
+    if (this.targetMenu) {
+      this.commandWindow.removeChild(this.targetMenu);
+    }
+
+    this.targetMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      onSelect: (item) => {
+        this.submitSpellCommand(actorName, item.value);
+      },
+      onCancel: () => {
+        this.hideTargetMenu();
+        this.uiState = 'spell_select';
+      },
+    });
+    this.commandWindow.addChild(this.targetMenu);
+    if (this.spellSelectMenu) {
+      this.spellSelectMenu.visible = false;
+    }
+    this.uiState = 'target';
+  }
+
+  private submitSpellCommand(actorName: string, targetId: string | undefined): void {
+    if (this.selectedSpellId) {
+      this.battle.submitCommand({
+        type: 'magic',
+        actorId: actorName,
+        targetId,
+        spellId: this.selectedSpellId,
+      });
+    }
+    this.cleanupSpellMenus();
+    this.startCommandPhase();
+  }
+
+  private cleanupSpellMenus(): void {
+    if (this.targetMenu) {
+      this.commandWindow.removeChild(this.targetMenu);
+      this.targetMenu = null;
+    }
+    if (this.spellSelectMenu) {
+      this.commandWindow.removeChild(this.spellSelectMenu);
+      this.spellSelectMenu = null;
+    }
+    if (this.spellLevelMenu) {
+      this.commandWindow.removeChild(this.spellLevelMenu);
+      this.spellLevelMenu = null;
+    }
+    this.selectedSpellId = null;
+    this.commandMenu.visible = true;
   }
 
   private showTargetMenu(actorName: string): void {

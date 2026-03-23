@@ -32,3 +32,40 @@ export function calculateDamage(
 
   return { damage, hit: true, critical };
 }
+
+import { getElementalMultiplier, type ElementType } from './Elements.js';
+
+export interface MagicCaster {
+  intelligence: number;
+}
+
+export interface MagicTarget {
+  intelligence: number;
+  weakness?: string;
+  resist?: string;
+}
+
+export interface SpellInfo {
+  power: number;
+  element?: string;
+  isHealing?: boolean;
+}
+
+export function calculateMagicDamage(
+  caster: MagicCaster,
+  target: MagicTarget,
+  spell: SpellInfo,
+  rng: () => number = Math.random
+): number {
+  const variance = 0.875 + rng() * 0.25;
+  if (spell.isHealing) {
+    return Math.floor(spell.power * caster.intelligence * variance / 4);
+  }
+  const elementMult = getElementalMultiplier(
+    (spell.element || 'none') as ElementType,
+    target.weakness as ElementType | undefined,
+    target.resist as ElementType | undefined
+  );
+  const intRatio = caster.intelligence / Math.max(1, target.intelligence);
+  return Math.max(1, Math.floor(spell.power * intRatio * elementMult * variance));
+}

@@ -1,6 +1,7 @@
 import type { Character } from '../entities/Character.js';
-import type { EnemyData } from '../types/index.js';
-import { calculateDamage } from './DamageFormula.js';
+import type { EnemyData, SpellData } from '../types/index.js';
+import { calculateDamage, calculateMagicDamage } from './DamageFormula.js';
+import { StatusTracker } from './StatusEffects.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
 import { selectTarget } from './EnemyAI.js';
 import { retargetIfDead, calculateRunChance, type BattleCommand } from './BattleCommands.js';
@@ -11,11 +12,13 @@ export interface EnemyInstance {
   id: string;
   data: EnemyData;
   currentHp: number;
+  status: StatusTracker;
 }
 
 export interface BattleConfig {
   party: Character[];
   enemies: EnemyData[];
+  spells?: SpellData[];
 }
 
 export interface BattleResult {
@@ -37,6 +40,7 @@ export class BattleStateMachine {
   private messages: BattleMessage[] = [];
   private result: BattleResult | null = null;
   private rng: () => number;
+  private spells: SpellData[];
 
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
@@ -44,7 +48,9 @@ export class BattleStateMachine {
       id: `enemy_${i}`,
       data: e,
       currentHp: e.stats.hp,
+      status: new StatusTracker(),
     }));
+    this.spells = config.spells ?? [];
     this.rng = rng;
   }
 
@@ -129,8 +135,13 @@ export class BattleStateMachine {
       return;
     }
 
+    if (cmd.type === 'magic' && cmd.spellId) {
+      this.executeMagicCommand(cmd, isEnemy);
+      return;
+    }
+
     if (cmd.type === 'magic') {
-      this.messages.push({ text: 'No spells available.' });
+      this.messages.push({ text: 'No spell selected.' });
       return;
     }
 
@@ -211,6 +222,122 @@ export class BattleStateMachine {
   private avgAgility(values: number[]): number {
     if (values.length === 0) return 0;
     return values.reduce((a, b) => a + b, 0) / values.length;
+  }
+
+  private executeMagicCommand(cmd: BattleCommand, isEnemy: boolean): void {
+    const spell = this.spells.find(s => s.id === cmd.spellId);
+    if (!spell) {
+      this.messages.push({ text: 'Unknown spell!' });
+      return;
+    }
+
+    // Get caster
+    const caster = isEnemy
+      ? this.enemies.find(e => e.id === cmd.actorId)
+      : this.party.find(c => c.name === cmd.actorId);
+    if (!caster) return;
+
+    // For party members, check charges and silence
+    if (!isEnemy) {
+      const char = caster as Character;
+      if (!char.hasCharges(spell.level)) {
+        this.messages.push({ text: `${char.name} has no charges!` });
+        return;
+      }
+      // Note: silence check would go here if we add StatusTracker to Character
+      char.useCharge(spell.level);
+    }
+
+    const casterName = isEnemy ? (caster as EnemyInstance).data.name : (caster as Character).name;
+    const casterInt = isEnemy
+      ? (caster as EnemyInstance).data.stats.intelligence
+      : (caster as Character).stats.intelligence;
+
+    this.messages.push({ text: `${casterName} casts ${spell.name}!` });
+
+    // Handle different spell effects
+    if (spell.effect === 'heal') {
+      this.executeHealSpell(cmd, spell, casterInt, isEnemy);
+    } else if (spell.effect.startsWith('damage') || spell.effect.startsWith('status_')) {
+      this.executeDamageSpell(cmd, spell, casterInt, isEnemy);
+    }
+  }
+
+  private executeHealSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
+    const power = spell.power ?? 30;
+    const targets = spell.targeting === 'all'
+      ? (isEnemy ? this.livingEnemies : this.livingParty)
+      : cmd.targetId
+        ? (isEnemy ? this.enemies.filter(e => e.id === cmd.targetId) : this.party.filter(c => c.name === cmd.targetId))
+        : [];
+
+    for (const target of targets) {
+      const heal = calculateMagicDamage(
+        { intelligence: casterInt },
+        { intelligence: 1 },
+        { power, isHealing: true },
+        this.rng
+      );
+      if ('currentHp' in target && 'data' in target) {
+        // EnemyInstance
+        const enemy = target as EnemyInstance;
+        enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
+        this.messages.push({ text: `${enemy.data.name} recovers ${heal} HP!` });
+      } else {
+        // Character
+        const char = target as Character;
+        char.currentHp = char.currentHp + heal;
+        this.messages.push({ text: `${char.name} recovers ${heal} HP!` });
+      }
+    }
+  }
+
+  private executeDamageSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
+    const power = spell.power ?? 20;
+    const targets = spell.targeting === 'all'
+      ? (isEnemy ? this.livingParty : this.livingEnemies)
+      : cmd.targetId
+        ? (isEnemy ? this.party.filter(c => c.name === cmd.targetId) : this.enemies.filter(e => e.id === cmd.targetId))
+        : [];
+
+    for (const target of targets) {
+      if ('data' in target) {
+        // EnemyInstance
+        const enemy = target as EnemyInstance;
+        const damage = calculateMagicDamage(
+          { intelligence: casterInt },
+          { intelligence: enemy.data.stats.intelligence, weakness: enemy.data.weakness, resist: enemy.data.resist },
+          { power, element: spell.element },
+          this.rng
+        );
+
+        if (spell.effect.startsWith('status_')) {
+          const status = spell.effect.replace('status_', '') as 'sleep' | 'poison' | 'stun';
+          enemy.status.apply(status);
+          this.messages.push({ text: `${enemy.data.name} is affected by ${status}!` });
+        } else {
+          enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+          this.messages.push({ text: `${enemy.data.name} takes ${damage} damage!` });
+          if (enemy.currentHp <= 0) {
+            this.messages.push({ text: `${enemy.data.name} defeated!` });
+          }
+        }
+      } else {
+        // Character
+        const char = target as Character;
+        const damage = calculateMagicDamage(
+          { intelligence: casterInt },
+          { intelligence: char.stats.intelligence },
+          { power, element: spell.element },
+          this.rng
+        );
+        char.currentHp = char.currentHp - damage;
+        this.messages.push({ text: `${char.name} takes ${damage} damage!` });
+        if (char.currentHp <= 0) {
+          this.messages.push({ text: `${char.name} fell!` });
+        }
+      }
+    }
   }
 
   resolveRound(): void {

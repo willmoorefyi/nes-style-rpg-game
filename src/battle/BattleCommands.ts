@@ -4,6 +4,11 @@ export interface BattleCommand {
   type: CommandType;
   actorId: string;
   targetId?: string;
+  spellId?: string;
+}
+
+export function createSpellCommand(actorId: string, targetId: string | undefined, spellId: string): BattleCommand {
+  return { type: 'magic', actorId, targetId, spellId };
 }
 
 export function retargetIfDead(

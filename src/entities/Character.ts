@@ -18,6 +18,7 @@ export class Character {
   private _currentHp: number;
   private equipment: Map<EquipmentSlot, ItemData | null> = new Map();
   private spellCharges: number[] = [0, 0, 0, 0, 0, 0, 0, 0];
+  private learnedSpells: Map<string, number> = new Map();
 
   constructor(data: CharacterData) {
     this.name = data.name;
@@ -109,6 +110,42 @@ export class Character {
 
   setSpellCharges(level: number, charges: number): void {
     if (level >= 1 && level <= 8) this.spellCharges[level - 1] = charges;
+  }
+
+  learnSpell(spellId: string, level: number): void {
+    this.learnedSpells.set(spellId, level);
+  }
+
+  getLearnedSpells(): Array<{ spellId: string; level: number }> {
+    return Array.from(this.learnedSpells.entries()).map(([spellId, level]) => ({ spellId, level }));
+  }
+
+  getSpellsAtLevel(level: number): string[] {
+    return Array.from(this.learnedSpells.entries())
+      .filter(([, l]) => l === level)
+      .map(([id]) => id);
+  }
+
+  hasCharges(level: number): boolean {
+    return this.getSpellCharges(level) > 0;
+  }
+
+  useCharge(level: number): boolean {
+    if (!this.hasCharges(level)) return false;
+    this.spellCharges[level - 1]--;
+    return true;
+  }
+
+  restoreAllCharges(): void {
+    for (let i = 0; i < 8; i++) {
+      const lvl = i + 1;
+      this.spellCharges[i] = this.getMaxCharges(lvl);
+    }
+  }
+
+  getMaxCharges(level: number): number {
+    // Simple formula: higher character level = more charges, lower spell level = more charges
+    return Math.max(0, 4 - level + Math.floor(this._level / 5));
   }
 
   toJSON(): object {
