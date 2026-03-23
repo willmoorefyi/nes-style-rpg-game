@@ -1027,9 +1027,9 @@ export interface QuantitySelectorConfig {
 | 19 | Private member access in tests | TEST | WP-09 | ✅ Done |
 | 20 | Loose mock typing in tests | TEST | WP-09 | ✅ Done |
 | 21 | No integration tests for battle flow | TEST | WP-09 | ✅ Done |
-| 22 | No movement mode abstraction | MISSING | WP-12 | Planned (interface only) |
-| 23 | No AI behavior system | MISSING | WP-12 | Planned (interface only) |
-| 24 | No grid/quantity selector | MISSING | WP-04 + WP-12 | Planned |
+| 22 | No movement mode abstraction | MISSING | WP-12 | ✅ Done (interface only) |
+| 23 | No AI behavior system | MISSING | WP-12 | ✅ Done (interface only) |
+| 24 | No grid/quantity selector | MISSING | WP-04 + WP-12 | ✅ Done |
 
 **Coverage: 24/24 issues addressed. Zero skipped.**
 
