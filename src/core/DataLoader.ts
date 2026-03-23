@@ -6,6 +6,7 @@ import type {
   SpellData,
   MapData,
 } from '../types/index.js';
+import { validateEnemyData, validateMapData } from './schemaValidation.js';
 
 export class DataLoader {
   constructor(private assets: AssetLoader) {}
@@ -17,9 +18,15 @@ export class DataLoader {
   }
 
   async loadEnemies(path: string): Promise<EnemyData[]> {
-    const data = await this.assets.load<EnemyData[]>(path);
+    const data = await this.assets.load<unknown[]>(path);
     this.assertArray(data, 'EnemyData');
-    return data;
+    return data.map((item, i) => {
+      try {
+        return validateEnemyData(item);
+      } catch (e) {
+        throw new Error(`EnemyData[${i}]: ${(e as Error).message}`);
+      }
+    });
   }
 
   async loadItems(path: string): Promise<ItemData[]> {
@@ -35,11 +42,8 @@ export class DataLoader {
   }
 
   async loadMap(path: string): Promise<MapData> {
-    const data = await this.assets.load<MapData>(path);
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid MapData: expected object');
-    }
-    return data;
+    const data = await this.assets.load<unknown>(path);
+    return validateMapData(data);
   }
 
   private assertArray(data: unknown, typeName: string): void {

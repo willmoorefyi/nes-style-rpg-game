@@ -22,11 +22,24 @@ describe('DataLoader', () => {
   });
 
   it('should load enemy data', async () => {
-    const enemyData = [{ id: 'goblin', name: 'Goblin' }];
+    const enemyData = [{
+      id: 'goblin',
+      name: 'Goblin',
+      stats: { hp: 10, strength: 5, agility: 3, intelligence: 1, vitality: 4, luck: 2, attack: 8, defense: 2, magicDefense: 1 },
+      xpReward: 10,
+      goldReward: 5,
+      sprite: 'goblin.png',
+    }];
     const loader = new DataLoader(mockAssetLoader(enemyData));
     
     const result = await loader.loadEnemies('enemies.json');
     expect(result).toEqual(enemyData);
+  });
+
+  it('should throw on invalid enemy data', async () => {
+    const loader = new DataLoader(mockAssetLoader([{ id: 'bad' }]));
+    
+    await expect(loader.loadEnemies('enemies.json')).rejects.toThrow('EnemyData[0]');
   });
 
   it('should load item data', async () => {
@@ -46,7 +59,16 @@ describe('DataLoader', () => {
   });
 
   it('should load map data', async () => {
-    const mapData = { id: 'town', width: 32, height: 32 };
+    const mapData = {
+      id: 'town',
+      width: 32,
+      height: 32,
+      layers: [[1, 2, 3]],
+      tilesets: ['tiles.png'],
+      collision: [0, 0, 1],
+      npcs: [],
+      transitions: [],
+    };
     const loader = new DataLoader(mockAssetLoader(mapData));
     
     const result = await loader.loadMap('map.json');
@@ -59,6 +81,7 @@ describe('DataLoader', () => {
     await expect(loader.loadMap('map.json')).rejects.toThrow('expected object');
   });
 });
+
 describe('DataLoader - test-town.json format', () => {
   const mockAssetLoader = (data: unknown): AssetLoader => ({
     load: vi.fn().mockResolvedValue(data),
