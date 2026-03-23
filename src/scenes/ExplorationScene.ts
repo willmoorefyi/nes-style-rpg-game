@@ -30,7 +30,8 @@ export class ExplorationScene implements Scene {
   private mapLoader: MapLoader;
   private dialogManager: DialogManager;
   private battleTrigger: BattleTrigger;
-  
+  private paused = false;
+
   constructor(game: Game) {
     this.game = game;
     this.camera = new Camera(this.worldContainer);
@@ -39,25 +40,19 @@ export class ExplorationScene implements Scene {
     this.encounterSystem = new EncounterSystem(game.events);
     this.errorDisplay = new ErrorDisplay();
     this.placeholders = new PlaceholderTextures({ app: game.app });
-    
     const dialogBox = new DialogBox({ onComplete: () => this.dialogManager.advance() });
     dialogBox.visible = false;
     this.dialogManager = new DialogManager(dialogBox);
-    
     this.mapLoader = new MapLoader(game.data, this.placeholders);
     this.battleTrigger = new BattleTrigger(game);
     this.battleTrigger.setOnBattleTriggered(() => {
-      if (this.player) {
-        this.savedPosition = { x: this.player.gridX, y: this.player.gridY };
-      }
+      if (this.player) this.savedPosition = { x: this.player.gridX, y: this.player.gridY };
       this.encounterSystem.stop();
     });
-
     this.container.addChild(this.worldContainer);
     this.container.addChild(this.uiContainer);
     this.uiContainer.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
-
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies));
     this.game.events.on('battleEnd', (data) => this.battleTrigger.onBattleEnd(data));
   }
@@ -77,74 +72,53 @@ export class ExplorationScene implements Scene {
     this.worldContainer.removeChildren();
     this.errorDisplay.hide();
     this.currentMapId = mapId;
-
     let result;
     try {
       result = await this.mapLoader.loadMap(mapId);
     } catch (e) {
-      const msg = `Failed to load map: ${mapId}`;
-      console.error(msg, e);
-      this.errorDisplay.show(msg);
+      console.error(`Failed to load map: ${mapId}`, e);
+      this.errorDisplay.show(`Failed to load map: ${mapId}`);
       return;
     }
-
     const { mapData, tilemap, collisionMap, npcs } = result;
-    
-    if (mapData.encounterRate) {
-      this.encounterSystem.setRate(mapData.encounterRate);
-    }
-    if (mapData.encounters) {
-      this.encounterSystem.setEncounters(mapData.encounters);
-    }
-
+    if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
+    if (mapData.encounters) this.encounterSystem.setEncounters(mapData.encounters);
     this.worldContainer.addChild(tilemap.container);
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
-
     const spawnX = mapData.width > 1 ? 1 : 0;
     const spawnY = mapData.height > 1 ? 1 : 0;
     this.player = new PlayerController({
-      startX: spawnX,
-      startY: spawnY,
+      startX: spawnX, startY: spawnY,
       texture: this.placeholders.getPlayerTexture(),
-      collisionMap,
-      input: this.game.input,
-      events: this.game.events,
+      collisionMap, input: this.game.input, events: this.game.events,
     });
     this.worldContainer.addChild(this.player.animation.sprite);
     this.camera.follow(this.player);
-
-    for (const npc of npcs) {
-      this.worldContainer.addChild(npc.sprite);
-    }
+    for (const npc of npcs) this.worldContainer.addChild(npc.sprite);
     this.player.setNPCPositions(npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     this.npcInteraction.setNPCs(npcs);
     this.npcInteraction.setPlayer(this.player);
     this.npcInteraction.setInput(this.game.input);
-
     this.mapTransition.setTransitions(mapData.transitions);
-
     this.camera.update();
     tilemap.render();
   }
 
   update(dt: number): void {
+    if (this.paused) return;
     if (this.dialogManager.isActive) {
       this.dialogManager.update(dt, this.game.input);
       return;
     }
-
     if (!this.player) return;
-
     const wasMoving = this.player.isMoving;
     this.player.update(dt);
-
     const npc = this.npcInteraction.checkInteraction();
     if (npc && npc.dialog.length > 0) {
       this.dialogManager.start(npc.dialog);
       return;
     }
-
     if (wasMoving && !this.player.isMoving) {
       const transition = this.mapTransition.getTransitionAt(this.player.gridX, this.player.gridY);
       if (transition) {
@@ -152,7 +126,6 @@ export class ExplorationScene implements Scene {
         return;
       }
     }
-
     this.camera.update();
   }
 
@@ -167,6 +140,16 @@ export class ExplorationScene implements Scene {
   exit(): void {
     this.encounterSystem.stop();
     this.worldContainer.removeChildren();
+  }
+
+  onPause(): void {
+    this.paused = true;
+    this.encounterSystem.stop();
+  }
+
+  onResume(): void {
+    this.paused = false;
+    this.encounterSystem.start();
   }
 
   setPlayerPosition(x: number, y: number): void {
