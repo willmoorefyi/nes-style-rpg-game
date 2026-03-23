@@ -1015,8 +1015,8 @@ export interface QuantitySelectorConfig {
 | 7 | Missing data files (classes/items/spells) | HIGH | WP-07 | ✅ Done |
 | 8 | No schema validation in DataLoader | MEDIUM | WP-06 | ✅ Done |
 | 9 | wrapText() duplication | MEDIUM | WP-05 | ✅ Done |
-| 10 | BattleScene/BattleCommands untested | MEDIUM | WP-09 | Planned |
-| 11 | InputManager tests access private members | MEDIUM | WP-09 | Planned |
+| 10 | BattleScene/BattleCommands untested | MEDIUM | WP-09 | ✅ Done |
+| 11 | InputManager tests access private members | MEDIUM | WP-09 | ✅ Done |
 | 12 | No bitmap font | LOW | WP-10 | Deferred (Phase 18 TODO) |
 | 13 | No dirty flag on tilemap rendering | LOW | WP-10 | Planned |
 | 14 | BootScene is dead code | LOW | WP-10 | Planned |
@@ -1024,9 +1024,9 @@ export interface QuantitySelectorConfig {
 | 16 | BattleScene coupled to Game | ARCH DEBT | WP-11 | Planned |
 | 17 | No dependency injection | ARCH DEBT | WP-11 | Planned |
 | 18 | EncounterSystem uses Math.random() | ARCH DEBT | WP-11 | Planned |
-| 19 | Private member access in tests | TEST | WP-09 | Planned |
-| 20 | Loose mock typing in tests | TEST | WP-09 | Planned |
-| 21 | No integration tests for battle flow | TEST | WP-09 | Planned |
+| 19 | Private member access in tests | TEST | WP-09 | ✅ Done |
+| 20 | Loose mock typing in tests | TEST | WP-09 | ✅ Done |
+| 21 | No integration tests for battle flow | TEST | WP-09 | ✅ Done |
 | 22 | No movement mode abstraction | MISSING | WP-12 | Planned (interface only) |
 | 23 | No AI behavior system | MISSING | WP-12 | Planned (interface only) |
 | 24 | No grid/quantity selector | MISSING | WP-04 + WP-12 | Planned |
