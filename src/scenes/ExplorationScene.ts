@@ -208,7 +208,10 @@ export class ExplorationScene implements Scene {
           const enemies = await this.game.data.loadEnemies('assets/data/enemies.json');
           for (const e of enemies) this.enemyDataCache.set(e.id, e);
           data = this.enemyDataCache.get(id);
-        } catch { /* ignore */ }
+        } catch (e) {
+          console.error(`Failed to load enemy data for '${id}':`, e);
+          this.errorDisplay.show(`Failed to load enemy data`);
+        }
       }
       if (data) result.push(data);
     }
