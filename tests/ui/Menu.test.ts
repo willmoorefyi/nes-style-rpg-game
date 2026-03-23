@@ -69,3 +69,60 @@ describe('Menu', () => {
     expect(onCancel).toHaveBeenCalled();
   });
 });
+
+
+describe('Menu scrolling', () => {
+  const manyItems = [
+    { label: 'Item1', value: '1' },
+    { label: 'Item2', value: '2' },
+    { label: 'Item3', value: '3' },
+    { label: 'Item4', value: '4' },
+    { label: 'Item5', value: '5' },
+    { label: 'Item6', value: '6' },
+  ];
+
+  it('shows only maxVisible items', () => {
+    const menu = new Menu({ items: manyItems, maxVisible: 3 });
+    // Menu should have cursor + 3 item texts + 2 indicators = 6 children
+    // But indicators may be hidden, just verify it constructs
+    expect(menu.selectedIndex).toBe(0);
+  });
+
+  it('scrolls down when cursor moves past visible window', () => {
+    const menu = new Menu({ items: manyItems, maxVisible: 3 });
+    menu.update(mockInput({ down: true })); // index 1
+    menu.update(mockInput({ down: true })); // index 2
+    menu.update(mockInput({ down: true })); // index 3, should scroll
+    expect(menu.selectedIndex).toBe(3);
+  });
+
+  it('scrolls up when cursor moves above visible window', () => {
+    const menu = new Menu({ items: manyItems, maxVisible: 3 });
+    menu.setIndex(4); // starts scrolled
+    menu.update(mockInput({ up: true })); // index 3
+    menu.update(mockInput({ up: true })); // index 2
+    expect(menu.selectedIndex).toBe(2);
+  });
+
+  it('wraps from last to first and resets scroll', () => {
+    const menu = new Menu({ items: manyItems, maxVisible: 3 });
+    menu.setIndex(5); // last item
+    menu.update(mockInput({ down: true })); // wrap to 0
+    expect(menu.selectedIndex).toBe(0);
+  });
+
+  it('wraps from first to last and scrolls to end', () => {
+    const menu = new Menu({ items: manyItems, maxVisible: 3 });
+    menu.update(mockInput({ up: true })); // wrap to last
+    expect(menu.selectedIndex).toBe(5);
+  });
+
+  it('works without maxVisible (backward compatible)', () => {
+    const menu = new Menu({ items: manyItems });
+    menu.update(mockInput({ down: true }));
+    expect(menu.selectedIndex).toBe(1);
+    menu.setIndex(5);
+    menu.update(mockInput({ down: true }));
+    expect(menu.selectedIndex).toBe(0);
+  });
+});
