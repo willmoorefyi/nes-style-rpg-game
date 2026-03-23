@@ -36,6 +36,8 @@ export interface CharacterClassData {
   spellLevels: { white: number; black: number };
 }
 
+import type { ElementalProfile } from '../battle/Elements.js';
+
 export interface EnemyData {
   id: string;
   name: string;
@@ -45,6 +47,7 @@ export interface EnemyData {
   sprite: string;
   weakness?: string;
   resist?: string;
+  elementalProfile?: ElementalProfile;
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';

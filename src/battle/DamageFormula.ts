@@ -63,8 +63,7 @@ export function calculateMagicDamage(
   }
   const elementMult = getElementalMultiplier(
     (spell.element || 'none') as ElementType,
-    target.weakness as ElementType | undefined,
-    target.resist as ElementType | undefined
+    { weakness: target.weakness as ElementType | undefined, resist: target.resist as ElementType | undefined }
   );
   const intRatio = caster.intelligence / Math.max(1, target.intelligence);
   return Math.max(1, Math.floor(spell.power * intRatio * elementMult * variance));
