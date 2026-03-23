@@ -102,3 +102,56 @@ export function validateMapData(data: unknown): MapData {
   
   return data as MapData;
 }
+
+
+export function validateCharacterClassData(data: unknown): import('../types/index.js').CharacterClassData {
+  assertObject('CharacterClassData', data);
+  assertString('CharacterClassData.id', data.id);
+  assertString('CharacterClassData.name', data.name);
+  validateStatBlock('CharacterClassData.baseStats', data.baseStats);
+  validateStatBlock('CharacterClassData.statGrowth', data.statGrowth);
+  assertArray('CharacterClassData.usableEquipment', data.usableEquipment);
+  (data.usableEquipment as unknown[]).forEach((e, i) => assertString(`CharacterClassData.usableEquipment[${i}]`, e));
+  assertObject('CharacterClassData.spellLevels', data.spellLevels);
+  assertNumber('CharacterClassData.spellLevels.white', (data.spellLevels as Record<string, unknown>).white);
+  assertNumber('CharacterClassData.spellLevels.black', (data.spellLevels as Record<string, unknown>).black);
+  return data as import('../types/index.js').CharacterClassData;
+}
+
+const VALID_ITEM_TYPES = ['weapon', 'armor', 'consumable', 'key'];
+
+export function validateItemData(data: unknown): import('../types/index.js').ItemData {
+  assertObject('ItemData', data);
+  assertString('ItemData.id', data.id);
+  assertString('ItemData.name', data.name);
+  assertString('ItemData.type', data.type);
+  if (!VALID_ITEM_TYPES.includes(data.type as string)) {
+    throw new ValidationError(`ItemData.type: expected one of ${VALID_ITEM_TYPES.join(', ')}, got ${data.type}`);
+  }
+  assertObject('ItemData.stats', data.stats);
+  assertNumber('ItemData.price', data.price);
+  assertArray('ItemData.usableBy', data.usableBy);
+  (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
+  return data as import('../types/index.js').ItemData;
+}
+
+const VALID_SPELL_TYPES = ['white', 'black'];
+const VALID_TARGETING = ['single', 'all', 'self'];
+
+export function validateSpellData(data: unknown): import('../types/index.js').SpellData {
+  assertObject('SpellData', data);
+  assertString('SpellData.id', data.id);
+  assertString('SpellData.name', data.name);
+  assertNumber('SpellData.level', data.level);
+  assertString('SpellData.type', data.type);
+  if (!VALID_SPELL_TYPES.includes(data.type as string)) {
+    throw new ValidationError(`SpellData.type: expected one of ${VALID_SPELL_TYPES.join(', ')}, got ${data.type}`);
+  }
+  assertString('SpellData.effect', data.effect);
+  assertString('SpellData.targeting', data.targeting);
+  if (!VALID_TARGETING.includes(data.targeting as string)) {
+    throw new ValidationError(`SpellData.targeting: expected one of ${VALID_TARGETING.join(', ')}, got ${data.targeting}`);
+  }
+  assertString('SpellData.description', data.description);
+  return data as import('../types/index.js').SpellData;
+}

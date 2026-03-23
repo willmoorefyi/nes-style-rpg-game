@@ -1,0 +1,12 @@
+[
+  { "id": "cure", "name": "CURE", "level": 1, "type": "white", "effect": "heal", "targeting": "single", "description": "Restore 30 HP to one ally" },
+  { "id": "harm", "name": "HARM", "level": 1, "type": "white", "effect": "damage_undead", "targeting": "all", "description": "Deal damage to all undead enemies" },
+  { "id": "fog", "name": "FOG", "level": 1, "type": "white", "effect": "buff_defense", "targeting": "single", "description": "Raise defense of one ally" },
+  { "id": "cure2", "name": "CUR2", "level": 3, "type": "white", "effect": "heal", "targeting": "single", "description": "Restore 60 HP to one ally" },
+  { "id": "life", "name": "LIFE", "level": 5, "type": "white", "effect": "revive", "targeting": "single", "description": "Revive one fallen ally with 1 HP" },
+  { "id": "fire", "name": "FIRE", "level": 1, "type": "black", "effect": "damage_fire", "targeting": "single", "description": "Deal fire damage to one enemy" },
+  { "id": "lit", "name": "LIT", "level": 1, "type": "black", "effect": "damage_lightning", "targeting": "single", "description": "Deal lightning damage to one enemy" },
+  { "id": "slep", "name": "SLEP", "level": 1, "type": "black", "effect": "status_sleep", "targeting": "all", "description": "Put all enemies to sleep" },
+  { "id": "ice", "name": "ICE", "level": 2, "type": "black", "effect": "damage_ice", "targeting": "single", "description": "Deal ice damage to one enemy" },
+  { "id": "fir2", "name": "FIR2", "level": 3, "type": "black", "effect": "damage_fire", "targeting": "all", "description": "Deal fire damage to all enemies" }
+]
