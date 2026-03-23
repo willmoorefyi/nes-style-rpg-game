@@ -52,14 +52,7 @@ export class LoadScene implements Scene {
   private onSelect(slotId: number): void {
     const data = SaveManager.load(slotId);
     if (!data) return;
-    // Restore game state - replace party/inventory/flags
-    Object.assign(this.game, {
-      party: data.party,
-      inventory: data.inventory,
-      gameFlags: data.flags,
-      currentMapId: data.currentMap,
-      playTime: data.playTime,
-    });
+    this.game.restoreState(data);
     this.game.scenes.switchTo('exploration');
   }
 }

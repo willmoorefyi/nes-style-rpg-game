@@ -104,7 +104,7 @@ export class SaveScene implements Scene {
       this.game.inventory,
       this.game.gameFlags,
       this.game.currentMapId,
-      { x: 0, y: 0 },
+      this.game.playerPosition,
       this.game.playTime
     );
     this.game.scenes.pop();

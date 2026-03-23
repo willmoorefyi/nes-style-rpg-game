@@ -142,6 +142,7 @@ export interface CharacterSaveData {
 }
 
 export interface SaveData {
+  version: number;
   party: { members: CharacterSaveData[]; gold: number };
   inventory: Array<{ itemId: string; quantity: number }>;
   flags: Record<string, boolean | number | string>;

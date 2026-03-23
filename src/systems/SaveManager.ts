@@ -5,6 +5,7 @@ import { GameFlags } from '../core/GameFlags.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
+const SAVE_VERSION = 1;
 
 export interface SlotSummary {
   level: number;
@@ -26,6 +27,7 @@ export class SaveManager {
     if (slotId < 0 || slotId >= MAX_SLOTS) return false;
     
     const data: SaveData = {
+      version: SAVE_VERSION,
       party: party.toJSON() as SaveData['party'],
       inventory: inventory.toJSON(),
       flags: flags.toJSON(),
@@ -59,6 +61,9 @@ export class SaveManager {
       if (!raw) return null;
       
       const data: SaveData = JSON.parse(raw);
+      if (data.version !== SAVE_VERSION) {
+        console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${data.version}`);
+      }
       return {
         party: PartyManager.fromJSON(data.party),
         inventory: Inventory.fromJSON(data.inventory),

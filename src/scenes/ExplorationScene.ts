@@ -64,6 +64,10 @@ export class ExplorationScene implements Scene {
       await this.loadMap(this.currentMapId);
       this.player?.setPosition(this.savedPosition.x, this.savedPosition.y);
       this.savedPosition = null;
+    } else if (this.game.currentMapId) {
+      // Restore from save
+      await this.loadMap(this.game.currentMapId);
+      this.player?.setPosition(this.game.playerPosition.x, this.game.playerPosition.y);
     } else {
       await this.loadMap('test-town');
     }
@@ -73,6 +77,7 @@ export class ExplorationScene implements Scene {
     this.worldContainer.removeChildren();
     this.errorDisplay.hide();
     this.currentMapId = mapId;
+    this.game.currentMapId = mapId;
     let result;
     try {
       result = await this.mapLoader.loadMap(mapId);
@@ -125,6 +130,8 @@ export class ExplorationScene implements Scene {
     if (!this.player) return;
     const wasMoving = this.player.isMoving;
     this.player.update(dt);
+    // Track player position in game for save/load
+    this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
     const npc = this.npcInteraction.checkInteraction();
     if (npc && npc.dialog.length > 0) {
       this.dialogManager.start(npc.dialog);

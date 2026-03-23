@@ -28,6 +28,7 @@ export class Game {
   readonly gameFlags: GameFlags;
   playTime = 0;
   currentMapId = '';
+  playerPosition = { x: 0, y: 0 };
 
   constructor() {
     this.app = new Application();
@@ -93,6 +94,22 @@ export class Game {
     const canvas = this.app.canvas;
     canvas.style.width = `${WIDTH * scale}px`;
     canvas.style.height = `${HEIGHT * scale}px`;
+  }
+
+  restoreState(data: {
+    party: PartyManager;
+    inventory: Inventory;
+    flags: GameFlags;
+    currentMap: string;
+    playerPosition: { x: number; y: number };
+    playTime: number;
+  }): void {
+    (this as { party: PartyManager }).party = data.party;
+    (this as { inventory: Inventory }).inventory = data.inventory;
+    (this as { gameFlags: GameFlags }).gameFlags = data.flags;
+    this.currentMapId = data.currentMap;
+    this.playerPosition = data.playerPosition;
+    this.playTime = data.playTime;
   }
 
   get canvas(): HTMLCanvasElement {
