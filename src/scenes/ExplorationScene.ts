@@ -26,6 +26,7 @@ export class ExplorationScene implements Scene {
   private errorDisplay: ErrorDisplay;
   private placeholders: PlaceholderTextures;
   private currentMapId: string = '';
+  private currentMapData: import('../types/index.js').MapData | null = null;
   private savedPosition: { x: number; y: number } | null = null;
   private mapLoader: MapLoader;
   private dialogManager: DialogManager;
@@ -81,6 +82,7 @@ export class ExplorationScene implements Scene {
       return;
     }
     const { mapData, tilemap, collisionMap, npcs } = result;
+    this.currentMapData = mapData;
     
     // Play map music
     const musicTrack = mapData.music ?? 'overworld';
@@ -163,5 +165,13 @@ export class ExplorationScene implements Scene {
 
   setPlayerPosition(x: number, y: number): void {
     this.player?.setPosition(x, y);
+  }
+
+  getMapId(): string {
+    return this.currentMapId;
+  }
+
+  canSave(): boolean {
+    return this.currentMapData?.canSave ?? false;
   }
 }

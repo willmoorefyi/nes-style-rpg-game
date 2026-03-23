@@ -111,5 +111,38 @@ export interface MapData {
   encounterRate?: EncounterRate;
   encounters?: EncounterEntry[];
   music?: string;
+  canSave?: boolean;
 }
 export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';
+
+// Save/Load types
+export interface CharacterSaveData {
+  name: string;
+  classId: string;
+  level: number;
+  xp: number;
+  currentHp: number;
+  equipment: Record<EquipmentSlot, string | null>;
+  spellCharges: number[];
+  learnedSpells: Array<{ spellId: string; level: number }>;
+}
+
+export interface SaveData {
+  party: { members: CharacterSaveData[]; gold: number };
+  inventory: Array<{ itemId: string; quantity: number }>;
+  flags: Record<string, boolean | number | string>;
+  currentMap: string;
+  playerPosition: { x: number; y: number };
+  playTime: number;
+  saveDate: string;
+  slotId: number;
+}
+
+export interface SaveSlotSummary {
+  slotId: number;
+  exists: boolean;
+  partyLeader?: string;
+  level?: number;
+  playTime?: number;
+  saveDate?: string;
+}

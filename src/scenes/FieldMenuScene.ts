@@ -3,6 +3,7 @@ import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
+import type { ExplorationScene } from './ExplorationScene.js';
 
 export class FieldMenuScene implements Scene {
   readonly container = new Container();
@@ -13,6 +14,8 @@ export class FieldMenuScene implements Scene {
   constructor(game: Game) {
     this.game = game;
     this.window = new Window({ x: 8, y: 8, width: 80, height: 88 });
+    const exploration = game.scenes.get<ExplorationScene>('exploration');
+    const canSave = exploration?.canSave() ?? false;
     const items: MenuItem[] = [
       { label: 'Items', value: 'items' },
       { label: 'Magic', value: 'magic' },
@@ -20,6 +23,7 @@ export class FieldMenuScene implements Scene {
       { label: 'Status', value: 'status' },
       { label: 'Order', value: 'order' },
       { label: 'Config', value: 'config' },
+      { label: 'Save', value: 'save', enabled: canSave },
     ];
     this.menu = new Menu({
       items,
@@ -50,6 +54,9 @@ export class FieldMenuScene implements Scene {
         break;
       case 'status':
         this.game.scenes.push('status');
+        break;
+      case 'save':
+        this.game.scenes.push('saveMenu');
         break;
     }
   }

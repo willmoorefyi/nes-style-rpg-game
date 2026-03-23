@@ -8,6 +8,7 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
+import { GameFlags } from './GameFlags.js';
 
 export const WIDTH = 256;
 export const HEIGHT = 240;
@@ -22,6 +23,9 @@ export class Game {
   readonly party: PartyManager;
   readonly inventory: Inventory;
   readonly audio: AudioManager;
+  readonly gameFlags: GameFlags;
+  playTime = 0;
+  currentMapId = '';
 
   constructor() {
     this.app = new Application();
@@ -33,6 +37,7 @@ export class Game {
     this.party = new PartyManager();
     this.inventory = new Inventory();
     this.audio = new AudioManager();
+    this.gameFlags = new GameFlags();
   }
 
   async init(): Promise<void> {
@@ -62,6 +67,7 @@ export class Game {
     this.app.ticker.add((ticker) => {
       this.input.update();
       this.scenes.update(ticker.deltaTime);
+      this.playTime += ticker.deltaTime / 60;
     });
   }
 

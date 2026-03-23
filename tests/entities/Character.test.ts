@@ -114,10 +114,10 @@ describe('Character', () => {
   it('serializes to JSON', () => {
     const char = new Character({ name: 'Hero', classData: mockWarriorClass });
     char.equip('weapon', mockSword);
-    const json = char.toJSON() as Record<string, unknown>;
+    const json = char.toJSON();
     expect(json.name).toBe('Hero');
     expect(json.classId).toBe('warrior');
-    expect((json.equipment as Record<string, unknown>).weapon).toBe('iron_sword');
+    expect(json.equipment.weapon).toBe('iron_sword');
   });
 
   it('manages spell charges', () => {

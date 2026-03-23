@@ -1,4 +1,5 @@
 import { Character } from './Character.js';
+import type { CharacterSaveData } from '../types/index.js';
 
 export class PartyManager {
   private members: Character[] = [];
@@ -41,5 +42,15 @@ export class PartyManager {
 
   toJSON(): object {
     return { members: this.members.map(m => m.toJSON()), gold: this._gold };
+  }
+
+  static fromJSON(data: { members: CharacterSaveData[]; gold: number }): PartyManager {
+    const party = new PartyManager();
+    for (const memberData of data.members) {
+      const char = Character.fromJSON(memberData);
+      if (char) party.members.push(char);
+    }
+    party._gold = data.gold;
+    return party;
   }
 }

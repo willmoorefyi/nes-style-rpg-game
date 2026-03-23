@@ -1,4 +1,6 @@
-import type { CharacterClassData, EquipmentSlot, ItemData, StatBlock } from '../types/index.js';
+import type { CharacterClassData, CharacterSaveData, EquipmentSlot, ItemData, StatBlock } from '../types/index.js';
+import { ClassRegistry } from '../data/ClassRegistry.js';
+import { ItemRegistry } from '../data/ItemRegistry.js';
 
 export interface CharacterData {
   name: string;
@@ -148,7 +150,7 @@ export class Character {
     return Math.max(0, 4 - level + Math.floor(this._level / 5));
   }
 
-  toJSON(): object {
+  toJSON(): CharacterSaveData {
     return {
       name: this.name,
       classId: this.classData.id,
@@ -157,8 +159,42 @@ export class Character {
       currentHp: this._currentHp,
       equipment: Object.fromEntries(
         [...this.equipment.entries()].map(([k, v]) => [k, v?.id ?? null])
-      ),
+      ) as Record<EquipmentSlot, string | null>,
       spellCharges: [...this.spellCharges],
+      learnedSpells: this.getLearnedSpells(),
     };
+  }
+
+  static fromJSON(data: CharacterSaveData): Character | null {
+    const classData = ClassRegistry.getClass(data.classId);
+    if (!classData) return null;
+    
+    const char = new Character({
+      name: data.name,
+      classData,
+      level: data.level,
+      xp: data.xp,
+      currentHp: data.currentHp,
+    });
+    
+    // Restore equipment
+    for (const [slot, itemId] of Object.entries(data.equipment)) {
+      if (itemId) {
+        const item = ItemRegistry.getItem(itemId);
+        if (item) char.equipment.set(slot as EquipmentSlot, item);
+      }
+    }
+    
+    // Restore spell charges
+    for (let i = 0; i < data.spellCharges.length; i++) {
+      char.spellCharges[i] = data.spellCharges[i];
+    }
+    
+    // Restore learned spells
+    for (const { spellId, level } of data.learnedSpells) {
+      char.learnSpell(spellId, level);
+    }
+    
+    return char;
   }
 }

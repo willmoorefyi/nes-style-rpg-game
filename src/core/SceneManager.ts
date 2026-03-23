@@ -78,4 +78,8 @@ export class SceneManager {
   get current(): string | null {
     return this.currentName;
   }
+
+  get<T extends Scene>(name: string): T | undefined {
+    return this.scenes.get(name) as T | undefined;
+  }
 }
