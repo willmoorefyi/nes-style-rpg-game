@@ -1018,12 +1018,12 @@ export interface QuantitySelectorConfig {
 | 10 | BattleScene/BattleCommands untested | MEDIUM | WP-09 | ✅ Done |
 | 11 | InputManager tests access private members | MEDIUM | WP-09 | ✅ Done |
 | 12 | No bitmap font | LOW | WP-10 | Deferred (Phase 18 TODO) |
-| 13 | No dirty flag on tilemap rendering | LOW | WP-10 | Planned |
-| 14 | BootScene is dead code | LOW | WP-10 | Planned |
-| 15 | ExplorationScene god object | ARCH DEBT | WP-11 | Planned |
-| 16 | BattleScene coupled to Game | ARCH DEBT | WP-11 | Planned |
-| 17 | No dependency injection | ARCH DEBT | WP-11 | Planned |
-| 18 | EncounterSystem uses Math.random() | ARCH DEBT | WP-11 | Planned |
+| 13 | No dirty flag on tilemap rendering | LOW | WP-10 | ✅ Done |
+| 14 | BootScene is dead code | LOW | WP-10 | ✅ Done |
+| 15 | ExplorationScene god object | ARCH DEBT | WP-11 | ✅ Done |
+| 16 | BattleScene coupled to Game | ARCH DEBT | WP-11 | ✅ Done |
+| 17 | No dependency injection | ARCH DEBT | WP-11 | ✅ Done |
+| 18 | EncounterSystem uses Math.random() | ARCH DEBT | WP-11 | ✅ Done |
 | 19 | Private member access in tests | TEST | WP-09 | ✅ Done |
 | 20 | Loose mock typing in tests | TEST | WP-09 | ✅ Done |
 | 21 | No integration tests for battle flow | TEST | WP-09 | ✅ Done |
