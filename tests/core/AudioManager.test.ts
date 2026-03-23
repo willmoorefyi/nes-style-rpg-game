@@ -105,4 +105,17 @@ describe('AudioManager', () => {
       expect(true).toBe(true);
     });
   });
+
+  describe('pauseMusic/resumeMusic', () => {
+    it('tracks paused state', () => {
+      expect(audio.isPaused).toBe(false);
+      audio.pauseMusic();
+      expect(audio.isPaused).toBe(false); // no music playing
+    });
+
+    it('handles resume when not paused', () => {
+      audio.resumeMusic();
+      expect(audio.isPaused).toBe(false);
+    });
+  });
 });

@@ -110,14 +110,15 @@ export class ShopScene implements Scene {
   }
 
   private getSellItems(): MenuItem[] {
-    const items: MenuItem[] = [];
-    for (const { itemId, quantity } of this.game.inventory.getAll()) {
-      const item = ItemRegistry.getItem(itemId);
-      if (!item || item.type === 'key') continue;
+    const entries = this.game.inventory.getAll()
+      .map(({ itemId, quantity }) => ({ item: ItemRegistry.getItem(itemId), itemId, quantity }))
+      .filter((e): e is { item: NonNullable<typeof e.item>; itemId: string; quantity: number } => 
+        e.item != null && e.item.type !== 'key');
+    const maxLen = Math.max(12, ...entries.map(e => e.item.name.length));
+    return entries.map(({ item, itemId, quantity }) => {
       const sellPrice = Math.floor(item.price / 2);
-      items.push({ label: `${item.name.padEnd(10)}x${quantity} ${String(sellPrice).padStart(4)}G`, value: itemId });
-    }
-    return items;
+      return { label: `${item.name.padEnd(maxLen)}x${quantity} ${String(sellPrice).padStart(4)}G`, value: itemId };
+    });
   }
 
   private onItemSelect(menuItem: MenuItem): void {

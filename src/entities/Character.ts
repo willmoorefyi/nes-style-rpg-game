@@ -114,8 +114,11 @@ export class Character {
     if (level >= 1 && level <= 8) this.spellCharges[level - 1] = charges;
   }
 
-  learnSpell(spellId: string, level: number): void {
+  learnSpell(spellId: string, level: number): boolean {
+    if (this.learnedSpells.has(spellId)) return true;
+    if (this.getSpellsAtLevel(level).length >= 3) return false;
     this.learnedSpells.set(spellId, level);
+    return true;
   }
 
   getLearnedSpells(): Array<{ spellId: string; level: number }> {

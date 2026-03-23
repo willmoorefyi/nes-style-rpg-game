@@ -11,6 +11,7 @@ export class AudioManager {
   private musicVolume = 1;
   private sfxVolume = 1;
   private muted = false;
+  private paused = false;
 
   async init(manifest: AudioManifest): Promise<void> {
     this.manifest = manifest;
@@ -128,4 +129,17 @@ export class AudioManager {
 
   get isMuted(): boolean { return this.muted; }
   get currentTrack(): string | null { return this.currentMusic?.trackId ?? null; }
+  get isPaused(): boolean { return this.paused; }
+
+  pauseMusic(): void {
+    if (this.paused || !this.currentMusic) return;
+    this.paused = true;
+    this.currentMusic.gain.gain.value = 0;
+  }
+
+  resumeMusic(): void {
+    if (!this.paused || !this.currentMusic) return;
+    this.paused = false;
+    this.currentMusic.gain.gain.value = this.muted ? 0 : this.musicVolume;
+  }
 }

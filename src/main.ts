@@ -4,6 +4,8 @@ import { StatusScene } from './scenes/StatusScene.js';
 import { FieldMenuScene } from './scenes/FieldMenuScene.js';
 import { ItemMenuScene } from './scenes/ItemMenuScene.js';
 import { EquipScene } from './scenes/EquipScene.js';
+import { FieldMagicScene } from './scenes/FieldMagicScene.js';
+import { FieldOrderScene } from './scenes/FieldOrderScene.js';
 
 function showError(msg: string): void {
   const el = document.createElement('div');
@@ -24,6 +26,8 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   game.scenes.register('fieldMenu', new FieldMenuScene(game));
   game.scenes.register('itemMenu', new ItemMenuScene(game));
   game.scenes.register('equip', new EquipScene(game));
+  game.scenes.register('fieldMagic', new FieldMagicScene(game));
+  game.scenes.register('fieldOrder', new FieldOrderScene(game));
   await game.scenes.switchTo('exploration');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {

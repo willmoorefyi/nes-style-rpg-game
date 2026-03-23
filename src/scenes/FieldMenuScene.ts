@@ -55,6 +55,12 @@ export class FieldMenuScene implements Scene {
       case 'status':
         this.game.scenes.push('status');
         break;
+      case 'magic':
+        this.game.scenes.push('fieldMagic');
+        break;
+      case 'order':
+        this.game.scenes.push('fieldOrder');
+        break;
       case 'save':
         this.game.scenes.push('saveMenu');
         break;
