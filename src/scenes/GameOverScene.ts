@@ -13,6 +13,8 @@ export class GameOverScene implements Scene {
   }
 
   enter(): void {
+    this.game.audio.playMusic('gameover', false);
+    
     const win = new Window({ x: 64, y: 80, width: 128, height: 80 });
     this.container.addChild(win);
 

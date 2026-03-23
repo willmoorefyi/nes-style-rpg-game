@@ -17,6 +17,20 @@ import { Container, Texture } from 'pixi.js';
 import type { MapData } from '../../src/types/index.js';
 import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
 
+export function createMockAudio() {
+  return {
+    playMusic: vi.fn().mockResolvedValue(undefined),
+    stopMusic: vi.fn(),
+    playSFX: vi.fn().mockResolvedValue(undefined),
+    setMusicVolume: vi.fn(),
+    setSFXVolume: vi.fn(),
+    mute: vi.fn(),
+    unmute: vi.fn(),
+    isMuted: false,
+    currentTrack: null,
+  };
+}
+
 export function createMockGame(mapData?: MapData) {
   const map = mapData ?? createMapData();
   return {
@@ -33,6 +47,7 @@ export function createMockGame(mapData?: MapData) {
     events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
     data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]) },
     party: { all: [], distributeXp: vi.fn(), addGold: vi.fn() },
+    audio: createMockAudio(),
   } as const;
 }
 
@@ -45,6 +60,7 @@ export function createMockBattleSceneDeps(input?: MockInput): BattleSceneDeps {
       isJustPressed: vi.fn().mockReturnValue(false),
     },
     events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
+    audio: createMockAudio(),
   } as unknown as BattleSceneDeps;
 }
 

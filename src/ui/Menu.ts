@@ -1,5 +1,6 @@
 import { Container, Text, TextStyle } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
+import type { EventBus } from '../core/EventBus.js';
 
 export interface MenuItem {
   label: string;
@@ -16,6 +17,7 @@ export interface MenuConfig {
   maxVisible?: number;
   onSelect?: (item: MenuItem, index: number) => void;
   onCancel?: () => void;
+  eventBus?: EventBus;
 }
 
 export class Menu extends Container {
@@ -33,6 +35,7 @@ export class Menu extends Container {
   private downIndicator?: Text;
   private onSelect?: (item: MenuItem, index: number) => void;
   private onCancel?: () => void;
+  private eventBus?: EventBus;
 
   constructor(config: MenuConfig) {
     super();
@@ -42,6 +45,7 @@ export class Menu extends Container {
     this.maxVisible = config.maxVisible ?? this.items.length;
     this.onSelect = config.onSelect;
     this.onCancel = config.onCancel;
+    this.eventBus = config.eventBus;
     this.position.set(config.x ?? 0, config.y ?? 0);
 
     this.style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
@@ -51,7 +55,6 @@ export class Menu extends Container {
     this.cursorText.position.set(0, 0);
     this.addChild(this.cursorText);
 
-    // Create scroll indicators (hidden initially)
     if (this.items.length > this.maxVisible) {
       this.upIndicator = new Text({ text: '▲', style: this.style });
       this.upIndicator.position.set(12 + 40, -this.lineHeight);
@@ -68,13 +71,9 @@ export class Menu extends Container {
   }
 
   private renderItems(): void {
-    // Remove old item texts
-    for (const t of this.texts) {
-      this.removeChild(t);
-    }
+    for (const t of this.texts) this.removeChild(t);
     this.texts = [];
 
-    // Render visible window of items
     const visibleCount = Math.min(this.maxVisible, this.items.length);
     for (let i = 0; i < visibleCount; i++) {
       const itemIndex = this.scrollOffset + i;
@@ -95,14 +94,18 @@ export class Menu extends Container {
   update(input: InputManager): void {
     if (input.isJustPressed('up')) {
       this.moveCursor(-1);
+      this.eventBus?.emit('cursorMove', {});
     } else if (input.isJustPressed('down')) {
       this.moveCursor(1);
+      this.eventBus?.emit('cursorMove', {});
     } else if (input.isJustPressed('confirm')) {
       const item = this.items[this.cursorIndex];
       if (item.enabled !== false) {
+        this.eventBus?.emit('cursorSelect', {});
         this.onSelect?.(item, this.cursorIndex);
       }
     } else if (input.isJustPressed('cancel')) {
+      this.eventBus?.emit('cursorCancel', {});
       this.onCancel?.();
     }
   }
@@ -114,7 +117,6 @@ export class Menu extends Container {
     this.cursorIndex = newIndex;
 
     if (wrapped) {
-      // Wrap: jump scroll to show cursor
       this.scrollOffset = delta === 1 ? 0 : Math.max(0, this.items.length - this.maxVisible);
     } else if (this.cursorIndex < this.scrollOffset) {
       this.scrollOffset = this.cursorIndex;
@@ -131,12 +133,8 @@ export class Menu extends Container {
   }
 
   private updateIndicators(): void {
-    if (this.upIndicator) {
-      this.upIndicator.visible = this.scrollOffset > 0;
-    }
-    if (this.downIndicator) {
-      this.downIndicator.visible = this.scrollOffset + this.maxVisible < this.items.length;
-    }
+    if (this.upIndicator) this.upIndicator.visible = this.scrollOffset > 0;
+    if (this.downIndicator) this.downIndicator.visible = this.scrollOffset + this.maxVisible < this.items.length;
   }
 
   get selectedIndex(): number { return this.cursorIndex; }
@@ -144,7 +142,6 @@ export class Menu extends Container {
 
   setIndex(index: number): void {
     this.cursorIndex = Math.max(0, Math.min(index, this.items.length - 1));
-    // Adjust scroll to show cursor
     if (this.cursorIndex < this.scrollOffset) {
       this.scrollOffset = this.cursorIndex;
     } else if (this.cursorIndex >= this.scrollOffset + this.maxVisible) {

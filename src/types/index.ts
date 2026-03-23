@@ -110,5 +110,6 @@ export interface MapData {
   transitions: MapTransition[];
   encounterRate?: EncounterRate;
   encounters?: EncounterEntry[];
+  music?: string;
 }
 export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';

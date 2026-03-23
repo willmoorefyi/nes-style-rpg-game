@@ -1,0 +1,22 @@
+{
+  "music": {
+    "overworld": "assets/audio/music/overworld.ogg",
+    "battle": "assets/audio/music/battle.ogg",
+    "boss": "assets/audio/music/boss.ogg",
+    "town": "assets/audio/music/town.ogg",
+    "dungeon": "assets/audio/music/dungeon.ogg",
+    "victory": "assets/audio/music/victory.ogg",
+    "gameover": "assets/audio/music/gameover.ogg",
+    "title": "assets/audio/music/title.ogg",
+    "shop": "assets/audio/music/shop.ogg"
+  },
+  "sfx": {
+    "cursor-move": "assets/audio/sfx/cursor-move.ogg",
+    "cursor-select": "assets/audio/sfx/cursor-select.ogg",
+    "cursor-cancel": "assets/audio/sfx/cursor-cancel.ogg",
+    "battle-hit": "assets/audio/sfx/battle-hit.ogg",
+    "battle-miss": "assets/audio/sfx/battle-miss.ogg",
+    "battle-victory": "assets/audio/sfx/battle-victory.ogg",
+    "spell-cast": "assets/audio/sfx/spell-cast.ogg"
+  }
+}

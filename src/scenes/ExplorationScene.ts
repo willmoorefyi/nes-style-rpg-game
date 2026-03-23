@@ -81,6 +81,11 @@ export class ExplorationScene implements Scene {
       return;
     }
     const { mapData, tilemap, collisionMap, npcs } = result;
+    
+    // Play map music
+    const musicTrack = mapData.music ?? 'overworld';
+    this.game.audio.playMusic(musicTrack);
+    
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     if (mapData.encounters) this.encounterSystem.setEncounters(mapData.encounters);
     this.worldContainer.addChild(tilemap.container);

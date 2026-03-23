@@ -6,6 +6,14 @@ export interface GameEvents {
   interact: { targetId: string };
   menuOpen: { menu: string };
   menuClose: { menu: string };
+  // Audio events
+  cursorMove: Record<string, never>;
+  cursorSelect: Record<string, never>;
+  cursorCancel: Record<string, never>;
+  battleHit: Record<string, never>;
+  battleMiss: Record<string, never>;
+  battleVictory: Record<string, never>;
+  spellCast: Record<string, never>;
 }
 
 type Callback<T> = (data: T) => void;

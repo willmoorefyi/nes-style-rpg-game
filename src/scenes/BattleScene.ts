@@ -2,6 +2,7 @@ import { Container, Text, TextStyle, Graphics } from 'pixi.js';
 import type { Scene, EnemyData, SpellData } from '../types/index.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
+import type { AudioManager } from '../core/AudioManager.js';
 import type { Character } from '../entities/Character.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
@@ -11,6 +12,7 @@ import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 export interface BattleSceneDeps {
   input: InputManager;
   events: EventBus;
+  audio?: AudioManager;
 }
 
 export interface BattleSceneConfig {
@@ -53,6 +55,7 @@ export class BattleScene implements Scene {
   }
 
   enter(): void {
+    this.deps.audio?.playMusic('battle');
     this.createUI();
     this.createEnemySprites();
     this.battle.startBattle();
@@ -61,17 +64,14 @@ export class BattleScene implements Scene {
   }
 
   private createUI(): void {
-    // Party stats window (bottom-left)
     this.partyWindow = new Window({ x: 0, y: 160, width: 128, height: 80 });
     this.container.addChild(this.partyWindow);
     this.updatePartyDisplay();
 
-    // Command window (bottom-right)
     this.commandWindow = new Window({ x: 128, y: 160, width: 128, height: 80 });
     this.container.addChild(this.commandWindow);
     this.createCommandMenu();
 
-    // Message window (top)
     this.messageWindow = new Window({ x: 0, y: 0, width: 256, height: 40 });
     this.container.addChild(this.messageWindow);
     this.messageText = new TextRenderer({ width: 240, revealSpeed: 2 });
@@ -91,6 +91,7 @@ export class BattleScene implements Scene {
       x: this.commandWindow.contentX,
       y: this.commandWindow.contentY,
       onSelect: (item) => this.onCommandSelect(item.value),
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.commandMenu);
     this.commandMenu.visible = false;
@@ -109,7 +110,6 @@ export class BattleScene implements Scene {
   }
 
   private updatePartyDisplay(): void {
-    // Remove old text
     const toRemove = this.partyWindow.children.filter(c => c instanceof Text);
     toRemove.forEach(c => this.partyWindow.removeChild(c));
 
@@ -207,7 +207,6 @@ export class BattleScene implements Scene {
   }
 
   private showSpellLevelMenu(actor: Character): void {
-    // Get levels with charges
     const levelsWithCharges: number[] = [];
     for (let lvl = 1; lvl <= 8; lvl++) {
       if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) {
@@ -228,9 +227,7 @@ export class BattleScene implements Scene {
       value: String(lvl),
     }));
 
-    if (this.spellLevelMenu) {
-      this.commandWindow.removeChild(this.spellLevelMenu);
-    }
+    if (this.spellLevelMenu) this.commandWindow.removeChild(this.spellLevelMenu);
 
     this.spellLevelMenu = new Menu({
       items,
@@ -244,6 +241,7 @@ export class BattleScene implements Scene {
         this.hideSpellLevelMenu();
         this.uiState = 'command';
       },
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.spellLevelMenu);
     this.commandMenu.visible = false;
@@ -265,9 +263,7 @@ export class BattleScene implements Scene {
       return { label: spell?.name ?? id, value: id };
     });
 
-    if (this.spellSelectMenu) {
-      this.commandWindow.removeChild(this.spellSelectMenu);
-    }
+    if (this.spellSelectMenu) this.commandWindow.removeChild(this.spellSelectMenu);
 
     this.spellSelectMenu = new Menu({
       items,
@@ -277,15 +273,12 @@ export class BattleScene implements Scene {
         this.selectedSpellId = item.value;
         const spell = this.spells.find(s => s.id === item.value);
         if (spell?.targeting === 'all') {
-          // Submit immediately for all-target spells
           this.submitSpellCommand(actor.name, undefined);
         } else if (spell?.targeting === 'self') {
           this.submitSpellCommand(actor.name, actor.name);
         } else if (spell?.type === 'white' && spell?.effect === 'heal') {
-          // Healing targets party
           this.showPartyTargetMenu(actor.name);
         } else {
-          // Damage targets enemies
           this.showSpellTargetMenu(actor.name);
         }
       },
@@ -293,11 +286,10 @@ export class BattleScene implements Scene {
         this.hideSpellSelectMenu();
         this.uiState = 'spell_level';
       },
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.spellSelectMenu);
-    if (this.spellLevelMenu) {
-      this.spellLevelMenu.visible = false;
-    }
+    if (this.spellLevelMenu) this.spellLevelMenu.visible = false;
     this.uiState = 'spell_select';
   }
 
@@ -306,66 +298,55 @@ export class BattleScene implements Scene {
       this.commandWindow.removeChild(this.spellSelectMenu);
       this.spellSelectMenu = null;
     }
-    if (this.spellLevelMenu) {
-      this.spellLevelMenu.visible = true;
-    }
+    if (this.spellLevelMenu) this.spellLevelMenu.visible = true;
   }
 
   private showSpellTargetMenu(actorName: string): void {
     const enemies = this.battle.livingEnemies;
     const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
 
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-    }
+    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
 
     this.targetMenu = new Menu({
       items,
       x: this.commandWindow.contentX,
       y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.submitSpellCommand(actorName, item.value);
-      },
+      onSelect: (item) => this.submitSpellCommand(actorName, item.value),
       onCancel: () => {
         this.hideTargetMenu();
         this.uiState = 'spell_select';
       },
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.targetMenu);
-    if (this.spellSelectMenu) {
-      this.spellSelectMenu.visible = false;
-    }
+    if (this.spellSelectMenu) this.spellSelectMenu.visible = false;
     this.uiState = 'target';
   }
 
   private showPartyTargetMenu(actorName: string): void {
     const items: MenuItem[] = this.config.party.map(c => ({ label: c.name, value: c.name }));
 
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-    }
+    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
 
     this.targetMenu = new Menu({
       items,
       x: this.commandWindow.contentX,
       y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.submitSpellCommand(actorName, item.value);
-      },
+      onSelect: (item) => this.submitSpellCommand(actorName, item.value),
       onCancel: () => {
         this.hideTargetMenu();
         this.uiState = 'spell_select';
       },
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.targetMenu);
-    if (this.spellSelectMenu) {
-      this.spellSelectMenu.visible = false;
-    }
+    if (this.spellSelectMenu) this.spellSelectMenu.visible = false;
     this.uiState = 'target';
   }
 
   private submitSpellCommand(actorName: string, targetId: string | undefined): void {
     if (this.selectedSpellId) {
+      this.deps.events.emit('spellCast', {});
       this.battle.submitCommand({
         type: 'magic',
         actorId: actorName,
@@ -398,9 +379,7 @@ export class BattleScene implements Scene {
     const enemies = this.battle.livingEnemies;
     const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
 
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-    }
+    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
 
     this.targetMenu = new Menu({
       items,
@@ -415,6 +394,7 @@ export class BattleScene implements Scene {
         this.hideTargetMenu();
         this.uiState = 'command';
       },
+      eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.targetMenu);
     this.commandMenu.visible = false;
@@ -474,6 +454,10 @@ export class BattleScene implements Scene {
     this.updateEnemySprites();
 
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
+      if (this.battle.state === 'victory') {
+        this.deps.events.emit('battleVictory', {});
+        this.deps.audio?.playMusic('victory', false);
+      }
       this.showMessages();
       this.uiState = 'end';
     } else {
