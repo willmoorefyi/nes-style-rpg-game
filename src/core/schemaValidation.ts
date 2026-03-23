@@ -47,7 +47,7 @@ function validateStatBlock(path: string, data: unknown): StatBlock {
   assertNumber(`${path}.intelligence`, data.intelligence);
   assertNumber(`${path}.vitality`, data.vitality);
   assertNumber(`${path}.luck`, data.luck);
-  return data as StatBlock;
+  return data as unknown as StatBlock;
 }
 
 export function validateEnemyData(data: unknown): EnemyData {
@@ -64,7 +64,7 @@ export function validateEnemyData(data: unknown): EnemyData {
   assertNumber('EnemyData.stats.defense', (data.stats as Record<string, unknown>).defense);
   assertNumber('EnemyData.stats.magicDefense', (data.stats as Record<string, unknown>).magicDefense);
   
-  return data as EnemyData;
+  return data as unknown as EnemyData;
 }
 
 export function validateMapData(data: unknown): MapData {
@@ -100,7 +100,7 @@ export function validateMapData(data: unknown): MapData {
     assertNumber(`MapData.transitions[${i}].targetY`, t.targetY);
   });
   
-  return data as MapData;
+  return data as unknown as MapData;
 }
 
 
@@ -115,7 +115,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   assertObject('CharacterClassData.spellLevels', data.spellLevels);
   assertNumber('CharacterClassData.spellLevels.white', (data.spellLevels as Record<string, unknown>).white);
   assertNumber('CharacterClassData.spellLevels.black', (data.spellLevels as Record<string, unknown>).black);
-  return data as import('../types/index.js').CharacterClassData;
+  return data as unknown as import('../types/index.js').CharacterClassData;
 }
 
 const VALID_ITEM_TYPES = ['weapon', 'armor', 'consumable', 'key'];
@@ -132,7 +132,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   assertNumber('ItemData.price', data.price);
   assertArray('ItemData.usableBy', data.usableBy);
   (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
-  return data as import('../types/index.js').ItemData;
+  return data as unknown as import('../types/index.js').ItemData;
 }
 
 const VALID_SPELL_TYPES = ['white', 'black'];
@@ -153,5 +153,5 @@ export function validateSpellData(data: unknown): import('../types/index.js').Sp
     throw new ValidationError(`SpellData.targeting: expected one of ${VALID_TARGETING.join(', ')}, got ${data.targeting}`);
   }
   assertString('SpellData.description', data.description);
-  return data as import('../types/index.js').SpellData;
+  return data as unknown as import('../types/index.js').SpellData;
 }

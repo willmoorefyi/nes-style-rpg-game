@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Texture, RenderTexture, Application } from 'pixi.js';
+import { Application } from 'pixi.js';
 import { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
 
 function createMockApp(): Application {
-  const mockRenderTexture = { width: 16, height: 16 } as RenderTexture;
   return {
     renderer: {
       render: vi.fn(),

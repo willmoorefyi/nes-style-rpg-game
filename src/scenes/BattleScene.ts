@@ -5,7 +5,7 @@ import type { Character } from '../entities/Character.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
-import { BattleStateMachine, type BattleResult } from '../battle/BattleStateMachine.js';
+import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 
 export interface BattleSceneConfig {
   party: Character[];

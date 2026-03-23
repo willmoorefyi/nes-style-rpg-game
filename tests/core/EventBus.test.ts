@@ -38,6 +38,6 @@ describe('EventBus', () => {
 
   it('should handle emit with no listeners', () => {
     const bus = new EventBus();
-    expect(() => bus.emit('battleEnd', { victory: true })).not.toThrow();
+    expect(() => bus.emit('battleEnd', { victory: true, xpReward: 0, goldReward: 0 })).not.toThrow();
   });
 });

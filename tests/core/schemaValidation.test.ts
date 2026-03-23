@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateEnemyData, validateMapData, ValidationError } from '../../src/core/schemaValidation.js';
+import { validateEnemyData, validateMapData } from '../../src/core/schemaValidation.js';
 
 describe('schemaValidation', () => {
   describe('validateEnemyData', () => {

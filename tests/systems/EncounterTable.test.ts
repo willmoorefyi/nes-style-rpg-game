@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { EncounterTable } from '../../src/systems/EncounterTable.js';
 import type { EncounterEntry } from '../../src/types/index.js';
 

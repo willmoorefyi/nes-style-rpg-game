@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js';
-import type { Scene, MapData } from '../types/index.js';
+import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import { PlayerController } from '../entities/PlayerController.js';
@@ -30,8 +30,7 @@ export class ExplorationScene implements Scene {
   private mapLoader: MapLoader;
   private dialogManager: DialogManager;
   private battleTrigger: BattleTrigger;
-  private currentMapData: MapData | null = null;
-
+  
   constructor(game: Game) {
     this.game = game;
     this.camera = new Camera(this.worldContainer);
@@ -90,8 +89,7 @@ export class ExplorationScene implements Scene {
     }
 
     const { mapData, tilemap, collisionMap, npcs } = result;
-    this.currentMapData = mapData;
-
+    
     if (mapData.encounterRate) {
       this.encounterSystem.setRate(mapData.encounterRate);
     }
