@@ -1,4 +1,5 @@
 import { Container, Text, TextStyle } from 'pixi.js';
+import { wrapText } from './textUtils.js';
 
 export interface TextRendererConfig {
   width: number;
@@ -34,7 +35,8 @@ export class TextRenderer extends Container {
   }
 
   setText(text: string, instant = false): void {
-    this.fullText = this.wrapText(text);
+    const maxChars = Math.floor(this.config.width / this.config.charWidth!);
+    this.fullText = wrapText(text, maxChars);
     if (instant || this.config.revealSpeed === 0) {
       this.revealedCount = this.fullText.length;
       this.textObj.text = this.fullText;
@@ -65,26 +67,6 @@ export class TextRenderer extends Container {
   complete(): void {
     this.revealedCount = this.fullText.length;
     this.textObj.text = this.fullText;
-  }
-
-  private wrapText(text: string): string {
-    const maxChars = Math.floor(this.config.width / this.config.charWidth!);
-    const lines: string[] = [];
-    for (const paragraph of text.split('\n')) {
-      const words = paragraph.split(' ');
-      let line = '';
-      for (const word of words) {
-        const test = line ? `${line} ${word}` : word;
-        if (test.length > maxChars && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = test;
-        }
-      }
-      if (line) lines.push(line);
-    }
-    return lines.join('\n');
   }
 
   get lineCount(): number {

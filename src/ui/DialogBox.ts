@@ -1,4 +1,5 @@
 import { Container } from 'pixi.js';
+import { wrapText } from './textUtils.js';
 import { Window } from './Window.js';
 import { TextRenderer } from './TextRenderer.js';
 import type { InputManager } from '../core/InputManager.js';
@@ -69,33 +70,14 @@ export class DialogBox extends Container {
   }
 
   private paginate(text: string): string[] {
-    const wrapped = this.wrapText(text);
+    const maxChars = Math.floor(this.window.contentWidth / 8);
+    const wrapped = wrapText(text, maxChars);
     const lines = wrapped.split('\n');
     const pages: string[] = [];
     for (let i = 0; i < lines.length; i += this.linesPerPage) {
       pages.push(lines.slice(i, i + this.linesPerPage).join('\n'));
     }
     return pages.length ? pages : [''];
-  }
-
-  private wrapText(text: string): string {
-    const maxChars = Math.floor(this.window.contentWidth / 8);
-    const lines: string[] = [];
-    for (const paragraph of text.split('\n')) {
-      const words = paragraph.split(' ');
-      let line = '';
-      for (const word of words) {
-        const test = line ? `${line} ${word}` : word;
-        if (test.length > maxChars && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = test;
-        }
-      }
-      if (line) lines.push(line);
-    }
-    return lines.join('\n');
   }
 
   get isVisible(): boolean { return this.visible; }
