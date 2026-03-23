@@ -25,3 +25,6 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Agent-specific tracking files
+.yolo-sisyphus/
