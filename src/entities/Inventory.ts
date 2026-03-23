@@ -34,4 +34,16 @@ export class Inventory {
   getAll(): Array<{ itemId: string; quantity: number }> {
     return Array.from(this.items.entries()).map(([itemId, quantity]) => ({ itemId, quantity }));
   }
+
+  toJSON(): Array<{ itemId: string; quantity: number }> {
+    return this.getAll();
+  }
+
+  static fromJSON(data: Array<{ itemId: string; quantity: number }>): Inventory {
+    const inv = new Inventory();
+    for (const { itemId, quantity } of data) {
+      inv.items.set(itemId, Math.min(quantity, Inventory.MAX_QUANTITY));
+    }
+    return inv;
+  }
 }

@@ -5,10 +5,15 @@ export interface BattleCommand {
   actorId: string;
   targetId?: string;
   spellId?: string;
+  itemId?: string;
 }
 
 export function createSpellCommand(actorId: string, targetId: string | undefined, spellId: string): BattleCommand {
   return { type: 'magic', actorId, targetId, spellId };
+}
+
+export function createItemCommand(actorId: string, targetId: string, itemId: string): BattleCommand {
+  return { type: 'item', actorId, targetId, itemId };
 }
 
 export function retargetIfDead(

@@ -116,6 +116,10 @@ export class ExplorationScene implements Scene {
       this.dialogManager.update(dt, this.game.input);
       return;
     }
+    if (this.game.input.isJustPressed('start')) {
+      this.game.scenes.push('fieldMenu');
+      return;
+    }
     if (!this.player) return;
     const wasMoving = this.player.isMoving;
     this.player.update(dt);

@@ -32,7 +32,7 @@ export class BattleTrigger {
     this.onBattleTriggered?.();
 
     const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events };
-    const battleScene = new BattleScene(deps, { party, enemies });
+    const battleScene = new BattleScene(deps, { party, enemies, inventory: this.game.inventory });
     this.game.scenes.register('battle', battleScene);
     this.game.scenes.register('gameover', new GameOverScene(this.game));
     await this.game.scenes.switchTo('battle');

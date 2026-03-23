@@ -4,10 +4,13 @@ import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { AudioManager } from '../core/AudioManager.js';
 import type { Character } from '../entities/Character.js';
+import type { Inventory } from '../entities/Inventory.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
+import { ItemRegistry } from '../data/ItemRegistry.js';
+import { createItemCommand } from '../battle/BattleCommands.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -19,9 +22,10 @@ export interface BattleSceneConfig {
   party: Character[];
   enemies: EnemyData[];
   spells?: SpellData[];
+  inventory?: Inventory;
 }
 
-type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_level' | 'spell_select';
+type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_level' | 'spell_select' | 'item_select' | 'item_target';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
@@ -36,9 +40,12 @@ export class BattleScene implements Scene {
   private targetMenu!: Menu | null;
   private spellLevelMenu: Menu | null = null;
   private spellSelectMenu: Menu | null = null;
+  private itemMenu: Menu | null = null;
   private currentSpellLevel = 0;
   private selectedSpellId: string | null = null;
+  private selectedItemId: string | null = null;
   private spells: SpellData[] = [];
+  private inventory: Inventory | undefined;
   private messageText!: TextRenderer;
   private enemySprites: Graphics[] = [];
 
@@ -51,7 +58,8 @@ export class BattleScene implements Scene {
     this.deps = deps;
     this.config = config;
     this.spells = config.spells ?? [];
-    this.battle = new BattleStateMachine({ ...config, spells: this.spells });
+    this.inventory = config.inventory;
+    this.battle = new BattleStateMachine({ ...config, spells: this.spells, inventory: this.inventory });
   }
 
   enter(): void {
@@ -159,6 +167,14 @@ export class BattleScene implements Scene {
         if (this.spellSelectMenu) this.spellSelectMenu.update(this.deps.input);
         break;
 
+      case 'item_select':
+        if (this.itemMenu) this.itemMenu.update(this.deps.input);
+        break;
+
+      case 'item_target':
+        if (this.targetMenu) this.targetMenu.update(this.deps.input);
+        break;
+
       case 'message':
         this.messageTimer -= dt;
         if (this.messageTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
@@ -195,10 +211,7 @@ export class BattleScene implements Scene {
     } else if (cmd === 'magic') {
       this.showSpellLevelMenu(actor);
     } else if (cmd === 'item') {
-      this.messageText.setText('No items available.', true);
-      this.uiState = 'message';
-      this.messageTimer = 30;
-      this.currentMessageIndex = -1;
+      this.showItemMenu();
     } else if (cmd === 'run') {
       this.battle.submitCommand({ type: 'run', actorId: actor.name });
       this.commandMenu.visible = false;
@@ -372,6 +385,113 @@ export class BattleScene implements Scene {
       this.spellLevelMenu = null;
     }
     this.selectedSpellId = null;
+    this.commandMenu.visible = true;
+  }
+
+  private showItemMenu(): void {
+    if (!this.inventory) {
+      this.messageText.setText('No items available.', true);
+      this.uiState = 'message';
+      this.messageTimer = 30;
+      this.currentMessageIndex = -1;
+      return;
+    }
+
+    const consumables = this.inventory.getAll().filter(entry => {
+      const item = ItemRegistry.getItem(entry.itemId);
+      return item?.type === 'consumable';
+    });
+
+    if (consumables.length === 0) {
+      this.messageText.setText('No items available.', true);
+      this.uiState = 'message';
+      this.messageTimer = 30;
+      this.currentMessageIndex = -1;
+      return;
+    }
+
+    const items: MenuItem[] = consumables.map(entry => {
+      const item = ItemRegistry.getItem(entry.itemId);
+      return { label: `${item?.name ?? entry.itemId} x${entry.quantity}`, value: entry.itemId };
+    });
+
+    if (this.itemMenu) {
+      this.commandWindow.removeChild(this.itemMenu);
+    }
+
+    this.itemMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      maxVisible: 4,
+      onSelect: (item) => {
+        this.selectedItemId = item.value;
+        this.showItemTargetMenu();
+      },
+      onCancel: () => {
+        this.hideItemMenu();
+        this.uiState = 'command';
+      },
+    });
+    this.commandWindow.addChild(this.itemMenu);
+    this.commandMenu.visible = false;
+    this.uiState = 'item_select';
+  }
+
+  private hideItemMenu(): void {
+    if (this.itemMenu) {
+      this.commandWindow.removeChild(this.itemMenu);
+      this.itemMenu = null;
+    }
+    this.commandMenu.visible = true;
+  }
+
+  private showItemTargetMenu(): void {
+    const actor = this.battle.currentCommandActor;
+    if (!actor) return;
+
+    const items: MenuItem[] = this.config.party.map(c => ({ label: c.name, value: c.name }));
+
+    if (this.targetMenu) {
+      this.commandWindow.removeChild(this.targetMenu);
+    }
+
+    this.targetMenu = new Menu({
+      items,
+      x: this.commandWindow.contentX,
+      y: this.commandWindow.contentY,
+      onSelect: (item) => {
+        this.submitItemCommand(actor.name, item.value);
+      },
+      onCancel: () => {
+        this.hideTargetMenu();
+        this.uiState = 'item_select';
+        if (this.itemMenu) this.itemMenu.visible = true;
+      },
+    });
+    this.commandWindow.addChild(this.targetMenu);
+    if (this.itemMenu) this.itemMenu.visible = false;
+    this.uiState = 'item_target';
+  }
+
+  private submitItemCommand(actorName: string, targetName: string): void {
+    if (this.selectedItemId) {
+      this.battle.submitCommand(createItemCommand(actorName, targetName, this.selectedItemId));
+    }
+    this.cleanupItemMenus();
+    this.startCommandPhase();
+  }
+
+  private cleanupItemMenus(): void {
+    if (this.targetMenu) {
+      this.commandWindow.removeChild(this.targetMenu);
+      this.targetMenu = null;
+    }
+    if (this.itemMenu) {
+      this.commandWindow.removeChild(this.itemMenu);
+      this.itemMenu = null;
+    }
+    this.selectedItemId = null;
     this.commandMenu.visible = true;
   }
 

@@ -1,10 +1,12 @@
 import type { Character } from '../entities/Character.js';
 import type { EnemyData, SpellData } from '../types/index.js';
+import type { Inventory } from '../entities/Inventory.js';
 import { calculateDamage, calculateMagicDamage } from './DamageFormula.js';
 import { StatusTracker } from './StatusEffects.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
 import { selectTarget } from './EnemyAI.js';
 import { retargetIfDead, calculateRunChance, type BattleCommand } from './BattleCommands.js';
+import { ItemEffects } from '../systems/ItemEffects.js';
 
 export type BattleState = 'intro' | 'command_select' | 'execution' | 'resolution' | 'victory' | 'defeat';
 
@@ -19,6 +21,7 @@ export interface BattleConfig {
   party: Character[];
   enemies: EnemyData[];
   spells?: SpellData[];
+  inventory?: Inventory;
 }
 
 export interface BattleResult {
@@ -41,6 +44,7 @@ export class BattleStateMachine {
   private result: BattleResult | null = null;
   private rng: () => number;
   private spells: SpellData[];
+  private inventory: Inventory | undefined;
 
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
@@ -51,6 +55,7 @@ export class BattleStateMachine {
       status: new StatusTracker(),
     }));
     this.spells = config.spells ?? [];
+    this.inventory = config.inventory;
     this.rng = rng;
   }
 
@@ -146,7 +151,7 @@ export class BattleStateMachine {
     }
 
     if (cmd.type === 'item') {
-      this.messages.push({ text: 'No items available.' });
+      this.executeItemCommand(cmd);
       return;
     }
 
@@ -338,6 +343,20 @@ export class BattleStateMachine {
         }
       }
     }
+  }
+
+  private executeItemCommand(cmd: BattleCommand): void {
+    if (!cmd.itemId || !cmd.targetId || !this.inventory) {
+      this.messages.push({ text: 'Cannot use item.' });
+      return;
+    }
+    const target = this.party.find(c => c.name === cmd.targetId);
+    if (!target) {
+      this.messages.push({ text: 'Invalid target.' });
+      return;
+    }
+    const result = ItemEffects.applyItemEffect(cmd.itemId, target, this.inventory);
+    this.messages.push({ text: result.message });
   }
 
   resolveRound(): void {

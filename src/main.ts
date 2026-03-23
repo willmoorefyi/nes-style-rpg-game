@@ -1,5 +1,9 @@
 import { Game } from './core/Game.js';
 import { ExplorationScene } from './scenes/ExplorationScene.js';
+import { StatusScene } from './scenes/StatusScene.js';
+import { FieldMenuScene } from './scenes/FieldMenuScene.js';
+import { ItemMenuScene } from './scenes/ItemMenuScene.js';
+import { EquipScene } from './scenes/EquipScene.js';
 
 function showError(msg: string): void {
   const el = document.createElement('div');
@@ -16,6 +20,10 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   await game.init();
   document.body.appendChild(game.canvas);
   game.scenes.register('exploration', new ExplorationScene(game));
+  game.scenes.register('status', new StatusScene(game));
+  game.scenes.register('fieldMenu', new FieldMenuScene(game));
+  game.scenes.register('itemMenu', new ItemMenuScene(game));
+  game.scenes.register('equip', new EquipScene(game));
   await game.scenes.switchTo('exploration');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {

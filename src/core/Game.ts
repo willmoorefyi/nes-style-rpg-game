@@ -4,6 +4,7 @@ import { AssetLoader } from './AssetLoader.js';
 import { InputManager } from './InputManager.js';
 import { EventBus } from './EventBus.js';
 import { DataLoader } from './DataLoader.js';
+import { ItemRegistry } from '../data/ItemRegistry.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
@@ -44,6 +45,7 @@ export class Game {
     });
 
     await this.assets.init();
+    await ItemRegistry.init(this.data);
     
     // Initialize audio
     try {
