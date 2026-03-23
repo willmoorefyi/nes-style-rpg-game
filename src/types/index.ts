@@ -5,6 +5,8 @@ export interface Scene {
   enter(): void | Promise<void>;
   update(dt: number): void;
   exit(): void | Promise<void>;
+  onPause?(): void;
+  onResume?(): void;
 }
 
 export interface AssetManifest {

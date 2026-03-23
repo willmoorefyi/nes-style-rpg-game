@@ -7,6 +7,8 @@ interface MockScene extends Scene {
   enterCalls: number;
   exitCalls: number;
   updateCalls: number[];
+  pauseCalls: number;
+  resumeCalls: number;
 }
 
 function createMockScene(): MockScene {
@@ -16,9 +18,13 @@ function createMockScene(): MockScene {
     enterCalls: 0,
     exitCalls: 0,
     updateCalls: [],
+    pauseCalls: 0,
+    resumeCalls: 0,
     enter: vi.fn(() => { scene.enterCalls++; }),
     exit: vi.fn(() => { scene.exitCalls++; }),
     update: vi.fn((dt: number) => { scene.updateCalls.push(dt); }),
+    onPause: vi.fn(() => { scene.pauseCalls++; }),
+    onResume: vi.fn(() => { scene.resumeCalls++; }),
   };
   return scene;
 }
@@ -96,5 +102,116 @@ describe('SceneManager', () => {
     await manager.switchTo('s2');
 
     expect(order).toEqual(['s1-enter', 's1-exit', 's2-enter']);
+  });
+
+  describe('push/pop', () => {
+    it('push adds scene to stack and calls enter on new scene', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+
+      expect(scene2.enterCalls).toBe(1);
+      expect(manager.current).toBe('s2');
+      expect(stage.children).toContain(scene2.container);
+    });
+
+    it('push calls onPause on the scene being pushed over', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+
+      expect(scene1.pauseCalls).toBe(1);
+    });
+
+    it('push hides previous scene container', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+
+      expect(scene1.container.visible).toBe(false);
+    });
+
+    it('pop calls exit on current and restores previous scene', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+      await manager.pop();
+
+      expect(scene2.exitCalls).toBe(1);
+      expect(manager.current).toBe('s1');
+      expect(scene1.container.visible).toBe(true);
+    });
+
+    it('pop calls onResume on the restored scene', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+      await manager.pop();
+
+      expect(scene1.resumeCalls).toBe(1);
+    });
+
+    it('pop on empty stack throws', async () => {
+      const scene = createMockScene();
+      manager.register('test', scene);
+      await manager.switchTo('test');
+
+      await expect(manager.pop()).rejects.toThrow('Scene stack is empty');
+    });
+
+    it('push throws when scene not registered', async () => {
+      await expect(manager.push('missing')).rejects.toThrow("Scene 'missing' not found");
+    });
+
+    it('switchTo clears the stack and calls exit on stacked scenes', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      const scene3 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+      manager.register('s3', scene3);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+      await manager.switchTo('s3');
+
+      expect(scene1.exitCalls).toBe(1);
+      expect(scene2.exitCalls).toBe(1);
+      expect(scene3.enterCalls).toBe(1);
+    });
+
+    it('update only updates top-of-stack scene', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.register('s2', scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('s2');
+      manager.update(16);
+
+      expect(scene1.updateCalls).toEqual([]);
+      expect(scene2.updateCalls).toEqual([16]);
+    });
   });
 });
