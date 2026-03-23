@@ -13,5 +13,11 @@
   { "id": "antidote", "name": "Antidote", "type": "consumable", "stats": {}, "price": 75, "usableBy": [] },
   { "id": "phoenix_down", "name": "Phoenix Down", "type": "consumable", "stats": {}, "price": 500, "usableBy": [] },
   { "id": "tent", "name": "Tent", "type": "consumable", "stats": {}, "price": 250, "usableBy": [] },
-  { "id": "lute", "name": "Lute", "type": "key", "stats": {}, "price": 0, "usableBy": [] }
+  { "id": "lute", "name": "Lute", "type": "key", "stats": {}, "price": 0, "usableBy": [] },
+  { "id": "short_sword", "name": "Short Sword", "type": "weapon", "stats": { "attack": 10 }, "price": 15, "usableBy": ["warrior", "thief", "red_mage"] },
+  { "id": "hammer", "name": "Hammer", "type": "weapon", "stats": { "attack": 9 }, "price": 10, "usableBy": ["warrior", "white_mage"] },
+  { "id": "leather_armor", "name": "Leather Armor", "type": "armor", "stats": { "defense": 4 }, "price": 50, "usableBy": ["warrior", "thief", "red_mage"] },
+  { "id": "wooden_shield", "name": "Wooden Shield", "type": "armor", "slot": "shield", "stats": { "defense": 2 }, "price": 15, "usableBy": ["warrior", "red_mage"] },
+  { "id": "cap", "name": "Cap", "type": "armor", "slot": "helmet", "stats": { "defense": 1 }, "price": 10, "usableBy": ["warrior", "thief", "monk", "white_mage", "black_mage", "red_mage"] },
+  { "id": "ether", "name": "Ether", "type": "consumable", "stats": {}, "price": 150, "usableBy": [] }
 ]

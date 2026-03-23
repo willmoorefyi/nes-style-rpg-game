@@ -11,5 +11,11 @@
   { "id": "lock", "name": "LOCK", "level": 1, "type": "black", "effect": "debuff_evade", "targeting": "single", "description": "Lower enemy evasion", "power": 0, "element": "none" },
   { "id": "ice", "name": "ICE", "level": 2, "type": "black", "effect": "damage", "targeting": "single", "description": "Deal ice damage to one enemy", "power": 30, "element": "ice" },
   { "id": "dark", "name": "DARK", "level": 2, "type": "black", "effect": "status_blind", "targeting": "all", "description": "Blind all enemies", "power": 0, "element": "none" },
-  { "id": "fir2", "name": "FIR2", "level": 3, "type": "black", "effect": "damage", "targeting": "all", "description": "Deal fire damage to all enemies", "power": 30, "element": "fire" }
+  { "id": "fir2", "name": "FIR2", "level": 3, "type": "black", "effect": "damage", "targeting": "all", "description": "Deal fire damage to all enemies", "power": 30, "element": "fire" },
+  { "id": "lamp", "name": "LAMP", "level": 2, "type": "white", "effect": "cure_blind", "targeting": "single", "description": "Cure blindness on one ally", "power": 0, "element": "none" },
+  { "id": "mute", "name": "MUTE", "level": 2, "type": "white", "effect": "status_silence", "targeting": "single", "description": "Inflict silence on one enemy", "power": 0, "element": "none" },
+  { "id": "alit", "name": "ALIT", "level": 2, "type": "white", "effect": "resist_lightning", "targeting": "all", "description": "Grant lightning resistance to all allies", "power": 0, "element": "lightning" },
+  { "id": "invs", "name": "INVS", "level": 2, "type": "white", "effect": "buff_evade", "targeting": "single", "description": "Raise evasion of one ally", "power": 0, "element": "none" },
+  { "id": "tmpr", "name": "TMPR", "level": 2, "type": "black", "effect": "buff_attack", "targeting": "single", "description": "Raise attack of one ally", "power": 0, "element": "none" },
+  { "id": "slow", "name": "SLOW", "level": 2, "type": "black", "effect": "debuff_speed", "targeting": "single", "description": "Reduce speed of one enemy", "power": 0, "element": "none" }
 ]

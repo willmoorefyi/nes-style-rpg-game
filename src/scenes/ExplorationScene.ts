@@ -172,6 +172,6 @@ export class ExplorationScene implements Scene {
   }
 
   canSave(): boolean {
-    return this.currentMapData?.canSave ?? false;
+    return this.currentMapData?.canSave ?? true;
   }
 }
