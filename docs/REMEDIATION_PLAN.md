@@ -1011,8 +1011,8 @@ export interface QuantitySelectorConfig {
 | 3 | Duplicate EquipmentSlot type | CRITICAL | WP-03 | ✅ Done |
 | 4 | No scene stack | HIGH | WP-01 | ✅ Done |
 | 5 | Menu lacks scrolling | HIGH | WP-04 | ✅ Done |
-| 6 | No inventory system | HIGH | WP-08 | Planned |
-| 7 | Missing data files (classes/items/spells) | HIGH | WP-07 | Planned |
+| 6 | No inventory system | HIGH | WP-08 | ✅ Done |
+| 7 | Missing data files (classes/items/spells) | HIGH | WP-07 | ✅ Done |
 | 8 | No schema validation in DataLoader | MEDIUM | WP-06 | ✅ Done |
 | 9 | wrapText() duplication | MEDIUM | WP-05 | ✅ Done |
 | 10 | BattleScene/BattleCommands untested | MEDIUM | WP-09 | Planned |
