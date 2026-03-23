@@ -11,6 +11,8 @@ export class TilemapRenderer {
   private spritePool: Sprite[][] = [];
   private camera: Camera | null = null;
   private placeholders: PlaceholderTextures | null = null;
+  private dirty = true;
+  private lastBounds = { startX: -1, startY: -1, endX: -1, endY: -1 };
 
   constructor(mapData: MapData, tilesetTexture: Texture | null, tilesPerRow: number, placeholders?: PlaceholderTextures) {
     this.mapData = mapData;
@@ -59,6 +61,11 @@ export class TilemapRenderer {
 
   setCamera(camera: Camera): void {
     this.camera = camera;
+    this.dirty = true;
+  }
+
+  markDirty(): void {
+    this.dirty = true;
   }
 
   private getTileTexture(tileId: number): Texture {
@@ -74,6 +81,19 @@ export class TilemapRenderer {
       : { startX: 0, startY: 0, endX: this.mapData.width, endY: this.mapData.height };
 
     const { startX, startY, endX, endY } = bounds;
+
+    // Skip render if bounds haven't changed and not dirty
+    if (!this.dirty &&
+        startX === this.lastBounds.startX &&
+        startY === this.lastBounds.startY &&
+        endX === this.lastBounds.endX &&
+        endY === this.lastBounds.endY) {
+      return;
+    }
+
+    this.lastBounds = { startX, startY, endX, endY };
+    this.dirty = false;
+
     const clampedStartX = Math.max(0, startX);
     const clampedStartY = Math.max(0, startY);
     const clampedEndX = Math.min(this.mapData.width, endX);

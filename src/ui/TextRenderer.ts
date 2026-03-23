@@ -9,6 +9,7 @@ export interface TextRendererConfig {
   style?: Partial<TextStyle>;
 }
 
+// TODO: Implement bitmap font rendering for authentic NES look
 export class TextRenderer extends Container {
   private config: TextRendererConfig;
   private textObj: Text;
