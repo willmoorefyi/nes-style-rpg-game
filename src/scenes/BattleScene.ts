@@ -1,11 +1,17 @@
 import { Container, Text, TextStyle, Graphics } from 'pixi.js';
 import type { Scene, EnemyData } from '../types/index.js';
-import type { Game } from '../core/Game.js';
+import type { InputManager } from '../core/InputManager.js';
+import type { EventBus } from '../core/EventBus.js';
 import type { Character } from '../entities/Character.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
+
+export interface BattleSceneDeps {
+  input: InputManager;
+  events: EventBus;
+}
 
 export interface BattleSceneConfig {
   party: Character[];
@@ -16,7 +22,7 @@ type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
-  private game: Game;
+  private deps: BattleSceneDeps;
   private battle: BattleStateMachine;
   private config: BattleSceneConfig;
 
@@ -33,8 +39,8 @@ export class BattleScene implements Scene {
   private messageTimer = 0;
   private currentMessageIndex = 0;
 
-  constructor(game: Game, config: BattleSceneConfig) {
-    this.game = game;
+  constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
+    this.deps = deps;
     this.config = config;
     this.battle = new BattleStateMachine(config);
   }
@@ -124,29 +130,29 @@ export class BattleScene implements Scene {
     switch (this.uiState) {
       case 'intro':
         this.introTimer -= dt;
-        if (this.introTimer <= 0 || this.game.input.isJustPressed('confirm')) {
+        if (this.introTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
           this.battle.advanceFromIntro();
           this.startCommandPhase();
         }
         break;
 
       case 'command':
-        this.commandMenu.update(this.game.input);
+        this.commandMenu.update(this.deps.input);
         break;
 
       case 'target':
-        if (this.targetMenu) this.targetMenu.update(this.game.input);
+        if (this.targetMenu) this.targetMenu.update(this.deps.input);
         break;
 
       case 'message':
         this.messageTimer -= dt;
-        if (this.messageTimer <= 0 || this.game.input.isJustPressed('confirm')) {
+        if (this.messageTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
           this.advanceMessage();
         }
         break;
 
       case 'end':
-        if (this.game.input.isJustPressed('confirm')) {
+        if (this.deps.input.isJustPressed('confirm')) {
           this.endBattle();
         }
         break;
@@ -283,7 +289,7 @@ export class BattleScene implements Scene {
   private endBattle(): void {
     const result = this.battle.battleResult;
     if (result) {
-      this.game.events.emit('battleEnd', {
+      this.deps.events.emit('battleEnd', {
         victory: result.victory,
         xpReward: result.xpReward,
         goldReward: result.goldReward,

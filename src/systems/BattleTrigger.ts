@@ -1,6 +1,6 @@
 import type { Game } from '../core/Game.js';
 import type { EnemyData } from '../types/index.js';
-import { BattleScene } from '../scenes/BattleScene.js';
+import { BattleScene, type BattleSceneDeps } from '../scenes/BattleScene.js';
 import { GameOverScene } from '../scenes/GameOverScene.js';
 
 export interface BattleEndData {
@@ -31,7 +31,8 @@ export class BattleTrigger {
 
     this.onBattleTriggered?.();
 
-    const battleScene = new BattleScene(this.game, { party, enemies });
+    const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events };
+    const battleScene = new BattleScene(deps, { party, enemies });
     this.game.scenes.register('battle', battleScene);
     this.game.scenes.register('gameover', new GameOverScene(this.game));
     await this.game.scenes.switchTo('battle');

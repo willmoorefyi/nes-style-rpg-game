@@ -1,4 +1,38 @@
+import { vi } from 'vitest';
+import { Container, Texture } from 'pixi.js';
 import type { MapData } from '../../src/types/index.js';
+import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
+
+export function createMockGame(mapData?: MapData) {
+  const map = mapData ?? createMapData();
+  return {
+    app: { stage: new Container() },
+    scenes: { register: vi.fn(), switchTo: vi.fn() },
+    assets: { load: vi.fn().mockResolvedValue(Texture.WHITE) },
+    input: {
+      isPressed: vi.fn().mockReturnValue(false),
+      isJustPressed: vi.fn().mockReturnValue(false),
+      attach: vi.fn(),
+      detach: vi.fn(),
+      update: vi.fn(),
+    },
+    events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
+    data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]) },
+    party: { all: [], distributeXp: vi.fn(), addGold: vi.fn() },
+  } as const;
+}
+
+export type MockGame = ReturnType<typeof createMockGame>;
+
+export function createMockBattleSceneDeps(): BattleSceneDeps {
+  return {
+    input: {
+      isPressed: vi.fn().mockReturnValue(false),
+      isJustPressed: vi.fn().mockReturnValue(false),
+    },
+    events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
+  } as unknown as BattleSceneDeps;
+}
 
 export function createMapData(overrides: Partial<MapData> = {}): MapData {
   const width = overrides.width ?? 8;

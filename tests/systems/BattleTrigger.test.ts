@@ -1,38 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BattleTrigger } from '../../src/systems/BattleTrigger.js';
 import type { Game } from '../../src/core/Game.js';
+import { createMockGame } from '../helpers/testUtils.js';
 
-function createMockGame() {
+const mockEnemy = {
+  id: 'goblin',
+  name: 'Goblin',
+  stats: { hp: 20, strength: 5, agility: 5, intelligence: 2, vitality: 3, luck: 3, attack: 8, defense: 2, magicDefense: 1 },
+  xpReward: 10,
+  goldReward: 5,
+  sprite: 'goblin.png',
+};
+
+function createBattleTriggerMock() {
+  const base = createMockGame();
   return {
+    ...base,
     party: {
+      ...base.party,
       all: [{ name: 'Hero', currentHp: 100, maxHp: 100 }],
-      distributeXp: vi.fn(),
-      addGold: vi.fn(),
     },
-    scenes: {
-      register: vi.fn(),
-      switchTo: vi.fn(),
-    },
-    data: {
-      loadEnemies: vi.fn().mockResolvedValue([{
-        id: 'goblin',
-        name: 'Goblin',
-        stats: { hp: 20, strength: 5, agility: 5, intelligence: 2, vitality: 3, luck: 3, attack: 8, defense: 2, magicDefense: 1 },
-        xpReward: 10,
-        goldReward: 5,
-        sprite: 'goblin.png',
-      }]),
-    },
-  } as unknown as Game;
+  };
 }
 
 describe('BattleTrigger', () => {
-  let game: Game;
+  let game: ReturnType<typeof createBattleTriggerMock>;
   let trigger: BattleTrigger;
 
   beforeEach(() => {
-    game = createMockGame();
-    trigger = new BattleTrigger(game);
+    game = createBattleTriggerMock();
+    game.data.loadEnemies.mockResolvedValue([mockEnemy]);
+    trigger = new BattleTrigger(game as unknown as Game);
   });
 
   it('creates instance', () => {

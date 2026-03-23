@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Container } from 'pixi.js';
 import { BattleScene, type BattleSceneConfig } from '../../src/scenes/BattleScene.js';
-import type { Game } from '../../src/core/Game.js';
 import type { EnemyData, CharacterClassData } from '../../src/types/index.js';
 import { Character } from '../../src/entities/Character.js';
+import { createMockBattleSceneDeps } from '../helpers/testUtils.js';
 
 const mockClassData: CharacterClassData = {
   id: 'fighter',
@@ -23,17 +23,6 @@ const mockEnemy: EnemyData = {
   sprite: 'goblin.png',
 };
 
-function createMockGame() {
-  return {
-    app: { stage: new Container() },
-    input: {
-      isPressed: vi.fn().mockReturnValue(false),
-      isJustPressed: vi.fn().mockReturnValue(false),
-    },
-    events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
-  };
-}
-
 function createConfig(): BattleSceneConfig {
   return {
     party: [new Character({ name: 'Hero', classData: mockClassData })],
@@ -42,12 +31,12 @@ function createConfig(): BattleSceneConfig {
 }
 
 describe('BattleScene', () => {
-  let game: ReturnType<typeof createMockGame>;
+  let deps: ReturnType<typeof createMockBattleSceneDeps>;
   let scene: BattleScene;
 
   beforeEach(() => {
-    game = createMockGame();
-    scene = new BattleScene(game as unknown as Game, createConfig());
+    deps = createMockBattleSceneDeps();
+    scene = new BattleScene(deps, createConfig());
   });
 
   it('has a container', () => {
@@ -66,9 +55,8 @@ describe('BattleScene', () => {
 
   it('advances from intro on confirm press', () => {
     scene.enter();
-    game.input.isJustPressed.mockReturnValue(true);
+    (deps.input.isJustPressed as ReturnType<typeof import('vitest').vi.fn>).mockReturnValue(true);
     scene.update(1);
-    // Should transition to command phase
     expect(() => scene.update(1)).not.toThrow();
   });
 
