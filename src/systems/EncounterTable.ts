@@ -3,6 +3,11 @@ import type { EncounterEntry } from '../types/index.js';
 export class EncounterTable {
   private entries: EncounterEntry[] = [];
   private totalWeight = 0;
+  private rng: () => number;
+
+  constructor(rng: () => number = Math.random) {
+    this.rng = rng;
+  }
 
   setEntries(entries: EncounterEntry[]): void {
     this.entries = entries;
@@ -11,7 +16,7 @@ export class EncounterTable {
 
   selectEnemies(): string[] {
     if (this.entries.length === 0 || this.totalWeight === 0) return [];
-    let roll = Math.random() * this.totalWeight;
+    let roll = this.rng() * this.totalWeight;
     for (const entry of this.entries) {
       roll -= entry.weight;
       if (roll <= 0) return entry.enemies;

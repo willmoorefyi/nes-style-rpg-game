@@ -17,10 +17,10 @@ describe('EncounterSystem', () => {
   });
 
   it('setRate changes step range', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    system.setRate({ min: 5, max: 10 });
-    expect(system.stepsRemaining).toBe(5);
-    vi.restoreAllMocks();
+    const rng = () => 0;
+    const sys = new EncounterSystem(events, rng);
+    sys.setRate({ min: 5, max: 10 });
+    expect(sys.stepsRemaining).toBe(5);
   });
 
   it('decrements counter on playerMove', () => {
@@ -33,48 +33,48 @@ describe('EncounterSystem', () => {
   });
 
   it('triggers encounter when counter reaches 0', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    system.setRate({ min: 2, max: 2 });
-    system.setEncounters([{ enemies: ['goblin'], weight: 1 }]);
+    const rng = () => 0;
+    const sys = new EncounterSystem(events, rng);
+    sys.setRate({ min: 2, max: 2 });
+    sys.setEncounters([{ enemies: ['goblin'], weight: 1 }]);
     const callback = vi.fn();
-    system.setOnEncounter(callback);
-    system.start();
+    sys.setOnEncounter(callback);
+    sys.start();
 
     events.emit('playerMove', { x: 1, y: 1 });
     expect(callback).not.toHaveBeenCalled();
     events.emit('playerMove', { x: 2, y: 1 });
     expect(callback).toHaveBeenCalledWith(['goblin']);
 
-    system.stop();
-    vi.restoreAllMocks();
+    sys.stop();
   });
 
   it('resets counter after encounter', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    system.setRate({ min: 1, max: 1 });
-    system.setEncounters([{ enemies: ['goblin'], weight: 1 }]);
-    system.setOnEncounter(() => {});
-    system.start();
+    const rng = () => 0;
+    const sys = new EncounterSystem(events, rng);
+    sys.setRate({ min: 1, max: 1 });
+    sys.setEncounters([{ enemies: ['goblin'], weight: 1 }]);
+    sys.setOnEncounter(() => {});
+    sys.start();
 
     events.emit('playerMove', { x: 1, y: 1 });
-    expect(system.stepsRemaining).toBe(1);
+    expect(sys.stepsRemaining).toBe(1);
 
-    system.stop();
-    vi.restoreAllMocks();
+    sys.stop();
   });
 
   it('does not trigger when no encounters set', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    system.setRate({ min: 1, max: 1 });
+    const rng = () => 0;
+    const sys = new EncounterSystem(events, rng);
+    sys.setRate({ min: 1, max: 1 });
     const callback = vi.fn();
-    system.setOnEncounter(callback);
-    system.start();
+    sys.setOnEncounter(callback);
+    sys.start();
 
     events.emit('playerMove', { x: 1, y: 1 });
     expect(callback).not.toHaveBeenCalled();
 
-    system.stop();
-    vi.restoreAllMocks();
+    sys.stop();
   });
 
   it('stop removes listener', () => {

@@ -44,16 +44,18 @@ describe('EncounterTable', () => {
   });
 
   it('respects weight distribution', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1);
     const entries: EncounterEntry[] = [
       { enemies: ['goblin'], weight: 3 },
       { enemies: ['wolf'], weight: 1 },
     ];
-    table.setEntries(entries);
-    expect(table.selectEnemies()).toEqual(['goblin']);
+    // rng=0.1 -> roll=0.4, goblin (weight 3) -> roll=-2.6 <= 0, returns goblin
+    const lowTable = new EncounterTable(() => 0.1);
+    lowTable.setEntries(entries);
+    expect(lowTable.selectEnemies()).toEqual(['goblin']);
 
-    vi.spyOn(Math, 'random').mockReturnValue(0.9);
-    expect(table.selectEnemies()).toEqual(['wolf']);
-    vi.restoreAllMocks();
+    // rng=0.9 -> roll=3.6, goblin -> roll=0.6, wolf -> roll=-0.4 <= 0, returns wolf
+    const highTable = new EncounterTable(() => 0.9);
+    highTable.setEntries(entries);
+    expect(highTable.selectEnemies()).toEqual(['wolf']);
   });
 });

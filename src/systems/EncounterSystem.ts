@@ -5,12 +5,15 @@ import { EncounterTable } from './EncounterTable.js';
 export class EncounterSystem {
   private stepCounter = 0;
   private rate: EncounterRate = { min: 20, max: 30 };
-  private table = new EncounterTable();
+  private table: EncounterTable;
   private events: EventBus;
   private onEncounter: ((enemies: string[]) => void) | null = null;
+  private rng: () => number;
 
-  constructor(events: EventBus) {
+  constructor(events: EventBus, rng: () => number = Math.random) {
     this.events = events;
+    this.rng = rng;
+    this.table = new EncounterTable(rng);
     this.resetCounter();
   }
 
@@ -48,7 +51,7 @@ export class EncounterSystem {
   };
 
   private resetCounter(): void {
-    this.stepCounter = this.rate.min + Math.floor(Math.random() * (this.rate.max - this.rate.min + 1));
+    this.stepCounter = this.rate.min + Math.floor(this.rng() * (this.rate.max - this.rate.min + 1));
   }
 
   get stepsRemaining(): number {
