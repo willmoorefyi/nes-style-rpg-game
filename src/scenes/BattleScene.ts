@@ -257,7 +257,8 @@ export class BattleScene implements Scene {
       this.messageText.setText(messages[this.currentMessageIndex].text, true);
       this.messageTimer = 45;
     } else if (this.battle.state === 'intro') {
-      // Still in intro, wait for advance
+      this.battle.advanceFromIntro();
+      this.startCommandPhase();
     } else if (this.battle.state === 'resolution') {
       this.resolveRound();
     } else if (this.battle.state === 'command_select') {
