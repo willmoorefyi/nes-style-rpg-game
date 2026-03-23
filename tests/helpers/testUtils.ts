@@ -1,4 +1,18 @@
 import { vi } from 'vitest';
+import type { InputAction } from '../../src/core/InputManager.js';
+
+/** Creates a mock input that tracks pressed state per-frame */
+export function createMockInput() {
+  let pressedThisFrame: InputAction | null = null;
+  return {
+    isPressed: vi.fn().mockReturnValue(false),
+    isJustPressed: vi.fn((action: InputAction) => action === pressedThisFrame),
+    press(action: InputAction) { pressedThisFrame = action; },
+    clear() { pressedThisFrame = null; },
+  };
+}
+
+export type MockInput = ReturnType<typeof createMockInput>;
 import { Container, Texture } from 'pixi.js';
 import type { MapData } from '../../src/types/index.js';
 import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
@@ -24,9 +38,9 @@ export function createMockGame(mapData?: MapData) {
 
 export type MockGame = ReturnType<typeof createMockGame>;
 
-export function createMockBattleSceneDeps(): BattleSceneDeps {
+export function createMockBattleSceneDeps(input?: MockInput): BattleSceneDeps {
   return {
-    input: {
+    input: input ?? {
       isPressed: vi.fn().mockReturnValue(false),
       isJustPressed: vi.fn().mockReturnValue(false),
     },

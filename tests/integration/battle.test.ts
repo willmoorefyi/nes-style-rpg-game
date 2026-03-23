@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BattleScene, type BattleSceneConfig } from '../../src/scenes/BattleScene.js';
-import type { Game } from '../../src/core/Game.js';
+import { BattleScene, type BattleSceneConfig, type BattleSceneDeps } from '../../src/scenes/BattleScene.js';
 import type { EnemyData, CharacterClassData } from '../../src/types/index.js';
 import { Character } from '../../src/entities/Character.js';
 import type { InputAction } from '../../src/core/InputManager.js';
+import { createMockInput, createMockBattleSceneDeps, type MockInput } from '../helpers/testUtils.js';
 
 const mockClassData: CharacterClassData = {
   id: 'fighter',
@@ -32,47 +32,29 @@ const strongEnemy: EnemyData = {
   sprite: 'dragon.png',
 };
 
-/** Creates a mock input that tracks pressed state per-frame */
-function createMockInput() {
-  let pressedThisFrame: InputAction | null = null;
-  return {
-    isPressed: vi.fn().mockReturnValue(false),
-    isJustPressed: vi.fn((action: InputAction) => action === pressedThisFrame),
-    press(action: InputAction) { pressedThisFrame = action; },
-    clear() { pressedThisFrame = null; },
-  };
-}
-
-function createMockGame(input: ReturnType<typeof createMockInput>) {
-  return {
-    input,
-    events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
-  } as unknown as Game;
-}
-
 function createConfig(party: Character[], enemies: EnemyData[]): BattleSceneConfig {
   return { party, enemies };
 }
 
 /** Helper to advance scene with input then clear */
-function tick(scene: BattleScene, input: ReturnType<typeof createMockInput>, action?: InputAction) {
+function tick(scene: BattleScene, input: MockInput, action?: InputAction) {
   if (action) input.press(action);
   scene.update(1);
   input.clear();
 }
 
 describe('Battle Integration', () => {
-  let input: ReturnType<typeof createMockInput>;
-  let game: Game;
+  let input: MockInput;
+  let deps: BattleSceneDeps;
 
   beforeEach(() => {
     input = createMockInput();
-    game = createMockGame(input);
+    deps = createMockBattleSceneDeps(input);
   });
 
   it('complete victory flow: intro → command → execute → victory', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
-    const scene = new BattleScene(game, createConfig([hero], [weakEnemy]));
+    const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
     scene.enter();
 
     // Access internal state for debugging
@@ -105,7 +87,7 @@ describe('Battle Integration', () => {
     // Final confirm to trigger endBattle
     tick(scene, input, 'confirm');
 
-    const emitCalls = (game.events.emit as ReturnType<typeof vi.fn>).mock.calls;
+    const emitCalls = (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls;
     const battleEndCall = emitCalls.find(c => c[0] === 'battleEnd');
     expect(battleEndCall).toBeDefined();
     expect(battleEndCall![1].victory).toBe(true);
@@ -113,7 +95,7 @@ describe('Battle Integration', () => {
 
   it('complete defeat flow: party dies → game over', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData, currentHp: 1 });
-    const scene = new BattleScene(game, createConfig([hero], [strongEnemy]));
+    const scene = new BattleScene(deps, createConfig([hero], [strongEnemy]));
     scene.enter();
 
     const getState = () => (scene as unknown as { uiState: string }).uiState;
@@ -134,7 +116,7 @@ describe('Battle Integration', () => {
 
     tick(scene, input, 'confirm');
 
-    const emitCalls = (game.events.emit as ReturnType<typeof vi.fn>).mock.calls;
+    const emitCalls = (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls;
     const battleEndCall = emitCalls.find(c => c[0] === 'battleEnd');
     expect(battleEndCall).toBeDefined();
     expect(battleEndCall![1].victory).toBe(false);
@@ -142,7 +124,7 @@ describe('Battle Integration', () => {
 
   it('command selection: navigate menu and cancel target selection', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
-    const scene = new BattleScene(game, createConfig([hero], [weakEnemy]));
+    const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
     scene.enter();
 
     const getState = () => (scene as unknown as { uiState: string }).uiState;
@@ -169,14 +151,14 @@ describe('Battle Integration', () => {
 
     tick(scene, input, 'confirm');
 
-    const emitCalls = (game.events.emit as ReturnType<typeof vi.fn>).mock.calls;
+    const emitCalls = (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls;
     const battleEndCall = emitCalls.find(c => c[0] === 'battleEnd');
     expect(battleEndCall).toBeDefined();
   });
 
   it('flee attempt: run command is processed', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
-    const scene = new BattleScene(game, createConfig([hero], [weakEnemy]));
+    const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
     scene.enter();
 
     const getState = () => (scene as unknown as { uiState: string }).uiState;
