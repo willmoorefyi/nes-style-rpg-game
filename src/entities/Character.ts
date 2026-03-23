@@ -1,6 +1,4 @@
-import type { CharacterClassData, ItemData, StatBlock } from '../types/index.js';
-
-export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';
+import type { CharacterClassData, EquipmentSlot, ItemData, StatBlock } from '../types/index.js';
 
 export interface CharacterData {
   name: string;
