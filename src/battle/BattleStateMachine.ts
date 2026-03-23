@@ -119,10 +119,55 @@ export class BattleStateMachine {
     for (const combatant of turnOrder) {
       const cmd = this.commands.find(c => c.actorId === combatant.id);
       if (!cmd) continue;
+      
+      // Tick status effects at start of turn
+      const canAct = this.tickCombatantStatus(combatant.id, combatant.isEnemy);
+      if (!canAct) continue;
+      
       this.executeCommand(cmd, combatant.isEnemy);
     }
 
     this._state = 'resolution';
+  }
+
+  private tickCombatantStatus(id: string, isEnemy: boolean): boolean {
+    if (isEnemy) {
+      const enemy = this.enemies.find(e => e.id === id);
+      if (!enemy || enemy.currentHp <= 0) return false;
+      const result = enemy.status.tick(enemy.data.stats.hp);
+      if (result.damage > 0) {
+        enemy.currentHp = Math.max(0, enemy.currentHp - result.damage);
+        this.messages.push({ text: `${enemy.data.name} takes ${result.damage} poison damage!` });
+        if (enemy.currentHp <= 0) {
+          this.messages.push({ text: `${enemy.data.name} defeated!` });
+          return false;
+        }
+      }
+      if (result.skipTurn) {
+        const status = enemy.status.has('sleep') ? 'asleep' : 'stunned';
+        this.messages.push({ text: `${enemy.data.name} is ${status}!` });
+        return false;
+      }
+      return true;
+    } else {
+      const char = this.party.find(c => c.name === id);
+      if (!char || char.currentHp <= 0) return false;
+      const result = char.statusTracker.tick(char.maxHp);
+      if (result.damage > 0) {
+        char.currentHp = char.currentHp - result.damage;
+        this.messages.push({ text: `${char.name} takes ${result.damage} poison damage!` });
+        if (char.currentHp <= 0) {
+          this.messages.push({ text: `${char.name} fell!` });
+          return false;
+        }
+      }
+      if (result.skipTurn) {
+        const status = char.statusTracker.has('sleep') ? 'asleep' : 'stunned';
+        this.messages.push({ text: `${char.name} is ${status}!` });
+        return false;
+      }
+      return true;
+    }
   }
 
   private executeCommand(cmd: BattleCommand, isEnemy: boolean): void {

@@ -27,6 +27,7 @@ export class ItemEffects {
         result = this.restoreCharges(target);
         break;
       case 'antidote':
+        target.statusTracker.remove('poison');
         result = { success: true, message: `${target.name} is cured of poison` };
         break;
       case 'phoenix_down':
@@ -55,7 +56,8 @@ export class ItemEffects {
   }
 
   private static revive(target: Character): ItemEffectResult {
-    if (target.currentHp > 0) return { success: false, message: `${target.name} is not KO'd` };
+    if (target.currentHp > 0 && !target.statusTracker.has('death')) return { success: false, message: `${target.name} is not KO'd` };
+    target.statusTracker.remove('death');
     target.currentHp = 1;
     return { success: true, message: `${target.name} was revived` };
   }

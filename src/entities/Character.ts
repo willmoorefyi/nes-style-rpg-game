@@ -1,6 +1,7 @@
 import type { CharacterClassData, CharacterSaveData, EquipmentSlot, ItemData, StatBlock } from '../types/index.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
+import { StatusTracker } from '../battle/StatusEffects.js';
 
 export interface CharacterData {
   name: string;
@@ -21,6 +22,7 @@ export class Character {
   private equipment: Map<EquipmentSlot, ItemData | null> = new Map();
   private spellCharges: number[] = [0, 0, 0, 0, 0, 0, 0, 0];
   private learnedSpells: Map<string, number> = new Map();
+  readonly statusTracker: StatusTracker = new StatusTracker();
 
   constructor(data: CharacterData) {
     this.name = data.name;
@@ -165,6 +167,7 @@ export class Character {
       ) as Record<EquipmentSlot, string | null>,
       spellCharges: [...this.spellCharges],
       learnedSpells: this.getLearnedSpells(),
+      statusEffects: this.statusTracker.toJSON(),
     };
   }
 
@@ -196,6 +199,13 @@ export class Character {
     // Restore learned spells
     for (const { spellId, level } of data.learnedSpells) {
       char.learnSpell(spellId, level);
+    }
+    
+    // Restore status effects
+    if (data.statusEffects) {
+      for (const { effect, duration } of data.statusEffects) {
+        char.statusTracker.apply(effect as any, duration);
+      }
     }
     
     return char;

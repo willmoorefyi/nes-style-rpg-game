@@ -48,4 +48,16 @@ export class StatusTracker {
   onHit(): void {
     this.effects.delete('sleep');
   }
+
+  toJSON(): Array<{ effect: string; duration: number }> {
+    return Array.from(this.effects.entries()).map(([effect, duration]) => ({ effect, duration }));
+  }
+
+  static fromJSON(data: Array<{ effect: string; duration: number }>): StatusTracker {
+    const tracker = new StatusTracker();
+    for (const { effect, duration } of data) {
+      tracker.apply(effect as StatusEffect, duration);
+    }
+    return tracker;
+  }
 }

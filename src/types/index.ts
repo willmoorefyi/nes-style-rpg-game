@@ -139,6 +139,7 @@ export interface CharacterSaveData {
   equipment: Record<EquipmentSlot, string | null>;
   spellCharges: number[];
   learnedSpells: Array<{ spellId: string; level: number }>;
+  statusEffects?: Array<{ effect: string; duration: number }>;
 }
 
 export interface SaveData {
