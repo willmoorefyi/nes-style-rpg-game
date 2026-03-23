@@ -1,4 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { InputManager } from '../../src/core/InputManager.js';
 
 describe('InputManager', () => {
@@ -6,60 +9,72 @@ describe('InputManager', () => {
 
   beforeEach(() => {
     input = new InputManager();
+    input.attach();
   });
 
-  it('should use default mappings', () => {
-    // Simulate keydown by accessing private state via type assertion
-    const im = input as unknown as { currentKeys: Set<string>; mappings: Record<string, string> };
-    im.currentKeys.add('ArrowUp');
+  afterEach(() => {
+    input.detach();
+  });
+
+  function pressKey(code: string): void {
+    window.dispatchEvent(new KeyboardEvent('keydown', { code }));
+  }
+
+  function releaseKey(code: string): void {
+    window.dispatchEvent(new KeyboardEvent('keyup', { code }));
+  }
+
+  it('should detect pressed keys via isPressed', () => {
+    pressKey('ArrowUp');
     expect(input.isPressed('up')).toBe(true);
   });
 
   it('should track isJustPressed for one frame only', () => {
-    const im = input as unknown as { currentKeys: Set<string> };
-    
-    // Frame 1: key pressed
-    im.currentKeys.add('KeyZ');
+    pressKey('KeyZ');
     expect(input.isJustPressed('confirm')).toBe(true);
     expect(input.isPressed('confirm')).toBe(true);
-    
-    // Frame 2: after update, no longer justPressed
+
     input.update();
     expect(input.isJustPressed('confirm')).toBe(false);
     expect(input.isPressed('confirm')).toBe(true);
   });
 
   it('should track isJustReleased for one frame only', () => {
-    const im = input as unknown as { currentKeys: Set<string> };
-    
-    // Press key
-    im.currentKeys.add('KeyX');
+    pressKey('KeyX');
     input.update();
-    
-    // Release key
-    im.currentKeys.delete('KeyX');
+
+    releaseKey('KeyX');
     expect(input.isJustReleased('cancel')).toBe(true);
     expect(input.isPressed('cancel')).toBe(false);
-    
-    // After update, no longer justReleased
+
     input.update();
     expect(input.isJustReleased('cancel')).toBe(false);
   });
 
-  it('should allow configurable mappings', () => {
-    const im = input as unknown as { currentKeys: Set<string> };
-    
+  it('should allow configurable mappings via setMapping', () => {
     input.setMapping('Space', 'confirm');
-    im.currentKeys.add('Space');
+    pressKey('Space');
     expect(input.isPressed('confirm')).toBe(true);
   });
 
   it('should support custom mappings in constructor', () => {
+    input.detach();
     const custom = new InputManager({ KeyW: 'up', KeyS: 'down' });
-    const im = custom as unknown as { currentKeys: Set<string> };
-    
-    im.currentKeys.add('KeyW');
+    custom.attach();
+
+    pressKey('KeyW');
     expect(custom.isPressed('up')).toBe(true);
     expect(custom.isPressed('down')).toBe(false);
+
+    custom.detach();
+  });
+
+  it('should clear key state on detach', () => {
+    pressKey('ArrowUp');
+    expect(input.isPressed('up')).toBe(true);
+
+    input.detach();
+    input.attach();
+    expect(input.isPressed('up')).toBe(false);
   });
 });
