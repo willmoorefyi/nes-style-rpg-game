@@ -9,11 +9,11 @@
     vitality: 10
     luck: 5
   statGrowth:
-    hp: 6
-    strength: 3
+    hp: 13
+    strength: 4
     agility: 1
     intelligence: 0
-    vitality: 2
+    vitality: 3
     luck: 1
   usableEquipment: [sword, axe, hammer, heavy_armor, shield]
   spellLevels: { white: 0, black: 0 }
@@ -29,12 +29,12 @@
     vitality: 5
     luck: 15
   statGrowth:
-    hp: 4
+    hp: 8
     strength: 2
-    agility: 3
+    agility: 4
     intelligence: 0
     vitality: 1
-    luck: 2
+    luck: 3
   usableEquipment: [knife, light_sword, light_armor]
   spellLevels: { white: 0, black: 0 }
 
@@ -49,11 +49,11 @@
     vitality: 10
     luck: 5
   statGrowth:
-    hp: 5
-    strength: 3
+    hp: 12
+    strength: 4
     agility: 2
     intelligence: 0
-    vitality: 2
+    vitality: 3
     luck: 1
   usableEquipment: [nunchaku, light_armor]
   spellLevels: { white: 0, black: 0 }
@@ -69,10 +69,10 @@
     vitality: 3
     luck: 8
   statGrowth:
-    hp: 3
+    hp: 6
     strength: 1
     agility: 1
-    intelligence: 3
+    intelligence: 4
     vitality: 1
     luck: 1
   usableEquipment: [staff, hammer, robe]
@@ -89,10 +89,10 @@
     vitality: 3
     luck: 8
   statGrowth:
-    hp: 3
+    hp: 6
     strength: 1
     agility: 1
-    intelligence: 3
+    intelligence: 4
     vitality: 1
     luck: 1
   usableEquipment: [knife, staff, robe]
@@ -109,11 +109,11 @@
     vitality: 5
     luck: 10
   statGrowth:
-    hp: 4
+    hp: 8
     strength: 2
     agility: 2
     intelligence: 2
-    vitality: 1
+    vitality: 2
     luck: 1
   usableEquipment: [sword, staff, medium_armor]
   spellLevels: { white: 5, black: 5 }
@@ -134,11 +134,11 @@
     vitality: 12
     luck: 6
   statGrowth:
-    hp: 7
-    strength: 4
+    hp: 16
+    strength: 5
     agility: 1
     intelligence: 1
-    vitality: 3
+    vitality: 4
     luck: 1
   usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
   spellLevels: { white: 3, black: 0 }
@@ -155,12 +155,12 @@
     vitality: 6
     luck: 18
   statGrowth:
-    hp: 5
+    hp: 10
     strength: 3
-    agility: 3
+    agility: 5
     intelligence: 1
     vitality: 1
-    luck: 2
+    luck: 4
   usableEquipment: [knife, light_sword, sword, nunchaku, light_armor]
   spellLevels: { white: 0, black: 4 }
 
@@ -176,11 +176,11 @@
     vitality: 12
     luck: 6
   statGrowth:
-    hp: 6
-    strength: 4
+    hp: 14
+    strength: 5
     agility: 2
     intelligence: 0
-    vitality: 3
+    vitality: 4
     luck: 1
   usableEquipment: [nunchaku, light_armor]
   spellLevels: { white: 0, black: 0 }
@@ -197,10 +197,10 @@
     vitality: 4
     luck: 10
   statGrowth:
-    hp: 4
+    hp: 7
     strength: 1
     agility: 1
-    intelligence: 4
+    intelligence: 5
     vitality: 1
     luck: 1
   usableEquipment: [staff, hammer, robe]
@@ -218,10 +218,10 @@
     vitality: 4
     luck: 10
   statGrowth:
-    hp: 4
+    hp: 7
     strength: 1
     agility: 1
-    intelligence: 4
+    intelligence: 5
     vitality: 1
     luck: 1
   usableEquipment: [knife, staff, robe]
@@ -239,11 +239,11 @@
     vitality: 6
     luck: 12
   statGrowth:
-    hp: 5
-    strength: 2
+    hp: 10
+    strength: 3
     agility: 2
     intelligence: 3
-    vitality: 1
+    vitality: 2
     luck: 1
   usableEquipment: [sword, staff, medium_armor, shield]
   spellLevels: { white: 7, black: 7 }

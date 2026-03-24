@@ -1,6 +1,7 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
+import { NES_FONT } from './NESFont.js';
 
 export interface MenuItem {
   label: string;
@@ -24,15 +25,13 @@ export class Menu extends Container {
   private items: MenuItem[];
   private cursorIndex = 0;
   private scrollOffset = 0;
-  private texts: Text[] = [];
-  private cursorText: Text;
+  private texts: BitmapText[] = [];
+  private cursorText: BitmapText;
   private lineHeight: number;
   private cursorChar: string;
   private maxVisible: number;
-  private style: TextStyle;
-  private disabledStyle: TextStyle;
-  private upIndicator?: Text;
-  private downIndicator?: Text;
+  private upIndicator?: BitmapText;
+  private downIndicator?: BitmapText;
   private onSelect?: (item: MenuItem, index: number) => void;
   private onCancel?: () => void;
   private eventBus?: EventBus;
@@ -48,20 +47,17 @@ export class Menu extends Container {
     this.eventBus = config.eventBus;
     this.position.set(config.x ?? 0, config.y ?? 0);
 
-    this.style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
-    this.disabledStyle = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0x808080 });
-
-    this.cursorText = new Text({ text: this.cursorChar, style: this.style });
+    this.cursorText = new BitmapText({ text: this.cursorChar, style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     this.cursorText.position.set(0, 0);
     this.addChild(this.cursorText);
 
     if (this.items.length > this.maxVisible) {
-      this.upIndicator = new Text({ text: '▲', style: this.style });
+      this.upIndicator = new BitmapText({ text: '▲', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
       this.upIndicator.position.set(12 + 40, -this.lineHeight);
       this.upIndicator.visible = false;
       this.addChild(this.upIndicator);
 
-      this.downIndicator = new Text({ text: '▼', style: this.style });
+      this.downIndicator = new BitmapText({ text: '▼', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
       this.downIndicator.position.set(12 + 40, this.maxVisible * this.lineHeight);
       this.downIndicator.visible = false;
       this.addChild(this.downIndicator);
@@ -78,9 +74,13 @@ export class Menu extends Container {
     for (let i = 0; i < visibleCount; i++) {
       const itemIndex = this.scrollOffset + i;
       const item = this.items[itemIndex];
-      const t = new Text({
+      const t = new BitmapText({
         text: item.label,
-        style: item.enabled === false ? this.disabledStyle : this.style,
+        style: {
+          fontFamily: NES_FONT,
+          fontSize: 8,
+          fill: item.enabled === false ? 0x808080 : 0xffffff,
+        },
       });
       t.position.set(12, i * this.lineHeight);
       this.texts.push(t);

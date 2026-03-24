@@ -74,9 +74,9 @@ describe('ItemEffects', () => {
 
   it('restores charges with ether', () => {
     inv.add('ether');
-    char.setSpellCharges(1, 2);
+    char.setSpellCharges(1, 1);
     const result = ItemEffects.applyItemEffect('ether', char, inv);
     expect(result.success).toBe(true);
-    expect(char.getSpellCharges(1)).toBe(3);
+    expect(char.getSpellCharges(1)).toBe(2);
   });
 });

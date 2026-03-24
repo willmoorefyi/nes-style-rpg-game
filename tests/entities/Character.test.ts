@@ -92,7 +92,7 @@ describe('Character', () => {
   it('levels up when XP threshold reached', () => {
     const char = new Character({ name: 'Hero', classData: mockWarriorClass });
     expect(char.level).toBe(1);
-    const leveledUp = char.addXp(100);
+    const leveledUp = char.addXp(200);
     expect(leveledUp).toBe(true);
     expect(char.level).toBe(2);
   });
@@ -107,7 +107,7 @@ describe('Character', () => {
   it('restores HP on level up', () => {
     const char = new Character({ name: 'Hero', classData: mockWarriorClass });
     char.currentHp = 10;
-    char.addXp(100);
+    char.addXp(200);
     expect(char.currentHp).toBe(char.maxHp);
   });
 

@@ -115,12 +115,27 @@ Terrain types, 4 movement modes (walk, ship, canoe, airship), VehicleManager, ke
 
 ---
 
-## Phases Remaining
+## Phase 18: Polish & Balancing ✅
 
-### Phase 18: Polish & Balancing ⏳
-Playtesting, stat tuning, encounter rates, final art/audio.
+Stat tuning, bitmap font, performance optimization, accessibility review, and playtest documentation.
 
-**Status:** PENDING
+**Deliverables:**
+- Resolved all `[DEFERRED: PLAYTESTING]` items from design doc
+- Stat and damage balancing pass across all tiers
+- Boss difficulty tuning (Garland, Lich, Fiends)
+- Encounter table balancing (per-area difficulty progression)
+- Bitmap font replacement for NES-authentic text rendering
+- Performance profiling and optimization
+- Accessibility review (keyboard nav, contrast, readability)
+- `docs/PLAYTEST_RESULTS.md` — playtesting methodology, progression analysis, class viability, tuning guide
+
+**Status:** COMPLETE
+
+---
+
+## All 18 Phases Complete 🎉
+
+The game is feature-complete with full content, balancing, and documentation. See `docs/PLAYTEST_RESULTS.md` for the balance tuning guide.
 
 ---
 
@@ -160,6 +175,7 @@ Phases 3 (Tilemap) and 4 (UI Framework) were successfully built in parallel usin
 
 ## Current Metrics
 
-- **Tests:** 739+ (all passing)
-- **Test files:** 70+
+- **Tests:** 770+ (all passing)
+- **Test files:** 63+
 - **Source files:** 80+ TypeScript files
+- **Phases complete:** 18/18

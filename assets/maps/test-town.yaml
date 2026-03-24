@@ -41,13 +41,4 @@ npcs:
 transitions: []
 
 # ═══ RANDOM ENCOUNTERS ═══
-encounterRate:
-  min: 5
-  max: 10
-encounters:
-  - enemies: [goblin]
-    weight: 3
-  - enemies: [goblin, goblin]
-    weight: 2
-  - enemies: [wolf]
-    weight: 1
+# Towns have no random encounters

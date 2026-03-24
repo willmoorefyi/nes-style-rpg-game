@@ -402,6 +402,16 @@ See [docs/PROGRESS.md](docs/PROGRESS.md) for detailed progress notes and challen
 
 ---
 
+## ♿ Accessibility
+
+- The game is fully keyboard-controlled — no mouse required
+- The canvas element has `role="application"` and an `aria-label` for screen readers
+- The canvas auto-focuses on load so keyboard input works immediately
+- A visible focus outline appears when the canvas is focused via keyboard
+- All menus, dialogs, and combat are navigable with Arrow Keys, Z/Enter (confirm), and X/Escape (cancel)
+
+---
+
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.

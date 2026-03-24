@@ -1,8 +1,9 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { Scene, ShopData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
+import { NES_FONT } from '../ui/NESFont.js';
 
 type InnState = 'confirm' | 'resting';
 
@@ -13,9 +14,8 @@ export class InnScene implements Scene {
   private state: InnState = 'confirm';
   private window: Window;
   private menu?: Menu;
-  private messageText?: Text;
+  private messageText?: BitmapText;
   private restTimer = 0;
-  private style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
 
   constructor(game: Game, shopData: ShopData) {
     this.game = game;
@@ -26,7 +26,7 @@ export class InnScene implements Scene {
   }
 
   private showConfirm(): void {
-    const label = new Text({ text: `Stay for ${this.price} G?`, style: this.style });
+    const label = new BitmapText({ text: `Stay for ${this.price} G?`, style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     label.position.set(this.window.contentX, this.window.contentY);
     this.window.addChild(label);
 
@@ -69,7 +69,7 @@ export class InnScene implements Scene {
     while (this.window.children.length > 1) {
       this.window.removeChildAt(1);
     }
-    this.messageText = new Text({ text: 'Your party rests...', style: this.style });
+    this.messageText = new BitmapText({ text: 'Your party rests...', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     this.messageText.position.set(this.window.contentX, this.window.contentY + 16);
     this.window.addChild(this.messageText);
     this.restTimer = 0;

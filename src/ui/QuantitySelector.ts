@@ -1,5 +1,6 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
+import { NES_FONT } from './NESFont.js';
 
 /**
  * QuantitySelector interface for future buy/sell quantity UI.
@@ -23,7 +24,7 @@ export class QuantitySelectorUI extends Container implements QuantitySelector {
   private max: number;
   private onConfirm: (qty: number) => void;
   private onCancel: () => void;
-  private qtyText: Text;
+  private qtyText: BitmapText;
 
   constructor(x: number, y: number, max: number, onConfirm: (qty: number) => void, onCancel: () => void) {
     super();
@@ -32,17 +33,17 @@ export class QuantitySelectorUI extends Container implements QuantitySelector {
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;
 
-    const style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
+    const style = { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff };
     
-    const minus = new Text({ text: '-', style });
+    const minus = new BitmapText({ text: '-', style });
     minus.position.set(0, 0);
     this.addChild(minus);
 
-    this.qtyText = new Text({ text: '1', style });
+    this.qtyText = new BitmapText({ text: '1', style });
     this.qtyText.position.set(12, 0);
     this.addChild(this.qtyText);
 
-    const plus = new Text({ text: '+', style });
+    const plus = new BitmapText({ text: '+', style });
     plus.position.set(36, 0);
     this.addChild(plus);
   }

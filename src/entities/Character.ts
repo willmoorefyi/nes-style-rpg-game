@@ -11,7 +11,17 @@ export interface CharacterData {
   currentHp?: number;
 }
 
-const XP_THRESHOLDS = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500];
+// XP required to reach each level (index = level).
+// Curve: exponential ~1.25x per level, tuned to match design doc §7 targets:
+//   Lv1=0, Lv10≈10,000, Lv20≈50,000, Lv30≈150,000, Lv50≈500,000
+const XP_THRESHOLDS: number[] = (() => {
+  const table = [0]; // Lv1 = 0 XP
+  for (let lvl = 2; lvl <= 50; lvl++) {
+    // Base formula: 25 * lvl^2.6 produces a smooth exponential curve
+    table.push(Math.floor(25 * Math.pow(lvl, 2.6)));
+  }
+  return table;
+})();
 
 export class Character {
   readonly name: string;
@@ -119,8 +129,7 @@ export class Character {
 
   xpForNextLevel(): number {
     if (this._level >= 50) return Infinity;
-    if (this._level < XP_THRESHOLDS.length) return XP_THRESHOLDS[this._level];
-    return Math.floor(XP_THRESHOLDS[9] * Math.pow(1.5, this._level - 9));
+    return XP_THRESHOLDS[this._level] ?? Infinity;
   }
 
   getSpellCharges(level: number): number {
@@ -166,8 +175,38 @@ export class Character {
   }
 
   getMaxCharges(level: number): number {
-    // Simple formula: higher character level = more charges, lower spell level = more charges
-    return Math.max(0, 4 - level + Math.floor(this._level / 5));
+    // Spell charge table per design doc §5.
+    // Key: character level → array of max charges for spell levels 1-8.
+    // Interpolated linearly between defined breakpoints.
+    // Lv1: 2/0/0/0/0/0/0/0
+    // Lv5: 4/2/1/0/0/0/0/0
+    // Lv10: 5/4/3/2/1/0/0/0
+    // Lv20: 7/6/5/5/4/3/2/1
+    // Lv50: 9/9/9/9/9/9/9/9
+    const breakpoints: Array<[number, number[]]> = [
+      [1,  [2, 0, 0, 0, 0, 0, 0, 0]],
+      [5,  [4, 2, 1, 0, 0, 0, 0, 0]],
+      [10, [5, 4, 3, 2, 1, 0, 0, 0]],
+      [20, [7, 6, 5, 5, 4, 3, 2, 1]],
+      [50, [9, 9, 9, 9, 9, 9, 9, 9]],
+    ];
+    if (level < 1 || level > 8) return 0;
+    const idx = level - 1;
+    const clvl = this._level;
+
+    // Find surrounding breakpoints and interpolate
+    if (clvl <= breakpoints[0][0]) return breakpoints[0][1][idx];
+    if (clvl >= breakpoints[breakpoints.length - 1][0]) return breakpoints[breakpoints.length - 1][1][idx];
+
+    for (let i = 0; i < breakpoints.length - 1; i++) {
+      const [loLvl, loCharges] = breakpoints[i];
+      const [hiLvl, hiCharges] = breakpoints[i + 1];
+      if (clvl >= loLvl && clvl <= hiLvl) {
+        const t = (clvl - loLvl) / (hiLvl - loLvl);
+        return Math.min(9, Math.floor(loCharges[idx] + t * (hiCharges[idx] - loCharges[idx])));
+      }
+    }
+    return 0;
   }
 
   /** Apply a battle-only buff to a stat (stacks additively) */

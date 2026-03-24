@@ -1,4 +1,4 @@
-import { Container, Text, TextStyle, Graphics } from 'pixi.js';
+import { Container, BitmapText, Graphics } from 'pixi.js';
 import type { Scene, EnemyData, SpellData } from '../types/index.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
@@ -12,6 +12,7 @@ import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
+import { NES_FONT } from '../ui/NESFont.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -123,14 +124,13 @@ export class BattleScene implements Scene {
   }
 
   private updatePartyDisplay(): void {
-    const toRemove = this.partyWindow.children.filter(c => c instanceof Text);
+    const toRemove = this.partyWindow.children.filter(c => c instanceof BitmapText);
     toRemove.forEach(c => this.partyWindow.removeChild(c));
 
-    const style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
     this.config.party.forEach((char, i) => {
-      const text = new Text({
+      const text = new BitmapText({
         text: `${char.name.slice(0, 6).padEnd(6)} ${char.currentHp}/${char.maxHp}`,
-        style,
+        style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
       });
       text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * 12);
       this.partyWindow.addChild(text);

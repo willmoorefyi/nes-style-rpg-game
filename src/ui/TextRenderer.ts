@@ -1,18 +1,18 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import { wrapText } from './textUtils.js';
+import { NES_FONT } from './NESFont.js';
 
 export interface TextRendererConfig {
   width: number;
   lineHeight?: number;
   charWidth?: number;
   revealSpeed?: number; // chars per frame, 0 = instant
-  style?: Partial<TextStyle>;
+  style?: { fill?: number };
 }
 
-// TODO: Implement bitmap font rendering for authentic NES look
 export class TextRenderer extends Container {
   private config: TextRendererConfig;
-  private textObj: Text;
+  private textObj: BitmapText;
   private fullText = '';
   private revealedCount = 0;
   private revealAccum = 0;
@@ -25,13 +25,14 @@ export class TextRenderer extends Container {
       revealSpeed: 0,
       ...config,
     };
-    const style = new TextStyle({
-      fontFamily: 'monospace',
-      fontSize: 8,
-      fill: 0xffffff,
-      ...config.style,
+    this.textObj = new BitmapText({
+      text: '',
+      style: {
+        fontFamily: NES_FONT,
+        fontSize: 8,
+        fill: config.style?.fill ?? 0xffffff,
+      },
     });
-    this.textObj = new Text({ text: '', style });
     this.addChild(this.textObj);
   }
 

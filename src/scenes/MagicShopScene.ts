@@ -1,4 +1,4 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
@@ -6,6 +6,7 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import type { Character } from '../entities/Character.js';
+import { NES_FONT } from '../ui/NESFont.js';
 
 type State = 'spells' | 'character' | 'slot';
 
@@ -23,12 +24,11 @@ export class MagicShopScene implements Scene {
   
   private mainWindow!: Window;
   private goldWindow!: Window;
-  private goldText!: Text;
+  private goldText!: BitmapText;
   private spellMenu!: Menu;
   private charMenu!: Menu;
   private slotMenu!: Menu;
-  private messageText!: Text;
-  private style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
+  private messageText!: BitmapText;
 
   constructor(game: Game, shopId: string) {
     this.game = game;
@@ -48,12 +48,12 @@ export class MagicShopScene implements Scene {
 
     this.goldWindow = new Window({ x: 8, y: 192, width: 100, height: 40 });
     this.container.addChild(this.goldWindow);
-    this.goldText = new Text({ text: '', style: this.style });
+    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     this.goldText.position.set(16, 200);
     this.container.addChild(this.goldText);
     this.updateGold();
 
-    this.messageText = new Text({ text: '', style: this.style });
+    this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     this.messageText.position.set(120, 200);
     this.container.addChild(this.messageText);
 

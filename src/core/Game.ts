@@ -13,6 +13,7 @@ import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
 import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
+import { installNESFont } from '../ui/NESFont.js';
 
 export const WIDTH = 256;
 export const HEIGHT = 240;
@@ -55,6 +56,7 @@ export class Game {
     });
 
     await this.assets.init();
+    installNESFont();
     await ClassRegistry.init(this.data);
     await ItemRegistry.init(this.data);
     await SpellRegistry.init(this.data);
@@ -71,6 +73,7 @@ export class Game {
     }
 
     this.input.attach();
+    this.setupAccessibility();
     this.resize();
     window.addEventListener('resize', () => this.resize());
     this.app.ticker.add((ticker) => {
@@ -78,6 +81,14 @@ export class Game {
       this.scenes.update(ticker.deltaTime);
       this.playTime += ticker.deltaTime / 60;
     });
+  }
+
+  private setupAccessibility(): void {
+    const canvas = this.app.canvas;
+    canvas.setAttribute('role', 'application');
+    canvas.setAttribute('aria-label', 'FF1-Style RPG Game');
+    canvas.setAttribute('tabindex', '0');
+    canvas.focus();
   }
 
   private setupAudioEvents(): void {

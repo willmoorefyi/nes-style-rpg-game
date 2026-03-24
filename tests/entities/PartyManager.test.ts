@@ -134,7 +134,7 @@ describe('PartyManager', () => {
     const party = new PartyManager();
     const a = createChar('A');
     party.add(a);
-    const results = party.distributeXp(100);
+    const results = party.distributeXp(200);
     expect(results.length).toBe(1);
     expect(results[0]).toBe(true);
   });

@@ -12,8 +12,8 @@
     attack: 8
     defense: 2
     magicDefense: 1
-  xpReward: 10
-  goldReward: 5
+  xpReward: 6
+  goldReward: 6
   sprite: goblin
   weakness: fire
 
@@ -27,10 +27,10 @@
     vitality: 4
     luck: 3
     attack: 10
-    defense: 1
+    defense: 2
     magicDefense: 0
   xpReward: 12
-  goldReward: 3
+  goldReward: 6
   sprite: wolf
   weakness: fire
   resist: ice
@@ -47,8 +47,8 @@
     attack: 12
     defense: 6
     magicDefense: 2
-  xpReward: 20
-  goldReward: 10
+  xpReward: 18
+  goldReward: 12
   sprite: skeleton
   weakness: fire
   resist: ice
@@ -62,11 +62,11 @@
     intelligence: 3
     vitality: 5
     luck: 4
-    attack: 14
+    attack: 12
     defense: 4
     magicDefense: 2
-  xpReward: 30
-  goldReward: 20
+  xpReward: 20
+  goldReward: 15
   sprite: pirate
   weakness: lightning
 
@@ -84,7 +84,7 @@
     attack: 28
     defense: 10
     magicDefense: 4
-  xpReward: 150
+  xpReward: 120
   goldReward: 80
   sprite: ogre
   weakness: lightning
@@ -99,9 +99,9 @@
     vitality: 12
     luck: 5
     attack: 24
-    defense: 8
+    defense: 12
     magicDefense: 6
-  xpReward: 120
+  xpReward: 100
   goldReward: 60
   sprite: troll
   weakness: fire
@@ -116,9 +116,9 @@
     vitality: 10
     luck: 3
     attack: 20
-    defense: 12
+    defense: 14
     magicDefense: 8
-  xpReward: 100
+  xpReward: 80
   goldReward: 50
   sprite: mummy
   weakness: fire
@@ -134,9 +134,9 @@
     vitality: 8
     luck: 6
     attack: 18
-    defense: 6
+    defense: 10
     magicDefense: 10
-  xpReward: 130
+  xpReward: 90
   goldReward: 70
   sprite: cockatrice
   weakness: ice
@@ -152,11 +152,11 @@
     intelligence: 20
     vitality: 18
     luck: 10
-    attack: 36
-    defense: 18
+    attack: 42
+    defense: 22
     magicDefense: 16
-  xpReward: 600
-  goldReward: 300
+  xpReward: 400
+  goldReward: 200
   sprite: vampire
   weakness: fire
   resist: dark
@@ -170,16 +170,16 @@
     intelligence: 15
     vitality: 25
     luck: 8
-    attack: 45
-    defense: 22
+    attack: 56
+    defense: 30
     magicDefense: 18
-  xpReward: 800
-  goldReward: 500
+  xpReward: 500
+  goldReward: 300
   sprite: dragon
   weakness: ice
   resist: fire
 
-# ═══ TIER 4 — Bosses (HP 500-2000) ═══
+# ═══ TIER 4 — Bosses (HP 200-800) ═══
 
 - id: garland
   name: Garland
@@ -190,11 +190,11 @@
     intelligence: 5
     vitality: 10
     luck: 5
-    attack: 20
-    defense: 10
+    attack: 25
+    defense: 15
     magicDefense: 6
-  xpReward: 250
-  goldReward: 200
+  xpReward: 500
+  goldReward: 250
   sprite: garland
   weakness: lightning
   bossPhases:
@@ -211,11 +211,11 @@
     intelligence: 30
     vitality: 15
     luck: 10
-    attack: 25
-    defense: 15
+    attack: 35
+    defense: 20
     magicDefense: 20
   xpReward: 2000
-  goldReward: 1500
+  goldReward: 1000
   sprite: lich
   weakness: fire
   resist: ice

@@ -1,9 +1,10 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { SaveManager, type SlotSummary } from '../systems/SaveManager.js';
+import { NES_FONT } from '../ui/NESFont.js';
 
 export class SaveScene implements Scene {
   readonly container = new Container();
@@ -13,7 +14,6 @@ export class SaveScene implements Scene {
   private confirmWindow?: Window;
   private confirmMenu?: Menu;
   private pendingSlot: number | null = null;
-  private style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
 
   constructor(game: Game) {
     this.game = game;
@@ -73,7 +73,7 @@ export class SaveScene implements Scene {
   private showConfirm(slotId: number): void {
     this.pendingSlot = slotId;
     this.confirmWindow = new Window({ x: 64, y: 80, width: 128, height: 48 });
-    const label = new Text({ text: 'Overwrite?', style: this.style });
+    const label = new BitmapText({ text: 'Overwrite?', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     label.position.set(this.confirmWindow.contentX, this.confirmWindow.contentY);
     this.confirmWindow.addChild(label);
     this.confirmMenu = new Menu({

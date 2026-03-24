@@ -1,4 +1,4 @@
-import { Container, Text, TextStyle } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
@@ -7,6 +7,7 @@ import { QuantitySelectorUI } from '../ui/QuantitySelector.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import { WIDTH } from '../core/Game.js';
+import { NES_FONT } from '../ui/NESFont.js';
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
@@ -27,8 +28,7 @@ export class ShopScene implements Scene {
   private choiceMenu!: Menu;
   private itemMenu?: Menu;
   private qtySelector?: QuantitySelectorUI;
-  private goldText: Text;
-  private style = new TextStyle({ fontFamily: 'monospace', fontSize: 8, fill: 0xffffff });
+  private goldText: BitmapText;
 
   constructor(game: Game, shopId: string) {
     this.game = game;
@@ -39,7 +39,7 @@ export class ShopScene implements Scene {
     this.itemWindow = new Window({ x: 8, y: 64, width: WIDTH - 16, height: 120 });
     this.itemWindow.visible = false;
 
-    this.goldText = new Text({ text: '', style: this.style });
+    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
     this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
     this.goldWindow.addChild(this.goldText);
 
