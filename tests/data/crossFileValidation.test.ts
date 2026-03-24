@@ -31,7 +31,7 @@ interface MapFile {
   id: string;
   encounters?: Array<{ enemies: string[] }>;
   transitions?: Array<{ targetMap: string }>;
-  npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string }>;
+  npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string }>;
   scriptedEncounters?: Array<{ enemyIds: string[]; flag: string }>;
   keyItemGates?: Array<{ requiredItem: string; x: number; y: number }>;
 }
@@ -278,6 +278,19 @@ describe('Cross-file data validation', () => {
         if (npc.shopId) {
           it(`map "${map.id}" NPC "${npc.id}" shopId "${npc.shopId}" exists in shops.yaml`, () => {
             expect(shopIds.has(npc.shopId!)).toBe(true);
+          });
+        }
+      });
+    });
+  });
+
+  // (n) NPC chestItem → items.yaml
+  describe('NPC chestItem → Items', () => {
+    maps.forEach((map) => {
+      (map.npcs ?? []).forEach((npc) => {
+        if (npc.chestItem) {
+          it(`map "${map.id}" NPC "${npc.id}" chestItem "${npc.chestItem}" exists in items.yaml`, () => {
+            expect(itemIds.has(npc.chestItem!)).toBe(true);
           });
         }
       });

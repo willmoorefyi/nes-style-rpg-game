@@ -9,6 +9,8 @@ export interface NPCData {
   dialog: string[] | ConditionalDialog[];
   shopId?: string;
   action?: string;
+  chestItem?: string;
+  chestFlag?: string;
 }
 
 export class NPC {
@@ -19,6 +21,8 @@ export class NPC {
   readonly dialog: string[] | ConditionalDialog[];
   readonly shopId?: string;
   readonly action?: string;
+  readonly chestItem?: string;
+  readonly chestFlag?: string;
 
   constructor(data: NPCData, texture: Texture) {
     this.id = data.id;
@@ -27,6 +31,8 @@ export class NPC {
     this.dialog = data.dialog;
     this.shopId = data.shopId;
     this.action = data.action;
+    this.chestItem = data.chestItem;
+    this.chestFlag = data.chestFlag;
     this.sprite = new Sprite(texture);
     this.sprite.x = data.x * 16;
     this.sprite.y = data.y * 16;

@@ -341,7 +341,7 @@ npcs:
           - "Thank you, Warriors of Light!"
       - text:
           - "The princess has been kidnapped!"
-          - "A knight named Garland took her to the Temple of Fiends to the north."
+          - "Garland took the princess to the Temple of Fiends, north of here."
 
   - id: old_man
     x: 10

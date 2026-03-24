@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Sprite, Graphics } from 'pixi.js';
 import type { Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
 import { resolveNPCDialog } from '../types/index.js';
 import type { Game } from '../core/Game.js';
@@ -27,6 +27,10 @@ import { ShipMode } from '../entities/ShipMode.js';
 import { AirshipMode } from '../entities/AirshipMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
+import { FieldHUD } from '../ui/FieldHUD.js';
+import { ControlsHint } from '../ui/ControlsHint.js';
+import { ItemRegistry } from '../data/ItemRegistry.js';
+import { FadeOverlay } from '../rendering/FadeOverlay.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -51,6 +55,12 @@ export class ExplorationScene implements Scene {
   private vehicleManager: VehicleManager;
   private walkingMode: MovementMode = new WalkingMode();
   private pendingNpcAction: NPC | null = null;
+  private transitionIndicators: Container = new Container();
+  private fieldHUD: FieldHUD;
+  private controlsHint: ControlsHint;
+  private battleFlash: Graphics | null = null;
+  private battleFlashState: { count: number; timer: number; on: boolean } | null = null;
+  private fadeOverlay: FadeOverlay;
   // Stored reference for cleanup in exit() to prevent listener leaks
   private handleBattleEnd = (data: { victory: boolean; xpReward: number; goldReward: number }) => this.battleTrigger.onBattleEnd(data);
   private handleShowDialog = (data: { text: string; onComplete: () => void }) => {
@@ -80,9 +90,14 @@ export class ExplorationScene implements Scene {
     this.dialogManager = new DialogManager(dialogBox);
     this.mapLoader = new MapLoader(game.data, this.placeholders);
     this.battleTrigger = new BattleTrigger(game);
+    this.battleTrigger.setFadeDeps({
+      fadeOut: (ms: number) => this.fadeOverlay.fadeOut(ms),
+      fadeIn: (ms: number) => this.fadeOverlay.fadeIn(ms),
+    });
     this.battleTrigger.setOnBattleTriggered(() => {
       if (this.player) this.savedPosition = { x: this.player.gridX, y: this.player.gridY };
       this.encounterSystem.stop();
+      this.startBattleFlash();
     });
     this.keyItemGateSystem = new KeyItemGateSystem(game.inventory, game.gameFlags);
     // Build vehicle movement mode map
@@ -94,6 +109,12 @@ export class ExplorationScene implements Scene {
     this.vehicleManager = new VehicleManager(game.gameFlags, vehicleModes);
     this.container.addChild(this.worldContainer);
     this.container.addChild(this.uiContainer);
+    this.fieldHUD = new FieldHUD(game.party);
+    this.container.addChild(this.fieldHUD.container);
+    this.controlsHint = new ControlsHint();
+    this.container.addChild(this.controlsHint.container);
+    this.fadeOverlay = new FadeOverlay();
+    this.container.addChild(this.fadeOverlay.overlay);
     this.uiContainer.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies));
@@ -162,14 +183,43 @@ export class ExplorationScene implements Scene {
     this.vehicleManager.setSpawns(mapData.vehicles ?? []);
     this.camera.update();
     tilemap.render();
+    // B3: Render transition indicators
+    this.renderTransitionIndicators(mapData.transitions);
+    // B5: Update HUD with map name and gold
+    this.fieldHUD.setMapName(mapData.id);
+    this.fieldHUD.setGold(this.game.party.gold);
   }
 
   update(dt: number): void {
     if (this.paused) return;
+    // C5: Battle flash animation
+    if (this.battleFlashState) {
+      this.battleFlashState.timer -= 1;
+      if (this.battleFlashState.timer <= 0) {
+        this.battleFlashState.on = !this.battleFlashState.on;
+        if (this.battleFlash) this.battleFlash.visible = this.battleFlashState.on;
+        if (!this.battleFlashState.on) this.battleFlashState.count--;
+        if (this.battleFlashState.count <= 0) {
+          this.finishBattleFlash();
+          return;
+        }
+        this.battleFlashState.timer = 5;
+      }
+      return;
+    }
+    // C1: Controls hint overlay
+    if (!this.controlsHint.isDismissed) {
+      this.controlsHint.update(this.game.input);
+      return;
+    }
+    // B5: Update HUD each frame
+    this.fieldHUD.update(this.game.party);
     if (this.dialogManager.isActive) {
+      this.fieldHUD.container.visible = false;
       this.dialogManager.update(dt, this.game.input);
       return;
     }
+    this.fieldHUD.container.visible = true;
     // Handle pending NPC actions after dialog completes
     if (this.pendingNpcAction) {
       this.handleNpcPostDialog(this.pendingNpcAction);
@@ -199,15 +249,30 @@ export class ExplorationScene implements Scene {
     // Track player position in game for save/load
     this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
     const npc = this.npcInteraction.checkInteraction();
-    if (npc && npc.dialog.length > 0) {
-      const lines = resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag));
-      if (lines.length > 0) {
-        // Store NPC for post-dialog action (shop, class upgrade, etc.)
-        if (npc.shopId || npc.action) {
-          this.pendingNpcAction = npc;
+    if (npc) {
+      // C2: Chest interaction — add item to inventory, set flag
+      if (npc.chestItem && npc.chestFlag) {
+        if (this.game.gameFlags.has(npc.chestFlag)) {
+          this.dialogManager.start(['Already opened.']);
+        } else {
+          this.game.inventory.add(npc.chestItem, 1);
+          this.game.gameFlags.set(npc.chestFlag);
+          const item = ItemRegistry.getItem(npc.chestItem);
+          const name = item?.name ?? npc.chestItem;
+          this.dialogManager.start([`Found ${name}!`]);
         }
-        this.dialogManager.start(lines);
         return;
+      }
+      if (npc.dialog.length > 0) {
+        const lines = resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag));
+        if (lines.length > 0) {
+          // Store NPC for post-dialog action (shop, class upgrade, etc.)
+          if (npc.shopId || npc.action) {
+            this.pendingNpcAction = npc;
+          }
+          this.dialogManager.start(lines);
+          return;
+        }
       }
     }
     if (wasMoving && !this.player.isMoving) {
@@ -275,16 +340,32 @@ export class ExplorationScene implements Scene {
     this.game.scenes.push(tempName);
   }
 
+  /** Render visual markers on transition tiles */
+  private renderTransitionIndicators(transitions: import('../types/index.js').MapTransition[]): void {
+    this.transitionIndicators.removeChildren();
+    const tex = this.placeholders.getTransitionIndicatorTexture();
+    for (const t of transitions) {
+      const indicator = new Sprite(tex);
+      indicator.x = t.x * 16;
+      indicator.y = t.y * 16;
+      this.transitionIndicators.addChild(indicator);
+    }
+    this.worldContainer.addChild(this.transitionIndicators);
+  }
+
   private async executeTransition(transition: { targetMap: string; targetX: number; targetY: number }): Promise<void> {
     // Disembark vehicle on map transition — return to walking
     if (this.player && this.player.currentMode.id !== 'walking') {
       this.player.currentMode = this.walkingMode;
     }
+    // D3: Fade out → load map → fade in
+    await this.fadeOverlay.fadeOut(300);
     await this.loadMap(transition.targetMap);
     if (this.player) {
       this.player.setPosition(transition.targetX, transition.targetY);
       this.camera.update();
     }
+    await this.fadeOverlay.fadeIn(300);
   }
 
   /** Find a scripted encounter at the given tile, checking flag prerequisites */
@@ -329,6 +410,23 @@ export class ExplorationScene implements Scene {
     } else {
       startBattle();
     }
+  }
+
+  /** C5: Start battle flash effect — 3 white flashes */
+  private startBattleFlash(): void {
+    this.battleFlash = new Graphics();
+    this.battleFlash.rect(0, 0, 256, 240).fill(0xffffff);
+    this.battleFlash.visible = true;
+    this.container.addChild(this.battleFlash);
+    this.battleFlashState = { count: 3, timer: 5, on: true };
+  }
+
+  private finishBattleFlash(): void {
+    if (this.battleFlash) {
+      this.container.removeChild(this.battleFlash);
+      this.battleFlash = null;
+    }
+    this.battleFlashState = null;
   }
 
   exit(): void {

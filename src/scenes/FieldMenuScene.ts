@@ -10,12 +10,12 @@ export class FieldMenuScene implements Scene {
   private game: Game;
   private window: Window;
   private menu: Menu;
+  private saveItem: MenuItem;
 
   constructor(game: Game) {
     this.game = game;
-    this.window = new Window({ x: 8, y: 8, width: 80, height: 88 });
-    const exploration = game.scenes.get<ExplorationScene>('exploration');
-    const canSave = exploration?.canSave() ?? false;
+    this.window = new Window({ x: 8, y: 8, width: 80, height: 100 });
+    this.saveItem = { label: 'Save', value: 'save', enabled: false };
     const items: MenuItem[] = [
       { label: 'Items', value: 'items' },
       { label: 'Magic', value: 'magic' },
@@ -23,7 +23,8 @@ export class FieldMenuScene implements Scene {
       { label: 'Status', value: 'status' },
       { label: 'Order', value: 'order' },
       { label: 'Config', value: 'config' },
-      { label: 'Save', value: 'save', enabled: canSave },
+      this.saveItem,
+      { label: 'Load', value: 'load' },
     ];
     this.menu = new Menu({
       items,
@@ -36,7 +37,11 @@ export class FieldMenuScene implements Scene {
     this.container.addChild(this.window);
   }
 
-  enter(): void {}
+  enter(): void {
+    // C7: Evaluate canSave on enter, not constructor
+    const exploration = this.game.scenes.get<ExplorationScene>('exploration');
+    this.saveItem.enabled = exploration?.canSave() ?? false;
+  }
 
   update(_dt: number): void {
     this.menu.update(this.game.input);
@@ -66,6 +71,9 @@ export class FieldMenuScene implements Scene {
         break;
       case 'save':
         this.game.scenes.push('saveMenu');
+        break;
+      case 'load':
+        this.game.scenes.push('loadMenu');
         break;
     }
   }

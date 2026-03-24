@@ -292,24 +292,32 @@ npcs:
     y: 6
     sprite: chest
     dialog: ["You found a Potion!"]
+    chestItem: potion
+    chestFlag: CHEST_TOF_POTION
 
   - id: chest_antidote
     x: 12
     y: 6
     sprite: chest
     dialog: ["You found an Antidote!"]
+    chestItem: antidote
+    chestFlag: CHEST_TOF_ANTIDOTE
 
   - id: chest_cap
     x: 1
     y: 11
     sprite: chest
     dialog: ["You found a Cap!"]
+    chestItem: cap
+    chestFlag: CHEST_TOF_CAP
 
   - id: chest_rapier
     x: 14
     y: 11
     sprite: chest
     dialog: ["You found a Rapier!"]
+    chestItem: rapier
+    chestFlag: CHEST_TOF_RAPIER
 
 # ═══ MAP TRANSITIONS ═══
 transitions:

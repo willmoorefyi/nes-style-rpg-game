@@ -25,6 +25,8 @@ export class BattleTrigger {
   private onBattleTriggered: (() => void) | null = null;
   /** Stored boss config for the current battle, cleared after battle ends */
   private currentBossConfig: BossBattleConfig | null = null;
+  /** Optional fade callbacks provided by the rendering layer */
+  private fadeDeps: { fadeOut?: (ms: number) => Promise<void>; fadeIn?: (ms: number) => Promise<void> } = {};
 
   constructor(game: Game) {
     this.game = game;
@@ -32,6 +34,10 @@ export class BattleTrigger {
 
   setOnBattleTriggered(callback: () => void): void {
     this.onBattleTriggered = callback;
+  }
+
+  setFadeDeps(deps: { fadeOut?: (ms: number) => Promise<void>; fadeIn?: (ms: number) => Promise<void> }): void {
+    this.fadeDeps = deps;
   }
 
   async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig): Promise<void> {
@@ -62,6 +68,8 @@ export class BattleTrigger {
 
   onBattleEnd(data: BattleEndData): void {
     if (data.victory) {
+      // C4: Track levels before XP distribution for level-up detection
+      const levelsBefore = this.game.party.all.map(m => m.level);
       this.game.party.distributeXp(data.xpReward);
       this.game.party.addGold(data.goldReward);
       // Set story flag on boss victory
@@ -69,12 +77,25 @@ export class BattleTrigger {
         this.game.gameFlags.set(this.currentBossConfig.flag);
         this.game.events.emit('bossDefeated', { flag: this.currentBossConfig.flag });
       }
+      // C4: Build level-up messages
+      const levelUpMessages: string[] = [];
+      this.game.party.all.forEach((member, i) => {
+        if (member.level > levelsBefore[i]) {
+          levelUpMessages.push(`${member.name} reached Level ${member.level}!`);
+        }
+      });
       // Play post-victory cutscene if configured
       const cutsceneId = this.currentBossConfig?.postVictoryCutscene;
       this.currentBossConfig = null;
       if (cutsceneId) {
         this.game.scenes.switchTo('exploration');
         this.playPostVictoryCutscene(cutsceneId);
+      } else if (levelUpMessages.length > 0) {
+        this.game.scenes.switchTo('exploration');
+        // Show level-up messages as dialog
+        for (const msg of levelUpMessages) {
+          this.game.events.emit('showDialog', { text: msg, onComplete: () => {} });
+        }
       } else {
         this.game.scenes.switchTo('exploration');
       }
@@ -91,6 +112,8 @@ export class BattleTrigger {
       showDialog: (text: string) => new Promise<void>((resolve) => {
         this.game.events.emit('showDialog', { text, onComplete: resolve });
       }),
+      fadeOut: this.fadeDeps.fadeOut,
+      fadeIn: this.fadeDeps.fadeIn,
       flags: this.game.gameFlags,
       party: [...this.game.party.all],
     });

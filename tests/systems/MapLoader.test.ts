@@ -4,7 +4,7 @@ import type { DataLoader } from '../../src/core/DataLoader.js';
 import type { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
 import { Texture } from 'pixi.js';
 
-function createMockDataLoader() {
+function createMockDataLoader(npcs: Array<{ id: string; x: number; y: number; sprite: string; dialog: string[] }> = []) {
   return {
     loadMap: vi.fn().mockResolvedValue({
       id: 'test',
@@ -13,7 +13,7 @@ function createMockDataLoader() {
       layers: [[0]],
       tilesets: [],
       collision: new Array(100).fill(0),
-      npcs: [],
+      npcs,
       transitions: [],
     }),
   } as unknown as DataLoader;
@@ -28,13 +28,13 @@ function createMockPlaceholders() {
 
 describe('MapLoader', () => {
   let dataLoader: DataLoader;
-  let placeholders: PlaceholderTextures;
+  let placeholders: ReturnType<typeof createMockPlaceholders>;
   let loader: MapLoader;
 
   beforeEach(() => {
     dataLoader = createMockDataLoader();
     placeholders = createMockPlaceholders();
-    loader = new MapLoader(dataLoader, placeholders);
+    loader = new MapLoader(dataLoader, placeholders as unknown as PlaceholderTextures);
   });
 
   it('loads map and returns result', async () => {
@@ -48,5 +48,19 @@ describe('MapLoader', () => {
   it('calls dataLoader with correct path', async () => {
     await loader.loadMap('my-map');
     expect(dataLoader.loadMap).toHaveBeenCalledWith('assets/maps/my-map.yaml');
+  });
+
+  it('passes NPC sprite type to getNPCTexture', async () => {
+    const npcs = [
+      { id: 'npc1', x: 1, y: 1, sprite: 'merchant', dialog: ['Buy something!'] },
+      { id: 'npc2', x: 2, y: 2, sprite: 'guard', dialog: ['Halt!'] },
+    ];
+    const dl = createMockDataLoader(npcs);
+    const pl = createMockPlaceholders();
+    const ml = new MapLoader(dl, pl as unknown as PlaceholderTextures);
+    const result = await ml.loadMap('test');
+    expect(result.npcs).toHaveLength(2);
+    expect(pl.getNPCTexture).toHaveBeenCalledWith('merchant');
+    expect(pl.getNPCTexture).toHaveBeenCalledWith('guard');
   });
 });

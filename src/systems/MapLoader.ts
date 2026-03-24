@@ -26,7 +26,7 @@ export class MapLoader {
     const collisionMap = new CollisionMap(mapData);
     const tilemap = new TilemapRenderer(mapData, null, 16, this.placeholders);
     const npcs = mapData.npcs.map(
-      npcData => new NPC(npcData as NPCData, this.placeholders.getNPCTexture())
+      npcData => new NPC(npcData as NPCData, this.placeholders.getNPCTexture(npcData.sprite))
     );
     return { mapData, tilemap, collisionMap, npcs };
   }

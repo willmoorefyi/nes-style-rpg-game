@@ -1,4 +1,6 @@
 import { Game } from './core/Game.js';
+import { TitleScene } from './scenes/TitleScene.js';
+import { PartyCreationScene } from './scenes/PartyCreationScene.js';
 import { ExplorationScene } from './scenes/ExplorationScene.js';
 import { StatusScene } from './scenes/StatusScene.js';
 import { FieldMenuScene } from './scenes/FieldMenuScene.js';
@@ -23,6 +25,8 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   const game = new Game();
   await game.init();
   document.body.appendChild(game.canvas);
+  game.scenes.register('title', new TitleScene(game));
+  game.scenes.register('partyCreation', new PartyCreationScene(game));
   game.scenes.register('exploration', new ExplorationScene(game));
   game.scenes.register('status', new StatusScene(game));
   game.scenes.register('fieldMenu', new FieldMenuScene(game));
@@ -32,7 +36,7 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   game.scenes.register('fieldOrder', new FieldOrderScene(game));
   game.scenes.register('saveMenu', new SaveScene(game));
   game.scenes.register('loadMenu', new LoadScene(game));
-  await game.scenes.switchTo('exploration');
+  await game.scenes.switchTo('title');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {
   console.error(e);

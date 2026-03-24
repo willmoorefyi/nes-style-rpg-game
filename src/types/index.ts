@@ -110,6 +110,8 @@ export interface MapNPC {
   dialog: string[] | ConditionalDialog[];
   shopId?: string;
   action?: string;
+  chestItem?: string;
+  chestFlag?: string;
 }
 
 /**

@@ -32,7 +32,7 @@ export class GameOverScene implements Scene {
 
   update(_dt: number): void {
     if (this.game.input.isJustPressed('start')) {
-      window.location.reload();
+      this.game.scenes.switchTo('title');
     }
   }
 
