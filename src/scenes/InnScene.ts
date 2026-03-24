@@ -88,5 +88,8 @@ export class InnScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 }

@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (437+ tests, 49+ files, Vitest)
+npm test             # Run all tests (739+ tests, 70+ files, Vitest)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
@@ -19,9 +19,9 @@ npm test             # Run all tests (437+ tests, 49+ files, Vitest)
 
 ## Project Overview
 
-A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. Turn-based RPG with 4-member party, 6 character classes, spell charge system, tile-based exploration, and data-driven content in YAML.
+A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. Turn-based RPG with 4-member party, 6 base classes (upgradeable to 12), spell charge system, tile-based exploration, boss battles, vehicles, and data-driven content in YAML.
 
-**Phases 1–13 are complete.** Phases 14–18 remain (vehicles, bosses, class upgrades, content, polish). See `docs/PHASE_PLAN.md` for detailed plans.
+**Phases 1–17 are complete.** Only Phase 18 remains (polish & balancing). See `docs/PHASE_PLAN.md` for detailed plans.
 
 ---
 
@@ -41,15 +41,18 @@ A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. T
 src/
 ├── core/           # Engine: Game, SceneManager, AssetLoader, DataLoader, EventBus,
 │                   #   InputManager, AudioManager, GameFlags, schemaValidation
-├── battle/         # Combat: BattleStateMachine, DamageFormula, Elements, StatusEffects,
-│                   #   BattleCommands, TurnOrder, EnemyAI, AIBehavior (interface stub)
+├── battle/         # Combat: BattleStateMachine, SpellExecutor, DamageFormula, Elements,
+│                   #   StatusEffects, BattleCommands, TurnOrder, EnemyAI, AIBehavior,
+│                   #   BasicAI, BossAI
 ├── scenes/         # All scenes: Exploration, Battle, FieldMenu, Status, Equip, Item,
 │                   #   Shop, MagicShop, Inn, Save, Load, GameOver, FieldMagic, FieldOrder
 ├── systems/        # Game systems: EncounterSystem, EncounterTable, MapLoader,
 │                   #   MapTransition, DialogManager, BattleTrigger, SaveManager,
-│                   #   NPCInteraction, ItemEffects
+│                   #   NPCInteraction, ItemEffects, KeyItemGateSystem,
+│                   #   ClassUpgradeSystem, VehicleManager, CutsceneManager,
+│                   #   CutsceneRegistry
 ├── entities/       # Game objects: Character, Inventory, PartyManager, PlayerController,
-│                   #   NPC, MovementMode (interface stub)
+│                   #   NPC, MovementMode
 ├── rendering/      # PixiJS: TilemapRenderer, Camera, SpriteAnimation, CollisionMap,
 │                   #   PlaceholderTextures
 ├── ui/             # UI: Window, Menu (with scrolling), DialogBox, TextRenderer,
@@ -228,7 +231,7 @@ npx vitest --watch                          # Watch mode
 
 1. Battle logic lives in `src/battle/` — pure TypeScript, no rendering dependencies
 2. The `BattleStateMachine` orchestrates combat flow: intro → command → execution → resolution
-3. Damage formulas are in `DamageFormula.ts` (physical) and `MagicDamage.ts` (magical, not yet a separate file — currently in BattleStateMachine)
+3. Damage formulas (both physical and magical) are in `DamageFormula.ts`
 4. Elements are in `Elements.ts` with `getElementalMultiplier()`
 5. Status effects are in `StatusEffects.ts` with `StatusTracker`
 6. Write tests with injectable RNG for deterministic results
@@ -243,17 +246,13 @@ npx vitest --watch                          # Watch mode
 
 ---
 
-## Remaining Work (Phases 14–18)
+## Remaining Work (Phase 18)
 
-See `docs/PHASE_PLAN.md` for detailed plans. Key interface stubs already exist:
+See `docs/PHASE_PLAN.md` for detailed plans.
 
-| Phase | What | Existing Stubs |
-|-------|------|----------------|
-| 14 | Boss Battles & AI | `src/battle/AIBehavior.ts` — interface for scripted boss AI |
-| 15 | Vehicles & World | `src/entities/MovementMode.ts` — interface for vehicle movement |
-| 16 | Class Upgrades | Character class system is data-driven, needs upgrade trigger |
-| 17a-d | Content Population | YAML pipeline ready, cross-file validation in place |
-| 18 | Polish & Balancing | Placeholder textures → real art, bitmap font, tuning |
+| Phase | What | Notes |
+|-------|------|-------|
+| 18 | Polish & Balancing | Placeholder textures → real art, bitmap font, playtesting, stat tuning |
 
 ---
 

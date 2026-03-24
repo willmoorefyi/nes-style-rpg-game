@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "validate": "npx tsx scripts/validate-content.ts"
   },
   "dependencies": {
     "pixi.js": "^8.0.0",

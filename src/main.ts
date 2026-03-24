@@ -6,6 +6,8 @@ import { ItemMenuScene } from './scenes/ItemMenuScene.js';
 import { EquipScene } from './scenes/EquipScene.js';
 import { FieldMagicScene } from './scenes/FieldMagicScene.js';
 import { FieldOrderScene } from './scenes/FieldOrderScene.js';
+import { SaveScene } from './scenes/SaveScene.js';
+import { LoadScene } from './scenes/LoadScene.js';
 
 function showError(msg: string): void {
   const el = document.createElement('div');
@@ -28,6 +30,8 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   game.scenes.register('equip', new EquipScene(game));
   game.scenes.register('fieldMagic', new FieldMagicScene(game));
   game.scenes.register('fieldOrder', new FieldOrderScene(game));
+  game.scenes.register('saveMenu', new SaveScene(game));
+  game.scenes.register('loadMenu', new LoadScene(game));
   await game.scenes.switchTo('exploration');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {

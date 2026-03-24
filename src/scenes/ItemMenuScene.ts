@@ -85,6 +85,9 @@ export class ItemMenuScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 
   private updateDescription(): void {
@@ -94,6 +97,13 @@ export class ItemMenuScene implements Scene {
 
   private onItemSelect(item: MenuItem): void {
     this.selectedItemId = item.value;
+    // Party-wide items (tent/cabin) skip target selection
+    if (ItemEffects.isPartyItem(item.value)) {
+      const result = ItemEffects.applyPartyItemEffect(item.value, this.game.party.all, this.game.inventory);
+      this.descText.setText(result.message, true);
+      this.buildItemMenu();
+      return;
+    }
     this.phase = 'selectTarget';
     this.targetWindow.visible = true;
     this.buildTargetMenu();

@@ -117,3 +117,133 @@
     luck: 1
   usableEquipment: [sword, staff, medium_armor]
   spellLevels: { white: 5, black: 5 }
+
+# ═══════════════════════════════════
+# UPGRADED CLASSES (Phase 16)
+# ═══════════════════════════════════
+
+# ═══ KNIGHT (upgraded Warrior) ═══
+- id: knight
+  name: Knight
+  upgradeFrom: warrior
+  baseStats:
+    hp: 42
+    strength: 24
+    agility: 6
+    intelligence: 2
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 7
+    strength: 4
+    agility: 1
+    intelligence: 1
+    vitality: 3
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
+  spellLevels: { white: 3, black: 0 }
+
+# ═══ NINJA (upgraded Thief) ═══
+- id: ninja
+  name: Ninja
+  upgradeFrom: thief
+  baseStats:
+    hp: 30
+    strength: 12
+    agility: 18
+    intelligence: 6
+    vitality: 6
+    luck: 18
+  statGrowth:
+    hp: 5
+    strength: 3
+    agility: 3
+    intelligence: 1
+    vitality: 1
+    luck: 2
+  usableEquipment: [knife, light_sword, sword, nunchaku, light_armor]
+  spellLevels: { white: 0, black: 4 }
+
+# ═══ MASTER (upgraded Monk) ═══
+- id: master
+  name: Master
+  upgradeFrom: monk
+  baseStats:
+    hp: 40
+    strength: 18
+    agility: 10
+    intelligence: 4
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 6
+    strength: 4
+    agility: 2
+    intelligence: 0
+    vitality: 3
+    luck: 1
+  usableEquipment: [nunchaku, light_armor]
+  spellLevels: { white: 0, black: 0 }
+
+# ═══ WHITE WIZARD (upgraded White Mage) ═══
+- id: white_wizard
+  name: White Wizard
+  upgradeFrom: white_mage
+  baseStats:
+    hp: 30
+    strength: 6
+    agility: 10
+    intelligence: 18
+    vitality: 4
+    luck: 10
+  statGrowth:
+    hp: 4
+    strength: 1
+    agility: 1
+    intelligence: 4
+    vitality: 1
+    luck: 1
+  usableEquipment: [staff, hammer, robe]
+  spellLevels: { white: 8, black: 0 }
+
+# ═══ BLACK WIZARD (upgraded Black Mage) ═══
+- id: black_wizard
+  name: Black Wizard
+  upgradeFrom: black_mage
+  baseStats:
+    hp: 30
+    strength: 6
+    agility: 10
+    intelligence: 18
+    vitality: 4
+    luck: 10
+  statGrowth:
+    hp: 4
+    strength: 1
+    agility: 1
+    intelligence: 4
+    vitality: 1
+    luck: 1
+  usableEquipment: [knife, staff, robe]
+  spellLevels: { white: 0, black: 8 }
+
+# ═══ RED WIZARD (upgraded Red Mage) ═══
+- id: red_wizard
+  name: Red Wizard
+  upgradeFrom: red_mage
+  baseStats:
+    hp: 36
+    strength: 12
+    agility: 12
+    intelligence: 12
+    vitality: 6
+    luck: 12
+  statGrowth:
+    hp: 5
+    strength: 2
+    agility: 2
+    intelligence: 3
+    vitality: 1
+    luck: 1
+  usableEquipment: [sword, staff, medium_armor, shield]
+  spellLevels: { white: 7, black: 7 }

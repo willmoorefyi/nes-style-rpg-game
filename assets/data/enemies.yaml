@@ -1,4 +1,5 @@
-# ═══ ENEMIES ═══
+# ═══ TIER 1 — Starting Area (HP 15-40) ═══
+
 - id: goblin
   name: Goblin
   stats:
@@ -33,3 +34,192 @@
   sprite: wolf
   weakness: fire
   resist: ice
+
+- id: skeleton
+  name: Skeleton
+  stats:
+    hp: 30
+    strength: 8
+    agility: 5
+    intelligence: 1
+    vitality: 6
+    luck: 2
+    attack: 12
+    defense: 6
+    magicDefense: 2
+  xpReward: 20
+  goldReward: 10
+  sprite: skeleton
+  weakness: fire
+  resist: ice
+
+- id: pirate
+  name: Pirate
+  stats:
+    hp: 40
+    strength: 10
+    agility: 6
+    intelligence: 3
+    vitality: 5
+    luck: 4
+    attack: 14
+    defense: 4
+    magicDefense: 2
+  xpReward: 30
+  goldReward: 20
+  sprite: pirate
+  weakness: lightning
+
+# ═══ TIER 2 — Mid-Game (HP 80-150) ═══
+
+- id: ogre
+  name: Ogre
+  stats:
+    hp: 120
+    strength: 22
+    agility: 6
+    intelligence: 3
+    vitality: 15
+    luck: 4
+    attack: 28
+    defense: 10
+    magicDefense: 4
+  xpReward: 150
+  goldReward: 80
+  sprite: ogre
+  weakness: lightning
+
+- id: troll
+  name: Troll
+  stats:
+    hp: 100
+    strength: 18
+    agility: 8
+    intelligence: 4
+    vitality: 12
+    luck: 5
+    attack: 24
+    defense: 8
+    magicDefense: 6
+  xpReward: 120
+  goldReward: 60
+  sprite: troll
+  weakness: fire
+
+- id: mummy
+  name: Mummy
+  stats:
+    hp: 80
+    strength: 16
+    agility: 5
+    intelligence: 6
+    vitality: 10
+    luck: 3
+    attack: 20
+    defense: 12
+    magicDefense: 8
+  xpReward: 100
+  goldReward: 50
+  sprite: mummy
+  weakness: fire
+  resist: ice
+
+- id: cockatrice
+  name: Cockatrice
+  stats:
+    hp: 90
+    strength: 14
+    agility: 12
+    intelligence: 8
+    vitality: 8
+    luck: 6
+    attack: 18
+    defense: 6
+    magicDefense: 10
+  xpReward: 130
+  goldReward: 70
+  sprite: cockatrice
+  weakness: ice
+
+# ═══ TIER 3 — Late-Game (HP 200-400) ═══
+
+- id: vampire
+  name: Vampire
+  stats:
+    hp: 280
+    strength: 28
+    agility: 18
+    intelligence: 20
+    vitality: 18
+    luck: 10
+    attack: 36
+    defense: 18
+    magicDefense: 16
+  xpReward: 600
+  goldReward: 300
+  sprite: vampire
+  weakness: fire
+  resist: dark
+
+- id: dragon
+  name: Dragon
+  stats:
+    hp: 400
+    strength: 35
+    agility: 14
+    intelligence: 15
+    vitality: 25
+    luck: 8
+    attack: 45
+    defense: 22
+    magicDefense: 18
+  xpReward: 800
+  goldReward: 500
+  sprite: dragon
+  weakness: ice
+  resist: fire
+
+# ═══ TIER 4 — Bosses (HP 500-2000) ═══
+
+- id: garland
+  name: Garland
+  stats:
+    hp: 200
+    strength: 15
+    agility: 8
+    intelligence: 5
+    vitality: 10
+    luck: 5
+    attack: 20
+    defense: 10
+    magicDefense: 6
+  xpReward: 250
+  goldReward: 200
+  sprite: garland
+  weakness: lightning
+  bossPhases:
+    - hpThreshold: 0.5
+      patternId: aggressive
+      message: "Garland's attacks grow fiercer!"
+
+- id: lich
+  name: Lich
+  stats:
+    hp: 800
+    strength: 20
+    agility: 12
+    intelligence: 30
+    vitality: 15
+    luck: 10
+    attack: 25
+    defense: 15
+    magicDefense: 20
+  xpReward: 2000
+  goldReward: 1500
+  sprite: lich
+  weakness: fire
+  resist: ice
+  bossPhases:
+    - hpThreshold: 0.5
+      patternId: aggressive
+      message: "The Lich's form shifts!"

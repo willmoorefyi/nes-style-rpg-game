@@ -1,12 +1,15 @@
 import type { Character } from '../entities/Character.js';
 import type { EnemyData, SpellData } from '../types/index.js';
 import type { Inventory } from '../entities/Inventory.js';
-import { calculateDamage, calculateMagicDamage } from './DamageFormula.js';
+import type { AIBehavior } from './AIBehavior.js';
+import type { BossPattern } from './BossAI.js';
+import { calculateDamage } from './DamageFormula.js';
 import { StatusTracker } from './StatusEffects.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
 import { selectTarget } from './EnemyAI.js';
 import { retargetIfDead, calculateRunChance, type BattleCommand } from './BattleCommands.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
+import { SpellExecutor } from './SpellExecutor.js';
 
 export type BattleState = 'intro' | 'command_select' | 'execution' | 'resolution' | 'victory' | 'defeat';
 
@@ -15,6 +18,12 @@ export interface EnemyInstance {
   data: EnemyData;
   currentHp: number;
   status: StatusTracker;
+  /** Battle-only buff/debuff tracking (e.g., evade: -20 from LOCK) */
+  buffs: Map<string, number>;
+  /** Optional AI behavior — if set, used instead of default random targeting */
+  aiBehavior?: AIBehavior;
+  /** Tracks which boss phase thresholds have been crossed (one-way) */
+  crossedPhases?: Set<number>;
 }
 
 export interface BattleConfig {
@@ -22,6 +31,10 @@ export interface BattleConfig {
   enemies: EnemyData[];
   spells?: SpellData[];
   inventory?: Inventory;
+  /** Whether the party can run from this battle (default true) */
+  canRun?: boolean;
+  /** Map of patternId → BossPattern for multi-phase bosses */
+  bossPatterns?: Map<string, BossPattern>;
 }
 
 export interface BattleResult {
@@ -43,8 +56,11 @@ export class BattleStateMachine {
   private messages: BattleMessage[] = [];
   private result: BattleResult | null = null;
   private rng: () => number;
-  private spells: SpellData[];
   private inventory: Inventory | undefined;
+  private canRun: boolean;
+  private turnNumber = 0;
+  private bossPatterns: Map<string, BossPattern>;
+  private spellExecutor: SpellExecutor;
 
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
@@ -53,10 +69,24 @@ export class BattleStateMachine {
       data: e,
       currentHp: e.stats.hp,
       status: new StatusTracker(),
+      buffs: new Map(),
+      crossedPhases: new Set<number>(),
     }));
-    this.spells = config.spells ?? [];
     this.inventory = config.inventory;
     this.rng = rng;
+    this.canRun = config.canRun ?? true;
+    this.bossPatterns = config.bossPatterns ?? new Map();
+    this.spellExecutor = new SpellExecutor(
+      {
+        party: this.party,
+        enemies: this.enemies,
+        rng: this.rng,
+        addMessage: (text: string) => this.messages.push({ text }),
+        livingParty: () => this.livingParty,
+        livingEnemies: () => this.livingEnemies,
+      },
+      config.spells ?? [],
+    );
   }
 
   get state(): BattleState { return this._state; }
@@ -96,15 +126,28 @@ export class BattleStateMachine {
   executeRound(): void {
     if (this._state !== 'execution') return;
     this.messages = [];
+    this.turnNumber++;
 
-    // Generate enemy commands
+    // Check boss phase transitions before generating enemy commands
     for (const enemy of this.livingEnemies) {
-      const target = selectTarget(
-        this.party.map(c => ({ id: c.name, isAlive: c.currentHp > 0 })),
-        this.rng
-      );
-      if (target) {
-        this.commands.push({ type: 'fight', actorId: enemy.id, targetId: target.id });
+      this.checkBossPhaseTransition(enemy);
+    }
+
+    // Generate enemy commands using AI behavior or default random targeting
+    for (const enemy of this.livingEnemies) {
+      if (enemy.aiBehavior) {
+        const cmd = enemy.aiBehavior.selectAction(
+          enemy, this.party, this.livingEnemies, this.turnNumber, this.rng
+        );
+        this.commands.push(cmd);
+      } else {
+        const target = selectTarget(
+          this.party.map(c => ({ id: c.name, isAlive: c.currentHp > 0 })),
+          this.rng
+        );
+        if (target) {
+          this.commands.push({ type: 'fight', actorId: enemy.id, targetId: target.id });
+        }
       }
     }
 
@@ -172,6 +215,10 @@ export class BattleStateMachine {
 
   private executeCommand(cmd: BattleCommand, isEnemy: boolean): void {
     if (cmd.type === 'run') {
+      if (!this.canRun) {
+        this.messages.push({ text: 'Cannot escape!' });
+        return;
+      }
       const partyAgi = this.avgAgility(this.livingParty.map(c => c.stats.agility));
       const enemyAgi = this.avgAgility(this.livingEnemies.map(e => e.data.stats.agility));
       const chance = calculateRunChance(partyAgi, enemyAgi);
@@ -186,7 +233,7 @@ export class BattleStateMachine {
     }
 
     if (cmd.type === 'magic' && cmd.spellId) {
-      this.executeMagicCommand(cmd, isEnemy);
+      this.spellExecutor.execute(cmd, isEnemy);
       return;
     }
 
@@ -274,122 +321,6 @@ export class BattleStateMachine {
     return values.reduce((a, b) => a + b, 0) / values.length;
   }
 
-  private executeMagicCommand(cmd: BattleCommand, isEnemy: boolean): void {
-    const spell = this.spells.find(s => s.id === cmd.spellId);
-    if (!spell) {
-      this.messages.push({ text: 'Unknown spell!' });
-      return;
-    }
-
-    // Get caster
-    const caster = isEnemy
-      ? this.enemies.find(e => e.id === cmd.actorId)
-      : this.party.find(c => c.name === cmd.actorId);
-    if (!caster) return;
-
-    // For party members, check charges and silence
-    if (!isEnemy) {
-      const char = caster as Character;
-      if (!char.hasCharges(spell.level)) {
-        this.messages.push({ text: `${char.name} has no charges!` });
-        return;
-      }
-      // Note: silence check would go here if we add StatusTracker to Character
-      char.useCharge(spell.level);
-    }
-
-    const casterName = isEnemy ? (caster as EnemyInstance).data.name : (caster as Character).name;
-    const casterInt = isEnemy
-      ? (caster as EnemyInstance).data.stats.intelligence
-      : (caster as Character).stats.intelligence;
-
-    this.messages.push({ text: `${casterName} casts ${spell.name}!` });
-
-    // Handle different spell effects
-    if (spell.effect === 'heal') {
-      this.executeHealSpell(cmd, spell, casterInt, isEnemy);
-    } else if (spell.effect.startsWith('damage') || spell.effect.startsWith('status_')) {
-      this.executeDamageSpell(cmd, spell, casterInt, isEnemy);
-    }
-  }
-
-  private executeHealSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
-    const power = spell.power ?? 30;
-    const targets = spell.targeting === 'all'
-      ? (isEnemy ? this.livingEnemies : this.livingParty)
-      : cmd.targetId
-        ? (isEnemy ? this.enemies.filter(e => e.id === cmd.targetId) : this.party.filter(c => c.name === cmd.targetId))
-        : [];
-
-    for (const target of targets) {
-      const heal = calculateMagicDamage(
-        { intelligence: casterInt },
-        { intelligence: 1 },
-        { power, isHealing: true },
-        this.rng
-      );
-      if ('currentHp' in target && 'data' in target) {
-        // EnemyInstance
-        const enemy = target as EnemyInstance;
-        enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
-        this.messages.push({ text: `${enemy.data.name} recovers ${heal} HP!` });
-      } else {
-        // Character
-        const char = target as Character;
-        char.currentHp = char.currentHp + heal;
-        this.messages.push({ text: `${char.name} recovers ${heal} HP!` });
-      }
-    }
-  }
-
-  private executeDamageSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
-    const power = spell.power ?? 20;
-    const targets = spell.targeting === 'all'
-      ? (isEnemy ? this.livingParty : this.livingEnemies)
-      : cmd.targetId
-        ? (isEnemy ? this.party.filter(c => c.name === cmd.targetId) : this.enemies.filter(e => e.id === cmd.targetId))
-        : [];
-
-    for (const target of targets) {
-      if ('data' in target) {
-        // EnemyInstance
-        const enemy = target as EnemyInstance;
-        const damage = calculateMagicDamage(
-          { intelligence: casterInt },
-          { intelligence: enemy.data.stats.intelligence, weakness: enemy.data.weakness, resist: enemy.data.resist },
-          { power, element: spell.element },
-          this.rng
-        );
-
-        if (spell.effect.startsWith('status_')) {
-          const status = spell.effect.replace('status_', '') as 'sleep' | 'poison' | 'stun';
-          enemy.status.apply(status);
-          this.messages.push({ text: `${enemy.data.name} is affected by ${status}!` });
-        } else {
-          enemy.currentHp = Math.max(0, enemy.currentHp - damage);
-          this.messages.push({ text: `${enemy.data.name} takes ${damage} damage!` });
-          if (enemy.currentHp <= 0) {
-            this.messages.push({ text: `${enemy.data.name} defeated!` });
-          }
-        }
-      } else {
-        // Character
-        const char = target as Character;
-        const damage = calculateMagicDamage(
-          { intelligence: casterInt },
-          { intelligence: char.stats.intelligence },
-          { power, element: spell.element },
-          this.rng
-        );
-        char.currentHp = char.currentHp - damage;
-        this.messages.push({ text: `${char.name} takes ${damage} damage!` });
-        if (char.currentHp <= 0) {
-          this.messages.push({ text: `${char.name} fell!` });
-        }
-      }
-    }
-  }
-
   private executeItemCommand(cmd: BattleCommand): void {
     if (!cmd.itemId || !cmd.targetId || !this.inventory) {
       this.messages.push({ text: 'Cannot use item.' });
@@ -404,6 +335,40 @@ export class BattleStateMachine {
     this.messages.push({ text: result.message });
   }
 
+  /** Check if an enemy has crossed a boss phase HP threshold and switch pattern */
+  private checkBossPhaseTransition(enemy: EnemyInstance): void {
+    const phases = enemy.data.bossPhases;
+    if (!phases || !enemy.aiBehavior) return;
+
+    const hpPercent = enemy.currentHp / enemy.data.stats.hp;
+    for (let i = 0; i < phases.length; i++) {
+      if (enemy.crossedPhases?.has(i)) continue;
+      if (hpPercent <= phases[i].hpThreshold) {
+        enemy.crossedPhases?.add(i);
+        // Switch AI pattern if available
+        const newPattern = this.bossPatterns.get(phases[i].patternId);
+        if (newPattern && 'setPattern' in enemy.aiBehavior) {
+          (enemy.aiBehavior as { setPattern(p: BossPattern): void }).setPattern(newPattern);
+        }
+        if (phases[i].message) {
+          this.messages.push({ text: phases[i].message! });
+        }
+      }
+    }
+  }
+
+  /** Set AI behavior for a specific enemy (used to attach BossAI after construction) */
+  setEnemyAI(enemyIndex: number, ai: AIBehavior): void {
+    if (this.enemies[enemyIndex]) {
+      this.enemies[enemyIndex].aiBehavior = ai;
+    }
+  }
+
+  /** Whether the party can run from this battle */
+  getCanRun(): boolean {
+    return this.canRun;
+  }
+
   resolveRound(): void {
     if (this._state !== 'resolution') return;
 
@@ -413,10 +378,13 @@ export class BattleStateMachine {
       this.result = { victory: true, xpReward: xp, goldReward: gold };
       this._state = 'victory';
       this.messages.push({ text: `Victory! Gained ${xp} XP and ${gold} Gold.` });
+      // Clear battle-only buffs/resists from party members
+      for (const char of this.party) char.clearBattleState();
     } else if (this.livingParty.length === 0) {
       this.result = { victory: false, xpReward: 0, goldReward: 0 };
       this._state = 'defeat';
       this.messages.push({ text: 'Game Over...' });
+      for (const char of this.party) char.clearBattleState();
     } else {
       this._state = 'command_select';
       this.currentActorIndex = 0;

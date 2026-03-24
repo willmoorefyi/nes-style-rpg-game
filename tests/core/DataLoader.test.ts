@@ -8,7 +8,13 @@ describe('DataLoader', () => {
   } as unknown as AssetLoader);
 
   it('should load and validate class data', async () => {
-    const classData = [{ id: 'warrior', name: 'Warrior' }];
+    const classData = [{
+      id: 'warrior', name: 'Warrior',
+      baseStats: { hp: 35, strength: 20, agility: 5, intelligence: 1, vitality: 10, luck: 5 },
+      statGrowth: { hp: 6, strength: 3, agility: 1, intelligence: 0, vitality: 2, luck: 1 },
+      usableEquipment: ['sword'],
+      spellLevels: { white: 0, black: 0 },
+    }];
     const loader = new DataLoader(mockAssetLoader(classData));
     
     const result = await loader.loadClasses('classes.yaml');
@@ -43,7 +49,10 @@ describe('DataLoader', () => {
   });
 
   it('should load item data', async () => {
-    const itemData = [{ id: 'potion', name: 'Potion' }];
+    const itemData = [{
+      id: 'potion', name: 'Potion', type: 'consumable',
+      stats: {}, price: 60, usableBy: ['warrior'],
+    }];
     const loader = new DataLoader(mockAssetLoader(itemData));
     
     const result = await loader.loadItems('items.yaml');
@@ -51,7 +60,10 @@ describe('DataLoader', () => {
   });
 
   it('should load spell data', async () => {
-    const spellData = [{ id: 'cure', name: 'CURE' }];
+    const spellData = [{
+      id: 'cure', name: 'CURE', level: 1, type: 'white',
+      effect: 'heal', targeting: 'single', description: 'Restore HP',
+    }];
     const loader = new DataLoader(mockAssetLoader(spellData));
     
     const result = await loader.loadSpells('spells.yaml');
@@ -61,11 +73,11 @@ describe('DataLoader', () => {
   it('should load map data', async () => {
     const mapData = {
       id: 'town',
-      width: 32,
-      height: 32,
+      width: 2,
+      height: 2,
       layers: [[1, 2, 3]],
       tilesets: ['tiles.png'],
-      collision: [0, 0, 1],
+      collision: [0, 0, 1, 0],
       npcs: [],
       transitions: [],
     };

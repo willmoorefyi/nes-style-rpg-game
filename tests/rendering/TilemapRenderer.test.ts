@@ -3,6 +3,7 @@ import { Container, Texture } from 'pixi.js';
 import { TilemapRenderer } from '../../src/rendering/TilemapRenderer.js';
 import { Camera } from '../../src/rendering/Camera.js';
 import type { MapData } from '../../src/types/index.js';
+import type { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
 
 function createMockTexture(): Texture {
   return {
@@ -56,14 +57,14 @@ describe('TilemapRenderer', () => {
     renderer.render();
     const layerContainer = renderer.container.children[0] as Container;
     // All 16 tiles should be rendered (none are 0)
-    const visibleSprites = layerContainer.children.filter((c: any) => c.visible);
+    const visibleSprites = layerContainer.children.filter((c) => c.visible);
     expect(visibleSprites.length).toBe(16);
   });
 
   it('positions tiles correctly', () => {
     renderer.render();
     const layerContainer = renderer.container.children[0] as Container;
-    const sprites = layerContainer.children as any[];
+    const sprites = layerContainer.children as Container[];
 
     // Find sprite at position (0,0) and (16,0)
     const atOrigin = sprites.find((s) => s.x === 0 && s.y === 0);
@@ -94,7 +95,7 @@ describe('TilemapRenderer', () => {
 
     largeRenderer.render();
     const layerContainer = largeRenderer.container.children[0] as Container;
-    const visibleSprites = layerContainer.children.filter((c: any) => c.visible);
+    const visibleSprites = layerContainer.children.filter((c) => c.visible);
 
     // Viewport is 256x240 = 16x15 tiles, so ~240 tiles visible (plus edge tiles)
     expect(visibleSprites.length).toBeLessThan(32 * 32);
@@ -117,7 +118,7 @@ describe('TilemapRenderer', () => {
     sparseRenderer.render();
 
     const layerContainer = sparseRenderer.container.children[0] as Container;
-    const visibleSprites = layerContainer.children.filter((c: any) => c.visible);
+    const visibleSprites = layerContainer.children.filter((c) => c.visible);
     expect(visibleSprites.length).toBe(2); // Only tiles 1 and 2
   });
 });
@@ -133,7 +134,7 @@ describe('TilemapRenderer with PlaceholderTextures', () => {
       mapData,
       null,
       16,
-      mockPlaceholders as any
+      mockPlaceholders as unknown as PlaceholderTextures
     );
 
     renderer.render();
@@ -164,7 +165,7 @@ describe('TilemapRenderer with PlaceholderTextures', () => {
       transitions: [],
     };
 
-    const renderer = new TilemapRenderer(mapData, null, 16, mockPlaceholders as any);
+    const renderer = new TilemapRenderer(mapData, null, 16, mockPlaceholders as unknown as PlaceholderTextures);
     renderer.render();
 
     // Should have requested textures for tile IDs 1, 2, and 3

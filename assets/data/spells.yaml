@@ -39,6 +39,47 @@
   power: 0
   element: none
 
+# ═══ WHITE MAGIC — LEVEL 2 ═══
+- id: lamp
+  name: LAMP
+  level: 2
+  type: white
+  effect: cure_blind
+  targeting: single
+  description: Cure blindness on one ally
+  power: 0
+  element: none
+
+- id: mute
+  name: MUTE
+  level: 2
+  type: white
+  effect: status_silence
+  targeting: single
+  description: Inflict silence on one enemy
+  power: 0
+  element: none
+
+- id: alit
+  name: ALIT
+  level: 2
+  type: white
+  effect: resist_lightning
+  targeting: all
+  description: Grant lightning resistance to all allies
+  power: 0
+  element: lightning
+
+- id: invs
+  name: INVS
+  level: 2
+  type: white
+  effect: buff_evade
+  targeting: single
+  description: Raise evasion of one ally
+  power: 0
+  element: none
+
 # ═══ WHITE MAGIC — LEVEL 3 ═══
 - id: cure2
   name: CUR2
@@ -50,7 +91,88 @@
   power: 60
   element: none
 
+- id: hrm2
+  name: HRM2
+  level: 3
+  type: white
+  effect: damage_holy
+  targeting: all
+  description: Deal holy damage to all undead
+  power: 40
+  element: holy
+
+- id: afir
+  name: AFIR
+  level: 3
+  type: white
+  effect: resist_fire
+  targeting: all
+  description: Grant fire resistance to all allies
+  power: 0
+  element: fire
+
+- id: heal
+  name: HEAL
+  level: 3
+  type: white
+  effect: heal
+  targeting: all
+  description: Restore HP to all allies
+  power: 20
+  element: none
+
+# ═══ WHITE MAGIC — LEVEL 4 ═══
+- id: pure
+  name: PURE
+  level: 4
+  type: white
+  effect: cure_poison
+  targeting: single
+  description: Cure poison on one ally
+  power: 0
+  element: none
+
+- id: fear
+  name: FEAR
+  level: 4
+  type: white
+  effect: debuff_morale
+  targeting: all
+  description: Lower morale of all enemies
+  power: 0
+  element: none
+
+- id: aice
+  name: AICE
+  level: 4
+  type: white
+  effect: resist_ice
+  targeting: all
+  description: Grant ice resistance to all allies
+  power: 0
+  element: ice
+
+- id: amut
+  name: AMUT
+  level: 4
+  type: white
+  effect: cure_silence
+  targeting: single
+  description: Cure silence on one ally
+  power: 0
+  element: none
+
 # ═══ WHITE MAGIC — LEVEL 5 ═══
+- id: cure3
+  name: CUR3
+  level: 5
+  type: white
+  effect: heal
+  targeting: single
+  description: Restore 120 HP to one ally
+  power: 120
+  element: none
+
 - id: life
   name: LIFE
   level: 5
@@ -123,59 +245,6 @@
   power: 0
   element: none
 
-# ═══ BLACK MAGIC — LEVEL 3 ═══
-- id: fir2
-  name: FIR2
-  level: 3
-  type: black
-  effect: damage
-  targeting: all
-  description: Deal fire damage to all enemies
-  power: 30
-  element: fire
-
-# ═══ WHITE MAGIC — LEVEL 2 ═══
-- id: lamp
-  name: LAMP
-  level: 2
-  type: white
-  effect: cure_blind
-  targeting: single
-  description: Cure blindness on one ally
-  power: 0
-  element: none
-
-- id: mute
-  name: MUTE
-  level: 2
-  type: white
-  effect: status_silence
-  targeting: single
-  description: Inflict silence on one enemy
-  power: 0
-  element: none
-
-- id: alit
-  name: ALIT
-  level: 2
-  type: white
-  effect: resist_lightning
-  targeting: all
-  description: Grant lightning resistance to all allies
-  power: 0
-  element: lightning
-
-- id: invs
-  name: INVS
-  level: 2
-  type: white
-  effect: buff_evade
-  targeting: single
-  description: Raise evasion of one ally
-  power: 0
-  element: none
-
-# ═══ BLACK MAGIC — LEVEL 2 (continued) ═══
 - id: tmpr
   name: TMPR
   level: 2
@@ -195,3 +264,85 @@
   description: Reduce speed of one enemy
   power: 0
   element: none
+
+# ═══ BLACK MAGIC — LEVEL 3 ═══
+- id: fir2
+  name: FIR2
+  level: 3
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal fire damage to all enemies
+  power: 30
+  element: fire
+
+- id: hold
+  name: HOLD
+  level: 3
+  type: black
+  effect: status_stun
+  targeting: single
+  description: Paralyze one enemy
+  power: 0
+  element: none
+
+- id: lit2
+  name: LIT2
+  level: 3
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal lightning damage to all enemies
+  power: 30
+  element: lightning
+
+- id: lok2
+  name: LOK2
+  level: 3
+  type: black
+  effect: debuff_evade
+  targeting: all
+  description: Lower evasion of all enemies
+  power: 0
+  element: none
+
+# ═══ BLACK MAGIC — LEVEL 4 ═══
+- id: slp2
+  name: SLP2
+  level: 4
+  type: black
+  effect: status_sleep
+  targeting: all
+  description: Put all enemies into deep sleep
+  power: 0
+  element: none
+
+- id: fast
+  name: FAST
+  level: 4
+  type: black
+  effect: buff_speed
+  targeting: single
+  description: Double attack speed of one ally
+  power: 0
+  element: none
+
+- id: conf
+  name: CONF
+  level: 4
+  type: black
+  effect: status_stun
+  targeting: all
+  description: Confuse all enemies
+  power: 0
+  element: none
+
+- id: ice2
+  name: ICE2
+  level: 4
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal ice damage to all enemies
+  power: 40
+  element: ice

@@ -4,6 +4,7 @@ import { PartyManager } from '../../src/entities/PartyManager.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
 import { ShopRegistry } from '../../src/data/ShopRegistry.js';
 import type { ItemData, ShopData } from '../../src/types/index.js';
+import type { DataLoader } from '../../src/core/DataLoader.js';
 
 const mockPotion: ItemData = {
   id: 'potion',
@@ -34,7 +35,7 @@ describe('ShopScene business logic', () => {
   let inventory: Inventory;
   let party: PartyManager;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     inventory = new Inventory();
     party = new PartyManager();
     party.addGold(500);
@@ -42,10 +43,10 @@ describe('ShopScene business logic', () => {
     // Setup registries with mock data
     ItemRegistry.reset();
     ShopRegistry.reset();
-    (ItemRegistry as any).items = new Map([['potion', mockPotion], ['crystal', mockKeyItem]]);
-    (ItemRegistry as any).initialized = true;
-    (ShopRegistry as any).shops = new Map([['test-shop', mockShop]]);
-    (ShopRegistry as any).initialized = true;
+    const mockItemLoader = { loadItems: async () => [mockPotion, mockKeyItem] } as Pick<DataLoader, 'loadItems'>;
+    await ItemRegistry.init(mockItemLoader as DataLoader);
+    const mockShopLoader = { loadShops: async () => [mockShop] } as Pick<DataLoader, 'loadShops'>;
+    await ShopRegistry.init(mockShopLoader as DataLoader);
   });
 
   describe('buy flow', () => {

@@ -3,6 +3,7 @@ import { Character } from '../../src/entities/Character.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
 import type { CharacterClassData, ItemData } from '../../src/types/index.js';
+import type { DataLoader } from '../../src/core/DataLoader.js';
 
 const mockWarriorClass: CharacterClassData = {
   id: 'warrior',
@@ -52,15 +53,11 @@ const mockArmor: ItemData = {
 describe('EquipScene business logic', () => {
   let inventory: Inventory;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     inventory = new Inventory();
     ItemRegistry.reset();
-    (ItemRegistry as any).items = new Map([
-      ['iron_sword', mockSword],
-      ['staff', mockStaff],
-      ['chain_mail', mockArmor],
-    ]);
-    (ItemRegistry as any).initialized = true;
+    const mockLoader = { loadItems: async () => [mockSword, mockStaff, mockArmor] } as Pick<DataLoader, 'loadItems'>;
+    await ItemRegistry.init(mockLoader as DataLoader);
   });
 
   describe('equip flow', () => {

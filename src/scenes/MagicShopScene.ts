@@ -204,5 +204,8 @@ export class MagicShopScene implements Scene {
     this.game.scenes.pop();
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 }

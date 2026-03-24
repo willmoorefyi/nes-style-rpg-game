@@ -1,0 +1,96 @@
+# ═══ MAP TEMPLATE ═══
+# Maps are hand-authored YAML files in assets/maps/.
+# This template shows all available fields with comments.
+# Run `npm run validate` to check cross-file references.
+
+id: example-dungeon          # Unique kebab-case ID (referenced by transitions)
+width: 16                    # Map width in tiles
+height: 16                   # Map height in tiles
+
+# Tile layers — array of tile index arrays. Each layer renders in order.
+# At minimum, provide one layer. Use [0] as shorthand for "all tile 0".
+layers:
+  - [0]                      # Background layer (tile indices into tileset)
+
+# Tilesets used by this map (asset IDs)
+tilesets: [dungeon]
+
+# Collision data — flat array of terrain type values, row by row (width × height).
+# Terrain types: 0=Grass, 1=Wall, 2=Water, 3=Mountain, 4=Forest,
+#                5=Desert, 6=Swamp, 7=River, 8=Road, 9=Bridge
+# Omit or leave empty for no collision (all walkable).
+collision:
+  # Row 0
+  - 1
+  - 1
+  - 1
+  - 1
+  # ... (width × height entries total)
+
+# ═══ NPCs ═══
+# NPCs placed on the map. Each has a position, sprite, and dialog.
+npcs:
+  - id: old_man              # Unique ID within this map
+    x: 5                     # Tile X position
+    y: 3                     # Tile Y position
+    sprite: old_man          # Sprite asset ID
+    dialog:                  # Array of dialog lines shown sequentially
+      - "Welcome, Warriors of Light!"
+      - "The cave ahead is dangerous."
+    # shopId: elfheim_weapon # Optional: triggers shop scene instead of dialog.
+                             # Must reference a shop ID from shops.yaml.
+
+# ═══ MAP TRANSITIONS ═══
+# Tiles that transport the player to another map.
+transitions:
+  - x: 0                    # Tile position of the transition trigger
+    y: 8
+    targetMap: test-overworld  # Map ID to transition to (must exist in assets/maps/)
+    targetX: 10              # Spawn X on the target map
+    targetY: 5               # Spawn Y on the target map
+
+# ═══ RANDOM ENCOUNTERS ═══
+# Omit encounterRate and encounters for maps with no random battles (towns).
+encounterRate:
+  min: 10                    # Minimum steps between encounters
+  max: 20                    # Maximum steps between encounters
+encounters:
+  - enemies: [goblin]        # Enemy IDs from enemies.yaml
+    weight: 3                # Relative probability (higher = more common)
+  - enemies: [goblin, goblin]
+    weight: 2
+  - enemies: [wolf]
+    weight: 1
+
+# ═══ SCRIPTED ENCOUNTERS (boss fights, one-time battles) ═══
+# Optional. Omit if no scripted encounters on this map.
+scriptedEncounters:
+  - x: 8                    # Tile position that triggers the encounter
+    y: 14
+    enemyIds: [goblin]      # Enemy IDs from enemies.yaml
+    flag: EXAMPLE_BOSS_DEFEATED  # Story flag set after victory (prevents re-trigger)
+    # requiredFlag: SOME_FLAG  # Optional: encounter only triggers if this flag is set
+    isBoss: true             # true = no running allowed, boss music plays
+    message: "A powerful foe blocks the path!"  # Pre-battle dialog (optional)
+
+# ═══ VEHICLES ═══
+# Optional. Vehicle spawn points on this map.
+# vehicles:
+#   - type: canoe            # canoe | ship | airship
+#     x: 9
+#     y: 8
+#     requiredFlag: EARTH_CAVE_COMPLETE  # Only spawns after this flag is set
+
+# ═══ KEY ITEM GATES ═══
+# Optional. Tiles that block passage until the player has a required item.
+# keyItemGates:
+#   - x: 5
+#     y: 10
+#     requiredItem: mystic_key   # Item ID from items.yaml
+#     flag: GATE_OPENED          # Story flag set when opened (for permanent gates)
+#     message: "It's locked. You need the Mystic Key."
+#     permanent: true            # true = stays open after first use
+
+# ═══ OTHER OPTIONAL FIELDS ═══
+# music: dungeon             # Music track ID (from audio-manifest.json)
+# canSave: false             # Set to false for dungeons (default: true)

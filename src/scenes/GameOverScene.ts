@@ -36,6 +36,9 @@ export class GameOverScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {
     this.container.removeChildren();
   }

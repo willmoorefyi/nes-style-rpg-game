@@ -46,52 +46,76 @@ Step counter, encounter tables, battle transitions, victory/defeat flow.
 
 ---
 
-## Phases Remaining (9-18)
+## Phases Completed (9-13)
 
-### Phase 9: Magic System ⏳
-Spell charge system (not MP), spell data, targeting, effects.
+### Phase 9: Magic System ✅
+Spell charge system (not MP), elemental damage, status effects, spell targeting, magic damage formula.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 10: Items & Equipment ⏳
-Item data, inventory system, equipment stat bonuses, consumables in battle.
+### Phase 10: Items & Equipment ✅
+Field menu, item registry, consumable effects, equip UI, key items.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 11: Shops & Economy ⏳
-Shop UI, buy/sell, Inn rest mechanic.
+### Phase 11: Save/Load System ✅
+Story flags (GameFlags), game state serialization/deserialization, save slots, localStorage persistence.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 12: Save/Load System ⏳
-Game state serialization, localStorage, save slots.
+### Phase 12: Shops & Economy ✅
+Shop scene, magic shop scene, inn scene, quantity selector, buy/sell flow.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 13: Audio System ⏳
-Web Audio API music, SFX manager, per-scene triggers.
+### Phase 13: Audio System ✅
+AudioManager, Web Audio API, music/SFX playback, EventBus integration.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 14: Vehicles & World Progression ⏳
-Ship, canoe, airship, key item gates.
+---
 
-**Status:** PENDING
+## Phases Completed (14-17)
 
-### Phase 15: Boss Battles & Scripted Events ⏳
-Boss AI, multi-phase bosses, cutscene system.
+### Phase 14: Boss Battles & AI ✅
+AIBehavior redesign from interface stub to full implementation. BossAI with multi-phase bosses, scripted encounters, cutscene system with CutsceneManager and CutsceneRegistry.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 16: Class Upgrades ⏳
-Warrior→Knight style upgrades at story milestones.
+### Phase 15: Vehicles & World ✅
+Terrain types, 4 movement modes (walk, ship, canoe, airship), VehicleManager, key item gates via KeyItemGateSystem.
 
-**Status:** PENDING
+**Status:** COMPLETE
 
-### Phase 17: Content Population ⏳
-All maps, 32+ enemies, full item lists, shop inventories, NPC dialog.
+### Phase 16: Class Upgrades ✅
+6 upgraded classes (Warrior→Knight, Thief→Ninja, Monk→Master, White Mage→White Wizard, Black Mage→Black Wizard, Red Mage→Red Wizard). ClassUpgradeSystem with NPC-triggered upgrades at story milestones.
 
-**Status:** PENDING
+**Status:** COMPLETE
+
+### Phase 17: Content Population ✅
+
+**Sub-phases:**
+- **17a: Content Tooling** ✅ — Validation script, content templates, content guide
+- **17b: Content Maps** ✅ — Overworld, Cornelia, Temple of Fiends, 12 enemies, encounter tables
+- **17c: Content Items/Spells** ✅ — 42 items, 34 spells, 18 shops
+- **17d: Content Dialog** ✅ — Conditional dialog, story flags, cutscene registry
+
+**Phase 17d deliverables:**
+- `ConditionalDialog` type + `resolveNPCDialog()` for flag-based NPC dialog branching
+- Story flag constants (`STORY_FLAGS`) in `GameFlags.ts`
+- Cornelia NPCs with conditional dialog (guard, old man change after princess rescue)
+- Garland pre-battle dialog and post-victory cutscene (`cutscenes.yaml`)
+- `CutsceneRegistry` for loading cutscene scripts from YAML
+- `requiredFlag` on `MapTransition` for flag-gated map transitions
+- `postVictoryCutscene` on `ScriptedEncounter` for post-boss cutscenes
+- `showDialog` event on `EventBus` for cutscene dialog integration
+- 27 new tests (conditional dialog, NPC dialog validation, cutscene registry)
+
+**Status:** COMPLETE
+
+---
+
+## Phases Remaining
 
 ### Phase 18: Polish & Balancing ⏳
 Playtesting, stat tuning, encounter rates, final art/audio.
@@ -136,5 +160,6 @@ Phases 3 (Tilemap) and 4 (UI Framework) were successfully built in parallel usin
 
 ## Current Metrics
 
-- **Tests:** 173 (all passing)
-- **Source files:** 36 TypeScript files
+- **Tests:** 739+ (all passing)
+- **Test files:** 70+
+- **Source files:** 80+ TypeScript files

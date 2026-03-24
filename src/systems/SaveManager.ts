@@ -41,7 +41,8 @@ export class SaveManager {
     try {
       localStorage.setItem(`${SAVE_KEY_PREFIX}${slotId}`, JSON.stringify(data));
       return true;
-    } catch {
+    } catch (e) {
+      console.error(`Failed to save to slot ${slotId}:`, e);
       return false;
     }
   }
@@ -72,7 +73,8 @@ export class SaveManager {
         playerPosition: data.playerPosition,
         playTime: data.playTime,
       };
-    } catch {
+    } catch (e) {
+      console.error(`Failed to load save slot ${slotId}:`, e);
       return null;
     }
   }
@@ -94,7 +96,8 @@ export class SaveManager {
           partyLeader: leader?.name,
           saveDate: data.saveDate,
         });
-      } catch {
+      } catch (e) {
+        console.error(`Failed to read save slot ${i}:`, e);
         slots.push(null);
       }
     }

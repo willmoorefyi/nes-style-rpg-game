@@ -1,0 +1,30 @@
+# ═══ ENEMY TEMPLATE ═══
+# Copy this block and fill in values to add a new enemy.
+# Then add the enemy ID to encounter tables in the relevant map YAML.
+# Run `npm run validate` to check references.
+
+- id: skeleton              # Unique snake_case ID (referenced by encounter tables)
+  name: Skeleton             # Display name shown in battle
+  stats:
+    hp: 40                   # Hit points
+    strength: 10             # Physical power (affects attack damage)
+    agility: 6               # Turn order priority + evasion
+    intelligence: 1          # Magic power (for enemies that cast spells)
+    vitality: 5              # Damage reduction modifier
+    luck: 3                  # Critical hit chance modifier
+    attack: 12               # Base physical attack value
+    defense: 4               # Physical damage reduction
+    magicDefense: 2          # Magic damage reduction
+  xpReward: 30              # XP awarded to party on defeat
+  goldReward: 15             # Gold awarded on defeat
+  sprite: skeleton           # Sprite sheet ID (matches asset filename)
+  # Optional elemental fields:
+  weakness: fire             # Element this enemy is weak to (2x damage). Omit if none.
+  resist: ice                # Element this enemy resists (0.5x damage). Omit if none.
+  # Valid elements: fire, ice, lightning, earth, holy, dark, water, wind, none
+  #
+  # Optional boss fields (omit for normal enemies):
+  # bossPhases:
+  #   - hpThreshold: 0.5    # Triggers when HP drops below 50%
+  #     patternId: aggressive
+  #     message: "The Lich's form shifts!"

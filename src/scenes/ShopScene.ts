@@ -200,5 +200,8 @@ export class ShopScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 }

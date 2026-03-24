@@ -14,6 +14,8 @@ export interface GameEvents {
   battleMiss: Record<string, never>;
   battleVictory: Record<string, never>;
   spellCast: Record<string, never>;
+  bossDefeated: { flag: string };
+  showDialog: { text: string; onComplete: () => void };
 }
 
 type Callback<T> = (data: T) => void;

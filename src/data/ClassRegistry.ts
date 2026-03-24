@@ -22,6 +22,10 @@ export class ClassRegistry {
     return Array.from(this.classes.values());
   }
 
+  static getAllClasses(): Map<string, CharacterClassData> {
+    return this.classes;
+  }
+
   static reset(): void {
     this.classes.clear();
     this.initialized = false;

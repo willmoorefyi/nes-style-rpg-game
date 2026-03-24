@@ -1,0 +1,60 @@
+# ═══ ITEM TEMPLATES ═══
+# Copy the relevant block to add a new weapon, armor, or consumable.
+# Add the item ID to shop inventories in shops.yaml if sold in stores.
+# Run `npm run validate` to check references.
+
+# ── Weapon example ──────────────────────────────────────────
+- id: mythril_sword          # Unique snake_case ID
+  name: Mythril Sword        # Display name
+  type: weapon               # weapon | armor | consumable | key
+  stats:
+    attack: 23               # Attack power bonus when equipped
+  price: 4000                # Buy price in gold (sell = floor(price / 2))
+  usableBy: [warrior, red_mage]  # Class IDs that can equip this. Must exist in classes.yaml.
+
+# ── Armor example (body) ───────────────────────────────────
+- id: iron_armor
+  name: Iron Armor
+  type: armor
+  # slot defaults to "armor" (body) if omitted
+  stats:
+    defense: 10              # Defense bonus when equipped
+  price: 800
+  usableBy: [warrior]
+
+# ── Armor example (shield) ─────────────────────────────────
+- id: iron_shield
+  name: Iron Shield
+  type: armor
+  slot: shield               # Equipment slot: armor | shield | helmet
+  stats:
+    defense: 4
+  price: 100
+  usableBy: [warrior, red_mage]
+
+# ── Armor example (helmet) ─────────────────────────────────
+- id: iron_helm
+  name: Iron Helm
+  type: armor
+  slot: helmet
+  stats:
+    defense: 3
+  price: 100
+  usableBy: [warrior]
+
+# ── Consumable example ─────────────────────────────────────
+- id: potion
+  name: Potion
+  type: consumable
+  stats:
+    hp: 30                   # HP restored on use. Omit for non-healing items.
+  price: 60
+  usableBy: []               # Empty = usable by all classes
+
+# ── Key item example ────────────────────────────────────────
+- id: mystic_key
+  name: Mystic Key
+  type: key                  # Cannot be sold or dropped
+  stats: {}
+  price: 0                   # Key items have no sell value
+  usableBy: []

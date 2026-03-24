@@ -75,6 +75,14 @@ export function validateMapData(data: unknown): MapData {
   assertArray('MapData.layers', data.layers);
   assertArray('MapData.tilesets', data.tilesets);
   assertArray('MapData.collision', data.collision);
+  // Validate collision array matches map dimensions
+  const collisionArr = data.collision as unknown[];
+  const expectedSize = (data.width as number) * (data.height as number);
+  if (collisionArr.length > 0 && collisionArr.length !== expectedSize) {
+    throw new ValidationError(
+      `MapData.collision: expected length ${expectedSize} (width*height), got ${collisionArr.length}`
+    );
+  }
   assertArray('MapData.npcs', data.npcs);
   assertArray('MapData.transitions', data.transitions);
   

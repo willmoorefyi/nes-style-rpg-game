@@ -7,10 +7,12 @@ import { DataLoader } from './DataLoader.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
+import { ClassRegistry } from '../data/ClassRegistry.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
 import { GameFlags } from './GameFlags.js';
+import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 
 export const WIDTH = 256;
 export const HEIGHT = 240;
@@ -53,9 +55,11 @@ export class Game {
     });
 
     await this.assets.init();
+    await ClassRegistry.init(this.data);
     await ItemRegistry.init(this.data);
     await SpellRegistry.init(this.data);
     await ShopRegistry.init(this.data);
+    await CutsceneRegistry.init(this.assets);
     
     // Initialize audio
     try {

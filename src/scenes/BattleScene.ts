@@ -24,6 +24,8 @@ export interface BattleSceneConfig {
   enemies: EnemyData[];
   spells?: SpellData[];
   inventory?: Inventory;
+  /** Whether the party can run from this battle (default true) */
+  canRun?: boolean;
 }
 
 type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui';
@@ -56,7 +58,12 @@ export class BattleScene implements Scene {
     this.config = config;
     this.spells = config.spells ?? [];
     this.inventory = config.inventory;
-    this.battle = new BattleStateMachine({ ...config, spells: this.spells, inventory: this.inventory });
+    this.battle = new BattleStateMachine({
+      ...config,
+      spells: this.spells,
+      inventory: this.inventory,
+      canRun: config.canRun,
+    });
   }
 
   enter(): void {
@@ -85,11 +92,12 @@ export class BattleScene implements Scene {
   }
 
   private createCommandMenu(): void {
+    const canRun = this.config.canRun ?? true;
     const items: MenuItem[] = [
       { label: 'Fight', value: 'fight' },
       { label: 'Magic', value: 'magic' },
       { label: 'Item', value: 'item' },
-      { label: 'Run', value: 'run' },
+      { label: 'Run', value: 'run', enabled: canRun },
     ];
     this.commandMenu = new Menu({
       items,
@@ -424,7 +432,14 @@ export class BattleScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {
     this.container.removeChildren();
+    // Null out UI references for GC
+    this.targetMenu = null;
+    this.spellUI = null;
+    this.itemUI = null;
   }
 }

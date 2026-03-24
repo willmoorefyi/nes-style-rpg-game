@@ -1,0 +1,352 @@
+# ═══ TEMPLE OF FIENDS — First Dungeon ═══
+# 16x16 dungeon, tier 1 encounters, Garland boss at the end.
+id: temple-of-fiends
+width: 16
+height: 16
+layers:
+  - [0]
+tilesets: [dungeon]
+canSave: false
+music: dungeon
+
+# Collision: 0=Grass(floor), 1=Wall
+# Layout: corridors leading to boss room at top
+collision:
+  # Row 0: top wall
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 1: boss room
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 2
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 3
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 4: corridor
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 5
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 6: treasure rooms
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  # Row 7
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 1
+  - 0
+  - 1
+  # Row 8: central hall
+  - 1
+  - 0
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 9
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 10
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 11
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  # Row 12
+  - 1
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 0
+  - 0
+  - 1
+  # Row 13
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 14: entrance hall
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 15: entrance
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+
+# ═══ NPCs (treasure chests) ═══
+npcs:
+  - id: chest_potion
+    x: 3
+    y: 6
+    sprite: chest
+    dialog: ["You found a Potion!"]
+
+  - id: chest_antidote
+    x: 12
+    y: 6
+    sprite: chest
+    dialog: ["You found an Antidote!"]
+
+  - id: chest_cap
+    x: 1
+    y: 11
+    sprite: chest
+    dialog: ["You found a Cap!"]
+
+  - id: chest_rapier
+    x: 14
+    y: 11
+    sprite: chest
+    dialog: ["You found a Rapier!"]
+
+# ═══ MAP TRANSITIONS ═══
+transitions:
+  # Entrance back to overworld
+  - x: 7
+    y: 15
+    targetMap: overworld
+    targetX: 8
+    targetY: 3
+  - x: 8
+    y: 15
+    targetMap: overworld
+    targetX: 9
+    targetY: 3
+
+# ═══ RANDOM ENCOUNTERS ═══
+encounterRate:
+  min: 8
+  max: 15
+encounters:
+  - enemies: [skeleton]
+    weight: 3
+  - enemies: [goblin, goblin]
+    weight: 3
+  - enemies: [skeleton, goblin]
+    weight: 2
+  - enemies: [wolf, wolf]
+    weight: 2
+  - enemies: [pirate]
+    weight: 1
+
+# ═══ SCRIPTED ENCOUNTERS ═══
+scriptedEncounters:
+  - x: 7
+    y: 1
+    enemyIds: [garland]
+    flag: GARLAND_DEFEATED
+    isBoss: true
+    message: "Garland: I, Garland, will knock you all down!"
+    postVictoryCutscene: garland_defeated

@@ -126,6 +126,9 @@ export class EquipScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 
   private updateStats(): void {

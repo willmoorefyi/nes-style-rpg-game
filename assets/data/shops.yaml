@@ -36,3 +36,81 @@
   name: Cornelia Inn
   inventory: []
   innPrice: 30
+
+# ═══ ELFHEIM SHOPS ═══
+
+# Weapon shop
+- id: elfheim_weapon
+  type: weapon
+  name: Elfheim Weapons
+  inventory: [mythril_sword, mythril_knife, great_axe, mythril_hammer, iron_nunchaku, power_staff]
+
+# Armor shop
+- id: elfheim_armor
+  type: armor
+  name: Elfheim Armor
+  inventory: [iron_armor, mythril_mail, iron_shield, iron_helm]
+
+# Item shop
+- id: elfheim_item
+  type: item
+  name: Elfheim Items
+  inventory: [potion, hi_potion, antidote, soft, tent, cabin, phoenix_down]
+
+# White magic shop (Lv2-3)
+- id: elfheim_white
+  type: magic
+  name: Elfheim White Magic
+  inventory: [lamp, mute, alit, invs, cure2, hrm2, afir, heal]
+
+# Black magic shop (Lv2-3)
+- id: elfheim_black
+  type: magic
+  name: Elfheim Black Magic
+  inventory: [ice, dark, tmpr, slow, fir2, hold, lit2, lok2]
+
+# Inn
+- id: elfheim_inn
+  type: inn
+  name: Elfheim Inn
+  inventory: []
+  innPrice: 100
+
+# ═══ MELMOND SHOPS ═══
+
+# Weapon shop
+- id: melmond_weapon
+  type: weapon
+  name: Melmond Weapons
+  inventory: [iron_sword, hand_axe, mythril_knife]
+
+# Armor shop
+- id: melmond_armor
+  type: armor
+  name: Melmond Armor
+  inventory: [chain_mail, iron_shield, iron_helm, cap]
+
+# Item shop
+- id: melmond_item
+  type: item
+  name: Melmond Items
+  inventory: [potion, hi_potion, antidote, soft, tent, cabin, phoenix_down]
+
+# White magic shop (Lv3-4)
+- id: melmond_white
+  type: magic
+  name: Melmond White Magic
+  inventory: [cure2, hrm2, afir, heal, pure, fear, aice, amut]
+
+# Black magic shop (Lv3-4)
+- id: melmond_black
+  type: magic
+  name: Melmond Black Magic
+  inventory: [fir2, hold, lit2, lok2, slp2, fast, conf, ice2]
+
+# Inn
+- id: melmond_inn
+  type: inn
+  name: Melmond Inn
+  inventory: []
+  innPrice: 200

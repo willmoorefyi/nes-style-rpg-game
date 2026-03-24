@@ -1,0 +1,380 @@
+# ═══ CORNELIA — Starting Town ═══
+# 16x16 town map with shops, inn, and hint NPCs.
+# No random encounters (town).
+id: cornelia
+width: 16
+height: 16
+layers:
+  - [0]
+tilesets: [town]
+
+# Collision: 0=Grass(walkable), 1=Wall, 8=Road
+# Layout: walls around edges, buildings as wall blocks, roads between
+collision:
+  # Row 0: top wall
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  # Row 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 2: weapon shop building
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 1
+  - 1
+  - 0
+  - 0
+  - 8
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 3
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 1
+  - 1
+  - 0
+  - 0
+  - 8
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 4: road
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 5
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 6: magic shops
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 7
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 1
+  - 1
+  - 0
+  - 1
+  # Row 8: central road
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 9
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 10: inn area
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 11
+  - 1
+  - 0
+  - 1
+  - 1
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 12
+  - 1
+  - 0
+  - 0
+  - 0
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 8
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 13
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 14
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 8
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  # Row 15: south wall with exit
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+
+# ═══ NPCs ═══
+npcs:
+  # Shops
+  - id: weapon_merchant
+    x: 3
+    y: 2
+    sprite: merchant
+    dialog: ["Welcome to Cornelia Weapons!"]
+    shopId: cornelia_weapon
+
+  - id: armor_merchant
+    x: 8
+    y: 2
+    sprite: merchant
+    dialog: ["Cornelia Armor at your service!"]
+    shopId: cornelia_armor
+
+  - id: item_merchant
+    x: 13
+    y: 2
+    sprite: merchant
+    dialog: ["Stock up on supplies!"]
+    shopId: cornelia_item
+
+  - id: white_mage_shop
+    x: 3
+    y: 6
+    sprite: mage
+    dialog: ["The light of magic guides you."]
+    shopId: cornelia_white
+
+  - id: black_mage_shop
+    x: 13
+    y: 6
+    sprite: mage
+    dialog: ["Power comes at a price."]
+    shopId: cornelia_black
+
+  - id: innkeeper
+    x: 3
+    y: 10
+    sprite: innkeeper
+    dialog: ["Rest your weary bones."]
+    shopId: cornelia_inn
+
+  # Hint NPCs
+  - id: guard
+    x: 7
+    y: 5
+    sprite: guard
+    dialog:
+      - condition: PRINCESS_RESCUED
+        text:
+          - "The princess is safe."
+          - "Thank you, Warriors of Light!"
+      - text:
+          - "The princess has been kidnapped!"
+          - "A knight named Garland took her to the Temple of Fiends to the north."
+
+  - id: old_man
+    x: 10
+    y: 9
+    sprite: old_man
+    dialog:
+      - condition: BRIDGE_BUILT
+        text:
+          - "The bridge to the north is complete."
+          - "Seek the four crystals across the land."
+      - text:
+          - "The four crystals have gone dark."
+          - "Only the Warriors of Light can restore them."
+
+  - id: villager
+    x: 5
+    y: 13
+    sprite: villager
+    dialog:
+      - "Buy spells early. They make a huge difference in the first dungeon!"
+
+# ═══ MAP TRANSITIONS ═══
+transitions:
+  # South exit to overworld
+  - x: 7
+    y: 15
+    targetMap: overworld
+    targetX: 8
+    targetY: 11
+  - x: 8
+    y: 15
+    targetMap: overworld
+    targetX: 9
+    targetY: 11
+
+music: town

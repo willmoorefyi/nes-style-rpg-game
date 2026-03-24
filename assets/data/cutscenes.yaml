@@ -1,0 +1,19 @@
+# ═══ CUTSCENE SCRIPTS ═══
+# Each cutscene is a sequence of steps executed by CutsceneManager.
+# Step types: dialog, fade_out, fade_in, wait, set_flag, heal_party
+
+- id: garland_defeated
+  steps:
+    - type: dialog
+      text: "You have defeated Garland and rescued the princess!"
+    - type: set_flag
+      flag: PRINCESS_RESCUED
+    - type: dialog
+      text: "The King has ordered a bridge built to the north."
+    - type: set_flag
+      flag: BRIDGE_BUILT
+    - type: heal_party
+    - type: fade_out
+      duration: 500
+    - type: fade_in
+      duration: 500

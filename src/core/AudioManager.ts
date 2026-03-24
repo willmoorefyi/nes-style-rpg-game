@@ -27,7 +27,7 @@ export class AudioManager {
       }
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
+      this.ctx.resume().catch(() => { /* Resume is best-effort; context may not be ready for user interaction yet */ });
     }
     return this.ctx;
   }
@@ -80,9 +80,9 @@ export class AudioManager {
     const { source, gain } = this.currentMusic;
     if (fadeMs > 0 && this.ctx) {
       gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + fadeMs / 1000);
-      setTimeout(() => { try { source.stop(); } catch {} }, fadeMs);
+      setTimeout(() => { try { source.stop(); } catch { /* Web Audio source.stop() throws if already stopped — safe to ignore */ } }, fadeMs);
     } else {
-      try { source.stop(); } catch {}
+      try { source.stop(); } catch { /* Web Audio source.stop() throws if already stopped — safe to ignore */ }
     }
     this.currentMusic = null;
   }

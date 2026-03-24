@@ -35,7 +35,7 @@ export function createMockGame(mapData?: MapData) {
   const map = mapData ?? createMapData();
   return {
     app: { stage: new Container() },
-    scenes: { register: vi.fn(), switchTo: vi.fn() },
+    scenes: { register: vi.fn(), unregister: vi.fn(), switchTo: vi.fn() },
     assets: { load: vi.fn().mockResolvedValue(Texture.WHITE) },
     input: {
       isPressed: vi.fn().mockReturnValue(false),

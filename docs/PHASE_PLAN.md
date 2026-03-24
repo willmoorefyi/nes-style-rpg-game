@@ -124,7 +124,7 @@ The elemental and status systems are defined here because magic is their first c
 
 - Phases 1-8 complete (battle state machine, character system, data loading)
 - Post-remediation: scrolling Menu, BattleSceneDeps, injectable RNG, schema validation
-- `spells.json` exists with 10 starter spells; `SpellData` interface defined in `types/index.ts`
+- `spells.yaml` exists with 10 starter spells; `SpellData` interface defined in `types/index.ts`
 - `Character.spellCharges` array with get/set; `CharacterClassData.spellLevels` for class access
 - `BattleStateMachine.executeCommand()` has `cmd.type === 'magic'` stub returning "No spells available"
 
@@ -139,8 +139,8 @@ The elemental and status systems are defined here because magic is their first c
 - Add `element?: ElementType` to `SpellData` interface in `types/index.ts`
 - Add `element?: ElementType` to `ItemData.stats` for elemental weapons (Flame Sword)
 - Add `elementalProfile?: ElementalProfile` to `EnemyData` in `types/index.ts`
-- Update `enemies.json` entries with default `elementalProfile: { weaknesses: [], resistances: [], immunities: [], absorbs: [] }`
-- Update `spells.json` entries with `element` field (FIRE→fire, LIT→lightning, ICE→ice, etc.)
+- Update `enemies.yaml` entries with default `elementalProfile: { weaknesses: [], resistances: [], immunities: [], absorbs: [] }`
+- Update `spells.yaml` entries with `element` field (FIRE→fire, LIT→lightning, ICE→ice, etc.)
 
 **2. Define status effect system (5-8 hrs)**
 [Resolves momus CRITICAL #2]
@@ -205,7 +205,7 @@ The elemental and status systems are defined here because magic is their first c
 - Add `restoreCharges(level: number, amount: number)` for partial restoration (Ether item)
 - Max charges per level determined by character level (use charge progression table from design doc §5, or placeholder values with `[DEFERRED: PLAYTESTING]` marker)
 
-**9. Expand spells.json with remaining Level 1-2 spells (2-3 hrs)**
+**9. Expand spells.yaml with remaining Level 1-2 spells (2-3 hrs)**
 - Add missing Level 1 spells: RUSE (white), LOCK (black)
 - Add all Level 2 spells: LAMP, MUTE, ALIT, INVS (white), DARK, TMPR, SLOW (black)
 - Each entry needs: id, name, level, type, effect, targeting, description, element (if applicable), statusEffect (if applicable)
@@ -265,8 +265,8 @@ The elemental and status systems are defined here because magic is their first c
 - `src/battle/BattleStateMachine.ts` — spell execution logic, status tick per turn, spells in BattleConfig
 - `src/entities/Character.ts` — learnedSpells, learnSpell(), restoreAllCharges(), restoreCharges()
 - `src/scenes/BattleScene.ts` — spell level menu, spell list menu, party target menu
-- `assets/data/spells.json` — add element field, expand to Lv1-2 complete
-- `assets/data/enemies.json` — add elementalProfile, statusImmunities
+- `assets/data/spells.yaml` — add element field, expand to Lv1-2 complete
+- `assets/data/enemies.yaml` — add elementalProfile, statusImmunities
 
 ---
 
@@ -279,7 +279,7 @@ Phase 10 builds the item usage layer on top of the existing Inventory class and 
 ### Prerequisites
 
 - Phase 9 complete (elemental system for elemental weapons, status system for status-curing items)
-- Existing: `Inventory` class (ID-based, add/remove/getAll), `Character.equip()`/`unequip()`/`canEquip()`, `ItemData` interface, `items.json` with 15 items, scrolling Menu, scene stack push/pop
+- Existing: `Inventory` class (ID-based, add/remove/getAll), `Character.equip()`/`unequip()`/`canEquip()`, `ItemData` interface, `items.yaml` with 15 items, scrolling Menu, scene stack push/pop
 
 ### Sub-Tasks
 
@@ -301,7 +301,7 @@ Phase 10 builds the item usage layer on top of the existing Inventory class and 
 [Resolves momus MAJOR #11]
 - Create `src/data/ItemRegistry.ts`
 - `class ItemRegistry { private items: Map<string, ItemData>; load(items: ItemData[]): void; get(id: string): ItemData | undefined; getAll(): ItemData[] }`
-- Populated at game startup from `items.json` via DataLoader
+- Populated at game startup from `items.yaml` via DataLoader
 - Add `readonly itemRegistry: ItemRegistry` to `Game.ts`
 - This bridges the gap between Inventory (stores IDs) and UI/effects (need ItemData)
 
@@ -549,7 +549,7 @@ interface ShopData {
   inventory: string[]; // item IDs or spell IDs
 }
 ```
-- Create `assets/data/shops.json` with starter shops for Cornelia: weapon shop, armor shop, item shop, white magic shop, black magic shop
+- Create `assets/data/shops.yaml` with starter shops for Cornelia: weapon shop, armor shop, item shop, white magic shop, black magic shop
 - Add schema validation for ShopData
 - Shops are associated with maps via NPC interaction: NPC `dialog` field extended to support `"type": "shop"` with `"shopId"` reference, or shops are triggered by a special NPC property
 
@@ -590,12 +590,12 @@ interface ShopData {
 **6. Wire shops to NPC interactions (2-3 hrs)**
 - Extend `MapNPC` interface: add optional `shopId?: string` and `innCost?: number`
 - When player interacts with shop NPC, DialogManager triggers shop scene push instead of normal dialog
-- ShopScene loads shop data from `shops.json` by ID, resolves item/spell IDs via registries
+- ShopScene loads shop data from `shops.yaml` by ID, resolves item/spell IDs via registries
 
 **7. Create SpellRegistry (1-2 hrs)**
 - Create `src/data/SpellRegistry.ts` — same pattern as ItemRegistry
 - `class SpellRegistry { load(spells: SpellData[]): void; get(id: string): SpellData | undefined; getByLevel(level: number): SpellData[]; getByType(type: SpellType): SpellData[] }`
-- Add to `Game.ts`; populated at startup from `spells.json`
+- Add to `Game.ts`; populated at startup from `spells.yaml`
 - Used by magic shops and save/load spell deserialization
 
 ### Acceptance Criteria
@@ -607,7 +607,7 @@ interface ShopData {
 - Magic shop shows spells; selecting FIRE shows eligible characters; learning adds to spell slots
 - Magic shop shows "FULL" for characters with 3 spells at that level
 - Inn deducts gold, restores all HP and spell charges
-- Shop data loads from `shops.json` with schema validation
+- Shop data loads from `shops.yaml` with schema validation
 
 ### Test Strategy
 
@@ -635,7 +635,7 @@ interface ShopData {
 - `src/scenes/ShopScene.ts`
 - `src/scenes/MagicShopScene.ts`
 - `src/data/SpellRegistry.ts`
-- `assets/data/shops.json`
+- `assets/data/shops.yaml`
 - `tests/scenes/ShopScene.test.ts`
 - `tests/ui/QuantitySelector.test.ts`
 - `tests/data/SpellRegistry.test.ts`
@@ -1059,7 +1059,7 @@ interface KeyItemGate {
 
 **7. Create test overworld map for vehicle testing (2-3 hrs)**
 [Resolves momus CRITICAL #32 — partial; real overworld in Phase 17b]
-- Create `assets/maps/test-overworld.json` — small (32×32) map with terrain variety: grass, water, mountains, forest, river
+- Create `assets/maps/test-overworld.yaml` — small (32×32) map with terrain variety: grass, water, mountains, forest, river
 - Include vehicle spawn points for canoe and ship
 - Include a key item gate
 - This is a development/testing map, not the final overworld
@@ -1112,7 +1112,7 @@ interface KeyItemGate {
 - `src/entities/CanoeMode.ts`
 - `src/entities/ShipMode.ts`
 - `src/entities/AirshipMode.ts`
-- `assets/maps/test-overworld.json`
+- `assets/maps/test-overworld.yaml`
 - `tests/entities/MovementModes.test.ts`
 - `tests/systems/KeyItemGate.test.ts`
 
@@ -1130,17 +1130,17 @@ interface KeyItemGate {
 
 ### Overview
 
-Phase 16 is the simplest remaining phase mechanically. It delivers: 6 upgraded class definitions in `classes.json`, a method to upgrade a character's class (fixing the `readonly classData` constraint), and the upgrade trigger mechanism tied to story flags. Per the design doc §3, all party members upgrade simultaneously at a story milestone (after lighting the Earth Crystal).
+Phase 16 is the simplest remaining phase mechanically. It delivers: 6 upgraded class definitions in `classes.yaml`, a method to upgrade a character's class (fixing the `readonly classData` constraint), and the upgrade trigger mechanism tied to story flags. Per the design doc §3, all party members upgrade simultaneously at a story milestone (after lighting the Earth Crystal).
 
 ### Prerequisites
 
 - Phase 11 (story flags — upgrade triggered by `EARTH_CRYSTAL_LIT` flag)
 - Phase 12 (magic shops — upgraded classes gain new spell access levels, purchasable at shops)
-- Existing: `Character` with `readonly classData`, `classes.json` with 6 base classes
+- Existing: `Character` with `readonly classData`, `classes.yaml` with 6 base classes
 
 ### Sub-Tasks
 
-**1. Add 6 upgraded class entries to classes.json (2-3 hrs)**
+**1. Add 6 upgraded class entries to classes.yaml (2-3 hrs)**
 [Resolves momus MAJOR #45]
 - Add: Knight, Ninja, Master, White Wizard, Black Wizard, Red Wizard
 - Each with: higher base stats, expanded `usableEquipment`, expanded `spellLevels`
@@ -1189,7 +1189,7 @@ get classData(): CharacterClassData { return this._classData; }
 
 ### Acceptance Criteria
 
-- `classes.json` contains 12 entries (6 base + 6 upgraded)
+- `classes.yaml` contains 12 entries (6 base + 6 upgraded)
 - `Character.upgrade(knightData)` changes class from Warrior to Knight
 - After upgrade: maxHp recalculated, currentHp healed to full
 - Knight gains `spellLevels: { white: 3, black: 0 }` — can now buy white magic Lv1-3
@@ -1226,7 +1226,7 @@ get classData(): CharacterClassData { return this._classData; }
 
 **Modified:**
 - `src/entities/Character.ts` — readonly→getter, add upgrade() method
-- `assets/data/classes.json` — add 6 upgraded class entries
+- `assets/data/classes.yaml` — add 6 upgraded class entries
 - `src/types/index.ts` — (no changes needed, CharacterClassData already sufficient)
 - `src/scenes/ExplorationScene.ts` — handle class_upgrade NPC type
 
@@ -1258,18 +1258,18 @@ Before creating content at scale, the tooling must exist. This sub-phase deliver
 [Resolves momus MINOR #54]
 - Create `scripts/validate-content.ts`
 - Checks:
-  - All enemy IDs in encounter tables exist in `enemies.json`
-  - All item IDs in shop inventories exist in `items.json`
-  - All spell IDs in magic shops exist in `spells.json`
+  - All enemy IDs in encounter tables exist in `enemies.yaml`
+  - All item IDs in shop inventories exist in `items.yaml`
+  - All spell IDs in magic shops exist in `spells.yaml`
   - All map transition targets exist as map files
-  - All NPC shopIds reference existing shops in `shops.json`
-  - All class IDs in upgrade mapping exist in `classes.json`
+  - All NPC shopIds reference existing shops in `shops.yaml`
+  - All class IDs in upgrade mapping exist in `classes.yaml`
 - Run as: `npx tsx scripts/validate-content.ts` — exits 0 if valid, 1 with error list
 - Add to `npm run validate` script
 
 **3. Create content templates and data entry guides (2-3 hrs)**
 - Create `docs/CONTENT_GUIDE.md` — instructions for adding enemies, items, spells, maps, shops
-- Create template JSON files: `assets/data/templates/enemy-template.json`, `item-template.json`, etc.
+- Create template YAML files: `assets/data/templates/enemy-template.yaml`, `item-template.yaml`, etc.
 - Define naming conventions: enemy IDs lowercase_snake, spell IDs lowercase, map IDs kebab-case
 
 **4. Create placeholder tileset for Tiled (2-3 hrs)**
@@ -1411,7 +1411,7 @@ Expands all item, spell, and shop data to full game scope. Currently: 15 items, 
 - Validate all spells load correctly
 
 **4. Define shop inventories for all towns (3-4 hrs)**
-- Create/expand `shops.json` with per-town shops
+- Create/expand `shops.yaml` with per-town shops
 - Cornelia: starter gear + Lv1 spells
 - Elfheim: mid-tier gear + Lv2-3 spells
 - Progression matches design doc §7 economy pacing
@@ -1429,9 +1429,9 @@ Expands all item, spell, and shop data to full game scope. Currently: 15 items, 
 
 ### Acceptance Criteria
 
-- `items.json` contains 40+ weapons, 20+ armor, 10+ consumables
-- `spells.json` contains all 64 spells (32 white + 32 black)
-- `shops.json` contains shops for every town with appropriate tier progression
+- `items.yaml` contains 40+ weapons, 20+ armor, 10+ consumables
+- `spells.yaml` contains all 64 spells (32 white + 32 black)
+- `shops.yaml` contains shops for every town with appropriate tier progression
 - Cross-reference validation passes for all shops
 - Economy pacing matches design doc §7 (early game: basic gear affordable, endgame: expensive)
 
@@ -1526,10 +1526,10 @@ The narrative content phase: NPC dialog for all towns, story event scripts, boss
 - `scripts/tiled-export.ts`, `scripts/validate-content.ts`
 - `docs/CONTENT_GUIDE.md`
 - `assets/tilesets/` (tileset files)
-- `assets/maps/overworld.json` + all town/dungeon maps
+- `assets/maps/overworld.yaml` + all town/dungeon maps
 - `assets/data/dialog/` (dialog files)
 - `assets/data/cutscenes/` (cutscene scripts)
-- Expanded: `enemies.json`, `items.json`, `spells.json`, `shops.json`
+- Expanded: `enemies.yaml`, `items.yaml`, `spells.yaml`, `shops.yaml`
 
 **Modified:**
 - `src/types/index.ts` — flag-conditional dialog, enemy drops
@@ -1552,7 +1552,7 @@ The final phase transforms the feature-complete game into a polished, balanced e
 
 **1. Resolve all DEFERRED: PLAYTESTING items (8-12 hrs)**
 [Resolves momus MINOR #57]
-- Exact stat growth tables per class (tune `statGrowth` in `classes.json`)
+- Exact stat growth tables per class (tune `statGrowth` in `classes.yaml`)
 - Spell charge progression curve (tune charge-per-level table)
 - XP table (tune `XP_THRESHOLDS` in Character.ts for smooth leveling)
 - Encounter rate tuning (overworld ~20-30 steps, dungeons ~10-20, per-area variance)
@@ -1649,10 +1649,10 @@ The final phase transforms the feature-complete game into a polished, balanced e
 - Bitmap font asset files
 
 **Modified:**
-- `assets/data/classes.json` — tuned stat growth
-- `assets/data/enemies.json` — tuned enemy stats
-- `assets/data/items.json` — tuned prices and stats
-- `assets/data/spells.json` — tuned spell power
+- `assets/data/classes.yaml` — tuned stat growth
+- `assets/data/enemies.yaml` — tuned enemy stats
+- `assets/data/items.yaml` — tuned prices and stats
+- `assets/data/spells.yaml` — tuned spell power
 - `src/entities/Character.ts` — tuned XP thresholds
 - `src/ui/TextRenderer.ts` — bitmap font implementation
 - `src/ui/DialogBox.ts` — bitmap font

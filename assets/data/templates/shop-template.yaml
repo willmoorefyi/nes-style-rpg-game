@@ -1,0 +1,50 @@
+# ═══ SHOP TEMPLATES ═══
+# Copy the relevant block to add a new shop.
+# All item/spell IDs in inventory must exist in items.yaml or spells.yaml.
+# Run `npm run validate` to check references.
+
+# ── Weapon shop ─────────────────────────────────────────────
+- id: elfheim_weapon         # Unique snake_case ID (convention: <town>_<type>)
+  type: weapon               # weapon | armor | item | magic | inn
+  name: Elfheim Weapons      # Display name shown to player
+  inventory:                 # List of item IDs from items.yaml
+    - rapier
+    - iron_sword
+    - short_sword
+
+# ── Armor shop ──────────────────────────────────────────────
+- id: elfheim_armor
+  type: armor
+  name: Elfheim Armor
+  inventory:
+    - chain_mail
+    - leather_armor
+    - wooden_shield
+    - cap
+
+# ── Item shop ───────────────────────────────────────────────
+- id: elfheim_item
+  type: item
+  name: Elfheim Items
+  inventory:
+    - potion
+    - hi_potion
+    - antidote
+    - tent
+
+# ── Magic shop ──────────────────────────────────────────────
+- id: elfheim_white
+  type: magic                # Magic shops sell spells, not items
+  name: White Magic Lv2
+  inventory:                 # List of spell IDs from spells.yaml
+    - lamp
+    - mute
+    - alit
+    - invs
+
+# ── Inn ─────────────────────────────────────────────────────
+- id: elfheim_inn
+  type: inn
+  name: Elfheim Inn
+  inventory: []              # Inns have no inventory
+  innPrice: 50               # Cost to rest (restores all HP + spell charges)

@@ -28,7 +28,7 @@ npm run dev
 # Production build (outputs to dist/)
 npm run build
 
-# Run all tests (437 tests across 49 files)
+# Run all tests (739+ tests across 70+ files)
 npm test
 ```
 
@@ -42,9 +42,11 @@ A turn-based RPG inspired by the original *Final Fantasy* for the NES. The world
 
 ### Key Features
 
-- **6 character classes** — Warrior, Thief, Monk, White Mage, Black Mage, Red Mage — each with unique stats, equipment, and upgrade paths
+- **6 base classes (upgradeable to 12)** — Warrior, Thief, Monk, White Mage, Black Mage, Red Mage — each with unique stats, equipment, and upgrade paths (Warrior→Knight, Thief→Ninja, etc.)
 - **Turn-based combat** with FF1-faithful damage formulas, turn order, and auto-retargeting
+- **Boss battles** — scripted encounters with multi-phase bosses and BossAI
 - **Spell charge system** — not MP! Each spell level has its own pool of charges, just like the original
+- **Vehicles** — ship, canoe, and airship with terrain-based movement modes
 - **Data-driven everything** — items, spells, enemies, shops, and maps are all YAML files you can edit
 - **NES-authentic visuals** — 256×240 resolution, 16×16 tiles, pixel art style
 - **Chiptune audio** — Web Audio API with EventBus-driven music and SFX
@@ -312,7 +314,7 @@ ff-game/
 │   ├── systems/             # Game systems: Encounters, MapLoader, SaveManager, DialogManager, BattleTrigger
 │   ├── types/               # Shared TypeScript type definitions
 │   └── ui/                  # UI components: Window, Menu, DialogBox, TextRenderer, SpellSelectionUI
-├── tests/                   # Mirrors src/ structure — 49 test files, 437 tests
+├── tests/                   # Mirrors src/ structure — 70+ test files, 739+ tests
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -340,7 +342,7 @@ PixiJS handles all WebGL/Canvas rendering (sprites, tilemaps, text). Every other
 npm test
 ```
 
-Runs 437 tests across 49 files with Vitest. The test suite covers:
+Runs 739+ tests across 70+ files with Vitest. The test suite covers:
 
 - Battle mechanics (damage formulas, turn order, AI, elements, status effects)
 - Core systems (scene management, input, events, data loading, audio, save/load)
@@ -368,7 +370,7 @@ See [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md) for the complete game des
 
 ## 📋 Implementation Status
 
-### ✅ Complete (Phases 1–13)
+### ✅ Complete (Phases 1–17)
 
 | Phase | What's Done |
 |-------|-------------|
@@ -377,7 +379,7 @@ See [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md) for the complete game des
 | 3. Tilemap & Rendering | Tilemap renderer, camera, sprite animation, collision map |
 | 4. UI Framework | NES-style windows, text renderer, menu system, dialog box |
 | 5. First Playable | Player movement, map transitions, NPC interaction |
-| 6. Party & Characters | Party manager, 6 classes, equipment slots, status screen |
+| 6. Party & Characters | Party manager, 6 base classes (upgradeable to 12), equipment slots, status screen |
 | 7. Combat Core | Battle state machine, command menu, damage formulas, enemy AI |
 | 8. Random Encounters | Step counter, encounter tables, battle transitions, victory/defeat |
 | 9. Magic System | Spell charges, spell data, targeting, effects |
@@ -385,15 +387,15 @@ See [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md) for the complete game des
 | 11. Shops & Economy | Shop UI, buy/sell, Inn rest mechanic |
 | 12. Save/Load | Game state serialization, localStorage, save slots |
 | 13. Audio | Web Audio API music, SFX manager, EventBus integration |
+| 14. Boss Battles & AI | AIBehavior, BossAI, multi-phase bosses, scripted encounters, cutscenes |
+| 15. Vehicles & World | Terrain types, 4 movement modes, VehicleManager, key item gates |
+| 16. Class Upgrades | 6 upgraded classes, ClassUpgradeSystem, NPC-triggered upgrades |
+| 17. Content Population | Overworld + towns + dungeons, 42 items, 34 spells, 12 enemies, 18 shops, conditional dialog |
 
-### 🔜 Remaining (Phases 14–18)
+### 🔜 Remaining (Phase 18)
 
 | Phase | What's Coming |
 |-------|---------------|
-| 14. Vehicles & World Progression | Ship, canoe, airship, key item gates |
-| 15. Boss Battles & Scripted Events | Boss AI, multi-phase bosses, cutscene system |
-| 16. Class Upgrades | Warrior→Knight, Thief→Ninja, etc. at story milestones |
-| 17. Content Population | All maps, 32+ enemies, full item lists, NPC dialog |
 | 18. Polish & Balancing | Playtesting, stat tuning, encounter rates, final art/audio |
 
 See [docs/PROGRESS.md](docs/PROGRESS.md) for detailed progress notes and challenges encountered.

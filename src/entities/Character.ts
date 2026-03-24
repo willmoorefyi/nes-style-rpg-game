@@ -15,7 +15,7 @@ const XP_THRESHOLDS = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500];
 
 export class Character {
   readonly name: string;
-  readonly classData: CharacterClassData;
+  private _classData: CharacterClassData;
   private _level: number;
   private _xp: number;
   private _currentHp: number;
@@ -24,9 +24,13 @@ export class Character {
   private learnedSpells: Map<string, number> = new Map();
   readonly statusTracker: StatusTracker = new StatusTracker();
 
+  // Battle-only buff tracking — not serialized, cleared on battle end
+  private battleBuffs: Map<string, number> = new Map();
+  private tempResist: Set<string> = new Set();
+
   constructor(data: CharacterData) {
     this.name = data.name;
-    this.classData = data.classData;
+    this._classData = data.classData;
     this._level = data.level ?? 1;
     this._xp = data.xp ?? 0;
     this.equipment.set('weapon', null);
@@ -34,6 +38,14 @@ export class Character {
     this.equipment.set('shield', null);
     this.equipment.set('helmet', null);
     this._currentHp = data.currentHp ?? this.maxHp;
+  }
+
+  get classData(): CharacterClassData { return this._classData; }
+
+  /** Upgrade character to a new class. Heals to full HP per FF1 behavior. */
+  upgrade(newClassData: CharacterClassData): void {
+    this._classData = newClassData;
+    this._currentHp = this.maxHp;
   }
 
   get level(): number { return this._level; }
@@ -67,6 +79,9 @@ export class Character {
         defense += item.stats.defense ?? 0;
       }
     }
+    // Apply battle-only buffs (cleared on battle end)
+    attack += this.getBuffAmount('attack');
+    defense += this.getBuffAmount('defense');
     return { ...base, attack, defense };
   }
 
@@ -153,6 +168,30 @@ export class Character {
   getMaxCharges(level: number): number {
     // Simple formula: higher character level = more charges, lower spell level = more charges
     return Math.max(0, 4 - level + Math.floor(this._level / 5));
+  }
+
+  /** Apply a battle-only buff to a stat (stacks additively) */
+  applyBuff(stat: string, amount: number): void {
+    const current = this.battleBuffs.get(stat) ?? 0;
+    this.battleBuffs.set(stat, current + amount);
+  }
+
+  getBuffAmount(stat: string): number {
+    return this.battleBuffs.get(stat) ?? 0;
+  }
+
+  addTempResist(element: string): void {
+    this.tempResist.add(element);
+  }
+
+  hasTempResist(element: string): boolean {
+    return this.tempResist.has(element);
+  }
+
+  /** Clear all battle-only state (buffs, temp resistances) — called on battle end */
+  clearBattleState(): void {
+    this.battleBuffs.clear();
+    this.tempResist.clear();
   }
 
   toJSON(): CharacterSaveData {

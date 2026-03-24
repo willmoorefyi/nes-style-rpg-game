@@ -16,6 +16,10 @@ export class SceneManager {
     this.scenes.set(name, scene);
   }
 
+  unregister(name: string): void {
+    this.scenes.delete(name);
+  }
+
   async switchTo(name: string): Promise<void> {
     const next = this.scenes.get(name);
     if (!next) throw new Error(`Scene '${name}' not found`);

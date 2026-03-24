@@ -1,4 +1,4 @@
-export type StatusEffect = 'poison' | 'stun' | 'sleep' | 'blind' | 'silence' | 'death';
+export type StatusEffect = 'poison' | 'stun' | 'sleep' | 'blind' | 'silence' | 'death' | 'stone';
 
 export class StatusTracker {
   private effects = new Map<StatusEffect, number>();
@@ -28,7 +28,7 @@ export class StatusTracker {
 
   tick(maxHp: number): { damage: number; skipTurn: boolean; expired: StatusEffect[] } {
     const damage = this.has('poison') ? Math.floor(maxHp * 0.05) : 0;
-    const skipTurn = this.has('stun') || this.has('sleep');
+    const skipTurn = this.has('stun') || this.has('sleep') || this.has('stone');
     
     const expired: StatusEffect[] = [];
     for (const [effect, turns] of this.effects) {

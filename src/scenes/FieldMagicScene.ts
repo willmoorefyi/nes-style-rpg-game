@@ -8,6 +8,9 @@ import { WIDTH } from '../core/Game.js';
 
 type Phase = 'selectCaster' | 'selectSpell' | 'selectTarget';
 
+/** Spell effects usable from the field menu */
+const FIELD_VALID_EFFECTS = ['heal', 'cure_poison', 'cure_blind', 'cure_silence', 'revive'];
+
 export class FieldMagicScene implements Scene {
   readonly container = new Container();
   private game: Game;
@@ -59,14 +62,14 @@ export class FieldMagicScene implements Scene {
     const spells = caster.getLearnedSpells()
       .map(({ spellId, level }) => ({ spell: SpellRegistry.getSpell(spellId), level }))
       .filter((e): e is { spell: NonNullable<typeof e.spell>; level: number } =>
-        e.spell != null && e.spell.type === 'white' && e.spell.effect === 'heal');
+        e.spell != null && e.spell.type === 'white' && FIELD_VALID_EFFECTS.includes(e.spell.effect));
     if (spells.length === 0) return;
     this.phase = 'selectSpell';
     this.spellWindow.visible = true;
     this.buildSpellMenu(spells, caster);
   }
 
-  private buildSpellMenu(spells: { spell: { id: string; name: string; level: number }; level: number }[], caster: { getSpellCharges(l: number): number }): void {
+  private buildSpellMenu(spells: { spell: { id: string; name: string; level: number; effect: string }; level: number }[], caster: { getSpellCharges(l: number): number }): void {
     if (this.spellMenu) this.spellWindow.removeChild(this.spellMenu);
     const items: MenuItem[] = spells.map(({ spell, level }) => {
       const charges = caster.getSpellCharges(level);
@@ -111,7 +114,29 @@ export class FieldMagicScene implements Scene {
     const spell = SpellRegistry.getSpell(this.selectedSpellId);
     if (!caster || !target || !spell) return;
     if (!caster.useCharge(this.selectedSpellLevel)) return;
-    target.currentHp = Math.min(target.maxHp, target.currentHp + (spell.power ?? 0));
+
+    // Apply spell effect based on type
+    switch (spell.effect) {
+      case 'heal':
+        target.currentHp = Math.min(target.maxHp, target.currentHp + (spell.power ?? 0));
+        break;
+      case 'cure_poison':
+        target.statusTracker.remove('poison');
+        break;
+      case 'cure_blind':
+        target.statusTracker.remove('blind');
+        break;
+      case 'cure_silence':
+        target.statusTracker.remove('silence');
+        break;
+      case 'revive':
+        if (target.currentHp <= 0) {
+          target.statusTracker.remove('death');
+          target.currentHp = 1;
+        }
+        break;
+    }
+
     this.phase = 'selectCaster';
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
@@ -122,6 +147,9 @@ export class FieldMagicScene implements Scene {
     else if (this.phase === 'selectSpell' && this.spellMenu) this.spellMenu.update(this.game.input);
     else if (this.phase === 'selectTarget' && this.targetMenu) this.targetMenu.update(this.game.input);
   }
+
+  onPause(): void {}
+  onResume(): void {}
 
   exit(): void {}
 }

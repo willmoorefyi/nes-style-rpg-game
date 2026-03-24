@@ -1,0 +1,465 @@
+# Test overworld map for vehicle and terrain testing (Phase 15)
+# 20x20 map with terrain variety
+# Terrain: 0=Grass, 1=Wall, 2=Water, 3=Mountain, 4=Forest, 5=Desert, 6=Swamp, 7=River, 8=Road, 9=Bridge
+id: test-overworld
+width: 20
+height: 20
+layers:
+  - [0]
+tilesets: [overworld]
+collision:
+  # Row 0: mountains across the top
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  # Row 1: mountain border with grass
+  - 3
+  - 0
+  - 0
+  - 8
+  - 8
+  - 0
+  - 0
+  - 4
+  - 4
+  - 4
+  - 7
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 3
+  # Row 2: road through grass, forest, river
+  - 3
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 4
+  - 4
+  - 0
+  - 0
+  - 7
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 3
+  # Row 3: road continues, bridge over river
+  - 3
+  - 0
+  - 0
+  - 8
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 9
+  - 9
+  - 9
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 3
+  # Row 4: grass and water
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 7
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 3
+  # Row 5: desert area
+  - 3
+  - 0
+  - 5
+  - 5
+  - 5
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 7
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 6: desert and swamp
+  - 3
+  - 0
+  - 5
+  - 5
+  - 5
+  - 0
+  - 6
+  - 6
+  - 0
+  - 0
+  - 7
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 7: swamp area
+  - 3
+  - 0
+  - 0
+  - 5
+  - 0
+  - 0
+  - 6
+  - 6
+  - 0
+  - 0
+  - 7
+  - 0
+  - 0
+  - 4
+  - 4
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 8: open grass
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 7
+  - 0
+  - 4
+  - 4
+  - 4
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 9: river runs east-west
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 7
+  - 7
+  - 7
+  - 7
+  - 7
+  - 7
+  - 0
+  - 0
+  - 4
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 10: grass below river
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 11
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 12
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 13
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 14
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 15
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 16
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 17
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 18
+  - 3
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 3
+  # Row 19: mountains across the bottom
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+  - 3
+
+npcs: []
+transitions: []
+
+# Vehicle spawn points
+vehicles:
+  - type: canoe
+    x: 9
+    y: 8
+    requiredFlag: EARTH_CAVE_COMPLETE
+  - type: ship
+    x: 14
+    y: 3
+    requiredFlag: BIKKE_DEFEATED
+
+# Key item gates
+keyItemGates:
+  - x: 9
+    y: 3
+    requiredItem: mystic_key
+    flag: MYSTIC_KEY_GATE_OPENED
+    message: "It's locked. You need the Mystic Key."
+    permanent: true
+
+# Random encounters on overworld
+encounterRate:
+  min: 15
+  max: 25
+encounters:
+  - enemies: [goblin]
+    weight: 3
+  - enemies: [goblin, goblin]
+    weight: 2
+  - enemies: [wolf]
+    weight: 1

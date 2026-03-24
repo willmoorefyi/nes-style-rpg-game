@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { QuantitySelectorUI } from '../../src/ui/QuantitySelector.js';
+import type { InputManager } from '../../src/core/InputManager.js';
 
-function createMockInput() {
+function createMockInput(): { press(action: string): void; clear(): void } & Pick<InputManager, 'isJustPressed'> {
   let pressed: string | null = null;
   return {
-    isJustPressed: vi.fn((action: string) => action === pressed),
+    isJustPressed: vi.fn((action: string) => action === pressed) as InputManager['isJustPressed'],
     press(action: string) { pressed = action; },
     clear() { pressed = null; },
   };
@@ -69,7 +70,7 @@ describe('QuantitySelectorUI', () => {
       const selector = new QuantitySelectorUI(0, 0, 10, vi.fn(), vi.fn());
       const input = createMockInput();
       input.press('right');
-      selector.update(input as any);
+      selector.update(input as unknown as InputManager);
       expect(selector.quantity).toBe(2);
     });
 
@@ -79,7 +80,7 @@ describe('QuantitySelectorUI', () => {
       selector.increment();
       const input = createMockInput();
       input.press('left');
-      selector.update(input as any);
+      selector.update(input as unknown as InputManager);
       expect(selector.quantity).toBe(2);
     });
 
@@ -88,7 +89,7 @@ describe('QuantitySelectorUI', () => {
       const selector = new QuantitySelectorUI(0, 0, 10, onConfirm, vi.fn());
       const input = createMockInput();
       input.press('confirm');
-      selector.update(input as any);
+      selector.update(input as unknown as InputManager);
       expect(onConfirm).toHaveBeenCalledWith(1);
     });
 
@@ -97,7 +98,7 @@ describe('QuantitySelectorUI', () => {
       const selector = new QuantitySelectorUI(0, 0, 10, vi.fn(), onCancel);
       const input = createMockInput();
       input.press('cancel');
-      selector.update(input as any);
+      selector.update(input as unknown as InputManager);
       expect(onCancel).toHaveBeenCalled();
     });
   });

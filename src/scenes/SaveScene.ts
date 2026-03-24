@@ -56,6 +56,9 @@ export class SaveScene implements Scene {
       this.menu.update(this.game.input);
     }
   }
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 
   private onSelect(slotId: number): void {

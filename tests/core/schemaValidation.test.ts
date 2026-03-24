@@ -49,11 +49,11 @@ describe('schemaValidation', () => {
   describe('validateMapData', () => {
     const validMap = {
       id: 'test-map',
-      width: 16,
-      height: 16,
+      width: 2,
+      height: 2,
       layers: [[1, 2, 3]],
       tilesets: ['tiles.png'],
-      collision: [0, 0, 1],
+      collision: [0, 0, 1, 0],
       npcs: [{ id: 'npc1', x: 5, y: 5, sprite: 'npc.png', dialog: ['Hello'] }],
       transitions: [{ x: 0, y: 15, targetMap: 'other', targetX: 0, targetY: 0 }],
     };

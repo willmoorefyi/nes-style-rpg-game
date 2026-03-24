@@ -1,18 +1,17 @@
+import type { EnemyInstance } from './BattleStateMachine.js';
 import type { Character } from '../entities/Character.js';
+import type { BattleCommand } from './BattleCommands.js';
 
 /**
- * AIBehavior interface for future enemy AI strategies.
- * Defines contract for AI decision-making beyond random targeting.
+ * AIBehavior interface for enemy AI strategies.
+ * Used by both basic enemies (random targeting) and bosses (pattern-based).
  */
 export interface AIBehavior {
-  /** Select an action for the enemy to perform against the party */
-  selectAction(enemy: Character, party: Character[]): AIAction;
-}
-
-/** Represents an action selected by AI */
-export interface AIAction {
-  type: 'attack' | 'spell' | 'item' | 'defend';
-  targetIndex?: number;
-  spellId?: string;
-  itemId?: string;
+  selectAction(
+    self: EnemyInstance,
+    party: Character[],
+    allies: EnemyInstance[],
+    turnNumber: number,
+    rng: () => number
+  ): BattleCommand;
 }

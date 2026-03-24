@@ -40,6 +40,9 @@ export class StatusScene implements Scene {
     }
   }
 
+  onPause(): void {}
+  onResume(): void {}
+
   exit(): void {}
 
   private render(): void {

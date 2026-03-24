@@ -4,6 +4,7 @@ import { ItemRegistry } from '../../data/ItemRegistry.js';
 import { Character } from '../../entities/Character.js';
 import { Inventory } from '../../entities/Inventory.js';
 import type { CharacterClassData } from '../../types/index.js';
+import type { DataLoader } from '../../core/DataLoader.js';
 
 const mockClass: CharacterClassData = {
   id: 'warrior', name: 'Warrior',
@@ -27,7 +28,7 @@ describe('ItemEffects', () => {
 
   beforeEach(async () => {
     ItemRegistry.reset();
-    await ItemRegistry.init({ loadItems: async () => mockItems } as any);
+    await ItemRegistry.init({ loadItems: async () => mockItems } as Pick<DataLoader, 'loadItems'> as DataLoader);
     char = new Character({ name: 'Test', classData: mockClass });
     inv = new Inventory();
   });

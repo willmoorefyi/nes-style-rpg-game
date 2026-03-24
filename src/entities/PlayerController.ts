@@ -4,6 +4,8 @@ import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
 import { TILE_SIZE } from '../rendering/Camera.js';
 import { Texture } from 'pixi.js';
+import type { MovementMode } from './MovementMode.js';
+import { WalkingMode } from './WalkingMode.js';
 
 export interface PlayerControllerConfig {
   startX: number;
@@ -13,6 +15,7 @@ export interface PlayerControllerConfig {
   input: InputManager;
   events: EventBus;
   moveSpeed?: number; // ms per tile
+  movementMode?: MovementMode;
 }
 
 type PlayerState = 'idle' | 'moving';
@@ -37,6 +40,7 @@ export class PlayerController {
   private input: InputManager;
   private events: EventBus;
   private npcPositions: Set<string> = new Set();
+  private _currentMode: MovementMode;
 
   constructor(config: PlayerControllerConfig) {
     this.tileX = config.startX;
@@ -47,6 +51,7 @@ export class PlayerController {
     this.collisionMap = config.collisionMap;
     this.input = config.input;
     this.events = config.events;
+    this._currentMode = config.movementMode ?? new WalkingMode();
 
     this.animation = new SpriteAnimation(config.texture, {
       frameWidth: 16,
@@ -67,7 +72,10 @@ export class PlayerController {
 
   update(dt: number): void {
     if (this.state === 'moving') {
-      this.moveProgress += (dt * 16.67) / this.moveSpeed;
+      const terrain = this.collisionMap.getTerrainType(this.targetX, this.targetY);
+      const speedMultiplier = this._currentMode.getSpeedMultiplier(terrain);
+      const effectiveSpeed = this.moveSpeed / Math.max(0.1, speedMultiplier);
+      this.moveProgress += (dt * 16.67) / effectiveSpeed;
       if (this.moveProgress >= 1) {
         this.tileX = this.targetX;
         this.tileY = this.targetY;
@@ -105,7 +113,7 @@ export class PlayerController {
   }
 
   private canMoveTo(x: number, y: number): boolean {
-    if (!this.collisionMap.isWalkable(x, y)) return false;
+    if (!this.collisionMap.isWalkable(x, y, this._currentMode)) return false;
     if (this.npcPositions.has(`${x},${y}`)) return false;
     return true;
   }
@@ -138,5 +146,13 @@ export class PlayerController {
   get facingTile(): { x: number; y: number } {
     const { dx, dy } = DIRECTION_VECTORS[this.animation.direction];
     return { x: this.tileX + dx, y: this.tileY + dy };
+  }
+
+  get currentMode(): MovementMode { return this._currentMode; }
+  set currentMode(mode: MovementMode) { this._currentMode = mode; }
+
+  /** Encounter rate multiplier from the current movement mode */
+  get encounterRateMultiplier(): number {
+    return this._currentMode.getEncounterRateMultiplier();
   }
 }
