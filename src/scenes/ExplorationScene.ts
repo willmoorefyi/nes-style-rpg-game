@@ -112,7 +112,7 @@ export class ExplorationScene implements Scene {
       await this.loadMap(this.game.currentMapId);
       this.player?.setPosition(this.game.playerPosition.x, this.game.playerPosition.y);
     } else {
-      await this.loadMap('test-town');
+      await this.loadMap('cornelia');
     }
   }
 

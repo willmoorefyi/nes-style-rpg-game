@@ -52,7 +52,7 @@ describe('ExplorationScene - loadMap regression tests', () => {
     const scene = new ExplorationScene(game as unknown as Game);
     await scene.enter();
 
-    expect(game.data.loadMap).toHaveBeenCalledWith('assets/maps/test-town.yaml');
+    expect(game.data.loadMap).toHaveBeenCalledWith('assets/maps/cornelia.yaml');
     expect(() => scene.update(16)).not.toThrow();
   });
 
