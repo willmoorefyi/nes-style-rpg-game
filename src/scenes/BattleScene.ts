@@ -72,6 +72,8 @@ export class BattleScene implements Scene {
   private messageTimer = 0;
   private currentMessageIndex = 0;
   private floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
+  private dyingEnemies: Map<number, number> = new Map();
+  private spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -190,13 +192,17 @@ export class BattleScene implements Scene {
   private updateEnemySprites(): void {
     const enemies = this.battle.allEnemies;
     for (let i = 0; i < enemies.length; i++) {
-      this.enemySprites[i].visible = enemies[i].currentHp > 0;
+      if (enemies[i].currentHp <= 0 && this.enemySprites[i].visible && !this.dyingEnemies.has(i)) {
+        this.dyingEnemies.set(i, 30);
+      }
     }
   }
 
   update(dt: number): void {
     this.messageText.update(dt);
     this.updateFloatingTexts(dt);
+    this.updateDyingEnemies(dt);
+    this.updateSpellFlashes(dt);
 
     switch (this.uiState) {
       case 'intro':
@@ -478,6 +484,11 @@ export class BattleScene implements Scene {
   }
 
 
+  private static readonly ELEMENT_COLORS: Record<string, number> = {
+    fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff,
+    dark: 0x660066, water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
+  };
+
   private spawnFloatingTexts(): void {
     for (const evt of this.battle.damageEvents) {
       let sprite: Graphics | undefined;
@@ -489,6 +500,17 @@ export class BattleScene implements Scene {
         sprite = this.partySprites[idx];
       }
       if (!sprite) continue;
+
+      // Spell flash overlay
+      if (evt.spellElement) {
+        const color = BattleScene.ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
+        const overlay = new Graphics();
+        overlay.rect(0, 0, sprite.width, sprite.height).fill(color);
+        overlay.position.set(sprite.x, sprite.y);
+        overlay.alpha = 0.6;
+        this.container.addChild(overlay);
+        this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
+      }
 
       const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
       const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
@@ -512,6 +534,32 @@ export class BattleScene implements Scene {
       if (ft.age >= ft.maxAge) {
         this.container.removeChild(ft.text);
         this.floatingTexts.splice(i, 1);
+      }
+    }
+  }
+
+  private updateDyingEnemies(dt: number): void {
+    for (const [idx, remaining] of this.dyingEnemies) {
+      const next = remaining - dt;
+      if (next <= 0) {
+        this.enemySprites[idx].alpha = 0;
+        this.enemySprites[idx].visible = false;
+        this.dyingEnemies.delete(idx);
+      } else {
+        this.enemySprites[idx].alpha = next / 30;
+        this.dyingEnemies.set(idx, next);
+      }
+    }
+  }
+
+  private updateSpellFlashes(dt: number): void {
+    for (let i = this.spellFlashes.length - 1; i >= 0; i--) {
+      const sf = this.spellFlashes[i];
+      sf.age += dt;
+      sf.overlay.alpha = 0.6 * (1 - sf.age / sf.maxAge);
+      if (sf.age >= sf.maxAge) {
+        this.container.removeChild(sf.overlay);
+        this.spellFlashes.splice(i, 1);
       }
     }
   }
