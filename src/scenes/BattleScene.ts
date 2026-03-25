@@ -71,6 +71,7 @@ export class BattleScene implements Scene {
   private introTimer = 60;
   private messageTimer = 0;
   private currentMessageIndex = 0;
+  private floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -195,6 +196,7 @@ export class BattleScene implements Scene {
 
   update(dt: number): void {
     this.messageText.update(dt);
+    this.updateFloatingTexts(dt);
 
     switch (this.uiState) {
       case 'intro':
@@ -416,6 +418,7 @@ export class BattleScene implements Scene {
     this.uiState = 'executing';
     this.commandMenu.visible = false;
     this.battle.executeRound();
+    this.spawnFloatingTexts();
     this.updatePartyDisplay();
     this.updateEnemySprites();
     this.showMessages();
@@ -471,6 +474,45 @@ export class BattleScene implements Scene {
   private checkBattleEnd(): void {
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
       this.uiState = 'end';
+    }
+  }
+
+
+  private spawnFloatingTexts(): void {
+    for (const evt of this.battle.damageEvents) {
+      let sprite: Graphics | undefined;
+      if (evt.targetId.startsWith('enemy_')) {
+        const idx = parseInt(evt.targetId.split('_')[1], 10);
+        sprite = this.enemySprites[idx];
+      } else {
+        const idx = parseInt(evt.targetId.split('_')[1], 10);
+        sprite = this.partySprites[idx];
+      }
+      if (!sprite) continue;
+
+      const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
+      const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
+      const bt = new BitmapText({
+        text: label,
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill },
+      });
+      bt.position.set(sprite.x, sprite.y);
+      this.container.addChild(bt);
+      this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
+    }
+    this.battle.clearDamageEvents();
+  }
+
+  private updateFloatingTexts(dt: number): void {
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      const ft = this.floatingTexts[i];
+      ft.age += dt;
+      ft.text.y -= 1 * dt;
+      ft.text.alpha = 1 - ft.age / ft.maxAge;
+      if (ft.age >= ft.maxAge) {
+        this.container.removeChild(ft.text);
+        this.floatingTexts.splice(i, 1);
+      }
     }
   }
 

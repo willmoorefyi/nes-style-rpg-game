@@ -47,11 +47,20 @@ export interface BattleMessage {
   text: string;
 }
 
+export interface DamageEvent {
+  targetId: string;
+  damage: number;
+  isHeal: boolean;
+  isCrit: boolean;
+  spellElement?: string;
+}
+
 export class BattleStateMachine {
   private _state: BattleState = 'intro';
   private party: Character[];
   private enemies: EnemyInstance[];
   private commands: BattleCommand[] = [];
+  private _damageEvents: DamageEvent[] = [];
   private currentActorIndex = 0;
   private messages: BattleMessage[] = [];
   private result: BattleResult | null = null;
@@ -88,6 +97,7 @@ export class BattleStateMachine {
         livingParty: () => this.livingParty,
         livingEnemies: () => this.livingEnemies,
         partyById: this.partyById,
+        addDamageEvent: (e: DamageEvent) => this._damageEvents.push(e),
       },
       config.spells ?? [],
     );
@@ -108,6 +118,10 @@ export class BattleStateMachine {
     const living = this.livingParty;
     return living[this.currentActorIndex] ?? null;
   }
+
+  get damageEvents(): DamageEvent[] { return this._damageEvents; }
+
+  clearDamageEvents(): void { this._damageEvents = []; }
 
   /** Get the unique battle ID for the current command actor */
   get currentCommandActorId(): string | null {
@@ -312,6 +326,7 @@ export class BattleStateMachine {
       target.currentHp = Math.max(0, target.currentHp - result.damage);
       const crit = result.critical ? ' Critical!' : '';
       this.messages.push({ text: `${actor.name} hits ${target.data.name} for ${result.damage}!${crit}` });
+      this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
       if (target.currentHp <= 0) {
         this.messages.push({ text: `${target.data.name} defeated!` });
       }
@@ -335,6 +350,7 @@ export class BattleStateMachine {
       target.currentHp = target.currentHp - result.damage;
       const crit = result.critical ? ' Critical!' : '';
       this.messages.push({ text: `${enemy.data.name} hits ${target.name} for ${result.damage}!${crit}` });
+      this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
       if (target.currentHp <= 0) {
         this.messages.push({ text: `${target.name} fell!` });
       }

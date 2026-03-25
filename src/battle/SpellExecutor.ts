@@ -5,6 +5,8 @@ import type { BattleCommand } from './BattleCommands.js';
 import type { StatusEffect } from './StatusEffects.js';
 import { calculateMagicDamage } from './DamageFormula.js';
 
+import type { DamageEvent } from './BattleStateMachine.js';
+
 export interface SpellExecutorDeps {
   party: Character[];
   enemies: EnemyInstance[];
@@ -14,6 +16,7 @@ export interface SpellExecutorDeps {
   livingEnemies: () => EnemyInstance[];
   /** Maps unique party IDs (party_0, party_1, ...) to their Character */
   partyById: Map<string, Character>;
+  addDamageEvent: (event: DamageEvent) => void;
 }
 
 // FF1-faithful buff values: FOG +8 def, RUSE/INVS +40 evade, TMPR +14 atk, FAST +10 agi
@@ -38,6 +41,14 @@ export class SpellExecutor {
   constructor(deps: SpellExecutorDeps, spells: SpellData[]) {
     this.deps = deps;
     this.spells = spells;
+  }
+
+  /** Get the battle ID for a Character reference */
+  private getCharId(char: Character): string | undefined {
+    for (const [id, c] of this.deps.partyById) {
+      if (c === char) return id;
+    }
+    return undefined;
   }
 
   /** Look up a party member by unique battle ID, returning as a single-element array for filter compatibility */
@@ -127,11 +138,14 @@ export class SpellExecutor {
         const enemy = target as EnemyInstance;
         enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
         this.deps.addMessage(`${enemy.data.name} recovers ${heal} HP!`);
+        this.deps.addDamageEvent({ targetId: enemy.id, damage: heal, isHeal: true, isCrit: false, spellElement: spell.element });
       } else {
         // Character
         const char = target as Character;
+        const charId = this.getCharId(char);
         char.currentHp = char.currentHp + heal;
         this.deps.addMessage(`${char.name} recovers ${heal} HP!`);
+        if (charId) this.deps.addDamageEvent({ targetId: charId, damage: heal, isHeal: true, isCrit: false, spellElement: spell.element });
       }
     }
   }
@@ -162,6 +176,7 @@ export class SpellExecutor {
         } else {
           enemy.currentHp = Math.max(0, enemy.currentHp - damage);
           this.deps.addMessage(`${enemy.data.name} takes ${damage} damage!`);
+          this.deps.addDamageEvent({ targetId: enemy.id, damage, isHeal: false, isCrit: false, spellElement: spell.element });
           if (enemy.currentHp <= 0) {
             this.deps.addMessage(`${enemy.data.name} defeated!`);
           }
@@ -169,6 +184,7 @@ export class SpellExecutor {
       } else {
         // Character
         const char = target as Character;
+        const charId = this.getCharId(char);
         const damage = calculateMagicDamage(
           { intelligence: casterInt },
           { intelligence: char.stats.intelligence },
@@ -177,6 +193,7 @@ export class SpellExecutor {
         );
         char.currentHp = char.currentHp - damage;
         this.deps.addMessage(`${char.name} takes ${damage} damage!`);
+        if (charId) this.deps.addDamageEvent({ targetId: charId, damage, isHeal: false, isCrit: false, spellElement: spell.element });
         if (char.currentHp <= 0) {
           this.deps.addMessage(`${char.name} fell!`);
         }
