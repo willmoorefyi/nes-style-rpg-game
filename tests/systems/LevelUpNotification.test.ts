@@ -4,7 +4,7 @@ import type { Game } from '../../src/core/Game.js';
 
 function createMockGameForLevelUp() {
   return {
-    scenes: { register: vi.fn(), unregister: vi.fn(), switchTo: vi.fn(), push: vi.fn() },
+    scenes: { register: vi.fn(), unregister: vi.fn(), switchTo: vi.fn(), push: vi.fn(), pop: vi.fn() },
     input: { isPressed: vi.fn(), isJustPressed: vi.fn() },
     events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
     data: { loadMap: vi.fn(), loadEnemies: vi.fn().mockResolvedValue([]) },

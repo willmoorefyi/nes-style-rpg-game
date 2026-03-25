@@ -29,7 +29,7 @@ describe('BasicAI', () => {
     const party = [new Character({ name: 'Hero', classData: mockClass })];
     const cmd = ai.selectAction(makeEnemy(), party, [], 1, () => 0);
     expect(cmd.type).toBe('fight');
-    expect(cmd.targetId).toBe('Hero');
+    expect(cmd.targetId).toBe('party_0');
     expect(cmd.actorId).toBe('enemy_0');
   });
 
@@ -37,16 +37,16 @@ describe('BasicAI', () => {
     const alive = new Character({ name: 'Alive', classData: mockClass });
     const dead = new Character({ name: 'Dead', classData: mockClass, currentHp: 0 });
     const cmd = ai.selectAction(makeEnemy(), [dead, alive], [], 1, () => 0);
-    expect(cmd.targetId).toBe('Alive');
+    expect(cmd.targetId).toBe('party_1');
   });
 
   it('should use rng for target selection among multiple living members', () => {
     const a = new Character({ name: 'A', classData: mockClass });
     const b = new Character({ name: 'B', classData: mockClass });
     const c = new Character({ name: 'C', classData: mockClass });
-    // rng=0.5 → floor(0.5*3)=1 → 'B'
+    // rng=0.5 → floor(0.5*3)=1 → 'party_1'
     const cmd = ai.selectAction(makeEnemy(), [a, b, c], [], 1, () => 0.5);
-    expect(cmd.targetId).toBe('B');
+    expect(cmd.targetId).toBe('party_1');
   });
 
   it('should return undefined targetId when all party members are dead', () => {

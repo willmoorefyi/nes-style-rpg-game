@@ -114,28 +114,28 @@ collision:
   - 1
   - 0
   - 1
-  # Row 6: treasure rooms
+  # Row 6: treasure rooms (doorways at col 2 and col 13)
   - 1
+  - 0
+  - 0
   - 0
   - 1
   - 0
   - 1
   - 0
-  - 1
-  - 0
   - 0
   - 1
   - 0
   - 1
   - 0
-  - 1
+  - 0
   - 0
   - 1
   # Row 7
   - 1
   - 0
   - 1
-  - 0
+  - 1
   - 1
   - 0
   - 0
@@ -144,7 +144,7 @@ collision:
   - 0
   - 0
   - 1
-  - 0
+  - 1
   - 1
   - 0
   - 1
@@ -182,12 +182,9 @@ collision:
   - 0
   - 0
   - 1
-  # Row 10
+  # Row 10 (doorways at col 2 and col 13 to lower treasure rooms)
   - 1
   - 1
-  - 1
-  - 1
-  - 0
   - 0
   - 1
   - 0
@@ -196,7 +193,10 @@ collision:
   - 0
   - 0
   - 1
+  - 0
+  - 0
   - 1
+  - 0
   - 1
   - 1
   # Row 11

@@ -144,6 +144,6 @@ describe('BossAI', () => {
     const dead = new Character({ name: 'Dead', classData: mockClass, currentHp: 0 });
     const alive = new Character({ name: 'Alive', classData: mockClass });
     const cmd = ai.selectAction(makeBoss(), [dead, alive], [], 1, () => 0);
-    expect(cmd.targetId).toBe('Alive');
+    expect(cmd.targetId).toBe('party_1');
   });
 });

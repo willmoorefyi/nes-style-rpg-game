@@ -29,7 +29,7 @@ describe('Boss Battle Integration', () => {
     );
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'run', actorId: 'Hero' });
+    battle.submitCommand({ type: 'run', actorId: 'party_0' });
     battle.executeRound();
     const msgs = battle.currentMessages.map(m => m.text);
     expect(msgs).toContain('Cannot escape!');
@@ -47,7 +47,7 @@ describe('Boss Battle Integration', () => {
     battle.setEnemyAI(0, new BossAI(pattern));
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     // Boss should have attacked (messages should include boss attack)
     const msgs = battle.currentMessages.map(m => m.text);
@@ -78,7 +78,7 @@ describe('Boss Battle Integration', () => {
     // Manually reduce boss HP to trigger phase transition
     battle.livingEnemies[0].currentHp = 4; // below 50% of 10
 
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
 
     const msgs = battle.currentMessages.map(m => m.text);
@@ -112,7 +112,7 @@ describe('Boss Battle Integration', () => {
 
     // Drop HP to trigger phase
     battle.livingEnemies[0].currentHp = 80; // below 50% of 200
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     const msgs1 = battle.currentMessages.map(m => m.text);
     expect(msgs1).toContain("Lich's form shifts!");
@@ -120,7 +120,7 @@ describe('Boss Battle Integration', () => {
     // Heal boss back above threshold
     battle.resolveRound();
     battle.livingEnemies[0].currentHp = 200;
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
 
     // Phase message should NOT appear again (one-way transition)
@@ -138,7 +138,7 @@ describe('Boss Battle Integration', () => {
     );
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     battle.resolveRound();
     expect(battle.state).toBe('victory');

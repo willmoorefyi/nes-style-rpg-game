@@ -61,9 +61,12 @@ export class BattleStateMachine {
   private turnNumber = 0;
   private bossPatterns: Map<string, BossPattern>;
   private spellExecutor: SpellExecutor;
+  /** Maps unique party IDs (party_0, party_1, ...) to their Character */
+  private partyById: Map<string, Character>;
 
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
+    this.partyById = new Map(config.party.map((c, i) => [`party_${i}`, c]));
     this.enemies = config.enemies.map((e, i) => ({
       id: `enemy_${i}`,
       data: e,
@@ -84,9 +87,15 @@ export class BattleStateMachine {
         addMessage: (text: string) => this.messages.push({ text }),
         livingParty: () => this.livingParty,
         livingEnemies: () => this.livingEnemies,
+        partyById: this.partyById,
       },
       config.spells ?? [],
     );
+  }
+
+  /** Get the unique battle ID for a party member by index */
+  getPartyId(index: number): string {
+    return `party_${index}`;
   }
 
   get state(): BattleState { return this._state; }
@@ -98,6 +107,29 @@ export class BattleStateMachine {
   get currentCommandActor(): Character | null {
     const living = this.livingParty;
     return living[this.currentActorIndex] ?? null;
+  }
+
+  /** Get the unique battle ID for the current command actor */
+  get currentCommandActorId(): string | null {
+    const actor = this.currentCommandActor;
+    if (!actor) return null;
+    for (const [id, char] of this.partyById) {
+      if (char === actor) return id;
+    }
+    return null;
+  }
+
+  /** Look up a party member by their unique battle ID */
+  private getPartyMember(id: string): Character | undefined {
+    return this.partyById.get(id);
+  }
+
+  /** Get the unique battle ID for a party member Character reference */
+  private getIdForPartyMember(char: Character): string | undefined {
+    for (const [id, c] of this.partyById) {
+      if (c === char) return id;
+    }
+    return undefined;
   }
 
   startBattle(): void {
@@ -142,7 +174,7 @@ export class BattleStateMachine {
         this.commands.push(cmd);
       } else {
         const target = selectTarget(
-          this.party.map(c => ({ id: c.name, isAlive: c.currentHp > 0 })),
+          this.party.map((c, i) => ({ id: `party_${i}`, isAlive: c.currentHp > 0 })),
           this.rng
         );
         if (target) {
@@ -153,7 +185,7 @@ export class BattleStateMachine {
 
     // Build combatant list for turn order
     const combatants: Combatant[] = [
-      ...this.livingParty.map(c => ({ id: c.name, agility: c.stats.agility, isEnemy: false })),
+      ...this.livingParty.map(c => ({ id: this.getIdForPartyMember(c)!, agility: c.stats.agility, isEnemy: false })),
       ...this.livingEnemies.map(e => ({ id: e.id, agility: e.data.stats.agility, isEnemy: true })),
     ];
     const turnOrder = sortByAgility(combatants, this.rng);
@@ -193,7 +225,7 @@ export class BattleStateMachine {
       }
       return true;
     } else {
-      const char = this.party.find(c => c.name === id);
+      const char = this.getPartyMember(id);
       if (!char || char.currentHp <= 0) return false;
       const result = char.statusTracker.tick(char.maxHp);
       if (result.damage > 0) {
@@ -263,8 +295,8 @@ export class BattleStateMachine {
     }
   }
 
-  private executePartyAttack(actorName: string, targetId: string): void {
-    const actor = this.party.find(c => c.name === actorName);
+  private executePartyAttack(actorId: string, targetId: string): void {
+    const actor = this.getPartyMember(actorId);
     const target = this.enemies.find(e => e.id === targetId);
     if (!actor || !target || actor.currentHp <= 0 || target.currentHp <= 0) return;
 
@@ -286,9 +318,9 @@ export class BattleStateMachine {
     }
   }
 
-  private executeEnemyAttack(enemyId: string, targetName: string): void {
+  private executeEnemyAttack(enemyId: string, targetId: string): void {
     const enemy = this.enemies.find(e => e.id === enemyId);
-    const target = this.party.find(c => c.name === targetName);
+    const target = this.getPartyMember(targetId);
     if (!enemy || !target || enemy.currentHp <= 0 || target.currentHp <= 0) return;
 
     const result = calculateDamage(
@@ -312,7 +344,7 @@ export class BattleStateMachine {
   private isTargetAlive(id: string): boolean {
     const enemy = this.enemies.find(e => e.id === id);
     if (enemy) return enemy.currentHp > 0;
-    const char = this.party.find(c => c.name === id);
+    const char = this.getPartyMember(id);
     return char ? char.currentHp > 0 : false;
   }
 
@@ -326,7 +358,7 @@ export class BattleStateMachine {
       this.messages.push({ text: 'Cannot use item.' });
       return;
     }
-    const target = this.party.find(c => c.name === cmd.targetId);
+    const target = this.getPartyMember(cmd.targetId);
     if (!target) {
       this.messages.push({ text: 'Invalid target.' });
       return;

@@ -66,12 +66,15 @@ function castSpell(
   battle.startBattle();
   battle.advanceFromIntro();
   // Submit spell command for each living party member
-  for (const char of party.filter(c => c.currentHp > 0)) {
-    if (char.name === actorId) {
+  const living = party.filter(c => c.currentHp > 0);
+  for (let i = 0; i < living.length; i++) {
+    const partyIndex = party.indexOf(living[i]);
+    const id = `party_${partyIndex}`;
+    if (id === actorId) {
       battle.submitCommand({ type: 'magic', actorId, targetId, spellId: spell.id });
     } else {
       // Other party members defend (fight with no real effect needed)
-      battle.submitCommand({ type: 'fight', actorId: char.name, targetId: 'enemy_0' });
+      battle.submitCommand({ type: 'fight', actorId: id, targetId: 'enemy_0' });
     }
   }
   battle.executeRound();
@@ -83,7 +86,7 @@ describe('Spell Effects', () => {
     it('increases target defense by 8', () => {
       const mage = createMage('Mage', 1);
       const defenseBefore = mage.stats.defense;
-      const battle = castSpell([mage], [goblin], fogSpell, 'Mage', 'Mage', [fogSpell]);
+      const battle = castSpell([mage], [goblin], fogSpell, 'party_0', 'party_0', [fogSpell]);
       expect(mage.stats.defense).toBe(defenseBefore + 8);
       expect(battle.currentMessages.some(m => m.text.includes("Mage's defense increased!"))).toBe(true);
     });
@@ -92,7 +95,7 @@ describe('Spell Effects', () => {
       const mage = createMage('Mage', 1);
       const defenseBefore = mage.stats.defense;
       mage.applyBuff('defense', 8); // Simulate first FOG
-      castSpell([mage], [goblin], fogSpell, 'Mage', 'Mage', [fogSpell]);
+      castSpell([mage], [goblin], fogSpell, 'party_0', 'party_0', [fogSpell]);
       expect(mage.stats.defense).toBe(defenseBefore + 16);
     });
   });
@@ -100,7 +103,7 @@ describe('Spell Effects', () => {
   describe('buff_evade (RUSE, INVS)', () => {
     it('RUSE increases caster evade buff by 40 (self-targeting)', () => {
       const mage = createMage('Mage', 1);
-      const battle = castSpell([mage], [goblin], ruseSpell, 'Mage', 'Mage', [ruseSpell]);
+      const battle = castSpell([mage], [goblin], ruseSpell, 'party_0', 'party_0', [ruseSpell]);
       expect(mage.getBuffAmount('evade')).toBe(40);
       expect(battle.currentMessages.some(m => m.text.includes("Mage's evasion increased!"))).toBe(true);
     });
@@ -108,7 +111,7 @@ describe('Spell Effects', () => {
     it('INVS increases target evade buff by 40 (single-targeting)', () => {
       const mage = createMage('Mage', 2);
       const warrior = new Character({ name: 'Warrior', classData: { ...mageClass, id: 'warrior', name: 'Warrior' } });
-      const battle = castSpell([mage, warrior], [goblin], invsSpell, 'Mage', 'Warrior', [invsSpell]);
+      const battle = castSpell([mage, warrior], [goblin], invsSpell, 'party_0', 'party_1', [invsSpell]);
       expect(warrior.getBuffAmount('evade')).toBe(40);
       expect(battle.currentMessages.some(m => m.text.includes("Warrior's evasion increased!"))).toBe(true);
     });
@@ -118,7 +121,7 @@ describe('Spell Effects', () => {
     it('increases target attack by 14', () => {
       const mage = createMage('Mage', 2);
       const attackBefore = mage.stats.attack;
-      const battle = castSpell([mage], [goblin], tmprSpell, 'Mage', 'Mage', [tmprSpell]);
+      const battle = castSpell([mage], [goblin], tmprSpell, 'party_0', 'party_0', [tmprSpell]);
       expect(mage.stats.attack).toBe(attackBefore + 14);
       expect(battle.currentMessages.some(m => m.text.includes("Mage's attack increased!"))).toBe(true);
     });
@@ -127,7 +130,7 @@ describe('Spell Effects', () => {
   describe('debuff_evade (LOCK)', () => {
     it('decreases enemy evade by 20', () => {
       const mage = createMage('Mage', 1);
-      const battle = castSpell([mage], [goblin], lockSpell, 'Mage', 'enemy_0', [lockSpell]);
+      const battle = castSpell([mage], [goblin], lockSpell, 'party_0', 'enemy_0', [lockSpell]);
       const enemy = battle.allEnemies[0];
       expect(enemy.buffs.get('evade')).toBe(-20);
       expect(battle.currentMessages.some(m => m.text.includes("Goblin's evasion decreased!"))).toBe(true);
@@ -135,7 +138,7 @@ describe('Spell Effects', () => {
 
     it('stacks with multiple casts', () => {
       const mage = createMage('Mage', 1);
-      const battle = castSpell([mage], [goblin], lockSpell, 'Mage', 'enemy_0', [lockSpell]);
+      const battle = castSpell([mage], [goblin], lockSpell, 'party_0', 'enemy_0', [lockSpell]);
       const enemy = battle.allEnemies[0];
       // Simulate second cast stacking
       enemy.buffs.set('evade', (enemy.buffs.get('evade') ?? 0) + (-20));
@@ -146,7 +149,7 @@ describe('Spell Effects', () => {
   describe('debuff_speed (SLOW)', () => {
     it('decreases enemy agility by 10', () => {
       const mage = createMage('Mage', 2);
-      const battle = castSpell([mage], [goblin], slowSpell, 'Mage', 'enemy_0', [slowSpell]);
+      const battle = castSpell([mage], [goblin], slowSpell, 'party_0', 'enemy_0', [slowSpell]);
       const enemy = battle.allEnemies[0];
       expect(enemy.buffs.get('agility')).toBe(-10);
       expect(battle.currentMessages.some(m => m.text.includes("Goblin's speed decreased!"))).toBe(true);
@@ -158,14 +161,14 @@ describe('Spell Effects', () => {
       const mage = createMage('Mage', 2);
       mage.statusTracker.apply('blind');
       expect(mage.statusTracker.has('blind')).toBe(true);
-      const battle = castSpell([mage], [goblin], lampSpell, 'Mage', 'Mage', [lampSpell]);
+      const battle = castSpell([mage], [goblin], lampSpell, 'party_0', 'party_0', [lampSpell]);
       expect(mage.statusTracker.has('blind')).toBe(false);
       expect(battle.currentMessages.some(m => m.text.includes("sight is restored"))).toBe(true);
     });
 
     it('shows "No effect." when target is not blind', () => {
       const mage = createMage('Mage', 2);
-      const battle = castSpell([mage], [goblin], lampSpell, 'Mage', 'Mage', [lampSpell]);
+      const battle = castSpell([mage], [goblin], lampSpell, 'party_0', 'party_0', [lampSpell]);
       expect(battle.currentMessages.some(m => m.text === 'No effect.')).toBe(true);
     });
   });
@@ -185,7 +188,7 @@ describe('Spell Effects', () => {
       battle.startBattle();
       battle.advanceFromIntro();
       // Only living party members submit commands
-      battle.submitCommand({ type: 'magic', actorId: 'Mage', targetId: 'Fallen', spellId: 'life' });
+      battle.submitCommand({ type: 'magic', actorId: 'party_0', targetId: 'party_1', spellId: 'life' });
       battle.executeRound();
 
       expect(fallen.currentHp).toBe(1);
@@ -195,7 +198,7 @@ describe('Spell Effects', () => {
 
     it('shows "No effect." on living target', () => {
       const mage = createMage('Mage', 5);
-      const battle = castSpell([mage], [goblin], lifeSpell, 'Mage', 'Mage', [lifeSpell]);
+      const battle = castSpell([mage], [goblin], lifeSpell, 'party_0', 'party_0', [lifeSpell]);
       expect(battle.currentMessages.some(m => m.text === 'No effect.')).toBe(true);
     });
   });
@@ -204,7 +207,7 @@ describe('Spell Effects', () => {
     it('grants lightning resistance to all living party members', () => {
       const mage = createMage('Mage', 2);
       const warrior = new Character({ name: 'Warrior', classData: { ...mageClass, id: 'warrior', name: 'Warrior' } });
-      const battle = castSpell([mage, warrior], [goblin], alitSpell, 'Mage', '', [alitSpell]);
+      const battle = castSpell([mage, warrior], [goblin], alitSpell, 'party_0', '', [alitSpell]);
       expect(mage.hasTempResist('lightning')).toBe(true);
       expect(warrior.hasTempResist('lightning')).toBe(true);
       expect(battle.currentMessages.some(m => m.text.includes('lightning resistance'))).toBe(true);
@@ -214,7 +217,7 @@ describe('Spell Effects', () => {
   describe('damage_holy (HARM)', () => {
     it('deals holy-element damage to enemies', () => {
       const mage = createMage('Mage', 1);
-      const battle = castSpell([mage], [undead], harmSpell, 'Mage', 'enemy_0', [harmSpell]);
+      const battle = castSpell([mage], [undead], harmSpell, 'party_0', 'enemy_0', [harmSpell]);
       const enemy = battle.allEnemies[0];
       // Undead is weak to holy — should take extra damage
       expect(enemy.currentHp).toBeLessThan(undead.stats.hp);
@@ -224,11 +227,11 @@ describe('Spell Effects', () => {
     it('applies 2x multiplier against holy-weak enemies', () => {
       const mage = createMage('Mage', 1);
       // Cast against undead (holy weakness) and normal enemy
-      const battle1 = castSpell([mage], [undead], harmSpell, 'Mage', 'enemy_0', [harmSpell]);
+      const battle1 = castSpell([mage], [undead], harmSpell, 'party_0', 'enemy_0', [harmSpell]);
       const dmgToUndead = undead.stats.hp - battle1.allEnemies[0].currentHp;
 
       const mage2 = createMage('Mage2', 1);
-      const battle2 = castSpell([mage2], [goblin], harmSpell, 'Mage2', 'enemy_0', [harmSpell]);
+      const battle2 = castSpell([mage2], [goblin], harmSpell, 'party_0', 'enemy_0', [harmSpell]);
       const dmgToGoblin = goblin.stats.hp - battle2.allEnemies[0].currentHp;
 
       // Holy damage to undead (weak) should be ~2x damage to goblin (neutral)
@@ -249,7 +252,7 @@ describe('Spell Effects', () => {
       );
       battle.startBattle();
       battle.advanceFromIntro();
-      battle.submitCommand({ type: 'fight', actorId: 'Mage', targetId: 'enemy_0' });
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
       battle.executeRound();
       battle.resolveRound();
 
@@ -270,7 +273,7 @@ describe('Spell Effects', () => {
       );
       battle.startBattle();
       battle.advanceFromIntro();
-      battle.submitCommand({ type: 'fight', actorId: 'Mage', targetId: 'enemy_0' });
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
       battle.executeRound();
       battle.resolveRound();
 
@@ -283,13 +286,13 @@ describe('Spell Effects', () => {
     it('consumes a charge when casting a buff spell', () => {
       const mage = createMage('Mage', 1, 3);
       expect(mage.getSpellCharges(1)).toBe(3);
-      castSpell([mage], [goblin], fogSpell, 'Mage', 'Mage', [fogSpell]);
+      castSpell([mage], [goblin], fogSpell, 'party_0', 'party_0', [fogSpell]);
       expect(mage.getSpellCharges(1)).toBe(2);
     });
 
     it('fails to cast when no charges remain', () => {
       const mage = createMage('Mage', 1, 0);
-      const battle = castSpell([mage], [goblin], fogSpell, 'Mage', 'Mage', [fogSpell]);
+      const battle = castSpell([mage], [goblin], fogSpell, 'party_0', 'party_0', [fogSpell]);
       expect(battle.currentMessages.some(m => m.text.includes('no charges'))).toBe(true);
       // Defense should not have changed
       expect(mage.getBuffAmount('defense')).toBe(0);

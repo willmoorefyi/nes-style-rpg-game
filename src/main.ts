@@ -25,6 +25,9 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   const game = new Game();
   await game.init();
   document.body.appendChild(game.canvas);
+  game.focusCanvas();
+  // Click anywhere on the page to ensure canvas gets focus
+  document.addEventListener('click', () => game.focusCanvas());
   game.scenes.register('title', new TitleScene(game));
   game.scenes.register('partyCreation', new PartyCreationScene(game));
   game.scenes.register('exploration', new ExplorationScene(game));

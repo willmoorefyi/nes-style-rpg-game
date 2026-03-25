@@ -26,8 +26,8 @@ export class ControlsHint {
 
     const lines = [
       'Arrow Keys: Move',
-      'Z: Confirm',
-      'X: Menu',
+      'Z / Enter: Confirm',
+      'X / Esc: Cancel / Menu',
     ];
     lines.forEach((line, i) => {
       const text = new BitmapText({

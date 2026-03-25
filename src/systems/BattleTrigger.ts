@@ -63,7 +63,7 @@ export class BattleTrigger {
     this.game.scenes.unregister('gameover');
     this.game.scenes.register('battle', battleScene);
     this.game.scenes.register('gameover', new GameOverScene(this.game));
-    await this.game.scenes.switchTo('battle');
+    await this.game.scenes.push('battle');
   }
 
   onBattleEnd(data: BattleEndData): void {
@@ -88,16 +88,16 @@ export class BattleTrigger {
       const cutsceneId = this.currentBossConfig?.postVictoryCutscene;
       this.currentBossConfig = null;
       if (cutsceneId) {
-        this.game.scenes.switchTo('exploration');
+        this.game.scenes.pop();
         this.playPostVictoryCutscene(cutsceneId);
       } else if (levelUpMessages.length > 0) {
-        this.game.scenes.switchTo('exploration');
+        this.game.scenes.pop();
         // Show level-up messages as dialog
         for (const msg of levelUpMessages) {
           this.game.events.emit('showDialog', { text: msg, onComplete: () => {} });
         }
       } else {
-        this.game.scenes.switchTo('exploration');
+        this.game.scenes.pop();
       }
     } else {
       this.currentBossConfig = null;

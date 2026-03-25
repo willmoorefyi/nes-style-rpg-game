@@ -12,9 +12,11 @@ export interface SpellSelectionResult {
 
 export interface SpellSelectionConfig {
   character: Character;
+  /** Unique battle ID for the casting character (e.g., 'party_0') */
+  actorId: string;
   spells: SpellData[];
   enemies: Array<{ id: string; name: string }>;
-  partyMembers: Array<{ name: string }>;
+  partyMembers: Array<{ name: string; id: string }>;
   contentX: number;
   contentY: number;
   eventBus?: EventBus;
@@ -94,7 +96,7 @@ export class SpellSelectionUI extends Container {
         if (spell?.targeting === 'all') {
           this.submitResult(undefined);
         } else if (spell?.targeting === 'self') {
-          this.submitResult(character.name);
+          this.submitResult(this.config.actorId);
         } else if (spell?.type === 'white' && spell?.effect === 'heal') {
           this.showPartyTargetMenu();
         } else {
@@ -128,7 +130,7 @@ export class SpellSelectionUI extends Container {
 
   private showPartyTargetMenu(): void {
     const { partyMembers, contentX, contentY, eventBus } = this.config;
-    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.name }));
+    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.id }));
     this.createTargetMenu(items, contentX, contentY, eventBus);
   }
 

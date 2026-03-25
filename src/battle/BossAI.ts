@@ -50,7 +50,7 @@ export class BossAI implements AIBehavior {
       : null;
 
     // Pick a living party member as target
-    const targets = party.map(c => ({ id: c.name, isAlive: c.currentHp > 0 }));
+    const targets = party.map((c, i) => ({ id: `party_${i}`, isAlive: c.currentHp > 0 }));
     const target = selectTarget(targets, rng);
 
     if (!chosen || chosen.type === 'fight') {

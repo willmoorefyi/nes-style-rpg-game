@@ -204,21 +204,22 @@ export class BattleScene implements Scene {
     if (!actor) return;
 
     if (cmd === 'fight') {
-      this.showTargetMenu(actor.name);
+      this.showTargetMenu();
     } else if (cmd === 'magic') {
       this.showSpellUI(actor);
     } else if (cmd === 'item') {
       this.showItemUI(actor);
     } else if (cmd === 'run') {
-      this.battle.submitCommand({ type: 'run', actorId: actor.name });
+      this.battle.submitCommand({ type: 'run', actorId: this.battle.currentCommandActorId! });
       this.commandMenu.visible = false;
       this.startCommandPhase();
     }
   }
 
   private showSpellUI(actor: Character): void {
+    const actorId = this.battle.currentCommandActorId!;
     const enemies = this.battle.livingEnemies.map(e => ({ id: e.id, name: e.data.name }));
-    const partyMembers = this.config.party.map(c => ({ name: c.name }));
+    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}` }));
 
     // Check if actor has any spells before creating UI
     let hasSpells = false;
@@ -239,6 +240,7 @@ export class BattleScene implements Scene {
 
     this.spellUI = new SpellSelectionUI({
       character: actor,
+      actorId,
       spells: this.spells,
       enemies,
       partyMembers,
@@ -249,7 +251,7 @@ export class BattleScene implements Scene {
         this.deps.events.emit('spellCast', {});
         this.battle.submitCommand({
           type: 'magic',
-          actorId: actor.name,
+          actorId,
           targetId: result.targetId,
           spellId: result.spellId,
         });
@@ -274,7 +276,7 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = true;
   }
 
-  private showItemUI(actor: Character): void {
+  private showItemUI(_actor: Character): void {
     if (!this.inventory) {
       this.messageText.setText('No items available.', true);
       this.uiState = 'message';
@@ -283,7 +285,8 @@ export class BattleScene implements Scene {
       return;
     }
 
-    const partyMembers = this.config.party.map(c => ({ name: c.name }));
+    const actorId = this.battle.currentCommandActorId!;
+    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}` }));
 
     this.itemUI = new ItemSelectionUI({
       inventory: this.inventory,
@@ -292,7 +295,7 @@ export class BattleScene implements Scene {
       contentY: this.commandWindow.contentY,
       eventBus: this.deps.events,
       onSelect: (result) => {
-        this.battle.submitCommand(createItemCommand(actor.name, result.targetName, result.itemId));
+        this.battle.submitCommand(createItemCommand(actorId, result.targetName, result.itemId));
         this.cleanupItemUI();
         this.startCommandPhase();
       },
@@ -325,7 +328,8 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = true;
   }
 
-  private showTargetMenu(actorName: string): void {
+  private showTargetMenu(): void {
+    const actorId = this.battle.currentCommandActorId!;
     const enemies = this.battle.livingEnemies;
     const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
 
@@ -336,7 +340,7 @@ export class BattleScene implements Scene {
       x: this.commandWindow.contentX,
       y: this.commandWindow.contentY,
       onSelect: (item) => {
-        this.battle.submitCommand({ type: 'fight', actorId: actorName, targetId: item.value });
+        this.battle.submitCommand({ type: 'fight', actorId, targetId: item.value });
         this.hideTargetMenu();
         this.startCommandPhase();
       },

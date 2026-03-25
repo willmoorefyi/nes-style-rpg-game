@@ -62,7 +62,9 @@ export class TitleScene implements Scene {
   }
 
   update(_dt: number): void {
-    this.menu.update(this.game.input);
+    if (this.menu) {
+      this.menu.update(this.game.input);
+    }
   }
 
   private onSelect(value: string): void {

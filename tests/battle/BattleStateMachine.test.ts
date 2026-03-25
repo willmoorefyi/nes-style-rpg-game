@@ -42,7 +42,7 @@ describe('BattleStateMachine', () => {
     const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] });
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     expect(battle.state).toBe('execution');
   });
 
@@ -51,7 +51,7 @@ describe('BattleStateMachine', () => {
     const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     expect(battle.state).toBe('resolution');
   });
@@ -62,7 +62,7 @@ describe('BattleStateMachine', () => {
     const battle = new BattleStateMachine({ party: [char], enemies: [weakEnemy] }, () => 0.5);
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     battle.resolveRound();
     expect(battle.state).toBe('victory');
@@ -76,7 +76,7 @@ describe('BattleStateMachine', () => {
     const battle = new BattleStateMachine({ party: [char], enemies: [strongEnemy] }, () => 0.5);
     battle.startBattle();
     battle.advanceFromIntro();
-    battle.submitCommand({ type: 'fight', actorId: 'Hero', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
     battle.executeRound();
     battle.resolveRound();
     expect(battle.state).toBe('defeat');
@@ -94,8 +94,8 @@ describe('BattleStateMachine', () => {
     battle.startBattle();
     battle.advanceFromIntro();
     // Both target enemy_0, but Hero1 is faster and kills it
-    battle.submitCommand({ type: 'fight', actorId: 'Hero1', targetId: 'enemy_0' });
-    battle.submitCommand({ type: 'fight', actorId: 'Hero2', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'fight', actorId: 'party_1', targetId: 'enemy_0' });
     battle.executeRound();
     // Hero2's attack should have been retargeted to enemy_1
     const messages = battle.currentMessages.map(m => m.text);

@@ -12,7 +12,7 @@ export interface ItemSelectionResult {
 
 export interface ItemSelectionConfig {
   inventory: Inventory;
-  partyMembers: Array<{ name: string }>;
+  partyMembers: Array<{ name: string; id: string }>;
   contentX: number;
   contentY: number;
   eventBus?: EventBus;
@@ -73,7 +73,7 @@ export class ItemSelectionUI extends Container {
 
   private showTargetMenu(): void {
     const { partyMembers, contentX, contentY, eventBus } = this.config;
-    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.name }));
+    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.id }));
 
     this.targetMenu = new Menu({
       items,

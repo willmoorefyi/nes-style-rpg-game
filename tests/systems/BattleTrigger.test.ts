@@ -41,7 +41,7 @@ describe('BattleTrigger', () => {
     trigger.onBattleEnd({ victory: true, xpReward: 100, goldReward: 50 });
     expect(game.party.distributeXp).toHaveBeenCalledWith(100);
     expect(game.party.addGold).toHaveBeenCalledWith(50);
-    expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
+    expect(game.scenes.pop).toHaveBeenCalled();
   });
 
   it('handles battle end defeat', () => {

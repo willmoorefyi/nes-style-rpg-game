@@ -115,7 +115,8 @@ export class ExplorationScene implements Scene {
     this.container.addChild(this.controlsHint.container);
     this.fadeOverlay = new FadeOverlay();
     this.container.addChild(this.fadeOverlay.overlay);
-    this.uiContainer.addChild(dialogBox);
+    // Dialog must be ABOVE fade overlay so cutscene dialog is visible on black screen
+    this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies));
     this.game.events.on('battleEnd', this.handleBattleEnd);
@@ -226,7 +227,7 @@ export class ExplorationScene implements Scene {
       this.pendingNpcAction = null;
       return;
     }
-    if (this.game.input.isJustPressed('start')) {
+    if (this.game.input.isJustPressed('cancel')) {
       this.game.scenes.push('fieldMenu');
       return;
     }

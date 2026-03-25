@@ -28,3 +28,4 @@ Thumbs.db
 
 # Agent-specific tracking files
 .yolo-sisyphus/
+playwright-responses/

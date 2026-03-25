@@ -48,8 +48,9 @@ export class PartyCreationScene implements Scene {
     this.dialogBox.visible = false;
     this.dialogManager = new DialogManager(this.dialogBox);
     this.fadeOverlay = new FadeOverlay();
-    this.container.addChild(this.dialogBox);
+    // Fade overlay first, dialog on top so it's visible during cutscenes
     this.container.addChild(this.fadeOverlay.overlay);
+    this.container.addChild(this.dialogBox);
   }
 
   enter(): void {
@@ -102,9 +103,9 @@ export class PartyCreationScene implements Scene {
       this.buildConfirm();
     }
 
-    // Keep dialog and fade overlay on top
-    this.container.addChild(this.dialogBox);
+    // Keep dialog and fade overlay on top — dialog ABOVE fade so it's visible during cutscenes
     this.container.addChild(this.fadeOverlay.overlay);
+    this.container.addChild(this.dialogBox);
   }
 
   private buildClassSelect(): void {
@@ -276,8 +277,12 @@ export class PartyCreationScene implements Scene {
         this.dialogManager.start([text]);
         this.cutsceneDialogResolve = resolve;
       }),
-      fadeOut: (ms: number) => this.fadeOverlay.fadeOut(ms),
-      fadeIn: (ms: number) => this.fadeOverlay.fadeIn(ms),
+      fadeOut: (ms: number) => {
+        return this.fadeOverlay.fadeOut(ms);
+      },
+      fadeIn: (ms: number) => {
+        return this.fadeOverlay.fadeIn(ms);
+      },
       flags: this.game.gameFlags,
       party: [...this.game.party.all],
     });

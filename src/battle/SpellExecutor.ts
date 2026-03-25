@@ -12,6 +12,8 @@ export interface SpellExecutorDeps {
   addMessage: (text: string) => void;
   livingParty: () => Character[];
   livingEnemies: () => EnemyInstance[];
+  /** Maps unique party IDs (party_0, party_1, ...) to their Character */
+  partyById: Map<string, Character>;
 }
 
 // FF1-faithful buff values: FOG +8 def, RUSE/INVS +40 evade, TMPR +14 atk, FAST +10 agi
@@ -38,6 +40,14 @@ export class SpellExecutor {
     this.spells = spells;
   }
 
+  /** Look up a party member by unique battle ID, returning as a single-element array for filter compatibility */
+  private partyFilter(id: string, condition?: (c: Character) => boolean): Character[] {
+    const char = this.deps.partyById.get(id);
+    if (!char) return [];
+    if (condition && !condition(char)) return [];
+    return [char];
+  }
+
   execute(cmd: BattleCommand, isEnemy: boolean): void {
     const spell = this.spells.find(s => s.id === cmd.spellId);
     if (!spell) {
@@ -48,7 +58,7 @@ export class SpellExecutor {
     // Get caster
     const caster = isEnemy
       ? this.deps.enemies.find(e => e.id === cmd.actorId)
-      : this.deps.party.find(c => c.name === cmd.actorId);
+      : this.deps.partyById.get(cmd.actorId);
     if (!caster) return;
 
     // For party members, check charges and silence
@@ -102,7 +112,7 @@ export class SpellExecutor {
     const targets = spell.targeting === 'all'
       ? (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty())
       : cmd.targetId
-        ? (isEnemy ? this.deps.enemies.filter(e => e.id === cmd.targetId) : this.deps.party.filter(c => c.name === cmd.targetId))
+        ? (isEnemy ? this.deps.enemies.filter(e => e.id === cmd.targetId) : this.partyFilter(cmd.targetId!))
         : [];
 
     for (const target of targets) {
@@ -131,7 +141,7 @@ export class SpellExecutor {
     const targets = spell.targeting === 'all'
       ? (isEnemy ? this.deps.livingParty() : this.deps.livingEnemies())
       : cmd.targetId
-        ? (isEnemy ? this.deps.party.filter(c => c.name === cmd.targetId) : this.deps.enemies.filter(e => e.id === cmd.targetId))
+        ? (isEnemy ? this.partyFilter(cmd.targetId!) : this.deps.enemies.filter(e => e.id === cmd.targetId))
         : [];
 
     for (const target of targets) {
@@ -180,11 +190,11 @@ export class SpellExecutor {
 
     // Buffs target allies — self or single ally
     const targets = spell.targeting === 'self'
-      ? (isEnemy ? [] : this.deps.party.filter(c => c.name === cmd.actorId && c.currentHp > 0))
+      ? (isEnemy ? [] : this.partyFilter(cmd.actorId, c => c.currentHp > 0))
       : cmd.targetId
         ? (isEnemy
           ? this.deps.enemies.filter(e => e.id === cmd.targetId && e.currentHp > 0)
-          : this.deps.party.filter(c => c.name === cmd.targetId && c.currentHp > 0))
+          : this.partyFilter(cmd.targetId!, c => c.currentHp > 0))
         : [];
 
     for (const target of targets) {
@@ -208,7 +218,7 @@ export class SpellExecutor {
     const targets = spell.targeting === 'all'
       ? (isEnemy ? this.deps.livingParty() : this.deps.livingEnemies())
       : cmd.targetId
-        ? (isEnemy ? this.deps.party.filter(c => c.name === cmd.targetId) : this.deps.enemies.filter(e => e.id === cmd.targetId))
+        ? (isEnemy ? this.partyFilter(cmd.targetId!) : this.deps.enemies.filter(e => e.id === cmd.targetId))
         : [];
 
     for (const target of targets) {
@@ -228,7 +238,7 @@ export class SpellExecutor {
     const targets = cmd.targetId
       ? (isEnemy
         ? this.deps.enemies.filter(e => e.id === cmd.targetId)
-        : this.deps.party.filter(c => c.name === cmd.targetId))
+        : this.partyFilter(cmd.targetId!))
       : [];
 
     for (const target of targets) {
@@ -257,7 +267,7 @@ export class SpellExecutor {
     const targets = cmd.targetId
       ? (isEnemy
         ? this.deps.enemies.filter(e => e.id === cmd.targetId)
-        : this.deps.party.filter(c => c.name === cmd.targetId))
+        : this.partyFilter(cmd.targetId!))
       : [];
 
     for (const target of targets) {

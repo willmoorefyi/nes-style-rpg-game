@@ -10,8 +10,10 @@ const DEFAULT_MAPPINGS: InputMapping = {
   ArrowLeft: 'left',
   ArrowRight: 'right',
   KeyZ: 'confirm',
+  Enter: 'confirm',
+  Space: 'confirm',
   KeyX: 'cancel',
-  Enter: 'start',
+  Escape: 'cancel',
   ShiftLeft: 'select',
   ShiftRight: 'select',
 };

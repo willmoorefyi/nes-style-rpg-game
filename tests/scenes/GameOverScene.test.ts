@@ -15,13 +15,13 @@ function createMockGameForGameOver() {
 }
 
 describe('GameOverScene', () => {
-  it('switches to title on start press instead of reloading', () => {
+  it('switches to title on confirm press instead of reloading', () => {
     const game = createMockGameForGameOver();
     const scene = new GameOverScene(game as unknown as Game);
     scene.enter();
 
-    // Simulate pressing start
-    game.input.isJustPressed.mockImplementation((action: string) => action === 'start');
+    // Simulate pressing confirm (Enter/Z/Space)
+    game.input.isJustPressed.mockImplementation((action: string) => action === 'confirm');
     scene.update(1);
 
     expect(game.scenes.switchTo).toHaveBeenCalledWith('title');

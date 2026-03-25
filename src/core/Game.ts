@@ -77,9 +77,13 @@ export class Game {
     this.resize();
     window.addEventListener('resize', () => this.resize());
     this.app.ticker.add((ticker) => {
-      this.input.update();
-      this.scenes.update(ticker.deltaTime);
-      this.playTime += ticker.deltaTime / 60;
+      try {
+        this.scenes.update(ticker.deltaTime);
+        this.input.update();
+        this.playTime += ticker.deltaTime / 60;
+      } catch (e) {
+        console.error('Game loop error:', e);
+      }
     });
   }
 
@@ -88,7 +92,12 @@ export class Game {
     canvas.setAttribute('role', 'application');
     canvas.setAttribute('aria-label', 'FF1-Style RPG Game');
     canvas.setAttribute('tabindex', '0');
-    canvas.focus();
+    // Focus after DOM insertion (called again in main.ts after appendChild)
+  }
+
+  /** Call after canvas is added to the DOM to ensure focus works */
+  focusCanvas(): void {
+    this.app.canvas.focus();
   }
 
   private setupAudioEvents(): void {

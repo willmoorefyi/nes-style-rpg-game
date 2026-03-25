@@ -16,7 +16,7 @@ export class BasicAI implements AIBehavior {
     _turnNumber: number,
     rng: () => number
   ): BattleCommand {
-    const targets = party.map(c => ({ id: c.name, isAlive: c.currentHp > 0 }));
+    const targets = party.map((c, i) => ({ id: `party_${i}`, isAlive: c.currentHp > 0 }));
     const target = selectTarget(targets, rng);
     return { type: 'fight', actorId: self.id, targetId: target?.id };
   }
