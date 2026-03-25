@@ -112,6 +112,26 @@ export class PlaceholderTextures {
         g.rect(ox + Math.floor(fw * 0.25), oy + 2, Math.floor(fw * 0.5), Math.floor(fh * 0.375)).fill(headColor);
       }
     }
+    // Directional arrows (white triangles, ~12px, centered on body area)
+    const arrowSize = 12;
+    const half = arrowSize / 2;
+    for (let frame = 0; frame < 2; frame++) {
+      const ox = frame * fw;
+      const cx = ox + fw / 2; // horizontal center
+      const bodyTop = Math.floor(fh * 0.375);
+      const bodyBot = fh - 2;
+      const cy = bodyTop + (bodyBot - bodyTop) * 0.65; // lower body area
+
+      // Row 0: down
+      g.poly([cx - half, 0 + cy - half, cx + half, 0 + cy - half, cx, 0 + cy + half]).fill(0xffffff);
+      // Row 1: up
+      g.poly([cx - half, fh + cy + half, cx + half, fh + cy + half, cx, fh + cy - half]).fill(0xffffff);
+      // Row 2: left
+      g.poly([cx + half, 2 * fh + cy - half, cx + half, 2 * fh + cy + half, cx - half, 2 * fh + cy]).fill(0xffffff);
+      // Row 3: right
+      g.poly([cx - half, 3 * fh + cy - half, cx - half, 3 * fh + cy + half, cx + half, 3 * fh + cy]).fill(0xffffff);
+    }
+
     const rt = RenderTexture.create({ width: sheetW, height: sheetH });
     this.app.renderer.render({ container: g, target: rt });
     return rt;

@@ -15,6 +15,22 @@ import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
+const ENEMY_COLORS: Record<string, number> = {
+  goblin: 0x228b22,    // green
+  wolf: 0x808080,      // gray
+  skeleton: 0xd4d4d4,  // bone white
+  pirate: 0x8b4513,    // brown
+  garland: 0x4b0082,   // dark purple
+  zombie: 0x556b2f,    // olive
+  ogre: 0xb22222,      // dark red
+  vampire: 0x800020,   // burgundy
+  lich: 0x191970,      // midnight blue
+  kraken: 0x006994,    // teal
+  tiamat: 0x8b0000,    // crimson
+  chaos: 0x1a1a1a,     // near-black
+};
+const DEFAULT_ENEMY_COLOR = 0xff4444;
+
 export interface BattleSceneDeps {
   input: InputManager;
   events: EventBus;
@@ -71,6 +87,14 @@ export class BattleScene implements Scene {
 
   enter(): void {
     this.deps.audio?.playMusic('battle');
+
+    // Two-tone battle background
+    const bg = new Graphics();
+    bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x16213e);
+    bg.rect(0, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x1a1a2e);
+    bg.rect(0, GAME_HEIGHT / 2 - 1, GAME_WIDTH, 2).fill(0x2a2a4e);
+    this.container.addChildAt(bg, 0);
+
     this.createUI();
     this.createEnemySprites();
     this.createPartySprites();
@@ -119,13 +143,18 @@ export class BattleScene implements Scene {
 
   private createEnemySprites(): void {
     const enemies = this.battle.allEnemies;
+    const isBossBattle = this.config.canRun === false;
     // Center enemies horizontally around x=350, vertically around y=450
     const totalHeight = (enemies.length - 1) * 120;
     const startY = 450 - totalHeight / 2;
     for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
+      const color = ENEMY_COLORS[enemy.data.name.toLowerCase()] ?? DEFAULT_ENEMY_COLOR;
+      const isBoss = isBossBattle || !!enemy.data.bossPhases;
+      const size = isBoss ? 128 : 96;
       const g = new Graphics();
-      g.rect(0, 0, 96, 96).fill(0xff0000 + i * 0x003300);
-      g.position.set(350 - 48, startY + i * 120);
+      g.rect(0, 0, size, size).fill(color);
+      g.position.set(350 - size / 2, startY + i * 120);
       this.container.addChild(g);
       this.enemySprites.push(g);
     }
