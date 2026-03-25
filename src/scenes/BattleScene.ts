@@ -13,6 +13,7 @@ import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -48,6 +49,7 @@ export class BattleScene implements Scene {
   private inventory: Inventory | undefined;
   private messageText!: TextRenderer;
   private enemySprites: Graphics[] = [];
+  private partySprites: Graphics[] = [];
 
   private uiState: UIState = 'intro';
   private introTimer = 60;
@@ -71,23 +73,27 @@ export class BattleScene implements Scene {
     this.deps.audio?.playMusic('battle');
     this.createUI();
     this.createEnemySprites();
+    this.createPartySprites();
     this.battle.startBattle();
     this.uiState = 'intro';
     this.showMessages();
   }
 
   private createUI(): void {
-    this.partyWindow = new Window({ x: 0, y: 160, width: 128, height: 80 });
+    // Party HP window — bottom-left
+    this.partyWindow = new Window({ x: 0, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
     this.container.addChild(this.partyWindow);
     this.updatePartyDisplay();
 
-    this.commandWindow = new Window({ x: 128, y: 160, width: 128, height: 80 });
+    // Command window — bottom-right
+    this.commandWindow = new Window({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
     this.container.addChild(this.commandWindow);
     this.createCommandMenu();
 
-    this.messageWindow = new Window({ x: 0, y: 0, width: 256, height: 40 });
+    // Message window — full width, top
+    this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: 120 });
     this.container.addChild(this.messageWindow);
-    this.messageText = new TextRenderer({ width: 240, revealSpeed: 2 });
+    this.messageText = new TextRenderer({ width: GAME_WIDTH - SCREEN_MARGIN * 2, revealSpeed: 2 });
     this.messageText.position.set(this.messageWindow.contentX, this.messageWindow.contentY);
     this.messageWindow.addChild(this.messageText);
   }
@@ -113,13 +119,27 @@ export class BattleScene implements Scene {
 
   private createEnemySprites(): void {
     const enemies = this.battle.allEnemies;
-    const startX = 128 - (enemies.length * 20);
+    // Center enemies horizontally around x=350, vertically around y=450
+    const totalHeight = (enemies.length - 1) * 120;
+    const startY = 450 - totalHeight / 2;
     for (let i = 0; i < enemies.length; i++) {
       const g = new Graphics();
-      g.rect(0, 0, 32, 32).fill(0xff0000 + i * 0x003300);
-      g.position.set(startX + i * 40, 60);
+      g.rect(0, 0, 96, 96).fill(0xff0000 + i * 0x003300);
+      g.position.set(350 - 48, startY + i * 120);
       this.container.addChild(g);
       this.enemySprites.push(g);
+    }
+  }
+
+  private createPartySprites(): void {
+    const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
+    const yPositions = [250, 380, 510, 640];
+    for (let i = 0; i < this.config.party.length; i++) {
+      const g = new Graphics();
+      g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
+      g.position.set(1500, yPositions[i]);
+      this.container.addChild(g);
+      this.partySprites.push(g);
     }
   }
 
@@ -130,9 +150,9 @@ export class BattleScene implements Scene {
     this.config.party.forEach((char, i) => {
       const text = new BitmapText({
         text: `${char.name.slice(0, 6).padEnd(6)} ${char.currentHp}/${char.maxHp}`,
-        style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
-      text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * 12);
+      text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * (FONT_SIZE + 12));
       this.partyWindow.addChild(text);
     });
   }
