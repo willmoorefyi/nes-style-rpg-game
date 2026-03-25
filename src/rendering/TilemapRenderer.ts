@@ -1,6 +1,7 @@
 import { Container, Sprite, Texture, Rectangle } from 'pixi.js';
 import type { MapData } from '../types/index.js';
-import { Camera, TILE_SIZE } from './Camera.js';
+import { Camera } from './Camera.js';
+import { TILE_SIZE } from '../core/LayoutConstants.js';
 import type { PlaceholderTextures } from './PlaceholderTextures.js';
 
 export class TilemapRenderer {

@@ -1,6 +1,7 @@
 import { Container, BitmapText } from 'pixi.js';
 import { wrapText } from './textUtils.js';
 import { NES_FONT } from './NESFont.js';
+import { CHAR_WIDTH, LINE_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
 export interface TextRendererConfig {
   width: number;
@@ -20,8 +21,8 @@ export class TextRenderer extends Container {
   constructor(config: TextRendererConfig) {
     super();
     this.config = {
-      lineHeight: 10,
-      charWidth: 8,
+      lineHeight: LINE_HEIGHT,
+      charWidth: CHAR_WIDTH,
       revealSpeed: 0,
       ...config,
     };
@@ -29,7 +30,7 @@ export class TextRenderer extends Container {
       text: '',
       style: {
         fontFamily: NES_FONT,
-        fontSize: 8,
+        fontSize: FONT_SIZE,
         fill: config.style?.fill ?? 0xffffff,
       },
     });

@@ -14,9 +14,10 @@ import { AudioManager, type AudioManifest } from './AudioManager.js';
 import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 import { installNESFont } from '../ui/NESFont.js';
+import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
 
-export const WIDTH = 256;
-export const HEIGHT = 240;
+export const WIDTH = GAME_WIDTH;
+export const HEIGHT = GAME_HEIGHT;
 
 export class Game {
   readonly app: Application;

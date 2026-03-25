@@ -1,4 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
+import { WINDOW_PADDING, WINDOW_BORDER_OUTER, WINDOW_BORDER_INNER } from '../core/LayoutConstants.js';
 
 export interface WindowConfig {
   x: number;
@@ -27,10 +28,10 @@ export class Window extends Container {
     this.bg.rect(0, 0, width, height);
     this.bg.fill(0xffffff);
     // Dark inner border
-    this.bg.rect(2, 2, width - 4, height - 4);
+    this.bg.rect(WINDOW_BORDER_OUTER, WINDOW_BORDER_OUTER, width - WINDOW_BORDER_OUTER * 2, height - WINDOW_BORDER_OUTER * 2);
     this.bg.fill(0x000080);
     // Blue background
-    this.bg.rect(4, 4, width - 8, height - 8);
+    this.bg.rect(WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER, width - (WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER) * 2, height - (WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER) * 2);
     this.bg.fill(0x00008b);
   }
 
@@ -40,8 +41,8 @@ export class Window extends Container {
     this.draw();
   }
 
-  get contentX(): number { return 8; }
-  get contentY(): number { return 8; }
-  get contentWidth(): number { return this.config.width - 16; }
-  get contentHeight(): number { return this.config.height - 16; }
+  get contentX(): number { return WINDOW_PADDING; }
+  get contentY(): number { return WINDOW_PADDING; }
+  get contentWidth(): number { return this.config.width - WINDOW_PADDING * 2; }
+  get contentHeight(): number { return this.config.height - WINDOW_PADDING * 2; }
 }

@@ -2,6 +2,7 @@ import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
 import { NES_FONT } from './NESFont.js';
+import { MENU_LINE_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
 export interface MenuItem {
   label: string;
@@ -39,7 +40,7 @@ export class Menu extends Container {
   constructor(config: MenuConfig) {
     super();
     this.items = config.items;
-    this.lineHeight = config.lineHeight ?? 12;
+    this.lineHeight = config.lineHeight ?? MENU_LINE_HEIGHT;
     this.cursorChar = config.cursor ?? '▶';
     this.maxVisible = config.maxVisible ?? this.items.length;
     this.onSelect = config.onSelect;
@@ -47,18 +48,18 @@ export class Menu extends Container {
     this.eventBus = config.eventBus;
     this.position.set(config.x ?? 0, config.y ?? 0);
 
-    this.cursorText = new BitmapText({ text: this.cursorChar, style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
+    this.cursorText = new BitmapText({ text: this.cursorChar, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.cursorText.position.set(0, 0);
     this.addChild(this.cursorText);
 
     if (this.items.length > this.maxVisible) {
-      this.upIndicator = new BitmapText({ text: '▲', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
-      this.upIndicator.position.set(12 + 40, -this.lineHeight);
+      this.upIndicator = new BitmapText({ text: '▲', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+      this.upIndicator.position.set(MENU_LINE_HEIGHT + 40, -this.lineHeight);
       this.upIndicator.visible = false;
       this.addChild(this.upIndicator);
 
-      this.downIndicator = new BitmapText({ text: '▼', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
-      this.downIndicator.position.set(12 + 40, this.maxVisible * this.lineHeight);
+      this.downIndicator = new BitmapText({ text: '▼', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+      this.downIndicator.position.set(MENU_LINE_HEIGHT + 40, this.maxVisible * this.lineHeight);
       this.downIndicator.visible = false;
       this.addChild(this.downIndicator);
     }
@@ -78,11 +79,11 @@ export class Menu extends Container {
         text: item.label,
         style: {
           fontFamily: NES_FONT,
-          fontSize: 8,
+          fontSize: FONT_SIZE,
           fill: item.enabled === false ? 0x808080 : 0xffffff,
         },
       });
-      t.position.set(12, i * this.lineHeight);
+      t.position.set(MENU_LINE_HEIGHT, i * this.lineHeight);
       this.texts.push(t);
       this.addChild(t);
     }

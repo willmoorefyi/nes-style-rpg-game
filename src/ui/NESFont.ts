@@ -1,4 +1,5 @@
 import { BitmapFont } from 'pixi.js';
+import { FONT_SIZE } from '../core/LayoutConstants.js';
 
 /** NES-authentic bitmap font name for use in BitmapText styles */
 export const NES_FONT = 'nes-font';
@@ -18,7 +19,7 @@ export function installNESFont(): void {
     name: NES_FONT,
     style: {
       fontFamily: 'monospace',
-      fontSize: 8,
+      fontSize: FONT_SIZE,
       fill: 0xffffff,
     },
     chars: NES_CHARS,

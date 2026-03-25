@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { WIDTH, HEIGHT } from '../core/Game.js';
+import { GAME_WIDTH, GAME_HEIGHT } from '../core/LayoutConstants.js';
 
 /**
  * Full-screen black overlay for fade transitions.
@@ -11,7 +11,7 @@ export class FadeOverlay {
 
   constructor() {
     this.overlay = new Graphics();
-    this.overlay.rect(0, 0, WIDTH, HEIGHT).fill(0x000000);
+    this.overlay.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill(0x000000);
     this.overlay.alpha = 0;
   }
 

@@ -1,8 +1,9 @@
 import { Container } from 'pixi.js';
+import { TILE_SIZE as _TILE_SIZE, GAME_WIDTH, GAME_HEIGHT } from '../core/LayoutConstants.js';
 
-export const TILE_SIZE = 16;
-export const VIEWPORT_WIDTH = 256;
-export const VIEWPORT_HEIGHT = 240;
+export const TILE_SIZE = _TILE_SIZE;
+export const VIEWPORT_WIDTH = GAME_WIDTH;
+export const VIEWPORT_HEIGHT = GAME_HEIGHT;
 
 export interface CameraTarget {
   x: number;

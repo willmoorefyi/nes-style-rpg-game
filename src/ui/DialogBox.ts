@@ -3,6 +3,7 @@ import { wrapText } from './textUtils.js';
 import { Window } from './Window.js';
 import { TextRenderer } from './TextRenderer.js';
 import type { InputManager } from '../core/InputManager.js';
+import { GAME_WIDTH, GAME_HEIGHT, CHAR_WIDTH, WINDOW_PADDING } from '../core/LayoutConstants.js';
 
 export interface DialogBoxConfig {
   x?: number;
@@ -24,10 +25,10 @@ export class DialogBox extends Container {
 
   constructor(config: DialogBoxConfig = {}) {
     super();
-    const x = config.x ?? 8;
-    const y = config.y ?? 176;
-    const width = config.width ?? 240;
-    const height = config.height ?? 56;
+    const x = config.x ?? WINDOW_PADDING;
+    const y = config.y ?? (GAME_HEIGHT - 168);
+    const width = config.width ?? (GAME_WIDTH - WINDOW_PADDING * 2);
+    const height = config.height ?? 144;
     this.linesPerPage = config.linesPerPage ?? 4;
     this.onComplete = config.onComplete;
 
@@ -70,7 +71,7 @@ export class DialogBox extends Container {
   }
 
   private paginate(text: string): string[] {
-    const maxChars = Math.floor(this.window.contentWidth / 8);
+    const maxChars = Math.floor(this.window.contentWidth / CHAR_WIDTH);
     const wrapped = wrapText(text, maxChars);
     const lines = wrapped.split('\n');
     const pages: string[] = [];

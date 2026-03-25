@@ -1,4 +1,5 @@
 import { Graphics, Texture, RenderTexture, Application } from 'pixi.js';
+import { TILE_SIZE } from '../core/LayoutConstants.js';
 
 export interface PlaceholderConfig {
   app: Application;
@@ -50,7 +51,7 @@ export class PlaceholderTextures {
       return this.tileCache.get(tileId)!;
     }
     const color = TILE_COLORS[tileId] ?? DEFAULT_TILE_COLOR;
-    const tex = this.createColoredRect(16, 16, color);
+    const tex = this.createColoredRect(TILE_SIZE, TILE_SIZE, color);
     this.tileCache.set(tileId, tex);
     return tex;
   }
@@ -68,7 +69,7 @@ export class PlaceholderTextures {
       return this.npcTextureCache.get(key)!;
     }
     const color = (spriteType ? NPC_COLORS[spriteType] : undefined) ?? DEFAULT_NPC_COLOR;
-    const tex = this.createColoredRect(16, 16, color);
+    const tex = this.createColoredRect(TILE_SIZE, TILE_SIZE, color);
     this.npcTextureCache.set(key, tex);
     return tex;
   }
@@ -89,14 +90,27 @@ export class PlaceholderTextures {
 
   private createPlayerSprite(): Texture {
     if (!this.app.renderer) return Texture.WHITE;
+    const fw = TILE_SIZE;
+    const fh = TILE_SIZE;
+    const sheetW = fw * 2;
+    const sheetH = fh * 4;
     const g = new Graphics();
-    // White outline for contrast
-    g.rect(1, 1, 14, 15).fill(0xffffff);
-    // Body (bright blue)
-    g.rect(2, 6, 12, 10).fill(0x2266ff);
-    // Head (lighter bright blue)
-    g.rect(4, 2, 8, 6).fill(0x44aaff);
-    const rt = RenderTexture.create({ width: 16, height: 16 });
+    // 4 directions (down=0, up=1, left=2, right=3), 2 frames each
+    const dirColors = [0x2266ff, 0x44aaff, 0x22aa44, 0xaa4422];
+    for (let dir = 0; dir < 4; dir++) {
+      for (let frame = 0; frame < 2; frame++) {
+        const ox = frame * fw;
+        const oy = dir * fh;
+        // White outline for contrast
+        g.rect(ox + 1, oy + 1, fw - 2, fh - 1).fill(0xffffff);
+        // Body
+        g.rect(ox + 2, oy + Math.floor(fh * 0.375), fw - 4, Math.floor(fh * 0.625) - 1).fill(dirColors[dir]);
+        // Head (slightly lighter for frame 1)
+        const headColor = frame === 0 ? dirColors[dir] : (dirColors[dir] + 0x222222);
+        g.rect(ox + Math.floor(fw * 0.25), oy + 2, Math.floor(fw * 0.5), Math.floor(fh * 0.375)).fill(headColor);
+      }
+    }
+    const rt = RenderTexture.create({ width: sheetW, height: sheetH });
     this.app.renderer.render({ container: g, target: rt });
     return rt;
   }
@@ -105,10 +119,10 @@ export class PlaceholderTextures {
     if (!this.app.renderer) return Texture.WHITE;
     const g = new Graphics();
     // Semi-transparent bright green marker
-    g.rect(0, 0, 16, 16).fill({ color: 0x00ff88, alpha: 0.5 });
+    g.rect(0, 0, TILE_SIZE, TILE_SIZE).fill({ color: 0x00ff88, alpha: 0.5 });
     // Inner arrow-like highlight
-    g.rect(4, 4, 8, 8).fill({ color: 0xffffff, alpha: 0.4 });
-    const rt = RenderTexture.create({ width: 16, height: 16 });
+    g.rect(Math.floor(TILE_SIZE * 0.25), Math.floor(TILE_SIZE * 0.25), Math.floor(TILE_SIZE * 0.5), Math.floor(TILE_SIZE * 0.5)).fill({ color: 0xffffff, alpha: 0.4 });
+    const rt = RenderTexture.create({ width: TILE_SIZE, height: TILE_SIZE });
     this.app.renderer.render({ container: g, target: rt });
     return rt;
   }

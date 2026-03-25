@@ -2,7 +2,7 @@ import { SpriteAnimation, type Direction } from '../rendering/SpriteAnimation.js
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
-import { TILE_SIZE } from '../rendering/Camera.js';
+import { TILE_SIZE } from '../core/LayoutConstants.js';
 import { Texture } from 'pixi.js';
 import type { MovementMode } from './MovementMode.js';
 import { WalkingMode } from './WalkingMode.js';
@@ -54,8 +54,8 @@ export class PlayerController {
     this._currentMode = config.movementMode ?? new WalkingMode();
 
     this.animation = new SpriteAnimation(config.texture, {
-      frameWidth: 16,
-      frameHeight: 16,
+      frameWidth: TILE_SIZE,
+      frameHeight: TILE_SIZE,
       frameCount: 2,
       frameDuration: 150,
       directions: { down: 0, up: 1, left: 2, right: 3 },
