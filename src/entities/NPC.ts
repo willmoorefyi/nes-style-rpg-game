@@ -1,4 +1,5 @@
 import { Sprite, Texture } from 'pixi.js';
+import { TILE_SIZE } from '../core/LayoutConstants.js';
 import type { ConditionalDialog } from '../types/index.js';
 
 export interface NPCData {
@@ -34,7 +35,7 @@ export class NPC {
     this.chestItem = data.chestItem;
     this.chestFlag = data.chestFlag;
     this.sprite = new Sprite(texture);
-    this.sprite.x = data.x * 16;
-    this.sprite.y = data.y * 16;
+    this.sprite.x = data.x * TILE_SIZE;
+    this.sprite.y = data.y * TILE_SIZE;
   }
 }

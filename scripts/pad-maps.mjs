@@ -65,12 +65,8 @@ for (const cfg of configs) {
     map.collision = newColl;
   }
 
-  // Move south-edge transitions to new south edge
-  if (map.transitions) {
-    for (const t of map.transitions) {
-      if (t.y === oldH - 1) t.y = cfg.targetH - 1;
-    }
-  }
+  // Keep transitions at their original positions — the padding area is
+  // impassable filler, so exits should stay at the original map boundary.
 
   map.width = cfg.targetW;
   map.height = cfg.targetH;
