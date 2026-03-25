@@ -146,7 +146,29 @@ All 11 verification tests pass via browser automation:
 | E10: Game Over → Title recovery | ✅ | Game over screen, Enter returns to title |
 | E11: Full playthrough | ✅ | Complete arc start to finish |
 
-### Priority 2: Visual Polish — Placeholder Improvements (2–3 days)
+### ✅ Priority 2: HD Resolution Refactor — COMPLETE (Phase F)
+
+Refactored from NES resolution (256×240) to HD (1920×1080):
+
+| Step | What | Status |
+|------|------|--------|
+| F1 | LayoutConstants.ts (central constants) | ✅ |
+| F2 | 11 core engine files updated | ✅ |
+| F3 | Battle layout redesigned (classic FF: enemies left, party right) | ✅ |
+| F4 | 19 scene/UI files updated with HD positions | ✅ |
+| F5a | Maps expanded (Cornelia 48×36, Overworld 64×64, Temple 40×30) | ✅ |
+| F6 | 4 test files updated | ✅ |
+| F7 | Responsive CSS scaling + pixelated rendering | ✅ |
+| F8 | Browser automation verification | ✅ |
+
+Post-refactor fixes:
+- Map tile layer rendering (collision data → tile IDs with +1 offset)
+- NPC positioning (hardcoded `*16` → `*TILE_SIZE`)
+- Town exit transitions (moved back to original boundary from unreachable padding edge)
+
+Key values: 1920×1080 resolution, 48×48 tiles, 24px font, 40×23 tile viewport.
+
+### Priority 3: Visual Polish — Placeholder Improvements (2–3 days)
 
 The game uses colored rectangles for everything. Before adding real sprites, the placeholders should be more informative:
 
@@ -158,7 +180,7 @@ The game uses colored rectangles for everything. Before adding real sprites, the
 - [ ] Spell cast visual: brief flash or color overlay on targets
 - [ ] Shop UI: show item stats comparison (current vs. new equipment)
 
-### Priority 3: Content Expansion (3–5 days)
+### Priority 4: Content Expansion (3–5 days)
 
 The game currently has one playable arc (Cornelia → Temple of Fiends → Garland). To be a "full game":
 
@@ -170,7 +192,7 @@ The game currently has one playable arc (Cornelia → Temple of Fiends → Garla
 - [ ] Wire vehicle acquisition to story flags (ship after Bikke, canoe after Earth Cave)
 - [ ] Add class upgrade NPC (Bahamut) with trigger
 
-### Priority 4: Audio (2–3 days)
+### Priority 5: Audio (2–3 days)
 
 The AudioManager and EventBus integration exist but no audio files are loaded:
 
@@ -180,7 +202,7 @@ The AudioManager and EventBus integration exist but no audio files are loaded:
 - [ ] Update `audio-manifest.json` with file paths
 - [ ] Verify music transitions between scenes
 
-### Priority 5: Sprite-Ready Architecture (1–2 days)
+### Priority 6: Sprite-Ready Architecture (1–2 days)
 
 Before commissioning pixel art, ensure the rendering system can swap placeholders for real sprites:
 
@@ -189,11 +211,13 @@ Before commissioning pixel art, ensure the rendering system can swap placeholder
 - [ ] Create a sprite specification document for an artist
 - [ ] Test with one real sprite to verify the pipeline works
 
-### Priority 6: Real Sprites & Art (timeline depends on artist)
+### Priority 7: Real Sprites & Art (timeline depends on artist)
 
-- [ ] 16×16 character sprites (4 directions × 2 walk frames × 12 classes)
-- [ ] 16×16 to 32×32 enemy sprites (12+ enemies)
-- [ ] 16×16 tile sprites for all terrain types
+Sprite sizes updated for HD resolution (48px tiles):
+
+- [ ] 48×48 character sprites (4 directions × 2 walk frames × 12 classes)
+- [ ] 48×48 to 96×96 enemy sprites (12+ enemies)
+- [ ] 48×48 tile sprites for all terrain types
 - [ ] NPC sprites by type
 - [ ] UI elements (window chrome, cursor, icons)
 
@@ -203,8 +227,9 @@ Before commissioning pixel art, ensure the rendering system can swap placeholder
 
 ```
 src/
-├── core/        (8 files)  Game, SceneManager, AssetLoader, DataLoader, EventBus,
-│                            InputManager, AudioManager, GameFlags, schemaValidation
+├── core/        (9 files)  Game, SceneManager, AssetLoader, DataLoader, EventBus,
+│                            InputManager, AudioManager, GameFlags, schemaValidation,
+│                            LayoutConstants
 ├── battle/      (11 files) BattleStateMachine, SpellExecutor, DamageFormula, Elements,
 │                            StatusEffects, BattleCommands, TurnOrder, EnemyAI,
 │                            AIBehavior, BasicAI, BossAI
