@@ -119,6 +119,7 @@ export class Game {
     const canvas = this.app.canvas;
     canvas.style.width = `${WIDTH * scale}px`;
     canvas.style.height = `${HEIGHT * scale}px`;
+    canvas.style.imageRendering = 'pixelated';
   }
 
   restoreState(data: {
