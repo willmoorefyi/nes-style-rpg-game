@@ -1,5 +1,5 @@
 import { Container, BitmapText } from 'pixi.js';
-import type { Scene } from '../types/index.js';
+import type { Scene, EquipmentSlot } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
@@ -8,6 +8,13 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+
+const SLOT_FOR_TYPE: Record<string, EquipmentSlot> = {
+  weapon: 'weapon',
+  armor: 'armor',
+  shield: 'shield',
+  helmet: 'helmet',
+};
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
@@ -25,10 +32,13 @@ export class ShopScene implements Scene {
   private choiceWindow: Window;
   private itemWindow: Window;
   private goldWindow: Window;
+  private detailWindow: Window;
   private choiceMenu!: Menu;
   private itemMenu?: Menu;
   private qtySelector?: QuantitySelectorUI;
   private goldText: BitmapText;
+  private detailTexts: BitmapText[] = [];
+  private lastSelectedIndex = -1;
 
   constructor(game: Game, shopId: string) {
     this.game = game;
@@ -39,11 +49,14 @@ export class ShopScene implements Scene {
     this.itemWindow = new Window({ x: SCREEN_MARGIN, y: 288, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
     this.itemWindow.visible = false;
 
+    this.detailWindow = new Window({ x: 1200, y: SCREEN_MARGIN, width: 696, height: 700 });
+    this.detailWindow.visible = false;
+
     this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
     this.goldWindow.addChild(this.goldText);
 
-    this.container.addChild(this.choiceWindow, this.goldWindow, this.itemWindow);
+    this.container.addChild(this.choiceWindow, this.goldWindow, this.itemWindow, this.detailWindow);
   }
 
   enter(): void {
@@ -96,6 +109,13 @@ export class ShopScene implements Scene {
       onCancel: () => this.closeItemMenu(),
     });
     this.itemWindow.addChild(this.itemMenu);
+    this.lastSelectedIndex = -1;
+    this.detailWindow.visible = this.isBuying && this.isEquipmentShop();
+  }
+
+  private isEquipmentShop(): boolean {
+    const shop = ShopRegistry.getShop(this.shopId);
+    return shop?.type === 'weapon' || shop?.type === 'armor';
   }
 
   private getBuyItems(): MenuItem[] {
@@ -179,6 +199,7 @@ export class ShopScene implements Scene {
 
   private closeItemMenu(): void {
     this.itemWindow.visible = false;
+    this.detailWindow.visible = false;
     if (this.itemMenu) {
       this.itemWindow.removeChild(this.itemMenu);
       this.itemMenu = undefined;
@@ -197,6 +218,57 @@ export class ShopScene implements Scene {
       this.qtySelector.update(this.game.input);
     } else if (this.itemMenu) {
       this.itemMenu.update(this.game.input);
+      if (this.detailWindow.visible && this.itemMenu.selectedIndex !== this.lastSelectedIndex) {
+        this.lastSelectedIndex = this.itemMenu.selectedIndex;
+        this.updateDetailPanel();
+      }
+    }
+  }
+
+  private updateDetailPanel(): void {
+    for (const t of this.detailTexts) this.detailWindow.removeChild(t);
+    this.detailTexts = [];
+
+    if (!this.itemMenu) return;
+    const menuItem = this.itemMenu.selectedItem;
+    if (!menuItem?.value) return;
+    const item = ItemRegistry.getItem(menuItem.value);
+    if (!item) return;
+
+    const slot = item.slot ?? SLOT_FOR_TYPE[item.type];
+    if (!slot) return;
+    const isWeapon = item.type === 'weapon';
+    const statLabel = isWeapon ? 'ATK' : 'DEF';
+    const newStat = (isWeapon ? item.stats.attack : item.stats.defense) ?? 0;
+
+    const cx = this.detailWindow.contentX;
+    const cy = this.detailWindow.contentY;
+    let y = cy;
+
+    const addLine = (text: string, color: number = 0xffffff): void => {
+      const bt = new BitmapText({ text, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: color } });
+      bt.position.set(cx, y);
+      this.detailWindow.addChild(bt);
+      this.detailTexts.push(bt);
+      y += FONT_SIZE + 8;
+    };
+
+    addLine(`${item.name}  ${statLabel}: ${newStat}`);
+    y += 8;
+
+    for (const char of this.game.party.all) {
+      const equipped = char.getEquipped(slot as EquipmentSlot);
+      const curStat = equipped ? ((isWeapon ? equipped.stats.attack : equipped.stats.defense) ?? 0) : 0;
+      const curName = equipped?.name ?? '\u2014';
+      const diff = newStat - curStat;
+      const diffStr = diff > 0 ? `+${diff}` : `${diff}`;
+      const diffColor = diff > 0 ? 0x00ff00 : diff < 0 ? 0xff0000 : 0xffffff;
+
+      addLine(`${char.name}`);
+      addLine(`  Now: ${curName} ${statLabel}: ${curStat}`);
+      addLine(`  New: ${statLabel}: ${newStat}`);
+      addLine(`  ${diffStr}`, diffColor);
+      y += 4;
     }
   }
 
