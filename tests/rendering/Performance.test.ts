@@ -68,10 +68,10 @@ describe('TilemapRenderer performance', () => {
     const layer = renderer.container.children[0] as Container;
     const visibleCount = layer.children.filter(c => c.visible).length;
 
-    // 64x64 = 4096 tiles total, but viewport is 256x240 = ~17x16 tiles
+    // 64x64 = 4096 tiles total, but viewport is 1920x1080 = ~41x24 tiles
     expect(visibleCount).toBeLessThan(64 * 64);
     expect(visibleCount).toBeGreaterThan(0);
-    expect(visibleCount).toBeLessThan(300); // Roughly 17*16 = 272 + edge tiles
+    expect(visibleCount).toBeLessThan(1100); // Roughly 41*24 = 984 + edge tiles
   });
 
   it('reuses sprites from pool instead of creating new ones', () => {

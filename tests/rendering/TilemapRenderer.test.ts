@@ -66,9 +66,9 @@ describe('TilemapRenderer', () => {
     const layerContainer = renderer.container.children[0] as Container;
     const sprites = layerContainer.children as Container[];
 
-    // Find sprite at position (0,0) and (16,0)
+    // Find sprite at position (0,0) and (48,0)
     const atOrigin = sprites.find((s) => s.x === 0 && s.y === 0);
-    const atSecond = sprites.find((s) => s.x === 16 && s.y === 0);
+    const atSecond = sprites.find((s) => s.x === 48 && s.y === 0);
 
     expect(atOrigin).toBeDefined();
     expect(atSecond).toBeDefined();

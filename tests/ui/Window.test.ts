@@ -10,10 +10,10 @@ describe('Window', () => {
 
   it('has content area inset from borders', () => {
     const w = new Window({ x: 0, y: 0, width: 100, height: 80 });
-    expect(w.contentX).toBe(8);
-    expect(w.contentY).toBe(8);
-    expect(w.contentWidth).toBe(84);
-    expect(w.contentHeight).toBe(64);
+    expect(w.contentX).toBe(24);
+    expect(w.contentY).toBe(24);
+    expect(w.contentWidth).toBe(52);
+    expect(w.contentHeight).toBe(32);
   });
 
   it('renders border graphics', () => {
@@ -24,7 +24,7 @@ describe('Window', () => {
   it('can resize', () => {
     const w = new Window({ x: 0, y: 0, width: 100, height: 80 });
     w.resize(200, 160);
-    expect(w.contentWidth).toBe(184);
-    expect(w.contentHeight).toBe(144);
+    expect(w.contentWidth).toBe(152);
+    expect(w.contentHeight).toBe(112);
   });
 });

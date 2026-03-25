@@ -9,7 +9,7 @@ describe('Camera', () => {
   beforeEach(() => {
     container = new Container();
     camera = new Camera(container);
-    camera.setMapBounds(20, 20); // 320x320 map
+    camera.setMapBounds(50, 30); // 2400x1440 map
   });
 
   it('initializes at origin', () => {
@@ -30,21 +30,21 @@ describe('Camera', () => {
     expect(camera.x).toBe(0);
     expect(camera.y).toBe(0);
 
-    // Map is 320x320, viewport is 256x240, max scroll is 64x80
-    camera.setPosition(100, 100);
-    expect(camera.x).toBe(64);
-    expect(camera.y).toBe(80);
+    // Map is 2400x1440, viewport is 1920x1080, max scroll is 480x360
+    camera.setPosition(500, 400);
+    expect(camera.x).toBe(480);
+    expect(camera.y).toBe(360);
   });
 
   it('follows target and centers it', () => {
-    const target = { x: 160, y: 160 };
+    const target = { x: 1200, y: 720 };
     camera.follow(target);
     camera.update();
 
     // Target at center means camera at target - viewport/2
-    // 160 - 128 = 32, 160 - 120 = 40
-    expect(camera.x).toBe(32);
-    expect(camera.y).toBe(40);
+    // 1200 - 960 = 240, 720 - 540 = 180
+    expect(camera.x).toBe(240);
+    expect(camera.y).toBe(180);
   });
 
   it('clamps when following target near edge', () => {
@@ -58,13 +58,13 @@ describe('Camera', () => {
   });
 
   it('stops following when stopFollowing called', () => {
-    const target = { x: 160, y: 160 };
+    const target = { x: 1200, y: 720 };
     camera.follow(target);
     camera.update();
     const prevX = camera.x;
 
     camera.stopFollowing();
-    target.x = 200;
+    target.x = 1400;
     camera.update();
 
     expect(camera.x).toBe(prevX);
@@ -85,28 +85,28 @@ describe('Camera', () => {
   });
 
   it('calculates visible tile bounds', () => {
-    camera.setPosition(32, 16);
+    camera.setPosition(96, 48);
     const bounds = camera.getVisibleTileBounds();
 
-    expect(bounds.startX).toBe(2);
-    expect(bounds.startY).toBe(1);
-    expect(bounds.endX).toBe(18); // ceil((32+256)/16)
-    expect(bounds.endY).toBe(16); // ceil((16+240)/16)
+    expect(bounds.startX).toBe(2);  // floor(96/48)
+    expect(bounds.startY).toBe(1);  // floor(48/48)
+    expect(bounds.endX).toBe(42);   // ceil((96+1920)/48)
+    expect(bounds.endY).toBe(24);   // ceil((48+1080)/48) = ceil(1128/48) = ceil(23.5)
   });
 
   it('applies smooth scrolling when enabled', () => {
     camera.smooth = true;
     camera.smoothSpeed = 0.5;
-    const target = { x: 160, y: 160 };
+    const target = { x: 1200, y: 720 };
     camera.follow(target);
 
     camera.update();
-    // Should move halfway toward target position (32, 40)
-    expect(camera.x).toBe(16);
-    expect(camera.y).toBe(20);
+    // Target camera pos is (240, 180), smooth moves halfway from 0
+    expect(camera.x).toBe(120);
+    expect(camera.y).toBe(90);
 
     camera.update();
-    expect(camera.x).toBe(24);
-    expect(camera.y).toBe(30);
+    expect(camera.x).toBe(180);
+    expect(camera.y).toBe(135);
   });
 });
