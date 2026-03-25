@@ -50,7 +50,9 @@ export class PlaceholderTextures {
     if (this.tileCache.has(tileId)) {
       return this.tileCache.get(tileId)!;
     }
-    const color = TILE_COLORS[tileId] ?? DEFAULT_TILE_COLOR;
+    // Tile IDs are terrain type + 1 (offset so 0 = empty/skip in renderer)
+    const terrainType = tileId - 1;
+    const color = TILE_COLORS[terrainType] ?? DEFAULT_TILE_COLOR;
     const tex = this.createColoredRect(TILE_SIZE, TILE_SIZE, color);
     this.tileCache.set(tileId, tex);
     return tex;
