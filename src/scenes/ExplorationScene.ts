@@ -31,6 +31,7 @@ import { FieldHUD } from '../ui/FieldHUD.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
+import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../core/LayoutConstants.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -347,8 +348,8 @@ export class ExplorationScene implements Scene {
     const tex = this.placeholders.getTransitionIndicatorTexture();
     for (const t of transitions) {
       const indicator = new Sprite(tex);
-      indicator.x = t.x * 16;
-      indicator.y = t.y * 16;
+      indicator.x = t.x * TILE_SIZE;
+      indicator.y = t.y * TILE_SIZE;
       this.transitionIndicators.addChild(indicator);
     }
     this.worldContainer.addChild(this.transitionIndicators);
@@ -416,7 +417,7 @@ export class ExplorationScene implements Scene {
   /** C5: Start battle flash effect — 3 white flashes */
   private startBattleFlash(): void {
     this.battleFlash = new Graphics();
-    this.battleFlash.rect(0, 0, 256, 240).fill(0xffffff);
+    this.battleFlash.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill(0xffffff);
     this.battleFlash.visible = true;
     this.container.addChild(this.battleFlash);
     this.battleFlashState = { count: 3, timer: 5, on: true };

@@ -4,7 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
-import { WIDTH } from '../core/Game.js';
+import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type Phase = 'selectCaster' | 'selectSpell' | 'selectTarget';
 
@@ -27,9 +27,9 @@ export class FieldMagicScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.partyWindow = new Window({ x: 8, y: 8, width: 100, height: 64 });
-    this.spellWindow = new Window({ x: 8, y: 80, width: WIDTH - 16, height: 100 });
-    this.targetWindow = new Window({ x: 116, y: 8, width: 100, height: 64 });
+    this.partyWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 500, height: 300 });
+    this.spellWindow = new Window({ x: SCREEN_MARGIN, y: 348, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 600 });
+    this.targetWindow = new Window({ x: 548, y: SCREEN_MARGIN, width: 500, height: 300 });
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
     this.container.addChild(this.partyWindow, this.spellWindow, this.targetWindow);

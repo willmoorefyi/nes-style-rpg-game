@@ -3,6 +3,7 @@ import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
+import { SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type Phase = 'selectFirst' | 'selectSecond';
 
@@ -16,7 +17,7 @@ export class FieldOrderScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.window = new Window({ x: 8, y: 8, width: 100, height: 64 });
+    this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 500, height: 300 });
     this.container.addChild(this.window);
   }
 

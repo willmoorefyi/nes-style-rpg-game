@@ -6,7 +6,7 @@ import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
-import { WIDTH } from '../core/Game.js';
+import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 const SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
 const SLOT_TO_TYPE: Record<EquipmentSlot, string> = { weapon: 'weapon', armor: 'armor', shield: 'armor', helmet: 'armor' };
@@ -30,10 +30,10 @@ export class EquipScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.memberWindow = new Window({ x: 8, y: 8, width: 80, height: 64 });
-    this.slotWindow = new Window({ x: 96, y: 8, width: 80, height: 64 });
-    this.itemWindow = new Window({ x: 8, y: 80, width: WIDTH - 16, height: 100 });
-    this.statsWindow = new Window({ x: 184, y: 8, width: 64, height: 64 });
+    this.memberWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 400, height: 300 });
+    this.slotWindow = new Window({ x: 448, y: SCREEN_MARGIN, width: 400, height: 300 });
+    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: 348, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 600 });
+    this.statsWindow = new Window({ x: 872, y: SCREEN_MARGIN, width: 300, height: 300 });
     this.slotWindow.visible = false;
     this.itemWindow.visible = false;
     this.statsText = new TextRenderer({ width: this.statsWindow.contentWidth });

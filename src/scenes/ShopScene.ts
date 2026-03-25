@@ -6,8 +6,8 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { QuantitySelectorUI } from '../ui/QuantitySelector.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
-import { WIDTH } from '../core/Game.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
@@ -34,12 +34,12 @@ export class ShopScene implements Scene {
     this.game = game;
     this.shopId = shopId;
 
-    this.choiceWindow = new Window({ x: 8, y: 8, width: 60, height: 48 });
-    this.goldWindow = new Window({ x: WIDTH - 80, y: 8, width: 72, height: 24 });
-    this.itemWindow = new Window({ x: 8, y: 64, width: WIDTH - 16, height: 120 });
+    this.choiceWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 240 });
+    this.goldWindow = new Window({ x: GAME_WIDTH - 400, y: SCREEN_MARGIN, width: 376, height: 100 });
+    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: 288, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
     this.itemWindow.visible = false;
 
-    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
+    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
     this.goldWindow.addChild(this.goldText);
 
@@ -144,8 +144,8 @@ export class ShopScene implements Scene {
   private showQuantitySelector(): void {
     if (this.qtySelector) this.itemWindow.removeChild(this.qtySelector);
     this.qtySelector = new QuantitySelectorUI(
-      this.itemWindow.contentX + 100,
-      this.itemWindow.contentY + 90,
+      this.itemWindow.contentX + 500,
+      this.itemWindow.contentY + 500,
       this.maxQty,
       (qty) => this.confirmTransaction(qty),
       () => this.cancelQuantity()

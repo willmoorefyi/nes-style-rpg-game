@@ -3,7 +3,7 @@ import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
-import { WIDTH, HEIGHT } from '../core/Game.js';
+import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 export class StatusScene implements Scene {
   readonly container = new Container();
@@ -14,7 +14,7 @@ export class StatusScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.window = new Window({ x: 8, y: 8, width: WIDTH - 16, height: HEIGHT - 16 });
+    this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: GAME_HEIGHT - 2 * SCREEN_MARGIN });
     this.text = new TextRenderer({ width: this.window.contentWidth });
     this.text.position.set(this.window.contentX, this.window.contentY);
     this.window.addChild(this.text);

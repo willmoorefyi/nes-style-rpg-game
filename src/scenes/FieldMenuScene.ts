@@ -4,6 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import type { ExplorationScene } from './ExplorationScene.js';
+import { SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 export class FieldMenuScene implements Scene {
   readonly container = new Container();
@@ -14,7 +15,7 @@ export class FieldMenuScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.window = new Window({ x: 8, y: 8, width: 80, height: 100 });
+    this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 500 });
     this.saveItem = { label: 'Save', value: 'save', enabled: false };
     const items: MenuItem[] = [
       { label: 'Items', value: 'items' },

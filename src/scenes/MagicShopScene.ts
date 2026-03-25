@@ -7,6 +7,7 @@ import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import type { Character } from '../entities/Character.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type State = 'spells' | 'character' | 'slot';
 
@@ -43,18 +44,18 @@ export class MagicShopScene implements Scene {
       .map(id => SpellRegistry.getSpell(id))
       .filter((s): s is SpellData => !!s);
 
-    this.mainWindow = new Window({ x: 8, y: 8, width: 240, height: 180 });
+    this.mainWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 800 });
     this.container.addChild(this.mainWindow);
 
-    this.goldWindow = new Window({ x: 8, y: 192, width: 100, height: 40 });
+    this.goldWindow = new Window({ x: SCREEN_MARGIN, y: 848, width: 500, height: 100 });
     this.container.addChild(this.goldWindow);
-    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
-    this.goldText.position.set(16, 200);
-    this.container.addChild(this.goldText);
+    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
+    this.goldWindow.addChild(this.goldText);
     this.updateGold();
 
-    this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
-    this.messageText.position.set(120, 200);
+    this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.messageText.position.set(600, 880);
     this.container.addChild(this.messageText);
 
     this.showSpellMenu();

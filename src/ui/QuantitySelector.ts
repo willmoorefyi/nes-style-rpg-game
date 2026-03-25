@@ -1,6 +1,7 @@
 import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
 import { NES_FONT } from './NESFont.js';
+import { FONT_SIZE } from '../core/LayoutConstants.js';
 
 /**
  * QuantitySelector interface for future buy/sell quantity UI.
@@ -33,18 +34,18 @@ export class QuantitySelectorUI extends Container implements QuantitySelector {
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;
 
-    const style = { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff };
+    const style = { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff };
     
     const minus = new BitmapText({ text: '-', style });
     minus.position.set(0, 0);
     this.addChild(minus);
 
     this.qtyText = new BitmapText({ text: '1', style });
-    this.qtyText.position.set(12, 0);
+    this.qtyText.position.set(36, 0);
     this.addChild(this.qtyText);
 
     const plus = new BitmapText({ text: '+', style });
-    plus.position.set(36, 0);
+    plus.position.set(96, 0);
     this.addChild(plus);
   }
 

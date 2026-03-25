@@ -4,6 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SaveManager, type SlotSummary } from '../systems/SaveManager.js';
+import { GAME_WIDTH, SCREEN_MARGIN, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 export class LoadScene implements Scene {
   readonly container = new Container();
@@ -13,7 +14,7 @@ export class LoadScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.window = new Window({ x: 16, y: 16, width: 224, height: 100 });
+    this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 500 });
     const slots = SaveManager.getSaveSlots();
     const items: MenuItem[] = slots.map((s: SlotSummary | null, i: number) => ({
       label: this.formatSlot(s, i),
@@ -24,7 +25,7 @@ export class LoadScene implements Scene {
       items,
       x: this.window.contentX,
       y: this.window.contentY,
-      lineHeight: 24,
+      lineHeight: MENU_LINE_HEIGHT,
       onSelect: (item) => this.onSelect(parseInt(item.value)),
       onCancel: () => this.game.scenes.pop(),
       eventBus: this.game.events,

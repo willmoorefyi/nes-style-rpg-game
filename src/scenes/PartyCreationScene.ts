@@ -1,7 +1,6 @@
 import { Container, BitmapText, Graphics } from 'pixi.js';
 import type { Scene, CharacterClassData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
-import { WIDTH, HEIGHT } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
@@ -11,6 +10,7 @@ import { CutsceneManager, type CutsceneScript } from '../systems/CutsceneManager
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { DialogBox } from '../ui/DialogBox.js';
 import { DialogManager } from '../systems/DialogManager.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT, LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 const DEFAULT_NAMES: Record<string, string> = {
   warrior: 'FGHTR',
@@ -66,21 +66,21 @@ export class PartyCreationScene implements Scene {
 
     // Background
     const bg = new Graphics();
-    bg.rect(0, 0, WIDTH, HEIGHT);
+    bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     bg.fill(0x000000);
     this.container.addChild(bg);
 
     // Header
     const header = new BitmapText({
       text: `Choose class for slot ${this.currentSlot + 1}/4`,
-      style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
+      style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
     });
-    header.position.set(8, 8);
+    header.position.set(SCREEN_MARGIN, SCREEN_MARGIN);
     this.container.addChild(header);
 
     // Slot display (top area showing chosen classes)
     this.slotDisplay = new Container();
-    this.slotDisplay.position.set(8, 22);
+    this.slotDisplay.position.set(SCREEN_MARGIN, 72);
     for (let i = 0; i < 4; i++) {
       const label = new BitmapText({
         text: i < this.selectedClasses.length
@@ -88,11 +88,11 @@ export class PartyCreationScene implements Scene {
           : `${i + 1}:----`,
         style: {
           fontFamily: NES_FONT,
-          fontSize: 8,
+          fontSize: FONT_SIZE,
           fill: i === this.currentSlot ? 0xffff00 : 0xffffff,
         },
       });
-      label.position.set(i * 62, 0);
+      label.position.set(i * 240, 0);
       this.slotDisplay.addChild(label);
     }
     this.container.addChild(this.slotDisplay);
@@ -110,7 +110,7 @@ export class PartyCreationScene implements Scene {
 
   private buildClassSelect(): void {
     // Class menu (left side)
-    this.menuWindow = new Window({ x: 4, y: 36, width: 100, height: 92 });
+    this.menuWindow = new Window({ x: SCREEN_MARGIN, y: 120, width: 600, height: 800 });
     this.classMenu = new Menu({
       items: this.baseClasses.map((c) => ({
         label: c.name,
@@ -118,7 +118,7 @@ export class PartyCreationScene implements Scene {
       })),
       x: this.menuWindow.contentX,
       y: this.menuWindow.contentY,
-      lineHeight: 12,
+      lineHeight: MENU_LINE_HEIGHT,
       onSelect: (item) => this.onClassSelect(item.value),
       onCancel: () => this.onBack(),
       eventBus: this.game.events,
@@ -128,27 +128,27 @@ export class PartyCreationScene implements Scene {
 
     // Preview panel (right side)
     this.previewDisplay = new Container();
-    this.previewDisplay.position.set(110, 36);
+    this.previewDisplay.position.set(648, 120);
     this.container.addChild(this.previewDisplay);
     this.updatePreview(0);
   }
 
   private buildConfirm(): void {
     // Show party summary
-    const summaryWin = new Window({ x: 16, y: 36, width: 224, height: 100 });
+    const summaryWin = new Window({ x: SCREEN_MARGIN, y: 120, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 500 });
     for (let i = 0; i < this.selectedClasses.length; i++) {
       const cls = this.selectedClasses[i];
       const name = DEFAULT_NAMES[cls.id] ?? cls.name;
       const text = new BitmapText({
         text: `${name}  ${cls.name}  HP:${cls.baseStats.hp}`,
-        style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
-      text.position.set(summaryWin.contentX, summaryWin.contentY + i * 16);
+      text.position.set(summaryWin.contentX, summaryWin.contentY + i * 48);
       summaryWin.addChild(text);
     }
     this.container.addChild(summaryWin);
 
-    this.confirmWindow = new Window({ x: 64, y: 150, width: 128, height: 52 });
+    this.confirmWindow = new Window({ x: 660, y: 700, width: 600, height: 200 });
     this.confirmMenu = new Menu({
       items: [
         { label: 'Begin Adventure', value: 'begin' },
@@ -156,7 +156,7 @@ export class PartyCreationScene implements Scene {
       ],
       x: this.confirmWindow.contentX,
       y: this.confirmWindow.contentY,
-      lineHeight: 16,
+      lineHeight: 48,
       onSelect: (item) => {
         if (item.value === 'begin') this.beginAdventure();
         else {
@@ -183,7 +183,7 @@ export class PartyCreationScene implements Scene {
     const cls = this.baseClasses[classIndex];
     if (!cls) return;
 
-    const previewWin = new Window({ x: 0, y: 0, width: 142, height: 92 });
+    const previewWin = new Window({ x: 0, y: 0, width: 600, height: 800 });
     const lines = [
       cls.name,
       '',
@@ -196,9 +196,9 @@ export class PartyCreationScene implements Scene {
     lines.forEach((line, i) => {
       const t = new BitmapText({
         text: line,
-        style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
-      t.position.set(previewWin.contentX, previewWin.contentY + i * 10);
+      t.position.set(previewWin.contentX, previewWin.contentY + i * LINE_HEIGHT);
       previewWin.addChild(t);
     });
     this.previewDisplay.addChild(previewWin);

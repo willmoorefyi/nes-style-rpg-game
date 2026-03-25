@@ -4,6 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
 type InnState = 'confirm' | 'resting';
 
@@ -20,13 +21,13 @@ export class InnScene implements Scene {
   constructor(game: Game, shopData: ShopData) {
     this.game = game;
     this.price = shopData.innPrice ?? 100;
-    this.window = new Window({ x: 48, y: 80, width: 160, height: 64 });
+    this.window = new Window({ x: (GAME_WIDTH - 600) / 2, y: (GAME_HEIGHT - 300) / 2, width: 600, height: 300 });
     this.container.addChild(this.window);
     this.showConfirm();
   }
 
   private showConfirm(): void {
-    const label = new BitmapText({ text: `Stay for ${this.price} G?`, style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
+    const label = new BitmapText({ text: `Stay for ${this.price} G?`, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     label.position.set(this.window.contentX, this.window.contentY);
     this.window.addChild(label);
 
@@ -36,7 +37,7 @@ export class InnScene implements Scene {
         { label: 'No', value: 'no' },
       ],
       x: this.window.contentX,
-      y: this.window.contentY + 20,
+      y: this.window.contentY + 60,
       onSelect: (item) => this.onSelect(item.value),
       onCancel: () => this.game.scenes.pop(),
       eventBus: this.game.events,
@@ -69,8 +70,8 @@ export class InnScene implements Scene {
     while (this.window.children.length > 1) {
       this.window.removeChildAt(1);
     }
-    this.messageText = new BitmapText({ text: 'Your party rests...', style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff } });
-    this.messageText.position.set(this.window.contentX, this.window.contentY + 16);
+    this.messageText = new BitmapText({ text: 'Your party rests...', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.messageText.position.set(this.window.contentX, this.window.contentY + 48);
     this.window.addChild(this.messageText);
     this.restTimer = 0;
   }

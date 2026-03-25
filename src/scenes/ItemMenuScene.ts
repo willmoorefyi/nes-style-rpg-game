@@ -6,7 +6,7 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
-import { WIDTH } from '../core/Game.js';
+import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type Phase = 'selectItem' | 'selectTarget';
 
@@ -24,9 +24,9 @@ export class ItemMenuScene implements Scene {
 
   constructor(game: Game) {
     this.game = game;
-    this.itemWindow = new Window({ x: 8, y: 8, width: WIDTH - 16, height: 140 });
-    this.descWindow = new Window({ x: 8, y: 152, width: WIDTH - 16, height: 40 });
-    this.targetWindow = new Window({ x: 168, y: 8, width: 80, height: 64 });
+    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
+    this.descWindow = new Window({ x: SCREEN_MARGIN, y: 748, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 200 });
+    this.targetWindow = new Window({ x: 1200, y: SCREEN_MARGIN, width: 400, height: 300 });
     this.targetWindow.visible = false;
     this.descText = new TextRenderer({ width: this.descWindow.contentWidth });
     this.descText.position.set(this.descWindow.contentX, this.descWindow.contentY);

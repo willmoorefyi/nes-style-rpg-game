@@ -1,6 +1,6 @@
 import { Container, Graphics, BitmapText } from 'pixi.js';
 import { NES_FONT } from './NESFont.js';
-import { WIDTH, HEIGHT } from '../core/Game.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
 const STORAGE_KEY = 'ff1_controlsSeen';
 const AUTO_DISMISS_MS = 5000;
@@ -21,7 +21,7 @@ export class ControlsHint {
     }
 
     const bg = new Graphics();
-    bg.rect(0, 0, WIDTH, HEIGHT).fill({ color: 0x000000, alpha: 0.7 });
+    bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill({ color: 0x000000, alpha: 0.7 });
     this.container.addChild(bg);
 
     const lines = [
@@ -32,10 +32,10 @@ export class ControlsHint {
     lines.forEach((line, i) => {
       const text = new BitmapText({
         text: line,
-        style: { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff },
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
       text.anchor.set(0.5, 0);
-      text.position.set(WIDTH / 2, HEIGHT / 2 - 20 + i * 16);
+      text.position.set(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60 + i * 48);
       this.container.addChild(text);
     });
   }

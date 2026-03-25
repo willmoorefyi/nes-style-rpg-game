@@ -1,7 +1,7 @@
 import { Container, BitmapText } from 'pixi.js';
 import { NES_FONT } from './NESFont.js';
 import type { PartyManager } from '../entities/PartyManager.js';
-import { WIDTH } from '../core/Game.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, CHAR_WIDTH } from '../core/LayoutConstants.js';
 
 /** Minimal field HUD: map name (top-left), gold (top-right), party HP (bottom) */
 export class FieldHUD {
@@ -11,21 +11,21 @@ export class FieldHUD {
   private hpText: BitmapText;
 
   constructor(party: PartyManager) {
-    const style = { fontFamily: NES_FONT, fontSize: 8, fill: 0xffffff };
+    const style = { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff };
 
     // Map name - top left
     this.mapNameText = new BitmapText({ text: '', style });
-    this.mapNameText.x = 4;
-    this.mapNameText.y = 2;
+    this.mapNameText.x = 12;
+    this.mapNameText.y = 6;
 
     // Gold - top right
     this.goldText = new BitmapText({ text: '', style });
-    this.goldText.y = 2;
+    this.goldText.y = 6;
 
     // Party HP strip - bottom
     this.hpText = new BitmapText({ text: '', style });
-    this.hpText.x = 4;
-    this.hpText.y = 228; // Near bottom of 240px screen
+    this.hpText.x = 12;
+    this.hpText.y = GAME_HEIGHT - 48;
 
     this.container.addChild(this.mapNameText);
     this.container.addChild(this.goldText);
@@ -41,7 +41,7 @@ export class FieldHUD {
   setGold(gold: number): void {
     const text = `${gold}G`;
     this.goldText.text = text;
-    this.goldText.x = WIDTH - 4 - text.length * 8;
+    this.goldText.x = GAME_WIDTH - 12 - text.length * CHAR_WIDTH;
   }
 
   update(party: PartyManager): void {
