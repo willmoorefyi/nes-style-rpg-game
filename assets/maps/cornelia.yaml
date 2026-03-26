@@ -3512,6 +3512,7 @@ npcs:
     - Garland took the princess to the Temple of Fiends, north of here.
   id: guard
   sprite: guard
+  wander: true
   x: 7
   y: 5
 - dialog:
@@ -3524,12 +3525,14 @@ npcs:
     - Only the Warriors of Light can restore them.
   id: old_man
   sprite: old_man
+  wander: true
   x: 10
   y: 9
 - dialog:
   - Buy spells early. They make a huge difference in the first dungeon!
   id: villager
   sprite: villager
+  wander: true
   x: 5
   y: 13
 tilesets:

@@ -112,6 +112,7 @@ export interface MapNPC {
   action?: string;
   chestItem?: string;
   chestFlag?: string;
+  wander?: boolean;
 }
 
 /**

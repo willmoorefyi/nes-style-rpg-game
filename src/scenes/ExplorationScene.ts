@@ -62,6 +62,8 @@ export class ExplorationScene implements Scene {
   private battleFlash: Graphics | null = null;
   private battleFlashState: { count: number; timer: number; on: boolean } | null = null;
   private fadeOverlay: FadeOverlay;
+  private npcs: NPC[] = [];
+  private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   // Stored reference for cleanup in exit() to prevent listener leaks
   private handleBattleEnd = (data: { victory: boolean; xpReward: number; goldReward: number }) => this.battleTrigger.onBattleEnd(data);
   private handleShowDialog = (data: { text: string; onComplete: () => void }) => {
@@ -154,6 +156,8 @@ export class ExplorationScene implements Scene {
     }
     const { mapData, tilemap, collisionMap, npcs } = result;
     this.currentMapData = mapData;
+    this.npcs = npcs;
+    this.collisionMap = collisionMap;
     
     // Play map music
     const musicTrack = mapData.music ?? 'overworld';
@@ -248,6 +252,11 @@ export class ExplorationScene implements Scene {
 
     const wasMoving = this.player.isMoving;
     this.player.update(dt);
+    // Update wandering NPCs
+    for (const npc of this.npcs) {
+      npc.update(dt, (x, y) => this.isNPCWalkable(x, y, npc));
+    }
+    this.player.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     // Track player position in game for save/load
     this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
     const npc = this.npcInteraction.checkInteraction();
@@ -304,6 +313,16 @@ export class ExplorationScene implements Scene {
       }
     }
     this.camera.update();
+  }
+
+  /** Check if a tile is walkable for NPC wandering (collision + no other NPC + not player) */
+  private isNPCWalkable(x: number, y: number, self: NPC): boolean {
+    if (!this.collisionMap || !this.collisionMap.isWalkable(x, y)) return false;
+    if (this.player && this.player.gridX === x && this.player.gridY === y) return false;
+    for (const npc of this.npcs) {
+      if (npc !== self && npc.tileX === x && npc.tileY === y) return false;
+    }
+    return true;
   }
 
   /** Handle NPC post-dialog actions (shop, class upgrade) */
