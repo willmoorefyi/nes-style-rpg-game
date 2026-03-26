@@ -506,9 +506,8 @@ export class BattleScene implements Scene {
       this.commandArrow = null;
     }
     this.flashTimer = 0;
-    for (const sprite of this.partySprites) {
-      sprite.alpha = 1.0;
-    }
+    // Restore alphas but respect dead member dimming
+    this.updatePartySprites();
     this.clearTargetArrow();
   }
 
