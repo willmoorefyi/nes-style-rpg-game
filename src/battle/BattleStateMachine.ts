@@ -55,12 +55,19 @@ export interface DamageEvent {
   spellElement?: string;
 }
 
+export interface QueuedAction {
+  combatantId: string;
+  command: BattleCommand;
+  isEnemy: boolean;
+}
+
 export class BattleStateMachine {
   private _state: BattleState = 'intro';
   private party: Character[];
   private enemies: EnemyInstance[];
   private commands: BattleCommand[] = [];
   private _damageEvents: DamageEvent[] = [];
+  private _actionQueue: QueuedAction[] = [];
   private currentActorIndex = 0;
   private messages: BattleMessage[] = [];
   private result: BattleResult | null = null;
@@ -169,7 +176,9 @@ export class BattleStateMachine {
     return true;
   }
 
-  executeRound(): void {
+  get actionQueueLength(): number { return this._actionQueue.length; }
+
+  prepareRound(): void {
     if (this._state !== 'execution') return;
     this.messages = [];
     this.turnNumber++;
@@ -204,19 +213,89 @@ export class BattleStateMachine {
     ];
     const turnOrder = sortByAgility(combatants, this.rng);
 
-    // Execute in turn order
+    // Build action queue from sorted combatants
+    this._actionQueue = [];
     for (const combatant of turnOrder) {
       const cmd = this.commands.find(c => c.actorId === combatant.id);
       if (!cmd) continue;
-      
-      // Tick status effects at start of turn
-      const canAct = this.tickCombatantStatus(combatant.id, combatant.isEnemy);
-      if (!canAct) continue;
-      
-      this.executeCommand(cmd, combatant.isEnemy);
+      this._actionQueue.push({ combatantId: combatant.id, command: cmd, isEnemy: combatant.isEnemy });
     }
 
-    this._state = 'resolution';
+    this._state = 'execution';
+  }
+
+  executeNextAction(): { done: boolean; messages: BattleMessage[]; damageEvents: DamageEvent[] } {
+    if (this._actionQueue.length === 0) {
+      return { done: true, messages: [], damageEvents: [] };
+    }
+
+    const action = this._actionQueue.shift()!;
+    this.messages = [];
+    this._damageEvents = [];
+
+    // Tick status effects at start of turn
+    const canAct = this.tickCombatantStatus(action.combatantId, action.isEnemy);
+    if (canAct) {
+      this.executeCommand(action.command, action.isEnemy);
+    }
+
+    const done = this._actionQueue.length === 0;
+    if (done) {
+      this._state = 'resolution';
+    }
+
+    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents] };
+  }
+
+  peekNextAction(): { actorName: string; actionType: string; targetName?: string; spellName?: string } | null {
+    if (this._actionQueue.length === 0) return null;
+    const action = this._actionQueue[0];
+    const cmd = action.command;
+
+    let actorName: string;
+    if (action.isEnemy) {
+      const enemy = this.enemies.find(e => e.id === action.combatantId);
+      actorName = enemy?.data.name ?? 'Unknown';
+    } else {
+      const char = this.getPartyMember(action.combatantId);
+      actorName = char?.name ?? 'Unknown';
+    }
+
+    const result: { actorName: string; actionType: string; targetName?: string; spellName?: string } = {
+      actorName,
+      actionType: cmd.type,
+    };
+
+    if (cmd.targetId) {
+      const targetEnemy = this.enemies.find(e => e.id === cmd.targetId);
+      if (targetEnemy) {
+        result.targetName = targetEnemy.data.name;
+      } else {
+        const targetChar = this.getPartyMember(cmd.targetId);
+        if (targetChar) result.targetName = targetChar.name;
+      }
+    }
+
+    if (cmd.spellId) {
+      result.spellName = cmd.spellId;
+    }
+
+    return result;
+  }
+
+  executeRound(): void {
+    if (this._state !== 'execution') return;
+    this.prepareRound();
+    // Capture any phase transition messages from prepareRound
+    const allMessages: BattleMessage[] = [...this.messages];
+    const allDamageEvents: DamageEvent[] = [];
+    while (this._actionQueue.length > 0) {
+      const result = this.executeNextAction();
+      allMessages.push(...result.messages);
+      allDamageEvents.push(...result.damageEvents);
+    }
+    this.messages = allMessages;
+    this._damageEvents = allDamageEvents;
   }
 
   private tickCombatantStatus(id: string, isEnemy: boolean): boolean {
