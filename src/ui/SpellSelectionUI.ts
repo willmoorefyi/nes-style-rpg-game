@@ -22,29 +22,18 @@ export interface SpellSelectionConfig {
   eventBus?: EventBus;
   onSelect: (result: SpellSelectionResult) => void;
   onCancel: () => void;
+  onNeedTarget?: (spellId: string, targetType: 'single' | 'single_ally' | 'all' | 'all_allies' | 'self') => void;
 }
 
-type SpellUIState = 'level' | 'spell' | 'target';
+type SpellUIState = 'level' | 'spell';
 
 export class SpellSelectionUI extends Container {
   private config: SpellSelectionConfig;
   private state: SpellUIState = 'level';
   private levelMenu: Menu | null = null;
   private spellMenu: Menu | null = null;
-  private targetMenu: Menu | null = null;
   private currentLevel = 0;
   private selectedSpellId: string | null = null;
-
-  /** Whether the UI is currently in target selection mode */
-  get isTargeting(): boolean { return this.state === 'target' && this.targetMenu !== null; }
-  /** Index of the currently highlighted target, or -1 */
-  get targetIndex(): number { return this.targetMenu?.selectedIndex ?? -1; }
-  /** Whether the current target is a party member (vs enemy) */
-  get isTargetingParty(): boolean {
-    if (!this.selectedSpellId || !this.config.spells) return false;
-    const spell = this.config.spells.find(s => s.id === this.selectedSpellId);
-    return spell?.targeting === 'single_ally';
-  }
 
   constructor(config: SpellSelectionConfig) {
     super();
@@ -104,14 +93,18 @@ export class SpellSelectionUI extends Container {
       onSelect: (item) => {
         this.selectedSpellId = item.value;
         const spell = spells.find(s => s.id === item.value);
-        if (spell?.targeting === 'all' || spell?.targeting === 'all_allies') {
+        const targeting = spell?.targeting ?? 'single';
+
+        if (targeting === 'all' || targeting === 'all_allies') {
           this.submitResult(undefined);
-        } else if (spell?.targeting === 'self') {
+        } else if (targeting === 'self') {
           this.submitResult(this.config.actorId);
-        } else if (spell?.targeting === 'single_ally') {
-          this.showPartyTargetMenu();
+        } else if (this.config.onNeedTarget) {
+          // Delegate target selection to the caller (field targeting)
+          this.config.onNeedTarget(item.value, targeting);
         } else {
-          this.showEnemyTargetMenu();
+          // Fallback: auto-submit without target
+          this.submitResult(undefined);
         }
       },
       onCancel: () => {
@@ -133,45 +126,6 @@ export class SpellSelectionUI extends Container {
     if (this.levelMenu) this.levelMenu.visible = true;
   }
 
-  private showEnemyTargetMenu(): void {
-    const { enemies, contentX, contentY, eventBus } = this.config;
-    const items: MenuItem[] = enemies.map(e => ({ label: e.name, value: e.id }));
-    this.createTargetMenu(items, contentX, contentY, eventBus);
-  }
-
-  private showPartyTargetMenu(): void {
-    const { partyMembers, contentX, contentY, eventBus } = this.config;
-    const spell = this.config.spells.find(s => s.id === this.selectedSpellId);
-    const filtered = partyMembers.filter(m => spell?.effect === 'revive' ? m.hp <= 0 : m.hp > 0);
-    const items: MenuItem[] = filtered.map(c => ({ label: c.name, value: c.id }));
-    this.createTargetMenu(items, contentX, contentY, eventBus);
-  }
-
-  private createTargetMenu(items: MenuItem[], x: number, y: number, eventBus?: EventBus): void {
-    this.targetMenu = new Menu({
-      items,
-      x,
-      y,
-      onSelect: (item) => this.submitResult(item.value),
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.state = 'spell';
-      },
-      eventBus,
-    });
-    this.addChild(this.targetMenu);
-    if (this.spellMenu) this.spellMenu.visible = false;
-    this.state = 'target';
-  }
-
-  private hideTargetMenu(): void {
-    if (this.targetMenu) {
-      this.removeChild(this.targetMenu);
-      this.targetMenu = null;
-    }
-    if (this.spellMenu) this.spellMenu.visible = true;
-  }
-
   private submitResult(targetId: string | undefined): void {
     if (this.selectedSpellId) {
       this.config.onSelect({ spellId: this.selectedSpellId, targetId });
@@ -180,10 +134,8 @@ export class SpellSelectionUI extends Container {
   }
 
   private cleanup(): void {
-    if (this.targetMenu) this.removeChild(this.targetMenu);
     if (this.spellMenu) this.removeChild(this.spellMenu);
     if (this.levelMenu) this.removeChild(this.levelMenu);
-    this.targetMenu = null;
     this.spellMenu = null;
     this.levelMenu = null;
   }
@@ -195,9 +147,6 @@ export class SpellSelectionUI extends Container {
         break;
       case 'spell':
         this.spellMenu?.update(input);
-        break;
-      case 'target':
-        this.targetMenu?.update(input);
         break;
     }
   }

@@ -58,7 +58,6 @@ export class BattleScene implements Scene {
   private commandWindow!: Window;
   private messageWindow!: Window;
   private commandMenu!: Menu;
-  private targetMenu!: Menu | null;
   private spellUI: SpellSelectionUI | null = null;
   private itemUI: ItemSelectionUI | null = null;
   private spells: SpellData[] = [];
@@ -84,6 +83,11 @@ export class BattleScene implements Scene {
   private animTargetX: number = 0;
   private animMessages: { text: string }[] = [];
   private animMessageIndex: number = 0;
+  private fieldTargetIndex: number = 0;
+  private fieldTargetIsParty: boolean = false;
+  private fieldTargetCallback: ((targetId: string) => void) | null = null;
+  private fieldTargetCancelCallback: (() => void) | null = null;
+  private fieldTargetRevive: boolean = false;
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -252,41 +256,18 @@ export class BattleScene implements Scene {
         break;
 
       case 'target':
-        if (this.targetMenu) {
-          const idx = this.targetMenu.selectedIndex;
-          this.targetMenu.update(this.deps.input);
-          if (this.targetMenu) {
-            this.updateTargetArrow([], false, idx);
-          } else {
-            this.clearTargetArrow();
-          }
-        }
+        this.updateFieldTargeting();
         break;
 
       case 'spell_ui':
         if (this.spellUI) {
-          const wasTargeting = this.spellUI.isTargeting;
-          const tgtParty = this.spellUI.isTargetingParty;
-          const tgtIdx = this.spellUI.targetIndex;
           this.spellUI.update(this.deps.input);
-          if (this.spellUI && wasTargeting && this.spellUI.isTargeting) {
-            this.updateTargetArrow([], tgtParty, tgtIdx);
-          } else {
-            this.clearTargetArrow();
-          }
         }
         break;
 
       case 'item_ui':
         if (this.itemUI) {
-          const wasTargeting = this.itemUI.isTargeting;
-          const tgtIdx = this.itemUI.targetIndex;
           this.itemUI.update(this.deps.input);
-          if (this.itemUI && wasTargeting && this.itemUI.isTargeting) {
-            this.updateTargetArrow([], true, tgtIdx);
-          } else {
-            this.clearTargetArrow();
-          }
         }
         break;
 
@@ -399,6 +380,25 @@ export class BattleScene implements Scene {
         this.cleanupSpellUI();
         this.uiState = 'command';
       },
+      onNeedTarget: (spellId, targetType) => {
+        const isParty = targetType === 'single_ally';
+        const spell = this.spells.find(s => s.id === spellId);
+        const revive = spell?.effect === 'revive';
+        this.enterFieldTargeting(isParty, revive, (targetId) => {
+          this.deps.events.emit('spellCast', {});
+          this.battle.submitCommand({
+            type: 'magic',
+            actorId,
+            targetId,
+            spellId,
+          });
+          this.cleanupSpellUI();
+          this.startCommandPhase();
+        }, () => {
+          // Return to spell UI
+          this.uiState = 'spell_ui';
+        });
+      },
     });
     this.commandWindow.addChild(this.spellUI);
     this.commandMenu.visible = false;
@@ -440,6 +440,16 @@ export class BattleScene implements Scene {
         this.cleanupItemUI();
         this.uiState = 'command';
       },
+      onNeedTarget: (itemId) => {
+        this.enterFieldTargeting(true, false, (targetId) => {
+          this.battle.submitCommand(createItemCommand(actorId, targetId, itemId));
+          this.cleanupItemUI();
+          this.startCommandPhase();
+        }, () => {
+          // Return to item UI
+          this.uiState = 'item_ui';
+        });
+      },
     });
 
     // Check if there are no consumables
@@ -467,37 +477,77 @@ export class BattleScene implements Scene {
 
   private showTargetMenu(): void {
     const actorId = this.battle.currentCommandActorId!;
-    const enemies = this.battle.livingEnemies;
-    const items: MenuItem[] = enemies.map(e => ({ label: e.displayName, value: e.id }));
-
-    if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
-
-    this.targetMenu = new Menu({
-      items,
-      x: this.commandWindow.contentX,
-      y: this.commandWindow.contentY,
-      onSelect: (item) => {
-        this.battle.submitCommand({ type: 'fight', actorId, targetId: item.value });
-        this.hideTargetMenu();
-        this.startCommandPhase();
-      },
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.uiState = 'command';
-      },
-      eventBus: this.deps.events,
+    this.enterFieldTargeting(false, false, (targetId) => {
+      this.battle.submitCommand({ type: 'fight', actorId, targetId });
+      this.commandMenu.visible = true;
+      this.startCommandPhase();
+    }, () => {
+      this.commandMenu.visible = true;
+      this.uiState = 'command';
     });
-    this.commandWindow.addChild(this.targetMenu);
     this.commandMenu.visible = false;
-    this.uiState = 'target';
   }
 
-  private hideTargetMenu(): void {
-    if (this.targetMenu) {
-      this.commandWindow.removeChild(this.targetMenu);
-      this.targetMenu = null;
+  private enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void): void {
+    this.fieldTargetIsParty = isParty;
+    this.fieldTargetRevive = revive;
+    this.fieldTargetCallback = onConfirm;
+    this.fieldTargetCancelCallback = onCancel;
+    this.fieldTargetIndex = 0;
+
+    const targets = this.getFieldTargets();
+    if (targets.length === 0) {
+      onCancel();
+      return;
     }
-    this.commandMenu.visible = true;
+
+    this.uiState = 'target';
+    this.updateTargetArrow([], isParty, 0);
+  }
+
+  private getFieldTargets(): Array<{ id: string; spriteIndex: number }> {
+    if (this.fieldTargetIsParty) {
+      const party = this.battle.allParty;
+      return party
+        .map((c, i) => ({ id: `party_${i}`, hp: c.currentHp, spriteIndex: i }))
+        .filter(t => this.fieldTargetRevive ? t.hp <= 0 : t.hp > 0);
+    }
+    const allEnemies = this.battle.allEnemies;
+    return this.battle.livingEnemies.map(e => ({
+      id: e.id,
+      spriteIndex: allEnemies.indexOf(e),
+    }));
+  }
+
+  private updateFieldTargeting(): void {
+    const input = this.deps.input;
+    const targets = this.getFieldTargets();
+    if (targets.length === 0) {
+      this.fieldTargetCancelCallback?.();
+      this.clearTargetArrow();
+      return;
+    }
+
+    if (input.isJustPressed('up')) {
+      this.fieldTargetIndex = (this.fieldTargetIndex - 1 + targets.length) % targets.length;
+      this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
+    } else if (input.isJustPressed('down')) {
+      this.fieldTargetIndex = (this.fieldTargetIndex + 1) % targets.length;
+      this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
+    } else if (input.isJustPressed('confirm')) {
+      const target = targets[this.fieldTargetIndex];
+      if (target) {
+        this.clearTargetArrow();
+        this.fieldTargetCallback?.(target.id);
+        this.fieldTargetCallback = null;
+        this.fieldTargetCancelCallback = null;
+      }
+    } else if (input.isJustPressed('cancel')) {
+      this.clearTargetArrow();
+      this.fieldTargetCancelCallback?.();
+      this.fieldTargetCallback = null;
+      this.fieldTargetCancelCallback = null;
+    }
   }
 
   private clearCommandIndicator(): void {
@@ -515,35 +565,18 @@ export class BattleScene implements Scene {
   private updateTargetArrow(_ids: string[], isParty: boolean, selectedIndex: number): void {
     this.clearTargetArrow();
     if (selectedIndex < 0) return;
+    const targets = this.getFieldTargets();
+    const target = targets[selectedIndex];
+    if (!target) return;
     const sprites = isParty ? this.partySprites : this.enemySprites;
-    // Map the menu index to the sprite index
-    if (isParty) {
-      // Party menu items are living party members; sprites are indexed by party position
-      const living = this.battle.allParty.filter(c => c.currentHp > 0);
-      const char = living[selectedIndex];
-      if (!char) return;
-      const spriteIdx = this.battle.allParty.indexOf(char);
-      if (spriteIdx < 0 || spriteIdx >= sprites.length) return;
-      const sprite = sprites[spriteIdx];
-      const arrow = new Graphics();
-      arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
-      arrow.position.set(sprite.x + 24, sprite.y - 20);
-      this.container.addChild(arrow);
-      this.targetArrow = arrow;
-    } else {
-      // Enemy menu items map to living enemies
-      const living = this.battle.livingEnemies;
-      const enemy = living[selectedIndex];
-      if (!enemy) return;
-      const spriteIdx = this.battle.allEnemies.indexOf(enemy);
-      if (spriteIdx < 0 || spriteIdx >= sprites.length) return;
-      const sprite = sprites[spriteIdx];
-      const arrow = new Graphics();
-      arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
-      arrow.position.set(sprite.x + 40, sprite.y - 20);
-      this.container.addChild(arrow);
-      this.targetArrow = arrow;
-    }
+    const sprite = sprites[target.spriteIndex];
+    if (!sprite) return;
+    const arrow = new Graphics();
+    arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
+    const offsetX = isParty ? 24 : 40;
+    arrow.position.set(sprite.x + offsetX, sprite.y - 20);
+    this.container.addChild(arrow);
+    this.targetArrow = arrow;
   }
 
   private clearTargetArrow(): void {
@@ -828,7 +861,6 @@ export class BattleScene implements Scene {
   exit(): void {
     this.container.removeChildren();
     // Null out UI references for GC
-    this.targetMenu = null;
     this.spellUI = null;
     this.itemUI = null;
     this.commandArrow = null;

@@ -18,23 +18,12 @@ export interface ItemSelectionConfig {
   eventBus?: EventBus;
   onSelect: (result: ItemSelectionResult) => void;
   onCancel: () => void;
+  onNeedTarget?: (itemId: string) => void;
 }
-
-type ItemUIState = 'item' | 'target';
 
 export class ItemSelectionUI extends Container {
   private config: ItemSelectionConfig;
-  private state: ItemUIState = 'item';
   private itemMenu: Menu | null = null;
-  private targetMenu: Menu | null = null;
-  private selectedItemId: string | null = null;
-
-  /** Whether the UI is currently in target selection mode */
-  get isTargeting(): boolean { return this.state === 'target' && this.targetMenu !== null; }
-  /** Index of the currently highlighted target, or -1 */
-  get targetIndex(): number { return this.targetMenu?.selectedIndex ?? -1; }
-  /** Items always target party members */
-  get isTargetingParty(): boolean { return true; }
 
   constructor(config: ItemSelectionConfig) {
     super();
@@ -65,8 +54,13 @@ export class ItemSelectionUI extends Container {
       y: contentY,
       maxVisible: 4,
       onSelect: (item) => {
-        this.selectedItemId = item.value;
-        this.showTargetMenu();
+        if (this.config.onNeedTarget) {
+          this.config.onNeedTarget(item.value);
+        } else {
+          // Fallback: no target
+          this.config.onSelect({ itemId: item.value, targetName: '' });
+          this.cleanup();
+        }
       },
       onCancel: () => {
         this.cleanup();
@@ -75,60 +69,15 @@ export class ItemSelectionUI extends Container {
       eventBus,
     });
     this.addChild(this.itemMenu);
-    this.state = 'item';
-  }
-
-  private showTargetMenu(): void {
-    const { partyMembers, contentX, contentY, eventBus } = this.config;
-    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.id }));
-
-    this.targetMenu = new Menu({
-      items,
-      x: contentX,
-      y: contentY,
-      onSelect: (item) => this.submitResult(item.value),
-      onCancel: () => {
-        this.hideTargetMenu();
-        this.state = 'item';
-      },
-      eventBus,
-    });
-    this.addChild(this.targetMenu);
-    if (this.itemMenu) this.itemMenu.visible = false;
-    this.state = 'target';
-  }
-
-  private hideTargetMenu(): void {
-    if (this.targetMenu) {
-      this.removeChild(this.targetMenu);
-      this.targetMenu = null;
-    }
-    if (this.itemMenu) this.itemMenu.visible = true;
-  }
-
-  private submitResult(targetName: string): void {
-    if (this.selectedItemId) {
-      this.config.onSelect({ itemId: this.selectedItemId, targetName });
-    }
-    this.cleanup();
   }
 
   private cleanup(): void {
-    if (this.targetMenu) this.removeChild(this.targetMenu);
     if (this.itemMenu) this.removeChild(this.itemMenu);
-    this.targetMenu = null;
     this.itemMenu = null;
   }
 
   update(input: InputManager): void {
-    switch (this.state) {
-      case 'item':
-        this.itemMenu?.update(input);
-        break;
-      case 'target':
-        this.targetMenu?.update(input);
-        break;
-    }
+    this.itemMenu?.update(input);
   }
 
   hasNoItems(): boolean {
