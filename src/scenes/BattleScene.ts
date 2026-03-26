@@ -75,6 +75,7 @@ export class BattleScene implements Scene {
   private dyingEnemies: Map<number, number> = new Map();
   private spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
   private commandArrow: Graphics | null = null;
+  private targetArrow: Graphics | null = null;
   private flashTimer: number = 0;
   private animPhase: 'announce' | 'step_forward' | 'execute' | 'result' | 'step_back' = 'announce';
   private animTimer: number = 0;
@@ -236,15 +237,42 @@ export class BattleScene implements Scene {
         break;
 
       case 'target':
-        if (this.targetMenu) this.targetMenu.update(this.deps.input);
+        if (this.targetMenu) {
+          const idx = this.targetMenu.selectedIndex;
+          this.targetMenu.update(this.deps.input);
+          if (this.targetMenu) {
+            this.updateTargetArrow([], false, idx);
+          } else {
+            this.clearTargetArrow();
+          }
+        }
         break;
 
       case 'spell_ui':
-        if (this.spellUI) this.spellUI.update(this.deps.input);
+        if (this.spellUI) {
+          const wasTargeting = this.spellUI.isTargeting;
+          const tgtParty = this.spellUI.isTargetingParty;
+          const tgtIdx = this.spellUI.targetIndex;
+          this.spellUI.update(this.deps.input);
+          if (this.spellUI && wasTargeting && this.spellUI.isTargeting) {
+            this.updateTargetArrow([], tgtParty, tgtIdx);
+          } else {
+            this.clearTargetArrow();
+          }
+        }
         break;
 
       case 'item_ui':
-        if (this.itemUI) this.itemUI.update(this.deps.input);
+        if (this.itemUI) {
+          const wasTargeting = this.itemUI.isTargeting;
+          const tgtIdx = this.itemUI.targetIndex;
+          this.itemUI.update(this.deps.input);
+          if (this.itemUI && wasTargeting && this.itemUI.isTargeting) {
+            this.updateTargetArrow([], true, tgtIdx);
+          } else {
+            this.clearTargetArrow();
+          }
+        }
         break;
 
       case 'executing':
@@ -465,9 +493,51 @@ export class BattleScene implements Scene {
       this.commandArrow = null;
     }
     this.flashTimer = 0;
-    // Reset all party sprite alphas
     for (const sprite of this.partySprites) {
       sprite.alpha = 1.0;
+    }
+    this.clearTargetArrow();
+  }
+
+  /** Show/update an arrow above the currently highlighted target sprite */
+  private updateTargetArrow(_ids: string[], isParty: boolean, selectedIndex: number): void {
+    this.clearTargetArrow();
+    if (selectedIndex < 0) return;
+    const sprites = isParty ? this.partySprites : this.enemySprites;
+    // Map the menu index to the sprite index
+    if (isParty) {
+      // Party menu items are living party members; sprites are indexed by party position
+      const living = this.battle.allParty.filter(c => c.currentHp > 0);
+      const char = living[selectedIndex];
+      if (!char) return;
+      const spriteIdx = this.battle.allParty.indexOf(char);
+      if (spriteIdx < 0 || spriteIdx >= sprites.length) return;
+      const sprite = sprites[spriteIdx];
+      const arrow = new Graphics();
+      arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
+      arrow.position.set(sprite.x + 24, sprite.y - 20);
+      this.container.addChild(arrow);
+      this.targetArrow = arrow;
+    } else {
+      // Enemy menu items map to living enemies
+      const living = this.battle.livingEnemies;
+      const enemy = living[selectedIndex];
+      if (!enemy) return;
+      const spriteIdx = this.battle.allEnemies.indexOf(enemy);
+      if (spriteIdx < 0 || spriteIdx >= sprites.length) return;
+      const sprite = sprites[spriteIdx];
+      const arrow = new Graphics();
+      arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
+      arrow.position.set(sprite.x + 40, sprite.y - 20);
+      this.container.addChild(arrow);
+      this.targetArrow = arrow;
+    }
+  }
+
+  private clearTargetArrow(): void {
+    if (this.targetArrow) {
+      this.container.removeChild(this.targetArrow);
+      this.targetArrow = null;
     }
   }
 

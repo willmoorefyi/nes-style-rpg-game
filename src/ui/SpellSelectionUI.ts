@@ -35,6 +35,17 @@ export class SpellSelectionUI extends Container {
   private currentLevel = 0;
   private selectedSpellId: string | null = null;
 
+  /** Whether the UI is currently in target selection mode */
+  get isTargeting(): boolean { return this.state === 'target' && this.targetMenu !== null; }
+  /** Index of the currently highlighted target, or -1 */
+  get targetIndex(): number { return this.targetMenu?.selectedIndex ?? -1; }
+  /** Whether the current target is a party member (vs enemy) */
+  get isTargetingParty(): boolean {
+    if (!this.selectedSpellId || !this.config.spells) return false;
+    const spell = this.config.spells.find(s => s.id === this.selectedSpellId);
+    return spell?.targeting === 'single_ally';
+  }
+
   constructor(config: SpellSelectionConfig) {
     super();
     this.config = config;

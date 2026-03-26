@@ -29,6 +29,13 @@ export class ItemSelectionUI extends Container {
   private targetMenu: Menu | null = null;
   private selectedItemId: string | null = null;
 
+  /** Whether the UI is currently in target selection mode */
+  get isTargeting(): boolean { return this.state === 'target' && this.targetMenu !== null; }
+  /** Index of the currently highlighted target, or -1 */
+  get targetIndex(): number { return this.targetMenu?.selectedIndex ?? -1; }
+  /** Items always target party members */
+  get isTargetingParty(): boolean { return true; }
+
   constructor(config: ItemSelectionConfig) {
     super();
     this.config = config;

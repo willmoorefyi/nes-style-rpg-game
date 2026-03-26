@@ -119,6 +119,7 @@ export class BattleStateMachine {
   get currentMessages(): BattleMessage[] { return this.messages; }
   get battleResult(): BattleResult | null { return this.result; }
   get livingParty(): Character[] { return this.party.filter(c => c.currentHp > 0); }
+  get allParty(): Character[] { return this.party; }
   get livingEnemies(): EnemyInstance[] { return this.enemies.filter(e => e.currentHp > 0); }
   get allEnemies(): EnemyInstance[] { return this.enemies; }
   get currentCommandActor(): Character | null {
