@@ -1,0 +1,44 @@
+# Debug battle scenarios for testing.
+# Loaded by DebugScenarioLoader when selecting Debug from the title screen (dev mode only).
+#
+# To add a new scenario:
+# 1. Add a new entry with a unique id
+# 2. Define party members with class, name, level, equipment, and spells
+# 3. Define items and gold
+# 4. Define enemies (IDs from enemies.yaml)
+# 5. The scenario will appear in the debug menu automatically
+
+- id: basic_battle
+  name: Basic Battle
+  party:
+    - class: warrior
+      name: FGHTR
+      level: 3
+      equipment: [rapier, chain_mail, wooden_shield, cap]
+      spells: []
+    - class: thief
+      name: THIEF
+      level: 3
+      equipment: [short_sword, leather_armor, cap]
+      spells: []
+    - class: white_mage
+      name: W.MAG
+      level: 3
+      equipment: [staff, robe]
+      spells:
+        - { id: cure, level: 1 }
+        - { id: harm, level: 1 }
+        - { id: lamp, level: 2 }
+    - class: black_mage
+      name: B.MAG
+      level: 3
+      equipment: [staff, robe]
+      spells:
+        - { id: fire, level: 1 }
+        - { id: slep, level: 1 }
+        - { id: ice, level: 2 }
+  items:
+    potion: 5
+    antidote: 3
+  gold: 200
+  enemies: [skeleton, goblin, goblin, wolf, pirate]

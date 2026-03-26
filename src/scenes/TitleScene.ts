@@ -4,6 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { SaveManager } from '../systems/SaveManager.js';
+import { DebugScenarioLoader } from '../systems/DebugScenarioLoader.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
@@ -46,11 +47,13 @@ export class TitleScene implements Scene {
     // Menu window
     const hasSaves = SaveManager.getSaveSlots().some((s) => s !== null);
     const menuWindow = new Window({ x: 760, y: 550, width: 400, height: 200 });
-    this.menu = new Menu({
-      items: [
+    const menuItems = [
         { label: 'New Game', value: 'new' },
         { label: 'Continue', value: 'continue', enabled: hasSaves },
-      ],
+        ...(import.meta.env.DEV ? [{ label: 'Debug', value: 'debug' }] : []),
+      ];
+    this.menu = new Menu({
+      items: menuItems,
       x: menuWindow.contentX,
       y: menuWindow.contentY,
       lineHeight: 48,
@@ -72,6 +75,13 @@ export class TitleScene implements Scene {
       this.game.scenes.switchTo('partyCreation');
     } else if (value === 'continue') {
       this.game.scenes.push('loadMenu');
+    } else if (value === 'debug') {
+      const loader = new DebugScenarioLoader(this.game);
+      loader.loadScenarios().then(scenarios => {
+        if (scenarios.length > 0) {
+          loader.applyAndBattle(scenarios[0]);
+        }
+      });
     }
   }
 
