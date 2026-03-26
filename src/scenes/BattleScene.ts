@@ -13,7 +13,7 @@ import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, FONT_SIZE_SM, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 const ENEMY_COLORS: Record<string, number> = {
   goblin: 0x228b22,    // green
@@ -89,6 +89,15 @@ export class BattleScene implements Scene {
   private fieldTargetCancelCallback: (() => void) | null = null;
   private fieldTargetRevive: boolean = false;
 
+  // K2: Character status boxes behind party sprites
+  private statusBoxes: Window[] = [];
+  // K3: Enemy list texts in partyWindow
+  private enemyListTexts: BitmapText[] = [];
+  // K4: Turn list in commandWindow during execution
+  private turnListContainer = new Container();
+  private turnListTexts: BitmapText[] = [];
+  private turnActionIndex: number = 0;
+
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
     this.config = config;
@@ -130,6 +139,8 @@ export class BattleScene implements Scene {
     this.commandWindow = new Window({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
     this.container.addChild(this.commandWindow);
     this.createCommandMenu();
+    this.turnListContainer.visible = false;
+    this.commandWindow.addChild(this.turnListContainer);
 
     // Message window — full width, top
     this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: 120 });
@@ -181,26 +192,66 @@ export class BattleScene implements Scene {
     const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
     const yPositions = [250, 380, 510, 640];
     for (let i = 0; i < this.config.party.length; i++) {
+      const char = this.config.party[i];
+      const yPos = yPositions[i];
+
+      // K2: Status box behind each party sprite
+      const box = new Window({ x: 1500 + 80, y: yPos, width: 280, height: 100 });
+      const nameText = new BitmapText({
+        text: char.name,
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
+      });
+      nameText.position.set(box.contentX, box.contentY);
+      box.addChild(nameText);
+
+      const statusText = new BitmapText({
+        text: '',
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffff44 },
+      });
+      statusText.position.set(box.contentX, box.contentY + 22);
+      box.addChild(statusText);
+
+      const hpText = new BitmapText({
+        text: `${char.currentHp}/${char.maxHp}`,
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
+      });
+      hpText.position.set(box.contentX, box.contentY + 44);
+      box.addChild(hpText);
+
+      this.container.addChild(box);
+      this.statusBoxes.push(box);
+
+      // Party sprite
       const g = new Graphics();
       g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
-      g.position.set(1500, yPositions[i]);
+      g.position.set(1500, yPos);
       this.container.addChild(g);
       this.partySprites.push(g);
     }
   }
 
   private updatePartyDisplay(): void {
-    const toRemove = this.partyWindow.children.filter(c => c instanceof BitmapText);
-    toRemove.forEach(c => this.partyWindow.removeChild(c));
+    // K3: partyWindow now shows enemy list instead of party HP
+    this.updateEnemyList();
+  }
 
-    this.config.party.forEach((char, i) => {
+  private updateEnemyList(): void {
+    // Remove old enemy list texts
+    for (const t of this.enemyListTexts) this.partyWindow.removeChild(t);
+    this.enemyListTexts = [];
+
+    const enemies = this.battle.allEnemies;
+    for (let i = 0; i < enemies.length; i++) {
+      const e = enemies[i];
       const text = new BitmapText({
-        text: `${char.name.slice(0, 6).padEnd(6)} ${char.currentHp}/${char.maxHp}`,
+        text: `${e.displayName}  ${e.currentHp}/${e.data.stats.hp}`,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
+      if (e.currentHp <= 0) text.tint = 0x888888;
       text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * (FONT_SIZE + 12));
       this.partyWindow.addChild(text);
-    });
+      this.enemyListTexts.push(text);
+    }
   }
 
   private updatePartySprites(): void {
@@ -215,7 +266,22 @@ export class BattleScene implements Scene {
         sprite.alpha = 1.0;
         sprite.tint = 0xffffff;
       }
+
+      // K2: Update status box texts
+      const box = this.statusBoxes[i];
+      if (box) {
+        const texts = box.children.filter(c => c instanceof BitmapText) as BitmapText[];
+        // texts[0]=name, texts[1]=status, texts[2]=hp
+        if (texts[1]) {
+          const statuses = party[i].statusTracker.getAll().map(s => s.effect);
+          texts[1].text = statuses.join(' ');
+        }
+        if (texts[2]) {
+          texts[2].text = `${party[i].currentHp}/${party[i].maxHp}`;
+        }
+      }
     }
+    this.updateEnemyList();
   }
 
   private updateEnemySprites(): void {
@@ -292,6 +358,8 @@ export class BattleScene implements Scene {
 
   private startCommandPhase(): void {
     this.clearCommandIndicator();
+    // K4: Hide turn list, show command menu
+    this.turnListContainer.visible = false;
     const actor = this.battle.currentCommandActor;
     if (!actor) {
       this.executeRound();
@@ -589,6 +657,11 @@ export class BattleScene implements Scene {
   private executeRound(): void {
     this.commandMenu.visible = false;
     this.battle.prepareRound();
+    // K4: Clear and show turn list
+    this.turnListContainer.removeChildren();
+    this.turnListTexts = [];
+    this.turnActionIndex = 0;
+    this.turnListContainer.visible = true;
     this.uiState = 'executing';
     this.animPhase = 'announce';
     this.animTimer = 0;
@@ -626,6 +699,15 @@ export class BattleScene implements Scene {
             return;
           }
           this.messageText.setText(this.formatAnnouncement(info), true);
+          // K4: Add entry to turn list
+          const entry = new BitmapText({
+            text: `${info.actorName}: ${info.actionType}`,
+            style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
+          });
+          entry.position.set(this.commandWindow.contentX, this.commandWindow.contentY + this.turnListTexts.length * (FONT_SIZE_SM + 8));
+          this.turnListContainer.addChild(entry);
+          this.turnListTexts.push(entry);
+
           const found = this.findActorSprite(info.actorName);
           this.animActorSprite = found?.sprite ?? null;
           if (this.animActorSprite) {
@@ -697,6 +779,11 @@ export class BattleScene implements Scene {
         }
         if (this.animTimer >= 15) {
           if (this.animActorSprite) this.animActorSprite.x = this.animActorOrigX;
+          // K4: Gray out completed action
+          if (this.turnListTexts[this.turnActionIndex]) {
+            this.turnListTexts[this.turnActionIndex].tint = 0x888888;
+          }
+          this.turnActionIndex++;
           this.animTimer = 0;
           this.animActorSprite = null;
           if (this.battle.actionQueueLength > 0) {
