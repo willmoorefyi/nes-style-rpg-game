@@ -59,6 +59,8 @@ export interface EnemyData {
   bossPhases?: BossPhase[];
   /** Enemy family/race for spell targeting (e.g., 'undead' for HARM) */
   family?: string;
+  /** Size category for grid layout: small (1x1), large (2x2), boss (fills screen) */
+  size?: 'small' | 'large' | 'boss';
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';

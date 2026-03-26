@@ -83,6 +83,7 @@
   sprite: ogre
   weakness: lightning
   family: giant
+  size: large
 - id: troll
   name: Troll
   stats:
@@ -100,6 +101,7 @@
   sprite: troll
   weakness: fire
   family: giant
+  size: large
 - id: mummy
   name: Mummy
   stats:
@@ -171,6 +173,7 @@
   weakness: ice
   resist: fire
   family: dragon
+  size: large
 - id: garland
   name: Garland
   stats:
@@ -191,6 +194,7 @@
   - hpThreshold: 0.5
     patternId: aggressive
     message: Garland's attacks grow fiercer!
+  size: large
 - id: lich
   name: Lich
   stats:
@@ -213,3 +217,4 @@
     patternId: aggressive
     message: The Lich's form shifts!
   family: undead
+  size: boss
