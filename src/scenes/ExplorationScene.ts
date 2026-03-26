@@ -374,19 +374,69 @@ export class ExplorationScene implements Scene {
     this.worldContainer.addChild(this.transitionIndicators);
   }
 
-  private async executeTransition(transition: { targetMap: string; targetX: number; targetY: number }): Promise<void> {
+  private async executeTransition(transition: { x: number; y: number; targetMap: string; targetX: number; targetY: number }): Promise<void> {
     // Disembark vehicle on map transition — return to walking
     if (this.player && this.player.currentMode.id !== 'walking') {
       this.player.currentMode = this.walkingMode;
     }
-    // D3: Fade out → load map → fade in
-    await this.fadeOverlay.fadeOut(300);
-    await this.loadMap(transition.targetMap);
-    if (this.player) {
-      this.player.setPosition(transition.targetX, transition.targetY);
-      this.camera.update();
+
+    const isShopInterior = transition.targetMap.startsWith('cornelia-');
+
+    if (isShopInterior) {
+      // Zoom-into-door effect for shop interiors
+      await this.zoomTransition(transition.x, transition.y);
+      await this.loadMap(transition.targetMap);
+      if (this.player) {
+        this.player.setPosition(transition.targetX, transition.targetY);
+        this.camera.update();
+      }
+      await this.fadeOverlay.fadeIn(300);
+    } else {
+      // D3: Fade out → load map → fade in
+      await this.fadeOverlay.fadeOut(300);
+      await this.loadMap(transition.targetMap);
+      if (this.player) {
+        this.player.setPosition(transition.targetX, transition.targetY);
+        this.camera.update();
+      }
+      await this.fadeOverlay.fadeIn(300);
     }
-    await this.fadeOverlay.fadeIn(300);
+  }
+
+  /** Zoom-into-door animation: scale up worldContainer toward the door tile while fading out */
+  private async zoomTransition(doorTileX: number, doorTileY: number): Promise<void> {
+    this.paused = true;
+    const wc = this.worldContainer;
+    // Calculate the screen-center point to zoom toward (door pixel position)
+    const centerX = -wc.x + GAME_WIDTH / 2;
+    const centerY = -wc.y + GAME_HEIGHT / 2;
+    const doorX = doorTileX * TILE_SIZE + TILE_SIZE / 2;
+    const doorY = doorTileY * TILE_SIZE + TILE_SIZE / 2;
+    // Use midpoint between camera center and door as zoom focus
+    const focusX = (centerX + doorX) / 2;
+    const focusY = (centerY + doorY) / 2;
+    const origX = wc.x;
+    const origY = wc.y;
+    // Set pivot to focus point; adjust position to compensate
+    wc.pivot.set(focusX, focusY);
+    wc.position.set(origX + focusX, origY + focusY);
+
+    const frames = 24;
+    for (let i = 1; i <= frames; i++) {
+      const t = i / frames;
+      wc.scale.set(1 + t);
+      wc.alpha = 1 - t;
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
+    }
+
+    // Reset worldContainer transforms
+    wc.scale.set(1);
+    wc.alpha = 1;
+    wc.pivot.set(0, 0);
+    wc.position.set(origX, origY);
+    // Set fade overlay to black (as if fadeOut completed)
+    this.fadeOverlay.overlay.alpha = 1;
+    this.paused = false;
   }
 
   /** Find a scripted encounter at the given tile, checking flag prerequisites */
