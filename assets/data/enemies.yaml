@@ -31,6 +31,7 @@
   sprite: wolf
   weakness: fire
   resist: ice
+  family: were
 - id: skeleton
   name: Skeleton
   stats:
@@ -81,6 +82,7 @@
   goldReward: 80
   sprite: ogre
   weakness: lightning
+  family: giant
 - id: troll
   name: Troll
   stats:
@@ -97,6 +99,7 @@
   goldReward: 60
   sprite: troll
   weakness: fire
+  family: giant
 - id: mummy
   name: Mummy
   stats:
@@ -131,6 +134,7 @@
   goldReward: 70
   sprite: cockatrice
   weakness: ice
+  family: magical
 - id: vampire
   name: Vampire
   stats:
@@ -166,6 +170,7 @@
   sprite: dragon
   weakness: ice
   resist: fire
+  family: dragon
 - id: garland
   name: Garland
   stats:
