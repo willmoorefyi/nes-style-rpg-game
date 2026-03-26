@@ -74,6 +74,8 @@ export class BattleScene implements Scene {
   private floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
   private dyingEnemies: Map<number, number> = new Map();
   private spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
+  private commandArrow: Graphics | null = null;
+  private flashTimer: number = 0;
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -215,6 +217,15 @@ export class BattleScene implements Scene {
 
       case 'command':
         this.commandMenu.update(this.deps.input);
+        this.flashTimer++;
+        {
+          const id = this.battle.currentCommandActorId;
+          if (id) {
+            const idx = parseInt(id.split('_')[1]);
+            const sprite = this.partySprites[idx];
+            if (sprite) sprite.alpha = 0.5 + 0.5 * Math.sin(this.flashTimer * 0.15);
+          }
+        }
         break;
 
       case 'target':
@@ -245,11 +256,25 @@ export class BattleScene implements Scene {
   }
 
   private startCommandPhase(): void {
+    this.clearCommandIndicator();
     const actor = this.battle.currentCommandActor;
     if (!actor) {
       this.executeRound();
       return;
     }
+
+    // Create arrow indicator above the current actor's sprite
+    const id = this.battle.currentCommandActorId!;
+    const index = parseInt(id.split('_')[1]);
+    const sprite = this.partySprites[index];
+    if (sprite) {
+      const arrow = new Graphics();
+      arrow.moveTo(0, 0).lineTo(16, 0).lineTo(8, 16).lineTo(0, 0).fill(0xffffff);
+      arrow.position.set(sprite.x + (sprite.width - 16) / 2, sprite.y - 20);
+      this.container.addChild(arrow);
+      this.commandArrow = arrow;
+    }
+
     this.messageText.setText(`${actor.name}'s turn`, true);
     this.commandMenu.visible = true;
     this.commandMenu.setIndex(0);
@@ -261,10 +286,13 @@ export class BattleScene implements Scene {
     if (!actor) return;
 
     if (cmd === 'fight') {
+      this.clearCommandIndicator();
       this.showTargetMenu();
     } else if (cmd === 'magic') {
+      this.clearCommandIndicator();
       this.showSpellUI(actor);
     } else if (cmd === 'item') {
+      this.clearCommandIndicator();
       this.showItemUI(actor);
     } else if (cmd === 'run') {
       this.battle.submitCommand({ type: 'run', actorId: this.battle.currentCommandActorId! });
@@ -418,6 +446,18 @@ export class BattleScene implements Scene {
       this.targetMenu = null;
     }
     this.commandMenu.visible = true;
+  }
+
+  private clearCommandIndicator(): void {
+    if (this.commandArrow) {
+      this.container.removeChild(this.commandArrow);
+      this.commandArrow = null;
+    }
+    this.flashTimer = 0;
+    // Reset all party sprite alphas
+    for (const sprite of this.partySprites) {
+      sprite.alpha = 1.0;
+    }
   }
 
   private executeRound(): void {
@@ -584,5 +624,6 @@ export class BattleScene implements Scene {
     this.targetMenu = null;
     this.spellUI = null;
     this.itemUI = null;
+    this.commandArrow = null;
   }
 }
