@@ -71,6 +71,8 @@ export interface ItemData {
   price: number;
   usableBy: string[];
   slot?: EquipmentSlot;
+  /** Extra damage multiplier vs enemies with this family (e.g., 'undead' for Silver Sword) */
+  bonusVsFamily?: string;
 }
 
 export type ShopType = 'weapon' | 'armor' | 'item' | 'magic' | 'inn';

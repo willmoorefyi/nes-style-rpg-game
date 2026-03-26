@@ -320,6 +320,12 @@ export class BattleStateMachine {
       this.rng
     );
 
+    // Bonus damage vs enemy family (e.g., Silver Sword vs undead)
+    const weapon = actor.getEquipped('weapon');
+    if (result.hit && weapon?.bonusVsFamily && weapon.bonusVsFamily === target.data.family) {
+      result.damage = Math.floor(result.damage * 1.5);
+    }
+
     if (!result.hit) {
       this.messages.push({ text: `${actor.name} missed!` });
     } else {

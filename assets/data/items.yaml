@@ -1,319 +1,383 @@
-# ═══ WEAPONS — Starter Tier ═══
 - id: small_knife
   name: Small Knife
   type: weapon
-  stats: { attack: 5 }
+  stats:
+    attack: 5
   price: 5
-  usableBy: [warrior, thief, monk, white_mage, black_mage, red_mage]
-
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
 - id: wooden_nunchaku
   name: Wooden Nunchaku
   type: weapon
-  stats: { attack: 12 }
+  stats:
+    attack: 12
   price: 10
-  usableBy: [monk]
-
+  usableBy:
+  - monk
 - id: staff
   name: Staff
   type: weapon
-  stats: { attack: 6 }
+  stats:
+    attack: 6
   price: 5
-  usableBy: [white_mage, black_mage, red_mage, monk]
-
+  usableBy:
+  - white_mage
+  - black_mage
+  - red_mage
+  - monk
 - id: rapier
   name: Rapier
   type: weapon
-  stats: { attack: 9 }
+  stats:
+    attack: 9
   price: 10
-  usableBy: [warrior, thief, red_mage]
-
-# ═══ WEAPONS — Early Tier ═══
+  usableBy:
+  - warrior
+  - thief
+  - red_mage
 - id: short_sword
   name: Short Sword
   type: weapon
-  stats: { attack: 10 }
+  stats:
+    attack: 10
   price: 15
-  usableBy: [warrior, thief, red_mage]
-
+  usableBy:
+  - warrior
+  - thief
+  - red_mage
 - id: hammer
   name: Hammer
   type: weapon
-  stats: { attack: 9 }
+  stats:
+    attack: 9
   price: 10
-  usableBy: [warrior, white_mage]
-
+  usableBy:
+  - warrior
+  - white_mage
 - id: hand_axe
   name: Hand Axe
   type: weapon
-  stats: { attack: 16 }
+  stats:
+    attack: 16
   price: 550
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: iron_nunchaku
   name: Iron Nunchaku
   type: weapon
-  stats: { attack: 16 }
+  stats:
+    attack: 16
   price: 200
-  usableBy: [monk]
-
-# ═══ WEAPONS — Mid Tier ═══
+  usableBy:
+  - monk
 - id: iron_sword
   name: Iron Sword
   type: weapon
-  stats: { attack: 14 }
+  stats:
+    attack: 14
   price: 175
-  usableBy: [warrior, red_mage]
-
+  usableBy:
+  - warrior
+  - red_mage
 - id: mythril_sword
   name: Mythril Sword
   type: weapon
-  stats: { attack: 23 }
+  stats:
+    attack: 23
   price: 4000
-  usableBy: [warrior, red_mage]
-
+  usableBy:
+  - warrior
+  - red_mage
+  bonusVsFamily: undead
 - id: mythril_knife
   name: Mythril Knife
   type: weapon
-  stats: { attack: 15 }
+  stats:
+    attack: 15
   price: 800
-  usableBy: [thief, black_mage, red_mage]
-
+  usableBy:
+  - thief
+  - black_mage
+  - red_mage
+  bonusVsFamily: undead
 - id: great_axe
   name: Great Axe
   type: weapon
-  stats: { attack: 22 }
+  stats:
+    attack: 22
   price: 4500
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
+  bonusVsFamily: giant
 - id: mythril_hammer
   name: Mythril Hammer
   type: weapon
-  stats: { attack: 18 }
+  stats:
+    attack: 18
   price: 2500
-  usableBy: [warrior, white_mage]
-
+  usableBy:
+  - warrior
+  - white_mage
+  bonusVsFamily: undead
 - id: power_staff
   name: Power Staff
   type: weapon
-  stats: { attack: 12 }
+  stats:
+    attack: 12
   price: 1000
-  usableBy: [white_mage, black_mage, red_mage]
-
-# ═══ WEAPONS — Late Tier (elemental) ═══
+  usableBy:
+  - white_mage
+  - black_mage
+  - red_mage
 - id: flame_sword
   name: Flame Sword
   type: weapon
-  stats: { attack: 26 }
+  stats:
+    attack: 26
   price: 10000
-  usableBy: [warrior]
+  usableBy:
+  - warrior
   element: fire
-
+  bonusVsFamily: undead
 - id: ice_brand
   name: Ice Brand
   type: weapon
-  stats: { attack: 26 }
+  stats:
+    attack: 26
   price: 10000
-  usableBy: [warrior]
+  usableBy:
+  - warrior
   element: ice
-
 - id: coral_sword
   name: Coral Sword
   type: weapon
-  stats: { attack: 26 }
+  stats:
+    attack: 26
   price: 10000
-  usableBy: [warrior, red_mage]
+  usableBy:
+  - warrior
+  - red_mage
   element: lightning
-
-# ═══ WEAPONS — Endgame ═══
+  bonusVsFamily: aquatic
 - id: masamune
   name: Masamune
   type: weapon
-  stats: { attack: 56 }
+  stats:
+    attack: 56
   price: 0
-  usableBy: [warrior, thief, monk, white_mage, black_mage, red_mage]
-
-# ═══ ARMOR — Body (Starter) ═══
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
+  bonusVsFamily: dragon
 - id: cloth
   name: Cloth
   type: armor
-  stats: { defense: 1 }
+  stats:
+    defense: 1
   price: 10
-  usableBy: [warrior, thief, monk, white_mage, black_mage, red_mage]
-
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
 - id: robe
   name: Robe
   type: armor
-  stats: { defense: 2 }
+  stats:
+    defense: 2
   price: 20
-  usableBy: [white_mage, black_mage, red_mage]
-
-# ═══ ARMOR — Body (Early) ═══
+  usableBy:
+  - white_mage
+  - black_mage
+  - red_mage
 - id: leather_armor
   name: Leather Armor
   type: armor
-  stats: { defense: 4 }
+  stats:
+    defense: 4
   price: 50
-  usableBy: [warrior, thief, red_mage]
-
+  usableBy:
+  - warrior
+  - thief
+  - red_mage
 - id: wooden_armor
   name: Wooden Armor
   type: armor
-  stats: { defense: 4 }
+  stats:
+    defense: 4
   price: 50
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: chain_mail
   name: Chain Mail
   type: armor
-  stats: { defense: 15 }
+  stats:
+    defense: 15
   price: 80
-  usableBy: [warrior, red_mage]
-
-# ═══ ARMOR — Body (Mid) ═══
+  usableBy:
+  - warrior
+  - red_mage
 - id: iron_armor
   name: Iron Armor
   type: armor
-  stats: { defense: 24 }
+  stats:
+    defense: 24
   price: 800
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: mythril_armor
   name: Mythril Armor
   type: armor
-  stats: { defense: 34 }
+  stats:
+    defense: 34
   price: 7500
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: mythril_mail
   name: Mythril Mail
   type: armor
-  stats: { defense: 18 }
+  stats:
+    defense: 18
   price: 3500
-  usableBy: [warrior, red_mage]
-
-# ═══ ARMOR — Body (Late) ═══
+  usableBy:
+  - warrior
+  - red_mage
 - id: dragon_armor
   name: Dragon Armor
   type: armor
-  stats: { defense: 42 }
+  stats:
+    defense: 42
   price: 0
-  usableBy: [warrior]
-
-# ═══ ARMOR — Shields ═══
+  usableBy:
+  - warrior
 - id: wooden_shield
   name: Wooden Shield
   type: armor
   slot: shield
-  stats: { defense: 2 }
+  stats:
+    defense: 2
   price: 15
-  usableBy: [warrior, red_mage]
-
+  usableBy:
+  - warrior
+  - red_mage
 - id: iron_shield
   name: Iron Shield
   type: armor
   slot: shield
-  stats: { defense: 4 }
+  stats:
+    defense: 4
   price: 100
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: mythril_shield
   name: Mythril Shield
   type: armor
   slot: shield
-  stats: { defense: 8 }
+  stats:
+    defense: 8
   price: 2500
-  usableBy: [warrior, red_mage]
-
-# ═══ ARMOR — Helmets ═══
+  usableBy:
+  - warrior
+  - red_mage
 - id: cap
   name: Cap
   type: armor
   slot: helmet
-  stats: { defense: 1 }
+  stats:
+    defense: 1
   price: 10
-  usableBy: [warrior, thief, monk, white_mage, black_mage, red_mage]
-
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
 - id: iron_helm
   name: Iron Helm
   type: armor
   slot: helmet
-  stats: { defense: 3 }
+  stats:
+    defense: 3
   price: 100
-  usableBy: [warrior]
-
+  usableBy:
+  - warrior
 - id: mythril_helm
   name: Mythril Helm
   type: armor
   slot: helmet
-  stats: { defense: 6 }
+  stats:
+    defense: 6
   price: 2500
-  usableBy: [warrior]
-
-# ═══ CONSUMABLES ═══
+  usableBy:
+  - warrior
 - id: potion
   name: Potion
   type: consumable
-  stats: { hp: 30 }
+  stats:
+    hp: 30
   price: 60
   usableBy: []
-
 - id: hi_potion
   name: Hi-Potion
   type: consumable
-  stats: { hp: 120 }
+  stats:
+    hp: 120
   price: 150
   usableBy: []
-
 - id: ether
   name: Ether
   type: consumable
   stats: {}
   price: 150
   usableBy: []
-
 - id: antidote
   name: Antidote
   type: consumable
   stats: {}
   price: 75
   usableBy: []
-
 - id: soft
   name: Soft
   type: consumable
   stats: {}
   price: 800
   usableBy: []
-
 - id: phoenix_down
   name: Phoenix Down
   type: consumable
   stats: {}
   price: 500
   usableBy: []
-
 - id: tent
   name: Tent
   type: consumable
   stats: {}
   price: 250
   usableBy: []
-
 - id: cabin
   name: Cabin
   type: consumable
   stats: {}
   price: 500
   usableBy: []
-
-# ═══ KEY ITEMS ═══
 - id: lute
   name: Lute
   type: key
   stats: {}
   price: 0
   usableBy: []
-
 - id: mystic_key
   name: Mystic Key
   type: key
