@@ -196,41 +196,45 @@ export class BattleScene implements Scene {
 
   private createPartySprites(): void {
     const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
-    const yPositions = [250, 380, 510, 640];
+    // M2: Diagonal party sprite layout
+    const xPositions = [1100, 1150, 1200, 1250];
+    const yPositions = [280, 380, 480, 580];
+    // M1: Full-height status box positions (decoupled from sprites)
+    const boxXPositions = [1440, 1560, 1680, 1800];
+
     for (let i = 0; i < this.config.party.length; i++) {
       const char = this.config.party[i];
-      const yPos = yPositions[i];
 
-      // K2: Status box behind each party sprite
-      const box = new Window({ x: 1500 + 80, y: yPos, width: 280, height: 100 });
+      // M1: Full-height character status box at right edge
+      const box = new Window({ x: boxXPositions[i], y: 120, width: 120, height: 660 });
       const nameText = new BitmapText({
         text: char.name,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
       });
-      nameText.position.set(box.contentX, box.contentY);
+      nameText.position.set(box.contentX, box.contentY + 24);
       box.addChild(nameText);
 
       const statusText = new BitmapText({
         text: '',
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffff44 },
       });
-      statusText.position.set(box.contentX, box.contentY + 22);
+      statusText.position.set(box.contentX, box.contentY + 280);
       box.addChild(statusText);
 
       const hpText = new BitmapText({
         text: `${char.currentHp}/${char.maxHp}`,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
       });
-      hpText.position.set(box.contentX, box.contentY + 44);
+      hpText.position.set(box.contentX, box.contentY + 600);
       box.addChild(hpText);
 
       this.container.addChild(box);
       this.statusBoxes.push(box);
 
-      // Party sprite
+      // M2: Party sprite at diagonal position
       const g = new Graphics();
       g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
-      g.position.set(1500, yPos);
+      g.position.set(xPositions[i], yPositions[i]);
       this.container.addChild(g);
       this.partySprites.push(g);
     }
@@ -802,7 +806,8 @@ export class BattleScene implements Scene {
           this.animActorSprite = found?.sprite ?? null;
           if (this.animActorSprite) {
             this.animActorOrigX = this.animActorSprite.x;
-            this.animTargetX = found!.isEnemy ? 700 : 900;
+            // M3: Relative step-forward — subtle "step out of line"
+            this.animTargetX = found!.isEnemy ? this.animActorOrigX + 120 : this.animActorOrigX - 120;
           }
         }
         this.animTimer += dt;
