@@ -57,6 +57,8 @@ export interface EnemyData {
   resist?: string;
   elementalProfile?: ElementalProfile;
   bossPhases?: BossPhase[];
+  /** Enemy family/race for spell targeting (e.g., 'undead' for HARM) */
+  family?: string;
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';
@@ -94,6 +96,8 @@ export interface SpellData {
   description: string;
   power?: number;
   element?: string;
+  /** If set, spell only affects enemies with this family (e.g., 'undead' for HARM) */
+  targetFamily?: string;
 }
 
 /** Flag-conditional dialog entry: shows text when condition flag is set (or as default if no condition) */

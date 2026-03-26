@@ -1,5 +1,3 @@
-# ═══ TIER 1 — Starting Area (HP 15-40) ═══
-
 - id: goblin
   name: Goblin
   stats:
@@ -16,7 +14,6 @@
   goldReward: 6
   sprite: goblin
   weakness: fire
-
 - id: wolf
   name: Wolf
   stats:
@@ -34,7 +31,6 @@
   sprite: wolf
   weakness: fire
   resist: ice
-
 - id: skeleton
   name: Skeleton
   stats:
@@ -52,7 +48,7 @@
   sprite: skeleton
   weakness: fire
   resist: ice
-
+  family: undead
 - id: pirate
   name: Pirate
   stats:
@@ -69,9 +65,6 @@
   goldReward: 15
   sprite: pirate
   weakness: lightning
-
-# ═══ TIER 2 — Mid-Game (HP 80-150) ═══
-
 - id: ogre
   name: Ogre
   stats:
@@ -88,7 +81,6 @@
   goldReward: 80
   sprite: ogre
   weakness: lightning
-
 - id: troll
   name: Troll
   stats:
@@ -105,7 +97,6 @@
   goldReward: 60
   sprite: troll
   weakness: fire
-
 - id: mummy
   name: Mummy
   stats:
@@ -123,7 +114,7 @@
   sprite: mummy
   weakness: fire
   resist: ice
-
+  family: undead
 - id: cockatrice
   name: Cockatrice
   stats:
@@ -140,9 +131,6 @@
   goldReward: 70
   sprite: cockatrice
   weakness: ice
-
-# ═══ TIER 3 — Late-Game (HP 200-400) ═══
-
 - id: vampire
   name: Vampire
   stats:
@@ -160,7 +148,7 @@
   sprite: vampire
   weakness: fire
   resist: dark
-
+  family: undead
 - id: dragon
   name: Dragon
   stats:
@@ -178,9 +166,6 @@
   sprite: dragon
   weakness: ice
   resist: fire
-
-# ═══ TIER 4 — Bosses (HP 200-800) ═══
-
 - id: garland
   name: Garland
   stats:
@@ -198,10 +183,9 @@
   sprite: garland
   weakness: lightning
   bossPhases:
-    - hpThreshold: 0.5
-      patternId: aggressive
-      message: "Garland's attacks grow fiercer!"
-
+  - hpThreshold: 0.5
+    patternId: aggressive
+    message: Garland's attacks grow fiercer!
 - id: lich
   name: Lich
   stats:
@@ -220,6 +204,7 @@
   weakness: fire
   resist: ice
   bossPhases:
-    - hpThreshold: 0.5
-      patternId: aggressive
-      message: "The Lich's form shifts!"
+  - hpThreshold: 0.5
+    patternId: aggressive
+    message: The Lich's form shifts!
+  family: undead

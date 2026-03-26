@@ -152,11 +152,20 @@ export class SpellExecutor {
 
   private executeDamageSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
     const power = spell.power ?? 20;
-    const targets = spell.targeting === 'all'
+    const allTargets = spell.targeting === 'all'
       ? (isEnemy ? this.deps.livingParty() : this.deps.livingEnemies())
       : cmd.targetId
         ? (isEnemy ? this.partyFilter(cmd.targetId!) : this.deps.enemies.filter(e => e.id === cmd.targetId))
         : [];
+
+    // Filter by targetFamily if spell is restricted (e.g., HARM only hits undead)
+    const targets = spell.targetFamily
+      ? allTargets.filter(t => 'data' in t && (t as EnemyInstance).data.family === spell.targetFamily)
+      : allTargets;
+    if (spell.targetFamily && targets.length === 0) {
+      this.deps.addMessage(`${spell.name} has no effect!`);
+      return;
+    }
 
     for (const target of targets) {
       if ('data' in target) {

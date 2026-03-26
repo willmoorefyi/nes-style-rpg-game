@@ -1,4 +1,3 @@
-# ═══ WHITE MAGIC — LEVEL 1 ═══
 - id: cure
   name: CURE
   level: 1
@@ -8,7 +7,6 @@
   description: Restore HP to one ally
   power: 30
   element: none
-
 - id: harm
   name: HARM
   level: 1
@@ -18,7 +16,7 @@
   description: Deal holy damage to undead
   power: 20
   element: holy
-
+  targetFamily: undead
 - id: fog
   name: FOG
   level: 1
@@ -28,7 +26,6 @@
   description: Raise defense of one ally
   power: 0
   element: none
-
 - id: ruse
   name: RUSE
   level: 1
@@ -38,8 +35,6 @@
   description: Raise evasion of self
   power: 0
   element: none
-
-# ═══ WHITE MAGIC — LEVEL 2 ═══
 - id: lamp
   name: LAMP
   level: 2
@@ -49,7 +44,6 @@
   description: Cure blindness on one ally
   power: 0
   element: none
-
 - id: mute
   name: MUTE
   level: 2
@@ -59,7 +53,6 @@
   description: Inflict silence on one enemy
   power: 0
   element: none
-
 - id: alit
   name: ALIT
   level: 2
@@ -69,7 +62,6 @@
   description: Grant lightning resistance to all allies
   power: 0
   element: lightning
-
 - id: invs
   name: INVS
   level: 2
@@ -79,8 +71,6 @@
   description: Raise evasion of one ally
   power: 0
   element: none
-
-# ═══ WHITE MAGIC — LEVEL 3 ═══
 - id: cure2
   name: CUR2
   level: 3
@@ -90,7 +80,6 @@
   description: Restore 60 HP to one ally
   power: 60
   element: none
-
 - id: hrm2
   name: HRM2
   level: 3
@@ -100,7 +89,7 @@
   description: Deal holy damage to all undead
   power: 40
   element: holy
-
+  targetFamily: undead
 - id: afir
   name: AFIR
   level: 3
@@ -110,7 +99,6 @@
   description: Grant fire resistance to all allies
   power: 0
   element: fire
-
 - id: heal
   name: HEAL
   level: 3
@@ -120,8 +108,6 @@
   description: Restore HP to all allies
   power: 20
   element: none
-
-# ═══ WHITE MAGIC — LEVEL 4 ═══
 - id: pure
   name: PURE
   level: 4
@@ -131,7 +117,6 @@
   description: Cure poison on one ally
   power: 0
   element: none
-
 - id: fear
   name: FEAR
   level: 4
@@ -141,7 +126,6 @@
   description: Lower morale of all enemies
   power: 0
   element: none
-
 - id: aice
   name: AICE
   level: 4
@@ -151,7 +135,6 @@
   description: Grant ice resistance to all allies
   power: 0
   element: ice
-
 - id: amut
   name: AMUT
   level: 4
@@ -161,8 +144,6 @@
   description: Cure silence on one ally
   power: 0
   element: none
-
-# ═══ WHITE MAGIC — LEVEL 5 ═══
 - id: cure3
   name: CUR3
   level: 5
@@ -172,7 +153,6 @@
   description: Restore 120 HP to one ally
   power: 120
   element: none
-
 - id: life
   name: LIFE
   level: 5
@@ -182,8 +162,6 @@
   description: Revive one fallen ally with 1 HP
   power: 0
   element: none
-
-# ═══ BLACK MAGIC — LEVEL 1 ═══
 - id: fire
   name: FIRE
   level: 1
@@ -193,7 +171,6 @@
   description: Deal fire damage to one enemy
   power: 20
   element: fire
-
 - id: lit
   name: LIT
   level: 1
@@ -203,7 +180,6 @@
   description: Deal lightning damage to one enemy
   power: 20
   element: lightning
-
 - id: slep
   name: SLEP
   level: 1
@@ -213,7 +189,6 @@
   description: Put all enemies to sleep
   power: 0
   element: none
-
 - id: lock
   name: LOCK
   level: 1
@@ -223,8 +198,6 @@
   description: Lower enemy evasion
   power: 0
   element: none
-
-# ═══ BLACK MAGIC — LEVEL 2 ═══
 - id: ice
   name: ICE
   level: 2
@@ -234,7 +207,6 @@
   description: Deal ice damage to one enemy
   power: 30
   element: ice
-
 - id: dark
   name: DARK
   level: 2
@@ -244,7 +216,6 @@
   description: Blind all enemies
   power: 0
   element: none
-
 - id: tmpr
   name: TMPR
   level: 2
@@ -254,7 +225,6 @@
   description: Raise attack of one ally
   power: 0
   element: none
-
 - id: slow
   name: SLOW
   level: 2
@@ -264,8 +234,6 @@
   description: Reduce speed of one enemy
   power: 0
   element: none
-
-# ═══ BLACK MAGIC — LEVEL 3 ═══
 - id: fir2
   name: FIR2
   level: 3
@@ -275,7 +243,6 @@
   description: Deal fire damage to all enemies
   power: 30
   element: fire
-
 - id: hold
   name: HOLD
   level: 3
@@ -285,7 +252,6 @@
   description: Paralyze one enemy
   power: 0
   element: none
-
 - id: lit2
   name: LIT2
   level: 3
@@ -295,7 +261,6 @@
   description: Deal lightning damage to all enemies
   power: 30
   element: lightning
-
 - id: lok2
   name: LOK2
   level: 3
@@ -305,8 +270,6 @@
   description: Lower evasion of all enemies
   power: 0
   element: none
-
-# ═══ BLACK MAGIC — LEVEL 4 ═══
 - id: slp2
   name: SLP2
   level: 4
@@ -316,7 +279,6 @@
   description: Put all enemies into deep sleep
   power: 0
   element: none
-
 - id: fast
   name: FAST
   level: 4
@@ -326,7 +288,6 @@
   description: Double attack speed of one ally
   power: 0
   element: none
-
 - id: conf
   name: CONF
   level: 4
@@ -336,7 +297,6 @@
   description: Confuse all enemies
   power: 0
   element: none
-
 - id: ice2
   name: ICE2
   level: 4
