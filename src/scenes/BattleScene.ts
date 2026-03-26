@@ -93,6 +93,12 @@ export class BattleScene implements Scene {
   private statusBoxes: Window[] = [];
   // K3: Enemy list texts in partyWindow
   private enemyListTexts: BitmapText[] = [];
+  // L2: Deduped enemy name -> list text index
+  private enemyNameToListIndex: Map<string, number> = new Map();
+  // L3: Outline around hovered target sprite
+  private targetOutline: Graphics | null = null;
+  // L4: Shared flash timer for target selection effects
+  private targetFlashTimer: number = 0;
   // K4: Turn list in commandWindow during execution
   private turnListContainer = new Container();
   private turnListTexts: BitmapText[] = [];
@@ -239,18 +245,32 @@ export class BattleScene implements Scene {
     // Remove old enemy list texts
     for (const t of this.enemyListTexts) this.partyWindow.removeChild(t);
     this.enemyListTexts = [];
+    this.enemyNameToListIndex.clear();
 
+    // L2: Group enemies by displayName, preserving first-seen order
     const enemies = this.battle.allEnemies;
-    for (let i = 0; i < enemies.length; i++) {
-      const e = enemies[i];
+    const nameOrder: string[] = [];
+    const counts = new Map<string, number>();
+    for (const e of enemies) {
+      const n = e.displayName;
+      if (!counts.has(n)) nameOrder.push(n);
+      counts.set(n, (counts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
+    }
+
+    for (let i = 0; i < nameOrder.length; i++) {
+      const name = nameOrder[i];
+      const alive = counts.get(name)!;
+      // L1: No HP display. L2: prefix with count if >1
+      const label = alive === 0 ? name : alive > 1 ? `${alive}x ${name}` : name;
       const text = new BitmapText({
-        text: `${e.displayName}  ${e.currentHp}/${e.data.stats.hp}`,
+        text: label,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
-      if (e.currentHp <= 0) text.tint = 0x888888;
+      if (alive === 0) text.tint = 0x888888;
       text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * (FONT_SIZE + 12));
       this.partyWindow.addChild(text);
       this.enemyListTexts.push(text);
+      this.enemyNameToListIndex.set(name, i);
     }
   }
 
@@ -323,6 +343,51 @@ export class BattleScene implements Scene {
 
       case 'target':
         this.updateFieldTargeting();
+        this.targetFlashTimer++;
+        // L3: Pulse outline around hovered target sprite
+        {
+          const targets = this.getFieldTargets();
+          const target = targets[this.fieldTargetIndex];
+          if (target) {
+            const sprites = this.fieldTargetIsParty ? this.partySprites : this.enemySprites;
+            const sprite = sprites[target.spriteIndex];
+            if (sprite) {
+              if (!this.targetOutline) {
+                this.targetOutline = new Graphics();
+                this.container.addChild(this.targetOutline);
+              }
+              this.targetOutline.clear();
+              this.targetOutline.rect(-3, -3, sprite.width + 6, sprite.height + 6).stroke({ width: 2, color: 0xffffff });
+              this.targetOutline.position.set(sprite.x, sprite.y);
+              this.targetOutline.alpha = 0.3 + 0.7 * Math.abs(Math.sin(this.targetFlashTimer * 0.12));
+            }
+          }
+          // L4: Flash enemy list entry or party status box
+          const sinVal = Math.sin(this.targetFlashTimer * 0.12);
+          if (target && this.fieldTargetIsParty) {
+            // Reset all status box alphas, then pulse the selected one
+            for (const box of this.statusBoxes) box.alpha = 1;
+            const box = this.statusBoxes[target.spriteIndex];
+            if (box) box.alpha = 0.5 + 0.5 * Math.abs(sinVal);
+          } else if (target && !this.fieldTargetIsParty) {
+            const enemy = this.battle.allEnemies[target.spriteIndex];
+            if (enemy) {
+              const listIdx = this.enemyNameToListIndex.get(enemy.displayName);
+              if (listIdx !== undefined) {
+                // Reset all list tints first
+                for (let i = 0; i < this.enemyListTexts.length; i++) {
+                  const e = this.enemyListTexts[i];
+                  // Preserve gray for all-dead groups
+                  e.tint = 0xffffff;
+                }
+                this.updateEnemyListDeadTints();
+                // Pulse selected between white and yellow
+                const t = this.enemyListTexts[listIdx];
+                if (t) t.tint = sinVal > 0 ? 0xffff00 : 0xffffff;
+              }
+            }
+          }
+        }
         break;
 
       case 'spell_ui':
@@ -652,6 +717,31 @@ export class BattleScene implements Scene {
       this.container.removeChild(this.targetArrow);
       this.targetArrow = null;
     }
+    // L3: Clear outline
+    if (this.targetOutline) {
+      this.container.removeChild(this.targetOutline);
+      this.targetOutline = null;
+    }
+    // L4: Reset flash timer and tints
+    this.targetFlashTimer = 0;
+    for (const t of this.enemyListTexts) t.tint = 0xffffff;
+    this.updateEnemyListDeadTints();
+    for (const box of this.statusBoxes) box.alpha = 1;
+  }
+
+  /** Restore gray tint on enemy list entries where all enemies of that name are dead */
+  private updateEnemyListDeadTints(): void {
+    const enemies = this.battle.allEnemies;
+    const aliveCounts = new Map<string, number>();
+    for (const e of enemies) {
+      const n = e.displayName;
+      aliveCounts.set(n, (aliveCounts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
+    }
+    for (const [name, idx] of this.enemyNameToListIndex) {
+      if ((aliveCounts.get(name) ?? 0) === 0 && this.enemyListTexts[idx]) {
+        this.enemyListTexts[idx].tint = 0x888888;
+      }
+    }
   }
 
   private executeRound(): void {
@@ -951,5 +1041,6 @@ export class BattleScene implements Scene {
     this.spellUI = null;
     this.itemUI = null;
     this.commandArrow = null;
+    this.targetOutline = null;
   }
 }
