@@ -8,7 +8,7 @@ import type { Inventory } from '../entities/Inventory.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
-import { BattleStateMachine } from '../battle/BattleStateMachine.js';
+import { BattleStateMachine, type DamageEvent } from '../battle/BattleStateMachine.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
@@ -46,7 +46,7 @@ export interface BattleSceneConfig {
   canRun?: boolean;
 }
 
-type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui';
+type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
@@ -76,6 +76,13 @@ export class BattleScene implements Scene {
   private spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
   private commandArrow: Graphics | null = null;
   private flashTimer: number = 0;
+  private animPhase: 'announce' | 'step_forward' | 'execute' | 'result' | 'step_back' = 'announce';
+  private animTimer: number = 0;
+  private animActorSprite: Graphics | null = null;
+  private animActorOrigX: number = 0;
+  private animTargetX: number = 0;
+  private animMessages: { text: string }[] = [];
+  private animMessageIndex: number = 0;
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -238,6 +245,10 @@ export class BattleScene implements Scene {
 
       case 'item_ui':
         if (this.itemUI) this.itemUI.update(this.deps.input);
+        break;
+
+      case 'executing':
+        this.updateAnimating(dt);
         break;
 
       case 'message':
@@ -461,13 +472,161 @@ export class BattleScene implements Scene {
   }
 
   private executeRound(): void {
-    this.uiState = 'executing';
     this.commandMenu.visible = false;
-    this.battle.executeRound();
-    this.spawnFloatingTexts();
-    this.updatePartyDisplay();
-    this.updateEnemySprites();
-    this.showMessages();
+    this.battle.prepareRound();
+    this.uiState = 'executing';
+    this.animPhase = 'announce';
+    this.animTimer = 0;
+  }
+
+  private findActorSprite(actorName: string): { sprite: Graphics; isEnemy: boolean } | null {
+    for (let i = 0; i < this.config.party.length; i++) {
+      if (this.config.party[i].name === actorName) return { sprite: this.partySprites[i], isEnemy: false };
+    }
+    const enemies = this.battle.allEnemies;
+    for (let i = 0; i < enemies.length; i++) {
+      if (enemies[i].data.name === actorName && enemies[i].currentHp > 0) return { sprite: this.enemySprites[i], isEnemy: true };
+    }
+    return null;
+  }
+
+  private formatAnnouncement(info: { actorName: string; actionType: string; targetName?: string; spellName?: string }): string {
+    switch (info.actionType) {
+      case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
+      case 'magic': return `${info.actorName} casts ${info.spellName ?? 'spell'}!`;
+      case 'item': return `${info.actorName} uses item!`;
+      case 'run': return `${info.actorName} tries to run!`;
+      default: return `${info.actorName} acts!`;
+    }
+  }
+
+  private updateAnimating(dt: number): void {
+    const confirmSkip = this.deps.input.isJustPressed('confirm');
+    switch (this.animPhase) {
+      case 'announce': {
+        if (this.animTimer === 0) {
+          const info = this.battle.peekNextAction();
+          if (!info) {
+            this.resolveRound();
+            return;
+          }
+          this.messageText.setText(this.formatAnnouncement(info), true);
+          const found = this.findActorSprite(info.actorName);
+          this.animActorSprite = found?.sprite ?? null;
+          if (this.animActorSprite) {
+            this.animActorOrigX = this.animActorSprite.x;
+            this.animTargetX = found!.isEnemy ? 700 : 900;
+          }
+        }
+        this.animTimer += dt;
+        if (this.animTimer >= 30 || confirmSkip) {
+          this.animTimer = 0;
+          this.animPhase = 'step_forward';
+        }
+        break;
+      }
+
+      case 'step_forward': {
+        this.animTimer += dt;
+        if (confirmSkip) this.animTimer = 15;
+        const progress = Math.min(this.animTimer / 15, 1);
+        if (this.animActorSprite) {
+          this.animActorSprite.x = this.animActorOrigX + (this.animTargetX - this.animActorOrigX) * progress;
+        }
+        if (this.animTimer >= 15) {
+          this.animTimer = 0;
+          this.animPhase = 'execute';
+        }
+        break;
+      }
+
+      case 'execute': {
+        const result = this.battle.executeNextAction();
+        this.spawnFloatingTextsFromEvents(result.damageEvents);
+        this.updatePartyDisplay();
+        this.updateEnemySprites();
+        this.animMessages = result.messages;
+        this.animMessageIndex = 0;
+        this.animTimer = 0;
+        this.animPhase = 'result';
+        break;
+      }
+
+      case 'result': {
+        if (this.animMessages.length > 0 && this.animMessageIndex < this.animMessages.length) {
+          if (this.animTimer === 0) {
+            this.messageText.setText(this.animMessages[this.animMessageIndex].text, true);
+          }
+          this.animTimer += dt;
+          if (this.animTimer >= 45 || confirmSkip) {
+            this.animMessageIndex++;
+            this.animTimer = 0;
+            if (this.animMessageIndex >= this.animMessages.length) {
+              this.animPhase = 'step_back';
+            }
+          }
+        } else {
+          this.animPhase = 'step_back';
+          this.animTimer = 0;
+        }
+        break;
+      }
+
+      case 'step_back': {
+        this.animTimer += dt;
+        if (confirmSkip) this.animTimer = 15;
+        const progress = Math.min(this.animTimer / 15, 1);
+        if (this.animActorSprite) {
+          this.animActorSprite.x = this.animTargetX + (this.animActorOrigX - this.animTargetX) * progress;
+        }
+        if (this.animTimer >= 15) {
+          if (this.animActorSprite) this.animActorSprite.x = this.animActorOrigX;
+          this.animTimer = 0;
+          this.animActorSprite = null;
+          if (this.battle.actionQueueLength > 0) {
+            this.animPhase = 'announce';
+          } else {
+            this.resolveRound();
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  private spawnFloatingTextsFromEvents(damageEvents: DamageEvent[]): void {
+    for (const evt of damageEvents) {
+      let sprite: Graphics | undefined;
+      if (evt.targetId.startsWith('enemy_')) {
+        const idx = parseInt(evt.targetId.split('_')[1], 10);
+        sprite = this.enemySprites[idx];
+      } else {
+        const idx = parseInt(evt.targetId.split('_')[1], 10);
+        sprite = this.partySprites[idx];
+      }
+      if (!sprite) continue;
+
+      // Spell flash overlay
+      if (evt.spellElement) {
+        const color = BattleScene.ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
+        const overlay = new Graphics();
+        overlay.rect(0, 0, sprite.width, sprite.height).fill(color);
+        overlay.position.set(sprite.x, sprite.y);
+        overlay.alpha = 0.6;
+        this.container.addChild(overlay);
+        this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
+      }
+
+      const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
+      const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
+      const bt = new BitmapText({
+        text: label,
+        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill },
+      });
+      bt.position.set(sprite.x, sprite.y);
+      this.container.addChild(bt);
+      this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
+    }
   }
 
   private showMessages(): void {
@@ -528,42 +687,6 @@ export class BattleScene implements Scene {
     fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff,
     dark: 0x660066, water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
   };
-
-  private spawnFloatingTexts(): void {
-    for (const evt of this.battle.damageEvents) {
-      let sprite: Graphics | undefined;
-      if (evt.targetId.startsWith('enemy_')) {
-        const idx = parseInt(evt.targetId.split('_')[1], 10);
-        sprite = this.enemySprites[idx];
-      } else {
-        const idx = parseInt(evt.targetId.split('_')[1], 10);
-        sprite = this.partySprites[idx];
-      }
-      if (!sprite) continue;
-
-      // Spell flash overlay
-      if (evt.spellElement) {
-        const color = BattleScene.ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
-        const overlay = new Graphics();
-        overlay.rect(0, 0, sprite.width, sprite.height).fill(color);
-        overlay.position.set(sprite.x, sprite.y);
-        overlay.alpha = 0.6;
-        this.container.addChild(overlay);
-        this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
-      }
-
-      const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
-      const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
-      const bt = new BitmapText({
-        text: label,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill },
-      });
-      bt.position.set(sprite.x, sprite.y);
-      this.container.addChild(bt);
-      this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
-    }
-    this.battle.clearDamageEvents();
-  }
 
   private updateFloatingTexts(dt: number): void {
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
