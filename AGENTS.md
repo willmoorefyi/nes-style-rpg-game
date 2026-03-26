@@ -270,6 +270,52 @@ See `docs/PHASE_PLAN.md` for detailed plans.
 
 ---
 
+## Debug Menu & Battle Scenarios
+
+The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads pre-configured battle scenarios from `assets/data/debug-scenarios.yaml` for rapid testing.
+
+### How to Add a New Debug Scenario
+
+1. Open `assets/data/debug-scenarios.yaml`
+2. Add a new entry with a unique `id`:
+
+```yaml
+- id: boss_test
+  name: Boss Test
+  party:
+    - class: warrior        # class ID from classes.yaml
+      name: KNIGHT
+      level: 10
+      equipment: [mythril_sword, iron_armor, iron_shield, iron_helm]
+      spells: []
+    - class: white_mage
+      name: HEALER
+      level: 10
+      equipment: [staff, robe]
+      spells:
+        - { id: cure, level: 1 }
+        - { id: cure2, level: 3 }
+  items:
+    potion: 10
+    hi_potion: 5
+  gold: 1000
+  enemies: [garland]        # enemy IDs from enemies.yaml
+```
+
+3. The scenario will appear automatically when selecting Debug from the title screen
+4. Class IDs must match `assets/data/classes.yaml`, item IDs must match `assets/data/items.yaml`, spell IDs must match `assets/data/spells.yaml`, enemy IDs must match `assets/data/enemies.yaml`
+5. Run `npm test` to verify cross-file references are valid
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `assets/data/debug-scenarios.yaml` | Scenario definitions |
+| `src/systems/DebugScenarioLoader.ts` | Loads YAML, builds party, triggers battle |
+| `src/scenes/TitleScene.ts` | Debug menu item (dev mode only) |
+
+---
+
 ## Common Pitfalls
 
 1. **Silent error swallowing** — Never write `catch { }` or `catch { /* ignore */ }`. Always log or surface errors. This caused a critical white-screen bug early in development.

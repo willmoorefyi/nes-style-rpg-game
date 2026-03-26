@@ -34,6 +34,8 @@ npm test
 
 You should be playing in under 30 seconds.
 
+> **Dev mode bonus:** The title screen shows a **Debug** option that drops you into a pre-configured battle for testing. Add new scenarios in `assets/data/debug-scenarios.yaml`.
+
 ---
 
 ## 🎮 About the Game
