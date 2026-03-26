@@ -1,0 +1,126 @@
+id: cornelia-inn
+width: 8
+height: 6
+layers:
+  - - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 2
+    - 2
+    - 1
+    - 11
+    - 11
+    - 11
+    - 11
+    - 1
+    - 2
+    - 2
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 2
+    - 2
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 2
+    - 2
+    - 2
+    - 2
+    - 1
+    - 1
+    - 2
+    - 2
+    - 2
+tilesets:
+  - interior
+collision:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 0
+  - 10
+  - 10
+  - 10
+  - 10
+  - 0
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  - 1
+  - 1
+npcs:
+  - id: cornelia-inn-keeper
+    x: 4
+    y: 2
+    sprite: innkeeper
+    dialog:
+      - Welcome to the Inn!
+    shopId: cornelia_inn
+transitions:
+  - x: 3
+    y: 5
+    targetMap: cornelia
+    targetX: 3
+    targetY: 10
+  - x: 4
+    y: 5
+    targetMap: cornelia
+    targetX: 3
+    targetY: 10
+encounterRate:
+  min: 999
+  max: 999
+encounters: []

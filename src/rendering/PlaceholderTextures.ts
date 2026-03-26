@@ -17,6 +17,7 @@ const TILE_COLORS: Record<number, number> = {
   7: 0x4169e1, // River - light blue
   8: 0xc2b280, // Road - tan
   9: 0x8b4513, // Bridge - wood brown
+  10: 0xdeb887, // Counter - burlywood
 };
 const DEFAULT_TILE_COLOR = 0x555555;
 
