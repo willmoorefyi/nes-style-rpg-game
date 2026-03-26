@@ -180,6 +180,14 @@ export class BattleStateMachine {
     return true;
   }
 
+  /** Undo the last submitted command, returning to the previous actor. */
+  undoCommand(): boolean {
+    if (this._state !== 'command_select' || this.commands.length === 0) return false;
+    this.commands.pop();
+    this.currentActorIndex = Math.max(0, this.currentActorIndex - 1);
+    return true;
+  }
+
   get actionQueueLength(): number { return this._actionQueue.length; }
 
   prepareRound(): void {

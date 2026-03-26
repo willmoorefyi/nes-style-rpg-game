@@ -169,6 +169,7 @@ export class BattleScene implements Scene {
       x: this.commandWindow.contentX,
       y: this.commandWindow.contentY,
       onSelect: (item) => this.onCommandSelect(item.value),
+      onCancel: () => this.undoPreviousCommand(),
       eventBus: this.deps.events,
     });
     this.commandWindow.addChild(this.commandMenu);
@@ -199,33 +200,37 @@ export class BattleScene implements Scene {
     // M2: Diagonal party sprite layout
     const xPositions = [1100, 1150, 1200, 1250];
     const yPositions = [280, 380, 480, 580];
-    // M1: Full-height status box positions (decoupled from sprites)
-    const boxXPositions = [1440, 1560, 1680, 1800];
+    // Status boxes: 4 boxes each 25% of battle field height (660px / 4 = 165px)
+    const battleFieldTop = 120;
+    const boxHeight = 165;
+    const boxWidth = 200;
+    const boxX = 1700;
 
     for (let i = 0; i < this.config.party.length; i++) {
       const char = this.config.party[i];
 
-      // M1: Full-height character status box at right edge
-      const box = new Window({ x: boxXPositions[i], y: 120, width: 120, height: 660 });
+      // Character status box — stacked vertically on right edge
+      const boxY = battleFieldTop + i * boxHeight;
+      const box = new Window({ x: boxX, y: boxY, width: boxWidth, height: boxHeight });
       const nameText = new BitmapText({
         text: char.name,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
       });
-      nameText.position.set(box.contentX, box.contentY + 24);
+      nameText.position.set(box.contentX, box.contentY);
       box.addChild(nameText);
 
       const statusText = new BitmapText({
         text: '',
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffff44 },
       });
-      statusText.position.set(box.contentX, box.contentY + 280);
+      statusText.position.set(box.contentX, box.contentY + 40);
       box.addChild(statusText);
 
       const hpText = new BitmapText({
         text: `${char.currentHp}/${char.maxHp}`,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
       });
-      hpText.position.set(box.contentX, box.contentY + 600);
+      hpText.position.set(box.contentX, box.contentY + 100);
       box.addChild(hpText);
 
       this.container.addChild(box);
@@ -451,6 +456,13 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = true;
     this.commandMenu.setIndex(0);
     this.uiState = 'command';
+  }
+
+  /** Undo the previous character's command and go back to their turn. */
+  private undoPreviousCommand(): void {
+    if (this.battle.undoCommand()) {
+      this.startCommandPhase();
+    }
   }
 
   private onCommandSelect(cmd: string): void {
