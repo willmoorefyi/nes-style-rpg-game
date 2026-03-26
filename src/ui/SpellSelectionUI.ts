@@ -16,7 +16,7 @@ export interface SpellSelectionConfig {
   actorId: string;
   spells: SpellData[];
   enemies: Array<{ id: string; name: string }>;
-  partyMembers: Array<{ name: string; id: string }>;
+  partyMembers: Array<{ name: string; id: string; hp: number }>;
   contentX: number;
   contentY: number;
   eventBus?: EventBus;
@@ -141,7 +141,9 @@ export class SpellSelectionUI extends Container {
 
   private showPartyTargetMenu(): void {
     const { partyMembers, contentX, contentY, eventBus } = this.config;
-    const items: MenuItem[] = partyMembers.map(c => ({ label: c.name, value: c.id }));
+    const spell = this.config.spells.find(s => s.id === this.selectedSpellId);
+    const filtered = partyMembers.filter(m => spell?.effect === 'revive' ? m.hp <= 0 : m.hp > 0);
+    const items: MenuItem[] = filtered.map(c => ({ label: c.name, value: c.id }));
     this.createTargetMenu(items, contentX, contentY, eventBus);
   }
 

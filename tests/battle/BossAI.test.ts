@@ -22,7 +22,7 @@ function makeBoss(hp?: number): EnemyInstance {
   return {
     id: 'enemy_0', data: bossData,
     currentHp: hp ?? bossData.stats.hp,
-    status: new StatusTracker(), buffs: new Map(),
+    status: new StatusTracker(), buffs: new Map(), displayName: bossData.name,
   };
 }
 

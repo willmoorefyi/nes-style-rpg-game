@@ -83,7 +83,7 @@ export class SpellExecutor {
       char.useCharge(spell.level);
     }
 
-    const casterName = isEnemy ? (caster as EnemyInstance).data.name : (caster as Character).name;
+    const casterName = isEnemy ? (caster as EnemyInstance).displayName : (caster as Character).name;
     const casterInt = isEnemy
       ? (caster as EnemyInstance).data.stats.intelligence
       : (caster as Character).stats.intelligence;
@@ -137,11 +137,15 @@ export class SpellExecutor {
         // EnemyInstance
         const enemy = target as EnemyInstance;
         enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
-        this.deps.addMessage(`${enemy.data.name} recovers ${heal} HP!`);
+        this.deps.addMessage(`${enemy.displayName} recovers ${heal} HP!`);
         this.deps.addDamageEvent({ targetId: enemy.id, damage: heal, isHeal: true, isCrit: false, spellElement: spell.element });
       } else {
-        // Character
+        // Character — skip fallen allies
         const char = target as Character;
+        if (char.currentHp <= 0) {
+          this.deps.addMessage(`${char.name} has no effect on the fallen!`);
+          continue;
+        }
         const charId = this.getCharId(char);
         char.currentHp = char.currentHp + heal;
         this.deps.addMessage(`${char.name} recovers ${heal} HP!`);
@@ -181,13 +185,13 @@ export class SpellExecutor {
         if (spell.effect.startsWith('status_')) {
           const status = spell.effect.replace('status_', '') as StatusEffect;
           enemy.status.apply(status);
-          this.deps.addMessage(`${enemy.data.name} is affected by ${status}!`);
+          this.deps.addMessage(`${enemy.displayName} is affected by ${status}!`);
         } else {
           enemy.currentHp = Math.max(0, enemy.currentHp - damage);
-          this.deps.addMessage(`${enemy.data.name} takes ${damage} damage!`);
+          this.deps.addMessage(`${enemy.displayName} takes ${damage} damage!`);
           this.deps.addDamageEvent({ targetId: enemy.id, damage, isHeal: false, isCrit: false, spellElement: spell.element });
           if (enemy.currentHp <= 0) {
-            this.deps.addMessage(`${enemy.data.name} defeated!`);
+            this.deps.addMessage(`${enemy.displayName} defeated!`);
           }
         }
       } else {
@@ -227,7 +231,7 @@ export class SpellExecutor {
       if ('data' in target) {
         const enemy = target as EnemyInstance;
         enemy.buffs.set(info.stat, (enemy.buffs.get(info.stat) ?? 0) + info.amount);
-        this.deps.addMessage(`${enemy.data.name}'s ${info.label} increased!`);
+        this.deps.addMessage(`${enemy.displayName}'s ${info.label} increased!`);
       } else {
         const char = target as Character;
         char.applyBuff(info.stat, info.amount);
@@ -251,7 +255,7 @@ export class SpellExecutor {
       if ('data' in target) {
         const enemy = target as EnemyInstance;
         enemy.buffs.set(info.stat, (enemy.buffs.get(info.stat) ?? 0) + info.amount);
-        this.deps.addMessage(`${enemy.data.name}'s ${info.label} decreased!`);
+        this.deps.addMessage(`${enemy.displayName}'s ${info.label} decreased!`);
       } else {
         const char = target as Character;
         char.applyBuff(info.stat, info.amount);
@@ -272,7 +276,7 @@ export class SpellExecutor {
         const enemy = target as EnemyInstance;
         if (enemy.status.has(status)) {
           enemy.status.remove(status);
-          this.deps.addMessage(`${enemy.data.name}'s ${successMsg}!`);
+          this.deps.addMessage(`${enemy.displayName}'s ${successMsg}!`);
         } else {
           this.deps.addMessage('No effect.');
         }
@@ -302,7 +306,7 @@ export class SpellExecutor {
         if (enemy.currentHp <= 0) {
           enemy.status.remove('death');
           enemy.currentHp = 1;
-          this.deps.addMessage(`${enemy.data.name} is revived!`);
+          this.deps.addMessage(`${enemy.displayName} is revived!`);
         } else {
           this.deps.addMessage('No effect.');
         }

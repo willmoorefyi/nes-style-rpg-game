@@ -24,6 +24,10 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
 (async () => {
   const game = new Game();
   await game.init();
+  // Expose game object in dev mode for debugging/testing
+  if (import.meta.env.DEV) {
+    (window as unknown as Record<string, unknown>).__game = game;
+  }
   document.body.appendChild(game.canvas);
   game.focusCanvas();
   // Click anywhere on the page to ensure canvas gets focus

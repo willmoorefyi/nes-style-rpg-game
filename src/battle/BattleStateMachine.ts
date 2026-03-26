@@ -20,6 +20,8 @@ export interface EnemyInstance {
   status: StatusTracker;
   /** Battle-only buff/debuff tracking (e.g., evade: -20 from LOCK) */
   buffs: Map<string, number>;
+  /** Display name with suffix for duplicates (e.g., "Goblin A") — use for messages */
+  displayName: string;
   /** Optional AI behavior — if set, used instead of default random targeting */
   aiBehavior?: AIBehavior;
   /** Tracks which boss phase thresholds have been crossed (one-way) */
@@ -89,8 +91,20 @@ export class BattleStateMachine {
       currentHp: e.stats.hp,
       status: new StatusTracker(),
       buffs: new Map(),
+      displayName: e.name,
       crossedPhases: new Set<number>(),
     }));
+    // Append A/B/C suffixes for duplicate enemy names
+    const nameCounts = new Map<string, number>();
+    for (const e of this.enemies) nameCounts.set(e.data.name, (nameCounts.get(e.data.name) ?? 0) + 1);
+    const nameIndex = new Map<string, number>();
+    for (const e of this.enemies) {
+      if ((nameCounts.get(e.data.name) ?? 0) > 1) {
+        const idx = nameIndex.get(e.data.name) ?? 0;
+        e.displayName = `${e.data.name} ${String.fromCharCode(65 + idx)}`;
+        nameIndex.set(e.data.name, idx + 1);
+      }
+    }
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
@@ -156,7 +170,7 @@ export class BattleStateMachine {
 
   startBattle(): void {
     this._state = 'intro';
-    this.messages = [{ text: `${this.enemies.map(e => e.data.name).join(', ')} appeared!` }];
+    this.messages = [{ text: `${this.enemies.map(e => e.displayName).join(', ')} appeared!` }];
   }
 
   advanceFromIntro(): void {
@@ -256,7 +270,7 @@ export class BattleStateMachine {
     let actorName: string;
     if (action.isEnemy) {
       const enemy = this.enemies.find(e => e.id === action.combatantId);
-      actorName = enemy?.data.name ?? 'Unknown';
+      actorName = enemy?.displayName ?? 'Unknown';
     } else {
       const char = this.getPartyMember(action.combatantId);
       actorName = char?.name ?? 'Unknown';
@@ -270,7 +284,7 @@ export class BattleStateMachine {
     if (cmd.targetId) {
       const targetEnemy = this.enemies.find(e => e.id === cmd.targetId);
       if (targetEnemy) {
-        result.targetName = targetEnemy.data.name;
+        result.targetName = targetEnemy.displayName;
       } else {
         const targetChar = this.getPartyMember(cmd.targetId);
         if (targetChar) result.targetName = targetChar.name;
@@ -306,15 +320,15 @@ export class BattleStateMachine {
       const result = enemy.status.tick(enemy.data.stats.hp);
       if (result.damage > 0) {
         enemy.currentHp = Math.max(0, enemy.currentHp - result.damage);
-        this.messages.push({ text: `${enemy.data.name} takes ${result.damage} poison damage!` });
+        this.messages.push({ text: `${enemy.displayName} takes ${result.damage} poison damage!` });
         if (enemy.currentHp <= 0) {
-          this.messages.push({ text: `${enemy.data.name} defeated!` });
+          this.messages.push({ text: `${enemy.displayName} defeated!` });
           return false;
         }
       }
       if (result.skipTurn) {
         const status = enemy.status.has('sleep') ? 'asleep' : 'stunned';
-        this.messages.push({ text: `${enemy.data.name} is ${status}!` });
+        this.messages.push({ text: `${enemy.displayName} is ${status}!` });
         return false;
       }
       return true;
@@ -411,10 +425,10 @@ export class BattleStateMachine {
     } else {
       target.currentHp = Math.max(0, target.currentHp - result.damage);
       const crit = result.critical ? ' Critical!' : '';
-      this.messages.push({ text: `${actor.name} hits ${target.data.name} for ${result.damage}!${crit}` });
+      this.messages.push({ text: `${actor.name} hits ${target.displayName} for ${result.damage}!${crit}` });
       this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
       if (target.currentHp <= 0) {
-        this.messages.push({ text: `${target.data.name} defeated!` });
+        this.messages.push({ text: `${target.displayName} defeated!` });
       }
     }
   }
@@ -431,11 +445,11 @@ export class BattleStateMachine {
     );
 
     if (!result.hit) {
-      this.messages.push({ text: `${enemy.data.name} missed!` });
+      this.messages.push({ text: `${enemy.displayName} missed!` });
     } else {
       target.currentHp = target.currentHp - result.damage;
       const crit = result.critical ? ' Critical!' : '';
-      this.messages.push({ text: `${enemy.data.name} hits ${target.name} for ${result.damage}!${crit}` });
+      this.messages.push({ text: `${enemy.displayName} hits ${target.name} for ${result.damage}!${crit}` });
       this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
       if (target.currentHp <= 0) {
         this.messages.push({ text: `${target.name} fell!` });

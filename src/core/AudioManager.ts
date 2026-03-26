@@ -7,6 +7,7 @@ export class AudioManager {
   private ctx: AudioContext | null = null;
   private manifest: AudioManifest | null = null;
   private audioCache = new Map<string, AudioBuffer>();
+  private failedLoads = new Set<string>();
   private currentMusic: { source: AudioBufferSourceNode; gain: GainNode; trackId: string } | null = null;
   private musicVolume = 1;
   private sfxVolume = 1;
@@ -34,12 +35,14 @@ export class AudioManager {
 
   private async loadAudio(path: string): Promise<AudioBuffer | null> {
     if (this.audioCache.has(path)) return this.audioCache.get(path)!;
+    if (this.failedLoads.has(path)) return null;
     const ctx = this.ensureContext();
     if (!ctx) return null;
     try {
       const response = await fetch(path);
       if (!response.ok) {
         console.warn(`Audio file not found: ${path}`);
+        this.failedLoads.add(path);
         return null;
       }
       const buffer = await response.arrayBuffer();
@@ -48,6 +51,7 @@ export class AudioManager {
       return audio;
     } catch (e) {
       console.warn(`Failed to load audio: ${path}`, e);
+      this.failedLoads.add(path);
       return null;
     }
   }

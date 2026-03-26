@@ -199,6 +199,21 @@ export class BattleScene implements Scene {
     });
   }
 
+  private updatePartySprites(): void {
+    const party = this.battle.allParty;
+    for (let i = 0; i < party.length; i++) {
+      const sprite = this.partySprites[i];
+      if (!sprite) continue;
+      if (party[i].currentHp <= 0) {
+        sprite.alpha = 0.3;
+        sprite.tint = 0x666666;
+      } else {
+        sprite.alpha = 1.0;
+        sprite.tint = 0xffffff;
+      }
+    }
+  }
+
   private updateEnemySprites(): void {
     const enemies = this.battle.allEnemies;
     for (let i = 0; i < enemies.length; i++) {
@@ -342,10 +357,8 @@ export class BattleScene implements Scene {
 
   private showSpellUI(actor: Character): void {
     const actorId = this.battle.currentCommandActorId!;
-    const enemies = this.battle.livingEnemies.map(e => ({ id: e.id, name: e.data.name }));
-    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}` }));
-
-    // Check if actor has any spells before creating UI
+    const enemies = this.battle.livingEnemies.map(e => ({ id: e.id, name: e.displayName }));
+    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}`, hp: c.currentHp }));
     let hasSpells = false;
     for (let lvl = 1; lvl <= 8; lvl++) {
       if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) {
@@ -455,7 +468,7 @@ export class BattleScene implements Scene {
   private showTargetMenu(): void {
     const actorId = this.battle.currentCommandActorId!;
     const enemies = this.battle.livingEnemies;
-    const items: MenuItem[] = enemies.map(e => ({ label: e.data.name, value: e.id }));
+    const items: MenuItem[] = enemies.map(e => ({ label: e.displayName, value: e.id }));
 
     if (this.targetMenu) this.commandWindow.removeChild(this.targetMenu);
 
@@ -555,7 +568,7 @@ export class BattleScene implements Scene {
     }
     const enemies = this.battle.allEnemies;
     for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i].data.name === actorName && enemies[i].currentHp > 0) return { sprite: this.enemySprites[i], isEnemy: true };
+      if (enemies[i].displayName === actorName && enemies[i].currentHp > 0) return { sprite: this.enemySprites[i], isEnemy: true };
     }
     return null;
   }
@@ -615,6 +628,7 @@ export class BattleScene implements Scene {
         this.spawnFloatingTextsFromEvents(result.damageEvents);
         this.updatePartyDisplay();
         this.updateEnemySprites();
+        this.updatePartySprites();
         this.animMessages = result.messages;
         this.animMessageIndex = 0;
         this.animTimer = 0;
@@ -733,6 +747,7 @@ export class BattleScene implements Scene {
     this.battle.resolveRound();
     this.updatePartyDisplay();
     this.updateEnemySprites();
+    this.updatePartySprites();
 
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
       if (this.battle.state === 'victory') {

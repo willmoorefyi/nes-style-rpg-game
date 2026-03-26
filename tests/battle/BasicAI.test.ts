@@ -19,7 +19,7 @@ const mockEnemyData: EnemyData = {
 };
 
 function makeEnemy(id = 'enemy_0'): EnemyInstance {
-  return { id, data: mockEnemyData, currentHp: 20, status: new StatusTracker(), buffs: new Map() };
+  return { id, data: mockEnemyData, currentHp: 20, status: new StatusTracker(), buffs: new Map(), displayName: mockEnemyData.name };
 }
 
 describe('BasicAI', () => {
