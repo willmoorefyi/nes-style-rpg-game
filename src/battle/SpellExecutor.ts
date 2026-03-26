@@ -120,7 +120,7 @@ export class SpellExecutor {
 
   private executeHealSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
     const power = spell.power ?? 30;
-    const targets = spell.targeting === 'all'
+    const targets = spell.targeting === 'all_allies'
       ? (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty())
       : cmd.targetId
         ? (isEnemy ? this.deps.enemies.filter(e => e.id === cmd.targetId) : this.partyFilter(cmd.targetId!))
@@ -212,7 +212,7 @@ export class SpellExecutor {
         ? (isEnemy
           ? this.deps.enemies.filter(e => e.id === cmd.targetId && e.currentHp > 0)
           : this.partyFilter(cmd.targetId!, c => c.currentHp > 0))
-        : [];
+        : (isEnemy ? [] : this.deps.livingParty());
 
     for (const target of targets) {
       if ('data' in target) {

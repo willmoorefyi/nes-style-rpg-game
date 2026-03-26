@@ -45,7 +45,7 @@ export function createMockGame(mapData?: MapData) {
       update: vi.fn(),
     },
     events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
-    data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]) },
+    data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]), loadSpells: vi.fn().mockResolvedValue([]) },
     party: { all: [] as readonly unknown[], gold: 0, distributeXp: vi.fn(), addGold: vi.fn() },
     audio: createMockAudio(),
   } as const;

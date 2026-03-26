@@ -50,12 +50,14 @@ export class BattleTrigger {
     this.onBattleTriggered?.();
     this.currentBossConfig = bossConfig ?? null;
 
+    const spells = await this.game.data.loadSpells('assets/data/spells.yaml');
     const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events };
     const sceneConfig: BattleSceneConfig = {
       party,
       enemies,
       inventory: this.game.inventory,
       canRun: bossConfig?.canRun ?? true,
+      spells,
     };
     const battleScene = new BattleScene(deps, sceneConfig);
     // Drop old scene references before creating new ones to prevent leaks

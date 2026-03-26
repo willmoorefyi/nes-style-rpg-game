@@ -144,7 +144,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
 }
 
 const VALID_SPELL_TYPES = ['white', 'black'];
-const VALID_TARGETING = ['single', 'all', 'self'];
+const VALID_TARGETING = ['single', 'all', 'self', 'single_ally', 'all_allies'];
 
 export function validateSpellData(data: unknown): import('../types/index.js').SpellData {
   assertObject('SpellData', data);

@@ -82,7 +82,7 @@ export interface ShopData {
 }
 
 export type SpellType = 'white' | 'black';
-export type SpellTargeting = 'single' | 'all' | 'self';
+export type SpellTargeting = 'single' | 'all' | 'self' | 'single_ally' | 'all_allies';
 
 export interface SpellData {
   id: string;

@@ -4,7 +4,7 @@
   level: 1
   type: white
   effect: heal
-  targeting: single
+  targeting: single_ally
   description: Restore HP to one ally
   power: 30
   element: none
@@ -24,7 +24,7 @@
   level: 1
   type: white
   effect: buff_defense
-  targeting: single
+  targeting: single_ally
   description: Raise defense of one ally
   power: 0
   element: none
@@ -45,7 +45,7 @@
   level: 2
   type: white
   effect: cure_blind
-  targeting: single
+  targeting: single_ally
   description: Cure blindness on one ally
   power: 0
   element: none
@@ -65,7 +65,7 @@
   level: 2
   type: white
   effect: resist_lightning
-  targeting: all
+  targeting: all_allies
   description: Grant lightning resistance to all allies
   power: 0
   element: lightning
@@ -75,7 +75,7 @@
   level: 2
   type: white
   effect: buff_evade
-  targeting: single
+  targeting: single_ally
   description: Raise evasion of one ally
   power: 0
   element: none
@@ -86,7 +86,7 @@
   level: 3
   type: white
   effect: heal
-  targeting: single
+  targeting: single_ally
   description: Restore 60 HP to one ally
   power: 60
   element: none
@@ -106,7 +106,7 @@
   level: 3
   type: white
   effect: resist_fire
-  targeting: all
+  targeting: all_allies
   description: Grant fire resistance to all allies
   power: 0
   element: fire
@@ -116,7 +116,7 @@
   level: 3
   type: white
   effect: heal
-  targeting: all
+  targeting: all_allies
   description: Restore HP to all allies
   power: 20
   element: none
@@ -127,7 +127,7 @@
   level: 4
   type: white
   effect: cure_poison
-  targeting: single
+  targeting: single_ally
   description: Cure poison on one ally
   power: 0
   element: none
@@ -147,7 +147,7 @@
   level: 4
   type: white
   effect: resist_ice
-  targeting: all
+  targeting: all_allies
   description: Grant ice resistance to all allies
   power: 0
   element: ice
@@ -157,7 +157,7 @@
   level: 4
   type: white
   effect: cure_silence
-  targeting: single
+  targeting: single_ally
   description: Cure silence on one ally
   power: 0
   element: none
@@ -168,7 +168,7 @@
   level: 5
   type: white
   effect: heal
-  targeting: single
+  targeting: single_ally
   description: Restore 120 HP to one ally
   power: 120
   element: none
@@ -178,7 +178,7 @@
   level: 5
   type: white
   effect: revive
-  targeting: single
+  targeting: single_ally
   description: Revive one fallen ally with 1 HP
   power: 0
   element: none
@@ -250,7 +250,7 @@
   level: 2
   type: black
   effect: buff_attack
-  targeting: single
+  targeting: single_ally
   description: Raise attack of one ally
   power: 0
   element: none
@@ -322,7 +322,7 @@
   level: 4
   type: black
   effect: buff_speed
-  targeting: single
+  targeting: single_ally
   description: Double attack speed of one ally
   power: 0
   element: none

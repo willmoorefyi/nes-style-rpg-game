@@ -32,15 +32,15 @@ const undead: EnemyData = {
 };
 
 // Spell definitions matching spells.yaml
-const fogSpell: SpellData = { id: 'fog', name: 'FOG', level: 1, type: 'white', effect: 'buff_defense', targeting: 'single', description: 'Raise defense', power: 0, element: 'none' };
+const fogSpell: SpellData = { id: 'fog', name: 'FOG', level: 1, type: 'white', effect: 'buff_defense', targeting: 'single_ally', description: 'Raise defense', power: 0, element: 'none' };
 const ruseSpell: SpellData = { id: 'ruse', name: 'RUSE', level: 1, type: 'white', effect: 'buff_evade', targeting: 'self', description: 'Raise evasion', power: 0, element: 'none' };
-const invsSpell: SpellData = { id: 'invs', name: 'INVS', level: 2, type: 'white', effect: 'buff_evade', targeting: 'single', description: 'Raise evasion', power: 0, element: 'none' };
-const tmprSpell: SpellData = { id: 'tmpr', name: 'TMPR', level: 2, type: 'black', effect: 'buff_attack', targeting: 'single', description: 'Raise attack', power: 0, element: 'none' };
+const invsSpell: SpellData = { id: 'invs', name: 'INVS', level: 2, type: 'white', effect: 'buff_evade', targeting: 'single_ally', description: 'Raise evasion', power: 0, element: 'none' };
+const tmprSpell: SpellData = { id: 'tmpr', name: 'TMPR', level: 2, type: 'black', effect: 'buff_attack', targeting: 'single_ally', description: 'Raise attack', power: 0, element: 'none' };
 const lockSpell: SpellData = { id: 'lock', name: 'LOCK', level: 1, type: 'black', effect: 'debuff_evade', targeting: 'single', description: 'Lower evasion', power: 0, element: 'none' };
 const slowSpell: SpellData = { id: 'slow', name: 'SLOW', level: 2, type: 'black', effect: 'debuff_speed', targeting: 'single', description: 'Reduce speed', power: 0, element: 'none' };
-const lampSpell: SpellData = { id: 'lamp', name: 'LAMP', level: 2, type: 'white', effect: 'cure_blind', targeting: 'single', description: 'Cure blindness', power: 0, element: 'none' };
-const lifeSpell: SpellData = { id: 'life', name: 'LIFE', level: 5, type: 'white', effect: 'revive', targeting: 'single', description: 'Revive ally', power: 0, element: 'none' };
-const alitSpell: SpellData = { id: 'alit', name: 'ALIT', level: 2, type: 'white', effect: 'resist_lightning', targeting: 'all', description: 'Lightning resist', power: 0, element: 'lightning' };
+const lampSpell: SpellData = { id: 'lamp', name: 'LAMP', level: 2, type: 'white', effect: 'cure_blind', targeting: 'single_ally', description: 'Cure blindness', power: 0, element: 'none' };
+const lifeSpell: SpellData = { id: 'life', name: 'LIFE', level: 5, type: 'white', effect: 'revive', targeting: 'single_ally', description: 'Revive ally', power: 0, element: 'none' };
+const alitSpell: SpellData = { id: 'alit', name: 'ALIT', level: 2, type: 'white', effect: 'resist_lightning', targeting: 'all_allies', description: 'Lightning resist', power: 0, element: 'lightning' };
 const harmSpell: SpellData = { id: 'harm', name: 'HARM', level: 1, type: 'white', effect: 'damage_holy', targeting: 'all', description: 'Holy damage', power: 20, element: 'holy' };
 
 /** Helper: create a mage with charges for a given spell level */

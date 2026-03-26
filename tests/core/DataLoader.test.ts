@@ -62,7 +62,7 @@ describe('DataLoader', () => {
   it('should load spell data', async () => {
     const spellData = [{
       id: 'cure', name: 'CURE', level: 1, type: 'white',
-      effect: 'heal', targeting: 'single', description: 'Restore HP',
+      effect: 'heal', targeting: 'single_ally', description: 'Restore HP',
     }];
     const loader = new DataLoader(mockAssetLoader(spellData));
     

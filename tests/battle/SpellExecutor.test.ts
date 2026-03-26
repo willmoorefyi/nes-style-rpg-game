@@ -22,11 +22,11 @@ const goblin: EnemyData = {
 };
 
 // New spell definitions for WP2
-const pureSpell: SpellData = { id: 'pure', name: 'PURE', level: 4, type: 'white', effect: 'cure_poison', targeting: 'single', description: 'Cure poison', power: 0, element: 'none' };
-const amutSpell: SpellData = { id: 'amut', name: 'AMUT', level: 4, type: 'white', effect: 'cure_silence', targeting: 'single', description: 'Cure silence', power: 0, element: 'none' };
-const fastSpell: SpellData = { id: 'fast', name: 'FAST', level: 4, type: 'black', effect: 'buff_speed', targeting: 'single', description: 'Raise speed', power: 0, element: 'none' };
-const afirSpell: SpellData = { id: 'afir', name: 'AFIR', level: 3, type: 'white', effect: 'resist_fire', targeting: 'all', description: 'Fire resist', power: 0, element: 'fire' };
-const aiceSpell: SpellData = { id: 'aice', name: 'AICE', level: 4, type: 'white', effect: 'resist_ice', targeting: 'all', description: 'Ice resist', power: 0, element: 'ice' };
+const pureSpell: SpellData = { id: 'pure', name: 'PURE', level: 4, type: 'white', effect: 'cure_poison', targeting: 'single_ally', description: 'Cure poison', power: 0, element: 'none' };
+const amutSpell: SpellData = { id: 'amut', name: 'AMUT', level: 4, type: 'white', effect: 'cure_silence', targeting: 'single_ally', description: 'Cure silence', power: 0, element: 'none' };
+const fastSpell: SpellData = { id: 'fast', name: 'FAST', level: 4, type: 'black', effect: 'buff_speed', targeting: 'single_ally', description: 'Raise speed', power: 0, element: 'none' };
+const afirSpell: SpellData = { id: 'afir', name: 'AFIR', level: 3, type: 'white', effect: 'resist_fire', targeting: 'all_allies', description: 'Fire resist', power: 0, element: 'fire' };
+const aiceSpell: SpellData = { id: 'aice', name: 'AICE', level: 4, type: 'white', effect: 'resist_ice', targeting: 'all_allies', description: 'Ice resist', power: 0, element: 'ice' };
 const fearSpell: SpellData = { id: 'fear', name: 'FEAR', level: 4, type: 'white', effect: 'debuff_morale', targeting: 'all', description: 'Lower morale', power: 0, element: 'none' };
 
 function createMage(name: string, spellLevel: number, charges = 9): Character {

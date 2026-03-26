@@ -93,11 +93,11 @@ export class SpellSelectionUI extends Container {
       onSelect: (item) => {
         this.selectedSpellId = item.value;
         const spell = spells.find(s => s.id === item.value);
-        if (spell?.targeting === 'all') {
+        if (spell?.targeting === 'all' || spell?.targeting === 'all_allies') {
           this.submitResult(undefined);
         } else if (spell?.targeting === 'self') {
           this.submitResult(this.config.actorId);
-        } else if (spell?.type === 'white' && spell?.effect === 'heal') {
+        } else if (spell?.targeting === 'single_ally') {
           this.showPartyTargetMenu();
         } else {
           this.showEnemyTargetMenu();
