@@ -94,17 +94,6 @@ export class BattleStateMachine {
       displayName: e.name,
       crossedPhases: new Set<number>(),
     }));
-    // Append A/B/C suffixes for duplicate enemy names
-    const nameCounts = new Map<string, number>();
-    for (const e of this.enemies) nameCounts.set(e.data.name, (nameCounts.get(e.data.name) ?? 0) + 1);
-    const nameIndex = new Map<string, number>();
-    for (const e of this.enemies) {
-      if ((nameCounts.get(e.data.name) ?? 0) > 1) {
-        const idx = nameIndex.get(e.data.name) ?? 0;
-        e.displayName = `${e.data.name} ${String.fromCharCode(65 + idx)}`;
-        nameIndex.set(e.data.name, idx + 1);
-      }
-    }
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
