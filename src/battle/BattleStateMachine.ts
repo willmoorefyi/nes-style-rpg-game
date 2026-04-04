@@ -236,9 +236,29 @@ export class BattleStateMachine {
     this._state = 'execution';
   }
 
+  /** Check if the next actor in the action queue is still alive */
+  isNextActorAlive(): boolean {
+    if (this._actionQueue.length === 0) return false;
+    const action = this._actionQueue[0];
+    if (action.isEnemy) {
+      const enemy = this.enemies.find(e => e.id === action.combatantId);
+      return !!enemy && enemy.currentHp > 0;
+    }
+    const member = this.getPartyMember(action.combatantId);
+    return !!member && member.currentHp > 0;
+  }
+
   executeNextAction(): { done: boolean; messages: BattleMessage[]; damageEvents: DamageEvent[] } {
     if (this._actionQueue.length === 0) {
       return { done: true, messages: [], damageEvents: [] };
+    }
+
+    // Skip dead actors — defense-in-depth for animation layer
+    if (!this.isNextActorAlive()) {
+      this._actionQueue.shift();
+      const done = this._actionQueue.length === 0;
+      if (done) this._state = 'resolution';
+      return { done, messages: [], damageEvents: [] };
     }
 
     const action = this._actionQueue.shift()!;
@@ -328,6 +348,10 @@ export class BattleStateMachine {
         this.messages.push({ text: `${enemy.displayName} is ${status}!` });
         return false;
       }
+      if (enemy.status.has('fear') && this.rng() < 0.5) {
+        this.messages.push({ text: `${enemy.displayName} is trembling with fear!` });
+        return false;
+      }
       return true;
     } else {
       const char = this.getPartyMember(id);
@@ -344,6 +368,10 @@ export class BattleStateMachine {
       if (result.skipTurn) {
         const status = char.statusTracker.has('sleep') ? 'asleep' : 'stunned';
         this.messages.push({ text: `${char.name} is ${status}!` });
+        return false;
+      }
+      if (char.statusTracker.has('fear') && this.rng() < 0.5) {
+        this.messages.push({ text: `${char.name} is trembling with fear!` });
         return false;
       }
       return true;
@@ -512,6 +540,11 @@ export class BattleStateMachine {
   /** Whether the party can run from this battle */
   getCanRun(): boolean {
     return this.canRun;
+  }
+
+  skipRemainingActions(): void {
+    this._actionQueue.length = 0;
+    this._state = 'resolution';
   }
 
   resolveRound(): void {

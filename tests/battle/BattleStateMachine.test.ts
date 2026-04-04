@@ -101,4 +101,160 @@ describe('BattleStateMachine', () => {
     const messages = battle.currentMessages.map(m => m.text);
     expect(messages.some(m => m.includes('Hero2 hits'))).toBe(true);
   });
+
+  describe('fear status in combat', () => {
+    it('enemy with fear skips turn when rng < 0.5', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      // rng sequence: need to control the fear check specifically
+      // tickCombatantStatus for enemy calls: tick() then checks fear with this.rng()
+      // We need rng < 0.5 for the fear check
+      let callCount = 0;
+      const rng = () => {
+        callCount++;
+        // Return 0.3 for fear check (< 0.5 → skip), 0.5 for everything else
+        return 0.3;
+      };
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, rng);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      // Apply fear to the enemy before execution
+      battle.allEnemies[0].status.apply('fear');
+      battle.prepareRound();
+      // Execute all actions and collect messages
+      const allMessages: string[] = [];
+      while (battle.actionQueueLength > 0) {
+        const result = battle.executeNextAction();
+        allMessages.push(...result.messages.map(m => m.text));
+      }
+      expect(allMessages.some(m => m.includes('trembling with fear'))).toBe(true);
+    });
+
+    it('enemy with fear acts normally when rng >= 0.5', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.8);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.allEnemies[0].status.apply('fear');
+      battle.prepareRound();
+      const allMessages: string[] = [];
+      while (battle.actionQueueLength > 0) {
+        const result = battle.executeNextAction();
+        allMessages.push(...result.messages.map(m => m.text));
+      }
+      expect(allMessages.some(m => m.includes('trembling with fear'))).toBe(false);
+      // Enemy should have acted (hit or missed)
+      expect(allMessages.some(m => m.includes('Goblin hits') || m.includes('Goblin missed'))).toBe(true);
+    });
+  });
+
+  describe('dead actor skipping', () => {
+    it('isNextActorAlive returns false for dead enemy', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      // Kill the enemy after it's queued
+      battle.allEnemies[0].currentHp = 0;
+      expect(battle.isNextActorAlive()).toBe(false);
+    });
+
+    it('isNextActorAlive returns true for living enemy', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      expect(battle.isNextActorAlive()).toBe(true);
+    });
+
+    it('isNextActorAlive returns false for empty queue', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      expect(battle.isNextActorAlive()).toBe(false);
+    });
+
+    it('skips dead enemy actions in executeNextAction', () => {
+      // Use high enemy agility so enemy goes first in the queue
+      const fastEnemy: EnemyData = { ...mockEnemy, stats: { ...mockEnemy.stats, agility: 99 } };
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [fastEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      // Kill the enemy after it's queued but before execution
+      battle.allEnemies[0].currentHp = 0;
+      const result = battle.executeNextAction();
+      // Dead actor's action should produce no messages or damage
+      expect(result.messages).toHaveLength(0);
+      expect(result.damageEvents).toHaveLength(0);
+    });
+
+    it('skips dead party member actions in executeNextAction', () => {
+      // Use high party agility so party goes first
+      const slowEnemy: EnemyData = { ...mockEnemy, stats: { ...mockEnemy.stats, agility: 1 } };
+      const fastClass = { ...mockClass, baseStats: { ...mockClass.baseStats, agility: 99 } };
+      const char = new Character({ name: 'Hero', classData: fastClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [slowEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      // Kill the party member after queued
+      char.currentHp = 0;
+      const result = battle.executeNextAction();
+      expect(result.messages).toHaveLength(0);
+      expect(result.damageEvents).toHaveLength(0);
+    });
+  });
+
+  describe('early battle end', () => {
+    it('skipRemainingActions clears queue and sets state to resolution', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      expect(battle.actionQueueLength).toBeGreaterThan(0);
+      battle.skipRemainingActions();
+      expect(battle.actionQueueLength).toBe(0);
+      expect(battle.state).toBe('resolution');
+    });
+
+    it('resolveRound detects victory after skipRemainingActions', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      battle.allEnemies[0].currentHp = 0;
+      battle.skipRemainingActions();
+      battle.resolveRound();
+      expect(battle.state).toBe('victory');
+      expect(battle.battleResult?.victory).toBe(true);
+      expect(battle.battleResult?.xpReward).toBe(10);
+      expect(battle.battleResult?.goldReward).toBe(5);
+    });
+
+    it('resolveRound detects defeat after skipRemainingActions', () => {
+      const char = new Character({ name: 'Hero', classData: mockClass });
+      const battle = new BattleStateMachine({ party: [char], enemies: [mockEnemy] }, () => 0.5);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      char.currentHp = 0;
+      battle.skipRemainingActions();
+      battle.resolveRound();
+      expect(battle.state).toBe('defeat');
+      expect(battle.battleResult?.victory).toBe(false);
+    });
+  });
 });
