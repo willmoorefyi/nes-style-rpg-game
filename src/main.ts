@@ -1,15 +1,5 @@
 import { Game } from './core/Game.js';
 import { TitleScene } from './scenes/TitleScene.js';
-import { PartyCreationScene } from './scenes/PartyCreationScene.js';
-import { ExplorationScene } from './scenes/ExplorationScene.js';
-import { StatusScene } from './scenes/StatusScene.js';
-import { FieldMenuScene } from './scenes/FieldMenuScene.js';
-import { ItemMenuScene } from './scenes/ItemMenuScene.js';
-import { EquipScene } from './scenes/EquipScene.js';
-import { FieldMagicScene } from './scenes/FieldMagicScene.js';
-import { FieldOrderScene } from './scenes/FieldOrderScene.js';
-import { SaveScene } from './scenes/SaveScene.js';
-import { LoadScene } from './scenes/LoadScene.js';
 
 function showError(msg: string): void {
   const el = document.createElement('div');
@@ -33,16 +23,46 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
   // Click anywhere on the page to ensure canvas gets focus
   document.addEventListener('click', () => game.focusCanvas());
   game.scenes.register('title', new TitleScene(game));
-  game.scenes.register('partyCreation', new PartyCreationScene(game));
-  game.scenes.register('exploration', new ExplorationScene(game));
-  game.scenes.register('status', new StatusScene(game));
-  game.scenes.register('fieldMenu', new FieldMenuScene(game));
-  game.scenes.register('itemMenu', new ItemMenuScene(game));
-  game.scenes.register('equip', new EquipScene(game));
-  game.scenes.register('fieldMagic', new FieldMagicScene(game));
-  game.scenes.register('fieldOrder', new FieldOrderScene(game));
-  game.scenes.register('saveMenu', new SaveScene(game));
-  game.scenes.register('loadMenu', new LoadScene(game));
+  game.scenes.registerLazy('partyCreation', async () => {
+    const { PartyCreationScene } = await import('./scenes/PartyCreationScene.js');
+    return new PartyCreationScene(game);
+  });
+  game.scenes.registerLazy('exploration', async () => {
+    const { ExplorationScene } = await import('./scenes/ExplorationScene.js');
+    return new ExplorationScene(game);
+  });
+  game.scenes.registerLazy('status', async () => {
+    const { StatusScene } = await import('./scenes/StatusScene.js');
+    return new StatusScene(game);
+  });
+  game.scenes.registerLazy('fieldMenu', async () => {
+    const { FieldMenuScene } = await import('./scenes/FieldMenuScene.js');
+    return new FieldMenuScene(game);
+  });
+  game.scenes.registerLazy('itemMenu', async () => {
+    const { ItemMenuScene } = await import('./scenes/ItemMenuScene.js');
+    return new ItemMenuScene(game);
+  });
+  game.scenes.registerLazy('equip', async () => {
+    const { EquipScene } = await import('./scenes/EquipScene.js');
+    return new EquipScene(game);
+  });
+  game.scenes.registerLazy('fieldMagic', async () => {
+    const { FieldMagicScene } = await import('./scenes/FieldMagicScene.js');
+    return new FieldMagicScene(game);
+  });
+  game.scenes.registerLazy('fieldOrder', async () => {
+    const { FieldOrderScene } = await import('./scenes/FieldOrderScene.js');
+    return new FieldOrderScene(game);
+  });
+  game.scenes.registerLazy('saveMenu', async () => {
+    const { SaveScene } = await import('./scenes/SaveScene.js');
+    return new SaveScene(game);
+  });
+  game.scenes.registerLazy('loadMenu', async () => {
+    const { LoadScene } = await import('./scenes/LoadScene.js');
+    return new LoadScene(game);
+  });
   await game.scenes.switchTo('title');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {

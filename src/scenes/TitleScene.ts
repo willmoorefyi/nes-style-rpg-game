@@ -4,7 +4,6 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { SaveManager } from '../systems/SaveManager.js';
-import { DebugScenarioLoader } from '../systems/DebugScenarioLoader.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
@@ -76,12 +75,14 @@ export class TitleScene implements Scene {
     } else if (value === 'continue') {
       this.game.scenes.push('loadMenu');
     } else if (value === 'debug') {
-      const loader = new DebugScenarioLoader(this.game);
-      loader.loadScenarios().then(scenarios => {
-        if (scenarios.length > 0) {
-          loader.applyAndBattle(scenarios[0]);
-        }
-      });
+      import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader }) => {
+        const loader = new DebugScenarioLoader(this.game);
+        loader.loadScenarios().then(scenarios => {
+          if (scenarios.length > 0) {
+            loader.applyAndBattle(scenarios[0]);
+          }
+        });
+      }).catch((err) => console.error('Failed to load debug scenario:', err));
     }
   }
 

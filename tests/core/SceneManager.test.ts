@@ -214,4 +214,64 @@ describe('SceneManager', () => {
       expect(scene2.updateCalls).toEqual([16]);
     });
   });
+
+  describe('registerLazy', () => {
+    it('switchTo resolves a lazy-registered scene', async () => {
+      const scene = createMockScene();
+      const factory = vi.fn(async () => scene);
+      manager.registerLazy('lazy', factory);
+
+      await manager.switchTo('lazy');
+
+      expect(factory).toHaveBeenCalledOnce();
+      expect(scene.enterCalls).toBe(1);
+      expect(manager.current).toBe('lazy');
+    });
+
+    it('push resolves a lazy-registered scene', async () => {
+      const scene1 = createMockScene();
+      const scene2 = createMockScene();
+      manager.register('s1', scene1);
+      manager.registerLazy('lazy', async () => scene2);
+
+      await manager.switchTo('s1');
+      await manager.push('lazy');
+
+      expect(scene2.enterCalls).toBe(1);
+      expect(scene1.pauseCalls).toBe(1);
+    });
+
+    it('caches the lazy scene after first resolution', async () => {
+      const scene = createMockScene();
+      const factory = vi.fn(async () => scene);
+      manager.registerLazy('lazy', factory);
+
+      await manager.switchTo('lazy');
+      // Push another scene then switch back to lazy
+      const other = createMockScene();
+      manager.register('other', other);
+      await manager.switchTo('other');
+      await manager.switchTo('lazy');
+
+      expect(factory).toHaveBeenCalledOnce();
+      expect(scene.enterCalls).toBe(2);
+    });
+
+    it('eager register takes priority over lazy', async () => {
+      const eager = createMockScene();
+      const lazy = createMockScene();
+      manager.register('scene', eager);
+      manager.registerLazy('scene', async () => lazy);
+
+      await manager.switchTo('scene');
+
+      expect(eager.enterCalls).toBe(1);
+      expect(lazy.enterCalls).toBe(0);
+    });
+
+    it('throws for scene not in eager or lazy maps', async () => {
+      await expect(manager.switchTo('missing')).rejects.toThrow("Scene 'missing' not found");
+      await expect(manager.push('missing')).rejects.toThrow("Scene 'missing' not found");
+    });
+  });
 });

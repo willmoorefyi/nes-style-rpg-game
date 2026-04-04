@@ -3,6 +3,7 @@ import type { Scene } from '../types/index.js';
 
 export class SceneManager {
   private scenes = new Map<string, Scene>();
+  private lazyFactories = new Map<string, () => Promise<Scene>>();
   private sceneStack: Array<{ name: string; scene: Scene }> = [];
   private currentScene: Scene | null = null;
   private currentName: string | null = null;
@@ -16,13 +17,28 @@ export class SceneManager {
     this.scenes.set(name, scene);
   }
 
+  registerLazy(name: string, factory: () => Promise<Scene>): void {
+    this.lazyFactories.set(name, factory);
+  }
+
   unregister(name: string): void {
     this.scenes.delete(name);
   }
 
+  private async resolve(name: string): Promise<Scene> {
+    const eager = this.scenes.get(name);
+    if (eager) return eager;
+
+    const factory = this.lazyFactories.get(name);
+    if (!factory) throw new Error(`Scene '${name}' not found`);
+
+    const scene = await factory();
+    this.scenes.set(name, scene);
+    return scene;
+  }
+
   async switchTo(name: string): Promise<void> {
-    const next = this.scenes.get(name);
-    if (!next) throw new Error(`Scene '${name}' not found`);
+    const next = await this.resolve(name);
 
     // Clear the stack - switchTo is a hard transition
     for (const entry of this.sceneStack) {
@@ -43,8 +59,7 @@ export class SceneManager {
   }
 
   async push(name: string): Promise<void> {
-    const next = this.scenes.get(name);
-    if (!next) throw new Error(`Scene '${name}' not found`);
+    const next = await this.resolve(name);
 
     if (this.currentScene && this.currentName) {
       this.currentScene.onPause?.();
