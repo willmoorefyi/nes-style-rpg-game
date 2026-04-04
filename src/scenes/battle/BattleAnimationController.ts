@@ -125,7 +125,8 @@ export class BattleAnimationController {
         if (entry && this.currentActionInfo) {
           const { actorName, actionType, spellName } = this.currentActionInfo;
           const label = actionType === 'magic' && spellName ? spellName.toUpperCase() : capitalize(actionType);
-          entry.text = `${actorName}: ${label} ${formatConciseResult(result.messages, actorName)}`;
+          const concise = formatConciseResult(result.messages, actorName);
+          entry.text = concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`;
           this.scrollTurnList();
         }
         this.animPhase = 'result'; break;

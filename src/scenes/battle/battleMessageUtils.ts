@@ -18,16 +18,20 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
 
   // --- Status-tick-skip patterns (checked FIRST — these override the intended action) ---
   const poisonMatch = texts.find(t => t.match(new RegExp(`^${escRe(actorName)} takes (\\d+) poison damage!$`)));
+  const hasSleepStun = texts.some(t => t === `${actorName} is asleep!` || t === `${actorName} is stunned!`);
+  const hasFear = texts.some(t => t === `${actorName} is trembling with fear!`);
   if (poisonMatch) {
     const n = poisonMatch.match(/takes (\d+) poison/)![1];
     const died = texts.some(t => /defeated!$|fell!$/.test(t));
-    return `Poison → ${n} dmg${died ? ' ☠' : ''}`;
+    if (hasSleepStun) return `${texts.find(t => t.includes('asleep')) ? 'Asleep' : 'Stunned'} (${n} poison)`;
+    if (hasFear) return `Afraid (${n} poison)`;
+    return `Poison → ${n} dmg${died ? ' *' : ''}`;
   }
-  if (texts.some(t => t === `${actorName} is asleep!` || t === `${actorName} is stunned!`)) {
+  if (hasSleepStun) {
     const status = texts.find(t => t.includes('asleep')) ? 'Asleep' : 'Stunned';
     return status;
   }
-  if (texts.some(t => t === `${actorName} is trembling with fear!`)) return 'Afraid';
+  if (hasFear) return 'Afraid';
 
   // --- Escape ---
   if (texts.includes('Escaped!')) return '→ Escaped!';
@@ -43,7 +47,7 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
     const m = hitMatch.match(hitRe)!;
     const target = m[1], dmg = m[2], crit = m[3].includes('Critical') ? '!' : '';
     const died = texts.some(t => t === `${target} defeated!` || t === `${target} fell!`);
-    return `→ ${dmg} to ${target}${crit}${died ? ' ☠' : ''}`;
+    return `→ ${dmg} to ${target}${crit}${died ? ' *' : ''}`;
   }
 
   // --- Enemy physical hit on party: "EnemyName hits CharName for N!" ---
@@ -53,7 +57,7 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
     const m = enemyHitMatch.match(enemyHitRe)!;
     const target = m[2], dmg = m[3], crit = m[4].includes('Critical') ? '!' : '';
     const died = texts.some(t => t === `${target} defeated!` || t === `${target} fell!`);
-    return `→ ${dmg} to ${target}${crit}${died ? ' ☠' : ''}`;
+    return `→ ${dmg} to ${target}${crit}${died ? ' *' : ''}`;
   }
 
   // --- Filter out "casts SPELL!" announce for spell result parsing ---
@@ -64,7 +68,7 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   const dmgMsgs = filtered.filter(t => dmgRe.test(t));
   if (dmgMsgs.length > 0) {
     const defeats = filtered.filter(t => /defeated!$|fell!$/.test(t));
-    const skull = defeats.length > 0 ? ' ☠' : '';
+    const skull = defeats.length > 0 ? ' *' : '';
     if (dmgMsgs.length === 1) {
       const m = dmgMsgs[0].match(dmgRe)!;
       return `→ ${m[2]} to ${m[1]}${skull}`;
