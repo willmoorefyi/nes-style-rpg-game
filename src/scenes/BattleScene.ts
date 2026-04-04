@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite, Assets } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
@@ -66,6 +66,20 @@ export class BattleScene implements Scene {
     bg.rect(0, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x1a1a2e);
     bg.rect(0, GAME_HEIGHT / 2 - 1, GAME_WIDTH, 2).fill(0x2a2a4e);
     this.container.addChildAt(bg, 0);
+
+    // Load optional background image (overlays the solid-color fallback)
+    if (this.config.background) {
+      Assets.load(this.config.background).then((texture) => {
+        const sprite = new Sprite(texture);
+        const scaleX = GAME_WIDTH / sprite.texture.width;
+        const scaleY = GAME_HEIGHT / sprite.texture.height;
+        const scale = Math.max(scaleX, scaleY);
+        sprite.scale.set(scale);
+        sprite.x = (GAME_WIDTH - sprite.texture.width * scale) / 2;
+        sprite.y = (GAME_HEIGHT - sprite.texture.height * scale) / 2;
+        this.container.addChildAt(sprite, 1);
+      }).catch(() => console.warn('Failed to load battle background:', this.config.background));
+    }
 
     this.createUI();
     this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.partyWindow);

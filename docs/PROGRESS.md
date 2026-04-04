@@ -173,9 +173,49 @@ Phases 3 (Tilemap) and 4 (UI Framework) were successfully built in parallel usin
 
 ---
 
+## Post-Phase-18 Improvements
+
+After all 18 phases were complete, additional polish and refactoring work was done:
+
+### FEAR Spell Effect ✅
+The `debuff_morale` spell effect is no longer a no-op. FEAR now applies the `fear` status to all living enemies. Feared combatants have a 50% chance to skip their turn. Works symmetrically — both enemies and party members can be affected.
+
+### BattleScene Decomposition ✅
+`BattleScene.ts` was reduced from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`:
+- `BattleSceneTypes.ts` — shared interfaces
+- `BattleLayoutEngine.ts` — pure enemy layout function
+- `BattleDisplayManager.ts` — sprite creation and status updates
+- `BattleFieldTargeting.ts` — targeting state machine
+- `BattleAnimationController.ts` — animation phases with result display
+- `battleMessageUtils.ts` — message formatting utilities
+
+### Lazy Scene Loading ✅
+`SceneManager.registerLazy()` with factory caching. 10 scenes lazy-loaded via dynamic `import()`. Main bundle reduced from 551KB to 430KB (−22%). Only `TitleScene` is eagerly loaded.
+
+### Battle Result Messages ✅
+Turn list entries in the bottom-right command window show concise action+result (e.g., `THIEF: Fight → 11 to Skeleton`, `W.MAG: CURE → 30 HP to FGHTR`). Multi-target spells consolidated. Scrollable when entries exceed visible area. End-of-round confirm-wait with blinking ▼ prompt.
+
+### Dead Combatant Turn-Skip ✅
+Defeated enemies and KO'd party members have their queued actions silently skipped. `isNextActorAlive()` check in both the animation layer and state machine (defense-in-depth).
+
+### Early Battle End ✅
+Battle ends immediately when all enemies (or all party) are eliminated mid-round. `skipRemainingActions()` clears the queue and transitions state. No more phantom turns after a side is wiped out.
+
+### Status Effect Display ✅
+Turn list shows status labels for skipped turns: `Goblin: Asleep`, `THIEF: Stunned`, `Goblin: Afraid`. Poison+sleep combo: `Asleep (5 poison)`. Generic handling via `→` prefix convention.
+
+### Battle Backgrounds ✅
+Optional `background` image field in `BattleSceneConfig`. Loaded via PixiJS `Assets.load()` with cover-mode scaling. Falls back to two-tone solid fill. Debug scenario uses `grassland-hd.png`. Assets stored in `assets/backgrounds/`.
+
+### Minor Fixes ✅
+- Kill indicator uses `*` instead of `☠` for NES font compatibility.
+- `.playwright-mcp/` and `.yolo-sisyphus/` added to `.gitignore`.
+
+---
+
 ## Current Metrics
 
-- **Tests:** 770+ (all passing)
-- **Test files:** 63+
+- **Tests:** 879 (all passing)
+- **Test files:** 76
 - **Source files:** 80+ TypeScript files
 - **Phases complete:** 18/18

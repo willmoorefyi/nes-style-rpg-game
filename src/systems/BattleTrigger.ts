@@ -40,7 +40,7 @@ export class BattleTrigger {
     this.fadeDeps = deps;
   }
 
-  async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig): Promise<void> {
+  async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string): Promise<void> {
     const enemies = await this.loadEnemyData(enemyIds);
     if (enemies.length === 0) return;
 
@@ -58,6 +58,7 @@ export class BattleTrigger {
       inventory: this.game.inventory,
       canRun: bossConfig?.canRun ?? true,
       spells,
+      background,
     };
     const battleScene = new BattleScene(deps, sceneConfig);
     // Drop old scene references before creating new ones to prevent leaks

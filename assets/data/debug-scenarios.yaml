@@ -42,3 +42,4 @@
     antidote: 3
   gold: 200
   enemies: [skeleton, goblin, goblin, wolf, pirate]
+  background: assets/backgrounds/grassland-hd.png

@@ -28,7 +28,7 @@ npm run dev
 # Production build (outputs to dist/)
 npm run build
 
-# Run all tests (739+ tests across 70+ files)
+# Run all tests (879+ tests across 76+ files)
 npm test
 ```
 
@@ -116,7 +116,7 @@ A scene stack with `push`, `pop`, `pause`, and `resume`. Opening the menu pushes
 
 ### Battle System
 
-A state machine that flows through phases: **Intro → Command → Execution → Resolution**. The `BattleSceneDeps` interface decouples the battle logic from rendering, making the entire combat system testable without PixiJS.
+A state machine that flows through phases: **Intro → Command → Execution → Resolution**. The `BattleSceneDeps` interface decouples the battle logic from rendering, making the entire combat system testable without PixiJS. The battle scene is decomposed into focused modules in `src/scenes/battle/` — layout, display, targeting, animation, and message formatting. Turn results display concise action+result messages (e.g., `THIEF: Fight → 11 to Skeleton`). Defeated combatants have their queued turns silently skipped, and battles end immediately when one side is eliminated. Optional background images can be configured per encounter.
 
 ### Magic & Elements
 
@@ -300,6 +300,7 @@ A dedicated test suite (`tests/data/crossFileValidation.test.ts`) validates that
 ```
 ff-game/
 ├── assets/
+│   ├── backgrounds/    # Battle background images
 │   ├── data/           # YAML game data (classes, enemies, items, shops, spells)
 │   └── maps/           # YAML map definitions
 ├── docs/
@@ -313,10 +314,11 @@ ff-game/
 │   ├── entities/            # Game objects: Character, Inventory, PartyManager, PlayerController, NPC
 │   ├── rendering/           # PixiJS rendering: TilemapRenderer, Camera, SpriteAnimation, CollisionMap
 │   ├── scenes/              # All game scenes: Exploration, Battle, Menus, Shops, Save/Load, Inn
+│   │   └── battle/          # Decomposed battle scene modules (layout, display, targeting, animation, messages)
 │   ├── systems/             # Game systems: Encounters, MapLoader, SaveManager, DialogManager, BattleTrigger
 │   ├── types/               # Shared TypeScript type definitions
 │   └── ui/                  # UI components: Window, Menu, DialogBox, TextRenderer, SpellSelectionUI
-├── tests/                   # Mirrors src/ structure — 70+ test files, 739+ tests
+├── tests/                   # Mirrors src/ structure — 76+ test files, 879+ tests
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -337,6 +339,7 @@ PixiJS handles all WebGL/Canvas rendering (sprites, tilemaps, text). Every other
 - **EventBus** — loose coupling between systems (audio reacts to game events, not direct calls)
 - **Data-driven content** — all game content loaded from YAML at runtime via `DataLoader`
 - **Scene stack** — push/pop architecture for layered UI (menus on top of exploration, etc.)
+- **Lazy scene loading** — `SceneManager.registerLazy()` with dynamic `import()` reduces main bundle by 22%
 
 ### Testing
 
@@ -344,7 +347,7 @@ PixiJS handles all WebGL/Canvas rendering (sprites, tilemaps, text). Every other
 npm test
 ```
 
-Runs 739+ tests across 70+ files with Vitest. The test suite covers:
+Runs 879+ tests across 76+ files with Vitest. The test suite covers:
 
 - Battle mechanics (damage formulas, turn order, AI, elements, status effects)
 - Core systems (scene management, input, events, data loading, audio, save/load)
@@ -372,7 +375,7 @@ See [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md) for the complete game des
 
 ## 📋 Implementation Status
 
-### ✅ Complete (Phases 1–17)
+### ✅ Complete (Phases 1–18)
 
 | Phase | What's Done |
 |-------|-------------|
@@ -393,14 +396,9 @@ See [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md) for the complete game des
 | 15. Vehicles & World | Terrain types, 4 movement modes, VehicleManager, key item gates |
 | 16. Class Upgrades | 6 upgraded classes, ClassUpgradeSystem, NPC-triggered upgrades |
 | 17. Content Population | Overworld + towns + dungeons, 42 items, 34 spells, 12 enemies, 18 shops, conditional dialog |
+| 18. Polish & Balancing | Playtesting, stat tuning, bitmap font, performance optimization, accessibility review |
 
-### 🔜 Remaining (Phase 18)
-
-| Phase | What's Coming |
-|-------|---------------|
-| 18. Polish & Balancing | Playtesting, stat tuning, encounter rates, final art/audio |
-
-See [docs/PROGRESS.md](docs/PROGRESS.md) for detailed progress notes and challenges encountered.
+All 18 phases are complete. See [docs/PROGRESS.md](docs/PROGRESS.md) for detailed progress notes and challenges encountered.
 
 ---
 

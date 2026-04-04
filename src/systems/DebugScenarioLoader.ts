@@ -17,6 +17,7 @@ export interface DebugScenario {
   items: Record<string, number>;
   gold: number;
   enemies: string[];
+  background?: string;
 }
 
 export class DebugScenarioLoader {
@@ -66,6 +67,6 @@ export class DebugScenarioLoader {
 
     // Trigger battle
     const trigger = new BattleTrigger(this.game);
-    await trigger.triggerBattle(scenario.enemies);
+    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background);
   }
 }

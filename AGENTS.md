@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (739+ tests, 70+ files, Vitest)
+npm test             # Run all tests (879+ tests, 76+ files, Vitest)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
@@ -21,7 +21,7 @@ npm test             # Run all tests (739+ tests, 70+ files, Vitest)
 
 A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. Turn-based RPG with 4-member party, 6 base classes (upgradeable to 12), spell charge system, tile-based exploration, boss battles, vehicles, and data-driven content in YAML.
 
-**Phases 1–17 are complete.** Only Phase 18 remains (polish & balancing). See `docs/PHASE_PLAN.md` for detailed plans.
+**All 18 phases are complete.** See `docs/PHASE_PLAN.md` for detailed plans and `docs/PROGRESS.md` for post-phase-18 improvements (battle decomposition, lazy loading, FEAR spell, battle UX).
 
 ---
 
@@ -34,6 +34,7 @@ A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. T
 3. **EventBus** — Loose coupling between systems. Audio reacts to game events, not direct calls.
 4. **Data-driven content** — All game content (items, spells, enemies, classes, shops, maps) loaded from YAML at runtime via `DataLoader`.
 5. **Scene stack** — Push/pop architecture with `onPause()`/`onResume()` lifecycle hooks for layered UI.
+6. **Lazy scene loading** — `SceneManager.registerLazy()` with dynamic `import()` and factory caching. Only `TitleScene` is eagerly loaded; 10 other scenes are lazy-loaded, reducing the main bundle from 551KB to 430KB (−22%).
 
 ### Directory Map
 
@@ -46,6 +47,9 @@ src/
 │                   #   BasicAI, BossAI
 ├── scenes/         # All scenes: Exploration, Battle, FieldMenu, Status, Equip, Item,
 │                   #   Shop, MagicShop, Inn, Save, Load, GameOver, FieldMagic, FieldOrder
+│   └── battle/     # Decomposed battle scene modules:
+│                   #   BattleSceneTypes, BattleLayoutEngine, BattleDisplayManager,
+│                   #   BattleFieldTargeting, BattleAnimationController, battleMessageUtils
 ├── systems/        # Game systems: EncounterSystem, EncounterTable, MapLoader,
 │                   #   MapTransition, DialogManager, BattleTrigger, SaveManager,
 │                   #   NPCInteraction, ItemEffects, KeyItemGateSystem,
@@ -111,7 +115,8 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- `BattleStateMachine.ts` (~426 lines) and `BattleScene.ts` (~430 lines) are known exceptions being monitored.
+- `BattleStateMachine.ts` (~426 lines) is a known exception being monitored.
+- `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
 
 ---
 
@@ -130,6 +135,7 @@ All game content is in YAML. **Never hardcode game data in TypeScript.**
 | `assets/data/shops.yaml` | Per-town shop inventories |
 | `assets/maps/*.yaml` | Tile maps, NPCs, transitions, encounter tables |
 | `assets/data/audio-manifest.json` | Audio file paths (JSON, not YAML) |
+| `assets/backgrounds/` | Battle background images (optional per encounter) |
 
 ### Cross-File Validation
 
@@ -223,7 +229,7 @@ npx vitest --watch                          # Watch mode
 ### New Scene
 
 1. Create the scene class in `src/scenes/` implementing the Scene interface (`enter`, `exit`, `update`, `onPause`, `onResume`)
-2. Register it in `src/main.ts` via `game.scenes.register('scene-name', new YourScene(game))`
+2. Register it in `src/main.ts` via `game.scenes.registerLazy('scene-name', async () => new YourScene(game))` (prefer lazy registration for non-critical scenes)
 3. Push it with `game.scenes.push('scene-name')` or switch with `game.scenes.switchTo('scene-name')`
 4. Add tests in `tests/scenes/`
 
@@ -246,13 +252,17 @@ npx vitest --watch                          # Watch mode
 
 ---
 
-## Remaining Work (Phase 18)
+## Project Status
 
-See `docs/PHASE_PLAN.md` for detailed plans.
+All 18 development phases are complete. Post-phase-18 improvements include:
 
-| Phase | What | Notes |
-|-------|------|-------|
-| 18 | Polish & Balancing | Placeholder textures → real art, bitmap font, playtesting, stat tuning |
+- **FEAR spell** — `debuff_morale` applies fear status (50% turn skip chance)
+- **BattleScene decomposition** — 6 modules extracted to `src/scenes/battle/` (1,169→508 lines)
+- **Lazy scene loading** — `SceneManager.registerLazy()` with dynamic `import()` (bundle −22%)
+- **Battle UX** — concise result messages, dead combatant turn-skip, early battle end, status labels, battle backgrounds
+- **NES font fixes** — kill indicator uses `*` instead of `☠`
+
+See `docs/PROGRESS.md` for full details.
 
 ---
 

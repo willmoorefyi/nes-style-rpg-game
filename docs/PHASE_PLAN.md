@@ -97,7 +97,7 @@ All phases should leverage existing post-remediation infrastructure:
 | Scene stack (push/pop/pause/resume) | `SceneManager.ts` | 10, 11, 12, 14 |
 | Scrolling Menu (maxVisible, wrap, indicators) | `ui/Menu.ts` | 9, 10, 11, 12 |
 | Inventory (ID-based, add/remove/getAll) | `entities/Inventory.ts` | 10, 11, 12 |
-| BattleSceneDeps interface | `scenes/BattleScene.ts` | 9, 14 |
+| BattleSceneDeps interface | `scenes/battle/BattleSceneTypes.ts` | 9, 14 |
 | Schema validation (validateXxxData) | `core/schemaValidation.ts` | 9, 10, 12, 17a |
 | Injectable RNG (EncounterRng) | `systems/EncounterSystem.ts` | 9, 14 |
 | BattleTrigger (extracted system) | `systems/BattleTrigger.ts` | 14, 15 |
@@ -1632,7 +1632,7 @@ The final phase transforms the feature-complete game into a polished, balanced e
 
 ### Test Strategy
 
-- **Automated:** Full test suite passes (all 252+ tests)
+- **Automated:** Full test suite passes (all 879+ tests)
 - **Automated:** Cross-reference validation passes
 - **Automated:** Performance benchmark: render 1000 frames, measure average frame time
 - **Manual:** Complete playthrough from start to final boss
@@ -1669,25 +1669,25 @@ Every issue from the momus review is mapped to a specific phase and sub-task.
 
 | # | Issue | Phase | Sub-Task | Status |
 |---|-------|-------|----------|--------|
-| 1 | No elemental damage system | 9 | Sub-task 1 | PLANNED |
-| 2 | No status effect system | 9 | Sub-task 2 | PLANNED |
-| 8 | Consumable effect execution undefined | 10 | Sub-task 3 | PLANNED |
-| 14 | No shop data format | 12 | Sub-task 1 | PLANNED |
-| 15 | Magic shops not mentioned | 12 | Sub-task 4 | PLANNED |
-| 20 | No deserialization (fromJSON) | 11 | Sub-tasks 3-4 | PLANNED |
-| 21 | Inventory has no serialization | 10 | Sub-task 7 | PLANNED |
-| 22 | Game state scope not defined | 11 | Sub-task 2 | PLANNED |
-| 32 | No overworld map | 15 (test), 17b (full) | Sub-task 7 / Sub-task 1 | PLANNED |
-| 33 | Terrain type system doesn't exist | 15 | Sub-task 1 | PLANNED |
-| 38 | AIBehavior interface incompatible | 14 | Sub-task 1 | PLANNED |
-| 39 | Multi-phase boss system not defined | 14 | Sub-task 3 | PLANNED |
-| 40 | No scripted encounter trigger system | 14 | Sub-task 4 | PLANNED |
-| 44 | Character.classData is readonly | 16 | Sub-task 2 | PLANNED |
-| 49 | Content scope unquantified | 17a-d | All sub-tasks | PLANNED |
-| 50 | No map editor or content pipeline | 17a | Sub-task 1 | PLANNED |
-| X1 | No acceptance criteria on any phase | ALL | Each phase has criteria | PLANNED |
-| X2 | No sub-task breakdowns | ALL | Each phase has 5-15 sub-tasks | PLANNED |
-| X3 | Story flag system unassigned | 11 | Sub-task 1 | PLANNED |
+| 1 | No elemental damage system | 9 | Sub-task 1 | COMPLETE |
+| 2 | No status effect system | 9 | Sub-task 2 | COMPLETE |
+| 8 | Consumable effect execution undefined | 10 | Sub-task 3 | COMPLETE |
+| 14 | No shop data format | 12 | Sub-task 1 | COMPLETE |
+| 15 | Magic shops not mentioned | 12 | Sub-task 4 | COMPLETE |
+| 20 | No deserialization (fromJSON) | 11 | Sub-tasks 3-4 | COMPLETE |
+| 21 | Inventory has no serialization | 10 | Sub-task 7 | COMPLETE |
+| 22 | Game state scope not defined | 11 | Sub-task 2 | COMPLETE |
+| 32 | No overworld map | 15 (test), 17b (full) | Sub-task 7 / Sub-task 1 | COMPLETE |
+| 33 | Terrain type system doesn't exist | 15 | Sub-task 1 | COMPLETE |
+| 38 | AIBehavior interface incompatible | 14 | Sub-task 1 | COMPLETE |
+| 39 | Multi-phase boss system not defined | 14 | Sub-task 3 | COMPLETE |
+| 40 | No scripted encounter trigger system | 14 | Sub-task 4 | COMPLETE |
+| 44 | Character.classData is readonly | 16 | Sub-task 2 | COMPLETE |
+| 49 | Content scope unquantified | 17a-d | All sub-tasks | COMPLETE |
+| 50 | No map editor or content pipeline | 17a | Sub-task 1 | COMPLETE |
+| X1 | No acceptance criteria on any phase | ALL | Each phase has criteria | COMPLETE |
+| X2 | No sub-task breakdowns | ALL | Each phase has 5-15 sub-tasks | COMPLETE |
+| X3 | Story flag system unassigned | 11 | Sub-task 1 | COMPLETE |
 
 ### MAJOR Issues (25)
 

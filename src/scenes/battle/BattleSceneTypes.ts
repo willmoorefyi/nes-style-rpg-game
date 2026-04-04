@@ -18,6 +18,8 @@ export interface BattleSceneConfig {
   inventory?: Inventory;
   /** Whether the party can run from this battle (default true) */
   canRun?: boolean;
+  /** Optional background image path for the battle scene */
+  background?: string;
 }
 
 export type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating';
