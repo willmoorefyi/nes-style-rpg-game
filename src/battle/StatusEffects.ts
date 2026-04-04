@@ -1,4 +1,4 @@
-export type StatusEffect = 'poison' | 'stun' | 'sleep' | 'blind' | 'silence' | 'death' | 'stone';
+export type StatusEffect = 'poison' | 'stun' | 'sleep' | 'blind' | 'silence' | 'death' | 'stone' | 'fear';
 
 export class StatusTracker {
   private effects = new Map<StatusEffect, number>();

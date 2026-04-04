@@ -96,10 +96,18 @@ export class SpellExecutor {
     } else if (spell.effect.startsWith('buff_')) {
       this.executeBuffSpell(cmd, spell, isEnemy);
     } else if (spell.effect === 'debuff_morale') {
-      // TODO: debuff_morale (FEAR) — no morale system implemented yet.
-      // Spell is defined in spells.yaml but has no gameplay effect.
-      // When a morale system is added, wire it here.
-      this.deps.addMessage(`${casterName} casts ${spell.name}... but nothing happens.`);
+      const targets = isEnemy ? this.deps.livingParty() : this.deps.livingEnemies();
+      for (const target of targets) {
+        if ('data' in target) {
+          const enemy = target as EnemyInstance;
+          enemy.status.apply('fear');
+          this.deps.addMessage(`${enemy.displayName} is frightened!`);
+        } else {
+          const char = target as Character;
+          char.statusTracker.apply('fear');
+          this.deps.addMessage(`${char.name} is frightened!`);
+        }
+      }
     } else if (spell.effect.startsWith('debuff_')) {
       this.executeDebuffSpell(cmd, spell, isEnemy);
     } else if (spell.effect === 'cure_blind') {

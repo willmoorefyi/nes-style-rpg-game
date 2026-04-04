@@ -104,6 +104,35 @@ describe('StatusTracker', () => {
     });
   });
 
+  describe('fear status', () => {
+    it('can be applied and detected', () => {
+      const tracker = new StatusTracker();
+      tracker.apply('fear');
+      expect(tracker.has('fear')).toBe(true);
+    });
+
+    it('appears in getAll()', () => {
+      const tracker = new StatusTracker();
+      tracker.apply('fear');
+      const all = tracker.getAll();
+      expect(all.some(e => e.effect === 'fear')).toBe(true);
+    });
+
+    it('tick() does NOT set skipTurn for fear alone', () => {
+      const tracker = new StatusTracker();
+      tracker.apply('fear');
+      const result = tracker.tick(100);
+      expect(result.skipTurn).toBe(false);
+    });
+
+    it('tick() does NOT cause poison damage for fear', () => {
+      const tracker = new StatusTracker();
+      tracker.apply('fear');
+      const result = tracker.tick(100);
+      expect(result.damage).toBe(0);
+    });
+  });
+
   describe('onHit', () => {
     it('removes sleep when hit', () => {
       const tracker = new StatusTracker();

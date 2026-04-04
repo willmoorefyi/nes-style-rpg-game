@@ -129,11 +129,13 @@ describe('SpellExecutor — WP2 new spell effects', () => {
     });
   });
 
-  describe('debuff_morale (FEAR) — documented no-op', () => {
-    it('shows "nothing happens" message', () => {
+  describe('debuff_morale (FEAR)', () => {
+    it('applies fear status to all living enemies', () => {
       const mage = createMage('Mage', 4);
       const battle = castSpell([mage], [goblin], fearSpell, 'party_0', 'enemy_0', [fearSpell]);
-      expect(battle.currentMessages.some(m => m.text.includes('nothing happens'))).toBe(true);
+      const enemy = battle.allEnemies[0];
+      expect(enemy.status.has('fear')).toBe(true);
+      expect(battle.currentMessages.some(m => m.text.includes('is frightened!'))).toBe(true);
     });
   });
 });
