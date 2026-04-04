@@ -1,52 +1,21 @@
-import { Container, BitmapText, Graphics } from 'pixi.js';
-import type { Scene, EnemyData, SpellData } from '../types/index.js';
-import type { InputManager } from '../core/InputManager.js';
-import type { EventBus } from '../core/EventBus.js';
-import type { AudioManager } from '../core/AudioManager.js';
+import { Container, Graphics } from 'pixi.js';
+import type { Scene, SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
+import { type BattleSceneDeps, type BattleSceneConfig, type UIState } from './battle/BattleSceneTypes.js';
+import { BattleDisplayManager } from './battle/BattleDisplayManager.js';
+import { BattleFieldTargeting } from './battle/BattleFieldTargeting.js';
+import { BattleAnimationController } from './battle/BattleAnimationController.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
-import { BattleStateMachine, type DamageEvent } from '../battle/BattleStateMachine.js';
+import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
-import { NES_FONT } from '../ui/NESFont.js';
-import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, FONT_SIZE_SM, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
-const ENEMY_COLORS: Record<string, number> = {
-  goblin: 0x228b22,    // green
-  wolf: 0x808080,      // gray
-  skeleton: 0xd4d4d4,  // bone white
-  pirate: 0x8b4513,    // brown
-  garland: 0x4b0082,   // dark purple
-  zombie: 0x556b2f,    // olive
-  ogre: 0xb22222,      // dark red
-  vampire: 0x800020,   // burgundy
-  lich: 0x191970,      // midnight blue
-  kraken: 0x006994,    // teal
-  tiamat: 0x8b0000,    // crimson
-  chaos: 0x1a1a1a,     // near-black
-};
-const DEFAULT_ENEMY_COLOR = 0xff4444;
-
-export interface BattleSceneDeps {
-  input: InputManager;
-  events: EventBus;
-  audio?: AudioManager;
-}
-
-export interface BattleSceneConfig {
-  party: Character[];
-  enemies: EnemyData[];
-  spells?: SpellData[];
-  inventory?: Inventory;
-  /** Whether the party can run from this battle (default true) */
-  canRun?: boolean;
-}
-
-type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating';
+export type { BattleSceneDeps, BattleSceneConfig } from './battle/BattleSceneTypes.js';
 
 export class BattleScene implements Scene {
   readonly container = new Container();
@@ -63,48 +32,18 @@ export class BattleScene implements Scene {
   private spells: SpellData[] = [];
   private inventory: Inventory | undefined;
   private messageText!: TextRenderer;
-  private enemySprites: Graphics[] = [];
-  private partySprites: Graphics[] = [];
+  private display!: BattleDisplayManager;
+  private targeting!: BattleFieldTargeting;
+  private animation!: BattleAnimationController;
 
   private uiState: UIState = 'intro';
   private introTimer = 60;
   private messageTimer = 0;
   private currentMessageIndex = 0;
-  private floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
-  private dyingEnemies: Map<number, number> = new Map();
-  private spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
   private commandArrow: Graphics | null = null;
-  private targetArrow: Graphics | null = null;
   private flashTimer: number = 0;
-  private animPhase: 'announce' | 'step_forward' | 'execute' | 'result' | 'step_back' = 'announce';
-  private animTimer: number = 0;
-  private animActorSprite: Graphics | null = null;
-  private animActorOrigX: number = 0;
-  private animTargetX: number = 0;
-  private animMessages: { text: string }[] = [];
-  private animMessageIndex: number = 0;
-  private fieldTargetIndex: number = 0;
-  private fieldTargetIsParty: boolean = false;
-  private fieldTargetCallback: ((targetId: string) => void) | null = null;
-  private fieldTargetCancelCallback: (() => void) | null = null;
-  private fieldTargetRevive: boolean = false;
-  // N2: Track if current animation actor is an enemy (skip step_forward/step_back)
-  private animActorIsEnemy: boolean = false;
-
-  // K2: Character status boxes behind party sprites
-  private statusBoxes: Window[] = [];
-  // K3: Enemy list texts in partyWindow
-  private enemyListTexts: BitmapText[] = [];
-  // L2: Deduped enemy name -> list text index
-  private enemyNameToListIndex: Map<string, number> = new Map();
-  // L3: Outline around hovered target sprite
-  private targetOutline: Graphics | null = null;
-  // L4: Shared flash timer for target selection effects
-  private targetFlashTimer: number = 0;
   // K4: Turn list in commandWindow during execution
   private turnListContainer = new Container();
-  private turnListTexts: BitmapText[] = [];
-  private turnActionIndex: number = 0;
 
   constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
     this.deps = deps;
@@ -121,7 +60,6 @@ export class BattleScene implements Scene {
 
   enter(): void {
     this.deps.audio?.playMusic('battle');
-
     // Two-tone battle background
     const bg = new Graphics();
     bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x16213e);
@@ -130,8 +68,17 @@ export class BattleScene implements Scene {
     this.container.addChildAt(bg, 0);
 
     this.createUI();
-    this.createEnemySprites();
-    this.createPartySprites();
+    this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.partyWindow);
+    this.display.createEnemySprites();
+    this.display.createPartySprites();
+    this.display.updatePartyDisplay();
+    this.targeting = new BattleFieldTargeting(this.container, this.battle, this.display, this.deps.input);
+    this.animation = new BattleAnimationController(
+      this.container, this.battle, this.config, this.display, this.deps.input,
+      this.commandWindow, this.messageWindow, this.turnListContainer,
+      (text: string) => this.messageText.setText(text, true),
+      () => this.resolveRound(),
+    );
     this.battle.startBattle();
     this.uiState = 'intro';
     this.showMessages();
@@ -141,15 +88,12 @@ export class BattleScene implements Scene {
     // Party HP window — bottom-left
     this.partyWindow = new Window({ x: 0, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
     this.container.addChild(this.partyWindow);
-    this.updatePartyDisplay();
-
     // Command window — bottom-right
     this.commandWindow = new Window({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
     this.container.addChild(this.commandWindow);
     this.createCommandMenu();
     this.turnListContainer.visible = false;
     this.commandWindow.addChild(this.turnListContainer);
-
     // Message window — full width, top
     this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: 120 });
     this.container.addChild(this.messageWindow);
@@ -178,231 +122,11 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = false;
   }
 
-  private createEnemySprites(): void {
-    const enemies = this.battle.allEnemies;
-    const positions = this.computeEnemyLayout(enemies.map(e => e.data));
-    for (let i = 0; i < enemies.length; i++) {
-      const { x, y, w, h } = positions[i];
-      const color = ENEMY_COLORS[enemies[i].data.name.toLowerCase()] ?? DEFAULT_ENEMY_COLOR;
-      const g = new Graphics();
-      g.rect(0, 0, w, h).fill(color);
-      g.position.set(x - w / 2, y - h / 2);
-      this.container.addChild(g);
-      this.enemySprites.push(g);
-    }
-  }
-
-  private computeEnemyLayout(data: EnemyData[]): Array<{ x: number; y: number; w: number; h: number }> {
-    const sizeMap = { small: 96, large: 192, boss: 288 } as const;
-    const getSize = (d: EnemyData) => d.size ?? 'small';
-
-    const bosses: number[] = [], larges: number[] = [], smalls: number[] = [];
-    for (let i = 0; i < data.length; i++) {
-      const s = getSize(data[i]);
-      if (s === 'boss') bosses.push(i);
-      else if (s === 'large') larges.push(i);
-      else smalls.push(i);
-    }
-
-    const result: Array<{ x: number; y: number; w: number; h: number }> = new Array(data.length);
-
-    // Boss layout
-    if (bosses.length > 0) {
-      result[bosses[0]] = { x: 400, y: 350, w: 288, h: 288 };
-      // Remaining enemies around boss
-      const rest = [...bosses.slice(1), ...larges, ...smalls];
-      const startY = 200;
-      const spacing = rest.length > 1 ? 400 / (rest.length - 1) : 0;
-      for (let i = 0; i < rest.length; i++) {
-        const s = sizeMap[getSize(data[rest[i]])];
-        result[rest[i]] = { x: 700, y: startY + i * spacing, w: s, h: s };
-      }
-      return result;
-    }
-
-    // Only small enemies
-    if (larges.length === 0) {
-      const grids: Record<number, [number, number][]> = {
-        1: [[400,400]],
-        2: [[300,350],[500,450]],
-        3: [[250,300],[400,400],[550,500]],
-        4: [[250,300],[500,300],[250,500],[500,500]],
-        5: [[200,250],[450,250],[650,250],[300,450],[550,450]],
-        6: [[200,250],[400,250],[600,250],[200,450],[400,450],[600,450]],
-        7: [[150,200],[350,200],[550,200],[250,400],[450,400],[200,550],[400,550]],
-        8: [[150,200],[350,200],[550,200],[150,400],[350,400],[550,400],[250,550],[450,550]],
-        9: [[150,200],[350,200],[550,200],[150,400],[350,400],[550,400],[150,550],[350,550],[550,550]],
-      };
-      const positions = grids[Math.min(smalls.length, 9)] ?? grids[9]!;
-      for (let i = 0; i < smalls.length; i++) {
-        const [x, y] = positions[i] ?? positions[positions.length - 1];
-        result[smalls[i]] = { x, y, w: 96, h: 96 };
-      }
-      return result;
-    }
-
-    // Only large enemies
-    if (smalls.length === 0) {
-      const grids: Record<number, [number, number][]> = {
-        1: [[350,350]],
-        2: [[200,300],[500,400]],
-        3: [[150,250],[400,350],[250,500]],
-        4: [[200,250],[500,250],[200,475],[500,475]],
-      };
-      const positions = grids[Math.min(larges.length, 4)] ?? grids[4]!;
-      for (let i = 0; i < larges.length; i++) {
-        const [x, y] = positions[i] ?? positions[positions.length - 1];
-        result[larges[i]] = { x, y, w: 192, h: 192 };
-      }
-      return result;
-    }
-
-    // Mixed: large on left, small on right
-    const lSpacing = larges.length > 1 ? 400 / (larges.length - 1) : 0;
-    const lStartY = 425 - (larges.length - 1) * lSpacing / 2;
-    for (let i = 0; i < larges.length; i++) {
-      result[larges[i]] = { x: 225, y: lStartY + i * lSpacing, w: 192, h: 192 };
-    }
-    const sSpacing = smalls.length > 1 ? 400 / (smalls.length - 1) : 0;
-    const sStartY = 425 - (smalls.length - 1) * sSpacing / 2;
-    for (let i = 0; i < smalls.length; i++) {
-      result[smalls[i]] = { x: 600, y: sStartY + i * sSpacing, w: 96, h: 96 };
-    }
-    return result;
-  }
-
-  private createPartySprites(): void {
-    const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
-    // N1: Right-aligned diagonal party sprite layout
-    const xPositions = [1450, 1475, 1500, 1525];
-    const yPositions = [280, 380, 480, 580];
-    // Status boxes: 4 boxes each 25% of battle field height (660px / 4 = 165px)
-    const battleFieldTop = 120;
-    const boxHeight = 165;
-    const boxWidth = 200;
-    const boxX = 1700;
-
-    for (let i = 0; i < this.config.party.length; i++) {
-      const char = this.config.party[i];
-
-      // Character status box — stacked vertically on right edge
-      const boxY = battleFieldTop + i * boxHeight;
-      const box = new Window({ x: boxX, y: boxY, width: boxWidth, height: boxHeight });
-      const nameText = new BitmapText({
-        text: char.name,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-      });
-      nameText.position.set(box.contentX, box.contentY);
-      box.addChild(nameText);
-
-      const statusText = new BitmapText({
-        text: '',
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffff44 },
-      });
-      statusText.position.set(box.contentX, box.contentY + 40);
-      box.addChild(statusText);
-
-      const hpText = new BitmapText({
-        text: `${char.currentHp}/${char.maxHp}`,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-      });
-      hpText.position.set(box.contentX, box.contentY + 100);
-      box.addChild(hpText);
-
-      this.container.addChild(box);
-      this.statusBoxes.push(box);
-
-      // M2: Party sprite at diagonal position
-      const g = new Graphics();
-      g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
-      g.position.set(xPositions[i], yPositions[i]);
-      this.container.addChild(g);
-      this.partySprites.push(g);
-    }
-  }
-
-  private updatePartyDisplay(): void {
-    // K3: partyWindow now shows enemy list instead of party HP
-    this.updateEnemyList();
-  }
-
-  private updateEnemyList(): void {
-    // Remove old enemy list texts
-    for (const t of this.enemyListTexts) this.partyWindow.removeChild(t);
-    this.enemyListTexts = [];
-    this.enemyNameToListIndex.clear();
-
-    // L2: Group enemies by displayName, preserving first-seen order
-    const enemies = this.battle.allEnemies;
-    const nameOrder: string[] = [];
-    const counts = new Map<string, number>();
-    for (const e of enemies) {
-      const n = e.displayName;
-      if (!counts.has(n)) nameOrder.push(n);
-      counts.set(n, (counts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
-    }
-
-    for (let i = 0; i < nameOrder.length; i++) {
-      const name = nameOrder[i];
-      const alive = counts.get(name)!;
-      // L1: No HP display. L2: prefix with count if >1
-      const label = alive === 0 ? name : alive > 1 ? `${alive}x ${name}` : name;
-      const text = new BitmapText({
-        text: label,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
-      });
-      if (alive === 0) text.tint = 0x888888;
-      text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * (FONT_SIZE + 12));
-      this.partyWindow.addChild(text);
-      this.enemyListTexts.push(text);
-      this.enemyNameToListIndex.set(name, i);
-    }
-  }
-
-  private updatePartySprites(): void {
-    const party = this.battle.allParty;
-    for (let i = 0; i < party.length; i++) {
-      const sprite = this.partySprites[i];
-      if (!sprite) continue;
-      if (party[i].currentHp <= 0) {
-        sprite.alpha = 0.3;
-        sprite.tint = 0x666666;
-      } else {
-        sprite.alpha = 1.0;
-        sprite.tint = 0xffffff;
-      }
-
-      // K2: Update status box texts
-      const box = this.statusBoxes[i];
-      if (box) {
-        const texts = box.children.filter(c => c instanceof BitmapText) as BitmapText[];
-        // texts[0]=name, texts[1]=status, texts[2]=hp
-        if (texts[1]) {
-          const statuses = party[i].statusTracker.getAll().map(s => s.effect);
-          texts[1].text = statuses.join(' ');
-        }
-        if (texts[2]) {
-          texts[2].text = `${party[i].currentHp}/${party[i].maxHp}`;
-        }
-      }
-    }
-    this.updateEnemyList();
-  }
-
-  private updateEnemySprites(): void {
-    const enemies = this.battle.allEnemies;
-    for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i].currentHp <= 0 && this.enemySprites[i].visible && !this.dyingEnemies.has(i)) {
-        this.dyingEnemies.set(i, 30);
-      }
-    }
-  }
-
   update(dt: number): void {
     this.messageText.update(dt);
-    this.updateFloatingTexts(dt);
-    this.updateDyingEnemies(dt);
-    this.updateSpellFlashes(dt);
+    this.animation.updateFloatingTexts(dt);
+    this.animation.updateDyingEnemies(dt);
+    this.animation.updateSpellFlashes(dt);
 
     switch (this.uiState) {
       case 'intro':
@@ -420,59 +144,15 @@ export class BattleScene implements Scene {
           const id = this.battle.currentCommandActorId;
           if (id) {
             const idx = parseInt(id.split('_')[1]);
-            const sprite = this.partySprites[idx];
+            const sprite = this.display.partySprites[idx];
             if (sprite) sprite.alpha = 0.5 + 0.5 * Math.sin(this.flashTimer * 0.15);
           }
         }
         break;
 
       case 'target':
-        this.updateFieldTargeting();
-        this.targetFlashTimer++;
-        // L3: Pulse outline around hovered target sprite
-        {
-          const targets = this.getFieldTargets();
-          const target = targets[this.fieldTargetIndex];
-          if (target) {
-            const sprites = this.fieldTargetIsParty ? this.partySprites : this.enemySprites;
-            const sprite = sprites[target.spriteIndex];
-            if (sprite) {
-              if (!this.targetOutline) {
-                this.targetOutline = new Graphics();
-                this.container.addChild(this.targetOutline);
-              }
-              this.targetOutline.clear();
-              this.targetOutline.rect(-3, -3, sprite.width + 6, sprite.height + 6).stroke({ width: 2, color: 0xffffff });
-              this.targetOutline.position.set(sprite.x, sprite.y);
-              this.targetOutline.alpha = 0.3 + 0.7 * Math.abs(Math.sin(this.targetFlashTimer * 0.12));
-            }
-          }
-          // L4: Flash enemy list entry or party status box
-          const sinVal = Math.sin(this.targetFlashTimer * 0.12);
-          if (target && this.fieldTargetIsParty) {
-            // Reset all status box alphas, then pulse the selected one
-            for (const box of this.statusBoxes) box.alpha = 1;
-            const box = this.statusBoxes[target.spriteIndex];
-            if (box) box.alpha = 0.5 + 0.5 * Math.abs(sinVal);
-          } else if (target && !this.fieldTargetIsParty) {
-            const enemy = this.battle.allEnemies[target.spriteIndex];
-            if (enemy) {
-              const listIdx = this.enemyNameToListIndex.get(enemy.displayName);
-              if (listIdx !== undefined) {
-                // Reset all list tints first
-                for (let i = 0; i < this.enemyListTexts.length; i++) {
-                  const e = this.enemyListTexts[i];
-                  // Preserve gray for all-dead groups
-                  e.tint = 0xffffff;
-                }
-                this.updateEnemyListDeadTints();
-                // Pulse selected between white and yellow
-                const t = this.enemyListTexts[listIdx];
-                if (t) t.tint = sinVal > 0 ? 0xffff00 : 0xffffff;
-              }
-            }
-          }
-        }
+        this.targeting.updateFieldTargeting();
+        this.targeting.updateTargetVisuals();
         break;
 
       case 'spell_ui':
@@ -488,7 +168,7 @@ export class BattleScene implements Scene {
         break;
 
       case 'executing':
-        this.updateAnimating(dt);
+        this.animation.updateAnimating(dt);
         break;
 
       case 'message':
@@ -519,7 +199,7 @@ export class BattleScene implements Scene {
     // Create arrow indicator above the current actor's sprite
     const id = this.battle.currentCommandActorId!;
     const index = parseInt(id.split('_')[1]);
-    const sprite = this.partySprites[index];
+    const sprite = this.display.partySprites[index];
     if (sprite) {
       const arrow = new Graphics();
       arrow.moveTo(0, 0).lineTo(16, 0).lineTo(8, 16).lineTo(0, 0).fill(0xffffff);
@@ -646,7 +326,6 @@ export class BattleScene implements Scene {
       this.currentMessageIndex = -1;
       return;
     }
-
     const actorId = this.battle.currentCommandActorId!;
     const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}` }));
 
@@ -713,68 +392,6 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = false;
   }
 
-  private enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void): void {
-    this.fieldTargetIsParty = isParty;
-    this.fieldTargetRevive = revive;
-    this.fieldTargetCallback = onConfirm;
-    this.fieldTargetCancelCallback = onCancel;
-    this.fieldTargetIndex = 0;
-
-    const targets = this.getFieldTargets();
-    if (targets.length === 0) {
-      onCancel();
-      return;
-    }
-
-    this.uiState = 'target';
-    this.updateTargetArrow([], isParty, 0);
-  }
-
-  private getFieldTargets(): Array<{ id: string; spriteIndex: number }> {
-    if (this.fieldTargetIsParty) {
-      const party = this.battle.allParty;
-      return party
-        .map((c, i) => ({ id: `party_${i}`, hp: c.currentHp, spriteIndex: i }))
-        .filter(t => this.fieldTargetRevive ? t.hp <= 0 : t.hp > 0);
-    }
-    const allEnemies = this.battle.allEnemies;
-    return this.battle.livingEnemies.map(e => ({
-      id: e.id,
-      spriteIndex: allEnemies.indexOf(e),
-    }));
-  }
-
-  private updateFieldTargeting(): void {
-    const input = this.deps.input;
-    const targets = this.getFieldTargets();
-    if (targets.length === 0) {
-      this.fieldTargetCancelCallback?.();
-      this.clearTargetArrow();
-      return;
-    }
-
-    if (input.isJustPressed('up')) {
-      this.fieldTargetIndex = (this.fieldTargetIndex - 1 + targets.length) % targets.length;
-      this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
-    } else if (input.isJustPressed('down')) {
-      this.fieldTargetIndex = (this.fieldTargetIndex + 1) % targets.length;
-      this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
-    } else if (input.isJustPressed('confirm')) {
-      const target = targets[this.fieldTargetIndex];
-      if (target) {
-        this.clearTargetArrow();
-        this.fieldTargetCallback?.(target.id);
-        this.fieldTargetCallback = null;
-        this.fieldTargetCancelCallback = null;
-      }
-    } else if (input.isJustPressed('cancel')) {
-      this.clearTargetArrow();
-      this.fieldTargetCancelCallback?.();
-      this.fieldTargetCallback = null;
-      this.fieldTargetCancelCallback = null;
-    }
-  }
-
   private clearCommandIndicator(): void {
     if (this.commandArrow) {
       this.container.removeChild(this.commandArrow);
@@ -782,57 +399,13 @@ export class BattleScene implements Scene {
     }
     this.flashTimer = 0;
     // Restore alphas but respect dead member dimming
-    this.updatePartySprites();
-    this.clearTargetArrow();
+    this.display.updatePartySprites();
+    this.targeting.clearTargetArrow();
   }
 
-  /** Show/update an arrow above the currently highlighted target sprite */
-  private updateTargetArrow(_ids: string[], isParty: boolean, selectedIndex: number): void {
-    this.clearTargetArrow();
-    if (selectedIndex < 0) return;
-    const targets = this.getFieldTargets();
-    const target = targets[selectedIndex];
-    if (!target) return;
-    const sprites = isParty ? this.partySprites : this.enemySprites;
-    const sprite = sprites[target.spriteIndex];
-    if (!sprite) return;
-    const arrow = new Graphics();
-    arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
-    const offsetX = isParty ? 24 : 40;
-    arrow.position.set(sprite.x + offsetX, sprite.y - 20);
-    this.container.addChild(arrow);
-    this.targetArrow = arrow;
-  }
-
-  private clearTargetArrow(): void {
-    if (this.targetArrow) {
-      this.container.removeChild(this.targetArrow);
-      this.targetArrow = null;
-    }
-    // L3: Clear outline
-    if (this.targetOutline) {
-      this.container.removeChild(this.targetOutline);
-      this.targetOutline = null;
-    }
-    // L4: Reset flash timer and tints
-    this.targetFlashTimer = 0;
-    for (const t of this.enemyListTexts) t.tint = 0xffffff;
-    this.updateEnemyListDeadTints();
-    for (const box of this.statusBoxes) box.alpha = 1;
-  }
-
-  /** Restore gray tint on enemy list entries where all enemies of that name are dead */
-  private updateEnemyListDeadTints(): void {
-    const enemies = this.battle.allEnemies;
-    const aliveCounts = new Map<string, number>();
-    for (const e of enemies) {
-      const n = e.displayName;
-      aliveCounts.set(n, (aliveCounts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
-    }
-    for (const [name, idx] of this.enemyNameToListIndex) {
-      if ((aliveCounts.get(name) ?? 0) === 0 && this.enemyListTexts[idx]) {
-        this.enemyListTexts[idx].tint = 0x888888;
-      }
+  private enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void): void {
+    if (this.targeting.enterFieldTargeting(isParty, revive, onConfirm, onCancel)) {
+      this.uiState = 'target';
     }
   }
 
@@ -841,208 +414,21 @@ export class BattleScene implements Scene {
     this.battle.prepareRound();
     // K4: Clear and show turn list
     this.turnListContainer.removeChildren();
-    this.turnListTexts = [];
-    this.turnActionIndex = 0;
+    this.turnListContainer.y = 0;
+    this.animation.turnListTexts = [];
+    this.animation.turnActionIndex = 0;
     this.turnListContainer.visible = true;
+    // Clip turn list to command window content area
+    if (!this.turnListContainer.mask) {
+      const mask = new Graphics();
+      mask.rect(0, 0, this.commandWindow.contentWidth, this.commandWindow.contentHeight).fill(0xffffff);
+      mask.position.set(this.commandWindow.contentX, this.commandWindow.contentY);
+      this.commandWindow.addChild(mask);
+      this.turnListContainer.mask = mask;
+    }
     this.uiState = 'executing';
-    this.animPhase = 'announce';
-    this.animTimer = 0;
-  }
-
-  private findActorSprite(actorName: string): { sprite: Graphics; isEnemy: boolean } | null {
-    for (let i = 0; i < this.config.party.length; i++) {
-      if (this.config.party[i].name === actorName) return { sprite: this.partySprites[i], isEnemy: false };
-    }
-    const enemies = this.battle.allEnemies;
-    for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i].displayName === actorName && enemies[i].currentHp > 0) return { sprite: this.enemySprites[i], isEnemy: true };
-    }
-    return null;
-  }
-
-  private formatAnnouncement(info: { actorName: string; actionType: string; targetName?: string; spellName?: string }): string {
-    switch (info.actionType) {
-      case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
-      case 'magic': return `${info.actorName} casts ${info.spellName ?? 'spell'}!`;
-      case 'item': return `${info.actorName} uses item!`;
-      case 'run': return `${info.actorName} tries to run!`;
-      default: return `${info.actorName} acts!`;
-    }
-  }
-
-  private updateAnimating(dt: number): void {
-    const confirmSkip = this.deps.input.isJustPressed('confirm');
-    switch (this.animPhase) {
-      case 'announce': {
-        if (this.animTimer === 0) {
-          const info = this.battle.peekNextAction();
-          if (!info) {
-            this.resolveRound();
-            return;
-          }
-          this.messageText.setText(this.formatAnnouncement(info), true);
-          // K4: Add entry to turn list
-          const entry = new BitmapText({
-            text: `${info.actorName}: ${info.actionType}`,
-            style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-          });
-          entry.position.set(this.commandWindow.contentX, this.commandWindow.contentY + this.turnListTexts.length * (FONT_SIZE_SM + 8));
-          this.turnListContainer.addChild(entry);
-          this.turnListTexts.push(entry);
-
-          const found = this.findActorSprite(info.actorName);
-          this.animActorSprite = found?.sprite ?? null;
-          this.animActorIsEnemy = found?.isEnemy ?? false;
-          if (this.animActorSprite) {
-            this.animActorOrigX = this.animActorSprite.x;
-            // M3: Relative step-forward — subtle "step out of line"
-            this.animTargetX = found!.isEnemy ? this.animActorOrigX + 120 : this.animActorOrigX - 120;
-          }
-        }
-        this.animTimer += dt;
-        if (this.animTimer >= 30 || confirmSkip) {
-          this.animTimer = 0;
-          // N2: Enemies skip step_forward
-          this.animPhase = this.animActorIsEnemy ? 'execute' : 'step_forward';
-        }
-        break;
-      }
-
-      case 'step_forward': {
-        this.animTimer += dt;
-        if (confirmSkip) this.animTimer = 15;
-        const progress = Math.min(this.animTimer / 15, 1);
-        if (this.animActorSprite) {
-          this.animActorSprite.x = this.animActorOrigX + (this.animTargetX - this.animActorOrigX) * progress;
-        }
-        if (this.animTimer >= 15) {
-          this.animTimer = 0;
-          this.animPhase = 'execute';
-        }
-        break;
-      }
-
-      case 'execute': {
-        const result = this.battle.executeNextAction();
-        this.spawnFloatingTextsFromEvents(result.damageEvents);
-        this.updatePartyDisplay();
-        this.updateEnemySprites();
-        this.updatePartySprites();
-        this.animMessages = result.messages;
-        this.animMessageIndex = 0;
-        this.animTimer = 0;
-        this.animPhase = 'result';
-        break;
-      }
-
-      case 'result': {
-        if (this.animMessages.length > 0 && this.animMessageIndex < this.animMessages.length) {
-          if (this.animTimer === 0) {
-            this.messageText.setText(this.animMessages[this.animMessageIndex].text, true);
-          }
-          this.animTimer += dt;
-          if (this.animTimer >= 45 || confirmSkip) {
-            this.animMessageIndex++;
-            this.animTimer = 0;
-            if (this.animMessageIndex >= this.animMessages.length) {
-              // N2: Enemies skip step_back, run bookkeeping inline
-              if (this.animActorIsEnemy) {
-                if (this.turnListTexts[this.turnActionIndex]) {
-                  this.turnListTexts[this.turnActionIndex].tint = 0x888888;
-                }
-                this.turnActionIndex++;
-                this.animActorSprite = null;
-                if (this.battle.actionQueueLength > 0) {
-                  this.animPhase = 'announce';
-                } else {
-                  this.resolveRound();
-                }
-              } else {
-                this.animPhase = 'step_back';
-              }
-            }
-          }
-        } else {
-          // N2: Enemies skip step_back, run bookkeeping inline
-          if (this.animActorIsEnemy) {
-            if (this.turnListTexts[this.turnActionIndex]) {
-              this.turnListTexts[this.turnActionIndex].tint = 0x888888;
-            }
-            this.turnActionIndex++;
-            this.animActorSprite = null;
-            if (this.battle.actionQueueLength > 0) {
-              this.animPhase = 'announce';
-            } else {
-              this.resolveRound();
-            }
-          } else {
-            this.animPhase = 'step_back';
-            this.animTimer = 0;
-          }
-        }
-        break;
-      }
-
-      case 'step_back': {
-        this.animTimer += dt;
-        if (confirmSkip) this.animTimer = 15;
-        const progress = Math.min(this.animTimer / 15, 1);
-        if (this.animActorSprite) {
-          this.animActorSprite.x = this.animTargetX + (this.animActorOrigX - this.animTargetX) * progress;
-        }
-        if (this.animTimer >= 15) {
-          if (this.animActorSprite) this.animActorSprite.x = this.animActorOrigX;
-          // K4: Gray out completed action
-          if (this.turnListTexts[this.turnActionIndex]) {
-            this.turnListTexts[this.turnActionIndex].tint = 0x888888;
-          }
-          this.turnActionIndex++;
-          this.animTimer = 0;
-          this.animActorSprite = null;
-          if (this.battle.actionQueueLength > 0) {
-            this.animPhase = 'announce';
-          } else {
-            this.resolveRound();
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  private spawnFloatingTextsFromEvents(damageEvents: DamageEvent[]): void {
-    for (const evt of damageEvents) {
-      let sprite: Graphics | undefined;
-      if (evt.targetId.startsWith('enemy_')) {
-        const idx = parseInt(evt.targetId.split('_')[1], 10);
-        sprite = this.enemySprites[idx];
-      } else {
-        const idx = parseInt(evt.targetId.split('_')[1], 10);
-        sprite = this.partySprites[idx];
-      }
-      if (!sprite) continue;
-
-      // Spell flash overlay
-      if (evt.spellElement) {
-        const color = BattleScene.ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
-        const overlay = new Graphics();
-        overlay.rect(0, 0, sprite.width, sprite.height).fill(color);
-        overlay.position.set(sprite.x, sprite.y);
-        overlay.alpha = 0.6;
-        this.container.addChild(overlay);
-        this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
-      }
-
-      const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
-      const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
-      const bt = new BitmapText({
-        text: label,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill },
-      });
-      bt.position.set(sprite.x, sprite.y);
-      this.container.addChild(bt);
-      this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
-    }
+    this.animation.animPhase = 'announce';
+    this.animation.animTimer = 0;
   }
 
   private showMessages(): void {
@@ -1077,9 +463,9 @@ export class BattleScene implements Scene {
 
   private resolveRound(): void {
     this.battle.resolveRound();
-    this.updatePartyDisplay();
-    this.updateEnemySprites();
-    this.updatePartySprites();
+    this.display.updatePartyDisplay();
+    this.display.updateEnemySprites(this.animation.dyingEnemies);
+    this.display.updatePartySprites();
 
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
       if (this.battle.state === 'victory') {
@@ -1087,7 +473,6 @@ export class BattleScene implements Scene {
         this.deps.audio?.playMusic('victory', false);
       }
       this.showMessages();
-      this.uiState = 'end';
     } else {
       this.startCommandPhase();
     }
@@ -1096,51 +481,6 @@ export class BattleScene implements Scene {
   private checkBattleEnd(): void {
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
       this.uiState = 'end';
-    }
-  }
-
-
-  private static readonly ELEMENT_COLORS: Record<string, number> = {
-    fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff,
-    dark: 0x660066, water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
-  };
-
-  private updateFloatingTexts(dt: number): void {
-    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
-      const ft = this.floatingTexts[i];
-      ft.age += dt;
-      ft.text.y -= 1 * dt;
-      ft.text.alpha = 1 - ft.age / ft.maxAge;
-      if (ft.age >= ft.maxAge) {
-        this.container.removeChild(ft.text);
-        this.floatingTexts.splice(i, 1);
-      }
-    }
-  }
-
-  private updateDyingEnemies(dt: number): void {
-    for (const [idx, remaining] of this.dyingEnemies) {
-      const next = remaining - dt;
-      if (next <= 0) {
-        this.enemySprites[idx].alpha = 0;
-        this.enemySprites[idx].visible = false;
-        this.dyingEnemies.delete(idx);
-      } else {
-        this.enemySprites[idx].alpha = next / 30;
-        this.dyingEnemies.set(idx, next);
-      }
-    }
-  }
-
-  private updateSpellFlashes(dt: number): void {
-    for (let i = this.spellFlashes.length - 1; i >= 0; i--) {
-      const sf = this.spellFlashes[i];
-      sf.age += dt;
-      sf.overlay.alpha = 0.6 * (1 - sf.age / sf.maxAge);
-      if (sf.age >= sf.maxAge) {
-        this.container.removeChild(sf.overlay);
-        this.spellFlashes.splice(i, 1);
-      }
     }
   }
 
@@ -1164,6 +504,5 @@ export class BattleScene implements Scene {
     this.spellUI = null;
     this.itemUI = null;
     this.commandArrow = null;
-    this.targetOutline = null;
   }
 }
