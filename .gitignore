@@ -29,6 +29,8 @@ Thumbs.db
 # Agent-specific tracking files
 .yolo-sisyphus/
 playwright-responses/
+.playwright-mcp/
+.yolo-sisyphus/
 
 # Playwright MCP screenshots (dumped in project root by browser automation)
 /*.png
