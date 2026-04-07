@@ -85,15 +85,28 @@ export class BattleStateMachine {
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
     this.partyById = new Map(config.party.map((c, i) => [`party_${i}`, c]));
-    this.enemies = config.enemies.map((e, i) => ({
-      id: `enemy_${i}`,
-      data: e,
-      currentHp: e.stats.hp,
-      status: new StatusTracker(),
-      buffs: new Map(),
-      displayName: e.name,
-      crossedPhases: new Set<number>(),
-    }));
+    // Count occurrences of each enemy name for deduplication
+    const nameCounts = new Map<string, number>();
+    for (const e of config.enemies) {
+      nameCounts.set(e.name, (nameCounts.get(e.name) ?? 0) + 1);
+    }
+    const nameIndex = new Map<string, number>();
+    this.enemies = config.enemies.map((e, i) => {
+      const idx = nameIndex.get(e.name) ?? 0;
+      nameIndex.set(e.name, idx + 1);
+      const suffix = (nameCounts.get(e.name) ?? 1) > 1
+        ? ` ${String.fromCharCode(65 + idx)}`  // A, B, C...
+        : '';
+      return {
+        id: `enemy_${i}`,
+        data: e,
+        currentHp: e.stats.hp,
+        status: new StatusTracker(),
+        buffs: new Map(),
+        displayName: `${e.name}${suffix}`,
+        crossedPhases: new Set<number>(),
+      };
+    });
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
@@ -413,10 +426,13 @@ export class BattleStateMachine {
     }
 
     if (cmd.type === 'fight' && cmd.targetId) {
+      const getLivingTargets = isEnemy
+        ? () => this.livingParty.map(c => this.getIdForPartyMember(c)!).filter(Boolean)
+        : () => this.livingEnemies.map(e => e.id);
       const retargeted = retargetIfDead(
         cmd,
         id => this.isTargetAlive(id),
-        () => this.livingEnemies.map(e => e.id),
+        getLivingTargets,
         this.rng
       );
 

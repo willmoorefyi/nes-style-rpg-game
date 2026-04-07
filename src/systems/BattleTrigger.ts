@@ -94,11 +94,11 @@ export class BattleTrigger {
         this.game.scenes.pop();
         this.playPostVictoryCutscene(cutsceneId);
       } else if (levelUpMessages.length > 0) {
-        this.game.scenes.pop();
-        // Show level-up messages as dialog
+        // Emit level-up dialogs BEFORE pop so the exploration scene's handler is ready
         for (const msg of levelUpMessages) {
           this.game.events.emit('showDialog', { text: msg, onComplete: () => {} });
         }
+        this.game.scenes.pop();
       } else {
         this.game.scenes.pop();
       }

@@ -59,8 +59,9 @@ export class DebugScenarioLoader {
       this.game.party.add(character);
     }
 
-    // Set gold and stock inventory
-    this.game.party.addGold(scenario.gold);
+    // Reset and set gold and inventory from scenario
+    this.game.party.setGold(scenario.gold);
+    this.game.inventory.clear();
     for (const [itemId, qty] of Object.entries(scenario.items)) {
       this.game.inventory.add(itemId, qty);
     }

@@ -79,10 +79,10 @@ export class TitleScene implements Scene {
         const loader = new DebugScenarioLoader(this.game);
         loader.loadScenarios().then(scenarios => {
           if (scenarios.length > 0) {
-            loader.applyAndBattle(scenarios[0]);
+            return loader.applyAndBattle(scenarios[0]);
           }
-        });
-      }).catch((err) => console.error('Failed to load debug scenario:', err));
+        }).catch((err) => console.error('Failed to load debug scenario:', err));
+      }).catch((err) => console.error('Failed to load debug module:', err));
     }
   }
 

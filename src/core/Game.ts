@@ -77,13 +77,20 @@ export class Game {
     this.setupAccessibility();
     this.resize();
     window.addEventListener('resize', () => this.resize());
+    let consecutiveErrors = 0;
     this.app.ticker.add((ticker) => {
       try {
         this.scenes.update(ticker.deltaTime);
         this.input.update();
         this.playTime += ticker.deltaTime / 60;
+        consecutiveErrors = 0;
       } catch (e) {
+        consecutiveErrors++;
         console.error('Game loop error:', e);
+        if (consecutiveErrors >= 3) {
+          this.app.ticker.stop();
+          console.error('Game halted after 3 consecutive errors.');
+        }
       }
     });
   }

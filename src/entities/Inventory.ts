@@ -31,6 +31,10 @@ export class Inventory {
     return this.items.has(itemId);
   }
 
+  clear(): void {
+    this.items.clear();
+  }
+
   getAll(): Array<{ itemId: string; quantity: number }> {
     return Array.from(this.items.entries()).map(([itemId, quantity]) => ({ itemId, quantity }));
   }

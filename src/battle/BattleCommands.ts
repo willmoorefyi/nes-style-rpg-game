@@ -19,13 +19,13 @@ export function createItemCommand(actorId: string, targetId: string, itemId: str
 export function retargetIfDead(
   command: BattleCommand,
   isTargetAlive: (id: string) => boolean,
-  getLivingEnemies: () => string[],
+  getLivingTargets: () => string[],
   rng: () => number = Math.random
 ): BattleCommand {
   if (command.type !== 'fight' || !command.targetId) return command;
   if (isTargetAlive(command.targetId)) return command;
 
-  const living = getLivingEnemies();
+  const living = getLivingTargets();
   if (living.length === 0) return command;
   const newTarget = living[Math.floor(rng() * living.length)];
   return { ...command, targetId: newTarget };
