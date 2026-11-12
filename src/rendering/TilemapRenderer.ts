@@ -69,9 +69,9 @@ export class TilemapRenderer {
     this.dirty = true;
   }
 
-  private getTileTexture(tileId: number): Texture {
+  private getTileTexture(tileId: number, x: number, y: number): Texture {
     if (this.placeholders) {
-      return this.placeholders.getTileTexture(tileId);
+      return this.placeholders.getTileTexture(tileId, x, y);
     }
     return this.tileTextures[tileId - 1] || Texture.EMPTY;
   }
@@ -125,7 +125,7 @@ export class TilemapRenderer {
             layerContainer.addChild(sprite);
           }
 
-          sprite.texture = this.getTileTexture(tileId);
+          sprite.texture = this.getTileTexture(tileId, x, y);
           sprite.x = x * TILE_SIZE;
           sprite.y = y * TILE_SIZE;
           sprite.visible = true;

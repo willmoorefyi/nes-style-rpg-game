@@ -58,7 +58,7 @@ src/
 ├── entities/       # Game objects: Character, Inventory, PartyManager, PlayerController,
 │                   #   NPC, MovementMode
 ├── rendering/      # PixiJS: TilemapRenderer, Camera, SpriteAnimation, CollisionMap,
-│                   #   PlaceholderTextures
+│                   #   PlaceholderTextures, CharacterAtlas, BattleArt
 ├── ui/             # UI: Window, Menu (with scrolling), DialogBox, TextRenderer,
 │                   #   ErrorDisplay, SpellSelectionUI, ItemSelectionUI, QuantitySelector
 ├── data/           # Registries: ItemRegistry, SpellRegistry, ClassRegistry, ShopRegistry
@@ -279,6 +279,35 @@ See `docs/PROGRESS.md` for full details.
 | `docs/YAML_MIGRATION_PLAN.md` | JSON→YAML migration plan (completed) |
 
 ---
+
+## Art & Audio Pipeline
+
+All art and audio are generated from code in `assets-src/` (Python 3 + Pillow + numpy + ffmpeg) and written into `assets/`. Nothing in `assets/sprites/`, `assets/audio/` or the new `assets/backgrounds/*.png` is hand-edited; change the generator and rebuild.
+
+```bash
+npm run assets                      # rebuild everything
+python3 -I assets-src/build_assets.py terrain characters   # or pick stages: terrain | characters | monsters | backgrounds | audio
+```
+
+**Style:** SNES-inspired. Every colour is defined as 5-bit-per-channel values (15-bit, BGR555-style) in `assets-src/snes_palette.py`, light comes from the top-left, and ramps run darkest→lightest. Art is authored at native resolution and upscaled with nearest-neighbour: x3 for field art (`TILE_SIZE` = 48), x4 for the battle character atlas, x3 for monsters.
+
+| Stage | Source | Output | Notes |
+|-------|--------|--------|-------|
+| terrain | `tiles.py` | `assets/sprites/terrain.png` | Rows = `TerrainType` order (+ counter), 4 variants per terrain, picked per map cell |
+| characters | `characters.py` | `assets/sprites/characters.png`, `characters-battle.png`, `characters.json` | Two-tile (16x32) characters: 6x5 cell block each (4 walk rows x 3 frames + a battle-pose row). Keyed by class id and NPC `sprite` name |
+| monsters | `monsters*.py` | `assets/sprites/monsters/<enemy-id>.png`, `index.json` | 32/64/96 px native for small/large/boss |
+| backgrounds | `backgrounds.py` | `assets/backgrounds/<id>.png` | Referenced by `battleBackgrounds` in map YAML |
+| audio | `audio/` | `assets/audio/{music,sfx}/*.ogg` | Filenames come from `audio-manifest.json` |
+
+**Adding art for new content**
+- New class or NPC sprite name: add a `Look` to `ROSTER` in `characters.py` (keys must match the class id / the `sprite:` value in map YAML), then `npm run assets`.
+- New enemy: add a drawing function in the monsters modules, then `npm run assets` (updates `index.json`).
+- `tests/data/assetCoverage.test.ts` fails if a class, NPC sprite, enemy, or audio-manifest entry has no asset.
+
+**Runtime wiring**
+- `CharacterAtlas` (`src/rendering/`) loads the character atlas once; `BattleArt` preloads monsters. Both are preloaded in `ExplorationScene.enter()`, and battle falls back to coloured rectangles (with a console warning) if art is missing.
+- Characters are two tiles tall: the head tile overhangs the tile above. `PlayerController`/`NPC` lift the sprite by `frameHeight - TILE_SIZE` and set `zIndex` to the feet position; `ExplorationScene.worldContainer.sortableChildren` depth-sorts them.
+- Battle uses the same sprites with poses (`ready`, `attack`, `cast`, `hurt`, `down`, `victory`) via `BattleDisplayManager`.
 
 ## Debug Menu & Battle Scenarios
 

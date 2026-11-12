@@ -168,9 +168,10 @@ describe('TilemapRenderer with PlaceholderTextures', () => {
     const renderer = new TilemapRenderer(mapData, null, 16, mockPlaceholders as unknown as PlaceholderTextures);
     renderer.render();
 
-    // Should have requested textures for tile IDs 1, 2, and 3
-    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(1);
-    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(2);
-    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(3);
+    // Layout is [1, 2 / 3, 1]; each lookup carries its map cell so art variants stay stable per cell
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(1, 0, 0);
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(2, 1, 0);
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(3, 0, 1);
+    expect(mockPlaceholders.getTileTexture).toHaveBeenCalledWith(1, 1, 1);
   });
 });

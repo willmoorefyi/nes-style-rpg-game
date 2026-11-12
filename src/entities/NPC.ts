@@ -23,6 +23,15 @@ const DIRECTION_OFFSETS = [
   { dx: 1, dy: 0 },
 ];
 
+/** Optional animated art for an NPC: frames[row][col] with rows down/up/left/right. */
+export interface NPCFrames {
+  frames: Texture[][];
+  frameHeight: number;
+}
+
+const FACE_ROW = { down: 0, up: 1, left: 2, right: 3 } as const;
+const WALK_CYCLE = [1, 0, 2, 0];
+
 export class NPC {
   readonly id: string;
   tileX: number;
@@ -40,8 +49,11 @@ export class NPC {
   private moveProgress: number = 0;
   private moveFromX: number = 0;
   private moveFromY: number = 0;
+  private readonly art: NPCFrames | null;
+  private readonly offsetY: number;
+  private facing: keyof typeof FACE_ROW = 'down';
 
-  constructor(data: NPCData, texture: Texture) {
+  constructor(data: NPCData, texture: Texture, art?: NPCFrames) {
     this.id = data.id;
     this.tileX = data.x;
     this.tileY = data.y;
@@ -51,9 +63,22 @@ export class NPC {
     this.chestItem = data.chestItem;
     this.chestFlag = data.chestFlag;
     this.wander = data.wander ?? false;
-    this.sprite = new Sprite(texture);
+    this.art = art ?? null;
+    this.offsetY = art ? TILE_SIZE - art.frameHeight : 0;
+    this.sprite = new Sprite(art ? art.frames[FACE_ROW.down][0] : texture);
     this.sprite.x = data.x * TILE_SIZE;
-    this.sprite.y = data.y * TILE_SIZE;
+    this.sprite.y = data.y * TILE_SIZE + this.offsetY;
+    this.updateDepth();
+  }
+
+  /** Sort by the feet so characters lower on screen draw over those behind them. */
+  private updateDepth(): void {
+    this.sprite.zIndex = this.sprite.y + (this.art?.frameHeight ?? TILE_SIZE);
+  }
+
+  private showFrame(col: number): void {
+    const row = this.art?.frames[FACE_ROW[this.facing]];
+    if (row) this.sprite.texture = row[col] ?? row[0];
   }
 
   update(dt: number, isWalkable: (x: number, y: number) => boolean): void {
@@ -64,7 +89,9 @@ export class NPC {
       this.moveProgress += dt;
       const t = Math.min(this.moveProgress / 18, 1);
       this.sprite.x = (this.moveFromX + (this.tileX - this.moveFromX) * t) * TILE_SIZE;
-      this.sprite.y = (this.moveFromY + (this.tileY - this.moveFromY) * t) * TILE_SIZE;
+      this.sprite.y = (this.moveFromY + (this.tileY - this.moveFromY) * t) * TILE_SIZE + this.offsetY;
+      this.updateDepth();
+      this.showFrame(t >= 1 ? 0 : WALK_CYCLE[Math.floor(t * 4) % WALK_CYCLE.length]);
       if (t >= 1) {
         this.isMoving = false;
       }
@@ -83,6 +110,10 @@ export class NPC {
     const targetX = this.tileX + dir.dx;
     const targetY = this.tileY + dir.dy;
 
+    if (this.art) {
+      this.facing = dir.dx < 0 ? 'left' : dir.dx > 0 ? 'right' : dir.dy < 0 ? 'up' : 'down';
+      this.showFrame(0);
+    }
     if (isWalkable(targetX, targetY)) {
       this.moveFromX = this.tileX;
       this.moveFromY = this.tileY;

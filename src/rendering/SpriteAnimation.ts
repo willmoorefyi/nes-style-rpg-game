@@ -9,6 +9,11 @@ export interface AnimationConfig {
   frameCount: number;
   frameDuration: number; // in ms
   directions: Record<Direction, number>; // row index for each direction
+  /** Top-left of this character's block inside a shared atlas (defaults to 0,0). */
+  originX?: number;
+  originY?: number;
+  /** Column order used while walking, e.g. [1, 0, 2, 0]. Defaults to 0..frameCount-1. */
+  walkSequence?: number[];
 }
 
 export class SpriteAnimation {
@@ -42,7 +47,7 @@ export class SpriteAnimation {
         } else {
           const frame = new Texture({
             source,
-            frame: new Rectangle(i * frameWidth, row * frameHeight, frameWidth, frameHeight),
+            frame: new Rectangle((this.config.originX ?? 0) + i * frameWidth, (this.config.originY ?? 0) + row * frameHeight, frameWidth, frameHeight),
           });
           frames.push(frame);
         }
@@ -75,7 +80,7 @@ export class SpriteAnimation {
     this.elapsed += deltaMs;
     if (this.elapsed >= this.config.frameDuration) {
       this.elapsed -= this.config.frameDuration;
-      this.frameIndex = (this.frameIndex + 1) % this.config.frameCount;
+      this.frameIndex = (this.frameIndex + 1) % this.cycleLength;
       this.updateTexture();
     }
   }
@@ -83,9 +88,14 @@ export class SpriteAnimation {
   private updateTexture(): void {
     const frames = this.textures.get(this.currentDirection);
     if (frames && frames.length > 0) {
-      const idx = this.currentState === 'idle' ? 0 : this.frameIndex;
-      this.sprite.texture = frames[idx];
+      const seq = this.config.walkSequence;
+      const idx = this.currentState === 'idle' ? 0 : (seq ? seq[this.frameIndex % seq.length] : this.frameIndex);
+      this.sprite.texture = frames[idx] ?? frames[0];
     }
+  }
+
+  private get cycleLength(): number {
+    return this.config.walkSequence?.length ?? this.config.frameCount;
   }
 
   get direction(): Direction { return this.currentDirection; }

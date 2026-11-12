@@ -8257,3 +8257,12 @@ encounters:
   - enemies:
       - pirate
     weight: 1
+
+battleBackgrounds:
+  default: grassland
+  terrain:
+    forest: forest
+    desert: desert
+    swamp: swamp
+    water: ocean
+    river: ocean

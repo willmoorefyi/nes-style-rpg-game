@@ -22,6 +22,7 @@ function createMockDataLoader(npcs: Array<{ id: string; x: number; y: number; sp
 function createMockPlaceholders() {
   return {
     getNPCTexture: vi.fn().mockReturnValue(Texture.WHITE),
+    getNPCFrames: vi.fn().mockReturnValue(null),
     getPlayerTexture: vi.fn().mockReturnValue(Texture.WHITE),
   } as unknown as PlaceholderTextures;
 }

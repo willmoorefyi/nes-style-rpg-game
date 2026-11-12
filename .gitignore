@@ -34,3 +34,7 @@ playwright-responses/
 
 # Playwright MCP screenshots (dumped in project root by browser automation)
 /*.png
+
+# Generated art previews
+assets-src/preview/
+assets-src/__pycache__/

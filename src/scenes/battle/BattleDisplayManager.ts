@@ -1,14 +1,26 @@
-import { Container, BitmapText, Graphics } from 'pixi.js';
+import { Container, BitmapText, Graphics, Sprite, Texture } from 'pixi.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
 import { computeEnemyLayout, ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
+import { battleArt } from '../../rendering/BattleArt.js';
+import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
+
+/** Party sprites are 64x128 (a 16x32 two-tile character at 4x); feet rest on these baselines. */
+const PARTY_FEET_Y = [330, 450, 570, 690];
+const PARTY_SPRITE_HEIGHT = 128;
+const HURT_FRAMES = 24;
 
 export class BattleDisplayManager {
-  readonly enemySprites: Graphics[] = [];
-  readonly partySprites: Graphics[] = [];
+  readonly enemySprites: Container[] = [];
+  readonly partySprites: Container[] = [];
+  // Per-member battle pose textures; null where only the placeholder rectangle is available
+  private partyFrames: (Texture[] | null)[] = [];
+  private poseOverride = new Map<number, BattlePose>();
+  private hurtTimers = new Map<number, number>();
+  private victory = false;
   // K2: Character status boxes behind party sprites
   readonly statusBoxes: Window[] = [];
   // K3: Enemy list texts in partyWindow
@@ -27,21 +39,77 @@ export class BattleDisplayManager {
     const enemies = this.battle.allEnemies;
     const positions = computeEnemyLayout(enemies.map(e => e.data));
     for (let i = 0; i < enemies.length; i++) {
-      const { x, y, w, h } = positions[i];
-      const color = ENEMY_COLORS[enemies[i].data.name.toLowerCase()] ?? DEFAULT_ENEMY_COLOR;
-      const g = new Graphics();
-      g.rect(0, 0, w, h).fill(color);
-      g.position.set(x - w / 2, y - h / 2);
-      this.mainContainer.addChild(g);
-      this.enemySprites.push(g);
+      const sprite = this.buildEnemySprite(i, positions[i]);
+      this.mainContainer.addChild(sprite);
+      this.enemySprites.push(sprite);
     }
+    if (!battleArt.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
+  }
+
+  private buildEnemySprite(i: number, box: { x: number; y: number; w: number; h: number }): Container {
+    const enemy = this.battle.allEnemies[i];
+    const { x, y, w, h } = box;
+    const tex = battleArt.getMonster(enemy.data.id);
+    if (tex) {
+      const sprite = new Sprite(tex);
+      sprite.scale.set(w / tex.width, h / tex.height);
+      sprite.position.set(x - w / 2, y - h / 2);
+      return sprite;
+    }
+    const color = ENEMY_COLORS[enemy.data.name.toLowerCase()] ?? DEFAULT_ENEMY_COLOR;
+    const g = new Graphics();
+    g.rect(0, 0, w, h).fill(color);
+    g.position.set(x - w / 2, y - h / 2);
+    return g;
+  }
+
+  private buildPartySprite(i: number): { sprite: Container; frames: Texture[] | null } {
+    const char = this.config.party[i];
+    const frames = characterAtlas.isLoaded ? characterAtlas.getBattleFrames(char.classData.id) : null;
+    const xPositions = [1450, 1475, 1500, 1525];
+    if (frames) {
+      const sprite = new Sprite(frames[0]);
+      sprite.position.set(xPositions[i], PARTY_FEET_Y[i] - PARTY_SPRITE_HEIGHT);
+      return { sprite, frames };
+    }
+    const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
+    const yPositions = [280, 380, 480, 580];
+    const g = new Graphics();
+    g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
+    g.position.set(xPositions[i], yPositions[i]);
+    return { sprite: g, frames: null };
+  }
+
+  /** Art finished loading after the placeholders were created (e.g. debug battles): swap them in place. */
+  private upgradeToArt(): void {
+    const positions = computeEnemyLayout(this.battle.allEnemies.map(e => e.data));
+    for (let i = 0; i < this.enemySprites.length; i++) {
+      if (this.enemySprites[i] instanceof Sprite) continue;
+      this.swapSprite(this.enemySprites, i, this.buildEnemySprite(i, positions[i]));
+    }
+    for (let i = 0; i < this.partySprites.length; i++) {
+      if (this.partyFrames[i]) continue;
+      const built = this.buildPartySprite(i);
+      if (!built.frames) continue;
+      this.partyFrames[i] = built.frames;
+      this.swapSprite(this.partySprites, i, built.sprite);
+    }
+    this.refreshPoses();
+  }
+
+  private swapSprite(list: Container[], i: number, next: Container): void {
+    const old = list[i];
+    const parent = old.parent;
+    if (parent) {
+      parent.addChildAt(next, parent.getChildIndex(old));
+      parent.removeChild(old);
+    }
+    next.alpha = old.alpha;
+    next.visible = old.visible;
+    list[i] = next;
   }
 
   createPartySprites(): void {
-    const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
-    // N1: Right-aligned diagonal party sprite layout
-    const xPositions = [1450, 1475, 1500, 1525];
-    const yPositions = [280, 380, 480, 580];
     // Status boxes: 4 boxes each 25% of battle field height (660px / 4 = 165px)
     const battleFieldTop = 120;
     const boxHeight = 165;
@@ -79,11 +147,56 @@ export class BattleDisplayManager {
       this.statusBoxes.push(box);
 
       // M2: Party sprite at diagonal position
-      const g = new Graphics();
-      g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
-      g.position.set(xPositions[i], yPositions[i]);
-      this.mainContainer.addChild(g);
-      this.partySprites.push(g);
+      const built = this.buildPartySprite(i);
+      this.mainContainer.addChild(built.sprite);
+      this.partySprites.push(built.sprite);
+      this.partyFrames.push(built.frames);
+    }
+    this.refreshPoses();
+    if (!characterAtlas.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
+  }
+
+  /** Force a temporary pose (e.g. 'attack') for a party sprite; null clears it. No-op for placeholders. */
+  setActorPose(sprite: Container, pose: BattlePose | null): void {
+    const i = this.partySprites.indexOf(sprite);
+    if (i < 0) return;
+    if (pose) this.poseOverride.set(i, pose); else this.poseOverride.delete(i);
+    this.refreshPoses();
+  }
+
+  /** Brief recoil when a party member takes damage. */
+  flashHurt(partyIndex: number): void {
+    this.hurtTimers.set(partyIndex, HURT_FRAMES);
+    this.refreshPoses();
+  }
+
+  setVictory(): void {
+    this.victory = true;
+    this.refreshPoses();
+  }
+
+  update(dt: number): void {
+    if (this.hurtTimers.size === 0) return;
+    for (const [i, t] of this.hurtTimers) {
+      if (t - dt <= 0) this.hurtTimers.delete(i); else this.hurtTimers.set(i, t - dt);
+    }
+    this.refreshPoses();
+  }
+
+  private poseFor(i: number): BattlePose {
+    if (this.battle.allParty[i]?.currentHp <= 0) return 'down';
+    if (this.victory) return 'victory';
+    const forced = this.poseOverride.get(i);
+    if (forced) return forced;
+    return this.hurtTimers.has(i) ? 'hurt' : 'ready';
+  }
+
+  private refreshPoses(): void {
+    for (let i = 0; i < this.partySprites.length; i++) {
+      const frames = this.partyFrames[i];
+      const sprite = this.partySprites[i];
+      if (!frames || !(sprite instanceof Sprite)) continue;
+      sprite.texture = frames[BATTLE_POSES.indexOf(this.poseFor(i))];
     }
   }
 
@@ -130,7 +243,7 @@ export class BattleDisplayManager {
     for (let i = 0; i < party.length; i++) {
       const sprite = this.partySprites[i];
       if (!sprite) continue;
-      if (party[i].currentHp <= 0) {
+      if (!this.partyFrames[i] && party[i].currentHp <= 0) {
         sprite.alpha = 0.3;
         sprite.tint = 0x666666;
       } else {
@@ -152,6 +265,7 @@ export class BattleDisplayManager {
         }
       }
     }
+    this.refreshPoses();
     this.updateEnemyList();
   }
 

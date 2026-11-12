@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -34,6 +34,7 @@ interface MapFile {
   npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string }>;
   scriptedEncounters?: Array<{ enemyIds: string[]; flag: string }>;
   keyItemGates?: Array<{ requiredItem: string; x: number; y: number }>;
+  battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
 }
 const mapFileNames = readdirSync(mapsDir)
   .filter((f) => f.endsWith('.yaml'));
@@ -293,6 +294,21 @@ describe('Cross-file data validation', () => {
             expect(itemIds.has(npc.chestItem!)).toBe(true);
           });
         }
+      });
+    });
+  });
+
+  // (o) battleBackgrounds → assets/backgrounds/<id>.png (run `npm run assets` if missing)
+  describe('battleBackgrounds → background art', () => {
+    const bgDir = resolve(__dirname, '../../assets/backgrounds');
+    maps.forEach((map) => {
+      const cfg = map.battleBackgrounds;
+      if (!cfg) return;
+      const ids = [cfg.default, ...Object.values(cfg.terrain ?? {})].filter((v): v is string => !!v);
+      new Set(ids).forEach((bg) => {
+        it(`map "${map.id}" battle background "${bg}" has art`, () => {
+          expect(existsSync(join(bgDir, `${bg}.png`))).toBe(true);
+        });
       });
     });
   });

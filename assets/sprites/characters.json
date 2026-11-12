@@ -1,0 +1,111 @@
+{
+  "cell": [
+    16,
+    32
+  ],
+  "cols": 6,
+  "rows": 5,
+  "fieldScale": 3,
+  "battleScale": 4,
+  "rowNames": [
+    "down",
+    "up",
+    "left",
+    "right",
+    "battle"
+  ],
+  "battleFrames": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "sheets": {
+    "warrior": {
+      "x": 0,
+      "y": 0
+    },
+    "thief": {
+      "x": 96,
+      "y": 0
+    },
+    "monk": {
+      "x": 192,
+      "y": 0
+    },
+    "white_mage": {
+      "x": 288,
+      "y": 0
+    },
+    "black_mage": {
+      "x": 0,
+      "y": 160
+    },
+    "red_mage": {
+      "x": 96,
+      "y": 160
+    },
+    "knight": {
+      "x": 192,
+      "y": 160
+    },
+    "ninja": {
+      "x": 288,
+      "y": 160
+    },
+    "master": {
+      "x": 0,
+      "y": 320
+    },
+    "white_wizard": {
+      "x": 96,
+      "y": 320
+    },
+    "black_wizard": {
+      "x": 192,
+      "y": 320
+    },
+    "red_wizard": {
+      "x": 288,
+      "y": 320
+    },
+    "guard": {
+      "x": 0,
+      "y": 480
+    },
+    "innkeeper": {
+      "x": 96,
+      "y": 480
+    },
+    "mage": {
+      "x": 192,
+      "y": 480
+    },
+    "merchant": {
+      "x": 288,
+      "y": 480
+    },
+    "old_man": {
+      "x": 0,
+      "y": 640
+    },
+    "villager": {
+      "x": 96,
+      "y": 640
+    },
+    "villager_f": {
+      "x": 192,
+      "y": 640
+    },
+    "king": {
+      "x": 288,
+      "y": 640
+    },
+    "chest": {
+      "x": 0,
+      "y": 800
+    }
+  }
+}

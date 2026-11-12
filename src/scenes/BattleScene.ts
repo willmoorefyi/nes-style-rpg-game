@@ -138,6 +138,7 @@ export class BattleScene implements Scene {
 
   update(dt: number): void {
     this.messageText.update(dt);
+    this.display.update(dt);
     this.animation.updateFloatingTexts(dt);
     this.animation.updateDyingEnemies(dt);
     this.animation.updateSpellFlashes(dt);
@@ -484,6 +485,7 @@ export class BattleScene implements Scene {
     if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
       if (this.battle.state === 'victory') {
         this.deps.events.emit('battleVictory', {});
+        this.display.setVictory();
         this.deps.audio?.playMusic('victory', false);
       }
       this.showMessages();

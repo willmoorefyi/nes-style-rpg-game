@@ -1,4 +1,4 @@
-import { Container, BitmapText, Graphics } from 'pixi.js';
+import { Container, BitmapText, Graphics, Sprite } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
@@ -14,7 +14,7 @@ export const ELEMENT_COLORS: Record<string, number> = {
 export class BattleAnimationController {
   animPhase: 'announce' | 'step_forward' | 'execute' | 'result' | 'step_back' | 'round_end' = 'announce';
   animTimer = 0;
-  animActorSprite: Graphics | null = null;
+  animActorSprite: Container | null = null;
   animActorOrigX = 0;
   animTargetX = 0;
   animMessages: { text: string }[] = [];
@@ -23,7 +23,7 @@ export class BattleAnimationController {
   animActorIsEnemy = false;
   floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
   dyingEnemies: Map<number, number> = new Map();
-  spellFlashes: { overlay: Graphics; age: number; maxAge: number }[] = [];
+  spellFlashes: { overlay: Container; age: number; maxAge: number }[] = [];
   // K4: Turn list in commandWindow during execution
   turnListTexts: BitmapText[] = [];
   turnActionIndex = 0;
@@ -42,7 +42,7 @@ export class BattleAnimationController {
     private readonly setMessageText: (text: string) => void,
     private readonly onResolveRound: () => void,
   ) {}
-  findActorSprite(actorName: string): { sprite: Graphics; isEnemy: boolean } | null {
+  findActorSprite(actorName: string): { sprite: Container; isEnemy: boolean } | null {
     for (let i = 0; i < this.config.party.length; i++) {
       if (this.config.party[i].name === actorName) return { sprite: this.display.partySprites[i], isEnemy: false };
     }
@@ -92,6 +92,7 @@ export class BattleAnimationController {
             this.animActorOrigX = this.animActorSprite.x;
             // M3: Relative step-forward — subtle "step out of line"
             this.animTargetX = found!.isEnemy ? this.animActorOrigX + 120 : this.animActorOrigX - 120;
+            if (!found!.isEnemy) this.display.setActorPose(this.animActorSprite, 'attack');
           }
         }
         this.animTimer += dt;
@@ -178,6 +179,7 @@ export class BattleAnimationController {
   /** K4: Gray out completed action and advance to next or end-of-round */
   private completeAction(): void {
     const entry = this.turnListTexts[this.turnActionIndex]; if (entry) entry.tint = 0x888888;
+    if (this.animActorSprite) this.display.setActorPose(this.animActorSprite, null);
     this.turnActionIndex++; this.animTimer = 0; this.animActorSprite = null;
     const battleOver = this.battle.livingEnemies.length === 0 || this.battle.livingParty.length === 0;
     if (battleOver) { this.battle.skipRemainingActions(); this.animPhase = 'round_end'; }
@@ -186,18 +188,29 @@ export class BattleAnimationController {
   spawnFloatingTextsFromEvents(damageEvents: DamageEvent[]): void {
     for (const evt of damageEvents) {
       const idx = parseInt(evt.targetId.split('_')[1], 10);
-      const sprite: Graphics | undefined = evt.targetId.startsWith('enemy_') ? this.display.enemySprites[idx] : this.display.partySprites[idx];
+      const sprite: Container | undefined = evt.targetId.startsWith('enemy_') ? this.display.enemySprites[idx] : this.display.partySprites[idx];
       if (!sprite) continue;
       // Spell flash overlay
       if (evt.spellElement) {
         const color = ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
-        const overlay = new Graphics();
-        overlay.rect(0, 0, sprite.width, sprite.height).fill(color);
+        let overlay: Container;
+        if (sprite instanceof Sprite) {
+          // Silhouette flash so the glow follows the art instead of a solid box
+          const glow = new Sprite(sprite.texture);
+          glow.tint = color;
+          glow.scale.copyFrom(sprite.scale);
+          overlay = glow;
+        } else {
+          const box = new Graphics();
+          box.rect(0, 0, sprite.width, sprite.height).fill(color);
+          overlay = box;
+        }
         overlay.position.set(sprite.x, sprite.y);
         overlay.alpha = 0.6;
         this.mainContainer.addChild(overlay);
         this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
       }
+      if (!evt.isHeal && evt.damage > 0 && !evt.targetId.startsWith('enemy_')) this.display.flashHurt(idx);
       const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
       const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
       const bt = new BitmapText({

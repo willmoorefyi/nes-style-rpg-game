@@ -1,6 +1,6 @@
 import { Container, Sprite, Graphics } from 'pixi.js';
-import type { Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
-import { resolveNPCDialog } from '../types/index.js';
+import type { MapData, Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
+import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import { PlayerController } from '../entities/PlayerController.js';
@@ -10,6 +10,7 @@ import { EncounterSystem } from '../systems/EncounterSystem.js';
 import { DialogBox } from '../ui/DialogBox.js';
 import { ErrorDisplay } from '../ui/ErrorDisplay.js';
 import { PlaceholderTextures } from '../rendering/PlaceholderTextures.js';
+import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
 import { DialogManager } from '../systems/DialogManager.js';
 import { BattleTrigger } from '../systems/BattleTrigger.js';
@@ -46,6 +47,7 @@ export class ExplorationScene implements Scene {
   private errorDisplay: ErrorDisplay;
   private placeholders: PlaceholderTextures;
   private currentMapId: string = '';
+  private battleBackgrounds: MapData['battleBackgrounds'];
   private currentMapData: import('../types/index.js').MapData | null = null;
   private savedPosition: { x: number; y: number } | null = null;
   private mapLoader: MapLoader;
@@ -121,12 +123,14 @@ export class ExplorationScene implements Scene {
     // Dialog must be ABOVE fade overlay so cutscene dialog is visible on black screen
     this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
-    this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies));
+    this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
     this.game.events.on('battleEnd', this.handleBattleEnd);
     this.game.events.on('showDialog', this.handleShowDialog);
   }
 
   async enter(): Promise<void> {
+    await this.placeholders.loadArt();
+    await battleArt.load();
     this.encounterSystem.start();
     if (this.savedPosition && this.currentMapId) {
       await this.loadMap(this.currentMapId);
@@ -158,6 +162,7 @@ export class ExplorationScene implements Scene {
     this.currentMapData = mapData;
     this.npcs = npcs;
     this.collisionMap = collisionMap;
+    this.battleBackgrounds = mapData.battleBackgrounds;
     
     // Play map music
     const musicTrack = mapData.music ?? 'overworld';
@@ -165,14 +170,17 @@ export class ExplorationScene implements Scene {
     
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     if (mapData.encounters) this.encounterSystem.setEncounters(mapData.encounters);
+    this.worldContainer.sortableChildren = true;
     this.worldContainer.addChild(tilemap.container);
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
     const spawnX = mapData.width > 1 ? 1 : 0;
     const spawnY = mapData.height > 1 ? 1 : 0;
+    const leaderArt = this.placeholders.getPlayerArt(this.game.party.get(0)?.classData.id ?? 'warrior');
     this.player = new PlayerController({
       startX: spawnX, startY: spawnY,
-      texture: this.placeholders.getPlayerTexture(),
+      texture: leaderArt?.texture ?? this.placeholders.getPlayerTexture(),
+      animation: leaderArt?.animation,
       collisionMap, input: this.game.input, events: this.game.events,
     });
     this.worldContainer.addChild(this.player.animation.sprite);
@@ -454,6 +462,18 @@ export class ExplorationScene implements Scene {
     return null;
   }
 
+  /** Backdrop for a battle here: per-terrain override from the map data, else the map default. */
+  private battleBackground(): string | undefined {
+    const cfg = this.battleBackgrounds;
+    if (!cfg) return undefined;
+    let id = cfg.default;
+    if (this.collisionMap && this.player && cfg.terrain) {
+      const terrain = TerrainType[this.collisionMap.getTerrainType(this.player.gridX, this.player.gridY)];
+      id = (terrain && cfg.terrain[terrain.toLowerCase()]) || id;
+    }
+    return id ? `assets/backgrounds/${id}.png` : undefined;
+  }
+
   /** Trigger a scripted encounter: show message, then start battle */
   private triggerScriptedEncounter(encounter: ScriptedEncounter): void {
     const startBattle = () => {
@@ -462,7 +482,7 @@ export class ExplorationScene implements Scene {
         flag: encounter.flag,
         isBoss: encounter.isBoss,
         postVictoryCutscene: encounter.postVictoryCutscene,
-      });
+      }, this.battleBackground());
     };
 
     if (encounter.message) {

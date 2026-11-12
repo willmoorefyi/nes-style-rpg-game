@@ -109,3 +109,22 @@ describe('PlayerController', () => {
     expect(player.facingTile).toEqual({ x: 1, y: 3 });
   });
 });
+
+describe('PlayerController - two-tile character art', () => {
+  it('lifts a tall frame so the feet stay on the tile and sorts by the feet', () => {
+    const player = new PlayerController({
+      startX: 2,
+      startY: 4,
+      texture: { source: { width: 288, height: 480 }, width: 288, height: 480 } as unknown as Texture,
+      animation: { frameWidth: 48, frameHeight: 96, frameCount: 3, walkSequence: [1, 0, 2, 0] },
+      collisionMap: new CollisionMap(createMapData(8, 8)),
+      input: new InputManager(),
+      events: new EventBus(),
+    });
+    expect(player.animation.sprite.y).toBe(4 * 48 - 48);
+    expect(player.animation.sprite.zIndex).toBe(4 * 48 - 48 + 96);
+    // Camera follow target stays centred on the tile, not on the taller sprite
+    expect(player.y).toBe(4 * 48 + 24);
+    expect(player.x).toBe(2 * 48 + 24);
+  });
+});

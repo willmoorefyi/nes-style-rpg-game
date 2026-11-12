@@ -1,5 +1,7 @@
-import { Graphics, Texture, RenderTexture, Application } from 'pixi.js';
+import { Assets, Graphics, Texture, Rectangle, RenderTexture, Application } from 'pixi.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
+import { characterAtlas, type FieldArt } from './CharacterAtlas.js';
+import type { NPCFrames } from '../entities/NPC.js';
 
 export interface PlaceholderConfig {
   app: Application;
@@ -21,6 +23,11 @@ const TILE_COLORS: Record<number, number> = {
 };
 const DEFAULT_TILE_COLOR = 0x555555;
 
+/** Terrain sheet layout produced by assets-src/build_assets.py: rows = terrain type, columns = variants. */
+const TERRAIN_SHEET_PATH = 'assets/sprites/terrain.png';
+const TERRAIN_VARIANTS = 4;
+const TERRAIN_ROWS = 11;
+
 // NPC colors by sprite type
 const NPC_COLORS: Record<string, number> = {
   shop: 0x00cc00,
@@ -38,8 +45,10 @@ const NPC_COLORS: Record<string, number> = {
 const DEFAULT_NPC_COLOR = 0xff6600;
 
 export class PlaceholderTextures {
+  readonly characters = characterAtlas;
   private app: Application;
   private tileCache = new Map<number, Texture>();
+  private terrainSheet: Texture | null = null;
   private playerTexture: Texture | null = null;
   private npcTextureCache = new Map<string, Texture>();
 
@@ -47,16 +56,52 @@ export class PlaceholderTextures {
     this.app = config.app;
   }
 
-  getTileTexture(tileId: number): Texture {
+  /** Load generated art; on failure the colored-rectangle fallbacks stay in use. */
+  async loadArt(): Promise<void> {
+    await this.characters.load();
+    try {
+      const sheet = await Assets.load<Texture>(TERRAIN_SHEET_PATH);
+      sheet.source.scaleMode = 'nearest';
+      this.terrainSheet = sheet;
+      this.tileCache.clear();
+    } catch (err) {
+      console.warn(`Terrain art unavailable (${TERRAIN_SHEET_PATH}); using placeholder tiles`, err);
+    }
+  }
+
+  /** Tile IDs are terrain type + 1. Passing map coordinates picks a stable per-cell art variant. */
+  getTileTexture(tileId: number, x = 0, y = 0): Texture {
+    // Tile IDs are terrain type + 1 (offset so 0 = empty/skip in renderer)
+    const terrainType = tileId - 1;
+    const sheet = this.terrainSheet;
+    if (sheet && terrainType >= 0 && terrainType < TERRAIN_ROWS) {
+      const variant = (((x * 73856093) ^ (y * 19349663)) >>> 0) % TERRAIN_VARIANTS;
+      const key = tileId * TERRAIN_VARIANTS + variant;
+      const cached = this.tileCache.get(key);
+      if (cached) return cached;
+      const tex = new Texture({
+        source: sheet.source,
+        frame: new Rectangle(variant * TILE_SIZE, terrainType * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+      });
+      this.tileCache.set(key, tex);
+      return tex;
+    }
     if (this.tileCache.has(tileId)) {
       return this.tileCache.get(tileId)!;
     }
-    // Tile IDs are terrain type + 1 (offset so 0 = empty/skip in renderer)
-    const terrainType = tileId - 1;
     const color = TILE_COLORS[terrainType] ?? DEFAULT_TILE_COLOR;
     const tex = this.createColoredRect(TILE_SIZE, TILE_SIZE, color);
     this.tileCache.set(tileId, tex);
     return tex;
+  }
+
+  /** Art for the party leader's class, or null when the atlas is unavailable. */
+  getPlayerArt(classId: string): FieldArt | null {
+    return this.characters.getFieldArt(classId);
+  }
+
+  getNPCFrames(spriteType?: string): NPCFrames | null {
+    return spriteType ? this.characters.getNpcFrames(spriteType) : null;
   }
 
   getPlayerTexture(): Texture {

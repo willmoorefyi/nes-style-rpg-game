@@ -1,4 +1,4 @@
-import { SpriteAnimation, type Direction } from '../rendering/SpriteAnimation.js';
+import { SpriteAnimation, type AnimationConfig, type Direction } from '../rendering/SpriteAnimation.js';
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
@@ -16,6 +16,8 @@ export interface PlayerControllerConfig {
   events: EventBus;
   moveSpeed?: number; // ms per tile
   movementMode?: MovementMode;
+  /** Overrides for tall character sheets (frame size, atlas origin, walk cycle). */
+  animation?: Partial<AnimationConfig>;
 }
 
 type PlayerState = 'idle' | 'moving';
@@ -41,6 +43,9 @@ export class PlayerController {
   private events: EventBus;
   private npcPositions: Set<string> = new Set();
   private _currentMode: MovementMode;
+  /** Pixels the sprite is lifted so a taller-than-tile frame keeps its feet on the tile. */
+  private spriteOffsetY = 0;
+  private frameHeight = TILE_SIZE;
 
   constructor(config: PlayerControllerConfig) {
     this.tileX = config.startX;
@@ -59,7 +64,10 @@ export class PlayerController {
       frameCount: 2,
       frameDuration: 150,
       directions: { down: 0, up: 1, left: 2, right: 3 },
+      ...config.animation,
     });
+    this.spriteOffsetY = TILE_SIZE - (config.animation?.frameHeight ?? TILE_SIZE);
+    this.frameHeight = config.animation?.frameHeight ?? TILE_SIZE;
     this.updateSpritePosition();
   }
 
@@ -124,7 +132,9 @@ export class PlayerController {
     const dstX = this.targetX * TILE_SIZE;
     const dstY = this.targetY * TILE_SIZE;
     this.animation.sprite.x = srcX + (dstX - srcX) * this.moveProgress;
-    this.animation.sprite.y = srcY + (dstY - srcY) * this.moveProgress;
+    this.animation.sprite.y = srcY + (dstY - srcY) * this.moveProgress + this.spriteOffsetY;
+    // Sort by the feet so characters lower on screen draw over those behind them.
+    this.animation.sprite.zIndex = this.animation.sprite.y + this.frameHeight;
   }
 
   setPosition(x: number, y: number): void {
@@ -138,7 +148,7 @@ export class PlayerController {
   }
 
   get x(): number { return this.animation.sprite.x + TILE_SIZE / 2; }
-  get y(): number { return this.animation.sprite.y + TILE_SIZE / 2; }
+  get y(): number { return this.animation.sprite.y - this.spriteOffsetY + TILE_SIZE / 2; }
   get gridX(): number { return this.tileX; }
   get gridY(): number { return this.tileY; }
   get direction(): Direction { return this.animation.direction; }
