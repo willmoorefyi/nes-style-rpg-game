@@ -1,0 +1,21 @@
+{
+  "cell": [
+    80,
+    80
+  ],
+  "scale": 2,
+  "footRow": 76,
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "sheets": {
+    "knight": {
+      "row": 0
+    }
+  }
+}

@@ -4,7 +4,10 @@ import type { NPCFrames } from '../entities/NPC.js';
 
 const META_PATH = 'assets/sprites/characters.json';
 const FIELD_PATH = 'assets/sprites/characters.png';
-const BATTLE_PATH = 'assets/sprites/characters-battle.png';
+const BATTLE_META_PATH = 'assets/sprites/battle-characters.json';
+const BATTLE_PATH = 'assets/sprites/battle-characters.png';
+const AI_BATTLE_META_PATH = 'assets/sprites/battle-characters-ai.json';
+const AI_BATTLE_PATH = 'assets/sprites/battle-characters-ai.png';
 
 /** Layout of assets/sprites/characters.json, produced by assets-src/build_assets.py. */
 export interface CharacterAtlasMeta {
@@ -12,10 +15,48 @@ export interface CharacterAtlasMeta {
   cols: number;
   rows: number;
   fieldScale: number;
-  battleScale: number;
   rowNames: string[];
-  battleFrames: string[];
   sheets: Record<string, { x: number; y: number }>;
+}
+
+/** Layout of assets/sprites/battle-characters.json: one row per class, one column per pose. */
+export interface BattleAtlasMeta {
+  cell: [number, number];
+  scale: number;
+  poses: string[];
+  sheets: Record<string, { row: number }>;
+}
+
+/** AI-generated battle atlas (docs/ART_2X_PLAN.md): like BattleAtlasMeta plus the native row the feet stand on. */
+export interface AiBattleAtlasMeta extends BattleAtlasMeta {
+  footRow: number;
+}
+
+/** Battle frames for one character plus how to place them. `footRow` is only known for AI art. */
+export interface BattleFrames {
+  frames: Texture[];
+  scale: number;
+  cell: [number, number];
+  footRow: number | null;
+  ai: boolean;
+}
+
+/** AI art preview: dev builds only, opted in with ?art=ai, until every asset on a screen is at 2x. */
+export function isPreviewAi(search: string = typeof location === 'undefined' ? '' : location.search): boolean {
+  if (!import.meta.env.DEV) return false;
+  return new URLSearchParams(search).get('art') === 'ai';
+}
+
+/** Fetch JSON, rejecting HTTP errors and non-JSON bodies (e.g. a dev server's HTML fallback for a missing file). */
+async function fetchJson<T>(path: string): Promise<T> {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`HTTP ${response.status} for ${path}`);
+  const text = await response.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(`${path} is not JSON (starts with ${JSON.stringify(text.slice(0, 20))})`);
+  }
 }
 
 /** What PlayerController needs to animate a character from the shared atlas. */
@@ -27,38 +68,65 @@ export interface FieldArt {
 export const BATTLE_POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory'] as const;
 export type BattlePose = typeof BATTLE_POSES[number];
 
-/** Two-tile (head over feet) character sheets: field walk frames at 3x and battle poses at 4x. */
+/** Two-tile (head over feet) character sheets: field walk frames and battle poses; scale and cell size come from the atlas JSON. */
 export class CharacterAtlas {
   private meta: CharacterAtlasMeta | null = null;
+  private battleMeta: BattleAtlasMeta | null = null;
   private field: Texture | null = null;
   private battle: Texture | null = null;
+  private aiBattleMeta: AiBattleAtlasMeta | null = null;
+  private aiBattle: Texture | null = null;
+  private aiAttempted = false;
 
   private loading: Promise<void> | null = null;
 
   get isLoaded(): boolean {
-    return !!this.meta && !!this.field && !!this.battle;
+    return !!this.meta && !!this.field && !!this.battle && !!this.battleMeta;
   }
 
-  /** Safe to call repeatedly; the atlas is fetched once. A failed load can be retried. */
+  get hasAiBattleArt(): boolean {
+    return !!this.aiBattleMeta && !!this.aiBattle;
+  }
+
+  /** Safe to call repeatedly; the atlas is fetched once. A failed load can be retried.
+   *  Resolves only after both the legacy atlas and the optional AI atlas attempts have finished. */
   load(): Promise<void> {
-    if (this.isLoaded) return Promise.resolve();
+    if (this.isLoaded && this.aiAttempted) return Promise.resolve();
     if (!this.loading) {
-      this.loading = this.fetchAtlas().finally(() => { this.loading = null; });
+      this.loading = (async () => {
+        if (!this.isLoaded) await this.fetchAtlas();
+        if (!this.aiAttempted) await this.fetchAiAtlas();
+      })().finally(() => { this.loading = null; });
     }
     return this.loading;
   }
 
+  /** Optional AI art. Any failure leaves the AI atlas null; it never touches the legacy atlas. */
+  private async fetchAiAtlas(): Promise<void> {
+    this.aiAttempted = true;
+    try {
+      const meta = await fetchJson<AiBattleAtlasMeta>(AI_BATTLE_META_PATH);
+      const tex = await Assets.load<Texture>(AI_BATTLE_PATH);
+      tex.source.scaleMode = 'nearest';
+      this.aiBattleMeta = meta;
+      this.aiBattle = tex;
+    } catch (err) {
+      this.aiBattleMeta = null;
+      this.aiBattle = null;
+      console.warn('AI battle art unavailable; legacy art only', err);
+    }
+  }
+
   private async fetchAtlas(): Promise<void> {
     try {
-      const response = await fetch(META_PATH);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      this.meta = (await response.json()) as CharacterAtlasMeta;
+      this.meta = await fetchJson<CharacterAtlasMeta>(META_PATH);
+      this.battleMeta = await fetchJson<BattleAtlasMeta>(BATTLE_META_PATH);
       this.field = await Assets.load<Texture>(FIELD_PATH);
       this.battle = await Assets.load<Texture>(BATTLE_PATH);
       this.field.source.scaleMode = 'nearest';
       this.battle.source.scaleMode = 'nearest';
     } catch (err) {
-      this.meta = this.field = this.battle = null;
+      this.meta = this.field = this.battle = this.battleMeta = null;
       console.warn('Character art unavailable; using placeholder sprites', err);
     }
   }
@@ -106,19 +174,28 @@ export class CharacterAtlas {
     return { frames, frameHeight: fh };
   }
 
-  /** Battle poses (left-facing) at 4x, in BATTLE_POSES order. */
-  getBattleFrames(id: string): Texture[] | null {
-    if (!this.meta || !this.battle || !this.meta.sheets[id]) return null;
-    const { cell, battleScale } = this.meta;
-    const o = this.meta.sheets[id];
-    const fw = cell[0] * battleScale;
-    const fh = cell[1] * battleScale;
-    const battleRow = this.meta.rowNames.indexOf('battle');
-    return BATTLE_POSES.map((_, col) => new Texture({
-      source: this.battle!.source,
-      frame: new Rectangle(o.x * battleScale + col * fw, o.y * battleScale + (battleRow) * fh, fw, fh),
-    }));
+  /** Battle poses (left-facing) in BATTLE_POSES order, or null when this class has no battle art.
+   *  AI art is used only when `preferAi` (preview mode) is set and the class has an approved AI sheet. */
+  getBattleFrames(id: string, preferAi: boolean = isPreviewAi()): BattleFrames | null {
+    if (preferAi && this.aiBattleMeta && this.aiBattle && this.aiBattleMeta.sheets[id]) {
+      const meta = this.aiBattleMeta;
+      return { frames: sliceRow(meta, this.aiBattle, meta.sheets[id].row), scale: meta.scale, cell: meta.cell,
+        footRow: meta.footRow, ai: true };
+    }
+    const meta = this.battleMeta;
+    if (!meta || !this.battle || !meta.sheets[id]) return null;
+    return { frames: sliceRow(meta, this.battle, meta.sheets[id].row), scale: meta.scale, cell: meta.cell,
+      footRow: null, ai: false };
   }
+}
+
+function sliceRow(meta: BattleAtlasMeta, tex: Texture, row: number): Texture[] {
+  const fw = meta.cell[0] * meta.scale;
+  const fh = meta.cell[1] * meta.scale;
+  return BATTLE_POSES.map((pose) => new Texture({
+    source: tex.source,
+    frame: new Rectangle(meta.poses.indexOf(pose) * fw, row * fh, fw, fh),
+  }));
 }
 
 /** Shared by exploration and battle so art is loaded once. */

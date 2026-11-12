@@ -43,3 +43,17 @@
   gold: 200
   enemies: [skeleton, goblin, goblin, wolf, pirate]
   background: assets/backgrounds/grassland-hd.png
+
+# AI-art preview: a whole party with approved AI battle sprites (open the dev build with ?art=ai).
+- id: knight_party
+  name: Knight Party (AI art preview)
+  party:
+    - { class: knight, name: KNT1, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
+    - { class: knight, name: KNT2, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
+    - { class: knight, name: KNT3, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
+    - { class: knight, name: KNT4, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
+  items:
+    potion: 3
+  gold: 100
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.png

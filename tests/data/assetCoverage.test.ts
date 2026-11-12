@@ -15,6 +15,12 @@ interface AtlasMeta {
   sheets: Record<string, { x: number; y: number }>;
 }
 const atlas = JSON.parse(readFileSync(join(assets, 'sprites/characters.json'), 'utf-8')) as AtlasMeta;
+const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-characters.json'), 'utf-8')) as {
+  cell: [number, number];
+  scale: number;
+  poses: string[];
+  sheets: Record<string, { row: number }>;
+};
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
 const enemies = readYaml<Array<{ id: string }>>('data/enemies.yaml');
 const manifest = JSON.parse(readFileSync(join(assets, 'data/audio-manifest.json'), 'utf-8')) as {
@@ -52,6 +58,51 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         expect(o.x * 3 + blockW, id).toBeLessThanOrEqual(width);
         expect(o.y * 3 + blockH, id).toBeLessThanOrEqual(height);
       }
+    });
+  });
+
+  describe('battle sprites', () => {
+    it.each(classes.map((c) => c.id))('class "%s" has battle poses', (id) => {
+      expect(battleAtlas.sheets[id]).toBeDefined();
+    });
+
+    it('provides every pose the battle scene uses', () => {
+      expect(battleAtlas.poses).toEqual(['ready', 'attack', 'cast', 'hurt', 'down', 'victory']);
+    });
+
+    it('has an atlas image large enough for every class row', () => {
+      const png = readFileSync(join(assets, 'sprites/battle-characters.png'));
+      const width = png.readUInt32BE(16);
+      const height = png.readUInt32BE(20);
+      const rows = Object.keys(battleAtlas.sheets).length;
+      expect(width).toBe(battleAtlas.cell[0] * battleAtlas.scale * battleAtlas.poses.length);
+      expect(height).toBe(battleAtlas.cell[1] * battleAtlas.scale * rows);
+    });
+  });
+
+  describe('AI battle atlas (preview art, optional)', () => {
+    const metaPath = join(assets, 'sprites/battle-characters-ai.json');
+    const present = existsSync(metaPath);
+    const meta = present
+      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { cell: [number, number]; scale: number; footRow: number; poses: string[]; sheets: Record<string, { row: number }> })
+      : null;
+
+    it.runIf(present)('uses the 2x art scale with 160 px on-screen cells', () => {
+      expect(meta!.scale).toBe(2);
+      expect(meta!.cell[1] * meta!.scale).toBe(160);
+      expect(meta!.footRow).toBeLessThan(meta!.cell[1]);
+    });
+
+    it.runIf(present)('provides every pose the battle scene uses', () => {
+      expect(meta!.poses).toEqual(['ready', 'attack', 'cast', 'hurt', 'down', 'victory']);
+    });
+
+    it.runIf(present)('only lists known classes, and the image matches cell x scale x poses by rows', () => {
+      const classIds = new Set(classes.map((c) => c.id));
+      for (const id of Object.keys(meta!.sheets)) expect(classIds.has(id), id).toBe(true);
+      const png = readFileSync(join(assets, 'sprites/battle-characters-ai.png'));
+      expect(png.readUInt32BE(16)).toBe(meta!.cell[0] * meta!.scale * meta!.poses.length);
+      expect(png.readUInt32BE(20)).toBe(meta!.cell[1] * meta!.scale * Object.keys(meta!.sheets).length);
     });
   });
 

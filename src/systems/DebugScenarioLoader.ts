@@ -20,6 +20,12 @@ export interface DebugScenario {
   background?: string;
 }
 
+/** Choose a scenario by `?scenario=<id>` (dev URLs); falls back to the first scenario. */
+export function pickScenario<T extends { id: string }>(scenarios: T[], search: string): T | undefined {
+  const wanted = new URLSearchParams(search).get('scenario');
+  return (wanted && scenarios.find((s) => s.id === wanted)) || scenarios[0];
+}
+
 export class DebugScenarioLoader {
   private game: Game;
 

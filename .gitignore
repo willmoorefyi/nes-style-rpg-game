@@ -38,3 +38,14 @@ playwright-responses/
 # Generated art previews
 assets-src/preview/
 assets-src/__pycache__/
+
+# AI sprite generation scratch (cache of paid Bedrock responses is kept)
+assets-src/gen/out/
+assets-src/gen/refs/
+
+# Paid image responses stay local; keep the ledger and approved entries reproducible
+assets-src/gen/cache/*
+!assets-src/gen/cache/ledger.jsonl
+!assets-src/gen/cache/fa13beb4f779e3f6b3dc87c0.png
+!assets-src/gen/cache/fa13beb4f779e3f6b3dc87c0.json
+__pycache__/

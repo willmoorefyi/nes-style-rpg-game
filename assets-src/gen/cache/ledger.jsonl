@@ -1,0 +1,3 @@
+{"event": "note", "ts": "2026-11-12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "knight", "sheet": "battle", "seed": 1234, "text": "1 paid image before the ledger existed (pre-plan exploratory run); 1 earlier attempt hit the free-tier quota (not billed)"}
+{"event": "attempt", "ts": "2026-11-12T10:19:04", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "knight", "sheet": "battle", "seed": 1234, "key": "fa13beb4f779e3f6b3dc87c0"}
+{"event": "result", "key": "fa13beb4f779e3f6b3dc87c0", "ok": true}

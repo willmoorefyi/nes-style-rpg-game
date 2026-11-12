@@ -1,12 +1,15 @@
 """SNES-style two-tile characters (16x32: a "head" tile above a "feet" tile).
 
-One generator builds every playable class and every NPC from a `Look`. Each character
-becomes a 6x5 block of 16x32 cells:
+Proportions follow the later 16-bit / pixel-remaster school: roughly three heads tall, a
+smaller face with real features, six-tone shading with cool shadows and warm highlights,
+coloured selective outlines, and clothing with folds, plates and trim.
+
+Each character is a 6x5 block of 16x32 cells:
   rows 0-3  field walk: down, up, left, right   (cols 0-2 = stand, step A, step B)
   row  4    battle poses, facing LEFT toward the enemies:
             ready, attack, cast, hurt, down (kneeling), victory
-Figures are composed from separately-drawn parts so poses and walk frames only change
-part offsets, not the art. Light always comes from the top-left.
+Figures are composed from separately drawn parts so poses and walk frames only change
+part offsets. Light always comes from the top-left.
 """
 from __future__ import annotations
 
@@ -19,27 +22,35 @@ from pixel import Canvas
 
 CELL_W, CELL_H = 16, 32
 BLOCK_COLS, BLOCK_ROWS = 6, 5
-OUTLINE = P.c15(3, 2, 6)
+GROUND = P.c15(2, 2, 4)
 EYE = P.c15(3, 2, 5)
 WHITE = P.c15(31, 31, 31)
 
+# Ramp indices: 0 deepest shadow ... 3 base ... 5 highlight
+SH2, SH1, MD, BASE, LT, HI = range(6)
+
 
 def shade_ramp(r: int, g: int, b: int) -> list:
-    """5-step ramp from a 5-bit base colour: shadows cool and deepen, highlights warm and lift."""
+    """6-step ramp from a 5-bit base: shadows deepen and cool, highlights lift and warm."""
     def cl(v: float) -> int:
         return max(0, min(31, int(round(v))))
     return [P.c15(*t) for t in (
-        (cl(r * 0.36), cl(g * 0.36), cl(b * 0.48 + 2)),
-        (cl(r * 0.62), cl(g * 0.62), cl(b * 0.76 + 1)),
+        (cl(r * 0.30), cl(g * 0.30), cl(b * 0.42 + 3)),
+        (cl(r * 0.48), cl(g * 0.48), cl(b * 0.62 + 2)),
+        (cl(r * 0.72), cl(g * 0.72), cl(b * 0.86 + 1)),
         (r, g, b),
-        (cl(r * 1.16 + 2), cl(g * 1.14 + 2), cl(b * 1.06 + 1)),
-        (cl(r * 1.28 + 5), cl(g * 1.26 + 5), cl(b * 1.12 + 3)),
+        (cl(r * 1.12 + 2), cl(g * 1.10 + 2), cl(b * 1.02 + 1)),
+        (cl(r * 1.24 + 5), cl(g * 1.22 + 5), cl(b * 1.08 + 3)),
     )]
 
 
-SKIN_LIGHT = shade_ramp(28, 20, 15)
-SKIN_TAN = shade_ramp(24, 16, 10)
-SKIN_DARK = shade_ramp(18, 11, 7)
+def _skin(*tones: tuple[int, int, int]) -> list:
+    return [P.c15(*t) for t in tones]
+
+
+SKIN_LIGHT = _skin((12, 6, 7), (18, 10, 9), (24, 15, 12), (28, 20, 16), (30, 24, 20), (31, 28, 24))
+SKIN_TAN = _skin((10, 5, 5), (15, 8, 7), (20, 12, 9), (24, 16, 11), (27, 20, 14), (30, 24, 18))
+SKIN_DARK = _skin((7, 3, 4), (11, 6, 5), (15, 9, 7), (19, 12, 9), (22, 15, 11), (25, 19, 14))
 STEEL = shade_ramp(17, 19, 23)
 GOLD = shade_ramp(27, 22, 6)
 
@@ -48,7 +59,7 @@ GOLD = shade_ramp(27, 22, 6)
 class Look:
     skin: list = field(default_factory=lambda: SKIN_LIGHT)
     hair: tuple[int, int, int] | None = (14, 8, 4)
-    hair_style: str = "short"        # short | spiky | long | bun | bald | hood
+    hair_style: str = "short"        # short | spiky | long | bun | bald
     cloth: tuple[int, int, int] = (8, 12, 22)
     trim: tuple[int, int, int] = (26, 22, 8)
     pants: tuple[int, int, int] = (9, 9, 14)
@@ -58,8 +69,8 @@ class Look:
     gear_color: tuple[int, int, int] = (26, 6, 6)
     gear_color2: tuple[int, int, int] = (31, 31, 31)
     beard: tuple[int, int, int] | None = None
-    mask: bool = False               # lower face covered (ninja)
-    shadow_face: bool = False        # black-mage style: dark face with glowing eyes
+    mask: bool = False
+    shadow_face: bool = False
     weapon: str | None = None        # sword | dagger | staff | rod | rapier | spear | cane
     weapon_color: tuple[int, int, int] = (22, 22, 26)
     shield: bool = False
@@ -68,7 +79,6 @@ class Look:
 
 
 class Pal:
-    """Resolved ramps for a Look."""
     def __init__(self, look: Look) -> None:
         self.skin = look.skin
         self.hair = shade_ramp(*look.hair) if look.hair else None
@@ -86,549 +96,608 @@ def new() -> Canvas:
     return Canvas(CELL_W, CELL_H)
 
 
-def vshade(cv: Canvas, x0: int, y0: int, x1: int, y1: int, ramp: list, lit_left: bool = True) -> None:
-    """Fill a rect with ramp[2], light edge on the lit side, shadow edge opposite, darker bottom row."""
-    cv.rect(x0, y0, x1, y1, ramp[2])
-    if x1 - x0 >= 2:
-        cv.rect(x0 if lit_left else x1, y0, x0 if lit_left else x1, y1, ramp[3])
-        cv.rect(x1 if lit_left else x0, y0, x1 if lit_left else x0, y1, ramp[1])
-    cv.rect(x0, y1, x1, y1, ramp[1])
-
-
-# ───────────────────────────── legs ─────────────────────────────
-
-def legs_front(look: Look, pal: Pal, frame: int, back: bool = False) -> Canvas:
-    cv = new()
-    if look.outfit in ("robe", "dress", "apron"):
-        # Skirt/robe hem sways by a pixel while the feet peek out underneath.
-        sway = {0: 0, 1: 1, 2: -1}[frame]
-        base = pal.cloth if look.outfit != "apron" else shade_ramp(*look.pants)
-        for y in range(23, 30):
-            grow = (y - 23) // 3
-            x0, x1 = 4 - grow, 11 + grow
-            cv.rect(x0 + (sway if y > 26 else 0), y, x1 + (sway if y > 26 else 0), y, base[2])
-            cv.set(x0 + (sway if y > 26 else 0), y, base[3])
-            cv.set(x1 + (sway if y > 26 else 0), y, base[1])
-        hem_y = 29
-        cv.rect(2 + sway, hem_y, 13 + sway, hem_y, pal.trim[2] if look.outfit == "robe" else base[1])
-        for fx in (4, 9):
-            if frame == 1 and fx == 9:
-                continue
-            if frame == 2 and fx == 4:
-                continue
-            cv.rect(fx, 30, fx + 2, 30, pal.boots[2])
-        return cv
-    lifted = {0: None, 1: "r", 2: "l"}[frame]
-    for side, (px0, px1, bx0, bx1) in {"l": (5, 7, 4, 7), "r": (8, 10, 8, 11)}.items():
-        lift = 1 if lifted == side else 0
-        vshade(cv, px0, 24, px1, 28 - lift, pal.pants, lit_left=True)
-        cv.rect(bx0, 29 - lift, bx1, 30 - lift, pal.boots[2])
-        cv.rect(bx0, 29 - lift, bx0, 29 - lift, pal.boots[3])
-        cv.rect(bx0, 30 - lift, bx1, 30 - lift, pal.boots[1])
-    return cv
-
-
-def legs_side(look: Look, pal: Pal, frame: int) -> Canvas:
-    """Facing left."""
-    cv = new()
-    if look.outfit in ("robe", "dress", "apron"):
-        sway = {0: 0, 1: -1, 2: 1}[frame]
-        base = pal.cloth if look.outfit != "apron" else shade_ramp(*look.pants)
-        for y in range(23, 30):
-            grow = (y - 23) // 3
-            x0, x1 = 5 - grow + (sway if y > 26 else 0), 10 + grow + (sway if y > 26 else 0)
-            cv.rect(x0, y, x1, y, base[2])
-            cv.set(x0, y, base[3])
-            cv.set(x1, y, base[1])
-        cv.rect(3 + sway, 29, 12 + sway, 29, pal.trim[2] if look.outfit == "robe" else base[1])
-        cv.rect(4 + sway, 30, 6 + sway, 30, pal.boots[2])
-        return cv
-    # (front-leg x offset, back-leg x offset)
-    off = {0: (0, 0), 1: (-2, 2), 2: (2, -2)}[frame]
-    back = (7, 9, 7 + off[1], 9 + off[1])
-    front = (6, 8, 6 + off[0], 8 + off[0])
-    for (_, _, a, b), shade in ((back, 1), (front, 2)):
-        ramp = pal.pants
-        cv.rect(a, 24, b, 28, ramp[shade])
-        cv.rect(a, 24, a, 28, ramp[shade + 1] if shade < 3 else ramp[3])
-        lead = a - 1
-        cv.rect(lead, 29, b, 30, pal.boots[shade])
-        cv.set(lead, 29, pal.boots[3])
-    return cv
-
-
-# ───────────────────────────── torso & arms ─────────────────────────────
-
-def torso_front(look: Look, pal: Pal, back: bool = False) -> Canvas:
-    cv = new()
-    top, bot = 17, 24
-    c = pal.cloth
-    if look.outfit == "gi":
-        # Open gi: bare chest between cloth lapels, sash at the waist.
-        cv.rect(4, top, 11, bot, pal.skin[2])
-        if not back:
-            cv.rect(7, top, 8, top + 4, pal.skin[1])
-            for i in range(3):
-                cv.set(5 + i, top + i, c[2]); cv.set(10 - i, top + i, c[2])
-            cv.rect(4, top, 4, bot, c[3]); cv.rect(11, top, 11, bot, c[1])
-        else:
-            cv.rect(4, top, 11, bot, c[2]); cv.rect(4, top, 4, bot, c[3]); cv.rect(11, top, 11, bot, c[1])
-        cv.rect(4, bot - 1, 11, bot, pal.trim[2])
-        cv.rect(4, bot, 11, bot, pal.trim[1])
-        return cv
-    vshade(cv, 4, top, 11, bot, c)
-    cv.rect(3, top, 12, top, c[3] if look.outfit != "armor" else pal.trim[3])  # shoulder line
-    if look.outfit == "armor":
-        cv.rect(5, top + 1, 10, top + 4, c[3])          # breastplate
-        cv.rect(5, top + 1, 6, top + 2, c[4])
-        cv.rect(10, top + 3, 10, top + 4, c[1])
-        cv.rect(7, top + 1, 8, top + 4, c[2])
-        cv.rect(7, top + 1, 7, top + 3, c[4])
-    elif look.outfit in ("robe", "dress"):
-        if not back:
-            cv.rect(7, top, 8, bot, pal.trim[2])         # front trim stripe
-            cv.rect(7, top, 7, bot, pal.trim[3])
-    elif look.outfit == "coat":
-        if not back:
-            cv.rect(7, top + 1, 8, bot, pal.trim[2])
-            cv.set(7, top + 3, pal.trim[4]); cv.set(8, top + 5, pal.trim[4])
-    elif look.outfit == "apron":
-        if not back:
-            vshade(cv, 5, top + 2, 10, bot, shade_ramp(31, 31, 29))
-    if not back and look.outfit not in ("armor",):
-        cv.set(6, top, pal.skin[1]); cv.set(7, top, pal.skin[2]); cv.set(8, top, pal.skin[2]); cv.set(9, top, pal.skin[1])
-    # belt
-    if look.outfit not in ("robe",):
-        cv.rect(4, bot - 1, 11, bot - 1, pal.trim[1])
-        cv.rect(7, bot - 1, 8, bot - 1, pal.trim[3])
-    return cv
-
-
-def torso_side(look: Look, pal: Pal) -> Canvas:
-    cv = new()
-    top, bot = 17, 24
-    c = pal.cloth
-    if look.outfit == "gi":
-        cv.rect(5, top, 10, bot, c[2]); cv.rect(5, top, 5, bot, c[3]); cv.rect(10, top, 10, bot, c[1])
-        cv.rect(5, top, 6, top + 2, pal.skin[2])
-        cv.rect(5, bot - 1, 10, bot, pal.trim[2])
-        return cv
-    vshade(cv, 5, top, 10, bot, c)
-    if look.outfit == "armor":
-        cv.rect(5, top + 1, 7, top + 4, c[3]); cv.set(5, top + 1, c[4])
-    elif look.outfit in ("robe", "dress"):
-        cv.rect(5, top, 5, bot, pal.trim[2])
-    elif look.outfit == "apron":
-        vshade(cv, 5, top + 2, 7, bot, shade_ramp(31, 31, 29))
-    if look.outfit != "robe":
-        cv.rect(5, bot - 1, 10, bot - 1, pal.trim[1])
-    cv.set(5, top, pal.skin[2])
-    return cv
-
-
-def arm_front(look: Look, pal: Pal, left: bool, length: int) -> Canvas:
-    """length 4..6 rows below the shoulder (swing varies it)."""
-    cv = new()
-    x0 = 2 if left else 12
-    sleeve = pal.skin if look.outfit == "gi" and look.gear != "no" else None
-    c = pal.cloth
-    top = 18
-    sleeve_bottom = top + length - 3
-    wide = look.outfit in ("robe", "dress")
-    xs = (x0 - (1 if wide and left else 0), x0 + 1 + (1 if wide and not left else 0))
-    body = sleeve if sleeve else c
-    cv.rect(xs[0], top, xs[1], sleeve_bottom + (1 if wide else 0), body[2])
-    cv.rect(xs[0] if left else xs[1], top, xs[0] if left else xs[1], sleeve_bottom, body[3 if left else 1])
-    if look.outfit == "armor":
-        cv.rect(xs[0], top - 1, xs[1], top, pal.trim[3])               # pauldron
-        cv.set(xs[0 if left else 1], top - 1, pal.trim[2])
-        cv.rect(xs[0], top + 1, xs[1], top + 1, pal.trim[1])
-    hand_y = sleeve_bottom + (2 if wide else 1)
-    hx = (x0, x0 + 1)
-    cv.rect(hx[0], hand_y, hx[1], hand_y + 1, pal.skin[2])
-    cv.set(hx[0], hand_y, pal.skin[3])
-    cv.set(hx[1], hand_y + 1, pal.skin[1])
-    if look.outfit == "gi":
-        cv.rect(hx[0], hand_y - 1, hx[1], hand_y - 1, pal.trim[2])    # wrist wrap
-    return cv
-
-
-def arm_side(look: Look, pal: Pal, dx: int, length: int = 6) -> Canvas:
-    """Near arm in profile; dx shifts it fore/aft."""
-    cv = new()
-    c = pal.skin if look.outfit == "gi" else pal.cloth
-    x0 = 6 + dx
-    cv.rect(x0, 18, x0 + 2, 18 + length - 3, c[2])
-    cv.rect(x0, 18, x0, 18 + length - 3, c[3])
-    cv.rect(x0 + 2, 18, x0 + 2, 18 + length - 3, c[1])
-    if look.outfit == "armor":
-        cv.rect(x0 - 1, 17, x0 + 3, 18, pal.trim[3])
-        cv.rect(x0 - 1, 18, x0 + 3, 18, pal.trim[2])
-    hand_y = 18 + length - 2
-    cv.rect(x0, hand_y, x0 + 1, hand_y + 1, pal.skin[2])
-    cv.set(x0, hand_y, pal.skin[3])
-    return cv
+def box(cv: Canvas, x0: int, y0: int, x1: int, y1: int, R: list, base: int = BASE) -> None:
+    """Lit rectangle: bright top-left edges, shadowed bottom-right edges."""
+    cv.rect(x0, y0, x1, y1, R[base])
+    if x1 > x0:
+        cv.rect(x0, y0, x0, y1, R[base + 1]); cv.rect(x1, y0, x1, y1, R[base - 1])
+    cv.rect(x0, y0, x1, y0, R[base + 1]); cv.rect(x0, y1, x1, y1, R[base - 2])
+    cv.set(x0, y0, R[min(base + 2, 5)])
 
 
 # ───────────────────────────── heads ─────────────────────────────
 
-def hair_cap(cv: Canvas, hair: list, style: str, facing: str, dy: int = 0) -> None:
-    h = hair
+FRONT_SIL = {3: (5, 10), 4: (4, 11), 5: (4, 11), 6: (4, 11), 7: (4, 11), 8: (4, 11),
+             9: (4, 11), 10: (4, 11), 11: (5, 10), 12: (6, 9)}
+
+
+def _hair_front(cv: Canvas, H: list, style: str, skin: list) -> None:
     if style == "bald":
         return
-    if style == "hood":
-        return
-    # base cap across the top of the head
-    for y, (x0, x1) in zip(range(4, 9), ((5, 10), (4, 11), (3, 12), (3, 12), (3, 12))):
-        cv.rect(x0, y + dy, x1, y + dy, h[2])
-    cv.rect(5, 4 + dy, 8, 4 + dy, h[3]); cv.rect(5, 5 + dy, 6, 5 + dy, h[4])
-    cv.rect(3, 8 + dy, 12, 8 + dy, h[1])
+    cv.rect(5, 3, 10, 3, H[BASE]); cv.rect(4, 4, 11, 6, H[BASE])
+    cv.rect(6, 3, 7, 3, H[LT]); cv.rect(5, 4, 7, 4, H[LT]); cv.set(6, 4, H[HI]); cv.set(5, 5, H[LT])
+    cv.rect(9, 4, 11, 6, H[MD]); cv.set(10, 3, H[MD]); cv.set(11, 6, H[SH1])
+    cv.rect(4, 7, 4, 8, H[MD]); cv.rect(11, 7, 11, 8, H[SH1])
+    if style in ("short", "long", "bun"):
+        cv.rect(7, 6, 8, 6, skin[BASE]); cv.set(6, 6, H[MD]); cv.set(9, 6, H[MD])
+        cv.set(6, 7, H[MD]); cv.set(5, 7, H[BASE])
     if style == "spiky":
-        for x, y in ((4, 3), (6, 2), (8, 2), (10, 3), (5, 3), (9, 3), (7, 3), (7, 2)):
-            cv.set(x, y + dy, h[2])
-        cv.set(6, 2 + dy, h[3]); cv.set(5, 3 + dy, h[3]); cv.set(10, 3 + dy, h[1])
-        cv.set(11, 4 + dy, h[1]); cv.set(3, 5 + dy, h[1])
+        for x, y in ((5, 2), (6, 1), (7, 2), (8, 0), (9, 2), (10, 2), (11, 3), (4, 3)):
+            cv.set(x, y, H[BASE])
+        cv.rect(5, 2, 10, 2, H[BASE]); cv.set(6, 1, H[LT]); cv.set(8, 0, H[LT]); cv.set(8, 1, H[BASE])
+        cv.set(10, 2, H[MD]); cv.set(11, 3, H[MD])
+        cv.set(6, 6, skin[BASE]); cv.set(7, 6, H[MD]); cv.set(8, 6, skin[BASE]); cv.set(9, 6, H[MD]); cv.set(5, 6, H[BASE])
     if style == "bun":
-        cv.disc(7.5, 3 + dy, 2, h[2]); cv.set(6, 2 + dy, h[3])
+        cv.rect(7, 1, 8, 2, H[BASE]); cv.set(7, 1, H[LT]); cv.set(8, 2, H[MD])
+    if style == "long":
+        for y in range(7, 16):
+            cv.rect(3, y, 4, y, H[BASE]); cv.rect(11, y, 12, y, H[MD])
+            cv.set(3, y, H[LT] if y % 3 else H[BASE]); cv.set(12, y, H[SH1])
+        cv.set(4, 15, H[MD]); cv.set(11, 15, H[SH1])
 
 
 def head_front(look: Look, pal: Pal, back: bool = False) -> Canvas:
     cv = new()
-    s = pal.skin
-    # skull/face
-    cv.ellipse(7.5, 9.5, 5.2, 5.7, s[2])
-    cv.rect(10, 9, 12, 14, s[2])
-    for y in range(4, 16):
-        for x in range(2, 14):
-            if cv.opaque(x, y) and (x >= 11 or y >= 13):
-                cv.set(x, y, s[1])
-    for y in range(4, 11):
-        for x in range(2, 9):
-            if cv.opaque(x, y) and (x <= 4 and y <= 10):
-                cv.set(x, y, s[3])
-    if look.hair_style == "hood":
-        pass
-    elif pal.hair:
-        if back:
-            cv.ellipse(7.5, 9.0, 5.4, 5.9, pal.hair[2])
-            cv.rect(4, 4, 8, 6, pal.hair[3]); cv.rect(5, 4, 6, 5, pal.hair[4])
-            cv.rect(9, 11, 12, 14, pal.hair[1]); cv.rect(4, 14, 11, 15, pal.hair[1])
-            cv.rect(4, 14, 4, 14, pal.hair[2])
-        else:
-            hair_cap(cv, pal.hair, look.hair_style, "down")
-            cv.set(5, 8, s[2]); cv.set(9, 8, s[2]); cv.set(10, 8, s[2])        # fringe gaps
-            if look.hair_style == "long":
-                cv.rect(3, 9, 4, 15, pal.hair[2]); cv.rect(11, 9, 12, 15, pal.hair[1])
-                cv.rect(3, 9, 3, 14, pal.hair[3])
-            else:
-                cv.rect(3, 9, 3, 11, pal.hair[2]); cv.rect(12, 9, 12, 11, pal.hair[1])
-    if not back:
+    S = pal.skin
+    for y, (a, b) in FRONT_SIL.items():
+        cv.rect(a, y, b, y, S[BASE])
+        cv.set(a, y, S[LT] if y < 10 else S[BASE]); cv.set(b, y, S[MD]); cv.set(b - 1, y, S[BASE] if b - 1 > a else S[MD])
+    cv.rect(6, 12, 9, 12, S[MD])
+    cv.rect(6, 13, 9, 13, S[SH1])
+    cv.rect(6, 14, 9, 14, S[SH1])
+    if back:
+        H = pal.hair
         if look.shadow_face:
-            cv.rect(4, 8, 11, 14, P.c15(2, 2, 6))
-            cv.rect(5, 10, 6, 11, P.c15(31, 28, 4)); cv.rect(9, 10, 10, 11, P.c15(31, 28, 4))
-        else:
-            cv.rect(6, 10, 6, 11, EYE); cv.rect(9, 10, 9, 11, EYE)
-            cv.set(6, 10, P.c15(9, 7, 12)); cv.set(9, 10, P.c15(9, 7, 12))
-            cv.set(4, 12, P.c15(29, 15, 13)); cv.set(11, 12, P.c15(26, 12, 11))
-            if not look.mask:
-                cv.rect(7, 13, 8, 13, P.c15(20, 8, 8))
-        if look.mask:
-            cv.rect(4, 12, 11, 15, pal.gear[1] if look.gear == "headband" else shade_ramp(8, 8, 11)[1])
-            cv.rect(4, 12, 4, 15, shade_ramp(8, 8, 11)[2])
-        if look.beard:
-            b = shade_ramp(*look.beard)
-            cv.rect(4, 13, 11, 15, b[3]); cv.rect(6, 12, 9, 12, b[3])
-            cv.rect(5, 15, 10, 16, b[2]); cv.rect(7, 16, 8, 17, b[2])
-            cv.rect(11, 13, 11, 15, b[2]); cv.rect(7, 13, 8, 13, s[1])
+            D = shade_ramp(6, 6, 14)
+            for y, (a, b) in FRONT_SIL.items():
+                cv.rect(a, y, b, y, D[BASE]); cv.set(a, y, D[LT]); cv.set(b, y, D[MD])
+            cv.rect(5, 11, 10, 12, D[MD])
+        if look.hair_style != "hood" and H:
+            for y, (a, b) in FRONT_SIL.items():
+                if y <= 10:
+                    cv.rect(a, y, b, y, H[BASE])
+                    cv.set(a, y, H[LT]); cv.set(b, y, H[MD]); cv.set(b - 1, y, H[MD])
+            cv.rect(5, 11, 10, 12, H[MD]); cv.rect(6, 12, 9, 12, H[SH1])
+            cv.rect(5, 3, 7, 4, H[LT]); cv.set(6, 3, H[HI]); cv.rect(7, 6, 8, 8, H[MD])
+            if look.hair_style == "long":
+                for y in range(11, 18):
+                    cv.rect(4, y, 11, y, H[BASE]); cv.rect(9, y, 11, y, H[MD]); cv.set(4, y, H[LT])
+                cv.rect(5, 17, 10, 17, H[SH1])
+            if look.hair_style == "spiky":
+                for x, y in ((5, 2), (6, 1), (8, 0), (9, 2), (10, 2), (7, 2)):
+                    cv.set(x, y, H[BASE])
+            if look.hair_style == "bun":
+                cv.rect(7, 1, 8, 2, H[BASE])
+        return cv
+    cv.set(4, 8, S[BASE]); cv.set(4, 9, S[MD]); cv.set(11, 8, S[MD]); cv.set(11, 9, S[SH1])
+    if look.shadow_face:
+        cv.rect(5, 7, 10, 12, P.c15(2, 2, 5))
+        cv.rect(5, 8, 6, 9, P.c15(31, 29, 5)); cv.rect(9, 8, 10, 9, P.c15(31, 29, 5))
+        cv.set(5, 8, P.c15(31, 31, 22)); cv.set(9, 8, P.c15(31, 31, 22))
+    else:
+        brow = pal.hair[SH1] if pal.hair else S[SH1]
+        cv.set(5, 7, brow); cv.set(6, 7, brow); cv.set(9, 7, brow); cv.set(10, 7, brow)
+        cv.set(5, 8, P.c15(28, 28, 29)); cv.set(6, 8, EYE); cv.set(9, 8, EYE); cv.set(10, 8, P.c15(28, 28, 29))
+        cv.set(7, 10, S[MD]); cv.set(8, 10, S[SH1])
+        if not look.mask:
+            cv.rect(7, 11, 8, 11, P.c15(21, 9, 9)); cv.set(6, 11, S[MD]); cv.set(9, 11, S[MD])
+    if look.mask:
+        M = shade_ramp(8, 8, 12)
+        cv.rect(4, 9, 11, 12, M[MD]); cv.rect(4, 9, 11, 9, M[BASE]); cv.rect(6, 12, 9, 12, M[SH1])
+        cv.rect(5, 10, 5, 11, M[LT])
+    if look.beard:
+        B = shade_ramp(*look.beard)
+        cv.rect(4, 10, 11, 11, B[BASE]); cv.rect(5, 12, 10, 14, B[BASE]); cv.rect(6, 15, 9, 16, B[MD])
+        cv.rect(4, 10, 5, 12, B[LT]); cv.rect(10, 10, 11, 13, B[MD]); cv.rect(7, 12, 8, 13, B[LT])
+        cv.rect(6, 10, 9, 10, B[MD]); cv.set(7, 10, S[MD]); cv.set(8, 10, S[MD])
+    if look.hair_style != "bald" and pal.hair:
+        _hair_front(cv, pal.hair, look.hair_style, S)
+    elif look.hair_style == "bald":
+        cv.rect(5, 3, 10, 3, S[BASE]); cv.rect(6, 3, 7, 3, S[HI]); cv.rect(5, 4, 6, 4, S[LT])
+        cv.rect(4, 4, 4, 6, S[LT]); cv.rect(9, 3, 10, 5, S[MD])
     return cv
 
 
 def head_side(look: Look, pal: Pal) -> Canvas:
+    """Facing left."""
     cv = new()
-    s = pal.skin
-    cv.ellipse(7.5, 9.5, 5.2, 5.7, s[2])
-    cv.set(2, 11, s[2]); cv.set(2, 12, s[1])              # nose
-    for y in range(4, 16):
-        for x in range(2, 14):
-            if cv.opaque(x, y) and (x >= 11 or y >= 14):
-                cv.set(x, y, s[1])
-    for y in range(4, 10):
-        for x in range(2, 6):
-            if cv.opaque(x, y):
-                cv.set(x, y, s[3])
-    if look.hair_style != "hood" and pal.hair and look.hair_style != "bald":
-        h = pal.hair
-        hair_cap(cv, h, look.hair_style, "left")
-        # back-of-head hair mass
-        cv.rect(8, 9, 12, 13 if look.hair_style != "long" else 16, h[2])
-        cv.rect(11, 9, 12, 13 if look.hair_style != "long" else 16, h[1])
-        cv.rect(5, 8, 6, 10, h[2])                       # sideburn
-        cv.set(7, 11, h[1])
-    elif look.hair_style == "bald":
-        cv.rect(8, 4, 9, 5, s[3])
+    S = pal.skin
+    sil = {3: (5, 10), 4: (4, 11), 5: (4, 11), 6: (4, 11), 7: (4, 11), 8: (4, 11), 9: (4, 11),
+           10: (4, 10), 11: (4, 9), 12: (5, 8)}
+    for y, (a, b) in sil.items():
+        cv.rect(a, y, b, y, S[BASE]); cv.set(a, y, S[LT]); cv.set(b, y, S[MD])
+    cv.set(3, 9, S[BASE]); cv.set(3, 10, S[MD])
+    cv.rect(5, 12, 8, 12, S[MD]); cv.rect(6, 13, 8, 14, S[SH1])
+    cv.set(8, 8, S[MD]); cv.set(8, 9, S[SH1])
     if look.shadow_face:
-        cv.rect(3, 9, 8, 14, P.c15(2, 2, 6)); cv.rect(3, 10, 4, 11, P.c15(31, 28, 4))
+        cv.rect(3, 7, 8, 12, P.c15(2, 2, 5)); cv.rect(4, 8, 5, 9, P.c15(31, 29, 5))
+        cv.set(4, 8, P.c15(31, 31, 22))
     else:
-        cv.rect(4, 10, 4, 11, EYE); cv.set(4, 10, P.c15(9, 7, 12))
-        cv.set(5, 12, P.c15(29, 15, 13)); cv.set(3, 13, P.c15(20, 8, 8))
+        cv.set(5, 8, EYE); cv.set(4, 8, P.c15(28, 28, 29))
+        brow = pal.hair[SH1] if pal.hair else S[SH1]
+        cv.set(4, 7, brow); cv.set(5, 7, brow)
+        if not look.mask:
+            cv.set(4, 11, P.c15(21, 9, 9))
     if look.mask:
-        cv.rect(3, 12, 8, 15, shade_ramp(8, 8, 11)[1]); cv.rect(3, 12, 3, 15, shade_ramp(8, 8, 11)[2])
+        M = shade_ramp(8, 8, 12)
+        cv.rect(3, 9, 8, 12, M[MD]); cv.rect(3, 9, 8, 9, M[BASE]); cv.rect(4, 10, 4, 11, M[LT])
     if look.beard:
-        b = shade_ramp(*look.beard)
-        cv.rect(3, 13, 8, 16, b[3]); cv.rect(4, 16, 7, 17, b[2]); cv.rect(8, 14, 8, 16, b[2])
+        B = shade_ramp(*look.beard)
+        cv.rect(3, 10, 8, 12, B[BASE]); cv.rect(4, 13, 7, 15, B[MD]); cv.rect(3, 10, 4, 11, B[LT])
+    if look.hair_style == "bald":
+        cv.rect(5, 3, 8, 3, S[LT]); cv.set(6, 3, S[HI])
+    elif pal.hair:
+        H = pal.hair
+        cv.rect(5, 3, 10, 3, H[BASE]); cv.rect(4, 4, 11, 6, H[BASE])
+        cv.rect(6, 3, 7, 3, H[LT]); cv.rect(5, 4, 8, 4, H[LT]); cv.set(6, 4, H[HI])
+        cv.rect(7, 5, 11, 6, H[MD]); cv.set(4, 6, H[BASE])
+        cv.rect(7, 7, 11, 10, H[MD]); cv.rect(10, 7, 11, 10, H[SH1])
+        cv.rect(6, 7, 6, 8, H[BASE]); cv.set(7, 7, H[BASE])
+        if look.hair_style == "long":
+            for y in range(11, 18):
+                cv.rect(7, y, 11, y, H[MD]); cv.rect(10, y, 11, y, H[SH1])
+        if look.hair_style == "spiky":
+            for x, y in ((5, 2), (6, 1), (8, 0), (9, 2), (10, 2), (7, 2), (11, 3)):
+                cv.set(x, y, H[BASE])
+            cv.set(8, 0, H[LT]); cv.set(6, 1, H[LT])
+        if look.hair_style == "bun":
+            cv.rect(9, 1, 10, 3, H[BASE]); cv.set(9, 1, H[LT])
     return cv
 
 
 # ───────────────────────────── headgear ─────────────────────────────
 
-def gear(look: Look, pal: Pal, facing: str, dy: int = 0) -> Canvas:
+def gear(look: Look, pal: Pal, facing: str) -> Canvas:
     cv = new()
-    g, g2 = pal.gear, pal.gear2
+    G, G2, T = pal.gear, pal.gear2, pal.trim
     kind = look.gear
-    side = facing in ("left", "right")
+    side = facing == "left"
     if kind in ("helm", "plume_helm"):
-        cv.ellipse(7.5, 8.0, 5.5, 5.0, g[2])
+        cv.rect(5, 2, 10, 2, G[LT]); cv.rect(4, 3, 11, 7, G[BASE])
+        cv.rect(4, 3, 11, 3, G[LT]); cv.rect(5, 3, 7, 3, G[HI]); cv.rect(10, 4, 11, 7, G[MD])
+        cv.rect(4, 7, 11, 7, G[SH1]); cv.rect(4, 4, 4, 6, G[LT])
         if facing == "down":
-            cv.rect(2, 9, 13, 15, None)
-        elif facing == "left":
-            cv.rect(2, 9, 7, 15, None)
-        cv.rect(2, 8, 13, 8, g[1])
-        cv.rect(4, 3, 8, 4, g[3]); cv.rect(5, 3, 6, 3, g[4])
-        if facing == "down":
-            cv.rect(3, 9, 4, 12, g[2]); cv.rect(11, 9, 12, 12, g[1])
-            cv.rect(3, 9, 3, 12, g[3])
-            cv.rect(7, 4, 8, 8, g[3])
+            cv.rect(4, 8, 5, 10, G[BASE]); cv.rect(10, 8, 11, 10, G[MD]); cv.rect(4, 8, 4, 10, G[LT])
+            cv.rect(7, 3, 8, 8, G[LT]); cv.rect(7, 4, 7, 7, G[HI]); cv.rect(8, 4, 8, 8, G[BASE])
         elif facing == "up":
-            cv.rect(2, 8, 13, 13, g[2]); cv.rect(2, 8, 13, 13, g[2]); cv.rect(10, 9, 13, 13, g[1])
+            cv.rect(4, 8, 11, 11, G[BASE]); cv.rect(9, 8, 11, 11, G[MD]); cv.rect(4, 11, 11, 11, G[SH1])
+            cv.rect(7, 3, 8, 10, G[LT])
         else:
-            cv.rect(8, 9, 12, 13, g[2]); cv.rect(11, 9, 12, 13, g[1]); cv.rect(5, 8, 6, 11, g[3])
+            cv.rect(8, 8, 11, 11, G[MD]); cv.rect(9, 8, 11, 11, G[SH1]); cv.rect(5, 3, 5, 7, G[LT])
         if kind == "plume_helm":
-            pl = g2
-            px = 8 if not side else 9
-            cv.rect(px - 1, 0, px, 4, pl[2]); cv.rect(px - 2, 1, px - 2, 3, pl[3]); cv.rect(px + 1, 1, px + 1, 3, pl[1])
-            cv.set(px - 1, 0, pl[4])
+            px = 9 if side else 8
+            cv.rect(px, 0, px + 2, 1, G2[BASE]); cv.rect(px - 1, 1, px + 2, 2, G2[BASE])
+            cv.set(px, 0, G2[HI]); cv.set(px + 1, 0, G2[LT]); cv.set(px + 2, 1, G2[MD]); cv.set(px + 2, 2, G2[SH1])
+            cv.rect(px + 3 if side else px - 2, 3, px + 3 if side else px - 2, 6, G2[MD])
     elif kind == "bandana":
-        cv.rect(3, 6, 12, 7, g[2]); cv.rect(3, 6, 12, 6, g[3]); cv.rect(3, 7, 12, 7, g[1])
-        kx = 13 if facing != "left" else 13
-        cv.rect(12, 6, 14, 7, g[2]); cv.rect(13, 8, 14, 10, g[1]); cv.set(14, 11, g[1])
-        if facing == "up":
-            cv.rect(3, 6, 12, 7, g[2])
+        cv.rect(4, 5, 11, 6, G[BASE]); cv.rect(4, 5, 11, 5, G[LT]); cv.rect(4, 6, 11, 6, G[MD])
+        cv.set(5, 5, G[HI]); cv.rect(10, 5, 11, 6, G[MD])
+        cv.rect(11, 6, 13, 7, G[BASE]); cv.rect(12, 7, 13, 10, G[MD]); cv.set(13, 10, G[SH1]); cv.set(12, 11, G[SH1])
     elif kind == "headband":
-        cv.rect(3, 6, 12, 7, g[2]); cv.rect(3, 6, 12, 6, g[3]); cv.rect(3, 7, 12, 7, g[1])
-        cv.rect(12, 7, 13, 9, g[2]); cv.rect(13, 9, 14, 12, g[1])
-        if look.mask:
-            cv.rect(3, 6, 12, 7, g[2])
+        cv.rect(4, 5, 11, 5, G[BASE]); cv.rect(4, 5, 6, 5, G[LT]); cv.rect(4, 6, 11, 6, G[MD])
+        cv.rect(11, 6, 13, 7, G[BASE]); cv.rect(12, 8, 13, 11, G[MD]); cv.set(13, 11, G[SH1]); cv.set(12, 12, G[SH1])
     elif kind == "hood":
-        cv.ellipse(7.5, 8.5, 6.3, 6.6, g[2])
-        cv.rect(1, 12, 14, 17, g[2])
-        cv.ellipse(7.5, 10.5, 4.2, 4.3, None)
+        shape = {2: (5, 10), 3: (4, 11), 4: (3, 12), 5: (3, 12)}
+        for y in range(6, 13):
+            shape[y] = (3, 12)
+        for y in (13, 14, 15):
+            shape[y] = (2, 13)
+        for y, (a, b) in shape.items():
+            cv.rect(a, y, b, y, G[BASE]); cv.set(a, y, G[LT]); cv.set(b, y, G[MD]); cv.set(b - 1, y, G[MD])
+        cv.rect(5, 2, 8, 2, G[HI]); cv.rect(4, 3, 6, 3, G[LT]); cv.rect(4, 4, 4, 6, G[LT])
+        for y in range(13, 16):
+            cv.rect(3, y, 12, y, G[BASE]); cv.rect(10, y, 13, y, G[MD]); cv.set(2, y, G[LT])
+        cv.rect(2, 15, 13, 15, G[SH1])
         if facing == "down":
-            cv.rect(4, 9, 11, 14, None)
-            cv.ellipse(7.5, 10.5, 4.2, 4.6, None)
-            cv.rect(3, 15, 12, 16, g[2])
-        elif facing == "up":
-            cv.ellipse(7.5, 8.5, 6.3, 6.6, g[2]); cv.rect(1, 12, 14, 17, g[2])
+            cv.rect(5, 6, 10, 12, None)
+            cv.rect(5, 6, 10, 6, G[SH2]); cv.rect(5, 7, 5, 12, G[SH1]); cv.rect(10, 7, 10, 12, G[SH1])
+            cv.rect(6, 6, 9, 6, T[BASE]); cv.rect(5, 6, 5, 6, T[MD]); cv.rect(10, 6, 10, 6, T[MD])
+            cv.rect(2, 14, 13, 14, T[BASE]); cv.rect(2, 14, 3, 14, T[LT])
+        elif facing == "left":
+            cv.rect(3, 6, 7, 12, None); cv.rect(7, 6, 7, 12, G[SH1]); cv.rect(3, 6, 8, 6, G[SH2])
+            cv.rect(3, 14, 13, 14, T[BASE])
         else:
-            cv.rect(1, 12, 14, 17, g[2]); cv.rect(2, 9, 7, 14, None)
-        # shading + trim
-        for y in range(1, 18):
-            for x in range(0, 16):
-                if cv.opaque(x, y):
-                    if x >= 11:
-                        cv.set(x, y, g[1])
-                    elif y <= 5 or x <= 3:
-                        cv.set(x, y, g[3])
-        cv.rect(4, 2, 7, 3, g[4])
-        if facing == "down":
-            for x in range(3, 13):
-                cv.set(x, 8 if x not in (3, 12) else 9, look and pal.trim[2])
-            cv.rect(2, 17, 13, 17, g[1])
+            cv.rect(2, 14, 13, 14, T[BASE])
     elif kind == "witch":
-        cv.rect(0, 6, 15, 7, g[2]); cv.rect(1, 8, 14, 8, g[1])
-        cv.rect(0, 6, 15, 6, g[3]); cv.rect(2, 5, 13, 5, g[2])
-        for i in range(6):
-            cv.rect(4 + i // 2, i, 11 - i // 2, i, g[2])
-            cv.set(4 + i // 2, i, g[3]); cv.set(11 - i // 2, i, g[1])
-        cv.rect(5, 4, 10, 4, pal.trim[2]); cv.rect(5, 4, 6, 4, pal.trim[3])
-        cv.set(8, 0, g[3])
-        if facing == "up":
-            cv.rect(2, 9, 13, 10, g[1])
-        if facing in ("left", "right"):
-            cv.rect(0, 6, 15, 8, None)
-            cv.rect(1, 6, 14, 7, g[2]); cv.rect(1, 6, 14, 6, g[3]); cv.rect(2, 8, 13, 8, g[1])
+        cv.rect(1, 5, 14, 6, G[BASE]); cv.rect(1, 5, 14, 5, G[LT]); cv.rect(2, 6, 13, 6, G[MD]); cv.rect(10, 5, 14, 6, G[MD])
+        cv.rect(1, 5, 2, 5, G[HI]); cv.set(1, 6, G[LT]); cv.set(14, 6, G[SH1])
+        if facing != "left":
+            cv.rect(3, 7, 12, 7, G[SH2])
+        for y, (a, b) in {0: (8, 9), 1: (7, 9), 2: (6, 9), 3: (5, 10), 4: (5, 10)}.items():
+            cv.rect(a, y, b, y, G[BASE]); cv.set(a, y, G[LT]); cv.set(b, y, G[MD])
+        cv.set(9, 0, G[MD]); cv.set(8, 0, G[LT])
+        cv.rect(5, 4, 10, 4, T[BASE]); cv.rect(5, 4, 6, 4, T[LT]); cv.rect(9, 4, 10, 4, T[MD])
     elif kind == "feather":
-        cv.rect(1, 6, 14, 7, g[2]); cv.rect(1, 6, 14, 6, g[3]); cv.rect(2, 8, 13, 8, g[1])
-        cv.rect(4, 3, 11, 5, g[2]); cv.rect(4, 3, 7, 3, g[3]); cv.rect(10, 4, 11, 5, g[1])
-        cv.rect(4, 5, 11, 5, pal.trim[2])
-        fx = 11 if facing != "left" else 4
-        for i, (dx, dyy) in enumerate(((0, 0), (1, -1), (2, -2), (2, -3), (3, -3))):
-            xx = fx + dx if facing != "left" else fx - dx
-            cv.set(xx, 3 + dyy, g2[3 if i % 2 else 4])
-            cv.set(xx, 4 + dyy, g2[2])
+        cv.rect(2, 5, 13, 6, G[BASE]); cv.rect(2, 5, 13, 5, G[LT]); cv.rect(3, 6, 12, 6, G[MD]); cv.rect(10, 5, 13, 6, G[MD])
+        cv.rect(2, 5, 3, 5, G[HI]); cv.rect(5, 2, 10, 4, G[BASE]); cv.rect(5, 2, 10, 2, G[LT]); cv.rect(5, 2, 6, 2, G[HI])
+        cv.rect(9, 3, 10, 4, G[MD]); cv.rect(5, 4, 10, 4, T[BASE]); cv.rect(5, 4, 6, 4, T[LT])
+        fx = 4 if side else 10
+        d = -1 if side else 1
+        for i, (dx, dy) in enumerate(((0, 0), (1, -1), (2, -2), (3, -2), (3, -3), (4, -3))):
+            cv.set(fx + dx * d, 2 + dy, G2[HI if i % 2 == 0 else LT]); cv.set(fx + dx * d, 3 + dy, G2[BASE])
+            if i < 3:
+                cv.set(fx + dx * d, 4 + dy, G2[MD])
     elif kind == "crown":
-        cv.rect(4, 3, 11, 5, GOLD[2]); cv.rect(4, 3, 11, 3, GOLD[3])
+        cv.rect(4, 2, 11, 4, GOLD[BASE]); cv.rect(4, 2, 11, 2, GOLD[LT]); cv.rect(4, 4, 11, 4, GOLD[MD])
         for x in (4, 7, 8, 11):
-            cv.set(x, 2, GOLD[4])
-        cv.set(7, 4, P.c15(28, 4, 6)); cv.set(8, 4, P.c15(28, 4, 6))
-        cv.rect(4, 5, 11, 5, GOLD[1])
+            cv.set(x, 1, GOLD[HI])
+        cv.set(7, 3, P.c15(28, 4, 8)); cv.set(8, 3, P.c15(28, 4, 8)); cv.set(5, 3, P.c15(6, 12, 28)); cv.set(10, 3, P.c15(6, 12, 28))
     elif kind == "round_hat":
-        cv.ellipse(7.5, 5.5, 6.0, 3.0, g[2])
-        cv.rect(3, 6, 12, 6, g[1])
-        cv.rect(4, 3, 7, 4, g[3])
-        cv.rect(3, 6, 12, 6, pal.trim[2])
-    if dy:
-        out = new()
-        out.paste(cv, 0, dy)
-        return out
+        cv.rect(5, 2, 10, 2, G[LT]); cv.rect(4, 3, 11, 5, G[BASE]); cv.rect(4, 3, 7, 3, G[LT]); cv.set(5, 3, G[HI])
+        cv.rect(10, 3, 11, 5, G[MD]); cv.rect(3, 5, 12, 6, G[MD]); cv.rect(3, 5, 12, 5, G[BASE]); cv.rect(3, 6, 12, 6, G[SH1])
+        cv.rect(4, 4, 11, 4, T[BASE]); cv.rect(4, 4, 6, 4, T[LT])
+    return cv
+
+
+# ───────────────────────────── torso, arms, legs (front/back) ─────────────────────────────
+
+def torso_front(look: Look, pal: Pal, back: bool = False) -> Canvas:
+    cv = new()
+    C, T, S = pal.cloth, pal.trim, pal.skin
+    o = look.outfit
+    if o == "gi":
+        if back:
+            box(cv, 4, 14, 11, 21, C)
+            cv.rect(3, 14, 12, 14, C[LT])
+        else:
+            cv.rect(4, 14, 11, 21, S[BASE])
+            cv.rect(5, 15, 7, 17, S[LT]); cv.rect(8, 15, 10, 17, S[BASE]); cv.rect(7, 15, 8, 18, S[MD])
+            cv.rect(5, 18, 10, 18, S[MD]); cv.rect(6, 19, 9, 19, S[MD]); cv.rect(10, 15, 11, 18, S[MD])
+            for i in range(5):
+                cv.set(4 + i, 14 + i, C[BASE]); cv.set(11 - i, 14 + i, C[MD])
+                if i < 4:
+                    cv.set(5 + i, 14 + i, C[LT])
+            cv.rect(4, 14, 4, 21, C[LT]); cv.rect(11, 14, 11, 21, C[MD])
+        cv.rect(4, 19, 11, 20, T[BASE]); cv.rect(4, 19, 11, 19, T[LT]); cv.rect(4, 20, 11, 20, T[MD])
+        cv.rect(8, 20, 9, 21, T[BASE]); cv.rect(8, 21, 9, 21, T[MD])
+        return cv
+    box(cv, 4, 14, 11, 21, C)
+    cv.rect(3, 14, 12, 14, C[LT]); cv.set(3, 14, C[BASE]); cv.set(12, 14, C[MD])
+    if o == "armor":
+        cv.rect(2, 14, 4, 16, T[BASE]); cv.rect(11, 14, 13, 16, T[MD])
+        cv.rect(2, 14, 4, 14, T[HI]); cv.rect(2, 14, 2, 16, T[LT]); cv.rect(11, 14, 13, 14, T[LT]); cv.rect(13, 15, 13, 16, T[SH1])
+        cv.rect(3, 16, 4, 16, T[MD]); cv.rect(11, 16, 12, 16, T[SH1])
+        if not back:
+            cv.rect(5, 15, 10, 19, C[LT]); cv.rect(5, 15, 7, 17, C[HI]); cv.rect(8, 15, 10, 19, C[BASE])
+            cv.rect(7, 15, 8, 19, C[BASE]); cv.rect(7, 15, 7, 18, C[LT]); cv.rect(5, 19, 10, 19, C[MD])
+            cv.rect(10, 15, 10, 19, C[MD]); cv.set(7, 16, T[HI]); cv.set(8, 16, T[BASE]); cv.set(7, 17, T[BASE]); cv.set(8, 17, T[MD])
+            cv.rect(6, 14, 9, 14, S[MD])
+        else:
+            cv.rect(5, 15, 10, 19, C[BASE]); cv.rect(5, 15, 7, 16, C[LT]); cv.rect(9, 17, 10, 19, C[MD])
+        cv.rect(4, 20, 11, 21, T[MD]); cv.rect(4, 20, 11, 20, T[LT]); cv.rect(7, 20, 8, 21, T[HI]); cv.rect(4, 21, 11, 21, T[SH1])
+        return cv
+    if o in ("robe", "dress"):
+        if not back:
+            if o == "robe":
+                cv.rect(7, 14, 8, 21, T[BASE]); cv.rect(7, 14, 7, 21, T[LT]); cv.rect(8, 14, 8, 21, T[MD])
+            cv.rect(6, 14, 9, 14, S[MD]); cv.set(7, 14, S[BASE])
+            if o == "dress":
+                cv.rect(4, 19, 11, 19, T[BASE]); cv.rect(4, 19, 6, 19, T[LT])
+        else:
+            cv.rect(4, 19, 11, 19, T[MD])
+            cv.rect(6, 15, 6, 18, C[MD]); cv.rect(9, 16, 9, 18, C[MD]); cv.rect(7, 14, 8, 14, C[LT])
+        cv.rect(5, 16, 5, 18, C[MD]); cv.rect(10, 17, 10, 18, C[SH1])
+        return cv
+    if o == "coat":
+        if not back:
+            cv.rect(7, 15, 8, 21, T[BASE]); cv.rect(7, 15, 7, 21, T[LT]); cv.rect(8, 16, 8, 21, T[MD])
+            for y in (16, 18):
+                cv.set(6, y, GOLD[HI]); cv.set(9, y, GOLD[BASE])
+            cv.rect(4, 14, 6, 15, C[HI]); cv.rect(9, 14, 11, 15, C[MD]); cv.rect(6, 14, 9, 14, S[MD])
+            cv.rect(4, 14, 4, 15, T[BASE]); cv.rect(11, 14, 11, 15, T[MD])
+        cv.rect(4, 19, 11, 20, T[MD]); cv.rect(4, 19, 11, 19, T[BASE]); cv.rect(7, 19, 8, 20, GOLD[BASE])
+        cv.rect(5, 16, 5, 18, C[MD]); cv.rect(10, 17, 10, 18, C[SH1])
+        return cv
+    if o == "apron":
+        if not back:
+            A = shade_ramp(28, 28, 26)
+            box(cv, 5, 16, 10, 21, A); cv.rect(6, 15, 9, 15, A[LT])
+            cv.rect(5, 14, 5, 15, T[BASE]); cv.rect(10, 14, 10, 15, T[BASE])
+            cv.rect(5, 18, 10, 18, A[MD])
+        cv.rect(4, 20, 11, 20, T[MD])
+        return cv
+    # tunic
+    if not back:
+        cv.rect(6, 14, 9, 14, S[MD]); cv.rect(7, 14, 8, 14, S[BASE]); cv.rect(7, 15, 8, 15, S[MD])
+        cv.set(6, 15, T[BASE]); cv.set(9, 15, T[MD]); cv.set(5, 14, T[LT]); cv.set(10, 14, T[MD])
+        cv.rect(6, 16, 6, 18, C[MD]); cv.rect(9, 17, 9, 18, C[SH1]); cv.set(5, 17, C[LT])
+    else:
+        cv.rect(6, 15, 6, 18, C[MD]); cv.rect(9, 16, 9, 18, C[SH1])
+    cv.rect(4, 19, 11, 20, T[MD]); cv.rect(4, 19, 11, 19, T[BASE]); cv.rect(4, 19, 6, 19, T[LT])
+    cv.rect(7, 19, 8, 20, T[HI]); cv.set(7, 20, T[BASE]); cv.rect(4, 21, 11, 21, C[SH1])
+    return cv
+
+
+def torso_side(look: Look, pal: Pal) -> Canvas:
+    cv = new()
+    C, T, S = pal.cloth, pal.trim, pal.skin
+    o = look.outfit
+    if o == "gi":
+        cv.rect(5, 14, 10, 21, S[BASE]); cv.rect(5, 14, 5, 21, C[LT]); cv.rect(5, 15, 7, 17, S[LT]); cv.rect(10, 14, 10, 21, S[MD])
+        cv.rect(5, 19, 10, 20, T[BASE]); cv.rect(5, 19, 10, 19, T[LT]); cv.rect(5, 20, 10, 20, T[MD])
+        return cv
+    box(cv, 5, 14, 10, 21, C)
+    cv.rect(4, 14, 10, 14, C[LT])
+    if o == "armor":
+        cv.rect(4, 14, 7, 16, T[BASE]); cv.rect(4, 14, 7, 14, T[HI]); cv.rect(4, 15, 4, 16, T[LT]); cv.rect(5, 16, 7, 16, T[MD])
+        cv.rect(5, 17, 6, 19, C[LT]); cv.set(5, 17, C[HI])
+        cv.rect(5, 20, 10, 21, T[MD]); cv.rect(5, 20, 10, 20, T[LT]); cv.rect(5, 21, 10, 21, T[SH1])
+        return cv
+    if o in ("robe", "dress", "coat"):
+        cv.rect(5, 15 if o == "coat" else 14, 5, 21, T[BASE])
+        cv.rect(5, 19, 10, 19, T[BASE]); cv.rect(6, 19, 7, 19, T[LT])
+        cv.rect(8, 16, 8, 18, C[MD]); cv.rect(6, 15, 6, 17, C[LT])
+        return cv
+    if o == "apron":
+        box(cv, 5, 16, 7, 21, shade_ramp(28, 28, 26)); cv.rect(5, 20, 10, 20, T[MD])
+        return cv
+    cv.rect(5, 19, 10, 20, T[MD]); cv.rect(5, 19, 10, 19, T[BASE]); cv.rect(5, 19, 6, 19, T[LT])
+    cv.rect(8, 16, 8, 18, C[MD]); cv.rect(6, 15, 6, 17, C[LT]); cv.set(5, 14, S[BASE]); cv.rect(5, 21, 10, 21, C[SH1])
+    return cv
+
+
+def arm_front(look: Look, pal: Pal, left: bool, sw: int) -> Canvas:
+    """sw > 0 swings the hand down/forward, < 0 up/back."""
+    cv = new()
+    C, T, S = pal.cloth, pal.trim, pal.skin
+    x0 = 2 if left else 12
+    wide = look.outfit in ("robe", "dress", "coat")
+    bare = look.outfit == "gi"
+    R = S if bare else C
+    top, sleeve_end = 15, 19 + sw
+    xs = (x0 - (1 if wide and left else 0), x0 + 1 + (1 if wide and not left else 0))
+    cv.rect(xs[0], top, xs[1], sleeve_end, R[BASE])
+    cv.rect(xs[0], top, xs[0], sleeve_end, R[LT]); cv.rect(xs[1], top, xs[1], sleeve_end, R[MD])
+    inner = xs[1] if left else xs[0]
+    cv.rect(inner, top, inner, sleeve_end, R[SH1])
+    if bare:
+        cv.rect(xs[0], top + 1, xs[1], top + 2, S[LT] if left else S[BASE])
+        cv.rect(xs[0], sleeve_end - 1, xs[1], sleeve_end, T[BASE])
+    if look.outfit == "armor":
+        cv.rect(xs[0], top + 3, xs[1], sleeve_end, T[BASE]); cv.rect(xs[0], top + 3, xs[0], sleeve_end, T[LT]); cv.rect(inner, top + 3, inner, sleeve_end, T[MD])
+        cv.rect(xs[0], sleeve_end, xs[1], sleeve_end, T[SH1])
+    if wide:
+        cv.rect(xs[0], sleeve_end, xs[1], sleeve_end, T[BASE]); cv.rect(xs[0], sleeve_end, xs[0], sleeve_end, T[LT])
+    hy = sleeve_end + 1
+    hx = (x0, x0 + 1)
+    cv.rect(hx[0], hy, hx[1], hy + 1, S[BASE]); cv.set(hx[0], hy, S[LT]); cv.set(hx[1], hy + 1, S[MD])
+    cv.set(hx[1] if left else hx[0], hy, S[MD])
+    return cv
+
+
+def arm_side(look: Look, pal: Pal, dx: int, length: int = 5) -> Canvas:
+    cv = new()
+    C, T, S = pal.cloth, pal.trim, pal.skin
+    bare = look.outfit == "gi"
+    R = S if bare else C
+    x0 = 6 + dx
+    end = 15 + length
+    cv.rect(x0, 15, x0 + 2, end, R[BASE]); cv.rect(x0, 15, x0, end, R[LT]); cv.rect(x0 + 2, 15, x0 + 2, end, R[MD])
+    cv.rect(x0 + 2, 16, x0 + 2, end, R[SH1])
+    if look.outfit == "armor":
+        cv.rect(x0 - 1, 14, x0 + 3, 16, T[BASE]); cv.rect(x0 - 1, 14, x0 + 3, 14, T[HI]); cv.rect(x0 + 3, 15, x0 + 3, 16, T[MD])
+        cv.rect(x0, end - 2, x0 + 2, end, T[BASE]); cv.rect(x0 + 2, end - 2, x0 + 2, end, T[MD])
+    if bare:
+        cv.rect(x0, end - 1, x0 + 2, end, T[BASE])
+    if look.outfit in ("robe", "dress", "coat"):
+        cv.rect(x0 - 1, end - 1, x0 + 3, end, T[BASE])
+    cv.rect(x0, end + 1, x0 + 1, end + 2, S[BASE]); cv.set(x0, end + 1, S[LT]); cv.set(x0 + 1, end + 2, S[MD])
+    return cv
+
+
+def legs_front(look: Look, pal: Pal, frame: int) -> Canvas:
+    cv = new()
+    B, P_ = pal.boots, pal.pants
+    if look.outfit in ("robe", "dress", "apron"):
+        base = pal.cloth if look.outfit != "apron" else shade_ramp(*look.pants)
+        sway = {0: 0, 1: 1, 2: -1}[frame]
+        for y in range(21, 29):
+            g = (y - 21) // 3
+            a, b = 4 - g + (sway if y > 25 else 0), 11 + g + (sway if y > 25 else 0)
+            cv.rect(a, y, b, y, base[BASE]); cv.set(a, y, base[LT]); cv.set(b, y, base[MD]); cv.set(b - 1, y, base[MD])
+            if y > 22:
+                cv.set(a + 2, y, base[MD])
+                if y > 23:
+                    cv.set(b - 3, y, base[SH1])
+                if y % 2:
+                    cv.set(7 + (sway if y > 25 else 0), y, base[LT])
+        e = pal.trim if look.outfit == "robe" else base
+        cv.rect(2 + sway, 28, 13 + sway, 28, e[BASE]); cv.rect(2 + sway, 28, 5 + sway, 28, e[LT]); cv.rect(10 + sway, 28, 13 + sway, 28, e[MD])
+        for fx, hide in ((4, frame == 2), (9, frame == 1)):
+            if not hide:
+                cv.rect(fx, 29, fx + 2, 30, B[BASE]); cv.rect(fx, 29, fx, 30, B[LT]); cv.rect(fx + 2, 29, fx + 2, 30, B[MD])
+                cv.rect(fx, 30, fx + 2, 30, B[SH1])
+        return cv
+    lifted = {0: None, 1: "r", 2: "l"}[frame]
+    for side, (px0, px1, bx0, bx1) in {"l": (5, 7, 4, 7), "r": (8, 10, 8, 11)}.items():
+        lift = 1 if lifted == side else 0
+        shift = (1 if side == "l" else -1) * lift
+        cv.rect(px0, 21, px1, 27 - lift, P_[BASE])
+        cv.rect(px0, 21, px0, 27 - lift, P_[LT]); cv.rect(px1, 21, px1, 27 - lift, P_[MD])
+        cv.rect(px0 + 1, 24 - lift, px1 - 1, 24 - lift, P_[MD])
+        cv.rect(bx0 + shift, 27 - lift, bx1 + shift, 30 - lift, B[BASE])
+        cv.rect(bx0 + shift, 27 - lift, bx1 + shift, 27 - lift, B[HI] if side == "l" else B[LT])
+        cv.rect(bx0 + shift, 27 - lift, bx0 + shift, 30 - lift, B[LT]); cv.rect(bx1 + shift, 28 - lift, bx1 + shift, 30 - lift, B[MD])
+        cv.rect(bx0 + shift, 30 - lift, bx1 + shift, 30 - lift, B[SH1])
+    if look.outfit == "coat":
+        C = pal.cloth
+        for y in range(21, 27):
+            cv.rect(4, y, 11, y, C[BASE]); cv.set(4, y, C[LT]); cv.set(11, y, C[MD]); cv.set(10, y, C[MD])
+            cv.set(7, y, C[SH1]); cv.set(8, y, C[MD])
+        cv.rect(4, 26, 11, 26, pal.trim[BASE]); cv.rect(4, 26, 6, 26, pal.trim[LT]); cv.rect(7, 26, 8, 26, C[SH2])
+    return cv
+
+
+def legs_side(look: Look, pal: Pal, frame: int) -> Canvas:
+    cv = new()
+    B, P_ = pal.boots, pal.pants
+    if look.outfit in ("robe", "dress", "apron"):
+        base = pal.cloth if look.outfit != "apron" else shade_ramp(*look.pants)
+        sway = {0: 0, 1: -1, 2: 1}[frame]
+        for y in range(21, 29):
+            g = (y - 21) // 3
+            a, b = 5 - g + (sway if y > 25 else 0), 10 + g + (sway if y > 25 else 0)
+            cv.rect(a, y, b, y, base[BASE]); cv.set(a, y, base[LT]); cv.set(b, y, base[MD]); cv.set(b - 1, y, base[MD])
+            if y > 22:
+                cv.set(a + 3, y, base[MD])
+        e = pal.trim if look.outfit == "robe" else base
+        cv.rect(3 + sway, 28, 12 + sway, 28, e[BASE]); cv.rect(3 + sway, 28, 6 + sway, 28, e[LT]); cv.rect(9 + sway, 28, 12 + sway, 28, e[MD])
+        cv.rect(4 + sway, 29, 7 + sway, 30, B[BASE]); cv.rect(4 + sway, 29, 7 + sway, 29, B[LT]); cv.rect(4 + sway, 30, 7 + sway, 30, B[SH1])
+        return cv
+    off = {0: (0, 0), 1: (-2, 2), 2: (2, -2)}[frame]
+    for sh, (x0, x1), o in ((1, (7, 9), off[1]), (3, (6, 8), off[0])):
+        a, b = x0 + o, x1 + o
+        cv.rect(a, 21, b, 27, P_[sh]); cv.rect(a, 21, a, 27, P_[min(sh + 1, 5)]); cv.rect(b, 21, b, 27, P_[sh - 1])
+        cv.rect(a, 24, b, 24, P_[sh - 1])
+        cv.rect(a - 1, 27, b, 30, B[sh]); cv.rect(a - 1, 27, b, 27, B[min(sh + 1, 5)]); cv.rect(a - 1, 28, a - 1, 30, B[min(sh + 1, 5)])
+        cv.rect(a - 1, 30, b, 30, B[max(sh - 2, 0)])
     return cv
 
 
 # ───────────────────────────── weapons ─────────────────────────────
 
 def weapon_canvas(look: Look, pal: Pal, hand: tuple[int, int], vec: tuple[int, int]) -> Canvas:
-    """Weapon for a LEFT-facing figure, gripped at `hand`, pointing along `vec` (dx, dy)."""
     cv = new()
-    w = pal.weapon
+    W = pal.weapon
     kind = look.weapon
     if kind is None:
         return cv
-    wood = shade_ramp(14, 8, 4)
-    metal = STEEL
+    wood = shade_ramp(15, 9, 5)
     hx, hy = hand
     tx, ty = hx + vec[0], hy + vec[1]
     if kind in ("sword", "rapier"):
-        blade = metal if kind == "sword" else shade_ramp(24, 24, 28)
-        cv.line(hx, hy, tx, ty, blade[3])
-        cv.line(hx + 1, hy, tx + 1, ty, blade[2])
-        cv.set(tx, ty, blade[4])
-        gx, gy = hx - (1 if vec[1] < -3 else 0), hy
-        cv.rect(gx - 1, gy, gx + 2, gy, GOLD[2])
-        cv.set(hx, hy + 1, wood[2])
+        blade = STEEL if kind == "sword" else shade_ramp(24, 24, 28)
+        cv.line(hx, hy, tx, ty, blade[BASE]); cv.line(hx + 1, hy, tx + 1, ty, blade[LT])
+        if kind == "sword":
+            cv.line(hx - 1, hy, tx - 1, ty, blade[MD])
+        cv.set(tx, ty, blade[HI]); cv.set(tx + 1, ty, blade[HI])
+        cv.rect(hx - 2, hy, hx + 2, hy, GOLD[BASE]); cv.set(hx - 2, hy, GOLD[HI]); cv.set(hx + 2, hy, GOLD[MD])
+        cv.rect(hx, hy + 1, hx, hy + 2, wood[BASE]); cv.set(hx, hy + 3, GOLD[BASE])
     elif kind == "dagger":
-        cv.line(hx, hy, hx + vec[0] // 2, hy + vec[1] // 2, metal[3])
-        cv.rect(hx - 1, hy, hx + 1, hy, GOLD[2])
+        cv.line(hx, hy, hx + vec[0] // 2, hy + vec[1] // 2, STEEL[LT]); cv.line(hx + 1, hy, hx + 1 + vec[0] // 2, hy + vec[1] // 2, STEEL[BASE])
+        cv.rect(hx - 1, hy, hx + 2, hy, GOLD[BASE]); cv.set(hx, hy + 1, wood[BASE])
     elif kind in ("staff", "rod", "cane"):
         bx, by = hx - vec[0] // 3, hy - vec[1] // 3
-        cv.line(bx, by, tx, ty, wood[2])
-        cv.line(bx + 1, by, tx + 1, ty, wood[1])
+        cv.line(bx, by, tx, ty, wood[BASE]); cv.line(bx + 1, by, tx + 1, ty, wood[MD])
         if kind != "cane":
-            cv.disc(tx, ty - 1, 1.6, w[3]); cv.set(tx, ty - 1, w[4])
+            cv.disc(tx, ty - 1, 2.0, W[BASE]); cv.disc(tx, ty - 1, 1.4, W[LT]); cv.set(tx - 1, ty - 2, W[HI])
+            cv.rect(tx - 1, ty + 1, tx + 1, ty + 1, GOLD[BASE])
+        else:
+            cv.rect(tx - 1, ty, tx + 1, ty, wood[LT])
     elif kind == "spear":
-        cv.line(hx, hy + 5, tx, ty, wood[2])
-        cv.poly([(tx - 1.5, ty + 2), (tx + 1.5, ty + 2), (tx, ty - 3)], metal[3])
+        cv.line(hx, hy + 5, tx, ty, wood[BASE]); cv.line(hx + 1, hy + 5, tx + 1, ty, wood[MD])
+        cv.poly([(tx - 1.8, ty + 3), (tx + 2.8, ty + 3), (tx + 0.5, ty - 3)], STEEL[LT])
+        cv.line(tx + 1, ty - 2, tx + 1, ty + 2, STEEL[HI])
     return cv
 
 
 def shield_canvas(look: Look, pal: Pal) -> Canvas:
     cv = new()
-    c = pal.trim
-    cv.ellipse(5.5, 21.5, 3.2, 4.2, STEEL[2])
-    cv.ellipse(5.5, 21.5, 2.2, 3.2, c[2])
-    cv.rect(5, 19, 6, 24, c[3]); cv.rect(3, 21, 8, 22, c[3])
+    T = pal.trim
+    cv.ellipse(5.5, 19.5, 3.4, 4.8, STEEL[MD]); cv.ellipse(5.5, 19.5, 2.6, 4.0, T[BASE])
+    cv.rect(5, 16, 6, 23, T[LT]); cv.rect(3, 19, 8, 20, T[LT]); cv.set(5, 19, T[HI])
     return cv
 
 
 # ───────────────────────────── composition ─────────────────────────────
 
+def _finish(cv: Canvas) -> Canvas:
+    cv.sel_outline(ground=GROUND)
+    return cv
+
+
 def compose_front(look: Look, pal: Pal, frame: int, back: bool) -> Canvas:
     cv = new()
     bob = -1 if frame else 0
     swing = {0: (0, 0), 1: (-1, 1), 2: (1, -1)}[frame]
-    cv.paste(legs_front(look, pal, frame, back), 0, 0)
+    cv.paste(legs_front(look, pal, frame), 0, 0)
     if back and pal.cape:
         c = pal.cape
-        cv.rect(4, 17 + bob, 11, 28, c[2]); cv.rect(4, 17 + bob, 4, 28, c[3]); cv.rect(11, 17 + bob, 11, 28, c[1])
-    parts: list[tuple[Canvas, int]] = [
-        (arm_front(look, pal, True, 5 + swing[0]), bob),
-        (arm_front(look, pal, False, 5 + swing[1]), bob),
-        (torso_front(look, pal, back), bob),
-        (head_front(look, pal, back), bob),
-    ]
-    for part, dy in parts:
-        cv.paste(part, 0, dy)
+        for y in range(14 + bob, 29):
+            cv.rect(3, y, 12, y, c[BASE]); cv.set(3, y, c[LT]); cv.set(12, y, c[MD]); cv.set(11, y, c[MD])
+            if y > 17:
+                cv.set(7 + (y % 2), y, c[MD])
+        cv.rect(3, 28, 12, 28, c[SH1])
+    cv.paste(arm_front(look, pal, True, swing[0]), 0, bob)
+    cv.paste(arm_front(look, pal, False, swing[1]), 0, bob)
+    cv.paste(torso_front(look, pal, back), 0, bob)
+    cv.paste(head_front(look, pal, back), 0, bob)
     if look.gear:
         cv.paste(gear(look, pal, "up" if back else "down"), 0, bob)
-    cv.outline(OUTLINE)
-    return cv
+    return _finish(cv)
 
 
 def compose_side(look: Look, pal: Pal, frame: int, pose: str | None = None) -> Canvas:
-    """Facing left. pose: None (field), 'ready','attack','cast','hurt','down','victory'."""
+    """Facing left."""
     cv = new()
     bob = -1 if frame else 0
     arm_dx = {0: 0, 1: -2, 2: 2}[frame]
-    ox = oy = 0
-    arm_len = 6
+    ox = 0
+    arm_len = 5
     wp = None
     if pose == "ready":
         arm_dx, wp = -1, "ready"
     elif pose == "attack":
-        arm_dx, wp, ox = -3, "swing", 3
-        arm_len = 4
+        arm_dx, wp, ox, arm_len = -3, "swing", 3, 3
     elif pose == "cast":
-        arm_dx, wp, arm_len = -1, "raised", 4
+        arm_dx, wp, arm_len = -1, "raised", 3
     elif pose == "hurt":
         ox, bob = 2, 0
     elif pose == "victory":
-        wp, arm_len = "raised", 4
-    legs = legs_side(look, pal, 0 if pose else frame)
-    cv.paste(legs, ox // 2, oy)
+        wp, arm_len = "raised", 3
     if pose == "down":
         return compose_kneel(look, pal)
+    cv.paste(legs_side(look, pal, 0 if pose else frame), ox // 2, 0)
     if pal.cape:
         c = pal.cape
-        cv.rect(9, 17 + bob, 13, 27, c[1]); cv.rect(10, 17 + bob, 12, 27, c[2])
-    cv.paste(torso_side(look, pal), ox, bob + oy)
-    cv.paste(head_side(look, pal), ox + (1 if pose == "hurt" else 0), bob + oy)
+        for y in range(14 + bob, 28):
+            cv.rect(9, y, 13, y, c[MD]); cv.rect(10, y, 12, y, c[BASE]); cv.set(13, y, c[SH1])
+    cv.paste(torso_side(look, pal), ox, bob)
+    cv.paste(head_side(look, pal), ox + (1 if pose == "hurt" else 0), bob)
     if look.gear:
-        cv.paste(gear(look, pal, "left"), ox + (1 if pose == "hurt" else 0), bob + oy)
+        cv.paste(gear(look, pal, "left"), ox + (1 if pose == "hurt" else 0), bob)
     if look.shield and pose in (None, "ready", "attack", "hurt"):
-        cv.paste(shield_canvas(look, pal), ox + 1, bob + oy)
-    arm = arm_side(look, pal, arm_dx, arm_len)
+        cv.paste(shield_canvas(look, pal), ox + 1, bob)
     if pose in ("cast", "victory"):
         arm = new()
-        c = pal.skin if look.outfit == "gi" else pal.cloth
-        cv_arm = arm
-        cv_arm.rect(3, 12, 5, 19, c[2]); cv_arm.rect(3, 12, 3, 19, c[3])
-        cv_arm.rect(3, 9, 4, 11, pal.skin[2]); cv_arm.set(3, 9, pal.skin[3])
-    cv.paste(arm, ox, bob + oy)
+        R = pal.skin if look.outfit == "gi" else pal.cloth
+        arm.rect(3, 10, 5, 18, R[BASE]); arm.rect(3, 10, 3, 18, R[LT]); arm.rect(5, 10, 5, 18, R[MD])
+        arm.rect(3, 7, 4, 9, pal.skin[BASE]); arm.set(3, 7, pal.skin[LT]); arm.set(4, 9, pal.skin[MD])
+        cv.paste(arm, ox, bob)
+    else:
+        cv.paste(arm_side(look, pal, arm_dx, arm_len), ox, bob)
     if wp and look.weapon:
         if wp == "ready":
-            wc = weapon_canvas(look, pal, (6 + arm_dx, 22), (-2, -10))
+            wc = weapon_canvas(look, pal, (6 + arm_dx, 21), (-2, -10))
         elif wp == "swing":
-            wc = weapon_canvas(look, pal, (6 + arm_dx, 20), (-6, -2))
+            wc = weapon_canvas(look, pal, (6 + arm_dx, 19), (-6, -2))
         else:
-            wc = weapon_canvas(look, pal, (3, 10), (0, -8))
-        cv.paste(wc, ox, bob + oy)
+            wc = weapon_canvas(look, pal, (4, 8), (0, -7))
+        cv.paste(wc, ox, bob)
     if pose == "hurt":
-        cv.rect(3, 10, 4, 10, EYE)
-    cv.outline(OUTLINE)
-    return cv
+        cv.rect(4, 8, 5, 8, EYE)
+    return _finish(cv)
 
 
 def compose_kneel(look: Look, pal: Pal) -> Canvas:
     cv = new()
-    c = pal.cloth
-    cv.rect(2, 28, 13, 30, pal.pants[1] if look.outfit not in ("robe", "dress") else c[1])      # folded legs
-    cv.rect(2, 28, 13, 28, pal.pants[2] if look.outfit not in ("robe", "dress") else c[2])
-    cv.rect(2, 30, 5, 30, pal.boots[2])
-    cv.rect(5, 20, 11, 27, c[2]); cv.rect(5, 20, 5, 27, c[3]); cv.rect(11, 20, 11, 27, c[1])
-    head = head_side(look, pal)
-    cv.paste(head, -1, 10)
-    if look.gear and look.gear != "witch":
-        cv.paste(gear(look, pal, "left"), -1, 10)
-    elif look.gear == "witch":
-        cv.paste(gear(look, pal, "left"), -1, 10)
-    cv.rect(3, 23, 7, 24, pal.skin[1])
-    cv.rect(3, 22, 4, 23, pal.skin[2])
-    cv.outline(OUTLINE)
-    return cv
+    C = pal.cloth
+    robe = look.outfit in ("robe", "dress", "coat")
+    leg = C if robe else pal.pants
+    cv.rect(2, 27, 13, 30, leg[BASE]); cv.rect(2, 27, 13, 27, leg[LT]); cv.rect(2, 30, 13, 30, leg[SH1]); cv.rect(11, 28, 13, 30, leg[MD])
+    cv.rect(2, 29, 4, 30, pal.boots[BASE]); cv.rect(2, 29, 4, 29, pal.boots[LT])
+    cv.rect(5, 19, 11, 26, C[BASE]); cv.rect(5, 19, 5, 26, C[LT]); cv.rect(10, 19, 11, 26, C[MD]); cv.rect(5, 19, 11, 19, C[LT])
+    cv.rect(5, 22, 11, 22, pal.trim[MD])
+    cv.paste(head_side(look, pal), -1, 9)
+    if look.gear:
+        cv.paste(gear(look, pal, "left"), -1, 9)
+    cv.rect(2, 24, 6, 25, pal.skin[BASE]); cv.rect(2, 23, 3, 24, pal.skin[LT])
+    return _finish(cv)
 
 
 # ───────────────────────────── sheet assembly ─────────────────────────────
 
 def build_block(look: Look) -> Image.Image:
-    """Native-resolution 96x160 block for one character."""
     block = Image.new("RGBA", (CELL_W * BLOCK_COLS, CELL_H * BLOCK_ROWS), (0, 0, 0, 0))
     if look.prop == "chest":
         for col, open_ in enumerate((False, True)):
@@ -653,31 +722,33 @@ def build_block(look: Look) -> Image.Image:
 def chest_cell(open_: bool) -> Canvas:
     cv = new()
     wood, band = shade_ramp(18, 10, 5), GOLD
-    cv.rect(2, 22, 13, 30, wood[2]); cv.rect(2, 22, 13, 22, wood[3]); cv.rect(2, 30, 13, 30, wood[1])
-    cv.rect(2, 22, 2, 30, wood[3]); cv.rect(13, 22, 13, 30, wood[1])
-    cv.rect(2, 26, 13, 26, band[2]); cv.rect(7, 25, 8, 28, band[3]); cv.set(7, 26, band[4])
+    box(cv, 2, 22, 13, 30, wood)
+    for x in (5, 10):
+        cv.rect(x, 22, x, 30, wood[MD])
+    cv.rect(2, 26, 13, 26, band[BASE]); cv.rect(2, 26, 5, 26, band[LT]); cv.rect(7, 25, 8, 28, band[LT]); cv.set(7, 26, band[HI]); cv.set(8, 28, band[MD])
+    cv.rect(2, 22, 2, 30, band[BASE]); cv.rect(13, 22, 13, 30, band[MD])
     if open_:
-        cv.rect(2, 15, 13, 21, wood[1]); cv.rect(3, 16, 12, 20, P.c15(3, 2, 4))
-        cv.rect(4, 22, 11, 23, P.c15(31, 28, 10))
-        cv.set(5, 22, WHITE); cv.set(9, 23, WHITE)
+        cv.rect(2, 15, 13, 21, wood[MD]); cv.rect(3, 16, 12, 20, P.c15(3, 2, 4))
+        cv.rect(2, 15, 13, 15, wood[LT])
+        cv.rect(4, 22, 11, 23, P.c15(31, 28, 10)); cv.set(5, 22, WHITE); cv.set(9, 23, WHITE); cv.set(7, 22, P.c15(31, 31, 24))
     else:
-        cv.rect(2, 17, 13, 21, wood[2]); cv.rect(2, 17, 13, 17, wood[3]); cv.rect(2, 17, 2, 21, wood[3])
-        cv.rect(13, 17, 13, 21, wood[1]); cv.rect(2, 19, 13, 19, band[2])
-    cv.outline(OUTLINE)
-    return cv
+        box(cv, 2, 16, 13, 21, wood)
+        cv.rect(2, 19, 13, 19, band[BASE]); cv.rect(7, 18, 8, 20, band[LT]); cv.set(7, 19, band[HI])
+        cv.rect(2, 16, 2, 21, band[BASE]); cv.rect(13, 16, 13, 21, band[MD])
+    return _finish(cv)
 
 
 # ───────────────────────────── roster ─────────────────────────────
 
 ROSTER: dict[str, Look] = {
     # Base classes
-    "warrior": Look(hair=(14, 8, 4), hair_style="spiky", outfit="armor", cloth=(24, 5, 5), trim=(19, 21, 26),
+    "warrior": Look(hair=(15, 8, 4), hair_style="spiky", outfit="armor", cloth=(24, 5, 6), trim=(19, 21, 26),
                     pants=(8, 8, 12), boots=(11, 6, 4), weapon="sword", shield=True),
-    "thief": Look(hair=(26, 21, 8), hair_style="short", outfit="tunic", cloth=(5, 17, 10), trim=(14, 8, 4),
-                  pants=(10, 9, 6), boots=(12, 7, 4), gear="bandana", gear_color=(26, 5, 7), weapon="dagger"),
+    "thief": Look(hair=(26, 21, 8), hair_style="short", outfit="tunic", cloth=(6, 17, 11), trim=(15, 9, 4),
+                  pants=(10, 9, 6), boots=(12, 7, 4), gear="bandana", gear_color=(25, 5, 8), weapon="dagger"),
     "monk": Look(skin=SKIN_TAN, hair=(4, 3, 4), hair_style="short", outfit="gi", cloth=(28, 15, 3), trim=(31, 28, 22),
                  pants=(26, 13, 3), boots=(14, 9, 5), gear="headband", gear_color=(31, 31, 29)),
-    "white_mage": Look(hair=(14, 8, 4), hair_style="short", outfit="robe", cloth=(29, 29, 30), trim=(26, 5, 6),
+    "white_mage": Look(hair=(14, 8, 4), hair_style="short", outfit="robe", cloth=(29, 29, 30), trim=(26, 5, 7),
                        gear="hood", gear_color=(29, 29, 30), boots=(14, 9, 5), weapon="staff", weapon_color=(30, 26, 8)),
     "black_mage": Look(outfit="robe", cloth=(6, 6, 17), trim=(27, 22, 6), shadow_face=True, hair=None, hair_style="bald",
                        gear="witch", gear_color=(7, 7, 20), boots=(12, 7, 4), weapon="rod", weapon_color=(30, 26, 8)),
@@ -688,7 +759,7 @@ ROSTER: dict[str, Look] = {
     "knight": Look(hair=(26, 22, 8), hair_style="short", outfit="armor", cloth=(18, 20, 27), trim=(27, 22, 6),
                    pants=(10, 12, 18), boots=(10, 11, 15), gear="plume_helm", gear_color=(18, 20, 27),
                    gear_color2=(28, 29, 31), weapon="sword", shield=True),
-    "ninja": Look(hair=None, hair_style="bald", outfit="tunic", cloth=(7, 7, 11), trim=(25, 5, 6), pants=(6, 6, 10),
+    "ninja": Look(hair=(7, 7, 13), hair_style="short", outfit="tunic", cloth=(7, 7, 11), trim=(25, 5, 6), pants=(6, 6, 10),
                   boots=(5, 5, 8), gear="headband", gear_color=(26, 6, 6), mask=True, weapon="dagger"),
     "master": Look(skin=SKIN_TAN, hair=None, hair_style="bald", outfit="gi", cloth=(29, 24, 6), trim=(31, 31, 29),
                    pants=(29, 24, 6), boots=(30, 28, 22)),

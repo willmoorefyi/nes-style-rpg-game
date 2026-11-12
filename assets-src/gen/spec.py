@@ -1,0 +1,214 @@
+"""Sprite specification: style rules, output grid, and exact pose positions.
+
+Everything that must stay the same from character to character lives here, so a new
+character is only a short costume prompt (see characters.yaml).
+
+Style (from the reference: hand-made bead versions of Pixel Remaster battle sprites)
+  - figure ~25 rows tall incl. outline at reference scale; chibi, ~2.5 heads tall
+  - head ~40% of height; large fists (3x3) and boots (4 wide)
+  - three-quarter view, facing LEFT, one eye clearly visible
+  - 1px black outline around the silhouette AND between overlapping parts
+  - flat cel shading, 2-3 tones per material, light from the upper left, no dithering, no gradients
+  - ~12-16 colours per sprite, high saturation, warm skin, small white accents (buckles, rings)
+
+Coordinates are in "pose units": a 32 x 40 authoring box, x to the right, y down, feet joints on y=36.5
+(the drawn boot bottoms reach about y=39.4). Each sheet kind has a SheetGeom that maps pose units to native
+pixels and guide pixels; see docs/ART_2X_PLAN.md for the measured numbers.
+
+Display: every pixel-art asset is drawn at ART_SCALE (1 art px = 2 screen px at 1920x1080).
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+# ───────── output ─────────
+ART_SCALE = 2             # 1 art pixel = 2 screen pixels
+PALETTE_SIZE = 14         # colours per sprite including the outline colour
+CONTROL_STRENGTH = 0.75   # Bedrock structure-control only
+
+
+@dataclass(frozen=True)
+class SheetGeom:
+    """How one sheet kind maps pose units -> native pixels -> guide pixels.
+
+    grid:        native cell size (w, h)
+    cell_px:     guide/raw cell size in pixels (w, h); must be an integer multiple of grid
+    layout:      cells per sheet (cols, rows)
+    px_per_unit: native pixels per pose unit
+    bottom_row:  native row that holds the figure's last opaque pixels (feet / hem)
+    """
+    name: str
+    grid: tuple[int, int]
+    cell_px: tuple[int, int]
+    layout: tuple[int, int]
+    px_per_unit: float
+    bottom_row: int
+    guide_bottom_px: float | None = None   # pin where the guide's drawn bottom sits (keeps approved guides identical)
+
+    @property
+    def guide_per_native(self) -> float:
+        return self.cell_px[0] / self.grid[0]
+
+    @property
+    def guide_per_unit(self) -> float:
+        return self.px_per_unit * self.guide_per_native
+
+    @property
+    def sheet_px(self) -> tuple[int, int]:
+        return self.cell_px[0] * self.layout[0], self.cell_px[1] * self.layout[1]
+
+    @property
+    def aspect(self) -> str:
+        from math import gcd
+        w, h = self.sheet_px
+        g = gcd(w, h)
+        return f"{w // g}:{h // g}"
+
+
+# Battle: the native grid matches the pixel grid Gemini draws for a 1536x1024 guide sheet (~6.4 guide px per art px,
+# i.e. ~80 art px per 512 px cell). Art is point-sampled 1:1, never rescaled. guide_per_unit stays 12.96, so guides
+# (and therefore cache keys) are unchanged from the 64-px plan.
+BATTLE_GEOM = SheetGeom("battle", grid=(80, 80), cell_px=(512, 512), layout=(3, 2), px_per_unit=2.025, bottom_row=76,
+                        guide_bottom_px=496.0)
+FIELD_GEOM = SheetGeom("field", grid=(24, 48), cell_px=(256, 512), layout=(3, 1), px_per_unit=1.18, bottom_row=46)
+# Prompt wording that produced the approved knight; Gemini sets its own pixel size (~72 px figures), so keep
+# this text stable to keep cache keys stable.
+BATTLE_TARGET_PX = "about 56-60 pixels tall"
+FIELD_TARGET_PX = "about 42 pixels tall"
+
+STYLE = (
+    "16-bit SNES JRPG {kind} sprite sheet, {n} poses of the same character drawn identically, {layout}, "
+    "chibi proportions about 2.5 heads tall, oversized head, large fists, big boots, "
+    "crisp pixel art, bold black outlines between every part, flat cel shading with three tones per colour, "
+    "limited saturated palette, light from the upper left, plain flat white background"
+)
+NEGATIVE = (
+    "multiple weapons, extra swords, floating objects, props on the ground, duplicate characters, facing right, "
+    "blurry, soft shading, gradient, airbrush, photo, 3d render, realistic, text, watermark, frame, border, grid lines, shadow on ground"
+)
+
+Pt = tuple[float, float]
+
+
+@dataclass(frozen=True)
+class Pose:
+    """Joint positions for one frame. `n` = near (viewer side) limb, `f` = far limb.
+
+    face: 'left' (3/4 facing left), 'front', or 'back'. Drives the guide's face cue.
+    weapon: (dx, dy) from the weapon hand to the tip, or None.
+    """
+    head: Pt
+    chest: Pt
+    hip: Pt
+    sh_n: Pt
+    el_n: Pt
+    hand_n: Pt
+    sh_f: Pt
+    el_f: Pt
+    hand_f: Pt
+    hip_n: Pt
+    knee_n: Pt
+    foot_n: Pt
+    hip_f: Pt
+    knee_f: Pt
+    foot_f: Pt
+    face: str = "left"
+    weapon: Pt | None = None
+    weapon_hand: str = "n"
+    caption: str = ""
+
+
+def _p(**kw) -> Pose:
+    return Pose(**kw)
+
+
+# ───────── battle poses (facing left toward the enemies) ─────────
+BATTLE_POSES: dict[str, Pose] = {
+    "ready": _p(head=(13.5, 10.0), chest=(15.5, 19.5), hip=(16.0, 28.0),
+                sh_n=(12.0, 18.0), el_n=(8.0, 22.0), hand_n=(6.0, 18.5),
+                sh_f=(19.5, 18.0), el_f=(22.0, 22.5), hand_f=(18.5, 24.5),
+                hip_n=(14.0, 28.5), knee_n=(11.0, 32.5), foot_n=(9.0, 36.5),
+                hip_f=(17.5, 28.5), knee_f=(20.0, 32.5), foot_f=(22.0, 36.5),
+                caption="battle stance, knees bent, fists raised"),
+    "attack": _p(head=(11.0, 10.5), chest=(13.0, 19.5), hip=(15.5, 28.5),
+                 sh_n=(10.0, 18.5), el_n=(6.0, 19.5), hand_n=(2.5, 18.0),
+                 sh_f=(17.5, 18.0), el_f=(21.5, 20.5), hand_f=(23.5, 17.0),
+                 hip_n=(13.5, 28.5), knee_n=(8.0, 31.5), foot_n=(5.0, 36.5),
+                 hip_f=(16.5, 28.5), knee_f=(22.0, 33.0), foot_f=(27.0, 36.5),
+                 weapon=(-9.0, -1.0), caption="lunging forward, weapon thrust to the left"),
+    "cast": _p(head=(14.0, 10.0), chest=(15.5, 19.5), hip=(16.0, 28.0),
+               sh_n=(12.0, 18.0), el_n=(6.0, 15.0), hand_n=(3.5, 9.5),
+               sh_f=(19.5, 18.0), el_f=(22.0, 22.5), hand_f=(18.5, 24.5),
+               hip_n=(14.0, 28.5), knee_n=(11.5, 32.5), foot_n=(10.0, 36.5),
+               hip_f=(17.5, 28.5), knee_f=(20.0, 32.5), foot_f=(22.0, 36.5),
+               caption="arm raised up and forward to cast a spell, face clearly visible"),
+    "hurt": _p(head=(16.5, 11.0), chest=(17.5, 20.0), hip=(16.5, 28.0),
+               sh_n=(14.0, 18.5), el_n=(11.0, 21.5), hand_n=(9.5, 24.5),
+               sh_f=(21.0, 18.5), el_f=(24.5, 21.0), hand_f=(26.0, 24.0),
+               hip_n=(15.0, 28.5), knee_n=(12.5, 32.5), foot_n=(10.5, 36.5),
+               hip_f=(18.0, 28.5), knee_f=(22.5, 32.0), foot_f=(25.5, 35.5),
+               caption="recoiling backward from a hit, eyes shut"),
+    "down": _p(head=(10.5, 22.0), chest=(14.0, 27.0), hip=(18.5, 31.5),
+               sh_n=(11.5, 25.5), el_n=(8.5, 29.0), hand_n=(6.5, 33.0),
+               sh_f=(17.0, 25.0), el_f=(15.5, 29.5), hand_f=(13.0, 33.0),
+               hip_n=(16.5, 32.0), knee_n=(11.0, 34.5), foot_n=(6.0, 37.0),
+               hip_f=(19.5, 32.0), knee_f=(24.0, 35.0), foot_f=(28.0, 37.0),
+               caption="collapsed, kneeling low with head bowed"),
+    "victory": _p(head=(14.0, 10.0), chest=(15.5, 19.5), hip=(16.0, 28.0),
+                  sh_n=(12.0, 18.0), el_n=(7.0, 14.0), hand_n=(5.5, 9.0),
+                  sh_f=(19.5, 18.0), el_f=(22.5, 22.0), hand_f=(20.0, 25.5),
+                  hip_n=(14.0, 28.5), knee_n=(11.5, 32.5), foot_n=(10.0, 36.5),
+                  hip_f=(17.5, 28.5), knee_f=(20.0, 32.5), foot_f=(22.0, 36.5),
+                  weapon=(0.5, -6.5), caption="triumphant, weapon raised overhead, face visible"),
+}
+BATTLE_ORDER = ["ready", "attack", "cast", "hurt", "down", "victory"]
+BATTLE_SHEET = BATTLE_GEOM.layout
+BATTLE_LAYOUT = ("battle", "every pose in three-quarter side view facing left, face turned left with one eye visible")
+
+
+def _walk(face: str, phase: int) -> Pose:
+    """Field walk frames: phase 0 = stand, 1 = left foot forward, 2 = right foot forward."""
+    lift = {0: 0.0, 1: 1.0, 2: -1.0}[phase]
+    if face in ("front", "back"):
+        return _p(head=(16.0, 10.0), chest=(16.0, 19.5), hip=(16.0, 28.0),
+                  sh_n=(11.0, 18.0), el_n=(10.5 + 0.5 * lift, 22.5), hand_n=(10.5 + lift, 26.0),
+                  sh_f=(21.0, 18.0), el_f=(21.5 - 0.5 * lift, 22.5), hand_f=(21.5 - lift, 26.0),
+                  hip_n=(13.5, 28.5), knee_n=(13.5, 32.5 - max(lift, 0)), foot_n=(13.0, 36.5 - max(lift, 0)),
+                  hip_f=(18.5, 28.5), knee_f=(18.5, 32.5 - max(-lift, 0)), foot_f=(19.0, 36.5 - max(-lift, 0)),
+                  face=face, caption=f"walking, {'facing the viewer' if face == 'front' else 'seen from behind'}")
+    return _p(head=(14.5, 10.0), chest=(16.0, 19.5), hip=(16.0, 28.0),
+              sh_n=(15.0, 18.0), el_n=(13.5 - 2 * lift, 22.5), hand_n=(13.0 - 3 * lift, 26.0),
+              sh_f=(17.5, 18.0), el_f=(18.5 + 2 * lift, 22.5), hand_f=(19.0 + 3 * lift, 26.0),
+              hip_n=(15.0, 28.5), knee_n=(14.0 - 2.0 * lift, 32.5), foot_n=(13.5 - 3.2 * lift, 36.5),
+              hip_f=(17.0, 28.5), knee_f=(18.0 + 2.0 * lift, 32.5), foot_f=(18.5 + 3.2 * lift, 36.5),
+              face="left", caption="walking, side view facing left")
+
+
+# ───────── field poses: one sheet per direction, 3 frames each (right = mirrored left) ─────────
+# Each direction is generated separately (the model will not draw a back view on a mixed sheet).
+# A 3x1 strip of 1:2 cells: stand, step-left, step-right.
+FIELD_DIRECTIONS = {
+    "down": ("front", "walking toward the viewer, full front view, face and both eyes visible", "side view, back view"),
+    "up": ("back", "rear view: walking away from the viewer, seen from directly behind, back of the helmet or hair, "
+                   "cape hanging down the back", "face, eyes, mouth, nose, front view, looking at viewer"),
+    "left": ("left", "walking in full side profile facing left, one eye visible", "front view, back view, facing right"),
+}
+FIELD_NEGATIVE = "sword, weapon, scabbard, held object, items on the ground"
+FIELD_POSES: dict[str, Pose] = {f"{d}{i}": _walk(face, i) for d, (face, _, _) in FIELD_DIRECTIONS.items() for i in range(3)}
+FIELD_SHEET = FIELD_GEOM.layout
+
+
+def field_order(direction: str) -> list[str]:
+    return [f"{direction}0", f"{direction}1", f"{direction}2"]
+
+
+@dataclass
+class CharacterSpec:
+    id: str
+    prompt: str                       # costume and gear only; style is added automatically
+    seed: int = 1234
+    robed: bool = False
+    weapon: str = "sword"
+    extra_negative: str = ""
+    palette_size: int = PALETTE_SIZE
+    tags: list[str] = field(default_factory=list)

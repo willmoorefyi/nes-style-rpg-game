@@ -1,0 +1,14 @@
+# Character prompts for the AI sprite pipeline (assets-src/gen/generate.py).
+# `prompt` describes costume only; `battle_gear` / `field_gear` describe what is held in each context.
+# The shared style, poses and negatives come from spec.py.
+# `seeds` are tried in order; put the approved seed first so rebuilds are identical.
+- id: knight
+  prompt: >-
+    young knight with short blond hair, polished silver plate armor with gold trim, blue tabard and blue cape,
+    round steel helmet with an open face and a tall white horsehair crest on top,
+    brown leather gloves and boots
+  battle_gear: holding a longsword in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  # Approved battle sheet, sent to Gemini (8x nearest) as the identity reference for the field sheets.
+  identity_ref: assets-src/gen/approved/knight/battle.png

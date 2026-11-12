@@ -1,0 +1,53 @@
+{
+  "cell": [
+    40,
+    46
+  ],
+  "scale": 3,
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "sheets": {
+    "warrior": {
+      "row": 0
+    },
+    "thief": {
+      "row": 1
+    },
+    "monk": {
+      "row": 2
+    },
+    "white_mage": {
+      "row": 3
+    },
+    "black_mage": {
+      "row": 4
+    },
+    "red_mage": {
+      "row": 5
+    },
+    "knight": {
+      "row": 6
+    },
+    "ninja": {
+      "row": 7
+    },
+    "master": {
+      "row": 8
+    },
+    "white_wizard": {
+      "row": 9
+    },
+    "black_wizard": {
+      "row": 10
+    },
+    "red_wizard": {
+      "row": 11
+    }
+  }
+}

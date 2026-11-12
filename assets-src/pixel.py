@@ -130,6 +130,28 @@ class Canvas:
         for x, y in added:
             self.set(x, y, col)
 
+    def sel_outline(self, ground: Color | None = None, darken: float = 0.32) -> None:
+        """Selective outline: each outline pixel is a darkened, cooled copy of the colour it borders,
+        so the silhouette reads as shaded form instead of a uniform black line. Pixels that only
+        border the bottom edge of the sprite (feet) use `ground` when given."""
+        todo: list[tuple[int, int, Color]] = []
+        for y in range(self.h):
+            for x in range(self.w):
+                if self.opaque(x, y):
+                    continue
+                nb = [(x, y + 1), (x + 1, y), (x - 1, y), (x, y - 1)]
+                src = next((self.px[a, b][:3] for a, b in nb if self.opaque(a, b)), None)
+                if src is None:
+                    continue
+                below = self.opaque(x, y - 1) and not any(self.opaque(a, b) for a, b in nb[:3])
+                if below and ground is not None:
+                    todo.append((x, y, ground))
+                    continue
+                r, g, b = src
+                todo.append((x, y, (int(r * darken), int(g * (darken - 0.02)), int(b * (darken + 0.12) + 6))))
+        for x, y, col in todo:
+            self.set(x, y, col)
+
     def inner_outline(self, col: Color) -> None:
         """Recolor silhouette-edge pixels (opaque pixels touching transparency) with col."""
         edge = [

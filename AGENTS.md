@@ -286,7 +286,7 @@ All art and audio are generated from code in `assets-src/` (Python 3 + Pillow + 
 
 ```bash
 npm run assets                      # rebuild everything
-python3 -I assets-src/build_assets.py terrain characters   # or pick stages: terrain | characters | monsters | backgrounds | audio
+python3 -I assets-src/build_assets.py terrain characters   # or pick stages: terrain | characters | battle | monsters | backgrounds | audio
 ```
 
 **Style:** SNES-inspired. Every colour is defined as 5-bit-per-channel values (15-bit, BGR555-style) in `assets-src/snes_palette.py`, light comes from the top-left, and ramps run darkest→lightest. Art is authored at native resolution and upscaled with nearest-neighbour: x3 for field art (`TILE_SIZE` = 48), x4 for the battle character atlas, x3 for monsters.
@@ -294,10 +294,16 @@ python3 -I assets-src/build_assets.py terrain characters   # or pick stages: ter
 | Stage | Source | Output | Notes |
 |-------|--------|--------|-------|
 | terrain | `tiles.py` | `assets/sprites/terrain.png` | Rows = `TerrainType` order (+ counter), 4 variants per terrain, picked per map cell |
-| characters | `characters.py` | `assets/sprites/characters.png`, `characters-battle.png`, `characters.json` | Two-tile (16x32) characters: 6x5 cell block each (4 walk rows x 3 frames + a battle-pose row). Keyed by class id and NPC `sprite` name |
+| characters | `characters.py` | `assets/sprites/characters.png`, `characters.json` | Field-size two-tile (16x32) characters: 4 walk rows x 3 frames per block. Keyed by class id and NPC `sprite` name. (A battle-pose row is still generated but unused.) |
+| battle | `rig/` (`raster.py`, `figure.py`) | `assets/sprites/battle-characters.png`, `.json` | Pixel-Remaster-style battle figures, 40x46 native at 3x: one row per class, columns = ready, attack, cast, hurt, down, victory. Rendered from a `Look` + joint `Pose` with a supersampled shape rasteriser and height-field shading |
 | monsters | `monsters*.py` | `assets/sprites/monsters/<enemy-id>.png`, `index.json` | 32/64/96 px native for small/large/boss |
 | backgrounds | `backgrounds.py` | `assets/backgrounds/<id>.png` | Referenced by `battleBackgrounds` in map YAML |
 | audio | `audio/` | `assets/audio/{music,sfx}/*.ogg` | Filenames come from `audio-manifest.json` |
+
+**AI sprite generation (2x art scale, in progress):** `assets-src/gen/` generates character sprites with Google
+Gemini and pixelizes them; see `assets-src/gen/README.md` and `docs/ART_2X_PLAN.md`. Paid image requests go through a
+budget guard: one per review checkpoint, `--paid` required, every attempt logged in `assets-src/gen/cache/ledger.jsonl`.
+Run `python3 -I assets-src/gen/selftest.py` after changing the pipeline.
 
 **Adding art for new content**
 - New class or NPC sprite name: add a `Look` to `ROSTER` in `characters.py` (keys must match the class id / the `sprite:` value in map YAML), then `npm run assets`.
@@ -307,7 +313,7 @@ python3 -I assets-src/build_assets.py terrain characters   # or pick stages: ter
 **Runtime wiring**
 - `CharacterAtlas` (`src/rendering/`) loads the character atlas once; `BattleArt` preloads monsters. Both are preloaded in `ExplorationScene.enter()`, and battle falls back to coloured rectangles (with a console warning) if art is missing.
 - Characters are two tiles tall: the head tile overhangs the tile above. `PlayerController`/`NPC` lift the sprite by `frameHeight - TILE_SIZE` and set `zIndex` to the feet position; `ExplorationScene.worldContainer.sortableChildren` depth-sorts them.
-- Battle uses the same sprites with poses (`ready`, `attack`, `cast`, `hurt`, `down`, `victory`) via `BattleDisplayManager`.
+- Battle uses the separate, larger `battle-characters` atlas with poses (`ready`, `attack`, `cast`, `hurt`, `down`, `victory`) via `BattleDisplayManager`. The class `Look` in `characters.py` drives both field and battle art.
 
 ## Debug Menu & Battle Scenarios
 
@@ -341,7 +347,7 @@ The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads 
   enemies: [garland]        # enemy IDs from enemies.yaml
 ```
 
-3. The scenario will appear automatically when selecting Debug from the title screen
+3. Selecting Debug runs the first scenario; pick another with `?scenario=<id>` in the dev URL (e.g. `http://localhost:5173/?scenario=knight_party`). Add `&art=ai` to preview approved AI battle art
 4. Class IDs must match `assets/data/classes.yaml`, item IDs must match `assets/data/items.yaml`, spell IDs must match `assets/data/spells.yaml`, enemy IDs must match `assets/data/enemies.yaml`
 5. Run `npm test` to verify cross-file references are valid
 

@@ -8,10 +8,23 @@ import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import { battleArt } from '../../rendering/BattleArt.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 
-/** Party sprites are 64x128 (a 16x32 two-tile character at 4x); feet rest on these baselines. */
-const PARTY_FEET_Y = [330, 450, 570, 690];
-const PARTY_SPRITE_HEIGHT = 128;
+/** Party sprites are 120x138 (40x46 native at 3x, matching monster pixel density); feet rest on these baselines. */
+const PARTY_FEET_Y = [335, 455, 575, 695];
+const PARTY_X = [1420, 1445, 1470, 1495];
+/** Transparent rows below the boots inside each battle cell (about 5px at 3x). */
+const PARTY_BOTTOM_PAD = 5;
 const HURT_FRAMES = 24;
+/** AI preview art (80x80 native at 2x): bottom of the feet row for each party slot, and x per slot. */
+export const AI_PARTY_FEET_Y = [290, 440, 590, 740];
+export const AI_PARTY_X = [1420, 1445, 1470, 1495];
+
+/** Screen position for a party battle sprite. Legacy art keeps its original constants (normal play unchanged). */
+export function partySpritePosition(i: number, art: { ai: boolean; footRow: number | null; scale: number }, spriteHeight: number): { x: number; y: number } {
+  if (art.ai && art.footRow !== null) {
+    return { x: AI_PARTY_X[i], y: AI_PARTY_FEET_Y[i] - (art.footRow + 1) * art.scale };
+  }
+  return { x: PARTY_X[i], y: PARTY_FEET_Y[i] - spriteHeight + PARTY_BOTTOM_PAD };
+}
 
 export class BattleDisplayManager {
   readonly enemySprites: Container[] = [];
@@ -65,12 +78,13 @@ export class BattleDisplayManager {
 
   private buildPartySprite(i: number): { sprite: Container; frames: Texture[] | null } {
     const char = this.config.party[i];
-    const frames = characterAtlas.isLoaded ? characterAtlas.getBattleFrames(char.classData.id) : null;
+    const art = characterAtlas.isLoaded ? characterAtlas.getBattleFrames(char.classData.id) : null;
     const xPositions = [1450, 1475, 1500, 1525];
-    if (frames) {
-      const sprite = new Sprite(frames[0]);
-      sprite.position.set(xPositions[i], PARTY_FEET_Y[i] - PARTY_SPRITE_HEIGHT);
-      return { sprite, frames };
+    if (art) {
+      const sprite = new Sprite(art.frames[0]);
+      const pos = partySpritePosition(i, art, sprite.height);
+      sprite.position.set(pos.x, pos.y);
+      return { sprite, frames: art.frames };
     }
     const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
     const yPositions = [280, 380, 480, 580];

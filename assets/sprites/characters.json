@@ -6,21 +6,12 @@
   "cols": 6,
   "rows": 5,
   "fieldScale": 3,
-  "battleScale": 4,
   "rowNames": [
     "down",
     "up",
     "left",
     "right",
     "battle"
-  ],
-  "battleFrames": [
-    "ready",
-    "attack",
-    "cast",
-    "hurt",
-    "down",
-    "victory"
   ],
   "sheets": {
     "warrior": {

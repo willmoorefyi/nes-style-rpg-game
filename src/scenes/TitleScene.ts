@@ -75,11 +75,12 @@ export class TitleScene implements Scene {
     } else if (value === 'continue') {
       this.game.scenes.push('loadMenu');
     } else if (value === 'debug') {
-      import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader }) => {
+      import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader, pickScenario }) => {
         const loader = new DebugScenarioLoader(this.game);
         loader.loadScenarios().then(scenarios => {
-          if (scenarios.length > 0) {
-            return loader.applyAndBattle(scenarios[0]);
+          const scenario = pickScenario(scenarios, typeof location === 'undefined' ? '' : location.search);
+          if (scenario) {
+            return loader.applyAndBattle(scenario);
           }
         }).catch((err) => console.error('Failed to load debug scenario:', err));
       }).catch((err) => console.error('Failed to load debug module:', err));
