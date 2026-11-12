@@ -173,6 +173,46 @@ def test_field_atlas() -> None:
         check(cid not in meta.get("fallbacks", {}), f"{cid}: every direction has approved art (fallbacks {meta.get('fallbacks', {}).get(cid)})")
 
 
+def test_style_lock() -> None:
+    """Phase 5: the knight's approved requests still reproduce their cache keys (no prompt/guide drift), the knight
+    is locked, rollout characters carry the house-style reference, and NPCs are field-only. Offline: keys only."""
+    import json
+    print("style lock")
+    if not GEN.STYLE_REF.exists():
+        print("  skip (style reference image not present)")
+        return
+    knight = GEN.load_character("knight")
+    check(bool(knight.get("locked")), "knight is locked in characters.yaml")
+    approved = HERE / "approved" / "knight"
+    for name in ("battle", "field_down", "field"):
+        meta = json.loads((approved / f"{name}.json").read_text())
+        req = GEN.plan_request(knight, GEN.SHEETS[name], meta["seed"], "gemini", meta["model"])
+        check(req.key == meta["cache_key"] and req.cached, f"knight {name}: planned key {req.key} == approved {meta['cache_key']}")
+        check("HOUSE STYLE" not in req.prompt, f"knight {name}: no house-style reference in its own request")
+
+    def refused(fn) -> bool:
+        try:
+            fn()
+        except SystemExit:
+            return True
+        return False
+    miss = _req("selftest-locked")
+    check(refused(lambda: GEN.check_budget([miss], paid=True, max_paid=1, retry=True, ledger=[], locked=True)),
+          "a locked character refuses uncached requests even with --retry")
+    warrior = GEN.load_character("warrior")
+    req = GEN.plan_request(warrior, GEN.SHEETS["battle"], 1234, "gemini", None)
+    check("HOUSE STYLE" in req.prompt and len(req.inputs) == 3, "rollout battle request = guide + style + knight battle sheet")
+    if not (HERE.parent.parent / warrior["identity_ref"][0]).exists():
+        check(refused(lambda: GEN.plan_request(warrior, GEN.SHEETS["field"], 1234, "gemini", None)),
+              "rollout field request is refused until that character's battle sheet is approved")
+    guard = GEN.load_character("guard")
+    check(refused(lambda: GEN.plan_request(guard, GEN.SHEETS["battle"], 1234, "gemini", None)), "NPCs have no battle sheet")
+    req = GEN.plan_request(guard, GEN.SHEETS["field"], 1234, "gemini", None)
+    check(len(req.inputs) == 3 and "HOUSE STYLE" in req.prompt, "NPC field request = guide + style + knight field sheet")
+    ids = [c["id"] for c in __import__("yaml").safe_load((HERE / "characters.yaml").read_text())]
+    check(len(ids) == len(set(ids)), "character ids are unique")
+
+
 def test_size_ref() -> None:
     print("size reference")
     if not GEN.SIZE_REF.exists():
@@ -191,6 +231,7 @@ if __name__ == "__main__":
     test_crop_bleed_and_keys()
     test_budget_guard()
     test_field_atlas()
+    test_style_lock()
     test_size_ref()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)

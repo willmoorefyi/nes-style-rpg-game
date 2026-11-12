@@ -94,7 +94,7 @@ def sheet_negative(char: dict, sheet: Sheet) -> str:
     return ", ".join(parts)
 
 
-def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
+def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool, has_house: bool = False) -> str:
     gear = char.get("battle_gear" if sheet.name == "battle" else "field_gear", "")
     names = CELL_NAMES[sheet.geom.layout]
     cells = []
@@ -110,8 +110,14 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
               if sheet.name in ("battle", "field_left") else
               "Each row is one walking direction; the three cells of a row are a walk cycle, so the legs must visibly "
               "change between them." if sheet.name == "field" else "")
+    house = ("Image 3 is the HOUSE STYLE: an approved sprite sheet of a DIFFERENT character from this same game. "
+             "Match its sprite-pixel size, figure height, proportions, outline weight, shading and level of detail "
+             "exactly, but do NOT copy its costume, colours, hair or face.\n\n") if has_house else ""
     if not has_identity:
         identity = ""
+    elif has_house:   # rollout characters: identity = their own approved battle sheet
+        identity = ("Image 4 is the APPROVED LOOK of THIS character in battle poses (pixel art). Keep the same face, "
+                    "hair, colours, costume shapes and proportions.\n\n")
     elif sheet.name == "field":
         identity = ("The images after the style reference show the APPROVED LOOK of this exact character (pixel art): "
                     "battle poses, then the approved front walking frames. Keep the same face, hair, colours, armour "
@@ -128,7 +134,7 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
         "Image 2 is a STYLE REFERENCE only (bead versions of classic battle sprites): match its chunky proportions "
         "(about 2.5 heads tall, oversized head, big fists and boots), black outlines around and between parts, and "
         "flat shading with 2-3 tones per colour. Do NOT copy those characters and do NOT draw bead texture.\n\n"
-        + identity +
+        + house + identity +
         f"Render as true pixel art: each character {sheet.target_px} in sprite pixels, every sprite pixel a hard-edged "
         "square, no anti-aliasing, no gradients, no soft shading. " + facing + "\n\n"
         f"Character: {char['prompt'].strip()}; {gear}. Keep every costume detail identical in every cell.\n\n"
@@ -139,18 +145,35 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
     )
 
 
+def ref_image(ref: str) -> Image.Image:
+    """An approved native sheet, 8x nearest, flattened on magenta (how references are sent to Gemini)."""
+    path = HERE.parent.parent / ref
+    if not path.exists():
+        raise SystemExit(f"refused: reference {ref} does not exist (approve that sheet first)")
+    im = Image.open(path).convert("RGBA")
+    big = im.resize((im.width * IDENTITY_UPSCALE, im.height * IDENTITY_UPSCALE), Image.Resampling.NEAREST)
+    flat = Image.new("RGB", big.size, (255, 0, 255))
+    flat.paste(big, (0, 0), big)
+    return flat
+
+
 def identity_images(char: dict) -> list[Image.Image]:
     refs = char.get("identity_ref") or []
     if isinstance(refs, str):
         refs = [refs]
-    out = []
-    for ref in refs:
-        im = Image.open(HERE.parent.parent / ref).convert("RGBA")
-        big = im.resize((im.width * IDENTITY_UPSCALE, im.height * IDENTITY_UPSCALE), Image.Resampling.NEAREST)
-        flat = Image.new("RGB", big.size, (255, 0, 255))
-        flat.paste(big, (0, 0), big)
-        out.append(flat)
-    return out
+    return [ref_image(r) for r in refs]
+
+
+def house_images(char: dict, sheet: Sheet) -> list[Image.Image]:
+    """The locked house-style sheet for rollout characters (never for the house character itself)."""
+    if char["id"] == S.HOUSE_CHARACTER or sheet.name not in S.HOUSE_REFS:
+        return []
+    return [ref_image(S.HOUSE_REFS[sheet.name])]
+
+
+def allowed_sheets(char: dict) -> list[str]:
+    """Sheets a character may request: NPCs are field-only (`sheets: [field]`); classes get battle + field."""
+    return char.get("sheets") or list(SHEETS)
 
 
 def style_image() -> Image.Image:
@@ -178,14 +201,17 @@ class Request:
 
 
 def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str | None) -> Request:
+    if sheet.name not in allowed_sheets(char):
+        raise SystemExit(f"refused: {char['id']} has no '{sheet.name}' sheet (sheets: {allowed_sheets(char)})")
     guide = G.sheet(sheet.poses, sheet.order, sheet.geom, robed=char.get("robed", False))
     if backend == "gemini":
         from gen import gemini as GM
         idents = identity_images(char) if sheet.name != "battle" else []   # identity refs are for field sheets
         if sheet.name.startswith("field_"):
             idents = idents[:1]           # single-direction sheets keep their original (approved) inputs
-        images = [guide, style_image()] + idents
-        prompt = gemini_prompt(char, sheet, bool(idents))
+        house = house_images(char, sheet)
+        images = [guide, style_image()] + house + idents
+        prompt = gemini_prompt(char, sheet, bool(idents), bool(house))
         mid = model or GM.DEFAULT_MODEL
         key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
         run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
@@ -213,11 +239,14 @@ def ledger_append(entry: dict, path: Path = LEDGER) -> None:
 
 
 def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: bool,
-                 ledger: list[dict]) -> list[Request]:
+                 ledger: list[dict], locked: bool = False) -> list[Request]:
     """Return the requests that would be paid; raise SystemExit if the run is not allowed."""
     misses = [r for r in requests if not r.cached]
     if not misses:
         return []
+    if locked:
+        raise SystemExit(f"refused: {misses[0].character} is style-locked (locked: true in characters.yaml); its "
+                         "approved requests must come from the cache. Only the user may unlock it.")
     if len(misses) > max_paid:
         raise SystemExit(f"refused: {len(misses)} uncached requests would be paid, limit is {max_paid} "
                          "(only the user may raise --max-paid)")
@@ -484,7 +513,8 @@ def main(argv: list[str] | None = None) -> None:
         print(f"dry run: {paid_count} paid request(s) would be made")
         return
 
-    check_budget([r for _, r in plan], paid=args.paid, max_paid=args.max_paid, retry=args.retry, ledger=read_ledger())
+    check_budget([r for _, r in plan], paid=args.paid, max_paid=args.max_paid, retry=args.retry, ledger=read_ledger(),
+                 locked=bool(char.get("locked")))
     by_seed: dict[int, dict] = {}
     for seed, r in plan:
         outdir = OUT / args.backend / char["id"] / str(seed)

@@ -24,6 +24,13 @@ from dataclasses import dataclass, field
 # ───────── output ─────────
 ART_SCALE = 2             # 1 art pixel = 2 screen pixels
 PALETTE_SIZE = 14         # colours per sprite including the outline colour
+
+# Style lock (Phase 5): the approved knight is the house style. Every other character's requests also send the
+# knight's approved sheet of the same type as a style reference (pixel size, proportions, outline, shading).
+# The knight's own requests never include these, so its approved cache keys stay valid.
+HOUSE_CHARACTER = "knight"
+HOUSE_REFS = {"battle": "assets-src/gen/approved/knight/battle.png",
+              "field": "assets-src/gen/approved/knight/field.png"}
 CONTROL_STRENGTH = 0.75   # Bedrock structure-control only
 
 

@@ -2,7 +2,13 @@
 # `prompt` describes costume only; `battle_gear` / `field_gear` describe what is held in each context.
 # The shared style, poses and negatives come from spec.py.
 # `seeds` are tried in order; put the approved seed first so rebuilds are identical.
+# `locked: true` = approved and frozen (only cached requests allowed). `sheets: [field]` = NPC, no battle sheet.
+# `robed: true` draws the pose guide with a long robe/dress instead of separate legs.
+# Rollout characters (everyone except the knight) also send the knight's approved sheet as a house-style
+# reference (spec.HOUSE_REFS). Their `identity_ref` (own approved battle sheet) only exists after battle approval.
+# Rollout order and checkpoints: docs/ART_ROLLOUT.md.
 - id: knight
+  locked: true
   prompt: >-
     young knight with short blond hair, polished silver plate armor with gold trim, blue tabard and blue cape,
     round steel helmet with an open face and a tall white horsehair crest on top,
@@ -15,3 +21,154 @@
   identity_ref:
     - assets-src/gen/approved/knight/battle.png
     - assets-src/gen/approved/knight/field_down.png
+
+# ───────── base classes ─────────
+- id: warrior
+  prompt: >-
+    young warrior with spiky dark brown hair, red tunic under a steel breastplate and pauldrons with grey trim,
+    dark trousers, brown leather boots and gloves, round steel shield on the back
+  battle_gear: holding a broad sword in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/warrior/battle.png]
+- id: thief
+  prompt: >-
+    nimble young thief with messy blond hair and a red bandana, green sleeveless tunic with a brown leather belt
+    and pouches, dark trousers, soft brown boots
+  battle_gear: holding a short dagger in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/thief/battle.png]
+- id: monk
+  prompt: >-
+    tan-skinned martial artist with short black hair and a white headband, orange sleeveless gi with a white
+    belt, orange wide trousers, simple brown sandals, bare muscular arms with cloth hand wraps
+  battle_gear: bare fists raised, no weapon
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/monk/battle.png]
+- id: white_mage
+  robed: true
+  prompt: >-
+    gentle white mage in a long white hooded robe with red triangle trim along the hem and sleeves,
+    short brown hair visible under the hood, brown shoes
+  battle_gear: holding a wooden staff with a gold top in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/white_mage/battle.png]
+- id: black_mage
+  robed: true
+  prompt: >-
+    small black mage in a long dark blue robe with gold trim, tall pointed wide-brimmed dark blue hat,
+    the face hidden in shadow with only two glowing yellow eyes, brown shoes
+  battle_gear: holding a short gold rod in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/black_mage/battle.png]
+- id: red_mage
+  prompt: >-
+    dashing red mage with blond hair, long red coat with white trim over white trousers, wide-brimmed red hat
+    with a long white feather, brown boots
+  battle_gear: holding a thin rapier in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/red_mage/battle.png]
+# ───────── upgraded classes ─────────
+- id: ninja
+  prompt: >-
+    ninja in a fitted charcoal-black outfit, black hood and a face mask covering the nose and mouth leaving only
+    the eyes visible, long red headband tails, dark wrapped boots
+  battle_gear: holding a short blade in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/ninja/battle.png]
+- id: master
+  prompt: >-
+    bald tan-skinned martial arts master, yellow-gold sleeveless gi with a white belt, gold wide trousers,
+    cream cloth shoes, bare muscular arms with cloth hand wraps
+  battle_gear: bare fists raised, no weapon
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/master/battle.png]
+- id: white_wizard
+  robed: true
+  prompt: >-
+    white wizard with silver-white hair in a long pure white hooded robe with gold trim along the hem and
+    sleeves, gold shoes
+  battle_gear: holding a tall staff with a gold top in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/white_wizard/battle.png]
+- id: black_wizard
+  robed: true
+  prompt: >-
+    black wizard in a long deep purple robe with silver trim, tall pointed wide-brimmed purple hat,
+    the face hidden in shadow with only two glowing yellow eyes, dark purple shoes
+  battle_gear: holding a purple rod in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/black_wizard/battle.png]
+- id: red_wizard
+  prompt: >-
+    red wizard with silver hair, long crimson coat with gold trim over gold trousers, wide-brimmed crimson hat
+    with a long cream feather, dark red boots
+  battle_gear: holding a thin rapier in one hand
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+  identity_ref: [assets-src/gen/approved/red_wizard/battle.png]
+# ───────── NPCs (field sheet only) ─────────
+- id: guard
+  sheets: [field]
+  prompt: >-
+    castle guard in steel armor over a dark blue tunic, steel helmet with a red crest, dark trousers, brown boots
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: innkeeper
+  sheets: [field]
+  prompt: >-
+    friendly innkeeper woman with brown hair in a bun, brown dress with rolled sleeves and a white apron, brown shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: mage
+  sheets: [field]
+  robed: true
+  prompt: >-
+    old wizard with a long white beard and white hair, long purple robe with gold trim, tall pointed purple hat,
+    brown shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: merchant
+  sheets: [field]
+  prompt: >-
+    stout merchant with a short dark beard, green tunic with gold trim and a belt, brown trousers,
+    round red cap, brown boots
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: old_man
+  sheets: [field]
+  robed: true
+  prompt: >-
+    stooped old man with white hair and a long white beard, long plain brown robe with a rope belt, brown sandals
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: villager
+  sheets: [field]
+  prompt: >-
+    young villager man with short brown hair, blue tunic with a tan belt, brown trousers, brown shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: villager_f
+  sheets: [field]
+  robed: true
+  prompt: >-
+    young villager woman with long golden hair, long rose-red dress with a white collar and apron, brown shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: king
+  sheets: [field]
+  robed: true
+  prompt: >-
+    elderly king with white hair and a white beard, gold crown, long red royal robe with white fur trim and a red
+    cape, gold shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]

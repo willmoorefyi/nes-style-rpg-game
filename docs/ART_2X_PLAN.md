@@ -281,6 +281,13 @@ Acceptance: each direction is approved by the user, and the walk screenshots loo
 - Write `docs/ART_ROLLOUT.md`: the 11 classes and 9 NPC types, 4 sheets each, still one paid image per checkpoint
   unless the user raises `--max-paid`.
 
+**Done (2026-11-12):**
+- The knight is `locked: true`, and its approved sheets and cache entries were already committed. The selftest re-plans its three keys.
+- Rollout characters send the knight's sheets as a house-style reference (`spec.HOUSE_REFS`).
+- NPCs are field-only. Since the two-requests change, a class needs 2 sheets (not 4) and an NPC needs 1.
+- Of the "9 NPC types", 8 are people and 1 is the treasure-chest prop, which moves to Phase 6.
+- Plan: `docs/ART_ROLLOUT.md`.
+
 ### Phase 6 (separate plan and approval): monsters, tiles, backdrops at 2x
 
 Then switch preview to default, screen by screen, with the user's approval.
