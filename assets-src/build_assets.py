@@ -137,6 +137,29 @@ def mirror_strip(strip: Image.Image, frame_w: int) -> Image.Image:
     return out
 
 
+def head_swap(row: Image.Image, gw: int, dst: int, src: int, head_rows: int) -> Image.Image:
+    import numpy as np
+    a = np.asarray(row.convert("RGBA")).copy()
+
+    def head(i: int) -> tuple[int, float]:
+        f = a[:, i * gw:(i + 1) * gw]
+        top = int(np.where((f[..., 3] > 0).any(1))[0].min())
+        xs = np.where((f[top:top + head_rows, :, 3] > 0).any(0))[0]
+        return top, (xs.min() + xs.max()) / 2
+
+    (td, cd), (ts, cs) = head(dst), head(src)
+    dx = int(round(cd - cs))
+    piece = a[ts:ts + head_rows, src * gw:(src + 1) * gw]
+    shifted = np.zeros_like(piece)
+    if dx >= 0:
+        shifted[:, dx:] = piece[:, :gw - dx]
+    else:
+        shifted[:, :dx] = piece[:, -dx:]
+    h = min(head_rows, a.shape[0] - td)
+    a[td:td + h, dst * gw:(dst + 1) * gw] = shifted[:h]
+    return Image.fromarray(a)
+
+
 def build_field_ai() -> None:
     """Approved AI field sheets (approved/<id>/field_<dir>.png, 3 frames each) -> characters-ai.png/.json.
 
@@ -158,6 +181,10 @@ def build_field_ai() -> None:
         dirs = {}
         for r, direction in enumerate(meta["rows"]):
             row = sheet.crop((0, r * gh, 3 * gw, (r + 1) * gh))
+            # a frame whose head was drawn wrong (e.g. eyes on the back of the head) takes the head of another
+            # frame in the same row: [dst, src, rows], aligned on the top row and the head's horizontal centre
+            for dst_i, src_i, head_rows in meta.get("head_from", {}).get(direction, []):
+                row = head_swap(row, gw, dst_i, src_i, head_rows)
             # single frames drawn facing the other way from the rest of their row (mirrored in place first)
             for i in meta.get("flip_frames", {}).get(direction, []):
                 row.paste(row.crop((i * gw, 0, (i + 1) * gw, gh)).transpose(Image.Transpose.FLIP_LEFT_RIGHT), (i * gw, 0))

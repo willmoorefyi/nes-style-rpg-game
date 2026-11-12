@@ -48,6 +48,10 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
         meta["flip_rows"] = flip
         if flip_frames:
             meta["flip_frames"] = flip_frames
+        # keep hand-reviewed per-frame fixes (head_from) when a sheet is re-approved
+        old = dst / f"{sheet_name}.json"
+        if old.exists() and "head_from" in json.loads(old.read_text()):
+            meta["head_from"] = json.loads(old.read_text())["head_from"]
     if note:
         meta["note"] = note
     (dst / f"{sheet_name}.json").write_text(json.dumps(meta, indent=2) + "\n")

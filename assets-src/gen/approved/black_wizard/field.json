@@ -28,10 +28,14 @@
   "flip_rows": [
     "left"
   ],
-  "flip_frames": {
+  "note": "side row drawn facing right and mirrored; standing side frame had its eyes on the back of the head, so it takes frame 1's head (head_from)",
+  "head_from": {
     "left": [
-      0
+      [
+        0,
+        1,
+        30
+      ]
     ]
-  },
-  "note": "standing side frame faced left, walk frames right; frame 0 mirrored, then row mirrored"
+  }
 }
