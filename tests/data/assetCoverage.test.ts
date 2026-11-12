@@ -121,8 +121,9 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect([meta!.cols, meta!.rows]).toEqual([3, 4]);
     });
 
-    it.runIf(present)('only lists known classes, every block inside the image', () => {
-      const classIds = new Set(classes.map((c) => c.id));
+    it.runIf(present)('only lists known classes or NPC sprites, every block inside the image', () => {
+      // NPC sprite names are the keys of the legacy character atlas that are not classes
+      const classIds = new Set([...classes.map((c) => c.id), ...Object.keys(atlas.sheets)]);
       const png = readFileSync(join(assets, 'sprites/characters-ai.png'));
       const w = png.readUInt32BE(16);
       const h = png.readUInt32BE(20);
