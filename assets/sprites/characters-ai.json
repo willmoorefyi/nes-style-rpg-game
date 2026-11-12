@@ -22,25 +22,45 @@
       "x": 144,
       "y": 0
     },
-    "monk": {
+    "black_wizard": {
       "x": 288,
       "y": 0
     },
-    "red_mage": {
+    "master": {
       "x": 432,
       "y": 0
     },
-    "thief": {
+    "monk": {
       "x": 0,
       "y": 384
     },
-    "warrior": {
+    "ninja": {
       "x": 144,
       "y": 384
     },
-    "white_mage": {
+    "red_mage": {
       "x": 288,
       "y": 384
+    },
+    "red_wizard": {
+      "x": 432,
+      "y": 384
+    },
+    "thief": {
+      "x": 0,
+      "y": 768
+    },
+    "warrior": {
+      "x": 144,
+      "y": 768
+    },
+    "white_mage": {
+      "x": 288,
+      "y": 768
+    },
+    "white_wizard": {
+      "x": 432,
+      "y": 768
     }
   },
   "fallbacks": {}

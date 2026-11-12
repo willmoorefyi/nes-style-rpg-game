@@ -31,3 +31,31 @@
 {"event": "result", "key": "c114a47c6ee198cd6c59b27c", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T15:24:16", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_mage", "sheet": "field", "seed": 1234, "key": "58341ca8039dca1928a0de50"}
 {"event": "result", "key": "58341ca8039dca1928a0de50", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:29:39", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ninja", "sheet": "battle", "seed": 1234, "key": "a44df75047ccb24e93aa570e"}
+{"event": "result", "key": "a44df75047ccb24e93aa570e", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:29:51", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "master", "sheet": "battle", "seed": 1234, "key": "acd2a73449b9c6fa8120fd07"}
+{"event": "result", "key": "acd2a73449b9c6fa8120fd07", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:30:03", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_wizard", "sheet": "battle", "seed": 1234, "key": "ecf7b6163b64d5089552dc7a"}
+{"event": "result", "key": "ecf7b6163b64d5089552dc7a", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:30:09", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_wizard", "sheet": "battle", "seed": 1234, "key": "a98b3a2fb720c0ce3c658321"}
+{"event": "result", "key": "a98b3a2fb720c0ce3c658321", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:30:20", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "battle", "seed": 1234, "key": "9cc31b1a91603c103b7ed538"}
+{"event": "result", "key": "9cc31b1a91603c103b7ed538", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:31:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "battle", "seed": 1234, "key": "4f4d16174cb50e1ae09ac220"}
+{"event": "result", "key": "4f4d16174cb50e1ae09ac220", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:31:14", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_wizard", "sheet": "battle", "seed": 1235, "key": "44b9d354ec1aa5b7a946a09c"}
+{"event": "result", "key": "44b9d354ec1aa5b7a946a09c", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:31:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ninja", "sheet": "field", "seed": 1234, "key": "06eb4c495e2041c0d11bcc55"}
+{"event": "result", "key": "06eb4c495e2041c0d11bcc55", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:31:48", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "master", "sheet": "field", "seed": 1234, "key": "8d946074766d23578e76e4c9"}
+{"event": "result", "key": "8d946074766d23578e76e4c9", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:32:00", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_wizard", "sheet": "field", "seed": 1234, "key": "9aff54239def487cff50d16f"}
+{"event": "result", "key": "9aff54239def487cff50d16f", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:32:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "field", "seed": 1234, "key": "61822244e30efb65ecc51498"}
+{"event": "result", "key": "61822244e30efb65ecc51498", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:32:25", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_wizard", "sheet": "field", "seed": 1235, "key": "e3c54cc2d43e341c9b586150"}
+{"event": "result", "key": "e3c54cc2d43e341c9b586150", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:34:03", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "battle", "seed": 1235, "key": "de2f5c9015d39007d95cf0a2"}
+{"event": "result", "key": "de2f5c9015d39007d95cf0a2", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:34:37", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "field", "seed": 1235, "key": "8532b031e64622e510db7a5a"}
+{"event": "result", "key": "8532b031e64622e510db7a5a", "ok": true}

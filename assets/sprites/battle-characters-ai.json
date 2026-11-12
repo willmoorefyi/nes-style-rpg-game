@@ -17,23 +17,38 @@
     "black_mage": {
       "row": 0
     },
-    "knight": {
+    "black_wizard": {
       "row": 1
     },
-    "monk": {
+    "knight": {
       "row": 2
     },
-    "red_mage": {
+    "master": {
       "row": 3
     },
-    "thief": {
+    "monk": {
       "row": 4
     },
-    "warrior": {
+    "ninja": {
       "row": 5
     },
-    "white_mage": {
+    "red_mage": {
       "row": 6
+    },
+    "red_wizard": {
+      "row": 7
+    },
+    "thief": {
+      "row": 8
+    },
+    "warrior": {
+      "row": 9
+    },
+    "white_mage": {
+      "row": 10
+    },
+    "white_wizard": {
+      "row": 11
     }
   }
 }

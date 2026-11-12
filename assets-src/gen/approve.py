@@ -22,7 +22,8 @@ from gen import generate as GEN  # noqa: E402
 from gen import spec as S  # noqa: E402
 
 
-def approve(cid: str, sheet_name: str, flip: list[str], note: str = "") -> Path:
+def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
+            flip_frames: dict[str, list[int]] | None = None) -> Path:
     char = GEN.load_character(cid)
     sheet = GEN.SHEETS[sheet_name]
     seed = char.get("seeds", [1234])[0]
@@ -45,6 +46,8 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "") -> Path:
         meta["rows"] = list(S.FIELD_ROWS)
         meta["frames"] = ["stand", "step_left", "step_right"]
         meta["flip_rows"] = flip
+        if flip_frames:
+            meta["flip_frames"] = flip_frames
     if note:
         meta["note"] = note
     (dst / f"{sheet_name}.json").write_text(json.dumps(meta, indent=2) + "\n")
@@ -64,5 +67,11 @@ if __name__ == "__main__":
     ap.add_argument("sheet", choices=list(GEN.SHEETS))
     ap.add_argument("--flip", default="", help="comma-separated field rows drawn facing the wrong way (mirrored)")
     ap.add_argument("--note", default="")
+    ap.add_argument("--flip-frames", default="", metavar="ROW:I,I",
+                    help="mirror single frames that face the other way from their row, e.g. left:0")
     a = ap.parse_args()
-    print("approved:", approve(a.character, a.sheet, [r for r in a.flip.split(",") if r], a.note))
+    ff = {}
+    for part in filter(None, a.flip_frames.split(";")):
+        row, idx = part.split(":")
+        ff[row] = [int(i) for i in idx.split(",")]
+    print("approved:", approve(a.character, a.sheet, [r for r in a.flip.split(",") if r], a.note, ff))

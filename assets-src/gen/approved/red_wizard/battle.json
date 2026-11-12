@@ -1,0 +1,26 @@
+{
+  "character": "red_wizard",
+  "sheet": "battle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "de2f5c9015d39007d95cf0a2",
+  "approved": "2026-11-12",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ]
+}

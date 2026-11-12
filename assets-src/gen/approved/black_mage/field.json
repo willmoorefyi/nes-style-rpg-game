@@ -28,5 +28,10 @@
   "flip_rows": [
     "left"
   ],
-  "note": "native-scaled or resampled; side row drawn facing right and mirrored"
+  "flip_frames": {
+    "left": [
+      0
+    ]
+  },
+  "note": "standing side frame faced left, walk frames right; frame 0 mirrored, then row mirrored"
 }

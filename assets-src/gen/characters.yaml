@@ -106,7 +106,7 @@
     sleeves, gold shoes
   battle_gear: holding a tall staff with a gold top in one hand
   field_gear: empty hands, arms at the sides
-  seeds: [1234]
+  seeds: [1235]   # 1234 drew the hurt pose from behind
   identity_ref: [assets-src/gen/approved/white_wizard/battle.png]
 - id: black_wizard
   robed: true
@@ -126,7 +126,8 @@
     with a long cream feather, dark red boots
   battle_gear: holding a thin rapier in one hand
   field_gear: empty hands, arms at the sides
-  seeds: [1234]
+  seeds: [1235]   # 1234 drew brown hair in battle
+  extra_negative: a second sword, two rapiers, a sword on the belt or back, a scabbard with a sword
   identity_ref: [assets-src/gen/approved/red_wizard/battle.png]
 # ───────── NPCs (field sheet only) ─────────
 - id: guard

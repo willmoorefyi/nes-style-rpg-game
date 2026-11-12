@@ -1,0 +1,31 @@
+{
+  "character": "ninja",
+  "sheet": "field",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "06eb4c495e2041c0d11bcc55",
+  "approved": "2026-11-12",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "character": "red_wizard",
+  "sheet": "field",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "8532b031e64622e510db7a5a",
+  "approved": "2026-11-12",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "flip_frames": {
+    "left": [
+      0
+    ]
+  },
+  "note": "standing side frame faced left, walk frames right; frame 0 mirrored, then row mirrored"
+}

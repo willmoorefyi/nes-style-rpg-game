@@ -69,3 +69,43 @@
   items: {}
   gold: 100
   enemies: []
+
+# AI-art battle previews covering all 12 classes (open with ?art=ai&mute=1&scenario=<id>).
+- id: ai_party_base
+  name: Base classes A (AI art preview)
+  party:
+    - { class: warrior, name: WARR, level: 10, equipment: [], spells: [] }
+    - { class: thief, name: THIF, level: 10, equipment: [], spells: [] }
+    - { class: white_mage, name: WHMG, level: 10, equipment: [], spells: [] }
+    - { class: black_mage, name: BKMG, level: 10, equipment: [], spells: [] }
+  items:
+    potion: 3
+  gold: 100
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.png
+
+- id: ai_party_mixed
+  name: Monk, red mage, knight, ninja (AI art preview)
+  party:
+    - { class: monk, name: MONK, level: 10, equipment: [], spells: [] }
+    - { class: red_mage, name: RDMG, level: 10, equipment: [], spells: [] }
+    - { class: knight, name: KNGT, level: 10, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 10, equipment: [], spells: [] }
+  items:
+    potion: 3
+  gold: 100
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.png
+
+- id: ai_party_promoted
+  name: Promoted classes (AI art preview)
+  party:
+    - { class: master, name: MSTR, level: 10, equipment: [], spells: [] }
+    - { class: white_wizard, name: WHWZ, level: 10, equipment: [], spells: [] }
+    - { class: black_wizard, name: BKWZ, level: 10, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 10, equipment: [], spells: [] }
+  items:
+    potion: 3
+  gold: 100
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.png

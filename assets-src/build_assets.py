@@ -158,6 +158,9 @@ def build_field_ai() -> None:
         dirs = {}
         for r, direction in enumerate(meta["rows"]):
             row = sheet.crop((0, r * gh, 3 * gw, (r + 1) * gh))
+            # single frames drawn facing the other way from the rest of their row (mirrored in place first)
+            for i in meta.get("flip_frames", {}).get(direction, []):
+                row.paste(row.crop((i * gw, 0, (i + 1) * gw, gh)).transpose(Image.Transpose.FLIP_LEFT_RIGHT), (i * gw, 0))
             if direction in meta.get("flip_rows", []):
                 row = mirror_strip(row, gw)
             dirs[direction] = (meta, row)
