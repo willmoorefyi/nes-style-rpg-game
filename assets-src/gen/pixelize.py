@@ -163,7 +163,7 @@ def foreground(rgb: np.ndarray, guide_mask: np.ndarray, bg_tol: float = 40.0, di
 
 def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | int, colors: int = 14,
              bg_tol: float = 40.0, seed: int = 0, ink_max: int = 40, ink_frac: float = 0.25,
-             bottom_row: int | None = None) -> Image.Image:
+             bottom_row: int | None = None, palette: np.ndarray | None = None) -> Image.Image:
     """cell: RGB(A) render of one cell; guide_mask: bool mask of that cell's pose guide, same size."""
     gw, gh = (grid, grid) if isinstance(grid, int) else grid
     rgb = np.asarray(cell.convert("RGB"))
@@ -173,11 +173,8 @@ def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | 
     if not solid.any():
         return Image.new("RGBA", (gw, gh))
     fpx = rgb[fg].astype(np.float32)
-    rng = np.random.default_rng(seed)
-    sample = fpx[rng.choice(len(fpx), size=min(len(fpx), 20000), replace=False)]
-    cent = snap15(kmeans(sample, colors, seed=seed)).astype(np.float32)
+    cent = palette.astype(np.float32).copy() if palette is not None else sheet_palette([fpx], colors, seed)
     dark = int(cent.sum(1).argmin())
-    cent[dark] = OUTLINE
     lab_full = np.full(fg.shape, -1, np.int32)
     lab_full[fg] = ((fpx[:, None, :] - cent[None]) ** 2).sum(-1).argmin(1)
     ink = fg & (rgb.max(axis=2) < ink_max)          # outline only if every channel is near black
@@ -236,6 +233,17 @@ def align_bottom(img: np.ndarray, bottom_row: int) -> np.ndarray:
     else:
         out[:dy] = img[-dy:]
     return out
+
+
+def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0) -> np.ndarray:
+    """One 15-bit palette for a whole sheet (k-means over every frame's figure pixels); darkest colour = outline.
+    Sharing it keeps colours consistent across frames and stops a small region (a face) merging into a neighbour."""
+    px = np.concatenate([p.astype(np.float32) for p in pixel_sets if len(p)])
+    rng = np.random.default_rng(seed)
+    sample = px[rng.choice(len(px), size=min(len(px), 40000), replace=False)]
+    cent = snap15(kmeans(sample, colors, seed=seed)).astype(np.float32)
+    cent[int(cent.sum(1).argmin())] = OUTLINE
+    return cent
 
 
 def pixelize_native(art: Image.Image, guide_mask: np.ndarray, out_size: tuple[int, int], colors: int = 14,

@@ -106,6 +106,35 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     });
   });
 
+  describe('AI field atlas (preview art, optional)', () => {
+    const metaPath = join(assets, 'sprites/characters-ai.json');
+    const present = existsSync(metaPath);
+    const meta = present
+      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { cell: [number, number]; cols: number; rows: number; fieldScale: number; rowNames: string[]; sheets: Record<string, { x: number; y: number }> })
+      : null;
+
+    it.runIf(present)('frames are one 96 px preview tile wide and two tiles tall at 2x', () => {
+      expect(meta!.fieldScale).toBe(2);
+      expect(meta!.cell[0] * meta!.fieldScale).toBe(96);
+      expect(meta!.cell[1] * meta!.fieldScale).toBe(192);
+      expect(meta!.rowNames).toEqual(['down', 'up', 'left', 'right']);
+      expect([meta!.cols, meta!.rows]).toEqual([3, 4]);
+    });
+
+    it.runIf(present)('only lists known classes, every block inside the image', () => {
+      const classIds = new Set(classes.map((c) => c.id));
+      const png = readFileSync(join(assets, 'sprites/characters-ai.png'));
+      const w = png.readUInt32BE(16);
+      const h = png.readUInt32BE(20);
+      const s = meta!.fieldScale;
+      for (const [id, o] of Object.entries(meta!.sheets)) {
+        expect(classIds.has(id), id).toBe(true);
+        expect((o.x + meta!.cell[0] * 3) * s).toBeLessThanOrEqual(w);
+        expect((o.y + meta!.cell[1] * 4) * s).toBeLessThanOrEqual(h);
+      }
+    });
+  });
+
   describe('enemy art', () => {
     it.each(enemies.map((e) => e.id))('enemy "%s" has a monster sprite', (id) => {
       expect(existsSync(join(assets, `sprites/monsters/${id}.png`))).toBe(true);

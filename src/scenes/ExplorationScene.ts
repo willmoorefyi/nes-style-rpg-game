@@ -40,6 +40,7 @@ export class ExplorationScene implements Scene {
   private worldContainer = new Container();
   private uiContainer = new Container();
   private camera: Camera;
+  private tilemap: import('../rendering/TilemapRenderer.js').TilemapRenderer | null = null;
   private player: PlayerController | null = null;
   private mapTransition: MapTransitionSystem;
   private npcInteraction: NPCInteractionSystem;
@@ -174,6 +175,7 @@ export class ExplorationScene implements Scene {
     this.worldContainer.addChild(tilemap.container);
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
+    this.tilemap = tilemap;
     const spawnX = mapData.width > 1 ? 1 : 0;
     const spawnY = mapData.height > 1 ? 1 : 0;
     const leaderArt = this.placeholders.getPlayerArt(this.game.party.get(0)?.classData.id ?? 'warrior');
@@ -181,6 +183,7 @@ export class ExplorationScene implements Scene {
       startX: spawnX, startY: spawnY,
       texture: leaderArt?.texture ?? this.placeholders.getPlayerTexture(),
       animation: leaderArt?.animation,
+      displayScale: leaderArt?.displayScale,
       collisionMap, input: this.game.input, events: this.game.events,
     });
     this.worldContainer.addChild(this.player.animation.sprite);
@@ -321,6 +324,7 @@ export class ExplorationScene implements Scene {
       }
     }
     this.camera.update();
+    this.tilemap?.render();
   }
 
   /** Check if a tile is walkable for NPC wandering (collision + no other NPC + not player) */
@@ -397,6 +401,7 @@ export class ExplorationScene implements Scene {
       if (this.player) {
         this.player.setPosition(transition.targetX, transition.targetY);
         this.camera.update();
+        this.tilemap?.render();
       }
       await this.fadeOverlay.fadeIn(300);
     } else {
@@ -406,6 +411,7 @@ export class ExplorationScene implements Scene {
       if (this.player) {
         this.player.setPosition(transition.targetX, transition.targetY);
         this.camera.update();
+        this.tilemap?.render();
       }
       await this.fadeOverlay.fadeIn(300);
     }

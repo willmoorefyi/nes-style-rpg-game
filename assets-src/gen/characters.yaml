@@ -10,5 +10,8 @@
   battle_gear: holding a longsword in one hand
   field_gear: empty hands, arms at the sides
   seeds: [1234]
-  # Approved battle sheet, sent to Gemini (8x nearest) as the identity reference for the field sheets.
-  identity_ref: assets-src/gen/approved/knight/battle.png
+  # Approved sheets sent to Gemini (8x nearest) as identity references for field sheets. Single-direction sheets
+  # use only the first entry; the full 3x3 field sheet uses all of them.
+  identity_ref:
+    - assets-src/gen/approved/knight/battle.png
+    - assets-src/gen/approved/knight/field_down.png

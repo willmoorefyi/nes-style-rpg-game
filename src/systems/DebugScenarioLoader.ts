@@ -18,6 +18,10 @@ export interface DebugScenario {
   gold: number;
   enemies: string[];
   background?: string;
+  /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `spawn`. */
+  mode?: 'battle' | 'field';
+  map?: string;
+  spawn?: [number, number];
 }
 
 /** Choose a scenario by `?scenario=<id>` (dev URLs); falls back to the first scenario. */
@@ -37,7 +41,27 @@ export class DebugScenarioLoader {
     return this.game.assets.loadYaml<DebugScenario[]>('assets/data/debug-scenarios.yaml');
   }
 
+  /** Start the scenario in its mode. */
+  async run(scenario: DebugScenario): Promise<void> {
+    if (scenario.mode === 'field') return this.applyAndExplore(scenario);
+    return this.applyAndBattle(scenario);
+  }
+
+  async applyAndExplore(scenario: DebugScenario): Promise<void> {
+    if (!scenario.map || !scenario.spawn) throw new Error(`field scenario ${scenario.id} needs map and spawn`);
+    this.applyParty(scenario);
+    this.game.currentMapId = scenario.map;
+    this.game.playerPosition = { x: scenario.spawn[0], y: scenario.spawn[1] };
+    this.game.scenes.switchTo('exploration');
+  }
+
   async applyAndBattle(scenario: DebugScenario): Promise<void> {
+    this.applyParty(scenario);
+    const trigger = new BattleTrigger(this.game);
+    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background);
+  }
+
+  private applyParty(scenario: DebugScenario): void {
     // Clear existing party
     while (this.game.party.all.length > 0) {
       this.game.party.remove(0);
@@ -71,9 +95,5 @@ export class DebugScenarioLoader {
     for (const [itemId, qty] of Object.entries(scenario.items)) {
       this.game.inventory.add(itemId, qty);
     }
-
-    // Trigger battle
-    const trigger = new BattleTrigger(this.game);
-    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background);
   }
 }

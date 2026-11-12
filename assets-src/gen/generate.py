@@ -48,8 +48,11 @@ SIZE_REF = REFS / "pr_warrior_1080p.png"
 IDENTITY_UPSCALE = 8
 
 CELL_NAMES = {(3, 2): ["top-left", "top-middle", "top-right", "bottom-left", "bottom-middle", "bottom-right"],
-              (3, 1): ["left", "middle", "right"]}
+              (3, 1): ["left", "middle", "right"],
+              (3, 3): [f"{r} row, {c}" for r in ("top", "middle", "bottom") for c in ("left", "middle", "right")]}
 FIELD_STEPS = ["standing still", "mid-step with the left foot forward", "mid-step with the right foot forward"]
+# 3x3 sheet wording (new requests only; the single-direction wording above must stay stable for cache keys)
+FIELD3_STEPS = ["standing still", "mid-step with the left foot clearly forward", "mid-step with the right foot clearly forward"]
 
 
 @dataclass(frozen=True)
@@ -67,6 +70,7 @@ SHEETS: dict[str, Sheet] = {
     "battle": Sheet("battle", S.BATTLE_POSES, S.BATTLE_ORDER, S.BATTLE_GEOM, "battle", S.BATTLE_LAYOUT[1], S.BATTLE_TARGET_PX),
     **{f"field_{d}": Sheet(f"field_{d}", S.FIELD_POSES, S.field_order(d), S.FIELD_GEOM, "overworld walking", text, S.FIELD_TARGET_PX)
        for d, (_, text, _) in S.FIELD_DIRECTIONS.items()},
+    "field": Sheet("field", S.FIELD3_POSES, S.FIELD_ORDER, S.FIELD3_GEOM, "overworld walking", "", S.FIELD_TARGET_PX),
 }
 
 
@@ -81,7 +85,9 @@ def load_character(cid: str) -> dict:
 
 def sheet_negative(char: dict, sheet: Sheet) -> str:
     parts = [S.NEGATIVE]
-    if sheet.name.startswith("field_"):
+    if sheet.name == "field":
+        parts.append(S.FIELD_NEGATIVE)
+    elif sheet.name.startswith("field_"):
         parts += [S.FIELD_NEGATIVE, S.FIELD_DIRECTIONS[sheet.name.removeprefix("field_")][2]]
     if char.get("extra_negative"):
         parts.append(char["extra_negative"])
@@ -93,12 +99,26 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
     names = CELL_NAMES[sheet.geom.layout]
     cells = []
     for i, name in enumerate(sheet.order):
-        cap = sheet.poses[name].caption if sheet.name == "battle" else f"{FIELD_STEPS[i]}, {sheet.layout_text}"
+        if sheet.name == "battle":
+            cap = sheet.poses[name].caption
+        elif sheet.name == "field":
+            cap = f"{FIELD3_STEPS[i % 3]}, {S.FIELD_ROWS[name[:-1]]}"
+        else:
+            cap = f"{FIELD_STEPS[i]}, {sheet.layout_text}"
         cells.append(f"- {names[i]} cell: {cap}.")
     facing = ("Side view: the nose points LEFT and only one eye is visible."
-              if sheet.name in ("battle", "field_left") else "")
-    identity = ("Image 3 is the APPROVED LOOK of this exact character in battle poses (pixel art). Keep the same "
-                "face, hair, colours, armour shapes and proportions.\n\n" if has_identity else "")
+              if sheet.name in ("battle", "field_left") else
+              "Each row is one walking direction; the three cells of a row are a walk cycle, so the legs must visibly "
+              "change between them." if sheet.name == "field" else "")
+    if not has_identity:
+        identity = ""
+    elif sheet.name == "field":
+        identity = ("The images after the style reference show the APPROVED LOOK of this exact character (pixel art): "
+                    "battle poses, then the approved front walking frames. Keep the same face, hair, colours, armour "
+                    "shapes and proportions.\n\n")
+    else:   # wording of the approved single-direction requests; keep stable for cache keys
+        identity = ("Image 3 is the APPROVED LOOK of this exact character in battle poses (pixel art). Keep the same "
+                    "face, hair, colours, armour shapes and proportions.\n\n")
     w, h = sheet.geom.layout
     return (
         f"Create a {w}x{h} sprite sheet for a modern 16-bit-style pixel-art RPG, {sheet.kind} sprites.\n\n"
@@ -119,15 +139,18 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool) -> str:
     )
 
 
-def identity_image(char: dict) -> Image.Image | None:
-    ref = char.get("identity_ref")
-    if not ref:
-        return None
-    im = Image.open(HERE.parent.parent / ref).convert("RGBA")
-    big = im.resize((im.width * IDENTITY_UPSCALE, im.height * IDENTITY_UPSCALE), Image.Resampling.NEAREST)
-    flat = Image.new("RGB", big.size, (255, 0, 255))
-    flat.paste(big, (0, 0), big)
-    return flat
+def identity_images(char: dict) -> list[Image.Image]:
+    refs = char.get("identity_ref") or []
+    if isinstance(refs, str):
+        refs = [refs]
+    out = []
+    for ref in refs:
+        im = Image.open(HERE.parent.parent / ref).convert("RGBA")
+        big = im.resize((im.width * IDENTITY_UPSCALE, im.height * IDENTITY_UPSCALE), Image.Resampling.NEAREST)
+        flat = Image.new("RGB", big.size, (255, 0, 255))
+        flat.paste(big, (0, 0), big)
+        out.append(flat)
+    return out
 
 
 def style_image() -> Image.Image:
@@ -158,9 +181,11 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
     guide = G.sheet(sheet.poses, sheet.order, sheet.geom, robed=char.get("robed", False))
     if backend == "gemini":
         from gen import gemini as GM
-        ident = identity_image(char) if sheet.name != "battle" else None   # identity ref is for field sheets
-        images = [guide, style_image()] + ([ident] if ident is not None else [])
-        prompt = gemini_prompt(char, sheet, ident is not None)
+        idents = identity_images(char) if sheet.name != "battle" else []   # identity refs are for field sheets
+        if sheet.name.startswith("field_"):
+            idents = idents[:1]           # single-direction sheets keep their original (approved) inputs
+        images = [guide, style_image()] + idents
+        prompt = gemini_prompt(char, sheet, bool(idents))
         mid = model or GM.DEFAULT_MODEL
         key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
         run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
@@ -254,22 +279,83 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
                 if rep.get("cropped"):
                     LAST_RESAMPLE[sheet.name]["cropped"] = LAST_RESAMPLE[sheet.name].get("cropped", []) + [sheet.order[i]]
                 frames.append(frame)
-            return frames
+            return [trim(f, geom) for f in frames]
         LAST_RESAMPLE[sheet.name]["mode"] = f"resampled (art cell {cell_w:.0f}x{cell_h:.0f} vs grid {geom.grid})"
     else:
         LAST_RESAMPLE[sheet.name]["mode"] = "resampled (no pixel grid)"
     cw, ch = geom.cell_px
-    frames = []
-    for i in range(len(sheet.order)):
-        x, y = (i % cols) * cw, (i // cols) * ch
-        frames.append(PX.pixelize(cleaned.crop((x, y, x + cw, y + ch)), masks[i], geom.grid, colors=colors, seed=seed,
-                                  bottom_row=geom.bottom_row))
-    return frames
+    boxes = [((i % cols) * cw, (i // cols) * ch, (i % cols + 1) * cw, (i // cols + 1) * ch) for i in range(len(sheet.order))]
+    if geom.fit_height:
+        boxes = fit_boxes(cleaned, masks, boxes, geom)
+        LAST_RESAMPLE[sheet.name]["fit_height"] = geom.fit_height
+    cells, gms, pixel_sets = [], [], []
+    for i, box in enumerate(boxes):
+        cell = crop_padded(cleaned, box)
+        gm = crop_padded(Image.fromarray((np.pad(masks[i], 0) * 255).astype(np.uint8)), _rel(box, i, cols, cw, ch))
+        gm = np.asarray(gm.resize(cell.size, Image.Resampling.NEAREST)) > 0
+        rgb = np.asarray(cell.convert("RGB"))
+        pixel_sets.append(rgb[PX.foreground(rgb, gm)])
+        cells.append(cell); gms.append(gm)
+    palette = PX.sheet_palette(pixel_sets, colors, seed)
+    frames = [PX.pixelize(c, g, geom.grid, colors=colors, seed=seed, bottom_row=geom.bottom_row, palette=palette)
+              for c, g in zip(cells, gms)]
+    return [trim(f, geom) for f in frames]
+
+
+def trim(frame: Image.Image, geom: S.SheetGeom) -> Image.Image:
+    """Centre-crop a frame to geom.trim_width (drops the cell margins of the 3x3 field sheet)."""
+    if not geom.trim_width or frame.width == geom.trim_width:
+        return frame
+    x0 = (frame.width - geom.trim_width) // 2
+    return frame.crop((x0, 0, x0 + geom.trim_width, frame.height))
+
+
+def frame_size(geom: S.SheetGeom) -> tuple[int, int]:
+    return (geom.trim_width or geom.grid[0], geom.grid[1])
+
+
+def _rel(box, i, cols, cw, ch):
+    """Box relative to its own cell (for cropping that cell's guide mask)."""
+    ox, oy = (i % cols) * cw, (i // cols) * ch
+    return (box[0] - ox, box[1] - oy, box[2] - ox, box[3] - oy)
+
+
+def crop_padded(img: Image.Image, box) -> Image.Image:
+    """Crop that may extend past the image; outside pixels take the image's border colour (the background)."""
+    x0, y0, x1, y1 = (int(round(v)) for v in box)
+    bg = img.getpixel((0, 0))
+    out = Image.new(img.mode, (x1 - x0, y1 - y0), bg)
+    out.paste(img.crop((max(0, x0), max(0, y0), min(img.width, x1), min(img.height, y1))), (max(0, -x0), max(0, -y0)))
+    return out
+
+
+def fit_boxes(img: Image.Image, masks, boxes, geom: S.SheetGeom):
+    """One shared scale for the sheet: crop boxes sized so the tallest figure maps to fit_height native rows,
+    bottom-aligned to bottom_row and centred on each cell's figure (so walk frames keep their relative motion)."""
+    rgb = np.asarray(img.convert("RGB"))
+    figs = []
+    for box in boxes:
+        x0, y0, x1, y1 = box
+        sub = rgb[y0:y1, x0:x1]
+        gm = masks[len(figs)]
+        fg = PX.foreground(sub, gm)
+        ys, xs = np.where(fg)
+        figs.append((x0 + xs.min(), y0 + ys.min(), x0 + xs.max(), y0 + ys.max()))
+    tallest = max(b[3] - b[1] + 1 for b in figs)
+    gw, gh = geom.grid
+    px_per_native = tallest / geom.fit_height
+    bw, bh = gw * px_per_native, gh * px_per_native
+    out = []
+    for fx0, fy0, fx1, fy1 in figs:
+        cx = (fx0 + fx1 + 1) / 2
+        bottom = fy1 + 1 + (gh - 1 - geom.bottom_row) * px_per_native
+        out.append((cx - bw / 2, bottom - bh, cx + bw / 2, bottom))
+    return out
 
 
 def native_sheet(frames: list[Image.Image], geom: S.SheetGeom) -> Image.Image:
     cols, rows = geom.layout
-    gw, gh = geom.grid
+    gw, gh = frame_size(geom)
     out = Image.new("RGBA", (gw * cols, gh * rows))
     for i, f in enumerate(frames):
         out.paste(f, ((i % cols) * gw, (i // cols) * gh))

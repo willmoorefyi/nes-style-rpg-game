@@ -24,7 +24,8 @@ const TILE_COLORS: Record<number, number> = {
 const DEFAULT_TILE_COLOR = 0x555555;
 
 /** Terrain sheet layout produced by assets-src/build_assets.py: rows = terrain type, columns = variants. */
-const TERRAIN_SHEET_PATH = 'assets/sprites/terrain.png';
+/** Terrain sheet at the on-screen tile size: legacy 16 px tiles at 3x, or at 6x for the 96 px AI-preview tiles. */
+const TERRAIN_SHEET_PATH = TILE_SIZE === 96 ? 'assets/sprites/terrain-6x.png' : 'assets/sprites/terrain.png';
 const TERRAIN_VARIANTS = 4;
 const TERRAIN_ROWS = 11;
 

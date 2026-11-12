@@ -18,6 +18,8 @@ export interface PlayerControllerConfig {
   movementMode?: MovementMode;
   /** Overrides for tall character sheets (frame size, atlas origin, walk cycle). */
   animation?: Partial<AnimationConfig>;
+  /** Sprite scale applied on screen (frames are this many times larger than their source pixels). */
+  displayScale?: number;
 }
 
 type PlayerState = 'idle' | 'moving';
@@ -66,8 +68,10 @@ export class PlayerController {
       directions: { down: 0, up: 1, left: 2, right: 3 },
       ...config.animation,
     });
-    this.spriteOffsetY = TILE_SIZE - (config.animation?.frameHeight ?? TILE_SIZE);
-    this.frameHeight = config.animation?.frameHeight ?? TILE_SIZE;
+    const displayScale = config.displayScale ?? 1;
+    this.animation.sprite.scale.set(displayScale);
+    this.frameHeight = (config.animation?.frameHeight ?? TILE_SIZE) * displayScale;
+    this.spriteOffsetY = TILE_SIZE - this.frameHeight;
     this.updateSpritePosition();
   }
 

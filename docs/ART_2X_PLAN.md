@@ -8,7 +8,8 @@ Baseline: `npm run build` exits 0; `npm test` gives 77 files and 956 tests passi
 Move every game graphic to one pixel scale, **1 art pixel = 2 screen pixels** at 1920x1080, for a modern, clean
 pixel-art look:
 - **Battle characters:** about 72 px tall native in an 80x80 cell (decision at checkpoint A, see below).
-- **Field characters:** FF3/FF6-style, two tiles tall at 24x48 native.
+- **Field characters:** FF3/FF6-style, two tiles tall at 48x96 native on 48x48-native tiles (decision at
+  checkpoint B, see below).
 
 Character art comes from Google Gemini (`gemini-3.1-flash-lite-image`) through `assets-src/gen/`, then pixelized.
 
@@ -44,8 +45,8 @@ Character art comes from Google Gemini (`gemini-3.1-flash-lite-image`) through `
 | Asset | Cell | Figure / feet | Display | On screen |
 |---|---|---|---|---|
 | Battle party | 80x80 | about 68-76 tall, feet on row 76 | 2x | 160x160 |
-| Field character | 24x48 | about 42 tall, feet on row 46 | 2x | 48x96 (same as the current 16x32 at 3x) |
-| Map tile | 24x24 | | 2x | 48x48 (`TILE_SIZE` unchanged) |
+| Field character | 48x96 | about 90 tall, feet on row 93 | 2x | 96x192 (two 96 px tiles) |
+| Map tile | 48x48 | | 2x | 96x96: a 20x11-tile view like the Pixel Remaster (preview only until Phase 6) |
 | Monsters S / L / Boss | 64 / 128 / 192 | | 2x | 128 / 256 / 384 (Phase 6) |
 | Backdrop | 960x540 | | 2x | 1920x1080 (Phase 6) |
 
@@ -62,6 +63,35 @@ Character art comes from Google Gemini (`gemini-3.1-flash-lite-image`) through `
 - **Field cells** keep 24x48 for now. Gemini's field pixel grid is measured at checkpoint B, and the field cell is
   adjusted to match it the same way, with the user's approval.
 
+## Checkpoint B decision (user, 2026-11-12): bigger field sprites and tiles
+
+- **What happened:** Gemini drew the field knight about 45x97 in its own pixels, with no clean pixel grid.
+  Shrinking that into 24x48 made the faces muddy.
+- **Decision:** the field cell is **48x96**, about 90 px figures with feet on row 93, shown at 2x. Map tiles
+  become 48x48 art px, i.e. 96 px on screen and a 20x11-tile view.
+- **Preview only:** this applies only in preview (`TILE_SIZE` is 96 under `?art=ai`, 48 otherwise). Legacy
+  terrain is shown enlarged 6x (`terrain-6x.png`) until Phase 6 redraws the terrain at 48x48 art px.
+- **Guides are unchanged:** guide px per unit stays 12.59 and the guide bottom is pinned at 501.33 guide px, so
+  the checkpoint B cache key is unchanged.
+- **Resampled field sheets** (no clean grid) are framed so the tallest figure is `fit_height` = 90 native rows.
+- **Found and fixed along the way:** the tile map was drawn only when a map loaded, so tiles never appeared when
+  the camera scrolled past the first screen. This affected normal play too. `ExplorationScene` now redraws the
+  visible tiles after each camera update, with a regression test.
+
+## Change after checkpoint B (user, 2026-11-12): one request per sprite
+
+- **Why:** single-direction field requests are retired for new work. Each character is generated in **two
+  requests**: the battle sheet (3x2, 6 poses) and the **full field sheet**. Flash-Lite outputs 1K only, so a single
+  15-frame sheet would halve the pixel density.
+- **Full field sheet:** a 3x3 grid. Rows are down, up and left; columns are stand, step-left and step-right. It is
+  9:16 at the same 5.33 guide px per art px (`FIELD3_GEOM`: 54x96 cells, trimmed to 48x96).
+- **Inputs:** clearer walk poses (`FIELD3_POSES`), identity references (the approved battle sheet and any approved
+  field frames), and one shared palette per sheet.
+- **Knight:** the approved `field.png` supersedes `field_down.png`. The side row was drawn facing right and is
+  mirrored (`flip_rows`); the right row is a mirror of left.
+- **Single-direction sheets** remain available for redoing one bad row.
+- **Automated browser tests** load the dev build with `?mute=1`, which disables audio entirely.
+
 ## Sheet geometry (replaces the single `GUIDE_CELL` / `GUIDE_SCALE`)
 
 `spec.py` gets a `SheetGeom` per sheet kind. The **drawn** figure bottom (boot caps, pose y ≈ 39.4) is anchored,
@@ -76,8 +106,8 @@ not the joint y. Measurements are made with `guides.draw_pose` offline.
     The tip lands on native row about 1.
 - **Field:** guide cell 256x512 px (10.67 guide px per native px), layout **3x1 strip**, image 768x512 (aspect 3:2).
   - The cells are stand, step-left and step-right.
-  - Scale 1.18 native px per unit (12.59 guide px per unit), so the figure is about 42.2 px tall. The drawn bottom
-    sits on native row 46.
+  - 12.59 guide px per pose unit. The guide bottom is pinned at 501.33 guide px.
+  - Since checkpoint B, the native grid is 48x96 (2.36 art px per unit) with the last opaque row 93.
   - The side-walk stride in `spec._walk` is narrowed: foot offset 4·lift becomes 3.2·lift, and knee 2.5 becomes 2.0,
     so the widest frame is about 22.3 px (23 px or less).
 - **Horizontal placement:** guides are centred on the span of all poses in the sheet, not the old 0-32 box.
@@ -122,8 +152,8 @@ not the joint y. Measurements are made with `guides.draw_pose` offline.
     - **Battle geometry:** every pose's last opaque row is 61 ±1. Every pose, weapon included, fits inside rows
       0-63 and columns 0-63. Ready, attack, cast, hurt and victory are 54-60 px tall without the weapon; down is
       36-42 px. Heights are counted in whole opaque rows.
-    - **Field geometry:** last opaque row 46 ±1, height 41-46 in whole opaque rows, width 23 px or less in
-      every frame.
+    - **Field geometry:** last opaque row 93 ±1, height 82-92 in whole opaque rows, width 46 px or less in
+      every frame (48x96 after checkpoint B).
     - the crop-bleed test
     - the magenta key test
     - the budget guard: counts misses, writes the ledger before the call, records a fake-backend failure as spent,

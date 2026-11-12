@@ -26,7 +26,10 @@ const DIRECTION_OFFSETS = [
 /** Optional animated art for an NPC: frames[row][col] with rows down/up/left/right. */
 export interface NPCFrames {
   frames: Texture[][];
+  /** On-screen frame height (after `scale`). */
   frameHeight: number;
+  /** Sprite scale so one frame is one tile wide on screen (default 1). */
+  scale?: number;
 }
 
 const FACE_ROW = { down: 0, up: 1, left: 2, right: 3 } as const;
@@ -66,6 +69,7 @@ export class NPC {
     this.art = art ?? null;
     this.offsetY = art ? TILE_SIZE - art.frameHeight : 0;
     this.sprite = new Sprite(art ? art.frames[FACE_ROW.down][0] : texture);
+    if (art?.scale) this.sprite.scale.set(art.scale);
     this.sprite.x = data.x * TILE_SIZE;
     this.sprite.y = data.y * TILE_SIZE + this.offsetY;
     this.updateDepth();

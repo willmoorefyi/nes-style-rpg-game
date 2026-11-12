@@ -128,3 +128,20 @@ describe('PlayerController - two-tile character art', () => {
     expect(player.x).toBe(2 * 48 + 24);
   });
 });
+
+describe('PlayerController - display scale', () => {
+  it('scales the sprite and keeps the feet on the tile', () => {
+    const player = new PlayerController({
+      startX: 2, startY: 4,
+      texture: { source: { width: 288, height: 480 }, width: 288, height: 480 } as unknown as Texture,
+      animation: { frameWidth: 48, frameHeight: 96, frameCount: 3 },
+      displayScale: 2,
+      collisionMap: new CollisionMap(createMapData(8, 8)),
+      input: new InputManager(),
+      events: new EventBus(),
+    });
+    expect(player.animation.sprite.scale.x).toBe(2);
+    expect(player.animation.sprite.y).toBe(4 * 48 + 48 - 192);
+    expect(player.y).toBe(4 * 48 + 24);
+  });
+});

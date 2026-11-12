@@ -303,7 +303,7 @@ python3 -I assets-src/build_assets.py terrain characters   # or pick stages: ter
 **AI sprite generation (2x art scale, in progress):** `assets-src/gen/` generates character sprites with Google
 Gemini and pixelizes them; see `assets-src/gen/README.md` and `docs/ART_2X_PLAN.md`. Paid image requests go through a
 budget guard: one per review checkpoint, `--paid` required, every attempt logged in `assets-src/gen/cache/ledger.jsonl`.
-Run `python3 -I assets-src/gen/selftest.py` after changing the pipeline.
+Run `python3 -I assets-src/gen/selftest.py` after changing the pipeline. Approved sheets live in `assets-src/gen/approved/<id>/`; the `battle_ai` and `field_ai` build stages turn them into `assets/sprites/battle-characters-ai.*` and `characters-ai.*`. Preview them in the dev build with `?art=ai` (96 px tiles, 20x11 view), e.g. `?art=ai&scenario=knight_field` or `?art=ai&scenario=knight_party`. Automated browser tests must add `&mute=1` (dev only), which disables audio entirely.
 
 **Adding art for new content**
 - New class or NPC sprite name: add a `Look` to `ROSTER` in `characters.py` (keys must match the class id / the `sprite:` value in map YAML), then `npm run assets`.

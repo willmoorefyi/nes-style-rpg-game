@@ -8,6 +8,8 @@ const BATTLE_META_PATH = 'assets/sprites/battle-characters.json';
 const BATTLE_PATH = 'assets/sprites/battle-characters.png';
 const AI_BATTLE_META_PATH = 'assets/sprites/battle-characters-ai.json';
 const AI_BATTLE_PATH = 'assets/sprites/battle-characters-ai.png';
+const AI_FIELD_META_PATH = 'assets/sprites/characters-ai.json';
+const AI_FIELD_PATH = 'assets/sprites/characters-ai.png';
 
 /** Layout of assets/sprites/characters.json, produced by assets-src/build_assets.py. */
 export interface CharacterAtlasMeta {
@@ -41,11 +43,9 @@ export interface BattleFrames {
   ai: boolean;
 }
 
-/** AI art preview: dev builds only, opted in with ?art=ai, until every asset on a screen is at 2x. */
-export function isPreviewAi(search: string = typeof location === 'undefined' ? '' : location.search): boolean {
-  if (!import.meta.env.DEV) return false;
-  return new URLSearchParams(search).get('art') === 'ai';
-}
+import { isPreviewAi } from '../core/artPreview.js';
+import { TILE_SIZE } from '../core/LayoutConstants.js';
+export { isPreviewAi };
 
 /** Fetch JSON, rejecting HTTP errors and non-JSON bodies (e.g. a dev server's HTML fallback for a missing file). */
 async function fetchJson<T>(path: string): Promise<T> {
@@ -63,6 +63,9 @@ async function fetchJson<T>(path: string): Promise<T> {
 export interface FieldArt {
   texture: Texture;
   animation: Pick<AnimationConfig, 'frameWidth' | 'frameHeight' | 'frameCount' | 'originX' | 'originY' | 'walkSequence'>;
+  /** Extra sprite scale so a frame is one tile wide on screen (2 for legacy art in the 96 px preview tiles). */
+  displayScale: number;
+  ai: boolean;
 }
 
 export const BATTLE_POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory'] as const;
@@ -76,6 +79,8 @@ export class CharacterAtlas {
   private battle: Texture | null = null;
   private aiBattleMeta: AiBattleAtlasMeta | null = null;
   private aiBattle: Texture | null = null;
+  private aiFieldMeta: CharacterAtlasMeta | null = null;
+  private aiField: Texture | null = null;
   private aiAttempted = false;
 
   private loading: Promise<void> | null = null;
@@ -101,9 +106,24 @@ export class CharacterAtlas {
     return this.loading;
   }
 
-  /** Optional AI art. Any failure leaves the AI atlas null; it never touches the legacy atlas. */
+  get hasAiFieldArt(): boolean {
+    return !!this.aiFieldMeta && !!this.aiField;
+  }
+
+  /** Optional AI art. Any failure leaves that AI atlas null; it never touches the legacy atlas. */
   private async fetchAiAtlas(): Promise<void> {
     this.aiAttempted = true;
+    try {
+      const meta = await fetchJson<CharacterAtlasMeta>(AI_FIELD_META_PATH);
+      const tex = await Assets.load<Texture>(AI_FIELD_PATH);
+      tex.source.scaleMode = 'nearest';
+      this.aiFieldMeta = meta;
+      this.aiField = tex;
+    } catch (err) {
+      this.aiFieldMeta = null;
+      this.aiField = null;
+      console.warn('AI field art unavailable; legacy art only', err);
+    }
     try {
       const meta = await fetchJson<AiBattleAtlasMeta>(AI_BATTLE_META_PATH);
       const tex = await Assets.load<Texture>(AI_BATTLE_PATH);
@@ -135,13 +155,23 @@ export class CharacterAtlas {
     return !!this.meta && !!this.field && id in this.meta.sheets;
   }
 
-  /** Field (overworld/town) animation source for a class or NPC sprite id. */
-  getFieldArt(id: string): FieldArt | null {
+  /** Pick the field atlas for an id: AI art when previewing and available, else legacy. */
+  private fieldSource(id: string, preferAi: boolean): { meta: CharacterAtlasMeta; tex: Texture; ai: boolean } | null {
+    if (preferAi && this.aiFieldMeta && this.aiField && this.aiFieldMeta.sheets[id]) {
+      return { meta: this.aiFieldMeta, tex: this.aiField, ai: true };
+    }
     if (!this.meta || !this.field || !this.meta.sheets[id]) return null;
-    const { cell, fieldScale } = this.meta;
-    const origin = this.meta.sheets[id];
+    return { meta: this.meta, tex: this.field, ai: false };
+  }
+
+  /** Field (overworld/town) animation source for a class or NPC sprite id. */
+  getFieldArt(id: string, preferAi: boolean = isPreviewAi()): FieldArt | null {
+    const src = this.fieldSource(id, preferAi);
+    if (!src) return null;
+    const { cell, fieldScale } = src.meta;
+    const origin = src.meta.sheets[id];
     return {
-      texture: this.field,
+      texture: src.tex,
       animation: {
         frameWidth: cell[0] * fieldScale,
         frameHeight: cell[1] * fieldScale,
@@ -150,14 +180,17 @@ export class CharacterAtlas {
         originY: origin.y * fieldScale,
         walkSequence: [1, 0, 2, 0],
       },
+      displayScale: TILE_SIZE / (cell[0] * fieldScale),
+      ai: src.ai,
     };
   }
 
   /** Frames for a static-or-wandering NPC: frames[direction][column]. */
-  getNpcFrames(id: string): NPCFrames | null {
-    if (!this.meta || !this.field || !this.meta.sheets[id]) return null;
-    const { cell, fieldScale } = this.meta;
-    const o = this.meta.sheets[id];
+  getNpcFrames(id: string, preferAi: boolean = isPreviewAi()): NPCFrames | null {
+    const src = this.fieldSource(id, preferAi);
+    if (!src) return null;
+    const { cell, fieldScale } = src.meta;
+    const o = src.meta.sheets[id];
     const fw = cell[0] * fieldScale;
     const fh = cell[1] * fieldScale;
     const frames: Texture[][] = [];
@@ -165,13 +198,14 @@ export class CharacterAtlas {
       const cols: Texture[] = [];
       for (let col = 0; col < 3; col++) {
         cols.push(new Texture({
-          source: this.field.source,
+          source: src.tex.source,
           frame: new Rectangle(o.x * fieldScale + col * fw, o.y * fieldScale + row * fh, fw, fh),
         }));
       }
       frames.push(cols);
     }
-    return { frames, frameHeight: fh };
+    const scale = TILE_SIZE / fw;
+    return { frames, frameHeight: fh * scale, scale };
   }
 
   /** Battle poses (left-facing) in BATTLE_POSES order, or null when this class has no battle art.

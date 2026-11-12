@@ -44,6 +44,8 @@ class SheetGeom:
     px_per_unit: float
     bottom_row: int
     guide_bottom_px: float | None = None   # pin where the guide's drawn bottom sits (keeps approved guides identical)
+    fit_height: int | None = None          # resampled sheets only: frame the crop so the tallest figure is this tall
+    trim_width: int | None = None          # centre-crop each frame to this width after cutting (cell margins)
 
     @property
     def guide_per_native(self) -> float:
@@ -70,7 +72,15 @@ class SheetGeom:
 # (and therefore cache keys) are unchanged from the 64-px plan.
 BATTLE_GEOM = SheetGeom("battle", grid=(80, 80), cell_px=(512, 512), layout=(3, 2), px_per_unit=2.025, bottom_row=76,
                         guide_bottom_px=496.0)
-FIELD_GEOM = SheetGeom("field", grid=(24, 48), cell_px=(256, 512), layout=(3, 1), px_per_unit=1.18, bottom_row=46)
+# Field (checkpoint B decision): 48x96 art px cells, 2 tiles tall on 48x48-art-px tiles (96 px on screen at 2x).
+# guide_per_unit stays 12.59 and the guide bottom is pinned, so the approved field guides are unchanged.
+FIELD_GEOM = SheetGeom("field", grid=(48, 96), cell_px=(256, 512), layout=(3, 1), px_per_unit=2.36, bottom_row=93,
+                       guide_bottom_px=501.33, fit_height=90)
+# Full field sprite in one request: 3x3 (rows down, up, left; columns stand, step-left, step-right). Gemini has no
+# 1:2 aspect, so 9:16 is used and each 48x96 cell gets 3 art px of margin per side (cell 54x96, trimmed to 48).
+# Same guide px per unit and pinned bottom as FIELD_GEOM, so figures are drawn at the approved density.
+FIELD3_GEOM = SheetGeom("field", grid=(54, 96), cell_px=(288, 512), layout=(3, 3), px_per_unit=2.36, bottom_row=93,
+                        guide_bottom_px=501.33, fit_height=90, trim_width=48)
 # Prompt wording that produced the approved knight; Gemini sets its own pixel size (~72 px figures), so keep
 # this text stable to keep cache keys stable.
 BATTLE_TARGET_PX = "about 56-60 pixels tall"
@@ -196,6 +206,42 @@ FIELD_DIRECTIONS = {
 FIELD_NEGATIVE = "sword, weapon, scabbard, held object, items on the ground"
 FIELD_POSES: dict[str, Pose] = {f"{d}{i}": _walk(face, i) for d, (face, _, _) in FIELD_DIRECTIONS.items() for i in range(3)}
 FIELD_SHEET = FIELD_GEOM.layout
+FIELD_ORDER = [f"{d}{i}" for d in ("down", "up", "left") for i in range(3)]
+
+
+def _walk3(face: str, phase: int) -> Pose:
+    """Walk frames for the 3x3 sheet: a clearer stride than _walk (which the approved single sheets were drawn from).
+    phase 0 = stand, 1 = left foot forward, 2 = right foot forward."""
+    if phase == 0:
+        return _walk(face, 0)
+    s = 1.0 if phase == 1 else -1.0
+    if face in ("front", "back"):
+        lift_n, lift_f = (2.2, 0.0) if s > 0 else (0.0, 2.2)
+        return _p(head=(16.0, 10.3), chest=(16.0, 19.8), hip=(16.0, 28.2),
+                  sh_n=(11.0, 18.2), el_n=(10.4, 22.6 - 0.6 * s), hand_n=(10.2, 26.0 - 1.4 * s),
+                  sh_f=(21.0, 18.2), el_f=(21.6, 22.6 + 0.6 * s), hand_f=(21.8, 26.0 + 1.4 * s),
+                  hip_n=(13.5, 28.6), knee_n=(13.2, 32.6 - lift_n), foot_n=(13.0, 36.5 - lift_n),
+                  hip_f=(18.5, 28.6), knee_f=(18.8, 32.6 - lift_f), foot_f=(19.0, 36.5 - lift_f),
+                  face=face, caption=f"walking, {'facing the viewer' if face == 'front' else 'seen from behind'}")
+    # side view: the forward foot is always the one nearer the left edge
+    fwd, back = (11.0, 21.0)
+    near_x, far_x = (fwd, back) if s > 0 else (back, fwd)
+    return _p(head=(14.5, 10.3), chest=(16.0, 19.8), hip=(16.0, 28.2),
+              sh_n=(15.0, 18.2), el_n=(13.5 + 2.2 * s, 22.6), hand_n=(13.0 + 3.2 * s, 26.0),
+              sh_f=(17.5, 18.2), el_f=(18.5 - 2.2 * s, 22.6), hand_f=(19.0 - 3.2 * s, 26.0),
+              hip_n=(15.2, 28.6), knee_n=((15.2 + near_x) / 2 - 0.3, 32.4), foot_n=(near_x, 36.5),
+              hip_f=(16.8, 28.6), knee_f=((16.8 + far_x) / 2 - 0.3, 32.4), foot_f=(far_x, 36.5),
+              face="left", caption="walking, side view facing left")
+
+
+FIELD3_POSES: dict[str, Pose] = {f"{d}{i}": _walk3({"down": "front", "up": "back", "left": "left"}[d], i)
+                                 for d in ("down", "up", "left") for i in range(3)}
+FIELD_ROWS = {
+    "down": "walking toward the viewer, full front view, face and both eyes visible",
+    "up": "walking away from the viewer, full back view seen from directly behind: back of the helmet or hair and the "
+          "cape, NO face, eyes, nose or mouth visible",
+    "left": "walking in full side profile facing left, nose pointing left, one eye visible",
+}
 
 
 def field_order(direction: str) -> list[str]:

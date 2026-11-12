@@ -1,6 +1,6 @@
 """Build all game art/audio from assets-src into assets/.
 
-Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle|battle_ai|monsters|backgrounds|audio ...]
+Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle|battle_ai|field_ai|monsters|backgrounds|audio ...]
 With no arguments every stage runs. Sprites are authored at native SNES resolution and
 upscaled with nearest-neighbour: x3 for the legacy field/terrain art (TILE_SIZE=48 in LayoutConstants.ts)
 and the legacy battle atlas. AI-generated 2x art is built from assets-src/gen/ (see docs/ART_2X_PLAN.md).
@@ -31,6 +31,7 @@ def build_terrain() -> None:
     out.mkdir(parents=True, exist_ok=True)
     terrain = tiles.build_terrain_sheet()
     scaled(terrain, FIELD_SCALE).save(out / "terrain.png")
+    scaled(terrain, 6).save(out / "terrain-6x.png")      # stopgap for the 96 px AI-preview tiles (Phase 6 redraws terrain)
     scaled(terrain, 8).save(PREVIEW / "terrain-8x.png")
     print(f"terrain.png: {terrain.width * FIELD_SCALE}x{terrain.height * FIELD_SCALE}")
 
@@ -124,6 +125,76 @@ def build_battle_ai() -> None:
     print(f"battle_ai: {len(entries)} approved sheet(s): {list(sheets)}")
 
 
+FIELD_DIRS = ["down", "up", "left"]
+
+
+def mirror_strip(strip: Image.Image, frame_w: int) -> Image.Image:
+    """Mirror each frame of a horizontal strip in place (frame order stays stand, step L, step R)."""
+    out = Image.new("RGBA", strip.size)
+    for i in range(strip.width // frame_w):
+        frame = strip.crop((i * frame_w, 0, (i + 1) * frame_w, strip.height))
+        out.paste(frame.transpose(Image.Transpose.FLIP_LEFT_RIGHT), (i * frame_w, 0))
+    return out
+
+
+def build_field_ai() -> None:
+    """Approved AI field sheets (approved/<id>/field_<dir>.png, 3 frames each) -> characters-ai.png/.json.
+
+    Same layout as the legacy characters atlas (rows down, up, left, right; 3 walk frames) so the runtime slices
+    it the same way. Right is baked as a mirror of left. A direction that is not approved yet falls back to
+    another approved direction (listed under "fallbacks") so preview mode stays usable.
+    """
+    out = ASSETS / "sprites"
+    chars: dict[str, dict] = {}
+    for meta_path in sorted(APPROVED.glob("*/field_*.json")):
+        meta = json.loads(meta_path.read_text())
+        direction = meta["sheet"].removeprefix("field_")
+        chars.setdefault(meta["character"], {})[direction] = (meta, Image.open(meta_path.with_suffix(".png")).convert("RGBA"))
+    # A full field sheet (approved/<id>/field.json, 3x3: one row per direction) supersedes single-direction sheets.
+    for meta_path in sorted(APPROVED.glob("*/field.json")):
+        meta = json.loads(meta_path.read_text())
+        sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
+        gw, gh = meta["grid"]
+        dirs = {}
+        for r, direction in enumerate(meta["rows"]):
+            row = sheet.crop((0, r * gh, 3 * gw, (r + 1) * gh))
+            if direction in meta.get("flip_rows", []):
+                row = mirror_strip(row, gw)
+            dirs[direction] = (meta, row)
+        chars[meta["character"]] = dirs
+    if not chars:
+        print("field_ai: no approved field sheets")
+        return
+    first = next(iter(next(iter(chars.values())).values()))[0]
+    gw, gh = first["grid"]
+    per_row = 4
+    blocks = list(chars.items())
+    atlas = Image.new("RGBA", (gw * 3 * per_row, gh * 4 * ((len(blocks) + per_row - 1) // per_row)), (0, 0, 0, 0))
+    sheets, fallbacks = {}, {}
+    for n, (cid, dirs) in enumerate(blocks):
+        bx, by = (n % per_row) * gw * 3, (n // per_row) * gh * 4
+        rows = {}
+        for d in FIELD_DIRS:
+            if d in dirs:
+                rows[d] = dirs[d][1]
+            else:
+                src = next(x for x in ("left", "down", "up") if x in dirs)
+                rows[d] = dirs[src][1]
+                fallbacks.setdefault(cid, []).append(f"{d}<-{src}")
+        rows["right"] = mirror_strip(rows["left"], gw)
+        if "left" not in dirs:
+            fallbacks.setdefault(cid, []).append("right<-mirror(fallback)")
+        for r, d in enumerate(["down", "up", "left", "right"]):
+            atlas.paste(rows[d], (bx, by + r * gh))
+        sheets[cid] = {"x": bx, "y": by}
+    scaled(atlas, AI_SCALE).save(out / "characters-ai.png")
+    (out / "characters-ai.json").write_text(json.dumps({
+        "cell": [gw, gh], "cols": 3, "rows": 4, "fieldScale": AI_SCALE, "footRow": first["bottom_row"],
+        "rowNames": ["down", "up", "left", "right"], "sheets": sheets, "fallbacks": fallbacks,
+    }, indent=2) + "\n")
+    print(f"field_ai: {list(sheets)}; fallbacks {fallbacks}")
+
+
 def build_monsters() -> None:
     import monsters
 
@@ -145,6 +216,7 @@ STAGES = {
     "characters": build_characters,
     "battle": build_battle,
     "battle_ai": build_battle_ai,
+    "field_ai": build_field_ai,
     "monsters": build_monsters,
     "backgrounds": lambda: build_optional("backgrounds"),
     "audio": lambda: build_optional("audio"),

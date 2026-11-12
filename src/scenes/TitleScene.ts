@@ -80,7 +80,7 @@ export class TitleScene implements Scene {
         loader.loadScenarios().then(scenarios => {
           const scenario = pickScenario(scenarios, typeof location === 'undefined' ? '' : location.search);
           if (scenario) {
-            return loader.applyAndBattle(scenario);
+            return loader.run(scenario);
           }
         }).catch((err) => console.error('Failed to load debug scenario:', err));
       }).catch((err) => console.error('Failed to load debug module:', err));

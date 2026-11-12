@@ -1,0 +1,23 @@
+{
+  "cell": [
+    48,
+    96
+  ],
+  "cols": 3,
+  "rows": 4,
+  "fieldScale": 2,
+  "footRow": 93,
+  "rowNames": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "sheets": {
+    "knight": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "fallbacks": {}
+}

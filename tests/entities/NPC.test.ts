@@ -64,3 +64,12 @@ describe('NPC two-tile art', () => {
     expect(npc.tileX).toBe(1);
   });
 });
+
+describe('NPC display scale', () => {
+  it('applies the art scale and lifts by the scaled frame height', () => {
+    const frames = [0, 1, 2, 3].map(() => [0, 1, 2].map(() => Texture.WHITE));
+    const npc = new NPC({ id: 'k', x: 2, y: 3, sprite: 'knight', dialog: ['hi'] }, Texture.WHITE, { frames, frameHeight: 192, scale: 2 });
+    expect(npc.sprite.scale.x).toBe(2);
+    expect(npc.sprite.y).toBe(3 * 48 + 48 - 192);
+  });
+});

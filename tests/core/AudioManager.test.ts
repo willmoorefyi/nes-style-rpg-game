@@ -119,3 +119,25 @@ describe('AudioManager', () => {
     });
   });
 });
+describe('AudioManager disable (dev ?mute=1)', () => {
+  it('never creates an AudioContext or plays once disabled', async () => {
+    const created = vi.fn();
+    vi.stubGlobal('AudioContext', class { constructor() { created(); } });
+    const audio = new AudioManager();
+    await audio.init({ music: { battle: 'b.ogg' }, sfx: { hit: 'h.ogg' } });
+    audio.disable();
+    await audio.playMusic('battle');
+    await audio.playSFX('hit');
+    expect(created).not.toHaveBeenCalled();
+    expect(audio.isDisabled).toBe(true);
+    vi.unstubAllGlobals();
+  });
+});
+
+describe('isMutedByUrl', () => {
+  it('is on only with ?mute=1', async () => {
+    const { isMutedByUrl } = await import('../../src/core/artPreview.js');
+    expect(isMutedByUrl('?art=ai&mute=1')).toBe(true);
+    expect(isMutedByUrl('?art=ai')).toBe(false);
+  });
+});

@@ -49,3 +49,7 @@ assets-src/gen/cache/*
 !assets-src/gen/cache/fa13beb4f779e3f6b3dc87c0.png
 !assets-src/gen/cache/fa13beb4f779e3f6b3dc87c0.json
 __pycache__/
+!assets-src/gen/cache/8524f0956ab3f853acbf5b85.png
+!assets-src/gen/cache/8524f0956ab3f853acbf5b85.json
+!assets-src/gen/cache/e52a5b8feb840621e1029032.png
+!assets-src/gen/cache/e52a5b8feb840621e1029032.json

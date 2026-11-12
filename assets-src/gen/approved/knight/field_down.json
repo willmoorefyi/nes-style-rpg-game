@@ -1,0 +1,24 @@
+{
+  "character": "knight",
+  "sheet": "field_down",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "8524f0956ab3f853acbf5b85",
+  "approved": "2026-11-12",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    1
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "note": "resampled (no clean pixel grid), framed so the figure is ~92 px tall (fit_height 90); approved at checkpoint B"
+}

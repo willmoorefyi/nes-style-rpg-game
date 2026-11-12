@@ -1,4 +1,5 @@
 import { Application } from 'pixi.js';
+import { isMutedByUrl } from './artPreview.js';
 import { SceneManager } from './SceneManager.js';
 import { AssetLoader } from './AssetLoader.js';
 import { InputManager } from './InputManager.js';
@@ -64,7 +65,8 @@ export class Game {
     await ShopRegistry.init(this.data);
     await CutsceneRegistry.init(this.assets);
     
-    // Initialize audio
+    // Initialize audio (dev ?mute=1 disables it completely, e.g. for automated browser tests)
+    if (isMutedByUrl()) this.audio.disable();
     try {
       const manifest = await this.assets.loadJson<AudioManifest>('assets/data/audio-manifest.json');
       await this.audio.init(manifest);

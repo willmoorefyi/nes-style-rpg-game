@@ -12,6 +12,8 @@ export class AudioManager {
   private musicVolume = 1;
   private sfxVolume = 1;
   private muted = false;
+  /** When disabled nothing is ever played and no AudioContext is created. */
+  private disabled = false;
   private paused = false;
 
   async init(manifest: AudioManifest): Promise<void> {
@@ -56,7 +58,16 @@ export class AudioManager {
     }
   }
 
+  /** Turn audio off for the session (dev `?mute=1`). */
+  disable(): void {
+    this.disabled = true;
+    this.stopMusic(0);
+  }
+
+  get isDisabled(): boolean { return this.disabled; }
+
   async playMusic(trackId: string, loop = true): Promise<void> {
+    if (this.disabled) return;
     if (this.currentMusic?.trackId === trackId) return;
     const path = this.manifest?.music[trackId];
     if (!path) {
@@ -92,6 +103,7 @@ export class AudioManager {
   }
 
   async playSFX(sfxId: string): Promise<void> {
+    if (this.disabled) return;
     const path = this.manifest?.sfx[sfxId];
     if (!path) {
       console.warn(`Unknown SFX: ${sfxId}`);

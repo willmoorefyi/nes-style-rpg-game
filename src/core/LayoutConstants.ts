@@ -1,3 +1,5 @@
+import { isPreviewAi } from './artPreview.js';
+
 /**
  * Central layout constants for the HD (1920×1080) rendering engine.
  * All UI, rendering, and scene files should import from here — no hardcoded pixel values.
@@ -11,7 +13,10 @@ export const GAME_WIDTH = 1920;
 export const GAME_HEIGHT = 1080;
 
 // ═══ TILES ═══
-export const TILE_SIZE = 48;
+/** Legacy map tiles: 16 art px at 3x. */
+export const LEGACY_TILE_SIZE = 48;
+/** On-screen tile size. The AI-art preview (?art=ai) uses 48 art px tiles at 2x, i.e. a 20x11-tile view. */
+export const TILE_SIZE = isPreviewAi() ? 96 : LEGACY_TILE_SIZE;
 
 // ═══ FONT ═══
 export const FONT_SIZE = 24;

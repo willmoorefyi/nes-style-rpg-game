@@ -63,8 +63,25 @@ def test_geometry() -> None:
         for name, (allm, _) in native_masks(S.FIELD_GEOM, S.FIELD_POSES, S.field_order(d)).items():
             rows, cols = np.where(allm.any(1))[0], np.where(allm.any(0))[0]
             h, w = int(rows.max() - rows.min() + 1), int(cols.max() - cols.min() + 1)
-            check(abs(int(rows.max()) - S.FIELD_GEOM.bottom_row) <= 1 and 41 <= h <= 46 and w <= 23,
-                  f"{name}: bottom {rows.max()}, height {h} (41-46), width {w} (<=23)")
+            check(abs(int(rows.max()) - S.FIELD_GEOM.bottom_row) <= 1 and 82 <= h <= 92 and w <= 46,
+                  f"{name}: bottom {rows.max()}, height {h} (82-92), width {w} (<=46)")
+
+
+def test_field3_geometry() -> None:
+    print("full field sheet (3x3) geometry")
+    g = S.FIELD3_GEOM
+    check(g.aspect == "9:16", f"sheet aspect {g.aspect} is 9:16")
+    for name, (allm, _) in native_masks(g, S.FIELD3_POSES, S.FIELD_ORDER).items():
+        rows, cols = np.where(allm.any(1))[0], np.where(allm.any(0))[0]
+        h = int(rows.max() - rows.min() + 1)
+        margin = (g.grid[0] - g.trim_width) // 2
+        inside = cols.min() >= margin and cols.max() < g.grid[0] - margin
+        check(abs(int(rows.max()) - g.bottom_row) <= 1 and 82 <= h <= 92 and inside,
+              f"{name}: bottom {rows.max()}, height {h}, cols {cols.min()}-{cols.max()} inside the trimmed 48 px")
+    a = native_masks(g, S.FIELD3_POSES, S.FIELD_ORDER)
+    for d in ("down", "up", "left"):
+        diff = [(a[f"{d}0"][0] != a[f"{d}{i}"][0]).sum() for i in (1, 2)]
+        check(min(diff) >= 40, f"{d}: walk frames differ from standing by {diff} px (>=40)")
 
 
 def _figure_cell(bg, size=(256, 256)) -> tuple[Image.Image, np.ndarray]:
@@ -139,6 +156,23 @@ def test_budget_guard() -> None:
               "a different checkpoint is not blocked")
 
 
+def test_field_atlas() -> None:
+    import json
+    meta_path = HERE.parent.parent / "assets" / "sprites" / "characters-ai.json"
+    if not meta_path.exists():
+        return
+    print("AI field atlas")
+    meta = json.loads(meta_path.read_text())
+    gw, gh = meta["cell"]
+    s = meta["fieldScale"]
+    a = np.asarray(Image.open(meta_path.with_suffix(".png")))[::s, ::s]
+    for cid, o in meta["sheets"].items():
+        rows = {n: a[o["y"] + r * gh:o["y"] + (r + 1) * gh, o["x"]:o["x"] + 3 * gw] for r, n in enumerate(meta["rowNames"])}
+        mirrored = all((rows["right"][:, i * gw:(i + 1) * gw] == rows["left"][:, i * gw:(i + 1) * gw][:, ::-1]).all() for i in range(3))
+        check(mirrored, f"{cid}: right row is the left row mirrored frame by frame")
+        check(cid not in meta.get("fallbacks", {}), f"{cid}: every direction has approved art (fallbacks {meta.get('fallbacks', {}).get(cid)})")
+
+
 def test_size_ref() -> None:
     print("size reference")
     if not GEN.SIZE_REF.exists():
@@ -153,8 +187,10 @@ def test_size_ref() -> None:
 
 if __name__ == "__main__":
     test_geometry()
+    test_field3_geometry()
     test_crop_bleed_and_keys()
     test_budget_guard()
+    test_field_atlas()
     test_size_ref()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)
