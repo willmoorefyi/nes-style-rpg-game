@@ -14,8 +14,20 @@
     "victory"
   ],
   "sheets": {
-    "knight": {
+    "black_mage": {
       "row": 0
+    },
+    "knight": {
+      "row": 1
+    },
+    "monk": {
+      "row": 2
+    },
+    "warrior": {
+      "row": 3
+    },
+    "white_mage": {
+      "row": 4
     }
   }
 }

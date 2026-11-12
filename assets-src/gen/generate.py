@@ -50,6 +50,9 @@ IDENTITY_UPSCALE = 8
 CELL_NAMES = {(3, 2): ["top-left", "top-middle", "top-right", "bottom-left", "bottom-middle", "bottom-right"],
               (3, 1): ["left", "middle", "right"],
               (3, 3): [f"{r} row, {c}" for r in ("top", "middle", "bottom") for c in ("left", "middle", "right")]}
+DEFAULT_FACE = ("every cell must show a clearly readable face drawn at the same sprite-pixel size as the body: two "
+                "dark eyes, eyebrows and a mouth, also when hurt, kneeling, knocked down, casting or seen in profile. "
+                "Hoods, hair and hats frame the face but never cover it. (Back views show no face.)")
 FIELD_STEPS = ["standing still", "mid-step with the left foot forward", "mid-step with the right foot forward"]
 # 3x3 sheet wording (new requests only; the single-direction wording above must stay stable for cache keys)
 FIELD3_STEPS = ["standing still", "mid-step with the left foot clearly forward", "mid-step with the right foot clearly forward"]
@@ -113,6 +116,11 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool, has_house: bool 
     house = ("Image 3 is the HOUSE STYLE: an approved sprite sheet of a DIFFERENT character from this same game. "
              "Match its sprite-pixel size, figure height, proportions, outline weight, shading and level of detail "
              "exactly, but do NOT copy its costume, colours, hair or face.\n\n") if has_house else ""
+    rules = ""
+    if has_house and char.get("prompt_rev", {}).get(sheet.name, 2) >= 2:   # rollout prompt rev 2 (sheets approved at rev 1 keep rev 1)
+        rules = ("The grey mannequins are ONLY a pose guide: never draw grey limbs or grey shapes; draw the character's "
+                 "own sleeves, hands and held items in every cell.\n\n"
+                 "FACE: " + char.get("face", DEFAULT_FACE) + "\n\n")
     if not has_identity:
         identity = ""
     elif has_house:   # rollout characters: identity = their own approved battle sheet
@@ -134,7 +142,7 @@ def gemini_prompt(char: dict, sheet: Sheet, has_identity: bool, has_house: bool 
         "Image 2 is a STYLE REFERENCE only (bead versions of classic battle sprites): match its chunky proportions "
         "(about 2.5 heads tall, oversized head, big fists and boots), black outlines around and between parts, and "
         "flat shading with 2-3 tones per colour. Do NOT copy those characters and do NOT draw bead texture.\n\n"
-        + house + identity +
+        + house + identity + rules +
         f"Render as true pixel art: each character {sheet.target_px} in sprite pixels, every sprite pixel a hard-edged "
         "square, no anti-aliasing, no gradients, no soft shading. " + facing + "\n\n"
         f"Character: {char['prompt'].strip()}; {gear}. Keep every costume detail identical in every cell.\n\n"
@@ -317,15 +325,17 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
     if geom.fit_height:
         boxes = fit_boxes(cleaned, masks, boxes, geom)
         LAST_RESAMPLE[sheet.name]["fit_height"] = geom.fit_height
-    cells, gms, pixel_sets = [], [], []
+    cells, gms, pixel_sets, detail_sets = [], [], [], []
     for i, box in enumerate(boxes):
         cell = crop_padded(cleaned, box)
         gm = crop_padded(Image.fromarray((np.pad(masks[i], 0) * 255).astype(np.uint8)), _rel(box, i, cols, cw, ch))
         gm = np.asarray(gm.resize(cell.size, Image.Resampling.NEAREST)) > 0
         rgb = np.asarray(cell.convert("RGB"))
-        pixel_sets.append(rgb[PX.foreground(rgb, gm)])
+        fg = PX.foreground(rgb, gm)
+        pixel_sets.append(rgb[fg])
+        detail_sets.append(rgb[PX.detail_mask(rgb, fg, cell.size[1] / geom.grid[1])])
         cells.append(cell); gms.append(gm)
-    palette = PX.sheet_palette(pixel_sets, colors, seed)
+    palette = PX.sheet_palette(pixel_sets, colors, seed, detail_px=np.concatenate(detail_sets))
     frames = [PX.pixelize(c, g, geom.grid, colors=colors, seed=seed, bottom_row=geom.bottom_row, palette=palette)
               for c, g in zip(cells, gms)]
     return [trim(f, geom) for f in frames]

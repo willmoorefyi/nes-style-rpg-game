@@ -163,8 +163,13 @@ def foreground(rgb: np.ndarray, guide_mask: np.ndarray, bg_tol: float = 40.0, di
 
 def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | int, colors: int = 14,
              bg_tol: float = 40.0, seed: int = 0, ink_max: int = 40, ink_frac: float = 0.25,
-             bottom_row: int | None = None, palette: np.ndarray | None = None) -> Image.Image:
-    """cell: RGB(A) render of one cell; guide_mask: bool mask of that cell's pose guide, same size."""
+             bottom_row: int | None = None, palette: np.ndarray | None = None,
+             detail_drop: float = 55.0, detail_frac: float = 0.15) -> Image.Image:
+    """cell: RGB(A) render of one cell; guide_mask: bool mask of that cell's pose guide, same size.
+
+    Facial features (eyes, brows, mouth) are often 1 sprite pixel of a mid-dark colour on skin; a plain majority
+    vote erases them. "Detail" pixels, much darker (or much brighter) than their neighbourhood, therefore win a block when they cover
+    `detail_frac` of it, and are exempt from the speckle filter (like outline ink)."""
     gw, gh = (grid, grid) if isinstance(grid, int) else grid
     rgb = np.asarray(cell.convert("RGB"))
     fg = foreground(rgb, guide_mask, bg_tol)
@@ -181,17 +186,25 @@ def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | 
     lab_full[ink] = dark
     h, w = fg.shape
     by, bx = h / gh, w / gw
+    detail = detail_mask(rgb, fg, max(bx, by), detail_drop) & ~ink
+    keep = np.zeros((gh, gw), bool)
     idx = np.zeros((gh, gw), np.int32)
     for y in range(gh):
         y0, y1 = int(round(y * by)), int(round((y + 1) * by))
         for x in range(gw):
             if not solid[y, x]:
                 continue
-            blk = lab_full[y0:y1, int(round(x * bx)):int(round((x + 1) * bx))]
-            blk = blk[blk >= 0]
+            xs = slice(int(round(x * bx)), int(round((x + 1) * bx)))
+            blk_all = lab_full[y0:y1, xs]
+            det = blk_all[detail[y0:y1, xs]]
+            blk = blk_all[blk_all >= 0]
             counts = np.bincount(blk, minlength=len(cent))
             if counts[dark] >= ink_frac * blk.size:
                 idx[y, x] = dark
+                keep[y, x] = True
+            elif det.size >= detail_frac * max(blk.size, 1) and det.size:
+                idx[y, x] = int(np.bincount(det, minlength=len(cent)).argmax())
+                keep[y, x] = True
             else:
                 if counts.sum() > counts[dark]:
                     counts[dark] = 0
@@ -199,7 +212,7 @@ def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | 
     out_idx = idx.copy()
     for y in range(1, gh - 1):
         for x in range(1, gw - 1):
-            if not solid[y, x]:
+            if not solid[y, x] or keep[y, x]:
                 continue
             nb = [idx[y + dy, x + dx] for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)) if solid[y + dy, x + dx]]
             if len(nb) >= 3 and idx[y, x] not in nb:
@@ -219,6 +232,16 @@ def pixelize(cell: Image.Image, guide_mask: np.ndarray, grid: tuple[int, int] | 
     return Image.fromarray(img, "RGBA")
 
 
+def detail_mask(rgb: np.ndarray, fg: np.ndarray, block: float, drop: float = 55.0) -> np.ndarray:
+    """Small features that differ strongly from their neighbourhood: dark ones on lighter parts (eyes on skin) and
+    bright ones on dark parts (glowing eyes in a shadowed face). `block` = render px per sprite pixel."""
+    lum = rgb.astype(np.float32) @ np.array([0.3, 0.59, 0.11], np.float32)
+    win = int(round(block * 2.5)) | 1
+    med_dark = np.asarray(Image.fromarray(np.where(fg, lum, 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(win))).astype(np.float32)
+    med_light = np.asarray(Image.fromarray(np.where(fg, lum, 0).astype(np.uint8)).filter(ImageFilter.MedianFilter(win))).astype(np.float32)
+    return fg & (rgb.max(axis=2) >= 40) & ((lum < med_dark - drop) | (lum > med_light + 1.5 * drop))
+
+
 def align_bottom(img: np.ndarray, bottom_row: int) -> np.ndarray:
     """Shift vertically so the last opaque row is bottom_row (feet line up across every frame)."""
     rows = np.where(img[..., 3].any(axis=1))[0]
@@ -235,14 +258,36 @@ def align_bottom(img: np.ndarray, bottom_row: int) -> np.ndarray:
     return out
 
 
-def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0) -> np.ndarray:
+def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0,
+                  detail_px: np.ndarray | None = None) -> np.ndarray:
     """One 15-bit palette for a whole sheet (k-means over every frame's figure pixels); darkest colour = outline.
     Sharing it keeps colours consistent across frames and stops a small region (a face) merging into a neighbour."""
     px = np.concatenate([p.astype(np.float32) for p in pixel_sets if len(p)])
     rng = np.random.default_rng(seed)
     sample = px[rng.choice(len(px), size=min(len(px), 40000), replace=False)]
-    cent = snap15(kmeans(sample, colors, seed=seed)).astype(np.float32)
+    cent = kmeans(sample, colors, seed=seed)
+    if detail_px is not None and len(detail_px) >= 8:
+        cent = reserve_detail(cent, detail_px.astype(np.float32), seed)
+    cent = snap15(cent).astype(np.float32)
     cent[int(cent.sum(1).argmin())] = OUTLINE
+    return cent
+
+
+def reserve_detail(cent: np.ndarray, detail_px: np.ndarray, seed: int = 0, max_err: float = 45.0,
+                   max_slots: int = 2) -> np.ndarray:
+    """Make sure small features (eyes) keep their own colour: if many detail pixels sit far from every palette
+    colour, merge the two closest palette colours and give the freed slot to those pixels."""
+    cent = cent.copy()
+    for _ in range(max_slots):
+        err = np.sqrt(((detail_px[:, None, :] - cent[None]) ** 2).sum(-1).min(1))
+        far = detail_px[err > max_err]
+        if len(far) < 8:
+            break
+        cd = ((cent[:, None] - cent[None]) ** 2).sum(-1)
+        np.fill_diagonal(cd, np.inf)
+        i, j = np.unravel_index(int(cd.argmin()), cd.shape)
+        cent[i] = (cent[i] + cent[j]) / 2
+        cent[j] = np.median(far, axis=0)
     return cent
 
 

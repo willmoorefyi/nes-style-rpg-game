@@ -67,6 +67,8 @@ sheet stop the rollout so the approach can be discussed.
    - facing correct (a mirror is acceptable for a wrong-facing side row: `flip_rows`)
    - walk frames visibly differ
    - costume matches the prompt
+   - **a readable face (eyes, brows, mouth) in every front, side and pose frame**, including hurt, down and cast (masked or faceless characters follow their `face` rule)
+   - no grey mannequin parts
    - no stray props
 4. On approval, copy the sheet, json, raw and prompt into `approved/<id>/`. Commit the cache entry and add its key to
    `.gitignore`'s exceptions. Rebuild with `build_assets.py battle_ai field_ai`.

@@ -1,0 +1,27 @@
+{
+  "character": "black_mage",
+  "sheet": "battle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "0b23056ab4ddc3621a82aa45",
+  "approved": "2026-11-12",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output"
+}

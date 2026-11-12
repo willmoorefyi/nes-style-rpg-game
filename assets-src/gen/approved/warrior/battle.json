@@ -1,0 +1,27 @@
+{
+  "character": "warrior",
+  "sheet": "battle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "e23eb0c4dbac7cc5e6747d7a",
+  "approved": "2026-11-12",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output"
+}

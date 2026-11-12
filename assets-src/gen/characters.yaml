@@ -3,6 +3,8 @@
 # The shared style, poses and negatives come from spec.py.
 # `seeds` are tried in order; put the approved seed first so rebuilds are identical.
 # `locked: true` = approved and frozen (only cached requests allowed). `sheets: [field]` = NPC, no battle sheet.
+# `prompt_rev` (per sheet) pins the rollout prompt wording an approved sheet was made with (default: latest, 2).
+# `face` overrides the default face rule (masked or faceless characters).
 # `robed: true` draws the pose guide with a long robe/dress instead of separate legs.
 # Rollout characters (everyone except the knight) also send the knight's approved sheet as a house-style
 # reference (spec.HOUSE_REFS). Their `identity_ref` (own approved battle sheet) only exists after battle approval.
@@ -24,6 +26,7 @@
 
 # ───────── base classes ─────────
 - id: warrior
+  prompt_rev: {battle: 1}   # battle approved before the face / no-mannequin rules; keeps its cache key
   prompt: >-
     young warrior with spiky dark brown hair, red tunic under a steel breastplate and pauldrons with grey trim,
     dark trousers, brown leather boots and gloves, round steel shield on the back
@@ -58,6 +61,9 @@
   identity_ref: [assets-src/gen/approved/white_mage/battle.png]
 - id: black_mage
   robed: true
+  face: >-
+    this character has NO visible face: only darkness under the hat brim with two glowing yellow eyes, in every
+    cell including hurt and knocked down. Never draw skin, a nose or a mouth.
   prompt: >-
     small black mage in a long dark blue robe with gold trim, tall pointed wide-brimmed dark blue hat,
     the face hidden in shadow with only two glowing yellow eyes, brown shoes
@@ -75,6 +81,9 @@
   identity_ref: [assets-src/gen/approved/red_mage/battle.png]
 # ───────── upgraded classes ─────────
 - id: ninja
+  face: >-
+    the mask covers the nose and mouth; every cell must still show two clearly readable dark eyes and eyebrows in
+    the gap, also when hurt, knocked down or casting.
   prompt: >-
     ninja in a fitted charcoal-black outfit, black hood and a face mask covering the nose and mouth leaving only
     the eyes visible, long red headband tails, dark wrapped boots
@@ -101,6 +110,9 @@
   identity_ref: [assets-src/gen/approved/white_wizard/battle.png]
 - id: black_wizard
   robed: true
+  face: >-
+    this character has NO visible face: only darkness under the hat brim with two glowing yellow eyes, in every
+    cell including hurt and knocked down. Never draw skin, a nose or a mouth.
   prompt: >-
     black wizard in a long deep purple robe with silver trim, tall pointed wide-brimmed purple hat,
     the face hidden in shadow with only two glowing yellow eyes, dark purple shoes

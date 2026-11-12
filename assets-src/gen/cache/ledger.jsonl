@@ -5,3 +5,13 @@
 {"event": "result", "key": "8524f0956ab3f853acbf5b85", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T13:45:43", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "knight", "sheet": "field", "seed": 1234, "key": "e52a5b8feb840621e1029032"}
 {"event": "result", "key": "e52a5b8feb840621e1029032", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T14:24:34", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "warrior", "sheet": "battle", "seed": 1234, "key": "e23eb0c4dbac7cc5e6747d7a"}
+{"event": "result", "key": "e23eb0c4dbac7cc5e6747d7a", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T14:41:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_mage", "sheet": "battle", "seed": 1234, "key": "404064b44b98f490274293ad"}
+{"event": "result", "key": "404064b44b98f490274293ad", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T14:57:44", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_mage", "sheet": "battle", "seed": 1234, "key": "7a2938b821732ca9c1c9245b"}
+{"event": "result", "key": "7a2938b821732ca9c1c9245b", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:02:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_mage", "sheet": "battle", "seed": 1234, "key": "0b23056ab4ddc3621a82aa45"}
+{"event": "result", "key": "0b23056ab4ddc3621a82aa45", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:14:48", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "monk", "sheet": "battle", "seed": 1234, "key": "e743c9a71ba22f3d64dc2ed2"}
+{"event": "result", "key": "e743c9a71ba22f3d64dc2ed2", "ok": true}

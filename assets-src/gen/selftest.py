@@ -113,6 +113,26 @@ def test_crop_bleed_and_keys() -> None:
     check(not (dark_blue.max(axis=2) < 40).any(), "ink rule: dark saturated blue is not outline")
 
 
+def test_face_details() -> None:
+    """1-sprite-pixel eyes survive pixelize: dark eyes on skin, and glowing eyes in a shadowed face."""
+    print("face details")
+    for name, face, eye, want in (("dark eyes on skin", (240, 190, 150), (70, 45, 30), lambda c: c.sum() < 400),
+                                  ("glowing eyes in shadow", (20, 18, 30), (250, 220, 60), lambda c: c[0] > 180 and c[1] > 150 and c[2] < 140)):
+        img = Image.new("RGB", (256, 256), (255, 0, 255))
+        d = ImageDraw.Draw(img)
+        d.rectangle([60, 40, 196, 230], fill=(40, 70, 200), outline=(0, 0, 0), width=6)    # body
+        d.rectangle([90, 60, 166, 130], fill=face)                                          # face
+        for ex in (112, 136):
+            d.rectangle([ex, 88, ex + 7, 95], fill=eye)                                    # 1 sprite px eyes (8 px/sprite px)
+        guide = np.zeros((256, 256), bool); guide[40:231, 60:197] = True
+        fg = PX.foreground(np.asarray(img), guide)
+        rgb = np.asarray(img)
+        pal = PX.sheet_palette([rgb[fg]], 6, detail_px=rgb[PX.detail_mask(rgb, fg, 8)])
+        out = np.asarray(PX.pixelize(img, guide, (32, 32), colors=6, palette=pal))
+        eyes = [out[88 // 8, ex // 8, :3].astype(int) for ex in (112, 136)]
+        check(all(want(c) for c in eyes), f"{name}: both eye pixels kept ({[tuple(c) for c in eyes]})")
+
+
 class _FakeSheet:
     def __init__(self, name):
         self.name = name
@@ -183,12 +203,14 @@ def test_style_lock() -> None:
         return
     knight = GEN.load_character("knight")
     check(bool(knight.get("locked")), "knight is locked in characters.yaml")
-    approved = HERE / "approved" / "knight"
-    for name in ("battle", "field_down", "field"):
-        meta = json.loads((approved / f"{name}.json").read_text())
-        req = GEN.plan_request(knight, GEN.SHEETS[name], meta["seed"], "gemini", meta["model"])
-        check(req.key == meta["cache_key"] and req.cached, f"knight {name}: planned key {req.key} == approved {meta['cache_key']}")
-        check("HOUSE STYLE" not in req.prompt, f"knight {name}: no house-style reference in its own request")
+    for path in sorted((HERE / "approved").glob("*/*.json")):
+        meta = json.loads(path.read_text())
+        char = GEN.load_character(meta["character"])
+        req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
+        check(req.key == meta["cache_key"] and req.cached,
+              f"{meta['character']} {meta['sheet']}: planned key {req.key} == approved {meta['cache_key']}")
+        if meta["character"] == "knight":
+            check("HOUSE STYLE" not in req.prompt, f"knight {meta['sheet']}: no house-style reference in its own request")
 
     def refused(fn) -> bool:
         try:
@@ -229,6 +251,7 @@ if __name__ == "__main__":
     test_geometry()
     test_field3_geometry()
     test_crop_bleed_and_keys()
+    test_face_details()
     test_budget_guard()
     test_field_atlas()
     test_style_lock()
