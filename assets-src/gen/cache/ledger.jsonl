@@ -59,3 +59,15 @@
 {"event": "result", "key": "de2f5c9015d39007d95cf0a2", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T15:34:37", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_wizard", "sheet": "field", "seed": 1235, "key": "8532b031e64622e510db7a5a"}
 {"event": "result", "key": "8532b031e64622e510db7a5a", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:31:28", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "villager", "sheet": "field", "seed": 1234, "key": "92b78972985357265256ed9d"}
+{"event": "result", "key": "92b78972985357265256ed9d", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:31:36", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "merchant", "sheet": "field", "seed": 1234, "key": "dbf4620f90bcc9c7209e5565"}
+{"event": "result", "key": "dbf4620f90bcc9c7209e5565", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:31:42", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "innkeeper", "sheet": "field", "seed": 1234, "key": "01fedcd3f8ef517ec6239e5d"}
+{"event": "result", "key": "01fedcd3f8ef517ec6239e5d", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:31:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "guard", "sheet": "field", "seed": 1234, "key": "b5887307a21c70077e2a5509"}
+{"event": "result", "key": "b5887307a21c70077e2a5509", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:31:59", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "mage", "sheet": "field", "seed": 1234, "key": "4fd7dfab98e35eed269c87f0"}
+{"event": "result", "key": "4fd7dfab98e35eed269c87f0", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T17:32:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "old_man", "sheet": "field", "seed": 1234, "key": "58e38a26b796f11d1481229d"}
+{"event": "result", "key": "58e38a26b796f11d1481229d", "ok": true}
