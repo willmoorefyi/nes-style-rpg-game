@@ -26,6 +26,13 @@ Outputs go to `assets-src/gen/out/<backend>/<id>/<seed>/` (git-ignored): `<sheet
 `<sheet>_raw.png`, `<sheet>_prompt.txt` / `_inputN.png` (dry run), `<sheet>.png` (native pixel sheet) and
 `review.png`. Responses are cached in `cache/` by request hash.
 
+**What is committed:** per character, `approved/<id>/{battle,field}.png` (the cut native sheets) and their `.json`
+(cache key, flips, `head_from` fixes), plus the matching `cache/<key>.{png,json}` (the raw Gemini render, kept so
+sheets can be re-cut offline and the self-test can prove each approved request still reproduces its key) and
+`cache/ledger.jsonl`. Everything else (`out/`, rejected attempts in `cache/`) is local scratch. Store a reviewed
+sheet with `python3 -I assets-src/gen/approve.py <id> <battle|field> [--flip left] [--flip-frames left:0]`.
+`approved/knight/field_down.png` stays because the knight's approved field request used it as an identity input.
+
 ## Pipeline
 
 1. **Spec** (`spec.py`) holds everything shared by all characters: the style prompt, negatives, grid sizes and the

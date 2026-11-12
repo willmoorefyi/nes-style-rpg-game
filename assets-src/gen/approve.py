@@ -2,8 +2,8 @@
 
   python3 -I assets-src/gen/approve.py <character> <sheet> [--flip left] [--note "..."]
 
-Re-plans the request to get its cache key (it must already be cached), copies the native sheet, raw render and prompt
-from out/gemini/<id>/<seed>/ into approved/<id>/, writes <sheet>.json, and un-ignores the cache entry in .gitignore.
+Re-plans the request to get its cache key (it must already be cached), copies the cut native sheet from
+out/gemini/<id>/<seed>/ into approved/<id>/, writes <sheet>.json, and un-ignores the cache entry (the raw render).
 """
 from __future__ import annotations
 
@@ -33,9 +33,9 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     src = GEN.OUT / "gemini" / cid / str(seed)
     dst = HERE / "approved" / cid
     dst.mkdir(parents=True, exist_ok=True)
-    for suffix in (".png", "_raw.png"):
-        shutil.copy2(src / f"{sheet_name}{suffix}", dst / f"{sheet_name}{suffix}")
-    (dst / f"{sheet_name}_prompt.txt").write_text(req.prompt + "\n")
+    # only the cut sheet: the raw render is the committed cache entry (cache/<key>.png) and the prompt is
+    # reproducible with --dry-run
+    shutil.copy2(src / f"{sheet_name}.png", dst / f"{sheet_name}.png")
     g = sheet.geom
     meta = {"character": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
             "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"), "grid": list(GEN.frame_size(g)),

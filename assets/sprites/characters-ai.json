@@ -14,15 +14,15 @@
     "right"
   ],
   "sheets": {
-    "knight": {
+    "black_mage": {
       "x": 0,
       "y": 0
     },
-    "black_mage": {
+    "black_wizard": {
       "x": 144,
       "y": 0
     },
-    "black_wizard": {
+    "knight": {
       "x": 288,
       "y": 0
     },
