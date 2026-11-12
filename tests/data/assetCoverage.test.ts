@@ -22,7 +22,9 @@ const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-charact
   sheets: Record<string, { row: number }>;
 };
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
-const enemies = readYaml<Array<{ id: string }>>('data/enemies.yaml');
+const enemies = readYaml<Array<{ id: string; sprite?: string }>>('data/enemies.yaml');
+/** Battle art is looked up by `sprite` (palette-swap variants), like BattleArt.monsterSpriteKey. */
+const spriteOf = (e: { id: string; sprite?: string }) => (e.sprite || e.id).replace(/\.png$/i, '');
 const manifest = JSON.parse(readFileSync(join(assets, 'data/audio-manifest.json'), 'utf-8')) as {
   music: Record<string, string>;
   sfx: Record<string, string>;
@@ -137,13 +139,43 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
   });
 
   describe('enemy art', () => {
-    it.each(enemies.map((e) => e.id))('enemy "%s" has a monster sprite', (id) => {
-      expect(existsSync(join(assets, `sprites/monsters/${id}.png`))).toBe(true);
+    it.each(enemies.map((e) => [e.id, spriteOf(e)]))('enemy "%s" has a monster sprite (%s)', (_id, sprite) => {
+      expect(existsSync(join(assets, `sprites/monsters/${sprite}.png`))).toBe(true);
     });
 
     it('monster index lists every sprite', () => {
       const index = JSON.parse(readFileSync(join(assets, 'sprites/monsters/index.json'), 'utf-8')) as string[];
-      for (const e of enemies) expect(index).toContain(e.id);
+      for (const e of enemies) expect(index).toContain(spriteOf(e));
+    });
+  });
+
+  describe('AI monster atlas (preview art, optional)', () => {
+    const metaPath = join(assets, 'sprites/monsters-ai.json');
+    const present = existsSync(metaPath);
+    const meta = present
+      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { scale: number; sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]> }> })
+      : null;
+
+    it.runIf(present)('every entry has idle, attack and hurt frames inside the image, feet inside the cell', () => {
+      const png = readFileSync(join(assets, 'sprites/monsters-ai.png'));
+      const w = png.readUInt32BE(16);
+      const h = png.readUInt32BE(20);
+      const s = meta!.scale;
+      for (const [id, e] of Object.entries(meta!.sheets)) {
+        expect(Object.keys(e.frames).sort(), id).toEqual(['attack', 'hurt', 'idle']);
+        for (const [x, y] of Object.values(e.frames)) {
+          expect((x + e.cell[0]) * s, id).toBeLessThanOrEqual(w);
+          expect((y + e.cell[1]) * s, id).toBeLessThanOrEqual(h);
+        }
+        expect(e.footRow, id).toBeLessThan(e.cell[1]);
+      }
+    });
+
+    it.runIf(present)('only lists sprites some enemy uses or a legacy sprite exists for', () => {
+      const used = new Set(enemies.map(spriteOf));
+      for (const id of Object.keys(meta!.sheets)) {
+        expect(used.has(id) || existsSync(join(assets, `sprites/monsters/${id}.png`)), id).toBe(true);
+      }
     });
   });
 

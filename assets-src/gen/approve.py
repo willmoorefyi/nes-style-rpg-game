@@ -25,6 +25,8 @@ from gen import spec as S  # noqa: E402
 def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
             flip_frames: dict[str, list[int]] | None = None) -> Path:
     char = GEN.load_character(cid)
+    if sheet_name == "monster":
+        sheet_name = GEN.allowed_sheets(char)[0]
     sheet = GEN.SHEETS[sheet_name]
     seed = char.get("seeds", [1234])[0]
     req = GEN.plan_request(char, sheet, seed, "gemini", None)
@@ -42,6 +44,10 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
             "bottom_row": g.bottom_row, "layout": list(g.layout)}
     if sheet_name == "battle":
         meta["poses"] = list(sheet.order)
+    elif sheet_name.startswith("monster_"):
+        # monster sheet: idle | attack | hurt in one row; per-frame mirroring is applied by the monsters_ai build stage
+        meta.update({"poses": list(S.MONSTER_POSES), "size": char.get("size", "small"),
+                     "floating": bool(char.get("floating")), "flip_frames": (flip_frames or {}).get("row", [])})
     else:
         meta["rows"] = list(S.FIELD_ROWS)
         meta["frames"] = ["stand", "step_left", "step_right"]
@@ -68,11 +74,11 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("character")
-    ap.add_argument("sheet", choices=list(GEN.SHEETS))
+    ap.add_argument("sheet", choices=list(GEN.SHEETS) + ["monster"])
     ap.add_argument("--flip", default="", help="comma-separated field rows drawn facing the wrong way (mirrored)")
     ap.add_argument("--note", default="")
     ap.add_argument("--flip-frames", default="", metavar="ROW:I,I",
-                    help="mirror single frames that face the other way from their row, e.g. left:0")
+                    help="mirror single frames that face the other way from their row, e.g. left:0 (monsters: row:1)")
     a = ap.parse_args()
     ff = {}
     for part in filter(None, a.flip_frames.split(";")):

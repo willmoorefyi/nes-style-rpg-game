@@ -12,7 +12,7 @@ export const ELEMENT_COLORS: Record<string, number> = {
   water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
 };
 export class BattleAnimationController {
-  animPhase: 'announce' | 'step_forward' | 'execute' | 'result' | 'step_back' | 'round_end' = 'announce';
+  animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'result' | 'step_back' | 'round_end' = 'announce';
   animTimer = 0;
   animActorSprite: Container | null = null;
   animActorOrigX = 0;
@@ -23,7 +23,9 @@ export class BattleAnimationController {
   animActorIsEnemy = false;
   floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
   dyingEnemies: Map<number, number> = new Map();
-  spellFlashes: { overlay: Container; age: number; maxAge: number }[] = [];
+  spellFlashes: { overlay: Container; age: number; maxAge: number; follow?: Container }[] = [];
+  /** Index of the acting enemy (preview pose art), or -1. */
+  private animEnemyIndex = -1;
   // K4: Turn list in commandWindow during execution
   turnListTexts: BitmapText[] = [];
   turnActionIndex = 0;
@@ -98,8 +100,8 @@ export class BattleAnimationController {
         this.animTimer += dt;
         if (this.animTimer >= 30 || confirmSkip) {
           this.animTimer = 0;
-          // N2: Enemies skip step_forward
-          this.animPhase = this.animActorIsEnemy ? 'execute' : 'step_forward';
+          // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead
+          this.animPhase = this.animActorIsEnemy ? (this.startEnemyLunge() ? 'enemy_lunge' : 'execute') : 'step_forward';
         }
         break;
       }
@@ -111,6 +113,11 @@ export class BattleAnimationController {
           this.animActorSprite.x = this.animActorOrigX + (this.animTargetX - this.animActorOrigX) * progress;
         }
         if (this.animTimer >= 15) { this.animTimer = 0; this.animPhase = 'execute'; }
+        break;
+      }
+      case 'enemy_lunge': {
+        // wait until the lunge reaches the party side, then resolve the action (the return plays on its own)
+        if (this.display.enemyView?.poses.attackOutDone(this.animEnemyIndex) ?? true) this.animPhase = 'execute';
         break;
       }
       case 'execute': {
@@ -136,7 +143,7 @@ export class BattleAnimationController {
         // Auto-advance through result messages on timer (no confirm-wait)
         const hasMsg = this.animMessageIndex < this.animMessages.length;
         if (!hasMsg) {
-          if (this.animActorIsEnemy) { this.completeAction(); } else { this.animPhase = 'step_back'; this.animTimer = 0; }
+          if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; this.animTimer = 0; }
           break;
         }
         if (this.animTimer === 0) this.setMessageText(this.animMessages[this.animMessageIndex].text);
@@ -144,7 +151,7 @@ export class BattleAnimationController {
         if (this.animTimer >= 25 || confirmSkip) {
           this.animMessageIndex++; this.animTimer = 0;
           if (this.animMessageIndex >= this.animMessages.length) {
-            if (this.animActorIsEnemy) { this.completeAction(); } else { this.animPhase = 'step_back'; }
+            if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; }
           }
         }
         break;
@@ -176,11 +183,23 @@ export class BattleAnimationController {
       }
     }
   }
+  /** Preview pose art: start the acting enemy's attack lunge (fight/magic). False when there is nothing to play. */
+  private startEnemyLunge(): boolean {
+    const view = this.display.enemyView;
+    const type = this.currentActionInfo?.actionType;
+    this.animEnemyIndex = this.animActorSprite ? this.display.enemySprites.indexOf(this.animActorSprite) : -1;
+    if (!view || this.animEnemyIndex < 0 || (type !== 'fight' && type !== 'magic')) return false;
+    view.poses.playAttack(this.animEnemyIndex);
+    return true;
+  }
+  private enemyStillAttacking(): boolean {
+    return this.animEnemyIndex >= 0 && (this.display.enemyView?.poses.isAttacking(this.animEnemyIndex) ?? false);
+  }
   /** K4: Gray out completed action and advance to next or end-of-round */
   private completeAction(): void {
     const entry = this.turnListTexts[this.turnActionIndex]; if (entry) entry.tint = 0x888888;
     if (this.animActorSprite) this.display.setActorPose(this.animActorSprite, null);
-    this.turnActionIndex++; this.animTimer = 0; this.animActorSprite = null;
+    this.turnActionIndex++; this.animTimer = 0; this.animActorSprite = null; this.animEnemyIndex = -1;
     const battleOver = this.battle.livingEnemies.length === 0 || this.battle.livingParty.length === 0;
     if (battleOver) { this.battle.skipRemainingActions(); this.animPhase = 'round_end'; }
     else { this.animPhase = this.battle.actionQueueLength > 0 ? 'announce' : 'round_end'; }
@@ -208,9 +227,10 @@ export class BattleAnimationController {
         overlay.position.set(sprite.x, sprite.y);
         overlay.alpha = 0.6;
         this.mainContainer.addChild(overlay);
-        this.spellFlashes.push({ overlay, age: 0, maxAge: 18 });
+        this.spellFlashes.push({ overlay, age: 0, maxAge: 18, follow: sprite });
       }
       if (!evt.isHeal && evt.damage > 0 && !evt.targetId.startsWith('enemy_')) this.display.flashHurt(idx);
+      if (!evt.isHeal && evt.damage > 0 && evt.targetId.startsWith('enemy_')) this.reactEnemy(idx);
       const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
       const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
       const bt = new BitmapText({
@@ -221,6 +241,12 @@ export class BattleAnimationController {
       this.mainContainer.addChild(bt);
       this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
     }
+  }
+  /** Preview pose art: a hit shows the hurt pose; a lethal hit holds it while the sprite fades out. */
+  private reactEnemy(idx: number): void {
+    const view = this.display.enemyView;
+    if (!view) return;
+    if ((this.battle.allEnemies[idx]?.currentHp ?? 0) <= 0) view.poses.freezeDying(idx); else view.poses.playHurt(idx);
   }
   updateFloatingTexts(dt: number): void {
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
@@ -252,6 +278,11 @@ export class BattleAnimationController {
       const sf = this.spellFlashes[i];
       sf.age += dt;
       sf.overlay.alpha = 0.6 * (1 - sf.age / sf.maxAge);
+      // follow the sprite (lunge, shake) and its current pose frame
+      if (sf.follow) {
+        sf.overlay.position.set(sf.follow.x, sf.follow.y);
+        if (sf.overlay instanceof Sprite && sf.follow instanceof Sprite) sf.overlay.texture = sf.follow.texture;
+      }
       if (sf.age >= sf.maxAge) {
         this.mainContainer.removeChild(sf.overlay);
         this.spellFlashes.splice(i, 1);

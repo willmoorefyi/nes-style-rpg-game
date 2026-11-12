@@ -235,6 +235,45 @@ def build_monsters() -> None:
     print(f"monsters: {len(ids)} sprites")
 
 
+def build_monsters_ai() -> None:
+    """Approved AI monster sheets (approved/<id>/monster_<size>.png: idle | attack | hurt) plus palette-swap variants
+    from gen/monsters.yaml -> assets/sprites/monsters-ai.png/.json (docs/ART_MONSTERS_PLAN.md). One row per sprite."""
+    import yaml
+    from gen import monster as M
+
+    out = ASSETS / "sprites"
+    entries: list[tuple[str, dict, list[Image.Image]]] = []
+    for meta_path in sorted(APPROVED.glob("*/monster_*.json")):
+        meta = json.loads(meta_path.read_text())
+        sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
+        c = meta["grid"][0]
+        frames = [sheet.crop((i * c, 0, (i + 1) * c, c)) for i in range(3)]
+        for i in meta.get("flip_frames", []):
+            frames[i] = frames[i].transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        entries.append((meta["character"], meta, frames))
+    if not entries:
+        print("monsters_ai: no approved monster sheets")
+        return
+    specs = {m["id"]: m for m in yaml.safe_load((HERE / "gen" / "monsters.yaml").read_text())}
+    for cid, meta, frames in list(entries):
+        for variant in specs.get(cid, {}).get("variants", []) or []:
+            entries.append((variant["id"], meta, [M.recolor(f, variant) for f in frames]))
+    width = max(3 * e[1]["grid"][0] for e in entries)
+    height = sum(e[1]["grid"][1] for e in entries)
+    atlas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    sheets, y = {}, 0
+    for sid, meta, frames in entries:
+        c = meta["grid"][0]
+        for i, f in enumerate(frames):
+            atlas.paste(f, (i * c, y))
+        sheets[sid] = {"cell": [c, c], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
+                       "frames": {pose: [i * c, y] for i, pose in enumerate(meta["poses"])}}
+        y += c
+    scaled(atlas, AI_SCALE).save(out / "monsters-ai.png")
+    (out / "monsters-ai.json").write_text(json.dumps({"scale": AI_SCALE, "sheets": sheets}, indent=2) + "\n")
+    print(f"monsters_ai: {list(sheets)}")
+
+
 def build_optional(module_name: str) -> None:
     mod = __import__(module_name)
     mod.build(ASSETS)
@@ -248,6 +287,7 @@ STAGES = {
     "battle_ai": build_battle_ai,
     "field_ai": build_field_ai,
     "monsters": build_monsters,
+    "monsters_ai": build_monsters_ai,
     "backgrounds": lambda: build_optional("backgrounds"),
     "audio": lambda: build_optional("audio"),
 }

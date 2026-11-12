@@ -48,7 +48,7 @@ import { TILE_SIZE } from '../core/LayoutConstants.js';
 export { isPreviewAi };
 
 /** Fetch JSON, rejecting HTTP errors and non-JSON bodies (e.g. a dev server's HTML fallback for a missing file). */
-async function fetchJson<T>(path: string): Promise<T> {
+export async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(path);
   if (!response.ok) throw new Error(`HTTP ${response.status} for ${path}`);
   const text = await response.text();

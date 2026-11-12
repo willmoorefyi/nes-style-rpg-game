@@ -53,6 +53,7 @@ class SheetGeom:
     guide_bottom_px: float | None = None   # pin where the guide's drawn bottom sits (keeps approved guides identical)
     fit_height: int | None = None          # resampled sheets only: frame the crop so the tallest figure is this tall
     trim_width: int | None = None          # centre-crop each frame to this width after cutting (cell margins)
+    aspect_override: str | None = None     # Gemini aspect string when the reduced ratio is not one it accepts (21:9)
 
     @property
     def guide_per_native(self) -> float:
@@ -68,6 +69,8 @@ class SheetGeom:
 
     @property
     def aspect(self) -> str:
+        if self.aspect_override:
+            return self.aspect_override
         from math import gcd
         w, h = self.sheet_px
         g = gcd(w, h)
@@ -265,3 +268,36 @@ class CharacterSpec:
     extra_negative: str = ""
     palette_size: int = PALETTE_SIZE
     tags: list[str] = field(default_factory=list)
+
+
+# ───────── monsters (docs/ART_MONSTERS_PLAN.md) ─────────
+# One 21:9 request per monster: idle | attack | hurt in one row. The guide is 1680x720 (exactly 21:9; the reduced ratio
+# 7:3 is not accepted by Gemini, hence aspect_override). `grid` is the OUTPUT cell per size band; guide cells are not a
+# multiple of it because monsters are cut by their own path (monster.py), which measures Gemini's pixel grid.
+MONSTER_POSES = ["idle", "attack", "hurt"]
+MONSTER_GUIDE_CELL = (560, 720)
+MONSTER_EXPECTED_PITCH = 5.33     # guide px per sprite px seen on the character sheets; pilot A measures the real one
+
+
+@dataclass(frozen=True)
+class MonsterBand:
+    size: str
+    cell: int                      # square output cell (art px)
+    height: tuple[int, int]        # accepted figure height (art px)
+    foot_row: int                  # last opaque row of grounded monsters
+
+
+MONSTER_BANDS = {
+    "small": MonsterBand("small", 80, (56, 72), 76),
+    "large": MonsterBand("large", 128, (96, 120), 122),
+    "boss": MonsterBand("boss", 176, (140, 168), 168),
+}
+MONSTER_GEOMS = {
+    b.size: SheetGeom(f"monster_{b.size}", grid=(b.cell, b.cell), cell_px=MONSTER_GUIDE_CELL, layout=(3, 1),
+                      px_per_unit=1.0, bottom_row=b.foot_row, aspect_override="21:9")
+    for b in MONSTER_BANDS.values()
+}
+MONSTER_NEGATIVE = (
+    "two creatures in one cell, different creatures in different cells, background scenery, floor tiles, shadows on the "
+    "ground, magic effects outside the cell, text, frame, border, grid lines, blurry, soft shading, gradient, 3d render"
+)

@@ -35,6 +35,7 @@ import yaml  # noqa: E402
 from PIL import Image, ImageDraw  # noqa: E402
 
 from gen import guides as G  # noqa: E402
+from gen import monster as M  # noqa: E402
 from gen import pixelize as PX  # noqa: E402
 from gen import spec as S  # noqa: E402
 
@@ -74,16 +75,44 @@ SHEETS: dict[str, Sheet] = {
     **{f"field_{d}": Sheet(f"field_{d}", S.FIELD_POSES, S.field_order(d), S.FIELD_GEOM, "overworld walking", text, S.FIELD_TARGET_PX)
        for d, (_, text, _) in S.FIELD_DIRECTIONS.items()},
     "field": Sheet("field", S.FIELD3_POSES, S.FIELD_ORDER, S.FIELD3_GEOM, "overworld walking", "", S.FIELD_TARGET_PX),
+    **{f"monster_{size}": Sheet(f"monster_{size}", {}, S.MONSTER_POSES, geom, "monster battle", "", "")
+       for size, geom in S.MONSTER_GEOMS.items()},
 }
+MONSTER_SPRITES = HERE.parent.parent / "assets" / "sprites" / "monsters"
 
 
 # ───────────────────────────── inputs ─────────────────────────────
 
 def load_character(cid: str) -> dict:
+    """A character (characters.yaml) or a monster (monsters.yaml, returned with kind: monster)."""
     for entry in yaml.safe_load((HERE / "characters.yaml").read_text()):
         if entry["id"] == cid:
             return entry
-    raise SystemExit(f"no character '{cid}' in characters.yaml")
+    for entry in yaml.safe_load((HERE / "monsters.yaml").read_text()):
+        if entry["id"] == cid:
+            return {**entry, "kind": "monster"}
+    raise SystemExit(f"no character or monster '{cid}' in characters.yaml / monsters.yaml")
+
+
+def is_monster(char: dict) -> bool:
+    return char.get("kind") == "monster"
+
+
+def monster_band(char: dict) -> S.MonsterBand:
+    return S.MONSTER_BANDS[char.get("size", "small")]
+
+
+def design_ref(char: dict) -> Image.Image | None:
+    """The monster's legacy sprite (our own art, stored at x3) back at native size, then 8x nearest on magenta."""
+    path = MONSTER_SPRITES / f"{char.get('design_ref', char['id'])}.png"
+    if not path.exists():
+        return None
+    im = Image.open(path).convert("RGBA")
+    im = im.resize((im.width // 3, im.height // 3), Image.Resampling.NEAREST)
+    big = im.resize((im.width * IDENTITY_UPSCALE, im.height * IDENTITY_UPSCALE), Image.Resampling.NEAREST)
+    flat = Image.new("RGB", big.size, (255, 0, 255))
+    flat.paste(big, (0, 0), big)
+    return flat
 
 
 def sheet_negative(char: dict, sheet: Sheet) -> str:
@@ -181,7 +210,9 @@ def house_images(char: dict, sheet: Sheet) -> list[Image.Image]:
 
 def allowed_sheets(char: dict) -> list[str]:
     """Sheets a character may request: NPCs are field-only (`sheets: [field]`); classes get battle + field."""
-    return char.get("sheets") or list(SHEETS)
+    if is_monster(char):
+        return [f"monster_{char.get('size', 'small')}"]
+    return char.get("sheets") or [n for n in SHEETS if not n.startswith("monster_")]
 
 
 def style_image() -> Image.Image:
@@ -211,6 +242,19 @@ class Request:
 def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str | None) -> Request:
     if sheet.name not in allowed_sheets(char):
         raise SystemExit(f"refused: {char['id']} has no '{sheet.name}' sheet (sheets: {allowed_sheets(char)})")
+    if is_monster(char):
+        if backend != "gemini":
+            raise SystemExit("refused: monster sheets are Gemini-only")
+        from gen import gemini as GM
+        band = monster_band(char)
+        guide = M.guide(band, bool(char.get("floating")))
+        ref = design_ref(char)
+        images = [guide, ref_image(S.HOUSE_REFS["battle"])] + ([ref] if ref is not None else [])
+        prompt = M.prompt(char, band, ref is not None)
+        mid = model or GM.DEFAULT_MODEL
+        key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
+        run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
+        return Request(char["id"], sheet, seed, backend, mid, guide, key, prompt, images, run)
     guide = G.sheet(sheet.poses, sheet.order, sheet.geom, robed=char.get("robed", False))
     if backend == "gemini":
         from gen import gemini as GM
@@ -292,6 +336,12 @@ LAST_RESAMPLE: dict = {}
 def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, seed: int) -> list[Image.Image]:
     """Pixel-perfect path when the render has a detectable pixel grid whose cell size matches the sheet grid;
     otherwise fall back to block resampling (with a warning in the review stats)."""
+    if sheet.name.startswith("monster_"):
+        frames, info = M.cut(raw, monster_band(char), bool(char.get("floating")),
+                             colors=char.get("palette_size", 16), seed=seed)
+        info["report"] = M.frame_report(frames, monster_band(char))
+        LAST_RESAMPLE[sheet.name] = info
+        return frames
     geom = sheet.geom
     cleaned, info = PX.clean_resample(raw, guide.size)
     LAST_RESAMPLE[sheet.name] = {k: v for k, v in info.items() if k != "native"}
@@ -506,6 +556,13 @@ def repixelize(outdir: Path) -> None:
         raw_path = outdir / f"{name}_raw.png"
         if not raw_path.exists():
             continue
+        if name.startswith("monster_"):
+            mchar = load_character(char_id)
+            raw = Image.open(raw_path).convert("RGBA")
+            frames = cut_frames(raw, M.guide(monster_band(mchar)), sheet, mchar, seed)
+            native_sheet(frames, sheet.geom).save(outdir / f"{name}.png")
+            results[name] = (raw, frames)
+            continue
         guide = G.sheet(sheet.poses, sheet.order, sheet.geom)
         raw = Image.open(raw_path).convert("RGBA")
         rw, rh = raw.size
@@ -544,7 +601,7 @@ def main(argv: list[str] | None = None) -> None:
         ap.error("character and --backend are required (or use --repixelize OUT_DIR)")
     char = load_character(args.character)
     seeds = [int(s) for s in args.seeds.split(",")] if args.seeds else char.get("seeds", [1234])
-    names = args.sheets.split(",")
+    names = [f"monster_{char.get('size', 'small')}" if n == "monster" else n for n in args.sheets.split(",")]
     unknown = [n for n in names if n not in SHEETS]
     if unknown:
         ap.error(f"unknown sheets {unknown}; choose from {list(SHEETS)}")

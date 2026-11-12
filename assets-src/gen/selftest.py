@@ -19,6 +19,7 @@ from PIL import Image, ImageDraw  # noqa: E402
 
 from gen import generate as GEN  # noqa: E402
 from gen import guides as G  # noqa: E402
+from gen import monster as M  # noqa: E402
 from gen import pixelize as PX  # noqa: E402
 from gen import spec as S  # noqa: E402
 
@@ -235,6 +236,49 @@ def test_style_lock() -> None:
     check(len(ids) == len(set(ids)), "character ids are unique")
 
 
+def _monster_raw(floating_hurt_lift: int = 0) -> Image.Image:
+    """Synthetic 3-cell monster render on magenta at 5 px per sprite px: a 64-px creature with 1-px eyes; the attack
+    frame leans 6 px right, the hurt frame leans 4 px left (and is lifted for the floating test)."""
+    cw, ch, pitch = 105, 135, 5
+    art = Image.new("RGB", (cw * 3, ch), (255, 0, 255))
+    d = ImageDraw.Draw(art)
+    for i, (dx, lift) in enumerate(((0, 0), (6, 0), (-4, floating_hurt_lift))):
+        x0, y1 = i * cw + 30 + dx, 120 - lift
+        d.rectangle([x0, y1 - 63, x0 + 40, y1], fill=(60, 140, 60), outline=(0, 0, 0))      # body
+        d.rectangle([x0 + 4, y1 - 60, x0 + 36, y1 - 44], fill=(230, 190, 150))            # face
+        d.point([(x0 + 12, y1 - 54), (x0 + 26, y1 - 54)], fill=(60, 30, 20))                # 1-px eyes
+    return art.resize((art.width * pitch, art.height * pitch), Image.Resampling.NEAREST)
+
+
+def test_monsters() -> None:
+    print("monsters")
+    band = S.MONSTER_BANDS["small"]
+    check(S.MONSTER_GEOMS["small"].aspect == "21:9" and S.MONSTER_GEOMS["boss"].sheet_px == (1680, 720),
+          "monster sheets request 21:9 (1680x720 guide)")
+    g = np.asarray(M.guide(band).convert("RGB")).astype(int)
+    box = (np.abs(g - np.array(M.GUIDE_BOX)).sum(2) < 6)
+    hb = int(np.ptp(np.where(box[:, :560].any(1))[0]) + 1)
+    check(abs(hb - round(band.height[1] * S.MONSTER_EXPECTED_PITCH)) <= 2, f"guide box height {hb} = top of band at expected pitch")
+    frames, info = M.cut(_monster_raw(), band)
+    rep = M.frame_report(frames, band)
+    check(all(f.size == (80, 80) for f in frames), "frames are 80x80 output cells")
+    check(rep["bottoms"] == [band.foot_row] * 3, f"grounded: every frame's feet on row {band.foot_row} ({rep['bottoms']})")
+    check(rep["height_ok"] and rep["outline"] and rep["colours"] <= 16, f"height band, outline, <=16 colours ({rep})")
+    cx = [float(np.where(np.asarray(f)[..., 3].any(0))[0].mean()) for f in frames]
+    check(cx[1] - cx[0] >= 4 and cx[0] - cx[2] >= 2, f"attack lean right / hurt lean left kept ({[round(x, 1) for x in cx]})")
+    eyes = [int((((np.asarray(f)[..., :3].astype(int) - np.array([60, 30, 20])) ** 2).sum(2) < 1600).sum()) for f in frames]
+    check(min(eyes) >= 2, f"1-px eyes survive in every frame ({eyes})")
+    lifted, _ = M.cut(_monster_raw(floating_hurt_lift=8), band, floating=True)
+    b = M.frame_report(lifted, band)["bottoms"]
+    check(b[0] == band.foot_row and b[2] == band.foot_row - 8, f"floating: one shared offset keeps the hurt lift ({b})")
+    v = M.recolor(frames[0], {"hue": 120})
+    va, fa = np.asarray(v), np.asarray(frames[0])
+    out_px = np.all(fa[..., :3] == np.array(PX.OUTLINE), 2) & (fa[..., 3] > 0)
+    check((va[..., 3] == fa[..., 3]).all() and np.all(va[out_px][:, :3] == np.array(PX.OUTLINE)),
+          "recolour keeps alpha and the outline")
+    check(not np.array_equal(va, fa), "recolour changes the body colours")
+
+
 def test_size_ref() -> None:
     print("size reference")
     if not GEN.SIZE_REF.exists():
@@ -255,6 +299,7 @@ if __name__ == "__main__":
     test_budget_guard()
     test_field_atlas()
     test_style_lock()
+    test_monsters()
     test_size_ref()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)

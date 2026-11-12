@@ -1,0 +1,108 @@
+# Monster prompts for the AI sprite pipeline (assets-src/gen/generate.py, monster.py; docs/ART_MONSTERS_PLAN.md).
+# One Gemini request per monster type -> idle | attack | hurt. `id` = the enemy's `sprite` name in enemies.yaml.
+# `size` picks the band (small 80 / large 128 / boss 176 px cells). `prompt` describes the look (keep it true to the
+# legacy sprite, which is also sent as the design reference); `attack` / `hurt` describe those two poses.
+# `floating: true` keeps one shared vertical offset (no ground line). `face` overrides the default readable-face rule.
+# `variants` (palette swaps, no extra images): [{id: <sprite>, map: {"#rrggbb": "#rrggbb"}} | {id, hue: <deg>, sat: <x>}]
+# `seeds` are tried in order; put the approved seed first.
+- id: goblin
+  size: small
+  prompt: >-
+    small hunched green goblin with long pointed ears, a big hooked nose, yellow eyes and a toothy grin, wearing a
+    ragged brown leather vest and a rope belt, bare green arms and feet, holding a short rusty dagger
+  attack: lunging forward and stabbing with the dagger held out toward the heroes
+  hurt: knocked back, flinching with eyes squeezed shut and the dagger arm thrown back
+  seeds: [1234]
+- id: wolf
+  size: small
+  prompt: >-
+    lean grey wolf on four legs with shaggy fur, a darker grey back, pointed ears, yellow eyes and bared white fangs
+  attack: leaping forward with jaws wide open to bite, front paws reaching out
+  hurt: yelping and recoiling, head pulled back and ears flat
+  seeds: [1234]
+- id: skeleton
+  size: small
+  prompt: >-
+    undead skeleton warrior with off-white bones, glowing red eye sockets, a tattered dark red loincloth, holding a
+    chipped iron sword
+  attack: swinging the sword down in a big overhead slash toward the heroes
+  hurt: rattling backward, ribs and skull knocked askew, sword arm flung back
+  face: the skull's face is two glowing red eye sockets and a toothed jaw, readable in every cell
+  seeds: [1234]
+- id: pirate
+  size: small
+  prompt: >-
+    stocky pirate with a black tricorn hat, an eyepatch, a short dark beard, a blue coat with a red sash, brown boots,
+    holding a curved cutlass
+  attack: slashing forward with the cutlass in a wide swing
+  hurt: staggering backward, hat tilted, grimacing
+  seeds: [1234]
+- id: mummy
+  size: small
+  prompt: >-
+    hunched mummy wrapped in dirty tan bandages with loose trailing strips, glowing orange eyes in a dark gap between
+    the wrappings, arms reaching forward
+  attack: lurching forward with both bandaged arms grabbing toward the heroes
+  hurt: reeling backward, bandages flapping loose
+  face: only two glowing orange eyes show in a dark gap between the bandages, readable in every cell
+  seeds: [1234]
+- id: cockatrice
+  size: small
+  prompt: >-
+    cockatrice: a large rooster-like bird with a red comb and wattle, iridescent green and purple body feathers, a
+    teal snake-like tail, yellow beak and yellow scaly legs
+  attack: pecking forward with the beak, wings spread wide
+  hurt: feathers ruffled, flapping backward with the beak open in a squawk
+  seeds: [1234]
+- id: vampire
+  size: small
+  prompt: >-
+    pale vampire with slicked-back black hair, red eyes and small fangs, a high-collared black cape with a red lining,
+    a dark red vest, reaching out with a clawed hand
+  attack: swooping forward with the cape spread and clawed hand slashing
+  hurt: recoiling behind the cape, hissing with fangs bared
+  seeds: [1234]
+- id: ogre
+  size: large
+  prompt: >-
+    huge muscular tan-skinned ogre with a small crown-like crest of brown hair, small angry red eyes, two tusks, a
+    big belly, a brown loincloth with a gold belt buckle, holding a spiked wooden club
+  attack: swinging the spiked club down in a heavy overhead smash toward the heroes
+  hurt: rocking back on its heels, roaring, club arm thrown back
+  seeds: [1234]
+- id: troll
+  size: large
+  prompt: >-
+    hulking green-skinned troll with a hunched back, long arms with claws, dark green spikes along its head and
+    spine, yellow eyes, tusks, a ragged brown loincloth, holding a crude wooden mallet
+  attack: lunging forward and swinging the mallet in a wide sideways sweep
+  hurt: hunching back with an arm raised to shield its face, snarling
+  seeds: [1234]
+- id: dragon
+  size: large
+  prompt: >-
+    red dragon on four legs with large bat-like wings, two curved horns, a row of pale spikes along its back, a cream
+    belly, yellow eyes and sharp teeth, a long tail
+  attack: rearing forward with jaws open in a fierce bite, wings raised
+  hurt: rearing back with wings flinching and head pulled away
+  seeds: [1234]
+- id: garland
+  size: large
+  prompt: >-
+    dark knight in heavy midnight-blue plate armour with large curved horns on the helmet, glowing red eyes in the
+    visor, a long dark red cape, holding a broad steel sword
+  attack: stepping forward with a powerful diagonal sword slash
+  hurt: staggering backward, cape flaring, sword lowered
+  face: the face is hidden by the horned helmet; two glowing red eyes in the visor slit are readable in every cell
+  seeds: [1234]
+- id: lich
+  size: boss
+  floating: true
+  prompt: >-
+    towering lich: a skull with glowing green eyes and a jagged golden crown, wearing a flowing purple hooded robe with
+    shoulder spikes, a black and gold chest panel with a green gem, holding a staff topped with a small skull in one
+    bony hand and a glowing green orb in the other, floating above the ground with a dark aura
+  attack: thrusting the green orb forward to cast a blast of green magic, robe billowing
+  hurt: recoiling backward, robe crumpling, crown tilted
+  face: the skull's face with two glowing green eyes and a toothed jaw is readable in every cell
+  seeds: [1234]

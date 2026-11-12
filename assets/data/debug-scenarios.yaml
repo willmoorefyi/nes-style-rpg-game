@@ -109,3 +109,52 @@
   gold: 100
   enemies: [goblin, goblin]
   background: assets/backgrounds/grassland.png
+
+# Monster pose previews (docs/ART_MONSTERS_PLAN.md; open with ?art=ai&mute=1&scenario=<id>).
+- id: ai_monsters_small
+  name: Small monsters (AI art preview)
+  party:
+    - { class: warrior, name: WARR, level: 1, equipment: [], spells: [] }
+    - { class: thief, name: THIF, level: 1, equipment: [], spells: [] }
+    - { class: white_mage, name: WHMG, level: 1, equipment: [], spells: [] }
+    - { class: black_mage, name: BKMG, level: 1, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, wolf, skeleton]
+  background: assets/backgrounds/grassland.png
+
+- id: ai_monsters_large
+  name: Large monsters (AI art preview)
+  party:
+    - { class: knight, name: KNGT, level: 3, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 3, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 3, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 3, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [ogre, troll]
+  background: assets/backgrounds/grassland.png
+
+- id: ai_boss
+  name: Boss with minions (AI art preview)
+  party:
+    - { class: knight, name: KNGT, level: 5, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 5, equipment: [], spells: [] }
+    - { class: white_wizard, name: WHWZ, level: 5, equipment: [], spells: [] }
+    - { class: black_wizard, name: BKWZ, level: 5, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [lich, goblin, goblin]
+  background: assets/backgrounds/grassland.png
+
+- id: ai_monsters_nine
+  name: Nine small monsters (AI layout preview)
+  party:
+    - { class: warrior, name: WARR, level: 1, equipment: [], spells: [] }
+    - { class: thief, name: THIF, level: 1, equipment: [], spells: [] }
+    - { class: monk, name: MONK, level: 1, equipment: [], spells: [] }
+    - { class: red_mage, name: RDMG, level: 1, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, goblin, goblin, wolf, wolf, wolf, skeleton, skeleton, skeleton]
+  background: assets/backgrounds/grassland.png

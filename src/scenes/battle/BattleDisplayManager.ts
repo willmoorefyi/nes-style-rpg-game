@@ -5,7 +5,9 @@ import { computeEnemyLayout, ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleL
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
-import { battleArt } from '../../rendering/BattleArt.js';
+import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
+import { isPreviewAi } from '../../core/artPreview.js';
+import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 
 /** Party sprites are 120x138 (40x46 native at 3x, matching monster pixel density); feet rest on these baselines. */
@@ -28,6 +30,8 @@ export function partySpritePosition(i: number, art: { ai: boolean; footRow: numb
 
 export class BattleDisplayManager {
   readonly enemySprites: Container[] = [];
+  /** Preview mode only: posed 2x monster art (null in normal play). */
+  enemyView: AiEnemyView | null = null;
   readonly partySprites: Container[] = [];
   // Per-member battle pose textures; null where only the placeholder rectangle is available
   private partyFrames: (Texture[] | null)[] = [];
@@ -50,6 +54,15 @@ export class BattleDisplayManager {
 
   createEnemySprites(): void {
     const enemies = this.battle.allEnemies;
+    if (isPreviewAi()) {
+      this.enemyView = new AiEnemyView(enemies.map(e => e.data));
+      for (const sprite of this.enemyView.build()) {
+        this.mainContainer.addChild(sprite);
+        this.enemySprites.push(sprite);
+      }
+      if (!battleArt.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
+      return;
+    }
     const positions = computeEnemyLayout(enemies.map(e => e.data));
     for (let i = 0; i < enemies.length; i++) {
       const sprite = this.buildEnemySprite(i, positions[i]);
@@ -62,7 +75,7 @@ export class BattleDisplayManager {
   private buildEnemySprite(i: number, box: { x: number; y: number; w: number; h: number }): Container {
     const enemy = this.battle.allEnemies[i];
     const { x, y, w, h } = box;
-    const tex = battleArt.getMonster(enemy.data.id);
+    const tex = battleArt.getMonster(monsterSpriteKey(enemy.data));
     if (tex) {
       const sprite = new Sprite(tex);
       sprite.scale.set(w / tex.width, h / tex.height);
@@ -96,8 +109,12 @@ export class BattleDisplayManager {
 
   /** Art finished loading after the placeholders were created (e.g. debug battles): swap them in place. */
   private upgradeToArt(): void {
+    if (this.enemyView) {
+      const rebuilt = this.enemyView.build();
+      rebuilt.forEach((sprite, i) => this.swapSprite(this.enemySprites, i, sprite));
+    }
     const positions = computeEnemyLayout(this.battle.allEnemies.map(e => e.data));
-    for (let i = 0; i < this.enemySprites.length; i++) {
+    for (let i = 0; i < this.enemySprites.length && !this.enemyView; i++) {
       if (this.enemySprites[i] instanceof Sprite) continue;
       this.swapSprite(this.enemySprites, i, this.buildEnemySprite(i, positions[i]));
     }
@@ -190,6 +207,7 @@ export class BattleDisplayManager {
   }
 
   update(dt: number): void {
+    this.enemyView?.update(dt, this.enemySprites);
     if (this.hurtTimers.size === 0) return;
     for (const [i, t] of this.hurtTimers) {
       if (t - dt <= 0) this.hurtTimers.delete(i); else this.hurtTimers.set(i, t - dt);

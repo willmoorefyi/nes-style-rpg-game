@@ -263,6 +263,11 @@ def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0,
     """One 15-bit palette for a whole sheet (k-means over every frame's figure pixels); darkest colour = outline.
     Sharing it keeps colours consistent across frames and stops a small region (a face) merging into a neighbour."""
     px = np.concatenate([p.astype(np.float32) for p in pixel_sets if len(p)])
+    uniq = np.unique(px.astype(np.uint8), axis=0)
+    if len(uniq) <= colors:          # already a small palette (e.g. clean pixel art): keep every colour as is
+        cent = snap15(uniq.astype(np.float32)).astype(np.float32)
+        cent[int(cent.sum(1).argmin())] = OUTLINE
+        return cent
     rng = np.random.default_rng(seed)
     sample = px[rng.choice(len(px), size=min(len(px), 40000), replace=False)]
     cent = kmeans(sample, colors, seed=seed)
