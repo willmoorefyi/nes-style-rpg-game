@@ -15,3 +15,19 @@
 {"event": "result", "key": "0b23056ab4ddc3621a82aa45", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T15:14:48", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "monk", "sheet": "battle", "seed": 1234, "key": "e743c9a71ba22f3d64dc2ed2"}
 {"event": "result", "key": "e743c9a71ba22f3d64dc2ed2", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:22:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "thief", "sheet": "battle", "seed": 1234, "key": "f7fdad13065142be2d4cf172"}
+{"event": "result", "key": "f7fdad13065142be2d4cf172", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:22:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_mage", "sheet": "battle", "seed": 1234, "key": "b37768755d3513bc846c5044"}
+{"event": "result", "key": "b37768755d3513bc846c5044", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:23:14", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "warrior", "sheet": "field", "seed": 1234, "key": "b2061ba949e6fcda96d15bd3"}
+{"event": "result", "key": "b2061ba949e6fcda96d15bd3", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:23:26", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "thief", "sheet": "field", "seed": 1234, "key": "2556d581420b809a8ef172a3"}
+{"event": "result", "key": "2556d581420b809a8ef172a3", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:23:39", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "monk", "sheet": "field", "seed": 1234, "key": "9ac91f7554fbb9a094adb008"}
+{"event": "result", "key": "9ac91f7554fbb9a094adb008", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:23:52", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_mage", "sheet": "field", "seed": 1234, "key": "dd0ae3c8f32c7f86ef114d7d"}
+{"event": "result", "key": "dd0ae3c8f32c7f86ef114d7d", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:24:05", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_mage", "sheet": "field", "seed": 1234, "key": "c114a47c6ee198cd6c59b27c"}
+{"event": "result", "key": "c114a47c6ee198cd6c59b27c", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T15:24:16", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_mage", "sheet": "field", "seed": 1234, "key": "58341ca8039dca1928a0de50"}
+{"event": "result", "key": "58341ca8039dca1928a0de50", "ok": true}

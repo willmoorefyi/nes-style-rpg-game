@@ -1,0 +1,26 @@
+{
+  "character": "red_mage",
+  "sheet": "battle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "b37768755d3513bc846c5044",
+  "approved": "2026-11-12",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ]
+}

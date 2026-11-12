@@ -32,8 +32,9 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "") -> Path:
     src = GEN.OUT / "gemini" / cid / str(seed)
     dst = HERE / "approved" / cid
     dst.mkdir(parents=True, exist_ok=True)
-    for suffix in (".png", "_raw.png", "_prompt.txt"):
+    for suffix in (".png", "_raw.png"):
         shutil.copy2(src / f"{sheet_name}{suffix}", dst / f"{sheet_name}{suffix}")
+    (dst / f"{sheet_name}_prompt.txt").write_text(req.prompt + "\n")
     g = sheet.geom
     meta = {"character": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
             "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"), "grid": list(GEN.frame_size(g)),

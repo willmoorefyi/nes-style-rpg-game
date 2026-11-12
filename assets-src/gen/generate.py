@@ -317,6 +317,9 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
                     LAST_RESAMPLE[sheet.name]["cropped"] = LAST_RESAMPLE[sheet.name].get("cropped", []) + [sheet.order[i]]
                 frames.append(frame)
             return [trim(f, geom) for f in frames]
+        if geom.fit_height and mismatch <= 0.25:
+            LAST_RESAMPLE[sheet.name]["mode"] = f"native-scaled (art cell {cell_w:.0f}x{cell_h:.0f} vs grid {geom.grid})"
+            return native_scaled(native, masks, sheet, colors, seed, cell_w, cell_h)
         LAST_RESAMPLE[sheet.name]["mode"] = f"resampled (art cell {cell_w:.0f}x{cell_h:.0f} vs grid {geom.grid})"
     else:
         LAST_RESAMPLE[sheet.name]["mode"] = "resampled (no pixel grid)"
@@ -339,6 +342,43 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
     frames = [PX.pixelize(c, g, geom.grid, colors=colors, seed=seed, bottom_row=geom.bottom_row, palette=palette)
               for c, g in zip(cells, gms)]
     return [trim(f, geom) for f in frames]
+
+
+def native_scaled(native: Image.Image, masks, sheet: Sheet, colors: int, seed: int,
+                  cell_w: float, cell_h: float) -> list[Image.Image]:
+    """Pixel art drawn on a clean grid but at a slightly different figure size: scale the art pixels themselves
+    (nearest neighbour, one shared factor so the tallest figure is fit_height rows), then cut 1:1 with one shared
+    palette. No blending, so 1-pixel features such as eyes survive."""
+    geom = sheet.geom
+    cols = geom.layout[0]
+    arts, gms, heights = [], [], []
+    for i in range(len(sheet.order)):
+        cx, cy = i % cols, i // cols
+        art = native.crop((int(round(cx * cell_w)), int(round(cy * cell_h)), int(round((cx + 1) * cell_w)), int(round((cy + 1) * cell_h))))
+        gm = np.asarray(Image.fromarray((masks[i] * 255).astype(np.uint8)).resize(art.size, Image.Resampling.NEAREST)) > 0
+        rgb = np.asarray(art.convert("RGB"))
+        fg = PX.foreground(rgb, gm, dilate=max(3, (min(art.size) // 20) | 1))
+        ys = np.where(fg.any(1))[0]
+        heights.append(int(ys.max() - ys.min() + 1) if len(ys) else 0)
+        arts.append(art); gms.append(gm)
+    f = geom.fit_height / max(heights)
+    LAST_RESAMPLE[sheet.name]["scale"] = round(f, 3)
+    scaled, smasks, pixel_sets = [], [], []
+    for art, gm in zip(arts, gms):
+        size = (max(1, round(art.width * f)), max(1, round(art.height * f)))
+        a = art.resize(size, Image.Resampling.NEAREST)
+        m = np.asarray(Image.fromarray((gm * 255).astype(np.uint8)).resize(size, Image.Resampling.NEAREST)) > 0
+        rgb = np.asarray(a.convert("RGB"))
+        pixel_sets.append(rgb[PX.foreground(rgb, m, dilate=max(3, (min(size) // 20) | 1))])
+        scaled.append(a); smasks.append(m)
+    palette = PX.sheet_palette(pixel_sets, colors, seed)
+    frames = []
+    for a, m in zip(scaled, smasks):
+        frame, rep = PX.pixelize_native(a, m, geom.grid, colors=colors, seed=seed, bottom_row=geom.bottom_row, palette=palette)
+        if rep.get("cropped"):
+            LAST_RESAMPLE[sheet.name]["cropped"] = LAST_RESAMPLE[sheet.name].get("cropped", []) + ["?"]
+        frames.append(frame)
+    return [trim(fr, geom) for fr in frames]
 
 
 def trim(frame: Image.Image, geom: S.SheetGeom) -> Image.Image:

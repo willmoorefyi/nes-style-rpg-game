@@ -266,6 +266,8 @@ def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0,
     rng = np.random.default_rng(seed)
     sample = px[rng.choice(len(px), size=min(len(px), 40000), replace=False)]
     cent = kmeans(sample, colors, seed=seed)
+    # coverage: a sizeable colour area far from every palette colour (a small face's skin) gets its own slot
+    cent = reserve_detail(cent, sample, seed, max_err=40.0, min_count=max(8, int(0.004 * len(sample))))
     if detail_px is not None and len(detail_px) >= 8:
         cent = reserve_detail(cent, detail_px.astype(np.float32), seed)
     cent = snap15(cent).astype(np.float32)
@@ -274,14 +276,14 @@ def sheet_palette(pixel_sets: list[np.ndarray], colors: int, seed: int = 0,
 
 
 def reserve_detail(cent: np.ndarray, detail_px: np.ndarray, seed: int = 0, max_err: float = 45.0,
-                   max_slots: int = 2) -> np.ndarray:
+                   max_slots: int = 2, min_count: int = 8) -> np.ndarray:
     """Make sure small features (eyes) keep their own colour: if many detail pixels sit far from every palette
     colour, merge the two closest palette colours and give the freed slot to those pixels."""
     cent = cent.copy()
     for _ in range(max_slots):
         err = np.sqrt(((detail_px[:, None, :] - cent[None]) ** 2).sum(-1).min(1))
         far = detail_px[err > max_err]
-        if len(far) < 8:
+        if len(far) < min_count:
             break
         cd = ((cent[:, None] - cent[None]) ** 2).sum(-1)
         np.fill_diagonal(cd, np.inf)
@@ -292,7 +294,8 @@ def reserve_detail(cent: np.ndarray, detail_px: np.ndarray, seed: int = 0, max_e
 
 
 def pixelize_native(art: Image.Image, guide_mask: np.ndarray, out_size: tuple[int, int], colors: int = 14,
-                    seed: int = 0, bottom_row: int | None = None, ink_max: int = 40) -> tuple[Image.Image, dict]:
+                    seed: int = 0, bottom_row: int | None = None, ink_max: int = 40,
+                    palette: np.ndarray | None = None) -> tuple[Image.Image, dict]:
     """1:1 path for renders that were drawn as pixel art: `art` is already one pixel per art pixel.
 
     No resampling: background key, prop filter, palette snap (k-means only if there are more colours than
@@ -307,7 +310,9 @@ def pixelize_native(art: Image.Image, guide_mask: np.ndarray, out_size: tuple[in
         return Image.fromarray(out, "RGBA"), report
     px = rgb[fg].astype(np.float32)
     uniq = np.unique(rgb[fg].reshape(-1, 3), axis=0)
-    if len(uniq) > colors:
+    if palette is not None:
+        cent = palette.astype(np.float32).copy()
+    elif len(uniq) > colors:
         rng = np.random.default_rng(seed)
         sample = px[rng.choice(len(px), size=min(len(px), 20000), replace=False)]
         cent = snap15(kmeans(sample, colors, seed=seed)).astype(np.float32)

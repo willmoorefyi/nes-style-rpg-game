@@ -1,0 +1,32 @@
+{
+  "character": "white_mage",
+  "sheet": "field",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "dd0ae3c8f32c7f86ef114d7d",
+  "approved": "2026-11-12",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "native-scaled or resampled; side row drawn facing right and mirrored"
+}

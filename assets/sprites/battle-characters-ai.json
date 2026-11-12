@@ -23,11 +23,17 @@
     "monk": {
       "row": 2
     },
-    "warrior": {
+    "red_mage": {
       "row": 3
     },
-    "white_mage": {
+    "thief": {
       "row": 4
+    },
+    "warrior": {
+      "row": 5
+    },
+    "white_mage": {
+      "row": 6
     }
   }
 }
