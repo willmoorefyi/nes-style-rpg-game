@@ -1,0 +1,25 @@
+{
+  "character": "lich",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "a93fe92cbfc51785f137d1f6",
+  "approved": "2026-11-12",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "Rime Sovereign idle; haze cleanup removes the mist blended into the key"
+}

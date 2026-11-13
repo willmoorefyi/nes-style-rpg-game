@@ -1,0 +1,25 @@
+{
+  "character": "lich",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "6926acecac2d26eff1f70ff5",
+  "approved": "2026-11-12",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "Rime Sovereign hurt (action prompt)"
+}

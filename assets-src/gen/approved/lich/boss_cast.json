@@ -1,0 +1,25 @@
+{
+  "character": "lich",
+  "sheet": "boss_cast",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "67885c0396385cbe90a01859",
+  "approved": "2026-11-12",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "cast"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "Rime Sovereign cast (action prompt)"
+}

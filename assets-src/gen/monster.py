@@ -81,13 +81,74 @@ def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool) -> str:
     )
 
 
+def pose_guide(band: S.MonsterBand, floating: bool = False) -> Image.Image:
+    """Square single-pose guide (per-pose bosses): size box for the band's top height, ground line, facing arrow."""
+    w, h = S.MONSTER_POSE_GUIDE
+    img = Image.new("RGB", (w, h), (255, 255, 255))
+    d = ImageDraw.Draw(img)
+    side = int(min(band.height[1] * S.MONSTER_EXPECTED_PITCH, h - 110))
+    ground = h - 40
+    x0, y1 = (w - side) // 2, ground - (60 if floating else 0)
+    d.rectangle([x0, y1 - side, x0 + side, y1], fill=GUIDE_BOX)
+    if not floating:
+        d.line([30, ground, w - 30, ground], fill=GUIDE_LINE, width=5)
+    ax, ay = x0 + side // 2, y1 - side - 26
+    d.line([ax - 70, ay, ax + 50, ay], fill=GUIDE_ARROW, width=10)
+    d.polygon([(ax + 76, ay), (ax + 46, ay - 20), (ax + 46, ay + 20)], fill=GUIDE_ARROW)
+    return img
+
+
+def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> str:
+    face = m.get("face") or "its face is clearly readable, drawn at the same sprite-pixel size as the body"
+    action = {"idle": "idle, a ready battle stance", "attack": m["attack"].strip(),
+              "cast": (m.get("cast") or "casting a spell, one hand raised with magic gathering").strip(),
+              "hurt": m["hurt"].strip() + ", recoiling away from the heroes (leaning left), still facing right"}[pose]
+    identity = ("Image 3 is the APPROVED LOOK of this exact boss in its idle pose (pixel art). Keep the identical "
+                "design, armour, colours, proportions and size; only the pose changes.\n\n") if has_identity else ""
+    # action poses: the look without static staging details (e.g. mist), plus direction for movement
+    look = (m.get("action_prompt") or m["prompt"]) if pose != "idle" else m["prompt"]
+    motion = ("" if pose == "idle" else
+              "MOVEMENT: this is a dramatic ACTION frame of a huge, intimidating boss, not a static stance. Use a "
+              "strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist "
+              "the torso, extend the limbs and weapon far from the body, and let the mantle and loose armour edges "
+              "fly with the motion. The silhouette must be very different from the idle reference. Limbs, mantle "
+              "and weapon may reach beyond the sides of the grey box. No mist, smoke or ground effects.\n\n")
+    return (
+        "Create ONE large boss monster sprite for a modern 16-bit-style pixel-art RPG battle (a single figure).\n\n"
+        "Image 1 is a LAYOUT GUIDE: the light-grey box shows where the boss stands and how big it is (fill the box), "
+        "the grey line is the ground, and the arrow shows the facing: the boss faces RIGHT, toward the heroes. Never "
+        "draw the grey box, line or arrow.\n\n"
+        "Image 2 is the HOUSE STYLE: an approved hero sprite sheet from this same game. Match its sprite-pixel size, "
+        "black outlines, crisp cel shading and level of detail exactly, but do NOT copy the hero.\n\n"
+        + identity +
+        f"Render as true pixel art: the boss about {band.height[0]}-{band.height[1]} pixels tall in sprite pixels, "
+        "every sprite pixel a hard-edged square, no anti-aliasing, no gradients, rich detail and 3-4 tones per "
+        "colour like a premium modern pixel-art boss.\n\n"
+        f"Boss: {look.strip()}. FACE: {face}.\n\n"
+        f"Pose: {action}, facing right.\n\n"
+        + motion +
+        "Only the boss: no other characters, no scenery, no floor tiles, no text.\n"
+        "Background: solid flat magenta (#FF00FF) everywhere, no shadows, no borders, no panels.\n"
+        f"Avoid: {S.MONSTER_NEGATIVE}{', ' + m['extra_negative'] if m.get('extra_negative') else ''}."
+    )
+
+
 # ───────────────────────────── cut ─────────────────────────────
 
-def _figure_mask(rgb: np.ndarray) -> np.ndarray:
+def _haze(rgb: np.ndarray) -> np.ndarray:
+    """Pale magenta-tinted pixels: semi-transparent effects (mist, glow) Gemini blended into the key colour."""
+    f = rgb.astype(np.int32)
+    r, g, b = f[..., 0], f[..., 1], f[..., 2]
+    return (r - g > 10) & (b - g > 30) & (np.minimum(r, b) > 130)
+
+
+def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     """Foreground of one cell. Background = magenta (the requested key) plus anything near-white or magenta connected
     to the cell border (Gemini sometimes draws magenta panels on a white page). Then keep the main figure: the largest
     blob and any blob overlapping its bounding box (staffs, held items); drop stray blobs outside it (shadows)."""
     bg = PX.magenta_bg(rgb)
+    if haze:   # opt-in (monsters.yaml `haze: true`): blended mist touching the background is background too
+        bg = bg | _haze(rgb)
     near_white = rgb.min(axis=2) > 225
     border_bg = PX.flood_bg(np.where((bg | near_white)[..., None], 255, 0).astype(np.uint8).repeat(3, 2), 10.0)
     fg = ~(bg | (near_white & border_bg))
@@ -100,17 +161,19 @@ def _figure_mask(rgb: np.ndarray) -> np.ndarray:
     ys, xs = np.where(lab == main)
     y0, y1, x0, x1 = ys.min(), ys.max(), xs.min(), xs.max()
     keep = [main]
+    pad = int(0.15 * (y1 - y0 + 1))     # floating parts of the figure (a spell crystal over a hand) sit just outside
     for i in range(1, n + 1):
         if i == main or sizes[i - 1] < 3:
             continue
         cy, cx = np.where(lab == i)
         inside = (cy.min() <= y1) and (cy.max() >= y0) and (cx.min() <= x1) and (cx.max() >= x0)
-        if inside and sizes[i - 1] >= STRAY_FRAC * sizes.max() * 0.25:
+        near = (cy.max() >= y0 - pad) and (cy.min() <= y1 + pad) and (cx.max() >= x0 - pad) and (cx.min() <= x1 + pad)
+        if (inside and sizes[i - 1] >= STRAY_FRAC * sizes.max() * 0.25) or (near and sizes[i - 1] >= 0.004 * sizes.max()):
             keep.append(i)
     return np.isin(lab, keep)
 
 
-def native_art(raw: Image.Image) -> tuple[Image.Image, dict]:
+def native_art(raw: Image.Image, guide_width: int = S.MONSTER_GUIDE_CELL[0] * 3) -> tuple[Image.Image, dict]:
     """One pixel per sprite pixel: Gemini's own grid when detectable, else an area-average at the expected pitch."""
     rgb = np.asarray(raw.convert("RGB"))
     _, info = PX.clean_resample(raw, raw.size, min_conf=0.45)
@@ -123,29 +186,33 @@ def native_art(raw: Image.Image) -> tuple[Image.Image, dict]:
     if info.get("native") is not None:
         meta["mode"] = "grid"
         return info["native"], meta
-    pitch = S.MONSTER_EXPECTED_PITCH * raw.width / (S.MONSTER_GUIDE_CELL[0] * 3)
+    pitch = S.MONSTER_EXPECTED_PITCH * raw.width / guide_width
     meta["mode"] = f"no grid, area-averaged at {pitch:.2f} px"
     size = (max(1, round(rgb.shape[1] / pitch)), max(1, round(rgb.shape[0] / pitch)))
     return Image.fromarray(rgb).resize(size, Image.Resampling.BOX), meta
 
 
 def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: int = 16,
-        seed: int = 0) -> tuple[list[Image.Image], dict]:
-    native, info = native_art(raw)
+        seed: int = 0, n_cells: int = 3, cell: int | None = None,
+        foot_row: int | None = None, haze: bool = False) -> tuple[list[Image.Image], dict]:
+    """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell)."""
+    native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
-    cells = [a[:, round(i * w / 3):round((i + 1) * w / 3)] for i in range(3)]
-    masks = [_figure_mask(c) for c in cells]
+    cells = [a[:, round(i * w / n_cells):round((i + 1) * w / n_cells)] for i in range(n_cells)]
+    masks = [_figure_mask(c, haze) for c in cells]
     heights = []
     for m in masks:
         ys = np.where(m.any(1))[0]
         heights.append(int(ys.max() - ys.min() + 1) if len(ys) else 0)
     tallest = max(heights) or 1
     lo, hi = band.height
+    if foot_row is not None:
+        hi = max(hi, foot_row + 1)        # larger per-pose cells: use their full height before rescaling
     # keep Gemini's pixels 1:1 unless the figure is clearly outside the band (rescaling by a few % drops or doubles
     # single pixel rows); far outside, nearest-neighbour scale to the band edge
     f = hi / tallest if tallest > hi * (1 + HEIGHT_TOLERANCE) else lo / tallest if tallest < lo * (1 - HEIGHT_TOLERANCE) else 1.0
-    info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / 3, 1), h)})
+    info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / n_cells, 1), h)})
 
     scaled, smasks = [], []
     for c, m in zip(cells, masks):
@@ -168,14 +235,15 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         ys, xs = np.where(fig[..., 3] > 0)
         return int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
 
-    c = band.cell
+    c = cell or band.cell
+    foot = foot_row if foot_row is not None else band.foot_row
     ix0, iy0, ix1, iy1 = bbox(figs[0])
     dx = c // 2 - (ix0 + ix1 + 1) // 2           # one horizontal shift for all frames (keeps lunges and recoils)
-    dy_shared = band.foot_row - iy1
+    dy_shared = foot - iy1
     frames, clipped = [], []
     for k, fig in enumerate(figs):
         x0, y0, x1, y1 = bbox(fig)
-        dy = dy_shared if floating else band.foot_row - y1
+        dy = dy_shared if floating else foot - y1
         out = np.zeros((c, c, 4), np.uint8)
         sx0, sy0 = max(0, -dx), max(0, -dy)
         tx0, ty0 = max(0, dx), max(0, dy)
@@ -200,7 +268,7 @@ def frame_report(frames: list[Image.Image], band: S.MonsterBand) -> dict:
         bottoms.append(int(ys.max()) if len(ys) else -1)
         colours.append(len({tuple(c) for c in x[m][:, :3].tolist()}))
     idle = alpha[0].sum() or 1
-    diff = [round(float((alpha[0] ^ alpha[k]).sum()) / idle, 2) for k in (1, 2)]
+    diff = [round(float((alpha[0] ^ alpha[k]).sum()) / idle, 2) for k in range(1, len(alpha))]
     outline = all((x[m][:, :3] == np.array(PX.OUTLINE)).all(1).any() for x, m in zip(arr, alpha))
     return {"heights": heights, "bottoms": bottoms, "colours": max(colours), "outline": outline,
             "pose_diff": diff,

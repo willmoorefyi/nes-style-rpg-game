@@ -44,6 +44,10 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
             "bottom_row": g.bottom_row, "layout": list(g.layout)}
     if sheet_name == "battle":
         meta["poses"] = list(sheet.order)
+    elif sheet_name.startswith("boss_"):
+        # one pose of a per-pose boss; monsters_ai combines idle / attack / hurt once all three are approved
+        meta.update({"poses": [sheet_name.removeprefix("boss_")], "size": char.get("size", "boss"),
+                     "floating": bool(char.get("floating")), "flip_frames": (flip_frames or {}).get("row", [])})
     elif sheet_name.startswith("monster_"):
         # monster sheet: idle | attack | hurt in one row; per-frame mirroring is applied by the monsters_ai build stage
         meta.update({"poses": list(S.MONSTER_POSES), "size": char.get("size", "small"),

@@ -275,6 +275,8 @@ class CharacterSpec:
 # 7:3 is not accepted by Gemini, hence aspect_override). `grid` is the OUTPUT cell per size band; guide cells are not a
 # multiple of it because monsters are cut by their own path (monster.py), which measures Gemini's pixel grid.
 MONSTER_POSES = ["idle", "attack", "hurt"]
+# Per-pose bosses also get a spell-casting stance (not wired into battle yet; the atlas carries it as `cast`).
+BOSS_POSES = ["idle", "attack", "cast", "hurt"]
 MONSTER_GUIDE_CELL = (560, 720)
 MONSTER_EXPECTED_PITCH = 5.33     # guide px per sprite px seen on the character sheets; pilot A measures the real one
 
@@ -301,3 +303,11 @@ MONSTER_NEGATIVE = (
     "two creatures in one cell, different creatures in different cells, background scenery, floor tiles, shadows on the "
     "ground, magic effects outside the cell, text, frame, border, grid lines, blurry, soft shading, gradient, 3d render"
 )
+
+# Bosses can be drawn one pose per request (`per_pose: true` in monsters.yaml): a square 1024 guide gives Gemini room
+# for a ~170-190 px figure, so the boss keeps the party's pixel density without enlarging.
+MONSTER_POSE_GUIDE = (1024, 1024)
+# The output cell is larger than the 3-pose boss cell: single-pose renders come back ~185 px tall at 1:1, and art is
+# never shrunk to fit (that drops pixel rows).
+BOSS_POSE_GEOM = SheetGeom("boss_pose", grid=(200, 200), cell_px=MONSTER_POSE_GUIDE, layout=(1, 1), px_per_unit=1.0,
+                           bottom_row=192)

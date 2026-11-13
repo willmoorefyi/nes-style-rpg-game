@@ -77,6 +77,8 @@ SHEETS: dict[str, Sheet] = {
     "field": Sheet("field", S.FIELD3_POSES, S.FIELD_ORDER, S.FIELD3_GEOM, "overworld walking", "", S.FIELD_TARGET_PX),
     **{f"monster_{size}": Sheet(f"monster_{size}", {}, S.MONSTER_POSES, geom, "monster battle", "", "")
        for size, geom in S.MONSTER_GEOMS.items()},
+    **{f"boss_{pose}": Sheet(f"boss_{pose}", {}, [pose], S.BOSS_POSE_GEOM, "boss battle", "", "")
+       for pose in S.BOSS_POSES},
 }
 MONSTER_SPRITES = HERE.parent.parent / "assets" / "sprites" / "monsters"
 
@@ -211,6 +213,8 @@ def house_images(char: dict, sheet: Sheet) -> list[Image.Image]:
 def allowed_sheets(char: dict) -> list[str]:
     """Sheets a character may request: NPCs are field-only (`sheets: [field]`); classes get battle + field."""
     if is_monster(char):
+        if char.get("per_pose"):
+            return [f"boss_{pose}" for pose in S.BOSS_POSES]
         return [f"monster_{char.get('size', 'small')}"]
     return char.get("sheets") or [n for n in SHEETS if not n.startswith("monster_")]
 
@@ -247,10 +251,19 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
             raise SystemExit("refused: monster sheets are Gemini-only")
         from gen import gemini as GM
         band = monster_band(char)
-        guide = M.guide(band, bool(char.get("floating")))
-        ref = design_ref(char)
-        images = [guide, ref_image(S.HOUSE_REFS["battle"])] + ([ref] if ref is not None else [])
-        prompt = M.prompt(char, band, ref is not None)
+        if sheet.name.startswith("boss_"):
+            pose = sheet.name.removeprefix("boss_")
+            guide = M.pose_guide(band, bool(char.get("floating")))
+            identity = []
+            if pose != "idle":     # attack / hurt match the approved idle pose
+                identity = [ref_image(f"assets-src/gen/approved/{char['id']}/boss_idle.png")]
+            images = [guide, ref_image(S.HOUSE_REFS["battle"])] + identity
+            prompt = M.pose_prompt(char, band, pose, bool(identity))
+        else:
+            guide = M.guide(band, bool(char.get("floating")))
+            ref = design_ref(char) if char.get("design_ref", True) is not False else None
+            images = [guide, ref_image(S.HOUSE_REFS["battle"])] + ([ref] if ref is not None else [])
+            prompt = M.prompt(char, band, ref is not None)
         mid = model or GM.DEFAULT_MODEL
         key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
         run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
@@ -336,9 +349,13 @@ LAST_RESAMPLE: dict = {}
 def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, seed: int) -> list[Image.Image]:
     """Pixel-perfect path when the render has a detectable pixel grid whose cell size matches the sheet grid;
     otherwise fall back to block resampling (with a warning in the review stats)."""
-    if sheet.name.startswith("monster_"):
+    if sheet.name.startswith(("monster_", "boss_")):
         frames, info = M.cut(raw, monster_band(char), bool(char.get("floating")),
-                             colors=char.get("palette_size", 16), seed=seed)
+                             colors=char.get("palette_size", 16), seed=seed,
+                             n_cells=1 if sheet.name.startswith("boss_") else 3,
+                             cell=sheet.geom.grid[0] if sheet.name.startswith("boss_") else None,
+                             foot_row=sheet.geom.bottom_row if sheet.name.startswith("boss_") else None,
+                             haze=bool(char.get("haze")))
         info["report"] = M.frame_report(frames, monster_band(char))
         LAST_RESAMPLE[sheet.name] = info
         return frames
@@ -556,7 +573,7 @@ def repixelize(outdir: Path) -> None:
         raw_path = outdir / f"{name}_raw.png"
         if not raw_path.exists():
             continue
-        if name.startswith("monster_"):
+        if name.startswith(("monster_", "boss_")):
             mchar = load_character(char_id)
             raw = Image.open(raw_path).convert("RGBA")
             frames = cut_frames(raw, M.guide(monster_band(mchar)), sheet, mchar, seed)
@@ -601,7 +618,7 @@ def main(argv: list[str] | None = None) -> None:
         ap.error("character and --backend are required (or use --repixelize OUT_DIR)")
     char = load_character(args.character)
     seeds = [int(s) for s in args.seeds.split(",")] if args.seeds else char.get("seeds", [1234])
-    names = [f"monster_{char.get('size', 'small')}" if n == "monster" else n for n in args.sheets.split(",")]
+    names = [allowed_sheets(char)[0] if n == "monster" else n for n in args.sheets.split(",")]
     unknown = [n for n in names if n not in SHEETS]
     if unknown:
         ap.error(f"unknown sheets {unknown}; choose from {list(SHEETS)}")

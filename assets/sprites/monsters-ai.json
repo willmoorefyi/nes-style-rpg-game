@@ -22,6 +22,54 @@
           0
         ]
       }
+    },
+    "ogre": {
+      "cell": [
+        128,
+        128
+      ],
+      "footRow": 122,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          80
+        ],
+        "attack": [
+          128,
+          80
+        ],
+        "hurt": [
+          256,
+          80
+        ]
+      }
+    },
+    "lich": {
+      "cell": [
+        200,
+        200
+      ],
+      "footRow": 192,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          208
+        ],
+        "attack": [
+          200,
+          208
+        ],
+        "hurt": [
+          400,
+          208
+        ],
+        "cast": [
+          600,
+          208
+        ]
+      }
     }
   }
 }

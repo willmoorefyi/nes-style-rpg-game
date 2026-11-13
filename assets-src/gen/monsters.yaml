@@ -96,13 +96,39 @@
   face: the face is hidden by the horned helmet; two glowing red eyes in the visor slit are readable in every cell
   seeds: [1234]
 - id: lich
+  # "the Rime Sovereign": original frost-undead knight-king boss (no legacy design reference; one image per pose)
   size: boss
-  floating: true
+  per_pose: true
+  design_ref: false
+  haze: true        # the mist at his feet is blended into the magenta key; clean it as background
   prompt: >-
-    towering lich: a skull with glowing green eyes and a jagged golden crown, wearing a flowing purple hooded robe with
-    shoulder spikes, a black and gold chest panel with a green gem, holding a staff topped with a small skull in one
-    bony hand and a glowing green orb in the other, floating above the ground with a dark aura
-  attack: thrusting the green orb forward to cast a blast of green magic, robe billowing
-  hurt: recoiling backward, robe crumpling, crown tilted
-  face: the skull's face with two glowing green eyes and a toothed jaw is readable in every cell
+    the Rime Sovereign, a towering gaunt undead knight-king in tall layered blackened-iron plate armour with frost
+    creeping over every edge, broad swept-back pauldrons shaped like frozen wings, a long tattered grey-blue mantle
+    hanging from the shoulders; no helmet: a bare cracked skull with a crown of jagged icicles growing out of the bone
+    and a thin rim of old tarnished gold, two pale cyan pinpoints of light deep in the eye sockets; he holds a long
+    two-handed glaive whose blade is clouded blue ice with faint cyan rune light running down the dark haft; cold mist
+    pools around his armoured boots and a few small ice shards hover near him; palette of blackened iron, frost white,
+    glacier blue and cyan glow with a single accent of tarnished gold
+  action_prompt: >-
+    the Rime Sovereign, a towering gaunt undead knight-king in tall layered blackened-iron plate armour with frost
+    creeping over every edge, broad swept-back pauldrons shaped like frozen wings, a long tattered grey-blue mantle
+    hanging from the shoulders; no helmet: a bare cracked skull with a crown of jagged icicles growing out of the bone
+    and a thin rim of old tarnished gold, two pale cyan pinpoints of light deep in the eye sockets; he wields a long
+    two-handed glaive whose blade is clouded blue ice with faint cyan rune light running down the dark haft; palette of
+    blackened iron, frost white, glacier blue and cyan glow with a single accent of tarnished gold
+  attack: >-
+    a ferocious lunging two-handed glaive slash: he steps far forward onto his front leg toward the heroes, back leg
+    stretched out behind, torso twisted hard into the swing, the glaive sweeping in a huge arc from high behind his
+    head down toward the heroes, mantle and pauldron edges whipping back with the motion, a short frost trail behind
+    the blade
+  cast: >-
+    a towering spell-casting stance: he rears up to full height, chest thrust out and skull tilted back, one gauntleted
+    arm thrust high overhead with a large crystal of freezing cyan magic forming above the open palm, the other arm
+    swinging the glaive out wide to the side, feet planted wide apart, mantle billowing upward in a magical wind
+  hurt: >-
+    violently knocked back by a heavy blow: torso bent and twisted away from the heroes, one arm thrown up across his
+    face, knees buckling, the glaive dipping toward the ground, cracks and small ice shards bursting from his chest
+    armour, mantle flung forward around him
+  face: the skull face with two pale cyan eye lights and a toothed jaw is readable
+  extra_negative: a helmet or mask covering the skull, a sword, skulls on the shoulders, a throne, a second weapon
   seeds: [1234]

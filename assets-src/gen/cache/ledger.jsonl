@@ -77,3 +77,17 @@
 {"event": "result", "key": "5c00115db9f09bd1af0f7038", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T19:19:53", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "monster_boss", "seed": 1234, "key": "c048930f50c3cf9cc8ef475b"}
 {"event": "result", "key": "c048930f50c3cf9cc8ef475b", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T19:56:44", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_idle", "seed": 1234, "key": "a93fe92cbfc51785f137d1f6"}
+{"event": "result", "key": "a93fe92cbfc51785f137d1f6", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:06:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_attack", "seed": 1234, "key": "fd4a597270463124415648c8"}
+{"event": "result", "key": "fd4a597270463124415648c8", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:06:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_cast", "seed": 1234, "key": "24ba1bca7bfcdc908f0fc8e8"}
+{"event": "result", "key": "24ba1bca7bfcdc908f0fc8e8", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:07:00", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_hurt", "seed": 1234, "key": "f5d818bfeab6a273b652933b"}
+{"event": "result", "key": "f5d818bfeab6a273b652933b", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:13:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_attack", "seed": 1234, "key": "048972da1bcf66f2b27f7db0"}
+{"event": "result", "key": "048972da1bcf66f2b27f7db0", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:13:15", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_cast", "seed": 1234, "key": "67885c0396385cbe90a01859"}
+{"event": "result", "key": "67885c0396385cbe90a01859", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:13:21", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_hurt", "seed": 1234, "key": "6926acecac2d26eff1f70ff5"}
+{"event": "result", "key": "6926acecac2d26eff1f70ff5", "ok": true}

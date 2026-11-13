@@ -251,6 +251,22 @@ def build_monsters_ai() -> None:
         for i in meta.get("flip_frames", []):
             frames[i] = frames[i].transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         entries.append((meta["character"], meta, frames))
+    # per-pose bosses: approved/<id>/boss_{idle,attack,hurt}.png (one frame each), combined once all three exist
+    for idle_meta in sorted(APPROVED.glob("*/boss_idle.json")):
+        parts = [idle_meta.with_name(f"boss_{p}.json") for p in ("idle", "attack", "hurt")]
+        if not all(p.exists() for p in parts):
+            print(f"monsters_ai: {idle_meta.parent.name} boss poses incomplete, skipped")
+            continue
+        cast = idle_meta.with_name("boss_cast.json")      # optional spell stance
+        poses = ["idle", "attack", "hurt"] + (["cast"] if cast.exists() else [])
+        parts = [idle_meta.with_name(f"boss_{p}.json") for p in poses]
+        metas = [json.loads(p.read_text()) for p in parts]
+        frames = []
+        for p, m in zip(parts, metas):
+            f = Image.open(p.with_suffix(".png")).convert("RGBA")
+            frames.append(f.transpose(Image.Transpose.FLIP_LEFT_RIGHT) if 0 in m.get("flip_frames", []) else f)
+        meta = {**metas[0], "poses": poses}
+        entries.append((meta["character"], meta, frames))
     if not entries:
         print("monsters_ai: no approved monster sheets")
         return
@@ -258,7 +274,7 @@ def build_monsters_ai() -> None:
     for cid, meta, frames in list(entries):
         for variant in specs.get(cid, {}).get("variants", []) or []:
             entries.append((variant["id"], meta, [M.recolor(f, variant) for f in frames]))
-    width = max(3 * e[1]["grid"][0] for e in entries)
+    width = max(len(e[2]) * e[1]["grid"][0] for e in entries)
     height = sum(e[1]["grid"][1] for e in entries)
     atlas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     sheets, y = {}, 0

@@ -162,7 +162,8 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       const h = png.readUInt32BE(20);
       const s = meta!.scale;
       for (const [id, e] of Object.entries(meta!.sheets)) {
-        expect(Object.keys(e.frames).sort(), id).toEqual(['attack', 'hurt', 'idle']);
+        // idle, attack and hurt are required; bosses may add a `cast` stance
+        expect(Object.keys(e.frames).filter((k) => k !== 'cast').sort(), id).toEqual(['attack', 'hurt', 'idle']);
         for (const [x, y] of Object.values(e.frames)) {
           expect((x + e.cell[0]) * s, id).toBeLessThanOrEqual(w);
           expect((y + e.cell[1]) * s, id).toBeLessThanOrEqual(h);

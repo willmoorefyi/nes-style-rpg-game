@@ -280,3 +280,23 @@ Total: 12 images plus retries.
 - Death and status poses, and per-spell casting animations.
 - Tiles and backdrops (6b/6c).
 - Making AI art the default.
+
+## Results of the pilots (2026-11-12)
+
+- **Measured output:** a 21:9 request returns 1584x672. Goblin pitch 6.6 px (80x101 sprite px per cell); ogre and lich
+  pitch 5.34 px. Large monsters fit at 1:1 (ogre 89–102 px), so the large-band density gate is passed.
+- **Bosses are drawn one pose per request** (`per_pose: true`):
+  - a square 1024 guide, a 200 px output cell, and about 185 px figures at 1:1 (pitch 5.12, grid confidence ~0.85)
+  - attack, cast and hurt each send the approved idle as identity
+  - the action poses use `action_prompt` (no static staging such as mist) plus explicit movement direction
+  - the user approved this for bosses: 4 images per boss
+- **Boss `cast` stance:** bosses get a fourth pose, carried in the atlas as `cast`; not wired into battle yet.
+- **The lich is redesigned** as an original frost-undead knight-king ("the Rime Sovereign"; id `lich` unchanged), with no
+  legacy design reference.
+- **Cut fixes:**
+  - white-page backgrounds are treated as background
+  - weak-but-plausible grids are point-sampled at Gemini's pitch
+  - art within 10% of the band is kept 1:1
+  - opt-in `haze` removes magenta-blended mist
+  - sizeable floating parts next to the figure (a spell crystal) are kept
+- **Approved:** goblin, ogre, lich (4 poses). Remaining: 9 monsters (checkpoint D).
