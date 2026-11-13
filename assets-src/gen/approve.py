@@ -49,7 +49,7 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
         report = json.loads((src / f"{sheet_name}_report.json").read_text())
         meta = {"kit": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
                 "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"), "tile": 48,
-                "cells": report.pop("cells"), "metrics": report}
+                "cells": report.pop("cells", []), "materials": report.pop("materials", {}), "metrics": report}
         if note:
             meta["note"] = note
         (dst / f"{part}.json").write_text(json.dumps(meta, indent=2) + "\n")

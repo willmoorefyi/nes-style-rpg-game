@@ -31,3 +31,27 @@
         and right. A wooden plank door with a dark frame stands in the right-centre of the wall, from about the
         middle of the wall down to the bottom edge; a small four-pane window with a wooden frame sits in the upper
         part of the wall left of the door; the rest of the wall is plain.
+    ground:
+      # checkpoint B: seamless ground materials, 2x2 map tiles (96 native px) per swatch, made seamless offline
+      kind: materials
+      seed: 1234
+      refs: [house]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 236
+      swatch_tiles: 2
+      layout:
+        - [grass, cobble]
+        - [dirt, water]
+      materials:
+        grass: >
+          short lush meadow grass in two or three close greens, small scattered tufts and a few tiny lighter
+          blades, evenly spread with no flowers, rocks or paths.
+        cobble: >
+          a town street of rounded grey cobblestones of mixed sizes, packed closely with thin dark gaps between them,
+          a few slightly bluish or warmer stones, evenly spread.
+        dirt: >
+          packed light-brown earth of a country path, with tiny pebbles and faint darker specks, evenly spread.
+        water: >
+          calm blue river water with small light ripple marks and a few highlights, evenly spread, no foam edges and
+          no shore.

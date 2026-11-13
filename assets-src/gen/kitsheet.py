@@ -450,3 +450,197 @@ def review(raw: Image.Image, sheet: Image.Image, report: dict, cells: list[list[
     d.text((4, out.height - 30), " ".join(f"{k}={v}" for k, v in report.items() if k != "pass"), fill="white")
     d.text((4, out.height - 16), "PASS " + str(report["pass"]), fill="white")
     return out
+
+
+# ───────────────────────────── material sheets (checkpoint B) ─────────────────────────────
+# A 2x2 arrangement of square swatches on a magenta page, each `swatch_tiles` x `swatch_tiles` map tiles. The cut
+# finds each swatch, resamples it to native size with one shared palette and makes it seamless (wrap-around).
+
+def swatch_boxes(sheet: dict) -> list[tuple[int, int, int, int]]:
+    size, tile = geo(sheet)
+    n = sheet.get("swatch_tiles", 2) * tile
+    layout = sheet["layout"]
+    rows, cols = len(layout), len(layout[0])
+    gap = (size[0] - cols * n) // (cols + 1), (size[1] - rows * n) // (rows + 1)
+    return [(gap[0] + c * (n + gap[0]), gap[1] + r * (n + gap[1]), gap[0] + c * (n + gap[0]) + n, gap[1] + r * (n + gap[1]) + n)
+            for r in range(rows) for c in range(cols)]
+
+
+def materials_guide(sheet: dict) -> Image.Image:
+    size, _ = geo(sheet)
+    im = Image.new("RGB", size, MAGENTA)
+    d = ImageDraw.Draw(im)
+    for box in swatch_boxes(sheet):
+        d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=(170, 170, 170))
+    return im
+
+
+def materials_prompt(sheet: dict, n_refs: int) -> str:
+    layout = sheet["layout"]
+    pos = {(0, 0): "top-left", (0, 1): "top-right", (1, 0): "bottom-left", (1, 1): "bottom-right"}
+    n_px = sheet.get("swatch_tiles", 2) * 48
+    lines = "\n".join(f"- {pos[(r, c)]} square: {sheet['materials'][name].strip()}"
+                      for r, row in enumerate(layout) for c, name in enumerate(row))
+    refs = "".join(f"Image {3 + i} is approved art from this same game (a building on this map): match its colours, "
+                   "outline weight and shading.\n" for i in range(n_refs))
+    return (
+        "Create four ground textures for a modern 16-bit-style top-down RPG map (seen from straight above, like the "
+        "ground of a classic SNES JRPG town).\n\n"
+        "Image 1 is a PLACEMENT GUIDE on a magenta page: fill each grey square edge to edge with one texture. Do not "
+        "copy the grey colour.\n\n"
+        "Image 2 is the HOUSE STYLE: the approved walking sprite of a character from this game at the same pixel "
+        f"scale as the map. Each square is about {n_px} sprite pixels wide and tall; this character is about 90 "
+        "sprite pixels tall. Match its sprite-pixel size exactly and its flat 2-3 tone shading with light from the "
+        "upper left. Ground is calmer than characters: lower contrast, no black outlines inside the texture.\n\n"
+        + refs + "\n"
+        "Textures:\n" + lines + "\n\n"
+        "Each texture must be a SEAMLESS repeating pattern: its left edge continues into its right edge and its top "
+        "edge into its bottom edge, with even detail and no large features, no borders, no frames and no objects. "
+        "Render as true pixel art: every sprite pixel a hard-edged square, no anti-aliasing, no gradients, no blur. "
+        "Between the squares: solid flat magenta (#FF00FF), no text.\n"
+    )
+
+
+def _min_path(err: np.ndarray, lo: int, hi: int) -> np.ndarray:
+    """Per row, a column in [lo, hi) forming a connected path (moves at most 1 per row) of least total error."""
+    sub = err[:, lo:hi].astype(np.float64)
+    h, w = sub.shape
+    cost = sub.copy()
+    back = np.zeros((h, w), np.int64)
+    for y in range(1, h):
+        prev = np.stack([np.r_[np.inf, cost[y - 1, :-1]], cost[y - 1], np.r_[cost[y - 1, 1:], np.inf]])
+        k = prev.argmin(0)
+        back[y] = np.arange(w) + k - 1
+        cost[y] += prev[k, np.arange(w)]
+    path = np.zeros(h, np.int64)
+    path[-1] = int(cost[-1].argmin())
+    for y in range(h - 1, 0, -1):
+        path[y - 1] = back[y, path[y]]
+    return path + lo
+
+
+def make_seamless(tex: np.ndarray, band: int = 16, seed: int = 0) -> np.ndarray:
+    """Wrap-around fix for pixel art (image-quilting style): the swatch rolled by half its size is seamless at its
+    border. Near each border use the rolled copy, switching to the original along a least-error path through the
+    band (it follows mortar gaps and texture boundaries rather than cutting through stones); no colour blending, so
+    the palette is kept."""
+    h, w = tex.shape[:2]
+    rolled = np.roll(np.roll(tex, h // 2, 0), w // 2, 1)
+    err = np.abs(tex.astype(np.int32) - rolled.astype(np.int32)).sum(-1)
+    use_rolled = np.zeros((h, w), bool)
+    left = _min_path(err, 1, band)
+    right = _min_path(err, w - band, w - 1)
+    top = _min_path(err.T, 1, band)
+    bottom = _min_path(err.T, h - band, h - 1)
+    cols = np.arange(w)[None, :]
+    rows = np.arange(h)[:, None]
+    use_rolled |= cols < left[:, None]
+    use_rolled |= cols > right[:, None]
+    use_rolled |= rows < top[None, :]
+    use_rolled |= rows > bottom[None, :]
+    return np.where(use_rolled[..., None], rolled, tex)
+
+
+def wrap_ratio(tex: np.ndarray) -> float:
+    """Worst of the horizontal and vertical wrap seams (seam_ratio on the texture and its transpose)."""
+    return max(seam_ratio(tex), seam_ratio(np.transpose(tex, (1, 0, 2))))
+
+
+def cut_materials(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Image, dict]:
+    size, tile = geo(sheet)
+    n_tiles = sheet.get("swatch_tiles", 2)
+    N = n_tiles * 48
+    layout = sheet["layout"]
+    names = [name for row in layout for name in row]
+    rgb = np.asarray(raw.convert("RGB").resize(size, Image.Resampling.LANCZOS))
+    mag = PX.magenta_bg(rgb)
+    rows_n, cols_n = len(layout), len(layout[0])
+
+    def spans(frac: np.ndarray, n: int) -> list[tuple[int, int]]:
+        """The n longest runs of non-gap lines (a gap line is mostly magenta), in order."""
+        solid = frac < 0.5
+        runs, start = [], None
+        for i, v in enumerate(list(solid) + [False]):
+            if v and start is None:
+                start = i
+            elif not v and start is not None:
+                runs.append((start, i)); start = None
+        runs = sorted(sorted(runs, key=lambda r: r[1] - r[0], reverse=True)[:n])
+        if len(runs) != n:
+            raise ValueError(f"material sheet: expected {n} swatch bands, found {len(runs)}")
+        return runs
+
+    xs = spans(mag.mean(0), cols_n)
+    ys = spans(mag.mean(1), rows_n)
+    crops, boxes = [], []
+    for (y0, y1) in ys:
+        for (x0, x1) in xs:
+            m = max(3, (x1 - x0) // 40)              # trim the soft edge of the drawn square
+            boxes.append((x0 + m, y0 + m, x1 - m, y1 - m))
+            crops.append(rgb[y0 + m:y1 - m, x0 + m:x1 - m])
+    pitch, conf, _, _ = PX.detect_pitch(np.asarray(raw.convert("RGB")))
+    scale = raw.width / size[0]
+    per_colors = sheet.get("colors_per_material", 16)
+    out = np.zeros((len(layout) * N, len(layout[0]) * N, 3), np.uint8)
+    report = {"swatch_native_px": [], "wrap_before": {}, "wrap_after": {}, "materials": {}}
+    for i, (crop, name) in enumerate(zip(crops, names)):
+        lab, cent = _quantize(crop, per_colors, seed + i)       # each material keeps its own palette
+        idx = _block_mode(lab, N, N, len(cent))
+        tex = cent[idx]
+        report["wrap_before"][name] = round(wrap_ratio(tex), 2)
+        tex = make_seamless(tex, seed=seed + i)
+        report["wrap_after"][name] = round(wrap_ratio(tex), 2)
+        r, c = divmod(i, len(layout[0]))
+        out[r * N:(r + 1) * N, c * N:(c + 1) * N] = tex
+        report["materials"][name] = [c * N, r * N, N, N]
+        if conf > 0.3 and pitch:
+            report["swatch_native_px"].append(round((boxes[i][2] - boxes[i][0]) * scale / pitch, 1))
+    per_tile = [v / n_tiles for v in report["swatch_native_px"]]
+    report.update({"drawn_pitch_raw_px": round(pitch, 2), "pitch_conf": round(conf, 2),
+                   "native_px_per_tile": round(float(np.median(per_tile)), 1) if per_tile else None,
+                   "colours": int(len(np.unique(out.reshape(-1, 3), axis=0)))})
+    report["pass"] = {
+        # finer than 48 is fine for ground (the cut downsamples); coarser would mean upscaling
+        "density": report["native_px_per_tile"] is not None and report["native_px_per_tile"] >= 40,
+        "seamless": all(v <= 1.5 for v in report["wrap_after"].values()),
+        "colours": all(len(np.unique(out[r0:r0 + N, c0:c0 + N].reshape(-1, 3), axis=0)) <= per_colors
+                       for c0, r0, _, _ in report["materials"].values()),
+    }
+    return Image.fromarray(out), report
+
+
+def materials_review(raw: Image.Image, sheet_img: Image.Image, report: dict, house: Image.Image | None) -> Image.Image:
+    """Raw | the cut | each material repeated 3x3 at in-game 2x (seams show up here) with the house and knight on grass."""
+    N = sheet_img.height // 2
+    mats = report["materials"]
+    tiles = []
+    for name, (x, y, w, h) in mats.items():
+        t = sheet_img.crop((x, y, x + w, y + h))
+        big = Image.new("RGB", (w * 3, h * 3))
+        for j in range(3):
+            for i in range(3):
+                big.paste(t, (i * w, j * h))
+        tiles.append((name, big.resize((big.width * 2, big.height * 2), Image.Resampling.NEAREST)))
+    if house is not None and "grass" in mats:
+        g = tiles[[n for n, _ in tiles].index("grass")][1].convert("RGBA")
+        hz = house.convert("RGBA").resize((house.width * 2, house.height * 2), Image.Resampling.NEAREST)
+        g.alpha_composite(hz.crop((0, 0, hz.width, 4 * 96)), (40, 40))
+        knight = Image.open(ROOT / S.HOUSE_REFS["field"]).convert("RGBA").crop((0, 0, 48, 96))
+        g.alpha_composite(knight.resize((96, 192), Image.Resampling.NEAREST), (40 + hz.width + 20, 40 + 4 * 96 - 192))
+        tiles[[n for n, _ in tiles].index("grass")] = ("grass", g.convert("RGB"))
+    tw = tiles[0][1].width
+    W = 2 * (tw + 12) + 520
+    H = 2 * (tiles[0][1].height + 28) + 40
+    out = Image.new("RGB", (W, H), (40, 40, 44))
+    out.paste(raw.convert("RGB").resize((500, 500)), (0, 20))
+    d = ImageDraw.Draw(out)
+    d.text((4, 4), "raw", fill="white")
+    for i, (name, t) in enumerate(tiles):
+        x, y = 520 + (i % 2) * (tw + 12), 20 + (i // 2) * (t.height + 28)
+        out.paste(t, (x, y))
+        d.text((x + 2, y - 14), f"{name} x3 (in-game 2x)  wrap {report['wrap_before'][name]} -> {report['wrap_after'][name]}",
+               fill="white")
+    d.text((4, H - 30), f"px/tile {report['native_px_per_tile']} pitch {report['drawn_pitch_raw_px']} conf "
+                        f"{report['pitch_conf']} colours {report['colours']}", fill="white")
+    d.text((4, H - 16), "PASS " + str(report["pass"]), fill="white")
+    return out

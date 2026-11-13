@@ -325,6 +325,19 @@ def test_kits() -> None:
     check(rep["pass"]["seams"], f"plain repeated parts are seamless ({rep['seam_ratio']})")
     check(KS.seam_ratio(np.tile(np.arange(48, dtype=np.uint8)[None, :, None] * 5, (48, 1, 3))) > 1.5,
           "a ramp tile repeated horizontally fails the seam check")
+    # materials: a noisy ramp is not seamless; make_seamless fixes both axes and keeps the palette
+    rng = np.random.default_rng(1)
+    pal = np.array([[60, 120, 50], [70, 140, 60], [90, 160, 70], [40, 100, 40]], np.uint8)
+    idx = np.clip(rng.integers(0, 2, (96, 96)) + (np.arange(96)[None, :] // 40), 0, 3)
+    tex = pal[idx]
+    fixed = KS.make_seamless(tex)
+    check(KS.wrap_ratio(tex) > 1.5 >= KS.wrap_ratio(fixed), f"make_seamless: wrap {KS.wrap_ratio(tex):.2f} -> {KS.wrap_ratio(fixed):.2f}")
+    check({tuple(c) for c in fixed.reshape(-1, 3)} <= {tuple(c) for c in pal}, "make_seamless keeps the palette")
+    ground = GEN.kit_sheet(kit, "kit_ground")
+    mg = KS.materials_guide(ground)
+    boxes = KS.swatch_boxes(ground)
+    check(mg.size == tuple(ground["guide"]) and len(boxes) == 4 and all(b[2] - b[0] == 2 * ground["tile_px"] for b in boxes)
+          and boxes[0][2] < boxes[1][0], f"ground guide: four separate 2x2-tile squares {boxes}")
 
 
 if __name__ == "__main__":

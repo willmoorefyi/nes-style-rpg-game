@@ -1,0 +1,67 @@
+{
+  "kit": "town",
+  "sheet": "kit_ground",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "f198704a4b40e3627e425699",
+  "approved": "2026-11-12",
+  "tile": 48,
+  "cells": [],
+  "materials": {
+    "grass": [
+      0,
+      0,
+      96,
+      96
+    ],
+    "cobble": [
+      96,
+      0,
+      96,
+      96
+    ],
+    "dirt": [
+      0,
+      96,
+      96,
+      96
+    ],
+    "water": [
+      96,
+      96,
+      96,
+      96
+    ]
+  },
+  "metrics": {
+    "swatch_native_px": [
+      140.6,
+      140.6,
+      140.6,
+      140.6
+    ],
+    "wrap_before": {
+      "grass": 0.38,
+      "cobble": 2.2,
+      "dirt": 2.46,
+      "water": 1.3
+    },
+    "wrap_after": {
+      "grass": 0.0,
+      "cobble": 0.94,
+      "dirt": 1.34,
+      "water": 0.75
+    },
+    "drawn_pitch_raw_px": 3.2,
+    "pitch_conf": 3.16,
+    "native_px_per_tile": 70.3,
+    "colours": 36,
+    "pass": {
+      "density": true,
+      "seamless": true,
+      "colours": true
+    }
+  },
+  "note": "checkpoint B ground materials (quilted seams, per-material palettes)"
+}

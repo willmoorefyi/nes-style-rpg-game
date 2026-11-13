@@ -85,8 +85,9 @@ SHEETS: dict[str, Sheet] = {
 KITS = yaml.safe_load((HERE / "kits.yaml").read_text())
 for _kit in KITS:
     for _name, _sh in _kit["sheets"].items():
-        SHEETS[f"kit_{_name}"] = Sheet(f"kit_{_name}", {}, [c for row in _sh["cells"] for c in row],
-                                       S.kit_geom(len(_sh["cells"][0]), len(_sh["cells"]), _sh.get("aspect", "5:4"),
+        _grid = _sh.get("cells") or _sh["layout"]          # materials sheets: a layout of swatches instead of cells
+        SHEETS[f"kit_{_name}"] = Sheet(f"kit_{_name}", {}, [c for row in _grid for c in row],
+                                       S.kit_geom(len(_grid[0]), len(_grid), _sh.get("aspect", "5:4"),
                                                   _sh.get("tile_px", 240)), "map tiles", "", "")
 
 # the old monster sprites (our own art) that approved rev-1/2 monster requests were sent as design references; archived
@@ -284,10 +285,14 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
         from gen import gemini as GM
         ks = kit_sheet(char, sheet.name)
         size, tile = KS.geo(ks)
-        guide = KS.guide(ks["cells"], size, tile, grid_lines=ks.get("grid_lines", True))
         refs = [ref_image(f"assets-src/gen/approved/{char['id']}/{r}.png") for r in ks.get("refs") or []]
+        if ks.get("kind") == "materials":
+            guide = KS.materials_guide(ks)
+            prompt = KS.materials_prompt(ks, len(refs))
+        else:
+            guide = KS.guide(ks["cells"], size, tile, grid_lines=ks.get("grid_lines", True))
+            prompt = KS.prompt(char, sheet.name, ks, len(refs))
         images = [guide, ref_image(S.HOUSE_REFS["field"])] + refs
-        prompt = KS.prompt(char, sheet.name, ks, len(refs))
         mid = model or GM.DEFAULT_MODEL
         key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
         run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
@@ -651,6 +656,16 @@ def repixelize(outdir: Path) -> None:
 def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int) -> dict:
     """Cut a kit sheet and write <sheet>_{guide,raw}.png, <sheet>.png (48 px tiles), <sheet>_report.json, review.png."""
     ks = kit_sheet(char, r.sheet.name)
+    if ks.get("kind") == "materials":
+        sheet, report = KS.cut_materials(raw, ks, seed)
+        house = HERE / "approved" / char["id"] / "house.png"
+        r.guide.save(outdir / f"{r.sheet.name}_guide.png")
+        raw.save(outdir / f"{r.sheet.name}_raw.png")
+        sheet.save(outdir / f"{r.sheet.name}.png")
+        (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
+        KS.materials_review(raw, sheet, report, Image.open(house) if house.exists() else None).save(outdir / f"{r.sheet.name}_review.png")
+        print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / (r.sheet.name + "_review.png")}")
+        return report
     cells = ks["cells"]
     size, tile = KS.geo(ks)
     sheet, report = KS.cut(raw, cells, seed, size, tile, ks.get("derive"), hairlines=ks.get("grid_lines", True))
@@ -658,8 +673,8 @@ def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int)
     raw.save(outdir / f"{r.sheet.name}_raw.png")
     sheet.save(outdir / f"{r.sheet.name}.png")
     (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
-    KS.review(raw, sheet, report, cells).save(outdir / "review.png")
-    print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / 'review.png'}")
+    KS.review(raw, sheet, report, cells).save(outdir / f"{r.sheet.name}_review.png")
+    print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / (r.sheet.name + "_review.png")}")
     return report
 
 
