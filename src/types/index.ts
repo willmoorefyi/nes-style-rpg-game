@@ -192,6 +192,8 @@ export interface ScriptedEncounter {
 
 export interface MapData {
   id: string;
+  /** Display name for the field HUD (defaults to the id). */
+  name?: string;
   width: number;
   height: number;
   layers: number[][];

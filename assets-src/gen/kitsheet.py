@@ -768,6 +768,15 @@ def make_seamless_x(tex: np.ndarray, band: int = 16) -> np.ndarray:
     return np.where(use[..., None], rolled, tex)
 
 
+def _aspect_w(sw: dict) -> int:
+    """Width (native px, a whole number of tiles) of a `keep_aspect` material at its height in tiles x 48 px, from
+    its `source` rect (and `crop` fractions)."""
+    x0, y0, x1, y1 = sw["source"]
+    fx0, fy0, fx1, fy1 = sw.get("crop", [0, 0, 1, 1])
+    w, h = (x1 - x0) * (fx1 - fx0), (y1 - y0) * (fy1 - fy0)
+    return max(1, round(sw["tiles"][1] * w / h)) * 48
+
+
 def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Image, dict]:
     size = tuple(sheet["guide"])
     rgb = np.asarray(raw.convert("RGB").resize(size, Image.Resampling.LANCZOS))
@@ -778,6 +787,7 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
     cols = max(sw["at"][0] + sw["tiles"][0] for sw in sheet["swatches"])
     rows = max(sw["at"][1] + sw["tiles"][1] for sw in sheet["swatches"])
     extra_w = sum(48 * sw["tiles"][1] for sw in sheet["swatches"] if sw.get("rotate"))
+    extra_w += sum(_aspect_w(sw) for sw in sheet["swatches"] if sw.get("keep_aspect"))
     canvas = np.zeros((rows * 48, cols * 48 + extra_w, 4), np.uint8)
     report = {"materials": {}, "cells": [[None] * (canvas.shape[1] // 48) for _ in range(rows)],
               "wrap_before": {}, "wrap_after": {}, "fill": {}}
@@ -822,13 +832,19 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
             fx0, _, fx1, _ = ref.get("crop", [0, 0, 1, 1])
             per = ref_w[0] * (fx1 - fx0) / (ref["tiles"][0] * 48)
             out_w = min(out_w, round(crop.shape[1] / per))
+        if sw.get("keep_aspect"):                    # review fix: the drawn piece's proportions, stored past the grid
+            out_w = _aspect_w(sw)
         lab, cent = _quantize(crop, per_colors, seed + i)
         tex = cent[_block_mode(lab, out_w, out_h, len(cent))]
         wrap = sw.get("wrap", "both")
         if wrap != "none":
             report["wrap_before"][name] = round(wrap_ratio(tex) if wrap == "both" else seam_ratio(tex), 2)
-            tex = make_seamless(tex, seed=seed + i) if wrap == "both" else make_seamless_x(tex)
+            if sw.get("seam_fix", True):             # review fix off: a regular pattern cropped to whole periods
+                tex = make_seamless(tex, seed=seed + i) if wrap == "both" else make_seamless_x(tex)
             report["wrap_after"][name] = round(wrap_ratio(tex) if wrap == "both" else seam_ratio(tex), 2)
+        if sw.get("keep_aspect"):
+            c, r = rot_x // 48, 0
+            rot_x += tex.shape[1]
         canvas[r * 48:r * 48 + tex.shape[0], c * 48:c * 48 + tex.shape[1], :3] = tex
         canvas[r * 48:r * 48 + tex.shape[0], c * 48:c * 48 + tex.shape[1], 3] = 255
         if wrap == "none":

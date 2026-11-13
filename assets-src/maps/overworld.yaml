@@ -27,9 +27,9 @@ ground: |
   ooooooom......,ffffffffff...,.....f.....mmmmmmmooooooooo
   oooooommm....f,ffffffff.....,..........mmmmmmmm.oooooooo
   oooooo.mmmffff,,,,ff........,...........mmmmmmm.oooooooo
-  oooooo..mmmmfffff,f....................rrmmmmmm.oooooooo
-  ooooooo.ffmmfffff,ff...................rrmmmmmf.oooooooo
-  oooooooofffffffff,ff...................rr..mmffooooooooo
+  oooooo..mmmmfffff,f.........,..........rrmmmmmm.oooooooo
+  ooooooo.ffmmfffff,ff........,..........rrmmmmmf.oooooooo
+  oooooooofffffffff,ff........,..........rr..mmffooooooooo
   oooooooffffffffff,fff.......,...........rr.ffffooooooooo
   oooooomffffffffff,,,,,,,,,,,,...........rr.ffffooooooooo
   oooommmmffffffffffff........,...........rr..fff.oooooooo
@@ -50,6 +50,7 @@ ground: |
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 entrances:
   north_shore: [28, 7]
+  castle: [28, 27]
 objects:
 - type: prefab
   prefab: town_icon
@@ -61,16 +62,13 @@ objects:
   door: 1
   ridge_rows: 0
   enter: {map: cornelia, entrance: south_gate}
-- type: prefab
+- type: prefab                 # the castle rises behind the town walls: one walled city (castle precinct to the north)
   prefab: castle_icon
-  name: castle
   x: 27
-  y: 23
+  y: 28
   w: 2
   h: 2
-  door: 1
-  ridge_rows: 0
-  enter: {map: cornelia-castle, entrance: gate}
+  ridge_rows: 1                # walk onto its towers from the road to enter the castle precinct
 - type: prefab
   prefab: temple_icon
   name: temple
@@ -121,4 +119,6 @@ battleBackgrounds:
 vehicles:
 - {type: ship, x: 30, y: 38, requiredFlag: BIKKE_DEFEATED}
 - {type: canoe, x: 37, y: 36, requiredFlag: EARTH_CAVE_COMPLETE}
-transitions: []
+transitions:
+- {x: 27, y: 28, targetMap: cornelia, targetEntrance: castle_gate}
+- {x: 28, y: 28, targetMap: cornelia, targetEntrance: castle_gate}

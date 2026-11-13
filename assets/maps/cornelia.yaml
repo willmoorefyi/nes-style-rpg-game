@@ -3567,6 +3567,12 @@ transitions:
 width: 48
 entrances:
   south_gate: [7, 14]
+  # the 2x city's other gates and the castle door (the legacy town has only its south gate)
+  castle: [7, 14]
+  castle_gate: [7, 14]
+  west_gate: [7, 14]
+  east_gate: [7, 14]
+  north_postern: [7, 14]
   weapon_shop: [3, 4]
   armor_shop: [8, 4]
   item_shop: [13, 4]

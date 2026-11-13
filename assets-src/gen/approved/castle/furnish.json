@@ -1,0 +1,83 @@
+{
+  "kit": "castle",
+  "sheet": "kit_furnish",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "b8360f8dd0d4265dc4a54d06",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "stairs_up_0_0",
+      "stairs_up_0_1",
+      "stairs_down_0_0",
+      "stairs_down_0_1"
+    ],
+    [
+      "stairs_up_1_0",
+      "stairs_up_1_1",
+      "stairs_down_1_0",
+      "stairs_down_1_1"
+    ],
+    [
+      "banquet_l",
+      "banquet_r",
+      "fireplace_0_0",
+      "fireplace_0_1"
+    ],
+    [
+      "tapestry",
+      "desk",
+      "fireplace_1_0",
+      "fireplace_1_1"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "stairs_up": [
+        91,
+        77
+      ],
+      "stairs_down": [
+        75,
+        66
+      ],
+      "banquet": [
+        96,
+        44
+      ],
+      "fireplace": [
+        70,
+        62
+      ],
+      "tapestry": [
+        45,
+        48
+      ],
+      "desk": [
+        48,
+        41
+      ]
+    },
+    "scale": {
+      "stairs_up": 1.0,
+      "stairs_down": 1.0,
+      "banquet": 0.98,
+      "fireplace": 1.0,
+      "tapestry": 0.94,
+      "desk": 0.86
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "castle rebuild: stairs up/down, banquet table, fireplace, tapestry, desk"
+}

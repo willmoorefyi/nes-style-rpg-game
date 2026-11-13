@@ -274,6 +274,34 @@
         - {name: chimney, at: [3, 2], tiles: [1, 1], source: [810, 590, 985, 868], wrap: prop,
            text: "a short square red-brick chimney seen in three-quarter view, standing on a roof, about half as wide as the box."}
 
+    market:
+      # town rebuild (2026-11-13): park tree, market stall, street lamp, bench, hedge, vegetable bed, lily pads
+      kind: swatches
+      seed: 1234
+      refs: [house, props]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: oak, source: [4, 28, 500, 656], key_border: true, at: [0, 0], tiles: [2, 3], wrap: prop, parts: [[oak_0_0, oak_0_1], [oak_1_0, oak_1_1], [oak_2_0, oak_2_1]],
+           text: "a big round leafy oak tree seen in three-quarter view: a wide bushy crown in three greens lit from the upper left with darker shade underneath, and a thick brown trunk with roots at the bottom centre; it fills the box."}
+        - {name: stall, source: [616, 20, 956, 376], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stall_0_0, stall_0_1], [stall_1_0, stall_1_1]],
+           text: "a market stall seen from the front in three-quarter view: a wooden counter table under a red-and-white striped cloth awning on four wooden poles, with baskets of red apples, bread loaves and green vegetables on the table; it fills the box."}
+        - {name: lamp, source: [580, 404, 728, 696], key_border: true, at: [2, 2], tiles: [1, 2], wrap: prop, parts: [[lamp_top], [lamp_bottom]],
+           text: "a black iron street lamp post with a warm glowing yellow lantern at the top, as tall as the box."}
+        - {name: bench, source: [768, 456, 1012, 664], key_border: true, at: [3, 2], tiles: [1, 1], wrap: prop,
+           text: "a wooden park bench with iron legs seen from the front."}
+        - {name: hedge, source: [4, 728, 308, 1016], key_border: true, at: [0, 3], tiles: [1, 1], wrap: prop,
+           text: "one section of a neatly clipped dark-green box hedge running left to right, in the lower two thirds of the box, touching both the left and the right edge of the box (so sections join into a long hedge)."}
+        - {name: crops, source: [376, 728, 668, 984], key_border: true, at: [1, 3], tiles: [1, 1], wrap: prop,
+           text: "a small square vegetable bed of dark brown soil with two rows of round green cabbages, filling the box."}
+        - {name: lilies, source: [764, 728, 1012, 968], key_border: true, at: [3, 3], tiles: [1, 1], wrap: prop,
+           text: "two floating green lily pads and one small pink water-lily flower, with no water drawn around them."}
+
 - id: interior
   kind: kit
   sheets:
@@ -389,6 +417,78 @@
            text: "a long red cloth banner hanging on a wall with a golden crown emblem and a gold fringe at the bottom."}
         - {name: torch, at: [1, 3], tiles: [1, 1], source: [352, 770, 446, 980], key_border: true, key_mode: v1, wrap: prop, align: center,
            text: "an iron wall sconce holding a burning torch with a bright orange flame."}
+
+    masonry:
+      # castle rebuild (2026-11-13): keep walls, slate roof, marble hall floor, castle inner wall
+      kind: swatches
+      seed: 1234
+      refs: [castle/hall, town/walls]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      swatches:
+        - {name: castle_face, source: [0, 0, 472, 296], keep_aspect: true, at: [0, 0], tiles: [2, 2], wrap: x,
+           text: "the outer front wall of a royal castle keep seen straight from the front: large pale cream-grey dressed ashlar stone blocks in even courses with thin dark joints, and one carved stone string-course band running across the middle, evenly repeating left to right; no windows, no doors, no edges."}
+        - {name: slate, source: [540, 8, 975, 215], keep_aspect: true, at: [2, 0], tiles: [2, 2], wrap: both,
+           text: "a castle roof seen from the front at a steep angle: dark blue-grey slate tiles in neat overlapping horizontal courses with a few lighter and darker slates, evenly spread, no ridge, no edges."}
+        - {name: marble, source: [2, 308, 408, 696], seam_fix: false, at: [0, 2], tiles: [2, 2], wrap: both,
+           text: "the polished floor of a royal castle hall seen from straight above: a checkerboard of cream and soft grey marble squares, four squares across the box and four down, with fine veins and thin dark joints, evenly spread."}
+        - {name: castle_wall_in, source: [432, 412, 1022, 686], keep_aspect: true, at: [2, 2], tiles: [2, 2], wrap: x,
+           text: "the inside wall of a royal castle hall seen straight from the front: pale grey dressed stone blocks in the upper three quarters, a dark red-brown carved wooden wainscot panel along the bottom quarter, and a thin carved stone cornice along the top edge; no windows, no doors, evenly repeating left to right."}
+    facade:
+      # castle rebuild: the grand gate and keep details (props stand on the bottom of their boxes)
+      kind: swatches
+      seed: 1234
+      refs: [castle/props, castle/hall]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: gatehouse, at: [0, 0], tiles: [3, 3], wrap: prop,
+           parts: [[gate_0_0, gate_0_1, gate_0_2], [gate_1_0, gate_1_1, gate_1_2], [gate_2_0, gate_2_1, gate_2_2]],
+           text: "the grand main gate of a royal castle seen straight from the front: a tall round-arched gateway of pale dressed stone with large carved voussoirs, heavy iron-studded wooden double doors standing open onto a dark passage, a raised iron portcullis just visible in the arch, and a blue shield with a golden crown carved above the arch; the stonework fills the box."}
+        - {name: arch_window, source: [784, 16, 984, 376], key_border: true, at: [3, 0], tiles: [1, 2], wrap: prop, parts: [[arch_window_top], [arch_window_bottom]],
+           text: "a tall narrow arched castle window with a pale carved stone frame and deep blue stained glass with thin gold leading, set in a wall, as tall as the box."}
+        - {name: flag, source: [784, 412, 980, 760], at: [3, 2], tiles: [1, 2], wrap: prop, parts: [[flag_top], [flag_bottom]],
+           text: "a long royal banner hanging straight down a castle wall: deep blue cloth with a golden crown emblem, a gold fringe and a pointed bottom, hung from a short iron rod, as tall as the box."}
+        - {name: urn, source: [32, 724, 256, 1008], at: [0, 3], tiles: [1, 1], wrap: prop,
+           text: "a large carved stone garden urn on a short pedestal, planted with red and white flowers."}
+        - {name: topiary, source: [324, 760, 476, 1008], at: [1, 3], tiles: [1, 1], wrap: prop,
+           text: "a neatly clipped round green topiary bush in a square pale stone planter."}
+        - {name: stone_bench, source: [548, 792, 880, 1008], at: [2, 3], tiles: [1, 1], wrap: prop,
+           text: "a carved pale stone garden bench seen from the front."}
+    furnish:
+      # castle rebuild: interior furniture (stairs, banquet table, fireplace, tapestry, desk)
+      kind: swatches
+      seed: 1234
+      refs: [castle/props, interior/furniture]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: stairs_up, source: [20, 12, 500, 408], key_border: true, at: [0, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_up_0_0, stairs_up_0_1], [stairs_up_1_0, stairs_up_1_1]],
+           text: "a wide flight of pale stone stairs seen from the front in three-quarter view, climbing away from the viewer up to a dark arched opening at the top, with carved stone side rails; it fills the box."}
+        - {name: stairs_down, source: [592, 16, 980, 356], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_down_0_0, stairs_down_0_1], [stairs_down_1_0, stairs_down_1_1]],
+           text: "a stairwell in a stone floor seen from above at an angle: grey stone steps leading down and away into darkness, with a low carved stone rail on the left, right and far side; it fills the box."}
+        - {name: banquet, source: [20, 452, 524, 684], key_border: true, at: [0, 2], tiles: [2, 1], wrap: prop, parts: [[banquet_l, banquet_r]],
+           text: "a long wooden banquet table seen from the front in three-quarter view, with a white tablecloth, two candlesticks, plates, goblets and a roast, as wide as the box."}
+        - {name: fireplace, source: [616, 408, 976, 728], key_border: true, at: [2, 2], tiles: [2, 2], wrap: prop, parts: [[fireplace_0_0, fireplace_0_1], [fireplace_1_0, fireplace_1_1]],
+           text: "a large carved stone fireplace standing against a wall, seen from the front, with a burning log fire glowing orange and a mantel with two candles; it fills the box."}
+        - {name: tapestry, source: [52, 744, 300, 1004], key_border: true, at: [0, 3], tiles: [1, 1], wrap: prop, align: center,
+           text: "a hanging wall tapestry with a deep blue background, a golden lion and a gold border."}
+        - {name: desk, source: [392, 748, 680, 996], key_border: true, at: [1, 3], tiles: [1, 1], wrap: prop,
+           text: "a polished dark wooden writing desk with an open book, a quill and a candle."}
 
 - id: overworld
   kind: kit

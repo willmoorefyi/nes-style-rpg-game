@@ -56,3 +56,31 @@ Act 1 is complete in 2x art, and it is the default. All of these are compiled ma
 - Garland's side-view frames reuse his front view.
 - The interior keepers stand on the counter, as in the legacy maps.
 - The production build still doesn't copy `assets/` into `dist/` (a pre-existing issue).
+
+## Cornelia rebuild (2026-11-13)
+
+The user asked for a more interesting Cornelia and a castle you are inside: the town and castle in one walled
+city, a river through the town, bent walls, several exits, and a castle with several floors.
+
+| # | Sheet | Images | Result | Decision |
+|---|---|---|---|---|
+| 15 | town/kit_market | 1 | oak, market stall, street lamp, bench, hedge, cabbage bed, lily pads; grey panels again, so sources and border keying | self-approved |
+| 16 | castle/kit_masonry | 1 | keep wall (ashlar with a string course), slate, marble checker, inner wall with a red wainscot; drawn in its own layout, so sources, `keep_aspect` and (marble) `seam_fix: false` with whole squares | self-approved |
+| 17 | castle/kit_facade | 1 | grand gate with portcullis, arched window, blue royal banner, urn, topiary, stone bench | self-approved |
+| 18 | castle/kit_furnish | 1 | stairs up, stairwell down, banquet table, fireplace, lion tapestry, writing desk | self-approved |
+
+**Result:**
+- **Cornelia** (`assets-src/tools/layouts/cornelia.py`, 62x72): one bent outer wall with turrets wraps the castle precinct and the town.
+  - The river enters under the north wall, fills the moat, winds through the town (rounded banks) and leaves under the south wall.
+  - Five bridges; a chevron inner wall with a gatehouse; formal castle gardens.
+  - Market square, magic quarter with a lily pond, varied houses (recoloured roofs and walls, two storeys).
+  - Gates: south, west, east, the castle precinct's east gate and a north postern.
+- **The castle exterior** is a `facade` object: a keep with a central tower, wings, end towers and gate turrets.
+- **The castle interior** (`assets-src/tools/layouts/castle.py`):
+  - 1F: grand hall, gallery, barracks, banquet hall, library, treasury
+  - 2F: throne room, the princess's chamber, the King's study, chapel, tower stair
+  - 3F: the sage's lookout
+  - B1: the cellar, with three chests
+- **Overworld:** the castle icon now sits behind the town icon as one walled city. Walk onto its towers to enter the castle precinct.
+
+**Images used:** 20 of the 100-image cap.

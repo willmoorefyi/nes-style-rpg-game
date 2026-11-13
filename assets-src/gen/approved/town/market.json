@@ -1,0 +1,88 @@
+{
+  "kit": "town",
+  "sheet": "kit_market",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "fd835cbd617be3e28a491e27",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "oak_0_0",
+      "oak_0_1",
+      "stall_0_0",
+      "stall_0_1"
+    ],
+    [
+      "oak_1_0",
+      "oak_1_1",
+      "stall_1_0",
+      "stall_1_1"
+    ],
+    [
+      "oak_2_0",
+      "oak_2_1",
+      "lamp_top",
+      "bench"
+    ],
+    [
+      "hedge",
+      "crops",
+      "lamp_bottom",
+      "lilies"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "oak": [
+        96,
+        122
+      ],
+      "stall": [
+        66,
+        69
+      ],
+      "lamp": [
+        29,
+        57
+      ],
+      "bench": [
+        47,
+        41
+      ],
+      "hedge": [
+        48,
+        46
+      ],
+      "crops": [
+        48,
+        42
+      ],
+      "lilies": [
+        48,
+        47
+      ]
+    },
+    "scale": {
+      "oak": 1.0,
+      "stall": 1.0,
+      "lamp": 1.0,
+      "bench": 1.0,
+      "hedge": 0.81,
+      "crops": 0.84,
+      "lilies": 1.0
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "town rebuild: oak, stall, lamp, bench, hedge, crops, lilies (grey panels keyed)"
+}

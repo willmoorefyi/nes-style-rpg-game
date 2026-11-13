@@ -163,3 +163,11 @@
 {"event": "result", "key": "ad10b66c768be4a16f1e7d48", "ok": true}
 {"event": "attempt", "ts": "2026-11-13T00:37:28", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland_npc", "sheet": "field", "seed": 1234, "key": "db79b94ea9658e2a4a433574"}
 {"event": "result", "key": "db79b94ea9658e2a4a433574", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T09:13:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_market", "seed": 1234, "key": "fd835cbd617be3e28a491e27"}
+{"event": "result", "key": "fd835cbd617be3e28a491e27", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T09:13:44", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_masonry", "seed": 1234, "key": "0b865ae47a4e4d60f5f6c648"}
+{"event": "result", "key": "0b865ae47a4e4d60f5f6c648", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T09:13:54", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_facade", "seed": 1234, "key": "a967b20dea4dc75d1a2ba57e"}
+{"event": "result", "key": "a967b20dea4dc75d1a2ba57e", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T09:14:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_furnish", "seed": 1234, "key": "b8360f8dd0d4265dc4a54d06"}
+{"event": "result", "key": "b8360f8dd0d4265dc4a54d06", "ok": true}

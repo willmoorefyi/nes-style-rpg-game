@@ -217,7 +217,7 @@ export class ExplorationScene implements Scene {
     this.camera.update();
     tilemap.render();
     // B5: Update HUD with map name and gold
-    this.fieldHUD.setMapName(mapData.id);
+    this.fieldHUD.setMapName(mapData.name ?? mapData.id);
     this.fieldHUD.setGold(this.game.party.gold);
   }
 

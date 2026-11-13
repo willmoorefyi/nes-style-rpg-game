@@ -1,0 +1,83 @@
+{
+  "kit": "castle",
+  "sheet": "kit_facade",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "a967b20dea4dc75d1a2ba57e",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "gate_0_0",
+      "gate_0_1",
+      "gate_0_2",
+      "arch_window_top"
+    ],
+    [
+      "gate_1_0",
+      "gate_1_1",
+      "gate_1_2",
+      "arch_window_bottom"
+    ],
+    [
+      "gate_2_0",
+      "gate_2_1",
+      "gate_2_2",
+      "flag_top"
+    ],
+    [
+      "urn",
+      "topiary",
+      "stone_bench",
+      "flag_bottom"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "gatehouse": [
+        138,
+        144
+      ],
+      "arch_window": [
+        48,
+        85
+      ],
+      "flag": [
+        48,
+        85
+      ],
+      "urn": [
+        38,
+        48
+      ],
+      "topiary": [
+        29,
+        48
+      ],
+      "stone_bench": [
+        48,
+        31
+      ]
+    },
+    "scale": {
+      "gatehouse": 0.79,
+      "arch_window": 0.96,
+      "flag": 0.98,
+      "urn": 0.68,
+      "topiary": 0.77,
+      "stone_bench": 0.58
+    },
+    "skipped": [],
+    "pitch_px": 4.0,
+    "pass": {
+      "fits": false,
+      "not_tiny": true
+    }
+  },
+  "note": "castle rebuild: grand gate, arched window, royal banner, urn, topiary, stone bench"
+}

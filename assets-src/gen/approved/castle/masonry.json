@@ -1,0 +1,157 @@
+{
+  "kit": "castle",
+  "sheet": "kit_masonry",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "0b865ae47a4e4d60f5f6c648",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {
+    "castle_face": [
+      192,
+      0,
+      144,
+      96
+    ],
+    "slate": [
+      336,
+      0,
+      192,
+      96
+    ],
+    "marble": [
+      0,
+      96,
+      96,
+      96
+    ],
+    "castle_wall_in": [
+      528,
+      0,
+      192,
+      96
+    ]
+  },
+  "metrics": {
+    "wrap_before": {
+      "castle_face": 4.97,
+      "slate": 3.16,
+      "marble": 3.82,
+      "castle_wall_in": 1.08
+    },
+    "wrap_after": {
+      "castle_face": 0.7,
+      "slate": 2.13,
+      "marble": 3.82,
+      "castle_wall_in": 0.76
+    },
+    "fill": {
+      "castle_face": 0.78,
+      "slate": 0.5,
+      "marble": 0.88,
+      "castle_wall_in": 0.9
+    },
+    "piece_px": {
+      "castle_face": [
+        472,
+        296
+      ],
+      "slate": [
+        435,
+        207
+      ],
+      "marble": [
+        406,
+        388
+      ],
+      "castle_wall_in": [
+        590,
+        274
+      ]
+    },
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 0.01,
+    "native_px_per_tile": {
+      "castle_face": 46.1,
+      "slate": 42.5,
+      "marble": 39.6,
+      "castle_wall_in": 57.6
+    },
+    "pass": {
+      "density": false,
+      "seamless": false
+    }
+  },
+  "note": "castle rebuild: keep face, slate, marble checker (whole periods, no seam fix), castle inner wall"
+}

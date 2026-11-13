@@ -177,10 +177,10 @@
 
 # Act-1 field previews (open with ?mute=1&scenario=<id>)
 - id: act1_castle
-  name: Act 1 - Cornelia Castle throne room
+  name: Act 1 - Cornelia Castle throne room (2F)
   mode: field
-  map: cornelia-castle-throne
-  entrance: door
+  map: cornelia-castle-2f
+  entrance: stairs
   party:
     - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
   items: {}

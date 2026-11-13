@@ -52,8 +52,12 @@ TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall":
 BLOCKED = {WALL, WATER, COUNTER, 3, 7}             # on foot: walls, water, counters, mountains, rivers
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
+# rows of the approved castle_face texture (castle/masonry): two courses of plain ashlar that repeat vertically, and
+# the base course; facades lay plain courses up from the base so no carved band repeats
+FACE_PLAIN, FACE_BASE = (56, 84), (84, 96)
+BANK_R = 34              # px: blur radius that rounds the canal outline
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
-PASSTHROUGH = ("music", "encounterRate", "encounters", "battleBackgrounds", "canSave", "scriptedEncounters",
+PASSTHROUGH = ("name", "music", "encounterRate", "encounters", "battleBackgrounds", "canSave", "scriptedEncounters",
                "vehicles", "keyItemGates")
 
 
@@ -174,13 +178,43 @@ def footprint(o: dict) -> list[tuple[int, int]]:
         return [(xx, yy) for yy in range(min(y0, y1), max(y0, y1) + 1) for xx in range(min(x0, x1), max(x0, x1) + 1)]
     if t == "deco":
         return [(x + i, y + j) for j, row in enumerate(o["parts"]) for i, _ in enumerate(row)]
-    if t in ("bush", "well", "barrel", "crate", "signpost", "flowers"):
+    if t == "facade":
+        cells, yy = [], y
+        for b in o["bands"]:
+            bx, bw = x + b.get("x", 0), b.get("w", o["w"])
+            cells += [(bx + i, yy + j) for j in range(b["rows"]) for i in range(bw)]
+            yy += b["rows"]
+        return cells
+    if t in ("bush", "well", "barrel", "crate", "signpost", "flowers", "bench"):
         return [(x, y)]
     raise MapError(f"unknown object type {t!r}")
 
 
+# style -> (hue shift in degrees, saturation factor, value factor): recoloured copies of the approved parts, so
+# streets can mix roof and wall colours (roof: blue, wall: stone, ...)
+RECOLOR = {"blue": (205, 0.75, 0.95), "green": (95, 0.7, 0.9), "teal": (160, 0.6, 0.9), "slate": (215, 0.3, 0.75),
+           "brown": (15, 0.75, 0.75), "white": (0, 0.35, 1.08), "stone": (0, 0.15, 0.85), "ochre": (-12, 1.25, 0.97),
+           "rose": (-25, 1.1, 1.0)}
+
+
+def _recolor(img: Image.Image, hue: float, sat: float, val: float) -> Image.Image:
+    hsv = np.asarray(img.convert("RGB").convert("HSV")).astype(np.float32)
+    hsv[..., 0] = (hsv[..., 0] + hue * 255 / 360) % 256
+    hsv[..., 1] = np.clip(hsv[..., 1] * sat, 0, 255)
+    hsv[..., 2] = np.clip(hsv[..., 2] * val, 0, 255)
+    rgb = Image.frombytes("HSV", img.size, hsv.astype(np.uint8).tobytes()).convert("RGB")
+    out = rgb.convert("RGBA")
+    out.putalpha(img.getchannel("A"))
+    return out
+
+
 def styled(kit: K.Kit, name: str, style: str | None) -> Image.Image:
+    if name.startswith("wall_up2_") and name not in kit.approved and name.replace("wall_up2_", "wall_up_") in kit.approved:
+        name = name.replace("wall_up2_", "wall_up_")          # upper storey: the approved ground-floor upper row
     if style and f"{name}@{style}" in kit.parts:
+        return kit.parts[f"{name}@{style}"]
+    if style in RECOLOR and name in kit.parts:
+        kit.parts[f"{name}@{style}"] = _recolor(kit.part(name), *RECOLOR[style])
         return kit.parts[f"{name}@{style}"]
     return kit.part(name)
 
@@ -194,7 +228,11 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
         kit = copy.copy(kit)
         kit.materials = dict(kit.materials)
         for name, alias in src["materials"].items():
-            kit.materials[name] = kit.material(alias)
+            if isinstance(alias, dict):                    # {from: castle_face, shade: 0.4}: a darkened copy
+                kit.materials[name] = np.clip(kit.material(alias["from"]).astype(np.float32) * alias.get("shade", 1.0),
+                                              0, 255).astype(np.uint8)
+            else:
+                kit.materials[name] = kit.material(alias)
     grid = parse_ground(src["ground"])
     hgt, wid = len(grid), len(grid[0])
     H, W = hgt * T, wid * T
@@ -235,13 +273,29 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
 
     # 2. hard ground: water with a stone rim, bridges, town walls, culverts
     waterish = np.isin(mat, list(WATERISH))
-    pw = _up(waterish)
-    water = _up(mat == "water") | _up(mat == "culvert") | _up(mat == "bridge")
+    # canal banks follow a smoothed outline (rounded bends instead of square steps); bridges and culverts stay square
+    square = _up(np.isin(mat, ["bridge", "culvert"]))
+    pw = (_box_blur(_box_blur(_up(waterish).astype(np.float32), BANK_R), BANK_R) > 0.5) | square
+    water = pw
+    # water cells left outside the rounded outline show the land beside them (the most common neighbouring material)
+    for y in range(hgt):
+        for x in range(wid):
+            if grid[y][x] not in ("water",):
+                continue
+            sl = (slice(y * T, (y + 1) * T), slice(x * T, (x + 1) * T))
+            out = ~pw[sl]
+            if not out.any():
+                continue
+            near = [grid[y + dy][x + dx] for dy in (-1, 0, 1) for dx in (-1, 0, 1)
+                    if 0 <= y + dy < hgt and 0 <= x + dx < wid and grid[y + dy][x + dx] in SOFT]
+            land = max(set(near), key=near.count) if near else "grass"
+            tex = _tile(kit.material(land), H, W)[sl]
+            below[sl][out] = tex[out]
     below[water] = _tile(kit.material("water"), H, W)[water]
-    rim = _up(mat == "water") & (_erode_depth(pw, RIM + 1) <= RIM)
+    rim = pw & ~square & (_erode_depth(pw, RIM + 1) <= RIM)
     below[rim] = _tile(kit.material("rim"), H, W)[rim]
     _shade(below, _edge_of(rim) & ~_edge_of(pw), 0.55)     # inner line of the rim
-    _shade(below, _edge_of(_up(mat == "water")) & rim & _edge_of(pw), 0.75)
+    _shade(below, rim & _edge_of(pw), 0.75)
     slits: list[tuple[int, int]] = []
     for y in range(hgt):
         for x in range(wid):
@@ -264,8 +318,16 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             continue
         px = _up(cells)
         tex = _tile(kit.material("floor" if name == "counter" else "floor_stone" if name == "rubble" and "rubble" not in kit.materials else name), H, W)
+        if name == "in_wall_face":
+            tex = _anchored_face(kit.material(name), cells, H, W)
         below[px] = tex[px]
-        if name in ("carpet", "in_wall_top", "in_wall_face"):
+        if name == "carpet" and src.get("carpet_trim"):      # a royal runner: dark edge, then a gold band
+            depth = _erode_depth(px, 6)
+            gold = np.array(src["carpet_trim"], np.float32)
+            band = (depth >= 3) & (depth <= 5)
+            below[band] = (below[band].astype(np.float32) * 0.3 + gold * 0.7).astype(np.uint8)
+            _shade(below, (depth >= 1) & (depth <= 2), 0.45)
+        elif name in ("carpet", "in_wall_top", "in_wall_face"):
             _shade(below, _edge_of(px), 0.55)
 
     canvas = Image.fromarray(below).convert("RGBA")
@@ -300,16 +362,24 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     # 3. objects
     objects = src.get("objects") or []
     owner: dict[tuple[int, int], int] = {}
+    problems: list[str] = []
     for n, o in enumerate(objects):
+        where = f"object {n} ({o['type']}{' ' + o['name'] if o.get('name') else ''} at {o.get('x')}, {o.get('y')})"
         for (cx, cy) in footprint(o):
             if not (0 <= cx < wid and 0 <= cy < hgt):
-                raise MapError(f"object {n} ({o['type']}) runs off the map at ({cx}, {cy})")
+                problems.append(f"{where} runs off the map at ({cx}, {cy})")
+                break
             if (cx, cy) in owner:
-                raise MapError(f"object {n} ({o['type']}) overlaps object {owner[(cx, cy)]} at ({cx}, {cy})")
+                problems.append(f"{where} overlaps object {owner[(cx, cy)]} at ({cx}, {cy})")
+                break
             on_wall = o.get("on_wall") and grid[cy][cx] in ("in_wall_face", "in_wall_top", "wall")
-            if grid[cy][cx] not in SOFT + ["floor", "floor_stone", "carpet", "rubble"] and not on_wall:
-                raise MapError(f"object {n} ({o['type']}) stands on {grid[cy][cx]} at ({cx}, {cy})")
+            on_water = o.get("on_water") and grid[cy][cx] in ("water", "river", "ocean")
+            if grid[cy][cx] not in SOFT + ["floor", "floor_stone", "carpet", "rubble"] and not on_wall and not on_water:
+                problems.append(f"{where} stands on {grid[cy][cx]} at ({cx}, {cy})")
+                break
             owner[(cx, cy)] = n
+    if problems:
+        raise MapError("; ".join(problems))
 
     entrances = {k: list(v) for k, v in (src.get("entrances") or {}).items()}
     transitions = [dict(t) for t in (src.get("transitions") or [])]
@@ -397,6 +467,18 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                                         "targetEntrance": e["entrance"]})
                     if check_interiors:
                         _check_interior_entrance(e["map"], e["entrance"])
+        elif t == "facade":
+            _facade(canvas, top, kit, o, coll, grid)
+            if o.get("door"):
+                dx, dy = o["door"]
+                coll[y + dy, x + dx] = ROAD
+                if o.get("name"):
+                    entrances[o["name"]] = [x + dx, y + dy + 1]
+                if o.get("enter"):
+                    e = o["enter"]
+                    transitions.append({"x": x + dx, "y": y + dy, "targetMap": e["map"], "targetEntrance": e["entrance"]})
+                    if check_interiors:
+                        _check_interior_entrance(e["map"], e["entrance"])
         elif t == "tree":
             _paste(top, kit.part("tree_crown"), x, y - 1)
             _paste(canvas, kit.part("tree_trunk"), x, y)
@@ -416,12 +498,21 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 coll[cy, cx] = WALL
         elif t == "deco":
             # any kit parts, e.g. {type: deco, parts: [[bed_top], [bed_bottom]], x, y, block: true, on_wall: false}
+            # above_rows: the top rows are drawn over characters and stay walkable (a tall tree's crown, a lamp head);
+            # walkable_rows: rows (from 0) that stay walkable but are drawn under characters (stairs)
+            above_rows = o.get("above_rows", len(o["parts"]) if o.get("above") else 0)
+            walk_rows = set(o.get("walkable_rows") or [])
             for j, row in enumerate(o["parts"]):
                 for i, name in enumerate(row):
                     if not name:
                         continue
                     part = kit.parts.get(name) or K.placeholder_tile(name)
-                    _paste(top if o.get("above") else canvas, part, x + i, y + j)
+                    _paste(top if j < above_rows else canvas, part, x + i, y + j)
+                    if j < above_rows and not o.get("above"):
+                        continue                         # crown over open ground: walk behind it
+                    if j in walk_rows:
+                        coll[y + j, x + i] = ROAD            # e.g. the foot of a staircase set into a wall face
+                        continue
                     if o.get("block", True):
                         coll[y + j, x + i] = WALL
         elif t == "flowers":
@@ -450,12 +541,107 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     return out
 
 
+def _anchored_face(tex: np.ndarray, cells: np.ndarray, H: int, W: int) -> np.ndarray:
+    """A wall-face texture laid so that its bottom edge sits on the bottom of each vertical run of face cells (the
+    wainscot or base course meets the floor whatever the wall height); it repeats left to right."""
+    th = tex.shape[0]
+    out = np.zeros((H, W, 3), np.uint8)
+    hgt, wid = cells.shape
+    cols = _tile(tex, th, W)
+    for x in range(wid):
+        y = 0
+        while y < hgt:
+            if not cells[y, x]:
+                y += 1
+                continue
+            y1 = y
+            while y1 + 1 < hgt and cells[y1 + 1, x]:
+                y1 += 1
+            bottom = (y1 + 1) * T
+            for py in range(y * T, bottom):
+                out[py, x * T:(x + 1) * T] = cols[(th - (bottom - py) % th) % th, x * T:(x + 1) * T]
+            y = y1 + 1
+    return out
+
+
+def _facade(canvas: Image.Image, top: Image.Image, kit: K.Kit, o: dict, coll: np.ndarray, grid) -> None:
+    """A castle-style building front from bands, top to bottom: roof (slate courses; the first band's `ridge` rows
+    are walkable and drawn over characters), wall (a face material, bottom-anchored) and battlement (a parapet with
+    merlons). A band may be narrower than the building (`x`, `w` relative), e.g. a central tower rising above the
+    roof; cells outside a band stay open ground. Parts (windows, banners, the gate) are stamped at positions
+    relative to the building."""
+    x0, y0 = o["x"], o["y"]
+    W, H = canvas.size
+    y = y0
+    ridge_rows = 0
+    rects = []
+    for n, band in enumerate(o["bands"]):
+        rows, kind = band["rows"], band["kind"]
+        bx, w = x0 + band.get("x", 0), band.get("w", o["w"])
+        x_px, y_px, w_px, h_px = bx * T, y * T, w * T, rows * T
+        if kind == "roof":
+            tex = _tile(kit.material(band.get("material", "slate")), H, W)[y_px:y_px + h_px, x_px:x_px + w_px].copy()
+            tex[:4] = (tex[:4].astype(np.float32) * 0.55).astype(np.uint8)          # ridge cap
+            tex[4:6] = np.minimum(tex[4:6].astype(np.int32) + 40, 255).astype(np.uint8)
+            tex[-8:-3] = (tex[-8:-3].astype(np.float32) * 0.7).astype(np.uint8)     # eave
+            tex[-3:] = (tex[-3:].astype(np.float32) * 0.35).astype(np.uint8)
+            img = Image.fromarray(tex).convert("RGBA")
+            ridge = band.get("ridge", 1) if n == 0 else 0
+            if ridge:
+                top.alpha_composite(img.crop((0, 0, w_px, ridge * T)), (x_px, y_px))
+                canvas.alpha_composite(img.crop((0, ridge * T, w_px, h_px)), (x_px, y_px + ridge * T))
+                ridge_rows = ridge
+            else:
+                canvas.alpha_composite(img, (x_px, y_px))
+        elif kind in ("wall", "battlement"):
+            face = kit.material(band.get("material", "castle_face"))
+            p0, p1 = o.get("plain_rows", FACE_PLAIN)
+            b0, b1 = o.get("base_rows", FACE_BASE)
+            plain = np.roll(_tile(face[p0:p1], h_px + (p1 - p0), W)[:, x_px:x_px + w_px], 0, axis=0)
+            off = (p1 - p0) - h_px % (p1 - p0)                                     # courses end on the base line
+            tex = plain[off:off + h_px].copy()
+            if kind == "wall":
+                base = _tile(face[b0:b1], b1 - b0, W)[:, x_px:x_px + w_px]
+                tex[-(b1 - b0):] = base
+                tex[-3:] = (tex[-3:].astype(np.float32) * 0.6).astype(np.uint8)    # shadow line at the foot
+            else:
+                # parapet: merlons of plain ashlar with lit tops; the gaps show the shadowed walkway behind
+                walk = (tex.astype(np.float32) * 0.38).astype(np.uint8)
+                m_h, m_w = 28, T // 3
+                for mx in range(0, w_px, 2 * m_w):
+                    g0, g1 = mx + m_w, min(w_px, mx + 2 * m_w)
+                    tex[:m_h, g0:g1] = walk[:m_h, g0:g1]
+                    tex[:2, mx:g0] = np.minimum(tex[:2, mx:g0].astype(np.int32) + 45, 255)
+                    tex[2:m_h, max(mx, g0 - 2):g0] = (tex[2:m_h, max(mx, g0 - 2):g0] * 0.6).astype(np.uint8)
+                tex[m_h:m_h + 2] = np.minimum(tex[m_h:m_h + 2].astype(np.int32) + 45, 255)  # coping
+                tex[m_h + 2:m_h + 4] = (tex[m_h + 2:m_h + 4].astype(np.float32) * 0.6).astype(np.uint8)
+                tex[-2:] = (tex[-2:].astype(np.float32) * 0.7).astype(np.uint8)
+            canvas.alpha_composite(Image.fromarray(tex).convert("RGBA"), (x_px, y_px))
+        else:
+            raise MapError(f"facade: unknown band kind {kind!r}")
+        rects.append((bx, y, w, rows, ridge if kind == "roof" and n == 0 else 0))
+        y += rows
+    for (bx, by, w, rows, ridge) in rects:              # dark side edges, and collision
+        a = np.zeros((rows * T, w * T, 4), np.uint8)
+        a[:, :2] = a[:, -2:] = (20, 18, 28, 200)
+        edge = Image.fromarray(a)
+        if ridge:
+            top.alpha_composite(edge.crop((0, 0, w * T, ridge * T)), (bx * T, by * T))
+        canvas.alpha_composite(edge.crop((0, ridge * T, w * T, rows * T)), (bx * T, (by + ridge) * T))
+        coll[by + ridge:by + rows, bx:bx + w] = WALL
+    for p in o.get("parts") or []:
+        for j, row in enumerate(p["parts"]):
+            for i, name in enumerate(row):
+                if name:
+                    _paste(canvas, kit.parts.get(name) or K.placeholder_tile(name), x0 + p["x"] + i, y0 + p["y"] + j)
+
+
 def _bridge_cell(below: np.ndarray, grid, x: int, y: int, kit: K.Kit, H: int, W: int) -> None:
     """One cell of a bridge. A bridge with land (anything but water) to its left or right carries east-west
     traffic and uses bridge_h, else bridge_v. The deck texture's middle band repeats across the whole bridge run, and
     its outer bands (the parapets, a quarter of the texture each) appear only on the run's two outer edges."""
     hgt, wid = len(grid), len(grid[0])
-    land = lambda xx, yy: 0 <= xx < wid and 0 <= yy < hgt and grid[yy][xx] not in WATERISH  # noqa: E731
+    land = lambda xx, yy: 0 <= xx < wid and 0 <= yy < hgt and grid[yy][xx] not in WATERISH | SOFT_WATER  # noqa: E731
     ew = land(x - 1, y) or land(x + 1, y) or any(
         grid[y][xx] == "bridge" and (land(xx - 1, y) or land(xx + 1, y)) for xx in range(wid))
     tex = kit.material("bridge_h" if ew else "bridge_v")
