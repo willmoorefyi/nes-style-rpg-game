@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8,
 npcs:
 - id: cornelia-armor-shop-keeper
   x: 4
-  y: 4
+  y: 3
   sprite: merchant
   dialog: [Welcome to the Armor Shop!]
   shopId: cornelia_armor

@@ -55,7 +55,7 @@ objects:
 npcs:
 - id: cornelia-item-shop-keeper
   x: 4
-  y: 4
+  y: 3
   sprite: merchant
   dialog: [Welcome to the Item Shop!]
   shopId: cornelia_item

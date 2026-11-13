@@ -64,7 +64,7 @@ export class PlayerController {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,
       frameCount: 2,
-      frameDuration: 150,
+      frameDuration: 260,   // each step pose holds for about a tile's worth of movement
       directions: { down: 0, up: 1, left: 2, right: 3 },
       ...config.animation,
     });

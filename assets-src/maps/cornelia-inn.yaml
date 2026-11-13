@@ -56,7 +56,7 @@ objects:
 npcs:
 - id: cornelia-inn-keeper
   x: 3
-  y: 4
+  y: 3
   sprite: innkeeper
   dialog: [Welcome to the Inn!]
   shopId: cornelia_inn

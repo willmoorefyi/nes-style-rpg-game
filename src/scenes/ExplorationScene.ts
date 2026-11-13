@@ -1,4 +1,4 @@
-import { Container, Sprite, Graphics } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { battleBackgroundPath } from '../rendering/BattleBackground.js';
 import type { MapData, Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
@@ -61,7 +61,6 @@ export class ExplorationScene implements Scene {
   private vehicleManager: VehicleManager;
   private walkingMode: MovementMode = new WalkingMode();
   private pendingNpcAction: NPC | null = null;
-  private transitionIndicators: Container = new Container();
   private fieldHUD: FieldHUD;
   private controlsHint: ControlsHint;
   private battleFlash: Graphics | null = null;
@@ -182,7 +181,8 @@ export class ExplorationScene implements Scene {
     this.game.audio.playMusic(musicTrack);
     
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
-    if (mapData.encounters) this.encounterSystem.setEncounters(mapData.encounters);
+    // a map without an encounter table has no random battles (towns, castles, interiors); never keep the last map's
+    this.encounterSystem.setEncounters(mapData.encounters ?? []);
     this.worldContainer.sortableChildren = true;
     this.worldContainer.addChild(tilemap.container);
     if (tilemap.aboveContainer) this.worldContainer.addChild(tilemap.aboveContainer);
@@ -205,6 +205,7 @@ export class ExplorationScene implements Scene {
     this.player.setNPCPositions(npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     this.npcInteraction.setNPCs(npcs);
     this.npcInteraction.setPlayer(this.player);
+    this.npcInteraction.setCounterCheck((x, y) => collisionMap.isCounter(x, y));
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
     // Wire key item gates
@@ -213,8 +214,6 @@ export class ExplorationScene implements Scene {
     this.vehicleManager.setSpawns(mapData.vehicles ?? []);
     this.camera.update();
     tilemap.render();
-    // B3: Render transition indicators
-    this.renderTransitionIndicators(mapData.transitions);
     // B5: Update HUD with map name and gold
     this.fieldHUD.setMapName(mapData.id);
     this.fieldHUD.setGold(this.game.party.gold);
@@ -389,19 +388,6 @@ export class ExplorationScene implements Scene {
       this.game.scenes.register(tempName, new ShopScene(this.game, shopId));
     }
     this.game.scenes.push(tempName);
-  }
-
-  /** Render visual markers on transition tiles */
-  private renderTransitionIndicators(transitions: import('../types/index.js').MapTransition[]): void {
-    this.transitionIndicators.removeChildren();
-    const tex = this.placeholders.getTransitionIndicatorTexture();
-    for (const t of transitions) {
-      const indicator = new Sprite(tex);
-      indicator.x = t.x * TILE_SIZE;
-      indicator.y = t.y * TILE_SIZE;
-      this.transitionIndicators.addChild(indicator);
-    }
-    this.worldContainer.addChild(this.transitionIndicators);
   }
 
   private async executeTransition(transition: MapTransitionData): Promise<void> {

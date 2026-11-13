@@ -43,6 +43,12 @@ export class CollisionMap {
     return terrain !== TerrainType.Wall;
   }
 
+  /** Shop counters (collision value 10): blocked, but NPCs behind them can be talked to across them. */
+  isCounter(tileX: number, tileY: number): boolean {
+    if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) return false;
+    return this.collision[tileY * this.width + tileX] === 10;
+  }
+
   getWidth(): number { return this.width; }
   getHeight(): number { return this.height; }
 }

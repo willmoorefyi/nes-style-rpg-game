@@ -6,6 +6,7 @@ export class NPCInteractionSystem {
   private npcs: NPC[] = [];
   private player: PlayerController | null = null;
   private input: InputManager | null = null;
+  private isCounter: (x: number, y: number) => boolean = () => false;
 
   setNPCs(npcs: NPC[]): void {
     this.npcs = npcs;
@@ -13,6 +14,11 @@ export class NPCInteractionSystem {
 
   setPlayer(player: PlayerController): void {
     this.player = player;
+  }
+
+  /** Lets the player talk to an NPC standing behind a counter tile. */
+  setCounterCheck(isCounter: (x: number, y: number) => boolean): void {
+    this.isCounter = isCounter;
   }
 
   setInput(input: InputManager): void {
@@ -29,6 +35,11 @@ export class NPCInteractionSystem {
     if (!this.input.isJustPressed('confirm')) return null;
 
     const facing = this.player.facingTile;
-    return this.getNPCAt(facing.x, facing.y);
+    const npc = this.getNPCAt(facing.x, facing.y);
+    if (npc || !this.isCounter(facing.x, facing.y)) return npc;
+    // across a counter: the NPC one tile further in the same direction
+    const dx = facing.x - this.player.gridX;
+    const dy = facing.y - this.player.gridY;
+    return this.getNPCAt(facing.x + dx, facing.y + dy);
   }
 }

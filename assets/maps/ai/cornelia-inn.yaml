@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8,
 npcs:
 - id: cornelia-inn-keeper
   x: 3
-  y: 4
+  y: 3
   sprite: innkeeper
   dialog: [Welcome to the Inn!]
   shopId: cornelia_inn

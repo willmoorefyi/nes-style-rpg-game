@@ -70,4 +70,12 @@ describe('map variants (legacy and compiled 2x)', () => {
       }
     }
   });
+
+  it('random battles only happen on the overworld and in dungeons (never in towns, castles or interiors)', () => {
+    const battleMaps = new Set(['overworld', 'temple-of-fiends']);
+    for (const m of compiled.values()) {
+      if (battleMaps.has(m.id)) continue;
+      expect(m.encounters ?? [], `${m.id} encounters`).toEqual([]);
+    }
+  });
 });

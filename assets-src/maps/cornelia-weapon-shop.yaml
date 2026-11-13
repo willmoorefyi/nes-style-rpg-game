@@ -50,7 +50,7 @@ objects:
 npcs:
 - id: cornelia-weapon-shop-keeper
   x: 4
-  y: 4
+  y: 3
   sprite: merchant
   dialog: [Welcome to the Weapon Shop!]
   shopId: cornelia_weapon

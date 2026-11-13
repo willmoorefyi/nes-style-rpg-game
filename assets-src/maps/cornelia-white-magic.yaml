@@ -48,7 +48,7 @@ objects:
 npcs:
 - id: cornelia-white-magic-keeper
   x: 4
-  y: 4
+  y: 3
   sprite: mage
   dialog: [Welcome to the White Magic!]
   shopId: cornelia_white

@@ -49,7 +49,8 @@ export class ShopScene implements Scene {
     this.itemWindow = new Window({ x: SCREEN_MARGIN, y: 288, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
     this.itemWindow.visible = false;
 
-    this.detailWindow = new Window({ x: 1200, y: SCREEN_MARGIN, width: 696, height: 700 });
+    // below the gold window (top right), so the party's gold stays visible while browsing equipment
+    this.detailWindow = new Window({ x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 });
     this.detailWindow.visible = false;
 
     this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
@@ -208,7 +209,7 @@ export class ShopScene implements Scene {
   }
 
   private updateGold(): void {
-    this.goldText.text = `${this.game.party.gold}G`;
+    this.goldText.text = `Gold: ${this.game.party.gold}G`;
   }
 
   update(_dt: number): void {

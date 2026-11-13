@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8,
 npcs:
 - id: cornelia-black-magic-keeper
   x: 4
-  y: 4
+  y: 3
   sprite: mage
   dialog: [Welcome to the Black Magic!]
   shopId: cornelia_black

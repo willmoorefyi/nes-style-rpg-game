@@ -88,3 +88,17 @@ describe('NPCInteractionSystem', () => {
     expect(system.checkInteraction()).toBeNull();
   });
 });
+
+describe('NPCInteractionSystem across a counter', () => {
+  it('talks to the NPC behind a counter tile the player faces', async () => {
+    const { NPCInteractionSystem } = await import('../../src/systems/NPCInteraction.js');
+    const sys = new NPCInteractionSystem();
+    const keeper = { tileX: 4, tileY: 3 } as unknown as import('../../src/entities/NPC.js').NPC;
+    sys.setNPCs([keeper]);
+    sys.setPlayer({ isMoving: false, gridX: 4, gridY: 5, facingTile: { x: 4, y: 4 } } as unknown as import('../../src/entities/PlayerController.js').PlayerController);
+    sys.setInput({ isJustPressed: () => true } as unknown as import('../../src/core/InputManager.js').InputManager);
+    expect(sys.checkInteraction()).toBeNull();                 // no counter: nothing within reach
+    sys.setCounterCheck((x, y) => x === 4 && y === 4);
+    expect(sys.checkInteraction()).toBe(keeper);               // counter between them: talk across it
+  });
+});
