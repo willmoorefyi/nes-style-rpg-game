@@ -1,0 +1,54 @@
+# cornelia-armor-shop interior, compiled by assets-src/tools/build_map.py (legend: W wall top, F back wall, _ floor, c counter)
+id: cornelia-armor-shop
+kits: [interior, town]
+ground: |
+  WWWWWWWWWW
+  WFFFFFFFFW
+  W________W
+  W________W
+  W_cccccc_W
+  W________W
+  W________W
+  WWWW__WWWW
+entrances:
+  door: [4, 6]
+objects:
+- type: deco
+  parts:
+  - [window_in]
+  x: 1
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [weapon_rack]
+  x: 7
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [armor_stand]
+  x: 2
+  y: 3
+- type: deco
+  parts:
+  - [armor_stand]
+  x: 7
+  y: 3
+- type: deco
+  parts:
+  - [crate]
+  x: 8
+  y: 6
+npcs:
+- id: cornelia-armor-shop-keeper
+  x: 4
+  y: 4
+  sprite: merchant
+  dialog: [Welcome to the Armor Shop!]
+  shopId: cornelia_armor
+transitions:
+- {x: 4, y: 7, targetMap: cornelia, targetEntrance: armor_shop}
+- {x: 5, y: 7, targetMap: cornelia, targetEntrance: armor_shop}
+encounterRate: {min: 999, max: 999}
+encounters: []

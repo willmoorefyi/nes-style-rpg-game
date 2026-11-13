@@ -30,6 +30,11 @@ MATERIALS = {
     "wall_face": ((115, 115, 125), "bricks"),
     "bridge_h": ((150, 110, 70), "planks_h"),
     "bridge_v": ((150, 110, 70), "planks_v"),
+    "floor": ((150, 105, 65), "planks_h"),
+    "floor_stone": ((130, 130, 140), "stones"),
+    "carpet": ((160, 40, 45), "speckle"),
+    "in_wall_top": ((70, 50, 40), "speckle"),
+    "in_wall_face": ((200, 180, 150), "bricks"),
 }
 
 ROOF_ROWS = ("ridge", "mid", "eave")
@@ -49,6 +54,8 @@ _PARTS["wall_door_top"] = ((110, 70, 40), "Dt", "door_top")
 _PARTS["wall_door_bottom"] = ((110, 70, 40), "Db", "door_bottom")
 for s in SIGNS:
     _PARTS[f"sign_{s}"] = ((200, 170, 90), s[:2].upper(), "sign")
+for col in ("l", "m", "r"):
+    _PARTS[f"counter_{col}"] = ((120, 80, 45), "C" + col, "tile")
 _PARTS.update({
     "tree_crown": ((30, 100, 50), "Tc", "crown"),
     "tree_trunk": ((30, 100, 50), "Tt", "trunk"),
@@ -206,3 +213,19 @@ def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool
             kit.materials[name] = np.asarray(sheet.convert("RGB").crop((x, y, x + w, y + h)))
             kit.approved.add(name)
     return kit
+
+
+def load_kits(kit_ids: list[str], approved_dir: Path = APPROVED) -> Kit:
+    """Several kits merged in order (later kits add to / override earlier ones); approved parts win over placeholders."""
+    merged = load_kit(kit_ids[0], approved_dir)
+    for kid in kit_ids[1:]:
+        k = load_kit(kid, approved_dir)
+        for name, part in k.parts.items():
+            if name in k.approved or name not in merged.approved:
+                merged.parts[name] = part
+        for name, mat in k.materials.items():
+            if name in k.approved or name not in merged.approved:
+                merged.materials[name] = mat
+        merged.approved |= k.approved
+    merged.id = "+".join(kit_ids)
+    return merged

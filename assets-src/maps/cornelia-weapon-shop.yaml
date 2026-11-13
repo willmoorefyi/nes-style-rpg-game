@@ -1,0 +1,61 @@
+# cornelia-weapon-shop interior, compiled by assets-src/tools/build_map.py (legend: W wall top, F back wall, _ floor, c counter)
+id: cornelia-weapon-shop
+kits: [interior, town]
+ground: |
+  WWWWWWWWWW
+  WFFFFFFFFW
+  W________W
+  W________W
+  W_cccccc_W
+  W________W
+  W________W
+  WWWW__WWWW
+entrances:
+  door: [4, 6]
+objects:
+- type: deco
+  parts:
+  - [weapon_rack]
+  x: 2
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [weapon_rack]
+  x: 4
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [weapon_rack]
+  x: 6
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [window_in]
+  x: 8
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [barrel]
+  x: 1
+  y: 6
+- type: deco
+  parts:
+  - [armor_stand]
+  x: 8
+  y: 5
+npcs:
+- id: cornelia-weapon-shop-keeper
+  x: 4
+  y: 4
+  sprite: merchant
+  dialog: [Welcome to the Weapon Shop!]
+  shopId: cornelia_weapon
+transitions:
+- {x: 4, y: 7, targetMap: cornelia, targetEntrance: weapon_shop}
+- {x: 5, y: 7, targetMap: cornelia, targetEntrance: weapon_shop}
+encounterRate: {min: 999, max: 999}
+encounters: []

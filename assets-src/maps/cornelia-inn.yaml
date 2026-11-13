@@ -1,0 +1,67 @@
+# cornelia-inn interior, compiled by assets-src/tools/build_map.py (legend: W wall top, F back wall, _ floor, c counter)
+id: cornelia-inn
+kits: [interior, town]
+ground: |
+  WWWWWWWWWW
+  WFFFFFFFFW
+  W________W
+  W________W
+  W_ccc____W
+  W________W
+  W________W
+  WWWW__WWWW
+entrances:
+  door: [4, 6]
+objects:
+- type: deco
+  parts:
+  - [window_in]
+  x: 2
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [window_in]
+  x: 7
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [plant]
+  x: 1
+  y: 3
+- type: deco
+  parts:
+  - [table]
+  x: 2
+  y: 6
+- type: deco
+  parts:
+  - [bed_top]
+  - [bed_bottom]
+  x: 6
+  y: 3
+- type: deco
+  parts:
+  - [bed_top]
+  - [bed_bottom]
+  x: 7
+  y: 3
+- type: deco
+  parts:
+  - [bed_top]
+  - [bed_bottom]
+  x: 8
+  y: 3
+npcs:
+- id: cornelia-inn-keeper
+  x: 3
+  y: 4
+  sprite: innkeeper
+  dialog: [Welcome to the Inn!]
+  shopId: cornelia_inn
+transitions:
+- {x: 4, y: 7, targetMap: cornelia, targetEntrance: inn}
+- {x: 5, y: 7, targetMap: cornelia, targetEntrance: inn}
+encounterRate: {min: 999, max: 999}
+encounters: []

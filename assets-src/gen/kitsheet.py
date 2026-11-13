@@ -723,7 +723,13 @@ def swatches_prompt(sheet: dict, n_refs: int) -> str:
                 "none": "a single complete piece filling the box",
                 "prop": "ONE object standing on the bottom edge of its box, as large as the box allows, with magenta "
                         "all around it (no ground, no shadow on the ground, no grass under it)"}[sw.get("wrap", "both")]
-        if ordered:
+        if ordered and sheet.get("labels") == "absolute":    # position counted across the whole page width
+            box = rects[sw["name"]]
+            row_i = tops.index(box[1])
+            xs_all = sorted({rects[q["name"]][0] for q in sheet["swatches"]})
+            label = (f"box in the {names_row[row_i]} row of boxes, {nth[xs_all.index(box[0])]} position from the "
+                     "left edge of the page")
+        elif ordered:
             box = rects[sw["name"]]
             row_i = tops.index(box[1])
             peers = sorted(rects[q["name"]][0] for q in sheet["swatches"] if rects[q["name"]][1] == box[1])
@@ -779,7 +785,10 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
 
     def body(name: str) -> tuple[int, int, int, int]:
         """The drawn piece in a box: rows / columns at least 60% as full as the fullest (drops spills such as
-        culvert water)."""
+        culvert water). A swatch's `source` (guide px, review fix) is used as is."""
+        sw_ = next(q for q in sheet["swatches"] if q["name"] == name)
+        if sw_.get("source"):
+            return tuple(sw_["source"])
         x0, y0, x1, y1 = rects[name]
         k = lab_cc[(y0 + y1) // 2, (x0 + x1) // 2]
         if k == 0:
@@ -835,6 +844,20 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
             canvas[:rt.shape[0], rot_x:rot_x + rt.shape[1], 3] = 255
             report["materials"][sw["rotate"]] = [rot_x, 0, rt.shape[1], rt.shape[0]]
             rot_x += rt.shape[1]
+    # derived from another material: a darkened copy (review fix, e.g. a wall top made from the wood floor)
+    for sw in sheet["swatches"]:
+        dm = sw.get("derive_material")
+        if not dm:
+            continue
+        src_rect = report["materials"][dm["from"]]
+        sx0, sy0, sw_w, sw_h = src_rect
+        (c, r), (tw, th) = sw["at"], sw["tiles"]
+        tex = canvas[sy0:sy0 + th * 48, sx0:sx0 + tw * 48, :3].astype(np.float32) * dm.get("shade", 1.0)
+        tex = make_seamless_x(PX.snap15(tex)) if sw.get("wrap") == "x" else PX.snap15(tex)
+        canvas[r * 48:(r + th) * 48, c * 48:(c + tw) * 48, :3] = tex
+        report["materials"][sw["name"]] = [c * 48, r * 48, tw * 48, th * 48]
+        report["wrap_after"][sw["name"]] = round(seam_ratio(tex), 2)
+        report.setdefault("derived", {})[sw["name"]] = f"{dm['from']} x {dm.get('shade', 1.0)}"
     # derived materials: e.g. wall_face from the arrow-slit piece with the slit painted out (same bricks as the part)
     for sw in sheet["swatches"]:
         src = sw.get("derive_from")

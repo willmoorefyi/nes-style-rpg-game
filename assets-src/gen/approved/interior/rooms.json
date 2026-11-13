@@ -1,0 +1,130 @@
+{
+  "kit": "interior",
+  "sheet": "kit_rooms",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "7b728a43ee3d4a870aa3ce4b",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {
+    "floor": [
+      0,
+      0,
+      96,
+      96
+    ],
+    "floor_stone": [
+      96,
+      0,
+      96,
+      96
+    ],
+    "carpet": [
+      0,
+      96,
+      96,
+      96
+    ],
+    "in_wall_face": [
+      96,
+      96,
+      96,
+      48
+    ],
+    "in_wall_top": [
+      96,
+      144,
+      96,
+      48
+    ]
+  },
+  "metrics": {
+    "wrap_before": {
+      "floor": 1.81,
+      "floor_stone": 1.3,
+      "carpet": 1.13,
+      "in_wall_face": 0.64,
+      "in_wall_top": 14.28
+    },
+    "wrap_after": {
+      "floor": 0.37,
+      "floor_stone": 0.1,
+      "carpet": 1.3,
+      "in_wall_face": 0.12,
+      "in_wall_top": 0.36
+    },
+    "fill": {
+      "floor": 1.18,
+      "floor_stone": 1.2,
+      "carpet": 1.13,
+      "in_wall_face": 1.29,
+      "in_wall_top": 1.63
+    },
+    "piece_px": {
+      "floor": [
+        430,
+        492
+      ],
+      "floor_stone": [
+        439,
+        491
+      ],
+      "carpet": [
+        430,
+        471
+      ],
+      "in_wall_face": [
+        563,
+        195
+      ],
+      "in_wall_top": [
+        563,
+        245
+      ]
+    },
+    "derived": {
+      "in_wall_top": "floor x 0.45"
+    },
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 0.02,
+    "native_px_per_tile": {
+      "floor": 42.0,
+      "floor_stone": 42.9,
+      "carpet": 42.0,
+      "in_wall_face": 55.0,
+      "in_wall_top": 55.0
+    },
+    "pass": {
+      "density": true,
+      "seamless": true
+    }
+  },
+  "note": "self-approved (act-1 run): review fixes in kits.yaml"
+}

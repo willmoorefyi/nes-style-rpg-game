@@ -287,7 +287,8 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
         from gen import gemini as GM
         ks = kit_sheet(char, sheet.name)
         size, tile = KS.geo(ks)
-        refs = [ref_image(f"assets-src/gen/approved/{char['id']}/{r}.png") for r in ks.get("refs") or []]
+        refs = [ref_image(f"assets-src/gen/approved/{r if '/' in r else char['id'] + '/' + r}.png")
+                for r in ks.get("refs") or []]
         if ks.get("kind") == "materials":
             guide = KS.materials_guide(ks)
             prompt = KS.materials_prompt(ks, len(refs))
@@ -712,6 +713,8 @@ def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int)
     if ks.get("kind") == "materials":
         sheet, report = KS.cut_materials(raw, ks, seed)
         house = HERE / "approved" / char["id"] / "house.png"
+        if not house.exists():
+            house = HERE / "approved" / "town" / "house.png"
         r.guide.save(outdir / f"{r.sheet.name}_guide.png")
         raw.save(outdir / f"{r.sheet.name}_raw.png")
         sheet.save(outdir / f"{r.sheet.name}.png")

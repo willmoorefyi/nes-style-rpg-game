@@ -1,0 +1,59 @@
+# cornelia-white-magic interior, compiled by assets-src/tools/build_map.py (legend: W wall top, F back wall, _ floor, c counter)
+id: cornelia-white-magic
+kits: [interior, town]
+ground: |
+  WWWWWWWWWW
+  WFFFFFFFFW
+  W________W
+  W________W
+  W_cccccc_W
+  W________W
+  W________W
+  WWWW__WWWW
+entrances:
+  door: [4, 6]
+objects:
+- type: deco
+  parts:
+  - [window_in]
+  x: 2
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [window_in]
+  x: 7
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [orb_white]
+  x: 2
+  y: 3
+- type: deco
+  parts:
+  - [orb_white]
+  x: 7
+  y: 3
+- type: deco
+  parts:
+  - [plant]
+  x: 1
+  y: 6
+- type: deco
+  parts:
+  - [plant]
+  x: 8
+  y: 6
+npcs:
+- id: cornelia-white-magic-keeper
+  x: 4
+  y: 4
+  sprite: mage
+  dialog: [Welcome to the White Magic!]
+  shopId: cornelia_white
+transitions:
+- {x: 4, y: 7, targetMap: cornelia, targetEntrance: white_magic}
+- {x: 5, y: 7, targetMap: cornelia, targetEntrance: white_magic}
+encounterRate: {min: 999, max: 999}
+encounters: []

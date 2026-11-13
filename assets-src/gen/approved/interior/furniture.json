@@ -1,0 +1,108 @@
+{
+  "kit": "interior",
+  "sheet": "kit_furniture",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "9865a527e7f05a7e96fe06d8",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "counter_l",
+      "counter_m",
+      "counter_r",
+      "plant"
+    ],
+    [
+      "bookshelf_top",
+      "bed_top",
+      "weapon_rack",
+      "potion_shelf"
+    ],
+    [
+      "bookshelf_bottom",
+      "bed_bottom",
+      "armor_stand",
+      "window_in"
+    ],
+    [
+      "orb_white",
+      "orb_black",
+      "table",
+      null
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "counter": [
+        138,
+        37
+      ],
+      "plant": [
+        31,
+        41
+      ],
+      "bookshelf": [
+        41,
+        69
+      ],
+      "bed": [
+        32,
+        58
+      ],
+      "weapon_rack": [
+        41,
+        29
+      ],
+      "potion_shelf": [
+        39,
+        22
+      ],
+      "armor_stand": [
+        26,
+        48
+      ],
+      "window_in": [
+        27,
+        29
+      ],
+      "orb_white": [
+        18,
+        36
+      ],
+      "orb_black": [
+        17,
+        36
+      ],
+      "table": [
+        32,
+        36
+      ]
+    },
+    "scale": {
+      "counter": 1.0,
+      "plant": 1.0,
+      "bookshelf": 1.0,
+      "bed": 1.0,
+      "weapon_rack": 1.0,
+      "potion_shelf": 1.0,
+      "armor_stand": 0.96,
+      "window_in": 1.0,
+      "orb_white": 1.0,
+      "orb_black": 1.0,
+      "table": 1.0
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "self-approved; counter/plant sources fixed"
+}

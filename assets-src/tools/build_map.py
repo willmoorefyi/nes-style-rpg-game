@@ -29,13 +29,20 @@ SRC = ROOT / "assets-src" / "maps"
 OUT = ROOT / "assets" / "maps" / "ai"
 LEGACY_MAPS = ROOT / "assets" / "maps"
 
-LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "=": "bridge", "u": "culvert"}
+LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "=": "bridge", "u": "culvert",
+          # interiors (kit materials floor / floor_stone / carpet / in_wall_top / in_wall_face; counters are parts)
+          "_": "floor", "-": "floor_stone", "+": "carpet", "W": "in_wall_top", "F": "in_wall_face", "c": "counter"}
+# painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
+FULL = ["floor", "floor_stone", "carpet", "in_wall_top", "in_wall_face"]
+COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
 SOFT = ["grass", "dirt", "cobble"]                 # painted in this order; each erodes against the ones before it
 WATERISH = {"water", "bridge", "culvert"}
 # TerrainType values (src/types/index.ts)
 GRASS, WALL, WATER, ROAD, BRIDGE = 0, 1, 2, 8, 9
-TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL}
-BLOCKED = {WALL, WATER}
+TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
+           "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
+           "counter": COUNTER}
+BLOCKED = {WALL, WATER, COUNTER}
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
@@ -145,6 +152,8 @@ def footprint(o: dict) -> list[tuple[int, int]]:
         if x0 != x1 and y0 != y1:
             raise MapError(f"fence {o['from']}->{o['to']} must be straight")
         return [(xx, yy) for yy in range(min(y0, y1), max(y0, y1) + 1) for xx in range(min(x0, x1), max(x0, x1) + 1)]
+    if t == "deco":
+        return [(x + i, y + j) for j, row in enumerate(o["parts"]) for i, _ in enumerate(row)]
     if t in ("bush", "well", "barrel", "crate", "signpost", "flowers"):
         return [(x, y)]
     raise MapError(f"unknown object type {t!r}")
@@ -208,6 +217,15 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                     slits.append((x, y))           # arrow slits every 4th face cell (pasted with the parts below)
     walls = _up(np.isin(mat, ["wall", "culvert"]))
     _shade(below, _edge_of(walls), 0.5)
+    for name in FULL + ["counter"]:
+        cells = mat == name
+        if not cells.any():
+            continue
+        px = _up(cells)
+        tex = _tile(kit.material("floor" if name == "counter" else name), H, W)   # counters stand on the floor
+        below[px] = tex[px]
+        if name in ("carpet", "in_wall_top", "in_wall_face"):
+            _shade(below, _edge_of(px), 0.55)
 
     canvas = Image.fromarray(below).convert("RGBA")
     top = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -223,6 +241,21 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 else:
                     _paste(canvas, kit.part("culvert"), x, y)
 
+    # counters: each horizontal run of 'c' cells is left end, middles, right end (a single cell uses counter_m)
+    for y in range(hgt):
+        x = 0
+        while x < wid:
+            if grid[y][x] != "counter":
+                x += 1
+                continue
+            x1 = x
+            while x1 + 1 < wid and grid[y][x1 + 1] == "counter":
+                x1 += 1
+            for xx in range(x, x1 + 1):
+                kind = "m" if x == x1 else "l" if xx == x else "r" if xx == x1 else "m"
+                _paste(canvas, kit.part(f"counter_{kind}"), xx, y)
+            x = x1 + 1
+
     # 3. objects
     objects = src.get("objects") or []
     owner: dict[tuple[int, int], int] = {}
@@ -232,7 +265,8 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 raise MapError(f"object {n} ({o['type']}) runs off the map at ({cx}, {cy})")
             if (cx, cy) in owner:
                 raise MapError(f"object {n} ({o['type']}) overlaps object {owner[(cx, cy)]} at ({cx}, {cy})")
-            if grid[cy][cx] not in SOFT:
+            on_wall = o.get("on_wall") and grid[cy][cx] in ("in_wall_face", "in_wall_top", "wall")
+            if grid[cy][cx] not in SOFT + ["floor", "floor_stone", "carpet"] and not on_wall:
                 raise MapError(f"object {n} ({o['type']}) stands on {grid[cy][cx]} at ({cx}, {cy})")
             owner[(cx, cy)] = n
 
@@ -338,6 +372,16 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 _paste(canvas, kit.part("fence_post" if end and len(cells) > 1 else "fence_h" if horiz else "fence_v"),
                        cx, cy)
                 coll[cy, cx] = WALL
+        elif t == "deco":
+            # any kit parts, e.g. {type: deco, parts: [[bed_top], [bed_bottom]], x, y, block: true, on_wall: false}
+            for j, row in enumerate(o["parts"]):
+                for i, name in enumerate(row):
+                    if not name:
+                        continue
+                    part = kit.parts.get(name) or K.placeholder_tile(name)
+                    _paste(top if o.get("above") else canvas, part, x + i, y + j)
+                    if o.get("block", True):
+                        coll[y + j, x + i] = WALL
         elif t == "flowers":
             _paste(canvas, kit.part("flowers"), x, y)
         else:
@@ -424,7 +468,8 @@ def _walkable(c: Compiled, x: int, y: int) -> bool:
 def validate(src: dict, c: Compiled) -> None:
     errors = []
     for npc in src.get("npcs") or []:
-        if not _walkable(c, npc["x"], npc["y"]):
+        on_counter = 0 <= npc["y"] < c.height and 0 <= npc["x"] < c.width and int(c.collision[npc["y"], npc["x"]]) == COUNTER
+        if not _walkable(c, npc["x"], npc["y"]) and not on_counter:
             errors.append(f"NPC {npc['id']} at ({npc['x']}, {npc['y']}) is on a blocked cell")
     for name, (x, y) in c.entrances.items():
         if not _walkable(c, x, y):
@@ -510,7 +555,7 @@ def build(ids: list[str] | None = None) -> list[Path]:
     written = []
     for p in srcs:
         src = yaml.safe_load(p.read_text())
-        kit = K.load_kit(src.get("kit", "town"))
+        kit = K.load_kits(src.get("kits") or [src.get("kit", "town")])
         c = compile_map(src, kit)
         path = write(src, c)
         placeholder = sorted(set(K.PART_NAMES) - kit.approved)
