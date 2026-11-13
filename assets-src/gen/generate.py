@@ -267,9 +267,14 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
             prompt = M.pose_prompt(char, band, pose, bool(identity))
         else:
             guide = M.guide(band, bool(char.get("floating")))
-            ref = design_ref(char) if char.get("design_ref", True) is not False else None
-            images = [guide, ref_image(S.HOUSE_REFS["battle"])] + ([ref] if ref is not None else [])
-            prompt = M.prompt(char, band, ref is not None)
+            rev = char.get("prompt_rev", 3)
+            if rev >= 3:   # text + approved art only: house style and an approved monster sheet, never old sprites
+                images = [guide, ref_image(S.HOUSE_REFS["battle"]), ref_image(S.MONSTER_STYLE_REF)]
+                prompt = M.prompt(char, band, False, has_monster_ref=True)
+            else:          # rev 1-2 (approved before 2026-11-12 evening): legacy sprite as design reference
+                ref = design_ref(char) if char.get("design_ref", True) is not False else None
+                images = [guide, ref_image(S.HOUSE_REFS["battle"])] + ([ref] if ref is not None else [])
+                prompt = M.prompt(char, band, ref is not None)
         mid = model or GM.DEFAULT_MODEL
         key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
         run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731

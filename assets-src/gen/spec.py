@@ -29,6 +29,8 @@ PALETTE_SIZE = 14         # colours per sprite including the outline colour
 # knight's approved sheet of the same type as a style reference (pixel size, proportions, outline, shading).
 # The knight's own requests never include these, so its approved cache keys stay valid.
 HOUSE_CHARACTER = "knight"
+# Monster requests (prompt rev 3+) also send an approved monster sheet as the rendering reference (never old sprites).
+MONSTER_STYLE_REF = "assets-src/gen/approved/ogre/monster_large.png"
 HOUSE_REFS = {"battle": "assets-src/gen/approved/knight/battle.png",
               "field": "assets-src/gen/approved/knight/field.png"}
 CONTROL_STRENGTH = 0.75   # Bedrock structure-control only

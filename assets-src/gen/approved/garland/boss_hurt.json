@@ -1,0 +1,25 @@
+{
+  "character": "garland",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "8bb31c5337aabed68766a296",
+  "approved": "2026-11-12",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "Garland hurt"
+}

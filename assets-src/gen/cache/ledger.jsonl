@@ -109,3 +109,17 @@
 {"event": "result", "key": "0848b8031281726807b8f5eb", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T20:19:59", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_idle", "seed": 1234, "key": "725729407d8e4ff145f82e12"}
 {"event": "result", "key": "725729407d8e4ff145f82e12", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:28:29", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_attack", "seed": 1234, "key": "e7ac299d4c0ac9e2b5ffeef3"}
+{"event": "result", "key": "e7ac299d4c0ac9e2b5ffeef3", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:28:35", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_cast", "seed": 1234, "key": "4c485110bcbea7b95bcdc8f0"}
+{"event": "result", "key": "4c485110bcbea7b95bcdc8f0", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:28:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_hurt", "seed": 1234, "key": "8bb31c5337aabed68766a296"}
+{"event": "result", "key": "8bb31c5337aabed68766a296", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:30:42", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_attack", "seed": 1235, "key": "cb6cb42a6cebd00d5723e973"}
+{"event": "result", "key": "cb6cb42a6cebd00d5723e973", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:38:43", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "skeleton", "sheet": "monster_small", "seed": 1234, "key": "6ca736d00812fe646b8a06ba"}
+{"event": "result", "key": "6ca736d00812fe646b8a06ba", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:38:52", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "dragon", "sheet": "monster_large", "seed": 1234, "key": "4647a60ad314a1ce2f3b375b"}
+{"event": "result", "key": "4647a60ad314a1ce2f3b375b", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T20:38:57", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "troll", "sheet": "monster_large", "seed": 1234, "key": "5988a29db2c6182e1d42a403"}
+{"event": "result", "key": "5988a29db2c6182e1d42a403", "ok": true}

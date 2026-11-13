@@ -16,6 +16,7 @@
   seeds: [1234]
 - id: wolf
   size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
   prompt: >-
     lean grey wolf on four legs with shaggy fur, a darker grey back, pointed ears, yellow eyes and bared white fangs
   attack: springing through the air at the heroes, body stretched long, front paws reaching and jaws wide open to bite
@@ -24,14 +25,16 @@
 - id: skeleton
   size: small
   prompt: >-
-    undead skeleton warrior with off-white bones, glowing red eye sockets, a tattered dark red loincloth, holding a
-    chipped iron sword
+    undead skeleton warrior, a full human skeleton with yellowed off-white bones, visible ribcage, spine and pelvis,
+    a skull with a toothed jaw and glowing red pinpoints in the eye sockets, a tattered dark red loincloth on a frayed
+    belt, a dented round iron shield strapped to one forearm, holding a chipped iron sword
   attack: lunging forward on one bony leg with a big overhead sword slash, ribcage twisted into the swing
   hurt: blasted backward, skull snapping back, bones rattling apart at the joints, sword arm flung wide
   face: the skull's face is two glowing red eye sockets and a toothed jaw, readable in every cell
   seeds: [1234]
 - id: pirate
   size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
   prompt: >-
     stocky pirate with a black tricorn hat, an eyepatch, a short dark beard, a blue coat with a red sash, brown boots,
     holding a curved cutlass
@@ -40,6 +43,7 @@
   seeds: [1234]
 - id: mummy
   size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
   prompt: >-
     hunched mummy wrapped in dirty tan bandages with loose trailing strips, glowing orange eyes in a dark gap between
     the wrappings, arms reaching forward
@@ -49,6 +53,7 @@
   seeds: [1234]
 - id: cockatrice
   size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
   prompt: >-
     cockatrice: a large rooster-like bird with a red comb and wattle, iridescent green and purple body feathers, a
     teal snake-like tail, yellow beak and yellow scaly legs
@@ -57,6 +62,7 @@
   seeds: [1234]
 - id: vampire
   size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
   prompt: >-
     pale vampire with slicked-back black hair, red eyes and small fangs, a high-collared black cape with a red lining,
     a dark red vest, reaching out with a clawed hand
@@ -75,16 +81,18 @@
 - id: troll
   size: large
   prompt: >-
-    hulking green-skinned troll with a hunched back, long arms with claws, dark green spikes along its head and
-    spine, yellow eyes, tusks, a ragged brown loincloth, holding a crude wooden mallet
+    hulking green-skinned troll with a hunched back and a big belly, very long arms ending in clawed hands, short
+    bowed legs, warty mottled skin, a row of dark green spikes along its head and spine, small yellow eyes, a wide
+    mouth with two upward tusks, a ragged brown loincloth on a rope belt, holding a crude wooden mallet
   attack: lunging forward on one huge leg and swinging the mallet in a wide sideways sweep, whole body twisting
   hurt: rocked backward, hunched over with an arm thrown up to shield its face, snarling
   seeds: [1234]
 - id: dragon
   size: large
   prompt: >-
-    red dragon on four legs with large bat-like wings, two curved horns, a row of pale spikes along its back, a cream
-    belly, yellow eyes and sharp teeth, a long tail
+    red dragon on four powerful clawed legs, crimson scales with darker red plating along the back, large bat-like
+    wings with dark red membranes, two backward-curving ivory horns, a row of pale bone spikes from head to tail, a
+    ridged cream belly, yellow slit eyes, a long jaw full of sharp teeth, a long tail ending in a spade tip
   attack: lunging its long neck forward in a fierce bite, wings thrown up high, tail whipping behind
   hurt: rearing back in pain, neck twisted away, wings half folded and flinching
   seeds: [1234]

@@ -53,11 +53,15 @@ def guide(band: S.MonsterBand, floating: bool = False) -> Image.Image:
 
 # ───────────────────────────── prompt ─────────────────────────────
 
-def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool) -> str:
+def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool, has_monster_ref: bool = False) -> str:
     face = m.get("face") or ("its face (eyes, mouth or muzzle) is clearly readable in every cell, drawn at the same "
                              "sprite-pixel size as the body")
     ref = ("Image 3 is the DESIGN REFERENCE: our current sprite of this exact creature. Keep its design, colours, "
            "silhouette and equipment; redraw it as larger, more detailed modern pixel art.\n\n") if has_design_ref else ""
+    if has_monster_ref:   # prompt rev 3: an approved monster from this game instead of our old sprite
+        ref = ("Image 3 is an APPROVED MONSTER sheet from this same game (a DIFFERENT monster, idle | attack | hurt): "
+               "match its sprite-pixel size, rendering, shading, outline weight and level of detail, and how much the "
+               "poses move. Do NOT copy that monster's body, colours or equipment.\n\n")
     return (
         "Create a 3x1 sprite sheet for a modern 16-bit-style pixel-art RPG: one MONSTER in three battle poses.\n\n"
         "Image 1 is a LAYOUT GUIDE: three cells on white. In each cell the light-grey box shows where the monster "
