@@ -1,0 +1,105 @@
+{
+  "kit": "town",
+  "sheet": "kit_props",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "e01d50e27c2e8b56d5edb686",
+  "approved": "2026-11-12",
+  "tile": 48,
+  "cells": [
+    [
+      "tree_crown",
+      "fountain_00",
+      "fountain_01",
+      "bush"
+    ],
+    [
+      "tree_trunk",
+      "fountain_10",
+      "fountain_11",
+      null
+    ],
+    [
+      "fence_h",
+      "fence_v",
+      "fence_post",
+      null
+    ],
+    [
+      "barrel",
+      "crate",
+      "signpost",
+      "flowers"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "tree": [
+        48,
+        71
+      ],
+      "fountain": [
+        65,
+        59
+      ],
+      "bush": [
+        47,
+        45
+      ],
+      "fence_h": [
+        48,
+        25
+      ],
+      "fence_v": [
+        5,
+        48
+      ],
+      "fence_post": [
+        11,
+        39
+      ],
+      "flowers": [
+        48,
+        23
+      ],
+      "barrel": [
+        32,
+        47
+      ],
+      "crate": [
+        36,
+        48
+      ],
+      "signpost": [
+        41,
+        48
+      ]
+    },
+    "scale": {
+      "tree": 0.94,
+      "fountain": 1.0,
+      "bush": 1.0,
+      "fence_h": 0.94,
+      "fence_v": 0.92,
+      "fence_post": 1.0,
+      "flowers": 0.98,
+      "barrel": 1.0,
+      "crate": 0.96,
+      "signpost": 0.96
+    },
+    "skipped": [
+      "well"
+    ],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "checkpoint D props; well skipped (not drawn), sources fixed at review"
+}

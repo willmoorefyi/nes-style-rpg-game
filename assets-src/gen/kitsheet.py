@@ -681,20 +681,38 @@ def swatches_prompt(sheet: dict, n_refs: int) -> str:
         h = "left" if cx < 0.4 else "right" if cx > 0.7 else "centre"
         return f"{v}-{h}"
 
+    labels = [where(rects[sw["name"]]) for sw in sheet["swatches"]]
+    ordered = len(set(labels)) < len(labels)        # ambiguous positions: list the boxes row by row instead
+    if ordered:
+        tops = sorted({rects[sw["name"]][1] for sw in sheet["swatches"]})
+        names_row = {2: ["top", "bottom"], 3: ["top", "middle", "bottom"],
+                     4: ["top", "second", "third", "bottom"]}.get(len(tops), [f"#{i + 1}" for i in range(len(tops))])
+        nth = ["first", "second", "third", "fourth", "fifth"]
     lines = []
     for sw in sheet["swatches"]:
         w, h = sw["tiles"]
         kind = {"both": "a SEAMLESS texture (left edge continues into the right edge, top into bottom)",
                 "x": "a strip that repeats SEAMLESSLY left to right (its top and bottom edges are real edges)",
-                "none": "a single complete piece filling the box"}[sw.get("wrap", "both")]
-        lines.append(f"- the {where(rects[sw['name']])} box ({w * 48}x{h * 48} sprite pixels): {kind}. {sw['text'].strip()}")
+                "none": "a single complete piece filling the box",
+                "prop": "ONE object standing on the bottom edge of its box, as large as the box allows, with magenta "
+                        "all around it (no ground, no shadow on the ground, no grass under it)"}[sw.get("wrap", "both")]
+        if ordered:
+            box = rects[sw["name"]]
+            row_i = tops.index(box[1])
+            peers = sorted(rects[q["name"]][0] for q in sheet["swatches"] if rects[q["name"]][1] == box[1])
+            label = f"{nth[peers.index(box[0])]} box from the left in the {names_row[row_i]} row of boxes"
+        else:
+            label = f"{where(rects[sw['name']])} box"
+        lines.append(f"- the {label} ({w * 48}x{h * 48} sprite pixels): {kind}. {sw['text'].strip()}")
     refs = "".join(f"Image {3 + i} is approved art from this same game map: match its colours, outline weight and "
                    "shading exactly.\n" for i in range(n_refs))
     return (
         "Create pixel-art pieces for a modern 16-bit-style top-down RPG town map (three-quarter overhead view, like a "
         "classic SNES JRPG town).\n\n"
-        "Image 1 is a PLACEMENT GUIDE on a magenta page: fill each grey box edge to edge with the piece described "
-        "for it. Do not copy the grey colour.\n\n"
+        + ("Image 1 is a PLACEMENT GUIDE on a magenta page: draw each object inside its grey box, as described. "
+           "Do not copy the grey colour.\n\n" if all(sw.get("wrap") == "prop" for sw in sheet["swatches"]) else
+           "Image 1 is a PLACEMENT GUIDE on a magenta page: fill each grey box edge to edge with the piece described "
+           "for it. Do not copy the grey colour.\n\n") +
         "Image 2 is the HOUSE STYLE: the approved walking sprite of a character from this game at the same pixel "
         "scale as the map (about 90 sprite pixels tall). Match its sprite-pixel size, its outlines and its flat "
         "2-3 tone shading with light from the upper left.\n\n" + refs + "\n"
@@ -745,6 +763,9 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
         xs = np.where(cw >= 0.6 * cw.max())[0]
         return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
 
+    props = [sw for sw in sheet["swatches"] if sw.get("wrap") == "prop"]
+    if props:
+        return _cut_props(rgb, sheet, rects, report, canvas, seed)
     bodies = {sw["name"]: body(sw["name"]) for sw in sheet["swatches"]}
     report["piece_px"] = {n: [b[2] - b[0], b[3] - b[1]] for n, b in bodies.items()}
     for i, sw in enumerate(sheet["swatches"]):
@@ -811,5 +832,63 @@ def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Im
         # the model sizes each piece itself; what matters is that each piece's drawn pixels map to 40-64 per tile
         "density": bool(dens) and all(40 <= v <= 64 for k, v in dens.items() if k not in derived),
         "seamless": all(v <= 1.5 for v in report["wrap_after"].values()),
+    }
+    return Image.fromarray(canvas), report
+
+
+def _cut_props(rgb: np.ndarray, sheet: dict, rects: dict, report: dict, canvas: np.ndarray,
+               seed: int) -> tuple[Image.Image, dict]:
+    """Props: everything drawn in (and slightly around) each box is the object; it keeps its drawn proportions,
+    scaled by the box (box width -> its tiles x 48 native px), and stands on the bottom edge of its cells,
+    centred. Magenta becomes transparent."""
+    page = PX.magenta_bg(rgb)
+    fg_all = _open(~page, 2)
+    per_colors = sheet.get("colors_per_material", 16)
+    report["prop_px"], report["scale"], report["skipped"] = {}, {}, []
+    # scale: by the drawn pixel size (one native px per drawn pixel, like the other kit sheets) when the sheet says
+    # `scale: pitch`, else by the box (box width -> its tiles x 48 native px)
+    pitch = None
+    if sheet.get("scale") == "pitch":
+        pitch, conf, _, _ = PX.detect_pitch(rgb)
+        report["pitch_px"] = round(pitch, 2)
+    for i, sw in enumerate(sheet["swatches"]):
+        name, (c, r), (tw, th) = sw["name"], sw["at"], sw["tiles"]
+        if sw.get("skip"):                           # review: the model did not draw it (placeholder stays)
+            report["skipped"].append(name)
+            continue
+        x0, y0, x1, y1 = rects[name]
+        pad = (x1 - x0) // 10
+        X0, Y0, X1, Y1 = max(0, x0 - pad), max(0, y0 - pad), min(rgb.shape[1], x1 + pad), min(rgb.shape[0], y1 + pad)
+        if sw.get("source"):                         # review fix: where the model actually drew it (guide px)
+            X0, Y0, X1, Y1 = sw["source"]
+        fg = fg_all[Y0:Y1, X0:X1]
+        ys, xs = np.where(fg)
+        if not len(ys):
+            raise ValueError(f"prop sheet: nothing drawn in the {name} box")
+        bx0, by0, bx1, by1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+        crop, mask = rgb[Y0:Y1, X0:X1][by0:by1, bx0:bx1], fg[by0:by1, bx0:bx1]
+        scale = 1 / pitch if pitch else tw * 48 / (x1 - x0)   # native px per guide px
+        ow, oh = max(1, round(crop.shape[1] * scale)), max(1, round(crop.shape[0] * scale))
+        f = min(1.0, tw * 48 / ow, th * 48 / oh)     # never larger than its cells
+        ow, oh = max(1, round(ow * f)), max(1, round(oh * f))
+        lab, cent = _quantize(crop[mask].reshape(-1, 1, 3), per_colors, seed + i)
+        full = np.full(mask.shape, len(cent), np.int32)
+        full[mask] = lab[:, 0]
+        idx = _block_mode(full, ow, oh, len(cent) + 1)
+        img = np.zeros((oh, ow, 4), np.uint8)
+        solid = idx < len(cent)
+        img[solid, :3] = cent[idx[solid]]
+        img[solid, 3] = 255
+        cx0 = c * 48 + (tw * 48 - ow) // 2
+        cy0 = r * 48 + th * 48 - oh
+        canvas[cy0:cy0 + oh, cx0:cx0 + ow] = img
+        for j, row in enumerate(sw.get("parts") or [[name]]):
+            for q, part in enumerate(row):
+                report["cells"][r + j][c + q] = part
+        report["prop_px"][name] = [ow, oh]
+        report["scale"][name] = round(f, 2)
+    report["pass"] = {
+        "fits": all(v >= 0.6 for v in report["scale"].values()),      # not drawn far larger than its cells
+        "not_tiny": all(w >= 24 or h >= 24 for w, h in report["prop_px"].values()),
     }
     return Image.fromarray(canvas), report

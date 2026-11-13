@@ -311,8 +311,10 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             _paste(canvas, kit.part(t), x, y)
             coll[y, x] = WALL
 
-    # grass detail: a tuft on some free grass cells, nudged within the cell
-    for y in range(hgt):
+    # grass detail: a tuft on some free grass cells, nudged within the cell (only while the grass is a
+    # placeholder or a tuft part is approved: the approved grass texture has its own tufts)
+    tufts = "tuft" in kit.approved or "grass" not in kit.approved
+    for y in range(hgt if tufts else 0):
         for x in range(wid):
             if grid[y][x] == "grass" and (x, y) not in owner and rng.random() < 0.18:
                 _paste(canvas, kit.part("tuft"), x, y, int(rng.integers(-8, 9)), int(rng.integers(-8, 9)))

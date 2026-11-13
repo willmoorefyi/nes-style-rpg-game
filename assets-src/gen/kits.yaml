@@ -117,3 +117,100 @@
           text: >
             the deck of a small stone footbridge seen from above, for walking left to right: pale stone paving
             running across, with a low stone parapet along the top edge and another along the bottom edge.
+    props:
+      # checkpoint D: props stand on the bottom edge of their cells; magenta becomes transparent
+      kind: swatches
+      seed: 1234
+      refs: [house, ground]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      scale: pitch           # one native px per drawn pixel (5.12 raw px), like the house
+      swatches:
+        - name: tree
+          at: [0, 0]
+          tiles: [1, 2]
+          source: [0, 0, 280, 400]   # review fix: drawn outside its box
+          wrap: prop
+          parts: [[tree_crown], [tree_trunk]]
+          text: >
+            a dark-green conifer (fir) tree seen in three-quarter view: a tall layered cone of needles in two or
+            three greens with darker shading on the right, and a short brown trunk at the bottom centre.
+        - name: fountain
+          at: [1, 0]
+          tiles: [2, 2]
+          source: [330, 30, 700, 350]   # review fix: drawn outside its box
+          wrap: prop
+          parts: [[fountain_00, fountain_01], [fountain_10, fountain_11]]
+          text: >
+            a round town-square fountain of pale grey stone seen in three-quarter view: a low round basin full of
+            blue water with a small central pillar and a little spout of water, filling most of the box.
+        - name: bush
+          at: [3, 0]
+          tiles: [1, 1]
+          source: [760, 140, 1020, 390]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a round leafy green bush, about as wide as the box, with lighter leaves on the upper left.
+        - name: well
+          at: [3, 2]
+          tiles: [1, 1]
+          skip: true             # review: not drawn; placeholder until checkpoint E
+          wrap: prop
+          text: >
+            a small round stone well with a little wooden roof on two posts and a bucket, about as wide as the box.
+        - name: fence_h
+          at: [0, 2]
+          tiles: [1, 1]
+          source: [0, 530, 270, 680]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            one section of a white wooden picket fence running left to right: two horizontal rails that touch
+            both the left and the right edge of the box (so sections join into a long fence), with three pointed
+            pickets, in the lower half of the box.
+        - name: fence_v
+          at: [1, 2]
+          tiles: [1, 1]
+          source: [440, 400, 490, 680]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            one section of the same white picket fence running away from the viewer (top to bottom): a narrow
+            vertical run of rails and pickets in the centre of the box, touching the top and bottom edges.
+        - name: fence_post
+          at: [2, 2]
+          tiles: [1, 1]
+          source: [600, 470, 680, 680]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a single square white wooden fence post with a pointed cap, in the lower part of the box.
+        - name: flowers
+          at: [3, 3]
+          tiles: [1, 1]
+          source: [760, 550, 1020, 680]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a small low patch of flowers: red, yellow and white blossoms among green leaves, covering the lower
+            half of the box.
+        - name: barrel
+          at: [0, 3]
+          tiles: [1, 1]
+          source: [40, 760, 230, 1010]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a wooden barrel with dark iron hoops, standing upright, a bit narrower than the box.
+        - name: crate
+          at: [1, 3]
+          tiles: [1, 1]
+          source: [400, 755, 610, 1020]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a wooden crate of light planks with darker corner boards, a bit narrower than the box.
+        - name: signpost
+          at: [2, 3]
+          tiles: [1, 1]
+          source: [775, 745, 1010, 1010]   # review fix: drawn outside its box
+          wrap: prop
+          text: >
+            a wooden signpost: one post with a blank wooden board pointing right, as tall as the box.

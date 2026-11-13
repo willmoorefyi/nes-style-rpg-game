@@ -657,7 +657,7 @@ def repixelize(outdir: Path) -> None:
     print(f"repixelized {list(results)}: {review(char_id, seed, results, outdir, 'offline repixelize')}")
 
 
-def kit_preview(kit_id: str, sheet: Image.Image, report: dict, raw: Image.Image) -> Image.Image:
+def kit_preview(kit_id: str, sheet: Image.Image, report: dict, raw: Image.Image, sheet_name: str = "") -> Image.Image:
     """Raw | cut at 2x | the town map baked with the approved kit plus this candidate sheet (not approved)."""
     sys.path.insert(0, str(HERE.parent / "tools"))
     import build_map as BM
@@ -677,7 +677,7 @@ def kit_preview(kit_id: str, sheet: Image.Image, report: dict, raw: Image.Image)
     c = BM.compile_map(src, k)
     town = Image.fromarray(c.below).convert("RGBA")
     town.alpha_composite(Image.fromarray(c.above))
-    town.save(OUT / "gemini" / kit_id / "preview_town_full.png")
+    town.save(OUT / "gemini" / kit_id / f"preview_town_{sheet_name or 'full'}.png")
     town = town.resize((town.width // 2, town.height // 2), Image.Resampling.LANCZOS)
     s2 = sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST)
     rs = raw.convert("RGBA").resize((480, 480))
@@ -711,7 +711,7 @@ def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int)
         raw.save(outdir / f"{r.sheet.name}_raw.png")
         sheet.save(outdir / f"{r.sheet.name}.png")
         (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
-        kit_preview(char["id"], sheet, report, raw).save(outdir / f"{r.sheet.name}_review.png")
+        kit_preview(char["id"], sheet, report, raw, r.sheet.name).save(outdir / f"{r.sheet.name}_review.png")
         print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / (r.sheet.name + '_review.png')}")
         return report
     cells = ks["cells"]
