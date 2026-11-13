@@ -1,0 +1,27 @@
+{
+  "scale": 2,
+  "sheets": {
+    "goblin": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          0
+        ],
+        "attack": [
+          80,
+          0
+        ],
+        "hurt": [
+          160,
+          0
+        ]
+      }
+    }
+  }
+}

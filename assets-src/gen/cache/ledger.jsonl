@@ -71,3 +71,9 @@
 {"event": "result", "key": "4fd7dfab98e35eed269c87f0", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T17:32:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "old_man", "sheet": "field", "seed": 1234, "key": "58e38a26b796f11d1481229d"}
 {"event": "result", "key": "58e38a26b796f11d1481229d", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T18:30:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "goblin", "sheet": "monster_small", "seed": 1234, "key": "cf039eec8f545b954bc9f3ef"}
+{"event": "result", "key": "cf039eec8f545b954bc9f3ef", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T19:19:45", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ogre", "sheet": "monster_large", "seed": 1234, "key": "5c00115db9f09bd1af0f7038"}
+{"event": "result", "key": "5c00115db9f09bd1af0f7038", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T19:19:53", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "monster_boss", "seed": 1234, "key": "c048930f50c3cf9cc8ef475b"}
+{"event": "result", "key": "c048930f50c3cf9cc8ef475b", "ok": true}

@@ -20,6 +20,7 @@ from gen import spec as S
 GUIDE_BOX = (200, 200, 200)
 GUIDE_LINE = (150, 150, 150)
 GUIDE_ARROW = (120, 120, 120)
+HEIGHT_TOLERANCE = 0.10   # figures within 10% of the height band are kept at 1:1
 STRAY_FRAC = 0.04     # drop separate blobs smaller than this share of the largest blob (sparks, stray pixels)
 
 
@@ -83,22 +84,40 @@ def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool) -> str:
 # ───────────────────────────── cut ─────────────────────────────
 
 def _figure_mask(rgb: np.ndarray) -> np.ndarray:
-    """Foreground of one cell: magenta key (or border flood), then drop small separate blobs."""
-    fg = ~(PX.magenta_bg(rgb) if PX.is_magenta_bg(rgb) else PX.flood_bg(rgb, 40.0))
-    if PX.is_magenta_bg(rgb):
-        fg &= ~PX.magenta_fringe(rgb, fg)
+    """Foreground of one cell. Background = magenta (the requested key) plus anything near-white or magenta connected
+    to the cell border (Gemini sometimes draws magenta panels on a white page). Then keep the main figure: the largest
+    blob and any blob overlapping its bounding box (staffs, held items); drop stray blobs outside it (shadows)."""
+    bg = PX.magenta_bg(rgb)
+    near_white = rgb.min(axis=2) > 225
+    border_bg = PX.flood_bg(np.where((bg | near_white)[..., None], 255, 0).astype(np.uint8).repeat(3, 2), 10.0)
+    fg = ~(bg | (near_white & border_bg))
+    fg &= ~PX.magenta_fringe(rgb, fg)
     lab, n = PX.components(fg)
     if n == 0:
         return fg
     sizes = np.bincount(lab.ravel())[1:]
-    keep = np.isin(lab, [i + 1 for i, s in enumerate(sizes) if s >= STRAY_FRAC * sizes.max()])
-    return keep
+    main = int(sizes.argmax()) + 1
+    ys, xs = np.where(lab == main)
+    y0, y1, x0, x1 = ys.min(), ys.max(), xs.min(), xs.max()
+    keep = [main]
+    for i in range(1, n + 1):
+        if i == main or sizes[i - 1] < 3:
+            continue
+        cy, cx = np.where(lab == i)
+        inside = (cy.min() <= y1) and (cy.max() >= y0) and (cx.min() <= x1) and (cx.max() >= x0)
+        if inside and sizes[i - 1] >= STRAY_FRAC * sizes.max() * 0.25:
+            keep.append(i)
+    return np.isin(lab, keep)
 
 
 def native_art(raw: Image.Image) -> tuple[Image.Image, dict]:
     """One pixel per sprite pixel: Gemini's own grid when detectable, else an area-average at the expected pitch."""
     rgb = np.asarray(raw.convert("RGB"))
     _, info = PX.clean_resample(raw, raw.size, min_conf=0.45)
+    if info.get("native") is None and 4.0 <= info.get("pitch", 0) <= 8.0 and info.get("confidence", 0) >= 0.25:
+        # weak but plausible grid (large figures): point-sample at Gemini's own pitch rather than averaging blur
+        _, info = PX.clean_resample(raw, raw.size, min_conf=0.25)
+        info["weak_grid"] = True
     meta = {k: v for k, v in info.items() if k != "native"}
     meta["raw_size"] = raw.size
     if info.get("native") is not None:
@@ -123,7 +142,9 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         heights.append(int(ys.max() - ys.min() + 1) if len(ys) else 0)
     tallest = max(heights) or 1
     lo, hi = band.height
-    f = hi / tallest if tallest > hi else lo / tallest if tallest < lo else 1.0
+    # keep Gemini's pixels 1:1 unless the figure is clearly outside the band (rescaling by a few % drops or doubles
+    # single pixel rows); far outside, nearest-neighbour scale to the band edge
+    f = hi / tallest if tallest > hi * (1 + HEIGHT_TOLERANCE) else lo / tallest if tallest < lo * (1 - HEIGHT_TOLERANCE) else 1.0
     info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / 3, 1), h)})
 
     scaled, smasks = [], []
@@ -182,7 +203,9 @@ def frame_report(frames: list[Image.Image], band: S.MonsterBand) -> dict:
     diff = [round(float((alpha[0] ^ alpha[k]).sum()) / idle, 2) for k in (1, 2)]
     outline = all((x[m][:, :3] == np.array(PX.OUTLINE)).all(1).any() for x, m in zip(arr, alpha))
     return {"heights": heights, "bottoms": bottoms, "colours": max(colours), "outline": outline,
-            "pose_diff": diff, "height_ok": all(band.height[0] <= hh <= band.height[1] for hh in heights),
+            "pose_diff": diff,
+            "height_ok": all(band.height[0] * (1 - HEIGHT_TOLERANCE) <= hh <= band.height[1] * (1 + HEIGHT_TOLERANCE)
+                             for hh in heights),
             "diff_ok": all(d >= 0.15 for d in diff)}
 
 
