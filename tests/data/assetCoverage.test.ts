@@ -15,11 +15,16 @@ interface AtlasMeta {
   sheets: Record<string, { x: number; y: number }>;
 }
 const atlas = JSON.parse(readFileSync(join(assets, 'sprites/characters.json'), 'utf-8')) as AtlasMeta;
-const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-characters.json'), 'utf-8')) as {
+const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-characters-ai.json'), 'utf-8')) as {
   cell: [number, number];
   scale: number;
+  footRow: number;
   poses: string[];
   sheets: Record<string, { row: number }>;
+};
+const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.json'), 'utf-8')) as {
+  scale: number;
+  sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]> }>;
 };
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
 const enemies = readYaml<Array<{ id: string; sprite?: string }>>('data/enemies.yaml');
@@ -63,48 +68,24 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     });
   });
 
-  describe('battle sprites', () => {
+  describe('battle sprites (2x art)', () => {
     it.each(classes.map((c) => c.id))('class "%s" has battle poses', (id) => {
       expect(battleAtlas.sheets[id]).toBeDefined();
     });
 
-    it('provides every pose the battle scene uses', () => {
+    it('uses the 2x art scale with 160 px on-screen cells and every pose the battle scene uses', () => {
+      expect(battleAtlas.scale).toBe(2);
+      expect(battleAtlas.cell[1] * battleAtlas.scale).toBe(160);
+      expect(battleAtlas.footRow).toBeLessThan(battleAtlas.cell[1]);
       expect(battleAtlas.poses).toEqual(['ready', 'attack', 'cast', 'hurt', 'down', 'victory']);
     });
 
-    it('has an atlas image large enough for every class row', () => {
-      const png = readFileSync(join(assets, 'sprites/battle-characters.png'));
-      const width = png.readUInt32BE(16);
-      const height = png.readUInt32BE(20);
-      const rows = Object.keys(battleAtlas.sheets).length;
-      expect(width).toBe(battleAtlas.cell[0] * battleAtlas.scale * battleAtlas.poses.length);
-      expect(height).toBe(battleAtlas.cell[1] * battleAtlas.scale * rows);
-    });
-  });
-
-  describe('AI battle atlas (preview art, optional)', () => {
-    const metaPath = join(assets, 'sprites/battle-characters-ai.json');
-    const present = existsSync(metaPath);
-    const meta = present
-      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { cell: [number, number]; scale: number; footRow: number; poses: string[]; sheets: Record<string, { row: number }> })
-      : null;
-
-    it.runIf(present)('uses the 2x art scale with 160 px on-screen cells', () => {
-      expect(meta!.scale).toBe(2);
-      expect(meta!.cell[1] * meta!.scale).toBe(160);
-      expect(meta!.footRow).toBeLessThan(meta!.cell[1]);
-    });
-
-    it.runIf(present)('provides every pose the battle scene uses', () => {
-      expect(meta!.poses).toEqual(['ready', 'attack', 'cast', 'hurt', 'down', 'victory']);
-    });
-
-    it.runIf(present)('only lists known classes, and the image matches cell x scale x poses by rows', () => {
+    it('only lists known classes, and the image matches cell x scale x poses by rows', () => {
       const classIds = new Set(classes.map((c) => c.id));
-      for (const id of Object.keys(meta!.sheets)) expect(classIds.has(id), id).toBe(true);
+      for (const id of Object.keys(battleAtlas.sheets)) expect(classIds.has(id), id).toBe(true);
       const png = readFileSync(join(assets, 'sprites/battle-characters-ai.png'));
-      expect(png.readUInt32BE(16)).toBe(meta!.cell[0] * meta!.scale * meta!.poses.length);
-      expect(png.readUInt32BE(20)).toBe(meta!.cell[1] * meta!.scale * Object.keys(meta!.sheets).length);
+      expect(png.readUInt32BE(16)).toBe(battleAtlas.cell[0] * battleAtlas.scale * battleAtlas.poses.length);
+      expect(png.readUInt32BE(20)).toBe(battleAtlas.cell[1] * battleAtlas.scale * Object.keys(battleAtlas.sheets).length);
     });
   });
 
@@ -138,30 +119,17 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     });
   });
 
-  describe('enemy art', () => {
-    it.each(enemies.map((e) => [e.id, spriteOf(e)]))('enemy "%s" has a monster sprite (%s)', (_id, sprite) => {
-      expect(existsSync(join(assets, `sprites/monsters/${sprite}.png`))).toBe(true);
+  describe('monster art (2x, with poses)', () => {
+    it.each(enemies.map((e) => [e.id, spriteOf(e)]))('enemy "%s" has monster art (%s)', (_id, sprite) => {
+      expect(monsterAtlas.sheets[sprite]).toBeDefined();
     });
 
-    it('monster index lists every sprite', () => {
-      const index = JSON.parse(readFileSync(join(assets, 'sprites/monsters/index.json'), 'utf-8')) as string[];
-      for (const e of enemies) expect(index).toContain(spriteOf(e));
-    });
-  });
-
-  describe('AI monster atlas (preview art, optional)', () => {
-    const metaPath = join(assets, 'sprites/monsters-ai.json');
-    const present = existsSync(metaPath);
-    const meta = present
-      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { scale: number; sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]> }> })
-      : null;
-
-    it.runIf(present)('every entry has idle, attack and hurt frames inside the image, feet inside the cell', () => {
+    it('every entry has idle, attack and hurt frames inside the image, feet inside the cell', () => {
       const png = readFileSync(join(assets, 'sprites/monsters-ai.png'));
       const w = png.readUInt32BE(16);
       const h = png.readUInt32BE(20);
-      const s = meta!.scale;
-      for (const [id, e] of Object.entries(meta!.sheets)) {
+      const s = monsterAtlas.scale;
+      for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
         // idle, attack and hurt are required; bosses may add a `cast` stance
         expect(Object.keys(e.frames).filter((k) => k !== 'cast').sort(), id).toEqual(['attack', 'hurt', 'idle']);
         for (const [x, y] of Object.values(e.frames)) {
@@ -172,11 +140,18 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       }
     });
 
-    it.runIf(present)('only lists sprites some enemy uses or a legacy sprite exists for', () => {
+    it('only lists sprites some enemy uses', () => {
       const used = new Set(enemies.map(spriteOf));
-      for (const id of Object.keys(meta!.sheets)) {
-        expect(used.has(id) || existsSync(join(assets, `sprites/monsters/${id}.png`)), id).toBe(true);
-      }
+      for (const id of Object.keys(monsterAtlas.sheets)) expect(used.has(id), id).toBe(true);
+    });
+  });
+
+  describe('battle stage backgrounds (map backgrounds: crossFileValidation)', () => {
+    const scenarioBackgrounds = readYaml<Array<{ background?: string }>>('data/debug-scenarios.yaml')
+      .map((s) => s.background).filter((x): x is string => !!x);
+
+    it.each([...new Set(scenarioBackgrounds)])('debug scenario background %s exists', (path) => {
+      expect(existsSync(resolve(assets, '..', path))).toBe(true);
     });
   });
 

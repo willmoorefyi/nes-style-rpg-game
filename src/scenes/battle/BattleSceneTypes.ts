@@ -18,10 +18,8 @@ export interface BattleSceneConfig {
   inventory?: Inventory;
   /** Whether the party can run from this battle (default true) */
   canRun?: boolean;
-  /** Optional background image path for the battle scene */
+  /** Battle stage background path (assets/backgrounds/<id>.webp) */
   background?: string;
-  /** 2x battle art (enemy view, layout, poses). Default: useAiBattleArt(); tests pass false for the legacy path. */
-  useAiArt?: boolean;
   /** Optional per-enemy-id action patterns (debug scenarios): attached as BossAI after the battle is created. */
   enemyAi?: EnemyAiPatterns;
 }

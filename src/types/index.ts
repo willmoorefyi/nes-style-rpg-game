@@ -192,7 +192,7 @@ export interface MapData {
   scriptedEncounters?: ScriptedEncounter[];
   vehicles?: VehicleSpawn[];
   keyItemGates?: KeyItemGate[];
-  /** Battle backdrop ids (assets/backgrounds/<id>.png); `terrain` keys are lowercase TerrainType names. */
+  /** Battle stage background ids (assets/backgrounds/<id>.webp); `terrain` keys are lowercase TerrainType names. */
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
 }
 /** Terrain types for the collision/movement system */

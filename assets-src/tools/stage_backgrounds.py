@@ -4,7 +4,7 @@
 
 Each source (1536x1024) is scaled to the 1920 px screen width and shifted so its horizon (where the scenery meets the
 battle plain, measured by eye in source pixels) lands at screen y HORIZON_Y. The result is a screen-ready 1920x1080
-image written to assets/backgrounds-ai/<game id>.webp and committed; the game draws it at (0, 0) unscaled.
+image written to assets/backgrounds/<game id>.webp and committed; the game draws it at (0, 0) unscaled.
 This is not a build stage: rerun it only when a source image or a horizon changes.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "assets" / "backgrounds-ai"
+OUT = ROOT / "assets" / "backgrounds"
 SCREEN = (1920, 1080)
 FIELD_TOP = 120            # the message window covers 0-120
 HORIZON_Y = 310            # stage spec: scenery above ~300, battle plain from ~340; feet at 360-770

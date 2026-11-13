@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { partySpritePosition, AI_PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayManager.js';
+import { partySpritePosition, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { computeEnemyLayoutAi, STAGE_FEET, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 
 /** docs/ART_BATTLE_PLAN.md: every actor's feet on the battle plain (y 360-770); tops below the message window (120). */
@@ -8,11 +8,11 @@ const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 
 
 describe('battle stage rules', () => {
   it('party feet stand on the plain and heads stay below the message window', () => {
-    const art = { ai: true, footRow: 76, scale: 2 };
-    AI_PARTY_FEET_Y.forEach((feet, i) => {
+    const art = { footRow: 76, scale: 2 };
+    PARTY_FEET_Y.forEach((feet, i) => {
       expect(feet).toBeGreaterThanOrEqual(STAGE_FEET.min);
       expect(feet).toBeLessThanOrEqual(STAGE_FEET.max);
-      const p = partySpritePosition(i, art, 160);
+      const p = partySpritePosition(i, art);
       expect(p.y).toBeGreaterThanOrEqual(FIELD_TOP);
       expect(p.y + (art.footRow + 1) * art.scale).toBe(feet);
     });

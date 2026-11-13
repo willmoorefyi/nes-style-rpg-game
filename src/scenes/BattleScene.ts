@@ -1,6 +1,4 @@
 import { Container, Graphics, Sprite, Assets, type Texture } from 'pixi.js';
-import { useAiBattleArt } from '../core/artPreview.js';
-import { stagedBackgroundPath } from '../rendering/BattleBackground.js';
 import type { Scene, SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
@@ -80,28 +78,17 @@ export class BattleScene implements Scene {
     bg.rect(0, GAME_HEIGHT / 2 - 1, GAME_WIDTH, 2).fill(0x2a2a4e);
     this.container.addChildAt(bg, 0);
 
-    // Optional background (overlays the solid-color fallback): the staged 2x background first, else the legacy image
+    // Battle stage background (screen-ready 1920x1080; overlays the solid-color fallback)
     if (this.config.background) {
-      const legacy = this.config.background;
-      const staged = (this.config.useAiArt ?? useAiBattleArt()) ? stagedBackgroundPath(legacy) : null;
-      const show = (texture: Texture): void => {
+      const path = this.config.background;
+      Assets.load<Texture>(path).then((texture) => {
         const sprite = new Sprite(texture);
         const scale = Math.max(GAME_WIDTH / texture.width, GAME_HEIGHT / texture.height);
         sprite.scale.set(scale);
         sprite.x = (GAME_WIDTH - texture.width * scale) / 2;
         sprite.y = (GAME_HEIGHT - texture.height * scale) / 2;
         this.container.addChildAt(sprite, 1);
-      };
-      const loadLegacy = () => Assets.load<Texture>(legacy).then(show)
-        .catch((err) => console.warn('Failed to load battle background:', legacy, err));
-      if (staged) {
-        Assets.load<Texture>(staged).then(show).catch((err) => {
-          console.warn('Staged battle background unavailable; using the legacy image', staged, err);
-          return loadLegacy();
-        });
-      } else {
-        void loadLegacy();
-      }
+      }).catch((err) => console.warn('Failed to load battle background:', path, err));
     }
 
     this.createUI();

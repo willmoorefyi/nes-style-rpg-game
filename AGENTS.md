@@ -282,22 +282,23 @@ See `docs/PROGRESS.md` for full details.
 
 ## Art & Audio Pipeline
 
-All art and audio are generated from code in `assets-src/` (Python 3 + Pillow + numpy + ffmpeg) and written into `assets/`. Nothing in `assets/sprites/`, `assets/audio/` or the new `assets/backgrounds/*.png` is hand-edited; change the generator and rebuild.
+All art and audio are generated from code in `assets-src/` (Python 3 + Pillow + numpy + ffmpeg) and written into `assets/`. Nothing in `assets/sprites/` or `assets/audio/` is hand-edited; change the generator (or approve new AI art) and rebuild. `assets/backgrounds/*.webp` come from the one-time stage remap.
 
 ```bash
 npm run assets                      # rebuild everything
 python3 -I assets-src/build_assets.py terrain characters   # or pick stages: terrain | characters | battle | monsters | backgrounds | audio
 ```
 
-**Style:** SNES-inspired. Every colour is defined as 5-bit-per-channel values (15-bit, BGR555-style) in `assets-src/snes_palette.py`, light comes from the top-left, and ramps run darkest→lightest. Art is authored at native resolution and upscaled with nearest-neighbour: x3 for field art (`TILE_SIZE` = 48), x4 for the battle character atlas, x3 for monsters.
+**Style:** SNES-inspired. Every colour is defined as 5-bit-per-channel values (15-bit, BGR555-style) in `assets-src/snes_palette.py`, light comes from the top-left, and ramps run darkest→lightest. Art is authored at native resolution and upscaled with nearest-neighbour: x3 for the legacy field art (`TILE_SIZE` = 48) and x2 for all AI-generated art (battle characters, monsters, preview field sprites).
 
 | Stage | Source | Output | Notes |
 |-------|--------|--------|-------|
 | terrain | `tiles.py` | `assets/sprites/terrain.png` | Rows = `TerrainType` order (+ counter), 4 variants per terrain, picked per map cell |
 | characters | `characters.py` | `assets/sprites/characters.png`, `characters.json` | Field-size two-tile (16x32) characters: 4 walk rows x 3 frames per block. Keyed by class id and NPC `sprite` name. (A battle-pose row is still generated but unused.) |
-| battle | `rig/` (`raster.py`, `figure.py`) | `assets/sprites/battle-characters.png`, `.json` | Pixel-Remaster-style battle figures, 40x46 native at 3x: one row per class, columns = ready, attack, cast, hurt, down, victory. Rendered from a `Look` + joint `Pose` with a supersampled shape rasteriser and height-field shading |
-| monsters | `monsters*.py` | `assets/sprites/monsters/<enemy-id>.png`, `index.json` | 32/64/96 px native for small/large/boss |
-| backgrounds | `backgrounds.py` | `assets/backgrounds/<id>.png` | Referenced by `battleBackgrounds` in map YAML |
+| battle_ai | `gen/approved/<class>/battle.png` | `assets/sprites/battle-characters-ai.png`, `.json` | Gemini-generated, approved 2x battle figures (80x80 native): one row per class, columns = ready, attack, cast, hurt, down, victory |
+| field_ai | `gen/approved/<id>/field.png` | `assets/sprites/characters-ai.png`, `.json` | 2x field sprites (preview only, `?art=ai`) |
+| monsters_ai | `gen/approved/<monster>/monster_*.png`, `boss_*.png` | `assets/sprites/monsters-ai.png`, `.json` | Idle / attack / hurt (+ boss `cast`) per monster sprite, plus palette-swap variants from `gen/monsters.yaml` |
+| (one-time) | `tools/stage_backgrounds.py` | `assets/backgrounds/<id>.webp` | Hand-made backgrounds remapped once onto the battle stage (1920x1080, per-image horizon); referenced by `battleBackgrounds` in map YAML. Not a build stage |
 | audio | `audio/` | `assets/audio/{music,sfx}/*.ogg` | Filenames come from `audio-manifest.json` |
 
 **AI sprite generation (2x art scale, in progress):** `assets-src/gen/` generates character sprites with Google
@@ -305,17 +306,17 @@ Gemini and pixelizes them; see `assets-src/gen/README.md` and `docs/ART_2X_PLAN.
 budget guard: one per review checkpoint, `--paid` required, every attempt logged in `assets-src/gen/cache/ledger.jsonl`.
 Run `python3 -I assets-src/gen/selftest.py` after changing the pipeline. Approved sheets live in `assets-src/gen/approved/<id>/`; the `battle_ai` and `field_ai` build stages turn them into `assets/sprites/battle-characters-ai.*` and `characters-ai.*`. Monsters come from `monsters.yaml` (`monsters_ai` stage → `assets/sprites/monsters-ai.*`; bosses are one image per pose, including `cast`).
 
-**Battles use the 2x art by default** in every build (party, monsters with attack/cast/hurt poses, staged backgrounds); `?art=legacy` switches battles back. Staged backgrounds are screen-ready 1920x1080 images in `assets/backgrounds-ai/<id>.webp`, remapped once from the hand-made sources by `python3 -I assets-src/tools/stage_backgrounds.py` (per-image horizon so every actor's feet land on the battle plain, y 360-770; see `docs/ART_BATTLE_PLAN.md`). Field art is still preview-only: `?art=ai` (96 px tiles, 20x11 view), e.g. `?art=ai&scenario=knight_field`. Battle previews: `?scenario=ai_party_base | ai_boss | ai_boss_cast | ai_monsters_nine`. Debug scenarios may give enemies an action pattern with `enemyAi` (e.g. a boss that casts). Automated browser tests must add `&mute=1` (dev only), which disables audio entirely.
+**Battles use only the 2x art** (party, monsters with attack/cast/hurt poses, staged backgrounds); the old code-drawn battle art is gone. Missing art shows coloured placeholder boxes with a console warning. Staged backgrounds are screen-ready 1920x1080 images in `assets/backgrounds/<id>.webp`, remapped once from the hand-made sources by `python3 -I assets-src/tools/stage_backgrounds.py` (per-image horizon so every actor's feet land on the battle plain, y 360-770; see `docs/ART_BATTLE_PLAN.md`). Field art is still preview-only: `?art=ai` (96 px tiles, 20x11 view), e.g. `?art=ai&scenario=knight_field`. Battle previews: `?scenario=ai_party_base | ai_boss | ai_boss_cast | ai_monsters_nine`. Debug scenarios may give enemies an action pattern with `enemyAi` (e.g. a boss that casts). Automated browser tests must add `&mute=1` (dev only), which disables audio entirely.
 
 **Adding art for new content**
 - New class or NPC sprite name: add a `Look` to `ROSTER` in `characters.py` (keys must match the class id / the `sprite:` value in map YAML), then `npm run assets`.
-- New enemy: add a drawing function in the monsters modules, then `npm run assets` (updates `index.json`).
+- New enemy: add it to `assets-src/gen/monsters.yaml` (or reuse a sprite / palette-swap `variants`), generate and approve its sheet (`generate.py <id> --backend gemini --sheets monster`, `approve.py <id> monster`), then `build_assets.py monsters_ai`.
 - `tests/data/assetCoverage.test.ts` fails if a class, NPC sprite, enemy, or audio-manifest entry has no asset.
 
 **Runtime wiring**
-- `CharacterAtlas` (`src/rendering/`) loads the character atlas once; `BattleArt` preloads monsters. Both are preloaded in `ExplorationScene.enter()`, and battle falls back to coloured rectangles (with a console warning) if art is missing.
+- `CharacterAtlas` (`src/rendering/`) loads the field atlas and the 2x battle atlas once; `BattleArt` preloads the monster atlas. Both are preloaded in `ExplorationScene.enter()`, and battle falls back to coloured rectangles (with a console warning) if art is missing.
 - Characters are two tiles tall: the head tile overhangs the tile above. `PlayerController`/`NPC` lift the sprite by `frameHeight - TILE_SIZE` and set `zIndex` to the feet position; `ExplorationScene.worldContainer.sortableChildren` depth-sorts them.
-- Battle uses the separate, larger `battle-characters` atlas with poses (`ready`, `attack`, `cast`, `hurt`, `down`, `victory`) via `BattleDisplayManager`. The class `Look` in `characters.py` drives both field and battle art.
+- Battle uses the 2x `battle-characters-ai` atlas with poses (`ready`, `attack`, `cast`, `hurt`, `down`, `victory`) via `BattleDisplayManager`, and monsters via `AiEnemyView` / `EnemyPoseController` (lunge, cast, hurt shake) laid out by `EnemyLayoutAi` with every actor's feet on the battle plain.
 
 ## Debug Menu & Battle Scenarios
 

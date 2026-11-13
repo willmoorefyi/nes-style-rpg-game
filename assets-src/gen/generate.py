@@ -80,7 +80,9 @@ SHEETS: dict[str, Sheet] = {
     **{f"boss_{pose}": Sheet(f"boss_{pose}", {}, [pose], S.BOSS_POSE_GEOM, "boss battle", "", "")
        for pose in S.BOSS_POSES},
 }
-MONSTER_SPRITES = HERE.parent.parent / "assets" / "sprites" / "monsters"
+# the old monster sprites (our own art) that approved rev-1/2 monster requests were sent as design references; archived
+# here (no longer game assets) so those requests still reproduce their cache keys
+MONSTER_SPRITES = HERE / "legacy_design"
 
 
 # ───────────────────────────── inputs ─────────────────────────────

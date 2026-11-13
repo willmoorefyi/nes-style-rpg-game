@@ -8264,5 +8264,5 @@ battleBackgrounds:
     forest: forest
     desert: desert
     swamp: swamp
-    water: ocean
-    river: ocean
+    water: ocean       # at sea: fought from the ship (deck background)
+    river: river       # on the river: fought from the canoe

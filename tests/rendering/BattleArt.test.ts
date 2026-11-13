@@ -26,18 +26,16 @@ describe('monsterSpriteKey', () => {
 });
 
 describe('BattleArt monster frames', () => {
-  let aiJson: () => Response;
+  let atlasJson: () => Response;
 
   beforeEach(() => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(Assets, 'load').mockImplementation(async () => fakeTexture() as never);
     vi.stubGlobal('fetch', vi.fn(async (path: string) => {
       const file = path.split('/').pop();
-      if (file === 'index.json') return respond(JSON.stringify(['goblin', 'wolf']));
-      if (file === 'monsters-ai.json') return aiJson();
+      if (file === 'monsters-ai.json') return atlasJson();
       return respond('', false, 404);
     }));
-    vi.stubGlobal('location', { search: '?art=ai' });
   });
 
   afterEach(() => {
@@ -45,45 +43,26 @@ describe('BattleArt monster frames', () => {
     vi.restoreAllMocks();
   });
 
-  it('legacy art: the same still for every pose, at its own size, feet on the last row', async () => {
-    aiJson = () => respond('', false, 404);
+  it('slices idle, attack and hurt at 2x with the atlas feet row; cast falls back to attack', async () => {
+    atlasJson = () => respond(JSON.stringify(aiMonsters));
     const art = new BattleArt();
     await art.load();
-    const f = art.getMonsterFrames('wolf', true)!;
-    expect(f.ai).toBe(false);
-    expect(f.idle).toBe(f.attack);
-    expect(f.idle).toBe(f.hurt);
-    expect(f.cast).toBe(f.idle);
-    expect(f.scale).toBe(1);
-    expect(f.cell).toEqual([96, 96]);
-    expect(f.footRow).toBe(95);
-  });
-
-  it('AI art in preview mode: three different frames at 2x with the atlas feet row', async () => {
-    aiJson = () => respond(JSON.stringify(aiMonsters));
-    const art = new BattleArt();
-    await art.load();
-    const f = art.getMonsterFrames('goblin', true)!;
-    expect(f.ai).toBe(true);
+    const f = art.getMonsterFrames('goblin')!;
     expect(f.scale).toBe(2);
     expect(f.footRow).toBe(76);
     expect(f.idle).not.toBe(f.attack);
     expect(f.attack.frame.x).toBe(160);
     expect(f.hurt.frame.x).toBe(320);
-    // no cast frame in the atlas: magic shows the attack frame
-    expect(f.cast.frame.x).toBe(f.attack.frame.x);
     expect(f.idle.frame.width).toBe(160);
-    // monsters without an approved AI sheet fall back to legacy art
-    expect(art.getMonsterFrames('wolf', true)?.ai).toBe(false);
-    // normal play never uses the AI sheet
-    expect(art.getMonsterFrames('goblin', false)?.ai).toBe(false);
+    expect(f.cast.frame.x).toBe(f.attack.frame.x);
+    expect(art.getMonsterFrames('wolf')).toBeNull();      // no art: the battle shows a placeholder box
   });
 
-  it('a broken AI atlas does not block battle art', async () => {
-    aiJson = () => respond('<!doctype html>');
+  it('a missing or broken atlas does not block battle', async () => {
+    atlasJson = () => respond('<!doctype html>');
     const art = new BattleArt();
     await art.load();
     expect(art.isLoaded).toBe(true);
-    expect(art.getMonsterFrames('goblin', true)?.ai).toBe(false);
+    expect(art.getMonsterFrames('goblin')).toBeNull();
   });
 });

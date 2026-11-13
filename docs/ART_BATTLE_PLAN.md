@@ -186,3 +186,10 @@ Then `selftest.py`, `npm run build` and `npm test`.
   - The party moved to feet `[440, 550, 660, 770]` at x `[1380, 1425, 1470, 1515]`, lower on the plain and wider
     apart.
 - **Step 3 is done.** `useAiBattleArt()` is the default; `?art=legacy` returns to the old battle art and backgrounds.
+- **Follow-up (user):** the legacy battle art and its generators are removed (the code-drawn battle rig, monster and
+  background generators and their outputs, and `?art=legacy`). Battles use only the 2x art, with placeholder boxes if
+  art is missing.
+  - The staged backgrounds now live in `assets/backgrounds/`.
+  - The 7 old monster sprites used as design references by approved rev-1/2 monster requests are archived in
+    `assets-src/gen/legacy_design/`, so their cache keys still reproduce.
+  - Overworld river battles (canoe) use `river`; sea battles (ship) use `ocean`, the ship deck.

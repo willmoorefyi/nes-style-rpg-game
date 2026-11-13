@@ -1,37 +1,29 @@
 import { Container, BitmapText, Graphics, Sprite, Texture } from 'pixi.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
-import { computeEnemyLayout, ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
-import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
-import { useAiBattleArt } from '../../core/artPreview.js';
+import { battleArt } from '../../rendering/BattleArt.js';
 import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 
-/** Party sprites are 120x138 (40x46 native at 3x, matching monster pixel density); feet rest on these baselines. */
-const PARTY_FEET_Y = [335, 455, 575, 695];
-const PARTY_X = [1420, 1445, 1470, 1495];
-/** Transparent rows below the boots inside each battle cell (about 5px at 3x). */
-const PARTY_BOTTOM_PAD = 5;
 const HURT_FRAMES = 24;
-/** 2x art (80x80 native at 2x): feet line per party slot, on the background's battle plain (docs/ART_BATTLE_PLAN.md:
- *  every actor's feet at y 360-770), and x per slot. */
-export const AI_PARTY_FEET_Y = [440, 550, 660, 770];
-export const AI_PARTY_X = [1380, 1425, 1470, 1515];
+/** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
+ *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-770), and x per slot (a slight diagonal). */
+export const PARTY_FEET_Y = [440, 550, 660, 770];
+export const PARTY_X = [1380, 1425, 1470, 1515];
+const PLACEHOLDER_SIZE = 64;
+const PLACEHOLDER_COLORS = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
 
-/** Screen position for a party battle sprite. Legacy art keeps its original constants (normal play unchanged). */
-export function partySpritePosition(i: number, art: { ai: boolean; footRow: number | null; scale: number }, spriteHeight: number): { x: number; y: number } {
-  if (art.ai && art.footRow !== null) {
-    return { x: AI_PARTY_X[i], y: AI_PARTY_FEET_Y[i] - (art.footRow + 1) * art.scale };
-  }
-  return { x: PARTY_X[i], y: PARTY_FEET_Y[i] - spriteHeight + PARTY_BOTTOM_PAD };
+/** Screen position (top-left) for a party battle sprite whose feet are on `art.footRow`. */
+export function partySpritePosition(i: number, art: { footRow: number; scale: number }): { x: number; y: number } {
+  return { x: PARTY_X[i], y: PARTY_FEET_Y[i] - (art.footRow + 1) * art.scale };
 }
 
 export class BattleDisplayManager {
   readonly enemySprites: Container[] = [];
-  /** 2x monster art with poses (null on the legacy path, ?art=legacy). */
+  /** Monster sprites with poses (attack / cast / hurt), placed on the battle plain. */
   enemyView: AiEnemyView | null = null;
   readonly partySprites: Container[] = [];
   // Per-member battle pose textures; null where only the placeholder rectangle is available
@@ -54,57 +46,26 @@ export class BattleDisplayManager {
   ) {}
 
   createEnemySprites(): void {
-    const enemies = this.battle.allEnemies;
-    if (this.config.useAiArt ?? useAiBattleArt()) {
-      this.enemyView = new AiEnemyView(enemies.map(e => e.data));
-      for (const sprite of this.enemyView.build()) {
-        this.mainContainer.addChild(sprite);
-        this.enemySprites.push(sprite);
-      }
-      if (!battleArt.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
-      return;
-    }
-    const positions = computeEnemyLayout(enemies.map(e => e.data));
-    for (let i = 0; i < enemies.length; i++) {
-      const sprite = this.buildEnemySprite(i, positions[i]);
+    this.enemyView = new AiEnemyView(this.battle.allEnemies.map(e => e.data));
+    for (const sprite of this.enemyView.build()) {
       this.mainContainer.addChild(sprite);
       this.enemySprites.push(sprite);
     }
     if (!battleArt.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
   }
 
-  private buildEnemySprite(i: number, box: { x: number; y: number; w: number; h: number }): Container {
-    const enemy = this.battle.allEnemies[i];
-    const { x, y, w, h } = box;
-    const tex = battleArt.getMonster(monsterSpriteKey(enemy.data));
-    if (tex) {
-      const sprite = new Sprite(tex);
-      sprite.scale.set(w / tex.width, h / tex.height);
-      sprite.position.set(x - w / 2, y - h / 2);
-      return sprite;
-    }
-    const color = ENEMY_COLORS[enemy.data.name.toLowerCase()] ?? DEFAULT_ENEMY_COLOR;
-    const g = new Graphics();
-    g.rect(0, 0, w, h).fill(color);
-    g.position.set(x - w / 2, y - h / 2);
-    return g;
-  }
-
   private buildPartySprite(i: number): { sprite: Container; frames: Texture[] | null } {
     const char = this.config.party[i];
-    const art = characterAtlas.isLoaded ? characterAtlas.getBattleFrames(char.classData.id) : null;
-    const xPositions = [1450, 1475, 1500, 1525];
+    const art = characterAtlas.getBattleFrames(char.classData.id);
     if (art) {
       const sprite = new Sprite(art.frames[0]);
-      const pos = partySpritePosition(i, art, sprite.height);
+      const pos = partySpritePosition(i, art);
       sprite.position.set(pos.x, pos.y);
       return { sprite, frames: art.frames };
     }
-    const colors = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
-    const yPositions = [280, 380, 480, 580];
     const g = new Graphics();
-    g.rect(0, 0, 64, 64).fill(colors[i % colors.length]);
-    g.position.set(xPositions[i], yPositions[i]);
+    g.rect(0, 0, PLACEHOLDER_SIZE, PLACEHOLDER_SIZE).fill(PLACEHOLDER_COLORS[i % PLACEHOLDER_COLORS.length]);
+    g.position.set(PARTY_X[i] + (160 - PLACEHOLDER_SIZE) / 2, PARTY_FEET_Y[i] - PLACEHOLDER_SIZE);
     return { sprite: g, frames: null };
   }
 
@@ -113,11 +74,6 @@ export class BattleDisplayManager {
     if (this.enemyView) {
       const rebuilt = this.enemyView.build();
       rebuilt.forEach((sprite, i) => this.swapSprite(this.enemySprites, i, sprite));
-    }
-    const positions = computeEnemyLayout(this.battle.allEnemies.map(e => e.data));
-    for (let i = 0; i < this.enemySprites.length && !this.enemyView; i++) {
-      if (this.enemySprites[i] instanceof Sprite) continue;
-      this.swapSprite(this.enemySprites, i, this.buildEnemySprite(i, positions[i]));
     }
     for (let i = 0; i < this.partySprites.length; i++) {
       if (this.partyFrames[i]) continue;
@@ -185,7 +141,7 @@ export class BattleDisplayManager {
       this.partyFrames.push(built.frames);
     }
     this.refreshPoses();
-    if (!characterAtlas.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
+    if (!characterAtlas.hasBattleArt) void battleArt.load().then(() => this.upgradeToArt());
   }
 
   /** Force a temporary pose (e.g. 'attack') for a party sprite; null clears it. No-op for placeholders. */

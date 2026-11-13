@@ -13,10 +13,3 @@ export function isPreviewAi(search: string = typeof location === 'undefined' ? '
   return new URLSearchParams(search).get('art') === 'ai';
 }
 
-/**
- * 2x battle art (party, monsters, poses, staged backgrounds; docs/ART_BATTLE_PLAN.md) is the default in every build.
- * `?art=legacy` switches battles back to the original art. Field art and 96 px tiles stay behind isPreviewAi().
- */
-export function useAiBattleArt(search: string = typeof location === 'undefined' ? '' : location.search): boolean {
-  return new URLSearchParams(search).get('art') !== 'legacy';
-}

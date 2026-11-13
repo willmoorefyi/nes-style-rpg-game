@@ -1,4 +1,5 @@
 import { Container, Sprite, Graphics } from 'pixi.js';
+import { battleBackgroundPath } from '../rendering/BattleBackground.js';
 import type { MapData, Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
@@ -477,7 +478,7 @@ export class ExplorationScene implements Scene {
       const terrain = TerrainType[this.collisionMap.getTerrainType(this.player.gridX, this.player.gridY)];
       id = (terrain && cfg.terrain[terrain.toLowerCase()]) || id;
     }
-    return id ? `assets/backgrounds/${id}.png` : undefined;
+    return id ? battleBackgroundPath(id) : undefined;
   }
 
   /** Trigger a scripted encounter: show message, then start battle */

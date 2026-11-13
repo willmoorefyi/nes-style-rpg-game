@@ -9,8 +9,8 @@ import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
 
 /**
- * Preview-mode (`?art=ai`) monster sprites: 2x art (or legacy stills) placed by computeEnemyLayoutAi with feet on a
- * shared line, posed and offset by EnemyPoseController. Normal play keeps BattleDisplayManager's legacy path.
+ * Monster battle sprites: 2x art (or placeholder boxes) placed by computeEnemyLayoutAi with every foot on the battle
+ * plain, posed and offset by EnemyPoseController.
  */
 export class AiEnemyView {
   readonly poses: EnemyPoseController;

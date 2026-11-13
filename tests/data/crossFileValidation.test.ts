@@ -307,7 +307,7 @@ describe('Cross-file data validation', () => {
       const ids = [cfg.default, ...Object.values(cfg.terrain ?? {})].filter((v): v is string => !!v);
       new Set(ids).forEach((bg) => {
         it(`map "${map.id}" battle background "${bg}" has art`, () => {
-          expect(existsSync(join(bgDir, `${bg}.png`))).toBe(true);
+          expect(existsSync(join(bgDir, `${bg}.webp`))).toBe(true);
         });
       });
     });
