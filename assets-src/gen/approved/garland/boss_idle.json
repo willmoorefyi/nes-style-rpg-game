@@ -1,0 +1,25 @@
+{
+  "character": "garland",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "725729407d8e4ff145f82e12",
+  "approved": "2026-11-12",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "Garland idle (per-pose boss)"
+}

@@ -1,9 +1,9 @@
 {
   "scale": 2,
   "sheets": {
-    "goblin": {
+    "cockatrice": {
       "cell": [
-        80,
+        84,
         80
       ],
       "footRow": 76,
@@ -14,12 +14,56 @@
           0
         ],
         "attack": [
-          80,
+          84,
           0
         ],
         "hurt": [
-          160,
+          168,
           0
+        ]
+      }
+    },
+    "goblin": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          80
+        ],
+        "attack": [
+          80,
+          80
+        ],
+        "hurt": [
+          160,
+          80
+        ]
+      }
+    },
+    "mummy": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          160
+        ],
+        "attack": [
+          80,
+          160
+        ],
+        "hurt": [
+          160,
+          160
         ]
       }
     },
@@ -33,15 +77,81 @@
       "frames": {
         "idle": [
           0,
-          80
+          240
         ],
         "attack": [
           128,
-          80
+          240
         ],
         "hurt": [
           256,
-          80
+          240
+        ]
+      }
+    },
+    "pirate": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          368
+        ],
+        "attack": [
+          80,
+          368
+        ],
+        "hurt": [
+          160,
+          368
+        ]
+      }
+    },
+    "vampire": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          448
+        ],
+        "attack": [
+          80,
+          448
+        ],
+        "hurt": [
+          160,
+          448
+        ]
+      }
+    },
+    "wolf": {
+      "cell": [
+        110,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          528
+        ],
+        "attack": [
+          110,
+          528
+        ],
+        "hurt": [
+          220,
+          528
         ]
       }
     },
@@ -55,19 +165,19 @@
       "frames": {
         "idle": [
           0,
-          208
+          608
         ],
         "attack": [
           200,
-          208
+          608
         ],
         "hurt": [
           400,
-          208
+          608
         ],
         "cast": [
           600,
-          208
+          608
         ]
       }
     }
