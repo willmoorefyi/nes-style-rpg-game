@@ -1,4 +1,4 @@
-import { SpriteAnimation, type AnimationConfig, type Direction } from '../rendering/SpriteAnimation.js';
+import { SpriteAnimation, type AnimationConfig, type Direction, walkCycleIndex } from '../rendering/SpriteAnimation.js';
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
@@ -39,6 +39,8 @@ export class PlayerController {
   private targetY: number;
   private moveProgress = 0;
   private moveSpeed: number;
+  /** Tiles walked so far; alternates the stepping foot from tile to tile. */
+  private stepsTaken = 0;
   private state: PlayerState = 'idle';
   private collisionMap: CollisionMap;
   private input: InputManager;
@@ -64,7 +66,7 @@ export class PlayerController {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,
       frameCount: 2,
-      frameDuration: 260,   // each step pose holds for about a tile's worth of movement
+      frameDuration: 150,   // only used by timer-driven callers; walking is driven by movement (walkCycleIndex)
       directions: { down: 0, up: 1, left: 2, right: 3 },
       ...config.animation,
     });
@@ -93,14 +95,16 @@ export class PlayerController {
         this.tileY = this.targetY;
         this.moveProgress = 0;
         this.state = 'idle';
+        this.stepsTaken++;                       // the next tile steps with the other foot
         this.animation.setState('idle');
         this.events.emit('playerMove', { x: this.tileX, y: this.tileY });
+      } else {
+        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, this.moveProgress));
       }
       this.updateSpritePosition();
     } else {
       this.handleInput();
     }
-    this.animation.update(dt * 16.67);
   }
 
   private handleInput(): void {
@@ -119,7 +123,7 @@ export class PlayerController {
         this.targetX = newX;
         this.targetY = newY;
         this.state = 'moving';
-        this.animation.setState('walking');
+        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, 0));
       }
     }
   }

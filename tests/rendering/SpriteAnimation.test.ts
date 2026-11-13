@@ -128,3 +128,15 @@ describe('SpriteAnimation - atlas origin and walk sequence', () => {
     expect(anim.sprite.texture.frame.x).toBe(0);
   });
 });
+
+describe('walkCycleIndex (movement-driven walking)', () => {
+  it('shows a step pose then the passing pose on each tile, alternating feet across tiles', async () => {
+    const { walkCycleIndex } = await import('../../src/rendering/SpriteAnimation.js');
+    const seq = [1, 0, 2, 0];                 // stepL, stand, stepR, stand
+    const frames = [];
+    for (let tile = 0; tile < 4; tile++) {
+      for (const p of [0, 0.25, 0.5, 0.75]) frames.push(seq[walkCycleIndex(tile, p) % 4]);
+    }
+    expect(frames).toEqual([1, 1, 0, 0, 2, 2, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0]);
+  });
+});

@@ -16,6 +16,13 @@ export interface AnimationConfig {
   walkSequence?: number[];
 }
 
+/** Position in the walk cycle for a character moving tile by tile: each tile shows a step pose for its first half
+ *  and the passing (standing) pose for its second half, and consecutive tiles alternate the stepping foot, so a
+ *  [stepL, stand, stepR, stand] cycle plays exactly once every two tiles at any walking speed. */
+export function walkCycleIndex(stepsTaken: number, tileProgress: number): number {
+  return stepsTaken * 2 + (tileProgress < 0.5 ? 0 : 1);
+}
+
 export class SpriteAnimation {
   readonly sprite: Sprite;
   private textures: Map<string, Texture[]> = new Map();
@@ -72,6 +79,16 @@ export class SpriteAnimation {
       this.elapsed = 0;
       this.updateTexture();
     }
+  }
+
+  /** Show a walk-cycle position directly (movement-driven animation; see walkCycleIndex). */
+  setWalkFrame(cycleIndex: number): void {
+    if (this.currentState !== 'walking') this.currentState = 'walking';
+    const next = ((cycleIndex % this.cycleLength) + this.cycleLength) % this.cycleLength;
+    if (next !== this.frameIndex) {
+      this.frameIndex = next;
+    }
+    this.updateTexture();
   }
 
   update(deltaMs: number): void {

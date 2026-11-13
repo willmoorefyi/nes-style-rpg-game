@@ -1,3 +1,4 @@
+import { walkCycleIndex } from '../rendering/SpriteAnimation.js';
 import { Sprite, Texture } from 'pixi.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
 import type { ConditionalDialog } from '../types/index.js';
@@ -50,6 +51,7 @@ export class NPC {
   readonly giftItem?: string;
   readonly giftFlag?: string;
   readonly wander: boolean;
+  private stepsTaken = 0;
   private wanderTimer: number = 0;
   private wanderInterval: number = 120;
   private isMoving: boolean = false;
@@ -101,9 +103,10 @@ export class NPC {
       this.sprite.x = (this.moveFromX + (this.tileX - this.moveFromX) * t) * TILE_SIZE;
       this.sprite.y = (this.moveFromY + (this.tileY - this.moveFromY) * t) * TILE_SIZE + this.offsetY;
       this.updateDepth();
-      this.showFrame(t >= 1 ? 0 : WALK_CYCLE[Math.floor(t * 4) % WALK_CYCLE.length]);
+      this.showFrame(t >= 1 ? 0 : WALK_CYCLE[walkCycleIndex(this.stepsTaken, t) % WALK_CYCLE.length]);
       if (t >= 1) {
         this.isMoving = false;
+        this.stepsTaken++;
       }
       return;
     }
