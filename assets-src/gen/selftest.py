@@ -206,6 +206,7 @@ def test_style_lock() -> None:
     check(bool(knight.get("locked")), "knight is locked in characters.yaml")
     for path in sorted((HERE / "approved").glob("*/*.json")):
         meta = json.loads(path.read_text())
+        meta.setdefault("character", meta.get("kit"))       # kit sheets are keyed by kit id
         char = GEN.load_character(meta["character"])
         req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
         check(req.key == meta["cache_key"] and req.cached,
@@ -291,6 +292,41 @@ def test_size_ref() -> None:
           f"warrior (red armour, {red.sum()} px) is inside the crop")
 
 
+def test_kits() -> None:
+    print("tile kits")
+    from gen import kitsheet as KS
+    kit = GEN.load_character("town")
+    ks = GEN.kit_sheet(kit, "kit_house")
+    cells = ks["cells"]
+    size, tile = KS.geo(ks)
+    cols, rows = len(cells[0]), len(cells)
+    g = KS.guide(cells, size, tile, grid_lines=ks.get("grid_lines", True))
+    x0, y0, x1, y1 = KS.grid_box(cols, rows, size, tile)
+    check(g.size == size and x0 >= 0 and y0 >= 0 and (x1 - x0, y1 - y0) == (cols * tile, rows * tile),
+          f"house guide {size}, {cols}x{rows} grid of {tile} px at ({x0}, {y0})")
+    w, h = size
+    from math import gcd
+    check(GEN.SHEETS["kit_house"].geom.aspect == f"{w // gcd(w, h)}:{h // gcd(w, h)}", "kit sheet aspect matches its guide")
+    # synthetic render: the guide recoloured as a house, drawn in ~6 px pixels at Gemini's output size
+    rgb = np.asarray(g).copy()
+    for grey, col in (((150, 150, 150), (180, 70, 50)), ((205, 205, 205), (225, 210, 180)),
+                      ((90, 90, 90), (110, 70, 40)), ((120, 120, 120), (90, 150, 200)), ((110, 110, 110), (200, 190, 160))):
+        rgb[(rgb == grey).all(-1)] = col
+    small = Image.fromarray(rgb).resize((w // 6, h // 6), Image.Resampling.NEAREST).resize((w, h), Image.Resampling.NEAREST)
+    sheet, rep = KS.cut(small, cells, 0, size, tile, ks.get("derive"))
+    extra = 1 if ks.get("derive") else 0
+    check(sheet.size == (cols * 48, (rows + extra) * 48), f"cut is 48 px per tile, plus a derived row ({sheet.size})")
+    check(rep["pass"]["alignment"] and rep["pass"]["door"] and rep["pass"]["colours"],
+          f"synthetic house passes alignment / door / colours ({rep['grid_alignment_native_px']} px, door "
+          f"{rep['door_opening_px']} px, {rep['colours']} colours)")
+    if extra:
+        plain = np.asarray(sheet)[rows * 48:, :48, :3].reshape(-1, 3)
+        check(len(np.unique(plain, axis=0)) <= 2, "derived wall_up_plain has the window painted out")
+    check(rep["pass"]["seams"], f"plain repeated parts are seamless ({rep['seam_ratio']})")
+    check(KS.seam_ratio(np.tile(np.arange(48, dtype=np.uint8)[None, :, None] * 5, (48, 1, 3))) > 1.5,
+          "a ramp tile repeated horizontally fails the seam check")
+
+
 if __name__ == "__main__":
     test_geometry()
     test_field3_geometry()
@@ -301,5 +337,6 @@ if __name__ == "__main__":
     test_style_lock()
     test_monsters()
     test_size_ref()
+    test_kits()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)

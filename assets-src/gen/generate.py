@@ -35,6 +35,7 @@ import yaml  # noqa: E402
 from PIL import Image, ImageDraw  # noqa: E402
 
 from gen import guides as G  # noqa: E402
+from gen import kitsheet as KS  # noqa: E402
 from gen import monster as M  # noqa: E402
 from gen import pixelize as PX  # noqa: E402
 from gen import spec as S  # noqa: E402
@@ -80,6 +81,14 @@ SHEETS: dict[str, Sheet] = {
     **{f"boss_{pose}": Sheet(f"boss_{pose}", {}, [pose], S.BOSS_POSE_GEOM, "boss battle", "", "")
        for pose in S.BOSS_POSES},
 }
+# tile kits (kits.yaml): one sheet per checkpoint, named kit_<sheet>
+KITS = yaml.safe_load((HERE / "kits.yaml").read_text())
+for _kit in KITS:
+    for _name, _sh in _kit["sheets"].items():
+        SHEETS[f"kit_{_name}"] = Sheet(f"kit_{_name}", {}, [c for row in _sh["cells"] for c in row],
+                                       S.kit_geom(len(_sh["cells"][0]), len(_sh["cells"]), _sh.get("aspect", "5:4"),
+                                                  _sh.get("tile_px", 240)), "map tiles", "", "")
+
 # the old monster sprites (our own art) that approved rev-1/2 monster requests were sent as design references; archived
 # here (no longer game assets) so those requests still reproduce their cache keys
 MONSTER_SPRITES = HERE / "legacy_design"
@@ -95,13 +104,26 @@ def load_character(cid: str) -> dict:
     for entry in yaml.safe_load((HERE / "monsters.yaml").read_text()):
         if entry["id"] == cid:
             return {**entry, "kind": "monster"}
-    raise SystemExit(f"no character or monster '{cid}' in characters.yaml / monsters.yaml")
+    for entry in KITS:
+        if entry["id"] == cid:
+            return {**entry, "kind": "kit"}
+    raise SystemExit(f"no character, monster or kit '{cid}' in characters.yaml / monsters.yaml / kits.yaml")
 
 
 def seed_for(char: dict, sheet_name: str) -> int:
+    if is_kit(char):
+        return kit_sheet(char, sheet_name).get("seed", 1234)
     """Approved seed for a sheet: `sheet_seeds: {<sheet>: n}` overrides the character's first seed (lets one pose of a
     per-pose boss be redrawn without changing the others' cache keys)."""
     return (char.get("sheet_seeds") or {}).get(sheet_name, char.get("seeds", [1234])[0])
+
+
+def is_kit(char: dict) -> bool:
+    return char.get("kind") == "kit"
+
+
+def kit_sheet(char: dict, sheet_name: str) -> dict:
+    return char["sheets"][sheet_name.removeprefix("kit_")]
 
 
 def is_monster(char: dict) -> bool:
@@ -220,6 +242,8 @@ def house_images(char: dict, sheet: Sheet) -> list[Image.Image]:
 
 def allowed_sheets(char: dict) -> list[str]:
     """Sheets a character may request: NPCs are field-only (`sheets: [field]`); classes get battle + field."""
+    if is_kit(char):
+        return [f"kit_{n}" for n in char["sheets"]]
     if is_monster(char):
         if char.get("per_pose"):
             return [f"boss_{pose}" for pose in S.BOSS_POSES]
@@ -254,6 +278,20 @@ class Request:
 def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str | None) -> Request:
     if sheet.name not in allowed_sheets(char):
         raise SystemExit(f"refused: {char['id']} has no '{sheet.name}' sheet (sheets: {allowed_sheets(char)})")
+    if is_kit(char):
+        if backend != "gemini":
+            raise SystemExit("refused: kit sheets are Gemini-only")
+        from gen import gemini as GM
+        ks = kit_sheet(char, sheet.name)
+        size, tile = KS.geo(ks)
+        guide = KS.guide(ks["cells"], size, tile, grid_lines=ks.get("grid_lines", True))
+        refs = [ref_image(f"assets-src/gen/approved/{char['id']}/{r}.png") for r in ks.get("refs") or []]
+        images = [guide, ref_image(S.HOUSE_REFS["field"])] + refs
+        prompt = KS.prompt(char, sheet.name, ks, len(refs))
+        mid = model or GM.DEFAULT_MODEL
+        key = GM.cache_key(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)
+        run = lambda: GM.generate(prompt, images, aspect_ratio=sheet.geom.aspect, seed=seed, model=mid)  # noqa: E731
+        return Request(char["id"], sheet, seed, backend, mid, guide, key, prompt, images, run)
     if is_monster(char):
         if backend != "gemini":
             raise SystemExit("refused: monster sheets are Gemini-only")
@@ -610,6 +648,21 @@ def repixelize(outdir: Path) -> None:
     print(f"repixelized {list(results)}: {review(char_id, seed, results, outdir, 'offline repixelize')}")
 
 
+def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int) -> dict:
+    """Cut a kit sheet and write <sheet>_{guide,raw}.png, <sheet>.png (48 px tiles), <sheet>_report.json, review.png."""
+    ks = kit_sheet(char, r.sheet.name)
+    cells = ks["cells"]
+    size, tile = KS.geo(ks)
+    sheet, report = KS.cut(raw, cells, seed, size, tile, ks.get("derive"), hairlines=ks.get("grid_lines", True))
+    r.guide.save(outdir / f"{r.sheet.name}_guide.png")
+    raw.save(outdir / f"{r.sheet.name}_raw.png")
+    sheet.save(outdir / f"{r.sheet.name}.png")
+    (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
+    KS.review(raw, sheet, report, cells).save(outdir / "review.png")
+    print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / 'review.png'}")
+    return report
+
+
 # ───────────────────────────── main ─────────────────────────────
 
 def main(argv: list[str] | None = None) -> None:
@@ -627,6 +680,13 @@ def main(argv: list[str] | None = None) -> None:
     args = ap.parse_args(argv)
 
     if args.repixelize:
+        if (args.repixelize / "kit_house_raw.png").exists() or list(args.repixelize.glob("kit_*_raw.png")):
+            kit = load_character(args.repixelize.parent.name)
+            for raw_path in sorted(args.repixelize.glob("kit_*_raw.png")):
+                name = raw_path.name.removesuffix("_raw.png")
+                req = plan_request(kit, SHEETS[name], int(args.repixelize.name), "gemini", None)
+                write_kit(args.repixelize, kit, req, Image.open(raw_path).convert("RGB"), req.seed)
+            return
         repixelize(args.repixelize)
         return
     if not args.character or not args.backend:
@@ -663,6 +723,9 @@ def main(argv: list[str] | None = None) -> None:
         outdir = OUT / args.backend / char["id"] / str(seed)
         outdir.mkdir(parents=True, exist_ok=True)
         raw = execute(r)
+        if is_kit(char):
+            write_kit(outdir, char, r, raw, seed)
+            continue
         frames = cut_frames(raw, r.guide, r.sheet, char, seed)
         write_outputs(outdir, r.sheet, r.guide, raw, frames)
         by_seed.setdefault(seed, {})[r.sheet.name] = (raw, frames)

@@ -260,12 +260,23 @@ def build_optional(module_name: str) -> None:
     print(f"{module_name}: built")
 
 
+def build_maps() -> None:
+    """Compile assets-src/maps/*.yaml into baked 2x maps (assets/maps/ai/); docs/ART_TILES_PLAN.md."""
+    sys.path.insert(0, str(HERE / "tools"))
+    import build_map
+    try:
+        build_map.build()
+    except build_map.MapError as e:
+        raise SystemExit(f"map error: {e}")
+
+
 STAGES = {
     "terrain": build_terrain,
     "characters": build_characters,
     "battle_ai": build_battle_ai,
     "field_ai": build_field_ai,
     "monsters_ai": build_monsters_ai,
+    "maps": build_maps,
     "audio": lambda: build_optional("audio"),
 }
 

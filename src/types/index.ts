@@ -145,14 +145,14 @@ export function resolveNPCDialog(
   return defaultEntry?.text ?? [];
 }
 
-export interface MapTransition {
+/** A transition lands either on fixed coordinates or on a named entrance of the target map (`MapData.entrances`). */
+export type MapTransition = {
   x: number;
   y: number;
   targetMap: string;
-  targetX: number;
-  targetY: number;
   requiredFlag?: string;  // story flag required to use this transition
-}
+} & ({ targetX: number; targetY: number; targetEntrance?: undefined }
+  | { targetEntrance: string; targetX?: undefined; targetY?: undefined });
 
 export interface EncounterEntry {
   enemies: string[];
@@ -194,6 +194,18 @@ export interface MapData {
   keyItemGates?: KeyItemGate[];
   /** Battle stage background ids (assets/backgrounds/<id>.webp); `terrain` keys are lowercase TerrainType names. */
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
+  /** Named arrival cells, e.g. `south_gate: [23, 34]` (targets of `targetEntrance`). */
+  entrances?: Record<string, [number, number]>;
+  /** Baked 2x art from assets-src/tools/build_map.py; when set, `layers` is empty. */
+  art?: BakedMapArt;
+}
+
+/** Baked map chunks: `chunk` x `chunk` tiles of `tile` native px each, row-major; `above` is null where empty. */
+export interface BakedMapArt {
+  tile: number;
+  chunk: number;
+  below: string[];
+  above: (string | null)[];
 }
 /** Terrain types for the collision/movement system */
 export enum TerrainType {

@@ -313,3 +313,10 @@ MONSTER_POSE_GUIDE = (1024, 1024)
 # never shrunk to fit (that drops pixel rows).
 BOSS_POSE_GEOM = SheetGeom("boss_pose", grid=(200, 200), cell_px=MONSTER_POSE_GUIDE, layout=(1, 1), px_per_unit=1.0,
                            bottom_row=192)
+
+
+# Tile-kit sheets (docs/ART_TILES_PLAN.md rev 2.1): 48x48 native tiles, 240 guide px per tile on a 1280x1024 (5:4)
+# guide; the layout comes from each sheet's cell table in kits.yaml. kitsheet.py draws the guide and cuts the result.
+def kit_geom(cols: int, rows: int, aspect: str = "5:4", tile_px: int = 240) -> SheetGeom:
+    return SheetGeom("kit", grid=(48, 48), cell_px=(tile_px, tile_px), layout=(cols, rows), px_per_unit=1.0,
+                     bottom_row=47, aspect_override=aspect)

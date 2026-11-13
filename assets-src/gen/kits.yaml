@@ -1,0 +1,33 @@
+# Tile kits for the map compiler (docs/ART_TILES_PLAN.md). Each sheet is one paid image: a complete object drawn on
+# a tile grid and sliced into the named 48x48 parts below (rows top to bottom). `refs` lists approved sheets of this
+# kit sent as extra style references.
+- id: town
+  kind: kit
+  sheets:
+    house:
+      # rev 2.2 (user, option 2): 4x4 tiles on a 1:1 guide so Gemini's ~6 px pixels give ~41 native px per tile;
+      # no grid lines on the guide (the 5:4 pilot copied them). wall_up_plain is derived offline from the window cell.
+      seed: 1234
+      refs: []
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 248
+      grid_lines: false
+      cells:
+        - [roof_ridge_l, roof_ridge_m, roof_ridge_m, roof_ridge_r]
+        - [roof_eave_l, roof_eave_m, roof_eave_m, roof_eave_r]
+        - [wall_up_l, wall_up_window, wall_door_top, wall_up_r]
+        - [wall_lo_l, wall_lo_plain, wall_door_bottom, wall_lo_r]
+      derive:
+        wall_up_plain: { from: wall_up_window }
+      prompt_rev: 2
+      prompt: >
+        a small European-style village cottage seen straight from the front (the south side). Show only the front:
+        the left and right sides of the building are straight vertical edges, with no side wall visible and no roof
+        overhang past the sides. The top half is the roof: red-orange clay roof tiles in neat horizontal courses
+        sloping toward the viewer, with the ridge line along the very top and the lower edge ending in a dark eave
+        with a thin shadow line under it (no gable, no chimney, no dormer, no sign). The bottom half is the front
+        wall: warm cream plaster with a darker base course along the bottom and slightly darker corners at the left
+        and right. A wooden plank door with a dark frame stands in the right-centre of the wall, from about the
+        middle of the wall down to the bottom edge; a small four-pane window with a wooden frame sits in the upper
+        part of the wall left of the door; the rest of the wall is plain.

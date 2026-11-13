@@ -3,8 +3,9 @@ import type { MapData } from '../types/index.js';
 import { Camera } from './Camera.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
 import type { PlaceholderTextures } from './PlaceholderTextures.js';
+import type { MapRenderer } from './MapRenderer.js';
 
-export class TilemapRenderer {
+export class TilemapRenderer implements MapRenderer {
   readonly container: Container;
   private mapData: MapData;
   private tileTextures: Texture[] = [];

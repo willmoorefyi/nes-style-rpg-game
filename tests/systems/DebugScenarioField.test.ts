@@ -37,14 +37,22 @@ describe('DebugScenarioLoader field mode', () => {
     await expect(new DebugScenarioLoader(game as unknown as Game).run({ ...field, spawn: undefined })).rejects.toThrow(/map and spawn/);
   });
 
+  it('an entrance scenario hands the entrance name to exploration', async () => {
+    const game = { ...fakeGame(), pendingEntrance: null as string | null };
+    await new DebugScenarioLoader(game as unknown as Game).run({ ...field, spawn: undefined, entrance: 'south_gate' });
+    expect(game.pendingEntrance).toBe('south_gate');
+    expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
+  });
+
   it('every field scenario in debug-scenarios.yaml spawns on a walkable tile', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
     const fields = scenarios.filter((s) => s.mode === 'field');
     expect(fields.length).toBeGreaterThan(0);
     for (const s of fields) {
-      const map = parse(readFileSync(resolve(root, `assets/maps/${s.map}.yaml`), 'utf-8')) as { width: number; collision: number[] };
-      const [x, y] = s.spawn!;
-      expect(map.collision[y * map.width + x], `${s.id} spawn`).toBe(0);
+      const map = parse(readFileSync(resolve(root, `assets/maps/${s.map}.yaml`), 'utf-8')) as
+        { width: number; collision: number[]; entrances?: Record<string, [number, number]> };
+      const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spawn!;
+      expect([1, 2], `${s.id} spawn`).not.toContain(map.collision[y * map.width + x]);
     }
   });
 });

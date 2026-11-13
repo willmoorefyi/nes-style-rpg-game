@@ -8203,13 +8203,11 @@ transitions:
   - x: 8
     y: 11
     targetMap: cornelia
-    targetX: 7
-    targetY: 14
+    targetEntrance: south_gate
   - x: 9
     y: 11
     targetMap: cornelia
-    targetX: 8
-    targetY: 14
+    targetEntrance: south_gate
   - x: 8
     y: 3
     targetMap: temple-of-fiends

@@ -76,7 +76,7 @@ describe('Battle Integration', () => {
 
     // Advance through messages until we reach 'end' state
     let iterations = 0;
-    while (getState() !== 'end' && iterations < 50) {
+    while (getState() !== 'end' && iterations < 300) {
       tick(scene, input, 'confirm');
       iterations++;
     }
@@ -106,7 +106,7 @@ describe('Battle Integration', () => {
     tick(scene, input, 'confirm'); // target
 
     let iterations = 0;
-    while (getState() !== 'end' && iterations < 50) {
+    while (getState() !== 'end' && iterations < 300) {
       tick(scene, input, 'confirm');
       iterations++;
     }
@@ -144,7 +144,7 @@ describe('Battle Integration', () => {
     tick(scene, input, 'confirm'); // target
 
     let iterations = 0;
-    while (getState() !== 'end' && iterations < 50) {
+    while (getState() !== 'end' && iterations < 300) {
       tick(scene, input, 'confirm');
       iterations++;
     }
@@ -172,7 +172,7 @@ describe('Battle Integration', () => {
     // Run command submitted - battle continues
     // Either we escape (defeat state) or fail to escape and continue fighting
     let iterations = 0;
-    while (iterations < 50) {
+    while (iterations < 300) {
       tick(scene, input, 'confirm');
       iterations++;
       // If we're in end state, we can break

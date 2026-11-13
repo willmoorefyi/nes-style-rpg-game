@@ -42,6 +42,19 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     src = GEN.OUT / "gemini" / cid / str(seed)
     dst = HERE / "approved" / cid
     dst.mkdir(parents=True, exist_ok=True)
+    if GEN.is_kit(char):
+        # kit sheet: the cut 48 px tiles plus the cell table the map compiler slices by (assets-src/tools/kit.py)
+        part = sheet_name.removeprefix("kit_")
+        shutil.copy2(src / f"{sheet_name}.png", dst / f"{part}.png")
+        report = json.loads((src / f"{sheet_name}_report.json").read_text())
+        meta = {"kit": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
+                "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"), "tile": 48,
+                "cells": report.pop("cells"), "metrics": report}
+        if note:
+            meta["note"] = note
+        (dst / f"{part}.json").write_text(json.dumps(meta, indent=2) + "\n")
+        _unignore(req.key)
+        return dst / f"{part}.json"
     # only the cut sheet: the raw render is the committed cache entry (cache/<key>.png) and the prompt is
     # reproducible with --dry-run
     shutil.copy2(src / f"{sheet_name}.png", dst / f"{sheet_name}.png")
@@ -74,14 +87,18 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     if note:
         meta["note"] = note
     (dst / f"{sheet_name}.json").write_text(json.dumps(meta, indent=2) + "\n")
+    _unignore(req.key)
+    return dst / f"{sheet_name}.json"
+
+
+def _unignore(key: str) -> None:
     gi = ROOT / ".gitignore"
     lines = gi.read_text().splitlines()
     for ext in ("png", "json"):
-        line = f"!assets-src/gen/cache/{req.key}.{ext}"
+        line = f"!assets-src/gen/cache/{key}.{ext}"
         if line not in lines:
             lines.append(line)
     gi.write_text("\n".join(lines) + "\n")
-    return dst / f"{sheet_name}.json"
 
 
 if __name__ == "__main__":

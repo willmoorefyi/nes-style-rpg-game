@@ -1,0 +1,77 @@
+import { describe, it, expect, vi } from 'vitest';
+import { arrivalFor, entrancePosition, safeSpawn } from '../../src/systems/MapTransition.js';
+import { MapLoader } from '../../src/systems/MapLoader.js';
+import { BakedMapRenderer } from '../../src/rendering/BakedMapRenderer.js';
+import { TilemapRenderer } from '../../src/rendering/TilemapRenderer.js';
+import type { DataLoader } from '../../src/core/DataLoader.js';
+import type { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
+import { Texture } from 'pixi.js';
+import type { MapData } from '../../src/types/index.js';
+
+function map(extra: Partial<MapData> = {}): MapData {
+  // 3x2: top row walls, bottom row grass
+  return { id: 'm', width: 3, height: 2, layers: [], tilesets: [], collision: [1, 1, 1, 0, 0, 0], npcs: [], transitions: [],
+    entrances: { gate: [2, 1], door: [0, 1] }, ...extra };
+}
+
+describe('entrances', () => {
+  it('resolves a named entrance and fixed coordinates', () => {
+    expect(arrivalFor({ x: 0, y: 0, targetMap: 'm', targetEntrance: 'door' }, map())).toEqual({ x: 0, y: 1 });
+    expect(arrivalFor({ x: 0, y: 0, targetMap: 'm', targetX: 1, targetY: 1 }, map())).toEqual({ x: 1, y: 1 });
+  });
+
+  it('throws on an unknown entrance', () => {
+    expect(() => entrancePosition(map(), 'nope')).toThrow(/no entrance 'nope'/);
+  });
+
+  it('moves a blocked restore position to the first entrance, keeps a walkable one', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(safeSpawn(map(), { x: 1, y: 0 })).toEqual({ x: 2, y: 1 });
+    expect(safeSpawn(map(), { x: 1, y: 1 })).toEqual({ x: 1, y: 1 });
+    expect(safeSpawn(map({ entrances: undefined }), { x: 1, y: 0 })).toEqual({ x: 1, y: 0 });
+    warn.mockRestore();
+  });
+});
+
+describe('MapLoader compiled maps', () => {
+  const placeholders = {
+    getNPCTexture: vi.fn().mockReturnValue(Texture.WHITE),
+    getNPCFrames: vi.fn().mockReturnValue(null),
+  } as unknown as PlaceholderTextures;
+
+  function loaderWith(preferCompiled: boolean) {
+    const baked: MapData = { ...map(), id: 'cornelia', art: { tile: 48, chunk: 16, below: ['b.png'], above: [null] } };
+    const dl = {
+      loadMapManifest: vi.fn().mockResolvedValue(['cornelia']),
+      loadMap: vi.fn().mockImplementation(async (path: string) => (path.includes('/ai/') ? baked : map({ id: 'legacy' }))),
+    };
+    const loadTextures = vi.fn().mockResolvedValue({ below: [Texture.WHITE], above: [null] });
+    const ml = new MapLoader(dl as unknown as DataLoader, placeholders, { preferCompiled, loadTextures });
+    return { ml, dl, loadTextures };
+  }
+
+  it('prefers the compiled map for a listed id under preview and awaits its chunks', async () => {
+    const { ml, dl, loadTextures } = loaderWith(true);
+    const r = await ml.loadMap('cornelia');
+    expect(dl.loadMap).toHaveBeenCalledWith('assets/maps/ai/cornelia.yaml');
+    expect(loadTextures).toHaveBeenCalledTimes(1);
+    expect(r.tilemap).toBeInstanceOf(BakedMapRenderer);
+    expect(r.tilemap.aboveContainer).toBeDefined();
+  });
+
+  it('uses the legacy map for unlisted ids and outside preview', async () => {
+    const a = loaderWith(true);
+    expect((await a.ml.loadMap('overworld')).tilemap).toBeInstanceOf(TilemapRenderer);
+    expect(a.dl.loadMap).toHaveBeenCalledWith('assets/maps/overworld.yaml');
+    const b = loaderWith(false);
+    await b.ml.loadMap('cornelia');
+    expect(b.dl.loadMap).toHaveBeenCalledWith('assets/maps/cornelia.yaml');
+    expect(b.dl.loadMapManifest).not.toHaveBeenCalled();
+  });
+
+  it('fails loudly when a listed compiled map is broken', async () => {
+    const { ml, dl } = loaderWith(true);
+    dl.loadMap.mockRejectedValueOnce(new Error('MapData.art.below: expected 1 chunks, got 0'));
+    await expect(ml.loadMap('cornelia')).rejects.toThrow(/expected 1 chunks/);
+  });
+});

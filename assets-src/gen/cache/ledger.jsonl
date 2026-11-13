@@ -123,3 +123,9 @@
 {"event": "result", "key": "4647a60ad314a1ce2f3b375b", "ok": true}
 {"event": "attempt", "ts": "2026-11-12T20:38:57", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "troll", "sheet": "monster_large", "seed": 1234, "key": "5988a29db2c6182e1d42a403"}
 {"event": "result", "key": "5988a29db2c6182e1d42a403", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T22:21:09", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_house", "seed": 1234, "key": "877453b0c68b9cf5264df3e8"}
+{"event": "result", "key": "877453b0c68b9cf5264df3e8", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T22:36:17", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_house", "seed": 1234, "key": "13318bf4b7c823e34d9ad1a6"}
+{"event": "result", "key": "13318bf4b7c823e34d9ad1a6", "ok": true}
+{"event": "attempt", "ts": "2026-11-12T22:51:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_house", "seed": 1234, "key": "06c4e2452230c92dbabb9c8c"}
+{"event": "result", "key": "06c4e2452230c92dbabb9c8c", "ok": true}

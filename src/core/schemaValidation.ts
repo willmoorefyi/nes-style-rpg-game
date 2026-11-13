@@ -104,9 +104,28 @@ export function validateMapData(data: unknown): MapData {
     assertNumber(`MapData.transitions[${i}].x`, t.x);
     assertNumber(`MapData.transitions[${i}].y`, t.y);
     assertString(`MapData.transitions[${i}].targetMap`, t.targetMap);
-    assertNumber(`MapData.transitions[${i}].targetX`, t.targetX);
-    assertNumber(`MapData.transitions[${i}].targetY`, t.targetY);
+    if (t.targetEntrance !== undefined) {
+      assertString(`MapData.transitions[${i}].targetEntrance`, t.targetEntrance);
+      if (t.targetX !== undefined || t.targetY !== undefined) {
+        throw new ValidationError(`MapData.transitions[${i}]: give targetEntrance or targetX/targetY, not both`);
+      }
+    } else {
+      assertNumber(`MapData.transitions[${i}].targetX`, t.targetX);
+      assertNumber(`MapData.transitions[${i}].targetY`, t.targetY);
+    }
   });
+
+  if (data.entrances !== undefined) {
+    assertObject('MapData.entrances', data.entrances);
+    for (const [name, pos] of Object.entries(data.entrances as Record<string, unknown>)) {
+      assertArray(`MapData.entrances.${name}`, pos);
+      const p = pos as unknown[];
+      if (p.length !== 2) throw new ValidationError(`MapData.entrances.${name}: expected [x, y]`);
+      assertNumber(`MapData.entrances.${name}[0]`, p[0]);
+      assertNumber(`MapData.entrances.${name}[1]`, p[1]);
+    }
+  }
+  if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
   
   return data as unknown as MapData;
 }
@@ -180,4 +199,26 @@ export function validateShopData(data: unknown): ShopData {
     assertNumber('ShopData.innPrice', data.innPrice);
   }
   return data as unknown as ShopData;
+}
+
+/** `art` of a compiled map: both chunk lists cover ceil(w/chunk) * ceil(h/chunk) chunks; `above` may hold nulls. */
+function validateBakedArt(art: unknown, width: number, height: number): void {
+  assertObject('MapData.art', art);
+  const a = art as Record<string, unknown>;
+  assertNumber('MapData.art.tile', a.tile);
+  assertNumber('MapData.art.chunk', a.chunk);
+  assertArray('MapData.art.below', a.below);
+  assertArray('MapData.art.above', a.above);
+  const chunk = a.chunk as number;
+  const expected = Math.ceil(width / chunk) * Math.ceil(height / chunk);
+  for (const key of ['below', 'above'] as const) {
+    const list = a[key] as unknown[];
+    if (list.length !== expected) {
+      throw new ValidationError(`MapData.art.${key}: expected ${expected} chunks, got ${list.length}`);
+    }
+    list.forEach((v, i) => {
+      if (key === 'above' && v === null) return;
+      assertString(`MapData.art.${key}[${i}]`, v);
+    });
+  }
 }

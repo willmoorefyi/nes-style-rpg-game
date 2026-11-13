@@ -21,10 +21,11 @@ export interface DebugScenario {
   background?: string;
   /** Optional action patterns per enemy id, e.g. `{ lich: [{ type: magic, spellId: ice, weight: 1 }] }`. */
   enemyAi?: EnemyAiPatterns;
-  /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `spawn`. */
+  /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `entrance` (or the `spawn` cell). */
   mode?: 'battle' | 'field';
   map?: string;
   spawn?: [number, number];
+  entrance?: string;
 }
 
 /** Choose a scenario by `?scenario=<id>` (dev URLs); falls back to the first scenario. */
@@ -51,10 +52,13 @@ export class DebugScenarioLoader {
   }
 
   async applyAndExplore(scenario: DebugScenario): Promise<void> {
-    if (!scenario.map || !scenario.spawn) throw new Error(`field scenario ${scenario.id} needs map and spawn`);
+    if (!scenario.map || (!scenario.spawn && !scenario.entrance)) {
+      throw new Error(`field scenario ${scenario.id} needs map and spawn or entrance`);
+    }
     this.applyParty(scenario);
     this.game.currentMapId = scenario.map;
-    this.game.playerPosition = { x: scenario.spawn[0], y: scenario.spawn[1] };
+    this.game.pendingEntrance = scenario.entrance ?? null;
+    if (scenario.spawn) this.game.playerPosition = { x: scenario.spawn[0], y: scenario.spawn[1] };
     this.game.scenes.switchTo('exploration');
   }
 

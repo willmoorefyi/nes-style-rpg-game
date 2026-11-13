@@ -63,7 +63,7 @@
   name: Knight in Cornelia (AI art preview)
   mode: field
   map: cornelia
-  spawn: [13, 13]
+  entrance: south_gate
   party:
     - { class: knight, name: KNT1, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
   items: {}

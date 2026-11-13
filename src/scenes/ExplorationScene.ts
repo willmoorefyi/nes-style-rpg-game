@@ -5,7 +5,8 @@ import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import { PlayerController } from '../entities/PlayerController.js';
-import { MapTransitionSystem } from '../systems/MapTransition.js';
+import { MapTransitionSystem, arrivalFor, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
+import type { MapTransition as MapTransitionData } from '../types/index.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { EncounterSystem } from '../systems/EncounterSystem.js';
 import { DialogBox } from '../ui/DialogBox.js';
@@ -41,7 +42,7 @@ export class ExplorationScene implements Scene {
   private worldContainer = new Container();
   private uiContainer = new Container();
   private camera: Camera;
-  private tilemap: import('../rendering/TilemapRenderer.js').TilemapRenderer | null = null;
+  private tilemap: import('../rendering/MapRenderer.js').MapRenderer | null = null;
   private player: PlayerController | null = null;
   private mapTransition: MapTransitionSystem;
   private npcInteraction: NPCInteractionSystem;
@@ -136,12 +137,18 @@ export class ExplorationScene implements Scene {
     this.encounterSystem.start();
     if (this.savedPosition && this.currentMapId) {
       await this.loadMap(this.currentMapId);
-      this.player?.setPosition(this.savedPosition.x, this.savedPosition.y);
+      const pos = this.currentMapData ? safeSpawn(this.currentMapData, this.savedPosition) : this.savedPosition;
+      this.player?.setPosition(pos.x, pos.y);
       this.savedPosition = null;
     } else if (this.game.currentMapId) {
-      // Restore from save
+      // Restore from save (or a debug field scenario, which may name an entrance)
       await this.loadMap(this.game.currentMapId);
-      this.player?.setPosition(this.game.playerPosition.x, this.game.playerPosition.y);
+      if (this.currentMapData) {
+        const entrance = this.game.pendingEntrance;
+        this.game.pendingEntrance = null;
+        const pos = entrance ? entrancePosition(this.currentMapData, entrance) : safeSpawn(this.currentMapData, this.game.playerPosition);
+        this.player?.setPosition(pos.x, pos.y);
+      }
     } else {
       await this.loadMap('cornelia');
     }
@@ -174,6 +181,7 @@ export class ExplorationScene implements Scene {
     if (mapData.encounters) this.encounterSystem.setEncounters(mapData.encounters);
     this.worldContainer.sortableChildren = true;
     this.worldContainer.addChild(tilemap.container);
+    if (tilemap.aboveContainer) this.worldContainer.addChild(tilemap.aboveContainer);
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
     this.tilemap = tilemap;
@@ -387,7 +395,7 @@ export class ExplorationScene implements Scene {
     this.worldContainer.addChild(this.transitionIndicators);
   }
 
-  private async executeTransition(transition: { x: number; y: number; targetMap: string; targetX: number; targetY: number }): Promise<void> {
+  private async executeTransition(transition: MapTransitionData): Promise<void> {
     // Disembark vehicle on map transition — return to walking
     if (this.player && this.player.currentMode.id !== 'walking') {
       this.player.currentMode = this.walkingMode;
@@ -399,8 +407,9 @@ export class ExplorationScene implements Scene {
       // Zoom-into-door effect for shop interiors
       await this.zoomTransition(transition.x, transition.y);
       await this.loadMap(transition.targetMap);
-      if (this.player) {
-        this.player.setPosition(transition.targetX, transition.targetY);
+      if (this.player && this.currentMapData) {
+        const at = arrivalFor(transition, this.currentMapData);
+        this.player.setPosition(at.x, at.y);
         this.camera.update();
         this.tilemap?.render();
       }
@@ -409,8 +418,9 @@ export class ExplorationScene implements Scene {
       // D3: Fade out → load map → fade in
       await this.fadeOverlay.fadeOut(300);
       await this.loadMap(transition.targetMap);
-      if (this.player) {
-        this.player.setPosition(transition.targetX, transition.targetY);
+      if (this.player && this.currentMapData) {
+        const at = arrivalFor(transition, this.currentMapData);
+        this.player.setPosition(at.x, at.y);
         this.camera.update();
         this.tilemap?.render();
       }

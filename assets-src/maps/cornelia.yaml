@@ -1,0 +1,209 @@
+# Cornelia (original layout), compiled by assets-src/tools/build_map.py into assets/maps/ai/cornelia.yaml.
+# ground legend: . grass  : cobble  , dirt  ~ water  # town wall  = bridge  u culvert (wall over water)
+# houses: h 4 = ridge row (walk behind, drawn over characters), eave, two wall rows; door / windows are columns
+id: cornelia
+kit: town
+music: town
+ground: |
+  ........................................
+  .##############################u#######.
+  .##############################u#######.
+  .#.............................~......#.
+  .#.............................~......#.
+  .#.............................~......#.
+  .#.............................~......#.
+  .#.............................~......#.
+  .#....:......:............:....~......#.
+  .#....:......:............:....~,,,,..#.
+  .#....:......:............:....~...,..#.
+  .#....:......:.::::::::::.:....~...,..#.
+  .#....:......:.::::::::::.:....~...,..#.
+  .#..:::::::::::::::::::::::::::=:::::.#.
+  .#..:::::::::::::::::::::::::::=:::::.#.
+  .#.............::::::::::......~......#.
+  .#.............::::::::::......~......#.
+  .#.................::..........~......#.
+  .#.................::..........~......#.
+  .#.................::..........~......#.
+  .#.................::..........~......#.
+  .#.................::..........~......#.
+  .#..:::::::::::::::::::::::::::~......#.
+  .#.................::..........~......#.
+  .#.................::..........~......#.
+  .##################::##########u#######.
+  .##################::##########u#######.
+  ...................::...................
+  ...................::...................
+  ...................::...................
+entrances:
+  south_gate: [19, 28]
+objects:
+- type: house
+  name: weapon_shop
+  x: 4
+  y: 4
+  w: 5
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3]
+  sign: weapon
+  enter: {map: cornelia-weapon-shop, entrance: door}
+- type: house
+  name: armor_shop
+  x: 11
+  y: 4
+  w: 5
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3]
+  sign: armor
+  enter: {map: cornelia-armor-shop, entrance: door}
+- type: house
+  name: item_shop
+  x: 24
+  y: 4
+  w: 5
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3]
+  sign: item
+  enter: {map: cornelia-item-shop, entrance: door}
+  chimney: 3
+- type: house
+  name: white_magic
+  x: 4
+  y: 18
+  w: 5
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3]
+  sign: white_magic
+  enter: {map: cornelia-white-magic, entrance: door}
+- type: house
+  name: black_magic
+  x: 11
+  y: 18
+  w: 5
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3]
+  sign: black_magic
+  enter: {map: cornelia-black-magic, entrance: door}
+- type: house
+  name: inn
+  x: 24
+  y: 18
+  w: 6
+  h: 4
+  roof: red
+  wall: plaster
+  door: 2
+  windows: [1, 3, 4]
+  sign: inn
+  enter: {map: cornelia-inn, entrance: door}
+  chimney: 4
+- {type: fountain, x: 19, y: 11}
+- {type: tree, x: 2, y: 4}
+- {type: tree, x: 2, y: 8}
+- {type: tree, x: 2, y: 17}
+- {type: tree, x: 2, y: 20}
+- {type: tree, x: 9, y: 10}
+- {type: tree, x: 17, y: 4}
+- {type: tree, x: 20, y: 4}
+- {type: tree, x: 22, y: 7}
+- {type: tree, x: 29, y: 4}
+- {type: tree, x: 29, y: 10}
+- {type: tree, x: 33, y: 4}
+- {type: tree, x: 36, y: 4}
+- {type: tree, x: 36, y: 18}
+- {type: tree, x: 33, y: 20}
+- {type: tree, x: 36, y: 22}
+- {type: tree, x: 9, y: 17}
+- {type: tree, x: 16, y: 19}
+- {type: tree, x: 23, y: 19}
+- {type: bush, x: 14, y: 11}
+- {type: bush, x: 25, y: 11}
+- {type: bush, x: 14, y: 16}
+- {type: bush, x: 25, y: 16}
+- type: fence
+  from: [32, 16]
+  to: [36, 16]
+- {type: flowers, x: 33, y: 17}
+- {type: flowers, x: 34, y: 17}
+- {type: flowers, x: 35, y: 17}
+- {type: well, x: 33, y: 11}
+- {type: signpost, x: 21, y: 24}
+- {type: barrel, x: 9, y: 7}
+- {type: crate, x: 10, y: 7}
+- {type: flowers, x: 5, y: 9}
+- {type: flowers, x: 12, y: 9}
+- {type: flowers, x: 27, y: 10}
+- {type: flowers, x: 5, y: 23}
+npcs:
+- dialog: [Come inside!]
+  id: weapon_merchant
+  sprite: merchant
+  x: 7
+  y: 8
+- dialog: [Come inside!]
+  id: armor_merchant
+  sprite: merchant
+  x: 14
+  y: 8
+- dialog: [Come inside!]
+  id: item_merchant
+  sprite: merchant
+  x: 27
+  y: 8
+- dialog: [Come inside!]
+  id: white_mage_shop
+  sprite: mage
+  x: 7
+  y: 23
+- dialog: [Come inside!]
+  id: black_mage_shop
+  sprite: mage
+  x: 14
+  y: 23
+- dialog: [Come inside!]
+  id: innkeeper
+  sprite: innkeeper
+  x: 27
+  y: 23
+- dialog:
+  - condition: PRINCESS_RESCUED
+    text: [The princess is safe., 'Thank you, Warriors of Light!']
+  - text: [The princess has been kidnapped!, 'Garland took the princess to the Temple of Fiends, north of here.']
+  id: guard
+  sprite: guard
+  wander: true
+  x: 22
+  y: 23
+- dialog:
+  - condition: BRIDGE_BUILT
+    text: [The bridge to the north is complete., Seek the four crystals across the land.]
+  - text: [The four crystals have gone dark., Only the Warriors of Light can restore them.]
+  id: old_man
+  sprite: old_man
+  wander: true
+  x: 34
+  y: 13
+- dialog: [Buy spells early. They make a huge difference in the first dungeon!]
+  id: villager
+  sprite: villager
+  wander: true
+  x: 17
+  y: 15
+transitions:
+- {x: 19, y: 29, targetMap: overworld, targetX: 8, targetY: 11}
+- {x: 20, y: 29, targetMap: overworld, targetX: 9, targetY: 11}

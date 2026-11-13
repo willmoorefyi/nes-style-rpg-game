@@ -62,6 +62,27 @@ describe('schemaValidation', () => {
       expect(validateMapData(validMap)).toEqual(validMap);
     });
 
+    it('accepts targetEntrance instead of coordinates, but not both', () => {
+      const t = { x: 0, y: 0, targetMap: 'other', targetEntrance: 'gate' };
+      expect(() => validateMapData({ ...validMap, transitions: [t] })).not.toThrow();
+      expect(() => validateMapData({ ...validMap, transitions: [{ ...t, targetX: 1, targetY: 1 }] })).toThrow(/not both/);
+      expect(() => validateMapData({ ...validMap, transitions: [{ ...t, targetEntrance: 3 }] })).toThrow(/targetEntrance/);
+    });
+
+    it('validates entrances as [x, y] pairs', () => {
+      expect(() => validateMapData({ ...validMap, entrances: { gate: [1, 1] } })).not.toThrow();
+      expect(() => validateMapData({ ...validMap, entrances: { gate: [1] } })).toThrow(/expected \[x, y\]/);
+      expect(() => validateMapData({ ...validMap, entrances: { gate: ['a', 1] } })).toThrow(/gate\[0\]/);
+    });
+
+    it('validates baked art chunk lists against the map size', () => {
+      const art = { tile: 48, chunk: 16, below: ['b.png'], above: [null] };
+      expect(() => validateMapData({ ...validMap, art })).not.toThrow();
+      expect(() => validateMapData({ ...validMap, art: { ...art, below: [] } })).toThrow(/expected 1 chunks, got 0/);
+      expect(() => validateMapData({ ...validMap, art: { ...art, below: [null] } })).toThrow(/art.below\[0\]/);
+      expect(() => validateMapData({ ...validMap, art: { ...art, chunk: 1 } })).toThrow(/expected 4 chunks/);
+    });
+
     it('should throw on missing id', () => {
       const { id, ...noId } = validMap;
       expect(() => validateMapData(noId)).toThrow('MapData.id: expected string, got undefined');

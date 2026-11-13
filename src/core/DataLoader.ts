@@ -65,6 +65,15 @@ export class DataLoader {
     return validateMapData(data);
   }
 
+  /** Ids listed in a compiled-map manifest (assets/maps/ai/index.yaml). */
+  async loadMapManifest(path: string): Promise<string[]> {
+    const data = await this.assets.loadYaml<unknown>(path);
+    if (!Array.isArray(data) || data.some((v) => typeof v !== 'string')) {
+      throw new Error(`${path}: expected a list of map ids`);
+    }
+    return data as string[];
+  }
+
   async loadShops(path: string): Promise<ShopData[]> {
     const data = await this.assets.loadYaml<unknown[]>(path);
     this.assertArray(data, 'ShopData');

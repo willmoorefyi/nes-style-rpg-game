@@ -113,14 +113,14 @@ transitions:
   - x: 3
     y: 5
     targetMap: cornelia
-    targetX: 3
-    targetY: 2
+    targetEntrance: weapon_shop
   - x: 4
     y: 5
     targetMap: cornelia
-    targetX: 3
-    targetY: 2
+    targetEntrance: weapon_shop
 encounterRate:
   min: 999
   max: 999
 encounters: []
+entrances:
+  door: [4, 4]

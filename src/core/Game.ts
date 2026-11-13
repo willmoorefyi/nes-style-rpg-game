@@ -34,6 +34,8 @@ export class Game {
   playTime = 0;
   currentMapId = '';
   playerPosition = { x: 0, y: 0 };
+  /** Entrance of `currentMapId` to place the player at on the next exploration enter (debug field scenarios). */
+  pendingEntrance: string | null = null;
 
   constructor() {
     this.app = new Application();

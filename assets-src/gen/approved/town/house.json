@@ -1,0 +1,74 @@
+{
+  "kit": "town",
+  "sheet": "kit_house",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "06c4e2452230c92dbabb9c8c",
+  "approved": "2026-11-12",
+  "tile": 48,
+  "cells": [
+    [
+      "roof_ridge_l",
+      "roof_ridge_m",
+      "roof_ridge_m",
+      "roof_ridge_r"
+    ],
+    [
+      "roof_eave_l",
+      "roof_eave_m",
+      "roof_eave_m",
+      "roof_eave_r"
+    ],
+    [
+      "wall_up_l",
+      "wall_up_window",
+      "wall_door_top",
+      "wall_up_r"
+    ],
+    [
+      "wall_lo_l",
+      "wall_lo_plain",
+      "wall_door_bottom",
+      "wall_lo_r"
+    ],
+    [
+      "wall_up_plain",
+      null,
+      null,
+      null
+    ]
+  ],
+  "metrics": {
+    "native_px_per_tile": 48.5,
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 0.41,
+    "tile_guide_px": [
+      248.5,
+      248.2
+    ],
+    "grid_alignment_native_px": 0.2,
+    "door_opening_px": 84,
+    "seam_ratio": {
+      "roof_ridge_m": 0.05,
+      "roof_eave_m": 0.0
+    },
+    "colours": 24,
+    "thin_line_px_removed": 0,
+    "grid_lines_removed": [
+      0,
+      0
+    ],
+    "pass": {
+      "density": true,
+      "alignment": true,
+      "door": true,
+      "seams": true,
+      "colours": true
+    },
+    "derived": {
+      "wall_up_plain": "wall_up_window with its feature painted out"
+    }
+  },
+  "note": "rev 2.2 4x4 cottage, prompt rev 2 (no grid wording)"
+}
