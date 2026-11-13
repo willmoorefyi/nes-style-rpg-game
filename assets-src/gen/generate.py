@@ -85,7 +85,8 @@ SHEETS: dict[str, Sheet] = {
 KITS = yaml.safe_load((HERE / "kits.yaml").read_text())
 for _kit in KITS:
     for _name, _sh in _kit["sheets"].items():
-        _grid = _sh.get("cells") or _sh["layout"]          # materials sheets: a layout of swatches instead of cells
+        _grid = (_sh.get("cells") or _sh.get("layout")                # materials sheets: a layout of swatches
+                 or [[sw["name"] for sw in _sh["swatches"]]])            # swatch sheets: a list of boxes
         SHEETS[f"kit_{_name}"] = Sheet(f"kit_{_name}", {}, [c for row in _grid for c in row],
                                        S.kit_geom(len(_grid[0]), len(_grid), _sh.get("aspect", "5:4"),
                                                   _sh.get("tile_px", 240)), "map tiles", "", "")
@@ -289,6 +290,9 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
         if ks.get("kind") == "materials":
             guide = KS.materials_guide(ks)
             prompt = KS.materials_prompt(ks, len(refs))
+        elif ks.get("kind") == "swatches":
+            guide = KS.swatches_guide(ks)
+            prompt = KS.swatches_prompt(ks, len(refs))
         else:
             guide = KS.guide(ks["cells"], size, tile, grid_lines=ks.get("grid_lines", True))
             prompt = KS.prompt(char, sheet.name, ks, len(refs))
@@ -653,6 +657,41 @@ def repixelize(outdir: Path) -> None:
     print(f"repixelized {list(results)}: {review(char_id, seed, results, outdir, 'offline repixelize')}")
 
 
+def kit_preview(kit_id: str, sheet: Image.Image, report: dict, raw: Image.Image) -> Image.Image:
+    """Raw | cut at 2x | the town map baked with the approved kit plus this candidate sheet (not approved)."""
+    sys.path.insert(0, str(HERE.parent / "tools"))
+    import build_map as BM
+    import kit as KT
+    k = KT.load_kit(kit_id)
+    arr = np.asarray(sheet.convert("RGBA"))
+    for name, (x, y, w, h) in report.get("materials", {}).items():
+        k.materials[name] = arr[y:y + h, x:x + w, :3].copy()
+        k.approved.add(name)
+    for r_, row in enumerate(report.get("cells", [])):
+        for c_, name in enumerate(row):
+            if name:
+                k.parts[name] = sheet.crop((c_ * 48, r_ * 48, (c_ + 1) * 48, (r_ + 1) * 48)).convert("RGBA")
+                k.approved.add(name)
+    srcs = sorted((HERE.parent / "maps").glob("*.yaml"))
+    src = yaml.safe_load(srcs[0].read_text())
+    c = BM.compile_map(src, k)
+    town = Image.fromarray(c.below).convert("RGBA")
+    town.alpha_composite(Image.fromarray(c.above))
+    town.save(OUT / "gemini" / kit_id / "preview_town_full.png")
+    town = town.resize((town.width // 2, town.height // 2), Image.Resampling.LANCZOS)
+    s2 = sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST)
+    rs = raw.convert("RGBA").resize((480, 480))
+    out = Image.new("RGBA", (rs.width + s2.width + town.width + 48, max(rs.height, s2.height, town.height) + 40),
+                    (40, 40, 44, 255))
+    out.alpha_composite(rs, (0, 20)); out.alpha_composite(s2, (rs.width + 16, 20))
+    out.alpha_composite(town, (rs.width + s2.width + 32, 20))
+    d = ImageDraw.Draw(out)
+    d.text((4, 4), "raw", fill="white"); d.text((rs.width + 20, 4), "cut 2x", fill="white")
+    d.text((rs.width + s2.width + 36, 4), f"{src['id']} with this sheet (half size)", fill="white")
+    d.text((4, out.height - 16), "PASS " + str(report["pass"]) + f"  wrap {report.get('wrap_after')}", fill="white")
+    return out
+
+
 def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int) -> dict:
     """Cut a kit sheet and write <sheet>_{guide,raw}.png, <sheet>.png (48 px tiles), <sheet>_report.json, review.png."""
     ks = kit_sheet(char, r.sheet.name)
@@ -665,6 +704,15 @@ def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int)
         (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
         KS.materials_review(raw, sheet, report, Image.open(house) if house.exists() else None).save(outdir / f"{r.sheet.name}_review.png")
         print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / (r.sheet.name + "_review.png")}")
+        return report
+    if ks.get("kind") == "swatches":
+        sheet, report = KS.cut_swatches(raw, ks, seed)
+        r.guide.save(outdir / f"{r.sheet.name}_guide.png")
+        raw.save(outdir / f"{r.sheet.name}_raw.png")
+        sheet.save(outdir / f"{r.sheet.name}.png")
+        (outdir / f"{r.sheet.name}_report.json").write_text(json.dumps(report, indent=2) + "\n")
+        kit_preview(char["id"], sheet, report, raw).save(outdir / f"{r.sheet.name}_review.png")
+        print(f"{char['id']}/{r.sheet.name} seed {seed}: {json.dumps(report)}\n  -> {outdir / (r.sheet.name + '_review.png')}")
         return report
     cells = ks["cells"]
     size, tile = KS.geo(ks)

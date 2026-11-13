@@ -55,3 +55,65 @@
         water: >
           calm blue river water with small light ripple marks and a few highlights, evenly spread, no foam edges and
           no shore.
+    walls:
+      # checkpoint C: town wall, river rim, bridge deck, culvert and arrow slit
+      kind: swatches
+      seed: 1234
+      refs: [house, ground]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 220
+      gap_px: 24
+      margin_px: 24
+      swatches:
+        - name: wall_top
+          at: [0, 0]
+          tiles: [2, 2]
+          crop: [0.0, 0.14, 1.0, 0.84]             # review fix: drop the coping / end caps the model added
+          wrap: both
+          text: >
+            the top of a thick grey stone town wall seen from above: the walkway along the top of the wall, paved
+            with large flat light-grey stone slabs with thin dark joints, evenly spread, no battlements, no edges.
+        - name: rim
+          at: [2, 0]
+          tiles: [2, 2]
+          crop: [0.0, 0.14, 1.0, 1.0]             # review fix: drop the coping / end caps the model added
+          wrap: both
+          text: >
+            mossy grey stone blocks of a river embankment seen from above: small squared stones with dark joints and
+            a little green moss in some joints, evenly spread.
+        - name: wall_face
+          at: [0, 2]
+          tiles: [2, 1]
+          crop: [0.02, 0.0, 0.97, 1.0]             # review fix: drop the coping / end caps the model added
+          match_scale: wall_slit  # review fix: drawn too short for 2 tiles; keep the slit piece's pixel scale
+          wrap: x
+          text: >
+            the outer front face of the same grey stone town wall seen from the front: courses of large grey stone
+            blocks with dark mortar, a slightly lighter coping course along the top edge and a darker, shadowed base
+            course along the bottom edge; no openings.
+        - name: culvert
+          at: [2, 2]
+          tiles: [1, 1]
+          crop: [0.03, 0.0, 0.97, 1.0]   # review fix: drop the piece's end-cap outlines
+          wrap: none
+          text: >
+            the same wall face (same stone courses, coping and base) with a dark semicircular stone arch opening at
+            the bottom centre, about half the box wide, where blue river water flows out under the wall.
+        - name: wall_slit
+          at: [3, 2]
+          tiles: [1, 1]
+          crop: [0.03, 0.0, 0.97, 1.0]   # review fix: drop the piece's end-cap outlines
+          wrap: none
+          text: >
+            the same wall face (same stone courses, coping and base) with one narrow dark vertical arrow slit in the
+            centre.
+        - name: bridge_h
+          at: [0, 3]
+          tiles: [2, 1]
+          crop: [0.02, 0.0, 0.98, 1.0]             # review fix: drop the coping / end caps the model added
+          wrap: x
+          rotate: bridge_v
+          text: >
+            the deck of a small stone footbridge seen from above, for walking left to right: pale stone paving
+            running across, with a low stone parapet along the top edge and another along the bottom edge.

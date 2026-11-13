@@ -644,3 +644,172 @@ def materials_review(raw: Image.Image, sheet_img: Image.Image, report: dict, hou
                         f"{report['pitch_conf']} colours {report['colours']}", fill="white")
     d.text((4, H - 16), "PASS " + str(report["pass"]), fill="white")
     return out
+
+
+# ───────────────────────────── swatch sheets (checkpoint C) ─────────────────────────────
+# Boxes of different sizes on a magenta page, placed in tile units: `swatches: [{name, at: [col, row], tiles:
+# [w, h], wrap: both | x | none, text}]`. wrap both/x = a seamless material; none = a 48x48 part (or several).
+# Output: every swatch at native size placed at its tile position (no gaps), plus `rotate` copies; materials are
+# listed as rectangles, parts as cells.
+
+def swatch_rects(sheet: dict) -> dict[str, tuple[int, int, int, int]]:
+    tile, gap, margin = sheet["tile_px"], sheet.get("gap_px", 24), sheet.get("margin_px", 24)
+    unit = tile + gap
+    out = {}
+    for sw in sheet["swatches"]:
+        (c, r), (w, h) = sw["at"], sw["tiles"]
+        x0, y0 = margin + c * unit, margin + r * unit
+        out[sw["name"]] = (x0, y0, x0 + w * tile + (w - 1) * gap, y0 + h * tile + (h - 1) * gap)
+    return out
+
+
+def swatches_guide(sheet: dict) -> Image.Image:
+    im = Image.new("RGB", tuple(sheet["guide"]), MAGENTA)
+    d = ImageDraw.Draw(im)
+    for box in swatch_rects(sheet).values():
+        d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=(170, 170, 170))
+    return im
+
+
+def swatches_prompt(sheet: dict, n_refs: int) -> str:
+    rects = swatch_rects(sheet)
+    W, H = sheet["guide"]
+
+    def where(box):
+        cx, cy = (box[0] + box[2]) / 2 / W, (box[1] + box[3]) / 2 / H
+        v = "top" if cy < 0.4 else "bottom" if cy > 0.75 else "middle"
+        h = "left" if cx < 0.4 else "right" if cx > 0.7 else "centre"
+        return f"{v}-{h}"
+
+    lines = []
+    for sw in sheet["swatches"]:
+        w, h = sw["tiles"]
+        kind = {"both": "a SEAMLESS texture (left edge continues into the right edge, top into bottom)",
+                "x": "a strip that repeats SEAMLESSLY left to right (its top and bottom edges are real edges)",
+                "none": "a single complete piece filling the box"}[sw.get("wrap", "both")]
+        lines.append(f"- the {where(rects[sw['name']])} box ({w * 48}x{h * 48} sprite pixels): {kind}. {sw['text'].strip()}")
+    refs = "".join(f"Image {3 + i} is approved art from this same game map: match its colours, outline weight and "
+                   "shading exactly.\n" for i in range(n_refs))
+    return (
+        "Create pixel-art pieces for a modern 16-bit-style top-down RPG town map (three-quarter overhead view, like a "
+        "classic SNES JRPG town).\n\n"
+        "Image 1 is a PLACEMENT GUIDE on a magenta page: fill each grey box edge to edge with the piece described "
+        "for it. Do not copy the grey colour.\n\n"
+        "Image 2 is the HOUSE STYLE: the approved walking sprite of a character from this game at the same pixel "
+        "scale as the map (about 90 sprite pixels tall). Match its sprite-pixel size, its outlines and its flat "
+        "2-3 tone shading with light from the upper left.\n\n" + refs + "\n"
+        "Pieces:\n" + "\n".join(lines) + "\n\n"
+        "Draw each piece as one continuous picture with no lines dividing it into squares. Render as true pixel art: "
+        "every sprite pixel a hard-edged square, no anti-aliasing, no gradients, no blur. Between the boxes: solid "
+        "flat magenta (#FF00FF), no text.\n"
+    )
+
+
+def make_seamless_x(tex: np.ndarray, band: int = 16) -> np.ndarray:
+    """Horizontal-only version of make_seamless (top and bottom edges are real structure)."""
+    h, w = tex.shape[:2]
+    rolled = np.roll(tex, w // 2, 1)
+    err = np.abs(tex.astype(np.int32) - rolled.astype(np.int32)).sum(-1)
+    left = _min_path(err, 1, band)
+    right = _min_path(err, w - band, w - 1)
+    cols = np.arange(w)[None, :]
+    use = (cols < left[:, None]) | (cols > right[:, None])
+    return np.where(use[..., None], rolled, tex)
+
+
+def cut_swatches(raw: Image.Image, sheet: dict, seed: int = 0) -> tuple[Image.Image, dict]:
+    size = tuple(sheet["guide"])
+    rgb = np.asarray(raw.convert("RGB").resize(size, Image.Resampling.LANCZOS))
+    fg = _open(~PX.magenta_bg(rgb), 4)
+    lab_cc, _ = PX.components(fg)
+    rects = swatch_rects(sheet)
+    per_colors = sheet.get("colors_per_material", 16)
+    cols = max(sw["at"][0] + sw["tiles"][0] for sw in sheet["swatches"])
+    rows = max(sw["at"][1] + sw["tiles"][1] for sw in sheet["swatches"])
+    extra_w = sum(48 * sw["tiles"][1] for sw in sheet["swatches"] if sw.get("rotate"))
+    canvas = np.zeros((rows * 48, cols * 48 + extra_w, 4), np.uint8)
+    report = {"materials": {}, "cells": [[None] * (canvas.shape[1] // 48) for _ in range(rows)],
+              "wrap_before": {}, "wrap_after": {}, "fill": {}}
+    rot_x = cols * 48
+
+    def body(name: str) -> tuple[int, int, int, int]:
+        """The drawn piece in a box: rows / columns at least 60% as full as the fullest (drops spills such as
+        culvert water)."""
+        x0, y0, x1, y1 = rects[name]
+        k = lab_cc[(y0 + y1) // 2, (x0 + x1) // 2]
+        if k == 0:
+            raise ValueError(f"swatch sheet: nothing drawn in the {name} box")
+        piece = lab_cc == k
+        rw, cw = piece.sum(1), piece.sum(0)
+        ys = np.where(rw >= 0.6 * rw.max())[0]
+        xs = np.where(cw >= 0.6 * cw.max())[0]
+        return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
+
+    bodies = {sw["name"]: body(sw["name"]) for sw in sheet["swatches"]}
+    report["piece_px"] = {n: [b[2] - b[0], b[3] - b[1]] for n, b in bodies.items()}
+    for i, sw in enumerate(sheet["swatches"]):
+        name, (c, r), (tw, th) = sw["name"], sw["at"], sw["tiles"]
+        x0, y0, x1, y1 = rects[name]
+        bx0, by0, bx1, by1 = bodies[name]
+        report["fill"][name] = round(float((bx1 - bx0) * (by1 - by0)) / ((x1 - x0) * (y1 - y0)), 2)
+        if sw.get("crop"):                           # review fix: keep only part of the drawn piece (fractions)
+            fx0, fy0, fx1, fy1 = sw["crop"]
+            bw, bh = bx1 - bx0, by1 - by0
+            bx0, by0, bx1, by1 = bx0 + round(fx0 * bw), by0 + round(fy0 * bh), bx0 + round(fx1 * bw), by0 + round(fy1 * bh)
+        m = max(2, (bx1 - bx0) // 60)
+        crop = rgb[by0 + m:by1 - m, bx0 + m:bx1 - m]
+        out_w, out_h = tw * 48, th * 48
+        if sw.get("match_scale"):                    # same raw-px-per-native-px as a sibling piece
+            ref = next(q for q in sheet["swatches"] if q["name"] == sw["match_scale"])
+            ref_w = report["piece_px"][ref["name"]]
+            fx0, _, fx1, _ = ref.get("crop", [0, 0, 1, 1])
+            per = ref_w[0] * (fx1 - fx0) / (ref["tiles"][0] * 48)
+            out_w = min(out_w, round(crop.shape[1] / per))
+        lab, cent = _quantize(crop, per_colors, seed + i)
+        tex = cent[_block_mode(lab, out_w, out_h, len(cent))]
+        wrap = sw.get("wrap", "both")
+        if wrap != "none":
+            report["wrap_before"][name] = round(wrap_ratio(tex) if wrap == "both" else seam_ratio(tex), 2)
+            tex = make_seamless(tex, seed=seed + i) if wrap == "both" else make_seamless_x(tex)
+            report["wrap_after"][name] = round(wrap_ratio(tex) if wrap == "both" else seam_ratio(tex), 2)
+        canvas[r * 48:r * 48 + tex.shape[0], c * 48:c * 48 + tex.shape[1], :3] = tex
+        canvas[r * 48:r * 48 + tex.shape[0], c * 48:c * 48 + tex.shape[1], 3] = 255
+        if wrap == "none":
+            names = sw.get("parts") or [[name]]
+            for j, row in enumerate(names):
+                for q, part in enumerate(row):
+                    report["cells"][r + j][c + q] = part
+        else:
+            report["materials"][name] = [c * 48, r * 48, int(tex.shape[1]), int(tex.shape[0])]
+        if sw.get("rotate"):
+            rt = np.rot90(tex, -1)
+            canvas[:rt.shape[0], rot_x:rot_x + rt.shape[1], :3] = rt
+            canvas[:rt.shape[0], rot_x:rot_x + rt.shape[1], 3] = 255
+            report["materials"][sw["rotate"]] = [rot_x, 0, rt.shape[1], rt.shape[0]]
+            rot_x += rt.shape[1]
+    # derived materials: e.g. wall_face from the arrow-slit piece with the slit painted out (same bricks as the part)
+    for sw in sheet["swatches"]:
+        src = sw.get("derive_from")
+        if not src:
+            continue
+        sp = next(q for q in sheet["swatches"] if q["name"] == src)
+        (sc, sr) = sp["at"]
+        part = canvas[sr * 48:(sr + 1) * 48, sc * 48:(sc + 1) * 48]
+        tex = make_seamless_x(paint_out(part)[..., :3])
+        (c, r), (tw, th) = sw["at"], sw["tiles"]
+        canvas[r * 48:(r + th) * 48, c * 48:(c + tw) * 48, :3] = np.tile(tex, (th, tw, 1))
+        report["wrap_after"][sw["name"]] = round(seam_ratio(np.tile(tex, (1, tw, 1))), 2)
+        report.setdefault("derived", {})[sw["name"]] = f"{src} with its feature painted out, seamless left-right"
+    pitch, conf, _, _ = PX.detect_pitch(np.asarray(raw.convert("RGB")))
+    sx = raw.width / size[0]
+    dens = {sw["name"]: round(report["piece_px"][sw["name"]][0] * sx / pitch / sw["tiles"][0], 1)
+            for sw in sheet["swatches"]} if pitch else {}
+    report.update({"drawn_pitch_raw_px": round(pitch, 2), "pitch_conf": round(conf, 2),
+                   "native_px_per_tile": dens})
+    derived = {sw["name"] for sw in sheet["swatches"] if sw.get("derive_from") or sw.get("match_scale")}
+    report["pass"] = {
+        # the model sizes each piece itself; what matters is that each piece's drawn pixels map to 40-64 per tile
+        "density": bool(dens) and all(40 <= v <= 64 for k, v in dens.items() if k not in derived),
+        "seamless": all(v <= 1.5 for v in report["wrap_after"].values()),
+    }
+    return Image.fromarray(canvas), report

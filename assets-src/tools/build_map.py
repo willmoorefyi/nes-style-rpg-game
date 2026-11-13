@@ -194,29 +194,25 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     below[rim] = _tile(kit.material("rim"), H, W)[rim]
     _shade(below, _edge_of(rim) & ~_edge_of(pw), 0.55)     # inner line of the rim
     _shade(below, _edge_of(_up(mat == "water")) & rim & _edge_of(pw), 0.75)
+    slits: list[tuple[int, int]] = []
     for y in range(hgt):
         for x in range(wid):
             m = grid[y][x]
             sl = (slice(y * T, (y + 1) * T), slice(x * T, (x + 1) * T))
             if m == "bridge":
-                ns = all(0 <= yy < hgt and grid[yy][x] in WATERISH - {"bridge"} for yy in (y - 1, y + 1))
-                tex = kit.material("bridge_h" if ns else "bridge_v")
-                below[sl] = _tile(tex, H, W)[sl]
-                px = below[sl]
-                for dx, dy, side in ((0, -1, "n"), (0, 1, "s"), (-1, 0, "w"), (1, 0, "e")):
-                    xx, yy = x + dx, y + dy
-                    if 0 <= xx < wid and 0 <= yy < hgt and grid[yy][xx] in ("water", "culvert"):
-                        band = {"n": (slice(0, 3), slice(None)), "s": (slice(T - 3, T), slice(None)),
-                                "w": (slice(None), slice(0, 3)), "e": (slice(None), slice(T - 3, T))}[side]
-                        px[band] = (px[band] * 0.55).astype(np.uint8)
+                _bridge_cell(below, grid, x, y, kit, H, W)
             elif m == "wall":
                 south_wall = y + 1 < hgt and grid[y + 1][x] in ("wall", "culvert")
                 below[sl] = _tile(kit.material("wall_top" if south_wall else "wall_face"), H, W)[sl]
+                if not south_wall and x % 4 == 2 and "wall_slit" in kit.approved:
+                    slits.append((x, y))           # arrow slits every 4th face cell (pasted with the parts below)
     walls = _up(np.isin(mat, ["wall", "culvert"]))
     _shade(below, _edge_of(walls), 0.5)
 
     canvas = Image.fromarray(below).convert("RGBA")
     top = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    for (x, y) in slits:
+        _paste(canvas, kit.part("wall_slit"), x, y)
     for y in range(hgt):
         for x in range(wid):
             if grid[y][x] == "culvert":
@@ -325,6 +321,50 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     out = Compiled(mid, wid, hgt, np.asarray(canvas.convert("RGB")).copy(), above, coll, entrances, transitions)
     validate(src, out)
     return out
+
+
+def _bridge_cell(below: np.ndarray, grid, x: int, y: int, kit: K.Kit, H: int, W: int) -> None:
+    """One cell of a bridge. A bridge with land (anything but water) to its left or right carries east-west
+    traffic and uses bridge_h, else bridge_v. The deck texture's middle band repeats across the whole bridge run, and
+    its outer bands (the parapets, a quarter of the texture each) appear only on the run's two outer edges."""
+    hgt, wid = len(grid), len(grid[0])
+    land = lambda xx, yy: 0 <= xx < wid and 0 <= yy < hgt and grid[yy][xx] not in WATERISH  # noqa: E731
+    ew = land(x - 1, y) or land(x + 1, y) or any(
+        grid[y][xx] == "bridge" and (land(xx - 1, y) or land(xx + 1, y)) for xx in range(wid))
+    tex = kit.material("bridge_h" if ew else "bridge_v")
+    if not ew:
+        tex = np.transpose(tex, (1, 0, 2))           # work across the run in rows below, then transpose back
+    th = tex.shape[0]
+    q = th // 4
+    deck, top, bot = tex[q:th - q], tex[:q], tex[th - q:]
+    # where this cell sits in its run (perpendicular to travel)
+    if ew:
+        y0 = y
+        while y0 - 1 >= 0 and grid[y0 - 1][x] == "bridge":
+            y0 -= 1
+        y1 = y
+        while y1 + 1 < hgt and grid[y1 + 1][x] == "bridge":
+            y1 += 1
+        span, pos, along = (y1 - y0 + 1) * T, (y - y0) * T, x * T
+    else:
+        x0 = x
+        while x0 - 1 >= 0 and grid[y][x0 - 1] == "bridge":
+            x0 -= 1
+        x1 = x
+        while x1 + 1 < wid and grid[y][x1 + 1] == "bridge":
+            x1 += 1
+        span, pos, along = (x1 - x0 + 1) * T, (x - x0) * T, y * T
+    rows = np.empty((span, T, 3), np.uint8)
+    reps = span // deck.shape[0] + 2
+    full = np.tile(deck, (reps, 1, 1))
+    cols = (np.arange(along, along + T)) % tex.shape[1]
+    rows[:] = full[:span][:, cols]
+    rows[:q] = top[:, cols]
+    rows[span - q:] = bot[:, cols]
+    cell = rows[pos:pos + T]
+    if not ew:
+        cell = np.transpose(cell, (1, 0, 2))
+    below[y * T:(y + 1) * T, x * T:(x + 1) * T] = cell
 
 
 def grid_terrain_row(grid, y, x, w) -> list[int]:

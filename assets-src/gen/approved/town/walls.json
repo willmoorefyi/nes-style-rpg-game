@@ -1,0 +1,135 @@
+{
+  "kit": "town",
+  "sheet": "kit_walls",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "fbc46d6c2b1af2a94aef10a3",
+  "approved": "2026-11-12",
+  "tile": 48,
+  "cells": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      "culvert",
+      "wall_slit",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {
+    "wall_top": [
+      0,
+      0,
+      96,
+      96
+    ],
+    "rim": [
+      96,
+      0,
+      96,
+      96
+    ],
+    "wall_face": [
+      0,
+      96,
+      62,
+      48
+    ],
+    "bridge_h": [
+      0,
+      144,
+      96,
+      48
+    ],
+    "bridge_v": [
+      192,
+      0,
+      48,
+      96
+    ]
+  },
+  "metrics": {
+    "wrap_before": {
+      "wall_top": 10.6,
+      "rim": 1.28,
+      "wall_face": 0.45,
+      "bridge_h": 0.82
+    },
+    "wrap_after": {
+      "wall_top": 0.69,
+      "rim": 0.47,
+      "wall_face": 0.65,
+      "bridge_h": 0.34
+    },
+    "fill": {
+      "wall_top": 0.76,
+      "rim": 0.75,
+      "wall_face": 0.73,
+      "culvert": 1.19,
+      "wall_slit": 1.18,
+      "bridge_h": 0.87
+    },
+    "piece_px": {
+      "wall_top": [
+        486,
+        336
+      ],
+      "rim": [
+        480,
+        336
+      ],
+      "wall_face": [
+        348,
+        215
+      ],
+      "culvert": [
+        267,
+        215
+      ],
+      "wall_slit": [
+        266,
+        215
+      ],
+      "bridge_h": [
+        435,
+        204
+      ]
+    },
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 0.04,
+    "native_px_per_tile": {
+      "wall_top": 47.5,
+      "rim": 46.9,
+      "wall_face": 34.0,
+      "culvert": 52.1,
+      "wall_slit": 52.0,
+      "bridge_h": 42.5
+    },
+    "pass": {
+      "density": true,
+      "seamless": true
+    }
+  },
+  "note": "checkpoint C: wall walkway/face, rim, bridge deck, culvert, arrow slit"
+}
