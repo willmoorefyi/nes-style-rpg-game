@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -49,10 +49,15 @@ describe('DebugScenarioLoader field mode', () => {
     const fields = scenarios.filter((s) => s.mode === 'field');
     expect(fields.length).toBeGreaterThan(0);
     for (const s of fields) {
-      const map = parse(readFileSync(resolve(root, `assets/maps/${s.map}.yaml`), 'utf-8')) as
-        { width: number; collision: number[]; entrances?: Record<string, [number, number]> };
-      const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spawn!;
-      expect([1, 2], `${s.id} spawn`).not.toContain(map.collision[y * map.width + x]);
+      const variants = [`assets/maps/${s.map}.yaml`, `assets/maps/ai/${s.map}.yaml`].filter((f) => existsSync(resolve(root, f)));
+      expect(variants.length, `${s.id}: map ${s.map} exists`).toBeGreaterThan(0);
+      for (const f of variants) {
+        const map = parse(readFileSync(resolve(root, f), 'utf-8')) as
+          { width: number; collision: number[]; entrances?: Record<string, [number, number]> };
+        if (s.entrance && !map.entrances?.[s.entrance]) throw new Error(`${s.id}: ${f} has no entrance ${s.entrance}`);
+        const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spawn!;
+        expect([1, 2], `${s.id} spawn in ${f}`).not.toContain(map.collision[y * map.width + x]);
+      }
     }
   });
 });

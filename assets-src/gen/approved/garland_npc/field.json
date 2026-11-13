@@ -1,0 +1,33 @@
+{
+  "character": "garland_npc",
+  "sheet": "field",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "db79b94ea9658e2a4a433574",
+  "approved": "2026-11-13",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "note": "side row drew the house knight; row_from left: down (static NPC)",
+  "row_from": {
+    "left": "down"
+  }
+}

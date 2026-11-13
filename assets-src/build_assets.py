@@ -165,7 +165,27 @@ def build_field_ai() -> None:
             if direction in meta.get("flip_rows", []):
                 row = mirror_strip(row, gw)
             dirs[direction] = (meta, row)
+        # a row drawn as the wrong character takes another row's frames (review fix, e.g. Garland's side view)
+        for direction, src in meta.get("row_from", {}).items():
+            dirs[direction] = dirs[src]
         chars[meta["character"]] = dirs
+    # static props used as NPCs (chests): one kit part, bottom-aligned on the field feet row, in every frame
+    relics = APPROVED / "temple" / "relics.json"
+    if relics.exists() and chars:
+        rmeta = json.loads(relics.read_text())
+        rimg = Image.open(relics.with_suffix(".png")).convert("RGBA")
+        pos = {n: (r, c) for r, row in enumerate(rmeta["cells"]) for c, n in enumerate(row) if n}
+        if "chest_closed" in pos:
+            r, c = pos["chest_closed"]
+            part = rimg.crop((c * 48, r * 48, (c + 1) * 48, (r + 1) * 48))
+            any_meta = next(iter(next(iter(chars.values())).values()))[0]
+            gw, gh = any_meta["grid"]
+            frame = Image.new("RGBA", (gw, gh))
+            frame.alpha_composite(part, ((gw - 48) // 2, any_meta["bottom_row"] + 1 - 48))
+            row = Image.new("RGBA", (3 * gw, gh))
+            for i in range(3):
+                row.alpha_composite(frame, (i * gw, 0))
+            chars["chest"] = {d: (any_meta, row) for d in ("down", "up", "left", "right")}
     if not chars:
         print("field_ai: no approved field sheets")
         return

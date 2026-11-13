@@ -33,9 +33,11 @@ LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "
           # interiors (kit materials floor / floor_stone / carpet / in_wall_top / in_wall_face; counters are parts)
           "_": "floor", "-": "floor_stone", "+": "carpet", "W": "in_wall_top", "F": "in_wall_face", "c": "counter",
           # overworld (river: no stone rim; ocean: ragged coast with foam)
-          "f": "forest", "m": "mountain", "s": "sand", "r": "river", "o": "ocean"}
+          "f": "forest", "m": "mountain", "s": "sand", "r": "river", "o": "ocean",
+          # dungeons: outside the walls is void; rubble is a walkable broken floor
+          "x": "void", "%": "rubble"}
 # painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
-FULL = ["floor", "floor_stone", "carpet", "in_wall_top", "in_wall_face"]
+FULL = ["floor", "floor_stone", "carpet", "rubble", "in_wall_top", "in_wall_face"]
 COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
 # painted in this order; each erodes (ragged edge inside its own cells) against the ones before it
 SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean"]
@@ -46,7 +48,7 @@ WATERISH = {"water", "bridge", "culvert"}
 GRASS, WALL, WATER, ROAD, BRIDGE = 0, 1, 2, 8, 9
 TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
            "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
-           "counter": COUNTER, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER}
+           "counter": COUNTER, "void": WALL, "rubble": ROAD, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER}
 BLOCKED = {WALL, WATER, COUNTER, 3, 7}             # on foot: walls, water, counters, mountains, rivers
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
@@ -187,6 +189,12 @@ def styled(kit: K.Kit, name: str, style: str | None) -> Image.Image:
 
 def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled:
     mid = src["id"]
+    if src.get("materials"):                               # per-map texture aliases, e.g. floor_stone: temple_floor
+        import copy
+        kit = copy.copy(kit)
+        kit.materials = dict(kit.materials)
+        for name, alias in src["materials"].items():
+            kit.materials[name] = kit.material(alias)
     grid = parse_ground(src["ground"])
     hgt, wid = len(grid), len(grid[0])
     H, W = hgt * T, wid * T
@@ -248,12 +256,14 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                     slits.append((x, y))           # arrow slits every 4th face cell (pasted with the parts below)
     walls = _up(np.isin(mat, ["wall", "culvert"]))
     _shade(below, _edge_of(walls), 0.5)
+    void = _up(mat == "void")
+    below[void] = (8, 6, 12)
     for name in FULL + ["counter"]:
         cells = mat == name
         if not cells.any():
             continue
         px = _up(cells)
-        tex = _tile(kit.material("floor" if name == "counter" else name), H, W)   # counters stand on the floor
+        tex = _tile(kit.material("floor" if name == "counter" else "floor_stone" if name == "rubble" and "rubble" not in kit.materials else name), H, W)
         below[px] = tex[px]
         if name in ("carpet", "in_wall_top", "in_wall_face"):
             _shade(below, _edge_of(px), 0.55)
@@ -297,7 +307,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             if (cx, cy) in owner:
                 raise MapError(f"object {n} ({o['type']}) overlaps object {owner[(cx, cy)]} at ({cx}, {cy})")
             on_wall = o.get("on_wall") and grid[cy][cx] in ("in_wall_face", "in_wall_top", "wall")
-            if grid[cy][cx] not in SOFT + ["floor", "floor_stone", "carpet"] and not on_wall:
+            if grid[cy][cx] not in SOFT + ["floor", "floor_stone", "carpet", "rubble"] and not on_wall:
                 raise MapError(f"object {n} ({o['type']}) stands on {grid[cy][cx]} at ({cx}, {cy})")
             owner[(cx, cy)] = n
 

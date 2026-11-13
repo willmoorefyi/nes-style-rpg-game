@@ -102,9 +102,10 @@ describe('CharacterAtlas AI field atlas', () => {
 });
 
 describe('isPreviewAi', () => {
-  it('is on only with ?art=ai', () => {
+  it('is on by default; ?art=legacy turns it off', () => {
     expect(isPreviewAi('?art=ai')).toBe(true);
     expect(isPreviewAi('?art=legacy')).toBe(false);
-    expect(isPreviewAi('')).toBe(false);
+    expect(isPreviewAi('', true)).toBe(true);       // the game's default
+    expect(isPreviewAi('?art=legacy', true)).toBe(false);
   });
 });

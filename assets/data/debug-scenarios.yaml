@@ -174,3 +174,35 @@
     lich:
       - { type: magic, spellId: ice, weight: 1 }
   background: assets/backgrounds/shoreline.webp
+
+# Act-1 field previews (open with ?mute=1&scenario=<id>)
+- id: act1_castle
+  name: Act 1 - Cornelia Castle throne room
+  mode: field
+  map: cornelia-castle-throne
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: act1_overworld
+  name: Act 1 - overworld outside Cornelia
+  mode: field
+  map: overworld
+  entrance: cornelia
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: act1_temple
+  name: Act 1 - Temple of Fiends
+  mode: field
+  map: temple-of-fiends
+  entrance: entry
+  party:
+    - { class: warrior, name: WAR, level: 9, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []

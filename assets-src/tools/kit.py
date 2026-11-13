@@ -33,6 +33,7 @@ MATERIALS = {
     "floor": ((150, 105, 65), "planks_h"),
     "floor_stone": ((130, 130, 140), "stones"),
     "carpet": ((160, 40, 45), "speckle"),
+    "rubble": ((110, 110, 115), "stones"),
     "in_wall_top": ((70, 50, 40), "speckle"),
     "in_wall_face": ((200, 180, 150), "bricks"),
 }

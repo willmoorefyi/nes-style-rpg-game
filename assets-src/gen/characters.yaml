@@ -193,4 +193,13 @@
     gentle smile
   field_gear: empty hands, arms at the sides
   seeds: [1234]
+- id: garland_npc
+  sheets: [field]
+  prompt: >-
+    towering dark knight in heavy midnight-blue plate armour with gold trim, a full helm crowned with two large curved
+    ivory horns, two glowing red eyes in the visor slit, broad layered pauldrons and a long dark red cape
+  field_gear: a broad steel greatsword in a scabbard on his back, empty hands
+  face: "a closed helm: no face is visible, only two glowing red eyes in the visor slit (front view); back views show the helm and cape."
+  identity_ref: assets-src/gen/approved/garland/boss_idle.png
+  seeds: [1234]
 

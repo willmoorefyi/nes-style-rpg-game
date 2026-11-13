@@ -151,6 +151,10 @@ export class ExplorationScene implements Scene {
       }
     } else {
       await this.loadMap('cornelia');
+      if (this.currentMapData && this.player) {         // new game: start at the town's first entrance
+        const pos = safeSpawn(this.currentMapData, { x: this.player.gridX, y: this.player.gridY });
+        this.player.setPosition(pos.x, pos.y);
+      }
     }
   }
 

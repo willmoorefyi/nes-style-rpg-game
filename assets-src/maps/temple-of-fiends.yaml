@@ -1,0 +1,208 @@
+# Temple of Fiends (original layout). legend: x void, W wall top, F wall face, - floor, % rubble
+id: temple-of-fiends
+kits: [temple, castle, interior, town]
+music: dungeon
+materials: {floor_stone: temple_floor, rubble: temple_rubble, in_wall_top: temple_wall_top, in_wall_face: temple_wall_face}
+ground: |
+  xxxxxxxxxxxxxxxxxxxxxxxx
+  xxxWWWWWWWWWWWWWWWWWWxxx
+  xxWFFFFFFFFFFFFFFFFFFWxx
+  xxW------------------Wxx
+  xxW------------------Wxx
+  xxW------------------Wxx
+  xxW------------------Wxx
+  xxWWWWWWWW----WWWWWWWWxx
+  xWFFFFFFFF----FFFFFFFFWx
+  xW--------------------Wx
+  xW----------------%---Wx
+  xW----%%--------------Wx
+  xW--------------------Wx
+  xW--------------------Wx
+  xW--------------%%----Wx
+  xW---%----------------Wx
+  xW--------------------Wx
+  xWWWWWWWWW----WWWWWWWWWx
+  xxxxxxxxxW-%--Wxxxxxxxxx
+  xxxxxxxxxW----Wxxxxxxxxx
+  xxxxxxxxxW----Wxxxxxxxxx
+  xxxxxxxxxWW--WWxxxxxxxxx
+entrances:
+  entry: [11, 20]
+objects:
+- type: deco
+  parts:
+  - [altar_l, altar_r]
+  x: 11
+  y: 3
+- type: deco
+  parts:
+  - [fiend_statue_top]
+  - [fiend_statue_bottom]
+  x: 4
+  y: 3
+- type: deco
+  parts:
+  - [fiend_statue_top]
+  - [fiend_statue_bottom]
+  x: 19
+  y: 3
+- type: deco
+  parts:
+  - [brazier]
+  x: 9
+  y: 3
+- type: deco
+  parts:
+  - [brazier]
+  x: 14
+  y: 3
+- type: deco
+  parts:
+  - [brazier]
+  x: 9
+  y: 16
+- type: deco
+  parts:
+  - [brazier]
+  x: 14
+  y: 16
+- type: deco
+  parts:
+  - [tpillar_top]
+  - [tpillar_bottom]
+  x: 6
+  y: 9
+- type: deco
+  parts:
+  - [tpillar_top]
+  - [tpillar_bottom]
+  x: 17
+  y: 9
+- type: deco
+  parts:
+  - [tpillar_top]
+  - [tpillar_bottom]
+  x: 6
+  y: 13
+- type: deco
+  parts:
+  - [tpillar_top]
+  - [tpillar_bottom]
+  x: 17
+  y: 13
+- type: deco
+  parts:
+  - [tpillar_broken_top]
+  - [tpillar_broken_bottom]
+  x: 9
+  y: 10
+- type: deco
+  parts:
+  - [tpillar_broken_top]
+  - [tpillar_broken_bottom]
+  x: 14
+  y: 12
+- type: deco
+  parts:
+  - [fallen_l, fallen_r]
+  x: 7
+  y: 15
+- type: deco
+  parts:
+  - [skulls]
+  x: 20
+  y: 15
+  block: false
+- type: deco
+  parts:
+  - [skulls]
+  x: 5
+  y: 5
+  block: false
+- type: deco
+  parts:
+  - [vines]
+  x: 5
+  y: 8
+  on_wall: true
+  block: true
+- type: deco
+  parts:
+  - [vines]
+  x: 18
+  y: 8
+  on_wall: true
+  block: true
+- type: deco
+  parts:
+  - [vines]
+  x: 2
+  y: 8
+  on_wall: true
+  block: true
+npcs:
+- chestFlag: CHEST_TOF_POTION
+  chestItem: potion
+  dialog: [You found a Potion!]
+  id: chest_potion
+  sprite: chest
+  x: 3
+  y: 10
+- chestFlag: CHEST_TOF_ANTIDOTE
+  chestItem: antidote
+  dialog: [You found an Antidote!]
+  id: chest_antidote
+  sprite: chest
+  x: 20
+  y: 10
+- chestFlag: CHEST_TOF_CAP
+  chestItem: cap
+  dialog: [You found a Cap!]
+  id: chest_cap
+  sprite: chest
+  x: 3
+  y: 12
+- chestFlag: CHEST_TOF_RAPIER
+  chestItem: rapier
+  dialog: [You found a Rapier!]
+  id: chest_rapier
+  sprite: chest
+  x: 20
+  y: 12
+- id: garland
+  sprite: garland_npc
+  x: 11
+  y: 5
+  hideIf: GARLAND_DEFEATED
+  dialog: ['Garland: You dare follow me here?', No one will take the princess from me!]
+- id: captive_princess
+  sprite: princess
+  x: 15
+  y: 4
+  hideIf: PRINCESS_RESCUED
+  dialog: [Please... help me! Garland has gone mad!]
+transitions:
+- {x: 11, y: 21, targetMap: overworld, targetEntrance: temple}
+- {x: 12, y: 21, targetMap: overworld, targetEntrance: temple}
+scriptedEncounters:
+- enemyIds: [garland]
+  flag: GARLAND_DEFEATED
+  isBoss: true
+  message: 'Garland: I, Garland, will knock you all down!'
+  postVictoryCutscene: garland_defeated
+  x: 11
+  y: 6
+encounterRate: {max: 15, min: 8}
+encounters:
+- enemies: [skeleton]
+  weight: 3
+- enemies: [goblin, goblin]
+  weight: 3
+- enemies: [skeleton, goblin]
+  weight: 2
+- enemies: [wolf, wolf]
+  weight: 2
+- enemies: [pirate]
+  weight: 1
+battleBackgrounds: {default: temple}
+canSave: false

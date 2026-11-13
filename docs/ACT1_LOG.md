@@ -28,3 +28,31 @@ overworld peninsula and the Temple of Fiends, with art, maps and the castle stor
 
 **Pipeline lesson:** a sheet used as a reference by other requests (e.g. castle/props) must not be re-cut after
 approval, because its PNG is part of their cache keys. The castle props keep the original keying (`key_mode: v1`).
+| 14 | garland_npc/field | 1 | horned dark knight with a red cape (front and back good); the side row drew the house knight, so row_from left: down (he never walks) | self-approved |
+
+## Result (2026-11-13)
+
+Act 1 is complete in 2x art, and it is the default. All of these are compiled maps under `assets/maps/ai/`:
+- **Cornelia:** the town, its six shops and the inn
+- **Cornelia Castle:** the grounds and the throne room, with the King, the Princess (after her rescue), the chancellor, guards, soldiers and a maid
+- **The overworld:** an original peninsula with Cornelia, the castle, forests, mountains, the river with its east bridge, beaches, and the north bridge gated on BRIDGE_BUILT
+- **The Temple of Fiends:** an original layout with the four chests, Garland guarding the sanctum (his encounter tile in front of him) and the captive Princess
+
+**Story wiring** (all NPC dialogs and flags live in data):
+- The King's dialog depends on PRINCESS_RESCUED.
+- The Princess appears in the castle once PRINCESS_RESCUED is set and gives the lute once (GOT_LUTE); her captive copy in the temple disappears at the same point.
+- Garland disappears once GARLAND_DEFEATED is set.
+- The existing `garland_defeated` cutscene sets PRINCESS_RESCUED and BRIDGE_BUILT, which opens the north bridge.
+
+**Checked:**
+- muted browser checks: the King's dialog, the Princess with the lute gift, entering the castle from the overworld icon, and the Garland battle trigger
+- `npm run build` and `npm test` (1041 tests), `selftest.py`, `build_map.py --selftest`
+
+**Images used:** 16 of the 100-image cap. Logged in `cache/ledger.jsonl`; decisions are listed above.
+
+**Known gaps:**
+- The castle keep is a single prefab, so the castle is modest.
+- The overworld icons are small next to characters.
+- Garland's side-view frames reuse his front view.
+- The interior keepers stand on the counter, as in the legacy maps.
+- The production build still doesn't copy `assets/` into `dist/` (a pre-existing issue).
