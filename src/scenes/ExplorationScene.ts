@@ -58,6 +58,8 @@ export class ExplorationScene implements Scene {
   private battleTrigger: BattleTrigger;
   private paused = false;
   private keyItemGateSystem: KeyItemGateSystem;
+  /** Where the current step began (a blocked key-item gate sends the player back here). */
+  private stepOrigin = { x: 0, y: 0 };
   private vehicleManager: VehicleManager;
   private walkingMode: MovementMode = new WalkingMode();
   /** NPC in conversation (faces the heroes until the dialog closes). */
@@ -281,6 +283,7 @@ export class ExplorationScene implements Scene {
     }
 
     const wasMoving = this.player.isMoving;
+    if (!wasMoving) this.stepOrigin = { x: this.player.gridX, y: this.player.gridY };
     this.player.update(dt);
     // Update wandering NPCs
     for (const npc of this.npcs) {
@@ -328,7 +331,8 @@ export class ExplorationScene implements Scene {
       // Check key item gates at new position
       const gateResult = this.keyItemGateSystem.check(this.player.gridX, this.player.gridY);
       if (gateResult.blocked) {
-        // Revert to previous position by stepping back
+        // the gate cell cannot be entered: step back to where the move started
+        this.player.setPosition(this.stepOrigin.x, this.stepOrigin.y);
         this.dialogManager.start([gateResult.message ?? 'The way is blocked.']);
         return;
       }

@@ -14,8 +14,8 @@ ground: |
   ooooooo......................................mmmmm.ooooo
   ooooooooooooo............................ooooooooooooooo
   oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
-  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
-  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
   oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
   oooooooooooooomo...oooo.....,......ooooooooooooooooooooo
   oooooooooooo.mmm....ooo.....,......ooooooooooooooooooooo
@@ -32,10 +32,10 @@ ground: |
   oooooooofffffffff,ff........,..........rr..mmffooooooooo
   oooooooffffffffff,fff.......,...........rr.ffffooooooooo
   oooooomffffffffff,,,,,,,,,,,,...........rr.ffffooooooooo
-  oooommmmffffffffffff........,...........rr..fff.oooooooo
-  oooommomffffffffffff........,..........rr......ooooooooo
-  ooooooomffffffffffff........,..........rr......ooooooooo
-  ooooooosfffffffffff..........,,,,,,,,,==,.....sooooooooo
+  oooommmmffffffffffff.,......,...........rr..fff.oooooooo
+  oooommomffffffffffff.,......,..........rr......ooooooooo
+  ooooooomffffffffffff.,,,,,..,.,........rr......ooooooooo
+  ooooooosfffffffffff........,,,,,,,,,,,==,.....sooooooooo
   ooooosss.ffffffff..................ffrrfff.....soooooooo
   ooooosoos....fff....f.............ffrrffff....sooooooooo
   ooooooooos.........fffff...........frrffff..sssooooooooo
@@ -48,27 +48,23 @@ ground: |
   oooooooooooooooooooossoooossosssoooooooooooooooooooooooo
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+unreachable_ok: [north_shore]   # across the broken north bridge (repaired after the princess is rescued)
 entrances:
+  cornelia: [28, 31]
   north_shore: [28, 7]
-  castle: [28, 27]
+  cornelia_west: [25, 30]
+  cornelia_east: [30, 30]
+  castle: [28, 26]
 objects:
-- type: prefab
-  prefab: town_icon
-  name: cornelia
-  x: 27
-  y: 30
-  w: 2
-  h: 2
-  door: 1
-  ridge_rows: 0
-  enter: {map: cornelia, entrance: south_gate}
-- type: prefab                 # the castle rises behind the town walls: one walled city (castle precinct to the north)
-  prefab: castle_icon
-  x: 27
-  y: 28
-  w: 2
-  h: 2
-  ridge_rows: 1                # walk onto its towers from the road to enter the castle precinct
+- type: deco                   # Cornelia: one walled city (castle to the north, town to the south)
+  parts:
+  - [city_0_0, city_0_1, city_0_2, city_0_3]
+  - [city_1_0, city_1_1, city_1_2, city_1_3]
+  - [city_2_0, city_2_1, city_2_2, city_2_3]
+  - [city_3_0, city_3_1, city_3_2, city_3_3]
+  x: 26
+  y: 27
+  walk_cells: [[1, 0], [2, 0], [0, 3], [1, 3], [2, 3], [3, 3]]   # the castle gate (north) and the W, S, E gates
 - type: prefab
   prefab: temple_icon
   name: temple
@@ -95,8 +91,8 @@ objects:
   x: 20
   y: 37
 keyItemGates:
-- {x: 28, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge is still unfinished. Workers block the way., permanent: false}
-- {x: 29, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge is still unfinished. Workers block the way., permanent: false}
+- {x: 28, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge has collapsed into the sea. Only the King's builders could repair it., permanent: false}
+- {x: 29, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge has collapsed into the sea. Only the King's builders could repair it., permanent: false}
 encounterRate: {min: 15, max: 30}
 encounters:
 - enemies: [goblin]
@@ -120,5 +116,9 @@ vehicles:
 - {type: ship, x: 30, y: 38, requiredFlag: BIKKE_DEFEATED}
 - {type: canoe, x: 37, y: 36, requiredFlag: EARTH_CAVE_COMPLETE}
 transitions:
-- {x: 27, y: 28, targetMap: cornelia, targetEntrance: castle_gate}
-- {x: 28, y: 28, targetMap: cornelia, targetEntrance: castle_gate}
+- {x: 27, y: 27, targetMap: cornelia, targetEntrance: north_postern}
+- {x: 28, y: 27, targetMap: cornelia, targetEntrance: north_postern}
+- {x: 26, y: 30, targetMap: cornelia, targetEntrance: west_gate}
+- {x: 27, y: 30, targetMap: cornelia, targetEntrance: south_gate}
+- {x: 28, y: 30, targetMap: cornelia, targetEntrance: south_gate}
+- {x: 29, y: 30, targetMap: cornelia, targetEntrance: east_gate}

@@ -59,6 +59,7 @@ objects:
   - [throne_1_0, throne_1_1]
   x: 21
   y: 6
+  fit: true
 - type: deco
   parts:
   - [stairs_down_0_0, stairs_down_0_1]
@@ -138,36 +139,42 @@ objects:
   - [pillar_bottom]
   x: 15
   y: 9
+  fit: true
 - type: deco
   parts:
   - [pillar_top]
   - [pillar_bottom]
   x: 28
   y: 9
+  fit: true
 - type: deco
   parts:
   - [pillar_top]
   - [pillar_bottom]
   x: 15
   y: 13
+  fit: true
 - type: deco
   parts:
   - [pillar_top]
   - [pillar_bottom]
   x: 28
   y: 13
+  fit: true
 - type: deco
   parts:
   - [pillar_top]
   - [pillar_bottom]
   x: 15
   y: 17
+  fit: true
 - type: deco
   parts:
   - [pillar_top]
   - [pillar_bottom]
   x: 28
   y: 17
+  fit: true
 - type: deco
   parts:
   - [statue_top]

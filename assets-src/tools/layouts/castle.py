@@ -36,7 +36,7 @@ class Room:
         self.deco(parts, x, y, on_wall=True)
 
     def pillar(self, x, y):
-        self.deco([["pillar_top"], ["pillar_bottom"]], x, y)
+        self.deco([["pillar_top"], ["pillar_bottom"]], x, y, fit=True)
 
     def statue(self, x, y):
         self.deco([["statue_top"], ["statue_bottom"]], x, y)
@@ -200,7 +200,7 @@ for y0 in (10, 21):                      # cross runners to the side doors
 g.carve(5, 9, 7, 11, "+")                # rug in the princess's chamber
 g.carve(36, 19, 38, 25, "+")             # chapel aisle
 g.faces(2)
-f2.deco([["throne_0_0", "throne_0_1"], ["throne_1_0", "throne_1_1"]], 21, 6)
+f2.deco([["throne_0_0", "throne_0_1"], ["throne_1_0", "throne_1_1"]], 21, 6, fit=True)
 f2.stairs_down(21, 24, "cornelia-castle", "stairs")
 for x in (13, 16, 27, 30):
     f2.wall([["arch_window_top"], ["arch_window_bottom"]], x, 4)

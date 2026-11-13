@@ -84,3 +84,22 @@ city, a river through the town, bent walls, several exits, and a castle with sev
 - **Overworld:** the castle icon now sits behind the town icon as one walled city. Walk onto its towers to enter the castle precinct.
 
 **Images used:** 20 of the 100-image cap.
+
+## Follow-up fixes (2026-11-13)
+
+| # | Sheet | Images | Result | Decision |
+|---|---|---|---|---|
+| 19 | overworld/kit_city | 1 | one 4x4 walled-city icon: castle in the north, red-roofed town and river in the south; gates S, lower W, lower E, castle N | self-approved |
+
+**Re-cuts (no new images):**
+- `fill: true` enlarges small props to fill their cells: the market stall, both staircases and the chests.
+- The compiler's `fit: true` enlarges the throne and pillars. The castle props sheet is a style reference for other sheets, so it is not re-cut.
+- The grand gate is recoloured to the castle wall stone (`match`).
+
+**Overworld:** the city icon has walkable gate cells (north, west, south, east) that lead to the matching city gates.
+
+**North bridge:** its middle has collapsed into the sea until the repair is implemented. The key-item gate now sends the player back; before, it only showed its message and let the player through.
+
+**Battle:** party melee attacks follow `attackChoreography.ts`. Styles are lunge (the default), dash, leap and classic, chosen with `?attack=`. Each hit draws a slash effect.
+
+**Images used:** 21 of the 100-image cap.

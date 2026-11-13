@@ -171,3 +171,5 @@
 {"event": "result", "key": "a967b20dea4dc75d1a2ba57e", "ok": true}
 {"event": "attempt", "ts": "2026-11-13T09:14:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_furnish", "seed": 1234, "key": "b8360f8dd0d4265dc4a54d06"}
 {"event": "result", "key": "b8360f8dd0d4265dc4a54d06", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T10:29:16", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_city", "seed": 1234, "key": "cefbca65dd7fe773839633aa"}
+{"event": "result", "key": "cefbca65dd7fe773839633aa", "ok": true}

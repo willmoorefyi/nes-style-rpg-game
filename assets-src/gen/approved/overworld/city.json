@@ -1,0 +1,58 @@
+{
+  "kit": "overworld",
+  "sheet": "kit_city",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "cefbca65dd7fe773839633aa",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "city_0_0",
+      "city_0_1",
+      "city_0_2",
+      "city_0_3"
+    ],
+    [
+      "city_1_0",
+      "city_1_1",
+      "city_1_2",
+      "city_1_3"
+    ],
+    [
+      "city_2_0",
+      "city_2_1",
+      "city_2_2",
+      "city_2_3"
+    ],
+    [
+      "city_3_0",
+      "city_3_1",
+      "city_3_2",
+      "city_3_3"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "city_icon": [
+        184,
+        171
+      ]
+    },
+    "scale": {
+      "city_icon": 1.0
+    },
+    "skipped": [],
+    "pitch_px": 4.26,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "Cornelia rebuild: one walled-city icon (4x4) with gates S, W, E and the castle N"
+}

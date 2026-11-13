@@ -502,15 +502,16 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             # walkable_rows: rows (from 0) that stay walkable but are drawn under characters (stairs)
             above_rows = o.get("above_rows", len(o["parts"]) if o.get("above") else 0)
             walk_rows = set(o.get("walkable_rows") or [])
+            fitted = _fit_parts(kit, o["parts"]) if o.get("fit") else None
             for j, row in enumerate(o["parts"]):
                 for i, name in enumerate(row):
                     if not name:
                         continue
-                    part = kit.parts.get(name) or K.placeholder_tile(name)
+                    part = fitted[j][i] if fitted else (kit.parts.get(name) or K.placeholder_tile(name))
                     _paste(top if j < above_rows else canvas, part, x + i, y + j)
                     if j < above_rows and not o.get("above"):
                         continue                         # crown over open ground: walk behind it
-                    if j in walk_rows:
+                    if j in walk_rows or [i, j] in (o.get("walk_cells") or []):
                         coll[y + j, x + i] = ROAD            # e.g. the foot of a staircase set into a wall face
                         continue
                     if o.get("block", True):
@@ -539,6 +540,26 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     out = Compiled(mid, wid, hgt, np.asarray(canvas.convert("RGB")).copy(), above, coll, entrances, transitions)
     validate(src, out)
     return out
+
+
+def _fit_parts(kit: K.Kit, parts: list[list[str]]) -> list[list[Image.Image]]:
+    """A multi-cell prop drawn smaller than its cells, enlarged to fill them (bottom-centred, aspect kept)."""
+    h, w = len(parts), len(parts[0])
+    whole = Image.new("RGBA", (w * T, h * T))
+    for j, row in enumerate(parts):
+        for i, name in enumerate(row):
+            if name:
+                whole.alpha_composite(kit.parts.get(name) or K.placeholder_tile(name), (i * T, j * T))
+    box = whole.getchannel("A").point(lambda a: 255 if a >= 128 else 0).getbbox()
+    if box:
+        obj = whole.crop(box)
+        f = min(w * T / obj.width, h * T / obj.height) * 0.96
+        big = obj.resize((max(1, round(obj.width * f)), max(1, round(obj.height * f))), Image.Resampling.LANCZOS)
+        a = np.asarray(big).copy()
+        a[..., 3] = np.where(a[..., 3] >= 128, 255, 0)
+        whole = Image.new("RGBA", (w * T, h * T))
+        whole.alpha_composite(Image.fromarray(a), ((w * T - big.width) // 2, h * T - big.height))
+    return [[whole.crop((i * T, j * T, (i + 1) * T, (j + 1) * T)) for i in range(w)] for j in range(h)]
 
 
 def _anchored_face(tex: np.ndarray, cells: np.ndarray, H: int, W: int) -> np.ndarray:
@@ -630,10 +651,25 @@ def _facade(canvas: Image.Image, top: Image.Image, kit: K.Kit, o: dict, coll: np
         canvas.alpha_composite(edge.crop((0, ridge * T, w * T, rows * T)), (bx * T, (by + ridge) * T))
         coll[by + ridge:by + rows, bx:bx + w] = WALL
     for p in o.get("parts") or []:
+        ratio = None
+        if p.get("match"):                                  # recolour the part's stone to the wall's stone
+            face = kit.material(p["match"]).reshape(-1, 3).astype(np.float32)
+            imgs = [np.asarray(kit.parts.get(n) or K.placeholder_tile(n)) for row in p["parts"] for n in row if n]
+            px = np.concatenate([a.reshape(-1, 4) for a in imgs])
+            px = px[px[:, 3] > 0][:, :3].astype(np.float32)
+            stone = px[px.mean(1) > 140]
+            face = face[face.mean(1) > 140]
+            if len(stone) and len(face):
+                ratio = face.mean(0) / stone.mean(0)
         for j, row in enumerate(p["parts"]):
             for i, name in enumerate(row):
                 if name:
-                    _paste(canvas, kit.parts.get(name) or K.placeholder_tile(name), x0 + p["x"] + i, y0 + p["y"] + j)
+                    part = kit.parts.get(name) or K.placeholder_tile(name)
+                    if ratio is not None:
+                        a = np.asarray(part).astype(np.float32)
+                        a[..., :3] = np.clip(a[..., :3] * ratio, 0, 255)
+                        part = Image.fromarray(a.astype(np.uint8))
+                    _paste(canvas, part, x0 + p["x"] + i, y0 + p["y"] + j)
 
 
 def _bridge_cell(below: np.ndarray, grid, x: int, y: int, kit: K.Kit, H: int, W: int) -> None:
@@ -727,7 +763,7 @@ def validate(src: dict, c: Compiled) -> None:
                     seen.add(n)
                     q.append(n)
         for name, pos in c.entrances.items():
-            if tuple(pos) not in seen:
+            if tuple(pos) not in seen and name not in (src.get("unreachable_ok") or []):
                 errors.append(f"entrance {name} at {tuple(pos)} is not reachable from the first entrance")
         for t in c.transitions:
             if (t["x"], t["y"]) not in seen:

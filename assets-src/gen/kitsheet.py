@@ -965,6 +965,8 @@ def _cut_props(rgb: np.ndarray, sheet: dict, rects: dict, report: dict, canvas: 
                 crop = crop[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
                 mask = mask[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
         scale = 1 / pitch if pitch else tw * 48 / (x1 - x0)   # native px per guide px
+        if sw.get("fill"):                           # review fix: drawn small in fine pixels; fill its cells
+            scale = min(tw * 48 / crop.shape[1], th * 48 / crop.shape[0]) * sw.get("fill_ratio", 0.96)
         ow, oh = max(1, round(crop.shape[1] * scale)), max(1, round(crop.shape[0] * scale))
         f = min(1.0, tw * 48 / ow, th * 48 / oh)     # never larger than its cells
         ow, oh = max(1, round(ow * f)), max(1, round(oh * f))

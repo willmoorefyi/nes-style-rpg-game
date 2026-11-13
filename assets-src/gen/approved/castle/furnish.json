@@ -40,12 +40,12 @@
     "fill": {},
     "prop_px": {
       "stairs_up": [
-        91,
-        77
+        92,
+        78
       ],
       "stairs_down": [
-        75,
-        66
+        92,
+        82
       ],
       "banquet": [
         96,
@@ -79,5 +79,5 @@
       "not_tiny": true
     }
   },
-  "note": "castle rebuild: stairs up/down, banquet table, fireplace, tapestry, desk"
+  "note": "castle rebuild; review fix: stairs fill their cells"
 }

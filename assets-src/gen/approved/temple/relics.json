@@ -64,12 +64,12 @@
         40
       ],
       "chest_closed": [
-        37,
-        36
+        46,
+        45
       ],
       "chest_open": [
-        39,
-        36
+        46,
+        43
       ],
       "vines": [
         38,
@@ -99,5 +99,5 @@
       "not_tiny": true
     }
   },
-  "note": "act-1 run self-approved; sources + keying"
+  "note": "pillars, statue, brazier, altar, chests; review fix: chests fill their cell"
 }

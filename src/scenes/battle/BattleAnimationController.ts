@@ -7,6 +7,8 @@ import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
 import { formatConciseResult, capitalize, createPromptIndicator, destroyPromptIndicator } from './battleMessageUtils.js';
+import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackStyle, type AttackFrame, type AttackStyle } from './attackChoreography.js';
+import { slashEffect } from './slashEffect.js';
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
   water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
@@ -16,7 +18,10 @@ export class BattleAnimationController {
   animTimer = 0;
   animActorSprite: Container | null = null;
   animActorOrigX = 0;
-  animTargetX = 0;
+  animActorOrigY = 0;
+  /** Melee choreography for party attacks (wind-up, run in, strike, hop back). */
+  attackStyle: AttackStyle = typeof location === 'undefined' ? 'lunge' : parseAttackStyle(location.search);
+  private lastAdvance: AttackFrame = { dx: 0, dy: 0, pose: 'ready' };
   animMessages: { text: string }[] = [];
   animMessageIndex = 0;
   // N2: Track if current animation actor is an enemy (skip step_forward/step_back)
@@ -92,9 +97,10 @@ export class BattleAnimationController {
           this.animActorIsEnemy = found?.isEnemy ?? false;
           if (this.animActorSprite) {
             this.animActorOrigX = this.animActorSprite.x;
-            // M3: Relative step-forward — subtle "step out of line"
-            this.animTargetX = found!.isEnemy ? this.animActorOrigX + 120 : this.animActorOrigX - 120;
-            if (!found!.isEnemy) this.display.setActorPose(this.animActorSprite, 'attack');
+            this.animActorOrigY = this.animActorSprite.y;
+            this.lastAdvance = { dx: 0, dy: 0, pose: 'ready' };
+            // spells and items: the cast stance at once; a melee attack poses frame by frame in step_forward
+            if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'attack');
           }
         }
         this.animTimer += dt;
@@ -106,13 +112,13 @@ export class BattleAnimationController {
         break;
       }
       case 'step_forward': {
+        const melee = this.currentActionInfo?.actionType === 'fight';
+        const frames = melee ? advanceFrames(this.attackStyle) : 15;
         this.animTimer += dt;
-        if (confirmSkip) this.animTimer = 15;
-        const progress = Math.min(this.animTimer / 15, 1);
-        if (this.animActorSprite) {
-          this.animActorSprite.x = this.animActorOrigX + (this.animTargetX - this.animActorOrigX) * progress;
-        }
-        if (this.animTimer >= 15) { this.animTimer = 0; this.animPhase = 'execute'; }
+        if (confirmSkip) this.animTimer = frames;
+        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer)
+          : { dx: -120 * Math.min(this.animTimer / 15, 1), dy: 0, pose: 'attack' });
+        if (this.animTimer >= frames) { this.animTimer = 0; this.animPhase = 'execute'; }
         break;
       }
       case 'enemy_lunge': {
@@ -123,6 +129,7 @@ export class BattleAnimationController {
       case 'execute': {
         const result = this.battle.executeNextAction();
         this.spawnFloatingTextsFromEvents(result.damageEvents);
+        if (!this.animActorIsEnemy && this.currentActionInfo?.actionType === 'fight') this.slashTargets(result.damageEvents);
         this.display.updatePartyDisplay();
         this.display.updateEnemySprites(this.dyingEnemies);
         this.display.updatePartySprites();
@@ -158,13 +165,10 @@ export class BattleAnimationController {
       }
       case 'step_back': {
         this.animTimer += dt;
-        if (confirmSkip) this.animTimer = 15;
-        const progress = Math.min(this.animTimer / 15, 1);
-        if (this.animActorSprite) {
-          this.animActorSprite.x = this.animTargetX + (this.animActorOrigX - this.animTargetX) * progress;
-        }
-        if (this.animTimer >= 15) {
-          if (this.animActorSprite) this.animActorSprite.x = this.animActorOrigX;
+        if (confirmSkip) this.animTimer = RETURN_FRAMES;
+        this.placeActor(returnAt(this.lastAdvance, this.animTimer, this.attackStyle), false);
+        if (this.animTimer >= RETURN_FRAMES) {
+          if (this.animActorSprite) this.animActorSprite.position.set(this.animActorOrigX, this.animActorOrigY);
           this.completeAction();
         }
         break;
@@ -181,6 +185,24 @@ export class BattleAnimationController {
         }
         this.animTimer = 1; break;
       }
+    }
+  }
+  /** Moves the acting party member to an offset from its place in line and shows the frame's pose. */
+  private placeActor(f: AttackFrame, remember = true): void {
+    if (!this.animActorSprite) return;
+    this.animActorSprite.position.set(this.animActorOrigX + f.dx, this.animActorOrigY + f.dy);
+    this.display.setActorPose(this.animActorSprite, f.pose);
+    if (remember) this.lastAdvance = f;
+  }
+  /** A quick white slash across each enemy the melee attack hit. */
+  private slashTargets(events: DamageEvent[]): void {
+    for (const evt of events) {
+      if (!evt.targetId.startsWith('enemy_') || evt.isHeal) continue;
+      const sprite = this.display.enemySprites[parseInt(evt.targetId.split('_')[1], 10)];
+      if (!sprite) continue;
+      const fx = slashEffect(sprite);
+      this.mainContainer.addChild(fx);
+      this.spellFlashes.push({ overlay: fx, age: 0, maxAge: 12 });
     }
   }
   /** Preview pose art: fight lunges in the attack pose, magic plays the cast stance. False when there is nothing to play. */

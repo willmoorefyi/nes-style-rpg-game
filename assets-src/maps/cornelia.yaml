@@ -155,6 +155,7 @@ objects:
     - [gate_2_0, gate_2_1, gate_2_2]
     x: 6
     y: 11
+    match: castle_face
   - parts: *id001
     x: 3
     y: 11
@@ -1130,11 +1131,11 @@ transitions:
 - {x: 29, y: 71, targetMap: overworld, targetEntrance: cornelia}
 - {x: 30, y: 71, targetMap: overworld, targetEntrance: cornelia}
 - {x: 31, y: 71, targetMap: overworld, targetEntrance: cornelia}
-- {x: 0, y: 44, targetMap: overworld, targetEntrance: cornelia}
-- {x: 0, y: 45, targetMap: overworld, targetEntrance: cornelia}
-- {x: 61, y: 44, targetMap: overworld, targetEntrance: cornelia}
-- {x: 61, y: 45, targetMap: overworld, targetEntrance: cornelia}
-- {x: 61, y: 24, targetMap: overworld, targetEntrance: castle}
-- {x: 61, y: 25, targetMap: overworld, targetEntrance: castle}
+- {x: 0, y: 44, targetMap: overworld, targetEntrance: cornelia_west}
+- {x: 0, y: 45, targetMap: overworld, targetEntrance: cornelia_west}
+- {x: 61, y: 44, targetMap: overworld, targetEntrance: cornelia_east}
+- {x: 61, y: 45, targetMap: overworld, targetEntrance: cornelia_east}
+- {x: 61, y: 24, targetMap: overworld, targetEntrance: cornelia_east}
+- {x: 61, y: 25, targetMap: overworld, targetEntrance: cornelia_east}
 - {x: 6, y: 0, targetMap: overworld, targetEntrance: castle}
 - {x: 7, y: 0, targetMap: overworld, targetEntrance: castle}

@@ -44,8 +44,8 @@
         122
       ],
       "stall": [
-        66,
-        69
+        89,
+        92
       ],
       "lamp": [
         29,
@@ -84,5 +84,5 @@
       "not_tiny": true
     }
   },
-  "note": "town rebuild: oak, stall, lamp, bench, hedge, crops, lilies (grey panels keyed)"
+  "note": "town rebuild; review fix: stall fills its cells"
 }

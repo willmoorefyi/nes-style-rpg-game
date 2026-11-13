@@ -289,7 +289,7 @@
       swatches:
         - {name: oak, source: [4, 28, 500, 656], key_border: true, at: [0, 0], tiles: [2, 3], wrap: prop, parts: [[oak_0_0, oak_0_1], [oak_1_0, oak_1_1], [oak_2_0, oak_2_1]],
            text: "a big round leafy oak tree seen in three-quarter view: a wide bushy crown in three greens lit from the upper left with darker shade underneath, and a thick brown trunk with roots at the bottom centre; it fills the box."}
-        - {name: stall, source: [616, 20, 956, 376], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stall_0_0, stall_0_1], [stall_1_0, stall_1_1]],
+        - {name: stall, fill: true, source: [616, 20, 956, 376], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stall_0_0, stall_0_1], [stall_1_0, stall_1_1]],
            text: "a market stall seen from the front in three-quarter view: a wooden counter table under a red-and-white striped cloth awning on four wooden poles, with baskets of red apples, bread loaves and green vegetables on the table; it fills the box."}
         - {name: lamp, source: [580, 404, 728, 696], key_border: true, at: [2, 2], tiles: [1, 2], wrap: prop, parts: [[lamp_top], [lamp_bottom]],
            text: "a black iron street lamp post with a warm glowing yellow lantern at the top, as tall as the box."}
@@ -477,9 +477,9 @@
       labels: absolute
       scale: pitch
       swatches:
-        - {name: stairs_up, source: [20, 12, 500, 408], key_border: true, at: [0, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_up_0_0, stairs_up_0_1], [stairs_up_1_0, stairs_up_1_1]],
+        - {name: stairs_up, fill: true, source: [20, 12, 500, 408], key_border: true, at: [0, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_up_0_0, stairs_up_0_1], [stairs_up_1_0, stairs_up_1_1]],
            text: "a wide flight of pale stone stairs seen from the front in three-quarter view, climbing away from the viewer up to a dark arched opening at the top, with carved stone side rails; it fills the box."}
-        - {name: stairs_down, source: [592, 16, 980, 356], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_down_0_0, stairs_down_0_1], [stairs_down_1_0, stairs_down_1_1]],
+        - {name: stairs_down, fill: true, source: [592, 16, 980, 356], key_border: true, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[stairs_down_0_0, stairs_down_0_1], [stairs_down_1_0, stairs_down_1_1]],
            text: "a stairwell in a stone floor seen from above at an angle: grey stone steps leading down and away into darkness, with a low carved stone rail on the left, right and far side; it fills the box."}
         - {name: banquet, source: [20, 452, 524, 684], key_border: true, at: [0, 2], tiles: [2, 1], wrap: prop, parts: [[banquet_l, banquet_r]],
            text: "a long wooden banquet table seen from the front in three-quarter view, with a white tablecloth, two candlesticks, plates, goblets and a roast, as wide as the box."}
@@ -538,6 +538,25 @@
         - {name: boulder, source: [392, 730, 633, 955], key_border: true, key_tol: 45, at: [2, 3], tiles: [1, 1], wrap: prop,
            text: "a mossy grey boulder, about half as wide as the box."}
 
+    city:
+      # Cornelia rebuild: one big world-map icon of the walled royal city (castle north, town south), gates on the
+      # south, west and east sides and the castle's own gate on the north side (matching the city map's gates)
+      kind: swatches
+      seed: 1234
+      refs: [landmarks, town/props]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: city_icon, fill: true, key_border: true, key_tol: 45, at: [0, 0], tiles: [4, 4], wrap: prop,
+           parts: [[city_0_0, city_0_1, city_0_2, city_0_3], [city_1_0, city_1_1, city_1_2, city_1_3],
+                   [city_2_0, city_2_1, city_2_2, city_2_3], [city_3_0, city_3_1, city_3_2, city_3_3]],
+           text: "a world-map icon of a large walled royal city seen from above at a three-quarter angle, filling the whole box: one ring of pale grey stone city walls with small round towers, enclosing a white castle with blue cone-roofed towers in the top half and many small red-roofed houses in the bottom half, a little blue river winding through the town; open arched gateways in the middle of the bottom wall, the middle of the left wall and the middle of the right wall, and a castle gate in the middle of the top wall; nothing outside the walls."}
+
 - id: temple
   kind: kit
   sheets:
@@ -584,9 +603,9 @@
            text: "a long dark stone sacrificial altar with carved runes, two candles and a faint purple glow, as wide as the box."}
         - {name: fallen_column, source: [533, 518, 974, 729], key_border: true, key_tol: 40, at: [2, 2], tiles: [2, 1], wrap: prop, parts: [[fallen_l, fallen_r]],
            text: "a fallen broken dark stone column lying on its side on the floor, as long as the box."}
-        - {name: chest_closed, source: [38, 786, 232, 977], key_border: true, key_tol: 40, at: [0, 3], tiles: [1, 1], wrap: prop,
+        - {name: chest_closed, fill: true, source: [38, 786, 232, 977], key_border: true, key_tol: 40, at: [0, 3], tiles: [1, 1], wrap: prop,
            text: "a closed wooden treasure chest with iron bands and a gold lock."}
-        - {name: chest_open, source: [280, 786, 484, 977], key_border: true, key_tol: 40, at: [1, 3], tiles: [1, 1], wrap: prop,
+        - {name: chest_open, fill: true, source: [280, 786, 484, 977], key_border: true, key_tol: 40, at: [1, 3], tiles: [1, 1], wrap: prop,
            text: "the same wooden treasure chest, opened and empty, lid up."}
         - {name: vines, source: [530, 786, 730, 977], key_border: true, key_tol: 40, at: [2, 3], tiles: [1, 1], wrap: prop, align: center,
            text: "dark green ivy vines hanging down a wall."}
