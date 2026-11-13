@@ -99,19 +99,16 @@ objects:
   windows: [1, 3]
   sign: black_magic
   enter: {map: cornelia-black-magic, entrance: door}
-- type: house
+- type: prefab
+  prefab: inn
   name: inn
   x: 24
-  y: 18
-  w: 6
-  h: 4
-  roof: red
-  wall: plaster
+  y: 17
+  w: 4
+  h: 5
   door: 2
-  windows: [1, 3, 4]
   sign: inn
   enter: {map: cornelia-inn, entrance: door}
-  chimney: 4
 - {type: fountain, x: 19, y: 11}
 - {type: tree, x: 2, y: 4}
 - {type: tree, x: 2, y: 8}

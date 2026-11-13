@@ -43,6 +43,7 @@ from gen import spec as S  # noqa: E402
 OUT = HERE / "out"
 CACHE = HERE / "cache"
 LEDGER = CACHE / "ledger.jsonl"
+BUDGET = HERE / "budget.json"
 REFS = HERE / "refs"
 STYLE_REF = REFS / "style_reference.jpg"
 STYLE_REF_CROP = (300, 270, 2800, 1100)
@@ -377,6 +378,19 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
                          "(only the user may raise --max-paid)")
     if not paid:
         raise SystemExit(f"refused: {len(misses)} uncached request(s) need --paid (run --dry-run to inspect first)")
+    attempts = [e for e in ledger if e.get("event") == "attempt"]
+    if BUDGET.exists():                              # the user's run-wide hard cap (budget.json)
+        b = json.loads(BUDGET.read_text())
+        used = len(attempts) - b["attempts_before"]
+        if used + len(misses) > b["cap"]:
+            raise SystemExit(f"refused: the run cap of {b['cap']} paid images is reached ({used} used); only the user "
+                             "may approve more")
+        run = attempts[b["attempts_before"]:]
+        for r in misses:
+            n = sum(1 for e in run if e.get("character") == r.character and e.get("sheet") == r.sheet.name)
+            if n >= b["max_attempts_per_sheet"]:
+                raise SystemExit(f"refused: {r.character}/{r.sheet.name} already used {n} attempts this run "
+                                 f"(max {b['max_attempts_per_sheet']})")
     for r in misses:
         prior = [e for e in ledger if e.get("character") == r.character and e.get("sheet") == r.sheet.name
                  and e.get("event") == "attempt"]
@@ -716,7 +730,8 @@ def write_kit(outdir: Path, char: dict, r: Request, raw: Image.Image, seed: int)
         return report
     cells = ks["cells"]
     size, tile = KS.geo(ks)
-    sheet, report = KS.cut(raw, cells, seed, size, tile, ks.get("derive"), hairlines=ks.get("grid_lines", True))
+    sheet, report = KS.cut(raw, cells, seed, size, tile, ks.get("derive"), hairlines=ks.get("grid_lines", True),
+                           prefab=ks.get("prefab"))
     r.guide.save(outdir / f"{r.sheet.name}_guide.png")
     raw.save(outdir / f"{r.sheet.name}_raw.png")
     sheet.save(outdir / f"{r.sheet.name}.png")

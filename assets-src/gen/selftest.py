@@ -7,6 +7,7 @@ and the size-reference crop.
 """
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -159,6 +160,15 @@ def test_budget_guard() -> None:
     check(refused(lambda: GEN.check_budget([a, b], paid=True, max_paid=1, retry=False, ledger=[])), "2 misses > max-paid 1 refused")
     check(refused(lambda: GEN.check_budget([a], paid=False, max_paid=1, retry=False, ledger=[])), "uncached without --paid refused")
     check(GEN.check_budget([a], paid=True, max_paid=1, retry=False, ledger=[]) == [a], "1 miss with --paid allowed")
+    if GEN.BUDGET.exists():
+        b = json.loads(GEN.BUDGET.read_text())
+        full = [{"event": "attempt", "character": "x", "sheet": "y"}] * (b["attempts_before"] + b["cap"])
+        check(refused(lambda: GEN.check_budget([a], paid=True, max_paid=1, retry=True, ledger=full)),
+              f"run cap: the {b['cap']}th-plus paid image is refused")
+        same = [{"event": "attempt", "character": "x", "sheet": "y"}] * b["attempts_before"] + \
+               [{"event": "attempt", "character": a.character, "sheet": a.sheet.name}] * b["max_attempts_per_sheet"]
+        check(refused(lambda: GEN.check_budget([a], paid=True, max_paid=1, retry=True, ledger=same)),
+              f"run cap: more than {b['max_attempts_per_sheet']} attempts at one sheet refused")
     with tempfile.TemporaryDirectory() as tmp:
         led = Path(tmp) / "ledger.jsonl"
         try:

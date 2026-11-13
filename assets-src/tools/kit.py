@@ -43,6 +43,8 @@ for col in ("l", "plain", "window", "r"):
     _PARTS[f"wall_up_{col}"] = ((225, 215, 190), "U" + col[0], "window" if col == "window" else "tile")
 for col in ("l", "plain", "r"):
     _PARTS[f"wall_lo_{col}"] = ((205, 195, 170), "L" + col[0], "tile")
+for col in ("l", "plain", "window", "r"):
+    _PARTS[f"wall_up2_{col}"] = ((215, 205, 180), "2" + col[0], "window" if col == "window" else "tile")
 _PARTS["wall_door_top"] = ((110, 70, 40), "Dt", "door_top")
 _PARTS["wall_door_bottom"] = ((110, 70, 40), "Db", "door_bottom")
 for s in SIGNS:
@@ -127,6 +129,15 @@ def placeholder_part(name: str) -> Image.Image:
             d.line([x, y, x, y + 5], fill=fill)
     if label:
         d.text((3, 2), label, fill=(*_dark(col, 0.25), 255), font=_font())
+    return im
+
+
+def placeholder_tile(name: str) -> Image.Image:
+    """Generic labelled placeholder for a part the kit does not define yet (e.g. a prefab not approved)."""
+    im = Image.new("RGBA", (T, T), (190, 170, 150, 255))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, T - 1, T - 1], outline=(60, 50, 40, 255))
+    d.text((3, 2), name[-5:], fill=(40, 30, 20, 255), font=_font())
     return im
 
 

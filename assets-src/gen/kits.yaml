@@ -214,3 +214,34 @@
           wrap: prop
           text: >
             a wooden signpost: one post with a blank wooden board pointing right, as tall as the box.
+    inn:
+      # checkpoint E1: second building style (timber frame over stone, two storeys) for the inn; same 1:1 rules as
+      # the house (prompt rev 2, no guide lines); 4:5 guide so five rows fit at ~45 native px per tile
+      seed: 1234
+      refs: [house]
+      aspect: "4:5"
+      guide: [1024, 1280]
+      tile_px: 240
+      grid_lines: false
+      prompt_rev: 2
+      prefab: inn            # review fix: braces and symmetric windows are not modular; stamp the drawing whole
+      cells:
+        - [roof_ridge_l@timber, roof_ridge_m@timber, roof_ridge_m@timber, roof_ridge_r@timber]
+        - [roof_eave_l@timber, roof_eave_m@timber, roof_eave_m@timber, roof_eave_r@timber]
+        - [wall_up2_l@timber, wall_up2_window@timber, wall_up2_window@timber, wall_up2_r@timber]
+        - [wall_up_l@timber, wall_up_window@timber, wall_door_top@timber, wall_up_r@timber]
+        - [wall_lo_l@timber, wall_lo_plain@timber, wall_door_bottom@timber, wall_lo_r@timber]
+      derive:
+        wall_up_plain@timber: { from: wall_up_window@timber }
+        wall_up2_plain@timber: { from: wall_up2_window@timber }
+      prompt: >
+        a two-storey village inn seen straight from the front (the south side). Show only the front: the left and
+        right sides are straight vertical edges, with no side wall visible and no roof overhang past the sides. The
+        top two fifths are the roof: dark brown-red clay roof tiles in neat horizontal courses sloping toward the
+        viewer, with the ridge line along the very top and the lower edge ending in a dark eave with a thin shadow
+        line under it (no gable, no chimney, no dormer, no sign). Below the roof, the upper storey is a white plaster
+        wall framed by dark brown timber beams (half-timbered), with two small wooden-framed windows, one in the
+        middle-left and one in the middle-right. The ground floor is grey fieldstone masonry: a wooden double-plank
+        door with a stone frame stands right of centre, from about the middle of the ground floor down to the bottom
+        edge; a small window sits left of the door in the upper part of the ground floor; the rest is plain stone,
+        with a darker base course along the bottom.

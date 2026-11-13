@@ -134,7 +134,7 @@ def parse_ground(text: str) -> list[list[str]]:
 
 def footprint(o: dict) -> list[tuple[int, int]]:
     t, x, y = o["type"], o.get("x"), o.get("y")
-    if t == "house":
+    if t in ("house", "prefab"):
         return [(x + i, y + j) for j in range(o["h"]) for i in range(o["w"])]
     if t == "tree":
         return [(x, y - 1), (x, y)]
@@ -250,7 +250,11 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             windows = set(o.get("windows") or [])
             if door is not None and not 1 <= door <= w - 2:
                 raise MapError(f"house {n}: door column {door} must be a middle column (1..{w - 2})")
-            roof_rows = ["ridge"] + ["mid"] * (h - 4) + ["eave"]
+            storeys = o.get("storeys", 1)
+            wall_rows = 2 + (storeys - 1)                # an upper storey adds one wall row above the ground floor
+            if h < wall_rows + 2:
+                raise MapError(f"house {n}: {storeys} storeys need h >= {wall_rows + 2}")
+            roof_rows = ["ridge"] + ["mid"] * (h - wall_rows - 2) + ["eave"]
             for j, row in enumerate(roof_rows):
                 for i in range(w):
                     col = "l" if i == 0 else "r" if i == w - 1 else "m"
@@ -268,16 +272,45 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                     up, lo = "wall_up_plain", "wall_lo_plain"
                 _paste(canvas, styled(kit, up, o.get("wall")), x + i, y + h - 2)
                 _paste(canvas, styled(kit, lo, o.get("wall")), x + i, y + h - 1)
+                if storeys == 2:                         # upstairs: windows over the listed columns and the door
+                    side = "l" if i == 0 else "r" if i == w - 1 else None
+                    up2 = (f"wall_up2_{side}" if side else
+                           "wall_up2_window" if (i in windows or i == door) else "wall_up2_plain")
+                    _paste(canvas, styled(kit, up2, o.get("wall")), x + i, y + h - 3)
             if o.get("sign"):
                 if door is None:
                     raise MapError(f"house {n}: a sign needs a door column")
-                _paste(canvas, kit.part(f"sign_{o['sign']}"), x + door, y + h - 3)
+                _paste(canvas, kit.part(f"sign_{o['sign']}"), x + door, y + h - 1 - wall_rows)   # on the eave
             if o.get("chimney") is not None:
                 _paste(top, kit.part("chimney"), x + o["chimney"], y)
             for j in range(h):
                 for i in range(w):
                     coll[y + j, x + i] = WALL
             coll[y, x:x + w] = grid_terrain_row(grid, y, x, w)       # ridge row: walk behind the house
+            if door is not None:
+                coll[y + h - 1, x + door] = ROAD
+                if o.get("name"):
+                    entrances[o["name"]] = [x + door, y + h]
+                if o.get("enter"):
+                    e = o["enter"]
+                    transitions.append({"x": x + door, "y": y + h - 1, "targetMap": e["map"],
+                                        "targetEntrance": e["entrance"]})
+                    if check_interiors:
+                        _check_interior_entrance(e["map"], e["entrance"])
+        elif t == "prefab":
+            # a unique building drawn whole (kit cells <prefab>_<row>_<col>): stamped as drawn; the top `ridge_rows`
+            # rows are walkable and drawn over characters, the door cell on the bottom row is walkable
+            w, h, door, pf = o["w"], o["h"], o.get("door"), o["prefab"]
+            ridge = o.get("ridge_rows", 1)
+            for j in range(h):
+                for i in range(w):
+                    name = f"{pf}_{j}_{i}"
+                    part = kit.parts.get(name) or K.placeholder_tile(name)
+                    _paste(top if j < ridge else canvas, part, x + i, y + j)
+                    coll[y + j, x + i] = WALL
+            coll[y:y + ridge, x:x + w] = [grid_terrain_row(grid, y + j, x, w) for j in range(ridge)]
+            if o.get("sign") and door is not None:
+                _paste(canvas, kit.part(f"sign_{o['sign']}"), x + door, y + o.get("sign_row", ridge))
             if door is not None:
                 coll[y + h - 1, x + door] = ROAD
                 if o.get("name"):

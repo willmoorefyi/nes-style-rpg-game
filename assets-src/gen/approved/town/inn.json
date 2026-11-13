@@ -1,0 +1,73 @@
+{
+  "kit": "town",
+  "sheet": "kit_inn",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "abd60eade9a5950682071523",
+  "approved": "2026-11-12",
+  "tile": 48,
+  "cells": [
+    [
+      "inn_0_0",
+      "inn_0_1",
+      "inn_0_2",
+      "inn_0_3"
+    ],
+    [
+      "inn_1_0",
+      "inn_1_1",
+      "inn_1_2",
+      "inn_1_3"
+    ],
+    [
+      "inn_2_0",
+      "inn_2_1",
+      "inn_2_2",
+      "inn_2_3"
+    ],
+    [
+      "inn_3_0",
+      "inn_3_1",
+      "inn_3_2",
+      "inn_3_3"
+    ],
+    [
+      "inn_4_0",
+      "inn_4_1",
+      "inn_4_2",
+      "inn_4_3"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "native_px_per_tile": 48.1,
+    "drawn_pitch_raw_px": 4.82,
+    "pitch_conf": 1.43,
+    "tile_guide_px": [
+      256.0,
+      248.6
+    ],
+    "grid_alignment_native_px": 8.0,
+    "door_opening_px": 62,
+    "seam_ratio": {
+      "roof_ridge_m@timber": 0.01,
+      "roof_eave_m@timber": 0.03
+    },
+    "colours": 30,
+    "thin_line_px_removed": 0,
+    "grid_lines_removed": [
+      0,
+      0
+    ],
+    "pass": {
+      "density": true,
+      "alignment": true,
+      "door": false,
+      "seams": true,
+      "colours": true
+    },
+    "prefab": "inn"
+  },
+  "note": "checkpoint E1 inn prefab (approved by user; door 62 px accepted)"
+}

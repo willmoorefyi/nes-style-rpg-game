@@ -33,7 +33,13 @@ def grid_box(cols: int, rows: int, size: tuple[int, int] = GUIDE_SIZE, tile: int
     return x0, y0, x0 + w, y0 + h
 
 
+def base(name: str) -> str:
+    """Part name without its style suffix (roof_ridge_m@timber -> roof_ridge_m)."""
+    return name.split("@")[0]
+
+
 def _kind(name: str) -> str:
+    name = base(name)
     if name.startswith("roof_"):
         return "roof"
     if "door" in name:
@@ -58,7 +64,7 @@ def guide(cells: list[list[str]], size: tuple[int, int] = GUIDE_SIZE, tile: int 
             kind = _kind(name)
             d.rectangle([bx, by, bx + TILE_GUIDE - 1, by + TILE_GUIDE - 1], fill=SHADES["roof" if kind == "roof" else "wall"])
             if kind == "door":
-                top = round(tile * 70 / 240) if name.endswith("_top") else 0
+                top = round(tile * 70 / 240) if base(name).endswith("_top") else 0
                 m = round(tile * 50 / 240)
                 d.rectangle([bx + m, by + top, bx + TILE_GUIDE - m - 1, by + TILE_GUIDE - 1], fill=SHADES["door"])
             if kind == "window":
@@ -293,7 +299,10 @@ def _period(sig: np.ndarray, g0: int, g1: int, n: int, lo: int = 10, hi: int = 6
 
 
 def cut(raw: Image.Image, cells: list[list[str]], seed: int = 0, size: tuple[int, int] = GUIDE_SIZE,
-        tile: int = TILE_GUIDE, derive: dict | None = None, hairlines: bool = True) -> tuple[Image.Image, dict]:
+        tile: int = TILE_GUIDE, derive: dict | None = None, hairlines: bool = True,
+        prefab: str | None = None) -> tuple[Image.Image, dict]:
+    """prefab: keep the drawing exactly as drawn (no repeated-part substitution, no derived parts) and name its
+    cells <prefab>_<row>_<col>, for a unique building stamped whole."""
     rows, cols = len(cells), len(cells[0])
     GUIDE_SIZE, TILE_GUIDE = size, tile  # noqa: N806 (this sheet's geometry)
     T = 48
@@ -328,7 +337,7 @@ def cut(raw: Image.Image, cells: list[list[str]], seed: int = 0, size: tuple[int
     seams = {}
     for r, row in enumerate(cells):
         for c, name in enumerate(row):
-            if name and name.endswith("_m"):
+            if name and base(name).endswith("_m"):
                 seams.setdefault(name, []).append((seam_ratio(sheet[r * T:(r + 1) * T, c * T:(c + 1) * T]), r, c))
     best = {n: min(v) for n, v in seams.items()}
     # a repeatable middle part may come from anywhere along its row band (the roof runs unbroken across the
@@ -360,6 +369,11 @@ def cut(raw: Image.Image, cells: list[list[str]], seed: int = 0, size: tuple[int
         "seams": all(v[0] <= 1.5 for v in best.values()),
         "colours": report["colours"] <= COLORS,
     }
+    if prefab:
+        report["cells"] = [[f"{prefab}_{r}_{c}" for c in range(cols)] for r in range(rows)]
+        report["pass"]["seams"] = True               # nothing repeats in a prefab
+        report["prefab"] = prefab
+        return Image.fromarray(sheet), report
     # repeated middle parts: copy the best-seam copy into every slot so the kit is consistent
     out = sheet.copy()
     for name, (_, r, c) in best.items():
@@ -408,26 +422,39 @@ def paint_out(tile: np.ndarray) -> np.ndarray:
 
 
 def _door_height(sheet: np.ndarray, cells: list[list[str]]) -> int | None:
-    """Rows of the door column (door_top over door_bottom) whose centre differs from the plain wall colour."""
+    """Rows of the door column (door_top over door_bottom) whose centre strip is mostly the door's own colours: the
+    commonest colours in the middle of the door's bottom cell that are rare on the plain wall (works on smooth
+    plaster and on textured stone alike)."""
     T = 48
-    pos = {name: (r, c) for r, row in enumerate(cells) for c, name in enumerate(row)}
+    pos = {base(name): (r, c) for r, row in enumerate(cells) for c, name in enumerate(row) if name}
     if "wall_door_top" not in pos or "wall_lo_plain" not in pos:
         return None
     (rt, ct), (rp, cp) = pos["wall_door_top"], pos["wall_lo_plain"]
-    wall = np.median(sheet[rp * T:(rp + 1) * T, cp * T:(cp + 1) * T, :3].reshape(-1, 3), axis=0)
-    col = sheet[rt * T:(rt + 2) * T, ct * T + 12:ct * T + 36, :3].astype(np.float32)
-    far = (np.abs(col - wall).sum(-1) > 90).mean(1) > 0.6
-    return int(far.sum())
-
+    key = lambda a: (a[..., 0].astype(np.int64) << 16) | (a[..., 1].astype(np.int64) << 8) | a[..., 2]  # noqa: E731
+    strip = key(sheet[rt * T:(rt + 2) * T, ct * T + 16:ct * T + 32, :3])
+    wall = key(sheet[rp * T:(rp + 1) * T, cp * T:(cp + 1) * T, :3])
+    bottom = strip[T + 8:]                          # the door's bottom cell, below any frame
+    vals, cnt = np.unique(bottom, return_counts=True)
+    wall_vals, wall_cnt = np.unique(wall, return_counts=True)
+    wall_share = dict(zip(wall_vals.tolist(), (wall_cnt / wall.size).tolist()))
+    door_cols = {v for v, n in zip(vals.tolist(), cnt.tolist()) if n / bottom.size > 0.05 and wall_share.get(v, 0) < 0.02}
+    if not door_cols:
+        return None
+    is_door = np.isin(strip, list(door_cols)).mean(1) > 0.5
+    return int(is_door.sum())
 
 def review(raw: Image.Image, sheet: Image.Image, report: dict, cells: list[list[str]]) -> Image.Image:
     """Raw | cut at in-game 2x | a test house 7 wide built from the parts, with the knight for scale."""
     T = 48
     s2 = sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST)
-    parts = {name: sheet.crop((c * T, r * T, (c + 1) * T, (r + 1) * T))
+    parts = {base(name): sheet.crop((c * T, r * T, (c + 1) * T, (r + 1) * T))
              for r, row in enumerate(report["cells"]) for c, name in enumerate(row) if name}
     plan = [["roof_ridge_l"] + ["roof_ridge_m"] * 5 + ["roof_ridge_r"],
-            ["roof_eave_l"] + ["roof_eave_m"] * 5 + ["roof_eave_r"],
+            ["roof_eave_l"] + ["roof_eave_m"] * 5 + ["roof_eave_r"]]
+    if "wall_up2_l" in parts:
+        plan.append(["wall_up2_l", "wall_up2_window", "wall_up2_plain", "wall_up2_window", "wall_up2_plain",
+                     "wall_up2_window", "wall_up2_r"])
+    plan += [
             ["wall_up_l", "wall_up_plain", "wall_up_window", "wall_door_top", "wall_up_window", "wall_up_plain", "wall_up_r"],
             ["wall_lo_l", "wall_lo_plain", "wall_lo_plain", "wall_door_bottom", "wall_lo_plain", "wall_lo_plain", "wall_lo_r"]]
     rows = len(plan)
