@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { computeEnemyLayoutAi, ENEMY_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 
-const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 352 };
+const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
 
 function rect(b: EnemyBox) {

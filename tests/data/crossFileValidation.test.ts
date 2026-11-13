@@ -313,3 +313,25 @@ describe('Cross-file data validation', () => {
     });
   });
 });
+
+describe('debug scenarios', () => {
+  const scenarios: Array<{ id: string; enemies?: string[]; party: Array<{ class: string }>;
+    enemyAi?: Record<string, Array<{ type: string; spellId?: string }>> }> = parse(
+    readFileSync(join(dataDir, 'debug-scenarios.yaml'), 'utf-8'),
+  );
+  const enemyIds = new Set(enemies.map((e) => e.id));
+  const spellIds = new Set(spells.map((s) => s.id));
+  const classIds = new Set(classes.map((c) => c.id));
+
+  it.each(scenarios.map((s) => [s.id, s] as const))('%s references existing enemies, classes and spells', (_id, s) => {
+    for (const e of s.enemies ?? []) expect(enemyIds.has(e), `enemy ${e}`).toBe(true);
+    for (const m of s.party) expect(classIds.has(m.class), `class ${m.class}`).toBe(true);
+    for (const [enemy, actions] of Object.entries(s.enemyAi ?? {})) {
+      expect((s.enemies ?? []).includes(enemy), `enemyAi for ${enemy} not in the battle`).toBe(true);
+      for (const a of actions) {
+        expect(['fight', 'magic']).toContain(a.type);
+        if (a.type === 'magic') expect(spellIds.has(a.spellId ?? ''), `spell ${a.spellId}`).toBe(true);
+      }
+    }
+  });
+});

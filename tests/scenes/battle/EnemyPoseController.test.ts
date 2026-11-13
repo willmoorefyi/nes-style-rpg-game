@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   EnemyPoseController, ATTACK_OUT, ATTACK_HOLD, ATTACK_FRAMES, LUNGE_PX, SHAKE_FRAMES, SHAKE_PX,
+  CAST_FRAMES, CAST_EDGE, CAST_RISE, CAST_OUT,
 } from '../../../src/scenes/battle/EnemyPoseController.js';
 
 function run(c: EnemyPoseController, frames: number): void {
@@ -73,5 +74,25 @@ describe('EnemyPoseController', () => {
     c.playAttack(1);
     c.playHurt(2);
     expect([c.state(0).pose, c.state(1).pose, c.state(2).pose]).toEqual(['idle', 'attack', 'hurt']);
+  });
+
+  it('cast: rises without lunging, holds, settles, then idles; the action resolves after CAST_OUT', () => {
+    const c = new EnemyPoseController(1);
+    c.playCast(0);
+    expect(c.state(0)).toEqual({ pose: 'cast', dx: 0, dy: -0 });
+    expect(c.attackOutDone(0)).toBe(false);
+    run(c, CAST_EDGE);
+    expect(c.state(0)).toEqual({ pose: 'cast', dx: 0, dy: -CAST_RISE });
+    run(c, CAST_OUT - CAST_EDGE);
+    expect(c.attackOutDone(0)).toBe(true);
+    expect(c.isAttacking(0)).toBe(true);
+    c.playHurt(0);                       // a hit never interrupts a cast
+    expect(c.state(0).pose).toBe('cast');
+    run(c, CAST_FRAMES - CAST_OUT - 1);
+    expect(c.isAttacking(0)).toBe(true);
+    run(c, 1);
+    expect(c.state(0)).toEqual({ pose: 'idle', dx: 0, dy: 0 });
+    c.playHurt(0);                       // after the cast, hits land normally
+    expect(c.state(0).pose).toBe('hurt');
   });
 });

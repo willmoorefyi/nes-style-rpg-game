@@ -15,7 +15,7 @@ describe('partySpritePosition', () => {
   it('places AI art by its foot row: 160 px cells inside the battle field, clear of the status boxes', () => {
     const ai = { ai: true, footRow: 76, scale: 2 };
     const pos = [0, 1, 2, 3].map((i) => partySpritePosition(i, ai, 160));
-    expect(pos.map((p) => p.y)).toEqual([136, 286, 436, 586]);
+    expect(pos.map((p) => p.y)).toEqual([286, 396, 506, 616]);
     for (const p of pos) {
       expect(p.y).toBeGreaterThanOrEqual(120);
       expect(p.y + 160).toBeLessThanOrEqual(780);

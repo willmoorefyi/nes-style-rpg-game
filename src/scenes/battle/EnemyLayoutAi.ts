@@ -25,7 +25,10 @@ export interface EnemyBox {
   scaleFactor: number;
 }
 
-export const ENEMY_AREA = { x0: 80, x1: 1340, y0: 130, y1: 770 } as const;
+/** y0 = 200 so even the smallest (160 px) box has its feet at y >= 360, on the background's battle plain. */
+export const ENEMY_AREA = { x0: 80, x1: 1340, y0: 200, y1: 770 } as const;
+/** Battle plain feet rule (docs/ART_BATTLE_PLAN.md). */
+export const STAGE_FEET = { min: 360, max: 770 } as const;
 const COLUMN_GAP = 24;
 const ROW_GAP = 16;
 const CAPACITY: Record<EnemySizeClass, number> = { boss: 1, large: 2, small: 3 };
@@ -65,6 +68,9 @@ export function computeEnemyLayoutAi(boxes: EnemyBoxInput[]): EnemyBox[] {
     // stagger: even columns sit s/2 higher, odd columns s/2 lower; |s/2| <= slack/2 keeps both inside the area
     const s = cols.length > 1 ? Math.min(step / 2, slack) : 0;
     let y = ENEMY_AREA.y0 + slack / 2 + (ci % 2 === 1 ? s / 2 : -s / 2);
+    // feet on the battle plain even for shrunk (half-size) boxes: the first enemy's feet at STAGE_FEET.min or lower
+    const firstH = boxes[col.items[0]].h * f;
+    y = Math.min(Math.max(y, STAGE_FEET.min - firstH), ENEMY_AREA.y1 - col.h);
     for (const i of col.items) {
       const w = boxes[i].w * f;
       const h = boxes[i].h * f;

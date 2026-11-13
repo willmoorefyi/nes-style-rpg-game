@@ -82,7 +82,7 @@
     potion: 3
   gold: 100
   enemies: [goblin, goblin]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/forest.png
 
 - id: ai_party_mixed
   name: Monk, red mage, knight, ninja (AI art preview)
@@ -95,7 +95,7 @@
     potion: 3
   gold: 100
   enemies: [goblin, goblin]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/river.png
 
 - id: ai_party_promoted
   name: Promoted classes (AI art preview)
@@ -108,7 +108,7 @@
     potion: 3
   gold: 100
   enemies: [goblin, goblin]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/cave.png
 
 # Monster pose previews (docs/ART_MONSTERS_PLAN.md; open with ?art=ai&mute=1&scenario=<id>).
 - id: ai_monsters_small
@@ -121,7 +121,7 @@
   items: { potion: 3 }
   gold: 100
   enemies: [goblin, wolf, skeleton]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/swamp.png
 
 - id: ai_monsters_large
   name: Large monsters (AI art preview)
@@ -133,7 +133,7 @@
   items: { potion: 3 }
   gold: 100
   enemies: [ogre, troll]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/desert.png
 
 - id: ai_boss
   name: Boss with minions (AI art preview)
@@ -145,7 +145,7 @@
   items: { potion: 3 }
   gold: 100
   enemies: [lich, goblin, goblin]
-  background: assets/backgrounds/grassland.png
+  background: assets/backgrounds/temple.png
 
 - id: ai_monsters_nine
   name: Nine small monsters (AI layout preview)
@@ -158,3 +158,19 @@
   gold: 100
   enemies: [goblin, goblin, goblin, wolf, wolf, wolf, skeleton, skeleton, skeleton]
   background: assets/backgrounds/grassland.png
+
+# Boss spell stance check: the Rime Sovereign (lich) casts every turn (open with ?mute=1&scenario=ai_boss_cast).
+- id: ai_boss_cast
+  name: Boss always casts (pose check)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: white_wizard, name: WHWZ, level: 30, equipment: [], spells: [] }
+    - { class: black_wizard, name: BKWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [lich]
+  enemyAi:
+    lich:
+      - { type: magic, spellId: ice, weight: 1 }
+  background: assets/backgrounds/shoreline.png

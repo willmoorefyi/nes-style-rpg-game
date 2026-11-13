@@ -90,4 +90,15 @@ describe('monster poses in the battle flow (preview art)', () => {
     tick(31);
     expect(ctrl.animPhase).not.toBe('enemy_lunge');
   });
+
+  it('a casting enemy plays the cast stance (no lunge) and the action waits for it to finish', () => {
+    const { ctrl, poses, tick } = setup({ actorName: 'Goblin A', actionType: 'magic' }, [hit('party_0')]);
+    tick(31);
+    expect(ctrl.animPhase).toBe('enemy_lunge');
+    expect(poses.state(0).pose).toBe('cast');
+    expect(poses.state(0).dx).toBe(0);
+    tick(60);
+    expect(poses.state(0).pose).toBe('idle');
+    expect(ctrl.animPhase).toBe('round_end');
+  });
 });

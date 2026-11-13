@@ -6,7 +6,7 @@ import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
-import { isPreviewAi } from '../../core/artPreview.js';
+import { useAiBattleArt } from '../../core/artPreview.js';
 import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 
@@ -16,9 +16,10 @@ const PARTY_X = [1420, 1445, 1470, 1495];
 /** Transparent rows below the boots inside each battle cell (about 5px at 3x). */
 const PARTY_BOTTOM_PAD = 5;
 const HURT_FRAMES = 24;
-/** AI preview art (80x80 native at 2x): bottom of the feet row for each party slot, and x per slot. */
-export const AI_PARTY_FEET_Y = [290, 440, 590, 740];
-export const AI_PARTY_X = [1420, 1445, 1470, 1495];
+/** 2x art (80x80 native at 2x): feet line per party slot, on the background's battle plain (docs/ART_BATTLE_PLAN.md:
+ *  every actor's feet at y 360-770), and x per slot. */
+export const AI_PARTY_FEET_Y = [440, 550, 660, 770];
+export const AI_PARTY_X = [1380, 1425, 1470, 1515];
 
 /** Screen position for a party battle sprite. Legacy art keeps its original constants (normal play unchanged). */
 export function partySpritePosition(i: number, art: { ai: boolean; footRow: number | null; scale: number }, spriteHeight: number): { x: number; y: number } {
@@ -30,7 +31,7 @@ export function partySpritePosition(i: number, art: { ai: boolean; footRow: numb
 
 export class BattleDisplayManager {
   readonly enemySprites: Container[] = [];
-  /** Preview mode only: posed 2x monster art (null in normal play). */
+  /** 2x monster art with poses (null on the legacy path, ?art=legacy). */
   enemyView: AiEnemyView | null = null;
   readonly partySprites: Container[] = [];
   // Per-member battle pose textures; null where only the placeholder rectangle is available
@@ -54,7 +55,7 @@ export class BattleDisplayManager {
 
   createEnemySprites(): void {
     const enemies = this.battle.allEnemies;
-    if (isPreviewAi()) {
+    if (this.config.useAiArt ?? useAiBattleArt()) {
       this.enemyView = new AiEnemyView(enemies.map(e => e.data));
       for (const sprite of this.enemyView.build()) {
         this.mainContainer.addChild(sprite);

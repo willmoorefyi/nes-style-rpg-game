@@ -43,7 +43,7 @@ export interface BattleFrames {
   ai: boolean;
 }
 
-import { isPreviewAi } from '../core/artPreview.js';
+import { isPreviewAi, useAiBattleArt } from '../core/artPreview.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
 export { isPreviewAi };
 
@@ -209,8 +209,8 @@ export class CharacterAtlas {
   }
 
   /** Battle poses (left-facing) in BATTLE_POSES order, or null when this class has no battle art.
-   *  AI art is used only when `preferAi` (preview mode) is set and the class has an approved AI sheet. */
-  getBattleFrames(id: string, preferAi: boolean = isPreviewAi()): BattleFrames | null {
+   *  AI art is used when `preferAi` (default: the 2x battle art flag) is set and the class has an approved AI sheet. */
+  getBattleFrames(id: string, preferAi: boolean = useAiBattleArt()): BattleFrames | null {
     if (preferAi && this.aiBattleMeta && this.aiBattle && this.aiBattleMeta.sheets[id]) {
       const meta = this.aiBattleMeta;
       return { frames: sliceRow(meta, this.aiBattle, meta.sheets[id].row), scale: meta.scale, cell: meta.cell,

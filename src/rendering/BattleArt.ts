@@ -1,5 +1,6 @@
 import { Assets, Rectangle, Texture } from 'pixi.js';
-import { characterAtlas, fetchJson, isPreviewAi } from './CharacterAtlas.js';
+import { characterAtlas, fetchJson } from './CharacterAtlas.js';
+import { useAiBattleArt } from '../core/artPreview.js';
 import type { MonsterPose } from '../scenes/battle/EnemyPoseController.js';
 
 const MONSTER_DIR = 'assets/sprites/monsters';
@@ -12,7 +13,8 @@ export interface MonsterAtlasMeta {
     cell: [number, number];
     footRow: number;
     floating: boolean;
-    frames: Record<MonsterPose, [number, number]>;
+    /** idle, attack and hurt always; bosses may add cast. */
+    frames: Partial<Record<MonsterPose, [number, number]>> & Record<'idle' | 'attack' | 'hurt', [number, number]>;
   }>;
 }
 
@@ -20,6 +22,8 @@ export interface MonsterAtlasMeta {
 export interface MonsterFrames {
   idle: Texture;
   attack: Texture;
+  /** Spell stance; the attack frame when the monster has none. */
+  cast: Texture;
   hurt: Texture;
   /** Screen px per art px. */
   scale: number;
@@ -52,24 +56,24 @@ export class BattleArt {
   }
 
   /**
-   * Three-pose frames for a monster. AI art (preview mode only) when approved, otherwise the legacy still used for
+   * Pose frames for a monster. 2x AI art (default; off with ?art=legacy) when approved, otherwise the legacy still used for
    * every pose at its own size (already x3), so callers have one code path. Null when no art is loaded.
    */
-  getMonsterFrames(sprite: string, preferAi: boolean = isPreviewAi()): MonsterFrames | null {
+  getMonsterFrames(sprite: string, preferAi: boolean = useAiBattleArt()): MonsterFrames | null {
     const entry = preferAi ? this.aiMeta?.sheets[sprite] : undefined;
     if (entry && this.aiTex && this.aiMeta) {
       const s = this.aiMeta.scale;
       const [w, h] = entry.cell;
       const slice = (pose: MonsterPose): Texture => {
-        const [x, y] = entry.frames[pose];
+        const [x, y] = entry.frames[pose] ?? entry.frames.attack;
         return new Texture({ source: this.aiTex!.source, frame: new Rectangle(x * s, y * s, w * s, h * s) });
       };
-      return { idle: slice('idle'), attack: slice('attack'), hurt: slice('hurt'), scale: s, cell: [w, h],
+      return { idle: slice('idle'), attack: slice('attack'), cast: slice('cast'), hurt: slice('hurt'), scale: s, cell: [w, h],
         footRow: entry.footRow, floating: entry.floating, ai: true };
     }
     const tex = this.monsters.get(sprite);
     if (!tex) return null;
-    return { idle: tex, attack: tex, hurt: tex, scale: 1, cell: [tex.width, tex.height], footRow: tex.height - 1,
+    return { idle: tex, attack: tex, cast: tex, hurt: tex, scale: 1, cell: [tex.width, tex.height], footRow: tex.height - 1,
       floating: false, ai: false };
   }
 
@@ -84,7 +88,7 @@ export class BattleArt {
   private async fetchAll(): Promise<void> {
     await characterAtlas.load();
     // Preview art is isolated: a missing or broken AI atlas only means legacy art is used.
-    const ai = isPreviewAi() ? this.fetchAi() : Promise.resolve();
+    const ai = useAiBattleArt() ? this.fetchAi() : Promise.resolve();
     try {
       const response = await fetch(`${MONSTER_DIR}/index.json`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

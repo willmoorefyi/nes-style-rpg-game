@@ -1,4 +1,6 @@
-import { Container, Graphics, Sprite, Assets } from 'pixi.js';
+import { Container, Graphics, Sprite, Assets, type Texture } from 'pixi.js';
+import { useAiBattleArt } from '../core/artPreview.js';
+import { stagedBackgroundPath } from '../rendering/BattleBackground.js';
 import type { Scene, SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
@@ -9,6 +11,7 @@ import { BattleAnimationController } from './battle/BattleAnimationController.js
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
+import { BossAI } from '../battle/BossAI.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
@@ -56,6 +59,16 @@ export class BattleScene implements Scene {
       inventory: this.inventory,
       canRun: config.canRun,
     });
+    this.attachEnemyAi(config);
+  }
+
+  /** Debug scenarios can give enemies an action pattern (e.g. a boss that casts): BossAI per matching enemy. */
+  private attachEnemyAi(config: BattleSceneConfig): void {
+    if (!config.enemyAi) return;
+    config.enemies.forEach((data, i) => {
+      const actions = config.enemyAi?.[data.id];
+      if (actions?.length) this.battle.setEnemyAI(i, new BossAI({ actions }));
+    });
   }
 
   enter(): void {
@@ -67,18 +80,28 @@ export class BattleScene implements Scene {
     bg.rect(0, GAME_HEIGHT / 2 - 1, GAME_WIDTH, 2).fill(0x2a2a4e);
     this.container.addChildAt(bg, 0);
 
-    // Load optional background image (overlays the solid-color fallback)
+    // Optional background (overlays the solid-color fallback): the staged 2x background first, else the legacy image
     if (this.config.background) {
-      Assets.load(this.config.background).then((texture) => {
+      const legacy = this.config.background;
+      const staged = (this.config.useAiArt ?? useAiBattleArt()) ? stagedBackgroundPath(legacy) : null;
+      const show = (texture: Texture): void => {
         const sprite = new Sprite(texture);
-        const scaleX = GAME_WIDTH / sprite.texture.width;
-        const scaleY = GAME_HEIGHT / sprite.texture.height;
-        const scale = Math.max(scaleX, scaleY);
+        const scale = Math.max(GAME_WIDTH / texture.width, GAME_HEIGHT / texture.height);
         sprite.scale.set(scale);
-        sprite.x = (GAME_WIDTH - sprite.texture.width * scale) / 2;
-        sprite.y = (GAME_HEIGHT - sprite.texture.height * scale) / 2;
+        sprite.x = (GAME_WIDTH - texture.width * scale) / 2;
+        sprite.y = (GAME_HEIGHT - texture.height * scale) / 2;
         this.container.addChildAt(sprite, 1);
-      }).catch(() => console.warn('Failed to load battle background:', this.config.background));
+      };
+      const loadLegacy = () => Assets.load<Texture>(legacy).then(show)
+        .catch((err) => console.warn('Failed to load battle background:', legacy, err));
+      if (staged) {
+        Assets.load<Texture>(staged).then(show).catch((err) => {
+          console.warn('Staged battle background unavailable; using the legacy image', staged, err);
+          return loadLegacy();
+        });
+      } else {
+        void loadLegacy();
+      }
     }
 
     this.createUI();

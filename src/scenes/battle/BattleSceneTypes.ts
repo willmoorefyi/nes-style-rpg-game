@@ -20,6 +20,13 @@ export interface BattleSceneConfig {
   canRun?: boolean;
   /** Optional background image path for the battle scene */
   background?: string;
+  /** 2x battle art (enemy view, layout, poses). Default: useAiBattleArt(); tests pass false for the legacy path. */
+  useAiArt?: boolean;
+  /** Optional per-enemy-id action patterns (debug scenarios): attached as BossAI after the battle is created. */
+  enemyAi?: EnemyAiPatterns;
 }
+
+/** Weighted actions an enemy may take, keyed by enemy id (e.g. make a boss cast). */
+export type EnemyAiPatterns = Record<string, { type: 'fight' | 'magic'; spellId?: string; weight: number }[]>;
 
 export type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating';

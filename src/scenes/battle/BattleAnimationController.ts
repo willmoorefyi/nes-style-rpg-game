@@ -183,13 +183,13 @@ export class BattleAnimationController {
       }
     }
   }
-  /** Preview pose art: start the acting enemy's attack lunge (fight/magic). False when there is nothing to play. */
+  /** Preview pose art: fight lunges in the attack pose, magic plays the cast stance. False when there is nothing to play. */
   private startEnemyLunge(): boolean {
     const view = this.display.enemyView;
     const type = this.currentActionInfo?.actionType;
     this.animEnemyIndex = this.animActorSprite ? this.display.enemySprites.indexOf(this.animActorSprite) : -1;
     if (!view || this.animEnemyIndex < 0 || (type !== 'fight' && type !== 'magic')) return false;
-    view.poses.playAttack(this.animEnemyIndex);
+    if (type === 'magic') view.poses.playCast(this.animEnemyIndex); else view.poses.playAttack(this.animEnemyIndex);
     return true;
   }
   private enemyStillAttacking(): boolean {

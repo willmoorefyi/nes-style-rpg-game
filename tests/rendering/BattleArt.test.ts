@@ -53,6 +53,7 @@ describe('BattleArt monster frames', () => {
     expect(f.ai).toBe(false);
     expect(f.idle).toBe(f.attack);
     expect(f.idle).toBe(f.hurt);
+    expect(f.cast).toBe(f.idle);
     expect(f.scale).toBe(1);
     expect(f.cell).toEqual([96, 96]);
     expect(f.footRow).toBe(95);
@@ -69,6 +70,8 @@ describe('BattleArt monster frames', () => {
     expect(f.idle).not.toBe(f.attack);
     expect(f.attack.frame.x).toBe(160);
     expect(f.hurt.frame.x).toBe(320);
+    // no cast frame in the atlas: magic shows the attack frame
+    expect(f.cast.frame.x).toBe(f.attack.frame.x);
     expect(f.idle.frame.width).toBe(160);
     // monsters without an approved AI sheet fall back to legacy art
     expect(art.getMonsterFrames('wolf', true)?.ai).toBe(false);

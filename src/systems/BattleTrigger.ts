@@ -2,6 +2,7 @@ import type { Game } from '../core/Game.js';
 import type { EnemyData } from '../types/index.js';
 import { BattleScene, type BattleSceneDeps, type BattleSceneConfig } from '../scenes/BattleScene.js';
 import { GameOverScene } from '../scenes/GameOverScene.js';
+import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import { CutsceneManager } from './CutsceneManager.js';
 import { CutsceneRegistry } from './CutsceneRegistry.js';
 
@@ -40,7 +41,8 @@ export class BattleTrigger {
     this.fadeDeps = deps;
   }
 
-  async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string): Promise<void> {
+  async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string,
+                      enemyAi?: EnemyAiPatterns): Promise<void> {
     const enemies = await this.loadEnemyData(enemyIds);
     if (enemies.length === 0) return;
 
@@ -59,6 +61,7 @@ export class BattleTrigger {
       canRun: bossConfig?.canRun ?? true,
       spells,
       background,
+      enemyAi,
     };
     const battleScene = new BattleScene(deps, sceneConfig);
     // Drop old scene references before creating new ones to prevent leaks

@@ -3,6 +3,7 @@ import { Character } from '../entities/Character.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { BattleTrigger } from './BattleTrigger.js';
+import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 
 export interface DebugScenario {
   id: string;
@@ -18,6 +19,8 @@ export interface DebugScenario {
   gold: number;
   enemies: string[];
   background?: string;
+  /** Optional action patterns per enemy id, e.g. `{ lich: [{ type: magic, spellId: ice, weight: 1 }] }`. */
+  enemyAi?: EnemyAiPatterns;
   /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `spawn`. */
   mode?: 'battle' | 'field';
   map?: string;
@@ -58,7 +61,7 @@ export class DebugScenarioLoader {
   async applyAndBattle(scenario: DebugScenario): Promise<void> {
     this.applyParty(scenario);
     const trigger = new BattleTrigger(this.game);
-    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background);
+    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi);
   }
 
   private applyParty(scenario: DebugScenario): void {
