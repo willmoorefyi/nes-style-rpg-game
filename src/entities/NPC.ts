@@ -61,6 +61,7 @@ export class NPC {
   private readonly art: NPCFrames | null;
   private readonly offsetY: number;
   private facing: keyof typeof FACE_ROW = 'down';
+  private facingBeforeTalk: keyof typeof FACE_ROW | null = null;
 
   constructor(data: NPCData, texture: Texture, art?: NPCFrames) {
     this.id = data.id;
@@ -87,6 +88,26 @@ export class NPC {
   private updateDepth(): void {
     this.sprite.zIndex = this.sprite.y + (this.art?.frameHeight ?? TILE_SIZE);
   }
+
+  /** Turn to face a tile (the hero talking to this NPC); the previous facing is kept for endTalk(). */
+  faceToward(x: number, y: number): void {
+    const dx = x - this.tileX;
+    const dy = y - this.tileY;
+    if (dx === 0 && dy === 0) return;
+    this.facingBeforeTalk ??= this.facing;
+    this.facing = Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
+    this.showFrame(0);
+  }
+
+  /** The conversation is over: turn back to the direction faced before it. */
+  endTalk(): void {
+    if (this.facingBeforeTalk === null) return;
+    this.facing = this.facingBeforeTalk;
+    this.facingBeforeTalk = null;
+    this.showFrame(0);
+  }
+
+  get facingDirection(): 'down' | 'up' | 'left' | 'right' { return this.facing; }
 
   private showFrame(col: number): void {
     const row = this.art?.frames[FACE_ROW[this.facing]];

@@ -73,3 +73,29 @@ describe('NPC display scale', () => {
     expect(npc.sprite.y).toBe(3 * 48 + 48 - 192);
   });
 });
+
+describe('NPC conversation facing', () => {
+  const art = () => {
+    const frames = [0, 1, 2, 3].map(() => [new Texture(), new Texture(), new Texture()]);
+    return { frames, frameHeight: 96, scale: 1 };
+  };
+  it('turns to face the hero for the conversation and back afterwards', () => {
+    const a = art();
+    const npc = new NPC({ id: 'n', x: 5, y: 5, sprite: 'villager', dialog: ['Hi'] }, Texture.WHITE, a);
+    expect(npc.facingDirection).toBe('down');
+    npc.faceToward(4, 5);                       // hero to the west
+    expect(npc.facingDirection).toBe('left');
+    expect(npc.sprite.texture).toBe(a.frames[2][0]);
+    npc.faceToward(4, 5);                       // still talking: keeps the original facing for later
+    npc.endTalk();
+    expect(npc.facingDirection).toBe('down');
+    expect(npc.sprite.texture).toBe(a.frames[0][0]);
+  });
+  it('faces a hero across a counter (two tiles away)', () => {
+    const npc = new NPC({ id: 'k', x: 4, y: 3, sprite: 'merchant', dialog: ['Hi'] }, Texture.WHITE, art());
+    npc.faceToward(4, 5);
+    expect(npc.facingDirection).toBe('down');
+    npc.faceToward(6, 3);
+    expect(npc.facingDirection).toBe('right');
+  });
+});

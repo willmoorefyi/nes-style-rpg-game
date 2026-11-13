@@ -60,6 +60,8 @@ export class ExplorationScene implements Scene {
   private keyItemGateSystem: KeyItemGateSystem;
   private vehicleManager: VehicleManager;
   private walkingMode: MovementMode = new WalkingMode();
+  /** NPC in conversation (faces the heroes until the dialog closes). */
+  private talkingNpc: NPC | null = null;
   private pendingNpcAction: NPC | null = null;
   private fieldHUD: FieldHUD;
   private controlsHint: ControlsHint;
@@ -249,6 +251,11 @@ export class ExplorationScene implements Scene {
       return;
     }
     this.fieldHUD.container.visible = true;
+    // the conversation box was dismissed: the NPC may turn back
+    if (this.talkingNpc) {
+      this.talkingNpc.endTalk();
+      this.talkingNpc = null;
+    }
     // Handle pending NPC actions after dialog completes
     if (this.pendingNpcAction) {
       this.handleNpcPostDialog(this.pendingNpcAction);
@@ -284,6 +291,9 @@ export class ExplorationScene implements Scene {
     this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
     const npc = this.npcInteraction.checkInteraction();
     if (npc) {
+      // the NPC turns to face the heroes and keeps facing them until the conversation box is dismissed
+      npc.faceToward(this.player.gridX, this.player.gridY);
+      this.talkingNpc = npc;
       // C2: Chest interaction — add item to inventory, set flag
       if (npc.chestItem && npc.chestFlag) {
         if (this.game.gameFlags.has(npc.chestFlag)) {
