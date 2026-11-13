@@ -7,6 +7,7 @@
 # `seeds` are tried in order; put the approved seed first.
 - id: goblin
   size: small
+  prompt_rev: 1     # approved before the action wording; keeps its cache key
   prompt: >-
     small hunched green goblin with long pointed ears, a big hooked nose, yellow eyes and a toothy grin, wearing a
     ragged brown leather vest and a rope belt, bare green arms and feet, holding a short rusty dagger
@@ -17,16 +18,16 @@
   size: small
   prompt: >-
     lean grey wolf on four legs with shaggy fur, a darker grey back, pointed ears, yellow eyes and bared white fangs
-  attack: leaping forward with jaws wide open to bite, front paws reaching out
-  hurt: yelping and recoiling, head pulled back and ears flat
+  attack: springing through the air at the heroes, body stretched long, front paws reaching and jaws wide open to bite
+  hurt: yelping as it is knocked sideways, legs scrambling, head twisted back and ears flat
   seeds: [1234]
 - id: skeleton
   size: small
   prompt: >-
     undead skeleton warrior with off-white bones, glowing red eye sockets, a tattered dark red loincloth, holding a
     chipped iron sword
-  attack: swinging the sword down in a big overhead slash toward the heroes
-  hurt: rattling backward, ribs and skull knocked askew, sword arm flung back
+  attack: lunging forward on one bony leg with a big overhead sword slash, ribcage twisted into the swing
+  hurt: blasted backward, skull snapping back, bones rattling apart at the joints, sword arm flung wide
   face: the skull's face is two glowing red eye sockets and a toothed jaw, readable in every cell
   seeds: [1234]
 - id: pirate
@@ -34,16 +35,16 @@
   prompt: >-
     stocky pirate with a black tricorn hat, an eyepatch, a short dark beard, a blue coat with a red sash, brown boots,
     holding a curved cutlass
-  attack: slashing forward with the cutlass in a wide swing
-  hurt: staggering backward, hat tilted, grimacing
+  attack: lunging forward with a wide cutlass slash, coat tails flying, free arm thrown back for balance
+  hurt: reeling backward off balance, hat knocked askew, one arm flailing, grimacing
   seeds: [1234]
 - id: mummy
   size: small
   prompt: >-
     hunched mummy wrapped in dirty tan bandages with loose trailing strips, glowing orange eyes in a dark gap between
     the wrappings, arms reaching forward
-  attack: lurching forward with both bandaged arms grabbing toward the heroes
-  hurt: reeling backward, bandages flapping loose
+  attack: lurching far forward, both bandaged arms stretched out to grab, loose wrappings streaming behind
+  hurt: knocked back and doubled over, head lolling, loose bandages whipping around it
   face: only two glowing orange eyes show in a dark gap between the bandages, readable in every cell
   seeds: [1234]
 - id: cockatrice
@@ -51,19 +52,20 @@
   prompt: >-
     cockatrice: a large rooster-like bird with a red comb and wattle, iridescent green and purple body feathers, a
     teal snake-like tail, yellow beak and yellow scaly legs
-  attack: pecking forward with the beak, wings spread wide
-  hurt: feathers ruffled, flapping backward with the beak open in a squawk
+  attack: darting forward with neck fully stretched to peck, wings flared wide, tail lashing
+  hurt: tumbling backward with feathers bursting loose, wings flailing, beak open in a squawk
   seeds: [1234]
 - id: vampire
   size: small
   prompt: >-
     pale vampire with slicked-back black hair, red eyes and small fangs, a high-collared black cape with a red lining,
     a dark red vest, reaching out with a clawed hand
-  attack: swooping forward with the cape spread and clawed hand slashing
-  hurt: recoiling behind the cape, hissing with fangs bared
+  attack: swooping forward low with the cape spread like wings and a clawed hand raking at the heroes
+  hurt: recoiling sharply, twisting away behind the raised cape, hissing with fangs bared
   seeds: [1234]
 - id: ogre
   size: large
+  prompt_rev: 1     # approved before the action wording; keeps its cache key
   prompt: >-
     huge muscular tan-skinned ogre with a small crown-like crest of brown hair, small angry red eyes, two tusks, a
     big belly, a brown loincloth with a gold belt buckle, holding a spiked wooden club
@@ -75,25 +77,41 @@
   prompt: >-
     hulking green-skinned troll with a hunched back, long arms with claws, dark green spikes along its head and
     spine, yellow eyes, tusks, a ragged brown loincloth, holding a crude wooden mallet
-  attack: lunging forward and swinging the mallet in a wide sideways sweep
-  hurt: hunching back with an arm raised to shield its face, snarling
+  attack: lunging forward on one huge leg and swinging the mallet in a wide sideways sweep, whole body twisting
+  hurt: rocked backward, hunched over with an arm thrown up to shield its face, snarling
   seeds: [1234]
 - id: dragon
   size: large
   prompt: >-
     red dragon on four legs with large bat-like wings, two curved horns, a row of pale spikes along its back, a cream
     belly, yellow eyes and sharp teeth, a long tail
-  attack: rearing forward with jaws open in a fierce bite, wings raised
-  hurt: rearing back with wings flinching and head pulled away
+  attack: lunging its long neck forward in a fierce bite, wings thrown up high, tail whipping behind
+  hurt: rearing back in pain, neck twisted away, wings half folded and flinching
   seeds: [1234]
 - id: garland
-  size: large
+  # FF1-homage knight boss; our own design (from the legacy sprite), one image per pose like the lich
+  size: boss
+  per_pose: true
+  design_ref: false
   prompt: >-
-    dark knight in heavy midnight-blue plate armour with large curved horns on the helmet, glowing red eyes in the
-    visor, a long dark red cape, holding a broad steel sword
-  attack: stepping forward with a powerful diagonal sword slash
-  hurt: staggering backward, cape flaring, sword lowered
-  face: the face is hidden by the horned helmet; two glowing red eyes in the visor slit are readable in every cell
+    a towering dark knight in heavy midnight-blue plate armour with gold trim, a full helm crowned with two large
+    curved ivory horns, two glowing red eyes in the visor slit, broad layered pauldrons, a long dark red cape, and a
+    broad steel greatsword held in both hands, standing tall and menacing
+  action_prompt: >-
+    a towering dark knight in heavy midnight-blue plate armour with gold trim, a full helm crowned with two large
+    curved ivory horns, two glowing red eyes in the visor slit, broad layered pauldrons, a long dark red cape, wielding
+    a broad steel greatsword
+  attack: >-
+    a crushing charge: he steps far forward on his front leg toward the heroes and brings the greatsword down in a huge
+    diagonal two-handed slash, torso twisted into the blow, cape flying out behind him
+  cast: >-
+    a dark spell stance: he plants the greatsword point-down in front of him with one hand and thrusts the other hand
+    high, crackling crimson energy gathering in the open palm, cape billowing upward
+  hurt: >-
+    knocked back by a heavy blow: staggering with one knee buckling, torso twisted away from the heroes, one arm thrown
+    up, the greatsword dragging low, cape flung forward
+  face: the face is hidden by the horned helm; two glowing red eyes in the visor slit are readable
+  extra_negative: a bare face, a skull, a shield, a second weapon
   seeds: [1234]
 - id: lich
   # "the Rime Sovereign": original frost-undead knight-king boss (no legacy design reference; one image per pose)

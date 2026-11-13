@@ -246,8 +246,8 @@ def build_monsters_ai() -> None:
     for meta_path in sorted(APPROVED.glob("*/monster_*.json")):
         meta = json.loads(meta_path.read_text())
         sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
-        c = meta["grid"][0]
-        frames = [sheet.crop((i * c, 0, (i + 1) * c, c)) for i in range(3)]
+        cw, ch = meta["grid"]
+        frames = [sheet.crop((i * cw, 0, (i + 1) * cw, ch)) for i in range(3)]
         for i in meta.get("flip_frames", []):
             frames[i] = frames[i].transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         entries.append((meta["character"], meta, frames))
@@ -274,17 +274,17 @@ def build_monsters_ai() -> None:
     for cid, meta, frames in list(entries):
         for variant in specs.get(cid, {}).get("variants", []) or []:
             entries.append((variant["id"], meta, [M.recolor(f, variant) for f in frames]))
-    width = max(len(e[2]) * e[1]["grid"][0] for e in entries)
-    height = sum(e[1]["grid"][1] for e in entries)
+    width = max(len(e[2]) * e[2][0].width for e in entries)
+    height = sum(e[2][0].height for e in entries)
     atlas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     sheets, y = {}, 0
     for sid, meta, frames in entries:
-        c = meta["grid"][0]
+        cw, ch = frames[0].size
         for i, f in enumerate(frames):
-            atlas.paste(f, (i * c, y))
-        sheets[sid] = {"cell": [c, c], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
-                       "frames": {pose: [i * c, y] for i, pose in enumerate(meta["poses"])}}
-        y += c
+            atlas.paste(f, (i * cw, y))
+        sheets[sid] = {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
+                       "frames": {pose: [i * cw, y] for i, pose in enumerate(meta["poses"])}}
+        y += ch
     scaled(atlas, AI_SCALE).save(out / "monsters-ai.png")
     (out / "monsters-ai.json").write_text(json.dumps({"scale": AI_SCALE, "sheets": sheets}, indent=2) + "\n")
     print(f"monsters_ai: {list(sheets)}")

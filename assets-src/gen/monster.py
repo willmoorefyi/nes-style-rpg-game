@@ -75,6 +75,7 @@ def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool) -> str:
         "- left cell: idle, a ready battle stance facing right.\n"
         f"- middle cell: attack, {m['attack'].strip()}, facing right.\n"
         f"- right cell: hurt, {m['hurt'].strip()}, recoiling away from the heroes (leaning left), still facing right.\n\n"
+        + (ACTION_3 if m.get("prompt_rev", 2) >= 2 else "") +
         "One monster per cell and nothing else: no props on the ground, no effects outside the monster, no text.\n"
         "Background: solid flat magenta (#FF00FF) everywhere, no floor, no shadows, no borders.\n"
         f"Avoid: {S.MONSTER_NEGATIVE}{', ' + m['extra_negative'] if m.get('extra_negative') else ''}."
@@ -133,6 +134,13 @@ def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> 
     )
 
 
+# prompt rev 2 (after the goblin / ogre approvals): the boss pilots showed static poses read as stiff
+ACTION_3 = ("MOVEMENT: the attack and hurt cells are dramatic ACTION frames, not static stances. Use a strong diagonal "
+            "line of action through the whole body, shift the weight clearly onto one side, twist the torso, extend "
+            "limbs, jaws or weapon far from the body, and let hair, cloth, wings or tails move with the motion. Each "
+            "of the three silhouettes must be clearly different. No mist, smoke or ground effects.\n\n")
+
+
 # ───────────────────────────── cut ─────────────────────────────
 
 def _haze(rgb: np.ndarray) -> np.ndarray:
@@ -150,8 +158,11 @@ def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     if haze:   # opt-in (monsters.yaml `haze: true`): blended mist touching the background is background too
         bg = bg | _haze(rgb)
     near_white = rgb.min(axis=2) > 225
-    border_bg = PX.flood_bg(np.where((bg | near_white)[..., None], 255, 0).astype(np.uint8).repeat(3, 2), 10.0)
-    fg = ~(bg | (near_white & border_bg))
+    f = rgb.astype(np.int32)
+    guide_grey = (np.abs(f - np.array(GUIDE_BOX)).max(2) < 14) | (np.abs(f - np.array(GUIDE_ARROW)).max(2) < 14)
+    loose = near_white | guide_grey          # page / copied guide shapes: background where connected to the border
+    border_bg = PX.flood_bg(np.where((bg | loose)[..., None], 255, 0).astype(np.uint8).repeat(3, 2), 10.0)
+    fg = ~(bg | (loose & border_bg))
     fg &= ~PX.magenta_fringe(rgb, fg)
     lab, n = PX.components(fg)
     if n == 0:
@@ -162,10 +173,16 @@ def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     y0, y1, x0, x1 = ys.min(), ys.max(), xs.min(), xs.max()
     keep = [main]
     pad = int(0.15 * (y1 - y0 + 1))     # floating parts of the figure (a spell crystal over a hand) sit just outside
+    h, w = fg.shape
     for i in range(1, n + 1):
         if i == main or sizes[i - 1] < 3:
             continue
         cy, cx = np.where(lab == i)
+        bw, bh = cx.max() - cx.min() + 1, cy.max() - cy.min() + 1
+        if min(bw, bh) <= 2 and max(bw, bh) >= 6:      # panel borders / divider lines Gemini drew
+            continue
+        if cx.min() == 0 or cx.max() == w - 1:          # bleed from the neighbouring cell (slash arcs, effects)
+            continue
         inside = (cy.min() <= y1) and (cy.max() >= y0) and (cx.min() <= x1) and (cx.max() >= x0)
         near = (cy.max() >= y0 - pad) and (cy.min() <= y1 + pad) and (cx.max() >= x0 - pad) and (cx.min() <= x1 + pad)
         if (inside and sizes[i - 1] >= STRAY_FRAC * sizes.max() * 0.25) or (near and sizes[i - 1] >= 0.004 * sizes.max()):
@@ -214,22 +231,41 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     f = hi / tallest if tallest > hi * (1 + HEIGHT_TOLERANCE) else lo / tallest if tallest < lo * (1 - HEIGHT_TOLERANCE) else 1.0
     info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / n_cells, 1), h)})
 
-    scaled, smasks = [], []
-    for c, m in zip(cells, masks):
-        size = (max(1, round(c.shape[1] * f)), max(1, round(c.shape[0] * f)))
-        scaled.append(np.asarray(Image.fromarray(c).resize(size, Image.Resampling.NEAREST)))
-        smasks.append(np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize(size, Image.Resampling.NEAREST)) > 0)
-    pixel_sets = [s[m] for s, m in zip(scaled, smasks)]
-    detail = np.concatenate([s[PX.detail_mask(s, m, 1.0)] for s, m in zip(scaled, smasks)])
-    palette = PX.sheet_palette(pixel_sets, colors, seed, detail_px=detail)
-
-    figs = []
-    for s, m in zip(scaled, smasks):
-        art = s.copy()
-        art[~m] = (255, 0, 255)            # only the kept figure: background and dropped blobs become key colour
-        fig, _ = PX.pixelize_native(Image.fromarray(art), m, (art.shape[1], art.shape[0]), colors=colors, seed=seed,
-                                    palette=palette)
-        figs.append(np.asarray(fig))
+    if f < 1.0:
+        # shrinking: re-pixelize from the full-resolution render (block vote with facial-detail protection) instead of
+        # dropping whole sprite pixels, as the character resample path does
+        rgb_raw = np.asarray(raw.convert("RGB"))
+        rh, rw, _ = rgb_raw.shape
+        raw_cells = [rgb_raw[:, round(i * rw / n_cells):round((i + 1) * rw / n_cells)] for i in range(n_cells)]
+        raw_masks = [np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize((rc.shape[1], rc.shape[0]),
+                                Image.Resampling.NEAREST)) > 0 for rc, m in zip(raw_cells, masks)]
+        detail = np.concatenate([rc[PX.detail_mask(rc, rm, rc.shape[0] / max(1, c0.shape[0]))]
+                                 for rc, rm, c0 in zip(raw_cells, raw_masks, cells)])
+        palette = PX.sheet_palette([rc[rm] for rc, rm in zip(raw_cells, raw_masks)], colors, seed, detail_px=detail)
+        figs = []
+        for rc, rm, c0 in zip(raw_cells, raw_masks, cells):
+            grid = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
+            art = rc.copy()
+            art[~rm] = (255, 0, 255)
+            figs.append(np.asarray(PX.pixelize(Image.fromarray(art), rm, grid, colors=colors, seed=seed,
+                                               palette=palette)))
+        info["shrink"] = "re-pixelized from the render"
+    else:
+        scaled, smasks = [], []
+        for c0, m in zip(cells, masks):
+            size = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
+            scaled.append(np.asarray(Image.fromarray(c0).resize(size, Image.Resampling.NEAREST)))
+            smasks.append(np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize(size, Image.Resampling.NEAREST)) > 0)
+        pixel_sets = [s0[m] for s0, m in zip(scaled, smasks)]
+        detail = np.concatenate([s0[PX.detail_mask(s0, m, 1.0)] for s0, m in zip(scaled, smasks)])
+        palette = PX.sheet_palette(pixel_sets, colors, seed, detail_px=detail)
+        figs = []
+        for s0, m in zip(scaled, smasks):
+            art = s0.copy()
+            art[~m] = (255, 0, 255)        # only the kept figure: background and dropped blobs become key colour
+            fig, _ = PX.pixelize_native(Image.fromarray(art), m, (art.shape[1], art.shape[0]), colors=colors,
+                                        seed=seed, palette=palette)
+            figs.append(np.asarray(fig))
 
     def bbox(fig: np.ndarray) -> tuple[int, int, int, int]:
         ys, xs = np.where(fig[..., 3] > 0)
@@ -238,19 +274,28 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     c = cell or band.cell
     foot = foot_row if foot_row is not None else band.foot_row
     ix0, iy0, ix1, iy1 = bbox(figs[0])
-    dx = c // 2 - (ix0 + ix1 + 1) // 2           # one horizontal shift for all frames (keeps lunges and recoils)
+    # cell width: the band's square cell, widened (height unchanged) when a lunge or a long body needs more room;
+    # one horizontal shift for all frames keeps lunges and recoils relative to the idle pose
+    lo_x = min(bbox(fg_)[0] for fg_ in figs)
+    hi_x = max(bbox(fg_)[2] for fg_ in figs)
+    cw = max(c, hi_x - lo_x + 1 + 4)
+    cw += cw % 2
+    dx = cw // 2 - (ix0 + ix1 + 1) // 2
+    if lo_x + dx < 2 or hi_x + dx > cw - 3:
+        dx = 2 - lo_x if lo_x + dx < 2 else cw - 3 - hi_x
     dy_shared = foot - iy1
     frames, clipped = [], []
+    info["cell_px"] = (cw, c)
     for k, fig in enumerate(figs):
         x0, y0, x1, y1 = bbox(fig)
         dy = dy_shared if floating else foot - y1
-        out = np.zeros((c, c, 4), np.uint8)
+        out = np.zeros((c, cw, 4), np.uint8)
         sx0, sy0 = max(0, -dx), max(0, -dy)
         tx0, ty0 = max(0, dx), max(0, dy)
-        ww = min(fig.shape[1] - sx0, c - tx0)
+        ww = min(fig.shape[1] - sx0, cw - tx0)
         hh = min(fig.shape[0] - sy0, c - ty0)
         out[ty0:ty0 + hh, tx0:tx0 + ww] = fig[sy0:sy0 + hh, sx0:sx0 + ww]
-        if (x0 + dx < 0 or x1 + dx >= c or y0 + dy < 0 or y1 + dy >= c):
+        if (x0 + dx < 0 or x1 + dx >= cw or y0 + dy < 0 or y1 + dy >= c):
             clipped.append(S.MONSTER_POSES[k])
         frames.append(Image.fromarray(out, "RGBA"))
     info["clipped"] = clipped

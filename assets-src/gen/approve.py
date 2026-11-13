@@ -22,6 +22,13 @@ from gen import generate as GEN  # noqa: E402
 from gen import spec as S  # noqa: E402
 
 
+def _monster_cell(png: Path, geom) -> tuple[int, int]:
+    """Monster cells can be widened by the cut: read the real cell size from the stored sheet."""
+    from PIL import Image
+    w, h = Image.open(png).size
+    return (w // geom.layout[0], h // geom.layout[1])
+
+
 def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
             flip_frames: dict[str, list[int]] | None = None) -> Path:
     char = GEN.load_character(cid)
@@ -40,7 +47,9 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     shutil.copy2(src / f"{sheet_name}.png", dst / f"{sheet_name}.png")
     g = sheet.geom
     meta = {"character": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
-            "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"), "grid": list(GEN.frame_size(g)),
+            "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"),
+            "grid": list(_monster_cell(dst / f"{sheet_name}.png", g) if sheet_name.startswith(("monster_", "boss_"))
+                         else GEN.frame_size(g)),
             "bottom_row": g.bottom_row, "layout": list(g.layout)}
     if sheet_name == "battle":
         meta["poses"] = list(sheet.order)

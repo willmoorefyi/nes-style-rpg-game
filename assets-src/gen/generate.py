@@ -502,6 +502,8 @@ def fit_boxes(img: Image.Image, masks, boxes, geom: S.SheetGeom):
 def native_sheet(frames: list[Image.Image], geom: S.SheetGeom) -> Image.Image:
     cols, rows = geom.layout
     gw, gh = frame_size(geom)
+    if geom.name.startswith(("monster_", "boss_")):    # monster cells may be widened to fit a pose
+        gw, gh = frames[0].size
     out = Image.new("RGBA", (gw * cols, gh * rows))
     for i, f in enumerate(frames):
         out.paste(f, ((i % cols) * gw, (i // cols) * gh))
