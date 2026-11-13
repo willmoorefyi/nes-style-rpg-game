@@ -104,9 +104,23 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect([meta!.cols, meta!.rows]).toEqual([3, 4]);
     });
 
+    it.runIf(present)('every NPC sprite on a compiled map has 2x field art (or legacy art)', () => {
+      const sprites = readdirSync(join(assets, 'maps/ai'))
+        .filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+        .flatMap((f) => readYaml<{ npcs?: Array<{ sprite: string }> }>(`maps/ai/${f}`).npcs ?? [])
+        .map((n) => n.sprite);
+      for (const sp of new Set(sprites)) {
+        expect(sp in meta!.sheets || sp in atlas.sheets, sp).toBe(true);
+      }
+    });
+
     it.runIf(present)('only lists known classes or NPC sprites, every block inside the image', () => {
       // NPC sprite names are the keys of the legacy character atlas that are not classes
-      const classIds = new Set([...classes.map((c) => c.id), ...Object.keys(atlas.sheets)]);
+      const compiledNpcSprites = readdirSync(join(assets, 'maps/ai'))
+        .filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+        .flatMap((f) => readYaml<{ npcs?: Array<{ sprite: string }> }>(`maps/ai/${f}`).npcs ?? [])
+        .map((n) => n.sprite);
+      const classIds = new Set([...classes.map((c) => c.id), ...Object.keys(atlas.sheets), ...compiledNpcSprites]);
       const png = readFileSync(join(assets, 'sprites/characters-ai.png'));
       const w = png.readUInt32BE(16);
       const h = png.readUInt32BE(20);

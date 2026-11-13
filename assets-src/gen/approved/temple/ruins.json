@@ -1,0 +1,113 @@
+{
+  "kit": "temple",
+  "sheet": "kit_ruins",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "9481f32eac3782bee4427a0a",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {
+    "temple_floor": [
+      0,
+      0,
+      96,
+      96
+    ],
+    "temple_rubble": [
+      96,
+      0,
+      96,
+      96
+    ],
+    "temple_wall_face": [
+      0,
+      96,
+      96,
+      48
+    ],
+    "temple_wall_top": [
+      96,
+      96,
+      96,
+      96
+    ]
+  },
+  "metrics": {
+    "wrap_before": {
+      "temple_floor": 1.75,
+      "temple_rubble": 1.71,
+      "temple_wall_face": 0.94,
+      "temple_wall_top": 3.74
+    },
+    "wrap_after": {
+      "temple_floor": 2.6,
+      "temple_rubble": 2.19,
+      "temple_wall_face": 0.99,
+      "temple_wall_top": 0.78
+    },
+    "fill": {
+      "temple_floor": 1.22,
+      "temple_rubble": 1.19,
+      "temple_wall_face": 1.11,
+      "temple_wall_top": 1.14
+    },
+    "piece_px": {
+      "temple_floor": [
+        482,
+        471
+      ],
+      "temple_rubble": [
+        471,
+        471
+      ],
+      "temple_wall_face": [
+        481,
+        200
+      ],
+      "temple_wall_top": [
+        471,
+        451
+      ]
+    },
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 0.08,
+    "native_px_per_tile": {
+      "temple_floor": 47.1,
+      "temple_rubble": 46.0,
+      "temple_wall_face": 47.0,
+      "temple_wall_top": 46.0
+    },
+    "pass": {
+      "density": true,
+      "seamless": false
+    }
+  },
+  "note": "act-1 run self-approved; keying/sources fixed"
+}

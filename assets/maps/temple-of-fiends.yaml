@@ -2472,16 +2472,16 @@ tilesets:
 - dungeon
 transitions:
 - targetMap: overworld
-  targetX: 8
-  targetY: 3
+  targetEntrance: temple
   x: 7
   y: 15
 - targetMap: overworld
-  targetX: 9
-  targetY: 3
+  targetEntrance: temple
   x: 8
   y: 15
 width: 40
 
 battleBackgrounds:
   default: temple
+entrances:
+  entry: [7, 14]

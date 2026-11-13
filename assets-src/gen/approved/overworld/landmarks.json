@@ -1,0 +1,83 @@
+{
+  "kit": "overworld",
+  "sheet": "kit_landmarks",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "d5214280aaa4033ce4a9912a",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "town_icon_0_0",
+      "town_icon_0_1",
+      "castle_icon_0_0",
+      "castle_icon_0_1"
+    ],
+    [
+      "town_icon_1_0",
+      "town_icon_1_1",
+      "castle_icon_1_0",
+      "castle_icon_1_1"
+    ],
+    [
+      "temple_icon_0_0",
+      "temple_icon_0_1",
+      "peak",
+      "tree_clump"
+    ],
+    [
+      "temple_icon_1_0",
+      "temple_icon_1_1",
+      "boulder",
+      null
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "town_icon": [
+        55,
+        53
+      ],
+      "castle_icon": [
+        57,
+        53
+      ],
+      "temple_icon": [
+        57,
+        56
+      ],
+      "peak": [
+        42,
+        32
+      ],
+      "tree_clump": [
+        44,
+        35
+      ],
+      "boulder": [
+        43,
+        44
+      ]
+    },
+    "scale": {
+      "town_icon": 1.0,
+      "castle_icon": 1.0,
+      "temple_icon": 1.0,
+      "peak": 1.0,
+      "tree_clump": 1.0,
+      "boulder": 1.0
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "act-1 run self-approved; keying/sources fixed"
+}

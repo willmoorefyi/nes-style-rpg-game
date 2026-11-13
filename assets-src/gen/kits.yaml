@@ -333,3 +333,162 @@
            text: "a small dark stone pedestal holding a glowing purple crystal orb."}
         - {name: table, source: [548, 822, 722, 1016], at: [2, 3], tiles: [1, 1], wrap: prop,
            text: "a small round wooden table with a candle on it."}
+
+- id: castle
+  kind: kit
+  sheets:
+    hall:
+      # castle keep, modular like the town house (4x4 on a 1:1 guide, prompt rev 2)
+      seed: 1234
+      refs: [town/house, town/walls]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 248
+      grid_lines: false
+      prompt_rev: 2
+      prefab: castle_hall    # review fix: roof overhang and a door wider than a tile; stamped whole as the keep
+      cells:
+        - [roof_ridge_l@castle, roof_ridge_m@castle, roof_ridge_m@castle, roof_ridge_r@castle]
+        - [roof_eave_l@castle, roof_eave_m@castle, roof_eave_m@castle, roof_eave_r@castle]
+        - [wall_up_l@castle, wall_up_window@castle, wall_door_top@castle, wall_up_r@castle]
+        - [wall_lo_l@castle, wall_lo_plain@castle, wall_door_bottom@castle, wall_lo_r@castle]
+      derive:
+        wall_up_plain@castle: { from: wall_up_window@castle }
+      prompt: >
+        the main hall of a royal castle seen straight from the front (the south side). Show only the front: the
+        left and right sides are straight vertical edges, with no side wall visible and no roof overhang past the
+        sides. The top half is the roof: dark blue-grey slate roof tiles in neat horizontal courses sloping toward
+        the viewer, with a ridge line along the very top and the lower edge ending in a dark eave with a thin shadow
+        line under it (no gable, no tower, no flag). The bottom half is the front wall: large pale grey dressed stone
+        blocks with dark joints and a darker base course along the bottom. A tall arched wooden double door with
+        iron studs and a stone arch stands in the right-centre of the wall, from about the middle of the wall down
+        to the bottom edge; a tall narrow arched window with blue glass sits in the upper part of the wall left of
+        the door; the rest of the wall is plain stone.
+    props:
+      kind: swatches
+      seed: 1234
+      refs: [town/house, town/walls]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: tower, at: [0, 0], tiles: [2, 3], source: [40, 5, 216, 446], wrap: prop,
+           parts: [[tower_0_0, tower_0_1], [tower_1_0, tower_1_1], [tower_2_0, tower_2_1]],
+           text: "a round castle tower of pale grey dressed stone seen in three-quarter view, with a tall pointed dark blue-grey slate cone roof, a small arched window and a little red pennant on top; it fills the box."}
+        - {name: throne, at: [2, 0], tiles: [2, 2], source: [625, 25, 958, 378], wrap: prop, parts: [[throne_0_0, throne_0_1], [throne_1_0, throne_1_1]],
+           text: "a royal throne seen from the front in three-quarter view: a tall gilded golden chair with red velvet cushions standing on a low two-step stone dais."}
+        - {name: pillar, at: [2, 2], tiles: [1, 2], source: [598, 392, 712, 703], wrap: prop, parts: [[pillar_top], [pillar_bottom]],
+           text: "a round pale stone column with a carved capital and a square base, as tall as the box."}
+        - {name: knight_statue, at: [3, 2], tiles: [1, 2], source: [832, 402, 966, 716], wrap: prop, parts: [[statue_top], [statue_bottom]],
+           text: "a grey stone statue of an armoured knight holding a sword point-down, on a square plinth, as tall as the box."}
+        - {name: banner, at: [0, 3], tiles: [1, 1], source: [58, 770, 200, 1004], key_border: true, key_mode: v1, wrap: prop, align: center,
+           text: "a long red cloth banner hanging on a wall with a golden crown emblem and a gold fringe at the bottom."}
+        - {name: torch, at: [1, 3], tiles: [1, 1], source: [352, 770, 446, 980], key_border: true, key_mode: v1, wrap: prop, align: center,
+           text: "an iron wall sconce holding a burning torch with a bright orange flame."}
+
+- id: overworld
+  kind: kit
+  sheets:
+    terrain:
+      # overworld ground materials (seamless, 2x2 map tiles each)
+      kind: swatches
+      seed: 1234
+      refs: [town/ground, town/props]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      swatches:
+        - {name: forest, source: [4, 4, 476, 476], at: [0, 0], tiles: [2, 2], wrap: both,
+           text: "a dense forest seen from straight above: many round dark-green tree crowns packed together, with lighter green tops lit from the upper left and dark shadows between them, evenly spread."}
+        - {name: mountain, source: [518, 4, 1020, 506], at: [2, 0], tiles: [2, 2], wrap: both,
+           text: "rugged rocky mountain ground seen from above: grey-brown rock with sharp ridges, cracks and darker crevices, a few light highlights, evenly spread, no snow."}
+        - {name: sand, source: [4, 516, 476, 986], at: [0, 2], tiles: [2, 2], wrap: both,
+           text: "pale golden beach sand seen from above with fine ripples and a few tiny pebbles, evenly spread."}
+        - {name: ocean, source: [518, 518, 1020, 1020], at: [2, 2], tiles: [2, 2], wrap: both,
+           text: "deep blue sea water seen from above with small white-capped wave marks and darker blue patches, evenly spread, no shore."}
+    landmarks:
+      kind: swatches
+      seed: 1234
+      refs: [town/props, town/house, castle/props]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: town_icon, source: [24, 24, 316, 294], key_border: true, key_tol: 45, at: [0, 0], tiles: [2, 2], wrap: prop, parts: [[town_icon_0_0, town_icon_0_1], [town_icon_1_0, town_icon_1_1]],
+           text: "a tiny world-map icon of a walled town seen in three-quarter view: a low grey stone wall ring with a gate at the front and four small red-roofed houses inside."}
+        - {name: castle_icon, source: [708, 24, 1002, 294], key_border: true, key_tol: 45, at: [2, 0], tiles: [2, 2], wrap: prop, parts: [[castle_icon_0_0, castle_icon_0_1], [castle_icon_1_0, castle_icon_1_1]],
+           text: "a tiny world-map icon of a royal castle seen in three-quarter view: pale stone walls, two round towers with blue cone roofs and red flags, and a central keep with a gate at the front."}
+        - {name: temple_icon, source: [24, 360, 316, 648], key_border: true, key_tol: 45, at: [0, 2], tiles: [2, 2], wrap: prop, parts: [[temple_icon_0_0, temple_icon_0_1], [temple_icon_1_0, temple_icon_1_1]],
+           text: "a tiny world-map icon of an ancient ruined temple seen in three-quarter view: dark weathered grey stone, broken columns, a crumbling roof and a dark doorway at the front, a little moss."}
+        - {name: peak, source: [392, 392, 633, 611], key_border: true, key_tol: 45, at: [2, 2], tiles: [1, 1], wrap: prop,
+           text: "a single small rocky mountain peak in grey-brown stone with a lit left face and a shadowed right face, filling the box."}
+        - {name: tree_clump, source: [730, 392, 970, 611], key_border: true, key_tol: 45, at: [3, 2], tiles: [1, 1], wrap: prop,
+           text: "a small clump of three round dark-green deciduous tree crowns seen from above at an angle, filling the box."}
+        - {name: boulder, source: [392, 730, 633, 955], key_border: true, key_tol: 45, at: [2, 3], tiles: [1, 1], wrap: prop,
+           text: "a mossy grey boulder, about half as wide as the box."}
+
+- id: temple
+  kind: kit
+  sheets:
+    ruins:
+      kind: swatches
+      seed: 1234
+      refs: [interior/rooms, town/walls]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 32
+      margin_px: 48
+      labels: absolute
+      swatches:
+        - {name: temple_floor, at: [0, 0], tiles: [2, 2], wrap: both,
+           text: "the floor of an ancient ruined temple seen from above: large dark grey-blue cracked flagstones with moss in the joints and a few small pebbles, evenly spread."}
+        - {name: temple_rubble, at: [2, 0], tiles: [2, 2], wrap: both,
+           text: "broken ruined temple floor seen from above: cracked dark stone slabs with scattered rubble, loose stones and patches of dark earth, evenly spread."}
+        - {name: temple_wall_face, at: [0, 2], tiles: [2, 1], wrap: x,
+           text: "the inside wall of an ancient temple seen from the front: big dark grey-blue weathered stone blocks with deep joints, a worn carved frieze along the top edge and a darker base along the bottom edge, some cracks and moss."}
+        - {name: temple_wall_top, crop: [0.1, 0.1, 0.9, 0.7], at: [2, 2], tiles: [2, 2], wrap: both,
+           text: "the top of thick ancient dark stone walls seen from straight above: rough dark grey-blue stone with cracks and moss, darker than the floor, evenly spread."}
+    relics:
+      kind: swatches
+      seed: 1234
+      refs: [castle/props, interior/furniture]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: tpillar, source: [40, 28, 242, 467], key_border: true, key_tol: 40, at: [0, 0], tiles: [1, 2], wrap: prop, parts: [[tpillar_top], [tpillar_bottom]],
+           text: "a tall weathered dark stone temple column with a carved capital, cracked and mossy, as tall as the box."}
+        - {name: tpillar_broken, source: [280, 54, 484, 467], key_border: true, key_tol: 40, at: [1, 0], tiles: [1, 2], wrap: prop, parts: [[tpillar_broken_top], [tpillar_broken_bottom]],
+           text: "a broken dark stone temple column snapped off at half height, with rubble at its base."}
+        - {name: fiend_statue, source: [530, 54, 730, 467], key_border: true, key_tol: 40, at: [2, 0], tiles: [1, 2], wrap: prop, parts: [[fiend_statue_top], [fiend_statue_bottom]],
+           text: "a menacing dark stone statue of a horned winged demon crouching on a square plinth, as tall as the box."}
+        - {name: brazier, source: [776, 54, 972, 238], key_border: true, key_tol: 40, at: [3, 0], tiles: [1, 1], wrap: prop,
+           text: "an iron brazier on three legs burning with an eerie purple flame."}
+        - {name: altar, source: [38, 518, 484, 729], key_border: true, key_tol: 40, at: [0, 2], tiles: [2, 1], wrap: prop, parts: [[altar_l, altar_r]],
+           text: "a long dark stone sacrificial altar with carved runes, two candles and a faint purple glow, as wide as the box."}
+        - {name: fallen_column, source: [533, 518, 974, 729], key_border: true, key_tol: 40, at: [2, 2], tiles: [2, 1], wrap: prop, parts: [[fallen_l, fallen_r]],
+           text: "a fallen broken dark stone column lying on its side on the floor, as long as the box."}
+        - {name: chest_closed, source: [38, 786, 232, 977], key_border: true, key_tol: 40, at: [0, 3], tiles: [1, 1], wrap: prop,
+           text: "a closed wooden treasure chest with iron bands and a gold lock."}
+        - {name: chest_open, source: [280, 786, 484, 977], key_border: true, key_tol: 40, at: [1, 3], tiles: [1, 1], wrap: prop,
+           text: "the same wooden treasure chest, opened and empty, lid up."}
+        - {name: vines, source: [530, 786, 730, 977], key_border: true, key_tol: 40, at: [2, 3], tiles: [1, 1], wrap: prop, align: center,
+           text: "dark green ivy vines hanging down a wall."}
+        - {name: skulls, source: [776, 786, 974, 977], key_border: true, key_tol: 40, at: [3, 3], tiles: [1, 1], wrap: prop,
+           text: "a small pile of old skulls and bones on the floor."}

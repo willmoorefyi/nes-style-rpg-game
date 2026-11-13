@@ -1,0 +1,117 @@
+# Cornelia Castle grounds (original layout), compiled by assets-src/tools/build_map.py
+id: cornelia-castle
+kits: [castle, town]
+music: town
+ground: |
+  ..............................
+  .############################.
+  .############################.
+  .#..........................#.
+  .#.,,,,,,............,,,,,,.#.
+  .#.,,,,,,............,,,,,,.#.
+  .#.,,,,,,............,,,,,,.#.
+  .#.,,,,,,............,,,,,,.#.
+  .#.,,,,,,.....::.....,,,,,,.#.
+  .#.,,,,,,.....::.....,,,,,,.#.
+  .#............::............#.
+  .#............::............#.
+  .#............::............#.
+  .#...::::::::::::::::::::...#.
+  .#............::............#.
+  .#............::............#.
+  .#............::............#.
+  .#............::............#.
+  .#............::............#.
+  .#############::#############.
+  .#############::#############.
+  ..............::..............
+entrances:
+  gate: [14, 20]
+  hall: [15, 8]
+objects:
+- type: prefab
+  prefab: castle_hall
+  name: hall
+  x: 13
+  y: 4
+  w: 4
+  h: 4
+  door: 2
+  enter: {map: cornelia-castle-throne, entrance: door}
+- type: deco
+  parts:
+  - [tower_0_0, tower_0_1]
+  - [tower_1_0, tower_1_1]
+  - [tower_2_0, tower_2_1]
+  x: 10
+  y: 5
+- type: deco
+  parts:
+  - [tower_0_0, tower_0_1]
+  - [tower_1_0, tower_1_1]
+  - [tower_2_0, tower_2_1]
+  x: 18
+  y: 5
+- type: deco
+  parts:
+  - [statue_top]
+  - [statue_bottom]
+  x: 12
+  y: 10
+- type: deco
+  parts:
+  - [statue_top]
+  - [statue_bottom]
+  x: 17
+  y: 10
+- {type: fountain, x: 6, y: 15}
+- {type: fountain, x: 22, y: 15}
+- {type: tree, x: 3, y: 12}
+- {type: tree, x: 3, y: 16}
+- {type: tree, x: 10, y: 16}
+- {type: tree, x: 19, y: 16}
+- {type: tree, x: 26, y: 12}
+- {type: tree, x: 26, y: 16}
+- {type: tree, x: 9, y: 4}
+- {type: tree, x: 20, y: 4}
+- {type: flowers, x: 5, y: 11}
+- {type: flowers, x: 6, y: 11}
+- {type: flowers, x: 7, y: 11}
+- {type: flowers, x: 22, y: 11}
+- {type: flowers, x: 23, y: 11}
+- {type: flowers, x: 24, y: 11}
+- {type: bush, x: 12, y: 17}
+- {type: bush, x: 17, y: 17}
+npcs:
+- id: castle_gate_guard_w
+  sprite: guard
+  x: 13
+  y: 17
+  dialog: [Welcome to Cornelia Castle.]
+- id: castle_gate_guard_e
+  sprite: guard
+  x: 16
+  y: 17
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: [The princess is home! The whole kingdom rejoices.]
+  - text: [The King awaits you in the great hall., 'Since Garland took the princess, he has not slept.']
+- id: castle_maid
+  sprite: villager_f
+  x: 8
+  y: 13
+  wander: true
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: [Her Highness is safe at last. Thank you!]
+  - text: [Garland was the King's most trusted knight..., 'Why would he turn against us?']
+- id: castle_soldier
+  sprite: guard
+  x: 23
+  y: 6
+  wander: true
+  dialog: ['They say the Temple of Fiends lies north-west, past the forest.']
+transitions:
+- {x: 14, y: 21, targetMap: overworld, targetEntrance: castle}
+- {x: 15, y: 21, targetMap: overworld, targetEntrance: castle}
+battleBackgrounds: {default: grassland}

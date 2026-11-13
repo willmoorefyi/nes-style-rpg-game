@@ -13,6 +13,8 @@ export interface NPCData {
   chestItem?: string;
   chestFlag?: string;
   wander?: boolean;
+  giftItem?: string;
+  giftFlag?: string;
 }
 
 // Direction offsets: up, down, left, right
@@ -45,6 +47,8 @@ export class NPC {
   readonly action?: string;
   readonly chestItem?: string;
   readonly chestFlag?: string;
+  readonly giftItem?: string;
+  readonly giftFlag?: string;
   readonly wander: boolean;
   private wanderTimer: number = 0;
   private wanderInterval: number = 120;
@@ -65,6 +69,8 @@ export class NPC {
     this.action = data.action;
     this.chestItem = data.chestItem;
     this.chestFlag = data.chestFlag;
+    this.giftItem = data.giftItem;
+    this.giftFlag = data.giftFlag;
     this.wander = data.wander ?? false;
     this.art = art ?? null;
     this.offsetY = art ? TILE_SIZE - art.frameHeight : 0;

@@ -143,3 +143,21 @@
 {"event": "result", "key": "7b728a43ee3d4a870aa3ce4b", "ok": true}
 {"event": "attempt", "ts": "2026-11-13T00:04:35", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "interior", "sheet": "kit_furniture", "seed": 1234, "key": "9865a527e7f05a7e96fe06d8"}
 {"event": "result", "key": "9865a527e7f05a7e96fe06d8", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:11:50", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_hall", "seed": 1234, "key": "5ca9a9153d69c8f09235267c"}
+{"event": "result", "key": "5ca9a9153d69c8f09235267c", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:11:57", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_props", "seed": 1234, "key": "f307a685e504f747828cd7e8"}
+{"event": "result", "key": "f307a685e504f747828cd7e8", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:12:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "king", "sheet": "field", "seed": 1234, "key": "b4f3e2155a41ab4cda0e9b4b"}
+{"event": "result", "key": "b4f3e2155a41ab4cda0e9b4b", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:12:18", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "princess", "sheet": "field", "seed": 1234, "key": "9920c2923286714f39dc54c4"}
+{"event": "result", "key": "9920c2923286714f39dc54c4", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:18:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "villager_f", "sheet": "field", "seed": 1234, "key": "6b08120542907be1c7aba347"}
+{"event": "result", "key": "6b08120542907be1c7aba347", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:19:54", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_terrain", "seed": 1234, "key": "81999490e74892e1c77b7351"}
+{"event": "result", "key": "81999490e74892e1c77b7351", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:20:01", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_landmarks", "seed": 1234, "key": "d5214280aaa4033ce4a9912a"}
+{"event": "result", "key": "d5214280aaa4033ce4a9912a", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:27:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "temple", "sheet": "kit_ruins", "seed": 1234, "key": "9481f32eac3782bee4427a0a"}
+{"event": "result", "key": "9481f32eac3782bee4427a0a", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T00:27:18", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "temple", "sheet": "kit_relics", "seed": 1234, "key": "ad10b66c768be4a16f1e7d48"}
+{"event": "result", "key": "ad10b66c768be4a16f1e7d48", "ok": true}

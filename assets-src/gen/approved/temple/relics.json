@@ -1,0 +1,103 @@
+{
+  "kit": "temple",
+  "sheet": "kit_relics",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "ad10b66c768be4a16f1e7d48",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "tpillar_top",
+      "tpillar_broken_top",
+      "fiend_statue_top",
+      "brazier"
+    ],
+    [
+      "tpillar_bottom",
+      "tpillar_broken_bottom",
+      "fiend_statue_bottom",
+      null
+    ],
+    [
+      "altar_l",
+      "altar_r",
+      "fallen_l",
+      "fallen_r"
+    ],
+    [
+      "chest_closed",
+      "chest_open",
+      "vines",
+      "skulls"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "tpillar": [
+        39,
+        84
+      ],
+      "tpillar_broken": [
+        40,
+        80
+      ],
+      "fiend_statue": [
+        38,
+        80
+      ],
+      "brazier": [
+        37,
+        35
+      ],
+      "altar": [
+        86,
+        40
+      ],
+      "fallen_column": [
+        85,
+        40
+      ],
+      "chest_closed": [
+        37,
+        36
+      ],
+      "chest_open": [
+        39,
+        36
+      ],
+      "vines": [
+        38,
+        37
+      ],
+      "skulls": [
+        37,
+        36
+      ]
+    },
+    "scale": {
+      "tpillar": 1.0,
+      "tpillar_broken": 1.0,
+      "fiend_statue": 1.0,
+      "brazier": 1.0,
+      "altar": 1.0,
+      "fallen_column": 1.0,
+      "chest_closed": 1.0,
+      "chest_open": 1.0,
+      "vines": 1.0,
+      "skulls": 1.0
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "act-1 run self-approved; sources + keying"
+}

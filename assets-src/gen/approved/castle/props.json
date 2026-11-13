@@ -1,0 +1,83 @@
+{
+  "kit": "castle",
+  "sheet": "kit_props",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "f307a685e504f747828cd7e8",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "tower_0_0",
+      "tower_0_1",
+      "throne_0_0",
+      "throne_0_1"
+    ],
+    [
+      "tower_1_0",
+      "tower_1_1",
+      "throne_1_0",
+      "throne_1_1"
+    ],
+    [
+      "tower_2_0",
+      "tower_2_1",
+      "pillar_top",
+      "statue_top"
+    ],
+    [
+      "banner",
+      "torch",
+      "pillar_bottom",
+      "statue_bottom"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "tower": [
+        54,
+        142
+      ],
+      "throne": [
+        91,
+        96
+      ],
+      "pillar": [
+        33,
+        96
+      ],
+      "knight_statue": [
+        39,
+        96
+      ],
+      "banner": [
+        29,
+        48
+      ],
+      "torch": [
+        19,
+        48
+      ]
+    },
+    "scale": {
+      "tower": 1.0,
+      "throne": 0.86,
+      "pillar": 0.97,
+      "knight_statue": 0.97,
+      "banner": 0.65,
+      "torch": 0.74
+    },
+    "skipped": [],
+    "pitch_px": 3.06,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "act-1 run self-approved (v1 keying)"
+}

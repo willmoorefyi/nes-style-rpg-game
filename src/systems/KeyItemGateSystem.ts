@@ -34,8 +34,12 @@ export class KeyItemGateSystem {
       return { blocked: false };
     }
 
+    // Story-flag gate (e.g. a bridge that opens once BRIDGE_BUILT is set)
+    if (gate.requiredFlag && !this.flags.has(gate.requiredFlag)) {
+      return { blocked: true, message: gate.message };
+    }
     // Check if player has the required item
-    if (!this.inventory.has(gate.requiredItem)) {
+    if (gate.requiredItem && !this.inventory.has(gate.requiredItem)) {
       return { blocked: true, message: gate.message };
     }
 

@@ -185,3 +185,12 @@
     cape, gold shoes
   field_gear: empty hands, arms at the sides
   seeds: [1234]
+- id: princess
+  sheets: [field]
+  robed: true
+  prompt: >-
+    young princess with long golden hair and a small silver tiara, long flowing pale pink gown with white sleeves,
+    gentle smile
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+

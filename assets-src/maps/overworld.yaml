@@ -1,0 +1,124 @@
+# Act-1 overworld (original layout): Cornelia peninsula, castle, temple of fiends, the north bridge (BRIDGE_BUILT).
+# legend: . grass  f forest  m mountain  s sand  , dirt road  r river  o ocean  = bridge
+id: overworld
+kits: [overworld, town]
+music: overworld
+ground: |
+  ooooooooooo.............................oo...ooooooooooo
+  ooooooo....f.....mmmm..........................o..oooooo
+  oooooo...ffffffmmmmmm.................ff............oooo
+  oooo....ffffffff.mmm................fffffffff........ooo
+  oo.......ffffff.....................fffffffff.......o..o
+  o..........ff.......................ffffffff.mmmmm......
+  oooooo..................................ff..mmmmmmm.o.oo
+  ooooooo......................................mmmmm.ooooo
+  ooooooooooooo............................ooooooooooooooo
+  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooo==oooooooooooooooooooooooooo
+  oooooooooooooomo...oooo.....,......ooooooooooooooooooooo
+  oooooooooooo.mmm....ooo.....,......ooooooooooooooooooooo
+  ooooooooo.....mmm...........,......ooooooooooooooooooooo
+  oooooooo.......mm.ff...fff..,....f.......mmmoooooooooooo
+  ooooooo........fmmfffffffff.,...fffff...mmmmmooooooooooo
+  oooooom........fmmffffffff..,..ffffff...mmmmmmmooooooooo
+  oooooom........ffffffffff...,...fffff...mmmmmmmooooooooo
+  ooooooom......,ffffffffff...,.....f.....mmmmmmmooooooooo
+  oooooommm....f,ffffffff.....,..........mmmmmmmm.oooooooo
+  oooooo.mmmffff,,,,ff........,...........mmmmmmm.oooooooo
+  oooooo..mmmmfffff,f....................rrmmmmmm.oooooooo
+  ooooooo.ffmmfffff,ff...................rrmmmmmf.oooooooo
+  oooooooofffffffff,ff...................rr..mmffooooooooo
+  oooooooffffffffff,fff.......,...........rr.ffffooooooooo
+  oooooomffffffffff,,,,,,,,,,,,...........rr.ffffooooooooo
+  oooommmmffffffffffff........,...........rr..fff.oooooooo
+  oooommomffffffffffff........,..........rr......ooooooooo
+  ooooooomffffffffffff........,..........rr......ooooooooo
+  ooooooosfffffffffff..........,,,,,,,,,==,.....sooooooooo
+  ooooosss.ffffffff..................ffrrfff.....soooooooo
+  ooooosoos....fff....f.............ffrrffff....sooooooooo
+  ooooooooos.........fffff...........frrffff..sssooooooooo
+  oooooooosm........ffffff........fff.rrfff..soooooooooooo
+  ooooooooossss......fffff.......fffffrr....sooooooooooooo
+  ooooooooooooos.......f.........fffff.rrsssoooooooooooooo
+  ooooooooooooos...ss..................rrooooooooooooooooo
+  oooooooooooooosssoos..............ssssoooooooooooooooooo
+  ooooooooooooooooooos..ssss..s...ssoooooooooooooooooooooo
+  oooooooooooooooooooossoooossosssoooooooooooooooooooooooo
+  oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+  oooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+entrances:
+  north_shore: [28, 7]
+objects:
+- type: prefab
+  prefab: town_icon
+  name: cornelia
+  x: 27
+  y: 30
+  w: 2
+  h: 2
+  door: 1
+  ridge_rows: 0
+  enter: {map: cornelia, entrance: south_gate}
+- type: prefab
+  prefab: castle_icon
+  name: castle
+  x: 27
+  y: 23
+  w: 2
+  h: 2
+  door: 1
+  ridge_rows: 0
+  enter: {map: cornelia-castle, entrance: gate}
+- type: prefab
+  prefab: temple_icon
+  name: temple
+  x: 10
+  y: 18
+  w: 2
+  h: 2
+  door: 1
+  ridge_rows: 0
+  enter: {map: temple-of-fiends, entrance: entry}
+- type: deco
+  parts:
+  - [boulder]
+  x: 22
+  y: 34
+- type: deco
+  parts:
+  - [boulder]
+  x: 34
+  y: 26
+- type: deco
+  parts:
+  - [boulder]
+  x: 20
+  y: 37
+keyItemGates:
+- {x: 28, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge is still unfinished. Workers block the way., permanent: false}
+- {x: 29, y: 12, requiredFlag: BRIDGE_BUILT, message: The bridge is still unfinished. Workers block the way., permanent: false}
+encounterRate: {min: 15, max: 30}
+encounters:
+- enemies: [goblin]
+  weight: 4
+- enemies: [goblin, goblin]
+  weight: 3
+- enemies: [wolf]
+  weight: 3
+- enemies: [wolf, wolf]
+  weight: 2
+- enemies: [skeleton]
+  weight: 2
+- enemies: [goblin, wolf]
+  weight: 2
+- enemies: [pirate]
+  weight: 1
+battleBackgrounds:
+  default: grassland
+  terrain: {forest: forest, desert: desert, swamp: swamp, water: ocean, river: river, sand: desert}
+vehicles:
+- {type: ship, x: 30, y: 38, requiredFlag: BIKKE_DEFEATED}
+- {type: canoe, x: 37, y: 36, requiredFlag: EARTH_CAVE_COMPLETE}
+transitions: []

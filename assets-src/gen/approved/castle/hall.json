@@ -1,0 +1,67 @@
+{
+  "kit": "castle",
+  "sheet": "kit_hall",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "5ca9a9153d69c8f09235267c",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "castle_hall_0_0",
+      "castle_hall_0_1",
+      "castle_hall_0_2",
+      "castle_hall_0_3"
+    ],
+    [
+      "castle_hall_1_0",
+      "castle_hall_1_1",
+      "castle_hall_1_2",
+      "castle_hall_1_3"
+    ],
+    [
+      "castle_hall_2_0",
+      "castle_hall_2_1",
+      "castle_hall_2_2",
+      "castle_hall_2_3"
+    ],
+    [
+      "castle_hall_3_0",
+      "castle_hall_3_1",
+      "castle_hall_3_2",
+      "castle_hall_3_3"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "native_px_per_tile": 47.3,
+    "drawn_pitch_raw_px": 5.12,
+    "pitch_conf": 2.76,
+    "tile_guide_px": [
+      242.0,
+      215.0
+    ],
+    "grid_alignment_native_px": 13.7,
+    "door_opening_px": 43,
+    "seam_ratio": {
+      "roof_ridge_m@castle": 0.18,
+      "roof_eave_m@castle": 0.14
+    },
+    "colours": 24,
+    "thin_line_px_removed": 0,
+    "grid_lines_removed": [
+      0,
+      0
+    ],
+    "pass": {
+      "density": true,
+      "alignment": false,
+      "door": false,
+      "seams": true,
+      "colours": true
+    },
+    "prefab": "castle_hall"
+  },
+  "note": "act-1 run self-approved; review fixes in kits.yaml"
+}

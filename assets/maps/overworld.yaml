@@ -8211,13 +8211,11 @@ transitions:
   - x: 8
     y: 3
     targetMap: temple-of-fiends
-    targetX: 7
-    targetY: 14
+    targetEntrance: entry
   - x: 9
     y: 3
     targetMap: temple-of-fiends
-    targetX: 8
-    targetY: 14
+    targetEntrance: entry
 vehicles:
   - type: ship
     x: 11
@@ -8264,3 +8262,8 @@ battleBackgrounds:
     swamp: swamp
     water: ocean       # at sea: fought from the ship (deck background)
     river: river       # on the river: fought from the canoe
+entrances:
+  cornelia: [8, 12]
+  castle: [8, 12]
+  temple: [8, 4]
+  north_shore: [8, 4]

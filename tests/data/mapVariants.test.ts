@@ -22,11 +22,13 @@ const variants = (id: string): MapData[] => [legacy.get(id), compiled.get(id)].f
 const all = [...legacy.values(), ...compiled.values()];
 
 describe('map variants (legacy and compiled 2x)', () => {
-  it('every compiled map in the manifest has a source and a legacy counterpart', () => {
+  it('every compiled map in the manifest has a source; maps new in 2x are only linked from compiled maps', () => {
     expect(manifest.length).toBeGreaterThan(0);
     for (const id of manifest) {
       expect(existsSync(resolve(root, `assets-src/maps/${id}.yaml`)), `${id} source`).toBe(true);
-      expect(legacy.has(id), `${id} legacy map`).toBe(true);
+    }
+    for (const m of legacy.values()) {
+      for (const t of m.transitions) expect(legacy.has(t.targetMap), `${m.id} -> ${t.targetMap}`).toBe(true);
     }
   });
 
@@ -39,9 +41,12 @@ describe('map variants (legacy and compiled 2x)', () => {
     }
   });
 
-  it('legacy and compiled variants define the same entrance names', () => {
+  it('compiled variants define every entrance of their legacy map', () => {
     for (const [id, m] of compiled) {
-      expect(Object.keys(m.entrances ?? {}).sort(), id).toEqual(Object.keys(legacy.get(id)!.entrances ?? {}).sort());
+      const old = legacy.get(id);
+      if (!old) continue;
+      // every entrance the legacy map offers must exist in the compiled one (it may add more, e.g. the castle)
+      for (const name of Object.keys(old.entrances ?? {})) expect(m.entrances?.[name], `${id}.${name}`).toBeDefined();
     }
   });
 

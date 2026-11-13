@@ -31,18 +31,23 @@ LEGACY_MAPS = ROOT / "assets" / "maps"
 
 LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "=": "bridge", "u": "culvert",
           # interiors (kit materials floor / floor_stone / carpet / in_wall_top / in_wall_face; counters are parts)
-          "_": "floor", "-": "floor_stone", "+": "carpet", "W": "in_wall_top", "F": "in_wall_face", "c": "counter"}
+          "_": "floor", "-": "floor_stone", "+": "carpet", "W": "in_wall_top", "F": "in_wall_face", "c": "counter",
+          # overworld (river: no stone rim; ocean: ragged coast with foam)
+          "f": "forest", "m": "mountain", "s": "sand", "r": "river", "o": "ocean"}
 # painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
 FULL = ["floor", "floor_stone", "carpet", "in_wall_top", "in_wall_face"]
 COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
-SOFT = ["grass", "dirt", "cobble"]                 # painted in this order; each erodes against the ones before it
+# painted in this order; each erodes (ragged edge inside its own cells) against the ones before it
+SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean"]
+SOFT_WATER = {"river", "ocean"}                    # foam on their edge
+ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16}   # blur radius (px) of wild edges
 WATERISH = {"water", "bridge", "culvert"}
 # TerrainType values (src/types/index.ts)
 GRASS, WALL, WATER, ROAD, BRIDGE = 0, 1, 2, 8, 9
 TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
            "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
-           "counter": COUNTER}
-BLOCKED = {WALL, WATER, COUNTER}
+           "counter": COUNTER, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER}
+BLOCKED = {WALL, WATER, COUNTER, 3, 7}             # on foot: walls, water, counters, mountains, rivers
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
@@ -81,6 +86,19 @@ def _erode_depth(mask: np.ndarray, cap: int) -> np.ndarray:
             break
     depth[mask & (depth == 0)] = 0
     return np.where(mask, depth + 1, 0)       # boundary pixels of the mask get 1
+
+
+def _box_blur(a: np.ndarray, r: int) -> np.ndarray:
+    """Separable box blur of radius r (edges clamp)."""
+    for axis in (0, 1):
+        pad = [(0, 0), (0, 0)]
+        pad[axis] = (r + 1, r)
+        c = np.cumsum(np.pad(a, pad, mode="edge"), axis=axis, dtype=np.float64)
+        n = a.shape[axis]
+        hi = np.take(c, np.arange(2 * r + 1, 2 * r + 1 + n), axis=axis)
+        lo = np.take(c, np.arange(0, n), axis=axis)
+        a = ((hi - lo) / (2 * r + 1)).astype(np.float32)
+    return a
 
 
 def _noise(h: int, w: int, seed: int, cell: int = 6, amp: int = MAX_INSET) -> np.ndarray:
@@ -179,20 +197,33 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
     # 1. ground: soft materials, each eroded (ragged) against the softer ones
     below = np.zeros((H, W, 3), np.uint8)
     for i, name in enumerate(SOFT):
+        if i > 0 and not np.isin(mat, SOFT[i:]).any():
+            continue                                         # no cell of this or any later soft layer
         covered = ~np.isin(mat, SOFT[:i])                    # this layer and everything harder
-        tex = _tile(kit.material(name), H, W)
+        if i > 0 and not (mat == name).any():
+            continue
+        tex = _tile(kit.material("water" if name == "river" else name), H, W)
         if i == 0:
             below[:] = tex
             continue
         pm = _up(covered)
-        show = pm & (_erode_depth(pm, MAX_INSET + 1) > _noise(H, W, seed + i))
+        if name in ROUNDED:                                   # wild terrain: rounded, wavy edges (cell mask blurred)
+            r = ROUNDED[name]
+            soft_mask = _box_blur(_box_blur(pm.astype(np.float32), r), r)
+            wave = (_noise(H, W, seed + 31 * i, cell=r, amp=100).astype(np.float32) / 100 - 0.5) * 0.5
+            show = soft_mask + wave > 0.5
+        else:
+            show = pm & (_erode_depth(pm, MAX_INSET + 1) > _noise(H, W, seed + i))
         below[show] = tex[show]
         edge = _edge_of(show)
         shadow = np.zeros_like(show)
         for k in range(1, SHADOW + 1):
             shadow[k:] |= show[:-k]
-        _shade(below, shadow & ~show, 0.8)
-        _shade(below, edge, 0.6)
+        if name in SOFT_WATER:                               # light foam line instead of a dark edge
+            below[edge] = np.minimum(below[edge].astype(np.int32) + 70, 255).astype(np.uint8)
+        else:
+            _shade(below, shadow & ~show, 0.8)
+            _shade(below, edge, 0.6)
 
     # 2. hard ground: water with a stone rim, bridges, town walls, culverts
     waterish = np.isin(mat, list(WATERISH))
@@ -342,7 +373,8 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                     part = kit.parts.get(name) or K.placeholder_tile(name)
                     _paste(top if j < ridge else canvas, part, x + i, y + j)
                     coll[y + j, x + i] = WALL
-            coll[y:y + ridge, x:x + w] = [grid_terrain_row(grid, y + j, x, w) for j in range(ridge)]
+            if ridge:
+                coll[y:y + ridge, x:x + w] = [grid_terrain_row(grid, y + j, x, w) for j in range(ridge)]
             if o.get("sign") and door is not None:
                 _paste(canvas, kit.part(f"sign_{o['sign']}"), x + door, y + o.get("sign_row", ridge))
             if door is not None:
@@ -396,6 +428,12 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             if grid[y][x] == "grass" and (x, y) not in owner and rng.random() < 0.18:
                 _paste(canvas, kit.part("tuft"), x, y, int(rng.integers(-8, 9)), int(rng.integers(-8, 9)))
 
+    # mountains: a peak on every mountain cell (jittered), so ranges read as ranges
+    if "peak" in kit.parts:
+        for y in range(hgt):
+            for x in range(wid):
+                if grid[y][x] == "mountain" and (x, y) not in owner:
+                    _paste(canvas, kit.part("peak"), x, y, int(rng.integers(-4, 5)), int(rng.integers(-6, 3)))
     above = np.asarray(top).copy()
     out = Compiled(mid, wid, hgt, np.asarray(canvas.convert("RGB")).copy(), above, coll, entrances, transitions)
     validate(src, out)
@@ -451,12 +489,14 @@ def grid_terrain_row(grid, y, x, w) -> list[int]:
 
 
 def _check_interior_entrance(map_id: str, entrance: str) -> None:
-    path = LEGACY_MAPS / f"{map_id}.yaml"
-    if not path.exists():
+    """The target map (a source map or a legacy map) must define the entrance; every variant that exists must."""
+    paths = [q for q in (SRC / f"{map_id}.yaml", LEGACY_MAPS / f"{map_id}.yaml") if q.exists()]
+    if not paths:
         raise MapError(f"door leads to unknown map {map_id}")
-    ents = (yaml.safe_load(path.read_text()) or {}).get("entrances") or {}
-    if entrance not in ents:
-        raise MapError(f"door leads to {map_id}, which has no entrance {entrance!r}")
+    for path in paths:
+        ents = (yaml.safe_load(path.read_text()) or {}).get("entrances") or {}
+        if entrance not in ents:
+            raise MapError(f"door leads to {map_id} ({path.name}), which has no entrance {entrance!r}")
 
 
 # ───────────────────────────── validation ─────────────────────────────

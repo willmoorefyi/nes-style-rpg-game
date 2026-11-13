@@ -121,6 +121,20 @@ export interface MapNPC {
   chestItem?: string;
   chestFlag?: string;
   wander?: boolean;
+  /** Present only while this story flag is set (e.g. the princess after PRINCESS_RESCUED). */
+  showIf?: string;
+  /** Removed once this story flag is set (e.g. the captive princess in the temple). */
+  hideIf?: string;
+  /** Given once, after the NPC's dialog, the first time the player talks to them. */
+  giftItem?: string;
+  giftFlag?: string;
+}
+
+/** Whether a map NPC is present for the current story flags. */
+export function npcPresent(npc: Pick<MapNPC, 'showIf' | 'hideIf'>, hasFlag: (flag: string) => boolean): boolean {
+  if (npc.showIf && !hasFlag(npc.showIf)) return false;
+  if (npc.hideIf && hasFlag(npc.hideIf)) return false;
+  return true;
 }
 
 /**
@@ -235,7 +249,10 @@ export interface VehicleSpawn {
 export interface KeyItemGate {
   x: number;
   y: number;
-  requiredItem: string;
+  /** Item that opens the gate; omit when the gate opens on a story flag (`requiredFlag`). */
+  requiredItem?: string;
+  /** Story flag that opens the gate (e.g. BRIDGE_BUILT). */
+  requiredFlag?: string;
   flag?: string;
   message: string;
   permanent: boolean;

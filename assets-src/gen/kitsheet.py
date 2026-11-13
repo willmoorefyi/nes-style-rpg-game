@@ -916,7 +916,38 @@ def _cut_props(rgb: np.ndarray, sheet: dict, rects: dict, report: dict, canvas: 
         if not len(ys):
             raise ValueError(f"prop sheet: nothing drawn in the {name} box")
         bx0, by0, bx1, by1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
-        crop, mask = rgb[Y0:Y1, X0:X1][by0:by1, bx0:bx1], fg[by0:by1, bx0:bx1]
+        crop, mask = rgb[Y0:Y1, X0:X1][by0:by1, bx0:bx1], fg[by0:by1, bx0:bx1].copy()
+        if sw.get("key_border") and sw.get("key_mode") == "v1":
+            # first keying version (median of the crop border); kept so the approved castle props reproduce exactly
+            ring = np.concatenate([crop[0], crop[-1], crop[:, 0], crop[:, -1]]).astype(np.int32)
+            bg = np.median(ring, axis=0)
+            mask &= np.abs(crop.astype(np.int32) - bg).sum(-1) > sw.get("key_tol", 60)
+            ys2, xs2 = np.where(mask)
+            if len(ys2):
+                crop = crop[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
+                mask = mask[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
+        elif sw.get("key_border"):                   # review fix: drop a backdrop the model painted behind it
+            k_in = 4                                 # sample inside the edge (the edge blends with magenta)
+            inner = crop[k_in:-k_in, k_in:-k_in]
+            imask = mask[k_in:-k_in, k_in:-k_in]
+            ring = np.concatenate([inner[0], inner[-1], inner[:, 0], inner[:, -1]]).astype(np.int32)
+            rfg = np.concatenate([imask[0], imask[-1], imask[:, 0], imask[:, -1]])
+            ring = ring[rfg] if rfg.any() else ring
+            q = ring // 8
+            keys, counts = np.unique(q[:, 0] * 1024 + q[:, 1] * 32 + q[:, 2], return_counts=True)
+            kk = keys[counts.argmax()]
+            bg = np.array([kk // 1024, (kk // 32) % 32, kk % 32]) * 8 + 4    # most common backdrop colour
+            ci = crop.astype(np.float32)
+            mag = np.array([255.0, 0.0, 255.0])
+            d = mag - bg
+            t = np.clip(((ci - bg) @ d) / (d @ d), 0, 1)[..., None]
+            residual = np.abs(ci - (bg + t * d)).sum(-1)       # distance from the backdrop..magenta blend line
+            mask &= residual > sw.get("key_tol", 60) * 0.5
+            mask &= np.abs(ci - bg).sum(-1) > sw.get("key_tol", 60)
+            ys2, xs2 = np.where(mask)
+            if len(ys2):
+                crop = crop[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
+                mask = mask[ys2.min():ys2.max() + 1, xs2.min():xs2.max() + 1]
         scale = 1 / pitch if pitch else tw * 48 / (x1 - x0)   # native px per guide px
         ow, oh = max(1, round(crop.shape[1] * scale)), max(1, round(crop.shape[0] * scale))
         f = min(1.0, tw * 48 / ow, th * 48 / oh)     # never larger than its cells

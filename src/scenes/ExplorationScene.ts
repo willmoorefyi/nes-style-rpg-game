@@ -161,7 +161,7 @@ export class ExplorationScene implements Scene {
     this.game.currentMapId = mapId;
     let result;
     try {
-      result = await this.mapLoader.loadMap(mapId);
+      result = await this.mapLoader.loadMap(mapId, (flag) => this.game.gameFlags.has(flag));
     } catch (e) {
       console.error(`Failed to load map: ${mapId}`, e);
       this.errorDisplay.show(`Failed to load map: ${mapId}`);
@@ -295,7 +295,12 @@ export class ExplorationScene implements Scene {
         return;
       }
       if (npc.dialog.length > 0) {
-        const lines = resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag));
+        const lines = [...resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag))];
+        if (npc.giftItem && npc.giftFlag && !this.game.gameFlags.has(npc.giftFlag)) {
+          this.game.inventory.add(npc.giftItem, 1);
+          this.game.gameFlags.set(npc.giftFlag);
+          lines.push(`Received ${ItemRegistry.getItem(npc.giftItem)?.name ?? npc.giftItem}!`);
+        }
         if (lines.length > 0) {
           // Store NPC for post-dialog action (shop, class upgrade, etc.)
           if (npc.shopId || npc.action) {

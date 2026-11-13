@@ -16,3 +16,15 @@ overworld peninsula and the Temple of Fiends, with art, maps and the castle stor
 | 2 | town/kit_signs (E2) | 1 | 6 sign boards with icons, well, chimney; Gemini drew the bottom row low, so source rects were added | self-approved |
 | 3 | interior/kit_rooms | 1 | wood and stone floors, carpet and back wall good; the wall top came back as a framed panel, so it is derived from the floor, darkened; carpet borders cropped | self-approved |
 | 4 | interior/kit_furniture | 1 | counter, plant, bookshelf, bed, racks, shelves, armour stand, window, orbs, table; source rects fixed (props outside boxes, counter caught the next row) | self-approved |
+| 5 | castle/kit_hall | 1 | castle keep: slate roof, stone walls, arched window, studded double door; the roof overhangs and the door is wider than a tile, so it is a prefab (castle_hall) | self-approved |
+| 6 | castle/kit_props | 1 | tower, throne on dais, pillar, knight statue, banner, torch; Gemini left two grey guide boxes and painted plaster behind the banner and torch, so source rects and border keying were added; drawn at about 3 px per pixel, so props come out large (3-tile tower, 2x2 throne) | self-approved |
+| 7 | king/field | 1 | white-bearded king, crown, red ermine robe; the side row faced right, so it is flipped | self-approved |
+| 8 | princess/field | 1 | blonde princess, tiara, pink gown; the side row faced right, so it is flipped | self-approved |
+| 9 | villager_f/field | 1 | woman villager (maid) in a red dress and apron; flipped | self-approved |
+| 10 | overworld/kit_terrain | 1 | forest canopy, rocky mountain, sand, ocean; Gemini filled the gaps between squares, so explicit sources were used; seams ≤ 1.12 | self-approved |
+| 11 | overworld/kit_landmarks | 1 | town, castle and temple icons, peak, tree clump, boulder; drawn on grey panels in its own layout, so sources and border keying were used | self-approved |
+| 12 | temple/kit_ruins | 1 | cracked temple floor, rubble, wall face, wall top; the wall top was framed, so it is cropped; the floor seam is 2.6 (a regular slab grid), accepted | self-approved |
+| 13 | temple/kit_relics | 1 | pillar, broken pillar, fiend statue, purple brazier, rune altar, fallen column, chests (closed and open), vines, skulls; on grey panels, so sources and blend-line keying were used | self-approved |
+
+**Pipeline lesson:** a sheet used as a reference by other requests (e.g. castle/props) must not be re-cut after
+approval, because its PNG is part of their cache keys. The castle props keep the original keying (`key_mode: v1`).

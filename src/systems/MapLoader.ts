@@ -1,4 +1,4 @@
-import type { MapData } from '../types/index.js';
+import { npcPresent, type MapData } from '../types/index.js';
 import type { DataLoader } from '../core/DataLoader.js';
 import { TilemapRenderer } from '../rendering/TilemapRenderer.js';
 import { BakedMapRenderer, loadBakedTextures, type BakedTextures } from '../rendering/BakedMapRenderer.js';
@@ -42,8 +42,10 @@ export class MapLoader {
     return `assets/maps/${mapId}.yaml`;
   }
 
-  async loadMap(mapId: string): Promise<MapLoadResult> {
-    const mapData = await this.dataLoader.loadMap(await this.mapPath(mapId));
+  /** `hasFlag` filters NPCs by their `showIf` / `hideIf` story flags (all NPCs when omitted). */
+  async loadMap(mapId: string, hasFlag?: (flag: string) => boolean): Promise<MapLoadResult> {
+    const loaded = await this.dataLoader.loadMap(await this.mapPath(mapId));
+    const mapData = hasFlag ? { ...loaded, npcs: loaded.npcs.filter((n) => npcPresent(n, hasFlag)) } : loaded;
     const collisionMap = new CollisionMap(mapData);
     const tilemap: MapRenderer = mapData.art
       ? new BakedMapRenderer(mapData, await this.loadTextures(mapData.art))

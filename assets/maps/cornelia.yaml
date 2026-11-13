@@ -3533,13 +3533,11 @@ tilesets:
 - town
 transitions:
 - targetMap: overworld
-  targetX: 8
-  targetY: 11
+  targetEntrance: cornelia
   x: 7
   y: 15
 - targetMap: overworld
-  targetX: 9
-  targetY: 11
+  targetEntrance: cornelia
   x: 8
   y: 15
 - targetMap: cornelia-weapon-shop
