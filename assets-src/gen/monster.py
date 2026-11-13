@@ -150,6 +150,25 @@ def _haze(rgb: np.ndarray) -> np.ndarray:
     return (r - g > 10) & (b - g > 30) & (np.minimum(r, b) > 130)
 
 
+def _painted_panel(rgb: np.ndarray, bg: np.ndarray, tol: int = 12) -> np.ndarray:
+    """A copied guide box: Gemini sometimes paints the grey size box (or a pink-tinted version of it) behind the
+    monster. Find the most common pale, flat colour touching the background and flood it from the background; the
+    monster's black outline stops the flood."""
+    f = rgb.astype(np.int32)
+    ring = np.zeros_like(bg)
+    ring[1:] |= bg[:-1]; ring[:-1] |= bg[1:]; ring[:, 1:] |= bg[:, :-1]; ring[:, :-1] |= bg[:, 1:]
+    ring &= ~bg & (f.min(axis=2) > 140)
+    if ring.sum() < 40:
+        return np.zeros_like(bg)
+    cols, counts = np.unique((f[ring] // 8) * 8, axis=0, return_counts=True)
+    panel = cols[counts.argmax()] + 4
+    near = np.abs(f - panel).max(axis=2) <= tol
+    if near.sum() < 0.03 * bg.size:            # a few pale pixels on the figure's edge, not a painted box
+        return np.zeros_like(bg)
+    seed = np.where((near | bg)[..., None], 255, 0).astype(np.uint8).repeat(3, 2)
+    return PX.flood_bg(seed, 10.0) & near
+
+
 def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     """Foreground of one cell. Background = magenta (the requested key) plus anything near-white or magenta connected
     to the cell border (Gemini sometimes draws magenta panels on a white page). Then keep the main figure: the largest
@@ -163,6 +182,7 @@ def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     loose = near_white | guide_grey          # page / copied guide shapes: background where connected to the border
     border_bg = PX.flood_bg(np.where((bg | loose)[..., None], 255, 0).astype(np.uint8).repeat(3, 2), 10.0)
     fg = ~(bg | (loose & border_bg))
+    fg &= ~_painted_panel(rgb, ~fg)
     fg &= ~PX.magenta_fringe(rgb, fg)
     lab, n = PX.components(fg)
     if n == 0:

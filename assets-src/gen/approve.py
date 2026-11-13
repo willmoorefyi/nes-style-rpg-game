@@ -35,7 +35,7 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     if sheet_name == "monster":
         sheet_name = GEN.allowed_sheets(char)[0]
     sheet = GEN.SHEETS[sheet_name]
-    seed = char.get("seeds", [1234])[0]
+    seed = GEN.seed_for(char, sheet_name)
     req = GEN.plan_request(char, sheet, seed, "gemini", None)
     if not req.cached:
         raise SystemExit(f"{cid}/{sheet_name}: request {req.key} is not cached; generate and review it first")

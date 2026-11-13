@@ -96,6 +96,12 @@ def load_character(cid: str) -> dict:
     raise SystemExit(f"no character or monster '{cid}' in characters.yaml / monsters.yaml")
 
 
+def seed_for(char: dict, sheet_name: str) -> int:
+    """Approved seed for a sheet: `sheet_seeds: {<sheet>: n}` overrides the character's first seed (lets one pose of a
+    per-pose boss be redrawn without changing the others' cache keys)."""
+    return (char.get("sheet_seeds") or {}).get(sheet_name, char.get("seeds", [1234])[0])
+
+
 def is_monster(char: dict) -> bool:
     return char.get("kind") == "monster"
 
@@ -625,7 +631,11 @@ def main(argv: list[str] | None = None) -> None:
     if unknown:
         ap.error(f"unknown sheets {unknown}; choose from {list(SHEETS)}")
 
-    plan = [(seed, plan_request(char, SHEETS[n], seed, args.backend, args.model)) for seed in seeds for n in names]
+    if args.seeds:
+        plan = [(seed, plan_request(char, SHEETS[n], seed, args.backend, args.model)) for seed in seeds for n in names]
+    else:
+        plan = [(seed_for(char, n), plan_request(char, SHEETS[n], seed_for(char, n), args.backend, args.model))
+                for n in names]
     paid_count = sum(not r.cached for _, r in plan)
     if args.dry_run:
         for seed, r in plan:

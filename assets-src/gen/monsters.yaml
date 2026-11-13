@@ -113,6 +113,7 @@
   face: the face is hidden by the horned helm; two glowing red eyes in the visor slit are readable
   extra_negative: a bare face, a skull, a shield, a second weapon
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1235}   # 1234 drew a stiff crouch with the guide box painted between the legs
 - id: lich
   # "the Rime Sovereign": original frost-undead knight-king boss (no legacy design reference; one image per pose)
   size: boss
