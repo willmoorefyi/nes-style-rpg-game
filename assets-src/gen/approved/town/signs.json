@@ -1,0 +1,87 @@
+{
+  "kit": "town",
+  "sheet": "kit_signs",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "ce55b41161f41bc0f21b9ce7",
+  "approved": "2026-11-13",
+  "tile": 48,
+  "cells": [
+    [
+      "sign_weapon",
+      "sign_armor",
+      "sign_item",
+      "sign_white_magic"
+    ],
+    [
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "sign_black_magic",
+      "sign_inn",
+      "well",
+      "chimney"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "sign_weapon": [
+        39,
+        39
+      ],
+      "sign_armor": [
+        40,
+        39
+      ],
+      "sign_item": [
+        40,
+        39
+      ],
+      "sign_white_magic": [
+        39,
+        39
+      ],
+      "sign_black_magic": [
+        40,
+        40
+      ],
+      "sign_inn": [
+        40,
+        40
+      ],
+      "well": [
+        32,
+        48
+      ],
+      "chimney": [
+        28,
+        48
+      ]
+    },
+    "scale": {
+      "sign_weapon": 1.0,
+      "sign_armor": 1.0,
+      "sign_item": 1.0,
+      "sign_white_magic": 1.0,
+      "sign_black_magic": 1.0,
+      "sign_inn": 1.0,
+      "well": 0.92,
+      "chimney": 0.94
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "E2 self-approved: 6 sign boards, well, chimney; bottom-row sources fixed"
+}

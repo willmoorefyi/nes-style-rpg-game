@@ -245,3 +245,31 @@
         door with a stone frame stands right of centre, from about the middle of the ground floor down to the bottom
         edge; a small window sits left of the door in the upper part of the ground floor; the rest is plain stone,
         with a darker base course along the bottom.
+    signs:
+      # checkpoint E2: shop sign boards (hung centred on the eave above the door), the well, a roof chimney
+      kind: swatches
+      seed: 1234
+      refs: [house, props]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 40
+      margin_px: 52
+      scale: pitch
+      swatches:
+        - {name: sign_weapon, at: [0, 0], tiles: [1, 1], wrap: prop, align: center,
+           text: "a small hanging wooden shop sign board with a dark frame, showing a simple silver sword icon; no letters."}
+        - {name: sign_armor, at: [1, 0], tiles: [1, 1], wrap: prop, align: center,
+           text: "the same kind of wooden sign board, showing a simple blue-and-silver shield icon; no letters."}
+        - {name: sign_item, at: [2, 0], tiles: [1, 1], wrap: prop, align: center,
+           text: "the same kind of wooden sign board, showing a simple green potion bottle icon; no letters."}
+        - {name: sign_white_magic, at: [3, 0], tiles: [1, 1], wrap: prop, align: center,
+           text: "the same kind of wooden sign board, showing a simple white glowing orb icon on a pale board; no letters."}
+        - {name: sign_black_magic, at: [0, 2], tiles: [1, 1], source: [20, 595, 235, 815], wrap: prop, align: center,
+           text: "the same kind of wooden sign board, showing a simple dark purple orb icon on a dark board; no letters."}
+        - {name: sign_inn, at: [1, 2], tiles: [1, 1], source: [275, 595, 490, 815], wrap: prop, align: center,
+           text: "the same kind of wooden sign board, showing a simple bed icon with a red blanket; no letters."}
+        - {name: well, at: [2, 2], tiles: [1, 1], source: [545, 575, 735, 850], wrap: prop,
+           text: "a small round grey stone well with a little wooden roof on two posts and a bucket hanging inside, as wide as the box."}
+        - {name: chimney, at: [3, 2], tiles: [1, 1], source: [810, 590, 985, 868], wrap: prop,
+           text: "a short square red-brick chimney seen in three-quarter view, standing on a roof, about half as wide as the box."}

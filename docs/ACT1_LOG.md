@@ -13,3 +13,4 @@ overworld peninsula and the Temple of Fiends, with art, maps and the castle stor
 | # | Sheet | Images | Result | Decision |
 |---|---|---|---|---|
 | 1 | town/kit_inn (E1) | 1 | two-storey timber inn, stamped whole as a prefab; door 62 px | approved by the user |
+| 2 | town/kit_signs (E2) | 1 | 6 sign boards with icons, well, chimney; Gemini drew the bottom row low, so source rects were added | self-approved |

@@ -907,7 +907,7 @@ def _cut_props(rgb: np.ndarray, sheet: dict, rects: dict, report: dict, canvas: 
         img[solid, :3] = cent[idx[solid]]
         img[solid, 3] = 255
         cx0 = c * 48 + (tw * 48 - ow) // 2
-        cy0 = r * 48 + th * 48 - oh
+        cy0 = r * 48 + (th * 48 - oh if sw.get("align", "bottom") == "bottom" else (th * 48 - oh) // 2)
         canvas[cy0:cy0 + oh, cx0:cx0 + ow] = img
         for j, row in enumerate(sw.get("parts") or [[name]]):
             for q, part in enumerate(row):
