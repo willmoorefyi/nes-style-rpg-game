@@ -5,9 +5,8 @@ import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
-import { PlayerController } from '../entities/PlayerController.js';
-import { MapTransitionSystem, arrivalFor, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
-import type { MapTransition as MapTransitionData } from '../types/index.js';
+import type { PlayerController } from '../entities/PlayerController.js';
+import { MapTransitionSystem, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { EncounterSystem } from '../systems/EncounterSystem.js';
 import { DialogBox } from '../ui/DialogBox.js';
@@ -25,7 +24,8 @@ import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
 import { FieldHUD } from '../ui/FieldHUD.js';
-import { transitionAnimation } from './exploration/TransitionEffect.js';
+import { FieldTransition } from './exploration/FieldTransition.js';
+import { createFieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
@@ -35,7 +35,6 @@ import { createFieldStateSystems, openShopScene } from './exploration/FieldSyste
 import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
-import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../core/LayoutConstants.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -71,6 +70,7 @@ export class ExplorationScene implements Scene {
   private controlsHint: ControlsHint;
   private battleFlash = new BattleFlashEffect(this.container);
   private fadeOverlay: FadeOverlay;
+  private fieldTransition: FieldTransition;
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   /** Tiles wandering NPCs never enter on this map (doors, warps, gates, entrances, the map's noWander list). */
@@ -111,6 +111,11 @@ export class ExplorationScene implements Scene {
     // Dialog must be ABOVE fade overlay so cutscene dialog is visible on black screen
     this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
+    this.fieldTransition = new FieldTransition({
+      world: this.worldContainer, fade: this.fadeOverlay, walkingMode: this.walkingMode,
+      player: () => this.player, mapData: () => this.currentMapData, loadMap: (id) => this.loadMap(id),
+      setPaused: (p) => { this.paused = p; }, redraw: () => { this.camera.update(); this.tilemap?.render(); },
+    });
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
   }
 
@@ -244,16 +249,7 @@ export class ExplorationScene implements Scene {
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
     this.tilemap = tilemap;
-    const spawnX = mapData.width > 1 ? 1 : 0;
-    const spawnY = mapData.height > 1 ? 1 : 0;
-    const leaderArt = this.placeholders.getPlayerArt(this.game.party.get(0)?.classData.id ?? 'warrior');
-    this.player = new PlayerController({
-      startX: spawnX, startY: spawnY,
-      texture: leaderArt?.texture ?? this.placeholders.getPlayerTexture(),
-      animation: leaderArt?.animation,
-      displayScale: leaderArt?.displayScale,
-      collisionMap, input: this.game.input, events: this.game.events,
-    });
+    this.player = createFieldPlayer(this.game, this.placeholders, collisionMap, mapData.width > 1 ? 1 : 0, mapData.height > 1 ? 1 : 0).player;
     this.worldContainer.addChild(this.player.animation.sprite);
     this.camera.follow(this.player);
     for (const npc of npcs) this.worldContainer.addChild(npc.sprite);
@@ -395,7 +391,7 @@ export class ExplorationScene implements Scene {
         if (transition.requiredFlag && !this.game.gameFlags.has(transition.requiredFlag)) {
           // Blocked — don't transition
         } else {
-          this.executeTransition(transition);
+          this.fieldTransition.run(transition).catch((e) => console.error('Map transition failed:', e));
           return;
         }
       }
@@ -433,61 +429,6 @@ export class ExplorationScene implements Scene {
     if (npc.shopId) {
       openShopScene(this.game, npc.shopId);
     }
-  }
-
-  private async executeTransition(transition: MapTransitionData): Promise<void> {
-    // Disembark vehicle on map transition — return to walking
-    if (this.player && this.player.currentMode.id !== 'walking') {
-      this.player.currentMode = this.walkingMode;
-    }
-
-    // CA-2: only a house or shop door zooms in; gates, stairs and edge exits fade (D3: fade out, load, fade in)
-    if (transitionAnimation(transition) === 'zoom') await this.zoomTransition(transition.x, transition.y);
-    else await this.fadeOverlay.fadeOut(300);
-    await this.loadMap(transition.targetMap);
-    if (this.player && this.currentMapData) {
-      const at = arrivalFor(transition, this.currentMapData);
-      this.player.setPosition(at.x, at.y);
-      this.camera.update();
-      this.tilemap?.render();
-    }
-    await this.fadeOverlay.fadeIn(300);
-  }
-
-  /** Zoom-into-door animation: scale up worldContainer toward the door tile while fading out */
-  private async zoomTransition(doorTileX: number, doorTileY: number): Promise<void> {
-    this.paused = true;
-    const wc = this.worldContainer;
-    // Calculate the screen-center point to zoom toward (door pixel position)
-    const centerX = -wc.x + GAME_WIDTH / 2;
-    const centerY = -wc.y + GAME_HEIGHT / 2;
-    const doorX = doorTileX * TILE_SIZE + TILE_SIZE / 2;
-    const doorY = doorTileY * TILE_SIZE + TILE_SIZE / 2;
-    // Use midpoint between camera center and door as zoom focus
-    const focusX = (centerX + doorX) / 2;
-    const focusY = (centerY + doorY) / 2;
-    const origX = wc.x;
-    const origY = wc.y;
-    // Set pivot to focus point; adjust position to compensate
-    wc.pivot.set(focusX, focusY);
-    wc.position.set(origX + focusX, origY + focusY);
-
-    const frames = 24;
-    for (let i = 1; i <= frames; i++) {
-      const t = i / frames;
-      wc.scale.set(1 + t);
-      wc.alpha = 1 - t;
-      await new Promise<void>(r => requestAnimationFrame(() => r()));
-    }
-
-    // Reset worldContainer transforms
-    wc.scale.set(1);
-    wc.alpha = 1;
-    wc.pivot.set(0, 0);
-    wc.position.set(origX, origY);
-    // Set fade overlay to black (as if fadeOut completed)
-    this.fadeOverlay.overlay.alpha = 1;
-    this.paused = false;
   }
 
   /** Find a scripted encounter at the given tile, checking flag prerequisites */

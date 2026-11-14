@@ -163,6 +163,8 @@ export class PlayerController {
   get gridX(): number { return this.tileX; }
   get gridY(): number { return this.tileY; }
   get direction(): Direction { return this.animation.direction; }
+  /** Turn to `dir` without moving (a cutscene warp's arrival facing, T2). */
+  face(dir: Direction): void { this.animation.setDirection(dir); }
   get isMoving(): boolean { return this.state === 'moving'; }
   /** The tile being stepped onto (the current tile when idle). */
   get targetTile(): { x: number; y: number } { return { x: this.targetX, y: this.targetY }; }
