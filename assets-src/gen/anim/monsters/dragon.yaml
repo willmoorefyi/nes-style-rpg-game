@@ -156,10 +156,7 @@ frames:
     moves: [back, chest, neck, head, snout]
     tweaks: {hip: [-4, 10], back: [-4, 10], chest: [-4, 10], neck: [-4, 10], head: [-4, 10], snout: [-4, 10], tail0: [-4, 10], wr_n: [0, 14], wt_n: [0, 14], sh_n: [-4, 10], el_n: [-4, 10], paw_n: [-4, 10], ftoe_n: [-4, 10], hip_n: [-4, 7], hip_f: [-4, 7], knee_n: [-4, 7], knee_f: [-4, 7], foot_n: [-4, 0], foot_f: [-4, 0], toe_n: [-4, 0], toe_f: [-4, 0], tail1: [-4, 5], tail2: [-4, 0], tail3: [-4, 0], tail_tip: [-4, 0]}
 holds: []
-paint:                         # outline ink in the 1 px leg-joint cracks the crack fill leaves open (art gaps between thigh / shin / paw)
-  - {frame: atk_wind1, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
-  - {frame: atk_wind2, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
-  - {frame: atk_recover, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
+paint:                         # outline ink: a 1 px neck/head crack (follow, hurt_in2) and the pocket the rear opens between far thigh and belly (hurt_in1)
   - {frame: atk_follow, xy: [[91, 83]], rgb: [6, 4, 10]}
-  - {frame: hurt_in1, xy: [[85, 95], [75, 103], [50, 113], [65, 115], [64, 101], [63, 102], [64, 102], [64, 103], [65, 104], [65, 105], [66, 106], [66, 107], [67, 107], [67, 108]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[64, 101], [63, 102], [64, 102], [64, 103], [65, 104], [65, 105], [66, 106], [66, 107], [67, 107], [67, 108]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[80, 43], [79, 45]], rgb: [6, 4, 10]}
