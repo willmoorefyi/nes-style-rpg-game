@@ -7,14 +7,13 @@ import { NameEntryGrid, uniqueDefaultName } from '../ui/NameEntryGrid.js';
 import { DEFAULT_NAMES, buildClassPreview, buildPartySummary, buildSlotDisplay } from './partyCreation/PartyCreationViews.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { Character } from '../entities/Character.js';
+import { STARTING_GOLD } from '../entities/PartyManager.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { CutsceneManager, type CutsceneScript } from '../systems/CutsceneManager.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { DialogBox } from '../ui/DialogBox.js';
 import { DialogManager } from '../systems/DialogManager.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
-
-const STARTING_GOLD = 100;
 
 export class PartyCreationScene implements Scene {
   readonly container = new Container();

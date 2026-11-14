@@ -3,15 +3,14 @@ import { ItemEffects } from '../ItemEffects.js';
 import { ItemRegistry } from '../../data/ItemRegistry.js';
 import { Character } from '../../entities/Character.js';
 import { Inventory } from '../../entities/Inventory.js';
-import type { CharacterClassData } from '../../types/index.js';
 import type { DataLoader } from '../../core/DataLoader.js';
+import { testMageClass } from '../../../tests/helpers/testUtils.js';
 
-const mockClass: CharacterClassData = {
-  id: 'warrior', name: 'Warrior',
+// a caster (Ether needs a charge table: a class without one has no charges to restore)
+const mockClass = testMageClass('black_mage', {
   baseStats: { hp: 100, strength: 10, agility: 5, intelligence: 3, vitality: 8, luck: 5 },
   statGrowth: { hp: 10, strength: 2, agility: 1, intelligence: 0, vitality: 1, luck: 1 },
-  usableEquipment: [], spellLevels: { white: 0, black: 0 },
-};
+});
 
 const mockItems = [
   { id: 'potion', name: 'Potion', type: 'consumable' as const, stats: { hp: 30 }, price: 60, usableBy: [] },

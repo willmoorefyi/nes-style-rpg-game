@@ -7,12 +7,10 @@ import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import type { Character } from '../entities/Character.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import { buySpell } from '../systems/SpellPurchase.js';
+import { buySpell, spellPrice } from '../systems/SpellPurchase.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type State = 'spells' | 'character' | 'slot';
-
-const SPELL_PRICE_BASE = 100;
 
 export class MagicShopScene implements Scene {
   readonly container = new Container();
@@ -66,18 +64,14 @@ export class MagicShopScene implements Scene {
     this.goldText.text = `Gold: ${this.game.party.gold}`;
   }
 
-  private getSpellPrice(spell: SpellData): number {
-    return SPELL_PRICE_BASE * spell.level;
-  }
-
   private showSpellMenu(): void {
     this.state = 'spells';
     this.clearMenus();
 
     const items: MenuItem[] = this.spells.map(s => ({
-      label: `${s.name} L${s.level} ${this.getSpellPrice(s)}G`,
+      label: `${s.name} L${s.level} ${spellPrice(s)}G`,
       value: s.id,
-      enabled: this.game.party.gold >= this.getSpellPrice(s)
+      enabled: this.game.party.gold >= spellPrice(s)
     }));
 
     this.spellMenu = new Menu({
@@ -174,7 +168,7 @@ export class MagicShopScene implements Scene {
   private confirmPurchase(): void {
     const spell = this.selectedSpell!;
     // gold is taken only after learnSpell succeeds
-    const result = buySpell(this.game.party, this.selectedMember!, spell, this.getSpellPrice(spell));
+    const result = buySpell(this.game.party, this.selectedMember!, spell, spellPrice(spell));
     if (!result.ok) {
       this.showMessage(result.message);
       return;

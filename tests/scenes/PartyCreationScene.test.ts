@@ -1,6 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Character } from '../../src/entities/Character.js';
-import { PartyManager } from '../../src/entities/PartyManager.js';
+import { PartyManager, STARTING_GOLD } from '../../src/entities/PartyManager.js';
+import { PartyCreationScene } from '../../src/scenes/PartyCreationScene.js';
+import { GameFlags } from '../../src/core/GameFlags.js';
+import type { Game } from '../../src/core/Game.js';
+import { loadRealRegistries, tapInput } from '../helpers/realData.js';
 import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import type { CharacterClassData } from '../../src/types/index.js';
 import type { DataLoader } from '../../src/core/DataLoader.js';
@@ -13,8 +17,6 @@ const DEFAULT_NAMES: Record<string, string> = {
   black_mage: 'B.MAG',
   red_mage: 'R.MAG',
 };
-
-const STARTING_GOLD = 100;
 
 const mockClasses: CharacterClassData[] = [
   {
@@ -147,13 +149,26 @@ describe('PartyCreationScene business logic', () => {
   });
 
   describe('starting gold', () => {
-    it('sets party gold to 100 after creation', () => {
-      const cls = ClassRegistry.getClass('warrior')!;
-      for (let i = 0; i < 4; i++) {
-        party.add(new Character({ name: 'FGHTR', classData: cls }));
-      }
-      party.addGold(STARTING_GOLD);
-      expect(party.gold).toBe(100);
+    it('Begin Adventure gives the new party 400 gold (FF1, NG-5)', async () => {
+      await loadRealRegistries();
+      vi.stubGlobal('requestAnimationFrame', () => 0); // the opening fade never needs to finish
+      const input = tapInput();
+      const realParty = new PartyManager();
+      const game = {
+        input,
+        events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
+        scenes: { switchTo: vi.fn() },
+        resetState: vi.fn(),
+        gameFlags: new GameFlags(),
+        party: realParty,
+      };
+      const scene = new PartyCreationScene(game as unknown as Game);
+      scene.enter();
+      for (let i = 0; i < 9; i++) input.tap('confirm', () => scene.update(1)); // 4 x (Warrior, End), Begin
+      expect(realParty.size).toBe(4);
+      expect(STARTING_GOLD).toBe(400);
+      expect(realParty.gold).toBe(400);
+      vi.unstubAllGlobals();
     });
 
     it('party starts with 0 gold before creation', () => {

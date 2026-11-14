@@ -4,6 +4,8 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { StatusTracker, type StatusEffect } from '../battle/StatusEffects.js';
 import { slotOf } from './EquipmentRules.js';
 import { maxChargesFor, SPELL_LEVELS } from './SpellCharges.js';
+import { levelForXp, MAX_LEVEL, xpToReach } from './ExperienceTable.js';
+import { partyAttack } from '../battle/CombatStats.js';
 
 export interface CharacterData {
   name: string;
@@ -12,18 +14,6 @@ export interface CharacterData {
   xp?: number;
   currentHp?: number;
 }
-
-// XP required to reach each level (index = level).
-// Curve: exponential ~1.25x per level, tuned to match design doc §7 targets:
-//   Lv1=0, Lv10≈10,000, Lv20≈50,000, Lv30≈150,000, Lv50≈500,000
-const XP_THRESHOLDS: number[] = (() => {
-  const table = [0]; // Lv1 = 0 XP
-  for (let lvl = 2; lvl <= 50; lvl++) {
-    // Base formula: 25 * lvl^2.6 produces a smooth exponential curve
-    table.push(Math.floor(25 * Math.pow(lvl, 2.6)));
-  }
-  return table;
-})();
 
 export class Character {
   readonly name: string;
@@ -83,20 +73,11 @@ export class Character {
 
   get maxHp(): number { return this.baseStats.hp; }
 
+  /** `attack` is the battle number (FF1 `partyAttack`); `defense` is the armour sum plus buffs. */
   get stats(): StatBlock & { attack: number; defense: number } {
-    const base = this.baseStats;
-    let attack = base.strength;
-    let defense = 0;
-    for (const item of this.equipment.values()) {
-      if (item?.stats) {
-        attack += item.stats.attack ?? 0;
-        defense += item.stats.defense ?? 0;
-      }
-    }
-    // Apply battle-only buffs (cleared on battle end)
-    attack += this.getBuffAmount('attack');
-    defense += this.getBuffAmount('defense');
-    return { ...base, attack, defense };
+    let defense = this.getBuffAmount('defense');
+    for (const item of this.equipment.values()) defense += item?.stats?.defense ?? 0;
+    return { ...this.baseStats, attack: partyAttack(this), defense };
   }
 
   getEquipped(slot: EquipmentSlot): ItemData | null {
@@ -132,12 +113,14 @@ export class Character {
     this._xp += amount;
     let leveledUp = false;
     const maxBefore = this.maxChargeList();
-    while (this._level < 50 && this._xp >= this.xpForNextLevel()) {
+    const hpBefore = this.maxHp;
+    while (this._level < MAX_LEVEL && this._xp >= this.xpForNextLevel()) {
       this._level++;
       leveledUp = true;
-      this._currentHp = this.maxHp;
     }
     if (leveledUp) {
+      // FF1: a level-up adds the max-HP gain, it doesn't heal fully (a KO'd member stays down)
+      if (this._currentHp > 0) this.currentHp = this._currentHp + this.maxHp - hpBefore;
       // current charges rise by however much the max rose
       const maxAfter = this.maxChargeList();
       for (let i = 0; i < SPELL_LEVELS; i++) {
@@ -147,9 +130,9 @@ export class Character {
     return leveledUp;
   }
 
+  /** Total XP to reach the next level (FF1 table). */
   xpForNextLevel(): number {
-    if (this._level >= 50) return Infinity;
-    return XP_THRESHOLDS[this._level] ?? Infinity;
+    return xpToReach(this._level + 1);
   }
 
   getSpellCharges(level: number): number {
@@ -199,7 +182,7 @@ export class Character {
   }
 
   getMaxCharges(level: number): number {
-    return maxChargesFor(this._level, level);
+    return maxChargesFor(this._classData, this._level, level);
   }
 
   private maxChargeList(): number[] {
@@ -250,14 +233,15 @@ export class Character {
     const classData = ClassRegistry.getClass(data.classId);
     if (!classData) return null;
     
+    // a save from the old, steeper XP curve may hold enough XP for a higher level: never lower it
     const char = new Character({
       name: data.name,
       classData,
-      level: data.level,
+      level: Math.max(data.level, levelForXp(data.xp)),
       xp: data.xp,
       currentHp: data.currentHp,
     });
-    
+
     // Restore equipment
     for (const [slot, itemId] of Object.entries(data.equipment)) {
       if (itemId) {
@@ -270,10 +254,11 @@ export class Character {
     for (const { spellId, level } of data.learnedSpells) {
       char.learnSpell(spellId, level);
     }
-    for (let i = 0; i < data.spellCharges.length; i++) {
-      char.spellCharges[i] = data.spellCharges[i];
+    // the save wins, clamped to this class's table (pre-T4 saves used one table for every class)
+    for (let i = 0; i < Math.min(data.spellCharges.length, SPELL_LEVELS); i++) {
+      char.spellCharges[i] = Math.max(0, Math.min(data.spellCharges[i], char.getMaxCharges(i + 1)));
     }
-    
+
     // Restore status effects
     if (data.statusEffects) {
       for (const { effect, duration } of data.statusEffects) {

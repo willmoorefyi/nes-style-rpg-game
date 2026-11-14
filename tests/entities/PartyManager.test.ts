@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PartyManager } from '../../src/entities/PartyManager.js';
+import { PartyManager, STARTING_GOLD } from '../../src/entities/PartyManager.js';
 import { Character } from '../../src/entities/Character.js';
 import type { CharacterClassData } from '../../src/types/index.js';
 
@@ -92,6 +92,10 @@ describe('PartyManager', () => {
     const json = party.toJSON() as { members: unknown[]; gold: number };
     expect(json.members.length).toBe(1);
     expect((json.members[0] as Record<string, unknown>).name).toBe('Hero');
+  });
+
+  it('a new game starts with FF1\'s 400 gold (NG-5)', () => {
+    expect(STARTING_GOLD).toBe(400);
   });
 
   it('starts with 0 gold', () => {

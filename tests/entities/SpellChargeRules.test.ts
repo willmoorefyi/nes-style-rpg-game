@@ -4,6 +4,7 @@ import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import { SpellRegistry } from '../../src/data/SpellRegistry.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { buySpell } from '../../src/systems/SpellPurchase.js';
+import { maxChargesFor } from '../../src/entities/SpellCharges.js';
 import { loadRealRegistries } from '../helpers/realData.js';
 
 beforeAll(loadRealRegistries);
@@ -61,6 +62,54 @@ describe('NG-4: spell charges', () => {
     mage.useCharge(1);
     const loaded = Character.fromJSON(mage.toJSON())!;
     expect(loaded.getSpellCharges(1)).toBe(mage.getMaxCharges(1) - 1);
+  });
+});
+
+describe('NG-4: per-class charge tables (FF1, T4 §1.4)', () => {
+  const at = (classId: string, level: number) => {
+    const c = new Character({ name: 'X', classData: ClassRegistry.getClass(classId)!, level });
+    return [1, 2, 3, 4, 5, 6, 7, 8].map((l) => c.getMaxCharges(l));
+  };
+
+  it('Black Mage Lv1 has [2], Lv3 [3,1]', () => {
+    expect(at('black_mage', 1)).toEqual([2, 0, 0, 0, 0, 0, 0, 0]);
+    expect(at('black_mage', 3)).toEqual([3, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('Red Mage Lv3 has [3,0]: its second spell level opens later', () => {
+    expect(at('red_mage', 3)).toEqual([3, 0, 0, 0, 0, 0, 0, 0]);
+    expect(at('red_mage', 4)).toEqual([3, 1, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('a class with no spells has no charges', () => {
+    for (const id of ['warrior', 'thief', 'monk', 'master']) expect(at(id, 1)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(at('warrior', 30)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('a value holds until the next breakpoint; the cap is 9', () => {
+    expect(at('white_mage', 12)).toEqual(at('white_mage', 11));
+    expect(at('black_mage', 50)).toEqual([9, 9, 9, 9, 9, 9, 9, 9]);
+    expect(at('knight', 9)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(at('knight', 10)).toEqual([1, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('after a class upgrade the new class\'s table applies', () => {
+    const w = new Character({ name: 'FGHTR', classData: ClassRegistry.getClass('warrior')!, level: 15 });
+    expect(w.getMaxCharges(1)).toBe(0);
+    w.upgrade(ClassRegistry.getClass('knight')!);
+    expect([w.getMaxCharges(1), w.getMaxCharges(2)]).toEqual([2, 1]);
+  });
+
+  it('a class without the field has none (maxChargesFor)', () => {
+    const cls = { ...ClassRegistry.getClass('black_mage')!, spellCharges: undefined };
+    expect(maxChargesFor(cls, 10, 1)).toBe(0);
+    expect(maxChargesFor(ClassRegistry.getClass('black_mage')!, 10, 9)).toBe(0);
+  });
+
+  it('a saved charge of 5 at Lv1 loads as 2', () => {
+    const save = { ...blackMage().toJSON(), spellCharges: [5, 3, 0, 0, 0, 0, 0, 0] };
+    const loaded = Character.fromJSON(save)!;
+    expect([loaded.getSpellCharges(1), loaded.getSpellCharges(2)]).toEqual([2, 0]);
   });
 });
 

@@ -110,6 +110,24 @@ export function testClass(id = 'warrior', overrides: Partial<CharacterClassData>
   };
 }
 
+/** The first rows of FF1's White/Black Mage charge table (fix plan T4 §1.4): Lv1 [2], Lv2 [3], Lv3 [3,1]... */
+export const TEST_MAGE_CHARGES: Array<[number, number[]]> = [
+  [1, [2]], [2, [3]], [3, [3, 1]], [4, [4, 2]], [5, [4, 2, 1]], [6, [5, 3, 2]], [7, [5, 3, 2, 1]],
+];
+
+/** Shared synthetic caster: `testClass` with a mage's stats and `TEST_MAGE_CHARGES`. */
+export function testMageClass(id = 'black_mage', overrides: Partial<CharacterClassData> = {}): CharacterClassData {
+  return testClass(id, {
+    baseStats: { hp: 25, strength: 3, agility: 10, intelligence: 20, vitality: 2, luck: 10 },
+    statGrowth: { hp: 6, strength: 1, agility: 2, intelligence: 4, vitality: 1, luck: 1 },
+    spellLevels: { white: 0, black: 7 },
+    hitPercent: { base: 5, growth: 1 },
+    magicDefense: { base: 20, growth: 2 },
+    spellCharges: TEST_MAGE_CHARGES,
+    ...overrides,
+  });
+}
+
 /** Shared synthetic enemy (an FF1 IMP-like Goblin by default); `stats` merges with the defaults. */
 export function testEnemy(overrides: Partial<Omit<EnemyData, 'stats'>> & { stats?: Partial<EnemyData['stats']> } = {}): EnemyData {
   const { stats, ...rest } = overrides;

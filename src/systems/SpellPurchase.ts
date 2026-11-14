@@ -1,6 +1,20 @@
 import type { Character } from '../entities/Character.js';
 import type { SpellData } from '../types/index.js';
 
+/** FF1 spell prices by spell level 1-8 (fix plan T4 §2.2). */
+export const SPELL_PRICE_BY_LEVEL: readonly number[] = [100, 400, 1500, 4000, 8000, 20000, 45000, 60000];
+
+/** A spell's shop price: its own `price` when set, else the FF1 per-level price. */
+export function spellPrice(spell: SpellData): number {
+  if (spell.price !== undefined) return spell.price;
+  const byLevel = SPELL_PRICE_BY_LEVEL[spell.level - 1];
+  if (byLevel === undefined) {
+    console.warn(`spellPrice: ${spell.id} has no price for spell level ${spell.level}`);
+    return SPELL_PRICE_BY_LEVEL[SPELL_PRICE_BY_LEVEL.length - 1];
+  }
+  return byLevel;
+}
+
 export interface SpellPurse {
   readonly gold: number;
   spendGold(amount: number): boolean;

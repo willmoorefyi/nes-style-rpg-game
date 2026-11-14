@@ -5,7 +5,8 @@ import { GameFlags } from '../core/GameFlags.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
-const SAVE_VERSION = 1;
+/** Unchanged by T4: old saves load through `Character.fromJSON`, which clamps charges and recomputes the level. */
+export const SAVE_VERSION = 1;
 
 export interface SlotSummary {
   level: number;

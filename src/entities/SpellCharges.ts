@@ -1,32 +1,23 @@
+import type { CharacterClassData } from '../types/index.js';
+
 /**
- * Spell charge table per design doc §5: max charges per spell level (1-8) for a character level.
- * Interpolated linearly between the breakpoints. (T4 replaces this with FF1's per-class numbers.)
+ * Per-class spell charges (FF1-style, fix plan T4 §1.4, NG-4). A class's `spellCharges` holds step
+ * breakpoints `[[level, [l1..l8]], ...]`: each row holds from its level until the next breakpoint,
+ * missing spell levels in a row are 0, and a class without the field (or below its first row) has none.
  */
-const BREAKPOINTS: Array<[number, number[]]> = [
-  [1,  [2, 0, 0, 0, 0, 0, 0, 0]],
-  [5,  [4, 2, 1, 0, 0, 0, 0, 0]],
-  [10, [5, 4, 3, 2, 1, 0, 0, 0]],
-  [20, [7, 6, 5, 5, 4, 3, 2, 1]],
-  [50, [9, 9, 9, 9, 9, 9, 9, 9]],
-];
-
 export const SPELL_LEVELS = 8;
+export const MAX_CHARGES = 9;
 
-/** Max charges at `spellLevel` (1-8) for a character at `charLevel`. */
-export function maxChargesFor(charLevel: number, spellLevel: number): number {
+/** Max charges at `spellLevel` (1-8) for a `classData` character at `charLevel`. */
+export function maxChargesFor(classData: CharacterClassData, charLevel: number, spellLevel: number): number {
   if (spellLevel < 1 || spellLevel > SPELL_LEVELS) return 0;
-  const idx = spellLevel - 1;
-  const first = BREAKPOINTS[0];
-  const last = BREAKPOINTS[BREAKPOINTS.length - 1];
-  if (charLevel <= first[0]) return first[1][idx];
-  if (charLevel >= last[0]) return last[1][idx];
-  for (let i = 0; i < BREAKPOINTS.length - 1; i++) {
-    const [loLvl, loCharges] = BREAKPOINTS[i];
-    const [hiLvl, hiCharges] = BREAKPOINTS[i + 1];
-    if (charLevel >= loLvl && charLevel <= hiLvl) {
-      const t = (charLevel - loLvl) / (hiLvl - loLvl);
-      return Math.min(9, Math.floor(loCharges[idx] + t * (hiCharges[idx] - loCharges[idx])));
+  let row: number[] | undefined;
+  let rowLevel = -Infinity;
+  for (const [level, charges] of classData.spellCharges ?? []) {
+    if (level <= charLevel && level >= rowLevel) {
+      row = charges;
+      rowLevel = level;
     }
   }
-  return 0;
+  return Math.min(MAX_CHARGES, row?.[spellLevel - 1] ?? 0);
 }

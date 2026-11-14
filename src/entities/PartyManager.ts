@@ -2,6 +2,9 @@ import { Character } from './Character.js';
 import type { CharacterSaveData } from '../types/index.js';
 import { xpShare } from '../battle/Rewards.js';
 
+/** Gold a new party starts with (FF1: 400, NG-5). */
+export const STARTING_GOLD = 400;
+
 export class PartyManager {
   private members: Character[] = [];
   private _gold = 0;
