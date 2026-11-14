@@ -2819,3 +2819,814 @@ Integration fixes: a seeded defeat-flow test (`9520c50`), and the review fixes b
 2. **Document** every finding in a new issue file, `docs/PLAYTEST_PENINSULA_2_<date>.md`.
 3. **Plan** a fix for each issue; momus validates the plan.
 4. **Implement** the fixes, validating each through tests and real gameplay in the browser, and commit tranche by tranche.
+
+## R: Second-pass remediation
+
+**Base:** `mainline` at `b202acd` (T6 merged, plus the second-playtest doc). All file:line references are to that commit.
+
+**Inputs:**
+- `docs/PLAYTEST_PENINSULA_2_2026-11-14.md`: 75 items (2 M, 33 m, 40 p) and its binding "Triage defaults" (B1's tougher Garland with talk-to-fight and a 3-wide trigger; every M and m fixed, cheap p items fixed; paid art only within budget; T2 warps the party to Cornelia Castle after the princess speaks);
+- the evidence in `/tmp/playtest2/{browser,town,overworld,systems}/`, including the throwaway tests `reentry-race`, `transition-control`, `battle-edges` and `inventory-cap` (`systems/`) and `enc.test.ts` (`overworld/`);
+- research sims for this plan in `/tmp/r-plan/` (Garland, temple, pacing, route encounters, the shoreline composite prototype).
+
+**Rules (as T1–T6):**
+- Edit generators and sources, never `assets/maps/ai/**` by hand; the integration branch rebuilds every map once after the last merge, and a second run gives no diff.
+- Every code fix gets a test that fails on the old code.
+- Browser checks use `http://127.0.0.1:5173/?mute=1&…` (never without `mute=1`), with 0 console errors; close the page and stop the dev server afterwards. Below, `?mute=1&scenario=<id>` is short for `http://127.0.0.1:5173/?mute=1&scenario=<id>`. Battle scenarios start from **Debug** on the title. Until S6 lands, a debug battle softlocks at its end, so reload between tries.
+- Paid art follows `docs/ART_ROLLOUT.md` "Per-checkpoint procedure" (dry run, one paid request per checkpoint, at most 2 retries per sheet, approved sheets never modified).
+- Files stay under 250 lines (the monitored exceptions must not grow: `ExplorationScene.ts` 601, `BattleScene.ts` 594, `BattleStateMachine.ts` 592; `PartyCreationScene.ts` is 291 and is split in R3).
+
+---
+
+### 1. Coverage
+
+| Items | Sub-tranche |
+|---|---|
+| S1, S2, S3, S6, I1, I2, I3 (field and menus), M12, T2 (`warp` step), E10 (sprite), W4 (counter), and the runtime halves of T1, B1 (talk), E1 (chests), N2 (`backdrop`) | R1 |
+| B1 (stats, phase), B2–B14, I3 (battle SFX) | R2 |
+| E1–E9, E10 (cursor), N1, S4, S5, N2 (opening runtime) | R3 |
+| T2 (cutscene data), T3–T6, M1–M10, M13, N2 (text), W15 | R4a |
+| T1 (data), M11, W1–W14, B1 (map), B9 (rate and table) | R4b |
+| W1 (art), W8 / W15 (paid fallbacks), M7 (gates and signs sheet) | R5 |
+
+All 75 items are covered. S4 and S5 move to R3 because both touch `SaveScene.ts`; W15 moves to R4a because R4a already rebuilds `characters-ai` and owns `gen/selftest.py` (M6). Won't-fix or deferred: the temple's size (W13, FF1 parity), new act-1 species (W5), the `river`, `swamp` and `waterfall` backdrops (same flaw as B14; recorded).
+
+---
+
+### 2. Shared contract (R0, one commit on `r-integration` before any branch)
+
+So that no two sub-tranches edit the same file, these land first. Tests and build pass; no behaviour change except where noted.
+
+1. **`src/systems/CutsceneManager.ts` (types only):** export `CutsceneWarp = { map: string; entrance?: string; x?: number; y?: number; facing?: 'up' | 'down' | 'left' | 'right' }`; `CutsceneStep.type` adds `'warp' | 'backdrop'`, with the optional `map`, `entrance`, `x`, `y`, `facing` and `image?: string | null`. A warp needs `map` and either `entrance` or both `x` and `y`. Update the step list in the `cutscenes.yaml` header comment (line 3).
+2. **`src/types/index.ts:352`:** `KeyItemGate.message: string | ConditionalDialog[]` (T1); `schemaValidation.ts` accepts either.
+3. **`src/types/index.ts:254-262`:** `ScriptedEncounter.npc?: string` ("talking to this NPC on the same map starts the encounter", B1); `validateMapData` (`schemaValidation.ts:176`) checks it is a string naming an `npcs[].id` of that map.
+4. **`src/entities/Inventory.ts`:** `static readonly MAX_QUANTITY = 99`, `space(id)`, `canAdd(id, qty = 1)`; `add` returns the number actually added (E1; no caller breaks). Test in `tests/entities/Inventory.test.ts`. R3 owns the file afterwards.
+5. **Save summary (S5):** `SaveData.location?: string` (`types/index.ts:370-380`); `SaveManager.save(…, playTime, location?)` writes it (`SAVE_VERSION` stays 1); `SlotSummary` gains `location` (`data.location ?? mapIdLabel(data.currentMap)`, title-casing the `-`-split words and upper-casing `/^\d+f$|^b\d$/`), `members: Array<{ name; classId; level; currentHp }>` and `gold`; `level`, `partyLeader` and `saveDate` stay. Tests: `SaveManager.test.ts` (new fields), `SaveCompatT4.test.ts` (an old save gives `location === 'Cornelia'`).
+6. **`src/types/index.ts:62-66` `BossPhase`:** `hits?: number; attack?: number` (overrides applied when the phase is crossed, B1); `validateEnemyData` (`schemaValidation.ts:104-119`) checks `bossPhases` entries (number `hpThreshold` in (0, 1], string `patternId`, optional string `message`, optional numbers `hits`, `attack`).
+7. **Map pipeline:** `build_map.py` `RECOLOR` (`:219`) adds `"pale_stone": (10, 0.45, 1.45)` (R4b tunes it) and `"bright": (0, 1.0, 1.2)`. `kit.py` `_PARTS` gets placeholders for `temple_ruin_{0,1}_{0,1}`, `temple_ruin3_{0,1}_{0,1,2}`, `bridge_gap_stone_{0,1}_{0,1}`, `gate_arch_3_{0,1}_{0..2}`, `gate_arch_2_{0,1}_{0,1}`, `gate_side_{0,1}_{0,1}`, `sign_tavern`, `sign_shrine`, so the map tranches compile before the art lands.
+8. **`src/core/EventBus.ts` `GameEvents`:** `partyHealed: Record<string, never>` (T2).
+9. **`src/ui/Menu.ts`:** `setActive(active: boolean)` and `get isActive`; an inactive menu draws its ▶ grey (0x808080) and skips `update()` (E3). R1 owns the file afterwards (I2).
+10. **`src/ui/uiSounds.ts` (new):** `setUiEventBus(bus)` / `uiEventBus()`; nothing calls it yet. R1 wires `Menu` and `Game.init`; R3 wires `NameEntryGrid` (I3).
+11. **`src/systems/DebugScenarioLoader.ts`:** `flags?: string[]` (set right after `resetState()`) and `party[].status?: string[]` (applied with `statusTracker.apply`). R1 owns the file afterwards.
+12. **`src/systems/ItemEffects.ts:113, 130`:** present tense, "recovers N HP" and "is revived" (B4); update `src/systems/__tests__/ItemEffects.test.ts:103, 106-113` and `tests/scenes/ItemMenuScene.test.ts:91`.
+13. **`assets/data/debug-scenarios.yaml`:** every new scenario below, plus the comment at `:236-237` (`t4_garland_l1_naked`: "240 HP Garland: no gear never wins"). `DebugScenarioField.test.ts:47` checks that field spawns are walkable; scenarios whose spawn depends on a map change (`r_garland`, `r_temple_garland`) are re-checked after the integration rebuild. "Start kit", "full kit" and the parties are the existing `t4_*` lines.
+
+| id | mode | map / spawn or entrance | party, items, flags | used by |
+|---|---|---|---|---|
+| `r_garland` | field | `temple-of-fiends` [11,7] | the four `t4_garland_l3_full` lines at Lv 20, `potion: 3` | T2, B1 |
+| `r_temple_garland` | field | `temple-of-fiends` [11,8] | `t4_garland_l2_start` party, `potion: 3` | B1 |
+| `r_temple_party` | field | `temple-of-fiends`, entrance `entry` | as above | B9 |
+| `r_garland_l2_full` | battle | `background: temple` | `t4_garland_l3_full` at Lv 2, `potion: 3`; `[garland]` | B1 |
+| `r_one_potion` | battle | grassland | `t4_fields_l1` party at Lv 2, FGHTR hp 10, THIEF hp 8; `potion: 1`; 2 goblins | B5 |
+| `r_same_names` | battle | grassland | warrior, thief, white_mage, black_mage Lv 2, all named ROLF; 3 wolves | B6 |
+| `r_temple_pack` | battle | temple | `t4_garland_l2_start` party, `potion: 2`; 4 skeletons | B9 |
+| `r_heal_fog` | battle | grassland | FGHTR hp 1, THIEF hp 24, W.MAG with `cure`, `fog`, B.MAG; 3 wolves | B4 |
+| `r_mute_dark` | battle | temple | Lv 5; W.MAG `cure`, `mute`; B.MAG `fire`, `dark`; lich (`enemyAi`: ice) + wolf | B8 |
+| `r_shoreline_nine` | battle | `shoreline` | `t4_nine` party; 6 goblins, 3 wolves | B14 |
+| `r_cap` | field | `cornelia-item-shop`, `door` | FGHTR Lv 3 with a rapier; `potion: 99, antidote: 95, rapier: 99`; 5000 G | E1 |
+| `r_cap_chest` | field | `cornelia-house-fisher`, `door` | FGHTR; `potion: 99` | E1 |
+| `r_shops` | field | `cornelia-weapon-shop`, `door` | warrior, thief, W.MAG, B.MAG Lv 2 (no Monk); `wooden_shield: 2, rapier: 2, chain_mail: 1, potion: 2`; 2000 G | E2, E3, E5 |
+| `r_magic` | field | `cornelia-white-magic`, `door` | W.MAG knows `cure`; R.MAG with three L1 spells; FGHTR; 3000 G | E4 |
+| `r_tent` | field | `overworld`, `cornelia` | hurt party (THIEF hp 0); `potion: 3, tent: 2, cabin: 1, phoenix_down: 1, rapier: 1, lute: 1` | E6, E7 |
+| `r_menus` | field | `cornelia`, `inn` | warrior Lv 4 (iron sword, chain mail, shield, cap), unarmoured Monk Lv 5, W.MAG with `status: [poison]`, B.MAG | E8, E9, E10, S4, S5 |
+| `r_castle_rescued` | field | `cornelia-castle-2f` [21,10] | `act1_castle` party; flags GARLAND_DEFEATED, PRINCESS_RESCUED | T4, T6 |
+| `r_castle_after_intro` | field | `cornelia-castle`, `gate` | + GOT_LUTE, INTRO_COMPLETE | T6 |
+| `r_castle_1f_gallery` | field | `cornelia-castle` [28,4] | `act1_castle` party | M2 |
+| `r_town_rescued` | field | `cornelia`, `castle` | the rescued flags | T5, T6, M1, M7, M9 |
+| `r_town_after_intro` | field | `cornelia`, `castle` | all four flags | T5 |
+| `r_overworld_after_intro` | field | `overworld`, `cornelia_north` | all four flags | T1 |
+| `r_item_shop`, `r_black_magic`, `r_weapon_shop`, `r_inn`, `r_shrine`, `r_house_fisher`, `r_house_farm`, `r_house_knight` | field | each interior, `door` | `act1_castle` party | M3–M10, T6 |
+| `r_cellar`, `r_tower` | field | `cornelia-castle-cellar`, `cornelia-castle-tower`, `stairs` | `act1_castle` party | M6, M9, M10, M13 |
+| `r_ow_temple`, `r_ow_bridge`, `r_ow_east` | field | `overworld` [15,42], [29,34], [48,46] | warrior Lv 9 (iron sword, chain mail) | W1, W5, W7, W8, W11, W12, W14 |
+
+---
+### R1: engine, scenes, input, audio
+
+**Size rule first.** `ExplorationScene.ts` is 601 lines (a monitored exception) and R1 must not grow it. The first R1 commit moves `executeTransition` and `zoomTransition` (`:438-491`) into `src/scenes/exploration/FieldTransition.ts`, and the player construction in `loadMap` (`:247-262`) into `src/scenes/exploration/FieldPlayer.ts` (`createFieldPlayer(game, placeholders, collisionMap, x, y, facing?)`). Existing tests pass unchanged after that commit. This frees about 70 lines for S1/S2, T2 and E10.
+
+#### S1: Load and Continue put you on a stale tile
+- **Root cause:**
+  - `SceneManager.switchTo` makes the next scene current and adds it to the stage before `await next.enter()` (`SceneManager.ts:55-58`); `push` does the same (`:70-73`).
+  - The ticker's `scenes.update()` (`:93-95`, from `Game.ts:92`) therefore runs the reused `ExplorationScene` while `enter()` is still loading (`ExplorationScene.ts:148-155`).
+  - `resetForEnter()` (`:129-144`) keeps the previous map's `this.player`, and `update()` writes its tile into `game.playerPosition` (`:340`).
+  - `enter()` then trusts the overwritten value in `safeSpawn(map, this.game.playerPosition)` (`:160`).
+- **Fix:**
+  - `SceneManager` keeps `private transitions = 0`. `switchTo`, `push` and `pop` increment it before their first `await` and decrement it in a `finally`; `update()` returns while it is > 0. No scene is updated until its `enter()` has resolved (only `ExplorationScene.enter` is async today).
+  - In the scene: a `private loading` flag, set in `resetForEnter()` and cleared at the end of `enter()` just before `fadeInOnEnter()`; `update()` returns while it is set. `resetForEnter()` also sets `this.player = null`.
+- **Test:**
+  - `tests/scenes/ExplorationReentry.test.ts` (new): port `/tmp/playtest2/systems/reentry-race.test.ts` case 1, typed with `createMockGame` and a real `EventBus` (no `as any`). Hold `data.loadMap` on a deferred, call `scene.update(1)` once, release; `playerPosition` equals the saved (2,3). Old code gives (7,7).
+  - `tests/core/SceneManager.test.ts`: "update is not forwarded while enter() is pending" (a scene whose `enter` awaits a deferred). Old code forwards it.
+- **Browser:**
+  - `?mute=1&scenario=act1_castle`: Menu > Save > slot 1 on the arrival tile, walk 6 tiles, Menu > Load > slot 1. The hero stands on the saved tile.
+  - Reload `http://127.0.0.1:5173/?mute=1`, Title > Continue > slot 1: the same tile. 0 console errors.
+
+#### S2: Input is live while the field loads or a transition runs
+- **Root cause:**
+  - The cancel check (`ExplorationScene.ts:310-313`) runs before `if (!this.player) return` (`:314`), and nothing gates it during `enter()`.
+  - `executeTransition` (`:438-455`) sets no busy state; only the zoom path pauses, and only for the zoom frames (`:459`, `:490`).
+  - During `fadeOut(300)` → `loadMap` → `fadeIn(300)`, `update()` keeps calling `player.update()`: the hero walks on the old map, each move emits `playerMove` (so encounters can fire), and cancel still pushes `fieldMenu`.
+- **Fix:** the load half is S1's gate plus `loading`. `FieldTransition.run()` sets a `transitioning` flag in a `try/finally` around the whole fade-load-fade and calls `encounterSystem.stop()` / `start()` around it. `update()` returns early while `loading || transitioning || cutsceneRunning`; one `fieldBusy` getter replaces the separate check at `:297`.
+- **Test:** `tests/scenes/ExplorationScene.test.ts`, ported from `/tmp/playtest2/systems/transition-control.test.ts`. Stub `requestAnimationFrame` so the fade never finishes; hold up from (5,6) onto the warp at (5,5) for 40 frames: `playerPosition` stays (5,5) (old code reaches (5,3)). Press cancel: `scenes.push('fieldMenu')` is not called (old code calls it). Also port `reentry-race.test.ts` case 2 (cancel during the first `enter()`).
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: hold Up into the inn door and press X repeatedly during the fade; the menu doesn't open and the hero arrives on the inn's `door` tile. Repeat at the overworld city gate with `?mute=1&scenario=act1_overworld`.
+
+#### S3: A double confirm while a lazy scene loads opens it twice
+- **Root cause:** `SceneManager.resolve` (`:28-38`) awaits `factory()` and caches only the finished scene (`:36`), so two calls in flight build two instances. During the await the title is still updated, and `TitleScene.onSelect` (`TitleScene.ts:72-88`) has no guard; the Debug entry (`:77-86`) can start two loaders.
+- **Fix:** `resolve` caches the pending promise (`private pending = new Map<string, Promise<Scene>>()`, removed on settle, so a rejected load can be retried). S1's `transitions` gate stops the title seeing the second confirm. `TitleScene` gets `private starting = false`, set in `onSelect`, reset in `enter()` and `onResume()`.
+- **Test:** `SceneManager.test.ts`: two `switchTo('a')` in flight with a deferred factory call the factory once and `enter` once (old: twice). `tests/scenes/TitleScene.test.ts`: confirm on two consecutive updates → `scenes.switchTo` once (old: twice).
+- **Browser:** `http://127.0.0.1:5173/?mute=1`: press Z twice fast on New Game, and in a second run on Debug. Party creation opens once; one battle is pushed (stack depth 1 via `__game.scenes`).
+
+#### S6: Debug battle scenarios softlock at the end of the battle (dev only)
+- **Root cause:** `DebugScenarioLoader.applyAndBattle` (`DebugScenarioLoader.ts:68-72`) builds a throwaway `BattleTrigger` and pushes the battle over the title. `BattleScene` emits `battleEnd` (`BattleScene.ts:561`), but only `ExplorationScene` subscribes (`ExplorationScene.ts:141`), and it was never entered, so nothing pops the battle.
+- **Fix:** `applyAndBattle` subscribes a one-shot `battleEnd` handler before `triggerBattle`; it unsubscribes itself and calls `trigger.onBattleEnd(data)`. Victory or escape → `pop()` to the title; defeat → `switchTo('gameover')` (`captureBattleSnapshot` returns null without a map, so Game Over offers Load and Title only). `TitleScene.onResume()` resets `starting` and plays the title track (I3).
+- **Test:** `tests/systems/DebugScenarioBattle.test.ts` (new; fake game as in `DebugScenarioField.test.ts`, real `EventBus`, `BattleTrigger.prototype.triggerBattle` spied): victory → one `scenes.pop`; a second `battleEnd` → no second pop; defeat → `switchTo('gameover')`. Old code calls nothing.
+- **Browser:** `?mute=1&scenario=ai_monsters_small`: Title > Debug, win; back on the title, the menu moves, and Debug starts a second battle. `?mute=1&scenario=t4_garland_l1_naked`: lose → Game Over → Title.
+
+#### I1: Keys stick after the window loses focus
+- **Root cause:** `InputManager.attach` (`InputManager.ts:36-39`) listens only to `keydown`/`keyup`. A key held while focus leaves never gets its `keyup`, stays in `currentKeys` (`:85`), and `isPressed` (`:54-58`) keeps the hero walking.
+- **Fix:** a private `releaseAll()` clears `currentKeys`, `previousKeys` and `pressedThisFrame`. `attach` adds `window` `blur` and `document` `visibilitychange` (when `document.hidden`) → `releaseAll`; `detach` removes both.
+- **Test:** `tests/core/InputManager.test.ts`: keydown `ArrowRight`, dispatch `blur` → `isPressed('right')` false; the same with `visibilitychange` while hidden. Old code returns true.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: Playwright `keyboard.down('ArrowRight')`, then `page.evaluate(() => window.dispatchEvent(new Event('blur')))`: the hero stops within one tile.
+
+#### I2: Menu auto-repeat, cancel closes dialogs, "more" marker
+- **Root cause:** `Menu.update` (`Menu.ts:101-118`) moves only on `isJustPressed`, and OS key repeat is ignored on purpose (`InputManager.ts:86`). `DialogBox.update` (`DialogBox.ts:54-67`) reacts only to confirm. There is no "more" glyph, and `DialogManager` (`DialogManager.ts:18-42`) never tells the box that more follows.
+- **Fix:**
+  - **Menu:** per-direction `holdFrames`; a just-press moves and resets; while `input.isPressed?.(dir)` holds, repeat after `REPEAT_DELAY_FRAMES = 20`, then every `REPEAT_EVERY_FRAMES = 5`. A repeat stops at the list ends; only a fresh press wraps. The parameter type is `Pick<InputManager, 'isJustPressed'> & Partial<Pick<InputManager, 'isPressed'>>`, so mocks without `isPressed` (`tests/ui/Menu.test.ts`, the BattleScene tests) just never repeat.
+  - **DialogBox:** cancel acts like confirm (finish the reveal, next page, close). `show(text, more = false)` adds a blinking ▼ `BitmapText` at the bottom right (local, in the style of `battleMessageUtils.ts:147-155`; no import from `scenes/battle`) while the page is revealed and another page follows or `more` is set.
+  - **DialogManager:** `start` and `advance` pass `more = dialogIndex < lines.length - 1 || queue.length > 0`.
+- **Test:** `tests/ui/Menu.test.ts`: hold down 1 + 20 + 5 frames → `selectedIndex` 2 (old: 1); a held repeat on the last item doesn't wrap. `tests/ui/DialogBox.test.ts`: cancel on a revealed last page calls `onComplete` (old: no); the marker shows on page 1 of 2, not on the last. `tests/systems/DialogManager.test.ts`: `start(['a', 'b'])` → marker on 'a', not on 'b'.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: talk to a multi-line NPC (▼ blinks; X advances and closes). Hold Down in the field menu: the cursor runs after a short delay and stops at Load.
+
+#### I3 (non-battle half): the title track and menu cursor sounds
+- **Root cause:**
+  - `title` is in `audio-manifest.json` but never played: the only `playMusic` callers are `GameOverScene.ts:22`, `BattleScene.ts:87, 542` and `ExplorationScene.ts:552`; `TitleScene.enter` (`:19-64`) and `onResume` (`:91`) are silent.
+  - Cursor sounds come only from a `Menu` given an `eventBus` (`Menu.ts:104-115`). These are built without one: `FieldMenuScene.ts:56`, `FieldOrderScene.ts:36`, `EquipScene.ts:81, 98, 119`, `FieldMagicScene.ts:72, 108, 155`, `ItemMenuScene.ts:60, 77`.
+  - `Game.ts:121-128` (`setupAudioEvents`) already subscribes `battleHit`, `battleMiss`, `spellCast`; R2 emits them.
+- **Fix:**
+  - New `src/ui/uiSounds.ts` (`setUiEventBus(bus)` / `uiEventBus()`); `Menu` and `NameEntryGrid.ts:86-101` use `config.eventBus ?? uiEventBus()`. `Game.init` (not the constructor, so unit tests stay silent) calls `setUiEventBus(this.events)`. One fix in `ui/`, no edits to R3's scenes.
+  - `TitleScene.enter` and `onResume` call `game.audio.playMusic('title')` with `.catch` → `console.error`; the same-track check (`AudioManager.ts:77`) makes a resume a no-op.
+  - `setupAudioEvents` moves into a pure `src/core/audioEvents.ts` (`wireAudioEvents(events, audio)`, the event→SFX table, plus `partyHealed` for T2).
+  - While there: `AudioManager.ts:33, 111, 113` are comment-only catches (AGENTS.md); make them `console.debug`.
+- **Test:** `tests/ui/Menu.test.ts`: after `setUiEventBus(bus)`, a Menu without `eventBus` emits `cursorMove` (old: the module doesn't exist). `tests/scenes/TitleScene.test.ts`: `enter()` → `playMusic('title')`. `tests/core/audioEvents.test.ts`: each event plays its SFX id.
+- **Browser:** audio stays off (`?mute=1`). In `?mute=1&scenario=t5_cornelia_field`, wrap `__game.audio.playSFX` / `playMusic` with console loggers: the arrows in Items, Magic, Equip and Order log `cursor-move`. In `?mute=1&scenario=ai_monsters_small` (wrap first): Debug → win → the title logs `music title`.
+
+#### T2 (engine half): the `warp` cutscene step and a heal signal
+- **Root cause:** `CutsceneStep.type` (`CutsceneManager.ts:6`) cannot change maps. `garland_defeated` (`cutscenes.yaml:6-21`) only fades and narrates, so the party stays in the temple with encounters on (`ExplorationScene.ts:187-202`; host in `ExplorationCutscenes.ts:10-17, 20-37`). `heal_party` (`CutsceneManager.ts:75-80`) is silent. The step switch has no `default` (`:45-81`) and `CutsceneRegistry.init` (`:9-18`) validates nothing, so a misspelt step is skipped silently.
+- **Fix:**
+  - The step shape is R0-1. `CutsceneDeps` gains `warp?: (w: CutsceneWarp) => Promise<void>` and `onHeal?: () => void`. A `default:` branch logs `Unknown cutscene step`; `CutsceneRegistry.init` logs and drops scripts with unknown types or malformed warps.
+  - `ExplorationScene.warpTo(w)` runs under `cutsceneRunning`, behind the fade: `await loadMap(w.map)` (map id, music, encounters and NPCs with current flags), the position from the named entrance or `{x, y}`, `player.setPosition` and a new `PlayerController.face(dir)` (wraps `animation.setDirection`, `SpriteAnimation.ts:68`), then `game.playerPosition`, camera and tilemap.
+  - `onHeal` emits `partyHealed`; `audioEvents` maps it to SFX `heal` (synthesised in R4; fallback `spell-cast`). The visible signal is a data line after the heal (R4b's cutscene data).
+- **Test:** `tests/systems/CutsceneManager.test.ts`: a warp step calls `deps.warp` in order between the fades; `heal_party` calls `onHeal`; an unknown type logs `console.error` (old code fails all three). `tests/scenes/ExplorationReentry.test.ts`: a script `[set_flag PRINCESS_RESCUED, warp {map: cornelia-castle-2f, entrance: throne_return, facing: up}]` leaves `currentMapId === 'cornelia-castle-2f'` on the entrance (old: still the temple).
+- **Browser:** `?mute=1&scenario=r_garland`: talk to Garland and win. The princess's line, the fade, the heal line; the party stands in the throne room facing the King, the HUD says "Cornelia Castle 2F"; talking to the King plays `act1_complete`.
+
+#### E10 (field half): the field sprite keeps the old leader after a reorder
+- **Root cause:** the leader's art is chosen only when `loadMap` builds the player (`ExplorationScene.ts:249-256`); `onResume` (`:555-565`) never checks it.
+- **Fix:** `FieldPlayer` records `leaderClassId`. On resume, if `game.party.get(0)?.classData.id` differs, rebuild the player with `createFieldPlayer` on the same tile, facing and movement mode, swap the sprite in `worldContainer`, and call `camera.follow` and `npcInteraction.setPlayer` again. (FieldOrderScene's cursor is R3's half.)
+- **Test:** `tests/scenes/ExplorationScene.test.ts`: spy `PlaceholderTextures.prototype.getPlayerArt`; enter with leader `warrior`, make the leader `white_mage`, `onPause()` + `onResume()` → the spy is called with `'white_mage'` and the grid position is kept. Old code: not called.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: Menu > Order, swap FGHTR and W.MAG, close: the white mage leads at once.
+
+#### W4 (code half): the encounter counter restarts on every map load
+- **Root cause:** `loadMap` calls `encounterSystem.setRate(mapData.encounterRate)` (`ExplorationScene.ts:237`), and `setRate` always calls `resetCounter()` (`EncounterSystem.ts:27-30, 97-103`). Interiors use `{999, 999}` (e.g. `assets/maps/ai/cornelia-inn.yaml:28`), the overworld `{15, 30}`, the temple `{8, 15}`. Each door re-rolls a full countdown, so short trips never meet a fight.
+- **Fix:** `setRate(rate)` stores the rate and only clamps the running countdown to the new map's scaled maximum: `stepCounter = min(stepCounter, max(1, round(rate.max / rateMultiplier)))`. Interiors (999) leave it alone. The counter still resets after a battle (`:83`); a new public `restart()` is called from `enter()` so Load, Retry and New Game roll fresh. The data half (rates, routes) is R4b.
+- **Test:** `tests/systems/EncounterSystem.test.ts`, "a running countdown survives map loads" (rng → 0): `setRate({15, 30})` → 15; 5 moves → 10; `setRate({999, 999})` → 10; `setRate({8, 15})` → 10; `setRate({2, 5})` → 5. Old code gives 999 at the second step.
+- **Browser (smoke):** `?mute=1&scenario=act1_overworld`: walk 10 steps, enter Cornelia and leave, walk on: a battle comes within 20 more steps (3 runs).
+
+#### M12: the HUD party bar covers the hero and the exit near a room's bottom
+- **Root cause:** the strip spans y 984–1056 (`FieldHUD.ts:46-47`, `HUD_PANEL_HEIGHT` 72 at `:11`), but the camera centres on the full 1080 px view (`Camera.ts:46-61`) and clamps to the full map (`:75-78`). The inn (12x11) puts its arrival (6,9) on the strip's top edge and the exit row (6,10) fully under it (`cornelia-inn.yaml:13, 25`; `56_inn.png`); in the temple (22 rows) the entry (11,20) is at 888–984 and the exits (11|12, 21) are under it.
+- **Fix:** `Camera.setViewInsets({ bottom })`: the usable height is `VIEWPORT_HEIGHT − bottom`; `update` centres in the usable band, `clampAxis(y)` allows `[0, mapH − usable]`, and a shorter map is centred inside it. `FieldHUD` exports `HUD_BOTTOM_BAND = HUD_PANEL_HEIGHT + 2 * SCREEN_MARGIN` (120); `ExplorationScene` sets it in the constructor. The usable 960 px is exactly 10 tiles. Default inset 0, so existing `Camera` tests stay valid.
+- **Test:** `tests/rendering/Camera.test.ts`: `setMapBounds(12, 11)`, `setViewInsets({ bottom: 120 })`, target on row 10 → the row's screen bottom ≤ `VIEWPORT_HEIGHT − 120` (old code has no method and draws the row under the band); a room shorter than the band is centred in it. `tests/ui/FieldHUD.test.ts`: the strip top ≥ `GAME_HEIGHT − HUD_BOTTOM_BAND`.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: enter the inn, stand on (6,9): the hero and the exit mat are above the strip. `?mute=1&scenario=act1_temple` (arrives at (11,20)): the exit row is visible.
+
+#### Cross-tranche runtime pieces that live in R1's files
+- **T1 (gate message):** `KeyItemGateSystem.check()` (`KeyItemGateSystem.ts:38-40`) resolves `message` with `resolveNPCDialog(message, f => flags.has(f))` when it is a `ConditionalDialog[]` (R0-2). Test: `tests/systems/KeyItemGateSystem.test.ts`: with INTRO_COMPLETE set the message changes (old: the type doesn't allow it, the string is fixed). Browser: see T1 in R4b.
+- **B1 (talk to fight):** in the talk branch (`ExplorationScene.ts:365-378`), if a due scripted encounter (same rule as `getScriptedEncounterAt`, `:493-506`: flag unset, `requiredFlag` met) has `npc === npc.id` (R0-3), set `pendingNpcAction`; `handleNpcPostDialog` (`:414-437`) then calls `triggerScriptedEncounter(enc)`. Test: `tests/scenes/ExplorationScene.test.ts`: talking to an NPC named by a due encounter starts that battle after the dialog closes; once the flag is set it doesn't (old: nothing starts). Browser: see B1 in R4b.
+- **E1 (chests and gifts at the cap):** at `ExplorationScene.ts:352-371`, check `inventory.canAdd(item)` (R0-4) before `add`. With no room: "You found <name>, but you can't carry any more.", and neither `chestFlag`/`giftFlag` nor `setOpened()` is set. Test in `ExplorationScene.test.ts` (old: the flag is set and the item lost). Browser: `?mute=1&scenario=r_cap_chest`.
+- **N2 (`backdrop` step):** `CutsceneManager` dispatches `backdrop` to an optional `deps.backdrop?(image: string | null)` (R0-1); a host without it logs once and skips. R3's `OpeningSequence.ts` supplies it.
+
+**R1 owns:** `src/core/{SceneManager,InputManager,Game,AudioManager,audioEvents}.ts`; `src/ui/{Menu,DialogBox,FieldHUD,NameEntryGrid,uiSounds}.ts`; `src/rendering/Camera.ts`; `src/entities/PlayerController.ts` (`face()` only); `src/scenes/{ExplorationScene,TitleScene}.ts`, `src/scenes/exploration/{ExplorationCutscenes,FieldTransition,FieldPlayer}.ts`; `src/systems/{DialogManager,CutsceneManager,CutsceneRegistry,EncounterSystem,DebugScenarioLoader,KeyItemGateSystem}.ts`; and the tests `tests/core/{SceneManager,InputManager,audioEvents}`, `tests/ui/{Menu,DialogBox,FieldHUD}`, `tests/rendering/Camera`, `tests/systems/{EncounterSystem,CutsceneManager,CutsceneRegistry,DialogManager,DebugScenarioBattle,KeyItemGateSystem}`, `tests/scenes/{ExplorationReentry,ExplorationScene,TitleScene,Act1Blockers}`.
+
+### R2: battle
+
+The balance numbers below come from throwaway sims that run the real `BattleStateMachine` and `tests/helpers` (`runBattle`, `makeParty`, `rollFormation`) with the `tests/balance/*` seed formulas (400 seeds), with the proposed rules patched in. Browser checks start from **Debug** on the title. Until S6 lands, a debug battle softlocks at its end, so reload between tries.
+
+#### B1: Garland's stats and his "attacks grow fiercer" phase (map half: R4b)
+- **Root cause:**
+  - `assets/data/enemies.yaml:221-243` is FF1's Garland (hp 106, attack 15, hits 1), per T4 revision 1.
+  - The phase (`:239-242`) only prints a message. `BattleStateMachine.checkBossPhaseTransition` (`BattleStateMachine.ts:513-537`) swaps a pattern only for enemies with an AI, and Garland has none.
+  - Hits come from the shared data only (`CombatStats.enemyHits(data)`, `CombatStats.ts:113-115`, from `PhysicalAttack.ts:32`), so there is no per-battle override.
+- **Fix:**
+  - **Data:** hp 240, attack 16, hits 2, no weakness; xp 130 and gold 250 stay.
+  - **Phase:** `bossPhases: [{ hpThreshold: 0.25, patternId: aggressive, message: "Garland's attacks grow fiercer!", hits: 3 }]`, so at ≤ 25 % HP (60) he goes from 2 hits to 3.
+  - **Where it lives:** `checkBossPhaseTransition` applies the optional `hits` / `attack` of a crossed phase through `enemy.buffs` (hits as the difference from the base). `enemyHits` takes an `EnemyInstance` and adds `buffs.get('hits')`; `enemyAttack` already reads `buffs.get('attack')` (`CombatStats.ts:105-107`). Shared data is never mutated and no RNG draw is added. The type and schema are R0-6.
+  - **Why 3 hits at ≤ 25 %:** it beat "attack +2 at ≤ 50 %" and "+3/+4" in the sims: it shows in the log ("(3 hits)") and leaves the most margin on the temple-run case.
+- **Test:**
+  - `tests/battle/BossPhase.test.ts`: `:37-50` hp 106 → 240 and the threshold HP 53 → 60; `:52-57` 54 → 61; `:59-79` ("identical damage events") becomes "events are identical with and without `bossPhases` until the phase round; after it some Garland lines read '(3 hits)', never before". This fails on the old code (no 3-hit line).
+  - `tests/battle/CombatStats.test.ts:124-128`: `enemyHits` takes an instance; a `hits` buff of +1 gives 3.
+  - `tests/data/actOneBalance.test.ts:86-93`: 106/15/1 → 240/16/2, phase `hits: 3` at 0.25.
+  - `tests/balance/garland.test.ts`: see "Balance bounds" below.
+- **Browser:**
+  - `?mute=1&scenario=t4_garland_l2_start`: Fight only loses at least 2 of 3 tries.
+  - `?mute=1&scenario=r_garland_l2_full`: sensible play (CURE below half, LIT, RUSE) wins at least 2 of 3 in 4+ rounds. "Garland's attacks grow fiercer!" shows once, at ≤ 60 HP, and some later lines read "(3 hits)".
+  - `?mute=1&scenario=t4_garland_l3_full`: 3 of 3.
+
+#### B2: a retargeted attack announces the dead target and animates at the wrong enemy
+- **Root cause:** `peekNextAction` names the queued `cmd.targetId` even when it is dead (`BattleStateMachine.ts:351-359`). The retarget happens later in `executeCommand`: party at `:442-448` (`retargetIfDead`, `BattleCommands.ts:23-36`), enemies at `:437-439` (`retargetEnemyTarget`, `EnemyAI.ts:136-142`), single-target spells at `SpellExecutor.ts:66-73`. The view finds the sprite by name, falling back to the first living enemy (`BattleAnimationController.ts:216-224`); the reach (`:116`) and the Miss float (`:196`) use it.
+- **Fix:** a private `resolveTarget(action)` retargets once and writes the result into the queued command; `peekNextAction` and `executeNextAction` both call it (the second is a no-op). It covers Fight on both sides and a party single-target spell at an enemy; `SpellExecutor`'s copy becomes a guard. `NextActionInfo` gets `targetId`, and `findTargetSprite` uses `findActorSprite(targetId)` (`:62-68`), with no name lookup. Side effect: the retarget draw moves to the peek, which shifts seeded balance numbers by 1–2 points (re-measure; the bounds leave margin).
+- **Test:** new `tests/battle/Retarget.test.ts` (from `/tmp/playtest2/systems/battle-edges.test.ts`): 4 Warriors Fight `enemy_0` against 3 Goblins; every peeked `targetName`/`targetId` is alive and matches the "hits X" line. Old: the second attacker announces "Goblin A". `tests/scenes/battle/meleeContact.test.ts`: a peek with `targetId: 'enemy_1'` puts the reach and the Miss on `enemySprites[1]`.
+- **Browser:** `?mute=1&scenario=t4_fields_l1`: all four Fight the same goblin; after it dies, the next announcement names a living goblin, and the lunge and number land on it.
+
+#### B3: spells are announced twice, first by id; items say "uses item!"
+- **Root cause:** `spellName = cmd.spellId` (`BattleStateMachine.ts:361-363`), formatted at `BattleAnimationController.ts:72`; the first result line repeats "casts FIRE!" (`SpellExecutor.ts:94`, shown at `BattleAnimationController.ts:203`); items announce "uses item!" (`:73`).
+- **Fix:** `peekNextAction` sets `spellName` to the spell's `name` and adds `itemName` (from `ItemRegistry`): "X uses Potion!". `executeAction` drops a result line identical to the announcement. The state machine's log keeps "casts FIRE!" (the balance tests and `formatConciseResult` read it).
+- **Test:** new `tests/scenes/battle/BattleAnimationController.test.ts`: FIRE gives ["B.MAG casts FIRE!", "Goblin takes N damage!"]; a Potion is "W.MAG uses Potion!". Old: "casts fire!" + "casts FIRE!"; "uses item!".
+- **Browser:** `?mute=1&scenario=t4_fields_l1`: FIRE is announced once; a Potion is named.
+
+#### B4: heal and buff messages
+- **Root cause:** heals report the raw roll while the HP setter clamps (`SpellExecutor.ts:132, 147-148`; clamp `Character.ts:58`); the fallen-target line uses the target as subject ("<target> has no effect on the fallen!", `:143`); a buff on an ally who fell is filtered out silently (`:213-219`) after the charge is spent (`:89`); items say "recovered N HP" / "was revived" (`ItemEffects.ts:113, 130`).
+- **Fix:** the heal line and float report the HP actually restored (after − before); a full-HP target reads "<name>'s HP is full!". A single-ally spell (not a revive) at a fallen ally spends no charge and says "<name> has fallen. No effect!" (checked before `useCharge`). Every battle line is present tense: items "recovers N HP!" / "is revived!" (the `ItemEffects.ts` wording is R0-13; `executeItemCommand`, `BattleStateMachine.ts:494-506`, adds the "!"). `battleMessageUtils.ts:77, 102-104` keeps matching both forms.
+- **Test:** `tests/battle/SpellExecutor.test.ts`: CURE on a member 2 below max → "recovers 2 HP!" and event damage 2 (old: 16–32); FOG on an ally at 0 HP leaves charges unchanged with a "has fallen" line (old: charge spent, no line). `battleMessageUtils.test.ts` for the concise forms.
+- **Browser:** `?mute=1&scenario=r_heal_fog`: CURE on FGHTR at max − 1 → "recovers 1 HP!"; FOG on FGHTR (hp 1, three wolves) until he falls first → "FGHTR has fallen. No effect!", and the L1 charge is still there.
+
+#### B5: two members can queue the same last item
+- **Root cause:** the battle item list counts the inventory only (`BattleScene.ts:380-389`, `ItemSelectionUI.ts:45-47, 91-95`), ignoring commands queued this round; the second use fails at `ItemEffects.ts:64`.
+- **Fix:** `BattleStateMachine.reservedItems(itemId)` counts queued item commands (undo pops the command, releasing the reservation). `ItemSelectionUI` takes `quantityOf?: (id) => number`; `BattleScene` passes inventory − reserved; items at 0 are not listed, and an empty list gives the existing "No items available." notice. Also fix the no-target fallback that passes `targetName` as the target id (`BattleScene.ts:389`). Move `showSpellUI` / `showItemUI` (`:302-429`) into `src/scenes/battle/BattleListMenus.ts` (`BattleScene.ts` is 594 lines).
+- **Test:** `tests/scenes/BattleScene.test.ts`: with 1 Potion, member 0 queues it and member 1's list doesn't offer it; after undo it is offered again (old: offered). `tests/ui/ItemSelectionUI.test.ts`: `quantityOf` drives the label and the filter.
+- **Browser:** `?mute=1&scenario=r_one_potion`: FGHTR > Item > Potion > THIEF; THIEF's Item shows "No items available."; cancel back to FGHTR: the Potion is offered again.
+
+#### B6: enemy attack animations find the hero by name
+- **Root cause:** `BattleAnimationController.ts:225` (`allParty.findIndex(c => c.name === info.targetName)`).
+- **Fix:** with B2, the sprite comes from `targetId`.
+- **Test:** `meleeContact.test.ts`-style: two members named "ROLF"; an attack on `party_1` flashes `partySprites[1]` (old: index 0).
+- **Browser:** `?mute=1&scenario=r_same_names`: over a few rounds each wolf hit flashes the hero whose HP row dropped.
+
+#### B7: turn order is a strict agility sort, with RNG in the comparator
+- **Root cause:** `TurnOrder.ts:7-15` sorts by agility and breaks ties with `rng() - 0.5` inside `sort` (`:13`); called at `BattleStateMachine.ts:268-272`.
+- **Fix (decision R-2):** one key per combatant before sorting, `key = agility × (1 + rng())`: n draws per round and no RNG in the comparator. A Warrior (agility 5) acts before a Goblin (6) about 27 % of the time (today 0 %). Gaps of 2x or more stay fixed, so the "agility 30 goes first" tests hold.
+- **Test:** `tests/battle/TurnOrder.test.ts`: `:17-28` becomes "the RNG is called exactly n times per call"; new: over 2,000 seeded calls, agility 5 precedes agility 6 in 20–35 % (old: 0 %). Audit the fixed `seq([...])` RNGs in `BattleStateMachine.test.ts`, `SpellExecutor.test.ts`, `StatusEffects.test.ts` (they now consume n draws first).
+- **Browser:** `?mute=1&scenario=t4_fields_l1`: over 5 rounds FGHTR acts before a goblin at least once.
+
+#### B8: blind and silence have no effect
+- **Root cause:** `SpellExecutor.ts:81-90` has no silence check (the comment at `:88` predates `Character.statusTracker`, `Character.ts:27`); the physical hit roll reads only helpless (`DamageFormula.ts:59`, `PhysicalAttack.ts:13-23, 27-38`); blind is never read.
+- **Fix:** FF1 blind: −40 on the hit roll for a blind attacker, +40 against a blind defender (`blind?: boolean` on `PhysicalAttacker` / `PhysicalDefender`, filled from `status.has('blind')`). Silence: a silenced caster (either side) spends no charge and loses the turn ("<name> is silenced!"); the party Magic command shows a "Silenced." notice via `showNotice` (`BattleScene.ts:262`).
+- **Test:** new `tests/battle/BlindSilence.test.ts`: on the hit-roll border, a blind attacker misses where a sighted one hits, and a blind target is hit where a sighted one is missed; a silenced Black Mage's FIRE leaves charges and enemy HP unchanged; a silenced `enemyAi` caster doesn't cast. All fail today.
+- **Browser:** `?mute=1&scenario=r_mute_dark`: MUTE on the lich → next turn "silenced", no ice; DARK on the wolf → it misses more (qualitative).
+
+#### B9 (battle half): temple packs and the Thief's escape (tables and rate: R4b)
+- **Root cause:**
+  - **Escape:** `calculateRunChance = luck / (level + 16)` (`BattleCommands.ts:38-44`, used at `BattleStateMachine.ts:407-416`). Thief luck is 15 + 3 per level (`classes.yaml:33, 40`): 88 % at Lv1 and **100 % from Lv2** (18/18). Hence 8 of 8.
+  - **Packs:** skeleton stats match FF1's BONE (`enemies.yaml:75-94`) and stay. A typical temple battle is mild (Lv2, 400 G kit, Fight only: 12.6 % HP lost, someone falls in 3.8 %). The damage is attrition plus the outlier formation `skeleton 4–6` (`assets/maps/ai/temple-of-fiends.yaml:83-85`): 32 % HP at Lv2, and at Lv1 someone falls in 56 % of those battles. At the rate 8–15 (`:68`), eight battles in a row at Lv2 (sensible, no inn) wipe 19 % of runs.
+- **Fix (R2):** `calculateRunChance(luck, level, livingEnemies) = max(0, min(0.75, luck / (level + 16)) − 0.05 × (livingEnemies − 1))`, with `RUN_CAP` and `PACK_PENALTY` constants. Thief vs 1: 75 %; Thief vs 3: 65 % at any level (8/8 escapes: 3.2 %); Warrior vs 3: 19 % at Lv1, 23 % at Lv2; W.MAG vs 3 at Lv2: 40 %. Garland stays `canRun: false`. Skeleton stats unchanged. R4b's data targets are in "Balance bounds".
+- **Test:** `tests/battle/BattleCommands.test.ts:53-67`: `(15, 1, 1)` 15/17 → 0.75; `(18, 2, 3)` 1 → 0.65; `(6, 2, 3)` 6/18 → 0.233; `(99, 1, 1)` 1 → 0.75; `(0, 1, 1)` 0 → 0. `BattleOutcome.test.ts`: the state machine passes the living-enemy count (a roll of 0.70 fails against 3 enemies, succeeds against 1).
+- **Browser:** `?mute=1&scenario=r_temple_pack`: the Thief runs, the others Fight; 8 tries → about 5 escapes, not 8. The 4-skeleton pack costs HP but nobody falls from full.
+
+#### B10: ally targeting is unclear
+- **Root cause:** the HP panel lights the active and the targeted member the same way (`lit = i === active || i === targeted`, `BattlePartyPanel.ts:100-108`); the active hero's arrow stays up (`ActiveHeroMarker.ts:38`) beside the white target arrow (`BattleFieldTargeting.ts:94-108`); targeting starts at index 0 (`BattleFieldTargeting.ts:32`).
+- **Fix:** while targeting, only the target row has ▶ (blinking, yellow); the active row keeps a blue name tint (`0x88ccff`); `ActiveHeroMarker` hides its arrow and the target arrow turns yellow. `enterFieldTargeting(..., initialId?)`: healing items and heal spells start on the most-hurt living member (lowest HP/max), revives on the first fallen, everything else at 0.
+- **Test:** `tests/scenes/battle/BattleFieldTargeting.test.ts`: members at 35/35, 12/25, 25/25, 25/25 → a Potion starts on index 1 (old: 0). New `tests/scenes/battle/BattlePartyPanel.test.ts`: `setActive(0); setTarget(2)` → a cursor on row 2 only (old: both).
+- **Browser:** `?mute=1&scenario=t5_battle_items`: FGHTR > Item > Potion: the cursor starts on the most-hurt living member, with one ▶ and one yellow arrow.
+
+#### B11: the melee lunge still stops about 250 px short
+- **Root cause (to confirm first):** the reach is `homeX − targetBounds.right + 24` (`BattleAnimationController.ts:116, 229-234`; `attackChoreography.ts:21-25`). In `85_exec_3.png` THIEF attacks Gr.Imp B in the back-middle column (right edge about x 675) and stops about 255 px short, where the front-column goblin's edge would put him. So the reach was measured from another sprite; the leading suspect is the name lookup and first-living fallback in `findTargetSprite` (B2/B6). Not reproduced without the browser.
+- **Fix:** land B2/B6 (target by id); then measure to the target's opaque right edge (cell right − (cell width − opaque right) from the monster frame data, `AiEnemyView.ts:39-48`, `monsters-ai.json`), independent of cell padding.
+- **Test:** `meleeContact.test.ts` on real layout boxes (`computeEnemyLayoutAi` for 2 Gr.Imp + 2 Goblin, `PARTY_X[1]`), target in a back column: on the contact frame the attacker's opaque left edge is within 40 px of the target's opaque right edge.
+- **Browser:** `?mute=1&scenario=t4_fields_l1&attack=classic`, then without `&attack`: attack a back-column enemy; the weapon overlaps it on contact.
+
+#### B12: the turn list is hard to read
+- **Root cause:** 16 px text (`FONT_SIZE_SM`, `LayoutConstants.ts:23`) on a 24 px pitch (`BattleAnimationController.ts:84-85, 98-104`); the pending line uses the raw lowercase type ("THIEF: fight", `:99`); the result line "Fight → 19 to Gr.Imp B…" is cut (`:205-210`, `fitTurnLine`).
+- **Fix:** 24 px (`FONT_SIZE`) on a 32 px pitch (8 lines fit); one label table for both states (Fight / spell NAME / item name / Run); compact entries without the target: pending `THIEF Fight`, done `THIEF Fight 19` (`19*` kill, `Miss`, `+24`, `Asleep`, `Escaped`, `x3 57`). `fitTurnLine` stays as a guard.
+- **Test:** `tests/scenes/battle/turnListFit.test.ts`: font ≥ 24; pending and done share casing; every sample (6-char name, "Gr.Imp B", crit, multi-target) fits the content width at 24 px. Old: 16 px, "fight" vs "Fight".
+- **Browser:** `?mute=1&scenario=t4_fields_l1`: a round with Fight, FIRE and a Potion; every line readable, uncut, same casing.
+
+#### B13: the bottom enemy row's feet touch the bottom strip
+- **Root cause:** `ENEMY_AREA.y1 = 770` and `STAGE_FEET.max = 770` (`EnemyLayoutAi.ts:29, 31, 73`) against `STRIP_Y = 780` (`BattleSceneTypes.ts:49`); the party's last row is also at 770 (`BattleDisplayManager.ts:18`).
+- **Fix:** `STAGE_FEET.max` and `ENEMY_AREA.y1` → 745; `PARTY_FEET_Y` → `[425, 530, 635, 740]`.
+- **Test:** `tests/scenes/battle/battleStage.test.ts`: feet ≤ `STRIP_Y − 35` for every composition and the party (old: 770).
+- **Browser:** `?mute=1&scenario=ai_monsters_nine` and `?mute=1&scenario=t4_nine`: at least 25 px of ground under the lowest feet, the B.MAG's included.
+
+#### B14: beach battles put the enemies on open sea
+- **Root cause:** `stage_backgrounds.py:42` stages `shoreline-hd.png` zoomed 1.12 and right-aligned for the party. The source (`~/temp/ffgame-assets/tiles/backgrounds/hd/shoreline-hd.png`, 1536x1024, local) has land only in its right ~37 %. On the committed `assets/backgrounds/shoreline.webp` the enemy feet band (x 80–1340, y 360–770) is **86 % water**, the party band 7 %. No zoom or alignment can put land under x 80–1340.
+- **Fix (free; decision R-5):** an optional composite in `STAGES` for `shoreline`: the source mirrored, zoom 1.6 (over the screen-width scale), pasted at y −560, through a mask over x ≤ 1250, y ≥ 380, feathered 50 px. The result is a rocky cove: rock under the enemies, sea and mountains behind, the party's rocks unchanged. Prototype `/tmp/r-plan/proto_shore.py` (output `/tmp/r-plan/img/proto_1.6_1250_-560.png`): enemy band **15 % water** (the channel), party band 7 %; the mask starting at y 380 (not 330) removes the ghosting. Then `python3 -I assets-src/tools/stage_backgrounds.py shoreline`.
+- **Test:** a new `stage_backgrounds.py --check shoreline`: water = b > r + 40 and b > g + 10; enemy band ≤ 15 %, party band ≤ 10 % (old file: 86 %). `assetCoverage.test.ts` (1920x1080) stays green.
+- **Browser:** `?mute=1&scenario=r_shoreline_nine`: all nine enemies stand on rock. `?mute=1&scenario=act1_overworld`: walk the beach south of the city until a battle.
+- **Note:** `river`, `swamp` and `waterfall` also put the enemies on water (recorded; decision R-5).
+
+#### I3 (battle half): hit and miss SFX never emitted; the cast SFX plays on pick
+- **Root cause:** `Game.ts:124-127` subscribes `battleHit`, `battleMiss`, `spellCast` (types `EventBus.ts:13-16`), but nothing emits the first two, and `spellCast` fires when the spell is picked (`BattleScene.ts:329, 348`). Target selection has no cursor sounds (`BattleFieldTargeting.ts:62-90`).
+- **Fix:** `BattleAnimationController` gets an `emit(event)` callback from `BattleScene`. In `executeAction` (`:192-214`), on the contact frame: `battleHit` when a Fight dealt damage > 0; `battleMiss` when `result.missed`; `spellCast` when a spell was really cast (not silenced, not out of charges). Delete `BattleScene.ts:329, 348`. `BattleFieldTargeting` emits `cursorMove` / `cursorSelect` / `cursorCancel`.
+- **Test:** `meleeContact.test.ts`: a hit emits `battleHit` once on contact, a miss `battleMiss` once. `BattleScene.test.ts` (spy `events.emit`): picking FIRE emits no `spellCast`, executing it exactly one. `BattleFieldTargeting.test.ts`: down emits `cursorMove`. All fail today.
+- **Browser:** `?mute=1&scenario=t4_fields_l1` (audio off): wrap `__game.audio.playSFX` with a console logger; one `battle-hit` per damaging hit, `battle-miss` per miss, `spell-cast` at the cast, none at the pick.
+
+**R2 owns:** `src/battle/**`, `src/scenes/BattleScene.ts`, `src/scenes/battle/**` (new `BattleListMenus.ts`), `src/ui/{ItemSelectionUI,SpellSelectionUI}.ts`, `assets/data/enemies.yaml`, `assets-src/tools/stage_backgrounds.py`, `assets/backgrounds/shoreline.webp`, and the tests `tests/battle/**`, `tests/scenes/battle/**`, `tests/scenes/BattleScene.test.ts`, `tests/ui/ItemSelectionUI.test.ts`, `tests/data/actOneBalance.test.ts`, `tests/balance/garland.test.ts`.
+
+### R3: menus, shops, items, Save and Load screens
+
+#### E1: items lost at the 99 cap (shop, unequip, chests)
+- **Root cause:** `Inventory.add` (`src/entities/Inventory.ts:9-12`) clamps to 99, drops the rest silently and returns `void`; nothing can ask how much room is left.
+  - `ShopScene.onItemSelect` caps the quantity only by gold, `Math.min(99, floor(gold / price))` (`ShopScene.ts:153`); `confirmTransaction` spends the gold and calls `add` (`:182-184`). At 99: "Bought 1 Potion.", nothing added (`/tmp/playtest2/systems/inventory-cap.test.ts`).
+  - `EquipScene.onEquipSelect` unequips, then adds the old item (`EquipScene.ts:139-140`): with 99 in the bag, the worn copy disappears.
+  - Chest and gift pickups call `add(..., 1)` and then set the flag (`ExplorationScene.ts:356-357, 368-369`): the chest shows opened and the item is gone. (R1's call site; uses R0-4.)
+- **Fix:**
+  - `Inventory` API (R0-4): `MAX_QUANTITY`, `space(id)`, `canAdd(id, qty = 1)`; `add` returns the number added.
+  - `ShopScene`: the buy quantity is `min(99, floor(gold / price), inventory.space(id))`. With no room: "You can't carry any more <name>." on the result line, no quantity picker. The quantity and transaction logic moves into a pure `src/scenes/shop/shopTransaction.ts` (`maxBuyQty`, `buy`, `sell` returning `{ ok, message }`), keeping ShopScene (247 lines) under 250 after E2/E3/E5.
+  - `EquipScene.onEquipSelect`: refuse to unequip when `prev` exists and `space(prev.id) < 1` (unless the new item is the same id); the stats window shows "No room for\n<prev name>." like "Can't equip" (`:136`).
+- **Test:** `tests/entities/Inventory.test.ts`: at 97 potions, `space` 2, `add('potion', 5)` returns 2, `canAdd('potion', 3)` false (old: TypeError / `undefined`). `tests/scenes/ShopScene.test.ts` (real registries): 99 potions, 500 G, confirm Potion → no picker, gold 500, result "can't carry" (old: picker, gold taken); 95 potions, 600 G → `quantityMax` 4 (old: 10). `tests/scenes/EquipScene.test.ts`: 99 rapiers in the bag, "(Unequip)" leaves the rapier equipped (old: lost).
+- **Browser:** `?mute=1&scenario=r_cap`: talk to the keeper, Buy > Potion → "can't carry", gold unchanged, no picker; Antidote (95 held) → the picker stops at 4. Menu > Equip > first member > Weapon > (Unequip) → "No room". Chests (after R1): `?mute=1&scenario=r_cap_chest`, open the chest: "can't carry any more", it stays closed, potions stay 99.
+
+#### E2: shop columns misaligned; "Wooden Shieldx2"
+- **Root cause:** buy rows use a fixed `name.padEnd(12)` (`src/scenes/shop/shopLists.ts:13`), so "Wooden Nunchaku" (15) pushes its price 3 columns right; sell rows pad to the longest name with no gap, `` `${name.padEnd(maxLen)}x${qty}` `` (`:23-26`); magic-shop rows have no columns (`MagicShopScene.ts:83`). The font is monospace (`NESFont.ts:21`), so padding is enough.
+- **Fix:** `columns(cells)` in `shopLists.ts`; the name width is the longest name + 2. Buy: `Name  price G  Have N` (E5). Sell: `Name  xN  price G`. Magic: `Name  L1  100G`.
+- **Test:** `ShopScene.test.ts`: in `cornelia_weapon`'s buy list every `G` is at the same index (old: 20 for Nunchaku, 17 for Knife); the sell list for `{wooden_shield: 2, rapier: 2}` has a row matching `/^Wooden Shield {2,}x2 /`. Update `MagicShopScene.test.ts:45-46` to the new format.
+- **Browser:** `?mute=1&scenario=r_shops`: Buy and Sell screenshots; prices and counts in columns.
+
+#### E3: unclear focus (Buy/Sell keeps its ▶; Equip shows three cursors; empty Equip help)
+- **Root cause:** `Menu` always draws a white ▶ (`src/ui/Menu.ts:53-55`), with no inactive state. ShopScene keeps `choiceMenu` on screen while the list is active (`ShopScene.ts:88-97`); EquipScene keeps member, slot and item menus with white cursors (`EquipScene.ts:85, 102`; `43_equip_weapons.png`). The Equip help is `''` in the member phase (cleared at `:103`), on an empty slot (`:173-176`) and on "(Unequip)" (`:182-185`).
+- **Fix:** with R0-3's `Menu.setActive(false)` (grey ▶, 0x808080), ShopScene and EquipScene grey the parent menu when focus moves down and restore it on the way back. Help text: member phase "Choose whose equipment to change."; empty slot "<Slot>: nothing equipped."; "(Unequip)" "Take off the <item>." or "The slot is already empty.".
+- **Test:** `ShopScene.test.ts`: after Buy, `choiceActive` false; after cancel, true. `EquipScene.test.ts`: in the item phase only the item menu is active; the help is non-empty in all three cases. Old: no `isActive`, help `''`.
+- **Browser:** `?mute=1&scenario=r_shops`: Buy → the Buy ▶ turns grey. Menu > Equip > member > Weapon: one white cursor, two grey, help text in every phase.
+
+#### E4: the magic shop learning flow
+- **Root cause:** after the member, a slot step lists three rows (a known spell or an unlabelled "---", `MagicShopScene.ts:162-191`, `:175`), and its `onSelect` ignores the row and calls `confirmPurchase()` (`:187`). `Character.learnSpell` stores spells in a Map with no slot index (`Character.ts:146-156`), so a slot can't be chosen at all (FF1 fills in order). "Known" is shown only in the member step (`:137-139`). The layout (`:50-69`) differs from ShopScene's.
+- **Fix:** remove the slot step (`:157-191`): choosing the member buys the spell. Member rows read `NAME  L1 2/3`, with `(knows)` / `(full)` disabled. Spell rows get a `Known` column when every member who can learn it knows it. A shared `src/scenes/shop/shopLayout.ts` (gold, list and panel rectangles, also used by ShopScene) and a `SpellLearnPanel.ts` (one line per member: can learn / knows / full / n/a) replace `learnText`. The file goes from 236 to about 210 lines.
+- **Test:** `MagicShopScene.test.ts`: W.MAG knows CURE → the CURE row shows `Known` and the panel `W.MAG  knows`; choosing a member with room buys with no third step (state back to `spells`, spell known, gold down); a member with 3 L1 spells is `(full)` and disabled; the list rectangle equals ShopScene's. Old: the slot state appears, nothing `Known`.
+- **Browser:** `?mute=1&scenario=r_magic`: CURE shows Known; HARM > the full member is disabled; FOG for W.MAG takes two confirms. Screenshot beside `r_shops`.
+
+#### E5: shops give little help (owned count, unusable gear, navy backdrop)
+- **Root cause:** buy rows have no owned count (`shopLists.ts:13`); the help bar shows only the description (`ShopScene.ts:239`), with only the panel's grey `n/a` rows (`ShopDetailPanel.ts:71-73`) hinting that nobody can equip it; neither shop sets `transparent`, so `SceneManager.push` hides the field (`SceneManager.ts:66`) and the renderer's navy shows (InnScene sets `transparent = true`, `InnScene.ts:26`).
+- **Fix:** a `Have N` column; for weapons and armour that nobody in the party can equip, the help reads "No one in your party can equip this. " + the description; both shop scenes set `readonly transparent = true`.
+- **Test:** `ShopScene.test.ts`: 2 potions → the Potion row ends `Have  2`; a Warrior/Thief/W.MAG/B.MAG party on Wooden Nunchaku → "No one in your party" in `helpText`; both shop scenes are `transparent`. All fail on old code.
+- **Browser:** `?mute=1&scenario=r_shops`: Buy, highlight Wooden Nunchaku → the warning; the town shows around the windows.
+
+#### E6: the Tent heals silently
+- **Root cause:** party items skip every prompt (`ItemMenuScene.ts:113-123`); the result goes into the shared help bar (`:122`), which the next cursor move overwrites (`:91`); `buildItemMenu()` rebuilds with the cursor at 0 (`:51-69`), so when the Tent stack runs out the bar describes another item (`149_tent_used.png`); no party HP is shown.
+- **Fix:** a new `src/ui/ConfirmBox.ts` (prompt + Yes/No; SaveScene's overwrite prompt `SaveScene.ts:93-121` moves into it; Load reuses it). Tent and Cabin ask "Rest in the Tent? (HP and charges restored by half)" (wording from the item's real effect). On Yes, the result goes on a separate result line that stays until the next input (ShopScene's pattern, `ShopScene.ts:218-222`), and the always-visible party window (E7) shows the new HP.
+- **Test:** `ItemMenuScene.test.ts`: on a camp map, confirming Tent shows the prompt and HP is unchanged (old: healed at once); Yes heals, the result line stays across one cursor move, the party labels show the new HP; No keeps the Tent. Update the existing camp test (`:43`) to press Yes.
+- **Browser:** `?mute=1&scenario=r_tent`: Items > Tent: the prompt; Yes: the HP column rises and the message survives a cursor move.
+
+#### E7: Field Item menu rough edges
+- **Root cause:** the list is full width (`ItemMenuScene.ts:37`) and the target window is drawn over it at x 1000 (`:39`; `102_pd_target.png`); each rebuild resets the cursor (`:51-69`, called at `:121`, `:138`); only key items are disabled (`:56-57`), so weapons and armour reach "Cannot use this item" (`ItemEffects.ts:63`); the field menu's help promises sorting (`FieldMenuScene.ts:21`).
+- **Fix:** two columns, always shown: the list (x 24–1000) and a party window (x 1016–1896) with HP and status; in the target phase the cursor moves into the party window. `buildItemMenu(keepIndex)` as `ShopScene.ts:115-116`. `enabled: item.type === 'consumable'`; a greyed weapon row's help says "Equip it from the Equip menu.". `FieldMenuScene.ts:21` → "Use the items you carry." (R3 owns this one line).
+- **Test:** `ItemMenuScene.test.ts`: the list and party rectangles don't intersect; after a potion at row 2 (2+ left), `selectedIndex` stays 2; a `rapier` row is disabled. `FieldMenuScene.test.ts`: no help text contains "sort". Old: overlap, index 0, rapier enabled.
+- **Browser:** `?mute=1&scenario=r_tent`: Items > Potion > a hurt member: the cursor stays on Potion, no overlap, Rapier grey.
+
+#### E8: the Status screen is bare
+- **Root cause:** one text block (`StatusScene.ts:37-41, 74-89`) fills about 30 % of the screen (`48_status.png`); left/right switch members (`:52-57`) with no hint; ailments are never shown (`partyRowData(char).status`, `PartyPanel.ts:33-35`, is unused here); `DEF` is `char.stats.defense` (`:84`), every slot plus buffs (`Character.ts:77-80`), while battles use `partyAbsorb` (armour only, plus the Monk floor, `CombatStats.ts:80-83`). No weapon has defense in `items.yaml` today, so the visible difference is the unarmoured Monk; it is still the wrong source.
+- **Fix:** header (name, class, Lv, ailments, `← 1/4 →`); left (HP, XP, Next, STR, AGI, INT, VIT, LCK); middle, the battle numbers from `CombatStats` (ATK `partyAttack` ×`partyHits`, Hit %, DEF `partyAbsorb`, Evade, M.Def); right, equipment; bottom, spells; footer "←/→ Member   X Back". Pure line builders in `src/scenes/status/statusLines.ts`.
+- **Test:** `StatusScene.test.ts`: an unarmoured Lv5 Monk shows `DEF 5` (old: 0); a poisoned member's header has `POISON`; the footer has "←/→"; the windows cover ≥ 80 % of the screen.
+- **Browser:** `?mute=1&scenario=r_menus`: Status, left/right across the 4 members; W.MAG shows POISON.
+
+#### E9: Equip reopens with the previous member's stats
+- **Root cause:** EquipScene is a cached lazy scene (`SceneManager.ts:36-37`); `enter()` (`EquipScene.ts:68-74`) rebuilds the member menu at index 0 (`:80-87`) but keeps `memberIdx`, and `updateStats()` reads `this.member` (`:76`).
+- **Fix:** `this.memberIdx = 0` in `enter()` before `buildMemberMenu()` (as `StatusScene.ts:45`).
+- **Test:** `EquipScene.test.ts`: members 0 and 2 differ in ATK; enter, Down twice, `enter()` again → `statsLines` equals member 0's preview (old: member 2's).
+- **Browser:** `?mute=1&scenario=r_menus`: Equip, Down twice, back out, Equip again: the first member's stats.
+
+#### E10 (scene half): the Order cursor resets after each pick
+- **Root cause:** `FieldOrderScene.buildMenu()` makes a new `Menu` with no `initialIndex` (`FieldOrderScene.ts:36-42`), after the first pick (`:50`), the swap (`:55`) and cancel (`:63`).
+- **Fix:** `buildMenu(cursor)`: keep the cursor on the first pick, then on the second pick's row after the swap, and on `firstIdx` after a cancel; a `cursorIndex` getter. (The sprite refresh is R1.)
+- **Test:** new `tests/scenes/FieldOrderScene.test.ts`: Down×2, Z → `cursorIndex` 2; Down, Z → swap and 3; in the second phase X → 2. Old: 0.
+- **Browser:** `?mute=1&scenario=r_menus`: Order, Down×2, Z: the cursor stays on row 3; pick row 4: it is on row 4.
+
+#### N1: naming and class select
+- **Root cause:**
+  - `NameEntryGrid.move` (`src/ui/NameEntryGrid.ts:91-97`) clamps the column by index between rows, but "End" (column 1 of the bottom row) is drawn 3 cells wide (`:68, 123`) above "3"; so Up from End lands on "1".
+  - The header names the class while naming (`PartyCreationScene.ts:75`), but the slot strip shows names only (`PartyCreationViews.ts:24-32`) and the class-select header (`:76`) doesn't show the classes chosen so far.
+  - Back rebuilds the class menu at index 0 after the name grid (`PartyCreationScene.ts:157-162`) and the confirm step (`:176-182`); `buildClassSelect` passes no `initialIndex` (`:102`).
+  - The preview is text only (`PartyCreationViews.ts:44-57`).
+- **Fix:** map columns between the 13-cell rows and the 2-cell bottom row by x (grid column `c` → bottom `c < 3 ? 0 : 1`; bottom `i` → column `i * 3`). The strip shows `1:ROLF Wa` and the open slot `3:? WM`. Back keeps the class (`buildClassSelect(initialIndex)`). The preview adds the class's `ready` battle pose from `characterAtlas.getBattleFrames(cls.id)`, loaded in `enter()` with `.then(refresh, e => console.error(...))`; text only if no art. **Size:** the file is 291 lines; move `playOpeningSequence` and `cutsceneDialogResolve` (`:253-283`) into `src/scenes/partyCreation/OpeningSequence.ts` and `buildConfirm` / `buildNameEntry` (`:124-166`) into `PartyCreationSteps.ts`; target ≤ 240.
+- **Test:** `tests/ui/NameEntryGrid.test.ts` (new): from End, Up → `cursorCell === '3'` (old: '1'); Down from '3' → End. `PartyCreationNaming.test.ts`: pick Black Mage (index 4), cancel the empty grid → `selectedIndex` 4 (old: 0); after naming member 1 the strip shows `1:<name> Wa`.
+- **Browser:** `http://127.0.0.1:5173/?mute=1`, New Game: Warrior; on the grid Down (End), Up → "3"; back out: still on Warrior with the sprite preview; finish slot 1: the strip shows the class.
+
+#### S4: the Save list doesn't refresh after saving
+- **Root cause:** `SaveScene.doSave` (`SaveScene.ts:123-135`) writes the slot and calls `showResult` without rebuilding the menu, which only `enter()` builds (`:60-65`); "Saved." sits over "Slot 1: Empty" (`52_saved.png`).
+- **Fix:** `this.buildMenu()` (cursor on the saved slot) before `showResult`.
+- **Test:** `SaveLoadSlots.test.ts`: empty store, save to slot 1; while "Saved." shows, no "Slot 1" Empty label and the new row is present. Old: "Slot 1: Empty".
+- **Browser:** `?mute=1&scenario=r_menus`: clear `ff1_save_*` from `localStorage` in devtools, Menu > Save > slot 1: behind "Saved." the row shows the save.
+
+#### S5: Save and Load look the same; terse slots; Load doesn't confirm
+- **Root cause:** two identical untitled windows (`SaveScene.ts:23`, `LoadScene.ts:16`), both formatting `Slot N: Lv<leader> H:MM` (`SaveScene.ts:48-53`, `LoadScene.ts:42-46`); `LoadScene.onSelect` restores at once (`LoadScene.ts:62-70`). `SaveData` already has the members, gold, `currentMap` and `saveDate` (`types/index.ts:370-380`; `SaveManager.ts:30-40`), but `SlotSummary` exposes only level, time, leader and date (`SaveManager.ts:11-16, 93-99`), and only the map id is stored (map names live in map YAML, not loaded on the title).
+- **Fix:** `src/scenes/save/slotView.ts`, shared: `slotLabel` (`Slot 1  Cornelia Castle 2F  0:12`), `slotDetail` (one line per member `ROLF  Wa  Lv3  HP 35/40`, then gold and `Saved 2026-11-14 14:03` local), `titleWindow`. Titles "Save: choose a slot" / "Load: choose a slot"; a detail window follows the cursor. `doSave` passes `ExplorationScene.getMapName()` (`ExplorationScene.ts:589`) as the location (R0-5). Load asks "Load Slot N? Progress since your last save is lost." through `ConfirmBox`.
+- **Test:** `SaveLoadSlots.test.ts`: the titles differ; a slot saved with location "Cornelia" shows `Slot 1  Cornelia` and its detail lists every member and the date; Load + confirm opens the prompt without `switchTo`, Yes calls it. Update the `'Slot 1: Lv'` expectations (`:51`, `:58`).
+- **Browser:** `?mute=1&scenario=r_menus`: save to slot 1 (title, location, party); reload `http://127.0.0.1:5173/?mute=1`, Continue: the Load title and detail; Z → prompt; No stays; Yes loads.
+
+#### N2 (runtime half): the opening plays from data
+- **Root cause:** `PartyCreationScene.ts:253-261` hardcodes 5 dialog pages on black (game data in TypeScript).
+- **Fix:** the extracted `src/scenes/partyCreation/OpeningSequence.ts` (N1) runs `CutsceneRegistry.get('opening')` (R4a's data) through `CutsceneManager`, with `showDialog`, `fadeOut`/`fadeIn` and a `backdrop(image)` dep that shows `assets/backgrounds/<id>.webp` full screen behind the dialog (or clears it for `null`). A missing script logs `console.error` and goes straight to the field.
+- **Test:** `PartyCreationNaming.test.ts`: finishing the party plays the registry's `opening` (spy on the registry; old code never reads it); `backdrop` is called with `dark_forest`, then `grassland`, then `null`; neither file contains dialog text literals.
+- **Browser:** `http://127.0.0.1:5173/?mute=1`, New Game, name four members: three pages over two backgrounds, then the field fades in. 0 console errors.
+
+**R3 owns:** `src/scenes/{ShopScene,MagicShopScene,ItemMenuScene,EquipScene,StatusScene,FieldOrderScene,SaveScene,LoadScene,PartyCreationScene}.ts`, `src/scenes/FieldMenuScene.ts` (line 21 only), `src/scenes/shop/**` (new `shopTransaction.ts`, `shopLayout.ts`, `SpellLearnPanel.ts`), new `src/scenes/save/slotView.ts`, `src/scenes/status/statusLines.ts`, `src/scenes/partyCreation/{OpeningSequence,PartyCreationSteps}.ts`, `src/scenes/PartyCreationViews.ts`, new `src/ui/ConfirmBox.ts`, `src/ui/NameEntryGrid.ts`, and the tests `tests/entities/Inventory`, `tests/scenes/{ShopScene,MagicShopScene,ItemMenuScene,EquipScene,StatusScene,FieldOrderScene,SaveLoadSlots,PartyCreationNaming,FieldMenuScene}`, `tests/ui/NameEntryGrid`.
+
+### R4a: town, castle and dialog data
+
+T1 and M11 live in `overworld.py`, so they are in R4b. The detailed TN-1..TN-24 text isn't in `/tmp/playtest2/town/`; the items below were mapped from the playtest summaries, `report.txt`, `dialog.txt` and fresh BFS runs.
+
+#### T2 (data half): the rescue is narration only
+- **Root cause:** `cutscenes.yaml:6-21`: nobody speaks, the heal is silent, and the party stays in the temple. The King's return already works on flags: his PRINCESS_RESCUED dialog, then `act1_complete` (`requiredFlag: PRINCESS_RESCUED, onceFlag: INTRO_COMPLETE`, `castle.py:253-265`, `ExplorationCutscenes.ts:40-46`); the princess (`castle.py:266`, `showIf PRINCESS_RESCUED`) gives the lute separately.
+- **Fix:** rewrite `garland_defeated`. The princess speaks while she is still visible (`captive_princess` has `hideIf PRINCESS_RESCUED`, `temple-of-fiends.yaml:189-194`), and the warp happens while the screen is black:
+  1. `dialog` "Garland falls, and the princess is free!"
+  2. `dialog` "Princess Liora: Thank you, Warriors of Light! Please, take me home to my father."
+  3. `fade_out 600`, `set_flag PRINCESS_RESCUED`, `heal_party`
+  4. `dialog` "The party rests on the road home: HP and spell charges are restored, and the fallen are revived."
+  5. `{type: warp, map: cornelia-castle-2f, entrance: throne_return, facing: up}`
+  6. `fade_in 600`, then `dialog` "Princess Liora is home at last. Speak to the King."
+  - `castle.py` adds the 2F entrance `throne_return: [21, 9]`, on the runner just south of the King's new cell (21,8) (M13). If decision R-9 keeps him on the seat (21,7), the entrance is (21,8). The princess at (23,8) is in view either way.
+  - Update the step list in the `cutscenes.yaml` header (line 3).
+  - Afterwards: confirm → the King's "You have brought my daughter home…" → `act1_complete` (INTRO_COMPLETE) → the princess → the lute.
+- **Test:** `tests/data/act1Flow.test.ts`: `garland_defeated` still sets only `PRINCESS_RESCUED`; a dialog naming "Princess" comes before the first `fade_out`; a dialog matching `/restored|revived/` follows `heal_party`; exactly one `warp`, after `set_flag` and before `fade_in`, to `cornelia-castle-2f` and an entrance that exists in the compiled map, is walkable and lies directly below the King's cell. Old: no warp. R1 adapts `Act1Blockers.test.ts`, which loads the real script.
+- **Browser:** `?mute=1&scenario=r_garland`: talk to Garland and win: the princess's line, the heal line, a fade, the 2F throne room facing the King; talk to him (ending), then to the princess (lute).
+
+#### T3: directions don't match the map
+- **Root cause:** `castle.py:263`: "beyond the forest to the north-west", but the temple road (`overworld_consts.py:69`) runs over open grass from the ring at (22,42) to the door at (15,39). `cornelia.py:307-308`: "The east road leads around the bay", but there is no bay: the road crosses the east river to the tomb at (50,43) below the mountains.
+- **Fix:** King: "He holds her in the Temple of Fiends, north-west of the city. Leave by the west gate and follow the road; it ends at the temple door." East gate guard: "The east road crosses the river and ends at an old tomb below the mountains."
+- **Test:** `actOneDialog.test.ts`: under all 5 flag states no line matches `/\bbay\b|beyond the forest/i`; every line naming the temple with a compass word uses the direction computed from the compiled overworld (temple entrance relative to `cornelia`: north-west); the east gate guard mentions `river|bridge`.
+- **Browser:** `?mute=1&scenario=act1_castle`: talk to the King. `?mute=1&scenario=t5_cornelia_field`: the east gate guard at (56,46).
+
+#### T4: the maid says the princess is "resting"
+- **Root cause:** `castle.py:279-280`, while the princess stands in the throne room at (23,8).
+- **Fix:** "Her Highness is with the King in the throne room. She talks of nothing but you!"
+- **Test:** `actOneDialog`: with PRINCESS_RESCUED, no castle line matches `/resting|in her (room|chamber)|asleep/i`.
+- **Browser:** `?mute=1&scenario=r_castle_rescued`: west into the chamber, talk to the maid.
+
+#### T5: a vendor announces the builders before the King orders them
+- **Root cause:** `cornelia.py:286-288`: `market_vendor_w`'s PRINCESS_RESCUED entry already mentions "builders out at the north bridge".
+- **Fix:** an INTRO_COMPLETE entry first, with the current two lines. The PRINCESS_RESCUED entry becomes "Apples from the royal orchard! Half price today, for the princess is home." / "Now if only someone would mend the north bridge. Trade would come back, you'll see."
+- **Test:** `actOneDialog`: replace `FLAG_SETS` (`:19-20`, which includes the impossible state INTRO_COMPLETE alone) with the 5 real states from `/tmp/playtest2/town/dialog.py`; in states without INTRO_COMPLETE no line matches `/builders?/i`.
+- **Browser:** `?mute=1&scenario=r_town_rescued`, then `?mute=1&scenario=r_town_after_intro`: the vendor at (24,41).
+
+#### T6: stale, duplicated and wrong lines
+- **Root cause and fix** (conditions are single flags; first match wins):
+  - **Stale after Garland:**
+    - `villager` (`cornelia.py:282-283`): + GARLAND_DEFEATED "You beat Garland! Keep buying spells early. Whatever waits past the bridge won't be easier."
+    - `treasury_guard` (`castle.py:164-166`): + GARLAND_DEFEATED "Garland is beaten, but the storeroom below stays open to you." / "Take what you need for the road ahead." (ST-9's no-flag line unchanged.)
+    - `patron_soldier` (`homes_b.py:124-128`): keep INTRO_COMPLETE, + PRINCESS_RESCUED "A soldier's pay buys one mug a night, and tonight it's raised to you." / "They say Garland's men scattered when you walked into the temple." The default's first line becomes "A soldier's pay buys one mug a night, and this is it." (removes the near-duplicate of the barracks soldier's "Off duty…").
+    - `stair_guard` (`castle.py:138`): + INTRO_COMPLETE "The throne room is up the stairs. His Majesty will always receive the Warriors of Light."
+  - **Looted chests**, an entry keyed on the chest flag (after GARLAND_DEFEATED for the farmer and the knight):
+    - `fisher_wife` (`homes_a.py:60`): CHEST_HOUSE_FISHER: line 1, then "I'm glad that potion went to someone who'll use it."
+    - `farmer` (`:82`): CHEST_HOUSE_FARM: the default's first two lines.
+    - `old_knight` (`:116`): CHEST_HOUSE_KNIGHT: the first two lines, then "That helm kept my head on my shoulders for thirty years. May it do the same for you." (matches M10).
+    - `royal_gardener` (`homes_b.py:32`): CHEST_HOUSE_GARDENER: line 1, then "Keep that tent dry and it will serve you for years."
+    - `apprentice` (`:88`): CHEST_HOUSE_APPRENTICE: line 1, then "You found my ether? Keep it. Charges are worth more out there than in here."
+  - **Duplicates:** `throne_guard_e` (`castle.py:278`): "Speak plainly to His Majesty. He has no patience for flattery."; drop `SHARED_OK`.
+  - **Weaver** (`homes_a.py:147`): "…That one on the left took two." (both rugs use one red material, `:128-129`).
+  - **Shrine** (`homes_b.py:152`): line 1 "Welcome to the wayside shrine. Say a prayer for the princess, if you would."; + PRINCESS_RESCUED "The light brought Her Highness home, and you with it. Bless you."; line 2 kept.
+- **Test:** `actOneDialog`: (a) no two NPCs share an opening sentence (up to the first `[.!?]`; fails today on "Off duty." and "Long live the King!"); (b) with every chest flag of a map set, an NPC whose default lines mention `chest` or that chest's item has an entry keyed on the chest flag; (c) villager, treasury_guard and patron_soldier differ between the "start" and "Garland defeated" states, and stair_guard between "start" and "intro complete"; (d) the weaver never says "blue", the priestess never says `/\brest\b/`.
+- **Browser:** `?mute=1&scenario=r_house_fisher` (talk, open the chest, talk again); `r_town_rescued` (the villager); `r_castle_rescued` (the treasury guard on 1F via the stairs, the throne guards); `r_castle_after_intro` (the stair guard).
+
+#### M1: the castle door guards cut the castle-front street
+- **Root cause:** `cornelia.py:263-269` puts the guards at (28,19) and (32,19), on the one-row apron (`:81`) between the façade and the moat. With static NPCs blocking, (27,19) or (33,19) → (30,19) takes 53 steps.
+- **Fix:** guards to the bridge's garden end, (28,22) and (32,22); the urns (`:140-141`) to (27,22) and (33,22). Simulated: 3 steps from either side; 20 from the orchard track (was 36).
+- **Test:** `corneliaLayout`: no static NPC on row 19 for x 10–50; with NPCs blocking, (27,19) and (33,19) reach (30,19) in ≤ 3 steps; CT-4 green.
+- **Browser:** `?mute=1&scenario=r_town_rescued` (arrives at (30,19)): walk west along the apron and back to the door.
+
+#### M2: the 1F reading gallery is a dead end
+- **Root cause:** the gallery (`castle.py:40`, x 12–31) meets the library at x 32, but the shelves at (32,4) and (33,4) (`:105, 108`) wall it off: (31,4) → (33,6) is 58 steps.
+- **Fix:** shelves at x 34, 35, 38, 39, 40, 41 (opening (32–33, 4–5); 36–37 stay under the windows). Simulated: 4 steps.
+- **Test:** `castleLayout`: in compiled 1F (no NPCs), (31,4) reaches (33,6) in ≤ 4 steps; the gallery test stays green.
+- **Browser:** `?mute=1&scenario=r_castle_1f_gallery`: walk east out of the gallery into the library.
+
+#### M3: the Item and Black Magic counters can be walked round
+- **Root cause:** item shop counter (3–5,4) (`shops.py:59`): you step up through (2,4) or (6,4) to the keeper at (4,3). Black magic counter (6–9,4) (`:100`): (6,3) is reached through (5,4).
+- **Fix:** item `g.carve(1, 4, 7, 4, "c")`; black magic `g.carve(4, 4, 9, 4, "c")` (the shelf at (3,3–4) closes the west end). A new `Place.staff(x0, y0, x1, y1)` in `interiors_common.py` records the cells behind each counter in `unreachable_ok` (needed once M4's check is on): item (2–6, 2–3), black magic (4–8, 3), armor (2–7, 3), weapon (1–4, 3–4), white magic (2–7, 3–4), inn (1–4, 7), tavern (1–4, 3–4).
+- **Test:** `corneliaLayout`: for every keeper, no 4-neighbour of the keeper except the counter cell in front is reachable from the door (NPCs blocking). The item and black magic shops fail today.
+- **Browser:** `?mute=1&scenario=r_item_shop` and `?mute=1&scenario=r_black_magic`: try both counter ends.
+
+#### M4: visible floor that can't be reached
+- **Root cause:** shrine: the benches at (3,6) and (7,6) (`homes_b.py:146-147`) and the pillars seal the aisles at x 1 and 9 (12 cells). Inn: the table at (9,8) (`shops.py:139`), the plant (10,7) and the barrel (10,9) box in (10,8). Interiors don't run `no_unreachable_walkable` (`interiors_common.py:13`).
+- **Fix:** benches to y 7; the inn table to (10,8); `CHECKS = {"no_static_chokepoints": True, "no_unreachable_walkable": True}` (M3 lists the staff cells); the same check in `castle.py:27`'s `QUIET` (every castle floor has 0 unreachable cells today).
+- **Test:** `corneliaLayout`: every interior source has `no_unreachable_walkable: true`; with no NPCs every walkable cell of every compiled interior is reachable or in `unreachable_ok`, and each listed cell is behind a counter or beside the keeper.
+- **Browser:** `?mute=1&scenario=r_shrine` (both aisles); `?mute=1&scenario=r_inn` (step onto the old (9,8)).
+
+#### M5: beds and bookshelves block a cell that looks like floor
+- **Root cause:** 35 floor placements of 2-cell `bed_*` / `bookshelf_*` parts are bottom-anchored (bed art 32x58 native px, shelf 41x69, in a 48x96 footprint, `approved/interior/furniture.json` `prop_px`), and every footprint cell blocks. A bed's top cell is about 79 % empty floor.
+- **Fix:** `Room.tall(part, x, y)` in `common.py` (and `Place.tall`, `interiors_common.py:45`, calls it) emits `offset: [0, -TOP[part]]` with `TOP = {bed: 38, bookshelf: 27}` (96 − art height, so the art sits against the wall) and `collide: "alpha"` (the compiler's `ALPHA_MIN` 0.25). A bed then blocks one cell; a shelf keeps 2 (its bottom cell 44 % covered). Replace the raw decos at `castle.py:88, 106, 108, 215, 217, 228, 306-307` and every `r.tall("bed"|"bookshelf")`; on-wall gallery shelves are excluded. (Rejected: `fit: true`, which upscales pixel art 1.12–1.44x with LANCZOS.)
+- **Test:** `castleLayout` / `corneliaLayout`: every non-`on_wall` bed or bookshelf deco has `collide: alpha` and a negative dy; in the compiled maps the cell below each bed's top cell is walkable. All 35 fail today.
+- **Browser:** `?mute=1&scenario=r_inn` (walk along the feet of the beds); `?mute=1&scenario=t5_castle` (barracks, library).
+
+#### M6: a stray pixel column on every chest frame
+- **Root cause:** the approved `assets-src/gen/approved/temple/relics.png` has key-fringe pixels (RGB ≈ 190,148,189) in column 1 of `chest_closed` (cell 3,0: 2 px) and `chest_open` (cell 3,1: 19 px); the chest starts at column 5 / 7. `build_assets.py:196-218` crops those cells straight from the PNG, so the kit's `paint` fixes (`kit.py:218`) never reach the field atlas.
+- **Fix:** `relics.json` gets `"paint": [{"from": [2,144,1,48], "to": [1,144]}, {"from": [50,144,1,48], "to": [49,144]}]` (a transparent column over the fringe; `approve.py` keeps `paint` on re-approval). The pixels of the approved sheet are untouched (style lock): the fix is a build-time op. `build_assets.py:199-200`: `rimg = K.apply_paint(Image.open(...), rmeta.get("paint") or [], "temple/relics.json")`. Rebuild `build_assets.py field_ai`. No paid art.
+- **Test:** `node_modules` has no PNG decoder, so a case in `assets-src/gen/selftest.py`: in `characters-ai.png`, each of the 3 chest frames (`sheets.chest`) is one run of opaque columns with no gap. Fails today.
+- **Browser:** `?mute=1&scenario=r_cellar`: the closed chests, then open one; `?mute=1&scenario=t5_castle` for the treasury chests.
+
+#### M7: the city gates are gaps in the wall; no tavern or shrine sign
+- **Root cause:** the gate passages are plain cobble cut through the wall (`cornelia.py:111-113`, the postern `:94`); the south gate has a turret on one side only, (33,66) (`:258`); the houses (`:188-196`) set no `sign`; `kit.py:47` `SIGNS` has no tavern or shrine, and `approved/town/signs.json` has no spare board.
+- **Fix:**
+  - **Free (always):** flank every gate with the existing `TURRET` decos (`on_wall`, 2x3).
+  - **Paid (R5, checkpoint 3):** `town/kit_gates`: `gate_arch_3` (3x2: the south gate and the inner gatehouse), `gate_arch_2` (2x2: the postern), `gate_side` (2x2: a lintel over a vertical wall for the W, E and precinct-E gates), `sign_tavern` (a tankard), `sign_shrine` (a white crystal). The arches are decos with `above_rows: 2` (drawn over characters, walkable). `HOUSES` get `sign="tavern"` / `sign="shrine"`.
+- **Test:** `corneliaLayout`: every gate passage has a turret on both sides; after the art, the tavern and shrine have signs and every arch deco has `above_rows` equal to its height.
+- **Browser:** `?mute=1&scenario=r_town_rescued`: out through the south and west gates.
+
+#### M8: sprite reuse and role mismatches
+- **Root cause:** across Cornelia `old_man` is used 9 times, `villager_f` 8, `guard` 18, `mage` 7 (compiled maps). `hall_noble` (`castle.py:139`), `farmer` (`homes_a.py:82`) and `royal_gardener` (`homes_b.py:32`) use `villager`.
+- **Fix (free, approved 2x sprites):** hall_noble and the chancellor (`castle.py:272`) → `burgher`; farmer and royal_gardener → `farmer`; the fisher (`cornelia.py:305`) and the cellar steward (`castle.py:345`) → `villager`. `old_man` 9 → 6. New sheets (maid, scholar, off-duty soldier, noble) are 1–3 images each and not budgeted (decision R-11).
+- **Test:** `corneliaLayout`: no sprite but `guard` used more than 6 times; the four roles above have those sprites; `assetCoverage` green.
+- **Browser:** `?mute=1&scenario=t5_castle` (hall), `?mute=1&scenario=act1_castle` (chancellor), `?mute=1&scenario=r_house_farm`.
+
+#### M9: empty or samey spaces
+- **Root cause:** the cellar (22x15) holds only edge barrels and racks (`castle.py:330-335`); the castle lawn, rows 26–28 between the hedges and the inner wall (`cornelia.py:151`), is bare; 7 of 16 interiors resolve to one wall palette (fisher, gardener, tavern, inn and item shop set no wall materials; family and weaver differ only in trim); the weapon shop's vertical counter arm (5,3–5) (`shops.py:18`) renders as loose boxes.
+- **Fix:**
+  - **Cellar:** a cask row of barrels at (18–19, 7–8) and (19,9); grain crates at (2,10), (3,10), (2,11); armour stands at (14,4), (15,4); a table at (11,8).
+  - **Lawn:** walkable `flowers` along row 28 under each hedge run (x 13–16, 23–26, 34–37, 44–47); statues at (21,26) and (39,26).
+  - **Palettes** (each a distinct `{from, shade}`): fisher face `in_wall_face` 0.8, top slate 0.6; gardener face `wall_face` 1.1; tavern face `wall_face` 0.75, top 0.7; inn face `castle_face`, trim [170,60,60]; item shop face `castle_wall_in` 1.1, top `wall_top` 0.8; family top slate 0.7; weaver face `in_wall_face` 0.85.
+  - **Weapon shop:** the counter becomes `carve(1,5,5,5,"c")`, with armour stands at (5,3), (5,4) closing the corner.
+- **Test:** `corneliaLayout`: no two of the 16 interiors share `(in_wall_face, in_wall_top, floor, floor_stone)`; the weapon shop has no counter cell above its counter row. `castleLayout`: the cellar has ≥ 20 props. The compile's reachability checks pass.
+- **Browser:** `?mute=1&scenario=r_cellar`; `r_town_rescued` (the gardens); `r_weapon_shop`; `r_item_shop` beside `r_inn` (palettes).
+
+#### M10: chest loot repeats; the knight's gift is a 10 G shop item
+- **Root cause:** potion, antidote, tent and ether each appear twice across the house and cellar chests (`homes_a.py:59, 81`, `homes_b.py:31, 87`, `castle.py:337-344`); the knight's chest (`homes_a.py:115`) holds `wooden_nunchaku`, sold for 10 G.
+- **Fix:** knight → `iron_helm` ("You found an Iron Helm!", 100 G, not sold in Cornelia). Cellar: potion → `hi_potion`, antidote → `wooden_armor` (the steward's "old armour"), tent → `robe`, ether kept. Flags unchanged.
+- **Test:** `castleLayout` / `crossFileValidation`: the 11 Cornelia and castle chests hold ≥ 9 distinct items; the knight's item isn't in any `cornelia_*` shop. Update the cellar test (`castleLayout:110`). Run `tests/balance` (the sims don't open chests, so they are unaffected; recorded).
+- **Browser:** `?mute=1&scenario=r_house_knight`, `?mute=1&scenario=r_cellar`.
+
+#### M13: castle art details
+- **Root cause:** the treasury guard at (36,23) (`castle.py:164`) stands in front of the `gold_heap` (36,22), which shows on both sides of him (`69_treasury.png`); the King at (21,7) covers the small chair on the throne plinth (`72_throne.png`); the tower is 16 wide (`castle.py:297`) but the view is 20 cells (1920/96), so its brick border stops short of the screen edge.
+- **Fix:** the guard to (34,23). The King to (21,8), standing before the throne (as T6 decision 7), so the chair back in row 6 shows; the throne drops `walk_cells` (`:196-197`); he is talked to from (21,9). The tower becomes `Room(..., 20, 13)` with every x shifted +2 (carve 5–14, rug 7–12, stairs (9,9), entrance `stairs [9,8]`, sage (8,5), windows 6/9/13, banner 11, shelves 5/14, desk 11, orb (5,8), plant (14,9)).
+- **Test:** `castleLayout`: no NPC directly south of `gold_heap`; CA-5's case rewritten (the King at `throne.y + 2`, `x = throne.x`, and the cell below walkable); every castle map taller than 11 rows is ≥ 20 wide.
+- **Browser:** `?mute=1&scenario=t5_castle` (treasury), `?mute=1&scenario=act1_castle` (throne), `?mute=1&scenario=r_tower`.
+
+#### N2: the opening is several pages of text on black (data; runtime in R3)
+- **Root cause:** `PartyCreationScene.ts:253-261` hardcodes 5 dialog pages on black: game data in TypeScript, against AGENTS.md.
+- **Fix:** the text moves to `cutscenes.yaml` as `opening`, cut to 3 pages over existing staged backgrounds (free):
+  1. `fade_out 500`, `{type: backdrop, image: dark_forest}`, `fade_in 800`, then "The world is veiled in darkness. The winds stop, the seas rage, and the earth decays."
+  2. "Their only hope is a prophecy: \"When the world is in darkness, four Warriors of Light will come.\""
+  3. `fade_out 600`, `backdrop grassland`, `fade_in 800`, then "After a long journey, four young warriors reach the gates of Cornelia, each holding a darkened orb."
+  4. `fade_out 600`, `{type: backdrop, image: null}` (it ends black, as the field fade-in expects).
+  - The dropped King line is covered by `south_gate_guard`.
+  - Runtime: R3's new `partyCreation/OpeningSequence.ts` plays `CutsceneRegistry.get('opening')` with a `backdrop` dep; R1's `CutsceneManager` dispatches the `backdrop` step (R0-1).
+- **Test:** `act1Flow`: `opening` has ≤ 3 dialog steps of ≤ 100 characters; every `backdrop` image exists as `assets/backgrounds/<id>.webp`; the last fade is `fade_out`. R3: `PartyCreationScene.ts` and `OpeningSequence.ts` contain no dialog text literals.
+- **Browser:** `http://127.0.0.1:5173/?mute=1`, New Game, name the party, watch the opening.
+
+**R4a owns:** `assets-src/tools/layouts/{cornelia,castle,common,interiors,interiors_common,homes_a,homes_b,shops}.py` (and the `assets-src/maps/cornelia*.yaml` they generate, rebuilt on the integration branch); `assets/data/cutscenes.yaml`; M6's `assets-src/gen/approved/temple/relics.json` (`paint` only), W15's `assets-src/gen/approved/vendor_f/field.json` (`head_from` only, specified in R4b), `assets-src/build_assets.py` (the chest loader), `assets/sprites/characters-ai.{png,json}` (rebuilt), the M6 and W15 cases in `assets-src/gen/selftest.py`; and `tests/data/{corneliaLayout,castleLayout,actOneDialog,act1Flow}.test.ts`.
+
+### R4b: overworld and temple data
+
+**Numbers today** (seeded sims, 3000 seeds, a fresh counter per trip): overworld rate `{15, 30}` (`overworld.py:221`), temple `{8, 15}` (`temple-of-fiends.yaml:206`; a long walk measures 11.5 steps per battle, so the live log's "every 5–10 steps" is perception). Battles per trip: S gate → temple 30 steps, 0.94; W or N gate → temple 17 steps, 0.12; temple entry → Garland 14 steps, 0.76; entry → 4 chests → Garland 52 steps, 4.01.
+
+#### T1: the bridge gate message doesn't change after the King's order (data; runtime in R1)
+- **Root cause:** one fixed string (`overworld.py:197`), wired as `keyItemGates` at `:219`; `KeyItemGate.message` is a `string` (`src/types/index.ts:352`), and `KeyItemGateSystem.ts:38-40` returns it whatever the flags.
+- **Fix:** with R0-2 (`message: string | ConditionalDialog[]`) and R1's resolver: `[{condition: INTRO_COMPLETE, text: ["The King's builders are at work on the bridge, but it isn't finished yet."]}, {text: ["The bridge has collapsed into the sea. Only the King's builders could repair it."]}]` on both gates.
+- **Test:** `overworldLayout.test.ts`: both bridge gates carry an INTRO_COMPLETE variant whose text differs from the default.
+- **Browser:** `?mute=1&scenario=r_overworld_after_intro`: walk north to the stub at (29,32) and bump it: the "at work" line. Then `?mute=1&scenario=act1_overworld`: the "collapsed" line.
+
+#### M11: the north keep door lands at the far east of the castle grounds
+- **Root cause:** `overworld.py:233` maps `N_WARP` (the keep's drawn door, `overworld_consts.py:13`) to Cornelia's `castle_gate` (55,24), the precinct's east gate.
+- **Fix:** target the existing entrance `castle` (30,19), in front of the castle door (R4a's M1 clears row 19). Combine with W10's new `N_WARP`.
+- **Test:** `overworldLayout`: the transition at `N_WARP` targets `castle`, and Cornelia's `castle` entrance is directly south of its castle-door transition (30,18).
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk into the keep door; arrive at (30,19) before the castle door.
+
+#### W1: the temple icon is tiny and dark (OW-8)
+- **Root cause:** `overworld.py:180-181` still stamps `prefab: temple_icon`: 48x50 native px in a 96x96 box (`approved/overworld/landmarks.png`, bbox x 22–69, y 46–95), mean luma 60. `kits.yaml:604` keeps `temple_grand` `skip: true` after 3 attempts (ledger keys `0cfb1eeb…`, `bc37fe12…`, `b398fc75…`). The hero's head tile on the arrival (15,39) covers the door cell and hides most of a 48 px icon.
+- **Fix A (preferred, 0 images; R5-1):** re-cut the `temple_grand` render already cached under the approved sheet's own key `b398fc75` (seed 1236): an asymmetric temple, about 91x96 native, doorway right of centre, on a lighter stone platform.
+  - A new sheet `overworld/grand_temple` in `kits.yaml`, whose request is byte-identical to `grand` (seed 1236, same refs, guide, boxes and texts), so the cache key matches; `bridge_gap` `skip: true`; `temple_grand` cut under new part names `temple_ruin_{0,1}_{0,1}` with a tighter `source` box; the measured doorway columns recorded as `door_px: [x0, x1]`.
+  - **Gate:** `generate.py overworld --backend gemini --sheets kit_grand_temple --seeds 1236 --dry-run` must report a cache hit on `b398fc75` and 0 paid requests. If the key differs, stop; no paid call.
+  - `approve.py overworld kit_grand_temple`; `grand.{png,json}` untouched (style lock).
+- **Map (`overworld.py:180-181`):** a `deco` at (14,37) with `parts: [[temple_ruin_0_0, temple_ruin_0_1, null], [temple_ruin_1_0, temple_ruin_1_1, null]]`, `offset: [72 − door centre, 0]` (about +15), `collide: alpha`, `walk_cells: [[1, 1]]`. The null column owns (16,37–38), so no peak draws over the spill (`terrain/peaks.py` `plan_peaks`). The explicit transition (15,38) → `temple-of-fiends`/`entry` and `entrances.temple: [15, 39]` replace what the prefab created; `TEMPLE_DOOR`, the arrival and the fade are unchanged. If the 0.25-scale preview still fails, add `style: bright` (R0-7). W14 removes the dark speckle around it.
+- **Fix B (if A fails review):** the seed-1234 render (`0cfb1eeb…`, cached): symmetric, centred door, 76x96; rebuild its request from `out/gemini/overworld/1234/kit_grand_prompt.txt`, `offset: [24, 0]`, the same dry-run gate.
+- **Fix C (no AI):** keep `temple_icon` with `offset: [27, 0]` (W2) and `style: bright`; fixes W2 but not the size. Then R5-2 (paid).
+- **Test:** `overworldLayout.test.ts` (replacing `:152-158`): the temple object's parts are `temple_ruin_*` and exist in `approved/overworld/grand_temple.json`, whose `prop_px` is ≥ 82x82 (old `temple_icon` 48x50 fails); `warp_leaves`, `art_coverage` and `act1Flow.test.ts:40-59` pass.
+- **Browser:** `?mute=1&scenario=r_ow_temple`: screenshot from the spawn, walk north 2 cells (the icon stays readable behind the hero), enter; 0 console errors. Then `python3 -I assets-src/tools/build_map.py --preview overworld 0 0 72 72 /tmp/r/ow_q.png --scale 0.25`: the temple can be picked out next to the city.
+
+#### W2: the temple's drawn door sits half a cell left of its warp cell (15,38)
+- **Root cause:** `temple_icon`'s doorway is centred in its 2x2 box at native x ≈ 45, but the door cell is cell 1, centred at x 72 (`overworld.py:180`, `door: 1`; `overworld_consts.py:20-21`).
+- **Fix:** W1's `offset` puts the measured doorway centre on x 72 ± 6 (A about +15; B +24; C +27).
+- **Test:** `overworldLayout`: the temple transition is at (deco.x + 1, deco.y + 1), and |(`door_px[0]` + `door_px[1]`) / 2 + offset.x − 72| ≤ 6 (old: no offset, door centre ≈ 45).
+- **Browser:** as W1; at the arrival, facing north, the door is centred above the hero.
+
+#### W3: two invisible walls in the temple hall
+- **Root cause:** the broken-pillar decos at (9,10) and (14,12) (`temple-of-fiends.yaml:104-115`) block both cells by default, and `tpillar_broken_top` has 0.00 alpha coverage, so the top cells block with nothing drawn.
+- **Fix:** `collide: alpha` on both decos; the bottom parts (0.47 coverage ≥ `ALPHA_MIN` 0.25, `build_map.py:76`) still block.
+- **Test:** `templeLayout.test.ts`: (9,10) and (14,12) walkable, (9,11) and (14,13) not; `:23` and `:31` 234 → 236 walkable cells.
+- **Browser:** `?mute=1&scenario=act1_temple`: (9,9) → (9,10); (14,11) → (14,12).
+
+#### W4 (data half): routes shorter than the minimum encounter rate
+- **Root cause:** the overworld minimum 15 (`overworld.py:221`) is above the W/N gate → temple route (16 counted steps), so 88 % of those trips have no fight. (The counter reset on map load is R1's.)
+- **Fix:** overworld `encounterRate: {min: 10, max: 22}` (decision R-14). Battles per trip with a fresh counter (R1's persistence only adds): S gate → temple 0.94 → 1.32; W/N gate → temple 0.12 → 0.54 (P ≥ 1 battle 54 %); E gate → tomb 0.38 → 0.86. `fieldPacing` counts battles, not steps, so it doesn't move.
+- **Test:** `tests/balance/zones.test.ts`, new `describe('route encounters')`: the real `EncounterSystem` with the step filter, BFS-shortest paths on the compiled maps, 2000 seeds: W gate → temple P(≥ 1 battle) ≥ 0.45 (old 0.12); S gate → temple mean 1.0–1.7 (old 0.94).
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk to the temple 3 times (re-open the URL each time); log the battles.
+
+#### W5: little enemy variety by region
+- **Root cause:** `overworld_zones.py:14-22`: the fields and the approach share goblin, wolf and gr_imp; `temple-of-fiends.yaml:215` rolls wolves in the temple. The act-1 species with art are goblin, gr_imp, wolf, gr_wolf and skeleton.
+- **Fix (data only, no new species):** approach (`overworld_zones.py:19-22`): gr_imp 2–4 (w3), wolf 2–3 (w3), skeleton 1–2 + gr_imp 1–2 (w2; the undead leaking from the temple), gr_imp 1–2 + wolf 1–2 (w2), no goblins. The temple loses its wolves (B9). The fields stay goblin-led; the east pocket keeps gr_wolf.
+- **Test:** `zones.test.ts`: the temple has no wolf (old: 1 entry); the approach rolls a skeleton and no goblin; each region's species set differs from its neighbour's. `actOneEncounters.test.ts:64-75` stays green (approach gr_imp ≈ 70 % ≥ 30 %; temple skeletons 80 % ≥ 70 %).
+- **Browser:** `?mute=1&scenario=r_ow_temple`: 3 approach battles; one has skeletons, none goblins.
+
+#### W6: the south gate exit is cut off from the west by the city stream
+- **Root cause:** `STREAM` (`overworld_consts.py:42`) runs from the city to the bay with no crossing; `RING` (`:65-66`) avoids it on purpose, so the S gate arrival (28,47) → (24,47) takes 24 steps.
+- **Fix:** `STREAM = [(CX, CY+3), (CX, CY+7), (CX−2, CY+9), (CX−4, CY+10), (CX−5, CY+12)]` makes column 26 a single river cell for rows 47–49; after the roads (`overworld.py:128`), a footbridge `=` at (26,48) and a road cell at (27,48) joining the S road (`river_check` passes: the run above and below is exactly [26]). S → (24,47) takes 6 steps. Side effect: S gate → temple door drops from 29 to 23 (decision R-13).
+- **Test:** `overworldLayout`: new, (24,47) is ≤ 8 steps from `entrances.cornelia` (old 24); `:243-249` temple bound 25–40 → 20–40; `overworld.py:152` `check()` (25, 40) → (20, 40); OW-1 (`:172-189`) still one network.
+- **Browser:** `?mute=1&scenario=act1_overworld`: from the S gate walk west over the footbridge.
+
+#### W7: the `temple_approach` zone splits a forest
+- **Root cause:** `encounter_zones` (`overworld_zones.py:50-67`) zones by distance only, so the boundary cuts the south-west forest at x 16|17, rows 53–62.
+- **Fix:** after the distance rule, each 4-connected forest component with ≥ half its cells in the approach joins it whole, otherwise leaves whole. Grass unchanged.
+- **Test:** `overworldLayout.test.ts:293-316`: `want` follows the majority rule; new: no forest component has cells both inside and outside `temple_approach` (old: fails at x 16/17).
+- **Browser:** `?mute=1&scenario=r_ow_temple`: read the backdrop at a forest edge with `browser_evaluate` (data change; no visual check).
+
+#### W8: the bridge debris is brown wood next to pale stone stubs
+- **Root cause:** `BROKEN_BRIDGE` (`overworld_consts.py:114-115`) draws the approved brown `bridge_gap` parts (mean (130,87,71)); the stubs are the approved `bridge_h` pale stone (deck mean (206,189,167)): ΔE76 = 38.8.
+- **Fix (free):** the deco gets `style: pale_stone`, a new `RECOLOR` entry (R0-7). A trial `(0, 0.4, 1.4)` measured ΔE 13.1; tune to ≤ 12 from `(10, 0.45, 1.45)`. The plank shapes stay and read as split slabs (review call). Rejected: re-texturing every overworld bridge in wood. Paid fallback: R5-2's `bridge_gap_stone`.
+- **Test:** `overworldLayout.test.ts:139-150`: the debris has `style: 'pale_stone'`; new (`map_selftest.py` or a vitest on the RECOLOR table): the restyled debris mean is within ΔE 12 of the `bridge_h` deck (old 38.8).
+- **Browser:** `?mute=1&scenario=r_ow_bridge`: stubs and debris read as one material; the gate message is per T1.
+
+#### W9: the jetty head uses the wrong piece; the pier leads nowhere in act 1
+- **Root cause:** `JETTY` starts at shore + 1 (`overworld.py:121-122`), at (28,53), which has land at (27,53), so `_bridge_cell` (`build_map.py:845-847`) picks `bridge_h` for the head. The ship needs `BIKKE_DEFEATED` (`overworld.py:230`).
+- **Fix:** (28,53) becomes land (the road end); `JETTY = [(CX+2, shore+2+i) for i in range(3)]` → (28,54)–(28,56), water both sides; the ship cell moves to (28,57) (ocean); an `inspect` at (28,57): "The pier runs out into the bay. No ship calls at Cornelia while pirates rule the seas."
+- **Test:** `overworldLayout`: every jetty cell has water at x ± 1 (old (28,53) fails); (28,57) has inspect text; OW-1's jetty target `[ship.x, ship.y − 1]` is in the network.
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk to the pier end and confirm facing the sea.
+
+#### W10: the city gates are hard to read
+- **Root cause:** the roads stop at the arrivals, outside the icon (`overworld_consts.py:67-75`); the north entry walks over the keep's tower art: `N_APPROACH` (28,43) is a walkable icon cell and `N_WARP` (28,44) is inside the keep (`:13-14`; `overworld.py:178`).
+- **Fix (free; a new city icon is not worth 1–3 images):** `N_WARP = (CX+2, CY)` = (28,43), drop `N_APPROACH`, `walk_cells` → `[[2,0], [0,2], [4,2], [2,3]]` (arrival (28,42) unchanged). Each gate road runs one cell further, onto its warp cell (W 26,45; E 30,45; S 28,46; N 28,43), allowed by `road_check` (`map_checks_terrain.py:73` only rejects road under blocked art).
+- **Test:** `overworldLayout`: OW-2 (`:191-200`) and OW-3 (`:202-208`) pass; new: every city warp cell is road (old: none); the `castle` warp's y is the city's top row.
+- **Browser:** `?mute=1&scenario=act1_overworld`: round the city through all four gates; the north gate warps at the wall's edge.
+
+#### W11: vines hang in mid-air at the tomb
+- **Root cause:** `TOMB_OBJECTS` places free-standing `vines` on grass at (53,43) (`overworld_consts.py:105`).
+- **Fix:** delete them; W12's chest takes that nook between (52,43) and the range (54,43).
+- **Test:** `overworldLayout`: no `vines` part on a cell whose north neighbour is walkable or grass.
+- **Browser:** `?mute=1&scenario=r_ow_east`.
+
+#### W12: the hardest area (the east pocket) has no reward
+- **Fix:** an overworld chest NPC `{id: chest_tomb, sprite: chest, x: 53, y: 43, chestItem: iron_shield, chestFlag: CHEST_ERDRICK_TOMB, dialog: ["You found an Iron Shield!"]}`. The Iron Shield is not sold in Cornelia (`shops.yaml`), and R4a's knight chest already gives the Iron Helm (M10). The `tests/balance` sims don't open chests.
+- **Test:** `overworldLayout`: the pocket has a chest NPC whose cell is in `east_pocket`; `crossFileValidation` checks the item and the unique flag.
+- **Browser:** `?mute=1&scenario=r_ow_east`: open the chest; it shows opened.
+
+#### W13: the temple floor shows a hard grid, and the temple is small
+- **Root cause:** every walkable cell is one 2x2 `temple_floor` texture (`temple-of-fiends.yaml:12`, ground `:17-39`) repeating every 2 cells; only 7 of 236 cells are `%`.
+- **Fix:** a 4-wide `_` aisle from the corridor (x 10–13, rows 7–20) to the altar row, aliased `floor: {from: carpet, shade: 0.55}` (a faded runner), with `contrast: {a: W, b: "_", min: 0.2}`; about 10 more `%` rubble cells in clusters off the main path. Size unchanged (FF1 parity; decision R-15).
+- **Test:** `templeLayout`: ≥ 15 % of walkable cells are `_` or `%` (old 3 %); `_` is a connected run from (11,20) to row 7.
+- **Browser:** `?mute=1&scenario=act1_temple`: screenshot the hall.
+
+#### W14: black dither speckle around mountain ranges
+- **Root cause:** `foothills` (`terrain/peaks.py:14-36`; `terrain/base.py:39-41`, `FOOT_COVER` 0.40) copies single raw mountain-texture pixels onto grass by a Bayer threshold, so the texture's dark crevice pixels land as isolated black dots.
+- **Fix:** clamp the foothill texture's luma to ≥ 0.8 of the local grass luma (or median-filter `mtex` 3x3) before the copy, and `FOOT_COVER[0]` 0.40 → 0.30. Only `organic` maps with mountains change (in act 1, the overworld).
+- **Test:** `terrain/selftest.py`, new case: on a synthetic grass + mountain strip, ≤ 1 % of foothill pixels are darker than the grass texture's 5th percentile (old: fails).
+- **Browser:** `?mute=1&scenario=r_ow_temple`: no black speckle round the temple hills.
+
+#### W15: `vendor_f`'s back-frame shawl flickers (implemented by R4a, which owns `selftest.py` and the `characters-ai` rebuild)
+- **Root cause:** in `approved/vendor_f/field.png` the up-row stand frame 0 draws a long brown shawl to the hem, while step frames 1 and 2 show a short one (the json note already records it as accepted in T6).
+- **Fix (free):** a review fix in `approved/vendor_f/field.json`: `head_from: {up: [[0, 2, 78]]}` (rows 0–77 from frame 2; the stand keeps its own hem and feet). `head_from` is a sanctioned hand fix (`approve.py:26`; applied in `build_assets.py:184-185`), and the png is untouched. Tune the row count with `python3 -I assets-src/gen/puppet.py review vendor_f`, then `build_assets.py field_ai`. Paid fallback: R5-3.
+- **Test:** `assets-src/gen/selftest.py`: in the built `characters-ai` up row of `vendor_f`, the stand frame's brown-shawl pixel count is within 15 % of the step frames' (old: about 2x).
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: walk behind the market woman; no flicker.
+
+#### B1 (map half): talk to Garland to fight, and a trigger that can't be sidestepped
+- **Root cause:** Garland (`temple-of-fiends.yaml:183-188`) is a plain dialog NPC at (11,5); the only trigger is (11,6) (`:198-205`). The room (x 3–20, y 3–6) opens through a 4-wide gap at row 7, x 10–13 (`:24`), so (13,7) → (13,6) → (14,6) → (14,4) reaches the princess side without the fight. Talking can't start a battle: post-dialog actions are only `shopId`, `action` (`classUpgrade`) or a due cutscene (`ExplorationScene.ts:374`, `handleNpcPostDialog` `:414-437`), and scripted encounters fire only by cell (`getScriptedEncounterAt` `:493-506`).
+- **Fix:** Garland moves to (11,6), standing in the doorway row. The room's whole cut, row 6 x 10–13, becomes Garland plus three trigger cells: `scriptedEncounters` at (10,6), (12,6) and (13,6), each with the same `enemyIds`, `flag: GARLAND_DEFEATED`, `isBoss`, `message` and `postVictoryCutscene` (the engine already handles several entries per flag). The (12,6) entry carries `npc: garland` (R0-3; R1 adds the talk branch). Talking from (11,7) gives his two lines, then the battle message and the battle. Victory sets the flag, which hides him and disarms all three cells.
+- **Test:** `templeLayout.test.ts`: BFS from `entrances.entry` on the compiled collision, NPC cells blocked and scripted cells as stops: no room cell (y 3–6) and no princess neighbour is reachable (old: (14,4) is); all scripted cells share one flag; exactly one has `npc: garland`, and Garland's cell neighbours a corridor cell.
+- **Browser:** `?mute=1&scenario=r_temple_garland`: (1) face north from (11,7), confirm: dialog, then battle; (2) re-open, walk (12,7) → (12,6): battle; (3) re-open, (13,7) → (13,6): battle. 0 console errors.
+
+#### B9 (data half): the temple rate and table
+- **Root cause:** rate `{8, 15}` (`temple-of-fiends.yaml:206`); table (`:208-218`): skeleton 2–4 (w4), skeleton 1–3 + imp 1–2 (w3), imp 2–4 (w2), wolf 2–3 (w1), skeleton 4–6 (w1). Mean formation 3.26; the chest route averages 4 battles.
+- **Fix:** rate `{min: 12, max: 22}`; table: skeleton 1–3 (w4), skeleton 1–2 + gr_imp 1–2 (w3), gr_imp 2–3 (w2), skeleton 3–4 (w1), no wolves. This meets R2's targets (no formation above 4 skeletons or 5 enemies; mean ≥ 16 steps per battle). Mirror the table and rate in the legacy `assets/maps/temple-of-fiends.yaml:1203-1206`, which `actOneBalance.test.ts:169-171` pins.
+
+  | Measure | Old | New |
+  |---|---|---|
+  | Mean formation | 3.26 | 2.54 |
+  | Chest route, battles | 4.01 | 2.54 |
+  | Direct route, battles | 0.76 | 0.19 |
+  | Lv1 fresh win | 97.2 % | 99.8 % |
+  | Lv2, 3 fights in a row: wipes / HP left | 1.0 % / 82 % | 0 % / 89 % |
+  | Lv1, 4 fights: wipes | 23 % | 2.8 % |
+
+- **Test:** see "Balance bounds". `zones.test.ts`: the chest route (BFS through the 4 chest stands) averages 2–3 battles (old 4.0), the direct route ≤ 0.35 (old 0.76).
+- **Browser:** `?mute=1&scenario=r_temple_party`: walk entry → 4 chests → the doorway; log the battle count and pack sizes.
+
+**R4b owns:** `assets-src/tools/layouts/overworld{,_consts,_zones,_grid}.py` (and the regenerated `assets-src/maps/overworld.yaml`); `assets-src/maps/temple-of-fiends.yaml`; the legacy `assets/maps/temple-of-fiends.yaml` (encounters and rate only); `assets-src/tools/terrain/{peaks,selftest}.py`; `tests/data/{overworldLayout,templeLayout}.test.ts`; `tests/balance/{zones,fieldPacing}.test.ts`. R5's sheets are listed in §3.
+
+
+---
+
+### 3. Paid art (R5)
+
+**Budget:** cap 100 Gemini images; **25 used** (ledger: 94 Gemini attempts − `attempts_before` 69); 3 attempts per sheet. Bedrock is not counted. R5 runs in the main checkout (it needs the gitignored refs and `.env`), dry run first, `--max-paid 1`; every free re-cut and every approval runs `python3 -I assets-src/gen/selftest.py` and `git diff --exit-code assets-src/gen/approved/` excluding the new files; decisions are logged in `docs/ACT1_LOG.md`.
+
+| # | Sheet | Spec | Approval | Images min / expected / max | Fallback |
+|---|---|---|---|---|---|
+| R5-1 | `overworld/grand_temple` (**free**, W1) | a request byte-identical to `grand` seed 1236 (cache key `b398fc75`); `bridge_gap` `skip`; the temple cut as `temple_ruin_*`; `door_px` recorded | the dry run reports a cache hit and 0 paid requests; prop ≥ 82x82; door centre + offset within 72 ± 6, ≥ 12 native px wide (decision R-12); readable at 0.25 scale; no magenta fringe; `art_coverage` and `warp_leaves` pass | 0 / 0 / 0 | free B (seed 1234, `0cfb1eeb`), then free C, then R5-2 |
+| R5-2 | `overworld/kit_temple` (paid; only if R5-1 and B fail, or W8's recolour fails review) | `temple_ruin3`, 3x2, **symmetric with the doorway centred** (the model centred it every time; revision 13 failed only because it asked for an off-centre door), ≥ 24 px wide, on a light stone platform; prefab `w: 3, door: 1` at (14,37) so the door lands on (15,38) with no offset. Plus `bridge_gap_stone` 2x2: snapped pale-stone deck ends and masonry blocks, ≥ 50 % keyed, within ΔE 12 of `bridge_h` | as R5-1, plus T6 checkpoint 1's criteria; the stone pieces match the stubs | 0 / 0 / 3 | W1: free C; W8: keep the recolour |
+| R5-3 | `vendor_f/field` retry (paid; only if W15's `head_from` fails review) | `--retry --seeds 1235`; the prompt adds "the shawl ends at the waist in every frame, front and back" | T6 checkpoints 3–5's criteria, plus the same shawl length in all 3 back frames | 0 / 0 / 2 | keep `head_from` |
+| R5-4 | `town/kit_gates` (paid, M7; decision R-10) | swatches, refs `town/walls`, `town/signs`: `gate_arch_3` (3x2), `gate_arch_2` (2x2), `gate_side` (2x2 lintel over a vertical wall), `sign_tavern` (a tankard), `sign_shrine` (a white crystal) | outline, light and saturation match `town/walls` and `town/signs`; the arches read as gatehouses over the passage at 2x; keyed cleanly | 1 / 1 / 3 | turret flanking only (free, done anyway); no tavern or shrine sign |
+
+- **Expected:** 1 image (R5-4), because W1, W8 and W15 are free → **26 of 100**. **Worst case:** 8 → 33 of 100.
+- **Not budgeted (only on a user decision):** a paid shoreline background (B14, 1–3), a seated King (M13, 1–3), new NPC sheets (M8, 1–3 each).
+
+---
+
+### 4. Balance bounds (B1 and B9)
+
+Sims: the real `BattleStateMachine` and `tests/helpers`, the `tests/balance/*` seed formulas, 400 seeds (encounters 2000–3000). Party Warrior / Thief / White Mage / Black Mage. Expected arrival at Garland: Lv 2–3 (`fieldPacing`: Lv 2 at battle 5, Lv 3 at battle 22, median).
+
+**Garland: 240 HP, attack 16, 2 hits, no weakness; at ≤ 25 % HP 3 hits; B7 jittered order.**
+
+| Case | Today (FF1 Garland) | Target (measured) |
+|---|---|---|
+| sensible Lv 2, 400 G kit | ≥ 95 % | 50 % |
+| sensible Lv 2, full kit + 3 potions | ≥ 95 % | 95 % (≥ 3 rounds in every win, median 5; 34 % party HP lost; 0.8 downs per win) |
+| sensible Lv 3, full kit | n/a | 99.5 % (28 % HP lost) |
+| careless Lv 1, naked | 0.25 % | 0 % |
+| careless Lv 1, 400 G kit | 98.25 % | 1.25 % |
+| careless Lv 2 / Lv 3, 400 G kit | n/a | 12 % / 41 % |
+| sensible Lv 1, full kit | n/a | 45.5 % |
+| temple run then Garland, Lv 2 (2 battles) / Lv 3 (3 battles) | ≥ 85 % / ≥ 95 % | 85.0 % / 95.75 % (97.25 % at Lv 3 with the new temple table) |
+| SLEP every round: locked out / share of rounds he acts | ≤ 5 % / 0.21 ± 0.04 | 0 % / 0.468 |
+
+Under the other B7 options: strict agility order gives sensible Lv 2 full 98.25 %, temple Lv 2 92.25 %, SLEP share 0.267; FF1's pure shuffle gives sensible Lv 2 full 94 %, temple Lv 2 79 % / Lv 3 95 %, SLEP share 0.503.
+
+**`tests/balance/garland.test.ts` changes (R2):**
+- `:2-5` header and `:41` describe title: 240/16/2, phase ≤ 25 % → 3 hits (triage default B1).
+- `:42-45` split: `start/sensible/L2` within 0.35–0.65 (old ≥ 0.95); `full/sensible/L2` ≥ 0.90 (old ≥ 0.95); new `full/sensible/L3` ≥ 0.97.
+- `:49-51` naked careless Lv 1 ≤ 0.05 (unchanged).
+- `:53-57` careless Lv 1, 400 G kit: 0.90–0.995 → ≤ 0.05.
+- New: careless Lv 2 within 0.05–0.35, careless Lv 3 within 0.25–0.65.
+- `:59-61` sensible Lv 1: 400 G kit ≥ 0.98 → full kit within 0.30–0.65.
+- `:63-66` temple run: Lv 2 ≥ 0.85 → **≥ 0.80**; Lv 3 ≥ 0.95 → **≥ 0.93** (decision R-1).
+- New: in sensible Lv 2 full-kit wins, ≥ 3 rounds in ≥ 90 % of battles.
+- `:68-72` comment (turn order no longer strictly by agility); `:94` comment 106 → 240 HP; `:98` ≤ 0.05 unchanged; `:99` `0.21 ± 0.04` → **`0.47 ± 0.05`** (0.27 ± 0.04 if B7 keeps agility order).
+- Also `tests/battle/BossPhase.test.ts:37-91`, `tests/battle/CombatStats.test.ts:124-128` and `tests/data/actOneBalance.test.ts:86-93` (see B1).
+
+**Temple (B9): rate `{12, 22}`; table skeleton 1–3 (w4), skeleton 1–2 + gr_imp 1–2 (w3), gr_imp 2–3 (w2), skeleton 3–4 (w1), no wolves; escape `min(0.75, luck / (level + 16)) − 0.05 × (enemies − 1)`.**
+- Targets: no formation above 4 skeletons or 5 enemies; per battle at Lv 2 (careless, 400 G kit) ≤ 11 % HP lost and ≤ 2 % someone falls (today 12.6 % / 3.8 %); mean ≥ 16 steps per battle; a 5-battle crawl at Lv 2 (sensible, no inn) wipes ≤ 1 % (today 3.4 %).
+- Measured with the new table: mean formation 3.26 → 2.54; chest route 4.01 → 2.54 battles; direct route 0.76 → 0.19; Lv 1 fresh win 97.2 → 99.8 %; Lv 2 three fights in a row 1.0 % → 0 % wipes, 82 → 89 % HP left; Lv 1 four fights 23 → 2.8 % wipes. Thief escapes vs 3 enemies: 100 % → 65 % (8 of 8: 3.2 %).
+- `tests/balance/zones.test.ts:27-31` ("temple won 90–99 %"; with the new table it would read 0.994 and break the 0.99 ceiling) becomes: Lv 1 fresh win ≥ 97 %; mean formation 2.3–2.8 (old 3.26 fails); Lv 2 sensible 3-fight chain ≤ 1 % wipes and ≥ 85 % HP left (old 1.0 % / 82 % fails). New describes: route encounters (W4), variety (W5), temple routes (B9).
+- `tests/balance/fieldPacing.test.ts:60-82`: the simulated campaign also shops at each zone boundary and once after the last battle (the walk home). Without that, `:110` "≥ 7 of 8 purchases" drops to 6.79 under the new tables (fewer inn visits); with it: 8.0 bought, 289 G left, Lv 2 median 5, Lv 3 median 22, 0 wipes, so `:92-110` are unchanged.
+- `tests/battle/BattleCommands.test.ts:53-67` (escape values) per B9.
+- The B2 draw-order change shifts seeded numbers by 1–2 points: re-measure on the implementation and keep every bound at least 3 points from the measured value.
+
+---
+
+### 5. Sub-tranches and order
+
+| # | Items | Owns (files) | Depends on |
+|---|---|---|---|
+| R0 | the shared contract (§2) | `CutsceneManager.ts` (types), `src/types/index.ts`, `schemaValidation.ts`, `Inventory.ts` (API), `SaveManager.ts`, `EventBus.ts`, `Menu.ts` (`setActive`), new `uiSounds.ts`, `DebugScenarioLoader.ts` (fields), `ItemEffects.ts` (wording), `build_map.py` (`RECOLOR`), `kit.py` (`_PARTS`), `debug-scenarios.yaml`, the `cutscenes.yaml` header comment, their tests | none; first commit on `r-integration` |
+| R1 | engine, scenes, input, audio | "R1 owns" | R0 |
+| R2 | battle | "R2 owns" | R0 |
+| R3 | menus, shops, items, Save/Load, naming, opening runtime | "R3 owns" | R0 |
+| R4a | town, castle, dialog, cutscene data, chest art fix, W15 | "R4a owns" | R0 |
+| R4b | overworld, temple, B1 map, B9 data | "R4b owns" | R0 |
+| R5 | paid and free art checkpoints | `assets-src/gen/kits.yaml`, `characters.yaml`, the new approved sheets, `cache/`, `ledger.jsonl`, `.gitignore` exceptions | none (sequential inside) |
+| R6 | art wiring: W1's `temple_ruin_*` deco (or fallback C), M7's arches and signs, R5-2's `bridge_gap_stone` if used | `layouts/overworld.py`, `layouts/cornelia.py`, `tests/data/{overworldLayout,corneliaLayout}.test.ts` | R5, R4a, R4b merged |
+
+**No file is shared within a wave.**
+- `ExplorationScene.ts` is R1's alone; the chest call site (E1), talk-to-fight (B1), the gate message (T1) and the `backdrop` dispatch (N2) are done there by R1 against R0's types.
+- `Menu.ts`, `Inventory.ts`, `DebugScenarioLoader.ts` and `ItemEffects.ts` are touched by R0, then by one tranche each.
+- `NameEntryGrid.ts` is R3's (N1 and its `uiEventBus()` line); `FieldMenuScene.ts` line 21 is R3's.
+- `build_assets.py`, `gen/selftest.py` and the `characters-ai` atlas are R4a's (M6, W15); `stage_backgrounds.py` and `shoreline.webp` are R2's.
+- `actOneBalance.test.ts` is R2's; R4b only mirrors the legacy temple map it reads. `act1Flow.test.ts` is R4a's; R4b only relies on it.
+- R6 runs alone after wave 1 and edits files R4a and R4b owned.
+
+**Order:**
+1. R0 on `r-integration`.
+2. **Wave 1:** R1, R2, R3, R4a, R4b in parallel worktrees from `r-integration`; R5 at the same time in the main checkout, R5-1 first (free), the paid checkpoints only per decisions R-10 / R-12.
+3. Merge R1 → R2 → R3 → R4a → R4b, then R5.
+4. **Wave 2:** R6.
+5. **Integration:** run the layout scripts by name (`overworld.py`, `cornelia.py`, `interiors.py`, `castle.py`), then `build_map.py` for every map; a second run gives no diff (`git diff --exit-code assets-src/maps assets/maps/ai`). Then `build_assets.py field_ai characters` and `stage_backgrounds.py shoreline`.
+
+**Validation:**
+- `npm run build`, `npm test`, `npx vitest run tests/data tests/balance` (with the new bounds);
+- `python3 -I assets-src/tools/build_map.py --selftest` and `--check-determinism`; `python3 -I assets-src/tools/terrain/selftest.py`; `python3 -I assets-src/gen/selftest.py` (main checkout); `stage_backgrounds.py --check shoreline`;
+- `map_report.py cornelia cornelia-castle cornelia-castle-2f cornelia-castle-tower cornelia-castle-cellar temple-of-fiends overworld` and the interiors;
+- every browser check above, 0 console errors, plus one New Game → rescue → King play-through (the T2 warp, the throne-room arrival, `act1_complete`);
+- file sizes: the new modules and every touched scene < 250 lines; the monitored exceptions no longer than today;
+- `AGENTS.md`: the `warp` and `backdrop` steps, `ScriptedEncounter.npc`, conditional gate messages, `SaveData.location`, `BossPhase.hits/attack`, the new debug scenarios and sheets, and the updated monitored-file sizes;
+- an R result section in this file.
+
+**Process:** as before: momus reviews this plan, then the implementation, before each commit.
+
+---
+
+### 6. Decisions for the user
+
+Each has a recommended default; the orchestrator proceeds on the defaults unless told otherwise.
+
+1. **R-1, Garland's phase and the temple-run bound (B1):** 2 → 3 hits at ≤ 25 % HP (default), or attack +2 at ≤ 50 %. With it, accept a temple-run-then-Garland bound of ≥ 80 % at Lv 2 (measured 85 %) instead of T4's ≥ 85 %. **Default: 3 hits; accept ≥ 80 %.**
+2. **R-2, turn order (B7):** (a) agility × (1 + random), modern and balance-neutral (default); (b) FF1's pure shuffle (the temple-run bound drops to ≥ 75 %); (c) keep strict agility order and only fix the tie-break.
+3. **R-3, escape (B9):** cap 75 % and −5 % per extra enemy (default), or keep FF1's formula and cut the Thief's luck growth from +3 to +1 per level.
+4. **R-4, a heal or buff on an ally who fell this round (B4):** spend no charge (default, as BA-3 does for enemies), or waste it as FF1 does.
+5. **R-5, beach backdrop (B14):** the free mirrored-rock composite for `shoreline` now (default; 15 % water under the enemies), or 1–3 paid images. `river`, `swamp` and `waterfall` have the same flaw: recorded for later (default) or fixed now with the same composite.
+6. **R-6, T2 arrival:** the 2F throne room facing the King, then the player talks to him to start `act1_complete` (default, FF1-like); or chain straight into the King's scene; or arrive at the 1F gate.
+7. **R-7, M12:** the camera keeps rooms above the HUD band (default; exits stay visible), or the HUD fades out when the hero walks under it.
+8. **R-8, magic shop slots (E4):** drop the slot step; spells fill in order as in FF1 (default; the slot was never stored), or real slot positions (a `Character` and save-format change).
+9. **R-9, the King (M13):** he steps down to (21,8) in front of the throne, so the chair shows (default, free), or a seated frame (1–3 images).
+10. **R-10, gates and signs (M7):** one paid `town/kit_gates` sheet within budget (default; 1 expected, 3 max), plus the free turret flanking either way; or free only, with no tavern or shrine signs.
+11. **R-11, NPC sprites (M8):** free reassignment of the approved sprites only (default), or 2–4 new NPC sheets (1–3 images each).
+12. **R-12, temple icon door (W1):** accept the cached free render's 12–13 px doorway if it is centred within ± 6 px and reads at 2x (default; saves 1–3 images).
+13. **R-13, south-gate footbridge (W6):** accept that it shortens the S gate → temple walk from 29 to 23 steps and relax the T3 bound to 20–40 (default).
+14. **R-14, overworld rate (W4):** `{10, 22}` (default; about 40 % more field battles per step, still about 1 battle on the short routes).
+15. **R-15, loot and scope:** the knight's chest becomes an Iron Helm, the cellar a Hi-Potion, Wooden Armour and a Robe (M10), the east pocket an Iron Shield (W12); the temple keeps its size (W13); no new act-1 species (W5). **Default: as listed.**
+16. **R-16, smaller UI choices:** Load always asks for confirmation (S5); Status shows the battle DEF (armour absorb) under "DEF" (E8); inactive menu cursors turn grey rather than hide (E3); a full bag leaves the chest closed (E1); Equip reopens on the first member (E9); cancel advances dialogs like confirm (I2); the shrine is fixed in text only, with no free heal (T6); the opening is shortened text over the `dark_forest` and `grassland` backgrounds (N2). **Default: as listed.**
+
+### R decisions (orchestrator defaults, reported to the user)
+
+| Topic | Decision |
+|---|---|
+| Temple run, then Garland, at Lv 2 | ≥ 80 % (eased from T4's 85 %) |
+| Turn order | agility × a random factor |
+| Escape | capped at 75 %, minus 5 % per extra enemy |
+| Rescue arrival (T2) | the throne room, facing the King |
+| Gate art (M7) | one paid image is allowed |
+| Temple icon (W1) | re-cut the cached render, accepting its 12–13 px door; pay only if it fails review |
+| South gate (W6) | add the footbridge; the route test's lower bound becomes 20 |
+| Overworld encounter rate | `{10, 22}` |
+| Chest loot | as the plan proposes |
+| King, spell learning, Load | the King stands in front of the throne; spell learning has no slots; Load always confirms |
+| Recorded, not fixed | the `river`, `swamp` and `waterfall` backdrops also put enemies on water |
