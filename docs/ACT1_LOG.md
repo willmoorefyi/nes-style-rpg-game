@@ -125,3 +125,11 @@ Branch `t6-art`. One paid Gemini request per checkpoint, `--paid`, at most 2 ret
 - **T6h note:** the approved sheets are `approved/overworld/grand.json` and `approved/castle/stairs_lib.json`, not `ruins.json` / `vault.json` as §2 says.
 
 **Images used:** 25 of the 100-image cap (ledger guard: 87 + 7 = 94 Gemini attempts − `attempts_before` 69).
+
+## R5 art (2026-11-14)
+
+Branch `r-art`, in the main checkout. `docs/FIX_PLAN_PENINSULA.md` §R 3 (paid art), decisions R-10 and R-12, momus revisions 15 and 16. Revision 15 calls the gates step R5-1 and the W1 re-cut R5-4; the §3 table numbers them the other way around. These entries use the sheet names. Every paid request is made with `--paid` and `--max-paid 1`, after a dry run.
+
+| # | Sheet | Images | Result | Decision |
+|---|---|---|---|---|
+| 26 | overworld/kit_grand_temple (W1, free re-cut) | 0 | The request is byte-identical to `grand` seed 1236, and the dry run reported a cache hit on `b398fc75dc4521f0a2e9f762` with 0 paid requests. The temple is cut as `temple_ruin_{0,1}_{0,1}` with `fill_ratio: 1.0`; at the default 0.96 the doorway came out 11 px. The prop is 91x96 native (≥ 82x82). The doorway's dark columns are x 53–64 (12 px, `door_px: [53, 65]`, centre 59), so the map offset is +13 and the door lands on 72 ± 0. `bridge_gap` is skipped. There is no pink or magenta fringe: 48 edge pixels are a dark violet ink (57, 0, 66; luma ≈ 25), fewer than the approved `grand` bridge gap has. It is still readable as a temple with a black door at 0.25 scale on its own; mean luma is 62 (the old icon's was 60) | **self-approved** (decision R-12) |

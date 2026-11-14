@@ -1,0 +1,54 @@
+{
+  "kit": "overworld",
+  "sheet": "kit_grand_temple",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "b398fc75dc4521f0a2e9f762",
+  "approved": "2026-11-14",
+  "tile": 48,
+  "cells": [
+    [
+      "temple_ruin_0_0",
+      "temple_ruin_0_1",
+      null,
+      null
+    ],
+    [
+      "temple_ruin_1_0",
+      "temple_ruin_1_1",
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "temple_ruin": [
+        91,
+        96
+      ]
+    },
+    "scale": {
+      "temple_ruin": 1.0
+    },
+    "skipped": [
+      "bridge_gap"
+    ],
+    "pitch_px": 3.2,
+    "door_px": {
+      "temple_ruin": [
+        53,
+        65
+      ]
+    },
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "R5 W1 (free re-cut of the grand seed-1236 render, cache b398fc75, 0 paid): temple_ruin 91x96, doorway 12 px at native x 53-64 (centre 59, map offset +13), decision R-12; bridge_gap skipped (stays in grand)"
+}

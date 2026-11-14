@@ -607,6 +607,31 @@
         - {name: bridge_gap, source: [528, 46, 980, 508], at: [2, 0], tiles: [2, 2], wrap: prop,
            parts: [[bridge_gap_0_0, bridge_gap_0_1], [bridge_gap_1_0, bridge_gap_1_1]],
            text: "the gap in a collapsed wooden bridge seen from straight above, on a plain magenta background: along the top edge and along the bottom edge, the snapped ends of plain mid-brown wooden deck planks (laid top to bottom; the same light mid-brown as a simple wooden bridge deck, about RGB 145, 106, 68, with thin dark brown gaps) stick out with jagged splintered tips and one plank hanging loose; four broken wooden piling stumps stand in the gap; a few loose planks and a coil of rope float in the middle; the middle of the box is empty: do NOT draw any water, sea or frame anywhere; leave flat magenta (#FF00FF) between all the pieces (the game draws its own sea under them)."}
+    grand_temple:
+      # R5 / W1 (FIX_PLAN R5-1 table row; R revisions item 15 calls it R5-4): a free re-cut of the `grand` seed-1236
+      # render (cache key b398fc75). The request must stay byte-identical to `grand` (same seed, refs, guide, boxes
+      # and texts; swatch names, `source`, `parts`, `skip` and `door_px` are not part of the request), so no new
+      # image is paid for. This time the temple is cut (as temple_ruin_*) and the bridge gap is skipped (it stays in
+      # `grand`). Decision R-12 accepts the render's 12-13 px doorway. fill_ratio 1.0 gives the full 91x96 prop (at
+      # 0.96 the doorway is 11 px). door_px: the doorway's dark columns in the cut 2x2 part (native px from the part's
+      # left edge, end exclusive; 12 px, centre 59, so the map offset is 72 - 59 = +13), copied into the approved
+      # json's metrics.door_px.
+      kind: swatches
+      seed: 1236
+      refs: [overworld/landmarks, overworld/city, temple/relics]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: temple_ruin, fill: true, fill_ratio: 1.0, source: [40, 34, 492, 507], door_px: [53, 65], at: [0, 0], tiles: [2, 2], wrap: prop,
+           parts: [[temple_ruin_0_0, temple_ruin_0_1], [temple_ruin_1_0, temple_ruin_1_1]],
+           text: "a world-map icon of an ancient ruined temple of evil seen from above at a three-quarter angle, as wide as it is tall and filling the whole square box edge to edge: a broad, low, stepped dark grey-blue stone temple on a cracked stone platform that spans the full width of the box. The building is ASYMMETRIC: on the LEFT side a squat stepped tower with a crumbling peaked roof and a short dark spire; the RIGHT side is a low pillared porch with a huge entrance. The entrance is NOT in the middle: a very wide, tall black arched doorway with a faint purple glow at the bottom edge, its left side at about 60 % and its right side at about 90 % of the box width (centred three quarters of the way from the left side, a third of the box wide), with a broken column on each side of it and a small brazier with a purple flame left of it. A little green moss and ivy; nothing outside the platform."}
+        - {name: bridge_gap, skip: true, at: [2, 0], tiles: [2, 2], wrap: prop,
+           text: "the gap in a collapsed wooden bridge seen from straight above, on a plain magenta background: along the top edge and along the bottom edge, the snapped ends of plain mid-brown wooden deck planks (laid top to bottom; the same light mid-brown as a simple wooden bridge deck, about RGB 145, 106, 68, with thin dark brown gaps) stick out with jagged splintered tips and one plank hanging loose; four broken wooden piling stumps stand in the gap; a few loose planks and a coil of rope float in the middle; the middle of the box is empty: do NOT draw any water, sea or frame anywhere; leave flat magenta (#FF00FF) between all the pieces (the game draws its own sea under them)."}
 
 - id: temple
   kind: kit
