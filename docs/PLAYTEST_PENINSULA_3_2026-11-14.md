@@ -1,5 +1,7 @@
 # Peninsula (act 1): third adversarial playtest, 2026-11-14
 
+**Status:** remediated by pass U (`r-integration` `9e8bbca`). Results, open items (U19, M7, W14) and follow-ups: "U result" in `docs/FIX_PLAN_PENINSULA.md`.
+
 **Tested:** `r-integration` `3f65301`-merge (all of tranche R: R0–R6 plus the review fixes), in a real browser.
 
 **Method:**

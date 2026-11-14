@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (879+ tests, 76+ files, Vitest)
+npm test             # Run all tests (2625 tests, 159 files, Vitest)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
@@ -76,6 +76,11 @@ All shared types live in `src/types/index.ts`. Key ones:
 - `ItemData` — items (weapons, armor, consumables, key items)
 - `MapData` — tile maps with layers, NPCs, transitions (`effect: door` zooms into shop/house doors, otherwise fade), encounters (`encounters`, `encounterZones`), `inspect` cells, `name` (the HUD label; no label when missing), `camp` (Tent/Cabin allowed; world map only) and `battleBackgrounds` (`default`, `terrain`, and per-encounter-zone `zones`)
 - `ItemData.description` — the one-line text shown in the help bar (`src/ui/HelpWindow.ts`) of the item, equip, field-magic and shop screens. Shared UI: `HelpWindow`, the field menu's `PartyPanel` (`src/ui/PartyPanel.ts`) and the battle's `BattlePartyPanel` (`src/scenes/battle/`)
+- `ItemData.prompt` — the confirm question before a party item (Tent, Cabin) is used; missing means "Use <name>?"
+- `CharacterClassData.abbr` — the short class label (WAR, THF, WHM …) for tight UI; read it through `classLabel()` (`src/data/classLabel.ts`: slot strip, magic shop, save slots), which falls back to the full name
+- `ScriptedEncounter.npc` — the id of an NPC on the same map; talking to it starts the fight (Garland). `BossPhase.hits` / `attack` override the boss's hits and attack once its `hpThreshold` is crossed
+- `KeyItemGate.message` — plain text, or a `ConditionalDialog[]` resolved on the story flags like NPC dialog (the bridge gate's line changes after the King's order)
+- `SaveData.location` — the map's display name at save time; `SaveManager.getSaveSlots()` returns `SlotSummary` rows (location, members, gold, play time) for the Save/Load lists, with a label made from the map id for older saves
 - `BattleSceneDeps` — decoupled battle scene dependencies
 - `BattleCommand` — fight/magic/item/run commands
 - `ElementalProfile` — per-enemy elemental weaknesses and resistances
@@ -116,7 +121,8 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- Known exceptions being monitored: `BattleStateMachine.ts`, `BattleScene.ts`, `ExplorationScene.ts`, `BattleAnimationController.ts` (~296), `Character.ts`, and the Python `layouts/castle.py` (~350) and `layouts/cornelia.py` (~345).
+- Known exceptions being monitored (current lines / ceiling): `ExplorationScene.ts` 601 / 601, `BattleStateMachine.ts` 580 / 592, `BattleScene.ts` 470 / 594, `SpellExecutor.ts` 308 / 314, `BattleAnimationController.ts` 278 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 352 / 355. `layouts/overworld.py` (249) stays under 250: its new data goes in `overworld_consts.py` or `overworld_zones.py`. `ExplorationScene.ts` and `castle.py` are at their ceilings, so a change there must extract code first (into `src/scenes/exploration/`) or be line-neutral.
+- Also over 250 and not split: `src/types/index.ts` (392), `src/core/schemaValidation.ts` (374), and the tools `build_map.py`, `kit.py` and `map_selftest.py`.
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
 
 ---
@@ -192,7 +198,8 @@ Some tests are co-located with source:
 ### Test Patterns
 
 - **Injectable RNG**: Battle tests pass deterministic RNG functions. Use `() => 0.5` or similar for predictable results.
-- **Shared mocks**: `tests/helpers/testUtils.ts` exports `createMockGame()` and `createMapData()`. Use these instead of creating ad-hoc mocks.
+- **Shared mocks**: `tests/helpers/testUtils.ts` exports `createMockGame()` and `createMapData()`. Use these instead of creating ad-hoc mocks. Their input mocks have `holdOff: vi.fn()`.
+- **Balance bounds**: `tests/balance/` (`garland.test.ts`, `zones.test.ts`, `fieldPacing.test.ts`) drive the real `BattleStateMachine` over seeded runs (`tests/helpers/battlePolicies.ts`, `balanceData.ts`). Each bound sits at least 3 points from its measured value, given in the test name; re-measure after any enemy, item or formula change.
 - **No private member access**: Don't use `as unknown as` to access private fields. Test through public API.
 - **Schema validation tests**: `tests/core/schemaValidation.test.ts` tests the data validators.
 
@@ -237,8 +244,13 @@ Most compiled maps come from Python layout scripts, not hand-written YAML. Each 
 | `assets-src/tools/layouts/cornelia.py` | `cornelia.yaml` (the walled royal city, its gates and edge exits) |
 | `assets-src/tools/layouts/interiors.py` | the ten house interiors `cornelia-house-<name>.yaml` (scholar, fisher, farm, knight, weaver, gardener, family, apprentice, tavern, shrine) and the six shop and inn maps (`cornelia-weapon-shop`, `-armor-shop`, `-item-shop`, `-white-magic`, `-black-magic`, `-inn`) |
 | `assets-src/tools/layouts/castle.py` | `cornelia-castle.yaml`, `-2f`, `-tower`, `-cellar` |
+| `assets-src/tools/layouts/cornelia_gates.py` | nothing on its own: the gate dressing `cornelia.py` places (turrets on the wall bends and beside every gate, the `town/gates` arches over the south gate, the inner gatehouse and the north postern) |
 
-`temple-of-fiends.yaml` is still hand-written. After an edit:
+`temple-of-fiends.yaml` is still hand-written. Object options added in R and U:
+- deco `passage: true` — the deco's above rows may cover a walkable cell (a gate arch over a road); only the arch's drawn opening is walkable, the jambs block.
+- deco `style` — a `RECOLOR` entry in `build_map.py`, e.g. `pale_stone` (the bridge debris), `bright`, `brighter` (value x1.5, the temple icon).
+
+After an edit:
 
 ```bash
 python3 -I assets-src/tools/layouts/overworld.py          # regenerate the source(s)
@@ -247,6 +259,30 @@ python3 -I assets-src/tools/build_map.py --preview overworld 20 30 40 45 /tmp/cr
 ```
 
 Re-running every layout script must leave `git diff --exit-code assets-src/maps` clean (the scripts are deterministic), and `build_map.py --check-determinism` must pass.
+
+### New Cutscene
+
+Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManager` (`src/systems/`) through injected `CutsceneDeps`.
+
+- Steps: `dialog` (`text`), `fade_out` / `fade_in` / `wait` (`duration` ms), `set_flag` (`flag`), `heal_party`, `warp` (`map` plus a named `entrance` or `x`/`y`, optional `facing`; put it behind a fade) and `backdrop` (`image`: a staged background id, or `null` to clear; optional `dim` in (0, 1], e.g. the opening's first page at 0.35).
+- `CutsceneRegistry` drops (with `console.error`) a script with an unknown step type, a `warp` without a map and place, or a `dim` outside (0, 1].
+- A host without the `warp` or `backdrop` dep logs `console.error` and the cutscene goes on.
+
+### Input Hold-offs
+
+`InputManager.holdOff(frames, actions?)` spends the presses so far and makes `isJustPressed` false for `frames` updates (per action; a later call keeps the larger count). `isPressed` is unaffected. It is used at:
+- **scene entry:** `Game` builds `SceneManager` with `onSettled` → `holdOff(SCENE_ENTRY_HOLDOFF_FRAMES)` (8), so one confirm press never reaches the next scene;
+- **dialog close (field only):** `ExplorationScene`'s `DialogManager` gets `closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES` (24, confirm only), so mashing after a talk doesn't restart it;
+- **cutscene end:** field cutscene dialog steps take confirm at once (`holdOff: false`); the 24-frame confirm hold-off comes once when the cutscene ends.
+
+### Game Over
+
+`GameOverScene` offers **Retry Battle** and **Return to Field** (both restore the pre-battle snapshot `game.battleRetry`; Return to Field puts the party where the fight began with no battle queued), then Load Game and Title. With no snapshot only the last two show. `retryAdvice()` (`src/systems/BattleRetry.ts`) calls the party weak when anyone was fallen or under 25 % HP; then a hint shows and the cursor starts on Return to Field.
+
+### Shared helpers (U)
+
+- `src/systems/pickupText.ts` — every pickup and gift line, by item id: `foundText`, `receivedText`, `cantCarryText`, `leftBehindText` (articles via `article()`; none for `…Armor` / `…Mail`). Use these, not ad-hoc strings.
+- `src/entities/partyTargets.ts` — where a party-target cursor starts: `initialItemTargetIndex` (heal → most hurt living member, revive → first fallen, a status cure → first member with it, else member 1), `mostHurtIndex`, `firstFallenIndex`. Used by the field item and magic menus and battle targeting.
 
 ### New Inspect Cell
 
@@ -291,7 +327,8 @@ All 18 development phases are complete. Post-phase-18 improvements include:
 - **BattleScene decomposition** — 6 modules extracted to `src/scenes/battle/` (1,169→508 lines)
 - **Lazy scene loading** — `SceneManager.registerLazy()` with dynamic `import()` (bundle −22%)
 - **Battle UX** — concise result messages, dead combatant turn-skip, early battle end, status labels, battle backgrounds
-- **NES font fixes** — kill indicator uses `*` instead of `☠`
+- **NES font fixes** — kill indicator uses `*` instead of `☠` (since U15 the turn list writes `KO` instead: `ACTOR LABEL>TARGET RESULT`, e.g. `B.MAG FIRE>Goblin 30`, fitted by `fitEntry` in `src/scenes/battle/TurnList.ts`)
+- **Act 1 playtest remediation** — passes R and U fixed the second and third playtests; plans, decisions and results are in `docs/FIX_PLAN_PENINSULA.md` ("R result", "U result")
 
 See `docs/PROGRESS.md` for full details.
 
@@ -327,12 +364,12 @@ python3 -I assets-src/build_assets.py terrain characters   # or pick stages: ter
 | terrain | `tiles.py` | `assets/sprites/terrain.png` | Rows = `TerrainType` order (+ counter), 4 variants per terrain, picked per map cell |
 | characters | `characters.py` | `assets/sprites/characters.png`, `characters.json` | Field-size two-tile (16x32) characters: 4 walk rows x 3 frames per block. Keyed by class id and NPC `sprite` name. (A battle-pose row is still generated but unused.) |
 | battle_ai | `gen/approved/<class>/battle.png` | `assets/sprites/battle-characters-ai.png`, `.json` | Gemini-generated, approved 2x battle figures (80x80 native): one row per class, columns = ready, attack, cast, hurt, down, victory |
-| (approved kits added in T6) | `gen/approved/overworld/grand` (broken-bridge debris; its `temple_grand` piece is skipped), `castle/stairs_lib` (top-down stairwell, map table, gold heap, crown cushion, lectern, globe), field sheets `vendor_f`, `farmer`, `burgher` | used by the map compiler and `field_ai` | Paid Gemini budget: 25 of 100 used (the ledger guard is authoritative) |
+| (approved kits added in T6) | `gen/approved/overworld/grand` (broken-bridge debris; its `temple_grand` piece is skipped), `castle/stairs_lib` (top-down stairwell, map table, gold heap, crown cushion, lectern, globe), field sheets `vendor_f`, `farmer`, `burgher`; R5 added `overworld/grand_temple` (the temple ruin icon, a free re-cut of `grand`) and `town/gates` (gate arches `gate_arch_3` / `gate_arch_2`, tavern and shrine signs; `gate_side` failed review, so the W and E gates have turrets but no arch) | used by the map compiler and `field_ai` | Paid Gemini budget: 26 of 100 used (`docs/ACT1_LOG.md`; the ledger guard is authoritative) |
 | field_ai | `gen/approved/<id>/field.png` | `assets/sprites/characters-ai.png`, `.json` | 2x field sprites (the default field art; dev builds show the old 1x sprites with `?art=legacy`) |
 | monsters_ai | `gen/approved/<monster>/monster_*.png`, `boss_*.png` | `assets/sprites/monsters-ai.png`, `.json` | Idle / attack / hurt (+ boss `cast`) per monster sprite, plus palette-swap variants from `gen/monsters.yaml` |
 | maps | `assets-src/maps/<id>.yaml` + kit parts (`gen/approved/<kit>/*.png`, placeholders from `tools/kit.py`) | `assets/maps/ai/<id>.yaml`, `assets/maps/ai/<id>/{below,above}_r_c.png`, `index.yaml` | Map compiler `tools/build_map.py` (docs/ART_TILES_PLAN.md): ASCII ground + placed objects (houses from roof/wall/door parts, trees, props) baked into 2x chunks; sources with `terrain: organic` (the overworld) get organic coasts, blends, foothills and peak variants and organic roads from the `tools/terrain/` package (`--metrics` prints its boundary numbers); validates reachability, collision and covering, plus the per-source opt-in checks in `tools/map_checks.py` (roads, rivers, sealed edges, warps, blobs, art coverage, NPC chokepoints, unreachable walkable cells). Output must not depend on `PYTHONHASHSEED` (`build_map.py --check-determinism`); `--preview` crops a compiled map, `tools/map_report.py <id>` prints reachability and chokepoints. Most sources are written by `tools/layouts/*.py` (see "Editing a 2x Map"). The game plays these compiled maps by default for every id in `index.yaml` (production always; dev unless `?art=legacy`; unit tests only with `?art=ai`); transitions may target named `entrances` |
 | (in battle_ai / field_ai) | `gen/puppet.py` + `gen/anim/<id>.yaml` | extra columns in both 2x atlases | Cut-out in-betweens from the approved pixels (no AI): 8 battle poses per class (`idle_b`, `atk_wind1/2`, `atk_mid`, `atk_follow`, `cast_gather/rise/release`) from hand-marked joints, and 7 walk columns per direction for every field sprite (stand + contact/down/pass per foot, 3 per tile). Check with `python3 -I assets-src/gen/puppet.py review [id]`; a class without a joint file repeats its keyframes. Review fixes that must not touch a style-reference sheet (e.g. the knight's attack face) go in `battle.json` `face_fix` and are applied at build time. (Bedrock/Stability in-betweens were tried and rejected on 2026-11-13: no identity lock to a reference image, img2img redraws the whole figure, inpainting comes back grey) |
-| (one-time) | `tools/stage_backgrounds.py` | `assets/backgrounds/<id>.webp` | Hand-made backgrounds remapped once onto the battle stage (1920x1080, per-image horizon); referenced by `battleBackgrounds` in map YAML. Not a build stage. Only the ids act 1 uses are committed (`temple` = evil-temple, `evil_temple`, `abandoned_castle`, `dark_forest`, `ruined_forest`, plus the original 11); the other staged ids stay local and uncommitted |
+| (one-time) | `tools/stage_backgrounds.py` | `assets/backgrounds/<id>.webp` | Hand-made backgrounds remapped once onto the battle stage (1920x1080, per-image horizon); referenced by `battleBackgrounds` in map YAML. Not a build stage. `shoreline` is a composite (the party's rocks pasted below the layer's own rock line, colour-matched); `stage_backgrounds.py --check [ID ...] [--image FILE]` measures water in the feet bands, the top enemy row's water and contrast, and the largest straight vertical seam against its `CHECKS` bounds, and exits non-zero on a failure. Only the ids act 1 uses are committed (`temple` = evil-temple, `evil_temple`, `abandoned_castle`, `dark_forest`, `ruined_forest`, plus the original 11); the other staged ids stay local and uncommitted |
 | audio | `audio/` | `assets/audio/{music,sfx}/*.ogg` | Filenames come from `audio-manifest.json` |
 
 **AI sprite generation (2x art scale, in progress):** `assets-src/gen/` generates character sprites with Google
@@ -388,6 +425,10 @@ The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads 
 3. Selecting Debug runs the first scenario; pick another with `?scenario=<id>` in the dev URL (e.g. `http://localhost:5173/?scenario=knight_party`). Add `&art=ai` to preview approved AI battle art
 4. Class IDs must match `assets/data/classes.yaml`, item IDs must match `assets/data/items.yaml`, spell IDs must match `assets/data/spells.yaml`, enemy IDs must match `assets/data/enemies.yaml`
 5. Run `npm test` to verify cross-file references are valid
+
+Scenario families (see the comments in `assets/data/debug-scenarios.yaml`; field scenarios start on a map, battle ones from **Debug**):
+- `r_*` (35, R): Garland and temple balance, battle checks (heal, DARK/MUTE, shoreline), the 99 cap, shops, menus, Tent, and field starts in every act-1 map (castle, town, shops, houses, cellar, tower, overworld spots).
+- `u_*` (8, U): the 400 G kit at Garland and in the temple, the Retry trap, a fallen leader, hurt-party item targets, the shop kit, lunge rows, and the command menu.
 
 ### Key Files
 

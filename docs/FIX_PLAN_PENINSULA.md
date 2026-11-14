@@ -3674,8 +3674,8 @@ All 22 momus issues apply. Resolutions:
 ### R result (from the third playtest, 2026-11-14)
 
 - **Tested:** `r-integration` at `3f65301` (R0–R6 and the review fixes), in a real browser; `docs/PLAYTEST_PENINSULA_3_2026-11-14.md`. Console: 0 errors and 0 warnings over 164 messages.
-- **Planned browser checks:** 49 pass. Partial: B11 (the lunge reaches the right column but not the right row; now U3) and B14 (rock under the enemies, but haze on the top row and a visible seam; now U10). Marginal: W1 (legible but small; now U19).
-- **Not run:** M7, M9, M11, W7, W10, W14, W15 and `r_temple_party`. They are run in U validation (§U6).
+- **Planned browser checks:** 49 pass. Partial: B11 (the lunge reaches the right column but not the right row; fixed in U3) and B14 (rock under the enemies, but haze on the top row and a visible seam; fixed in U10, the seam in the U review fixes `9e8bbca`). Marginal: W1 (legible but small; U19, still open, see "U result").
+- **Not run:** M7, M9, M11, W7, W10, W14, W15 and `r_temple_party`. They were run in U validation (§U6); results in "U result" below.
 - **Not a defect:** B8's "the wolf is unaffected" under DARK is a resist roll on an all-enemy spell, as in FF1.
 - **Paid art:** 26 of 100 images (`docs/ACT1_LOG.md`, R5).
 - **New issues:** 22 (0 B, 1 M, 11 m, 10 p), U1–U22 below.
@@ -4305,11 +4305,11 @@ Momus verdict: REVISE (26 items). Every item is adopted. Where the review offere
 1. **U9 article:** `article()` gives no article for names ending in `Armor` or `Mail` ("You found Wooden Armor!"). Wooden Armor and Leather Armor are added as `pickupText.test.ts` cases. `castle.py:350` is unchanged. `chestText.test.ts` is checked on the merged tree.
 2. **U12 mocks:** `tests/helpers/testUtils.ts` belongs to Ua, which adds `holdOff: vi.fn()` to both `createMockGame().input` and `createMockInput`. Other tranches only read it. `DialogManager` types its input as `Pick<InputManager, 'holdOff'>` and calls it only when the method exists. The full suite stays green after U0 and after Ua.
 3. **U11 glyph:** use the ASCII hyphen, `evade -2`, in `items.yaml` and in the `descriptions.test.ts` regex.
-4. **U15 fit:** the kill marker joins with no space (`x3 57!KO`). Once a spell label has dropped, the target truncates to 2 characters plus `…`. The test checks the format `<actor≤6>><target≤3|2…> <label?> <result>` against 292 px at 14.4 px per character.
+4. **U15 fit:** the kill marker joins with no space (`x3 57!KO`). Once a spell label has dropped, the target truncates to 2 characters plus `…`. The test checks the format `<actor≤6> <label?>><target≤3|2…> <result>` (as implemented: `B.MAG FIRE>Goblin 30`; the label comes before the `>`) against 292 px at 14.4 px per character.
 5. **U12 timing:** `DIALOG_CLOSE_HOLDOFF_FRAMES = 24` (400 ms). The browser check mashes 10 presses at `delay: 30`, and no new dialog starts. A deliberate Z 0.5 s after the close does start the King's dialog.
 6. **U11 repeat:** the "Equip it now?" prompt repeats while bought copies remain and an eligible member without the item is left. The browser check keeps "Rapier ×2 → FGHTR, then THIEF". The ShopScene test is updated to match.
 7. **U14 silence:** `canOpenSpells` returns true while the member is silenced, so the existing "Silenced." notice still shows. Magic is greyed only when the member has no spells or no charges left. `Menu.ts` is not changed.
-8. **U6 "a game is running":** TitleScene pushes `loadMenu` with `{ fromTitle: true }`, and only that path skips the "lost" warning. Test the Game Over → Title → Continue path: no warning, and Load defaults to No only during a game.
+8. **U6 "a game is running":** TitleScene pushes `loadMenu` and then calls `LoadScene.openedFromTitle()` once the push has settled (`LoadScene.enter` takes no options); only that path skips the "lost" warning. Test the Game Over → Title → Continue path: no warning, and Load defaults to No only during a game.
 9. **U0-4:** the new scenarios use full background paths (`assets/backgrounds/temple.webp`, `assets/backgrounds/grassland.webp`).
 10. **U8 item kinds:**
     - `stats.hp > 0` → heal (most hurt living member);
@@ -4345,3 +4345,84 @@ Momus verdict: REVISE (26 items). Every item is adopted. Where the review offere
 26. **§U7 docs:** also update the AGENTS.md quick-reference counts ("879+ tests, 76+ files") and add a line to `docs/PROGRESS.md`.
 
 **Decision U-1 (Garland):** attack 9, about 340 HP, phase unchanged. The old careless and full-kit bounds are re-set from new measurements with at least 3 points of margin. This is reported to the user.
+
+### U result (2026-11-14)
+
+- **Tested:** `r-integration` at `9e8bbca` (U0, Ua, Ub, Uc merged, the integration rebuild, and the review fixes). `npx vitest run`: 159 files, 2625 tests, all pass. `npm run build` passes (main bundle 451 kB, 141 kB gzip).
+- **Paid art:** none in U; the budget stays at 26 of 100.
+- **File sizes:** `ExplorationScene.ts` 601 (ceiling 601, down from 603), `BattleStateMachine.ts` 580, `BattleScene.ts` 470, `SpellExecutor.ts` 308, `BattleAnimationController.ts` 278, `castle.py` 360, `cornelia.py` 352, `overworld.py` 249. All within their ceilings.
+
+**Per item** (commits `fc058cf` U0, `8b276dc` Ua, `f06f15e` Ub, `86b8ebe` Uc, `9e8bbca` review fixes):
+
+| Item | Done | Browser |
+|---|---|---|
+| U0 | `pickupText.ts` (by item id, article rule), `partyTargets.ts`, cutscene `backdrop` `dim`, the 8 `u_*` scenarios | (contract) |
+| U1 | Garland 340 HP, attack 9, 2 hits (3 at ≤ 25 % HP; decision U-1); temple top pack 2–3 skeletons; bounds re-measured (table below) | partial: see below |
+| U2 | `InputManager.holdOff`, `SceneManager` `onSettled` → 8-frame scene-entry hold-off | pass |
+| U3 | the melee advance rises to the target's row | pass (one recorded issue, below) |
+| U4 | Game Over **Return to Field** and the weak-party hint (`retryAdvice`, cursor on Return to Field) | pass; Run is disabled against Garland, so the "Run every turn" step (revision 24) can't be done as written |
+| U5 | the field sprite is the first living member | pass |
+| U6 | Load defaults to No during a game; from the title's Continue, a plain "Load Slot N?" (`openedFromTitle()`) | pass |
+| U7 | leaving party creation for the Title asks first (default No); name-grid help line | pass |
+| U8 | field item and spell targets start on the member who needs them (`partyTargets`) | pass |
+| U9 | chests show their own line; one wording for full bag and gifts (`pickupText`); shop and equip refusals on the help bar | pass |
+| U10 | shoreline composite below the layer's own rock line, colour-matched; `--check` `top` and `seam` metrics | partial: seam visible; fixed after, in `9e8bbca` (seam 13.0 ≤ 14.0) |
+| U11 | "Equip it now?" after buying gear (repeats per copy, `EquipNowPrompt`); armour descriptions say `evade -N` | pass |
+| U12 | dialog-close confirm hold-off, 24 frames, field only | pass |
+| U13 | Magic skips the level step with one usable level | pass |
+| U14 | Magic and Item greyed per member | pass |
+| U15 | the turn list names targets (`B.MAG FIRE>Goblin 30`), `KO` replaces `*`, `fitEntry` | pass |
+| U16 | the opening's first backdrop dimmed to 0.35 with a cool tint | pass |
+| U17 | two bridge workers by the south stub from INTRO_COMPLETE | pass |
+| U18 | the princess beside the King; plants and corner pillars close the dais | pass |
+| U19 | temple icon `style: brighter` (value 1.5, the cap) with a selftest | partial: still darker than the city |
+| U22 | a drawn 28x20 "more" marker | pass |
+| U20, U21 | won't-fix (§U1) | — |
+
+**U1, measured** (Garland 340 HP, attack 9, accuracy 15, 2 hits; 400 seeds, mage survival 4000 rolls; from `tests/balance/garland.test.ts` and `zones.test.ts`):
+
+| Case | Bound | Old (R: 240 HP, attack 16) | Measured |
+|---|---|---|---|
+| sensible Lv 2, 400 G kit, 0 potions | ≥ 70 % | 51 % | 96.75 % |
+| sensible Lv 1, 400 G kit | 25–55 % | 7.75 % | 36.25 % |
+| careless Lv 1, no gear | ≤ 10 % | 0 % | 0 % |
+| Lv 2 W.MAG / B.MAG in cloth survives one 2-hit attack | ≥ 90 % | 56.3 % | 95.35 / 95.63 % |
+| temple run (2 battles) then Garland, sensible Lv 2, 400 G kit, 0 potions | ≥ 70 % | 32 % | 89 % |
+| careless Lv 1, 400 G kit | ≤ 7 % | 1.25 % | 3 % |
+| careless Lv 2 / Lv 3, 400 G kit | 45–60 % / 85–97 % | 12.25 / 41.25 % | 52.75 / 92 % |
+| sensible Lv 1, full kit, 0 potions | ≥ 95 % | 57.25 % | 100 % |
+| sensible Lv 2 / Lv 3, full kit, 3 potions | ≥ 97 % | 95.8 / 99.5 % | 100 % / 100 % |
+| temple run, full kit, 3 shared potions, Lv 2 / Lv 3 | ≥ 95 % | 91.0 / 99.3 % | 100 % / 100 % |
+| SLEP every round: rounds Garland acts in | ± 0.05 | 0.468 | 0.402 |
+| temple table: max skeletons / enemies; mean formation | ≤ 3 / ≤ 4; 2.3–2.8 | 4 / 5; 2.55 | 3 / 4; 2.455 |
+
+**Implementation review (momus): REVISE**, four items, all fixed in `9e8bbca`:
+1. the shoreline composite still showed a vertical cut (x 1282) and blown-out boulder tops; it now pastes only below an eased rock line, colour-matched, and `--check` measures the largest straight vertical seam (old 14.7 and the U composite's 32.1 fail; 13.0 passes);
+2. `holdOff` widened: a later `holdOff(8)` cut short a confirm-only `holdOff(24)`; the count is now kept per action;
+3. the cutscene hold-off shape: field cutscene dialog steps take confirm at once, and the 24-frame confirm hold-off comes once at the cutscene's end;
+4. `LoadScene.enter` took a `fromTitle` option; it takes none now (`openedFromTitle()` only).
+
+**Browser validation:** 23 pass, 6 partial, 0 console errors (all with `?mute=1`; evidence in `/tmp/uval/`, local). Partial:
+- **U1:** `u_temple_400` lost both runs (0 of 2), against the sim's 89 %; too small a sample to call. The E2E (below) won Garland on the first try at Lv 2.
+- **U10:** the seam still showed; fixed after, in `9e8bbca`.
+- **U19:** the temple icon is still darker than the city, mean luma 92 against 132 at the 1.5 cap. **Open:** needs art or a higher cap.
+- **M7:** the west and east gates have turrets but no arch, because `gate_side` failed review (R5). **Open.**
+- **W14:** a dither halo remains round the temple hills. **Open.**
+- **W14 (same screenshots):** a hard-edged slab under the temple. **Open.**
+
+**Leftover R checks** (not run in the third playtest): M9, M11, W7, W10, W15 and `r_temple_party` pass; M7 and W14 are partial (above).
+
+**E2E** (New Game, no debug scenario): bought the 400 G kit with equip-now; 7 overworld battles and one inn rest, then 3 temple battles; Garland won on the first attempt at Lv 2 with the 400 G kit. (The inn rest departs from revision 16's "don't rest at the inn".)
+
+**Recorded, not fixed:**
+- U3: when the target is in the back column, the attacker overlaps the front-column enemy.
+- U4: Run is disabled against Garland, so U4's browser step (revision 24) can't be done as written.
+
+**Follow-ups** (in progress, see the next commit):
+- the Equip-now prompt's default member;
+- the stale compare panel;
+- plurals;
+- restore facing;
+- field Magic KO marks;
+- the spell charge count;
+- Overwrite defaults to No.

@@ -211,11 +211,15 @@ Optional `background` image field in `BattleSceneConfig`. Loaded via PixiJS `Ass
 - Kill indicator uses `*` instead of `☠` for NES font compatibility.
 - `.playwright-mcp/` and `.yolo-sisyphus/` added to `.gitignore`.
 
+### Act 1 Remediation Passes R and U ✅
+- **R** (second playtest): R0–R6 on `r-integration` — battle, engine, menus, map and data fixes, 1 paid image (26 of 100). 49 planned browser checks pass. See "R result" in `docs/FIX_PLAN_PENINSULA.md`.
+- **U** (third playtest, U1–U22): input hold-offs, Game Over Return to Field, Garland 340 HP / attack 9 against the 400 G kit, turn-list targets, equip-now, and map and opening fixes; no paid art. 23 browser checks pass, 6 partial (U19, M7, W14 open). See "U result".
+
 ---
 
 ## Current Metrics
 
-- **Tests:** 879 (all passing)
-- **Test files:** 76
+- **Tests:** 2625 (all passing)
+- **Test files:** 159
 - **Source files:** 80+ TypeScript files
 - **Phases complete:** 18/18
