@@ -1,5 +1,6 @@
 import { Container } from 'pixi.js';
 import { battleBackgroundPath } from '../rendering/BattleBackground.js';
+import { battleBackdropId } from './exploration/BattleBackdrop.js';
 import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
@@ -517,15 +518,14 @@ export class ExplorationScene implements Scene {
     return null;
   }
 
-  /** Backdrop for a battle here: per-terrain override from the map data, else the map default. */
+  /** Backdrop for a battle here (see BattleBackdrop.ts). */
   private battleBackground(): string | undefined {
-    const cfg = this.battleBackgrounds;
-    if (!cfg) return undefined;
-    let id = cfg.default;
-    if (this.collisionMap && this.player && cfg.terrain) {
-      const terrain = TerrainType[this.collisionMap.getTerrainType(this.player.gridX, this.player.gridY)];
-      id = (terrain && cfg.terrain[terrain.toLowerCase()]) || id;
-    }
+    const collision = this.collisionMap;
+    const pos = this.player ? { x: this.player.gridX, y: this.player.gridY } : null;
+    const terrainAt = (x: number, y: number): string | undefined =>
+      collision ? TerrainType[collision.getTerrainType(x, y)] : undefined;
+    const zoneId = pos ? this.encounterSystem.zoneAt(pos.x, pos.y)?.id ?? null : null;
+    const id = battleBackdropId(this.battleBackgrounds, pos, terrainAt, zoneId);
     return id ? battleBackgroundPath(id) : undefined;
   }
 

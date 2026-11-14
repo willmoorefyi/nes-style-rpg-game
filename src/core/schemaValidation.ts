@@ -150,6 +150,29 @@ function validateInspect(value: unknown, width: number, height: number): void {
   });
 }
 
+const VALID_TRANSITION_EFFECTS = ['door', 'fade'];
+
+/** `{ default?, terrain? }`: a background id and a record of terrain name -> background id. */
+function validateBackdropTable(path: string, value: unknown): Record<string, unknown> {
+  assertObject(path, value);
+  if (value.default !== undefined) assertString(`${path}.default`, value.default);
+  if (value.terrain !== undefined) {
+    assertObject(`${path}.terrain`, value.terrain);
+    for (const [k, v] of Object.entries(value.terrain)) assertString(`${path}.terrain.${k}`, v);
+  }
+  return value;
+}
+
+/** `battleBackgrounds`: the map's table, plus optional `zones` (encounter zone id -> table). */
+function validateBattleBackgrounds(value: unknown): void {
+  const cfg = validateBackdropTable('MapData.battleBackgrounds', value);
+  if (cfg.zones === undefined) return;
+  assertObject('MapData.battleBackgrounds.zones', cfg.zones);
+  for (const [zone, table] of Object.entries(cfg.zones)) {
+    validateBackdropTable(`MapData.battleBackgrounds.zones.${zone}`, table);
+  }
+}
+
 export function validateMapData(data: unknown): MapData {
   assertObject('MapData', data);
   assertString('MapData.id', data.id);
@@ -203,6 +226,10 @@ export function validateMapData(data: unknown): MapData {
       assertNumber(`MapData.transitions[${i}].targetX`, t.targetX);
       assertNumber(`MapData.transitions[${i}].targetY`, t.targetY);
     }
+    if (t.effect !== undefined && !VALID_TRANSITION_EFFECTS.includes(t.effect as string)) {
+      throw new ValidationError(
+        `MapData.transitions[${i}].effect: expected one of ${VALID_TRANSITION_EFFECTS.join(', ')}, got ${String(t.effect)}`);
+    }
   });
 
   if (data.entrances !== undefined) {
@@ -231,6 +258,7 @@ export function validateMapData(data: unknown): MapData {
   if (data.encounterZones !== undefined) {
     validateEncounterZones(data.encounterZones, data.width as number, data.height as number);
   }
+  if (data.battleBackgrounds !== undefined) validateBattleBackgrounds(data.battleBackgrounds);
   if (data.inspect !== undefined) validateInspect(data.inspect, data.width as number, data.height as number);
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
   
@@ -271,6 +299,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   assertArray('ItemData.usableBy', data.usableBy);
   (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
   assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
+  if (data.description !== undefined) assertString('ItemData.description', data.description);
   return data as unknown as import('../types/index.js').ItemData;
 }
 

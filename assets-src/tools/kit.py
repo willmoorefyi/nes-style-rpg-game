@@ -81,6 +81,21 @@ _PARTS.update({
 for r in range(2):
     for c in range(2):
         _PARTS[f"fountain_{r}{c}"] = ((150, 160, 190), f"f{r}{c}", "tile")
+# T6 paid-art parts (docs/FIX_PLAN_PENINSULA.md T6 §3), placeholders until the sheets are approved:
+# overworld/kit_grand (temple_grand, bridge_gap) and castle/kit_stairs_lib (stairwell and the props).
+for r in range(2):
+    for c in range(2):
+        _PARTS[f"temple_grand_{r}_{c}"] = ((70, 75, 95), f"G{r}{c}", "tile")
+        _PARTS[f"bridge_gap_{r}_{c}"] = ((150, 110, 70), f"g{r}{c}", "post")
+        _PARTS[f"stairwell_{r}_{c}"] = ((200, 190, 170), f"S{r}{c}", "tile")
+_PARTS.update({
+    "map_table_l": ((110, 75, 45), "Ml", "tile_small"),
+    "map_table_r": ((110, 75, 45), "Mr", "tile_small"),
+    "gold_heap": ((220, 180, 60), "Gh", "blob"),
+    "crown_cushion": ((170, 40, 50), "Cc", "blob"),
+    "lectern": ((100, 65, 40), "Le", "tile_small"),
+    "globe": ((90, 140, 190), "Gl", "blob"),
+})
 
 PART_NAMES = tuple(_PARTS)
 

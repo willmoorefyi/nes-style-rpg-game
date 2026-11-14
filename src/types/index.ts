@@ -115,6 +115,8 @@ export interface ItemData {
   crit?: number;
   /** Armour weight, subtracted from evade; missing means 0. */
   weight?: number;
+  /** One-line help text for menus and shops (what the item does). */
+  description?: string;
 }
 
 export type ShopType = 'weapon' | 'armor' | 'item' | 'magic' | 'inn';
@@ -218,6 +220,8 @@ export type MapTransition = {
   y: number;
   targetMap: string;
   requiredFlag?: string;  // story flag required to use this transition
+  /** Screen effect when taking this transition: a door opening, or the plain fade. */
+  effect?: 'door' | 'fade';
 } & ({ targetX: number; targetY: number; targetEntrance?: undefined }
   | { targetEntrance: string; targetX?: undefined; targetY?: undefined });
 
@@ -280,8 +284,13 @@ export interface MapData {
   scriptedEncounters?: ScriptedEncounter[];
   vehicles?: VehicleSpawn[];
   keyItemGates?: KeyItemGate[];
-  /** Battle stage background ids (assets/backgrounds/<id>.webp); `terrain` keys are lowercase TerrainType names. */
-  battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
+  /** Battle stage background ids (assets/backgrounds/<id>.webp); `terrain` keys are lowercase TerrainType names;
+   *  `zones` keys are `encounterZones` ids, each with its own default and terrain table. */
+  battleBackgrounds?: {
+    default?: string;
+    terrain?: Record<string, string>;
+    zones?: Record<string, { default?: string; terrain?: Record<string, string> }>;
+  };
   /** Named arrival cells, e.g. `south_gate: [23, 34]` (targets of `targetEntrance`). */
   entrances?: Record<string, [number, number]>;
   /** Extra tiles wandering NPCs never step onto (single-file routes they would plug), as [x, y]. */
