@@ -9,6 +9,8 @@ import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, CHAR_WIDTH, SCREEN_MARGIN, WINDOW_B
 const INSET = WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER + 6;
 /** HUD panel height: one line of text. */
 export const HUD_PANEL_HEIGHT = FONT_SIZE + 2 * INSET;
+/** The screen band the party strip covers at the bottom, with its margins (the field camera keeps rooms above it, M12). */
+export const HUD_BOTTOM_BAND = HUD_PANEL_HEIGHT + 2 * SCREEN_MARGIN;
 /** The gold panel always fits this many characters ("99999G"). */
 const GOLD_CHARS = 6;
 const PARTY_COLUMNS = 4;

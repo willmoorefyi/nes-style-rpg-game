@@ -90,4 +90,19 @@ describe('KeyItemGateSystem', () => {
     inventory.remove('mystic_key');
     expect(system.check(3, 3).blocked).toBe(true);
   });
+
+  it('T1: a conditional message follows the story flags', () => {
+    const flags = new GameFlags();
+    const gates = new KeyItemGateSystem(inventory, flags);
+    gates.setGates([{
+      x: 3, y: 3, requiredFlag: 'BRIDGE_BUILT', permanent: false,
+      message: [
+        { condition: 'INTRO_COMPLETE', text: ["The King's builders are at work on the bridge."] },
+        { text: ['The bridge has collapsed into the sea.'] },
+      ],
+    }]);
+    expect(gates.check(3, 3)).toEqual({ blocked: true, message: 'The bridge has collapsed into the sea.' });
+    flags.set('INTRO_COMPLETE');
+    expect(gates.check(3, 3)).toEqual({ blocked: true, message: "The King's builders are at work on the bridge." });
+  });
 });

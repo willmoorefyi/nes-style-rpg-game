@@ -1,5 +1,14 @@
-import type { CutsceneScript, CutsceneStep } from './CutsceneManager.js';
+import { CUTSCENE_STEP_TYPES, cutsceneWarp, type CutsceneScript, type CutsceneStep } from './CutsceneManager.js';
 import type { AssetLoader } from '../core/AssetLoader.js';
+
+/** Why a script can't be played (an unknown step type or a warp without a map and place), or null (T2). */
+export function scriptProblem(steps: readonly CutsceneStep[]): string | null {
+  for (const [i, step] of steps.entries()) {
+    if (!CUTSCENE_STEP_TYPES.includes(step?.type)) return `step ${i} has unknown type '${String(step?.type)}'`;
+    if (step.type === 'warp' && !cutsceneWarp(step)) return `step ${i} is a warp without map and an entrance or x and y`;
+  }
+  return null;
+}
 
 interface CutsceneEntry {
   id: string;
@@ -13,11 +22,21 @@ export class CutsceneRegistry {
   static async init(assets: AssetLoader): Promise<void> {
     try {
       const data = await assets.loadYaml<CutsceneEntry[]>('assets/data/cutscenes.yaml');
-      if (!Array.isArray(data)) return;
+      if (!Array.isArray(data)) {
+        console.error('cutscenes.yaml is not a list of cutscenes');
+        return;
+      }
       for (const entry of data) {
-        if (entry.id && Array.isArray(entry.steps)) {
-          this.scripts.set(entry.id, entry.steps);
+        if (!entry.id || !Array.isArray(entry.steps)) {
+          console.error('cutscenes.yaml: an entry without an id or steps was dropped:', entry);
+          continue;
         }
+        const problem = scriptProblem(entry.steps);
+        if (problem) {
+          console.error(`cutscenes.yaml: cutscene ${entry.id} dropped: ${problem}`);
+          continue;
+        }
+        this.scripts.set(entry.id, entry.steps);
       }
     } catch (e) {
       console.warn('Failed to load cutscenes.yaml:', e);

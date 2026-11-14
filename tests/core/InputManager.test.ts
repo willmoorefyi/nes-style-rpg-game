@@ -107,4 +107,35 @@ describe('InputManager', () => {
       input.attach();
     });
   });
+
+  describe('I1: focus loss releases held keys', () => {
+    it('a key held while the window loses focus is released', () => {
+      pressKey('ArrowRight');
+      input.update();
+      expect(input.isPressed('right')).toBe(true);
+      window.dispatchEvent(new Event('blur'));
+      expect(input.isPressed('right')).toBe(false);
+      expect(input.isJustPressed('right')).toBe(false);
+    });
+
+    it('the page being hidden releases held keys', () => {
+      pressKey('ArrowRight');
+      input.update();
+      const hidden = Object.getOwnPropertyDescriptor(document, 'hidden');
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      try {
+        document.dispatchEvent(new Event('visibilitychange'));
+      } finally {
+        if (hidden) Object.defineProperty(document, 'hidden', hidden);
+        else delete (document as { hidden?: boolean }).hidden;
+      }
+      expect(input.isPressed('right')).toBe(false);
+    });
+
+    it('a visibilitychange to visible keeps held keys', () => {
+      pressKey('ArrowRight');
+      document.dispatchEvent(new Event('visibilitychange'));
+      expect(input.isPressed('right')).toBe(true);
+    });
+  });
 });

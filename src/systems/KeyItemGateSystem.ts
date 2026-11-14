@@ -7,12 +7,9 @@ export interface GateCheckResult {
   message?: string;
 }
 
-/**
- * The gate's message as one line. Conditional entries (R0, T1) show their default entry here; resolving them on
- * the story flags is R1's (docs/FIX_PLAN_PENINSULA.md, R1 T1).
- */
-function gateText(gate: KeyItemGate): string {
-  return typeof gate.message === 'string' ? gate.message : resolveNPCDialog(gate.message, () => false).join(' ');
+/** The gate's message as one line; a conditional message is resolved on the story flags (first match wins, T1). */
+function gateText(gate: KeyItemGate, flags: GameFlags): string {
+  return typeof gate.message === 'string' ? gate.message : resolveNPCDialog(gate.message, (f) => flags.has(f)).join(' ');
 }
 
 /**
@@ -44,11 +41,11 @@ export class KeyItemGateSystem {
 
     // Story-flag gate (e.g. a bridge that opens once BRIDGE_BUILT is set)
     if (gate.requiredFlag && !this.flags.has(gate.requiredFlag)) {
-      return { blocked: true, message: gateText(gate) };
+      return { blocked: true, message: gateText(gate, this.flags) };
     }
     // Check if player has the required item
     if (gate.requiredItem && !this.inventory.has(gate.requiredItem)) {
-      return { blocked: true, message: gateText(gate) };
+      return { blocked: true, message: gateText(gate, this.flags) };
     }
 
     // Player has the item — open the gate

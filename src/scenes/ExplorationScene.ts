@@ -5,9 +5,8 @@ import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
-import { PlayerController } from '../entities/PlayerController.js';
-import { MapTransitionSystem, arrivalFor, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
-import type { MapTransition as MapTransitionData } from '../types/index.js';
+import type { PlayerController } from '../entities/PlayerController.js';
+import { MapTransitionSystem, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { EncounterSystem } from '../systems/EncounterSystem.js';
 import { DialogBox } from '../ui/DialogBox.js';
@@ -24,8 +23,9 @@ import { upgradeParty } from '../systems/ClassUpgradeSystem.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
-import { FieldHUD } from '../ui/FieldHUD.js';
-import { transitionAnimation } from './exploration/TransitionEffect.js';
+import { FieldHUD, HUD_BOTTOM_BAND } from '../ui/FieldHUD.js';
+import { FieldTransition } from './exploration/FieldTransition.js';
+import { createFieldPlayer, leaderClassId, type FieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
@@ -35,7 +35,10 @@ import { createFieldStateSystems, openShopScene } from './exploration/FieldSyste
 import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
-import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../core/LayoutConstants.js';
+
+const itemName = (id: string): string => ItemRegistry.getItem(id)?.name ?? id;
+/** A chest or gift the bag has no room for (E1). */
+const cannotCarry = (id: string): string => `You found ${itemName(id)}, but you can't carry any more.`;
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -55,6 +58,10 @@ export class ExplorationScene implements Scene {
   private currentMapData: import('../types/index.js').MapData | null = null;
   /** A field cutscene is playing: the player can't move, talk, open the menu or meet monsters. */
   private cutsceneRunning = false;
+  /** enter() is still loading the map (S1). */
+  private loading = false;
+  /** The class whose art the field sprite wears (E10). */
+  private leaderClassId = '';
   private mapLoader: MapLoader;
   private dialogManager: DialogManager;
   private battleTrigger: BattleTrigger;
@@ -71,6 +78,7 @@ export class ExplorationScene implements Scene {
   private controlsHint: ControlsHint;
   private battleFlash = new BattleFlashEffect(this.container);
   private fadeOverlay: FadeOverlay;
+  private fieldTransition: FieldTransition;
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   /** Tiles wandering NPCs never enter on this map (doors, warps, gates, entrances, the map's noWander list). */
@@ -111,6 +119,13 @@ export class ExplorationScene implements Scene {
     // Dialog must be ABOVE fade overlay so cutscene dialog is visible on black screen
     this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
+    // M12: rooms scroll and centre above the HUD's party strip, so the hero and the exits stay visible
+    this.camera.setViewInsets({ bottom: HUD_BOTTOM_BAND });
+    this.fieldTransition = new FieldTransition({
+      world: this.worldContainer, fade: this.fadeOverlay, walkingMode: this.walkingMode, encounters: this.encounterSystem,
+      player: () => this.player, mapData: () => this.currentMapData, loadMap: (id) => this.loadMap(id),
+      setPaused: (p) => { this.paused = p; }, redraw: () => this.redraw(),
+    });
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
   }
 
@@ -132,6 +147,9 @@ export class ExplorationScene implements Scene {
     // black until the map is loaded; fadeInOnEnter reveals it
     this.fadeOverlay.overlay.alpha = 1;
     this.cutsceneRunning = false;
+    // S1: no update until enter() has placed the player; the last map's hero must not write its tile meanwhile
+    this.loading = true;
+    this.player = null;
     this.battleFlash.finish();
     this.dialogManager.clear();
     this.talkingNpc = null;
@@ -153,16 +171,17 @@ export class ExplorationScene implements Scene {
     const entrance = this.game.currentMapId ? this.game.pendingEntrance : 'south_gate';
     this.game.pendingEntrance = null;
     await this.loadMap(mapId);
+    // W4: a new game, load or retry rolls a fresh countdown (map changes only clamp it)
+    this.encounterSystem.restart();
     if (this.currentMapData) {
       const map = this.currentMapData;
       const hasEntrance = entrance !== null && map.entrances?.[entrance] !== undefined;
       if (entrance !== null && !hasEntrance) console.warn(`map ${map.id} has no entrance '${entrance}'; using the saved position`);
       const pos = hasEntrance ? entrancePosition(map, entrance) : safeSpawn(map, this.game.playerPosition);
       this.player?.setPosition(pos.x, pos.y);
-      this.game.playerPosition = { x: pos.x, y: pos.y };
-      this.camera.update();
-      this.tilemap?.render();
+      this.redraw();
     }
+    this.loading = false;
     this.fadeInOnEnter();
     // Game Over > Retry Battle: the same fight again, from where it started
     const retry = this.game.pendingBattle;
@@ -194,6 +213,8 @@ export class ExplorationScene implements Scene {
         flags: this.game.gameFlags,
         party: this.game.party.all,
         onFlagSet: () => this.refreshNpcPresence(),
+        warp: (w) => this.fieldTransition.warp(w),
+        onHeal: () => this.game.events.emit('partyHealed', {}),
       });
     } finally {
       this.cutsceneRunning = false;
@@ -244,22 +265,9 @@ export class ExplorationScene implements Scene {
     this.camera.setMapBounds(mapData.width, mapData.height);
     tilemap.setCamera(this.camera);
     this.tilemap = tilemap;
-    const spawnX = mapData.width > 1 ? 1 : 0;
-    const spawnY = mapData.height > 1 ? 1 : 0;
-    const leaderArt = this.placeholders.getPlayerArt(this.game.party.get(0)?.classData.id ?? 'warrior');
-    this.player = new PlayerController({
-      startX: spawnX, startY: spawnY,
-      texture: leaderArt?.texture ?? this.placeholders.getPlayerTexture(),
-      animation: leaderArt?.animation,
-      displayScale: leaderArt?.displayScale,
-      collisionMap, input: this.game.input, events: this.game.events,
-    });
-    this.worldContainer.addChild(this.player.animation.sprite);
-    this.camera.follow(this.player);
     for (const npc of npcs) this.worldContainer.addChild(npc.sprite);
-    this.player.setNPCPositions(npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     this.npcInteraction.setNPCs(npcs);
-    this.npcInteraction.setPlayer(this.player);
+    this.adoptPlayer(createFieldPlayer(this.game, this.placeholders, collisionMap, mapData.width > 1 ? 1 : 0, mapData.height > 1 ? 1 : 0));
     this.npcInteraction.setCounterCheck((x, y) => collisionMap.isCounter(x, y));
     this.npcInteraction.setInspectCheck((x, y) => inspectAt(mapData, x, y, (f) => this.game.gameFlags.has(f)));
     this.npcInteraction.setInput(this.game.input);
@@ -275,8 +283,39 @@ export class ExplorationScene implements Scene {
     this.fieldHUD.setGold(this.game.party.gold);
   }
 
+  /** Make `built` the field hero: its sprite in the world, followed by the camera, known to NPC interaction. */
+  private adoptPlayer(built: FieldPlayer): void {
+    if (this.player) this.worldContainer.removeChild(this.player.animation.sprite);
+    this.player = built.player;
+    this.leaderClassId = built.leaderClassId;
+    this.worldContainer.addChild(built.player.animation.sprite);
+    this.camera.follow(built.player);
+    built.player.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
+    this.npcInteraction.setPlayer(built.player);
+  }
+
+  /** The party was reordered in the menu: the new leader's art at once, same tile, facing and mode (E10). */
+  private refreshLeader(): void {
+    const p = this.player;
+    if (!p || !this.collisionMap || leaderClassId(this.game) === this.leaderClassId) return;
+    this.adoptPlayer(createFieldPlayer(this.game, this.placeholders, this.collisionMap, p.gridX, p.gridY, p.direction, p.currentMode));
+    this.redraw();
+  }
+
+  /** After the player was placed: the saved tile, the camera and the tilemap. */
+  private redraw(): void {
+    if (this.player) this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
+    this.camera.update();
+    this.tilemap?.render();
+  }
+
+  /** Loading, changing maps or in a cutscene: no walking, talking, menu or monsters (S1, S2). */
+  private get fieldBusy(): boolean {
+    return this.loading || this.fieldTransition.active || this.cutsceneRunning;
+  }
+
   update(dt: number): void {
-    if (this.paused) return;
+    if (this.paused || this.loading) return;
     // C5: Battle flash animation
     if (this.battleFlash.active) {
       this.battleFlash.update();
@@ -294,7 +333,7 @@ export class ExplorationScene implements Scene {
       this.dialogManager.update(dt, this.game.input);
       return;
     }
-    if (this.cutsceneRunning) return;
+    if (this.fieldBusy) return;
     this.fieldHUD.container.visible = true;
     // the conversation box was dismissed: the NPC may turn back
     if (this.talkingNpc) {
@@ -352,31 +391,40 @@ export class ExplorationScene implements Scene {
       if (npc.chestItem && npc.chestFlag) {
         if (this.game.gameFlags.has(npc.chestFlag)) {
           this.dialogManager.start(['Already opened.']);
+        } else if (!this.game.inventory.canAdd(npc.chestItem)) {
+          // E1: a full bag leaves the chest closed for later
+          this.dialogManager.start([cannotCarry(npc.chestItem)]);
         } else {
           this.game.inventory.add(npc.chestItem, 1);
           this.game.gameFlags.set(npc.chestFlag);
           npc.setOpened();
-          const item = ItemRegistry.getItem(npc.chestItem);
-          const name = item?.name ?? npc.chestItem;
-          this.dialogManager.start([`Found ${name}!`]);
+          this.dialogManager.start([`Found ${itemName(npc.chestItem)}!`]);
         }
         return;
       }
       if (npc.dialog.length > 0) {
         const lines = [...resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag))];
         if (npc.giftItem && npc.giftFlag && !this.game.gameFlags.has(npc.giftFlag)) {
-          this.game.inventory.add(npc.giftItem, 1);
-          this.game.gameFlags.set(npc.giftFlag);
-          lines.push(`Received ${ItemRegistry.getItem(npc.giftItem)?.name ?? npc.giftItem}!`);
+          if (this.game.inventory.canAdd(npc.giftItem)) {
+            this.game.inventory.add(npc.giftItem, 1);
+            this.game.gameFlags.set(npc.giftFlag);
+            lines.push(`Received ${itemName(npc.giftItem)}!`);
+          } else lines.push(cannotCarry(npc.giftItem));
         }
         if (lines.length > 0) {
-          // Store NPC for post-dialog action (shop, class upgrade, etc.)
-          if (npc.shopId || npc.action || npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f))) {
+          // Store NPC for post-dialog action (shop, class upgrade, cutscene, a fight it starts (B1), etc.)
+          if (npc.shopId || npc.action || npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f)) || this.npcFight(npc)) {
             this.pendingNpcAction = npc;
           }
           this.dialogManager.start(lines);
           return;
         }
+      }
+      // an NPC with nothing to say who starts a fight (B1)
+      const fight = this.npcFight(npc);
+      if (fight) {
+        this.triggerScriptedEncounter(fight);
+        return;
       }
     }
     if (wasMoving && !this.player.isMoving) {
@@ -390,14 +438,10 @@ export class ExplorationScene implements Scene {
       }
 
       const transition = this.mapTransition.getTransitionAt(this.player.gridX, this.player.gridY);
-      if (transition) {
-        // Check if transition requires a story flag
-        if (transition.requiredFlag && !this.game.gameFlags.has(transition.requiredFlag)) {
-          // Blocked — don't transition
-        } else {
-          this.executeTransition(transition);
-          return;
-        }
+      // a transition that needs a story flag stays shut without it
+      if (transition && (!transition.requiredFlag || this.game.gameFlags.has(transition.requiredFlag))) {
+        this.fieldTransition.run(transition).catch((e) => console.error('Map transition failed:', e));
+        return;
       }
       // Check for scripted encounters at new position
       const encounter = this.getScriptedEncounterAt(this.player.gridX, this.player.gridY);
@@ -412,6 +456,11 @@ export class ExplorationScene implements Scene {
 
   /** Handle NPC post-dialog actions (shop, class upgrade) */
   private handleNpcPostDialog(npc: NPC): void {
+    const fight = this.npcFight(npc);
+    if (fight) {
+      this.triggerScriptedEncounter(fight);
+      return;
+    }
     const cutscene = npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f));
     if (cutscene) {
       this.playCutscene(cutscene).catch((e) => console.error(`Cutscene ${cutscene} failed:`, e));
@@ -435,74 +484,19 @@ export class ExplorationScene implements Scene {
     }
   }
 
-  private async executeTransition(transition: MapTransitionData): Promise<void> {
-    // Disembark vehicle on map transition — return to walking
-    if (this.player && this.player.currentMode.id !== 'walking') {
-      this.player.currentMode = this.walkingMode;
-    }
-
-    // CA-2: only a house or shop door zooms in; gates, stairs and edge exits fade (D3: fade out, load, fade in)
-    if (transitionAnimation(transition) === 'zoom') await this.zoomTransition(transition.x, transition.y);
-    else await this.fadeOverlay.fadeOut(300);
-    await this.loadMap(transition.targetMap);
-    if (this.player && this.currentMapData) {
-      const at = arrivalFor(transition, this.currentMapData);
-      this.player.setPosition(at.x, at.y);
-      this.camera.update();
-      this.tilemap?.render();
-    }
-    await this.fadeOverlay.fadeIn(300);
+  /** The first scripted encounter matching `where` that is still due: its flag unset (one-time), requiredFlag met. */
+  private dueEncounter(where: (enc: ScriptedEncounter) => boolean): ScriptedEncounter | null {
+    const has = (f: string) => this.game.gameFlags.has(f);
+    return this.currentMapData?.scriptedEncounters?.find((e) => where(e) && !has(e.flag) && (!e.requiredFlag || has(e.requiredFlag))) ?? null;
   }
 
-  /** Zoom-into-door animation: scale up worldContainer toward the door tile while fading out */
-  private async zoomTransition(doorTileX: number, doorTileY: number): Promise<void> {
-    this.paused = true;
-    const wc = this.worldContainer;
-    // Calculate the screen-center point to zoom toward (door pixel position)
-    const centerX = -wc.x + GAME_WIDTH / 2;
-    const centerY = -wc.y + GAME_HEIGHT / 2;
-    const doorX = doorTileX * TILE_SIZE + TILE_SIZE / 2;
-    const doorY = doorTileY * TILE_SIZE + TILE_SIZE / 2;
-    // Use midpoint between camera center and door as zoom focus
-    const focusX = (centerX + doorX) / 2;
-    const focusY = (centerY + doorY) / 2;
-    const origX = wc.x;
-    const origY = wc.y;
-    // Set pivot to focus point; adjust position to compensate
-    wc.pivot.set(focusX, focusY);
-    wc.position.set(origX + focusX, origY + focusY);
-
-    const frames = 24;
-    for (let i = 1; i <= frames; i++) {
-      const t = i / frames;
-      wc.scale.set(1 + t);
-      wc.alpha = 1 - t;
-      await new Promise<void>(r => requestAnimationFrame(() => r()));
-    }
-
-    // Reset worldContainer transforms
-    wc.scale.set(1);
-    wc.alpha = 1;
-    wc.pivot.set(0, 0);
-    wc.position.set(origX, origY);
-    // Set fade overlay to black (as if fadeOut completed)
-    this.fadeOverlay.overlay.alpha = 1;
-    this.paused = false;
-  }
-
-  /** Find a scripted encounter at the given tile, checking flag prerequisites */
   private getScriptedEncounterAt(x: number, y: number): ScriptedEncounter | null {
-    const encounters = this.currentMapData?.scriptedEncounters;
-    if (!encounters) return null;
-    for (const enc of encounters) {
-      if (enc.x !== x || enc.y !== y) continue;
-      // Already completed (one-time)
-      if (this.game.gameFlags.has(enc.flag)) continue;
-      // Check prerequisite flag
-      if (enc.requiredFlag && !this.game.gameFlags.has(enc.requiredFlag)) continue;
-      return enc;
-    }
-    return null;
+    return this.dueEncounter((e) => e.x === x && e.y === y);
+  }
+
+  /** The due encounter that talking to `npc` starts (`ScriptedEncounter.npc`, B1). */
+  private npcFight(npc: NPC): ScriptedEncounter | null {
+    return this.dueEncounter((e) => e.npc === npc.id);
   }
 
   /** Backdrop for a battle here (see BattleBackdrop.ts). */
@@ -560,6 +554,7 @@ export class ExplorationScene implements Scene {
     // back from a battle (battle / victory music) or a menu: the map's own track again
     this.playMapMusic();
     this.refreshNpcPresence();
+    this.refreshLeader();
     // Cleanup temp shop scenes on resume
     this.cleanupTempScenes();
   }

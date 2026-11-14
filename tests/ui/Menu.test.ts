@@ -160,3 +160,60 @@ describe('MS-5: MenuConfig.initialIndex', () => {
     expect(menu.selectedIndex).toBe(1);
   });
 });
+
+describe('I2: a held direction auto-repeats', () => {
+  const list = ['A', 'B', 'C', 'D'].map((l) => ({ label: l, value: l }));
+  /** One frame: `fresh` is a new press this frame; `held` is a direction still down. */
+  const frame = (held: string | null, fresh = false) => ({
+    isJustPressed: (a: string) => fresh && a === held,
+    isPressed: (a: string) => a === held,
+  }) as Pick<InputManager, 'isJustPressed' | 'isPressed'>;
+
+  it('after a delay the cursor moves on by itself while Down stays held', () => {
+    const menu = new Menu({ items: list });
+    menu.update(frame('down', true));                       // the press: 0 -> 1
+    for (let i = 0; i < 20 + 4; i++) menu.update(frame('down'));
+    expect(menu.selectedIndex).toBe(1);
+    menu.update(frame('down'));                             // 1 + 20 + 5 frames: the first repeat
+    expect(menu.selectedIndex).toBe(2);
+    for (let i = 0; i < 5; i++) menu.update(frame('down'));
+    expect(menu.selectedIndex).toBe(3);
+  });
+
+  it('a held repeat stops at the last item; only a fresh press wraps', () => {
+    const menu = new Menu({ items: list, initialIndex: 2 });
+    menu.update(frame('down', true));                       // 2 -> 3
+    for (let i = 0; i < 60; i++) menu.update(frame('down'));
+    expect(menu.selectedIndex).toBe(3);
+    menu.update(frame(null));
+    menu.update(frame('down', true));
+    expect(menu.selectedIndex).toBe(0);
+  });
+
+  it('releasing the key resets the delay', () => {
+    const menu = new Menu({ items: list });
+    menu.update(frame('down', true));
+    for (let i = 0; i < 20; i++) menu.update(frame('down'));
+    menu.update(frame(null));
+    for (let i = 0; i < 20; i++) menu.update(frame('down'));
+    expect(menu.selectedIndex).toBe(1);
+  });
+});
+
+describe('I3: menus without their own bus use the shared UI bus', () => {
+  it('a Menu built without eventBus emits cursorMove on the bus set by setUiEventBus', async () => {
+    const { setUiEventBus } = await import('../../src/ui/uiSounds.js');
+    const { EventBus } = await import('../../src/core/EventBus.js');
+    const bus = new EventBus();
+    const moved = vi.fn();
+    bus.on('cursorMove', moved);
+    setUiEventBus(bus);
+    try {
+      const menu = new Menu({ items: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] });
+      menu.update(mockInput({ down: true }));
+      expect(moved).toHaveBeenCalledTimes(1);
+    } finally {
+      setUiEventBus(undefined);
+    }
+  });
+});

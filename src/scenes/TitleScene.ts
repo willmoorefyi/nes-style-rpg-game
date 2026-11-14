@@ -11,12 +11,16 @@ export class TitleScene implements Scene {
   readonly container = new Container();
   private game: Game;
   private menu!: Menu;
+  /** A choice was confirmed and its scene is on the way: further confirms are ignored (S3). */
+  private starting = false;
 
   constructor(game: Game) {
     this.game = game;
   }
 
   enter(): void {
+    this.starting = false;
+    this.playTitleMusic();
     this.container.removeChildren();
 
     // Black background
@@ -70,25 +74,43 @@ export class TitleScene implements Scene {
   }
 
   private onSelect(value: string): void {
+    if (this.starting) return;
+    this.starting = true;
+    const failed = (what: string) => (err: unknown) => {
+      console.error(what, err);
+      this.starting = false;
+    };
     if (value === 'new') {
-      this.game.scenes.switchTo('partyCreation');
+      Promise.resolve(this.game.scenes.switchTo('partyCreation')).catch(failed('Failed to open party creation:'));
     } else if (value === 'continue') {
-      this.game.scenes.push('loadMenu');
+      Promise.resolve(this.game.scenes.push('loadMenu')).catch(failed('Failed to open the load menu:'));
     } else if (value === 'debug') {
       import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader, pickScenario }) => {
         const loader = new DebugScenarioLoader(this.game);
-        loader.loadScenarios().then(scenarios => {
+        return loader.loadScenarios().then((scenarios) => {
           const scenario = pickScenario(scenarios, typeof location === 'undefined' ? '' : location.search);
-          if (scenario) {
-            return loader.run(scenario);
-          }
-        }).catch((err) => console.error('Failed to load debug scenario:', err));
-      }).catch((err) => console.error('Failed to load debug module:', err));
+          if (scenario) return loader.run(scenario);
+          console.error('No debug scenario to run');
+          this.starting = false;
+        });
+      }).catch(failed('Failed to start the debug scenario:'));
+    } else {
+      this.starting = false;
     }
   }
 
+  /** The title track (I3); playMusic keeps a track that is already playing, so a resume doesn't restart it. */
+  private playTitleMusic(): void {
+    this.game.audio.playMusic('title').catch((e) => console.error('Title music failed:', e));
+  }
+
   onPause(): void {}
-  onResume(): void {}
+
+  /** Back on the title (a debug battle ended, the load menu was closed): the menu takes choices again. */
+  onResume(): void {
+    this.starting = false;
+    this.playTitleMusic();
+  }
 
   exit(): void {
     this.container.removeChildren();

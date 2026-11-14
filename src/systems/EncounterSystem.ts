@@ -14,6 +14,8 @@ export class EncounterSystem {
   private onEncounter: ((enemies: string[]) => void) | null = null;
   private rng: () => number;
   private rateMultiplier = 1.0;
+  /** setRate has been called once (the first call rolls; later ones clamp). */
+  private rateSet = false;
   /** Tiles where a step is not a step (warps, gates, scripted battles): no countdown and no battle there. */
   private stepFilter: ((x: number, y: number) => boolean) | null = null;
 
@@ -24,8 +26,23 @@ export class EncounterSystem {
     this.resetCounter();
   }
 
+  /**
+   * The map's rate (every map load). The first call on a fresh system rolls a countdown; later ones keep the running
+   * countdown and only clamp it to this map's scaled maximum, so walking through a door doesn't restart it (W4).
+   */
   setRate(rate: EncounterRate): void {
     this.rate = rate;
+    if (!this.rateSet) {
+      this.rateSet = true;
+      this.resetCounter();
+      return;
+    }
+    const max = this.rateMultiplier > 0 ? Math.max(1, Math.round(rate.max / this.rateMultiplier)) : rate.max;
+    this.stepCounter = Math.min(this.stepCounter, max);
+  }
+
+  /** A fresh countdown on the current rate (a new game, a load or a retry enters the field). */
+  restart(): void {
     this.resetCounter();
   }
 

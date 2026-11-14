@@ -30,7 +30,8 @@ export class AudioManager {
       }
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => { /* Resume is best-effort; context may not be ready for user interaction yet */ });
+      // best-effort: the context may not resume before a user gesture
+      this.ctx.resume().catch((e) => console.debug('AudioContext resume deferred:', e));
     }
     return this.ctx;
   }
@@ -108,11 +109,20 @@ export class AudioManager {
     const { source, gain } = this.currentMusic;
     if (fadeMs > 0 && this.ctx) {
       gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + fadeMs / 1000);
-      setTimeout(() => { try { source.stop(); } catch { /* Web Audio source.stop() throws if already stopped — safe to ignore */ } }, fadeMs);
+      setTimeout(() => AudioManager.stopSource(source), fadeMs);
     } else {
-      try { source.stop(); } catch { /* Web Audio source.stop() throws if already stopped — safe to ignore */ }
+      AudioManager.stopSource(source);
     }
     this.currentMusic = null;
+  }
+
+  /** Web Audio's stop() throws when the source has already stopped; that is expected, so it is only logged at debug. */
+  private static stopSource(source: AudioBufferSourceNode): void {
+    try {
+      source.stop();
+    } catch (e) {
+      console.debug('Music source already stopped:', e);
+    }
   }
 
   async playSFX(sfxId: string): Promise<void> {

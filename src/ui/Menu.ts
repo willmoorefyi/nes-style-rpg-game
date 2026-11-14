@@ -2,7 +2,15 @@ import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../core/InputManager.js';
 import type { EventBus } from '../core/EventBus.js';
 import { NES_FONT } from './NESFont.js';
+import { uiEventBus } from './uiSounds.js';
 import { MENU_LINE_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
+
+/** Frames a direction is held before the cursor repeats, and frames between repeats (I2). */
+export const REPEAT_DELAY_FRAMES = 20;
+export const REPEAT_EVERY_FRAMES = 5;
+
+/** What a menu reads: just-presses, plus held keys for auto-repeat when the input has them (mocks may not). */
+export type MenuInput = Pick<InputManager, 'isJustPressed'> & Partial<Pick<InputManager, 'isPressed'>>;
 
 export interface MenuItem {
   label: string;
@@ -39,6 +47,8 @@ export class Menu extends Container {
   private onCancel?: () => void;
   private eventBus?: EventBus;
   private active = true;
+  /** Frames each direction has been held since its last press (auto-repeat, I2). */
+  private holdFrames = { up: 0, down: 0 };
 
   constructor(config: MenuConfig) {
     super();
@@ -107,23 +117,55 @@ export class Menu extends Container {
 
   get isActive(): boolean { return this.active; }
 
-  update(input: InputManager): void {
-    if (!this.active) return;
+  update(input: MenuInput): void {
+    if (!this.active) {
+      this.holdFrames = { up: 0, down: 0 };
+      return;
+    }
     if (input.isJustPressed('up')) {
-      this.moveCursor(-1);
-      this.eventBus?.emit('cursorMove', {});
+      this.step(-1, true);
     } else if (input.isJustPressed('down')) {
-      this.moveCursor(1);
-      this.eventBus?.emit('cursorMove', {});
+      this.step(1, true);
     } else if (input.isJustPressed('confirm')) {
       const item = this.items[this.cursorIndex];
       if (item.enabled !== false) {
-        this.eventBus?.emit('cursorSelect', {});
+        this.bus?.emit('cursorSelect', {});
         this.onSelect?.(item, this.cursorIndex);
       }
     } else if (input.isJustPressed('cancel')) {
-      this.eventBus?.emit('cursorCancel', {});
+      this.bus?.emit('cursorCancel', {});
       this.onCancel?.();
+    } else {
+      this.repeatHeld(input);
+    }
+  }
+
+  /** The menu's own bus, else the shared UI bus (set by Game.init; unset in unit tests) (I3). */
+  private get bus(): EventBus | undefined {
+    return this.eventBus ?? uiEventBus();
+  }
+
+  /** Move one row; a fresh press wraps around the list ends, a held repeat stops at them. */
+  private step(delta: number, fresh: boolean): void {
+    if (fresh) this.holdFrames = { up: 0, down: 0 };
+    const next = this.cursorIndex + delta;
+    if (!fresh && (next < 0 || next >= this.items.length)) return;
+    this.moveCursor(delta);
+    this.bus?.emit('cursorMove', {});
+  }
+
+  /** While a direction stays held: a move after REPEAT_DELAY_FRAMES + REPEAT_EVERY_FRAMES, then every REPEAT_EVERY_FRAMES (I2). */
+  private repeatHeld(input: MenuInput): void {
+    for (const [dir, delta] of [['up', -1], ['down', 1]] as const) {
+      if (!input.isPressed?.(dir)) {
+        this.holdFrames[dir] = 0;
+        continue;
+      }
+      const held = ++this.holdFrames[dir];
+      if (held > REPEAT_DELAY_FRAMES && (held - REPEAT_DELAY_FRAMES) % REPEAT_EVERY_FRAMES === 0) {
+        this.step(delta, false);
+        return;
+      }
     }
   }
 

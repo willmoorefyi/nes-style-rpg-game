@@ -291,3 +291,102 @@ describe('SceneManager', () => {
     });
   });
 });
+
+/** A promise and its resolver, to hold an enter() or a factory open. */
+function deferred<T = void>(): { promise: Promise<T>; resolve: (v: T) => void; reject: (e: unknown) => void } {
+  let resolve!: (v: T) => void;
+  let reject!: (e: unknown) => void;
+  const promise = new Promise<T>((res, rej) => { resolve = res; reject = rej; });
+  return { promise, resolve, reject };
+}
+
+describe('S1 / S3: scene changes in flight', () => {
+  let manager: SceneManager;
+  beforeEach(() => { manager = new SceneManager(new Container()); });
+
+  it('update is not forwarded while enter() is pending', async () => {
+    const title = createMockScene();
+    manager.register('title', title);
+    await manager.switchTo('title');
+    const slow = createMockScene();
+    const entered = deferred();
+    slow.enter = vi.fn(() => entered.promise);
+    manager.register('field', slow);
+    const switching = manager.switchTo('field');
+    await Promise.resolve();
+    manager.update(1);
+    expect(slow.updateCalls).toEqual([]);
+    expect(title.updateCalls).toEqual([]);
+    entered.resolve();
+    await switching;
+    manager.update(2);
+    expect(slow.updateCalls).toEqual([2]);
+  });
+
+  it('update is not forwarded while a lazy factory is still loading', async () => {
+    const title = createMockScene();
+    manager.register('title', title);
+    await manager.switchTo('title');
+    const built = deferred<Scene>();
+    manager.registerLazy('menu', () => built.promise);
+    const pushing = manager.push('menu');
+    manager.update(1);
+    expect(title.updateCalls).toEqual([]);
+    built.resolve(createMockScene());
+    await pushing;
+  });
+
+  it('two switchTo calls in flight build the lazy scene once and enter it once', async () => {
+    const scene = createMockScene();
+    const built = deferred<Scene>();
+    const factory = vi.fn(() => built.promise);
+    manager.registerLazy('a', factory);
+    const first = manager.switchTo('a');
+    const second = manager.switchTo('a');
+    built.resolve(scene);
+    await Promise.all([first, second]);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(scene.enterCalls).toBe(1);
+  });
+
+  it('a double push while the scene loads pushes it once (depth 1)', async () => {
+    manager.register('title', createMockScene());
+    await manager.switchTo('title');
+    const built = deferred<Scene>();
+    manager.registerLazy('battle', () => built.promise);
+    const first = manager.push('battle');
+    const second = manager.push('battle');
+    built.resolve(createMockScene());
+    await Promise.all([first, second]);
+    expect(manager.depth).toBe(1);
+    expect(manager.current).toBe('battle');
+  });
+
+  it('a lazy load that failed can be retried', async () => {
+    let calls = 0;
+    const scene = createMockScene();
+    manager.registerLazy('flaky', async () => {
+      calls++;
+      if (calls === 1) throw new Error('chunk failed');
+      return scene;
+    });
+    await expect(manager.switchTo('flaky')).rejects.toThrow('chunk failed');
+    manager.update(1);                                         // the gate is released after a failure
+    await manager.switchTo('flaky');
+    expect(scene.enterCalls).toBe(1);
+    manager.update(3);
+    expect(scene.updateCalls).toEqual([3]);
+  });
+
+  it('depth counts the scenes paused under the current one', async () => {
+    manager.register('a', createMockScene());
+    manager.register('b', createMockScene());
+    expect(manager.depth).toBe(0);
+    await manager.switchTo('a');
+    expect(manager.depth).toBe(0);
+    await manager.push('b');
+    expect(manager.depth).toBe(1);
+    await manager.pop();
+    expect(manager.depth).toBe(0);
+  });
+});

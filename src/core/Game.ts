@@ -16,6 +16,8 @@ import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 import type { BattleRequest, BattleRetrySnapshot } from '../systems/BattleRetry.js';
 import { installNESFont } from '../ui/NESFont.js';
+import { setUiEventBus } from '../ui/uiSounds.js';
+import { wireAudioEvents } from './audioEvents.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
 
 export const WIDTH = GAME_WIDTH;
@@ -77,10 +79,12 @@ export class Game {
     try {
       const manifest = await this.assets.loadJson<AudioManifest>('assets/data/audio-manifest.json');
       await this.audio.init(manifest);
-      this.setupAudioEvents();
+      wireAudioEvents(this.events, this.audio);
     } catch (e) {
       console.warn('Failed to load audio manifest:', e);
     }
+    // menus built without their own bus still make cursor sounds (here, not in the constructor: unit tests stay quiet)
+    setUiEventBus(this.events);
 
     this.input.attach();
     this.setupAccessibility();
@@ -115,16 +119,6 @@ export class Game {
   /** Call after canvas is added to the DOM to ensure focus works */
   focusCanvas(): void {
     this.app.canvas.focus();
-  }
-
-  private setupAudioEvents(): void {
-    this.events.on('cursorMove', () => this.audio.playSFX('cursor-move'));
-    this.events.on('cursorSelect', () => this.audio.playSFX('cursor-select'));
-    this.events.on('cursorCancel', () => this.audio.playSFX('cursor-cancel'));
-    this.events.on('battleHit', () => this.audio.playSFX('battle-hit'));
-    this.events.on('battleMiss', () => this.audio.playSFX('battle-miss'));
-    // battleVictory: the battle scene plays the victory fanfare track (no separate sound effect on top)
-    this.events.on('spellCast', () => this.audio.playSFX('spell-cast'));
   }
 
   private resize(): void {

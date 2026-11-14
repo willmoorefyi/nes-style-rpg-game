@@ -50,7 +50,17 @@ export interface CutsceneDeps {
   party: Character[];
   /** Called after each set_flag step (the field drops NPCs the new flag removes, e.g. while the screen is black). */
   onFlagSet?: (flag: string) => void;
+  /** Move the party to another map (T2); a host without it logs and the cutscene goes on. */
+  warp?: (warp: CutsceneWarp) => Promise<void>;
+  /** Called after heal_party (the field emits partyHealed for its sound). */
+  onHeal?: () => void;
+  /** Show a staged background, or clear it with null (N2); a host without it logs once and skips. */
+  backdrop?: (image: string | null) => void | Promise<void>;
 }
+
+/** The step types CutsceneManager plays. */
+export const CUTSCENE_STEP_TYPES: readonly CutsceneStep['type'][] =
+  ['dialog', 'fade_out', 'fade_in', 'wait', 'set_flag', 'heal_party', 'warp', 'backdrop'];
 
 /**
  * Lightweight cutscene system: executes a sequence of steps.
@@ -59,6 +69,7 @@ export interface CutsceneDeps {
  */
 export class CutsceneManager {
   private deps: CutsceneDeps;
+  private backdropWarned = false;
 
   constructor(deps: CutsceneDeps) {
     this.deps = deps;
@@ -107,8 +118,38 @@ export class CutsceneManager {
           char.currentHp = char.maxHp;
           char.restoreAllCharges();
         }
+        this.deps.onHeal?.();
         break;
+
+      case 'warp':
+        await this.warp(step);
+        break;
+
+      case 'backdrop':
+        if (this.deps.backdrop) {
+          await this.deps.backdrop(step.image ?? null);
+        } else if (!this.backdropWarned) {
+          this.backdropWarned = true;
+          console.error('Cutscene backdrop step skipped: this host shows no backdrops');
+        }
+        break;
+
+      default:
+        console.error(`Unknown cutscene step: ${String((step as { type?: unknown }).type)}`);
     }
+  }
+
+  private async warp(step: CutsceneStep): Promise<void> {
+    const warp = cutsceneWarp(step);
+    if (!warp) {
+      console.error('Cutscene warp step needs map and an entrance or x and y:', step);
+      return;
+    }
+    if (!this.deps.warp) {
+      console.error(`Cutscene warp to ${warp.map} skipped: this host cannot change maps`);
+      return;
+    }
+    await this.deps.warp(warp);
   }
 
   private wait(ms: number): Promise<void> {

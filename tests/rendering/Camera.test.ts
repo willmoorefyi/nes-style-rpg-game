@@ -153,3 +153,40 @@ describe('Camera on maps smaller than the viewport (IN-2)', () => {
     expect(container.y).toBe((VIEWPORT_HEIGHT - 4 * TILE_SIZE) / 2);
   });
 });
+
+describe('M12: setViewInsets keeps rooms above the bottom HUD band', () => {
+  const BAND = 120;
+  const usable = VIEWPORT_HEIGHT - BAND;
+  /** Rows that nearly fill the screen but not the band above the HUD (22 at 48 px tiles, 11 at 96 px). */
+  const rows = Math.floor(VIEWPORT_HEIGHT / TILE_SIZE);
+
+  it('the bottom row of a tall room ends above the band when the hero stands on it', () => {
+    const camera = new Camera(new Container());
+    camera.setMapBounds(12, rows);
+    camera.setViewInsets({ bottom: BAND });
+    camera.follow({ x: 6 * TILE_SIZE + TILE_SIZE / 2, y: (rows - 1) * TILE_SIZE + TILE_SIZE / 2 });
+    camera.update();
+    expect(camera.worldToScreen(0, rows * TILE_SIZE).y).toBeLessThanOrEqual(usable);
+    expect(camera.worldToScreen(0, 0).y).toBeLessThanOrEqual(0);   // the top is clamped, no gap above
+  });
+
+  it('a room shorter than the band is centred inside it', () => {
+    const camera = new Camera(new Container());
+    camera.setMapBounds(12, 5);
+    camera.setViewInsets({ bottom: BAND });
+    camera.follow({ x: 0, y: 0 });
+    camera.update();
+    const top = camera.worldToScreen(0, 0).y;
+    const bottom = camera.worldToScreen(0, 5 * TILE_SIZE).y;
+    expect((top + bottom) / 2).toBeCloseTo(usable / 2);
+  });
+
+  it('without insets the full view is used (default)', () => {
+    const camera = new Camera(new Container());
+    camera.setMapBounds(12, 5);
+    camera.follow({ x: 0, y: 0 });
+    camera.update();
+    const top = camera.worldToScreen(0, 0).y;
+    expect(top).toBeCloseTo((VIEWPORT_HEIGHT - 5 * TILE_SIZE) / 2);
+  });
+});

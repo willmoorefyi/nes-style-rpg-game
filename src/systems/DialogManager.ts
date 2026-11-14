@@ -20,13 +20,13 @@ export class DialogManager {
     this.currentDialog = lines;
     this.dialogIndex = 0;
     this._isActive = true;
-    this.dialogBox.show(lines[0]);
+    this.dialogBox.show(lines[0], this.moreFollows());
   }
 
   advance(): void {
     this.dialogIndex++;
     if (this.dialogIndex < this.currentDialog.length) {
-      this.dialogBox.show(this.currentDialog[this.dialogIndex]);
+      this.dialogBox.show(this.currentDialog[this.dialogIndex], this.moreFollows());
     } else {
       this._isActive = false;
       this.dialogBox.visible = false;
@@ -41,10 +41,19 @@ export class DialogManager {
     }
   }
 
+  /** Another line of this dialog, or a queued dialog, comes after the one showing (the box's ▼ marker, I2). */
+  private moreFollows(): boolean {
+    return this.dialogIndex < this.currentDialog.length - 1 || this.queue.length > 0;
+  }
+
   /** Like `start`, but waits for the current dialog to finish instead of replacing it. */
   enqueue(lines: string[], onComplete?: () => void): void {
-    if (this._isActive) this.queue.push({ lines, onComplete });
-    else this.start(lines, onComplete);
+    if (this._isActive) {
+      this.queue.push({ lines, onComplete });
+      this.dialogBox.setMore(true);
+    } else {
+      this.start(lines, onComplete);
+    }
   }
 
   /** Close any dialog without running its completion callback (scene re-entry). */
