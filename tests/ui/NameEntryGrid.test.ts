@@ -18,8 +18,8 @@ function grid(defaultName = 'FGHTR') {
 function typeChar(press: (...k: Key[]) => void, ch: string): void {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.- ';
   const idx = letters.indexOf(ch);
-  // the cursor starts on End (bottom row, 2nd cell); 'down' wraps to the top row, 'left' to its first cell
-  press('down', 'left');
+  // the cursor starts on End (bottom row, over '3'); 'down' wraps to the top row at 'D', three 'left's reach 'A'
+  press('down', 'left', 'left', 'left');
   for (let i = 0; i < Math.floor(idx / 13); i++) press('down');
   for (let i = 0; i < idx % 13; i++) press('right');
   press('confirm');
@@ -48,7 +48,7 @@ describe('NameEntryGrid', () => {
 
   it('caps names at 6 characters', () => {
     const { g, press } = grid('');
-    press('down', 'left'); // top-left: 'A'
+    press('down', 'left', 'left', 'left'); // top-left: 'A'
     for (let i = 0; i < 8; i++) press('confirm');
     expect(g.value).toBe('AAAAAA');
   });
@@ -68,6 +68,40 @@ describe('NameEntryGrid', () => {
     const { onDone, press } = grid('MONK');
     press('cancel', 'cancel', 'cancel', 'cancel', 'confirm');
     expect(onDone).toHaveBeenCalledWith('MONK');
+  });
+});
+
+describe('N1: Up and Down map columns by x between the letters and Back / End', () => {
+  it('Up from End lands on 3 (the cell under it), Down from 3 goes back to End', () => {
+    const { g, press } = grid();
+    press('up');
+    expect(g.cursorCell).toBe('3');
+    press('down');
+    expect(g.cursorCell).toBe('End');
+  });
+
+  it('the first three columns lead to Back, the rest to End; Back leads up to 0', () => {
+    const { g, press } = grid();
+    press('up', 'left'); // '2'
+    press('down');
+    expect(g.cursorCell).toBe('Back');
+    press('up');
+    expect(g.cursorCell).toBe('0');
+    press('right', 'right', 'right', 'right', 'down'); // '4'
+    expect(g.cursorCell).toBe('End');
+  });
+
+  it('cursor sounds fall back to the UI event bus when the config has none (I3)', async () => {
+    const { setUiEventBus } = await import('../../src/ui/uiSounds.js');
+    const emit = vi.fn();
+    setUiEventBus({ emit } as unknown as Parameters<typeof setUiEventBus>[0]);
+    try {
+      const { press } = grid();
+      press('up');
+      expect(emit).toHaveBeenCalledWith('cursorMove', {});
+    } finally {
+      setUiEventBus(undefined);
+    }
   });
 });
 

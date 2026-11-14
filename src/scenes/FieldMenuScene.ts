@@ -18,7 +18,7 @@ const INFO_HEIGHT = FONT_SIZE + 2 * WINDOW_PADDING;
 const INFO_GAP = 12;
 
 const COMMANDS: ReadonlyArray<MenuItem & { help: string }> = [
-  { label: 'Items', value: 'items', help: 'Use or sort the items you carry.' },
+  { label: 'Items', value: 'items', help: 'Use the items you carry.' },
   { label: 'Magic', value: 'magic', help: 'Cast a field spell.' },
   { label: 'Equip', value: 'equip', help: 'Change weapons and armour.' },
   { label: 'Status', value: 'status', help: 'Look at a member\'s stats, spells and gear.' },

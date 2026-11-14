@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Graphics } from 'pixi.js';
+import { Graphics, type Container } from 'pixi.js';
 import { PartyCreationScene } from '../../src/scenes/PartyCreationScene.js';
 import type { Game } from '../../src/core/Game.js';
 
@@ -12,8 +12,9 @@ describe('PartyCreationScene restart (NG-2)', () => {
     };
     const scene = new PartyCreationScene(game as unknown as Game);
     scene.enter();
-    // the overlay is the full-screen Graphics drawn just under the dialog box (both kept on top)
-    const overlay = () => scene.container.children[scene.container.children.length - 2] as Graphics;
+    // the opening's layer is kept on top: backdrop, then the full-screen fade Graphics, then the dialog box
+    const layer = () => scene.container.children[scene.container.children.length - 1] as Container;
+    const overlay = () => layer().children[1] as Graphics;
     overlay().alpha = 1;            // the opening sequence ends on black
     scene.exit();
     scene.enter();                  // Game Over > Title > New Game

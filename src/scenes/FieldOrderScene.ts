@@ -24,10 +24,14 @@ export class FieldOrderScene implements Scene {
   enter(): void {
     this.phase = 'selectFirst';
     this.firstIdx = -1;
-    this.buildMenu();
+    this.buildMenu(0);
   }
 
-  private buildMenu(): void {
+  /** The cursor's row. */
+  get cursorIndex(): number { return this.menu.selectedIndex; }
+
+  /** `cursor`: the row the rebuilt menu starts on, so the cursor stays where the player picked (E10). */
+  private buildMenu(cursor: number): void {
     if (this.menu) this.window.removeChild(this.menu);
     const items: MenuItem[] = this.game.party.all.map((c, i) => ({
       label: this.firstIdx === i ? `>${c.name}<` : c.name,
@@ -37,6 +41,7 @@ export class FieldOrderScene implements Scene {
       items,
       x: this.window.contentX,
       y: this.window.contentY,
+      initialIndex: cursor,
       onSelect: (item) => this.onSelect(Number(item.value)),
       onCancel: () => this.onCancel(),
     });
@@ -47,20 +52,21 @@ export class FieldOrderScene implements Scene {
     if (this.phase === 'selectFirst') {
       this.firstIdx = idx;
       this.phase = 'selectSecond';
-      this.buildMenu();
+      this.buildMenu(idx);
     } else {
       if (idx !== this.firstIdx) this.game.party.swap(this.firstIdx, idx);
       this.phase = 'selectFirst';
       this.firstIdx = -1;
-      this.buildMenu();
+      this.buildMenu(idx);
     }
   }
 
   private onCancel(): void {
     if (this.phase === 'selectSecond') {
+      const cursor = this.firstIdx;
       this.phase = 'selectFirst';
       this.firstIdx = -1;
-      this.buildMenu();
+      this.buildMenu(cursor);
     } else {
       this.game.scenes.pop();
     }

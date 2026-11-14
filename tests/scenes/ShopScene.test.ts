@@ -4,6 +4,7 @@ import { FONT_SIZE, WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
 import { Character } from '../../src/entities/Character.js';
 import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import { ShopScene } from '../../src/scenes/ShopScene.js';
+import { MagicShopScene } from '../../src/scenes/MagicShopScene.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
@@ -176,5 +177,70 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
     expect(inventory.getQuantity('antidote')).toBe(1);
     expect(scene.itemIndex).toBe(1);
     expect(scene.resultMessage).toBe('Sold 1 Antidote.');
+  });
+
+  describe('R3: the 99 cap, columns, focus and help (E1, E2, E3, E5)', () => {
+    it('E1: with 99 potions, buying a Potion opens no picker, takes no gold and says so', async () => {
+      const { scene, tap, party, inventory } = await setup('cornelia_item', { potion: 99 }, 500);
+      tap('confirm'); // Buy
+      tap('confirm'); // Potion
+      expect(scene.quantityMax).toBe(0);
+      expect(party.gold).toBe(500);
+      expect(inventory.getQuantity('potion')).toBe(99);
+      expect(scene.resultMessage).toBe("You can't carry any more Potion.");
+    });
+
+    it('E1: the picker stops at the room left in the bag (95 potions, 600 G: 4)', async () => {
+      const { scene, tap } = await setup('cornelia_item', { potion: 95 }, 600);
+      tap('confirm');
+      tap('confirm');
+      expect(scene.quantityMax).toBe(4);
+    });
+
+    it('E2: every price in the weapon list ends at the same column', async () => {
+      const { scene, tap } = await setup('cornelia_weapon');
+      tap('confirm');
+      expect(scene.itemLabels).toHaveLength(5);
+      const ends = scene.itemLabels.map((l) => l.indexOf('G '));
+      expect(ends[0]).toBeGreaterThan(0);
+      expect(new Set(ends).size).toBe(1);
+    });
+
+    it('E2: sell rows are columns with a gap before the count', async () => {
+      const { scene, tap } = await setup('cornelia_item', { wooden_shield: 2, rapier: 2 });
+      tap('down');
+      tap('confirm'); // Sell
+      expect(scene.itemLabels.some((l) => /^Wooden Shield {2,}x2 /.test(l))).toBe(true);
+    });
+
+    it('E3: the Buy/Sell cursor greys while the list has the focus, and comes back on cancel', async () => {
+      const { scene, tap } = await setup('cornelia_item');
+      expect(scene.choiceActive).toBe(true);
+      tap('confirm');
+      expect(scene.choiceActive).toBe(false);
+      tap('cancel');
+      expect(scene.choiceActive).toBe(true);
+    });
+
+    it('E5: buy rows show how many the party has', async () => {
+      const { scene, tap } = await setup('cornelia_item', { potion: 2 });
+      tap('confirm');
+      expect(scene.itemLabels[0]).toMatch(/Have {2}2$/);
+    });
+
+    it('E5: gear nobody in the party can equip is flagged in the help bar', async () => {
+      const { scene, tap } = await setup('cornelia_weapon');
+      tap('confirm'); // Wooden Nunchaku (Monk only)
+      expect(scene.helpText).toMatch(/^No one in your party can equip this\./);
+      tap('down'); // Small Knife: the thief can
+      expect(scene.helpText).not.toMatch(/No one/);
+    });
+
+    it('E5: both shop scenes let the town show through', async () => {
+      const { scene } = await setup('cornelia_item');
+      expect(scene.transparent).toBe(true);
+      const magic = new MagicShopScene({ party: { gold: 0, all: [] } } as unknown as Game, 'cornelia_white');
+      expect(magic.transparent).toBe(true);
+    });
   });
 });

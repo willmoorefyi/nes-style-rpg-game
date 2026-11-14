@@ -4,6 +4,11 @@ import { GameFlags } from '../../src/core/GameFlags.js';
 import type { Character } from '../../src/entities/Character.js';
 import type { Game } from '../../src/core/Game.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
+import { CutsceneRegistry } from '../../src/systems/CutsceneRegistry.js';
+import { playOpening, OPENING_CUTSCENE } from '../../src/scenes/partyCreation/OpeningSequence.js';
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 beforeAll(loadRealRegistries);
 // Begin Adventure starts the opening fade; it never needs to finish here
@@ -42,10 +47,10 @@ describe('NG-3: party creation names', () => {
   it('a name typed on the grid is the character\'s name, and shows in the slots and the summary', () => {
     const { scene, press, added } = setup();
     press('confirm');                          // Warrior
-    press('down', 'left', 'right', 'confirm'); // 'B' replaces the default
-    press('up');                               // wraps to End
+    press('down', 'left', 'left', 'confirm');  // End is over '3', so down wraps to 'D'; 'B' replaces the default
+    press('up', 'right');                      // wraps to Back (under 'B'), then End
     press('confirm');
-    expect(visibleLabels(scene.container)).toContain('1:B');
+    expect(visibleLabels(scene.container)).toContain('1:B Wa');
     for (let i = 0; i < 3; i++) pickWarriorDefault(press);
     expect(visibleLabels(scene.container).some((l) => l.startsWith('B  Warrior'))).toBe(true);
     press('confirm');
@@ -66,5 +71,83 @@ describe('NG-3: party creation names', () => {
     pickWarriorDefault(press);
     press('confirm');
     expect(added.map((c) => c.name)).toEqual(['FGHTR', 'FGHTR2', 'FGHTR3', 'FGHTR4']);
+  });
+});
+
+describe('N1: the class menu keeps its place, and the strip shows the classes', () => {
+  it('cancelling the empty name grid returns to the class just picked (Black Mage, index 4)', () => {
+    const { scene, press } = setup();
+    press('down', 'down', 'down', 'down');
+    expect(scene.classIndex).toBe(4);
+    press('confirm');                                     // Black Mage
+    press('cancel', 'cancel', 'cancel', 'cancel', 'cancel', 'cancel'); // B.MAG emptied, then leave the grid
+    expect(scene.classIndex).toBe(4);
+  });
+
+  it('Back from the confirm screen opens slot 4 on the class it had', () => {
+    const { scene, press } = setup();
+    for (let i = 0; i < 3; i++) pickWarriorDefault(press);
+    press('down', 'confirm', 'confirm');                  // slot 4: Thief
+    press('cancel');                                      // confirm -> back to slot 4
+    expect(scene.classIndex).toBe(1);
+  });
+
+  it('the strip shows each named member with its class, and the slot being named as "?"', () => {
+    const { scene, press } = setup();
+    pickWarriorDefault(press);
+    expect(visibleLabels(scene.container)).toContain('1:FGHTR Wa');
+    press('down', 'down', 'down', 'confirm');             // White Mage, now naming slot 2
+    expect(visibleLabels(scene.container)).toContain('2:? WM');
+    expect(visibleLabels(scene.container)).toContain('3:----');
+  });
+});
+
+describe('N2: the opening plays from cutscenes.yaml', () => {
+  it('finishing the party plays the registry\'s opening', () => {
+    const get = vi.spyOn(CutsceneRegistry, 'get');
+    const { press } = setup();
+    for (let i = 0; i < 4; i++) pickWarriorDefault(press);
+    press('confirm');                                     // Begin Adventure
+    expect(get).toHaveBeenCalledWith(OPENING_CUTSCENE);
+    get.mockRestore();
+  });
+
+  it('backdrop steps reach the backdrop dep in order (dark_forest, grassland, null); dialog goes to showDialog', async () => {
+    const calls: Array<string | null> = [];
+    const dialogs: string[] = [];
+    await playOpening({
+      showDialog: async (t) => { dialogs.push(t); },
+      fadeOut: async () => undefined,
+      fadeIn: async () => undefined,
+      backdrop: async (image) => { calls.push(image); },
+      flags: new GameFlags(),
+      party: [],
+    }, [
+      { type: 'backdrop', image: 'dark_forest' },
+      { type: 'dialog', text: 'one' },
+      { type: 'backdrop', image: 'grassland' },
+      { type: 'dialog', text: 'two' },
+      { type: 'backdrop', image: null },
+    ]);
+    expect(calls).toEqual(['dark_forest', 'grassland', null]);
+    expect(dialogs).toEqual(['one', 'two']);
+  });
+
+  it('a missing opening logs an error and goes on', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const backdrop = vi.fn(async () => undefined);
+    await playOpening({ showDialog: async () => undefined, fadeOut: async () => undefined, fadeIn: async () => undefined,
+      backdrop, flags: new GameFlags(), party: [] }, undefined);
+    expect(err).toHaveBeenCalled();
+    expect(backdrop).not.toHaveBeenCalled();
+    err.mockRestore();
+  });
+
+  it('no opening text is hardcoded in the scene or the sequence', () => {
+    const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../src/scenes');
+    for (const f of ['PartyCreationScene.ts', 'partyCreation/OpeningSequence.ts']) {
+      const src = readFileSync(resolve(root, f), 'utf-8');
+      expect(src, f).not.toMatch(/darkness|prophecy|Warriors of Light|type: 'dialog'/);
+    }
   });
 });

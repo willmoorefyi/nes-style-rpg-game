@@ -3,16 +3,15 @@ import type { Scene, CharacterClassData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
-import { NameEntryGrid, uniqueDefaultName } from '../ui/NameEntryGrid.js';
-import { DEFAULT_NAMES, buildClassPreview, buildPartySummary, buildSlotDisplay } from './partyCreation/PartyCreationViews.js';
+import type { NameEntryGrid } from '../ui/NameEntryGrid.js';
+import { buildClassPreview, buildSlotDisplay } from './partyCreation/PartyCreationViews.js';
+import { buildConfirmStep, buildNameStep } from './partyCreation/PartyCreationSteps.js';
+import { OpeningSequence } from './partyCreation/OpeningSequence.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { Character } from '../entities/Character.js';
 import { STARTING_GOLD } from '../entities/PartyManager.js';
+import { characterAtlas } from '../rendering/CharacterAtlas.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import { CutsceneManager, type CutsceneScript } from '../systems/CutsceneManager.js';
-import { FadeOverlay } from '../rendering/FadeOverlay.js';
-import { DialogBox } from '../ui/DialogBox.js';
-import { DialogManager } from '../systems/DialogManager.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 export class PartyCreationScene implements Scene {
@@ -23,53 +22,51 @@ export class PartyCreationScene implements Scene {
   /** Chosen names, one per entry of `selectedClasses` once that member is named. */
   private names: string[] = [];
   private currentSlot = 0;
-  private classMenu!: Menu;
+  /** Where the class menu opens: the class just backed out of, so Back keeps it (N1). */
+  private classCursor = 0;
+  private classMenu?: Menu;
   private confirmMenu?: Menu;
   private nameGrid?: NameEntryGrid;
   private phase: 'select' | 'name' | 'confirm' | 'cutscene' = 'select';
 
-  // UI containers for easy rebuild
-  private slotDisplay!: Container;
   private previewDisplay!: Container;
-  private menuWindow!: Window;
-  private confirmWindow?: Window;
-  private fadeOverlay: FadeOverlay;
-  private dialogManager: DialogManager;
-  private dialogBox: DialogBox;
+  private readonly opening = new OpeningSequence();
 
   constructor(game: Game) {
     this.game = game;
-    this.dialogBox = new DialogBox({ onComplete: () => this.dialogManager.advance() });
-    this.dialogBox.visible = false;
-    this.dialogManager = new DialogManager(this.dialogBox);
-    this.fadeOverlay = new FadeOverlay();
-    // Fade overlay first, dialog on top so it's visible during cutscenes
-    this.container.addChild(this.fadeOverlay.overlay);
-    this.container.addChild(this.dialogBox);
+    this.container.addChild(this.opening.layer);
   }
 
+  /** The class menu's cursor, or -1 when it is not shown. */
+  get classIndex(): number { return this.phase === 'select' && this.classMenu ? this.classMenu.selectedIndex : -1; }
+
   enter(): void {
-    // the opening leaves the screen black for the field to fade in from; a later New Game must start visible
-    this.fadeOverlay.overlay.alpha = 0;
-    this.dialogManager.clear();
+    this.opening.reset();
     this.selectedClasses = [];
     this.names = [];
     this.currentSlot = 0;
+    this.classCursor = 0;
     this.phase = 'select';
     this.baseClasses = ClassRegistry.getAll().filter((c) => !c.upgradeFrom);
     this.buildUI();
+    // the preview's battle pose appears once the atlas is in (text only until then, or without art)
+    characterAtlas.load().then(
+      () => { if (this.phase === 'select' && this.classMenu) this.updatePreview(this.classMenu.selectedIndex); },
+      (e) => console.error('PartyCreationScene: character art failed to load', e),
+    );
   }
 
   private buildUI(): void {
     this.container.removeChildren();
+    this.classMenu = undefined;
+    this.confirmMenu = undefined;
+    this.nameGrid = undefined;
 
-    // Background
     const bg = new Graphics();
     bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     bg.fill(0x000000);
     this.container.addChild(bg);
 
-    // Header
     const header = new BitmapText({
       text: this.currentSlot >= 4 ? 'Confirm your party'
         : this.phase === 'name' ? `Name the ${this.selectedClasses[this.currentSlot].name} (slot ${this.currentSlot + 1}/4)`
@@ -78,103 +75,71 @@ export class PartyCreationScene implements Scene {
     });
     header.position.set(SCREEN_MARGIN, SCREEN_MARGIN);
     this.container.addChild(header);
+    // the slots along the top: names and classes so far (N1)
+    this.container.addChild(buildSlotDisplay(this.names, this.selectedClasses, this.currentSlot));
 
-    // Slot display (top area showing the chosen names)
-    this.slotDisplay = buildSlotDisplay(this.names, this.currentSlot);
-    this.container.addChild(this.slotDisplay);
-
+    const eventBus = this.game.events;
     if (this.phase === 'select') {
       this.buildClassSelect();
     } else if (this.phase === 'name') {
-      this.buildNameEntry();
+      this.nameGrid = buildNameStep(this.container, this.selectedClasses[this.currentSlot], this.names, {
+        eventBus,
+        onDone: (name) => this.onNamed(name),
+        // cancel on an empty name: back to class select for this slot, on the same class
+        onExit: () => {
+          this.classCursor = this.indexOf(this.selectedClasses.pop());
+          this.phase = 'select';
+          this.buildUI();
+        },
+      });
     } else {
-      this.buildConfirm();
+      this.confirmMenu = buildConfirmStep(this.container, this.selectedClasses, this.names, {
+        eventBus,
+        onBegin: () => this.beginAdventure(),
+        onBack: () => this.backToClassSelect(),
+      });
     }
 
-    // Keep dialog and fade overlay on top — dialog ABOVE fade so it's visible during cutscenes
-    this.container.addChild(this.fadeOverlay.overlay);
-    this.container.addChild(this.dialogBox);
+    // the opening's backdrop, fade and dialog stay on top
+    this.container.addChild(this.opening.layer);
+  }
+
+  private indexOf(cls: CharacterClassData | undefined): number {
+    return Math.max(0, this.baseClasses.findIndex((c) => c.id === cls?.id));
   }
 
   private buildClassSelect(): void {
-    // Class menu (left side)
-    this.menuWindow = new Window({ x: SCREEN_MARGIN, y: 120, width: 600, height: 800 });
+    const menuWindow = new Window({ x: SCREEN_MARGIN, y: 120, width: 600, height: 800 });
     this.classMenu = new Menu({
-      items: this.baseClasses.map((c) => ({
-        label: c.name,
-        value: c.id,
-      })),
-      x: this.menuWindow.contentX,
-      y: this.menuWindow.contentY,
+      items: this.baseClasses.map((c) => ({ label: c.name, value: c.id })),
+      x: menuWindow.contentX,
+      y: menuWindow.contentY,
       lineHeight: MENU_LINE_HEIGHT,
+      initialIndex: this.classCursor,
       onSelect: (item) => this.onClassSelect(item.value),
       onCancel: () => this.onBack(),
       eventBus: this.game.events,
     });
-    this.menuWindow.addChild(this.classMenu);
-    this.container.addChild(this.menuWindow);
+    menuWindow.addChild(this.classMenu);
+    this.container.addChild(menuWindow);
 
-    // Preview panel (right side)
     this.previewDisplay = new Container();
     this.previewDisplay.position.set(648, 120);
     this.container.addChild(this.previewDisplay);
-    this.updatePreview(0);
-  }
-
-  private buildConfirm(): void {
-    this.container.addChild(buildPartySummary(this.selectedClasses, this.names));
-
-    this.confirmWindow = new Window({ x: 660, y: 700, width: 600, height: 200 });
-    this.confirmMenu = new Menu({
-      items: [
-        { label: 'Begin Adventure', value: 'begin' },
-        { label: 'Back', value: 'back' },
-      ],
-      x: this.confirmWindow.contentX,
-      y: this.confirmWindow.contentY,
-      lineHeight: 48,
-      onSelect: (item) => {
-        if (item.value === 'begin') this.beginAdventure();
-        else this.backToClassSelect();
-      },
-      onCancel: () => this.backToClassSelect(),
-      eventBus: this.game.events,
-    });
-    this.confirmWindow.addChild(this.confirmMenu);
-    this.container.addChild(this.confirmWindow);
-  }
-
-  private buildNameEntry(): void {
-    const win = new Window({ x: SCREEN_MARGIN, y: 120, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 600 });
-    const cls = this.selectedClasses[this.currentSlot];
-    this.nameGrid = new NameEntryGrid({
-      // defaults are unique: a second Warrior is FGHTR2
-      defaultName: uniqueDefaultName(DEFAULT_NAMES[cls.id] ?? cls.name.slice(0, 6), this.names),
-      x: win.contentX,
-      y: win.contentY,
-      eventBus: this.game.events,
-      onDone: (name) => this.onNamed(name),
-      onExit: () => {
-        // cancel on an empty name: back to class select for this slot
-        this.selectedClasses.pop();
-        this.phase = 'select';
-        this.buildUI();
-      },
-    });
-    win.addChild(this.nameGrid);
-    this.container.addChild(win);
+    this.updatePreview(this.classMenu.selectedIndex);
   }
 
   private onNamed(name: string): void {
     this.names.push(name);
     this.currentSlot++;
+    this.classCursor = 0;
     this.phase = this.currentSlot >= 4 ? 'confirm' : 'select';
     this.buildUI();
   }
 
-  /** Drop the last member (class and name) and pick that slot's class again. */
+  /** Drop the last member (class and name) and pick that slot's class again, starting on the same class. */
   private backToClassSelect(): void {
-    this.selectedClasses.pop();
+    this.classCursor = this.indexOf(this.selectedClasses.pop());
     this.names.pop();
     this.currentSlot = this.selectedClasses.length;
     this.phase = 'select';
@@ -185,21 +150,13 @@ export class PartyCreationScene implements Scene {
     this.previewDisplay.removeChildren();
     const cls = this.baseClasses[classIndex];
     if (!cls) return;
-
-    this.previewDisplay.addChild(buildClassPreview(cls));
+    const pose = characterAtlas.getBattleFrames(cls.id)?.frames[0] ?? null;
+    this.previewDisplay.addChild(buildClassPreview(cls, pose));
   }
 
-  update(_dt: number): void {
-    // D2: During cutscene, advance dialog on input
+  update(dt: number): void {
     if (this.phase === 'cutscene') {
-      if (this.dialogManager.isActive) {
-        this.dialogManager.update(_dt, this.game.input);
-        if (!this.dialogManager.isActive && this.cutsceneDialogResolve) {
-          const resolve = this.cutsceneDialogResolve;
-          this.cutsceneDialogResolve = null;
-          resolve();
-        }
-      }
+      this.opening.update(dt, this.game.input);
       return;
     }
     if (this.phase === 'name' && this.nameGrid) {
@@ -213,7 +170,7 @@ export class PartyCreationScene implements Scene {
     if (this.classMenu) {
       const prevIndex = this.classMenu.selectedIndex;
       this.classMenu.update(this.game.input);
-      if (this.classMenu.selectedIndex !== prevIndex) {
+      if (this.phase === 'select' && this.classMenu && this.classMenu.selectedIndex !== prevIndex) {
         this.updatePreview(this.classMenu.selectedIndex);
       }
     }
@@ -235,7 +192,7 @@ export class PartyCreationScene implements Scene {
     }
   }
 
-  private beginAdventure(): void {
+  private async beginAdventure(): Promise<void> {
     // a new game starts from nothing: no party, gold, items or flags left over from a previous run
     this.game.resetState();
     for (const [i, cls] of this.selectedClasses.entries()) {
@@ -243,44 +200,14 @@ export class PartyCreationScene implements Scene {
       const character = new Character({ name, classData: cls });
       if (!this.game.party.add(character)) console.error(`Could not add ${name} to the new party`);
     }
-    // Give starting gold
     this.game.party.addGold(STARTING_GOLD);
-    // D2: Play opening sequence cutscene
+    // the opening plays from data (N2), then the party starts at the town's south gate
     this.phase = 'cutscene';
-    this.playOpeningSequence();
-  }
-
-  private async playOpeningSequence(): Promise<void> {
-    const script: CutsceneScript = [
-      { type: 'fade_out', duration: 500 },
-      { type: 'dialog', text: 'The world is veiled in darkness. The winds stop, the seas rage, and the earth decays.' },
-      { type: 'dialog', text: 'The people wait, their only hope a prophecy...' },
-      { type: 'dialog', text: '"When the world is in darkness, four Warriors of Light will come."' },
-      { type: 'dialog', text: 'After a long journey, four young warriors arrive at the gates of Cornelia, each holding an orb.' },
-      { type: 'dialog', text: 'The King awaits in the castle at the top of the high street.' },
-    ];
-    const cutscene = new CutsceneManager({
-      showDialog: (text: string) => new Promise<void>((resolve) => {
-        this.dialogManager.start([text]);
-        this.cutsceneDialogResolve = resolve;
-      }),
-      fadeOut: (ms: number) => {
-        return this.fadeOverlay.fadeOut(ms);
-      },
-      fadeIn: (ms: number) => {
-        return this.fadeOverlay.fadeIn(ms);
-      },
-      flags: this.game.gameFlags,
-      party: [...this.game.party.all],
-    });
-    await cutscene.play(script);
-    // the party starts at the town's south gate; the field fades in from this black screen
+    await this.opening.play(this.game.gameFlags, [...this.game.party.all]);
     this.game.currentMapId = 'cornelia';
     this.game.pendingEntrance = 'south_gate';
     this.game.scenes.switchTo('exploration');
   }
-
-  private cutsceneDialogResolve: (() => void) | null = null;
 
   onPause(): void {}
   onResume(): void {}

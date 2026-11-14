@@ -31,7 +31,8 @@ describe('T6f: the help bar shows item descriptions; the detail panel does not r
     const { scene, tap } = open('cornelia_weapon');
     tap('confirm'); // Buy: the Wooden Nunchaku
     const first = ItemRegistry.getItem('wooden_nunchaku')!;
-    expect(scene.helpText).toBe(first.description);
+    // nobody in this party is a Monk, so the help warns first (E5)
+    expect(scene.helpText).toBe(`No one in your party can equip this. ${first.description}`);
     expect(scene.detailLines).toHaveLength(5); // the item and one line per member
     tap('down'); // Small Knife
     expect(scene.detailLines[0].text.startsWith('Small Knife')).toBe(true);

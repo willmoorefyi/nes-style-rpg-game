@@ -44,8 +44,35 @@ describe('MS-7: Status screen', () => {
     const a = new Character({ name: 'AAA', classData: ClassRegistry.getClass('warrior')! });
     const b = new Character({ name: 'BBB', classData: ClassRegistry.getClass('white_mage')! });
     const { scene, game, text } = statusFor(a, b);
-    expect(text()).toContain('AAA (1/2)');
+    expect(text()).toMatch(/AAA .*← 1\/2 →/);
     game.input.tap('right', () => scene.update(1));
-    expect(text()).toContain('BBB (2/2)');
+    expect(text()).toMatch(/BBB .*← 2\/2 →/);
+  });
+});
+
+describe('E8: the Status screen shows the battle numbers, ailments and how to switch members', () => {
+  it('an unarmoured Lv 5 Monk shows the battle DEF (the Monk floor), not the stat sum', () => {
+    const monk = new Character({ name: 'MONK', classData: ClassRegistry.getClass('monk')!, level: 5 });
+    const { scene } = statusFor(monk);
+    expect(scene.sections.battle).toMatch(/^DEF +5$/m);
+    expect(scene.sections.battle).toMatch(/^ATK +\d+ x\d+$/m);
+    for (const label of ['Hit %', 'Evade', 'M.Def']) expect(scene.sections.battle).toContain(label);
+  });
+
+  it('a poisoned member\'s header names the ailment, with class and level', () => {
+    const wm = new Character({ name: 'W.MAG', classData: ClassRegistry.getClass('white_mage')!, level: 3 });
+    wm.statusTracker.apply('poison', 99);
+    const { scene } = statusFor(wm);
+    expect(scene.sections.header).toContain('POISON');
+    expect(scene.sections.header).toContain('White Mage');
+    expect(scene.sections.header).toContain('Lv 3');
+  });
+
+  it('the footer explains left/right, and the windows cover at least 80 % of the screen', async () => {
+    const { scene } = statusFor(new Character({ name: 'A', classData: ClassRegistry.getClass('warrior')! }));
+    expect(scene.sections.footer).toContain('←/→');
+    const { STATUS_RECTS } = await import('../../src/scenes/StatusScene.js');
+    const area = Object.values(STATUS_RECTS).reduce((sum, r) => sum + r.width * r.height, 0);
+    expect(area / (1920 * 1080)).toBeGreaterThanOrEqual(0.8);
   });
 });

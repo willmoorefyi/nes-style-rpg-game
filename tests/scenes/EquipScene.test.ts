@@ -188,3 +188,69 @@ describe('MS-7: the Equip screen (slot labels, live preview, descriptions)', () 
     }
   });
 });
+
+describe('R3: Equip keeps the worn item when the bag is full, shows one focus, and reopens on member 1 (E1, E3, E9)', () => {
+  async function open(inv: Record<string, number>, classes = ['warrior']) {
+    await loadRealRegistries();
+    const all = classes.map((cls, i) => new Character({ name: `M${i}`, classData: ClassRegistry.getClass(cls)! }));
+    const inventory = new Inventory();
+    for (const [id, n] of Object.entries(inv)) inventory.add(id, n);
+    const input = tapInput();
+    const game = { input, inventory, party: { all, get: (i: number) => all[i] }, scenes: { pop: () => undefined } };
+    const scene = new EquipScene(game as unknown as Game);
+    scene.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => scene.update(1));
+    return { scene, tap, all, inventory };
+  }
+
+  it('E1: with 99 rapiers in the bag, (Unequip) leaves the worn rapier equipped and says why', async () => {
+    const { scene, tap, all, inventory } = await open({ rapier: 99 });
+    all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
+    tap('confirm'); // member
+    tap('confirm'); // Weapon
+    tap('confirm'); // (Unequip)
+    expect(all[0].getEquipped('weapon')?.id).toBe('rapier');
+    expect(inventory.getQuantity('rapier')).toBe(99);
+    expect(scene.statsLines).toBe('No room for\nRapier.');
+  });
+
+  it('E3: only the menu with the focus has a white cursor', async () => {
+    const { scene, tap } = await open({ rapier: 1 });
+    expect(scene.activeMenus).toEqual({ member: true, slot: false, item: false });
+    tap('confirm');
+    expect(scene.activeMenus).toEqual({ member: false, slot: true, item: false });
+    tap('confirm');
+    expect(scene.activeMenus).toEqual({ member: false, slot: false, item: true });
+    tap('cancel');
+    expect(scene.activeMenus).toEqual({ member: false, slot: true, item: false });
+    tap('cancel');
+    expect(scene.activeMenus).toEqual({ member: true, slot: false, item: false });
+  });
+
+  it('E3: the help bar is never empty (member phase, empty slot, (Unequip))', async () => {
+    const { scene, tap, all } = await open({});
+    expect(scene.helpText).toBe('Choose whose equipment to change.');
+    tap('confirm');
+    expect(scene.helpText).toBe('Weapon: nothing equipped.');
+    tap('confirm'); // (Unequip) on an empty slot
+    expect(scene.helpText).toBe('The slot is already empty.');
+    tap('cancel');
+    tap('cancel');
+    all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
+    tap('confirm');
+    tap('confirm');
+    expect(scene.helpText).toBe('Take off the Rapier.');
+  });
+
+  it('E9: reopening shows the first member again, not the last one browsed', async () => {
+    const { scene, tap, all } = await open({}, ['warrior', 'thief', 'black_mage']);
+    all[0].equip('weapon', ItemRegistry.getItem('iron_sword')!);
+    scene.enter();
+    const first = scene.statsLines;
+    tap('down');
+    tap('down');
+    expect(scene.statsLines).not.toBe(first);
+    scene.enter();
+    expect(scene.statsLines).toBe(first);
+  });
+});

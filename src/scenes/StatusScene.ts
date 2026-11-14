@@ -3,42 +3,53 @@ import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
-import { SLOT_LABELS } from '../ui/labels.js';
-import { partyRowData } from '../ui/PartyPanel.js';
-import { SpellRegistry } from '../data/SpellRegistry.js';
-import { SPELL_LEVELS } from '../entities/SpellCharges.js';
-import type { Character } from '../entities/Character.js';
-import type { EquipmentSlot } from '../types/index.js';
-import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+import {
+  STATUS_FOOTER, baseLines, battleLines, equipmentLines, headerLine, spellLines,
+} from './status/statusLines.js';
+import { SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
-const EQUIPMENT_SLOTS: readonly EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
+export { spellLines } from './status/statusLines.js';
 
-/** MS-7: one line per spell level the member has charges or spells in: "L1 2/2  CURE, FIRE". */
-export function spellLines(char: Character): string[] {
-  const out: string[] = [];
-  for (let lv = 1; lv <= SPELL_LEVELS; lv++) {
-    const max = char.getMaxCharges(lv);
-    const names = char.getSpellsAtLevel(lv).map((id) => SpellRegistry.getSpell(id)?.name ?? id);
-    if (max === 0 && names.length === 0) continue;
-    out.push(` L${lv} ${char.getSpellCharges(lv)}/${max}  ${names.length > 0 ? names.join(', ') : '-'}`);
-  }
-  return out.length > 0 ? ['', 'Spells:', ...out] : [];
-}
+/** A window's rectangle on screen (for layout tests). */
+export interface StatusRect { x: number; y: number; width: number; height: number }
+
+const FULL = 1920 - 2 * SCREEN_MARGIN;
+const COLUMN_Y = 136;
+const COLUMN_H = 480;
+/** The screen's windows (E8): header, three columns (base stats, battle numbers, equipment), spells, footer. */
+export const STATUS_RECTS = {
+  header: { x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: FULL, height: 96 },
+  base: { x: SCREEN_MARGIN, y: COLUMN_Y, width: 560, height: COLUMN_H },
+  battle: { x: 600, y: COLUMN_Y, width: 600, height: COLUMN_H },
+  equipment: { x: 1216, y: COLUMN_Y, width: 1896 - 1216, height: COLUMN_H },
+  spells: { x: SCREEN_MARGIN, y: 632, width: FULL, height: 312 },
+  footer: { x: SCREEN_MARGIN, y: 960, width: FULL, height: 96 },
+} as const satisfies Record<string, StatusRect>;
+
+type Part = keyof typeof STATUS_RECTS;
 
 export class StatusScene implements Scene {
   readonly container = new Container();
-  private game: Game;
-  private window: Window;
-  private text: TextRenderer;
+  private readonly texts = {} as Record<Part, TextRenderer>;
   private memberIndex = 0;
 
-  constructor(game: Game) {
-    this.game = game;
-    this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: GAME_HEIGHT - 2 * SCREEN_MARGIN });
-    this.text = new TextRenderer({ width: this.window.contentWidth });
-    this.text.position.set(this.window.contentX, this.window.contentY);
-    this.window.addChild(this.text);
-    this.container.addChild(this.window);
+  constructor(private readonly game: Game) {
+    for (const part of Object.keys(STATUS_RECTS) as Part[]) {
+      const win = new Window({ ...STATUS_RECTS[part] });
+      const text = new TextRenderer({ width: win.contentWidth });
+      text.position.set(win.contentX, win.contentY);
+      win.addChild(text);
+      this.texts[part] = text;
+      this.container.addChild(win);
+    }
+    this.texts.footer.setText(STATUS_FOOTER, true);
+  }
+
+  /** Each window's text, for tests. */
+  get sections(): Record<Part, string> {
+    const out = {} as Record<Part, string>;
+    for (const part of Object.keys(this.texts) as Part[]) out[part] = this.texts[part].text;
+    return out;
   }
 
   enter(): void {
@@ -62,31 +73,21 @@ export class StatusScene implements Scene {
 
   onPause(): void {}
   onResume(): void {}
-
   exit(): void {}
 
   private render(): void {
     const char = this.game.party.get(this.memberIndex);
+    const set = (part: Part, lines: string[]): void => this.texts[part].setText(lines.join('\n'), true);
     if (!char) {
-      this.text.setText('No party members', true);
+      set('header', ['No party members']);
+      for (const part of ['base', 'battle', 'equipment', 'spells'] as const) set(part, []);
       return;
     }
-    const s = char.stats;
-    const lines = [
-      `${char.name} (${this.memberIndex + 1}/${this.game.party.size})`,
-      `Class: ${char.classData.name}`,
-      `Level: ${char.level}  XP: ${char.xp}  ${partyRowData(char).next}`,
-      `HP: ${char.currentHp}/${char.maxHp}`,
-      ``,
-      `STR: ${s.strength}  AGI: ${s.agility}`,
-      `INT: ${s.intelligence}  VIT: ${s.vitality}`,
-      `LCK: ${s.luck}`,
-      `ATK: ${s.attack}  DEF: ${s.defense}`,
-      ``,
-      `Equipment:`,
-      ...EQUIPMENT_SLOTS.map((slot) => ` ${`${SLOT_LABELS[slot]}:`.padEnd(8)}${char.getEquipped(slot)?.name ?? 'None'}`),
-      ...spellLines(char),
-    ];
-    this.text.setText(lines.join('\n'), true);
+    set('header', [headerLine(char, this.memberIndex, this.game.party.size)]);
+    set('base', baseLines(char));
+    set('battle', ['Battle', '', ...battleLines(char)]);
+    set('equipment', ['Equipment', '', ...equipmentLines(char)]);
+    const spells = spellLines(char);
+    set('spells', spells.length > 0 ? spells : ['No magic.']);
   }
 }

@@ -1,7 +1,8 @@
-import { Container, BitmapText } from 'pixi.js';
+import { Container, BitmapText, Sprite, type Texture } from 'pixi.js';
 import type { CharacterClassData } from '../../types/index.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
+import { classInitials } from '../shop/spellLearners.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN, LINE_HEIGHT } from '../../core/LayoutConstants.js';
 
 /** Default name per base class; NameEntryGrid's uniqueDefaultName adds 2, 3... for repeats. */
@@ -20,13 +21,19 @@ function label(text: string, x: number, y: number, fill = 0xffffff): BitmapText 
   return t;
 }
 
-/** The four slots along the top: chosen names, the current slot in yellow. */
-export function buildSlotDisplay(names: readonly string[], currentSlot: number): Container {
+/** One slot of the strip: `1:ROLF Wa` once named, `3:? WM` while being named, `4:----` before a class (N1). */
+export function slotText(i: number, names: readonly string[], classes: readonly CharacterClassData[]): string {
+  const cls = classes[i] ? ` ${classInitials(classes[i].name)}` : '';
+  if (i < names.length) return `${i + 1}:${names[i]}${cls}`;
+  return cls ? `${i + 1}:?${cls}` : `${i + 1}:----`;
+}
+
+/** The four slots along the top: chosen names and classes, the current slot in yellow. */
+export function buildSlotDisplay(names: readonly string[], classes: readonly CharacterClassData[], currentSlot: number): Container {
   const display = new Container();
   display.position.set(SCREEN_MARGIN, 72);
   for (let i = 0; i < 4; i++) {
-    const text = i < names.length ? `${i + 1}:${names[i]}` : `${i + 1}:----`;
-    display.addChild(label(text, i * 240, 0, i === currentSlot ? 0xffff00 : 0xffffff));
+    display.addChild(label(slotText(i, names, classes), i * 440, 0, i === currentSlot ? 0xffff00 : 0xffffff));
   }
   return display;
 }
@@ -40,8 +47,8 @@ export function buildPartySummary(classes: readonly CharacterClassData[], names:
   return win;
 }
 
-/** The class preview panel beside the class menu. */
-export function buildClassPreview(cls: CharacterClassData): Window {
+/** The class preview panel beside the class menu, with the class's battle `ready` pose when the art is loaded. */
+export function buildClassPreview(cls: CharacterClassData, pose: Texture | null = null): Window {
   const win = new Window({ x: 0, y: 0, width: 600, height: 800 });
   const lines = [
     cls.name,
@@ -53,5 +60,11 @@ export function buildClassPreview(cls: CharacterClassData): Window {
     `Magic: W${cls.spellLevels.white}/B${cls.spellLevels.black}`,
   ];
   lines.forEach((line, i) => win.addChild(label(line, win.contentX, win.contentY + i * LINE_HEIGHT)));
+  if (pose) {
+    const sprite = new Sprite(pose);
+    sprite.label = 'classPose';
+    sprite.position.set(win.contentX, win.contentY + (lines.length + 1) * LINE_HEIGHT);
+    win.addChild(sprite);
+  }
   return win;
 }

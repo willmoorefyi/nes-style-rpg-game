@@ -7,6 +7,8 @@ import type { SpellData } from '../../src/types/index.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
 import { Character } from '../../src/entities/Character.js';
 import { ClassRegistry } from '../../src/data/ClassRegistry.js';
+import { PartyManager } from '../../src/entities/PartyManager.js';
+import { Inventory } from '../../src/entities/Inventory.js';
 import { classInitials, learnersLine } from '../../src/scenes/shop/spellLearners.js';
 
 beforeAll(loadRealRegistries);
@@ -42,8 +44,9 @@ describe('MagicShopScene prices', () => {
     const scene = new MagicShopScene(game as unknown as Game, 'elfheim_black');
     scene.enter();
     const labels = visibleLabels(scene.container);
-    expect(labels).toContain('ICE L2 400G');
-    expect(labels).toContain('FIR2 L3 1500G');
+    // columns: `Name  L1  100G` (E2)
+    expect(labels.some((l) => /^ICE +L2 +400G$/.test(l))).toBe(true);
+    expect(labels.some((l) => /^FIR2 +L3 +1500G$/.test(l))).toBe(true);
   });
 });
 
@@ -95,5 +98,76 @@ describe('MS-7: the magic shop shows the description and who can learn each spel
   it('an upgraded class that cannot learn the spell is not listed', () => {
     const { scene } = open(['knight', 'master']);
     expect(scene.learners.text).toBe('Learn: WM RM Kn');   // the Master learns no magic
+  });
+});
+
+describe('E4: learning a spell takes a spell and a member, with no slot step', () => {
+  function open() {
+    const input = tapInput();
+    const party = new PartyManager();
+    const wmag = new Character({ name: 'W.MAG', classData: ClassRegistry.getClass('white_mage')! });
+    wmag.learnSpell('cure', 1);
+    const rmag = new Character({ name: 'R.MAG', classData: ClassRegistry.getClass('red_mage')! });
+    for (const id of ['cure', 'harm', 'fog']) rmag.learnSpell(id, 1);
+    const fghtr = new Character({ name: 'FGHTR', classData: ClassRegistry.getClass('warrior')! });
+    for (const c of [wmag, rmag, fghtr]) party.add(c);
+    party.addGold(3000);
+    const game = { input, events: { emit: vi.fn() }, scenes: { pop: vi.fn() }, party };
+    const scene = new MagicShopScene(game as unknown as Game, 'cornelia_white');
+    scene.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => scene.update(1));
+    return { scene, tap, party, wmag, rmag };
+  }
+
+  it('CURE, known by every member who could learn it, shows Known; the panel says who knows it', () => {
+    const { scene } = open();
+    expect(scene.menuItems[0].label).toMatch(/^CURE +L1 +100G +Known$/);
+    expect(scene.menuItems[1].label).not.toMatch(/Known/); // HARM: the W.MAG can still learn it
+    expect(scene.panelLines.some((l) => /^W\.MAG +knows$/.test(l))).toBe(true);
+    expect(scene.panelLines.some((l) => /^FGHTR +n\/a$/.test(l))).toBe(true);
+  });
+
+  it('choosing a member with room buys the spell at once', () => {
+    const { scene, tap, party, wmag } = open();
+    tap('down'); // HARM
+    tap('confirm');
+    expect(scene.phase).toBe('character');
+    expect(scene.menuItems.map((m) => m.enabled)).toEqual([true, false]); // W.MAG, R.MAG (knows it)
+    expect(scene.menuItems[0].label).toMatch(/^W\.MAG +L1 1\/3$/);
+    expect(scene.menuItems[1].label).toMatch(/^R\.MAG +L1 3\/3 +\(knows\)$/);
+    tap('confirm'); // W.MAG
+    expect(scene.phase).toBe('spells');
+    expect(wmag.getSpellsAtLevel(1)).toContain('harm');
+    expect(party.gold).toBe(2900);
+    expect(scene.message).toBe('W.MAG learned HARM!');
+  });
+
+  it('a disabled (full) member cannot be chosen', () => {
+    const { scene, tap, party, rmag } = open();
+    tap('down');
+    tap('down');
+    tap('down'); // RUSE
+    tap('confirm');
+    expect(scene.menuItems[1]).toEqual({ label: expect.stringMatching(/^R\.MAG +L1 3\/3 +\(full\)$/), enabled: false });
+    tap('down'); // R.MAG (full)
+    tap('confirm');
+    expect(scene.phase).toBe('character');
+    expect(rmag.getSpellsAtLevel(1)).not.toContain('ruse');
+    expect(party.gold).toBe(3000);
+    tap('cancel');
+    expect(scene.phase).toBe('spells');
+  });
+
+  it('the spell list sits where the item shop puts its list beside the panel', async () => {
+    const { scene } = open();
+    const { ShopScene } = await import('../../src/scenes/ShopScene.js');
+    const input = tapInput();
+    const shopParty = new PartyManager();
+    shopParty.add(new Character({ name: 'A', classData: ClassRegistry.getClass('warrior')! }));
+    const shop = new ShopScene({ input, inventory: new Inventory(), party: shopParty, events: { emit: vi.fn() },
+      scenes: { pop: vi.fn() } } as unknown as Game, 'cornelia_weapon');
+    shop.enter();
+    input.tap('confirm', () => shop.update(1)); // Buy: the comparison panel opens
+    expect(scene.listRect).toEqual(shop.itemWindowRect);
   });
 });

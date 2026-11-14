@@ -14,6 +14,7 @@ import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 const SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
 const TOP_HEIGHT = 300;
+const MEMBER_HELP = 'Choose whose equipment to change.';
 const ITEM_Y = SCREEN_MARGIN + TOP_HEIGHT + SCREEN_MARGIN;
 
 type Phase = 'selectMember' | 'selectSlot' | 'selectItem';
@@ -64,13 +65,24 @@ export class EquipScene implements Scene {
   get statsLines(): string { return this.statsText.text; }
   /** The help bar's text (the highlighted item's description). */
   get helpText(): string { return this.help.text; }
+  /** Which menus have the focus (a white cursor); the others are grey (E3). */
+  get activeMenus(): { member: boolean; slot: boolean; item: boolean } {
+    return {
+      member: this.memberMenu.isActive,
+      slot: this.slotWindow.visible && this.slotMenu.isActive,
+      item: this.itemWindow.visible && this.itemMenu.isActive,
+    };
+  }
 
   enter(): void {
     this.phase = 'selectMember';
+    // the scene is cached: reopen on the first member, whose stats the window shows (E9)
+    this.memberIdx = 0;
     this.slotWindow.visible = false;
     this.itemWindow.visible = false;
     this.buildMemberMenu();
     this.updateStats();
+    this.help.setText(MEMBER_HELP);
   }
 
   private get member(): Character | undefined { return this.game.party.get(this.memberIdx) ?? undefined; }
@@ -82,7 +94,13 @@ export class EquipScene implements Scene {
       items,
       x: this.memberWindow.contentX,
       y: this.memberWindow.contentY,
-      onSelect: (item) => { this.memberIdx = Number(item.value); this.phase = 'selectSlot'; this.slotWindow.visible = true; this.buildSlotMenu(); },
+      onSelect: (item) => {
+        this.memberIdx = Number(item.value);
+        this.phase = 'selectSlot';
+        this.memberMenu.setActive(false);
+        this.slotWindow.visible = true;
+        this.buildSlotMenu();
+      },
       onCancel: () => this.game.scenes.pop(),
     });
     this.memberWindow.addChild(this.memberMenu);
@@ -99,8 +117,19 @@ export class EquipScene implements Scene {
       items,
       x: this.slotWindow.contentX,
       y: this.slotWindow.contentY,
-      onSelect: (item) => { this.selectedSlot = item.value as EquipmentSlot; this.phase = 'selectItem'; this.itemWindow.visible = true; this.buildItemMenu(); },
-      onCancel: () => { this.phase = 'selectMember'; this.slotWindow.visible = false; this.help.setText(''); },
+      onSelect: (item) => {
+        this.selectedSlot = item.value as EquipmentSlot;
+        this.phase = 'selectItem';
+        this.slotMenu.setActive(false);
+        this.itemWindow.visible = true;
+        this.buildItemMenu();
+      },
+      onCancel: () => {
+        this.phase = 'selectMember';
+        this.slotWindow.visible = false;
+        this.memberMenu.setActive(true);
+        this.help.setText(MEMBER_HELP);
+      },
     });
     this.slotWindow.addChild(this.slotMenu);
     this.showSlotHelp();
@@ -122,7 +151,13 @@ export class EquipScene implements Scene {
       y: this.itemWindow.contentY,
       maxVisible: 7,
       onSelect: (item) => this.onEquipSelect(item),
-      onCancel: () => { this.phase = 'selectSlot'; this.itemWindow.visible = false; this.updateStats(); this.showSlotHelp(); },
+      onCancel: () => {
+        this.phase = 'selectSlot';
+        this.itemWindow.visible = false;
+        this.slotMenu.setActive(true);
+        this.updateStats();
+        this.showSlotHelp();
+      },
     });
     this.itemWindow.addChild(this.itemMenu);
     this.previewSelected();
@@ -136,8 +171,14 @@ export class EquipScene implements Scene {
       this.statsText.setText(`Can't equip\nthat there.`, true);
       return;
     }
+    // the worn item goes back to the bag: refuse when the bag already holds 99 of it (E1)
+    const worn = char.getEquipped(this.selectedSlot);
+    if (worn && worn.id !== newItem?.id && !this.game.inventory.canAdd(worn.id)) {
+      this.statsText.setText(`No room for\n${worn.name}.`, true);
+      return;
+    }
     const prev = char.unequip(this.selectedSlot);
-    if (prev) this.game.inventory.add(prev.id);
+    if (prev && this.game.inventory.add(prev.id) < 1) console.error(`EquipScene: no room for ${prev.id}`);
     if (newItem) {
       if (char.equip(this.selectedSlot, newItem) === false) console.error(`EquipScene: ${char.name} refused ${newItem.id}`);
       else this.game.inventory.remove(newItem.id);
@@ -166,13 +207,14 @@ export class EquipScene implements Scene {
 
   onPause(): void {}
   onResume(): void {}
-
   exit(): void {}
 
-  /** The help bar describes what the highlighted slot holds. */
+  /** The help bar describes what the highlighted slot holds, or says it is empty (E3). */
   private showSlotHelp(): void {
     const slot = SLOTS[this.slotMenu.selectedIndex];
-    this.help.setText((slot && this.member?.getEquipped(slot)?.description) ?? '');
+    if (!slot) return;
+    const worn = this.member?.getEquipped(slot);
+    this.help.setText(worn ? worn.description ?? worn.name : `${SLOT_LABELS[slot]}: nothing equipped.`);
   }
 
   /** Live ATK/DEF preview and description for the highlighted item ('(Unequip)' previews an empty slot). */
@@ -182,7 +224,9 @@ export class EquipScene implements Scene {
     const value = this.itemMenu.selectedItem?.value;
     const item = value ? ItemRegistry.getItem(value) ?? null : null;
     this.statsText.setText(equipPreview(char, this.selectedSlot, item), true);
-    this.help.setText(item?.description ?? '');
+    const worn = char.getEquipped(this.selectedSlot);
+    const unequipHelp = worn ? `Take off the ${worn.name}.` : 'The slot is already empty.';
+    this.help.setText(item ? item.description ?? item.name : unequipHelp);
   }
 
   private updateStats(): void {

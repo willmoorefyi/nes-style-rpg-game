@@ -124,6 +124,17 @@ describe('FieldMenuScene', () => {
       expect(help()).toMatch(/spell/i);
     });
 
+    it('E7: no command promises sorting (the item menu cannot sort)', () => {
+      const game = createMockGameForMenu();
+      const scene = new FieldMenuScene(game as unknown as Game);
+      scene.enter();
+      const bar = scene.container.children.find((c): c is HelpWindow => c instanceof HelpWindow)!;
+      for (let i = 0; i < 7; i++) {
+        expect(bar.text).not.toMatch(/sort/i);
+        game.input.tap('down', () => scene.update(1));
+      }
+    });
+
     it('refreshes the party when it comes back from a sub-menu', () => {
       const party = fullParty();
       const scene = new FieldMenuScene(createMockGameForMenu(true, party) as unknown as Game);

@@ -5,13 +5,10 @@ import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { slotOf } from '../../entities/EquipmentRules.js';
 import { compareEquip, hitsSuffix } from '../shopComparison.js';
-import { FONT_SIZE, SCREEN_MARGIN } from '../../core/LayoutConstants.js';
+import { FONT_SIZE } from '../../core/LayoutConstants.js';
+import { DETAIL_RECT } from './shopLayout.js';
 
-/** A window's rectangle on screen (for layout tests). */
-export interface ShopRect { x: number; y: number; width: number; height: number }
-
-/** The equipment comparison panel; the shop's item list narrows to end before it while it is shown. */
-export const DETAIL_RECT: ShopRect = { x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 };
+export { DETAIL_RECT, type ShopRect } from './shopLayout.js';
 const LINE_STEP = FONT_SIZE + 8;
 
 /**
