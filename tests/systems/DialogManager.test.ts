@@ -174,7 +174,7 @@ describe('DialogManager: confirm hold-off after the last line closes (U12)', () 
     expect(holdOff).toHaveBeenCalledTimes(1);
   });
 
-  it('a manager built without the option never holds input off (cutscene hosts, the opening)', () => {
+  it('a manager built without the option never holds input off (the opening sequence)', () => {
     const box: RealDialogBox = new RealDialogBox({ revealSpeed: 0, onComplete: () => mgr.advance() });
     const mgr = new DialogManager(box);
     const holdOff = vi.spyOn(input, 'holdOff');
@@ -183,6 +183,27 @@ describe('DialogManager: confirm hold-off after the last line closes (U12)', () 
     tap(mgr);
     expect(mgr.isActive).toBe(false);
     expect(holdOff).not.toHaveBeenCalled();
+  });
+
+  it('a dialog started with holdOff: false closes without a hold-off (a field cutscene step)', () => {
+    const mgr = fieldManager();
+    const holdOff = vi.spyOn(input, 'holdOff');
+    mgr.start(['step'], undefined, { holdOff: false });
+    frame(mgr);
+    tap(mgr);
+    expect(mgr.isActive).toBe(false);
+    expect(holdOff).not.toHaveBeenCalled();
+    key('keydown');
+    expect(input.isJustPressed('confirm')).toBe(true);
+  });
+
+  it('holdOffConfirm holds confirm for the close hold-off (a field cutscene ends)', () => {
+    const mgr = fieldManager();
+    const holdOff = vi.spyOn(input, 'holdOff');
+    mgr.start(['step'], undefined, { holdOff: false });
+    frame(mgr);
+    mgr.holdOffConfirm();
+    expect(holdOff).toHaveBeenCalledWith(DIALOG_CLOSE_HOLDOFF_FRAMES, ['confirm']);
   });
 
   it('an input without holdOff (a test mock) is skipped', () => {

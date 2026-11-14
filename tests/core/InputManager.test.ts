@@ -201,5 +201,25 @@ describe('InputManager', () => {
       pressKey('KeyZ');
       expect(input.isJustPressed('confirm')).toBe(true);
     });
+
+    it('keeps the count per action: a later holdOff(8) does not widen a confirm-only holdOff(24) to every action', () => {
+      input.holdOff(24, ['confirm']);
+      input.holdOff(8);
+      for (let i = 0; i < 8; i++) input.update();
+      pressKey('KeyX');
+      pressKey('KeyZ');
+      expect(input.isJustPressed('cancel')).toBe(true);
+      expect(input.isJustPressed('confirm')).toBe(false);
+      releaseKey('KeyX');
+      releaseKey('KeyZ');
+      for (let i = 8; i < 23; i++) input.update();
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(false);
+      input.update();
+      releaseKey('KeyZ');
+      input.update();
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(true);
+    });
   });
 });

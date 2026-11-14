@@ -185,16 +185,22 @@ describe('U6: the Load prompt defaults to No only during a game', () => {
   it('from the title (Continue, even after Game Over left a party) it is "Load Slot 1?" on Yes', async () => {
     const { g, load, press, restore } = await withSave();
     expect(g.party.size).toBe(1);   // Game Over -> Title keeps the wiped party in memory
-    load.enter({ fromTitle: true });
+    load.enter();
+    load.openedFromTitle();
     press('confirm');
     expect(load.confirmPrompt).toBe('Load Slot 1?');
     press('confirm');               // the default answer
     expect(restore).toHaveBeenCalledTimes(1);
   });
 
+  it('enter takes no options: only openedFromTitle marks the title\'s Continue (U6 review)', () => {
+    expect(LoadScene.prototype.enter.length).toBe(0);
+  });
+
   it('re-opening from the field after the title forgets fromTitle', async () => {
     const { load, press } = await withSave();
-    load.enter({ fromTitle: true });
+    load.enter();
+    load.openedFromTitle();
     load.enter();
     press('confirm');
     expect(load.confirmPrompt).toContain('lost');

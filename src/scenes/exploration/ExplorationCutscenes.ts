@@ -29,7 +29,8 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
     return false;
   }
   const manager = new CutsceneManager({
-    showDialog: (text: string) => new Promise<void>((resolve) => host.dialog.enqueue([text], resolve)),
+    // the steps themselves don't hold confirm off (U12 review); the whole scene does once, below
+    showDialog: (text: string) => new Promise<void>((resolve) => host.dialog.enqueue([text], resolve, { holdOff: false })),
     fadeOut: host.fadeOut,
     fadeIn: host.fadeIn,
     flags: host.flags,
@@ -39,6 +40,8 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
     onHeal: host.onHeal,
   });
   await manager.play(script);
+  // the press that closed the last line, or a mash after the scene, must not talk to the NPC again
+  host.dialog.holdOffConfirm();
   return true;
 }
 

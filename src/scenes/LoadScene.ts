@@ -10,9 +10,6 @@ import { MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 export const LOAD_TITLE = 'Load: choose a slot';
 
-/** How the Load screen was opened (U6): from the title's Continue nothing unsaved can be lost. */
-export interface LoadOpenOptions { fromTitle?: boolean }
-
 export class LoadScene implements Scene {
   readonly container = new Container();
   private readonly listWindow = new Window({ ...SLOT_RECTS.list });
@@ -50,11 +47,11 @@ export class LoadScene implements Scene {
   }
 
   /**
-   * `fromTitle` is set only by the title's Continue (`openedFromTitle` once the push has settled); every other opener
-   * (the field menu, Game Over) is a game in progress.
+   * Every opening starts as a game in progress (the field menu, Game Over); only the title's Continue then calls
+   * `openedFromTitle` once the push has settled.
    */
-  enter(opts?: LoadOpenOptions): void {
-    this.fromTitle = opts?.fromTitle === true;
+  enter(): void {
+    this.fromTitle = false;
     this.closeConfirm();
     this.buildMenu();
   }

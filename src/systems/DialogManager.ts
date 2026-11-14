@@ -9,14 +9,21 @@ export interface DialogManagerOptions {
   closeHoldOffFrames?: number;
 }
 
+/** Per dialog: `holdOff: false` skips the close hold-off (a field cutscene's steps; it holds off once at its end). */
+export interface DialogShowOptions {
+  holdOff?: boolean;
+}
+
 export class DialogManager {
   private dialogBox: DialogBox;
   private currentDialog: string[] = [];
   private dialogIndex = 0;
   private _isActive = false;
   private onComplete: (() => void) | null = null;
+  /** Whether closing the current dialog (with nothing queued) holds confirm off. */
+  private holdOffOnClose = true;
   /** Dialogs requested while another one is showing (e.g. several level-up messages). */
-  private queue: Array<{ lines: string[]; onComplete?: () => void }> = [];
+  private queue: Array<{ lines: string[]; onComplete?: () => void; opts?: DialogShowOptions }> = [];
 
   private closeHoldOffFrames: number;
   /** The input of the last update(); the hold-off goes to it (a mock without holdOff is skipped). */
@@ -28,8 +35,9 @@ export class DialogManager {
   }
 
   /** Show `lines`; `onComplete` runs once, after the last line is dismissed. */
-  start(lines: string[], onComplete?: () => void): void {
+  start(lines: string[], onComplete?: () => void, opts: DialogShowOptions = {}): void {
     this.onComplete = onComplete ?? null;
+    this.holdOffOnClose = opts.holdOff ?? true;
     this.currentDialog = lines;
     this.dialogIndex = 0;
     this._isActive = true;
@@ -43,17 +51,23 @@ export class DialogManager {
     } else {
       this._isActive = false;
       this.dialogBox.visible = false;
+      const hold = this.holdOffOnClose;
       const done = this.onComplete;
       this.onComplete = null;
       done?.();
       // the callback may itself have started a dialog; the queue then waits for that one
       if (!this._isActive) {
         const next = this.queue.shift();
-        if (next) this.start(next.lines, next.onComplete);
+        if (next) this.start(next.lines, next.onComplete, next.opts);
       }
       // the last box closed: the press that closed it, or a mash right after, must not talk again (U12)
-      if (!this._isActive && this.closeHoldOffFrames > 0) this.input?.holdOff?.(this.closeHoldOffFrames, ['confirm']);
+      if (!this._isActive && hold) this.holdOffConfirm();
     }
+  }
+
+  /** Hold confirm off for the close hold-off (if this manager has one); a field cutscene calls it once at its end. */
+  holdOffConfirm(): void {
+    if (this.closeHoldOffFrames > 0) this.input?.holdOff?.(this.closeHoldOffFrames, ['confirm']);
   }
 
   /** Another line of this dialog, or a queued dialog, comes after the one showing (the box's ▼ marker, I2). */
@@ -62,12 +76,12 @@ export class DialogManager {
   }
 
   /** Like `start`, but waits for the current dialog to finish instead of replacing it. */
-  enqueue(lines: string[], onComplete?: () => void): void {
+  enqueue(lines: string[], onComplete?: () => void, opts?: DialogShowOptions): void {
     if (this._isActive) {
-      this.queue.push({ lines, onComplete });
+      this.queue.push({ lines, onComplete, opts });
       this.dialogBox.setMore(true);
     } else {
-      this.start(lines, onComplete);
+      this.start(lines, onComplete, opts);
     }
   }
 
