@@ -54,7 +54,7 @@ keyframes:
     sh_n: [58, 62]
     el_n: [72, 55]
     hand_n: [86, 47]
-    club_h: [72, 92]
+    club_h: [74, 98]           # E9: the dropped club hangs behind the near shin (hurt_in2), not floating at the hip
     hip_n: [68, 95]
     knee_n: [80, 105]
     foot_n: [75, 115]
@@ -79,9 +79,9 @@ frames:                        # tweaks from /tmp/t3/pose.py: rigid rotations ab
   atk_wind1:                   # lean back 4 about the hip, club arm swings 20 back
     moves: []
     tweaks: {crown: [-4, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, -1], el_n: [-6, -1], hand_n: [-11, -1], tip: [-14, 4], sh_f: [-2, 1], el_f: [-1, 2], hand_f: [0, 2]}
-  atk_wind2:                   # coil: lean back 9 (head 6), club arm 37 back (28 net), body 2 lower
+  atk_wind2:                   # coil: lean back 9 (head 6), club arm hangs back along the side (E9: not across the belly), body 2 lower
     moves: []
-    tweaks: {crown: [-9, -1], neck: [-6, -1], chest: [-4, 0], sh_n: [-5, -3], el_n: [-12, -4], hand_n: [-19, -3], tip: [-26, 4], sh_f: [-5, 4], el_f: [-2, 5], hand_f: [1, 5]}
+    tweaks: {crown: [-9, -1], neck: [-6, -1], chest: [-4, 0], sh_n: [-5, -3], el_n: [-9, -4], hand_n: [-12, -3], tip: [-17, 2], sh_f: [-5, 4], el_f: [-2, 5], hand_f: [1, 5]}
   atk_mid:                     # the attack pose leaned back 10 and 1 lower (arms rigid with the body: hands stay on the club)
     moves: []
     dy: 1
@@ -115,3 +115,9 @@ masks:
 holds: []
 paint:                         # hurt_in1: the far arm / belly slit (open in idle) closed with the arm's dark brown
   - {frame: hurt_in1, xy: [[36, 81], [36, 82], [36, 83], [37, 84], [38, 84], [37, 85], [36, 86], [37, 86], [37, 87], [38, 87], [37, 88], [38, 88], [37, 89]], rgb: [66, 41, 41]}
+  # hurt_in2 (E9): the leaned torso staircases the back edge where the shoulder fold meets it (y 62-65) and above the
+  # belt (y 79-81); the edge is evened out, the fold kept inside, the 1 px holes closed
+  - {frame: hurt_in2, xy: [[34, 62], [35, 62], [34, 63], [35, 63], [35, 64], [36, 64], [35, 65], [36, 65]], rgb: [181, 123, 90]}
+  - {frame: hurt_in2, xy: [[33, 63], [34, 64], [34, 65], [38, 80], [39, 81], [40, 88]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[39, 79], [39, 80], [40, 80], [40, 81], [41, 81]], rgb: [99, 57, 57]}
+  - {frame: hurt_in2, xy: [[37, 79], [37, 80], [38, 81]], rgb: null}

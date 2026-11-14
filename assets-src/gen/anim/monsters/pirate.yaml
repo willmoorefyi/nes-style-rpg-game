@@ -69,12 +69,13 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
-  atk_wind1:                   # fist and cutlass translated back and up as one piece (no rotation: crisp fist), head back,
-    moves: [crown, neck]       # far arm back; the torso only drops (no rotation: the coat details stay clean)
-    tweaks: {crown: [-2, 0], neck: [-2, 0], el_n: [-2, -1], hand_n: [-2, -1], tip: [-2, -1], el_f: [-2, -1], hand_f: [-4, -1]}
+  atk_wind1:                   # anticipation (E12): further back toward the coil (t -0.30); head back 4, fist and cutlass
+    t: -0.30                   # drawn back and up, blade tipped back, far arm swings back; the torso only drops
+    moves: [crown, neck]       # (no rotation: the coat details stay clean)
+    tweaks: {crown: [-4, 0], neck: [-2, 0], sh_n: [-2, 0], el_n: [-3, -2], hand_n: [-4, -2], tip: [-8, -3], el_f: [-2, -1], hand_f: [-4, -1]}
   atk_wind2:                   # coil: fist pulled back and up, blade tipped back 16 deg, head leans back, far arm swings back 14 deg, torso down 2
     moves: [crown, neck]
-    tweaks: {crown: [-5, 0], neck: [-3, 0], el_n: [-2, -3], hand_n: [-2, -3], tip: [-9, -4], el_f: [-2, -1], hand_f: [-4, -1]}
+    tweaks: {crown: [-5, 0], neck: [-3, 0], sh_n: [-2, -1], el_n: [-4, -4], hand_n: [-4, -4], tip: [-11, -5], el_f: [-2, -1], hand_f: [-4, -1]}
   atk_mid:                     # legs shifted (not rotated) a third of the way back; far arm and blade keep their attack
                                # angles (the crescent stays one piece); head and fist group 3 px back
     t: 0.35
