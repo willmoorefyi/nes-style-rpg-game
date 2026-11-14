@@ -5,7 +5,7 @@
   python3 -I assets-src/tools/build_map.py --selftest   # offline checks
   python3 -I assets-src/tools/build_map.py --check-determinism [ids]       # compile under two hash seeds, compare
   python3 -I assets-src/tools/build_map.py --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision] [--scale f]
-  python3 -I assets-src/tools/build_map.py --metrics [ids]                 # terrain metrics (terrain.py)
+  python3 -I assets-src/tools/build_map.py --metrics [ids]                 # terrain metrics (terrain/)
   python3 -I assets-src/tools/map_report.py <id>                           # reachability / chokepoint report
 
 Writes assets/maps/ai/<id>.yaml (runtime MapData with `art` and `entrances`) and the baked chunks
@@ -253,7 +253,7 @@ def most_common_soft(near: Counter) -> str:
 
 
 def _terrain_module(src: dict):
-    """`terrain: organic` maps paint soft ground and peaks with assets-src/tools/terrain.py (T3b) instead of
+    """`terrain: organic` maps paint soft ground and peaks with assets-src/tools/terrain/ (T3b) instead of
     paint_soft / place_peaks below. The module must provide paint_soft(below, mat, kit, seed) and
     place_peaks(canvas, mat, owner, kit, rng)."""
     mode = src.get("terrain")
@@ -262,7 +262,7 @@ def _terrain_module(src: dict):
     if mode != "organic":
         raise MapError(f"terrain: unknown mode {mode!r} (classic or organic)")
     if importlib.util.find_spec("terrain") is None:
-        raise MapError("terrain: organic needs assets-src/tools/terrain.py")
+        raise MapError("terrain: organic needs assets-src/tools/terrain/")
     import terrain  # noqa: PLC0415
     return terrain
 
@@ -1065,9 +1065,9 @@ def preview(map_id: str, x0: int, y0: int, x1: int, y1: int, out: Path, grid: bo
 
 
 def metrics(ids: list[str] | None = None) -> None:
-    """Terrain metrics of compiled maps; provided by terrain.metrics(src, compiled) once terrain.py exists."""
+    """Terrain metrics of compiled maps; provided by terrain.metrics(src, compiled) (assets-src/tools/terrain/)."""
     if importlib.util.find_spec("terrain") is None:
-        raise MapError("--metrics needs assets-src/tools/terrain.py (terrain blending)")
+        raise MapError("--metrics needs assets-src/tools/terrain/ (terrain blending)")
     import terrain  # noqa: PLC0415
     for mid in ids or source_ids():
         src = yaml.safe_load((SRC / f"{mid}.yaml").read_text())
@@ -1175,7 +1175,7 @@ def selftest() -> None:
     ok += 1
     import map_selftest  # noqa: PLC0415  (determinism, objects, edge exits, inspect, map checks, report, preview)
     ok += map_selftest.run(sys.modules[__name__])
-    if importlib.util.find_spec("terrain"): __import__("terrain").selftest()   # terrain blending (terrain.py)
+    if importlib.util.find_spec("terrain"): __import__("terrain").selftest()   # terrain blending (terrain/)
     print(f"build_map selftest: {ok} checks passed")
 
 

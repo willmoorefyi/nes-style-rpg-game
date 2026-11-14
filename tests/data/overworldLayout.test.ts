@@ -21,7 +21,7 @@ const key = (x: number, y: number) => `${x},${y}`;
 const DIRS: Cell[] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const col = new CollisionMap(map);
 const walking = new WalkingMode();
-const ROAD = 8, BRIDGE = 9, WATER = 2, RIVER = 7;
+const ROAD = 8, BRIDGE = 9, WATER = 2, RIVER = 7, MOUNTAIN = 3;
 const terrain = (x: number, y: number) => map.collision[y * map.width + x];
 const inside = (x: number, y: number) => x >= 0 && y >= 0 && x < map.width && y < map.height;
 
@@ -123,6 +123,15 @@ describe('overworld layout (T3c)', () => {
     expect(reach(start, gateCells).has(north)).toBe(false);      // gates closed
     expect(reach(start).has(north)).toBe(false);                 // gates open, gap still water
     expect(reach(start, new Set(), new Set(gap.map((c) => key(...c)))).has(north)).toBe(true);   // gap bridged
+    // the mainland is clearly larger than the peninsula, and joins it over land behind the range
+    const peninsula = reach(start);
+    const mainland = reach(entrance('north_shore'));
+    expect(mainland.size, `mainland ${mainland.size} vs peninsula ${peninsula.size} cells`)
+      .toBeGreaterThan(1.15 * peninsula.size);
+    // the isthmus: were the mountains walkable, the north shore could be reached on foot (no water in the way)
+    const rock = new Set<string>();
+    for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) if (terrain(x, y) === MOUNTAIN) rock.add(key(x, y));
+    expect(reach(start, gateCells, rock).has(north)).toBe(true);
   });
 
   it('OW-14: no walkable cell on the map edge', () => {

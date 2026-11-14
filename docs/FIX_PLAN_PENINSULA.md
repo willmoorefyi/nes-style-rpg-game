@@ -784,14 +784,6 @@ All 15 momus issues apply. Ownership and resolutions:
 
 **Order:** T3a and T3e run in parallel and merge first. Then T3b, T3c and T3d run in parallel, each branched from `mainline` *after* that merge. Then all maps are rebuilt once on the integration branch.
 
----
-
-## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
-
-1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
-2. **Document** every finding in a new issue file, `docs/PLAYTEST_PENINSULA_2_<date>.md`.
-3. **Plan** a fix for each issue; momus validates the plan.
-4. **Implement** the fixes, validating each through tests and real gameplay in the browser, and commit tranche by tranche.
 ### T3a result
 
 **Done** (`build_map.py`, new `map_checks.py`, `map_report.py`, `map_selftest.py`; `kit.py`; `gen/approve.py`):
@@ -827,16 +819,6 @@ All 15 momus issues apply. Ownership and resolutions:
 
 **`gen/selftest.py`** needs the gitignored `assets-src/gen/refs/`. Run it from the main checkout.
 
-### T3d result
-
-**Done** (`layouts/common.py` now holds `Room`; new `layouts/interiors.py`; `layouts/cornelia.py`; `castle.py` regenerates byte-identical sources):
-- **CT-1:** ten generated homes, `cornelia-house-<name>`: scholar (study with a reading alcove), fisher (one-room cottage), farm (earth floor, hearth, store; L-plan), knight (hall and armoury through an inner door), weaver (rugs and hangings), gardener (L-plan potting lodge), family (living room and bedroom), apprentice (orb niche), tavern ("The Crystal Tankard": bar, banquet tables, hearth; the barkeep is talked to across the bar, a patron points to the tomb past the east bridge) and shrine (runner, pillars, statue). Ten sizes from 9x8 to 14x10; `music: town`, `canSave`, a HUD `name`, `no_static_chokepoints`. Chests: `CHEST_HOUSE_FISHER` (potion), `_FARM` (antidote), `_KNIGHT` (wooden_nunchaku, pending T4), `_GARDENER` (tent), `_APPRENTICE` (ether). The legacy `assets/maps/cornelia.yaml` has the ten `house_*` names as aliases of [7, 14].
-- **IN-5:** the six shops and the inn are generated too, each with its own plan (L counter, stands, short counter before shelves, white orb alcove, west black-orb niche, front counter plus a back room of beds); keeper ids, `shopId`, `door`, return targets and `music: shop` kept. Every keeper has a counter cell in front of it.
-- **CT-6/CT-7:** the NW pocket (x 0-2, y 0-17) is wall; `edge_exits` makes all 189 walkable edge cells exits (north `cornelia_north`, west `cornelia_west`, east y <= 30 `cornelia_north`, east y >= 31 `cornelia_east`, south `cornelia`); the explicit edge transitions are gone.
-- **CT-8:** `road_check` (`cobble`, `dirt`; `check_under` off) passes: the garden walks join the promenade at (28,25) and (32,25), the postern track runs down to the apron, (50,19) crosses a new footbridge to the quiet garden's bench, (4,25) became a spur to the orchard well, the magic-quarter lane moved out from under the white magic shop to x 9-10 and stops at the two doors, the inn lane starts at its door, the stray dirt at (33-35,56) is gone, and a lane passes the shrine door to a path that crosses the river (the bridge moved to row 61, off the tavern's front wall) and ends at a bench and flower garden by the east wall. The lane on row 51 ends at a bench and flowers at (53-54,50-52). The fisher moved to (38,64), off the new path.
-- **ST-12:** `NPC.setOpened()` shows the opened frame (column 1 of the chest block; `build_assets.py field_ai` now bakes `chest_open` there, as the legacy atlas already did) or a dimmed sprite, at map load from the flag (`MapLoader`) and right after looting; chests never turn.
-- **Tests:** `tests/data/corneliaLayout.test.ts` (CT-1 from the sources, round trips, sizes, IN-5, talkable, CT-6); `crossFileValidation` reads `assets/maps/ai/` too (flag-based key gates allowed), and checks chest flags; ST-12 cases in `tests/entities/NPC.test.ts`.
-
 ### T3b result
 
 **Done** (new `assets-src/tools/terrain.py`; `build_map.py` untouched, only the T3a hooks are used). It runs only for sources with `terrain: organic`; the castle and the temple compile to their committed chunks (a selftest check).
@@ -865,3 +847,80 @@ All 15 momus issues apply. Ownership and resolutions:
 - **Peak spacing** is 34 px x scale (the plan's minimum is 30), so the mountain texture shows between the peaks.
 - **Beach inner edge.** It is steered off cell lines. Where the ocean already cuts deep into a land cell, the beach narrows to a 2.5-4 px strip that follows the coast. So beaches are 6-10 px where the coast recedes and thin where it bulges.
 - **Real-map metric:** one sand/grass run is 86 px, on a narrow peninsula tip whose coast hugs the clamped cell centres. That is over the 72 px synthetic target; every other real-map number meets the synthetic targets.
+
+### T3c result
+
+**Done** (new `layouts/overworld.py`, which writes `assets-src/maps/overworld.yaml`; `gen/approved/overworld/city.json` `paint` fixes; legacy `assets/maps/overworld.yaml` entrance aliases only):
+- **Geography:** the peninsula hangs south-west from the mainland; the sound narrows east to the strait and ends at a fjord head; the spine runs from the fjord head south-east to the eastern gulf and seals the isthmus; the east river rises at a tarn (`≈`) and runs straight through the east bridge to the south bay; the east pocket holds the tomb.
+- **The moat ponds:** `≈` ponds fill the icon's transparent corner cells (north-west, north-east where the stream rises, south-east), so every gate is a doorway with exactly one walkable neighbour (`warp_leaves`). The city stream is laid as `r` cells under the town, from the north-east pond to the south-west corner, and on to the bay; the icon's `paint` list draws the stream through the walls and a culvert arch.
+- **The ring road:** one 1-wide dirt ring runs round the city from the W gate, north, east and down to the S road (never across the stream). The N road leaves it for the north bridge foot, the temple road for the temple's door approach, the E road for the east bridge and the tomb, and the S road for a 3-cell jetty (the ship waits off it). `road_check` passes with `check_under`: no road under an icon.
+- **The 2-wide bridges:** the east bridge is two `=` cells across the 2-wide east river, with the channel on the span's columns on both sides (`river_check`). The north bridge is two 2-wide stubs with two rows of open water between them; the `BRIDGE_BUILT` key-item gates sit on the south stub.
+- **The canoe** (`requiredFlag: EARTH_CAVE_COMPLETE`; OW-10 stays open) was meant for the east river below the bridge, but its search took the first river cell of that row, which is the city stream, (23,34). Fixed in the T3 review fixes.
+- **The tomb (OW-11):** a stone sarcophagus between two broken columns, with flowers and vines, at the end of the E road; both cells `inspect` to "Here lies Erdrick.".
+- **Checks on:** `terrain: organic`, `sealed_edges`, `road_check`, `warp_leaves`, `min_blob`, `river_check`, `art_coverage`; `unreachable_ok: [north_shore]`; `cornelia` is the first entrance. `safeSpawn` moves a restored spawn that the first entrance cannot reach.
+- **Tests:** `tests/data/overworldLayout.test.ts` (sealed land, edges, roads, warps, river, tomb, distances) and the `act1Flow` overworld case.
+
+### T3d result
+
+**Done** (`layouts/common.py` now holds `Room`; new `layouts/interiors.py`; `layouts/cornelia.py`; `castle.py` regenerates byte-identical sources):
+- **CT-1:** ten generated homes, `cornelia-house-<name>`: scholar (study with a reading alcove), fisher (one-room cottage), farm (earth floor, hearth, store; L-plan), knight (hall and armoury through an inner door), weaver (rugs and hangings), gardener (L-plan potting lodge), family (living room and bedroom), apprentice (orb niche), tavern ("The Crystal Tankard": bar, banquet tables, hearth; the barkeep is talked to across the bar, a patron points to the tomb past the east bridge) and shrine (runner, pillars, statue). Ten sizes from 9x8 to 14x10; `music: town`, `canSave`, a HUD `name`, `no_static_chokepoints`. Chests: `CHEST_HOUSE_FISHER` (potion), `_FARM` (antidote), `_KNIGHT` (wooden_nunchaku, pending T4), `_GARDENER` (tent), `_APPRENTICE` (ether). The legacy `assets/maps/cornelia.yaml` has the ten `house_*` names as aliases of [7, 14].
+- **IN-5:** the six shops and the inn are generated too, each with its own plan (L counter, stands, short counter before shelves, white orb alcove, west black-orb niche, front counter plus a back room of beds); keeper ids, `shopId`, `door`, return targets and `music: shop` kept. Every keeper has a counter cell in front of it.
+- **CT-6/CT-7:** the NW pocket (x 0-2, y 0-17) is wall; `edge_exits` makes all 189 walkable edge cells exits (north `cornelia_north`, west `cornelia_west`, east y <= 30 `cornelia_north`, east y >= 31 `cornelia_east`, south `cornelia`); the explicit edge transitions are gone.
+- **CT-8:** `road_check` (`cobble`, `dirt`; `check_under` off) passes: the garden walks join the promenade at (28,25) and (32,25), the postern track runs down to the apron, (50,19) crosses a new footbridge to the quiet garden's bench, (4,25) became a spur to the orchard well, the magic-quarter lane moved out from under the white magic shop to x 9-10 and stops at the two doors, the inn lane starts at its door, the stray dirt at (33-35,56) is gone, and a lane passes the shrine door to a path that crosses the river (the bridge moved to row 61, off the tavern's front wall) and ends at a bench and flower garden by the east wall. The lane on row 51 ends at a bench and flowers at (53-54,50-52). The fisher moved to (38,64), off the new path.
+- **ST-12:** `NPC.setOpened()` shows the opened frame (column 1 of the chest block; `build_assets.py field_ai` now bakes `chest_open` there, as the legacy atlas already did) or a dimmed sprite, at map load from the flag (`MapLoader`) and right after looting; chests never turn.
+- **Tests:** `tests/data/corneliaLayout.test.ts` (CT-1 from the sources, round trips, sizes, IN-5, talkable, CT-6); `crossFileValidation` reads `assets/maps/ai/` too (flag-based key gates allowed), and checks chest flags; ST-12 cases in `tests/entities/NPC.test.ts`.
+
+### T3 integration result
+
+**Done** on `t3-integration` (head `6a9ad95`):
+- **Merge order:** T3a and T3e first, then the T3a/T3e review fixes, then T3d, T3c and T3b. The sub-branches' compiled output was discarded and every map rebuilt once after the last merge.
+- **The rebuild:** the overworld is the only map whose chunks changed with T3b (the castle and the temple compile to their committed chunks, a selftest check); the T3b numbers above are measured on that build.
+- **Checked again** at the start of the review fixes: the overworld recompiles to its committed chunks, and `--selftest` passes (73 compiler checks and 42 terrain checks).
+
+The review of the integrated tranche then found the issues fixed in the next section.
+
+### T3 review fixes result
+
+**Done** (from the review of `t3-integration`):
+- **OW-3, one door per gate:** the keep's drawn door is the N warp, (28,44); the cell above it, among the flag tips, is a walkable approach (`walk_cells`). The painted postern arch is gone from `city.json` (the approved PNG is unchanged). `warp_leaves` holds.
+- **OW-15, the larger mainland:** the map gained 16 rows of mainland in the north (72x72; the T3c land keeps its shapes because the layout noise keeps its knots for those rows), with a north bay, two ranges, forests and a mere. The compiled mainland has 1218 walkable cells from `north_shore`, the peninsula 937 from `cornelia` (before: 574 and 930). The layout script and the tests check that the mainland is over 1.15 times the peninsula, and that with the mountains open the north shore can be reached from the city (the isthmus exists).
+- **OW-5:**
+  - The straight-run metric is now the longest boundary stretch whose points all lie within 3 px of their fitted line (any direction, `metrics.STRAIGHT_DEV`), traced along the outline; `RUN_MAX` is 96 px.
+  - The old warp's square-wave coarse octave held outlines parallel to cell lines for 200-300 px. The main warp term is now a meander whose knots alternate in sign every 24-48 px (each row with its own phase), pushed off zero so that outlines cross their cell lines steeply.
+  - The cell masks lost their macro staircases: a headland and a cove on the sound's south shore, a bulge in the steps up to the fjord head, a ragged top edge for the south-west forest, and a filled gulf head (its straight east shore was the last coast run over 96 px).
+  - The beach's inner edge is steered 6-9.5 px off a parallel cell line (was 4.5-9).
+- **Organic roads:** roads are drawn along the network's centre line: rounded corners, staircases of alternating turns as smooth diagonals, junction and 2x2-block fills, dead ends to the cell edge, a noisy edge with a dithered fringe and a darker rim. Collision is unchanged (a selftest compares it with the classic painting).
+- **Unreachable cells:** rock fills the pocket behind the tomb (the columns now block both cells), and the layout fills any walkable cell that no entrance reaches (the grass hole in the north-east range). New opt-in map check `no_unreachable_walkable` (allow-list: `unreachable_ok` entrance names or `[x, y]` cells), on for the overworld, with a selftest case.
+- **The canoe** is on the east river at (45,50): the river cell of its row nearest the bridge column.
+- **`safeSpawn`** accepts a cell that any entrance reaches, and moves a spawn off a warp onto a good neighbour (else to the first entrance).
+- **Tests:** `homes.length === 10` in the Cornelia house tests; the OW-15 test and the `act1Flow` overworld case now fail on the old map; the key-gate test checks `requiredFlag` against `STORY_FLAGS`; new `safeSpawn` cases.
+- **`terrain.py` is now the `terrain/` package:** `base`, `outline`, `water`, `peaks`, `roads`, `metrics` and `selftest`, each under 250 lines, with the same `terrain.*` hooks. The split alone left every map byte-identical.
+
+**Metrics** (`--metrics overworld`, after the fixes; straight run = within 3 px of a line, limit 96 px):
+
+| Boundary | Longest straight run | On a cell line | Integrated build (new metric) |
+|---|---|---|---|
+| coast | 91 px | 13 % | 303 px, 13 % |
+| sand/grass | 73 px | 19 % | 242 px, 11 % |
+| forest/grass | 95 px | 12 % | 166 px, 11 % |
+| mountain/grass | 91 px | 17 % | 211 px, 14 % |
+
+Peaks: 12 variants, anchor spread 13.1 px; foothills 100 %; fidelity: every wild cell centre is >= 61 % its own material (roads are now left out of fidelity: a diagonal track cuts across its cells by design). The cost of the shorter runs is a higher on-line share for sand/grass and mountain/grass: an outline that may not stay parallel to a cell line for 96 px has to cross it more often. A uniformly random offset inside the 10 px margin would give about 24 %; the classic painting gives 50-59 %. Synthetic straight boundaries (the selftest) stay under 96 px and 15 %.
+
+---
+
+## T6: Polish and the presentation decisions
+
+### OW-9: the broken north bridge (note from the T3 review)
+
+- The art fix (snapped planks, pilings, debris on the two stubs) is paid art, as decided.
+- **A future bridge-building cutscene (ST-1) must also change the map.** The gap between the stubs is two rows of open ocean, so setting `BRIDGE_BUILT` alone opens nothing: the key-item gates on the south stub let the party through, but the water stops it one step later. The cutscene needs a built variant of the span: the gap cells as bridge (collision and art), for example a flag-gated overlay or a second compiled variant of the overworld that the map loader picks when the flag is set. The OW-15 test already models this (it opens the gap cells by hand).
+
+---
+
+## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
+
+1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
+2. **Document** every finding in a new issue file, `docs/PLAYTEST_PENINSULA_2_<date>.md`.
+3. **Plan** a fix for each issue; momus validates the plan.
+4. **Implement** the fixes, validating each through tests and real gameplay in the browser, and commit tranche by tranche.

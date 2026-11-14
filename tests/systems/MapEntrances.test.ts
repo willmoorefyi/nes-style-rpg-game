@@ -32,13 +32,40 @@ describe('entrances', () => {
     warn.mockRestore();
   });
 
-  it('moves a walkable restore position that the first entrance cannot reach (an old save on a redrawn map)', () => {
+  it('moves a walkable restore position that no entrance can reach (an old save on a redrawn map)', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    // 5x1: grass, grass, wall, grass, grass; the first entrance is on the west side
-    const split = map({ width: 5, height: 1, collision: [0, 0, 1, 0, 0], entrances: { west: [0, 0], east: [4, 0] } });
+    // 7x1: grass, grass, wall, grass, wall, grass, grass; entrances at both ends, a sealed cell in the middle
+    const split = map({ width: 7, height: 1, collision: [0, 0, 1, 0, 1, 0, 0], entrances: { west: [0, 0], east: [6, 0] } });
     expect(safeSpawn(split, { x: 1, y: 0 })).toEqual({ x: 1, y: 0 });
     expect(safeSpawn(split, { x: 3, y: 0 })).toEqual({ x: 0, y: 0 });
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('cut off'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('cut off from every entrance'));
+    warn.mockRestore();
+  });
+
+  it('keeps a position reachable from any entrance, not only the first (the overworld north shore)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // 5x1: grass, grass, wall, grass, grass; the first entrance is on the west side, the second on the east
+    const split = map({ width: 5, height: 1, collision: [0, 0, 1, 0, 0], entrances: { west: [0, 0], east: [4, 0] } });
+    expect(safeSpawn(split, { x: 3, y: 0 })).toEqual({ x: 3, y: 0 });
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('moves a spawn off a warp onto the doorway in front of it, so loading never fires the transition', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // 3x3: a door (warp) in the middle of a wall row, grass below
+    const door = map({
+      width: 3, height: 3, collision: [1, 1, 1, 1, 0, 1, 0, 0, 0], entrances: { south: [0, 2] },
+      transitions: [{ x: 1, y: 1, targetMap: 'inside', targetEntrance: 'door' }],
+    });
+    expect(safeSpawn(door, { x: 1, y: 1 })).toEqual({ x: 1, y: 2 });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('on a warp'));
+    // a warp with no good neighbour falls back to the first entrance
+    const sealed = map({
+      width: 3, height: 2, collision: [0, 1, 0, 0, 1, 0], entrances: { a: [0, 0] },
+      transitions: [{ x: 2, y: 0, targetMap: 'x', targetX: 0, targetY: 0 }, { x: 2, y: 1, targetMap: 'x', targetX: 0, targetY: 0 }],
+    });
+    expect(safeSpawn(sealed, { x: 2, y: 0 })).toEqual({ x: 0, y: 0 });
     warn.mockRestore();
   });
 });

@@ -189,6 +189,14 @@ def run(B) -> int:
     expect_error(choke, "static NPCs cut off the transition")
     assert ok_src({**choke, "npcs": [{**choke["npcs"][0], "wander": True}]})
     ok += 3
+    # no_unreachable_walkable: a walled-in grass cell is an error unless listed, or reached from an allowed entrance
+    pocket = {"id": "pk", "ground": "......\n.###..\n.#.#..\n.###..\n......", "entrances": {"a": [0, 0]}}
+    assert ok_src(pocket), "the check is opt-in"
+    expect_error({**pocket, "no_unreachable_walkable": True}, "1 walkable cells can't be reached from any entrance")
+    assert ok_src({**pocket, "no_unreachable_walkable": True, "unreachable_ok": [[2, 2]]}), "a listed cell"
+    assert ok_src({**pocket, "no_unreachable_walkable": True, "entrances": {"a": [0, 0], "inner": [2, 2]},
+                   "unreachable_ok": ["inner"]}), "a region reached from an unreachable_ok entrance"
+    ok += 1
 
     # ── 6. map report and 7. preview, on a compiled map written to a temp dir
     with tempfile.TemporaryDirectory() as tmp:
@@ -226,6 +234,6 @@ def run(B) -> int:
     lake = comp({"id": "lk", "ground": "....\n.≈≈.\n....", "entrances": {"a": [0, 0]}})
     assert lake.collision[1, 1] == B.WATER and lake.mat[1, 2] == "lake"
     if not __import__("importlib").util.find_spec("terrain"):
-        expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain.py")
+        expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain/")
     ok += 2
     return ok

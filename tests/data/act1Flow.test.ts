@@ -62,6 +62,19 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
     for (const g of gates) expect(seen.has(`${g.x},${g.y}`), `bridge gate (${g.x},${g.y})`).toBe(true);
     const [nx, ny] = map.entrances!.north_shore;
     expect(seen.has(`${nx},${ny}`), 'the north shore').toBe(false);
+    // OW-15: what lies beyond the bridge is the larger land
+    const north = new Set([`${nx},${ny}`]);
+    const next: Array<[number, number]> = [[nx, ny]];
+    while (next.length) {
+      const [x, y] = next.shift()!;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ax = x + dx, ay = y + dy, k = `${ax},${ay}`;
+        if (ax < 0 || ay < 0 || ax >= map.width || ay >= map.height || north.has(k) || !col.isWalkable(ax, ay, walk)) continue;
+        north.add(k);
+        next.push([ax, ay]);
+      }
+    }
+    expect(north.size, `the mainland (${north.size} cells) vs the peninsula (${seen.size})`).toBeGreaterThan(1.15 * seen.size);
   });
 
   it('beating Garland frees the princess but does not open the north bridge (ST-1)', () => {

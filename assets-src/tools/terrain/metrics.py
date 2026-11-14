@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 
 import kit as K
-from .base import CORE, MARGIN, ROADS, T, TEX, WILD, _blur, _tile, _up
+from .base import CORE, MARGIN, T, TEX, WILD, _blur, _tile, _up
 from .outline import _cached_partition
 from .peaks import plan_peaks
 
@@ -42,9 +42,15 @@ def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray
     return out
 
 
-def boundary_stats(a: np.ndarray, b: np.ndarray, window: tuple[slice, slice] | None = None) -> dict[str, float]:
+STRAIGHT_DEV = 3.0                       # px: a boundary stretch this close to one line counts as straight
+RUN_MAX = 96                             # px: a straight stretch this long reads as a grid edge (selftest limit)
+
+
+def boundary_stats(a: np.ndarray, b: np.ndarray, window: tuple[slice, slice] | None = None) -> dict:
     """Boundary between pixel sets a and b (smoothed r 4, so dither does not count as boundary): the longest
-    straight axis-aligned run (px) and the share of boundary edges that run along a cell line within 2 px."""
+    straight run (px, end to end) of the traced outline, i.e. the longest stretch whose points all lie within
+    STRAIGHT_DEV px of their fitted (total least squares) line, in any direction, with the cell it is centred on;
+    and the share of boundary edges that run along a cell line within 2 px."""
     fa, fb = _blur(_blur(a.astype(np.float32), 4), 4), _blur(_blur(b.astype(np.float32), 4), 4)
     region = (fa + fb) > 0.6
     side = fa > 1.5 * fb                     # a: its clear majority (60 %); a dithered fringe below that is not its edge
@@ -58,19 +64,74 @@ def boundary_stats(a: np.ndarray, b: np.ndarray, window: tuple[slice, slice] | N
         oy = ox = 0
     n = int(eh.sum() + ev.sum())
     if not n:
-        return {"edges": 0, "longest_run": 0, "on_cell_line": 0.0}
+        return {"edges": 0, "longest_run": 0, "longest_at": None, "on_cell_line": 0.0}
     ly = (np.arange(eh.shape[0]) + oy + 1) % T
     lx = (np.arange(ev.shape[1]) + ox + 1) % T
     near_h = eh & np.isin(ly, [T - 2, T - 1, 0, 1, 2])[:, None]
     near_v = ev & np.isin(lx, [T - 2, T - 1, 0, 1, 2])[None, :]
-    return {"edges": n, "longest_run": int(max(_longest(eh), _longest(ev.T))),
+    best, at = 0.0, None
+    for chain in _chains(eh, ev):
+        run, mid = _straight_run(chain, STRAIGHT_DEV)
+        if run > best:
+            best, at = run, [int((mid[0] + ox) // T), int((mid[1] + oy) // T)]
+    return {"edges": n, "longest_run": int(round(best)), "longest_at": at,
             "on_cell_line": round(float(near_h.sum() + near_v.sum()) / n, 3)}
 
 
-def _longest(e: np.ndarray) -> int:
-    d = np.diff(np.pad(e, ((0, 0), (1, 1))).astype(np.int8), axis=1)
-    s, t = np.nonzero(d == 1), np.nonzero(d == -1)
-    return int((t[1] - s[1]).max()) if len(s[1]) else 0
+def _chains(eh: np.ndarray, ev: np.ndarray) -> list[np.ndarray]:
+    """The boundary's crack edges traced into chains of lattice vertices (x, y): eh[y, x] joins (x, y+1) and
+    (x+1, y+1), ev[y, x] joins (x+1, y) and (x+1, y+1). Open chains start at their ends; at a vertex where four edges
+    meet the first unused edge is taken. Closed loops repeat their first vertices, so a run may wrap round."""
+    ys, xs = np.nonzero(eh)
+    segs = [((x, y + 1), (x + 1, y + 1)) for y, x in zip(ys.tolist(), xs.tolist())]
+    ys, xs = np.nonzero(ev)
+    segs += [((x + 1, y), (x + 1, y + 1)) for y, x in zip(ys.tolist(), xs.tolist())]
+    adj: dict[tuple[int, int], list[int]] = {}
+    for i, (p, q) in enumerate(segs):
+        adj.setdefault(p, []).append(i)
+        adj.setdefault(q, []).append(i)
+    used = [False] * len(segs)
+    starts = sorted(v for v, es in adj.items() if len(es) % 2) + sorted(adj)
+    chains = []
+    for s in starts:
+        while any(not used[i] for i in adj[s]):
+            pts, v = [s], s
+            while True:
+                nxt = next((i for i in adj[v] if not used[i]), None)
+                if nxt is None:
+                    break
+                used[nxt] = True
+                p, q = segs[nxt]
+                v = q if p == v else p
+                pts.append(v)
+            if pts[-1] == pts[0]:
+                pts += pts[1:min(len(pts), 400)]
+            chains.append(np.array(pts, np.float64))
+    return chains
+
+
+def _straight_run(pts: np.ndarray, dev: float) -> tuple[float, np.ndarray]:
+    """The longest end-to-end distance over windows of consecutive chain points that all lie within `dev` px of
+    their total-least-squares line (two pointers), and the midpoint of that window."""
+    best, mid = 0.0, pts[0]
+    n, j = len(pts), 1
+    for i in range(n - 1):
+        j = max(j, i + 1)
+        while j + 1 < n and _deviation(pts[i:j + 2]) <= dev:
+            j += 1
+        run = float(np.hypot(*(pts[j] - pts[i])))
+        if run > best:
+            best, mid = run, (pts[i] + pts[j]) / 2
+        if j == n - 1:
+            break
+    return best, mid
+
+
+def _deviation(p: np.ndarray) -> float:
+    c = p - p.mean(axis=0)
+    cov = c.T @ c
+    _, vecs = np.linalg.eigh(cov)
+    return float(np.abs(c @ vecs[:, 0]).max())          # distance along the normal (smallest eigenvector)
 
 
 def peak_stats(placements: list[tuple[str, int, int]]) -> dict[str, float]:
@@ -106,15 +167,16 @@ FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "co
 
 
 def fidelity(below: np.ndarray, mat: np.ndarray, kit: K.Kit, skip: set | None = None) -> dict[str, float]:
-    """Per soft cell: the share of its centre CORE px that read as its own material (classify: its texture, shaded,
-    or its stamped art); the minimum and the number of cells under 50 %."""
+    """Per wild cell: the share of its centre CORE px that read as its own material (classify: its texture, shaded,
+    or its stamped art); the minimum and the number of cells under 50 %. Roads are left out: they are drawn as a
+    track along their centre line (a diagonal cuts across its cells), and road and grass are both walkable."""
     cls = classify(below, kit, FID_MATS)
     worst, bad = 1.0, 0
     hgt, wid = mat.shape
     for y in range(hgt):
         for x in range(wid):
             m = mat[y, x]
-            if m not in WILD + list(ROADS) or (skip and (x, y) in skip):
+            if m not in WILD or (skip and (x, y) in skip):
                 continue
             sl = (slice(y * T + MARGIN, y * T + MARGIN + CORE), slice(x * T + MARGIN, x * T + MARGIN + CORE))
             share = float((cls[sl] == FID_MATS.index(TEX.get(m, m))).mean())

@@ -15,14 +15,19 @@ WATERS = ("river", "ocean", "lake")
 TEX = {"river": "water", "lake": "water"}          # texture of each material
 LOW = 4                                            # the blurred fields are built at 1/LOW resolution
 BLUR_R = 20                                        # px, applied twice to the cell masks
-# domain warp octaves: (value-noise cell px, amplitude px). The coarse octave (14 px) is soft-limited to 6.5 px
-# through tanh(3 n / sqrt(|n| + eps)): the outline crosses a cell line steeply and otherwise keeps a few px off it,
-# and the total (< 10 px) never reaches the clamped cell centre, which would cut straight notches. The 6 px octave
-# breaks the flat stretches of the smooth noise. Each warp component changes WARP_STRETCH times more slowly along
-# its own axis, which (with eps) keeps the warp from folding an outline into thin slivers.
-WARP_COARSE = (96, 14.0, 6.5)                      # cell, nominal amplitude, soft limit
+# Domain warp. The outline of a straight cell edge sits where the warp moves it, inside the 10 px left between the
+# clamped cell centres. The main term is a meander (base._meander): knots of alternating sign every 24-48 px, so no
+# 96 px stretch of an outline stays within 3 px of one line (a grid edge; metrics.RUN_MAX); its rows have their own
+# phase. The gap then pushes the total off zero (an outline crosses its cell line steeply, so it seldom runs along
+# it), and the value-noise octaves (cell px, amplitude px) roughen it. The old coarse octave (soft-limited through
+# tanh(3 n / sqrt(|n| + eps))) is kept small: as a square wave it held outlines parallel to the cell lines for
+# 200-300 px. Each value-noise component changes WARP_STRETCH times more slowly along its own axis, which keeps the
+# warp from folding an outline into thin slivers.
+WARP_COARSE = (96, 14.0, 0.5)                      # cell, nominal amplitude, soft limit
 WARP_FINE = ((24, 2.5), (6, 1.0))
 WARP_EPS, WARP_STRETCH = 0.01, 2
+WARP_MEANDER = (40, 6.5, 0.65)                     # (mean half-wave px, amplitude px, least share of it); 0: off
+WARP_GAP = (4.0, 12.0)                             # (px kept off zero, total warp reach px); 0: off
 CORE = 28                                          # px: the centre of every cell always shows its own material
 MARGIN = (T - CORE) // 2
 CORE_PULL, CORE_REACH = 0.3, 3.0                   # corner cells: own-material bonus at the centre's edge, 3 px
@@ -81,6 +86,25 @@ def _vnoise(h: int, w: int, cell: int, seed: int, cell_x: int | None = None) -> 
     top = g[np.ix_(y0, x0)] * (1 - tx) + g[np.ix_(y0, x0 + 1)] * tx
     bot = g[np.ix_(y0 + 1, x0)] * (1 - tx) + g[np.ix_(y0 + 1, x0 + 1)] * tx
     return top * (1 - ty) + bot * ty
+
+
+def _meander(h: int, w: int, cell: int, lo: float, seed: int, along_x: bool) -> np.ndarray:
+    """A wave in -1..1 along one axis whose knots alternate in sign (spaced 0.6-1.2 x `cell` px, each of size
+    lo..1), so any stretch of about 2 cells swings both ways, without a fixed period. The knot coordinate is shifted
+    by slow noise along the other axis, so each row has its own phase (and rows never cancel each other out)."""
+    n_along, n_across = (w, h) if along_x else (h, w)
+    r = np.random.default_rng(seed)
+    k = int(n_along / (0.6 * cell)) + 8
+    size = lo + (1 - lo) * r.random(k)
+    knots = (size * np.where(np.arange(k) % 2 == 0, 1, -1)).astype(np.float32)
+    pos = np.concatenate([[0.0], np.cumsum(cell * (0.6 + 0.6 * r.random(k - 1)))]).astype(np.float32)
+    phase = (_vnoise(n_across, 1, 4 * cell, seed + 1)[:, 0] * 0.5 + 0.5) * 2 * cell        # per row, 0..2 cells
+    u = np.arange(n_along, dtype=np.float32)[None, :] + phase[:, None] + 2 * cell
+    i = np.clip(np.searchsorted(pos, u, side="right") - 1, 0, k - 2)
+    t = np.clip((u - pos[i]) / (pos[i + 1] - pos[i]), 0, 1)
+    t = t * t * (3 - 2 * t)
+    out = (knots[i] * (1 - t) + knots[i + 1] * t).astype(np.float32)
+    return out if along_x else out.T
 
 
 def _dist(mask: np.ndarray, maxd: int) -> np.ndarray:

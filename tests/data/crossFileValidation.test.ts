@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
+import { STORY_FLAGS } from '../../src/core/GameFlags.js';
 
 // Load all YAML data files using readFileSync (asset files, not modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -273,10 +274,10 @@ describe('Cross-file data validation', () => {
   describe('Key item gates → Items', () => {
     refMaps.forEach((map) => {
       (map.keyItemGates ?? []).forEach((gate, i) => {
-        // a gate opens on an item or on a story flag (requiredFlag, e.g. the north bridge)
+        // a gate opens on an item or on a story flag (requiredFlag, e.g. the north bridge) that GameFlags names
         it(`map "${map.id}" (${map.variant}) keyItemGate[${i}] needs an existing item or a story flag`, () => {
           if (gate.requiredItem !== undefined) expect(itemIds.has(gate.requiredItem)).toBe(true);
-          else expect(gate.requiredFlag ?? '').toMatch(/^[A-Z][A-Z0-9_]+$/);
+          else expect(Object.values(STORY_FLAGS), `requiredFlag ${gate.requiredFlag}`).toContain(gate.requiredFlag);
         });
       });
     });

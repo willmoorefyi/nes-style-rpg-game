@@ -2,16 +2,18 @@
 
   python3 -I assets-src/tools/layouts/overworld.py && python3 -I assets-src/tools/build_map.py overworld
 
-An original layout on the classic idea (docs/FIX_PLAN_PENINSULA.md, T3c). The Cornelia peninsula hangs south-west from
-a larger landmass. A sound opens to the western ocean north of it, narrows eastward to a strait (the broken north
-bridge) and ends in a fjord head. From the fjord head an unbroken range, the spine, runs south-east to the eastern sea
+An original layout on the classic idea (docs/FIX_PLAN_PENINSULA.md, T3c and the T3 review fixes). The Cornelia
+peninsula hangs south-west from a larger landmass: the mainland, DY rows deeper than the T3c map, has more walkable
+cells than the peninsula (OW-15). A sound opens to the western ocean north of it, narrows eastward to a strait (the
+broken north bridge) and ends in a fjord head. From the fjord head an unbroken range, the spine, runs south-east to the eastern sea
 and seals the land route, so the north bridge is the only way out. The east river rises at a tarn in the spine's
 foothills and runs south-west to the south bay; the east pocket between the river and the spine holds Erdrick's tomb.
 The city stream feeds the moat ponds at the walled city's corners, runs under the town (as the icon draws it) and
 leaves at the south-west corner for the bay.
 
 Shapes come from polygons whose outlines are perturbed by seeded value noise (numpy only; no `random`, no `hash()`),
-then tidied (no stray single cells, no 1-cell inlets) so the compiler's map checks pass.
+then tidied (no stray single cells, no 1-cell inlets, no walkable cell that no entrance reaches) so the compiler's map
+checks pass.
 """
 from __future__ import annotations
 
@@ -24,23 +26,35 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import Grid, write_map  # noqa: E402
 
-W, H = 72, 56
+DY = 16                              # rows of mainland added above the T3c map (OW-15: the mainland is the larger land)
+W, H = 72, 56 + DY
 SEED = 1987
 
 # ───────────────────────────── fixed points ─────────────────────────────
-CX, CY = 26, 27                      # the city icon's top-left cell: a 5x4 footprint (the 4x4 art shifted 24 px right)
-N_WARP, W_WARP, E_WARP, S_WARP = (CX + 2, CY), (CX, CY + 2), (CX + 4, CY + 2), (CX + 2, CY + 3)
+CX, CY = 26, 43                      # the city icon's top-left cell: a 5x4 footprint (the 4x4 art shifted 24 px right)
+# the gates: N is the keep's drawn door (its approach, the cell above, is walkable art), W / E the flank arches, S the
+# main arch
+N_WARP, W_WARP, E_WARP, S_WARP = (CX + 2, CY + 1), (CX, CY + 2), (CX + 4, CY + 2), (CX + 2, CY + 3)
+N_APPROACH = (CX + 2, CY)
 ARRIVE = {"cornelia": (CX + 2, CY + 4), "cornelia_west": (CX - 1, CY + 2), "cornelia_east": (CX + 5, CY + 2),
           "cornelia_north": (CX + 2, CY - 1)}
 BX = 29                              # the north bridge (columns BX, BX+1): south stub, a 2-cell gap of open water, north stub
-S_STUB, N_STUB = 16, 13                # rows of the two stubs; rows 14-15 between them stay open water
+S_STUB, N_STUB = 32, 29              # rows of the two stubs; the two rows between them stay open water
 BRIDGE_FOOT, NORTH_SHORE = (BX, S_STUB + 1), (BX, N_STUB - 1)
-TX, TY = 14, 21                      # the temple icon (2x2); its door is (TX+1, TY+1), the arrival one cell south
+TX, TY = 14, 37                      # the temple icon (2x2); its door is (TX+1, TY+1), the arrival one cell south
 TEMPLE_DOOR = (TX + 1, TY + 2)
-RX, RY = 45, 29                      # the east bridge: two cells (RX, RY), (RX+1, RY) over the 2-wide east river
-TOMB = (50, 27)                      # the sarcophagus' left cell (altar_l); altar_r is east of it
+RX, RY = 45, 45                      # the east bridge: two cells (RX, RY), (RX+1, RY) over the 2-wide east river
+TOMB = (50, 43)                      # the sarcophagus' left cell (altar_l); altar_r is east of it
 TOMB_END = (TOMB[0], TOMB[1] + 1)    # the E road ends in front of the sarcophagus
 JETTY: list[tuple[int, int]] = []    # 3 bridge-deck cells straight out from the shore below the S road (set by build)
+BOULDERS = [(20, 47), (37, 41), (11, 51)]     # on open grass, never on a road
+# OW-5: cell-mask fixes where the noise left a long straight edge or a regular staircase (the organic painter rounds
+# a cell edge but cannot hide one that runs straight for 8 cells): a headland and a cove on the sound's south shore,
+# a bulge in the steps up to the fjord head, and a ragged top edge for the south-west forest
+SHORE_LAND = [(22, 33), (23, 33), (24, 33), (23, 32), (24, 32), (36, 31), (36, 30), (37, 30), (58, 47), (59, 47)]
+SHORE_SEA = [(33, 33), (34, 33)]
+FOREST_ADD = [(13, 56), (14, 56), (15, 56), (14, 55), (15, 55)]
+FOREST_CUT = [(17, 57), (18, 57)]
 
 # moat ponds in the icon's transparent corner cells, so every gate is a doorway (one walkable neighbour); the stream
 # (river cells) enters at the north-east corner, runs under the town and leaves at the south-west corner
@@ -55,12 +69,14 @@ STREAM = [(CX, CY + 3), (CX, CY + 5), (CX - 2, CY + 7), (CX - 4, CY + 9), (CX - 
 
 
 def value_noise(cell: float, seed: int) -> np.ndarray:
-    """Smooth value noise in 0..1 on the cell grid (bilinear with smoothstep)."""
+    """Smooth value noise in 0..1 on the cell grid (bilinear with smoothstep). The knots of the T3c map (the rows
+    below the DY added ones) are drawn as before, so the old land keeps its shapes; the new rows get knots of their own."""
     r = np.random.default_rng(seed)
-    gw, gh = int(W / cell) + 3, int(H / cell) + 3
-    g = r.random((gh, gw))
+    gw, gh = int(W / cell) + 3, int((H - DY) / cell) + 3
+    pad = int(np.ceil(DY / cell)) + 1
+    g = np.vstack([np.random.default_rng(seed + 7919).random((pad, gw)), r.random((gh, gw))])
     yy, xx = np.mgrid[0:H, 0:W].astype(np.float64)
-    fy, fx = (yy + 0.5) / cell, (xx + 0.5) / cell
+    fy, fx = (yy - DY + 0.5) / cell + pad, (xx + 0.5) / cell
     y0, x0 = fy.astype(int), fx.astype(int)
     ty, tx = fy - y0, fx - x0
     ty, tx = ty * ty * (3 - 2 * ty), tx * tx * (3 - 2 * tx)
@@ -109,29 +125,33 @@ def blob(cx: float, cy: float, rx: float, ry: float) -> np.ndarray:
 
 
 # the whole landmass (mainland and peninsula), then the waters cut out of it
-LAND = [(6.5, 6.5), (11, 4.8), (17, 5.4), (22, 4.6), (28, 5.4), (34, 4.6), (40, 5.2), (46, 4.4), (52, 5.4), (58, 4.6),
-        (63, 6.5), (64.5, 11), (62.5, 15), (64.8, 19), (64, 24), (65.5, 29), (65.8, 35), (64.5, 41), (62, 46),
-        (58.5, 48), (55, 46.5), (50, 44), (45, 42.5), (40, 46), (34, 45.5), (28, 44.5), (22, 46.5), (17, 49), (12, 49.6),
-        (8.5, 47.5), (7.5, 44), (9, 40.5), (7, 36.5), (8.2, 32), (7, 27.5), (8.5, 23), (-2, 22), (-2, 12), (6.8, 11.5)]
-SOUND = [(-3, 11), (6, 11.4), (12, 11.8), (18, 12.2), (24, 12.6), (28, 12.7), (31, 12.6), (33.5, 12.2), (36, 11.2),
-         (39, 10.6), (41.5, 10.8), (42.6, 11.8), (42, 12.9), (39.5, 13.4), (37, 14.3), (34.5, 15.6), (32, 16.6), (28, 16.7),
-         (25, 17.4), (21, 18.2), (17, 19), (12, 20.2), (7, 21.4), (-3, 23)]
-GULF = [(50, 60), (48, 44), (48, 40), (49.8, 36.4), (53.4, 33.2), (57.2, 31.2), (59, 30.4), (59.6, 32.5), (58, 35.5),
-        (56.5, 39), (55.5, 43), (56, 60)]   # the eastern sea: a gulf between the pocket and the east arm
-SOUTH_BAY = [(19, 41.5), (21.5, 39.2), (25, 38), (29, 37.6), (33, 38), (37, 38.6), (40, 39.2), (42.5, 40.5), (43, 47),
-             (21, 49)]
-SPINE = [(42.8, 11.5), (45, 15), (48, 18.6), (51.5, 21.5), (55, 24.5), (57, 27.6), (59.2, 30.4)]
-SPUR = [(50.5, 21.2), (51.5, 20)]     # the tarn sits in a notch of the range: rock on its north-east side
-TARN = [(48, 21), (49, 21), (48, 22), (49, 22), (50, 22)]
-RIVER = [(48, 23), (47, 25), (46, 27), (RX, RY - 1), (RX, RY + 1), (44, 33), (43, 35), (42, 37)]   # 2 wide (x, x+1)
+LAND = [(7, 8.5), (10, 6.6), (15, 7.4), (19, 6.2), (24, 7.2), (29, 6.4), (32.5, 7.8), (35.5, 10.2), (39.5, 10.8),  # north
+        (42.5, 8.4), (46, 6.6), (51, 7.4), (56, 6.2), (60.5, 7.6),                                # coast, with a bay
+        (63.5, 9.5), (64.8, 12.5), (62, 15.5), (64.6, 23),                                    # the mainland's east coast
+        (64.5, 27), (62.5, 31), (64.8, 35), (64, 40), (65.5, 45), (65.8, 51), (64.5, 57), (62, 62),
+        (58.5, 64), (55, 62.5), (50, 60), (45, 58.5), (40, 62), (34, 61.5), (28, 60.5), (22, 62.5), (17, 65), (12, 65.6),
+        (8.5, 63.5), (7.5, 60), (9, 56.5), (7, 52.5), (8.2, 48), (7, 43.5), (8.5, 39), (-2, 38), (-2, 28), (6.8, 27.5),
+        (6, 24.5), (9.5, 21.5), (6.6, 14.5), (6.2, 11.5)]                                      # and its west coast
+SOUND = [(-3, 27), (6, 27.4), (12, 27.8), (18, 28.2), (24, 28.6), (28, 28.7), (31, 28.6), (33.5, 28.2), (36, 27.2),
+         (39, 26.6), (41.5, 26.8), (42.6, 27.8), (42, 28.9), (39.5, 29.4), (37, 30.3), (34.5, 31.6), (32, 32.6), (28, 32.7),
+         (25, 33.4), (21, 34.2), (17, 35), (12, 36.2), (7, 37.4), (-3, 39)]
+GULF = [(50, 76), (48, 60), (48, 56), (49.8, 52.4), (53.4, 49.2), (57.2, 47.2), (59, 46.4), (59.6, 48.5), (58, 51.5),
+        (56.5, 55), (55.5, 59), (56, 76)]   # the eastern sea: a gulf between the pocket and the east arm
+SOUTH_BAY = [(19, 57.5), (21.5, 55.2), (25, 54), (29, 53.6), (33, 54), (37, 54.6), (40, 55.2), (42.5, 56.5), (43, 63),
+             (21, 65)]
+SPINE = [(42.8, 27.5), (45, 31), (48, 34.6), (51.5, 37.5), (55, 40.5), (57, 43.6), (59.2, 46.4)]
+SPUR = [(50.5, 37.2), (51.5, 36)]     # the tarn sits in a notch of the range: rock on its north-east side
+TARN = [(48, 37), (49, 37), (48, 38), (49, 38), (50, 38)]
+NORTH_LAKE = [(20, 17), (21, 17), (22, 17), (20, 18), (21, 18), (22, 18), (21, 19)]   # a mere on the mainland
+RIVER = [(48, 39), (47, 41), (46, 43), (RX, RY - 1), (RX, RY + 1), (44, 49), (43, 51), (42, 53)]   # 2 wide (x, x+1)
 
 RING = [(CX - 3, CY + 2), (CX - 3, CY - 1), (CX, CY - 4), (CX + 5, CY - 4), (CX + 8, CY - 1), (CX + 8, CY + 5),
         (CX + 5, CY + 8), (CX + 2, CY + 8)]                # round the city from the W gate to the S road (not across the stream)
 ROADS = [
-    [ARRIVE["cornelia_north"], (CX + 2, 21), (BX, 21), BRIDGE_FOOT],                 # N: to the north bridge
+    [ARRIVE["cornelia_north"], (CX + 2, 37), (BX, 37), BRIDGE_FOOT],                 # N: to the north bridge
     RING,
     [ARRIVE["cornelia_west"], (CX - 2, CY + 2)],                                     # W gate: onto the ring
-    [(CX - 4, CY - 1), (18, CY - 1), (16, 24), (TX + 1, 24), TEMPLE_DOOR],          # the temple road (W)
+    [(CX - 4, CY - 1), (18, CY - 1), (16, 40), (TX + 1, 40), TEMPLE_DOOR],          # the temple road (W)
     [ARRIVE["cornelia_east"], (CX + 7, CY + 2)],                                     # E gate: onto the ring
     [(CX + 9, CY + 2), (RX - 1, RY)],                                                # E: to the east bridge
     [(RX + 2, RY), (TOMB[0] - 2, RY), (TOMB[0] - 2, TOMB_END[1] + 1), (TOMB[0], TOMB_END[1] + 1), TOMB_END],  # tomb
@@ -151,9 +171,13 @@ def build() -> tuple[Grid, list[str]]:
         land[N_STUB:S_STUB + 1, x] = False
         land[N_STUB - 2:N_STUB, x] = True
         land[S_STUB + 1:S_STUB + 4, x] = True
-    land[18:37, 13:41] |= True
-    land[18:37, 13:41] &= ~(np.asarray(signed_distance(SOUTH_BAY)) > 0)[18:37, 13:41]
+    land[34:53, 13:41] |= True
+    land[34:53, 13:41] &= ~(np.asarray(signed_distance(SOUTH_BAY)) > 0)[34:53, 13:41]
     land[TY - 2:TY + 3, TX - 2:TX + 4] = True
+    for x, y in SHORE_LAND:                          # OW-5: no long straight or stepped run of the cell mask
+        land[y, x] = True
+    for x, y in SHORE_SEA:
+        land[y, x] = False
     land = tidy_land(land)
 
     g = Grid(W, H, "o")
@@ -165,20 +189,29 @@ def build() -> tuple[Grid, list[str]]:
     # mountains: the spine (seals the isthmus), the hills behind the temple, a south-west ridge and two mainland ranges
     n1 = fbm(SEED + 20)
     spine = (polyline_distance(SPINE) < 2.7 + 0.8 * n1) | (polyline_distance(SPUR) < 1.3)
-    hills = (blob(13.5, 19.2, 4.6, 2.0) + 0.5 * n1 > 0.15) | (blob(17.2, 20.6, 1.4, 1.6) > 0)
-    ridge = blob(8.5, 39.5, 2.2, 4.2) + 0.6 * n1 > 0.1
-    north = (blob(16, 6.8, 5.5, 1.8) + 0.5 * n1 > 0.1) | (blob(54, 10.5, 6.5, 2.4) + 0.5 * n1 > 0.1) | \
-            (blob(62.5, 19, 2.6, 4.5) + 0.5 * n1 > 0.1) | (blob(61.5, 43, 1.6, 2.6) + 0.4 * n1 > 0.05)
-    mountain = (spine | hills | ridge | north) & land
+    hills = (blob(13.5, 35.2, 4.6, 2.0) + 0.5 * n1 > 0.15) | (blob(17.2, 36.6, 1.4, 1.6) > 0)
+    ridge = blob(8.5, 55.5, 2.2, 4.2) + 0.6 * n1 > 0.1
+    north = (blob(16, 22.8, 5.5, 1.8) + 0.5 * n1 > 0.1) | (blob(54, 26.5, 6.5, 2.4) + 0.5 * n1 > 0.1) | \
+            (blob(62.5, 35, 2.6, 4.5) + 0.5 * n1 > 0.1) | (blob(61.5, 59, 1.6, 2.6) + 0.4 * n1 > 0.05)
+    # the deep north (the rows added for OW-15): a range across the north-west, a ridge north-east, a spur by the coast
+    deep = (blob(20, 9.5, 6.5, 2.0) + 0.5 * n1 > 0.1) | (blob(47, 8.5, 5.5, 1.8) + 0.5 * n1 > 0.1) | \
+           (blob(58.5, 13.5, 2.2, 3.4) + 0.5 * n1 > 0.1) | (blob(45, 19, 2.6, 1.3) + 0.4 * n1 > 0.1)
+    mountain = (spine | hills | ridge | north | deep) & land
     # forests: noise inside loose zones, kept off the roads' surroundings below
     n2 = fbm(SEED + 30)
-    zones = np.maximum.reduce([blob(9, 29, 5.5, 5.0), blob(15, 44, 6.5, 3.6), blob(35.5, 19.5, 4.0, 2.2),
-                               blob(51.5, 34, 6.5, 6.0), blob(21, 33.5, 3.0, 2.2), blob(32.5, 41.5, 3.0, 1.6),
-                               blob(26, 7.5, 7, 2.6), blob(44, 8, 5, 2.6), blob(58, 15, 4, 3), blob(63, 9, 3.2, 2.6),
-                               blob(50, 26.5, 2.0, 1.4), blob(21, 19.6, 3.2, 1.6), blob(35, 37.5, 2.6, 1.4),
-                               blob(14, 31, 2.2, 1.8), blob(38.5, 33.5, 2.4, 1.8),
-                               blob(16.5, 38, 2.4, 1.8), blob(61, 37.5, 1.8, 3.4), blob(39.5, 21, 2.2, 1.4)])
+    zones = np.maximum.reduce([blob(9, 45, 5.5, 5.0), blob(15, 60, 6.5, 3.6), blob(35.5, 35.5, 4.0, 2.2),
+                               blob(51.5, 50, 6.5, 6.0), blob(21, 49.5, 3.0, 2.2), blob(32.5, 57.5, 3.0, 1.6),
+                               blob(26, 23.5, 7, 2.6), blob(44, 24, 5, 2.6), blob(58, 31, 4, 3), blob(63, 25, 3.2, 2.6),
+                               blob(50, 42.5, 2.0, 1.4), blob(21, 35.6, 3.2, 1.6), blob(35, 53.5, 2.6, 1.4),
+                               blob(14, 47, 2.2, 1.8), blob(38.5, 49.5, 2.4, 1.8),
+                               blob(16.5, 54, 2.4, 1.8), blob(61, 53.5, 1.8, 3.4), blob(39.5, 37, 2.2, 1.4),
+                               blob(33, 10, 7, 3), blob(10, 14, 3, 3), blob(52, 14, 4, 2.5), blob(40, 15.5, 4, 1.8),
+                               blob(31, 18.5, 5, 1.6), blob(55, 19, 3.5, 1.5), blob(12, 19.5, 2.4, 1.4)])
     forest = (zones + 0.55 * n2 > 0.12) & land & ~mountain
+    for x, y in FOREST_ADD:
+        forest[y, x] = land[y, x] and not mountain[y, x]
+    for x, y in FOREST_CUT:
+        forest[y, x] = False
     for y in range(H):
         for x in range(W):
             if mountain[y, x]:
@@ -195,18 +228,23 @@ def build() -> tuple[Grid, list[str]]:
     # the temple sits against the hills: rock behind it and east of its door, so the door is a doorway
     for x, y in [(TX, TY), (TX + 1, TY), (TX + 2, TY), (TX + 2, TY + 1), (TX + 3, TY + 1), (TX + 3, TY), (TX - 1, TY)]:
         g.set(x, y, "m")
+    # the tomb backs onto the range: rock behind the sarcophagus and behind the columns' broken tops
+    for x, y in [(TOMB[0] - 1, TOMB[1] - 1), (TOMB[0], TOMB[1] - 1), (TOMB[0] + 1, TOMB[1] - 1), (TOMB[0] + 2, TOMB[1] - 1),
+                 (TOMB[0], TOMB[1] - 2), (TOMB[0] + 1, TOMB[1] - 2), (TOMB[0], TOMB[1] - 3)]:
+        g.set(x, y, "m")
 
     # sand beaches: coastal land in some stretches
     n3 = fbm(SEED + 40)
-    beach = np.maximum.reduce([blob(7.5, 35, 2.5, 6), blob(19, 18.5, 3.5, 1.5), blob(12, 49, 7, 3), blob(22, 43, 4, 3), blob(33, 39.5, 5, 2),
-                               blob(47, 39, 3, 2), blob(56, 34, 4, 3), blob(6, 13, 3, 4), blob(64, 28, 3, 3)])
+    beach = np.maximum.reduce([blob(7.5, 51, 2.5, 6), blob(19, 34.5, 3.5, 1.5), blob(12, 65, 7, 3), blob(22, 59, 4, 3), blob(33, 55.5, 5, 2),
+                               blob(47, 55, 3, 2), blob(56, 50, 4, 3), blob(6, 29, 3, 4), blob(64, 44, 3, 3),
+                               blob(30, 4.5, 6, 1.5), blob(61, 7, 3, 2)])
     for y in range(H):
         for x in range(W):
             if g[x, y] in ".f" and beach[y, x] + 0.4 * n3[y, x] > 0 and near(g, x, y, "o", 1 + (n3[y, x] > 0.1)):
                 g.set(x, y, "s")
 
     # water features: the tarn and the east river, the moat ponds and the city stream
-    for x, y in TARN:
+    for x, y in TARN + NORTH_LAKE:
         g.set(x, y, "≈")
     g.line(RIVER, "r", 2)
     extend_to_sea(g, RIVER[-1], 2)
@@ -238,7 +276,21 @@ def build() -> tuple[Grid, list[str]]:
     for x, y in JETTY:
         g.set(x, y, "=")
     tidy_blobs(g, notes)
+    fill_unreachable(g, notes)
     return g, notes
+
+
+def fill_unreachable(g: Grid, notes: list[str]) -> None:
+    """Walkable cells that can be reached neither from the city nor from the north shore (a grass hole in a range)
+    take the blocking ground around them (mountain before ocean); the compiler's no_unreachable_walkable agrees."""
+    ok = walk_grid(g)
+    seen = set(bfs(ok, ARRIVE["cornelia"])) | set(bfs(ok, NORTH_SHORE))
+    for y in range(H):
+        for x in range(W):
+            if ok[y, x] and (x, y) not in seen and g[x, y] in ".fs":
+                near = [g[x + dx, y + dy] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if g.inside(x + dx, y + dy)]
+                g.set(x, y, "m" if "m" in near or "o" not in near else "o")
+                notes.append(f"filled the unreachable cell ({x}, {y}) with {g[x, y]!r}")
 
 
 def walk_grid(g: Grid) -> np.ndarray:
@@ -251,7 +303,9 @@ def walk_grid(g: Grid) -> np.ndarray:
         for i in range(2):
             ok[TY + j, TX + i] = False
     ok[TOMB[1], TOMB[0]:TOMB[0] + 2] = False
-    ok[TOMB[1], [TOMB[0] - 1, TOMB[0] + 2]] = False
+    ok[TOMB[1] - 1:TOMB[1] + 1, [TOMB[0] - 1, TOMB[0] + 2]] = False       # the two columns
+    for x, y in BOULDERS:
+        ok[y, x] = False
     return ok
 
 
@@ -275,6 +329,12 @@ def check(g: Grid) -> list[str]:
     d = bfs(ok, ARRIVE["cornelia"])
     if NORTH_SHORE in d:
         errs.append("north_shore is reachable on foot: the range does not seal the land route")
+    mainland = bfs(ok, NORTH_SHORE)
+    if len(mainland) <= 1.15 * len(d):
+        errs.append(f"the mainland ({len(mainland)} cells) is not clearly larger than the peninsula ({len(d)})")
+    rock = ok | np.array([[g[x, y] == "m" for x in range(W)] for y in range(H)])
+    if NORTH_SHORE not in bfs(rock, ARRIVE["cornelia"]):
+        errs.append("no isthmus: with the mountains open the north shore is still cut off")
     for name, (lo, hi), p in (("temple door", (25, 40), TEMPLE_DOOR), ("bridge foot", (18, 30), BRIDGE_FOOT)):
         if not lo <= d.get(p, 999) <= hi:
             errs.append(f"south gate to the {name}: {d.get(p)} steps, want {lo}-{hi}")
@@ -289,7 +349,7 @@ def check(g: Grid) -> list[str]:
             if g[x, y] == "o" and ((not water[y, x - 1] and not water[y, x + 1]) or (not water[y - 1, x] and not water[y + 1, x])):
                 errs.append(f"1-cell ocean inlet at ({x}, {y})")
     print(f"  reachable from cornelia: {len(d)} cells; to the temple door {d.get(TEMPLE_DOOR)}, to the bridge foot "
-          f"{d.get(BRIDGE_FOOT)}; east pocket {len(pocket)} cells")
+          f"{d.get(BRIDGE_FOOT)}; east pocket {len(pocket)} cells; the mainland {len(mainland)} cells")
     return errs
 
 
@@ -389,33 +449,35 @@ def objects() -> list[dict]:
     city = [[f"city_{j}_{i}" for i in range(4)] + [None] for j in range(4)]
     objs = [
         {"type": "deco", "parts": city, "x": CX, "y": CY, "offset": [24, 0], "collide": "alpha",
-         # the four gates, one doorway cell each (N: the castle postern, W and E: the flank arches, S: the main arch)
-         "walk_cells": [[N_WARP[0] - CX, 0], [0, 2], [4, 2], [2, 3]]},
+         # the four gates, one doorway cell each (N: the keep's door, reached over its walkable top cell; W and E:
+         # the flank arches; S: the main arch)
+         "walk_cells": [[N_APPROACH[0] - CX, N_APPROACH[1] - CY], [N_WARP[0] - CX, N_WARP[1] - CY], [0, 2], [4, 2],
+                        [2, 3]]},
         {"type": "prefab", "prefab": "temple_icon", "name": "temple", "x": TX, "y": TY, "w": 2, "h": 2, "door": 1,
          "ridge_rows": 0, "collide": "alpha", "enter": {"map": "temple-of-fiends", "entrance": "entry"}},
-        # Erdrick's tomb: a stone sarcophagus between two broken columns, flowers and vines
+        # Erdrick's tomb: a stone sarcophagus between two broken columns (both cells block: the rock behind them is
+        # the range's foot, so there is no walkable pocket behind the tomb), flowers and vines in front
         {"type": "deco", "parts": [["altar_l", "altar_r"]], "x": TOMB[0], "y": TOMB[1], "style": "stone"},
         {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": TOMB[0] - 1,
-         "y": TOMB[1] - 1, "above_rows": 1},
+         "y": TOMB[1] - 1},
         {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": TOMB[0] + 2,
-         "y": TOMB[1] - 1, "above_rows": 1},
-        {"type": "deco", "parts": [["vines"]], "x": TOMB[0], "y": TOMB[1] - 1, "block": False},
+         "y": TOMB[1] - 1},
         {"type": "deco", "parts": [["vines"]], "x": TOMB[0] + 3, "y": TOMB[1], "block": False},
         {"type": "flowers", "x": TOMB[0] - 1, "y": TOMB[1] + 1},
         {"type": "flowers", "x": TOMB[0] + 2, "y": TOMB[1] + 1},
-        {"type": "flowers", "x": TOMB[0] + 1, "y": TOMB[1] - 1},
     ]
-    for x, y in [(20, 31), (37, 25), (11, 35)]:          # a few boulders on open grass, never on a road
+    for x, y in BOULDERS:          # a few boulders on open grass, never on a road
         objs.append({"type": "deco", "parts": [["boulder"]], "x": x, "y": y, "collide": "alpha"})
     return objs
 
 
 def main() -> None:
     g, notes = build()
-    for x, y in [(20, 31), (37, 25), (11, 35)]:
+    for x, y in BOULDERS:
         if g[x, y] != ".":
             raise SystemExit(f"boulder at ({x}, {y}) is on {g[x, y]!r}, not grass")
-    canoe = next((x, RY + 5) for x in range(W) if g[x, RY + 5] == "r")      # on the east river below the bridge
+    # the canoe: on the east river below the bridge (the river cell of that row nearest the bridge, not the stream)
+    canoe = (min((x for x in range(W) if g[x, RY + 5] == "r"), key=lambda x: (abs(x - RX), x)), RY + 5)
     gate = "The bridge has collapsed into the sea. Only the King's builders could repair it."
     doc = {
         "id": "overworld",
@@ -428,6 +490,7 @@ def main() -> None:
         "min_blob": {"mountain": 3, "sand": 3, "forest": 3, "ocean_inlet": 2},
         "river_check": True,
         "art_coverage": True,
+        "no_unreachable_walkable": True,
         "unreachable_ok": ["north_shore"],
         # `cornelia` first: safeSpawn moves old saves that are cut off from it (the act-1 component)
         "entrances": {"cornelia": list(ARRIVE["cornelia"]), "cornelia_west": list(ARRIVE["cornelia_west"]),

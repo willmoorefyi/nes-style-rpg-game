@@ -21,6 +21,9 @@ reachable exit. Opt-in per source map:
                                              on both sides of each bridge
   art_coverage: true | {min: 0.25}           every blocked cell on open ground has at least that share of object art
   no_static_chokepoints: true                static NPCs (no `wander`) cut off no entrance or transition
+  no_unreachable_walkable: true              every walkable cell can be reached from the first entrance, or from an
+                                             entrance named in `unreachable_ok` (a region opened later, e.g. the
+                                             north shore); `unreachable_ok` may also list [x, y] cells
 
 Collision values are TerrainType (src/types/index.ts); BLOCKED is what blocks on foot.
 """
@@ -219,7 +222,7 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
     coll = c.collision
     npcs = src.get("npcs") or []
     static = static_npc_cells(npcs)
-    ok_unreach = set(src.get("unreachable_ok") or [])
+    ok_unreach = {e for e in src.get("unreachable_ok") or [] if isinstance(e, str)}
     starts = [v for k, v in c.entrances.items()]
     seen_static = reach(coll, starts, static)
 
@@ -297,7 +300,23 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
         for label, p in targets:
             if p in seen and p not in plugged and p not in static:
                 errors.append(f"no_static_chokepoints: static NPCs cut off the {label} at {p}")
+
+    if src.get("no_unreachable_walkable"):
+        errors += _unreachable(src, c, seen)
     return errors
+
+
+def _unreachable(src: dict, c, seen: set[Cell]) -> list[str]:
+    """Walkable cells reached neither from the first entrance nor from an `unreachable_ok` entrance (or cell)."""
+    allowed = src.get("unreachable_ok") or []
+    later = [c.entrances[e] for e in allowed if isinstance(e, str) and e in c.entrances]
+    cells = {(int(e[0]), int(e[1])) for e in allowed if not isinstance(e, str)}
+    ok = seen | reach(c.collision, later) | cells
+    lost = [(x, y) for y in range(c.height) for x in range(c.width) if walkable(c.collision, x, y) and (x, y) not in ok]
+    if not lost:
+        return []
+    return [f"no_unreachable_walkable: {len(lost)} walkable cells can't be reached from any entrance (fill them or "
+            f"open a path): {_cells(lost, 10)}"]
 
 
 def _road_check(src: dict, c, spec: dict) -> list[str]:

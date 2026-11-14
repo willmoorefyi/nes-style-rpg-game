@@ -5,9 +5,10 @@ from __future__ import annotations
 import numpy as np
 
 import kit as K
-from .base import (BLUR_R, CLUMP_BULGE, CLUMP_OUT, CLUMP_STEP, CORE, CORE_PULL, CORE_REACH, LOW, MARGIN,
-                   NEAR_LINE, ROADS, SAND_BAND, T, WARP_COARSE, WARP_EPS, WARP_FINE, WARP_STRETCH, WATERS, WILD, _blur,
-                   _core, _dist, _edge, _inner_depth, _key, _poisson, _resized, _shade, _stamp, _up, _vnoise)
+from .base import (BLUR_R, CLUMP_BULGE, CLUMP_OUT, CLUMP_STEP, CORE, CORE_PULL, CORE_REACH, LOW, MARGIN, NEAR_LINE,
+                   ROADS, SAND_BAND, T, WARP_COARSE, WARP_EPS, WARP_FINE, WARP_GAP, WARP_MEANDER, WARP_STRETCH, WATERS,
+                   WILD, _blur, _core, _dist, _edge, _inner_depth, _key, _meander, _poisson, _resized, _shade, _stamp,
+                   _up, _vnoise)
 
 _PARTITION: dict[int, tuple[int, list[str], np.ndarray]] = {}   # mat key -> (seed, names, label), set by paint_soft
 
@@ -62,6 +63,12 @@ def _warp(H: int, W: int, seed: int) -> tuple[np.ndarray, np.ndarray]:
         out = lim * np.tanh(amp / lim * 1.4 * n / np.sqrt(np.abs(n) + WARP_EPS))
         for k, (c, a) in enumerate(WARP_FINE):
             out += a * noise(c, 1 + k)
+        mc, ma, mlo = WARP_MEANDER
+        if ma:
+            out += ma * _meander(H, W, mc, mlo, seed + base + 50, along_x=along_y)
+        gap, reach = WARP_GAP
+        if gap:                                   # push offsets off zero: an outline crosses its cell line steeply
+            out = out * (1 - gap / reach) + gap * np.tanh(out / 0.75)
         return out.astype(np.float32)
     return axis(101, True), axis(201, False)
 

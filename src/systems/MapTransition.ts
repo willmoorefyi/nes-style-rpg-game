@@ -18,15 +18,21 @@ export function arrivalFor(t: TransitionData, target: MapData): { x: number; y: 
   return { x: t.targetX, y: t.targetY };
 }
 
-/** True when `to` can be reached on foot from `from` (4-connected, walking). */
-function reachableOnFoot(map: MapData, col: CollisionMap, from: [number, number], to: { x: number; y: number }): boolean {
+const DIRS: ReadonlyArray<readonly [number, number]> = [[0, 1], [0, -1], [-1, 0], [1, 0]];
+
+/** Cells (as y * width + x) reachable on foot from any of `starts` (4-connected, walking). */
+function reachableOnFoot(map: MapData, col: CollisionMap, starts: ReadonlyArray<readonly [number, number]>): Set<number> {
   const key = (x: number, y: number) => y * map.width + x;
-  const seen = new Set([key(from[0], from[1])]);
-  const queue: Array<[number, number]> = [from];
+  const seen = new Set<number>();
+  const queue: Array<readonly [number, number]> = [];
+  for (const [x, y] of starts) {
+    if (!col.isWalkable(x, y, walking) || seen.has(key(x, y))) continue;
+    seen.add(key(x, y));
+    queue.push([x, y]);
+  }
   for (let i = 0; i < queue.length; i++) {
     const [x, y] = queue[i];
-    if (x === to.x && y === to.y) return true;
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    for (const [dx, dy] of DIRS) {
       const nx = x + dx, ny = y + dy;
       if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height || seen.has(key(nx, ny))) continue;
       if (!col.isWalkable(nx, ny, walking)) continue;
@@ -34,21 +40,34 @@ function reachableOnFoot(map: MapData, col: CollisionMap, from: [number, number]
       queue.push([nx, ny]);
     }
   }
-  return false;
+  return seen;
 }
 
-/** A restored position that is blocked in this map, or cut off from the map's first entrance (e.g. a save from the
- *  other map variant, or from before the map was redrawn), moves to that first entrance; maps without entrances keep
- *  the position. */
+/** Where a restored position may stand: walkable, not a warp, and reachable on foot from one of the map's entrances
+ *  (e.g. the north shore of the overworld counts, though the first entrance cannot reach it). A spawn on a warp
+ *  steps off it onto a good neighbouring cell (the doorway in front of it), so loading a save never fires the warp;
+ *  anything else (blocked, cut off, a save from the other map variant or from before the map was redrawn) moves to
+ *  the first entrance. Maps without entrances keep the position. */
 export function safeSpawn(map: MapData, pos: { x: number; y: number }): { x: number; y: number } {
+  const entrances = map.entrances ? Object.values(map.entrances) : [];
+  if (!entrances.length) return pos;
   const col = new CollisionMap(map);
-  const first = map.entrances && Object.values(map.entrances)[0];
-  const walkable = col.isWalkable(pos.x, pos.y, walking);
-  if (!first) return pos;
-  if (walkable && reachableOnFoot(map, col, first, pos)) return pos;
-  console.warn(`spawn (${pos.x}, ${pos.y}) is ${walkable ? 'cut off from the first entrance' : 'blocked'} in ${map.id}; `
-    + 'using its first entrance');
-  return { x: first[0], y: first[1] };
+  const seen = reachableOnFoot(map, col, entrances);
+  const warps = new Set(map.transitions.map((t) => t.y * map.width + t.x));
+  const inside = (x: number, y: number) => x >= 0 && y >= 0 && x < map.width && y < map.height;
+  const good = (x: number, y: number) => inside(x, y) && seen.has(y * map.width + x) && !warps.has(y * map.width + x);
+  if (good(pos.x, pos.y)) return pos;
+  if (inside(pos.x, pos.y) && warps.has(pos.y * map.width + pos.x)) {
+    const off = DIRS.map(([dx, dy]) => ({ x: pos.x + dx, y: pos.y + dy })).find((c) => good(c.x, c.y));
+    if (off) {
+      console.warn(`spawn (${pos.x}, ${pos.y}) is on a warp in ${map.id}; stepping off to (${off.x}, ${off.y})`);
+      return off;
+    }
+  }
+  const why = !inside(pos.x, pos.y) || !col.isWalkable(pos.x, pos.y, walking) ? 'blocked'
+    : warps.has(pos.y * map.width + pos.x) ? 'on a warp' : 'cut off from every entrance';
+  console.warn(`spawn (${pos.x}, ${pos.y}) is ${why} in ${map.id}; using its first entrance`);
+  return { x: entrances[0][0], y: entrances[0][1] };
 }
 
 export interface TransitionResult {

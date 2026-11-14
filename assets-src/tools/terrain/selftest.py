@@ -8,7 +8,7 @@ from PIL import Image
 
 import kit as K
 from .base import T, _tile
-from .metrics import _Recorder, boundary_stats, classify, fidelity, foothill_share, peak_stats
+from .metrics import RUN_MAX, _Recorder, boundary_stats, classify, fidelity, foothill_share, peak_stats
 from .outline import _PARTITION
 from .peaks import place_peaks, plan_peaks
 
@@ -45,9 +45,9 @@ def selftest() -> int:
             new, mat, below = _boundary_case(case, kit, True, ga, gb, w)
             old, _, _ = _boundary_case(case, kit, False, ga, gb, w)
             assert new["edges"] > 0, f"{ch}: no boundary found"
-            assert new["longest_run"] <= 72, f"{ch}: straight run {new['longest_run']} px > 72 ({new})"
+            assert new["longest_run"] < RUN_MAX, f"{ch}: straight run {new['longest_run']} px >= {RUN_MAX} ({new})"
             assert new["on_cell_line"] <= 0.15, f"{ch}: {new['on_cell_line']:.0%} of the boundary on cell lines"
-            assert old["longest_run"] > 72 or old["on_cell_line"] > 0.15, f"{ch}: classic passes too ({old})"
+            assert old["longest_run"] >= RUN_MAX or old["on_cell_line"] > 0.15, f"{ch}: classic passes too ({old})"
             fid = fidelity(below, mat, kit)
             assert fid["cells_below_half"] == 0, f"{ch}: a cell centre does not show its material ({fid})"
             ok += 4
@@ -80,6 +80,7 @@ def selftest() -> int:
     rim = _tile(kit.material("rim"), *c.below.shape[:2])
     assert not np.all(c.below == rim, axis=2).any() and c.collision[2, 2] == B.WATER
     ok += 1
+    ok += _road_case(B, kit)
     # determinism: the same pixels again, and under other string-hash seeds (subprocesses, as --check-determinism)
     _PARTITION.clear()
     _, again = _ground(block, kit, True)
@@ -107,3 +108,38 @@ def selftest() -> int:
         ok += 1
     print(f"terrain selftest: {ok} checks passed")
     return ok
+
+
+def _road_case(B, kit: K.Kit) -> int:
+    """A diagonal dirt road (a staircase of cells) reads as a smooth track: the outer corner of every step stays
+    grass, while the classic painting fills the steps. The collision
+    is the same either way."""
+    rows = ["." * 9, ".,,......", "..,,.....", "...,,....", "....,,...", ".....,,..", "." * 9]
+    mat, below_o = _ground(rows, kit, True)
+    _, below_c = _ground(rows, kit, False)
+    dirt = _tile(kit.material("dirt"), *below_o.shape[:2])
+
+    def corner_share(below: np.ndarray) -> float:
+        """Dirt share of the 12 px outer corner of each step (a turn cell, away from both of its neighbours)."""
+        shares = []
+        for y in range(1, 6):
+            for x in range(1, 8):
+                if mat[y, x] != "dirt":
+                    continue
+                n = [(dx, dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if mat[y + dy, x + dx] == "dirt"]
+                if len(n) != 2 or n[0][0] == -n[1][0]:
+                    continue
+                ox, oy = -(n[0][0] + n[1][0]), -(n[0][1] + n[1][1])          # the corner away from both
+                px = x * T + (T - 12 if ox > 0 else 0)
+                py = y * T + (T - 12 if oy > 0 else 0)
+                sl = (slice(py, py + 12), slice(px, px + 12))
+                shares.append(float(np.all(below[sl] == dirt[sl], axis=2).mean()))
+        return max(shares)
+
+    new, old = corner_share(below_o), corner_share(below_c)
+    assert new < 0.1, f"road: the outer corners of the steps show dirt ({new:.0%})"
+    assert old > 0.5, f"road: the classic steps are not filled ({old:.0%})"
+    src ={"id": "rd", "kits": ["overworld", "town"], "ground": "\n".join(rows), "entrances": {"a": [0, 0]}}
+    coll = [B.compile_map({**src, "terrain": t}, kit, check_interiors=False).collision for t in ("organic", "classic")]
+    assert np.array_equal(*coll), "organic roads change the collision"
+    return 2

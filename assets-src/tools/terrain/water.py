@@ -37,8 +37,8 @@ def banks(below: np.ndarray, fresh: np.ndarray, grass: np.ndarray, sand: np.ndar
 def _steer(d: np.ndarray, width: np.ndarray, n: np.ndarray) -> np.ndarray:
     """Band widths for a band drawn as `d <= width` (d: distance from the band's outer edge, dithered over a 3 px
     ramp). Where the band would reach the clamped cell centre (and follow the centre squares) it narrows to a 2.5-4
-    px strip that follows its outer edge; an inner edge that would run within 4.5 px of a cell line parallel to it
-    moves to 4.5-9 px past the line (n in 0..1 picks where). Along the band's normal, s - d is constant (s: signed offset
+    px strip that follows its outer edge; an inner edge that would run within 6 px of a cell line parallel to it
+    moves to 6-9.5 px past the line (n in 0..1 picks where). Along the band's normal, s - d is constant (s: signed offset
     from the nearest parallel cell line), so every pixel of a normal makes the same choice."""
     H, W = d.shape
     gy, gx = np.zeros_like(d), np.zeros_like(d)
@@ -50,8 +50,8 @@ def _steer(d: np.ndarray, width: np.ndarray, n: np.ndarray) -> np.ndarray:
     edge = s - d + width - 1.5                           # offset of the inner edge from the line
     width = np.where(edge > MARGIN - 1, 2.5 + 1.5 * n, width)   # deep: a thin strip that follows the coast
     edge = s - d + width - 1.5
-    target = 4.5 + (MARGIN - 5.5) * n
-    return np.where(np.abs(edge) < 4.5, width + target - edge, width)
+    target = 6.0 + (MARGIN - 6.5) * n
+    return np.where(np.abs(edge) < 6.0, width + target - edge, width)
 
 
 def shallows(below: np.ndarray, layers: list[np.ndarray], by: dict[str, np.ndarray], bayer: np.ndarray, seed: int) -> None:

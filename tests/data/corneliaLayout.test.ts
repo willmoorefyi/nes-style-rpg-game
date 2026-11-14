@@ -65,6 +65,7 @@ describe('Cornelia houses (CT-1)', () => {
   });
 
   it('every exit of an interior returns to the cell just south of the door it was entered by', () => {
+    expect(homes.length).toBe(10);
     const map = compiled('cornelia');
     for (const { o, door: [x, y] } of [...homes, ...houseDoors.filter(({ o: s }) => SHOPS.includes(s.enter!.map))]) {
       const inner = sources.get(o.enter!.map)!;
@@ -82,6 +83,7 @@ describe('Cornelia houses (CT-1)', () => {
   });
 
   it('every interior has someone to talk to or a chest; homes play the town music, shops the shop music', () => {
+    expect(homes.length).toBe(10);
     for (const { o } of homes) {
       const s = sources.get(o.enter!.map)!;
       expect((s.npcs ?? []).length, s.id).toBeGreaterThan(0);
@@ -102,6 +104,7 @@ describe('Cornelia houses (CT-1)', () => {
   });
 
   it('every interior NPC can be talked to: from a reachable cell beside it, or across a counter', () => {
+    expect(homes.length).toBe(10);
     for (const id of [...homes.map(({ o }) => o.enter!.map), ...SHOPS]) {
       const m = compiled(id);
       const col = new CollisionMap(m);
