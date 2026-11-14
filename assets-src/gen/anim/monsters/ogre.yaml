@@ -97,9 +97,9 @@ frames:                        # tweaks from /tmp/t3/pose.py: rigid rotations ab
   hurt_in1:                    # recoil 3 back, lean back 13, head back 28, club arm lifts
     moves: []
     tweaks: {crown: [-25, 2], neck: [-11, -1], chest: [-9, 1], hip: [-1, 0], sh_n: [-10, -3], el_n: [-5, -5], hand_n: [0, -7], tip: [2, -13], sh_f: [-10, 6], el_f: [-4, 9], hand_f: [2, 7]}
-  hurt_in2:                    # 2 forward, lean in 13, head 13 forward, thrown arm 27 down; club dropped behind the near leg (club_h)
+  hurt_in2:                    # 2 forward, lean in 13, head 13 forward (crown 1 px up since the crack-fill fix: IoU), thrown arm 27 down; club dropped behind the near leg (club_h)
     moves: []
-    tweaks: {crown: [19, -11], neck: [9, -1], chest: [6, -1], hip: [1, 0], sh_n: [8, 1], el_n: [10, 8], hand_n: [12, 15]}
+    tweaks: {crown: [19, -12], neck: [9, -1], chest: [6, -1], hip: [1, 0], sh_n: [8, 1], el_n: [10, 8], hand_n: [12, 15]}
 masks:
   club:
     idle: [[87, 86], [108, 84], [108, 112], [94, 112], [87, 100]]

@@ -82,7 +82,8 @@ def detached(a: np.ndarray, src: np.ndarray) -> list[str]:
 
 def seam_gaps(a: np.ndarray, labels: np.ndarray, tolerance: int = 0, pairs: set | None = None) -> list[str]:
     """A transparent pixel inside the silhouette bbox with two opposite neighbours (left/right, up/down or a
-    diagonal pair) drawn by different parts is a crack between them; `pairs` limits it to joined parts."""
+    diagonal pair) drawn by different parts is a crack between them; `pairs` limits it to joined parts. Pixels
+    labelled -3 (rig_render.KEPT: a gap the approved art already had between two parts) are not cracks."""
     box = _bbox(_solid(a))
     if box is None:
         return []
@@ -98,14 +99,15 @@ def seam_gaps(a: np.ndarray, labels: np.ndarray, tolerance: int = 0, pairs: set 
         gap |= ok
     x0, y0, x1, y1 = box
     inside = np.zeros_like(gap); inside[y0:y1 + 1, x0:x1 + 1] = True
-    gap &= inside & ~_solid(a)
+    gap &= inside & ~_solid(a) & (labels != -3)
     if int(gap.sum()) > tolerance:
         x, y = _first(gap)
         return [f"seam gaps {int(gap.sum())} > {tolerance} at ({x}, {y})"]
     return []
 
 
-def _holes(a: np.ndarray) -> list[tuple[int, float, float]]:
+def _holes(a: np.ndarray, kept: np.ndarray | None = None) -> list[tuple[int, float, float, int]]:
+    """Enclosed transparent pieces as (size, cx, cy, size without the `kept` pixels)."""
     lab, n = _components(~_solid(a))
     border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]])).tolist())
     out = []
@@ -113,17 +115,18 @@ def _holes(a: np.ndarray) -> list[tuple[int, float, float]]:
         if i in border:
             continue
         ys, xs = np.nonzero(lab == i)
-        out.append((len(xs), float(xs.mean()), float(ys.mean())))
+        out.append((len(xs), float(xs.mean()), float(ys.mean()), len(xs) - (int(kept[ys, xs].sum()) if kept is not None else 0)))
     return out
 
 
-def new_holes(a: np.ndarray, src: np.ndarray, min_px: int = 4) -> list[str]:
-    """An enclosed transparent piece of >= min_px with no counterpart (similar size, nearby) in the source fails."""
+def new_holes(a: np.ndarray, src: np.ndarray, min_px: int = 4, labels: np.ndarray | None = None) -> list[str]:
+    """An enclosed transparent piece of >= min_px with no counterpart (similar size, nearby) in the source fails.
+    Pixels labelled -3 (rig_render.KEPT, a gap the source already had between two parts) do not count toward min_px."""
     reach = 6 * a.shape[0] / 80
     shole = _holes(src)
-    bad = [h for h in _holes(a) if h[0] >= min_px and not any(
+    bad = [h for h in _holes(a, None if labels is None else labels == -3) if h[3] >= min_px and not any(
         0.5 * h[0] <= s[0] <= 2 * h[0] + 2 and np.hypot(h[1] - s[1], h[2] - s[2]) <= reach for s in shole)]
-    return [f"new hole {bad[0][0]} px at ({bad[0][1]:.0f}, {bad[0][2]:.0f})"] if bad else []
+    return [f"new hole {bad[0][3]} px at ({bad[0][1]:.0f}, {bad[0][2]:.0f})"] if bad else []
 
 
 # 6: silhouette continuity

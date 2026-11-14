@@ -151,8 +151,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     size = (cell[1], cell[0])
     arrs = {k: np.asarray(v.convert("RGBA")).copy() for k, v in keyframes.items()}
     segs = {k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes}
-    holds = {h["frame"] for h in cfg.get("holds") or []}
-    pairs = rig.joined_pairs()
+    holds, pairs = {h["frame"] for h in cfg.get("holds") or []}, rig.joined_pairs()
+    gaps = {k: RR.source_gaps(s[0], pairs) for k, s in segs.items()}     # the approved art's own part gaps
     foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
                   for ft in rig.feet}
     has_cast = "cast" in keyframes
@@ -203,18 +203,18 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                     ys, xs = np.nonzero(mask)
                     t = ((np.stack([xs, ys], 1) - a) @ (b - a)) / max(float((b - a) @ (b - a)), 1e-9)
                     mask[ys[t < 0.5], xs[t < 0.5]] = False
-                rgba, hit = RR.rigid(arrs[src_kf], mask, sj[js[0]], J[to], rot, size)
+                rgba, hit, emp = RR.rigid(arrs[src_kf], mask, sj[js[0]], J[to], rot, size, gaps[src_kf])
                 rots[part] = (math.degrees(rot), "prop")
             elif d["kind"] in ("chain", "cloth"):
-                rgba, hit = RR.mesh_warp(arrs[src_kf], mask, [sj[j] for j in js], [J[j] for j in js],
-                                         _warp_width(d, mask, [sj[j] for j in js]), size)
+                rgba, hit, emp = RR.mesh_warp(arrs[src_kf], mask, [sj[j] for j in js], [J[j] for j in js],
+                                              _warp_width(d, mask, [sj[j] for j in js]), size, gaps[src_kf])
                 rots[part] = (R.part_rotation(rig, part, src_kf, sj, J), d["kind"])
             else:
                 rot = math.radians(R.part_rotation(rig, part, src_kf, sj, J))
                 fn = RR.rotsprite if rig.sampler == "rotsprite" else RR.rigid
-                rgba, hit = fn(arrs[src_kf], mask, sj[js[0]], J[js[0]], rot, size)
+                rgba, hit, emp = fn(arrs[src_kf], mask, sj[js[0]], J[js[0]], rot, size, gaps[src_kf])
                 rots[part] = (math.degrees(rot), d["kind"])
-            layers.append((list(rig.parts).index(part), rgba, hit))
+            layers.append((list(rig.parts).index(part), rgba, hit, emp))
         img, labels = RR.composite(layers, size, pairs)
         for patch in cfg.get("paint") or []:
             if patch["frame"] == name:

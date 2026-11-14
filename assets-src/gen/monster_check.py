@@ -32,7 +32,7 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     S = arrs[f["src"]]
     T = gen[f["toward"]]["img"] if f["toward"] in gen else arrs[f["toward"]]
     cell_h = a.shape[0]
-    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + C.new_holes(a, S)
+    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + C.new_holes(a, S, 4, f["labels"])
     if f["labels"] is not None:
         out += C.seam_gaps(a, f["labels"], f.get("seam_tolerance", 0), f.get("pairs"))
     out += C.silhouette(a, S, T, f["u"], cell_h) + C.outline_kept(a, S)

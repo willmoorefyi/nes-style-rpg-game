@@ -14,20 +14,33 @@ from PIL import Image
 U32_MAX = np.iinfo(np.uint32).max
 
 
-def rigid(arr: np.ndarray, mask: np.ndarray, sj0, tj0, rot: float, size) -> tuple[np.ndarray, np.ndarray]:
-    """Rotate the masked source part by `rot` about sj0 and place sj0 on tj0 (inverse map, nearest)."""
+def _src_gap(gaps: np.ndarray, sx: np.ndarray, sy: np.ndarray, ok: np.ndarray) -> np.ndarray:
+    """Output pixels whose source position (under the part's own map) is a gap pixel of the source keyframe."""
+    out = np.zeros(ok.shape, bool)
+    out[ok] = gaps[sy[ok], sx[ok]]
+    return out
+
+
+def _rigid_map(arr: np.ndarray, sj0, tj0, rot: float, size):
     h, w = size
     gy, gx = np.mgrid[0:h, 0:w]
     c, s = math.cos(-rot), math.sin(-rot)
     dx, dy = gx - tj0[0], gy - tj0[1]
     sx = np.rint(c * dx - s * dy + sj0[0]).astype(int)
     sy = np.rint(s * dx + c * dy + sj0[1]).astype(int)
-    ok = (sx >= 0) & (sx < arr.shape[1]) & (sy >= 0) & (sy < arr.shape[0])
+    return sx, sy, (sx >= 0) & (sx < arr.shape[1]) & (sy >= 0) & (sy < arr.shape[0])
+
+
+def rigid(arr: np.ndarray, mask: np.ndarray, sj0, tj0, rot: float, size, gaps: np.ndarray | None = None):
+    """Rotate the masked source part by `rot` about sj0 and place sj0 on tj0 (inverse map, nearest). Given the
+    source keyframe's `gaps` (crack_mask of its own labels), also return where they land under this part's map."""
+    h, w = size
+    sx, sy, ok = _rigid_map(arr, sj0, tj0, rot, size)
     hit = np.zeros((h, w), bool)
     hit[ok] = mask[sy[ok], sx[ok]]
     out = np.zeros((h, w, 4), np.uint8)
     out[hit] = arr[sy[hit], sx[hit]]
-    return out, hit
+    return (out, hit, _src_gap(gaps, sx, sy, ok)) if gaps is not None else (out, hit)
 
 
 # ───────── rotsprite ─────────
@@ -62,8 +75,8 @@ def block_mode(samples: np.ndarray, centre: np.ndarray) -> np.ndarray:
     return np.where(centre_n == mx, centre, lowest).astype(np.uint32)
 
 
-def rotsprite(arr: np.ndarray, mask: np.ndarray, sj0, tj0, rot: float, size, k: int = 8) -> tuple[np.ndarray, np.ndarray]:
-    """Scale2x three times (8x), nearest rotate, then mode-downsample every 8x8 block."""
+def rotsprite(arr: np.ndarray, mask: np.ndarray, sj0, tj0, rot: float, size, gaps: np.ndarray | None = None, k: int = 8):
+    """Scale2x three times (8x), nearest rotate, then mode-downsample every 8x8 block (`gaps` as in rigid)."""
     part = _pack(np.where(mask[..., None], arr, 0))
     up = scale2x(scale2x(scale2x(part)))
     h, w = size
@@ -84,6 +97,8 @@ def rotsprite(arr: np.ndarray, mask: np.ndarray, sj0, tj0, rot: float, size, k: 
         val[ok] = up[uy[ok], ux[ok]]
         out[lo:lo + 2048] = block_mode(val[:, 1:], val[:, 0])
     out = out.reshape(h, w)
+    if gaps is not None:
+        return _unpack(out), out != 0, _src_gap(gaps, *_rigid_map(arr, sj0, tj0, rot, size))
     return _unpack(out), out != 0
 
 
@@ -102,15 +117,17 @@ def _extend(chain: np.ndarray, d: float) -> np.ndarray:
     return np.concatenate([[ext(chain[0], chain[1])], chain, [ext(chain[-1], chain[-2])]], 0)
 
 
-def mesh_warp(arr: np.ndarray, mask: np.ndarray, src_chain, dst_chain, width: float, size) -> tuple[np.ndarray, np.ndarray]:
+def mesh_warp(arr: np.ndarray, mask: np.ndarray, src_chain, dst_chain, width: float, size, gaps: np.ndarray | None = None):
     """Piecewise-affine warp of the masked pixels along a joint chain: quads of half-width `width` around every
-    segment (the ends extended by `width`), two triangles each, inverse-mapped through barycentrics, nearest sampling."""
+    segment (the ends extended by `width`), two triangles each, inverse-mapped through barycentrics, nearest sampling.
+    `gaps` as in rigid; outside the mesh the source position is unknown (not a gap)."""
     S, D = _extend(np.asarray(src_chain, float), width), _extend(np.asarray(dst_chain, float), width)
     ns, nd = _normals(S), _normals(D)
     h, w = size
     gy, gx = np.mgrid[0:h, 0:w]
     P = np.stack([gx.ravel(), gy.ravel()], 1).astype(float)
     hit = np.zeros(h * w, bool)
+    seen, gap = np.zeros(h * w, bool), np.zeros(h * w, bool)
     out = np.zeros((h * w, 4), np.uint8)
     for i in range(len(S) - 1):
         qs = [S[i] + ns[i] * width, S[i] - ns[i] * width, S[i + 1] - ns[i + 1] * width, S[i + 1] + ns[i + 1] * width]
@@ -127,20 +144,29 @@ def mesh_warp(arr: np.ndarray, mask: np.ndarray, src_chain, dst_chain, width: fl
             src = sa + l12[:, :1] * (sb - sa) + l12[:, 1:] * (sc - sa)
             sx, sy = np.rint(src[:, 0]).astype(int), np.rint(src[:, 1]).astype(int)
             ok = inside & (sx >= 0) & (sx < arr.shape[1]) & (sy >= 0) & (sy < arr.shape[0])
+            first = inside & ~seen
+            if gaps is not None:
+                gap[first & ok] = gaps[sy[first & ok], sx[first & ok]]
+            seen |= inside
             take = np.zeros_like(ok)
             take[ok] = mask[sy[ok], sx[ok]]
             out[take] = arr[sy[take], sx[take]]
             hit |= take
+    if gaps is not None:
+        return out.reshape(h, w, 4), hit.reshape(h, w), gap.reshape(h, w)
     return out.reshape(h, w, 4), hit.reshape(h, w)
 
 
 # ───────── compositing ─────────
 PAIRS = ((0, 1), (1, 0), (1, 1), (1, -1))
+KEPT = -3                                                  # label of a gap the approved art already had (left open)
 
 
-def crack_mask(lab: np.ndarray, pairs: set | None, reach: int = 1) -> tuple[np.ndarray, np.ndarray]:
+def crack_mask(lab: np.ndarray, pairs: set | None, reach: int = 1, old: np.ndarray | None = None,
+               was: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
     """Empty pixels with opposite neighbours (at distance 1..reach) drawn by two different (joined) parts, and the
-    label of the neighbour to copy from."""
+    label of the neighbour to copy from. With `old[label]` (pixels that land on a gap of that part's source keyframe
+    under the part's own placement) `was` is set where both neighbours' sources already had a gap there."""
     h, w = lab.shape
     pad = np.full((h + 2 * reach, w + 2 * reach), -1, np.int32)
     pad[reach:-reach, reach:-reach] = lab
@@ -153,33 +179,79 @@ def crack_mask(lab: np.ndarray, pairs: set | None, reach: int = 1) -> tuple[np.n
             ok = (p >= 0) & (q >= 0) & (p != q) & (lab == -1)
             if pairs is not None and ok.any():
                 ok &= np.array([frozenset((int(x), int(y))) in pairs for x, y in zip(p.ravel(), q.ravel())]).reshape(ok.shape)
+            if old is not None and was is not None and ok.any():
+                ys, xs = np.nonzero(ok)
+                was[ys, xs] |= old[p[ys, xs], ys, xs] & old[q[ys, xs], ys, xs]
             new = ok & ~gap
             src[new] = (dy * r * w + dx * r)                  # offset to the neighbour p
             gap |= ok
     return gap, src
 
 
-def composite(layers: list[tuple[int, np.ndarray, np.ndarray]], size, pairs: set | None = None
-              ) -> tuple[np.ndarray, np.ndarray]:
-    """layers back to front as (part index, rgba, hit) -> outlined image and part-label map (-1 empty, -2 new ink).
-    Joint cracks (1-2 px gaps between joined parts that a rotation opened) are closed with the neighbour's colour
-    before puppet's outline repair."""
-    from gen.puppet import outline
-    h, w = size
-    img = np.zeros((h, w, 4), np.uint8)
-    lab = np.full((h, w), -1, np.int32)
-    for idx, rgba, hit in layers:
-        img[hit] = rgba[hit]
-        lab[hit] = idx
+def source_gaps(lab: np.ndarray, pairs: set | None, grow: int = 1) -> np.ndarray:
+    """A keyframe's own gaps between parts: its crack_mask pixels, grown by `grow` px (8-neighbour) over transparent
+    pixels so that a gap moved by a 1 px rounding still matches."""
+    gap = crack_mask(lab, pairs, 2)[0]
+    for _ in range(grow):
+        g = np.pad(gap, 1)
+        gap = gap | (np.max([g[1 + dy:g.shape[0] - 1 + dy, 1 + dx:g.shape[1] - 1 + dx]
+                             for dy in (-1, 0, 1) for dx in (-1, 0, 1)], 0) & (lab == -1))
+    return gap
+
+
+def _fill(img: np.ndarray, lab: np.ndarray, pairs: set | None, old=None, keep=None) -> tuple[np.ndarray, np.ndarray]:
+    """Close joint cracks in place (3 rounds of crack_mask, reach 2) except the `keep` pixels; returns the filled
+    pixels and where both neighbours' sources already had a gap."""
+    h, w = lab.shape
+    filled, was = np.zeros((h, w), bool), np.zeros((h, w), bool)
     for _ in range(3):
-        gap, off = crack_mask(lab, pairs, 2)
+        gap, off = crack_mask(lab, pairs, 2, old, was)
+        if keep is not None:
+            gap &= ~keep
         if not gap.any():
             break
         ys, xs = np.nonzero(gap)
         flat = ys * w + xs + off[ys, xs]
         img.reshape(-1, 4)[ys * w + xs] = img.reshape(-1, 4)[flat]
         lab.reshape(-1)[ys * w + xs] = lab.reshape(-1)[flat]
+        filled |= gap
+    return filled, was
+
+
+def composite(layers: list[tuple], size, pairs: set | None = None) -> tuple[np.ndarray, np.ndarray]:
+    """layers back to front as (part index, rgba, hit[, gaps]) -> outlined image and part-label map (-1 empty, -2 new
+    ink, KEPT a gap the approved art already had). Joint cracks (1-2 px gaps between joined parts that a rotation
+    opened) are closed with the neighbour's colour before puppet's outline repair.
+
+    With every layer's mapped source gaps (the third output of rigid / rotsprite / mesh_warp given `gaps`) only cracks
+    the motion created are closed: a would-be fill region (4-connected) at least half of whose pixels land on a source
+    gap under both parts around them is the approved art's own gap between two parts that did not move apart, and it
+    stays open (neither filled nor inked by the outline repair)."""
+    from gen.pixelize import components
+    from gen.puppet import outline
+    h, w = size
+    img = np.zeros((h, w, 4), np.uint8)
+    lab = np.full((h, w), -1, np.int32)
+    n = max([L[0] for L in layers] + [0]) + 1
+    old = np.zeros((n, h, w), bool) if any(len(L) > 3 for L in layers) else None
+    for L in layers:
+        idx, rgba, hit = L[:3]
+        img[hit] = rgba[hit]
+        lab[hit] = idx
+        if old is not None and len(L) > 3:
+            old[idx] = L[3]
+    kept = np.zeros((h, w), bool)
+    if old is not None:
+        trial, was = _fill(img.copy(), lab.copy(), pairs, old)
+        comps, nc = components(trial)
+        for i in range(1, nc + 1):
+            c = comps == i
+            if was[c].mean() >= 0.5:
+                kept |= c & was
+    _fill(img, lab, pairs, keep=kept)
     inked = np.asarray(outline(Image.fromarray(img, "RGBA"))).copy()
+    inked[kept] = 0                                       # the outline repair leaves the kept gaps open too
     lab[inked[..., 3] == 0] = -1
     lab[(inked[..., 3] > 0) & (img[..., 3] == 0)] = -2
+    lab[kept] = KEPT
     return inked, lab

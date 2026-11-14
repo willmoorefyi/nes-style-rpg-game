@@ -94,8 +94,51 @@ def run_cloth_chain(check: Callable[[bool, str], None]) -> None:
     check({"c1", "c2", "c3"} <= set(moves), f"per-keyframe cloth joints join the wind moves {sorted(moves)[-4:]}")
 
 
+def _two_parts(gap: int) -> tuple[np.ndarray, np.ndarray]:
+    """Two light 20x40 slabs side by side (parts 0 and 1), `gap` px apart; returns the image and its label map."""
+    a = _rect(10, 20, 30, 60)
+    a[20:60, 30 + gap:50 + gap] = (90, 90, 90, 255)
+    lab = np.full((80, 80), -1, np.int32)
+    lab[20:60, 10:30], lab[20:60, 30 + gap:50 + gap] = 0, 1
+    return a, lab
+
+
+def _compose(arr: np.ndarray, lab: np.ndarray, shift: int) -> tuple[np.ndarray, np.ndarray]:
+    """Part 0 in place, part 1 moved `shift` px right, through rigid + composite with the source's own gaps."""
+    from gen import rig_render as RR
+    pairs = {frozenset((0, 1))}
+    gaps = RR.source_gaps(lab, pairs)
+    layers = []
+    for i, dx in ((0, 0), (1, shift)):
+        rgba, hit, mapped = RR.rigid(arr, lab == i, (40.0, 40.0), (40.0 + dx, 40.0), 0.0, (80, 80), gaps)
+        layers.append((i, rgba, hit, mapped))
+    return RR.composite(layers, (80, 80), pairs)
+
+
+def run_kept_gaps(check: Callable[[bool, str], None]) -> None:
+    """rig_render.composite: the joint-crack fill and the outline repair close only cracks the motion created; a gap
+    the approved art already has between two parts that did not move apart stays open (troll far arm / belly,
+    cockatrice coil channel), and the seam and hole checks accept it."""
+    from gen import anim_checks as C
+    arr, lab = _two_parts(2)
+    try:
+        img, out = _compose(arr, lab, 0)
+    except (AttributeError, TypeError) as e:                          # before the fix: no source-gap inputs
+        check(False, f"composite: an unmoved approved 2 px gap between two parts stays open ({e})")
+        return
+    open_px = int((img[20:60, 30:32, 3] == 0).sum())
+    check(open_px == 80, f"composite: an unmoved approved 2 px gap between two parts stays open ({open_px} / 80 px)")
+    check(not C.seam_gaps(img, out, 0, {frozenset((0, 1))}), "seam check: the approved gap is not a seam gap")
+    check(not C.new_holes(img, arr, 4, out), "hole check: the approved gap is not a new hole")
+    arr, lab = _two_parts(0)
+    img, out = _compose(arr, lab, 1)
+    filled = int((img[20:60, 30, 3] > 0).sum())
+    check(filled == 40, f"composite: a 1 px crack the motion opened is still closed ({filled} / 40 px)")
+
+
 def run_fixes(check: Callable[[bool, str], None]) -> None:
     run_iou_bound(check)
     run_per_foot(check)
     run_pinned_reach(check)
     run_cloth_chain(check)
+    run_kept_gaps(check)
