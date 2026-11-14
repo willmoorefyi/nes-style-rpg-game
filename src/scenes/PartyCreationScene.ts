@@ -3,6 +3,8 @@ import type { Scene, CharacterClassData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
+import { NameEntryGrid, uniqueDefaultName } from '../ui/NameEntryGrid.js';
+import { DEFAULT_NAMES, buildClassPreview, buildPartySummary, buildSlotDisplay } from './partyCreation/PartyCreationViews.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { Character } from '../entities/Character.js';
 import { NES_FONT } from '../ui/NESFont.js';
@@ -10,16 +12,7 @@ import { CutsceneManager, type CutsceneScript } from '../systems/CutsceneManager
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { DialogBox } from '../ui/DialogBox.js';
 import { DialogManager } from '../systems/DialogManager.js';
-import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT, LINE_HEIGHT } from '../core/LayoutConstants.js';
-
-const DEFAULT_NAMES: Record<string, string> = {
-  warrior: 'FGHTR',
-  thief: 'THIEF',
-  monk: 'MONK',
-  white_mage: 'W.MAG',
-  black_mage: 'B.MAG',
-  red_mage: 'R.MAG',
-};
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 const STARTING_GOLD = 100;
 
@@ -28,10 +21,13 @@ export class PartyCreationScene implements Scene {
   private game: Game;
   private baseClasses: CharacterClassData[] = [];
   private selectedClasses: CharacterClassData[] = [];
+  /** Chosen names, one per entry of `selectedClasses` once that member is named. */
+  private names: string[] = [];
   private currentSlot = 0;
   private classMenu!: Menu;
   private confirmMenu?: Menu;
-  private phase: 'select' | 'confirm' | 'cutscene' = 'select';
+  private nameGrid?: NameEntryGrid;
+  private phase: 'select' | 'name' | 'confirm' | 'cutscene' = 'select';
 
   // UI containers for easy rebuild
   private slotDisplay!: Container;
@@ -58,6 +54,7 @@ export class PartyCreationScene implements Scene {
     this.fadeOverlay.overlay.alpha = 0;
     this.dialogManager.clear();
     this.selectedClasses = [];
+    this.names = [];
     this.currentSlot = 0;
     this.phase = 'select';
     this.baseClasses = ClassRegistry.getAll().filter((c) => !c.upgradeFrom);
@@ -75,33 +72,22 @@ export class PartyCreationScene implements Scene {
 
     // Header
     const header = new BitmapText({
-      text: this.currentSlot >= 4 ? 'Confirm your party' : `Choose class for slot ${this.currentSlot + 1}/4`,
+      text: this.currentSlot >= 4 ? 'Confirm your party'
+        : this.phase === 'name' ? `Name the ${this.selectedClasses[this.currentSlot].name} (slot ${this.currentSlot + 1}/4)`
+        : `Choose class for slot ${this.currentSlot + 1}/4`,
       style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
     });
     header.position.set(SCREEN_MARGIN, SCREEN_MARGIN);
     this.container.addChild(header);
 
-    // Slot display (top area showing chosen classes)
-    this.slotDisplay = new Container();
-    this.slotDisplay.position.set(SCREEN_MARGIN, 72);
-    for (let i = 0; i < 4; i++) {
-      const label = new BitmapText({
-        text: i < this.selectedClasses.length
-          ? `${i + 1}:${DEFAULT_NAMES[this.selectedClasses[i].id] ?? this.selectedClasses[i].name}`
-          : `${i + 1}:----`,
-        style: {
-          fontFamily: NES_FONT,
-          fontSize: FONT_SIZE,
-          fill: i === this.currentSlot ? 0xffff00 : 0xffffff,
-        },
-      });
-      label.position.set(i * 240, 0);
-      this.slotDisplay.addChild(label);
-    }
+    // Slot display (top area showing the chosen names)
+    this.slotDisplay = buildSlotDisplay(this.names, this.currentSlot);
     this.container.addChild(this.slotDisplay);
 
     if (this.phase === 'select') {
       this.buildClassSelect();
+    } else if (this.phase === 'name') {
+      this.buildNameEntry();
     } else {
       this.buildConfirm();
     }
@@ -137,19 +123,7 @@ export class PartyCreationScene implements Scene {
   }
 
   private buildConfirm(): void {
-    // Show party summary
-    const summaryWin = new Window({ x: SCREEN_MARGIN, y: 120, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 500 });
-    for (let i = 0; i < this.selectedClasses.length; i++) {
-      const cls = this.selectedClasses[i];
-      const name = DEFAULT_NAMES[cls.id] ?? cls.name;
-      const text = new BitmapText({
-        text: `${name}  ${cls.name}  HP:${cls.baseStats.hp}`,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
-      });
-      text.position.set(summaryWin.contentX, summaryWin.contentY + i * 48);
-      summaryWin.addChild(text);
-    }
-    this.container.addChild(summaryWin);
+    this.container.addChild(buildPartySummary(this.selectedClasses, this.names));
 
     this.confirmWindow = new Window({ x: 660, y: 700, width: 600, height: 200 });
     this.confirmMenu = new Menu({
@@ -162,23 +136,50 @@ export class PartyCreationScene implements Scene {
       lineHeight: 48,
       onSelect: (item) => {
         if (item.value === 'begin') this.beginAdventure();
-        else {
-          this.selectedClasses.pop();
-          this.currentSlot = this.selectedClasses.length;
-          this.phase = 'select';
-          this.buildUI();
-        }
+        else this.backToClassSelect();
       },
-      onCancel: () => {
-        this.selectedClasses.pop();
-        this.currentSlot = this.selectedClasses.length;
-        this.phase = 'select';
-        this.buildUI();
-      },
+      onCancel: () => this.backToClassSelect(),
       eventBus: this.game.events,
     });
     this.confirmWindow.addChild(this.confirmMenu);
     this.container.addChild(this.confirmWindow);
+  }
+
+  private buildNameEntry(): void {
+    const win = new Window({ x: SCREEN_MARGIN, y: 120, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 600 });
+    const cls = this.selectedClasses[this.currentSlot];
+    this.nameGrid = new NameEntryGrid({
+      // defaults are unique: a second Warrior is FGHTR2
+      defaultName: uniqueDefaultName(DEFAULT_NAMES[cls.id] ?? cls.name.slice(0, 6), this.names),
+      x: win.contentX,
+      y: win.contentY,
+      eventBus: this.game.events,
+      onDone: (name) => this.onNamed(name),
+      onExit: () => {
+        // cancel on an empty name: back to class select for this slot
+        this.selectedClasses.pop();
+        this.phase = 'select';
+        this.buildUI();
+      },
+    });
+    win.addChild(this.nameGrid);
+    this.container.addChild(win);
+  }
+
+  private onNamed(name: string): void {
+    this.names.push(name);
+    this.currentSlot++;
+    this.phase = this.currentSlot >= 4 ? 'confirm' : 'select';
+    this.buildUI();
+  }
+
+  /** Drop the last member (class and name) and pick that slot's class again. */
+  private backToClassSelect(): void {
+    this.selectedClasses.pop();
+    this.names.pop();
+    this.currentSlot = this.selectedClasses.length;
+    this.phase = 'select';
+    this.buildUI();
   }
 
   private updatePreview(classIndex: number): void {
@@ -186,25 +187,7 @@ export class PartyCreationScene implements Scene {
     const cls = this.baseClasses[classIndex];
     if (!cls) return;
 
-    const previewWin = new Window({ x: 0, y: 0, width: 600, height: 800 });
-    const lines = [
-      cls.name,
-      '',
-      `HP:${cls.baseStats.hp}  STR:${cls.baseStats.strength}`,
-      `AGI:${cls.baseStats.agility} INT:${cls.baseStats.intelligence}`,
-      `VIT:${cls.baseStats.vitality} LCK:${cls.baseStats.luck}`,
-      '',
-      `Magic: W${cls.spellLevels.white}/B${cls.spellLevels.black}`,
-    ];
-    lines.forEach((line, i) => {
-      const t = new BitmapText({
-        text: line,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
-      });
-      t.position.set(previewWin.contentX, previewWin.contentY + i * LINE_HEIGHT);
-      previewWin.addChild(t);
-    });
-    this.previewDisplay.addChild(previewWin);
+    this.previewDisplay.addChild(buildClassPreview(cls));
   }
 
   update(_dt: number): void {
@@ -218,6 +201,10 @@ export class PartyCreationScene implements Scene {
           resolve();
         }
       }
+      return;
+    }
+    if (this.phase === 'name' && this.nameGrid) {
+      this.nameGrid.update(this.game.input);
       return;
     }
     if (this.phase === 'confirm' && this.confirmMenu) {
@@ -237,18 +224,13 @@ export class PartyCreationScene implements Scene {
     const cls = this.baseClasses.find((c) => c.id === classId);
     if (!cls) return;
     this.selectedClasses.push(cls);
-    this.currentSlot++;
-    if (this.currentSlot >= 4) {
-      this.phase = 'confirm';
-    }
+    this.phase = 'name';
     this.buildUI();
   }
 
   private onBack(): void {
     if (this.currentSlot > 0) {
-      this.selectedClasses.pop();
-      this.currentSlot--;
-      this.buildUI();
+      this.backToClassSelect();
     } else {
       this.game.scenes.switchTo('title');
     }
@@ -257,8 +239,8 @@ export class PartyCreationScene implements Scene {
   private beginAdventure(): void {
     // a new game starts from nothing: no party, gold, items or flags left over from a previous run
     this.game.resetState();
-    for (const cls of this.selectedClasses) {
-      const name = DEFAULT_NAMES[cls.id] ?? cls.name;
+    for (const [i, cls] of this.selectedClasses.entries()) {
+      const name = this.names[i];
       const character = new Character({ name, classData: cls });
       if (!this.game.party.add(character)) console.error(`Could not add ${name} to the new party`);
     }

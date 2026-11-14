@@ -7,6 +7,7 @@ import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import type { Character } from '../entities/Character.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { buySpell } from '../systems/SpellPurchase.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type State = 'spells' | 'character' | 'slot';
@@ -171,16 +172,16 @@ export class MagicShopScene implements Scene {
   }
 
   private confirmPurchase(): void {
-    const price = this.getSpellPrice(this.selectedSpell!);
-    if (!this.game.party.spendGold(price)) {
-      this.showMessage('Not enough gold.');
+    const spell = this.selectedSpell!;
+    // gold is taken only after learnSpell succeeds
+    const result = buySpell(this.game.party, this.selectedMember!, spell, this.getSpellPrice(spell));
+    if (!result.ok) {
+      this.showMessage(result.message);
       return;
     }
-
-    this.selectedMember!.learnSpell(this.selectedSpell!.id, this.selectedSpell!.level);
     this.updateGold();
-    this.showMessage(`${this.selectedMember!.name} learned ${this.selectedSpell!.name}!`);
     this.showSpellMenu();
+    this.showMessage(result.message);
   }
 
   private showMessage(msg: string): void {

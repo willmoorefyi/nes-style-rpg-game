@@ -3,7 +3,7 @@ import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellData } from '../types/index.js';
 import type { BattleCommand } from './BattleCommands.js';
 import type { StatusEffect } from './StatusEffects.js';
-import { calculateMagicDamage } from './DamageFormula.js';
+import { calculateMagicDamage, healAmount } from './DamageFormula.js';
 
 import type { DamageEvent } from './BattleStateMachine.js';
 
@@ -127,7 +127,6 @@ export class SpellExecutor {
   }
 
   private executeHealSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
-    const power = spell.power ?? 30;
     const targets = spell.targeting === 'all_allies'
       ? (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty())
       : cmd.targetId
@@ -135,12 +134,7 @@ export class SpellExecutor {
         : [];
 
     for (const target of targets) {
-      const heal = calculateMagicDamage(
-        { intelligence: casterInt },
-        { intelligence: 1 },
-        { power, isHealing: true },
-        this.deps.rng
-      );
+      const heal = healAmount(spell, { intelligence: casterInt }, this.deps.rng);
       if ('currentHp' in target && 'data' in target) {
         // EnemyInstance
         const enemy = target as EnemyInstance;

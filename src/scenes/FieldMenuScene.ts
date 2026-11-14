@@ -11,12 +11,11 @@ export class FieldMenuScene implements Scene {
   private game: Game;
   private window: Window;
   private menu: Menu;
-  private saveItem: MenuItem;
+  private saveIndex: number;
 
   constructor(game: Game) {
     this.game = game;
     this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 500 });
-    this.saveItem = { label: 'Save', value: 'save', enabled: false };
     const items: MenuItem[] = [
       { label: 'Items', value: 'items' },
       { label: 'Magic', value: 'magic' },
@@ -24,9 +23,10 @@ export class FieldMenuScene implements Scene {
       { label: 'Status', value: 'status' },
       { label: 'Order', value: 'order' },
       { label: 'Config', value: 'config' },
-      this.saveItem,
+      { label: 'Save', value: 'save' },
       { label: 'Load', value: 'load' },
     ];
+    this.saveIndex = items.findIndex((i) => i.value === 'save');
     this.menu = new Menu({
       items,
       x: this.window.contentX,
@@ -41,7 +41,8 @@ export class FieldMenuScene implements Scene {
   enter(): void {
     // C7: Evaluate canSave on enter, not constructor
     const exploration = this.game.scenes.get<ExplorationScene>('exploration');
-    this.saveItem.enabled = exploration?.canSave() ?? false;
+    // redraws the item, so Save is only grey where the map forbids saving
+    this.menu.setItemEnabled(this.saveIndex, exploration?.canSave() ?? false);
   }
 
   update(_dt: number): void {
