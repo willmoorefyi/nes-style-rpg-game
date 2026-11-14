@@ -2760,6 +2760,59 @@ All 22 momus issues apply. Resolutions:
 
 ---
 
+### T6 result
+
+**Commits on `t6-integration`:**
+
+| Part | Commit | What |
+|---|---|---|
+| T6-0 | `5394f3d` | the shared contract |
+| T6a | `e1c0252` | the overworld and map-check splits, BA-12 map keys |
+| T6b | `8c2671d`, `00e45b3` | the interiors split, IN-4, CT-9, UI-2 (vendor_f / farmer / burgher) |
+| T6c | `0a85b61` | CA-4, CA-5, CA-6, CA-7 (rooms and chests), TF-1; CA-3 won't-fix |
+| T6d | `6c56547` | MS-7 field menu and party panel, UI-1 HUD panels, CA-2 door effect |
+| T6e | `c3dd16d` | BA-8 battle text, party panel, 9-enemy list, active hero; BA-9 reach and contact-frame miss |
+| T6f | `4fcef24` | ShopScene split, item descriptions, help bar, Equip preview, magic-shop learners |
+| T6g | `aaa43ab` | 21 staged backgrounds; the temple uses `evil_temple`; zone-aware backdrop lookup |
+| T6-art | branch `t6-art` | the paid sheets (budget 25 of 100) |
+| T6h | `1424e80` | the art fitted into the maps |
+
+Integration fixes: a seeded defeat-flow test (`9520c50`), and the review fixes below.
+
+**Fallbacks and won't-fix:**
+- **OW-8:** keeps `temple_icon`. The `temple_grand` door failed revision 13 on all 3 attempts, and at 0.25 scale the temple at (14,37) still can't be picked out. This stays open for the second pass.
+- **CA-3:** won't-fix; the 1F and 2F stairs keep the classic layout.
+- **Sheet names:** §2 T6h's `ruins.json` / `vault.json` are really `overworld/grand.json` / `castle/stairs_lib.json`.
+
+**Accepted deviations (momus):**
+- the bridge gap is 49 % transparent;
+- `vendor_f`'s back-frame shawl flickers;
+- the door rule reads only the first kit;
+- the reach overlap is 24 px;
+- the extra files `shopLists.ts` and `spellLearners.ts`;
+- `fiend_hall` is a staging-only entry;
+- `evil_temple` is committed both as itself and as `temple`;
+- `potion_shelf` stands in for the wine racks;
+- the seeded defeat-flow test.
+
+**Carried to the second pass:**
+- the bridge debris is brown wood next to pale stone stubs; new stone debris, or wooden stubs, would match;
+- the vendor_f flicker;
+- OW-8 temple visibility.
+
+**Browser checks** (`?mute=1`; screenshots in `/tmp/t6/`, background comparisons in `/tmp/t6/bg/`):
+- **Temple background:** `t6_bg_evil_temple` and `t6_bg_abandoned_castle`. evil_temple is chosen.
+- **BA-12 backdrops:** a beach cell at (58,7) gets `shoreline`; a forest-edge cell at (8,11) gets `forest`.
+- **CA-2 transitions:** 16 Cornelia doors zoom, and the castle gate fades.
+- **Field menu (MS-7):** party panel, gold, time, location and the help bar.
+- **Battle:** 9 enemies show as "6x Goblin / 3x Wolf"; the compact HP panel; the active hero stays visible.
+- **Castle 1F:** the treasury chest gives a Cabin; the stairwell is top-down.
+- **Signpost:** has text.
+- **Magic shop:** the description and "Learn: WM RM".
+- **Inn at 0 G:** the message box and HUD panels don't overlap.
+- **Temple:** the top corners are stone.
+- **Console:** 0 errors.
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
