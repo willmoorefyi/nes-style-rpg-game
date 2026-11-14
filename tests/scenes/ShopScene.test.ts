@@ -187,7 +187,7 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       expect(scene.quantityMax).toBe(0);
       expect(party.gold).toBe(500);
       expect(inventory.getQuantity('potion')).toBe(99);
-      expect(scene.resultMessage).toBe("You can't carry any more Potion.");
+      expect(scene.resultMessage).toBe("You can't carry another Potion.");
     });
 
     it('E1: the picker stops at the room left in the bag (95 potions, 600 G: 4)', async () => {
@@ -241,6 +241,89 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       expect(scene.transparent).toBe(true);
       const magic = new MagicShopScene({ party: { gold: 0, all: [] } } as unknown as Game, 'cornelia_white');
       expect(magic.transparent).toBe(true);
+    });
+  });
+
+  describe('U9: the result line is on the help bar; the gold window shows the gold only', () => {
+    it('at 99 potions, Buy > Potion puts the shared wording on the help bar', async () => {
+      const { scene, tap } = await setup('cornelia_item', { potion: 99 }, 500);
+      tap('confirm'); // Buy
+      tap('confirm'); // Potion
+      expect(scene.helpText).toBe("You can't carry another Potion.");
+      expect(scene.goldLines).toEqual(['Gold: 500G']);
+      tap('down');    // the next input clears it, and the help describes the item again
+      expect(scene.resultMessage).toBe('');
+      expect(scene.helpText).toBe(ItemRegistry.getItem('antidote')!.description);
+    });
+
+    it('"Bought 2 Potion." replaces the description on the help bar until the next input', async () => {
+      const { scene, tap } = await setup('cornelia_item');
+      tap('confirm');
+      tap('confirm');
+      tap('right');
+      tap('confirm');
+      expect(scene.helpText).toBe('Bought 2 Potion.');
+      expect(scene.goldLines).toHaveLength(1);
+      scene.update(1);
+      expect(scene.helpText).toBe('Bought 2 Potion.');
+    });
+  });
+
+  describe('U11: "Equip it now?" after buying gear', () => {
+    /** Buy `count` of the weapon shop's Rapier (row 4) with a Lv 1, unequipped party. */
+    async function buyRapiers(count: number) {
+      const s = await setup('cornelia_weapon', {}, 400);
+      for (const c of s.party.all) c.unequip('weapon');
+      s.tap('confirm'); // Buy
+      const row = ShopRegistry.getShop('cornelia_weapon')!.inventory.indexOf('rapier');
+      for (let i = 0; i < row; i++) s.tap('down');
+      s.tap('confirm'); // Rapier
+      for (let i = 1; i < count; i++) s.tap('right');
+      s.tap('confirm'); // buy
+      return s;
+    }
+
+    it('buying a Rapier asks, with FGHTR and THIEF enabled and the mages greyed', async () => {
+      const { scene, tap, party, inventory } = await buyRapiers(1);
+      const rows = scene.equipPromptRows;
+      expect(rows.map((r) => r.enabled)).toEqual([true, true, false, false, true]);
+      expect(rows[0].label).toMatch(/^FGHTR {2}ATK \d+→\d+$/);
+      expect(rows[4].label).toBe('Not now');
+      tap('confirm'); // FGHTR
+      expect(party.get(0)!.getEquipped('weapon')?.id).toBe('rapier');
+      expect(inventory.getQuantity('rapier')).toBe(0);
+      expect(party.gold).toBe(390);
+      expect(scene.equipPromptRows).toEqual([]);
+    });
+
+    it('"Not now" leaves the Rapier in the bag', async () => {
+      const { scene, tap, party, inventory } = await buyRapiers(1);
+      tap('up'); // wraps to "Not now"
+      tap('confirm');
+      expect(scene.equipPromptRows).toEqual([]);
+      expect(inventory.getQuantity('rapier')).toBe(1);
+      expect(party.get(0)!.getEquipped('weapon')).toBeNull();
+    });
+
+    it('two Rapiers ask again for the second copy: FGHTR, then THIEF', async () => {
+      const { scene, tap, party, inventory } = await buyRapiers(2);
+      tap('confirm'); // FGHTR
+      const again = scene.equipPromptRows;
+      expect(again.map((r) => r.enabled)).toEqual([false, true, false, false, true]);
+      expect(again[0].label).toMatch(/equipped$/);
+      tap('confirm'); // the cursor starts on THIEF
+      expect(party.get(1)!.getEquipped('weapon')?.id).toBe('rapier');
+      expect(inventory.getQuantity('rapier')).toBe(0);
+      expect(scene.equipPromptRows).toEqual([]);
+    });
+
+    it('buying a Potion opens no prompt', async () => {
+      const { scene, tap } = await setup('cornelia_item');
+      tap('confirm');
+      tap('confirm');
+      tap('confirm');
+      expect(scene.equipPromptRows).toEqual([]);
+      expect(scene.resultMessage).toBe('Bought 1 Potion.');
     });
   });
 });

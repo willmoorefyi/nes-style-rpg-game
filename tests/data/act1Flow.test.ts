@@ -10,7 +10,7 @@ import type { MapData } from '../../src/types/index.js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const readMap = (id: string) => parse(readFileSync(join(root, 'assets/maps/ai', `${id}.yaml`), 'utf-8')) as MapData;
 interface Step { type: string; flag?: string; text?: string; map?: string; entrance?: string; facing?: string;
-  image?: string | null }
+  image?: string | null; dim?: number }
 const cutscenes = parse(readFileSync(join(root, 'assets/data/cutscenes.yaml'), 'utf-8')) as
   Array<{ id: string; steps: Step[] }>;
 const script = (id: string): Step[] => cutscenes.find((c) => c.id === id)!.steps;
@@ -122,6 +122,19 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
     const fades = steps.filter((s) => s.type === 'fade_out' || s.type === 'fade_in');
     expect(fades[fades.length - 1].type).toBe('fade_out');
     expect(steps[steps.length - 1]).toEqual({ type: 'backdrop', image: null });
+  });
+
+  it('U16: the opening\'s first page is dark: its backdrop is dimmed to mean luma 60 or less; the arrival is not', () => {
+    // mean luma (0-255) of the staged backgrounds, measured with PIL on the committed .webp files
+    const LUMA: Record<string, number> = { dark_forest: 112, grassland: 154 };
+    const backdrops = script('opening').filter((s) => s.type === 'backdrop' && s.image);
+    const first = backdrops[0];
+    expect(first.image).toBe('dark_forest');
+    expect(first.dim).toBeDefined();
+    expect(first.dim!).toBeLessThanOrEqual(0.5);
+    expect(LUMA[first.image as string] * first.dim!).toBeLessThanOrEqual(60);
+    const arrival = backdrops.find((s) => s.image === 'grassland')!;
+    expect(arrival.dim ?? 1).toBe(1);
   });
 
   it('the King plays the act-1 ending once, after the rescue, and it never builds the bridge in act 1', () => {

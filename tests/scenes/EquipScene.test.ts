@@ -208,10 +208,13 @@ describe('R3: Equip keeps the worn item when the bag is full, shows one focus, a
     all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
     tap('confirm'); // member
     tap('confirm'); // Weapon
+    const preview = scene.statsLines;
     tap('confirm'); // (Unequip)
     expect(all[0].getEquipped('weapon')?.id).toBe('rapier');
     expect(inventory.getQuantity('rapier')).toBe(99);
-    expect(scene.statsLines).toBe('No room for\nRapier.');
+    // U9: the shared wording, on the help bar; the stats window keeps its stats
+    expect(scene.helpText).toBe("You can't carry another Rapier.");
+    expect(scene.statsLines).toBe(preview);
   });
 
   it('re-equipping the worn item with 99 in the bag is a no-op (no copy is lost)', async () => {
@@ -246,11 +249,13 @@ describe('R3: Equip keeps the worn item when the bag is full, shows one focus, a
     // rows after (Unequip) follow registry order; move to the iron sword's row
     const order = ItemRegistry.getAllByType('weapon').filter(i => i.id === 'rapier' || i.id === 'iron_sword').map(i => i.id);
     for (let i = 0; i <= order.indexOf('iron_sword'); i++) tap('down');
+    const preview = scene.statsLines;
     tap('confirm');
     expect(all[0].getEquipped('weapon')?.id).toBe('rapier');
     expect(inventory.getQuantity('rapier')).toBe(99);
     expect(inventory.getQuantity('iron_sword')).toBe(1);
-    expect(scene.statsLines).toBe('No room for\nRapier.');
+    expect(scene.helpText).toBe("You can't carry another Rapier.");
+    expect(scene.statsLines).toBe(preview);
   });
 
   it('E3: only the menu with the focus has a white cursor', async () => {

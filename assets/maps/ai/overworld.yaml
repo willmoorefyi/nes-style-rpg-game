@@ -107,6 +107,18 @@ npcs:
   chestItem: iron_shield
   chestFlag: CHEST_ERDRICK_TOMB
   dialog: [You found an Iron Shield!]
+- id: bridge_worker_w
+  sprite: farmer
+  x: 28
+  y: 33
+  showIf: INTRO_COMPLETE
+  dialog: ['We''re rebuilding the span, stone by stone. Come back when the work is done.']
+- id: bridge_worker_e
+  sprite: villager
+  x: 31
+  y: 33
+  showIf: INTRO_COMPLETE
+  dialog: ['The King''s orders: the north bridge before the harvest. Mind the scaffolding!']
 transitions:
 - {x: 28, y: 43, targetMap: cornelia, targetEntrance: castle}
 - {x: 26, y: 45, targetMap: cornelia, targetEntrance: west_gate}

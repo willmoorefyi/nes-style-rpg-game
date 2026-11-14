@@ -197,3 +197,47 @@ describe('TitleScene: a second confirm does not leak into party creation (U2)', 
     }
   });
 });
+
+describe('TitleScene: Continue opens Load without the "lost" warning (U6, U revision 8)', () => {
+  it('Game Over -> Title -> Continue: "Load Slot 1?" on Yes although the wiped party is still in memory', async () => {
+    const { loadRealRegistries } = await import('../helpers/realData.js');
+    await loadRealRegistries();
+    const { Game } = await import('../../src/core/Game.js');
+    const { LoadScene } = await import('../../src/scenes/LoadScene.js');
+    const { Character } = await import('../../src/entities/Character.js');
+    const { ClassRegistry } = await import('../../src/data/ClassRegistry.js');
+    const game = new Game();
+    vi.spyOn(game.audio, 'playMusic').mockResolvedValue(undefined);
+    const fallen = new Character({ name: 'ROLF', classData: ClassRegistry.getClass('warrior')! });
+    fallen.currentHp = 0;
+    game.party.add(fallen);  // what Game Over leaves behind
+    SaveManager.save(0, game.party, game.inventory, game.gameFlags, 'cornelia', { x: 1, y: 1 }, 0);
+    const load = new LoadScene(game);
+    const switchTo = vi.spyOn(game.scenes, 'switchTo');
+    game.input.attach();
+    game.scenes.register('title', new TitleScene(game));
+    game.scenes.register('loadMenu', load);
+    game.scenes.register('exploration', { container: new Container(), enter: () => {}, exit: () => {}, update: () => {} });
+    const frame = () => { game.scenes.update(1); game.input.update(); };
+    const tap = async (code: string) => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { code }));
+      window.dispatchEvent(new KeyboardEvent('keyup', { code }));
+      frame();
+      await new Promise((r) => setTimeout(r, 0));
+      for (let i = 0; i < 10; i++) frame(); // past the scene-entry hold-off
+    };
+    try {
+      await game.scenes.switchTo('title');
+      for (let i = 0; i < 10; i++) frame();
+      await tap('ArrowDown');
+      await tap('KeyZ');          // Continue
+      expect(game.scenes.current).toBe('loadMenu');
+      await tap('KeyZ');          // slot 1
+      expect(load.confirmPrompt).toBe('Load Slot 1?');
+      await tap('KeyZ');          // the default answer is Yes
+      expect(switchTo).toHaveBeenLastCalledWith('exploration');
+    } finally {
+      game.input.detach();
+    }
+  });
+});

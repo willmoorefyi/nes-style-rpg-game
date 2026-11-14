@@ -9,9 +9,21 @@ import { NES_FONT } from '../ui/NESFont.js';
 import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
 import { castFieldSpell, isFallen, isFieldSpell } from '../systems/FieldSpellEffects.js';
 import { GAME_WIDTH, SCREEN_MARGIN, FONT_SIZE } from '../core/LayoutConstants.js';
+import { initialTargetIndex } from '../entities/partyTargets.js';
+import type { StatusEffect } from '../battle/StatusEffects.js';
 
 type Phase = 'selectCaster' | 'selectSpell' | 'selectTarget';
 type FieldSpell = { spell: SpellData; level: number };
+
+const SPELL_CURES: Readonly<Record<string, StatusEffect>> = { cure_poison: 'poison', cure_blind: 'blind', cure_silence: 'silence' };
+
+/** Where a field spell's target cursor starts (U8): CURE on the most hurt, LIFE on the fallen, PURE on the poisoned. */
+export function spellTargetIndex(party: readonly Character[], spell: SpellData): number {
+  if (spell.effect === 'heal') return initialTargetIndex(party, 'heal');
+  if (spell.effect === 'revive') return initialTargetIndex(party, 'revive');
+  const status = SPELL_CURES[spell.effect];
+  return initialTargetIndex(party, status ? 'cure_status' : 'other', status);
+}
 
 export class FieldMagicScene implements Scene {
   readonly container = new Container();
@@ -47,6 +59,8 @@ export class FieldMagicScene implements Scene {
 
   /** The current message line (results and notices). */
   get message(): string { return this.messageText.text; }
+  /** The target cursor while choosing who the spell is cast on, or -1. */
+  get targetIndex(): number { return this.phase === 'selectTarget' ? this.targetMenu?.selectedIndex ?? -1 : -1; }
   /** The help bar's text while it is shown (the highlighted spell's description), else ''. */
   get helpText(): string { return this.help.visible ? this.help.text : ''; }
 
@@ -149,7 +163,8 @@ export class FieldMagicScene implements Scene {
   }
 
   private buildTargetMenu(): void {
-    const prev = this.targetMenu?.selectedIndex ?? 0;
+    const party = this.game.party.all;
+    const prev = this.targetMenu?.selectedIndex ?? (this.selected ? spellTargetIndex(party, this.selected.spell) : 0);
     if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
     const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: `${c.name} ${c.currentHp}/${c.maxHp}`, value: String(i) }));
     this.targetMenu = new Menu({

@@ -36,4 +36,21 @@ def run(B) -> int:
     assert de["pale_stone"] <= MAX_DE, f"W8: pale_stone debris is dE {de['pale_stone']:.1f} from the bridge deck"
     assert de[None] > MAX_DE, f"W8: the unstyled debris already matches the deck (dE {de[None]:.1f})"
     print(f"  W8: bridge debris dE {de[None]:.1f} unstyled, {de['pale_stone']:.1f} as pale_stone")
+    return 1 + _temple_brighter(B, kit)
+
+
+TEMPLE = [f"temple_ruin_{j}_{i}" for j in (0, 1) for i in (0, 1)]
+
+
+def _temple_brighter(B, kit) -> int:
+    """U19: the overworld temple's `brighter` style lifts its mean luma above `bright`, keeping the hue and the
+    saturation (value factor at most 1.5, so it doesn't wash out)."""
+    hue, sat, val = B.RECOLOR["brighter"]
+    assert (hue, sat) == (0, 1.0) and B.RECOLOR["bright"][2] < val <= 1.5, f"U19: brighter is {B.RECOLOR['brighter']}"
+    if not all(p in kit.approved for p in TEMPLE):
+        return 0
+    luma = {s: float(_opaque_mean([B.styled(kit, p, s) for p in TEMPLE]) @ np.array([0.299, 0.587, 0.114]))
+            for s in ("bright", "brighter")}
+    assert luma["brighter"] > luma["bright"], f"U19: brighter temple luma {luma}"
+    print(f"  U19: temple luma {luma['bright']:.1f} bright, {luma['brighter']:.1f} brighter")
     return 1

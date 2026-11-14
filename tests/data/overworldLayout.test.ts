@@ -491,3 +491,33 @@ describe('overworld second-pass fixes (R4b)', () => {
     }
   });
 });
+
+describe('overworld third-pass fixes (U)', () => {
+  it('U17: two builders stand beside the south stub from INTRO_COMPLETE on, on walkable cells off the stub', () => {
+    const stub = gates.map((g) => [g.x, g.y] as Cell);
+    expect(stub).toEqual([[29, 32], [30, 32]]);
+    const workers = map.npcs.filter((n) => n.showIf === 'INTRO_COMPLETE');
+    expect(workers).toHaveLength(2);
+    const atlas = JSON.parse(readFileSync(join(root, 'assets/sprites/characters-ai.json'), 'utf-8')) as
+      { sheets: Record<string, unknown> };
+    const start = entrance('cornelia');
+    const reachable = reach(start);
+    for (const w of workers) {
+      const near = Math.min(...stub.map(([x, y]) => Math.abs(w.x - x) + Math.abs(w.y - y)));
+      expect(near, w.id).toBeLessThanOrEqual(2);
+      expect(stub.some(([x, y]) => x === w.x && y === w.y), `${w.id} on the stub`).toBe(false);
+      expect(col.isWalkable(w.x, w.y, walking), `${w.id} cell`).toBe(true);
+      expect(reachable.has(key(w.x, w.y)), `${w.id} can be walked up to`).toBe(true);
+      expect(atlas.sheets[w.sprite], `${w.sprite}: existing field art`).toBeDefined();
+      expect((w.dialog as string[]).join(' ').length).toBeGreaterThan(0);
+    }
+    // the stub's road stays open: the bridge foot is still reachable with the workers standing
+    const blocked = new Set(workers.map((w) => key(w.x, w.y)));
+    expect(reach(start, blocked).has(key(29, 33))).toBe(true);
+  });
+
+  it('U19: the temple icon uses the `brighter` recolour (darker than the city at 0.25 scale under `bright`)', () => {
+    const temple = (source.objects as Array<{ name?: string; style?: string }>).find((o) => o.name === 'temple')!;
+    expect(temple.style).toBe('brighter');
+  });
+});

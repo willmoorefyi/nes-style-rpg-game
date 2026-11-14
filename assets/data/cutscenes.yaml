@@ -13,6 +13,8 @@
       duration: 500
     - type: backdrop
       image: dark_forest
+      # U16: the staged forest is sunny (mean luma 112); dimmed and cooled, it reads as a world veiled in darkness
+      dim: 0.35
     - type: fade_in
       duration: 800
     - type: dialog

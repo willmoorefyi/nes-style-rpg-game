@@ -139,13 +139,64 @@ describe('R3: Save and Load screens (S4, S5)', () => {
     expect(load.confirmPrompt).toContain('Load Slot 1?');
     expect(load.confirmPrompt).toContain('Progress since your last save is lost.');
     expect(g.scenes.switchTo).not.toHaveBeenCalled();
-    press('down');
-    press('confirm'); // No
+    press('confirm'); // No (the default during a game, U6)
     expect(load.confirmPrompt).toBe('');
     expect(g.scenes.switchTo).not.toHaveBeenCalled();
     press('confirm'); // the slot again
+    press('up');
     press('confirm'); // Yes
     expect(restore).toHaveBeenCalledTimes(1);
     expect(g.scenes.switchTo).toHaveBeenCalledWith('exploration');
+  });
+});
+
+describe('U6: the Load prompt defaults to No only during a game', () => {
+  beforeEach(() => localStorage.clear());
+
+  async function withSave() {
+    const { loadRealRegistries } = await import('../helpers/realData.js');
+    await loadRealRegistries();
+    const { Character } = await import('../../src/entities/Character.js');
+    const { ClassRegistry } = await import('../../src/data/ClassRegistry.js');
+    const g = game();
+    g.party.add(new Character({ name: 'ROLF', classData: ClassRegistry.getClass('warrior')! }));
+    const save = new SaveScene(g as unknown as Game);
+    save.enter();
+    g.pressed.add('confirm');
+    save.update(1);
+    g.pressed.clear();
+    const restore = vi.fn();
+    const lg = { ...g, restoreState: restore, pendingEntrance: null, battleRetry: null, pendingBattle: null };
+    const load = new LoadScene(lg as unknown as Game);
+    const press = (a: string): void => { g.pressed.add(a); load.update(1); g.pressed.clear(); };
+    return { g, load, press, restore };
+  }
+
+  it('from the field (a party is in play) the prompt warns and starts on No', async () => {
+    const { load, press, restore } = await withSave();
+    load.enter();
+    press('confirm');               // slot 1
+    expect(load.confirmPrompt).toContain('lost');
+    press('confirm');               // the default answer
+    expect(restore).not.toHaveBeenCalled();
+    expect(load.confirmPrompt).toBe('');
+  });
+
+  it('from the title (Continue, even after Game Over left a party) it is "Load Slot 1?" on Yes', async () => {
+    const { g, load, press, restore } = await withSave();
+    expect(g.party.size).toBe(1);   // Game Over -> Title keeps the wiped party in memory
+    load.enter({ fromTitle: true });
+    press('confirm');
+    expect(load.confirmPrompt).toBe('Load Slot 1?');
+    press('confirm');               // the default answer
+    expect(restore).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-opening from the field after the title forgets fromTitle', async () => {
+    const { load, press } = await withSave();
+    load.enter({ fromTitle: true });
+    load.enter();
+    press('confirm');
+    expect(load.confirmPrompt).toContain('lost');
   });
 });

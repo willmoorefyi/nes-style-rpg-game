@@ -201,18 +201,17 @@ f2.deco([["throne_0_0", "throne_0_1"], ["throne_1_0", "throne_1_1"]], 21, 6, fit
 f2.stairs_down(21, 24, "cornelia-castle", "stairs")
 for x in (13, 16, 27, 30):
     f2.wall([["arch_window_top"], ["arch_window_bottom"]], x, 4)
-for x in (19, 24):
-    f2.wall([["flag_top"], ["flag_bottom"]], x, 4)
-for x in (18, 25):
-    f2.wall([["torch"]], x, 4)
-for x in (20, 23):
-    f2.wall([["banner"]], x, 4)
+for x, parts in [(x, [["flag_top"], ["flag_bottom"]]) for x in (19, 24)] + [(x, [["torch"]]) for x in (18, 25)] + [
+        (x, [["banner"]]) for x in (20, 23)]:
+    f2.wall(parts, x, 4)
+for x in (19, 24):                       # U18: pillars close the dais's back corners, plants (below) its front
+    f2.pillar(x, 6)
 for y in (9, 13, 17):
     f2.pillar(15, y)
     f2.pillar(28, y)
 for (x, y) in [(13, 24), (30, 24), (13, 14), (30, 14)]:
     f2.statue(x, y)
-for (x, y) in [(12, 6), (31, 6), (12, 25), (31, 25), (18, 25), (25, 25)]:
+for (x, y) in [(12, 6), (31, 6), (12, 25), (31, 25), (18, 25), (25, 25), (19, 8), (20, 8), (23, 8), (24, 8)]:
     f2.deco([["plant"]], x, y)
 # the princess's chamber
 f2.tall("bed", 2, 6)
@@ -267,7 +266,7 @@ f2.npcs += [
                           " follow the road; it ends at the temple door.",
                           "Bring her home safely, and I will rebuild the bridge to the north for you."]}],
      "cutscene": {"id": "act1_complete", "requiredFlag": "PRINCESS_RESCUED", "onceFlag": "INTRO_COMPLETE"}},
-    {"id": "princess", "sprite": "princess", "x": 23, "y": 8, "showIf": "PRINCESS_RESCUED",
+    {"id": "princess", "sprite": "princess", "x": 22, "y": 8, "showIf": "PRINCESS_RESCUED",
      "dialog": [{"condition": "GOT_LUTE", "text": ["Thank you again. Keep the lute safe."]},
                 {"text": ["Thank you for rescuing me from Garland.",
                           "Please take this lute. It has been in our family for generations.",
@@ -296,7 +295,8 @@ f2.npcs += [
 ]
 f2.write("Cornelia Castle 2F: throne room, the princess's chamber, the King's study, guard room (tower stair),"
          " chapel.",
-         {"stairs": [21, 23], "tower": [37, 6], "throne_return": [21, 9]})     # T2: the rescue warps here
+         {"stairs": [21, 23], "tower": [37, 6], "throne_return": [21, 9]},     # T2: the rescue warps here
+         extra={"unreachable_ok": [[x, y] for x in (20, 23) for y in (6, 7)]})  # U18: the dais behind the royals
 
 
 # ════════════════════════════ 3F: the sage's lookout ════════════════════════════

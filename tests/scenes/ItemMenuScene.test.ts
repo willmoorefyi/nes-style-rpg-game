@@ -179,3 +179,51 @@ describe('E7: the field item menu: two columns, the cursor keeps its place, gear
     expect(menu.helpText).toBe('Equip it from the Equip menu.');
   });
 });
+
+describe('U8: the item target cursor starts on who needs the item', () => {
+  function open() {
+    const input = tapInput();
+    const party = new PartyManager();
+    const make = (name: string, cls: string, hp?: number): Character => {
+      const c = new Character({ name, classData: ClassRegistry.getClass(cls)! });
+      if (hp !== undefined) c.currentHp = hp;
+      party.add(c);
+      return c;
+    };
+    make('FGHTR', 'warrior');
+    const thief = make('THIEF', 'thief', 8);
+    make('W.MAG', 'white_mage');
+    make('B.MAG', 'black_mage', 0);
+    const inventory = new Inventory();
+    inventory.add('potion', 3);
+    inventory.add('phoenix_down', 1);
+    inventory.add('antidote', 1);
+    const game = { input, party, inventory, scenes: { pop: vi.fn(), get: vi.fn() } };
+    const menu = new ItemMenuScene(game as unknown as Game);
+    menu.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => menu.update(1));
+    return { menu, tap, thief };
+  }
+
+  it('a Potion starts on the most hurt living member, a Phoenix Down on the fallen one', () => {
+    const { menu, tap } = open();
+    tap('confirm');                       // Potion
+    expect(menu.targetIndex).toBe(1);     // THIEF at 8 HP
+    tap('cancel');
+    tap('down');
+    tap('confirm');                       // Phoenix Down
+    expect(menu.targetIndex).toBe(3);     // B.MAG at 0 HP
+  });
+
+  it('an Antidote starts on the first poisoned member, else on the first row', () => {
+    const { menu, tap, thief } = open();
+    tap('down');
+    tap('down');
+    tap('confirm');                       // Antidote, nobody poisoned
+    expect(menu.targetIndex).toBe(0);
+    tap('cancel');
+    thief.statusTracker.apply('poison', 99);
+    tap('confirm');
+    expect(menu.targetIndex).toBe(1);
+  });
+});

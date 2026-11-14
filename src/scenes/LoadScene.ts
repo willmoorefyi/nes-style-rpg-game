@@ -10,6 +10,9 @@ import { MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
 export const LOAD_TITLE = 'Load: choose a slot';
 
+/** How the Load screen was opened (U6): from the title's Continue nothing unsaved can be lost. */
+export interface LoadOpenOptions { fromTitle?: boolean }
+
 export class LoadScene implements Scene {
   readonly container = new Container();
   private readonly listWindow = new Window({ ...SLOT_RECTS.list });
@@ -17,6 +20,7 @@ export class LoadScene implements Scene {
   private menu!: Menu;
   private slots: (SlotSummary | null)[] = [];
   private confirmBox?: ConfirmBox;
+  private fromTitle = false;
 
   constructor(private readonly game: Game) {
     this.container.addChild(titleWindow(LOAD_TITLE), this.listWindow, this.detail.window);
@@ -45,9 +49,19 @@ export class LoadScene implements Scene {
     this.detail.show(this.slots[0] ?? null);
   }
 
-  enter(): void {
+  /**
+   * `fromTitle` is set only by the title's Continue (`openedFromTitle` once the push has settled); every other opener
+   * (the field menu, Game Over) is a game in progress.
+   */
+  enter(opts?: LoadOpenOptions): void {
+    this.fromTitle = opts?.fromTitle === true;
     this.closeConfirm();
     this.buildMenu();
+  }
+
+  /** The title's Continue opened this screen (U6): nothing unsaved can be lost. */
+  openedFromTitle(): void {
+    this.fromTitle = true;
   }
 
   update(_dt: number): void {
@@ -64,10 +78,15 @@ export class LoadScene implements Scene {
   onResume(): void {}
   exit(): void {}
 
-  /** Loading always asks first (S5): unsaved progress would be lost. */
+  /**
+   * Loading always asks first (S5). During a game unsaved progress would be lost, so the prompt warns and starts on
+   * No (U6); from the title it is a plain "Load Slot N?" on Yes.
+   */
   private askToLoad(slotId: number): void {
+    const warn = !this.fromTitle;
     this.confirmBox = new ConfirmBox({
-      prompt: `Load Slot ${slotId + 1}? Progress since your last save is lost.`,
+      prompt: `Load Slot ${slotId + 1}?${warn ? ' Progress since your last save is lost.' : ''}`,
+      defaultNo: warn && this.game.party.size > 0,
       eventBus: this.game.events,
       onAnswer: (yes) => {
         this.closeConfirm();
