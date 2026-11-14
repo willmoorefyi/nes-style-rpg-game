@@ -221,6 +221,8 @@ export interface MapData {
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
   /** Named arrival cells, e.g. `south_gate: [23, 34]` (targets of `targetEntrance`). */
   entrances?: Record<string, [number, number]>;
+  /** Extra tiles wandering NPCs never step onto (single-file routes they would plug), as [x, y]. */
+  noWander?: [number, number][];
   /** Baked 2x art from assets-src/tools/build_map.py; when set, `layers` is empty. */
   art?: BakedMapArt;
 }

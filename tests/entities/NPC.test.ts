@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { NPC, type NPCData } from '../../src/entities/NPC.js';
 import { Texture } from 'pixi.js';
 
@@ -55,11 +55,9 @@ describe('NPC two-tile art', () => {
   });
 
   it('faces the direction it wanders and uses that row of frames', () => {
-    const npc = new NPC({ ...data, x: 2, y: 2 }, Texture.WHITE, { frames, frameHeight: 96 });
-    // Direction index = floor(random * 4); 0.5 selects index 2, which is "left"
-    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    // Direction index = floor(rng * 4); 0.5 selects index 2, which is "left"
+    const npc = new NPC({ ...data, x: 2, y: 2 }, Texture.WHITE, { frames, frameHeight: 96 }, () => 0.5);
     npc.update(200, () => true);
-    spy.mockRestore();
     expect((npc.sprite.texture as unknown as { row: number }).row).toBe(2);
     expect(npc.tileX).toBe(1);
   });

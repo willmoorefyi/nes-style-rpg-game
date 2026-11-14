@@ -132,6 +132,16 @@ export function validateMapData(data: unknown): MapData {
       assertNumber(`MapData.entrances.${name}[1]`, p[1]);
     }
   }
+  if (data.noWander !== undefined) {
+    assertArray('MapData.noWander', data.noWander);
+    (data.noWander as unknown[]).forEach((pos, i) => {
+      assertArray(`MapData.noWander[${i}]`, pos);
+      const p = pos as unknown[];
+      if (p.length !== 2) throw new ValidationError(`MapData.noWander[${i}]: expected [x, y]`);
+      assertNumber(`MapData.noWander[${i}][0]`, p[0]);
+      assertNumber(`MapData.noWander[${i}][1]`, p[1]);
+    });
+  }
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
   
   return data as unknown as MapData;

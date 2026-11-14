@@ -56,6 +56,9 @@ export class NPC {
   readonly giftFlag?: string;
   readonly cutscene?: NPCCutscene;
   readonly wander: boolean;
+  /** Where the NPC was placed; wandering stays near it. */
+  readonly spawn: { readonly x: number; readonly y: number };
+  private readonly rng: () => number;
   private stepsTaken = 0;
   private wanderTimer: number = 0;
   private wanderInterval: number = 120;
@@ -68,8 +71,10 @@ export class NPC {
   private facing: keyof typeof FACE_ROW = 'down';
   private facingBeforeTalk: keyof typeof FACE_ROW | null = null;
 
-  constructor(data: NPCData, texture: Texture, art?: NPCFrames) {
+  constructor(data: NPCData, texture: Texture, art?: NPCFrames, rng: () => number = Math.random) {
     this.id = data.id;
+    this.spawn = { x: data.x, y: data.y };
+    this.rng = rng;
     this.tileX = data.x;
     this.tileY = data.y;
     this.dialog = data.dialog;
@@ -120,7 +125,11 @@ export class NPC {
     if (row) this.sprite.texture = row[col] ?? row[0];
   }
 
-  update(dt: number, isWalkable: (x: number, y: number) => boolean): void {
+  /**
+   * Wander one frame. `canStepTo` decides whether a chosen neighbour tile may be entered (see NpcWander); while
+   * `hold` is set (the player is right beside the NPC) no new step starts, though a step under way finishes.
+   */
+  update(dt: number, canStepTo: (x: number, y: number) => boolean, hold = false): void {
     if (!this.wander) return;
 
     if (this.isMoving) {
@@ -138,16 +147,17 @@ export class NPC {
       }
       return;
     }
+    if (hold) return;
 
     this.wanderTimer += dt;
     if (this.wanderTimer < this.wanderInterval) return;
 
     // Reset timer to random 120-180 frames (~2-3 seconds)
     this.wanderTimer = 0;
-    this.wanderInterval = 120 + Math.floor(Math.random() * 61);
+    this.wanderInterval = 120 + Math.floor(this.rng() * 61);
 
     // Pick random direction
-    const dir = DIRECTION_OFFSETS[Math.floor(Math.random() * 4)];
+    const dir = DIRECTION_OFFSETS[Math.min(3, Math.floor(this.rng() * 4))];
     const targetX = this.tileX + dir.dx;
     const targetY = this.tileY + dir.dy;
 
@@ -155,7 +165,7 @@ export class NPC {
       this.facing = dir.dx < 0 ? 'left' : dir.dx > 0 ? 'right' : dir.dy < 0 ? 'up' : 'down';
       this.showFrame(0);
     }
-    if (isWalkable(targetX, targetY)) {
+    if (canStepTo(targetX, targetY)) {
       this.moveFromX = this.tileX;
       this.moveFromY = this.tileY;
       this.tileX = targetX;

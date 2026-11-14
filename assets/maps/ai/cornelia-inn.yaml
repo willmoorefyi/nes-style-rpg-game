@@ -23,5 +23,6 @@ npcs:
 transitions:
 - {x: 4, y: 7, targetMap: cornelia, targetEntrance: inn}
 - {x: 5, y: 7, targetMap: cornelia, targetEntrance: inn}
+music: shop
 encounterRate: {min: 999, max: 999}
 encounters: []
