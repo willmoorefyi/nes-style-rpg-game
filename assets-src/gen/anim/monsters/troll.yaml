@@ -55,7 +55,8 @@ keyframes:
     sh_f: [44, 34]
     el_f: [66, 48]
     hand_f: [96, 36]
-    cl_h: [49, 92]
+    cl_h: [60, 84]             # V.1: the dropped mallet hangs behind the loincloth (hurt_in2): it showed half, smeared into
+                               # the cloth with no hand; now only a few handle pixels show under the cloth
     hip_n: [72, 84]
     knee_n: [78, 98]
     foot_n: [74, 113]
@@ -136,3 +137,8 @@ paint:                         # 1-2 px joint notches (the knee notch at 83,108 
   # the outline seam repair fills the approved far-arm / belly gap although nothing there moved: reopened
   - {frame: atk_recover, xy: [[44, 57], [43, 58], [44, 58], [43, 59], [44, 59], [43, 60], [44, 60], [43, 61], [44, 61], [44, 62]], rgb: null}
   - {frame: hurt_in1, xy: [[83, 108]], rgb: [6, 4, 10]}
+  # atk_follow (V.1): the notch and ink line between the hump and the far shoulder closed with the hump's dark green
+  # (it read as a separate block); one outline runs over the top, the armpit outline below is kept
+  - {frame: atk_follow, xy: [[54, 29], [55, 28], [56, 28], [56, 38]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[55, 29], [56, 29], [57, 29], [54, 30], [55, 30], [56, 30], [57, 30], [54, 31], [55, 31], [56, 31], [57, 31], [54, 32], [55, 32], [56, 32], [57, 32], [55, 33], [56, 33], [57, 33], [55, 34], [56, 34], [55, 35], [56, 35], [56, 36], [55, 37], [56, 37]], rgb: [57, 74, 57]}
+  - {frame: atk_follow, xy: [[60, 33], [61, 33], [60, 34], [61, 34], [61, 35]], rgb: [66, 90, 66]}
