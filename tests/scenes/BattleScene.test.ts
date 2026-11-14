@@ -9,6 +9,11 @@ import { Character } from '../../src/entities/Character.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
 import { createMockBattleSceneDeps, createMockInput, type MockInput } from '../helpers/testUtils.js';
+import { ACTIVE_STEP } from '../../src/scenes/battle/ActiveHeroMarker.js';
+import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_HEIGHT, FLOAT_FONT, ENEMY_WINDOW, STRIP_Y } from '../../src/scenes/battle/BattleSceneTypes.js';
+import { WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
+import { ItemSelectionUI } from '../../src/ui/ItemSelectionUI.js';
+import { Window } from '../../src/ui/Window.js';
 
 const mockClassData: CharacterClassData = {
   id: 'fighter',
@@ -162,3 +167,90 @@ describe('BattleScene: Phoenix Down from Item (BA-5)', () => {
     expect(inventory.has('phoenix_down')).toBe(true);
   });
 });
+
+describe('BattleScene: readability (BA-8)', () => {
+  const party = () => ['KNIGHT', 'THIEF'].map(name => new Character({ name, classData: sturdy }));
+
+  it('the active hero stays fully visible for 200 frames of its turn, stepped forward and tinted', () => {
+    const input = createMockInput();
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: party(), enemies: [harmless], rng: () => 0.5 });
+    scene.enter();
+    const home = scene.partySprites[0].x;
+    const otherHome = scene.partySprites[1].x;
+    toCommandMenu(scene, input);
+    const sprite = scene.partySprites[0];
+    const tints = new Set<number>();
+    for (let i = 0; i < 200; i++) {
+      tick(scene, input);
+      expect(sprite.alpha, `frame ${i}`).toBe(1);
+      tints.add(sprite.tint);
+    }
+    expect(sprite.x).toBe(home - ACTIVE_STEP);
+    expect(tints.size).toBeGreaterThan(2);
+    expect(scene.partyPanel.activeIndex).toBe(0);
+    expect(scene.partySprites[1].x).toBe(otherHome);
+  });
+
+  it('the hero steps back into line when its command is chosen', () => {
+    const input = createMockInput();
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: party(), enemies: [harmless], rng: () => 0.5 });
+    scene.enter();
+    const home = scene.partySprites[0].x;
+    toCommandMenu(scene, input);
+    tick(scene, input, 'confirm'); // Fight
+    tick(scene, input, 'confirm'); // the target: the next member's turn
+    expect(scene.partySprites[0].x).toBe(home);
+    expect(scene.partySprites[0].tint).toBe(0xffffff);
+    expect(scene.partyPanel.activeIndex).toBe(1);
+  });
+
+  it('the message text is 32 px with 36 px lines, and two lines fit the 120 px window', () => {
+    const scene = new BattleScene(createMockBattleSceneDeps(), { party: party(), enemies: [harmless] });
+    scene.enter();
+    const text = scene.messageRenderer;
+    expect(text.fontSize).toBe(BATTLE_MESSAGE_FONT);
+    expect(BATTLE_MESSAGE_FONT).toBe(32);
+    expect(text.lineHeight).toBe(36);
+    expect(WINDOW_PADDING + 2 * text.lineHeight).toBeLessThanOrEqual(BATTLE_MESSAGE_HEIGHT - WINDOW_PADDING);
+    expect(FLOAT_FONT).toBeGreaterThanOrEqual(48);
+  });
+
+  it('9 enemies of two species give two list lines', () => {
+    const wolf: EnemyData = { ...harmless, id: 'wolf', name: 'Wolf' };
+    const enemies = [...Array.from({ length: 6 }, () => harmless), ...Array.from({ length: 3 }, () => wolf)];
+    const scene = new BattleScene(createMockBattleSceneDeps(), { party: party(), enemies });
+    scene.enter();
+    expect(scene.enemyListLines).toEqual(['6x Goblin', '3x Wolf']);
+  });
+
+  it('the item list opens in the left (enemy-list) window, not the command window', async () => {
+    ItemRegistry.reset();
+    await ItemRegistry.init({ loadItems: async () => [
+      { id: 'potion', name: 'Potion', type: 'consumable' as const, stats: {}, price: 60, usableBy: [] },
+    ] } as Pick<DataLoader, 'loadItems'> as DataLoader);
+    const input = createMockInput();
+    const inventory = new Inventory();
+    inventory.add('potion');
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: party(), enemies: [harmless], inventory, rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    tick(scene, input, 'down');
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm'); // Item
+    expect(scene.uiPhase).toBe('item_ui');
+    const ui = findDescendant(scene.container, (c): c is ItemSelectionUI => c instanceof ItemSelectionUI);
+    expect(ui).not.toBeNull();
+    expect(ui!.parent).toBeInstanceOf(Window);
+    expect(ui!.parent!.x).toBe(ENEMY_WINDOW.x);
+    expect(ui!.parent!.y).toBe(STRIP_Y);
+  });
+});
+
+function findDescendant<T extends Container>(root: Container, test: (c: Container) => c is T): T | null {
+  for (const child of root.children) {
+    if (test(child)) return child;
+    const found = findDescendant(child, test);
+    if (found) return found;
+  }
+  return null;
+}

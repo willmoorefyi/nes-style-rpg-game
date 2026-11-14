@@ -11,8 +11,17 @@ export type AttackStyle = 'lunge' | 'dash' | 'leap' | 'classic';
 export const ATTACK_STYLES: readonly AttackStyle[] = ['lunge', 'dash', 'leap', 'classic'];
 export const DEFAULT_ATTACK_STYLE: AttackStyle = 'lunge';
 
-/** How far (px) the attacker ends up in front of its place in line. */
-export const ATTACK_REACH = 150;
+/** How far (px) the attacker ends up in front of its place in line: clamped to [MIN, MAX] (BA-9). */
+export const MIN_ATTACK_REACH = 150;
+export const MAX_ATTACK_REACH = 900;
+/** The attacker's sprite box ends this far inside the target's box, so the figures (inset in their cells) touch. */
+export const REACH_OVERLAP = 24;
+
+/** BA-9: the reach that brings an attacker at `homeX` (its sprite's left edge) to a target whose right edge is `targetRight`. */
+export function attackReach(homeX: number, targetRight: number): number {
+  const d = homeX - targetRight + REACH_OVERLAP;
+  return Math.max(MIN_ATTACK_REACH, Math.min(MAX_ATTACK_REACH, Number.isFinite(d) ? d : MIN_ATTACK_REACH));
+}
 
 const easeIn = (p: number) => p * p;
 const easeOut = (p: number) => 1 - (1 - p) * (1 - p);
@@ -22,8 +31,8 @@ const hop = (p: number, h: number) => -h * Math.sin(Math.PI * clamp01(p));
 
 interface Segment { frames: number; at: (p: number) => AttackFrame }
 
-const D = ATTACK_REACH;
-const SEGMENTS: Record<AttackStyle, Segment[]> = {
+/** The advance of each style for a reach of `D` px; every style ends at dx = -D. */
+const segments = (D: number): Record<AttackStyle, Segment[]> => ({
   // draw the weapon back and coil, spring in low, then a short burst forward in the strike pose
   lunge: [
     { frames: 9, at: p => ({ dx: 12 * easeOut(p), dy: hop(p, 3), pose: p < 0.45 ? 'atk_wind1' : 'atk_wind2' }) },
@@ -43,18 +52,19 @@ const SEGMENTS: Record<AttackStyle, Segment[]> = {
   ],
   // the original: strike pose at once, straight slide
   classic: [
-    { frames: 15, at: p => ({ dx: -120 * p, dy: 0, pose: 'attack' }) },
+    { frames: 15, at: p => ({ dx: -D * p, dy: 0, pose: 'attack' }) },
   ],
-};
+});
 
+/** Frame counts do not depend on the reach. */
 export function advanceFrames(style: AttackStyle): number {
-  return SEGMENTS[style].reduce((n, s) => n + s.frames, 0);
+  return segments(MIN_ATTACK_REACH)[style].reduce((n, s) => n + s.frames, 0);
 }
 
-/** Pose and offset `t` frames into the advance (clamped to its last frame: the moment of contact). */
-export function advanceAt(style: AttackStyle, t: number): AttackFrame {
+/** Pose and offset `t` frames into the advance (clamped to its last frame: the moment of contact, dx = -reach). */
+export function advanceAt(style: AttackStyle, t: number, reach: number = MIN_ATTACK_REACH): AttackFrame {
   let start = 0;
-  const segs = SEGMENTS[style];
+  const segs = segments(reach)[style];
   for (const seg of segs) {
     if (t < start + seg.frames) return seg.at(clamp01((t - start) / seg.frames));
     start += seg.frames;

@@ -1,19 +1,23 @@
-import { Container, BitmapText } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { wrapText } from './textUtils.js';
-import { NES_FONT } from './NESFont.js';
+import { OutlinedText } from './NESFont.js';
 import { CHAR_WIDTH, LINE_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
 
 export interface TextRendererConfig {
   width: number;
   lineHeight?: number;
+  /** Wrap width per character; defaults to the measured CHAR_WIDTH scaled to `fontSize`. */
   charWidth?: number;
+  /** Glyph size in px (default FONT_SIZE). */
+  fontSize?: number;
   revealSpeed?: number; // chars per frame, 0 = instant
-  style?: { fill?: number };
+  /** `outline`: a dark edge drawn as offset shadow copies (OutlinedText). */
+  style?: { fill?: number; outline?: number };
 }
 
 export class TextRenderer extends Container {
   private config: TextRendererConfig;
-  private textObj: BitmapText;
+  private textObj: OutlinedText;
   private fullText = '';
   /** The whole current text (wrapped), whether or not it has finished revealing. */
   get text(): string { return this.fullText; }
@@ -22,26 +26,32 @@ export class TextRenderer extends Container {
 
   constructor(config: TextRendererConfig) {
     super();
+    const fontSize = config.fontSize ?? FONT_SIZE;
     this.config = {
       lineHeight: LINE_HEIGHT,
-      charWidth: CHAR_WIDTH,
+      charWidth: (CHAR_WIDTH * fontSize) / FONT_SIZE,
       revealSpeed: 0,
       ...config,
+      fontSize,
     };
-    this.textObj = new BitmapText({
-      text: '',
-      style: {
-        fontFamily: NES_FONT,
-        fontSize: FONT_SIZE,
-        fill: config.style?.fill ?? 0xffffff,
-      },
+    this.textObj = new OutlinedText({
+      fontSize,
+      fill: config.style?.fill ?? 0xffffff,
+      outline: config.style?.outline,
+      // only an explicit line height changes the spacing; the default keeps the font's own
+      lineHeight: config.lineHeight,
     });
     this.addChild(this.textObj);
   }
 
+  /** The glyph size in px. */
+  get fontSize(): number { return this.config.fontSize!; }
+  get lineHeight(): number { return this.config.lineHeight!; }
+  /** Characters per wrapped line. */
+  get maxChars(): number { return Math.floor(this.config.width / this.config.charWidth!); }
+
   setText(text: string, instant = false): void {
-    const maxChars = Math.floor(this.config.width / this.config.charWidth!);
-    this.fullText = wrapText(text, maxChars);
+    this.fullText = wrapText(text, this.maxChars);
     if (instant || this.config.revealSpeed === 0) {
       this.revealedCount = this.fullText.length;
       this.textObj.text = this.fullText;

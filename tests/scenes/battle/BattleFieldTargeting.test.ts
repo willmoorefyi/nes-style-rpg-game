@@ -16,8 +16,9 @@ function setup() {
   const enemySprites = [new Sprite(), new Sprite()];
   const partySprites = [new Sprite()];
   const display = {
-    enemySprites, partySprites, enemyListTexts: [], statusBoxes: [],
-    enemyNameToListIndex: new Map<string, number>(),
+    enemySprites, partySprites, enemyListTexts: [],
+    partyPanel: { targetIndex: -1, setTarget: vi.fn(function (this: { targetIndex: number }, i: number) { this.targetIndex = i; }) },
+    listIndexFor: () => undefined,
     updateEnemyListDeadTints: vi.fn(),
   } as unknown as BattleDisplayManager;
   const enemies = [{ id: 'enemy_0', displayName: 'Goblin A', currentHp: 5 }, { id: 'enemy_1', displayName: 'Goblin B', currentHp: 5 }];
@@ -28,7 +29,7 @@ function setup() {
   } as unknown as BattleStateMachine;
   const input = createMockInput();
   const targeting = new BattleFieldTargeting(main, battle, display, input as unknown as InputManager);
-  return { main, input, targeting };
+  return { main, input, targeting, display };
 }
 
 const outlines = (c: Container) => c.children.filter(ch => ch instanceof Graphics).length;
@@ -74,5 +75,15 @@ describe('BattleFieldTargeting (BA-7)', () => {
     targeting.enterFieldTargeting(false, false, vi.fn(), vi.fn());
     targeting.updateTargetVisuals();
     expect(outlines(main)).toBe(2);
+  });
+
+  it('T6e: a party target lights its row in the party panel, and the row goes dark when targeting ends', () => {
+    const { input, targeting, display } = setup();
+    targeting.enterFieldTargeting(true, false, vi.fn(), vi.fn());
+    targeting.updateTargetVisuals();
+    expect(display.partyPanel.targetIndex).toBe(0);
+    input.press('confirm');
+    targeting.updateFieldTargeting();
+    expect(display.partyPanel.targetIndex).toBe(-1);
   });
 });

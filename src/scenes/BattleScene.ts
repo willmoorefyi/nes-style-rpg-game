@@ -17,6 +17,9 @@ import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
+import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
+import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_LINE, BATTLE_MESSAGE_HEIGHT, STRIP_Y, STRIP_HEIGHT, ENEMY_WINDOW, COMMAND_WINDOW,
+  FLOAT_OUTLINE } from './battle/BattleSceneTypes.js';
 
 /** Frames after the command menu opens during which confirm is ignored, so mashing doesn't pick commands. */
 export const COMMAND_CONFIRM_GUARD_FRAMES = 10;
@@ -31,7 +34,8 @@ export class BattleScene implements Scene {
   private battle: BattleStateMachine;
   private config: BattleSceneConfig;
 
-  private partyWindow!: Window;
+  /** Bottom-left: the enemy list, or the spell / item list while one is open (BA-8). */
+  private enemyWindow!: Window;
   private commandWindow!: Window;
   private messageWindow!: Window;
   private commandMenu!: Menu;
@@ -52,8 +56,7 @@ export class BattleScene implements Scene {
   private noticeTimer = 0;
   private endPrompt: BitmapText | null = null;
   private endPromptTimer = 0;
-  private commandArrow: Graphics | null = null;
-  private flashTimer: number = 0;
+  private activeHero = new ActiveHeroMarker(this.container);
   // K4: Turn list in commandWindow during execution
   private turnListContainer = new Container();
 
@@ -103,7 +106,7 @@ export class BattleScene implements Scene {
     }
 
     this.createUI();
-    this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.partyWindow);
+    this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.enemyWindow);
     this.display.createEnemySprites();
     this.display.createPartySprites();
     this.display.updatePartyDisplay();
@@ -120,19 +123,21 @@ export class BattleScene implements Scene {
   }
 
   private createUI(): void {
-    // Party HP window — bottom-left
-    this.partyWindow = new Window({ x: 0, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
-    this.container.addChild(this.partyWindow);
-    // Command window — bottom-right
-    this.commandWindow = new Window({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 300, width: GAME_WIDTH / 2, height: 300 });
+    // BA-8 bottom strip: enemy list (left), command window (middle); the party panel (right) is the display's
+    this.enemyWindow = new Window({ x: ENEMY_WINDOW.x, y: STRIP_Y, width: ENEMY_WINDOW.width, height: STRIP_HEIGHT });
+    this.container.addChild(this.enemyWindow);
+    this.commandWindow = new Window({ x: COMMAND_WINDOW.x, y: STRIP_Y, width: COMMAND_WINDOW.width, height: STRIP_HEIGHT });
     this.container.addChild(this.commandWindow);
     this.createCommandMenu();
     this.turnListContainer.visible = false;
     this.commandWindow.addChild(this.turnListContainer);
     // Message window — full width, top
-    this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: 120 });
+    this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: BATTLE_MESSAGE_HEIGHT });
     this.container.addChild(this.messageWindow);
-    this.messageText = new TextRenderer({ width: GAME_WIDTH - SCREEN_MARGIN * 2, revealSpeed: 2 });
+    this.messageText = new TextRenderer({
+      width: GAME_WIDTH - SCREEN_MARGIN * 2, revealSpeed: 2,
+      fontSize: BATTLE_MESSAGE_FONT, lineHeight: BATTLE_MESSAGE_LINE, style: { outline: FLOAT_OUTLINE },
+    });
     this.messageText.position.set(this.messageWindow.contentX, this.messageWindow.contentY);
     this.messageWindow.addChild(this.messageText);
   }
@@ -163,6 +168,7 @@ export class BattleScene implements Scene {
     this.animation.updateFloatingTexts(dt);
     this.animation.updateDyingEnemies(dt);
     this.animation.updateSpellFlashes(dt);
+    this.activeHero.update(dt);
 
     switch (this.uiState) {
       case 'intro':
@@ -179,15 +185,6 @@ export class BattleScene implements Scene {
           if (!this.deps.input.isJustPressed('confirm')) this.commandMenu.update(this.deps.input);
         } else {
           this.commandMenu.update(this.deps.input);
-        }
-        this.flashTimer++;
-        {
-          const id = this.battle.currentCommandActorId;
-          if (id) {
-            const idx = parseInt(id.split('_')[1]);
-            const sprite = this.display.partySprites[idx];
-            if (sprite) sprite.alpha = 0.5 + 0.5 * Math.sin(this.flashTimer * 0.15);
-          }
         }
         break;
 
@@ -236,25 +233,21 @@ export class BattleScene implements Scene {
 
   private startCommandPhase(): void {
     this.clearCommandIndicator();
+    this.activeHero.hide();
     // K4: Hide turn list, show command menu
     this.turnListContainer.visible = false;
     const actor = this.battle.currentCommandActor;
     if (!actor) {
+      this.display.partyPanel.setActive(-1);
       this.executeRound();
       return;
     }
 
-    // Create arrow indicator above the current actor's sprite
-    const id = this.battle.currentCommandActorId!;
-    const index = parseInt(id.split('_')[1]);
+    // BA-8: the active hero steps forward and pulses (always opaque); its panel row gets the cursor
+    const index = parseInt(this.battle.currentCommandActorId!.split('_')[1]);
     const sprite = this.display.partySprites[index];
-    if (sprite) {
-      const arrow = new Graphics();
-      arrow.moveTo(0, 0).lineTo(16, 0).lineTo(8, 16).lineTo(0, 0).fill(0xffffff);
-      arrow.position.set(sprite.x + (sprite.width - 16) / 2, sprite.y - 20);
-      this.container.addChild(arrow);
-      this.commandArrow = arrow;
-    }
+    if (sprite) this.activeHero.show(sprite);
+    this.display.partyPanel.setActive(index);
 
     this.messageText.setText(`${actor.name}'s turn`, true);
     this.commandMenu.visible = true;
@@ -327,8 +320,8 @@ export class BattleScene implements Scene {
       spells: this.spells,
       enemies,
       partyMembers,
-      contentX: this.commandWindow.contentX,
-      contentY: this.commandWindow.contentY,
+      contentX: this.enemyWindow.contentX,
+      contentY: this.enemyWindow.contentY,
       eventBus: this.deps.events,
       onSelect: (result) => {
         this.deps.events.emit('spellCast', {});
@@ -365,17 +358,13 @@ export class BattleScene implements Scene {
         });
       },
     });
-    this.commandWindow.addChild(this.spellUI);
-    this.commandMenu.visible = false;
+    this.openListWindow(this.spellUI);
     this.uiState = 'spell_ui';
   }
 
   private cleanupSpellUI(): void {
-    if (this.spellUI) {
-      this.commandWindow.removeChild(this.spellUI);
-      this.spellUI = null;
-    }
-    this.commandMenu.visible = true;
+    if (this.spellUI) this.closeListWindow(this.spellUI);
+    this.spellUI = null;
   }
 
   private showItemUI(_actor: Character): void {
@@ -389,8 +378,8 @@ export class BattleScene implements Scene {
     this.itemUI = new ItemSelectionUI({
       inventory: this.inventory,
       partyMembers,
-      contentX: this.commandWindow.contentX,
-      contentY: this.commandWindow.contentY,
+      contentX: this.enemyWindow.contentX,
+      contentY: this.enemyWindow.contentY,
       eventBus: this.deps.events,
       // BA-4: Tent and Cabin are camp items; they are not listed in battle
       isUsable: (id) => !ItemEffects.isPartyItem(id),
@@ -428,16 +417,25 @@ export class BattleScene implements Scene {
       return;
     }
 
-    this.commandWindow.addChild(this.itemUI);
-    this.commandMenu.visible = false;
+    this.openListWindow(this.itemUI);
     this.uiState = 'item_ui';
   }
 
   private cleanupItemUI(): void {
-    if (this.itemUI) {
-      this.commandWindow.removeChild(this.itemUI);
-      this.itemUI = null;
-    }
+    if (this.itemUI) this.closeListWindow(this.itemUI);
+    this.itemUI = null;
+  }
+
+  /** BA-8: spell and item lists draw in the left window at full width, over the (hidden) enemy list. */
+  private openListWindow(list: Container): void {
+    this.display.enemyList.visible = false;
+    this.enemyWindow.addChild(list);
+    this.commandMenu.visible = false;
+  }
+
+  private closeListWindow(list: Container): void {
+    this.enemyWindow.removeChild(list);
+    this.display.enemyList.visible = true;
     this.commandMenu.visible = true;
   }
 
@@ -455,12 +453,7 @@ export class BattleScene implements Scene {
   }
 
   private clearCommandIndicator(): void {
-    if (this.commandArrow) {
-      this.container.removeChild(this.commandArrow);
-      this.commandArrow = null;
-    }
-    this.flashTimer = 0;
-    // Restore alphas but respect dead member dimming
+    // Restore alphas but respect dead member dimming (the active hero keeps its step and pulse until the turn ends)
     this.display.updatePartySprites();
     this.targeting.clearTargetArrow();
   }
@@ -577,6 +570,12 @@ export class BattleScene implements Scene {
   get battleState(): string { return this.battle.state; }
   get outcome(): 'victory' | 'defeat' | 'escaped' | null { return this.battle.outcome; }
   get messageLine(): string { return this.messageText.text; }
+  /** The battle message text (size checks). */
+  get messageRenderer(): TextRenderer { return this.messageText; }
+  /** Party battle sprites, in party order. */
+  get partySprites(): readonly Container[] { return this.display.partySprites; }
+  get partyPanel(): BattleDisplayManager['partyPanel'] { return this.display.partyPanel; }
+  get enemyListLines(): readonly string[] { return this.display.enemyListTexts.map(t => t.text); }
 
   onPause(): void {}
   onResume(): void {}
@@ -584,10 +583,10 @@ export class BattleScene implements Scene {
   exit(): void {
     destroyPromptIndicator(this.endPrompt, this.messageWindow);
     this.endPrompt = null;
+    this.activeHero.hide();
     this.container.removeChildren();
     // Null out UI references for GC
     this.spellUI = null;
     this.itemUI = null;
-    this.commandArrow = null;
   }
 }

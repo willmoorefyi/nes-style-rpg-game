@@ -1,18 +1,17 @@
-import { Container, BitmapText, Graphics, Sprite } from 'pixi.js';
+import { Container, BitmapText } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine, DamageEvent, NextActionInfo } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import { NES_FONT } from '../../ui/NESFont.js';
-import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
+import { FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
 import { formatConciseResult, capitalize } from './battleMessageUtils.js';
 import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
-  type AttackStyle } from './attackChoreography.js';
+  type AttackStyle, attackReach, MIN_ATTACK_REACH } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
-export const ELEMENT_COLORS: Record<string, number> = {
-  fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
-  water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
-};
+import { floatKind, floatLabel } from './floatingNumbers.js';
+import { BattleEffects } from './BattleEffects.js';
+export { ELEMENT_COLORS } from './BattleEffects.js';
 /** Frames the last result line stays up after a round before the next command menu (or the end screen). */
 export const ROUND_END_FRAMES = 20;
 /** Frames each action's announcement and each result line stay up; confirm skips either. */
@@ -30,13 +29,17 @@ export class BattleAnimationController {
   /** Random source for the attack style (tests inject a fixed one). */
   attackRng: () => number = Math.random;
   private lastAdvance: AttackFrame = { dx: 0, dy: 0, pose: 'ready' };
+  /** BA-9: how far this melee attack advances: from the attacker's place in line to the target's right edge. */
+  attackReachPx = MIN_ATTACK_REACH;
+  /** The sprite the current action aims at (for the miss number), or null. */
+  private targetSprite: Container | null = null;
   animMessages: { text: string }[] = [];
   animMessageIndex = 0;
   // N2: Track if current animation actor is an enemy (skip step_forward/step_back)
   animActorIsEnemy = false;
-  floatingTexts: { text: BitmapText; age: number; maxAge: number }[] = [];
-  dyingEnemies: Map<number, number> = new Map();
-  spellFlashes: { overlay: Container; age: number; maxAge: number; follow?: Container }[] = [];
+  /** Floating numbers, flashes and the dying fade. */
+  readonly effects: BattleEffects;
+  get dyingEnemies(): Map<number, number> { return this.effects.dyingEnemies; }
   /** Index of the acting enemy (preview pose art), or -1. */
   private animEnemyIndex = -1;
   // K4: Turn list in commandWindow during execution
@@ -44,7 +47,7 @@ export class BattleAnimationController {
   turnActionIndex = 0;
   private currentActionInfo: NextActionInfo | null = null;
   constructor(
-    private readonly mainContainer: Container,
+    mainContainer: Container,
     private readonly battle: BattleStateMachine,
     private readonly display: BattleDisplayManager,
     private readonly input: InputManager,
@@ -52,7 +55,9 @@ export class BattleAnimationController {
     private readonly turnListContainer: Container,
     private readonly setMessageText: (text: string) => void,
     private readonly onResolveRound: () => void,
-  ) {}
+  ) {
+    this.effects = new BattleEffects(mainContainer, () => display.enemySprites);
+  }
   /** The actor's sprite by battle id (party_i / enemy_i), so equal names never share a sprite. */
   findActorSprite(actorId: string): { sprite: Container; isEnemy: boolean } | null {
     const [side, index] = actorId.split('_');
@@ -97,11 +102,15 @@ export class BattleAnimationController {
           const found = this.findActorSprite(info.actorId);
           this.animActorSprite = found?.sprite ?? null;
           this.animActorIsEnemy = found?.isEnemy ?? false;
+          this.targetSprite = this.findTargetSprite(info);
           if (this.animActorSprite) {
             this.animActorOrigX = this.animActorSprite.x;
             this.animActorOrigY = this.animActorSprite.y;
             this.lastAdvance = { dx: 0, dy: 0, pose: 'ready' };
-            if (info.actionType === 'fight') this.attackStyle = this.attackOverride ?? pickAttackStyle(this.attackRng);
+            if (info.actionType === 'fight') {
+              this.attackStyle = this.attackOverride ?? pickAttackStyle(this.attackRng);
+              this.attackReachPx = this.measureReach(this.animActorOrigX, this.targetSprite);
+            }
             // spells and items gather in place first; every party action then poses frame by frame in step_forward
             if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'cast_gather');
           }
@@ -119,34 +128,19 @@ export class BattleAnimationController {
         const frames = melee ? advanceFrames(this.attackStyle) : CAST_FRAMES;
         this.animTimer += dt;
         if (confirmSkip) this.animTimer = frames;
-        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer) : castAt(this.animTimer));
-        if (this.animTimer >= frames) { this.animTimer = 0; this.animPhase = 'execute'; }
+        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, this.attackReachPx) : castAt(this.animTimer));
+        // BA-9: the action resolves on the contact frame itself, so the number and the result line meet the blow
+        if (this.animTimer >= frames) this.executeAction();
         break;
       }
       case 'enemy_lunge': {
         // wait until the lunge reaches the party side, then resolve the action (the return plays on its own)
-        if (this.display.enemyView?.poses.attackOutDone(this.animEnemyIndex) ?? true) this.animPhase = 'execute';
+        if (this.display.enemyView?.poses.attackOutDone(this.animEnemyIndex) ?? true) this.executeAction();
         break;
       }
       case 'execute': {
-        const result = this.battle.executeNextAction();
-        this.spawnFloatingTextsFromEvents(result.damageEvents);
-        if (!this.animActorIsEnemy && this.currentActionInfo?.actionType === 'fight') this.slashTargets(result.damageEvents);
-        this.display.updatePartyDisplay();
-        this.display.updateEnemySprites(this.dyingEnemies);
-        this.display.updatePartySprites();
-        this.animMessages = result.messages;
-        this.animMessageIndex = 0; this.animTimer = 0;
-        // Update turn list entry in-place with concise result
-        const entry = this.turnListTexts[this.turnActionIndex];
-        if (entry && this.currentActionInfo) {
-          const { actorName, actionType, spellName } = this.currentActionInfo;
-          const label = actionType === 'magic' && spellName ? spellName.toUpperCase() : capitalize(actionType);
-          const concise = formatConciseResult(result.messages, actorName);
-          entry.text = concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`;
-          this.scrollTurnList();
-        }
-        this.animPhase = 'result'; break;
+        this.executeAction();
+        break;
       }
       case 'result': {
         // Auto-advance through result messages on timer (no confirm-wait)
@@ -190,6 +184,53 @@ export class BattleAnimationController {
       }
     }
   }
+  /** Resolve the action: numbers, slash, panels, and the first result line, all on this frame. */
+  private executeAction(): void {
+    const result = this.battle.executeNextAction();
+    const info = this.currentActionInfo;
+    this.spawnFloatingTextsFromEvents(result.damageEvents);
+    const missed = info?.actionType === 'fight' && result.damageEvents.length === 0
+      && result.messages.some(m => m.text === `${info.actorName} missed!`);
+    if (missed && this.targetSprite) this.effects.addFloating('Miss', 'miss', this.targetSprite);
+    if (!this.animActorIsEnemy && info?.actionType === 'fight') this.slashTargets(result.damageEvents);
+    this.display.updatePartyDisplay();
+    this.display.updateEnemySprites(this.dyingEnemies);
+    this.display.updatePartySprites();
+    this.animMessages = result.messages;
+    this.animMessageIndex = 0; this.animTimer = 0;
+    if (result.messages.length > 0) this.setMessageText(result.messages[0].text);
+    // Update turn list entry in-place with concise result
+    const entry = this.turnListTexts[this.turnActionIndex];
+    if (entry && info) {
+      const { actorName, actionType, spellName } = info;
+      const label = actionType === 'magic' && spellName ? spellName.toUpperCase() : capitalize(actionType);
+      const concise = formatConciseResult(result.messages, actorName);
+      entry.text = concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`;
+      this.scrollTurnList();
+    }
+    this.animPhase = 'result';
+  }
+
+  /** The sprite an action aims at, by the announced target name (a dead enemy target retargets to the first living one). */
+  private findTargetSprite(info: NextActionInfo): Container | null {
+    if (!info.targetName) return null;
+    if (info.actorId.startsWith('party_')) {
+      const enemies = this.battle.allEnemies;
+      let i = enemies.findIndex(e => e.displayName === info.targetName && e.currentHp > 0);
+      if (i < 0) i = enemies.findIndex(e => e.currentHp > 0);
+      return this.display.enemySprites[i] ?? null;
+    }
+    const i = (this.battle.allParty ?? []).findIndex(c => c.name === info.targetName);
+    return this.display.partySprites[i] ?? null;
+  }
+
+  /** BA-9: reach to the target sprite's right edge (its 2x bounds); the minimum when there is no target. */
+  private measureReach(homeX: number, target: Container | null): number {
+    if (!target) return MIN_ATTACK_REACH;
+    const b = target.getBounds();
+    return attackReach(homeX, b.x + b.width);
+  }
+
   /** Moves the acting party member to an offset from its place in line and shows the frame's pose. */
   private placeActor(f: AttackFrame, remember = true): void {
     if (!this.animActorSprite) return;
@@ -203,9 +244,7 @@ export class BattleAnimationController {
       if (!evt.targetId.startsWith('enemy_') || evt.isHeal) continue;
       const sprite = this.display.enemySprites[parseInt(evt.targetId.split('_')[1], 10)];
       if (!sprite) continue;
-      const fx = slashEffect(sprite);
-      this.mainContainer.addChild(fx);
-      this.spellFlashes.push({ overlay: fx, age: 0, maxAge: 12 });
+      this.effects.addFlash(slashEffect(sprite), 12);
     }
   }
   /** Preview pose art: fight lunges in the attack pose, magic plays the cast stance. False when there is nothing to play. */
@@ -238,84 +277,20 @@ export class BattleAnimationController {
       const idx = parseInt(evt.targetId.split('_')[1], 10);
       const sprite: Container | undefined = evt.targetId.startsWith('enemy_') ? this.display.enemySprites[idx] : this.display.partySprites[idx];
       if (!sprite) continue;
-      // Spell flash overlay
-      if (evt.spellElement) {
-        const color = ELEMENT_COLORS[evt.spellElement] ?? 0xffffff;
-        let overlay: Container;
-        if (sprite instanceof Sprite) {
-          // Silhouette flash so the glow follows the art instead of a solid box
-          const glow = new Sprite(sprite.texture);
-          glow.tint = color;
-          glow.scale.copyFrom(sprite.scale);
-          overlay = glow;
-        } else {
-          const box = new Graphics();
-          box.rect(0, 0, sprite.width, sprite.height).fill(color);
-          overlay = box;
-        }
-        overlay.position.set(sprite.x, sprite.y);
-        overlay.alpha = 0.6;
-        this.mainContainer.addChild(overlay);
-        this.spellFlashes.push({ overlay, age: 0, maxAge: 18, follow: sprite });
-      }
+      if (evt.spellElement) this.effects.elementFlash(sprite, evt.spellElement);
       if (!evt.isHeal && evt.damage > 0 && !evt.targetId.startsWith('enemy_')) this.display.flashHurt(idx);
       if (!evt.isHeal && evt.damage > 0 && evt.targetId.startsWith('enemy_')) this.reactEnemy(idx);
-      const fill = evt.isHeal ? 0x44ff44 : evt.isCrit ? 0xff4444 : 0xffffff;
-      const label = evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
-      const bt = new BitmapText({
-        text: label,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill },
-      });
-      bt.position.set(sprite.x, sprite.y);
-      this.mainContainer.addChild(bt);
-      this.floatingTexts.push({ text: bt, age: 0, maxAge: 48 });
+      this.effects.addFloating(floatLabel(evt), floatKind(evt), sprite);
     }
   }
+
   /** Preview pose art: a hit shows the hurt pose; a lethal hit holds it while the sprite fades out. */
   private reactEnemy(idx: number): void {
     const view = this.display.enemyView;
     if (!view) return;
     if ((this.battle.allEnemies[idx]?.currentHp ?? 0) <= 0) view.poses.freezeDying(idx); else view.poses.playHurt(idx);
   }
-  updateFloatingTexts(dt: number): void {
-    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
-      const ft = this.floatingTexts[i];
-      ft.age += dt;
-      ft.text.y -= 1 * dt;
-      ft.text.alpha = 1 - ft.age / ft.maxAge;
-      if (ft.age >= ft.maxAge) {
-        this.mainContainer.removeChild(ft.text);
-        this.floatingTexts.splice(i, 1);
-      }
-    }
-  }
-  updateDyingEnemies(dt: number): void {
-    for (const [idx, remaining] of this.dyingEnemies) {
-      const next = remaining - dt;
-      if (next <= 0) {
-        this.display.enemySprites[idx].alpha = 0;
-        this.display.enemySprites[idx].visible = false;
-        this.dyingEnemies.delete(idx);
-      } else {
-        this.display.enemySprites[idx].alpha = next / 30;
-        this.dyingEnemies.set(idx, next);
-      }
-    }
-  }
-  updateSpellFlashes(dt: number): void {
-    for (let i = this.spellFlashes.length - 1; i >= 0; i--) {
-      const sf = this.spellFlashes[i];
-      sf.age += dt;
-      sf.overlay.alpha = 0.6 * (1 - sf.age / sf.maxAge);
-      // follow the sprite (lunge, shake) and its current pose frame
-      if (sf.follow) {
-        sf.overlay.position.set(sf.follow.x, sf.follow.y);
-        if (sf.overlay instanceof Sprite && sf.follow instanceof Sprite) sf.overlay.texture = sf.follow.texture;
-      }
-      if (sf.age >= sf.maxAge) {
-        this.mainContainer.removeChild(sf.overlay);
-        this.spellFlashes.splice(i, 1);
-      }
-    }
-  }
+  updateFloatingTexts(dt: number): void { this.effects.updateFloatingTexts(dt); }
+  updateDyingEnemies(dt: number): void { this.effects.updateDyingEnemies(dt); }
+  updateSpellFlashes(dt: number): void { this.effects.updateSpellFlashes(dt); }
 }

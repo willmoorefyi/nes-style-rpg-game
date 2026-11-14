@@ -122,7 +122,7 @@ export class BattleFieldTargeting {
     this.targetFlashTimer = 0;
     for (const t of this.display.enemyListTexts) t.tint = 0xffffff;
     this.display.updateEnemyListDeadTints();
-    for (const box of this.display.statusBoxes) box.alpha = 1;
+    this.display.partyPanel.setTarget(-1);
   }
 
   /** Update target outline and flash effects during target selection */
@@ -146,17 +146,14 @@ export class BattleFieldTargeting {
         this.targetOutline.alpha = 0.3 + 0.7 * Math.abs(Math.sin(this.targetFlashTimer * 0.12));
       }
     }
-    // L4: Flash enemy list entry or party status box
+    // L4: Flash the enemy list line; a party target lights its row in the party panel (cursor + highlight)
     const sinVal = Math.sin(this.targetFlashTimer * 0.12);
     if (target && this.fieldTargetIsParty) {
-      // Reset all status box alphas, then pulse the selected one
-      for (const box of this.display.statusBoxes) box.alpha = 1;
-      const box = this.display.statusBoxes[target.spriteIndex];
-      if (box) box.alpha = 0.5 + 0.5 * Math.abs(sinVal);
+      if (this.display.partyPanel.targetIndex !== target.spriteIndex) this.display.partyPanel.setTarget(target.spriteIndex);
     } else if (target && !this.fieldTargetIsParty) {
       const enemy = this.battle.allEnemies[target.spriteIndex];
       if (enemy) {
-        const listIdx = this.display.enemyNameToListIndex.get(enemy.displayName);
+        const listIdx = this.display.listIndexFor(enemy);
         if (listIdx !== undefined) {
           // Reset all list tints first
           for (let i = 0; i < this.display.enemyListTexts.length; i++) {
