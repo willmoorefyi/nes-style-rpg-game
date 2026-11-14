@@ -2825,7 +2825,7 @@ Integration fixes: a seeded defeat-flow test (`9520c50`), and the review fixes b
 **Base:** `mainline` at `b202acd` (T6 merged, plus the second-playtest doc). All file:line references are to that commit.
 
 **Inputs:**
-- `docs/PLAYTEST_PENINSULA_2_2026-11-14.md`: 75 items (2 M, 33 m, 40 p) and its binding "Triage defaults" (B1's tougher Garland with talk-to-fight and a 3-wide trigger; every M and m fixed, cheap p items fixed; paid art only within budget; T2 warps the party to Cornelia Castle after the princess speaks);
+- `docs/PLAYTEST_PENINSULA_2_2026-11-14.md`: 69 items (2 M, 33 m, 40 p) and its binding "Triage defaults" (B1's tougher Garland with talk-to-fight and a 3-wide trigger; every M and m fixed, cheap p items fixed; paid art only within budget; T2 warps the party to Cornelia Castle after the princess speaks);
 - the evidence in `/tmp/playtest2/{browser,town,overworld,systems}/`, including the throwaway tests `reentry-race`, `transition-control`, `battle-edges` and `inventory-cap` (`systems/`) and `enc.test.ts` (`overworld/`);
 - research sims for this plan in `/tmp/r-plan/` (Garland, temple, pacing, route encounters, the shoreline composite prototype).
 
@@ -2849,7 +2849,7 @@ Integration fixes: a seeded defeat-flow test (`9520c50`), and the review fixes b
 | T1 (data), M11, W1–W14, B1 (map), B9 (rate and table) | R4b |
 | W1 (art), W8 / W15 (paid fallbacks), M7 (gates and signs sheet) | R5 |
 
-All 75 items are covered. S4 and S5 move to R3 because both touch `SaveScene.ts`; W15 moves to R4a because R4a already rebuilds `characters-ai` and owns `gen/selftest.py` (M6). Won't-fix or deferred: the temple's size (W13, FF1 parity), new act-1 species (W5), the `river`, `swamp` and `waterfall` backdrops (same flaw as B14; recorded).
+All 69 items are covered. S4 and S5 move to R3 because both touch `SaveScene.ts`; W15 moves to R4a because R4a already rebuilds `characters-ai` and owns `gen/selftest.py` (M6). Won't-fix or deferred: the temple's size (W13, FF1 parity), new act-1 species (W5), the `river`, `swamp` and `waterfall` backdrops (same flaw as B14; recorded).
 
 ---
 
@@ -3630,3 +3630,43 @@ Each has a recommended default; the orchestrator proceeds on the defaults unless
 | Chest loot | as the plan proposes |
 | King, spell learning, Load | the King stands in front of the throne; spell learning has no slots; Load always confirms |
 | Recorded, not fixed | the `river`, `swamp` and `waterfall` backdrops also put enemies on water |
+
+### R revisions after the momus review (binding)
+
+All 22 momus issues apply. Resolutions:
+
+1. **W4 counter.** A fresh `EncounterSystem`'s first `setRate` rolls a new countdown; later calls only clamp. `restart()` runs in `enter()` after `loadMap`. `EncounterSystem.test.ts:20-25` keeps passing. `systemFor` and the route test start from a rolled countdown.
+2. **Spawn check.** `DebugScenarioField` checks spawns on the compiled variant only, for maps in `ai/index.yaml`.
+3. **Scenario backgrounds** use full paths: `assets/backgrounds/<id>.webp`.
+4. **M8 test.** `chest` is excluded. Per-sprite caps: `guard` ≤ 6, `old_man` ≤ 6, `villager_f` ≤ 8, `mage` ≤ 7. R4a reassigns sprites so these hold.
+5. **T6 test (a)** excludes NPCs that have a `chestItem`.
+6. **File sizes.**
+   - R2 extracts `src/battle/ActionResolution.ts` (target resolution, item reservation, phase overrides), so `BattleStateMachine.ts` doesn't grow.
+   - R0 puts its new validators in `src/core/mapValidators.ts`.
+   - Ceilings, as current size plus 10 lines: `SpellExecutor` 314, `BattleAnimationController` 308, `castle.py` 360, `cornelia.py` 355.
+   - `overworld.py` stays under 250 by moving any additions into `overworld_consts.py` or `overworld_zones.py`.
+7. **`NameEntryGrid.ts`** belongs to R3 only.
+8. **W8 recolour.** R4b owns the `RECOLOR` line in `build_map.py` and the W8 selftest case. R0 doesn't set it.
+9. **W14:** R4b also owns `terrain/base.py`.
+10. **Heal sound:** use `spell-cast` (no new manifest entry). The T2 cutscene data belongs to R4a.
+11. **W1 and W2** map wiring and their tests move to R6. R4b doesn't touch the temple icon.
+12. **Compiled maps:** each map tranche rebuilds locally, and may commit compiled output for review; the integration rebuild replaces it. R1's T2 test uses a `createMapData` mock that has the `throne_return` entrance.
+13. **M13** explicitly reverses T6 decision 7 and the CA-5 test (decision R-9): the King stands in front of the throne. CA-5's test is updated.
+14. **`fieldPacing`:** shopping at each zone boundary is a model change, recorded as a user-reported decision. The ≥ 7 of 8 purchases bound stays.
+15. **Paid-art order.** Wave 1 runs R5-1 (gates and signs, M7) and R5-4 (the W1 free re-cut). R5-2 (stone debris, only if the W8 recolour fails review) and R5-3 (the vendor sprite, only if the W15 row copy fails) run after the wave-1 reviews, before R6. If only W8 fails, R5-2 generates the stone debris alone.
+16. **R5's diff guard** allows R4a's edits to `approved/temple/relics.json` (`paint`) and `approved/vendor_f/field.json` (`head_from`).
+17. **Test paths:**
+    - `KeyItemGate.test.ts`;
+    - `ExplorationReentry.test.ts` and `tests/ui/NameEntryGrid.test.ts` exist already, so extend them;
+    - `tests/systems/actOneEncounters.test.ts`.
+18. **The item count is 69** (2 M, 33 m, 34 p). Both docs are corrected.
+19. **R3 E3** uses R0-9's `Menu.setActive`.
+20. **Missing `warp` host:** a host without `warp` logs `console.error` and the cutscene continues, as with `backdrop`.
+21. **M6:** `build_assets.py` adds `assets-src/tools` to `sys.path` and does `import kit as K`.
+22. **Concrete browser outcomes:**
+    - **B8:** in 20 seeded swings under DARK, the hit rate is lower than without (a logged count).
+    - **W7:** `scene.battleBackground()` at (16,55) and (17,55) both return the same id.
+    - **W13:** the screenshot of the hall shows no repeating grid marks at 1x; checked by eye and recorded.
+    - **M5:** walking under every bed and shelf top cell is blocked only where art covers at least 40 % of the cell (`art_coverage` passes).
+    - **S3:** add a `SceneManager.depth` getter and assert it is 1 after a double confirm.
+    - **B9:** in 20 Thief escapes against 4 enemies, 10–16 succeed (cap 75 % minus 15 %).

@@ -16,7 +16,7 @@ The bar is what an average modern RPG player expects. Classic FF names and lines
 - **m:** minor
 - **p:** polish
 
-**Totals:** 0 B, 2 M, 33 m, 40 p, so 75 items after merging duplicates. Each item lists its source finding IDs (BR, SY, TN, OW). Console errors: 0.
+**Totals:** 0 B, 2 M, 33 m, 34 p, so 69 items after merging duplicates. Each item lists its source finding IDs (BR, SY, TN, OW). Console errors: 0.
 
 **Fixed and verified this pass:** every first-pass blocker and major is confirmed fixed, along with most minors. The full lists are in the source reports.
 
