@@ -1,0 +1,110 @@
+sprite: goblin
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [45, 9]
+    neck: [45, 31]
+    chest: [44, 38]
+    hip: [44, 52]
+    sh_n: [51, 36]
+    el_n: [53, 46]
+    hand_n: [62, 39]
+    sh_f: [36, 33]
+    el_f: [22, 41]
+    hand_f: [27, 50]
+    dag: [17, 59]
+    dag_h: [42, 57]
+    hip_n: [50, 56]
+    knee_n: [54, 64]
+    foot_n: [52, 70]
+    toe_n: [59, 75]
+    hip_f: [34, 56]
+    knee_f: [28, 64]
+    foot_f: [25, 70]
+    toe_f: [30, 75]
+  attack:
+    crown: [52, 10]
+    neck: [48, 32]
+    chest: [40, 37]
+    hip: [36, 52]
+    sh_n: [40, 34]
+    el_n: [55, 38]
+    hand_n: [70, 42]
+    tip: [77, 40]
+    sh_f: [30, 31]
+    el_f: [19, 36]
+    hand_f: [13, 39]
+    hip_n: [42, 56]
+    knee_n: [45, 65]
+    foot_n: [44, 71]
+    toe_n: [51, 75]
+    hip_f: [30, 56]
+    knee_f: [17, 63]
+    foot_f: [6, 71]
+    toe_f: [12, 75]
+  hurt:
+    crown: [47, 10]
+    neck: [46, 33]
+    chest: [41, 38]
+    hip: [44, 52]
+    sh_f: [34, 36]
+    el_f: [22, 30]
+    hand_f: [10, 23]
+    hip_n: [50, 56]
+    knee_n: [55, 64]
+    foot_n: [54, 71]
+    toe_n: [61, 75]
+    hip_f: [36, 56]
+    knee_f: [31, 65]
+    foot_f: [28, 71]
+    toe_f: [34, 75]
+    dag_h: [42, 57]
+parts:
+  weapon: {remove: true}
+  dagger:
+    kind: prop
+    bone: {idle: [hip_f, dag], attack: [hand_n, tip], hurt: [hip, dag_h]}
+    radius: 2.0
+    in: [idle, attack]
+    carry_to: dag_h
+    carry_mode: behind
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1: {pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
+  atk_wind2: {pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
+  atk_recover: {t: 0.22, pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
+  atk_mid:
+    t: 0.32
+    pins: [hip_n, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {knee_n: [2, 0], foot_n: [2, 0], toe_n: [2, 0], knee_f: [5, 0], foot_f: [5, 0], toe_f: [5, 0]}
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, tip, sh_f, el_f, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow: {t: 1.10, pins: [foot_n, foot_f, toe_n, toe_f], tweaks: {hand_n: [-2, 1], tip: [-2, 1]}}
+  hurt_in1:
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, sh_f, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {el_f: [0, -3]}
+    pins: [foot_n, foot_f, toe_n, toe_f]
+  hurt_in2:
+    moves: [crown, neck, chest, hip, sh_f, el_f, hip_n, knee_n, hip_f, knee_f]
+    pins: [foot_n, foot_f, toe_n, toe_f]
+masks:
+  head:
+    hurt: [[15, 12], [42, 12], [42, 22], [31, 22], [24, 21], [16, 20]]
+  dagger:
+    idle: [[13, 60], [16, 62], [21, 61], [28, 53], [28, 48], [25, 47]]
+  ft_n:
+    idle: [[44, 71], [65, 71], [65, 78], [44, 78]]
+    attack: [[35, 71], [57, 71], [57, 78], [35, 78]]
+    hurt: [[46, 71], [67, 71], [67, 78], [46, 78]]
+  ft_f:
+    idle: [[16, 71], [34, 71], [34, 78], [16, 78]]
+    attack: [[0, 71], [18, 71], [18, 78], [0, 78]]
+    hurt: [[20, 71], [39, 71], [39, 78], [20, 78]]
+holds: []
+paint:                       # 1 px joint cracks between the skirt / near thigh / near elbow, closed with outline ink
+  - {frame: atk_wind1, xy: [[44, 64]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[49, 48], [44, 63]], rgb: [6, 4, 10]}
