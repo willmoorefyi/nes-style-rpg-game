@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
+import { TerrainType } from '../../src/types/index.js';
 import type { MapData } from '../../src/types/index.js';
 
 /** The generated act-1 overworld (assets-src/tools/layouts/overworld.py, compiled by build_map.py): T3c. */
@@ -288,5 +289,37 @@ describe('overworld encounter zones (T4e, §1.6)', () => {
     const got = new Set(cells('temple_approach').map((c) => key(...c)));
     expect([...got].filter((k) => !want.has(k)), 'zoned but not closer to the temple').toEqual([]);
     expect([...want].filter((k) => !got.has(k)), 'closer to the temple but not zoned').toEqual([]);
+  });
+});
+
+describe('overworld battle backgrounds (BA-12)', () => {
+  const bg = map.battleBackgrounds!;
+  /** Lowercase TerrainType names: the only keys `battleBackdropId` can match (the collision map's terrain). */
+  const terrainNames = new Set(Object.keys(TerrainType).filter((k) => Number.isNaN(Number(k))).map((k) => k.toLowerCase()));
+  const tables = [{ where: 'map', ...bg }, ...Object.entries(bg.zones ?? {}).map(([id, z]) => ({ where: `zone ${id}`, ...z }))];
+
+  it('every background id (default, terrain, zones) names a staged file in assets/backgrounds/', () => {
+    expect(bg.default).toBeDefined();
+    for (const t of tables) {
+      for (const id of [t.default, ...Object.values(t.terrain ?? {})].filter((v): v is string => v !== undefined)) {
+        expect(existsSync(join(root, 'assets/backgrounds', `${id}.webp`)), `${t.where}: ${id}.webp`).toBe(true);
+      }
+    }
+  });
+
+  it('every terrain key is a TerrainType name, and every zone key an encounter zone id', () => {
+    for (const t of tables) {
+      for (const k of Object.keys(t.terrain ?? {})) expect(terrainNames.has(k), `${t.where}: terrain key ${k}`).toBe(true);
+    }
+    const zoneIds = new Set((map.encounterZones ?? []).map((z) => z.id));
+    for (const id of Object.keys(bg.zones ?? {})) expect(zoneIds.has(id), `zone ${id}`).toBe(true);
+  });
+
+  it('beach sand compiles to Desert, and Desert battles use the shoreline background', () => {
+    const sand = ground.flatMap((row, y) => [...row].map((c, x): Cell | null => (c === 's' ? [x, y] : null)))
+      .filter((c): c is Cell => c !== null);
+    expect(sand.length).toBeGreaterThan(0);
+    for (const [x, y] of sand) expect(terrain(x, y), `sand at (${x},${y})`).toBe(TerrainType.Desert);
+    expect(bg.terrain?.desert).toBe('shoreline');
   });
 });

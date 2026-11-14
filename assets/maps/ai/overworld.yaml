@@ -129,7 +129,7 @@ encounters:
   weight: 1
 battleBackgrounds:
   default: grassland
-  terrain: {forest: forest, desert: desert, swamp: swamp, water: ocean, river: river, sand: desert}
+  terrain: {forest: forest, desert: shoreline, swamp: swamp, water: ocean, river: river}
 vehicles:
 - {type: ship, x: 28, y: 56, requiredFlag: BIKKE_DEFEATED}
 - {type: canoe, x: 45, y: 50, requiredFlag: EARTH_CAVE_COMPLETE}
