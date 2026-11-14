@@ -9,6 +9,7 @@ import { TextRenderer } from '../ui/TextRenderer.js';
 import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
 import { SLOT_LABELS } from '../ui/labels.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
+import { CANT_EQUIP_TEXT, equipFromBag } from '../entities/EquipmentRules.js';
 import { partyAbsorb, partyAttack, withEquipped, type MemberView } from '../battle/CombatStats.js';
 import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
@@ -163,33 +164,13 @@ export class EquipScene implements Scene {
     this.previewSelected();
   }
 
+  /** A refusal (wrong slot, a full bag for the worn item) goes to the help bar; the stats stay as they are (U9). */
   private onEquipSelect(item: MenuItem): void {
-    const char = this.member!;
     const newItem = item.value ? ItemRegistry.getItem(item.value) : null;
-    // check before unequipping, so a refused item never costs the member what they wore
-    if (item.value && (!newItem || !char.canEquipIn(this.selectedSlot, newItem))) {
-      this.statsText.setText(`Can't equip\nthat there.`, true);
-      return;
-    }
-    const worn = char.getEquipped(this.selectedSlot);
-    // re-picking what is already worn changes nothing (and must not cycle a copy through a full bag)
-    if (worn && newItem && worn.id === newItem.id) {
-      this.backToSlots();
-      return;
-    }
-    // the worn item goes back to the bag: refuse when the bag already holds 99 of it (E1)
-    if (worn && !this.game.inventory.canAdd(worn.id)) {
-      this.statsText.setText(`No room for\n${worn.name}.`, true);
-      return;
-    }
-    const prev = char.unequip(this.selectedSlot);
-    // take the new item out of the bag before the worn one goes in, so a full bag never loses a copy
-    if (newItem && !this.game.inventory.remove(newItem.id)) console.error(`EquipScene: ${newItem.id} is not in the bag`);
-    else if (newItem && char.equip(this.selectedSlot, newItem) === false) {
-      console.error(`EquipScene: ${char.name} refused ${newItem.id}`);
-      this.game.inventory.add(newItem.id);
-    }
-    if (prev && this.game.inventory.add(prev.id) < 1) console.error(`EquipScene: no room for ${prev.id}`);
+    const result = item.value && !newItem
+      ? { ok: false as const, message: CANT_EQUIP_TEXT }
+      : equipFromBag(this.member!, this.selectedSlot, newItem ?? null, this.game.inventory);
+    if (!result.ok) { this.help.setText(result.message); return; }
     this.backToSlots();
   }
 

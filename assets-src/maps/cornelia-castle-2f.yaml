@@ -139,6 +139,20 @@ objects:
   parts:
   - [pillar_top]
   - [pillar_bottom]
+  x: 19
+  y: 6
+  fit: true
+- type: deco
+  parts:
+  - [pillar_top]
+  - [pillar_bottom]
+  x: 24
+  y: 6
+  fit: true
+- type: deco
+  parts:
+  - [pillar_top]
+  - [pillar_bottom]
   x: 15
   y: 9
   fit: true
@@ -231,6 +245,26 @@ objects:
   - [plant]
   x: 25
   y: 25
+- type: deco
+  parts:
+  - [plant]
+  x: 19
+  y: 8
+- type: deco
+  parts:
+  - [plant]
+  x: 20
+  y: 8
+- type: deco
+  parts:
+  - [plant]
+  x: 23
+  y: 8
+- type: deco
+  parts:
+  - [plant]
+  x: 24
+  y: 8
 - type: deco
   parts:
   - [bed_top]
@@ -459,7 +493,7 @@ npcs:
   cutscene: {id: act1_complete, requiredFlag: PRINCESS_RESCUED, onceFlag: INTRO_COMPLETE}
 - id: princess
   sprite: princess
-  x: 23
+  x: 22
   y: 8
   showIf: PRINCESS_RESCUED
   dialog:
@@ -523,3 +557,8 @@ encounters: []
 no_static_chokepoints: true
 no_unreachable_walkable: true
 canSave: true
+unreachable_ok:
+- [20, 6]
+- [20, 7]
+- [23, 6]
+- [23, 7]

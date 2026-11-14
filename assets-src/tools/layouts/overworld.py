@@ -28,7 +28,7 @@ from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BROKEN_BRI
                               JETTY, LAND, MOUNTAIN_BLOBS, N_STUB, N_WARP, NORTH_LAKE, NORTH_SHORE, PIER_TEXT, PONDS,
                               RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND, SHORE_SEA, SOUND, SOUTH_BAY, SPINE,
                               SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_OBJECT, TEMPLE_ROCK, TEMPLE_WARP, TOMB,
-                              TOMB_CHEST, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
+                              TOMB_CHEST, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP, BRIDGE_WORKERS)
 from overworld_grid import (bfs, clear_disc, clear_rect, extend_to_sea, fill_unreachable, near, tidy_blobs,  # noqa: E402
                             tidy_land, walk_grid)
 from overworld_noise import blob, fbm, polyline_distance, signed_distance  # noqa: E402
@@ -217,7 +217,7 @@ def main() -> None:
         "inspect": [{"x": TOMB[0], "y": TOMB[1], "text": ["Here lies Erdrick."]},
                     {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]},
                     {"x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "text": list(PIER_TEXT)}],
-        "npcs": [dict(TOMB_CHEST)],
+        "npcs": [dict(TOMB_CHEST), *(dict(n) for n in BRIDGE_WORKERS)],
         "keyItemGates": [{"x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT", "message": [dict(m) for m in GATE_MESSAGE],
                           "permanent": False} for x in (BX, BX + 1)],
         "encounterRate": {"min": 10, "max": 22},       # W4: the W / N gate -> temple walk (16 steps) sees a battle

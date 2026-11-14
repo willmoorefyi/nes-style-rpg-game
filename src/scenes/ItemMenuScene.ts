@@ -11,6 +11,7 @@ import type { Character } from '../entities/Character.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { isFallen } from '../systems/FieldSpellEffects.js';
+import { initialItemTargetIndex } from '../entities/partyTargets.js';
 import { FONT_SIZE, MENU_LINE_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type Phase = 'selectItem' | 'selectTarget' | 'confirm';
@@ -77,6 +78,8 @@ export class ItemMenuScene implements Scene {
   get partyLabels(): string[] {
     return this.targetMenu ? this.targetRows().map((r) => r.label) : this.partyRows.map((t) => t.text);
   }
+  /** The target cursor while choosing who gets the item, or -1. */
+  get targetIndex(): number { return this.targetMenu?.selectedIndex ?? -1; }
   /** The Yes/No prompt's text, or '' when none is open. */
   get confirmPrompt(): string { return this.confirmBox?.prompt ?? ''; }
   get listRect(): ItemMenuRect { return { ...ITEM_LIST_RECT }; }
@@ -128,6 +131,7 @@ export class ItemMenuScene implements Scene {
         items: rows,
         x: this.partyWindow.contentX,
         y: this.partyWindow.contentY,
+        initialIndex: initialItemTargetIndex(this.game.party.all, this.selectedItemId), // U8: who needs it
         eventBus: this.game.events,
         onSelect: (item) => this.onTargetSelect(item),
         onCancel: () => this.backToItems(),

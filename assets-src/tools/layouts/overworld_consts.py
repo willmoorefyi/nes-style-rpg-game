@@ -22,7 +22,7 @@ TEMPLE_DOOR = (TX + 1, TY + 2)
 # W1 / W2: the ruined temple cut from overworld/grand_temple (91x96 native, doorway at native x 53-64, centre 58.5);
 # +13 px puts the door on the warp cell's centre (x 72 of the 3-cell box). The null third column owns the 8 px spill
 # (no peak draws over it); the door cell (TX+1, TY+1) stays walkable and warps to the temple (no prefab any more)
-TEMPLE_OBJECT = {"type": "deco", "name": "temple", "x": TX, "y": TY, "offset": [13, 0], "collide": "alpha", "style": "bright",
+TEMPLE_OBJECT = {"type": "deco", "name": "temple", "x": TX, "y": TY, "offset": [13, 0], "collide": "alpha", "style": "brighter",
                  "parts": [["temple_ruin_0_0", "temple_ruin_0_1", None], ["temple_ruin_1_0", "temple_ruin_1_1", None]],
                  "walk_cells": [[1, 1]]}
 TEMPLE_WARP = {"x": TX + 1, "y": TY + 1, "targetMap": "temple-of-fiends", "targetEntrance": "entry"}
@@ -124,6 +124,13 @@ PIER_TEXT = ["The pier runs out into the bay. No ship calls at Cornelia while pi
 # T1: the north bridge's gate message, once the King has ordered the repair (INTRO_COMPLETE) and before
 GATE_MESSAGE = [{"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge, but it isn't finished yet."]},
                 {"text": ["The bridge has collapsed into the sea. Only the King's builders could repair it."]}]
+# U17: the builders the gate message names, on the south bank either side of the stub's road (existing sprites)
+BRIDGE_WORKERS = [
+    {"id": "bridge_worker_w", "sprite": "farmer", "x": BX - 1, "y": S_STUB + 1, "showIf": "INTRO_COMPLETE",
+     "dialog": ["We're rebuilding the span, stone by stone. Come back when the work is done."]},
+    {"id": "bridge_worker_e", "sprite": "villager", "x": BX + 2, "y": S_STUB + 1, "showIf": "INTRO_COMPLETE",
+     "dialog": ["The King's orders: the north bridge before the harvest. Mind the scaffolding!"]},
+]
 
 # OW-9: the snapped ends, pilings and loose planks of the north bridge (overworld/kit_grand `bridge_gap`), drawn over
 # the two open-water gap rows. Art only: the cells stay ocean in collision and BRIDGE_BUILT stays unset in act 1.

@@ -1,6 +1,7 @@
 import { Container, BitmapText, Graphics } from 'pixi.js';
 import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
+import type { LoadScene } from './LoadScene.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { SaveManager } from '../systems/SaveManager.js';
@@ -83,7 +84,10 @@ export class TitleScene implements Scene {
     if (value === 'new') {
       Promise.resolve(this.game.scenes.switchTo('partyCreation')).catch(failed('Failed to open party creation:'));
     } else if (value === 'continue') {
-      Promise.resolve(this.game.scenes.push('loadMenu')).catch(failed('Failed to open the load menu:'));
+      // U6: from the title nothing unsaved can be lost, so the Load prompt neither warns nor defaults to No
+      Promise.resolve(this.game.scenes.push('loadMenu'))
+        .then(() => this.game.scenes.get<LoadScene>('loadMenu')?.openedFromTitle())
+        .catch(failed('Failed to open the load menu:'));
     } else if (value === 'debug') {
       import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader, pickScenario }) => {
         const loader = new DebugScenarioLoader(this.game);

@@ -234,7 +234,7 @@
   crit: 20
 - id: cloth
   name: Cloth
-  description: "Simple clothes any class can wear. DEF 1."
+  description: "Simple clothes any class can wear. DEF 1, evade -2."
   type: armor
   stats:
     defense: 1
@@ -250,7 +250,7 @@
   weight: 2
 - id: robe
   name: Robe
-  description: "A mage's robe. DEF 2, weight 2."
+  description: "A mage's robe. DEF 2, evade -2."
   type: armor
   stats:
     defense: 2
@@ -263,7 +263,7 @@
   weight: 2
 - id: leather_armor
   name: Leather Armor
-  description: "Hardened leather. DEF 4, weight 8."
+  description: "Hardened leather. DEF 4, evade -8."
   type: armor
   stats:
     defense: 4
@@ -277,7 +277,7 @@
   weight: 8
 - id: wooden_armor
   name: Wooden Armor
-  description: "Plates of hard wood. DEF 4, weight 8."
+  description: "Plates of hard wood. DEF 4, evade -8."
   type: armor
   stats:
     defense: 4
@@ -288,7 +288,7 @@
   weight: 8
 - id: chain_mail
   name: Chain Mail
-  description: "Linked iron rings. DEF 15, weight 15."
+  description: "Linked iron rings. DEF 15, evade -15."
   type: armor
   stats:
     defense: 15
@@ -300,7 +300,7 @@
   weight: 15
 - id: iron_armor
   name: Iron Armor
-  description: "Full iron plate. DEF 24, heavy (weight 23)."
+  description: "Full iron plate. DEF 24, heavy: evade -23."
   type: armor
   stats:
     defense: 24
@@ -311,7 +311,7 @@
   weight: 23
 - id: mythril_armor
   name: Mythril Armor
-  description: "Mythril plate. DEF 34, heavy (weight 33)."
+  description: "Mythril plate. DEF 34, heavy: evade -33."
   type: armor
   stats:
     defense: 34
@@ -322,7 +322,7 @@
   weight: 33
 - id: mythril_mail
   name: Mythril Mail
-  description: "Light mythril links. DEF 18, weight 8."
+  description: "Light mythril links. DEF 18, evade -8."
   type: armor
   stats:
     defense: 18
@@ -334,7 +334,7 @@
   weight: 8
 - id: dragon_armor
   name: Dragon Armor
-  description: "Armour of dragon scale. DEF 42, weight 10."
+  description: "Armour of dragon scale. DEF 42, evade -10."
   type: armor
   stats:
     defense: 42
@@ -380,7 +380,7 @@
   weight: 0
 - id: cap
   name: Cap
-  description: "A leather cap any class can wear. DEF 1."
+  description: "A leather cap any class can wear. DEF 1, evade -1."
   type: armor
   slot: helmet
   stats:
@@ -396,7 +396,7 @@
   weight: 1
 - id: iron_helm
   name: Iron Helm
-  description: "An iron helmet. DEF 3."
+  description: "An iron helmet. DEF 3, evade -3."
   type: armor
   slot: helmet
   stats:
@@ -407,7 +407,7 @@
   weight: 3
 - id: mythril_helm
   name: Mythril Helm
-  description: "A mythril helmet. DEF 6."
+  description: "A mythril helmet. DEF 6, evade -3."
   type: armor
   slot: helmet
   stats:

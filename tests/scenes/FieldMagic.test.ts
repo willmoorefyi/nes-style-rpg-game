@@ -100,7 +100,7 @@ describe('MS-3: field magic', () => {
     fighter.currentHp = 5;
     const { scene, tap } = openScene([mage, fighter]);
     const before = mage.getSpellCharges(1);
-    tap('confirm', 'confirm', 'down', 'confirm');
+    tap('confirm', 'confirm', 'confirm'); // caster, CURE, target FGHTR (the cursor starts on the most hurt, U8)
     expect(scene.message).toMatch(/^FGHTR recovers \d+ HP$/);
     expect(mage.getSpellCharges(1)).toBe(before - 1);
     expect(visibleLabels(scene.container)).toContain(`FGHTR ${fighter.currentHp}/${fighter.maxHp}`);
@@ -162,5 +162,18 @@ describe('MS-7: field magic shows the spell description in the help bar', () => 
     expect(scene.helpText).toBe(SpellRegistry.getSpell('heal')!.description);
     tap('cancel');
     expect(scene.helpText).toBe('');
+  });
+});
+
+describe('U8: the field spell target cursor starts on who needs the spell', () => {
+  it('CURE starts on the most hurt member (index 1 of full / 8 / full / KO)', () => {
+    const bmag = new Character({ name: 'B.MAG', classData: ClassRegistry.getClass('black_mage')! });
+    thief.currentHp = 8;
+    bmag.currentHp = 0;
+    const { scene, tap } = openScene([fighter, thief, mage, bmag]);
+    tap('down', 'down'); // W.MAG
+    tap('confirm');      // her spells
+    tap('confirm');      // CURE
+    expect(scene.targetIndex).toBe(1);
   });
 });

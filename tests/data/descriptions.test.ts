@@ -61,4 +61,11 @@ describe('MS-7: every item has a real description', () => {
     expect(byId.get('potion')!.description).toContain(`${byId.get('potion')!.stats.hp} HP`);
     expect(byId.get('hi_potion')!.description).toContain(`${byId.get('hi_potion')!.stats.hp} HP`);
   });
+
+  it('U11: no description says "weight"; armour with weight says what it costs: "evade -N"', () => {
+    for (const item of items) expect(item.description, item.id).not.toMatch(/\bweight\b/i);
+    const heavy = items.filter((i) => i.type === 'armor' && (i.weight ?? 0) > 0);
+    expect(heavy.length).toBeGreaterThan(0);
+    for (const item of heavy) expect(item.description, item.id).toMatch(new RegExp(`\\bevade -${item.weight}\\b`));
+  });
 });

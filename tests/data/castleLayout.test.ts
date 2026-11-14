@@ -259,3 +259,52 @@ describe('the castle rooms have a purpose (CA-7)', () => {
     expect(mask('cornelia-castle-2f')).not.toEqual(mask('cornelia-castle'));
   });
 });
+
+describe('U18: the throne dais (2F)', () => {
+  const map = compiled('cornelia-castle-2f');
+  const col = new CollisionMap(map);
+  const npc = (id: string) => map.npcs.find((n) => n.id === id)!;
+  const king = npc('king');
+  const princess = npc('princess');
+  /** Reachable cells from throne_return with the King and the (rescued) princess standing. */
+  function reachable(): Set<string> {
+    const blocked = new Set([`${king.x},${king.y}`, `${princess.x},${princess.y}`]);
+    const [sx, sy] = map.entrances!.throne_return as [number, number];
+    const seen = new Set([`${sx},${sy}`]);
+    const queue: Array<[number, number]> = [[sx, sy]];
+    while (queue.length) {
+      const [x, y] = queue.shift()!;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy, k = `${nx},${ny}`;
+        if (seen.has(k) || blocked.has(k) || !col.isWalkable(nx, ny, walk)) continue;
+        seen.add(k);
+        queue.push([nx, ny]);
+      }
+    }
+    return seen;
+  }
+
+  it('the princess stands beside her father, talked to from the cell south of her', () => {
+    expect([king.x, king.y]).toEqual([21, 8]);
+    expect([princess.x, princess.y]).toEqual([22, 8]);
+    expect(princess.showIf).toBe('PRINCESS_RESCUED');
+    expect(reachable().has(`${princess.x},${princess.y + 1}`)).toBe(true);
+    expect(map.entrances!.throne_return).toEqual([21, 9]);
+  });
+
+  it('no reachable cell touches both royals or lies between them, and the dais behind them is closed', () => {
+    const seen = reachable();
+    const touches = (x: number, y: number, n: { x: number; y: number }) => Math.abs(x - n.x) + Math.abs(y - n.y) === 1;
+    for (const k of seen) {
+      const [x, y] = k.split(',').map(Number);
+      expect(touches(x, y, king) && touches(x, y, princess), `(${k}) touches both`).toBe(false);
+      if (y === 8) expect(x > Math.min(king.x, princess.x) && x < Math.max(king.x, princess.x), `(${k})`).toBe(false);
+    }
+    for (let x = 19; x <= 24; x++) {
+      for (const y of [6, 7, 8]) {
+        if (y === 8 && (x === king.x || x === princess.x)) continue;
+        expect(seen.has(`${x},${y}`), `dais cell (${x}, ${y})`).toBe(false);
+      }
+    }
+  });
+});

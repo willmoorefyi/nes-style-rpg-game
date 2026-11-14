@@ -7,7 +7,7 @@ export interface ShopRect { x: number; y: number; width: number; height: number 
 export const DETAIL_RECT: ShopRect = { x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 };
 /** Top left: Buy / Sell / Exit (the magic shop shows its name here). */
 export const CHOICE_RECT: ShopRect = { x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 240 };
-/** Top right, as wide as the panel below it, so the gold and the result line stay visible while browsing. */
+/** Top right, as wide as the panel below it: the gold only (the result line is on the help bar, U9). */
 export const GOLD_RECT: ShopRect = { x: DETAIL_RECT.x, y: SCREEN_MARGIN, width: DETAIL_RECT.width, height: 100 };
 
 const LIST_Y = 288;

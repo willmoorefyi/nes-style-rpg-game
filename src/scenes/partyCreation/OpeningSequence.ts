@@ -1,4 +1,4 @@
-import { Assets, Container, Sprite, type Texture } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { GameFlags } from '../../core/GameFlags.js';
 import type { Character } from '../../entities/Character.js';
@@ -17,8 +17,8 @@ export interface OpeningDeps {
   showDialog: (text: string) => Promise<void>;
   fadeOut: (ms: number) => Promise<void>;
   fadeIn: (ms: number) => Promise<void>;
-  /** Show `assets/backgrounds/<image>.webp` full screen behind the dialog, or clear it for null. */
-  backdrop: (image: string | null) => Promise<void>;
+  /** Show `assets/backgrounds/<image>.webp` full screen behind the dialog (dimmed by `opts.dim`), or clear it for null. */
+  backdrop: (image: string | null, opts?: { dim?: number }) => Promise<void>;
   flags: GameFlags;
   party: Character[];
 }
@@ -45,6 +45,18 @@ export function backdropSprite(tex: Texture): Sprite {
   return sprite;
 }
 
+/** The cool tint a dimmed backdrop gets (U16): night, not just a darker day. */
+export const DIM_TINT = 0x8090c0;
+
+/** A dimmed backdrop: a black overlay of alpha `1 - dim` over the sprite, which gets `DIM_TINT` (U16). */
+export function dimBackdrop(sprite: Sprite, dim: number | undefined): Graphics | null {
+  if (dim === undefined || dim >= 1) return null;
+  sprite.tint = DIM_TINT;
+  const overlay = new Graphics().rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill({ color: 0x000000 });
+  overlay.alpha = 1 - dim;
+  return overlay;
+}
+
 /** The opening's layers (backdrop, fade, dialog) and the plumbing between the dialog box and the cutscene. */
 export class OpeningSequence {
   readonly layer = new Container();
@@ -54,7 +66,8 @@ export class OpeningSequence {
   private readonly dialogManager: DialogManager;
   private dialogResolve: (() => void) | null = null;
 
-  constructor() {
+  /** `loadTexture`: how a backdrop image is loaded (tests pass their own). */
+  constructor(private readonly loadTexture: (path: string) => Promise<Texture> = (path) => Assets.load<Texture>(path)) {
     this.dialogBox = new DialogBox({ onComplete: () => this.dialogManager.advance() });
     this.dialogBox.visible = false;
     this.dialogManager = new DialogManager(this.dialogBox);
@@ -90,7 +103,7 @@ export class OpeningSequence {
       }),
       fadeOut: (ms) => this.fade.fadeOut(ms),
       fadeIn: (ms) => this.fade.fadeIn(ms),
-      backdrop: (image) => this.showBackdrop(image),
+      backdrop: (image, opts) => this.showBackdrop(image, opts),
       flags,
       party,
     });
@@ -98,12 +111,22 @@ export class OpeningSequence {
     this.fade.overlay.alpha = 1;
   }
 
-  private async showBackdrop(image: string | null): Promise<void> {
+  /** The dimming overlay's alpha over the current backdrop (0 when there is none). */
+  get backdropDimAlpha(): number {
+    const overlay = this.backdropLayer.children.find((c) => c instanceof Graphics);
+    return overlay?.alpha ?? 0;
+  }
+
+  /** Show a backdrop (dimmed when `opts.dim` < 1, U16), or clear it for null. */
+  async showBackdrop(image: string | null, opts?: { dim?: number }): Promise<void> {
     this.backdropLayer.removeChildren();
     if (image === null) return;
     const path = `assets/backgrounds/${image}.webp`;
     try {
-      this.backdropLayer.addChild(backdropSprite(await Assets.load<Texture>(path)));
+      const sprite = backdropSprite(await this.loadTexture(path));
+      this.backdropLayer.addChild(sprite);
+      const overlay = dimBackdrop(sprite, opts?.dim);
+      if (overlay) this.backdropLayer.addChild(overlay);
     } catch (e) {
       console.error(`Opening backdrop ${path} failed to load`, e);
     }

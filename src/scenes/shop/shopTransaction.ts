@@ -1,5 +1,6 @@
 import type { ItemData } from '../../types/index.js';
 import { Inventory } from '../../entities/Inventory.js';
+import { cantCarryText } from '../../systems/pickupText.js';
 
 /** The party's gold, as the shop uses it. */
 export interface ShopPurse {
@@ -11,11 +12,6 @@ export interface ShopPurse {
 export interface ShopResult {
   ok: boolean;
   message: string;
-}
-
-/** Shown when the bag already holds 99 of an item (E1). */
-export function cantCarryMessage(name: string): string {
-  return `You can't carry any more ${name}.`;
 }
 
 /** The most of an item the party can buy: limited by the 99 cap, the gold and the room left in the bag (E1). */
@@ -31,7 +27,7 @@ export function sellPrice(item: ItemData): number {
 
 /** Buy `qty` of `item`; nothing is paid unless every one of them fits in the bag. */
 export function buy(purse: ShopPurse, inventory: Inventory, item: ItemData, qty: number): ShopResult {
-  if (!inventory.canAdd(item.id, qty)) return { ok: false, message: cantCarryMessage(item.name) };
+  if (!inventory.canAdd(item.id, qty)) return { ok: false, message: cantCarryText(item.id) };
   if (!purse.spendGold(item.price * qty)) return { ok: false, message: 'Not enough gold.' };
   const added = inventory.add(item.id, qty);
   if (added !== qty) {
