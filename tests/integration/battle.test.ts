@@ -101,7 +101,7 @@ describe('Battle Integration', () => {
 
   it('complete defeat flow: party dies → game over', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData, currentHp: 1 });
-    const scene = new BattleScene(deps, createConfig([hero], [strongEnemy]));
+    const scene = new BattleScene(deps, createConfig([hero], [strongEnemy], () => 0.01)); // seeded: low rolls hit, so the enemy lands its blow
     scene.enter();
 
     const getState = () => scene.uiPhase;
