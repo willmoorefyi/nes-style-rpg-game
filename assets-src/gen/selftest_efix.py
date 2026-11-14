@@ -13,7 +13,7 @@ import yaml
 BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4)
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}}
-FX_PENDING = {("lich", "crystal")}
+FX_PENDING: set[tuple[str, str]] = set()
 
 
 def _canvas() -> tuple[np.ndarray, np.ndarray]:
