@@ -63,6 +63,7 @@ npcs:
 transitions:
 - {x: 11, y: 21, targetMap: overworld, targetEntrance: temple}
 - {x: 12, y: 21, targetMap: overworld, targetEntrance: temple}
+name: Temple of Fiends
 music: dungeon
 encounterRate: {max: 15, min: 8}
 encounters:

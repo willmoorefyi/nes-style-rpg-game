@@ -459,7 +459,7 @@ objects:
   - [stairs_down_1_0, stairs_down_1_1]
   x: 39
   y: 28
-  walkable_rows: [0, 1]
+  walkable_rows: [0]
 - {type: crate, x: 32, y: 30}
 - {type: barrel, x: 33, y: 30}
 - {type: crate, x: 41, y: 19}
@@ -564,8 +564,8 @@ npcs:
 transitions:
 - {x: 21, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}
 - {x: 22, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}
-- {x: 39, y: 29, targetMap: cornelia-castle-cellar, targetEntrance: stairs}
-- {x: 40, y: 29, targetMap: cornelia-castle-cellar, targetEntrance: stairs}
+- {x: 39, y: 28, targetMap: cornelia-castle-cellar, targetEntrance: stairs}
+- {x: 40, y: 28, targetMap: cornelia-castle-cellar, targetEntrance: stairs}
 - {x: 21, y: 33, targetMap: cornelia, targetEntrance: castle}
 - {x: 22, y: 33, targetMap: cornelia, targetEntrance: castle}
 encounterRate: {min: 999, max: 999}

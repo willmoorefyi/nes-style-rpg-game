@@ -223,6 +223,29 @@ def run(B) -> int:
     assert ok_src({**pocket, "no_unreachable_walkable": True, "entrances": {"a": [0, 0], "inner": [2, 2]},
                    "unreachable_ok": ["inner"]}), "a region reached from an unreachable_ok entrance"
     ok += 1
+    # contrast (TF-2): wall tops cut from the floor's own texture read as one surface; a darkened copy reads apart
+    hall = {"id": "hl", "ground": "WWWWW\nW---W\nW---W\nWWWWW", "entrances": {"a": [2, 1]},
+            "materials": {"in_wall_top": "floor_stone"}, "contrast": [{"a": "W", "b": "-", "min": 0.2}]}
+    expect_error(hall, "contrast 0: 'W' cells")
+    dark = {**hall, "materials": {"in_wall_top": {"from": "floor_stone", "shade": 0.3}}}
+    dc = comp(dark)
+    sa, sb = MC.contrast_pairs(dark, dc, "W", "-")
+    assert len(sa) == 10 and len(sb) == 6 and MC.cell_luma(dc, sa) < MC.cell_luma(dc, sb) - 0.2, \
+        "the wall cells next to the floor, against the floor, sampled at their centres"
+    expect_error({**dark, "contrast": [{"a": "W", "b": "-"}]}, "want {a: <char>, b: <other char>, min: 0-1}")
+    expect_error({**dark, "contrast": [{"a": "W", "b": "%", "min": 0.2}]}, "no bare 'W' cell next to a bare '%'")
+    # the real temple: its old material list (one slab texture for wall tops and floor) fails; the source passes
+    temple = __import__("yaml").safe_load((B.SRC / "temple-of-fiends.yaml").read_text())
+    assert temple.get("contrast"), "the temple opts in to the contrast check"
+    B.compile_source(temple)
+    old = {**temple, "materials": {"floor_stone": "temple_floor", "rubble": "temple_rubble",
+                                   "in_wall_top": "temple_wall_top", "in_wall_face": "temple_wall_face"}}
+    try:
+        B.compile_source(old)
+        raise AssertionError("the temple's old materials must fail the contrast check")
+    except B.MapError as e:
+        assert "contrast 0" in str(e), e
+    ok += 5
 
     # ── 6. map report and 7. preview, on a compiled map written to a temp dir
     with tempfile.TemporaryDirectory() as tmp:

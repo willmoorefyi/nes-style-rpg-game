@@ -96,10 +96,11 @@ class Room:
         self.transitions += [{"x": x + i, "y": y + 1, "targetMap": to_map, "targetEntrance": to_entrance} for i in (0, 1)]
 
     def stairs_down(self, x, y, to_map, to_entrance):
-        """A 2x2 stairwell in the floor; stepping on its lower row leads down."""
+        """A 2x2 stairwell in the floor; the first step onto its top row leads down (CA-1: the player never walks
+        across the drawn pit), and its lower row is solid."""
         self.deco([["stairs_down_0_0", "stairs_down_0_1"], ["stairs_down_1_0", "stairs_down_1_1"]], x, y,
-                  walkable_rows=[0, 1])
-        self.transitions += [{"x": x + i, "y": y + 1, "targetMap": to_map, "targetEntrance": to_entrance} for i in (0, 1)]
+                  walkable_rows=[0])
+        self.transitions += [{"x": x + i, "y": y, "targetMap": to_map, "targetEntrance": to_entrance} for i in (0, 1)]
 
     def write(self, header: str, entrances: dict, *, kits: list, mats: dict | None, trim: list | None, quiet: dict,
               script: str, legend: str, music: str = "town", extra: dict | None = None) -> Path:

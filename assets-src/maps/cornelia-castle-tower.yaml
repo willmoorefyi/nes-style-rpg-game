@@ -41,7 +41,7 @@ objects:
   - [stairs_down_1_0, stairs_down_1_1]
   x: 7
   y: 9
-  walkable_rows: [0, 1]
+  walkable_rows: [0]
 - type: deco
   parts:
   - [arch_window_top]
@@ -107,8 +107,8 @@ npcs:
   - text: ['Ah, visitors! From up here I watch the stars... and the crystals.', Four crystals hold the world in balance. Their light is fading.,
       Legend says four Warriors of Light will come. Perhaps you are they.]
 transitions:
-- {x: 7, y: 10, targetMap: cornelia-castle-2f, targetEntrance: tower}
-- {x: 8, y: 10, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 7, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 8, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
 encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true

@@ -66,7 +66,7 @@ objects:
   - [stairs_down_1_0, stairs_down_1_1]
   x: 21
   y: 24
-  walkable_rows: [0, 1]
+  walkable_rows: [0]
 - type: deco
   parts:
   - [arch_window_top]
@@ -470,8 +470,8 @@ npcs:
   y: 21
   dialog: [Welcome to the royal chapel., May the light of the crystals watch over you.]
 transitions:
-- {x: 21, y: 25, targetMap: cornelia-castle, targetEntrance: stairs}
-- {x: 22, y: 25, targetMap: cornelia-castle, targetEntrance: stairs}
+- {x: 21, y: 24, targetMap: cornelia-castle, targetEntrance: stairs}
+- {x: 22, y: 24, targetMap: cornelia-castle, targetEntrance: stairs}
 - {x: 37, y: 5, targetMap: cornelia-castle-tower, targetEntrance: stairs}
 - {x: 38, y: 5, targetMap: cornelia-castle-tower, targetEntrance: stairs}
 encounterRate: {min: 999, max: 999}
