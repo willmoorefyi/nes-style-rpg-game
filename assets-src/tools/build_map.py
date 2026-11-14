@@ -72,7 +72,7 @@ FACE_PLAIN, FACE_BASE = (56, 84), (84, 96)
 BANK_R = 34              # px: blur radius that rounds the canal outline
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
 PASSTHROUGH = ("name", "music", "encounterRate", "encounters", "battleBackgrounds", "canSave", "scriptedEncounters",
-               "vehicles", "keyItemGates", "noWander", "inspect", "encounterZones")
+               "vehicles", "keyItemGates", "noWander", "inspect", "encounterZones", "camp")
 ALPHA_MIN = 0.25         # collide: alpha: a footprint cell blocks when this share of its pixels is opaque art
 SIDES = ("north", "south", "west", "east")
 

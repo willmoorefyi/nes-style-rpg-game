@@ -418,8 +418,11 @@ npcs:
   x: 23
   y: 8
   showIf: PRINCESS_RESCUED
-  dialog: [Thank you for rescuing me from Garland., Please take this lute. It has been in our family for generations., They say that one day its
-      song will open a sealed way.]
+  dialog:
+  - condition: GOT_LUTE
+    text: [Thank you again. Keep the lute safe.]
+  - text: [Thank you for rescuing me from Garland., Please take this lute. It has been in our family for generations., They say that one day its
+        song will open a sealed way.]
   giftItem: lute
   giftFlag: GOT_LUTE
 - id: chancellor

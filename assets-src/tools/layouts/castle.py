@@ -134,7 +134,8 @@ f1.npcs += [
     {"id": "barracks_soldier", "sprite": "guard", "x": 8, "y": 12, "wander": True,
      "dialog": ["Off duty. Do not tell the captain I was napping."]},
     {"id": "castle_cook", "sprite": "villager_f", "x": 6, "y": 24, "wander": True,
-     "dialog": ["A feast for the princess's return is ready the moment she is home!"]},
+     "dialog": [{"condition": "PRINCESS_RESCUED", "text": ["The feast is ready! Her Highness is home!"]},
+                {"text": ["A feast for the princess's return is ready the moment she is home!"]}]},
     {"id": "castle_maid", "sprite": "villager_f", "x": 9, "y": 28, "wander": True,
      "dialog": [{"condition": "PRINCESS_RESCUED", "text": ["Her Highness is safe at last. Thank you!"]},
                 {"text": ["Garland was the King's most trusted knight...", "Why would he turn against us?"]}]},
@@ -144,7 +145,8 @@ f1.npcs += [
     {"id": "library_mage", "sprite": "mage", "x": 39, "y": 12, "wander": True,
      "dialog": ["Shh! This is a library.", "...The sage in the east tower knows more than every book here."]},
     {"id": "treasury_guard", "sprite": "guard", "x": 36, "y": 23,
-     "dialog": ["The King ordered the storeroom below opened for you.", "Take what you need for your journey."]},
+     # ST-9: holds before the audience with the King (there is no "met the King" flag)
+     "dialog": ["The storeroom below is open to any who would face Garland.", "Take what you need before you set out."]},
 ]
 f1.transitions += [{"x": x, "y": 33, "targetMap": "cornelia", "targetEntrance": "castle"} for x in (21, 22)]
 f1.write("Cornelia Castle 1F: grand hall (stairs up to the throne room), barracks, banquet hall, library, treasury"
@@ -234,8 +236,10 @@ f2.npcs += [
                           "Bring her home safely, and I will rebuild the bridge to the north for you."]}],
      "cutscene": {"id": "act1_complete", "requiredFlag": "PRINCESS_RESCUED", "onceFlag": "INTRO_COMPLETE"}},
     {"id": "princess", "sprite": "princess", "x": 23, "y": 8, "showIf": "PRINCESS_RESCUED",
-     "dialog": ["Thank you for rescuing me from Garland.", "Please take this lute. It has been in our family for generations.",
-                "They say that one day its song will open a sealed way."],
+     "dialog": [{"condition": "GOT_LUTE", "text": ["Thank you again. Keep the lute safe."]},
+                {"text": ["Thank you for rescuing me from Garland.",
+                          "Please take this lute. It has been in our family for generations.",
+                          "They say that one day its song will open a sealed way."]}],
      "giftItem": "lute", "giftFlag": "GOT_LUTE"},
     {"id": "chancellor", "sprite": "old_man", "x": 18, "y": 10,
      "dialog": [{"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge to the north."]},
@@ -275,7 +279,7 @@ f3.deco([["desk"]], 9, 4)
 f3.deco([["orb_white"]], 3, 8)
 f3.deco([["plant"]], 12, 9)
 f3.npcs += [{"id": "tower_sage", "sprite": "old_man", "x": 6, "y": 5,
-             "dialog": [{"condition": "PRINCESS_RESCUED",
+             "dialog": [{"condition": "GOT_LUTE",
                          "text": ["So the princess gave you the old lute.",
                                   "Keep it close. Somewhere a door sleeps that only its song can wake."]},
                         {"text": ["Ah, visitors! From up here I watch the stars... and the crystals.",
@@ -305,7 +309,7 @@ b1.npcs += [
     {"id": "chest_castle_tent", "sprite": "chest", "x": 15, "y": 9, "chestItem": "tent",
      "chestFlag": "CHEST_CORNELIA_TENT", "dialog": ["You found a Tent!"]},
     {"id": "cellar_steward", "sprite": "old_man", "x": 13, "y": 6,
-     "dialog": ["Wine, grain and old armour, all the way to the walls.", "The chests are yours, by royal order."]},
+     "dialog": ["Wine, grain and old armour, all the way to the walls.", "Take what you need. The King would want it so."]},
 ]
 b1.write("Cornelia Castle B1: the cellar storerooms under the treasury.", {"stairs": [10, 4]},
          mats={"floor_stone": "floor_stone", "in_wall_face": "castle_wall_in",

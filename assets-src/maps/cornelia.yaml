@@ -3,6 +3,7 @@
 # through the town. Compiled by assets-src/tools/build_map.py.
 # ground legend: . grass  : cobble  , dirt  ~ water  # wall  = bridge  u culvert (wall over water)
 id: cornelia
+name: Cornelia
 kits:
 - town
 - castle
@@ -75,7 +76,7 @@ ground: |
   .........#####...............:::.......~~.......####..........
   ..........#######............:::.......~~....######...........
   ............########.........:::.......~~#########............
-  ...............########......:::.....##uu######...............
+  ...............########......:::...####uu######...............
   ..................###########:::#######uu##...................
   .....................########:::#######~~.....................
   .............................:::.......~~.....................
@@ -511,14 +512,7 @@ objects:
 - {type: bush, x: 56, y: 9}
 - {type: tree, x: 54, y: 7}
 - {type: tree, x: 56, y: 22}
-- type: deco
-  parts:
-  - [oak_0_0, oak_0_1]
-  - [oak_1_0, oak_1_1]
-  - [oak_2_0, oak_2_1]
-  x: 53
-  y: 3
-  above_rows: 1
+- {type: tree, x: 53, y: 5}
 - type: house
   w: 5
   door: 2
@@ -1094,17 +1088,17 @@ objects:
 npcs:
 - id: castle_door_guard_w
   sprite: guard
-  x: 29
+  x: 28
   y: 19
   dialog: [The castle of Cornelia. The King receives travellers in the throne room upstairs.]
 - id: castle_door_guard_e
   sprite: guard
-  x: 31
+  x: 32
   y: 19
   dialog:
   - condition: PRINCESS_RESCUED
-    text: [The princess is home! The whole kingdom rejoices.]
-  - text: ['Since Garland took the princess, the King has not slept.']
+    text: [Her Highness rode in through this very gate., I will tell my grandchildren I stood guard that day!]
+  - text: ['I keep watch on the castle gate, day and night.', No one has crossed this bridge unseen since Garland rode out.]
 - id: inner_gate_guard
   sprite: guard
   x: 28
@@ -1138,7 +1132,7 @@ npcs:
   x: 34
   y: 45
   wander: true
-  dialog: [Buy spells early. They make a huge difference in the first dungeon!]
+  dialog: [Buy spells early. Garland is no easy foe!]
 - id: market_vendor_w
   sprite: merchant
   x: 24
@@ -1189,8 +1183,8 @@ npcs:
   wander: true
   dialog:
   - condition: PRINCESS_RESCUED
-    text: [Her Highness walks in the gardens again. Thank you!]
-  - text: [Garland was the King's most trusted knight..., 'Why would he turn against us?']
+    text: [Her Highness is home at last! I will cut her the first roses.]
+  - text: [I tend the roses for Her Highness., I hope she comes home before they fade.]
 edge_exits:
   north: {targetMap: overworld, targetEntrance: cornelia_north}
   west: {targetMap: overworld, targetEntrance: cornelia_west}
@@ -1206,3 +1200,4 @@ road_check:
   - [54, 51]
   - [53, 59]
 no_static_chokepoints: true
+no_unreachable_walkable: true

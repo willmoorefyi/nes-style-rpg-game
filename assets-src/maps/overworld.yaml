@@ -4,6 +4,7 @@
 # Compiled by assets-src/tools/build_map.py.
 # ground legend: . grass  f forest  m mountain  s sand  , dirt road  r river  o ocean  = bridge  ≈ lake
 id: overworld
+name: World Map
 kits:
 - overworld
 - town
@@ -82,6 +83,7 @@ ground: |
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
   oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+camp: true
 terrain: organic
 sealed_edges: true
 road_check:

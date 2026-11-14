@@ -1729,6 +1729,7 @@ collision:
 - 1
 height: 36
 id: cornelia
+name: Cornelia
 layers:
 - - 2
   - 2

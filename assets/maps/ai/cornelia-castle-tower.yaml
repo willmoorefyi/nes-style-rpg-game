@@ -21,7 +21,7 @@ npcs:
   x: 6
   y: 5
   dialog:
-  - condition: PRINCESS_RESCUED
+  - condition: GOT_LUTE
     text: [So the princess gave you the old lute., Keep it close. Somewhere a door sleeps that only its song can wake.]
   - text: ['Ah, visitors! From up here I watch the stars... and the crystals.', Four crystals hold the world in balance. Their light is fading., Legend says four Warriors of Light will come. Perhaps you
         are they.]

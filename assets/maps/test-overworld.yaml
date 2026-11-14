@@ -2,6 +2,7 @@
 # 20x20 map with terrain variety
 # Terrain: 0=Grass, 1=Wall, 2=Water, 3=Mountain, 4=Forest, 5=Desert, 6=Swamp, 7=River, 8=Road, 9=Bridge
 id: test-overworld
+name: Test Overworld
 width: 20
 height: 20
 layers:

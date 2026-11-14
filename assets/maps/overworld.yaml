@@ -1,4 +1,6 @@
 id: overworld
+name: World Map
+camp: true
 width: 64
 height: 64
 layers:
