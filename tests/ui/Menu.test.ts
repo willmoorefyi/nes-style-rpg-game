@@ -141,4 +141,22 @@ describe('MS-5: MenuConfig.initialIndex', () => {
     const menu = new Menu({ items: many, maxVisible: 4, initialIndex: 10 });
     expect(menu.selectedItem.value).toBe('10');
   });
+
+  it('R0 (E3): an inactive menu greys its cursor and ignores input until reactivated', () => {
+    const onSelect = vi.fn();
+    const menu = new Menu({ items, onSelect });
+    const cursor = menu.children[0];
+    expect(menu.isActive).toBe(true);
+    menu.setActive(false);
+    expect(menu.isActive).toBe(false);
+    expect(cursor.tint).toBe(0x808080);
+    menu.update(mockInput({ down: true }));
+    menu.update(mockInput({ confirm: true }));
+    expect(menu.selectedIndex).toBe(0);
+    expect(onSelect).not.toHaveBeenCalled();
+    menu.setActive(true);
+    expect(cursor.tint).toBe(0xffffff);
+    menu.update(mockInput({ down: true }));
+    expect(menu.selectedIndex).toBe(1);
+  });
 });

@@ -38,6 +38,7 @@ export class Menu extends Container {
   private onSelect?: (item: MenuItem, index: number) => void;
   private onCancel?: () => void;
   private eventBus?: EventBus;
+  private active = true;
 
   constructor(config: MenuConfig) {
     super();
@@ -98,7 +99,16 @@ export class Menu extends Container {
     this.updateIndicators();
   }
 
+  /** An inactive menu (focus moved to another one, E3) draws its cursor grey and ignores input. */
+  setActive(active: boolean): void {
+    this.active = active;
+    this.cursorText.tint = active ? 0xffffff : 0x808080;
+  }
+
+  get isActive(): boolean { return this.active; }
+
   update(input: InputManager): void {
+    if (!this.active) return;
     if (input.isJustPressed('up')) {
       this.moveCursor(-1);
       this.eventBus?.emit('cursorMove', {});

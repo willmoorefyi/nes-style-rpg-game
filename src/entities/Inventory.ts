@@ -4,11 +4,23 @@
  */
 export class Inventory {
   private items = new Map<string, number>();
-  private static readonly MAX_QUANTITY = 99;
+  static readonly MAX_QUANTITY = 99;
 
-  add(itemId: string, quantity = 1): void {
-    const current = this.items.get(itemId) ?? 0;
-    this.items.set(itemId, Math.min(current + quantity, Inventory.MAX_QUANTITY));
+  /** How many more of `itemId` fit before the 99 cap. */
+  space(itemId: string): number {
+    return Math.max(0, Inventory.MAX_QUANTITY - this.getQuantity(itemId));
+  }
+
+  /** Whether `quantity` more of `itemId` fit (E1: a chest stays closed when they don't). */
+  canAdd(itemId: string, quantity = 1): boolean {
+    return quantity <= this.space(itemId);
+  }
+
+  /** Add up to the cap; returns the number actually added (0 when full). */
+  add(itemId: string, quantity = 1): number {
+    const added = Math.max(0, Math.min(quantity, this.space(itemId)));
+    if (added > 0) this.items.set(itemId, this.getQuantity(itemId) + added);
+    return added;
   }
 
   remove(itemId: string, quantity = 1): boolean {

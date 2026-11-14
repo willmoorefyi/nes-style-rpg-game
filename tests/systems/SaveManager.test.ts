@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { SaveManager } from '../../src/systems/SaveManager.js';
+import { SaveManager, mapIdLabel } from '../../src/systems/SaveManager.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
@@ -100,6 +100,39 @@ describe('SaveManager', () => {
     expect(slots[1]!.playTime).toBe(7200);
     expect(slots[1]!.partyLeader).toBe('Hero');
     expect(slots[2]).toBeNull();
+  });
+
+  it('S5: a save records its location; the summary lists members, gold and location', () => {
+    const party = new PartyManager();
+    const hero = new Character({ name: 'Hero', classData: mockClassData, level: 3 });
+    hero.currentHp = 12;
+    party.add(hero);
+    party.add(new Character({ name: 'Mate', classData: mockClassData, level: 2 }));
+    party.addGold(250);
+
+    SaveManager.save(0, party, new Inventory(), new GameFlags(), 'cornelia-castle-2f', { x: 1, y: 1 }, 60, 'Throne Room');
+    SaveManager.save(2, party, new Inventory(), new GameFlags(), 'cornelia-castle-2f', { x: 1, y: 1 }, 60);
+
+    expect(JSON.parse(localStorageMock.getItem('ff1_save_0')!).location).toBe('Throne Room');
+    expect(JSON.parse(localStorageMock.getItem('ff1_save_0')!).version).toBe(1);
+    const slots = SaveManager.getSaveSlots();
+    expect(slots[0]!.location).toBe('Throne Room');
+    expect(slots[2]!.location).toBe('Cornelia Castle 2F');
+    expect(slots[0]!.gold).toBe(250);
+    expect(slots[0]!.members).toEqual([
+      { name: 'Hero', classId: 'warrior', level: 3, currentHp: 12 },
+      { name: 'Mate', classId: 'warrior', level: 2, currentHp: party.all[1].maxHp },
+    ]);
+    expect(slots[0]!.level).toBe(3);
+    expect(slots[0]!.partyLeader).toBe('Hero');
+    expect(slots[0]!.saveDate).toBeTypeOf('string');
+  });
+
+  it('mapIdLabel title-cases the words and upper-cases floor tags', () => {
+    expect(mapIdLabel('cornelia')).toBe('Cornelia');
+    expect(mapIdLabel('cornelia-castle-2f')).toBe('Cornelia Castle 2F');
+    expect(mapIdLabel('temple-of-fiends')).toBe('Temple Of Fiends');
+    expect(mapIdLabel('marsh-cave-b1')).toBe('Marsh Cave B1');
   });
 
   it('deleteSave removes save data', () => {

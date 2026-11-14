@@ -1,5 +1,6 @@
 import type { EnemyData, MapData, ShopData, StatBlock } from '../types/index.js';
 import { validateEncounterEntries, validateEncounterZones } from './encounterValidation.js';
+import { validateBossPhases, validateKeyItemGates, validateScriptedEncounters } from './mapValidators.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -115,7 +116,8 @@ export function validateEnemyData(data: unknown): EnemyData {
   assertNumber('EnemyData.stats.defense', (data.stats as Record<string, unknown>).defense);
   assertNumber('EnemyData.stats.magicDefense', (data.stats as Record<string, unknown>).magicDefense);
   assertOptionalNumbers('EnemyData.stats', data.stats as Record<string, unknown>, ['accuracy', 'evade', 'hits', 'crit']);
-  
+  if (data.bossPhases !== undefined) validateBossPhases(data.bossPhases);
+
   return data as unknown as EnemyData;
 }
 
@@ -261,6 +263,10 @@ export function validateMapData(data: unknown): MapData {
   if (data.battleBackgrounds !== undefined) validateBattleBackgrounds(data.battleBackgrounds);
   if (data.inspect !== undefined) validateInspect(data.inspect, data.width as number, data.height as number);
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
+  if (data.keyItemGates !== undefined) validateKeyItemGates(data.keyItemGates);
+  if (data.scriptedEncounters !== undefined) {
+    validateScriptedEncounters(data.scriptedEncounters, (data.npcs as Record<string, unknown>[]).map((n) => String(n.id)));
+  }
   
   return data as unknown as MapData;
 }

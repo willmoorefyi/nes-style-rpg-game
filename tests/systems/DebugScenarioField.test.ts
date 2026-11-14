@@ -48,9 +48,12 @@ describe('DebugScenarioLoader field mode', () => {
   it('every field scenario in debug-scenarios.yaml spawns on a walkable tile', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
     const fields = scenarios.filter((s) => s.mode === 'field');
+    const compiled = parse(readFileSync(resolve(root, 'assets/maps/ai/index.yaml'), 'utf-8')) as string[];
     expect(fields.length).toBeGreaterThan(0);
     for (const s of fields) {
-      const variants = [`assets/maps/${s.map}.yaml`, `assets/maps/ai/${s.map}.yaml`].filter((f) => existsSync(resolve(root, f)));
+      // R revision 2: maps in ai/index.yaml are checked on their compiled variant only (the one the game plays)
+      const variants = (compiled.includes(s.map!) ? [`assets/maps/ai/${s.map}.yaml`] : [`assets/maps/${s.map}.yaml`])
+        .filter((f) => existsSync(resolve(root, f)));
       expect(variants.length, `${s.id}: map ${s.map} exists`).toBeGreaterThan(0);
       for (const f of variants) {
         const map = parse(readFileSync(resolve(root, f), 'utf-8')) as
@@ -76,5 +79,41 @@ describe('DebugScenarioLoader field mode', () => {
       ...field, party: [{ ...member, name: 'A', hp: 0 }, { ...member, name: 'B', hp: 7 }, { ...member, name: 'C' }],
     });
     expect(party.all.map((c) => c.currentHp)).toEqual([0, 7, party.all[2].maxHp]);
+  });
+
+  it('R0: scenario flags are set on the fresh game and members may start with a status', async () => {
+    const { ClassRegistry } = await import('../../src/data/ClassRegistry.js');
+    const { PartyManager } = await import('../../src/entities/PartyManager.js');
+    const { Inventory } = await import('../../src/entities/Inventory.js');
+    const { GameFlags } = await import('../../src/core/GameFlags.js');
+    const { testClass } = await import('../helpers/testUtils.js');
+    ClassRegistry.reset();
+    await ClassRegistry.init({ loadClasses: async () => [testClass('warrior')] } as never);
+    const party = new PartyManager();
+    const game = { ...fakeGame(), party, inventory: new Inventory(), gameFlags: new GameFlags(), pendingEntrance: null as string | null };
+    const order: string[] = [];
+    game.resetState = vi.fn(() => { order.push('reset'); });
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const member = { class: 'warrior', level: 1, equipment: [], spells: [] };
+    await new DebugScenarioLoader(game as unknown as Game).run({
+      ...field, flags: ['GARLAND_DEFEATED', 'PRINCESS_RESCUED'],
+      party: [{ ...member, name: 'A', status: ['poison'] }, { ...member, name: 'B', status: ['nonsense'] }],
+    });
+    expect(order).toEqual(['reset']);
+    expect(game.gameFlags.has('GARLAND_DEFEATED')).toBe(true);
+    expect(game.gameFlags.has('PRINCESS_RESCUED')).toBe(true);
+    expect(party.all[0].statusTracker.has('poison')).toBe(true);
+    expect(party.all[1].statusTracker.has('poison')).toBe(false);
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("unknown status 'nonsense'"));
+    error.mockRestore();
+  });
+
+  it('R0: every r_* scenario flag and status is a known name', () => {
+    const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
+    const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE'];
+    for (const s of scenarios) {
+      for (const f of s.flags ?? []) expect(known, `${s.id} flag ${f}`).toContain(f);
+      for (const m of s.party) for (const st of m.status ?? []) expect(['poison', 'blind', 'silence', 'sleep', 'stun'], `${s.id}`).toContain(st);
+    }
   });
 });

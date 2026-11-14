@@ -88,6 +88,6 @@ describe('MS-7: the item menu shows descriptions and the targets\' HP and status
     const { menu, tap } = open();
     tap('confirm'); // Potion
     tap('confirm'); // on FGHTR
-    expect(menu.helpText).toContain('FGHTR recovered');
+    expect(menu.helpText).toContain('FGHTR recovers');
   });
 });

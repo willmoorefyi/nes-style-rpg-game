@@ -15,6 +15,8 @@ export interface GameEvents {
   battleVictory: Record<string, never>;
   spellCast: Record<string, never>;
   bossDefeated: { flag: string };
+  /** The party was fully healed by a cutscene (T2). */
+  partyHealed: Record<string, never>;
   showDialog: { text: string; onComplete: () => void };
 }
 

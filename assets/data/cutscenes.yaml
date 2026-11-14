@@ -1,6 +1,7 @@
 # ═══ CUTSCENE SCRIPTS ═══
 # Each cutscene is a sequence of steps executed by CutsceneManager.
-# Step types: dialog, fade_out, fade_in, wait, set_flag, heal_party
+# Step types: dialog, fade_out, fade_in, wait, set_flag, heal_party,
+#   warp (map, and entrance or x and y; optional facing), backdrop (image: a background id, or null to clear)
 # Played after a boss battle (scriptedEncounters.postVictoryCutscene) or after talking to an NPC (npc.cutscene).
 
 - id: garland_defeated

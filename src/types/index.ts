@@ -63,6 +63,9 @@ export interface BossPhase {
   hpThreshold: number; // percentage, e.g. 0.5 = below 50% HP
   patternId: string;   // identifies which BossPattern to switch to
   message?: string;    // e.g. "Lich's form shifts!"
+  /** Overrides applied once the phase is crossed (B1): hits per attack, and the attack number. */
+  hits?: number;
+  attack?: number;
 }
 
 /** Enemy combat numbers (FF1). The optional ones default to accuracy 0, evade 0, hits 1, crit 1 (out of 200). */
@@ -260,6 +263,8 @@ export interface ScriptedEncounter {
   isBoss: boolean;
   message?: string;       // pre-battle dialog
   postVictoryCutscene?: string;  // cutscene ID to play after victory
+  /** Talking to this NPC (an `npcs[].id` of the same map) starts the encounter (B1). */
+  npc?: string;
 }
 
 export interface MapData {
@@ -348,7 +353,8 @@ export interface KeyItemGate {
   /** Story flag that opens the gate (e.g. BRIDGE_BUILT). */
   requiredFlag?: string;
   flag?: string;
-  message: string;
+  /** Shown while blocked: plain text, or conditional entries resolved on the story flags (T1). */
+  message: string | ConditionalDialog[];
   permanent: boolean;
 }
 
@@ -377,4 +383,6 @@ export interface SaveData {
   playTime: number;
   saveDate: string;
   slotId: number;
+  /** Display name of the map at save time (S5); older saves fall back to a label made from `currentMap`. */
+  location?: string;
 }

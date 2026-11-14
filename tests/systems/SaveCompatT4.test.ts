@@ -49,6 +49,14 @@ describe('T4 save compatibility (revision 16): a pre-T4 save', () => {
     store.ff1_save_0 = JSON.stringify(PRE_T4_SAVE);
   });
 
+  it('R0 (S5): an old save without a location summarises as Cornelia, with its members and gold', () => {
+    const slot = SaveManager.getSaveSlots()[0]!;
+    expect(slot.location).toBe('Cornelia');
+    expect(slot.gold).toBe(321);
+    expect(slot.members.map((m) => m.name)).toEqual(['FGHTR', 'R.MAG', 'B.MAG', 'W.MAG']);
+    expect(slot.members[0]).toEqual({ name: 'FGHTR', classId: 'warrior', level: 5, currentHp: 20 });
+  });
+
   it('loads without a version warning, and saves back as version 1', () => {
     const warn = vi.spyOn(console, 'warn');
     const loaded = SaveManager.load(0)!;

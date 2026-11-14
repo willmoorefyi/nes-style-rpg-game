@@ -1,10 +1,18 @@
-import type { KeyItemGate } from '../types/index.js';
+import { resolveNPCDialog, type KeyItemGate } from '../types/index.js';
 import type { Inventory } from '../entities/Inventory.js';
 import type { GameFlags } from '../core/GameFlags.js';
 
 export interface GateCheckResult {
   blocked: boolean;
   message?: string;
+}
+
+/**
+ * The gate's message as one line. Conditional entries (R0, T1) show their default entry here; resolving them on
+ * the story flags is R1's (docs/FIX_PLAN_PENINSULA.md, R1 T1).
+ */
+function gateText(gate: KeyItemGate): string {
+  return typeof gate.message === 'string' ? gate.message : resolveNPCDialog(gate.message, () => false).join(' ');
 }
 
 /**
@@ -36,11 +44,11 @@ export class KeyItemGateSystem {
 
     // Story-flag gate (e.g. a bridge that opens once BRIDGE_BUILT is set)
     if (gate.requiredFlag && !this.flags.has(gate.requiredFlag)) {
-      return { blocked: true, message: gate.message };
+      return { blocked: true, message: gateText(gate) };
     }
     // Check if player has the required item
     if (gate.requiredItem && !this.inventory.has(gate.requiredItem)) {
-      return { blocked: true, message: gate.message };
+      return { blocked: true, message: gateText(gate) };
     }
 
     // Player has the item — open the gate

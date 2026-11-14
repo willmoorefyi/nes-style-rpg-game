@@ -110,7 +110,7 @@ export class ItemEffects {
     if (target.currentHp >= target.maxHp) return { success: false, message: `${target.name} is already at full HP` };
     const before = target.currentHp;
     target.currentHp += amount; // the setter clamps at maxHp
-    return { success: true, message: `${target.name} recovered ${target.currentHp - before} HP` };
+    return { success: true, message: `${target.name} recovers ${target.currentHp - before} HP` };
   }
 
   private static restoreCharges(target: Character): ItemEffectResult {
@@ -127,6 +127,6 @@ export class ItemEffects {
     if (target.currentHp > 0 && !target.statusTracker.has('death')) return { success: false, message: `${target.name} is not KO'd` };
     target.statusTracker.remove('death');
     target.currentHp = 1;
-    return { success: true, message: `${target.name} was revived` };
+    return { success: true, message: `${target.name} is revived` };
   }
 }

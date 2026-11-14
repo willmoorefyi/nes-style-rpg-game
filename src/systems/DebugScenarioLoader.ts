@@ -5,6 +5,9 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { slotOf } from '../entities/EquipmentRules.js';
 import { BattleTrigger } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
+import type { StatusEffect } from '../battle/StatusEffects.js';
+
+const STATUSES: readonly StatusEffect[] = ['poison', 'stun', 'sleep', 'blind', 'silence', 'death', 'stone', 'fear'];
 
 export interface DebugScenario {
   id: string;
@@ -17,7 +20,11 @@ export interface DebugScenario {
     spells: { id: string; level: number }[];
     /** Start with this HP instead of full (0: fallen), for item and inn checks. */
     hp?: number;
+    /** Start with these status effects, e.g. `[poison]`, for menu and battle checks. */
+    status?: string[];
   }[];
+  /** Story flags set on the fresh game before the party is built, e.g. `[GARLAND_DEFEATED]`. */
+  flags?: string[];
   items: Record<string, number>;
   gold: number;
   enemies: string[];
@@ -74,6 +81,7 @@ export class DebugScenarioLoader {
   private applyParty(scenario: DebugScenario): void {
     // every scenario starts from a fresh game (no party, items, flags or retry state from an earlier run)
     this.game.resetState();
+    for (const flag of scenario.flags ?? []) this.game.gameFlags.set(flag);
 
     // Build party from scenario
     for (const member of scenario.party) {
@@ -99,6 +107,10 @@ export class DebugScenarioLoader {
       }
       character.restoreAllCharges();
       character.currentHp = member.hp ?? character.maxHp;
+      for (const status of member.status ?? []) {
+        if ((STATUSES as readonly string[]).includes(status)) character.statusTracker.apply(status as StatusEffect);
+        else console.error(`Debug scenario ${scenario.id}: unknown status '${status}' for ${member.name}`);
+      }
 
       if (!this.game.party.add(character)) console.error(`Debug scenario ${scenario.id}: could not add ${member.name}`);
     }

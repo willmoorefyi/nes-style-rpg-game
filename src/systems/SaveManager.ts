@@ -13,6 +13,17 @@ export interface SlotSummary {
   playTime: number;
   partyLeader?: string;
   saveDate?: string;
+  /** Where the party saved: `SaveData.location`, or a label made from the map id for older saves (S5). */
+  location: string;
+  members: Array<{ name: string; classId: string; level: number; currentHp: number }>;
+  gold: number;
+}
+
+/** `cornelia-castle-2f` -> `Cornelia Castle 2F`: title-cased words, floor tags (`2f`, `b1`) upper-cased. */
+export function mapIdLabel(mapId: string): string {
+  return mapId.split('-').filter(Boolean)
+    .map((w) => (/^\d+f$|^b\d$/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(' ');
 }
 
 export class SaveManager {
@@ -23,7 +34,8 @@ export class SaveManager {
     flags: GameFlags,
     currentMap: string,
     playerPosition: { x: number; y: number },
-    playTime: number
+    playTime: number,
+    location?: string
   ): boolean {
     if (slotId < 0 || slotId >= MAX_SLOTS) return false;
     
@@ -38,6 +50,7 @@ export class SaveManager {
       saveDate: new Date().toISOString(),
       slotId,
     };
+    if (location !== undefined) data.location = location;
     
     try {
       localStorage.setItem(`${SAVE_KEY_PREFIX}${slotId}`, JSON.stringify(data));
@@ -96,6 +109,9 @@ export class SaveManager {
           playTime: data.playTime,
           partyLeader: leader?.name,
           saveDate: data.saveDate,
+          location: data.location ?? mapIdLabel(data.currentMap),
+          members: data.party.members.map((m) => ({ name: m.name, classId: m.classId, level: m.level, currentHp: m.currentHp })),
+          gold: data.party.gold,
         });
       } catch (e) {
         console.error(`Failed to read save slot ${i}:`, e);

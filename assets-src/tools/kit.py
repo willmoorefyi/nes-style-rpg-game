@@ -96,6 +96,19 @@ _PARTS.update({
     "lectern": ((100, 65, 40), "Le", "tile_small"),
     "globe": ((90, 140, 190), "Gl", "blob"),
 })
+# R paid-art parts (docs/FIX_PLAN_PENINSULA.md R0-7), placeholders until R5's sheets are approved: the temple
+# ruin icons (W1), the stone bridge gap (W8 fallback) and Cornelia's gate arches, gate sides and signs (M7).
+for r in range(2):
+    for c in range(2):
+        _PARTS[f"temple_ruin_{r}_{c}"] = ((95, 95, 105), f"R{r}{c}", "tile")
+        _PARTS[f"bridge_gap_stone_{r}_{c}"] = ((150, 150, 155), f"s{r}{c}", "post")
+        _PARTS[f"gate_arch_2_{r}_{c}"] = ((165, 160, 150), f"a{r}{c}", "tile")
+        _PARTS[f"gate_side_{r}_{c}"] = ((150, 145, 135), f"q{r}{c}", "tile")
+    for c in range(3):
+        _PARTS[f"temple_ruin3_{r}_{c}"] = ((95, 95, 105), f"3{r}{c}", "tile")
+        _PARTS[f"gate_arch_3_{r}_{c}"] = ((165, 160, 150), f"A{r}{c}", "tile")
+for s in ("tavern", "shrine"):
+    _PARTS[f"sign_{s}"] = ((200, 170, 90), s[:2].upper(), "sign")
 
 PART_NAMES = tuple(_PARTS)
 

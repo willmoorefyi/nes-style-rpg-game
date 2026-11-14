@@ -55,6 +55,7 @@ describe('ItemEffects', () => {
     const result = ItemEffects.applyItemEffect('phoenix_down', char, inv);
     expect(result.success).toBe(true);
     expect(char.currentHp).toBe(1);
+    expect(result.message).toBe(`${char.name} is revived`);
   });
 
   it('rejects key items', () => {
@@ -100,17 +101,17 @@ describe('ItemEffects (MS-8: data-driven heals)', () => {
     const result = ItemEffects.applyItemEffect('hi_potion', char, inv);
     expect(result.success).toBe(true);
     expect(char.currentHp).toBe(130);
-    expect(result.message).toBe('Big recovered 120 HP');
+    expect(result.message).toBe('Big recovers 120 HP');
   });
 
-  it('a Potion on a member at 20/25 HP reports "recovered 5"', () => {
+  it('a Potion on a member at 20/25 HP reports "recovers 5"', () => {
     const char = new Character({ name: 'Tiny', classData: testMageClass(), currentHp: 20 });
     expect(char.maxHp).toBe(25);
     inv.add('potion');
     const result = ItemEffects.applyItemEffect('potion', char, inv);
     expect(result.success).toBe(true);
     expect(char.currentHp).toBe(25);
-    expect(result.message).toBe('Tiny recovered 5 HP');
+    expect(result.message).toBe('Tiny recovers 5 HP');
   });
 
   it('an Antidote on an unpoisoned member fails and is kept', () => {

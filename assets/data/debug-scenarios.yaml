@@ -4,6 +4,7 @@
 # To add a new scenario:
 # 1. Add a new entry with a unique id
 # 2. Define party members with class, name, level, equipment, and spells
+#    (optional per member: hp to start hurt or fallen, status e.g. [poison]; optional per scenario: flags)
 # 3. Define items and gold
 # 4. Define enemies (IDs from enemies.yaml)
 # 5. The scenario will appear in the debug menu automatically
@@ -234,7 +235,7 @@
   enemies: [garland]
   background: assets/backgrounds/temple.webp
 
-# Revision 1 (FF1 Garland): careless Lv1 Fight-only play with no gear should lose more often than it wins (~0.1 % wins).
+# R (B1): the 240 HP Garland; Lv1 Fight-only play with no gear never wins.
 - id: t4_garland_l1_naked
   name: T4 - Lv1 no gear vs Garland
   party:
@@ -345,3 +346,391 @@
   gold: 100
   enemies: [garland, skeleton, skeleton, gr_imp, gr_imp]
   background: assets/backgrounds/abandoned_castle.webp
+
+# R (second-pass remediation, docs/FIX_PLAN_PENINSULA.md R0; open with ?mute=1&scenario=<id>).
+# Temple spawns (r_garland, r_temple_garland) depend on R4b's Garland room and are re-checked after the rebuild.
+- id: r_garland
+  name: R - Lv20 full kit next to Garland (T2, B1)
+  mode: field
+  map: temple-of-fiends
+  spawn: [11, 7]
+  party:
+    - { class: warrior, name: FGHTR, level: 20, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THIEF, level: 20, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 20, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 20, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: []
+- id: r_temple_garland
+  name: R - Lv2 start kit below Garland (B1)
+  mode: field
+  map: temple-of-fiends
+  spawn: [11, 8]
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: []
+- id: r_temple_party
+  name: R - Lv2 start kit at the temple entry (B9)
+  mode: field
+  map: temple-of-fiends
+  entrance: entry
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: []
+- id: r_garland_l2_full
+  name: R - Lv2 full kit vs Garland (B1)
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [garland]
+  background: assets/backgrounds/temple.webp
+- id: r_one_potion
+  name: R - one Potion, two hurt members (B5)
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 10 }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [], hp: 8 }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }, { id: slep, level: 1 }] }
+  items: { potion: 1 }
+  gold: 100
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.webp
+- id: r_same_names
+  name: R - four members named ROLF (B6)
+  party:
+    - { class: warrior, name: ROLF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: thief, name: ROLF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: ROLF, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: ROLF, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 2 }
+  gold: 100
+  enemies: [wolf, wolf, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: r_temple_pack
+  name: R - Lv2 start kit vs Skeleton x4 (B9)
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 2 }
+  gold: 30
+  enemies: [skeleton, skeleton, skeleton, skeleton]
+  background: assets/backgrounds/temple.webp
+- id: r_heal_fog
+  name: R - CURE and FOG on a falling ally (B4)
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 1 }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [], hp: 24 }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }, { id: fog, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 100
+  enemies: [wolf, wolf, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: r_mute_dark
+  name: R - MUTE and DARK vs a casting Lich (B8)
+  party:
+    - { class: warrior, name: FGHTR, level: 5, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THIEF, level: 5, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 5, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: mute, level: 2 }] }
+    - { class: black_mage, name: B.MAG, level: 5, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: dark, level: 2 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [lich, wolf]
+  enemyAi:
+    lich:
+      - { type: magic, spellId: ice, weight: 1 }
+  background: assets/backgrounds/temple.webp
+- id: r_shoreline_nine
+  name: R - Goblin x6 + Wolf x3 on the shoreline (B14)
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }, { id: slep, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, goblin, goblin, goblin, goblin, goblin, wolf, wolf, wolf]
+  background: assets/backgrounds/shoreline.webp
+- id: r_cap
+  name: R - item shop with full stacks (E1)
+  mode: field
+  map: cornelia-item-shop
+  entrance: door
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier], spells: [] }
+  items: { potion: 99, antidote: 95, rapier: 99 }
+  gold: 5000
+  enemies: []
+- id: r_cap_chest
+  name: R - fisher house chest with 99 Potions (E1)
+  mode: field
+  map: cornelia-house-fisher
+  entrance: door
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier], spells: [] }
+  items: { potion: 99 }
+  gold: 100
+  enemies: []
+- id: r_shops
+  name: R - weapon shop, four members, no Monk (E2, E3, E5)
+  mode: field
+  map: cornelia-weapon-shop
+  entrance: door
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [], spells: [] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [], spells: [] }
+  items: { wooden_shield: 2, rapier: 2, chain_mail: 1, potion: 2 }
+  gold: 2000
+  enemies: []
+- id: r_magic
+  name: R - white magic shop (E4)
+  mode: field
+  map: cornelia-white-magic
+  entrance: door
+  party:
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [], spells: [{ id: cure, level: 1 }] }
+    - { class: red_mage, name: R.MAG, level: 3, equipment: [], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }, { id: lit, level: 1 }] }
+    - { class: warrior, name: FGHTR, level: 3, equipment: [], spells: [] }
+  items: {}
+  gold: 3000
+  enemies: []
+- id: r_tent
+  name: R - overworld, hurt party with camp items (E6, E7)
+  mode: field
+  map: overworld
+  entrance: cornelia
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 10 }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [], hp: 0 }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 8 }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }], hp: 6 }
+  items: { potion: 3, tent: 2, cabin: 1, phoenix_down: 1, rapier: 1, lute: 1 }
+  gold: 100
+  enemies: []
+- id: r_menus
+  name: R - Cornelia inn, field menus (E8, E9, E10, S4, S5)
+  mode: field
+  map: cornelia
+  entrance: inn
+  party:
+    - { class: warrior, name: FGHTR, level: 4, equipment: [iron_sword, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: monk, name: MONK, level: 5, equipment: [], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [poison] }
+    - { class: black_mage, name: B.MAG, level: 3, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: []
+- id: r_castle_rescued
+  name: R - throne room after the rescue (T4, T6)
+  mode: field
+  map: cornelia-castle-2f
+  spawn: [21, 10]
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_castle_after_intro
+  name: R - castle gate after the intro (T6)
+  mode: field
+  map: cornelia-castle
+  entrance: gate
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_castle_1f_gallery
+  name: R - castle 1F gallery (M2)
+  mode: field
+  map: cornelia-castle
+  spawn: [28, 4]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_town_rescued
+  name: R - Cornelia after the rescue (T5, T6, M1, M7, M9)
+  mode: field
+  map: cornelia
+  entrance: castle
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_town_after_intro
+  name: R - Cornelia after the intro (T5)
+  mode: field
+  map: cornelia
+  entrance: castle
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_overworld_after_intro
+  name: R - overworld north of Cornelia after the intro (T1)
+  mode: field
+  map: overworld
+  entrance: cornelia_north
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE]
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_item_shop
+  name: R - Cornelia item shop (M3-M10, T6)
+  mode: field
+  map: cornelia-item-shop
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_black_magic
+  name: R - Cornelia black magic shop (M3-M10, T6)
+  mode: field
+  map: cornelia-black-magic
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_weapon_shop
+  name: R - Cornelia weapon shop (M3-M10, T6)
+  mode: field
+  map: cornelia-weapon-shop
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_inn
+  name: R - Cornelia inn (M3-M10, T6)
+  mode: field
+  map: cornelia-inn
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_shrine
+  name: R - Cornelia shrine (M3-M10, T6)
+  mode: field
+  map: cornelia-house-shrine
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_house_fisher
+  name: R - Cornelia fisher house (M3-M10, T6)
+  mode: field
+  map: cornelia-house-fisher
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_house_farm
+  name: R - Cornelia farm house (M3-M10, T6)
+  mode: field
+  map: cornelia-house-farm
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_house_knight
+  name: R - Cornelia knight house (M3-M10, T6)
+  mode: field
+  map: cornelia-house-knight
+  entrance: door
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_cellar
+  name: R - castle cellar (M6, M9, M10, M13)
+  mode: field
+  map: cornelia-castle-cellar
+  entrance: stairs
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_tower
+  name: R - castle tower (M6, M9, M10, M13)
+  mode: field
+  map: cornelia-castle-tower
+  entrance: stairs
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_ow_temple
+  name: R - overworld by the temple (W1, W5, W7, W8, W11, W12, W14)
+  mode: field
+  map: overworld
+  spawn: [15, 42]
+  party:
+    - { class: warrior, name: WAR, level: 9, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_ow_bridge
+  name: R - overworld at the north bridge (W1, W5, W7, W8, W11, W12, W14)
+  mode: field
+  map: overworld
+  spawn: [29, 34]
+  party:
+    - { class: warrior, name: WAR, level: 9, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: r_ow_east
+  name: R - overworld east pocket (W1, W5, W7, W8, W11, W12, W14)
+  mode: field
+  map: overworld
+  spawn: [48, 46]
+  party:
+    - { class: warrior, name: WAR, level: 9, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []

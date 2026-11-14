@@ -30,6 +30,31 @@ describe('Inventory', () => {
       inv.add('potion', 10);
       expect(inv.getQuantity('potion')).toBe(99);
     });
+
+    it('returns the number actually added (R0, E1)', () => {
+      expect(inv.add('potion', 95)).toBe(95);
+      expect(inv.add('potion', 10)).toBe(4);
+      expect(inv.add('potion')).toBe(0);
+      expect(inv.getQuantity('potion')).toBe(Inventory.MAX_QUANTITY);
+    });
+  });
+
+  describe('space and canAdd (R0, E1)', () => {
+    it('space is what fits under the 99 cap', () => {
+      expect(Inventory.MAX_QUANTITY).toBe(99);
+      expect(inv.space('potion')).toBe(99);
+      inv.add('potion', 97);
+      expect(inv.space('potion')).toBe(2);
+    });
+
+    it('canAdd is true only while the whole quantity fits', () => {
+      inv.add('potion', 98);
+      expect(inv.canAdd('potion')).toBe(true);
+      expect(inv.canAdd('potion', 2)).toBe(false);
+      inv.add('potion');
+      expect(inv.canAdd('potion')).toBe(false);
+      expect(inv.canAdd('ether')).toBe(true);
+    });
   });
 
   describe('remove', () => {
