@@ -104,6 +104,7 @@ entrances:
   cornelia_north: [28, 42]
   castle: [28, 42]
   north_shore: [29, 28]
+  temple: [15, 39]
 objects:
 - type: deco
   parts:
@@ -120,17 +121,18 @@ objects:
   - [0, 2]
   - [4, 2]
   - [2, 3]
-- type: prefab
-  prefab: temple_icon
+- type: deco
   name: temple
   x: 14
   y: 37
-  w: 2
-  h: 2
-  door: 1
-  ridge_rows: 0
+  offset: [13, 0]
   collide: alpha
-  enter: {map: temple-of-fiends, entrance: entry}
+  style: bright
+  parts:
+  - [temple_ruin_0_0, temple_ruin_0_1, null]
+  - [temple_ruin_1_0, temple_ruin_1_1, null]
+  walk_cells:
+  - [1, 1]
 - type: deco
   parts:
   - [altar_l, altar_r]
@@ -334,3 +336,4 @@ transitions:
 - {x: 26, y: 45, targetMap: cornelia, targetEntrance: west_gate}
 - {x: 30, y: 45, targetMap: cornelia, targetEntrance: east_gate}
 - {x: 28, y: 46, targetMap: cornelia, targetEntrance: south_gate}
+- {x: 15, y: 38, targetMap: temple-of-fiends, targetEntrance: entry}

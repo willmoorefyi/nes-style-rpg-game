@@ -44,7 +44,7 @@ MATERIALS = {
 }
 
 ROOF_ROWS = ("ridge", "mid", "eave")
-SIGNS = ("weapon", "armor", "item", "white_magic", "black_magic", "inn")
+SIGNS = ("weapon", "armor", "item", "white_magic", "black_magic", "inn", "tavern", "shrine")   # last two: M7
 # part name -> (colour, label, shape)
 _PARTS: dict[str, tuple[tuple[int, int, int], str, str]] = {}
 for row in ROOF_ROWS:
@@ -97,7 +97,7 @@ _PARTS.update({
     "globe": ((90, 140, 190), "Gl", "blob"),
 })
 # R paid-art parts (docs/FIX_PLAN_PENINSULA.md R0-7), placeholders until R5's sheets are approved: the temple
-# ruin icons (W1), the stone bridge gap (W8 fallback) and Cornelia's gate arches, gate sides and signs (M7).
+# ruin icons (W1), the stone bridge gap (W8 fallback) and Cornelia's gate arches and sides (M7; the signs: SIGNS).
 for r in range(2):
     for c in range(2):
         _PARTS[f"temple_ruin_{r}_{c}"] = ((95, 95, 105), f"R{r}{c}", "tile")
@@ -107,8 +107,6 @@ for r in range(2):
     for c in range(3):
         _PARTS[f"temple_ruin3_{r}_{c}"] = ((95, 95, 105), f"3{r}{c}", "tile")
         _PARTS[f"gate_arch_3_{r}_{c}"] = ((165, 160, 150), f"A{r}{c}", "tile")
-for s in ("tavern", "shrine"):
-    _PARTS[f"sign_{s}"] = ((200, 170, 90), s[:2].upper(), "sign")
 
 PART_NAMES = tuple(_PARTS)
 

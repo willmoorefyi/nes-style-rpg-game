@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cornelia_gates  # noqa: E402
 from common import Grid, polygon_mask, ring, write_map  # noqa: E402
 
 W, H = 62, 72
@@ -194,9 +195,10 @@ HOUSES = [  # (name, x, y, h, storeys, roof, wall, chimney); the door is at (x +
     ("weaver", 48, 53, 4, 1, "brown", "rose", None), ("gardener", 13, 33, 4, 1, "green", "plaster", 1),
     ("family", 12, 60, 4, 1, "red", "white", None), ("apprentice", 4, 38, 4, 1, "teal", "plaster", 3),
     ("tavern", 44, 57, 4, 1, "blue", "ochre", 1), ("shrine", 33, 58, 5, 2, "red", "stone", None)]
-for (name, x, y, h, st, roof, wall, ch) in HOUSES:
+for (name, x, y, h, st, roof, wall, ch) in HOUSES:              # M7: the tavern and the shrine hang their signs
     obj(**HOUSE, name=f"house_{name}", x=x, y=y, h=h, storeys=st, roof=roof, wall=wall,
-        **({"chimney": ch} if ch is not None else {}), enter={"map": f"cornelia-house-{name}", "entrance": "door"})
+        **({"sign": name} if name in ("tavern", "shrine") else {}), **({"chimney": ch} if ch is not None else {}),
+        enter={"map": f"cornelia-house-{name}", "entrance": "door"})
 
 # ── town: the market square ──
 deco([["statue_top"], ["statue_bottom"]], CX, 42)
@@ -258,10 +260,8 @@ for (x, y) in [(1, 52), (2, 56), (4, 60), (8, 64), (13, 67), (20, 69), (40, 69),
                (60, 52), (60, 48), (60, 33), (61, 15), (60, 10), (0, 30), (0, 18), (1, 64), (58, 64)]:
     if g.inside(x, y) and g[x, y] == "." and g[x, y - 1] == ".":
         fir(x, y)
-# the bends, then (M7, free) both sides of every gate: south, west, east, precinct east, inner gatehouse, postern
-for (x, y) in [(55, 2), (56, 36), (56, 58), (1, 22), (1, 33), (4, 56), (26, 66), (33, 66), (1, 41), (1, 46), (58, 41),
-               (58, 46), (58, 21), (58, 26), (27, 30), (32, 30), (4, 0), (8, 0)]:
-    deco(TURRET, x, y, on_wall=True)
+# M7: turrets on the bends and both sides of every gate; arches over the south gate, the gatehouse and the postern
+cornelia_gates.place(g, deco, obj, TURRET, CX)
 
 npcs = [
     # CT-4 / M1: the door guards stand at the bridge's garden end, beside it, so the castle apron (row 19) stays open
@@ -337,10 +337,8 @@ doc = {
     "inspect": INSPECT,
     # CT-6 / CT-7: every walkable edge cell leaves town; the castle precinct's side of the east edge (and its east
     # gate, (61, 24-25)) comes out north of the city icon, like the north edge and the postern
-    "edge_exits": {"north": {"targetMap": OUT, "targetEntrance": "cornelia_north"},
-                   "west": {"targetMap": OUT, "targetEntrance": "cornelia_west"},
-                   "east": {"targetMap": OUT, "targetEntrance": "cornelia_east"},
-                   "south": {"targetMap": OUT, "targetEntrance": "cornelia"},
+    "edge_exits": {**{side: {"targetMap": OUT, "targetEntrance": f"cornelia{sfx}"} for side, sfx in
+                      (("north", "_north"), ("west", "_west"), ("east", "_east"), ("south", ""))},
                    "split": [{"side": "east", "from": 0, "to": 30, "targetEntrance": "cornelia_north"}]},
     # CT-8: every road and lane ends at a gate, a door, a bridge or one of these gardens
     "road_check": {"materials": ["cobble", "dirt"], "ends": LANE_ENDS},
