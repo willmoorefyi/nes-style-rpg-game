@@ -31,8 +31,10 @@ export function retargetIfDead(
   return { ...command, targetId: newTarget };
 }
 
-export function calculateRunChance(partyAvgAgility: number, enemyAvgAgility: number): number {
-  const base = 50;
-  const bonus = Math.floor((partyAvgAgility - enemyAvgAgility) / 2);
-  return Math.max(10, Math.min(90, base + bonus));
+/**
+ * FF1 run: the runner escapes if rand(0 .. level + 15) < luck, so the chance is luck / (level + 16), at most 1.
+ * A Lv1 Thief (luck 15) escapes 15/17 of the time.
+ */
+export function calculateRunChance(luck: number, level: number): number {
+  return Math.max(0, Math.min(1, luck / (level + 16)));
 }

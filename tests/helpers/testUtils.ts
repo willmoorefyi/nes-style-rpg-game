@@ -14,7 +14,7 @@ export function createMockInput() {
 
 export type MockInput = ReturnType<typeof createMockInput>;
 import { Container, Texture } from 'pixi.js';
-import type { MapData } from '../../src/types/index.js';
+import type { CharacterClassData, EnemyData, MapData } from '../../src/types/index.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
@@ -89,5 +89,53 @@ export function createMapData(overrides: Partial<MapData> = {}): MapData {
     npcs: [],
     transitions: [],
     ...overrides,
+  };
+}
+/**
+ * Shared synthetic class (FF1-style combat fields included, so battle maths tests don't depend on
+ * classes.yaml). Defaults to a Warrior-like class; `overrides` replace whole fields.
+ */
+export function testClass(id = 'warrior', overrides: Partial<CharacterClassData> = {}): CharacterClassData {
+  return {
+    id,
+    name: id,
+    baseStats: { hp: 50, strength: 10, agility: 5, intelligence: 1, vitality: 8, luck: 5 },
+    statGrowth: { hp: 5, strength: 2, agility: 1, intelligence: 0, vitality: 1, luck: 1 },
+    usableEquipment: [],
+    spellLevels: { white: 0, black: 0 },
+    hitPercent: { base: 10, growth: 3 },
+    magicDefense: { base: 15, growth: 3 },
+    spellCharges: [],
+    ...overrides,
+  };
+}
+
+/** Shared synthetic enemy (an FF1 IMP-like Goblin by default); `stats` merges with the defaults. */
+export function testEnemy(overrides: Partial<Omit<EnemyData, 'stats'>> & { stats?: Partial<EnemyData['stats']> } = {}): EnemyData {
+  const { stats, ...rest } = overrides;
+  return {
+    id: 'goblin',
+    name: 'Goblin',
+    xpReward: 6,
+    goldReward: 6,
+    sprite: 'goblin',
+    ...rest,
+    stats: {
+      hp: 8, strength: 0, agility: 6, intelligence: 1, vitality: 0, luck: 0,
+      attack: 4, defense: 4, magicDefense: 16, accuracy: 2, evade: 6,
+      ...stats,
+    },
+  };
+}
+
+/** Small seeded RNG (mulberry32) for statistical battle tests. */
+export function mulberry32(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { StatusTracker } from '../../src/battle/StatusEffects.js';
+import { rollWake, tickStatus } from '../../src/battle/StatusTick.js';
 
 describe('StatusTracker', () => {
   it('applies and checks status effects', () => {
@@ -150,3 +151,58 @@ describe('StatusTracker', () => {
     });
   });
 });
+
+describe('helpless and the wake rule (FF1, EB-5)', () => {
+  function subject(hp: number, tracker = new StatusTracker()) {
+    let cur = hp;
+    return { name: 'X', maxHp: 100, tracker, fallText: 'fell!', getHp: () => cur, setHp: (v: number) => { cur = v; } };
+  }
+
+  it('isHelpless is true for sleep or stun only', () => {
+    const t = new StatusTracker();
+    expect(t.isHelpless()).toBe(false);
+    t.apply('blind');
+    expect(t.isHelpless()).toBe(false);
+    t.apply('sleep');
+    expect(t.isHelpless()).toBe(true);
+    t.remove('sleep');
+    t.apply('stun');
+    expect(t.isHelpless()).toBe(true);
+  });
+
+  it('rollWake: rand(0..80) < current HP', () => {
+    expect(rollWake(41, () => 0.5)).toBe(true);  // 40 < 41
+    expect(rollWake(40, () => 0.5)).toBe(false); // 40 < 40 fails
+    expect(rollWake(240, () => 0.999)).toBe(true);
+  });
+
+  it('a sleeper loses its turn, then wakes on a good roll', () => {
+    const s = subject(50);
+    s.tracker.apply('sleep');
+    const said: string[] = [];
+    expect(tickStatus(s, () => 0.1, t => said.push(t))).toBe(false);
+    expect(said).toEqual(['X is asleep!', 'X wakes up!']);
+    expect(s.tracker.has('sleep')).toBe(false);
+  });
+
+  it('a paralysed actor (stun) wakes by the same rule; stone never does', () => {
+    const stunned = subject(50);
+    stunned.tracker.apply('stun');
+    tickStatus(stunned, () => 0.1, () => undefined);
+    expect(stunned.tracker.has('stun')).toBe(false);
+    const stone = subject(50);
+    stone.tracker.apply('stone');
+    expect(tickStatus(stone, () => 0.1, () => undefined)).toBe(false);
+    expect(stone.tracker.has('stone')).toBe(true);
+  });
+
+  it('a low-HP sleeper stays asleep', () => {
+    const s = subject(5);
+    s.tracker.apply('sleep');
+    const said: string[] = [];
+    tickStatus(s, () => 0.5, t => said.push(t));
+    expect(said).toEqual(['X is asleep!']);
+    expect(s.tracker.has('sleep')).toBe(true);
+  });
+});
+

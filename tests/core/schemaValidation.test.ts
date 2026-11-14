@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { validateEnemyData, validateMapData } from '../../src/core/schemaValidation.js';
+import {
+  validateCharacterClassData, validateEnemyData, validateItemData, validateMapData, validateSpellData,
+} from '../../src/core/schemaValidation.js';
 
 describe('schemaValidation', () => {
   describe('validateEnemyData', () => {
@@ -186,3 +188,37 @@ describe('schemaValidation', () => {
     });
   });
 });
+
+describe('schemaValidation: optional FF1 combat fields (T4a)', () => {
+  const stats = { hp: 8, strength: 0, agility: 6, intelligence: 1, vitality: 0, luck: 0, attack: 4, defense: 4, magicDefense: 16 };
+  const enemy = { id: 'goblin', name: 'Goblin', stats, xpReward: 6, goldReward: 6, sprite: 'goblin' };
+  const item = { id: 'rapier', name: 'Rapier', type: 'weapon', stats: { attack: 9 }, price: 10, usableBy: ['warrior'] };
+  const spell = { id: 'fire', name: 'FIRE', level: 1, type: 'black', effect: 'damage', targeting: 'single', description: 'x' };
+  const block = { hp: 1, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 };
+  const cls = { id: 'warrior', name: 'Warrior', baseStats: block, statGrowth: block, usableEquipment: [], spellLevels: { white: 0, black: 0 } };
+
+  it('existing data without the new fields still validates', () => {
+    expect(validateEnemyData(enemy)).toEqual(enemy);
+    expect(validateItemData(item)).toEqual(item);
+    expect(validateSpellData(spell)).toEqual(spell);
+    expect(validateCharacterClassData(cls)).toEqual(cls);
+  });
+
+  it('accepts the new numbers when present', () => {
+    expect(() => validateEnemyData({ ...enemy, stats: { ...stats, accuracy: 2, evade: 6, hits: 2, crit: 1 } })).not.toThrow();
+    expect(() => validateItemData({ ...item, hit: 5, crit: 4, weight: 0 })).not.toThrow();
+    expect(() => validateSpellData({ ...spell, accuracy: 24, price: 100 })).not.toThrow();
+    expect(() => validateCharacterClassData({
+      ...cls, hitPercent: { base: 10, growth: 3 }, magicDefense: { base: 15, growth: 3 }, spellCharges: [[1, [2]], [3, [3, 1]]],
+    })).not.toThrow();
+  });
+
+  it('rejects non-numbers', () => {
+    expect(() => validateEnemyData({ ...enemy, stats: { ...stats, evade: '6' } })).toThrow('EnemyData.stats.evade: expected number, got string');
+    expect(() => validateItemData({ ...item, weight: 'heavy' })).toThrow('ItemData.weight: expected number');
+    expect(() => validateSpellData({ ...spell, accuracy: null })).toThrow('SpellData.accuracy: expected number, got null');
+    expect(() => validateCharacterClassData({ ...cls, hitPercent: { base: 10 } })).toThrow('CharacterClassData.hitPercent.growth');
+    expect(() => validateCharacterClassData({ ...cls, spellCharges: [[1, 2]] })).toThrow('CharacterClassData.spellCharges[0][1]');
+  });
+});
+

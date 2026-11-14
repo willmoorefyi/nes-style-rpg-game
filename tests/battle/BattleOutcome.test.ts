@@ -45,7 +45,7 @@ describe('battle outcome (BA-1)', () => {
     expect(battle.isOver).toBe(true);
     expect(battle.state).toBe('escaped');
     expect(battle.actionQueueLength).toBe(0);
-    expect(battle.battleResult).toEqual({ victory: false, escaped: true, xpReward: 0, goldReward: 0 });
+    expect(battle.battleResult).toEqual({ victory: false, escaped: true, xpReward: 0, xpPerMember: 0, goldReward: 0 });
     expect(clear).toHaveBeenCalled();
 
     // Nothing afterwards may move it back to resolution / command_select
@@ -88,8 +88,45 @@ describe('battle outcome (BA-1)', () => {
     battle.executeRound();
     battle.resolveRound();
     expect(battle.outcome).toBe('victory');
-    expect(battle.currentMessages).toEqual([{ text: 'Victory! Gained 10 XP and 5 Gold.' }]);
-    expect(battle.battleResult).toMatchObject({ victory: true, xpReward: 10, goldReward: 5 });
+    expect(battle.currentMessages).toEqual([{ text: 'Victory! 10 XP each, 5 Gold.' }]);
+    expect(battle.battleResult).toMatchObject({ victory: true, xpReward: 10, xpPerMember: 10, goldReward: 5 });
+  });
+
+  /** Win against Goblin ×4 (6 XP each, 24 in all) with `fallen` members already down. */
+  function winAgainstFourGoblins(fallen: number) {
+    const imp = { ...goblin, xpReward: 6, goldReward: 6, stats: { ...goblin.stats, hp: 1, defense: 0 } };
+    const party = [0, 1, 2, 3].map(i => new Character({ name: `H${i}`, classData: fighter, currentHp: i < fallen ? 0 : undefined }));
+    const battle = new BattleStateMachine({ party, enemies: [imp, imp, imp, imp] }, () => 0);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    party.forEach((c, i) => {
+      if (c.currentHp > 0) battle.submitCommand({ type: 'fight', actorId: `party_${i}`, targetId: `enemy_${i - fallen}` });
+    });
+    // the living fight one goblin each; whatever is left, keep fighting until it ends
+    for (let round = 0; round < 10 && !battle.isOver; round++) {
+      if (battle.state === 'command_select') {
+        party.forEach((c, i) => {
+          if (c.currentHp > 0) battle.submitCommand({ type: 'fight', actorId: `party_${i}`, targetId: battle.livingEnemies[0]?.id });
+        });
+      }
+      battle.executeRound();
+      battle.resolveRound();
+    }
+    return battle;
+  }
+
+  it('the victory line shows the XP per living member: Goblin ×4 (24 XP) with 4 alive says "6 XP each" (BA-10)', () => {
+    const battle = winAgainstFourGoblins(0);
+    expect(battle.outcome).toBe('victory');
+    expect(battle.currentMessages).toEqual([{ text: 'Victory! 6 XP each, 24 Gold.' }]);
+    expect(battle.battleResult).toMatchObject({ xpReward: 24, xpPerMember: 6 });
+  });
+
+  it('with 3 alive each gets 8', () => {
+    const battle = winAgainstFourGoblins(1);
+    expect(battle.outcome).toBe('victory');
+    expect(battle.battleResult?.xpPerMember).toBe(8);
+    expect(battle.currentMessages[0].text).toBe('Victory! 8 XP each, 24 Gold.');
   });
 
   it('defeat ends as defeat, not escaped', () => {

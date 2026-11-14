@@ -15,6 +15,11 @@ export class StatusTracker {
     return this.effects.has(effect);
   }
 
+  /** Asleep or paralysed (stun): loses its turn, and physical attacks get +40 to hit. */
+  isHelpless(): boolean {
+    return this.has('sleep') || this.has('stun');
+  }
+
   clear(): void {
     this.effects.clear();
   }
@@ -45,6 +50,10 @@ export class StatusTracker {
     return { damage, skipTurn, expired };
   }
 
+  /**
+   * Not called by the battle: as in FF1, damage does not wake a sleeper. Sleepers wake by the HP roll in
+   * `rollWake` (StatusTick) after losing a turn. Kept for callers that want the wake-on-hit rule.
+   */
   onHit(): void {
     this.effects.delete('sleep');
   }

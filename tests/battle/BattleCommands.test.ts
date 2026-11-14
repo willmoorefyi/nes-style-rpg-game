@@ -37,24 +37,19 @@ describe('retargetIfDead', () => {
   });
 });
 
-describe('calculateRunChance', () => {
-  it('returns 50% when agilities are equal', () => {
-    expect(calculateRunChance(10, 10)).toBe(50);
+describe('calculateRunChance (FF1, EB-9)', () => {
+  it('is luck / (level + 16): a Lv1 Thief with luck 15 escapes 15/17 of the time', () => {
+    expect(calculateRunChance(15, 1)).toBeCloseTo(15 / 17);
   });
 
-  it('increases chance when party is faster', () => {
-    expect(calculateRunChance(20, 10)).toBe(55);
+  it('a Lv1 Thief escapes on a 0.85 roll; a Lv1 Warrior (luck 5) fails on the same roll', () => {
+    expect(0.85 < calculateRunChance(15, 1)).toBe(true);
+    expect(0.85 < calculateRunChance(5, 1)).toBe(false);
   });
 
-  it('decreases chance when enemies are faster', () => {
-    expect(calculateRunChance(10, 20)).toBe(45);
-  });
-
-  it('clamps to minimum 10%', () => {
-    expect(calculateRunChance(10, 200)).toBe(10);
-  });
-
-  it('clamps to maximum 90%', () => {
-    expect(calculateRunChance(200, 10)).toBe(90);
+  it('higher levels make running harder and the chance stays in [0, 1]', () => {
+    expect(calculateRunChance(15, 10)).toBeLessThan(calculateRunChance(15, 1));
+    expect(calculateRunChance(99, 1)).toBe(1);
+    expect(calculateRunChance(0, 1)).toBe(0);
   });
 });

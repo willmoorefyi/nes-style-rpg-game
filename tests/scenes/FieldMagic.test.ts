@@ -41,7 +41,7 @@ describe('MS-3: field magic', () => {
     const cure = SpellRegistry.getSpell('cure')!;
     fighter.currentHp = 1;
     const result = castFieldSpell(cure, mage, [fighter], () => 0.5);
-    const expected = Math.min(fighter.maxHp - 1, healAmount(cure, { intelligence: mage.stats.intelligence }, () => 0.5));
+    const expected = Math.min(fighter.maxHp - 1, healAmount(cure, () => 0.5));
     expect(fighter.currentHp).toBe(1 + expected);
     expect(result.messages).toEqual([`FGHTR recovers ${expected} HP`]);
 
@@ -54,7 +54,31 @@ describe('MS-3: field magic', () => {
       partyById: new Map([['party_0', mage], ['party_1', target]]), addDamageEvent: vi.fn(),
     }, [cure]);
     exec.execute({ type: 'magic', actorId: 'party_0', spellId: 'cure', targetId: 'party_1' }, false);
-    expect(target.currentHp - 1).toBe(healAmount(cure, { intelligence: mage.stats.intelligence }, () => 0.5));
+    expect(target.currentHp - 1).toBe(healAmount(cure, () => 0.5));
+  });
+
+  it('CURE (power 16) heals 16–32 in the field and in battle, whatever the caster’s INT (FF1)', () => {
+    const cure16 = { ...SpellRegistry.getSpell('cure')!, power: 16 };
+    const big = () => {
+      const t = new Character({ name: 'BIG', classData: ClassRegistry.getClass('warrior')!, level: 30 });
+      t.currentHp = 1;
+      return t;
+    };
+    for (const [roll, want] of [[0, 16], [0.999, 32]] as const) {
+      const field = big();
+      castFieldSpell(cure16, mage, [field], () => roll);
+      expect(field.currentHp - 1).toBe(want);
+
+      const target = big();
+      const party = [mage, target];
+      mage.setSpellCharges(1, 9);
+      const exec = new SpellExecutor({
+        party, enemies: [], rng: () => roll, addMessage: vi.fn(), livingParty: () => party, livingEnemies: () => [],
+        partyById: new Map([['party_0', mage], ['party_1', target]]), addDamageEvent: vi.fn(),
+      }, [cure16]);
+      exec.execute({ type: 'magic', actorId: 'party_0', spellId: 'cure', targetId: 'party_1' }, false);
+      expect(target.currentHp - 1).toBe(want);
+    }
   });
 
   it('CURE does not revive the fallen', () => {

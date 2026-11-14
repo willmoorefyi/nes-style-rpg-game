@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { BattleStateMachine } from '../../src/battle/BattleStateMachine.js';
 import { Character } from '../../src/entities/Character.js';
 import type { EnemyData, CharacterClassData } from '../../src/types/index.js';
+import { mulberry32, testClass, testEnemy } from '../helpers/testUtils.js';
 
 const mockClass: CharacterClassData = {
   id: 'warrior',
@@ -258,3 +259,72 @@ describe('BattleStateMachine', () => {
     });
   });
 });
+
+describe('BattleStateMachine: FF1 maths wiring (T4a)', () => {
+  /** One round in which only `enemy` fights `target`; returns the damage it dealt. */
+  function enemyHit(rng: () => number): number {
+    const tank = new Character({ name: 'Tank', classData: testClass('warrior', { baseStats: { hp: 999, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 } }) });
+    const brute = testEnemy({ name: 'Brute', stats: { hp: 999, agility: 50, attack: 20, accuracy: 100, defense: 50 } });
+    const battle = new BattleStateMachine({ party: [tank], enemies: [brute], canRun: false }, rng);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.submitCommand({ type: 'run', actorId: 'party_0' });
+    battle.prepareRound();
+    battle.executeNextAction();
+    return 999 - tank.currentHp;
+  }
+
+  it('enemy damage varies: the same enemy and target under two RNG streams deal different damage (EB-10)', () => {
+    const results = new Set([1, 2, 3, 4, 5, 6].map(seed => enemyHit(mulberry32(seed))));
+    expect(results.size).toBeGreaterThan(1);
+    for (const d of results) {
+      expect(d).toBeGreaterThanOrEqual(20);
+      expect(d).toBeLessThanOrEqual(80); // rand(20, 40), plus a crit's second roll
+    }
+  });
+
+  it('a party hit that lands twice says "(2 hits)"', () => {
+    const fast = testClass('warrior', { hitPercent: { base: 40, growth: 0 }, baseStats: { hp: 99, strength: 20, agility: 50, intelligence: 1, vitality: 1, luck: 1 } });
+    const hero = new Character({ name: 'Hero', classData: fast });
+    const battle = new BattleStateMachine({ party: [hero], enemies: [testEnemy({ stats: { hp: 999, defense: 0, evade: 0 } })] }, () => 0);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+    battle.prepareRound();
+    const { messages } = battle.executeNextAction();
+    // rng 0: two hits of rand(10, 20) = 10 each; crit 0 never fires
+    expect(messages[0].text).toBe('Hero hits Goblin for 20! (2 hits)');
+  });
+
+  it('an enemy whose target died retargets by the original slots (front-weighted)', () => {
+    const cls = testClass('warrior', { baseStats: { hp: 999, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 } });
+    const party = [0, 1, 2, 3].map(i => new Character({ name: `P${i}`, classData: cls }));
+    const enemy = testEnemy({ stats: { hp: 999, agility: 50, accuracy: 200 } });
+    const battle = new BattleStateMachine({ party, enemies: [enemy], canRun: false }, () => 0.6);
+    battle.setEnemyAI(0, { selectAction: (self) => ({ type: 'fight', actorId: self.id, targetId: 'party_1' }) });
+    battle.startBattle();
+    battle.advanceFromIntro();
+    party.forEach((_, i) => battle.submitCommand({ type: 'run', actorId: `party_${i}` }));
+    party[1].currentHp = 0;
+    battle.prepareRound();
+    battle.executeNextAction();
+    // living slots 0, 2, 3 keep weights 4/1/1: 0.6 × 6 = 3.6 → slot 0 (uniform would give slot 2)
+    expect(party[0].currentHp).toBeLessThan(999);
+    expect(party[2].currentHp).toBe(999);
+  });
+
+  it('Run uses the runner’s luck and level: a Lv1 Thief escapes on 0.85, a Lv1 Warrior does not (EB-9)', () => {
+    const run = (luck: number) => {
+      const cls = testClass('x', { baseStats: { hp: 99, strength: 1, agility: 99, intelligence: 1, vitality: 1, luck } });
+      const battle = new BattleStateMachine({ party: [new Character({ name: 'R', classData: cls })], enemies: [testEnemy()] }, () => 0.85);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'run', actorId: 'party_0' });
+      battle.executeRound();
+      return battle.outcome;
+    };
+    expect(run(15)).toBe('escaped');
+    expect(run(5)).toBeNull();
+  });
+});
+

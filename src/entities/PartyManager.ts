@@ -1,5 +1,6 @@
 import { Character } from './Character.js';
 import type { CharacterSaveData } from '../types/index.js';
+import { xpShare } from '../battle/Rewards.js';
 
 export class PartyManager {
   private members: Character[] = [];
@@ -42,7 +43,7 @@ export class PartyManager {
   distributeXp(amount: number): boolean[] {
     const living = this.members.filter(m => m.currentHp > 0);
     if (living.length === 0) return [];
-    const share = Math.floor(amount / living.length);
+    const share = xpShare(amount, living.length);
     return living.map(m => m.addXp(share));
   }
 

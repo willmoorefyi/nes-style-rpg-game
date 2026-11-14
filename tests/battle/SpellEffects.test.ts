@@ -266,7 +266,8 @@ describe('Spell Effects', () => {
       mage.currentHp = 1;
       mage.applyBuff('attack', 14);
 
-      const strongEnemy: EnemyData = { ...goblin, stats: { ...goblin.stats, attack: 999 } };
+      // faster than the mage, so it strikes before TMPR's attack can win the fight
+      const strongEnemy: EnemyData = { ...goblin, stats: { ...goblin.stats, attack: 999, agility: 99 } };
       const battle = new BattleStateMachine(
         { party: [mage], enemies: [strongEnemy], spells: [] },
         () => 0.5,
@@ -296,6 +297,62 @@ describe('Spell Effects', () => {
       expect(battle.currentMessages.some(m => m.text.includes('no charges'))).toBe(true);
       // Defense should not have changed
       expect(mage.getBuffAmount('defense')).toBe(0);
+    });
+  });
+
+  describe('FF1 evade is read by the hit roll (EB-6)', () => {
+    const garland: EnemyData = {
+      ...goblin, id: 'garland', name: 'Garland',
+      stats: { ...goblin.stats, hp: 106, agility: 1, attack: 15, accuracy: 15, defense: 10, evade: 12, magicDefense: 15 },
+    };
+    const wolf: EnemyData = {
+      ...goblin, id: 'wolf', name: 'Wolf',
+      stats: { ...goblin.stats, hp: 20, agility: 1, attack: 8, accuracy: 5, defense: 0, evade: 36, magicDefense: 28 },
+    };
+    const ruse80: SpellData = { ...ruseSpell, power: 80 };
+    const lock20: SpellData = { ...lockSpell, power: 20, accuracy: 64 };
+
+    function round(party: Character[], enemy: EnemyData, cmds: Array<{ spellId?: string; targetId: string }>, rng: number) {
+      const battle = new BattleStateMachine({ party, enemies: [enemy], spells: [fogSpell, ruse80, lock20] }, () => rng);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      cmds.forEach((c, i) => battle.submitCommand(c.spellId
+        ? { type: 'magic', actorId: `party_${i}`, targetId: c.targetId, spellId: c.spellId }
+        : { type: 'fight', actorId: `party_${i}`, targetId: c.targetId }));
+      battle.executeRound();
+      return battle.currentMessages.map(m => m.text);
+    }
+
+    it('RUSE (+80, self): the same roll that lets Garland hit before RUSE misses after it', () => {
+      // evade 48 + 8 = 56 → Garland's chance 168 + 15 − 56 = 127/200; after RUSE 47/200; roll 0.5 = 100
+      const before = round([createMage('Mage', 1)], garland, [{ spellId: 'fog', targetId: 'party_0' }], 0.5);
+      expect(before).toContain('Garland hits Mage for 15!'); // rand(15, 30) at 0.5 = 23, minus FOG's 8
+      const mage = createMage('Mage', 1);
+      const after = round([mage], garland, [{ spellId: 'ruse', targetId: 'party_0' }], 0.5);
+      expect(mage.getBuffAmount('evade')).toBe(80); // RUSE's power is the amount
+      expect(after).toContain('Garland missed!');
+    });
+
+    it('LOCK (−20 evade): a party roll that misses before LOCK hits after it', () => {
+      const fast = { ...mageClass, baseStats: { ...mageClass.baseStats, agility: 20 } };
+      // the caster acts first; the fighter's chance is 168 − 36 = 132/200, after LOCK 152/200; roll 0.7 = 140
+      const before = round([new Character({ name: 'Caster', classData: fast }), createMage('Hitter', 1)], wolf,
+        [{ spellId: 'fog', targetId: 'party_0' }, { targetId: 'enemy_0' }], 0.7);
+      expect(before).toContain('Hitter missed!');
+      const caster = new Character({ name: 'Caster', classData: fast });
+      caster.setSpellCharges(1, 9);
+      const after = round([caster, createMage('Hitter', 1)], wolf,
+        [{ spellId: 'lock', targetId: 'enemy_0' }, { targetId: 'enemy_0' }], 0.7);
+      expect(after).toContain("Wolf's evasion decreased!");
+      expect(after.some(t => t.startsWith('Hitter hits Wolf'))).toBe(true);
+    });
+
+    it('LOCK rolls statusHits: a high roll leaves the enemy unaffected', () => {
+      // 148 + 64 − 28 = 184/200 → a 0.95 roll (190) misses
+      const mage = createMage('Mage', 1);
+      const texts = round([mage], wolf, [{ spellId: 'lock', targetId: 'enemy_0' }], 0.95);
+      expect(texts).toContain('Wolf is unaffected.');
+      expect(texts.some(t => t.includes('decreased'))).toBe(false);
     });
   });
 });

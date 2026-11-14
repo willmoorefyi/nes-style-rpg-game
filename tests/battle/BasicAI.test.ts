@@ -40,13 +40,14 @@ describe('BasicAI', () => {
     expect(cmd.targetId).toBe('party_1');
   });
 
-  it('should use rng for target selection among multiple living members', () => {
+  it('should weight targets to the front slots (4/2/1 for three members)', () => {
     const a = new Character({ name: 'A', classData: mockClass });
     const b = new Character({ name: 'B', classData: mockClass });
     const c = new Character({ name: 'C', classData: mockClass });
-    // rng=0.5 → floor(0.5*3)=1 → 'party_1'
-    const cmd = ai.selectAction(makeEnemy(), [a, b, c], [], 1, () => 0.5);
-    expect(cmd.targetId).toBe('party_1');
+    // total 7: 0.5 → 3.5 < 4 → front slot; 0.7 → 4.9 → slot 1; 0.9 → 6.3 → slot 2
+    expect(ai.selectAction(makeEnemy(), [a, b, c], [], 1, () => 0.5).targetId).toBe('party_0');
+    expect(ai.selectAction(makeEnemy(), [a, b, c], [], 1, () => 0.7).targetId).toBe('party_1');
+    expect(ai.selectAction(makeEnemy(), [a, b, c], [], 1, () => 0.9).targetId).toBe('party_2');
   });
 
   it('should return undefined targetId when all party members are dead', () => {
