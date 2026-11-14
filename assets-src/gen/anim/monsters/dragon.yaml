@@ -1,0 +1,165 @@
+sprite: dragon
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Wings: the folded idle wing is one rigid part (wing_i) on the withers; attack / hurt wings use their own root joints
+# (wr_n / wr_f, not joined to the body, so the art gap between wing and neck is not crack-filled or counted as a seam)
+# and every wing move is an explicit tweak (a rotation about the root, <= 30 deg). The idle wing has no attack / hurt
+# counterpart, so frames cut from idle keep it folded and frames cut from attack keep the raised wings.
+# Continuity: idle -> attack moves the centroid 19.9 px up (cap 10 per step), so atk_mid and atk_follow sit at the
+# centroid midpoint: body 8 px lower, near wing 24 deg down, tail swung 24 deg down, far wing nearly unrotated.
+# Hurt: hurt_in1 rears 4 deg past the 30% lerp about the hind hip; hurt_in2 pitches the upright body 30% back toward
+# idle and drops it 10 px (hind legs 7, tail tip planted on the plain), the whole frame 4 px back (the recoil side).
+keyframes:
+  idle:
+    hip: [48, 100]
+    back: [60, 96]
+    chest: [74, 96]
+    neck: [82, 90]
+    head: [89, 84]
+    snout: [108, 88]
+    tail0: [40, 100]
+    tail1: [30, 105]
+    tail2: [20, 103]
+    tail3: [17, 94]
+    tail_tip: [24, 87]
+    wtip_i: [33, 80]
+    sh_n: [73, 102]
+    el_n: [71, 111]
+    paw_n: [72, 118]
+    ftoe_n: [79, 121]
+    sh_f: [83, 104]
+    el_f: [85, 111]
+    paw_f: [87, 118]
+    ftoe_f: [93, 121]
+    hip_n: [49, 102]
+    knee_n: [45, 111]
+    foot_n: [43, 118]
+    toe_n: [48, 121]
+    hip_f: [59, 104]
+    knee_f: [60, 111]
+    foot_f: [62, 118]
+    toe_f: [66, 121]
+  attack:
+    hip: [44, 94]
+    back: [60, 90]
+    chest: [76, 90]
+    neck: [89, 88]
+    head: [100, 85]
+    snout: [115, 91]
+    tail0: [33, 92]
+    tail1: [18, 88]
+    tail2: [12, 72]
+    tail3: [17, 61]
+    tail_tip: [30, 57]
+    wr_n: [66, 82]
+    wt_n: [28, 32]
+    wr_f: [72, 80]
+    wt_f: [68, 24]
+    sh_n: [62, 96]
+    el_n: [64, 103]
+    paw_n: [66, 108]
+    ftoe_n: [68, 110]
+    sh_f: [74, 98]
+    el_f: [76, 103]
+    paw_f: [78, 107]
+    ftoe_f: [80, 108]
+    hip_n: [47, 96]
+    knee_n: [42, 107]
+    foot_n: [37, 115]
+    toe_n: [41, 121]
+    hip_f: [50, 100]
+    knee_f: [47, 107]
+    foot_f: [48, 112]
+    toe_f: [52, 114]
+  hurt:
+    hip: [64, 80]
+    back: [70, 68]
+    chest: [75, 56]
+    neck: [78, 42]
+    head: [82, 31]
+    snout: [103, 32]
+    tail0: [57, 88]
+    tail1: [57, 98]
+    tail2: [64, 108]
+    tail3: [60, 116]
+    tail_tip: [48, 117]
+    wr_n: [68, 44]
+    wt_n: [36, 64]
+    sh_n: [78, 63]
+    el_n: [87, 62]
+    paw_n: [94, 63]
+    ftoe_n: [99, 67]
+    hip_n: [64, 78]
+    knee_n: [62, 90]
+    foot_n: [65, 100]
+    toe_n: [68, 104]
+    hip_f: [72, 76]
+    knee_f: [76, 88]
+    foot_f: [78, 98]
+    toe_f: [80, 103]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  wing_i: {bone: [chest, wtip_i], radius: 8.0, in: [idle]}     # the folded idle wing rides the withers
+  wing_n: {bone: [wr_n, wt_n], radius: 8.0}
+  wing_f: {bone: [wr_f, wt_f], radius: 8.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+masks:
+  wing_f:                      # the far (dark) wing behind the near wing's arm
+    attack: [[66, 20], [76, 26], [86, 36], [95, 50], [99, 60], [92, 67], [82, 69], [77, 73], [75, 80], [70, 80], [68, 66], [71, 56], [67, 48], [66, 40]]
+  wing_n:                      # the near wing (its arm runs down to the shoulder at x 62-70)
+    attack: [[22, 27], [48, 31], [60, 41], [66, 47], [72, 54], [68, 62], [67, 72], [70, 80], [56, 82], [50, 76], [42, 62], [34, 50], [29, 40]]
+    hurt: [[27, 58], [40, 40], [52, 29], [60, 27], [71, 31], [71, 37], [67, 42], [66, 56], [60, 61], [52, 67], [44, 74], [27, 74]]
+  wing_i:
+    idle: [[30, 79], [40, 74], [50, 70], [60, 68], [72, 70], [82, 74], [80, 80], [74, 88], [70, 92], [52, 92], [44, 88], [38, 85], [30, 83]]
+  head:
+    idle: [[82, 70], [98, 70], [111, 84], [111, 97], [95, 97], [86, 92], [82, 84]]
+    attack: [[95, 76], [120, 76], [120, 105], [100, 105], [95, 96]]
+    hurt: [[70, 20], [108, 20], [108, 42], [86, 42], [80, 36], [70, 30]]
+frames:
+  atk_wind1:                  # anticipation: wings start to lift, head drawn back, body leans 1 px back
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {wtip_i: [3, -8], head: [-2, -1], snout: [-2, -1], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], neck: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:                  # coil: wings lifted 24 deg, head reared back, body 2 px back (t only sets the bbox lerp; motion is tweaks)
+    t: 0.1
+    dy: 0
+    moves: []
+    tweaks: {wtip_i: [8, -15], neck: [-3, -1], head: [-4, -2], snout: [-4, -2], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  atk_mid:                    # the pass: body 8 px lower, wings half raised, tail swung down, near hind paw planted
+    t: 0.35
+    pins: [knee_n, foot_n, toe_n]
+    moves: [back, chest, neck, head, snout, hip_f, knee_f, foot_f, toe_f]
+    tweaks: {foot_n: [3, 0], toe_n: [3, 0], knee_n: [3, 0], hip: [2, 8], back: [2, 8], chest: [2, 8], neck: [2, 8], head: [2, 8], snout: [2, 8], tail0: [2, 8], tail1: [2, 14], tail2: [-4, 18], tail3: [-9, 17], tail_tip: [-12, 12], wr_n: [2, 8], wt_n: [-15, 28], wr_f: [2, 8], wt_f: [14, 8], sh_n: [2, 8], el_n: [2, 8], paw_n: [2, 7], ftoe_n: [2, 7], sh_f: [2, 8], el_f: [2, 8], paw_f: [2, 8], ftoe_f: [2, 8], hip_n: [2, 8], hip_f: [2, 8], knee_f: [2, 5], foot_f: [2, 3], toe_f: [2, 3]}
+  atk_follow:                 # downstroke after the bite: body drops 8 px, wings beat down, tail swings down
+    t: 0.68
+    pins: [knee_n, foot_n, toe_n]
+    moves: [back, chest, neck, head, snout, hip_f, knee_f, foot_f, toe_f]
+    tweaks: {knee_n: [1, 2], hip: [2, 8], back: [2, 8], chest: [2, 8], neck: [2, 8], head: [2, 8], snout: [2, 8], tail0: [2, 8], tail1: [2, 14], tail2: [-4, 18], tail3: [-9, 17], tail_tip: [-12, 12], wr_n: [2, 8], wt_n: [-15, 28], wr_f: [2, 11], wt_f: [8, 11], sh_n: [2, 8], el_n: [2, 8], paw_n: [2, 7], ftoe_n: [2, 7], sh_f: [2, 8], el_f: [2, 8], paw_f: [2, 8], ftoe_f: [2, 8], hip_n: [2, 8], hip_f: [2, 8], knee_f: [2, 5], foot_f: [2, 3], toe_f: [2, 3]}
+  atk_recover:                # settle: wings still lifted 30 deg, spine 30% toward the lunge
+    t: 0.3
+    moves: [back, chest, neck, head, snout]
+    tweaks: {wtip_i: [11, -18], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], neck: [-2, 0], head: [-2, 0], snout: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  hurt_in1:                   # rear starts: spine pitched up about the hind hip, wings flung up, forepaws freed, hind paws planted
+    t: 0.3
+    pins: [foot_n, foot_f]
+    moves: [back, chest, neck, head, snout, knee_n, knee_f]
+    tweaks: {back: [0, -1], chest: [0, -2], neck: [-1, -2], head: [-1, -3], snout: [-1, -4], wtip_i: [9, -14], sh_n: [0, -2], el_n: [1, -2], paw_n: [1, -2], ftoe_n: [1, -2], sh_f: [0, -2], el_f: [1, -3], paw_f: [1, -3], ftoe_f: [1, -3]}
+  hurt_in2:                   # nearly recoiled: upright body pitched 30% back down and dropped toward the plain, tail tip on the ground
+    t: 0.3
+    pins: []
+    moves: [back, chest, neck, head, snout]
+    tweaks: {hip: [-4, 10], back: [-4, 10], chest: [-4, 10], neck: [-4, 10], head: [-4, 10], snout: [-4, 10], tail0: [-4, 10], wr_n: [0, 14], wt_n: [0, 14], sh_n: [-4, 10], el_n: [-4, 10], paw_n: [-4, 10], ftoe_n: [-4, 10], hip_n: [-4, 7], hip_f: [-4, 7], knee_n: [-4, 7], knee_f: [-4, 7], foot_n: [-4, 0], foot_f: [-4, 0], toe_n: [-4, 0], toe_f: [-4, 0], tail1: [-4, 5], tail2: [-4, 0], tail3: [-4, 0], tail_tip: [-4, 0]}
+holds: []
+paint:                         # outline ink in the 1 px leg-joint cracks the crack fill leaves open (art gaps between thigh / shin / paw)
+  - {frame: atk_wind1, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[50, 113], [76, 113], [65, 115]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[91, 83]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[85, 95], [75, 103], [50, 113], [65, 115], [64, 101], [63, 102], [64, 102], [64, 103], [65, 104], [65, 105], [66, 106], [66, 107], [67, 107], [67, 108]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[80, 43], [79, 45]], rgb: [6, 4, 10]}
