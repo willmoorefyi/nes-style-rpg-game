@@ -1,15 +1,18 @@
 import { Container, BitmapText, Graphics, Sprite, Texture } from 'pixi.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
-import { Window } from '../../ui/Window.js';
+import type { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
-import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
+import { FONT_SIZE } from '../../core/LayoutConstants.js';
 import { battleArt } from '../../rendering/BattleArt.js';
 import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 import { idlePose } from './attackChoreography.js';
+import { BattlePartyPanel } from './BattlePartyPanel.js';
+import { groupEnemies, enemyListCells } from './enemyList.js';
 
 const HURT_FRAMES = 24;
+const DEAD_TINT = 0x888888;
 /** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
  *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-770), and x per slot (a slight diagonal). */
 export const PARTY_FEET_Y = [440, 550, 660, 770];
@@ -34,19 +37,25 @@ export class BattleDisplayManager {
   private idleClock = 0;
   private hurtTimers = new Map<number, number>();
   private victory = false;
-  // K2: Character status boxes behind party sprites
-  readonly statusBoxes: Window[] = [];
-  // K3: Enemy list texts in partyWindow
+  /** BA-8: the compact party HP panel in the bottom strip (replaces the four status boxes). */
+  readonly partyPanel: BattlePartyPanel;
+  // K3: Enemy list texts in the enemy window
   enemyListTexts: BitmapText[] = [];
-  // L2: Deduped enemy name -> list text index
+  /** Base enemy name (species) -> list text index. */
   readonly enemyNameToListIndex: Map<string, number> = new Map();
+  /** The enemy list container (hidden while a spell or item list uses the window). */
+  readonly enemyList = new Container();
 
   constructor(
     private readonly mainContainer: Container,
     private readonly battle: BattleStateMachine,
     private readonly config: BattleSceneConfig,
-    private readonly partyWindow: Window,
-  ) {}
+    private readonly enemyWindow: Window,
+  ) {
+    this.partyPanel = new BattlePartyPanel(config.party);
+    this.enemyList.position.set(enemyWindow.contentX, enemyWindow.contentY);
+    enemyWindow.addChild(this.enemyList);
+  }
 
   createEnemySprites(): void {
     this.enemyView = new AiEnemyView(this.battle.allEnemies.map(e => e.data));
@@ -101,42 +110,8 @@ export class BattleDisplayManager {
   }
 
   createPartySprites(): void {
-    // Status boxes: 4 boxes each 25% of battle field height (660px / 4 = 165px)
-    const battleFieldTop = 120;
-    const boxHeight = 165;
-    const boxWidth = 200;
-    const boxX = 1700;
-
+    this.mainContainer.addChild(this.partyPanel.window);
     for (let i = 0; i < this.config.party.length; i++) {
-      const char = this.config.party[i];
-
-      // Character status box — stacked vertically on right edge
-      const boxY = battleFieldTop + i * boxHeight;
-      const box = new Window({ x: boxX, y: boxY, width: boxWidth, height: boxHeight });
-      const nameText = new BitmapText({
-        text: char.name,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-      });
-      nameText.position.set(box.contentX, box.contentY);
-      box.addChild(nameText);
-
-      const statusText = new BitmapText({
-        text: '',
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffff44 },
-      });
-      statusText.position.set(box.contentX, box.contentY + 40);
-      box.addChild(statusText);
-
-      const hpText = new BitmapText({
-        text: `${char.currentHp}/${char.maxHp}`,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-      });
-      hpText.position.set(box.contentX, box.contentY + 100);
-      box.addChild(hpText);
-
-      this.mainContainer.addChild(box);
-      this.statusBoxes.push(box);
-
       // M2: Party sprite at diagonal position
       const built = this.buildPartySprite(i);
       this.mainContainer.addChild(built.sprite);
@@ -196,41 +171,34 @@ export class BattleDisplayManager {
   }
 
   updatePartyDisplay(): void {
-    // K3: partyWindow now shows enemy list instead of party HP
+    // the left window lists the enemies; party HP is in the party panel
+    this.partyPanel.refresh();
     this.updateEnemyList();
   }
 
   updateEnemyList(): void {
-    // Remove old enemy list texts
-    for (const t of this.enemyListTexts) this.partyWindow.removeChild(t);
+    for (const t of this.enemyListTexts) this.enemyList.removeChild(t);
     this.enemyListTexts = [];
     this.enemyNameToListIndex.clear();
-
-    // L2: Group enemies by displayName, preserving first-seen order
-    const enemies = this.battle.allEnemies;
-    const nameOrder: string[] = [];
-    const counts = new Map<string, number>();
-    for (const e of enemies) {
-      const n = e.displayName;
-      if (!counts.has(n)) nameOrder.push(n);
-      counts.set(n, (counts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
-    }
-
-    for (let i = 0; i < nameOrder.length; i++) {
-      const name = nameOrder[i];
-      const alive = counts.get(name)!;
-      // L1: No HP display. L2: prefix with count if >1
-      const label = alive === 0 ? name : alive > 1 ? `${alive}x ${name}` : name;
+    // BA-8: one line per species ("6x Goblin"), two columns past 5 lines; dead species grey. L1: no HP display.
+    const entries = groupEnemies(this.battle.allEnemies);
+    const cells = enemyListCells(entries.length, this.enemyWindow.contentWidth);
+    entries.forEach((entry, i) => {
       const text = new BitmapText({
-        text: label,
+        text: entry.label,
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
-      if (alive === 0) text.tint = 0x888888;
-      text.position.set(this.partyWindow.contentX, this.partyWindow.contentY + i * (FONT_SIZE + 12));
-      this.partyWindow.addChild(text);
+      if (entry.alive === 0) text.tint = DEAD_TINT;
+      text.position.set(cells[i].x, cells[i].y);
+      this.enemyList.addChild(text);
       this.enemyListTexts.push(text);
-      this.enemyNameToListIndex.set(name, i);
-    }
+      this.enemyNameToListIndex.set(entry.name, i);
+    });
+  }
+
+  /** The list line of an enemy's species, if listed. */
+  listIndexFor(enemy: { data: { name: string } }): number | undefined {
+    return this.enemyNameToListIndex.get(enemy.data.name);
   }
 
   updatePartySprites(): void {
@@ -245,21 +213,8 @@ export class BattleDisplayManager {
         sprite.alpha = 1.0;
         sprite.tint = 0xffffff;
       }
-
-      // K2: Update status box texts
-      const box = this.statusBoxes[i];
-      if (box) {
-        const texts = box.children.filter(c => c instanceof BitmapText) as BitmapText[];
-        // texts[0]=name, texts[1]=status, texts[2]=hp
-        if (texts[1]) {
-          const statuses = party[i].statusTracker.getAll().map(s => s.effect);
-          texts[1].text = statuses.join(' ');
-        }
-        if (texts[2]) {
-          texts[2].text = `${party[i].currentHp}/${party[i].maxHp}`;
-        }
-      }
     }
+    this.partyPanel.refresh();
     this.refreshPoses();
     this.updateEnemyList();
   }
@@ -273,18 +228,11 @@ export class BattleDisplayManager {
     }
   }
 
-  /** Restore gray tint on enemy list entries where all enemies of that name are dead */
+  /** Restore the grey tint on list lines whose whole species is dead. */
   updateEnemyListDeadTints(): void {
-    const enemies = this.battle.allEnemies;
-    const aliveCounts = new Map<string, number>();
-    for (const e of enemies) {
-      const n = e.displayName;
-      aliveCounts.set(n, (aliveCounts.get(n) ?? 0) + (e.currentHp > 0 ? 1 : 0));
-    }
-    for (const [name, idx] of this.enemyNameToListIndex) {
-      if ((aliveCounts.get(name) ?? 0) === 0 && this.enemyListTexts[idx]) {
-        this.enemyListTexts[idx].tint = 0x888888;
-      }
+    for (const entry of groupEnemies(this.battle.allEnemies)) {
+      const idx = this.enemyNameToListIndex.get(entry.name);
+      if (entry.alive === 0 && idx !== undefined && this.enemyListTexts[idx]) this.enemyListTexts[idx].tint = DEAD_TINT;
     }
   }
 }

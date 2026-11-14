@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ATTACK_STYLES, ATTACK_REACH, advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackStyle, castAt, castReturnAt,
+import { ATTACK_STYLES, MIN_ATTACK_REACH, MAX_ATTACK_REACH, REACH_OVERLAP, attackReach, advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackStyle, castAt, castReturnAt,
   CAST_FRAMES, idlePose, IDLE_PERIOD, parseAttackOverride, pickAttackStyle, RANDOM_ATTACK_STYLES } from '../../../src/scenes/battle/attackChoreography.js';
 
 describe('attack choreography', () => {
@@ -11,7 +11,25 @@ describe('attack choreography', () => {
       expect(end.dx).toBeLessThan(-100);
       expect(Math.abs(advanceAt(style, 0).dx)).toBeLessThan(1);
     }
-    expect(advanceAt('lunge', advanceFrames('lunge')).dx).toBeCloseTo(-ATTACK_REACH);
+    expect(advanceAt('lunge', advanceFrames('lunge')).dx).toBeCloseTo(-MIN_ATTACK_REACH);
+  });
+
+  it('BA-9: every style, classic included, ends at dx = -reach on its contact frame', () => {
+    for (const reach of [MIN_ATTACK_REACH, 420, 644, MAX_ATTACK_REACH]) {
+      for (const style of ATTACK_STYLES) {
+        const contact = advanceAt(style, advanceFrames(style), reach);
+        expect(contact.dx, `${style} ${reach}`).toBeCloseTo(-reach);
+        expect(advanceAt(style, advanceFrames(style) + 5, reach).dx).toBeCloseTo(-reach);
+      }
+    }
+  });
+
+  it('BA-9: the reach runs from the attacker\'s home x to the target\'s right edge, clamped to [150, 900]', () => {
+    expect(attackReach(1380, 760)).toBe(1380 - 760 + REACH_OVERLAP);
+    expect(attackReach(1380, 1300)).toBe(MIN_ATTACK_REACH);
+    expect(attackReach(1515, 200)).toBe(MAX_ATTACK_REACH);
+    expect(attackReach(1380, Number.NaN)).toBe(MIN_ATTACK_REACH);
+    expect([MIN_ATTACK_REACH, MAX_ATTACK_REACH]).toEqual([150, 900]);
   });
 
   it('the lunge draws back, coils, springs and strikes, in that order', () => {
