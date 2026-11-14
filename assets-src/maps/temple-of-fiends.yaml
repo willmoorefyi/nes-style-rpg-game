@@ -1,8 +1,17 @@
 # Temple of Fiends (original layout). legend: x void, W wall top, F wall face, - floor, % rubble
 id: temple-of-fiends
+name: Temple of Fiends
 kits: [temple, castle, interior, town]
 music: dungeon
-materials: {floor_stone: temple_floor, rubble: temple_rubble, in_wall_top: temple_wall_top, in_wall_face: temple_wall_face}
+# TF-2: the wall tops and the floor came from one cracked slab texture and read as one surface. The wall tops are a
+# darkened copy and the walkable floor (and its rubble) a lightened one; the faces are lifted too, so they stay apart
+# from the brighter floor. `contrast` keeps wall tops and floor apart (map_checks.py).
+materials:
+  floor_stone: {from: temple_floor, shade: 1.3}
+  rubble: {from: temple_rubble, shade: 1.3}
+  in_wall_top: {from: temple_wall_top, shade: 0.35}
+  in_wall_face: {from: temple_wall_face, shade: 1.2}
+contrast: [{a: W, b: "-", min: 0.2}]
 ground: |
   xxxxxxxxxxxxxxxxxxxxxxxx
   xxxWWWWWWWWWWWWWWWWWWxxx

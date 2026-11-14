@@ -13,7 +13,7 @@ entrances:
   stairs: [7, 8]
 collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 8, 8, 8, 8, 8, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1,
-  1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: tower_sage
@@ -26,8 +26,8 @@ npcs:
   - text: ['Ah, visitors! From up here I watch the stars... and the crystals.', Four crystals hold the world in balance. Their light is fading., Legend says four Warriors of Light will come. Perhaps you
         are they.]
 transitions:
-- {x: 7, y: 10, targetMap: cornelia-castle-2f, targetEntrance: tower}
-- {x: 8, y: 10, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 7, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 8, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
 name: East Tower
 music: town
 encounterRate: {min: 999, max: 999}

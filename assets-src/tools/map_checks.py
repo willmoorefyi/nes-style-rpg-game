@@ -24,6 +24,10 @@ reachable exit. Opt-in per source map:
   no_unreachable_walkable: true              every walkable cell can be reached from the first entrance, or from an
                                              entrance named in `unreachable_ok` (a region opened later, e.g. the
                                              north shore); `unreachable_ok` may also list [x, y] cells
+  contrast: [{a: W, b: "-", min: 0.2}]       ground cells drawn with legend char `a` next to (4-neighbour) cells of
+                                             char `b` read apart: the mean Rec. 601 luma (0-1) of the centre 8x8 px of
+                                             `c.below` differs by at least `min` between the two sets (cells under
+                                             object art are skipped), e.g. a temple's wall tops against its floor
 
 Also always on, for `encounters` and `encounterZones`: every table entry has a weight and exactly one of `enemies`
 (ids) or `groups` ({id, min, max?} with 0 <= min <= max); a formation's largest roll is at most 9 enemies; every id is
@@ -313,6 +317,8 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
 
     if src.get("no_unreachable_walkable"):
         errors += _unreachable(src, c, seen)
+    if src.get("contrast"):
+        errors += contrast_errors(src, c)
     errors += encounter_errors(src, c)                 # encounter tables and zones: always
     return errors
 
@@ -422,6 +428,61 @@ def encounter_errors(src: dict, c) -> list[str]:
         if rate is not None and not (isinstance(rate, dict) and _is_int(rate.get("min")) and _is_int(rate.get("max"))
                                      and 1 <= rate["min"] <= rate["max"]):
             errors.append(f"{p}: encounterRate must be {{min, max}} integers with 1 <= min <= max")
+    return errors
+
+
+LUMA_601 = np.array([0.299, 0.587, 0.114], np.float32)
+CONTRAST_SAMPLE = 8                                 # px: the centre square of a cell that is sampled
+
+
+def contrast_pairs(src: dict, c, a: str, b: str) -> tuple[set[Cell], set[Cell]]:
+    """Cells of ground char `a` with a 4-neighbour of char `b`, and those neighbours; cells under object art are
+    left out (they show the object, not the ground)."""
+    rows = src["ground"].rstrip("\n").split("\n")
+    bare = (lambda x, y: c.art_share is None or c.art_share[y, x] == 0)  # noqa: E731
+    sa: set[Cell] = set()
+    sb: set[Cell] = set()
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != a or not bare(x, y):
+                continue
+            for dx, dy in DIRS:
+                nx, ny = x + dx, y + dy
+                if 0 <= ny < len(rows) and 0 <= nx < len(rows[ny]) and rows[ny][nx] == b and bare(nx, ny):
+                    sa.add((x, y))
+                    sb.add((nx, ny))
+    return sa, sb
+
+
+def cell_luma(c, cells: Iterable[Cell]) -> float:
+    """Mean Rec. 601 luma (0-1) of the centre CONTRAST_SAMPLE px square of each cell in `c.below`."""
+    t = c.below.shape[0] // c.height
+    lo, hi = (t - CONTRAST_SAMPLE) // 2, (t + CONTRAST_SAMPLE) // 2
+    vals = [float((c.below[y * t + lo:y * t + hi, x * t + lo:x * t + hi, :3].astype(np.float32) @ LUMA_601).mean())
+            for x, y in sorted(cells)]
+    return sum(vals) / len(vals) / 255.0
+
+
+def contrast_errors(src: dict, c) -> list[str]:
+    specs = src["contrast"]
+    if not isinstance(specs, list):
+        return [f"contrast: want a list of {{a, b, min}} entries, not {specs!r}"]
+    errors = []
+    for n, spec in enumerate(specs):
+        a, b, need = (spec.get(k) for k in ("a", "b", "min")) if isinstance(spec, dict) else (None, None, None)
+        if not (isinstance(a, str) and len(a) == 1 and isinstance(b, str) and len(b) == 1 and a != b
+                and isinstance(need, (int, float)) and not isinstance(need, bool) and 0 < need <= 1
+                and set(spec) == {"a", "b", "min"}):
+            errors.append(f"contrast {n}: want {{a: <char>, b: <other char>, min: 0-1}}, not {spec!r}")
+            continue
+        sa, sb = contrast_pairs(src, c, a, b)
+        if not sa:
+            errors.append(f"contrast {n}: no bare {a!r} cell next to a bare {b!r} cell")
+            continue
+        la, lb = cell_luma(c, sa), cell_luma(c, sb)
+        if abs(la - lb) < need:
+            errors.append(f"contrast {n}: {a!r} cells (luma {la:.3f}) and the {b!r} cells next to them (luma "
+                          f"{lb:.3f}) differ by {abs(la - lb):.3f}, under {need} (they read as one texture)")
     return errors
 
 
