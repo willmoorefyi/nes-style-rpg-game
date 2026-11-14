@@ -54,7 +54,8 @@ keyframes:
     sh_n: [58, 62]
     el_n: [72, 55]
     hand_n: [86, 47]
-    club_h: [74, 98]           # E9: the dropped club hangs behind the near shin (hurt_in2), not floating at the hip
+    club_h: [70, 98]           # E9 / V.1: the dropped club lies behind the near leg (hurt_in2); only its handle shows
+                               # between the legs, the head ends that poked past the shin (a spiked shin guard) are erased
     hip_n: [68, 95]
     knee_n: [80, 105]
     foot_n: [75, 115]
@@ -121,3 +122,9 @@ paint:                         # hurt_in1: the far arm / belly slit (open in idl
   - {frame: hurt_in2, xy: [[33, 63], [34, 64], [34, 65], [38, 80], [39, 81], [40, 88]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[39, 79], [39, 80], [40, 80], [40, 81], [41, 81]], rgb: [99, 57, 57]}
   - {frame: hurt_in2, xy: [[37, 79], [37, 80], [38, 81]], rgb: null}
+  - {frame: hurt_in2, xy: [[87,103], [87,104], [88,104], [87,105], [88,105], [87,106], [86,107], [87,107], [86,108], [85,109], [86,109], [84,110], [85,110], [83,111], [84,111], [85,111], [82,112], [83,112], [84,112], [81,113], [82,113], [83,113], [81,114], [82,114], [83,114], [82,115], [75,122], [76,122], [77,122]], rgb: null}
+  # hurt_in2 (V.1): the broken shoulder-fold ink inside the shoulder blade repainted with the skin around it; the 1 px
+  # outline bump at the back of the shoulder evened out
+  - {frame: hurt_in2, xy: [[36, 63], [38, 63], [37, 64], [38, 64], [40, 64], [37, 65], [38, 65], [40, 65], [41, 65], [44, 65], [36, 66]], rgb: [181, 123, 90]}
+  - {frame: hurt_in2, xy: [[32, 61]], rgb: null}
+  - {frame: hurt_in2, xy: [[33, 61]], rgb: [6, 4, 10]}
