@@ -1695,6 +1695,16 @@ These are checked by `tests/balance/*` and by re-running the scratch simulation 
 
 ---
 
+### T4 final validation (orchestrator)
+
+- **Momus:** REVISE with 12 items, all fixed (`b1ded5f`). Momus judged the deviations acceptable.
+- **Browser, `?mute=1`** (§5):
+  - New Game gives 400 G, a fresh party (W, T, WM, BM at 35/25/25/25 HP), and spells at 100 G in the black magic shop;
+  - `t4_nine` lays out 9 enemies (6 goblins and 3 wolves), and its rounds read with the new formulas;
+  - `t4_temple_six` lays out 6 enemies; dead enemies grey out in the list and leave the field with no stale box;
+  - the console shows 0 errors.
+- **Tests:** 1852 pass. The balance bounds catch a Garland at half HP.
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
