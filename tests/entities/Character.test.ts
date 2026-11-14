@@ -71,14 +71,14 @@ describe('Character', () => {
     const char = new Character({ name: 'Hero', classData: mockWarriorClass });
     expect(char.canEquip(mockSword)).toBe(true);
     expect(char.canEquip(mockMageOnlyItem)).toBe(false);
-    expect(char.equip('weapon', mockMageOnlyItem)).toBe(null);
+    expect(char.equip('weapon', mockMageOnlyItem)).toBe(false);
   });
 
   it('returns previous item on equip', () => {
     const char = new Character({ name: 'Hero', classData: mockWarriorClass });
     char.equip('weapon', mockSword);
     const prev = char.equip('weapon', mockSword);
-    expect(prev?.id).toBe('iron_sword');
+    expect(prev && prev.id).toBe('iron_sword');
   });
 
   it('unequips items', () => {

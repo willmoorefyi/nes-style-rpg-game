@@ -361,4 +361,24 @@ describe('debug scenarios', () => {
       }
     }
   });
+
+  // MS-1: the loader now equips weapons and body armour too, so every listed item must fit its member
+  it.each(scenarios.map((s) => [s.id, s] as const))('%s equipment is usable by its member, one item per slot', (_id, s) => {
+    const byId = new Map(items.map((i) => [i.id, i as { id: string; type: string; slot?: string; usableBy: string[] }]));
+    for (const m of s.party as Array<{ class: string; name: string; equipment?: string[] }>) {
+      const slots = new Set<string>();
+      for (const id of m.equipment ?? []) {
+        const item = byId.get(id);
+        expect(item, `item ${id}`).toBeDefined();
+        if (!item) continue;
+        // an upgraded class keeps its base class's gear (Character.canEquip)
+        const base = classes.find((c) => c.id === m.class)?.upgradeFrom;
+        const usable = item.usableBy.includes(m.class) || (!!base && item.usableBy.includes(base));
+        expect(usable, `${m.name} (${m.class}) can't use ${id}`).toBe(true);
+        const slot = item.slot ?? (item.type === 'weapon' ? 'weapon' : 'armor');
+        expect(slots.has(slot), `${m.name} has two items for ${slot}`).toBe(false);
+        slots.add(slot);
+      }
+    }
+  });
 });

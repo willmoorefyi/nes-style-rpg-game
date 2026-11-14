@@ -1,15 +1,16 @@
-import { Container } from 'pixi.js';
-import type { Scene } from '../types/index.js';
+import { Container, BitmapText } from 'pixi.js';
+import type { Scene, SpellData } from '../types/index.js';
 import type { Game } from '../core/Game.js';
+import type { Character } from '../entities/Character.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
-import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+import { NES_FONT } from '../ui/NESFont.js';
+import { castFieldSpell, isFallen, isFieldSpell } from '../systems/FieldSpellEffects.js';
+import { GAME_WIDTH, SCREEN_MARGIN, FONT_SIZE } from '../core/LayoutConstants.js';
 
 type Phase = 'selectCaster' | 'selectSpell' | 'selectTarget';
-
-/** Spell effects usable from the field menu */
-const FIELD_VALID_EFFECTS = ['heal', 'cure_poison', 'cure_blind', 'cure_silence', 'revive'];
+type FieldSpell = { spell: SpellData; level: number };
 
 export class FieldMagicScene implements Scene {
   readonly container = new Container();
@@ -20,10 +21,11 @@ export class FieldMagicScene implements Scene {
   private partyMenu!: Menu;
   private spellMenu?: Menu;
   private targetMenu?: Menu;
+  private messageText: BitmapText;
   private phase: Phase = 'selectCaster';
   private selectedCasterIdx = 0;
-  private selectedSpellId = '';
-  private selectedSpellLevel = 0;
+  private spells: FieldSpell[] = [];
+  private selected: FieldSpell | null = null;
 
   constructor(game: Game) {
     this.game = game;
@@ -32,19 +34,34 @@ export class FieldMagicScene implements Scene {
     this.targetWindow = new Window({ x: 548, y: SCREEN_MARGIN, width: 500, height: 300 });
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
+    // message line at the foot of the spell window: results, "No effect.", "No field spells."
+    this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.messageText.position.set(this.spellWindow.contentX, this.spellWindow.contentY + 300);
+    this.spellWindow.addChild(this.messageText);
     this.container.addChild(this.partyWindow, this.spellWindow, this.targetWindow);
   }
+
+  /** The current message line (results and notices). */
+  get message(): string { return this.messageText.text; }
 
   enter(): void {
     this.phase = 'selectCaster';
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
+    this.messageText.text = '';
     this.buildPartyMenu();
   }
 
+  private showMessage(text: string): void {
+    this.messageText.text = text;
+    this.spellWindow.visible = true;
+  }
+
   private buildPartyMenu(): void {
+    const prev = this.partyMenu?.selectedIndex ?? 0;
     if (this.partyMenu) this.partyWindow.removeChild(this.partyMenu);
-    const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: c.name, value: String(i) }));
+    // the fallen can't cast
+    const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: c.name, value: String(i), enabled: !isFallen(c) }));
     this.partyMenu = new Menu({
       items,
       x: this.partyWindow.contentX,
@@ -52,94 +69,105 @@ export class FieldMagicScene implements Scene {
       onSelect: (item) => this.onCasterSelect(Number(item.value)),
       onCancel: () => this.game.scenes.pop(),
     });
+    this.partyMenu.setIndex(prev);
     this.partyWindow.addChild(this.partyMenu);
   }
 
   private onCasterSelect(idx: number): void {
     this.selectedCasterIdx = idx;
     const caster = this.game.party.get(idx);
-    if (!caster) return;
-    const spells = caster.getLearnedSpells()
+    if (!caster || isFallen(caster)) return;
+    this.spells = caster.getLearnedSpells()
       .map(({ spellId, level }) => ({ spell: SpellRegistry.getSpell(spellId), level }))
-      .filter((e): e is { spell: NonNullable<typeof e.spell>; level: number } =>
-        e.spell != null && e.spell.type === 'white' && FIELD_VALID_EFFECTS.includes(e.spell.effect));
-    if (spells.length === 0) return;
+      .filter((e): e is FieldSpell => e.spell != null && isFieldSpell(e.spell));
+    if (this.spells.length === 0) {
+      this.showMessage(`${caster.name} has no field spells.`);
+      return;
+    }
+    this.messageText.text = '';
     this.phase = 'selectSpell';
     this.spellWindow.visible = true;
-    this.buildSpellMenu(spells, caster);
+    this.dropMenus();
+    this.buildSpellMenu(caster);
   }
 
-  private buildSpellMenu(spells: { spell: { id: string; name: string; level: number; effect: string }; level: number }[], caster: { getSpellCharges(l: number): number }): void {
+  private buildSpellMenu(caster: Character): void {
+    const prev = this.spellMenu?.selectedIndex ?? 0;
     if (this.spellMenu) this.spellWindow.removeChild(this.spellMenu);
-    const items: MenuItem[] = spells.map(({ spell, level }) => {
+    const items: MenuItem[] = this.spells.map(({ spell, level }) => {
       const charges = caster.getSpellCharges(level);
-      return { label: `${spell.name} (${charges})`, value: `${spell.id}:${level}`, enabled: charges > 0 };
+      return { label: `${spell.name} (${charges})`, value: spell.id, enabled: charges > 0 };
     });
     this.spellMenu = new Menu({
       items,
       x: this.spellWindow.contentX,
       y: this.spellWindow.contentY,
       maxVisible: 6,
-      onSelect: (item) => this.onSpellSelect(item.value),
+      onSelect: (_item, i) => this.onSpellSelect(i),
       onCancel: () => { this.phase = 'selectCaster'; this.spellWindow.visible = false; },
     });
+    this.spellMenu.setIndex(Math.min(prev, items.length - 1));
     this.spellWindow.addChild(this.spellMenu);
   }
 
-  private onSpellSelect(val: string): void {
-    const [spellId, levelStr] = val.split(':');
-    this.selectedSpellId = spellId;
-    this.selectedSpellLevel = Number(levelStr);
+  private onSpellSelect(i: number): void {
+    this.selected = this.spells[i] ?? null;
+    if (!this.selected) return;
+    if (this.selected.spell.targeting === 'all_allies') {
+      // party-wide spells need no target pick
+      this.cast([...this.game.party.all]);
+      return;
+    }
     this.phase = 'selectTarget';
     this.targetWindow.visible = true;
+    if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
+    this.targetMenu = undefined;
     this.buildTargetMenu();
   }
 
+  /** A new caster starts at the top of fresh spell and target lists. */
+  private dropMenus(): void {
+    if (this.spellMenu) this.spellWindow.removeChild(this.spellMenu);
+    if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
+    this.spellMenu = undefined;
+    this.targetMenu = undefined;
+  }
+
   private buildTargetMenu(): void {
+    const prev = this.targetMenu?.selectedIndex ?? 0;
     if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
     const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: `${c.name} ${c.currentHp}/${c.maxHp}`, value: String(i) }));
     this.targetMenu = new Menu({
       items,
       x: this.targetWindow.contentX,
       y: this.targetWindow.contentY,
-      onSelect: (item) => this.onTargetSelect(Number(item.value)),
+      onSelect: (item) => {
+        const target = this.game.party.get(Number(item.value));
+        if (target) this.cast([target]);
+      },
       onCancel: () => { this.phase = 'selectSpell'; this.targetWindow.visible = false; },
     });
+    this.targetMenu.setIndex(prev);
     this.targetWindow.addChild(this.targetMenu);
   }
 
-  private onTargetSelect(idx: number): void {
+  private cast(targets: Character[]): void {
     const caster = this.game.party.get(this.selectedCasterIdx);
-    const target = this.game.party.get(idx);
-    const spell = SpellRegistry.getSpell(this.selectedSpellId);
-    if (!caster || !target || !spell) return;
-    if (!caster.useCharge(this.selectedSpellLevel)) return;
-
-    // Apply spell effect based on type
-    switch (spell.effect) {
-      case 'heal':
-        target.currentHp = Math.min(target.maxHp, target.currentHp + (spell.power ?? 0));
-        break;
-      case 'cure_poison':
-        target.statusTracker.remove('poison');
-        break;
-      case 'cure_blind':
-        target.statusTracker.remove('blind');
-        break;
-      case 'cure_silence':
-        target.statusTracker.remove('silence');
-        break;
-      case 'revive':
-        if (target.currentHp <= 0) {
-          target.statusTracker.remove('death');
-          target.currentHp = 1;
-        }
-        break;
+    if (!caster || !this.selected) return;
+    const { spell, level } = this.selected;
+    if (!caster.hasCharges(level)) { this.showMessage('No charges left.'); return; }
+    const result = castFieldSpell(spell, caster, targets);
+    if (result.used && !caster.useCharge(level)) console.error(`FieldMagicScene: ${caster.name} had no charge for ${spell.id}`);
+    this.showMessage(result.messages.join('\n'));
+    // refresh the HP and charge labels; keep picking targets while charges remain
+    this.buildSpellMenu(caster);
+    if (this.phase === 'selectTarget' && caster.hasCharges(level)) {
+      this.buildTargetMenu();
+    } else {
+      this.phase = 'selectSpell';
+      this.targetWindow.visible = false;
     }
-
-    this.phase = 'selectCaster';
-    this.spellWindow.visible = false;
-    this.targetWindow.visible = false;
+    this.buildPartyMenu();
   }
 
   update(_dt: number): void {

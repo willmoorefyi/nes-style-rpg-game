@@ -68,3 +68,12 @@ export function calculateMagicDamage(
   const intRatio = caster.intelligence / Math.max(1, target.intelligence);
   return Math.max(1, Math.floor(spell.power * intRatio * elementMult * variance));
 }
+
+/** HP a heal spell restores; battle and field CURE share this so they always agree. */
+export function healAmount(
+  spell: { power?: number },
+  caster: MagicCaster,
+  rng: () => number = Math.random
+): number {
+  return calculateMagicDamage(caster, { intelligence: 1 }, { power: spell.power ?? 30, isHealing: true }, rng);
+}

@@ -1,5 +1,5 @@
 import { Container, BitmapText } from 'pixi.js';
-import type { Scene, EquipmentSlot } from '../types/index.js';
+import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
@@ -7,14 +7,8 @@ import { QuantitySelectorUI } from '../ui/QuantitySelector.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { slotOf } from '../entities/EquipmentRules.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
-
-const SLOT_FOR_TYPE: Record<string, EquipmentSlot> = {
-  weapon: 'weapon',
-  armor: 'armor',
-  shield: 'shield',
-  helmet: 'helmet',
-};
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
@@ -236,7 +230,7 @@ export class ShopScene implements Scene {
     const item = ItemRegistry.getItem(menuItem.value);
     if (!item) return;
 
-    const slot = item.slot ?? SLOT_FOR_TYPE[item.type];
+    const slot = slotOf(item);
     if (!slot) return;
     const isWeapon = item.type === 'weapon';
     const statLabel = isWeapon ? 'ATK' : 'DEF';
@@ -258,9 +252,15 @@ export class ShopScene implements Scene {
     y += 8;
 
     for (const char of this.game.party.all) {
-      const equipped = char.getEquipped(slot as EquipmentSlot);
+      // same rule as EquipScene: members whose class can't use the item get no +/- value
+      if (!char.canEquip(item)) {
+        addLine(`${char.name}  n/a`, 0x808080);
+        y += 4;
+        continue;
+      }
+      const equipped = char.getEquipped(slot);
       const curStat = equipped ? ((isWeapon ? equipped.stats.attack : equipped.stats.defense) ?? 0) : 0;
-      const curName = equipped?.name ?? '\u2014';
+      const curName = equipped?.name ?? '-';
       const diff = newStat - curStat;
       const diffStr = diff > 0 ? `+${diff}` : `${diff}`;
       const diffColor = diff > 0 ? 0x00ff00 : diff < 0 ? 0xff0000 : 0xffffff;

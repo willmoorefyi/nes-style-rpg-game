@@ -1,6 +1,7 @@
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
+import { isFallen } from './FieldSpellEffects.js';
 
 export interface ItemEffectResult {
   success: boolean;
@@ -21,8 +22,10 @@ export class ItemEffects {
   ): ItemEffectResult {
     if (!inventory.has(itemId)) return { success: false, message: 'Item not in inventory' };
 
+    // resting doesn't revive the fallen (that's Phoenix Down's job, as in FF1): they get no HP or charges
+    const resting = party.filter((m) => !isFallen(m));
     if (itemId === 'tent') {
-      for (const member of party) {
+      for (const member of resting) {
         member.currentHp = Math.min(member.maxHp, member.currentHp + Math.floor(member.maxHp * 0.5));
         for (let lvl = 1; lvl <= 8; lvl++) {
           const max = member.getMaxCharges(lvl);
@@ -35,7 +38,7 @@ export class ItemEffects {
     }
 
     if (itemId === 'cabin') {
-      for (const member of party) {
+      for (const member of resting) {
         member.currentHp = member.maxHp;
         for (let lvl = 1; lvl <= 8; lvl++) {
           member.setSpellCharges(lvl, member.getMaxCharges(lvl));

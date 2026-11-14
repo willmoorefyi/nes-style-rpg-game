@@ -2,6 +2,8 @@ import type { CharacterClassData, CharacterSaveData, EquipmentSlot, ItemData, St
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { StatusTracker, type StatusEffect } from '../battle/StatusEffects.js';
+import { slotOf } from './EquipmentRules.js';
+import { maxChargesFor, SPELL_LEVELS } from './SpellCharges.js';
 
 export interface CharacterData {
   name: string;
@@ -48,6 +50,8 @@ export class Character {
     this.equipment.set('shield', null);
     this.equipment.set('helmet', null);
     this._currentHp = data.currentHp ?? this.maxHp;
+    // a new character starts rested: full charges for its level (a save overwrites these in fromJSON)
+    this.restoreAllCharges();
   }
 
   get classData(): CharacterClassData { return this._classData; }
@@ -99,12 +103,20 @@ export class Character {
     return this.equipment.get(slot) ?? null;
   }
 
+  /** True if this class may use the item; an upgraded class (Knight) keeps its base class's gear. */
   canEquip(item: ItemData): boolean {
-    return item.usableBy.includes(this.classData.id);
+    const { id, upgradeFrom } = this.classData;
+    return item.usableBy.includes(id) || (!!upgradeFrom && item.usableBy.includes(upgradeFrom));
   }
 
-  equip(slot: EquipmentSlot, item: ItemData): ItemData | null {
-    if (!this.canEquip(item)) return null;
+  /** True if this class may use the item and the item fits `slot` (a cap is never body armour). */
+  canEquipIn(slot: EquipmentSlot, item: ItemData): boolean {
+    return this.canEquip(item) && slotOf(item) === slot;
+  }
+
+  /** Equip `item` in `slot`. Returns the item it replaced (or null), or false if refused. */
+  equip(slot: EquipmentSlot, item: ItemData): ItemData | null | false {
+    if (!this.canEquipIn(slot, item)) return false;
     const prev = this.equipment.get(slot) ?? null;
     this.equipment.set(slot, item);
     return prev;
@@ -119,10 +131,18 @@ export class Character {
   addXp(amount: number): boolean {
     this._xp += amount;
     let leveledUp = false;
+    const maxBefore = this.maxChargeList();
     while (this._level < 50 && this._xp >= this.xpForNextLevel()) {
       this._level++;
       leveledUp = true;
       this._currentHp = this.maxHp;
+    }
+    if (leveledUp) {
+      // current charges rise by however much the max rose
+      const maxAfter = this.maxChargeList();
+      for (let i = 0; i < SPELL_LEVELS; i++) {
+        this.spellCharges[i] = Math.min(maxAfter[i], this.spellCharges[i] + Math.max(0, maxAfter[i] - maxBefore[i]));
+      }
     }
     return leveledUp;
   }
@@ -142,8 +162,13 @@ export class Character {
 
   learnSpell(spellId: string, level: number): boolean {
     if (this.learnedSpells.has(spellId)) return true;
-    if (this.getSpellsAtLevel(level).length >= 3) return false;
+    const knownAtLevel = this.getSpellsAtLevel(level).length;
+    if (knownAtLevel >= 3) return false;
     this.learnedSpells.set(spellId, level);
+    // the first spell at a level comes with that level's charges, so it can be cast at once
+    if (knownAtLevel === 0) {
+      this.setSpellCharges(level, Math.max(this.getSpellCharges(level), this.getMaxCharges(level)));
+    }
     return true;
   }
 
@@ -168,45 +193,17 @@ export class Character {
   }
 
   restoreAllCharges(): void {
-    for (let i = 0; i < 8; i++) {
-      const lvl = i + 1;
-      this.spellCharges[i] = this.getMaxCharges(lvl);
+    for (let i = 0; i < SPELL_LEVELS; i++) {
+      this.spellCharges[i] = this.getMaxCharges(i + 1);
     }
   }
 
   getMaxCharges(level: number): number {
-    // Spell charge table per design doc §5.
-    // Key: character level → array of max charges for spell levels 1-8.
-    // Interpolated linearly between defined breakpoints.
-    // Lv1: 2/0/0/0/0/0/0/0
-    // Lv5: 4/2/1/0/0/0/0/0
-    // Lv10: 5/4/3/2/1/0/0/0
-    // Lv20: 7/6/5/5/4/3/2/1
-    // Lv50: 9/9/9/9/9/9/9/9
-    const breakpoints: Array<[number, number[]]> = [
-      [1,  [2, 0, 0, 0, 0, 0, 0, 0]],
-      [5,  [4, 2, 1, 0, 0, 0, 0, 0]],
-      [10, [5, 4, 3, 2, 1, 0, 0, 0]],
-      [20, [7, 6, 5, 5, 4, 3, 2, 1]],
-      [50, [9, 9, 9, 9, 9, 9, 9, 9]],
-    ];
-    if (level < 1 || level > 8) return 0;
-    const idx = level - 1;
-    const clvl = this._level;
+    return maxChargesFor(this._level, level);
+  }
 
-    // Find surrounding breakpoints and interpolate
-    if (clvl <= breakpoints[0][0]) return breakpoints[0][1][idx];
-    if (clvl >= breakpoints[breakpoints.length - 1][0]) return breakpoints[breakpoints.length - 1][1][idx];
-
-    for (let i = 0; i < breakpoints.length - 1; i++) {
-      const [loLvl, loCharges] = breakpoints[i];
-      const [hiLvl, hiCharges] = breakpoints[i + 1];
-      if (clvl >= loLvl && clvl <= hiLvl) {
-        const t = (clvl - loLvl) / (hiLvl - loLvl);
-        return Math.min(9, Math.floor(loCharges[idx] + t * (hiCharges[idx] - loCharges[idx])));
-      }
-    }
-    return 0;
+  private maxChargeList(): number[] {
+    return Array.from({ length: SPELL_LEVELS }, (_, i) => this.getMaxCharges(i + 1));
   }
 
   /** Apply a battle-only buff to a stat (stacks additively) */
@@ -269,14 +266,12 @@ export class Character {
       }
     }
     
-    // Restore spell charges
-    for (let i = 0; i < data.spellCharges.length; i++) {
-      char.spellCharges[i] = data.spellCharges[i];
-    }
-    
-    // Restore learned spells
+    // Restore learned spells, then the saved charges (learning grants charges, the save wins)
     for (const { spellId, level } of data.learnedSpells) {
       char.learnSpell(spellId, level);
+    }
+    for (let i = 0; i < data.spellCharges.length; i++) {
+      char.spellCharges[i] = data.spellCharges[i];
     }
     
     // Restore status effects

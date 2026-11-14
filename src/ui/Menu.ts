@@ -138,6 +138,14 @@ export class Menu extends Container {
     if (this.downIndicator) this.downIndicator.visible = this.scrollOffset + this.maxVisible < this.items.length;
   }
 
+  /** Enable or disable item `index` and redraw it (grey when disabled). */
+  setItemEnabled(index: number, enabled: boolean): void {
+    const item = this.items[index];
+    if (!item) return;
+    item.enabled = enabled;
+    this.renderItems();
+  }
+
   get selectedIndex(): number { return this.cursorIndex; }
   get selectedItem(): MenuItem { return this.items[this.cursorIndex]; }
 

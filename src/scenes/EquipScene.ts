@@ -9,7 +9,6 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 const SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
-const SLOT_TO_TYPE: Record<EquipmentSlot, string> = { weapon: 'weapon', armor: 'armor', shield: 'armor', helmet: 'armor' };
 
 type Phase = 'selectMember' | 'selectSlot' | 'selectItem';
 
@@ -83,8 +82,9 @@ export class EquipScene implements Scene {
   private buildItemMenu(): void {
     if (this.itemMenu) this.itemWindow.removeChild(this.itemMenu);
     const char = this.game.party.get(this.memberIdx)!;
-    const type = SLOT_TO_TYPE[this.selectedSlot];
-    const compatible = ItemRegistry.getAllByType(type as 'weapon' | 'armor').filter(i => char.canEquip(i));
+    const type = this.selectedSlot === 'weapon' ? 'weapon' : 'armor';
+    // only items that fit the slot being edited (no chain mail in the shield slot)
+    const compatible = ItemRegistry.getAllByType(type).filter(i => char.canEquipIn(this.selectedSlot, i));
     const items: MenuItem[] = [{ label: '(Unequip)', value: '' }];
     for (const i of compatible) {
       if (this.game.inventory.has(i.id)) items.push({ label: i.name, value: i.id });
@@ -102,11 +102,17 @@ export class EquipScene implements Scene {
 
   private onEquipSelect(item: MenuItem): void {
     const char = this.game.party.get(this.memberIdx)!;
+    const newItem = item.value ? ItemRegistry.getItem(item.value) : null;
+    // check before unequipping, so a refused item never costs the member what they wore
+    if (item.value && (!newItem || !char.canEquipIn(this.selectedSlot, newItem))) {
+      this.statsText.setText(`Can't equip\nthat there.`, true);
+      return;
+    }
     const prev = char.unequip(this.selectedSlot);
     if (prev) this.game.inventory.add(prev.id);
-    if (item.value) {
-      const newItem = ItemRegistry.getItem(item.value);
-      if (newItem) { char.equip(this.selectedSlot, newItem); this.game.inventory.remove(item.value); }
+    if (newItem) {
+      if (char.equip(this.selectedSlot, newItem) === false) console.error(`EquipScene: ${char.name} refused ${newItem.id}`);
+      else this.game.inventory.remove(newItem.id);
     }
     this.phase = 'selectSlot';
     this.itemWindow.visible = false;

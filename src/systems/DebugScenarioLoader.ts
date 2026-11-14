@@ -2,6 +2,7 @@ import type { Game } from '../core/Game.js';
 import { Character } from '../entities/Character.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
+import { slotOf } from '../entities/EquipmentRules.js';
 import { BattleTrigger } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 
@@ -84,7 +85,10 @@ export class DebugScenarioLoader {
       // Equip items
       for (const itemId of member.equipment) {
         const item = ItemRegistry.getItem(itemId);
-        if (item?.slot) character.equip(item.slot, item);
+        const slot = item ? slotOf(item) : null;
+        if (!item || !slot || character.equip(slot, item) === false) {
+          console.warn(`Debug scenario ${scenario.id}: ${member.name} cannot equip '${itemId}'`);
+        }
       }
 
       // Learn spells and restore charges
