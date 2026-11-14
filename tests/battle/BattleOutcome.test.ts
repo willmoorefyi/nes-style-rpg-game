@@ -155,3 +155,53 @@ describe('peekNextAction carries the actor id (NG-3)', () => {
     expect(ids.sort()).toEqual(['enemy_0', 'party_0', 'party_1']);
   });
 });
+
+describe('B9: the run chance counts the living enemies', () => {
+  const lucky: CharacterClassData = { ...fighter, id: 'thief', baseStats: { ...fighter.baseStats, luck: 18, agility: 99 } };
+
+  /** One lucky runner (18/17, capped at 75 %) against `n` goblins, every roll at 0.70. */
+  function runAgainst(n: number) {
+    const runner = new Character({ name: 'THIEF', classData: lucky });
+    const battle = new BattleStateMachine({ party: [runner], enemies: Array.from({ length: n }, () => goblin) }, () => 0.7);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.submitCommand({ type: 'run', actorId: 'party_0' });
+    battle.prepareRound();
+    battle.executeNextAction(); // the runner (agility 99) acts first
+    return battle.outcome;
+  }
+
+  it('a roll of 0.70 escapes from 1 enemy (75 %) but not from 3 (65 %); the old chance was 100 %', () => {
+    expect(runAgainst(1)).toBe('escaped');
+    expect(runAgainst(3)).toBeNull();
+  });
+
+  it('a fallen enemy no longer counts: 3 goblins with 2 down is the 1-enemy chance', () => {
+    const runner = new Character({ name: 'THIEF', classData: lucky });
+    const battle = new BattleStateMachine({ party: [runner], enemies: [goblin, goblin, goblin] }, () => 0.7);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.allEnemies[1].currentHp = 0;
+    battle.allEnemies[2].currentHp = 0;
+    battle.submitCommand({ type: 'run', actorId: 'party_0' });
+    battle.prepareRound();
+    battle.executeNextAction();
+    expect(battle.outcome).toBe('escaped');
+  });
+});
+
+describe('B5: queued item commands reserve the item', () => {
+  it('reservedItems counts this round\'s item commands, and undo releases them', () => {
+    const a = new Character({ name: 'A', classData: fighter });
+    const b = new Character({ name: 'B', classData: fighter });
+    const battle = new BattleStateMachine({ party: [a, b], enemies: [goblin] }, () => 0.5);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    expect(battle.reservedItems('potion')).toBe(0);
+    battle.submitCommand({ type: 'item', actorId: 'party_0', targetId: 'party_0', itemId: 'potion' });
+    expect(battle.reservedItems('potion')).toBe(1);
+    expect(battle.reservedItems('ether')).toBe(0);
+    battle.undoCommand();
+    expect(battle.reservedItems('potion')).toBe(0);
+  });
+});

@@ -74,7 +74,7 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
     return `→ ${total} to ${dmgMsgs.length} foes${skull}`;
   }
 
-  // --- Heal: "Y recovers N HP!" (spell) or "Y recovered N HP" (item) ---
+  // --- Heal: "Y recovers N HP!" (spell, battle item), "Y recovers N HP" (field item) or the old "Y recovered N HP" ---
   const healRe = /^(.+?) recover(?:s|ed) (\d+) HP!?$/;
   const healMsgs = filtered.filter(t => healRe.test(t));
   if (healMsgs.length > 0) {
@@ -98,10 +98,10 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
     return affected.length === 1 ? `→ ${capitalize(m[2])} ${m[1]}` : `→ ${capitalize(m[2])} ${affected.length} foes`;
   }
 
-  // --- Revive ---
-  if (filtered.some(t => /is revived!$|was revived$/.test(t))) {
+  // --- Revive: "Y is revived!" (spell and battle item), "Y is revived" (field item) or the old "Y was revived" ---
+  if (filtered.some(t => /is revived!?$|was revived$/.test(t))) {
     const m = filtered.find(t => /revive/.test(t))!;
-    const name = m.replace(/ (is revived!|was revived)$/, '');
+    const name = m.replace(/ (is revived!?|was revived)$/, '');
     return `→ Revived ${name}`;
   }
 

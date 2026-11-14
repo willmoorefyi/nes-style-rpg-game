@@ -221,25 +221,26 @@
 - id: garland
   name: Garland
   stats:
-    hp: 106
+    hp: 240
     strength: 15
     agility: 8
     intelligence: 1
     vitality: 10
     luck: 5
-    attack: 15
+    attack: 16
     defense: 10
     magicDefense: 15
     accuracy: 15
-    hits: 1
+    hits: 2
     evade: 12
   xpReward: 130
   goldReward: 250
   sprite: garland
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 0.25
     patternId: aggressive
     message: Garland's attacks grow fiercer!
+    hits: 3
   size: large
 - id: lich
   name: Lich

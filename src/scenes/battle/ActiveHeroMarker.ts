@@ -52,6 +52,11 @@ export class ActiveHeroMarker {
     this.clock = clock;
   }
 
+  /** B10: while the hero picks a target, its own arrow hides so only the (yellow) target arrow shows. */
+  setArrowVisible(visible: boolean): void {
+    if (this.arrow) this.arrow.visible = visible;
+  }
+
   update(dt: number): void {
     if (!this.sprite) return;
     this.clock += dt;

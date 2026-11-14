@@ -2,6 +2,24 @@ import { Container, Graphics } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
+import type { Character } from '../../entities/Character.js';
+
+/** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
+const TARGET_ARROW = 0xffff00;
+/** Frames per blink of the target row's cursor in the party panel. */
+const BLINK_FRAMES = 15;
+
+export type TargetingSound = 'cursorMove' | 'cursorSelect' | 'cursorCancel';
+
+/** B10: where a party-target cursor starts: the most hurt living member (lowest HP / max), by battle id. */
+export function mostHurtMemberId(party: readonly Character[]): string | undefined {
+  let best = -1;
+  party.forEach((c, i) => {
+    if (c.currentHp <= 0) return;
+    if (best < 0 || c.currentHp / c.maxHp < party[best].currentHp / party[best].maxHp) best = i;
+  });
+  return best >= 0 ? `party_${best}` : undefined;
+}
 
 export class BattleFieldTargeting {
   fieldTargetIndex: number = 0;
@@ -22,14 +40,17 @@ export class BattleFieldTargeting {
     private readonly battle: BattleStateMachine,
     private readonly display: BattleDisplayManager,
     private readonly input: InputManager,
+    /** I3: cursor sounds while choosing a target. */
+    private readonly emit: (event: TargetingSound) => void = () => {},
   ) {}
 
-  enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void): boolean {
+  /** Start choosing a target; the cursor starts on `initialId` when it is a valid target (B10), else on the first. */
+  enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void,
+    initialId?: string): boolean {
     this.fieldTargetIsParty = isParty;
     this.fieldTargetRevive = revive;
     this.fieldTargetCallback = onConfirm;
     this.fieldTargetCancelCallback = onCancel;
-    this.fieldTargetIndex = 0;
 
     const targets = this.getFieldTargets();
     if (targets.length === 0) {
@@ -37,9 +58,10 @@ export class BattleFieldTargeting {
       onCancel();
       return false;
     }
+    this.fieldTargetIndex = Math.max(0, targets.findIndex(t => t.id === initialId));
 
     this.active = true;
-    this.updateTargetArrow([], isParty, 0);
+    this.updateTargetArrow([], isParty, this.fieldTargetIndex);
     return true;
   }
 
@@ -69,12 +91,15 @@ export class BattleFieldTargeting {
     if (this.input.isJustPressed('up')) {
       this.fieldTargetIndex = (this.fieldTargetIndex - 1 + targets.length) % targets.length;
       this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
+      this.emit('cursorMove');
     } else if (this.input.isJustPressed('down')) {
       this.fieldTargetIndex = (this.fieldTargetIndex + 1) % targets.length;
       this.updateTargetArrow([], this.fieldTargetIsParty, this.fieldTargetIndex);
+      this.emit('cursorMove');
     } else if (this.input.isJustPressed('confirm')) {
       const target = targets[this.fieldTargetIndex];
       if (target) {
+        this.emit('cursorSelect');
         this.active = false;
         this.clearTargetArrow();
         this.fieldTargetCallback?.(target.id);
@@ -82,6 +107,7 @@ export class BattleFieldTargeting {
         this.fieldTargetCancelCallback = null;
       }
     } else if (this.input.isJustPressed('cancel')) {
+      this.emit('cursorCancel');
       this.active = false;
       this.clearTargetArrow();
       this.fieldTargetCancelCallback?.();
@@ -101,7 +127,7 @@ export class BattleFieldTargeting {
     const sprite = sprites[target.spriteIndex];
     if (!sprite) return;
     const arrow = new Graphics();
-    arrow.poly([0, 0, 16, 0, 8, 12]).fill(0xffffff);
+    arrow.poly([0, 0, 16, 0, 8, 12]).fill(TARGET_ARROW);
     const offsetX = isParty ? 24 : 40;
     arrow.position.set(sprite.x + offsetX, sprite.y - 20);
     this.mainContainer.addChild(arrow);
@@ -150,6 +176,7 @@ export class BattleFieldTargeting {
     const sinVal = Math.sin(this.targetFlashTimer * 0.12);
     if (target && this.fieldTargetIsParty) {
       if (this.display.partyPanel.targetIndex !== target.spriteIndex) this.display.partyPanel.setTarget(target.spriteIndex);
+      this.display.partyPanel.blinkTarget(Math.floor(this.targetFlashTimer / BLINK_FRAMES) % 2 === 0);
     } else if (target && !this.fieldTargetIsParty) {
       const enemy = this.battle.allEnemies[target.spriteIndex];
       if (enemy) {

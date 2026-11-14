@@ -5,8 +5,10 @@ import type { AIBehavior } from './AIBehavior.js';
 import type { BossPattern } from './BossAI.js';
 import { StatusTracker } from './StatusEffects.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
-import { selectTarget, retargetEnemyTarget } from './EnemyAI.js';
-import { retargetIfDead, calculateRunChance, type BattleCommand } from './BattleCommands.js';
+import { selectTarget } from './EnemyAI.js';
+import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
+import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
+import { ItemRegistry } from '../data/ItemRegistry.js';
 import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
 import { tickStatus } from './StatusTick.js';
 import { xpShare } from './Rewards.js';
@@ -80,8 +82,13 @@ export interface NextActionInfo {
   actorId: string;
   actorName: string;
   actionType: string;
+  /** The (resolved, living) target's battle id: the view finds its sprite by this, never by name (B2/B6). */
+  targetId?: string;
   targetName?: string;
+  /** The spell's display name (FIRE), not its id (B3). */
   spellName?: string;
+  /** The item's display name (Potion) (B3). */
+  itemName?: string;
 }
 
 export interface QueuedAction {
@@ -109,6 +116,8 @@ export class BattleStateMachine {
   private turnNumber = 0;
   private bossPatterns: Map<string, BossPattern>;
   private spellExecutor: SpellExecutor;
+  private spells: SpellData[];
+  private targets: TargetContext;
   /** Maps unique party IDs (party_0, party_1, ...) to their Character */
   private partyById: Map<string, Character>;
 
@@ -141,6 +150,11 @@ export class BattleStateMachine {
     this.rng = rng;
     this.canRun = config.canRun ?? true;
     this.bossPatterns = config.bossPatterns ?? new Map();
+    this.spells = config.spells ?? [];
+    this.targets = {
+      partyIds: this.party.map((_, i) => this.getPartyId(i)), livingEnemyIds: () => this.livingEnemies.map(e => e.id),
+      isAlive: id => this.isTargetAlive(id), spells: this.spells, rng: this.rng,
+    };
     this.spellExecutor = new SpellExecutor(
       {
         party: this.party,
@@ -152,7 +166,7 @@ export class BattleStateMachine {
         partyById: this.partyById,
         addDamageEvent: (e: DamageEvent) => this._damageEvents.push(e),
       },
-      config.spells ?? [],
+      this.spells,
     );
   }
 
@@ -236,6 +250,9 @@ export class BattleStateMachine {
 
   get actionQueueLength(): number { return this._actionQueue.length; }
 
+  /** B5: how many of `itemId` the party's commands this round already use (undo releases them). */
+  reservedItems(itemId: string): number { return reservedItems(this.commands, itemId); }
+
   prepareRound(): void {
     if (this._state !== 'execution') return;
     this.messages = [];
@@ -243,7 +260,7 @@ export class BattleStateMachine {
 
     // Check boss phase transitions before generating enemy commands
     for (const enemy of this.livingEnemies) {
-      this.checkBossPhaseTransition(enemy);
+      checkBossPhases(enemy, this.bossPatterns, text => this.messages.push({ text }));
     }
 
     // Generate enemy commands using AI behavior or default random targeting
@@ -307,7 +324,9 @@ export class BattleStateMachine {
       return { done, messages: [], damageEvents: [], missed: false };
     }
 
-    const action = this._actionQueue.shift()!;
+    const action = this._actionQueue[0];
+    resolveActionTarget(action, this.targets); // a no-op after the peek
+    this._actionQueue.shift();
     this.messages = [];
     this._damageEvents = [];
     this._missed = false;
@@ -331,6 +350,7 @@ export class BattleStateMachine {
   peekNextAction(): NextActionInfo | null {
     if (this._actionQueue.length === 0) return null;
     const action = this._actionQueue[0];
+    if (this.isNextActorAlive()) resolveActionTarget(action, this.targets);
     const cmd = action.command;
 
     let actorName: string;
@@ -349,6 +369,7 @@ export class BattleStateMachine {
     };
 
     if (cmd.targetId) {
+      result.targetId = cmd.targetId;
       const targetEnemy = this.enemies.find(e => e.id === cmd.targetId);
       if (targetEnemy) {
         result.targetName = targetEnemy.displayName;
@@ -358,9 +379,8 @@ export class BattleStateMachine {
       }
     }
 
-    if (cmd.spellId) {
-      result.spellName = cmd.spellId;
-    }
+    if (cmd.spellId) result.spellName = this.spells.find(s => s.id === cmd.spellId)?.name ?? cmd.spellId;
+    if (cmd.itemId) result.itemName = ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId;
 
     return result;
   }
@@ -406,7 +426,7 @@ export class BattleStateMachine {
       }
       // FF1: the acting member's luck and level decide (enemies never run)
       const runner = this.getPartyMember(cmd.actorId);
-      const chance = runner ? calculateRunChance(runner.stats.luck, runner.level) : 0;
+      const chance = runner ? calculateRunChance(runner.stats.luck, runner.level, this.livingEnemies.length) : 0;
       if (this.rng() < chance) {
         this.messages.push({ text: 'Escaped!' });
         this.finish('escaped');
@@ -431,22 +451,10 @@ export class BattleStateMachine {
       return;
     }
 
+    // the target was resolved before the action (resolveActionTarget)
     if (cmd.type === 'fight' && cmd.targetId) {
-      if (isEnemy) {
-        // enemies retarget by the original party slots, so the front stays favoured
-        const targetId = this.isTargetAlive(cmd.targetId)
-          ? cmd.targetId
-          : retargetEnemyTarget(this.party.map((_, i) => this.getPartyId(i)), id => this.isTargetAlive(id), this.rng);
-        if (targetId) this.executeEnemyAttack(cmd.actorId, targetId);
-      } else {
-        const retargeted = retargetIfDead(
-          cmd,
-          id => this.isTargetAlive(id),
-          () => this.livingEnemies.map(e => e.id),
-          this.rng
-        );
-        this.executePartyAttack(cmd.actorId, retargeted.targetId!);
-      }
+      if (isEnemy) this.executeEnemyAttack(cmd.actorId, cmd.targetId);
+      else this.executePartyAttack(cmd.actorId, cmd.targetId);
     }
   }
 
@@ -502,38 +510,8 @@ export class BattleStateMachine {
       return;
     }
     const result = ItemEffects.applyItemEffect(cmd.itemId, target, this.inventory);
-    this.messages.push({ text: result.message });
-  }
-
-  /**
-   * Check if an enemy has crossed a boss phase HP threshold (ST-6). The bookkeeping and the message need no AI;
-   * the pattern swaps only for an AI with `setPattern` when `bossPatterns` knows the id. An enemy with no AI
-   * (Garland) keeps the default targeting, so a phase is its message only and adds no RNG draws.
-   */
-  private checkBossPhaseTransition(enemy: EnemyInstance): void {
-    const phases = enemy.data.bossPhases;
-    if (!phases) return;
-
-    const hpPercent = enemy.currentHp / enemy.data.stats.hp;
-    for (let i = 0; i < phases.length; i++) {
-      if (enemy.crossedPhases?.has(i)) continue;
-      if (hpPercent <= phases[i].hpThreshold) {
-        enemy.crossedPhases?.add(i);
-        const ai = enemy.aiBehavior;
-        if (ai) {
-          const newPattern = this.bossPatterns.get(phases[i].patternId);
-          if (!newPattern) {
-            // crossedPhases makes this fire once per phase
-            console.warn(`${enemy.data.id}: boss phase pattern "${phases[i].patternId}" is not in bossPatterns`);
-          } else if ('setPattern' in ai) {
-            (ai as { setPattern(p: BossPattern): void }).setPattern(newPattern);
-          }
-        }
-        if (phases[i].message) {
-          this.messages.push({ text: phases[i].message! });
-        }
-      }
-    }
+    // battle lines end in "!" (B4): "W.MAG recovers 30 HP!", "FGHTR is revived!"
+    this.messages.push({ text: /[.!?]$/.test(result.message) ? result.message : `${result.message}!` });
   }
 
   /** Set AI behavior for a specific enemy (used to attach BossAI after construction) */

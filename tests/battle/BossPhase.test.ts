@@ -1,6 +1,7 @@
 /**
- * ST-6 (docs/FIX_PLAN_PENINSULA.md T5a): Garland's `bossPhases` entry fires with no AI attached. Following the T4
- * decision the phase is its message only: no pattern, no extra RNG draws, so the seeded damage is unchanged.
+ * ST-6 (docs/FIX_PLAN_PENINSULA.md T5a) and B1 (R2): Garland's `bossPhases` entry fires with no AI attached. At
+ * <= 25 % HP (60 of 240) the phase line shows once and his attacks go from 2 hits to 3 (a battle-only `hits` buff,
+ * no extra RNG draw for the phase itself).
  */
 import { describe, it, expect, vi } from 'vitest';
 import { BattleStateMachine, type DamageEvent } from '../../src/battle/BattleStateMachine.js';
@@ -25,21 +26,15 @@ function idleRound(bsm: BattleStateMachine): void {
   bsm.resolveRound();
 }
 
-function fightRound(bsm: BattleStateMachine): void {
-  while (bsm.state === 'command_select') bsm.submitCommand({ type: 'fight', actorId: bsm.currentCommandActorId!, targetId: 'enemy_0' });
-  bsm.executeRound();
-  bsm.resolveRound();
-}
-
 const count = (bsm: BattleStateMachine) => bsm.currentMessages.filter(m => m.text === LINE).length;
 
 describe('boss phase with no AI (ST-6)', () => {
-  it('Garland at 53/106 HP: the next round says the phase line exactly once, and later rounds never repeat it', () => {
+  it('Garland at 60/240 HP: the next round says the phase line exactly once, and later rounds never repeat it', () => {
     const garland = enemyCopy('garland');
-    expect(garland.stats.hp).toBe(106);
+    expect(garland.stats.hp).toBe(240);
     expect(garland.bossPhases?.[0].message).toBe(LINE);
     const bsm = newBattle(garland, 7);
-    bsm.allEnemies[0].currentHp = 53;
+    bsm.allEnemies[0].currentHp = 60;
     idleRound(bsm);
     expect(count(bsm)).toBe(1);
     expect(bsm.currentMessages[0].text).toBe(LINE); // before any action's lines
@@ -49,33 +44,43 @@ describe('boss phase with no AI (ST-6)', () => {
     }
   });
 
-  it('above half HP there is no line', () => {
+  it('above a quarter HP (61/240) there is no line and he keeps 2 hits', () => {
     const bsm = newBattle(enemyCopy('garland'), 7);
-    bsm.allEnemies[0].currentHp = 54;
+    bsm.allEnemies[0].currentHp = 61;
     idleRound(bsm);
     expect(count(bsm)).toBe(0);
+    expect(bsm.allEnemies[0].buffs.get('hits') ?? 0).toBe(0);
   });
 
-  it('under the same seed, 10 rounds with and without bossPhases give identical damage events (no added damage)', () => {
+  it('events are identical with and without bossPhases until the phase round; after it some lines read "(3 hits)", never before', () => {
+    let threeHitLines = 0;
     for (const seed of [1, 2, 3, 42, 99]) {
-      const run = (withPhases: boolean): { events: DamageEvent[]; lines: number } => {
+      const run = (withPhases: boolean) => {
         const garland = enemyCopy('garland');
         if (!withPhases) delete garland.bossPhases;
         const bsm = newBattle(garland, seed);
-        const events: DamageEvent[] = [];
-        let lines = 0;
-        for (let r = 0; r < 10 && !bsm.isOver; r++) {
-          fightRound(bsm);
-          events.push(...bsm.damageEvents);
-          lines += count(bsm);
+        bsm.allEnemies[0].currentHp = 120; // reach the phase within a few rounds
+        const rounds: { events: DamageEvent[]; lines: string[] }[] = [];
+        for (let r = 0; r < 12 && !bsm.isOver; r++) {
+          while (bsm.state === 'command_select') bsm.submitCommand({ type: 'fight', actorId: bsm.currentCommandActorId!, targetId: 'enemy_0' });
+          bsm.executeRound(); // the round's lines, read before a victory replaces them
+          rounds.push({ events: [...bsm.damageEvents], lines: bsm.currentMessages.map(m => m.text) });
+          bsm.resolveRound();
         }
-        return { events, lines };
+        return rounds;
       };
       const withPhases = run(true);
       const without = run(false);
-      expect(withPhases.events).toEqual(without.events);
-      expect(without.lines).toBe(0);
+      const phaseRound = withPhases.findIndex(r => r.lines.includes(LINE));
+      const before = phaseRound < 0 ? withPhases.length : phaseRound;
+      for (let r = 0; r < before; r++) {
+        expect(withPhases[r].events, `seed ${seed} round ${r}`).toEqual(without[r].events);
+        expect(withPhases[r].lines.some(t => t.includes('(3 hits)')), `seed ${seed} round ${r}`).toBe(false);
+      }
+      expect(without.some(r => r.lines.some(t => t.includes('(3 hits)')))).toBe(false);
+      for (const r of withPhases.slice(before)) threeHitLines += r.lines.filter(t => /^Garland hits .*\(3 hits\)/.test(t)).length;
     }
+    expect(threeHitLines).toBeGreaterThan(0);
   });
 
   it('an enemy with an AI but an unknown pattern id warns once and still shows the line', () => {

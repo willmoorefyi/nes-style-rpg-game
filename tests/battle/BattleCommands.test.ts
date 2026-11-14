@@ -50,19 +50,18 @@ describe('retargetIfDead', () => {
   });
 });
 
-describe('calculateRunChance (FF1, EB-9)', () => {
-  it('is luck / (level + 16): a Lv1 Thief with luck 15 escapes 15/17 of the time', () => {
-    expect(calculateRunChance(15, 1)).toBeCloseTo(15 / 17);
+describe('calculateRunChance (FF1 base, B9 cap and pack penalty)', () => {
+  it('is min(0.75, luck / (level + 16)) − 0.05 per living enemy past the first', () => {
+    expect(calculateRunChance(15, 1, 1)).toBeCloseTo(0.75); // 15/17 capped
+    expect(calculateRunChance(18, 2, 3)).toBeCloseTo(0.65); // 18/18 capped, two extra enemies
+    expect(calculateRunChance(6, 2, 3)).toBeCloseTo(6 / 18 - 0.1); // 0.233
+    expect(calculateRunChance(99, 1, 1)).toBeCloseTo(0.75);
+    expect(calculateRunChance(0, 1, 1)).toBe(0);
   });
 
-  it('a Lv1 Thief escapes on a 0.85 roll; a Lv1 Warrior (luck 5) fails on the same roll', () => {
-    expect(0.85 < calculateRunChance(15, 1)).toBe(true);
-    expect(0.85 < calculateRunChance(5, 1)).toBe(false);
-  });
-
-  it('higher levels make running harder and the chance stays in [0, 1]', () => {
-    expect(calculateRunChance(15, 10)).toBeLessThan(calculateRunChance(15, 1));
-    expect(calculateRunChance(99, 1)).toBe(1);
-    expect(calculateRunChance(0, 1)).toBe(0);
+  it('defaults to one enemy, never goes below 0, and higher levels make running harder', () => {
+    expect(calculateRunChance(15, 1)).toBeCloseTo(0.75);
+    expect(calculateRunChance(1, 1, 9)).toBe(0);
+    expect(calculateRunChance(5, 10)).toBeLessThan(calculateRunChance(5, 1));
   });
 });

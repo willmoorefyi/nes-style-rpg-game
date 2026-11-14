@@ -21,6 +21,11 @@ export interface ItemSelectionConfig {
   onNeedTarget?: (itemId: string) => void;
   /** Only consumables this accepts are listed (battle leaves out the camp items, BA-4); default: all. */
   isUsable?: (itemId: string) => boolean;
+  /**
+   * How many of an item can still be picked (B5: battle passes the inventory count minus the uses already queued this
+   * round); it drives the "x N" label, and an item at 0 is not listed. Default: the inventory count.
+   */
+  quantityOf?: (itemId: string) => number;
 }
 
 export class ItemSelectionUI extends Container {
@@ -89,10 +94,12 @@ export class ItemSelectionUI extends Container {
   }
 
   private listedItems(): Array<{ itemId: string; quantity: number }> {
-    const { inventory, isUsable } = this.config;
-    return inventory.getAll().filter(entry => {
-      const item = ItemRegistry.getItem(entry.itemId);
-      return item?.type === 'consumable' && (isUsable?.(entry.itemId) ?? true);
-    });
+    const { inventory, isUsable, quantityOf } = this.config;
+    return inventory.getAll()
+      .map(entry => ({ itemId: entry.itemId, quantity: quantityOf ? quantityOf(entry.itemId) : entry.quantity }))
+      .filter(entry => {
+        const item = ItemRegistry.getItem(entry.itemId);
+        return entry.quantity > 0 && item?.type === 'consumable' && (isUsable?.(entry.itemId) ?? true);
+      });
   }
 }

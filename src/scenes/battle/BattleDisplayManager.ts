@@ -14,8 +14,8 @@ import { groupEnemies, enemyListCells } from './enemyList.js';
 const HURT_FRAMES = 24;
 const DEAD_TINT = 0x888888;
 /** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
- *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-770), and x per slot (a slight diagonal). */
-export const PARTY_FEET_Y = [440, 550, 660, 770];
+ *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-745, B13), and x per slot (a slight diagonal). */
+export const PARTY_FEET_Y = [425, 530, 635, 740];
 export const PARTY_X = [1380, 1425, 1470, 1515];
 const PLACEHOLDER_SIZE = 64;
 const PLACEHOLDER_COLORS = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];

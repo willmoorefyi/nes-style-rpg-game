@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { partySpritePosition, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { computeEnemyLayoutAi, STAGE_FEET, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { STRIP_Y } from '../../../src/scenes/battle/BattleSceneTypes.js';
 
-/** docs/ART_BATTLE_PLAN.md: every actor's feet on the battle plain (y 360-770); tops below the message window (120). */
+/** docs/ART_BATTLE_PLAN.md: every actor's feet on the battle plain (y 360-745, B13); tops below the message window (120). */
 const FIELD_TOP = 120;
 const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
 
@@ -12,6 +13,7 @@ describe('battle stage rules', () => {
     PARTY_FEET_Y.forEach((feet, i) => {
       expect(feet).toBeGreaterThanOrEqual(STAGE_FEET.min);
       expect(feet).toBeLessThanOrEqual(STAGE_FEET.max);
+      expect(feet).toBeLessThanOrEqual(STRIP_Y - 35); // B13: the B.MAG's feet too (old: 770)
       const p = partySpritePosition(i, art);
       expect(p.y).toBeGreaterThanOrEqual(FIELD_TOP);
       expect(p.y + (art.footRow + 1) * art.scale).toBe(feet);
@@ -32,6 +34,7 @@ describe('battle stage rules', () => {
             const at = `${bosses}b ${large}l ${small}s`;
             expect(b.feetY, at).toBeGreaterThanOrEqual(STAGE_FEET.min);
             expect(b.feetY, at).toBeLessThanOrEqual(STAGE_FEET.max);
+            expect(b.feetY, at).toBeLessThanOrEqual(STRIP_Y - 35); // B13: ground under the lowest feet (old: 770)
             expect(b.feetY - b.h, at).toBeGreaterThanOrEqual(FIELD_TOP);
           }
         }

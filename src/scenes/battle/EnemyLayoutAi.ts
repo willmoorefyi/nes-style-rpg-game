@@ -26,9 +26,9 @@ export interface EnemyBox {
 }
 
 /** y0 = 200 so even the smallest (160 px) box has its feet at y >= 360, on the background's battle plain. */
-export const ENEMY_AREA = { x0: 80, x1: 1340, y0: 200, y1: 770 } as const;
-/** Battle plain feet rule (docs/ART_BATTLE_PLAN.md). */
-export const STAGE_FEET = { min: 360, max: 770 } as const;
+export const ENEMY_AREA = { x0: 80, x1: 1340, y0: 200, y1: 745 } as const;
+/** Battle plain feet rule (docs/ART_BATTLE_PLAN.md); B13: the lowest feet stop 35 px above the bottom strip (y 780). */
+export const STAGE_FEET = { min: 360, max: 745 } as const;
 const COLUMN_GAP = 24;
 const ROW_GAP = 16;
 const CAPACITY: Record<EnemySizeClass, number> = { boss: 1, large: 2, small: 3 };
