@@ -13,6 +13,7 @@ function fakeGame() {
     party: { all: [] as unknown[], remove: vi.fn(), add: vi.fn(), setGold: vi.fn() },
     inventory: { clear: vi.fn(), add: vi.fn() },
     scenes: { switchTo: vi.fn() },
+    resetState: vi.fn(),
     currentMapId: '',
     playerPosition: { x: 0, y: 0 },
   };

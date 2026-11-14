@@ -3510,9 +3510,9 @@ npcs:
   x: 7
   y: 5
 - dialog:
-  - condition: BRIDGE_BUILT
+  - condition: INTRO_COMPLETE
     text:
-    - The bridge to the north is complete.
+    - They say the King's builders are mending the bridge to the north.
     - Seek the four crystals across the land.
   - text:
     - The four crystals have gone dark.

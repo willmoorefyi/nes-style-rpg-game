@@ -15,6 +15,8 @@ export function createMockInput() {
 export type MockInput = ReturnType<typeof createMockInput>;
 import { Container, Texture } from 'pixi.js';
 import type { MapData } from '../../src/types/index.js';
+import { GameFlags } from '../../src/core/GameFlags.js';
+import { Inventory } from '../../src/entities/Inventory.js';
 import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
 
 export function createMockAudio() {
@@ -48,7 +50,15 @@ export function createMockGame(mapData?: MapData) {
     data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]), loadSpells: vi.fn().mockResolvedValue([]) },
     party: { all: [] as readonly unknown[], get: vi.fn().mockReturnValue(null), gold: 0, distributeXp: vi.fn(), addGold: vi.fn() },
     audio: createMockAudio(),
-  } as const;
+    // Game state the exploration scene reads on enter (new game: no map yet)
+    currentMapId: '',
+    playerPosition: { x: 0, y: 0 },
+    pendingEntrance: null as string | null,
+    battleRetry: null,
+    pendingBattle: null,
+    gameFlags: new GameFlags(),
+    inventory: new Inventory(),
+  };
 }
 
 export type MockGame = ReturnType<typeof createMockGame>;

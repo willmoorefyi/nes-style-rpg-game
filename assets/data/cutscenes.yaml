@@ -1,19 +1,38 @@
 # ═══ CUTSCENE SCRIPTS ═══
 # Each cutscene is a sequence of steps executed by CutsceneManager.
 # Step types: dialog, fade_out, fade_in, wait, set_flag, heal_party
+# Played after a boss battle (scriptedEncounters.postVictoryCutscene) or after talking to an NPC (npc.cutscene).
 
 - id: garland_defeated
   steps:
     - type: dialog
-      text: "You have defeated Garland and rescued the princess!"
-    - type: set_flag
-      flag: PRINCESS_RESCUED
-    - type: dialog
-      text: "The King has ordered a bridge built to the north."
-    - type: set_flag
-      flag: BRIDGE_BUILT
-    - type: heal_party
+      text: "You have defeated Garland! The princess is free."
     - type: fade_out
       duration: 500
+    # flags while the screen is black, so Garland and the captive princess are gone when it fades back in
+    - type: set_flag
+      flag: PRINCESS_RESCUED
+    - type: heal_party
+    - type: dialog
+      text: "The princess returns safely to Cornelia Castle."
+    - type: dialog
+      text: "Report to the King of Cornelia."
     - type: fade_in
       duration: 500
+
+# The end of act 1: played once when the King is told of the rescue (BRIDGE_BUILT stays unset until the
+# bridge-building scene exists).
+- id: act1_complete
+  steps:
+    - type: fade_out
+      duration: 800
+    - type: dialog
+      text: "The King's builders set to work on the bridge to the north."
+    - type: dialog
+      text: "Congratulations! You have completed the introduction."
+    - type: dialog
+      text: "Your journey will continue once the bridge to the north is rebuilt..."
+    - type: set_flag
+      flag: INTRO_COMPLETE
+    - type: fade_in
+      duration: 800

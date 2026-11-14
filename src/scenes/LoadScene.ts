@@ -10,11 +10,18 @@ export class LoadScene implements Scene {
   readonly container = new Container();
   private game: Game;
   private window: Window;
-  private menu: Menu;
+  private menu!: Menu;
 
   constructor(game: Game) {
     this.game = game;
     this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 500 });
+    this.container.addChild(this.window);
+    this.buildMenu();
+  }
+
+  /** The slot list is read fresh each time the scene opens (it is cached, and saves happen in between). */
+  private buildMenu(): void {
+    if (this.menu) this.window.removeChild(this.menu);
     const slots = SaveManager.getSaveSlots();
     const items: MenuItem[] = slots.map((s: SlotSummary | null, i: number) => ({
       label: this.formatSlot(s, i),
@@ -31,7 +38,6 @@ export class LoadScene implements Scene {
       eventBus: this.game.events,
     });
     this.window.addChild(this.menu);
-    this.container.addChild(this.window);
   }
 
   private formatSlot(slot: SlotSummary | null, index: number): string {
@@ -46,7 +52,7 @@ export class LoadScene implements Scene {
     return `${h}:${m.toString().padStart(2, '0')}`;
   }
 
-  enter(): void {}
+  enter(): void { this.buildMenu(); }
   update(_dt: number): void { this.menu.update(this.game.input); }
   onPause(): void {}
   onResume(): void {}
@@ -57,6 +63,9 @@ export class LoadScene implements Scene {
     const data = SaveManager.load(slotId);
     if (!data) return;
     this.game.restoreState(data);
+    this.game.pendingEntrance = null;
+    this.game.battleRetry = null;
+    this.game.pendingBattle = null;
     this.game.scenes.switchTo('exploration');
   }
 }

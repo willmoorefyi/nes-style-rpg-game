@@ -1,6 +1,6 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { battleBackgroundPath } from '../rendering/BattleBackground.js';
-import type { MapData, Scene, ScriptedEncounter, VehicleType } from '../types/index.js';
+import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
 import { resolveNPCDialog, TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
@@ -18,22 +18,18 @@ import { DialogManager } from '../systems/DialogManager.js';
 import { BattleTrigger } from '../systems/BattleTrigger.js';
 import { KeyItemGateSystem } from '../systems/KeyItemGateSystem.js';
 import { VehicleManager } from '../systems/VehicleManager.js';
-import { ShopScene } from './ShopScene.js';
-import { MagicShopScene } from './MagicShopScene.js';
-import { InnScene } from './InnScene.js';
-import { ShopRegistry } from '../data/ShopRegistry.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { upgradeParty } from '../systems/ClassUpgradeSystem.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
-import { CanoeMode } from '../entities/CanoeMode.js';
-import { ShipMode } from '../entities/ShipMode.js';
-import { AirshipMode } from '../entities/AirshipMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
 import { FieldHUD } from '../ui/FieldHUD.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
+import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
+import { createFieldStateSystems, openShopScene } from './exploration/FieldSystems.js';
+import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../core/LayoutConstants.js';
 
 export class ExplorationScene implements Scene {
@@ -52,40 +48,30 @@ export class ExplorationScene implements Scene {
   private currentMapId: string = '';
   private battleBackgrounds: MapData['battleBackgrounds'];
   private currentMapData: import('../types/index.js').MapData | null = null;
-  private savedPosition: { x: number; y: number } | null = null;
+  /** A field cutscene is playing: the player can't move, talk, open the menu or meet monsters. */
+  private cutsceneRunning = false;
   private mapLoader: MapLoader;
   private dialogManager: DialogManager;
   private battleTrigger: BattleTrigger;
   private paused = false;
-  private keyItemGateSystem: KeyItemGateSystem;
+  private keyItemGateSystem!: KeyItemGateSystem;
   /** Where the current step began (a blocked key-item gate sends the player back here). */
   private stepOrigin = { x: 0, y: 0 };
-  private vehicleManager: VehicleManager;
+  private vehicleManager!: VehicleManager;
   private walkingMode: MovementMode = new WalkingMode();
   /** NPC in conversation (faces the heroes until the dialog closes). */
   private talkingNpc: NPC | null = null;
   private pendingNpcAction: NPC | null = null;
   private fieldHUD: FieldHUD;
   private controlsHint: ControlsHint;
-  private battleFlash: Graphics | null = null;
-  private battleFlashState: { count: number; timer: number; on: boolean } | null = null;
+  private battleFlash = new BattleFlashEffect(this.container);
   private fadeOverlay: FadeOverlay;
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   // Stored reference for cleanup in exit() to prevent listener leaks
   private handleBattleEnd = (data: { victory: boolean; xpReward: number; goldReward: number }) => this.battleTrigger.onBattleEnd(data);
   private handleShowDialog = (data: { text: string; onComplete: () => void }) => {
-    this.dialogManager.start([data.text]);
-    // Override advance to call onComplete when dialog finishes
-    const origAdvance = this.dialogManager.advance.bind(this.dialogManager);
-    const self = this;
-    this.dialogManager.advance = function () {
-      origAdvance();
-      if (!self.dialogManager.isActive) {
-        self.dialogManager.advance = origAdvance;
-        data.onComplete();
-      }
-    };
+    this.dialogManager.enqueue([data.text], data.onComplete);
   };
 
   constructor(game: Game) {
@@ -101,23 +87,12 @@ export class ExplorationScene implements Scene {
     this.dialogManager = new DialogManager(dialogBox);
     this.mapLoader = new MapLoader(game.data, this.placeholders);
     this.battleTrigger = new BattleTrigger(game);
-    this.battleTrigger.setFadeDeps({
-      fadeOut: (ms: number) => this.fadeOverlay.fadeOut(ms),
-      fadeIn: (ms: number) => this.fadeOverlay.fadeIn(ms),
-    });
+    this.battleTrigger.setCutscenePlayer((id) => this.playCutscene(id));
     this.battleTrigger.setOnBattleTriggered(() => {
-      if (this.player) this.savedPosition = { x: this.player.gridX, y: this.player.gridY };
       this.encounterSystem.stop();
-      this.startBattleFlash();
+      this.battleFlash.start();
     });
-    this.keyItemGateSystem = new KeyItemGateSystem(game.inventory, game.gameFlags);
-    // Build vehicle movement mode map
-    const vehicleModes = new Map<VehicleType, MovementMode>([
-      ['canoe', new CanoeMode()],
-      ['ship', new ShipMode()],
-      ['airship', new AirshipMode()],
-    ]);
-    this.vehicleManager = new VehicleManager(game.gameFlags, vehicleModes);
+    this.bindGameState();
     this.container.addChild(this.worldContainer);
     this.container.addChild(this.uiContainer);
     this.fieldHUD = new FieldHUD(game.party);
@@ -130,35 +105,104 @@ export class ExplorationScene implements Scene {
     this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
+  }
+
+  /**
+   * Systems that hold the game's inventory and flags. Game.restoreState / resetState replace those objects (load,
+   * retry, new game), so these are rebuilt on every enter, before loadMap hands them the map's gates and vehicles.
+   */
+  private bindGameState(): void {
+    ({ gates: this.keyItemGateSystem, vehicles: this.vehicleManager } = createFieldStateSystems(this.game));
+  }
+
+  /**
+   * The scene is created once and reused, so every enter starts it fresh: it may come back from a switchTo while it was
+   * still paused and hidden under a battle (Game Over > Load / Retry, Field > Load), with a dialog or flash left over.
+   */
+  private resetForEnter(): void {
+    this.paused = false;
+    this.container.visible = true;
+    // black until the map is loaded; fadeInOnEnter reveals it
+    this.fadeOverlay.overlay.alpha = 1;
+    this.cutsceneRunning = false;
+    this.battleFlash.finish();
+    this.dialogManager.clear();
+    this.talkingNpc = null;
+    this.pendingNpcAction = null;
+    this.game.events.off('battleEnd', this.handleBattleEnd);
+    this.game.events.off('showDialog', this.handleShowDialog);
     this.game.events.on('battleEnd', this.handleBattleEnd);
     this.game.events.on('showDialog', this.handleShowDialog);
+    this.bindGameState();
   }
 
   async enter(): Promise<void> {
+    this.resetForEnter();
     await this.placeholders.loadArt();
     await battleArt.load();
     this.encounterSystem.start();
-    if (this.savedPosition && this.currentMapId) {
-      await this.loadMap(this.currentMapId);
-      const pos = this.currentMapData ? safeSpawn(this.currentMapData, this.savedPosition) : this.savedPosition;
+    // the saved / retried / scenario map, or a new game: Cornelia's south gate
+    const mapId = this.game.currentMapId || 'cornelia';
+    const entrance = this.game.currentMapId ? this.game.pendingEntrance : 'south_gate';
+    this.game.pendingEntrance = null;
+    await this.loadMap(mapId);
+    if (this.currentMapData) {
+      const map = this.currentMapData;
+      const hasEntrance = entrance !== null && map.entrances?.[entrance] !== undefined;
+      if (entrance !== null && !hasEntrance) console.warn(`map ${map.id} has no entrance '${entrance}'; using the saved position`);
+      const pos = hasEntrance ? entrancePosition(map, entrance) : safeSpawn(map, this.game.playerPosition);
       this.player?.setPosition(pos.x, pos.y);
-      this.savedPosition = null;
-    } else if (this.game.currentMapId) {
-      // Restore from save (or a debug field scenario, which may name an entrance)
-      await this.loadMap(this.game.currentMapId);
-      if (this.currentMapData) {
-        const entrance = this.game.pendingEntrance;
-        this.game.pendingEntrance = null;
-        const pos = entrance ? entrancePosition(this.currentMapData, entrance) : safeSpawn(this.currentMapData, this.game.playerPosition);
-        this.player?.setPosition(pos.x, pos.y);
-      }
-    } else {
-      await this.loadMap('cornelia');
-      if (this.currentMapData && this.player) {         // new game: start at the town's first entrance
-        const pos = safeSpawn(this.currentMapData, { x: this.player.gridX, y: this.player.gridY });
-        this.player.setPosition(pos.x, pos.y);
-      }
+      this.game.playerPosition = { x: pos.x, y: pos.y };
+      this.camera.update();
+      this.tilemap?.render();
     }
+    this.fadeInOnEnter();
+    // Game Over > Retry Battle: the same fight again, from where it started
+    const retry = this.game.pendingBattle;
+    this.game.pendingBattle = null;
+    if (retry && this.currentMapData) {
+      this.battleTrigger.triggerBattle(retry.enemyIds, retry.bossConfig, retry.background, retry.enemyAi)
+        .catch((e) => console.error('Retry battle failed to start:', e));
+    }
+  }
+
+  /** Every arrival in the field (new game, load, retry) fades in from black. */
+  private fadeInOnEnter(): void {
+    if (typeof requestAnimationFrame === 'undefined') {
+      this.fadeOverlay.overlay.alpha = 0;
+      return;
+    }
+    this.fadeOverlay.overlay.alpha = 1;
+    this.fadeOverlay.fadeIn(400).catch((e) => console.error('Fade-in failed:', e));
+  }
+
+  /** Play a field cutscene with the player frozen; afterwards NPCs that the new flags remove leave the map. */
+  async playCutscene(id: string): Promise<void> {
+    this.cutsceneRunning = true;
+    try {
+      await playFieldCutscene(id, {
+        dialog: this.dialogManager,
+        fadeOut: (ms) => this.fadeOverlay.fadeOut(ms),
+        fadeIn: (ms) => this.fadeOverlay.fadeIn(ms),
+        flags: this.game.gameFlags,
+        party: this.game.party.all,
+        onFlagSet: () => this.refreshNpcPresence(),
+      });
+    } finally {
+      this.cutsceneRunning = false;
+      this.refreshNpcPresence();
+    }
+  }
+
+  /** Drop NPCs whose showIf / hideIf no longer pass (e.g. Garland and the captive princess after the battle). */
+  private refreshNpcPresence(): void {
+    if (!this.currentMapData) return;
+    const gone = npcsToRemove(this.npcs, this.currentMapData.npcs, (f) => this.game.gameFlags.has(f));
+    if (gone.length === 0) return;
+    for (const npc of gone) npc.sprite.parent?.removeChild(npc.sprite);
+    this.npcs = this.npcs.filter((n) => !gone.includes(n));
+    this.npcInteraction.setNPCs(this.npcs);
+    this.player?.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
   }
 
   async loadMap(mapId: string): Promise<void> {
@@ -226,18 +270,8 @@ export class ExplorationScene implements Scene {
   update(dt: number): void {
     if (this.paused) return;
     // C5: Battle flash animation
-    if (this.battleFlashState) {
-      this.battleFlashState.timer -= 1;
-      if (this.battleFlashState.timer <= 0) {
-        this.battleFlashState.on = !this.battleFlashState.on;
-        if (this.battleFlash) this.battleFlash.visible = this.battleFlashState.on;
-        if (!this.battleFlashState.on) this.battleFlashState.count--;
-        if (this.battleFlashState.count <= 0) {
-          this.finishBattleFlash();
-          return;
-        }
-        this.battleFlashState.timer = 5;
-      }
+    if (this.battleFlash.active) {
+      this.battleFlash.update();
       return;
     }
     // C1: Controls hint overlay
@@ -252,6 +286,7 @@ export class ExplorationScene implements Scene {
       this.dialogManager.update(dt, this.game.input);
       return;
     }
+    if (this.cutsceneRunning) return;
     this.fieldHUD.container.visible = true;
     // the conversation box was dismissed: the NPC may turn back
     if (this.talkingNpc) {
@@ -319,7 +354,7 @@ export class ExplorationScene implements Scene {
         }
         if (lines.length > 0) {
           // Store NPC for post-dialog action (shop, class upgrade, etc.)
-          if (npc.shopId || npc.action) {
+          if (npc.shopId || npc.action || npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f))) {
             this.pendingNpcAction = npc;
           }
           this.dialogManager.start(lines);
@@ -370,6 +405,11 @@ export class ExplorationScene implements Scene {
 
   /** Handle NPC post-dialog actions (shop, class upgrade) */
   private handleNpcPostDialog(npc: NPC): void {
+    const cutscene = npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f));
+    if (cutscene) {
+      this.playCutscene(cutscene).catch((e) => console.error(`Cutscene ${cutscene} failed:`, e));
+      return;
+    }
     if (npc.action === 'classUpgrade') {
       const messages = upgradeParty(
         [...this.game.party.all],
@@ -384,24 +424,8 @@ export class ExplorationScene implements Scene {
       return;
     }
     if (npc.shopId) {
-      this.openShopForNPC(npc.shopId);
+      openShopScene(this.game, npc.shopId);
     }
-  }
-
-  /** Open the appropriate shop scene for a given shopId */
-  private openShopForNPC(shopId: string): void {
-    const shopData = ShopRegistry.getShop(shopId);
-    if (!shopData) return;
-
-    const tempName = `_shop_${shopId}`;
-    if (shopData.type === 'inn') {
-      this.game.scenes.register(tempName, new InnScene(this.game, shopData));
-    } else if (shopData.type === 'magic') {
-      this.game.scenes.register(tempName, new MagicShopScene(this.game, shopId));
-    } else {
-      this.game.scenes.register(tempName, new ShopScene(this.game, shopId));
-    }
-    this.game.scenes.push(tempName);
   }
 
   private async executeTransition(transition: MapTransitionData): Promise<void> {
@@ -512,38 +536,10 @@ export class ExplorationScene implements Scene {
     };
 
     if (encounter.message) {
-      this.dialogManager.start([encounter.message]);
-      // Wait for dialog to finish, then trigger battle
-      const origAdvance = this.dialogManager.advance.bind(this.dialogManager);
-      const self = this;
-      this.dialogManager.advance = function () {
-        origAdvance();
-        if (!self.dialogManager.isActive) {
-          // Restore original advance
-          self.dialogManager.advance = origAdvance;
-          startBattle();
-        }
-      };
+      this.dialogManager.start([encounter.message], startBattle);
     } else {
       startBattle();
     }
-  }
-
-  /** C5: Start battle flash effect — 3 white flashes */
-  private startBattleFlash(): void {
-    this.battleFlash = new Graphics();
-    this.battleFlash.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill(0xffffff);
-    this.battleFlash.visible = true;
-    this.container.addChild(this.battleFlash);
-    this.battleFlashState = { count: 3, timer: 5, on: true };
-  }
-
-  private finishBattleFlash(): void {
-    if (this.battleFlash) {
-      this.container.removeChild(this.battleFlash);
-      this.battleFlash = null;
-    }
-    this.battleFlashState = null;
   }
 
   exit(): void {
@@ -561,6 +557,7 @@ export class ExplorationScene implements Scene {
   onResume(): void {
     this.paused = false;
     this.encounterSystem.start();
+    this.refreshNpcPresence();
     // Cleanup temp shop scenes on resume
     this.cleanupTempScenes();
   }

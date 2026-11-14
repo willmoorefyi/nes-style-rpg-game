@@ -18,6 +18,8 @@ export interface CutsceneDeps {
   fadeIn?: (durationMs: number) => Promise<void>;
   flags: GameFlags;
   party: Character[];
+  /** Called after each set_flag step (the field drops NPCs the new flag removes, e.g. while the screen is black). */
+  onFlagSet?: (flag: string) => void;
 }
 
 /**
@@ -66,6 +68,7 @@ export class CutsceneManager {
       case 'set_flag':
         if (step.flag) {
           this.deps.flags.set(step.flag);
+          this.deps.onFlagSet?.(step.flag);
         }
         break;
 

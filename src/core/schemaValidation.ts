@@ -95,6 +95,13 @@ export function validateMapData(data: unknown): MapData {
     assertNumber(`MapData.npcs[${i}].y`, n.y);
     assertString(`MapData.npcs[${i}].sprite`, n.sprite);
     assertArray(`MapData.npcs[${i}].dialog`, n.dialog);
+    if (n.cutscene !== undefined) {
+      assertObject(`MapData.npcs[${i}].cutscene`, n.cutscene);
+      const c = n.cutscene as Record<string, unknown>;
+      assertString(`MapData.npcs[${i}].cutscene.id`, c.id);
+      assertString(`MapData.npcs[${i}].cutscene.onceFlag`, c.onceFlag);
+      if (c.requiredFlag !== undefined) assertString(`MapData.npcs[${i}].cutscene.requiredFlag`, c.requiredFlag);
+    }
   });
   
   // Validate each transition

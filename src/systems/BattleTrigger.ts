@@ -3,8 +3,7 @@ import type { EnemyData } from '../types/index.js';
 import { BattleScene, type BattleSceneDeps, type BattleSceneConfig } from '../scenes/BattleScene.js';
 import { GameOverScene } from '../scenes/GameOverScene.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
-import { CutsceneManager } from './CutsceneManager.js';
-import { CutsceneRegistry } from './CutsceneRegistry.js';
+import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 
 export interface BattleEndData {
   victory: boolean;
@@ -12,13 +11,7 @@ export interface BattleEndData {
   goldReward: number;
 }
 
-/** Optional config for boss/scripted battles */
-export interface BossBattleConfig {
-  canRun: boolean;
-  flag?: string;         // story flag to set on victory
-  isBoss: boolean;
-  postVictoryCutscene?: string;  // cutscene ID to play after victory
-}
+export type { BossBattleConfig } from './BattleRetry.js';
 
 export class BattleTrigger {
   private game: Game;
@@ -26,8 +19,8 @@ export class BattleTrigger {
   private onBattleTriggered: (() => void) | null = null;
   /** Stored boss config for the current battle, cleared after battle ends */
   private currentBossConfig: BossBattleConfig | null = null;
-  /** Optional fade callbacks provided by the rendering layer */
-  private fadeDeps: { fadeOut?: (ms: number) => Promise<void>; fadeIn?: (ms: number) => Promise<void> } = {};
+  /** Plays a post-victory cutscene in the field (provided by the exploration scene). */
+  private cutscenePlayer: ((id: string) => Promise<void>) | null = null;
 
   constructor(game: Game) {
     this.game = game;
@@ -37,8 +30,8 @@ export class BattleTrigger {
     this.onBattleTriggered = callback;
   }
 
-  setFadeDeps(deps: { fadeOut?: (ms: number) => Promise<void>; fadeIn?: (ms: number) => Promise<void> }): void {
-    this.fadeDeps = deps;
+  setCutscenePlayer(player: (id: string) => Promise<void>): void {
+    this.cutscenePlayer = player;
   }
 
   async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string,
@@ -49,6 +42,8 @@ export class BattleTrigger {
     const party = [...this.game.party.all];
     if (party.length === 0) return;
 
+    // Game Over > Retry Battle puts the game back exactly as it is now
+    this.game.battleRetry = captureBattleSnapshot(this.game, { enemyIds, bossConfig, background, enemyAi });
     this.onBattleTriggered?.();
     this.currentBossConfig = bossConfig ?? null;
 
@@ -73,57 +68,37 @@ export class BattleTrigger {
   }
 
   onBattleEnd(data: BattleEndData): void {
-    if (data.victory) {
-      // C4: Track levels before XP distribution for level-up detection
-      const levelsBefore = this.game.party.all.map(m => m.level);
-      this.game.party.distributeXp(data.xpReward);
-      this.game.party.addGold(data.goldReward);
-      // Set story flag on boss victory
-      if (this.currentBossConfig?.flag) {
-        this.game.gameFlags.set(this.currentBossConfig.flag);
-        this.game.events.emit('bossDefeated', { flag: this.currentBossConfig.flag });
-      }
-      // C4: Build level-up messages
-      const levelUpMessages: string[] = [];
-      this.game.party.all.forEach((member, i) => {
-        if (member.level > levelsBefore[i]) {
-          levelUpMessages.push(`${member.name} reached Level ${member.level}!`);
-        }
-      });
-      // Play post-victory cutscene if configured
-      const cutsceneId = this.currentBossConfig?.postVictoryCutscene;
-      this.currentBossConfig = null;
-      if (cutsceneId) {
-        this.game.scenes.pop();
-        this.playPostVictoryCutscene(cutsceneId);
-      } else if (levelUpMessages.length > 0) {
-        // Emit level-up dialogs BEFORE pop so the exploration scene's handler is ready
-        for (const msg of levelUpMessages) {
-          this.game.events.emit('showDialog', { text: msg, onComplete: () => {} });
-        }
-        this.game.scenes.pop();
-      } else {
-        this.game.scenes.pop();
-      }
-    } else {
+    if (!data.victory) {
       this.currentBossConfig = null;
       this.game.scenes.switchTo('gameover');
+      return;
     }
-  }
-
-  private async playPostVictoryCutscene(cutsceneId: string): Promise<void> {
-    const script = CutsceneRegistry.get(cutsceneId);
-    if (!script) return;
-    const cutscene = new CutsceneManager({
-      showDialog: (text: string) => new Promise<void>((resolve) => {
-        this.game.events.emit('showDialog', { text, onComplete: resolve });
-      }),
-      fadeOut: this.fadeDeps.fadeOut,
-      fadeIn: this.fadeDeps.fadeIn,
-      flags: this.game.gameFlags,
-      party: [...this.game.party.all],
+    this.game.battleRetry = null;
+    // C4: Track levels before XP distribution for level-up detection
+    const levelsBefore = this.game.party.all.map(m => m.level);
+    this.game.party.distributeXp(data.xpReward);
+    this.game.party.addGold(data.goldReward);
+    // Set story flag on boss victory
+    if (this.currentBossConfig?.flag) {
+      this.game.gameFlags.set(this.currentBossConfig.flag);
+      this.game.events.emit('bossDefeated', { flag: this.currentBossConfig.flag });
+    }
+    // Level-up messages queue in the field dialog, ahead of any post-victory cutscene
+    this.game.party.all.forEach((member, i) => {
+      if (member.level > levelsBefore[i]) {
+        this.game.events.emit('showDialog', { text: `${member.name} reached Level ${member.level}!`, onComplete: () => {} });
+      }
     });
-    await cutscene.play(script);
+    const cutsceneId = this.currentBossConfig?.postVictoryCutscene;
+    this.currentBossConfig = null;
+    this.game.scenes.pop();
+    if (cutsceneId) {
+      if (this.cutscenePlayer) {
+        this.cutscenePlayer(cutsceneId).catch((e) => console.error(`Cutscene ${cutsceneId} failed:`, e));
+      } else {
+        console.error(`No field scene to play post-victory cutscene ${cutsceneId}`);
+      }
+    }
   }
 
   private async loadEnemyData(ids: string[]): Promise<EnemyData[]> {

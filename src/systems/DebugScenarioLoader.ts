@@ -69,15 +69,16 @@ export class DebugScenarioLoader {
   }
 
   private applyParty(scenario: DebugScenario): void {
-    // Clear existing party
-    while (this.game.party.all.length > 0) {
-      this.game.party.remove(0);
-    }
+    // every scenario starts from a fresh game (no party, items, flags or retry state from an earlier run)
+    this.game.resetState();
 
     // Build party from scenario
     for (const member of scenario.party) {
       const classData = ClassRegistry.getClass(member.class);
-      if (!classData) continue;
+      if (!classData) {
+        console.error(`Debug scenario ${scenario.id}: unknown class '${member.class}' for ${member.name}`);
+        continue;
+      }
       const character = new Character({ name: member.name, classData, level: member.level });
 
       // Equip items
@@ -93,7 +94,7 @@ export class DebugScenarioLoader {
       character.restoreAllCharges();
       character.currentHp = character.maxHp;
 
-      this.game.party.add(character);
+      if (!this.game.party.add(character)) console.error(`Debug scenario ${scenario.id}: could not add ${member.name}`);
     }
 
     // Reset and set gold and inventory from scenario

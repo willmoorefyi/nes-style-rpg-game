@@ -11,7 +11,9 @@ export class SaveScene implements Scene {
   readonly container = new Container();
   private game: Game;
   private window: Window;
-  private menu: Menu;
+  private menu!: Menu;
+  /** "Saved." / "Could not save." — the scene closes on the next confirm. */
+  private resultWindow?: Window;
   private confirmWindow?: Window;
   private confirmMenu?: Menu;
   private pendingSlot: number | null = null;
@@ -19,6 +21,13 @@ export class SaveScene implements Scene {
   constructor(game: Game) {
     this.game = game;
     this.window = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 500 });
+    this.container.addChild(this.window);
+    this.buildMenu();
+  }
+
+  /** The slot list is read fresh each time the scene opens (it is cached, and saves happen in between). */
+  private buildMenu(): void {
+    if (this.menu) this.window.removeChild(this.menu);
     const slots = SaveManager.getSaveSlots();
     const items = slots.map((s: SlotSummary | null, i: number) => ({
       label: this.formatSlot(s, i),
@@ -34,7 +43,6 @@ export class SaveScene implements Scene {
       eventBus: this.game.events,
     });
     this.window.addChild(this.menu);
-    this.container.addChild(this.window);
   }
 
   private formatSlot(slot: SlotSummary | null, index: number): string {
@@ -49,9 +57,20 @@ export class SaveScene implements Scene {
     return `${h}:${m.toString().padStart(2, '0')}`;
   }
 
-  enter(): void {}
+  enter(): void {
+    this.hideConfirm();
+    if (this.resultWindow) this.container.removeChild(this.resultWindow);
+    this.resultWindow = undefined;
+    this.buildMenu();
+  }
   update(_dt: number): void {
-    if (this.confirmMenu) {
+    if (this.resultWindow) {
+      if (this.game.input.isJustPressed('confirm') || this.game.input.isJustPressed('cancel')) {
+        this.container.removeChild(this.resultWindow);
+        this.resultWindow = undefined;
+        this.game.scenes.pop();
+      }
+    } else if (this.confirmMenu) {
       this.confirmMenu.update(this.game.input);
     } else {
       this.menu.update(this.game.input);
@@ -102,7 +121,7 @@ export class SaveScene implements Scene {
   }
 
   private doSave(slotId: number): void {
-    SaveManager.save(
+    const ok = SaveManager.save(
       slotId,
       this.game.party,
       this.game.inventory,
@@ -111,6 +130,15 @@ export class SaveScene implements Scene {
       this.game.playerPosition,
       this.game.playTime
     );
-    this.game.scenes.pop();
+    if (!ok) console.error(`Save to slot ${slotId + 1} failed`);
+    this.showResult(ok ? 'Saved.' : 'Could not save.');
+  }
+
+  private showResult(message: string): void {
+    this.resultWindow = new Window({ x: (GAME_WIDTH - 500) / 2, y: 400, width: 500, height: 140 });
+    const label = new BitmapText({ text: message, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    label.position.set(this.resultWindow.contentX, this.resultWindow.contentY);
+    this.resultWindow.addChild(label);
+    this.container.addChild(this.resultWindow);
   }
 }

@@ -4,7 +4,8 @@
  * Key story flags used throughout the game:
  * - GARLAND_DEFEATED   — set after defeating Garland in Temple of Fiends
  * - PRINCESS_RESCUED   — set in post-Garland cutscene
- * - BRIDGE_BUILT       — set in post-Garland cutscene, enables wider world access
+ * - INTRO_COMPLETE     — set when the party reports the rescue to the King (act1_complete cutscene); ends act 1
+ * - BRIDGE_BUILT       — opens the north bridge; not set in act 1 (a later bridge-building cutscene will set it)
  * - BIKKE_DEFEATED     — set after defeating pirate captain, enables ship
  * - EARTH_CAVE_COMPLETE — set after Earth Cave boss, enables canoe
  * - EARTH_CRYSTAL_LIT  — set after restoring Earth Crystal, enables class upgrades
@@ -17,6 +18,7 @@
 export const STORY_FLAGS = {
   GARLAND_DEFEATED: 'GARLAND_DEFEATED',
   PRINCESS_RESCUED: 'PRINCESS_RESCUED',
+  INTRO_COMPLETE: 'INTRO_COMPLETE',
   BRIDGE_BUILT: 'BRIDGE_BUILT',
   BIKKE_DEFEATED: 'BIKKE_DEFEATED',
   EARTH_CAVE_COMPLETE: 'EARTH_CAVE_COMPLETE',

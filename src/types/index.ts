@@ -128,6 +128,15 @@ export interface MapNPC {
   /** Given once, after the NPC's dialog, the first time the player talks to them. */
   giftItem?: string;
   giftFlag?: string;
+  /** Cutscene played once after talking (when `requiredFlag` is set and `onceFlag` is not; the script sets `onceFlag`). */
+  cutscene?: NPCCutscene;
+}
+
+export interface NPCCutscene {
+  /** Id in assets/data/cutscenes.yaml. */
+  id: string;
+  requiredFlag?: string;
+  onceFlag: string;
 }
 
 /** Whether a map NPC is present for the current story flags. */

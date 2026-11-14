@@ -1,7 +1,7 @@
 import { walkCycleIndex } from '../rendering/SpriteAnimation.js';
 import { Sprite, Texture } from 'pixi.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
-import type { ConditionalDialog } from '../types/index.js';
+import type { ConditionalDialog, NPCCutscene } from '../types/index.js';
 
 export interface NPCData {
   id: string;
@@ -16,6 +16,7 @@ export interface NPCData {
   wander?: boolean;
   giftItem?: string;
   giftFlag?: string;
+  cutscene?: NPCCutscene;
 }
 
 // Direction offsets: up, down, left, right
@@ -53,6 +54,7 @@ export class NPC {
   readonly chestFlag?: string;
   readonly giftItem?: string;
   readonly giftFlag?: string;
+  readonly cutscene?: NPCCutscene;
   readonly wander: boolean;
   private stepsTaken = 0;
   private wanderTimer: number = 0;
@@ -77,6 +79,7 @@ export class NPC {
     this.chestFlag = data.chestFlag;
     this.giftItem = data.giftItem;
     this.giftFlag = data.giftFlag;
+    this.cutscene = data.cutscene;
     this.wander = data.wander ?? false;
     this.art = art ?? null;
     this.offsetY = art ? TILE_SIZE - art.frameHeight : 0;

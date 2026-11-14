@@ -404,12 +404,15 @@ npcs:
   x: 20
   y: 8
   dialog:
+  - condition: INTRO_COMPLETE
+    text: [My builders are hard at work on the bridge to the north., 'Go with our blessing, and may the crystals guide you.']
   - condition: PRINCESS_RESCUED
-    text: ['You have brought my daughter home. Cornelia is in your debt, Warriors of Light!', 'As I promised, my builders are raising the bridge
-        to the north.', 'Go with our blessing, and may the crystals guide you.']
+    text: ['You have brought my daughter home. Cornelia is in your debt, Warriors of Light!', 'As I promised, I will order the bridge to the north
+        rebuilt at once.']
   - text: ['Welcome, travellers. I am the King of Cornelia.', 'Garland, once my finest knight, has carried off my daughter, Princess Liora.',
       'He holds her in the Temple of Fiends, beyond the forest to the north-west.', 'Bring her home safely, and I will rebuild the bridge to the
         north for you.']
+  cutscene: {id: act1_complete, requiredFlag: PRINCESS_RESCUED, onceFlag: INTRO_COMPLETE}
 - id: princess
   sprite: princess
   x: 23
@@ -424,8 +427,10 @@ npcs:
   x: 18
   y: 10
   dialog:
+  - condition: INTRO_COMPLETE
+    text: [The King's builders are at work on the bridge to the north.]
   - condition: PRINCESS_RESCUED
-    text: [The bridge to the north will soon be finished.]
+    text: [Her Highness is home! The King wishes to thank you himself.]
   - text: [Garland is a fearsome swordsman. Buy armour in town before you go., 'And rest at the inn, if you are wounded.']
 - id: throne_guard_w
   sprite: guard

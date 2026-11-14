@@ -14,6 +14,7 @@ import { Inventory } from '../entities/Inventory.js';
 import { AudioManager, type AudioManifest } from './AudioManager.js';
 import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
+import type { BattleRequest, BattleRetrySnapshot } from '../systems/BattleRetry.js';
 import { installNESFont } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
 
@@ -36,6 +37,10 @@ export class Game {
   playerPosition = { x: 0, y: 0 };
   /** Entrance of `currentMapId` to place the player at on the next exploration enter (debug field scenarios). */
   pendingEntrance: string | null = null;
+  /** The game as it was when the current battle started (Game Over > Retry Battle); null when not retryable. */
+  battleRetry: BattleRetrySnapshot | null = null;
+  /** A battle the exploration scene starts as soon as it has entered (set by Retry Battle). */
+  pendingBattle: BattleRequest | null = null;
 
   constructor() {
     this.app = new Application();
@@ -147,6 +152,21 @@ export class Game {
     this.currentMapId = data.currentMap;
     this.playerPosition = data.playerPosition;
     this.playTime = data.playTime;
+  }
+
+  /** A brand-new game: empty party, no gold, items or flags, no map yet, play time 0. */
+  resetState(): void {
+    this.restoreState({
+      party: new PartyManager(),
+      inventory: new Inventory(),
+      flags: new GameFlags(),
+      currentMap: '',
+      playerPosition: { x: 0, y: 0 },
+      playTime: 0,
+    });
+    this.pendingEntrance = null;
+    this.battleRetry = null;
+    this.pendingBattle = null;
   }
 
   get canvas(): HTMLCanvasElement {

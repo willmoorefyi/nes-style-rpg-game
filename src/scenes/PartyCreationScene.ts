@@ -54,6 +54,9 @@ export class PartyCreationScene implements Scene {
   }
 
   enter(): void {
+    // the opening leaves the screen black for the field to fade in from; a later New Game must start visible
+    this.fadeOverlay.overlay.alpha = 0;
+    this.dialogManager.clear();
     this.selectedClasses = [];
     this.currentSlot = 0;
     this.phase = 'select';
@@ -72,7 +75,7 @@ export class PartyCreationScene implements Scene {
 
     // Header
     const header = new BitmapText({
-      text: `Choose class for slot ${this.currentSlot + 1}/4`,
+      text: this.currentSlot >= 4 ? 'Confirm your party' : `Choose class for slot ${this.currentSlot + 1}/4`,
       style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
     });
     header.position.set(SCREEN_MARGIN, SCREEN_MARGIN);
@@ -252,11 +255,12 @@ export class PartyCreationScene implements Scene {
   }
 
   private beginAdventure(): void {
-    // Create characters and add to party
+    // a new game starts from nothing: no party, gold, items or flags left over from a previous run
+    this.game.resetState();
     for (const cls of this.selectedClasses) {
       const name = DEFAULT_NAMES[cls.id] ?? cls.name;
       const character = new Character({ name, classData: cls });
-      this.game.party.add(character);
+      if (!this.game.party.add(character)) console.error(`Could not add ${name} to the new party`);
     }
     // Give starting gold
     this.game.party.addGold(STARTING_GOLD);
@@ -268,9 +272,11 @@ export class PartyCreationScene implements Scene {
   private async playOpeningSequence(): Promise<void> {
     const script: CutsceneScript = [
       { type: 'fade_out', duration: 500 },
-      { type: 'dialog', text: 'The world is shrouded in darkness...' },
-      { type: 'dialog', text: 'Four Warriors of Light have appeared...' },
-      { type: 'fade_in', duration: 500 },
+      { type: 'dialog', text: 'The world is veiled in darkness. The winds stop, the seas rage, and the earth decays.' },
+      { type: 'dialog', text: 'The people wait, their only hope a prophecy...' },
+      { type: 'dialog', text: '"When the world is in darkness, four Warriors of Light will come."' },
+      { type: 'dialog', text: 'After a long journey, four young warriors arrive at the gates of Cornelia, each holding an orb.' },
+      { type: 'dialog', text: 'The King awaits in the castle at the top of the high street.' },
     ];
     const cutscene = new CutsceneManager({
       showDialog: (text: string) => new Promise<void>((resolve) => {
@@ -287,6 +293,9 @@ export class PartyCreationScene implements Scene {
       party: [...this.game.party.all],
     });
     await cutscene.play(script);
+    // the party starts at the town's south gate; the field fades in from this black screen
+    this.game.currentMapId = 'cornelia';
+    this.game.pendingEntrance = 'south_gate';
     this.game.scenes.switchTo('exploration');
   }
 

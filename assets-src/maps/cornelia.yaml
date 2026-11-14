@@ -1066,8 +1066,8 @@ npcs:
   y: 44
   wander: true
   dialog:
-  - condition: BRIDGE_BUILT
-    text: [The bridge to the north is complete., Seek the four crystals across the land.]
+  - condition: INTRO_COMPLETE
+    text: [They say the King's builders are mending the bridge to the north., Seek the four crystals across the land.]
   - text: [The four crystals have gone dark., Only the Warriors of Light can restore them.]
 - id: villager
   sprite: villager

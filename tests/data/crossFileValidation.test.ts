@@ -31,8 +31,9 @@ interface MapFile {
   id: string;
   encounters?: Array<{ enemies: string[] }>;
   transitions?: Array<{ targetMap: string }>;
-  npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string }>;
-  scriptedEncounters?: Array<{ enemyIds: string[]; flag: string }>;
+  npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string;
+    cutscene?: { id: string } }>;
+  scriptedEncounters?: Array<{ enemyIds: string[]; flag: string; postVictoryCutscene?: string }>;
   keyItemGates?: Array<{ requiredItem: string; x: number; y: number }>;
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
 }
@@ -311,6 +312,32 @@ describe('Cross-file data validation', () => {
         });
       });
     });
+  });
+});
+
+// Cutscene ids used by maps (legacy and the compiled 2x maps the game plays) → assets/data/cutscenes.yaml
+describe('Cutscene references → cutscenes.yaml', () => {
+  const cutsceneIds = new Set(
+    (parse(readFileSync(join(dataDir, 'cutscenes.yaml'), 'utf-8')) as Array<{ id: string }>).map((c) => c.id),
+  );
+  const aiDir = join(mapsDir, 'ai');
+  const allMaps = [
+    ...maps,
+    ...readdirSync(aiDir).filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+      .map((f) => parse(readFileSync(join(aiDir, f), 'utf-8')) as MapFile),
+  ];
+  const refs = allMaps.flatMap((m) => [
+    ...(m.npcs ?? []).filter((n) => n.cutscene).map((n) => [`${m.id} NPC ${n.id}`, n.cutscene!.id] as const),
+    ...(m.scriptedEncounters ?? []).filter((e) => e.postVictoryCutscene)
+      .map((e) => [`${m.id} scripted encounter`, e.postVictoryCutscene!] as const),
+  ]);
+
+  it('the King starts the act-1 ending cutscene', () => {
+    expect(refs.some(([, id]) => id === 'act1_complete')).toBe(true);
+  });
+
+  it.each(refs)('%s uses cutscene "%s", which exists', (_where, id) => {
+    expect(cutsceneIds.has(id)).toBe(true);
   });
 });
 
