@@ -165,6 +165,43 @@ describe('EncounterSystem zones (T4c)', () => {
   });
 });
 
+describe('W4: the countdown is not restarted by map loads', () => {
+  it('a running countdown survives map loads and is only clamped to a smaller map maximum', () => {
+    const events = new EventBus();
+    const sys = new EncounterSystem(events, () => 0);
+    sys.setEncounters([{ enemies: ['goblin'], weight: 1 }]);
+    sys.start();
+    sys.setRate({ min: 15, max: 30 });                   // the first map: a fresh roll
+    expect(sys.stepsRemaining).toBe(15);
+    for (let i = 0; i < 5; i++) events.emit('playerMove', { x: 1, y: 1 });
+    expect(sys.stepsRemaining).toBe(10);
+    sys.setRate({ min: 999, max: 999 });                 // an interior
+    expect(sys.stepsRemaining).toBe(10);
+    sys.setRate({ min: 8, max: 15 });                    // the temple
+    expect(sys.stepsRemaining).toBe(10);
+    sys.setRate({ min: 2, max: 5 });
+    expect(sys.stepsRemaining).toBe(5);
+    sys.stop();
+  });
+
+  it('restart() rolls a fresh countdown on the current rate (new game, load, retry)', () => {
+    const sys = new EncounterSystem(new EventBus(), () => 0);
+    sys.setRate({ min: 15, max: 30 });
+    sys.setRate({ min: 4, max: 6 });
+    expect(sys.stepsRemaining).toBe(6);
+    sys.restart();
+    expect(sys.stepsRemaining).toBe(4);
+  });
+
+  it('the clamp uses the movement mode multiplier', () => {
+    const sys = new EncounterSystem(new EventBus(), () => 0);
+    sys.setRate({ min: 30, max: 30 });
+    sys.setRateMultiplier(2);
+    sys.setRate({ min: 10, max: 10 });
+    expect(sys.stepsRemaining).toBe(5);
+  });
+});
+
 function seeded(seed: number): () => number {
   let a = seed;
   return () => {

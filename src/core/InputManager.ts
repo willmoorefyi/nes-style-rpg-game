@@ -26,6 +26,11 @@ export class InputManager {
   private pressedThisFrame = new Set<string>();
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundKeyUp: (e: KeyboardEvent) => void;
+  /** Focus left the page: a key held then never sends its keyup, so every key is released (I1). */
+  private boundBlur = (): void => this.releaseAll();
+  private boundVisibility = (): void => {
+    if (document.hidden) this.releaseAll();
+  };
 
   constructor(mappings: InputMapping = DEFAULT_MAPPINGS) {
     this.mappings = { ...mappings };
@@ -36,11 +41,19 @@ export class InputManager {
   attach(): void {
     window.addEventListener('keydown', this.boundKeyDown);
     window.addEventListener('keyup', this.boundKeyUp);
+    window.addEventListener('blur', this.boundBlur);
+    document.addEventListener('visibilitychange', this.boundVisibility);
   }
 
   detach(): void {
     window.removeEventListener('keydown', this.boundKeyDown);
     window.removeEventListener('keyup', this.boundKeyUp);
+    window.removeEventListener('blur', this.boundBlur);
+    document.removeEventListener('visibilitychange', this.boundVisibility);
+    this.releaseAll();
+  }
+
+  private releaseAll(): void {
     this.currentKeys.clear();
     this.previousKeys.clear();
     this.pressedThisFrame.clear();

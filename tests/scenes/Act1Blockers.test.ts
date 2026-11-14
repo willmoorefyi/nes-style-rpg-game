@@ -89,6 +89,11 @@ const npcSprites = (scene: ExplorationScene) => (scene.container.children[0] as 
 describe('ST-5 / ST-1: beating Garland (real trigger, real garland_defeated script)', () => {
   it('sets the boss flag, plays the cutscene, removes Garland and the princess, and never builds the bridge', async () => {
     const game = makeGame(templeMap());
+    // T2: the script may warp the party to the throne room; that map has the arrival entrance
+    const castle = createMapData({ id: 'cornelia-castle-2f', width: 30, height: 20, entrances: { throne_return: [21, 9] } });
+    game.data.loadMap.mockImplementation((path: string) =>
+      Promise.resolve(path.includes('cornelia-castle-2f') ? castle : templeMap()));
+    const warp = realCutscenes.find((c) => c.id === 'garland_defeated')?.steps.find((s) => s.type === 'warp');
     game.currentMapId = 'temple-of-fiends';
     game.playerPosition = { x: 5, y: 6 };
     const boss = { canRun: false, isBoss: true, flag: 'GARLAND_DEFEATED', postVictoryCutscene: 'garland_defeated' };
@@ -106,7 +111,13 @@ describe('ST-5 / ST-1: beating Garland (real trigger, real garland_defeated scri
     await settle(1500);                                         // two 500 ms fades
     expect(game.gameFlags.has('PRINCESS_RESCUED')).toBe(true);
     expect(game.gameFlags.has('BRIDGE_BUILT')).toBe(false);
-    expect(npcSprites(scene)).toBe(before - 2);
+    if (warp) {
+      // the party left the temple for the throne room (R4a's script)
+      expect(scene.getMapId()).toBe(warp.map);
+      expect(game.playerPosition).toEqual({ x: 21, y: 9 });
+    } else {
+      expect(npcSprites(scene)).toBe(before - 2);
+    }
   });
 
   it('returning from any battle drops NPCs whose flags are now set (onResume)', async () => {

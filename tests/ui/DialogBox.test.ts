@@ -43,3 +43,47 @@ describe('DialogBox', () => {
     expect(dialog.isVisible).toBe(false);
   });
 });
+
+describe('I2: cancel advances dialogs, and a ▼ marks more text', () => {
+  it('cancel on a revealed last page closes the box', () => {
+    const onComplete = vi.fn();
+    const dialog = new DialogBox({ revealSpeed: 0, onComplete });
+    dialog.show('Short text');
+    dialog.update(1, mockInput({ cancel: true }));
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(dialog.isVisible).toBe(false);
+  });
+
+  it('cancel finishes the reveal, then turns the page', () => {
+    const dialog = new DialogBox({ linesPerPage: 1, revealSpeed: 0.1 });
+    dialog.show('Page1\nPage2');
+    dialog.update(1, mockInput({ cancel: true }));
+    expect(dialog.currentPage).toBe(0);
+    dialog.update(1, mockInput({ cancel: true }));
+    expect(dialog.currentPage).toBe(1);
+  });
+
+  it('the marker shows on page 1 of 2, not on the last page', () => {
+    const dialog = new DialogBox({ linesPerPage: 1, revealSpeed: 0 });
+    dialog.show('Page1\nPage2');
+    dialog.update(1, mockInput({}));
+    expect(dialog.moreShown).toBe(true);
+    dialog.update(1, mockInput({ confirm: true }));
+    expect(dialog.currentPage).toBe(1);
+    expect(dialog.moreShown).toBe(false);
+  });
+
+  it('show(text, true) marks the last page too; the marker waits for the reveal and blinks', () => {
+    const dialog = new DialogBox({ revealSpeed: 0.1 });
+    dialog.show('Hello there', true);
+    expect(dialog.moreShown).toBe(false);
+    dialog.update(1, mockInput({ confirm: true }));          // finish the reveal
+    expect(dialog.moreShown).toBe(true);
+    const seen = new Set<boolean>();
+    for (let i = 0; i < 80; i++) {
+      dialog.update(1, mockInput({}));
+      seen.add(dialog.moreShown);
+    }
+    expect(seen).toEqual(new Set([true, false]));
+  });
+});

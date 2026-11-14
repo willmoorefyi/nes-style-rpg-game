@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Container } from 'pixi.js';
-import { FieldHUD, windowBox } from '../../src/ui/FieldHUD.js';
+import { FieldHUD, windowBox, HUD_BOTTOM_BAND } from '../../src/ui/FieldHUD.js';
 import { Window } from '../../src/ui/Window.js';
-import { CHAR_WIDTH, GAME_WIDTH } from '../../src/core/LayoutConstants.js';
+import { CHAR_WIDTH, GAME_WIDTH, GAME_HEIGHT } from '../../src/core/LayoutConstants.js';
 import { allTexts } from '../helpers/realData.js';
 import { createMockGame } from '../helpers/testUtils.js';
 import { InnScene } from '../../src/scenes/InnScene.js';
@@ -152,5 +152,14 @@ describe('FieldHUD', () => {
         expect(overlap(hud.panelBox(panel), box)).toBe(false);
       }
     });
+  });
+});
+
+describe('M12: the party strip lies inside the bottom band the field camera keeps clear', () => {
+  it('the strip top is at or below GAME_HEIGHT - HUD_BOTTOM_BAND, and the band is 120 px', () => {
+    const hud = new FieldHUD(createMockParty());
+    expect(HUD_BOTTOM_BAND).toBe(120);
+    expect(windowBox(hud.hpPanel).y).toBeGreaterThanOrEqual(GAME_HEIGHT - HUD_BOTTOM_BAND);
+    expect(windowBox(hud.hpPanel).y + windowBox(hud.hpPanel).height).toBeLessThanOrEqual(GAME_HEIGHT);
   });
 });

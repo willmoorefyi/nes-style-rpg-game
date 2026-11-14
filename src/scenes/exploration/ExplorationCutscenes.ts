@@ -4,7 +4,7 @@ import type { Character } from '../../entities/Character.js';
 import type { NPC } from '../../entities/NPC.js';
 import type { MapNPC } from '../../types/index.js';
 import { npcPresent } from '../../types/index.js';
-import { CutsceneManager } from '../../systems/CutsceneManager.js';
+import { CutsceneManager, type CutsceneDeps } from '../../systems/CutsceneManager.js';
 import { CutsceneRegistry } from '../../systems/CutsceneRegistry.js';
 
 /** What a field cutscene needs from the exploration scene. */
@@ -15,6 +15,10 @@ export interface CutsceneHost {
   flags: GameFlags;
   party: readonly Character[];
   onFlagSet?: (flag: string) => void;
+  /** A `warp` step: change maps behind the fade (T2). */
+  warp?: CutsceneDeps['warp'];
+  /** After a `heal_party` step (the partyHealed sound). */
+  onHeal?: () => void;
 }
 
 /** Play cutscene `id` in the field. Resolves false (and logs) when the id is unknown. */
@@ -31,6 +35,8 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
     flags: host.flags,
     party: [...host.party],
     onFlagSet: host.onFlagSet,
+    warp: host.warp,
+    onHeal: host.onHeal,
   });
   await manager.play(script);
   return true;

@@ -3,7 +3,7 @@ import { Character } from '../entities/Character.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { slotOf } from '../entities/EquipmentRules.js';
-import { BattleTrigger } from './BattleTrigger.js';
+import { BattleTrigger, type BattleEndData } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 
@@ -75,7 +75,20 @@ export class DebugScenarioLoader {
   async applyAndBattle(scenario: DebugScenario): Promise<void> {
     this.applyParty(scenario);
     const trigger = new BattleTrigger(this.game);
-    await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi);
+    // no field scene listens over the title: end this battle here, once (victory / escape: pop back to the title;
+    // defeat: Game Over, which offers Load and Title only as there is no map to retry on) (S6)
+    const events = this.game.events;
+    const onEnd = (data: BattleEndData): void => {
+      events.off('battleEnd', onEnd);
+      trigger.onBattleEnd(data);
+    };
+    events.on('battleEnd', onEnd);
+    try {
+      await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi);
+    } catch (e) {
+      events.off('battleEnd', onEnd);
+      throw e;
+    }
   }
 
   private applyParty(scenario: DebugScenario): void {

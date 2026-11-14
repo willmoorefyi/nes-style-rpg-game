@@ -16,6 +16,8 @@ export class Camera {
   private mapWidth = 0;
   private mapHeight = 0;
   private target: CameraTarget | null = null;
+  /** Screen pixels at the bottom covered by UI (the field HUD's party strip, M12). */
+  private insetBottom = 0;
   readonly container: Container;
   smooth = false;
   smoothSpeed = 0.1;
@@ -27,6 +29,19 @@ export class Camera {
   setMapBounds(widthTiles: number, heightTiles: number): void {
     this.mapWidth = widthTiles * TILE_SIZE;
     this.mapHeight = heightTiles * TILE_SIZE;
+  }
+
+  /**
+   * Keep the view's bottom `bottom` pixels for UI: targets are centred in the band above it, the map scrolls far
+   * enough that its last row clears it, and a map shorter than the band is centred inside the band (M12).
+   */
+  setViewInsets(insets: { bottom?: number }): void {
+    this.insetBottom = Math.max(0, Math.min(insets.bottom ?? 0, VIEWPORT_HEIGHT));
+  }
+
+  /** The height of the view above the bottom inset. */
+  private get usableHeight(): number {
+    return VIEWPORT_HEIGHT - this.insetBottom;
   }
 
   follow(target: CameraTarget): void {
@@ -47,7 +62,7 @@ export class Camera {
     if (!this.target) return;
 
     const targetX = this.target.x - VIEWPORT_WIDTH / 2;
-    const targetY = this.target.y - VIEWPORT_HEIGHT / 2;
+    const targetY = this.target.y - this.usableHeight / 2;
 
     if (this.smooth) {
       this._x += (this.clampX(targetX) - this._x) * this.smoothSpeed;
@@ -65,7 +80,7 @@ export class Camera {
   }
 
   private clampY(y: number): number {
-    return Camera.clampAxis(y, this.mapHeight, VIEWPORT_HEIGHT);
+    return Camera.clampAxis(y, this.mapHeight, this.usableHeight);
   }
 
   /**

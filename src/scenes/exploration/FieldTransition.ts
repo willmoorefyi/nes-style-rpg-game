@@ -3,7 +3,8 @@ import type { MapData, MapTransition } from '../../types/index.js';
 import type { FadeOverlay } from '../../rendering/FadeOverlay.js';
 import type { PlayerController } from '../../entities/PlayerController.js';
 import type { MovementMode } from '../../entities/MovementMode.js';
-import { arrivalFor } from '../../systems/MapTransition.js';
+import type { CutsceneWarp } from '../../systems/CutsceneManager.js';
+import { arrivalFor, entrancePosition } from '../../systems/MapTransition.js';
 import { transitionAnimation } from './TransitionEffect.js';
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../../core/LayoutConstants.js';
 
@@ -12,19 +13,55 @@ export interface FieldTransitionHost {
   readonly world: Container;
   readonly fade: FadeOverlay;
   readonly walkingMode: MovementMode;
+  /** Random battles, off for the whole fade-load-fade (S2). */
+  readonly encounters: { stop(): void; start(): void };
   player(): PlayerController | null;
   mapData(): MapData | null;
   loadMap(mapId: string): Promise<void>;
   setPaused(paused: boolean): void;
-  /** Camera and tilemap after the player was placed. */
+  /** After the player was placed: the game's saved tile, the camera and the tilemap. */
   redraw(): void;
 }
 
 /** A warp or door: fade (or zoom into a door), load the target map, place the player, fade in. */
 export class FieldTransition {
+  private running = false;
+
   constructor(private readonly host: FieldTransitionHost) {}
 
+  /** A map change is under way: the field takes no input and meets no monsters until it is over (S2). */
+  get active(): boolean {
+    return this.running;
+  }
+
   async run(transition: MapTransition): Promise<void> {
+    this.running = true;
+    this.host.encounters.stop();
+    try {
+      await this.change(transition);
+    } finally {
+      this.running = false;
+      this.host.encounters.start();
+    }
+  }
+
+  /**
+   * A cutscene's `warp` step (T2): load `w.map` (its music, encounters and NPCs on the current flags) and stand on
+   * the named entrance or cell, facing `w.facing`. The cutscene's own fades hide it.
+   */
+  async warp(w: CutsceneWarp): Promise<void> {
+    const host = this.host;
+    await host.loadMap(w.map);
+    const map = host.mapData();
+    const player = host.player();
+    if (!map || !player) throw new Error(`warp to ${w.map}: the map did not load`);
+    const at = w.entrance !== undefined ? entrancePosition(map, w.entrance) : { x: w.x ?? 0, y: w.y ?? 0 };
+    player.setPosition(at.x, at.y);
+    if (w.facing) player.face(w.facing);
+    host.redraw();
+  }
+
+  private async change(transition: MapTransition): Promise<void> {
     const host = this.host;
     // Disembark vehicle on map transition — return to walking
     const before = host.player();

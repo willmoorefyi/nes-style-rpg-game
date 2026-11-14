@@ -1,5 +1,8 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { SaveManager } from '../../src/systems/SaveManager.js';
+import { TitleScene } from '../../src/scenes/TitleScene.js';
+import type { Game } from '../../src/core/Game.js';
+import { createMockGame } from '../helpers/testUtils.js';
 
 // Mock localStorage for Node.js test environment
 const localStorageMock = (() => {
@@ -97,5 +100,64 @@ describe('TitleScene business logic', () => {
       onSelect('continue');
       expect(navigatedTo).toBe('loadMenu');
     });
+  });
+});
+
+describe('TitleScene (S3, S6, I3)', () => {
+  /** A mock game whose confirm key is down on every frame (two fast presses arrive on consecutive updates). */
+  function titleGame() {
+    const game = createMockGame();
+    let confirm = false;
+    game.input.isJustPressed = vi.fn((a: string) => confirm && a === 'confirm');
+    game.scenes.switchTo = vi.fn().mockResolvedValue(undefined);
+    game.scenes.push = vi.fn().mockResolvedValue(undefined);
+    return { game, press: (on: boolean) => { confirm = on; } };
+  }
+
+  it('a double confirm on New Game switches to party creation once', () => {
+    const { game, press } = titleGame();
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    press(true);
+    scene.update(1);
+    scene.update(1);
+    expect(game.scenes.switchTo).toHaveBeenCalledTimes(1);
+    expect(game.scenes.switchTo).toHaveBeenCalledWith('partyCreation');
+  });
+
+  it('after the load menu is closed (onResume) the title takes a choice again', () => {
+    const { game, press } = titleGame();
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    press(true);
+    scene.update(1);
+    scene.onResume();
+    scene.update(1);
+    expect(game.scenes.switchTo).toHaveBeenCalledTimes(2);
+  });
+
+  it('a failed scene change lets the player choose again', async () => {
+    const { game, press } = titleGame();
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    game.scenes.switchTo = vi.fn().mockRejectedValueOnce(new Error('chunk failed')).mockResolvedValue(undefined);
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    press(true);
+    scene.update(1);
+    await new Promise((r) => setTimeout(r, 0));
+    scene.update(1);
+    expect(game.scenes.switchTo).toHaveBeenCalledTimes(2);
+    expect(err).toHaveBeenCalled();
+    err.mockRestore();
+  });
+
+  it('plays the title track on enter and again on resume (a no-op while it already plays)', () => {
+    const { game } = titleGame();
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    expect(game.audio.playMusic).toHaveBeenCalledWith('title');
+    scene.onResume();
+    expect(game.audio.playMusic).toHaveBeenCalledTimes(2);
+    expect(game.audio.playMusic).toHaveBeenLastCalledWith('title');
   });
 });
