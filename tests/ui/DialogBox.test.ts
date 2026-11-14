@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { Graphics } from 'pixi.js';
 import { DialogBox } from '../../src/ui/DialogBox.js';
 import { InputManager } from '../../src/core/InputManager.js';
 
@@ -85,5 +86,41 @@ describe('I2: cancel advances dialogs, and a ▼ marks more text', () => {
       seen.add(dialog.moreShown);
     }
     expect(seen).toEqual(new Set([true, false]));
+  });
+});
+
+describe('U22: the ▼ marker is drawn large enough to see', () => {
+  it('is at least 24 x 16 px and still blinks on page 1 of 2', () => {
+    const dialog = new DialogBox({ linesPerPage: 1, revealSpeed: 0 });
+    dialog.show('Page1\nPage2');
+    const { width, height } = dialog.moreMarkerSize;
+    expect(width).toBeGreaterThanOrEqual(24);
+    expect(height).toBeGreaterThanOrEqual(16);
+    const seen = new Set<boolean>();
+    for (let i = 0; i < 80; i++) {
+      dialog.update(1, mockInput({}));
+      seen.add(dialog.moreShown);
+    }
+    expect(seen).toEqual(new Set([true, false]));
+  });
+
+  it('sits inside the box, at the bottom right of its content', () => {
+    const dialog = new DialogBox({ linesPerPage: 1, revealSpeed: 0 });
+    dialog.show('Page1\nPage2');
+    dialog.update(1, mockInput({}));
+    const marker = dialog.children.find((c) => c.visible && c instanceof Graphics && c.width >= 24);
+    expect(marker).toBeDefined();
+    const win = dialog.children[0];
+    expect(marker!.x + marker!.width).toBeLessThanOrEqual(win.width);
+    expect(marker!.y + marker!.height).toBeLessThanOrEqual(win.height);
+  });
+});
+
+describe('createMoreMarker', () => {
+  it('is 28 x 20 by default', async () => {
+    const { createMoreMarker } = await import('../../src/ui/moreMarker.js');
+    const g = createMoreMarker();
+    expect(Math.round(g.width)).toBe(28);
+    expect(Math.round(g.height)).toBe(20);
   });
 });

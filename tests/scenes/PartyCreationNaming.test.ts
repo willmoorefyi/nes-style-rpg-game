@@ -183,3 +183,48 @@ describe('N2: the opening plays from cutscenes.yaml', () => {
     }
   });
 });
+
+describe('U7: leaving party creation for the title asks first', () => {
+  const header = (scene: PartyCreationScene) => visibleLabels(scene.container).some((l) => l.startsWith('Choose class for slot 1'));
+
+  it('cancel on slot 1 opens the box on No; No keeps the scene', () => {
+    const { scene, press, game } = setup();
+    press('cancel');
+    expect(scene.leavePromptOpen).toBe(true);
+    expect(visibleLabels(scene.container).join(' ')).toContain('Return to the title?');
+    expect(game.scenes.switchTo).not.toHaveBeenCalled();
+    press('confirm');                // the cursor starts on No
+    expect(scene.leavePromptOpen).toBe(false);
+    expect(game.scenes.switchTo).not.toHaveBeenCalled();
+    expect(header(scene)).toBe(true);
+  });
+
+  it('Yes returns to the title', () => {
+    const { scene, press, game } = setup();
+    press('cancel', 'up', 'confirm');
+    expect(scene.leavePromptOpen).toBe(false);
+    expect(game.scenes.switchTo).toHaveBeenCalledWith('title');
+  });
+
+  it('from a fresh FGHTR grid, 11 cancels leave the box open, the 12th returns to class select; never the title', () => {
+    const { scene, press, game } = setup();
+    press('confirm');                // Warrior: the grid with FGHTR
+    for (let i = 0; i < 11; i++) press('cancel');
+    expect(scene.leavePromptOpen).toBe(true);
+    press('cancel');
+    expect(scene.leavePromptOpen).toBe(false);
+    expect(header(scene)).toBe(true);
+    expect(game.scenes.switchTo).not.toHaveBeenCalled();
+  });
+
+  it('New Game after a title round trip names the Warrior FGHTR again', () => {
+    const { scene, press, game } = setup();
+    press('confirm', 'up', 'confirm');                   // Warrior, then type '3' over the default
+    press('cancel', 'cancel');                           // delete it, leave the grid
+    press('cancel', 'up', 'confirm');                    // the box, then Yes: to the title
+    expect(game.scenes.switchTo).toHaveBeenCalledWith('title');
+    scene.enter();                                       // New Game again
+    press('confirm');
+    expect(visibleLabels(scene.container)).toContain('Name: FGHTR_');
+  });
+});

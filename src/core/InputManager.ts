@@ -24,6 +24,9 @@ export class InputManager {
   private previousKeys = new Set<string>();
   /** Keys whose (non-repeat) keydown arrived since the last update(); a tap that is released before the tick still counts. */
   private pressedThisFrame = new Set<string>();
+  /** update() calls left during which isJustPressed is false (holdOff), and the actions held (null: all). */
+  private holdFrames = 0;
+  private heldActions: Set<InputAction> | null = null;
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundKeyUp: (e: KeyboardEvent) => void;
   /** Focus left the page: a key held then never sends its keyup, so every key is released (I1). */
@@ -54,6 +57,8 @@ export class InputManager {
   }
 
   private releaseAll(): void {
+    this.holdFrames = 0;
+    this.heldActions = null;
     this.currentKeys.clear();
     this.previousKeys.clear();
     this.pressedThisFrame.clear();
@@ -62,6 +67,22 @@ export class InputManager {
   update(): void {
     this.previousKeys = new Set(this.currentKeys);
     this.pressedThisFrame.clear();
+    if (this.holdFrames > 0 && --this.holdFrames === 0) this.heldActions = null;
+  }
+
+  /**
+   * Mark a boundary (scene entry, dialog close, U2/U12): presses so far are spent, and for the next `frames`
+   * update() calls isJustPressed is false for `actions` (all when omitted). isPressed is unaffected.
+   * A second call keeps the larger remaining count (and widens the held actions).
+   */
+  holdOff(frames: number, actions?: InputAction[]): void {
+    this.previousKeys = new Set(this.currentKeys);
+    this.pressedThisFrame.clear();
+    const widen = this.holdFrames > 0;
+    if (!actions) this.heldActions = null;
+    else if (!widen) this.heldActions = new Set(actions);
+    else if (this.heldActions) actions.forEach(a => this.heldActions?.add(a));
+    this.holdFrames = Math.max(this.holdFrames, frames);
   }
 
   isPressed(action: InputAction): boolean {
@@ -71,6 +92,7 @@ export class InputManager {
   }
 
   isJustPressed(action: InputAction): boolean {
+    if (this.holdFrames > 0 && (this.heldActions === null || this.heldActions.has(action))) return false;
     return this.getKeysForAction(action).some(
       k => this.pressedThisFrame.has(k) || (this.currentKeys.has(k) && !this.previousKeys.has(k))
     );

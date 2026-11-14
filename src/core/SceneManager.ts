@@ -14,9 +14,12 @@ export class SceneManager {
   /** Scene changes in flight; no scene is updated until its enter() has resolved (S1). */
   private transitions = 0;
   readonly stage: Container;
+  /** Called once each switchTo / push / pop has finished (not for a joined repeat): Game holds input off (U2). */
+  private onSettled: (() => void) | undefined;
 
-  constructor(stage: Container) {
+  constructor(stage: Container, opts: { onSettled?: () => void } = {}) {
     this.stage = stage;
+    this.onSettled = opts.onSettled;
   }
 
   register(name: string, scene: Scene): void {
@@ -62,6 +65,7 @@ export class SceneManager {
       } finally {
         this.transitions--;
         this.running.delete(key);
+        this.onSettled?.();
       }
     })();
     this.running.set(key, run);
@@ -126,6 +130,7 @@ export class SceneManager {
       prev.scene.onResume?.();
     } finally {
       this.transitions--;
+      this.onSettled?.();
     }
   }
 

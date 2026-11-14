@@ -138,4 +138,68 @@ describe('InputManager', () => {
       expect(input.isPressed('right')).toBe(true);
     });
   });
+
+  describe('holdOff (U2)', () => {
+    it('after holdOff(8) a fresh press is not just-pressed for 8 updates, and is afterwards', () => {
+      input.holdOff(8);
+      for (let i = 0; i < 8; i++) {
+        pressKey('KeyZ');
+        expect(input.isJustPressed('confirm')).toBe(false);
+        expect(input.isPressed('confirm')).toBe(true);
+        releaseKey('KeyZ');
+        input.update();
+      }
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(true);
+    });
+
+    it('holds a press for exactly the given number of update() calls', () => {
+      input.holdOff(8);
+      for (let i = 0; i < 7; i++) input.update();
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(false);
+      input.update();
+      releaseKey('KeyZ');
+      input.update();
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(true);
+    });
+
+    it('spends a press already waiting when it is called', () => {
+      pressKey('KeyZ');
+      releaseKey('KeyZ');
+      input.holdOff(1);
+      input.update();
+      expect(input.isJustPressed('confirm')).toBe(false);
+    });
+
+    it('a key held through the hold-off is not just-pressed afterwards', () => {
+      pressKey('KeyZ');
+      input.holdOff(8);
+      for (let i = 0; i < 8; i++) input.update();
+      expect(input.isPressed('confirm')).toBe(true);
+      expect(input.isJustPressed('confirm')).toBe(false);
+    });
+
+    it('holds only the listed actions', () => {
+      input.holdOff(5, ['confirm']);
+      pressKey('KeyZ');
+      pressKey('KeyX');
+      expect(input.isJustPressed('confirm')).toBe(false);
+      expect(input.isJustPressed('cancel')).toBe(true);
+    });
+
+    it('a second call keeps the larger remaining count', () => {
+      input.holdOff(10);
+      input.update();
+      input.holdOff(2);
+      for (let i = 0; i < 8; i++) input.update();
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(false);
+      input.update();
+      releaseKey('KeyZ');
+      pressKey('KeyZ');
+      expect(input.isJustPressed('confirm')).toBe(true);
+    });
+  });
 });

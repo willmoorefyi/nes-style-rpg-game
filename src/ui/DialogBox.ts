@@ -1,10 +1,10 @@
-import { BitmapText, Container } from 'pixi.js';
+import { Container, type Graphics } from 'pixi.js';
 import { wrapText } from './textUtils.js';
 import { Window } from './Window.js';
 import { TextRenderer } from './TextRenderer.js';
-import { NES_FONT } from './NESFont.js';
+import { createMoreMarker } from './moreMarker.js';
 import type { InputManager } from '../core/InputManager.js';
-import { GAME_WIDTH, GAME_HEIGHT, CHAR_WIDTH, WINDOW_PADDING, FONT_SIZE } from '../core/LayoutConstants.js';
+import { GAME_WIDTH, GAME_HEIGHT, CHAR_WIDTH, WINDOW_PADDING } from '../core/LayoutConstants.js';
 
 /** Frames the "more" marker stays on, then off (I2). */
 const MORE_BLINK_FRAMES = 30;
@@ -28,8 +28,8 @@ export class DialogBox extends Container {
   private onComplete?: () => void;
   /** Another text follows this one (the dialog manager has more lines or a queued dialog). */
   private more = false;
-  /** Blinking ▼ at the bottom right while a revealed page has another page or text after it. */
-  private moreMarker: BitmapText;
+  /** Blinking drawn ▼ at the bottom right while a revealed page has another page or text after it (U22). */
+  private moreMarker: Graphics;
   private blinkFrames = 0;
 
   constructor(config: DialogBoxConfig = {}) {
@@ -52,10 +52,10 @@ export class DialogBox extends Container {
     this.textRenderer.position.set(this.window.contentX, this.window.contentY);
     this.addChild(this.textRenderer);
 
-    this.moreMarker = new BitmapText({ text: '▼', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.moreMarker = createMoreMarker();
     this.moreMarker.position.set(
-      this.window.contentX + this.window.contentWidth - FONT_SIZE,
-      this.window.contentY + this.window.contentHeight - FONT_SIZE,
+      this.window.contentX + this.window.contentWidth - this.moreMarker.width,
+      this.window.contentY + this.window.contentHeight - this.moreMarker.height,
     );
     this.moreMarker.visible = false;
     this.addChild(this.moreMarker);
@@ -127,4 +127,8 @@ export class DialogBox extends Container {
   get totalPages(): number { return this.pages.length; }
   /** The ▼ "more" marker is lit this frame. */
   get moreShown(): boolean { return this.moreMarker.visible; }
+  /** The marker's size in px (U22). */
+  get moreMarkerSize(): { width: number; height: number } {
+    return { width: this.moreMarker.width, height: this.moreMarker.height };
+  }
 }

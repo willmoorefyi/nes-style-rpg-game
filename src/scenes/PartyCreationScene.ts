@@ -4,6 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import type { NameEntryGrid } from '../ui/NameEntryGrid.js';
+import { ConfirmBox } from '../ui/ConfirmBox.js';
 import { buildClassPreview, buildSlotDisplay, type SlotStrip } from './partyCreation/PartyCreationViews.js';
 import { buildConfirmStep, buildNameStep } from './partyCreation/PartyCreationSteps.js';
 import { OpeningSequence } from './partyCreation/OpeningSequence.js';
@@ -13,6 +14,9 @@ import { STARTING_GOLD } from '../entities/PartyManager.js';
 import { characterAtlas } from '../rendering/CharacterAtlas.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, SCREEN_MARGIN, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
+
+/** Asked before party creation goes back to the title (U7); it opens on No, and X answers No. */
+export const LEAVE_PROMPT = 'Return to the title? The party so far is lost.';
 
 export class PartyCreationScene implements Scene {
   readonly container = new Container();
@@ -28,6 +32,7 @@ export class PartyCreationScene implements Scene {
   private confirmMenu?: Menu;
   private nameGrid?: NameEntryGrid;
   private slotStrip?: SlotStrip;
+  private leaveBox?: ConfirmBox; // "Return to the title?" while it is open
   private phase: 'select' | 'name' | 'confirm' | 'cutscene' = 'select';
 
   private previewDisplay!: Container;
@@ -40,8 +45,11 @@ export class PartyCreationScene implements Scene {
 
   /** The class menu's cursor, or -1 when it is not shown. */
   get classIndex(): number { return this.phase === 'select' && this.classMenu ? this.classMenu.selectedIndex : -1; }
+  /** The "Return to the title?" box is open. */
+  get leavePromptOpen(): boolean { return this.leaveBox !== undefined; }
 
   enter(): void {
+    this.leaveBox = undefined;
     this.opening.reset();
     this.selectedClasses = [];
     this.names = [];
@@ -158,6 +166,10 @@ export class PartyCreationScene implements Scene {
   }
 
   update(dt: number): void {
+    if (this.leaveBox) {
+      this.leaveBox.update(this.game.input);
+      return;
+    }
     if (this.phase === 'cutscene') {
       this.opening.update(dt, this.game.input);
       return;
@@ -192,8 +204,22 @@ export class PartyCreationScene implements Scene {
     if (this.currentSlot > 0) {
       this.backToClassSelect();
     } else {
-      this.game.scenes.switchTo('title');
+      this.askLeave();
     }
+  }
+
+  /** Slot 1's cancel: only a Yes goes back to the title (U7). */
+  private askLeave(): void {
+    const box = new ConfirmBox({
+      prompt: LEAVE_PROMPT, defaultNo: true, eventBus: this.game.events,
+      onAnswer: (yes) => {
+        this.container.removeChild(box);
+        this.leaveBox = undefined;
+        if (yes) this.game.scenes.switchTo('title');
+      },
+    });
+    this.leaveBox = box;
+    this.container.addChild(box);
   }
 
   private async beginAdventure(): Promise<void> {

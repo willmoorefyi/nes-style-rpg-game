@@ -72,3 +72,16 @@ export function restoreBattleSnapshot(game: RetryState, snap: BattleRetrySnapsho
   game.pendingEntrance = null;
   return copy.battle;
 }
+
+/** Below this share of max HP a member counts as hurt when the battle began. */
+const WEAK_HP_SHARE = 0.25;
+
+/**
+ * 'weak' when the snapshot's party went into the battle with someone fallen or under 25 % HP: Game Over then
+ * suggests Return to Field instead of replaying the same doomed fight (U4).
+ */
+export function retryAdvice(snap: BattleRetrySnapshot): 'weak' | 'ok' {
+  const party = PartyManager.fromJSON(structuredClone(snap.party));
+  const weak = party.all.some((m) => m.currentHp <= 0 || m.currentHp < m.maxHp * WEAK_HP_SHARE);
+  return weak ? 'weak' : 'ok';
+}

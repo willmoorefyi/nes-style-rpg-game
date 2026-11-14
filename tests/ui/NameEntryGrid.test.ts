@@ -1,5 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
-import { NameEntryGrid, normalizeName, uniqueDefaultName } from '../../src/ui/NameEntryGrid.js';
+import { NameEntryGrid, normalizeName, uniqueDefaultName, NAME_GRID_HELP } from '../../src/ui/NameEntryGrid.js';
+import { visibleLabels } from '../helpers/realData.js';
+
+describe('U7: the name grid help line', () => {
+  it('shows under the grid', () => {
+    const g = new NameEntryGrid({ defaultName: 'FGHTR', onDone: () => {}, onExit: () => {} });
+    expect(NAME_GRID_HELP).toBe('Z: type   X: delete   Choose End when done.');
+    expect(g.help).toBe(NAME_GRID_HELP);
+    expect(visibleLabels(g)).toContain(NAME_GRID_HELP);
+  });
+});
 import type { InputManager } from '../../src/core/InputManager.js';
 import { tapInput } from '../helpers/realData.js';
 

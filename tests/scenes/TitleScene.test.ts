@@ -1,4 +1,8 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { Container } from 'pixi.js';
 import { SaveManager } from '../../src/systems/SaveManager.js';
 import { TitleScene } from '../../src/scenes/TitleScene.js';
 import type { Game } from '../../src/core/Game.js';
@@ -159,5 +163,37 @@ describe('TitleScene (S3, S6, I3)', () => {
     scene.onResume();
     expect(game.audio.playMusic).toHaveBeenCalledTimes(2);
     expect(game.audio.playMusic).toHaveBeenLastCalledWith('title');
+  });
+});
+
+describe('TitleScene: a second confirm does not leak into party creation (U2)', () => {
+  it('the party-creation scene sees no just-pressed confirm from a press one frame after New Game', async () => {
+    const { Game } = await import('../../src/core/Game.js');
+    const game = new Game();
+    vi.spyOn(game.audio, 'playMusic').mockResolvedValue(undefined);
+    game.input.attach();
+    const seen: boolean[] = [];
+    game.scenes.register('title', new TitleScene(game));
+    game.scenes.register('partyCreation', {
+      container: new Container(),
+      enter: () => {},
+      exit: () => {},
+      update: () => { seen.push(game.input.isJustPressed('confirm')); },
+    });
+    const frame = () => { game.scenes.update(1); game.input.update(); };
+    const key = (type: 'keydown' | 'keyup') => window.dispatchEvent(new KeyboardEvent(type, { code: 'KeyZ' }));
+    try {
+      await game.scenes.switchTo('title');
+      for (let i = 0; i < 10; i++) frame();
+      key('keydown'); key('keyup');
+      frame(); // the title takes New Game
+      await new Promise((r) => setTimeout(r, 0)); // the switch settles
+      expect(game.scenes.current).toBe('partyCreation');
+      key('keydown'); key('keyup'); // the second tap, one frame later
+      frame(); frame(); frame();
+      expect(seen).toEqual([false, false, false]);
+    } finally {
+      game.input.detach();
+    }
   });
 });

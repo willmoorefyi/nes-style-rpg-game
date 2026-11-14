@@ -9,6 +9,9 @@ import { BattleTrigger } from '../../src/systems/BattleTrigger.js';
 import { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
 import { NPC } from '../../src/entities/NPC.js';
 import type { MapData } from '../../src/types/index.js';
+import { DialogManager } from '../../src/systems/DialogManager.js';
+import { InputManager } from '../../src/core/InputManager.js';
+import { loadRealRegistries } from '../helpers/realData.js';
 
 describe('ExplorationScene', () => {
   let game: MockGame;
@@ -265,5 +268,116 @@ describe('R1 field control (S2, E10, B1, E1)', () => {
     confirmFrames(game, scene, 1);
     expect(game.gameFlags.has('GIFT')).toBe(false);
     expect(game.inventory.getQuantity('potion')).toBe(99);
+  });
+});
+
+describe('U9 chest and gift wording', () => {
+  beforeEach(async () => { await loadRealRegistries(); });
+  afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+  const chest = (dialog: string[]) => createMapData({
+    id: 'house', width: 10, height: 10,
+    npcs: [{ id: 'chest', x: 3, y: 3, sprite: 'chest', dialog, chestItem: 'potion', chestFlag: 'CHEST_POTION' }],
+  });
+
+  it('a chest shows its own data line', async () => {
+    const { game, scene } = await fieldAt(chest(['You found a Potion!']), 3, 2);
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    confirmFrames(game, scene, 1);
+    expect(start).toHaveBeenCalledWith(['You found a Potion!']);
+  });
+
+  it('a chest with no line of its own falls back to the shared wording', async () => {
+    const { game, scene } = await fieldAt(chest([]), 3, 2);
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    confirmFrames(game, scene, 1);
+    expect(start).toHaveBeenCalledWith(['You found a Potion!']);
+  });
+
+  it('a full bag: found, then left behind; the chest stays closed', async () => {
+    const { game, scene } = await fieldAt(chest(['You found a Potion!']), 3, 2);
+    game.inventory.add('potion', 99);
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    confirmFrames(game, scene, 1);
+    expect(start).toHaveBeenCalledWith(['You found a Potion!', "You can't carry another Potion, so you leave it."]);
+    expect(game.gameFlags.has('CHEST_POTION')).toBe(false);
+  });
+
+  it("the princess's gift ends 'You received the Lute!'", async () => {
+    const map = createMapData({ id: 'room', width: 10, height: 10,
+      npcs: [{ id: 'princess', x: 3, y: 3, sprite: 'princess', dialog: ['Please take this.'], giftItem: 'lute', giftFlag: 'GOT_LUTE' }] });
+    const { game, scene } = await fieldAt(map, 3, 2);
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    confirmFrames(game, scene, 1);
+    expect(start).toHaveBeenCalledWith(['Please take this.', 'You received the Lute!']);
+  });
+
+  it("a gift with no room: \"You can't carry another Potion.\"", async () => {
+    const map = createMapData({ id: 'room', width: 10, height: 10,
+      npcs: [{ id: 'elder', x: 3, y: 3, sprite: 'old_man', dialog: ['Take this.'], giftItem: 'potion', giftFlag: 'GIFT' }] });
+    const { game, scene } = await fieldAt(map, 3, 2);
+    game.inventory.add('potion', 99);
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    confirmFrames(game, scene, 1);
+    expect(start).toHaveBeenCalledWith(['Take this.', "You can't carry another Potion."]);
+  });
+});
+
+describe('U5: the field sprite is the first living member', () => {
+  afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+  it("a KO'd leader hands the sprite to the next living member on resume", async () => {
+    const getArt = vi.spyOn(PlaceholderTextures.prototype, 'getPlayerArt');
+    const warrior = { name: 'FGHTR', classData: { id: 'warrior' }, currentHp: 30, maxHp: 30 };
+    const thief = { name: 'THIEF', classData: { id: 'thief' }, currentHp: 20, maxHp: 20 };
+    const map = createMapData({ id: 'town', width: 10, height: 10 });
+    const game0 = createMockGame(map);
+    game0.party.get.mockImplementation((i: number) => [warrior, thief][i] ?? null);
+    game0.party.all = [warrior, thief];
+    const game = { ...game0, events: new EventBus(), currentMapId: 'town', playerPosition: { x: 3, y: 4 } };
+    const scene = new ExplorationScene(game as unknown as Game);
+    await scene.enter();
+    expect(getArt).toHaveBeenLastCalledWith('warrior');
+    warrior.currentHp = 0;
+    scene.onPause();
+    scene.onResume();
+    expect(getArt).toHaveBeenLastCalledWith('thief');
+  });
+});
+
+describe('U12: mashing confirm after a dialog closes does not talk again', () => {
+  afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+  it('confirm on every frame for 20 frames after the close starts no new talk; a later press does', async () => {
+    // a real InputManager on a stand-in window (this file runs without a DOM)
+    const win = new EventTarget();
+    vi.stubGlobal('window', win);
+    vi.stubGlobal('document', Object.assign(new EventTarget(), { hidden: false }));
+    const input = new InputManager();
+    input.attach();
+    const tapZ = (): void => {
+      for (const type of ['keydown', 'keyup']) win.dispatchEvent(Object.assign(new Event(type), { code: 'KeyZ', repeat: false }));
+    };
+    const map = createMapData({ id: 'hall', width: 10, height: 10,
+      npcs: [{ id: 'king', x: 3, y: 3, sprite: 'king', dialog: ['Thank you.'] }] });
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => (k === 'ff1_controlsSeen' ? 'true' : null), setItem: () => {}, removeItem: () => {},
+    });
+    const game = { ...createMockGame(map), events: new EventBus(), input, currentMapId: 'hall', playerPosition: { x: 3, y: 2 } };
+    const scene = new ExplorationScene(game as unknown as Game);
+    await scene.enter();
+    const start = vi.spyOn(DialogManager.prototype, 'start');
+    const holdOff = vi.spyOn(input, 'holdOff');
+    const frame = (): void => { scene.update(1); input.update(); };
+    tapZ(); frame();                          // talk to the King
+    expect(start).toHaveBeenCalledTimes(1);
+    for (let i = 0; i < 30 && holdOff.mock.calls.length === 0; i++) { tapZ(); frame(); } // reveal, then close
+    expect(holdOff).toHaveBeenCalledWith(24, ['confirm']);
+    for (let i = 0; i < 20; i++) { tapZ(); frame(); }
+    expect(start).toHaveBeenCalledTimes(1);   // the mash after the close talked to nobody
+    for (let i = 0; i < 5; i++) frame();
+    tapZ(); frame();
+    expect(start).toHaveBeenCalledTimes(2);   // a deliberate press later talks again
+    input.detach();
   });
 });

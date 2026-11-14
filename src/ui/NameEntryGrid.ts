@@ -15,6 +15,8 @@ const BACK = 'Back';
 const END = 'End';
 /** Back and End are each drawn three letter cells wide. */
 const WIDE_CELLS = 3;
+/** The help line under the grid (U7). */
+export const NAME_GRID_HELP = 'Z: type   X: delete   Choose End when done.';
 
 /** Trim, keep only `[A-Za-z0-9 .-]`, cap at 6 characters; an empty name means `fallback`. */
 export function normalizeName(raw: string, fallback: string): string {
@@ -53,6 +55,7 @@ export class NameEntryGrid extends Container {
   private readonly config: NameEntryGridConfig;
   private readonly nameText: BitmapText;
   private readonly cursorText: BitmapText;
+  private readonly helpLine: BitmapText;
 
   constructor(config: NameEntryGridConfig) {
     super();
@@ -71,11 +74,14 @@ export class NameEntryGrid extends Container {
       this.text(cell === ' ' ? 'SP' : cell, 36 + c * (cell.length > 1 ? CELL_W * WIDE_CELLS : CELL_W), 80 + r * CELL_H);
     }));
     this.cursorText = this.text('▶', 0, 0);
+    this.helpLine = this.text(NAME_GRID_HELP, 0, 80 + this.rows.length * CELL_H + 16);
     this.redraw();
   }
 
   /** The name as currently entered (before trimming / defaulting). */
   get value(): string { return this.entered; }
+  /** The help line shown under the grid. */
+  get help(): string { return this.helpLine.text; }
   /** Label of the cell under the cursor (`'A'`, `' '`, `'Back'`, `'End'`). */
   get cursorCell(): string { return this.rows[this.row][this.col]; }
 

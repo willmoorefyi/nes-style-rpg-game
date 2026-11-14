@@ -11,9 +11,13 @@ export interface FieldPlayer {
   leaderClassId: string;
 }
 
-/** The party leader's class id (the field sprite's art); a warrior when the party is empty. */
-export function leaderClassId(game: Game): string {
-  return game.party.get(0)?.classData.id ?? 'warrior';
+/**
+ * The class id the field sprite wears: the first living member's, as in FF1 (U5); member 0's when all are down,
+ * a warrior when the party is empty.
+ */
+export function leaderClassId(game: Pick<Game, 'party'>): string {
+  const lead = game.party.all.find((m) => m.currentHp > 0) ?? game.party.get(0);
+  return lead?.classData.id ?? 'warrior';
 }
 
 /** Build the field hero on (x, y) wearing the leader's art (or the placeholder sprite when the atlas is missing). */

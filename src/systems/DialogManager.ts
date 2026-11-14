@@ -1,6 +1,14 @@
 import type { DialogBox } from '../ui/DialogBox.js';
 import type { InputManager } from '../core/InputManager.js';
 
+/** Frames after the field's last dialog line closes during which confirm can't start a new talk (400 ms; U12). */
+export const DIALOG_CLOSE_HOLDOFF_FRAMES = 24;
+
+export interface DialogManagerOptions {
+  /** Hold confirm off for this many frames once the last dialog closes (nothing queued); 0 or unset: no hold-off. */
+  closeHoldOffFrames?: number;
+}
+
 export class DialogManager {
   private dialogBox: DialogBox;
   private currentDialog: string[] = [];
@@ -10,8 +18,13 @@ export class DialogManager {
   /** Dialogs requested while another one is showing (e.g. several level-up messages). */
   private queue: Array<{ lines: string[]; onComplete?: () => void }> = [];
 
-  constructor(dialogBox: DialogBox) {
+  private closeHoldOffFrames: number;
+  /** The input of the last update(); the hold-off goes to it (a mock without holdOff is skipped). */
+  private input: Partial<Pick<InputManager, 'holdOff'>> | null = null;
+
+  constructor(dialogBox: DialogBox, opts: DialogManagerOptions = {}) {
     this.dialogBox = dialogBox;
+    this.closeHoldOffFrames = opts.closeHoldOffFrames ?? 0;
   }
 
   /** Show `lines`; `onComplete` runs once, after the last line is dismissed. */
@@ -38,6 +51,8 @@ export class DialogManager {
         const next = this.queue.shift();
         if (next) this.start(next.lines, next.onComplete);
       }
+      // the last box closed: the press that closed it, or a mash right after, must not talk again (U12)
+      if (!this._isActive && this.closeHoldOffFrames > 0) this.input?.holdOff?.(this.closeHoldOffFrames, ['confirm']);
     }
   }
 
@@ -66,6 +81,7 @@ export class DialogManager {
   }
 
   update(dt: number, input: InputManager): void {
+    this.input = input;
     this.dialogBox.update(dt, input);
   }
 

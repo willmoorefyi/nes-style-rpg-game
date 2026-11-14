@@ -389,4 +389,50 @@ describe('S1 / S3: scene changes in flight', () => {
     await manager.pop();
     expect(manager.depth).toBe(0);
   });
+
+  describe('onSettled (U2)', () => {
+    it('is called once after switchTo, push and pop', async () => {
+      const onSettled = vi.fn();
+      const m = new SceneManager(new Container(), { onSettled });
+      m.register('a', createMockScene());
+      m.register('b', createMockScene());
+      await m.switchTo('a');
+      expect(onSettled).toHaveBeenCalledTimes(1);
+      await m.push('b');
+      expect(onSettled).toHaveBeenCalledTimes(2);
+      await m.pop();
+      expect(onSettled).toHaveBeenCalledTimes(3);
+    });
+
+    it('is not called again for a joined change', async () => {
+      const onSettled = vi.fn();
+      const m = new SceneManager(new Container(), { onSettled });
+      m.register('a', createMockScene());
+      const first = m.switchTo('a');
+      const second = m.switchTo('a');
+      await Promise.all([first, second]);
+      expect(onSettled).toHaveBeenCalledTimes(1);
+    });
+
+    it('is called only once the change has completed', async () => {
+      const calls: string[] = [];
+      const scene = createMockScene();
+      scene.enter = vi.fn(async () => { await Promise.resolve(); calls.push('enter'); });
+      const m = new SceneManager(new Container(), { onSettled: () => calls.push('settled') });
+      m.register('a', scene);
+      await m.switchTo('a');
+      expect(calls).toEqual(['enter', 'settled']);
+    });
+  });
+
+  it('Game builds its SceneManager so that every settled change calls input.holdOff(8) (U2)', async () => {
+    const { Game, SCENE_ENTRY_HOLDOFF_FRAMES } = await import('../../src/core/Game.js');
+    expect(SCENE_ENTRY_HOLDOFF_FRAMES).toBe(8);
+    const game = new Game();
+    const holdOff = vi.spyOn(game.input, 'holdOff');
+    game.scenes.register('a', createMockScene());
+    await game.scenes.switchTo('a');
+    expect(holdOff).toHaveBeenCalledTimes(1);
+    expect(holdOff).toHaveBeenCalledWith(8);
+  });
 });

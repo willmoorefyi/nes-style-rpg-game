@@ -7,6 +7,7 @@ export function createMockInput() {
   return {
     isPressed: vi.fn().mockReturnValue(false),
     isJustPressed: vi.fn((action: InputAction) => action === pressedThisFrame),
+    holdOff: vi.fn(),
     press(action: InputAction) { pressedThisFrame = action; },
     clear() { pressedThisFrame = null; },
   };
@@ -45,6 +46,7 @@ export function createMockGame(mapData?: MapData) {
       attach: vi.fn(),
       detach: vi.fn(),
       update: vi.fn(),
+      holdOff: vi.fn(),
     },
     events: { on: vi.fn(), off: vi.fn(), emit: vi.fn() },
     data: { loadMap: vi.fn().mockResolvedValue(map), loadEnemies: vi.fn().mockResolvedValue([]), loadSpells: vi.fn().mockResolvedValue([]) },

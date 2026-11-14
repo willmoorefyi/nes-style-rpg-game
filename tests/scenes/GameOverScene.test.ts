@@ -5,7 +5,7 @@ import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import { Character } from '../../src/entities/Character.js';
 import type { DataLoader } from '../../src/core/DataLoader.js';
 import type { CharacterClassData } from '../../src/types/index.js';
-import { GameOverScene } from '../../src/scenes/GameOverScene.js';
+import { GameOverScene, WEAK_RETRY_HINT } from '../../src/scenes/GameOverScene.js';
 import type { Game } from '../../src/core/Game.js';
 import { createMockAudio } from '../helpers/testUtils.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
@@ -111,5 +111,56 @@ describe('GameOverScene', () => {
     expect(game.playTime).toBe(99);            // play time keeps counting
     expect(game.pendingBattle).toEqual(garland);
     expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
+  });
+
+  describe('U4: Return to Field and the weak-party hint', () => {
+    /** A two-member party snapshot; the second member went in at `hp2` HP. */
+    function withSnapshot(hp2: number) {
+      const { game, press } = createGame();
+      game.party.add(new Character({ name: 'FGHTR', classData: ClassRegistry.getClass('warrior')! }));
+      game.party.add(new Character({ name: 'THIEF', classData: ClassRegistry.getClass('thief')! }));
+      game.party.all[1].currentHp = hp2;
+      game.battleRetry = captureBattleSnapshot(game as unknown as Game, garland);
+      game.party.all[0].currentHp = 0;
+      game.party.all[1].currentHp = 0;
+      return { game, press, snapHp: [game.battleRetry!.party.members[0].currentHp, hp2] };
+    }
+
+    it('a weak snapshot: four choices, the hint, the cursor on Return to Field', () => {
+      const { game } = withSnapshot(1);
+      const scene = new GameOverScene(game as unknown as Game);
+      scene.enter();
+      expect(scene.choices).toEqual(['Retry Battle', 'Return to Field', 'Load Game', 'Title']);
+      expect(scene.hintText?.replace(/\s+/g, ' ')).toBe(WEAK_RETRY_HINT);
+      expect(scene.selectedIndex).toBe(1);
+    });
+
+    it('Return to Field restores the snapshot with no battle queued', () => {
+      const { game, press, snapHp } = withSnapshot(1);
+      const scene = new GameOverScene(game as unknown as Game);
+      scene.enter();
+      press(scene, 'confirm');
+      expect(game.party.all.map((m) => m.currentHp)).toEqual(snapHp);
+      expect(game.pendingBattle).toBeNull();
+      expect(game.currentMapId).toBe('temple-of-fiends');
+      expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
+    });
+
+    it('a healthy snapshot: no hint, the cursor on Retry Battle', () => {
+      const { game } = withSnapshot(1000);
+      const scene = new GameOverScene(game as unknown as Game);
+      scene.enter();
+      expect(scene.choices).toEqual(['Retry Battle', 'Return to Field', 'Load Game', 'Title']);
+      expect(scene.hintText).toBeNull();
+      expect(scene.selectedIndex).toBe(0);
+    });
+
+    it('no snapshot: no Retry Battle or Return to Field', () => {
+      const { game } = createGame();
+      const scene = new GameOverScene(game as unknown as Game);
+      scene.enter();
+      expect(scene.choices).toEqual(['Load Game', 'Title']);
+      expect(scene.hintText).toBeNull();
+    });
   });
 });

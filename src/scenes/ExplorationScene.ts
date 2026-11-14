@@ -14,7 +14,7 @@ import { ErrorDisplay } from '../ui/ErrorDisplay.js';
 import { PlaceholderTextures } from '../rendering/PlaceholderTextures.js';
 import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
-import { DialogManager } from '../systems/DialogManager.js';
+import { DialogManager, DIALOG_CLOSE_HOLDOFF_FRAMES } from '../systems/DialogManager.js';
 import { BattleTrigger, type BattleEndData } from '../systems/BattleTrigger.js';
 import { KeyItemGateSystem } from '../systems/KeyItemGateSystem.js';
 import { VehicleManager } from '../systems/VehicleManager.js';
@@ -27,7 +27,7 @@ import { FieldHUD, HUD_BOTTOM_BAND } from '../ui/FieldHUD.js';
 import { FieldTransition } from './exploration/FieldTransition.js';
 import { createFieldPlayer, leaderClassId, type FieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
-import { ItemRegistry } from '../data/ItemRegistry.js';
+import { foundText, leftBehindText, receivedText, cantCarryText } from '../systems/pickupText.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { inspectAt } from './exploration/FieldInspect.js';
@@ -35,10 +35,6 @@ import { createFieldStateSystems, openShopScene } from './exploration/FieldSyste
 import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
-
-const itemName = (id: string): string => ItemRegistry.getItem(id)?.name ?? id;
-/** A chest or gift the bag has no room for (E1). */
-const cannotCarry = (id: string): string => `You found ${itemName(id)}, but you can't carry any more.`;
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -99,7 +95,7 @@ export class ExplorationScene implements Scene {
     this.placeholders = new PlaceholderTextures({ app: game.app });
     const dialogBox = new DialogBox({ onComplete: () => this.dialogManager.advance() });
     dialogBox.visible = false;
-    this.dialogManager = new DialogManager(dialogBox);
+    this.dialogManager = new DialogManager(dialogBox, { closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES });
     this.mapLoader = new MapLoader(game.data, this.placeholders);
     this.battleTrigger = new BattleTrigger(game);
     this.battleTrigger.setCutscenePlayer((id) => this.playCutscene(id));
@@ -400,12 +396,14 @@ export class ExplorationScene implements Scene {
           this.dialogManager.start(['Already opened.']);
         } else if (!this.game.inventory.canAdd(npc.chestItem)) {
           // E1: a full bag leaves the chest closed for later
-          this.dialogManager.start([cannotCarry(npc.chestItem)]);
+          this.dialogManager.start([foundText(npc.chestItem), leftBehindText(npc.chestItem)]);
         } else {
           this.game.inventory.add(npc.chestItem, 1);
           this.game.gameFlags.set(npc.chestFlag);
           npc.setOpened();
-          this.dialogManager.start([`Found ${itemName(npc.chestItem)}!`]);
+          // the chest's own line ("You found a Potion!", U9), else the shared wording
+          const own = resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag));
+          this.dialogManager.start(own.length > 0 ? [...own] : [foundText(npc.chestItem)]);
         }
         return;
       }
@@ -415,8 +413,8 @@ export class ExplorationScene implements Scene {
           if (this.game.inventory.canAdd(npc.giftItem)) {
             this.game.inventory.add(npc.giftItem, 1);
             this.game.gameFlags.set(npc.giftFlag);
-            lines.push(`Received ${itemName(npc.giftItem)}!`);
-          } else lines.push(cannotCarry(npc.giftItem));
+            lines.push(receivedText(npc.giftItem));
+          } else lines.push(cantCarryText(npc.giftItem));
         }
         if (lines.length > 0) {
           // Store NPC for post-dialog action (shop, class upgrade, cutscene, a fight it starts (B1), etc.)

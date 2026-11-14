@@ -22,6 +22,8 @@ import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
 
 export const WIDTH = GAME_WIDTH;
 export const HEIGHT = GAME_HEIGHT;
+/** Frames after every scene change during which no press counts as new (about 133 ms; U2). */
+export const SCENE_ENTRY_HOLDOFF_FRAMES = 8;
 
 export class Game {
   readonly app: Application;
@@ -46,9 +48,11 @@ export class Game {
 
   constructor() {
     this.app = new Application();
-    this.scenes = new SceneManager(this.app.stage);
-    this.assets = new AssetLoader();
     this.input = new InputManager();
+    this.scenes = new SceneManager(this.app.stage, {
+      onSettled: () => this.input.holdOff(SCENE_ENTRY_HOLDOFF_FRAMES),
+    });
+    this.assets = new AssetLoader();
     this.events = new EventBus();
     this.data = new DataLoader(this.assets);
     this.party = new PartyManager();
