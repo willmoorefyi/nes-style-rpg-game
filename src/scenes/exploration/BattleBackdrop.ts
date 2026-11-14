@@ -7,22 +7,37 @@ export type BattleBackdropConfig = MapData['battleBackgrounds'];
 /** TerrainType name at a cell (e.g. `'FOREST'`, any case), or undefined off the map / without a collision map. */
 export type TerrainAt = (x: number, y: number) => string | undefined;
 
+/** A grass cell with at least this many forest 4-neighbours counts as forest (organic outlines draw forest over it). */
+export const FOREST_EDGE_NEIGHBOURS = 2;
+
+const NEIGHBOURS: ReadonlyArray<readonly [number, number]> = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+
+/** Lowercase terrain at `pos`, with grass on a forest edge read as forest; undefined when unknown. */
+export function backdropTerrain(pos: TilePos, terrainAt: TerrainAt): string | undefined {
+  const terrain = terrainAt(pos.x, pos.y)?.toLowerCase();
+  if (terrain !== 'grass') return terrain;
+  const forests = NEIGHBOURS.filter(([dx, dy]) => terrainAt(pos.x + dx, pos.y + dy)?.toLowerCase() === 'forest').length;
+  return forests >= FOREST_EDGE_NEIGHBOURS ? 'forest' : terrain;
+}
+
 /**
- * Background id for a battle started at `pos`: the map's per-terrain override (keys are lowercase TerrainType
- * names), else the map default; undefined when the map has no table. `pos` is null when there is no player yet.
- * `zoneId` is the encounter zone at `pos` (`EncounterSystem.zoneAt`); `battleBackgrounds.zones` is not read yet.
+ * Background id for a battle started at `pos`: the encounter zone's table first (`zones[zoneId]`: its per-terrain
+ * override, then its default), then the map's per-terrain override (keys are lowercase TerrainType names), then the
+ * map default; undefined when the map has no table. `pos` is null when there is no player yet. `zoneId` is the
+ * encounter zone at `pos` (`EncounterSystem.zoneAt`).
  */
 export function battleBackdropId(
   cfg: BattleBackdropConfig,
   pos: TilePos | null,
   terrainAt: TerrainAt,
-  _zoneId: string | null,
+  zoneId: string | null,
 ): string | undefined {
   if (!cfg) return undefined;
-  let id = cfg.default;
-  if (pos && cfg.terrain) {
-    const terrain = terrainAt(pos.x, pos.y);
-    id = (terrain && cfg.terrain[terrain.toLowerCase()]) || id;
+  const terrain = pos ? backdropTerrain(pos, terrainAt) : undefined;
+  const zone = zoneId ? cfg.zones?.[zoneId] : undefined;
+  if (zone) {
+    const id = (terrain && zone.terrain?.[terrain]) || zone.default;
+    if (id) return id;
   }
-  return id;
+  return (terrain && cfg.terrain?.[terrain]) || cfg.default;
 }

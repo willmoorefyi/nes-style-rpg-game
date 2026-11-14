@@ -165,12 +165,63 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     });
   });
 
-  describe('battle stage backgrounds (map backgrounds: crossFileValidation)', () => {
+  describe('battle stage backgrounds', () => {
     const scenarioBackgrounds = readYaml<Array<{ background?: string }>>('data/debug-scenarios.yaml')
       .map((s) => s.background).filter((x): x is string => !!x);
 
     it.each([...new Set(scenarioBackgrounds)])('debug scenario background %s exists', (path) => {
       expect(existsSync(resolve(assets, '..', path))).toBe(true);
+    });
+
+    // Only the referenced (act-1) ids are committed; the other STAGES ids stay staged locally (FIX_PLAN T6 revision 1).
+    type Table = { default?: string; terrain?: Record<string, string> };
+    const tableIds = (t: Table | undefined): string[] => (t ? [t.default, ...Object.values(t.terrain ?? {})] : [])
+      .filter((x): x is string => !!x);
+    const mapIds = ['maps', 'maps/ai', '../assets-src/maps'].flatMap((dir) => readdirSync(join(assets, dir))
+      .filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+      .flatMap((f) => {
+        const cfg = readYaml<{ battleBackgrounds?: Table & { zones?: Record<string, Table> } }>(`${dir}/${f}`).battleBackgrounds;
+        return [...tableIds(cfg), ...Object.values(cfg?.zones ?? {}).flatMap(tableIds)];
+      }));
+    // The overworld's encounter-zone backdrops (T6a contract: temple_approach forest, east_pocket) and the beach.
+    const act1ZoneIds = ['dark_forest', 'ruined_forest', 'shoreline'];
+    const scenarioIds = scenarioBackgrounds.map((p) => p.match(/^assets\/backgrounds\/(\w+)\.webp$/)?.[1] ?? p);
+    const referenced = [...new Set([...mapIds, ...act1ZoneIds, ...scenarioIds])].sort();
+    const stageScript = readFileSync(join(assets, '../assets-src/tools/stage_backgrounds.py'), 'utf-8');
+    const stagesBody = stageScript.slice(stageScript.indexOf('STAGES = {'), stageScript.indexOf('\n}\n'));
+    const stageIds = new Set([...stagesBody.matchAll(/^\s+"(\w+)": \(/gm)].map((m) => m[1]));
+
+    /** Width and height of a WebP file (lossy VP8, lossless VP8L or extended VP8X). */
+    const webpSize = (buf: Buffer): [number, number] => {
+      expect(buf.toString('ascii', 0, 4) + buf.toString('ascii', 8, 12)).toBe('RIFFWEBP');
+      const chunk = buf.toString('ascii', 12, 16);
+      if (chunk === 'VP8 ') return [buf.readUInt16LE(26) & 0x3fff, buf.readUInt16LE(28) & 0x3fff];
+      if (chunk === 'VP8L') {
+        const b = buf.readUInt32LE(21);
+        return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1];
+      }
+      expect(chunk).toBe('VP8X');
+      return [buf.readUIntLE(24, 3) + 1, buf.readUIntLE(27, 3) + 1];
+    };
+
+    it('the act-1 temple and zone ids are referenced', () => {
+      expect(referenced).toEqual(expect.arrayContaining(['temple', 'dark_forest', 'ruined_forest', 'shoreline']));
+    });
+
+    it.each(referenced)('background "%s" is a staged id with a 1920x1080 webp', (id) => {
+      expect(stageIds.has(id), `${id} in STAGES`).toBe(true);
+      const path = join(assets, 'backgrounds', `${id}.webp`);
+      expect(existsSync(path), path).toBe(true);
+      expect(webpSize(readFileSync(path))).toEqual([1920, 1080]);
+    });
+
+    it('STAGES lists the 21 TF-3 sources under their snake_case stems, temple = evil-temple, fiend_hall kept', () => {
+      const tf3 = ['abandoned_castle', 'chaos', 'cracked_earth', 'dark_forest', 'evil_temple', 'fire_temple', 'ice_cave',
+        'magic_forest', 'magma_temple', 'palace', 'red_forest', 'ruined_forest', 'sky_palace', 'swamp_cave', 'throne_kary',
+        'throne_kraken', 'throne_lich', 'throne_tiamat', 'tower_of_babel', 'town', 'water_temple'];
+      for (const id of tf3) expect(stagesBody, id).toContain(`"${id}": ("${id.replace(/_/g, '-')}-hd.png"`);
+      expect(stagesBody).toContain('"temple": ("evil-temple-hd.png"');
+      expect(stagesBody).toContain('"fiend_hall": ("temple-of-fiends-hd.png"');
     });
   });
 

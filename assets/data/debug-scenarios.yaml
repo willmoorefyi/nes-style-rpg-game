@@ -319,3 +319,29 @@
   items: {}
   gold: 100
   enemies: []
+
+# T6g (TF-3): the Temple of Fiends background candidates, Garland plus the temple formation
+# (open with ?mute=1&scenario=<id>). evil_temple won and is staged as `temple` too.
+- id: t6_bg_evil_temple
+  name: T6g - temple background evil_temple
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THIEF, level: 3, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 3, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [garland, skeleton, skeleton, gr_imp, gr_imp]
+  background: assets/backgrounds/evil_temple.webp
+
+- id: t6_bg_abandoned_castle
+  name: T6g - temple background abandoned_castle
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THIEF, level: 3, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 3, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [garland, skeleton, skeleton, gr_imp, gr_imp]
+  background: assets/backgrounds/abandoned_castle.webp
