@@ -447,3 +447,26 @@ npx vitest run tests/scenes/battle/ tests/data/assetCoverage.test.ts tests/rende
 | O4 | Accepted: gather → rise is where the pixel source switches, from idle to cast. |
 | O5 | Accepted: once the arc is dropped, the glaive in lich `atk_follow` is a bare shaft. |
 | O6 | The dragon's hurt in-betweens get no continuity exemption by default. If its 3 iterations fail, escalate to the user with the best images. |
+
+### Revisions after the momus review (binding)
+
+Momus verdict: REVISE (4 must, 6 should, 8 nits). All are adopted, and they override the fix plan where the two differ.
+
+1. **New checks stay out of the build gate until V.3.** `check_sprite(..., efix_gates: bool = True)` is threaded into `frame_checks`. `monster_anim.py check/review` pass `True`; `monster_atlas.sprite_frames` passes `False` until the integrator flips it in V.3 (one line). `selftest_efix` tests F3–F5 and F7 on synthetic fixtures only, so wave-0 selftest stays ALL PASSED.
+2. **E3 uses the merge option only.** Delete lich `blade` (`lich.yaml:99`) and its mask (`:124-125`), add the polygon to `masks.trail.attack`, and drop the `tr` tweaks (`:153`, `:159`). F3 stays "fx-mask pixels labelled as any other part".
+3. **The fx scope is enforced.** `selftest_efix` gets an allowlist check: fx parts must be exactly `{garland: {glow}, lich: {trail, crystal}, vampire: {slash}}`. Rule for §3: no new `kind: fx` without orchestrator approval.
+4. **The E4 crystal assertion is added by the integrator in V.3**, as a selftest on the real lich: the crystal in `cast_rise` is at most 40 % of its size in `cast`. It is listed in the V.3 pass criteria.
+5. **Lich `hurt_in2` crease:** 18 of the 19 px are the flat bottom edge of `masks.head.hurt` (`lich.yaml:137`) at y 112, x 131–149, opened by `neck [4,-3]` (`:174`). Reshape the mask edge onto an existing ink line, or paint the edge. Don't change the tweak, because the height check depends on it.
+6. **Locks follow V.1.** A V.1 rejection returns to the tranche owner and counts as one iteration; escalate after 3. Run `lock <id>` only after V.1 passes, then hand the locks to the integrator.
+7. **Browser checks for E1, E13 and E17 run in real battles, not step mode.** For E1: `?mute=1&scenario=anim_status`, with no `enemyAnim`. In round 1 the mages cast SLEP and HOLD, the knight and the ninja use Potions, and the goblins live. From round 2 on, watch each goblin's turn: read the pose through `window.__game`, or screenshot the announce and execute frames. E13 and E17 follow the same approach. Step-mode URLs use the full form, e.g. `?mute=1&scenario=anim_goblin&enemyAnim=step`.
+8. **The E1 lookahead mirrors the tick.** It uses enemy `data.stats.hp` and party `char.maxHp`, and requires poison damage > 0. If a shared helper is extracted, `src/battle/StatusTick.ts` joins tranche R. Unit test: sleep with 1 turn left still skips, because `skipTurn` is computed before the status expires.
+9. **gr_imp stays unchanged.** In V.3, crop its cells by the JSON frame rects and compare the HEAD atlas with the rebuilt one; they must be byte-equal.
+10. **F1 excludes the fx's own outline.** It excludes fx-labelled pixels plus any `-2` outline pixels 8-adjacent to fx pixels. The selftest and the check use this same definition.
+11. **E4 crystal:** drop the orphaned `cm` tweaks (`:184`, `:189`) and re-derive `cry`.
+12. **E7:** re-derive the `atk_follow` hump paint (`troll.yaml:130-131`).
+13. **E6:** a rig-level `width: 16` is in cell px (not scaled).
+14. **F4:** "fully inside" means all 8 neighbours are opaque.
+15. **E1 mocks:** needed only in `turnListFit`, `enemyPoseFlow` and `meleeContact` (3 places).
+16. **Expected reds:** the expected-red list is matched by frame, not by message.
+17. **E13:** the dying start pose follows the frame on screen: `hurt` → `DYING_IN`, `hurt_in2` → `HURT_REHIT_AT`, `hurt_in1` → 0.
+18. **Wave-0 changes during the wave:** an on-call wave-0 fix lands on `enemy-anim`; the requesting worktree merges it, and the other tranches pick it up at integration. E16's test-only atlas is built by copying the JSON and deleting one sheet entry in a temp dir (no repo change).
