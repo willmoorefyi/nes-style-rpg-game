@@ -57,10 +57,13 @@ def build() -> list[Path]:
     for (x, y) in [(6, 2), (1, 6)]:
         r.thing("crate", x, y)
     r.chest("fisher", "potion", "a Potion", 1, 4)
+    wife = "My husband is down at the river bend again. He swears the big ones only bite at dusk."
     r.npc("fisher_wife", "villager_f", 5, 4, [
-        "My husband is down at the river bend again. He swears the big ones only bite at dusk.",
-        "Take the potion in the chest, if you need it. He never remembers to use them."])
-    out.append(r.save("The fisher's cottage: one room with a bed, a table, barrels and crates.", {"floor": wood(1.05)}))
+        {"condition": "CHEST_HOUSE_FISHER", "text": [wife, "I'm glad that potion went to someone who'll use it."]},
+        {"text": [wife, "Take the potion in the chest, if you need it. He never remembers to use them."]}])
+    out.append(r.save("The fisher's cottage: one room with a bed, a table, barrels and crates.",
+                      {"floor": wood(1.05), "in_wall_face": {"from": "in_wall_face", "shade": 0.8},
+                       "in_wall_top": {"from": "slate", "shade": 0.6}}))
 
     # (50,49) red / ochre: the farmhouse by the crops, earth floor and a hearth
     r = house("farm", "Farmhouse", 11, 9, [3])
@@ -79,13 +82,14 @@ def build() -> list[Path]:
         r.thing("crate", x, y)
     r.deco([["crops"]], 9, 7)
     r.chest("farm", "antidote", "an Antidote", 1, 7)
-    r.npc("farmer", "villager", 6, 6, [
+    farm = ["Wolves came right up to the fence last night. Bold as you like.",
+            "If you're heading out, travel together. They pick off stragglers."]
+    r.npc("farmer", "farmer", 6, 6, [
         {"condition": "GARLAND_DEFEATED",
          "text": ["The wolves have been bolder since the dark came. Lost two hens last week.",
                   "Keep an antidote handy out there. Some beasts bite worse than wolves."]},
-        {"text": ["Wolves came right up to the fence last night. Bold as you like.",
-                  "If you're heading out, travel together. They pick off stragglers.",
-                  "There's an antidote in the chest by the door. Take it, take it."]}])
+        {"condition": "CHEST_HOUSE_FARM", "text": farm},
+        {"text": [*farm, "There's an antidote in the chest by the door. Take it, take it."]}])
     out.append(r.save("The farmhouse by the crops: an earth floor, a hearth, sacks and crates in the store.",
                       {"floor_stone": "dirt", "in_wall_face": {"from": "castle_face", "shade": 0.95}}))
 
@@ -112,14 +116,16 @@ def build() -> list[Path]:
     r.one("desk", 7, 7)
     r.one("armor_stand", 11, 5)
     r.thing("crate", 11, 7)
-    r.chest("knight", "wooden_nunchaku", "Wooden Nunchaku", 9, 7)
+    r.chest("knight", "iron_helm", "an Iron Helm", 9, 7)          # M10: not sold in Cornelia
+    knight = ["I served the King's guard with Garland, before my knees gave out.",
+              "He fights with great two-handed sweeps. Strike when the blade is still coming round."]
     r.npc("old_knight", "guard", 2, 4, [
         {"condition": "GARLAND_DEFEATED",
          "text": ["So Garland fell to you. I trained beside him for twenty years.",
                   "He always dropped his guard after a big swing. I hope that is how you beat him."]},
-        {"text": ["I served the King's guard with Garland, before my knees gave out.",
-                  "He fights with great two-handed sweeps. Strike when the blade is still coming round.",
-                  "Take what is in the chest in my armoury. An old man has no use for it now."]}])
+        {"condition": "CHEST_HOUSE_KNIGHT",
+         "text": [*knight, "That helm kept my head on my shoulders for thirty years. May it do the same for you."]},
+        {"text": [*knight, "Take what is in the chest in my armoury. An old man has no use for it now."]}])
     out.append(r.save("A retired knight's house: a hall with a hearth and tapestries, and an armoury beyond an inner door.",
                       {"floor_stone": "floor_stone", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
                       [190, 196, 206]))
@@ -144,8 +150,8 @@ def build() -> list[Path]:
     r.thing("barrel", 10, 5)
     r.one("plant", 1, 6)
     r.npc("weaver", "villager_f", 3, 3, [
-        "Every rug in this room took me a season. That blue one took two.",
+        "Every rug in this room took me a season. That one on the left took two.",
         "Garland bought a cloak from me once. Paid in full, and polite as a prince. I can't believe what they say."])
     out.append(r.save("The weaver's shop-home: rugs laid out on the floor, hangings on every wall.",
-                      {"floor": wood(0.95)}, [150, 60, 110]))
+                      {"floor": wood(0.95), "in_wall_face": {"from": "in_wall_face", "shade": 0.85}}, [150, 60, 110]))
     return out

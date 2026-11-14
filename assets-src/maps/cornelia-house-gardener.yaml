@@ -12,6 +12,9 @@ materials:
   floor:
     from: floor
     shade: 1.1
+  in_wall_face:
+    from: wall_face
+    shade: 1.1
 ground: |
   WWWWWWWWWW
   WFFFFFFFFW
@@ -80,14 +83,18 @@ npcs:
   chestFlag: CHEST_HOUSE_GARDENER
   dialog: [You found a Tent!]
 - id: royal_gardener
-  sprite: villager
+  sprite: farmer
   x: 5
   y: 5
-  dialog: [Seedlings for the castle gardens. The princess chose every one herself., 'If you sleep out under the stars, a tent keeps the dew off.
-      There''s one in the chest. Go on.']
+  dialog:
+  - condition: CHEST_HOUSE_GARDENER
+    text: [Seedlings for the castle gardens. The princess chose every one herself., Keep that tent dry and it will serve you for years.]
+  - text: [Seedlings for the castle gardens. The princess chose every one herself., 'If you sleep out under the stars, a tent keeps the dew off.
+        There''s one in the chest. Go on.']
 transitions:
 - {x: 3, y: 8, targetMap: cornelia, targetEntrance: house_gardener}
 encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true

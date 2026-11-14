@@ -19,8 +19,8 @@ ground: |
   WWWWWWWWWWW
   WFFFFFFFFFW
   WFFFFFFFFFW
-  W____c____W
-  W____c____W
+  W_________W
+  W_________W
   Wccccc____W
   W_________W
   W_________W
@@ -75,6 +75,16 @@ objects:
 - type: deco
   parts:
   - [armor_stand]
+  x: 5
+  y: 3
+- type: deco
+  parts:
+  - [armor_stand]
+  x: 5
+  y: 4
+- type: deco
+  parts:
+  - [armor_stand]
   x: 9
   y: 3
 - {type: barrel, x: 9, y: 7}
@@ -91,3 +101,13 @@ encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true
+unreachable_ok:
+- [1, 3]
+- [2, 3]
+- [3, 3]
+- [4, 3]
+- [1, 4]
+- [2, 4]
+- [3, 4]
+- [4, 4]

@@ -45,7 +45,7 @@ describe('castle stairwells (CA-1)', () => {
       const map = compiled(id);
       const col = new CollisionMap(map);
       const top = map.transitions.filter((t) => t.y === o.y && t.x >= o.x && t.x <= o.x + 1);
-      expect(top.map((t) => t.x).sort(), `${id}: both top cells lead down`).toEqual([o.x, o.x + 1]);
+      expect(top.map((t) => t.x).sort((a, b) => a - b),`${id}: both top cells lead down`).toEqual([o.x, o.x + 1]);
       expect(new Set(top.map((t) => `${t.targetMap}:${t.targetEntrance}`)).size).toBe(1);
       // the lower row is solid, and an arrival tile sits directly above the stairwell
       expect(col.isWalkable(o.x, o.y + 1, walk) || col.isWalkable(o.x + 1, o.y + 1, walk)).toBe(false);

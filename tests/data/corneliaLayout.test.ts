@@ -240,3 +240,141 @@ describe('Cornelia signpost and townsfolk (CT-9 / UI-2)', () => {
     }
   });
 });
+
+// ── R4a: the town and interior second pass ──
+const INTERIORS = [...homes.map(({ o }) => o.enter!.map), ...SHOPS];
+interface Placed { type: string; parts?: string[][]; x: number; y: number; on_wall?: boolean; collide?: string;
+  offset?: number[] }
+const placed = (id: string) => (sources.get(id)!.objects ?? []) as unknown as Placed[];
+/** Steps on the compiled collision with every NPC cell blocked, from (sx, sy) to (tx, ty). */
+function stepsBetween(m: MapData, [sx, sy]: [number, number], [tx, ty]: [number, number]): number {
+  const col = new CollisionMap(m);
+  const npcs = new Set(m.npcs.map((n) => `${n.x},${n.y}`));
+  const dist = new Map([[`${sx},${sy}`, 0]]);
+  const queue: Array<[number, number]> = [[sx, sy]];
+  while (queue.length) {
+    const [x, y] = queue.shift()!;
+    if (x === tx && y === ty) return dist.get(`${x},${y}`)!;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy, k = `${nx},${ny}`;
+      if (dist.has(k) || npcs.has(k) || !col.isWalkable(nx, ny, walk)) continue;
+      dist.set(k, dist.get(`${x},${y}`)! + 1);
+      queue.push([nx, ny]);
+    }
+  }
+  return Infinity;
+}
+
+describe('Cornelia second pass (R4a)', () => {
+  it('the castle apron stays open: no static NPC on row 19, and the door is 3 steps from either side (M1)', () => {
+    const map = compiled('cornelia');
+    expect(map.npcs.filter((n) => !n.wander && n.y === 19 && n.x >= 10 && n.x <= 50).map((n) => n.id)).toEqual([]);
+    for (const from of [[27, 19], [33, 19]] as Array<[number, number]>) {
+      expect(stepsBetween(map, from, [30, 19]), `(${from})`).toBeLessThanOrEqual(3);
+    }
+  });
+
+  it('a keeper can only be reached across the counter in front of them (M3)', () => {
+    for (const id of [...SHOPS, 'cornelia-house-tavern']) {
+      const m = compiled(id);
+      const col = new CollisionMap(m);
+      const seen = reachable(m);
+      for (const k of m.npcs.filter((n) => n.shopId || n.id === 'barkeep')) {
+        expect(col.isCounter(k.x, k.y + 1), `${id} ${k.id}`).toBe(true);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, -1]]) {
+          expect(seen.has(`${k.x + dx},${k.y + dy}`), `${id}: (${k.x + dx}, ${k.y + dy}) beside ${k.id}`).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('every interior checks for unreachable floor, and only the staff side of a counter is out of reach (M4)', () => {
+    expect(INTERIORS.length).toBe(16);
+    for (const id of INTERIORS) {
+      const src = sources.get(id)! as Source & { no_unreachable_walkable?: boolean; unreachable_ok?: Array<[number, number]> };
+      expect(src.no_unreachable_walkable, id).toBe(true);
+      const m = compiled(id);
+      const col = new CollisionMap(m);
+      const seen = reachable({ ...m, npcs: [] });
+      const ok = new Set((src.unreachable_ok ?? []).map(([x, y]) => `${x},${y}`));
+      for (let y = 0; y < m.height; y++) {
+        for (let x = 0; x < m.width; x++) {
+          if (col.isWalkable(x, y, walk) && !seen.has(`${x},${y}`)) expect(ok.has(`${x},${y}`), `${id} (${x}, ${y})`).toBe(true);
+        }
+      }
+      const keepers = m.npcs.filter((n) => n.shopId || n.id === 'barkeep');
+      for (const [x, y] of src.unreachable_ok ?? []) {
+        const behind = Array.from({ length: m.height - y - 1 }, (_, i) => y + 1 + i).some((cy) => col.isCounter(x, cy));
+        const beside = keepers.some((k) => Math.abs(k.x - x) + Math.abs(k.y - y) <= 1);
+        expect(behind || beside, `${id} (${x}, ${y}) is behind a counter`).toBe(true);
+      }
+    }
+  });
+
+  it('beds and bookshelves on the floor stand against the wall and block only their art (M5)', () => {
+    let n = 0;
+    for (const id of INTERIORS) {
+      const col = new CollisionMap(compiled(id));
+      for (const o of placed(id)) {
+        const top = o.parts?.[0]?.[0];
+        if (o.on_wall || (top !== 'bed_top' && top !== 'bookshelf_top')) continue;
+        n++;
+        expect(o.collide, `${id} ${top} (${o.x}, ${o.y})`).toBe('alpha');
+        expect(o.offset?.[1] ?? 0, `${id} ${top} (${o.x}, ${o.y})`).toBeLessThan(0);
+        if (top === 'bed_top') expect(col.isWalkable(o.x, o.y + 1, walk), `${id} below the bed (${o.x}, ${o.y})`).toBe(true);
+      }
+    }
+    expect(n).toBe(19);                    // + 16 in the castle (castleLayout): the 35 of M5
+  });
+
+  it('every gate passage has a turret on both sides (M7)', () => {
+    const turrets = placed('cornelia').filter((o) => o.parts?.[0]?.[0] === 'tower_0_0')
+      .map((o) => ({ x0: o.x, x1: o.x + 1, y0: o.y, y1: o.y + 2 }));
+    const overlaps = (a0: number, a1: number, b0: number, b1: number) => a0 <= b1 && b0 <= a1;
+    // [x0, x1, y0, y1, the passage runs north-south (flanked west and east) or west-east (flanked north and south)]
+    const gates: Array<[string, number, number, number, number, 'ns' | 'we']> = [
+      ['south', 29, 31, 66, 71, 'ns'], ['inner', 29, 31, 31, 32, 'ns'], ['postern', 6, 7, 0, 1, 'ns'],
+      ['west', 0, 3, 44, 45, 'we'], ['east', 56, 61, 44, 45, 'we'], ['precinct east', 56, 61, 24, 25, 'we']];
+    for (const [name, x0, x1, y0, y1, dir] of gates) {
+      const sides = dir === 'ns'
+        ? [turrets.some((t) => t.x1 >= x0 - 3 && t.x1 < x0 && overlaps(t.y0, t.y1, y0 - 2, y1 + 2)),
+          turrets.some((t) => t.x0 > x1 && t.x0 <= x1 + 3 && overlaps(t.y0, t.y1, y0 - 2, y1 + 2))]
+        : [turrets.some((t) => t.y1 >= y0 - 3 && t.y1 < y0 && overlaps(t.x0, t.x1, x0, x1)),
+          turrets.some((t) => t.y0 > y1 && t.y0 <= y1 + 3 && overlaps(t.x0, t.x1, x0, x1))];
+      expect(sides, `${name} gate`).toEqual([true, true]);
+    }
+  });
+
+  it('no NPC sprite is overused, and the roles have fitting sprites (M8)', () => {
+    const cornelia = (parse(readFileSync(join(root, 'assets/maps/ai/index.yaml'), 'utf-8')) as string[])
+      .filter((id) => id.startsWith('cornelia')).map(compiled);
+    const count = new Map<string, number>();
+    for (const m of cornelia) for (const n of m.npcs) if (n.sprite !== 'chest') count.set(n.sprite, (count.get(n.sprite) ?? 0) + 1);
+    // R4a reading of the caps: guard per map (the castle guards keep their uniforms), the others over all of Cornelia
+    for (const m of cornelia) expect(m.npcs.filter((n) => n.sprite === 'guard').length, `${m.id} guards`).toBeLessThanOrEqual(6);
+    const caps: Record<string, number> = { old_man: 6, villager_f: 8, mage: 7 };
+    for (const [sprite, cap] of Object.entries(caps)) expect(count.get(sprite) ?? 0, sprite).toBeLessThanOrEqual(cap);
+    const sprite = (id: string) => cornelia.flatMap((m) => m.npcs).find((n) => n.id === id)?.sprite;
+    expect([sprite('hall_noble'), sprite('chancellor')]).toEqual(['burgher', 'burgher']);
+    expect([sprite('farmer'), sprite('royal_gardener')]).toEqual(['farmer', 'farmer']);
+    expect([sprite('fisher'), sprite('cellar_steward')]).toEqual(['villager', 'villager']);
+  });
+
+  it('no two interiors share a palette, and the weapon shop counter is one straight run (M9)', () => {
+    const key = (id: string) => {
+      const m = (sources.get(id) as Source & { materials?: Record<string, unknown> }).materials ?? {};
+      return JSON.stringify(['in_wall_face', 'in_wall_top', 'floor', 'floor_stone'].map((k) => m[k] ?? null));
+    };
+    const keys = INTERIORS.map(key);
+    expect(new Set(keys).size, INTERIORS.map((id, i) => `${id} ${keys[i]}`).join('\n')).toBe(16);
+    const rowsW = sources.get('cornelia-weapon-shop')!.ground.trimEnd().split('\n');
+    expect(rowsW.flatMap((r, y) => (r.includes('c') ? [y] : []))).toEqual([5]);
+  });
+
+  it("the knight's gift is an Iron Helm, which no Cornelia shop sells (M10)", () => {
+    const knight = compiled('cornelia-house-knight').npcs.find((n) => n.chestItem)!;
+    expect(knight.chestItem).toBe('iron_helm');
+    const shops = parse(readFileSync(join(root, 'assets/data/shops.yaml'), 'utf-8')) as Array<{ id: string; inventory?: string[] }>;
+    for (const s of shops.filter((sh) => sh.id.startsWith('cornelia_'))) expect(s.inventory ?? [], s.id).not.toContain('iron_helm');
+  });
+});

@@ -202,6 +202,30 @@ def test_field_atlas() -> None:
         mirrored = all((rows["right"][:, i * gw:(i + 1) * gw] == rows["left"][:, i * gw:(i + 1) * gw][:, ::-1]).all() for i in range(3))
         check(mirrored, f"{cid}: right row is the left row mirrored frame by frame")
         check(cid not in meta.get("fallbacks", {}), f"{cid}: every direction has approved art (fallbacks {meta.get('fallbacks', {}).get(cid)})")
+    # M6 (R4a): each chest frame (closed, open, closed) is one run of opaque columns: no key-fringe column beside it
+    if "chest" in meta["sheets"]:
+        o = meta["sheets"]["chest"]
+        for i, name in enumerate(("closed", "open", "closed")):
+            f = a[o["y"]:o["y"] + gh, o["x"] + i * gw:o["x"] + (i + 1) * gw]
+            cols = np.where((f[..., 3] > 0).any(0))[0]
+            check(len(cols) > 0 and cols.max() - cols.min() + 1 == len(cols),
+                  f"chest frame {i} ({name}): opaque columns {cols.min() if len(cols) else None}-"
+                  f"{cols.max() if len(cols) else None} have no gap")
+    # W15 (R4a): vendor_f's back stand frame shows the same short shawl as its walk frames (head_from), not the long
+    # brown cloak the approved stand frame drew
+    if "vendor_f" in meta["sheets"]:
+        o = meta["sheets"]["vendor_f"]
+        r = meta["rowNames"].index("up")
+        up = a[o["y"] + r * gh:o["y"] + (r + 1) * gh, o["x"]:o["x"] + meta["cols"] * gw].astype(int)
+
+        def brown(i: int) -> int:
+            f = up[:, i * gw:(i + 1) * gw]
+            rr, gg, bb = f[..., 0], f[..., 1], f[..., 2]
+            return int(((f[..., 3] > 0) & (rr > gg) & (gg > bb) & (rr > 70) & (rr < 140) & (gg - bb < 30)).sum())
+        steps = [brown(i) for i in range(1, meta["cols"])]
+        mean = sum(steps) / len(steps)
+        check(abs(brown(0) - mean) <= 0.15 * mean,
+              f"vendor_f up: stand frame brown-shawl px {brown(0)} within 15% of the walk frames' mean {mean:.0f}")
 
 
 def test_style_lock() -> None:

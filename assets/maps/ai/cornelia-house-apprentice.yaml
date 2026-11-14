@@ -25,8 +25,11 @@ npcs:
   sprite: mage
   x: 2
   y: 4
-  dialog: ['A spell isn''t cast from nothing. Each level has its own charges, and sleep restores them.', 'Spend the strong ones on the strong foes. And an ether brings charges back, too. I keep one for
-      emergencies.']
+  dialog:
+  - condition: CHEST_HOUSE_APPRENTICE
+    text: ['A spell isn''t cast from nothing. Each level has its own charges, and sleep restores them.', 'You found my ether? Keep it. Charges are worth more out there than in here.']
+  - text: ['A spell isn''t cast from nothing. Each level has its own charges, and sleep restores them.', 'Spend the strong ones on the strong foes. And an ether brings charges back, too. I keep one for
+        emergencies.']
 transitions:
 - {x: 4, y: 8, targetMap: cornelia, targetEntrance: house_apprentice}
 name: Apprentice's Room

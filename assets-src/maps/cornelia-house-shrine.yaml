@@ -98,12 +98,12 @@ objects:
   parts:
   - [stone_bench]
   x: 3
-  y: 6
+  y: 7
 - type: deco
   parts:
   - [stone_bench]
   x: 7
-  y: 6
+  y: 7
 - type: deco
   parts:
   - [plant]
@@ -124,11 +124,16 @@ npcs:
   sprite: white_mage
   x: 6
   y: 4
-  dialog: ['Rest here a moment, travellers. The light keeps no one waiting.', 'Cure magic mends wounds, but a knocked-out friend needs more than
-      that. The inn or a phoenix down will do.']
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: ['The light brought Her Highness home, and you with it. Bless you.', 'Cure magic mends wounds, but a knocked-out friend needs more than
+        that. The inn or a phoenix down will do.']
+  - text: ['Welcome to the wayside shrine. Say a prayer for the princess, if you would.', 'Cure magic mends wounds, but a knocked-out friend needs
+        more than that. The inn or a phoenix down will do.']
 transitions:
 - {x: 5, y: 9, targetMap: cornelia, targetEntrance: house_shrine}
 encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true

@@ -24,7 +24,7 @@ ground: |
   WWWFFFFFFFW
   WFFFFFFFFFW
   WFF-------W
-  W-----ccccW
+  W---ccccccW
   W--++-----W
   W--++-----W
   WWW-------W
@@ -73,6 +73,8 @@ objects:
   - [bookshelf_bottom]
   x: 3
   y: 3
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [desk]
@@ -92,3 +94,10 @@ encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true
+unreachable_ok:
+- [4, 3]
+- [5, 3]
+- [6, 3]
+- [7, 3]
+- [8, 3]

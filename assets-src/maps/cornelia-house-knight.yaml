@@ -81,6 +81,8 @@ objects:
   - [bed_bottom]
   x: 7
   y: 3
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [table]
@@ -92,6 +94,8 @@ objects:
   - [bookshelf_bottom]
   x: 1
   y: 3
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [plant]
@@ -113,9 +117,9 @@ npcs:
   sprite: chest
   x: 9
   y: 7
-  chestItem: wooden_nunchaku
+  chestItem: iron_helm
   chestFlag: CHEST_HOUSE_KNIGHT
-  dialog: [You found Wooden Nunchaku!]
+  dialog: [You found an Iron Helm!]
 - id: old_knight
   sprite: guard
   x: 2
@@ -124,6 +128,9 @@ npcs:
   - condition: GARLAND_DEFEATED
     text: [So Garland fell to you. I trained beside him for twenty years., He always dropped his guard after a big swing. I hope that is how you
         beat him.]
+  - condition: CHEST_HOUSE_KNIGHT
+    text: ['I served the King''s guard with Garland, before my knees gave out.', He fights with great two-handed sweeps. Strike when the blade
+        is still coming round., That helm kept my head on my shoulders for thirty years. May it do the same for you.]
   - text: ['I served the King''s guard with Garland, before my knees gave out.', He fights with great two-handed sweeps. Strike when the blade
         is still coming round., Take what is in the chest in my armoury. An old man has no use for it now.]
 transitions:
@@ -132,3 +139,4 @@ encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true

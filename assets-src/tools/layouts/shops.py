@@ -10,12 +10,12 @@ from interiors_common import SHOP, keeper, shop, wood, STONE_FACE, SLATE_TOP  # 
 
 def build() -> list[Path]:
     out: list[Path] = []
-    # weapon shop: an L counter closing the corner where the keeper stands among the racks
+    # weapon shop: a counter closing the corner where the keeper stands among the racks; armour stands close the
+    # corner above its east end (M9: no vertical counter arm, which drew as loose boxes)
     r = shop("cornelia-weapon-shop", "Weapon Shop", 11, 9, [7], "weapon_shop")
     g = r.g
     g.carve(1, 3, 9, 7, "_")
-    g.carve(1, 5, 4, 5, "c")
-    g.carve(5, 3, 5, 5, "c")
+    g.carve(1, 5, 5, 5, "c")
     r.open_exit()
     g.faces(2)
     for x in (1, 2, 3, 4):
@@ -25,6 +25,9 @@ def build() -> list[Path]:
     r.wall([["torch"]], 6, 1)
     r.thing("barrel", 1, 3)
     r.thing("crate", 4, 3)
+    r.one("armor_stand", 5, 3)
+    r.one("armor_stand", 5, 4)
+    r.staff(1, 3, 4, 4)
     r.one("armor_stand", 9, 3)
     r.thing("barrel", 9, 7)
     keeper(r, "weapon-shop", "merchant", 2, 4, "Welcome to the Weapon Shop!", "cornelia_weapon")
@@ -48,15 +51,17 @@ def build() -> list[Path]:
         r.one("armor_stand", x, y)
     r.thing("crate", 1, 7)
     r.thing("crate", 8, 7)
+    r.staff(2, 3, 7, 3)
     keeper(r, "armor-shop", "merchant", 4, 3, "Welcome to the Armor Shop!", "cornelia_armor")
     out.append(r.save("The armor shop: a counter across the back and armour stands on the shop floor.",
                       {"floor_stone": "floor_stone", "floor": wood(1.0), "in_wall_face": STONE_FACE}, music=SHOP))
 
-    # item shop: a short counter in front of shelves of potions, barrels and crates by the door
+    # item shop: a counter wall to wall (M3) in front of shelves of potions, barrels and crates by the door
     r = shop("cornelia-item-shop", "Item Shop", 9, 8, [4], "item_shop")
     g = r.g
     g.carve(1, 2, 7, 6, "_")
-    g.carve(3, 4, 5, 4, "c")
+    g.carve(1, 4, 7, 4, "c")
+    r.staff(2, 2, 6, 3)
     r.open_exit()
     g.faces(1)
     for x in (2, 3, 5, 6):
@@ -68,7 +73,9 @@ def build() -> list[Path]:
         r.thing("barrel", x, y)
     r.thing("crate", 7, 6)
     keeper(r, "item-shop", "merchant", 4, 3, "Welcome to the Item Shop!", "cornelia_item")
-    out.append(r.save("The item shop: a short counter before shelves of potions.", {"floor": wood(1.1)}, music=SHOP))
+    out.append(r.save("The item shop: a counter before shelves of potions.",
+                      {"floor": wood(1.1), "in_wall_face": {"from": STONE_FACE, "shade": 1.1},
+                       "in_wall_top": {"from": "wall_top", "shade": 0.8}}, music=SHOP))
 
     # white magic: the counter guards an alcove of white orbs under an arched window
     r = shop("cornelia-white-magic", "White Magic Shop", 10, 9, [4, 5], "white_magic")
@@ -87,6 +94,7 @@ def build() -> list[Path]:
     r.one("plant", 8, 4)
     r.one("plant", 1, 7)
     r.one("plant", 8, 7)
+    r.staff(2, 3, 7, 4)
     keeper(r, "white-magic", "mage", 4, 4,
            "Welcome to the White Magic Shop! Healing arts, for those with the gift.", "cornelia_white")
     out.append(r.save("The white magic shop: a counter before an alcove of white orbs.",
@@ -97,7 +105,7 @@ def build() -> list[Path]:
     g = r.g
     g.carve(3, 3, 9, 7, "-")
     g.carve(1, 4, 2, 6, "-")                     # the orb niche
-    g.carve(6, 4, 9, 4, "c")
+    g.carve(4, 4, 9, 4, "c")                     # M3: the shelf at (3, 3-4) closes its west end
     g.carve(3, 5, 4, 6, "+")
     r.open_exit("-")
     g.faces(2)
@@ -110,6 +118,7 @@ def build() -> list[Path]:
     r.tall("bookshelf", 3, 3)
     r.one("desk", 9, 3)
     r.thing("crate", 9, 7)
+    r.staff(4, 3, 8, 3)
     keeper(r, "black-magic", "mage", 7, 3,
            "Welcome to the Black Magic Shop! Destructive arts, for those with the nerve.", "cornelia_black")
     out.append(r.save("The black magic shop: a dark room, a counter on the east side and black orbs in a niche.",
@@ -136,10 +145,11 @@ def build() -> list[Path]:
     r.one("table", 10, 5)
     r.thing("barrel", 10, 9)
     r.one("plant", 5, 7)
-    r.one("table", 9, 8)
+    r.one("table", 10, 8)                        # M4: was (9, 8), which boxed in (10, 8)
     r.one("plant", 10, 7)
     r.thing("barrel", 1, 9)
+    r.staff(1, 7, 4, 7)
     keeper(r, "inn", "innkeeper", 2, 7, "Welcome to the Inn!", "cornelia_inn")
     out.append(r.save("The inn: a front counter, and a back room of beds through a doorway.",
-                      {"floor": wood(0.95)}, music=SHOP))
+                      {"floor": wood(0.95), "in_wall_face": "castle_face"}, [170, 60, 60], music=SHOP))
     return out

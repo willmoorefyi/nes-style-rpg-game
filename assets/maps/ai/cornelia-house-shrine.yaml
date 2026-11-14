@@ -12,13 +12,16 @@ art:
 entrances:
   door: [5, 8]
 collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 8, 8, 8, 1, 1, 1, 8, 1, 8, 8, 1, 8, 8, 1, 8, 1, 1, 8, 1, 8, 8, 8, 8, 8, 1,
-  8, 1, 1, 8, 8, 1, 8, 8, 8, 1, 8, 8, 1, 1, 8, 1, 8, 8, 8, 8, 8, 1, 8, 1, 1, 8, 1, 8, 8, 8, 8, 8, 1, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1]
+  8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 1, 1, 8, 8, 8, 1, 1, 8, 1, 1, 8, 1, 8, 8, 8, 8, 8, 1, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1]
 npcs:
 - id: priestess
   sprite: white_mage
   x: 6
   y: 4
-  dialog: ['Rest here a moment, travellers. The light keeps no one waiting.', 'Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down will do.']
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: ['The light brought Her Highness home, and you with it. Bless you.', 'Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down will do.']
+  - text: ['Welcome to the wayside shrine. Say a prayer for the princess, if you would.', 'Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down will do.']
 transitions:
 - {x: 5, y: 9, targetMap: cornelia, targetEntrance: house_shrine}
 name: Wayside Shrine

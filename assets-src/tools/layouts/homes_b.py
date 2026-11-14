@@ -29,11 +29,12 @@ def build() -> list[Path]:
     for (x, y) in [(4, 7), (5, 7), (4, 6)]:
         r.thing("flowers", x, y)
     r.chest("gardener", "tent", "a Tent", 8, 5)
-    r.npc("royal_gardener", "villager", 5, 5, [
-        "Seedlings for the castle gardens. The princess chose every one herself.",
-        "If you sleep out under the stars, a tent keeps the dew off. There's one in the chest. Go on."])
+    seeds = "Seedlings for the castle gardens. The princess chose every one herself."
+    r.npc("royal_gardener", "farmer", 5, 5, [
+        {"condition": "CHEST_HOUSE_GARDENER", "text": [seeds, "Keep that tent dry and it will serve you for years."]},
+        {"text": [seeds, "If you sleep out under the stars, a tent keeps the dew off. There's one in the chest. Go on."]}])
     out.append(r.save("The gardener's lodge by the castle gardens: a potting floor with seed racks, plants and flowers.",
-                      {"floor": wood(1.1)}))
+                      {"floor": wood(1.1), "in_wall_face": {"from": "wall_face", "shade": 1.1}}))
 
     # (14,63) red / white: a family home, a living room and a bedroom joined by an inner door
     r = house("family", "Family Home", 13, 10, [3])
@@ -65,7 +66,7 @@ def build() -> list[Path]:
         "In my day the bridge to the north was always open. Ships came in, too, from the east.",
         "Mind you rest at the inn before a long road. Hurt is easier to mend than to carry."])
     out.append(r.save("A family home: a living room with a hearth and a bedroom beyond an inner door.",
-                      {"floor": wood(0.9)}, [200, 160, 70]))
+                      {"floor": wood(0.9), "in_wall_top": {"from": "slate", "shade": 0.7}}, [200, 160, 70]))
 
     # (6,41) teal / plaster: the apprentice mage's room, orbs in a niche
     r = house("apprentice", "Apprentice's Room", 9, 9, [4])
@@ -85,9 +86,12 @@ def build() -> list[Path]:
     r.one("desk", 1, 5)
     r.one("plant", 7, 7)
     r.chest("apprentice", "ether", "an Ether", 1, 7)
+    spell = "A spell isn't cast from nothing. Each level has its own charges, and sleep restores them."
     r.npc("apprentice", "mage", 2, 4, [
-        "A spell isn't cast from nothing. Each level has its own charges, and sleep restores them.",
-        "Spend the strong ones on the strong foes. And an ether brings charges back, too. I keep one for emergencies."])
+        {"condition": "CHEST_HOUSE_APPRENTICE",
+         "text": [spell, "You found my ether? Keep it. Charges are worth more out there than in here."]},
+        {"text": [spell, "Spend the strong ones on the strong foes. And an ether brings charges back, too. "
+                         "I keep one for emergencies."]}])
     out.append(r.save("An apprentice mage's room: a niche of orbs, potion shelves and a bookshelf.",
                       {"floor": wood(0.85), "in_wall_face": {"from": "castle_face", "shade": 0.6},
                        "in_wall_top": SLATE_TOP}, [90, 170, 170]))
@@ -115,6 +119,7 @@ def build() -> list[Path]:
     for (x, y, kind) in [(12, 8, "barrel"), (12, 7, "barrel"), (11, 8, "crate"), (5, 3, "barrel"), (5, 4, "crate")]:
         r.thing(kind, x, y)
     r.one("plant", 12, 3)
+    r.staff(1, 3, 4, 4)
     r.npc("barkeep", "merchant", 2, 4, [
         "Welcome to the Crystal Tankard! Nothing's poured on credit, but the stories are free.",
         "Talk to the regulars. Half of what they say is true."])
@@ -123,10 +128,14 @@ def build() -> list[Path]:
         "Nobody knows who lies there. My grandfather swore it was a hero from before the crystals dimmed."])
     r.npc("patron_soldier", "guard", 11, 6, [
         {"condition": "INTRO_COMPLETE", "text": ["The King has the builders out at the north bridge. Won't be long now."]},
-        {"text": ["Off duty. Don't tell the captain.",
+        {"condition": "PRINCESS_RESCUED",
+         "text": ["A soldier's pay buys one mug a night, and tonight it's raised to you.",
+                  "They say Garland's men scattered when you walked into the temple."]},
+        {"text": ["A soldier's pay buys one mug a night, and this is it.",
                   "Garland's men say the temple to the north-west is crawling with wolves and worse."]}])
     out.append(r.save("The tavern: a bar with a barkeep behind it, banquet tables, barrels and a hearth.",
-                      {"floor": wood(0.7)}))
+                      {"floor": wood(0.7), "in_wall_face": {"from": "wall_face", "shade": 0.75},
+                       "in_wall_top": {"from": "wall_top", "shade": 0.7}}))
 
     # (35,62) red / stone, 2 storeys: the wayside shrine, a runner between pillars to a statue
     r = house("shrine", "Wayside Shrine", 11, 10, [5])
@@ -144,13 +153,16 @@ def build() -> list[Path]:
     for (x, y) in [(2, 4), (8, 4), (2, 7), (8, 7)]:
         r.pillar(x, y)
     for x in (3, 7):
-        r.one("stone_bench", x, 6)
+        r.one("stone_bench", x, 7)                   # M4: at y 6 they sealed the side aisles with the pillars
     r.one("plant", 1, 3)
     r.one("plant", 9, 3)
     r.one("orb_white", 4, 3)
+    cure = ("Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down "
+            "will do.")
     r.npc("priestess", "white_mage", 6, 4, [
-        "Rest here a moment, travellers. The light keeps no one waiting.",
-        "Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down will do."])
+        {"condition": "PRINCESS_RESCUED", "text": ["The light brought Her Highness home, and you with it. Bless you.",
+                                                   cure]},
+        {"text": ["Welcome to the wayside shrine. Say a prayer for the princess, if you would.", cure]}])
     out.append(r.save("A wayside shrine: a runner between pillars to a statue, torches and a priestess.",
                       {"floor_stone": "marble", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
                       [214, 170, 64]))

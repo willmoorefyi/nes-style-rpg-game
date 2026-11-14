@@ -73,24 +73,100 @@ describe('castle doorways (CA-4)', () => {
   });
 });
 
-describe('the King on his throne (CA-5)', () => {
+describe('the King before his throne (CA-5, reversed by M13)', () => {
   const src = source('cornelia-castle-2f');
   const map = compiled('cornelia-castle-2f');
   const throne = (src.objects ?? []).find((o) => (o.parts ?? []).flat().includes('throne_0_0'))!;
   const king = map.npcs!.find((n) => n.id === 'king')!;
 
-  it("the King's cell is in the bottom row of the throne's footprint", () => {
+  it('the King stands on the dais just in front of the throne, so the chair shows above him', () => {
     expect(throne).toBeDefined();
-    const bottom = throne.y + throne.parts!.length - 1;
-    expect(king.y).toBe(bottom);
-    expect(king.x).toBeGreaterThanOrEqual(throne.x);
-    expect(king.x).toBeLessThan(throne.x + throne.parts![0].length);
+    expect(throne.offset).toEqual([-24, 0]);
+    expect((throne as Deco & { walk_cells?: unknown }).walk_cells).toBeUndefined();
+    expect(king.y).toBe(throne.y + 2);
+    expect(king.x).toBe(throne.x);
   });
 
-  it('the throne is centred on his cell, and the dais below him is walkable', () => {
-    expect(throne.offset).toEqual([-24, 0]);
-    expect(king.x).toBe(throne.x);
+  it('the cell below him is walkable (he is talked to from there)', () => {
     expect(new CollisionMap(map).isWalkable(king.x, king.y + 1, walk)).toBe(true);
+  });
+});
+
+/** Steps from (sx, sy) to (tx, ty) on the compiled collision (NPC cells blocked when `npcs`), or Infinity. */
+function steps(m: MapData, [sx, sy]: [number, number], [tx, ty]: [number, number], npcs = false): number {
+  const col = new CollisionMap(m);
+  const block = new Set(npcs ? m.npcs.map((n) => `${n.x},${n.y}`) : []);
+  const dist = new Map([[`${sx},${sy}`, 0]]);
+  const queue: Array<[number, number]> = [[sx, sy]];
+  while (queue.length) {
+    const [x, y] = queue.shift()!;
+    const d = dist.get(`${x},${y}`)!;
+    if (x === tx && y === ty) return d;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy, k = `${nx},${ny}`;
+      if (dist.has(k) || block.has(k) || !col.isWalkable(nx, ny, walk)) continue;
+      dist.set(k, d + 1);
+      queue.push([nx, ny]);
+    }
+  }
+  return Infinity;
+}
+
+describe('castle second pass (R4a)', () => {
+  it('the 1F reading gallery opens into the library (M2)', () => {
+    expect(steps(compiled('cornelia-castle'), [31, 4], [33, 6])).toBeLessThanOrEqual(4);
+  });
+
+  it('every castle floor checks that no walkable cell is out of reach (M4)', () => {
+    for (const id of FLOORS) {
+      expect((source(id) as Source & { no_unreachable_walkable?: boolean }).no_unreachable_walkable, id).toBe(true);
+    }
+  });
+
+  it('beds and bookshelves on the floor stand against the wall and block only their art (M5)', () => {
+    let beds = 0;
+    for (const id of FLOORS) {
+      const col = new CollisionMap(compiled(id));
+      for (const o of (source(id).objects ?? []) as Array<Deco & { on_wall?: boolean; collide?: string }>) {
+        const top = o.parts?.[0]?.[0];
+        if (o.on_wall || (top !== 'bed_top' && top !== 'bookshelf_top')) continue;
+        expect(o.collide, `${id} ${top} (${o.x}, ${o.y})`).toBe('alpha');
+        expect(o.offset?.[1] ?? 0, `${id} ${top} (${o.x}, ${o.y})`).toBeLessThan(0);
+        if (top === 'bed_top') {
+          beds++;
+          expect(col.isWalkable(o.x, o.y + 1, walk), `${id} below the bed at (${o.x}, ${o.y})`).toBe(true);
+        }
+      }
+    }
+    expect(beds).toBe(4);
+  });
+
+  it('the cellar is stocked: casks, grain, armour stands and a table (M9)', () => {
+    const objs = source('cornelia-castle-cellar').objects ?? [];
+    expect(objs.filter((o) => o.type !== 'deco' || !(o as { on_wall?: boolean }).on_wall).length).toBeGreaterThanOrEqual(20);
+  });
+
+  it('the cellar chests hold new loot, and no chest item repeats much across Cornelia (M10)', () => {
+    const cellar = compiled('cornelia-castle-cellar').npcs!.filter((n) => n.chestItem).map((n) => n.chestItem).sort();
+    expect(cellar).toEqual(['ether', 'hi_potion', 'robe', 'wooden_armor']);
+    const ids = parse(readFileSync(join(root, 'assets/maps/ai/index.yaml'), 'utf-8')) as string[];
+    const chests = ids.filter((id) => id.startsWith('cornelia')).flatMap((id) => compiled(id).npcs.filter((n) => n.chestItem));
+    expect(chests.length).toBe(11);
+    expect(new Set(chests.map((c) => c.chestItem)).size).toBeGreaterThanOrEqual(9);
+  });
+
+  it('no NPC stands directly south of the gold heap (M13)', () => {
+    const f1 = compiled('cornelia-castle');
+    const heaps = (source('cornelia-castle').objects ?? []).filter((o) => (o.parts ?? []).flat().includes('gold_heap'));
+    expect(heaps.length).toBe(1);
+    for (const h of heaps) expect(f1.npcs.filter((n) => n.x === h.x && n.y === h.y + 1).map((n) => n.id)).toEqual([]);
+  });
+
+  it('every castle floor taller than the view is at least as wide as it (M13: 20 cells)', () => {
+    for (const id of FLOORS) {
+      const m = compiled(id);
+      if (m.height > 11) expect(m.width, id).toBeGreaterThanOrEqual(20);
+    }
   });
 });
 
@@ -107,7 +183,7 @@ describe('the castle rooms have a purpose (CA-7)', () => {
     expect(chests.map((n) => n.chestItem).sort()).toEqual(['cabin', 'phoenix_down']);
   });
 
-  it('the cellar has a fourth chest (an Ether)', () => {
+  it('the cellar has a fourth chest (an Ether, kept by M10)', () => {
     const chests = compiled('cornelia-castle-cellar').npcs!.filter((n) => n.chestItem);
     expect(chests.length).toBe(4);
     expect(chests.map((n) => n.chestItem)).toContain('ether');

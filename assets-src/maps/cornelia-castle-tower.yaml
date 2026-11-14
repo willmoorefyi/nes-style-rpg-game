@@ -18,88 +18,92 @@ materials:
     from: floor
     shade: 0.8
 ground: |
-  WWWWWWWWWWWWWWWW
-  WWWWWWWWWWWWWWWW
-  WWWFFFFFFFFFFWWW
-  WWWFFFFFFFFFFWWW
-  WWW__________WWW
-  WWW__________WWW
-  WWW__++++++__WWW
-  WWW__++++++__WWW
-  WWW__++++++__WWW
-  WWW__++++++__WWW
-  WWW__________WWW
-  WWWWWWWWWWWWWWWW
-  WWWWWWWWWWWWWWWW
+  WWWWWWWWWWWWWWWWWWWW
+  WWWWWWWWWWWWWWWWWWWW
+  WWWWWFFFFFFFFFFWWWWW
+  WWWWWFFFFFFFFFFWWWWW
+  WWWWW__________WWWWW
+  WWWWW__________WWWWW
+  WWWWW__++++++__WWWWW
+  WWWWW__++++++__WWWWW
+  WWWWW__++++++__WWWWW
+  WWWWW__++++++__WWWWW
+  WWWWW__________WWWWW
+  WWWWWWWWWWWWWWWWWWWW
+  WWWWWWWWWWWWWWWWWWWW
 carpet_trim: [214, 170, 64]
 entrances:
-  stairs: [7, 8]
+  stairs: [9, 8]
 objects:
 - type: deco
   parts:
   - [stairwell_0_0, stairwell_0_1]
   - [stairwell_1_0, stairwell_1_1]
-  x: 7
+  x: 9
   y: 9
   walkable_rows: [0]
 - type: deco
   parts:
   - [arch_window_top]
   - [arch_window_bottom]
-  x: 4
+  x: 6
   y: 2
   on_wall: true
 - type: deco
   parts:
   - [arch_window_top]
   - [arch_window_bottom]
-  x: 7
+  x: 9
   y: 2
   on_wall: true
 - type: deco
   parts:
   - [arch_window_top]
   - [arch_window_bottom]
-  x: 11
+  x: 13
   y: 2
   on_wall: true
 - type: deco
   parts:
   - [banner]
-  x: 9
+  x: 11
   y: 2
   on_wall: true
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
-  x: 3
+  x: 5
   y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
-  x: 12
+  x: 14
   y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [desk]
-  x: 9
+  x: 11
   y: 4
 - type: deco
   parts:
   - [orb_white]
-  x: 3
+  x: 5
   y: 8
 - type: deco
   parts:
   - [plant]
-  x: 12
+  x: 14
   y: 9
 npcs:
 - id: tower_sage
   sprite: old_man
-  x: 6
+  x: 8
   y: 5
   dialog:
   - condition: GOT_LUTE
@@ -107,9 +111,10 @@ npcs:
   - text: ['Ah, visitors! From up here I watch the stars... and the crystals.', Four crystals hold the world in balance. Their light is fading.,
       Legend says four Warriors of Light will come. Perhaps you are they.]
 transitions:
-- {x: 7, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
-- {x: 8, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 9, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
+- {x: 10, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
 encounterRate: {min: 999, max: 999}
 encounters: []
 no_static_chokepoints: true
+no_unreachable_walkable: true
 canSave: true

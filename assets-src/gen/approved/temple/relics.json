@@ -99,5 +99,33 @@
       "not_tiny": true
     }
   },
+  "paint": [
+    {
+      "note": "M6 (R4a): key-fringe pixels in column 1 of chest_closed (sheet px [1, 144], 2 px), replaced with the transparent column 2",
+      "from": [
+        2,
+        144,
+        1,
+        48
+      ],
+      "to": [
+        1,
+        144
+      ]
+    },
+    {
+      "note": "M6 (R4a): key-fringe pixels in column 1 of chest_open (sheet px [49, 144], 19 px), replaced with the transparent column 50",
+      "from": [
+        50,
+        144,
+        1,
+        48
+      ],
+      "to": [
+        49,
+        144
+      ]
+    }
+  ],
   "note": "pillars, statue, brazier, altar, chests; review fix: chests fill their cell"
 }

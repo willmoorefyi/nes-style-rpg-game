@@ -22,12 +22,14 @@ npcs:
   chestFlag: CHEST_HOUSE_FARM
   dialog: [You found an Antidote!]
 - id: farmer
-  sprite: villager
+  sprite: farmer
   x: 6
   y: 6
   dialog:
   - condition: GARLAND_DEFEATED
     text: [The wolves have been bolder since the dark came. Lost two hens last week., Keep an antidote handy out there. Some beasts bite worse than wolves.]
+  - condition: CHEST_HOUSE_FARM
+    text: [Wolves came right up to the fence last night. Bold as you like., 'If you''re heading out, travel together. They pick off stragglers.']
   - text: [Wolves came right up to the fence last night. Bold as you like., 'If you''re heading out, travel together. They pick off stragglers.', 'There''s an antidote in the chest by the door. Take it,
         take it.']
 transitions:

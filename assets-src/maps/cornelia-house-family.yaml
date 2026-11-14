@@ -12,6 +12,9 @@ materials:
   floor:
     from: floor
     shade: 0.9
+  in_wall_top:
+    from: slate
+    shade: 0.7
 ground: |
   WWWWWWWWWWWWW
   WFFFFFFWFFFFW
@@ -74,18 +77,24 @@ objects:
   - [bed_bottom]
   x: 8
   y: 3
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [bed_top]
   - [bed_bottom]
   x: 11
   y: 3
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
   x: 10
   y: 3
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [plant]
@@ -112,3 +121,4 @@ encounterRate: {min: 999, max: 999}
 encounters: []
 canSave: true
 no_static_chokepoints: true
+no_unreachable_walkable: true
