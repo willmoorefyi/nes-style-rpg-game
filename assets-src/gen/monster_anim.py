@@ -111,17 +111,31 @@ def lock_path(sprite: str) -> Path:
 
 # ───────── generation ─────────
 def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
-    from gen import rig as R
     h = cfg.get("attack_hand", "n")
     cast_h = cfg.get("cast_hand", "n")
     cloth = [j for p in rig.parts.values() if p["kind"] == "cloth" for j in p.get("chain", [])[1:]]
     arm = [a.format(h=h) for a in ARM]
-    moves = {"all": "all", "wind": ["crown", "neck", "chest", *arm, "tip", *cloth],
-             "follow": ["crown", "chest", *arm, "tip"], "cast": ["crown", "chest", *[a.format(h=s) for s in "nf" for a in ARM], *cloth],
-             "release": ["crown", *[a.format(h=cast_h) for a in ARM], *cloth]}[r["moves"]]
-    pins = {"legs": list(R.LEGS), "feet": list(R.FEET), "planted": [cfg.get("planted", "foot_f")]}[r["pins"]]
+    if rig.moves:                                          # beast templates (rig_templates.py) name their own sets
+        moves = {"all": "all", **{k: v + cloth for k, v in rig.moves.items()}}[r["moves"]]
+    else:
+        moves = {"all": "all", "wind": ["crown", "neck", "chest", *arm, "tip", *cloth],
+                 "follow": ["crown", "chest", *arm, "tip"], "cast": ["crown", "chest", *[a.format(h=s) for s in "nf" for a in ARM], *cloth],
+                 "release": ["crown", *[a.format(h=cast_h) for a in ARM], *cloth]}[r["moves"]]
+    planted = [rig.planted] if isinstance(rig.planted, str) else list(rig.planted)
+    pins = {"legs": list(rig.legs), "feet": list(rig.feet), "planted": planted}[r["pins"]]
     over = (cfg.get("frames") or {}).get(name, {})
     return over.get("moves", moves), list(over.get("pins", pins))
+
+
+def _warp_width(d: dict, mask: np.ndarray, chain: list) -> float:
+    """Half-width of a chain / cloth part's warp quads: `width` (a number, or `auto` = every masked pixel inside the
+    quads), else the segmentation radius (the biped default)."""
+    from gen import rig as R
+    if d.get("width") != "auto":
+        return float(d.get("width", d["radius"]))
+    ys, xs = np.nonzero(mask)
+    px = np.stack([xs, ys], 1).astype(float)
+    return float(np.min([R._seg_dist(px, a, b) for a, b in zip(chain, chain[1:])], 0).max()) + 1.5
 
 
 def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: dict) -> dict[str, dict]:
@@ -142,7 +156,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     if cfg.get("breath", True) and "idle_b" not in holds:
         idle = keyframes["idle"]
         img = np.asarray(PU.bob(idle, cell[1], 1) if meta.get("floating") else
-                         PU.bob(idle, int(round(rig.keyframes["idle"]["hip"][1])), 1)).copy()
+                         PU.bob(idle, int(round(rig.keyframes["idle"][rig.breath][1])), 1)).copy()
         out["idle_b"] = {"img": img, "labels": None, "src": "idle", "toward": "idle", "u": 0.0, "joints": {}, "rots": {},
                          "pinned": True, "prop_px": {}}
     for name in generated_names(has_cast):
@@ -188,7 +202,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                 rgba, hit = RR.rigid(arrs[src_kf], mask, sj[js[0]], J[to], rot, size)
                 rots[part] = (math.degrees(rot), "prop")
             elif d["kind"] in ("chain", "cloth"):
-                rgba, hit = RR.mesh_warp(arrs[src_kf], mask, [sj[j] for j in js], [J[j] for j in js], d["radius"], size)
+                rgba, hit = RR.mesh_warp(arrs[src_kf], mask, [sj[j] for j in js], [J[j] for j in js],
+                                         _warp_width(d, mask, [sj[j] for j in js]), size)
                 rots[part] = (R.part_rotation(rig, part, src_kf, sj, J), d["kind"])
             else:
                 rot = math.radians(R.part_rotation(rig, part, src_kf, sj, J))

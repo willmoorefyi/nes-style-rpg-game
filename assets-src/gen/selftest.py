@@ -396,6 +396,9 @@ def test_monster_anim() -> None:
     SA.run_checks(check)
     print("monster animation generator")
     SA.run_generator(check)
+    print("monster body templates (quadruped, bird)")
+    from gen import selftest_beasts as SB
+    SB.run_beasts(check)
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

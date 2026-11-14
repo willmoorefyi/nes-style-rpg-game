@@ -12,6 +12,8 @@ import math
 import numpy as np
 from PIL import Image, ImageDraw
 
+from gen.rig_templates import BEASTS
+
 # joint -> parent, rooted at the hip (biped template)
 BIPED_PARENT = {"chest": "hip", "neck": "chest", "crown": "neck",
                 "sh_n": "chest", "el_n": "sh_n", "hand_n": "el_n", "sh_f": "chest", "el_f": "sh_f", "hand_f": "el_f",
@@ -30,6 +32,12 @@ BIPED_Z = ["uarm_f", "farm_f", "thigh_f", "shin_f", "torso", "thigh_n", "shin_n"
 TEMPLATES = {"biped": (BIPED_PARENT, BIPED_PARTS, BIPED_Z)}
 LEGS = ("knee_n", "knee_f", "foot_n", "foot_f")
 FEET = ("foot_n", "foot_f")
+# per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
+BODY = {"biped": {"legs": LEGS, "feet": FEET, "limbs": tuple((f"hip_{s}", f"knee_{s}", f"foot_{s}") for s in "nf"),
+                  "moves": None, "planted": "foot_f", "breath": "hip"}}
+for _name, _t in BEASTS.items():                          # quadruped, bird (rig_templates.py, T5a)
+    TEMPLATES[_name] = (_t["parent"], _t["parts"], _t["z"])
+    BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath")}
 
 
 class Rig:
@@ -41,17 +49,24 @@ class Rig:
         if self.body not in TEMPLATES:
             raise ValueError(f"rig {cfg.get('sprite')}: body template {self.body!r} is not implemented (T5a)")
         parent, parts, z = TEMPLATES[self.body]
+        b = BODY[self.body]
+        self.legs, self.feet, self.limbs, self.moves = b["legs"], b["feet"], b["limbs"], b["moves"]
+        self.planted, self.breath = cfg.get("planted", b["planted"]), cfg.get("breath_joint", b["breath"])
         self.cell = cell
         self.fwd = 1 if cfg.get("facing", "right") == "right" else -1
         self.sampler = cfg.get("sampler", "nearest")
         self.parent = dict(parent)
         wh = cfg.get("weapon_hand", "n")
-        self.parent["tip"] = f"hand_{wh}"
+        if "tip" in self.parent:
+            self.parent["tip"] = f"hand_{wh}"
         scale = cell[1] / 80.0
         self.parts: dict[str, dict] = {}
         for name, p in parts.items():
             self.parts[name] = {"kind": "rigid", **p, "radius": p["radius"] * scale}
-        self.parts["weapon"]["bone"] = [f"hand_{wh}", "tip"]
+            if isinstance(p.get("width"), (int, float)):
+                self.parts[name]["width"] = p["width"] * scale
+        if "weapon" in self.parts:
+            self.parts["weapon"]["bone"] = [f"hand_{wh}", "tip"]
         for name, p in (cfg.get("parts") or {}).items():
             if p.get("remove"):
                 self.parts.pop(name, None)
@@ -190,13 +205,12 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
     for j in fixed:
         out[j] = S[j]
     if body_dy:
-        out = {j: (v[0], v[1] + body_dy) if j not in pins and j not in LEGS else v for j, v in out.items()}
+        out = {j: (v[0], v[1] + body_dy) if j not in pins and j not in rig.legs else v for j, v in out.items()}
     for j, dv in (tweaks or {}).items():
         if j in out:
             out[j] = (out[j][0] + dv[0], out[j][1] + dv[1])
-    ground = max((S[f][1] for f in FEET if f in S), default=1e9) if grounded else 1e9
-    for side in "nf":
-        h, k, f = f"hip_{side}", f"knee_{side}", f"foot_{side}"
+    ground = max((S[f][1] for f in rig.feet if f in S), default=1e9) if grounded else 1e9
+    for h, k, f in rig.limbs:
         if not all(j in out for j in (h, k, f)) or k in pins:
             continue
         if f in pins or out[f][1] > ground:              # keep the shin's length to a held / grounded foot

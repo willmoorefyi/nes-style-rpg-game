@@ -64,3 +64,24 @@ renders fall back to a border flood fill.
 
 Add an entry to `characters.yaml` with `prompt` (costume only), `battle_gear`, `field_gear` and `seeds`. Generate,
 review `review.png`, and move the approved seed to the front of `seeds`.
+
+## Monster rig body templates (docs/ENEMY_ANIM_PLAN.md 4.1)
+
+A rig file `anim/monsters/<sprite>.yaml` picks `body: biped | quadruped | bird`. The biped template is in `rig.py`; the
+beast templates (T5a) are in `rig_templates.py`, whose docstring is the reference for the joint names. In short
+(`_n` = near side, `_f` = far side, image coordinates, facing right):
+
+| Body | Spine / head | Tail | Limbs | Wings (only when marked) |
+|------|--------------|------|-------|--------------------------|
+| `quadruped` (wolf, gr_wolf, dragon) | `hip` (root) → `back` → `chest` (`body` chain) → `neck` → `head` (`neck` chain) → `snout` (`head` rigid) | `tail0` → `tail1` → `tail2` → `tail_tip` (`tail` chain) | fore `sh` → `el` → `paw` → `ftoe`; hind `hip_n/f` → `knee` → `foot` → `toe` | `wsh` → `wel` → `wtip` from `chest` |
+| `bird` (cockatrice) | `hip` (root) → `chest` (`body` torso) → `neck` → `head` (`neck` chain) → `beak` | same `tail` chain (the snake tail) | `hip_n/f` → `knee` → `foot` → `toe` | `wsh` → `wel` → `wtip` from `chest` |
+
+- Chain parts (`body`, `neck`, `tail`) are mesh-warped with `width: auto`, so the warp covers every pixel the part
+  segments to; override `chain` for more joints (e.g. a longer snake tail) and add parts such as a jaw
+  (`parts: {jaw: {bone: [head, jaw]}}`) as usual.
+- Pins: wind-up and recover pin every knee / elbow and foot / paw; follow, hurt and cast pin every foot (four on a
+  quadruped); `atk_mid` plants both hind feet (`planted:` overrides, a string or a list). A rearing hurt (wolf, dragon)
+  must release the forepaws in `frames: {hurt_in1: {pins: [foot_n, foot_f]}, hurt_in2: {pins: [foot_n, foot_f]}}`,
+  otherwise the forelegs hold the chest down.
+- Mark the toes: a paw part then rides its pinned ankle without rotating, so it stays on the ground line.
+- `breath_joint:` moves the `idle_b` cut (default `hip`).
