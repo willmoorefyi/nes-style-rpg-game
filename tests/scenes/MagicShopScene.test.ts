@@ -4,7 +4,10 @@ import { SpellRegistry } from '../../src/data/SpellRegistry.js';
 import { spellPrice, SPELL_PRICE_BY_LEVEL } from '../../src/systems/SpellPurchase.js';
 import type { Game } from '../../src/core/Game.js';
 import type { SpellData } from '../../src/types/index.js';
-import { loadRealRegistries, visibleLabels } from '../helpers/realData.js';
+import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
+import { Character } from '../../src/entities/Character.js';
+import { ClassRegistry } from '../../src/data/ClassRegistry.js';
+import { classInitials, learnersLine } from '../../src/scenes/shop/spellLearners.js';
 
 beforeAll(loadRealRegistries);
 
@@ -41,5 +44,44 @@ describe('MagicShopScene prices', () => {
     const labels = visibleLabels(scene.container);
     expect(labels).toContain('ICE L2 400G');
     expect(labels).toContain('FIR2 L3 1500G');
+  });
+});
+
+describe('MS-7: the magic shop shows the description and who can learn each spell', () => {
+  function open(classes: string[], shopId = 'cornelia_white') {
+    const input = tapInput();
+    const all = classes.map((cls, i) => new Character({ name: `M${i}`, classData: ClassRegistry.getClass(cls)! }));
+    const game = { input, events: { emit: vi.fn() }, scenes: { pop: vi.fn() }, party: { gold: 5000, all } };
+    const scene = new MagicShopScene(game as unknown as Game, shopId);
+    scene.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => scene.update(1));
+    return { scene, tap };
+  }
+
+  it('class initials: two-word names give their initials, one-word names their first two letters', () => {
+    expect(classInitials('White Mage')).toBe('WM');
+    expect(classInitials('Warrior')).toBe('Wa');
+  });
+
+  it('CURE: the description in the help bar, and "Learn: WM RM" (white and red mages)', () => {
+    const { scene } = open(['warrior', 'white_mage']);
+    expect(scene.helpText).toBe(spell('cure').description);
+    expect(visibleLabels(scene.container)).toContain(spell('cure').description);
+    expect(scene.learners).toEqual({ text: 'Learn: WM RM', greyed: false });
+    expect(learnersLine(spell('cure'))).toBe('Learn: WM RM');
+  });
+
+  it('the line follows the cursor, and is greyed when nobody in the party can learn the spell', () => {
+    const { scene, tap } = open(['warrior', 'thief']);
+    expect(scene.learners.greyed).toBe(true);
+    tap('down'); // HARM
+    expect(scene.helpText).toBe(spell('harm').description);
+    expect(scene.learners.text).toBe(learnersLine(spell('harm')));
+    expect(scene.learners.greyed).toBe(true);
+  });
+
+  it('black magic lists the black and red mages', () => {
+    const { scene } = open(['black_mage'], 'cornelia_black');
+    expect(scene.learners).toEqual({ text: 'Learn: BM RM', greyed: false });
   });
 });

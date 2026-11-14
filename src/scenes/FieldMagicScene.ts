@@ -6,6 +6,7 @@ import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
 import { castFieldSpell, isFallen, isFieldSpell } from '../systems/FieldSpellEffects.js';
 import { GAME_WIDTH, SCREEN_MARGIN, FONT_SIZE } from '../core/LayoutConstants.js';
 
@@ -22,6 +23,7 @@ export class FieldMagicScene implements Scene {
   private spellMenu?: Menu;
   private targetMenu?: Menu;
   private messageText: BitmapText;
+  private help = new HelpWindow();
   private phase: Phase = 'selectCaster';
   private selectedCasterIdx = 0;
   private spells: FieldSpell[] = [];
@@ -30,7 +32,8 @@ export class FieldMagicScene implements Scene {
   constructor(game: Game) {
     this.game = game;
     this.partyWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 500, height: 300 });
-    this.spellWindow = new Window({ x: SCREEN_MARGIN, y: 348, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 600 });
+    // ends 24 px above the help bar (y 900)
+    this.spellWindow = new Window({ x: SCREEN_MARGIN, y: 348, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: HELP_RECT.y - SCREEN_MARGIN - 348 });
     this.targetWindow = new Window({ x: 548, y: SCREEN_MARGIN, width: 500, height: 300 });
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
@@ -38,16 +41,20 @@ export class FieldMagicScene implements Scene {
     this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.messageText.position.set(this.spellWindow.contentX, this.spellWindow.contentY + 300);
     this.spellWindow.addChild(this.messageText);
-    this.container.addChild(this.partyWindow, this.spellWindow, this.targetWindow);
+    this.help.visible = false;
+    this.container.addChild(this.partyWindow, this.spellWindow, this.targetWindow, this.help);
   }
 
   /** The current message line (results and notices). */
   get message(): string { return this.messageText.text; }
+  /** The help bar's text while it is shown (the highlighted spell's description), else ''. */
+  get helpText(): string { return this.help.visible ? this.help.text : ''; }
 
   enter(): void {
     this.phase = 'selectCaster';
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
+    this.help.visible = false;
     this.messageText.text = '';
     this.buildPartyMenu();
   }
@@ -104,10 +111,18 @@ export class FieldMagicScene implements Scene {
       y: this.spellWindow.contentY,
       maxVisible: 6,
       onSelect: (_item, i) => this.onSpellSelect(i),
-      onCancel: () => { this.phase = 'selectCaster'; this.spellWindow.visible = false; },
+      onCancel: () => { this.phase = 'selectCaster'; this.spellWindow.visible = false; this.help.visible = false; },
     });
     this.spellMenu.setIndex(Math.min(prev, items.length - 1));
     this.spellWindow.addChild(this.spellMenu);
+    this.showSpellHelp();
+  }
+
+  /** The help bar describes the spell under the cursor while the spell list is open. */
+  private showSpellHelp(): void {
+    const spell = this.spellMenu ? this.spells[this.spellMenu.selectedIndex]?.spell : undefined;
+    this.help.visible = this.phase !== 'selectCaster' && spell !== undefined;
+    this.help.setText(spell?.description ?? '');
   }
 
   private onSpellSelect(i: number): void {
@@ -172,7 +187,11 @@ export class FieldMagicScene implements Scene {
 
   update(_dt: number): void {
     if (this.phase === 'selectCaster') this.partyMenu.update(this.game.input);
-    else if (this.phase === 'selectSpell' && this.spellMenu) this.spellMenu.update(this.game.input);
+    else if (this.phase === 'selectSpell' && this.spellMenu) {
+      const prev = this.spellMenu.selectedIndex;
+      this.spellMenu.update(this.game.input);
+      if (this.phase === 'selectSpell' && this.spellMenu.selectedIndex !== prev) this.showSpellHelp();
+    }
     else if (this.phase === 'selectTarget' && this.targetMenu) this.targetMenu.update(this.game.input);
   }
 

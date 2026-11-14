@@ -7,15 +7,19 @@ import { SpellRegistry } from '../data/SpellRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import type { Character } from '../entities/Character.js';
 import { NES_FONT } from '../ui/NESFont.js';
+import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
+import { canLearn, learnersLine } from './shop/spellLearners.js';
 import { buySpell, spellPrice } from '../systems/SpellPurchase.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type State = 'spells' | 'character' | 'slot';
 
+const GREY = 0x808080;
+const INFO_Y = 748;
+const INFO_HEIGHT = HELP_RECT.y - SCREEN_MARGIN - INFO_Y;
+
 export class MagicShopScene implements Scene {
   readonly container = new Container();
-  private game: Game;
-  private shopId: string;
   private state: State = 'spells';
   private spells: SpellData[] = [];
   private selectedSpell: SpellData | null = null;
@@ -25,15 +29,15 @@ export class MagicShopScene implements Scene {
   private mainWindow!: Window;
   private goldWindow!: Window;
   private goldText!: BitmapText;
+  private infoWindow!: Window;
+  private learnText!: BitmapText;
+  private help!: HelpWindow;
   private spellMenu!: Menu;
   private charMenu!: Menu;
   private slotMenu!: Menu;
   private messageText!: BitmapText;
 
-  constructor(game: Game, shopId: string) {
-    this.game = game;
-    this.shopId = shopId;
-  }
+  constructor(private readonly game: Game, private readonly shopId: string) {}
 
   enter(): void {
     const shop = ShopRegistry.getShop(this.shopId);
@@ -43,19 +47,26 @@ export class MagicShopScene implements Scene {
       .map(id => SpellRegistry.getSpell(id))
       .filter((s): s is SpellData => !!s);
 
-    this.mainWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 800 });
+    this.mainWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: INFO_Y - 2 * SCREEN_MARGIN });
     this.container.addChild(this.mainWindow);
 
-    this.goldWindow = new Window({ x: SCREEN_MARGIN, y: 848, width: 500, height: 100 });
+    // gold (left) and the learners / result lines (right) above the help bar at the bottom
+    this.goldWindow = new Window({ x: SCREEN_MARGIN, y: INFO_Y, width: 500, height: INFO_HEIGHT });
     this.container.addChild(this.goldWindow);
     this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
     this.goldWindow.addChild(this.goldText);
     this.updateGold();
 
+    const infoX = SCREEN_MARGIN + 500 + SCREEN_MARGIN;
+    this.infoWindow = new Window({ x: infoX, y: INFO_Y, width: GAME_WIDTH - SCREEN_MARGIN - infoX, height: INFO_HEIGHT });
+    this.learnText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.learnText.position.set(this.infoWindow.contentX, this.infoWindow.contentY);
     this.messageText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
-    this.messageText.position.set(600, 880);
-    this.container.addChild(this.messageText);
+    this.messageText.position.set(this.infoWindow.contentX, this.infoWindow.contentY + FONT_SIZE + 12);
+    this.infoWindow.addChild(this.learnText, this.messageText);
+    this.help = new HelpWindow();
+    this.container.addChild(this.infoWindow, this.help);
 
     this.showSpellMenu();
   }
@@ -84,6 +95,23 @@ export class MagicShopScene implements Scene {
       onCancel: () => this.exitScene()
     });
     this.mainWindow.addChild(this.spellMenu);
+    this.showSpellInfo();
+  }
+
+  /** The help bar's text (the highlighted spell's description). */
+  get helpText(): string { return this.help?.text ?? ''; }
+  /** The learners line ("Learn: WM RM") and whether it is greyed (nobody in the party can learn the spell). */
+  get learners(): { text: string; greyed: boolean } {
+    return { text: this.learnText?.text ?? '', greyed: this.learnText?.tint === GREY };
+  }
+
+  /** Description and learners of the spell under the cursor. */
+  private showSpellInfo(): void {
+    const spell = SpellRegistry.getSpell(this.spellMenu?.selectedItem?.value ?? '');
+    this.help.setText(spell?.description ?? '');
+    this.learnText.text = spell ? learnersLine(spell) : '';
+    const anyone = spell ? this.game.party.all.some((c) => canLearn(c, spell)) : false;
+    this.learnText.tint = anyone ? 0xffffff : GREY;
   }
 
   private onSpellSelect(spellId: string): void {
@@ -91,10 +119,7 @@ export class MagicShopScene implements Scene {
     if (!spell) return;
     this.selectedSpell = spell;
 
-    this.eligibleMembers = this.game.party.all.filter(c => {
-      const maxLevel = c.classData.spellLevels[spell.type];
-      return maxLevel >= spell.level;
-    });
+    this.eligibleMembers = this.game.party.all.filter((c) => canLearn(c, spell));
 
     if (this.eligibleMembers.length === 0) {
       this.showMessage('No one can learn this.');
@@ -191,7 +216,11 @@ export class MagicShopScene implements Scene {
 
   update(_dt: number): void {
     const input = this.game.input;
-    if (this.state === 'spells' && this.spellMenu) this.spellMenu.update(input);
+    if (this.state === 'spells' && this.spellMenu) {
+      const prev = this.spellMenu.selectedIndex;
+      this.spellMenu.update(input);
+      if (this.state === 'spells' && this.spellMenu.selectedIndex !== prev) this.showSpellInfo();
+    }
     else if (this.state === 'character' && this.charMenu) this.charMenu.update(input);
     else if (this.state === 'slot' && this.slotMenu) this.slotMenu.update(input);
   }

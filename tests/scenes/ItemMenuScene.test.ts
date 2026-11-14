@@ -46,3 +46,48 @@ describe('MS-8: Tents and Cabins only where the map allows camping', () => {
     expect(war.currentHp).toBeGreaterThan(1);
   });
 });
+
+describe('MS-7: the item menu shows descriptions and the targets\' HP and status', () => {
+  function open() {
+    const input = tapInput();
+    const war = new Character({ name: 'FGHTR', classData: ClassRegistry.getClass('warrior')! });
+    war.currentHp = 7;
+    war.statusTracker.apply('poison', 99);
+    const mage = new Character({ name: 'W.MAG', classData: ClassRegistry.getClass('white_mage')! });
+    mage.currentHp = 0;
+    const party = new PartyManager();
+    party.add(war);
+    party.add(mage);
+    const inventory = new Inventory();
+    inventory.add('potion', 2);
+    inventory.add('antidote', 1);
+    const game = { input, party, inventory, scenes: { pop: vi.fn(), get: vi.fn() } };
+    const menu = new ItemMenuScene(game as unknown as Game);
+    menu.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => menu.update(1));
+    return { menu, tap, war, mage };
+  }
+
+  it('the help bar shows the highlighted item\'s description (not its name) and follows the cursor', () => {
+    const { menu, tap } = open();
+    expect(menu.helpText).toBe('Restores 30 HP to one ally.');
+    expect(visibleLabels(menu.container)).toContain('Restores 30 HP to one ally.');
+    tap('down');
+    expect(menu.helpText).toBe('Cures poison on one ally.');
+  });
+
+  it('the target list shows each member\'s HP cur/max and status', () => {
+    const { menu, tap, war, mage } = open();
+    tap('confirm'); // Potion -> pick a target
+    const labels = visibleLabels(menu.container);
+    expect(labels.some((l) => l.startsWith('FGHTR') && l.includes(`HP   7/${String(war.maxHp).padStart(3)}`) && l.includes('POISON'))).toBe(true);
+    expect(labels.some((l) => l.startsWith('W.MAG') && l.includes(`HP   0/${String(mage.maxHp).padStart(3)}`) && l.endsWith('KO'))).toBe(true);
+  });
+
+  it('the result of using an item stays in the help bar', () => {
+    const { menu, tap } = open();
+    tap('confirm'); // Potion
+    tap('confirm'); // on FGHTR
+    expect(menu.helpText).toContain('FGHTR recovered');
+  });
+});

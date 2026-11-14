@@ -151,3 +151,16 @@ describe('MS-3: Tent and Cabin skip the fallen', () => {
     expect(fighter.currentHp).toBeGreaterThan(1);
   });
 });
+
+describe('MS-7: field magic shows the spell description in the help bar', () => {
+  it('hidden while choosing a caster; the highlighted spell\'s description while choosing a spell', () => {
+    const { scene, tap } = openScene([mage, fighter]);
+    expect(scene.helpText).toBe('');
+    tap('confirm'); // W.MAG: CURE, HEAL
+    expect(scene.helpText).toBe(SpellRegistry.getSpell('cure')!.description);
+    tap('down');
+    expect(scene.helpText).toBe(SpellRegistry.getSpell('heal')!.description);
+    tap('cancel');
+    expect(scene.helpText).toBe('');
+  });
+});

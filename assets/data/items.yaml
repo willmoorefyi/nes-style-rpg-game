@@ -1,5 +1,6 @@
 - id: small_knife
   name: Small Knife
+  description: "A light blade any class can use. ATK 5."
   type: weapon
   stats:
     attack: 5
@@ -15,6 +16,7 @@
   crit: 2
 - id: wooden_nunchaku
   name: Wooden Nunchaku
+  description: "Monk weapon of hard wood. ATK 12."
   type: weapon
   stats:
     attack: 12
@@ -25,6 +27,7 @@
   crit: 1
 - id: staff
   name: Staff
+  description: "A plain wooden staff for mages and monks. ATK 6."
   type: weapon
   stats:
     attack: 6
@@ -38,6 +41,7 @@
   crit: 3
 - id: rapier
   name: Rapier
+  description: "A thin, quick sword. ATK 9, hit +5."
   type: weapon
   stats:
     attack: 9
@@ -50,6 +54,7 @@
   crit: 4
 - id: short_sword
   name: Short Sword
+  description: "A sturdy short blade. ATK 15, hit +10."
   type: weapon
   stats:
     attack: 15
@@ -62,6 +67,7 @@
   crit: 6
 - id: hammer
   name: Hammer
+  description: "A blunt hammer for warriors and white mages. ATK 9."
   type: weapon
   stats:
     attack: 9
@@ -73,6 +79,7 @@
   crit: 5
 - id: hand_axe
   name: Hand Axe
+  description: "A heavy one-handed axe. ATK 16."
   type: weapon
   stats:
     attack: 16
@@ -83,6 +90,7 @@
   crit: 7
 - id: iron_nunchaku
   name: Iron Nunchaku
+  description: "Monk weapon of iron links. ATK 16."
   type: weapon
   stats:
     attack: 16
@@ -93,6 +101,7 @@
   crit: 9
 - id: iron_sword
   name: Iron Sword
+  description: "A well-forged iron sword. ATK 14, hit +10."
   type: weapon
   stats:
     attack: 14
@@ -104,6 +113,7 @@
   crit: 10
 - id: mythril_sword
   name: Mythril Sword
+  description: "Mythril blade, strong against undead. ATK 23."
   type: weapon
   stats:
     attack: 23
@@ -116,6 +126,7 @@
   crit: 12
 - id: mythril_knife
   name: Mythril Knife
+  description: "Mythril dagger, strong against undead. ATK 15."
   type: weapon
   stats:
     attack: 15
@@ -129,6 +140,7 @@
   crit: 12
 - id: great_axe
   name: Great Axe
+  description: "A huge axe, strong against giants. ATK 22."
   type: weapon
   stats:
     attack: 22
@@ -140,6 +152,7 @@
   crit: 14
 - id: mythril_hammer
   name: Mythril Hammer
+  description: "Mythril hammer, strong against undead. ATK 18."
   type: weapon
   stats:
     attack: 18
@@ -152,6 +165,7 @@
   crit: 12
 - id: power_staff
   name: Power Staff
+  description: "A staff with a weighted head. ATK 12."
   type: weapon
   stats:
     attack: 12
@@ -164,6 +178,7 @@
   crit: 10
 - id: flame_sword
   name: Flame Sword
+  description: "A burning blade, strong against undead. ATK 26."
   type: weapon
   stats:
     attack: 26
@@ -176,6 +191,7 @@
   crit: 16
 - id: ice_brand
   name: Ice Brand
+  description: "A blade of frozen steel. ATK 26."
   type: weapon
   stats:
     attack: 26
@@ -187,6 +203,7 @@
   crit: 16
 - id: coral_sword
   name: Coral Sword
+  description: "Coral blade, strong against sea foes. ATK 26."
   type: weapon
   stats:
     attack: 26
@@ -200,6 +217,7 @@
   crit: 16
 - id: masamune
   name: Masamune
+  description: "The legendary blade. Anyone can wield it. ATK 56."
   type: weapon
   stats:
     attack: 56
@@ -216,6 +234,7 @@
   crit: 20
 - id: cloth
   name: Cloth
+  description: "Simple clothes any class can wear. DEF 1."
   type: armor
   stats:
     defense: 1
@@ -231,6 +250,7 @@
   weight: 2
 - id: robe
   name: Robe
+  description: "A mage's robe. DEF 2, weight 2."
   type: armor
   stats:
     defense: 2
@@ -243,6 +263,7 @@
   weight: 2
 - id: leather_armor
   name: Leather Armor
+  description: "Hardened leather. DEF 4, weight 8."
   type: armor
   stats:
     defense: 4
@@ -256,6 +277,7 @@
   weight: 8
 - id: wooden_armor
   name: Wooden Armor
+  description: "Plates of hard wood. DEF 4, weight 8."
   type: armor
   stats:
     defense: 4
@@ -266,6 +288,7 @@
   weight: 8
 - id: chain_mail
   name: Chain Mail
+  description: "Linked iron rings. DEF 15, weight 15."
   type: armor
   stats:
     defense: 15
@@ -277,6 +300,7 @@
   weight: 15
 - id: iron_armor
   name: Iron Armor
+  description: "Full iron plate. DEF 24, heavy (weight 23)."
   type: armor
   stats:
     defense: 24
@@ -287,6 +311,7 @@
   weight: 23
 - id: mythril_armor
   name: Mythril Armor
+  description: "Mythril plate. DEF 34, heavy (weight 33)."
   type: armor
   stats:
     defense: 34
@@ -297,6 +322,7 @@
   weight: 33
 - id: mythril_mail
   name: Mythril Mail
+  description: "Light mythril links. DEF 18, weight 8."
   type: armor
   stats:
     defense: 18
@@ -308,6 +334,7 @@
   weight: 8
 - id: dragon_armor
   name: Dragon Armor
+  description: "Armour of dragon scale. DEF 42, weight 10."
   type: armor
   stats:
     defense: 42
@@ -318,6 +345,7 @@
   weight: 10
 - id: wooden_shield
   name: Wooden Shield
+  description: "A round wooden shield. DEF 2."
   type: armor
   slot: shield
   stats:
@@ -329,6 +357,7 @@
   weight: 0
 - id: iron_shield
   name: Iron Shield
+  description: "A solid iron shield. DEF 4."
   type: armor
   slot: shield
   stats:
@@ -339,6 +368,7 @@
   weight: 0
 - id: mythril_shield
   name: Mythril Shield
+  description: "A light mythril shield. DEF 8."
   type: armor
   slot: shield
   stats:
@@ -350,6 +380,7 @@
   weight: 0
 - id: cap
   name: Cap
+  description: "A leather cap any class can wear. DEF 1."
   type: armor
   slot: helmet
   stats:
@@ -365,6 +396,7 @@
   weight: 1
 - id: iron_helm
   name: Iron Helm
+  description: "An iron helmet. DEF 3."
   type: armor
   slot: helmet
   stats:
@@ -375,6 +407,7 @@
   weight: 3
 - id: mythril_helm
   name: Mythril Helm
+  description: "A mythril helmet. DEF 6."
   type: armor
   slot: helmet
   stats:
@@ -385,6 +418,7 @@
   weight: 3
 - id: potion
   name: Potion
+  description: "Restores 30 HP to one ally."
   type: consumable
   stats:
     hp: 30
@@ -392,6 +426,7 @@
   usableBy: []
 - id: hi_potion
   name: Hi-Potion
+  description: "Restores 120 HP to one ally."
   type: consumable
   stats:
     hp: 120
@@ -399,48 +434,56 @@
   usableBy: []
 - id: ether
   name: Ether
+  description: "Restores 1 spell charge per level to one ally."
   type: consumable
   stats: {}
   price: 150
   usableBy: []
 - id: antidote
   name: Antidote
+  description: "Cures poison on one ally."
   type: consumable
   stats: {}
   price: 75
   usableBy: []
 - id: soft
   name: Soft
+  description: "Cures stone on one ally."
   type: consumable
   stats: {}
   price: 800
   usableBy: []
 - id: phoenix_down
   name: Phoenix Down
+  description: "Revives one fallen ally with 1 HP."
   type: consumable
   stats: {}
   price: 500
   usableBy: []
 - id: tent
   name: Tent
+  description: "Party rests: half HP and charges back. World map only."
   type: consumable
   stats: {}
   price: 75
   usableBy: []
 - id: cabin
   name: Cabin
+  description: "Party rests: full HP and charges back. World map only."
   type: consumable
   stats: {}
   price: 250
   usableBy: []
 - id: lute
   name: Lute
+  description: "The princess's lute. Its song may open the way."
   type: key
   stats: {}
   price: 0
   usableBy: []
 - id: mystic_key
   name: Mystic Key
+  description: "A key that opens sealed doors."
   type: key
   stats: {}
   price: 0
