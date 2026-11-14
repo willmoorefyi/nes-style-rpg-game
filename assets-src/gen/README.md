@@ -89,3 +89,29 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 - A `cloth` part may give its `chain` per keyframe (`chain: {idle: [...], attack: [...]}`); its joints join the wind
   and cast move sets like a plain chain.
 - `breath_joint:` moves the `idle_b` cut (default `hip`).
+
+## Monster animation (docs/ENEMY_ANIM_PLAN.md, docs/ENEMY_ANIM_ISSUES.md)
+
+In-betweens are cut from the approved monster pixels by `monster_anim.py` (no AI, no Bedrock, no paid requests); the
+approved sheets are never modified. One rig per base sprite in `anim/monsters/<sprite>.yaml`; palette variants reuse it.
+
+```bash
+python3 -I assets-src/gen/monster_anim.py mark <id>            # zoomed keyframes with joints and part labels
+python3 -I assets-src/gen/monster_anim.py check --all          # every check + lock files: only "OK" lines
+python3 -I assets-src/gen/monster_anim.py review <id> ...      # gen/out/anim/review/monsters/ (strips, onion, GIFs, _stage)
+python3 -I assets-src/gen/monster_anim.py lock <id>            # <id>.lock.json, only after the image review passes
+python3 -I assets-src/build_assets.py monsters_ai              # the build runs the same checks (efix gates on)
+```
+
+- Rig fixes go in the rig: masks, `z`, `frames.<f>` (`tweaks`, `pins`, `dy`, `drop`, `moves`, `scale`, `sampler`),
+  `holds` (at most 1 per sequence) and `paint` (`{frame, xy: [[x, y], ...], rgb: [r, g, b] | null}`, native frame
+  pixels; use a colour from the surrounding approved palette). Review-strip coordinates are 4x: native = (px − 2) / 4.
+- `frames.<f>.scale: {part: s}` (0.25 ≤ s ≤ 1) is for `kind: fx` parts only; `frames.<f>.sampler: nearest |
+  rotsprite` overrides the rig's `sampler` in one frame (`monster_render.py`).
+- Checks: `anim_checks.py` (5.1 checks 1-14), `anim_efix.py` and `monster_check.py` (F1 fx exclusion, F3 fx-mask
+  integrity, F4 intra-part crease, F5 foot release, F7 prop attached; F6 edge roughness is report only). The fx parts
+  are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`.
+- A frame whose bytes change fails `check` until it is reviewed and re-locked. The monster atlas must be identical
+  under any `PYTHONHASHSEED`, and a `monsters_ai` build must leave the party atlases byte-identical.
+- `python3 -I assets-src/gen/selftest.py` covers the monster pipeline (`selftest_anim`, `selftest_beasts`,
+  `selftest_fixes`, `selftest_efix`, including the real-lich crystal size check: `cast_rise` ≤ 40 % of `cast`).

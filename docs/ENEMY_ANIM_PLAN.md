@@ -149,7 +149,8 @@ hurt in-betweens and is gone at the approved `hurt`. The "fade" is **occlusion o
 
 **Fx parts** (lich trail and crystal, Garland glow) exist only in frames whose pixel source carries them:
 - The lich trail is dropped from `atk_follow`.
-- The crystal and the glow appear at `cast`, stay in `cast_release`, and are absent from `cast_rise`.
+- The glow appears at `cast` and stays in `cast_release`. The lich crystal grows in: about 30 % of its `cast` size in
+  `cast_rise` (`frames.cast_rise.scale: {crystal: 0.55}`, E4; `selftest_efix` asserts at most 40 %), full at `cast`.
 
 ### 3.2 Runtime timing (60 fps frames; `dt` is in frames as today)
 
@@ -437,8 +438,8 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
 
 **Wave-0 checks (docs/ENEMY_ANIM_ISSUES.md §2, `anim_efix.py`).**
 - `check_sprite(..., efix_gates=True)` runs checks 15-18 in `monster_anim.py check` and `review`.
-- The `monsters_ai` build passes `efix_gates=False` (`monster_atlas.sprite_frames`) until the integrator turns it on
-  in V.3.
+- Since V.3 the `monsters_ai` build passes `efix_gates=True` (`monster_atlas.sprite_frames`), so checks 15-18 gate
+  the build as well.
 - Each check is RED first on a synthetic fixture in `selftest_efix.py`.
 
 15. **fx-mask integrity (F3).** Opaque pixels of a keyframe inside an fx part's `masks` polygon must not be

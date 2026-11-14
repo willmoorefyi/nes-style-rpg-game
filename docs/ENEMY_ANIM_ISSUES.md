@@ -470,3 +470,83 @@ Momus verdict: REVISE (4 must, 6 should, 8 nits). All are adopted, and they over
 16. **Expected reds:** the expected-red list is matched by frame, not by message.
 17. **E13:** the dying start pose follows the frame on screen: `hurt` → `DYING_IN`, `hurt_in2` → `HURT_REHIT_AT`, `hurt_in1` → 0.
 18. **Wave-0 changes during the wave:** an on-call wave-0 fix lands on `enemy-anim`; the requesting worktree merges it, and the other tranches pick it up at integration. E16's test-only atlas is built by copying the JSON and deleting one sheet entry in a temp dir (no repo change).
+
+## Result
+
+Integrated on `enemy-anim` (V.3). Commits after `1692c05`: plan (`bcb3c6a`, `d76f38c`), wave 0 (`00ef35e`), wave 1
+(`87c56f5` R, `5aaacd5` G2, `2ada78f` G4, `14747cd` G3, `67fcc0f` G1), V.1 follow-ups (`17026b8`, `09382c6`,
+`671c005`), zero-nit paint and locks (`08253dc`), integration and atlas (`f17c83b`). The style lock held: no file
+under `assets-src/gen/approved/` changed, and no image was generated (paid or Bedrock).
+
+### Per item
+
+| ID | Done |
+|---|---|
+| E1 | `BattleStateMachine.nextActorLosesTurn()` (sleep, stun, stone, lethal poison; no RNG). An enemy that loses its turn goes straight to execute, frozen on idle. Fear still lunges (O1). |
+| E2 | Garland: `cape_i` mask covers the whole cape and the sword mask starts at the pommel. Cape and blade ride the body in wind / recover, so there is no flap and no blade-lift fill. Seam and pinhole paint. |
+| E3 | Lich: the frost arc is one fx `trail` (the `blade` part merged into it, revision 2). The head mask is clear of the arc, and the pale remnant at the hidden shaft end is cleared, leaving a bare shaft (O5). |
+| E4 | Lich: the crystal is fx, rigid in the fist, at `frames.cast_rise.scale: {crystal: 0.55}` (332 of 1093 px in `cast_rise`, 30 %). `cast_gather` is deeper. The real-lich selftest (revision 4) asserts ≤ 40 %. |
+| E5 | Vampire `atk_recover`: the head slide is cut to crown / neck / `cv_0` [2, 1], so face, collar and buttons stay intact. |
+| E6 | Dragon: in `hurt_in2` the neck and head keep the hurt angle (no ghost horn). Hurt `thigh_n` and `thigh_f` masks, the idle belly band moved to the body, a hip lift without spine tweaks in `hurt_in1` (t 0.32), longer `hurt_in2` hind legs, body `width: 16`. `atk_mid` / `atk_follow` use rotsprite with a smaller `wt_f` spread (roughness +5.28 → +0.30). V.1 follow-up: the far hind leg is repainted as the hurt key's leg, and the specks are removed. |
+| E7 | Troll: the hump rides with the head in `atk_follow` (head mask), so there is one head. The belly flank is kept off the near arm, and the follow forearm is lowered about the elbow only. V.1 follow-up: the hump notch is closed, and the `hurt_in2` mallet sits behind the loincloth. |
+| E8 | Wolf: the idle neck mask is redrawn (no crease, F4), the `atk_recover` forepaws are planted (F5), and the `hurt_in1` hocks are pinned (haunch). The 6 px forepaw lift in `hurt_in1` is accepted (O3). gr_wolf is re-checked after the recolour. |
+| E9 | Ogre: the hurt club lies behind the near shin (`club_h`), with the head ends past the shin erased. The `hurt_in2` back edge and shoulder blade are evened out by paint, and the `atk_wind2` arm runs along the side. |
+| E10 | Vampire `atk_mid`: `el_n` / `hand_n` stay on the attack pose (no smear), the ink-blob paint is removed, and the stray collar pixel is inked. V.1 follow-up: the collar spike is joined to the head. |
+| E11 | Cockatrice `hurt_in2`: the near wing is not turned (`wtip_n` [-2, 1]). |
+| E12 | Pirate: wind1 anticipation (t −0.30, sword arm drawn back and up, head back) and a deeper wind2. |
+| E13 | The dying start pose follows the frame on screen: `hurt` → `DYING_IN`, `hurt_in2` → `HURT_REHIT_AT`, `hurt_in1` → 0. |
+| E14 | The shake signs are swapped, so the first hold frame recoils away from the party (−9, −9, −3, −3, …). |
+| E15 | Every `BOSS_CAST` and `PLAIN_CAST` row has dy 0, so the feet stay on the plain; the motion is in the pinned cast in-betweens. |
+| E16 | `BattleArt` warns once per sprite when the loaded atlas lacks its sheet (no warning before the atlas loads). |
+| E17 | Where the fade starts (`dyingEnemies.set`), the enemy also enters `freezeDying`, so a death with no damage event holds `hurt` instead of animating. |
+| E18 | The step label sits at `(16, BATTLE_MESSAGE_HEIGHT + 8)`, below the message window. |
+
+Framework (wave 0): F1-F7 as planned, and `monster_render.py` / `rig_rotsprite.py` were split out. In V.3, F3-F5 and
+F7 joined the build gate (`monster_atlas.sprite_frames` now passes `efix_gates=True`).
+
+### V.1 image review
+
+- **Round 1:** cockatrice, wolf and pirate SHIP, and were locked (`17026b8`). The other six returned to their owners.
+- **Round 2 (follow-ups):**
+  - vampire, garland and lich got outline fixes (`09382c6`);
+  - dragon, ogre and troll got rig and paint fixes (`671c005`).
+- **Final zero-nit list:** 11 px of paint (`08253dc`). Each pixel was verified by a HEAD-vs-new per-frame diff (only the
+  listed pixels changed) and by zoomed crops.
+  - ogre `hurt_in1` (77, 83) and (79, 86), `hurt_in2` (58, 39) and (71, 70): 1 px background holes closed with ink.
+    The `hurt_in1` holes are at the club hand / hip. The coordinates reported for `hurt_in1` had no hole; they belong
+    to `hurt_in2`.
+  - vampire `atk_follow` (42, 34): a hole in the hair, closed with ink. `atk_recover` (37, 36) and (39, 38): stray
+    red → lapel colour.
+  - garland `atk_mid` (125, 159) and (126, 160): leg fill. `atk_follow` (131, 137): ink.
+- **Then locked:** dragon, ogre, troll, vampire, garland and lich.
+- **Browser re-test (V.2):** not recorded here.
+
+### Locks
+
+All 12 rigs are locked (goblin, skeleton and mummy since before this round). `monster_anim.py check --all`: 12 × OK,
+and no lock line.
+
+### V.3 validation
+
+| Command / check | Result |
+|---|---|
+| `python3 -I assets-src/gen/selftest.py` | ALL PASSED. The new lich crystal check was RED first: with the scale at 1.0 in memory, 1093 / 1093 px. |
+| `monster_anim.py check --all` with the gates on in the build | all OK |
+| `build_assets.py monsters_ai battle_ai field_ai` | OK. Party atlases byte-identical (`git diff --exit-code`); `monsters-ai.json` unchanged. |
+| Monster atlas rebuilt with `PYTHONHASHSEED=1 python3 -s` | `cmp`-identical PNG and JSON |
+| gr_imp, goblin, skeleton, mummy cells (cropped by the JSON rects, HEAD atlas vs rebuilt) | byte-equal (revision 9) |
+| `npx tsc --noEmit -p .`, `npm run build` | clean |
+| `npx vitest run` | 163 files, 2718 tests passed |
+
+### Remaining accepted nits
+
+- **Decisions:** O1 (a feared enemy lunges), O3 (wolf forepaw lift in `hurt_in1`), O4 (gather → rise source switch)
+  and O5 (bare glaive shaft in lich `atk_follow`).
+- **Source art:** the ogre's approved idle club is cut flat at x 106.
+- **Edge notches copied from the approved keyframes, not holes:**
+  - vampire `atk_follow` (70, 53), (65, 55), (67, 55), (58, 60), the same pixels as in the attack key;
+  - vampire `atk_recover` (61, 46), from idle (62, 46);
+  - garland `atk_follow` (133, 116), on the silhouette edge.
+- **Report only:**
+  - edge roughness top values: vampire `atk_mid` +5.36, garland `atk_mid` +4.52, ogre `atk_mid` +3.65;
+  - mask overlap: garland hurt `cape_h` 313 px (sword 310), idle `cape_i` 12 px.
