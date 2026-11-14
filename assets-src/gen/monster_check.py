@@ -2,9 +2,9 @@
 (docs/ENEMY_ANIM_PLAN.md 5.1). Used by monster_anim.py check / review / lock and by the monsters_ai build.
 
 `efix_gates` (docs/ENEMY_ANIM_ISSUES.md, revision 1) switches the wave-0 checks F3 (fx-mask integrity), F4 (intra-
-part crease), F5 (foot release) and F7 (prop attached) on: `monster_anim.py check / review` pass True, the build
-(monster_atlas.sprite_frames) passes False until the integrator turns it on in V.3. F1 (fx exclusion in check 6) is
-strict with the gates on; with them off it can only relax check 6, so wave 0 makes no build fail."""
+part crease), F5 (foot release) and F7 (prop attached) on: `monster_anim.py check / review` and, since V.3, the build
+(monster_atlas.sprite_frames) pass True. F1 (fx exclusion in check 6) is strict with the gates on; with them off (only
+the selftests turn them off) it can only relax check 6."""
 from __future__ import annotations
 
 import json

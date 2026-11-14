@@ -1,6 +1,7 @@
 """Wave-0 framework selftests (docs/ENEMY_ANIM_ISSUES.md section 2), each RED first on a synthetic fixture: F1 fx
 exclusion, F2 part scale and the per-frame sampler, F3 fx-mask integrity, F4 intra-part crease, F5 foot release, F6
-roughness, F7 prop attached, the efix_gates switch, and the fx allowlist (revision 3)."""
+roughness, F7 prop attached, the efix_gates switch, the fx allowlist (revision 3), and the real-lich crystal size in
+cast_rise (revision 4, E4)."""
 from __future__ import annotations
 
 import copy
@@ -182,7 +183,7 @@ def run_f5(check: Callable[[bool, str], None]) -> None:
 
 
 def run_gates(check: Callable[[bool, str], None]) -> None:
-    """Revision 1: the new checks run in check / review (efix_gates True) and stay out of the build until V.3."""
+    """Revision 1: the new checks run in check / review (efix_gates True) and, since V.3, in the build gate too."""
     from gen import anim_efix as E, monster_atlas as MAT, monster_check as MC
     a, lab = _canvas()
     _paint(a, lab, (10, 10, 60, 60), BODY, 0)
@@ -193,7 +194,7 @@ def run_gates(check: Callable[[bool, str], None]) -> None:
     on, off = MC.frame_checks(*args), MC.frame_checks(*args, efix_gates=False)
     check(any("crease" in e for e in on) and not any("crease" in e for e in off), "efix_gates: on in check, off by flag")
     src = inspect.getsource(MAT.sprite_frames)
-    check("efix_gates=False" in src, "efix_gates: the monsters_ai build passes False until V.3")
+    check("efix_gates=True" in src and "efix_gates=False" not in src, "efix_gates: the monsters_ai build gates on them (V.3)")
     check(E.roughness(np.pad(np.ones((20, 20, 4), np.uint8) * 255, ((5, 5), (5, 5), (0, 0)))) == 0.0, "F6: a square is smooth")
 
 
@@ -212,6 +213,26 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
     check(not missing, f"fx allowlist: every approved fx part is declared {sorted(missing)}")
 
 
+def lich_crystal_ratio(cfg: dict | None = None) -> tuple[int, int]:
+    """(crystal px in the generated lich cast_rise, crystal px in the approved cast keyframe), from the real rig and
+    sheet; `cfg` overrides the rig file (the RED-first run sets the rise scale back to 1.0 in memory)."""
+    from gen import monster_anim as MA, rig as R
+    cfg = cfg if cfg is not None else MA.load_rig("lich")
+    _, meta, kfs = next(e for e in MA.load_entries() if e[0] == "lich")
+    gen = MA.generate("lich", cfg, kfs, meta)
+    rig = R.Rig(cfg, kfs["idle"].size)
+    rise = int((gen["cast_rise"]["labels"] == list(rig.parts).index("crystal")).sum())
+    plab, pnames = R.segment(rig, "cast", np.asarray(kfs["cast"].convert("RGBA")).copy())
+    return rise, int((plab == pnames.index("crystal")).sum())
+
+
+def run_lich_crystal(check: Callable[[bool, str], None]) -> None:
+    """Revision 4 (E4, V.3): on the real lich the crystal grows in, so in cast_rise it is at most 40 % of its size
+    in cast (RED with frames.cast_rise.scale.crystal at 1.0)."""
+    rise, cast = lich_crystal_ratio()
+    check(cast > 0 and rise <= 0.4 * cast, f"E4: lich crystal in cast_rise is at most 40 % of cast ({rise} / {cast} px)")
+
+
 def run_efix(check: Callable[[bool, str], None]) -> None:
-    for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist):
+    for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal):
         fn(check)

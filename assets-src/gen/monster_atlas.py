@@ -40,14 +40,14 @@ def shelf_pack(sizes: list[tuple[int, int]], cap: int = SHELF_W) -> tuple[list[t
 def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict[str, Image.Image], list[str], bool]:
     """(unique frames: keyframes + generated, holds, anim) for a base sprite; the build fails on a check failure in a
     frame that is not held (lock mismatches only warn here; `monster_anim.py check --all` fails on them). The wave-0
-    checks F3-F5 and F7 stay out of the build gate until V.3 (docs/ENEMY_ANIM_ISSUES.md, revision 1)."""
+    checks F3-F5 and F7 are part of the build gate since V.3 (docs/ENEMY_ANIM_ISSUES.md, revision 1)."""
     from gen import monster_check as MC
     cfg = MA.load_rig(sid)
     if not cfg:
         return dict(kfs), [], False
     gen = MA.generate(sid, cfg, kfs, meta)
     holds = [h["frame"] for h in cfg.get("holds") or []]
-    rep = MC.check_sprite(sid, cfg, kfs, meta, gen, efix_gates=False)   # V.3 (integrator): efix_gates=True
+    rep = MC.check_sprite(sid, cfg, kfs, meta, gen, efix_gates=True)   # V.3: the wave-0 checks gate the build
     lock = rep.pop("lock", [])
     fails = [f"{sid} {k}: {e}" for k, v in rep.items() for e in v]
     if fails:
