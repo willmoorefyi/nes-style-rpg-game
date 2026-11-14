@@ -195,3 +195,5 @@
 {"event": "result", "key": "b398fc75dc4521f0a2e9f762", "ok": true}
 {"event": "attempt", "ts": "2026-11-14T04:44:33", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_stairs_lib", "seed": 1234, "key": "2b119549410186ccfeaadeef"}
 {"event": "result", "key": "2b119549410186ccfeaadeef", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:47:26", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vendor_f", "sheet": "field", "seed": 1234, "key": "c0b04dee287999463b761f24"}
+{"event": "result", "key": "c0b04dee287999463b761f24", "ok": true}

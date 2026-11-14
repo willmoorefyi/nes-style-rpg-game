@@ -203,3 +203,26 @@
   identity_ref: assets-src/gen/approved/garland/boss_idle.png
   seeds: [1234]
 
+# T6-art (CT-9 / UI-2): Cornelia townsfolk
+- id: vendor_f
+  sheets: [field]
+  robed: true
+  prompt: >-
+    stout middle-aged market woman with rosy cheeks, green headscarf, brown knitted shawl over a mustard-yellow
+    dress, white apron, brown shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: farmer
+  sheets: [field]
+  prompt: >-
+    sun-tanned farmer with a wide straw hat, short brown beard, sleeveless olive tunic over a cream shirt, rolled
+    brown trousers, brown boots
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
+- id: burgher
+  sheets: [field]
+  prompt: >-
+    well-to-do townsman with a neat grey moustache, plum-purple doublet with a white ruff collar, black trousers,
+    short black cape, black cap with a white feather, black shoes
+  field_gear: empty hands, arms at the sides
+  seeds: [1234]
