@@ -1,6 +1,7 @@
 import { Container, BitmapText, Sprite, type Texture } from 'pixi.js';
 import type { CharacterClassData } from '../../types/index.js';
 import { Window } from '../../ui/Window.js';
+import { classLabel } from '../../data/classLabel.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN, LINE_HEIGHT } from '../../core/LayoutConstants.js';
 
@@ -18,11 +19,6 @@ function label(text: string, x: number, y: number, fill = 0xffffff): BitmapText 
   const t = new BitmapText({ text, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill } });
   t.position.set(x, y);
   return t;
-}
-
-/** A class's label in the strip: its `abbr` from classes.yaml (WAR, WHM), else its full name. */
-export function classLabel(cls: CharacterClassData): string {
-  return cls.abbr ?? cls.name;
 }
 
 /**

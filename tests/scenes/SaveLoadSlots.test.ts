@@ -119,8 +119,8 @@ describe('R3: Save and Load screens (S4, S5)', () => {
     const load = new LoadScene(g as unknown as Game);
     load.enter();
     expect(texts(load.container)).toContain('Slot 1  Cornelia Castle 2F  0:00');
-    expect(load.detailText).toMatch(new RegExp(`^ROLF  Wa  Lv3  HP 20/${rolf.maxHp}$`, 'm'));
-    expect(load.detailText).toMatch(/^MAYA  WM  Lv1  HP \d+\/\d+$/m);
+    expect(load.detailText).toMatch(new RegExp(`^ROLF  WAR  Lv3  HP 20/${rolf.maxHp}$`, 'm'));
+    expect(load.detailText).toMatch(/^MAYA  WHM  Lv1  HP \d+\/\d+$/m);
     expect(load.detailText).toContain('400 G');
     expect(load.detailText).toMatch(/Saved \d{4}-\d{2}-\d{2} \d{2}:\d{2}/);
   });

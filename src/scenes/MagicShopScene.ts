@@ -74,7 +74,7 @@ export class MagicShopScene implements Scene {
   get phase(): State { return this.state; }
   /** The help bar's text (the highlighted spell's description). */
   get helpText(): string { return this.help.text; }
-  /** The learners line ("Learn: WM RM") and whether it is greyed (nobody in the party can learn the spell). */
+  /** The learners line ("Learn: WHM RDM") and whether it is greyed (nobody in the party can learn the spell). */
   get learners(): { text: string; greyed: boolean } { return this.panel.learners; }
   /** The panel's per-member lines (`W.MAG  knows`), while choosing a spell. */
   get panelLines(): string[] { return this.panel.lines; }

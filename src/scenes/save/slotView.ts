@@ -5,7 +5,7 @@ import { NES_FONT } from '../../ui/NESFont.js';
 import type { SlotSummary } from '../../systems/SaveManager.js';
 import { ClassRegistry } from '../../data/ClassRegistry.js';
 import { Character } from '../../entities/Character.js';
-import { classInitials } from '../shop/spellLearners.js';
+import { classLabel } from '../../data/classLabel.js';
 import { FONT_SIZE, GAME_WIDTH, SCREEN_MARGIN } from '../../core/LayoutConstants.js';
 
 const FULL = GAME_WIDTH - 2 * SCREEN_MARGIN;
@@ -38,16 +38,16 @@ export function formatSaveDate(iso: string | undefined): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-/** One line per member (`ROLF  Wa  Lv3  HP 35/40`), then the gold and the save date. */
+/** One line per member (`ROLF  WAR  Lv3  HP 35/40`), then the gold and the save date. */
 export function slotDetail(slot: SlotSummary | null): string[] {
   if (!slot) return ['No save in this slot.'];
   const width = Math.max(0, ...slot.members.map((m) => m.name.length));
   const lines = slot.members.map((m) => {
     const cls = ClassRegistry.getClass(m.classId);
-    const short = cls ? classInitials(cls.name) : m.classId;
+    const short = cls ? classLabel(cls) : m.classId;
     // max HP follows from class and level; it is not stored in the save
     const maxHp = cls ? new Character({ name: m.name, classData: cls, level: m.level }).maxHp : undefined;
-    return `${m.name.padEnd(width)}  ${short.padEnd(2)}  Lv${m.level}  HP ${m.currentHp}${maxHp !== undefined ? `/${maxHp}` : ''}`;
+    return `${m.name.padEnd(width)}  ${short.padEnd(3)}  Lv${m.level}  HP ${m.currentHp}${maxHp !== undefined ? `/${maxHp}` : ''}`;
   });
   const date = formatSaveDate(slot.saveDate);
   return [...lines, '', `${slot.gold} G`, ...(date ? [`Saved ${date}`] : [])];
