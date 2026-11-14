@@ -5,7 +5,7 @@ import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
-import { formatConciseResult, capitalize } from './battleMessageUtils.js';
+import { formatConciseResult, capitalize, fitToWidth } from './battleMessageUtils.js';
 import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
   type AttackStyle, attackReach, MIN_ATTACK_REACH } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
@@ -75,6 +75,10 @@ export class BattleAnimationController {
       default: return `${info.actorName} acts!`;
     }
   }
+  /** A turn-list line cut to the command window's content width, so it never runs into the party panel. */
+  private fitTurnLine(text: string): string {
+    return fitToWidth(text, this.commandWindow.contentWidth, FONT_SIZE_SM);
+  }
   /** Scroll turn list container so latest entry is visible within command window. */
   private scrollTurnList(): void {
     const overflow = this.turnListTexts.length - Math.floor(this.commandWindow.contentHeight / (FONT_SIZE_SM + 8));
@@ -92,7 +96,7 @@ export class BattleAnimationController {
           this.setMessageText(this.formatAnnouncement(info));
           // K4: Add entry to turn list
           const entry = new BitmapText({
-            text: `${info.actorName}: ${info.actionType}`,
+            text: this.fitTurnLine(`${info.actorName}: ${info.actionType}`),
             style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
           });
           entry.position.set(this.commandWindow.contentX, this.commandWindow.contentY + this.turnListTexts.length * (FONT_SIZE_SM + 8));
@@ -189,9 +193,7 @@ export class BattleAnimationController {
     const result = this.battle.executeNextAction();
     const info = this.currentActionInfo;
     this.spawnFloatingTextsFromEvents(result.damageEvents);
-    const missed = info?.actionType === 'fight' && result.damageEvents.length === 0
-      && result.messages.some(m => m.text === `${info.actorName} missed!`);
-    if (missed && this.targetSprite) this.effects.addFloating('Miss', 'miss', this.targetSprite);
+    if (result.missed && this.targetSprite) this.effects.addFloating('Miss', 'miss', this.targetSprite);
     if (!this.animActorIsEnemy && info?.actionType === 'fight') this.slashTargets(result.damageEvents);
     this.display.updatePartyDisplay();
     this.display.updateEnemySprites(this.dyingEnemies);
@@ -205,7 +207,7 @@ export class BattleAnimationController {
       const { actorName, actionType, spellName } = info;
       const label = actionType === 'magic' && spellName ? spellName.toUpperCase() : capitalize(actionType);
       const concise = formatConciseResult(result.messages, actorName);
-      entry.text = concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`;
+      entry.text = this.fitTurnLine(concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`);
       this.scrollTurnList();
     }
     this.animPhase = 'result';

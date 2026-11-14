@@ -1,6 +1,6 @@
 - id: small_knife
   name: Small Knife
-  description: "A light blade any class can use. ATK 5."
+  description: "A light blade any class can use. ATK 5, hit +10."
   type: weapon
   stats:
     attack: 5
@@ -79,7 +79,7 @@
   crit: 5
 - id: hand_axe
   name: Hand Axe
-  description: "A heavy one-handed axe. ATK 16."
+  description: "A heavy one-handed axe. ATK 16, hit +5."
   type: weapon
   stats:
     attack: 16
@@ -113,7 +113,7 @@
   crit: 10
 - id: mythril_sword
   name: Mythril Sword
-  description: "Mythril blade, strong against undead. ATK 23."
+  description: "Mythril blade, strong against undead. ATK 23, hit +10."
   type: weapon
   stats:
     attack: 23
@@ -126,7 +126,7 @@
   crit: 12
 - id: mythril_knife
   name: Mythril Knife
-  description: "Mythril dagger, strong against undead. ATK 15."
+  description: "Mythril dagger, strong against undead. ATK 15, hit +10."
   type: weapon
   stats:
     attack: 15
@@ -140,7 +140,7 @@
   crit: 12
 - id: great_axe
   name: Great Axe
-  description: "A huge axe, strong against giants. ATK 22."
+  description: "A huge axe, strong against giants. ATK 22, hit +10."
   type: weapon
   stats:
     attack: 22
@@ -152,7 +152,7 @@
   crit: 14
 - id: mythril_hammer
   name: Mythril Hammer
-  description: "Mythril hammer, strong against undead. ATK 18."
+  description: "Mythril hammer, strong against undead. ATK 18, hit +10."
   type: weapon
   stats:
     attack: 18
@@ -165,7 +165,7 @@
   crit: 12
 - id: power_staff
   name: Power Staff
-  description: "A staff with a weighted head. ATK 12."
+  description: "A staff with a weighted head. ATK 12, hit +10."
   type: weapon
   stats:
     attack: 12
@@ -178,7 +178,7 @@
   crit: 10
 - id: flame_sword
   name: Flame Sword
-  description: "A burning blade, strong against undead. ATK 26."
+  description: "Fire blade, strong against undead. ATK 26, hit +10."
   type: weapon
   stats:
     attack: 26
@@ -191,7 +191,7 @@
   crit: 16
 - id: ice_brand
   name: Ice Brand
-  description: "A blade of frozen steel. ATK 26."
+  description: "Ice blade of frozen steel. ATK 26, hit +10."
   type: weapon
   stats:
     attack: 26
@@ -203,7 +203,7 @@
   crit: 16
 - id: coral_sword
   name: Coral Sword
-  description: "Coral blade, strong against sea foes. ATK 26."
+  description: "Lightning blade, strong against sea foes. ATK 26, hit +10."
   type: weapon
   stats:
     attack: 26
@@ -217,7 +217,7 @@
   crit: 16
 - id: masamune
   name: Masamune
-  description: "The legendary blade. Anyone can wield it. ATK 56."
+  description: "The legendary blade. Anyone can wield it. ATK 56, hit +10."
   type: weapon
   stats:
     attack: 56

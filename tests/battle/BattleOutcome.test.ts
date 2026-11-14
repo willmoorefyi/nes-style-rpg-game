@@ -49,7 +49,7 @@ describe('battle outcome (BA-1)', () => {
     expect(clear).toHaveBeenCalled();
 
     // Nothing afterwards may move it back to resolution / command_select
-    expect(battle.executeNextAction()).toEqual({ done: true, messages: [], damageEvents: [] });
+    expect(battle.executeNextAction()).toEqual({ done: true, messages: [], damageEvents: [], missed: false });
     battle.skipRemainingActions();
     battle.resolveRound();
     expect(battle.state).toBe('escaped');

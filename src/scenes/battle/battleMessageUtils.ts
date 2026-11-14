@@ -1,6 +1,6 @@
 import { BitmapText } from 'pixi.js';
 import { NES_FONT } from '../../ui/NESFont.js';
-import { FONT_SIZE } from '../../core/LayoutConstants.js';
+import { CHAR_WIDTH, FONT_SIZE } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
 
 /** Capitalize first letter of a string. */
@@ -160,4 +160,16 @@ export function destroyPromptIndicator(indicator: BitmapText | null, messageWind
     messageWindow.removeChild(indicator);
     indicator.destroy();
   }
+}
+
+/** A glyph's width at `fontSize`: the measured `CHAR_WIDTH` (taken at `FONT_SIZE`) scaled, but never under the
+ * monospace font's usual 0.6 em, so an unmeasured font still errs on the narrow side. */
+export function glyphWidth(fontSize: number): number {
+  return Math.max(CHAR_WIDTH / FONT_SIZE, 0.6) * fontSize;
+}
+
+/** `text` cut to fit `widthPx` at `fontSize` (the last glyph becomes "…" when it is cut). */
+export function fitToWidth(text: string, widthPx: number, fontSize: number): string {
+  const max = Math.max(1, Math.floor(widthPx / glyphWidth(fontSize)));
+  return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
 }

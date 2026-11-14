@@ -2,6 +2,7 @@ import { Container, BitmapText } from 'pixi.js';
 import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
+import { HelpWindow } from '../ui/HelpWindow.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { PartyPanel } from '../ui/PartyPanel.js';
 import { NES_FONT } from '../ui/NESFont.js';
@@ -9,10 +10,10 @@ import type { ExplorationScene } from './ExplorationScene.js';
 import { wrapText } from '../ui/textUtils.js';
 import { SCREEN_MARGIN, FONT_SIZE, MENU_LINE_HEIGHT, WINDOW_PADDING, LINE_HEIGHT, CHAR_WIDTH } from '../core/LayoutConstants.js';
 
-/** MS-7 layout (fix plan T6 revision 12): left pane x 24 w 360, party pane x 408 w 1488, rows 168 px, help bar y 900. */
+/** MS-7 layout (fix plan T6 revision 12): left pane x 24 w 360, party pane x 408 w 1488, rows 168 px; the shared
+ * `HelpWindow` sits at `HELP_RECT` (y 900) below. */
 export const LEFT_PANE = { x: SCREEN_MARGIN, width: 360 };
 export const PARTY_PANE = { x: 408, width: 1488, rowHeight: 168, rows: 4 };
-export const HELP_BAR = { y: 900, height: 156 };
 const INFO_HEIGHT = FONT_SIZE + 2 * WINDOW_PADDING;
 const INFO_GAP = 12;
 
@@ -43,7 +44,7 @@ export class FieldMenuScene implements Scene {
   private goldText: BitmapText;
   private timeText: BitmapText;
   private locationText: BitmapText;
-  private helpText: BitmapText;
+  private help: HelpWindow;
   private shownIndex = -1;
 
   constructor(game: Game) {
@@ -81,12 +82,8 @@ export class FieldMenuScene implements Scene {
       rowHeight: PARTY_PANE.rowHeight, rows: PARTY_PANE.rows });
     this.container.addChild(this.partyPanel);
 
-    const help = new Window({ x: LEFT_PANE.x, y: HELP_BAR.y, width: PARTY_PANE.x + PARTY_PANE.width - LEFT_PANE.x,
-      height: HELP_BAR.height });
-    this.helpText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
-    this.helpText.position.set(help.contentX, help.contentY);
-    help.addChild(this.helpText);
-    this.container.addChild(help);
+    this.help = new HelpWindow();
+    this.container.addChild(this.help);
   }
 
   enter(): void {
@@ -125,7 +122,7 @@ export class FieldMenuScene implements Scene {
   private showHelp(): void {
     if (this.menu.selectedIndex === this.shownIndex) return;
     this.shownIndex = this.menu.selectedIndex;
-    this.helpText.text = COMMANDS[this.shownIndex]?.help ?? '';
+    this.help.setText(COMMANDS[this.shownIndex]?.help ?? '');
   }
 
   private onSelect(item: MenuItem): void {

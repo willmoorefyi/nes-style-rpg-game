@@ -55,6 +55,21 @@ describe('FieldHUD', () => {
     // No error thrown
   });
 
+  it('redraws the gold panel only when the gold text changes, not on every frame (T6 review)', () => {
+    const party = createMockParty([], 500) as { gold: number } & PartyManager;
+    const hud = new FieldHUD(party);
+    const resize = vi.spyOn(hud.goldPanel, 'resize');
+    for (let i = 0; i < 60; i++) hud.update(party);   // a second of frames, gold unchanged
+    expect(resize).not.toHaveBeenCalled();
+    party.gold = 123456;
+    hud.update(party);
+    hud.update(party);
+    expect(resize).toHaveBeenCalledTimes(1);
+    expect(allTexts(hud.goldPanel)[0].text).toBe('123456G');
+    const box = hud.panelBox(hud.goldPanel);
+    expect(box.x + box.width).toBe(GAME_WIDTH - 24);   // still right-aligned at the screen margin
+  });
+
   it('updates party HP from party data', () => {
     const party = createMockParty([
       { name: 'FGHTR', currentHp: 100, maxHp: 150 },

@@ -2,7 +2,6 @@ import { BitmapText } from 'pixi.js';
 import type { ItemData } from '../../types/index.js';
 import type { Character } from '../../entities/Character.js';
 import { Window } from '../../ui/Window.js';
-import { TextRenderer } from '../../ui/TextRenderer.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { slotOf } from '../../entities/EquipmentRules.js';
 import { compareEquip, hitsSuffix } from '../shopComparison.js';
@@ -14,22 +13,17 @@ export interface ShopRect { x: number; y: number; width: number; height: number 
 /** The equipment comparison panel; the shop's item list narrows to end before it while it is shown. */
 export const DETAIL_RECT: ShopRect = { x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 };
 const LINE_STEP = FONT_SIZE + 8;
-const DESC_GAP = 16;
 
 /**
- * The equipment shop's detail panel: the item and its stat, one comparison line per member (MS-5), and the item's
- * description under them.
+ * The equipment shop's detail panel: the item and its stat, and one comparison line per member (MS-5). The item's
+ * description is shown once, in the shop's help bar, not here.
  */
 export class ShopDetailPanel {
   readonly window = new Window({ ...DETAIL_RECT });
   private texts: BitmapText[] = [];
-  private readonly desc: TextRenderer;
 
   constructor() {
     this.window.visible = false;
-    this.desc = new TextRenderer({ width: this.window.contentWidth });
-    this.desc.position.set(this.window.contentX, this.window.contentY);
-    this.window.addChild(this.desc);
   }
 
   get visible(): boolean { return this.window.visible; }
@@ -40,16 +34,10 @@ export class ShopDetailPanel {
     return this.texts.map((t) => ({ text: t.text, y: t.position.y }));
   }
 
-  /** The description shown under the comparison, and its top y inside the panel. */
-  get description(): { text: string; y: number } {
-    return { text: this.desc.text, y: this.desc.position.y };
-  }
-
   /** Clear the panel. */
   clear(): void {
     for (const t of this.texts) this.window.removeChild(t);
     this.texts = [];
-    this.desc.setText('', true);
   }
 
   /** Draw `item` against each member of `party` (nothing for items that fit no slot). */
@@ -93,8 +81,5 @@ export class ShopDetailPanel {
       const next = `${cmp.next}${hitsSuffix(cmp, cmp.nextHits)}`;
       addLine(`${name}  ${cmp.label} ${now}->${next}  ${diffStr}`, diffColor);
     }
-
-    this.desc.position.set(cx, y + DESC_GAP);
-    this.desc.setText(item.description ?? '', true);
   }
 }

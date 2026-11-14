@@ -23,10 +23,11 @@ TEMPLE_APPROACH = [{"groups": [_g("gr_imp", 2, 4)], "weight": 3},
 EAST_POCKET = [{"groups": [_g("wolf", 3, 5)], "weight": 3},
                {"groups": [_g("gr_imp", 3, 5)], "weight": 2},
                {"groups": [_g("gr_wolf", 1), _g("wolf", 0, 2)], "weight": 1}]
-# battle backgrounds per zone (BA-12, T6h): the temple approach fights in the dark forest, the east pocket in the
-# ruined forest; a zone table wins over the map's terrain table, so beaches and water keep their own backdrops
+# battle backgrounds per zone (BA-12, T6h; the plan's TF-3 table): only the temple approach's forest is the dark
+# forest; with no zone default its open fields, beaches and water fall through to the map's table. The east pocket
+# fights in the ruined forest; a zone default wins over the map's terrain table, so its beaches and water list theirs
 _WET = {"desert": "shoreline", "water": "ocean", "river": "river"}
-ZONE_BACKDROPS = {"temple_approach": {"default": "dark_forest", "terrain": dict(_WET)},
+ZONE_BACKDROPS = {"temple_approach": {"terrain": {"forest": "dark_forest"}},
                   "east_pocket": {"default": "ruined_forest", "terrain": dict(_WET)}}
 
 

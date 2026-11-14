@@ -132,8 +132,7 @@ battleBackgrounds:
   terrain: {forest: forest, desert: shoreline, swamp: swamp, water: ocean, river: river}
   zones:
     temple_approach:
-      default: dark_forest
-      terrain: {desert: shoreline, water: ocean, river: river}
+      terrain: {forest: dark_forest}
     east_pocket:
       default: ruined_forest
       terrain: {desert: shoreline, water: ocean, river: river}

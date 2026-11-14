@@ -22,6 +22,8 @@ export class FieldHUD {
   private mapNameText: BitmapText;
   private goldText: BitmapText;
   private hpTexts: BitmapText[] = [];
+  /** The gold text last laid out (null before the first), so an unchanged amount costs no redraw. */
+  private shownGold: string | null = null;
 
   constructor(party: PartyManager) {
     const style = { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff };
@@ -65,8 +67,11 @@ export class FieldHUD {
     this.mapPanel.visible = label.length > 0;
   }
 
+  /** Show `gold`; the panel is resized and redrawn only when the text changes (`update` runs every frame). */
   setGold(gold: number): void {
     const text = `${gold}G`;
+    if (text === this.shownGold) return;
+    this.shownGold = text;
     this.goldText.text = text;
     // right-aligned inside the panel (the panel grows only past 99999G)
     const width = Math.max(GOLD_CHARS, text.length) * CHAR_WIDTH + 2 * INSET;

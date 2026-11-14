@@ -7,6 +7,7 @@ import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
 import { TerrainType } from '../../src/types/index.js';
 import type { MapData } from '../../src/types/index.js';
+import { backdropTerrain, battleBackdropId } from '../../src/scenes/exploration/BattleBackdrop.js';
 
 /** The generated act-1 overworld (assets-src/tools/layouts/overworld.py, compiled by build_map.py): T3c. */
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -339,10 +340,27 @@ describe('overworld battle backgrounds (BA-12)', () => {
     for (const id of Object.keys(bg.zones ?? {})) expect(zoneIds.has(id), `zone ${id}`).toBe(true);
   });
 
-  it('the temple approach fights in the dark forest and the east pocket in the ruined forest (T6h)', () => {
-    expect(bg.zones?.temple_approach?.default).toBe('dark_forest');
+  it('the temple approach fights in the dark forest only in its forest; the east pocket in the ruined forest (T6h)', () => {
+    // the plan's TF-3 table: no zone default for the temple approach, so its open fields keep the map's grassland
+    expect(bg.zones?.temple_approach).toEqual({ terrain: { forest: 'dark_forest' } });
     expect(bg.zones?.east_pocket?.default).toBe('ruined_forest');
-    for (const z of ['temple_approach', 'east_pocket']) expect(bg.zones?.[z]?.terrain?.desert, z).toBe('shoreline');
+    expect(bg.zones?.east_pocket?.terrain?.desert).toBe('shoreline');
+  });
+
+  it('battles in the temple approach: forest gives dark_forest, open grass the map\'s grassland', () => {
+    const zone = (map.encounterZones ?? []).find((z) => z.id === 'temple_approach')!;
+    const terrainAt = (x: number, y: number): string | undefined => (inside(x, y) ? TerrainType[terrain(x, y)] : undefined);
+    const picked = new Map<string, Set<string>>();
+    for (const [x0, y0, x1, y1] of zone.rects) {
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        const t = backdropTerrain({ x, y }, terrainAt) ?? '?';
+        const id = battleBackdropId(bg, { x, y }, terrainAt, 'temple_approach') ?? '?';
+        if (!picked.has(t)) picked.set(t, new Set());
+        picked.get(t)!.add(id);
+      }
+    }
+    expect([...picked.get('forest') ?? []]).toEqual(['dark_forest']);
+    expect([...picked.get('grass') ?? []]).toEqual(['grassland']);   // open-field fights keep the grass backdrop
   });
 
   it('beach sand compiles to Desert, and Desert battles use the shoreline background', () => {

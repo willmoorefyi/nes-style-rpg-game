@@ -67,6 +67,15 @@ export interface DamageEvent {
   spellElement?: string;
 }
 
+/** What one executed action did: its lines, its damage events, and whether a physical attack missed. */
+export interface ActionResult {
+  done: boolean;
+  messages: BattleMessage[];
+  damageEvents: DamageEvent[];
+  /** True when the action was a fight that missed its target (the battle view shows a grey "Miss"). */
+  missed: boolean;
+}
+
 export interface NextActionInfo {
   actorId: string;
   actorName: string;
@@ -87,6 +96,8 @@ export class BattleStateMachine {
   private enemies: EnemyInstance[];
   private commands: BattleCommand[] = [];
   private _damageEvents: DamageEvent[] = [];
+  /** Set by a physical attack that misses during the current action. */
+  private _missed = false;
   private _actionQueue: QueuedAction[] = [];
   private currentActorIndex = 0;
   private messages: BattleMessage[] = [];
@@ -283,9 +294,9 @@ export class BattleStateMachine {
     return !!member && member.currentHp > 0;
   }
 
-  executeNextAction(): { done: boolean; messages: BattleMessage[]; damageEvents: DamageEvent[] } {
+  executeNextAction(): ActionResult {
     if (this._actionQueue.length === 0 || this.isOver) {
-      return { done: true, messages: [], damageEvents: [] };
+      return { done: true, messages: [], damageEvents: [], missed: false };
     }
 
     // Skip dead actors — defense-in-depth for animation layer
@@ -293,12 +304,13 @@ export class BattleStateMachine {
       this._actionQueue.shift();
       const done = this._actionQueue.length === 0;
       if (done) this._state = 'resolution';
-      return { done, messages: [], damageEvents: [] };
+      return { done, messages: [], damageEvents: [], missed: false };
     }
 
     const action = this._actionQueue.shift()!;
     this.messages = [];
     this._damageEvents = [];
+    this._missed = false;
 
     // Tick status effects at start of turn
     const canAct = this.tickCombatantStatus(action.combatantId, action.isEnemy);
@@ -312,7 +324,7 @@ export class BattleStateMachine {
       this._state = 'resolution';
     }
 
-    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents] };
+    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed };
   }
 
   /** The next queued action; `actorId` (party_i / enemy_i) identifies the actor's sprite, never its name. */
@@ -445,6 +457,7 @@ export class BattleStateMachine {
 
     const result = resolvePartyAttack(actor, target, this.rng);
     if (!result.hit) {
+      this._missed = true;
       this.messages.push({ text: `${actor.name} missed!` });
       return;
     }
@@ -461,6 +474,7 @@ export class BattleStateMachine {
 
     const result = resolveEnemyAttack(enemy, target, this.rng);
     if (!result.hit) {
+      this._missed = true;
       this.messages.push({ text: `${enemy.displayName} missed!` });
       return;
     }

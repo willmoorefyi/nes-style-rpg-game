@@ -40,6 +40,18 @@ export class ActiveHeroMarker {
     this.arrow = arrow;
   }
 
+  /**
+   * `old` was swapped for `next` (late art replacing a placeholder): when `old` is the marked sprite, mark `next`
+   * instead, so the step, the pulse and the arrow follow the art. `next` arrives at its place in line.
+   */
+  replace(old: Container, next: Container): void {
+    if (this.sprite !== old) return;
+    const clock = this.clock;
+    this.hide();
+    this.show(next);
+    this.clock = clock;
+  }
+
   update(dt: number): void {
     if (!this.sprite) return;
     this.clock += dt;

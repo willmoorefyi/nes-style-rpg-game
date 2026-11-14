@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
-import { FieldMenuScene, formatPlayTime, LEFT_PANE, PARTY_PANE, HELP_BAR } from '../../src/scenes/FieldMenuScene.js';
+import { HelpWindow, HELP_RECT } from '../../src/ui/HelpWindow.js';
+import { FieldMenuScene, formatPlayTime, LEFT_PANE, PARTY_PANE } from '../../src/scenes/FieldMenuScene.js';
 import type { Game } from '../../src/core/Game.js';
 import { Character } from '../../src/entities/Character.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import { xpToReach } from '../../src/entities/ExperienceTable.js';
-import { allTexts, loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
+import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
 
 beforeAll(loadRealRegistries);
 
@@ -114,7 +115,10 @@ describe('FieldMenuScene', () => {
       const game = createMockGameForMenu();
       const scene = new FieldMenuScene(game as unknown as Game);
       scene.enter();
-      const help = () => allTexts(scene.container).find((t) => t.y > 0 && t.parent?.y === HELP_BAR.y)?.text;
+      const bars = scene.container.children.filter((c): c is HelpWindow => c instanceof HelpWindow);
+      expect(bars).toHaveLength(1);                  // the shared HelpWindow, not a bar of its own
+      expect(bars[0].y).toBe(HELP_RECT.y);
+      const help = () => bars[0].text;
       expect(help()).toMatch(/item/i);
       game.input.tap('down', () => scene.update(1));
       expect(help()).toMatch(/spell/i);
