@@ -1210,7 +1210,7 @@ encounters:
   weight: 3
 - groups: [{id: gr_imp, min: 2, max: 3}]
   weight: 2
-- groups: [{id: skeleton, min: 3, max: 4}]
+- groups: [{id: skeleton, min: 2, max: 3}]
   weight: 1
 height: 30
 id: temple-of-fiends

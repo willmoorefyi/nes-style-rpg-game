@@ -17,6 +17,18 @@ export const MAX_ATTACK_REACH = 900;
 /** The attacker's sprite box ends this far inside the target's box, so the figures (inset in their cells) touch. */
 export const REACH_OVERLAP = 24;
 
+/** U3: the most (px) a melee attacker rises or drops to meet its target's row (party feet 425-740, enemy feet from 360). */
+export const MAX_ATTACK_RISE = 400;
+
+/** U3: the full offset of the contact frame: `dx` toward the enemies (as `attackReach`, positive), `dy` down to the target's feet row. */
+export interface AttackReach { dx: number; dy: number }
+
+/** U3: the vertical move that brings an attacker whose feet are at `actorFeetY` to a target whose feet are at `targetFeetY`. */
+export function attackRise(actorFeetY: number, targetFeetY: number): number {
+  const d = targetFeetY - actorFeetY;
+  return Number.isFinite(d) ? Math.max(-MAX_ATTACK_RISE, Math.min(MAX_ATTACK_RISE, d)) : 0;
+}
+
 /** BA-9: the reach that brings an attacker at `homeX` (its sprite's left edge) to a target whose right edge is `targetRight`. */
 export function attackReach(homeX: number, targetRight: number): number {
   const d = homeX - targetRight + REACH_OVERLAP;
@@ -61,10 +73,20 @@ export function advanceFrames(style: AttackStyle): number {
   return segments(MIN_ATTACK_REACH)[style].reduce((n, s) => n + s.frames, 0);
 }
 
-/** Pose and offset `t` frames into the advance (clamped to its last frame: the moment of contact, dx = -reach). */
-export function advanceAt(style: AttackStyle, t: number, reach: number = MIN_ATTACK_REACH): AttackFrame {
+/**
+ * Pose and offset `t` frames into the advance (clamped to its last frame: the moment of contact, dx = -reach.dx).
+ * U3: the attacker also moves `reach.dy` toward the target's row in step with its horizontal progress (its share of
+ * the advance, 0 to 1), on top of the style's hop, so the contact frame lands at (-dx, dy). A number is a flat reach.
+ */
+export function advanceAt(style: AttackStyle, t: number, reach: number | AttackReach = MIN_ATTACK_REACH): AttackFrame {
+  const { dx: D, dy: rise } = typeof reach === 'number' ? { dx: reach, dy: 0 } : reach;
+  const f = baseAdvanceAt(style, t, D);
+  return rise === 0 ? f : { ...f, dy: f.dy + rise * clamp01(-f.dx / D) };
+}
+
+function baseAdvanceAt(style: AttackStyle, t: number, D: number): AttackFrame {
   let start = 0;
-  const segs = segments(reach)[style];
+  const segs = segments(D)[style];
   for (const seg of segs) {
     if (t < start + seg.frames) return seg.at(clamp01((t - start) / seg.frames));
     start += seg.frames;
@@ -74,11 +96,12 @@ export function advanceAt(style: AttackStyle, t: number, reach: number = MIN_ATT
 
 export const RETURN_FRAMES = 16;
 
-/** The way back to the line: a hop backwards from `from` (the advance's last offset), easing out. */
+/** The way back to the line: a hop backwards from `from` (the advance's last offset, both axes), easing out. */
 export function returnAt(from: AttackFrame, t: number, style: AttackStyle): AttackFrame {
   const p = clamp01(t / RETURN_FRAMES);
-  if (style === 'classic') return { dx: from.dx * (1 - p), dy: 0, pose: 'attack' };
-  return { dx: from.dx * (1 - easeOut(p)), dy: hop(p, 12), pose: p < 0.3 ? 'atk_follow' : 'ready' };
+  if (style === 'classic') return { dx: from.dx * (1 - p), dy: from.dy * (1 - p), pose: 'attack' };
+  const back = 1 - easeOut(p);
+  return { dx: from.dx * back, dy: from.dy * back + hop(p, 12), pose: p < 0.3 ? 'atk_follow' : 'ready' };
 }
 
 /** Spells and items: a short step forward while gathering and raising the casting hand, then the cast is held. */

@@ -34,22 +34,35 @@ export class SpellSelectionUI extends Container {
   private spellMenu: Menu | null = null;
   private currentLevel = 0;
   private selectedSpellId: string | null = null;
+  /** U13: only one level was usable, so there is no level menu to go back to. */
+  private singleLevel = false;
 
   constructor(config: SpellSelectionConfig) {
     super();
     this.config = config;
-    this.showLevelMenu();
+    const levels = this.usableLevels();
+    // U13: with one usable level the level step is skipped; the spell menu opens at once and its cancel leaves
+    if (levels.length === 1) {
+      this.currentLevel = levels[0];
+      this.singleLevel = true;
+      this.showSpellMenu();
+    } else {
+      this.showLevelMenu(levels);
+    }
   }
 
-  private showLevelMenu(): void {
-    const { character, contentX, contentY, eventBus, onCancel } = this.config;
+  /** Spell levels with charges left and at least one learned spell. */
+  private usableLevels(): number[] {
+    const { character } = this.config;
     const levels: number[] = [];
     for (let lvl = 1; lvl <= 8; lvl++) {
-      if (character.hasCharges(lvl) && character.getSpellsAtLevel(lvl).length > 0) {
-        levels.push(lvl);
-      }
+      if (character.hasCharges(lvl) && character.getSpellsAtLevel(lvl).length > 0) levels.push(lvl);
     }
+    return levels;
+  }
 
+  private showLevelMenu(levels: number[]): void {
+    const { character, contentX, contentY, eventBus, onCancel } = this.config;
     if (levels.length === 0) {
       onCancel();
       return;
@@ -81,9 +94,11 @@ export class SpellSelectionUI extends Container {
   private showSpellMenu(): void {
     const { character, spells, contentX, contentY, eventBus } = this.config;
     const spellIds = character.getSpellsAtLevel(this.currentLevel);
+    // U13: with no level step the rows carry the level's charges after the name ("CURE  2")
+    const charges = this.singleLevel ? `  ${character.getSpellCharges(this.currentLevel)}` : '';
     const items: MenuItem[] = spellIds.map(id => {
       const spell = spells.find(s => s.id === id);
-      return { label: spell?.name ?? id, value: id };
+      return { label: `${spell?.name ?? id}${charges}`, value: id };
     });
 
     this.spellMenu = new Menu({
@@ -108,6 +123,11 @@ export class SpellSelectionUI extends Container {
         }
       },
       onCancel: () => {
+        if (this.singleLevel) {
+          this.cleanup();
+          this.config.onCancel();
+          return;
+        }
         this.hideSpellMenu();
         this.state = 'level';
       },
@@ -152,12 +172,6 @@ export class SpellSelectionUI extends Container {
   }
 
   hasNoSpells(): boolean {
-    const { character } = this.config;
-    for (let lvl = 1; lvl <= 8; lvl++) {
-      if (character.hasCharges(lvl) && character.getSpellsAtLevel(lvl).length > 0) {
-        return false;
-      }
-    }
-    return true;
+    return this.usableLevels().length === 0;
   }
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { ATTACK_STYLES, MIN_ATTACK_REACH, MAX_ATTACK_REACH, REACH_OVERLAP, attackReach, advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackStyle, castAt, castReturnAt,
-  CAST_FRAMES, idlePose, IDLE_PERIOD, parseAttackOverride, pickAttackStyle, RANDOM_ATTACK_STYLES } from '../../../src/scenes/battle/attackChoreography.js';
+  CAST_FRAMES, idlePose, IDLE_PERIOD, parseAttackOverride, pickAttackStyle, RANDOM_ATTACK_STYLES, attackRise,
+  MAX_ATTACK_RISE } from '../../../src/scenes/battle/attackChoreography.js';
 
 describe('attack choreography', () => {
   it('every style starts in line and ends at contact in the strike pose', () => {
@@ -90,5 +91,51 @@ describe('attack choreography', () => {
     expect(parseAttackStyle('?attack=leap')).toBe('leap');
     expect(parseAttackStyle('?attack=nope')).toBe('lunge');
     expect(parseAttackStyle('')).toBe('lunge');
+  });
+});
+
+describe('U3: the melee advance also moves to the target\'s row', () => {
+  it('for every style the contact frame lands at (-dx, rise), up or down', () => {
+    for (const rise of [-315, -120, 0, 90]) {
+      for (const style of ATTACK_STYLES) {
+        const end = advanceAt(style, advanceFrames(style), { dx: 644, dy: rise });
+        expect(end.dx, `${style} ${rise}`).toBeCloseTo(-644);
+        expect(end.dy, `${style} ${rise}`).toBeCloseTo(rise); // old: 0, the attacker's own row
+        expect(end.pose).toBe('attack');
+      }
+    }
+  });
+
+  it('the vertical move follows the horizontal progress: monotonic, from 0 to the rise (the hop rides on top)', () => {
+    for (const style of ATTACK_STYLES) {
+      let prev = 0;
+      for (let t = 0; t <= advanceFrames(style); t++) {
+        const extra = advanceAt(style, t, { dx: 500, dy: -300 }).dy - advanceAt(style, t, 500).dy;
+        expect(extra, `${style} t=${t}`).toBeLessThanOrEqual(prev + 1e-9);
+        expect(extra).toBeGreaterThanOrEqual(-300 - 1e-9);
+        prev = extra;
+      }
+      expect(prev, style).toBeCloseTo(-300);
+      expect(advanceAt(style, 0, { dx: 500, dy: -300 }).dy).toBeCloseTo(advanceAt(style, 0, 500).dy);
+    }
+  });
+
+  it('the return brings both axes back to the line', () => {
+    for (const style of ATTACK_STYLES) {
+      const from = advanceAt(style, advanceFrames(style), { dx: 500, dy: -280 });
+      const end = returnAt(from, RETURN_FRAMES, style);
+      expect(end.dx, style).toBeCloseTo(0);
+      expect(end.dy, style).toBeCloseTo(0);
+      expect(returnAt(from, 0, style).dy, style).toBeCloseTo(-280);
+    }
+  });
+
+  it('the rise is the feet-row difference, clamped to +-MAX_ATTACK_RISE (>= 385: party feet 740 to enemy feet 360)', () => {
+    expect(MAX_ATTACK_RISE).toBeGreaterThanOrEqual(385);
+    expect(attackRise(740, 360)).toBe(-380);
+    expect(attackRise(425, 470)).toBe(45);
+    expect(attackRise(1000, 0)).toBe(-MAX_ATTACK_RISE);
+    expect(attackRise(0, 1000)).toBe(MAX_ATTACK_RISE);
+    expect(attackRise(500, Number.NaN)).toBe(0);
   });
 });

@@ -226,7 +226,7 @@ scriptedEncounters:
   postVictoryCutscene: garland_defeated
   x: 13
   y: 6
-# B9: fewer, smaller packs (mean formation 2.54, no wolves; docs/FIX_PLAN_PENINSULA.md R4b)
+# B9, U1: fewer, smaller packs (mean formation 2.45, at most 3 skeletons or 4 enemies, no wolves; docs/FIX_PLAN_PENINSULA.md R4b, U1)
 encounterRate: {max: 22, min: 12}
 # FF1 Temple of Fiends formations (docs/FIX_PLAN_PENINSULA.md T4 §1.6, R4b B9; no CREEP / MADPONY art, no pirates)
 encounters:
@@ -236,7 +236,7 @@ encounters:
   weight: 3
 - groups: [{id: gr_imp, min: 2, max: 3}]
   weight: 2
-- groups: [{id: skeleton, min: 3, max: 4}]
+- groups: [{id: skeleton, min: 2, max: 3}]
   weight: 1
 battleBackgrounds: {default: temple}
 canSave: false

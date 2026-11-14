@@ -8,7 +8,7 @@ import { BattleAnimationController } from '../../../src/scenes/battle/BattleAnim
 import { ATTACK_STYLES, advanceFrames, attackReach, type AttackStyle } from '../../../src/scenes/battle/attackChoreography.js';
 import { FLOAT_FONT, FLOAT_COLORS } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
-import { PARTY_X } from '../../../src/scenes/battle/BattleDisplayManager.js';
+import { PARTY_X, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { OutlinedText } from '../../../src/ui/NESFont.js';
 import { readFileSync } from 'node:fs';
 import { readRgbaPng, opaqueBounds } from '../../helpers/pngAlpha.js';
@@ -276,4 +276,60 @@ describe('B11: the lunge reaches a back-column target on the real layout', () =>
     const thiefArtLeft = thief.x + HERO_OPAQUE_LEFT_INSET;
     expect(Math.abs(thiefArtLeft - targetArtRight)).toBeLessThanOrEqual(40);
   });
+});
+
+describe('U3: the melee advance meets a top-row target on its own row', () => {
+  const MONSTER_OPAQUE_RIGHT_INSET = monsterRightInset(['goblin']);
+  const HERO_OPAQUE_LEFT_INSET = heroAttackLeftInset();
+  const layout = computeEnemyLayoutAi(Array.from({ length: 6 }, () => ({ size: 'small' as const, w: 160, h: 160 })));
+  const topFeet = Math.min(...layout.map(b => b.feetY));
+  // the top-row goblin (the highest feet)
+  const top = layout.findIndex(b => b.feetY === topFeet);
+
+  function attack(slot: number, style: AttackStyle) {
+    const main = new Container();
+    const sprites = layout.map(b => box(b.x - b.w / 2, b.feetY - b.h, b.w, b.h));
+    const party = PARTY_X.map((x, i) => box(x, PARTY_FEET_Y[i] - 160, 160, 160));
+    main.addChild(...party, ...sprites);
+    let queued = 1;
+    const display = {
+      enemySprites: sprites, partySprites: party, enemyView: null,
+      setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+    } as unknown as BattleDisplayManager;
+    const battle = {
+      allEnemies: layout.map((_, i) => ({ displayName: `Goblin ${i}`, currentHp: 10 })), allParty: [], livingParty: [{}], isOver: false,
+      get livingEnemies() { return [{}]; },
+      get actionQueueLength() { return queued; },
+      peekNextAction: () => (queued > 0 ? { actorId: `party_${slot}`, actorName: 'HERO', actionType: 'fight', targetId: `enemy_${top}`, targetName: 'Goblin' } : null),
+      isNextActorAlive: () => true,
+      executeNextAction: () => { queued = 0; return { done: true, damageEvents: [], messages: [{ text: 'HERO missed!' }], missed: true }; },
+      skipRemainingActions: vi.fn(),
+    } as unknown as BattleStateMachine;
+    const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
+    const ctrl = new BattleAnimationController(main, battle, display, { isJustPressed: () => false } as unknown as InputManager,
+      win, new Container(), () => {}, vi.fn());
+    ctrl.attackOverride = style;
+    return { ctrl, actor: party[slot] };
+  }
+
+  it('the layout has a top row above every party row', () => {
+    expect(layout).toHaveLength(6);
+    expect(topFeet).toBeLessThan(Math.min(...PARTY_FEET_Y));
+  });
+
+  for (const style of ATTACK_STYLES) {
+    it(`${style}: each of the four party rows ends within 30 px of the target's feet, its art touching it, then returns`, () => {
+      for (let slot = 0; slot < 4; slot++) {
+        const { ctrl, actor } = attack(slot, style);
+        for (let i = 0; i < contactFrame(style) + 1; i++) ctrl.updateAnimating(1);
+        expect(ctrl.animPhase, `${style} slot ${slot}`).toBe('result');
+        // old: the feet stayed on the attacker's own row, 65-380 px below the top row
+        expect(Math.abs(actor.y + 160 - layout[top].feetY), `${style} slot ${slot} feet`).toBeLessThanOrEqual(30);
+        const targetArtRight = layout[top].x + layout[top].w / 2 - MONSTER_OPAQUE_RIGHT_INSET;
+        expect(Math.abs(actor.x + HERO_OPAQUE_LEFT_INSET - targetArtRight), `${style} slot ${slot} edge`).toBeLessThanOrEqual(40);
+        for (let i = 0; i < 200 && ctrl.animPhase !== 'round_end'; i++) ctrl.updateAnimating(1);
+        expect([actor.x, actor.y]).toEqual([PARTY_X[slot], PARTY_FEET_Y[slot] - 160]);
+      }
+    });
+  }
 });

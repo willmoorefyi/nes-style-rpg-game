@@ -242,8 +242,9 @@ describe('Battle Integration', () => {
     expect(getState()).toBe('target');
   });
 
-  it('"No spells available." is a one-off notice and never replays an old battle message (BA-6)', () => {
+  it('a greyed Magic pick does nothing (U14); the "Silenced." notice is one-off and never replays an old battle message (BA-6)', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
+    const silencedLater = () => { hero.learnSpell('fire', 1); hero.setSpellCharges(1, 2); hero.statusTracker.apply('silence'); };
     const scene = new BattleScene(deps, createConfig([hero], [strongEnemy], () => 0.99));
     scene.enter();
     const internals = scene;
@@ -255,13 +256,23 @@ describe('Battle Integration', () => {
     for (let i = 0; i < 400 && internals.uiPhase !== 'command'; i++) tick(scene, input);
     expect(internals.uiPhase).toBe('command');
     waitGuard(scene, input);
+    tick(scene, input, 'down');    // Magic, greyed: no spells
+    tick(scene, input, 'confirm');
+    expect(internals.uiPhase).toBe('command');
+    tick(scene, input, 'up');
+    silencedLater(); // a spell, but silenced: Magic stays enabled and explains itself (U revision 7)
+    tick(scene, input, 'confirm'); // Fight
+    tick(scene, input, 'confirm'); // target
+    for (let i = 0; i < 400 && internals.uiPhase !== 'command'; i++) tick(scene, input);
+    expect(internals.uiPhase).toBe('command');
+    waitGuard(scene, input);
     tick(scene, input, 'down');    // Magic
-    tick(scene, input, 'confirm'); // no spells
+    tick(scene, input, 'confirm'); // silenced
     expect(internals.uiPhase).toBe('notice');
     const seen: string[] = [];
     for (let i = 0; i < 60 && internals.uiPhase !== 'command'; i++) { tick(scene, input); seen.push(internals.messageLine); }
     expect(internals.uiPhase).toBe('command');
-    expect(seen.every(t => t === 'No spells available.' || t === "Hero's turn")).toBe(true);
+    expect(seen.every(t => t === 'Silenced.' || t === "Hero's turn")).toBe(true);
     expect(internals.messageLine).toBe("Hero's turn");
   });
 });

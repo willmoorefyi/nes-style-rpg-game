@@ -13,6 +13,29 @@ import { ItemSelectionUI } from '../../ui/ItemSelectionUI.js';
 import { ItemEffects } from '../../systems/ItemEffects.js';
 import { ItemRegistry } from '../../data/ItemRegistry.js';
 import { mostHurtMemberId } from './BattleFieldTargeting.js';
+import type { Inventory } from '../../entities/Inventory.js';
+
+/** U14: a spell level with charges left and a learned spell. */
+function hasCastableSpell(actor: Character): boolean {
+  for (let lvl = 1; lvl <= 8; lvl++) if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) return true;
+  return false;
+}
+
+/**
+ * U14: whether Magic is worth opening for `actor` (the command row is greyed otherwise). True while silenced, so the
+ * pick still explains itself with the "Silenced." notice (U revision 7).
+ */
+export function canOpenSpells(actor: Character): boolean {
+  return actor.statusTracker.has('silence') || hasCastableSpell(actor);
+}
+
+/** The battle item list's filter (`ItemSelectionUI`): a consumable that is not a camp item (BA-4). */
+const battleUsable = (id: string): boolean => ItemRegistry.getItem(id)?.type === 'consumable' && !ItemEffects.isPartyItem(id);
+
+/** U14: whether the bag holds a battle-usable consumable not already spoken for this round (`reserved`, B5). */
+export function canOpenItems(inventory: Inventory | undefined, reserved: (id: string) => number): boolean {
+  return !!inventory && inventory.getAll().some(e => e.quantity - reserved(e.itemId) > 0 && battleUsable(e.itemId));
+}
 
 /** What the list menus need from the battle scene. */
 export interface ListMenuHost {
@@ -50,9 +73,7 @@ export class BattleListMenus {
       this.host.showNotice('Silenced.');
       return;
     }
-    let hasSpells = false;
-    for (let lvl = 1; lvl <= 8 && !hasSpells; lvl++) hasSpells = actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0;
-    if (!hasSpells) {
+    if (!hasCastableSpell(actor)) {
       this.host.showNotice('No spells available.');
       return;
     }
@@ -106,7 +127,7 @@ export class BattleListMenus {
       contentY: this.host.listWindow.contentY,
       eventBus: this.host.events,
       // BA-4: Tent and Cabin are camp items; they are not listed in battle
-      isUsable: (id) => !ItemEffects.isPartyItem(id),
+      isUsable: battleUsable,
       // B5: what the members before this one queued this round is already spoken for
       quantityOf: (id) => inventory.getQuantity(id) - battle.reservedItems(id),
       // the no-target fallback uses the item on the actor (never a name as a target id)
