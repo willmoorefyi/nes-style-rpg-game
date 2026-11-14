@@ -13,9 +13,6 @@ const legacyIds = readdirSync(join(root, 'assets/maps')).filter((f) => f.endsWit
   .map((f) => f.replace(/\.yaml$/, ''));
 const compiled = compiledIds.map((id) => read(`assets/maps/ai/${id}.yaml`));
 const legacy = legacyIds.map((id) => read(`assets/maps/${id}.yaml`));
-// The temple's source (assets-src/maps/temple-of-fiends.yaml) belongs to T5d, which adds its name; drop this entry
-// once T5d is merged.
-const NAMED_BY_T5D = new Set(['temple-of-fiends']);
 
 describe('map names (IN-3)', () => {
   it('reads all the compiled and legacy maps', () => {
@@ -24,7 +21,7 @@ describe('map names (IN-3)', () => {
   });
 
   it('every compiled map has a name', () => {
-    for (const m of compiled.filter((c) => !NAMED_BY_T5D.has(c.id))) {
+    for (const m of compiled) {
       expect(typeof m.name === 'string' && m.name.trim().length > 0, m.id).toBe(true);
     }
   });
