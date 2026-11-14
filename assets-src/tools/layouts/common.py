@@ -10,6 +10,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 MAPS = ROOT / "assets-src" / "maps"
+# M5: 96 minus the art height (approved/interior/furniture.json prop_px: bed 32x58, bookshelf 41x69), native px
+TALL_TOP = {"bed": 38, "bookshelf": 27}
 
 
 class Grid:
@@ -79,6 +81,12 @@ class Room:
 
     def deco(self, parts, x, y, **kw):
         self.objects.append({"type": "deco", "parts": parts, "x": x, "y": y, **kw})
+
+    def tall(self, part, x, y):
+        """A two-cell floor part (<part>_top over <part>_bottom). M5: the art is bottom-anchored in a 48x96 footprint
+        but shorter than it, so it is lifted against the wall (TALL_TOP native px) and blocks only the cells its art
+        covers (collide: alpha): a bed blocks one cell, a bookshelf two."""
+        self.deco([[f"{part}_top"], [f"{part}_bottom"]], x, y, offset=[0, -TALL_TOP[part]], collide="alpha")
 
     def wall(self, parts, x, y):                       # hung on a wall face
         self.deco(parts, x, y, on_wall=True)

@@ -18,7 +18,7 @@ npcs:
   sprite: villager_f
   x: 3
   y: 3
-  dialog: [Every rug in this room took me a season. That blue one took two., 'Garland bought a cloak from me once. Paid in full, and polite as a prince. I can''t believe what they say.']
+  dialog: [Every rug in this room took me a season. That one on the left took two., 'Garland bought a cloak from me once. Paid in full, and polite as a prince. I can''t believe what they say.']
 transitions:
 - {x: 6, y: 7, targetMap: cornelia, targetEntrance: house_weaver}
 name: Weaver's House

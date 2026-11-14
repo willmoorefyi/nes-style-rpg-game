@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -9,8 +9,11 @@ import type { MapData } from '../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const readMap = (id: string) => parse(readFileSync(join(root, 'assets/maps/ai', `${id}.yaml`), 'utf-8')) as MapData;
+interface Step { type: string; flag?: string; text?: string; map?: string; entrance?: string; facing?: string;
+  image?: string | null }
 const cutscenes = parse(readFileSync(join(root, 'assets/data/cutscenes.yaml'), 'utf-8')) as
-  Array<{ id: string; steps: Array<{ type: string; flag?: string }> }>;
+  Array<{ id: string; steps: Step[] }>;
+const script = (id: string): Step[] => cutscenes.find((c) => c.id === id)!.steps;
 const flagsSetBy = (id: string) => cutscenes.find((c) => c.id === id)!.steps.filter((s) => s.type === 'set_flag').map((s) => s.flag);
 
 describe('act 1 flow (the compiled 2x maps the game plays)', () => {
@@ -79,6 +82,46 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
 
   it('beating Garland frees the princess but does not open the north bridge (ST-1)', () => {
     expect(flagsSetBy('garland_defeated')).toEqual(['PRINCESS_RESCUED']);
+  });
+
+  it('the rescue (T2): the princess speaks, the heal is told, and the party warps to the throne room below the King', () => {
+    const steps = script('garland_defeated');
+    const at = (pred: (s: Step) => boolean) => steps.findIndex(pred);
+    const firstFadeOut = at((s) => s.type === 'fade_out');
+    expect(firstFadeOut).toBeGreaterThan(0);
+    expect(steps.slice(0, firstFadeOut).some((s) => s.type === 'dialog' && /Princess/.test(s.text ?? '')),
+      'the princess speaks before the screen goes black').toBe(true);
+    const heal = at((s) => s.type === 'heal_party');
+    expect(heal).toBeGreaterThan(-1);
+    expect(steps.slice(heal + 1).some((s) => s.type === 'dialog' && /restored|revived/.test(s.text ?? '')),
+      'the heal is told').toBe(true);
+    const warps = steps.filter((s) => s.type === 'warp');
+    expect(warps.length).toBe(1);
+    const warp = at((s) => s.type === 'warp');
+    expect(warp).toBeGreaterThan(at((s) => s.type === 'set_flag'));
+    expect(warp).toBeLessThan(at((s) => s.type === 'fade_in'));
+    expect(warps[0].map).toBe('cornelia-castle-2f');
+    const map = readMap('cornelia-castle-2f');
+    const cell = map.entrances?.[warps[0].entrance!];
+    expect(cell, `entrance ${warps[0].entrance}`).toBeDefined();
+    expect(new CollisionMap(map).isWalkable(cell![0], cell![1], new WalkingMode()), 'the arrival is walkable').toBe(true);
+    const king = map.npcs.find((n) => n.id === 'king')!;
+    expect(cell).toEqual([king.x, king.y + 1]);
+    expect(warps[0].facing).toBe('up');
+  });
+
+  it('the opening (N2) is at most 3 short pages over staged backgrounds, ending on black', () => {
+    const steps = script('opening');
+    const pages = steps.filter((s) => s.type === 'dialog');
+    expect(pages.length).toBeGreaterThan(0);
+    expect(pages.length).toBeLessThanOrEqual(3);
+    for (const p of pages) expect((p.text ?? '').length, p.text).toBeLessThanOrEqual(100);
+    const images = steps.filter((s) => s.type === 'backdrop' && s.image).map((s) => s.image as string);
+    expect(images.length).toBeGreaterThan(0);
+    for (const id of images) expect(existsSync(join(root, 'assets/backgrounds', `${id}.webp`)), id).toBe(true);
+    const fades = steps.filter((s) => s.type === 'fade_out' || s.type === 'fade_in');
+    expect(fades[fades.length - 1].type).toBe('fade_out');
+    expect(steps[steps.length - 1]).toEqual({ type: 'backdrop', image: null });
   });
 
   it('the King plays the act-1 ending once, after the rescue, and it never builds the bridge in act 1', () => {

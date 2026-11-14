@@ -329,7 +329,7 @@ objects:
 - type: deco
   parts:
   - [urn]
-  x: 28
+  x: 27
   y: 22
 - type: deco
   parts:
@@ -344,7 +344,7 @@ objects:
 - type: deco
   parts:
   - [urn]
-  x: 32
+  x: 33
   y: 22
 - type: deco
   parts:
@@ -391,21 +391,49 @@ objects:
 - {type: flowers, x: 43, y: 22}
 - {type: flowers, x: 44, y: 22}
 - {type: bush, x: 13, y: 27}
+- {type: flowers, x: 13, y: 28}
 - {type: bush, x: 14, y: 27}
+- {type: flowers, x: 14, y: 28}
 - {type: bush, x: 15, y: 27}
+- {type: flowers, x: 15, y: 28}
 - {type: bush, x: 16, y: 27}
+- {type: flowers, x: 16, y: 28}
 - {type: bush, x: 23, y: 27}
+- {type: flowers, x: 23, y: 28}
 - {type: bush, x: 24, y: 27}
+- {type: flowers, x: 24, y: 28}
 - {type: bush, x: 25, y: 27}
+- {type: flowers, x: 25, y: 28}
 - {type: bush, x: 26, y: 27}
+- {type: flowers, x: 26, y: 28}
 - {type: bush, x: 34, y: 27}
+- {type: flowers, x: 34, y: 28}
 - {type: bush, x: 35, y: 27}
+- {type: flowers, x: 35, y: 28}
 - {type: bush, x: 36, y: 27}
+- {type: flowers, x: 36, y: 28}
 - {type: bush, x: 37, y: 27}
+- {type: flowers, x: 37, y: 28}
 - {type: bush, x: 44, y: 27}
+- {type: flowers, x: 44, y: 28}
 - {type: bush, x: 45, y: 27}
+- {type: flowers, x: 45, y: 28}
 - {type: bush, x: 46, y: 27}
+- {type: flowers, x: 46, y: 28}
 - {type: bush, x: 47, y: 27}
+- {type: flowers, x: 47, y: 28}
+- type: deco
+  parts:
+  - [statue_top]
+  - [statue_bottom]
+  x: 21
+  y: 26
+- type: deco
+  parts:
+  - [statue_top]
+  - [statue_bottom]
+  x: 39
+  y: 26
 - type: deco
   parts:
   - [oak_0_0, oak_0_1]
@@ -1048,11 +1076,6 @@ objects:
 - type: deco
   parts: *id001
   x: 56
-  y: 27
-  on_wall: true
-- type: deco
-  parts: *id001
-  x: 56
   y: 36
   on_wall: true
 - type: deco
@@ -1077,7 +1100,7 @@ objects:
   on_wall: true
 - type: deco
   parts: *id001
-  x: 24
+  x: 26
   y: 66
   on_wall: true
 - type: deco
@@ -1085,16 +1108,66 @@ objects:
   x: 33
   y: 66
   on_wall: true
+- type: deco
+  parts: *id001
+  x: 1
+  y: 41
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 1
+  y: 46
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 58
+  y: 41
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 58
+  y: 46
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 58
+  y: 21
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 58
+  y: 26
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 27
+  y: 30
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 32
+  y: 30
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 4
+  y: 0
+  on_wall: true
+- type: deco
+  parts: *id001
+  x: 8
+  y: 0
+  on_wall: true
 npcs:
 - id: castle_door_guard_w
   sprite: guard
   x: 28
-  y: 19
+  y: 22
   dialog: [The castle of Cornelia. The King receives travellers in the throne room upstairs.]
 - id: castle_door_guard_e
   sprite: guard
   x: 32
-  y: 19
+  y: 22
   dialog:
   - condition: PRINCESS_RESCUED
     text: [Her Highness rode in through this very gate., I will tell my grandchildren I stood guard that day!]
@@ -1105,7 +1178,7 @@ npcs:
   y: 33
   dialog: [Beyond this gate are the castle gardens. Mind the moat!]
 - id: guard
-  sprite: guard
+  sprite: villager
   x: 33
   y: 50
   wander: true
@@ -1132,15 +1205,21 @@ npcs:
   x: 34
   y: 45
   wander: true
-  dialog: [Buy spells early. Garland is no easy foe!]
+  dialog:
+  - condition: GARLAND_DEFEATED
+    text: [You beat Garland! Keep buying spells early. Whatever waits past the bridge won't be easier.]
+  - text: [Buy spells early. Garland is no easy foe!]
 - id: market_vendor_w
   sprite: vendor_f
   x: 24
   y: 41
   dialog:
-  - condition: PRINCESS_RESCUED
+  - condition: INTRO_COMPLETE
     text: ['Apples from the royal orchard! Half price today, for the princess is home.', 'They say the King has builders out at the north bridge.
         Trade will come back, you''ll see.']
+  - condition: PRINCESS_RESCUED
+    text: ['Apples from the royal orchard! Half price today, for the princess is home.', 'Now if only someone would mend the north bridge. Trade
+        would come back, you''ll see.']
   - text: ['Apples from the royal orchard! Dear this week, I''m sorry to say.', 'The carters won''t use the roads. Wolves, right up to the walls,
         and in daylight too.', 'Since the princess was taken, nobody has the heart to haggle.']
 - id: market_vendor_e
@@ -1172,7 +1251,7 @@ npcs:
   wander: true
   dialog: ['White magic heals, black magic harms.', A wise party carries both.]
 - id: fisher
-  sprite: old_man
+  sprite: villager
   x: 38
   y: 64
   dialog: [The fish bite best where the river bends.]
@@ -1180,7 +1259,7 @@ npcs:
   sprite: guard
   x: 56
   y: 46
-  dialog: [The east road leads around the bay.]
+  dialog: [The east road crosses the river and ends at an old tomb below the mountains.]
 - id: postern_guard
   sprite: guard
   x: 8

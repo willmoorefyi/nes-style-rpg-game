@@ -9,7 +9,7 @@ from common import Room  # noqa: E402
 
 KITS = ["interior", "town", "castle"]
 QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": []}
-CHECKS = {"no_static_chokepoints": True}
+CHECKS = {"no_static_chokepoints": True, "no_unreachable_walkable": True}       # M4
 LEGEND = "legend: W wall top  F wall face  _ wood floor  - stone / earth floor  + carpet  c counter"
 TOWN = "cornelia"
 
@@ -29,6 +29,7 @@ class Place(Room):
     def __init__(self, map_id: str, name: str, w: int, h: int, gap: list[int], back: str):
         super().__init__(map_id, name, w, h)
         self.gap, self.back = gap, back
+        self.unreachable: list[list[int]] = []
 
     def open_exit(self, ch: str = "_") -> None:
         for x in self.gap:
@@ -40,8 +41,9 @@ class Place(Room):
     def one(self, part: str, x: int, y: int, **kw) -> None:
         self.deco([[part]], x, y, **kw)
 
-    def tall(self, part: str, x: int, y: int) -> None:      # a two-cell part: <part>_top over <part>_bottom
-        self.deco([[f"{part}_top"], [f"{part}_bottom"]], x, y)
+    def staff(self, x0: int, y0: int, x1: int, y1: int) -> None:
+        """M3/M4: the floor behind a counter (the keeper's side) is visible but not reachable from the door."""
+        self.unreachable += [[x, y] for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
 
     def fireplace(self, x: int, y: int) -> None:
         self.deco([["fireplace_0_0", "fireplace_0_1"], ["fireplace_1_0", "fireplace_1_1"]], x, y, on_wall=True)
@@ -57,7 +59,8 @@ class Place(Room):
         self.transitions += [{"x": x, "y": self.g.h - 1, "targetMap": TOWN, "targetEntrance": self.back}
                              for x in self.gap]
         return self.write(header, {"door": [self.gap[0], self.g.h - 2]}, kits=KITS, mats=mats, trim=trim,
-                          quiet=QUIET, script="interiors.py", legend=LEGEND, music=music, extra=CHECKS)
+                          quiet=QUIET, script="interiors.py", legend=LEGEND, music=music,
+                          extra={**CHECKS, **({"unreachable_ok": self.unreachable} if self.unreachable else {})})
 
 
 def house(name: str, title: str, w: int, h: int, gap: list[int]) -> Place:

@@ -350,18 +350,24 @@ objects:
   - [bed_bottom]
   x: 3
   y: 4
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [bed_top]
   - [bed_bottom]
   x: 5
   y: 4
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [bed_top]
   - [bed_bottom]
   x: 7
   y: 4
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [weapon_rack]
@@ -440,38 +446,50 @@ objects:
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
-  x: 32
+  x: 34
   y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
-  x: 34
+  x: 35
   y: 4
+  offset: [0, -27]
+  collide: alpha
+- type: deco
+  parts:
+  - [bookshelf_top]
+  - [bookshelf_bottom]
+  x: 38
+  y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
   x: 39
   y: 4
-- type: deco
-  parts:
-  - [bookshelf_top]
-  - [bookshelf_bottom]
-  x: 41
-  y: 4
-- type: deco
-  parts:
-  - [bookshelf_top]
-  - [bookshelf_bottom]
-  x: 33
-  y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
   x: 40
   y: 4
+  offset: [0, -27]
+  collide: alpha
+- type: deco
+  parts:
+  - [bookshelf_top]
+  - [bookshelf_bottom]
+  x: 41
+  y: 4
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [window_in]
@@ -589,9 +607,12 @@ npcs:
   sprite: guard
   x: 20
   y: 11
-  dialog: [His Majesty awaits you upstairs.]
+  dialog:
+  - condition: INTRO_COMPLETE
+    text: [The throne room is up the stairs. His Majesty will always receive the Warriors of Light.]
+  - text: [His Majesty awaits you upstairs.]
 - id: hall_noble
-  sprite: villager
+  sprite: burgher
   x: 18
   y: 20
   wander: true
@@ -661,9 +682,12 @@ npcs:
   dialog: [You found a Phoenix Down!]
 - id: treasury_guard
   sprite: guard
-  x: 36
+  x: 34
   y: 23
-  dialog: [The storeroom below is open to any who would face Garland., Take what you need before you set out.]
+  dialog:
+  - condition: GARLAND_DEFEATED
+    text: ['Garland is beaten, but the storeroom below stays open to you.', Take what you need for the road ahead.]
+  - text: [The storeroom below is open to any who would face Garland., Take what you need before you set out.]
 transitions:
 - {x: 21, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}
 - {x: 22, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}
@@ -674,4 +698,5 @@ transitions:
 encounterRate: {min: 999, max: 999}
 encounters: []
 no_static_chokepoints: true
+no_unreachable_walkable: true
 canSave: true

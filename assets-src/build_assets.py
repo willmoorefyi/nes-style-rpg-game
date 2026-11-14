@@ -197,8 +197,12 @@ def field_rows() -> dict[str, dict]:
     # chest (as in the legacy atlas, ST-12), the others the closed one
     relics = APPROVED / "temple" / "relics.json"
     if relics.exists() and chars:
+        if str(HERE / "tools") not in sys.path:
+            sys.path.insert(0, str(HERE / "tools"))
+        import kit as K                                  # M6: the sheet's build-time `paint` fixes (key fringe)
         rmeta = json.loads(relics.read_text())
-        rimg = Image.open(relics.with_suffix(".png")).convert("RGBA")
+        rimg = K.apply_paint(Image.open(relics.with_suffix(".png")).convert("RGBA"), rmeta.get("paint") or [],
+                             "temple/relics.json")
         pos = {n: (r, c) for r, row in enumerate(rmeta["cells"]) for c, n in enumerate(row) if n}
         if "chest_closed" in pos:
             any_meta = next(iter(next(iter(chars.values())).values()))[0]

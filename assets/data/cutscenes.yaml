@@ -4,22 +4,57 @@
 #   warp (map, and entrance or x and y; optional facing), backdrop (image: a background id, or null to clear)
 # Played after a boss battle (scriptedEncounters.postVictoryCutscene) or after talking to an NPC (npc.cutscene).
 
+# The opening (N2): played by the party-creation scene after the names are chosen, over staged battle backgrounds
+# (assets/backgrounds/<id>.webp). It ends on black, as the field fade-in expects.
+- id: opening
+  steps:
+    - type: fade_out
+      duration: 500
+    - type: backdrop
+      image: dark_forest
+    - type: fade_in
+      duration: 800
+    - type: dialog
+      text: "The world is veiled in darkness. The winds stop, the seas rage, and the earth decays."
+    - type: dialog
+      text: "Their only hope is a prophecy: \"When the world is in darkness, four Warriors of Light will come.\""
+    - type: fade_out
+      duration: 600
+    - type: backdrop
+      image: grassland
+    - type: fade_in
+      duration: 800
+    - type: dialog
+      text: "After a long journey, four young warriors reach the gates of Cornelia, each holding a darkened orb."
+    - type: fade_out
+      duration: 600
+    - type: backdrop
+      image: null
+
+# T2: the princess speaks while she is still on the map (captive_princess hides once PRINCESS_RESCUED is set); the
+# flag, the heal and the warp happen while the screen is black, and the party arrives in the throne room facing the
+# King (cornelia-castle-2f entrance throne_return, just below him). Talking to him then plays act1_complete.
 - id: garland_defeated
   steps:
     - type: dialog
-      text: "You have defeated Garland! The princess is free."
+      text: "Garland falls, and the princess is free!"
+    - type: dialog
+      text: "Princess Liora: Thank you, Warriors of Light! Please, take me home to my father."
     - type: fade_out
-      duration: 500
-    # flags while the screen is black, so Garland and the captive princess are gone when it fades back in
+      duration: 600
     - type: set_flag
       flag: PRINCESS_RESCUED
     - type: heal_party
     - type: dialog
-      text: "The princess returns safely to Cornelia Castle."
-    - type: dialog
-      text: "Report to the King of Cornelia."
+      text: "The party rests on the road home: HP and spell charges are restored, and the fallen are revived."
+    - type: warp
+      map: cornelia-castle-2f
+      entrance: throne_return
+      facing: up
     - type: fade_in
-      duration: 500
+      duration: 600
+    - type: dialog
+      text: "Princess Liora is home at last. Speak to the King."
 
 # The end of act 1: played once when the King is told of the rescue (BRIDGE_BUILT stays unset until the
 # bridge-building scene exists).

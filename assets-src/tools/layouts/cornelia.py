@@ -138,7 +138,7 @@ for x0 in (CX - 20, CX + 18):                    # end towers
 
 # ── castle gardens (between the moat and the inner wall) ──
 for x in (CX - 2, CX + 2):
-    deco([["urn"]], x, 22)
+    deco([["urn"]], x + (x - CX) // 2, 22)       # M1: (27, 22) and (33, 22); the door guards stand inside them
     for y in (24, 27):
         deco([["topiary"]], x, y)
 for fx in (19, 40):
@@ -150,6 +150,9 @@ for fx in (19, 40):
             obj(type="flowers", x=x, y=22)
 for x in list(range(13, 17)) + list(range(23, 27)) + list(range(34, 38)) + list(range(44, 48)):
     obj(type="bush", x=x, y=27)
+    obj(type="flowers", x=x, y=28)               # M9: the lawn under each hedge run
+for x in (21, 39):
+    deco([["statue_top"], ["statue_bottom"]], x, 26)
 for (x, y) in [(12, 22), (47, 22), (25, 22), (34, 22)]:
     oak(x, y)
 # the royal orchard by the north postern, and a quiet garden east of the river
@@ -255,21 +258,23 @@ for (x, y) in [(1, 52), (2, 56), (4, 60), (8, 64), (13, 67), (20, 69), (40, 69),
                (60, 52), (60, 48), (60, 33), (61, 15), (60, 10), (0, 30), (0, 18), (1, 64), (58, 64)]:
     if g.inside(x, y) and g[x, y] == "." and g[x, y - 1] == ".":
         fir(x, y)
-for (x, y) in [(55, 2), (56, 27), (56, 36), (56, 58), (1, 22), (1, 33), (4, 56), (24, 66), (33, 66)]:
+# the bends, then (M7, free) both sides of every gate: south, west, east, precinct east, inner gatehouse, postern
+for (x, y) in [(55, 2), (56, 36), (56, 58), (1, 22), (1, 33), (4, 56), (26, 66), (33, 66), (1, 41), (1, 46), (58, 41),
+               (58, 46), (58, 21), (58, 26), (27, 30), (32, 30), (4, 0), (8, 0)]:
     deco(TURRET, x, y, on_wall=True)
 
 npcs = [
-    # CT-4: the door guards stand beside the 3-wide bridge head, not on it
-    {"id": "castle_door_guard_w", "sprite": "guard", "x": CX - 2, "y": 19,
+    # CT-4 / M1: the door guards stand at the bridge's garden end, beside it, so the castle apron (row 19) stays open
+    {"id": "castle_door_guard_w", "sprite": "guard", "x": CX - 2, "y": 22,
      "dialog": ["The castle of Cornelia. The King receives travellers in the throne room upstairs."]},
-    {"id": "castle_door_guard_e", "sprite": "guard", "x": CX + 2, "y": 19,
+    {"id": "castle_door_guard_e", "sprite": "guard", "x": CX + 2, "y": 22,
      "dialog": [{"condition": "PRINCESS_RESCUED", "text": ["Her Highness rode in through this very gate.",
                                                            "I will tell my grandchildren I stood guard that day!"]},
                 {"text": ["I keep watch on the castle gate, day and night.",
                           "No one has crossed this bridge unseen since Garland rode out."]}]},
     {"id": "inner_gate_guard", "sprite": "guard", "x": CX - 2, "y": 33,
      "dialog": ["Beyond this gate are the castle gardens. Mind the moat!"]},
-    {"id": "guard", "sprite": "guard", "x": CX + 3, "y": 50, "wander": True,
+    {"id": "guard", "sprite": "villager", "x": CX + 3, "y": 50, "wander": True,     # M8: a town crier, not a guard
      "dialog": [{"condition": "PRINCESS_RESCUED", "text": ["The princess is safe.", "Thank you, Warriors of Light!"]},
                 {"text": ["The princess has been kidnapped!",
                           "Garland took her to the Temple of Fiends, north-west of here."]}]},
@@ -280,12 +285,16 @@ npcs = [
                                                          "Seek the four crystals across the land."]},
                 {"text": ["The four crystals have gone dark.", "Only the Warriors of Light can restore them."]}]},
     {"id": "villager", "sprite": "burgher", "x": 34, "y": 45, "wander": True,
-     "dialog": ["Buy spells early. Garland is no easy foe!"]},
+     "dialog": [{"condition": "GARLAND_DEFEATED", "text": [
+                    "You beat Garland! Keep buying spells early. Whatever waits past the bridge won't be easier."]},
+                {"text": ["Buy spells early. Garland is no easy foe!"]}]},
     # UI-2: the market vendors are townsfolk (the merchant sprite is kept for keepers with a shop), and they chat
     {"id": "market_vendor_w", "sprite": "vendor_f", "x": 24, "y": 41,
-     "dialog": [{"condition": "PRINCESS_RESCUED",
-                 "text": ["Apples from the royal orchard! Half price today, for the princess is home.",
-                          "They say the King has builders out at the north bridge. Trade will come back, you'll see."]},
+     "dialog": [{"condition": c, "text": ["Apples from the royal orchard! Half price today, for the princess is home.", t]}
+                for c, t in [("INTRO_COMPLETE",      # T5: the builders only once the King has ordered them
+                              "They say the King has builders out at the north bridge. Trade will come back, you'll see."),
+                             ("PRINCESS_RESCUED",
+                              "Now if only someone would mend the north bridge. Trade would come back, you'll see.")]] + [
                 {"text": ["Apples from the royal orchard! Dear this week, I'm sorry to say.",
                           "The carters won't use the roads. Wolves, right up to the walls, and in daylight too.",
                           "Since the princess was taken, nobody has the heart to haggle."]}]},
@@ -302,10 +311,10 @@ npcs = [
      "dialog": ["I tend the royal orchard.", "The princess loved to read under these trees."]},
     {"id": "mage_student", "sprite": "mage", "x": 9, "y": 55, "wander": True,
      "dialog": ["White magic heals, black magic harms.", "A wise party carries both."]},
-    {"id": "fisher", "sprite": "old_man", "x": 38, "y": 64,
+    {"id": "fisher", "sprite": "villager", "x": 38, "y": 64,
      "dialog": ["The fish bite best where the river bends."]},
     {"id": "east_gate_guard", "sprite": "guard", "x": 56, "y": 46,
-     "dialog": ["The east road leads around the bay."]},
+     "dialog": ["The east road crosses the river and ends at an old tomb below the mountains."]},
     {"id": "postern_guard", "sprite": "guard", "x": 8, "y": 3,
      "dialog": ["This postern lets the gardeners out to the fields.", "Watch for wolves past the orchard."]},
     {"id": "garden_maid", "sprite": "villager_f", "x": 42, "y": 25, "wander": True,

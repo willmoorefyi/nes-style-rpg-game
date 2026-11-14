@@ -52,6 +52,7 @@ carpet_trim: [214, 170, 64]
 entrances:
   stairs: [21, 23]
   tower: [37, 6]
+  throne_return: [21, 9]
 objects:
 - type: deco
   parts:
@@ -61,8 +62,6 @@ objects:
   y: 6
   fit: true
   offset: [-24, 0]
-  walk_cells:
-  - [0, 1]
 - type: deco
   parts:
   - [stairwell_0_0, stairwell_0_1]
@@ -238,6 +237,8 @@ objects:
   - [bed_bottom]
   x: 2
   y: 6
+  offset: [0, -38]
+  collide: alpha
 - type: deco
   parts:
   - [desk]
@@ -249,6 +250,8 @@ objects:
   - [bookshelf_bottom]
   x: 10
   y: 6
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [plant]
@@ -292,18 +295,24 @@ objects:
   - [bookshelf_bottom]
   x: 2
   y: 18
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
   x: 3
   y: 18
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [bookshelf_top]
   - [bookshelf_bottom]
   x: 4
   y: 18
+  offset: [0, -27]
+  collide: alpha
 - type: deco
   parts:
   - [desk]
@@ -437,7 +446,7 @@ npcs:
 - id: king
   sprite: king
   x: 21
-  y: 7
+  y: 8
   dialog:
   - condition: INTRO_COMPLETE
     text: [My builders are hard at work on the bridge to the north., 'Go with our blessing, and may the crystals guide you.']
@@ -445,8 +454,8 @@ npcs:
     text: ['You have brought my daughter home. Cornelia is in your debt, Warriors of Light!', 'As I promised, I will order the bridge to the north
         rebuilt at once.']
   - text: ['Welcome, travellers. I am the King of Cornelia.', 'Garland, once my finest knight, has carried off my daughter, Princess Liora.',
-      'He holds her in the Temple of Fiends, beyond the forest to the north-west.', 'Bring her home safely, and I will rebuild the bridge to the
-        north for you.']
+      'He holds her in the Temple of Fiends, north-west of the city. Leave by the west gate and follow the road; it ends at the temple door.',
+      'Bring her home safely, and I will rebuild the bridge to the north for you.']
   cutscene: {id: act1_complete, requiredFlag: PRINCESS_RESCUED, onceFlag: INTRO_COMPLETE}
 - id: princess
   sprite: princess
@@ -461,7 +470,7 @@ npcs:
   giftItem: lute
   giftFlag: GOT_LUTE
 - id: chancellor
-  sprite: old_man
+  sprite: burgher
   x: 18
   y: 10
   dialog:
@@ -479,7 +488,7 @@ npcs:
   sprite: guard
   x: 24
   y: 21
-  dialog: [Long live the King!]
+  dialog: [Speak plainly to His Majesty. He has no patience for flattery.]
 - id: princess_maid
   sprite: villager_f
   x: 7
@@ -487,7 +496,7 @@ npcs:
   wander: true
   dialog:
   - condition: PRINCESS_RESCUED
-    text: [Her Highness is resting. She talks of nothing but you!]
+    text: [Her Highness is with the King in the throne room. She talks of nothing but you!]
   - text: [This is Her Highness's chamber. I keep it ready for her return., Every morning I set out fresh flowers.]
 - id: court_mage
   sprite: mage
@@ -512,4 +521,5 @@ transitions:
 encounterRate: {min: 999, max: 999}
 encounters: []
 no_static_chokepoints: true
+no_unreachable_walkable: true
 canSave: true
