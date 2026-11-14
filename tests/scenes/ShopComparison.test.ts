@@ -22,7 +22,8 @@ describe('MS-2: shop comparison respects who can equip the item', () => {
     };
     const scene = new ShopScene(game as unknown as Game, 'cornelia_weapon');
     scene.enter();
-    input.tap('confirm', () => scene.update(1)); // Buy (first item: Rapier)
+    input.tap('confirm', () => scene.update(1)); // Buy (Nunchaku, Knife, Staff, Rapier, Hammer)
+    for (let i = 0; i < 3; i++) input.tap('down', () => scene.update(1)); // to the Rapier
     scene.update(1);                              // draws the comparison panel
     const labels = visibleLabels(scene.container);
     expect(labels).toContain('B.MAG  n/a');

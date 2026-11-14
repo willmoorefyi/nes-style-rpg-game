@@ -272,6 +272,50 @@
           1144
         ]
       }
+    },
+    "gr_imp": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          1344
+        ],
+        "attack": [
+          80,
+          1344
+        ],
+        "hurt": [
+          160,
+          1344
+        ]
+      }
+    },
+    "gr_wolf": {
+      "cell": [
+        110,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          0,
+          1424
+        ],
+        "attack": [
+          110,
+          1424
+        ],
+        "hurt": [
+          220,
+          1424
+        ]
+      }
     }
   }
 }

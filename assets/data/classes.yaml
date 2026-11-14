@@ -17,6 +17,9 @@
     luck: 1
   usableEquipment: [sword, axe, hammer, heavy_armor, shield]
   spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
 
 # ═══ THIEF ═══
 - id: thief
@@ -37,6 +40,9 @@
     luck: 3
   usableEquipment: [knife, light_sword, light_armor]
   spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 2 }
+  magicDefense: { base: 15, growth: 2 }
 
 # ═══ MONK ═══
 - id: monk
@@ -57,6 +63,9 @@
     luck: 1
   usableEquipment: [nunchaku, light_armor]
   spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 3 }
+  magicDefense: { base: 10, growth: 4 }
 
 # ═══ WHITE MAGE ═══
 - id: white_mage
@@ -77,6 +86,9 @@
     luck: 1
   usableEquipment: [staff, hammer, robe]
   spellLevels: { white: 7, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 1 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]
@@ -116,6 +128,9 @@
     luck: 1
   usableEquipment: [knife, staff, robe]
   spellLevels: { white: 0, black: 7 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 1 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]
@@ -155,6 +170,9 @@
     luck: 1
   usableEquipment: [sword, staff, medium_armor]
   spellLevels: { white: 5, black: 5 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 7, growth: 2 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]
@@ -196,6 +214,9 @@
     luck: 1
   usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
   spellLevels: { white: 3, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [10, [1]]
@@ -225,6 +246,9 @@
     luck: 4
   usableEquipment: [knife, light_sword, sword, nunchaku, light_armor]
   spellLevels: { white: 0, black: 4 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 2 }
+  magicDefense: { base: 15, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [10, [1]]
@@ -255,6 +279,9 @@
     luck: 1
   usableEquipment: [nunchaku, light_armor]
   spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 3 }
+  magicDefense: { base: 10, growth: 4 }
 
 # ═══ WHITE WIZARD (upgraded White Mage) ═══
 - id: white_wizard
@@ -276,6 +303,9 @@
     luck: 1
   usableEquipment: [staff, hammer, robe]
   spellLevels: { white: 8, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 1 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]
@@ -316,6 +346,9 @@
     luck: 1
   usableEquipment: [knife, staff, robe]
   spellLevels: { white: 0, black: 8 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 1 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]
@@ -356,6 +389,9 @@
     luck: 1
   usableEquipment: [sword, staff, medium_armor, shield]
   spellLevels: { white: 7, black: 7 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 7, growth: 2 }
+  magicDefense: { base: 20, growth: 2 }
   # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [1, [2]]

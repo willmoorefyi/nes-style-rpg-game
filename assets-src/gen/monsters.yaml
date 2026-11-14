@@ -3,7 +3,7 @@
 # `size` picks the band (small 80 / large 128 / boss 176 px cells). `prompt` describes the look (keep it true to the
 # legacy sprite, which is also sent as the design reference); `attack` / `hurt` describe those two poses.
 # `floating: true` keeps one shared vertical offset (no ground line). `face` overrides the default readable-face rule.
-# `variants` (palette swaps, no extra images): [{id: <sprite>, map: {"#rrggbb": "#rrggbb"}} | {id, hue: <deg>, sat: <x>}]
+# `variants` (palette swaps, no extra images): [{id: <sprite>, map: {"#rrggbb": "#rrggbb"}} | {id, hue: <deg>, sat: <x>, val: <x>}]
 # `seeds` are tried in order; put the approved seed first.
 - id: goblin
   size: small
@@ -14,6 +14,8 @@
   attack: lunging forward and stabbing with the dagger held out toward the heroes
   hurt: knocked back, flinching with eyes squeezed shut and the dagger arm thrown back
   seeds: [1234]
+  variants:
+    - {id: gr_imp, hue: -95, sat: 1.1}    # Gr.Imp (T4 §1.1): a redder imp
 - id: wolf
   size: small
   prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
@@ -22,6 +24,8 @@
   attack: springing through the air at the heroes, body stretched long, front paws reaching and jaws wide open to bite
   hurt: yelping as it is knocked sideways, legs scrambling, head twisted back and ears flat
   seeds: [1234]
+  variants:
+    - {id: gr_wolf, hue: -20, sat: 0.6, val: 0.65}   # Gr.Wolf (T4 §1.1): a darker, greyer wolf
 - id: skeleton
   size: small
   prompt: >-

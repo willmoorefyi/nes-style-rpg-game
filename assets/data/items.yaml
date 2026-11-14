@@ -11,6 +11,8 @@
   - white_mage
   - black_mage
   - red_mage
+  hit: 10
+  crit: 2
 - id: wooden_nunchaku
   name: Wooden Nunchaku
   type: weapon
@@ -19,6 +21,8 @@
   price: 10
   usableBy:
   - monk
+  hit: 0
+  crit: 1
 - id: staff
   name: Staff
   type: weapon
@@ -30,6 +34,8 @@
   - black_mage
   - red_mage
   - monk
+  hit: 0
+  crit: 3
 - id: rapier
   name: Rapier
   type: weapon
@@ -40,16 +46,20 @@
   - warrior
   - thief
   - red_mage
+  hit: 5
+  crit: 4
 - id: short_sword
   name: Short Sword
   type: weapon
   stats:
-    attack: 10
-  price: 15
+    attack: 15
+  price: 550
   usableBy:
   - warrior
   - thief
   - red_mage
+  hit: 10
+  crit: 6
 - id: hammer
   name: Hammer
   type: weapon
@@ -59,6 +69,8 @@
   usableBy:
   - warrior
   - white_mage
+  hit: 0
+  crit: 5
 - id: hand_axe
   name: Hand Axe
   type: weapon
@@ -67,6 +79,8 @@
   price: 550
   usableBy:
   - warrior
+  hit: 5
+  crit: 7
 - id: iron_nunchaku
   name: Iron Nunchaku
   type: weapon
@@ -75,6 +89,8 @@
   price: 200
   usableBy:
   - monk
+  hit: 0
+  crit: 9
 - id: iron_sword
   name: Iron Sword
   type: weapon
@@ -84,6 +100,8 @@
   usableBy:
   - warrior
   - red_mage
+  hit: 10
+  crit: 10
 - id: mythril_sword
   name: Mythril Sword
   type: weapon
@@ -94,6 +112,8 @@
   - warrior
   - red_mage
   bonusVsFamily: undead
+  hit: 10
+  crit: 12
 - id: mythril_knife
   name: Mythril Knife
   type: weapon
@@ -105,6 +125,8 @@
   - black_mage
   - red_mage
   bonusVsFamily: undead
+  hit: 10
+  crit: 12
 - id: great_axe
   name: Great Axe
   type: weapon
@@ -114,6 +136,8 @@
   usableBy:
   - warrior
   bonusVsFamily: giant
+  hit: 10
+  crit: 14
 - id: mythril_hammer
   name: Mythril Hammer
   type: weapon
@@ -124,6 +148,8 @@
   - warrior
   - white_mage
   bonusVsFamily: undead
+  hit: 10
+  crit: 12
 - id: power_staff
   name: Power Staff
   type: weapon
@@ -134,6 +160,8 @@
   - white_mage
   - black_mage
   - red_mage
+  hit: 10
+  crit: 10
 - id: flame_sword
   name: Flame Sword
   type: weapon
@@ -144,6 +172,8 @@
   - warrior
   element: fire
   bonusVsFamily: undead
+  hit: 10
+  crit: 16
 - id: ice_brand
   name: Ice Brand
   type: weapon
@@ -153,6 +183,8 @@
   usableBy:
   - warrior
   element: ice
+  hit: 10
+  crit: 16
 - id: coral_sword
   name: Coral Sword
   type: weapon
@@ -164,6 +196,8 @@
   - red_mage
   element: lightning
   bonusVsFamily: aquatic
+  hit: 10
+  crit: 16
 - id: masamune
   name: Masamune
   type: weapon
@@ -178,6 +212,8 @@
   - black_mage
   - red_mage
   bonusVsFamily: dragon
+  hit: 10
+  crit: 20
 - id: cloth
   name: Cloth
   type: armor
@@ -191,6 +227,8 @@
   - white_mage
   - black_mage
   - red_mage
+  slot: armor
+  weight: 2
 - id: robe
   name: Robe
   type: armor
@@ -201,6 +239,8 @@
   - white_mage
   - black_mage
   - red_mage
+  slot: armor
+  weight: 2
 - id: leather_armor
   name: Leather Armor
   type: armor
@@ -210,7 +250,10 @@
   usableBy:
   - warrior
   - thief
+  - monk
   - red_mage
+  slot: armor
+  weight: 8
 - id: wooden_armor
   name: Wooden Armor
   type: armor
@@ -219,6 +262,8 @@
   price: 50
   usableBy:
   - warrior
+  slot: armor
+  weight: 8
 - id: chain_mail
   name: Chain Mail
   type: armor
@@ -228,6 +273,8 @@
   usableBy:
   - warrior
   - red_mage
+  slot: armor
+  weight: 15
 - id: iron_armor
   name: Iron Armor
   type: armor
@@ -236,6 +283,8 @@
   price: 800
   usableBy:
   - warrior
+  slot: armor
+  weight: 23
 - id: mythril_armor
   name: Mythril Armor
   type: armor
@@ -244,6 +293,8 @@
   price: 7500
   usableBy:
   - warrior
+  slot: armor
+  weight: 33
 - id: mythril_mail
   name: Mythril Mail
   type: armor
@@ -253,6 +304,8 @@
   usableBy:
   - warrior
   - red_mage
+  slot: armor
+  weight: 8
 - id: dragon_armor
   name: Dragon Armor
   type: armor
@@ -261,6 +314,8 @@
   price: 0
   usableBy:
   - warrior
+  slot: armor
+  weight: 10
 - id: wooden_shield
   name: Wooden Shield
   type: armor
@@ -271,6 +326,7 @@
   usableBy:
   - warrior
   - red_mage
+  weight: 0
 - id: iron_shield
   name: Iron Shield
   type: armor
@@ -280,6 +336,7 @@
   price: 100
   usableBy:
   - warrior
+  weight: 0
 - id: mythril_shield
   name: Mythril Shield
   type: armor
@@ -290,13 +347,14 @@
   usableBy:
   - warrior
   - red_mage
+  weight: 0
 - id: cap
   name: Cap
   type: armor
   slot: helmet
   stats:
     defense: 1
-  price: 10
+  price: 80
   usableBy:
   - warrior
   - thief
@@ -304,6 +362,7 @@
   - white_mage
   - black_mage
   - red_mage
+  weight: 1
 - id: iron_helm
   name: Iron Helm
   type: armor
@@ -313,6 +372,7 @@
   price: 100
   usableBy:
   - warrior
+  weight: 3
 - id: mythril_helm
   name: Mythril Helm
   type: armor
@@ -322,6 +382,7 @@
   price: 2500
   usableBy:
   - warrior
+  weight: 3
 - id: potion
   name: Potion
   type: consumable
@@ -364,13 +425,13 @@
   name: Tent
   type: consumable
   stats: {}
-  price: 250
+  price: 75
   usableBy: []
 - id: cabin
   name: Cabin
   type: consumable
   stats: {}
-  price: 500
+  price: 250
   usableBy: []
 - id: lute
   name: Lute

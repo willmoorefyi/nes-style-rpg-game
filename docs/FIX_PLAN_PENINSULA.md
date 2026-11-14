@@ -1639,6 +1639,14 @@ These are checked by `tests/balance/*` and by re-running the scratch simulation 
 
 **Order:** T4a and T4c run in parallel. T4b runs after T4a merges (revision 5). Then T4d, then T4e.
 
+### T4d result
+
+- **Data:** §1.1 enemies (FF1 Garland 106 / 15 / 1 hit, no weakness, 130 XP; new `gr_imp`, `gr_wolf`; combat fields under `stats`), §1.2 items (`hit`/`crit`/`weight`, explicit `slot: armor` on body armour, Monk wears leather, Cap 80 G, Short Sword 15 / 550 G, Tent 75, Cabin 250), §1.3 spells (FF1 powers and accuracies; CURE 16), §1.4 `hitPercent`/`magicDefense` on every class, §1.5 Cornelia lists, six `t4_*` debug scenarios (§1.7's five plus `t4_garland_l1_naked` for revision 1's careless check).
+- **Art:** palette swaps in `gen/monsters.yaml`; `monster.recolor` gained a `val` (brightness) factor. The plan's `hue: 25` barely changes a green imp, so Gr.Imp uses `hue: -95, sat: 1.1` (red); Gr.Wolf uses `hue: -20, sat: 0.6, val: 0.65` (grey wolves have no hue to shift, so "darker" needs `val`).
+- **Tests:** `tests/helpers/battlePolicies.ts` (the sim's `chooseCommands`, plus RUSE on self against a big enemy), `tests/helpers/balanceData.ts` (kits, §1.6 tables inline), `tests/balance/{garland,fieldPacing,zones}.test.ts`, `tests/data/actOneBalance.test.ts`; `crossFileValidation` reads group entries and zones and checks every formation's maximum roll with `formationFits` (and the debug scenarios').
+- **Simulation on the real data** (real engine, 2,000 seeds): Garland careless L1 no gear 0.1 %, careless L1 400 G kit 97 %, sensible L1 99.9 %, sensible L2 100 % (both kits), temple run then Garland 100 % at L2 and L3. Fields: Lv1 fight-only wins 100 % (5.7 % HP lost), temple 97.2 %. Campaign (200 runs): Lv2 at battle 5 (median), Lv3 at 22, 0 wipes, 2.0 inn visits, 7.5 of 8 purchases, 353 G left (Cap at 80 G costs 280 G more than the sim assumed). Every target met without tuning; the numbers match §4.1/§4.4 to the decimal.
+- **Deviations:** the Red Mage's starting kit has no spell (rapier + cloth), otherwise three mages + Warrior cost 430 G. "SLEP every turn, Garland acts in every battle" cannot hold for a 106-HP Garland: turn order is by agility, so a SLEP that lands before each of his turns (79 %) can hold him through a short fight. The test asserts the FF1 property instead: each landed SLEP costs at most one turn (he always wakes), and over 15 open rounds he acts in ≥ 95 % of battles.
+
 ---
 
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)

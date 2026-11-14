@@ -4,6 +4,8 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { STORY_FLAGS } from '../../src/core/GameFlags.js';
+import { formationFits, type EnemyBoxInput, type EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
+import { MAX_FORMATION } from '../../src/systems/EncounterTable.js';
 
 // Load all YAML data files using readFileSync (asset files, not modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +19,7 @@ const items: Array<{ id: string; usableBy: string[] }> = parse(
 const spells: Array<{ id: string; element: string; effect: string }> = parse(
   readFileSync(join(dataDir, 'spells.yaml'), 'utf-8')
 );
-const enemies: Array<{ id: string; weakness?: string; resist?: string }> = parse(
+const enemies: Array<{ id: string; weakness?: string; resist?: string; sprite?: string; size?: EnemySizeClass }> = parse(
   readFileSync(join(dataDir, 'enemies.yaml'), 'utf-8')
 );
 const classes: Array<{ id: string; upgradeFrom?: string }> = parse(
@@ -28,9 +30,12 @@ const shops: Array<{ id: string; type: string; inventory: string[] }> = parse(
 );
 
 // Load all map files
+/** A formation: a fixed `enemies` list (legacy) or rolled `groups` (T4c). */
+interface EncounterFile { weight: number; enemies?: string[]; groups?: Array<{ id: string; min: number; max?: number }> }
 interface MapFile {
   id: string;
-  encounters?: Array<{ enemies: string[] }>;
+  encounters?: EncounterFile[];
+  encounterZones?: Array<{ id: string; encounters: EncounterFile[] }>;
   transitions?: Array<{ targetMap: string }>;
   npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string;
     chestFlag?: string; cutscene?: { id: string } }>;
@@ -67,6 +72,31 @@ const validStatusEffects = new Set([
   'poison', 'stun', 'sleep', 'blind', 'silence', 'death', 'stone',
 ]);
 
+/** Every enemy id a formation can roll. */
+function formationIds(enc: EncounterFile): string[] {
+  return enc.groups ? enc.groups.map((g) => g.id) : enc.enemies ?? [];
+}
+
+/** The biggest formation an entry can roll (each group at its max), before the runtime cap. */
+function maxRoll(enc: EncounterFile): string[] {
+  if (!enc.groups) return enc.enemies ?? [];
+  return enc.groups.flatMap((g) => Array<string>(g.max ?? g.min).fill(g.id));
+}
+
+// battle boxes as AiEnemyView sizes them: the monster atlas cell at its scale, else the placeholder box
+const monsterAtlas = JSON.parse(readFileSync(resolve(__dirname, '../../assets/sprites/monsters-ai.json'), 'utf-8')) as {
+  scale: number; sheets: Record<string, { cell: [number, number] }>;
+};
+const PLACEHOLDER_BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
+function enemyBox(id: string): EnemyBoxInput {
+  const e = enemies.find((x) => x.id === id);
+  const size = e?.size ?? 'small';
+  const sheet = monsterAtlas.sheets[(e?.sprite || id).replace(/\.png$/i, '')];
+  return sheet
+    ? { size, w: sheet.cell[0] * monsterAtlas.scale, h: sheet.cell[1] * monsterAtlas.scale }
+    : { size, w: PLACEHOLDER_BOX[size], h: PLACEHOLDER_BOX[size] };
+}
+
 // Base classes are those without upgradeFrom
 const baseClassIds = new Set(
   classes.filter((c) => !c.upgradeFrom).map((c) => c.id)
@@ -97,16 +127,41 @@ describe('Cross-file data validation', () => {
     });
   });
 
-  // (c) Map encounter tables → enemies.yaml (all maps)
+  // (c) Map encounter tables (the map's own and every zone's) → enemies.yaml; group formations fit the battle screen
   describe('Encounter → Enemies', () => {
-    refMaps.forEach((map) => {
-      (map.encounters ?? []).forEach((enc, i) => {
-        enc.enemies.forEach((enemyId) => {
-          it(`map "${map.id}" (${map.variant}) encounter[${i}] references enemy "${enemyId}" that exists in enemies.yaml`, () => {
-            expect(enemyIds.has(enemyId)).toBe(true);
-          });
+    const tables = refMaps.flatMap((map) => [
+      ...(map.encounters ?? []).map((enc, i) => ({ where: `map "${map.id}" (${map.variant}) encounter[${i}]`, enc })),
+      ...(map.encounterZones ?? []).flatMap((z) => z.encounters.map((enc, i) => ({
+        where: `map "${map.id}" (${map.variant}) zone "${z.id}" encounter[${i}]`, enc }))),
+    ]);
+    tables.forEach(({ where, enc }) => {
+      formationIds(enc).forEach((enemyId) => {
+        it(`${where} references enemy "${enemyId}" that exists in enemies.yaml`, () => {
+          expect(enemyIds.has(enemyId)).toBe(true);
         });
       });
+      it(`${where} has its maximum roll within ${MAX_FORMATION} enemies, laid out without overlap`, () => {
+        const ids = maxRoll(enc);
+        expect(ids.length).toBeGreaterThan(0);
+        expect(ids.length).toBeLessThanOrEqual(MAX_FORMATION);
+        expect(formationFits(ids.map(enemyBox)), ids.join(',')).toBe(true);
+      });
+    });
+  });
+
+  // (c2) the helpers above, on synthetic formations
+  describe('Encounter formation helpers', () => {
+    it('read a group entry\'s ids and maximum roll, and a legacy list as it is', () => {
+      expect(formationIds({ weight: 1, groups: [{ id: 'goblin', min: 3, max: 5 }, { id: 'wolf', min: 1 }] })).toEqual(['goblin', 'wolf']);
+      expect(maxRoll({ weight: 1, groups: [{ id: 'goblin', min: 3, max: 5 }, { id: 'wolf', min: 1 }] }))
+        .toEqual(['goblin', 'goblin', 'goblin', 'goblin', 'goblin', 'wolf']);
+      expect(maxRoll({ weight: 1, enemies: ['goblin', 'wolf'] })).toEqual(['goblin', 'wolf']);
+    });
+
+    it('reject a formation over the cap or too big for the screen', () => {
+      expect(maxRoll({ weight: 1, groups: [{ id: 'goblin', min: 6, max: 10 }] }).length).toBeGreaterThan(MAX_FORMATION);
+      expect(formationFits(maxRoll({ weight: 1, groups: [{ id: 'garland', min: 5 }, { id: 'goblin', min: 6 }] })
+        .map(enemyBox))).toBe(false);
     });
   });
 
@@ -395,6 +450,13 @@ describe('debug scenarios', () => {
       }
     }
   });
+
+  // T4: up to 9 enemies (t4_nine), laid out on the battle screen without overlap
+  it.each(scenarios.filter((s) => (s.enemies ?? []).length > 0).map((s) => [s.id, s] as const))(
+    '%s enemies fit the battle screen', (_id, s) => {
+      expect((s.enemies ?? []).length).toBeLessThanOrEqual(MAX_FORMATION);
+      expect(formationFits((s.enemies ?? []).map(enemyBox))).toBe(true);
+    });
 
   // MS-1: the loader now equips weapons and body armour too, so every listed item must fit its member
   it.each(scenarios.map((s) => [s.id, s] as const))('%s equipment is usable by its member, one item per slot', (_id, s) => {

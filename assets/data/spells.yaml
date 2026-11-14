@@ -5,7 +5,7 @@
   effect: heal
   targeting: single_ally
   description: Restore HP to one ally
-  power: 30
+  power: 16
   element: none
 - id: harm
   name: HARM
@@ -17,6 +17,7 @@
   power: 20
   element: holy
   targetFamily: undead
+  accuracy: 24
 - id: fog
   name: FOG
   level: 1
@@ -24,7 +25,7 @@
   effect: buff_defense
   targeting: single_ally
   description: Raise defense of one ally
-  power: 0
+  power: 8
   element: none
 - id: ruse
   name: RUSE
@@ -33,7 +34,7 @@
   effect: buff_evade
   targeting: self
   description: Raise evasion of self
-  power: 0
+  power: 80
   element: none
 - id: lamp
   name: LAMP
@@ -53,6 +54,7 @@
   description: Inflict silence on one enemy
   power: 0
   element: none
+  accuracy: 64
 - id: alit
   name: ALIT
   level: 2
@@ -69,7 +71,7 @@
   effect: buff_evade
   targeting: single_ally
   description: Raise evasion of one ally
-  power: 0
+  power: 40
   element: none
 - id: cure2
   name: CUR2
@@ -77,8 +79,8 @@
   type: white
   effect: heal
   targeting: single_ally
-  description: Restore 60 HP to one ally
-  power: 60
+  description: Restore HP to one ally
+  power: 33
   element: none
 - id: hrm2
   name: HRM2
@@ -90,6 +92,7 @@
   power: 40
   element: holy
   targetFamily: undead
+  accuracy: 24
 - id: afir
   name: AFIR
   level: 3
@@ -106,7 +109,7 @@
   effect: heal
   targeting: all_allies
   description: Restore HP to all allies
-  power: 20
+  power: 12
   element: none
 - id: pure
   name: PURE
@@ -126,6 +129,7 @@
   description: Lower morale of all enemies
   power: 0
   element: none
+  accuracy: 40
 - id: aice
   name: AICE
   level: 4
@@ -150,8 +154,8 @@
   type: white
   effect: heal
   targeting: single_ally
-  description: Restore 120 HP to one ally
-  power: 120
+  description: Restore HP to one ally
+  power: 66
   element: none
 - id: life
   name: LIFE
@@ -169,8 +173,9 @@
   effect: damage
   targeting: single
   description: Deal fire damage to one enemy
-  power: 20
+  power: 10
   element: fire
+  accuracy: 24
 - id: lit
   name: LIT
   level: 1
@@ -178,8 +183,9 @@
   effect: damage
   targeting: single
   description: Deal lightning damage to one enemy
-  power: 20
+  power: 10
   element: lightning
+  accuracy: 24
 - id: slep
   name: SLEP
   level: 1
@@ -189,6 +195,7 @@
   description: Put all enemies to sleep
   power: 0
   element: none
+  accuracy: 24
 - id: lock
   name: LOCK
   level: 1
@@ -196,8 +203,9 @@
   effect: debuff_evade
   targeting: single
   description: Lower enemy evasion
-  power: 0
+  power: 20
   element: none
+  accuracy: 64
 - id: ice
   name: ICE
   level: 2
@@ -205,8 +213,9 @@
   effect: damage
   targeting: single
   description: Deal ice damage to one enemy
-  power: 30
+  power: 20
   element: ice
+  accuracy: 24
 - id: dark
   name: DARK
   level: 2
@@ -216,6 +225,7 @@
   description: Blind all enemies
   power: 0
   element: none
+  accuracy: 24
 - id: tmpr
   name: TMPR
   level: 2
@@ -223,7 +233,7 @@
   effect: buff_attack
   targeting: single_ally
   description: Raise attack of one ally
-  power: 0
+  power: 14
   element: none
 - id: slow
   name: SLOW
@@ -234,6 +244,7 @@
   description: Reduce speed of one enemy
   power: 0
   element: none
+  accuracy: 64
 - id: fir2
   name: FIR2
   level: 3
@@ -243,6 +254,7 @@
   description: Deal fire damage to all enemies
   power: 30
   element: fire
+  accuracy: 24
 - id: hold
   name: HOLD
   level: 3
@@ -252,6 +264,7 @@
   description: Paralyze one enemy
   power: 0
   element: none
+  accuracy: 64
 - id: lit2
   name: LIT2
   level: 3
@@ -261,6 +274,7 @@
   description: Deal lightning damage to all enemies
   power: 30
   element: lightning
+  accuracy: 24
 - id: lok2
   name: LOK2
   level: 3
@@ -268,8 +282,9 @@
   effect: debuff_evade
   targeting: all
   description: Lower evasion of all enemies
-  power: 0
+  power: 20
   element: none
+  accuracy: 64
 - id: slp2
   name: SLP2
   level: 4
@@ -279,6 +294,7 @@
   description: Put all enemies into deep sleep
   power: 0
   element: none
+  accuracy: 48
 - id: fast
   name: FAST
   level: 4
@@ -297,6 +313,7 @@
   description: Confuse all enemies
   power: 0
   element: none
+  accuracy: 48
 - id: ice2
   name: ICE2
   level: 4
@@ -306,3 +323,4 @@
   description: Deal ice damage to all enemies
   power: 40
   element: ice
+  accuracy: 24

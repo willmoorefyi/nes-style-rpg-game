@@ -355,22 +355,23 @@ def _hex(c: str) -> tuple[int, int, int]:
 
 def recolor(frame: Image.Image, variant: dict) -> Image.Image:
     """Variant of an approved frame. `map`: exact colour replacements ("#rrggbb": "#rrggbb"). `hue` (degrees) / `sat`
-    (factor): shift every colour except the outline. Results are snapped to 15-bit like all sprite colours."""
+    (factor) / `val` (brightness factor): shift every colour except the outline. Results are snapped to 15-bit like all sprite colours."""
     a = np.asarray(frame.convert("RGBA")).copy()
     vis = a[..., 3] > 0
     outline = np.all(a[..., :3] == np.array(PX.OUTLINE), axis=2)
     for src, dst in (variant.get("map") or {}).items():
         hit = vis & np.all(a[..., :3] == np.array(_hex(src)), axis=2)
         a[hit, :3] = _hex(dst)
-    if variant.get("hue") or variant.get("sat"):
+    if variant.get("hue") or variant.get("sat") or variant.get("val"):
         dh = float(variant.get("hue", 0)) / 360.0
         sat = float(variant.get("sat", 1.0))
+        val = float(variant.get("val", 1.0))
         sel = vis & ~outline
         cols = {tuple(c) for c in a[sel][:, :3].tolist()}
         lut = {}
         for c in cols:
             hh, ss, vv = colorsys.rgb_to_hsv(*(v / 255.0 for v in c))
-            r, g, b = colorsys.hsv_to_rgb((hh + dh) % 1.0, min(1.0, ss * sat), vv)
+            r, g, b = colorsys.hsv_to_rgb((hh + dh) % 1.0, min(1.0, ss * sat), min(1.0, vv * val))
             lut[c] = tuple(int(x) for x in PX.snap15(np.array([r * 255, g * 255, b * 255])))
         flat = a[..., :3].reshape(-1, 3)
         m = sel.reshape(-1)

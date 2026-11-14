@@ -1,51 +1,93 @@
 - id: goblin
   name: Goblin
   stats:
-    hp: 20
+    hp: 8
     strength: 5
-    agility: 4
-    intelligence: 2
+    agility: 6
+    intelligence: 1
     vitality: 3
     luck: 2
-    attack: 8
-    defense: 2
-    magicDefense: 1
+    attack: 4
+    defense: 4
+    magicDefense: 16
+    accuracy: 2
+    evade: 6
   xpReward: 6
   goldReward: 6
   sprite: goblin
   weakness: fire
+- id: gr_imp
+  name: Gr.Imp
+  stats:
+    hp: 16
+    strength: 5
+    agility: 7
+    intelligence: 1
+    vitality: 3
+    luck: 2
+    attack: 8
+    defense: 6
+    magicDefense: 23
+    accuracy: 4
+    evade: 9
+  xpReward: 18
+  goldReward: 18
+  sprite: gr_imp
+  weakness: fire
 - id: wolf
   name: Wolf
   stats:
-    hp: 15
+    hp: 20
     strength: 6
-    agility: 7
+    agility: 12
     intelligence: 1
     vitality: 4
     luck: 3
-    attack: 10
-    defense: 2
-    magicDefense: 0
-  xpReward: 12
+    attack: 8
+    defense: 0
+    magicDefense: 28
+    accuracy: 5
+    evade: 36
+  xpReward: 24
   goldReward: 6
   sprite: wolf
   weakness: fire
   resist: ice
   family: were
+- id: gr_wolf
+  name: Gr.Wolf
+  stats:
+    hp: 72
+    strength: 6
+    agility: 14
+    intelligence: 1
+    vitality: 4
+    luck: 3
+    attack: 14
+    defense: 0
+    magicDefense: 46
+    accuracy: 18
+    evade: 36
+  xpReward: 93
+  goldReward: 22
+  sprite: gr_wolf
+  family: were
 - id: skeleton
   name: Skeleton
   stats:
-    hp: 30
+    hp: 10
     strength: 8
-    agility: 5
+    agility: 6
     intelligence: 1
     vitality: 6
     luck: 2
-    attack: 12
-    defense: 6
-    magicDefense: 2
-  xpReward: 18
-  goldReward: 12
+    attack: 10
+    defense: 12
+    magicDefense: 17
+    accuracy: 9
+    evade: 12
+  xpReward: 9
+  goldReward: 3
   sprite: skeleton
   weakness: fire
   resist: ice
@@ -53,17 +95,19 @@
 - id: pirate
   name: Pirate
   stats:
-    hp: 40
+    hp: 6
     strength: 10
     agility: 6
-    intelligence: 3
+    intelligence: 1
     vitality: 5
     luck: 4
-    attack: 12
-    defense: 4
-    magicDefense: 2
-  xpReward: 20
-  goldReward: 15
+    attack: 8
+    defense: 0
+    magicDefense: 15
+    accuracy: 2
+    evade: 6
+  xpReward: 40
+  goldReward: 40
   sprite: pirate
   weakness: lightning
 - id: ogre
@@ -177,19 +221,21 @@
 - id: garland
   name: Garland
   stats:
-    hp: 200
+    hp: 106
     strength: 15
     agility: 8
-    intelligence: 5
+    intelligence: 1
     vitality: 10
     luck: 5
-    attack: 25
-    defense: 15
-    magicDefense: 6
-  xpReward: 500
+    attack: 15
+    defense: 10
+    magicDefense: 15
+    accuracy: 15
+    hits: 1
+    evade: 12
+  xpReward: 130
   goldReward: 250
   sprite: garland
-  weakness: lightning
   bossPhases:
   - hpThreshold: 0.5
     patternId: aggressive

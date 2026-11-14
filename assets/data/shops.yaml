@@ -4,13 +4,13 @@
 - id: cornelia_weapon
   type: weapon
   name: Cornelia Weapons
-  inventory: [rapier, short_sword, hammer, staff]
+  inventory: [wooden_nunchaku, small_knife, staff, rapier, hammer]
 
 # Armor shop
 - id: cornelia_armor
   type: armor
   name: Cornelia Armor
-  inventory: [leather_armor, chain_mail, wooden_shield, cap]
+  inventory: [cloth, leather_armor, chain_mail, wooden_shield, cap]
 
 # Item shop
 - id: cornelia_item
