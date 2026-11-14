@@ -22,6 +22,21 @@ from gen import generate as GEN  # noqa: E402
 from gen import spec as S  # noqa: E402
 
 
+# hand-made fixes stored in an approved sheet's .json that a re-approval must not drop
+FIELD_HAND_FIXES = ("head_from", "row_from")
+KIT_HAND_FIXES = ("paint",)                  # copy-rect art fixes applied by assets-src/tools/kit.py at load
+
+
+def keep_hand_fixes(old: Path, meta: dict, keys: tuple[str, ...]) -> dict:
+    """Copy the listed keys from the previously approved .json (if any) into the new metadata."""
+    if old.exists():
+        prev = json.loads(old.read_text())
+        for key in keys:
+            if key in prev:
+                meta[key] = prev[key]
+    return meta
+
+
 def _monster_cell(png: Path, geom) -> tuple[int, int]:
     """Monster cells can be widened by the cut: read the real cell size from the stored sheet."""
     from PIL import Image
@@ -52,6 +67,7 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
                 "cells": report.pop("cells", []), "materials": report.pop("materials", {}), "metrics": report}
         if note:
             meta["note"] = note
+        keep_hand_fixes(dst / f"{part}.json", meta, KIT_HAND_FIXES)
         (dst / f"{part}.json").write_text(json.dumps(meta, indent=2) + "\n")
         _unignore(req.key)
         return dst / f"{part}.json"
@@ -81,10 +97,7 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
         if flip_frames:
             meta["flip_frames"] = flip_frames
         # keep hand-reviewed per-frame fixes (head_from) when a sheet is re-approved
-        old = dst / f"{sheet_name}.json"
-        for key in ("head_from", "row_from"):
-            if old.exists() and key in json.loads(old.read_text()):
-                meta[key] = json.loads(old.read_text())[key]
+        keep_hand_fixes(dst / f"{sheet_name}.json", meta, FIELD_HAND_FIXES)
     if note:
         meta["note"] = note
     (dst / f"{sheet_name}.json").write_text(json.dumps(meta, indent=2) + "\n")

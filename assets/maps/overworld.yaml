@@ -8267,5 +8267,6 @@ entrances:
   cornelia_west: [8, 12]
   cornelia_east: [8, 12]
   castle: [8, 12]
+  cornelia_north: [8, 12]
   temple: [8, 4]
   north_shore: [8, 4]

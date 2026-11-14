@@ -3,6 +3,10 @@
   python3 -I assets-src/tools/build_map.py              # compile every source map
   python3 -I assets-src/tools/build_map.py cornelia     # one map
   python3 -I assets-src/tools/build_map.py --selftest   # offline checks
+  python3 -I assets-src/tools/build_map.py --check-determinism [ids]       # compile under two hash seeds, compare
+  python3 -I assets-src/tools/build_map.py --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision] [--scale f]
+  python3 -I assets-src/tools/build_map.py --metrics [ids]                 # terrain metrics (terrain.py)
+  python3 -I assets-src/tools/map_report.py <id>                           # reachability / chokepoint report
 
 Writes assets/maps/ai/<id>.yaml (runtime MapData with `art` and `entrances`) and the baked chunks
 assets/maps/ai/<id>/{below,above}_<row>_<col>.png (16x16 tiles of 48 native px each). The game draws `below` under
@@ -10,8 +14,12 @@ the characters and `above` (roof ridges, tree crowns) over them. The build fails
 """
 from __future__ import annotations
 
+import hashlib
+import importlib.util
+import json
+import subprocess
 import sys
-from collections import deque
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -21,6 +29,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kit as K  # noqa: E402
+import map_checks as MC  # noqa: E402
 
 T = K.T
 CHUNK = 16
@@ -35,21 +44,26 @@ LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "
           # overworld (river: no stone rim; ocean: ragged coast with foam)
           "f": "forest", "m": "mountain", "s": "sand", "r": "river", "o": "ocean",
           # dungeons: outside the walls is void; rubble is a walkable broken floor
-          "x": "void", "%": "rubble"}
+          "x": "void", "%": "rubble",
+          # a natural lake or tarn (no stone rim, unlike the town canal `~`); a river source for river_check
+          "≈": "lake"}
 # painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
 FULL = ["floor", "floor_stone", "carpet", "rubble", "in_wall_top", "in_wall_face"]
 COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
 # painted in this order; each erodes (ragged edge inside its own cells) against the ones before it
-SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean"]
-SOFT_WATER = {"river", "ocean"}                    # foam on their edge
-ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16}   # blur radius (px) of wild edges
+# (new materials go at the end: a layer's noise seed depends on its index). Ties between materials are broken by
+# this order too (the earlier wins), so no pixel depends on set iteration order (PYTHONHASHSEED).
+SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean", "lake"]
+SOFT_WATER = {"river", "ocean", "lake"}            # foam on their edge
+ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16, "lake": 12}   # blur radius (px)
 WATERISH = {"water", "bridge", "culvert"}
 # TerrainType values (src/types/index.ts)
 GRASS, WALL, WATER, ROAD, BRIDGE = 0, 1, 2, 8, 9
 TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
            "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
-           "counter": COUNTER, "void": WALL, "rubble": ROAD, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER}
-BLOCKED = {WALL, WATER, COUNTER, 3, 7}             # on foot: walls, water, counters, mountains, rivers
+           "counter": COUNTER, "void": WALL, "rubble": ROAD, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER,
+           "lake": WATER}
+BLOCKED = MC.BLOCKED                               # on foot: walls, water, counters, mountains (3), rivers (7)
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
 # rows of the approved castle_face texture (castle/masonry): two courses of plain ashlar that repeat vertically, and
@@ -58,7 +72,9 @@ FACE_PLAIN, FACE_BASE = (56, 84), (84, 96)
 BANK_R = 34              # px: blur radius that rounds the canal outline
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
 PASSTHROUGH = ("name", "music", "encounterRate", "encounters", "battleBackgrounds", "canSave", "scriptedEncounters",
-               "vehicles", "keyItemGates", "noWander")
+               "vehicles", "keyItemGates", "noWander", "inspect")
+ALPHA_MIN = 0.25         # collide: alpha: a footprint cell blocks when this share of its pixels is opaque art
+SIDES = ("north", "south", "west", "east")
 
 
 class MapError(ValueError):
@@ -76,6 +92,10 @@ class Compiled:
     entrances: dict[str, list[int]]
     transitions: list[dict]
     doc: dict = field(default_factory=dict)
+    mat: np.ndarray | None = None                      # height x width ground material names
+    owner: dict[tuple[int, int], int] = field(default_factory=dict)   # footprint cell -> object index
+    art_share: np.ndarray | None = None                # height x width: share of each cell's pixels drawn by objects
+    edge_cells: set[tuple[int, int]] = field(default_factory=set)     # transitions generated by edge_exits
 
 
 # ───────────────────────────── helpers ─────────────────────────────
@@ -143,7 +163,11 @@ def _edge_of(mask: np.ndarray) -> np.ndarray:
 
 
 def _paste(canvas: Image.Image, part: Image.Image, cx: int, cy: int, dx: int = 0, dy: int = 0) -> None:
-    canvas.alpha_composite(part, (cx * T + dx, cy * T + dy))
+    px, py = cx * T + dx, cy * T + dy
+    if px < 0 or py < 0:                                # off the top / left edge: paste the part's visible rest
+        part = part.crop((max(0, -px), max(0, -py), part.width, part.height))
+        px, py = max(0, px), max(0, py)
+    canvas.alpha_composite(part, (px, py))
 
 
 # ───────────────────────────── source ─────────────────────────────
@@ -219,6 +243,74 @@ def styled(kit: K.Kit, name: str, style: str | None) -> Image.Image:
     return kit.part(name)
 
 
+# ───────────────────────────── ground hooks ─────────────────────────────
+
+def most_common_soft(near: Counter) -> str:
+    """The most common soft material among the counted neighbours; ties go to the earlier material in SOFT."""
+    if not near:
+        return "grass"
+    return min(near, key=lambda m: (-near[m], SOFT.index(m)))
+
+
+def _terrain_module(src: dict):
+    """`terrain: organic` maps paint soft ground and peaks with assets-src/tools/terrain.py (T3b) instead of
+    paint_soft / place_peaks below. The module must provide paint_soft(below, mat, kit, seed) and
+    place_peaks(canvas, mat, owner, kit, rng)."""
+    mode = src.get("terrain")
+    if mode in (None, "classic"):
+        return None
+    if mode != "organic":
+        raise MapError(f"terrain: unknown mode {mode!r} (classic or organic)")
+    if importlib.util.find_spec("terrain") is None:
+        raise MapError("terrain: organic needs assets-src/tools/terrain.py")
+    import terrain  # noqa: PLC0415
+    return terrain
+
+
+def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> None:
+    """Step 1 (classic): soft materials in SOFT order, each eroded (ragged) against the softer ones."""
+    H, W = below.shape[:2]
+    for i, name in enumerate(SOFT):
+        if i > 0 and not np.isin(mat, SOFT[i:]).any():
+            continue                                         # no cell of this or any later soft layer
+        covered = ~np.isin(mat, SOFT[:i])                    # this layer and everything harder
+        if i > 0 and not (mat == name).any():
+            continue
+        tex = _tile(kit.material("water" if name in ("river", "lake") else name), H, W)
+        if i == 0:
+            below[:] = tex
+            continue
+        pm = _up(covered)
+        if name in ROUNDED:                                   # wild terrain: rounded, wavy edges (cell mask blurred)
+            r = ROUNDED[name]
+            soft_mask = _box_blur(_box_blur(pm.astype(np.float32), r), r)
+            wave = (_noise(H, W, seed + 31 * i, cell=r, amp=100).astype(np.float32) / 100 - 0.5) * 0.5
+            show = soft_mask + wave > 0.5
+        else:
+            show = pm & (_erode_depth(pm, MAX_INSET + 1) > _noise(H, W, seed + i))
+        below[show] = tex[show]
+        edge = _edge_of(show)
+        shadow = np.zeros_like(show)
+        for k in range(1, SHADOW + 1):
+            shadow[k:] |= show[:-k]
+        if name in SOFT_WATER:                               # light foam line instead of a dark edge
+            below[edge] = np.minimum(below[edge].astype(np.int32) + 70, 255).astype(np.uint8)
+        else:
+            _shade(below, shadow & ~show, 0.8)
+            _shade(below, edge, 0.6)
+
+
+def place_peaks(canvas: Image.Image, mat: np.ndarray, owner: dict, kit: K.Kit, rng: np.random.Generator) -> None:
+    """Classic mountains: a peak on every free mountain cell (jittered), so ranges read as ranges."""
+    if "peak" not in kit.parts:
+        return
+    hgt, wid = mat.shape
+    for y in range(hgt):
+        for x in range(wid):
+            if mat[y, x] == "mountain" and (x, y) not in owner:
+                _paste(canvas, kit.part("peak"), x, y, int(rng.integers(-4, 5)), int(rng.integers(-6, 3)))
+
+
 # ───────────────────────────── compile ─────────────────────────────
 
 def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled:
@@ -242,34 +334,8 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
 
     # 1. ground: soft materials, each eroded (ragged) against the softer ones
     below = np.zeros((H, W, 3), np.uint8)
-    for i, name in enumerate(SOFT):
-        if i > 0 and not np.isin(mat, SOFT[i:]).any():
-            continue                                         # no cell of this or any later soft layer
-        covered = ~np.isin(mat, SOFT[:i])                    # this layer and everything harder
-        if i > 0 and not (mat == name).any():
-            continue
-        tex = _tile(kit.material("water" if name == "river" else name), H, W)
-        if i == 0:
-            below[:] = tex
-            continue
-        pm = _up(covered)
-        if name in ROUNDED:                                   # wild terrain: rounded, wavy edges (cell mask blurred)
-            r = ROUNDED[name]
-            soft_mask = _box_blur(_box_blur(pm.astype(np.float32), r), r)
-            wave = (_noise(H, W, seed + 31 * i, cell=r, amp=100).astype(np.float32) / 100 - 0.5) * 0.5
-            show = soft_mask + wave > 0.5
-        else:
-            show = pm & (_erode_depth(pm, MAX_INSET + 1) > _noise(H, W, seed + i))
-        below[show] = tex[show]
-        edge = _edge_of(show)
-        shadow = np.zeros_like(show)
-        for k in range(1, SHADOW + 1):
-            shadow[k:] |= show[:-k]
-        if name in SOFT_WATER:                               # light foam line instead of a dark edge
-            below[edge] = np.minimum(below[edge].astype(np.int32) + 70, 255).astype(np.uint8)
-        else:
-            _shade(below, shadow & ~show, 0.8)
-            _shade(below, edge, 0.6)
+    terrain = _terrain_module(src)
+    (terrain.paint_soft if terrain else paint_soft)(below, mat, kit, seed)
 
     # 2. hard ground: water with a stone rim, bridges, town walls, culverts
     waterish = np.isin(mat, list(WATERISH))
@@ -286,9 +352,9 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             out = ~pw[sl]
             if not out.any():
                 continue
-            near = [grid[y + dy][x + dx] for dy in (-1, 0, 1) for dx in (-1, 0, 1)
-                    if 0 <= y + dy < hgt and 0 <= x + dx < wid and grid[y + dy][x + dx] in SOFT]
-            land = max(set(near), key=near.count) if near else "grass"
+            near = Counter(grid[y + dy][x + dx] for dy in (-1, 0, 1) for dx in (-1, 0, 1)
+                           if 0 <= y + dy < hgt and 0 <= x + dx < wid and grid[y + dy][x + dx] in SOFT)
+            land = most_common_soft(near)
             tex = _tile(kit.material(land), H, W)[sl]
             below[sl][out] = tex[out]
     below[water] = _tile(kit.material("water"), H, W)[water]
@@ -360,6 +426,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             x = x1 + 1
 
     # 3. objects
+    pre_objects = np.asarray(canvas).copy()
     objects = src.get("objects") or []
     owner: dict[tuple[int, int], int] = {}
     problems: list[str] = []
@@ -447,12 +514,15 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             # rows are walkable and drawn over characters, the door cell on the bottom row is walkable
             w, h, door, pf = o["w"], o["h"], o.get("door"), o["prefab"]
             ridge = o.get("ridge_rows", 1)
+            dx, dy = _offset(o, n)
+            names = [[f"{pf}_{j}_{i}" for i in range(w)] for j in range(h)]
+            parts = [[kit.parts.get(nm) or K.placeholder_tile(nm) for nm in row] for row in names]
+            share = _alpha_share(parts, dx, dy) if _collide_alpha(o, n) else None
             for j in range(h):
                 for i in range(w):
-                    name = f"{pf}_{j}_{i}"
-                    part = kit.parts.get(name) or K.placeholder_tile(name)
-                    _paste(top if j < ridge else canvas, part, x + i, y + j)
-                    coll[y + j, x + i] = WALL
+                    _paste(top if j < ridge else canvas, parts[j][i], x + i, y + j, dx, dy)
+                    if share is None or share[j, i] >= o.get("alpha_min", ALPHA_MIN):
+                        coll[y + j, x + i] = WALL
             if ridge:
                 coll[y:y + ridge, x:x + w] = [grid_terrain_row(grid, y + j, x, w) for j in range(ridge)]
             if o.get("sign") and door is not None:
@@ -500,27 +570,41 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             # any kit parts, e.g. {type: deco, parts: [[bed_top], [bed_bottom]], x, y, block: true, on_wall: false}
             # above_rows: the top rows are drawn over characters and stay walkable (a tall tree's crown, a lamp head);
             # walkable_rows: rows (from 0) that stay walkable but are drawn under characters (stairs)
+            # offset: [dx, dy] native px moves every part (an icon centred on a half cell); style recolours the parts;
+            # collide: alpha blocks only the footprint cells (null cells included) whose composited art covers at
+            # least alpha_min of the cell, instead of every cell with a part
             above_rows = o.get("above_rows", len(o["parts"]) if o.get("above") else 0)
             walk_rows = set(o.get("walkable_rows") or [])
-            fitted = _fit_parts(kit, o["parts"]) if o.get("fit") else None
+            dx, dy = _offset(o, n)
+            style = o.get("style")
+            get = (lambda nm: styled(kit, nm, style) if nm in kit.parts else K.placeholder_tile(nm))  # noqa: E731
+            parts = (_fit_parts(kit, o["parts"], get) if o.get("fit") else
+                     [[get(nm) if nm else None for nm in row] for row in o["parts"]])
+            share = _alpha_share(parts, dx, dy) if _collide_alpha(o, n) else None
             for j, row in enumerate(o["parts"]):
                 for i, name in enumerate(row):
-                    if not name:
+                    if name:
+                        _paste(top if j < above_rows else canvas, parts[j][i], x + i, y + j, dx, dy)
+                    elif share is None:
                         continue
-                    part = fitted[j][i] if fitted else (kit.parts.get(name) or K.placeholder_tile(name))
-                    _paste(top if j < above_rows else canvas, part, x + i, y + j)
                     if j < above_rows and not o.get("above"):
                         continue                         # crown over open ground: walk behind it
                     if j in walk_rows or [i, j] in (o.get("walk_cells") or []):
                         coll[y + j, x + i] = ROAD            # e.g. the foot of a staircase set into a wall face
                         continue
-                    if o.get("block", True):
+                    if share is not None:
+                        if share[j, i] >= o.get("alpha_min", ALPHA_MIN):
+                            coll[y + j, x + i] = WALL
+                    elif o.get("block", True):
                         coll[y + j, x + i] = WALL
         elif t == "flowers":
             _paste(canvas, kit.part("flowers"), x, y)
         else:
             _paste(canvas, kit.part(t), x, y)
             coll[y, x] = WALL
+
+    drawn = np.any(np.asarray(canvas) != pre_objects, axis=2) | (np.asarray(top)[..., 3] > 0)
+    art_share = drawn.reshape(hgt, T, wid, T).mean(axis=(1, 3))
 
     # grass detail: a tuft on some free grass cells, nudged within the cell (only while the grass is a
     # placeholder or a tuft part is approved: the approved grass texture has its own tufts)
@@ -530,26 +614,92 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             if grid[y][x] == "grass" and (x, y) not in owner and rng.random() < 0.18:
                 _paste(canvas, kit.part("tuft"), x, y, int(rng.integers(-8, 9)), int(rng.integers(-8, 9)))
 
-    # mountains: a peak on every mountain cell (jittered), so ranges read as ranges
-    if "peak" in kit.parts:
-        for y in range(hgt):
-            for x in range(wid):
-                if grid[y][x] == "mountain" and (x, y) not in owner:
-                    _paste(canvas, kit.part("peak"), x, y, int(rng.integers(-4, 5)), int(rng.integers(-6, 3)))
+    # mountains
+    (terrain.place_peaks if terrain else place_peaks)(canvas, mat, owner, kit, rng)
     above = np.asarray(top).copy()
-    out = Compiled(mid, wid, hgt, np.asarray(canvas.convert("RGB")).copy(), above, coll, entrances, transitions)
+    edge_cells = _edge_exits(src, coll, transitions)
+    out = Compiled(mid, wid, hgt, np.asarray(canvas.convert("RGB")).copy(), above, coll, entrances, transitions,
+                   mat=mat, owner=owner, art_share=art_share, edge_cells=edge_cells)
     validate(src, out)
     return out
 
 
-def _fit_parts(kit: K.Kit, parts: list[list[str]]) -> list[list[Image.Image]]:
+def _edge_exits(src: dict, coll: np.ndarray, transitions: list[dict]) -> set[tuple[int, int]]:
+    """`edge_exits: {north|south|west|east: {targetMap, targetEntrance}, split: [{side, from, to, targetEntrance,
+    targetMap?}]}`: every walkable cell on the map edge becomes a transition (corner cells belong to the north or
+    south side; `from`/`to` are inclusive x for north/south, y for west/east). Explicit transitions win."""
+    spec = src.get("edge_exits")
+    if not spec:
+        return set()
+    for k in spec:
+        if k not in SIDES + ("split",):
+            raise MapError(f"edge_exits: unknown key {k!r}")
+    hgt, wid = coll.shape
+    taken = {(t["x"], t["y"]) for t in transitions}
+    made: set[tuple[int, int]] = set()
+    for y in range(hgt):
+        for x in range(wid):
+            if not (x in (0, wid - 1) or y in (0, hgt - 1)) or int(coll[y, x]) in BLOCKED or (x, y) in taken:
+                continue
+            side = "north" if y == 0 else "south" if y == hgt - 1 else "west" if x == 0 else "east"
+            along = x if side in ("north", "south") else y
+            target = spec.get(side)
+            for s in spec.get("split") or []:
+                if s["side"] == side and s["from"] <= along <= s["to"]:
+                    target = {"targetMap": s.get("targetMap", (spec.get(side) or {}).get("targetMap")),
+                              "targetEntrance": s["targetEntrance"]}
+            if not target:
+                continue                                  # the validator reports the uncovered side
+            if not target.get("targetMap"):
+                raise MapError(f"edge_exits: {side} split at {along} has no targetMap")
+            transitions.append({"x": x, "y": y, "targetMap": target["targetMap"],
+                                "targetEntrance": target["targetEntrance"]})
+            made.add((x, y))
+    return made
+
+
+def _offset(o: dict, n: int) -> tuple[int, int]:
+    off = o.get("offset") or [0, 0]
+    if len(off) != 2 or not all(isinstance(v, int) for v in off):
+        raise MapError(f"object {n}: offset must be [dx, dy] in whole native px")
+    return int(off[0]), int(off[1])
+
+
+def _collide_alpha(o: dict, n: int) -> bool:
+    mode = o.get("collide")
+    if mode not in (None, "cells", "alpha"):
+        raise MapError(f"object {n}: collide must be cells or alpha, not {mode!r}")
+    return mode == "alpha"
+
+
+def _alpha_share(parts: list[list[Image.Image | None]], dx: int, dy: int) -> np.ndarray:
+    """Per footprint cell (rows x cols, null cells included): the share of its pixels covered by opaque art once
+    every part is composited at its cell plus the offset."""
+    h, w = len(parts), max(len(r) for r in parts)
+    opaque = np.zeros((h * T, w * T), bool)
+    for j, row in enumerate(parts):
+        for i, part in enumerate(row):
+            if part is None:
+                continue
+            a = np.asarray(part.getchannel("A")) >= 128
+            x0, y0 = i * T + dx, j * T + dy
+            sx0, sy0 = max(0, -x0), max(0, -y0)
+            tx0, ty0 = max(0, x0), max(0, y0)
+            tx1, ty1 = min(w * T, x0 + a.shape[1]), min(h * T, y0 + a.shape[0])
+            if tx1 > tx0 and ty1 > ty0:
+                opaque[ty0:ty1, tx0:tx1] |= a[sy0:sy0 + ty1 - ty0, sx0:sx0 + tx1 - tx0]
+    return opaque.reshape(h, T, w, T).mean(axis=(1, 3))
+
+
+def _fit_parts(kit: K.Kit, parts: list[list[str]], get=None) -> list[list[Image.Image]]:
     """A multi-cell prop drawn smaller than its cells, enlarged to fill them (bottom-centred, aspect kept)."""
+    get = get or (lambda name: kit.parts.get(name) or K.placeholder_tile(name))
     h, w = len(parts), len(parts[0])
     whole = Image.new("RGBA", (w * T, h * T))
     for j, row in enumerate(parts):
         for i, name in enumerate(row):
             if name:
-                whole.alpha_composite(kit.parts.get(name) or K.placeholder_tile(name), (i * T, j * T))
+                whole.alpha_composite(get(name), (i * T, j * T))
     box = whole.getchannel("A").point(lambda a: 255 if a >= 128 else 0).getbbox()
     if box:
         obj = whole.crop(box)
@@ -752,22 +902,15 @@ def validate(src: dict, c: Compiled) -> None:
     if not c.entrances:
         errors.append("map has no entrances")
     else:
-        start = next(iter(c.entrances.values()))
-        seen = {tuple(start)}
-        q = deque([tuple(start)])
-        while q:
-            x, y = q.popleft()
-            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                n = (x + dx, y + dy)
-                if n not in seen and _walkable(c, *n):
-                    seen.add(n)
-                    q.append(n)
+        seen = MC.reach(c.collision, [next(iter(c.entrances.values()))])
         for name, pos in c.entrances.items():
             if tuple(pos) not in seen and name not in (src.get("unreachable_ok") or []):
                 errors.append(f"entrance {name} at {tuple(pos)} is not reachable from the first entrance")
+        on_edge = src.get("edge_exits") and (lambda x, y: x in (0, c.width - 1) or y in (0, c.height - 1))
         for t in c.transitions:
-            if (t["x"], t["y"]) not in seen:
+            if (t["x"], t["y"]) not in seen and not (on_edge and on_edge(t["x"], t["y"])):
                 errors.append(f"transition at ({t['x']}, {t['y']}) is not reachable on foot")
+        errors += MC.run(src, c, seen)       # talkable NPCs, inspect cells, edge exits and the opt-in map checks
     # covering rules: above art only over walkable cells, and the cell south of it must be blocked
     a = c.above[..., 3] > 0
     for y in range(c.height):
@@ -795,7 +938,7 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT) -> Path:
     d.mkdir(parents=True, exist_ok=True)
     for old in d.glob("*.png"):
         old.unlink()
-    rel = d.relative_to(ROOT).as_posix()
+    rel = d.relative_to(ROOT).as_posix() if d.resolve().is_relative_to(ROOT) else d.resolve().as_posix()   # tests
     below, above = [], []
     for r, cc, part in chunks(c.below, c.height, c.width):
         name = f"below_{r}_{cc}.png"
@@ -822,19 +965,126 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT) -> Path:
     return path
 
 
+def source_ids() -> list[str]:
+    return sorted(q.stem for q in SRC.glob("*.yaml"))
+
+
+def compile_source(src: dict, placeholders: bool = False) -> tuple[Compiled, K.Kit]:
+    kit_ids = src.get("kits") or [src.get("kit", "town")]
+    kit = K.load_kit(kit_ids[0], placeholders_only=True) if placeholders else K.load_kits(kit_ids)
+    return compile_map(src, kit, check_interiors=not placeholders), kit
+
+
+def hashes(c: Compiled) -> dict[str, str]:
+    """SHA-256 of the pixel and collision output (what the determinism check compares)."""
+    return {"below": hashlib.sha256(np.ascontiguousarray(c.below).tobytes()).hexdigest(),
+            "above": hashlib.sha256(np.ascontiguousarray(c.above).tobytes()).hexdigest(),
+            "collision": hashlib.sha256(np.ascontiguousarray(c.collision, dtype=np.int16).tobytes()).hexdigest()}
+
+
+def hash_run(ids: list[str], src_file: str | None, placeholders: bool, seed: str) -> dict[str, dict[str, str]]:
+    """Compile in a subprocess under PYTHONHASHSEED=seed and return {id: hashes}. Runs without -I (which would
+    ignore the variable) but with -s, and with an environment holding nothing but the seed."""
+    cmd = [sys.executable, "-s", str(Path(__file__).resolve()), "--hash", *ids]
+    if src_file:
+        cmd += ["--src", src_file]
+    if placeholders:
+        cmd.append("--placeholders")
+    out = subprocess.run(cmd, env={"PYTHONHASHSEED": seed}, cwd=ROOT, capture_output=True, text=True)
+    if out.returncode:
+        raise MapError(f"--hash under PYTHONHASHSEED={seed} failed: {out.stderr.strip() or out.stdout.strip()}")
+    return json.loads(out.stdout)
+
+
+def check_determinism(ids: list[str] | None = None, seeds: tuple[str, ...] = ("1", "3")) -> bool:
+    """Every map compiles to the same below / above / collision under two string-hash seeds."""
+    ids = ids or source_ids()
+    runs = {s: hash_run(ids, None, False, s) for s in seeds}
+    ok = True
+    for mid in ids:
+        diff = [k for k in ("below", "above", "collision") if len({runs[s][mid][k] for s in seeds}) > 1]
+        print(f"{mid}: {'differs in ' + ', '.join(diff) if diff else 'deterministic'}")
+        ok &= not diff
+    return ok
+
+
+def stitch(map_id: str, out_dir: Path = OUT) -> tuple[Image.Image, dict]:
+    """The compiled map's chunks stitched into one RGBA image (below with above composited over it)."""
+    doc = yaml.safe_load((out_dir / f"{map_id}.yaml").read_text())
+    art, wid, hgt = doc["art"], doc["width"], doc["height"]
+    img = Image.new("RGBA", (wid * T, hgt * T))
+    cols = (wid + art["chunk"] - 1) // art["chunk"]
+    for layer in ("below", "above"):
+        for k, rel in enumerate(art[layer]):
+            if rel:
+                part = Image.open(ROOT / rel).convert("RGBA")
+                img.alpha_composite(part, ((k % cols) * art["chunk"] * T, (k // cols) * art["chunk"] * T))
+    return img, doc
+
+
+def preview(map_id: str, x0: int, y0: int, x1: int, y1: int, out: Path, grid: bool = False,
+            collision: bool = False, scale: float = 1.0, out_dir: Path = OUT) -> Path:
+    """Crop cells x0..x1, y0..y1 (inclusive) of a compiled map to a PNG; --collision tints blocked cells red and
+    transitions cyan, --grid draws cell lines (labelled every 5 cells), --scale resizes (nearest)."""
+    from PIL import ImageDraw
+    img, doc = stitch(map_id, out_dir)
+    wid, hgt = doc["width"], doc["height"]
+    x0, y0, x1, y1 = max(0, x0), max(0, y0), min(wid - 1, x1), min(hgt - 1, y1)
+    if x1 < x0 or y1 < y0:
+        raise MapError(f"preview: empty crop for a {wid}x{hgt} map")
+    if collision:
+        over = Image.new("RGBA", img.size)
+        d = ImageDraw.Draw(over)
+        coll = doc["collision"]
+        for y in range(hgt):
+            for x in range(wid):
+                if coll[y * wid + x] in BLOCKED:
+                    d.rectangle([x * T, y * T, (x + 1) * T - 1, (y + 1) * T - 1], fill=(255, 0, 0, 90))
+        for t in doc.get("transitions") or []:
+            d.rectangle([t["x"] * T, t["y"] * T, (t["x"] + 1) * T - 1, (t["y"] + 1) * T - 1], fill=(0, 255, 255, 110))
+        img.alpha_composite(over)
+    img = img.crop((x0 * T, y0 * T, (x1 + 1) * T, (y1 + 1) * T))
+    if scale != 1.0:
+        img = img.resize((max(1, round(img.width * scale)), max(1, round(img.height * scale))), Image.Resampling.NEAREST)
+    if grid:
+        d = ImageDraw.Draw(img)
+        step = T * scale
+        for i in range(x1 - x0 + 2):
+            d.line([(round(i * step), 0), (round(i * step), img.height)], fill=(255, 255, 255, 140))
+        for j in range(y1 - y0 + 2):
+            d.line([(0, round(j * step)), (img.width, round(j * step))], fill=(255, 255, 255, 140))
+        for i in range(x1 - x0 + 1):
+            for j in range(y1 - y0 + 1):
+                if (x0 + i) % 5 == 0 and (y0 + j) % 5 == 0:
+                    d.text((round(i * step) + 2, round(j * step) + 1), f"{x0 + i},{y0 + j}", fill=(255, 255, 0, 255))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out)
+    return out
+
+
+def metrics(ids: list[str] | None = None) -> None:
+    """Terrain metrics of compiled maps; provided by terrain.metrics(src, compiled) once terrain.py exists."""
+    if importlib.util.find_spec("terrain") is None:
+        raise MapError("--metrics needs assets-src/tools/terrain.py (terrain blending)")
+    import terrain  # noqa: PLC0415
+    for mid in ids or source_ids():
+        src = yaml.safe_load((SRC / f"{mid}.yaml").read_text())
+        c, _ = compile_source(src)
+        print(f"{mid}: {terrain.metrics(src, c)}")
+
+
 def build(ids: list[str] | None = None) -> list[Path]:
     srcs = sorted(SRC.glob("*.yaml")) if not ids else [SRC / f"{i}.yaml" for i in ids]
     written = []
     for p in srcs:
         src = yaml.safe_load(p.read_text())
-        kit = K.load_kits(src.get("kits") or [src.get("kit", "town")])
-        c = compile_map(src, kit)
+        c, kit = compile_source(src)
         path = write(src, c)
         placeholder = sorted(set(K.PART_NAMES) - kit.approved)
         print(f"{c.id}: {c.width}x{c.height} -> {path.relative_to(ROOT)} "
               f"({len(kit.approved)} approved parts, {len(placeholder)} placeholders)")
         written.append(path)
-    ids_all = sorted(q.stem for q in SRC.glob("*.yaml"))
+    ids_all = source_ids()
     (OUT / "index.yaml").write_text("# GENERATED by assets-src/tools/build_map.py: compiled maps the game prefers under ?art=ai\n"
                                     + yaml.safe_dump(ids_all))
     return written
@@ -921,15 +1171,52 @@ def selftest() -> None:
     hc = compile_map(house, kit, check_interiors=False)
     assert hc.collision[0, 4] == GRASS and hc.collision[1, 4] == WALL and hc.collision[3, 4] == ROAD
     ok += 1
+    import map_selftest  # noqa: PLC0415  (determinism, objects, edge exits, inspect, map checks, report, preview)
+    ok += map_selftest.run(sys.modules[__name__])
+    if importlib.util.find_spec("terrain"): __import__("terrain").selftest()   # terrain blending (terrain.py)
     print(f"build_map selftest: {ok} checks passed")
 
 
-if __name__ == "__main__":
-    args = sys.argv[1:]
+def main(args: list[str]) -> None:
+    flags = {a for a in args if a.startswith("--")}
     if args == ["--selftest"]:
         selftest()
+    elif args and args[0] == "--hash":                  # internal: used by the determinism checks
+        rest = args[1:]
+        src_file = None
+        if "--src" in rest:
+            i = rest.index("--src")
+            src_file = rest[i + 1]
+            del rest[i:i + 2]
+        placeholders = "--placeholders" in rest
+        ids = [a for a in rest if not a.startswith("--")]
+        srcs = ({(s := json.loads(Path(src_file).read_text()))["id"]: s} if src_file else
+                {mid: yaml.safe_load((SRC / f"{mid}.yaml").read_text()) for mid in ids or source_ids()})
+        print(json.dumps({mid: hashes(compile_source(s, placeholders)[0]) for mid, s in srcs.items()}))
+    elif args and args[0] == "--check-determinism":
+        if not check_determinism(args[1:] or None):
+            raise SystemExit("map error: compiled output depends on PYTHONHASHSEED")
+    elif args and args[0] == "--preview":
+        pos = [a for a in args[1:] if not a.startswith("--")]
+        scale = 1.0
+        if "--scale" in args:
+            scale = float(args[args.index("--scale") + 1])
+            pos.remove(args[args.index("--scale") + 1])
+        if len(pos) != 6:
+            raise SystemExit("usage: --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision] [--scale f]")
+        mid, x0, y0, x1, y1, out = pos
+        print(preview(mid, int(x0), int(y0), int(x1), int(y1), Path(out), "--grid" in flags, "--collision" in flags,
+                      scale))
+    elif args and args[0] == "--metrics":
+        metrics(args[1:] or None)
+    elif flags:
+        raise SystemExit(f"unknown option(s) {sorted(flags)}; see the module docstring")
     else:
-        try:
-            build(args or None)
-        except MapError as e:
-            raise SystemExit(f"map error: {e}")
+        build(args or None)
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except MapError as e:
+        raise SystemExit(f"map error: {e}")

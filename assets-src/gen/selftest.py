@@ -350,6 +350,21 @@ def test_kits() -> None:
           and boxes[0][2] < boxes[1][0], f"ground guide: four separate 2x2-tile squares {boxes}")
 
 
+def test_approve_keeps_hand_fixes() -> None:
+    """Re-approving a kit sheet keeps its `paint` fixes (as field sheets keep head_from / row_from)."""
+    print("approve keeps hand fixes")
+    from gen import approve as AP
+    check("paint" in AP.KIT_HAND_FIXES and "head_from" in AP.FIELD_HAND_FIXES, "paint and head_from are hand fixes")
+    with tempfile.TemporaryDirectory() as tmp:
+        old = Path(tmp) / "city.json"
+        paint = [{"from": [0, 0, 8, 8], "to": [8, 0]}]
+        old.write_text(json.dumps({"kit": "overworld", "cells": [["a"]], "paint": paint}))
+        meta = AP.keep_hand_fixes(old, {"kit": "overworld", "cells": [["b"]]}, AP.KIT_HAND_FIXES)
+        check(meta.get("paint") == paint and meta["cells"] == [["b"]], "re-approval keeps paint, takes the new cells")
+        fresh = AP.keep_hand_fixes(Path(tmp) / "none.json", {"cells": []}, AP.KIT_HAND_FIXES)
+        check("paint" not in fresh, "a first approval has no paint")
+
+
 if __name__ == "__main__":
     test_geometry()
     test_field3_geometry()
@@ -361,5 +376,6 @@ if __name__ == "__main__":
     test_monsters()
     test_size_ref()
     test_kits()
+    test_approve_keeps_hand_fixes()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)
