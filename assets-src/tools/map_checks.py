@@ -229,14 +229,25 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
 
     for n, e in enumerate(src.get("inspect") or []):    # inspect cells: always
         x, y = e.get("x"), e.get("y")
-        if not isinstance(e.get("text"), list) or not e["text"]:
+        text = e.get("text")
+        if not isinstance(text, list) or not text:
             errors.append(f"inspect {n} at ({x}, {y}) needs a non-empty text list")
+        elif not (all(isinstance(t, str) for t in text) or all(
+                isinstance(t, dict) and set(t) <= {"text", "condition"} and isinstance(t.get("text"), list)
+                and all(isinstance(s, str) for s in t["text"]) and isinstance(t.get("condition", ""), str) for t in text)):
+            errors.append(f"inspect {n} at ({x}, {y}): text must be all strings or all {{text: [..], condition?}}"
+                          " entries (no other keys)")
+        if set(e) - {"x", "y", "text"}:
+            errors.append(f"inspect {n} at ({x}, {y}) has unknown keys {sorted(set(e) - {'x', 'y', 'text'})}")
         if not (isinstance(x, int) and isinstance(y, int) and 0 <= x < c.width and 0 <= y < c.height):
             errors.append(f"inspect {n} at ({x}, {y}) is off the map")
         elif not any((x + dx, y + dy) in seen for dx, dy in DIRS):
             errors.append(f"inspect {n} at ({x}, {y}) has no reachable walkable neighbour")
 
     trans = {(t["x"], t["y"]) for t in c.transitions}
+    for name, at in c.entrances.items():               # arrivals: never on a warp
+        if tuple(at) in trans:
+            errors.append(f"entrance {name} at {tuple(at)} is on a transition cell (the player would arrive on a warp)")
     if src.get("edge_exits"):
         walk_edge = [p for p in edge_cells(c.width, c.height) if walkable(coll, *p)]
         missing = [p for p in walk_edge if p not in trans]
@@ -257,12 +268,11 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
     if src.get("warp_leaves"):
         for t in c.transitions:
             p = (t["x"], t["y"])
-            own = c.owner.get(p)
             out = [(p[0] + dx, p[1] + dy) for dx, dy in DIRS
-                   if walkable(coll, p[0] + dx, p[1] + dy) and (own is None or c.owner.get((p[0] + dx, p[1] + dy)) != own)]
-            if len(out) > 1:
+                   if walkable(coll, p[0] + dx, p[1] + dy) and (p[0] + dx, p[1] + dy) not in trans]
+            if len(out) != 1:
                 errors.append(f"warp_leaves: transition at {p} to {t['targetMap']} has {len(out)} walkable "
-                              f"neighbours outside its object: {_cells(out)}")
+                              f"non-warp neighbours (want exactly 1, so it is a doorway, not a junction): {_cells(out)}")
 
     if src.get("min_blob"):
         errors += _min_blob(c.mat, src["min_blob"])
@@ -294,7 +304,10 @@ def _road_check(src: dict, c, spec: dict) -> list[str]:
     errors = []
     mats = spec.get("materials", ["dirt"])
     road = np.isin(c.mat, list(mats)) | (c.mat == "bridge")
+    islands_ok = {tuple(p) for p in spec.get("islands_ok") or []}
     comps = components(road)
+    # a stub that is all bridge (a broken span's far half), or a listed island, is not a stray network
+    comps = [cs for cs in comps if not (all(c.mat[y, x] == "bridge" for x, y in cs) or islands_ok & set(cs))] or comps[:1]
     if len(comps) > 1:
         comps.sort(key=len, reverse=True)
         errors.append(f"road_check: the roads form {len(comps)} separate networks; smaller ones at "
@@ -312,7 +325,8 @@ def _road_check(src: dict, c, spec: dict) -> list[str]:
         bad.append(cap[0])
     if bad:
         errors.append(f"road_check: dead ends that reach no gate, door, bridge or listed end: {_cells(bad, 10)}")
-    under = [(x, y) for (x, y) in c.owner if road[y, x] and int(c.collision[y, x]) in BLOCKED]
+    # icons hiding roads (opt-in: towns have stalls and fountains on cobble on purpose)
+    under = [(x, y) for (x, y) in c.owner if road[y, x] and int(c.collision[y, x]) in BLOCKED] if spec.get("check_under") else []
     if under:
         errors.append(f"road_check: road cells under a blocked object: {_cells(under)}")
     return errors

@@ -78,6 +78,8 @@ function validateInspect(value: unknown, width: number, height: number): void {
     if (cell.x < 0 || cell.y < 0 || cell.x >= width || cell.y >= height) {
       throw new ValidationError(`${path}: cell (${cell.x}, ${cell.y}) is outside the ${width}x${height} map`);
     }
+    const extra = Object.keys(cell).filter((k) => !['x', 'y', 'text'].includes(k));
+    if (extra.length) throw new ValidationError(`${path}: unknown keys ${extra.join(', ')}`);
     const text = cell.text;
     assertArray(`${path}.text`, text);
     if (text.length === 0) throw new ValidationError(`${path}.text: expected at least one line`);
@@ -87,6 +89,8 @@ function validateInspect(value: unknown, width: number, height: number): void {
     }
     text.forEach((entry, j) => {
       assertObject(`${path}.text[${j}]`, entry);
+      const bad = Object.keys(entry).filter((k) => k !== 'text' && k !== 'condition');
+      if (bad.length) throw new ValidationError(`${path}.text[${j}]: unknown keys ${bad.join(', ')} (use condition)`);
       if (entry.condition !== undefined) assertString(`${path}.text[${j}].condition`, entry.condition);
       assertArray(`${path}.text[${j}].text`, entry.text);
       (entry.text as unknown[]).forEach((line, k) => assertString(`${path}.text[${j}].text[${k}]`, line));

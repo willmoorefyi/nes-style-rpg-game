@@ -804,3 +804,25 @@ All 15 momus issues apply. Ownership and resolutions:
 - `terrain: organic` dispatches to `terrain.paint_soft(below, mat, kit, seed)` and `terrain.place_peaks(canvas, mat, owner, kit, rng)`.
 - `--selftest` calls `terrain.selftest()`, and `--metrics [ids]` calls `terrain.metrics(src, compiled)`, once `terrain.py` exists.
 - Source keys: `edge_exits` (+`split`), `inspect`, `sealed_edges`, `road_check` (`materials`, `ends`, `cap_width`), `warp_leaves`, `min_blob` (with `ocean_inlet`), `river_check`, `art_coverage`, `no_static_chokepoints`, and `paint` in kit `.json`. Talkable NPCs are checked on every map.
+
+### T3a/T3e review fixes (momus, binding for T3b–T3d)
+
+**Compiler and runtime changes:**
+- `road_check` changes:
+  - `check_under: true` turns on the "road under a blocked object" check (it is opt-in; towns keep stalls on cobble);
+  - a road component made only of bridge cells (a broken span's far stub) is not a stray network;
+  - `islands_ok: [[x, y]]` exempts listed islands.
+- `warp_leaves` counts every walkable non-warp 4-neighbour, inside its object too, and requires exactly 1.
+- An entrance on a transition cell is a compiler error.
+- Inspect entries are strict: plain strings, or `{text, condition?}` with no other keys, in both the compiler and the runtime schema.
+- `--preview --scale` parsing works by index, and bad `split` entries raise `MapError`.
+
+**T3c layout rules:**
+- The city stream is laid as `r` cells under the icon, so `river_check` sees one river.
+- With `ocean_inlet: 2`, the fjord head stays at least 2 wide on both axes.
+
+**T3d rules:**
+- Every generated interior sets `no_static_chokepoints: true`.
+- Join the castle precinct road network at (55,24) (36 cells) and the piece at (39,60) (14 cells).
+
+**`gen/selftest.py`** needs the gitignored `assets-src/gen/refs/`. Run it from the main checkout.

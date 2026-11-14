@@ -130,8 +130,16 @@ def run(B) -> int:
     assert ok_src({**road, "road_check": {"materials": ["dirt"], "ends": [[7, 1]]}})
     expect_error({**road, "ground": "..........\n.,,,..,,..\n..........",
                   "road_check": {"ends": [[3, 1], [6, 1], [7, 1]]}}, "separate networks")
-    expect_error({**road, "road_check": {"ends": [[7, 1]]}, "objects": [{"type": "bush", "x": 4, "y": 1}]},
-                 "under a blocked object")
+    expect_error({**road, "road_check": {"ends": [[7, 1]], "check_under": True},
+                  "objects": [{"type": "bush", "x": 4, "y": 1}]}, "under a blocked object")
+    # town props standing on cobble are fine unless check_under is asked for
+    assert ok_src({**road, "road_check": {"ends": [[7, 1], [3, 1], [5, 1]]}, "objects": [{"type": "bush", "x": 4, "y": 1}]})
+    # a broken bridge: the far stub (all bridge cells) is not a stray network; listed islands are fine too
+    span = {"id": "br", "ground": "..........\n.,,,,=~~=.\n..........", "entrances": {"a": [0, 1]}}
+    assert ok_src({**span, "road_check": {"ends": [[1, 1]]}})
+    isle = {**road, "ground": "..........\n.,,,..,,..\n.........."}
+    assert ok_src({**isle, "road_check": {"ends": [[3, 1], [6, 1], [7, 1], [1, 1]], "islands_ok": [[6, 1]]}})
+    ok += 3
     wide = {"id": "w", "ground": "........\n.,,,,,..\n.,,,,,..\n........", "entrances": {"a": [0, 1]}}
     expect_error({**wide, "road_check": {}}, "dead ends")                         # a 2-wide dead end
     assert ok_src({**wide, "road_check": {"ends": [[6, 2]]}})
@@ -146,6 +154,14 @@ def run(B) -> int:
             "objects": [{"type": "deco", "parts": [["bush", "bush", "bush"]], "x": 1, "y": 1, "walk_cells": [[1, 0]]}]}
     assert ok_src(warp)
     expect_error({**warp, "ground": ".....\n.....\n....."}, "warp_leaves")
+    # a walkable cell inside the icon also leads away: the warp is a junction
+    expect_error({**warp, "objects": [{**warp["objects"][0], "walk_cells": [[0, 0], [1, 0]]}]}, "warp_leaves")
+    # an arrival on a warp cell is an error
+    expect_error({**warp, "warp_leaves": False, "entrances": {"a": [0, 2], "door": [2, 1]}}, "is on a transition cell")
+    # inspect: a misspelt condition key is rejected
+    expect_error({**grass_map(3, 3), "inspect": [{"x": 1, "y": 1, "text": [{"requiredFlag": "F", "text": ["x"]}]}]},
+                 "no other keys")
+    ok += 3
     blob = {"id": "b", "ground": "......\n.m....\n......", "entrances": {"a": [5, 2]},
             "min_blob": {"mountain": 3, "ocean_inlet": 2}}
     expect_error(blob, "mountain patches smaller than 3")

@@ -645,6 +645,8 @@ def _edge_exits(src: dict, coll: np.ndarray, transitions: list[dict]) -> set[tup
             along = x if side in ("north", "south") else y
             target = spec.get(side)
             for s in spec.get("split") or []:
+                if not {"side", "from", "to", "targetEntrance"} <= set(s):
+                    raise MapError(f"edge_exits: split entry {s} needs side, from, to and targetEntrance")
                 if s["side"] == side and s["from"] <= along <= s["to"]:
                     target = {"targetMap": s.get("targetMap", (spec.get(side) or {}).get("targetMap")),
                               "targetEntrance": s["targetEntrance"]}
@@ -1197,11 +1199,13 @@ def main(args: list[str]) -> None:
         if not check_determinism(args[1:] or None):
             raise SystemExit("map error: compiled output depends on PYTHONHASHSEED")
     elif args and args[0] == "--preview":
-        pos = [a for a in args[1:] if not a.startswith("--")]
+        rest = list(args[1:])
         scale = 1.0
-        if "--scale" in args:
-            scale = float(args[args.index("--scale") + 1])
-            pos.remove(args[args.index("--scale") + 1])
+        if "--scale" in rest:
+            i = rest.index("--scale")
+            scale = float(rest[i + 1])
+            del rest[i:i + 2]                       # by index: the value may equal a coordinate
+        pos = [a for a in rest if not a.startswith("--")]
         if len(pos) != 6:
             raise SystemExit("usage: --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision] [--scale f]")
         mid, x0, y0, x1, y1, out = pos

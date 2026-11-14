@@ -85,6 +85,9 @@ describe('schemaValidation', () => {
     it('validates inspect cells: in bounds, with plain or conditional text', () => {
       const ok = (inspect: unknown) => expect(() => validateMapData({ ...validMap, inspect })).not.toThrow();
       const bad = (inspect: unknown, re: RegExp) => expect(() => validateMapData({ ...validMap, inspect })).toThrow(re);
+      // a misspelt condition key would otherwise become an unconditional line
+      bad([{ x: 1, y: 1, text: [{ requiredFlag: 'F', text: ['x'] }] }], /unknown keys requiredFlag/);
+      bad([{ x: 1, y: 1, text: ['x'], requiredFlag: 'F' }], /unknown keys requiredFlag/);
       ok([{ x: 1, y: 0, text: ['Here lies Erdrick.'] }]);
       ok([{ x: 0, y: 1, text: [{ condition: 'F', text: ['Later.'] }, { text: ['Now.'] }] }]);
       bad({ x: 1, y: 0, text: ['a'] }, /MapData.inspect: expected array/);
