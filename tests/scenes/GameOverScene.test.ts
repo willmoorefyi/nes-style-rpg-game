@@ -30,6 +30,8 @@ function createGame() {
     playerPosition: { x: 11, y: 6 },
     playTime: 50,
     pendingEntrance: null as string | null,
+    playerFacing: 'up' as 'up' | 'down' | 'left' | 'right', // toward Garland
+    pendingFacing: null as 'up' | 'down' | 'left' | 'right' | null,
     battleRetry: null as ReturnType<typeof captureBattleSnapshot>,
     pendingBattle: null as unknown,
     restoreState(d: { party: PartyManager; inventory: Inventory; flags: GameFlags; currentMap: string;
@@ -110,6 +112,7 @@ describe('GameOverScene', () => {
     expect(game.playerPosition).toEqual({ x: 11, y: 6 });
     expect(game.playTime).toBe(99);            // play time keeps counting
     expect(game.pendingBattle).toEqual(garland);
+    expect(game.pendingFacing).toBe('up');
     expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
   });
 
@@ -142,6 +145,7 @@ describe('GameOverScene', () => {
       press(scene, 'confirm');
       expect(game.party.all.map((m) => m.currentHp)).toEqual(snapHp);
       expect(game.pendingBattle).toBeNull();
+      expect(game.pendingFacing).toBe('up');
       expect(game.currentMapId).toBe('temple-of-fiends');
       expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
     });

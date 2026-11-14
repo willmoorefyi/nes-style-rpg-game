@@ -7,10 +7,9 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
 import { ConfirmBox } from '../ui/ConfirmBox.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import type { Character } from '../entities/Character.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
-import { isFallen } from '../systems/FieldSpellEffects.js';
+import { targetRows } from '../ui/partyTargetLabel.js';
 import { initialItemTargetIndex } from '../entities/partyTargets.js';
 import { FONT_SIZE, MENU_LINE_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
@@ -29,12 +28,6 @@ export function restPrompt(item: Pick<ItemData, 'name' | 'prompt'> | undefined, 
   return item?.prompt ?? `Use ${item?.name ?? itemId}?`;
 }
 
-/** A target row: `NAME  HP cur/max  STATUS` (MS-7), so the player sees who needs the item. */
-export function targetLabel(c: Character, nameWidth: number): string {
-  const status = isFallen(c) ? 'KO' : c.statusTracker.getAll().map((s) => s.effect.toUpperCase()).join(' ');
-  const hp = `HP ${String(c.currentHp).padStart(3)}/${String(c.maxHp).padStart(3)}`;
-  return `${c.name.padEnd(nameWidth)}  ${hp}${status ? `  ${status}` : ''}`;
-}
 
 export class ItemMenuScene implements Scene {
   readonly container = new Container();
@@ -114,9 +107,7 @@ export class ItemMenuScene implements Scene {
   }
 
   private targetRows(): MenuItem[] {
-    const party = this.game.party.all;
-    const nameWidth = Math.max(0, ...party.map((c) => c.name.length));
-    return party.map((c, i) => ({ label: targetLabel(c, nameWidth), value: String(i) }));
+    return targetRows(this.game.party.all);
   }
 
   /** The party's HP and status, always shown; `asTargets` puts the cursor on it to pick who gets the item. */

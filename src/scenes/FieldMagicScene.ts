@@ -10,6 +10,7 @@ import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
 import { castFieldSpell, isFallen, isFieldSpell } from '../systems/FieldSpellEffects.js';
 import { GAME_WIDTH, SCREEN_MARGIN, FONT_SIZE } from '../core/LayoutConstants.js';
 import { initialTargetIndex } from '../entities/partyTargets.js';
+import { targetRows } from '../ui/partyTargetLabel.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 
 type Phase = 'selectCaster' | 'selectSpell' | 'selectTarget';
@@ -46,7 +47,8 @@ export class FieldMagicScene implements Scene {
     this.partyWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 500, height: 300 });
     // ends 24 px above the help bar (y 900)
     this.spellWindow = new Window({ x: SCREEN_MARGIN, y: 348, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: HELP_RECT.y - SCREEN_MARGIN - 348 });
-    this.targetWindow = new Window({ x: 548, y: SCREEN_MARGIN, width: 500, height: 300 });
+    // wide enough for the Items-style rows with a status or two (`FGHTR  HP  35/ 35  POISON BLIND`)
+    this.targetWindow = new Window({ x: 548, y: SCREEN_MARGIN, width: 760, height: 300 });
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
     // message line at the foot of the spell window: results, "No effect.", "No field spells."
@@ -166,7 +168,8 @@ export class FieldMagicScene implements Scene {
     const party = this.game.party.all;
     const prev = this.targetMenu?.selectedIndex ?? (this.selected ? spellTargetIndex(party, this.selected.spell) : 0);
     if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
-    const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: `${c.name} ${c.currentHp}/${c.maxHp}`, value: String(i) }));
+    // the same rows as the Items target list: `NAME  HP cur/max  STATUS`, "KO" for the fallen
+    const items: MenuItem[] = targetRows(this.game.party.all);
     this.targetMenu = new Menu({
       items,
       x: this.targetWindow.contentX,

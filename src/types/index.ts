@@ -122,6 +122,8 @@ export interface ItemData {
   weight?: number;
   /** One-line help text for menus and shops (what the item does). */
   description?: string;
+  /** The plural name when the English rule gets it wrong ("Small Knives"); see `pluralName`. */
+  plural?: string;
   /** Confirm question asked before a party item (Tent, Cabin) is used; missing means "Use <name>?". */
   prompt?: string;
 }

@@ -20,6 +20,18 @@ export function leaderClassId(game: Pick<Game, 'party'>): string {
   return lead?.classData.id ?? 'warrior';
 }
 
+/** Record the hero's tile and facing on the game (save/load, and the battle snapshot for Retry / Return to Field). */
+export function recordPlayer(game: Pick<Game, 'playerPosition' | 'playerFacing'>, player: PlayerController): void {
+  game.playerPosition = { x: player.gridX, y: player.gridY };
+  game.playerFacing = player.direction;
+}
+
+/** Turn the hero to the facing Retry / Return to Field restored, once (`pendingFacing` clears). */
+export function applyPendingFacing(game: Pick<Game, 'pendingFacing'>, player: PlayerController | null | undefined): void {
+  if (game.pendingFacing && player) player.face(game.pendingFacing);
+  game.pendingFacing = null;
+}
+
 /** Build the field hero on (x, y) wearing the leader's art (or the placeholder sprite when the atlas is missing). */
 export function createFieldPlayer(
   game: Game, placeholders: PlaceholderTextures, collisionMap: CollisionMap,

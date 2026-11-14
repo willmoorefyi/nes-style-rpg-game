@@ -11,7 +11,7 @@ import type { EquipNowPrompt } from './EquipNowPrompt.js';
 
 /**
  * The equipment and item shop's windows and the read-only view tests use (extracted from `ShopScene`, U revision 13).
- * The gold window shows the gold only; the result of a deal ("Bought 2 Potion.", "You can't carry another Potion.")
+ * The gold window shows the gold only; the result of a deal ("Bought 2 Potions.", "You can't carry another Potion.")
  * is shown on the help bar until the next input (U9).
  */
 export abstract class ShopSceneView {
@@ -53,7 +53,7 @@ export abstract class ShopSceneView {
   get detailLines(): Array<{ text: string; y: number }> { return this.detail.lines; }
   /** The help bar's text, or '' while it is hidden. */
   get helpText(): string { return this.help.visible ? this.help.text : ''; }
-  /** The result line on the help bar ("Bought 2 Potion."), or ''. */
+  /** The result line on the help bar ("Bought 2 Potions."), or ''. */
   get resultMessage(): string { return this.message; }
   /** The gold window's lines (the gold only, U9). */
   get goldLines(): string[] {

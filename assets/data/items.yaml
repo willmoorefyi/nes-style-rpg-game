@@ -1,5 +1,6 @@
 - id: small_knife
   name: Small Knife
+  plural: Small Knives
   description: "A light blade any class can use. ATK 5, hit +10."
   type: weapon
   stats:
@@ -16,6 +17,7 @@
   crit: 2
 - id: wooden_nunchaku
   name: Wooden Nunchaku
+  plural: Wooden Nunchaku
   description: "Monk weapon of hard wood. ATK 12."
   type: weapon
   stats:
@@ -90,6 +92,7 @@
   crit: 7
 - id: iron_nunchaku
   name: Iron Nunchaku
+  plural: Iron Nunchaku
   description: "Monk weapon of iron links. ATK 16."
   type: weapon
   stats:
@@ -126,6 +129,7 @@
   crit: 12
 - id: mythril_knife
   name: Mythril Knife
+  plural: Mythril Knives
   description: "Mythril dagger, strong against undead. ATK 15, hit +10."
   type: weapon
   stats:
@@ -234,6 +238,7 @@
   crit: 20
 - id: cloth
   name: Cloth
+  plural: Cloth
   description: "Simple clothes any class can wear. DEF 1, evade -2."
   type: armor
   stats:

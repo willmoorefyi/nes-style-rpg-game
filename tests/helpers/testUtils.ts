@@ -56,6 +56,8 @@ export function createMockGame(mapData?: MapData) {
     currentMapId: '',
     playerPosition: { x: 0, y: 0 },
     pendingEntrance: null as string | null,
+    playerFacing: 'down' as 'up' | 'down' | 'left' | 'right',
+    pendingFacing: null as 'up' | 'down' | 'left' | 'right' | null,
     battleRetry: null,
     pendingBattle: null,
     gameFlags: new GameFlags(),

@@ -68,6 +68,16 @@ describe('BattleRetry', () => {
     expect(s.inventory.getQuantity('potion')).toBe(2);
   });
 
+  it('the snapshot keeps the hero\'s facing, and restoring queues it for the next field enter', () => {
+    const s = state();
+    s.playerFacing = 'up';
+    const snap = captureBattleSnapshot(s, { enemyIds: ['garland'] })!;
+    s.playerFacing = 'down';
+    expect(snap.facing).toBe('up');
+    restoreBattleSnapshot(s, snap);
+    expect(s.pendingFacing).toBe('up');
+  });
+
   describe('retryAdvice (U4)', () => {
     /** A snapshot of a warrior and a thief, the thief at `hp` (null: full). */
     function snapWith(hp: number | null) {

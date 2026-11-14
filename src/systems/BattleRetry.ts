@@ -1,5 +1,6 @@
 import type { SaveData } from '../types/index.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
+import type { Direction } from '../rendering/SpriteAnimation.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
@@ -27,6 +28,8 @@ export interface BattleRetrySnapshot {
   flags: SaveData['flags'];
   mapId: string;
   position: { x: number; y: number };
+  /** The way the hero faced when the battle began (e.g. toward Garland); missing means the default facing. */
+  facing?: Direction;
   battle: BattleRequest;
 }
 
@@ -37,6 +40,9 @@ export interface RetryState {
   gameFlags: GameFlags;
   currentMapId: string;
   playerPosition: { x: number; y: number };
+  /** The hero's facing (recorded) and the facing to apply on the next field enter (restored). */
+  playerFacing?: Direction;
+  pendingFacing?: Direction | null;
   playTime: number;
   pendingEntrance: string | null;
   restoreState(data: {
@@ -54,11 +60,15 @@ export function captureBattleSnapshot(game: RetryState, battle: BattleRequest): 
     flags: game.gameFlags.toJSON(),
     mapId: game.currentMapId,
     position: { ...game.playerPosition },
+    facing: game.playerFacing,
     battle,
   });
 }
 
-/** Put the game back as the snapshot recorded it (play time keeps running) and return the battle to start again. */
+/**
+ * Put the game back as the snapshot recorded it (play time keeps running; the hero's facing is applied on the next
+ * field enter) and return the battle to start again.
+ */
 export function restoreBattleSnapshot(game: RetryState, snap: BattleRetrySnapshot): BattleRequest {
   const copy = structuredClone(snap);
   game.restoreState({
@@ -70,6 +80,7 @@ export function restoreBattleSnapshot(game: RetryState, snap: BattleRetrySnapsho
     playTime: game.playTime,
   });
   game.pendingEntrance = null;
+  game.pendingFacing = copy.facing ?? null;
   return copy.battle;
 }
 

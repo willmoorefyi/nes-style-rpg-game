@@ -69,6 +69,28 @@ describe('Save and Load slot lists (MS-4)', () => {
     save.update(1);                              // confirm again
     expect(g.scenes.pop).toHaveBeenCalledTimes(1);
   });
+
+  it('"Overwrite Slot 1?" opens on No: mashing confirm keeps the old save', () => {
+    const g = game();
+    const press = (scene: SaveScene, key: string) => { g.pressed.clear(); g.pressed.add(key); scene.update(1); g.pressed.clear(); };
+    const first = new SaveScene(g as unknown as Game);
+    first.enter();
+    press(first, 'confirm');                     // save to the empty slot 1
+    const saved = store['ff1_save_0'];
+    g.playTime = 3600;
+    const save = new SaveScene(g as unknown as Game);
+    save.enter();
+    press(save, 'confirm');                      // slot 1 again
+    expect(save.confirmPrompt).toBe('Overwrite Slot 1?');
+    press(save, 'confirm');                      // the default answer: No
+    expect(save.confirmPrompt).toBe('');
+    expect(texts(save.container)).not.toContain('Saved.');
+    expect(store['ff1_save_0']).toBe(saved);
+    press(save, 'confirm');                      // slot 1 again
+    press(save, 'up');                           // Yes
+    press(save, 'confirm');
+    expect(texts(save.container)).toContain('Saved.');
+  });
 });
 
 describe('R3: Save and Load screens (S4, S5)', () => {

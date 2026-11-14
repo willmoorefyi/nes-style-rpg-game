@@ -94,8 +94,8 @@ export class SpellSelectionUI extends Container {
   private showSpellMenu(): void {
     const { character, spells, contentX, contentY, eventBus } = this.config;
     const spellIds = character.getSpellsAtLevel(this.currentLevel);
-    // U13: with no level step the rows carry the level's charges after the name ("CURE  2")
-    const charges = this.singleLevel ? `  ${character.getSpellCharges(this.currentLevel)}` : '';
+    // every row carries its level's charges after the name ("CURE  2"), whether or not a level step came first (U13)
+    const charges = `  ${character.getSpellCharges(this.currentLevel)}`;
     const items: MenuItem[] = spellIds.map(id => {
       const spell = spells.find(s => s.id === id);
       return { label: `${spell?.name ?? id}${charges}`, value: id };

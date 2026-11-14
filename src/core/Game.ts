@@ -15,6 +15,7 @@ import { AudioManager, type AudioManifest } from './AudioManager.js';
 import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 import type { BattleRequest, BattleRetrySnapshot } from '../systems/BattleRetry.js';
+import type { Direction } from '../rendering/SpriteAnimation.js';
 import { installNESFont } from '../ui/NESFont.js';
 import { setUiEventBus } from '../ui/uiSounds.js';
 import { wireAudioEvents } from './audioEvents.js';
@@ -39,6 +40,10 @@ export class Game {
   playTime = 0;
   currentMapId = '';
   playerPosition = { x: 0, y: 0 };
+  /** The way the field hero faces (kept by the exploration scene; Game Over > Retry / Return to Field restore it). */
+  playerFacing: Direction = 'down';
+  /** The facing the exploration scene applies on its next enter (set by Retry / Return to Field), then clears. */
+  pendingFacing: Direction | null = null;
   /** Entrance of `currentMapId` to place the player at on the next exploration enter (debug field scenarios). */
   pendingEntrance: string | null = null;
   /** The game as it was when the current battle started (Game Over > Retry Battle); null when not retryable. */
@@ -165,6 +170,7 @@ export class Game {
     this.pendingEntrance = null;
     this.battleRetry = null;
     this.pendingBattle = null;
+    this.pendingFacing = null;
   }
 
   get canvas(): HTMLCanvasElement {

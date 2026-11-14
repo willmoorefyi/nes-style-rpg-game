@@ -83,7 +83,8 @@ describe('U13: Magic with one usable spell level', () => {
     expect(levels[0]).toMatch(/^Lv1 \(\d+\)$/);
     expect(levels[1]).toMatch(/^Lv2 \(\d+\)$/);
     ui.update(press('confirm'));
-    expect(visibleLabels(ui)).toEqual(['FIRE']);
+    // the Lv1 spells carry their charges too, as on a single-level list ("CURE  3")
+    expect(visibleLabels(ui)).toEqual([`FIRE  ${levels[0].match(/\((\d+)\)/)![1]}`]);
     ui.update(press('cancel'));
     expect(onCancel).not.toHaveBeenCalled();
     expect(visibleLabels(ui)).toEqual(levels);
