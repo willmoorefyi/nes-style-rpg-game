@@ -201,3 +201,5 @@
 {"event": "result", "key": "667c4c0c244265344a924b4b", "ok": true}
 {"event": "attempt", "ts": "2026-11-14T04:49:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "burgher", "sheet": "field", "seed": 1234, "key": "d50e89bf8b2990fcb6becace"}
 {"event": "result", "key": "d50e89bf8b2990fcb6becace", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T07:44:47", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_gates", "seed": 1234, "key": "3750f22e440fed09b2478d13"}
+{"event": "result", "key": "3750f22e440fed09b2478d13", "ok": true}

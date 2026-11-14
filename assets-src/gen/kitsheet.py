@@ -986,6 +986,8 @@ def _cut_props(rgb: np.ndarray, sheet: dict, rects: dict, report: dict, canvas: 
                 report["cells"][r + j][c + q] = part
         report["prop_px"][name] = [ow, oh]
         report["scale"][name] = round(f, 2)
+        if sw.get("door_px"):                        # reviewed doorway columns (native px in the part), for the map
+            report.setdefault("door_px", {})[name] = list(sw["door_px"])
     report["pass"] = {
         "fits": all(v >= 0.6 for v in report["scale"].values()),      # not drawn far larger than its cells
         "not_tiny": all(w >= 24 or h >= 24 for w, h in report["prop_px"].values()),

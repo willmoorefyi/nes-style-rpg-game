@@ -1,0 +1,209 @@
+{
+  "kit": "town",
+  "sheet": "kit_gates",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "3750f22e440fed09b2478d13",
+  "approved": "2026-11-14",
+  "tile": 48,
+  "cells": [
+    [
+      "gate_arch_3_0_0",
+      "gate_arch_3_0_1",
+      "gate_arch_3_0_2",
+      "sign_tavern"
+    ],
+    [
+      "gate_arch_3_1_0",
+      "gate_arch_3_1_1",
+      "gate_arch_3_1_2",
+      "sign_shrine"
+    ],
+    [
+      "gate_arch_2_0_0",
+      "gate_arch_2_0_1",
+      null,
+      null
+    ],
+    [
+      "gate_arch_2_1_0",
+      "gate_arch_2_1_1",
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "gate_arch_3": [
+        144,
+        96
+      ],
+      "sign_tavern": [
+        40,
+        40
+      ],
+      "sign_shrine": [
+        38,
+        40
+      ],
+      "gate_arch_2": [
+        96,
+        96
+      ]
+    },
+    "scale": {
+      "gate_arch_3": 1.0,
+      "sign_tavern": 1.0,
+      "sign_shrine": 1.0,
+      "gate_arch_2": 1.0
+    },
+    "skipped": [
+      "gate_side"
+    ],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "R5 M7 (decision R-10), attempt 1 of 1 allowed (seed 1234, 1 paid image): gate_arch_3 144x96, gate_arch_2 96x96, sign_tavern 40x40, sign_shrine 38x40 approved; gate_side skipped (drawn as a front-view arch on a pink backdrop with a window, not a lintel over a north-south wall), so the W, E and precinct-E gates keep turret flanking only. paint: 17 magenta-blend edge pixels (shrine hook gap, sign corners, arch_2 inner rim) made transparent with a patch from the empty gate_side cells",
+  "paint": [
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        149,
+        10
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        150,
+        58
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        174,
+        59
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        4,
+        1
+      ],
+      "to": [
+        162,
+        60
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        4,
+        1
+      ],
+      "to": [
+        169,
+        60
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        152,
+        90
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        54,
+        148
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        55,
+        149
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        38,
+        150
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        56,
+        150
+      ]
+    },
+    {
+      "from": [
+        120,
+        120,
+        1,
+        1
+      ],
+      "to": [
+        36,
+        151
+      ]
+    }
+  ]
+}
