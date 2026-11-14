@@ -836,3 +836,32 @@ All 15 momus issues apply. Ownership and resolutions:
 - **CT-8:** `road_check` (`cobble`, `dirt`; `check_under` off) passes: the garden walks join the promenade at (28,25) and (32,25), the postern track runs down to the apron, (50,19) crosses a new footbridge to the quiet garden's bench, (4,25) became a spur to the orchard well, the magic-quarter lane moved out from under the white magic shop to x 9-10 and stops at the two doors, the inn lane starts at its door, the stray dirt at (33-35,56) is gone, and a lane passes the shrine door to a path that crosses the river (the bridge moved to row 61, off the tavern's front wall) and ends at a bench and flower garden by the east wall. The lane on row 51 ends at a bench and flowers at (53-54,50-52). The fisher moved to (38,64), off the new path.
 - **ST-12:** `NPC.setOpened()` shows the opened frame (column 1 of the chest block; `build_assets.py field_ai` now bakes `chest_open` there, as the legacy atlas already did) or a dimmed sprite, at map load from the flag (`MapLoader`) and right after looting; chests never turn.
 - **Tests:** `tests/data/corneliaLayout.test.ts` (CT-1 from the sources, round trips, sizes, IN-5, talkable, CT-6); `crossFileValidation` reads `assets/maps/ai/` too (flag-based key gates allowed), and checks chest flags; ST-12 cases in `tests/entities/NPC.test.ts`.
+
+### T3b result
+
+**Done** (new `assets-src/tools/terrain.py`; `build_map.py` untouched, only the T3a hooks are used). It runs only for sources with `terrain: organic`; the castle and the temple compile to their committed chunks (a selftest check).
+- **Outline:** each material's cell mask is blurred (r 20 px, twice, at 1/4 resolution) and resampled through a two-octave domain warp; the strongest field wins. The centre 28x28 px of every cell is clamped to its own material, so collision matches the art (unchanged: the overworld's collision is identical to the classic build).
+- **Blends:** grass and sand meet in a 10 px Bayer band. Forests get `tree_clump` stamps about every 40 px along the outline (0.8 / 1.0 scale, mirrored; 2-14 px out, only onto open grass or sand), a 1 px canopy rim and a 3 px south-east shadow; the tan fringe is gone.
+- **Water:** ocean and lakes have a shallow band (within 10 px of land, 35 % toward cyan, Bayer-dithered) and a foam line broken by noise. Ocean meeting grass grows a 6-10 px beach on the land side, and mountains meeting the sea get a dark rock rim. Rivers and lakes get 3 px dithered earth banks. `≈` lakes use the river water and have no stone rim.
+- **Foothills:** grass near a range carries the mountain texture with ordered dithering, plus scattered 0.5 / 0.6 small peaks and hole-filled `boulder`s (Poisson disc). These cells stay grass.
+- **Peaks:** the variants are built from `peak` (as drawn or mirrored, at 0.6 / 0.8 / 1.0 / 1.25), with LANCZOS on premultiplied alpha, the alpha thresholded and the colours snapped to the part's own palette. Snow caps (the top 35 % behind a dithered line) appear at scale >= 1.0 and depth >= 2 cells. They are placed by Poisson disc in the mountain outline, anchored at the bottom, with bigger peaks deeper in and drawn in y order; they overhang walkable cells by at most 8 px. Placement is seeded from the map (not the compile `rng`), so `--metrics` can replay it.
+- **Metrics** (`terrain.metrics`; `--metrics`): pixels are classified by the nearest kit texture (shading factors and stamped parts count as their material). An edge is "on a cell line" if it runs parallel to one within 2 px, and a material's edge is where it holds 60 %, so a dithered fringe does not count. On the T3c overworld:
+  - coast: run 60 px, 13 % on a cell line;
+  - sand/grass: run 86 px, 11 %;
+  - forest/grass: run 38 px, 11 %;
+  - mountain/grass: run 56 px, 14 %;
+  - peaks: 12 variants, anchor spread 13.4 px;
+  - foothills: 100 %;
+  - fidelity: every cell centre is >= 62 % its own material.
+  
+  The classic painting of the same map gives 50-59 % on cell lines, 1 variant, a 2.5 px spread and 3 % foothills.
+- **Selftest** (`terrain.selftest()`, 42 checks, from `build_map.py --selftest`): horizontal and vertical straight coast, sand, forest and mountain boundaries; a 6x4 mountain block (variants, anchor spread, foothills); fidelity; a lake (no rim); determinism, both in-process and under two `PYTHONHASHSEED`s; and the castle and temple chunks. Every boundary and peak case also asserts that the classic painting fails it.
+
+**Deviations from the plan (for review):**
+- **Warp.** The coarse octave (96 px, 14 px) is soft-limited to 6.5 px through `tanh(3 n / sqrt(|n| + 0.01))`. The fine octave is 24 px at 2.5 px, and a 6 px / 1 px octave is added. Each component varies half as fast along its own axis.
+  - The reason: the 28 px clamp leaves only 10 px either side of a cell line. With the plan's amplitudes the outline either sat on the line (about 25 % of the boundary) or ran into the clamp and was cut off straight; a steep unshaped warp also folded outlines into thin slivers.
+  - Corner cells also get a small own-material pull at the clamp edge, so an outline bends around a cell centre instead of being cut straight.
+- **Foothill cover** is 40 % at the foot, fading to 10 % at one cell, then to 0 over 12 px past a noisy reach. It is capped at 33 % in a grass cell's centre. Coverage of 50 % to 25 % read as a grey halo around every range.
+- **Peak spacing** is 34 px x scale (the plan's minimum is 30), so the mountain texture shows between the peaks.
+- **Beach inner edge.** It is steered off cell lines. Where the ocean already cuts deep into a land cell, the beach narrows to a 2.5-4 px strip that follows the coast. So beaches are 6-10 px where the coast recedes and thin where it bulges.
+- **Real-map metric:** one sand/grass run is 86 px, on a narrow peninsula tip whose coast hugs the clamped cell centres. That is over the 72 px synthetic target; every other real-map number meets the synthetic targets.
