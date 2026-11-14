@@ -1,0 +1,166 @@
+"""The T3b terrain numbers (build_map.py --metrics): boundary straightness, peaks, foothills and fidelity."""
+from __future__ import annotations
+
+import numpy as np
+
+import kit as K
+from .base import CORE, MARGIN, ROADS, T, TEX, WILD, _blur, _tile, _up
+from .outline import _cached_partition
+from .peaks import plan_peaks
+
+
+GROUPS = {"coast": (("ocean", "water"), ("grass", "sand", "forest", "mountain", "dirt")),
+          "sand_grass": (("sand",), ("grass",)), "forest_grass": (("forest",), ("grass",)),
+          "mountain_grass": (("mountain",), ("grass",))}
+
+
+PART_OF = {"forest": ("tree_clump",), "mountain": ("peak", "boulder")}
+
+
+def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray:
+    """Per pixel, the index into mats of the texture (tiled at that pixel) it is closest to. Shadows and rims are
+    not materials: the texture is also tried at the shading factors both painters use."""
+    H, W = below.shape[:2]
+    best = np.full((H, W), np.inf, np.float32)
+    out = np.zeros((H, W), np.uint8)
+    b = below.astype(np.float32)
+    for i, m in enumerate(mats):
+        t = _tile(kit.material(m), H, W).astype(np.float32)
+        d = np.min([np.abs(b - t * f).sum(axis=2) for f in (1.0, 0.85, 0.8, 0.72, 0.6, 0.55)], axis=0)
+        parts = [kit.parts[p] for p in PART_OF.get(m, ()) if p in kit.parts and p in kit.approved]
+        if parts:                                  # stamped art (clumps, peaks, rocks) counts as its material
+            pal = np.unique(np.concatenate([np.asarray(p.convert("RGBA"))[..., :3][np.asarray(p)[..., 3] > 127]
+                                            for p in parts]), axis=0).astype(np.int32)
+            packed = (below[..., 0].astype(np.int32) << 16) | (below[..., 1].astype(np.int32) << 8) | below[..., 2]
+            cols, inv = np.unique(packed, return_inverse=True)
+            rgb = np.stack([cols >> 16, (cols >> 8) & 255, cols & 255], axis=1)
+            dp = np.abs(rgb[:, None, :] - pal[None, :, :]).sum(axis=2).min(axis=1)
+            d = np.minimum(d, dp[inv.reshape(H, W)].astype(np.float32))
+        upd = d < best
+        best[upd] = d[upd]
+        out[upd] = i
+    return out
+
+
+def boundary_stats(a: np.ndarray, b: np.ndarray, window: tuple[slice, slice] | None = None) -> dict[str, float]:
+    """Boundary between pixel sets a and b (smoothed r 4, so dither does not count as boundary): the longest
+    straight axis-aligned run (px) and the share of boundary edges that run along a cell line within 2 px."""
+    fa, fb = _blur(_blur(a.astype(np.float32), 4), 4), _blur(_blur(b.astype(np.float32), 4), 4)
+    region = (fa + fb) > 0.6
+    side = fa > 1.5 * fb                     # a: its clear majority (60 %); a dithered fringe below that is not its edge
+    eh = region[:-1, :] & region[1:, :] & (side[:-1, :] != side[1:, :])      # between rows y and y+1
+    ev = region[:, :-1] & region[:, 1:] & (side[:, :-1] != side[:, 1:])      # between columns x and x+1
+    if window is not None:
+        ys, xs = window
+        eh, ev = eh[ys, xs], ev[ys, xs]
+        oy, ox = ys.start or 0, xs.start or 0
+    else:
+        oy = ox = 0
+    n = int(eh.sum() + ev.sum())
+    if not n:
+        return {"edges": 0, "longest_run": 0, "on_cell_line": 0.0}
+    ly = (np.arange(eh.shape[0]) + oy + 1) % T
+    lx = (np.arange(ev.shape[1]) + ox + 1) % T
+    near_h = eh & np.isin(ly, [T - 2, T - 1, 0, 1, 2])[:, None]
+    near_v = ev & np.isin(lx, [T - 2, T - 1, 0, 1, 2])[None, :]
+    return {"edges": n, "longest_run": int(max(_longest(eh), _longest(ev.T))),
+            "on_cell_line": round(float(near_h.sum() + near_v.sum()) / n, 3)}
+
+
+def _longest(e: np.ndarray) -> int:
+    d = np.diff(np.pad(e, ((0, 0), (1, 1))).astype(np.int8), axis=1)
+    s, t = np.nonzero(d == 1), np.nonzero(d == -1)
+    return int((t[1] - s[1]).max()) if len(s[1]) else 0
+
+
+def peak_stats(placements: list[tuple[str, int, int]]) -> dict[str, float]:
+    peaks = [(n, x, y) for n, x, y in placements if n.startswith("peak")]   # not the foothill rocks
+    if not peaks:
+        return {"peaks": 0, "variants": 0, "anchor_std_mod48": 0.0}
+    xs, ys = np.array([p[1] for p in peaks]) % T, np.array([p[2] for p in peaks]) % T
+    return {"peaks": len(peaks), "variants": len({p[0] for p in peaks}),
+            "anchor_std_mod48": round(float(min(xs.std(), ys.std())), 1)}
+
+
+def foothill_share(below: np.ndarray, mat: np.ndarray, kit: K.Kit) -> float:
+    """Share of grass cells 4-next to a mountain cell whose centre holds foothill pixels (mountain texture or rock)."""
+    H, W = below.shape[:2]
+    mtex = _tile(kit.material("mountain"), H, W)
+    gtex = _tile(kit.material("grass"), H, W)
+    hgt, wid = mat.shape
+    hits = total = 0
+    for y in range(hgt):
+        for x in range(wid):
+            if mat[y, x] != "grass" or not any(0 <= y + b < hgt and 0 <= x + a < wid and mat[y + b, x + a] == "mountain"
+                                               for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                continue
+            sl = (slice(y * T + MARGIN, y * T + MARGIN + CORE), slice(x * T + MARGIN, x * T + MARGIN + CORE))
+            px = below[sl].astype(np.int32)
+            rock = np.all(px == mtex[sl], axis=2) | (np.abs(px - gtex[sl]).sum(axis=2) > 120)
+            total += 1
+            hits += int(rock.sum() >= 10)
+    return round(hits / total, 3) if total else 1.0
+
+
+FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "cobble")
+
+
+def fidelity(below: np.ndarray, mat: np.ndarray, kit: K.Kit, skip: set | None = None) -> dict[str, float]:
+    """Per soft cell: the share of its centre CORE px that read as its own material (classify: its texture, shaded,
+    or its stamped art); the minimum and the number of cells under 50 %."""
+    cls = classify(below, kit, FID_MATS)
+    worst, bad = 1.0, 0
+    hgt, wid = mat.shape
+    for y in range(hgt):
+        for x in range(wid):
+            m = mat[y, x]
+            if m not in WILD + list(ROADS) or (skip and (x, y) in skip):
+                continue
+            sl = (slice(y * T + MARGIN, y * T + MARGIN + CORE), slice(x * T + MARGIN, x * T + MARGIN + CORE))
+            share = float((cls[sl] == FID_MATS.index(TEX.get(m, m))).mean())
+            worst = min(worst, share)
+            bad += share < 0.5
+    return {"min_core_share": round(worst, 3), "cells_below_half": bad}
+
+
+class _Recorder:
+    """Stands in for the canvas: records which part goes where (for peak metrics)."""
+
+    def __init__(self, names: dict[int, str]):
+        self.names, self.pastes = names, []
+
+    def alpha_composite(self, im, dest):
+        self.pastes.append((self.names.get(id(im), "peak"), dest))
+
+
+def metrics(src: dict, compiled) -> dict:
+    """The T3b numbers for a compiled map (build_map.py --metrics)."""
+    import build_map as B  # noqa: PLC0415
+    kit = B.K.load_kits(src.get("kits") or [src.get("kit", "town")])
+    mat, below = compiled.mat, compiled.below
+    mats = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt")
+    cls = classify(below, kit, mats)
+    # roads, bridges, walls and objects are square by design: only the wild ground is measured
+    wild = np.isin(mat, WILD)
+    for (x, y) in compiled.owner:
+        wild[y, x] = False
+    keep = _up(wild)
+    out: dict = {}
+    for name, (ga, gb) in GROUPS.items():
+        a = np.isin(cls, [mats.index(m) for m in ga]) & keep
+        b = np.isin(cls, [mats.index(m) for m in gb]) & keep
+        out[name] = boundary_stats(a, b)
+    organic = src.get("terrain") == "organic"
+    if organic and "peak" in kit.parts:
+        seed = sum(map(ord, src["id"]))
+        _cached_partition(mat, seed)
+        out["peaks"] = peak_stats(plan_peaks(mat, compiled.owner, kit))
+    elif "peak" in kit.parts:
+        part = kit.part("peak")
+        rec = _Recorder({id(part): "peak"})
+        B.place_peaks(rec, mat, compiled.owner, kit, np.random.default_rng(sum(map(ord, src["id"]))))
+        ax, ay = 24, 47
+        out["peaks"] = peak_stats([(n, x + ax, y + ay) for n, (x, y) in rec.pastes])
+    out["foothills"] = foothill_share(below, mat, kit)
+    out["fidelity"] = fidelity(below, mat, kit, set(compiled.owner))
+    return out
