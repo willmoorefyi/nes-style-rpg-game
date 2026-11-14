@@ -25,6 +25,7 @@ import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
 import { FieldHUD } from '../ui/FieldHUD.js';
+import { transitionAnimation } from './exploration/TransitionEffect.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
@@ -440,31 +441,17 @@ export class ExplorationScene implements Scene {
       this.player.currentMode = this.walkingMode;
     }
 
-    const isShopInterior = transition.targetMap.startsWith('cornelia-');
-
-    if (isShopInterior) {
-      // Zoom-into-door effect for shop interiors
-      await this.zoomTransition(transition.x, transition.y);
-      await this.loadMap(transition.targetMap);
-      if (this.player && this.currentMapData) {
-        const at = arrivalFor(transition, this.currentMapData);
-        this.player.setPosition(at.x, at.y);
-        this.camera.update();
-        this.tilemap?.render();
-      }
-      await this.fadeOverlay.fadeIn(300);
-    } else {
-      // D3: Fade out → load map → fade in
-      await this.fadeOverlay.fadeOut(300);
-      await this.loadMap(transition.targetMap);
-      if (this.player && this.currentMapData) {
-        const at = arrivalFor(transition, this.currentMapData);
-        this.player.setPosition(at.x, at.y);
-        this.camera.update();
-        this.tilemap?.render();
-      }
-      await this.fadeOverlay.fadeIn(300);
+    // CA-2: only a house or shop door zooms in; gates, stairs and edge exits fade (D3: fade out, load, fade in)
+    if (transitionAnimation(transition) === 'zoom') await this.zoomTransition(transition.x, transition.y);
+    else await this.fadeOverlay.fadeOut(300);
+    await this.loadMap(transition.targetMap);
+    if (this.player && this.currentMapData) {
+      const at = arrivalFor(transition, this.currentMapData);
+      this.player.setPosition(at.x, at.y);
+      this.camera.update();
+      this.tilemap?.render();
     }
+    await this.fadeOverlay.fadeIn(300);
   }
 
   /** Zoom-into-door animation: scale up worldContainer toward the door tile while fading out */
@@ -596,6 +583,11 @@ export class ExplorationScene implements Scene {
 
   getMapId(): string {
     return this.currentMapId;
+  }
+
+  /** The current map's display name (the field menu's location line). */
+  getMapName(): string {
+    return this.currentMapData?.name ?? '';
   }
 
   canSave(): boolean {
