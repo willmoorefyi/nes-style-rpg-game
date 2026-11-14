@@ -57,7 +57,7 @@ export class SpellLearnPanel {
     this.window.addChild(this.header);
   }
 
-  /** The "Learn: WM RM" line and whether it is greyed (nobody in the party can learn the spell). */
+  /** The "Learn: WHM RDM" line and whether it is greyed (nobody in the party can learn the spell). */
   get learners(): { text: string; greyed: boolean } {
     return { text: this.header.text, greyed: this.header.tint === GREY };
   }
