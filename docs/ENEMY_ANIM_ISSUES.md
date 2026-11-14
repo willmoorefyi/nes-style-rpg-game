@@ -550,3 +550,20 @@ and no lock line.
 - **Report only:**
   - edge roughness top values: vampire `atk_mid` +5.36, garland `atk_mid` +4.52, ogre `atk_mid` +3.65;
   - mask overlap: garland hurt `cape_h` 313 px (sword 310), idle `cape_i` 12 px.
+
+### V.2 browser re-test (2026-11-14)
+
+All 18 E items pass in the browser. E1, E13 and E17 were tested in real battles.
+
+The A1–A20 regression sweep passes, except:
+- A6: not applicable (no multi-target damage spell).
+- A9: covered by a unit test only.
+
+Real battles also pass:
+- an overworld Gr.Imp pack;
+- Garland via `r_temple_garland`;
+- Retry Battle after a wipe.
+
+754 stepped frames match the atlas cells exactly, so there is no blur, bleeding, half-pixel offset or wrong frame. `anim_crowd` runs at a median of 120 fps, with a 1st percentile of 97. The only console output is the expected E16 warning.
+
+One new polish item is accepted, not fixed: the ogre's club and the troll's mallet show only a few pixels in `hurt_in2`. The prop-carry check passes, and the big pose change in that step hides the switch.
