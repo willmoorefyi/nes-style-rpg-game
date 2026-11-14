@@ -185,7 +185,7 @@ For L = 24 this gives −4, −6, 18, 24, 14.
 |------|--------|----|
 | `hurt_in1` | 2 | 0 → −3 |
 | `hurt_in2` | 2 | −3 → −6 |
-| `hurt` | 10 | −6, plus a ±3 shake every 2 frames |
+| `hurt` | 10 | −6, plus a shake of −3 then +3, every 2 frames (E14: −9, −9, −3, −3, …; the first hold frame recoils further, never back toward the party) |
 | `hurt_in2` | 3 | −6 → −3 |
 | `hurt_in1` | 3 | −3 → 0 |
 
@@ -199,27 +199,38 @@ Re-hit rules:
 (`DYING_FRAMES`) runs at the same time, unchanged. `freezeDying` stays unconditional, so death can arrive mid-lunge
 or mid-cast. In that case the offset **eases from the current lunge or cast offset to the dying offset** (dx −6,
 dy 0) over the 4 in-phase frames, instead of jumping. This is covered by a unit test (old probe A9).
+- **E13:** the dying in-phase starts from the pose on screen when the lethal hit lands: during the hold (`hurt`) it
+  goes straight to the held `hurt`; during the return, `hurt_in2` starts at `HURT_REHIT_AT` and `hurt_in1` at 0. So a
+  dying enemy never steps back to an earlier in-phase pose. A second `freezeDying` on a dying enemy is a no-op.
+- **E17:** an enemy whose HP reaches 0 with no damage event (poison, instant death) enters dying when its fade starts
+  (`BattleDisplayManager.updateEnemySprites`), so it never fades while still breathing.
 
-**Boss cast: 30 frames (today 24). The spell resolves at the start of the hold (`CAST_OUT` = 10, today 8).**
+**Boss cast: 30 frames (today 24). The spell resolves at the start of the hold (`CAST_OUT` = 10, today 8).** The
+sprite stays planted (E15: dy 0 throughout): a frame is one texture, so the whole sprite cannot rise without the
+feet leaving the plain. The cast in-betweens carry the motion with their feet pinned.
 
 | Pose | Frames | dy |
 |------|--------|----|
-| `cast_gather` | 6 | 0 → −2 |
-| `cast_rise` | 4 | −2 → −6 |
-| `cast` | 10 | −6, held |
-| `cast_release` | 4 | −6 |
-| `cast_rise` | 3 | −6 → −2 |
-| `cast_gather` | 3 | −2 → 0 |
+| `cast_gather` | 6 | 0 |
+| `cast_rise` | 4 | 0 |
+| `cast` | 10 | 0, held |
+| `cast_release` | 4 | 0 |
+| `cast_rise` | 3 | 0 |
+| `cast_gather` | 3 | 0 |
 
-**Non-boss cast (D4).** The attack frames play without the lunge:
+**Non-boss cast (D4).** The attack frames play in place, without the lunge and (E15) without a lift:
 
 | Pose | Frames | dy |
 |------|--------|----|
 | `atk_wind1` | 5 | 0 |
-| `atk_wind2` | 6 | 0 → −6 |
-| `attack` | 10 | −6, held (`CAST_OUT` = 11, at its start) |
-| `atk_follow` | 4 | −6 → −3 |
-| `atk_recover` | 5 | −3 → 0 |
+| `atk_wind2` | 6 | 0 |
+| `attack` | 10 | 0, held (`CAST_OUT` = 11, at its start) |
+| `atk_follow` | 4 | 0 |
+| `atk_recover` | 5 | 0 |
+
+**Lost turns (E1):** an enemy whose start-of-turn tick is certain to end its turn (sleep, stun, stone, or a lethal
+poison tick; `BattleStateMachine.nextActorLosesTurn`) plays no wind-up, lunge or cast: its turn message shows with it
+frozen on `idle`. Blind, silence, confusion and fear (a 50 % roll at execute time, decision O1) still lunge.
 
 **Idle:** `idle` and `idle_b` alternate every 36 frames (period 72), with phase `index*17` as in the party's
 `idlePose`. This applies only in idle mode. A rig may turn breathing off (`breath: false`). **Frozen enemies (D6)**
@@ -642,7 +653,7 @@ artifact in normal play), P2 (only visible when stepping).
 | A7 | Rapid re-hits | multi-target spells hitting the same enemy in quick succession, and confirm-mashing through result lines | in-phase finishes, then a full hold; no snap back to idle between hits |
 | A8 | Death | lethal hit during each phase (in, hold, return, idle_b) | in-phase then a held `hurt`; the fade is smooth; no frame swap after alpha < 0.5; sprite hidden at the end |
 | A9 | Death mid-lunge | covered by the unit test (6.3); in the browser, only a visual spot check in a debug scenario | the offset eases to the dying offset; `round_end` does not hang |
-| A10 | Bosses | `anim_boss_garland` (fight and magic 1:1) and `anim_boss_lich`, cast and fight | fx parts appear and disappear only at the planned frames; no cape tearing; feet planted during cast rise/settle (only dy) |
+| A10 | Bosses | `anim_boss_garland` (fight and magic 1:1) and `anim_boss_lich`, cast and fight | fx parts appear and disappear only at the planned frames; no cape tearing; feet on the plain line through every cast frame (no lift: dx = dy = 0, E15) |
 | A11 | Palette variants | `anim_goblin`, `anim_beasts` | gr_imp and gr_wolf match their base frame for frame; no un-recoloured pixels (outline unchanged by design; check the eye colours) |
 | A12 | Magenta / key fringe | screenshot over a dark and over a light background, zoomed in | no pink edge pixels |
 | A13 | Idle breathing | 5 identical goblins idle for 10 s | out of phase, 1 art px only, no shimmer on the feet |

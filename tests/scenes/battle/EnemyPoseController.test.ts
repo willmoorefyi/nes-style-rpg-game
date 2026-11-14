@@ -70,12 +70,12 @@ describe('EnemyPoseController (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(c.state(0)).toEqual({ pose: 'idle', dx: 0, dy: 0 });
   });
 
-  it('hurt hold recoils by -6 with a +-3 shake every 2 frames', () => {
+  it('hurt hold recoils by -6 with a -+3 shake every 2 frames (E14: away from the party first)', () => {
     const c = new EnemyPoseController(1);
     c.playHurt(0);
     run(c, HURT_HOLD_START);
     const dx = Array.from({ length: 4 }, () => { const v = c.state(0).dx; c.update(1); return v; });
-    expect(dx).toEqual([-3, -3, -9, -9]);
+    expect(dx).toEqual([-9, -9, -3, -3]);
   });
 
   it('a re-hit during the in-phase lets it finish, then a full 10-frame hold', () => {
@@ -144,6 +144,44 @@ describe('EnemyPoseController (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(c.isAttacking(0)).toBe(false);            // round_end does not hang on a dead attacker
   });
 
+  it('E13: a lethal hit during the hold or return never shows an earlier in-phase pose', () => {
+    const order = ['hurt_in1', 'hurt_in2', 'hurt'];
+    // from the hold: 30 frames of `hurt`, no shake
+    const hold = new EnemyPoseController(1);
+    hold.playHurt(0);
+    run(hold, HURT_HOLD_START + 3);
+    hold.freezeDying(0);
+    expect(poses(hold, 0, 30)).toEqual(Array(30).fill('hurt'));
+    expect(hold.state(0)).toEqual({ pose: 'hurt', dx: DYING_DX, dy: 0 });
+    // from the return: each start frame keeps its pose or moves on (in1 -> in2 -> hurt), dx continuous within 3 px
+    for (let t = HURT_HOLD_END; t < HURT_FRAMES; t++) {
+      const c = new EnemyPoseController(1);
+      c.playHurt(0);
+      run(c, t);
+      const before = c.state(0);
+      c.freezeDying(0);
+      const seq: { pose: string; dx: number }[] = [before];
+      for (let k = 0; k < 30; k++) { seq.push(c.state(0)); c.update(1); }
+      for (let k = 1; k < seq.length; k++) {
+        expect(order.indexOf(seq[k].pose), `t ${t} k ${k}`).toBeGreaterThanOrEqual(order.indexOf(seq[k - 1].pose));
+        expect(Math.abs(seq[k].dx - seq[k - 1].dx), `t ${t} k ${k}`).toBeLessThanOrEqual(3);
+      }
+      if (before.pose === 'hurt_in2') expect(new Set(seq.map((s) => s.pose))).toEqual(new Set(['hurt_in2', 'hurt']));
+    }
+  });
+
+  it('E13 / E17: freezeDying twice does not restart', () => {
+    const c = new EnemyPoseController(1);
+    c.freezeDying(0);
+    run(c, 3);
+    const at = c.state(0);
+    expect(at.pose).toBe('hurt_in2');
+    c.freezeDying(0);
+    expect(c.state(0)).toEqual(at);
+    run(c, 1);
+    expect(c.state(0).pose).toBe('hurt');
+  });
+
   it('poses are per enemy', () => {
     const c = new EnemyPoseController(3);
     c.playAttack(1);
@@ -162,7 +200,7 @@ describe('EnemyPoseController (ENEMY_ANIM_PLAN 3.2)', () => {
     run(c, 1);
     expect(CAST_OUT).toBe(10);
     expect(c.attackOutDone(0)).toBe(true);
-    expect(c.state(0)).toEqual({ pose: 'cast', dx: 0, dy: -6 });
+    expect(c.state(0)).toEqual({ pose: 'cast', dx: 0, dy: 0 });   // E15: planted
     c.playHurt(0);                                   // a hit never interrupts a cast
     expect(c.state(0).pose).toBe('cast');
     run(c, CAST_FRAMES - CAST_OUT - 1);

@@ -8,11 +8,14 @@
  */
 import { BitmapText, type Container } from 'pixi.js';
 import { NES_FONT } from '../../ui/NESFont.js';
+import { BATTLE_MESSAGE_HEIGHT } from './BattleSceneTypes.js';
 import { ATTACK_FRAMES, CAST_FRAMES, HURT_FRAMES, type EnemyPoseController } from './EnemyPoseController.js';
 
 export type PreviewMode = 'loop' | 'step';
 export const STAGGER = 20;
 export const PAUSE = 20;
+/** E18: the step label sits just below the battle message window (y 0 to BATTLE_MESSAGE_HEIGHT). */
+export const LABEL_POS = { x: 16, y: BATTLE_MESSAGE_HEIGHT + 8 } as const;
 
 export function parseEnemyAnim(search: string): { mode: PreviewMode; slow: number } | null {
   const q = new URLSearchParams(search);
@@ -109,7 +112,7 @@ export class EnemyAnimPreview {
     if (this.mode !== 'step') return;
     if (!this.label) {
       this.label = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 24, fill: 0xffff00 } });
-      this.label.position.set(16, 16);
+      this.label.position.set(LABEL_POS.x, LABEL_POS.y);
       parent.addChild(this.label);
     }
     this.label.text = `t ${this.clock}\n${this.labelText()}`;

@@ -42,22 +42,23 @@ const HURT: Seg[] = [
   { frame: 'hurt_in2', len: 3, from: -6, to: -3 },
   { frame: 'hurt_in1', len: 3, from: -3, to: 0 },
 ];
-/** Boss cast, dy in px; the spell resolves at the start of the hold. */
+/** Boss cast, dy in px: 0 throughout (E15: the feet stay on the plain; the in-betweens carry the motion with their feet
+ *  pinned). The spell resolves at the start of the hold. */
 const BOSS_CAST: Seg[] = [
-  { frame: 'cast_gather', len: 6, from: 0, to: -2 },
-  { frame: 'cast_rise', len: 4, from: -2, to: -6 },
-  { frame: 'cast', len: 10, from: -6, to: -6 },
-  { frame: 'cast_release', len: 4, from: -6, to: -6 },
-  { frame: 'cast_rise', len: 3, from: -6, to: -2 },
-  { frame: 'cast_gather', len: 3, from: -2, to: 0 },
+  { frame: 'cast_gather', len: 6, from: 0, to: 0 },
+  { frame: 'cast_rise', len: 4, from: 0, to: 0 },
+  { frame: 'cast', len: 10, from: 0, to: 0 },
+  { frame: 'cast_release', len: 4, from: 0, to: 0 },
+  { frame: 'cast_rise', len: 3, from: 0, to: 0 },
+  { frame: 'cast_gather', len: 3, from: 0, to: 0 },
 ];
-/** D4: a non-boss cast plays its attack frames without the lunge (dy only). */
+/** D4: a non-boss cast plays its attack frames in place (no lunge; E15: no lift either). */
 const PLAIN_CAST: Seg[] = [
   { frame: 'atk_wind1', len: 5, from: 0, to: 0 },
-  { frame: 'atk_wind2', len: 6, from: 0, to: -6 },
-  { frame: 'attack', len: 10, from: -6, to: -6 },
-  { frame: 'atk_follow', len: 4, from: -6, to: -3 },
-  { frame: 'atk_recover', len: 5, from: -3, to: 0 },
+  { frame: 'atk_wind2', len: 6, from: 0, to: 0 },
+  { frame: 'attack', len: 10, from: 0, to: 0 },
+  { frame: 'atk_follow', len: 4, from: 0, to: 0 },
+  { frame: 'atk_recover', len: 5, from: 0, to: 0 },
 ];
 
 const total = (segs: Seg[]): number => segs.reduce((n, s) => n + s.len, 0);
@@ -95,7 +96,8 @@ function sample(segs: Seg[], t: number): { frame: MonsterFrame; v: number } {
   for (const s of segs) {
     if (t < start + s.len) {
       const local = Math.max(0, t - start);
-      const shake = s.shake ? (Math.floor(local / 2) % 2 === 0 ? s.shake : -s.shake) : 0;
+      // E14: the first shake frame recoils further (away from the party), then back toward it
+      const shake = s.shake ? (Math.floor(local / 2) % 2 === 0 ? -s.shake : s.shake) : 0;
       return { frame: s.frame, v: s.from + (s.to - s.from) * ease(local / s.len, s.ease) + shake };
     }
     start += s.len;
@@ -120,10 +122,11 @@ export function castAt(t: number, hasCast: boolean): FrameAt {
 }
 
 /** Lethal hit: the hurt in-phase, easing from wherever the enemy was (mid-lunge, mid-cast) to the dying offset, then
- *  `hurt` held with no shake while the sprite fades. */
-export function dyingAt(t: number, from: { dx: number; dy: number }): FrameAt {
+ *  `hurt` held with no shake while the sprite fades. E13: `start` is where the in-phase begins (the pose on screen when
+ *  the hit landed: `hurt` → DYING_IN, `hurt_in2` → HURT_REHIT_AT, else 0), so a dying enemy never steps back a pose. */
+export function dyingAt(t: number, from: { dx: number; dy: number }, start = 0): FrameAt {
   if (t >= DYING_IN) return { frame: 'hurt', dx: DYING_DX, dy: 0 };
-  const k = t / DYING_IN;
+  const k = Math.max(0, (t - start) / (DYING_IN - start));
   return { frame: hurtAt(t).frame, dx: from.dx + (DYING_DX - from.dx) * k, dy: from.dy * (1 - k) };
 }
 

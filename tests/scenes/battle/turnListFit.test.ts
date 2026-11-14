@@ -42,7 +42,7 @@ function run(actorName: string, targetName: string, messages: string[], extra: E
     isOver: false,
     get actionQueueLength() { return queued; },
     peekNextAction: () => (queued > 0 ? { actorId: 'enemy_0', actorName, actionType: 'fight', targetId: 'party_0', targetName, ...extra } : null),
-    isNextActorAlive: () => true,
+    isNextActorAlive: () => true, nextActorLosesTurn: vi.fn(() => false),
     executeNextAction: () => {
       queued = 0;
       return { done: true, damageEvents: [], messages: messages.map(text => ({ text })), missed: false };

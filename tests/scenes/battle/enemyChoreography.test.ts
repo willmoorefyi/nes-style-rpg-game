@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
-  ATTACK_CONTACT, ATTACK_FRAMES, BOSS_FRAMES, CAST_FRAMES, DYING_DX, FRAME_SOURCE, HURT_FRAMES, MONSTER_FRAMES,
+  ATTACK_CONTACT, ATTACK_FRAMES, BOSS_FRAMES, CAST_FRAMES, DYING_DX, DYING_IN, FRAME_SOURCE, HURT_FRAMES, HURT_HOLD_START,
+  HURT_REHIT_AT, MONSTER_FRAMES,
   PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame, lungePx, type FrameAt, type MonsterFrame,
 } from '../../../src/scenes/battle/enemyChoreography.js';
 import { EnemyPoseController } from '../../../src/scenes/battle/EnemyPoseController.js';
@@ -39,11 +40,11 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(frames((t) => attackAt(t, L), ATTACK_FRAMES).every((f) => f.dy === 0)).toBe(true);
   });
 
-  it('hurt: 20 frames, two poses into and out of the recoil; -6 hold with a +-3 shake every 2 frames', () => {
+  it('hurt: 20 frames, two poses into and out of the recoil; -6 hold with a -+3 shake every 2 frames (E14: away first)', () => {
     expect(HURT_FRAMES).toBe(20);
     const fs = frames(hurtAt, HURT_FRAMES);
     expect(runs(fs)).toEqual([['hurt_in1', 2], ['hurt_in2', 2], ['hurt', 10], ['hurt_in2', 3], ['hurt_in1', 3]]);
-    expect(fs.slice(4, 14).map((f) => f.dx)).toEqual([-3, -3, -9, -9, -3, -3, -9, -9, -3, -3]);
+    expect(fs.slice(4, 14).map((f) => f.dx)).toEqual([-9, -9, -3, -3, -9, -9, -3, -3, -9, -9]);
     expect(fs[2].dx).toBeCloseTo(-3);
     expect(hurtAt(HURT_FRAMES).dx).toBe(0);
   });
@@ -57,15 +58,14 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     for (let k = 1; k < eased.length; k++) expect(eased[k]).toBeLessThan(eased[k - 1]);
   });
 
-  it('boss cast: 30 frames, resolves at the start of the hold (10); only dy moves', () => {
+  it('boss cast: 30 frames, resolves at the start of the hold (10); planted (E15)', () => {
     expect(CAST_FRAMES).toBe(30);
     expect(castOut(true)).toBe(10);
     const fs = frames((t) => castAt(t, true), CAST_FRAMES);
     expect(runs(fs)).toEqual([['cast_gather', 6], ['cast_rise', 4], ['cast', 10], ['cast_release', 4], ['cast_rise', 3],
       ['cast_gather', 3]]);
-    expect(fs[6].dy).toBeCloseTo(-2);
-    expect(fs[10].dy).toBe(-6);
-    expect(fs.every((f) => f.dx === 0)).toBe(true);
+    expect(fs[6].dy).toBe(0);
+    expect(fs[10].dy).toBe(0);
   });
 
   it('non-boss cast (D4): the attack frames without mid, no lunge, resolving at 11', () => {
@@ -73,8 +73,29 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(castOut(false)).toBe(11);
     const fs = frames((t) => castAt(t, false), PLAIN_CAST_FRAMES);
     expect(runs(fs)).toEqual([['atk_wind1', 5], ['atk_wind2', 6], ['attack', 10], ['atk_follow', 4], ['atk_recover', 5]]);
-    expect(fs[11].dy).toBe(-6);
-    expect(fs.every((f) => f.dx === 0)).toBe(true);
+    expect(fs[11].dy).toBe(0);
+  });
+
+  it('E15: casts never move the sprite (dx = dy = 0 on every frame, boss and plain), so the feet stay on the plain', () => {
+    for (const hasCast of [true, false]) {
+      for (const f of frames((t) => castAt(t, hasCast), 35)) expect(f, `${hasCast} ${f.frame}`).toMatchObject({ dx: 0, dy: 0 });
+    }
+  });
+
+  it('E14: the first hold frame recoils further (away from the party) than the last in-phase frame', () => {
+    const fs = frames(hurtAt, HURT_FRAMES);
+    const lastIn = fs[HURT_HOLD_START - 1].dx;
+    expect(fs[HURT_HOLD_START].dx).toBeLessThan(lastIn);
+    // monotone away from the party into the hold: never a step back toward it before the first shake swing
+    for (let t = 1; t <= HURT_HOLD_START; t++) expect(fs[t].dx).toBeLessThanOrEqual(fs[t - 1].dx);
+  });
+
+  it('E13: dyingAt with a start never shows an earlier in-phase pose and eases from the start', () => {
+    for (let t = DYING_IN; t < DYING_IN + 30; t++) expect(dyingAt(t, { dx: -9, dy: 0 }, DYING_IN).frame).toBe('hurt');
+    const ret = frames((t) => dyingAt(t + HURT_REHIT_AT, { dx: -5, dy: 0 }, HURT_REHIT_AT), 30);
+    expect(new Set(names(ret))).toEqual(new Set(['hurt_in2', 'hurt']));
+    expect(ret[0].dx).toBe(-5);
+    for (let k = 1; k < ret.length; k++) expect(Math.abs(ret[k].dx - ret[k - 1].dx)).toBeLessThanOrEqual(3);
   });
 
   it('every frame name used is in MONSTER_FRAMES / BOSS_FRAMES, with a keyframe source', () => {
@@ -109,7 +130,7 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     const dx: number[] = [];
     for (let t = 0; t < HURT_FRAMES; t++) { dx.push(c.state(0).dx); c.update(1); }
     for (const v of dx) expect(Number.isInteger(v)).toBe(true);
-    // the hold is round((-6 +- 3) * 0.5): -1.5 -> -1, -4.5 -> -4
-    expect(dx.slice(4, 8)).toEqual([-1, -1, -4, -4]);
+    // the hold is round((-6 -+ 3) * 0.5): -4.5 -> -4, then -1.5 -> -1
+    expect(dx.slice(4, 8)).toEqual([-4, -4, -1, -1]);
   });
 });

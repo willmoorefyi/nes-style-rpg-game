@@ -11,6 +11,8 @@ import { ENEMY_LIST_LINE, groupEnemies } from '../../../src/scenes/battle/enemyL
 import { Window } from '../../../src/ui/Window.js';
 import { Character } from '../../../src/entities/Character.js';
 import { CHAR_WIDTH, FONT_SIZE, GAME_WIDTH } from '../../../src/core/LayoutConstants.js';
+import { EnemyPoseController } from '../../../src/scenes/battle/EnemyPoseController.js';
+import type { AiEnemyView } from '../../../src/scenes/battle/AiEnemyView.js';
 import type { BattleStateMachine } from '../../../src/battle/BattleStateMachine.js';
 import type { CharacterClassData } from '../../../src/types/index.js';
 
@@ -114,5 +116,27 @@ describe('BA-8: the party panel', () => {
     const { dm } = manager(foes([['Goblin', 1]]), members);
     expect(dm.partyPanel.rows).toHaveLength(4);
     expect('statusBoxes' in dm).toBe(false);
+  });
+});
+
+describe('E17: a death with no damage event', () => {
+  it('an enemy whose HP reaches 0 without a damage event enters dying (hurt_in1, then held hurt; never idle)', () => {
+    const enemies = foes([['Goblin', 2]]);
+    const { dm } = manager(enemies);
+    const poses = new EnemyPoseController(2);
+    dm.enemyView = { poses } as unknown as AiEnemyView;
+    dm.enemySprites.push(new Container(), new Container());
+    enemies[1].currentHp = 0;                 // e.g. a lethal poison tick: no damage event, so no reactEnemy
+    const dying = new Map<number, number>();
+    dm.updateEnemySprites(dying);
+    expect(dying.has(1)).toBe(true);
+    expect(poses.state(1).pose).toBe('hurt_in1');
+    const seen = new Set<string>();
+    for (let f = 0; f < 30; f++) { poses.update(1); seen.add(poses.state(1).pose); }
+    expect(poses.state(1)).toEqual({ pose: 'hurt', dx: -6, dy: 0 });
+    expect(seen.has('idle_b') || seen.has('idle')).toBe(false);
+    expect(poses.state(0).pose).toBe('idle');   // the living enemy is untouched
+    dm.updateEnemySprites(dying);               // the fade is already running: no restart
+    expect(poses.state(1).pose).toBe('hurt');
   });
 });

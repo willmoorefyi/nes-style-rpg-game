@@ -21,6 +21,7 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
   } as unknown as BattleDisplayManager;
   const enemies = [{ displayName: 'Goblin A', currentHp: 10 }, { displayName: 'Goblin B', currentHp: 10 }];
   let queued = 1;
+  let executed = 0;
   const battle = {
     allEnemies: enemies,
     get livingEnemies() { return enemies.filter((e) => e.currentHp > 0); },
@@ -29,7 +30,9 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
     get actionQueueLength() { return queued; },
     peekNextAction: () => (queued > 0 ? action : null),
     isNextActorAlive: () => true,
+    nextActorLosesTurn: vi.fn(() => false),
     executeNextAction: () => {
+      executed++;
       queued = 0;
       for (const e of events) if (e.targetId.startsWith('enemy_')) enemies[Number(e.targetId.split('_')[1])].currentHp = enemyHpAfter;
       return { done: true, damageEvents: events, messages: [], missed: false };
@@ -43,7 +46,7 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
     () => {}, onResolveRound);
   /** One scene frame: the scene ticks display (poses) and the animation controller. */
   const tick = (n = 1) => { for (let i = 0; i < n; i++) { poses.update(1); ctrl.updateAnimating(1); } };
-  return { ctrl, poses, tick, enemies, partySprites, enemySprites, onResolveRound };
+  return { ctrl, poses, tick, enemies, partySprites, enemySprites, onResolveRound, battle, executed: () => executed };
 }
 
 /** Idle breathes (idle / idle_b) once a sequence is over. */
@@ -93,6 +96,23 @@ describe('monster poses in the battle flow (preview art)', () => {
     s.ctrl.spawnFloatingTextsFromEvents([hit('enemy_0', 5, true), hit('enemy_1', 0)]);
     expect(s.poses.state(0).pose).toBe('idle');
     expect(s.poses.state(1).pose).toBe('idle');
+  });
+
+  it('E1: a sleeping enemy does not wind up or lunge on its lost turn', () => {
+    for (const actionType of ['fight', 'magic']) {
+      const s = setup({ actorId: 'enemy_0', actorName: 'Goblin A', actionType }, []);
+      vi.mocked(s.battle.nextActorLosesTurn).mockReturnValue(true);
+      s.tick(30);                       // announce; its last frame would start the lunge
+      expect(s.ctrl.animPhase).toBe('execute');
+      expect(s.poses.isAttacking(0)).toBe(false);
+      expect(s.poses.state(0)).toMatchObject({ pose: 'idle', dx: 0, dy: 0 });
+      expect(s.executed()).toBe(0);
+      s.tick(1);                        // executeNextAction runs on the next tick
+      expect(s.executed()).toBe(1);
+      s.tick(40);
+      expect(s.poses.state(0)).toMatchObject({ dx: 0, dy: 0 });
+      expect(s.ctrl.animPhase).toBe('round_end');
+    }
   });
 
   it('normal play (no preview view): enemies resolve straight away, as before', () => {

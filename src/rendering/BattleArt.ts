@@ -56,6 +56,8 @@ export class BattleArt {
   private tex: Texture | null = null;
   private loading: Promise<void> | null = null;
   private done = false;
+  /** Sprites already reported missing from a loaded atlas (one warning each). */
+  private readonly warned = new Set<string>();
 
   /** True once loading has been attempted (art may still be missing: battles then use placeholder boxes). */
   get isLoaded(): boolean {
@@ -65,6 +67,11 @@ export class BattleArt {
   /** Pose frames for a monster sprite, or null when it has no approved art (placeholder box). */
   getMonsterFrames(sprite: string): MonsterFrames | null {
     const entry = this.meta?.sheets[sprite];
+    // E16: the atlas is loaded but lacks this sheet: say so once (before the load this is the late-load path, A15)
+    if (this.meta && !entry && !this.warned.has(sprite)) {
+      this.warned.add(sprite);
+      console.warn(`Monster art: no sheet for "${sprite}" in ${MONSTER_ATLAS}.json; using a placeholder box`);
+    }
     if (!entry || !this.tex || !this.meta) return null;
     const source = this.tex.source;
     const s = this.meta.scale;

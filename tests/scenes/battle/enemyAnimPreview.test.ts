@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { EnemyAnimPreview, PAUSE, STAGGER, parseEnemyAnim, schedule } from '../../../src/scenes/battle/enemyAnimPreview.js';
+import { Container } from 'pixi.js';
+import { EnemyAnimPreview, LABEL_POS, PAUSE, STAGGER, parseEnemyAnim, schedule } from '../../../src/scenes/battle/enemyAnimPreview.js';
+import { BATTLE_MESSAGE_HEIGHT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { ATTACK_FRAMES, CAST_FRAMES, EnemyPoseController, HURT_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
 
 function target(count: number, boss = (_i: number) => false) {
@@ -63,6 +65,17 @@ describe('enemy animation preview (dev ?enemyAnim=)', () => {
     expect(p.time).toBe(13);
     expect(t.poses.state(0).pose).toBe('atk_mid');
     expect(p.labelText()).toBe('E0: atk_mid / 13');
+  });
+
+  it('E18: the step label sits below the message window (y 0 to BATTLE_MESSAGE_HEIGHT)', () => {
+    expect(LABEL_POS.y).toBeGreaterThanOrEqual(BATTLE_MESSAGE_HEIGHT);
+    const parent = new Container();
+    const p = new EnemyAnimPreview('step', 1, target(1), new Keys());
+    p.showLabel(parent);
+    expect(parent.children).toHaveLength(1);
+    expect(parent.children[0].position).toMatchObject({ x: LABEL_POS.x, y: LABEL_POS.y });
+    p.dispose();
+    expect(parent.children).toHaveLength(0);
   });
 
   it('the keydown listener is removed on exit', () => {

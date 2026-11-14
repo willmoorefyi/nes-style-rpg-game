@@ -11,7 +11,7 @@
  */
 import {
   ATTACK_CONTACT, ATTACK_FRAMES, CAST_FRAMES, DEFAULT_LUNGE_PX, HURT_FRAMES, HURT_HOLD_END, HURT_HOLD_START,
-  HURT_REHIT_AT, PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame,
+  DYING_IN, HURT_REHIT_AT, PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame,
   type FrameAt, type MonsterFrame, type MonsterKeyframe,
 } from './enemyChoreography.js';
 
@@ -41,6 +41,8 @@ interface EnemyState extends EnemyAnimConfig {
   freeze: Freeze;
   /** Unscaled offset when the lethal hit landed (dying eases from it). */
   from: { dx: number; dy: number };
+  /** Where in the dying in-phase it began (E13). */
+  start: number;
 }
 
 export interface PoseState {
@@ -57,7 +59,7 @@ export class EnemyPoseController {
 
   constructor(count: number) {
     this.states = Array.from({ length: count }, () => ({ ...DEFAULTS, mode: 'idle' as Mode, t: 0, freeze: 'none' as Freeze,
-      from: { dx: 0, dy: 0 } }));
+      from: { dx: 0, dy: 0 }, start: 0 }));
   }
 
   /** Per-enemy art facts (from the atlas) and layout scale. */
@@ -102,16 +104,16 @@ export class EnemyPoseController {
     s.t = s.t < HURT_HOLD_END ? HURT_HOLD_START : HURT_REHIT_AT;
   }
 
-  /** Lethal hit (unconditional, so it may land mid-lunge): ease into the held hurt pose while the sprite fades. */
+  /** Lethal hit (unconditional, so it may land mid-lunge): ease into the held hurt pose while the sprite fades.
+   *  E13: it starts from the pose on screen (never an earlier in-phase pose); E17: a second call is a no-op. */
   freezeDying(i: number): void {
     const s = this.states[i];
-    if (!s) return;
-    if (s.mode !== 'dying') {
-      const cur = this.raw(s);
-      s.from = { dx: cur.dx, dy: cur.dy };
-    }
+    if (!s || s.mode === 'dying') return;
+    const cur = this.raw(s);
+    s.from = { dx: cur.dx, dy: cur.dy };
+    s.start = cur.frame === 'hurt' ? DYING_IN : cur.frame === 'hurt_in2' ? HURT_REHIT_AT : 0;
     s.mode = 'dying';
-    s.t = 0;
+    s.t = s.start;
   }
 
   /** The lunge has reached the party side (or the spell its hold): the action can resolve now. */
@@ -154,7 +156,7 @@ export class EnemyPoseController {
       case 'attack': return attackAt(s.t, s.lungePx);
       case 'cast': return castAt(s.t, s.hasCast);
       case 'hurt': return hurtAt(s.t);
-      case 'dying': return dyingAt(s.t, s.from);
+      case 'dying': return dyingAt(s.t, s.from, s.start);
       default: return { frame: idleFrame(this.clock, this.states.indexOf(s), s.breath, s.freeze !== 'none'), dx: 0, dy: 0 };
     }
   }
