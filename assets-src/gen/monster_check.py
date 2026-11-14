@@ -20,6 +20,13 @@ def palette(keyframes: dict[str, Image.Image]) -> set:
     return cols
 
 
+def _per_foot(f: dict) -> dict | None:
+    """Part-label maps for the per-foot feet check (frame, pixel source, target keyframe), or None (no rig labels)."""
+    if f.get("labels") is None or f.get("src_labels") is None:
+        return None
+    return {"frame": f["labels"], "src": f["src_labels"], "toward": f.get("toward_labels"), "parts": f["foot_parts"]}
+
+
 def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str, dict], meta: dict, allowed: set) -> list[str]:
     a = f["img"]
     S = arrs[f["src"]]
@@ -29,7 +36,8 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     if f["labels"] is not None:
         out += C.seam_gaps(a, f["labels"], f.get("seam_tolerance", 0), f.get("pairs"))
     out += C.silhouette(a, S, T, f["u"], cell_h) + C.outline_kept(a, S)
-    out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], bool(meta.get("floating")), 1 if name == "idle_b" else 0)
+    out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], bool(meta.get("floating")), 1 if name == "idle_b" else 0,
+                  f.get("contact"), _per_foot(f))
     out += C.clipping(a) + C.rotation_cap(f["rots"]) + C.whole_pixel(f["joints"])
     if name != "idle_b":
         out += C.near_keyframe(f["u"])

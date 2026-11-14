@@ -113,7 +113,9 @@ def lock_path(sprite: str) -> Path:
 def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
     h = cfg.get("attack_hand", "n")
     cast_h = cfg.get("cast_hand", "n")
-    cloth = [j for p in rig.parts.values() if p["kind"] == "cloth" for j in p.get("chain", [])[1:]]
+    cloth = list(dict.fromkeys(j for p in rig.parts.values() if p["kind"] == "cloth"
+                               for c in (p["chain"].values() if isinstance(p.get("chain"), dict) else [p.get("chain", [])])
+                               for j in c[1:]))
     arm = [a.format(h=h) for a in ARM]
     if rig.moves:                                          # beast templates (rig_templates.py) name their own sets
         moves = {"all": "all", **{k: v + cloth for k, v in rig.moves.items()}}[r["moves"]]
@@ -141,7 +143,7 @@ def _warp_width(d: dict, mask: np.ndarray, chain: list) -> float:
 def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: dict) -> dict[str, dict]:
     """Every generated frame of a rigged sprite: {name: {img, labels, parts, u, src, toward, joints, rots, pinned,
     prop_px}}. Held frames are skipped (the atlas aliases them to their source keyframe)."""
-    from gen import puppet as PU
+    from gen import anim_feet as AF, puppet as PU
     from gen import rig as R
     from gen import rig_render as RR
     cell = keyframes["idle"].size
@@ -151,6 +153,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     segs = {k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes}
     holds = {h["frame"] for h in cfg.get("holds") or []}
     pairs = rig.joined_pairs()
+    foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
+                  for ft in rig.feet}
     has_cast = "cast" in keyframes
     out: dict[str, dict] = {}
     if cfg.get("breath", True) and "idle_b" not in holds:
@@ -219,8 +223,13 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         for p in rig.parts:
             if rig.parts[p]["kind"] == "prop":
                 prop_px[p] = int((labels == list(rig.parts).index(p)).sum())
+        pinned = r["pins"] in ("legs", "feet")
         out[name] = {"img": img, "labels": labels, "src": r["src"], "toward": r["toward"], "u": u, "joints": J,
-                     "rots": rots, "pinned": r["pins"] in ("legs", "feet"), "prop_px": prop_px,
+                     "rots": rots, "pinned": pinned, "prop_px": prop_px,
+                     "contact": AF.contact_mask(rig, r["src"], segs[r["src"]], pins, meta["bottom_row"]) if pinned
+                     and set(rig.feet) - set(pins) else None,
+                     "src_labels": lab, "foot_parts": foot_parts,
+                     "toward_labels": out[r["toward"]]["labels"] if r["toward"] in out else segs.get(r["toward"], (None,))[0],
                      "carried": carried, "pairs": pairs, "seam_tolerance": int(cfg.get("seam_tolerance", 0))}
     return out
 

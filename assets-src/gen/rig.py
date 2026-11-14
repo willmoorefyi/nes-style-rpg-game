@@ -12,6 +12,7 @@ import math
 import numpy as np
 from PIL import Image, ImageDraw
 
+from gen import rig_ik as RI
 from gen.rig_templates import BEASTS
 
 # joint -> parent, rooted at the hip (biped template)
@@ -73,7 +74,8 @@ class Rig:
                 continue
             base = self.parts.get(name, {"kind": "rigid", "radius": 3.0 * scale})
             self.parts[name] = {**base, **p}
-            bones = p.get("bone") if isinstance(p.get("bone"), dict) else {"*": p.get("chain") or p.get("bone") or []}
+            given = p.get("chain") or p.get("bone") or []
+            bones = given if isinstance(given, dict) else {"*": given}
             for joints in bones.values():                 # a prop may sit on other joints per keyframe
                 for a, b in zip(joints, joints[1:]):
                     self.parent.setdefault(b, a)
@@ -209,12 +211,13 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
     for j, dv in (tweaks or {}).items():
         if j in out:
             out[j] = (out[j][0] + dv[0], out[j][1] + dv[1])
+    out = RI.keep_reach(rig, S, out, set(pins), fixed)
     ground = max((S[f][1] for f in rig.feet if f in S), default=1e9) if grounded else 1e9
     for h, k, f in rig.limbs:
         if not all(j in out for j in (h, k, f)) or k in pins:
             continue
         if f in pins or out[f][1] > ground:              # keep the shin's length to a held / grounded foot
-            out[k], out[f] = _ik(out[h], (out[f][0], min(out[f][1], ground)), S[h], S[k], S[f])
+            out[k], out[f] = RI.ik(out[h], (out[f][0], min(out[f][1], ground)), S[h], S[k], S[f])
             fixed |= {k, f}
     follow: set[str] = set()                               # children (e.g. toes) of pinned / IK-moved joints keep
     for j in rig.order:                                    # their solved offset from the parent (plus own tweak)
@@ -224,17 +227,6 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
             out[j] = (out[p][0] + base[j][0] - base[p][0] + tw[0], out[p][1] + base[j][1] - base[p][1] + tw[1])
             follow.add(j)
     return {j: (float(np.rint(v[0])), float(np.rint(v[1]))) for j, v in out.items()}
-
-
-def _ik(hip, foot, sh, sk, sf) -> tuple[tuple[float, float], tuple[float, float]]:
-    """Two-bone IK: the knee for `foot` with the source thigh / shin lengths, bent to the source knee's side."""
-    l1, l2 = math.hypot(sk[0] - sh[0], sk[1] - sh[1]), math.hypot(sf[0] - sk[0], sf[1] - sk[1])
-    d = min(math.hypot(foot[0] - hip[0], foot[1] - hip[1]), l1 + l2 - 1e-6)
-    base = math.atan2(foot[1] - hip[1], foot[0] - hip[0])
-    side = 1.0 if (sf[0] - sh[0]) * (sk[1] - sh[1]) - (sf[1] - sh[1]) * (sk[0] - sh[0]) >= 0 else -1.0
-    bend = math.acos(max(-1.0, min(1.0, (l1 * l1 + d * d - l2 * l2) / max(2 * l1 * d, 1e-9))))
-    knee = (hip[0] + l1 * math.cos(base + side * bend), hip[1] + l1 * math.sin(base + side * bend))
-    return knee, (hip[0] + d * math.cos(base), hip[1] + d * math.sin(base))
 
 
 def part_rotation(rig: Rig, part: str, kf: str, S: dict, out: dict) -> float:

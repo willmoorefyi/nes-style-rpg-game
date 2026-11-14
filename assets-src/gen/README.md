@@ -84,4 +84,8 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
   must release the forepaws in `frames: {hurt_in1: {pins: [foot_n, foot_f]}, hurt_in2: {pins: [foot_n, foot_f]}}`,
   otherwise the forelegs hold the chest down.
 - Mark the toes: a paw part then rides its pinned ankle without rotating, so it stays on the ground line.
+- A pinned foot never moves: when the hip would rise out of the leg's reach, `rig.solve` moves the body toward the
+  foot instead of letting the IK lift it.
+- A `cloth` part may give its `chain` per keyframe (`chain: {idle: [...], attack: [...]}`); its joints join the wind
+  and cast move sets like a plain chain.
 - `breath_joint:` moves the `idle_b` cut (default `hip`).

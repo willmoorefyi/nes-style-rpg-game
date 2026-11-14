@@ -365,7 +365,9 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
    - Opaque area is 0.85-1.15 of S.
    - Bbox height is within ±4 px per 80 px of cell height (±4 small, ±6 large, ±10 boss) of the S→T lerp.
    - For **adjacent frames of the runtime sequence** (feet-aligned): `IoU ≥ min(0.55, IoU(spanning keyframe pair) +
-     0.10)`. The centroid moves at most `max(cap, 0.5 × keyframe centroid shift)`, with cap = 6 native px per 80 px
+     0.02)`: in-betweens must not pop worse than the approved keyframes themselves (orchestrator decision during T4/T5b;
+     the earlier +0.10 was unreachable for pairs overlapping 0.42-0.51 with the legs pinned to different keyframes on
+     each side). The centroid moves at most `max(cap, 0.5 × keyframe centroid shift)`, with cap = 6 native px per 80 px
      of cell. The "spanning pair" is the two keyframes whose span the step lies on, e.g. idle→hurt for
      `hurt_in1`→`hurt_in2`.
 
@@ -380,7 +382,8 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
    | wolf | hurt 0.40 | - |
    | garland | - | cast 27.8 |
 
-   With a fixed 0.55 these legitimate keyframe pairs would fail, which is why the threshold is relative. T0 recomputes
+   With a fixed 0.55 these legitimate keyframe pairs would fail, which is why the threshold is relative (the pair's
+   IoU + 0.02, capped at 0.55). T0 recomputes
    this table for all sprites and prints it from `check --all --calibrate`.
 7. **Outline.**
    - The second-ring ratio is within ±0.08 of S (puppet's metric).
@@ -389,6 +392,12 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
    - For grounded sprites, the lowest opaque row equals `bottom_row` in every frame.
    - Frames with pinned feet keep the foot pixels within ±1 px of S. Other frames keep them within ±2 px of the S→T
      lerp.
+   - Judged **per foot** where the rig labels exist: a foot's pixels are the bottom 3 rows drawn by the parts ending on
+     that foot joint. A foot lifted (no pixels in the bottom 3 rows) in either keyframe of the span is skipped; a foot
+     grounded in its source stays pinned exactly (±1).
+   - A pinned frame that releases feet (a rearing hurt: `pins: [foot_n, foot_f]` on a quadruped) is judged on the
+     ground contact of the paws it keeps: nothing below the plain, each kept paw keeps its ground row and x extent
+     (±1); the released paws may leave the bottom rows.
    - Floating sprites keep their one shared offset.
 9. **No clipping.** No opaque pixel in the outer 1 px border of the cell.
 10. **Rotation cap and near-keyframe rule.**

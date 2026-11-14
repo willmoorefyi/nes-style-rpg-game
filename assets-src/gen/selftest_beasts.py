@@ -24,7 +24,14 @@ Q_HURT = {**Q_IDLE, "back": (49, 35), "chest": (68, 34), "neck": (73, 25), "head
           "tail1": (18, 38), "tail2": (12, 36), "tail_tip": (7, 32), "sh_n": (69, 40), "el_n": (72, 56),
           "paw_n": (71, 72), "ftoe_n": (75, 74), "sh_f": (63, 40), "el_f": (59, 56), "paw_f": (61, 72), "ftoe_f": (65, 74)}
 QUAD = {"sprite": "synthetic_quad", "body": "quadruped", "facing": "right",
-        "keyframes": {"idle": Q_IDLE, "attack": Q_ATTACK, "hurt": Q_HURT}, "colors": {}}
+        "keyframes": {"idle": Q_IDLE, "attack": Q_ATTACK, "hurt": Q_HURT}, "colors": {},
+        "frames": {"atk_mid": {"tweaks": {"paw_f": [-3, 0], "ftoe_f": [-3, 0]}}}}   # far forepaw on its lerp (check 8)
+# a rearing hurt (wolf, dragon): chest up, both forepaws off the ground; only the hind paws stay grounded
+Q_REAR = {**Q_IDLE, "back": (42, 30), "chest": (50, 18), "neck": (58, 12), "head": (66, 9), "snout": (78, 12),
+          "sh_n": (54, 24), "el_n": (64, 32), "paw_n": (70, 42), "ftoe_n": (74, 44),
+          "sh_f": (48, 24), "el_f": (58, 34), "paw_f": (64, 44), "ftoe_f": (68, 46)}
+REAR = {**QUAD, "sprite": "synthetic_rear", "keyframes": {**QUAD["keyframes"], "hurt": Q_REAR},
+        "frames": {"hurt_in1": {"t": 0.25, "pins": ["foot_n", "foot_f"]}, "hurt_in2": {"t": 0.25, "pins": ["foot_n", "foot_f"]}}}
 
 B_IDLE = {"hip": (36, 52), "chest": (48, 44), "neck": (52, 34), "head": (55, 24), "beak": (63, 26),
           "tail0": (28, 50), "tail1": (20, 44), "tail2": (16, 34), "tail_tip": (12, 26),
@@ -81,6 +88,37 @@ def render(cfg: dict) -> dict[str, dict]:
     return MA.generate(cfg["sprite"], cfg, keyframes(cfg), META)
 
 
+FEET_ERRS = ("lowest opaque row", "feet x", "no foot pixels", "below the plain", "kept paw")
+
+
+def run_rearing(check: Callable[[bool, str], None]) -> None:
+    """Check 8 judges a frame that releases feet (a rearing hurt_in1 / hurt_in2) on the ground contact of the paws it
+    keeps pinned in its pixel source: the forepaws may leave the bottom rows, the pinned hind paws may not move."""
+    from gen import anim_checks as C
+    from gen import monster_check as MC
+    kfs = keyframes(REAR)
+    gen = render(REAR)
+    rep = MC.check_sprite(REAR["sprite"], REAR, kfs, META, gen, with_lock=False)
+    for name in ("hurt_in1", "hurt_in2"):
+        f = gen[name]
+        S = REAR["keyframes"][f["src"]]
+        up = all(f["joints"][p][1] < Q_IDLE[p][1] for p in ("paw_n", "paw_f"))
+        check(up and all(f["joints"][p] == S[p] for p in ("foot_n", "foot_f")),
+              f"rearing {name}: forepaws off the ground, hind feet pinned to {f['src']}")
+        bad = [e for e in rep[name] if e.startswith(FEET_ERRS)]
+        check(not bad, f"rearing {name}: feet judged on the pinned paws' ground contact {bad}")
+    f = gen["hurt_in1"]
+    src = np.asarray(kfs["idle"])
+    contact = f.get("contact")
+    lifted = np.roll(f["img"], -1, 0)
+    check(bool(C.feet(lifted, src, src, f["u"], 76, True, False, contact=contact)) if contact is not None else False,
+          "rearing hurt_in1 with the pinned hind paws lifted 1 px fails")
+    low = f["img"].copy()
+    low[77, 2] = (*FUR[:3], 255)
+    check(bool(C.feet(low, src, src, f["u"], 76, True, False, contact=contact)) if contact is not None else False,
+          "rearing hurt_in1 with a pixel below the plain fails")
+
+
 def run_beasts(check: Callable[[bool, str], None]) -> None:
     from gen import monster_check as MC
     from gen import rig as R
@@ -110,6 +148,7 @@ def run_beasts(check: Callable[[bool, str], None]) -> None:
         src = idle[..., 3] > 0                          # (joint-crack closing may add ink; no source pixel may change)
         lost = int((src & (zero != idle).any(2)).sum())
         check(lost == 0, f"{body}: hurt_in1 at t = 0 keeps every idle pixel ({lost} of {int(src.sum())} lost or changed)")
+    run_rearing(check)
     try:
         R.Rig({**QUAD, "body": "serpent"}, (110, 80))
         check(False, "an unknown body template is rejected")

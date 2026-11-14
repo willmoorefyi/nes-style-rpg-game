@@ -1,0 +1,121 @@
+sprite: wolf
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [38, 42]
+    back: [54, 37]
+    chest: [69, 38]
+    neck: [76, 33]
+    head: [83, 29]
+    snout: [101, 38]
+    tail0: [33, 37]
+    tail1: [25, 35]
+    tail2: [17, 32]
+    tail_tip: [10, 28]
+    sh_n: [64, 46]
+    el_n: [64, 61]
+    paw_n: [65, 71]
+    ftoe_n: [70, 75]
+    sh_f: [73, 47]
+    el_f: [77, 62]
+    paw_f: [82, 70]
+    ftoe_f: [86, 72]
+    hip_n: [36, 47]
+    knee_n: [29, 57]
+    foot_n: [30, 70]
+    toe_n: [34, 74]
+    hip_f: [45, 47]
+    knee_f: [46, 60]
+    foot_f: [50, 68]
+    toe_f: [53, 71]
+  attack:
+    hip: [36, 43]
+    back: [50, 34]
+    chest: [65, 28]
+    neck: [76, 24]
+    head: [84, 20]
+    snout: [105, 28]
+    tail0: [28, 40]
+    tail1: [20, 39]
+    tail2: [12, 37]
+    tail_tip: [4, 33]
+    sh_n: [72, 38]
+    el_n: [84, 50]
+    paw_n: [93, 57]
+    ftoe_n: [93, 62]
+    sh_f: [80, 41]
+    el_f: [92, 46]
+    paw_f: [102, 49]
+    ftoe_f: [106, 52]
+    hip_n: [34, 47]
+    knee_n: [22, 58]
+    foot_n: [14, 69]
+    toe_n: [15, 74]
+    hip_f: [42, 49]
+    knee_f: [33, 60]
+    foot_f: [28, 69]
+    toe_f: [27, 73]
+  hurt:
+    hip: [45, 52]
+    back: [44, 36]
+    chest: [50, 22]
+    neck: [60, 15]
+    head: [70, 10]
+    snout: [92, 19]
+    tail0: [37, 56]
+    tail1: [30, 61]
+    tail2: [22, 61]
+    tail_tip: [15, 58]
+    sh_n: [53, 30]
+    el_n: [63, 40]
+    paw_n: [70, 50]
+    ftoe_n: [69, 54]
+    sh_f: [66, 32]
+    el_f: [80, 38]
+    paw_f: [85, 47]
+    ftoe_f: [85, 52]
+    hip_n: [48, 55]
+    knee_n: [53, 61]
+    foot_n: [57, 69]
+    toe_n: [65, 74]
+    hip_f: [52, 52]
+    knee_f: [60, 61]
+    foot_f: [75, 58]
+    toe_f: [82, 57]
+frames:
+  atk_wind1:                   # crouch starts: spine tips nose-down (extrapolated away from the leap), head and tail sink
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1], tail_tip: [0, 1]}
+  atk_wind2:                   # coil: chest and head low, head pulled back, tail down
+    dy: 1
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1], tail2: [0, 1], tail_tip: [0, 2]}
+  atk_mid:                     # the pass: near hind paw pushing off part-way back, far hind shin carried forward, head low
+    pins: [foot_n, foot_f, knee_f]
+    tweaks: {foot_n: [5, 0], knee_f: [5, 2], foot_f: [7, 2], paw_n: [0, -3], ftoe_n: [0, -3], head: [-2, 2], snout: [-2, 2], neck: [-1, 1]}
+  atk_follow:                  # follow-through: spine and tail overshoot the leap (head and forelegs keep the bite)
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+  atk_recover:                 # landing: forelegs still reaching (they land on idle), body lifted, head kept level, hind legs pinned
+    t: 0.35
+    pins: [knee_n, knee_f, foot_n, foot_f]
+    moves: [back, chest, neck, tail0, tail1, tail2, tail_tip, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f]
+    tweaks: {chest: [0, -1], neck: [0, -1], head: [0, -1], snout: [0, -1]}
+  hurt_in1:                    # rear starts: spine pitched up, hip toward the hurt hip, forepaws freed
+    t: 0.32
+    pins: [foot_n, foot_f]
+    moves: [hip, back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, knee_n, knee_f]
+  hurt_in2:                    # the rear pitched back down about the hind hip, hind paws planted, tail kept low
+    t: 0.25
+    pins: [foot_n, foot_f]
+    moves: [back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, knee_n, knee_f]
+masks:
+  head:                        # the open lower jaw is head, not the far foreleg under it
+    attack: [[87, 30], [100, 30], [100, 41], [87, 41]]
+holds: []
+paint:                         # build-time patches: open the leg gap the rear closed; fill the pockets the forearm left
+  - {frame: hurt_in1, xy: [[37, 60]], rgb: null}
+  - {frame: hurt_in2, xy: [[70, 41], [71, 41], [71, 42], [72, 42], [73, 42], [73, 43], [56, 46], [57, 46]], rgb: [41, 41, 57]}
