@@ -67,6 +67,33 @@ export function validateEnemyData(data: unknown): EnemyData {
   return data as unknown as EnemyData;
 }
 
+/** `inspect: [{x, y, text}]`: in-bounds cells; `text` is non-empty, all strings or all `{condition?, text: string[]}`. */
+function validateInspect(value: unknown, width: number, height: number): void {
+  assertArray('MapData.inspect', value);
+  value.forEach((cell, i) => {
+    const path = `MapData.inspect[${i}]`;
+    assertObject(path, cell);
+    assertNumber(`${path}.x`, cell.x);
+    assertNumber(`${path}.y`, cell.y);
+    if (cell.x < 0 || cell.y < 0 || cell.x >= width || cell.y >= height) {
+      throw new ValidationError(`${path}: cell (${cell.x}, ${cell.y}) is outside the ${width}x${height} map`);
+    }
+    const text = cell.text;
+    assertArray(`${path}.text`, text);
+    if (text.length === 0) throw new ValidationError(`${path}.text: expected at least one line`);
+    if (typeof text[0] === 'string') {
+      text.forEach((line, j) => assertString(`${path}.text[${j}]`, line));
+      return;
+    }
+    text.forEach((entry, j) => {
+      assertObject(`${path}.text[${j}]`, entry);
+      if (entry.condition !== undefined) assertString(`${path}.text[${j}].condition`, entry.condition);
+      assertArray(`${path}.text[${j}].text`, entry.text);
+      (entry.text as unknown[]).forEach((line, k) => assertString(`${path}.text[${j}].text[${k}]`, line));
+    });
+  });
+}
+
 export function validateMapData(data: unknown): MapData {
   assertObject('MapData', data);
   assertString('MapData.id', data.id);
@@ -142,6 +169,7 @@ export function validateMapData(data: unknown): MapData {
       assertNumber(`MapData.noWander[${i}][1]`, p[1]);
     });
   }
+  if (data.inspect !== undefined) validateInspect(data.inspect, data.width as number, data.height as number);
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
   
   return data as unknown as MapData;

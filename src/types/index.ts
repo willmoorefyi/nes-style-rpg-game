@@ -223,8 +223,17 @@ export interface MapData {
   entrances?: Record<string, [number, number]>;
   /** Extra tiles wandering NPCs never step onto (single-file routes they would plug), as [x, y]. */
   noWander?: [number, number][];
+  /** Cells that show text when the player faces one and presses confirm (a tomb, a sign). */
+  inspect?: MapInspectCell[];
   /** Baked 2x art from assets-src/tools/build_map.py; when set, `layers` is empty. */
   art?: BakedMapArt;
+}
+
+/** An inspectable map cell; `text` resolves like NPC dialog (plain lines, or conditional entries). */
+export interface MapInspectCell {
+  x: number;
+  y: number;
+  text: string[] | ConditionalDialog[];
 }
 
 /** Baked map chunks: `chunk` x `chunk` tiles of `tile` native px each, row-major; `above` is null where empty. */
