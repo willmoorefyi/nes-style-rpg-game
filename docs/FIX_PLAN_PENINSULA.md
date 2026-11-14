@@ -918,6 +918,26 @@ Peaks: 12 variants, anchor spread 13.1 px; foothills 100 %; fidelity: every wild
 
 ---
 
+### T3 final validation (orchestrator, head 8d2cd88)
+
+- **Momus:** OKAY after two revise rounds.
+- **Browser, `?mute=1`:**
+  - a house interior and its exit;
+  - the town's west edge exits onto the overworld beside the west gate;
+  - the Erdrick tomb's inspect text;
+  - an opened chest shows as opened and adds its item;
+  - all 72x72 overworld previews reviewed.
+- **Load time (local dev):**
+  - overworld 53 ms with the cache disabled, about 20 ms cached;
+  - Cornelia 53 ms;
+  - houses, castle and temple 16–23 ms;
+  - all well under the 1.5 s target.
+- **On-cell-line share** is 17–19 % for sand/grass and mountain/grass, against the 15 % synthetic target. Accepted, because the fitted-line metric and the visual review pass.
+- **Carried forward:**
+  - **T5:** Cornelia's unreachable cells, which predate T3: (53,2), (53,3), (54,3), (35,67) and (36,67). Fill them and turn on `no_unreachable_walkable`.
+  - **T6:** split `layouts/overworld.py` (536 lines), `layouts/interiors.py` (509) and `map_checks.py` (435).
+  - **Second pass:** the stray-pixel line beside the opened chest in the fisher's cottage, and the HUD's 5-character name truncation.
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
