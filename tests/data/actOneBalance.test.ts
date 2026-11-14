@@ -83,10 +83,11 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
 });
 
 describe('T4d act-1 enemies (FF1 counterparts)', () => {
-  it('Garland is tougher than FF1 (B1): 240 HP, attack 16, two hits, no weakness; 3 hits at <= 25 % HP', () => {
+  it('Garland (U1, decision U-1): 340 HP, attack 9, two hits, accuracy 15, no weakness; 3 hits at <= 25 % HP', () => {
     const g = enemy('garland');
-    expect(g.stats.hp).toBe(240);
-    expect(g.stats.attack).toBe(16);
+    expect(g.stats.hp).toBe(340);
+    expect(g.stats.attack).toBe(9);
+    expect(g.stats.accuracy).toBe(15);
     expect(g.stats.hits).toBe(2);
     expect(g.weakness).toBeUndefined();
     expect(g.xpReward).toBe(130);

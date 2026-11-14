@@ -89,6 +89,8 @@ export interface NextActionInfo {
   spellName?: string;
   /** The item's display name (Potion) (B3). */
   itemName?: string;
+  /** U15: a spell that hits every enemy (the turn list reads `>All`). */
+  allTargets?: boolean;
   /** A magic action whose caster is silenced: the view announces an attempt, not a cast (the spell fizzles, B8). */
   silenced?: boolean;
 }
@@ -384,7 +386,9 @@ export class BattleStateMachine {
       }
     }
 
-    if (cmd.spellId) result.spellName = this.spells.find(s => s.id === cmd.spellId)?.name ?? cmd.spellId;
+    const spell = cmd.spellId ? this.spells.find(s => s.id === cmd.spellId) : undefined;
+    if (cmd.spellId) result.spellName = spell?.name ?? cmd.spellId;
+    if (spell?.targeting === 'all') result.allTargets = true;
     if (cmd.type === 'magic' && silenced) result.silenced = true;
     if (cmd.itemId) result.itemName = ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId;
 

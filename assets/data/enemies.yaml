@@ -221,13 +221,13 @@
 - id: garland
   name: Garland
   stats:
-    hp: 240
+    hp: 340
     strength: 15
     agility: 8
     intelligence: 1
     vitality: 10
     luck: 5
-    attack: 16
+    attack: 9
     defense: 10
     magicDefense: 15
     accuracy: 15

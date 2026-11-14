@@ -10,7 +10,7 @@ import { TextRenderer } from '../ui/TextRenderer.js';
 import { BossAI } from '../battle/BossAI.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import type { BattleCommand } from '../battle/BattleCommands.js';
-import { BattleListMenus } from './battle/BattleListMenus.js';
+import { BattleListMenus, canOpenItems, canOpenSpells } from './battle/BattleListMenus.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
@@ -248,6 +248,9 @@ export class BattleScene implements Scene {
 
     this.messageText.setText(`${actor.name}'s turn`, true);
     this.commandMenu.visible = true;
+    // U14: Magic and Item are greyed for a member with nothing to cast or use (a greyed pick does nothing)
+    this.commandMenu.setItemEnabled(1, canOpenSpells(actor));
+    this.commandMenu.setItemEnabled(2, canOpenItems(this.config.inventory, (id) => this.battle.reservedItems(id)));
     this.commandMenu.setIndex(0);
     this.commandGuard = COMMAND_CONFIRM_GUARD_FRAMES;
     this.uiState = 'command';

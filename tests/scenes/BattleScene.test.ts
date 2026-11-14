@@ -14,6 +14,13 @@ import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_HEIGHT, FLOAT_FONT, ENEMY_WINDOW, S
 import { WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
 import { ItemSelectionUI } from '../../src/ui/ItemSelectionUI.js';
 import { Window } from '../../src/ui/Window.js';
+import { Menu } from '../../src/ui/Menu.js';
+import { BitmapText } from 'pixi.js';
+import { readFileSync } from 'node:fs';
+import { parse } from 'yaml';
+import { classOf, item, ITEMS, SPELLS } from '../helpers/balanceData.js';
+import { slotOf } from '../../src/entities/EquipmentRules.js';
+import type { DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
 
 const mockClassData: CharacterClassData = {
   id: 'fighter',
@@ -264,7 +271,7 @@ describe('BattleScene: R2 command menus (B5, B8, I3)', () => {
     tick(scene, input, 'confirm');
   };
 
-  it('B5: with 1 Potion queued by member 0, member 1 gets "No items available."; after undo it is offered again', () => {
+  it('B5 / U14: with 1 Potion queued by member 0, member 1\'s Item is greyed and picking it does nothing; after undo it is offered again', () => {
     const input = createMockInput();
     const inventory = new Inventory();
     inventory.add('potion', 1);
@@ -281,10 +288,11 @@ describe('BattleScene: R2 command menus (B5, B8, I3)', () => {
     tick(scene, input, 'confirm'); // the cursor starts on the most hurt member: FGHTR
     expect(scene.partyPanel.activeIndex).toBe(1); // THIEF's turn
     for (let i = 0; i < COMMAND_CONFIRM_GUARD_FRAMES; i++) tick(scene, input);
+    expect(commandRows(scene).Item).toBe(false);
     openItems(scene, input);
-    expect(scene.uiPhase).toBe('notice');
-    expect(scene.messageLine).toBe('No items available.');
-    for (let i = 0; i < 40 && scene.uiPhase !== 'command'; i++) tick(scene, input);
+    expect(scene.uiPhase).toBe('command'); // a greyed row cannot be picked
+    tick(scene, input, 'up');
+    tick(scene, input, 'up');
     tick(scene, input, 'cancel'); // back to FGHTR: the Potion is released
     expect(scene.partyPanel.activeIndex).toBe(0);
     for (let i = 0; i < COMMAND_CONFIRM_GUARD_FRAMES; i++) tick(scene, input);
@@ -327,6 +335,85 @@ describe('BattleScene: R2 command menus (B5, B8, I3)', () => {
     expect(scene.uiPhase).toBe('notice');
     expect(scene.messageLine).toBe('Silenced.');
     expect(mage.getSpellCharges(1)).toBe(2);
+  });
+});
+
+/** The command menu's rows (Fight, Magic, Item, Run) and whether each is enabled (white) or greyed. */
+function commandRows(scene: BattleScene): Record<string, boolean> {
+  const menu = findDescendant(scene.container, (c): c is Menu => c instanceof Menu && c.children.some(t => t instanceof BitmapText && t.text === 'Fight'));
+  expect(menu).not.toBeNull();
+  const rows = menu!.children.filter((t): t is BitmapText => t instanceof BitmapText && t.text !== '▶');
+  return Object.fromEntries(rows.map(t => [t.text, t.style.fill !== 0x808080]));
+}
+
+describe('BattleScene: Magic and Item greyed per member (U14)', () => {
+  /** The `u_cmd_menu` party, from its YAML entry, with the real items and spells. */
+  async function cmdMenuScene() {
+    ItemRegistry.reset();
+    await ItemRegistry.init({ loadItems: async () => ITEMS } as Pick<DataLoader, 'loadItems'> as DataLoader);
+    const scenarios = parse(readFileSync('assets/data/debug-scenarios.yaml', 'utf-8')) as DebugScenario[];
+    const sc = scenarios.find(x => x.id === 'u_cmd_menu')!;
+    const party = sc.party.map((m) => {
+      const c = new Character({ name: m.name, classData: classOf(m.class), level: m.level });
+      for (const id of m.equipment) expect(c.equip(slotOf(item(id))!, item(id)), `${m.name} ${id}`).not.toBe(false);
+      for (const sp of m.spells) c.learnSpell(sp.id, sp.level);
+      c.restoreAllCharges();
+      return c;
+    });
+    const inventory = new Inventory();
+    for (const [id, n] of Object.entries(sc.items)) inventory.add(id, n);
+    const input = createMockInput();
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party, enemies: [harmless], inventory, spells: SPELLS, rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    return { scene, input, inventory, party };
+  }
+
+  /** Fight the first enemy, then wait out the next member's confirm guard. */
+  function fight(scene: BattleScene, input: MockInput): void {
+    tick(scene, input, 'confirm');
+    tick(scene, input, 'confirm');
+    for (let i = 0; i < COMMAND_CONFIRM_GUARD_FRAMES; i++) tick(scene, input);
+  }
+
+  it('with only a lute in the bag, Item is grey for every member and Magic for FGHTR and THIEF (old: always enabled)', async () => {
+    const { scene, input, party } = await cmdMenuScene();
+    expect(party.map(c => c.name)).toEqual(['FGHTR', 'THIEF', 'W.MAG', 'B.MAG']);
+    const seen: Array<Record<string, boolean>> = [];
+    for (let m = 0; m < 4; m++) {
+      expect(scene.partyPanel.activeIndex).toBe(m);
+      seen.push(commandRows(scene));
+      fight(scene, input);
+    }
+    expect(seen.map(r => r.Item)).toEqual([false, false, false, false]);
+    expect(seen.map(r => r.Magic)).toEqual([false, false, true, true]);
+    expect(seen.map(r => r.Fight)).toEqual([true, true, true, true]);
+  });
+
+  it('after a Potion is added, Item is enabled on the next command phase', async () => {
+    const { scene, input, inventory } = await cmdMenuScene();
+    expect(commandRows(scene).Item).toBe(false);
+    inventory.add('potion');
+    fight(scene, input);
+    expect(scene.partyPanel.activeIndex).toBe(1);
+    expect(commandRows(scene).Item).toBe(true);
+  });
+
+  it('a greyed Magic pick does nothing; a silenced mage keeps Magic enabled and still hears "Silenced."', async () => {
+    const { scene, input, party } = await cmdMenuScene();
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm'); // FGHTR's greyed Magic
+    expect(scene.uiPhase).toBe('command');
+    tick(scene, input, 'up');
+    fight(scene, input); // FGHTR
+    party[2].statusTracker.apply('silence'); // before W.MAG's turn starts
+    fight(scene, input); // THIEF
+    expect(scene.partyPanel.activeIndex).toBe(2);
+    expect(commandRows(scene).Magic).toBe(true);
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm');
+    expect(scene.uiPhase).toBe('notice');
+    expect(scene.messageLine).toBe('Silenced.');
   });
 });
 

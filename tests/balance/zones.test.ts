@@ -45,19 +45,19 @@ function meanFormation(zone: Zone): number {
   return n / 2000;
 }
 
-describe('B9: the temple table (docs/FIX_PLAN_PENINSULA.md R4b)', () => {
-  it('rolls 2.3-2.8 enemies on average (old 3.26), never more than 4 skeletons or 5 enemies', () => {
+describe('B9, U1: the temple table (docs/FIX_PLAN_PENINSULA.md R4b, U1)', () => {
+  it('rolls 2.3-2.8 enemies on average (2.455; old 3.26, R 2.55), never more than 3 skeletons or 4 enemies (U1; R: 4 / 5)', () => {
     const mean = meanFormation('temple');
     expect(mean).toBeGreaterThanOrEqual(2.3);
     expect(mean).toBeLessThanOrEqual(2.8);
     for (const e of ZONE_TABLES.temple) {
       const most = (id?: string) => e.groups!.filter((g) => !id || g.id === id).reduce((s, g) => s + (g.max ?? g.min), 0);
-      expect(most('skeleton')).toBeLessThanOrEqual(4);
-      expect(most()).toBeLessThanOrEqual(5);
+      expect(most('skeleton')).toBeLessThanOrEqual(3);
+      expect(most()).toBeLessThanOrEqual(4);
     }
   });
 
-  it('a Lv2 party (400 G kit, sensible) survives 3 temple fights in a row: <= 1 % wipes, >= 85 % HP left', () => {
+  it('a Lv2 party (400 G kit, sensible) survives 3 temple fights in a row: <= 1 % wipes (0 %), >= 85 % HP left (89.9 %)', () => {
     const N3 = 400;
     let wipes = 0, left = 0;
     for (let s = 1; s <= N3; s++) {

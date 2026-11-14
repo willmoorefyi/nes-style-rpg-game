@@ -6,7 +6,7 @@ import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import type { Window } from '../../ui/Window.js';
 import { TurnList } from './TurnList.js';
 import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
-  type AttackStyle, attackReach, MIN_ATTACK_REACH } from './attackChoreography.js';
+  type AttackStyle, type AttackReach, attackReach, attackRise, MIN_ATTACK_REACH } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
 import { floatKind, floatLabel } from './floatingNumbers.js';
 import { BattleEffects } from './BattleEffects.js';
@@ -30,6 +30,8 @@ export class BattleAnimationController {
   private lastAdvance: AttackFrame = { dx: 0, dy: 0, pose: 'ready' };
   /** BA-9: how far this melee attack advances: from the attacker's place in line to the target's right edge. */
   attackReachPx = MIN_ATTACK_REACH;
+  /** U3: how far down (or up, < 0) it moves to meet the target's feet row. */
+  attackRisePx = 0;
   /** The sprite the current action aims at (for the miss number), or null. */
   private targetSprite: Container | null = null;
   animMessages: { text: string }[] = [];
@@ -101,7 +103,7 @@ export class BattleAnimationController {
             this.lastAdvance = { dx: 0, dy: 0, pose: 'ready' };
             if (info.actionType === 'fight') {
               this.attackStyle = this.attackOverride ?? pickAttackStyle(this.attackRng);
-              this.attackReachPx = this.measureReach(this.animActorOrigX, this.targetSprite);
+              ({ dx: this.attackReachPx, dy: this.attackRisePx } = this.measureReach(this.animActorSprite, this.targetSprite));
             }
             // spells and items gather in place first; every party action then poses frame by frame in step_forward
             if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'cast_gather');
@@ -120,7 +122,7 @@ export class BattleAnimationController {
         const frames = melee ? advanceFrames(this.attackStyle) : CAST_FRAMES;
         this.animTimer += dt;
         if (confirmSkip) this.animTimer = frames;
-        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, this.attackReachPx) : castAt(this.animTimer));
+        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, { dx: this.attackReachPx, dy: this.attackRisePx }) : castAt(this.animTimer));
         // BA-9: the action resolves on the contact frame itself, so the number and the result line meet the blow
         if (this.animTimer >= frames) this.executeAction();
         break;
@@ -202,11 +204,13 @@ export class BattleAnimationController {
     if (info.actionType === 'magic' && result.messages.some(m => m.text.startsWith(`${info.actorName} casts `))) this.emit('spellCast', {});
   }
 
-  /** BA-9 / B11: reach to the target sprite's right edge (its 2x cell, whose art sits 16-34 px inside); the minimum when there is no target. */
-  private measureReach(homeX: number, target: Container | null): number {
-    if (!target) return MIN_ATTACK_REACH;
+  /** BA-9 / B11: reach to the target sprite's right edge (its 2x cell, whose art sits 16-34 px inside); the minimum when
+   *  there is no target. U3: and from the attacker's feet row (its box's bottom) to the target's. */
+  private measureReach(actor: Container, target: Container | null): AttackReach {
+    if (!target) return { dx: MIN_ATTACK_REACH, dy: 0 };
     const b = target.getBounds();
-    return attackReach(homeX, b.x + b.width);
+    const a = actor.getBounds();
+    return { dx: attackReach(actor.x, b.x + b.width), dy: attackRise(a.y + a.height, b.y + b.height) };
   }
 
   /** Moves the acting party member to an offset from its place in line and shows the frame's pose. */
