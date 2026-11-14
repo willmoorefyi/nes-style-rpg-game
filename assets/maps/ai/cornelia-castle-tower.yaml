@@ -28,7 +28,7 @@ npcs:
 transitions:
 - {x: 7, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
 - {x: 8, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
-name: East Tower
+name: Cornelia Castle 3F
 music: town
 encounterRate: {min: 999, max: 999}
 encounters: []

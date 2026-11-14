@@ -38,6 +38,13 @@ npcs:
   chestItem: tent
   chestFlag: CHEST_CORNELIA_TENT
   dialog: [You found a Tent!]
+- id: chest_castle_ether
+  sprite: chest
+  x: 3
+  y: 5
+  chestItem: ether
+  chestFlag: CHEST_CORNELIA_ETHER
+  dialog: [You found an Ether!]
 - id: cellar_steward
   sprite: old_man
   x: 13
@@ -46,7 +53,7 @@ npcs:
 transitions:
 - {x: 10, y: 3, targetMap: cornelia-castle, targetEntrance: cellar}
 - {x: 11, y: 3, targetMap: cornelia-castle, targetEntrance: cellar}
-name: Castle Cellar
+name: Cornelia Castle B1
 music: town
 encounterRate: {min: 999, max: 999}
 encounters: []

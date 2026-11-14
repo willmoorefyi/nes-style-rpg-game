@@ -3,10 +3,13 @@
   python3 -I assets-src/tools/layouts/castle.py && python3 -I assets-src/tools/build_map.py
 
 Four floors joined by stairs:
-  cornelia-castle         1F  grand hall, barracks, banquet hall, library, treasury
-  cornelia-castle-2f      2F  throne room, the princess's chamber, the King's study, chapel, tower stair
+  cornelia-castle         1F  grand hall, barracks, banquet hall, library and its reading gallery, treasury
+  cornelia-castle-2f      2F  throne room, the princess's chamber, the King's study, chapel, guard room (tower stair)
   cornelia-castle-tower   3F  the sage's lookout at the top of the east tower
-  cornelia-castle-cellar  B1  storerooms under the treasury
+  cornelia-castle-cellar  B1  storerooms and wine cellar under the treasury
+
+CA-3 (won't fix, T6 decision 1): the 1F stairs leave at the hall's north end and 2F is entered at the throne room's
+foot, as in FF1; 2F's north end is the dais and the throne, so the stairs cannot line up without rebuilding 2F.
 """
 from __future__ import annotations
 
@@ -21,7 +24,7 @@ CASTLE_MATS = {"floor_stone": "marble", "in_wall_face": "castle_wall_in",
                "in_wall_top": {"from": "slate", "shade": 0.55}, "floor": {"from": "floor", "shade": 0.8}}
 GOLD = [214, 170, 64]
 LEGEND = "legend: W wall top  F wall face  - marble  _ wood floor  + royal carpet"
-QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": []}
+QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": [], "no_static_chokepoints": True}
 
 
 class Room(BaseRoom):
@@ -32,9 +35,9 @@ class Room(BaseRoom):
 
 
 # ════════════════════════════ 1F: the grand hall ════════════════════════════
-f1 = Room("cornelia-castle", "Cornelia Castle", 44, 34)
+f1 = Room("cornelia-castle", "Cornelia Castle 1F", 44, 34)
 g = f1.g
-g.carve(12, 3, 31, 5)                    # north gallery joining the wings
+g.carve(12, 3, 31, 5)                    # north gallery joining the wings (the library's reading gallery)
 g.carve(2, 4, 11, 15, "_")               # barracks
 g.carve(2, 19, 11, 30, "_")              # banquet hall
 g.carve(32, 4, 41, 15, "_")              # library
@@ -66,11 +69,14 @@ for (x, y) in [(15, 30), (28, 30), (14, 9), (29, 9), (14, 23), (29, 23)]:
     f1.deco([["plant"]], x, y)
 for (x, y) in [(14, 18), (29, 18)]:
     f1.statue(x, y)
-for x in (13, 30):
-    f1.statue(x, 3)
-for x in (17, 26):
-    f1.deco([["stone_bench"]], x, 4)
-# gallery
+# gallery (CA-7): the library's reading gallery. Shelves stand against the north wall and the lecterns, the bench
+# and the scholar keep to the top row, so rows 4 and 5 stay open from the barracks to the library.
+for x in (12, 13, 15, 16, 17, 26, 27, 28, 30, 31):
+    f1.deco([["bookshelf_top"], ["bookshelf_bottom"]], x, 2, on_wall=True)
+for x in (19, 24):
+    f1.deco([["lectern"]], x, 3)             # castle/kit_stairs_lib (a kit.py placeholder until it is approved)
+for x in (21, 22):
+    f1.deco([["stone_bench"]], x, 3)
 for x in (14, 18, 25, 29):
     f1.wall([["arch_window_top"], ["arch_window_bottom"]], x, 1)
 for x in (16, 27):
@@ -106,6 +112,7 @@ for (x, y) in [(35, 9), (38, 9), (35, 12)]:
     f1.deco([["desk"]], x, y)
 f1.deco([["orb_white"]], 41, 14)
 f1.deco([["plant"]], 32, 14)
+f1.deco([["globe"]], 38, 12)                 # castle/kit_stairs_lib (placeholder until approved)
 # treasury, with the stair down to the cellar
 f1.wall([["banner"]], 34, 17)
 f1.wall([["torch"]], 39, 17)
@@ -114,10 +121,11 @@ for (x, y, t) in [(32, 30, "crate"), (33, 30, "barrel"), (41, 19, "crate"), (41,
     f1.objects.append({"type": t, "x": x, "y": y})
 f1.deco([["armor_stand"]], 32, 19)
 f1.deco([["armor_stand"]], 33, 19)
-f1.wall([["weapon_rack"]], 37, 17)
+f1.wall([["weapon_rack"]], 35, 17)          # not 37: that cell is in the library doorway (CA-4)
 f1.wall([["weapon_rack"]], 40, 17)
-for (x, y) in [(32, 24), (32, 25)]:
+for (x, y) in [(32, 21), (32, 22)]:          # CA-4: clear of the doorway from the hall at (32, 25-26)
     f1.objects.append({"type": "barrel", "x": x, "y": y})
+# CA-7: (36, 22) and (38, 22) are kept free for the gold heap and the crown (T6h, castle/kit_stairs_lib)
 
 f1.npcs += [
     {"id": "hall_guard_w", "sprite": "guard", "x": 19, "y": 30, "dialog": ["Welcome to Cornelia Castle.",
@@ -144,13 +152,20 @@ f1.npcs += [
                 "Now darkness gathers there. Garland chose it for a reason."]},
     {"id": "library_mage", "sprite": "mage", "x": 39, "y": 12, "wander": True,
      "dialog": ["Shh! This is a library.", "...The sage in the east tower knows more than every book here."]},
+    {"id": "gallery_scholar", "sprite": "old_man", "x": 20, "y": 3,
+     "dialog": ["These shelves hold the chronicles of Cornelia, back to the sailors who founded it.",
+                "The old charts show a bridge to the north since long before my time. A winter storm took it."]},
+    {"id": "chest_treasury_cabin", "sprite": "chest", "x": 35, "y": 24, "chestItem": "cabin",
+     "chestFlag": "CHEST_CORNELIA_TREASURY_1", "dialog": ["You found a Cabin!"]},
+    {"id": "chest_treasury_phoenix", "sprite": "chest", "x": 37, "y": 24, "chestItem": "phoenix_down",
+     "chestFlag": "CHEST_CORNELIA_TREASURY_2", "dialog": ["You found a Phoenix Down!"]},
     {"id": "treasury_guard", "sprite": "guard", "x": 36, "y": 23,
      # ST-9: holds before the audience with the King (there is no "met the King" flag)
      "dialog": ["The storeroom below is open to any who would face Garland.", "Take what you need before you set out."]},
 ]
 f1.transitions += [{"x": x, "y": 33, "targetMap": "cornelia", "targetEntrance": "castle"} for x in (21, 22)]
-f1.write("Cornelia Castle 1F: grand hall (stairs up to the throne room), barracks, banquet hall, library, treasury"
-         " (stairs down to the cellar).",
+f1.write("Cornelia Castle 1F: grand hall (stairs up to the throne room), barracks, banquet hall, library and its"
+         " reading gallery, treasury (stairs down to the cellar).",
          {"gate": [21, 31], "stairs": [21, 9], "cellar": [39, 27]})
 
 
@@ -165,13 +180,19 @@ g.carve(33, 18, 41, 25)                  # chapel
 for (x, y0) in [(11, 10), (11, 21), (32, 10), (32, 21)]:
     g.carve(x, y0, x, y0 + 1)
 g.carve(19, 6, 24, 8, "+")               # the dais
-g.carve(21, 9, 22, 25, "+")              # the royal runner
+g.carve(20, 9, 23, 25, "+")              # the royal runner, 4 wide (1F's is 2: CA-7)
 for y0 in (10, 21):                      # cross runners to the side doors
     g.carve(11, y0, 32, y0 + 1, "+")
+for dy in range(-3, 4):                  # a medallion rug before the dais
+    g.carve(17 + abs(dy), 15 + dy, 26 - abs(dy), 15 + dy, "+")
 g.carve(5, 9, 7, 11, "+")                # rug in the princess's chamber
 g.carve(36, 19, 38, 25, "+")             # chapel aisle
 g.faces(2)
-f2.deco([["throne_0_0", "throne_0_1"], ["throne_1_0", "throne_1_1"]], 21, 6, fit=True)
+# CA-5: the throne is shifted half a cell west so its seat is centred on (21, 7), where the King stands (in front
+# of the throne back; there is no sitting pose). The seat cell is walkable so he can stand there; the player talks
+# to him from the dais at (21, 8).
+f2.deco([["throne_0_0", "throne_0_1"], ["throne_1_0", "throne_1_1"]], 21, 6, fit=True, offset=[-24, 0],
+        walk_cells=[[0, 1]])
 f2.stairs_down(21, 24, "cornelia-castle", "stairs")
 for x in (13, 16, 27, 30):
     f2.wall([["arch_window_top"], ["arch_window_bottom"]], x, 4)
@@ -206,12 +227,18 @@ for x in (2, 3, 4):
 f2.deco([["desk"]], 5, 22)
 f2.wall([["tapestry"]], 5, 16)
 f2.deco([["armor_stand"]], 10, 25)
-# tower stair hall
+# the guard room, with the tower stair (CA-7); the table becomes the war-map table in T6h
 f2.stairs_up(37, 4, "cornelia-castle-tower", "stairs")
 f2.wall([["banner"]], 35, 4)
 f2.wall([["banner"]], 40, 4)
+for x in (36, 39):
+    f2.wall([["weapon_rack"]], x, 4)
 f2.statue(34, 6)
 f2.statue(41, 6)
+for y in (8, 10, 12):
+    f2.deco([["armor_stand"]], 41, y)
+for x in (37, 38):
+    f2.deco([["table"]], x, 12)
 # chapel
 f2.deco([["orb_white"]], 36, 18)
 f2.deco([["orb_white"]], 38, 18)
@@ -222,7 +249,7 @@ for (x, y) in [(34, 21), (34, 23), (40, 21), (40, 23)]:
     f2.deco([["stone_bench"]], x, y)
 
 f2.npcs += [
-    {"id": "king", "sprite": "king", "x": 20, "y": 8,
+    {"id": "king", "sprite": "king", "x": 21, "y": 7,
      # first match wins: INTRO_COMPLETE must come before PRINCESS_RESCUED
      "dialog": [{"condition": "INTRO_COMPLETE",
                  "text": ["My builders are hard at work on the bridge to the north.",
@@ -255,16 +282,18 @@ f2.npcs += [
     {"id": "court_mage", "sprite": "mage", "x": 7, "y": 21,
      "dialog": ["His Majesty's study.", "The King reads old accounts of the Warriors of Light late into the night."]},
     {"id": "tower_guard", "sprite": "guard", "x": 36, "y": 9,
-     "dialog": ["These stairs climb the east tower.", "The old sage lives at the top. Mind your head."]},
+     "dialog": ["The castle guard keeps watch from this room. These stairs climb the east tower.",
+                "The old sage lives at the top. Mind your head."]},
     {"id": "chapel_priest", "sprite": "mage", "x": 37, "y": 21,
      "dialog": ["Welcome to the royal chapel.", "May the light of the crystals watch over you."]},
 ]
-f2.write("Cornelia Castle 2F: throne room, the princess's chamber, the King's study, tower stair, chapel.",
+f2.write("Cornelia Castle 2F: throne room, the princess's chamber, the King's study, guard room (tower stair),"
+         " chapel.",
          {"stairs": [21, 23], "tower": [37, 6]})
 
 
 # ════════════════════════════ 3F: the sage's lookout ════════════════════════════
-f3 = Room("cornelia-castle-tower", "East Tower", 16, 13)
+f3 = Room("cornelia-castle-tower", "Cornelia Castle 3F", 16, 13)
 g = f3.g
 g.carve(3, 4, 12, 10, "_")
 g.carve(5, 6, 10, 9, "+")
@@ -289,7 +318,7 @@ f3.write("Cornelia Castle 3F: the sage's lookout at the top of the east tower.",
 
 
 # ════════════════════════════ B1: the cellar ════════════════════════════
-b1 = Room("cornelia-castle-cellar", "Castle Cellar", 22, 15)
+b1 = Room("cornelia-castle-cellar", "Cornelia Castle B1", 22, 15)
 g = b1.g
 g.carve(2, 4, 19, 12)
 g.carve(2, 4, 8, 12)
@@ -301,6 +330,8 @@ for (x, y, t) in [(2, 4, "barrel"), (3, 4, "barrel"), (4, 4, "barrel"), (2, 5, "
                   (18, 4, "crate"), (19, 4, "crate"), (19, 5, "crate"), (2, 12, "crate"), (19, 12, "barrel"),
                   (18, 12, "barrel")]:
     b1.objects.append({"type": t, "x": x, "y": y})
+for x in (5, 6, 7, 8, 13, 14, 15, 16):      # CA-7: a row of wine racks along the north wall
+    b1.wall([["potion_shelf"]], x, 3)
 b1.npcs += [
     {"id": "chest_castle_potion", "sprite": "chest", "x": 6, "y": 9, "chestItem": "potion",
      "chestFlag": "CHEST_CORNELIA_POTION", "dialog": ["You found a Potion!"]},
@@ -308,9 +339,11 @@ b1.npcs += [
      "chestFlag": "CHEST_CORNELIA_ANTIDOTE", "dialog": ["You found an Antidote!"]},
     {"id": "chest_castle_tent", "sprite": "chest", "x": 15, "y": 9, "chestItem": "tent",
      "chestFlag": "CHEST_CORNELIA_TENT", "dialog": ["You found a Tent!"]},
+    {"id": "chest_castle_ether", "sprite": "chest", "x": 3, "y": 5, "chestItem": "ether",   # behind the barrels
+     "chestFlag": "CHEST_CORNELIA_ETHER", "dialog": ["You found an Ether!"]},
     {"id": "cellar_steward", "sprite": "old_man", "x": 13, "y": 6,
      "dialog": ["Wine, grain and old armour, all the way to the walls.", "Take what you need. The King would want it so."]},
 ]
-b1.write("Cornelia Castle B1: the cellar storerooms under the treasury.", {"stairs": [10, 4]},
+b1.write("Cornelia Castle B1: the cellar storerooms and wine racks under the treasury.", {"stairs": [10, 4]},
          mats={"floor_stone": "floor_stone", "in_wall_face": "castle_wall_in",
                "in_wall_top": {"from": "slate", "shade": 0.45}})

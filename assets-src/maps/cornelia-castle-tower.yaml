@@ -2,7 +2,7 @@
 # Cornelia Castle 3F: the sage's lookout at the top of the east tower.
 # legend: W wall top  F wall face  - marble  _ wood floor  + royal carpet
 id: cornelia-castle-tower
-name: East Tower
+name: Cornelia Castle 3F
 kits:
 - castle
 - interior
@@ -111,4 +111,5 @@ transitions:
 - {x: 8, y: 9, targetMap: cornelia-castle-2f, targetEntrance: tower}
 encounterRate: {min: 999, max: 999}
 encounters: []
+no_static_chokepoints: true
 canSave: true
