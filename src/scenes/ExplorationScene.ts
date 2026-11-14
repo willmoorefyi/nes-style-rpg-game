@@ -269,7 +269,7 @@ export class ExplorationScene implements Scene {
     this.camera.update();
     tilemap.render();
     // B5: Update HUD with map name and gold
-    this.fieldHUD.setMapName(mapData.name ?? mapData.id);
+    this.fieldHUD.setMapName(mapData.name ?? '');
     this.fieldHUD.setGold(this.game.party.gold);
   }
 
@@ -567,6 +567,8 @@ export class ExplorationScene implements Scene {
 
   onResume(): void {
     this.paused = false;
+    // BA-13: the battle was pushed mid-flash; don't replay its last frames on the field
+    this.battleFlash.finish();
     this.encounterSystem.start();
     // back from a battle (battle / victory music) or a menu: the map's own track again
     this.playMapMusic();
@@ -598,5 +600,10 @@ export class ExplorationScene implements Scene {
 
   canSave(): boolean {
     return this.currentMapData?.canSave ?? true;
+  }
+
+  /** Tents and Cabins work only where the map allows camping (MS-8). */
+  canCamp(): boolean {
+    return this.currentMapData?.camp ?? false;
   }
 }

@@ -13,6 +13,17 @@ import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
+/** A window's rectangle on screen (for layout tests). */
+export interface ShopRect { x: number; y: number; width: number; height: number }
+
+const ITEM_WINDOW_Y = 288;
+const ITEM_WINDOW_HEIGHT = 700;
+/** The equipment comparison panel; the item list narrows to end before it while it is shown. */
+const DETAIL_RECT: ShopRect = { x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 };
+const PANEL_GAP = 16;
+const LINE_STEP = FONT_SIZE + 8;
+const INPUT_ACTIONS = ['up', 'down', 'left', 'right', 'confirm', 'cancel'] as const;
+
 export class ShopScene implements Scene {
   readonly container = new Container();
   private game: Game;
@@ -34,23 +45,30 @@ export class ShopScene implements Scene {
   private goldText: BitmapText;
   private detailTexts: BitmapText[] = [];
   private lastSelectedIndex = -1;
+  private itemRect: ShopRect;
+  private resultText: BitmapText;
 
   constructor(game: Game, shopId: string) {
     this.game = game;
     this.shopId = shopId;
 
     this.choiceWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 240 });
-    this.goldWindow = new Window({ x: GAME_WIDTH - 400, y: SCREEN_MARGIN, width: 376, height: 100 });
-    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: 288, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
+    // As wide as the comparison panel below it, so "Bought N <item>." fits under the gold line.
+    this.goldWindow = new Window({ x: DETAIL_RECT.x, y: SCREEN_MARGIN, width: DETAIL_RECT.width, height: 100 });
+    this.itemRect = { x: SCREEN_MARGIN, y: ITEM_WINDOW_Y, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: ITEM_WINDOW_HEIGHT };
+    this.itemWindow = new Window({ ...this.itemRect });
     this.itemWindow.visible = false;
 
     // below the gold window (top right), so the party's gold stays visible while browsing equipment
-    this.detailWindow = new Window({ x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 });
+    this.detailWindow = new Window({ ...DETAIL_RECT });
     this.detailWindow.visible = false;
 
     this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
     this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
     this.goldWindow.addChild(this.goldText);
+    this.resultText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+    this.resultText.position.set(this.goldWindow.contentX, this.goldWindow.contentY + FONT_SIZE + 4);
+    this.goldWindow.addChild(this.resultText);
 
     this.container.addChild(this.choiceWindow, this.goldWindow, this.itemWindow, this.detailWindow);
   }
@@ -89,7 +107,24 @@ export class ShopScene implements Scene {
     this.buildItemMenu();
   }
 
-  private buildItemMenu(): void {
+  /** The item list's rectangle (narrowed while the comparison panel is shown). */
+  get itemWindowRect(): ShopRect { return { ...this.itemRect }; }
+  /** The comparison panel's rectangle. */
+  get detailWindowRect(): ShopRect { return { ...DETAIL_RECT }; }
+  /** Whether the comparison panel is shown. */
+  get detailVisible(): boolean { return this.detailWindow.visible; }
+  /** The comparison panel's lines, with their top y inside the panel. */
+  get detailLines(): Array<{ text: string; y: number }> {
+    return this.detailTexts.map((t) => ({ text: t.text, y: t.position.y }));
+  }
+  /** The line under the gold ("Bought 2 Potion."), or ''. */
+  get resultMessage(): string { return this.resultText.text; }
+  /** The item list's cursor, or -1 when the list is closed. */
+  get itemIndex(): number { return this.itemMenu?.selectedIndex ?? -1; }
+
+  /** `keepIndex`: rebuild with the cursor where it was (clamped), e.g. after a sale. */
+  private buildItemMenu(keepIndex = false): void {
+    const initialIndex = keepIndex && this.itemMenu ? this.itemMenu.selectedIndex : undefined;
     if (this.itemMenu) this.itemWindow.removeChild(this.itemMenu);
     const items: MenuItem[] = this.isBuying ? this.getBuyItems() : this.getSellItems();
     if (items.length === 0) {
@@ -100,13 +135,23 @@ export class ShopScene implements Scene {
       x: this.itemWindow.contentX,
       y: this.itemWindow.contentY,
       maxVisible: 8,
+      initialIndex,
       eventBus: this.game.events,
       onSelect: (item) => this.onItemSelect(item),
       onCancel: () => this.closeItemMenu(),
     });
     this.itemWindow.addChild(this.itemMenu);
     this.lastSelectedIndex = -1;
-    this.detailWindow.visible = this.isBuying && this.isEquipmentShop();
+    this.setDetailVisible(this.isBuying && this.isEquipmentShop());
+  }
+
+  private setDetailVisible(visible: boolean): void {
+    this.detailWindow.visible = visible;
+    const width = visible ? DETAIL_RECT.x - PANEL_GAP - SCREEN_MARGIN : GAME_WIDTH - 2 * SCREEN_MARGIN;
+    if (width !== this.itemRect.width) {
+      this.itemRect = { ...this.itemRect, width };
+      this.itemWindow.resize(width, this.itemRect.height);
+    }
   }
 
   private isEquipmentShop(): boolean {
@@ -164,25 +209,29 @@ export class ShopScene implements Scene {
       this.itemWindow.contentY + 500,
       this.maxQty,
       (qty) => this.confirmTransaction(qty),
-      () => this.cancelQuantity()
+      () => this.cancelQuantity(),
+      this.selectedPrice,
     );
     this.itemWindow.addChild(this.qtySelector);
   }
 
   private confirmTransaction(qty: number): void {
     const total = this.selectedPrice * qty;
+    const name = ItemRegistry.getItem(this.selectedItemId)?.name ?? this.selectedItemId;
     if (this.isBuying) {
       if (this.game.party.spendGold(total)) {
         this.game.inventory.add(this.selectedItemId, qty);
+        this.resultText.text = `Bought ${qty} ${name}.`;
       }
     } else {
       if (this.game.inventory.remove(this.selectedItemId, qty)) {
         this.game.party.addGold(total);
+        this.resultText.text = `Sold ${qty} ${name}.`;
       }
     }
     this.updateGold();
     this.cancelQuantity();
-    this.buildItemMenu();
+    this.buildItemMenu(true);
   }
 
   private cancelQuantity(): void {
@@ -195,7 +244,7 @@ export class ShopScene implements Scene {
 
   private closeItemMenu(): void {
     this.itemWindow.visible = false;
-    this.detailWindow.visible = false;
+    this.setDetailVisible(false);
     if (this.itemMenu) {
       this.itemWindow.removeChild(this.itemMenu);
       this.itemMenu = undefined;
@@ -208,6 +257,10 @@ export class ShopScene implements Scene {
   }
 
   update(_dt: number): void {
+    // The transaction line stays until the next input.
+    if (this.resultText.text && INPUT_ACTIONS.some((a) => this.game.input.isJustPressed(a))) {
+      this.resultText.text = '';
+    }
     if (this.state === 'choice') {
       this.choiceMenu.update(this.game.input);
     } else if (this.state === 'quantity' && this.qtySelector) {
@@ -246,32 +299,29 @@ export class ShopScene implements Scene {
       bt.position.set(cx, y);
       this.detailWindow.addChild(bt);
       this.detailTexts.push(bt);
-      y += FONT_SIZE + 8;
+      y += LINE_STEP;
     };
 
     addLine(`${item.name}  ${statLabel}: ${newStat}`);
     y += 8;
 
+    // One line per member: `NAME  ATK cur->new  +d` (MS-5), so four members fit the panel.
+    const nameWidth = Math.max(0, ...this.game.party.all.map((c) => c.name.length));
     for (const char of this.game.party.all) {
+      const name = char.name.padEnd(nameWidth);
       // same rule as EquipScene: members whose class can't use the item get no +/- value
       if (!char.canEquip(item)) {
-        addLine(`${char.name}  n/a`, 0x808080);
-        y += 4;
+        addLine(`${name}  n/a`, 0x808080);
         continue;
       }
-      const equipped = char.getEquipped(slot);
-      const curName = equipped?.name ?? '-';
       // the battle numbers with the item and without it (a Monk's bare hands can beat a weapon: negative)
       const cmp = compareEquip(char, item, slot);
       const diff = cmp.diff;
       const diffStr = diff > 0 ? `+${diff}` : `${diff}`;
       const diffColor = diff > 0 ? 0x00ff00 : diff < 0 ? 0xff0000 : 0xffffff;
-
-      addLine(`${char.name}`);
-      addLine(`  Now: ${curName} ${cmp.label}: ${cmp.now}${hitsSuffix(cmp, cmp.nowHits)}`);
-      addLine(`  New: ${cmp.label}: ${cmp.next}${hitsSuffix(cmp, cmp.nextHits)}`);
-      addLine(`  ${diffStr}`, diffColor);
-      y += 4;
+      const now = `${cmp.now}${hitsSuffix(cmp, cmp.nowHits)}`;
+      const next = `${cmp.next}${hitsSuffix(cmp, cmp.nextHits)}`;
+      addLine(`${name}  ${cmp.label} ${now}->${next}  ${diffStr}`, diffColor);
     }
   }
 

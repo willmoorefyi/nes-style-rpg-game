@@ -61,4 +61,20 @@ describe('DebugScenarioLoader field mode', () => {
       }
     }
   });
+
+  it('T5: a member may start hurt or fallen (hp), the rest at full HP', async () => {
+    const { ClassRegistry } = await import('../../src/data/ClassRegistry.js');
+    const { PartyManager } = await import('../../src/entities/PartyManager.js');
+    const { Inventory } = await import('../../src/entities/Inventory.js');
+    const { testClass } = await import('../helpers/testUtils.js');
+    ClassRegistry.reset();
+    await ClassRegistry.init({ loadClasses: async () => [testClass('warrior')] } as never);
+    const party = new PartyManager();
+    const game = { ...fakeGame(), party, inventory: new Inventory(), pendingEntrance: null as string | null };
+    const member = { class: 'warrior', level: 1, equipment: [], spells: [] };
+    await new DebugScenarioLoader(game as unknown as Game).run({
+      ...field, party: [{ ...member, name: 'A', hp: 0 }, { ...member, name: 'B', hp: 7 }, { ...member, name: 'C' }],
+    });
+    expect(party.all.map((c) => c.currentHp)).toEqual([0, 7, party.all[2].maxHp]);
+  });
 });

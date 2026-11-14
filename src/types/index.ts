@@ -2,6 +2,8 @@ import { Container } from 'pixi.js';
 
 export interface Scene {
   readonly container: Container;
+  /** When true, `SceneManager.push` leaves the scene below visible (an overlay such as the inn). */
+  readonly transparent?: boolean;
   enter(): void | Promise<void>;
   update(dt: number): void;
   exit(): void | Promise<void>;
@@ -258,7 +260,7 @@ export interface ScriptedEncounter {
 
 export interface MapData {
   id: string;
-  /** Display name for the field HUD (defaults to the id). */
+  /** Display name for the field HUD (no label when missing). */
   name?: string;
   width: number;
   height: number;
@@ -273,6 +275,8 @@ export interface MapData {
   encounterZones?: EncounterZone[];
   music?: string;
   canSave?: boolean;
+  /** Tents and Cabins work here (FF1: the world map only). Default false. */
+  camp?: boolean;
   scriptedEncounters?: ScriptedEncounter[];
   vehicles?: VehicleSpawn[];
   keyItemGates?: KeyItemGate[];

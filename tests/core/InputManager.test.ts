@@ -77,4 +77,34 @@ describe('InputManager', () => {
     input.attach();
     expect(input.isPressed('up')).toBe(false);
   });
+
+  describe('NG-9: taps shorter than a frame', () => {
+    it('registers a keydown and keyup that arrive between two updates', () => {
+      pressKey('Enter');
+      releaseKey('Enter');
+      expect(input.isJustPressed('confirm')).toBe(true);
+      expect(input.isPressed('confirm')).toBe(true);
+
+      input.update();
+      expect(input.isJustPressed('confirm')).toBe(false);
+      expect(input.isPressed('confirm')).toBe(false);
+    });
+
+    it('does not re-trigger on a repeat keydown while held', () => {
+      pressKey('Enter');
+      input.update();
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', repeat: true }));
+      expect(input.isJustPressed('confirm')).toBe(false);
+      expect(input.isPressed('confirm')).toBe(true);
+    });
+
+    it('detach empties the per-frame presses', () => {
+      pressKey('ArrowDown');
+      releaseKey('ArrowDown');
+      input.detach();
+      expect(input.isJustPressed('down')).toBe(false);
+      expect(input.isPressed('down')).toBe(false);
+      input.attach();
+    });
+  });
 });

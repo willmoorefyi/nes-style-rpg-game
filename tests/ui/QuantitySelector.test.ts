@@ -103,3 +103,18 @@ describe('QuantitySelectorUI', () => {
     });
   });
 });
+
+describe('MS-5: unit price and total', () => {
+  it('shows a total that follows the quantity', () => {
+    const selector = new QuantitySelectorUI(0, 0, 10, vi.fn(), vi.fn(), 40);
+    expect(selector.totalLabel).toBe('Total: 40 G');
+    selector.increment();
+    expect(selector.totalLabel).toBe('Total: 80 G');
+    selector.decrement();
+    expect(selector.totalLabel).toBe('Total: 40 G');
+  });
+
+  it('without a price there is no total', () => {
+    expect(new QuantitySelectorUI(0, 0, 10, vi.fn(), vi.fn()).totalLabel).toBe('');
+  });
+});

@@ -17,6 +17,8 @@ export interface MenuConfig {
   lineHeight?: number;
   cursor?: string;
   maxVisible?: number;
+  /** Start with the cursor here (clamped to the list), e.g. to keep a shop's place after a sale. */
+  initialIndex?: number;
   onSelect?: (item: MenuItem, index: number) => void;
   onCancel?: () => void;
   eventBus?: EventBus;
@@ -64,7 +66,11 @@ export class Menu extends Container {
       this.addChild(this.downIndicator);
     }
 
-    this.renderItems();
+    if (config.initialIndex !== undefined && this.items.length > 0) {
+      this.setIndex(config.initialIndex);
+    } else {
+      this.renderItems();
+    }
   }
 
   private renderItems(): void {

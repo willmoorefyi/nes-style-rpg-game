@@ -30,8 +30,9 @@ describe('MS-2: shop comparison respects who can equip the item', () => {
     scene.update(1);                              // draws the comparison panel
     const labels = visibleLabels(scene.container);
     expect(labels).toContain('B.MAG  n/a');
-    expect(labels.some((l) => /^\s*\+\d+$/.test(l))).toBe(true); // the warrior's gain
-    expect(labels.filter((l) => /^\s*[+-]?\d+$/.test(l))).toHaveLength(1); // only one member is compared
+    // MS-5: one line per member, `NAME  ATK cur->new  +d`
+    expect(labels.some((l) => /^FGHTR  ATK \d+->\d+  \+\d+$/.test(l))).toBe(true); // the warrior's gain
+    expect(labels.filter((l) => /->/.test(l))).toHaveLength(1); // only one member is compared
   });
 });
 
@@ -61,9 +62,7 @@ describe('T4 review: the shop compares on the battle formulas (Monk unarmed / ma
       { label: 'ATK', now: 9, next: 19, diff: 10, nowHits: 2, nextHits: 1 });
     const labels = panelFor([m]);
     expect(labels).toContain('Wooden Nunchaku  ATK: 12');
-    expect(labels).toContain('  Now: - ATK: 9 (2 hits)');
-    expect(labels).toContain('  New: ATK: 19 (1 hit)');
-    expect(labels).toContain('  +10');
+    expect(labels).toContain('MONK  ATK 9 (2 hits)->19 (1 hit)  +10');
   });
 
   it('a Lv7 Monk\'s bare hands beat the Wooden Nunchaku: a negative value', () => {
@@ -72,9 +71,7 @@ describe('T4 review: the shop compares on the battle formulas (Monk unarmed / ma
     expect(compareEquip(m, ItemRegistry.getItem('wooden_nunchaku')!, 'weapon')).toEqual(
       { label: 'ATK', now: 33, next: 31, diff: -2, nowHits: 2, nextHits: 1 });
     const labels = panelFor([m]);
-    expect(labels).toContain('  Now: - ATK: 33 (2 hits)');
-    expect(labels).toContain('  New: ATK: 31 (1 hit)');
-    expect(labels).toContain('  -2');
+    expect(labels).toContain('MONK  ATK 33 (2 hits)->31 (1 hit)  -2');
   });
 
   it('a Warrior\'s comparison is weapon + ⌊STR/2⌋ against the current weapon, with no hit count at 1 hit', () => {

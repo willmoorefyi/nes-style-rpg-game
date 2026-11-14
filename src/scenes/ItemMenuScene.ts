@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js';
 import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
+import type { ExplorationScene } from './ExplorationScene.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
@@ -99,6 +100,12 @@ export class ItemMenuScene implements Scene {
     this.selectedItemId = item.value;
     // Party-wide items (tent/cabin) skip target selection
     if (ItemEffects.isPartyItem(item.value)) {
+      // MS-8: camping only where the map allows it (FF1: the world map); the item is kept
+      const exploration = this.game.scenes.get<ExplorationScene>('exploration');
+      if (!(exploration?.canCamp() ?? false)) {
+        this.descText.setText("You can't camp here.", true);
+        return;
+      }
       const result = ItemEffects.applyPartyItemEffect(item.value, this.game.party.all, this.game.inventory);
       this.descText.setText(result.message, true);
       this.buildItemMenu();

@@ -1,4 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { Game } from '../../src/core/Game.js';
+import { FONT_SIZE, WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
+import { Character } from '../../src/entities/Character.js';
+import { ClassRegistry } from '../../src/data/ClassRegistry.js';
+import { ShopScene } from '../../src/scenes/ShopScene.js';
+import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
@@ -103,5 +109,72 @@ describe('ShopScene business logic', () => {
       
       expect(sellableItems).toHaveLength(0);
     });
+  });
+});
+
+describe('MS-5: shop layout, quantity total, result line and cursor', () => {
+  // Real data for these cases (the business-logic cases above reset the registries to mocks).
+  const setup = async (shopId: string, inv: Record<string, number> = {}, gold = 10000) => {
+    await loadRealRegistries();
+    const input = tapInput();
+    const party = new PartyManager();
+    for (const [name, cls] of [['FGHTR', 'warrior'], ['THIEF', 'thief'], ['W.MAG', 'white_mage'], ['B.MAG', 'black_mage']]) {
+      party.add(new Character({ name, classData: ClassRegistry.getClass(cls)! }));
+    }
+    party.addGold(gold);
+    const inventory = new Inventory();
+    for (const [id, n] of Object.entries(inv)) inventory.add(id, n);
+    const game = { input, inventory, party, events: { emit: vi.fn() }, scenes: { pop: vi.fn() } };
+    const scene = new ShopScene(game as unknown as Game, shopId);
+    scene.enter();
+    const tap = (a: Parameters<typeof input.tap>[0]): void => input.tap(a, () => scene.update(1));
+    return { scene, tap, party, inventory };
+  };
+
+  it('the item list ends before the comparison panel, and every comparison line fits the panel', async () => {
+    const { scene, tap } = await setup('cornelia_weapon');
+    tap('confirm'); // Buy
+    scene.update(1); // draws the panel
+    expect(scene.detailVisible).toBe(true);
+    const list = scene.itemWindowRect;
+    const panel = scene.detailWindowRect;
+    expect(list.x + list.width).toBeLessThanOrEqual(panel.x);
+    const lines = scene.detailLines;
+    expect(lines).toHaveLength(5); // the item, then one line per member
+    const contentBottom = panel.height - WINDOW_PADDING;
+    for (const l of lines) expect(l.y + FONT_SIZE).toBeLessThanOrEqual(contentBottom);
+    // closing the list gives it the full width back
+    tap('cancel');
+    expect(scene.itemWindowRect.width).toBeGreaterThan(panel.x);
+  });
+
+  it('the quantity picker shows the total, then "Bought 2 Potion." until the next input', async () => {
+    const { scene, tap, inventory } = await setup('cornelia_item');
+    const price = ItemRegistry.getItem('potion')!.price;
+    tap('confirm'); // Buy
+    tap('confirm'); // Potion
+    expect(visibleLabels(scene.container)).toContain(`Total: ${price} G`);
+    tap('right');
+    expect(visibleLabels(scene.container)).toContain(`Total: ${price * 2} G`);
+    tap('confirm');
+    expect(inventory.getQuantity('potion')).toBe(2);
+    expect(scene.resultMessage).toBe('Bought 2 Potion.');
+    scene.update(1); // no input: the line stays
+    expect(scene.resultMessage).toBe('Bought 2 Potion.');
+    tap('down');
+    expect(scene.resultMessage).toBe('');
+  });
+
+  it('after a sale the cursor stays on the same row and "Sold" shows', async () => {
+    const { scene, tap, inventory } = await setup('cornelia_item', { potion: 3, antidote: 2, tent: 1 });
+    tap('down'); // Sell
+    tap('confirm');
+    tap('down'); // the middle row: Antidote
+    expect(scene.itemIndex).toBe(1);
+    tap('confirm'); // picker
+    tap('confirm'); // sell 1
+    expect(inventory.getQuantity('antidote')).toBe(1);
+    expect(scene.itemIndex).toBe(1);
+    expect(scene.resultMessage).toBe('Sold 1 Antidote.');
   });
 });
