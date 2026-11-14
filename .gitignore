@@ -192,3 +192,5 @@ __pycache__/
 
 # Agent worktrees
 .claude/worktrees/
+!assets-src/gen/cache/b398fc75dc4521f0a2e9f762.png
+!assets-src/gen/cache/b398fc75dc4521f0a2e9f762.json
