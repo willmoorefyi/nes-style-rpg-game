@@ -1,0 +1,23 @@
+# Puppet animation joints for the red mage (assets-src/gen/puppet.py). Native px on approved/red_mage/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+robed: false
+attack_hand: n
+front_far_arm: {ready: true, attack: false, cast: false}
+battle:
+  ready:
+    {neck: [40, 33], crown: [45, 9], chest: [43, 40], hip: [44, 54],
+     sh_n: [33, 39], el_n: [29, 45], hand_n: [22, 38], sh_f: [50, 37], el_f: [53, 45], hand_f: [45, 42],
+     hip_n: [38, 56], knee_n: [30, 62], foot_n: [29, 73], hip_f: [48, 56], knee_f: [54, 63], foot_f: [58, 73]}
+  attack:
+    {neck: [43, 35], crown: [48, 12], chest: [46, 40], hip: [47, 55],
+     sh_n: [38, 38], el_n: [29, 38], hand_n: [21, 37], tip: [0, 37], weapon_hand: n,
+     sh_f: [52, 37], el_f: [60, 40], hand_f: [70, 43],
+     hip_n: [42, 57], knee_n: [37, 62], foot_n: [36, 73], hip_f: [55, 58], knee_f: [65, 63], foot_f: [70, 72]}
+  cast:
+    {neck: [43, 34], crown: [48, 8], chest: [42, 40], hip: [44, 54],
+     sh_n: [34, 35], el_n: [28, 29], hand_n: [20, 23], sh_f: [50, 36], el_f: [53, 43], hand_f: [55, 46],
+     hip_n: [38, 56], knee_n: [30, 63], foot_n: [29, 73], hip_f: [48, 56], knee_f: [51, 63], foot_f: [55, 74]}
+tweaks:
+  atk_mid: {sh_n: [0, -3], el_f: [1, 0], el_n: [2, 0]}
+  cast_gather: {el_n: [-2, 0], hand_n: [0, 1], el_f: [-2, 0]}
+  cast_rise: {sh_n: [0, 2], el_n: [0, -2], hand_n: [0, -1], crown: [-1, 0], neck: [0, 2], el_f: [2, 0]}

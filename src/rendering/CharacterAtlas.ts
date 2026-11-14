@@ -17,6 +17,10 @@ export interface CharacterAtlasMeta {
   fieldScale: number;
   rowNames: string[];
   sheets: Record<string, { x: number; y: number }>;
+  /** Walk columns played while moving, e.g. [1, 0, 2, 0] (legacy, the default) or [1..6] (2x art). */
+  walkSequence?: number[];
+  /** Walk frames shown per tile moved (2 for the 3-column legacy sheets, 3 for the 7-column 2x sheets). */
+  walkPhases?: number;
 }
 
 /** Layout of assets/sprites/battle-characters-ai.json (build stage battle_ai; docs/ART_2X_PLAN.md): one row per
@@ -56,14 +60,25 @@ export async function fetchJson<T>(path: string): Promise<T> {
 /** What PlayerController needs to animate a character from the shared atlas. */
 export interface FieldArt {
   texture: Texture;
-  animation: Pick<AnimationConfig, 'frameWidth' | 'frameHeight' | 'frameCount' | 'originX' | 'originY' | 'walkSequence'>;
+  animation: Pick<AnimationConfig, 'frameWidth' | 'frameHeight' | 'frameCount' | 'originX' | 'originY' | 'walkSequence'
+    | 'walkPhases'>;
   /** Extra sprite scale so a frame is one tile wide on screen (2 for legacy art in the 96 px preview tiles). */
   displayScale: number;
   ai: boolean;
 }
 
-export const BATTLE_POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory'] as const;
+/** Keyframe poses, then the in-betweens (assets-src/gen/puppet.py) that smooth idle, melee and casting. */
+export const BATTLE_POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory',
+  'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'atk_follow', 'cast_gather', 'cast_rise', 'cast_release'] as const;
 export type BattlePose = typeof BATTLE_POSES[number];
+
+/** The keyframe an in-between falls back to when an atlas does not carry it (older builds). */
+export const POSE_FALLBACK: Partial<Record<BattlePose, BattlePose>> = {
+  idle_b: 'ready', atk_wind1: 'ready', atk_wind2: 'ready', atk_mid: 'attack', atk_follow: 'attack',
+  cast_gather: 'ready', cast_rise: 'cast', cast_release: 'cast',
+};
+
+const LEGACY_WALK = [1, 0, 2, 0];
 
 /** Two-tile (head over feet) character sheets: field walk frames and battle poses; scale and cell size come from the atlas JSON. */
 export class CharacterAtlas {
@@ -164,10 +179,11 @@ export class CharacterAtlas {
       animation: {
         frameWidth: cell[0] * fieldScale,
         frameHeight: cell[1] * fieldScale,
-        frameCount: 3,
+        frameCount: src.meta.cols,
         originX: origin.x * fieldScale,
         originY: origin.y * fieldScale,
-        walkSequence: [1, 0, 2, 0],
+        walkSequence: src.meta.walkSequence ?? LEGACY_WALK,
+        walkPhases: src.meta.walkPhases ?? 2,
       },
       displayScale: TILE_SIZE / (cell[0] * fieldScale),
       ai: src.ai,
@@ -185,7 +201,7 @@ export class CharacterAtlas {
     const frames: Texture[][] = [];
     for (let row = 0; row < 4; row++) {
       const cols: Texture[] = [];
-      for (let col = 0; col < 3; col++) {
+      for (let col = 0; col < src.meta.cols; col++) {
         cols.push(new Texture({
           source: src.tex.source,
           frame: new Rectangle(o.x * fieldScale + col * fw, o.y * fieldScale + row * fh, fw, fh),
@@ -194,7 +210,8 @@ export class CharacterAtlas {
       frames.push(cols);
     }
     const scale = TILE_SIZE / fw;
-    return { frames, frameHeight: fh * scale, scale };
+    return { frames, frameHeight: fh * scale, scale, walkSequence: src.meta.walkSequence ?? LEGACY_WALK,
+      walkPhases: src.meta.walkPhases ?? 2 };
   }
 
   /** Battle poses (left-facing) in BATTLE_POSES order, or null when this class has no battle art (placeholder). */
@@ -209,10 +226,11 @@ export class CharacterAtlas {
 function sliceRow(meta: BattleAtlasMeta, tex: Texture, row: number): Texture[] {
   const fw = meta.cell[0] * meta.scale;
   const fh = meta.cell[1] * meta.scale;
-  return BATTLE_POSES.map((pose) => new Texture({
-    source: tex.source,
-    frame: new Rectangle(meta.poses.indexOf(pose) * fw, row * fh, fw, fh),
-  }));
+  return BATTLE_POSES.map((pose) => {
+    let col = meta.poses.indexOf(pose);
+    if (col < 0) col = meta.poses.indexOf(POSE_FALLBACK[pose] ?? 'ready');
+    return new Texture({ source: tex.source, frame: new Rectangle(Math.max(0, col) * fw, row * fh, fw, fh) });
+  });
 }
 
 /** Shared by exploration and battle so art is loaded once. */

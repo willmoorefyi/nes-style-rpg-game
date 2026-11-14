@@ -379,7 +379,7 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
                          "(only the user may raise --max-paid)")
     if not paid:
         raise SystemExit(f"refused: {len(misses)} uncached request(s) need --paid (run --dry-run to inspect first)")
-    attempts = [e for e in ledger if e.get("event") == "attempt"]
+    attempts = [e for e in ledger if e.get("event") == "attempt" and e.get("backend") != "bedrock"]  # cap is Gemini-only
     if BUDGET.exists():                              # the user's run-wide hard cap (budget.json)
         b = json.loads(BUDGET.read_text())
         used = len(attempts) - b["attempts_before"]

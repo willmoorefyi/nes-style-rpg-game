@@ -33,6 +33,8 @@ const DIRECTION_VECTORS: Record<Direction, { dx: number; dy: number }> = {
 
 export class PlayerController {
   readonly animation: SpriteAnimation;
+  /** Walk frames per tile moved (from the atlas). */
+  private readonly walkPhases: number;
   private tileX: number;
   private tileY: number;
   private targetX: number;
@@ -70,6 +72,7 @@ export class PlayerController {
       directions: { down: 0, up: 1, left: 2, right: 3 },
       ...config.animation,
     });
+    this.walkPhases = config.animation?.walkPhases ?? 2;
     const displayScale = config.displayScale ?? 1;
     this.animation.sprite.scale.set(displayScale);
     this.frameHeight = (config.animation?.frameHeight ?? TILE_SIZE) * displayScale;
@@ -99,7 +102,7 @@ export class PlayerController {
         this.animation.setState('idle');
         this.events.emit('playerMove', { x: this.tileX, y: this.tileY });
       } else {
-        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, this.moveProgress));
+        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, this.moveProgress, this.walkPhases));
       }
       this.updateSpritePosition();
     } else {
@@ -123,7 +126,7 @@ export class PlayerController {
         this.targetX = newX;
         this.targetY = newY;
         this.state = 'moving';
-        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, 0));
+        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, 0, this.walkPhases));
       }
     }
   }

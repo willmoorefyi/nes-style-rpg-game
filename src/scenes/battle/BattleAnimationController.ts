@@ -7,7 +7,8 @@ import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
 import { formatConciseResult, capitalize, createPromptIndicator, destroyPromptIndicator } from './battleMessageUtils.js';
-import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackStyle, type AttackFrame, type AttackStyle } from './attackChoreography.js';
+import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
+  type AttackStyle } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
@@ -19,8 +20,11 @@ export class BattleAnimationController {
   animActorSprite: Container | null = null;
   animActorOrigX = 0;
   animActorOrigY = 0;
-  /** Melee choreography for party attacks (wind-up, run in, strike, hop back). */
-  attackStyle: AttackStyle = typeof location === 'undefined' ? 'lunge' : parseAttackStyle(location.search);
+  /** Melee choreography for the current party attack: drawn at random per attack unless `?attack=` forces one. */
+  attackStyle: AttackStyle = 'lunge';
+  attackOverride: AttackStyle | null = typeof location === 'undefined' ? null : parseAttackOverride(location.search);
+  /** Random source for the attack style (tests inject a fixed one). */
+  attackRng: () => number = Math.random;
   private lastAdvance: AttackFrame = { dx: 0, dy: 0, pose: 'ready' };
   animMessages: { text: string }[] = [];
   animMessageIndex = 0;
@@ -99,8 +103,9 @@ export class BattleAnimationController {
             this.animActorOrigX = this.animActorSprite.x;
             this.animActorOrigY = this.animActorSprite.y;
             this.lastAdvance = { dx: 0, dy: 0, pose: 'ready' };
-            // spells and items: the cast stance at once; a melee attack poses frame by frame in step_forward
-            if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'attack');
+            if (info.actionType === 'fight') this.attackStyle = this.attackOverride ?? pickAttackStyle(this.attackRng);
+            // spells and items gather in place first; every party action then poses frame by frame in step_forward
+            if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'cast_gather');
           }
         }
         this.animTimer += dt;
@@ -113,11 +118,10 @@ export class BattleAnimationController {
       }
       case 'step_forward': {
         const melee = this.currentActionInfo?.actionType === 'fight';
-        const frames = melee ? advanceFrames(this.attackStyle) : 15;
+        const frames = melee ? advanceFrames(this.attackStyle) : CAST_FRAMES;
         this.animTimer += dt;
         if (confirmSkip) this.animTimer = frames;
-        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer)
-          : { dx: -120 * Math.min(this.animTimer / 15, 1), dy: 0, pose: 'attack' });
+        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer) : castAt(this.animTimer));
         if (this.animTimer >= frames) { this.animTimer = 0; this.animPhase = 'execute'; }
         break;
       }
@@ -166,7 +170,9 @@ export class BattleAnimationController {
       case 'step_back': {
         this.animTimer += dt;
         if (confirmSkip) this.animTimer = RETURN_FRAMES;
-        this.placeActor(returnAt(this.lastAdvance, this.animTimer, this.attackStyle), false);
+        this.placeActor(this.currentActionInfo?.actionType === 'fight' || !this.currentActionInfo
+          ? returnAt(this.lastAdvance, this.animTimer, this.attackStyle)
+          : castReturnAt(this.lastAdvance, this.animTimer), false);
         if (this.animTimer >= RETURN_FRAMES) {
           if (this.animActorSprite) this.animActorSprite.position.set(this.animActorOrigX, this.animActorOrigY);
           this.completeAction();

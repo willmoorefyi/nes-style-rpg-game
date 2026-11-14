@@ -14,13 +14,15 @@ export interface AnimationConfig {
   originY?: number;
   /** Column order used while walking, e.g. [1, 0, 2, 0]. Defaults to 0..frameCount-1. */
   walkSequence?: number[];
+  /** Walk-sequence frames shown per tile moved (see walkCycleIndex; default 2). */
+  walkPhases?: number;
 }
 
-/** Position in the walk cycle for a character moving tile by tile: each tile shows a step pose for its first half
- *  and the passing (standing) pose for its second half, and consecutive tiles alternate the stepping foot, so a
- *  [stepL, stand, stepR, stand] cycle plays exactly once every two tiles at any walking speed. */
-export function walkCycleIndex(stepsTaken: number, tileProgress: number): number {
-  return stepsTaken * 2 + (tileProgress < 0.5 ? 0 : 1);
+/** Position in the walk cycle for a character moving tile by tile: each tile is split into `phases` equal parts
+ *  (legacy: step pose, then the passing pose; 2x art: contact, down, passing) and consecutive tiles alternate the
+ *  stepping foot, so the cycle plays exactly once every two tiles at any walking speed. */
+export function walkCycleIndex(stepsTaken: number, tileProgress: number, phases: number = 2): number {
+  return stepsTaken * phases + Math.min(phases - 1, Math.floor(Math.max(0, tileProgress) * phases));
 }
 
 export class SpriteAnimation {

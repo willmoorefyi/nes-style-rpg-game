@@ -33,6 +33,9 @@ export interface NPCFrames {
   frameHeight: number;
   /** Sprite scale so one frame is one tile wide on screen (default 1). */
   scale?: number;
+  /** Walk columns and frames per tile (default: the legacy [1, 0, 2, 0], 2 per tile). */
+  walkSequence?: number[];
+  walkPhases?: number;
 }
 
 const FACE_ROW = { down: 0, up: 1, left: 2, right: 3 } as const;
@@ -124,7 +127,8 @@ export class NPC {
       this.sprite.x = (this.moveFromX + (this.tileX - this.moveFromX) * t) * TILE_SIZE;
       this.sprite.y = (this.moveFromY + (this.tileY - this.moveFromY) * t) * TILE_SIZE + this.offsetY;
       this.updateDepth();
-      this.showFrame(t >= 1 ? 0 : WALK_CYCLE[walkCycleIndex(this.stepsTaken, t) % WALK_CYCLE.length]);
+      const seq = this.art?.walkSequence ?? WALK_CYCLE;
+      this.showFrame(t >= 1 ? 0 : seq[walkCycleIndex(this.stepsTaken, t, this.art?.walkPhases ?? 2) % seq.length]);
       if (t >= 1) {
         this.isMoving = false;
         this.stepsTaken++;

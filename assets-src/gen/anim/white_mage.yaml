@@ -1,0 +1,30 @@
+# Puppet animation joints for the white mage (assets-src/gen/puppet.py). Native px on approved/white_mage/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+# Ready: the staff below the fist is cut with the torso, so the far fist stays put in every ready-cut frame (tweaks).
+# Cast: the staff runs both ways from the fist, so hand_n sits on the staff's butt end and the weapon bone covers the
+# whole staff (the fist rides with it).
+robed: true
+attack_hand: n
+cast_hand: n
+front_far_arm: {ready: true, attack: false, cast: true}
+battle:
+  ready:
+    {neck: [40, 34], crown: [41, 12], chest: [42, 40], hip: [43, 56],
+     sh_n: [31, 38], el_n: [26, 42], hand_n: [19, 38], sh_f: [51, 38], el_f: [56, 42], hand_f: [62, 43],
+     tip: [64, 22], weapon_hand: f,
+     hip_n: [37, 58], knee_n: [33, 66], foot_n: [28, 73], hip_f: [49, 58], knee_f: [54, 66], foot_f: [58, 73]}
+  attack:
+    {neck: [43, 35], crown: [45, 12], chest: [47, 42], hip: [48, 57],
+     sh_n: [33, 36], el_n: [27, 35], hand_n: [20, 34], tip: [1, 35], weapon_hand: n,
+     sh_f: [56, 38], el_f: [62, 44], hand_f: [56, 45],
+     hip_n: [42, 60], knee_n: [40, 67], foot_n: [39, 73], hip_f: [58, 60], knee_f: [65, 67], foot_f: [70, 73]}
+  cast:
+    {neck: [44, 35], crown: [42, 10], chest: [43, 42], hip: [44, 57],
+     sh_n: [31, 36], el_n: [26, 31], hand_n: [12, 47], tip: [28, 5], weapon_hand: n,
+     sh_f: [52, 38], el_f: [55, 44], hand_f: [45, 42],
+     hip_n: [36, 60], knee_n: [32, 67], foot_n: [28, 73], hip_f: [50, 60], knee_f: [53, 67], foot_f: [55, 74]}
+tweaks:
+  atk_wind1: {el_f: [-1, 0], hand_f: [-1, 0], tip: [-1, 0]}
+  cast_gather: {hand_f: [19, -3], el_f: [2, -2], tip: [19, -3]}
+  cast_rise: {hand_n: [0, -2]}
+  cast_release: {hand_n: [0, 3], el_n: [0, 2]}

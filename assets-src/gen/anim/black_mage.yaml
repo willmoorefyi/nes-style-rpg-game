@@ -1,0 +1,27 @@
+# Puppet animation joints for the black mage (assets-src/gen/puppet.py). Native px on approved/black_mage/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+# The whole mage is blue, so the blue-cape-behind heuristic is off (it would glue the far sleeve and hat to the torso).
+robed: true
+attack_hand: n
+front_far_arm: {ready: true, attack: false, cast: false}
+battle:
+  ready:
+    {neck: [38, 32], crown: [44, 4], chest: [40, 40], hip: [42, 55], cape_behind: false,
+     sh_n: [32, 38], el_n: [27, 43], hand_n: [20, 37], sh_f: [49, 34], el_f: [54, 43], hand_f: [44, 40],
+     hip_n: [36, 58], knee_n: [32, 66], foot_n: [28, 73], hip_f: [48, 58], knee_f: [55, 66], foot_f: [59, 73]}
+  attack:
+    {neck: [46, 37], crown: [52, 8], chest: [48, 43], hip: [50, 57], cape_behind: false,
+     sh_n: [36, 35], el_n: [27, 36], hand_n: [17, 34], tip: [1, 34], weapon_hand: n,
+     sh_f: [56, 37], el_f: [62, 42], hand_f: [57, 45],
+     hip_n: [42, 60], knee_n: [36, 66], foot_n: [30, 73], hip_f: [58, 60], knee_f: [66, 66], foot_f: [72, 73]}
+  cast:
+    {neck: [43, 33], crown: [32, 3], chest: [42, 42], hip: [44, 57], cape_behind: false,
+     sh_n: [33, 40], el_n: [28, 48], hand_n: [27, 55], sh_f: [50, 36], el_f: [56, 30], hand_f: [65, 20],
+     hip_n: [36, 60], knee_n: [32, 67], foot_n: [28, 73], hip_f: [50, 60], knee_f: [54, 67], foot_f: [57, 74]}
+tweaks:
+  # the big near sleeve hangs in the cast keyframe; keep it (and the hat) at the cast pose and only raise the far arm
+  cast_rise: {neck: [2.5, 0.5], crown: [-6, -0.5], chest: [1, 1], hip: [1, 1],
+              sh_n: [0.5, 1], el_n: [0.5, 2.5], hand_n: [3.5, 9], hand_f: [6, -3]}
+  atk_mid: {el_n: [2, 0]}
+  atk_follow: {sh_n: [0, -2]}
+  cast_gather: {el_n: [0, -2], el_f: [-1, 0]}

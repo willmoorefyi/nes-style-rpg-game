@@ -1,3 +1,4 @@
+import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -77,7 +78,7 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(battleAtlas.scale).toBe(2);
       expect(battleAtlas.cell[1] * battleAtlas.scale).toBe(160);
       expect(battleAtlas.footRow).toBeLessThan(battleAtlas.cell[1]);
-      expect(battleAtlas.poses).toEqual(['ready', 'attack', 'cast', 'hurt', 'down', 'victory']);
+      expect(battleAtlas.poses).toEqual([...BATTLE_POSES]);
     });
 
     it('only lists known classes, and the image matches cell x scale x poses by rows', () => {
@@ -93,7 +94,8 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     const metaPath = join(assets, 'sprites/characters-ai.json');
     const present = existsSync(metaPath);
     const meta = present
-      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { cell: [number, number]; cols: number; rows: number; fieldScale: number; rowNames: string[]; sheets: Record<string, { x: number; y: number }> })
+      ? (JSON.parse(readFileSync(metaPath, 'utf-8')) as { cell: [number, number]; cols: number; rows: number; fieldScale: number; rowNames: string[]; sheets: Record<string, { x: number; y: number }>;
+        walkSequence?: number[]; walkPhases?: number })
       : null;
 
     it.runIf(present)('frames are one 96 px preview tile wide and two tiles tall at 2x', () => {
@@ -101,7 +103,10 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(meta!.cell[0] * meta!.fieldScale).toBe(96);
       expect(meta!.cell[1] * meta!.fieldScale).toBe(192);
       expect(meta!.rowNames).toEqual(['down', 'up', 'left', 'right']);
-      expect([meta!.cols, meta!.rows]).toEqual([3, 4]);
+      expect([meta!.cols, meta!.rows]).toEqual([7, 4]);
+      // stand + contact/down/pass for each foot, three frames per tile
+      expect(meta!.walkSequence).toEqual([1, 2, 3, 4, 5, 6]);
+      expect(meta!.walkPhases).toBe(3);
     });
 
     it.runIf(present)('every NPC sprite on a compiled map has 2x field art (or legacy art)', () => {

@@ -23,5 +23,33 @@
     "down",
     "victory"
   ],
-  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output"
+  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output",
+  "face_fix": {
+    "pose": "attack",
+    "box": [
+      35,
+      30,
+      45,
+      37
+    ],
+    "from": [
+      [
+        198,
+        189,
+        189
+      ]
+    ],
+    "to": [
+      231,
+      181,
+      107
+    ],
+    "extra": [
+      [
+        42,
+        35
+      ]
+    ],
+    "note": "review fix 2026-11-13: Gemini shaded the attack face in armour grey; recoloured to the skin of the other poses"
+  }
 }

@@ -173,3 +173,17 @@
 {"event": "result", "key": "b8360f8dd0d4265dc4a54d06", "ok": true}
 {"event": "attempt", "ts": "2026-11-13T10:29:16", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_city", "seed": 1234, "key": "cefbca65dd7fe773839633aa"}
 {"event": "result", "key": "cefbca65dd7fe773839633aa", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:42:20", "backend": "bedrock", "model": "structure", "character": "knight", "sheet": "anim_battle", "seed": 1234, "key": "03444830de33e8b853f767e4"}
+{"event": "result", "key": "03444830de33e8b853f767e4", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:42:37", "backend": "bedrock", "model": "structure", "character": "knight", "sheet": "anim_walk_left", "seed": 1234, "key": "b36c0a2fe98c5b0be28ffb93"}
+{"event": "result", "key": "b36c0a2fe98c5b0be28ffb93", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:46:34", "backend": "bedrock", "model": "sd35", "character": "knight", "sheet": "anim_battle_i2i_35", "seed": 1234, "key": "4e5c0dc406e431f9f07d7774"}
+{"event": "result", "key": "4e5c0dc406e431f9f07d7774", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:46:42", "backend": "bedrock", "model": "sd35", "character": "knight", "sheet": "anim_battle_i2i_55", "seed": 1234, "key": "f351fa69426b73e6b3b3ef5b"}
+{"event": "result", "key": "f351fa69426b73e6b3b3ef5b", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:46:50", "backend": "bedrock", "model": "sd35", "character": "knight", "sheet": "anim_walk_i2i_35", "seed": 1234, "key": "733f23af28bd11cc1c48377a"}
+{"event": "result", "key": "733f23af28bd11cc1c48377a", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:48:51", "backend": "bedrock", "model": "inpaint", "character": "knight", "sheet": "anim_battle_inpaint", "seed": 1234, "key": "2961f956111fdd3a6d710a71"}
+{"event": "result", "key": "2961f956111fdd3a6d710a71", "ok": true}
+{"event": "attempt", "ts": "2026-11-13T19:49:11", "backend": "bedrock", "model": "inpaint", "character": "knight", "sheet": "anim_walk_inpaint", "seed": 1234, "key": "3cc52cedf2e29572afa18812"}
+{"event": "result", "key": "3cc52cedf2e29572afa18812", "ok": true}

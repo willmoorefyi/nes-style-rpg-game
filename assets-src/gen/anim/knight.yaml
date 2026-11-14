@@ -1,0 +1,19 @@
+# Puppet animation joints for the knight (assets-src/gen/puppet.py). Native px on approved/knight/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+robed: false
+attack_hand: n
+front_far_arm: {ready: true, attack: false, cast: true}
+battle:
+  ready:
+    {neck: [40, 34], crown: [42, 9], chest: [41, 38], hip: [43, 54],
+     sh_n: [32, 38], el_n: [28, 46], hand_n: [21, 40], sh_f: [50, 36], el_f: [55, 44], hand_f: [46, 42],
+     hip_n: [38, 55], knee_n: [29, 61], foot_n: [30, 72], hip_f: [48, 55], knee_f: [52, 62], foot_f: [58, 72]}
+  attack:
+    {neck: [42, 33], crown: [47, 8], chest: [46, 40], hip: [47, 55],
+     sh_n: [37, 36], el_n: [28, 34], hand_n: [20, 34], tip: [0, 34], weapon_hand: n,
+     sh_f: [54, 37], el_f: [61, 42], hand_f: [60, 47],
+     hip_n: [43, 57], knee_n: [36, 62], foot_n: [40, 72], hip_f: [52, 57], knee_f: [60, 63], foot_f: [70, 72]}
+  cast:
+    {neck: [42, 34], crown: [37, 6], chest: [41, 40], hip: [43, 54],
+     sh_n: [32, 40], el_n: [27, 46], hand_n: [21, 45], sh_f: [49, 36], el_f: [56, 33], hand_f: [63, 28],
+     hip_n: [37, 55], knee_n: [28, 61], foot_n: [30, 72], hip_f: [48, 55], knee_f: [51, 62], foot_f: [55, 73]}

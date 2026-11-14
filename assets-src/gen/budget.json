@@ -1,5 +1,5 @@
 {
-  "note": "User hard limit (2026-11-12): at most 100 more paid images unless the user explicitly approves more; at most 3 attempts (1 + 2 retries) per sheet in this run.",
+  "note": "User hard limit (2026-11-12): at most 100 more paid images unless the user explicitly approves more; at most 3 attempts (1 + 2 retries) per sheet in this run. Bedrock (Stability) requests are not counted against this cap (user, 2026-11-13); they are still logged in the ledger.",
   "attempts_before": 69,
   "cap": 100,
   "max_attempts_per_sheet": 3

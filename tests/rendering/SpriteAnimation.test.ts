@@ -139,4 +139,14 @@ describe('walkCycleIndex (movement-driven walking)', () => {
     }
     expect(frames).toEqual([1, 1, 0, 0, 2, 2, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0]);
   });
+
+  it('2x art: contact, down and passing on each tile, the six-frame cycle once every two tiles', async () => {
+    const { walkCycleIndex } = await import('../../src/rendering/SpriteAnimation.js');
+    const seq = [1, 2, 3, 4, 5, 6];
+    const frames = [];
+    for (let tile = 0; tile < 2; tile++) {
+      for (const p of [0, 0.2, 0.4, 0.6, 0.8, 0.99]) frames.push(seq[walkCycleIndex(tile, p, 3) % 6]);
+    }
+    expect(frames).toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]);
+  });
 });

@@ -1,0 +1,31 @@
+# Puppet animation joints for the red wizard (assets-src/gen/puppet.py). Native px on approved/red_wizard/battle.png
+# cells (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = rapier tip, held in hand_<weapon_hand>.
+# robed: the long coat hangs over the legs, so the legs stay with the torso.
+robed: true
+attack_hand: n
+front_far_arm: {ready: true, attack: false, cast: false}
+battle:
+  ready:
+    {neck: [42, 31], crown: [44, 6], chest: [43, 37], hip: [44, 48],
+     sh_n: [35, 35], el_n: [28, 42], hand_n: [22, 36], sh_f: [49, 33], el_f: [52, 42], hand_f: [44, 38],
+     hip_n: [38, 52], knee_n: [30, 58], foot_n: [28, 72], hip_f: [48, 52], knee_f: [50, 62], foot_f: [57, 74]}
+  attack:
+    {neck: [44, 32], crown: [48, 10], chest: [46, 38], hip: [48, 50],
+     sh_n: [36, 33], el_n: [28, 33], hand_n: [20, 32], tip: [1, 32], weapon_hand: n,
+     sh_f: [52, 34], el_f: [60, 38], hand_f: [67, 42],
+     hip_n: [42, 54], knee_n: [36, 58], foot_n: [40, 73], hip_f: [56, 56], knee_f: [66, 64], foot_f: [70, 74]}
+  cast:
+    {neck: [42, 30], crown: [45, 5], chest: [44, 36], hip: [44, 48],
+     sh_n: [36, 32], el_n: [35, 42], hand_n: [28, 45], sh_f: [50, 31], el_f: [57, 30], hand_f: [64, 25],
+     hip_n: [38, 50], knee_n: [31, 60], foot_n: [28, 73], hip_f: [48, 50], knee_f: [52, 62], foot_f: [55, 74]}
+# tweaks: in-between joint offsets. They keep the coat/torso and head rigid (robed: legs ride with the torso, so a
+# rotated torso would tear the coat) and let only the acting arm move; .5 entries move joints that would land exactly on
+# half a pixel onto whole pixels (np.rint rounds .5 to even, which doubles/drops alternate columns).
+tweaks:
+  atk_wind1: {hip: [1, 0]}
+  atk_wind2: {chest: [0, -2], neck: [0, -2], crown: [0, -2], hip: [0, -2], sh_n: [0, -2], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2]}
+  atk_mid: {neck: [0, -0.45], crown: [0.9, 0.9], chest: [0.45, -0.45], hip: [0.9, 0], sh_n: [-0.45, -1.8], sh_f: [0.45, -0.45], el_f: [2.7, -2.7], hand_f: [9.45, 0.9]}
+  atk_follow: {neck: [0.5, 0.25], crown: [1, 1], chest: [0.75, 0.25], hip: [1, 0.5], sh_n: [0.25, -0.5], sh_f: [0.75, 0.25], el_f: [2, -1], hand_f: [5.75, 1], hip_n: [0, 0.5]}
+  cast_gather: {el_n: [1, 0], hand_n: [-8, -6], el_f: [2, -2], hand_f: [0, -5]}
+  cast_rise: {el_f: [1.5, -4], hand_f: [8, -2.5], neck: [0, -0.5], crown: [0.5, -0.5], chest: [0.5, -0.5], sh_n: [0.5, -1.5], el_n: [3.5, 0], hand_n: [3, 4.5], sh_f: [0.5, -1]}
+  cast_release: {neck: [1, 0], crown: [1, 0]}

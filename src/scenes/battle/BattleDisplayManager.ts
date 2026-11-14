@@ -7,6 +7,7 @@ import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import { battleArt } from '../../rendering/BattleArt.js';
 import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
+import { idlePose } from './attackChoreography.js';
 
 const HURT_FRAMES = 24;
 /** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
@@ -29,6 +30,8 @@ export class BattleDisplayManager {
   // Per-member battle pose textures; null where only the placeholder rectangle is available
   private partyFrames: (Texture[] | null)[] = [];
   private poseOverride = new Map<number, BattlePose>();
+  /** Frames elapsed, for the breathing idle (attackChoreography.idlePose). */
+  private idleClock = 0;
   private hurtTimers = new Map<number, number>();
   private victory = false;
   // K2: Character status boxes behind party sprites
@@ -165,6 +168,9 @@ export class BattleDisplayManager {
 
   update(dt: number): void {
     this.enemyView?.update(dt, this.enemySprites);
+    const before = this.idleClock;
+    this.idleClock += dt;
+    if (this.partySprites.some((_, i) => idlePose(before, i) !== idlePose(this.idleClock, i))) this.refreshPoses();
     if (this.hurtTimers.size === 0) return;
     for (const [i, t] of this.hurtTimers) {
       if (t - dt <= 0) this.hurtTimers.delete(i); else this.hurtTimers.set(i, t - dt);
@@ -177,7 +183,7 @@ export class BattleDisplayManager {
     if (this.victory) return 'victory';
     const forced = this.poseOverride.get(i);
     if (forced) return forced;
-    return this.hurtTimers.has(i) ? 'hurt' : 'ready';
+    return this.hurtTimers.has(i) ? 'hurt' : idlePose(this.idleClock, i);
   }
 
   private refreshPoses(): void {

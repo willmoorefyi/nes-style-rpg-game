@@ -1,0 +1,26 @@
+# Puppet animation joints for the warrior (assets-src/gen/puppet.py). Native px on approved/warrior/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+robed: false
+attack_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [40, 32], crown: [40, 10], chest: [41, 38], hip: [42, 52],
+     sh_n: [33, 36], el_n: [28, 43], hand_n: [20, 40], sh_f: [49, 34], el_f: [53, 43], hand_f: [44, 42],
+     hip_n: [35, 54], knee_n: [30, 60], foot_n: [28, 72], hip_f: [47, 54], knee_f: [50, 61], foot_f: [57, 72]}
+  attack:
+    {neck: [40, 32], crown: [40, 9], chest: [44, 40], hip: [46, 52],
+     sh_n: [34, 34], el_n: [26, 34], hand_n: [18, 35], tip: [0, 34], weapon_hand: n,
+     sh_f: [51, 32], el_f: [57, 40], hand_f: [59, 43],
+     hip_n: [38, 54], knee_n: [32, 60], foot_n: [31, 72], hip_f: [52, 54], knee_f: [60, 62], foot_f: [69, 72]}
+  cast:
+    {neck: [42, 31], crown: [44, 5], chest: [42, 38], hip: [42, 50],
+     sh_n: [29, 31], el_n: [24, 26], hand_n: [17, 19], sh_f: [51, 34], el_f: [53, 42], hand_f: [59, 41],
+     hip_n: [35, 53], knee_n: [31, 60], foot_n: [27, 72], hip_f: [48, 53], knee_f: [53, 60], foot_f: [55, 72]}
+# tweaks generated: every in-between joint snapped to a whole pixel (half-pixel offsets resample a translated part
+# with duplicated/dropped columns); far arm kept at its attack angles in atk_mid/atk_follow (the shield rim behind the
+# far fist is cut with the far forearm); cast_rise = cast pose with the raised arm swung 20 deg lower.
+tweaks:
+  atk_mid: {neck: [0.1, 0.1], crown: [0.1, -0.35], chest: [0.45, 0], hip: [-0.1, 0.1], sh_n: [-0.45, 0.2], el_n: [0.25, 0.15], hand_n: [-0.1, 0.15], sh_f: [0, 0.2], el_f: [0.9, -0.25], hand_f: [5.85, 1.55], hip_n: [0.45, 0.1], knee_n: [-0.1, 0.1], foot_n: [0.35, 0], hip_f: [0.35, 0.1], knee_f: [0.05, -0.45], foot_f: [0.4, 0], tip: [-0.1, 0.15]}
+  atk_follow: {crown: [0, -0.25], chest: [-0.25, 0.5], sh_n: [0.25, 0.5], sh_f: [0.5, 0.5], el_f: [1, 0.25], hand_f: [3.75, 1.25], hip_n: [-0.25, 0], knee_n: [0.5, 0], foot_n: [-0.25, 0], hip_f: [0.25, 0], knee_f: [0.5, 0.25]}
+  cast_rise: {neck: [1, -0.5], crown: [2, -2.5], chest: [0.5, 0], hip: [0, -1], sh_n: [-2, -2.5], el_n: [-3.41, -6.49], hand_n: [-4.88, -5.67], sh_f: [1, 0], el_f: [0, -0.5], hand_f: [7.5, -0.5], hip_n: [0, -0.5], knee_n: [0.5, 0], foot_n: [-0.5, 0], hip_f: [0.5, -0.5], knee_f: [1.5, -0.5], foot_f: [-1, 0]}

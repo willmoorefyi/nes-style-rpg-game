@@ -11,44 +11,64 @@
     "cast",
     "hurt",
     "down",
-    "victory"
+    "victory",
+    "idle_b",
+    "atk_wind1",
+    "atk_wind2",
+    "atk_mid",
+    "atk_follow",
+    "cast_gather",
+    "cast_rise",
+    "cast_release"
   ],
   "sheets": {
     "black_mage": {
-      "row": 0
+      "row": 0,
+      "inbetweens": true
     },
     "black_wizard": {
-      "row": 1
+      "row": 1,
+      "inbetweens": true
     },
     "knight": {
-      "row": 2
+      "row": 2,
+      "inbetweens": true
     },
     "master": {
-      "row": 3
+      "row": 3,
+      "inbetweens": true
     },
     "monk": {
-      "row": 4
+      "row": 4,
+      "inbetweens": true
     },
     "ninja": {
-      "row": 5
+      "row": 5,
+      "inbetweens": true
     },
     "red_mage": {
-      "row": 6
+      "row": 6,
+      "inbetweens": true
     },
     "red_wizard": {
-      "row": 7
+      "row": 7,
+      "inbetweens": true
     },
     "thief": {
-      "row": 8
+      "row": 8,
+      "inbetweens": true
     },
     "warrior": {
-      "row": 9
+      "row": 9,
+      "inbetweens": true
     },
     "white_mage": {
-      "row": 10
+      "row": 10,
+      "inbetweens": true
     },
     "white_wizard": {
-      "row": 11
+      "row": 11,
+      "inbetweens": true
     }
   }
 }

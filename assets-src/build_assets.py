@@ -65,6 +65,25 @@ APPROVED = HERE / "gen" / "approved"
 AI_SCALE = 2
 
 
+def apply_face_fix(sheet: Image.Image, meta: dict, gw: int, gh: int, cols: int, poses: list) -> Image.Image:
+    """Review fix applied at build time (the approved sheet itself is a style reference and must stay byte-identical):
+    recolour `from` colours inside `box` of one pose, plus single `extra` pixels, to `to`."""
+    fix = meta.get("face_fix")
+    if not fix:
+        return sheet
+    import numpy as np
+    a = np.asarray(sheet).copy()
+    i = poses.index(fix["pose"])
+    ox, oy = (i % cols) * gw, (i // cols) * gh
+    x0, y0, x1, y1 = fix["box"]
+    sub = a[oy + y0:oy + y1, ox + x0:ox + x1]
+    for c in fix["from"]:
+        sub[(sub[..., :3] == c).all(-1) & (sub[..., 3] > 0), :3] = fix["to"]
+    for x, y in fix.get("extra", []):
+        a[oy + y, ox + x, :3] = fix["to"]
+    return Image.fromarray(a)
+
+
 def build_battle_ai() -> None:
     """Approved AI battle sheets (assets-src/gen/approved/<id>/battle.png, 3x2 native) -> one 6-frame row per id.
 
@@ -80,23 +99,33 @@ def build_battle_ai() -> None:
     if not entries:
         print("battle_ai: no approved sheets")
         return
+    from gen import puppet as PU
     gw, gh = entries[0][0]["grid"]
     poses = entries[0][0]["poses"]
     cols = entries[0][0]["layout"][0]
-    atlas = Image.new("RGBA", (gw * len(poses), gh * len(entries)), (0, 0, 0, 0))
+    # in-between poses (puppet.py, from gen/anim/<id>.yaml); a class without joints repeats its nearest keyframe
+    all_poses = poses + PU.INBETWEENS
+    atlas = Image.new("RGBA", (gw * len(all_poses), gh * len(entries)), (0, 0, 0, 0))
     sheets = {}
     for row, (meta, sheet) in enumerate(entries):
         if meta["grid"] != [gw, gh] or meta["poses"] != poses:
             raise SystemExit(f"battle_ai: {meta['character']} grid/poses differ from the first approved sheet")
-        for i in range(len(poses)):
+        sheet = PU.apply_face_fix(sheet, meta, gw, gh, cols, poses)
+        frames = {}
+        for i, pose in enumerate(poses):
             x, y = (i % cols) * gw, (i // cols) * gh
-            atlas.paste(sheet.crop((x, y, x + gw, y + gh)), (i * gw, row * gh))
-        sheets[meta["character"]] = {"row": row}
+            frames[pose] = sheet.crop((x, y, x + gw, y + gh))
+        tween = PU.battle_inbetweens(meta["character"])
+        for pose in PU.INBETWEENS:
+            frames[pose] = tween.get(pose, frames[PU.SOURCE[pose]])
+        for i, pose in enumerate(all_poses):
+            atlas.paste(frames[pose], (i * gw, row * gh))
+        sheets[meta["character"]] = {"row": row, "inbetweens": bool(tween)}
     scaled(atlas, AI_SCALE).save(out / "battle-characters-ai.png")
     (out / "battle-characters-ai.json").write_text(json.dumps({
-        "cell": [gw, gh], "scale": AI_SCALE, "footRow": entries[0][0]["bottom_row"], "poses": poses, "sheets": sheets,
+        "cell": [gw, gh], "scale": AI_SCALE, "footRow": entries[0][0]["bottom_row"], "poses": all_poses, "sheets": sheets,
     }, indent=2) + "\n")
-    print(f"battle_ai: {len(entries)} approved sheet(s): {list(sheets)}")
+    print(f"battle_ai: {len(entries)} approved sheet(s); in-betweens for {[c for c, v in sheets.items() if v['inbetweens']]}")
 
 
 FIELD_DIRS = ["down", "up", "left"]
@@ -134,14 +163,9 @@ def head_swap(row: Image.Image, gw: int, dst: int, src: int, head_rows: int) -> 
     return Image.fromarray(a)
 
 
-def build_field_ai() -> None:
-    """Approved AI field sheets (approved/<id>/field_<dir>.png, 3 frames each) -> characters-ai.png/.json.
-
-    Same layout as the legacy characters atlas (rows down, up, left, right; 3 walk frames) so the runtime slices
-    it the same way. Right is baked as a mirror of left. A direction that is not approved yet falls back to
-    another approved direction (listed under "fallbacks") so preview mode stays usable.
-    """
-    out = ASSETS / "sprites"
+def field_rows() -> dict[str, dict]:
+    """Every approved field sprite as {id: {direction: (meta, 3-frame row)}} with the review fixes applied
+    (head_from, flip_frames, flip_rows, row_from); side rows face left."""
     chars: dict[str, dict] = {}
     for meta_path in sorted(APPROVED.glob("*/field_*.json")):
         meta = json.loads(meta_path.read_text())
@@ -186,25 +210,43 @@ def build_field_ai() -> None:
             for i in range(3):
                 row.alpha_composite(frame, (i * gw, 0))
             chars["chest"] = {d: (any_meta, row) for d in ("down", "up", "left", "right")}
+    return chars
+
+
+def build_field_ai() -> None:
+    """Approved AI field sheets -> characters-ai.png/.json: rows down, up, left, right; 7 columns per direction
+    (stand, then the walk cycle contact/down/pass for each foot, puppet.walk_row). Right is baked as a mirror of
+    left. A direction that is not approved yet falls back to another approved direction ("fallbacks")."""
+    from gen import puppet as PU
+    out = ASSETS / "sprites"
+    chars = field_rows()
     if not chars:
         print("field_ai: no approved field sheets")
         return
     first = next(iter(next(iter(chars.values())).values()))[0]
     gw, gh = first["grid"]
+    ncol = len(PU.WALK_COLS)
     per_row = 4
     blocks = list(chars.items())
-    atlas = Image.new("RGBA", (gw * 3 * per_row, gh * 4 * ((len(blocks) + per_row - 1) // per_row)), (0, 0, 0, 0))
+    atlas = Image.new("RGBA", (gw * ncol * per_row, gh * 4 * ((len(blocks) + per_row - 1) // per_row)), (0, 0, 0, 0))
     sheets, fallbacks = {}, {}
     for n, (cid, dirs) in enumerate(blocks):
-        bx, by = (n % per_row) * gw * 3, (n // per_row) * gh * 4
+        bx, by = (n % per_row) * gw * ncol, (n // per_row) * gh * 4
+        cfg = PU.load_cfg(cid)
         rows = {}
         for d in FIELD_DIRS:
             if d in dirs:
-                rows[d] = dirs[d][1]
+                row = dirs[d][1]
             else:
                 src = next(x for x in ("left", "down", "up") if x in dirs)
-                rows[d] = dirs[src][1]
+                row = dirs[src][1]
                 fallbacks.setdefault(cid, []).append(f"{d}<-{src}")
+            three = [row.crop((i * gw, 0, (i + 1) * gw, gh)) for i in range(3)]
+            seven = PU.walk_row("side" if d == "left" else d, three, cfg, first["bottom_row"]) if cid != "chest" else \
+                [three[0]] * ncol
+            rows[d] = Image.new("RGBA", (gw * ncol, gh))
+            for i, f in enumerate(seven):
+                rows[d].paste(f, (i * gw, 0))
         rows["right"] = mirror_strip(rows["left"], gw)
         if "left" not in dirs:
             fallbacks.setdefault(cid, []).append("right<-mirror(fallback)")
@@ -213,7 +255,8 @@ def build_field_ai() -> None:
         sheets[cid] = {"x": bx, "y": by}
     scaled(atlas, AI_SCALE).save(out / "characters-ai.png")
     (out / "characters-ai.json").write_text(json.dumps({
-        "cell": [gw, gh], "cols": 3, "rows": 4, "fieldScale": AI_SCALE, "footRow": first["bottom_row"],
+        "cell": [gw, gh], "cols": ncol, "rows": 4, "fieldScale": AI_SCALE, "footRow": first["bottom_row"],
+        "columns": PU.WALK_COLS, "walkSequence": PU.WALK_SEQUENCE, "walkPhases": PU.WALK_PHASES,
         "rowNames": ["down", "up", "left", "right"], "sheets": sheets, "fallbacks": fallbacks,
     }, indent=2) + "\n")
     print(f"field_ai: {list(sheets)}; fallbacks {fallbacks}")

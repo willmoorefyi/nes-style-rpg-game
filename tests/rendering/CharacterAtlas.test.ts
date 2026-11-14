@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Assets, Texture } from 'pixi.js';
-import { CharacterAtlas, isPreviewAi } from '../../src/rendering/CharacterAtlas.js';
+import { BATTLE_POSES, CharacterAtlas, isPreviewAi } from '../../src/rendering/CharacterAtlas.js';
 
 const legacyField = { cell: [16, 32], cols: 6, rows: 5, fieldScale: 3, rowNames: ['down', 'up', 'left', 'right', 'battle'], sheets: { knight: { x: 0, y: 0 } } };
 const aiBattle = { cell: [80, 80], scale: 2, footRow: 76, poses: ['ready', 'attack', 'cast', 'hurt', 'down', 'victory'], sheets: { knight: { row: 0 } } };
@@ -58,9 +58,11 @@ describe('CharacterAtlas battle atlas loading', () => {
     expect(atlas.hasBattleArt).toBe(true);
     const art = atlas.getBattleFrames('knight')!;
     expect(art.footRow).toBe(76);
-    expect(art.frames).toHaveLength(6);
+    expect(art.frames).toHaveLength(BATTLE_POSES.length);
     expect(art.frames[1].frame.x).toBe(160);
     expect(art.frames[1].frame.width).toBe(160);
+    // an older 6-pose atlas: in-betweens fall back to their keyframe (atk_mid -> attack)
+    expect(art.frames[BATTLE_POSES.indexOf('atk_mid')].frame.x).toBe(160);
     expect(atlas.getBattleFrames('ninja')).toBeNull();
   });
 });
