@@ -89,6 +89,8 @@ export interface NextActionInfo {
   spellName?: string;
   /** The item's display name (Potion) (B3). */
   itemName?: string;
+  /** A magic action whose caster is silenced: the view announces an attempt, not a cast (the spell fizzles, B8). */
+  silenced?: boolean;
 }
 
 export interface QueuedAction {
@@ -354,12 +356,15 @@ export class BattleStateMachine {
     const cmd = action.command;
 
     let actorName: string;
+    let silenced = false;
     if (action.isEnemy) {
       const enemy = this.enemies.find(e => e.id === action.combatantId);
       actorName = enemy?.displayName ?? 'Unknown';
+      silenced = enemy?.status.has('silence') ?? false;
     } else {
       const char = this.getPartyMember(action.combatantId);
       actorName = char?.name ?? 'Unknown';
+      silenced = char?.statusTracker.has('silence') ?? false;
     }
 
     const result: NextActionInfo = {
@@ -380,6 +385,7 @@ export class BattleStateMachine {
     }
 
     if (cmd.spellId) result.spellName = this.spells.find(s => s.id === cmd.spellId)?.name ?? cmd.spellId;
+    if (cmd.type === 'magic' && silenced) result.silenced = true;
     if (cmd.itemId) result.itemName = ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId;
 
     return result;

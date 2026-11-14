@@ -8,6 +8,7 @@ import { createMockGame, createMapData } from '../helpers/testUtils.js';
 import { EncounterSystem } from '../../src/systems/EncounterSystem.js';
 import { PlayerController } from '../../src/entities/PlayerController.js';
 import type { MapData } from '../../src/types/index.js';
+import { FieldTransition } from '../../src/scenes/exploration/FieldTransition.js';
 
 /** A mock game with a real EventBus, so subscribe / unsubscribe is observable. */
 function gameWith(map = createMapData()) {
@@ -221,6 +222,22 @@ describe('T2: a cutscene warp step moves the party to another map', () => {
     expect(scene.getMapName()).toBe('Cornelia Castle 2F');
     expect(game.playerPosition).toEqual({ x: 21, y: 9 });
     expect(face).toHaveBeenLastCalledWith('up');
+  });
+
+  it('a warp step that throws does not leave the field black (the fade comes back in)', async () => {
+    CutsceneRegistry.register('broken', [
+      { type: 'fade_out', duration: 0 },
+      { type: 'warp', map: 'nowhere', x: 1, y: 1 },
+      { type: 'fade_in', duration: 0 },
+    ]);
+    vi.spyOn(FieldTransition.prototype, 'warp').mockRejectedValue(new Error('map failed to load'));
+    const scene = new ExplorationScene(gameWith() as unknown as Game);
+    await scene.enter();
+    await new Promise((r) => setTimeout(r, 600)); // the arrival fade-in
+    expect(scene.fadeAlpha).toBe(0);
+    await expect(scene.playCutscene('broken')).rejects.toThrow('map failed to load');
+    await new Promise((r) => setTimeout(r, 600));
+    expect(scene.fadeAlpha).toBe(0);
   });
 
   it('heal_party emits partyHealed (its sound)', async () => {

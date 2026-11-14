@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
-import { ItemMenuScene } from '../../src/scenes/ItemMenuScene.js';
+import { ItemMenuScene, restPrompt } from '../../src/scenes/ItemMenuScene.js';
+import { ItemRegistry } from '../../src/data/ItemRegistry.js';
 import { ExplorationScene } from '../../src/scenes/ExplorationScene.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { Character } from '../../src/entities/Character.js';
@@ -91,6 +92,19 @@ describe('MS-7: the item menu shows descriptions and the targets\' HP and status
     tap('confirm'); // Potion
     tap('confirm'); // on FGHTR
     expect(menu.resultMessage).toContain('FGHTR recovers');
+  });
+});
+
+describe('E6: the rest prompt comes from the item data', () => {
+  it('Tent and Cabin carry their prompt in items.yaml', () => {
+    expect(ItemRegistry.getItem('tent')?.prompt).toBe('Rest in the Tent? (HP and charges restored by half)');
+    expect(ItemRegistry.getItem('cabin')?.prompt).toBe('Rest in the Cabin? (HP and charges fully restored)');
+    expect(restPrompt(ItemRegistry.getItem('cabin'), 'cabin')).toBe(ItemRegistry.getItem('cabin')?.prompt);
+  });
+
+  it('an item without a prompt falls back to "Use <name>?"', () => {
+    expect(restPrompt({ name: 'Bedroll' }, 'bedroll')).toBe('Use Bedroll?');
+    expect(restPrompt(undefined, 'bedroll')).toBe('Use bedroll?');
   });
 });
 

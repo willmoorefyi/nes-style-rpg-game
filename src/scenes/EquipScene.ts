@@ -171,18 +171,29 @@ export class EquipScene implements Scene {
       this.statsText.setText(`Can't equip\nthat there.`, true);
       return;
     }
-    // the worn item goes back to the bag: refuse when the bag already holds 99 of it (E1)
     const worn = char.getEquipped(this.selectedSlot);
-    if (worn && worn.id !== newItem?.id && !this.game.inventory.canAdd(worn.id)) {
+    // re-picking what is already worn changes nothing (and must not cycle a copy through a full bag)
+    if (worn && newItem && worn.id === newItem.id) {
+      this.backToSlots();
+      return;
+    }
+    // the worn item goes back to the bag: refuse when the bag already holds 99 of it (E1)
+    if (worn && !this.game.inventory.canAdd(worn.id)) {
       this.statsText.setText(`No room for\n${worn.name}.`, true);
       return;
     }
     const prev = char.unequip(this.selectedSlot);
-    if (prev && this.game.inventory.add(prev.id) < 1) console.error(`EquipScene: no room for ${prev.id}`);
-    if (newItem) {
-      if (char.equip(this.selectedSlot, newItem) === false) console.error(`EquipScene: ${char.name} refused ${newItem.id}`);
-      else this.game.inventory.remove(newItem.id);
+    // take the new item out of the bag before the worn one goes in, so a full bag never loses a copy
+    if (newItem && !this.game.inventory.remove(newItem.id)) console.error(`EquipScene: ${newItem.id} is not in the bag`);
+    else if (newItem && char.equip(this.selectedSlot, newItem) === false) {
+      console.error(`EquipScene: ${char.name} refused ${newItem.id}`);
+      this.game.inventory.add(newItem.id);
     }
+    if (prev && this.game.inventory.add(prev.id) < 1) console.error(`EquipScene: no room for ${prev.id}`);
+    this.backToSlots();
+  }
+
+  private backToSlots(): void {
     this.phase = 'selectSlot';
     this.itemWindow.visible = false;
     this.buildSlotMenu();

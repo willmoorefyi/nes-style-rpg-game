@@ -2,7 +2,6 @@ import { Container, BitmapText, Sprite, type Texture } from 'pixi.js';
 import type { CharacterClassData } from '../../types/index.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
-import { classInitials } from '../shop/spellLearners.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN, LINE_HEIGHT } from '../../core/LayoutConstants.js';
 
 /** Default name per base class; NameEntryGrid's uniqueDefaultName adds 2, 3... for repeats. */
@@ -21,21 +20,50 @@ function label(text: string, x: number, y: number, fill = 0xffffff): BitmapText 
   return t;
 }
 
-/** One slot of the strip: `1:ROLF Wa` once named, `3:? WM` while being named, `4:----` before a class (N1). */
-export function slotText(i: number, names: readonly string[], classes: readonly CharacterClassData[]): string {
-  const cls = classes[i] ? ` ${classInitials(classes[i].name)}` : '';
+/** A class's label in the strip: its `abbr` from classes.yaml (WAR, WHM), else its full name. */
+export function classLabel(cls: CharacterClassData): string {
+  return cls.abbr ?? cls.name;
+}
+
+/**
+ * One slot of the strip: `1:ROLF WAR` once named, `3:B.M WHM` while being named (the name typed so far, `----`
+ * while it is empty), `4:----` before a class (N1).
+ */
+export function slotText(i: number, names: readonly string[], classes: readonly CharacterClassData[], typed = ''): string {
+  const cls = classes[i] ? ` ${classLabel(classes[i])}` : '';
   if (i < names.length) return `${i + 1}:${names[i]}${cls}`;
-  return cls ? `${i + 1}:?${cls}` : `${i + 1}:----`;
+  return cls ? `${i + 1}:${typed || '----'}${cls}` : `${i + 1}:----`;
 }
 
 /** The four slots along the top: chosen names and classes, the current slot in yellow. */
-export function buildSlotDisplay(names: readonly string[], classes: readonly CharacterClassData[], currentSlot: number): Container {
-  const display = new Container();
-  display.position.set(SCREEN_MARGIN, 72);
-  for (let i = 0; i < 4; i++) {
-    display.addChild(label(slotText(i, names, classes), i * 440, 0, i === currentSlot ? 0xffff00 : 0xffffff));
+export class SlotStrip extends Container {
+  private readonly labels: BitmapText[] = [];
+
+  constructor(
+    private readonly names: readonly string[],
+    private readonly classes: readonly CharacterClassData[],
+    private readonly currentSlot: number,
+  ) {
+    super();
+    this.position.set(SCREEN_MARGIN, 72);
+    for (let i = 0; i < 4; i++) {
+      const t = label(slotText(i, names, classes), i * 440, 0, i === currentSlot ? 0xffff00 : 0xffffff);
+      this.labels.push(t);
+      this.addChild(t);
+    }
   }
-  return display;
+
+  /** Show the name being typed in the current slot. */
+  setTyped(typed: string): void {
+    const t = this.labels[this.currentSlot];
+    if (!t) return;
+    const text = slotText(this.currentSlot, this.names, this.classes, typed);
+    if (t.text !== text) t.text = text;
+  }
+}
+
+export function buildSlotDisplay(names: readonly string[], classes: readonly CharacterClassData[], currentSlot: number): SlotStrip {
+  return new SlotStrip(names, classes, currentSlot);
 }
 
 /** The party summary on the confirm screen: name, class and HP per member. */

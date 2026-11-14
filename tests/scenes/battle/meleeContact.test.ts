@@ -10,6 +10,8 @@ import { FLOAT_FONT, FLOAT_COLORS } from '../../../src/scenes/battle/BattleScene
 import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 import { PARTY_X } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { OutlinedText } from '../../../src/ui/NESFont.js';
+import { readFileSync } from 'node:fs';
+import { readRgbaPng, opaqueBounds } from '../../helpers/pngAlpha.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
 import type { InputManager } from '../../../src/core/InputManager.js';
@@ -192,11 +194,47 @@ describe('I3: hit and miss sounds on the contact frame', () => {
   });
 });
 
+interface MonsterAtlas { scale: number; sheets: Record<string, { cell: [number, number]; frames: Record<string, [number, number]> }> }
+interface HeroAtlas { scale: number; cell: [number, number]; poses: string[]; sheets: Record<string, { row: number }> }
+
+function monsterRightInset(ids: string[]): number {
+  const meta = JSON.parse(readFileSync('assets/sprites/monsters-ai.json', 'utf8')) as MonsterAtlas;
+  const img = readRgbaPng('assets/sprites/monsters-ai.png');
+  return Math.max(...ids.map((id) => {
+    const sheet = meta.sheets[id];
+    const [fx, fy] = sheet.frames.idle;
+    const [w, h] = sheet.cell.map(v => v * meta.scale);
+    const bounds = opaqueBounds(img, fx * meta.scale, fy * meta.scale, w, h);
+    if (!bounds) throw new Error(`monsters-ai: ${id} idle frame is empty`);
+    return w - bounds[2];
+  }));
+}
+
+function heroAttackLeftInset(): number {
+  const meta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json', 'utf8')) as HeroAtlas;
+  const img = readRgbaPng('assets/sprites/battle-characters-ai.png');
+  const [w, h] = meta.cell.map(v => v * meta.scale);
+  const col = meta.poses.indexOf('attack');
+  return Math.max(...Object.entries(meta.sheets).map(([id, sheet]) => {
+    const bounds = opaqueBounds(img, col * w, sheet.row * h, w, h);
+    if (!bounds) throw new Error(`battle-characters-ai: ${id} attack frame is empty`);
+    return bounds[0];
+  }));
+}
+
 describe('B11: the lunge reaches a back-column target on the real layout', () => {
-  // Opaque edges measured on the committed art (assets/sprites/*-ai.png, screen px inside the 2x cells): the goblin
-  // and Gr.Imp idle frames end 24 px inside their 160 px cell; a hero's attack pose starts at most 18 px into its cell.
-  const MONSTER_OPAQUE_RIGHT_INSET = 24;
-  const HERO_OPAQUE_LEFT_INSET = 18;
+  // Opaque edges measured on the committed art at test time (assets/sprites/*-ai.{png,json}, screen px inside the 2x
+  // cells): how far the goblin / Gr.Imp idle frames end inside their cell (worst of the two), and how far into its cell
+  // the classic swing's 'attack' pose starts (worst over every class).
+  const MONSTER_OPAQUE_RIGHT_INSET = monsterRightInset(['gr_imp', 'goblin']);
+  const HERO_OPAQUE_LEFT_INSET = heroAttackLeftInset();
+
+  it('the measured insets are real (inside the cell, not empty art)', () => {
+    expect(MONSTER_OPAQUE_RIGHT_INSET).toBeGreaterThanOrEqual(0);
+    expect(MONSTER_OPAQUE_RIGHT_INSET).toBeLessThan(80);
+    expect(HERO_OPAQUE_LEFT_INSET).toBeGreaterThanOrEqual(0);
+    expect(HERO_OPAQUE_LEFT_INSET).toBeLessThan(80);
+  });
 
   it('THIEF (slot 1) attacking the back-column Gr.Imp B ends with its art within 40 px of the target\'s art', () => {
     const layout = computeEnemyLayoutAi([

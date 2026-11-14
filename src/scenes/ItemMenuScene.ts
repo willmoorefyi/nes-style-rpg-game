@@ -1,5 +1,5 @@
 import { Container, BitmapText } from 'pixi.js';
-import type { Scene } from '../types/index.js';
+import type { ItemData, Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import type { ExplorationScene } from './ExplorationScene.js';
 import { Window } from '../ui/Window.js';
@@ -23,11 +23,10 @@ const WINDOW_HEIGHT = HELP_RECT.y - 2 * SCREEN_MARGIN;
 export const ITEM_LIST_RECT: ItemMenuRect = { x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 1000 - SCREEN_MARGIN, height: WINDOW_HEIGHT };
 export const ITEM_PARTY_RECT: ItemMenuRect = { x: 1016, y: SCREEN_MARGIN, width: 1896 - 1016, height: WINDOW_HEIGHT };
 
-/** What resting does, from the items' real effects (E6). */
-const REST_PROMPTS: Record<string, string> = {
-  tent: 'Rest in the Tent? (HP and charges restored by half)',
-  cabin: 'Rest in the Cabin? (HP and charges fully restored)',
-};
+/** The confirm question for a party item: its data `prompt` (what resting does, E6), else "Use <name>?". */
+export function restPrompt(item: Pick<ItemData, 'name' | 'prompt'> | undefined, itemId: string): string {
+  return item?.prompt ?? `Use ${item?.name ?? itemId}?`;
+}
 
 /** A target row: `NAME  HP cur/max  STATUS` (MS-7), so the player sees who needs the item. */
 export function targetLabel(c: Character, nameWidth: number): string {
@@ -188,9 +187,8 @@ export class ItemMenuScene implements Scene {
   private askToRest(itemId: string): void {
     this.phase = 'confirm';
     this.itemMenu.setActive(false);
-    const name = ItemRegistry.getItem(itemId)?.name ?? itemId;
     this.confirmBox = new ConfirmBox({
-      prompt: REST_PROMPTS[itemId] ?? `Use the ${name}?`,
+      prompt: restPrompt(ItemRegistry.getItem(itemId), itemId),
       eventBus: this.game.events,
       onAnswer: (yes) => {
         this.closeConfirm();

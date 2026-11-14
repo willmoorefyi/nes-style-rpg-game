@@ -214,6 +214,45 @@ describe('R3: Equip keeps the worn item when the bag is full, shows one focus, a
     expect(scene.statsLines).toBe('No room for\nRapier.');
   });
 
+  it('re-equipping the worn item with 99 in the bag is a no-op (no copy is lost)', async () => {
+    const { scene, tap, all, inventory } = await open({ rapier: 99 });
+    all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
+    tap('confirm'); // member
+    tap('confirm'); // Weapon
+    tap('down'); // Rapier
+    tap('confirm');
+    expect(all[0].getEquipped('weapon')?.id).toBe('rapier');
+    expect(inventory.getQuantity('rapier')).toBe(99);
+    expect(scene.activeMenus).toEqual({ member: false, slot: true, item: false });
+  });
+
+  it('swapping to an item the bag holds 99 of keeps every copy (new one leaves the bag first)', async () => {
+    const { tap, all, inventory } = await open({ iron_sword: 99 });
+    all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
+    tap('confirm');
+    tap('confirm');
+    tap('down'); // Iron Sword
+    tap('confirm');
+    expect(all[0].getEquipped('weapon')?.id).toBe('iron_sword');
+    expect(inventory.getQuantity('iron_sword')).toBe(98);
+    expect(inventory.getQuantity('rapier')).toBe(1);
+  });
+
+  it('swapping away from a worn item the bag holds 99 of is refused and loses nothing', async () => {
+    const { scene, tap, all, inventory } = await open({ rapier: 99, iron_sword: 1 });
+    all[0].equip('weapon', ItemRegistry.getItem('rapier')!);
+    tap('confirm');
+    tap('confirm');
+    // rows after (Unequip) follow registry order; move to the iron sword's row
+    const order = ItemRegistry.getAllByType('weapon').filter(i => i.id === 'rapier' || i.id === 'iron_sword').map(i => i.id);
+    for (let i = 0; i <= order.indexOf('iron_sword'); i++) tap('down');
+    tap('confirm');
+    expect(all[0].getEquipped('weapon')?.id).toBe('rapier');
+    expect(inventory.getQuantity('rapier')).toBe(99);
+    expect(inventory.getQuantity('iron_sword')).toBe(1);
+    expect(scene.statsLines).toBe('No room for\nRapier.');
+  });
+
   it('E3: only the menu with the focus has a white cursor', async () => {
     const { scene, tap } = await open({ rapier: 1 });
     expect(scene.activeMenus).toEqual({ member: true, slot: false, item: false });

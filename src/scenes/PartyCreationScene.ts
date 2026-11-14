@@ -4,7 +4,7 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import type { NameEntryGrid } from '../ui/NameEntryGrid.js';
-import { buildClassPreview, buildSlotDisplay } from './partyCreation/PartyCreationViews.js';
+import { buildClassPreview, buildSlotDisplay, type SlotStrip } from './partyCreation/PartyCreationViews.js';
 import { buildConfirmStep, buildNameStep } from './partyCreation/PartyCreationSteps.js';
 import { OpeningSequence } from './partyCreation/OpeningSequence.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
@@ -27,6 +27,7 @@ export class PartyCreationScene implements Scene {
   private classMenu?: Menu;
   private confirmMenu?: Menu;
   private nameGrid?: NameEntryGrid;
+  private slotStrip?: SlotStrip;
   private phase: 'select' | 'name' | 'confirm' | 'cutscene' = 'select';
 
   private previewDisplay!: Container;
@@ -76,7 +77,8 @@ export class PartyCreationScene implements Scene {
     header.position.set(SCREEN_MARGIN, SCREEN_MARGIN);
     this.container.addChild(header);
     // the slots along the top: names and classes so far (N1)
-    this.container.addChild(buildSlotDisplay(this.names, this.selectedClasses, this.currentSlot));
+    this.slotStrip = buildSlotDisplay(this.names, this.selectedClasses, this.currentSlot);
+    this.container.addChild(this.slotStrip);
 
     const eventBus = this.game.events;
     if (this.phase === 'select') {
@@ -92,6 +94,7 @@ export class PartyCreationScene implements Scene {
           this.buildUI();
         },
       });
+      this.slotStrip?.setTyped(this.nameGrid.value);
     } else {
       this.confirmMenu = buildConfirmStep(this.container, this.selectedClasses, this.names, {
         eventBus,
@@ -161,6 +164,7 @@ export class PartyCreationScene implements Scene {
     }
     if (this.phase === 'name' && this.nameGrid) {
       this.nameGrid.update(this.game.input);
+      if (this.phase === 'name' && this.nameGrid) this.slotStrip?.setTyped(this.nameGrid.value);
       return;
     }
     if (this.phase === 'confirm' && this.confirmMenu) {

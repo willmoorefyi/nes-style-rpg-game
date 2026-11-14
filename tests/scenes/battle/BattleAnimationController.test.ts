@@ -57,6 +57,15 @@ describe('B3: announcements', () => {
     expect(goblinLines[0]).toMatch(/^Goblin takes \d+ damage!$/);
   });
 
+  it('a silenced caster only tries: "B.MAG tries to cast FIRE!", then "B.MAG is silenced!" (never "casts")', () => {
+    const mage = member('black_mage', 'B.MAG');
+    mage.learnSpell('fire', 1);
+    mage.statusTracker.apply('silence');
+    const lines = play([mage], [{ type: 'magic', actorId: 'party_0', targetId: 'enemy_0', spellId: 'fire' }]);
+    expect(lines.slice(0, 2)).toEqual(['B.MAG tries to cast FIRE!', 'B.MAG is silenced!']);
+    expect(lines.some(t => / casts /.test(t))).toBe(false);
+  });
+
   it('a Potion is named: "W.MAG uses Potion!", then "FGHTR recovers N HP!"', () => {
     const wm = member('white_mage', 'W.MAG');
     const fighter = member('warrior', 'FGHTR');

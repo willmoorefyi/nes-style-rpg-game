@@ -4,7 +4,9 @@
  * 16, 2 hits, and 3 hits once he is at <= 25 % HP. A sensible Lv2 party with the full kit wins almost always and
  * takes at least 3 rounds; with only the 400 G kit it is a coin toss; careless Fight-only play at Lv1 nearly never
  * wins. Turn order is agility × a random factor (B7). Party: Warrior / Thief / White Mage / Black Mage. Measured
- * values (400 seeds) are in brackets; every bound is at least 3 points from them.
+ * values (400 seeds, re-measured with the merged temple encounter table) are in brackets; every bound is at least
+ * 3 points from them, except the Lv3 full-kit bound (>= 97 % vs 99.5 %, 2.5 points): that rate sits against the
+ * 100 % ceiling, so a 3-point bound would be too loose to catch a regression.
  */
 import { describe, it, expect } from 'vitest';
 import { runBattle, mulberry32, type Policy } from '../helpers/battlePolicies.js';
@@ -48,7 +50,7 @@ describe('Garland (240 HP, attack 16, 2 hits, 3 at <= 25 % HP; 400 seeded battle
     expect(garlandWinRate(2, 'full', 'sensible', 3)).toBeGreaterThanOrEqual(0.9);
   });
 
-  it('a sensible Lv3 party with the full kit and 3 potions wins >= 97 % (99.5 %)', () => {
+  it('a sensible Lv3 party with the full kit and 3 potions wins >= 97 % (99.5 %; ceiling-limited, see header)', () => {
     expect(garlandWinRate(3, 'full', 'sensible', 3)).toBeGreaterThanOrEqual(0.97);
   });
 
@@ -88,9 +90,9 @@ describe('Garland (240 HP, attack 16, 2 hits, 3 at <= 25 % HP; 400 seeded battle
     expect(rate).toBeLessThanOrEqual(0.65);
   });
 
-  it('after a temple run (sensible, full kit, 3 shared potions) Lv2 wins >= 80 % (85 %) and Lv3 >= 93 % (95.75 %)', () => {
-    expect(templeRunWinRate(2, 2)).toBeGreaterThanOrEqual(0.8);
-    expect(templeRunWinRate(3, 3)).toBeGreaterThanOrEqual(0.93);
+  it('after a temple run (sensible, full kit, 3 shared potions) Lv2 wins >= 85 % (91 %) and Lv3 >= 95 % (99.25 %)', () => {
+    expect(templeRunWinRate(2, 2)).toBeGreaterThanOrEqual(0.85);
+    expect(templeRunWinRate(3, 3)).toBeGreaterThanOrEqual(0.95);
   });
 
   // §4.5 "SLEP every turn": sleep never locks him for good. Each SLEP that lands takes at most one turn (he wakes by
@@ -98,7 +100,7 @@ describe('Garland (240 HP, attack 16, 2 hits, 3 at <= 25 % HP; 400 seeded battle
   // by agility (B7: agility × a random factor), so he often acts before the Black Mage's SLEP of that round. The
   // check holds the fight open (nobody hurts him for 15 rounds): he never loses more turns than SLEPs landed, he acts
   // in almost every battle, and he acts in about 47 % of the rounds (measured 0.468 over 400 seeds; the bound is ±0.05).
-  it('with SLEP cast at him every round, Garland loses at most one turn per SLEP and acts in >= 95 % of battles (EB-5)', () => {
+  it('with SLEP cast at him every round, Garland loses at most one turn per SLEP and acts in >= 95 % of battles (100 %) (EB-5)', () => {
     let lockedOut = 0;
     let actedShare = 0;
     for (let s = 1; s <= N; s++) {

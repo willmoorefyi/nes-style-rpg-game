@@ -219,7 +219,14 @@ export class ExplorationScene implements Scene {
     } finally {
       this.cutsceneRunning = false;
       this.refreshNpcPresence();
+      // a step that threw (e.g. a failed warp) must not leave the field behind the black fade
+      if (this.fadeOverlay.overlay.alpha > 0) this.fadeInOnEnter();
     }
+  }
+
+  /** How black the field fade is (0 = clear, 1 = black); for tests and debugging. */
+  get fadeAlpha(): number {
+    return this.fadeOverlay.overlay.alpha;
   }
 
   /** Drop NPCs whose showIf / hideIf no longer pass (e.g. Garland and the captive princess after the battle). */

@@ -132,7 +132,7 @@ def build() -> list[Path]:
          "text": ["A soldier's pay buys one mug a night, and tonight it's raised to you.",
                   "They say Garland's men scattered when you walked into the temple."]},
         {"text": ["A soldier's pay buys one mug a night, and this is it.",
-                  "Garland's men say the temple to the north-west is crawling with wolves and worse."]}])
+                  "Garland's men say the temple to the north-west is crawling with the dead and worse."]}])
     out.append(r.save("The tavern: a bar with a barkeep behind it, banquet tables, barrels and a hearth.",
                       {"floor": wood(0.7), "in_wall_face": {"from": "wall_face", "shade": 0.75},
                        "in_wall_top": {"from": "wall_top", "shade": 0.7}}))

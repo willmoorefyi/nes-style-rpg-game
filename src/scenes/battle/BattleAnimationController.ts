@@ -72,7 +72,7 @@ export class BattleAnimationController {
   formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): string {
     switch (info.actionType) {
       case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
-      case 'magic': return `${info.actorName} casts ${info.spellName ?? 'spell'}!`;
+      case 'magic': return `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
       case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
       case 'run': return `${info.actorName} tries to run!`;
       default: return `${info.actorName} acts!`;

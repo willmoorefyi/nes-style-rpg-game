@@ -1,6 +1,7 @@
 # ═══ WARRIOR ═══
 - id: warrior
   name: Warrior
+  abbr: WAR
   baseStats:
     hp: 35
     strength: 20
@@ -24,6 +25,7 @@
 # ═══ THIEF ═══
 - id: thief
   name: Thief
+  abbr: THF
   baseStats:
     hp: 25
     strength: 10
@@ -47,6 +49,7 @@
 # ═══ MONK ═══
 - id: monk
   name: Monk
+  abbr: MNK
   baseStats:
     hp: 33
     strength: 15
@@ -72,6 +75,7 @@
 # ═══ WHITE MAGE ═══
 - id: white_mage
   name: White Mage
+  abbr: WHM
   baseStats:
     hp: 25
     strength: 5
@@ -114,6 +118,7 @@
 # ═══ BLACK MAGE ═══
 - id: black_mage
   name: Black Mage
+  abbr: BLM
   baseStats:
     hp: 25
     strength: 5
@@ -156,6 +161,7 @@
 # ═══ RED MAGE ═══
 - id: red_mage
   name: Red Mage
+  abbr: RDM
   baseStats:
     hp: 30
     strength: 10
@@ -199,6 +205,7 @@
 # ═══ KNIGHT (upgraded Warrior) ═══
 - id: knight
   name: Knight
+  abbr: KNT
   upgradeFrom: warrior
   baseStats:
     hp: 42
@@ -231,6 +238,7 @@
 # ═══ NINJA (upgraded Thief) ═══
 - id: ninja
   name: Ninja
+  abbr: NIN
   upgradeFrom: thief
   baseStats:
     hp: 30
@@ -264,6 +272,7 @@
 # ═══ MASTER (upgraded Monk) ═══
 - id: master
   name: Master
+  abbr: MST
   upgradeFrom: monk
   baseStats:
     hp: 40
@@ -290,6 +299,7 @@
 # ═══ WHITE WIZARD (upgraded White Mage) ═══
 - id: white_wizard
   name: White Wizard
+  abbr: WHW
   upgradeFrom: white_mage
   baseStats:
     hp: 30
@@ -333,6 +343,7 @@
 # ═══ BLACK WIZARD (upgraded Black Mage) ═══
 - id: black_wizard
   name: Black Wizard
+  abbr: BLW
   upgradeFrom: black_mage
   baseStats:
     hp: 30
@@ -376,6 +387,7 @@
 # ═══ RED WIZARD (upgraded Red Mage) ═══
 - id: red_wizard
   name: Red Wizard
+  abbr: RDW
   upgradeFrom: red_mage
   baseStats:
     hp: 36

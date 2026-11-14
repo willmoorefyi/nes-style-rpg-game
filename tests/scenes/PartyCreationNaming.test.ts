@@ -5,7 +5,10 @@ import type { Character } from '../../src/entities/Character.js';
 import type { Game } from '../../src/core/Game.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
 import { CutsceneRegistry } from '../../src/systems/CutsceneRegistry.js';
-import { playOpening, OPENING_CUTSCENE } from '../../src/scenes/partyCreation/OpeningSequence.js';
+import { ClassRegistry } from '../../src/data/ClassRegistry.js';
+import { playOpening, backdropSprite, OPENING_CUTSCENE } from '../../src/scenes/partyCreation/OpeningSequence.js';
+import { STAGE_COVERED_TOP } from '../../src/rendering/BattleBackground.js';
+import { Texture, TextureSource } from 'pixi.js';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,7 +53,7 @@ describe('NG-3: party creation names', () => {
     press('down', 'left', 'left', 'confirm');  // End is over '3', so down wraps to 'D'; 'B' replaces the default
     press('up', 'right');                      // wraps to Back (under 'B'), then End
     press('confirm');
-    expect(visibleLabels(scene.container)).toContain('1:B Wa');
+    expect(visibleLabels(scene.container)).toContain('1:B WAR');
     for (let i = 0; i < 3; i++) pickWarriorDefault(press);
     expect(visibleLabels(scene.container).some((l) => l.startsWith('B  Warrior'))).toBe(true);
     press('confirm');
@@ -92,13 +95,42 @@ describe('N1: the class menu keeps its place, and the strip shows the classes', 
     expect(scene.classIndex).toBe(1);
   });
 
-  it('the strip shows each named member with its class, and the slot being named as "?"', () => {
+  it('the strip shows each named member with its class abbreviation, and the slot being named with the name so far', () => {
     const { scene, press } = setup();
     pickWarriorDefault(press);
-    expect(visibleLabels(scene.container)).toContain('1:FGHTR Wa');
-    press('down', 'down', 'down', 'confirm');             // White Mage, now naming slot 2
-    expect(visibleLabels(scene.container)).toContain('2:? WM');
+    expect(visibleLabels(scene.container)).toContain('1:FGHTR WAR');
+    press('down', 'down', 'down', 'confirm');             // White Mage, now naming slot 2 (default W.MAG)
+    expect(visibleLabels(scene.container)).toContain('2:W.MAG WHM');
+    expect(visibleLabels(scene.container).some((l) => l.includes('?'))).toBe(false);
     expect(visibleLabels(scene.container)).toContain('3:----');
+    press('cancel');                                      // one letter erased
+    expect(visibleLabels(scene.container)).toContain('2:W.MA WHM');
+    press('cancel', 'cancel', 'cancel', 'cancel');        // empty
+    expect(visibleLabels(scene.container)).toContain('2:---- WHM');
+  });
+
+  it('every class in classes.yaml has a 3-letter upper-case abbreviation, all different', () => {
+    const all = ClassRegistry.getAll();
+    expect(all.length).toBeGreaterThan(0);
+    for (const c of all) expect(c.abbr, c.id).toMatch(/^[A-Z]{3}$/);
+    expect(new Set(all.map((c) => c.abbr)).size).toBe(all.length);
+  });
+});
+
+describe('N2: the opening backdrop covers the screen without the staged top band', () => {
+  it('a 1920x1080 staged image starts at its row 120 (no flat band) and still covers 1920x1080', () => {
+    const sprite = backdropSprite(new Texture({ source: new TextureSource({ width: 1920, height: 1080 }) }));
+    const b = sprite.getBounds();
+    expect(b.x).toBeLessThanOrEqual(0);
+    expect(b.y + STAGE_COVERED_TOP * sprite.scale.y).toBeCloseTo(0, 0); // image row 120 at the screen's top
+    expect(b.x + b.width).toBeGreaterThanOrEqual(1920);
+    expect(b.y + b.height).toBeGreaterThanOrEqual(1080);
+    expect(sprite.scale.x).toBe(sprite.scale.y);                         // not stretched
+  });
+
+  it('the cut matches the stager\'s uncovered band (stage_backgrounds.py FIELD_TOP)', () => {
+    const py = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../assets-src/tools/stage_backgrounds.py'), 'utf8');
+    expect(Number(/^FIELD_TOP = (\d+)/m.exec(py)?.[1])).toBe(STAGE_COVERED_TOP);
   });
 });
 

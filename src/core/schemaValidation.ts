@@ -276,6 +276,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   assertObject('CharacterClassData', data);
   assertString('CharacterClassData.id', data.id);
   assertString('CharacterClassData.name', data.name);
+  if (data.abbr !== undefined) assertString('CharacterClassData.abbr', data.abbr);
   validateStatBlock('CharacterClassData.baseStats', data.baseStats);
   validateStatBlock('CharacterClassData.statGrowth', data.statGrowth);
   assertArray('CharacterClassData.usableEquipment', data.usableEquipment);
@@ -306,6 +307,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
   assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
   if (data.description !== undefined) assertString('ItemData.description', data.description);
+  if (data.prompt !== undefined) assertString('ItemData.prompt', data.prompt);
   return data as unknown as import('../types/index.js').ItemData;
 }
 

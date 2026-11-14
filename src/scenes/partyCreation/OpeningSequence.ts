@@ -8,6 +8,7 @@ import { FadeOverlay } from '../../rendering/FadeOverlay.js';
 import { DialogBox } from '../../ui/DialogBox.js';
 import { DialogManager } from '../../systems/DialogManager.js';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../core/LayoutConstants.js';
+import { backdropCover } from '../../rendering/BattleBackground.js';
 
 /** The cutscene played after the party is made (N2; its text lives in `cutscenes.yaml`). */
 export const OPENING_CUTSCENE = 'opening';
@@ -23,20 +24,25 @@ export interface OpeningDeps {
 }
 
 /**
- * Run `script` (default: the registry's `opening`). `backdrop` steps go to `deps.backdrop`; the rest run through
- * CutsceneManager. A missing script logs an error and returns at once (the game goes straight to the field).
+ * Run `script` (default: the registry's `opening`) once through CutsceneManager; its `backdrop` steps go to
+ * `deps.backdrop`. A missing script logs an error and returns at once (the game goes straight to the field).
  */
 export async function playOpening(deps: OpeningDeps, script: CutsceneScript | undefined = CutsceneRegistry.get(OPENING_CUTSCENE)): Promise<void> {
   if (!script) {
     console.error(`No "${OPENING_CUTSCENE}" cutscene in cutscenes.yaml; starting in the field`);
     return;
   }
-  const { showDialog, fadeOut, fadeIn, flags, party } = deps;
-  const manager = new CutsceneManager({ showDialog, fadeOut, fadeIn, flags, party });
-  for (const step of script) {
-    if (step.type === 'backdrop') await deps.backdrop(step.image ?? null);
-    else await manager.play([step]);
-  }
+  const { showDialog, fadeOut, fadeIn, backdrop, flags, party } = deps;
+  await new CutsceneManager({ showDialog, fadeOut, fadeIn, backdrop, flags, party }).play(script);
+}
+
+/** A staged background as the opening shows it: no message window above, so its padded top band is cut off. */
+export function backdropSprite(tex: Texture): Sprite {
+  const sprite = new Sprite(tex);
+  const { x, y, scale } = backdropCover(tex.width, tex.height, GAME_WIDTH, GAME_HEIGHT);
+  sprite.scale.set(scale);
+  sprite.position.set(x, y);
+  return sprite;
 }
 
 /** The opening's layers (backdrop, fade, dialog) and the plumbing between the dialog box and the cutscene. */
@@ -97,11 +103,7 @@ export class OpeningSequence {
     if (image === null) return;
     const path = `assets/backgrounds/${image}.webp`;
     try {
-      const tex = await Assets.load<Texture>(path);
-      const sprite = new Sprite(tex);
-      sprite.width = GAME_WIDTH;
-      sprite.height = GAME_HEIGHT;
-      this.backdropLayer.addChild(sprite);
+      this.backdropLayer.addChild(backdropSprite(await Assets.load<Texture>(path)));
     } catch (e) {
       console.error(`Opening backdrop ${path} failed to load`, e);
     }

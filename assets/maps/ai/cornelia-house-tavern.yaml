@@ -34,7 +34,7 @@ npcs:
     text: [The King has the builders out at the north bridge. Won't be long now.]
   - condition: PRINCESS_RESCUED
     text: ['A soldier''s pay buys one mug a night, and tonight it''s raised to you.', They say Garland's men scattered when you walked into the temple.]
-  - text: ['A soldier''s pay buys one mug a night, and this is it.', Garland's men say the temple to the north-west is crawling with wolves and worse.]
+  - text: ['A soldier''s pay buys one mug a night, and this is it.', Garland's men say the temple to the north-west is crawling with the dead and worse.]
 transitions:
 - {x: 6, y: 9, targetMap: cornelia, targetEntrance: house_tavern}
 - {x: 7, y: 9, targetMap: cornelia, targetEntrance: house_tavern}

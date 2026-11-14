@@ -32,6 +32,8 @@ export interface StatBlock {
 export interface CharacterClassData {
   id: string;
   name: string;
+  /** Short label for tight UI (the party-creation slot strip), e.g. WAR, WHM; missing means the full name. */
+  abbr?: string;
   baseStats: StatBlock;
   statGrowth: StatBlock;
   usableEquipment: string[];
@@ -120,6 +122,8 @@ export interface ItemData {
   weight?: number;
   /** One-line help text for menus and shops (what the item does). */
   description?: string;
+  /** Confirm question asked before a party item (Tent, Cabin) is used; missing means "Use <name>?". */
+  prompt?: string;
 }
 
 export type ShopType = 'weapon' | 'armor' | 'item' | 'magic' | 'inn';

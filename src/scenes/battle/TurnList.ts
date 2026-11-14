@@ -5,7 +5,7 @@ import { FONT_SIZE } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
 import { formatConciseResult, fitToWidth } from './battleMessageUtils.js';
 
-/** B12: the turn list reads at the normal UI size, one line per 32 px (8 lines fit the command window). */
+/** B12: the turn list reads at the normal UI size, one line per 32 px (7 lines fit the 252 px command window: 252 / 32 = 7.9). */
 export const TURN_FONT = FONT_SIZE;
 export const TURN_PITCH = 32;
 const DONE_TINT = 0x888888;

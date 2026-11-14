@@ -463,6 +463,7 @@
 - id: tent
   name: Tent
   description: "Party rests: half HP and charges back. World map only."
+  prompt: "Rest in the Tent? (HP and charges restored by half)"
   type: consumable
   stats: {}
   price: 75
@@ -470,6 +471,7 @@
 - id: cabin
   name: Cabin
   description: "Party rests: full HP and charges back. World map only."
+  prompt: "Rest in the Cabin? (HP and charges fully restored)"
   type: consumable
   stats: {}
   price: 250
