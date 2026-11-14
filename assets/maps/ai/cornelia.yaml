@@ -214,22 +214,22 @@ npcs:
   - text: [I tend the roses for Her Highness., I hope she comes home before they fade.]
 transitions:
 - {x: 30, y: 18, targetMap: cornelia-castle, targetEntrance: gate}
-- {x: 22, y: 37, targetMap: cornelia-weapon-shop, targetEntrance: door}
-- {x: 38, y: 37, targetMap: cornelia-armor-shop, targetEntrance: door}
-- {x: 44, y: 43, targetMap: cornelia-item-shop, targetEntrance: door}
-- {x: 6, y: 53, targetMap: cornelia-white-magic, targetEntrance: door}
-- {x: 13, y: 53, targetMap: cornelia-black-magic, targetEntrance: door}
-- {x: 24, y: 59, targetMap: cornelia-inn, targetEntrance: door}
-- {x: 46, y: 36, targetMap: cornelia-house-scholar, targetEntrance: door}
-- {x: 52, y: 37, targetMap: cornelia-house-fisher, targetEntrance: door}
-- {x: 50, y: 49, targetMap: cornelia-house-farm, targetEntrance: door}
-- {x: 44, y: 56, targetMap: cornelia-house-knight, targetEntrance: door}
-- {x: 50, y: 56, targetMap: cornelia-house-weaver, targetEntrance: door}
-- {x: 15, y: 36, targetMap: cornelia-house-gardener, targetEntrance: door}
-- {x: 14, y: 63, targetMap: cornelia-house-family, targetEntrance: door}
-- {x: 6, y: 41, targetMap: cornelia-house-apprentice, targetEntrance: door}
-- {x: 46, y: 60, targetMap: cornelia-house-tavern, targetEntrance: door}
-- {x: 35, y: 62, targetMap: cornelia-house-shrine, targetEntrance: door}
+- {x: 22, y: 37, targetMap: cornelia-weapon-shop, targetEntrance: door, effect: door}
+- {x: 38, y: 37, targetMap: cornelia-armor-shop, targetEntrance: door, effect: door}
+- {x: 44, y: 43, targetMap: cornelia-item-shop, targetEntrance: door, effect: door}
+- {x: 6, y: 53, targetMap: cornelia-white-magic, targetEntrance: door, effect: door}
+- {x: 13, y: 53, targetMap: cornelia-black-magic, targetEntrance: door, effect: door}
+- {x: 24, y: 59, targetMap: cornelia-inn, targetEntrance: door, effect: door}
+- {x: 46, y: 36, targetMap: cornelia-house-scholar, targetEntrance: door, effect: door}
+- {x: 52, y: 37, targetMap: cornelia-house-fisher, targetEntrance: door, effect: door}
+- {x: 50, y: 49, targetMap: cornelia-house-farm, targetEntrance: door, effect: door}
+- {x: 44, y: 56, targetMap: cornelia-house-knight, targetEntrance: door, effect: door}
+- {x: 50, y: 56, targetMap: cornelia-house-weaver, targetEntrance: door, effect: door}
+- {x: 15, y: 36, targetMap: cornelia-house-gardener, targetEntrance: door, effect: door}
+- {x: 14, y: 63, targetMap: cornelia-house-family, targetEntrance: door, effect: door}
+- {x: 6, y: 41, targetMap: cornelia-house-apprentice, targetEntrance: door, effect: door}
+- {x: 46, y: 60, targetMap: cornelia-house-tavern, targetEntrance: door, effect: door}
+- {x: 35, y: 62, targetMap: cornelia-house-shrine, targetEntrance: door, effect: door}
 - {x: 6, y: 0, targetMap: overworld, targetEntrance: cornelia_north}
 - {x: 7, y: 0, targetMap: overworld, targetEntrance: cornelia_north}
 - {x: 56, y: 0, targetMap: overworld, targetEntrance: cornelia_north}

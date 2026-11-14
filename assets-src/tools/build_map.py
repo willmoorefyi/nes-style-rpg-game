@@ -313,6 +313,17 @@ def place_peaks(canvas: Image.Image, mat: np.ndarray, owner: dict, kit: K.Kit, r
 
 # ───────────────────────────── compile ─────────────────────────────
 
+DOOR_KITS = ("town", "interior")
+
+
+def door_effect(src: dict) -> dict:
+    """CA-2: on a map whose own (first) kit is `town` or `interior`, house and prefab doors (shops, the inn, houses)
+    get `effect: door`, the zoom into the door. Facades (the castle gate), stairs, edge exits and explicit transitions
+    get none (the plain fade), and so do prefabs on other maps (the overworld's temple)."""
+    kits = src.get("kits") or [src.get("kit", "town")]
+    return {"effect": "door"} if kits[0] in DOOR_KITS else {}
+
+
 def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled:
     mid = src["id"]
     if src.get("materials"):                               # per-map texture aliases, e.g. floor_stone: temple_floor
@@ -450,6 +461,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
 
     entrances = {k: list(v) for k, v in (src.get("entrances") or {}).items()}
     transitions = [dict(t) for t in (src.get("transitions") or [])]
+    door_fx = door_effect(src)
     rng = np.random.default_rng(seed)
     for n, o in enumerate(objects):
         t = o["type"]
@@ -506,7 +518,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 if o.get("enter"):
                     e = o["enter"]
                     transitions.append({"x": x + door, "y": y + h - 1, "targetMap": e["map"],
-                                        "targetEntrance": e["entrance"]})
+                                        "targetEntrance": e["entrance"], **door_fx})
                     if check_interiors:
                         _check_interior_entrance(e["map"], e["entrance"])
         elif t == "prefab":
@@ -534,7 +546,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
                 if o.get("enter"):
                     e = o["enter"]
                     transitions.append({"x": x + door, "y": y + h - 1, "targetMap": e["map"],
-                                        "targetEntrance": e["entrance"]})
+                                        "targetEntrance": e["entrance"], **door_fx})
                     if check_interiors:
                         _check_interior_entrance(e["map"], e["entrance"])
         elif t == "facade":
@@ -1172,6 +1184,12 @@ def selftest() -> None:
     house["entrances"] = {"west": [0, 0]}
     hc = compile_map(house, kit, check_interiors=False)
     assert hc.collision[0, 4] == GRASS and hc.collision[1, 4] == WALL and hc.collision[3, 4] == ROAD
+    ok += 1
+    # CA-2: a house door on a town map zooms (effect: door); the same door on an overworld-kit map fades
+    shop = {**house, "objects": [{**house["objects"][0], "enter": {"map": "x", "entrance": "door"}}]}
+    assert compile_map(shop, kit, check_interiors=False).transitions[-1].get("effect") == "door"
+    world = compile_map({**shop, "kits": ["overworld", "town"]}, kit, check_interiors=False)
+    assert "effect" not in world.transitions[-1]
     ok += 1
     import map_selftest  # noqa: PLC0415  (determinism, objects, edge exits, inspect, map checks, report, preview)
     ok += map_selftest.run(sys.modules[__name__])

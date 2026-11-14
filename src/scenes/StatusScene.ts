@@ -3,7 +3,27 @@ import type { Scene } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
+import { SLOT_LABELS } from '../ui/labels.js';
+import { partyRowData } from '../ui/PartyPanel.js';
+import { SpellRegistry } from '../data/SpellRegistry.js';
+import { SPELL_LEVELS } from '../entities/SpellCharges.js';
+import type { Character } from '../entities/Character.js';
+import type { EquipmentSlot } from '../types/index.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+
+const EQUIPMENT_SLOTS: readonly EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
+
+/** MS-7: one line per spell level the member has charges or spells in: "L1 2/2  CURE, FIRE". */
+export function spellLines(char: Character): string[] {
+  const out: string[] = [];
+  for (let lv = 1; lv <= SPELL_LEVELS; lv++) {
+    const max = char.getMaxCharges(lv);
+    const names = char.getSpellsAtLevel(lv).map((id) => SpellRegistry.getSpell(id)?.name ?? id);
+    if (max === 0 && names.length === 0) continue;
+    out.push(` L${lv} ${char.getSpellCharges(lv)}/${max}  ${names.length > 0 ? names.join(', ') : '-'}`);
+  }
+  return out.length > 0 ? ['', 'Spells:', ...out] : [];
+}
 
 export class StatusScene implements Scene {
   readonly container = new Container();
@@ -55,7 +75,7 @@ export class StatusScene implements Scene {
     const lines = [
       `${char.name} (${this.memberIndex + 1}/${this.game.party.size})`,
       `Class: ${char.classData.name}`,
-      `Level: ${char.level}  XP: ${char.xp}`,
+      `Level: ${char.level}  XP: ${char.xp}  ${partyRowData(char).next}`,
       `HP: ${char.currentHp}/${char.maxHp}`,
       ``,
       `STR: ${s.strength}  AGI: ${s.agility}`,
@@ -64,10 +84,8 @@ export class StatusScene implements Scene {
       `ATK: ${s.attack}  DEF: ${s.defense}`,
       ``,
       `Equipment:`,
-      ` Weapon: ${char.getEquipped('weapon')?.name ?? 'None'}`,
-      ` Armor:  ${char.getEquipped('armor')?.name ?? 'None'}`,
-      ` Shield: ${char.getEquipped('shield')?.name ?? 'None'}`,
-      ` Helmet: ${char.getEquipped('helmet')?.name ?? 'None'}`,
+      ...EQUIPMENT_SLOTS.map((slot) => ` ${`${SLOT_LABELS[slot]}:`.padEnd(8)}${char.getEquipped(slot)?.name ?? 'None'}`),
+      ...spellLines(char),
     ];
     this.text.setText(lines.join('\n'), true);
   }

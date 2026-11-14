@@ -4,6 +4,7 @@ import { FieldMenuScene } from '../../src/scenes/FieldMenuScene.js';
 import type { Game } from '../../src/core/Game.js';
 import type { InputManager } from '../../src/core/InputManager.js';
 import { allTexts, tapInput } from '../helpers/realData.js';
+import { PartyManager } from '../../src/entities/PartyManager.js';
 
 const GREY = 0x808080;
 const WHITE = 0xffffff;
@@ -30,7 +31,9 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
     const input = tapInput();
     const game = {
       input,
-      scenes: { get: vi.fn(() => ({ canSave: () => canSave })), push: vi.fn(), pop: vi.fn() },
+      party: new PartyManager(),
+      playTime: 0,
+      scenes: { get: vi.fn(() => ({ canSave: () => canSave, getMapName: () => '' })), push: vi.fn(), pop: vi.fn() },
     };
     const scene = new FieldMenuScene(game as unknown as Game);
     scene.enter();
@@ -41,7 +44,7 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
     const { scene, game } = menuFor(true);
     expect(fillOf(scene.container, 'Save')).toBe(WHITE);
     const input = game.input;
-    for (let i = 0; i < 6; i++) input.tap('down', () => scene.update(1));
+    for (let i = 0; i < 5; i++) input.tap('down', () => scene.update(1));   // Config is gone (MS-7): Save is 5 down
     input.tap('confirm', () => scene.update(1));
     expect(game.scenes.push).toHaveBeenCalledWith('saveMenu');
   });
@@ -55,7 +58,9 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
     let allowed = false;
     const game = {
       input: tapInput(),
-      scenes: { get: vi.fn(() => ({ canSave: () => allowed })), push: vi.fn(), pop: vi.fn() },
+      party: new PartyManager(),
+      playTime: 0,
+      scenes: { get: vi.fn(() => ({ canSave: () => allowed, getMapName: () => '' })), push: vi.fn(), pop: vi.fn() },
     };
     const scene = new FieldMenuScene(game as unknown as Game);
     scene.enter();
