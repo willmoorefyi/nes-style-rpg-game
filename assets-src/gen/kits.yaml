@@ -492,6 +492,8 @@
 
     stairs_lib:
       # T6-art (CA-1 + CA-7): a top-down stairwell (replaces the oblique stairs_down art) and treasury / library props
+      # Approved first try. Gemini used its own layout, so every piece has a source rect; the stairwell is cropped square
+      # to its kerbs (top edge luma +7 % of marble) and filled to its 2x2; the gold heap's grey floor patch is keyed out.
       kind: swatches
       seed: 1234
       refs: [castle/furnish, castle/props, interior/furniture]
@@ -503,18 +505,18 @@
       labels: absolute
       scale: pitch
       swatches:
-        - {name: stairwell, fill: true, key_border: true, at: [0, 0], tiles: [2, 2], wrap: prop,
+        - {name: stairwell, fill: true, fill_ratio: 1.0, source: [94, 85, 402, 393], at: [0, 0], tiles: [2, 2], wrap: prop,
            parts: [[stairwell_0_0, stairwell_0_1], [stairwell_1_0, stairwell_1_1]],
            text: "a square stairwell opening in a polished cream marble floor seen from STRAIGHT ABOVE (top-down, not at an angle): pale stone steps descend from the top edge toward the bottom edge, each step a horizontal band, getting darker step by step until the bottom quarter is in deep shadow; a low carved pale stone kerb runs along the left, right and bottom sides; the top edge is open where the first step starts; no side walls visible; it fills the box."}
-        - {name: map_table, key_border: true, at: [2, 0], tiles: [2, 1], wrap: prop, parts: [[map_table_l, map_table_r]],
+        - {name: map_table, source: [536, 26, 1004, 348], at: [2, 0], tiles: [2, 1], wrap: prop, parts: [[map_table_l, map_table_r]],
            text: "a heavy dark wooden war table seen from the front in three-quarter view, with a large parchment map of a coastline spread on top, two candles and a dagger pinning the map, as wide as the box."}
-        - {name: gold_heap, at: [2, 1], tiles: [1, 1], wrap: prop,
+        - {name: gold_heap, source: [132, 512, 360, 664], key_border: true, key_tol: 90, at: [2, 1], tiles: [1, 1], wrap: prop,
            text: "a heap of gold coins with a few red and blue gems on a stone floor."}
-        - {name: crown_cushion, at: [3, 1], tiles: [1, 1], wrap: prop,
+        - {name: crown_cushion, source: [676, 430, 866, 696], at: [3, 1], tiles: [1, 1], wrap: prop,
            text: "a golden crown resting on a red velvet cushion on a short carved stone pedestal."}
-        - {name: lectern, at: [0, 2], tiles: [1, 1], wrap: prop,
+        - {name: lectern, source: [144, 730, 350, 1018], at: [0, 2], tiles: [1, 1], wrap: prop,
            text: "a carved dark wooden lectern holding a large open book."}
-        - {name: globe, at: [1, 2], tiles: [1, 1], wrap: prop,
+        - {name: globe, source: [658, 730, 890, 1018], at: [1, 2], tiles: [1, 1], wrap: prop,
            text: "a world globe in brass on a wooden stand."}
 
 - id: overworld
