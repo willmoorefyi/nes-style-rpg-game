@@ -352,6 +352,7 @@ export class ExplorationScene implements Scene {
         } else {
           this.game.inventory.add(npc.chestItem, 1);
           this.game.gameFlags.set(npc.chestFlag);
+          npc.setOpened();
           const item = ItemRegistry.getItem(npc.chestItem);
           const name = item?.name ?? npc.chestItem;
           this.dialogManager.start([`Found ${name}!`]);

@@ -41,6 +41,10 @@ export interface NPCFrames {
 
 const FACE_ROW = { down: 0, up: 1, left: 2, right: 3 } as const;
 const WALK_CYCLE = [1, 0, 2, 0];
+/** Chest art: the closed lid is column 0 of the first row, the opened chest column 1 (characters.py chest_cell). */
+const CHEST_OPEN_COL = 1;
+/** An opened chest with no opened frame is drawn dimmed instead. */
+export const OPENED_CHEST_TINT = 0x707070;
 
 export class NPC {
   readonly id: string;
@@ -70,6 +74,7 @@ export class NPC {
   private readonly offsetY: number;
   private facing: keyof typeof FACE_ROW = 'down';
   private facingBeforeTalk: keyof typeof FACE_ROW | null = null;
+  private openedChest = false;
 
   constructor(data: NPCData, texture: Texture, art?: NPCFrames, rng: () => number = Math.random) {
     this.id = data.id;
@@ -100,8 +105,23 @@ export class NPC {
     this.sprite.zIndex = this.sprite.y + (this.art?.frameHeight ?? TILE_SIZE);
   }
 
-  /** Turn to face a tile (the hero talking to this NPC); the previous facing is kept for endTalk(). */
+  /** A treasure chest (it has a chest item): it never turns and shows as opened once looted. */
+  get isChest(): boolean { return this.chestItem !== undefined; }
+
+  get opened(): boolean { return this.openedChest; }
+
+  /** Show the chest as opened (its opened frame, or dimmed when the art has none); set at map load and on looting. */
+  setOpened(): void {
+    if (!this.isChest || this.openedChest) return;
+    this.openedChest = true;
+    const open = this.art?.frames[FACE_ROW.down]?.[CHEST_OPEN_COL];
+    if (open) this.sprite.texture = open;
+    else this.sprite.tint = OPENED_CHEST_TINT;
+  }
+
+  /** Turn to face a tile (the hero talking to this NPC); the previous facing is kept for endTalk(). Chests don't. */
   faceToward(x: number, y: number): void {
+    if (this.isChest) return;
     const dx = x - this.tileX;
     const dy = y - this.tileY;
     if (dx === 0 && dy === 0) return;

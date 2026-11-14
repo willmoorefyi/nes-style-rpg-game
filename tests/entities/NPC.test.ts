@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { NPC, type NPCData } from '../../src/entities/NPC.js';
+import { describe, it, expect, vi } from 'vitest';
+import { NPC, OPENED_CHEST_TINT, type NPCData } from '../../src/entities/NPC.js';
+import { MapLoader } from '../../src/systems/MapLoader.js';
+import type { DataLoader } from '../../src/core/DataLoader.js';
+import type { PlaceholderTextures } from '../../src/rendering/PlaceholderTextures.js';
 import { Texture } from 'pixi.js';
 
 describe('NPC chest fields', () => {
@@ -95,5 +98,63 @@ describe('NPC conversation facing', () => {
     expect(npc.facingDirection).toBe('down');
     npc.faceToward(6, 3);
     expect(npc.facingDirection).toBe('right');
+  });
+});
+
+describe('opened chests (ST-12)', () => {
+  const chestData: NPCData = { id: 'chest_house_fisher', x: 1, y: 4, sprite: 'chest', dialog: ['You found a Potion!'],
+    chestItem: 'potion', chestFlag: 'CHEST_HOUSE_FISHER' };
+  const art = () => {
+    const frames = [0, 1, 2, 3].map(() => [new Texture(), new Texture(), new Texture()]);
+    return { frames, frameHeight: 96, scale: 1 };
+  };
+
+  it('shows the closed frame until opened, then the opened frame (column 1)', () => {
+    const a = art();
+    const npc = new NPC(chestData, Texture.WHITE, a);
+    expect(npc.isChest).toBe(true);
+    expect(npc.opened).toBe(false);
+    expect(npc.sprite.texture).toBe(a.frames[0][0]);
+    npc.setOpened();
+    expect(npc.opened).toBe(true);
+    expect(npc.sprite.texture).toBe(a.frames[0][1]);
+  });
+
+  it('is dimmed when there is no opened frame (placeholder art)', () => {
+    const npc = new NPC(chestData, Texture.WHITE);
+    npc.setOpened();
+    expect(npc.sprite.tint).toBe(OPENED_CHEST_TINT);
+  });
+
+  it('never turns to face the hero, opened or not', () => {
+    const a = art();
+    const npc = new NPC(chestData, Texture.WHITE, a);
+    npc.faceToward(2, 4);                       // hero to the east
+    expect(npc.facingDirection).toBe('down');
+    expect(npc.sprite.texture).toBe(a.frames[0][0]);
+    npc.setOpened();
+    npc.faceToward(1, 3);
+    npc.endTalk();
+    expect(npc.sprite.texture).toBe(a.frames[0][1]);
+  });
+
+  it('only chests can be opened', () => {
+    const a = art();
+    const npc = new NPC({ id: 'v', x: 1, y: 1, sprite: 'villager', dialog: ['Hi'] }, Texture.WHITE, a);
+    expect(npc.isChest).toBe(false);
+    npc.setOpened();
+    expect(npc.opened).toBe(false);
+    expect(npc.sprite.texture).toBe(a.frames[0][0]);
+  });
+
+  it('is shown opened at map load when its flag is already set', async () => {
+    const mapData = { id: 'house', width: 4, height: 4, layers: [[0]], tilesets: [], collision: new Array(16).fill(0),
+      npcs: [chestData, { ...chestData, id: 'other', x: 2, chestFlag: 'CHEST_HOUSE_OTHER' }], transitions: [] };
+    const dataLoader = { loadMap: vi.fn().mockResolvedValue(mapData) } as unknown as DataLoader;
+    const placeholders = { getNPCTexture: vi.fn().mockReturnValue(Texture.WHITE),
+      getNPCFrames: vi.fn().mockImplementation(() => art()) } as unknown as PlaceholderTextures;
+    const { npcs } = await new MapLoader(dataLoader, placeholders, { preferCompiled: false })
+      .loadMap('house', (f) => f === 'CHEST_HOUSE_FISHER');
+    expect(npcs.map((n) => n.opened)).toEqual([true, false]);
   });
 });

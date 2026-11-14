@@ -53,6 +53,8 @@ export class MapLoader {
     const npcs = mapData.npcs.map(
       npcData => new NPC(npcData as NPCData, this.placeholders.getNPCTexture(npcData.sprite), this.placeholders.getNPCFrames(npcData.sprite) ?? undefined)
     );
+    // ST-12: chests looted on an earlier visit show as opened
+    for (const npc of npcs) if (npc.chestFlag && hasFlag?.(npc.chestFlag)) npc.setOpened();
     return { mapData, tilemap, collisionMap, npcs };
   }
 }

@@ -62,6 +62,7 @@ for (x, y) in walls:
 # inner wall between the castle gardens and the town: a shallow chevron pointing south at the gatehouse
 INNER = [(3, 29), (16, 29), (21, 31), (39, 31), (44, 29), (58, 29)]
 walls |= set(g.line(INNER, "#", 2))
+g.rect(0, 0, 2, 17, "#", only=".")                # the sealed pocket outside the NW corner: solid wall (CT-6)
 
 # ── water: in under the north wall, round the moat, then winding through the town and out under the south wall ──
 water = g.line([(51, 0), (51, 20)], "~", 2)
@@ -83,20 +84,26 @@ for (x, y) in [(21, 38), (22, 38), (21, 39), (39, 38), (38, 38), (39, 39), (21, 
     g.set(x, y, ".")
 g.rect(0, 44, 20, 45, ":", only=ST)              # west road
 g.rect(40, 44, W - 1, 45, ":", only=ST)          # east road
-g.rect(11, 25, 27, 25, ":", only=ST)             # garden walks
-g.rect(33, 25, 54, 25, ":", only=ST)
-g.rect(4, 25, 8, 25, ":", only=ST)
+g.rect(11, 25, 54, 25, ":", only=ST)             # garden walks, joining the promenade
+g.rect(7, 25, 8, 25, ":", only=ST)               # ... over the bridge, then a spur to the orchard well
+g.rect(7, 23, 7, 24, ":", only=ST)
 g.rect(55, 24, W - 1, 25, ":", only=ST)          # the castle precinct's east gate
-g.rect(6, 0, 7, 9, ",", only=ST + "#")           # north postern and the orchard track
-g.rect(7, 46, 8, 54, ":", only=ST)               # lane down to the magic quarter
-g.rect(4, 54, 16, 54, ":", only=ST)
-g.rect(23, 60, CX - 2, 60, ":", only=ST)         # lane to the inn
-g.rect(42, 46, 43, 51, ":", only=ST)             # east quarter lanes
+g.rect(6, 0, 7, 9, ",", only=ST + "#")           # north postern and the orchard track, down to the castle apron
+g.rect(6, 10, 7, 18, ",", only=ST)
+g.rect(6, 19, 9, 19, ",", only=ST)
+g.rect(53, 19, 54, 19, ":", only=ST)             # over the river to the bench in the quiet garden
+g.rect(54, 17, 54, 18, ":", only=ST)
+g.rect(9, 46, 10, 54, ":", only=ST)              # lane down to the magic quarter, between the two magic shops
+g.rect(6, 54, 13, 54, ":", only=ST)              # ... and along their doors
+g.rect(24, 60, CX - 2, 60, ":", only=ST)         # lane to the inn
+g.rect(CX + 2, 63, 38, 63, ":", only=ST)         # past the shrine door to the river path
+g.rect(42, 46, 43, 51, ":", only=ST)             # east quarter lanes, ending at a bench and flower garden
 g.rect(44, 51, 53, 51, ":", only=ST)
-g.rect(33, 56, 37, 56, ",", only=".")            # dirt paths through the orchard
-g.rect(41, 60, 52, 60, ",", only=".")
+g.rect(38, 61, 38, 62, ",", only=".")            # the river path: over the bridge, past the tavern door,
+g.rect(41, 61, 51, 61, ",", only=".")            # to the oak garden by the east wall
+g.rect(51, 59, 52, 60, ",", only=".")
 for (x0, y0, x1, y1) in [(CX - 1, 20, CX + 1, 21), (17, 44, 18, 45), (CX - 1, 52, CX + 1, 54), (9, 25, 10, 25),
-                         (39, 60, 40, 60)]:
+                         (39, 61, 40, 61), (51, 19, 52, 19)]:
     g.rect(x0, y0, x1, y1, "=", only="~")
 for (x0, y0, x1, y1) in [(CX - 1, 66, CX + 1, H - 1), (0, 44, 3, 45), (56, 44, W - 1, 45), (56, 24, W - 1, 25),
                          (CX - 1, 31, CX + 1, 32)]:
@@ -149,7 +156,7 @@ for (x, y) in [(5, 14), (8, 14), (9, 4), (9, 7), (8, 18)]:
     fir(x, y)
 for (x, y) in [(4, 20), (5, 20), (6, 20), (4, 21), (5, 21), (6, 21)]:
     deco([["crops"]], x, y)
-obj(type="fence", **{"from": [3, 19], "to": [7, 19]})
+obj(type="fence", **{"from": [3, 19], "to": [5, 19]})
 obj(type="well", x=7, y=22)
 for (x, y) in [(53, 14), (55, 15), (56, 12)]:
     obj(type="flowers", x=x, y=y)
@@ -174,13 +181,16 @@ obj(**HOUSE, name="black_magic", x=11, y=49, h=5, storeys=2, roof="slate", wall=
 obj(type="prefab", prefab="inn", name="inn", x=22, y=55, w=4, h=5, door=2, sign="inn",
     enter={"map": "cornelia-inn", "entrance": "door"})
 
-# ── town: houses (not entered) ──
-for (x, y, h, st, roof, wall, ch) in [
-        (44, 32, 5, 2, "blue", "plaster", 1), (50, 34, 4, 1, "green", "white", None), (48, 46, 4, 1, "red", "ochre", 3),
-        (42, 52, 5, 2, "slate", "white", 3), (48, 53, 4, 1, "brown", "rose", None), (13, 33, 4, 1, "green", "plaster", 1),
-        (12, 60, 4, 1, "red", "white", None), (4, 38, 4, 1, "teal", "plaster", 3), (44, 57, 4, 1, "blue", "ochre", 1),
-        (33, 58, 5, 2, "red", "stone", None)]:
-    obj(**HOUSE, x=x, y=y, h=h, storeys=st, roof=roof, wall=wall, **({"chimney": ch} if ch is not None else {}))
+# ── town: houses, each with its own interior (layouts/interiors.py writes cornelia-house-<name>) ──
+HOUSES = [  # (name, x, y, h, storeys, roof, wall, chimney); the door is at (x + 2, y + h - 1)
+    ("scholar", 44, 32, 5, 2, "blue", "plaster", 1), ("fisher", 50, 34, 4, 1, "green", "white", None),
+    ("farm", 48, 46, 4, 1, "red", "ochre", 3), ("knight", 42, 52, 5, 2, "slate", "white", 3),
+    ("weaver", 48, 53, 4, 1, "brown", "rose", None), ("gardener", 13, 33, 4, 1, "green", "plaster", 1),
+    ("family", 12, 60, 4, 1, "red", "white", None), ("apprentice", 4, 38, 4, 1, "teal", "plaster", 3),
+    ("tavern", 44, 57, 4, 1, "blue", "ochre", 1), ("shrine", 33, 58, 5, 2, "red", "stone", None)]
+for (name, x, y, h, st, roof, wall, ch) in HOUSES:
+    obj(**HOUSE, name=f"house_{name}", x=x, y=y, h=h, storeys=st, roof=roof, wall=wall,
+        **({"chimney": ch} if ch is not None else {}), enter={"map": f"cornelia-house-{name}", "entrance": "door"})
 
 # ── town: the market square ──
 deco([["statue_top"], ["statue_bottom"]], CX, 42)
@@ -212,10 +222,16 @@ obj(type="fence", **{"from": [49, 40], "to": [53, 40]})
 obj(type="well", x=46, y=49)
 for (x, y) in [(7, 56), (9, 57), (6, 58)]:
     deco([["lilies"]], x, y, on_water=True)
-for (x, y) in [(11, 56), (11, 58), (5, 55), (15, 56), (34, 50), (36, 52), (24, 49), (26, 51), (10, 46), (11, 46),
-               (12, 46)]:
+for (x, y) in [(11, 56), (11, 58), (5, 55), (15, 56), (34, 50), (36, 52), (24, 49), (26, 51), (11, 46), (12, 46),
+               (13, 46)]:
     obj(type="flowers", x=x, y=y)
 obj(type="bench", x=12, y=57)
+# where the lanes end (CT-8): a bench and flower garden in the east quarter, the oak garden by the east wall
+obj(type="bench", x=54, y=51)
+obj(type="bench", x=53, y=59)
+for (x, y) in [(53, 50), (54, 50), (53, 52), (54, 52), (52, 58), (53, 58)]:
+    obj(type="flowers", x=x, y=y)
+LANE_ENDS = [[7, 22], [54, 16], [54, 51], [53, 59]]   # the orchard well, the quiet garden's bench, the two gardens
 obj(type="signpost", x=CX + 2, y=66)
 
 # ── backdrop: woods behind the castle and outside the walls; turrets on the wall's bends ──
@@ -260,7 +276,7 @@ npcs = [
      "dialog": ["I tend the royal orchard.", "The princess loved to read under these trees."]},
     {"id": "mage_student", "sprite": "mage", "x": 9, "y": 55, "wander": True,
      "dialog": ["White magic heals, black magic harms.", "A wise party carries both."]},
-    {"id": "fisher", "sprite": "old_man", "x": 38, "y": 62,
+    {"id": "fisher", "sprite": "old_man", "x": 38, "y": 64,
      "dialog": ["The fish bite best where the river bends."]},
     {"id": "east_gate_guard", "sprite": "guard", "x": 56, "y": 46,
      "dialog": ["The east road leads around the bay."]},
@@ -282,11 +298,16 @@ doc = {
     "noWander": [[x, y] for x in range(8, 12) for y in range(17, 26)],
     "objects": objects,
     "npcs": npcs,
-    "transitions": [*[{"x": x, "y": H - 1, "targetMap": OUT, "targetEntrance": "cornelia"} for x in (CX - 1, CX, CX + 1)],
-                    *[{"x": 0, "y": y, "targetMap": OUT, "targetEntrance": "cornelia_west"} for y in (44, 45)],
-                    *[{"x": W - 1, "y": y, "targetMap": OUT, "targetEntrance": "cornelia_east"} for y in (44, 45)],
-                    *[{"x": W - 1, "y": y, "targetMap": OUT, "targetEntrance": "cornelia_east"} for y in (24, 25)],
-                    *[{"x": x, "y": 0, "targetMap": OUT, "targetEntrance": "castle"} for x in (6, 7)]],
+    # CT-6 / CT-7: every walkable edge cell leaves town; the castle precinct's side of the east edge (and its east
+    # gate, (61, 24-25)) comes out north of the city icon, like the north edge and the postern
+    "edge_exits": {"north": {"targetMap": OUT, "targetEntrance": "cornelia_north"},
+                   "west": {"targetMap": OUT, "targetEntrance": "cornelia_west"},
+                   "east": {"targetMap": OUT, "targetEntrance": "cornelia_east"},
+                   "south": {"targetMap": OUT, "targetEntrance": "cornelia"},
+                   "split": [{"side": "east", "from": 0, "to": 30, "targetEntrance": "cornelia_north"}]},
+    # CT-8: every road and lane ends at a gate, a door, a bridge or one of these gardens
+    "road_check": {"materials": ["cobble", "dirt"], "ends": LANE_ENDS},
+    "no_static_chokepoints": True,
 }
 HEADER = """GENERATED by assets-src/tools/layouts/cornelia.py - edit the script, not this file.
 Cornelia (original layout): castle precinct and town inside one bent outer wall; the river feeds the moat and winds

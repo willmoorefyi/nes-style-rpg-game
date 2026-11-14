@@ -32,9 +32,9 @@ interface MapFile {
   encounters?: Array<{ enemies: string[] }>;
   transitions?: Array<{ targetMap: string }>;
   npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string;
-    cutscene?: { id: string } }>;
+    chestFlag?: string; cutscene?: { id: string } }>;
   scriptedEncounters?: Array<{ enemyIds: string[]; flag: string; postVictoryCutscene?: string }>;
-  keyItemGates?: Array<{ requiredItem: string; x: number; y: number }>;
+  keyItemGates?: Array<{ requiredItem?: string; requiredFlag?: string; x: number; y: number }>;
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
 }
 const mapFileNames = readdirSync(mapsDir)
@@ -42,7 +42,15 @@ const mapFileNames = readdirSync(mapsDir)
 const maps: MapFile[] = mapFileNames.map((f) =>
   parse(readFileSync(join(mapsDir, f), 'utf-8'))
 );
-const mapIds = new Set(maps.map((m) => m.id));
+// the compiled 2x maps (assets/maps/ai/) the game plays by default; some (the house interiors) have no legacy file
+const aiDir = join(mapsDir, 'ai');
+const aiMaps: MapFile[] = readdirSync(aiDir).filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+  .map((f) => parse(readFileSync(join(aiDir, f), 'utf-8')) as MapFile);
+/** Every map variant whose references must resolve: legacy and compiled. */
+const refMaps: Array<MapFile & { variant: string }> = [
+  ...maps.map((m) => ({ ...m, variant: 'legacy' })), ...aiMaps.map((m) => ({ ...m, variant: 'ai' })),
+];
+const mapIds = new Set([...maps, ...aiMaps].map((m) => m.id));
 
 // Build lookup sets
 const itemIds = new Set(items.map((i) => i.id));
@@ -90,10 +98,10 @@ describe('Cross-file data validation', () => {
 
   // (c) Map encounter tables → enemies.yaml (all maps)
   describe('Encounter → Enemies', () => {
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.encounters ?? []).forEach((enc, i) => {
         enc.enemies.forEach((enemyId) => {
-          it(`map "${map.id}" encounter[${i}] references enemy "${enemyId}" that exists in enemies.yaml`, () => {
+          it(`map "${map.id}" (${map.variant}) encounter[${i}] references enemy "${enemyId}" that exists in enemies.yaml`, () => {
             expect(enemyIds.has(enemyId)).toBe(true);
           });
         });
@@ -206,8 +214,8 @@ describe('Cross-file data validation', () => {
 
   // (i) Map transition targets exist as map files
   describe('Map transitions → map files', () => {
-    const allTransitions = maps.flatMap((map) =>
-      (map.transitions ?? []).map((t, i) => ({ mapId: map.id, index: i, target: t.targetMap }))
+    const allTransitions = refMaps.flatMap((map) =>
+      (map.transitions ?? []).map((t, i) => ({ mapId: `${map.id} (${map.variant})`, index: i, target: t.targetMap }))
     );
 
     if (allTransitions.length === 0) {
@@ -227,9 +235,9 @@ describe('Cross-file data validation', () => {
 
   // (j) All NPC dialog arrays are non-empty
   describe('NPC dialog validation', () => {
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.npcs ?? []).forEach((npc) => {
-        it(`map "${map.id}" NPC "${npc.id}" has non-empty dialog`, () => {
+        it(`map "${map.id}" (${map.variant}) NPC "${npc.id}" has non-empty dialog`, () => {
           expect(npc.dialog.length).toBeGreaterThan(0);
         });
 
@@ -237,7 +245,7 @@ describe('Cross-file data validation', () => {
         if (npc.dialog.length > 0 && typeof npc.dialog[0] !== 'string') {
           const entries = npc.dialog as Array<{ condition?: string; text: string[] }>;
           entries.forEach((entry, i) => {
-            it(`map "${map.id}" NPC "${npc.id}" conditional dialog[${i}] has non-empty text`, () => {
+            it(`map "${map.id}" (${map.variant}) NPC "${npc.id}" conditional dialog[${i}] has non-empty text`, () => {
               expect(entry.text.length).toBeGreaterThan(0);
             });
           });
@@ -250,10 +258,10 @@ describe('Cross-file data validation', () => {
 
   // (k) Scripted encounter enemy IDs → enemies.yaml
   describe('Scripted encounters → Enemies', () => {
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.scriptedEncounters ?? []).forEach((enc, i) => {
         enc.enemyIds.forEach((enemyId) => {
-          it(`map "${map.id}" scriptedEncounter[${i}] references enemy "${enemyId}" that exists in enemies.yaml`, () => {
+          it(`map "${map.id}" (${map.variant}) scriptedEncounter[${i}] references enemy "${enemyId}" that exists in enemies.yaml`, () => {
             expect(enemyIds.has(enemyId)).toBe(true);
           });
         });
@@ -263,10 +271,12 @@ describe('Cross-file data validation', () => {
 
   // (l) Key item gates → items.yaml
   describe('Key item gates → Items', () => {
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.keyItemGates ?? []).forEach((gate, i) => {
-        it(`map "${map.id}" keyItemGate[${i}] requiredItem "${gate.requiredItem}" exists in items.yaml`, () => {
-          expect(itemIds.has(gate.requiredItem)).toBe(true);
+        // a gate opens on an item or on a story flag (requiredFlag, e.g. the north bridge)
+        it(`map "${map.id}" (${map.variant}) keyItemGate[${i}] needs an existing item or a story flag`, () => {
+          if (gate.requiredItem !== undefined) expect(itemIds.has(gate.requiredItem)).toBe(true);
+          else expect(gate.requiredFlag ?? '').toMatch(/^[A-Z][A-Z0-9_]+$/);
         });
       });
     });
@@ -275,10 +285,10 @@ describe('Cross-file data validation', () => {
   // (m) NPC shopId → shops.yaml
   describe('NPC shopId → Shops', () => {
     const shopIds = new Set(shops.map((s) => s.id));
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.npcs ?? []).forEach((npc) => {
         if (npc.shopId) {
-          it(`map "${map.id}" NPC "${npc.id}" shopId "${npc.shopId}" exists in shops.yaml`, () => {
+          it(`map "${map.id}" (${map.variant}) NPC "${npc.id}" shopId "${npc.shopId}" exists in shops.yaml`, () => {
             expect(shopIds.has(npc.shopId!)).toBe(true);
           });
         }
@@ -288,10 +298,10 @@ describe('Cross-file data validation', () => {
 
   // (n) NPC chestItem → items.yaml
   describe('NPC chestItem → Items', () => {
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       (map.npcs ?? []).forEach((npc) => {
         if (npc.chestItem) {
-          it(`map "${map.id}" NPC "${npc.id}" chestItem "${npc.chestItem}" exists in items.yaml`, () => {
+          it(`map "${map.id}" (${map.variant}) NPC "${npc.id}" chestItem "${npc.chestItem}" exists in items.yaml`, () => {
             expect(itemIds.has(npc.chestItem!)).toBe(true);
           });
         }
@@ -299,15 +309,44 @@ describe('Cross-file data validation', () => {
     });
   });
 
+  // (n2) chest flags: every chest has one, it reads as a flag, and no two chests (in different maps or the same map)
+  // share it; a map's legacy and compiled variants may repeat their own chests
+  describe('NPC chestFlag', () => {
+    const chests = refMaps.flatMap((map) => (map.npcs ?? []).filter((n) => n.chestItem)
+      .map((n) => ({ map: map.id, variant: map.variant, npc: n.id, flag: n.chestFlag })));
+
+    it('every chest has a CHEST_* flag', () => {
+      for (const c of chests) expect(c.flag ?? '', `${c.map} (${c.variant}) ${c.npc}`).toMatch(/^CHEST_[A-Z0-9_]+$/);
+    });
+
+    it('chest flags are unique across maps and within each map variant', () => {
+      const owner = new Map<string, string>();
+      const perVariant = new Set<string>();
+      for (const c of chests) {
+        const key = `${c.variant}:${c.map}:${c.flag}`;
+        expect(perVariant.has(key), `${c.flag} twice in ${c.map} (${c.variant})`).toBe(false);
+        perVariant.add(key);
+        expect(owner.get(c.flag!) ?? c.map, `${c.flag} in ${c.map} and ${owner.get(c.flag!)}`).toBe(c.map);
+        owner.set(c.flag!, c.map);
+      }
+    });
+
+    it('the ten Cornelia houses hold their CHEST_HOUSE_* chests, each of an existing item', () => {
+      const house = chests.filter((c) => c.flag?.startsWith('CHEST_HOUSE_'));
+      expect(house.length).toBeGreaterThanOrEqual(5);
+      for (const c of house) expect(c.map, c.flag).toMatch(/^cornelia-house-/);
+    });
+  });
+
   // (o) battleBackgrounds → assets/backgrounds/<id>.png (run `npm run assets` if missing)
   describe('battleBackgrounds → background art', () => {
     const bgDir = resolve(__dirname, '../../assets/backgrounds');
-    maps.forEach((map) => {
+    refMaps.forEach((map) => {
       const cfg = map.battleBackgrounds;
       if (!cfg) return;
       const ids = [cfg.default, ...Object.values(cfg.terrain ?? {})].filter((v): v is string => !!v);
       new Set(ids).forEach((bg) => {
-        it(`map "${map.id}" battle background "${bg}" has art`, () => {
+        it(`map "${map.id}" (${map.variant}) battle background "${bg}" has art`, () => {
           expect(existsSync(join(bgDir, `${bg}.webp`))).toBe(true);
         });
       });
@@ -320,13 +359,7 @@ describe('Cutscene references → cutscenes.yaml', () => {
   const cutsceneIds = new Set(
     (parse(readFileSync(join(dataDir, 'cutscenes.yaml'), 'utf-8')) as Array<{ id: string }>).map((c) => c.id),
   );
-  const aiDir = join(mapsDir, 'ai');
-  const allMaps = [
-    ...maps,
-    ...readdirSync(aiDir).filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
-      .map((f) => parse(readFileSync(join(aiDir, f), 'utf-8')) as MapFile),
-  ];
-  const refs = allMaps.flatMap((m) => [
+  const refs = refMaps.flatMap((m) => [
     ...(m.npcs ?? []).filter((n) => n.cutscene).map((n) => [`${m.id} NPC ${n.id}`, n.cutscene!.id] as const),
     ...(m.scriptedEncounters ?? []).filter((e) => e.postVictoryCutscene)
       .map((e) => [`${m.id} scripted encounter`, e.postVictoryCutscene!] as const),

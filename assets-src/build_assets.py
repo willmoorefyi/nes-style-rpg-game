@@ -193,21 +193,27 @@ def field_rows() -> dict[str, dict]:
         for direction, src in meta.get("row_from", {}).items():
             dirs[direction] = dirs[src]
         chars[meta["character"]] = dirs
-    # static props used as NPCs (chests): one kit part, bottom-aligned on the field feet row, in every frame
+    # static props used as NPCs (chests): one kit part, bottom-aligned on the field feet row; frame 1 is the opened
+    # chest (as in the legacy atlas, ST-12), the others the closed one
     relics = APPROVED / "temple" / "relics.json"
     if relics.exists() and chars:
         rmeta = json.loads(relics.read_text())
         rimg = Image.open(relics.with_suffix(".png")).convert("RGBA")
         pos = {n: (r, c) for r, row in enumerate(rmeta["cells"]) for c, n in enumerate(row) if n}
         if "chest_closed" in pos:
-            r, c = pos["chest_closed"]
-            part = rimg.crop((c * 48, r * 48, (c + 1) * 48, (r + 1) * 48))
             any_meta = next(iter(next(iter(chars.values())).values()))[0]
             gw, gh = any_meta["grid"]
-            frame = Image.new("RGBA", (gw, gh))
-            frame.alpha_composite(part, ((gw - 48) // 2, any_meta["bottom_row"] + 1 - 48))
+
+            def prop_frame(name: str) -> Image.Image:
+                r, c = pos[name]
+                frame = Image.new("RGBA", (gw, gh))
+                frame.alpha_composite(rimg.crop((c * 48, r * 48, (c + 1) * 48, (r + 1) * 48)),
+                                      ((gw - 48) // 2, any_meta["bottom_row"] + 1 - 48))
+                return frame
+            closed = prop_frame("chest_closed")
+            opened = prop_frame("chest_open") if "chest_open" in pos else closed
             row = Image.new("RGBA", (3 * gw, gh))
-            for i in range(3):
+            for i, frame in enumerate((closed, opened, closed)):
                 row.alpha_composite(frame, (i * gw, 0))
             chars["chest"] = {d: (any_meta, row) for d in ("down", "up", "left", "right")}
     return chars
@@ -243,7 +249,7 @@ def build_field_ai() -> None:
                 fallbacks.setdefault(cid, []).append(f"{d}<-{src}")
             three = [row.crop((i * gw, 0, (i + 1) * gw, gh)) for i in range(3)]
             seven = PU.walk_row("side" if d == "left" else d, three, cfg, first["bottom_row"]) if cid != "chest" else \
-                [three[0]] * ncol
+                [three[0], three[1]] + [three[0]] * (ncol - 2)          # column 1: the opened chest
             rows[d] = Image.new("RGBA", (gw * ncol, gh))
             for i, f in enumerate(seven):
                 rows[d].paste(f, (i * gw, 0))
