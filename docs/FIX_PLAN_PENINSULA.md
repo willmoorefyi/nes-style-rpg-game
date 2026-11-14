@@ -2273,6 +2273,493 @@ Integration: the temple-name exemption is removed, and a full layout and map reb
 
 **Note:** debug scenario `ai_boss_cast` now logs one expected `console.warn` when the Lich drops below half HP: `bossPhases` with an AI but no known pattern id. This is planned behaviour, not a regression.
 
+## T6: Polish and the presentation decisions
+
+**Base:** `mainline` at `2922e5d` (T5 merged; `t5-integration` = `mainline`). All file:line references are to that commit.
+
+**Inputs:**
+- `docs/PLAYTEST_PENINSULA_2026-11-13.md`: every severity `p` item (triage default "fix as proposed in the review"), plus the binding rows for MS-7, BA-8, TF-3, CT-9/UI-2, IN-5/CA-7, OW-8/OW-9;
+- `docs/FIX_PLAN_PENINSULA.md`: T1–T5 results, the T6 OW-9 note, the T3 carry (file splits), T5 decision 4 (CA-1 stair art);
+- `/tmp/t3/second-pass-notes.md` (the 4 notes that fit T6 are folded in; the rest stay for the final pass);
+- `assets-src/gen/README.md`, `docs/ART_ROLLOUT.md`, `docs/ART_TILES_PLAN.md`, `docs/ART_BATTLE_PLAN.md`, `assets-src/tools/stage_backgrounds.py`.
+
+**Rules (as T1–T5):**
+- Edit generators and sources, never `assets/maps/ai/**` by hand. Sub-branches commit sources and code; the integration branch rebuilds every map once after the last merge, and a second run must give no diff.
+- Every code fix gets a test that fails on the old code.
+- Browser checks use `http://127.0.0.1:5173/?mute=1&…` (memory: never without `mute=1`), with 0 console errors. Close the page and stop the dev server afterwards.
+- Paid art follows `docs/ART_ROLLOUT.md` "Per-checkpoint procedure": dry run first, exactly one paid request per checkpoint (`--max-paid 1`), review, then approve or retry. At most 2 retries per sheet (the `budget.json` guard enforces 3 attempts). Approved sheets are never modified (style lock): new art is always a new sheet with new part names.
+
+---
+
+### 1. Status of the T6 scope
+
+### 1.1 The 25 `p` items
+
+#### Fixed already (11)
+
+| ID | Evidence on `mainline` |
+|---|---|
+| CT-8 | T3d: `road_check` on Cornelia (`layouts/cornelia.py:304`, `LANE_ENDS` at `:237`); every lane ends at a gate, door, bridge or garden (`FIX_PLAN` T3d result) |
+| IN-5 | T3d: the six shops and the inn each have their own plan (`layouts/interiors.py:368-509`); tested in `tests/data/corneliaLayout.test.ts` |
+| OW-12 | T3c: `min_blob {mountain 3, sand 3, forest 3, ocean_inlet 2}` (`layouts/overworld.py:549`) |
+| OW-13 | T3c: the city stream is laid as river cells under the icon to the bay (`overworld.py:255-262`); `river_check` |
+| OW-14 | T3c: `sealed_edges: true` (`overworld.py:546`), an ocean ring on every edge |
+| OW-15 | T3 review fixes: the larger mainland (72x72, mainland > 1.15x peninsula), the spine range seals the isthmus; OW-15 test in `overworldLayout.test.ts` |
+| EB-10 | T4a: `PhysicalAttack.resolveEnemyAttack` rolls `rand(A, 2A) − absorb` (`src/battle/PhysicalAttack.ts:27`); `MAX_FORMATION = 9` (`src/systems/EncounterTable.ts:4`) |
+| BA-6 | T2a: one-off notices (`BattleScene.ts:23`, `showNotice('No spells available.')` at `:320`), no message replay |
+| BA-10 | T4a: "Victory! N XP each" (`BattleStateMachine.ts:571`); party order matters through `FRONT_WEIGHTS` 4/2/1/1 (`src/battle/EnemyAI.ts:7`) |
+| BA-11 | T1: Game Over is a menu (Retry Battle / Load Game / Title, `GameOverScene.ts:32-34`); no "Press START" text anywhere in `src/` |
+| MS-6 | T2b: `MagicShopScene.confirmPurchase` shows the result after rebuilding the menu (`MagicShopScene.ts:177-178`) |
+
+#### Open (14)
+
+CT-9, IN-4, CA-2, CA-3, CA-4, CA-5, CA-6, CA-7, TF-1, TF-3, BA-9, BA-12, UI-1, UI-2.
+
+### 1.2 The other T6 items (all open)
+
+| Item | Source |
+|---|---|
+| MS-7 field menu redesign | triage (binding) |
+| BA-8 bigger battle text, compact party HP panel | triage (binding) |
+| OW-8 temple icon (paid) | triage |
+| OW-9 broken-bridge stubs (paid); art only, map unchanged | triage + `FIX_PLAN` T6 note |
+| CA-1 oblique stair art (paid) | `FIX_PLAN` T5 decision 4 |
+| Split `layouts/overworld.py` (594 lines), `layouts/interiors.py` (509), `map_checks.py` (615), `ShopScene.ts` (332; the detail panel) | `FIX_PLAN` T3 final validation; `AGENTS.md:118` |
+
+### 1.3 Second-pass notes folded in
+
+| Note | Folded into |
+|---|---|
+| The HUD truncates names to 5 characters (`FieldHUD.ts:56`, `slice(0, 5)`; names are up to `NAME_MAX_LENGTH` = 6) | UI-1 |
+| The battle enemy list overflows with 9 enemies (one line per lettered instance, `BattleDisplayManager.ts:210-235`) | BA-8 |
+| The magic shop shows no spell description and no who-can-learn | MS-7 (descriptions), in T6f |
+| The active hero vanishes (`BattleScene.ts:189`, alpha `0.5 + 0.5·sin`, reaches 0) | BA-8 |
+| The temple icon is hard to spot at overview scale | OW-8 acceptance |
+
+Left for the final adversarial pass: the staircase roads, the fisher's-cottage stray pixels, the "attacks Goblin A" announcement naming a dead target, and NG-9 (already fixed in T5).
+
+**Count:** 14 open `p` items + MS-7, BA-8, OW-8, OW-9, CA-1 art + 4 splits = **23 open work items** (4 notes folded in, no separate items).
+
+---
+
+### 2. Open items
+
+### Shared contract (T6-0, one commit on `t6-integration` before any branch)
+
+So that no two sub-tranches edit the same file, the shared types and one extraction land first:
+- `src/types/index.ts`:
+  - `ItemData.description?: string`;
+  - `MapTransition.effect?: 'door' | 'fade'` (CA-2);
+  - `MapData.battleBackgrounds.zones?: Record<string, { default?: string; terrain?: Record<string, string> }>` (TF-3).
+- `src/core/schemaValidation.ts`: the three optional fields (string; enum; record of records of strings).
+- Move `ExplorationScene.battleBackground()` (`ExplorationScene.ts:520-530`) into a new pure module `src/scenes/exploration/BattleBackdrop.ts`:
+  `battleBackdropId(cfg, pos, terrainAt(x, y) → string | undefined, zoneId: string | null) → string | undefined`, with today's behaviour. `ExplorationScene` passes `TerrainType` names from the collision map and `encounterSystem.zoneAt(x, y)?.id`. Test `tests/scenes/BattleBackdrop.test.ts` pins today's behaviour.
+- `assets-src/tools/kit.py` `_PARTS`: placeholder entries for every new part name in §3 (so map tranches compile before the art lands).
+- Tests and build pass; no behaviour change.
+
+### T6a: overworld layout and map checks (Python)
+
+#### Split `layouts/overworld.py` (594 lines)
+- **Fix:** `overworld.py` keeps the constants, `build()`, `check()`, `objects()` and `main()`. New sibling modules: `overworld_noise.py` (`value_noise`, `fbm`, `signed_distance`, `polyline_distance`, `blob`), `overworld_grid.py` (`fill_unreachable`, `walk_grid`, `bfs`, `clear_rect`, `clear_disc`, `near`, `extend_to_sea`, `components`, `tidy_land`, `tidy_blobs`), `overworld_zones.py` (`_g`, the §1.6 tables, `row_rects`, `encounter_zones`). Constants the helpers need are passed as arguments, or live in `overworld_consts.py`.
+- **Test:** each file < 250 lines; `python3 -I assets-src/tools/layouts/overworld.py` regenerates `assets-src/maps/overworld.yaml` byte-identical (`git diff --exit-code assets-src/maps`); `overworldLayout.test.ts` unchanged and green.
+
+#### Split `map_checks.py` (615 lines)
+- **Fix:** `map_checks.py` stays the façade that `build_map.py` and `map_selftest.py` import (`run`, `encounter_errors`, `contrast_errors` and every name they use, re-exported). New: `map_graph.py` (`walkable`, `reach`, `distances`, `static_npc_cells`, `talkable`, `articulation_points`, `components`, `edge_cells`), `map_checks_terrain.py` (`road_caps`, `_road_check`, `_min_blob`, `ocean_inlets`, `_river_check`, `_run`, the contrast trio), `map_checks_encounters.py` (`known_enemies`, `table_errors`, `encounter_errors`).
+- **Test:** each < 250 lines; `build_map.py --selftest` (94 checks) passes; a full compile leaves `assets/maps/ai/**` byte-identical; `--check-determinism` passes.
+
+#### BA-12: beach battles use the desert background (map half)
+- **Root cause:** sand compiles to `TerrainType.Desert`, so the overworld key `sand: desert` never matches and `desert: desert` does (`overworld.py:567-569`).
+- **Fix:** `terrain: {forest: forest, desert: shoreline, swamp: swamp, water: ocean, river: river}` (drop the dead `sand` key). TF-3 zone keys: `zones: {temple_approach: {terrain: {forest: dark_forest}}, east_pocket: {default: ruined_forest}}`. The ids are the T6g contract.
+- **Test:** `overworldLayout.test.ts`: every `battleBackgrounds` value (default, terrain, zones) names a file in `assets/backgrounds/`, and no key is a `TerrainType` name that doesn't exist (catches `sand`). The runtime half is T6g.
+- **Browser:** see T6g.
+
+**T6a owns:** `layouts/overworld*.py`, `map_checks*.py`, `map_graph.py`, `map_selftest.py` (imports only), `tests/data/overworldLayout.test.ts`.
+
+### T6b: Cornelia and the interiors (Python, legacy sprites)
+
+#### Split `layouts/interiors.py` (509 lines)
+- **Fix:** `interiors.py` stays the entry point (writes all 17 maps). New: `interiors_common.py` (`wood`, `Place`, `house`, `shop`, `keeper`), `homes_a.py` and `homes_b.py` (five homes each), `shops.py` (the six shops and the inn).
+- **Test:** each < 250 lines; the 17 generated sources are byte-identical; `corneliaLayout.test.ts` green.
+
+#### IN-4: "Welcome to the White Magic!"
+- **Fix:** `keeper()` takes a greeting; the magic shops say "Welcome to the White Magic Shop! Healing arts, for those with the gift." and "…Black Magic Shop!…". The HUD names become "White Magic Shop" and "Black Magic Shop" in `shops.py` and in the legacy `assets/maps/cornelia-{white,black}-magic.yaml` (names and keeper lines).
+- **Test:** `corneliaLayout.test.ts`: every keeper's first line names a shop noun (`Shop|Inn`) and none ends "Magic!".
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`, enter the white magic shop, talk to the keeper.
+
+#### CT-9 and UI-2: the signpost, and market vendors become townsfolk
+- **Fix (`cornelia.py`):**
+  - add `inspect` text for the signpost cell (`CX + 2, 66` = (32,66)): the directions to the castle (north up the high street), the market square, the magic quarter and the inn, checked against the layout's real positions;
+  - `market_vendor_w` / `_e` drop the merchant sprite and the "not for adventurers" line, and get market chatter, conditional on `PRINCESS_RESCUED` (prices, the princess, wolves on the roads, the bridge). Sprites `vendor_f` and `farmer`; the `villager` at (34,45) becomes `burgher` (the three new sprites from §3);
+  - `assets-src/characters.py` `ROSTER`: legacy `Look`s for `vendor_f`, `farmer` and `burgher`, then `build_assets.py characters`, so `assetCoverage` passes before the 2x art lands (its 2x test accepts legacy art).
+- **Test:** `corneliaLayout.test.ts`: the signpost cell has inspect text; no NPC without `shopId` uses `merchant`; the vendors have ≥ 2 dialog variants; `assetCoverage.test.ts` (unchanged) covers the new sprite names.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: face the signpost and press confirm; talk to both vendors; screenshot the market (after §3, the new sprites; before, the legacy look).
+
+**T6b owns:** `layouts/interiors*.py`, `homes_*.py`, `shops.py`, `layouts/cornelia.py`, legacy `assets/maps/cornelia-*.yaml`, `assets-src/characters.py`, `assets/sprites/characters.{png,json}`, `tests/data/{corneliaLayout,actOneDialog}.test.ts`.
+
+### T6c: castle and temple (Python)
+
+#### CA-3: the 1F and 2F stairs don't line up
+- 1F leaves at the hall's north end (`castle.py:53`, stairs at (21,7)); 2F arrives at the throne room's south end (`:175`, (21,24)). There is no cheap realignment: 2F's north end is the dais and throne.
+- **Options (user decision 1):** (a) accept it as the classic FF1 layout (you climb from the hall and enter the throne room at its foot) and record it as won't-fix; (b) rebuild 2F with a stair landing on its north side (map +4 rows, a north gallery with the stairwell, entered through doors at the gallery ends). This changes the walk to the King and every 2F arrival.
+- **Test (b only):** `castleLayout.test.ts`: the 1F stair column and the 2F arrival are within 4 rows of the same relative height. **Browser (b):** `?mute=1&scenario=t5_castle`.
+
+#### CA-4: a barrel half-blocks the treasury doorway
+- **Fix:** move the barrels at (32,24) and (32,25) (`castle.py:119-120`) to (32,21) and (32,22).
+- **Test (new `tests/data/castleLayout.test.ts`):** for every 2-cell doorway carved between rooms (read from the compiled collision: a 2-wide gap in a wall line), both cells on each side are walkable.
+- **Browser:** `?mute=1&scenario=t5_castle`, walk from the hall into the treasury through both doorway cells.
+
+#### CA-5: the King stands beside the throne
+- **Fix:** the King moves from (20,8) to the throne's seat cell (21,7); the throne deco (`castle.py:174`) gets `offset: [-24, 0]` so its seat is centred on that cell, and `walk_cells: [[0, 1]]` so the NPC stands on a non-wall cell (the compiler forbids NPCs on blocked cells). The player talks to him from the dais at (21,8). The King has no sitting pose; he stands in front of the throne back, as in FF1 (user decision 7).
+- **Test:** `castleLayout.test.ts`: the King's cell is in the throne footprint's bottom row; the cell south of it is walkable; `actOneDialog` and `Act1Blockers` (King cutscenes) green.
+- **Browser:** `?mute=1&scenario=act1_castle`: the King is on the throne; talking from the dais works.
+
+#### CA-6: inconsistent floor names
+- **Fix:** "Cornelia Castle 1F", "Cornelia Castle 2F", "Cornelia Castle 3F" (the tower) and "Cornelia Castle B1" (`castle.py:35, 158, 266, 291`).
+- **Test:** `mapNames.test.ts`: every `cornelia-castle*` name matches `^Cornelia Castle (B1|[1-3]F)$`.
+- **Browser:** the HUD label on each floor (`act1_castle`, `t5_castle`).
+
+#### CA-7: give the empty rooms a purpose
+- **Fix (`castle.py`):**
+  - **1F north gallery** (12–31, 3–5) becomes the library's reading gallery: bookshelves on the north row, two lecterns, a reading bench, and a scholar NPC (two lines of lore). Two rows stay open end to end (`no_static_chokepoints` holds).
+  - **Treasury** (32–41, 19–30): two chest NPCs (`CHEST_CORNELIA_TREASURY_1/2`; default loot `cabin` and `phoenix_down`, user decision 6), plus gold heaps and a crown on a cushion as deco (wired in T6h when the art lands).
+  - **Cellar:** its three chests already exist and show opened (ST-12, T3d). Add a wine-rack row and a fourth chest behind the barrels (`ether`), so it reads as a store, not an empty room.
+  - **2F tower-stair hall** (33–41, 6–14) becomes the guard room: armour stands, a weapon rack, a table, and a guard NPC with a line about the tower. The map table is wired in T6h.
+  - **Carpets:** 2F's runner becomes 4 wide with a medallion rug before the dais, so 1F and 2F no longer share one layout.
+- **Test:** `castleLayout.test.ts`: the treasury has ≥ 2 chest NPCs whose flags are unique (`crossFileValidation` already checks chest flags); the gallery has ≥ 4 bookshelf decos and a talkable NPC; 1F and 2F carpet (`+`) masks differ; compiler checks pass.
+- **Browser:** `?mute=1&scenario=t5_castle`: loot a treasury chest (it shows opened); walk the gallery; `act1_castle` for the guard room.
+
+#### TF-1: black void corners in the temple
+- **Root cause:** the ground's `x` (void) cells (`assets-src/maps/temple-of-fiends.yaml:16-37`) draw flat black, in the top corners and beside the entry corridor. The map is larger than the view in both axes, so nothing outside the map ever shows.
+- **Fix:** every `x` becomes `W` (the dark wall-top texture, shade 0.35), so the temple sits in solid rock. The `contrast` check (W vs floor) still applies.
+- **Test:** new `tests/data/templeLayout.test.ts`: the source ground has no `x`, and the compiled collision is unchanged (wall either way). No new map check, because T6a owns `map_checks.py` in this wave.
+- **Browser:** `?mute=1&scenario=act1_temple`: walk to both top corners; no black.
+
+**T6c owns:** `layouts/castle.py`, `assets-src/maps/temple-of-fiends.yaml`, `tests/data/{castleLayout,templeLayout,mapNames}.test.ts` (new / edited).
+
+### T6d: the field menu, the HUD and transitions (runtime)
+
+#### MS-7: field menu redesign (no portraits; show the data)
+- **Fix:**
+  - `FieldMenuScene` becomes a two-pane screen. Left: the command list (Items, Magic, Equip, Status, Order, Save, Load). Below it: a gold window and a play-time window (`Game.playTime`, `H:MM:SS`), plus the location name.
+  - Right: a new `src/ui/PartyPanel.ts`, one row per member: full name (6 chars), class, `Lv N`, HP `cur/max` with a bar, MP as per-level charges `L1 2/2 L2 1/1…` (casters only; others blank), status, and `Next: N` (`xpForNextLevel() − xp`). Fallen members are greyed out.
+  - **Config** (`FieldMenuScene.ts:25`) does nothing: remove it (user decision 2; the alternative is a small Config scene with message speed).
+  - `StatusScene`: XP to the next level, learned spells with charges, and slot labels Weapon / Body / Shield / Helmet.
+- **Test:** `FieldMenuScene.test.ts`: the panel shows each member's name, Lv, HP, Next, and charges for casters; gold and time strings; no Config item. `PartyPanel.test.ts` (new). `StatusScene` test for "Next" and spells.
+- **Browser:** New Game from the title (default party, FGHTR / FGHTR2 if duplicated), open the menu; then `?mute=1&scenario=t5_cornelia_field` (hurt party, 0 G). Screenshot.
+
+#### UI-1: the HUD is bare text (and names are cut to 5 characters)
+- **Fix (`FieldHUD.ts`):** the map label and the gold sit in small `Window` panels; the bottom HP strip sits in a panel, with fixed columns and full 6-character names (`NAME_MAX_LENGTH`), not `slice(0, 5)`.
+- **Test:** `tests/ui/FieldHUD.test.ts` (new): `FGHTR2` is shown in full; the label, gold and HP texts each have a panel behind them; gold stays inside its panel for 99999G.
+- **Browser:** `?mute=1&scenario=act1_castle` over the battlements; a New Game party with duplicate classes.
+
+#### CA-2: castle stairs and the castle entrance use the shop-door zoom
+- **Root cause:** `ExplorationScene.ts:442` zooms whenever the target map id starts with `cornelia-`.
+- **Fix:** `build_map.py` stamps `effect: door` on transitions from `house` and `prefab` objects with `enter` (shop, inn and house doors). Facades (the castle gate), stairs and edge exits get none. A new pure `src/scenes/exploration/TransitionEffect.ts` returns `zoom` for `door` and `fade` otherwise; `ExplorationScene` calls it.
+- **Test:** `TransitionEffect.test.ts`; a compiled-map test: every Cornelia house and shop transition has `effect: door`, no `cornelia-castle*` stair transition does, and the castle gate doesn't.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: a shop door zooms; the castle gate and the castle stairs fade.
+
+**T6d owns:** `src/scenes/{FieldMenuScene,StatusScene,ExplorationScene}.ts`, `src/ui/{FieldHUD,PartyPanel}.ts`, `src/scenes/exploration/TransitionEffect.ts`, `assets-src/tools/build_map.py` (transition `effect` only), their tests.
+
+### T6e: battle readability (runtime)
+
+#### BA-8: bigger text, a compact party HP panel, the active hero
+- **Fix:**
+  - Battle-only sizes in `BattleSceneTypes.ts` (global `FONT_SIZE` unchanged): the message text at 36 (two lines fit the 120 px window, which the stage spec keeps at 0–120), floating damage numbers at 48 with a dark outline (heal green, miss grey).
+  - Remove the four 200x165 status boxes at x 1700 (`BattleDisplayManager.ts:104-140`). The bottom strip (y 780–1080) gets: the enemy list (x 0–560), the command window (x 560–900, shown in the command phase) and a compact party panel (x 900–1920): 4 rows of name, HP `cur/max` with a bar and a status tag, at 32 px. The acting member's row is highlighted with a cursor.
+  - **Active hero:** no alpha pulse (`BattleScene.ts:189`). Alpha stays 1; the hero steps 24 px forward and pulses its tint between white and pale yellow.
+  - **Enemy list (9 enemies):** grouped by species, as FF1 does ("6x Goblin", "3x Wolf", from the base enemy name, not the lettered `displayName`). If there are more than 5 lines, it uses two columns. Dead species grey out, as now.
+- **Test:** `tests/scenes/battle/BattleDisplayManager.test.ts`: 9 enemies (6 + 3) give 2 lines inside the window; 6 species give two columns inside the window; the party panel has 4 rows with HP text. `BattleScene.test.ts`: across 200 update frames on a member's turn, that sprite's alpha stays 1. The message and floating text sizes are ≥ 36 / 48.
+- **Browser:** `?mute=1&scenario=t4_nine` and `?mute=1&scenario=ai_boss`: screenshots of the command phase and a damage number; the active hero stays visible.
+
+#### BA-9: the lunge stops about 400 px short, and "missed!" shows before the swing
+- **Root cause:** a fixed `ATTACK_REACH = 150` (`attackChoreography.ts:15`) whatever the distance; the result text starts when the advance starts.
+- **Fix:** `advanceAt(style, t, reach)` takes the reach: the distance from the attacker's home x to the target's right edge plus 24 px, clamped to [150, 900]. `BattleAnimationController` computes it from the target sprite's bounds, and shows the floating number and the result line on the contact frame (`advanceFrames(style)`).
+- **Test:** `attackChoreography.test.ts`: the last advance frame's `dx` equals `−reach` for lunge, dash and leap; `BattleAnimationController` test: no result text before the contact frame.
+- **Browser:** `?mute=1&scenario=ai_party_base&attack=lunge` (and `dash`, `leap`): the attacker reaches the target; the number appears on contact.
+
+**T6e owns:** `src/scenes/BattleScene.ts`, `src/scenes/battle/{BattleDisplayManager,BattleAnimationController,attackChoreography,BattleSceneTypes}.ts`, their tests.
+
+### T6f: shops, items and descriptions (runtime and data)
+
+#### Split `ShopScene.ts` (332 lines)
+- **Fix:** `updateDetailPanel`, `setDetailVisible` and `DETAIL_RECT` (`ShopScene.ts:22, 148-156, 277-327`) move to `src/scenes/shop/ShopDetailPanel.ts`. The detail panel also shows the item's description.
+- **Test:** `ShopScene.test.ts` and `ShopComparison.test.ts` green unchanged; each file < 250 lines.
+
+#### MS-7, the description half (and the magic-shop note)
+- **Fix:**
+  - `assets/data/items.yaml`: a real `description` for all 43 items (what it does, in numbers where useful: "Restores 30 HP to one ally.").
+  - A new `src/ui/HelpWindow.ts` (a one-line description bar) used by `ItemMenuScene`, `FieldMagicScene`, `EquipScene` and both shops.
+  - `ItemMenuScene`: the target list shows `HP cur/max` and status.
+  - `EquipScene`: slot labels Weapon / Body / Shield / Helmet (not `weapon:`), and a live ATK/DEF preview while browsing (reusing `CombatStats.withEquipped` from `shopComparison.ts`).
+  - `MagicShopScene`: the selected spell's description, and who can learn it (class initials, greyed when nobody in the party can).
+- **Test:** `crossFileValidation` (or a new `tests/data/descriptions.test.ts`): every item has a non-empty description that isn't its name; `ItemMenuScene.test.ts`, `EquipScene.test.ts`, `MagicShopScene.test.ts` cases for each.
+- **Browser:** `?mute=1&scenario=t5_cornelia_field`: Items (description, target HP); Equip (preview); the white magic shop (description, learners).
+
+**T6f owns:** `src/scenes/{ShopScene,MagicShopScene,ItemMenuScene,EquipScene,FieldMagicScene}.ts`, `src/scenes/shop/ShopDetailPanel.ts`, `src/ui/HelpWindow.ts`, `assets/data/items.yaml`, their tests.
+
+### T6g: battle backgrounds (TF-3, and the runtime half of BA-12)
+
+#### TF-3: the 21 unused hand-made backgrounds
+- **Fix (`stage_backgrounds.py`):**
+  - Add the 21 unused sources from `~/temp/ffgame-assets/tiles/backgrounds/hd/` to `STAGES`, with a horizon (source row) measured per image: abandoned-castle, chaos, cracked-earth, dark-forest, evil-temple, fire-temple, ice-cave, magic-forest, magma-temple, palace, red-forest, ruined-forest, sky-palace, swamp-cave, throne-kary, throne-kraken, throne-lich, throne-tiamat, tower-of-babel, town, water-temple.
+  - Game ids are snake_case of the file stem (`chaos` → `chaos_shrine`).
+  - The sources stay out of git; the `.webp` outputs are committed (about 21 × 450 KB ≈ 9–10 MB).
+  - Many have a high horizon. `stage()` already refuses a frame that leaves the field or the bottom uncovered; use `zoom` / `horizon_y` where needed.
+- **The temple choice:** stage both `evil_temple` and `abandoned_castle`, plus two debug scenarios `t6_bg_evil_temple` and `t6_bg_abandoned_castle` (Garland plus the temple formation, `background:` set).
+  - Compare the screenshots: feet of all 4 heroes and Garland on the plain (y 360–770), the horizon in 290–350, sprite contrast against the floor, and a ruin mood.
+  - The winner becomes `STAGES["temple"]`, so the temple map (`battleBackgrounds: {default: temple}`) doesn't change. The palace hall it replaces (`temple-of-fiends-hd.png`) is kept as `fiend_hall` for the act-4 return.
+  - The orchestrator picks, and reports with both screenshots (user decision 3; swapping later is one line).
+- **Test:** `assetCoverage.test.ts`: every `STAGES` id has `assets/backgrounds/<id>.webp` at 1920x1080 (parse the `STAGES` keys from the script, or a small manifest it writes); every map `battleBackgrounds` id (including `zones`) exists.
+- **Browser:** the two `t6_bg_*` scenarios; a contact sheet of all 21 staged images with the feet band (y 360/770) and the party column (x 1380–1675) drawn on top, saved to `/tmp/t6/bg/`.
+
+#### BA-12, runtime: the forest edge
+- **Fix (`BattleBackdrop.ts`):** zones first (`zones[zoneId]`, `terrain` then `default`), then the map's `terrain`, then `default`. A grass cell with ≥ 2 of its 4 neighbours forest counts as forest (T3b's organic outlines draw forest over grass cells).
+- **Test:** `BattleBackdrop.test.ts`: sand → `shoreline`; grass beside 2 forests → `forest`; forest in `temple_approach` → `dark_forest`; `east_pocket` → `ruined_forest`; no config → undefined.
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk the beach south of the city until a battle starts (shoreline); then a forest-edge cell.
+
+**T6g owns:** `assets-src/tools/stage_backgrounds.py`, `assets/backgrounds/*.webp`, `src/scenes/exploration/BattleBackdrop.ts`, `assets/data/debug-scenarios.yaml`, `tests/data/assetCoverage.test.ts`, `tests/scenes/BattleBackdrop.test.ts`.
+
+### T6-art: paid art (one sub-tranche, sequential checkpoints)
+
+See §3. **Owns:** `assets-src/gen/{kits.yaml,characters.yaml}`, `assets-src/gen/approved/{overworld/ruins,castle/vault,vendor_f,farmer,burgher}/*`, the matching `assets-src/gen/cache/<key>.{png,json}`, `cache/ledger.jsonl`, `.gitignore` exceptions, `assets/sprites/characters-ai.{png,json}` (`field_ai` stage). It touches no map source.
+
+### T6h: art wiring (after T6-art and wave 1 merge)
+
+#### OW-8: the temple icon
+- **Fix (`overworld.py:513`):** `prefab: temple_grand` (the new 2x2 parts `temple_grand_{r}_{c}`), with `collide: alpha` and the door on cell 1 as now. `TEMPLE_DOOR` and the arrival are unchanged.
+- **Test:** `overworldLayout.test.ts`: the temple prefab's art covers ≥ 85 % of its 2x2 footprint's width and height (read from `approved/overworld/ruins.json` `prop_px`); `warp_leaves`, `art_coverage` and `act1Flow`'s temple reachability pass.
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk to the temple and enter. Plus `build_map.py --preview overworld --scale 0.25`: the temple is readable at overview scale.
+
+#### OW-9: the broken bridge (art only)
+- **Fix:** a `BROKEN_BRIDGE` list in `overworld.py`: the 2x2 `bridge_gap` deco on the two gap rows (x 29–30, y 30–31), drawn on water (`on_water`); the cells stay water.
+- **Map unchanged:** `BRIDGE_BUILT` stays unset in act 1 and nothing opens. A comment records the `FIX_PLAN` T6 note: the future bridge cutscene needs a built variant of the span (the gap cells become bridge in collision and art, e.g. a flag-gated map variant), and that variant must drop `BROKEN_BRIDGE`.
+- **Test:** `overworldLayout.test.ts`: the four gap cells are still water in the compiled collision; the `BRIDGE_BUILT` gates are unchanged; `north_shore` still can't be reached (`act1Flow`).
+- **Browser:** `?mute=1&scenario=act1_overworld`: walk to the bridge foot (29,33); both stubs end in splinters, debris lies in the gap, and the gate message is unchanged.
+
+#### CA-1: the stair art
+- **Fix (`layouts/common.py` `stairs_down`):** use the new top-down `stairwell_{0,1}_{0,1}` parts. CA-1's walkable-row fix and the transitions are unchanged. The old `stairs_down_*` parts and their `furnish.json` `paint` entry stay; that sheet is not modified.
+- **Test:** `castleStairs.test.ts` green; a new case: every `stairs_down` deco uses `stairwell_*`.
+- **Browser:** `?mute=1&scenario=t5_castle` and `act1_castle`: the stairwells read top-down, with no black corner, and descend on the first step.
+
+#### CA-7 props and the townsfolk sprites
+- **Fix:** `castle.py` places `gold_heap`, `crown_cushion`, `lectern` and `map_table` from `castle/vault`. `cornelia.py` needs nothing: T6b already uses `vendor_f`, `farmer` and `burgher`, which now resolve to 2x art.
+
+**T6h owns:** `layouts/{overworld,common,castle}.py`, `tests/data/{overworldLayout,castleStairs,castleLayout}.test.ts`. It runs alone, after wave 1, so no file is shared.
+
+---
+
+### 3. Paid art (T6-art)
+
+**Budget:** `budget.json`: cap 100 Gemini images; 18 used (ledger: 87 Gemini attempts − `attempts_before` 69); `max_attempts_per_sheet` 3. Bedrock is not counted, but these are Gemini sheets (triage).
+
+**Checkpoint procedure** (each sheet; one paid request per checkpoint):
+1. Add the entry (`kits.yaml` / `characters.yaml`).
+2. `generate.py <id> --backend gemini --sheets <sheet> --seeds 1234 --dry-run`; check the prompt and the `_input*.png`: exactly 1 paid request.
+3. `… --paid` (`--max-paid 1`, the default), then review `out/gemini/<id>/1234/review.png` (raw, 2x in-game, 4x).
+4. Before any retry, offline fixes: `--repixelize`, `source` crop boxes, `key_tol`, `paint` ops for kits; `--flip`, `head_from` for field sheets.
+5. A retry is a new seed with `--retry --seeds 1235` (then 1236), at most 2 per sheet. A failed attempt counts.
+6. On approval: `approve.py <id> <sheet>`; commit the cut sheet, json, cache entry and ledger. Run `python3 -I assets-src/gen/selftest.py` (from the main checkout; it needs `refs/`).
+7. Rebuild: `build_assets.py field_ai` for sprites; kit parts take effect at the T6h map compile.
+
+Approval runs under the act-1 unattended rule (self-approve, ≤ 2 retries per sheet); the review screenshots go into the T6 report.
+
+### Checkpoint 1: `overworld/ruins` (OW-8 + OW-9)
+- **Spec:** `kind: swatches`, `seed: 1234`, `refs: [overworld/landmarks, overworld/city, temple/relics]`, `aspect: "1:1"`, `guide: [1024, 1024]`, `tile_px: 200`, `gap_px: 24`, `margin_px: 56`, `labels: absolute`, `scale: pitch`.
+- **Swatches:**
+  - `temple_grand`: at [0,0], 2x2 tiles, `fill: true`, `key_border: true`, `key_tol: 45`, `wrap: prop`, parts `[[temple_grand_0_0, temple_grand_0_1], [temple_grand_1_0, temple_grand_1_1]]`.
+    > "a world-map icon of an ancient ruined temple of evil seen from above at a three-quarter angle, filling the whole box: a stepped dark grey-blue stone temple on a broad cracked stone platform, two tall broken columns flanking the front, a crumbling peaked roof with a dark spire, a wide black arched doorway in the middle of the front edge at the bottom, a faint purple glow from the doorway and two small braziers with purple flames, a little green moss and ivy; nothing outside the platform."
+  - `bridge_gap`: at [2,0], 2x2 tiles, `key_border: true`, `key_tol: 45`, `wrap: prop`, parts `[[bridge_gap_0_0, bridge_gap_0_1], [bridge_gap_1_0, bridge_gap_1_1]]`.
+    > "the gap in a collapsed wooden bridge seen from straight above, on a plain magenta background: along the top edge and along the bottom edge, the snapped ends of brown wooden deck planks (laid top to bottom) stick out with jagged splintered tips and one plank hanging loose; four broken wooden piling stumps stand in the gap; a few loose planks and a coil of rope float in the middle; the middle of the box is empty background (open water will show through)."
+- **Specs to meet:** ≤ 32 colours on the 15-bit grid; light from the top left.
+  - `temple_grand` `prop_px` ≥ 82x82 of 96x96 native (it was 57x56); the doorway is centred, ≥ 16 native px wide, with ≥ 16 px over the door cell (the right bottom cell).
+  - `bridge_gap` plank colours within ΔE 12 of the `bridge_v` deck material, and ≥ 50 % transparent.
+- **Approval criteria:**
+  - the temple is clearly a dark, sinister ruin, distinct from the city icon, mountains and forest, and readable in `--preview overworld --scale 0.25` (second-pass note);
+  - its outline matches the city and castle icons;
+  - no grass plate, and the alpha edge is clean (no magenta fringe);
+  - the bridge pieces read as snapped and impassable: no continuous deck across the gap;
+  - the overworld compile passes `art_coverage`, `warp_leaves` and the reachability checks.
+
+### Checkpoint 2: `castle/vault` (CA-1 + CA-7 props)
+- **Spec:** as the existing `castle/furnish` (`kind: swatches`, `seed: 1234`, `refs: [castle/furnish, castle/props, interior/furniture]`, 1:1, 1024 guide, tile 200, gap 24, margin 56, `labels: absolute`, `scale: pitch`).
+- **Swatches:**
+  - `stairwell`: [0,0], 2x2, `fill: true`, `key_border: true`, parts `stairwell_{0,1}_{0,1}`.
+    > "a square stairwell opening in a polished cream marble floor seen from STRAIGHT ABOVE (top-down, not at an angle): pale stone steps descend from the top edge toward the bottom edge, each step a horizontal band, getting darker step by step until the bottom quarter is in deep shadow; a low carved pale stone kerb runs along the left, right and bottom sides; the top edge is open where the first step starts; no side walls visible; it fills the box."
+  - `map_table`: [2,0], 2x1, `key_border: true`, `wrap: prop`, parts `[[map_table_l, map_table_r]]`.
+    > "a heavy dark wooden war table seen from the front in three-quarter view, with a large parchment map of a coastline spread on top, two candles and a dagger pinning the map, as wide as the box."
+  - `gold_heap`: [2,1], 1x1.
+    > "a heap of gold coins with a few red and blue gems on a stone floor."
+  - `crown_cushion`: [3,1], 1x1.
+    > "a golden crown resting on a red velvet cushion on a short carved stone pedestal."
+  - `lectern`: [0,2], 1x1.
+    > "a carved dark wooden lectern holding a large open book."
+  - `globe`: [1,2], 1x1.
+    > "a world globe in brass on a wooden stand."
+- **Specs to meet:** ≤ 32 colours; `stairwell` fill ≥ 0.95, all 4 cells opaque or cleanly keyed (no black corner, the CA-1 complaint); the top edge's mean luma within 10 % of the `marble` material, so it meets the floor without a seam. Props use `scale: pitch` and stand on the bottom of their boxes.
+- **Approval criteria:**
+  - the stairwell is plainly top-down (no oblique side walls) and plainly goes down, starting at the top edge;
+  - the props match `castle/props` and `castle/furnish` (outline, light, saturation);
+  - the stairwell reads in the 1F treasury, on 2F and in the tower (the tower floor is wood: a stone kerb on wood is acceptable).
+
+### Checkpoints 3–5: townsfolk field sprites (CT-9 / UI-2)
+- **Spec:** `characters.yaml` NPC entries (`sheets: [field]`, `field_gear: empty hands, arms at the sides`, `seeds: [1234]`); the house-style reference is sent automatically.
+  - `vendor_f` (`robed: true`): "stout middle-aged market woman with rosy cheeks, green headscarf, brown knitted shawl over a mustard-yellow dress, white apron, brown shoes".
+  - `farmer`: "sun-tanned farmer with a wide straw hat, short brown beard, sleeveless olive tunic over a cream shirt, rolled brown trousers, brown boots".
+  - `burgher`: "well-to-do townsman with a neat grey moustache, plum-purple doublet with a white ruff collar, black trousers, short black cape, black cap with a white feather, black shoes".
+- **Specs to meet (`ART_ROLLOUT.md` acceptance):**
+  - field figure height 82–92 rows, the feet row matching the knight's;
+  - an outline and ≤ 14 colours;
+  - correct facing (a mirrored side row is allowed with `--flip left`);
+  - the walk frames visibly differ;
+  - a readable face in every front and side frame;
+  - no mannequin parts and no stray props.
+- **Approval criteria:**
+  - each is distinct in silhouette and hue from `villager`, `villager_f`, `merchant` and `old_man` at 2x (side by side in the review);
+  - `python3 -I assets-src/gen/puppet.py review <id>` shows clean walk in-betweens;
+  - `build_assets.py field_ai` lists the three ids.
+
+### Image count
+
+| Checkpoint | Sheet | Images (no retry) | Max (2 retries) |
+|---|---|---|---|
+| 1 | `overworld/kit_ruins` | 1 | 3 |
+| 2 | `castle/kit_vault` | 1 | 3 |
+| 3 | `vendor_f/field` | 1 | 3 |
+| 4 | `farmer/field` | 1 | 3 |
+| 5 | `burgher/field` | 1 | 3 |
+| **Total** | | **5** | **15** |
+
+- **Expected:** 5–8 images (T3–T5 history: kit sheets mostly first-try; the gap sheet's transparent middle is the likeliest retry).
+- **After T6:** 23–26 of 100 used in the expected case, and at most 33.
+- **Not budgeted:** a sitting-King frame (user decision 7; it would add 1–3).
+
+---
+
+### 4. Sub-tranches and order
+
+| # | Items | Owns (files) | Depends on |
+|---|---|---|---|
+| T6-0 | the shared contract | `src/types/index.ts`, `src/core/schemaValidation.ts`, `src/scenes/exploration/BattleBackdrop.ts` (extraction), the `ExplorationScene` call site, `assets-src/tools/kit.py` (`_PARTS`) | none; commit on `t6-integration` first |
+| T6a | overworld.py and map_checks splits, BA-12 / TF-3 map keys | §2 T6a | T6-0 |
+| T6b | interiors.py split, IN-4, CT-9, UI-2 (data and legacy looks) | §2 T6b | T6-0 |
+| T6c | CA-3 (per decision), CA-4, CA-5, CA-6, CA-7 (layout and chests), TF-1 | §2 T6c | T6-0 |
+| T6d | MS-7 (menu, panel, Status, Config), UI-1, CA-2 | §2 T6d | T6-0 |
+| T6e | BA-8, BA-9, enemy list, active hero | §2 T6e | T6-0 |
+| T6f | ShopScene split, MS-7 descriptions, Equip and Items, magic shop | §2 T6f | T6-0 (`ItemData.description`) |
+| T6g | TF-3 staging and the temple pick, BA-12 runtime | §2 T6g | T6-0 (`BattleBackdrop.ts`, `zones` type) |
+| T6-art | 5 paid checkpoints | §2 T6-art | none (sequential inside) |
+| T6h | OW-8, OW-9, CA-1 art, CA-7 props wiring | §2 T6h | T6-art, T6a, T6c merged |
+
+**No file is shared between sub-tranches of a wave.**
+- T6d alone edits `ExplorationScene.ts` after T6-0. T6g edits only `BattleBackdrop.ts`.
+- T6-0 owns `kit.py`; T6a owns `map_checks*.py`; T6d owns only `build_map.py`'s transition stamping.
+- T6b and T6c both regenerate Cornelia/castle `assets-src/maps/*`. By the T3 rule, generated sources and compiled output are rebuilt on the integration branch.
+- T6h runs after wave 1 and edits files that T6a and T6c owned (`overworld.py`, `castle.py`), plus `common.py`, which nobody else edits.
+
+**Order:**
+1. T6-0 on `t6-integration`.
+2. **Wave 1:** T6a–T6g in parallel worktrees from `t6-integration`. T6-art runs at the same time, sequentially through its 5 checkpoints.
+3. Merge T6a, T6b, T6c, T6d, T6e, T6f, T6g, then T6-art.
+4. **Wave 2:** T6h from the merged head.
+5. **Integration:** run the layout scripts by name (`overworld.py`, `cornelia.py`, `interiors.py`, `castle.py`), then `build_map.py` for every map; a second run gives no diff (`git diff --exit-code assets-src/maps assets/maps/ai`). Then `build_assets.py field_ai characters`.
+
+**Validation:**
+- `npm run build`, `npm test`, `npx vitest run tests/data tests/balance` (balance unchanged and green);
+- `python3 -I assets-src/tools/build_map.py --selftest` and `--check-determinism`;
+- `python3 -I assets-src/gen/selftest.py` (main checkout);
+- `map_report.py cornelia cornelia-castle cornelia-castle-2f cornelia-castle-tower cornelia-castle-cellar temple-of-fiends overworld`;
+- the browser checks above, 0 console errors;
+- file sizes: the four split files and their parts are < 250 lines;
+- `AGENTS.md`: drop `ShopScene.ts`, `layouts/overworld.py`, `layouts/interiors.py` and `map_checks.py` from the monitored list; record the 21 new background ids, the `effect` transition field, `battleBackgrounds.zones`, `ItemData.description`, and the new sheets;
+- a T6 result section in `docs/FIX_PLAN_PENINSULA.md`.
+
+**Process:** as before: momus reviews this plan, then the implementation, before the commit.
+
+---
+
+### 5. Decisions for the user
+
+1. **CA-3 (stair alignment):**
+   - (a) accept the classic FF1 layout (you enter the throne room at its foot) and record it as won't-fix. **Recommended.**
+   - (b) rebuild 2F with a north stair landing. This changes the approach to the King.
+2. **Config** in the field menu does nothing:
+   - remove it (**planned**);
+   - or build a small Config scene (message speed, battle message speed).
+3. **TF-3 temple background:** the orchestrator stages `evil_temple` and `abandoned_castle`, compares them on the stage and picks one, then reports both screenshots. Swapping later is a one-line change. The old palace hall stays as `fiend_hall`.
+4. **New townsfolk:** three (`vendor_f`, `farmer`, `burgher`); each extra one costs 1–3 images.
+5. **Backgrounds in git:** all 21 staged images are committed (about 9–10 MB), as the triage implies. The alternative is to commit only the act-1 ones and stage the rest when those acts are built.
+6. **Treasury loot (CA-7):** a Cabin and a Phoenix Down in the treasury, an Ether in the cellar (**planned**); or name others. This does not affect `tests/balance` (the sims don't open chests).
+7. **CA-5:** the King stands on the throne's seat cell. There is no sitting pose (as in FF1). A seated King field sheet would cost 1–3 extra images.
+
+### Decisions (orchestrator defaults, reported to the user)
+1. **CA-3:** keep the classic layout where the 1F and 2F stairs don't line up. Recorded as won't-fix with the reason (the throne sits at 2F's north end).
+2. **Config:** remove the menu item that does nothing; there are no settings yet.
+3. **TF-3:** compare `evil-temple` and `abandoned-castle` on the battle stage, choose one, and keep both screenshots for the user.
+4. **Townsfolk:** three new sprites.
+5. **Backgrounds in git:** commit only the backgrounds act 1 uses. The rest stay staged locally (gitignored, or not staged).
+6. **Castle chest loot:** accept the plan (treasury: Cabin and Phoenix Down; cellar: Ether).
+7. **The King** stands on the throne seat; no seated pose.
+
+### Revisions after the momus review (binding)
+
+All 22 momus issues apply. Resolutions:
+
+1. **Backgrounds:** only the act-1 ids are committed: every id referenced by a map's `battleBackgrounds` or a debug scenario, plus the chosen temple background. T6g lists the committed ids. The coverage test covers only referenced ids. T6g writes no `.gitignore` rules; it just doesn't `git add` the other staged files.
+2. **Ownership:**
+   - `.gitignore` belongs to T6-art (`approve.py`);
+   - `BattleFieldTargeting.ts` and its test belong to T6e (party-target highlight = the row in the new party panel);
+   - `TextRenderer.ts` (a new `fontSize` option, wrapping by the measured char width) and `NESFont.ts` belong to T6e (outline = offset shadow copies, not stroke);
+   - one `SLOT_LABELS` constant goes in T6-0 (`src/ui/labels.ts`).
+3. **`overworld.py` split:** the constant and polyline tables (`LAND` … `ROADS`) also move to `overworld_consts.py`, so every file ends under 250 lines.
+4. **BA-8 layout:**
+   - the message window stays 120 px tall, with font 32 px and line height 36 (2 lines = 72 px, which fits inside the 24 px padding);
+   - spell and item lists draw in the left (enemy-list) window at full width, not inside the command window;
+   - the party panel is a new `src/scenes/battle/BattlePartyPanel.ts`;
+   - `FIELD_TOP` is unchanged.
+5. **CA-2:** the door-effect rule applies only to maps whose `kits` include `town` or `interior`. The overworld temple and other prefabs keep the fade (test that the temple transition has no effect). The legacy maps losing the shop zoom is accepted (dev only).
+6. **OW-9:** the debris deco has `block: false` and `on_water: true`, and the gap cells stay WATER (test).
+7. **T6a's background test** checks only files that exist today; T6g extends the keys and the test.
+8. **Paid-art fallbacks:** after three failed attempts at a checkpoint:
+   - OW-8 keeps `temple_icon`;
+   - OW-9 adds no debris;
+   - CA-1 keeps `stairs_down_*`;
+   - CA-7 skips the new props;
+   - each townsperson keeps the legacy look.
+
+   Each T6h step is conditional on its sheet being approved, and the report flags any fallback used.
+9. **T6-art environment and bookkeeping.**
+   - T6-art runs in the main checkout (it needs the gitignored refs and `.env`), not in a worktree.
+   - Every approval decision is logged in `docs/ACT1_LOG.md`. The ledger guard count is authoritative (18 used), and `ACT1_LOG.md` is corrected to match.
+   - Sheet names: `overworld/kit_grand`, `castle/kit_stairs_lib`, `townsfolk_*`, with exact `generate.py` / `approve.py` commands.
+   - After approval: `git diff --exit-code` on `assets-src/gen/approved/` excluding the new sheets, then `selftest.py`.
+10. **Tests that change:**
+    - `FieldMenuSaveEnabled.test.ts` (Save is now 5 down);
+    - `tests/ui/FieldHUD.test.ts` (exists; update the child count);
+    - `attackChoreography.test.ts` (`ATTACK_REACH`).
+11. **CT-9 test:** limited to the `cornelia` map (the tavern barkeep keeps the merchant sprite).
+12. **MS-7 layout:**
+    - left pane x 24, width 360; party pane x 408, width 1488; row height 168 (4 rows);
+    - show only charge levels with max > 0;
+    - `Next: —` becomes `MAX` at `MAX_LEVEL`;
+    - location from a new `ExplorationScene.getMapName()`;
+    - the `HelpWindow` sits at the bottom (y 900, height 156) in Item, Equip and MagicShop, reusing `ItemMenuScene`'s `descWindow` slot.
+13. **`temple_grand` door:** centred on the door cell, at least 24 px wide.
+14. **CA-7 positions:**
+    - in the treasury, chests at (35,24) and (37,24), a gold heap at (36,22), the crown on a table at (38,22), avoiding the stairwell and the existing props;
+    - lecterns are placed only in T6c;
+    - `globe` is placed in the library;
+    - bookshelves use `on_wall` on the gallery's top row.
+15. **TF-3:** T6g gives the full 21-entry id table (stem → snake_case, no renames). The chosen temple image is also staged under its own id. Only the new ids are re-encoded.
+16. **`map_checks` split:** `_unreachable`, `_touches`, `_cells` and `_is_int` go to `map_checks/util.py`. The façade re-exports everything `map_report.py` and the selftest use.
+17. **CA-3:** won't-fix, so the option (b) test and browser lines are dropped.
+18. **BA-9:** the clamp covers `classic` too. The target bounds are the `AiEnemyView` sprite's `getBounds()` at 2x.
+19. **BA-12:** the browser check reads the backdrop chosen at the player's cell via `browser_evaluate` (beach and forest edge), not a random encounter.
+20. **UI-1:** add an inn screenshot with 0 G; the inn box and the HUD panels must not overlap.
+21. **Validation** includes `npx vitest run tests/balance`.
+22. **Line references** corrected as momus listed.
+
+---
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
