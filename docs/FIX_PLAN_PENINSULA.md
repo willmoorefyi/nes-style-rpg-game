@@ -938,6 +938,709 @@ Peaks: 12 variants, anchor spread 13.1 px; foothills 100 %; fidelity: every wild
   - **T6:** split `layouts/overworld.py` (536 lines), `layouts/interiors.py` (509) and `map_checks.py` (435).
   - **Second pass:** the stray-pixel line beside the opened chest in the fisher's cottage, and the HUD's 5-character name truncation.
 
+## T4: Balance on the FF1 baseline
+
+**Defects:**
+- NG-4, the charge-table half (T2 kept the old table);
+- NG-5;
+- EB-1;
+- EB-3 to EB-10;
+- BA-10: front-slot targeting and the per-member XP line.
+
+EB-11 is context.
+
+**Binding decision** (playtest triage): "Use the original FF1 numbers as the tuning baseline for XP, gold, spell power, status hit rates and starting gold." EB-10 and BA-10 fall under the same baseline: enemy damage varies, formations hold 1 to 9 enemies, and enemies prefer the front slots.
+
+**Approach.**
+- Port FF1's (NES, 1987) formulas and act-1 numbers.
+- Map the game's enemies onto their FF1 counterparts, and keep the game's own content: names, classes, the Knight-house chest and the art.
+- Deviate from FF1 only where the target needs it. There is one such deviation, Garland (§2.1).
+- Numbers I'm not sure of are marked **(≈)**, each with the value to use.
+
+**Target.** A fresh party at the level expected for Garland (about L2–L4 after an hour of play in FF1):
+- wins most of the time with sensible play;
+- loses with careless play.
+
+The scratch simulation in §6 sets the numbers.
+
+---
+
+### 0. Summary of the model
+
+| Area | Today | T4 (FF1) |
+|---|---|---|
+| Physical damage | `atk − def + rand(1..level)` (enemies use level 1, so there is no variance); one hit; flat 80 % hit; crit 1/32 | Per hit: `rand(A, 2A) − absorb` (min 1). `A = weapon + ⌊STR/2⌋` for party members; for enemies, `A` is their `attack`. Hits per attack: `1 + ⌊hit%/32⌋` for the party, `hits` for enemies. Hit chance: `(168 + hit% − evade) / 200`, with +40 against a sleeping or paralysed target. Crit chance: `crit / 200`; a crit adds one more `rand(A, 2A)` that ignores absorb |
+| Party hit% | none | Class base + growth per level + weapon `hit` |
+| Party evade | none | `48 + AGI − armour weight`, plus the RUSE and INVS buffs |
+| Enemy evade | none | Data field `evade`, plus the LOCK debuff |
+| Magic damage | `power × INT / targetINT` (FIRE 300–600) | `rand(E, 2E)`, where `E` is the spell's `power`. Weak: `E × 1.5`. Resistant: damage halved. If the spell connects (`(148 + accuracy − MDef) / 200`), damage doubles. INT is not used (as in FF1). FIRE does 10–20, or 20–40 when it connects |
+| Heal | `power × INT / 4` (CURE about 112) | `rand(E, 2E)`. CURE heals 16–32, CUR2 33–66, HEAL 12–24 each |
+| Status spells | always hit; last forever | Hit on `(148 + accuracy − MDef) / 200`. A sleeping or paralysed actor loses its turn, then wakes if `rand(0..80) < currentHP` **(≈)**. Damage doesn't wake (FF1) |
+| RUSE / INVS / LOCK / FOG / TMPR | values stored, never read | RUSE +80 evade (self), INVS +40 evade, LOCK −20 enemy evade, FOG +8 absorb, TMPR +14 attack, all read by the formulas above |
+| Run | `50 + (party AGI − enemy AGI)/2` | Per runner: succeeds if `rand(0 .. level+15) < LUCK`. A Lv1 Thief escapes 88 % of the time, a Lv1 Warrior 29 % |
+| Enemy targeting | uniform over the living | Slot weights 4/2/1/1 over the living, in party order (FF1: 50/25/12.5/12.5 %) |
+| XP curve | `25·lvl^2.6` (151 XP for Lv2) | FF1 table (40 XP for Lv2, 196 for Lv3, 547 for Lv4, …) |
+| Level-up | full heal | +max-HP gain only (FF1) |
+| Spell charges | one table for every class | Per-class FF1-style tables in `classes.yaml`. Classes with no spells have no charges |
+| Starting gold | 100 | 400 |
+| Spell price | 100 × spell level | FF1 by level: 100 / 400 / 1500 / 4000 / 8000 / 20000 / 45000 / 60000 |
+| Formations | fixed lists of at most 2 | Groups with min–max counts, at most 9 enemies, regional zones |
+
+---
+
+### 1. Data changes
+
+### 1.1 `enemies.yaml`: act-1 enemies mapped to FF1
+
+New optional fields: `accuracy`, `evade`, `hits` (default 1) and `crit` (out of 200, default 1). `stats.magicDefense` is now used.
+
+| Game id (keep the name) | FF1 counterpart | HP | attack | accuracy | hits | defense | evade | magicDefense | agility | xpReward | goldReward | Elements / family | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `goblin` (Goblin) | IMP | 8 | 4 | 2 | 1 | 4 | 6 | 16 | 6 (was 4) | 6 | 6 | weak fire (game's own; FF1 IMP has none) | was HP 20, 6 XP |
+| **new** `gr_imp` (Gr.Imp) | GrIMP | 16 | 8 | 4 (≈) | 1 | 6 | 9 | 23 (≈) | 7 | 18 | 18 | weak fire | sprite `gr_imp`, a palette swap of `goblin` |
+| `wolf` (Wolf) | WOLF | 20 | 8 | 5 (≈) | 1 | 0 | 36 (≈) | 28 (≈) | 12 (was 7) | 24 | 6 | weak fire, resist ice, `were` (keep) | was HP 15 |
+| **new** `gr_wolf` (Gr.Wolf) | GrWOLF | 72 | 14 | 18 (≈) | 1 | 0 | 36 (≈) | 46 (≈) | 14 | 93 | 22 | `were` | east pocket only (rare); palette swap of `wolf` |
+| `skeleton` (Skeleton) | BONE | 10 | 10 | 9 (≈) | 1 | 12 | 12 (≈) | 17 (≈) | 6 | 9 | 3 | weak fire, resist ice, `undead` (HARM works) | was HP 30 |
+| `pirate` (Pirate) | PIRATE | 6 | 8 | 2 (≈) | 1 | 0 | 6 (≈) | 15 (≈) | 6 | 40 | 40 | weak lightning (keep) | **removed from the act-1 tables** (FF1: Pravoka); kept for later acts |
+| `garland` (Garland) | GARLAND | **240** (FF1 106) | **16** (FF1 15) | 15 (≈) | **2** (FF1 1) | 10 | 12 (≈) | 15 (≈) | 8 | 130 | 250 | **no weakness** (FF1 has none; today's `weakness: lightning` goes) | see §2.1. Keep `bossPhases` (message only; see ST-6 below) |
+
+**Unchanged structure:** `str`, `int`, `vit` and `luck` stay in `stats`, but no formula reads them for enemies. Set `intelligence` to 1.
+
+**Optional:** enemies from later acts (FF1 counterpart, values ≈, so later acts start on the same scale). None of them is in act 1. Do this only if debug scenarios and tests stay green.
+
+| id | FF1 counterpart | HP | attack | defense | XP | gold |
+|---|---|---|---|---|---|---|
+| `ogre` | OGRE | 100 | 18 | 10 | 195 | 195 |
+| `troll` | TROLL | 184 | 24 | 12 | 621 | 621 |
+| `mummy` | MUMMY | 80 | 30 | 20 | 300 | 300 |
+| `cockatrice` | COCTRICE | 50 | 1 (stone touch) | 4 | 276 | 200 |
+| `vampire` | VAMPIRE | 156 | 76 | 24 | 1200 | 2000 |
+| `dragon` | RED D (≈) | 248 | 30 | 30 | 1218 | 4000 |
+| `lich` | LICH (boss) | 400 | 40 | 40 | 2200 | 3000 |
+
+**Art (no paid images).** Add `variants` to `assets-src/gen/monsters.yaml`:
+- under `goblin`: `{id: gr_imp, hue: 25, sat: 1.1}`, a redder imp;
+- under `wolf`: `{id: gr_wolf, hue: -20, sat: 0.6}`, a darker, greyer wolf.
+
+Then run `python3 -I assets-src/build_assets.py monsters_ai`. `assetCoverage.test.ts` covers both.
+
+### 1.2 `items.yaml`
+
+New optional fields:
+- weapons: `hit` (hit% bonus) and `crit` (out of 200);
+- armour: `weight` (the evade penalty).
+
+| id | attack / defense | hit | crit (FF1 index bug, ≈) | weight | price | usableBy changes |
+|---|---|---|---|---|---|---|
+| `wooden_nunchaku` | 12 | 0 | 1 | – | 10 | – |
+| `small_knife` | 5 | 10 | 2 | – | 5 | – |
+| `staff` | 6 | 0 | 3 | – | 5 | – |
+| `rapier` | 9 | 5 | 4 | – | 10 | – |
+| `hammer` | 9 | 0 | 5 | – | 10 | – |
+| `short_sword` | **15** (was 10) | 10 | 6 | – | **550** (was 15) | – (leaves Cornelia) |
+| `hand_axe` | 16 | 5 | 7 | – | 550 | – |
+| `iron_nunchaku` | 16 | 0 | 9 | – | 200 | – |
+| `iron_sword`, `mythril_*` and the rest | as now | 10 (≈) | 10–20 (≈) | – | as now | – |
+| `cloth` | 1 | – | – | 2 | 10 | all (as now) |
+| `robe` | 2 | – | – | 2 | 20 | mages (as now) |
+| `leather_armor` (FF1 Wooden Armor) | 4 | – | – | 8 | 50 | **+ monk** (EB-8) |
+| `chain_mail` | 15 | – | – | 15 | 80 | – |
+| `iron_armor` | 24 | – | – | 23 | 800 | – |
+| `mythril_armor` / `mythril_mail` / `dragon_armor` | as now | – | – | 33 / 8 / 10 (≈) | as now | – |
+| `wooden_shield` / `iron_shield` / `mythril_shield` | as now | – | – | 0 | as now | – |
+| `cap` | 1 | – | – | 1 | 10 | – |
+| `iron_helm` / `mythril_helm` | as now | – | – | 3 / 3 (≈) | as now | – |
+| `tent` | – | – | – | – | **75** (was 250) | – |
+| `cabin` | – | – | – | – | **250** (was 500) | – |
+| `potion`, `antidote`, `soft` | – | – | – | – | 60 / 75 / 800 (already FF1) | – |
+
+Body armour (`leather_armor`, `chain_mail`, …) gets an explicit `slot: armor`, so the Monk rule "no body armour" is a clear slot check.
+
+### 1.3 `spells.yaml`
+
+New optional fields:
+- `accuracy`, used in the connect and status roll; the default is 24;
+- `price`; when it is absent, the per-level table applies.
+
+`power` is now FF1's effectivity. For buff and debuff spells, `power` is the amount.
+
+| id | level | power (was) | accuracy | price | Notes |
+|---|---|---|---|---|---|
+| `cure` | 1 | 16 (30) | – | 100 | heals 16–32 |
+| `harm` | 1 | 20 (20) | 24 | 100 | undead only |
+| `fog` | 1 | 8 (0) | – | 100 | +8 absorb |
+| `ruse` | 1 | 80 (0) | – | 100 | +80 evade, self |
+| `fire` | 1 | 10 (20) | 24 | 100 | 10–20, or 20–40 when it connects |
+| `lit` | 1 | 10 (20) | 24 | 100 | |
+| `slep` | 1 | 0 | 24 | 100 | all enemies |
+| `lock` | 1 | 20 (0) | 64 (≈) | 100 | −20 evade |
+| `ice` | 2 | 20 (30) | 24 | 400 | |
+| `invs` | 2 | 40 (0) | – | 400 | +40 evade |
+| `tmpr` | 2 | 14 (0) | – | 400 | |
+| `mute`, `dark`, `slow` | 2 | – | 64 / 24 / 64 (≈) | 400 | |
+| `lamp`, `alit` | 2 | – | – | 400 | |
+| `cure2` | 3 | 33 (60) | – | 1500 | |
+| `heal` | 3 | 12 (20) | – | 1500 | all allies |
+| `hrm2` | 3 | 40 | 24 | 1500 | |
+| `fir2` / `lit2` | 3 | 30 | 24 | 1500 | |
+| `hold` | 3 | – | 64 (≈) | 1500 | |
+| `lok2` | 3 | 20 | 64 (≈) | 1500 | |
+| `afir` | 3 | – | – | 1500 | |
+| `ice2` | 4 | 40 | 24 | 4000 | |
+| `slp2`, `conf` | 4 | – | 48 (≈) | 4000 | |
+| `fear` | 4 | – | 40 (≈) | 4000 | |
+| `pure`, `aice`, `amut`, `fast` | 4 | – | – | 4000 | |
+| `cure3` | 5 | 66 (120) | – | 8000 | |
+| `life` | 5 | – | – | 8000 | |
+
+### 1.4 `classes.yaml`
+
+New fields:
+- `hitPercent: {base, growth}`, used by party attacks;
+- `magicDefense: {base, growth}`, used when enemies cast at the party;
+- `spellCharges`: step breakpoints `[[level, [l1..l8]], …]`. A value holds until the next breakpoint, and a missing class means no charges.
+
+`baseStats` and `statGrowth` stay as they are: they are the game's own and close to FF1's.
+
+| Class | hitPercent base / growth | magicDefense base / growth (≈) | spellCharges (level: L1, L2, …) |
+|---|---|---|---|
+| warrior, knight | 10 / 3 | 15 / 3 | warrior: none. Knight: 10: [1]; 15: [2,1]; 20: [3,2,1]; 30: [5,4,3]; 40: [7,6,5]; 50: [9,8,7] (≈) |
+| thief, ninja | 5 / 2 | 15 / 2 | thief: none. Ninja: 10: [1]; 15: [2,1]; 20: [3,2,1]; 25: [4,3,2,1]; 30: [5,4,3,2]; 40: [7,6,5,4]; 50: [9,8,7,6] (≈) |
+| monk, master | 5 / 3 (≈) | 10 / 4 (≈) | none |
+| red_mage, red_wizard | 7 / 2 | 20 / 2 | 1: [2]; 3: [3]; 4: [3,1]; 5: [4,1]; 6: [4,2]; 7: [5,2,1]; 9: [5,3,2]; 10: [6,3,2,1]; 13: [6,4,3,2,1]; 16: [7,5,4,3,2,1]; 20: [8,6,5,4,3,2,1]; 30: [9,8,7,6,5,4,3]; 40: [9,9,9,8,7,6,5]; 50: [9,9,9,9,9,8,7] (≈) |
+| white_mage, black_mage, both wizards | 5 / 1 | 20 / 2 | 1: [2]; 2: [3]; 3: [3,1]; 4: [4,2]; 5: [4,2,1]; 6: [5,3,2]; 7: [5,3,2,1]; 8: [6,4,3,2]; 9: [6,4,3,2,1]; 10: [7,5,4,3,2]; 11: [7,5,4,3,2,1]; 13: [8,6,5,4,3,2,1]; 15: [9,7,6,5,4,3,2,1]; 20: [9,9,8,7,6,5,4,3]; 30: [9,9,9,9,8,7,6,5]; 40: [9,9,9,9,9,9,8,7]; 50: [9 × 8] (≈) |
+
+**Certainty.** The exact FF1 MP tables are not certain. The structure is: Lv1 starts with 2 L1 charges; a new spell level opens about every 2 levels for White and Black Mages and every 3 for Red Mages; the cap is 9. That structure is what matters for act 1.
+
+Also delete the unused `usableEquipment` keys, or leave them, since `usableBy` is the rule. Recommendation: leave them (out of scope).
+
+### 1.5 `shops.yaml` (FF1 Coneria lists)
+
+| Shop | Now | T4 |
+|---|---|---|
+| `cornelia_weapon` | rapier, short_sword, hammer, staff | **wooden_nunchaku, small_knife, staff, rapier, hammer** (EB-8: the Monk can buy a weapon) |
+| `cornelia_armor` | leather_armor, chain_mail, wooden_shield, cap | **cloth**, leather_armor, chain_mail, wooden_shield, cap (EB-7: mage body armour) |
+| `cornelia_item` | potion, antidote, tent | same (Tent is now 75) |
+| `cornelia_white` / `cornelia_black` | cure, harm, fog, ruse / fire, lit, slep, lock | same (already FF1) |
+| `cornelia_inn` | 30 | 30 (FF1) |
+
+**What the 400 G start buys (checked):**
+
+| Member | Kit | Cost |
+|---|---|---|
+| Warrior | rapier, leather armour, wooden shield | 75 |
+| Thief | rapier, leather armour | 60 |
+| White Mage | hammer, cloth, CURE | 120 |
+| Black Mage | knife, cloth, FIRE | 115 |
+| **Total** | | **370** |
+
+In the simulation, the rest of the "full" kit costs about 600 G:
+- chain mail and four caps;
+- LIT, SLEP and RUSE;
+- three potions.
+
+The simulated campaign has earned that by about battle 25–40, which is L3.
+
+### 1.6 Formations and zones (map data; T4e)
+
+`EncounterEntry` gains a group form, `{groups: [{id, min, max}], weight}`. The old `enemies: [...]` form keeps working. The total is capped at 9.
+
+**Overworld: map default (Cornelia fields, which includes the north road to the bridge).** FF1 counterpart: the Coneria domain (≈ formations, IMP and WOLF heavy).
+
+| Formation | weight |
+|---|---|
+| Goblin ×3–5 | 5 |
+| Wolf ×1–2 | 3 |
+| Goblin ×2–3 + Wolf ×1 | 3 |
+| Gr.Imp ×1–2 + Goblin ×1–3 | 2 |
+| Wolf ×2–4 | 1 |
+
+**Zone `temple_approach`:** walkable cells closer, by walking distance, to the temple door than to the `cornelia` arrival.
+
+| Formation | weight |
+|---|---|
+| Gr.Imp ×2–4 | 3 |
+| Wolf ×2–4 | 3 |
+| Goblin ×4–6 | 2 |
+| Gr.Imp ×1–2 + Wolf ×1–2 | 2 |
+
+**Zone `east_pocket`:** the component that the east bridge cuts off; it holds the tomb.
+
+| Formation | weight |
+|---|---|
+| Wolf ×3–5 | 3 |
+| Gr.Imp ×3–5 | 2 |
+| Gr.Wolf ×1 + Wolf ×0–2 | 1 |
+
+**Temple of Fiends** (map-level `encounters`). FF1 counterpart: BONE and GrIMP (≈). The FF1 CREEP and MADPONY have no art, so they are left out.
+
+| Formation | weight |
+|---|---|
+| Skeleton ×2–4 | 4 |
+| Skeleton ×1–3 + Gr.Imp ×1–2 | 3 |
+| Gr.Imp ×2–4 | 2 |
+| Wolf ×2–3 | 1 |
+| Skeleton ×4–6 | 1 |
+
+**Rates:** these stay as they are, 15–30 steps on the overworld and 8–15 in the temple. A zone may override the rate, but none does in act 1.
+
+**Pirates** leave every act-1 table, so there are no pirates next to town (EB-1).
+
+The legacy 1x maps (`assets/maps/overworld.yaml` and `temple-of-fiends.yaml`, `?art=legacy`) get the same default and temple tables, with no zones.
+
+### 1.7 Other data
+
+- **`PartyCreationScene.STARTING_GOLD`:** 400 (NG-5).
+- **`debug-scenarios.yaml`:** new scenarios for the browser checks:
+  - `t4_fields_l1`: the Lv1 400 G kit against Goblin ×5;
+  - `t4_garland_l2_start`: Lv2 with the 400 G kit, against Garland;
+  - `t4_garland_l3_full`: Lv3 with the full kit, LIT, SLEP, RUSE and 3 potions, against Garland;
+  - `t4_temple_six`: Skeleton ×4 + Gr.Imp ×2;
+  - `t4_nine`: Goblin ×6 + Wolf ×3.
+- **`CHEST_HOUSE_KNIGHT`** stays `wooden_nunchaku` (confirmed; it is now also sold for 10 G, so it is a small gift).
+
+---
+
+### 2. Code changes
+
+`BattleStateMachine.ts` is already 620 lines. The new maths goes into new pure modules, and the state machine only delegates to them, so its size goes down.
+
+### 2.1 T4a: battle maths (`src/battle/`)
+
+**New `src/battle/CombatStats.ts`** (pure, no PixiJS). For a party member:
+- `partyAttack(c)` = weapon attack + ⌊STR/2⌋ + the TMPR buff. An unarmed Monk or Master gets ⌊STR/2⌋ + 2×level (≈ FF1).
+- `partyHitPercent(c)` = class base + growth×(level−1) + weapon `hit`.
+- `partyHits(c)` = 1 + ⌊hit%/32⌋, doubled for an unarmed Monk or Master.
+- `partyEvade(c)` = 48 + AGI − Σ armour `weight` + the evade buff.
+- `partyAbsorb(c)` = Σ armour defense + FOG. A Monk or Master with no body armour gets max(that, level).
+- `partyMagicDefense(c)` = class `magicDefense` base + growth×(level−1).
+- `partyCrit(c)` = weapon `crit`, or 0 unarmed.
+
+For an enemy:
+- `enemyEvade(e)` = `data.evade` + the LOCK buff;
+- `enemyHits`, `enemyCrit` and `enemyAccuracy` read the data, with defaults 1, 1 and 0.
+
+**`DamageFormula.ts`:**
+- Replace `calculateDamage` with `physicalAttack({attack, hitPercent, hits, crit}, {evade, absorb, helpless}, rng) → {damage, hitsLanded, critical, hit}`. It runs the per-hit loop from §0.
+- Replace `calculateMagicDamage` with `magicDamage({power, accuracy, element}, {magicDefense, weakness, resist, elementalProfile}, rng)`. The weak multiplier is ×1.5 on E and the resist multiplier halves the damage, both from `Elements` through a new `magicElementMultiplier`. `getElementalMultiplier` stays for its current callers.
+- Add `statusHits(accuracy, magicDefense, rng)`.
+- `healAmount(spell, rng)` = `rand(E, 2E)`. It is still shared by battle and field CURE (MS-3), with no caster INT.
+
+**`BattleStateMachine.ts`:**
+- `executePartyAttack` and `executeEnemyAttack` call `physicalAttack` with `CombatStats`. This fixes EB-6 and EB-10. The message shows the number of hits when it is more than 1 ("hits Goblin 2 times for 18!").
+- `executeCommand('run')` uses the acting member's `luck` and `level` through a new `BattleCommands.calculateRunChance(luck, level)` (EB-9).
+- `tickCombatantStatus`: a sleeping or stunned actor loses its turn. Then it rolls `rand(0..80) < currentHp` and wakes on success ("X wakes up!") (EB-5).
+- `finish('victory')`: `result.xpPerMember = xpShare(total, livingParty.length)`, and the line becomes `Victory! {share} XP each, {gold} Gold.` (BA-10). `PartyManager.distributeXp` uses the same `xpShare`.
+- The default enemy target and `retargetIfDead` for enemy actions use the weighted `selectTarget`.
+
+**`EnemyAI.selectTarget(targets, rng, weights = FRONT_WEIGHTS [4,2,1,1])`:**
+- weighted over the living, in party order;
+- used by `BasicAI`, `BossAI` and the state machine's default.
+
+This is BA-10 / EB-10, and it makes `FieldOrderScene` meaningful.
+
+**`SpellExecutor.ts`:**
+- `executeDamageSpell` uses `magicDamage`. A `status_*` spell rolls `statusHits` per target and says "X is unaffected." on a miss. A party target uses `partyMagicDefense`.
+- `executeHealSpell` uses `healAmount`.
+- `executeBuffSpell` and `executeDebuffSpell` take the amount from `spell.power` when it is above 0, and fall back to `BUFF_VALUES` / `DEBUFF_VALUES`. Fix the comment (RUSE is +80).
+- LOCK rolls `statusHits` too.
+
+**`StatusEffects.ts`:**
+- Add `StatusTracker.isHelpless()` (sleep or stun).
+- `onHit()` stays unused: damage doesn't wake, as in FF1. Document that.
+
+**Types** (`src/types/index.ts`):
+- `EnemyData`: `accuracy?`, `evade?`, `hits?`, `crit?`.
+- `ItemData`: `hit?`, `crit?`, `weight?`.
+- `SpellData`: `accuracy?`, `price?`.
+- `CharacterClassData`: `hitPercent?`, `magicDefense?`, `spellCharges?`.
+- `BattleResult.xpPerMember`.
+
+`schemaValidation.ts` checks the optional numbers when they are present.
+
+**ST-6 interplay (stays in T5).** Garland's `bossPhases.patternId: aggressive` must not add damage when T5 wires it: the pattern is Fight only, plus the message. Otherwise T5 re-runs the §6 simulation and keeps its targets.
+
+### 2.2 T4b: progression and economy
+
+- **New `src/entities/ExperienceTable.ts`:** the FF1 table below; `Character.xpForNextLevel` uses it.
+- **`Character.addXp`:** on level-up, `currentHp += maxHp_after − maxHp_before` instead of a full heal (FF1).
+- **`Character.stats.attack`** becomes `partyAttack(c)` (from T4a's `CombatStats`, which T4b imports), so Status, Equip and the shop comparison show the battle number. `defense` stays the armour sum plus buffs.
+
+  If T4a is not merged yet, T4b keeps the old `stats` and T4d switches it over.
+- **`SpellCharges.ts`:** `maxChargesFor(classData, charLevel, spellLevel)` reads `classData.spellCharges` (step breakpoints) and returns 0 when the class has none. It drops the shared `BREAKPOINTS`. `Character.getMaxCharges` passes `this.classData`; after an upgrade, the new class's table applies.
+- **`Character.fromJSON`:** clamp the saved charges to the new maximum, so an old save never holds more than the new table allows.
+- **`PartyCreationScene`:** `STARTING_GOLD = 400`.
+- **`MagicShopScene.priceOf(spell)`:** `spell.price ?? SPELL_PRICE_BY_LEVEL[spell.level]` (100, 400, 1500, 4000, 8000, 20000, 45000, 60000). Remove `SPELL_PRICE_BASE`. `SpellPurchase` is unchanged.
+- **Wizards:** the class upgrade already heals; charges are refilled by the new table on the next rest. No change.
+
+**FF1 experience table** (total XP needed to reach each level). The exact values above Lv30 are uncertain to ±1. FF1 adds a constant 32,799 or 32,800 per level past 30.
+
+| Lv | XP | Lv | XP | Lv | XP | Lv | XP | Lv | XP |
+|---|---|---|---|---|---|---|---|---|---|
+| 2 | 40 | 12 | 19,735 | 22 | 129,131 | 32 | 399,250 | 42 | 727,245 |
+| 3 | 196 | 13 | 25,351 | 23 | 148,008 | 33 | 432,049 | 43 | 760,044 |
+| 4 | 547 | 14 | 31,942 | 24 | 168,639 | 34 | 464,849 | 44 | 792,844 |
+| 5 | 1,171 | 15 | 39,586 | 25 | 191,103 | 35 | 497,648 | 45 | 825,643 |
+| 6 | 2,146 | 16 | 48,361 | 26 | 215,479 | 36 | 530,448 | 46 | 858,443 |
+| 7 | 3,550 | 17 | 58,345 | 27 | 241,843 | 37 | 563,247 | 47 | 891,242 |
+| 8 | 5,461 | 18 | 69,617 | 28 | 270,275 | 38 | 596,047 | 48 | 924,042 |
+| 9 | 7,957 | 19 | 82,253 | 29 | 300,851 | 39 | 628,846 | 49 | 956,841 |
+| 10 | 11,116 | 20 | 96,332 | 30 | 333,651 | 40 | 661,646 | 50 | 989,641 |
+| 11 | 15,016 | 21 | 111,932 | 31 | 366,450 | 41 | 694,445 | | |
+
+### 2.3 T4c: encounter engine
+
+**Types:**
+- `EncounterEntry = {weight} & ({enemies: string[]} | {groups: EncounterGroup[]})`, with `EncounterGroup = {id, min, max?}`.
+- `EncounterZone = {id, rects: [x0, y0, x1, y1][], encounters: EncounterEntry[], encounterRate?: EncounterRate}`, with inclusive rects.
+- `MapData.encounterZones?: EncounterZone[]`.
+
+**`EncounterTable.selectEnemies()`:**
+- For a group entry, it rolls each count in `[min, max]`.
+- If the total is 0 (every min is 0), it uses the first group's id once.
+- It caps the total at `MAX_FORMATION = 9`, cutting from the end.
+
+**`EncounterSystem`:**
+- **`setZones(zones)`:** one `EncounterTable` per zone, sharing the RNG.
+- **`handleMove(pos)`:** when the counter fires, the table is the first zone whose rects contain `pos`, or else the map table. After an encounter, the counter is reset with that zone's `encounterRate`, or the map's.
+- **`isEmpty`:** the check considers the zones too.
+- **`ExplorationScene.loadMap`:** calls `setZones(mapData.encounterZones ?? [])` next to `setEncounters` (one line).
+
+**`schemaValidation.validateMapData`:**
+- each entry has exactly one of `enemies` or `groups`;
+- 0 ≤ min ≤ max ≤ 9;
+- zone rects are 4 integers inside the map bounds.
+
+**Formation fits the screen.** Add a pure helper, `formationFits(sizes)`, in `src/scenes/battle/EnemyLayoutAi.ts`. It reports whether the maximum roll of any formation fits `ENEMY_AREA` at scale 1 or 0.5, without overlap. `crossFileValidation` uses it.
+
+### 2.4 T4d: data and tuning
+
+- All of §1.1 to §1.5 and §1.7: the YAML, the monster variants and the atlas rebuild.
+- Commit the balance test (§3, T4d).
+
+### 2.5 T4e: map zones (after T3 merges)
+
+**The hook it needs.** A new source key, `encounterZones`, in:
+- `assets-src/tools/build_map.py` `PASSTHROUGH` (T3a's file; one tuple entry);
+- a compiler validator: each zone has an `id`, the rects are in bounds, and every zone covers at least one walkable cell. It goes in `validate()`, next to the existing `inspect` check.
+
+**`assets-src/tools/layouts/overworld.py`** (T3c's file) emits:
+- `encounters`: the default (fields) table from §1.6;
+- `encounterZones`:
+  - `temple_approach`: BFS from `TEMPLE_DOOR` and from `ARRIVE["cornelia"]` over `walk_grid(g)`, with the east bridge blocked. The cells strictly closer to the temple form the zone, run-length encoded per row into rects.
+  - `east_pocket`: the cells reachable from `TOMB_END` when the east-bridge cells `(RX, RY)` and `(RX+1, RY)` are blocked.
+
+  The order is `east_pocket`, then `temple_approach`. Use the existing `bfs` and `walk_grid` helpers.
+- **`assets-src/maps/temple-of-fiends.yaml`:** the temple table from §1.6, in group form.
+- **The legacy `assets/maps/overworld.yaml` and `temple-of-fiends.yaml`:** the same tables, no zones.
+- **Rebuild:** run `layouts/overworld.py`, then `build_map.py` for `overworld` and `temple-of-fiends`, then `--check-determinism overworld temple-of-fiends`.
+
+---
+
+### 3. Tests (each fails on the current code)
+
+### T4a
+
+| File | Test | Why it fails today |
+|---|---|---|
+| `tests/battle/DamageFormula.test.ts` (rewritten) | `physicalAttack` with A=19 and absorb 10: rng ≈ 0 gives 9, rng ≈ 0.999 gives 28. With hit% 10 and evade 6, the chance is 172/200: a roll of 0.85 hits and 0.87 misses. hit% 32 gives 2 hits. crit 4 with roll < 0.02 crits and adds a second roll that ignores absorb. A helpless target gets +40 | flat 80 % hit; `atk − def + rand(level)` |
+| `tests/battle/BattleStateMachine.test.ts` | Enemy damage varies: the same enemy and target under two RNG streams give different damage (EB-10) | enemies use `level: 1`, so damage is constant |
+| `tests/battle/SpellEffects.test.ts` | RUSE: a fixed RNG where Garland hits before RUSE and misses after it. LOCK: a party roll that misses before LOCK and hits after it (EB-6) | evade is never read |
+| `tests/battle/MagicDamage.test.ts` (rewritten) | FIRE (power 10) on MDef 16: a miss-connect stays in [10, 20], a connect in [20, 40]. Weak gives [15, 30] / [30, 60]; resistant halves it. A Lv1 Black Mage's FIRE never does more than 60 (EB-4) | 300–600 |
+| `tests/scenes/FieldMagic.test.ts` and a new battle CURE case | CURE heals 16–32 in battle and in the field | about 112 |
+| `tests/battle/StatusEffects.test.ts`, `SpellExecutor.test.ts` | SLEP misses when the roll is ≥ (148+24−MDef)/200 ("unaffected"). A sleeping Garland (HP 240) loses one turn, then wakes, and acts on the next round. A goblin at 8 HP stays asleep with roll 0.5. Over 15 rounds of SLEP every round, Garland acts at least once (EB-5) | 100 % hit; sleep never ends |
+| `tests/battle/BattleCommands.test.ts` | `calculateRunChance(luck 15, level 1)` = 15/17. A Lv1 Thief escapes with roll 0.85; a Lv1 Warrior (luck 5) fails with the same roll (EB-9) | uses the agility average |
+| `tests/battle/EnemyAI.test.ts` | Weighted targets: rolls 0.49, 0.6, 0.8 and 0.95 pick slots 0, 1, 2 and 3. With slot 0 dead, the weights are 2/1/1. Over 10,000 rolls, slot 0 is chosen 50 ± 2 % of the time (BA-10) | uniform choice |
+| `tests/battle/CombatStats.test.ts` (new) | An unarmed Lv1 Monk (STR 15) has attack 9 and 2 hits, and absorb 1 without armour. With a wooden nunchaku, attack 19 and 1 hit. Evade = 48 + AGI − weight | new module |
+| `tests/battle/BattleOutcome.test.ts` | Victory over Goblin ×4 (24 XP) with 4 living members says "6 XP each", and `xpPerMember === 6`; with 3 alive, 8 (BA-10) | the line shows the total |
+
+### T4b
+
+| File | Test | Why it fails today |
+|---|---|---|
+| `tests/entities/Character.test.ts` | 39 XP is Lv1; 40 is Lv2; 196 is Lv3; 547 is Lv4 (EB-3) | Lv2 needs 151 |
+| `tests/entities/Character.test.ts` | Level-up adds the HP gain without a full heal: 10/25 HP at Lv1 becomes 16/31 at Lv2 for a White Mage | heals to full |
+| `tests/entities/SpellChargeRules.test.ts` | Black Mage Lv1 → [2], Lv3 → [3,1]; Red Mage Lv3 → [3,0]; Warrior Lv1 → all 0; a saved charge of 5 at Lv1 loads as 2 (NG-4) | one table for every class |
+| `tests/scenes/PartyCreationScene.test.ts`, `tests/entities/PartyManager.test.ts` | New game gold is 400 (NG-5) | 100 |
+| `tests/scenes/MagicShopScene.test.ts` (new case) | LIT costs 100, ICE 400, FIR2 1500; a spell with an explicit `price` uses it | 100 × level |
+
+### T4c
+
+| File | Test | Why it fails today |
+|---|---|---|
+| `tests/systems/EncounterTable.test.ts` | `{groups: [{id: goblin, min: 3, max: 5}]}` gives 3–5 goblins and all three counts appear in 300 rolls. A legacy `enemies` entry is unchanged. 6+6 is capped at 9 | no groups |
+| `tests/systems/EncounterSystem.test.ts` | With a zone at rect [0,0,4,4] and table Z, a step at (2,2) that fires gives Z; at (9,9) it gives the map table. A zone `encounterRate` resets the counter within its range | no zones |
+| `tests/core/schemaValidation.test.ts` | Bad group (min > max, or both `enemies` and `groups`) and out-of-bounds zone rect are rejected | no checks |
+| `tests/scenes/battle/EnemyLayoutAi.test.ts` | `formationFits` is true for 9 small and false for 5 large + 6 small | no helper |
+
+### T4d (data)
+
+| File | Test | Why it fails today |
+|---|---|---|
+| `tests/data/crossFileValidation.test.ts` | Groups' ids exist in `enemies.yaml`; every formation's maximum roll is ≤ 9 and passes `formationFits`. Map zone tables are checked the same way | – |
+| `tests/data/actOneBalance.test.ts` (new) | `cornelia_armor` holds a body armour usable by `white_mage` and by `black_mage` (EB-7). `cornelia_weapon` holds a weapon usable by `monk`, and `cornelia_armor` a monk-wearable body armour (EB-8). No act-1 table (overworld, all its zones, the temple) contains `pirate` (EB-1). Every `cornelia_*` item costs ≤ 400 and the FF1 kit for any 4 base classes costs ≤ 400 (NG-5). `garland` has `hits` ≥ 2 and no weakness | no cloth; leather excludes the Monk; pirates on the overworld; no nunchaku |
+| `tests/data/assetCoverage.test.ts` | Already covers `gr_imp` and `gr_wolf` once the enemies exist | – |
+| `tests/balance/garland.test.ts` (new; seeded `mulberry32`, real `BattleStateMachine`, 400 battles per case, about 2 s) | **Policies** (in `tests/helpers/battlePolicies.ts`):<ul><li>*careless*: Fight only, random target;</li><li>*sensible*: CURE the lowest member below 50 %, LIT/FIRE the biggest enemy, potion below 35 %.</li></ul>**Assertions** (party Warrior / Thief / White Mage / Black Mage):<ul><li>careless at L2 with the 400 G kit wins ≤ 35 %;</li><li>careless at L3 with the 400 G kit wins ≤ 65 %;</li><li>sensible at L2 with the full kit wins ≥ 90 %;</li><li>sensible at L3 with the full kit wins ≥ 97 %;</li><li>in sensible wins, Garland survives ≥ 3 rounds in ≥ 90 % of battles (EB-4: no two-LIT kill);</li><li>with SLEP every turn, Garland acts at least once in every battle (EB-5).</li></ul> | Today: LIT does 105–135 and kills in 2 casts; SLEP locks him for good; the L1 careless start is 0.1 % but the L2 full kit is 96 % with the fight lasting 2 rounds |
+| `tests/balance/fieldPacing.test.ts` (new; seeded) | **Campaign:** the 400 G kit; 20 fields battles, then 10 approach, then 10 temple; rest at the inn below 45 % party HP. The whole party reaches Lv2 within 4–10 battles and Lv3 within 15–35. Fewer than 0.2 wipes per run. Gold left after 40 battles is between 200 and 1200 (EB-3) | Lv2 needs about 47 battles today |
+
+### T4e (after T3)
+
+| File | Test | Why it fails today |
+|---|---|---|
+| `tests/data/overworldLayout.test.ts` (new cases) | The arrival `cornelia` cell is in no zone (fields); the temple door's approach cell is in `temple_approach`; `TOMB_END` is in `east_pocket`; the north bridge foot is in no zone; zones don't overlap; every zone rect cell is in bounds | no zones |
+| `tests/systems/actOneEncounters.test.ts` (new; compiled overworld + `EncounterSystem`, seeded, 5,000 fires per point) | Rolls at the city arrival never give Gr.Wolf; rolls at the tomb give Wolf ×3+ in ≥ 40 %; rolls at the temple door give Gr.Imp ≥ 30 %; the mean formation size near town is 2.5–4 (EB-1). The real `temple-of-fiends` table rolls skeletons in ≥ 70 % | one table, at most 2 enemies |
+
+**Existing tests that change on purpose** (update the expected values, not the intent):
+- `DamageFormula`, `MagicDamage`, `SpellEffects`, `CharacterBuffs`;
+- `Character` (`stats.attack`), `EquipScene`, `BattleCommands`, `EnemyAI`, `BasicAI`, `BossAI`;
+- `FieldMagic`, `SpellChargeRules`, `PartyCreationScene`, `PartyManager`;
+- `tests/integration/battle.test.ts`, which uses deterministic RNG; its fights may take more rounds.
+
+---
+
+### 4. Simulation targets (and what the scratch simulation found)
+
+**Scratch simulation:** `/tmp/t4sim/`.
+- `model.ts` patches the real `BattleStateMachine` and `SpellExecutor` prototypes with the §0 formulas. The turn order, queue, status tick, finish and boss plumbing are the real code; the patches double as a prototype of T4a.
+- `garland.test.ts` and `tune.test.ts` are the Garland scans; `field.test.ts` is the campaign and zones; `run.test.ts` is a temple run followed by Garland.
+- To run them: `npx vitest run --root /tmp/t4sim <file>` from the repo.
+
+**Policies:**
+- *careless*: Fight only, random target, no healing or items;
+- *sensible*: CURE below 50 %, LIT/FIRE the biggest enemy, potion below 35 % when no CURE is left, focus the weakest enemy;
+- *sleep*: like sensible, plus SLEP when Garland or a pack of 3+ enemies is awake.
+
+**Kits:**
+- *start*: the 400 G kit (§1.5);
+- *full*: + chain mail, caps, LIT, SLEP, RUSE and 3 potions (about 600 G more).
+
+### 4.1 Garland at FF1's own stats is a pushover
+
+FF1 stats: HP 106, attack 15, 1 hit. Party: Warrior / Thief / White Mage / Black Mage. 2,000 seeds per cell.
+
+| Level | Careless, start kit | Sensible, start kit | Sensible, full kit |
+|---|---|---|---|
+| L1 | 97 % | 99.9 % | 100 % (2.4 rounds) |
+| L2 | 100 % | 100 % | 100 % |
+
+Even careless play wins, so the target needs a Garland that is tougher than FF1's. This is the single planned deviation from FF1. The game's own Garland already had 200 HP.
+
+### 4.2 Chosen: Garland HP 240, attack 16, hits 2
+
+Accuracy 15, defense 10, evade 12, MDef 15, no weakness. 1,500–2,000 seeds per cell; win %.
+
+| Party | Level | Careless, start kit | Sensible, start kit | Sensible, full kit | Sleep, full kit |
+|---|---|---|---|---|---|
+| Warrior / Thief / White Mage / Black Mage | L1 | 1 | 10 | 70 | 71 |
+| | **L2** | **16** | 66 | **98** | 99 |
+| | **L3** | **47** | 91 | **100** | 100 |
+| | L4 | 89 | 99 | 100 | 100 |
+| Warrior / Monk / White Mage / Black Mage | L2 | 39 | 80 | 99 | 100 |
+| | L3 | 76 | 98 | 100 | 100 |
+| Warrior / Monk / Red Mage / White Mage | L2 | 65 | 80 | 100 | 100 |
+| | L3 | 95 | 98 | 100 | 100 |
+| Warrior / Thief / Red Mage / Black Mage | L2 | 29 | 74 | 99 | 99 |
+| | L3 | 69 | 96 | 100 | 100 |
+
+Battles last 5–8 rounds, against 2 rounds today.
+
+Careless play with the *full* kit wins 76 % at L2 for Warrior / Thief / White Mage / Black Mage. So buying gear helps, and healing and spells decide the fight.
+
+**Rejected variants** (for the record):
+
+| Variant | Why not |
+|---|---|
+| 200 / 18, 1 hit | careless L2 wins 87 % |
+| 260 / 16, 2 hits | sensible L1 full kit wins 63 %; too harsh for early arrivals |
+| 240 / 18, 1 hit becoming 2 hits below 50 % | close to the chosen one, but needs ST-6's phase code |
+
+### 4.3 Temple run, then Garland
+
+The temple run is 2–3 temple battles, no inn, potions shared. Party: Warrior / Thief / White Mage / Black Mage.
+
+| Run | Careless, start kit | Sensible, start kit | Sensible, full kit |
+|---|---|---|---|
+| L2, 2 battles first | 6 % | 35 % | **94 %** |
+| L3, 3 battles first | 22 % | 63 % | **99 %** |
+| L4, 3 battles first | 70 % | 94 % | 100 % |
+
+### 4.4 Field pacing
+
+400 seeds. Campaign: 20 fields battles, then 10 approach, then 10 temple. The party starts with the 400 G kit, rests at the inn when party HP falls below 45 % or the White Mage has no CURE left and someone is below 50 %, and shops at each inn visit.
+
+- **Levels.** The whole party is Lv2 by battle 5 (median) and Lv3 by battle 22. After 40 battles everyone is Lv3 (Lv4 needs 547 XP, about battle 55).
+- **Wipes:** 0.00 per run.
+- **Inn visits:** 1.7 per run.
+- **Shopping:** 7.9 of the 8 shopping-list items bought, with 611 G left.
+
+| Zone | XP per member per battle | Gold per battle |
+|---|---|---|
+| Fields | 8.7 | 22 |
+| Approach | 14.0 | 35 |
+| Temple | 10.1 | 25 |
+
+At 40–60 battles an hour, that matches FF1's "L2–4 after an hour", and the Garland target level (L2–3) arrives when the full kit is affordable.
+
+**Attrition per battle** (fresh party, the 400 G kit, Fight only):
+
+| Zone | L1: HP lost | L1: someone down | L2: HP lost |
+|---|---|---|---|
+| Fields | 5.7 % | 0.2 % | 3.6 % |
+| Approach | 12 % | 1.8 % | 7.8 % |
+| East pocket | 25 % | 14 % | 17 % |
+| Temple | 23 % | 13.5 % | 12.6 % |
+
+The fields are gentle, as Coneria's are, and the east pocket and the temple are the ones that send a Lv1 party back to the inn.
+
+### 4.5 Targets that T4 must meet
+
+These are checked by `tests/balance/*` and by re-running the scratch simulation on the final data. Party: Warrior / Thief / White Mage / Black Mage.
+
+| Target | Value |
+|---|---|
+| Garland, careless, 400 G kit | L2 ≤ 35 %; L3 ≤ 65 % |
+| Garland, sensible, full kit | L2 ≥ 90 %; L3 ≥ 97 % |
+| Garland, sensible, after 2–3 temple battles | L2 ≥ 85 %; L3 ≥ 95 % |
+| Garland's fight length, sensible | ≥ 3 rounds in ≥ 90 % of battles |
+| SLEP every turn | Garland acts at least once in every battle |
+| Lv2 | battles 4–10 |
+| Lv3 | battles 15–35 |
+| Wipes over 40 battles | < 0.2 per run |
+| Fields win rate at Lv1 (fresh, 400 G kit) | ≥ 98 % |
+| Temple win rate at Lv1 | 90–99 % (it can hurt) |
+| FIRE damage at Lv1 | ≤ 60 against a weak target |
+| CURE healing | 16–32 |
+| L1 spells | 100 G each |
+| Starting kit | ≤ 400 G for every 4-class party |
+
+---
+
+### 5. Browser checks
+
+`npm run dev`, then `http://127.0.0.1:5173/?mute=1&...`.
+
+**New Game:**
+- the HUD shows 400 G;
+- buy the §1.5 kit: cloth is listed for both mages, nunchaku for the Monk, and the comparison shows `n/a` where it should;
+- LIT costs 100.
+
+**First fields battles** (walk out of the south gate):
+- groups of 3–5 Goblins appear;
+- damage numbers vary between hits;
+- some attacks miss;
+- multi-hit messages appear later, at higher hit%;
+- after about 5 battles, a level-up message shows.
+
+**Victory line:** "N XP each".
+
+**Battle checks** (debug scenarios):
+- `scenario=t4_fields_l1`:
+  - FIRE does 10–40 to a Goblin and kills it;
+  - CURE heals 16–32;
+  - SLEP puts most Goblins to sleep, and some wake later;
+  - Run with the Thief succeeds about 9 times in 10.
+- `scenario=t4_nine` and `scenario=t4_temple_six`: 9 and 6 enemies are laid out with no overlap, every target box is selectable, and there's no stale box after a death.
+- `scenario=t4_garland_l2_start`: Fight-only play loses (play it 3 times; at least 2 losses).
+- `scenario=t4_garland_l3_full`: sensible play (CURE, LIT, RUSE on the White Mage) wins 3 out of 3. Garland lasts 4 or more rounds and targets the front slot most of the time.
+
+**Party order:** put the White Mage first with the field Order menu; Garland now hits the White Mage most of the time.
+
+**Zones (T4e):**
+- On the overworld, Gr.Imps and Wolf packs appear near the temple, and only Goblins and Wolves appear next to town.
+- Past the east bridge, Wolf packs and the occasional Gr.Wolf appear.
+- No Pirates anywhere in act 1.
+- Temple encounters are mostly Skeletons.
+
+**Old save:** load a save from before T4. Charges are clamped, and the level stays the same (XP is kept; the level is recomputed on the next gain). Note this in the result.
+
+**Console:** 0 errors.
+
+---
+
+### 6. Sub-tranches and order
+
+| # | Scope | Owns (files) | Depends on |
+|---|---|---|---|
+| T4a | Battle maths: §0 formulas, EB-4/5/6/9/10, BA-10 (targeting and the XP line) | `src/battle/*` (new `CombatStats.ts`), `src/battle/DamageFormula.ts`, `SpellExecutor.ts`, `StatusEffects.ts`, `EnemyAI.ts`, `BattleCommands.ts`, `BattleStateMachine.ts`; `EnemyData`/`ItemData`/`SpellData`/class combat fields in `src/types/index.ts`; `schemaValidation` for them; `PartyManager.distributeXp` (`xpShare`); `FieldSpellEffects` (`healAmount` call) | none. Tests use synthetic data, and missing fields default (hit% 0, evade 0, `accuracy` 24, weight 0) |
+| T4b | Progression and economy: XP table, level-up HP, per-class charges (NG-4), 400 G (NG-5), spell prices | new `src/entities/ExperienceTable.ts`, `Character.ts`, `SpellCharges.ts`, `PartyCreationScene.ts`, `MagicShopScene.ts`; the `spellCharges` type | none (`stats.attack` switches to `partyAttack` in T4d if T4a merges later) |
+| T4c | Encounter engine: groups, zones, the 9 cap, layout fit | `EncounterTable.ts`, `EncounterSystem.ts`, `EncounterEntry`/`EncounterZone`/`MapData.encounterZones` types, `schemaValidation` (maps), the one line in `ExplorationScene.loadMap`, `formationFits` in `EnemyLayoutAi.ts` | none |
+| T4d | Data and tuning: §1.1–§1.5 and §1.7, the monster variants and the atlas rebuild, `actOneBalance` and `tests/balance/*`, debug scenarios, re-run the scratch simulation on the real data | `assets/data/{enemies,items,spells,classes,shops,debug-scenarios}.yaml`, `assets-src/gen/monsters.yaml`, `assets/sprites/monsters-ai.*`, `tests/balance/`, `tests/helpers/battlePolicies.ts`, `tests/data/actOneBalance.test.ts` | T4a, T4b and T4c merged |
+| T4e | Map zones and act-1 tables | `build_map.py` (`PASSTHROUGH` + zone validator), `layouts/overworld.py`, `assets-src/maps/temple-of-fiends.yaml`, legacy `assets/maps/{overworld,temple-of-fiends}.yaml`, compiled maps, overworld zone tests | **T3 merged to mainline** (T3a's `build_map.py` and T3c's `overworld.py`), plus T4c (runtime) and T4d (enemy ids `gr_imp`/`gr_wolf`) |
+
+**Order:**
+1. T4a, T4b and T4c run in parallel worktrees now. None touches a T3 file.
+2. Merge T4a, then T4b, then T4c into `t4-integration`. The overlap is `src/types/index.ts` and `schemaValidation.ts`, both additive.
+3. T4d on `t4-integration`.
+4. After T3 merges to mainline, rebase `t4-integration` and do T4e, then rebuild every map once.
+5. Final integration: re-run the scratch simulation and `tests/balance/*` against the real data, plus the browser checks.
+
+**The hook T4e needs from T3:** the `encounterZones` key in `build_map.py PASSTHROUGH`, plus a zone validator in `validate()`. The overworld source is generated, so the zones come from `layouts/overworld.py`, computed from its fixed points (`TEMPLE_DOOR`, `ARRIVE`, `TOMB_END`, `RX`/`RY`) through its `bfs`/`walk_grid` helpers. Nothing in `assets/maps/ai/**` is edited by hand.
+
+**Review steps** (as for T1–T3): momus reviews the plan, the implementation is done, momus reviews it, then validation:
+- `npm run build`;
+- `npm test`;
+- `npx vitest run tests/data tests/balance`;
+- `python3 -I assets-src/tools/build_map.py --selftest` and `--check-determinism`, for T4e;
+- the browser checks.
+
+---
+
+### 7. Decisions for the user
+
+1. **Garland deviates from FF1:** HP 240, attack 16, 2 hits. FF1's Garland (106 / 15 / 1 hit) loses even to careless play: 97–100 % for careless at L1–L2. The alternative is to keep FF1's Garland and accept an easy boss. Recommendation: deviate.
+2. **INT does nothing in spell maths, as in FF1.** The alternative is a small bonus, `E + ⌊INT/10⌋`. Recommendation: FF1.
+3. **Damage doesn't wake a sleeping target, as in FF1.** Sleep is limited instead by the HP-based wake roll, so SLEP takes about one turn from Garland per cast, and packs of small enemies stay asleep longer.
+4. **Level-up no longer heals fully, as in FF1.** This makes the temple run matter. The alternative is to keep the full heal (it's kind); the simulation targets hold either way, because the Garland runs start fresh.
+5. **New enemies Gr.Imp and Gr.Wolf** are palette swaps: free art, no Gemini images. FF1's MADPONY, CRAWL and CREEP are left out, since they would need new art (paid, or Bedrock).
+6. **Later-act enemies (ogre … lich)** can be put on the FF1 scale now, as an optional part of T4d. The alternative is to leave them for the act that uses them.
+
+### Decisions (taken by the orchestrator, following the user's "start with the original numbers")
+
+- **Garland keeps FF1's stats** (106 HP, attack 15, one hit). The tougher variant (240 HP, attack 16, two hits) is recorded as a ready alternative for the user. The balance test for him targets the FF1 behaviour, and his boss phase (ST-6, T5) must not add damage.
+- **Accept the FF1-faithful rules:**
+  - INT has no effect on spell power;
+  - damage doesn't wake a sleeping target (sleepers wake by the HP rule);
+  - a level-up no longer fully heals.
+- **Mad Pony, Crawl and Creep** are left out, since they need new art.
+- **Later-act enemies** stay as they are for now; they are moved onto the FF1 scale when those acts are built.
+
+### Revisions after the momus review (binding)
+
+1. **Garland stays at FF1's stats (106 HP, attack 15, one hit),** following the user's instruction. Every Garland target is rewritten to FF1 behaviour:
+   - a sensible L2 party wins ≥ 95 %;
+   - careless L1 Fight-only play with no gear wins ≤ 60 %;
+   - there is no round-count target.
+
+   §1.1, §3, §4.5, §5, §7.1, `garland.test.ts` and the browser check are updated to match. The tougher variant goes in the user report as an option.
+2. **`t4-integration` branches from `t3-integration`,** not `mainline`, because T4c and T4d edit files that T3 changed.
+3. **Tests that need T4e's data move to T4e:** the "no pirate in an act-1 table" check, and `fieldPacing` reading the real tables. Before that, `fieldPacing` uses inline copies of the §1.6 tables. `crossFileValidation.test.ts` goes in T4d's Owns column, so it handles group entries.
+4. **A shared class fixture** with `spellCharges` goes in `tests/helpers/testUtils.ts`. Every inline `CharacterClassData` test that breaks is moved to it, including `src/systems/__tests__/ItemEffects.test.ts`.
+5. **T4b owns the `Character.ts` switch to `partyAttack`** and depends on T4a. `CombatStats` imports `Character` as a type only.
+6. **Multi-hit message format:** "hits Goblin for 18! (2 hits)". `battleMessageUtils` gets new handling for the "unaffected" and "wakes up" lines, with tests (T4a).
+7. **`bonusVsFamily`** is kept as an element/family multiplier, applied after the FF1 damage roll.
+8. **Name fixes:**
+   - export a pure `spellPrice()`;
+   - `MagicShopScene.test.ts` is a new file;
+   - `BattleResult` lives in `BattleStateMachine.ts`;
+   - the buffs test is `tests/entities/CharacterBuffs.test.ts`;
+   - `BattleOutcome.test.ts` is updated.
+9. **Items and data shape.**
+   - `wooden_armor` stays as a Warrior armour; `leather_armor` stands in for FF1's Wooden Armor.
+   - Cap costs 80 G, as in FF1; re-check the full-kit pacing.
+   - New fields go under `stats` for enemies and at the top level for items.
+10. **Kit cost test:** the starting kit is defined per class, and the test checks parties of four different base classes.
+11. **The sim follows the plan.** `battlePolicies.ts` is an exact port of `chooseCommands`. There is one Red Mage charge table (§1.4's); the sim uses `partyMagicDefense`; the sensible policy casts RUSE where §5 expects it.
+12. **Every §4.5 "must meet" target gets a `tests/balance/*` assertion,** or is moved out of "must meet".
+13. **Spell hit rolls:** every `debuff_*`, `debuff_morale` and `status_*` spell rolls `statusHits`.
+14. **Weighted enemy retargeting** uses the original slots: the new `retargetEnemyTarget(slots, alive, rng)`. Party retargeting stays uniform.
+15. **Encounter rates:** `EncounterSystem` keeps the map's base rate separate from the zone rate.
+16. **Save compatibility:** a pre-T4 save fixture test checks that a Warrior's charges become 0, a mage's charges are clamped, level and XP are kept, and the save version stays 1. `fromJSON` recomputes the level upward from XP.
+17. **`temple_approach`:** cells that can't be reached count as infinitely far.
+
+**Order:** T4a and T4c run in parallel. T4b runs after T4a merges (revision 5). Then T4d, then T4e.
+
+---
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
