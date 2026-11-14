@@ -32,6 +32,8 @@ export class BattleDisplayManager {
   readonly partySprites: Container[] = [];
   // Per-member battle pose textures; null where only the placeholder rectangle is available
   private partyFrames: (Texture[] | null)[] = [];
+  /** Called after late art replaced a sprite in place (the active-hero marker moves to the new one). */
+  onSpriteSwap: ((old: Container, next: Container) => void) | null = null;
   private poseOverride = new Map<number, BattlePose>();
   /** Frames elapsed, for the breathing idle (attackChoreography.idlePose). */
   private idleClock = 0;
@@ -107,6 +109,7 @@ export class BattleDisplayManager {
     next.alpha = old.alpha;
     next.visible = old.visible;
     list[i] = next;
+    this.onSpriteSwap?.(old, next);
   }
 
   createPartySprites(): void {

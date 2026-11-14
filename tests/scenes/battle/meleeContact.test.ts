@@ -24,7 +24,7 @@ function box(x: number, y: number, w: number, h: number): Graphics {
   return g;
 }
 
-function setup(style: AttackStyle, messages: string[], events: DamageEvent[], enemyX = ENEMY_X) {
+function setup(style: AttackStyle, messages: string[], events: DamageEvent[], enemyX = ENEMY_X, missed = false) {
   const main = new Container();
   const hero = box(HOME_X, 300, 160, 160);
   const goblins = [box(enemyX, 300, ENEMY_W, ENEMY_W), box(enemyX - 200, 300, ENEMY_W, ENEMY_W)];
@@ -45,11 +45,11 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
     get actionQueueLength() { return queued; },
     peekNextAction: () => (queued > 0 ? { actorId: 'party_0', actorName: 'Hero', actionType: 'fight', targetName: 'Goblin A' } : null),
     isNextActorAlive: () => true,
-    executeNextAction: () => { queued = 0; return { damageEvents: events, messages: messages.map(text => ({ text })) }; },
+    executeNextAction: () => { queued = 0; return { done: true, damageEvents: events, messages: messages.map(text => ({ text })), missed }; },
     skipRemainingActions: vi.fn(),
   } as unknown as BattleStateMachine;
   const input = { isJustPressed: () => false } as unknown as InputManager;
-  const win = { contentX: 0, contentY: 0, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
+  const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
   const lines: string[] = [];
   const ctrl = new BattleAnimationController(main, battle, display, input, win, new Container(), t => lines.push(t), vi.fn());
   ctrl.attackOverride = style;
@@ -85,7 +85,7 @@ describe('BA-9: the lunge reaches the target', () => {
   });
 
   it('a far target clamps the reach at 900 px', () => {
-    const s = setup('dash', ['Hero missed!'], [], 100);
+    const s = setup('dash', ['Hero missed!'], [], 100, true);
     runToContact(s, 'dash');
     expect(s.ctrl.attackReachPx).toBe(900);
   });
@@ -94,7 +94,7 @@ describe('BA-9: the lunge reaches the target', () => {
 describe('BA-9: the result shows on contact, not during the swing', () => {
   for (const style of ATTACK_STYLES) {
     it(`${style}: "missed!" and the grey Miss appear on the contact frame`, () => {
-      const s = setup(style, ['Hero missed!'], []);
+      const s = setup(style, ['Hero missed!'], [], ENEMY_X, true);
       const frames = runToContact(s, style);
       const contact = contactFrame(style);
       expect(frames[contact].x).toBeCloseTo(HOME_X - REACH);
@@ -111,6 +111,15 @@ describe('BA-9: the result shows on contact, not during the swing', () => {
       expect(miss.main.style.fill).toBe(FLOAT_COLORS.miss);
     });
   }
+
+  it('the grey Miss follows the action result\'s missed flag, not the wording of the line', () => {
+    const flagged = setup('lunge', ['Hero swings at thin air.'], [], ENEMY_X, true);
+    runToContact(flagged, 'lunge');
+    expect(floats(flagged.main).map(f => f.text)).toEqual(['Miss']);
+    const worded = setup('lunge', ['Hero missed!'], [], ENEMY_X, false);
+    runToContact(worded, 'lunge');
+    expect(floats(worded.main)).toHaveLength(0);
+  });
 
   it('a hit shows a 48 px outlined number on the contact frame', () => {
     const s = setup('lunge', ['Hero hits Goblin A for 7!'], [{ targetId: 'enemy_0', damage: 7, isHeal: false, isCrit: false }]);

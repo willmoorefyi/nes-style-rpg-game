@@ -109,7 +109,7 @@ export class MagicShopScene implements Scene {
   private showSpellInfo(): void {
     const spell = SpellRegistry.getSpell(this.spellMenu?.selectedItem?.value ?? '');
     this.help.setText(spell?.description ?? '');
-    this.learnText.text = spell ? learnersLine(spell) : '';
+    this.learnText.text = spell ? learnersLine(spell, this.game.party.all) : '';
     const anyone = spell ? this.game.party.all.some((c) => canLearn(c, spell)) : false;
     this.learnText.tint = anyone ? 0xffffff : GREY;
   }

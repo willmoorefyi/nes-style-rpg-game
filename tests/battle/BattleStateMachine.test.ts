@@ -326,5 +326,24 @@ describe('BattleStateMachine: FF1 maths wiring (T4a)', () => {
     expect(run(15)).toBe('escaped');
     expect(run(5)).toBeNull();
   });
+
+  it('the action result carries `missed`: true for a fight that misses, false for one that lands (T6 review)', () => {
+    const swing = (roll: number) => {
+      const hero = new Character({ name: 'Hero', classData: testClass('warrior', { baseStats: { hp: 99, strength: 20, agility: 50, intelligence: 1, vitality: 1, luck: 1 } }) });
+      const battle = new BattleStateMachine({ party: [hero], enemies: [testEnemy({ stats: { hp: 999, defense: 0, evade: 0, agility: 1 } })] }, () => roll);
+      battle.startBattle();
+      battle.advanceFromIntro();
+      battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+      battle.prepareRound();
+      return battle.executeNextAction();   // the hero is faster: the first action is the hero's
+    };
+    const miss = swing(0.999);
+    expect(miss.messages[0].text).toBe('Hero missed!');
+    expect(miss.missed).toBe(true);
+    expect(miss.damageEvents).toHaveLength(0);
+    const hit = swing(0);
+    expect(hit.missed).toBe(false);
+    expect(hit.damageEvents).toHaveLength(1);
+  });
 });
 

@@ -32,12 +32,12 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
     executeNextAction: () => {
       queued = 0;
       for (const e of events) if (e.targetId.startsWith('enemy_')) enemies[Number(e.targetId.split('_')[1])].currentHp = enemyHpAfter;
-      return { damageEvents: events, messages: [] };
+      return { done: true, damageEvents: events, messages: [], missed: false };
     },
     skipRemainingActions: vi.fn(),
   } as unknown as BattleStateMachine;
   const input = { isJustPressed: () => false } as unknown as InputManager;
-  const win = { contentX: 0, contentY: 0, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
+  const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
   const onResolveRound = vi.fn();
   const ctrl = new BattleAnimationController(new Container(), battle, display, input, win, new Container(),
     () => {}, onResolveRound);

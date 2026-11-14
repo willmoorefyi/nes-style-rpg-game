@@ -3,14 +3,14 @@ import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Game } from '../../src/core/Game.js';
-import { CHAR_WIDTH, LINE_HEIGHT, WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
+import { LINE_HEIGHT, WINDOW_PADDING } from '../../src/core/LayoutConstants.js';
 import { Character } from '../../src/entities/Character.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { ClassRegistry } from '../../src/data/ClassRegistry.js';
 import { ItemRegistry } from '../../src/data/ItemRegistry.js';
 import { ShopScene } from '../../src/scenes/ShopScene.js';
 import { ShopDetailPanel, DETAIL_RECT } from '../../src/scenes/shop/ShopDetailPanel.js';
-import { loadRealRegistries, tapInput } from '../helpers/realData.js';
+import { allTexts, loadRealRegistries, tapInput } from '../helpers/realData.js';
 
 beforeAll(loadRealRegistries);
 
@@ -26,33 +26,30 @@ function open(shopId: string, inv: Record<string, number> = {}) {
   return { scene, tap };
 }
 
-describe('T6f: the shop detail panel and the help bar show item descriptions', () => {
-  it('the equipment panel shows the highlighted item\'s description under the comparison lines', () => {
+describe('T6f: the help bar shows item descriptions; the detail panel does not repeat them', () => {
+  it('the equipment shop describes the highlighted item once, in the help bar', () => {
     const { scene, tap } = open('cornelia_weapon');
     tap('confirm'); // Buy: the Wooden Nunchaku
     const first = ItemRegistry.getItem('wooden_nunchaku')!;
-    expect(scene.detailDescription).toBe(first.description);
     expect(scene.helpText).toBe(first.description);
-    expect(scene.detailLines).toHaveLength(5); // unchanged: the item and one line per member
+    expect(scene.detailLines).toHaveLength(5); // the item and one line per member
     tap('down'); // Small Knife
     expect(scene.detailLines[0].text.startsWith('Small Knife')).toBe(true);
-    expect(scene.detailDescription).toBe(ItemRegistry.getItem('small_knife')!.description);
     expect(scene.helpText).toBe(ItemRegistry.getItem('small_knife')!.description);
+    const shown = allTexts(scene.container).map((t) => t.text.replace(/\n/g, ' '));
+    expect(shown.filter((t) => t === ItemRegistry.getItem('small_knife')!.description)).toHaveLength(1);
   });
 
-  it('the description fits inside the panel, below the last comparison line', () => {
+  it('the panel holds only the comparison lines, never a description', () => {
     const panel = new ShopDetailPanel();
     const all = ['warrior', 'thief', 'white_mage', 'black_mage'].map((cls) => new Character({ name: 'FGHTR2', classData: ClassRegistry.getClass(cls)! }));
-    const charsPerLine = Math.floor((DETAIL_RECT.width - 2 * WINDOW_PADDING) / CHAR_WIDTH);
     for (const item of ItemRegistry.getAllByType('weapon').concat(ItemRegistry.getAllByType('armor'))) {
       panel.show(item, all);
-      const { text, y } = panel.description;
-      expect(text.replace(/\n/g, ' ')).toBe(item.description); // wrapped to the panel's width
+      const texts = allTexts(panel.window).map((t) => t.text).filter((t) => t !== '');
+      expect(texts).toEqual(panel.lines.map((l) => l.text));
+      if (item.description) expect(texts.some((t) => t.replace(/\n/g, ' ').includes(item.description!))).toBe(false);
       const last = panel.lines[panel.lines.length - 1];
-      expect(y).toBeGreaterThan(last.y);
-      const lines = text.split('\n');
-      for (const l of lines) expect(l.length).toBeLessThanOrEqual(charsPerLine);
-      expect(y + lines.length * LINE_HEIGHT).toBeLessThanOrEqual(DETAIL_RECT.height - WINDOW_PADDING);
+      expect(last.y + LINE_HEIGHT).toBeLessThanOrEqual(DETAIL_RECT.height - WINDOW_PADDING);
     }
   });
 

@@ -104,8 +104,6 @@ export class ShopScene implements Scene {
   get detailVisible(): boolean { return this.detail.visible; }
   /** The comparison panel's lines, with their top y inside the panel. */
   get detailLines(): Array<{ text: string; y: number }> { return this.detail.lines; }
-  /** The comparison panel's description of the highlighted item. */
-  get detailDescription(): string { return this.detail.description.text; }
   /** The help bar's text, or '' while it is hidden. */
   get helpText(): string { return this.help.visible ? this.help.text : ''; }
   /** The line under the gold ("Bought 2 Potion."), or ''. */

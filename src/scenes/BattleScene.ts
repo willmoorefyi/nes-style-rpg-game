@@ -107,6 +107,8 @@ export class BattleScene implements Scene {
 
     this.createUI();
     this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.enemyWindow);
+    // late art swaps a placeholder for the real sprite: the active-hero marker moves with it
+    this.display.onSpriteSwap = (old, next) => this.activeHero.replace(old, next);
     this.display.createEnemySprites();
     this.display.createPartySprites();
     this.display.updatePartyDisplay();

@@ -110,13 +110,13 @@ Branch `t6-art`. One paid Gemini request per checkpoint, `--paid`, at most 2 ret
 
 | # | Sheet | Images | Result | Decision |
 |---|---|---|---|---|
-| 20 | overworld/kit_grand (seed 1234) | 1 | the temple door is in the middle of the icon (between the two bottom cells), and the icon is 73 px wide (it must be at least 82); the bridge gap is good but its planks are too dark and red (ΔE ≈ 17 from the deck) | rejected |
-| 21 | overworld/kit_grand (seed 1235, retry 1) | 1 | the temple is asymmetric and 91x92 px, but the door is 13 px wide and centred at x≈61 (the door cell's centre is 72); the bridge gap has painted water in the middle, so it isn't transparent | rejected |
-| 22 | overworld/kit_grand (seed 1236, retry 2) | 1 | the temple door is again narrow (≈11 px) and left of the door cell; the bridge gap is clean on magenta, its planks within ΔE ≈ 5–7 of the deck, 49 % transparent, with a faint dark-red outline | **approved for `bridge_gap` only** (OW-9). `temple_grand` gets `skip: true` and **OW-8 falls back to `temple_icon`** (revision 8) |
-| 23 | castle/kit_stairs_lib | 1 | the stairwell is top-down, descends from the top edge and has kerbs left, right and bottom. Map table, gold heap, crown on cushion, lectern, globe. Gemini used its own layout, so every piece has a source rect. The stairwell is cropped square and filled to 96x96 (all four corners opaque, top-edge luma +7 % of the marble). The gold heap's grey floor patch is keyed out | self-approved |
-| 24 | vendor_f/field | 1 | heights 86–92, 14 colours, outlined, faces readable. Side frames 1–2 were drawn facing right (`flip_frames left:1,2`). The back stand frame draws the shawl long (brown), so the colour flickers a little when walking up | self-approved |
-| 25 | farmer/field | 1 | heights 84–92, 13 colours; the side row was drawn facing right (`--flip left`) | self-approved |
-| 26 | burgher/field | 1 | heights 85–90, 14 colours; the side row was drawn facing right (`--flip left`) | self-approved |
+| 19 | overworld/kit_grand (seed 1234) | 1 | the temple door is in the middle of the icon (between the two bottom cells), and the icon is 73 px wide (it must be at least 82); the bridge gap is good but its planks are too dark and red (ΔE ≈ 17 from the deck) | rejected |
+| 20 | overworld/kit_grand (seed 1235, retry 1) | 1 | the temple is asymmetric and 91x92 px, but the door is 13 px wide and centred at x≈61 (the door cell's centre is 72); the bridge gap has painted water in the middle, so it isn't transparent | rejected |
+| 21 | overworld/kit_grand (seed 1236, retry 2) | 1 | the temple door is again narrow (≈11 px) and left of the door cell; the bridge gap is clean on magenta, its planks within ΔE ≈ 5–7 of the deck, 49 % transparent, with a faint dark-red outline | **approved for `bridge_gap` only** (OW-9). `temple_grand` gets `skip: true` and **OW-8 falls back to `temple_icon`** (revision 8) |
+| 22 | castle/kit_stairs_lib | 1 | the stairwell is top-down, descends from the top edge and has kerbs left, right and bottom. Map table, gold heap, crown on cushion, lectern, globe. Gemini used its own layout, so every piece has a source rect. The stairwell is cropped square and filled to 96x96 (all four corners opaque, top-edge luma +7 % of the marble). The gold heap's grey floor patch is keyed out | self-approved |
+| 23 | vendor_f/field | 1 | heights 86–92, 14 colours, outlined, faces readable. Side frames 1–2 were drawn facing right (`flip_frames left:1,2`). The back stand frame draws the shawl long (brown), so the colour flickers a little when walking up | self-approved |
+| 24 | farmer/field | 1 | heights 84–92, 13 colours; the side row was drawn facing right (`--flip left`) | self-approved |
+| 25 | burgher/field | 1 | heights 85–90, 14 colours; the side row was drawn facing right (`--flip left`) | self-approved |
 
 - The three townsfolk are distinct from `villager`, `villager_f`, `merchant` and `old_man` at 2x. Their walk in-betweens are clean (checked with `puppet.walk_row` and `review_walk`).
 - `build_assets.py field_ai` lists all three.
