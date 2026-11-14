@@ -734,3 +734,106 @@
   items: {}
   gold: 100
   enemies: []
+
+# U (docs/FIX_PLAN_PENINSULA.md §U2-4, revisions 9 and 12). "400 G kit" = t4_garland_l2_start's party lines.
+- id: u_garland_400_l1
+  name: U - Lv1 400 G kit vs Garland (U1)
+  party:
+    - { class: warrior, name: FGHTR, level: 1, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 1, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 1, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 1, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 30
+  enemies: [garland]
+  background: assets/backgrounds/temple.webp
+- id: u_temple_400
+  name: U - Lv2 400 G kit at the temple entry (U1)
+  mode: field
+  map: temple-of-fiends
+  entrance: entry
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 30
+  enemies: []
+# Garland is directly north at (11,6): press Up once, then confirm.
+- id: u_retry_trap
+  name: U - Lv1 400 G kit below Garland, FGHTR down, THIEF at 1 HP (U4)
+  mode: field
+  map: temple-of-fiends
+  spawn: [11, 7]
+  party:
+    - { class: warrior, name: FGHTR, level: 1, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 0 }
+    - { class: thief, name: THIEF, level: 1, equipment: [rapier, leather_armor], spells: [], hp: 1 }
+    - { class: white_mage, name: W.MAG, level: 1, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 1, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 30
+  enemies: []
+- id: u_ko_leader
+  name: U - overworld, the leader fallen (U5)
+  mode: field
+  map: overworld
+  entrance: cornelia
+  party:
+    - { class: warrior, name: FGHTR, level: 5, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 0 }
+    - { class: thief, name: THIEF, level: 5, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 5, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 5, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 2, phoenix_down: 1 }
+  gold: 100
+  enemies: []
+- id: u_items_hurt
+  name: U - Cornelia inn, THIEF hurt and B.MAG down (U8)
+  mode: field
+  map: cornelia
+  entrance: inn
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 2, equipment: [rapier, leather_armor], spells: [], hp: 8 }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }], hp: 0 }
+  items: { potion: 3, phoenix_down: 1, antidote: 1 }
+  gold: 100
+  enemies: []
+- id: u_shop_kit
+  name: U - weapon shop, Lv1 party with 400 G and nothing else (U9, U11, U1)
+  mode: field
+  map: cornelia-weapon-shop
+  entrance: door
+  party:
+    - { class: warrior, name: FGHTR, level: 1, equipment: [], spells: [] }
+    - { class: thief, name: THIEF, level: 1, equipment: [], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 1, equipment: [], spells: [] }
+    - { class: black_mage, name: B.MAG, level: 1, equipment: [], spells: [] }
+  items: {}
+  gold: 400
+  enemies: []
+# Revision 12: Lv1 unarmed attackers against Gr.Wolves (72 HP; their bite barely passes chain mail), so every row
+# stays alive while the lunges are watched. Six small enemies lay out as 2 columns x 3 rows.
+- id: u_lunge_rows
+  name: U - 4 unarmed warriors vs 6 Gr.Wolves in 2 columns x 3 rows (U3)
+  party:
+    - { class: warrior, name: WAR1, level: 1, equipment: [chain_mail], spells: [] }
+    - { class: warrior, name: WAR2, level: 1, equipment: [chain_mail], spells: [] }
+    - { class: warrior, name: WAR3, level: 1, equipment: [chain_mail], spells: [] }
+    - { class: warrior, name: WAR4, level: 1, equipment: [chain_mail], spells: [] }
+  items: {}
+  gold: 0
+  enemies: [gr_wolf, gr_wolf, gr_wolf, gr_wolf, gr_wolf, gr_wolf]
+  background: assets/backgrounds/grassland.webp
+- id: u_cmd_menu
+  name: U - battle menus, W.MAG with Cure only, B.MAG with Fire and Ice, a key item only (U13, U14, U15)
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 3, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 3, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }] }
+  items: { lute: 1 }
+  gold: 100
+  enemies: [goblin, goblin, goblin]
+  background: assets/backgrounds/grassland.webp

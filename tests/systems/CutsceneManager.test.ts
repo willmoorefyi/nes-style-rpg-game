@@ -130,13 +130,19 @@ describe('T2 / N2: warp, heal signal, backdrop and unknown steps', () => {
   it('a backdrop step goes to deps.backdrop; a host without it logs once and skips', async () => {
     const backdrop = vi.fn();
     await new CutsceneManager(makeDeps({ backdrop })).play([{ type: 'backdrop', image: 'dark_forest' }, { type: 'backdrop', image: null }]);
-    expect(backdrop.mock.calls).toEqual([['dark_forest'], [null]]);
+    expect(backdrop.mock.calls).toEqual([['dark_forest', { dim: undefined }], [null, { dim: undefined }]]);
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     const deps = makeDeps();
     await new CutsceneManager(deps).play([{ type: 'backdrop', image: 'a' }, { type: 'backdrop', image: 'b' }, { type: 'dialog', text: 'on' }]);
     expect(err).toHaveBeenCalledTimes(1);
     expect(deps.showDialog).toHaveBeenCalledWith('on');
     err.mockRestore();
+  });
+
+  it('U16: a backdrop step passes its dim to deps.backdrop', async () => {
+    const backdrop = vi.fn();
+    await new CutsceneManager(makeDeps({ backdrop })).play([{ type: 'backdrop', image: 'dark_forest', dim: 0.35 }]);
+    expect(backdrop).toHaveBeenCalledWith('dark_forest', { dim: 0.35 });
   });
 
   it('an unknown step type is reported, not skipped silently', async () => {

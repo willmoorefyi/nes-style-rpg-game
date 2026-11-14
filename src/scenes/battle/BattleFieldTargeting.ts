@@ -3,6 +3,7 @@ import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import type { Character } from '../../entities/Character.js';
+import { mostHurtIndex } from '../../entities/partyTargets.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
 const TARGET_ARROW = 0xffff00;
@@ -13,12 +14,8 @@ export type TargetingSound = 'cursorMove' | 'cursorSelect' | 'cursorCancel';
 
 /** B10: where a party-target cursor starts: the most hurt living member (lowest HP / max), by battle id. */
 export function mostHurtMemberId(party: readonly Character[]): string | undefined {
-  let best = -1;
-  party.forEach((c, i) => {
-    if (c.currentHp <= 0) return;
-    if (best < 0 || c.currentHp / c.maxHp < party[best].currentHp / party[best].maxHp) best = i;
-  });
-  return best >= 0 ? `party_${best}` : undefined;
+  const i = mostHurtIndex(party);
+  return i >= 0 ? `party_${i}` : undefined;
 }
 
 export class BattleFieldTargeting {

@@ -1,7 +1,8 @@
 # ═══ CUTSCENE SCRIPTS ═══
 # Each cutscene is a sequence of steps executed by CutsceneManager.
 # Step types: dialog, fade_out, fade_in, wait, set_flag, heal_party,
-#   warp (map, and entrance or x and y; optional facing), backdrop (image: a background id, or null to clear)
+#   warp (map, and entrance or x and y; optional facing), backdrop (image: a background id, or null to clear;
+#   optional dim: a brightness multiplier in (0, 1], default 1)
 # Played after a boss battle (scriptedEncounters.postVictoryCutscene) or after talking to an NPC (npc.cutscene).
 
 # The opening (N2): played by the party-creation scene after the names are chosen, over staged battle backgrounds

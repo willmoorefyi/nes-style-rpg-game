@@ -24,6 +24,8 @@ export interface CutsceneStep {
   facing?: CutsceneWarp['facing'];
   /** For backdrop: a staged background id (assets/backgrounds/<id>.webp), or null to clear it (N2). */
   image?: string | null;
+  /** For backdrop: a brightness multiplier in (0, 1]; missing means 1 (U16). */
+  dim?: number;
 }
 
 export type CutsceneScript = CutsceneStep[];
@@ -54,8 +56,11 @@ export interface CutsceneDeps {
   warp?: (warp: CutsceneWarp) => Promise<void>;
   /** Called after heal_party (the field emits partyHealed for its sound). */
   onHeal?: () => void;
-  /** Show a staged background, or clear it with null (N2); a host without it logs once and skips. */
-  backdrop?: (image: string | null) => void | Promise<void>;
+  /**
+   * Show a staged background, or clear it with null (N2); a host without it logs once and skips.
+   * `opts.dim` is the step's brightness multiplier in (0, 1] (U16; undefined means 1).
+   */
+  backdrop?: (image: string | null, opts?: { dim?: number }) => void | Promise<void>;
 }
 
 /** The step types CutsceneManager plays. */
@@ -127,7 +132,7 @@ export class CutsceneManager {
 
       case 'backdrop':
         if (this.deps.backdrop) {
-          await this.deps.backdrop(step.image ?? null);
+          await this.deps.backdrop(step.image ?? null, { dim: step.dim });
         } else if (!this.backdropWarned) {
           this.backdropWarned = true;
           console.error('Cutscene backdrop step skipped: this host shows no backdrops');

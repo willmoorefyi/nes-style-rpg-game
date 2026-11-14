@@ -1,11 +1,17 @@
 import { CUTSCENE_STEP_TYPES, cutsceneWarp, type CutsceneScript, type CutsceneStep } from './CutsceneManager.js';
 import type { AssetLoader } from '../core/AssetLoader.js';
 
-/** Why a script can't be played (an unknown step type or a warp without a map and place), or null (T2). */
+/** A backdrop brightness multiplier in (0, 1] (U16). */
+function validDim(dim: unknown): boolean {
+  return typeof dim === 'number' && Number.isFinite(dim) && dim > 0 && dim <= 1;
+}
+
+/** Why a script can't be played (an unknown step type, a warp without a map and place, or a `dim` outside (0, 1]), or null (T2). */
 export function scriptProblem(steps: readonly CutsceneStep[]): string | null {
   for (const [i, step] of steps.entries()) {
     if (!CUTSCENE_STEP_TYPES.includes(step?.type)) return `step ${i} has unknown type '${String(step?.type)}'`;
     if (step.type === 'warp' && !cutsceneWarp(step)) return `step ${i} is a warp without map and an entrance or x and y`;
+    if (step.dim !== undefined && !validDim(step.dim)) return `step ${i} has dim ${String(step.dim)}, not a number in (0, 1]`;
   }
   return null;
 }

@@ -51,6 +51,21 @@ describe('T2: CutsceneRegistry.init validates scripts', () => {
     expect(err).toHaveBeenCalledTimes(2);
   });
 
+  it('U16: drops a script whose backdrop dim is not a number in (0, 1], and logs it', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await CutsceneRegistry.init(assetsWith([
+      { id: 'dim_ok', steps: [{ type: 'backdrop', image: 'dark_forest', dim: 0.35 }, { type: 'backdrop', image: null, dim: 1 }] },
+      { id: 'dim_two', steps: [{ type: 'backdrop', image: 'dark_forest', dim: 2 }] },
+      { id: 'dim_zero', steps: [{ type: 'backdrop', image: 'dark_forest', dim: 0 }] },
+      { id: 'dim_text', steps: [{ type: 'backdrop', image: 'dark_forest', dim: 'half' }] },
+    ]));
+    expect(CutsceneRegistry.get('dim_ok')).toHaveLength(2);
+    expect(CutsceneRegistry.get('dim_two')).toBeUndefined();
+    expect(CutsceneRegistry.get('dim_zero')).toBeUndefined();
+    expect(CutsceneRegistry.get('dim_text')).toBeUndefined();
+    expect(err).toHaveBeenCalledTimes(3);
+  });
+
   it('the real cutscenes.yaml loads without errors', async () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { readFileSync } = await import('node:fs');

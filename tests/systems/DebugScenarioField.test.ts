@@ -116,4 +116,22 @@ describe('DebugScenarioLoader field mode', () => {
       for (const m of s.party) for (const st of m.status ?? []) expect(['poison', 'blind', 'silence', 'sleep', 'stun'], `${s.id}`).toContain(st);
     }
   });
+  it('U0: the u_* scenarios exist; battle ones use full background paths that exist (revisions 9, 12)', () => {
+    const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
+    const byId = new Map(scenarios.map((s) => [s.id, s]));
+    const ids = ['u_garland_400_l1', 'u_temple_400', 'u_retry_trap', 'u_ko_leader', 'u_items_hurt', 'u_shop_kit',
+      'u_lunge_rows', 'u_cmd_menu'];
+    for (const id of ids) expect(byId.has(id), id).toBe(true);
+    for (const s of scenarios.filter((x) => x.id.startsWith('u_') && x.mode !== 'field')) {
+      expect(s.background, s.id).toMatch(/^assets\/backgrounds\/[a-z_]+\.webp$/);
+      expect(existsSync(resolve(root, s.background!)), `${s.id}: ${s.background}`).toBe(true);
+    }
+    const lunge = byId.get('u_lunge_rows')!;
+    expect(lunge.enemies).toHaveLength(6);
+    for (const m of lunge.party) {
+      expect(m.level).toBe(1);
+      expect(m.equipment.some((e) => ['rapier', 'iron_sword', 'small_knife', 'hammer'].includes(e)), m.name).toBe(false);
+    }
+    expect(byId.get('u_retry_trap')!.spawn).toEqual([11, 7]);
+  });
 });
