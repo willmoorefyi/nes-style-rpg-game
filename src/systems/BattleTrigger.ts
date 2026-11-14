@@ -8,6 +8,8 @@ import { CutsceneRegistry } from './CutsceneRegistry.js';
 
 export interface BattleEndData {
   victory: boolean;
+  /** The party ran away: no rewards and no Game Over. */
+  escaped?: boolean;
   xpReward: number;
   goldReward: number;
 }
@@ -73,7 +75,11 @@ export class BattleTrigger {
   }
 
   onBattleEnd(data: BattleEndData): void {
-    if (data.victory) {
+    if (data.escaped) {
+      // Back to the field where the battle started (boss battles never allow Run)
+      this.currentBossConfig = null;
+      this.game.scenes.pop();
+    } else if (data.victory) {
       // C4: Track levels before XP distribution for level-up detection
       const levelsBefore = this.game.party.all.map(m => m.level);
       this.game.party.distributeXp(data.xpReward);

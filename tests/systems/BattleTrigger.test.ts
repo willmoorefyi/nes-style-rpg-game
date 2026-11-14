@@ -49,6 +49,14 @@ describe('BattleTrigger', () => {
     expect(game.scenes.switchTo).toHaveBeenCalledWith('gameover');
   });
 
+  it('an escape pops back to the field with no rewards and no Game Over (BA-1)', () => {
+    trigger.onBattleEnd({ victory: false, escaped: true, xpReward: 0, goldReward: 0 });
+    expect(game.scenes.pop).toHaveBeenCalledTimes(1);
+    expect(game.scenes.switchTo).not.toHaveBeenCalled();
+    expect(game.party.distributeXp).not.toHaveBeenCalled();
+    expect(game.party.addGold).not.toHaveBeenCalled();
+  });
+
   it('calls onBattleTriggered callback', async () => {
     const callback = vi.fn();
     trigger.setOnBattleTriggered(callback);

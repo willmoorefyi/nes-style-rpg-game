@@ -15,7 +15,7 @@ import { PlaceholderTextures } from '../rendering/PlaceholderTextures.js';
 import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
 import { DialogManager } from '../systems/DialogManager.js';
-import { BattleTrigger } from '../systems/BattleTrigger.js';
+import { BattleTrigger, type BattleEndData } from '../systems/BattleTrigger.js';
 import { KeyItemGateSystem } from '../systems/KeyItemGateSystem.js';
 import { VehicleManager } from '../systems/VehicleManager.js';
 import { ShopScene } from './ShopScene.js';
@@ -73,7 +73,7 @@ export class ExplorationScene implements Scene {
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   // Stored reference for cleanup in exit() to prevent listener leaks
-  private handleBattleEnd = (data: { victory: boolean; xpReward: number; goldReward: number }) => this.battleTrigger.onBattleEnd(data);
+  private handleBattleEnd = (data: BattleEndData) => this.battleTrigger.onBattleEnd(data);
   private handleShowDialog = (data: { text: string; onComplete: () => void }) => {
     this.dialogManager.start([data.text]);
     // Override advance to call onComplete when dialog finishes
