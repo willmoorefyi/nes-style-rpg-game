@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EncounterTable } from '../../src/systems/EncounterTable.js';
+import { EncounterTable, MAX_FORMATION } from '../../src/systems/EncounterTable.js';
+import { MAX_LAYOUT } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import type { EncounterEntry } from '../../src/types/index.js';
 
 describe('EncounterTable', () => {
@@ -57,5 +58,61 @@ describe('EncounterTable', () => {
     const highTable = new EncounterTable(() => 0.9);
     highTable.setEntries(entries);
     expect(highTable.selectEnemies()).toEqual(['wolf']);
+  });
+});
+
+/** Deterministic RNG (mulberry32). */
+function seeded(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+describe('EncounterTable groups (T4c)', () => {
+  it('rolls a group count in [min, max] and every count appears in 300 rolls', () => {
+    const table = new EncounterTable(seeded(7));
+    table.setEntries([{ groups: [{ id: 'goblin', min: 3, max: 5 }], weight: 1 }]);
+    const counts = new Set<number>();
+    for (let i = 0; i < 300; i++) {
+      const enemies = table.selectEnemies();
+      expect(enemies.every((id) => id === 'goblin')).toBe(true);
+      expect(enemies.length).toBeGreaterThanOrEqual(3);
+      expect(enemies.length).toBeLessThanOrEqual(5);
+      counts.add(enemies.length);
+    }
+    expect([...counts].sort()).toEqual([3, 4, 5]);
+  });
+
+  it('lists groups in order and treats a missing max as min', () => {
+    const table = new EncounterTable(() => 0);
+    table.setEntries([{ groups: [{ id: 'goblin', min: 2 }, { id: 'wolf', min: 1, max: 3 }], weight: 1 }]);
+    expect(table.selectEnemies()).toEqual(['goblin', 'goblin', 'wolf']);
+  });
+
+  it('leaves a legacy enemies entry unchanged', () => {
+    const table = new EncounterTable(seeded(1));
+    table.setEntries([{ enemies: ['goblin', 'wolf'], weight: 1 }]);
+    for (let i = 0; i < 20; i++) expect(table.selectEnemies()).toEqual(['goblin', 'wolf']);
+  });
+
+  it('caps the total at MAX_FORMATION (9), cutting from the end', () => {
+    expect(MAX_FORMATION).toBe(9);
+    const table = new EncounterTable(() => 0);
+    table.setEntries([{ groups: [{ id: 'goblin', min: 6, max: 6 }, { id: 'wolf', min: 6, max: 6 }], weight: 1 }]);
+    expect(table.selectEnemies()).toEqual([...Array(6).fill('goblin'), ...Array(3).fill('wolf')]);
+  });
+
+  it('uses the first group once when every count rolls 0', () => {
+    const table = new EncounterTable(() => 0);
+    table.setEntries([{ groups: [{ id: 'gr_wolf', min: 0, max: 1 }, { id: 'wolf', min: 0, max: 2 }], weight: 1 }]);
+    expect(table.selectEnemies()).toEqual(['gr_wolf']);
+  });
+
+  it('keeps MAX_FORMATION equal to the layout limit', () => {
+    expect(MAX_LAYOUT).toBe(MAX_FORMATION);
   });
 });

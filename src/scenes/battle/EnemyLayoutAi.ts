@@ -81,3 +81,25 @@ export function computeEnemyLayoutAi(boxes: EnemyBoxInput[]): EnemyBox[] {
   });
   return out;
 }
+
+/** Most enemies in one battle; equal to EncounterTable's MAX_FORMATION (a test checks). */
+export const MAX_LAYOUT = 9;
+
+/**
+ * True when a formation (the boxes of its maximum roll) holds 1 to MAX_LAYOUT enemies and lays out at scale 1 or 0.5
+ * with every box inside ENEMY_AREA and no two boxes overlapping.
+ */
+export function formationFits(sizes: EnemyBoxInput[]): boolean {
+  if (sizes.length === 0 || sizes.length > MAX_LAYOUT) return false;
+  const rs = computeEnemyLayoutAi(sizes).map((b) => ({ l: b.x - b.w / 2, r: b.x + b.w / 2, t: b.feetY - b.h, btm: b.feetY }));
+  const inside = rs.every((r) => r.l >= ENEMY_AREA.x0 && r.r <= ENEMY_AREA.x1 && r.t >= ENEMY_AREA.y0
+    && r.btm <= ENEMY_AREA.y1);
+  if (!inside) return false;
+  for (let i = 0; i < rs.length; i++) {
+    for (let j = i + 1; j < rs.length; j++) {
+      const a = rs[i], b = rs[j];
+      if (a.l < b.r && b.l < a.r && a.t < b.btm && b.t < a.btm) return false;
+    }
+  }
+  return true;
+}

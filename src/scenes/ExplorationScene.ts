@@ -235,6 +235,7 @@ export class ExplorationScene implements Scene {
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     // a map without an encounter table has no random battles (towns, castles, interiors); never keep the last map's
     this.encounterSystem.setEncounters(mapData.encounters ?? []);
+    this.encounterSystem.setZones(mapData.encounterZones ?? []);
     this.worldContainer.sortableChildren = true;
     this.worldContainer.addChild(tilemap.container);
     if (tilemap.aboveContainer) this.worldContainer.addChild(tilemap.aboveContainer);

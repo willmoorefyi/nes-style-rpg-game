@@ -1,4 +1,5 @@
 import type { EnemyData, MapData, ShopData, StatBlock } from '../types/index.js';
+import { validateEncounterEntries, validateEncounterZones } from './encounterValidation.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -172,6 +173,10 @@ export function validateMapData(data: unknown): MapData {
       assertNumber(`MapData.noWander[${i}][0]`, p[0]);
       assertNumber(`MapData.noWander[${i}][1]`, p[1]);
     });
+  }
+  if (data.encounters !== undefined) validateEncounterEntries('MapData.encounters', data.encounters);
+  if (data.encounterZones !== undefined) {
+    validateEncounterZones(data.encounterZones, data.width as number, data.height as number);
   }
   if (data.inspect !== undefined) validateInspect(data.inspect, data.width as number, data.height as number);
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);

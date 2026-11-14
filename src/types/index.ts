@@ -177,14 +177,29 @@ export type MapTransition = {
 } & ({ targetX: number; targetY: number; targetEntrance?: undefined }
   | { targetEntrance: string; targetX?: undefined; targetY?: undefined });
 
-export interface EncounterEntry {
-  enemies: string[];
-  weight: number;
+/** `count` enemies of one id in a formation, rolled in [min, max] (max defaults to min). */
+export interface EncounterGroup {
+  id: string;
+  min: number;
+  max?: number;
 }
+
+/** A weighted formation: a fixed `enemies` list (legacy) or rolled `groups`; at most 9 enemies in total. */
+export type EncounterEntry = { weight: number } & (
+  | { enemies: string[]; groups?: undefined }
+  | { groups: EncounterGroup[]; enemies?: undefined });
 
 export interface EncounterRate {
   min: number;
   max: number;
+}
+
+/** A region of a map with its own table (and optionally rate); rects are inclusive [x0, y0, x1, y1]. */
+export interface EncounterZone {
+  id: string;
+  rects: [number, number, number, number][];
+  encounters: EncounterEntry[];
+  encounterRate?: EncounterRate;
 }
 
 /** A one-time scripted encounter placed at a specific map tile */
@@ -212,6 +227,8 @@ export interface MapData {
   transitions: MapTransition[];
   encounterRate?: EncounterRate;
   encounters?: EncounterEntry[];
+  /** Regional tables: the first zone containing the player's cell overrides `encounters` (and `encounterRate`). */
+  encounterZones?: EncounterZone[];
   music?: string;
   canSave?: boolean;
   scriptedEncounters?: ScriptedEncounter[];

@@ -137,5 +137,52 @@ describe('schemaValidation', () => {
       const emptyArrays = { ...validMap, npcs: [], transitions: [] };
       expect(validateMapData(emptyArrays)).toEqual(emptyArrays);
     });
+
+    describe('encounters and encounterZones (T4c)', () => {
+      const big = { ...validMap, width: 10, height: 8, collision: [] };
+      const groupEntry = { groups: [{ id: 'goblin', min: 3, max: 5 }], weight: 2 };
+
+      it('accepts legacy and group entries, and zones inside the map', () => {
+        const zones = [{ id: 'z', rects: [[0, 0, 9, 7]], encounters: [groupEntry], encounterRate: { min: 8, max: 15 } }];
+        const map = { ...big, encounters: [{ enemies: ['goblin'], weight: 1 }, groupEntry], encounterZones: zones };
+        expect(validateMapData(map)).toEqual(map);
+        expect(() => validateMapData({ ...big, encounters: [{ groups: [{ id: 'gob', min: 0, max: 9 }], weight: 1 }] }))
+          .not.toThrow();
+        expect(() => validateMapData({ ...big, encounters: [{ groups: [{ id: 'gob', min: 2 }], weight: 1 }] }))
+          .not.toThrow();
+      });
+
+      it('rejects a group with min > max, max > 9 or a negative min', () => {
+        for (const g of [{ id: 'g', min: 5, max: 3 }, { id: 'g', min: 1, max: 10 }, { id: 'g', min: -1, max: 2 },
+          { id: 'g', min: 1.5, max: 2 }]) {
+          expect(() => validateMapData({ ...big, encounters: [{ groups: [g], weight: 1 }] })).toThrow(/min/);
+        }
+      });
+
+      it('rejects an entry with both enemies and groups, or neither', () => {
+        const both = { enemies: ['goblin'], groups: [{ id: 'goblin', min: 1, max: 1 }], weight: 1 };
+        expect(() => validateMapData({ ...big, encounters: [both] })).toThrow(/exactly one of enemies or groups/);
+        expect(() => validateMapData({ ...big, encounters: [{ weight: 1 }] })).toThrow(/exactly one/);
+      });
+
+      it('checks the same rules inside zone tables', () => {
+        const bad = [{ id: 'z', rects: [[0, 0, 1, 1]], encounters: [{ groups: [{ id: 'g', min: 4, max: 2 }], weight: 1 }] }];
+        expect(() => validateMapData({ ...big, encounterZones: bad })).toThrow(/encounterZones\[0\]\.encounters\[0\]/);
+      });
+
+      it('rejects zone rects outside the map, inverted or not 4 integers', () => {
+        for (const rect of [[0, 0, 10, 7], [0, 0, 9, 8], [-1, 0, 2, 2], [3, 0, 2, 2], [0, 0, 1], [0, 0, 1, 1.5]]) {
+          const zones = [{ id: 'z', rects: [rect], encounters: [groupEntry] }];
+          expect(() => validateMapData({ ...big, encounterZones: zones }), JSON.stringify(rect))
+            .toThrow(/encounterZones\[0\]\.rects\[0\]/);
+        }
+      });
+
+      it('rejects a zone without an id or with a bad rate', () => {
+        expect(() => validateMapData({ ...big, encounterZones: [{ rects: [[0, 0, 1, 1]], encounters: [] }] })).toThrow(/id/);
+        const zones = [{ id: 'z', rects: [[0, 0, 1, 1]], encounters: [], encounterRate: { min: 9, max: 3 } }];
+        expect(() => validateMapData({ ...big, encounterZones: zones })).toThrow(/encounterRate/);
+      });
+    });
   });
 });

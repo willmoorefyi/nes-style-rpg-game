@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeEnemyLayoutAi, ENEMY_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { computeEnemyLayoutAi, formationFits, ENEMY_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 
 const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
@@ -65,5 +65,24 @@ describe('computeEnemyLayoutAi', () => {
     expect(out[1].w).toBe(BOX.boss);
     expect(out[2].w).toBe(BOX.large);
     expect(out[0].w).toBe(BOX.small);
+  });
+});
+
+describe('formationFits (T4c)', () => {
+  const many = (size: EnemySizeClass, n: number) => Array.from({ length: n }, () => box(size));
+
+  it('is true for 9 small enemies, 9 large ones (half size) and a boss with 8 small', () => {
+    expect(formationFits(many('small', 9))).toBe(true);
+    expect(formationFits(many('large', 9))).toBe(true);
+    expect(formationFits([box('boss'), ...many('small', 8)])).toBe(true);
+  });
+
+  it('is false for 5 large + 6 small (more than 9) and for an empty formation', () => {
+    expect(formationFits([...many('large', 5), ...many('small', 6)])).toBe(false);
+    expect(formationFits([])).toBe(false);
+  });
+
+  it('is false when the boxes overflow the area even at half size', () => {
+    expect(formationFits(many('boss', 9))).toBe(false);
   });
 });
