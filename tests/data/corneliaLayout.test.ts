@@ -350,23 +350,36 @@ describe('Cornelia second pass (R4a)', () => {
     const arches = (placed('cornelia') as Arch[]).filter((o) => o.parts?.[0]?.[0]?.startsWith('gate_arch_'));
     const sheet = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/town/gates.json'), 'utf-8')) as
       { cells: Array<Array<string | null>> };
-    const m = compiled('cornelia');
-    const col = new CollisionMap(m);
-    // [x, y, width]: the arch's footprint is exactly the passage through the wall band (the wall cells either side)
-    const want: Array<[string, number, number, number]> = [['south', 29, 68, 3], ['inner', 29, 31, 3], ['postern', 6, 0, 2]];
-    expect(arches.map((a) => [a.x, a.y, a.parts![0].length])).toEqual(want.map(([, x, y, w]) => [x, y, w]));
-    for (const [name, x, y, w] of want) {
-      const a = arches.find((o) => o.x === x && o.y === y)!;
-      expect(a.parts, name).toEqual([0, 1].map((j) => Array.from({ length: w }, (_, i) => `gate_arch_${w}_${j}_${i}`)));
-      for (const p of a.parts!.flat()) expect(sheet.cells.flat(), `${name}: ${p} is approved art`).toContain(p);
-      expect(a.above_rows, `${name}: every row is drawn over characters`).toBe(a.parts!.length);
-      expect(a.passage).toBe(true);
-      for (let j = 0; j < 2; j++) {
-        for (let i = 0; i < w; i++) expect(col.isWalkable(x + i, y + j, walk), `${name} (${x + i}, ${y + j})`).toBe(true);
-        expect(col.isWalkable(x - 1, y + j, walk), `${name}: wall west of the passage`).toBe(false);
-        expect(col.isWalkable(x + w, y + j, walk), `${name}: wall east of the passage`).toBe(false);
+    for (const p of arches.flatMap((a) => a.parts!.flat())) expect(sheet.cells.flat(), `${p} is approved art`).toContain(p);
+    const col = new CollisionMap(compiled('cornelia'));
+    const at = (x: number, y: number) => arches.find((o) => o.x === x && o.y === y);
+    // the 3-wide arches are cut into columns: the opening (centre) is drawn over characters and is the only walkable
+    // cell of the wall line; the jambs stand on the wall, drawn under characters, and block
+    for (const [name, y] of [['south', 68], ['inner', 31]] as const) {
+      const [west, mid, east] = [29, 30, 31].map((x) => at(x, y));
+      expect(mid?.parts, name).toEqual([['gate_arch_3_0_1'], ['gate_arch_3_1_1']]);
+      expect([west?.parts, east?.parts], name).toEqual([[['gate_arch_3_0_0'], ['gate_arch_3_1_0']],
+        [['gate_arch_3_0_2'], ['gate_arch_3_1_2']]]);
+      expect(mid!.above_rows, `${name}: the opening is drawn over characters`).toBe(2);
+      expect(mid!.passage).toBe(true);
+      expect([west!.above_rows ?? 0, east!.above_rows ?? 0, west!.on_wall, east!.on_wall]).toEqual([0, 0, true, true]);
+      for (const j of [0, 1]) {
+        expect(col.isWalkable(30, y + j, walk), `${name}: the opening (30, ${y + j})`).toBe(true);
+        for (const x of [28, 29, 31, 32]) expect(col.isWalkable(x, y + j, walk), `${name}: wall (${x}, ${y + j})`).toBe(false);
       }
+      expect([col.isWalkable(30, y - 1, walk), col.isWalkable(30, y + 2, walk)], `${name}: the road runs on`).toEqual([true, true]);
     }
+    // the postern's 2-wide arch has a half-cell opening on its cell boundary: shifted 23 px west it lies over x 6,
+    // the only walkable cell of the wall line; (7, 2) is closed so no head sits under the east jamb
+    const postern = at(6, 0)!;
+    expect(postern.parts).toEqual([['gate_arch_2_0_0', 'gate_arch_2_0_1'], ['gate_arch_2_1_0', 'gate_arch_2_1_1']]);
+    expect([postern.above_rows, postern.passage, postern.offset]).toEqual([2, true, [-23, 0]]);
+    for (const j of [0, 1]) {
+      expect(col.isWalkable(6, j, walk), `postern opening (6, ${j})`).toBe(true);
+      for (const x of [5, 7]) expect(col.isWalkable(x, j, walk), `postern wall (${x}, ${j})`).toBe(false);
+    }
+    expect([col.isWalkable(6, 2, walk), col.isWalkable(7, 2, walk)]).toEqual([true, false]);
+    expect(arches.length).toBe(7);
   });
 
   it('the tavern and the shrine hang their signs (M7)', () => {

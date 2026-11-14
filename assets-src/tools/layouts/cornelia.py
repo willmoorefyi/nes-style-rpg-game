@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cornelia_gates  # noqa: E402
 from common import Grid, polygon_mask, ring, write_map  # noqa: E402
 
 W, H = 62, 72
@@ -259,12 +260,8 @@ for (x, y) in [(1, 52), (2, 56), (4, 60), (8, 64), (13, 67), (20, 69), (40, 69),
                (60, 52), (60, 48), (60, 33), (61, 15), (60, 10), (0, 30), (0, 18), (1, 64), (58, 64)]:
     if g.inside(x, y) and g[x, y] == "." and g[x, y - 1] == ".":
         fir(x, y)
-# the bends, then (M7, free) both sides of every gate: south, west, east, precinct east, inner gatehouse, postern
-for (x, y) in [(55, 2), (56, 36), (56, 58), (1, 22), (1, 33), (4, 56), (26, 66), (33, 66), (1, 41), (1, 46), (58, 41),
-               (58, 46), (58, 21), (58, 26), (27, 30), (32, 30), (4, 0), (8, 0)]:
-    deco(TURRET, x, y, on_wall=True)
-for (w, x, y) in [(3, CX - 1, H - 4), (3, CX - 1, 31), (2, 6, 0)]:   # M7: arches (S gate, gatehouse, postern)
-    deco([[f"gate_arch_{w}_{j}_{i}" for i in range(w)] for j in range(2)], x, y, above_rows=2, passage=True)
+# M7: turrets on the bends and both sides of every gate; arches over the south gate, the gatehouse and the postern
+cornelia_gates.place(g, deco, obj, TURRET, CX)
 
 npcs = [
     # CT-4 / M1: the door guards stand at the bridge's garden end, beside it, so the castle apron (row 19) stays open

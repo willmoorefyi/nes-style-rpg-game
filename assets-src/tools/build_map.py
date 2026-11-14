@@ -926,18 +926,26 @@ def validate(src: dict, c: Compiled) -> None:
             if (t["x"], t["y"]) not in seen and not (on_edge and on_edge(t["x"], t["y"])):
                 errors.append(f"transition at ({t['x']}, {t['y']}) is not reachable on foot")
         errors += MC.run(src, c, seen)       # talkable NPCs, inspect cells, edge exits and the opt-in map checks
-    # covering rules: above art only over walkable cells, and the cell south of it must be blocked (except under a
-    # `passage` deco, e.g. a gate arch: the road runs on through it, and the arch's opening shows the walker)
+    # covering rules: above art only over walkable cells, and the cell south of it must be blocked. A `passage` deco
+    # (a gate arch) relaxes both: its art may cover the blocked wall cells it is drawn over (offset included), and a
+    # walkable cell of its footprint (the opening: the road runs on through it) may have a walkable cell south of it
     a = c.above[..., 3] > 0
-    through = {(o["x"] + i, o["y"] + j) for o in src.get("objects") or [] if o.get("type") == "deco" and o.get("passage")
-               for j, row in enumerate(o["parts"]) for i in range(len(row))}
+    through: set[tuple[int, int]] = set()
+    walled: set[tuple[int, int]] = set()
+    for o in src.get("objects") or []:
+        if o.get("type") != "deco" or not o.get("passage"):
+            continue
+        dx = (o.get("offset") or [0, 0])[0]
+        for j, row in enumerate(o["parts"]):
+            through |= {(o["x"] + i, o["y"] + j) for i in range(len(row))}
+            walled |= {(cx, o["y"] + j) for cx in range(o["x"] + dx // T, o["x"] + len(row) + -(-dx // T))}
     for y in range(c.height):
         for x in range(c.width):
             if not a[y * T:(y + 1) * T, x * T:(x + 1) * T].any():
                 continue
-            if not _walkable(c, x, y):
+            if not _walkable(c, x, y) and (x, y) not in walled:
                 errors.append(f"above-layer art over blocked cell ({x}, {y})")
-            if y + 1 < c.height and _walkable(c, x, y + 1) and (x, y) not in through:
+            if y + 1 < c.height and _walkable(c, x, y + 1) and not ((x, y) in through and _walkable(c, x, y)):
                 errors.append(f"cell ({x}, {y + 1}) below above-layer art must be blocked")
     if errors:
         raise MapError(f"{c.id}: " + "; ".join(errors))
