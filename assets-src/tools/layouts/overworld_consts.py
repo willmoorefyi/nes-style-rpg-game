@@ -19,6 +19,13 @@ S_STUB, N_STUB = 32, 29              # rows of the two stubs; the two rows betwe
 BRIDGE_FOOT, NORTH_SHORE = (BX, S_STUB + 1), (BX, N_STUB - 1)
 TX, TY = 14, 37                      # the temple icon (2x2); its door is (TX+1, TY+1), the arrival one cell south
 TEMPLE_DOOR = (TX + 1, TY + 2)
+# W1 / W2: the ruined temple cut from overworld/grand_temple (91x96 native, doorway at native x 53-64, centre 58.5);
+# +13 px puts the door on the warp cell's centre (x 72 of the 3-cell box). The null third column owns the 8 px spill
+# (no peak draws over it); the door cell (TX+1, TY+1) stays walkable and warps to the temple (no prefab any more)
+TEMPLE_OBJECT = {"type": "deco", "name": "temple", "x": TX, "y": TY, "offset": [13, 0], "collide": "alpha", "style": "bright",
+                 "parts": [["temple_ruin_0_0", "temple_ruin_0_1", None], ["temple_ruin_1_0", "temple_ruin_1_1", None]],
+                 "walk_cells": [[1, 1]]}
+TEMPLE_WARP = {"x": TX + 1, "y": TY + 1, "targetMap": "temple-of-fiends", "targetEntrance": "entry"}
 RX, RY = 45, 45                      # the east bridge: two cells (RX, RY), (RX+1, RY) over the 2-wide east river
 TOMB = (50, 43)                      # the sarcophagus' left cell (altar_l); altar_r is east of it
 TOMB_END = (TOMB[0], TOMB[1] + 1)    # the E road ends in front of the sarcophagus

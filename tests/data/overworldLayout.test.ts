@@ -150,15 +150,51 @@ describe('overworld layout (T3c)', () => {
       expect(terrain(x, y), `(${x}, ${y}) is water`).toBe(WATER);
       expect(col.isWalkable(x, y, walking)).toBe(false);
     }
-    // the parts are cut from the approved overworld/kit_grand sheet; temple_grand fell back (OW-8 keeps temple_icon)
+    // the parts are cut from the approved overworld/kit_grand sheet; temple_grand fell back there (W1 re-cut it as
+    // overworld/grand_temple, see the W1 / W2 case)
     const grand = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/overworld/grand.json'), 'utf-8')) as
       { cells: Array<Array<string | null>>; metrics: { skipped: string[] } };
     for (const p of d.parts!.flat()) expect(grand.cells.flat()).toContain(p);
     expect(grand.metrics.skipped).toContain('temple_grand');
-    const temple = source.objects.find((o) => o.type === 'prefab') as { prefab?: string } | undefined;
-    expect(temple?.prefab).toBe('temple_icon');
     // the gates are unchanged: both south-stub cells still need BRIDGE_BUILT
     expect(gates.map((g) => g.requiredFlag)).toEqual(['BRIDGE_BUILT', 'BRIDGE_BUILT']);
+  });
+
+  it('W1 / W2: the temple is the ruin cut from overworld/grand_temple, its door centred on the warp cell', () => {
+    type Deco = { type: string; x: number; y: number; parts?: Array<Array<string | null>>; offset?: [number, number];
+      collide?: string; walk_cells?: number[][] };
+    const temples = (source.objects as Deco[]).filter((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('temple_')));
+    expect(temples.length).toBe(1);
+    const t = temples[0];
+    expect(source.objects.some((o) => o.type === 'prefab'), 'no temple_icon prefab any more').toBe(false);
+    expect(t.type).toBe('deco');
+    expect(t.collide).toBe('alpha');
+    const used = t.parts!.flat().filter((p): p is string => p !== null);
+    expect(used.length).toBe(4);
+    for (const p of used) expect(p).toMatch(/^temple_ruin_\d_\d$/);
+    // the third column is null: it owns the art's spill, so no peak draws over it
+    expect(t.parts!.map((row) => row[2])).toEqual([null, null]);
+    const sheet = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/overworld/grand_temple.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>>; metrics: { prop_px: Record<string, [number, number]>;
+        door_px: Record<string, [number, number]> } };
+    for (const p of used) expect(sheet.cells.flat()).toContain(p);
+    const [pw, ph] = sheet.metrics.prop_px.temple_ruin;
+    expect(pw, 'the old temple_icon was 48x50').toBeGreaterThanOrEqual(82);
+    expect(ph).toBeGreaterThanOrEqual(82);
+    // W2: the measured doorway's centre plus the offset lands on the door cell's centre (x 72 of the box), +- 6 px
+    const [d0, d1] = sheet.metrics.door_px.temple_ruin;
+    expect(d1 - d0, 'the doorway is at least 12 native px wide').toBeGreaterThanOrEqual(12);
+    expect(Math.abs((d0 + d1) / 2 + (t.offset?.[0] ?? 0) - 72)).toBeLessThanOrEqual(6);
+    // the door cell (deco.x + 1, deco.y + 1) is walkable and warps into the temple; the arrival is one cell south
+    expect(t.walk_cells).toEqual([[1, 1]]);
+    const door: Cell = [t.x + 1, t.y + 1];
+    expect(col.isWalkable(...door, walking)).toBe(true);
+    expect(map.transitions.filter((w) => w.targetMap === 'temple-of-fiends'))
+      .toEqual([{ x: door[0], y: door[1], targetMap: 'temple-of-fiends', targetEntrance: 'entry' }]);
+    expect(entrance('temple')).toEqual([door[0], door[1] + 1]);
+    for (const [x, y] of [[t.x, t.y], [t.x + 1, t.y], [t.x, t.y + 1]] as Cell[]) {
+      expect(col.isWalkable(x, y, walking), `temple body (${x}, ${y})`).toBe(false);
+    }
   });
 
   it('OW-14: no walkable cell on the map edge', () => {

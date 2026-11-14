@@ -582,6 +582,7 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True) -> Compiled
             # any kit parts, e.g. {type: deco, parts: [[bed_top], [bed_bottom]], x, y, block: true, on_wall: false}
             # above_rows: the top rows are drawn over characters and stay walkable (a tall tree's crown, a lamp head);
             # walkable_rows: rows (from 0) that stay walkable but are drawn under characters (stairs)
+            # passage: true lets a walkable cell sit south of the deco's above rows (a gate arch over a road)
             # offset: [dx, dy] native px moves every part (an icon centred on a half cell); style recolours the parts;
             # collide: alpha blocks only the footprint cells (null cells included) whose composited art covers at
             # least alpha_min of the cell, instead of every cell with a part
@@ -925,15 +926,18 @@ def validate(src: dict, c: Compiled) -> None:
             if (t["x"], t["y"]) not in seen and not (on_edge and on_edge(t["x"], t["y"])):
                 errors.append(f"transition at ({t['x']}, {t['y']}) is not reachable on foot")
         errors += MC.run(src, c, seen)       # talkable NPCs, inspect cells, edge exits and the opt-in map checks
-    # covering rules: above art only over walkable cells, and the cell south of it must be blocked
+    # covering rules: above art only over walkable cells, and the cell south of it must be blocked (except under a
+    # `passage` deco, e.g. a gate arch: the road runs on through it, and the arch's opening shows the walker)
     a = c.above[..., 3] > 0
+    through = {(o["x"] + i, o["y"] + j) for o in src.get("objects") or [] if o.get("type") == "deco" and o.get("passage")
+               for j, row in enumerate(o["parts"]) for i in range(len(row))}
     for y in range(c.height):
         for x in range(c.width):
             if not a[y * T:(y + 1) * T, x * T:(x + 1) * T].any():
                 continue
             if not _walkable(c, x, y):
                 errors.append(f"above-layer art over blocked cell ({x}, {y})")
-            if y + 1 < c.height and _walkable(c, x, y + 1):
+            if y + 1 < c.height and _walkable(c, x, y + 1) and (x, y) not in through:
                 errors.append(f"cell ({x}, {y + 1}) below above-layer art must be blocked")
     if errors:
         raise MapError(f"{c.id}: " + "; ".join(errors))
@@ -1184,6 +1188,13 @@ def selftest() -> None:
     house["entrances"] = {"west": [0, 0]}
     hc = compile_map(house, kit, check_interiors=False)
     assert hc.collision[0, 4] == GRASS and hc.collision[1, 4] == WALL and hc.collision[3, 4] == ROAD
+    ok += 1
+    # M7: an arch drawn over characters needs `passage: true` to keep the walkable road south of it
+    arch = {**house, "objects": [{"type": "deco", "x": 3, "y": 1, "above_rows": 2,
+                                  "parts": [["gate_arch_2_0_0", "gate_arch_2_0_1"], ["gate_arch_2_1_0", "gate_arch_2_1_1"]]}]}
+    expect_error(arch, "below above-layer art must be blocked")
+    ac = compile_map({**arch, "objects": [{**arch["objects"][0], "passage": True}]}, kit, check_interiors=False)
+    assert ac.collision[1, 3] == GRASS and ac.collision[3, 3] == GRASS and (ac.above[T:3 * T, 3 * T:5 * T, 3] > 0).any()
     ok += 1
     # CA-2: a house door on a town map zooms (effect: door); the same door on an overworld-kit map fades
     shop = {**house, "objects": [{**house["objects"][0], "enter": {"map": "x", "entrance": "door"}}]}

@@ -345,6 +345,43 @@ describe('Cornelia second pass (R4a)', () => {
     }
   });
 
+  it('the south gate, the inner gatehouse and the postern have arches over the passage, drawn over characters (M7)', () => {
+    type Arch = Placed & { above_rows?: number; passage?: boolean };
+    const arches = (placed('cornelia') as Arch[]).filter((o) => o.parts?.[0]?.[0]?.startsWith('gate_arch_'));
+    const sheet = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/town/gates.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>> };
+    const m = compiled('cornelia');
+    const col = new CollisionMap(m);
+    // [x, y, width]: the arch's footprint is exactly the passage through the wall band (the wall cells either side)
+    const want: Array<[string, number, number, number]> = [['south', 29, 68, 3], ['inner', 29, 31, 3], ['postern', 6, 0, 2]];
+    expect(arches.map((a) => [a.x, a.y, a.parts![0].length])).toEqual(want.map(([, x, y, w]) => [x, y, w]));
+    for (const [name, x, y, w] of want) {
+      const a = arches.find((o) => o.x === x && o.y === y)!;
+      expect(a.parts, name).toEqual([0, 1].map((j) => Array.from({ length: w }, (_, i) => `gate_arch_${w}_${j}_${i}`)));
+      for (const p of a.parts!.flat()) expect(sheet.cells.flat(), `${name}: ${p} is approved art`).toContain(p);
+      expect(a.above_rows, `${name}: every row is drawn over characters`).toBe(a.parts!.length);
+      expect(a.passage).toBe(true);
+      for (let j = 0; j < 2; j++) {
+        for (let i = 0; i < w; i++) expect(col.isWalkable(x + i, y + j, walk), `${name} (${x + i}, ${y + j})`).toBe(true);
+        expect(col.isWalkable(x - 1, y + j, walk), `${name}: wall west of the passage`).toBe(false);
+        expect(col.isWalkable(x + w, y + j, walk), `${name}: wall east of the passage`).toBe(false);
+      }
+    }
+  });
+
+  it('the tavern and the shrine hang their signs (M7)', () => {
+    const signs = new Map((town.objects ?? []).filter((o) => o.type === 'house')
+      .map((o) => [o.name, (o as Obj & { sign?: string }).sign] as const));
+    expect(signs.get('house_tavern')).toBe('tavern');
+    expect(signs.get('house_shrine')).toBe('shrine');
+    const sheet = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/town/gates.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>> };
+    expect(sheet.cells.flat()).toEqual(expect.arrayContaining(['sign_tavern', 'sign_shrine']));
+    // the other homes stay unsigned
+    expect([...signs].filter(([n, s]) => s && n !== 'house_tavern' && n !== 'house_shrine' && n?.startsWith('house_')))
+      .toEqual([]);
+  });
+
   it('no NPC sprite is overused, and the roles have fitting sprites (M8)', () => {
     const cornelia = (parse(readFileSync(join(root, 'assets/maps/ai/index.yaml'), 'utf-8')) as string[])
       .filter((id) => id.startsWith('cornelia')).map(compiled);

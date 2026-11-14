@@ -27,8 +27,8 @@ from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BROKEN_BRI
                               FOOT_ROAD, FOOTBRIDGE, FOREST_ADD, FOREST_CUT, FOREST_ZONES, GATE_MESSAGE, GULF, H, HEADER,
                               JETTY, LAND, MOUNTAIN_BLOBS, N_STUB, N_WARP, NORTH_LAKE, NORTH_SHORE, PIER_TEXT, PONDS,
                               RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND, SHORE_SEA, SOUND, SOUTH_BAY, SPINE,
-                              SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_ROCK, TOMB, TOMB_CHEST, TOMB_END,
-                              TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
+                              SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_OBJECT, TEMPLE_ROCK, TEMPLE_WARP, TOMB,
+                              TOMB_CHEST, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
 from overworld_grid import (bfs, clear_disc, clear_rect, extend_to_sea, fill_unreachable, near, tidy_blobs,  # noqa: E402
                             tidy_land, walk_grid)
 from overworld_noise import blob, fbm, polyline_distance, signed_distance  # noqa: E402
@@ -179,8 +179,7 @@ def objects() -> list[dict]:
         {"type": "deco", "parts": city, "x": CX, "y": CY, "offset": [24, 0], "collide": "alpha",
          # the four gates, one doorway cell each (N: the wall's top edge; W and E: the flank arches; S: the main arch)
          "walk_cells": [[x - CX, y - CY] for x, y in (N_WARP, W_WARP, E_WARP, S_WARP)]},
-        {"type": "prefab", "prefab": "temple_icon", "name": "temple", "x": TX, "y": TY, "w": 2, "h": 2, "door": 1,
-         "ridge_rows": 0, "collide": "alpha", "enter": {"map": "temple-of-fiends", "entrance": "entry"}},
+        dict(TEMPLE_OBJECT),                       # W1 / W2: the ruined temple, its door centred on (TX+1, TY+1)
         *(dict(o) for o in TOMB_OBJECTS),          # Erdrick's tomb
         *(dict(o) for o in BROKEN_BRIDGE),         # OW-9: debris in the north bridge's gap (art only)
     ]
@@ -213,7 +212,7 @@ def main() -> None:
         "unreachable_ok": ["north_shore"],
         # `cornelia` first: safeSpawn moves old saves that are cut off from it (the act-1 component)
         "entrances": {**{k: list(v) for k, v in ARRIVE.items()}, "castle": list(ARRIVE["cornelia_north"]),
-                      "north_shore": list(NORTH_SHORE)},
+                      "north_shore": list(NORTH_SHORE), "temple": list(TEMPLE_DOOR)},
         "objects": objects(),
         "inspect": [{"x": TOMB[0], "y": TOMB[1], "text": ["Here lies Erdrick."]},
                     {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]},
@@ -233,7 +232,8 @@ def main() -> None:
         "vehicles": [{"type": "ship", "x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "requiredFlag": "BIKKE_DEFEATED"},
                      {"type": "canoe", "x": canoe[0], "y": canoe[1], "requiredFlag": "EARTH_CAVE_COMPLETE"}],
         "transitions": [{"x": p[0], "y": p[1], "targetMap": "cornelia", "targetEntrance": e} for p, e in
-                        ((N_WARP, "castle"), (W_WARP, "west_gate"), (E_WARP, "east_gate"), (S_WARP, "south_gate"))],
+                        ((N_WARP, "castle"), (W_WARP, "west_gate"), (E_WARP, "east_gate"), (S_WARP, "south_gate"))]
+        + [dict(TEMPLE_WARP)],
     }
     for v in doc["vehicles"]:
         assert g[v["x"], v["y"]] in "or", f"vehicle {v['type']} at ({v['x']}, {v['y']}) is on {g[v['x'], v['y']]!r}"

@@ -728,6 +728,7 @@ objects:
   storeys: 1
   roof: blue
   wall: ochre
+  sign: tavern
   chimney: 1
   enter: {map: cornelia-house-tavern, entrance: door}
 - type: house
@@ -741,6 +742,7 @@ objects:
   storeys: 2
   roof: red
   wall: stone
+  sign: shrine
   enter: {map: cornelia-house-shrine, entrance: door}
 - type: deco
   parts:
@@ -1158,6 +1160,30 @@ objects:
   x: 8
   y: 0
   on_wall: true
+- type: deco
+  parts:
+  - [gate_arch_3_0_0, gate_arch_3_0_1, gate_arch_3_0_2]
+  - [gate_arch_3_1_0, gate_arch_3_1_1, gate_arch_3_1_2]
+  x: 29
+  y: 68
+  above_rows: 2
+  passage: true
+- type: deco
+  parts:
+  - [gate_arch_3_0_0, gate_arch_3_0_1, gate_arch_3_0_2]
+  - [gate_arch_3_1_0, gate_arch_3_1_1, gate_arch_3_1_2]
+  x: 29
+  y: 31
+  above_rows: 2
+  passage: true
+- type: deco
+  parts:
+  - [gate_arch_2_0_0, gate_arch_2_0_1]
+  - [gate_arch_2_1_0, gate_arch_2_1_1]
+  x: 6
+  y: 0
+  above_rows: 2
+  passage: true
 npcs:
 - id: castle_door_guard_w
   sprite: guard
