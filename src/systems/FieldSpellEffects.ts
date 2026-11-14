@@ -31,15 +31,16 @@ export function isFieldSpell(spell: SpellData): boolean {
 
 /**
  * Apply a field spell. Does not spend the charge: the caller spends it only when `used` is true,
- * so a CURE on a full-HP ally ("No effect.") costs nothing.
+ * so a CURE on a full-HP ally ("No effect.") costs nothing. The caster's stats do not change the
+ * amount (FF1: INT has no effect), so `_caster` is only the caller's record of who cast it.
  */
 export function castFieldSpell(
   spell: SpellData,
-  caster: Character,
+  _caster: Character,
   targets: readonly Character[],
   rng: () => number = Math.random,
 ): FieldSpellResult {
-  if (spell.effect === 'heal') return heal(spell, caster, targets, rng);
+  if (spell.effect === 'heal') return heal(spell, targets, rng);
   if (spell.effect === 'revive') {
     const fallen = targets.filter(isFallen);
     if (fallen.length === 0) return NO_EFFECT;
@@ -57,14 +58,14 @@ export function castFieldSpell(
   return { used: true, messages: cured.map((t) => `${t.name} ${cure.text}`) };
 }
 
-function heal(spell: SpellData, caster: Character, targets: readonly Character[], rng: () => number): FieldSpellResult {
+function heal(spell: SpellData, targets: readonly Character[], rng: () => number): FieldSpellResult {
   // the fallen are not healed (that is Phoenix Down's or LIFE's job), and a full-HP ally gains nothing
   const living = targets.filter((t) => !isFallen(t) && t.currentHp < t.maxHp);
   if (living.length === 0) return NO_EFFECT;
   const messages: string[] = [];
   for (const t of living) {
     const before = t.currentHp;
-    t.currentHp = before + healAmount(spell, { intelligence: caster.stats.intelligence }, rng);
+    t.currentHp = before + healAmount(spell, rng);
     messages.push(`${t.name} recovers ${t.currentHp - before} HP`);
   }
   return { used: true, messages };

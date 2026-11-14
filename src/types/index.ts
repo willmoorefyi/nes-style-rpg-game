@@ -35,6 +35,18 @@ export interface CharacterClassData {
   usableEquipment: string[];
   spellLevels: { white: number; black: number };
   upgradeFrom?: string;
+  /** FF1 hit%: `base + growth * (level - 1)` (plus the weapon's `hit`); missing means 0. */
+  hitPercent?: ClassGrowth;
+  /** Magic defence against enemy spells: `base + growth * (level - 1)`; missing means 0. */
+  magicDefense?: ClassGrowth;
+  /** Spell-charge step breakpoints `[[level, [l1..l8]], ...]` (read by the charge rules; missing means none). */
+  spellCharges?: Array<[number, number[]]>;
+}
+
+/** A per-level class number: `base + growth * (level - 1)`. */
+export interface ClassGrowth {
+  base: number;
+  growth: number;
 }
 
 import type { ElementalProfile } from '../battle/Elements.js';
@@ -46,10 +58,25 @@ export interface BossPhase {
   message?: string;    // e.g. "Lich's form shifts!"
 }
 
+/** Enemy combat numbers (FF1). The optional ones default to accuracy 0, evade 0, hits 1, crit 1 (out of 200). */
+export interface EnemyCombatStats {
+  attack: number;
+  /** Absorb: subtracted from each hit. */
+  defense: number;
+  magicDefense: number;
+  /** Hit% added to the 168 base of the hit roll. */
+  accuracy?: number;
+  evade?: number;
+  /** Hits per attack. */
+  hits?: number;
+  /** Critical chance out of 200. */
+  crit?: number;
+}
+
 export interface EnemyData {
   id: string;
   name: string;
-  stats: StatBlock & { attack: number; defense: number; magicDefense: number };
+  stats: StatBlock & EnemyCombatStats;
   xpReward: number;
   goldReward: number;
   sprite: string;
@@ -75,6 +102,12 @@ export interface ItemData {
   slot?: EquipmentSlot;
   /** Extra damage multiplier vs enemies with this family (e.g., 'undead' for Silver Sword) */
   bonusVsFamily?: string;
+  /** Weapon hit% bonus (FF1); missing means 0. */
+  hit?: number;
+  /** Weapon critical chance out of 200; missing means 0. */
+  crit?: number;
+  /** Armour weight, subtracted from evade; missing means 0. */
+  weight?: number;
 }
 
 export type ShopType = 'weapon' | 'armor' | 'item' | 'magic' | 'inn';
@@ -102,6 +135,10 @@ export interface SpellData {
   element?: string;
   /** If set, spell only affects enemies with this family (e.g., 'undead' for HARM) */
   targetFamily?: string;
+  /** Added to the 148 base of the connect / status roll; missing means 24 (FF1). */
+  accuracy?: number;
+  /** Shop price; when missing, the per-level price table applies. */
+  price?: number;
 }
 
 /** Flag-conditional dialog entry: shows text when condition flag is set (or as default if no condition) */

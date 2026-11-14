@@ -3,11 +3,13 @@ import type { EnemyData, SpellData } from '../types/index.js';
 import type { Inventory } from '../entities/Inventory.js';
 import type { AIBehavior } from './AIBehavior.js';
 import type { BossPattern } from './BossAI.js';
-import { calculateDamage } from './DamageFormula.js';
 import { StatusTracker } from './StatusEffects.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
-import { selectTarget } from './EnemyAI.js';
+import { selectTarget, retargetEnemyTarget } from './EnemyAI.js';
 import { retargetIfDead, calculateRunChance, type BattleCommand } from './BattleCommands.js';
+import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
+import { tickStatus } from './StatusTick.js';
+import { xpShare } from './Rewards.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { SpellExecutor } from './SpellExecutor.js';
 
@@ -46,7 +48,10 @@ export interface BattleResult {
   victory: boolean;
   /** True when the party ran away (no rewards, no Game Over). */
   escaped?: boolean;
+  /** Total XP of the battle (each living member gets `xpPerMember`). */
   xpReward: number;
+  /** Each living member's share: `xpShare(xpReward, living)`; 0 unless victorious. */
+  xpPerMember: number;
   goldReward: number;
 }
 
@@ -364,51 +369,21 @@ export class BattleStateMachine {
   }
 
   private tickCombatantStatus(id: string, isEnemy: boolean): boolean {
+    const say = (text: string) => this.messages.push({ text });
     if (isEnemy) {
       const enemy = this.enemies.find(e => e.id === id);
-      if (!enemy || enemy.currentHp <= 0) return false;
-      const result = enemy.status.tick(enemy.data.stats.hp);
-      if (result.damage > 0) {
-        enemy.currentHp = Math.max(0, enemy.currentHp - result.damage);
-        this.messages.push({ text: `${enemy.displayName} takes ${result.damage} poison damage!` });
-        if (enemy.currentHp <= 0) {
-          this.messages.push({ text: `${enemy.displayName} defeated!` });
-          return false;
-        }
-      }
-      if (result.skipTurn) {
-        const status = enemy.status.has('sleep') ? 'asleep' : 'stunned';
-        this.messages.push({ text: `${enemy.displayName} is ${status}!` });
-        return false;
-      }
-      if (enemy.status.has('fear') && this.rng() < 0.5) {
-        this.messages.push({ text: `${enemy.displayName} is trembling with fear!` });
-        return false;
-      }
-      return true;
-    } else {
-      const char = this.getPartyMember(id);
-      if (!char || char.currentHp <= 0) return false;
-      const result = char.statusTracker.tick(char.maxHp);
-      if (result.damage > 0) {
-        char.currentHp = char.currentHp - result.damage;
-        this.messages.push({ text: `${char.name} takes ${result.damage} poison damage!` });
-        if (char.currentHp <= 0) {
-          this.messages.push({ text: `${char.name} fell!` });
-          return false;
-        }
-      }
-      if (result.skipTurn) {
-        const status = char.statusTracker.has('sleep') ? 'asleep' : 'stunned';
-        this.messages.push({ text: `${char.name} is ${status}!` });
-        return false;
-      }
-      if (char.statusTracker.has('fear') && this.rng() < 0.5) {
-        this.messages.push({ text: `${char.name} is trembling with fear!` });
-        return false;
-      }
-      return true;
+      if (!enemy) return false;
+      return tickStatus({
+        name: enemy.displayName, maxHp: enemy.data.stats.hp, tracker: enemy.status, fallText: 'defeated!',
+        getHp: () => enemy.currentHp, setHp: (hp) => { enemy.currentHp = hp; },
+      }, this.rng, say);
     }
+    const char = this.getPartyMember(id);
+    if (!char) return false;
+    return tickStatus({
+      name: char.name, maxHp: char.maxHp, tracker: char.statusTracker, fallText: 'fell!',
+      getHp: () => char.currentHp, setHp: (hp) => { char.currentHp = hp; },
+    }, this.rng, say);
   }
 
   private executeCommand(cmd: BattleCommand, isEnemy: boolean): void {
@@ -417,10 +392,10 @@ export class BattleStateMachine {
         this.messages.push({ text: 'Cannot escape!' });
         return;
       }
-      const partyAgi = this.avgAgility(this.livingParty.map(c => c.stats.agility));
-      const enemyAgi = this.avgAgility(this.livingEnemies.map(e => e.data.stats.agility));
-      const chance = calculateRunChance(partyAgi, enemyAgi);
-      if (this.rng() * 100 < chance) {
+      // FF1: the acting member's luck and level decide (enemies never run)
+      const runner = this.getPartyMember(cmd.actorId);
+      const chance = runner ? calculateRunChance(runner.stats.luck, runner.level) : 0;
+      if (this.rng() < chance) {
         this.messages.push({ text: 'Escaped!' });
         this.finish('escaped');
       } else {
@@ -445,19 +420,19 @@ export class BattleStateMachine {
     }
 
     if (cmd.type === 'fight' && cmd.targetId) {
-      const getLivingTargets = isEnemy
-        ? () => this.livingParty.map(c => this.getIdForPartyMember(c)!).filter(Boolean)
-        : () => this.livingEnemies.map(e => e.id);
-      const retargeted = retargetIfDead(
-        cmd,
-        id => this.isTargetAlive(id),
-        getLivingTargets,
-        this.rng
-      );
-
       if (isEnemy) {
-        this.executeEnemyAttack(cmd.actorId, retargeted.targetId!);
+        // enemies retarget by the original party slots, so the front stays favoured
+        const targetId = this.isTargetAlive(cmd.targetId)
+          ? cmd.targetId
+          : retargetEnemyTarget(this.party.map((_, i) => this.getPartyId(i)), id => this.isTargetAlive(id), this.rng);
+        if (targetId) this.executeEnemyAttack(cmd.actorId, targetId);
       } else {
+        const retargeted = retargetIfDead(
+          cmd,
+          id => this.isTargetAlive(id),
+          () => this.livingEnemies.map(e => e.id),
+          this.rng
+        );
         this.executePartyAttack(cmd.actorId, retargeted.targetId!);
       }
     }
@@ -468,29 +443,15 @@ export class BattleStateMachine {
     const target = this.enemies.find(e => e.id === targetId);
     if (!actor || !target || actor.currentHp <= 0 || target.currentHp <= 0) return;
 
-    const result = calculateDamage(
-      { attack: actor.stats.attack, level: actor.level },
-      { defense: target.data.stats.defense },
-      this.rng
-    );
-
-    // Bonus damage vs enemy family (e.g., Silver Sword vs undead)
-    const weapon = actor.getEquipped('weapon');
-    if (result.hit && weapon?.bonusVsFamily && weapon.bonusVsFamily === target.data.family) {
-      result.damage = Math.floor(result.damage * 1.5);
-    }
-
+    const result = resolvePartyAttack(actor, target, this.rng);
     if (!result.hit) {
       this.messages.push({ text: `${actor.name} missed!` });
-    } else {
-      target.currentHp = Math.max(0, target.currentHp - result.damage);
-      const crit = result.critical ? ' Critical!' : '';
-      this.messages.push({ text: `${actor.name} hits ${target.displayName} for ${result.damage}!${crit}` });
-      this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-      if (target.currentHp <= 0) {
-        this.messages.push({ text: `${target.displayName} defeated!` });
-      }
+      return;
     }
+    target.currentHp = Math.max(0, target.currentHp - result.damage);
+    this.messages.push({ text: attackLine(actor.name, target.displayName, result) });
+    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
+    if (target.currentHp <= 0) this.messages.push({ text: `${target.displayName} defeated!` });
   }
 
   private executeEnemyAttack(enemyId: string, targetId: string): void {
@@ -498,23 +459,15 @@ export class BattleStateMachine {
     const target = this.getPartyMember(targetId);
     if (!enemy || !target || enemy.currentHp <= 0 || target.currentHp <= 0) return;
 
-    const result = calculateDamage(
-      { attack: enemy.data.stats.attack, level: 1 },
-      { defense: target.stats.defense },
-      this.rng
-    );
-
+    const result = resolveEnemyAttack(enemy, target, this.rng);
     if (!result.hit) {
       this.messages.push({ text: `${enemy.displayName} missed!` });
-    } else {
-      target.currentHp = target.currentHp - result.damage;
-      const crit = result.critical ? ' Critical!' : '';
-      this.messages.push({ text: `${enemy.displayName} hits ${target.name} for ${result.damage}!${crit}` });
-      this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-      if (target.currentHp <= 0) {
-        this.messages.push({ text: `${target.name} fell!` });
-      }
+      return;
     }
+    target.currentHp = target.currentHp - result.damage;
+    this.messages.push({ text: attackLine(enemy.displayName, target.name, result) });
+    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
+    if (target.currentHp <= 0) this.messages.push({ text: `${target.name} fell!` });
   }
 
   private isTargetAlive(id: string): boolean {
@@ -522,11 +475,6 @@ export class BattleStateMachine {
     if (enemy) return enemy.currentHp > 0;
     const char = this.getPartyMember(id);
     return char ? char.currentHp > 0 : false;
-  }
-
-  private avgAgility(values: number[]): number {
-    if (values.length === 0) return 0;
-    return values.reduce((a, b) => a + b, 0) / values.length;
   }
 
   private executeItemCommand(cmd: BattleCommand): void {
@@ -609,10 +557,11 @@ export class BattleStateMachine {
     if (outcome === 'victory') {
       const xp = this.enemies.reduce((sum, e) => sum + e.data.xpReward, 0);
       const gold = this.enemies.reduce((sum, e) => sum + e.data.goldReward, 0);
-      this.result = { victory: true, xpReward: xp, goldReward: gold };
-      this.messages = [{ text: `Victory! Gained ${xp} XP and ${gold} Gold.` }];
+      const share = xpShare(xp, this.livingParty.length);
+      this.result = { victory: true, xpReward: xp, xpPerMember: share, goldReward: gold };
+      this.messages = [{ text: `Victory! ${share} XP each, ${gold} Gold.` }];
     } else {
-      this.result = { victory: false, escaped: outcome === 'escaped', xpReward: 0, goldReward: 0 };
+      this.result = { victory: false, escaped: outcome === 'escaped', xpReward: 0, xpPerMember: 0, goldReward: 0 };
       if (outcome === 'defeat') this.messages = [{ text: 'Game Over...' }];
     }
     for (const char of this.party) char.clearBattleState();

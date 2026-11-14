@@ -29,7 +29,8 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   }
   if (hasSleepStun) {
     const status = texts.find(t => t.includes('asleep')) ? 'Asleep' : 'Stunned';
-    return status;
+    // the turn is lost either way; the wake roll comes after it
+    return texts.includes(`${actorName} wakes up!`) ? `${status} → Wakes up` : status;
   }
   if (hasFear) return 'Afraid';
 
@@ -40,14 +41,12 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   // --- Miss ---
   if (texts.some(t => t === `${actorName} missed!`)) return '→ Miss!';
 
-  // --- Physical hit: "X hits Y for N!" or "X hits Y for N! Critical!" ---
+  // --- Physical hit: "X hits Y for N!", then " (2 hits)" for several hits and " Critical!" on a crit ---
   const hitRe = new RegExp(`^${escRe(actorName)} hits (.+?) for (\\d+)!(.*)$`);
   const hitMatch = texts.find(t => hitRe.test(t));
   if (hitMatch) {
     const m = hitMatch.match(hitRe)!;
-    const target = m[1], dmg = m[2], crit = m[3].includes('Critical') ? '!' : '';
-    const died = texts.some(t => t === `${target} defeated!` || t === `${target} fell!`);
-    return `→ ${dmg} to ${target}${crit}${died ? ' *' : ''}`;
+    return conciseHit(texts, m[1], m[2], m[3]);
   }
 
   // --- Enemy physical hit on party: "EnemyName hits CharName for N!" ---
@@ -55,9 +54,7 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   const enemyHitMatch = texts.find(t => enemyHitRe.test(t));
   if (enemyHitMatch) {
     const m = enemyHitMatch.match(enemyHitRe)!;
-    const target = m[2], dmg = m[3], crit = m[4].includes('Critical') ? '!' : '';
-    const died = texts.some(t => t === `${target} defeated!` || t === `${target} fell!`);
-    return `→ ${dmg} to ${target}${crit}${died ? ' *' : ''}`;
+    return conciseHit(texts, m[2], m[3], m[4]);
   }
 
   // --- Filter out "casts SPELL!" announce for spell result parsing ---
@@ -95,10 +92,10 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   if (frightenMatch) return `→ Frightened ${frightenMatch.match(frightenRe)![1]}`;
 
   const affectedRe = /^(.+?) is affected by (.+?)!$/;
-  const affectedMatch = filtered.find(t => affectedRe.test(t));
-  if (affectedMatch) {
-    const m = affectedMatch.match(affectedRe)!;
-    return `→ ${capitalize(m[2])} ${m[1]}`;
+  const affected = filtered.filter(t => affectedRe.test(t));
+  if (affected.length > 0) {
+    const m = affected[0].match(affectedRe)!;
+    return affected.length === 1 ? `→ ${capitalize(m[2])} ${m[1]}` : `→ ${capitalize(m[2])} ${affected.length} foes`;
   }
 
   // --- Revive ---
@@ -121,6 +118,9 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
     return `→ ${capitalize(label)} ${up ? 'up' : 'down'}!`;
   }
 
+  // --- A status / debuff spell that landed on no one: "X is unaffected." ---
+  if (filtered.some(t => t.endsWith(' is unaffected.'))) return '→ Unaffected';
+
   // --- No effect ---
   if (filtered.some(t => t.includes('No effect') || t.includes('no effect'))) return '→ No effect';
 
@@ -128,6 +128,14 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   const first = (filtered[0] ?? texts[0] ?? '').replace(new RegExp(`^${escRe(actorName)}['s ]*\\s*`, 'i'), '');
   const short = first.length > 20 ? first.slice(0, 18) + '..' : first;
   return `→ ${short || 'Act'}`;
+}
+
+/** "→ 18 to Goblin", plus " x2" for several hits, "!" for a crit and " *" for a kill. */
+function conciseHit(texts: string[], target: string, dmg: string, tail: string): string {
+  const hits = tail.match(/\((\d+) hits\)/)?.[1];
+  const crit = tail.includes('Critical') ? '!' : '';
+  const died = texts.some(t => t === `${target} defeated!` || t === `${target} fell!`);
+  return `→ ${dmg} to ${target}${hits ? ` x${hits}` : ''}${crit}${died ? ' *' : ''}`;
 }
 
 /** Escape a string for use in a RegExp. */

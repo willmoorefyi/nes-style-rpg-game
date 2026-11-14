@@ -3,7 +3,9 @@ import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellData } from '../types/index.js';
 import type { BattleCommand } from './BattleCommands.js';
 import type { StatusEffect } from './StatusEffects.js';
-import { calculateMagicDamage, healAmount } from './DamageFormula.js';
+import { healAmount, magicDamage } from './DamageFormula.js';
+import { partyMagicDefense } from './CombatStats.js';
+import { applyDebuffSpell, applyMoraleSpell, applyStatusSpell } from './SpellStatus.js';
 
 import type { DamageEvent } from './BattleStateMachine.js';
 
@@ -19,19 +21,14 @@ export interface SpellExecutorDeps {
   addDamageEvent: (event: DamageEvent) => void;
 }
 
-// FF1-faithful buff values: FOG +8 def, RUSE/INVS +40 evade, TMPR +14 atk, FAST +10 agi
+// Fallback buff amounts when a spell has no `power`: FOG +8 absorb, INVS +40 evade, TMPR +14 attack,
+// FAST +10 agility. A spell's `power` above 0 is the amount (RUSE is +80 evade, self).
 // All buffs last the entire battle (no turn countdown), matching FF1 behavior
 export const BUFF_VALUES: Record<string, { stat: string; amount: number; label: string }> = {
   buff_defense: { stat: 'defense', amount: 8, label: 'defense' },
   buff_evade:   { stat: 'evade', amount: 40, label: 'evasion' },
   buff_attack:  { stat: 'attack', amount: 14, label: 'attack' },
   buff_speed:   { stat: 'agility', amount: 10, label: 'speed' },
-};
-
-// FF1-faithful debuff values: LOCK -20 evade, SLOW -10 agility
-const DEBUFF_VALUES: Record<string, { stat: string; amount: number; label: string }> = {
-  debuff_evade: { stat: 'evade', amount: -20, label: 'evasion' },
-  debuff_speed: { stat: 'agility', amount: -10, label: 'speed' },
 };
 
 export class SpellExecutor {
@@ -84,32 +81,21 @@ export class SpellExecutor {
     }
 
     const casterName = isEnemy ? (caster as EnemyInstance).displayName : (caster as Character).name;
-    const casterInt = isEnemy
-      ? (caster as EnemyInstance).data.stats.intelligence
-      : (caster as Character).stats.intelligence;
 
     this.deps.addMessage(`${casterName} casts ${spell.name}!`);
 
     // Handle different spell effects
     if (spell.effect === 'heal') {
-      this.executeHealSpell(cmd, spell, casterInt, isEnemy);
+      this.executeHealSpell(cmd, spell, isEnemy);
     } else if (spell.effect.startsWith('buff_')) {
       this.executeBuffSpell(cmd, spell, isEnemy);
     } else if (spell.effect === 'debuff_morale') {
-      const targets = isEnemy ? this.deps.livingParty() : this.deps.livingEnemies();
-      for (const target of targets) {
-        if ('data' in target) {
-          const enemy = target as EnemyInstance;
-          enemy.status.apply('fear');
-          this.deps.addMessage(`${enemy.displayName} is frightened!`);
-        } else {
-          const char = target as Character;
-          char.statusTracker.apply('fear');
-          this.deps.addMessage(`${char.name} is frightened!`);
-        }
-      }
+      applyMoraleSpell(this.deps, spell, isEnemy ? this.deps.livingParty() : this.deps.livingEnemies());
     } else if (spell.effect.startsWith('debuff_')) {
-      this.executeDebuffSpell(cmd, spell, isEnemy);
+      applyDebuffSpell(this.deps, spell, this.opposingTargets(cmd, spell, isEnemy));
+    } else if (spell.effect.startsWith('status_')) {
+      const targets = this.familyFiltered(spell, this.opposingTargets(cmd, spell, isEnemy));
+      if (targets) applyStatusSpell(this.deps, spell, targets);
     } else if (spell.effect === 'cure_blind') {
       this.executeCureStatusSpell(cmd, isEnemy, 'blind', 'sight is restored');
     } else if (spell.effect === 'cure_poison') {
@@ -121,12 +107,12 @@ export class SpellExecutor {
     } else if (spell.effect.startsWith('resist_')) {
       const element = spell.effect.replace('resist_', '');
       this.executeResistSpell(isEnemy, element);
-    } else if (spell.effect.startsWith('damage') || spell.effect.startsWith('status_')) {
-      this.executeDamageSpell(cmd, spell, casterInt, isEnemy);
+    } else if (spell.effect.startsWith('damage')) {
+      this.executeDamageSpell(cmd, spell, isEnemy);
     }
   }
 
-  private executeHealSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
+  private executeHealSpell(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): void {
     const targets = spell.targeting === 'all_allies'
       ? (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty())
       : cmd.targetId
@@ -134,7 +120,7 @@ export class SpellExecutor {
         : [];
 
     for (const target of targets) {
-      const heal = healAmount(spell, { intelligence: casterInt }, this.deps.rng);
+      const heal = healAmount(spell, this.deps.rng);
       if ('currentHp' in target && 'data' in target) {
         // EnemyInstance
         const enemy = target as EnemyInstance;
@@ -156,62 +142,54 @@ export class SpellExecutor {
     }
   }
 
-  private executeDamageSpell(cmd: BattleCommand, spell: SpellData, casterInt: number, isEnemy: boolean): void {
-    const power = spell.power ?? 20;
-    const allTargets = spell.targeting === 'all'
-      ? (isEnemy ? this.deps.livingParty() : this.deps.livingEnemies())
-      : cmd.targetId
-        ? (isEnemy ? this.partyFilter(cmd.targetId!) : this.deps.enemies.filter(e => e.id === cmd.targetId))
-        : [];
+  /** Targets on the other side: everyone for an `all` spell, else the chosen one (enemies: if alive). */
+  private opposingTargets(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): Array<Character | EnemyInstance> {
+    if (spell.targeting === 'all') return isEnemy ? this.deps.livingParty() : this.deps.livingEnemies();
+    if (!cmd.targetId) return [];
+    return isEnemy
+      ? this.partyFilter(cmd.targetId)
+      : this.deps.enemies.filter(e => e.id === cmd.targetId && e.currentHp > 0);
+  }
 
-    // Filter by targetFamily if spell is restricted (e.g., HARM only hits undead)
-    const targets = spell.targetFamily
-      ? allTargets.filter(t => 'data' in t && (t as EnemyInstance).data.family === spell.targetFamily)
-      : allTargets;
-    if (spell.targetFamily && targets.length === 0) {
-      this.deps.addMessage(`${spell.name} has no effect!`);
-      return;
-    }
+  /** Keep only the spell's family (HARM: undead); null, after a "no effect" line, when none is left. */
+  private familyFiltered(spell: SpellData, all: Array<Character | EnemyInstance>): Array<Character | EnemyInstance> | null {
+    if (!spell.targetFamily) return all;
+    const targets = all.filter(t => 'data' in t && t.data.family === spell.targetFamily);
+    if (targets.length > 0) return targets;
+    this.deps.addMessage(`${spell.name} has no effect!`);
+    return null;
+  }
+
+  private executeDamageSpell(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): void {
+    const targets = this.familyFiltered(spell, this.opposingTargets(cmd, spell, isEnemy));
+    if (!targets) return;
+    const info = { power: spell.power ?? 20, accuracy: spell.accuracy, element: spell.element };
 
     for (const target of targets) {
       if ('data' in target) {
-        // EnemyInstance
-        const enemy = target as EnemyInstance;
-        const damage = calculateMagicDamage(
-          { intelligence: casterInt },
-          { intelligence: enemy.data.stats.intelligence, weakness: enemy.data.weakness, resist: enemy.data.resist },
-          { power, element: spell.element },
-          this.deps.rng
-        );
-
-        if (spell.effect.startsWith('status_')) {
-          const status = spell.effect.replace('status_', '') as StatusEffect;
-          enemy.status.apply(status);
-          this.deps.addMessage(`${enemy.displayName} is affected by ${status}!`);
-        } else {
-          enemy.currentHp = Math.max(0, enemy.currentHp - damage);
-          this.deps.addMessage(`${enemy.displayName} takes ${damage} damage!`);
-          this.deps.addDamageEvent({ targetId: enemy.id, damage, isHeal: false, isCrit: false, spellElement: spell.element });
-          if (enemy.currentHp <= 0) {
-            this.deps.addMessage(`${enemy.displayName} defeated!`);
-          }
-        }
+        const enemy = target;
+        const { damage } = magicDamage(info, {
+          magicDefense: enemy.data.stats.magicDefense,
+          weakness: enemy.data.weakness,
+          resist: enemy.data.resist,
+          elementalProfile: enemy.data.elementalProfile,
+        }, this.deps.rng);
+        enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+        this.deps.addMessage(`${enemy.displayName} takes ${damage} damage!`);
+        this.deps.addDamageEvent({ targetId: enemy.id, damage, isHeal: false, isCrit: false, spellElement: spell.element });
+        if (enemy.currentHp <= 0) this.deps.addMessage(`${enemy.displayName} defeated!`);
       } else {
-        // Character
-        const char = target as Character;
+        const char = target;
         const charId = this.getCharId(char);
-        const damage = calculateMagicDamage(
-          { intelligence: casterInt },
-          { intelligence: char.stats.intelligence },
-          { power, element: spell.element },
-          this.deps.rng
-        );
+        const resisted = !!spell.element && char.hasTempResist(spell.element);
+        const { damage } = magicDamage(info, {
+          magicDefense: partyMagicDefense(char),
+          resist: resisted ? spell.element : undefined,
+        }, this.deps.rng);
         char.currentHp = char.currentHp - damage;
         this.deps.addMessage(`${char.name} takes ${damage} damage!`);
         if (charId) this.deps.addDamageEvent({ targetId: charId, damage, isHeal: false, isCrit: false, spellElement: spell.element });
-        if (char.currentHp <= 0) {
-          this.deps.addMessage(`${char.name} fell!`);
-        }
+        if (char.currentHp <= 0) this.deps.addMessage(`${char.name} fell!`);
       }
     }
   }
@@ -219,6 +197,8 @@ export class SpellExecutor {
   private executeBuffSpell(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): void {
     const info = BUFF_VALUES[spell.effect];
     if (!info) return;
+    const power = spell.power ?? 0;
+    const amount = power > 0 ? power : info.amount;
 
     // Buffs target allies — self or single ally
     const targets = spell.targeting === 'self'
@@ -232,36 +212,12 @@ export class SpellExecutor {
     for (const target of targets) {
       if ('data' in target) {
         const enemy = target as EnemyInstance;
-        enemy.buffs.set(info.stat, (enemy.buffs.get(info.stat) ?? 0) + info.amount);
+        enemy.buffs.set(info.stat, (enemy.buffs.get(info.stat) ?? 0) + amount);
         this.deps.addMessage(`${enemy.displayName}'s ${info.label} increased!`);
       } else {
         const char = target as Character;
-        char.applyBuff(info.stat, info.amount);
+        char.applyBuff(info.stat, amount);
         this.deps.addMessage(`${char.name}'s ${info.label} increased!`);
-      }
-    }
-  }
-
-  private executeDebuffSpell(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): void {
-    const info = DEBUFF_VALUES[spell.effect];
-    if (!info) return;
-
-    // Debuffs target enemies
-    const targets = spell.targeting === 'all'
-      ? (isEnemy ? this.deps.livingParty() : this.deps.livingEnemies())
-      : cmd.targetId
-        ? (isEnemy ? this.partyFilter(cmd.targetId!) : this.deps.enemies.filter(e => e.id === cmd.targetId))
-        : [];
-
-    for (const target of targets) {
-      if ('data' in target) {
-        const enemy = target as EnemyInstance;
-        enemy.buffs.set(info.stat, (enemy.buffs.get(info.stat) ?? 0) + info.amount);
-        this.deps.addMessage(`${enemy.displayName}'s ${info.label} decreased!`);
-      } else {
-        const char = target as Character;
-        char.applyBuff(info.stat, info.amount);
-        this.deps.addMessage(`${char.name}'s ${info.label} decreased!`);
       }
     }
   }

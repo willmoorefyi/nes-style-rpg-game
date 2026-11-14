@@ -39,6 +39,34 @@ function assertObject(path: string, value: unknown): asserts value is Record<str
   }
 }
 
+/** Each listed key, when present, must be a number (the optional FF1 combat fields). */
+function assertOptionalNumbers(path: string, obj: Record<string, unknown>, keys: string[]): void {
+  for (const key of keys) {
+    if (obj[key] !== undefined) assertNumber(`${path}.${key}`, obj[key]);
+  }
+}
+
+/** `{base, growth}` per-level class numbers (hitPercent, magicDefense), when present. */
+function assertOptionalGrowth(path: string, value: unknown): void {
+  if (value === undefined) return;
+  assertObject(path, value);
+  assertNumber(`${path}.base`, value.base);
+  assertNumber(`${path}.growth`, value.growth);
+}
+
+/** `spellCharges: [[level, [l1..l8]], ...]`, when present. */
+function assertOptionalChargeTable(path: string, value: unknown): void {
+  if (value === undefined) return;
+  assertArray(path, value);
+  value.forEach((step, i) => {
+    assertArray(`${path}[${i}]`, step);
+    if (step.length !== 2) throw new ValidationError(`${path}[${i}]: expected [level, [charges...]]`);
+    assertNumber(`${path}[${i}][0]`, step[0]);
+    assertArray(`${path}[${i}][1]`, step[1]);
+    (step[1] as unknown[]).forEach((n, j) => assertNumber(`${path}[${i}][1][${j}]`, n));
+  });
+}
+
 function validateStatBlock(path: string, data: unknown): StatBlock {
   assertObject(path, data);
   assertNumber(`${path}.hp`, data.hp);
@@ -63,6 +91,7 @@ export function validateEnemyData(data: unknown): EnemyData {
   assertNumber('EnemyData.stats.attack', (data.stats as Record<string, unknown>).attack);
   assertNumber('EnemyData.stats.defense', (data.stats as Record<string, unknown>).defense);
   assertNumber('EnemyData.stats.magicDefense', (data.stats as Record<string, unknown>).magicDefense);
+  assertOptionalNumbers('EnemyData.stats', data.stats as Record<string, unknown>, ['accuracy', 'evade', 'hits', 'crit']);
   
   return data as unknown as EnemyData;
 }
@@ -191,6 +220,9 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   assertObject('CharacterClassData.spellLevels', data.spellLevels);
   assertNumber('CharacterClassData.spellLevels.white', (data.spellLevels as Record<string, unknown>).white);
   assertNumber('CharacterClassData.spellLevels.black', (data.spellLevels as Record<string, unknown>).black);
+  assertOptionalGrowth('CharacterClassData.hitPercent', data.hitPercent);
+  assertOptionalGrowth('CharacterClassData.magicDefense', data.magicDefense);
+  assertOptionalChargeTable('CharacterClassData.spellCharges', data.spellCharges);
   return data as unknown as import('../types/index.js').CharacterClassData;
 }
 
@@ -208,6 +240,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   assertNumber('ItemData.price', data.price);
   assertArray('ItemData.usableBy', data.usableBy);
   (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
+  assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
   return data as unknown as import('../types/index.js').ItemData;
 }
 
@@ -229,6 +262,7 @@ export function validateSpellData(data: unknown): import('../types/index.js').Sp
     throw new ValidationError(`SpellData.targeting: expected one of ${VALID_TARGETING.join(', ')}, got ${data.targeting}`);
   }
   assertString('SpellData.description', data.description);
+  assertOptionalNumbers('SpellData', data, ['accuracy', 'price']);
   return data as unknown as import('../types/index.js').SpellData;
 }
 

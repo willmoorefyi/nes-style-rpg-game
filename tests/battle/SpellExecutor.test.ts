@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { BattleStateMachine } from '../../src/battle/BattleStateMachine.js';
 import { Character } from '../../src/entities/Character.js';
 import type { EnemyData, CharacterClassData, SpellData } from '../../src/types/index.js';
+import { mulberry32, testClass, testEnemy } from '../helpers/testUtils.js';
 
 const mageClass: CharacterClassData = {
   id: 'white_mage',
@@ -139,3 +140,107 @@ describe('SpellExecutor — WP2 new spell effects', () => {
     });
   });
 });
+
+describe('FEAR rolls statusHits (revision 13)', () => {
+  it('a high roll leaves the target unaffected', () => {
+    // FEAR accuracy 40 vs magic defence 2: 186/200 → 0.95 (190) misses
+    const mage = createMage('Mage', 4);
+    const battle = new BattleStateMachine({ party: [mage], enemies: [goblin], spells: [{ ...fearSpell, accuracy: 40 }] }, () => 0.95);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.submitCommand({ type: 'magic', actorId: 'party_0', targetId: 'enemy_0', spellId: 'fear' });
+    battle.executeRound();
+    expect(battle.allEnemies[0].status.has('fear')).toBe(false);
+    expect(battle.currentMessages.map(m => m.text)).toContain('Goblin is unaffected.');
+  });
+});
+
+describe('SLEP: hit roll and the wake rule (FF1, EB-5)', () => {
+  const slep: SpellData = { id: 'slep', name: 'SLEP', level: 1, type: 'black', effect: 'status_sleep', targeting: 'all', description: 'Sleep', power: 0, accuracy: 24 };
+  // a sturdy, fast caster so 15 rounds of Garland never end the test early
+  const sleeper = testClass('black_mage', { baseStats: { hp: 999, strength: 1, agility: 30, intelligence: 10, vitality: 1, luck: 5 } });
+  const garland = testEnemy({ id: 'garland', name: 'Garland', stats: { hp: 240, agility: 1, attack: 15, accuracy: 15, defense: 10, evade: 12, magicDefense: 15 } });
+  const imp = testEnemy({ stats: { hp: 8, agility: 1, magicDefense: 16 } });
+
+  function caster(): Character {
+    const c = new Character({ name: 'BM', classData: sleeper });
+    c.setSpellCharges(1, 99);
+    return c;
+  }
+
+  function slepRound(battle: BattleStateMachine): string[] {
+    battle.submitCommand({ type: 'magic', actorId: 'party_0', spellId: 'slep' });
+    battle.executeRound();
+    const texts = battle.currentMessages.map(m => m.text);
+    battle.resolveRound();
+    return texts;
+  }
+
+  function start(enemies: EnemyData[], rng: () => number): BattleStateMachine {
+    const battle = new BattleStateMachine({ party: [caster()], enemies, spells: [slep] }, rng);
+    battle.startBattle();
+    battle.advanceFromIntro();
+    return battle;
+  }
+
+  it('misses ("unaffected") when the roll is ≥ (148 + 24 − MDef) / 200', () => {
+    // MDef 16 → 156/200: 0.8 (160) misses, 0.7 (140) lands
+    const miss = slepRound(start([imp], () => 0.8));
+    expect(miss).toContain('Goblin is unaffected.');
+    const battle = start([imp], () => 0.7);
+    const hit = slepRound(battle);
+    expect(hit).toContain('Goblin is affected by sleep!');
+  });
+
+  it('a sleeping Garland (HP 240) loses one turn, wakes, and acts on the next round', () => {
+    const battle = start([garland], () => 0.5);
+    const first = slepRound(battle);
+    expect(first).toContain('Garland is affected by sleep!');
+    expect(first).toContain('Garland is asleep!');
+    expect(first).toContain('Garland wakes up!');
+    expect(battle.allEnemies[0].status.has('sleep')).toBe(false);
+    // next round the caster fights instead; Garland now acts
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+    battle.executeRound();
+    const second = battle.currentMessages.map(m => m.text);
+    expect(second.some(t => t.startsWith('Garland hits') || t === 'Garland missed!')).toBe(true);
+  });
+
+  it('a goblin at 8 HP stays asleep with roll 0.5 (rand(0..80) = 40 ≥ 8)', () => {
+    const battle = start([imp], () => 0.5);
+    const texts = slepRound(battle);
+    expect(texts).toContain('Goblin is affected by sleep!');
+    expect(texts).toContain('Goblin is asleep!');
+    expect(texts).not.toContain('Goblin wakes up!');
+    expect(battle.allEnemies[0].status.has('sleep')).toBe(true);
+  });
+
+  it('damage does not wake a sleeper (FF1)', () => {
+    const tough = testEnemy({ stats: { hp: 500, agility: 1, defense: 0, evade: 0, magicDefense: 0 } });
+    const battle = start([tough], () => 0.99);
+    battle.allEnemies[0].status.apply('sleep');
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+    battle.prepareRound();
+    battle.executeNextAction(); // the caster hits first (agility 30)
+    expect(battle.allEnemies[0].currentHp).toBeLessThan(500);
+    expect(battle.allEnemies[0].status.has('sleep')).toBe(true);
+  });
+
+  it('over 15 rounds of SLEP every round, Garland acts at least once', () => {
+    const acted = (seed: number) => {
+      const battle = start([garland], mulberry32(seed));
+      let turns = 0;
+      for (let r = 0; r < 15 && !battle.isOver; r++) {
+        const texts = slepRound(battle);
+        if (texts.some(t => t.startsWith('Garland hits') || t === 'Garland missed!')) turns++;
+      }
+      return turns;
+    };
+    expect(acted(1)).toBeGreaterThanOrEqual(1);
+    // each round SLEP misses ~21 % of the time; nearly every battle sees Garland act
+    const seeds = Array.from({ length: 200 }, (_, i) => i + 1);
+    const withTurn = seeds.filter(s => acted(s) >= 1).length;
+    expect(withTurn / seeds.length).toBeGreaterThanOrEqual(0.95);
+  });
+});
+
