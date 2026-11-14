@@ -302,6 +302,40 @@
         - {name: lilies, source: [764, 728, 1012, 968], key_border: true, at: [3, 3], tiles: [1, 1], wrap: prop,
            text: "two floating green lily pads and one small pink water-lily flower, with no water drawn around them."}
 
+    gates:
+      # R5 / M7 (FIX_PLAN R5-4 table row, decision R-10; R revisions item 15 calls it R5-1): gatehouse arches over the
+      # city gate passages (decos with above_rows = their height, walkable, drawn over characters) and the tavern and
+      # shrine sign boards. The arches fill their cells (fill) so they line up with the 2-row wall; the signs keep
+      # the signs sheet's pixel scale (pitch). Attempt 1 (the only paid image allowed, R-10) was approved without
+      # gate_side: Gemini drew it as a front-view arch with a pink backdrop and a window, not a lintel over a
+      # north-south wall, so it is skipped (the W, E and precinct-E gates keep turret flanking only). Gemini used its
+      # own layout (pieces drawn to the page edges), so every piece has a source rect; the arch_3 source drops 27 px of
+      # walkway so it is 3:2 and fills its 144x96 cells.
+      kind: swatches
+      seed: 1234
+      refs: [walls, signs]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: gate_arch_3, fill: true, fill_ratio: 1.0, source: [0, 24, 717, 501], at: [0, 0], tiles: [3, 2], wrap: prop,
+           parts: [[gate_arch_3_0_0, gate_arch_3_0_1, gate_arch_3_0_2], [gate_arch_3_1_0, gate_arch_3_1_1, gate_arch_3_1_2]],
+           text: "a town gatehouse arch seen from the front in the same three-quarter view as Image 3, filling the whole box edge to edge: the top half is the pale grey flagstone walkway on top of the town wall (the same slabs as Image 3), running across the full width; the bottom half is the front face of the same grey stone wall (the same block courses, lighter coping and darker base as Image 3) with one big round-topped gateway arch framed by light carved voussoir stones and a keystone. The arch opening is about two thirds of the box wide and rises from the bottom edge to just under the walkway; inside the opening leave EMPTY flat magenta (#FF00FF) right down to the bottom edge, so the road shows through. No doors, no portcullis, no towers, no flags."}
+        - {name: sign_tavern, fill: true, fill_ratio: 0.84, source: [776, 38, 976, 238], at: [3, 0], tiles: [1, 1], wrap: prop, align: center,
+           text: "the same kind of small hanging wooden shop sign board as in Image 4 (a wooden board with a dark frame hanging from a short wooden bar), showing a simple brown wooden beer tankard with white foam on top; no letters."}
+        - {name: sign_shrine, fill: true, fill_ratio: 0.84, source: [776, 274, 976, 484], at: [3, 1], tiles: [1, 1], wrap: prop, align: center,
+           text: "the same kind of small hanging wooden shop sign board as in Image 4, showing a simple tall pointed white crystal with pale blue facets and a little sparkle; no letters."}
+        - {name: gate_arch_2, fill: true, fill_ratio: 1.0, source: [0, 563, 405, 968], at: [0, 2], tiles: [2, 2], wrap: prop,
+           parts: [[gate_arch_2_0_0, gate_arch_2_0_1], [gate_arch_2_1_0, gate_arch_2_1_1]],
+           text: "a smaller version of the same gatehouse arch (a postern gate), filling the whole box edge to edge: the top half is the same pale grey flagstone wall walkway running across the full width, the bottom half the same grey stone wall face with one round-topped arch framed by light voussoir stones. The opening is about half the box wide and rises from the bottom edge to just under the walkway; inside it leave EMPTY flat magenta (#FF00FF) right down to the bottom edge. No doors, no towers."}
+        - {name: gate_side, skip: true, fill: true, at: [2, 2], tiles: [2, 2], wrap: prop,
+           parts: [[gate_side_0_0, gate_side_0_1], [gate_side_1_0, gate_side_1_1]],
+           text: "where a town wall running from the top of the map to the bottom crosses over a road, seen from above at a three-quarter angle, filling the whole box edge to edge: the pale grey flagstone walkway on top of the wall (the same slabs as Image 3) runs from the top edge to the bottom edge as a thick stone lintel bridging the road, with a low stone parapet along its left and right edges and the light carved voussoir stones of an arch showing along its left and right sides; along the bottom edge a thin strip of the same grey wall face with a dark shadow under it. No doors, no towers, nothing outside the stonework."}
+
 - id: interior
   kind: kit
   sheets:
