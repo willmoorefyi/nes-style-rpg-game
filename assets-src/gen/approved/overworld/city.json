@@ -54,5 +54,385 @@
       "not_tiny": true
     }
   },
-  "note": "Cornelia rebuild: one walled-city icon (4x4) with gates S, W, E and the castle N"
+  "note": "Cornelia rebuild: one walled-city icon (4x4) with gates S, W, E and the castle N",
+  "paint": [
+    {
+      "note": "W gate: the south arch copied onto the west flank turret (warp cell (0,2) of the 5x4 grid)",
+      "from": [
+        88,
+        173,
+        16,
+        18
+      ],
+      "to": [
+        5,
+        116
+      ]
+    },
+    {
+      "note": "E gate: the south arch on the east flank turret (warp cell (4,2))",
+      "from": [
+        88,
+        173,
+        16,
+        18
+      ],
+      "to": [
+        171,
+        116
+      ],
+      "flip": "h"
+    },
+    {
+      "note": "fill the old west notch beside the south arch with the wall face to its right",
+      "from": [
+        41,
+        156,
+        9,
+        22
+      ],
+      "to": [
+        31,
+        156
+      ]
+    },
+    {
+      "note": "fill the old east notch with the wall face to its left",
+      "from": [
+        140,
+        156,
+        12,
+        22
+      ],
+      "to": [
+        152,
+        156
+      ]
+    },
+    {
+      "note": "N gate: a postern arch (the castle door) on the keep (warp cell (2,0))",
+      "from": [
+        89,
+        83,
+        14,
+        13
+      ],
+      "to": [
+        89,
+        34
+      ]
+    },
+    {
+      "note": "SW: a culvert arch in the south-west wall where the stream leaves (over cell (1,3))",
+      "from": [
+        88,
+        173,
+        16,
+        18
+      ],
+      "to": [
+        44,
+        163
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        48,
+        167
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        48,
+        172
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        48,
+        176
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        50,
+        167
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        50,
+        172
+      ]
+    },
+    {
+      "note": "water in the culvert arch",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        50,
+        176
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        71,
+        151
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        68,
+        153
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        65,
+        155
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        62,
+        157
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        59,
+        159
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        56,
+        161
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        53,
+        163
+      ]
+    },
+    {
+      "note": "the stream over the south-west wall walk to the culvert",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        50,
+        164
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        150,
+        82
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        153,
+        80
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        156,
+        78
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        159,
+        76
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        162,
+        74
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        165,
+        72
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        168,
+        70
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        171,
+        68
+      ]
+    },
+    {
+      "note": "the stream through a gap in the north-east wall from the moat pond",
+      "from": [
+        106,
+        128,
+        6,
+        6
+      ],
+      "to": [
+        173,
+        66
+      ]
+    }
+  ]
 }

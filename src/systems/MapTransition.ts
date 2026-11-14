@@ -18,13 +18,36 @@ export function arrivalFor(t: TransitionData, target: MapData): { x: number; y: 
   return { x: t.targetX, y: t.targetY };
 }
 
-/** A restored position that is blocked in this map (e.g. a save from the other map variant) moves to the map's first
- *  entrance; maps without entrances keep the position. */
+/** True when `to` can be reached on foot from `from` (4-connected, walking). */
+function reachableOnFoot(map: MapData, col: CollisionMap, from: [number, number], to: { x: number; y: number }): boolean {
+  const key = (x: number, y: number) => y * map.width + x;
+  const seen = new Set([key(from[0], from[1])]);
+  const queue: Array<[number, number]> = [from];
+  for (let i = 0; i < queue.length; i++) {
+    const [x, y] = queue[i];
+    if (x === to.x && y === to.y) return true;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height || seen.has(key(nx, ny))) continue;
+      if (!col.isWalkable(nx, ny, walking)) continue;
+      seen.add(key(nx, ny));
+      queue.push([nx, ny]);
+    }
+  }
+  return false;
+}
+
+/** A restored position that is blocked in this map, or cut off from the map's first entrance (e.g. a save from the
+ *  other map variant, or from before the map was redrawn), moves to that first entrance; maps without entrances keep
+ *  the position. */
 export function safeSpawn(map: MapData, pos: { x: number; y: number }): { x: number; y: number } {
-  if (new CollisionMap(map).isWalkable(pos.x, pos.y, walking)) return pos;
+  const col = new CollisionMap(map);
   const first = map.entrances && Object.values(map.entrances)[0];
+  const walkable = col.isWalkable(pos.x, pos.y, walking);
   if (!first) return pos;
-  console.warn(`spawn (${pos.x}, ${pos.y}) is blocked in ${map.id}; using its first entrance`);
+  if (walkable && reachableOnFoot(map, col, first, pos)) return pos;
+  console.warn(`spawn (${pos.x}, ${pos.y}) is ${walkable ? 'cut off from the first entrance' : 'blocked'} in ${map.id}; `
+    + 'using its first entrance');
   return { x: first[0], y: first[1] };
 }
 
