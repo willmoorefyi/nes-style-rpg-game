@@ -2,6 +2,7 @@
 
   python3 -I assets-src/tools/stage_backgrounds.py [--src DIR] [ID ...]   # default: every id; DIR defaults to
                                                                           # ~/temp/ffgame-assets/tiles/backgrounds/hd
+  python3 -I assets-src/tools/stage_backgrounds.py --check [ID ...]      # water share under the actors' feet
 
 Each source (1536x1024) is scaled to the 1920 px screen width and shifted so its horizon (where the scenery meets the
 battle plain, measured by eye in source pixels) lands at screen y HORIZON_Y. The result is a screen-ready 1920x1080
@@ -9,6 +10,12 @@ image written to assets/backgrounds/<game id>.webp; the game draws it at (0, 0) 
 This is not a build stage: rerun it only when a source image or a horizon changes, and name the ids you changed, so
 the other images are not re-encoded. Only the ids a map's `battleBackgrounds` or a debug scenario uses are committed
 (tests/data/assetCoverage.test.ts checks those); the rest stay staged locally until their act is built.
+
+An id in COMPOSITES is then patched with a second copy of its own source (B14): `shoreline` has land only in its
+right ~37 %, so the enemies stood on open sea. The source is mirrored, zoomed and pasted through a feathered mask
+over the enemy side, which turns the beach into a rocky cove (rock under the enemies, sea and mountains behind; the
+party's rocks are unchanged). `--check` measures the committed image: the share of water pixels (b > r + 40 and
+b > g + 10) in the enemy and party feet bands must stay within CHECKS.
 """
 from __future__ import annotations
 
@@ -16,7 +23,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "assets" / "backgrounds"
@@ -67,6 +74,56 @@ STAGES = {
 }
 
 
+# B14 (decision R-5): id -> the free mirrored composite. zoom is over the screen-width scale, y the paste row, the mask
+# covers x <= mask_x1 and y >= mask_y0 (starting at 380, not 330, removes the ghosting of the far shore), feathered.
+# The plan's prototype (zoom 1.6, y -560) measured 15 % water with its y 330 mask but 20 % with the 380 one; zoom 1.8
+# at y -600 brings the 380 mask to 13.7 % (the channel).
+COMPOSITES = {
+    "shoreline": {"zoom": 1.8, "y": -600, "mask_x1": 1250, "mask_y0": 380, "feather": 50},
+}
+
+# --check: the feet bands (screen px, x0 y0 x1 y1) and the largest water share allowed in each
+ENEMY_BAND = (80, 360, 1340, 770)
+PARTY_BAND = (1380, 360, 1675, 770)
+CHECKS = {"shoreline": {"enemy": 0.15, "party": 0.10}}
+
+
+def composite(base: Image.Image, src: Path, zoom: float, y: int, mask_x1: int, mask_y0: int, feather: int) -> Image.Image:
+    """`base` with the mirrored, zoomed source pasted at (0, y) through a feathered mask over x <= mask_x1, y >= mask_y0."""
+    im = Image.open(src).convert("RGB").transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    scale = SCREEN[0] / im.width * zoom
+    big = im.resize((round(im.width * scale), round(im.height * scale)), Image.Resampling.LANCZOS)
+    layer = Image.new("RGB", SCREEN)
+    layer.paste(big, (0, y))
+    mask = Image.new("L", SCREEN, 0)
+    ImageDraw.Draw(mask).rectangle([0, mask_y0, mask_x1, SCREEN[1]], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(feather))
+    return Image.composite(layer, base, mask)
+
+
+def water_share(img: Image.Image, box: tuple[int, int, int, int]) -> float:
+    """The share of `box` that reads as water: blue well above red and above green."""
+    px = list(img.convert("RGB").crop(box).getdata())
+    return sum(1 for r, g, b in px if b > r + 40 and b > g + 10) / max(1, len(px))
+
+
+def check(ids: list[str]) -> None:
+    failed = []
+    for gid in ids:
+        if gid not in CHECKS:
+            raise SystemExit(f"--check: no bounds for {gid} (known: {', '.join(CHECKS)})")
+        img = Image.open(OUT / f"{gid}.webp")
+        enemy, party = water_share(img, ENEMY_BAND), water_share(img, PARTY_BAND)
+        lim = CHECKS[gid]
+        ok = enemy <= lim["enemy"] and party <= lim["party"]
+        print(f"{gid:16s} water: enemy band {enemy:.1%} (<= {lim['enemy']:.0%}), party band {party:.1%} "
+              f"(<= {lim['party']:.0%}) {'ok' if ok else 'FAIL'}")
+        if not ok:
+            failed.append(gid)
+    if failed:
+        raise SystemExit(f"--check failed: {', '.join(failed)}")
+
+
 def stage(src: Path, horizon: int, zoom: float = 1.0, align: str = "center", horizon_y: int = HORIZON_Y) -> Image.Image:
     im = Image.open(src).convert("RGB")
     scale = SCREEN[0] / im.width * zoom
@@ -87,15 +144,21 @@ def main(argv: list[str]) -> None:
     ap = argparse.ArgumentParser(description="Stage hand-made battle backgrounds (see the module docstring).")
     ap.add_argument("ids", nargs="*", help="background ids to (re)stage; default: all of STAGES")
     ap.add_argument("--src", default=DEFAULT_SRC, help="directory with the *-hd.png sources")
+    ap.add_argument("--check", action="store_true", help="measure the committed images' water share instead of staging")
     args = ap.parse_args(argv[1:])
     unknown = [i for i in args.ids if i not in STAGES]
     if unknown:
         raise SystemExit(f"unknown background id(s): {', '.join(unknown)} (known: {', '.join(STAGES)})")
+    if args.check:
+        check(args.ids or list(CHECKS))
+        return
     src_dir = Path(args.src).expanduser()
     OUT.mkdir(parents=True, exist_ok=True)
     for gid in args.ids or list(STAGES):
         name, horizon, *frame = STAGES[gid]
         img = stage(src_dir / name, horizon, *frame)
+        if gid in COMPOSITES:
+            img = composite(img, src_dir / name, **COMPOSITES[gid])
         path = OUT / f"{gid}.webp"
         img.save(path, "WEBP", quality=90, method=6)
         print(f"{gid:16s} <- {name:26s} horizon {horizon:3d} -> {path.relative_to(ROOT)} ({path.stat().st_size // 1024} KB)")

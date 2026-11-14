@@ -85,11 +85,13 @@ describe('SpellExecutor — WP2 new spell effects', () => {
 
   describe('cure_silence (AMUT)', () => {
     it('removes silence status from target', () => {
+      // B8: a silenced caster cannot cast, so another member cures the silenced one
       const mage = createMage('Mage', 4);
-      mage.statusTracker.apply('silence');
-      expect(mage.statusTracker.has('silence')).toBe(true);
-      const battle = castSpell([mage], [goblin], amutSpell, 'party_0', 'party_0', [amutSpell]);
-      expect(mage.statusTracker.has('silence')).toBe(false);
+      const mute = createMage('Mute', 4);
+      mute.statusTracker.apply('silence');
+      expect(mute.statusTracker.has('silence')).toBe(true);
+      const battle = castSpell([mage, mute], [goblin], amutSpell, 'party_0', 'party_1', [amutSpell]);
+      expect(mute.statusTracker.has('silence')).toBe(false);
       expect(battle.currentMessages.some(m => m.text.includes('can speak again'))).toBe(true);
     });
 
@@ -286,6 +288,52 @@ describe('BA-3: a single-target spell at an enemy that already died retargets', 
     executor.execute({ type: 'magic', actorId: 'party_0', targetId: 'enemy_0', spellId: 'fire' }, false);
     expect(said).toEqual([]);
     expect(mage.getSpellCharges(1)).toBe(charges);
+  });
+});
+
+describe('B4: heal and buff lines report what happened', () => {
+  const cure: SpellData = { id: 'cure', name: 'CURE', level: 1, type: 'white', effect: 'heal', targeting: 'single_ally', description: '', power: 16, element: 'none' };
+  const fog: SpellData = { id: 'fog', name: 'FOG', level: 1, type: 'white', effect: 'buff_defense', targeting: 'single_ally', description: '', power: 8, element: 'none' };
+
+  function cast(spell: SpellData, setup: (target: Character) => void) {
+    const mage = new Character({ name: 'WMAG', classData: testMageClass() });
+    const target = new Character({ name: 'FGHTR', classData: testMageClass() });
+    setup(target);
+    const said: string[] = [];
+    const events: { damage: number; isHeal: boolean }[] = [];
+    const executor = new SpellExecutor({
+      party: [mage, target], enemies: [], rng: () => 0.99, addMessage: (t) => said.push(t),
+      livingParty: () => [mage, target].filter(c => c.currentHp > 0), livingEnemies: () => [],
+      partyById: new Map([['party_0', mage], ['party_1', target]]), addDamageEvent: (e) => events.push(e),
+    }, [spell]);
+    const charges = mage.getSpellCharges(1);
+    executor.execute({ type: 'magic', actorId: 'party_0', targetId: 'party_1', spellId: spell.id }, false);
+    return { said, events, spent: charges - mage.getSpellCharges(1), target };
+  }
+
+  it('CURE on a member 2 below max says "recovers 2 HP!" and its event is 2 (the old line reported the roll, 16-32)', () => {
+    const { said, events } = cast(cure, t => { t.currentHp = t.maxHp - 2; });
+    expect(said).toEqual(['WMAG casts CURE!', 'FGHTR recovers 2 HP!']);
+    expect(events.map(e => e.damage)).toEqual([2]);
+  });
+
+  it('CURE on a member at full HP says the HP is full and shows no number', () => {
+    const { said, events } = cast(cure, () => {});
+    expect(said[1]).toBe("FGHTR's HP is full!");
+    expect(events).toEqual([]);
+  });
+
+  it('FOG on an ally at 0 HP spends no charge and says "has fallen" (the old code spent it silently)', () => {
+    const { said, spent, target } = cast(fog, t => { t.currentHp = 0; });
+    expect(said).toEqual(['FGHTR has fallen. No effect!']);
+    expect(spent).toBe(0);
+    expect(target.getBuffAmount('defense')).toBe(0);
+  });
+
+  it('CURE on an ally at 0 HP spends no charge either', () => {
+    const { said, spent } = cast(cure, t => { t.currentHp = 0; });
+    expect(said).toEqual(['FGHTR has fallen. No effect!']);
+    expect(spent).toBe(0);
   });
 });
 

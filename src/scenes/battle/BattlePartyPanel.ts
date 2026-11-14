@@ -9,6 +9,9 @@ const COL = { cursor: 0, name: 44, hp: 220, bar: 420, status: 800 } as const;
 const BAR = { width: 340, height: 16 } as const;
 const HIGHLIGHT = 0xffff88;
 const DEAD = 0x888888;
+/** B10: while a target is being chosen the target row's cursor is yellow and blinks; the actor's name keeps a blue tint. */
+const TARGET_CURSOR = 0xffff00;
+const ACTOR_WHILE_TARGETING = 0x88ccff;
 /** Short tags for the status column. */
 const STATUS_TAGS: Record<string, string> = {
   poison: 'PSN', stun: 'STUN', sleep: 'SLP', blind: 'BLND', silence: 'MUTE', death: 'KO', stone: 'STON', fear: 'FEAR',
@@ -29,8 +32,9 @@ function hpColor(ratio: number): number {
 
 /**
  * BA-8: the compact party HP panel in the bottom strip (x 900-1920). One row per member: a cursor, the name,
- * HP `cur/max` with a bar, and a status tag, at 32 px. The acting member's row (or the hovered party target) is
- * highlighted with the cursor.
+ * HP `cur/max` with a bar, and a status tag, at 32 px. The acting member's row is highlighted with the cursor; while a
+ * party target is being chosen (B10) only the target row has a cursor (yellow, blinking) and the actor's row keeps a
+ * blue name tint, so the two never look alike.
  */
 export class BattlePartyPanel {
   readonly window: Window;
@@ -94,18 +98,27 @@ export class BattlePartyPanel {
     this.applyHighlight();
   }
 
+  /** B10: the blink of the target row's cursor (on / off), driven by the targeting's flash timer. */
+  blinkTarget(on: boolean): void {
+    const row = this.rows[this.targeted];
+    if (row) row.cursor.visible = on;
+  }
+
   get activeIndex(): number { return this.active; }
   get targetIndex(): number { return this.targeted; }
 
   private applyHighlight(): void {
+    const targeting = this.targeted >= 0;
     this.party.forEach((c, i) => {
       const row = this.rows[i];
       if (!row) return;
-      const lit = i === this.active || i === this.targeted;
+      const lit = targeting ? i === this.targeted : i === this.active;
       row.cursor.visible = lit;
-      const tint = c.currentHp <= 0 ? DEAD : lit ? HIGHLIGHT : 0xffffff;
+      row.cursor.tint = targeting ? TARGET_CURSOR : 0xffffff;
+      const actorTint = targeting && i === this.active && !lit ? ACTOR_WHILE_TARGETING : null;
+      const tint = c.currentHp <= 0 ? DEAD : lit ? HIGHLIGHT : actorTint ?? 0xffffff;
       row.name.tint = tint;
-      row.hp.tint = tint;
+      row.hp.tint = c.currentHp <= 0 ? DEAD : lit ? HIGHLIGHT : 0xffffff;
     });
   }
 }

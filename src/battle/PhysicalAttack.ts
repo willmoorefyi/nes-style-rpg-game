@@ -12,8 +12,10 @@ const FAMILY_BONUS = 1.5;
 /** A party member's Fight against an enemy (FF1 formulas through `CombatStats`). */
 export function resolvePartyAttack(actor: Character, target: EnemyInstance, rng: () => number): PhysicalResult {
   const result = physicalAttack(
-    { attack: partyAttack(actor), hitPercent: partyHitPercent(actor), hits: partyHits(actor), crit: partyCrit(actor) },
-    { evade: enemyEvade(target), absorb: enemyAbsorb(target), helpless: target.status.isHelpless() },
+    { attack: partyAttack(actor), hitPercent: partyHitPercent(actor), hits: partyHits(actor), crit: partyCrit(actor),
+      blind: actor.statusTracker.has('blind') },
+    { evade: enemyEvade(target), absorb: enemyAbsorb(target), helpless: target.status.isHelpless(),
+      blind: target.status.has('blind') },
     rng,
   );
   const weapon = actor.getEquipped('weapon');
@@ -29,10 +31,12 @@ export function resolveEnemyAttack(enemy: EnemyInstance, target: Character, rng:
     {
       attack: enemyAttack(enemy),
       hitPercent: enemyAccuracy(enemy.data),
-      hits: enemyHits(enemy.data),
+      hits: enemyHits(enemy),
       crit: enemyCrit(enemy.data),
+      blind: enemy.status.has('blind'),
     },
-    { evade: partyEvade(target), absorb: partyAbsorb(target), helpless: target.statusTracker.isHelpless() },
+    { evade: partyEvade(target), absorb: partyAbsorb(target), helpless: target.statusTracker.isHelpless(),
+      blind: target.statusTracker.has('blind') },
     rng,
   );
 }

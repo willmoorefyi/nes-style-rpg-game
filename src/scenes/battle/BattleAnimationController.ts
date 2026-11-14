@@ -1,11 +1,10 @@
-import { Container, BitmapText } from 'pixi.js';
+import { Container, type BitmapText } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
-import type { BattleStateMachine, DamageEvent, NextActionInfo } from '../../battle/BattleStateMachine.js';
+import type { GameEvents } from '../../core/EventBus.js';
+import type { ActionResult, BattleStateMachine, DamageEvent, NextActionInfo } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
-import { NES_FONT } from '../../ui/NESFont.js';
-import { FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
-import { formatConciseResult, capitalize, fitToWidth } from './battleMessageUtils.js';
+import { TurnList } from './TurnList.js';
 import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
   type AttackStyle, attackReach, MIN_ATTACK_REACH } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
@@ -42,21 +41,25 @@ export class BattleAnimationController {
   get dyingEnemies(): Map<number, number> { return this.effects.dyingEnemies; }
   /** Index of the acting enemy (preview pose art), or -1. */
   private animEnemyIndex = -1;
-  // K4: Turn list in commandWindow during execution
-  turnListTexts: BitmapText[] = [];
-  turnActionIndex = 0;
+  /** K4 / B12: the round's actions in the command window during execution. */
+  readonly turnList: TurnList;
+  get turnListTexts(): BitmapText[] { return this.turnList.texts; }
   private currentActionInfo: NextActionInfo | null = null;
+  private announcement = '';
   constructor(
     mainContainer: Container,
     private readonly battle: BattleStateMachine,
     private readonly display: BattleDisplayManager,
     private readonly input: InputManager,
-    private readonly commandWindow: Window,
-    private readonly turnListContainer: Container,
+    commandWindow: Window,
+    turnListContainer: Container,
     private readonly setMessageText: (text: string) => void,
     private readonly onResolveRound: () => void,
+    /** I3: battle sound events (battleHit, battleMiss, spellCast), raised on the contact frame. */
+    private readonly emit: (event: 'battleHit' | 'battleMiss' | 'spellCast', data: GameEvents['battleHit']) => void = () => {},
   ) {
     this.effects = new BattleEffects(mainContainer, () => display.enemySprites);
+    this.turnList = new TurnList(turnListContainer, commandWindow);
   }
   /** The actor's sprite by battle id (party_i / enemy_i), so equal names never share a sprite. */
   findActorSprite(actorId: string): { sprite: Container; isEnemy: boolean } | null {
@@ -70,19 +73,10 @@ export class BattleAnimationController {
     switch (info.actionType) {
       case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
       case 'magic': return `${info.actorName} casts ${info.spellName ?? 'spell'}!`;
-      case 'item': return `${info.actorName} uses item!`;
+      case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
       case 'run': return `${info.actorName} tries to run!`;
       default: return `${info.actorName} acts!`;
     }
-  }
-  /** A turn-list line cut to the command window's content width, so it never runs into the party panel. */
-  private fitTurnLine(text: string): string {
-    return fitToWidth(text, this.commandWindow.contentWidth, FONT_SIZE_SM);
-  }
-  /** Scroll turn list container so latest entry is visible within command window. */
-  private scrollTurnList(): void {
-    const overflow = this.turnListTexts.length - Math.floor(this.commandWindow.contentHeight / (FONT_SIZE_SM + 8));
-    if (overflow > 0) this.turnListContainer.y = -overflow * (FONT_SIZE_SM + 8);
   }
   updateAnimating(dt: number): void {
     const confirmSkip = this.input.isJustPressed('confirm');
@@ -93,20 +87,14 @@ export class BattleAnimationController {
           if (!info) { this.onResolveRound(); return; }
           if (!this.battle.isNextActorAlive()) { this.battle.executeNextAction(); return; }
           this.currentActionInfo = info;
-          this.setMessageText(this.formatAnnouncement(info));
-          // K4: Add entry to turn list
-          const entry = new BitmapText({
-            text: this.fitTurnLine(`${info.actorName}: ${info.actionType}`),
-            style: { fontFamily: NES_FONT, fontSize: FONT_SIZE_SM, fill: 0xffffff },
-          });
-          entry.position.set(this.commandWindow.contentX, this.commandWindow.contentY + this.turnListTexts.length * (FONT_SIZE_SM + 8));
-          this.turnListContainer.addChild(entry);
-          this.turnListTexts.push(entry);
-          this.scrollTurnList();
+          this.announcement = this.formatAnnouncement(info);
+          this.setMessageText(this.announcement);
+          this.turnList.add(info);
           const found = this.findActorSprite(info.actorId);
           this.animActorSprite = found?.sprite ?? null;
           this.animActorIsEnemy = found?.isEnemy ?? false;
-          this.targetSprite = this.findTargetSprite(info);
+          // B2/B6/B11: the target sprite by its battle id (the state machine has already resolved a retarget)
+          this.targetSprite = info.targetId ? this.findActorSprite(info.targetId)?.sprite ?? null : null;
           if (this.animActorSprite) {
             this.animActorOrigX = this.animActorSprite.x;
             this.animActorOrigY = this.animActorSprite.y;
@@ -195,38 +183,26 @@ export class BattleAnimationController {
     this.spawnFloatingTextsFromEvents(result.damageEvents);
     if (result.missed && this.targetSprite) this.effects.addFloating('Miss', 'miss', this.targetSprite);
     if (!this.animActorIsEnemy && info?.actionType === 'fight') this.slashTargets(result.damageEvents);
+    if (info) this.emitSounds(info, result);
     this.display.updatePartyDisplay();
     this.display.updateEnemySprites(this.dyingEnemies);
     this.display.updatePartySprites();
-    this.animMessages = result.messages;
+    // B3: the announcement already said "X casts FIRE!"; the same line is not shown twice
+    this.animMessages = result.messages.filter(m => m.text !== this.announcement);
     this.animMessageIndex = 0; this.animTimer = 0;
-    if (result.messages.length > 0) this.setMessageText(result.messages[0].text);
-    // Update turn list entry in-place with concise result
-    const entry = this.turnListTexts[this.turnActionIndex];
-    if (entry && info) {
-      const { actorName, actionType, spellName } = info;
-      const label = actionType === 'magic' && spellName ? spellName.toUpperCase() : capitalize(actionType);
-      const concise = formatConciseResult(result.messages, actorName);
-      entry.text = this.fitTurnLine(concise.startsWith('→') ? `${actorName}: ${label} ${concise}` : `${actorName}: ${concise}`);
-      this.scrollTurnList();
-    }
+    if (this.animMessages.length > 0) this.setMessageText(this.animMessages[0].text);
+    if (info) this.turnList.complete(info, result.messages);
     this.animPhase = 'result';
   }
 
-  /** The sprite an action aims at, by the announced target name (a dead enemy target retargets to the first living one). */
-  private findTargetSprite(info: NextActionInfo): Container | null {
-    if (!info.targetName) return null;
-    if (info.actorId.startsWith('party_')) {
-      const enemies = this.battle.allEnemies;
-      let i = enemies.findIndex(e => e.displayName === info.targetName && e.currentHp > 0);
-      if (i < 0) i = enemies.findIndex(e => e.currentHp > 0);
-      return this.display.enemySprites[i] ?? null;
-    }
-    const i = (this.battle.allParty ?? []).findIndex(c => c.name === info.targetName);
-    return this.display.partySprites[i] ?? null;
+  /** I3: a damaging Fight sounds a hit, a miss a miss, and a spell that really went off its cast (not when picked). */
+  private emitSounds(info: NextActionInfo, result: ActionResult): void {
+    if (result.missed) this.emit('battleMiss', {});
+    else if (info.actionType === 'fight' && result.damageEvents.some(e => !e.isHeal && e.damage > 0)) this.emit('battleHit', {});
+    if (info.actionType === 'magic' && result.messages.some(m => m.text.startsWith(`${info.actorName} casts `))) this.emit('spellCast', {});
   }
 
-  /** BA-9: reach to the target sprite's right edge (its 2x bounds); the minimum when there is no target. */
+  /** BA-9 / B11: reach to the target sprite's right edge (its 2x cell, whose art sits 16-34 px inside); the minimum when there is no target. */
   private measureReach(homeX: number, target: Container | null): number {
     if (!target) return MIN_ATTACK_REACH;
     const b = target.getBounds();
@@ -267,9 +243,9 @@ export class BattleAnimationController {
   }
   /** K4: Gray out completed action and advance to next or end-of-round */
   private completeAction(): void {
-    const entry = this.turnListTexts[this.turnActionIndex]; if (entry) entry.tint = 0x888888;
+    this.turnList.advance();
     if (this.animActorSprite) this.display.setActorPose(this.animActorSprite, null);
-    this.turnActionIndex++; this.animTimer = 0; this.animActorSprite = null; this.animEnemyIndex = -1;
+    this.animTimer = 0; this.animActorSprite = null; this.animEnemyIndex = -1;
     const battleOver = this.battle.isOver || this.battle.livingEnemies.length === 0 || this.battle.livingParty.length === 0;
     if (battleOver) { this.battle.skipRemainingActions(); this.animPhase = 'round_end'; }
     else { this.animPhase = this.battle.actionQueueLength > 0 ? 'announce' : 'round_end'; }

@@ -246,6 +246,90 @@ describe('BattleScene: readability (BA-8)', () => {
   });
 });
 
+describe('BattleScene: R2 command menus (B5, B8, I3)', () => {
+  const potionData = [{ id: 'potion', name: 'Potion', type: 'consumable' as const, stats: { hp: 30 }, price: 60, usableBy: [] }];
+  const mageClass: CharacterClassData = { ...sturdy, id: 'black_mage', spellLevels: { white: 0, black: 8 } };
+  const fire = { id: 'fire', name: 'FIRE', level: 1, type: 'black' as const, effect: 'damage', targeting: 'single' as const,
+    description: '', power: 10, element: 'fire' };
+
+  beforeEach(async () => {
+    ItemRegistry.reset();
+    await ItemRegistry.init({ loadItems: async () => potionData } as Pick<DataLoader, 'loadItems'> as DataLoader);
+  });
+
+  /** Command menu -> Item (two downs), from the current member's turn. */
+  const openItems = (scene: BattleScene, input: MockInput) => {
+    tick(scene, input, 'down');
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm');
+  };
+
+  it('B5: with 1 Potion queued by member 0, member 1 gets "No items available."; after undo it is offered again', () => {
+    const input = createMockInput();
+    const inventory = new Inventory();
+    inventory.add('potion', 1);
+    const a = new Character({ name: 'FGHTR', classData: sturdy });
+    const b = new Character({ name: 'THIEF', classData: sturdy });
+    a.currentHp = 10;
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: [a, b], enemies: [harmless], inventory, rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    openItems(scene, input);
+    expect(scene.itemListIds).toEqual(['potion']);
+    tick(scene, input, 'confirm'); // Potion
+    expect(scene.uiPhase).toBe('target');
+    tick(scene, input, 'confirm'); // the cursor starts on the most hurt member: FGHTR
+    expect(scene.partyPanel.activeIndex).toBe(1); // THIEF's turn
+    for (let i = 0; i < COMMAND_CONFIRM_GUARD_FRAMES; i++) tick(scene, input);
+    openItems(scene, input);
+    expect(scene.uiPhase).toBe('notice');
+    expect(scene.messageLine).toBe('No items available.');
+    for (let i = 0; i < 40 && scene.uiPhase !== 'command'; i++) tick(scene, input);
+    tick(scene, input, 'cancel'); // back to FGHTR: the Potion is released
+    expect(scene.partyPanel.activeIndex).toBe(0);
+    for (let i = 0; i < COMMAND_CONFIRM_GUARD_FRAMES; i++) tick(scene, input);
+    openItems(scene, input);
+    expect(scene.uiPhase).toBe('item_ui');
+    expect(scene.itemListIds).toEqual(['potion']);
+  });
+
+  it('I3: picking FIRE emits no spellCast; executing it emits exactly one', () => {
+    const input = createMockInput();
+    const deps = createMockBattleSceneDeps(input);
+    const mage = new Character({ name: 'B.MAG', classData: mageClass });
+    mage.learnSpell('fire', 1);
+    mage.setSpellCharges(1, 2);
+    const scene = new BattleScene(deps, { party: [mage], enemies: [harmless], spells: [fire], rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    const casts = () => (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls.filter(c => c[0] === 'spellCast').length;
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm'); // Magic
+    expect(scene.uiPhase).toBe('spell_ui');
+    for (let i = 0; i < 6 && scene.uiPhase !== 'executing'; i++) tick(scene, input, 'confirm'); // level, FIRE, the goblin
+    expect(scene.uiPhase).toBe('executing');
+    expect(casts()).toBe(0);
+    for (let i = 0; i < 300 && scene.uiPhase === 'executing'; i++) tick(scene, input);
+    expect(casts()).toBe(1);
+  });
+
+  it("B8: a silenced member's Magic shows \"Silenced.\" and spends nothing", () => {
+    const input = createMockInput();
+    const mage = new Character({ name: 'B.MAG', classData: mageClass });
+    mage.learnSpell('fire', 1);
+    mage.setSpellCharges(1, 2);
+    mage.statusTracker.apply('silence');
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: [mage], enemies: [harmless], spells: [fire], rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm'); // Magic
+    expect(scene.uiPhase).toBe('notice');
+    expect(scene.messageLine).toBe('Silenced.');
+    expect(mage.getSpellCharges(1)).toBe(2);
+  });
+});
+
 function findDescendant<T extends Container>(root: Container, test: (c: Container) => c is T): T | null {
   for (const child of root.children) {
     if (test(child)) return child;

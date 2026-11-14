@@ -65,3 +65,17 @@ describe('formatConciseResult: FF1 multi-hit, status rolls and waking (T4a)', ()
   });
 });
 
+describe('formatConciseResult: present-tense item lines with and without "!" (B4, R0-12)', () => {
+  it('heals: "recovers N HP!" (battle), "recovers N HP" (field) and the old "recovered N HP"', () => {
+    expect(formatConciseResult(msgs('W.MAG recovers 24 HP!'), 'W.MAG')).toBe('→ 24 HP to W.MAG');
+    expect(formatConciseResult(msgs('W.MAG recovers 24 HP'), 'W.MAG')).toBe('→ 24 HP to W.MAG');
+    expect(formatConciseResult(msgs('W.MAG recovered 24 HP'), 'W.MAG')).toBe('→ 24 HP to W.MAG');
+  });
+
+  it('revives: "is revived!" (battle), "is revived" (field) and the old "was revived"', () => {
+    expect(formatConciseResult(msgs('FGHTR is revived!'), 'W.MAG')).toBe('→ Revived FGHTR');
+    expect(formatConciseResult(msgs('FGHTR is revived'), 'W.MAG')).toBe('→ Revived FGHTR');
+    expect(formatConciseResult(msgs('FGHTR was revived'), 'W.MAG')).toBe('→ Revived FGHTR');
+  });
+});
+

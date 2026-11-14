@@ -7,6 +7,8 @@ import { Container, Graphics } from 'pixi.js';
 import { BattleAnimationController } from '../../../src/scenes/battle/BattleAnimationController.js';
 import { ATTACK_STYLES, advanceFrames, attackReach, type AttackStyle } from '../../../src/scenes/battle/attackChoreography.js';
 import { FLOAT_FONT, FLOAT_COLORS } from '../../../src/scenes/battle/BattleSceneTypes.js';
+import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { PARTY_X } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { OutlinedText } from '../../../src/ui/NESFont.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
@@ -24,13 +26,17 @@ function box(x: number, y: number, w: number, h: number): Graphics {
   return g;
 }
 
-function setup(style: AttackStyle, messages: string[], events: DamageEvent[], enemyX = ENEMY_X, missed = false) {
+interface Peek { actorId: string; actorName: string; actionType: string; targetId?: string; targetName?: string }
+const HERO_FIGHTS_A: Peek = { actorId: 'party_0', actorName: 'Hero', actionType: 'fight', targetId: 'enemy_0', targetName: 'Goblin A' };
+
+function setup(style: AttackStyle, messages: string[], events: DamageEvent[], enemyX = ENEMY_X, missed = false, peek: Peek = HERO_FIGHTS_A) {
   const main = new Container();
   const hero = box(HOME_X, 300, 160, 160);
+  const hero2 = box(HOME_X + 45, 420, 160, 160);
   const goblins = [box(enemyX, 300, ENEMY_W, ENEMY_W), box(enemyX - 200, 300, ENEMY_W, ENEMY_W)];
-  main.addChild(hero, ...goblins);
+  main.addChild(hero, hero2, ...goblins);
   const display = {
-    enemySprites: goblins, partySprites: [hero], enemyView: null,
+    enemySprites: goblins, partySprites: [hero, hero2], enemyView: null,
     setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
     updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
@@ -38,12 +44,12 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
   let queued = 1;
   const battle = {
     allEnemies: enemies,
-    allParty: [{ name: 'Hero', currentHp: 30 }],
+    allParty: [{ name: 'Hero', currentHp: 30 }, { name: 'Hero', currentHp: 30 }],
     get livingEnemies() { return enemies.filter(e => e.currentHp > 0); },
     livingParty: [{}],
     isOver: false,
     get actionQueueLength() { return queued; },
-    peekNextAction: () => (queued > 0 ? { actorId: 'party_0', actorName: 'Hero', actionType: 'fight', targetName: 'Goblin A' } : null),
+    peekNextAction: () => (queued > 0 ? peek : null),
     isNextActorAlive: () => true,
     executeNextAction: () => { queued = 0; return { done: true, damageEvents: events, messages: messages.map(text => ({ text })), missed }; },
     skipRemainingActions: vi.fn(),
@@ -51,9 +57,11 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
   const input = { isJustPressed: () => false } as unknown as InputManager;
   const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
   const lines: string[] = [];
-  const ctrl = new BattleAnimationController(main, battle, display, input, win, new Container(), t => lines.push(t), vi.fn());
+  const sounds: string[] = [];
+  const ctrl = new BattleAnimationController(main, battle, display, input, win, new Container(), t => lines.push(t), vi.fn(),
+    e => sounds.push(e));
   ctrl.attackOverride = style;
-  return { ctrl, hero, main, lines };
+  return { ctrl, hero, hero2, goblins, display, main, lines, sounds };
 }
 
 /** The frame index (0-based) on which the advance reaches contact: 30 announce frames, then the advance. */
@@ -132,5 +140,102 @@ describe('BA-9: the result shows on contact, not during the swing', () => {
     expect(num.fontSize).toBeGreaterThanOrEqual(48);
     expect(FLOAT_FONT).toBeGreaterThanOrEqual(48);
     expect(num.shadows.length).toBeGreaterThan(0);
+  });
+});
+
+describe('B2 / B6: the target sprite comes from the target id, never the name', () => {
+  it('a peek with targetId enemy_1 puts the reach and the Miss on enemySprites[1] (the stale name says Goblin A)', () => {
+    const peek = { ...HERO_FIGHTS_A, targetId: 'enemy_1' };
+    const s = setup('lunge', ['Hero missed!'], [], ENEMY_X, true, peek);
+    runToContact(s, 'lunge');
+    expect(s.ctrl.attackReachPx).toBe(attackReach(HOME_X, ENEMY_X - 200 + ENEMY_W));
+    const miss = floats(s.main)[0];
+    expect(miss.text).toBe('Miss');
+    const b = s.goblins[1].getBounds();
+    expect(miss.x).toBeGreaterThanOrEqual(b.x - 1);
+    expect(miss.x).toBeLessThanOrEqual(b.x + b.width + 1);
+  });
+
+  it('two heroes named alike: a wolf missing party_1 shows the Miss over partySprites[1] (old: index 0)', () => {
+    const peek = { actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetId: 'party_1', targetName: 'Hero' };
+    const s = setup('lunge', ['Goblin A missed!'], [], ENEMY_X, true, peek);
+    for (let i = 0; i < 40; i++) s.ctrl.updateAnimating(1);
+    const miss = floats(s.main)[0];
+    expect(miss.text).toBe('Miss');
+    const b = s.hero2.getBounds();
+    expect(miss.x).toBeGreaterThanOrEqual(b.x - 1);
+    expect(miss.x).toBeLessThanOrEqual(b.x + b.width + 1);
+  });
+
+  it('a hit on party_1 flashes partySprites[1]', () => {
+    const peek = { actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetId: 'party_1', targetName: 'Hero' };
+    const s = setup('lunge', ['Goblin A hits Hero for 4!'], [{ targetId: 'party_1', damage: 4, isHeal: false, isCrit: false }], ENEMY_X, false, peek);
+    for (let i = 0; i < 40; i++) s.ctrl.updateAnimating(1);
+    expect(s.display.flashHurt).toHaveBeenCalledWith(1);
+  });
+});
+
+describe('I3: hit and miss sounds on the contact frame', () => {
+  it('a hit emits battleHit once, on contact', () => {
+    const s = setup('lunge', ['Hero hits Goblin A for 7!'], [{ targetId: 'enemy_0', damage: 7, isHeal: false, isCrit: false }]);
+    for (let i = 0; i < contactFrame('lunge'); i++) s.ctrl.updateAnimating(1);
+    expect(s.sounds).toEqual([]);
+    s.ctrl.updateAnimating(1);
+    for (let i = 0; i < 60; i++) s.ctrl.updateAnimating(1);
+    expect(s.sounds).toEqual(['battleHit']);
+  });
+
+  it('a miss emits battleMiss once', () => {
+    const s = setup('lunge', ['Hero missed!'], [], ENEMY_X, true);
+    for (let i = 0; i < 100; i++) s.ctrl.updateAnimating(1);
+    expect(s.sounds).toEqual(['battleMiss']);
+  });
+});
+
+describe('B11: the lunge reaches a back-column target on the real layout', () => {
+  // Opaque edges measured on the committed art (assets/sprites/*-ai.png, screen px inside the 2x cells): the goblin
+  // and Gr.Imp idle frames end 24 px inside their 160 px cell; a hero's attack pose starts at most 18 px into its cell.
+  const MONSTER_OPAQUE_RIGHT_INSET = 24;
+  const HERO_OPAQUE_LEFT_INSET = 18;
+
+  it('THIEF (slot 1) attacking the back-column Gr.Imp B ends with its art within 40 px of the target\'s art', () => {
+    const layout = computeEnemyLayoutAi([
+      { size: 'small', w: 160, h: 160 }, { size: 'small', w: 160, h: 160 }, // Gr.Imp A, B
+      { size: 'small', w: 160, h: 160 }, { size: 'small', w: 160, h: 160 }, // Goblin A, B
+    ]);
+    // the enemies' boxes in screen px; the leftmost column is the back row (furthest from the party). The target is
+    // the back column's middle enemy; a stale name that matches a front-column enemy must not move the reach there.
+    const minX = Math.min(...layout.map(b => b.x));
+    const back = layout.findIndex((b, i) => i > 0 && b.x === minX);
+    const front = layout.findIndex(b => b.x > minX);
+    expect(back).toBeGreaterThan(0);
+    expect(front).toBeGreaterThan(0);
+    const main = new Container();
+    const sprites = layout.map(b => box(b.x - b.w / 2, b.feetY - b.h, b.w, b.h));
+    const thief = box(PARTY_X[1], 400, 160, 160);
+    main.addChild(thief, ...sprites);
+    let queued = 1;
+    const display = {
+      enemySprites: sprites, partySprites: [box(PARTY_X[0], 300, 160, 160), thief], enemyView: null,
+      setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+    } as unknown as BattleDisplayManager;
+    const battle = {
+      allEnemies: layout.map((_, i) => ({ displayName: i === front ? 'Gr.Imp B' : `E${i}`, currentHp: 10 })), allParty: [], livingParty: [{}], isOver: false,
+      get livingEnemies() { return [{}]; },
+      get actionQueueLength() { return queued; },
+      peekNextAction: () => (queued > 0 ? { actorId: 'party_1', actorName: 'THIEF', actionType: 'fight', targetId: `enemy_${back}`, targetName: 'Gr.Imp B' } : null),
+      isNextActorAlive: () => true,
+      executeNextAction: () => { queued = 0; return { done: true, damageEvents: [], messages: [{ text: 'THIEF missed!' }], missed: true }; },
+      skipRemainingActions: vi.fn(),
+    } as unknown as BattleStateMachine;
+    const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 400, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
+    const ctrl = new BattleAnimationController(main, battle, display, { isJustPressed: () => false } as unknown as InputManager,
+      win, new Container(), () => {}, vi.fn());
+    ctrl.attackOverride = 'classic';
+    for (let i = 0; i < contactFrame('classic') + 1; i++) ctrl.updateAnimating(1);
+    const target = layout[back];
+    const targetArtRight = target.x + target.w / 2 - MONSTER_OPAQUE_RIGHT_INSET;
+    const thiefArtLeft = thief.x + HERO_OPAQUE_LEFT_INSET;
+    expect(Math.abs(thiefArtLeft - targetArtRight)).toBeLessThanOrEqual(40);
   });
 });

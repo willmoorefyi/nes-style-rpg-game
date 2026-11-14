@@ -5,19 +5,20 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { Container, Graphics, Sprite } from 'pixi.js';
-import { BattleFieldTargeting } from '../../../src/scenes/battle/BattleFieldTargeting.js';
+import { BattleFieldTargeting, mostHurtMemberId } from '../../../src/scenes/battle/BattleFieldTargeting.js';
+import type { Character } from '../../../src/entities/Character.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine } from '../../../src/battle/BattleStateMachine.js';
 import type { InputManager } from '../../../src/core/InputManager.js';
 import { createMockInput } from '../../helpers/testUtils.js';
 
-function setup() {
+function setup(party: Array<{ currentHp: number; maxHp?: number }> = [{ currentHp: 10 }]) {
   const main = new Container();
   const enemySprites = [new Sprite(), new Sprite()];
-  const partySprites = [new Sprite()];
+  const partySprites = party.map(() => new Sprite());
   const display = {
     enemySprites, partySprites, enemyListTexts: [],
-    partyPanel: { targetIndex: -1, setTarget: vi.fn(function (this: { targetIndex: number }, i: number) { this.targetIndex = i; }) },
+    partyPanel: { targetIndex: -1, setTarget: vi.fn(function (this: { targetIndex: number }, i: number) { this.targetIndex = i; }), blinkTarget: vi.fn() },
     listIndexFor: () => undefined,
     updateEnemyListDeadTints: vi.fn(),
   } as unknown as BattleDisplayManager;
@@ -25,11 +26,12 @@ function setup() {
   const battle = {
     allEnemies: enemies,
     get livingEnemies() { return enemies.filter(e => e.currentHp > 0); },
-    allParty: [{ currentHp: 10 }],
+    allParty: party,
   } as unknown as BattleStateMachine;
   const input = createMockInput();
-  const targeting = new BattleFieldTargeting(main, battle, display, input as unknown as InputManager);
-  return { main, input, targeting, display };
+  const sounds: string[] = [];
+  const targeting = new BattleFieldTargeting(main, battle, display, input as unknown as InputManager, e => sounds.push(e));
+  return { main, input, targeting, display, sounds };
 }
 
 const outlines = (c: Container) => c.children.filter(ch => ch instanceof Graphics).length;
@@ -85,5 +87,48 @@ describe('BattleFieldTargeting (BA-7)', () => {
     input.press('confirm');
     targeting.updateFieldTargeting();
     expect(display.partyPanel.targetIndex).toBe(-1);
+  });
+
+  it('B10: a Potion starts on the most hurt living member (35/35, 12/25, 25/25, 25/25 -> index 1; old: 0)', () => {
+    const party = [{ currentHp: 35, maxHp: 35 }, { currentHp: 12, maxHp: 25 }, { currentHp: 25, maxHp: 25 }, { currentHp: 25, maxHp: 25 }];
+    const { targeting } = setup(party);
+    const initial = mostHurtMemberId(party as unknown as Character[]);
+    expect(initial).toBe('party_1');
+    const onConfirm = vi.fn();
+    targeting.enterFieldTargeting(true, false, onConfirm, vi.fn(), initial);
+    expect(targeting.fieldTargetIndex).toBe(1);
+  });
+
+  it('B10: the most hurt member skips the fallen, and an unknown initial id starts at 0', () => {
+    expect(mostHurtMemberId([{ currentHp: 0, maxHp: 30 }, { currentHp: 20, maxHp: 30 }] as unknown as Character[])).toBe('party_1');
+    const { targeting } = setup([{ currentHp: 10 }, { currentHp: 10 }]);
+    targeting.enterFieldTargeting(true, false, vi.fn(), vi.fn(), 'party_9');
+    expect(targeting.fieldTargetIndex).toBe(0);
+  });
+
+  it('B10: the target arrow is yellow', () => {
+    const { main, targeting } = setup();
+    targeting.enterFieldTargeting(false, false, vi.fn(), vi.fn());
+    expect(targeting.targetArrow).not.toBeNull();
+    expect(main.children).toContain(targeting.targetArrow);
+    const fills = JSON.stringify(targeting.targetArrow!.context.instructions.map(i => (i.data as { style?: { color?: number } }).style?.color));
+    expect(fills).toContain(String(0xffff00));
+  });
+
+  it('I3: moving the cursor sounds cursorMove; confirm sounds cursorSelect; cancel sounds cursorCancel', () => {
+    const { input, targeting, sounds } = setup();
+    targeting.enterFieldTargeting(false, false, vi.fn(), vi.fn());
+    input.press('down');
+    targeting.updateFieldTargeting();
+    input.clear();
+    expect(sounds).toEqual(['cursorMove']);
+    input.press('confirm');
+    targeting.updateFieldTargeting();
+    input.clear();
+    expect(sounds).toEqual(['cursorMove', 'cursorSelect']);
+    targeting.enterFieldTargeting(false, false, vi.fn(), vi.fn());
+    input.press('cancel');
+    targeting.updateFieldTargeting();
+    expect(sounds).toEqual(['cursorMove', 'cursorSelect', 'cursorCancel']);
   });
 });

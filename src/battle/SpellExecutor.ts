@@ -1,7 +1,7 @@
 import type { Character } from '../entities/Character.js';
 import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellData } from '../types/index.js';
-import { retargetIfDead, type BattleCommand } from './BattleCommands.js';
+import type { BattleCommand } from './BattleCommands.js';
 import type { StatusEffect } from './StatusEffects.js';
 import { healAmount, magicDamage } from './DamageFormula.js';
 import { partyMagicDefense } from './CombatStats.js';
@@ -63,33 +63,37 @@ export class SpellExecutor {
       return;
     }
 
-    // BA-3: a party caster's single-target spell at an enemy that already died goes to a living enemy (as Fight
-    // does); with none left the spell isn't cast and no charge is spent.
-    let cmd = command;
-    if (!isEnemy && spell.targeting === 'single' && cmd.targetId?.startsWith('enemy_')) {
-      const living = this.deps.livingEnemies();
-      if (living.length === 0) return;
-      cmd = retargetIfDead(cmd, id => living.some(e => e.id === id), () => living.map(e => e.id), this.deps.rng);
-    }
+    // BA-3 / B2: the state machine has already moved a single-target spell at a dead enemy onto a living one; with
+    // none left the spell isn't cast and no charge is spent.
+    const cmd = command;
+    if (!isEnemy && spell.targeting === 'single' && cmd.targetId?.startsWith('enemy_')
+      && this.deps.livingEnemies().length === 0) return;
 
-    // Get caster
     const caster = isEnemy
       ? this.deps.enemies.find(e => e.id === cmd.actorId)
       : this.deps.partyById.get(cmd.actorId);
     if (!caster) return;
+    const casterName = isEnemy ? (caster as EnemyInstance).displayName : (caster as Character).name;
 
-    // For party members, check charges and silence
+    // B8: a silenced caster (either side) loses the turn and spends nothing
+    if ((isEnemy ? (caster as EnemyInstance).status : (caster as Character).statusTracker).has('silence')) {
+      this.deps.addMessage(`${casterName} is silenced!`);
+      return;
+    }
+    // B4: a single-ally spell (not a revive) at an ally who fell before it went off is not cast
+    const ally = spell.targeting === 'single_ally' && spell.effect !== 'revive' && cmd.targetId ? this.allyById(cmd.targetId, isEnemy) : null;
+    if (ally && ally.hp <= 0) {
+      this.deps.addMessage(`${ally.name} has fallen. No effect!`);
+      return;
+    }
     if (!isEnemy) {
       const char = caster as Character;
       if (!char.hasCharges(spell.level)) {
         this.deps.addMessage(`${char.name} has no charges!`);
         return;
       }
-      // Note: silence check would go here if we add StatusTracker to Character
       char.useCharge(spell.level);
     }
-
-    const casterName = isEnemy ? (caster as EnemyInstance).displayName : (caster as Character).name;
 
     this.deps.addMessage(`${casterName} casts ${spell.name}!`);
 
@@ -121,6 +125,19 @@ export class SpellExecutor {
     }
   }
 
+  /** An ally of the caster by battle id: its name and HP (null when the id is not on the caster's side). */
+  private allyById(id: string, isEnemy: boolean): { name: string; hp: number } | null {
+    const e = isEnemy ? this.deps.enemies.find(x => x.id === id) : undefined;
+    const c = isEnemy ? undefined : this.deps.partyById.get(id);
+    return e ? { name: e.displayName, hp: e.currentHp } : c ? { name: c.name, hp: c.currentHp } : null;
+  }
+
+  /** B4: the line and the float report the HP actually restored; a full-HP target says so (no float). */
+  private reportHeal(name: string, id: string | undefined, restored: number, element?: string): void {
+    this.deps.addMessage(restored > 0 ? `${name} recovers ${restored} HP!` : `${name}'s HP is full!`);
+    if (id && restored > 0) this.deps.addDamageEvent({ targetId: id, damage: restored, isHeal: true, isCrit: false, spellElement: element });
+  }
+
   private executeHealSpell(cmd: BattleCommand, spell: SpellData, isEnemy: boolean): void {
     const targets = spell.targeting === 'all_allies'
       ? (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty())
@@ -133,20 +150,19 @@ export class SpellExecutor {
       if ('currentHp' in target && 'data' in target) {
         // EnemyInstance
         const enemy = target as EnemyInstance;
+        const before = enemy.currentHp;
         enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
-        this.deps.addMessage(`${enemy.displayName} recovers ${heal} HP!`);
-        this.deps.addDamageEvent({ targetId: enemy.id, damage: heal, isHeal: true, isCrit: false, spellElement: spell.element });
+        this.reportHeal(enemy.displayName, enemy.id, enemy.currentHp - before, spell.element);
       } else {
         // Character — skip fallen allies
         const char = target as Character;
         if (char.currentHp <= 0) {
-          this.deps.addMessage(`${char.name} has no effect on the fallen!`);
+          this.deps.addMessage(`${char.name} has fallen. No effect!`);
           continue;
         }
-        const charId = this.getCharId(char);
-        char.currentHp = char.currentHp + heal;
-        this.deps.addMessage(`${char.name} recovers ${heal} HP!`);
-        if (charId) this.deps.addDamageEvent({ targetId: charId, damage: heal, isHeal: true, isCrit: false, spellElement: spell.element });
+        const before = char.currentHp;
+        char.currentHp = char.currentHp + heal; // the setter clamps at max HP
+        this.reportHeal(char.name, this.getCharId(char), char.currentHp - before, spell.element);
       }
     }
   }
@@ -233,28 +249,16 @@ export class SpellExecutor {
 
   private executeCureStatusSpell(cmd: BattleCommand, isEnemy: boolean, status: StatusEffect, successMsg: string): void {
     const targets = cmd.targetId
-      ? (isEnemy
-        ? this.deps.enemies.filter(e => e.id === cmd.targetId)
-        : this.partyFilter(cmd.targetId!))
+      ? (isEnemy ? this.deps.enemies.filter(e => e.id === cmd.targetId) : this.partyFilter(cmd.targetId!))
       : [];
-
     for (const target of targets) {
-      if ('data' in target) {
-        const enemy = target as EnemyInstance;
-        if (enemy.status.has(status)) {
-          enemy.status.remove(status);
-          this.deps.addMessage(`${enemy.displayName}'s ${successMsg}!`);
-        } else {
-          this.deps.addMessage('No effect.');
-        }
+      const tracker = 'data' in target ? target.status : target.statusTracker;
+      const name = 'data' in target ? target.displayName : target.name;
+      if (tracker.has(status)) {
+        tracker.remove(status);
+        this.deps.addMessage(`${name}'s ${successMsg}!`);
       } else {
-        const char = target as Character;
-        if (char.statusTracker.has(status)) {
-          char.statusTracker.remove(status);
-          this.deps.addMessage(`${char.name}'s ${successMsg}!`);
-        } else {
-          this.deps.addMessage('No effect.');
-        }
+        this.deps.addMessage('No effect.');
       }
     }
   }

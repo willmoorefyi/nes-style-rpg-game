@@ -8,6 +8,8 @@ const PHYSICAL_HIT_BASE = 168;
 const MAGIC_HIT_BASE = 148;
 /** Bonus to hit a sleeping or paralysed target. */
 const HELPLESS_BONUS = 40;
+/** FF1 blind (B8): a blind attacker loses 40 on the hit roll; a blind defender is hit 40 more easily. */
+const BLIND_PENALTY = 40;
 /** FF1: a spell's connect base rises by 40 against a weakness. */
 const WEAK_CONNECT_BONUS = 40;
 /** Spell accuracy when the data gives none (FF1's usual value). */
@@ -30,6 +32,8 @@ export interface PhysicalAttacker {
   hits: number;
   /** Critical chance out of 200. */
   crit: number;
+  /** Blind: −40 to hit (B8). */
+  blind?: boolean;
 }
 
 export interface PhysicalDefender {
@@ -38,6 +42,8 @@ export interface PhysicalDefender {
   absorb: number;
   /** Asleep or paralysed: +40 to hit. */
   helpless?: boolean;
+  /** Blind: +40 to hit it (B8). */
+  blind?: boolean;
 }
 
 export interface PhysicalResult {
@@ -57,7 +63,8 @@ export function physicalAttack(
   defender: PhysicalDefender,
   rng: () => number = Math.random,
 ): PhysicalResult {
-  const chance = PHYSICAL_HIT_BASE + attacker.hitPercent - defender.evade + (defender.helpless ? HELPLESS_BONUS : 0);
+  const chance = PHYSICAL_HIT_BASE + attacker.hitPercent - defender.evade + (defender.helpless ? HELPLESS_BONUS : 0)
+    - (attacker.blind ? BLIND_PENALTY : 0) + (defender.blind ? BLIND_PENALTY : 0);
   const a = Math.max(0, attacker.attack);
   let damage = 0;
   let hitsLanded = 0;

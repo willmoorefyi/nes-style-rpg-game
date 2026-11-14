@@ -1,7 +1,5 @@
 import { Container, Graphics, Sprite, Assets, type BitmapText, type Texture } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
-import type { Character } from '../entities/Character.js';
-import type { Inventory } from '../entities/Inventory.js';
 import { type BattleSceneDeps, type BattleSceneConfig, type UIState } from './battle/BattleSceneTypes.js';
 import { BattleDisplayManager } from './battle/BattleDisplayManager.js';
 import { BattleFieldTargeting } from './battle/BattleFieldTargeting.js';
@@ -11,10 +9,8 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { BossAI } from '../battle/BossAI.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
-import { createItemCommand } from '../battle/BattleCommands.js';
-import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
-import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
-import { ItemEffects } from '../systems/ItemEffects.js';
+import type { BattleCommand } from '../battle/BattleCommands.js';
+import { BattleListMenus } from './battle/BattleListMenus.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
@@ -39,10 +35,8 @@ export class BattleScene implements Scene {
   private commandWindow!: Window;
   private messageWindow!: Window;
   private commandMenu!: Menu;
-  private spellUI: SpellSelectionUI | null = null;
-  private itemUI: ItemSelectionUI | null = null;
+  private lists!: BattleListMenus;
   private spells: SpellData[] = [];
-  private inventory: Inventory | undefined;
   private messageText!: TextRenderer;
   private display!: BattleDisplayManager;
   private targeting!: BattleFieldTargeting;
@@ -64,13 +58,7 @@ export class BattleScene implements Scene {
     this.deps = deps;
     this.config = config;
     this.spells = config.spells ?? [];
-    this.inventory = config.inventory;
-    this.battle = new BattleStateMachine({
-      ...config,
-      spells: this.spells,
-      inventory: this.inventory,
-      canRun: config.canRun,
-    }, config.rng);
+    this.battle = new BattleStateMachine({ ...config, spells: this.spells, canRun: config.canRun }, config.rng);
     this.attachEnemyAi(config);
   }
 
@@ -112,13 +100,24 @@ export class BattleScene implements Scene {
     this.display.createEnemySprites();
     this.display.createPartySprites();
     this.display.updatePartyDisplay();
-    this.targeting = new BattleFieldTargeting(this.container, this.battle, this.display, this.deps.input);
+    const emit = (event: 'cursorMove' | 'cursorSelect' | 'cursorCancel' | 'battleHit' | 'battleMiss' | 'spellCast') => this.deps.events.emit(event, {});
+    this.targeting = new BattleFieldTargeting(this.container, this.battle, this.display, this.deps.input, emit);
     this.animation = new BattleAnimationController(
       this.container, this.battle, this.display, this.deps.input,
       this.commandWindow, this.turnListContainer,
       (text: string) => this.messageText.setText(text, true),
       () => this.resolveRound(),
+      emit,
     );
+    this.lists = new BattleListMenus({
+      battle: this.battle, config: this.config, spells: this.spells, events: this.deps.events, listWindow: this.enemyWindow,
+      showNotice: (text) => this.showNotice(text),
+      enterFieldTargeting: (isParty, revive, onConfirm, onCancel, initialId) => this.enterFieldTargeting(isParty, revive, onConfirm, onCancel, initialId),
+      submit: (command) => this.submitAndContinue(command),
+      setState: (state) => { this.uiState = state; },
+      openList: (list) => this.openListWindow(list),
+      closeList: (list) => this.closeListWindow(list),
+    });
     this.battle.startBattle();
     this.uiState = 'intro';
     this.showMessages();
@@ -196,15 +195,11 @@ export class BattleScene implements Scene {
         break;
 
       case 'spell_ui':
-        if (this.spellUI) {
-          this.spellUI.update(this.deps.input);
-        }
+        this.lists.updateSpells(this.deps.input);
         break;
 
       case 'item_ui':
-        if (this.itemUI) {
-          this.itemUI.update(this.deps.input);
-        }
+        this.lists.updateItems(this.deps.input);
         break;
 
       case 'executing':
@@ -288,10 +283,10 @@ export class BattleScene implements Scene {
       this.showTargetMenu();
     } else if (cmd === 'magic') {
       this.clearCommandIndicator();
-      this.showSpellUI(actor);
+      this.lists.showSpells(actor);
     } else if (cmd === 'item') {
       this.clearCommandIndicator();
-      this.showItemUI(actor);
+      this.lists.showItems();
     } else if (cmd === 'run') {
       this.battle.submitCommand({ type: 'run', actorId: this.battle.currentCommandActorId! });
       this.commandMenu.visible = false;
@@ -299,133 +294,10 @@ export class BattleScene implements Scene {
     }
   }
 
-  private showSpellUI(actor: Character): void {
-    const actorId = this.battle.currentCommandActorId!;
-    const enemies = this.battle.livingEnemies.map(e => ({ id: e.id, name: e.displayName }));
-    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}`, hp: c.currentHp }));
-    let hasSpells = false;
-    for (let lvl = 1; lvl <= 8; lvl++) {
-      if (actor.hasCharges(lvl) && actor.getSpellsAtLevel(lvl).length > 0) {
-        hasSpells = true;
-        break;
-      }
-    }
-
-    if (!hasSpells) {
-      this.showNotice('No spells available.');
-      return;
-    }
-
-    this.spellUI = new SpellSelectionUI({
-      character: actor,
-      actorId,
-      spells: this.spells,
-      enemies,
-      partyMembers,
-      contentX: this.enemyWindow.contentX,
-      contentY: this.enemyWindow.contentY,
-      eventBus: this.deps.events,
-      onSelect: (result) => {
-        this.deps.events.emit('spellCast', {});
-        this.battle.submitCommand({
-          type: 'magic',
-          actorId,
-          targetId: result.targetId,
-          spellId: result.spellId,
-        });
-        this.cleanupSpellUI();
-        this.startCommandPhase();
-      },
-      onCancel: () => {
-        this.cleanupSpellUI();
-        this.uiState = 'command';
-      },
-      onNeedTarget: (spellId, targetType) => {
-        const isParty = targetType === 'single_ally';
-        const spell = this.spells.find(s => s.id === spellId);
-        const revive = spell?.effect === 'revive';
-        this.enterFieldTargeting(isParty, revive, (targetId) => {
-          this.deps.events.emit('spellCast', {});
-          this.battle.submitCommand({
-            type: 'magic',
-            actorId,
-            targetId,
-            spellId,
-          });
-          this.cleanupSpellUI();
-          this.startCommandPhase();
-        }, () => {
-          // Return to spell UI
-          this.uiState = 'spell_ui';
-        });
-      },
-    });
-    this.openListWindow(this.spellUI);
-    this.uiState = 'spell_ui';
-  }
-
-  private cleanupSpellUI(): void {
-    if (this.spellUI) this.closeListWindow(this.spellUI);
-    this.spellUI = null;
-  }
-
-  private showItemUI(_actor: Character): void {
-    if (!this.inventory) {
-      this.showNotice('No items available.');
-      return;
-    }
-    const actorId = this.battle.currentCommandActorId!;
-    const partyMembers = this.config.party.map((c, i) => ({ name: c.name, id: `party_${i}` }));
-
-    this.itemUI = new ItemSelectionUI({
-      inventory: this.inventory,
-      partyMembers,
-      contentX: this.enemyWindow.contentX,
-      contentY: this.enemyWindow.contentY,
-      eventBus: this.deps.events,
-      // BA-4: Tent and Cabin are camp items; they are not listed in battle
-      isUsable: (id) => !ItemEffects.isPartyItem(id),
-      onSelect: (result) => {
-        this.battle.submitCommand(createItemCommand(actorId, result.targetName, result.itemId));
-        this.cleanupItemUI();
-        this.startCommandPhase();
-      },
-      onCancel: () => {
-        this.cleanupItemUI();
-        this.uiState = 'command';
-      },
-      onNeedTarget: (itemId) => {
-        // BA-5: a revive item (Phoenix Down) targets the fallen; with nobody fallen, say so instead of a silent cancel
-        if (ItemEffects.isReviveItem(itemId) && !this.config.party.some((c) => c.currentHp <= 0)) {
-          this.cleanupItemUI();
-          this.showNotice('No one to revive.');
-          return;
-        }
-        this.enterFieldTargeting(true, ItemEffects.isReviveItem(itemId), (targetId) => {
-          this.battle.submitCommand(createItemCommand(actorId, targetId, itemId));
-          this.cleanupItemUI();
-          this.startCommandPhase();
-        }, () => {
-          // Return to item UI
-          this.uiState = 'item_ui';
-        });
-      },
-    });
-
-    // Check if there are no consumables
-    if (this.itemUI.hasNoItems()) {
-      this.cleanupItemUI();
-      this.showNotice('No items available.');
-      return;
-    }
-
-    this.openListWindow(this.itemUI);
-    this.uiState = 'item_ui';
-  }
-
-  private cleanupItemUI(): void {
-    if (this.itemUI) this.closeListWindow(this.itemUI);
-    this.itemUI = null;
+  /** A command from the Magic or Item list: submit it and go on to the next member. */
+  private submitAndContinue(command: BattleCommand): void {
+    this.battle.submitCommand(command);
+    this.startCommandPhase();
   }
 
   /** BA-8: spell and item lists draw in the left window at full width, over the (hidden) enemy list. */
@@ -460,8 +332,12 @@ export class BattleScene implements Scene {
     this.targeting.clearTargetArrow();
   }
 
-  private enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void): void {
-    if (this.targeting.enterFieldTargeting(isParty, revive, onConfirm, onCancel)) {
+  /** B10: while a target is chosen the active hero's arrow hides, so only the yellow target arrow shows. */
+  private enterFieldTargeting(isParty: boolean, revive: boolean, onConfirm: (targetId: string) => void, onCancel: () => void,
+    initialId?: string): void {
+    const done = (f: () => void) => { this.activeHero.setArrowVisible(true); f(); };
+    this.activeHero.setArrowVisible(false);
+    if (this.targeting.enterFieldTargeting(isParty, revive, id => done(() => onConfirm(id)), () => done(onCancel), initialId)) {
       this.uiState = 'target';
     }
   }
@@ -470,10 +346,7 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = false;
     this.battle.prepareRound();
     // K4: Clear and show turn list
-    this.turnListContainer.removeChildren();
-    this.turnListContainer.y = 0;
-    this.animation.turnListTexts = [];
-    this.animation.turnActionIndex = 0;
+    this.animation.turnList.reset();
     this.turnListContainer.visible = true;
     // Clip turn list to command window content area
     if (!this.turnListContainer.mask) {
@@ -578,6 +451,8 @@ export class BattleScene implements Scene {
   get partySprites(): readonly Container[] { return this.display.partySprites; }
   get partyPanel(): BattleDisplayManager['partyPanel'] { return this.display.partyPanel; }
   get enemyListLines(): readonly string[] { return this.display.enemyListTexts.map(t => t.text); }
+  /** The item ids the open battle item list offers (B5). */
+  get itemListIds(): readonly string[] { return this.lists.listedItemIds; }
 
   onPause(): void {}
   onResume(): void {}
@@ -587,8 +462,6 @@ export class BattleScene implements Scene {
     this.endPrompt = null;
     this.activeHero.hide();
     this.container.removeChildren();
-    // Null out UI references for GC
-    this.spellUI = null;
-    this.itemUI = null;
+    this.lists?.closeAll();
   }
 }

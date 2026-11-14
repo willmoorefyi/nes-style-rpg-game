@@ -35,10 +35,17 @@ export function retargetIfDead(
   return { ...command, targetId: newTarget };
 }
 
+/** B9 (decision R-3): no runner escapes more than 3 times in 4 ... */
+export const RUN_CAP = 0.75;
+/** ... and every living enemy past the first takes 5 points off. */
+export const PACK_PENALTY = 0.05;
+
 /**
- * FF1 run: the runner escapes if rand(0 .. level + 15) < luck, so the chance is luck / (level + 16), at most 1.
- * A Lv1 Thief (luck 15) escapes 15/17 of the time.
+ * FF1 run: the runner escapes if rand(0 .. level + 15) < luck, so the base chance is luck / (level + 16). B9 caps it at
+ * RUN_CAP and takes PACK_PENALTY per living enemy past the first: a Thief escapes 75 % from one enemy and 65 % from
+ * three at any level (FF1's formula gave a Lv2 Thief 100 %).
  */
-export function calculateRunChance(luck: number, level: number): number {
-  return Math.max(0, Math.min(1, luck / (level + 16)));
+export function calculateRunChance(luck: number, level: number, livingEnemies = 1): number {
+  const base = Math.min(RUN_CAP, luck / (level + 16));
+  return Math.max(0, base - PACK_PENALTY * Math.max(0, livingEnemies - 1));
 }

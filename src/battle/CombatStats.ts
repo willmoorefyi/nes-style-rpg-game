@@ -110,8 +110,9 @@ export function enemyAbsorb(e: EnemyInstance): number {
   return e.data.stats.defense + (e.buffs.get('defense') ?? 0);
 }
 
-export function enemyHits(data: EnemyData): number {
-  return data.stats.hits ?? 1;
+/** The data's hits plus the battle-only `hits` buff (a boss phase, B1). */
+export function enemyHits(e: EnemyInstance): number {
+  return (e.data.stats.hits ?? 1) + (e.buffs.get('hits') ?? 0);
 }
 
 export function enemyCrit(data: EnemyData): number {

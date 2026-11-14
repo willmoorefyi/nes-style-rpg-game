@@ -83,13 +83,15 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
 });
 
 describe('T4d act-1 enemies (FF1 counterparts)', () => {
-  it('keeps Garland at FF1\'s stats: 106 HP, attack 15, one hit, no weakness (revision 1)', () => {
+  it('Garland is tougher than FF1 (B1): 240 HP, attack 16, two hits, no weakness; 3 hits at <= 25 % HP', () => {
     const g = enemy('garland');
-    expect(g.stats.hp).toBe(106);
-    expect(g.stats.attack).toBe(15);
-    expect(g.stats.hits ?? 1).toBe(1);
+    expect(g.stats.hp).toBe(240);
+    expect(g.stats.attack).toBe(16);
+    expect(g.stats.hits).toBe(2);
     expect(g.weakness).toBeUndefined();
     expect(g.xpReward).toBe(130);
+    expect(g.goldReward).toBe(250);
+    expect(g.bossPhases).toEqual([{ hpThreshold: 0.25, patternId: 'aggressive', message: "Garland's attacks grow fiercer!", hits: 3 }]);
   });
 
   it('maps the field enemies to IMP, GrIMP, WOLF, GrWOLF and BONE', () => {

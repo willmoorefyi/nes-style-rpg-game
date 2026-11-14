@@ -313,10 +313,10 @@ describe('BattleStateMachine: FF1 maths wiring (T4a)', () => {
     expect(party[2].currentHp).toBe(999);
   });
 
-  it('Run uses the runner’s luck and level: a Lv1 Thief escapes on 0.85, a Lv1 Warrior does not (EB-9)', () => {
+  it('Run uses the runner’s luck and level: a Lv1 Thief escapes on 0.70, a Lv1 Warrior does not (EB-9, B9 cap)', () => {
     const run = (luck: number) => {
       const cls = testClass('x', { baseStats: { hp: 99, strength: 1, agility: 99, intelligence: 1, vitality: 1, luck } });
-      const battle = new BattleStateMachine({ party: [new Character({ name: 'R', classData: cls })], enemies: [testEnemy()] }, () => 0.85);
+      const battle = new BattleStateMachine({ party: [new Character({ name: 'R', classData: cls })], enemies: [testEnemy()] }, () => 0.70);
       battle.startBattle();
       battle.advanceFromIntro();
       battle.submitCommand({ type: 'run', actorId: 'party_0' });

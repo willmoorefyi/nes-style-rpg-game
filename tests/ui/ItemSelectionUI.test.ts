@@ -50,3 +50,44 @@ describe('ItemSelectionUI isUsable (BA-4)', () => {
     expect(makeUI(inv).listedItemIds).toEqual(['tent', 'potion']);
   });
 });
+
+describe('ItemSelectionUI quantityOf (B5)', () => {
+  beforeEach(async () => {
+    ItemRegistry.reset();
+    await ItemRegistry.init({ loadItems: async () => items } as Pick<DataLoader, 'loadItems'> as DataLoader);
+  });
+
+  const labels = (ui: ItemSelectionUI): string[] => {
+    const out: string[] = [];
+    const walk = (c: { children: unknown[] }) => {
+      for (const ch of c.children as Array<{ text?: unknown; children: unknown[] }>) {
+        if (typeof ch.text === 'string') out.push(ch.text);
+        walk(ch);
+      }
+    };
+    walk(ui);
+    return out;
+  };
+
+  it('drives the "x N" label: 3 Potions with 1 reserved read "Potion x2"', () => {
+    const inv = new Inventory();
+    inv.add('potion', 3);
+    const ui = new ItemSelectionUI({
+      inventory: inv, partyMembers: [], contentX: 0, contentY: 0, onSelect: vi.fn(), onCancel: vi.fn(),
+      quantityOf: (id) => inv.getQuantity(id) - (id === 'potion' ? 1 : 0),
+    });
+    expect(labels(ui).some(t => t.includes('Potion x2'))).toBe(true);
+    expect(labels(ui).some(t => t.includes('Potion x3'))).toBe(false);
+  });
+
+  it('an item at 0 is not listed; with nothing left the list is empty', () => {
+    const inv = new Inventory();
+    inv.add('potion', 1);
+    const ui = new ItemSelectionUI({
+      inventory: inv, partyMembers: [], contentX: 0, contentY: 0, onSelect: vi.fn(), onCancel: vi.fn(),
+      quantityOf: () => 0,
+    });
+    expect(ui.listedItemIds).toEqual([]);
+    expect(ui.hasNoItems()).toBe(true);
+  });
+});

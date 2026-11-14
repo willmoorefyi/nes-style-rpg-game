@@ -121,10 +121,17 @@ describe('CombatStats: enemies', () => {
 
   it('hits, crit and accuracy default to 1, 1 and 0', () => {
     const plain = testEnemy({ stats: { accuracy: undefined } });
-    expect(enemyHits(plain)).toBe(1);
+    expect(enemyHits(inst(plain))).toBe(1);
     expect(enemyCrit(plain)).toBe(1);
     expect(enemyAccuracy(plain)).toBe(0);
     const boss = testEnemy({ stats: { hits: 2, crit: 5, accuracy: 15 } });
-    expect([enemyHits(boss), enemyCrit(boss), enemyAccuracy(boss)]).toEqual([2, 5, 15]);
+    expect([enemyHits(inst(boss)), enemyCrit(boss), enemyAccuracy(boss)]).toEqual([2, 5, 15]);
+  });
+
+  it('enemyHits takes the instance: a `hits` buff of +1 (a boss phase, B1) gives 3 on a 2-hit enemy', () => {
+    const boss = inst(testEnemy({ stats: { hits: 2 } }));
+    boss.buffs.set('hits', 1);
+    expect(enemyHits(boss)).toBe(3);
+    expect(boss.data.stats.hits).toBe(2); // the shared data is not changed
   });
 });
