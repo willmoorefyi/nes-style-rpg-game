@@ -95,10 +95,11 @@ frames:                        # tweaks = rigid rotations about the hip / should
     dy: 1
     pins: [knee_n, foot_n, knee_f, foot_f]
     tweaks: {crown: [-5, -1], neck: [-3, -1], chest: [-2, 0], sh_n: [-2, -2], el_n: [-3, 0], hand_n: [-5, 2], sh_f: [-4, 1], el_f: [-4, 10], hand_f: [3, 17], knee_f: [6, 0], foot_f: [6, 0]}
-  atk_follow:                  # upper body 7 forward, near arm 12 down, stick arm 28 lower (t 0.80)
+  atk_follow:                  # upper body 7 forward, near arm lowered about the elbow only (E7: the shoulder stays on the
+                               # rigid lean, so no forearm / chest seam), stick arm 28 lower (t 0.80)
     t: 0.80
     moves: []
-    tweaks: {crown: [7, 3], neck: [4, 2], chest: [3, 1], sh_n: [3, 3], el_n: [0, 7], hand_n: [-4, 11], sh_f: [5, 0], el_f: [4, 7], hand_f: [10, 12]}
+    tweaks: {crown: [7, 3], neck: [4, 2], chest: [3, 1], sh_n: [3, 2], el_n: [3, 3], hand_n: [-1, 10], sh_f: [5, 0], el_f: [4, 7], hand_f: [10, 12]}
   atk_recover:                 # head, chest and near arm lean in 5, near arm 26 forward; far arm and mallet as idle
     moves: []
     tweaks: {crown: [6, 0], neck: [3, 1], chest: [2, 0], sh_n: [3, 2], el_n: [11, -2], hand_n: [21, -6]}
@@ -109,6 +110,10 @@ frames:                        # tweaks = rigid rotations about the hip / should
     moves: []
     tweaks: {crown: [-7, 0], neck: [-3, -1], chest: [-3, 1], hip: [1, 0], sh_f: [-6, 3], el_f: [-4, 0], hand_f: [-6, -4]}
 masks:
+  torso:                       # E7: the belly flank beside the near arm is belly, not arm (else it swings out with the arm)
+    idle: [[74, 46], [80, 46], [82, 64], [83, 85], [74, 85]]
+  head:                        # E7: the spiked hump rides with the head (else it shows as a second head in atk_follow)
+    attack: [[53, 24], [69, 22], [70, 42], [57, 45], [51, 36]]
   club:
     idle: [[47, 84], [56, 84], [59, 88], [60, 99], [56, 105], [50, 107], [44, 104], [43, 92]]
   club_s:
@@ -127,8 +132,6 @@ paint:                         # 1-2 px joint notches (the knee notch at 83,108 
   - {frame: atk_wind1, xy: [[83, 108]], rgb: [6, 4, 10]}
   - {frame: atk_wind2, xy: [[29, 95], [83, 108]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[82, 65]], rgb: [6, 4, 10]}
-  - {frame: atk_follow, xy: [[83, 70], [84, 70], [91, 58], [92, 58], [93, 58], [94, 58]], rgb: [6, 4, 10]}
-  - {frame: atk_follow, xy: [[63, 29], [63, 30], [64, 30], [65, 30]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[83, 108]], rgb: [6, 4, 10]}
   # the outline seam repair fills the approved far-arm / belly gap although nothing there moved: reopened
   - {frame: atk_recover, xy: [[44, 57], [43, 58], [44, 58], [43, 59], [44, 59], [43, 60], [44, 60], [43, 61], [44, 61], [44, 62]], rgb: null}
