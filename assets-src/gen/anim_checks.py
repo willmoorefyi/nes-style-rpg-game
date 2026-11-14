@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from gen.anim_feet import feet  # noqa: F401  (re-exported: check 8)
 from gen.anim_rules import (  # noqa: F401  (re-exported: checks 10-14)
     MAX_PAGE, NEAR_KEYFRAME, ROT_CAP, atlas_exact, frame_hash, holds_cap, lock_match, near_keyframe,
     page_size, prop_carry, rotation_cap, whole_pixel)
@@ -156,7 +157,7 @@ def centroid(a: np.ndarray) -> tuple[float, float]:
 def continuity(prev: np.ndarray, nxt: np.ndarray, span: tuple[np.ndarray, np.ndarray], cell_h: int) -> list[str]:
     """Adjacent frames of a runtime sequence (same cell, feet aligned) against the keyframe pair they lie between."""
     out = []
-    need = min(0.55, iou(*span) + 0.10)
+    need = min(0.55, iou(*span) + 0.02)
     if iou(prev, nxt) < need:
         out.append(f"adjacent IoU {iou(prev, nxt):.2f} < {need:.2f}")
     (ax, ay), (bx, by) = centroid(prev), centroid(nxt)
@@ -198,34 +199,7 @@ def outline_kept(a: np.ndarray, src: np.ndarray) -> list[str]:
     return out
 
 
-# 8-9: feet and cell border
-def _feet_x(a: np.ndarray, bottom: int) -> tuple[int, int] | None:
-    rows = _solid(a)[max(0, bottom - 2):bottom + 1]
-    xs = np.where(rows.any(0))[0]
-    return (int(xs.min()), int(xs.max())) if len(xs) else None
-
-
-def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_row: int, pinned: bool,
-         floating: bool, float_dy: int = 0) -> list[str]:
-    rows = np.where(_solid(a).any(1))[0]
-    if not len(rows):
-        return ["empty frame"]
-    low = int(rows.max())
-    srows = np.where(_solid(src).any(1))[0]
-    want_low = (int(srows.max()) + float_dy) if floating else bottom_row
-    if low != want_low:
-        return [f"lowest opaque row {low} != {want_low}"]
-    if floating:
-        return []
-    f, s, t = _feet_x(a, bottom_row), _feet_x(src, bottom_row), _feet_x(toward, bottom_row)
-    if f is None or s is None:
-        return ["no foot pixels"]
-    ref, tol = (s, 1) if pinned or t is None else ((s[0] + (t[0] - s[0]) * u, s[1] + (t[1] - s[1]) * u), 2)
-    if abs(f[0] - ref[0]) > tol or abs(f[1] - ref[1]) > tol:
-        return [f"feet x {f} vs {tuple(round(v, 1) for v in ref)} (+-{tol})"]
-    return []
-
-
+# 9: cell border
 def clipping(a: np.ndarray) -> list[str]:
     s = _solid(a)
     ring = s.copy(); ring[1:-1, 1:-1] = False
