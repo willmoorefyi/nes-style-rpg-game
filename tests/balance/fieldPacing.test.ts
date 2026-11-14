@@ -6,7 +6,9 @@
  * Campaign: the 400 G kit; 20 fields battles, then 10 temple-approach battles, then 10 temple battles, sensible
  * play. The party rests at the inn (30 G) after a battle when someone is down, party HP is below 45 %, or the White
  * Mage has no CURE left and someone is below 50 %; it then buys the next items on the shopping list it can afford.
- * A wipe halves the gold and sends the party to the inn.
+ * It also shops (no inn) at each zone boundary and once after the last battle, the walk home (R4b: with the B9 temple
+ * table there are fewer inn visits, so without these trips the party bought 6.8 of 8). A wipe halves the gold and
+ * sends the party to the inn.
  */
 import { describe, it, expect } from 'vitest';
 import { runBattle, mulberry32 } from '../helpers/battlePolicies.js';
@@ -40,10 +42,7 @@ function campaign(seed: number): Campaign {
   let gold = START_GOLD - START_KIT_COST;
   let next = 0, inns = 0, wipes = 0, battles = 0;
   const reachedAt: Record<number, number> = {};
-  const inn = (): void => {
-    inns++;
-    gold -= Math.min(gold, innPrice);
-    for (const c of party) { c.currentHp = c.maxHp; c.restoreAllCharges(); }
+  const shop = (): void => {
     while (next < SHOPPING.length && gold >= priceOf(SHOPPING[next])) {
       const s = SHOPPING[next++];
       gold -= priceOf(s);
@@ -57,7 +56,14 @@ function campaign(seed: number): Campaign {
       }
     }
   };
+  const inn = (): void => {
+    inns++;
+    gold -= Math.min(gold, innPrice);
+    for (const c of party) { c.currentHp = c.maxHp; c.restoreAllCharges(); }
+    shop();
+  };
   for (const [zone, count] of SCHEDULE) {
+    shop();
     for (let b = 0; b < count; b++) {
       const r = runBattle(party, rollFormation(zone, rng), SPELLS, 'sensible', rng);
       battles++;
@@ -79,6 +85,7 @@ function campaign(seed: number): Campaign {
         || (!wm.hasCharges(1) && party.some((c) => c.currentHp < 0.5 * c.maxHp))) inn();
     }
   }
+  shop();
   return { reachedAt, wipes, inns, gold, bought: next, levels: party.map((c) => c.level) };
 }
 

@@ -285,4 +285,5 @@ def run(B) -> int:
     if not __import__("importlib").util.find_spec("terrain"):
         expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain/")
     ok += 2
+    ok += __import__("recolor_selftest").run(B)     # W8: the restyled north-bridge debris matches the stubs
     return ok

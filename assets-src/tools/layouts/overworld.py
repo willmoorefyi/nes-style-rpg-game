@@ -24,10 +24,11 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import Grid, write_map  # noqa: E402
 from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BROKEN_BRIDGE, BX, CX, CY, E_WARP,  # noqa: E402
-                              FOREST_ADD, FOREST_CUT, FOREST_ZONES, GULF, H, HEADER, JETTY, LAND, MOUNTAIN_BLOBS, N_APPROACH, N_STUB, N_WARP,
-                              NORTH_LAKE, NORTH_SHORE, PONDS, RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND,
-                              SHORE_SEA, SOUND, SOUTH_BAY, SPINE, SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS,
-                              TEMPLE_ROCK, TOMB, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
+                              FOOT_ROAD, FOOTBRIDGE, FOREST_ADD, FOREST_CUT, FOREST_ZONES, GATE_MESSAGE, GULF, H, HEADER,
+                              JETTY, LAND, MOUNTAIN_BLOBS, N_STUB, N_WARP, NORTH_LAKE, NORTH_SHORE, PIER_TEXT, PONDS,
+                              RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND, SHORE_SEA, SOUND, SOUTH_BAY, SPINE,
+                              SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_ROCK, TOMB, TOMB_CHEST, TOMB_END,
+                              TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
 from overworld_grid import (bfs, clear_disc, clear_rect, extend_to_sea, fill_unreachable, near, tidy_blobs,  # noqa: E402
                             tidy_land, walk_grid)
 from overworld_noise import blob, fbm, polyline_distance, signed_distance  # noqa: E402
@@ -119,9 +120,10 @@ def build() -> tuple[Grid, list[str]]:
 
     # roads, bridges and the jetty (no road under the icons; the river stays straight through the east bridge)
     shore = next(y for y in range(CY + 5, H) if g[CX + 2, y + 1] == "o")
-    JETTY[:] = [(CX + 2, shore + 1 + i) for i in range(3)]
+    g.set(CX + 2, shore + 1, ".")                    # W9: the road ends on land, so the jetty head has water both sides
+    JETTY[:] = [(CX + 2, shore + 2 + i) for i in range(3)]
     before = [row[:] for row in g.g]
-    for pts in ROADS + [[ARRIVE["cornelia"], (CX + 2, shore)]]:                      # S: to the jetty
+    for pts in ROADS + [[S_WARP, ARRIVE["cornelia"], (CX + 2, shore + 1)]]:          # S: to the jetty
         for x, y in g.line(pts, ",", 1):
             if before[y][x] in "r≈om":
                 raise SystemExit(f"road crosses {before[y][x]!r} at ({x}, {y})")
@@ -132,6 +134,8 @@ def build() -> tuple[Grid, list[str]]:
         g.set(x, N_STUB, "=")
     for x, y in JETTY:
         g.set(x, y, "=")
+    g.set(*FOOTBRIDGE, "=")                          # W6: the S gate's footbridge over the stream, to the west
+    g.set(*FOOT_ROAD, ",")
     tidy_blobs(g, notes)
     fill_unreachable(g, notes)
     return g, notes
@@ -149,7 +153,7 @@ def check(g: Grid) -> list[str]:
     rock = ok | np.array([[g[x, y] == "m" for x in range(W)] for y in range(H)])
     if NORTH_SHORE not in bfs(rock, ARRIVE["cornelia"]):
         errs.append("no isthmus: with the mountains open the north shore is still cut off")
-    for name, (lo, hi), p in (("temple door", (25, 40), TEMPLE_DOOR), ("bridge foot", (18, 30), BRIDGE_FOOT)):
+    for name, (lo, hi), p in (("temple door", (20, 40), TEMPLE_DOOR), ("bridge foot", (18, 30), BRIDGE_FOOT)):
         if not lo <= d.get(p, 999) <= hi:
             errs.append(f"south gate to the {name}: {d.get(p)} steps, want {lo}-{hi}")
     pocket = bfs(ok, TOMB_END, {(RX, RY), (RX + 1, RY)})
@@ -173,10 +177,8 @@ def objects() -> list[dict]:
     city = [[f"city_{j}_{i}" for i in range(4)] + [None] for j in range(4)]
     objs = [
         {"type": "deco", "parts": city, "x": CX, "y": CY, "offset": [24, 0], "collide": "alpha",
-         # the four gates, one doorway cell each (N: the keep's door, reached over its walkable top cell; W and E:
-         # the flank arches; S: the main arch)
-         "walk_cells": [[N_APPROACH[0] - CX, N_APPROACH[1] - CY], [N_WARP[0] - CX, N_WARP[1] - CY], [0, 2], [4, 2],
-                        [2, 3]]},
+         # the four gates, one doorway cell each (N: the wall's top edge; W and E: the flank arches; S: the main arch)
+         "walk_cells": [[x - CX, y - CY] for x, y in (N_WARP, W_WARP, E_WARP, S_WARP)]},
         {"type": "prefab", "prefab": "temple_icon", "name": "temple", "x": TX, "y": TY, "w": 2, "h": 2, "door": 1,
          "ridge_rows": 0, "collide": "alpha", "enter": {"map": "temple-of-fiends", "entrance": "entry"}},
         *(dict(o) for o in TOMB_OBJECTS),          # Erdrick's tomb
@@ -194,7 +196,6 @@ def main() -> None:
             raise SystemExit(f"boulder at ({x}, {y}) is on {g[x, y]!r}, not grass")
     # the canoe: on the east river below the bridge (the river cell of that row nearest the bridge, not the stream)
     canoe = (min((x for x in range(W) if g[x, RY + 5] == "r"), key=lambda x: (abs(x - RX), x)), RY + 5)
-    gate = "The bridge has collapsed into the sea. Only the King's builders could repair it."
     doc = {
         "id": "overworld",
         "name": "World Map",
@@ -215,10 +216,12 @@ def main() -> None:
                       "north_shore": list(NORTH_SHORE)},
         "objects": objects(),
         "inspect": [{"x": TOMB[0], "y": TOMB[1], "text": ["Here lies Erdrick."]},
-                    {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]}],
-        "keyItemGates": [{"x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT", "message": gate, "permanent": False}
-                         for x in (BX, BX + 1)],
-        "encounterRate": {"min": 15, "max": 30},
+                    {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]},
+                    {"x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "text": list(PIER_TEXT)}],
+        "npcs": [dict(TOMB_CHEST)],
+        "keyItemGates": [{"x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT", "message": [dict(m) for m in GATE_MESSAGE],
+                          "permanent": False} for x in (BX, BX + 1)],
+        "encounterRate": {"min": 10, "max": 22},       # W4: the W / N gate -> temple walk (16 steps) sees a battle
         # T4 §1.6: FF1-style formations; no pirates in act 1 (EB-1). The first zone holding the cell wins.
         "encounters": FIELDS,
         "encounterZones": encounter_zones(g),
@@ -230,7 +233,7 @@ def main() -> None:
         "vehicles": [{"type": "ship", "x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "requiredFlag": "BIKKE_DEFEATED"},
                      {"type": "canoe", "x": canoe[0], "y": canoe[1], "requiredFlag": "EARTH_CAVE_COMPLETE"}],
         "transitions": [{"x": p[0], "y": p[1], "targetMap": "cornelia", "targetEntrance": e} for p, e in
-                        ((N_WARP, "castle_gate"), (W_WARP, "west_gate"), (E_WARP, "east_gate"), (S_WARP, "south_gate"))],
+                        ((N_WARP, "castle"), (W_WARP, "west_gate"), (E_WARP, "east_gate"), (S_WARP, "south_gate"))],
     }
     for v in doc["vehicles"]:
         assert g[v["x"], v["y"]] in "or", f"vehicle {v['type']} at ({v['x']}, {v['y']}) is on {g[v['x'], v['y']]!r}"

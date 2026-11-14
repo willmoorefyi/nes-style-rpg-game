@@ -1,4 +1,4 @@
-# Temple of Fiends (original layout). legend: W wall top, F wall face, - floor, % rubble
+# Temple of Fiends (original layout). legend: W wall top, F wall face, - floor, _ causeway, % rubble
 # TF-1: no void (x) cells: the temple sits in solid rock (W, the dark wall top), so no flat black shows in its
 # corners or beside the entry corridor. Void and wall top block alike, so the collision is unchanged.
 id: temple-of-fiends
@@ -13,29 +13,32 @@ materials:
   rubble: {from: temple_rubble, shade: 1.3}
   in_wall_top: {from: temple_wall_top, shade: 0.35}
   in_wall_face: {from: temple_wall_face, shade: 1.2}
-contrast: [{a: W, b: "-", min: 0.2}]
+  # W13: a worn causeway, 4 wide, from the entry corridor up to the altar, breaks the floor's 2-cell repeat. (The
+  # plan's faded carpet at shade 0.55 is too dark for the wall-top contrast: luma 0.13 against the walls' 0.08.)
+  floor: {from: cobble, shade: 0.7}
+contrast: [{a: W, b: "-", min: 0.2}, {a: W, b: "_", min: 0.2}]
 ground: |
   WWWWWWWWWWWWWWWWWWWWWWWW
   WWWWWWWWWWWWWWWWWWWWWWWW
   WWWFFFFFFFFFFFFFFFFFFWWW
-  WWW------------------WWW
-  WWW------------------WWW
-  WWW------------------WWW
-  WWW------------------WWW
-  WWWWWWWWWW----WWWWWWWWWW
-  WWFFFFFFFF----FFFFFFFFWW
-  WW--------------------WW
-  WW----------------%---WW
-  WW----%%--------------WW
-  WW--------------------WW
-  WW--------------------WW
-  WW--------------%%----WW
-  WW---%----------------WW
-  WW--------------------WW
-  WWWWWWWWWW----WWWWWWWWWW
-  WWWWWWWWWW-%--WWWWWWWWWW
-  WWWWWWWWWW----WWWWWWWWWW
-  WWWWWWWWWW----WWWWWWWWWW
+  WWW-------____-------WWW
+  WWW-------____-------WWW
+  WWW-------____-----%-WWW
+  WWW-------____----%%-WWW
+  WWWWWWWWWW____WWWWWWWWWW
+  WWFFFFFFFF____FFFFFFFFWW
+  WW--------____----%%--WW
+  WW--------____----%---WW
+  WW----%%%-____--------WW
+  WW--------____--------WW
+  WW--------____--------WW
+  WW--------____--%%----WW
+  WW--%%----____--%%----WW
+  WW-%%-----____--------WW
+  WWWWWWWWWW____WWWWWWWWWW
+  WWWWWWWWWW____WWWWWWWWWW
+  WWWWWWWWWW____WWWWWWWWWW
+  WWWWWWWWWW____WWWWWWWWWW
   WWWWWWWWWWW--WWWWWWWWWWW
 entrances:
   entry: [11, 20]
@@ -107,12 +110,14 @@ objects:
   - [tpillar_broken_bottom]
   x: 9
   y: 10
+  collide: alpha        # W3: the broken top draws nothing, so only the base blocks
 - type: deco
   parts:
   - [tpillar_broken_top]
   - [tpillar_broken_bottom]
   x: 14
   y: 12
+  collide: alpha        # W3: the broken top draws nothing, so only the base blocks
 - type: deco
   parts:
   - [fallen_l, fallen_r]
@@ -180,10 +185,12 @@ npcs:
   sprite: chest
   x: 20
   y: 12
+# B1: Garland stands in the doorway row; with the three trigger cells beside him (scriptedEncounters) the room's
+# whole 4-wide cut is closed, so no path reaches the princess without the fight
 - id: garland
   sprite: garland_npc
   x: 11
-  y: 5
+  y: 6
   hideIf: GARLAND_DEFEATED
   dialog: ['Garland: You dare follow me here?', No one will take the princess from me!]
 - id: captive_princess
@@ -196,25 +203,40 @@ transitions:
 - {x: 11, y: 21, targetMap: overworld, targetEntrance: temple}
 - {x: 12, y: 21, targetMap: overworld, targetEntrance: temple}
 scriptedEncounters:
+# B1: the doorway row's cells beside Garland; talking to him (the `npc` entry) starts the same battle
 - enemyIds: [garland]
   flag: GARLAND_DEFEATED
   isBoss: true
   message: 'Garland: I, Garland, will knock you all down!'
   postVictoryCutscene: garland_defeated
-  x: 11
+  x: 10
   y: 6
-encounterRate: {max: 15, min: 8}
-# FF1 Temple of Fiends formations (docs/FIX_PLAN_PENINSULA.md T4 §1.6; no CREEP / MADPONY art, no pirates)
+- enemyIds: [garland]
+  flag: GARLAND_DEFEATED
+  isBoss: true
+  message: 'Garland: I, Garland, will knock you all down!'
+  postVictoryCutscene: garland_defeated
+  x: 12
+  y: 6
+  npc: garland
+- enemyIds: [garland]
+  flag: GARLAND_DEFEATED
+  isBoss: true
+  message: 'Garland: I, Garland, will knock you all down!'
+  postVictoryCutscene: garland_defeated
+  x: 13
+  y: 6
+# B9: fewer, smaller packs (mean formation 2.54, no wolves; docs/FIX_PLAN_PENINSULA.md R4b)
+encounterRate: {max: 22, min: 12}
+# FF1 Temple of Fiends formations (docs/FIX_PLAN_PENINSULA.md T4 §1.6, R4b B9; no CREEP / MADPONY art, no pirates)
 encounters:
-- groups: [{id: skeleton, min: 2, max: 4}]
+- groups: [{id: skeleton, min: 1, max: 3}]
   weight: 4
-- groups: [{id: skeleton, min: 1, max: 3}, {id: gr_imp, min: 1, max: 2}]
+- groups: [{id: skeleton, min: 1, max: 2}, {id: gr_imp, min: 1, max: 2}]
   weight: 3
-- groups: [{id: gr_imp, min: 2, max: 4}]
+- groups: [{id: gr_imp, min: 2, max: 3}]
   weight: 2
-- groups: [{id: wolf, min: 2, max: 3}]
-  weight: 1
-- groups: [{id: skeleton, min: 4, max: 6}]
+- groups: [{id: skeleton, min: 3, max: 4}]
   weight: 1
 battleBackgrounds: {default: temple}
 canSave: false
