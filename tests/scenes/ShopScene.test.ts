@@ -149,7 +149,7 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
     expect(scene.itemWindowRect.width).toBeGreaterThan(panel.x);
   });
 
-  it('the quantity picker shows the total, then "Bought 2 Potion." until the next input', async () => {
+  it('the quantity picker shows the total, then "Bought 2 Potions." until the next input', async () => {
     const { scene, tap, inventory } = await setup('cornelia_item');
     const price = ItemRegistry.getItem('potion')!.price;
     tap('confirm'); // Buy
@@ -159,9 +159,9 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
     expect(visibleLabels(scene.container)).toContain(`Total: ${price * 2} G`);
     tap('confirm');
     expect(inventory.getQuantity('potion')).toBe(2);
-    expect(scene.resultMessage).toBe('Bought 2 Potion.');
+    expect(scene.resultMessage).toBe('Bought 2 Potions.');
     scene.update(1); // no input: the line stays
-    expect(scene.resultMessage).toBe('Bought 2 Potion.');
+    expect(scene.resultMessage).toBe('Bought 2 Potions.');
     tap('down');
     expect(scene.resultMessage).toBe('');
   });
@@ -256,16 +256,16 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       expect(scene.helpText).toBe(ItemRegistry.getItem('antidote')!.description);
     });
 
-    it('"Bought 2 Potion." replaces the description on the help bar until the next input', async () => {
+    it('"Bought 2 Potions." replaces the description on the help bar until the next input', async () => {
       const { scene, tap } = await setup('cornelia_item');
       tap('confirm');
       tap('confirm');
       tap('right');
       tap('confirm');
-      expect(scene.helpText).toBe('Bought 2 Potion.');
+      expect(scene.helpText).toBe('Bought 2 Potions.');
       expect(scene.goldLines).toHaveLength(1);
       scene.update(1);
-      expect(scene.helpText).toBe('Bought 2 Potion.');
+      expect(scene.helpText).toBe('Bought 2 Potions.');
     });
   });
 
@@ -287,7 +287,7 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       const { scene, tap, party, inventory } = await buyRapiers(1);
       const rows = scene.equipPromptRows;
       expect(rows.map((r) => r.enabled)).toEqual([true, true, false, false, true]);
-      expect(rows[0].label).toMatch(/^FGHTR {2}ATK \d+→\d+$/);
+      expect(rows[0].label).toMatch(/^FGHTR {2}ATK \d+→\d+ {2}\+\d+$/);
       expect(rows[4].label).toBe('Not now');
       tap('confirm'); // FGHTR
       expect(party.get(0)!.getEquipped('weapon')?.id).toBe('rapier');
@@ -315,6 +315,52 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       expect(party.get(1)!.getEquipped('weapon')?.id).toBe('rapier');
       expect(inventory.getQuantity('rapier')).toBe(0);
       expect(scene.equipPromptRows).toEqual([]);
+    });
+
+    /** Buy `count` of the weapon shop's `id` after `dress` has equipped the party. */
+    async function buyWeapon(id: string, count: number, dress: (party: PartyManager) => void) {
+      const s = await setup('cornelia_weapon', {}, 400);
+      dress(s.party);
+      s.tap('confirm'); // Buy
+      const row = ShopRegistry.getShop('cornelia_weapon')!.inventory.indexOf(id);
+      for (let i = 0; i < row; i++) s.tap('down');
+      s.tap('confirm');
+      for (let i = 1; i < count; i++) s.tap('right');
+      s.tap('confirm');
+      return s;
+    }
+    const wield = (party: PartyManager, ids: string[]): void => {
+      party.all.forEach((c, i) => { c.unequip('weapon'); if (ids[i]) c.equip('weapon', ItemRegistry.getItem(ids[i])!); });
+    };
+
+    it('the cursor starts on the biggest gain, not on a downgrade (FGHTR with a Rapier, THIEF bare-handed)', async () => {
+      const { scene, tap, party } = await buyWeapon('small_knife', 1, (p) => wield(p, ['rapier']));
+      const rows = scene.equipPromptRows;
+      expect(rows[0].label).toMatch(/^FGHTR {2}ATK (\d+)→(\d+) {2}-\d+$/);
+      expect(rows[1].label).toMatch(/^THIEF {2}ATK \d+→\d+ {2}\+\d+$/);
+      tap('confirm'); // mashing Z
+      expect(party.get(0)!.getEquipped('weapon')?.id).toBe('rapier');
+      expect(party.get(1)!.getEquipped('weapon')?.id).toBe('small_knife');
+    });
+
+    it('when nobody gains, the cursor starts on "Not now"', async () => {
+      const { scene, tap, party, inventory } = await buyWeapon('small_knife', 1,
+        (p) => wield(p, ['rapier', 'rapier', 'staff', 'staff']));
+      const rows = scene.equipPromptRows;
+      expect(rows.slice(0, 4).every((r) => r.enabled && /-\d+$/.test(r.label))).toBe(true);
+      tap('confirm');
+      expect(scene.equipPromptRows).toEqual([]);
+      expect(inventory.getQuantity('small_knife')).toBe(1);
+      expect(party.all.map((c) => c.getEquipped('weapon')?.id)).toEqual(['rapier', 'rapier', 'staff', 'staff']);
+    });
+
+    it('the comparison panel follows each equip while the prompt repeats', async () => {
+      const { scene, tap } = await buyRapiers(2);
+      expect(scene.detailLines[1].text).toMatch(/^FGHTR .*\+\d+$/);
+      tap('confirm'); // FGHTR takes one; the prompt asks again for THIEF
+      expect(scene.equipPromptRows).not.toEqual([]);
+      expect(scene.detailLines[1].text).toMatch(/^FGHTR .*->(\d+) {2}0$/);
+      expect(scene.detailLines[2].text).toMatch(/^THIEF .*\+\d+$/);
     });
 
     it('buying a Potion opens no prompt', async () => {

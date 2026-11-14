@@ -89,6 +89,7 @@ export class SaveScene implements Scene {
     this.confirmBox = new ConfirmBox({
       prompt: `Overwrite Slot ${slotId + 1}?`,
       width: 600,
+      defaultNo: true, // as Load: mashing confirm never overwrites a save
       eventBus: this.game.events,
       onAnswer: (yes) => {
         this.hideConfirm();

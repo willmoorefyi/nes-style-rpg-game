@@ -24,6 +24,8 @@ export interface EquipNowConfig {
   party: readonly Character[];
   inventory: Inventory;
   eventBus?: EventBus;
+  /** Called after each member equips a copy, while the prompt may still repeat (the shop redraws its comparison). */
+  onEquipped?: () => void;
   /** Called once when the prompt closes, with the refusal to show (a full bag for the worn item), if any. */
   onDone: (message?: string) => void;
 }
@@ -39,10 +41,34 @@ export function offersEquipNow(item: ItemData, party: readonly Character[]): boo
   return party.some((c) => canTakeNow(c, item));
 }
 
+/** The signed change shown at the end of a row: "+4", "-4", "0" (as the comparison panel). */
+export function signedDiff(diff: number): string {
+  return diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '0';
+}
+
 /**
- * "Equip it now?" after buying gear (U11): one row per member with the change (`FGHTR  ATK 5→9`), the members who
- * can't take it greyed, and "Not now" last. A pick equips the copy from the bag (`equipFromBag`, the worn item goes
- * back to the bag); the prompt repeats while bought copies remain and another member can take one.
+ * Where the cursor starts: the member who can take the item with the largest gain (ATK for weapons, DEF for armour;
+ * the first such member on a tie), or "Not now" (the last row) when nobody gains, so mashing confirm never
+ * downgrades anyone.
+ */
+export function bestTakerIndex(item: ItemData, party: readonly Character[]): number {
+  const slot = slotOf(item);
+  let best = party.length;
+  let bestDiff = 0;
+  if (!slot) return best;
+  party.forEach((c, i) => {
+    if (!canTakeNow(c, item)) return;
+    const diff = compareEquip(c, item, slot).diff;
+    if (diff > bestDiff) { best = i; bestDiff = diff; }
+  });
+  return best;
+}
+
+/**
+ * "Equip it now?" after buying gear (U11): one row per member with the change (`FGHTR  ATK 5→9  +4`, a downgrade
+ * reads `FGHTR  ATK 19→15  -4`), the members who can't take it greyed, and "Not now" last. The cursor starts on
+ * the biggest gain, or on "Not now" when nobody gains. A pick equips the copy from the bag (`equipFromBag`, the worn
+ * item goes back to the bag); the prompt repeats while bought copies remain and another member can take one.
  */
 export class EquipNowPrompt extends Window {
   private menu!: Menu;
@@ -84,14 +110,14 @@ export class EquipNowPrompt extends Window {
       if (!slot || !c.canEquipIn(slot, item)) return { label: `${name}  can't equip`, value: String(i), enabled: false };
       if (!canTakeNow(c, item)) return { label: `${name}  equipped`, value: String(i), enabled: false };
       const cmp = compareEquip(c, item, slot);
-      return { label: `${name}  ${cmp.label} ${cmp.now}→${cmp.next}`, value: String(i) };
+      return { label: `${name}  ${cmp.label} ${cmp.now}→${cmp.next}  ${signedDiff(cmp.diff)}`, value: String(i) };
     });
     this.rows.push({ label: NOT_NOW, value: '' });
     this.menu = new Menu({
       items: this.rows,
       x: this.contentX,
       y: this.contentY + LINE_HEIGHT + 16,
-      initialIndex: Math.max(0, this.rows.findIndex((r) => r.enabled !== false)),
+      initialIndex: bestTakerIndex(item, party),
       eventBus: this.prompt.eventBus,
       onSelect: (row) => this.pick(row.value),
       onCancel: () => this.finish(),
@@ -107,6 +133,7 @@ export class EquipNowPrompt extends Window {
     const result = equipFromBag(member, slot, item, inventory);
     if (!result.ok) { this.finish(result.message); return; }
     this.copies--;
+    this.prompt.onEquipped?.();
     if (this.copies > 0 && inventory.has(item.id) && offersEquipNow(item, party)) this.build();
     else this.finish();
   }

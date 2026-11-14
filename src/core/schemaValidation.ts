@@ -308,6 +308,7 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
   if (data.description !== undefined) assertString('ItemData.description', data.description);
   if (data.prompt !== undefined) assertString('ItemData.prompt', data.prompt);
+  if (data.plural !== undefined) assertString('ItemData.plural', data.plural);
   return data as unknown as import('../types/index.js').ItemData;
 }
 

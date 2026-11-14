@@ -90,6 +90,19 @@ describe('ExplorationScene new game (NG-1) and retry (NG-2)', () => {
     expect(trigger).toHaveBeenCalledWith(['garland'], boss, undefined, undefined);
     expect(game.pendingBattle).toBeNull();
   });
+
+  it('Retry / Return to Field: the hero faces as when the battle began, once', async () => {
+    const game = gameWith(createMapData({ id: 'temple', width: 10, height: 10 }));
+    game.currentMapId = 'temple';
+    game.pendingFacing = 'up'; // toward Garland
+    const scene = new ExplorationScene(game as unknown as Game);
+    await scene.enter();
+    expect(game.playerFacing).toBe('up');
+    expect(game.pendingFacing).toBeNull();
+    scene.exit();
+    await scene.enter(); // a later enter (e.g. a load) keeps the default facing
+    expect(game.playerFacing).toBe('down');
+  });
 });
 
 describe('ExplorationScene cutscenes (ST-1 / ST-5)', () => {

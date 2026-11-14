@@ -136,6 +136,7 @@ export class ShopScene extends ShopSceneView implements Scene {
     this.itemMenu?.setActive(false);
     this.equipPrompt = new EquipNowPrompt({
       item, copies, party: this.game.party.all, inventory: this.game.inventory, eventBus: this.game.events,
+      onEquipped: () => this.refreshSelection(), // the comparison panel follows each equip while the prompt repeats
       onDone: (message) => {
         if (this.equipPrompt) this.container.removeChild(this.equipPrompt);
         this.equipPrompt = undefined;

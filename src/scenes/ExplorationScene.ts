@@ -25,7 +25,7 @@ import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
 import { FieldHUD, HUD_BOTTOM_BAND } from '../ui/FieldHUD.js';
 import { FieldTransition } from './exploration/FieldTransition.js';
-import { createFieldPlayer, leaderClassId, type FieldPlayer } from './exploration/FieldPlayer.js';
+import { applyPendingFacing, createFieldPlayer, leaderClassId, recordPlayer, type FieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { foundText, leftBehindText, receivedText, cantCarryText } from '../systems/pickupText.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
@@ -175,6 +175,7 @@ export class ExplorationScene implements Scene {
       if (entrance !== null && !hasEntrance) console.warn(`map ${map.id} has no entrance '${entrance}'; using the saved position`);
       const pos = hasEntrance ? entrancePosition(map, entrance) : safeSpawn(map, this.game.playerPosition);
       this.player?.setPosition(pos.x, pos.y);
+      applyPendingFacing(this.game, this.player); // Retry / Return to Field: facing as when the battle began
       this.redraw();
     }
     this.loading = false;
@@ -307,7 +308,7 @@ export class ExplorationScene implements Scene {
 
   /** After the player was placed: the saved tile, the camera and the tilemap. */
   private redraw(): void {
-    if (this.player) this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
+    if (this.player) recordPlayer(this.game, this.player);
     this.camera.update();
     this.tilemap?.render();
   }
@@ -378,8 +379,7 @@ export class ExplorationScene implements Scene {
       playerTiles: [{ x: this.player.gridX, y: this.player.gridY }, this.player.targetTile],
     });
     this.player.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
-    // Track player position in game for save/load
-    this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
+    recordPlayer(this.game, this.player);
     const hit = this.npcInteraction.interact();
     if (hit?.kind === 'inspect') {
       this.dialogManager.start(hit.lines);

@@ -1,6 +1,6 @@
 import type { ItemData } from '../../types/index.js';
 import { Inventory } from '../../entities/Inventory.js';
-import { cantCarryText } from '../../systems/pickupText.js';
+import { cantCarryText, countedName } from '../../systems/pickupText.js';
 
 /** The party's gold, as the shop uses it. */
 export interface ShopPurse {
@@ -34,12 +34,12 @@ export function buy(purse: ShopPurse, inventory: Inventory, item: ItemData, qty:
     // canAdd was checked above; logged so a future change can't lose items silently
     console.error(`shop buy: added ${added} of ${qty} ${item.id}`);
   }
-  return { ok: true, message: `Bought ${qty} ${item.name}.` };
+  return { ok: true, message: `Bought ${countedName(item, qty)}.` };
 }
 
 /** Sell `qty` of `item` at half price. */
 export function sell(purse: ShopPurse, inventory: Inventory, item: ItemData, qty: number): ShopResult {
-  if (!inventory.remove(item.id, qty)) return { ok: false, message: `You don't have ${qty} ${item.name}.` };
+  if (!inventory.remove(item.id, qty)) return { ok: false, message: `You don't have ${countedName(item, qty)}.` };
   purse.addGold(sellPrice(item) * qty);
-  return { ok: true, message: `Sold ${qty} ${item.name}.` };
+  return { ok: true, message: `Sold ${countedName(item, qty)}.` };
 }

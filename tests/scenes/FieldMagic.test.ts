@@ -10,6 +10,7 @@ import { ItemEffects } from '../../src/systems/ItemEffects.js';
 import { FieldMagicScene } from '../../src/scenes/FieldMagicScene.js';
 import type { Game } from '../../src/core/Game.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../helpers/realData.js';
+import { targetLabel } from '../../src/ui/partyTargetLabel.js';
 
 beforeAll(loadRealRegistries);
 
@@ -103,7 +104,7 @@ describe('MS-3: field magic', () => {
     tap('confirm', 'confirm', 'confirm'); // caster, CURE, target FGHTR (the cursor starts on the most hurt, U8)
     expect(scene.message).toMatch(/^FGHTR recovers \d+ HP$/);
     expect(mage.getSpellCharges(1)).toBe(before - 1);
-    expect(visibleLabels(scene.container)).toContain(`FGHTR ${fighter.currentHp}/${fighter.maxHp}`);
+    expect(visibleLabels(scene.container)).toContain(targetLabel(fighter, 5));
   });
 
   it('an all_allies heal (HEAL) heals every living member, not one, and skips the fallen', () => {
@@ -175,5 +176,18 @@ describe('U8: the field spell target cursor starts on who needs the spell', () =
     tap('confirm');      // her spells
     tap('confirm');      // CURE
     expect(scene.targetIndex).toBe(1);
+  });
+});
+
+describe('the field magic target list marks the fallen as the Items target list does', () => {
+  it('rows are `NAME  HP cur/max  STATUS`, with KO on the fallen', () => {
+    thief.currentHp = 0;
+    fighter.currentHp = 5;
+    const { scene, tap } = openScene([mage, fighter, thief]);
+    tap('confirm', 'confirm'); // caster, CURE
+    const labels = visibleLabels(scene.container);
+    const hp = (c: Character) => `HP ${String(c.currentHp).padStart(3)}/${String(c.maxHp).padStart(3)}`;
+    expect(labels).toContain(`THIEF  ${hp(thief)}  KO`);
+    expect(labels).toContain(`FGHTR  ${hp(fighter)}`);
   });
 });
