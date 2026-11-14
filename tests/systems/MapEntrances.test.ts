@@ -31,6 +31,16 @@ describe('entrances', () => {
     expect(safeSpawn(map({ entrances: undefined }), { x: 1, y: 0 })).toEqual({ x: 1, y: 0 });
     warn.mockRestore();
   });
+
+  it('moves a walkable restore position that the first entrance cannot reach (an old save on a redrawn map)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // 5x1: grass, grass, wall, grass, grass; the first entrance is on the west side
+    const split = map({ width: 5, height: 1, collision: [0, 0, 1, 0, 0], entrances: { west: [0, 0], east: [4, 0] } });
+    expect(safeSpawn(split, { x: 1, y: 0 })).toEqual({ x: 1, y: 0 });
+    expect(safeSpawn(split, { x: 3, y: 0 })).toEqual({ x: 0, y: 0 });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('cut off'));
+    warn.mockRestore();
+  });
 });
 
 describe('MapLoader compiled maps', () => {

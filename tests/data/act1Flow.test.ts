@@ -37,6 +37,33 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
     expect(reached).toBeGreaterThan(5);
   });
 
+  it('overworld: from the south gate the temple and both bridge gates can be reached, the north shore cannot', () => {
+    const map = readMap('overworld');
+    const col = new CollisionMap(map);
+    const walk = new WalkingMode();
+    const [sx, sy] = map.entrances!.cornelia;
+    const seen = new Set([`${sx},${sy}`]);
+    const queue: Array<[number, number]> = [[sx, sy]];
+    while (queue.length) {
+      const [x, y] = queue.shift()!;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy, k = `${nx},${ny}`;
+        if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height || seen.has(k) || !col.isWalkable(nx, ny, walk)) continue;
+        seen.add(k);
+        queue.push([nx, ny]);
+      }
+    }
+    const temple = map.transitions.find((t) => t.targetMap === 'temple-of-fiends')!;
+    expect(seen.has(`${temple.x},${temple.y}`), 'the temple door').toBe(true);
+    const [tx, ty] = map.entrances!.temple;
+    expect(seen.has(`${tx},${ty}`), 'the arrival from the temple').toBe(true);
+    const gates = map.keyItemGates ?? [];
+    expect(gates.length).toBe(2);
+    for (const g of gates) expect(seen.has(`${g.x},${g.y}`), `bridge gate (${g.x},${g.y})`).toBe(true);
+    const [nx, ny] = map.entrances!.north_shore;
+    expect(seen.has(`${nx},${ny}`), 'the north shore').toBe(false);
+  });
+
   it('beating Garland frees the princess but does not open the north bridge (ST-1)', () => {
     expect(flagsSetBy('garland_defeated')).toEqual(['PRINCESS_RESCUED']);
   });
