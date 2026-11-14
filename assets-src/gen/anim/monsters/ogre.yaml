@@ -128,3 +128,7 @@ paint:                         # hurt_in1: the far arm / belly slit (open in idl
   - {frame: hurt_in2, xy: [[36, 63], [38, 63], [37, 64], [38, 64], [40, 64], [37, 65], [38, 65], [40, 65], [41, 65], [44, 65], [36, 66]], rgb: [181, 123, 90]}
   - {frame: hurt_in2, xy: [[32, 61]], rgb: null}
   - {frame: hurt_in2, xy: [[33, 61]], rgb: [6, 4, 10]}
+  # zero-nit pass: 1 px background holes enclosed by outline ink (hurt_in1 at the club hand / hip, hurt_in2 by the
+  # tusk / brow and in the armpit), closed with the outline
+  - {frame: hurt_in1, xy: [[77, 83], [79, 86]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[58, 39], [71, 70]], rgb: [6, 4, 10]}
