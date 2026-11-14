@@ -102,3 +102,42 @@ describe('NPCInteractionSystem across a counter', () => {
     expect(sys.checkInteraction()).toBe(keeper);               // counter between them: talk across it
   });
 });
+
+describe('NPCInteractionSystem inspect cells (T3e)', () => {
+  type Npc = import('../../src/entities/NPC.js').NPC;
+  type Player = import('../../src/entities/PlayerController.js').PlayerController;
+  type Input = import('../../src/core/InputManager.js').InputManager;
+  const tomb = (x: number, y: number) => (x === 4 && y === 4 ? ['Here lies Erdrick.'] : null);
+  const make = (facing: { x: number; y: number }, npcs: Npc[] = [], confirm = true) => {
+    const sys = new NPCInteractionSystem();
+    sys.setNPCs(npcs);
+    sys.setPlayer({ isMoving: false, gridX: 4, gridY: 5, facingTile: facing } as unknown as Player);
+    sys.setInput({ isJustPressed: (a: string) => confirm && a === 'confirm' } as unknown as Input);
+    sys.setInspectCheck(tomb);
+    return sys;
+  };
+
+  it('facing an inspect cell and pressing confirm gives its lines', () => {
+    expect(make({ x: 4, y: 4 }).interact()).toEqual({ kind: 'inspect', lines: ['Here lies Erdrick.'] });
+  });
+
+  it('facing away, or not pressing confirm, does nothing', () => {
+    expect(make({ x: 4, y: 6 }).interact()).toBeNull();
+    expect(make({ x: 4, y: 4 }, [], false).interact()).toBeNull();
+  });
+
+  it('an NPC on the same cell wins, and checkInteraction never returns inspect text', () => {
+    const npc = { tileX: 4, tileY: 4 } as unknown as Npc;
+    expect(make({ x: 4, y: 4 }, [npc]).interact()).toEqual({ kind: 'npc', npc });
+    expect(make({ x: 4, y: 4 }).checkInteraction()).toBeNull();
+  });
+
+  it('an NPC across a counter wins over an inspect cell on the counter', () => {
+    const keeper = { tileX: 4, tileY: 3 } as unknown as Npc;
+    const sys = make({ x: 4, y: 4 }, [keeper]);
+    sys.setCounterCheck((x, y) => x === 4 && y === 4);
+    expect(sys.interact()).toEqual({ kind: 'npc', npc: keeper });
+    sys.setNPCs([]);
+    expect(sys.interact()).toEqual({ kind: 'inspect', lines: ['Here lies Erdrick.'] });
+  });
+});

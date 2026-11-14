@@ -28,6 +28,7 @@ import { ControlsHint } from '../ui/ControlsHint.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
+import { inspectAt } from './exploration/FieldInspect.js';
 import { createFieldStateSystems, openShopScene } from './exploration/FieldSystems.js';
 import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
@@ -257,6 +258,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setNPCs(npcs);
     this.npcInteraction.setPlayer(this.player);
     this.npcInteraction.setCounterCheck((x, y) => collisionMap.isCounter(x, y));
+    this.npcInteraction.setInspectCheck((x, y) => inspectAt(mapData, x, y, (f) => this.game.gameFlags.has(f)));
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
     // Wire key item gates
@@ -333,7 +335,12 @@ export class ExplorationScene implements Scene {
     this.player.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     // Track player position in game for save/load
     this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
-    const npc = this.npcInteraction.checkInteraction();
+    const hit = this.npcInteraction.interact();
+    if (hit?.kind === 'inspect') {
+      this.dialogManager.start(hit.lines);
+      return;
+    }
+    const npc = hit?.npc ?? null;
     if (npc) {
       // the NPC turns to face the heroes and keeps facing them until the conversation box is dismissed
       npc.faceToward(this.player.gridX, this.player.gridY);
