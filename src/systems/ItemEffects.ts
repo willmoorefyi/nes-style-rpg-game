@@ -14,6 +14,11 @@ export class ItemEffects {
     return itemId === 'tent' || itemId === 'cabin';
   }
 
+  /** Check if an item revives a fallen member (its targets are the KO'd, not the living) */
+  static isReviveItem(itemId: string): boolean {
+    return itemId === 'phoenix_down';
+  }
+
   /** Apply a party-wide item effect (tent/cabin). Consumes the item. */
   static applyPartyItemEffect(
     itemId: string,
@@ -61,17 +66,25 @@ export class ItemEffects {
     let result: ItemEffectResult;
     switch (itemId) {
       case 'potion':
-        result = this.heal(target, 30);
+      case 'hi_potion': {
+        const amount = item.stats.hp;
+        if (amount === undefined || amount <= 0) {
+          console.error(`ItemEffects: ${itemId} has no stats.hp heal amount in items.yaml`);
+          return { success: false, message: 'Cannot use this item' };
+        }
+        result = this.heal(target, amount);
         break;
-      case 'hi_potion':
-        result = this.heal(target, 150);
-        break;
+      }
       case 'ether':
         result = this.restoreCharges(target);
         break;
       case 'antidote':
-        target.statusTracker.remove('poison');
-        result = { success: true, message: `${target.name} is cured of poison` };
+        if (target.statusTracker.has('poison')) {
+          target.statusTracker.remove('poison');
+          result = { success: true, message: `${target.name} is cured of poison` };
+        } else {
+          result = { success: false, message: `${target.name} is not poisoned.` };
+        }
         break;
       case 'soft':
         if (target.statusTracker.has('stone')) {
@@ -95,8 +108,9 @@ export class ItemEffects {
   private static heal(target: Character, amount: number): ItemEffectResult {
     if (target.currentHp <= 0) return { success: false, message: `${target.name} is KO'd` };
     if (target.currentHp >= target.maxHp) return { success: false, message: `${target.name} is already at full HP` };
-    target.currentHp += amount;
-    return { success: true, message: `${target.name} recovered ${amount} HP` };
+    const before = target.currentHp;
+    target.currentHp += amount; // the setter clamps at maxHp
+    return { success: true, message: `${target.name} recovered ${target.currentHp - before} HP` };
   }
 
   private static restoreCharges(target: Character): ItemEffectResult {

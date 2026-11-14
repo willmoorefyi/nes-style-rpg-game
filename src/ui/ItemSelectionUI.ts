@@ -19,6 +19,8 @@ export interface ItemSelectionConfig {
   onSelect: (result: ItemSelectionResult) => void;
   onCancel: () => void;
   onNeedTarget?: (itemId: string) => void;
+  /** Only consumables this accepts are listed (battle leaves out the camp items, BA-4); default: all. */
+  isUsable?: (itemId: string) => boolean;
 }
 
 export class ItemSelectionUI extends Container {
@@ -32,11 +34,8 @@ export class ItemSelectionUI extends Container {
   }
 
   private showItemMenu(): void {
-    const { inventory, contentX, contentY, eventBus, onCancel } = this.config;
-    const consumables = inventory.getAll().filter(entry => {
-      const item = ItemRegistry.getItem(entry.itemId);
-      return item?.type === 'consumable';
-    });
+    const { contentX, contentY, eventBus, onCancel } = this.config;
+    const consumables = this.listedItems();
 
     if (consumables.length === 0) {
       onCancel();
@@ -81,10 +80,19 @@ export class ItemSelectionUI extends Container {
   }
 
   hasNoItems(): boolean {
-    const { inventory } = this.config;
+    return this.listedItems().length === 0;
+  }
+
+  /** The item ids in the menu, in order. */
+  get listedItemIds(): string[] {
+    return this.listedItems().map(entry => entry.itemId);
+  }
+
+  private listedItems(): Array<{ itemId: string; quantity: number }> {
+    const { inventory, isUsable } = this.config;
     return inventory.getAll().filter(entry => {
       const item = ItemRegistry.getItem(entry.itemId);
-      return item?.type === 'consumable';
-    }).length === 0;
+      return item?.type === 'consumable' && (isUsable?.(entry.itemId) ?? true);
+    });
   }
 }

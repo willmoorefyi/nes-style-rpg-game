@@ -283,14 +283,13 @@ Armor provides Defense bonus and may grant resistances.
 
 | Item | Price | Effect |
 |------|-------|--------|
-| Potion | 60 | Restore 30 HP |
-| Hi-Potion | 150 | Restore 120 HP |
-| Ether | 500 | Restore 1 charge to each spell level |
-| Antidote | 75 | Cure Poison |
-| Soft | 800 | Cure Stone |
-| Tent | 250 | Restore HP/charges (overworld, partial) |
-| Cabin | 500 | Restore HP/charges (overworld, full) |
-| House | 3000 | Restore HP/charges (anywhere, full) |
+| Potion | 60 | Restore 30 HP (`stats.hp`; the message reports the HP actually gained) |
+| Hi-Potion | 150 | Restore 120 HP (`stats.hp`) |
+| Ether | 150 | Restore 1 charge to each spell level (up to the maximum) |
+| Antidote | 75 | Cure Poison (fails, and is kept, if the target is not poisoned) |
+| Soft | 800 | Cure Stone (fails, and is kept, if the target is not petrified) |
+| Tent | 75 | Party: restore half of max HP and half of each level's charges; not the fallen (world map only; not in battle) |
+| Cabin | 250 | Party: restore full HP and charges; not the fallen (world map only; not in battle) |
 | Phoenix Down | 500 | Revive with 1 HP |
 
 ### Key Items

@@ -16,13 +16,17 @@ export function createItemCommand(actorId: string, targetId: string, itemId: str
   return { type: 'item', actorId, targetId, itemId };
 }
 
+/**
+ * A fight, or a single-target spell (BA-3), whose target has died picks a living one uniformly. The caller decides
+ * which spells qualify (a party caster's `single` spell aimed at an enemy); the RNG is drawn only when retargeting.
+ */
 export function retargetIfDead(
   command: BattleCommand,
   isTargetAlive: (id: string) => boolean,
   getLivingTargets: () => string[],
   rng: () => number = Math.random
 ): BattleCommand {
-  if (command.type !== 'fight' || !command.targetId) return command;
+  if ((command.type !== 'fight' && command.type !== 'magic') || !command.targetId) return command;
   if (isTargetAlive(command.targetId)) return command;
 
   const living = getLivingTargets();

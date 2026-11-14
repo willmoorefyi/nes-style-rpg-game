@@ -1,7 +1,7 @@
 import type { Character } from '../entities/Character.js';
 import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellData } from '../types/index.js';
-import type { BattleCommand } from './BattleCommands.js';
+import { retargetIfDead, type BattleCommand } from './BattleCommands.js';
 import type { StatusEffect } from './StatusEffects.js';
 import { healAmount, magicDamage } from './DamageFormula.js';
 import { partyMagicDefense } from './CombatStats.js';
@@ -56,11 +56,20 @@ export class SpellExecutor {
     return [char];
   }
 
-  execute(cmd: BattleCommand, isEnemy: boolean): void {
-    const spell = this.spells.find(s => s.id === cmd.spellId);
+  execute(command: BattleCommand, isEnemy: boolean): void {
+    const spell = this.spells.find(s => s.id === command.spellId);
     if (!spell) {
       this.deps.addMessage('Unknown spell!');
       return;
+    }
+
+    // BA-3: a party caster's single-target spell at an enemy that already died goes to a living enemy (as Fight
+    // does); with none left the spell isn't cast and no charge is spent.
+    let cmd = command;
+    if (!isEnemy && spell.targeting === 'single' && cmd.targetId?.startsWith('enemy_')) {
+      const living = this.deps.livingEnemies();
+      if (living.length === 0) return;
+      cmd = retargetIfDead(cmd, id => living.some(e => e.id === id), () => living.map(e => e.id), this.deps.rng);
     }
 
     // Get caster

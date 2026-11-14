@@ -14,6 +14,8 @@ export class BattleFieldTargeting {
   targetOutline: Graphics | null = null;
   // L4: Shared flash timer for target selection effects
   targetFlashTimer: number = 0;
+  /** BA-7: true from `enterFieldTargeting` until confirm, cancel or no targets; the visuals draw only while set. */
+  private active = false;
 
   constructor(
     private readonly mainContainer: Container,
@@ -31,10 +33,12 @@ export class BattleFieldTargeting {
 
     const targets = this.getFieldTargets();
     if (targets.length === 0) {
+      this.active = false;
       onCancel();
       return false;
     }
 
+    this.active = true;
     this.updateTargetArrow([], isParty, 0);
     return true;
   }
@@ -56,6 +60,7 @@ export class BattleFieldTargeting {
   updateFieldTargeting(): void {
     const targets = this.getFieldTargets();
     if (targets.length === 0) {
+      this.active = false;
       this.fieldTargetCancelCallback?.();
       this.clearTargetArrow();
       return;
@@ -70,12 +75,14 @@ export class BattleFieldTargeting {
     } else if (this.input.isJustPressed('confirm')) {
       const target = targets[this.fieldTargetIndex];
       if (target) {
+        this.active = false;
         this.clearTargetArrow();
         this.fieldTargetCallback?.(target.id);
         this.fieldTargetCallback = null;
         this.fieldTargetCancelCallback = null;
       }
     } else if (this.input.isJustPressed('cancel')) {
+      this.active = false;
       this.clearTargetArrow();
       this.fieldTargetCancelCallback?.();
       this.fieldTargetCallback = null;
@@ -120,6 +127,8 @@ export class BattleFieldTargeting {
 
   /** Update target outline and flash effects during target selection */
   updateTargetVisuals(): void {
+    // BA-7: after confirm or cancel in the same frame, drawing would leave an outline that nothing removes
+    if (!this.active) return;
     this.targetFlashTimer++;
     const targets = this.getFieldTargets();
     const target = targets[this.fieldTargetIndex];

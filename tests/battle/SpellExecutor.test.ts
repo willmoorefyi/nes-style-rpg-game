@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { BattleStateMachine } from '../../src/battle/BattleStateMachine.js';
 import { Character } from '../../src/entities/Character.js';
 import type { EnemyData, CharacterClassData, SpellData } from '../../src/types/index.js';
-import { mulberry32, testClass, testEnemy } from '../helpers/testUtils.js';
+import { SpellExecutor } from '../../src/battle/SpellExecutor.js';
+import { mulberry32, testClass, testEnemy, testMageClass } from '../helpers/testUtils.js';
 
 const mageClass: CharacterClassData = {
   id: 'white_mage',
@@ -241,6 +242,50 @@ describe('SLEP: hit roll and the wake rule (FF1, EB-5)', () => {
     const seeds = Array.from({ length: 200 }, (_, i) => i + 1);
     const withTurn = seeds.filter(s => acted(s) >= 1).length;
     expect(withTurn / seeds.length).toBeGreaterThanOrEqual(0.95);
+  });
+});
+
+describe('BA-3: a single-target spell at an enemy that already died retargets', () => {
+  const fire: SpellData = { id: 'fire', name: 'FIRE', level: 1, type: 'black', effect: 'damage', targeting: 'single', description: 'Fire', power: 10, accuracy: 24, element: 'fire' };
+  const fast = testClass('warrior', { baseStats: { hp: 50, strength: 60, agility: 50, intelligence: 1, vitality: 8, luck: 5 } });
+  const goblins = [
+    testEnemy({ name: 'Goblin', stats: { hp: 1, agility: 1, evade: 0, defense: 0 } }),
+    testEnemy({ name: 'Goblin', stats: { hp: 500, agility: 1, magicDefense: 0 } }),
+  ];
+
+  it('Goblin A dies before the Black Mage acts: FIRE aimed at A damages B, and one charge is spent', () => {
+    const warrior = new Character({ name: 'WAR', classData: fast });
+    const mage = new Character({ name: 'BMAG', classData: testMageClass() });
+    const charges = mage.getSpellCharges(1);
+    expect(charges).toBeGreaterThan(0);
+    const battle = new BattleStateMachine({ party: [warrior, mage], enemies: goblins.map(g => structuredClone(g)), spells: [fire] }, mulberry32(3));
+    battle.startBattle();
+    battle.advanceFromIntro();
+    battle.submitCommand({ type: 'fight', actorId: 'party_0', targetId: 'enemy_0' });
+    battle.submitCommand({ type: 'magic', actorId: 'party_1', targetId: 'enemy_0', spellId: 'fire' });
+    battle.prepareRound();
+    expect(battle.peekNextAction()?.actorId).toBe('party_0');
+    battle.executeNextAction();
+    expect(battle.allEnemies[0].currentHp).toBe(0); // the Warrior killed Goblin A
+    expect(battle.peekNextAction()?.actorId).toBe('party_1');
+    const { messages, damageEvents } = battle.executeNextAction();
+    expect(damageEvents.some(e => e.targetId === 'enemy_1' && e.damage > 0)).toBe(true);
+    expect(battle.allEnemies[1].currentHp).toBeLessThan(500);
+    expect(messages.map(m => m.text)).toContain('Goblin B takes ' + damageEvents[0].damage + ' damage!');
+    expect(mage.getSpellCharges(1)).toBe(charges - 1);
+  });
+
+  it('with no enemy alive the spell is not cast and no charge is spent', () => {
+    const mage = new Character({ name: 'BMAG', classData: testMageClass() });
+    const charges = mage.getSpellCharges(1);
+    const said: string[] = [];
+    const executor = new SpellExecutor({
+      party: [mage], enemies: [], rng: () => 0.5, addMessage: (t) => said.push(t),
+      livingParty: () => [mage], livingEnemies: () => [], partyById: new Map([['party_0', mage]]), addDamageEvent: () => {},
+    }, [fire]);
+    executor.execute({ type: 'magic', actorId: 'party_0', targetId: 'enemy_0', spellId: 'fire' }, false);
+    expect(said).toEqual([]);
+    expect(mage.getSpellCharges(1)).toBe(charges);
   });
 });
 

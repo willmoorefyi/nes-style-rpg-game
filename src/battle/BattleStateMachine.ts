@@ -491,20 +491,29 @@ export class BattleStateMachine {
     this.messages.push({ text: result.message });
   }
 
-  /** Check if an enemy has crossed a boss phase HP threshold and switch pattern */
+  /**
+   * Check if an enemy has crossed a boss phase HP threshold (ST-6). The bookkeeping and the message need no AI;
+   * the pattern swaps only for an AI with `setPattern` when `bossPatterns` knows the id. An enemy with no AI
+   * (Garland) keeps the default targeting, so a phase is its message only and adds no RNG draws.
+   */
   private checkBossPhaseTransition(enemy: EnemyInstance): void {
     const phases = enemy.data.bossPhases;
-    if (!phases || !enemy.aiBehavior) return;
+    if (!phases) return;
 
     const hpPercent = enemy.currentHp / enemy.data.stats.hp;
     for (let i = 0; i < phases.length; i++) {
       if (enemy.crossedPhases?.has(i)) continue;
       if (hpPercent <= phases[i].hpThreshold) {
         enemy.crossedPhases?.add(i);
-        // Switch AI pattern if available
-        const newPattern = this.bossPatterns.get(phases[i].patternId);
-        if (newPattern && 'setPattern' in enemy.aiBehavior) {
-          (enemy.aiBehavior as { setPattern(p: BossPattern): void }).setPattern(newPattern);
+        const ai = enemy.aiBehavior;
+        if (ai) {
+          const newPattern = this.bossPatterns.get(phases[i].patternId);
+          if (!newPattern) {
+            // crossedPhases makes this fire once per phase
+            console.warn(`${enemy.data.id}: boss phase pattern "${phases[i].patternId}" is not in bossPatterns`);
+          } else if ('setPattern' in ai) {
+            (ai as { setPattern(p: BossPattern): void }).setPattern(newPattern);
+          }
         }
         if (phases[i].message) {
           this.messages.push({ text: phases[i].message! });

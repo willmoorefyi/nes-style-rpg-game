@@ -14,6 +14,7 @@ import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
+import { ItemEffects } from '../systems/ItemEffects.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 
@@ -391,6 +392,8 @@ export class BattleScene implements Scene {
       contentX: this.commandWindow.contentX,
       contentY: this.commandWindow.contentY,
       eventBus: this.deps.events,
+      // BA-4: Tent and Cabin are camp items; they are not listed in battle
+      isUsable: (id) => !ItemEffects.isPartyItem(id),
       onSelect: (result) => {
         this.battle.submitCommand(createItemCommand(actorId, result.targetName, result.itemId));
         this.cleanupItemUI();
@@ -401,7 +404,8 @@ export class BattleScene implements Scene {
         this.uiState = 'command';
       },
       onNeedTarget: (itemId) => {
-        this.enterFieldTargeting(true, false, (targetId) => {
+        // BA-5: a revive item (Phoenix Down) targets the fallen
+        this.enterFieldTargeting(true, ItemEffects.isReviveItem(itemId), (targetId) => {
           this.battle.submitCommand(createItemCommand(actorId, targetId, itemId));
           this.cleanupItemUI();
           this.startCommandPhase();
@@ -479,6 +483,15 @@ export class BattleScene implements Scene {
       this.commandWindow.addChild(mask);
       this.turnListContainer.mask = mask;
     }
+    // ST-6: round-start lines (a boss phase change) show before the first announcement, on the message timer
+    if (this.battle.currentMessages.length > 0) {
+      this.showMessages();
+      return;
+    }
+    this.startActions();
+  }
+
+  private startActions(): void {
     this.uiState = 'executing';
     this.animation.animPhase = 'announce';
     this.animation.animTimer = 0;
@@ -507,6 +520,8 @@ export class BattleScene implements Scene {
     } else if (this.battle.state === 'intro') {
       this.battle.advanceFromIntro();
       this.startCommandPhase();
+    } else if (this.battle.state === 'execution') {
+      this.startActions();
     } else if (this.battle.state === 'resolution') {
       this.resolveRound();
     } else if (this.battle.state === 'command_select') {

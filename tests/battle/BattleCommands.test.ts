@@ -30,6 +30,19 @@ describe('retargetIfDead', () => {
     expect(result).toEqual(cmd);
   });
 
+  it('BA-3: retargets a magic command whose target died, uniformly over the living', () => {
+    const cmd: BattleCommand = { type: 'magic', actorId: 'party_3', targetId: 'deadEnemy', spellId: 'fire' };
+    expect(retargetIfDead(cmd, isTargetAlive, getLivingEnemies, () => 0)).toEqual({ ...cmd, targetId: 'enemy1' });
+    expect(retargetIfDead(cmd, isTargetAlive, getLivingEnemies, () => 0.6).targetId).toBe('enemy2');
+  });
+
+  it('BA-3: a magic command at a living target is unchanged and draws no RNG', () => {
+    const cmd: BattleCommand = { type: 'magic', actorId: 'party_3', targetId: 'enemy2', spellId: 'fire' };
+    let draws = 0;
+    expect(retargetIfDead(cmd, isTargetAlive, getLivingEnemies, () => { draws++; return 0; })).toEqual(cmd);
+    expect(draws).toBe(0);
+  });
+
   it('uses rng to select random target', () => {
     const cmd: BattleCommand = { type: 'fight', actorId: 'hero', targetId: 'deadEnemy' };
     const result = retargetIfDead(cmd, isTargetAlive, getLivingEnemies, () => 0.99);
