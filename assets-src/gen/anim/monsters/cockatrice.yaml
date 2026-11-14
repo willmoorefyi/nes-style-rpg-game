@@ -1,0 +1,148 @@
+sprite: cockatrice
+body: bird
+facing: right
+sampler: nearest
+breath: true
+# Wings: the idle wing is folded into the body (part of `body`); only attack and hurt mark wsh/wel/wtip, so frames
+# cut from attack / hurt keep their raised wings (the idle side has no wing joints to interpolate toward) and any
+# wing motion is an explicit wtip tweak (a rotation about the shoulder, <= 30 deg). The snake tail is never
+# interpolated (its keyframe coils differ by far more than the 25 deg chain cap allows); it rides the body shift.
+# Body shift: the attack keyframe's body sits 8 px behind idle (lean back, neck thrust), so every in-between moves
+# the upper body joints by the same dx (the legs stay planted), which keeps the adjacent-frame centroid steps small.
+keyframes:
+  idle:
+    hip: [38, 56]
+    chest: [50, 45]
+    neck: [53, 37]
+    head: [55, 28]
+    beak: [64, 29]
+    tail0: [28, 54]
+    tail1: [21, 46]
+    tail2: [26, 37]
+    tail3: [27, 30]
+    tail_tip: [15, 27]
+    hip_n: [46, 60]
+    knee_n: [46, 65]
+    foot_n: [48, 72]
+    toe_n: [56, 75]
+    hip_f: [38, 60]
+    knee_f: [36, 65]
+    foot_f: [36, 72]
+    toe_f: [42, 75]
+  attack:
+    hip: [30, 56]
+    chest: [43, 45]
+    neck: [54, 45]
+    head: [65, 43]
+    beak: [79, 41]
+    tail0: [22, 54]
+    tail1: [9, 51]
+    tail2: [9, 44]
+    tail3: [16, 39]
+    tail_tip: [7, 28]
+    wsh_n: [42, 42]
+    wel_n: [46, 30]
+    wtip_n: [52, 14]
+    wsh_f: [34, 44]
+    wel_f: [27, 30]
+    wtip_f: [20, 14]
+    hip_n: [36, 59]
+    knee_n: [40, 63]
+    foot_n: [44, 65]
+    toe_n: [44, 70]
+    hip_f: [27, 59]
+    knee_f: [21, 64]
+    foot_f: [15, 71]
+    toe_f: [23, 75]
+  hurt:
+    hip: [36, 55]
+    chest: [46, 42]
+    neck: [55, 39]
+    head: [62, 34]
+    beak: [74, 31]
+    tail0: [30, 53]
+    tail1: [24, 50]
+    tail2: [22, 45]
+    tail3: [23, 40]
+    tail_tip: [27, 38]
+    wsh_n: [44, 40]
+    wel_n: [46, 28]
+    wtip_n: [47, 13]
+    wsh_f: [36, 42]
+    wel_f: [30, 28]
+    wtip_f: [23, 13]
+    hip_n: [52, 60]
+    knee_n: [56, 62]
+    foot_n: [60, 63]
+    toe_n: [61, 68]
+    hip_f: [40, 60]
+    knee_f: [39, 64]
+    foot_f: [45, 71]
+    toe_f: [47, 76]
+    fa0: [18, 37]
+    fa: [12, 39]
+    fb0: [20, 56]
+    fb: [15, 50]
+    fc0: [25, 57]
+    fc: [25, 61]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  wing_n: {bone: [wsh_n, wtip_n], radius: 8.0}
+  wing_f: {bone: [wsh_f, wtip_f], radius: 8.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  feather_a: {bone: [fa0, fa], radius: 3.0, in: [hurt]}   # the hurt keyframe's 3 loose feathers: own root joints (not joined to the body, so no crack fill)
+  feather_b: {bone: [fb0, fb], radius: 3.0, in: [hurt]}
+  feather_c: {bone: [fc0, fc], radius: 3.0, in: [hurt]}
+masks:
+  feather_a:
+    hurt: [[9, 34], [21, 34], [21, 42], [9, 42]]
+  feather_b:
+    hurt: [[13, 48], [18, 48], [22, 54], [22, 58], [17, 58], [13, 53]]
+  feather_c:
+    hurt: [[22, 57], [28, 57], [28, 63], [22, 63]]
+  head:                        # comb, face, beak and the whole wattle
+    idle: [[47, 16], [62, 16], [67, 28], [67, 32], [62, 33], [62, 38], [54, 38], [54, 30], [50, 29], [47, 24]]
+  tail:                        # body rim along the coil's narrow channel: same part on both sides, so the joint-crack fill leaves it open
+    attack: [[22, 44], [27, 44], [27, 50], [22, 50]]
+z:
+  attack: [wing_f, thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, wing_n, neck, head]
+  hurt: [wing_f, thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, wing_n, neck, head]
+frames:
+  atk_wind1:                   # neck rears back, body leans 2 px back
+    t: -0.2
+    pins: [foot_n, foot_f]
+    moves: [chest, neck, head, beak]
+    tweaks: {hip: [-2, 0], chest: [-2, 0], neck: [-2, 0], head: [-2, 0], beak: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0]}
+  atk_wind2:                   # coil: neck further back, body 4 px back and 2 px down
+    t: -0.3
+    dy: 1
+    pins: [foot_n, foot_f]
+    moves: [chest, neck, head, beak]
+    tweaks: {hip: [-4, 0], chest: [-4, 0], neck: [-4, 0], head: [-4, 0], beak: [-4, 0], tail0: [-4, 0], tail1: [-4, 0], tail2: [-4, 0], tail3: [-4, 0], tail_tip: [-4, 0], hip_n: [-3, 0], hip_f: [-3, 0]}
+  atk_mid:                     # the far (rear) leg is the attack leg moved 7 px forward (feet lerp), near wing 10 deg forward
+    t: 0.25
+    pins: [knee_f, foot_f, toe_f]
+    moves: [hip, chest, head, beak, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    tweaks: {hip: [0, 2], chest: [0, 2], neck: [0, 2], head: [0, 2], beak: [0, 2], tail0: [0, 2], tail1: [0, 2], tail2: [0, 2], tail3: [0, 2], tail_tip: [0, 2], wsh_n: [0, 2], wtip_n: [5, 4], wsh_f: [0, 2], wtip_f: [0, 2], hip_f: [4, 0], knee_f: [7, 0], foot_f: [7, 0], toe_f: [7, 0]}
+  atk_follow:                  # t < 1: the head pulls back 32% toward idle after the peck, wings start the downstroke
+    t: 0.68
+    moves: []
+    tweaks: {hip: [3, 0], chest: [3, 0], neck: [3, 0], head: [1, -2], beak: [1, -2], tail0: [3, 0], tail1: [3, 0], tail2: [3, 0], tail3: [3, 0], tail_tip: [3, 0], wsh_n: [3, 0], wtip_n: [8, 2], wsh_f: [3, 0], wtip_f: [3, 0]}
+  atk_recover:
+    t: 0.22
+    pins: [foot_n, foot_f]
+    moves: [chest, neck, head, beak]
+    tweaks: {hip: [-3, 0], chest: [-3, 0], neck: [-3, 0], head: [-3, 0], beak: [-3, 0], tail0: [-3, 0], tail1: [-3, 0], tail2: [-3, 0], tail3: [-3, 0], tail_tip: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0]}
+  hurt_in1:                    # body jolts 2 px forward and up off its legs, neck toward the hurt pose
+    moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {hip: [2, -2], chest: [2, -2], neck: [2, -2], head: [2, -2], beak: [2, -2], tail0: [2, -2], tail1: [2, -2], tail2: [2, -2], tail3: [2, -2], tail_tip: [2, -2]}
+  hurt_in2:                    # wings 20 / 30 deg down from the hurt spread
+    moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {hip: [-2, 1], chest: [-2, 1], neck: [-2, 1], head: [-2, 1], beak: [-2, 1], tail0: [-2, 1], tail1: [-2, 1], tail2: [-2, 1], tail3: [-2, 1], tail_tip: [-2, 1], wsh_n: [-2, 1], wtip_n: [7, 4], wsh_f: [-2, 1], wtip_f: [-2, 1]}
+holds: []
+paint:                         # 1 px joint cracks closed with outline ink
+  - {frame: atk_mid, xy: [[44, 65]], rgb: null}
+  - {frame: hurt_in1, xy: [[39, 67]], rgb: [6, 4, 10]}
