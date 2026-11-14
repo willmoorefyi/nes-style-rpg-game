@@ -1,5 +1,5 @@
 id: cornelia-white-magic
-name: White Magic
+name: White Magic Shop
 width: 8
 height: 6
 music: shop
@@ -109,7 +109,7 @@ npcs:
     y: 2
     sprite: mage
     dialog:
-      - Welcome to the White Magic!
+      - Welcome to the White Magic Shop! Healing arts, for those with the gift.
     shopId: cornelia_white
 transitions:
   - x: 3

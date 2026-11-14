@@ -148,21 +148,28 @@ npcs:
     text: [They say the King's builders are mending the bridge to the north., Seek the four crystals across the land.]
   - text: [The four crystals have gone dark., Only the Warriors of Light can restore them.]
 - id: villager
-  sprite: villager
+  sprite: burgher
   x: 34
   y: 45
   wander: true
   dialog: [Buy spells early. Garland is no easy foe!]
 - id: market_vendor_w
-  sprite: merchant
+  sprite: vendor_f
   x: 24
   y: 41
-  dialog: [Fresh apples from the royal orchard!, '...Sorry, these are not for adventurers.']
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: ['Apples from the royal orchard! Half price today, for the princess is home.', 'They say the King has builders out at the north bridge. Trade will come back, you''ll see.']
+  - text: ['Apples from the royal orchard! Dear this week, I''m sorry to say.', 'The carters won''t use the roads. Wolves, right up to the walls, and in daylight too.', 'Since the princess was taken, nobody
+        has the heart to haggle.']
 - id: market_vendor_e
-  sprite: merchant
+  sprite: farmer
   x: 37
   y: 41
-  dialog: ['Bread and cheese, the finest in Cornelia!']
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: ['Bread and cheese, the finest in Cornelia! Folk are buying again, now Her Highness is safe.', Once the north bridge is mended I'll take my cheeses across. They fetch double over there.]
+  - text: ['Bread and cheese, the finest in Cornelia!', 'With the north bridge broken, nothing comes in from across the water. Flour costs a fortune.', 'And with the princess gone, who has an appetite?']
 - id: townswoman
   sprite: villager_f
   x: 44
@@ -451,3 +458,8 @@ noWander:
 - [11, 23]
 - [11, 24]
 - [11, 25]
+inspect:
+- x: 32
+  y: 66
+  text: ['The sign reads: "CORNELIA, the royal city."', 'North, up the high street: the Inn (first lane on the left), then the Market Square, and the Castle at the top.', 'Magic Quarter: from the Market
+      Square, west along the road, then south down the lane.']

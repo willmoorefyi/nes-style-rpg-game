@@ -2,7 +2,7 @@
 # The black magic shop: a dark room, a counter on the east side and black orbs in a niche.
 # legend: W wall top  F wall face  _ wood floor  - stone / earth floor  + carpet  c counter
 id: cornelia-black-magic
-name: Black Magic
+name: Black Magic Shop
 kits:
 - interior
 - town
@@ -84,7 +84,7 @@ npcs:
   x: 7
   y: 3
   sprite: mage
-  dialog: [Welcome to the Black Magic!]
+  dialog: ['Welcome to the Black Magic Shop! Destructive arts, for those with the nerve.']
   shopId: cornelia_black
 transitions:
 - {x: 6, y: 8, targetMap: cornelia, targetEntrance: black_magic}

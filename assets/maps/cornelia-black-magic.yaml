@@ -1,5 +1,5 @@
 id: cornelia-black-magic
-name: Black Magic
+name: Black Magic Shop
 width: 8
 height: 6
 music: shop
@@ -109,7 +109,7 @@ npcs:
     y: 2
     sprite: mage
     dialog:
-      - Welcome to the Black Magic!
+      - Welcome to the Black Magic Shop! Destructive arts, for those with the nerve.
     shopId: cornelia_black
 transitions:
   - x: 3

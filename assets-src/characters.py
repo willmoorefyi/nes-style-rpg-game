@@ -789,4 +789,13 @@ ROSTER: dict[str, Look] = {
     "king": Look(hair=(26, 26, 28), hair_style="short", beard=(26, 26, 28), outfit="robe", cloth=(24, 4, 6),
                  trim=(31, 31, 30), gear="crown", boots=(26, 22, 8), cape=(24, 4, 6)),
     "chest": Look(prop="chest"),
+    # Townsfolk (CT-9 / UI-2): legacy looks until their 2x field sheets are approved (T6-art checkpoints 3-5)
+    "vendor_f": Look(hair=(16, 9, 4), hair_style="long", outfit="dress", cloth=(26, 20, 5), trim=(30, 30, 28),
+                     boots=(12, 7, 4), gear="bandana", gear_color=(7, 18, 8)),
+    "farmer": Look(skin=SKIN_TAN, hair=(14, 8, 4), hair_style="short", beard=(14, 8, 4), outfit="tunic",
+                   cloth=(14, 16, 6), trim=(29, 27, 21), pants=(15, 10, 5), boots=(12, 7, 4), gear="round_hat",
+                   gear_color=(28, 24, 12)),
+    "burgher": Look(hair=(21, 21, 22), hair_style="short", outfit="coat", cloth=(16, 5, 14), trim=(30, 30, 30),
+                    pants=(4, 4, 6), boots=(3, 3, 4), gear="feather", gear_color=(4, 4, 6), gear_color2=(31, 31, 31),
+                    cape=(4, 4, 6)),
 }

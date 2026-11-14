@@ -5,15 +5,19 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
-import type { MapData } from '../../src/types/index.js';
+import { resolveNPCDialog, type ConditionalDialog, type MapData } from '../../src/types/index.js';
+import { inspectAt } from '../../src/scenes/exploration/FieldInspect.js';
 
 // CT-1 / CT-6 / IN-5: Cornelia's houses, edge exits and shop layouts. The house checks read the map sources
 // (assets-src/maps, written by layouts/cornelia.py and layouts/interiors.py); the walking checks read the compiled maps.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 interface Obj { type: string; name?: string; x: number; y: number; w?: number; h?: number; door?: number;
   enter?: { map: string; entrance: string } }
-interface Source { id: string; ground: string; music?: string; canSave?: boolean; no_static_chokepoints?: boolean;
-  objects?: Obj[]; npcs?: Array<{ id: string; sprite: string; x: number; y: number; chestItem?: string }>;
+interface Source { id: string; name?: string; ground: string; music?: string; canSave?: boolean;
+  no_static_chokepoints?: boolean; objects?: Obj[];
+  npcs?: Array<{ id: string; sprite: string; x: number; y: number; chestItem?: string; shopId?: string;
+    dialog: string[] | ConditionalDialog[] }>;
+  inspect?: Array<{ x: number; y: number; text: string[] | ConditionalDialog[] }>;
   entrances?: Record<string, [number, number]>;
   transitions?: Array<{ x: number; y: number; targetMap: string; targetEntrance?: string }> }
 const sources = new Map(readdirSync(join(root, 'assets-src/maps')).filter((f) => f.endsWith('.yaml'))
@@ -172,6 +176,67 @@ describe('Cornelia edges (CT-6)', () => {
     }
     for (const name of ['south_gate', 'west_gate', 'east_gate', 'castle_gate', 'north_postern']) {
       expect(map.entrances?.[name], name).toBeDefined();
+    }
+  });
+});
+
+describe('Cornelia shopkeepers (IN-4)', () => {
+  const legacy = (id: string) => parse(readFileSync(join(root, 'assets/maps', `${id}.yaml`), 'utf-8')) as MapData;
+  const keepers = (npcs: Array<{ id: string; shopId?: string; dialog: string[] | ConditionalDialog[] }>) =>
+    npcs.filter((n) => n.shopId).map((n) => ({ id: n.id, first: resolveNPCDialog(n.dialog, () => false)[0] ?? '' }));
+
+  it('every keeper greets you with the name of a shop or the inn, never "...Magic!"', () => {
+    for (const id of SHOPS) {
+      for (const [where, npcs] of [['source', sources.get(id)!.npcs ?? []], ['legacy', legacy(id).npcs]] as const) {
+        const ks = keepers(npcs);
+        expect(ks.length, `${where} ${id}`).toBe(1);
+        for (const k of ks) {
+          expect(k.first, `${where} ${id} ${k.id}`).toMatch(/\b(Shop|Inn)\b/);
+          expect(k.first, `${where} ${id} ${k.id}`).not.toMatch(/Magic!$/);
+        }
+      }
+    }
+  });
+
+  it('the magic shops are called "White Magic Shop" and "Black Magic Shop" on the HUD', () => {
+    for (const [id, name] of [['cornelia-white-magic', 'White Magic Shop'], ['cornelia-black-magic', 'Black Magic Shop']]) {
+      expect(sources.get(id)!.name, id).toBe(name);
+      expect(compiled(id).name, id).toBe(name);
+      expect(legacy(id).name, `legacy ${id}`).toBe(name);
+    }
+  });
+});
+
+describe('Cornelia signpost and townsfolk (CT-9 / UI-2)', () => {
+  const SIGNPOST: [number, number] = [32, 66];
+
+  it('the signpost by the south gate can be read: directions to the castle, market, magic shops and inn', () => {
+    const [x, y] = SIGNPOST;
+    expect((town.objects ?? []).some((o) => o.type === 'signpost' && o.x === x && o.y === y)).toBe(true);
+    const lines = inspectAt(compiled('cornelia'), x, y, () => false);
+    expect(lines).not.toBeNull();
+    const text = lines!.join(' ');
+    for (const place of [/castle/i, /market/i, /magic/i, /\binn\b/i, /north/i]) expect(text).toMatch(place);
+  });
+
+  it('on the Cornelia map, no NPC without a shop uses the merchant sprite', () => {
+    const offenders = (town.npcs ?? []).filter((n) => n.sprite === 'merchant' && !n.shopId);
+    expect(offenders.map((n) => n.id)).toEqual([]);
+    expect(compiled('cornelia').npcs.filter((n) => n.sprite === 'merchant' && !n.shopId).map((n) => n.id)).toEqual([]);
+  });
+
+  it('the market vendors are townsfolk with chatter that changes once the princess is rescued', () => {
+    const npcs = compiled('cornelia').npcs;
+    const sprites: Record<string, string> = { market_vendor_w: 'vendor_f', market_vendor_e: 'farmer', villager: 'burgher' };
+    for (const [id, sprite] of Object.entries(sprites)) expect(npcs.find((n) => n.id === id)?.sprite, id).toBe(sprite);
+    for (const id of ['market_vendor_w', 'market_vendor_e']) {
+      const n = npcs.find((v) => v.id === id)!;
+      expect(n.dialog.length, id).toBeGreaterThanOrEqual(2);
+      const before = resolveNPCDialog(n.dialog, () => false);
+      const after = resolveNPCDialog(n.dialog, (f) => f === 'PRINCESS_RESCUED');
+      expect(before.length, id).toBeGreaterThan(0);
+      expect(after, id).not.toEqual(before);
+      expect(before.join(' '), id).not.toMatch(/not for adventurers/i);
     }
   });
 });
