@@ -185,3 +185,151 @@ OW-10 is deferred and stays open.
   - Save → a battle elsewhere → Load returns you to the saved map and tile, the field is visible and moves, and the next battle ends.
   - A second New Game in the same session starts clean.
   - The console showed 0 errors.
+
+---
+
+## T2: Major engine and UX bugs
+
+Root causes are from the playtest; the implementer re-verifies each one before changing code. Unless stated otherwise, every fix gets a unit test that fails on the old code.
+
+### Party and battle
+- **NG-3: naming and duplicate names.**
+  - Add a name-entry step to party creation after each class pick:
+    - a letter grid (A–Z, a–z, 0–9, `.`, `-`, space) with Back / End, up to 6 characters;
+    - the default name is pre-filled and confirm accepts it.
+  - Default names are made unique (`FGHTR`, `FGHTR2`).
+  - The battle animation finds the actor's sprite by its party index or character object (`Character` identity; the state machine can carry an actor reference or index), never by `name`. The same goes for enemies with equal display names: match on the instance.
+  - Tests:
+    - two Warriors named the same: the second one's attack animates the second sprite;
+    - the name grid writes a custom name.
+- **NG-4: spell charges.**
+  - A new `Character` starts with full charges for its level.
+  - Learning a spell (magic shop) never leaves its level's charges below what the class has at that level.
+  - Test: a new Black Mage that learns FIRE can cast it at once.
+- **BA-1: running away.**
+  - On a successful escape the battle ends in a new `escaped` result. `executeNextAction` must not overwrite the end state.
+  - `BattleEndData` gets `escaped?: boolean`.
+  - `BattleTrigger.onBattleEnd`, when escaped: no rewards, no Game Over, clear the retry snapshot, pop back to the field (a boss battle never allows Run).
+  - The victory, defeat and escape outcomes are decided in one place.
+  - Tests:
+    - with a forced-success RNG, the battle ends as escaped and the field resumes;
+    - a failed escape continues the battle.
+- **BA-2: the battle stalls between rounds.**
+  - When the actions resolve, the battle shows each message for a short time (about 1 s at 60 fps, skippable with confirm) and moves on by itself: to the next round's command menu, or to Victory / Game Over.
+  - Victory and level-up text still wait for a confirm, because they're reading moments.
+  - Remove the empty-box dead state.
+  - Test: the battle goes from resolution to command_select with no input after N frames.
+
+### Menus, shops and field magic
+- **MS-1: equip slots.** `EquipScene` only lists items whose `slot` matches the slot being edited. `Character.equip` refuses an item whose slot doesn't match (it returns false, and the caller shows a message). Test: chain mail can't go in the shield or helmet slot, and a cap can't go in the body slot.
+- **MS-2: shop comparison.** The comparison uses `usableBy`, or the class's equipment rules, the same check `EquipScene` uses (share one helper). Members who can't equip the item show "—" (can't equip) instead of a +/− value. Test included.
+- **MS-3: field CURE and Tent.**
+  - Field CURE uses the same heal formula as battle CURE (share one function) and doesn't affect fallen allies. It reports "X recovers N HP" or "No effect."
+  - With no usable field spells, the field magic screen says so instead of doing nothing.
+  - Tent and Cabin don't revive the fallen (revival is Phoenix Down's job, as in FF1).
+  - Tests included.
+- **MS-4, the rest: "Save greyed out in the streets".** Find why the field menu disables Save on town maps; `canSave` defaults to true. Town and castle maps allow saving; the Temple doesn't. Test the menu's enabled state per map.
+
+### Field
+- **EB-2: no encounters on warps.** `EncounterSystem` doesn't count a step, and doesn't trigger a battle, when the step ends on a transition, key-item-gate or scripted-encounter tile. Bumping into a blocked gate isn't a step. Roads and bridges keep encounters (triage decision). Test: walking onto a warp tile at step count 0 never starts a battle.
+- **CT-2 / CT-3: NPC movement.**
+  - Wandering NPCs check walkability with `WalkingMode`, so no water, walls or counters.
+  - They stay within 3 tiles of their spawn tile.
+  - They never step onto a transition tile, the tile in front of a transition (the door approach), a key-item gate, an entrance tile, or a scripted-encounter tile.
+  - They don't move while the player is within 1 tile (this also removes CT-11's "walks off as you arrive").
+  - Tests for each rule.
+- **IN-1: shop music.** The six shop and inn interiors get `music: shop` in `assets-src/maps/*.yaml` (if a layout script generates them, edit the script), then recompile.
+- **IN-2: small rooms pinned to the top-left.** When a map is smaller than the viewport, `Camera` centres it, giving a negative offset on that axis. The baked renderer and the NPC/player layers must agree. Test: a 10x8 map gives a centred container offset.
+
+### Validation
+- `npm run build` and `npm test` pass, plus `npx vitest run tests/data`.
+- **Browser** (`?mute=1`, 127.0.0.1):
+  - name a character;
+  - two same-class members each animate their own sprite;
+  - Run escapes;
+  - rounds flow without key presses;
+  - Equip refuses a wrong-slot item;
+  - the shop shows "—" for a mage;
+  - field CURE;
+  - Save is enabled in town;
+  - no encounter on the city gate tiles (30 attempts);
+  - NPCs stay near home and off doors;
+  - the shop plays shop music;
+  - an interior is centred.
+
+### T2 revisions after the momus review (binding)
+
+**T2 is split** into three parts, each reviewed separately:
+- **T2a, battle:** the NG-3 sprite identity, BA-1 and BA-2.
+- **T2b, menus and party:** the NG-3 name grid, NG-4 and MS-1 to MS-4.
+- **T2c, field:** EB-2, CT-2/CT-3, IN-1 and IN-2.
+
+#### T2a, battle
+- **NG-3 sprite.**
+  - `peekNextAction()` also returns `actorId` (the action's `combatantId`).
+  - `findActorSprite(actorId)` maps `party_i` to `partySprites[i]` and `enemy_i` to `enemySprites[i]`.
+  - The name-based regexes in `battleMessageUtils.ts` must keep working for names with spaces and `.`; test that.
+- **BA-1 outcome.**
+  - Add `BattleStateMachine.outcome: 'victory' | 'defeat' | 'escaped' | null` and `isOver`.
+  - Escaping clears the action queue and calls `clearBattleState()`.
+  - The end state is never overwritten by the `'resolution'` writes at `:273` and `:287-290`.
+  - Use `isOver` / `outcome` in `BattleAnimationController.completeAction` and in `BattleScene` at `:477-486`, `:495`, `:508` and `:513-522`.
+  - The `escaped` flag goes in the `battleEnd` payload types: `EventBus.ts`, `BattleTrigger` `BattleEndData`, and the ExplorationScene handler.
+  - "Escaped!" closes on confirm, like the other end states.
+  - Rewrite `tests/integration/battle.test.ts:159-185` with deterministic RNG.
+- **BA-2 pacing.**
+  - Replace `round_end`'s confirm wait with a timer.
+  - Timer constants: `ROUND_END_FRAMES = 20`. The result messages keep 25 frames each and the announce keeps 30; confirm skips any of them.
+  - Leave `round_end` only when `dyingEnemies` is empty and no enemy pose is attacking.
+  - After `startCommandPhase`, ignore confirm for 10 frames, so mashing doesn't pick commands.
+  - Spell and item UI messages ("No spells available.") get their own one-off message path; never set `currentMessageIndex = -1` and replay old messages. This fixes BA-6.
+  - Level-up text stays in the field dialog; no change there.
+  - Update `tests/scenes/battle/enemyPoseFlow.test.ts`.
+  - Test: with no input, resolution reaches `command_select` within the stated frame budget.
+
+#### T2b, menus and party
+- **Name grid.**
+  - New `src/ui/NameEntryGrid.ts`.
+  - `PartyCreationScene` keeps `names[]` alongside `selectedClasses` and pops it in every Back path.
+  - The chosen names appear in the slot display and the summary.
+  - On the grid, cancel deletes a letter, or goes back to class select when the name is empty.
+  - Names are trimmed, and empty means the default; at most 6 characters from `[A-Za-z0-9 .-]`.
+- **NG-4.**
+  - The constructor fills charges to max.
+  - On level-up, current charges rise by however much the max rose.
+  - On learn, a spell level is set to max only if this is the first spell known at that level.
+  - Keep the current charge table; T4 brings in FF1's per-class numbers.
+  - Fix `MagicShopScene` so it doesn't take gold before `learnSpell` succeeds.
+  - Tests: a new mage; a Lv1 mage levelled to 5 who then learns a level-2 spell; a full spell level costs no gold.
+- **MS-1.** Add a single `slotOf(item) = item.slot ?? (type === 'weapon' ? 'weapon' : 'armor')` helper, plus `Character.canEquipIn(slot, item)`. Use them in `EquipScene` (check before unequipping), in `Character.equip`, and in `DebugScenarioLoader`, which currently never equips weapons or body armour.
+- **MS-2.** Use `Character.canEquip` (`usableBy`). Mark members who can't equip the item with `n/a`, because the NES font has no em dash.
+- **MS-3.**
+  - A shared `healAmount(spell, caster, rng)` built from SpellExecutor's heal and DamageFormula.
+  - Field magic gets a message line in `spellWindow`, and fallen members can't cast.
+  - "No field spells" is shown instead of returning silently.
+  - Target labels refresh, and `all_allies` heals work.
+  - CURE on a full-HP target says "No effect." and doesn't use a charge.
+  - Tent and Cabin skip fallen members for both HP and charges.
+- **MS-4.** `Menu.setItemEnabled(i, enabled)` redraws the item, and `FieldMenuScene` uses it. The test checks the drawn text's fill colour.
+
+#### T2c, field
+- **EB-2.**
+  - `EncounterSystem.setStepFilter((x, y) => boolean)`, built in `loadMap` from transitions, key-item gates and scripted encounters.
+  - A filtered step neither counts down nor triggers; a blocked gate bump isn't a step.
+  - Test: the counter fires on the step where `stepsRemaining === 1`, and never on a warp tile.
+- **CT-2 / CT-3.**
+  - Pure rules in a new `src/scenes/exploration/NpcWander.ts`, with the RNG injected into `NPC`.
+  - The spawn tile is stored.
+  - The wander radius is 3, measured Manhattan.
+  - Forbidden tiles:
+    - transition tiles and every walkable 4-neighbour of them;
+    - key-item gates;
+    - `MapData.entrances` tiles;
+    - scripted-encounter tiles;
+    - the per-map `noWander` tiles (new optional `MapData.noWander: [x, y][]`);
+    - the player's current and target tiles.
+  - NPCs don't step while the player is within Manhattan distance 1.
+  - `WalkingMode` decides walkability.
+  - Cornelia: set `wander: False` for `gardener`, or add `noWander` for the north-postern route (8,17)–(8,25) and (9,17)–(11,25), in `layouts/cornelia.py`. Regenerate and recompile.
+- **IN-1.** Add `music: shop` to the six hand-written `assets-src/maps/cornelia-*` interiors and to their legacy copies in `assets/maps/`. While here, battle and victory music: `BattleTrigger` passes `audio` in the battle dependencies, and `onResume` restarts the map track. Verify both.
+- **IN-2.** `Camera` centres any axis smaller than the viewport. Test with `(GAME_W - w*TILE_SIZE)/2`, a 10x8 room, and the 16x13 tower (centred on one axis only).
