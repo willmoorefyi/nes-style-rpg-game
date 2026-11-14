@@ -364,3 +364,422 @@ Root causes are from the playtest; the implementer re-verifies each one before c
 **Known, not from T2:**
 - The map build is not deterministic: about 466 pixels change in two Cornelia chunks on some runs. Track it in T3.
 - `BattleStateMachine.ts` (620 lines) and `BattleScene.ts` (about 570) are over the size guideline.
+
+---
+
+## T3: Major map work
+
+**Defects:** CT-1, CT-6, OW-1, OW-2, OW-4, OW-5, OW-11, OW-15, and map-build determinism.
+
+**Folded in, because they share the work:**
+- OW-3, OW-6, OW-7, OW-12, OW-13 and OW-14: the overworld is rebuilt anyway;
+- CT-7, which CT-6 covers, and CT-8: both are Cornelia edits;
+- **IN-5:** the six shop interiors move into the same generator as the houses.
+
+**Left to T6:** CA-7, the empty castle rooms. It touches `layouts/castle.py` and wants the ST-12 chest fix first.
+
+**Rules for the whole tranche:**
+- Edit generators and sources, never `assets/maps/ai/**`.
+- Sub-branches commit sources and code. They may also commit compiled output for their own review, but `t3-integration` discards it and rebuilds every map once after the last merge. This avoids binary conflicts.
+- No step adds an encounter table or changes one. Zones are T4's job (EB-1).
+
+### Sub-tranches and order
+
+| # | Scope | Owns (files) | Depends on |
+|---|---|---|---|
+| T3a | Compiler core: determinism, object and collision features, map checks, preview and check CLIs | `assets-src/tools/build_map.py` (objects, validation, CLI), new `assets-src/tools/map_checks.py` | none; **merge first** |
+| T3b | Compiler terrain: organic edges, blends, foothills, peak variants (OW-4/OW-5) | new `assets-src/tools/terrain.py`; in `build_map.py`, only the step-1 soft-ground loop and the peaks block, replaced by one call | T3a's determinism fix (rebase) |
+| T3c | Overworld layout: OW-15, OW-1/2/3/6/7/12/13/14, the tomb's map data (OW-11) | new `assets-src/tools/layouts/overworld.py`, `assets-src/maps/overworld.yaml` (now generated), `assets-src/gen/approved/overworld/city.json` (`paint` fixes), legacy `assets/maps/overworld.yaml` (entrance aliases only) | T3a for the final compile; T3e for the tomb to work in the game; T3b only for the final look |
+| T3d | Cornelia: 10 house interiors (CT-1), edge exits (CT-6/CT-7), dead-end paths (CT-8), shop layouts (IN-5) | `layouts/cornelia.py`, new `layouts/interiors.py`, `layouts/common.py` (`Room` moved here), the six `assets-src/maps/cornelia-*shop*.yaml`, `-inn.yaml` and `-magic.yaml` files (now generated), legacy `assets/maps/cornelia.yaml` (entrance aliases only) | T3a (`edge_exits`); the overworld entrance names below |
+| T3e | Runtime "inspect" cells (the tomb's text) | `src/types/index.ts`, `src/core/schemaValidation.ts`, `src/systems/NPCInteraction.ts`, new `src/scenes/exploration/FieldInspect.ts`, a hook in `ExplorationScene.ts` | none; can start at once |
+
+**Order:**
+1. T3a and T3e run in parallel.
+2. Once T3a merges, T3b, T3c and T3d run in parallel.
+3. Integration: merge T3b, then T3c, then T3d; rebuild all maps; validate.
+
+**Fixed contract between T3c and T3d.** Entrance names:
+- Overworld arrivals: `cornelia` (south), `cornelia_west`, `cornelia_east` and `cornelia_north`. The legacy name `castle` is kept as an alias of `cornelia_north`.
+- Cornelia targets: `south_gate`, `west_gate`, `east_gate` and `castle_gate`.
+
+### T3a: compiler core
+
+1. **Determinism (cause found).**
+   - In `compile_map` step 2, a water cell that falls outside the rounded canal outline is painted with the land beside it: `land = max(set(near), key=near.count)`.
+   - When two materials tie, the winner depends on set iteration order, which follows the per-process string hash (`PYTHONHASHSEED`).
+   - Reproduced: compiling `cornelia` under seeds 1, 2 and 3 gives the same output for 1 and 2, but 932 px change under 3, in cells (28,52) and (33,55). `overworld`, `temple-of-fiends` and `cornelia-castle` don't change.
+   - **Fix:** use `Counter(near)` and break ties by `SOFT` order (the earlier material wins). No set iteration may feed pixel output.
+   - **Test (selftest):** build a synthetic map with a water cell whose neighbours are 3 grass and 3 cobble. Compile it in subprocesses under `PYTHONHASHSEED` 0 to 7 and require every SHA-256 of `below` to match. On the old code at least one seed differs.
+   - **New CLI:** `build_map.py --check-determinism [ids]` compiles each map under two hash seeds and compares hashes of `below`, `above` and `collision`.
+2. **Icon and object features.** These go in `compile_map` object handling and `footprint`.
+   - `deco` and `prefab` take `offset: [dx, dy]` in native px, applied to every pasted part.
+   - `deco` takes `style`, which goes through `styled()`, so a deco can be recoloured.
+   - `deco` and `prefab` take `collide: alpha` (with an optional `alpha_min`, default 0.25). A footprint cell blocks only when that share of its pixels is opaque art; `walk_cells` still override. This fixes OW-7, the square footprint corners of a round icon and the empty top row of the temple icon.
+   - `null` part entries count in the footprint, so an icon shifted by half a cell can use a 5-wide grid.
+3. **Edge exits (CT-6).**
+   - Source key: `edge_exits: {north|south|west|east: {targetMap, targetEntrance}, split?: [{side, from, to, targetEntrance}]}`.
+   - After collision is final, every walkable edge cell gets a transition. Corner cells go to the north or south side.
+   - Explicit `transitions` on edge cells win.
+   - **Validator:** with `edge_exits` set, every walkable edge cell is a transition.
+4. **Inspect cells (OW-11; the runtime is in T3e).**
+   - `inspect: [{x, y, text: [...]}]` is added to `PASSTHROUGH`.
+   - **Validator:** the cell is in bounds and has a reachable walkable 4-neighbour.
+5. **New `map_checks.py`, called from `validate()`. Each check is opt-in per source.**
+   - `sealed_edges: true`: no walkable cell on the map edge (OW-14).
+   - `road_check: {materials: [dirt], ends: [[x, y], ...]}` (OW-1/OW-2/CT-8):
+     - road cells, counting bridges, form one 4-connected component;
+     - a road cell with ≤ 1 road neighbour must touch a transition, a bridge end, a gate or a listed `ends` cell;
+     - no road cell lies under a blocked icon footprint cell.
+   - `warp_leaves: true` (OW-2): every transition cell has at most one walkable 4-neighbour outside its own icon, so no junction is a warp.
+   - `min_blob: {mountain: 3, sand: 3, forest: 3, ocean_inlet: 2}` (OW-12): no terrain component smaller than the minimum, and no 1-cell-wide water inlet.
+   - `talkable` (all maps): every NPC has a reachable walkable neighbour, or is reachable across a counter. This ports `untalkable` from `/tmp/playtest/town/reach.py`.
+   - `river_check` (OW-6):
+     - river cells, plus bridge cells over river, form components that each touch both a source (a lake `~`, or mountain) and the ocean;
+     - on each side of a bridge, the river channel uses the same columns (or rows) as the bridge span.
+6. **New `map_report.py`, a committed port of `/tmp/playtest/town/{reach,choke}.py`.** For a compiled map, it prints:
+   - reachability from every entrance;
+   - walkable edge cells that are not exits;
+   - single-cell chokepoints when static NPCs block their cells;
+   - BFS distances between named points.
+7. **`build_map.py --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision]`** stitches the chunks and crops them, with an optional grid and a collision overlay (replaces the `/tmp` stitch and crop scripts).
+
+**Tests:** `--selftest` gets one failing-then-passing case for each of items 1–5. It also asserts that the town and castle maps, which set none of the new keys, compile to the same `below` hashes as before. The two determinism cells are the only allowed difference.
+
+### T3b: terrain blending (OW-4 / OW-5)
+
+- **Scope:** opt-in with `terrain: organic` in a source; only the overworld sets it. Town, castle and temple output must stay byte-identical (selftest hash check).
+- **Hook:** new `terrain.paint_soft(below, mat, kit, seed)` replaces the `SOFT` loop. New `terrain.place_peaks(canvas, mat, owner, kit, rng)` replaces the per-cell `peak` paste.
+- **Paid art: none needed.** Everything below is derived from the approved `overworld` terrain textures and the `peak`, `tree_clump` and `boulder` parts.
+
+**Techniques:**
+1. **Organic outline (coast, sand, river, forest).**
+   - Blur the cell mask (r 20 px, twice), then resample it through a two-octave domain warp: value noise with a 96 px cell and 14 px amplitude, plus a 24 px cell and 5 px amplitude. Threshold at 0.5.
+   - **Fidelity clamp:** the central 28x28 px of each cell always shows that cell's material. Collision still matches the art.
+2. **Blends instead of dark lines.**
+   - Grass and sand meet in a 10 px band dithered with a 4x4 Bayer matrix.
+   - Forest gets a 1 px canopy rim and a 3 px shadow cast to the south-east (light comes from the top-left). This replaces the tan fringe. `tree_clump` stamps sit about every 40 px along the outline and stick out by at most 14 px.
+3. **Water.**
+   - A shallow band: ocean pixels within 10 px of land are tinted 35 % toward cyan, dithered.
+   - The foam is broken by noise.
+   - Ocean meeting grass gets an automatic 6–10 px sand beach on the land side; ocean meeting mountain gets a dark rock rim.
+   - The river gets 3 px dithered earth banks.
+4. **Foothills.**
+   - Walkable grass within one cell of a mountain gets the mountain texture at 25–50 % dithered coverage, fading with distance.
+   - Small peaks (0.5–0.6x) and `boulder`s are scattered by Poisson disc.
+   - Collision doesn't change; these cells stay grass, so battle backgrounds stay grassland.
+5. **Peak variants.**
+   - Built at kit load: `peak` × {as drawn, mirrored} × scale {0.6, 0.8, 1.0, 1.25}, resampled with LANCZOS, the alpha thresholded and the colours snapped back to the part's own palette.
+   - A snow-cap version: the top 35 % of the opaque rows are lightened toward (232,236,244) behind a dithered line. It is used only at scale ≥ 1.0 and at a distance-to-edge of 2 cells or more.
+   - Placement: Poisson disc with a minimum spacing of 30 px × scale, anchored at the bottom inside the mask, drawn in y order, with larger peaks toward the inside of the range.
+   - Peaks may overhang a walkable cell by at most 8 px.
+
+**Tests** (selftest metrics on synthetic maps; each fails on the current output):
+- On a straight 10-cell coast:
+  - the longest straight axis-aligned run of the land/water boundary is ≤ 72 px;
+  - ≤ 15 % of boundary pixels lie within 2 px of a cell line;
+  - the same holds for the sand/grass, forest/grass and mountain/grass boundaries.
+- On a 6x4 mountain block:
+  - at least 4 distinct peak variants are used;
+  - the standard deviation of the peak anchor positions mod 48 is ≥ 10 px (today the jitter is only ±4 px);
+  - ≥ 90 % of the grass cells next to the mountain contain foothill pixels.
+- Fidelity: the centre of every cell shows its own material.
+
+**Metrics on real output:** `build_map.py --metrics overworld` prints the same numbers for the real overworld, and the review uses them.
+
+### T3c: overworld layout (OW-15 and the rest)
+
+**The overworld becomes generated.** New `layouts/overworld.py` writes `assets-src/maps/overworld.yaml`, with the same header convention as `cornelia.py`:
+- About 72x56 cells, so 5x4 chunks.
+- Shapes are drawn with seeded `numpy` noise; there is no unseeded `random` and no `hash()`.
+- The source sets `terrain: organic`, `sealed_edges`, `road_check`, `warp_leaves`, `min_blob` and `river_check`.
+- `kits: [overworld, town, temple]`, so the tomb can use temple parts.
+
+**Geography.** The layout is original: the idea follows the classic world map, the coastline does not.
+- **The peninsula** (Cornelia, the temple and the east pocket) hangs south-west from a larger landmass.
+- **A sound** opens to the western ocean north of the peninsula. It narrows eastward and ends at a fjord head. It is not a straight strait (OW-5).
+- **The north mainland** wraps across the top. It is ringed by ocean, at least 3 cells, on every map edge (OW-14).
+- **The isthmus.** The peninsula's north-east joins the mainland over land, but an unbroken range, 3–6 cells thick, runs from the fjord head south-east to the eastern sea. It is the original "spine" range and seals the land route (OW-15).
+- **The north bridge** crosses the sound at its narrowest point. It is drawn as two stubs with a 2-cell gap of open water, and the gate sits on the south stub (ST-1 and OW-9 stay as decided).
+- **The east river** rises at a tarn (a `~` lake cell group) in the spine's foothills and flows south-west to the south coast. Its channel is straight through the east bridge (OW-6).
+- **The city stream** rises at a spring pond north-east of the city, enters the icon at its north-east corner and leaves at its south-west corner to the coast, where the icon draws its river (OW-13). It crosses no road.
+- **The east pocket** lies between the river and the spine, about 60–90 cells. It holds the tomb (OW-11).
+- Act-1 distances stay close to today's: south gate to temple door 25–40 steps (today 29); south gate to the bridge foot 18–30 (today 22).
+
+**The city icon (OW-2/OW-3/OW-7).**
+- **Placement.**
+  - The icon gets `offset: [24, 0]` on a 5x4 grid with a `null` column, so its south arch and the castle sit on the centre of one column.
+  - `collide: alpha` sets its collision.
+  - Exactly one walkable warp cell per gate: N, W, E and S.
+- **The missing side gates.** The drawn W and E notches are on the bottom row, next to the south arch, so three adjacent warps can't be read.
+  - **Offline art fix** (no paid art): add a `paint` list in `approved/overworld/city.json`. `K.load_kit` applies these copy-rect fixes after cutting:
+    - copy the south arch onto the W and E flanks, at the wall's widest row;
+    - fill the bottom notches with neighbouring wall pixels;
+    - draw a small postern arch on the north wall below the castle.
+  - **Fallback (needs the user's budget):** regenerate the icon with four clear gates (1 Gemini image).
+
+**Warp targets:**
+
+| Warp | Town entrance |
+|---|---|
+| N | `castle_gate` (closes CT-7: the castle precinct's east gate entrance is now used) |
+| W | `west_gate` |
+| E | `east_gate` |
+| S | `south_gate` |
+
+**Arrivals.** `cornelia`, `cornelia_west`, `cornelia_east` and `cornelia_north` are each the first road cell outside their gate, and never a warp.
+
+**Roads (OW-1).** One readable 1-wide dirt road leaves each gate, with no road under any icon:
+- **N:** to the north bridge foot.
+- **W:** curves to the temple door. The road ends on the temple's door approach, not 3 cells short.
+- **E:** over the east bridge to the tomb clearing.
+- **S:** to a 3-cell bridge-deck jetty into the south sea, a future landing.
+  - The ship spawn is moved there if that is trivial; OW-10 itself stays deferred.
+  - The S road may join the W or E road through one marked junction away from any warp, never at a warp.
+
+**Tidy-ups:**
+- No stray single mountain, sand or inlet cells (OW-12; enforced by `min_blob`).
+- Keep `boulder` decos only where they don't sit on a road.
+
+**The tomb (OW-11).**
+- A clearing at the end of the E road holds a 2x1 sarcophagus (`altar_l`, `altar_r`, `style: stone`, so the candles read less purple), between two `tpillar_broken` columns, with `flowers` and `vines`.
+- `inspect` on both sarcophagus cells: `["Here lies Erdrick."]`.
+- The road's terminal cell is listed in `road_check.ends`.
+
+**Other data:**
+- Keep `keyItemGates` on the south stub.
+- Keep `encounters`, `encounterRate`, `battleBackgrounds` and `vehicles` (moved onto cells in bounds).
+- `unreachable_ok: [north_shore]`.
+- The legacy `assets/maps/overworld.yaml` gets `cornelia_north` as an alias of its existing spot ([8, 12]).
+
+**Tests: new `tests/data/overworldLayout.test.ts`, on the compiled map.** Each test fails on today's map.
+1. **Sealed (OW-15).** From `cornelia`, with gates blocked, `north_shore` can't be reached. With the gates open and the 2 gap cells set walkable, it can. With the gates open but the gap left as water, it still can't. This proves the range seals the land.
+2. **Edges (OW-14).** No walkable cell on the map edge.
+3. **Roads (OW-1/OW-2):**
+   - the road and bridge cells form one component;
+   - BFS along roads only connects the 4 warp approaches, the temple door, the north bridge foot, the east bridge, the tomb clearing and the jetty;
+   - every warp cell has exactly 1 walkable neighbour outside the icon;
+   - no road cell sits under a blocked icon cell.
+4. **Invisible walls (OW-7).** Every blocked cell has ≥ 25 % art coverage from an icon, a mountain, water or a wall.
+5. **River (OW-6).** The east river is one component from the tarn to the ocean.
+6. **Tomb (OW-11):**
+   - an `inspect` entry whose text contains "Here lies Erdrick" sits next to a cell reachable from `cornelia`;
+   - that cell can't be reached when the east bridge is blocked.
+7. **Distances.** South gate to the temple door and to the bridge foot are within the ranges above.
+
+**Images to inspect** (`build_map.py --preview overworld …`):
+- the whole map at 1/4 scale;
+- the city icon with its 4 roads (`--grid --collision`);
+- the north bridge;
+- the east bridge and the tarn;
+- the tomb clearing;
+- a spine edge with foothills;
+- the south-west coast and the sound's south shore (sand, grass and forest);
+- `--metrics overworld`.
+
+### T3d: Cornelia interiors, edges and paths
+
+**Code.**
+- Move `Room` from `layouts/castle.py` to `layouts/common.py`. Regenerating the castle must give byte-identical sources; check with `git diff --exit-code assets-src/maps/cornelia-castle*`.
+- New `layouts/interiors.py` writes `assets-src/maps/cornelia-house-<name>.yaml` and the six shop and inn maps.
+
+**Common data for every house interior.**
+- Kits: `interior`, `town` and `castle`.
+- `music: town`, `canSave: true`, no encounters, and a `name` for the HUD.
+- Entrance `door` on the cell above the exit gap; the exit gap leads to `targetEntrance: house_<name>`.
+
+**`cornelia.py`.** Each of the 10 houses gets `name: house_<name>` (the compiler emits the entrance one cell south of the door) and `enter: {map: cornelia-house-<name>, entrance: door}`.
+
+**Variety.**
+- No two rooms share a size or plan: sizes run from 8x7 to 14x10, with L-shapes, two rooms joined by an inner doorway, and alcoves.
+- Material aliases vary per room:
+  - wood floor shaded 0.8 to 1.1;
+  - `floor_stone` set to `cobble` or `dirt` for the smithy, farm and cellar;
+  - `in_wall_face` set to `castle_wall_in` or to a shaded `castle_face`;
+  - carpets with different `carpet_trim` colours.
+
+**The 10 houses.** Each has at least one NPC or chest, using the existing NPC sprites and chest NPCs with new `CHEST_HOUSE_*` flags.
+
+| Door | House | Room | Inside |
+|---|---|---|---|
+| (46,36) | blue, 2 storeys | Scholar's study: bookshelves, desk, tapestry, a reading alcove | `old_man`, lore on the four crystals and the dark orbs |
+| (52,37) | green / white | Fisher's cottage: one room, barrels, crates, table, bed | `villager_f`; chest: Potion |
+| (50,49) | red / ochre | Farmhouse by the crops: earth floor, crates, sacks (barrels), a hearth (fireplace) | `villager` farmer, wolf warning; chest: Antidote |
+| (44,56) | slate / white, 2 storeys | Retired knight's house: `armor_stand`, `weapon_rack`, fireplace, tapestry | `guard`, who remembers Garland's sword style; chest: item chosen with T4 (e.g. `wooden_nunchaku` for EB-8) |
+| (50,56) | brown / rose | Weaver's shop-home: carpet runs, tables, plants | `villager_f` |
+| (15,36) | green / plaster | Gardener's lodge by the castle gardens: plants, flowers, `crops` racks | `villager`; chest: Tent |
+| (14,63) | red / white | Family home: two rooms, two beds and a table | `villager_f` and `old_man` |
+| (6,41) | teal / plaster | Apprentice mage's room: orbs, `potion_shelf`, bookshelf | `mage`, spell-charge hint; chest: Ether |
+| (46,60) | blue / ochre | Tavern: counter bar, banquet tables, barrels, fireplace | `merchant` barkeep (talked to across the counter) and 2 patrons with rumours, including one that points to the tomb in the east |
+| (35,62) | red / stone, 2 storeys | Wayside shrine: a carpet runner, pillars, a statue, torches | `white_mage` priestess with a healing hint |
+
+Chests in these houses will show ST-12 (an opened chest still looks closed) until T5 fixes it. Pulling ST-12 forward into T3d is optional; it is small.
+
+**IN-5 (folded).** The six shop and inn interiors are rebuilt by the same script, each with its own plan:
+- the weapon shop with racks along an L counter;
+- the armor shop with stands;
+- the item shop with shelves behind a short counter;
+- the two magic shops with an orb alcove (white, black);
+- the inn: a front counter and a back room of beds.
+
+Keep the keeper ids and `shopId`/`action`, `entrances.door`, the return targets and `music: shop`. The keepers stay behind counters, so the across-counter talk still works.
+
+**CT-6 / CT-7.** `doc["edge_exits"]` in `cornelia.py`:
+
+| Edge | Overworld arrival |
+|---|---|
+| North (includes the north postern, (6–7,0)) | `cornelia_north` |
+| West | `cornelia_west` |
+| East, y ≤ 30 (the castle precinct and its east gate (61,24–25)) | `cornelia_north` |
+| East, y ≥ 31 | `cornelia_east` |
+| South | `cornelia` |
+
+- The explicit edge transitions in `doc["transitions"]` are removed, since they are now generated.
+- About 208 walkable edge cells become exits. Arrival in town stays at the gates.
+
+**CT-8.** Connect or cap the dead-end paths in `cornelia.py`:
+- the north postern track ends at the north-edge exit (now real);
+- the garden walk at (4,25) ends at the orchard well (7,22), through a short spur;
+- the lane on row 51 ends at a bench and flower garden at (53–54,50–52);
+- the dirt path on row 60 ends at the oak garden at (53–54,59–61);
+- the stray dirt at (33–35,56) becomes a path from the high street (31,56) to the shrine door approach (35,63), or is removed.
+
+`road_check` for `cornelia` uses `materials: [cobble, dirt]`, with `ends` listing these gardens.
+
+**Legacy.** `assets/maps/cornelia.yaml` gets the 10 `house_*` names as aliases of [7, 14], as with `castle_gate`, so the every-variant transition test passes.
+
+**Tests: new `tests/data/corneliaLayout.test.ts`.** Each test fails on today's output.
+1. **CT-1:**
+   - each of the 10 door cells is a transition to a `cornelia-house-*` map that has a `door` entrance;
+   - every exit of that interior returns to the cell one south of the same door;
+   - every interior has at least one NPC or chest;
+   - the 10 ground strings are pairwise different, with at least 5 distinct sizes;
+   - the six shop grounds are pairwise different (IN-5).
+2. **CT-6:** every walkable edge cell of the compiled `cornelia` is a transition to `overworld`, and its target follows the edge table above.
+3. **CT-7:** some overworld transition targets `castle_gate`.
+4. **Interiors:** every new interior's NPCs are talkable (also enforced in the compiler).
+
+`crossFileValidation`: the new `CHEST_HOUSE_*` items exist, and the chest flags are unique across maps.
+
+**Images to inspect:**
+- Cornelia at full size (small);
+- crops of each of the 10 doors;
+- each interior at 1x, and all 16 interiors side by side to check that they vary;
+- the 4 edges with `--collision`.
+
+### T3e: inspect cells (runtime)
+
+- **Types.** `MapData.inspect?: { x: number; y: number; text: string[] | ConditionalDialog[] }[]`. `validateMapData` checks the shape.
+- **New `FieldInspect.ts`.** `inspectAt(map, x, y)` returns the lines, resolved with the same condition logic as NPC dialog.
+- **`NPCInteractionSystem`.** When confirm faces no NPC and no counter, it asks `FieldInspect`. `ExplorationScene` opens the dialog through its `DialogManager` (a few lines, so the file doesn't grow).
+- **Tests:**
+  - facing an inspect cell and pressing confirm shows the text;
+  - facing away does nothing;
+  - an NPC on the same cell wins;
+  - schema cases.
+- The same mechanism makes the CT-9 signpost text a one-line data change in T6.
+
+### Validation (integration)
+
+**Commands:**
+- `python3 -I assets-src/tools/build_map.py --selftest`
+- the layout scripts, then `build_map.py`
+- `build_map.py --check-determinism`, for every map
+- `npm run build`
+- `npm test`, plus `npx vitest run tests/data`
+
+**Reachability and chokepoints (`map_report.py`):**
+- **Overworld:** the reachable count, the sealed check, and the distances.
+- **Cornelia:**
+  - every edge cell is an exit;
+  - no new chokepoint is plugged by a static NPC;
+  - with T2's `noWander` rules, no wanderer can stand on a door approach.
+- **Each interior:** no chokepoint is plugged by its static NPCs.
+
+**Images:** the T3b, T3c and T3d lists above, reviewed before the browser pass.
+
+**Browser** (`?mute=1`, 127.0.0.1):
+- `knight_field`:
+  - enter 4 houses, including the tavern (talk across the counter) and one chest house;
+  - open the chest;
+  - exit and arrive on the right door cell;
+  - visit one shop of each new layout.
+- Leave town over the grass ring at the N, W, E and S edges and the precinct's east gate, and check each arrival side on the overworld.
+- Enter each of the 4 icon gates, and check the matching town gate.
+- `act1_overworld`:
+  - follow each road to its end: the temple door, the north bridge (gate message), the east bridge, the tomb (shows "Here lies Erdrick."), and the jetty;
+  - try to cross the spine (impossible);
+  - check the camera at the map edges;
+  - with the counter at 1, step on each warp 10 times and see no battle;
+  - check that load time and fps match T1 (120 fps).
+- The console shows 0 errors.
+
+### Decisions for the user
+
+1. **Paid art.** None is needed for T3; everything comes from approved kit art plus offline derivation. The budget stays at 18 of 100 Gemini images. Fallbacks, only if a review rejects the derived result:
+   - (a) a city icon with four clear gates (1 Gemini);
+   - (b) an overworld edge sheet: hills, peak and snow variants, shallow water (1 Gemini, or Bedrock, which costs nothing against the cap but risks a style mismatch);
+   - (c) a tomb landmark (1 Gemini or Bedrock).
+   
+   OW-8 and OW-9 stay in T6, as already decided.
+2. **IN-5 folded into T3d; CA-7 left to T6.** Confirm.
+3. **Gate mapping.** The overworld N gate leads to the castle precinct (`castle_gate`). The town's north edge and the precinct's east edge come out north of the icon. Confirm, or name another arrival.
+4. **ST-12 forward?** Pull the chest-art fix into T3d so the new house chests look opened. This is optional.
+
+### T3 decisions (taken so the work can proceed; reported to the user)
+
+- **Paid art:** none planned, so the count stays at 18 of 100 Gemini images. Fallbacks are used only if a review rejects the derived art.
+- **IN-5** is folded into T3d. **CA-7** stays in T6.
+- **City gates:** accepted as the plan describes. The side gates are repainted from the existing pixels; the north gate leads to the castle precinct; leaving by the town's north edge or the precinct's east gate comes out north of the icon.
+- **ST-12** (opened chests show as opened) moves into T3d, because the new houses add chests.
+
+### T3 revisions after the momus review (binding)
+
+All 15 momus issues apply. Ownership and resolutions:
+
+1. **Determinism checks.** They run the compiler in subprocesses as `[sys.executable, "-s", build_map.py, …]` with `env={"PYTHONHASHSEED": s}` and without `-I`, because `-I` ignores the variable. The reproduction notes are corrected to say they ran without `-I`.
+2. **T3d fills Cornelia's sealed NW pocket**, x 0–2, y 0–17, in `cornelia.py`. The T3a edge-exit validator reports a walkable edge cell that can't be reached as its own error.
+3. **T3d lists every road end and connection.**
+   - It joins the garden walks at (28,25) and (32,25), and connects the postern track to the network.
+   - It handles (10,19), (50,19), (27,25), (33,25), (5,54), (16,54) and (23,60).
+   - The oak-garden target becomes the real grass cell (53,59), and the stray dirt rect is corrected to x 33–35.
+   - The road check uses "every component end touches a gate, door, garden or plaza", which also covers 2-wide dead ends.
+4. **No permanent "town unchanged" selftest.** T3a compares town and castle chunks against the parent commit as a one-off review step, outside `--selftest`. T3b's byte-identical claim covers the castle and temple only.
+5. **File ownership.**
+   - `kit.py`, including the `paint` loader, belongs to T3a. Peak variants live inside `terrain.py` (T3b).
+   - T3a owns `build_map.py`'s CLI and `selftest()`. T3b exposes `terrain.selftest()`, which T3a's selftest calls in one line (as a no-op until T3b lands).
+   - T3c must not edit `layouts/common.py`, which T3d owns. T3c must not edit `build_map.py` beyond the hooks T3a provides.
+6. **`approve.py` keeps `paint` on re-approval**, the same way it keeps `head_from`. `python3 -I assets-src/gen/selftest.py` is added to the validation.
+7. **T3c specifies every paint** with source and target rects in native pixels. That includes a gap where the stream passes through the wall, and the N warp cell's row and column in the 5x4 grid.
+8. **`collide: alpha`** is measured on the composited alpha of every footprint cell, null cells included (T3a).
+9. **New legend character `≈`**: a natural lake or tarn painted by `terrain.py`, with no stone rim. `river_check` accepts it. `~` stays the town canal.
+10. **Old saves (T3c).**
+    - `safeSpawn` also moves a spawn that isn't in the component reachable from the first entrance, with a test.
+    - The generated overworld lists `cornelia` as its first entrance.
+11. **The entrance contract.**
+    - The overworld keeps `cornelia`, `cornelia_west`, `cornelia_east`, `cornelia_north`, `castle`, `temple` and `north_shore`.
+    - The temple prefab keeps `name: temple`, and `cornelia.py` keeps `north_postern`.
+    - T3a adds `cornelia_north` at [28,26] to the current `assets-src/maps/overworld.yaml` and to the legacy overworld, so T3c and T3d each build on their own.
+12. **Test placement.**
+    - Art-coverage checks go in `map_checks.py`, not vitest.
+    - The CT-1 house test reads `assets-src/maps/*.yaml`.
+    - The CT-7 test goes in `overworldLayout.test.ts`.
+    - `crossFileValidation` also reads `assets/maps/ai/`, and the chest names in it are flags.
+    - OW-15 test 1 finds the bridge gap as the water cells between the two stubs in the gate column.
+13. **ST-12 in T3d, after T3e has merged.**
+    - The chest NPC gets an `opened` state: an opened-chest frame, or a dimmed sprite if no frame exists. It is set at map load from its flag and right after it is looted.
+    - Chests don't turn to face the player.
+    - Files: `NPC.ts`, `ExplorationScene.ts` (the chest branch), the placeholder or atlas frame lookup. Tests are in `tests/entities/NPC.test.ts`.
+14. **`act1Flow.test.ts`** gains overworld cases (T3c):
+    - from `cornelia`, the temple transition and both gate cells can be reached;
+    - the arrival at `temple` is in that same component;
+    - `north_shore` can't be reached.
+15. **Smaller points.**
+    - `Room.write` takes `KITS`, `CASTLE_MATS`, `GOLD` and `QUIET` as parameters.
+    - Fix the house names and the `tpillar_broken_top` / `tpillar_broken_bottom` names.
+    - Define `ocean_inlet`.
+    - Validation runs the layout scripts by name (`layouts/overworld.py`, `cornelia.py`, `interiors.py`, `castle.py`), then checks `git diff --exit-code assets-src/maps`.
+    - The T3a brief carries the map-report logic from `/tmp/playtest/town/{reach,choke}.py`.
+    - Load time: compiled-map load in the browser is ≤ 1.5 s per map.
+    - A static NPC creating a chokepoint in an interior is a compiler error.
+
+**Order:** T3a and T3e run in parallel and merge first. Then T3b, T3c and T3d run in parallel, each branched from `mainline` *after* that merge. Then all maps are rebuilt once on the integration branch.
