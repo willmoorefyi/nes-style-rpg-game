@@ -8,7 +8,7 @@ import { parse } from 'yaml';
 import { Character } from '../../src/entities/Character.js';
 import { slotOf } from '../../src/entities/EquipmentRules.js';
 import { EncounterTable } from '../../src/systems/EncounterTable.js';
-import type { CharacterClassData, EncounterEntry, EnemyData, ItemData, ShopData, SpellData } from '../../src/types/index.js';
+import type { CharacterClassData, EncounterEntry, EnemyData, ItemData, MapData, ShopData, SpellData } from '../../src/types/index.js';
 
 const dataDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/data');
 const read = <T>(file: string): T => parse(readFileSync(join(dataDir, file), 'utf-8')) as T;
@@ -84,34 +84,23 @@ export function makeParty(level: number, kit: KitName, withSpells: boolean, comp
   });
 }
 
-// ── §1.6 formation tables, inline until T4e puts them in the maps (revision 3) ──
-const g = (id: string, min: number, max = min) => ({ id, min, max });
+// ── §1.6 formation tables, read from the compiled act-1 maps (T4e; revision 3) ──
+const mapsDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/maps');
+/** A map as the game loads it: the compiled 2x map (`ai/<id>.yaml`), or the legacy 1x one with `legacy`. */
+export const readMap = (id: string, legacy = false): MapData =>
+  parse(readFileSync(join(mapsDir, legacy ? `${id}.yaml` : `ai/${id}.yaml`), 'utf-8')) as MapData;
+export const OVERWORLD = readMap('overworld');
+export const TEMPLE = readMap('temple-of-fiends');
+const zoneTable = (map: MapData, id: string): EncounterEntry[] => {
+  const zone = (map.encounterZones ?? []).find((z) => z.id === id);
+  if (!zone) throw new Error(`map ${map.id} has no encounter zone "${id}"`);
+  return zone.encounters;
+};
 export const ZONE_TABLES: Record<'fields' | 'approach' | 'east' | 'temple', EncounterEntry[]> = {
-  fields: [
-    { groups: [g('goblin', 3, 5)], weight: 5 },
-    { groups: [g('wolf', 1, 2)], weight: 3 },
-    { groups: [g('goblin', 2, 3), g('wolf', 1)], weight: 3 },
-    { groups: [g('gr_imp', 1, 2), g('goblin', 1, 3)], weight: 2 },
-    { groups: [g('wolf', 2, 4)], weight: 1 },
-  ],
-  approach: [
-    { groups: [g('gr_imp', 2, 4)], weight: 3 },
-    { groups: [g('wolf', 2, 4)], weight: 3 },
-    { groups: [g('goblin', 4, 6)], weight: 2 },
-    { groups: [g('gr_imp', 1, 2), g('wolf', 1, 2)], weight: 2 },
-  ],
-  east: [
-    { groups: [g('wolf', 3, 5)], weight: 3 },
-    { groups: [g('gr_imp', 3, 5)], weight: 2 },
-    { groups: [g('gr_wolf', 1), g('wolf', 0, 2)], weight: 1 },
-  ],
-  temple: [
-    { groups: [g('skeleton', 2, 4)], weight: 4 },
-    { groups: [g('skeleton', 1, 3), g('gr_imp', 1, 2)], weight: 3 },
-    { groups: [g('gr_imp', 2, 4)], weight: 2 },
-    { groups: [g('wolf', 2, 3)], weight: 1 },
-    { groups: [g('skeleton', 4, 6)], weight: 1 },
-  ],
+  fields: OVERWORLD.encounters ?? [],
+  approach: zoneTable(OVERWORLD, 'temple_approach'),
+  east: zoneTable(OVERWORLD, 'east_pocket'),
+  temple: TEMPLE.encounters ?? [],
 };
 export type Zone = keyof typeof ZONE_TABLES;
 

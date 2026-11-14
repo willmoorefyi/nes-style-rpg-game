@@ -1647,6 +1647,14 @@ These are checked by `tests/balance/*` and by re-running the scratch simulation 
 - **Simulation on the real data** (real engine, 2,000 seeds): Garland careless L1 no gear 0.1 %, careless L1 400 G kit 97 %, sensible L1 99.9 %, sensible L2 100 % (both kits), temple run then Garland 100 % at L2 and L3. Fields: Lv1 fight-only wins 100 % (5.7 % HP lost), temple 97.2 %. Campaign (200 runs): Lv2 at battle 5 (median), Lv3 at 22, 0 wipes, 2.0 inn visits, 7.5 of 8 purchases, 353 G left (Cap at 80 G costs 280 G more than the sim assumed). Every target met without tuning; the numbers match §4.1/§4.4 to the decimal.
 - **Deviations:** the Red Mage's starting kit has no spell (rapier + cloth), otherwise three mages + Warrior cost 430 G. "SLEP every turn, Garland acts in every battle" cannot hold for a 106-HP Garland: turn order is by agility, so a SLEP that lands before each of his turns (79 %) can hold him through a short fight. The test asserts the FF1 property instead: each landed SLEP costs at most one turn (he always wakes), and over 15 open rounds he acts in ≥ 95 % of battles.
 
+### T4e result
+
+- **Compiler:** `encounterZones` is in `PASSTHROUGH`; `map_checks.encounter_errors` (always on, for `encounters` and every zone) checks the enemies / groups form (`0 <= min <= max`), at most 9 enemies per formation, ids known to `enemies.yaml`, unique zone ids, inclusive rects inside the map, at least one walkable cell per zone, and an optional zone rate. Selftest case 4b. Every map recompiles clean; no chunk PNG changed.
+- **Overworld** (`layouts/overworld.py`): the §1.6 fields table as the map default, then `east_pocket` (82 cells, what `TOMB_END` reaches with the east bridge shut; 16 row rects) and `temple_approach` (275 cells, 37 row rects). No pirates.
+- **Temple** (source and legacy) and the **legacy overworld:** the §1.6 tables in group form, no zones.
+- **Deviation:** `temple_approach` measures "the city" as the nearest of its four gate arrivals, not only `ARRIVE["cornelia"]`. From the south gate the north bridge foot is 21 steps round the walls but 20 from the temple door, so the plan's rule would put the north road in the approach, against §1.6 and the §3 test. Unreachable cells count as infinitely far (revision 17). The temple door's own warp cell is left out (warps are never battle cells).
+- **Tests:** `overworldLayout` (zone order, arrival / bridge foot in the fields, door / tomb zoned, in bounds, walkable, disjoint, and both zones recomputed from the compiled collision), `actOneBalance` (no pirate in any act-1 table, compiled or legacy; legacy tables equal the compiled ones), new `tests/systems/actOneEncounters.test.ts` (the §3 rolls on the real `EncounterSystem`), and `balanceData.ZONE_TABLES` now reads the compiled maps (`fieldPacing`, `zones`, `garland` unchanged and passing).
+
 ---
 
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)

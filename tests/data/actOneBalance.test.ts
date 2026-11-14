@@ -1,9 +1,12 @@
 /**
  * T4d act-1 data on the FF1 baseline (docs/FIX_PLAN_PENINSULA.md T4 §1, §3 "T4d (data)", revisions 1, 9 and 10).
- * The "no pirate in an act-1 table" check moves to T4e with the map tables (revision 3).
+ * T4e adds the "no pirate in an act-1 table" check on the map tables (revision 3).
  */
 import { describe, it, expect } from 'vitest';
-import { CLASSES, SHOPS, SPELLS, START_KIT, enemy, item, kitCost, spell, makeMember } from '../helpers/balanceData.js';
+import {
+  CLASSES, SHOPS, SPELLS, START_KIT, OVERWORLD, TEMPLE, enemy, item, kitCost, spell, makeMember, readMap,
+} from '../helpers/balanceData.js';
+import type { EncounterEntry } from '../../src/types/index.js';
 import { spellPrice } from '../../src/systems/SpellPurchase.js';
 import { slotOf } from '../../src/entities/EquipmentRules.js';
 import { healAmount, magicDamage } from '../../src/battle/DamageFormula.js';
@@ -135,5 +138,33 @@ describe('T4d spells and classes', () => {
     for (const s of SPELLS.filter((x) => x.effect.startsWith('damage') || x.effect.startsWith('status_'))) {
       expect(s.accuracy, s.id).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('T4e act-1 encounter tables (EB-1)', () => {
+  const ids = (table: EncounterEntry[] | undefined): string[] =>
+    (table ?? []).flatMap((e) => (e.groups ? e.groups.map((g) => g.id) : e.enemies));
+  /** Every act-1 table: the compiled overworld (default and every zone), the temple, and the legacy 1x maps. */
+  const tables: Array<[string, EncounterEntry[] | undefined]> = (['overworld', 'temple-of-fiends'] as const).flatMap(
+    (id) => [false, true].flatMap((legacy): Array<[string, EncounterEntry[] | undefined]> => {
+      const map = readMap(id, legacy);
+      const tag = `${id}${legacy ? ' (legacy)' : ''}`;
+      return [[tag, map.encounters], ...(map.encounterZones ?? []).map((z): [string, EncounterEntry[]] => [`${tag} zone ${z.id}`, z.encounters])];
+    }));
+
+  it('has no pirate in any act-1 table (overworld, all its zones, the temple; compiled and legacy)', () => {
+    expect(tables.map(([where]) => where)).toEqual(expect.arrayContaining(
+      ['overworld', 'overworld zone east_pocket', 'overworld zone temple_approach', 'temple-of-fiends', 'overworld (legacy)',
+        'temple-of-fiends (legacy)']));
+    for (const [where, table] of tables) {
+      expect(table?.length ?? 0, where).toBeGreaterThan(0);
+      expect(ids(table), where).not.toContain('pirate');
+    }
+  });
+
+  it('gives the legacy maps the same default and temple tables as the compiled ones, with no zones', () => {
+    expect(readMap('overworld', true).encounters).toEqual(OVERWORLD.encounters);
+    expect(readMap('temple-of-fiends', true).encounters).toEqual(TEMPLE.encounters);
+    expect(readMap('overworld', true).encounterZones).toBeUndefined();
   });
 });

@@ -1,6 +1,6 @@
 /**
  * T4d formation attrition and spell numbers on the real engine (docs/FIX_PLAN_PENINSULA.md T4 §4.4, §4.5): a fresh
- * Lv1 party with the 400 G kit, Fight only, over the §1.6 tables (inline until T4e); FIRE and CURE in a real battle.
+ * Lv1 party with the 400 G kit, Fight only, over the §1.6 tables of the compiled maps (T4e); FIRE and CURE in a real battle.
  */
 import { describe, it, expect } from 'vitest';
 import { BattleStateMachine } from '../../src/battle/BattleStateMachine.js';

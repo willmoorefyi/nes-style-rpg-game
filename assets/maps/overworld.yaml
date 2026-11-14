@@ -8228,30 +8228,17 @@ vehicles:
 encounterRate:
   min: 15
   max: 30
+# FF1 Coneria-field formations (docs/FIX_PLAN_PENINSULA.md T4 §1.6); the legacy map has no zones, no pirates
 encounters:
-  - enemies:
-      - goblin
-    weight: 4
-  - enemies:
-      - goblin
-      - goblin
+  - groups: [{id: goblin, min: 3, max: 5}]
+    weight: 5
+  - groups: [{id: wolf, min: 1, max: 2}]
     weight: 3
-  - enemies:
-      - wolf
+  - groups: [{id: goblin, min: 2, max: 3}, {id: wolf, min: 1, max: 1}]
     weight: 3
-  - enemies:
-      - wolf
-      - wolf
+  - groups: [{id: gr_imp, min: 1, max: 2}, {id: goblin, min: 1, max: 3}]
     weight: 2
-  - enemies:
-      - skeleton
-    weight: 2
-  - enemies:
-      - goblin
-      - wolf
-    weight: 2
-  - enemies:
-      - pirate
+  - groups: [{id: wolf, min: 2, max: 4}]
     weight: 1
 
 battleBackgrounds:

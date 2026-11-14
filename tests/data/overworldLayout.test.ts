@@ -224,3 +224,69 @@ describe('overworld layout (T3c)', () => {
     expect(bridge).toBeLessThanOrEqual(30);
   });
 });
+
+describe('overworld encounter zones (T4e, §1.6)', () => {
+  const zones = map.encounterZones ?? [];
+  const inRect = (x: number, y: number, [x0, y0, x1, y1]: [number, number, number, number]) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+  /** The zone the runtime picks for a cell (the first whose rects hold it), or null for the fields. */
+  const zoneAt = (x: number, y: number) => zones.find((z) => z.rects.some((r) => inRect(x, y, r)))?.id ?? null;
+  const cells = (id: string): Cell[] => zones.find((z) => z.id === id)!.rects
+    .flatMap(([x0, y0, x1, y1]) => Array.from({ length: (x1 - x0 + 1) * (y1 - y0 + 1) },
+      (_, i): Cell => [x0 + (i % (x1 - x0 + 1)), y0 + Math.floor(i / (x1 - x0 + 1))]));
+  const tomb = map.inspect![0];
+  const tombEnd: Cell = [tomb.x, tomb.y + 1];
+
+  it('has the east pocket, then the temple approach', () => {
+    expect(zones.map((z) => z.id)).toEqual(['east_pocket', 'temple_approach']);
+  });
+
+  it('keeps the city arrival and the north bridge foot in the fields; the temple door and the tomb are zoned', () => {
+    expect(zoneAt(...start)).toBeNull();
+    expect(zoneAt(gates[0].x, gates[0].y + 1), 'north bridge foot').toBeNull();
+    expect(zoneAt(...entrance('temple'))).toBe('temple_approach');
+    expect(zoneAt(...tombEnd)).toBe('east_pocket');
+  });
+
+  it('every zone cell is in bounds and walkable, and the zones do not overlap', () => {
+    const owner = new Map<string, string>();
+    for (const z of zones) {
+      for (const [x, y] of cells(z.id)) {
+        expect(inside(x, y), `${z.id} (${x},${y})`).toBe(true);
+        expect(col.isWalkable(x, y, walking), `${z.id} (${x},${y}) walkable`).toBe(true);
+        expect(owner.get(key(x, y)), `(${x},${y}) in ${z.id}`).toBeUndefined();
+        owner.set(key(x, y), z.id);
+      }
+    }
+  });
+
+  it('the east pocket is what the tomb reaches without the east bridge', () => {
+    const pocket = reach(tombEnd, new Set(eastBridge.map((c) => key(...c))));
+    expect(new Set(cells('east_pocket').map((c) => key(...c)))).toEqual(pocket);
+  });
+
+  it('the temple approach is the cells closer on foot to the temple door than to any city gate (bridge closed)', () => {
+    const shut = new Set(eastBridge.map((c) => key(...c)));
+    const dist = (...from: Cell[]) => {
+      const d = new Map(from.map((c) => [key(...c), 0]));
+      const queue: Cell[] = [...from];
+      while (queue.length) {
+        const [x, y] = queue.shift()!;
+        for (const [dx, dy] of DIRS) {
+          const nx = x + dx, ny = y + dy, k = key(nx, ny);
+          if (!inside(nx, ny) || d.has(k) || shut.has(k) || !col.isWalkable(nx, ny, walking)) continue;
+          d.set(k, d.get(key(x, y))! + 1);
+          queue.push([nx, ny]);
+        }
+      }
+      return d;
+    };
+    const toTemple = dist(entrance('temple'));
+    const toCity = dist(...['cornelia', 'cornelia_west', 'cornelia_east', 'cornelia_north'].map(entrance));
+    // a warp cell (the temple door itself) is never a battle cell: the step filter skips it, so the zone may leave it out
+    const warps = new Set(map.transitions.map((t) => key(t.x, t.y)));
+    const want = new Set([...toTemple].filter(([k, d]) => d < (toCity.get(k) ?? Infinity) && !warps.has(k)).map(([k]) => k));
+    const got = new Set(cells('temple_approach').map((c) => key(...c)));
+    expect([...got].filter((k) => !want.has(k)), 'zoned but not closer to the temple').toEqual([]);
+    expect([...want].filter((k) => !got.has(k)), 'closer to the temple but not zoned').toEqual([]);
+  });
+});

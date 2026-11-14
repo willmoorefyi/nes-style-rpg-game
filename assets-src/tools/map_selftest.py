@@ -119,6 +119,32 @@ def run(B) -> int:
                  "no reachable walkable neighbour")
     ok += 1
 
+    # ── 4b. encounter tables and zones (T4e): passed through; group / enemies form, <= 9, known ids, rects in bounds
+    table = [{"groups": [{"id": "goblin", "min": 3, "max": 5}], "weight": 5}, {"enemies": ["wolf"], "weight": 1}]
+    zoned = {**grass_map(5, 6), "encounters": table,
+             "encounterZones": [{"id": "east", "rects": [[3, 0, 5, 4]], "encounters": table}]}
+    zc = comp(zoned)
+    with tempfile.TemporaryDirectory() as tmp:
+        import yaml
+        doc = yaml.safe_load(B.write(zoned, zc, Path(tmp)).read_text())
+        assert doc.get("encounterZones") == zoned["encounterZones"], "encounterZones is passed through to the runtime map"
+    zone = zoned["encounterZones"][0]
+    bad = lambda **kw: {**zoned, "encounterZones": [{**zone, **kw}]}  # noqa: E731
+    expect_error(bad(rects=[[3, 0, 6, 4]]), "not an inclusive rect inside the 6x5 map")
+    expect_error(bad(rects=[[4, 0, 3, 4]]), "not an inclusive rect")
+    expect_error(bad(encounters=[{"groups": [{"id": "goblin", "min": 6}, {"id": "wolf", "min": 1, "max": 4}],
+                                  "weight": 1}]), "up to 10 enemies, more than 9")
+    expect_error(bad(encounters=[{"groups": [{"id": "goblin", "min": 3, "max": 2}], "weight": 1}]), "0 <= min <= max")
+    expect_error(bad(encounters=[{"enemies": ["goblin"], "groups": [{"id": "goblin", "min": 1}], "weight": 1}]),
+                 "exactly one of enemies or groups")
+    expect_error({**zoned, "encounters": [{"enemies": ["dragon_of_nowhere"], "weight": 1}]}, "unknown enemy ids")
+    expect_error(bad(encounters=[{"groups": [{"id": "gobln", "min": 1}], "weight": 1}]), "unknown enemy ids ['gobln']")
+    walled = {**zoned, "ground": "......\n......\n......\n......\n.....#"}
+    expect_error({**walled, "encounterZones": [{**zone, "rects": [[5, 4, 5, 4]]}]}, "covers no walkable cell")
+    expect_error({**zoned, "encounterZones": [zone, zone]}, "duplicate zone id")
+    expect_error(bad(id=""), "non-empty string id")
+    ok += 1
+
     # ── 5. map checks
     ok_src = lambda s: comp(s) and True  # noqa: E731
     open_map = grass_map(3, 5)

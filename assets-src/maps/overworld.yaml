@@ -186,20 +186,106 @@ keyItemGates:
 - {x: 30, y: 32, requiredFlag: BRIDGE_BUILT, message: The bridge has collapsed into the sea. Only the King's builders could repair it., permanent: false}
 encounterRate: {min: 15, max: 30}
 encounters:
-- enemies: [goblin]
-  weight: 4
-- enemies: [goblin, goblin]
+- groups:
+  - {id: goblin, min: 3, max: 5}
+  weight: 5
+- groups:
+  - {id: wolf, min: 1, max: 2}
   weight: 3
-- enemies: [wolf]
+- groups:
+  - {id: goblin, min: 2, max: 3}
+  - {id: wolf, min: 1, max: 1}
   weight: 3
-- enemies: [wolf, wolf]
+- groups:
+  - {id: gr_imp, min: 1, max: 2}
+  - {id: goblin, min: 1, max: 3}
   weight: 2
-- enemies: [skeleton]
-  weight: 2
-- enemies: [goblin, wolf]
-  weight: 2
-- enemies: [pirate]
+- groups:
+  - {id: wolf, min: 2, max: 4}
   weight: 1
+encounterZones:
+- id: east_pocket
+  rects:
+  - [53, 43, 53, 43]
+  - [47, 44, 53, 44]
+  - [47, 45, 54, 45]
+  - [47, 46, 55, 46]
+  - [47, 47, 56, 47]
+  - [47, 48, 56, 48]
+  - [46, 49, 51, 49]
+  - [46, 50, 49, 50]
+  - [46, 51, 47, 51]
+  - [45, 52, 47, 52]
+  - [45, 53, 47, 53]
+  - [44, 54, 47, 54]
+  - [44, 55, 47, 55]
+  - [43, 56, 46, 56]
+  - [43, 57, 46, 57]
+  - [43, 58, 45, 58]
+  encounters:
+  - groups:
+    - {id: wolf, min: 3, max: 5}
+    weight: 3
+  - groups:
+    - {id: gr_imp, min: 3, max: 5}
+    weight: 2
+  - groups:
+    - {id: gr_wolf, min: 1, max: 1}
+    - {id: wolf, min: 0, max: 2}
+    weight: 1
+- id: temple_approach
+  rects:
+  - [22, 33, 22, 33]
+  - [17, 34, 22, 34]
+  - [18, 35, 22, 35]
+  - [19, 36, 22, 36]
+  - [10, 37, 12, 37]
+  - [18, 37, 22, 37]
+  - [10, 38, 13, 38]
+  - [18, 38, 22, 38]
+  - [10, 39, 22, 39]
+  - [9, 40, 21, 40]
+  - [9, 41, 20, 41]
+  - [9, 42, 19, 42]
+  - [8, 43, 18, 43]
+  - [8, 44, 17, 44]
+  - [9, 45, 16, 45]
+  - [9, 46, 16, 46]
+  - [9, 47, 16, 47]
+  - [8, 48, 16, 48]
+  - [8, 49, 16, 49]
+  - [8, 50, 16, 50]
+  - [7, 51, 10, 51]
+  - [12, 51, 16, 51]
+  - [10, 52, 16, 52]
+  - [10, 53, 16, 53]
+  - [11, 54, 16, 54]
+  - [11, 55, 16, 55]
+  - [11, 56, 16, 56]
+  - [10, 57, 16, 57]
+  - [10, 58, 16, 58]
+  - [6, 59, 7, 59]
+  - [9, 59, 16, 59]
+  - [6, 60, 16, 60]
+  - [6, 61, 16, 61]
+  - [7, 62, 16, 62]
+  - [7, 63, 16, 63]
+  - [8, 64, 16, 64]
+  - [9, 65, 13, 65]
+  encounters:
+  - groups:
+    - {id: gr_imp, min: 2, max: 4}
+    weight: 3
+  - groups:
+    - {id: wolf, min: 2, max: 4}
+    weight: 3
+  - groups:
+    - {id: goblin, min: 4, max: 6}
+    weight: 2
+  - groups:
+    - {id: gr_imp, min: 1, max: 2}
+    - {id: wolf, min: 1, max: 2}
+    weight: 2
 battleBackgrounds:
   default: grassland
   terrain: {forest: forest, desert: desert, swamp: swamp, water: ocean, river: river, sand: desert}

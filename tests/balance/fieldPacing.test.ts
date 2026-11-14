@@ -1,7 +1,7 @@
 /**
  * T4d field pacing (docs/FIX_PLAN_PENINSULA.md T4 §3, §4.4, §4.5; EB-3): a seeded campaign on the real battle engine,
- * real characters (FF1 XP table, level-up HP) and real prices, over the §1.6 formation tables (inline copies until
- * T4e puts them in the maps).
+ * real characters (FF1 XP table, level-up HP) and real prices, over the §1.6 formation tables as the compiled maps
+ * hold them (T4e: the overworld's default table and its `temple_approach` zone, and the temple's table).
  *
  * Campaign: the 400 G kit; 20 fields battles, then 10 temple-approach battles, then 10 temple battles, sensible
  * play. The party rests at the inn (30 G) after a battle when someone is down, party HP is below 45 %, or the White
