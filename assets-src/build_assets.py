@@ -273,58 +273,11 @@ def build_field_ai() -> None:
 
 
 def build_monsters_ai() -> None:
-    """Approved AI monster sheets (approved/<id>/monster_<size>.png: idle | attack | hurt) plus palette-swap variants
-    from gen/monsters.yaml -> assets/sprites/monsters-ai.png/.json (docs/ART_MONSTERS_PLAN.md). One row per sprite."""
-    import yaml
-    from gen import monster as M
-
-    out = ASSETS / "sprites"
-    entries: list[tuple[str, dict, list[Image.Image]]] = []
-    for meta_path in sorted(APPROVED.glob("*/monster_*.json")):
-        meta = json.loads(meta_path.read_text())
-        sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
-        cw, ch = meta["grid"]
-        frames = [sheet.crop((i * cw, 0, (i + 1) * cw, ch)) for i in range(3)]
-        for i in meta.get("flip_frames", []):
-            frames[i] = frames[i].transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-        entries.append((meta["character"], meta, frames))
-    # per-pose bosses: approved/<id>/boss_{idle,attack,hurt}.png (one frame each), combined once all three exist
-    for idle_meta in sorted(APPROVED.glob("*/boss_idle.json")):
-        parts = [idle_meta.with_name(f"boss_{p}.json") for p in ("idle", "attack", "hurt")]
-        if not all(p.exists() for p in parts):
-            print(f"monsters_ai: {idle_meta.parent.name} boss poses incomplete, skipped")
-            continue
-        cast = idle_meta.with_name("boss_cast.json")      # optional spell stance
-        poses = ["idle", "attack", "hurt"] + (["cast"] if cast.exists() else [])
-        parts = [idle_meta.with_name(f"boss_{p}.json") for p in poses]
-        metas = [json.loads(p.read_text()) for p in parts]
-        frames = []
-        for p, m in zip(parts, metas):
-            f = Image.open(p.with_suffix(".png")).convert("RGBA")
-            frames.append(f.transpose(Image.Transpose.FLIP_LEFT_RIGHT) if 0 in m.get("flip_frames", []) else f)
-        meta = {**metas[0], "poses": poses}
-        entries.append((meta["character"], meta, frames))
-    if not entries:
-        print("monsters_ai: no approved monster sheets")
-        return
-    specs = {m["id"]: m for m in yaml.safe_load((HERE / "gen" / "monsters.yaml").read_text())}
-    for cid, meta, frames in list(entries):
-        for variant in specs.get(cid, {}).get("variants", []) or []:
-            entries.append((variant["id"], meta, [M.recolor(f, variant) for f in frames]))
-    width = max(len(e[2]) * e[2][0].width for e in entries)
-    height = sum(e[2][0].height for e in entries)
-    atlas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    sheets, y = {}, 0
-    for sid, meta, frames in entries:
-        cw, ch = frames[0].size
-        for i, f in enumerate(frames):
-            atlas.paste(f, (i * cw, y))
-        sheets[sid] = {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
-                       "frames": {pose: [i * cw, y] for i, pose in enumerate(meta["poses"])}}
-        y += ch
-    scaled(atlas, AI_SCALE).save(out / "monsters-ai.png")
-    (out / "monsters-ai.json").write_text(json.dumps({"scale": AI_SCALE, "sheets": sheets}, indent=2) + "\n")
-    print(f"monsters_ai: {list(sheets)}")
+    """Approved AI monster keyframes (approved/<id>/monster_<size>.png: idle | attack | hurt, or per-pose boss_*.png),
+    the generated in-betweens (gen/monster_anim.py, docs/ENEMY_ANIM_PLAN.md) and palette-swap variants from
+    gen/monsters.yaml -> a native-size atlas assets/sprites/monsters-ai.png/.json (gen/monster_atlas.py)."""
+    from gen import monster_atlas
+    monster_atlas.build(ASSETS / "sprites")
 
 
 def build_optional(module_name: str) -> None:

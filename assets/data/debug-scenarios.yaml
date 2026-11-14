@@ -837,3 +837,112 @@
   gold: 100
   enemies: [goblin, goblin, goblin]
   background: assets/backgrounds/grassland.webp
+
+# Enemy animation review (docs/ENEMY_ANIM_PLAN.md 7). Open with ?mute=1&scenario=<id>, plus &enemyAnim=loop (every
+# enemy cycles attack / hurt / cast) or &enemyAnim=step (`.` / `,` step one frame; &slow=N slows the loop).
+- id: anim_goblin
+  name: Anim - goblin and Gr.Imp
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, gr_imp]
+  background: assets/backgrounds/grassland.webp
+- id: anim_goblin_cast
+  name: Anim - goblins that always cast (D4, attack frames with no lunge)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, goblin]
+  enemyAi:
+    goblin:
+      - { type: magic, spellId: fire, weight: 1 }
+  background: assets/backgrounds/grassland.webp
+- id: anim_bipeds
+  name: Anim - six small bipeds (stacking, D5 draw order)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, pirate, skeleton, mummy, vampire, gr_imp]
+  background: assets/backgrounds/grassland.webp
+- id: anim_large
+  name: Anim - ogre, troll, dragon
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [ogre, troll, dragon]
+  background: assets/backgrounds/desert.webp
+- id: anim_beasts
+  name: Anim - wolf, Gr.Wolf, cockatrice
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [wolf, gr_wolf, cockatrice]
+  background: assets/backgrounds/forest.webp
+- id: anim_boss_garland
+  name: Anim - Garland, fight and magic 1:1
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [garland]
+  enemyAi:
+    garland:
+      - { type: fight, weight: 1 }
+      - { type: magic, spellId: fire, weight: 1 }
+  background: assets/backgrounds/temple.webp
+- id: anim_boss_lich
+  name: Anim - lich with two goblins
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [lich, goblin, goblin]
+  background: assets/backgrounds/shoreline.webp
+- id: anim_crowd
+  name: Anim - nine large enemies (half-size layout)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [ogre, troll, ogre, troll, ogre, troll, ogre, troll, ogre]
+  background: assets/backgrounds/desert.webp
+- id: anim_status
+  name: Anim - goblins to sleep (SLEP) and stun (HOLD) for the D6 freeze
+  party:
+    - { class: black_mage, name: B.MAG, level: 10, equipment: [], spells: [{ id: slep, level: 1 }, { id: hold, level: 3 }] }
+    - { class: black_wizard, name: BKWZ, level: 20, equipment: [], spells: [{ id: slep, level: 1 }, { id: hold, level: 3 }] }
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, goblin, goblin, goblin]
+  background: assets/backgrounds/grassland.webp

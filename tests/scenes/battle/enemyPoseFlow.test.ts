@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Container, Sprite } from 'pixi.js';
 import { BattleAnimationController, ROUND_END_FRAMES } from '../../../src/scenes/battle/BattleAnimationController.js';
-import { EnemyPoseController, ATTACK_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
+import { EnemyPoseController, ATTACK_FRAMES, ATTACK_OUT, CAST_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
 import type { InputManager } from '../../../src/core/InputManager.js';
@@ -46,36 +46,46 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
   return { ctrl, poses, tick, enemies, partySprites, enemySprites, onResolveRound };
 }
 
+/** Idle breathes (idle / idle_b) once a sequence is over. */
+const RESTING = ['idle', 'idle_b'];
+
 const hit = (targetId: string, damage = 3, isHeal = false): DamageEvent =>
   ({ targetId, damage, isHeal, isCrit: false } as unknown as DamageEvent);
 
 describe('monster poses in the battle flow (preview art)', () => {
-  it('an attacking enemy lunges in its attack pose before the action resolves, then returns to idle', () => {
+  it('an attacking enemy winds up and lunges; the action resolves on the contact frame (t = 14), not before', () => {
     const { ctrl, poses, tick } = setup({ actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetName: 'Hero' }, [hit('party_0')]);
-    tick(31);                         // announce (30 frames)
+    tick(30);                         // announce (30 frames); the lunge starts on its last frame
     expect(ctrl.animPhase).toBe('enemy_lunge');
+    expect(poses.state(0)).toMatchObject({ pose: 'atk_wind1', dx: 0 });
+    tick(ATTACK_OUT - 1);
+    expect(ctrl.animPhase).toBe('enemy_lunge');      // still winding up / passing
+    expect(poses.state(0).pose).toBe('atk_mid');
+    tick(1);                          // contact: execute + result on this frame
     expect(poses.state(0).pose).toBe('attack');
-    tick(8);                          // lunge out, then execute + result
     expect(['result', 'round_end']).toContain(ctrl.animPhase);
-    tick(30);
-    expect(poses.state(0).pose).toBe('idle');
+    tick(40);
+    expect(RESTING).toContain(poses.state(0).pose);
     expect(ctrl.animPhase).toBe('round_end');
   });
 
   it('a hit on an enemy shows the hurt pose, then idles', () => {
     const s = setup({ actorId: 'party_0', actorName: 'Hero', actionType: 'fight', targetName: 'Goblin B' }, []);
     s.ctrl.spawnFloatingTextsFromEvents([hit('enemy_1')]);
+    expect(s.poses.state(1).pose).toBe('hurt_in1');
+    s.poses.update(4);
     expect(s.poses.state(1).pose).toBe('hurt');
-    s.poses.update(18);
-    expect(s.poses.state(1).pose).toBe('idle');
+    s.poses.update(16);
+    expect(RESTING).toContain(s.poses.state(1).pose);
   });
 
-  it('a lethal hit holds the hurt pose with no shake while the sprite fades', () => {
+  it('a lethal hit plays the in-phase, then holds the hurt pose with no shake while the sprite fades', () => {
     const s = setup({ actorId: 'party_0', actorName: 'Hero', actionType: 'fight' }, []);
     s.enemies[0].currentHp = 0;   // HP is already 0 when the damage event is processed
     s.ctrl.spawnFloatingTextsFromEvents([hit('enemy_0')]);
+    expect(s.poses.state(0).pose).toBe('hurt_in1');
     s.poses.update(40);
-    expect(s.poses.state(0)).toEqual({ pose: 'hurt', dx: 0, dy: 0 });
+    expect(s.poses.state(0)).toEqual({ pose: 'hurt', dx: -6, dy: 0 });
   });
 
   it('heals and zero-damage misses do not show the hurt pose', () => {
@@ -91,15 +101,28 @@ describe('monster poses in the battle flow (preview art)', () => {
     expect(ctrl.animPhase).not.toBe('enemy_lunge');
   });
 
-  it('a casting enemy plays the cast stance (no lunge) and the action waits for it to finish', () => {
+  it('a non-boss magic action plays the attack frames without the lunge (D4) and the action waits for it', () => {
     const { ctrl, poses, tick } = setup({ actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'magic' }, [hit('party_0')]);
     tick(31);
     expect(ctrl.animPhase).toBe('enemy_lunge');
-    expect(poses.state(0).pose).toBe('cast');
-    expect(poses.state(0).dx).toBe(0);
-    tick(60);
-    expect(poses.state(0).pose).toBe('idle');
+    expect(poses.state(0).pose).toBe('atk_wind1');
+    for (let k = 0; k < 30; k++) { expect(poses.state(0).dx).toBe(0); tick(1); }
+    expect(RESTING).toContain(poses.state(0).pose);
+    tick(30);
     expect(ctrl.animPhase).toBe('round_end');
+  });
+
+  it('a boss magic action plays gather / rise / cast; round_end waits for the 30-frame cast', () => {
+    const s = setup({ actorId: 'party_0', actorName: 'Hero', actionType: 'fight' }, []);
+    s.poses.configure(0, { hasCast: true });
+    s.ctrl.animPhase = 'round_end';
+    s.ctrl.animTimer = 0;
+    s.poses.playCast(0);
+    expect(s.poses.state(0).pose).toBe('cast_gather');
+    s.tick(CAST_FRAMES - 1);
+    expect(s.onResolveRound).not.toHaveBeenCalled();
+    s.tick(1);
+    expect(s.onResolveRound).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -139,7 +162,7 @@ describe('round end pacing (BA-2)', () => {
     expect(s.onResolveRound).toHaveBeenCalledTimes(1);
   });
 
-  it('round_end waits for an attacking enemy pose to finish', () => {
+  it('round_end waits for an attacking enemy pose to finish (31 frames)', () => {
     const s = setup({ actorId: 'party_0', actorName: 'Hero', actionType: 'fight' }, []);
     s.ctrl.animPhase = 'round_end';
     s.ctrl.animTimer = 0;

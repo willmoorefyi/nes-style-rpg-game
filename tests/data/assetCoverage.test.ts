@@ -1,4 +1,5 @@
 import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
+import { BOSS_FRAMES, FRAME_SOURCE, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -25,7 +26,9 @@ const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-charact
 };
 const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number;
-  sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]> }>;
+  texScale?: number;
+  sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>;
+    anim?: boolean; holds?: string[]; lungePx?: number }>;
 };
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
 const enemies = readYaml<Array<{ id: string; sprite?: string }>>('data/enemies.yaml');
@@ -151,19 +154,50 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(monsterAtlas.sheets[sprite]).toBeDefined();
     });
 
-    it('every entry has idle, attack and hurt frames inside the image, feet inside the cell', () => {
+    it('every entry has every MONSTER_FRAMES key (bosses with cast: every BOSS_FRAMES key) inside the image, feet inside the cell', () => {
       const png = readFileSync(join(assets, 'sprites/monsters-ai.png'));
       const w = png.readUInt32BE(16);
       const h = png.readUInt32BE(20);
-      const s = monsterAtlas.scale;
+      const ts = monsterAtlas.texScale ?? monsterAtlas.scale;     // PNG px per art px (1 = native atlas)
+      expect(w, 'page width (native px)').toBeLessThanOrEqual(4096 * ts);
+      expect(h, 'page height (native px)').toBeLessThanOrEqual(4096 * ts);
       for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
-        // idle, attack and hurt are required; bosses may add a `cast` stance
-        expect(Object.keys(e.frames).filter((k) => k !== 'cast').sort(), id).toEqual(['attack', 'hurt', 'idle']);
+        const want = 'cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES;
+        expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
         for (const [x, y] of Object.values(e.frames)) {
-          expect((x + e.cell[0]) * s, id).toBeLessThanOrEqual(w);
-          expect((y + e.cell[1]) * s, id).toBeLessThanOrEqual(h);
+          expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);
+          expect((y + e.cell[1]) * ts, id).toBeLessThanOrEqual(h);
         }
         expect(e.footRow, id).toBeLessThan(e.cell[1]);
+      }
+    });
+
+    it('generated frames: their own rects when animated (except held frames), else aliased to the source keyframe', () => {
+      for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
+        const holds = e.holds ?? [];
+        for (const n of Object.keys(e.frames) as MonsterFrame[]) {
+          if (FRAME_SOURCE[n] === n) continue;
+          const own = e.frames[n].join() !== e.frames[FRAME_SOURCE[n]].join();
+          expect(own, `${id} ${n}`).toBe(!!e.anim && !holds.includes(n));
+        }
+        for (const prefix of ['atk_', 'hurt_in', 'cast_']) {
+          expect(holds.filter((f) => f.startsWith(prefix)).length, `${id} holds ${prefix}*`).toBeLessThanOrEqual(1);
+        }
+        expect(e.lungePx, id).toBeGreaterThanOrEqual(24);
+        expect(e.lungePx, id).toBeLessThanOrEqual(40);
+      }
+    });
+
+    it('palette-swap variants carry the same frame keys, anim flag and holds as their base sprite', () => {
+      const specs = parse(readFileSync(join(assets, '../assets-src/gen/monsters.yaml'), 'utf-8')) as
+        Array<{ id: string; variants?: Array<{ id: string }> }>;
+      const pairs = specs.flatMap((m) => (m.variants ?? []).map((v) => [m.id, v.id] as const));
+      expect(pairs.length).toBeGreaterThan(0);
+      for (const [base, variant] of pairs) {
+        const b = monsterAtlas.sheets[base];
+        const v = monsterAtlas.sheets[variant];
+        expect(Object.keys(v.frames).sort(), variant).toEqual(Object.keys(b.frames).sort());
+        expect([v.anim, v.holds, v.lungePx], variant).toEqual([b.anim, b.holds, b.lungePx]);
       }
     });
 

@@ -5,7 +5,7 @@ import type { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE } from '../../core/LayoutConstants.js';
 import { battleArt } from '../../rendering/BattleArt.js';
-import { AiEnemyView } from './AiEnemyView.js';
+import { AiEnemyView, freezeOf } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 import { idlePose } from './attackChoreography.js';
 import { BattlePartyPanel } from './BattlePartyPanel.js';
@@ -145,7 +145,7 @@ export class BattleDisplayManager {
   }
 
   update(dt: number): void {
-    this.enemyView?.update(dt, this.enemySprites);
+    this.enemyView?.update(dt, this.enemySprites, this.battle.allEnemies.map((e) => freezeOf(e.status)));
     const before = this.idleClock;
     this.idleClock += dt;
     if (this.partySprites.some((_, i) => idlePose(before, i) !== idlePose(this.idleClock, i))) this.refreshPoses();

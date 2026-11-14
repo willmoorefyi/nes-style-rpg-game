@@ -389,7 +389,22 @@ def test_approve_keeps_hand_fixes() -> None:
         check("paint" not in fresh, "a first approval has no paint")
 
 
+def test_monster_anim() -> None:
+    """docs/ENEMY_ANIM_PLAN.md 6.3: every animation check RED on an injected defect, then the generator and build locks."""
+    from gen import selftest_anim as SA
+    print("monster animation checks")
+    SA.run_checks(check)
+    print("monster animation generator")
+    SA.run_generator(check)
+    print("monster atlas build locks")
+    SA.run_build_locks(check)
+
+
 if __name__ == "__main__":
+    test_monster_anim() if "--anim" in sys.argv else None
+    if "--anim" in sys.argv:
+        print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
+        sys.exit(1 if FAILS else 0)
     test_geometry()
     test_field3_geometry()
     test_crop_bleed_and_keys()
@@ -401,5 +416,6 @@ if __name__ == "__main__":
     test_size_ref()
     test_kits()
     test_approve_keeps_hand_fixes()
+    test_monster_anim()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)

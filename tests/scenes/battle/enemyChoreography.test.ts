@@ -1,0 +1,115 @@
+import { describe, it, expect } from 'vitest';
+import {
+  ATTACK_CONTACT, ATTACK_FRAMES, BOSS_FRAMES, CAST_FRAMES, DYING_DX, FRAME_SOURCE, HURT_FRAMES, MONSTER_FRAMES,
+  PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame, lungePx, type FrameAt, type MonsterFrame,
+} from '../../../src/scenes/battle/enemyChoreography.js';
+import { EnemyPoseController } from '../../../src/scenes/battle/EnemyPoseController.js';
+
+const frames = (fn: (t: number) => FrameAt, n: number): FrameAt[] => Array.from({ length: n }, (_, t) => fn(t));
+const names = (fs: FrameAt[]): MonsterFrame[] => fs.map((f) => f.frame);
+const runs = (fs: FrameAt[]): [MonsterFrame, number][] => {
+  const out: [MonsterFrame, number][] = [];
+  for (const f of fs) {
+    if (out.length && out[out.length - 1][0] === f.frame) out[out.length - 1][1]++; else out.push([f.frame, 1]);
+  }
+  return out;
+};
+/** D2 formula (the build emits it per sheet as lungePx). */
+const lungeFor = (w: number): number => Math.round(24 + 16 * Math.min(1, Math.max(0, (w - 55) / 130)));
+
+describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
+  it('attack: 31 frames in six poses, contact on frame 14', () => {
+    expect(ATTACK_FRAMES).toBe(31);
+    expect(ATTACK_CONTACT).toBe(14);
+    expect(runs(frames((t) => attackAt(t, 24), ATTACK_FRAMES))).toEqual([['atk_wind1', 5], ['atk_wind2', 6], ['atk_mid', 3],
+      ['attack', 8], ['atk_follow', 4], ['atk_recover', 5]]);
+    expect(attackAt(ATTACK_CONTACT, 24).frame).toBe('attack');
+    expect(attackAt(ATTACK_CONTACT - 1, 24).frame).toBe('atk_mid');
+  });
+
+  it.each([[24, [-4, -6, 18, 24, 13.92]], [40, [-40 / 6, -10, 30, 40, 23.2]]])('attack offsets at L = %i', (L, [w1, w2, mid, hit, fo]) => {
+    expect(attackAt(0, L).dx).toBe(0);
+    expect(attackAt(5, L).dx).toBeCloseTo(w1);
+    expect(attackAt(11, L).dx).toBeCloseTo(w2);
+    expect(attackAt(14, L).dx).toBeCloseTo(mid);
+    expect(attackAt(16, L).dx).toBeCloseTo(hit);
+    expect(attackAt(21, L).dx).toBeCloseTo(hit);
+    expect(attackAt(26, L).dx).toBeCloseTo(fo);
+    expect(attackAt(ATTACK_FRAMES, L).dx).toBe(0);
+    expect(frames((t) => attackAt(t, L), ATTACK_FRAMES).every((f) => f.dy === 0)).toBe(true);
+  });
+
+  it('hurt: 20 frames, two poses into and out of the recoil; -6 hold with a +-3 shake every 2 frames', () => {
+    expect(HURT_FRAMES).toBe(20);
+    const fs = frames(hurtAt, HURT_FRAMES);
+    expect(runs(fs)).toEqual([['hurt_in1', 2], ['hurt_in2', 2], ['hurt', 10], ['hurt_in2', 3], ['hurt_in1', 3]]);
+    expect(fs.slice(4, 14).map((f) => f.dx)).toEqual([-3, -3, -9, -9, -3, -3, -9, -9, -3, -3]);
+    expect(fs[2].dx).toBeCloseTo(-3);
+    expect(hurtAt(HURT_FRAMES).dx).toBe(0);
+  });
+
+  it('dying: the in-phase, then hurt held at dx -6 with no shake; eases from the current offset', () => {
+    expect(names(frames((t) => dyingAt(t, { dx: 0, dy: 0 }), 4))).toEqual(['hurt_in1', 'hurt_in1', 'hurt_in2', 'hurt_in2']);
+    expect(dyingAt(2, { dx: 0, dy: 0 }).dx).toBeCloseTo(-3);
+    for (const t of [4, 10, 29, 200]) expect(dyingAt(t, { dx: 30, dy: -6 })).toEqual({ frame: 'hurt', dx: DYING_DX, dy: 0 });
+    const eased = frames((t) => dyingAt(t, { dx: 24, dy: 0 }), 5).map((f) => f.dx);
+    expect(eased[0]).toBe(24);
+    for (let k = 1; k < eased.length; k++) expect(eased[k]).toBeLessThan(eased[k - 1]);
+  });
+
+  it('boss cast: 30 frames, resolves at the start of the hold (10); only dy moves', () => {
+    expect(CAST_FRAMES).toBe(30);
+    expect(castOut(true)).toBe(10);
+    const fs = frames((t) => castAt(t, true), CAST_FRAMES);
+    expect(runs(fs)).toEqual([['cast_gather', 6], ['cast_rise', 4], ['cast', 10], ['cast_release', 4], ['cast_rise', 3],
+      ['cast_gather', 3]]);
+    expect(fs[6].dy).toBeCloseTo(-2);
+    expect(fs[10].dy).toBe(-6);
+    expect(fs.every((f) => f.dx === 0)).toBe(true);
+  });
+
+  it('non-boss cast (D4): the attack frames without mid, no lunge, resolving at 11', () => {
+    expect(PLAIN_CAST_FRAMES).toBe(30);
+    expect(castOut(false)).toBe(11);
+    const fs = frames((t) => castAt(t, false), PLAIN_CAST_FRAMES);
+    expect(runs(fs)).toEqual([['atk_wind1', 5], ['atk_wind2', 6], ['attack', 10], ['atk_follow', 4], ['atk_recover', 5]]);
+    expect(fs[11].dy).toBe(-6);
+    expect(fs.every((f) => f.dx === 0)).toBe(true);
+  });
+
+  it('every frame name used is in MONSTER_FRAMES / BOSS_FRAMES, with a keyframe source', () => {
+    const used = new Set<MonsterFrame>([...names(frames((t) => attackAt(t, 24), 40)), ...names(frames(hurtAt, 25)),
+      ...names(frames((t) => castAt(t, false), 35)), ...names(frames((t) => dyingAt(t, { dx: 0, dy: 0 }), 10)), 'idle', 'idle_b']);
+    for (const n of used) expect(MONSTER_FRAMES, n).toContain(n);
+    for (const n of names(frames((t) => castAt(t, true), 35))) expect(BOSS_FRAMES, n).toContain(n);
+    for (const n of BOSS_FRAMES) expect(['idle', 'attack', 'hurt', 'cast']).toContain(FRAME_SOURCE[n]);
+    expect(MONSTER_FRAMES).toHaveLength(11);
+    expect(BOSS_FRAMES).toHaveLength(15);
+  });
+
+  it('lungePx: the D2 formula at w = 55, 93, 185 and beyond the clamps; 24 when the atlas has none', () => {
+    expect([lungeFor(55), lungeFor(93), lungeFor(168), lungeFor(185), lungeFor(30), lungeFor(300)]).toEqual([24, 29, 38, 40, 24, 40]);
+    expect(lungePx({ lungePx: 31 })).toBe(31);
+    expect(lungePx({})).toBe(24);
+    expect(lungePx(null)).toBe(24);
+  });
+
+  it('idle breathing: period 72, phase index * 17; idle when frozen or when the rig turns breathing off', () => {
+    expect([0, 35, 36, 71, 72].map((c) => idleFrame(c, 0, true, false))).toEqual(['idle', 'idle', 'idle_b', 'idle_b', 'idle']);
+    expect(idleFrame(19, 1, true, false)).toBe('idle_b');
+    expect(idleFrame(18, 1, true, false)).toBe('idle');
+    expect(idleFrame(40, 0, true, true)).toBe('idle');
+    expect(idleFrame(40, 0, false, false)).toBe('idle');
+  });
+
+  it('at scaleFactor 0.5 every offset is an integer, rounded once from recoil + shake', () => {
+    const c = new EnemyPoseController(1);
+    c.configure(0, { scaleFactor: 0.5 });
+    c.playHurt(0);
+    const dx: number[] = [];
+    for (let t = 0; t < HURT_FRAMES; t++) { dx.push(c.state(0).dx); c.update(1); }
+    for (const v of dx) expect(Number.isInteger(v)).toBe(true);
+    // the hold is round((-6 +- 3) * 0.5): -1.5 -> -1, -4.5 -> -4
+    expect(dx.slice(4, 8)).toEqual([-1, -1, -4, -4]);
+  });
+});

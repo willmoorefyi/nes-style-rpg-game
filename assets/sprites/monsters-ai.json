@@ -1,5 +1,6 @@
 {
   "scale": 2,
+  "texScale": 1,
   "sheets": {
     "cockatrice": {
       "cell": [
@@ -13,15 +14,52 @@
           0,
           0
         ],
+        "idle_b": [
+          0,
+          0
+        ],
+        "atk_wind1": [
+          0,
+          0
+        ],
+        "atk_wind2": [
+          0,
+          0
+        ],
+        "atk_mid": [
+          84,
+          0
+        ],
         "attack": [
           84,
+          0
+        ],
+        "atk_follow": [
+          84,
+          0
+        ],
+        "atk_recover": [
+          0,
+          0
+        ],
+        "hurt_in1": [
+          0,
+          0
+        ],
+        "hurt_in2": [
+          168,
           0
         ],
         "hurt": [
           168,
           0
         ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
     },
     "dragon": {
       "cell": [
@@ -32,194 +70,55 @@
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          80
+          252,
+          0
+        ],
+        "idle_b": [
+          252,
+          0
+        ],
+        "atk_wind1": [
+          252,
+          0
+        ],
+        "atk_wind2": [
+          252,
+          0
+        ],
+        "atk_mid": [
+          380,
+          0
         ],
         "attack": [
-          128,
-          80
+          380,
+          0
+        ],
+        "atk_follow": [
+          380,
+          0
+        ],
+        "atk_recover": [
+          252,
+          0
+        ],
+        "hurt_in1": [
+          252,
+          0
+        ],
+        "hurt_in2": [
+          508,
+          0
         ],
         "hurt": [
-          256,
-          80
+          508,
+          0
         ]
-      }
-    },
-    "goblin": {
-      "cell": [
-        80,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          208
-        ],
-        "attack": [
-          80,
-          208
-        ],
-        "hurt": [
-          160,
-          208
-        ]
-      }
-    },
-    "mummy": {
-      "cell": [
-        80,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          288
-        ],
-        "attack": [
-          80,
-          288
-        ],
-        "hurt": [
-          160,
-          288
-        ]
-      }
-    },
-    "ogre": {
-      "cell": [
-        128,
-        128
-      ],
-      "footRow": 122,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          368
-        ],
-        "attack": [
-          128,
-          368
-        ],
-        "hurt": [
-          256,
-          368
-        ]
-      }
-    },
-    "pirate": {
-      "cell": [
-        80,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          496
-        ],
-        "attack": [
-          80,
-          496
-        ],
-        "hurt": [
-          160,
-          496
-        ]
-      }
-    },
-    "skeleton": {
-      "cell": [
-        80,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          576
-        ],
-        "attack": [
-          80,
-          576
-        ],
-        "hurt": [
-          160,
-          576
-        ]
-      }
-    },
-    "troll": {
-      "cell": [
-        128,
-        128
-      ],
-      "footRow": 122,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          656
-        ],
-        "attack": [
-          128,
-          656
-        ],
-        "hurt": [
-          256,
-          656
-        ]
-      }
-    },
-    "vampire": {
-      "cell": [
-        80,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          784
-        ],
-        "attack": [
-          80,
-          784
-        ],
-        "hurt": [
-          160,
-          784
-        ]
-      }
-    },
-    "wolf": {
-      "cell": [
-        110,
-        80
-      ],
-      "footRow": 76,
-      "floating": false,
-      "frames": {
-        "idle": [
-          0,
-          864
-        ],
-        "attack": [
-          110,
-          864
-        ],
-        "hurt": [
-          220,
-          864
-        ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 29,
+      "sequence_version": 1,
+      "page": 0
     },
     "garland": {
       "cell": [
@@ -230,48 +129,130 @@
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          944
+          636,
+          0
+        ],
+        "idle_b": [
+          636,
+          0
+        ],
+        "atk_wind1": [
+          636,
+          0
+        ],
+        "atk_wind2": [
+          636,
+          0
+        ],
+        "atk_mid": [
+          836,
+          0
         ],
         "attack": [
-          200,
-          944
+          836,
+          0
+        ],
+        "atk_follow": [
+          836,
+          0
+        ],
+        "atk_recover": [
+          636,
+          0
+        ],
+        "hurt_in1": [
+          636,
+          0
+        ],
+        "hurt_in2": [
+          1036,
+          0
         ],
         "hurt": [
-          400,
-          944
+          1036,
+          0
+        ],
+        "cast_gather": [
+          636,
+          0
+        ],
+        "cast_rise": [
+          1236,
+          0
         ],
         "cast": [
-          600,
-          944
+          1236,
+          0
+        ],
+        "cast_release": [
+          1236,
+          0
         ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 38,
+      "sequence_version": 1,
+      "page": 0
     },
-    "lich": {
+    "goblin": {
       "cell": [
-        200,
-        200
+        80,
+        80
       ],
-      "footRow": 192,
+      "footRow": 76,
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          1144
+          1436,
+          0
+        ],
+        "idle_b": [
+          1436,
+          0
+        ],
+        "atk_wind1": [
+          1436,
+          0
+        ],
+        "atk_wind2": [
+          1436,
+          0
+        ],
+        "atk_mid": [
+          1516,
+          0
         ],
         "attack": [
-          200,
-          1144
+          1516,
+          0
+        ],
+        "atk_follow": [
+          1516,
+          0
+        ],
+        "atk_recover": [
+          1436,
+          0
+        ],
+        "hurt_in1": [
+          1436,
+          0
+        ],
+        "hurt_in2": [
+          1596,
+          0
         ],
         "hurt": [
-          400,
-          1144
-        ],
-        "cast": [
-          600,
-          1144
+          1596,
+          0
         ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
     },
     "gr_imp": {
       "cell": [
@@ -282,18 +263,55 @@
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          1344
+          1676,
+          0
+        ],
+        "idle_b": [
+          1676,
+          0
+        ],
+        "atk_wind1": [
+          1676,
+          0
+        ],
+        "atk_wind2": [
+          1676,
+          0
+        ],
+        "atk_mid": [
+          1756,
+          0
         ],
         "attack": [
-          80,
-          1344
+          1756,
+          0
+        ],
+        "atk_follow": [
+          1756,
+          0
+        ],
+        "atk_recover": [
+          1676,
+          0
+        ],
+        "hurt_in1": [
+          1676,
+          0
+        ],
+        "hurt_in2": [
+          1836,
+          0
         ],
         "hurt": [
-          160,
-          1344
+          1836,
+          0
         ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
     },
     "gr_wolf": {
       "cell": [
@@ -304,18 +322,543 @@
       "floating": false,
       "frames": {
         "idle": [
+          1916,
+          0
+        ],
+        "idle_b": [
+          1916,
+          0
+        ],
+        "atk_wind1": [
+          1916,
+          0
+        ],
+        "atk_wind2": [
+          1916,
+          0
+        ],
+        "atk_mid": [
           0,
-          1424
+          200
         ],
         "attack": [
+          0,
+          200
+        ],
+        "atk_follow": [
+          0,
+          200
+        ],
+        "atk_recover": [
+          1916,
+          0
+        ],
+        "hurt_in1": [
+          1916,
+          0
+        ],
+        "hurt_in2": [
           110,
-          1424
+          200
         ],
         "hurt": [
-          220,
-          1424
+          110,
+          200
         ]
-      }
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 29,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "lich": {
+      "cell": [
+        200,
+        200
+      ],
+      "footRow": 192,
+      "floating": false,
+      "frames": {
+        "idle": [
+          220,
+          200
+        ],
+        "idle_b": [
+          220,
+          200
+        ],
+        "atk_wind1": [
+          220,
+          200
+        ],
+        "atk_wind2": [
+          220,
+          200
+        ],
+        "atk_mid": [
+          420,
+          200
+        ],
+        "attack": [
+          420,
+          200
+        ],
+        "atk_follow": [
+          420,
+          200
+        ],
+        "atk_recover": [
+          220,
+          200
+        ],
+        "hurt_in1": [
+          220,
+          200
+        ],
+        "hurt_in2": [
+          620,
+          200
+        ],
+        "hurt": [
+          620,
+          200
+        ],
+        "cast_gather": [
+          220,
+          200
+        ],
+        "cast_rise": [
+          820,
+          200
+        ],
+        "cast": [
+          820,
+          200
+        ],
+        "cast_release": [
+          820,
+          200
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 40,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "mummy": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          1020,
+          200
+        ],
+        "idle_b": [
+          1020,
+          200
+        ],
+        "atk_wind1": [
+          1020,
+          200
+        ],
+        "atk_wind2": [
+          1020,
+          200
+        ],
+        "atk_mid": [
+          1100,
+          200
+        ],
+        "attack": [
+          1100,
+          200
+        ],
+        "atk_follow": [
+          1100,
+          200
+        ],
+        "atk_recover": [
+          1020,
+          200
+        ],
+        "hurt_in1": [
+          1020,
+          200
+        ],
+        "hurt_in2": [
+          1180,
+          200
+        ],
+        "hurt": [
+          1180,
+          200
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "ogre": {
+      "cell": [
+        128,
+        128
+      ],
+      "footRow": 122,
+      "floating": false,
+      "frames": {
+        "idle": [
+          1260,
+          200
+        ],
+        "idle_b": [
+          1260,
+          200
+        ],
+        "atk_wind1": [
+          1260,
+          200
+        ],
+        "atk_wind2": [
+          1260,
+          200
+        ],
+        "atk_mid": [
+          1388,
+          200
+        ],
+        "attack": [
+          1388,
+          200
+        ],
+        "atk_follow": [
+          1388,
+          200
+        ],
+        "atk_recover": [
+          1260,
+          200
+        ],
+        "hurt_in1": [
+          1260,
+          200
+        ],
+        "hurt_in2": [
+          1516,
+          200
+        ],
+        "hurt": [
+          1516,
+          200
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 28,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "pirate": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          1644,
+          200
+        ],
+        "idle_b": [
+          1644,
+          200
+        ],
+        "atk_wind1": [
+          1644,
+          200
+        ],
+        "atk_wind2": [
+          1644,
+          200
+        ],
+        "atk_mid": [
+          1724,
+          200
+        ],
+        "attack": [
+          1724,
+          200
+        ],
+        "atk_follow": [
+          1724,
+          200
+        ],
+        "atk_recover": [
+          1644,
+          200
+        ],
+        "hurt_in1": [
+          1644,
+          200
+        ],
+        "hurt_in2": [
+          1804,
+          200
+        ],
+        "hurt": [
+          1804,
+          200
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "skeleton": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          1884,
+          200
+        ],
+        "idle_b": [
+          1884,
+          200
+        ],
+        "atk_wind1": [
+          1884,
+          200
+        ],
+        "atk_wind2": [
+          1884,
+          200
+        ],
+        "atk_mid": [
+          1964,
+          200
+        ],
+        "attack": [
+          1964,
+          200
+        ],
+        "atk_follow": [
+          1964,
+          200
+        ],
+        "atk_recover": [
+          1884,
+          200
+        ],
+        "hurt_in1": [
+          1884,
+          200
+        ],
+        "hurt_in2": [
+          0,
+          400
+        ],
+        "hurt": [
+          0,
+          400
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "troll": {
+      "cell": [
+        128,
+        128
+      ],
+      "footRow": 122,
+      "floating": false,
+      "frames": {
+        "idle": [
+          80,
+          400
+        ],
+        "idle_b": [
+          80,
+          400
+        ],
+        "atk_wind1": [
+          80,
+          400
+        ],
+        "atk_wind2": [
+          80,
+          400
+        ],
+        "atk_mid": [
+          208,
+          400
+        ],
+        "attack": [
+          208,
+          400
+        ],
+        "atk_follow": [
+          208,
+          400
+        ],
+        "atk_recover": [
+          80,
+          400
+        ],
+        "hurt_in1": [
+          80,
+          400
+        ],
+        "hurt_in2": [
+          336,
+          400
+        ],
+        "hurt": [
+          336,
+          400
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 27,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "vampire": {
+      "cell": [
+        80,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          464,
+          400
+        ],
+        "idle_b": [
+          464,
+          400
+        ],
+        "atk_wind1": [
+          464,
+          400
+        ],
+        "atk_wind2": [
+          464,
+          400
+        ],
+        "atk_mid": [
+          544,
+          400
+        ],
+        "attack": [
+          544,
+          400
+        ],
+        "atk_follow": [
+          544,
+          400
+        ],
+        "atk_recover": [
+          464,
+          400
+        ],
+        "hurt_in1": [
+          464,
+          400
+        ],
+        "hurt_in2": [
+          624,
+          400
+        ],
+        "hurt": [
+          624,
+          400
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 24,
+      "sequence_version": 1,
+      "page": 0
+    },
+    "wolf": {
+      "cell": [
+        110,
+        80
+      ],
+      "footRow": 76,
+      "floating": false,
+      "frames": {
+        "idle": [
+          704,
+          400
+        ],
+        "idle_b": [
+          704,
+          400
+        ],
+        "atk_wind1": [
+          704,
+          400
+        ],
+        "atk_wind2": [
+          704,
+          400
+        ],
+        "atk_mid": [
+          814,
+          400
+        ],
+        "attack": [
+          814,
+          400
+        ],
+        "atk_follow": [
+          814,
+          400
+        ],
+        "atk_recover": [
+          704,
+          400
+        ],
+        "hurt_in1": [
+          704,
+          400
+        ],
+        "hurt_in2": [
+          924,
+          400
+        ],
+        "hurt": [
+          924,
+          400
+        ]
+      },
+      "anim": false,
+      "holds": [],
+      "lungePx": 29,
+      "sequence_version": 1,
+      "page": 0
     }
   }
 }

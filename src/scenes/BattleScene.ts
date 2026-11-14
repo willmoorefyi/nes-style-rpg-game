@@ -14,6 +14,7 @@ import { BattleListMenus, canOpenItems, canOpenSpells } from './battle/BattleLis
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
+import { enemyAnimPreview } from './battle/enemyAnimPreview.js';
 import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_LINE, BATTLE_MESSAGE_HEIGHT, STRIP_Y, STRIP_HEIGHT, ENEMY_WINDOW, COMMAND_WINDOW,
   FLOAT_OUTLINE } from './battle/BattleSceneTypes.js';
 
@@ -164,6 +165,7 @@ export class BattleScene implements Scene {
   }
 
   update(dt: number): void {
+    dt = enemyAnimPreview.tick(this.display, this.battle.allEnemies.map(e => e.displayName), this.container, dt);  // dev ?enemyAnim=
     this.messageText.update(dt);
     this.display.update(dt);
     this.animation.updateFloatingTexts(dt);
@@ -461,6 +463,7 @@ export class BattleScene implements Scene {
   onResume(): void {}
 
   exit(): void {
+    enemyAnimPreview.dispose(this.display);
     destroyPromptIndicator(this.endPrompt, this.messageWindow);
     this.endPrompt = null;
     this.activeHero.hide();
