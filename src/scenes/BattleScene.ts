@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite, Assets, type Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, Assets, type BitmapText, type Texture } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
@@ -15,6 +15,12 @@ import { createItemCommand } from '../battle/BattleCommands.js';
 import { SpellSelectionUI } from '../ui/SpellSelectionUI.js';
 import { ItemSelectionUI } from '../ui/ItemSelectionUI.js';
 import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.js';
+import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
+
+/** Frames after the command menu opens during which confirm is ignored, so mashing doesn't pick commands. */
+export const COMMAND_CONFIRM_GUARD_FRAMES = 10;
+/** Frames a one-off UI notice ("No spells available.") stays up before the menu returns. */
+const NOTICE_FRAMES = 30;
 
 export type { BattleSceneDeps, BattleSceneConfig } from './battle/BattleSceneTypes.js';
 
@@ -41,6 +47,10 @@ export class BattleScene implements Scene {
   private introTimer = 60;
   private messageTimer = 0;
   private currentMessageIndex = 0;
+  private commandGuard = 0;
+  private noticeTimer = 0;
+  private endPrompt: BitmapText | null = null;
+  private endPromptTimer = 0;
   private commandArrow: Graphics | null = null;
   private flashTimer: number = 0;
   // K4: Turn list in commandWindow during execution
@@ -56,7 +66,7 @@ export class BattleScene implements Scene {
       spells: this.spells,
       inventory: this.inventory,
       canRun: config.canRun,
-    });
+    }, config.rng);
     this.attachEnemyAi(config);
   }
 
@@ -98,8 +108,8 @@ export class BattleScene implements Scene {
     this.display.updatePartyDisplay();
     this.targeting = new BattleFieldTargeting(this.container, this.battle, this.display, this.deps.input);
     this.animation = new BattleAnimationController(
-      this.container, this.battle, this.config, this.display, this.deps.input,
-      this.commandWindow, this.messageWindow, this.turnListContainer,
+      this.container, this.battle, this.display, this.deps.input,
+      this.commandWindow, this.turnListContainer,
       (text: string) => this.messageText.setText(text, true),
       () => this.resolveRound(),
     );
@@ -163,7 +173,12 @@ export class BattleScene implements Scene {
         break;
 
       case 'command':
-        this.commandMenu.update(this.deps.input);
+        if (this.commandGuard > 0) {
+          this.commandGuard -= dt;
+          if (!this.deps.input.isJustPressed('confirm')) this.commandMenu.update(this.deps.input);
+        } else {
+          this.commandMenu.update(this.deps.input);
+        }
         this.flashTimer++;
         {
           const id = this.battle.currentCommandActorId;
@@ -203,7 +218,14 @@ export class BattleScene implements Scene {
         }
         break;
 
+      case 'notice':
+        this.noticeTimer -= dt;
+        if (this.noticeTimer <= 0 || this.deps.input.isJustPressed('confirm')) this.closeNotice();
+        break;
+
       case 'end':
+        this.endPromptTimer += dt;
+        if (this.endPrompt) this.endPrompt.visible = Math.floor(this.endPromptTimer / 20) % 2 === 0;
         if (this.deps.input.isJustPressed('confirm')) {
           this.endBattle();
         }
@@ -236,7 +258,22 @@ export class BattleScene implements Scene {
     this.messageText.setText(`${actor.name}'s turn`, true);
     this.commandMenu.visible = true;
     this.commandMenu.setIndex(0);
+    this.commandGuard = COMMAND_CONFIRM_GUARD_FRAMES;
     this.uiState = 'command';
+  }
+
+  /** A one-off message from the command menu; it never touches the battle's message list. */
+  private showNotice(text: string): void {
+    this.messageText.setText(text, true);
+    this.noticeTimer = NOTICE_FRAMES;
+    this.uiState = 'notice';
+  }
+
+  /** Back to the same actor's command menu, cursor where it was. */
+  private closeNotice(): void {
+    const index = this.commandMenu.selectedIndex;
+    this.startCommandPhase();
+    this.commandMenu.setIndex(index);
   }
 
   /** Undo the previous character's command and go back to their turn. */
@@ -279,10 +316,7 @@ export class BattleScene implements Scene {
     }
 
     if (!hasSpells) {
-      this.messageText.setText('No spells available.', true);
-      this.uiState = 'message';
-      this.messageTimer = 30;
-      this.currentMessageIndex = -1;
+      this.showNotice('No spells available.');
       return;
     }
 
@@ -345,10 +379,7 @@ export class BattleScene implements Scene {
 
   private showItemUI(_actor: Character): void {
     if (!this.inventory) {
-      this.messageText.setText('No items available.', true);
-      this.uiState = 'message';
-      this.messageTimer = 30;
-      this.currentMessageIndex = -1;
+      this.showNotice('No items available.');
       return;
     }
     const actorId = this.battle.currentCommandActorId!;
@@ -384,10 +415,7 @@ export class BattleScene implements Scene {
     // Check if there are no consumables
     if (this.itemUI.hasNoItems()) {
       this.cleanupItemUI();
-      this.messageText.setText('No items available.', true);
-      this.uiState = 'message';
-      this.messageTimer = 30;
-      this.currentMessageIndex = -1;
+      this.showNotice('No items available.');
       return;
     }
 
@@ -459,7 +487,7 @@ export class BattleScene implements Scene {
   private showMessages(): void {
     const messages = this.battle.currentMessages;
     if (messages.length === 0) {
-      this.resolveRound();
+      if (this.battle.isOver) this.checkBattleEnd(); else this.resolveRound();
       return;
     }
     this.currentMessageIndex = 0;
@@ -474,6 +502,8 @@ export class BattleScene implements Scene {
     if (this.currentMessageIndex < messages.length) {
       this.messageText.setText(messages[this.currentMessageIndex].text, true);
       this.messageTimer = 45;
+    } else if (this.battle.isOver) {
+      this.checkBattleEnd();
     } else if (this.battle.state === 'intro') {
       this.battle.advanceFromIntro();
       this.startCommandPhase();
@@ -481,8 +511,6 @@ export class BattleScene implements Scene {
       this.resolveRound();
     } else if (this.battle.state === 'command_select') {
       this.startCommandPhase();
-    } else {
-      this.checkBattleEnd();
     }
   }
 
@@ -492,8 +520,8 @@ export class BattleScene implements Scene {
     this.display.updateEnemySprites(this.animation.dyingEnemies);
     this.display.updatePartySprites();
 
-    if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
-      if (this.battle.state === 'victory') {
+    if (this.battle.isOver) {
+      if (this.battle.outcome === 'victory') {
         this.deps.events.emit('battleVictory', {});
         this.display.setVictory();
         this.deps.audio?.playMusic('victory', false);
@@ -505,9 +533,10 @@ export class BattleScene implements Scene {
   }
 
   private checkBattleEnd(): void {
-    if (this.battle.state === 'victory' || this.battle.state === 'defeat') {
-      this.uiState = 'end';
-    }
+    if (!this.battle.isOver) return;
+    this.uiState = 'end';
+    this.endPromptTimer = 0;
+    if (!this.endPrompt) this.endPrompt = createPromptIndicator(this.messageWindow);
   }
 
   private endBattle(): void {
@@ -515,6 +544,7 @@ export class BattleScene implements Scene {
     if (result) {
       this.deps.events.emit('battleEnd', {
         victory: result.victory,
+        escaped: this.battle.outcome === 'escaped',
         xpReward: result.xpReward,
         goldReward: result.goldReward,
       });
@@ -525,6 +555,8 @@ export class BattleScene implements Scene {
   onResume(): void {}
 
   exit(): void {
+    destroyPromptIndicator(this.endPrompt, this.messageWindow);
+    this.endPrompt = null;
     this.container.removeChildren();
     // Null out UI references for GC
     this.spellUI = null;

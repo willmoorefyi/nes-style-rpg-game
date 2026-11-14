@@ -7,6 +7,8 @@ import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 
 export interface BattleEndData {
   victory: boolean;
+  /** The party ran away: no rewards and no Game Over. */
+  escaped?: boolean;
   xpReward: number;
   goldReward: number;
 }
@@ -68,6 +70,13 @@ export class BattleTrigger {
   }
 
   onBattleEnd(data: BattleEndData): void {
+    if (data.escaped) {
+      // back to the field where the battle started (boss battles never allow Run); nothing to retry
+      this.currentBossConfig = null;
+      this.game.battleRetry = null;
+      this.game.scenes.pop();
+      return;
+    }
     if (!data.victory) {
       this.currentBossConfig = null;
       this.game.scenes.switchTo('gameover');

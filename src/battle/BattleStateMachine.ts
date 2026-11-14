@@ -11,7 +11,10 @@ import { retargetIfDead, calculateRunChance, type BattleCommand } from './Battle
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { SpellExecutor } from './SpellExecutor.js';
 
-export type BattleState = 'intro' | 'command_select' | 'execution' | 'resolution' | 'victory' | 'defeat';
+export type BattleState = 'intro' | 'command_select' | 'execution' | 'resolution' | 'victory' | 'defeat' | 'escaped';
+
+/** How a battle ended; decided only in `BattleStateMachine.finish`. */
+export type BattleOutcome = 'victory' | 'defeat' | 'escaped';
 
 export interface EnemyInstance {
   id: string;
@@ -41,6 +44,8 @@ export interface BattleConfig {
 
 export interface BattleResult {
   victory: boolean;
+  /** True when the party ran away (no rewards, no Game Over). */
+  escaped?: boolean;
   xpReward: number;
   goldReward: number;
 }
@@ -55,6 +60,14 @@ export interface DamageEvent {
   isHeal: boolean;
   isCrit: boolean;
   spellElement?: string;
+}
+
+export interface NextActionInfo {
+  actorId: string;
+  actorName: string;
+  actionType: string;
+  targetName?: string;
+  spellName?: string;
 }
 
 export interface QueuedAction {
@@ -73,6 +86,7 @@ export class BattleStateMachine {
   private currentActorIndex = 0;
   private messages: BattleMessage[] = [];
   private result: BattleResult | null = null;
+  private _outcome: BattleOutcome | null = null;
   private rng: () => number;
   private inventory: Inventory | undefined;
   private canRun: boolean;
@@ -134,6 +148,9 @@ export class BattleStateMachine {
   get state(): BattleState { return this._state; }
   get currentMessages(): BattleMessage[] { return this.messages; }
   get battleResult(): BattleResult | null { return this.result; }
+  /** Victory, defeat or escape once the battle has ended; null while it is running. */
+  get outcome(): BattleOutcome | null { return this._outcome; }
+  get isOver(): boolean { return this._outcome !== null; }
   get livingParty(): Character[] { return this.party.filter(c => c.currentHp > 0); }
   get allParty(): Character[] { return this.party; }
   get livingEnemies(): EnemyInstance[] { return this.enemies.filter(e => e.currentHp > 0); }
@@ -262,7 +279,7 @@ export class BattleStateMachine {
   }
 
   executeNextAction(): { done: boolean; messages: BattleMessage[]; damageEvents: DamageEvent[] } {
-    if (this._actionQueue.length === 0) {
+    if (this._actionQueue.length === 0 || this.isOver) {
       return { done: true, messages: [], damageEvents: [] };
     }
 
@@ -284,15 +301,17 @@ export class BattleStateMachine {
       this.executeCommand(action.command, action.isEnemy);
     }
 
-    const done = this._actionQueue.length === 0;
-    if (done) {
+    // An escape ends the battle mid-round: never overwrite the end state
+    const done = this.isOver || this._actionQueue.length === 0;
+    if (done && !this.isOver) {
       this._state = 'resolution';
     }
 
     return { done, messages: [...this.messages], damageEvents: [...this._damageEvents] };
   }
 
-  peekNextAction(): { actorName: string; actionType: string; targetName?: string; spellName?: string } | null {
+  /** The next queued action; `actorId` (party_i / enemy_i) identifies the actor's sprite, never its name. */
+  peekNextAction(): NextActionInfo | null {
     if (this._actionQueue.length === 0) return null;
     const action = this._actionQueue[0];
     const cmd = action.command;
@@ -306,7 +325,8 @@ export class BattleStateMachine {
       actorName = char?.name ?? 'Unknown';
     }
 
-    const result: { actorName: string; actionType: string; targetName?: string; spellName?: string } = {
+    const result: NextActionInfo = {
+      actorId: action.combatantId,
       actorName,
       actionType: cmd.type,
     };
@@ -402,8 +422,7 @@ export class BattleStateMachine {
       const chance = calculateRunChance(partyAgi, enemyAgi);
       if (this.rng() * 100 < chance) {
         this.messages.push({ text: 'Escaped!' });
-        this.result = { victory: false, xpReward: 0, goldReward: 0 };
-        this._state = 'defeat';
+        this.finish('escaped');
       } else {
         this.messages.push({ text: 'Cannot escape!' });
       }
@@ -560,29 +579,42 @@ export class BattleStateMachine {
 
   skipRemainingActions(): void {
     this._actionQueue.length = 0;
-    this._state = 'resolution';
+    if (!this.isOver) this._state = 'resolution';
   }
 
   resolveRound(): void {
-    if (this._state !== 'resolution') return;
+    if (this._state !== 'resolution' || this.isOver) return;
 
     if (this.livingEnemies.length === 0) {
-      const xp = this.enemies.reduce((sum, e) => sum + e.data.xpReward, 0);
-      const gold = this.enemies.reduce((sum, e) => sum + e.data.goldReward, 0);
-      this.result = { victory: true, xpReward: xp, goldReward: gold };
-      this._state = 'victory';
-      this.messages.push({ text: `Victory! Gained ${xp} XP and ${gold} Gold.` });
-      // Clear battle-only buffs/resists from party members
-      for (const char of this.party) char.clearBattleState();
+      this.finish('victory');
     } else if (this.livingParty.length === 0) {
-      this.result = { victory: false, xpReward: 0, goldReward: 0 };
-      this._state = 'defeat';
-      this.messages.push({ text: 'Game Over...' });
-      for (const char of this.party) char.clearBattleState();
+      this.finish('defeat');
     } else {
       this._state = 'command_select';
       this.currentActorIndex = 0;
       this.commands = [];
     }
+  }
+
+  /**
+   * The one place a battle ends. Sets the outcome, result and end state, empties the action queue and
+   * clears battle-only buffs. Victory and defeat replace the message list with their single end line,
+   * so the scene never replays the last action's messages.
+   */
+  private finish(outcome: BattleOutcome): void {
+    if (this.isOver) return;
+    this._outcome = outcome;
+    this._state = outcome;
+    this._actionQueue.length = 0;
+    if (outcome === 'victory') {
+      const xp = this.enemies.reduce((sum, e) => sum + e.data.xpReward, 0);
+      const gold = this.enemies.reduce((sum, e) => sum + e.data.goldReward, 0);
+      this.result = { victory: true, xpReward: xp, goldReward: gold };
+      this.messages = [{ text: `Victory! Gained ${xp} XP and ${gold} Gold.` }];
+    } else {
+      this.result = { victory: false, escaped: outcome === 'escaped', xpReward: 0, goldReward: 0 };
+      if (outcome === 'defeat') this.messages = [{ text: 'Game Over...' }];
+    }
+    for (const char of this.party) char.clearBattleState();
   }
 }

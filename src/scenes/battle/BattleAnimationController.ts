@@ -1,12 +1,11 @@
 import { Container, BitmapText, Graphics, Sprite } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
-import type { BattleStateMachine, DamageEvent } from '../../battle/BattleStateMachine.js';
-import type { BattleSceneConfig } from './BattleSceneTypes.js';
+import type { BattleStateMachine, DamageEvent, NextActionInfo } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE, FONT_SIZE_SM } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
-import { formatConciseResult, capitalize, createPromptIndicator, destroyPromptIndicator } from './battleMessageUtils.js';
+import { formatConciseResult, capitalize } from './battleMessageUtils.js';
 import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride, pickAttackStyle, castAt, castReturnAt, CAST_FRAMES, type AttackFrame,
   type AttackStyle } from './attackChoreography.js';
 import { slashEffect } from './slashEffect.js';
@@ -14,6 +13,11 @@ export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
   water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
 };
+/** Frames the last result line stays up after a round before the next command menu (or the end screen). */
+export const ROUND_END_FRAMES = 20;
+/** Frames each action's announcement and each result line stay up; confirm skips either. */
+export const ANNOUNCE_FRAMES = 30;
+export const RESULT_FRAMES = 25;
 export class BattleAnimationController {
   animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'result' | 'step_back' | 'round_end' = 'announce';
   animTimer = 0;
@@ -38,32 +42,26 @@ export class BattleAnimationController {
   // K4: Turn list in commandWindow during execution
   turnListTexts: BitmapText[] = [];
   turnActionIndex = 0;
-  private currentActionInfo: { actorName: string; actionType: string; targetName?: string; spellName?: string } | null = null;
-  private promptIndicator: BitmapText | null = null;
-  private promptBlinkTimer = 0;
+  private currentActionInfo: NextActionInfo | null = null;
   constructor(
     private readonly mainContainer: Container,
     private readonly battle: BattleStateMachine,
-    private readonly config: BattleSceneConfig,
     private readonly display: BattleDisplayManager,
     private readonly input: InputManager,
     private readonly commandWindow: Window,
-    private readonly messageWindow: Window,
     private readonly turnListContainer: Container,
     private readonly setMessageText: (text: string) => void,
     private readonly onResolveRound: () => void,
   ) {}
-  findActorSprite(actorName: string): { sprite: Container; isEnemy: boolean } | null {
-    for (let i = 0; i < this.config.party.length; i++) {
-      if (this.config.party[i].name === actorName) return { sprite: this.display.partySprites[i], isEnemy: false };
-    }
-    const enemies = this.battle.allEnemies;
-    for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i].displayName === actorName && enemies[i].currentHp > 0) return { sprite: this.display.enemySprites[i], isEnemy: true };
-    }
-    return null;
+  /** The actor's sprite by battle id (party_i / enemy_i), so equal names never share a sprite. */
+  findActorSprite(actorId: string): { sprite: Container; isEnemy: boolean } | null {
+    const [side, index] = actorId.split('_');
+    const i = Number(index);
+    if (!Number.isInteger(i)) return null;
+    const sprite = side === 'party' ? this.display.partySprites[i] : side === 'enemy' ? this.display.enemySprites[i] : undefined;
+    return sprite ? { sprite, isEnemy: side === 'enemy' } : null;
   }
-  formatAnnouncement(info: { actorName: string; actionType: string; targetName?: string; spellName?: string }): string {
+  formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): string {
     switch (info.actionType) {
       case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
       case 'magic': return `${info.actorName} casts ${info.spellName ?? 'spell'}!`;
@@ -96,7 +94,7 @@ export class BattleAnimationController {
           this.turnListContainer.addChild(entry);
           this.turnListTexts.push(entry);
           this.scrollTurnList();
-          const found = this.findActorSprite(info.actorName);
+          const found = this.findActorSprite(info.actorId);
           this.animActorSprite = found?.sprite ?? null;
           this.animActorIsEnemy = found?.isEnemy ?? false;
           if (this.animActorSprite) {
@@ -109,7 +107,7 @@ export class BattleAnimationController {
           }
         }
         this.animTimer += dt;
-        if (this.animTimer >= 30 || confirmSkip) {
+        if (this.animTimer >= ANNOUNCE_FRAMES || confirmSkip) {
           this.animTimer = 0;
           // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead
           this.animPhase = this.animActorIsEnemy ? (this.startEnemyLunge() ? 'enemy_lunge' : 'execute') : 'step_forward';
@@ -159,7 +157,7 @@ export class BattleAnimationController {
         }
         if (this.animTimer === 0) this.setMessageText(this.animMessages[this.animMessageIndex].text);
         this.animTimer += dt;
-        if (this.animTimer >= 25 || confirmSkip) {
+        if (this.animTimer >= RESULT_FRAMES || confirmSkip) {
           this.animMessageIndex++; this.animTimer = 0;
           if (this.animMessageIndex >= this.animMessages.length) {
             if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; }
@@ -180,16 +178,15 @@ export class BattleAnimationController {
         break;
       }
       case 'round_end': {
-        if (this.animTimer === 0) this.setMessageText('');
-        this.promptBlinkTimer++;
-        if (!this.promptIndicator) this.promptIndicator = createPromptIndicator(this.messageWindow);
-        this.promptIndicator.visible = Math.floor(this.promptBlinkTimer / 20) % 2 === 0;
-        if (confirmSkip) {
-          destroyPromptIndicator(this.promptIndicator, this.messageWindow);
-          this.promptIndicator = null; this.promptBlinkTimer = 0;
+        // The last result line stays up for a moment, then the round resolves by itself (confirm skips the wait).
+        // Fades and lunges always finish first, so the next menu never opens over a dying or attacking enemy.
+        this.animTimer += dt;
+        if (confirmSkip) this.animTimer = Math.max(this.animTimer, ROUND_END_FRAMES);
+        if (this.animTimer >= ROUND_END_FRAMES && this.dyingEnemies.size === 0 && !this.anyEnemyAttacking()) {
+          this.animTimer = 0;
           this.onResolveRound();
         }
-        this.animTimer = 1; break;
+        break;
       }
     }
   }
@@ -220,6 +217,10 @@ export class BattleAnimationController {
     if (type === 'magic') view.poses.playCast(this.animEnemyIndex); else view.poses.playAttack(this.animEnemyIndex);
     return true;
   }
+  private anyEnemyAttacking(): boolean {
+    const poses = this.display.enemyView?.poses;
+    return !!poses && this.display.enemySprites.some((_, i) => poses.isAttacking(i));
+  }
   private enemyStillAttacking(): boolean {
     return this.animEnemyIndex >= 0 && (this.display.enemyView?.poses.isAttacking(this.animEnemyIndex) ?? false);
   }
@@ -228,7 +229,7 @@ export class BattleAnimationController {
     const entry = this.turnListTexts[this.turnActionIndex]; if (entry) entry.tint = 0x888888;
     if (this.animActorSprite) this.display.setActorPose(this.animActorSprite, null);
     this.turnActionIndex++; this.animTimer = 0; this.animActorSprite = null; this.animEnemyIndex = -1;
-    const battleOver = this.battle.livingEnemies.length === 0 || this.battle.livingParty.length === 0;
+    const battleOver = this.battle.isOver || this.battle.livingEnemies.length === 0 || this.battle.livingParty.length === 0;
     if (battleOver) { this.battle.skipRemainingActions(); this.animPhase = 'round_end'; }
     else { this.animPhase = this.battle.actionQueueLength > 0 ? 'announce' : 'round_end'; }
   }

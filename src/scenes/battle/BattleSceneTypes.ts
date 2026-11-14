@@ -22,9 +22,11 @@ export interface BattleSceneConfig {
   background?: string;
   /** Optional per-enemy-id action patterns (debug scenarios): attached as BossAI after the battle is created. */
   enemyAi?: EnemyAiPatterns;
+  /** Injectable RNG for the battle logic (deterministic tests); defaults to Math.random. */
+  rng?: () => number;
 }
 
 /** Weighted actions an enemy may take, keyed by enemy id (e.g. make a boss cast). */
 export type EnemyAiPatterns = Record<string, { type: 'fight' | 'magic'; spellId?: string; weight: number }[]>;
 
-export type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating';
+export type UIState = 'intro' | 'command' | 'target' | 'executing' | 'message' | 'end' | 'spell_ui' | 'item_ui' | 'animating' | 'notice';

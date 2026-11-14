@@ -1,7 +1,7 @@
 export interface GameEvents {
   sceneChange: { from: string | null; to: string };
   battleStart: { enemies: string[] };
-  battleEnd: { victory: boolean; xpReward: number; goldReward: number };
+  battleEnd: { victory: boolean; escaped?: boolean; xpReward: number; goldReward: number };
   playerMove: { x: number; y: number };
   interact: { targetId: string };
   menuOpen: { menu: string };
