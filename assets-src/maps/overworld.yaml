@@ -160,6 +160,15 @@ objects:
 - {type: flowers, x: 52, y: 44}
 - type: deco
   parts:
+  - [bridge_gap_0_0, bridge_gap_0_1]
+  - [bridge_gap_1_0, bridge_gap_1_1]
+  name: broken_bridge
+  x: 29
+  y: 30
+  block: false
+  on_water: true
+- type: deco
+  parts:
   - [boulder]
   x: 20
   y: 47
@@ -291,6 +300,13 @@ encounterZones:
 battleBackgrounds:
   default: grassland
   terrain: {forest: forest, desert: shoreline, swamp: swamp, water: ocean, river: river}
+  zones:
+    temple_approach:
+      default: dark_forest
+      terrain: {desert: shoreline, water: ocean, river: river}
+    east_pocket:
+      default: ruined_forest
+      terrain: {desert: shoreline, water: ocean, river: river}
 vehicles:
 - {type: ship, x: 28, y: 56, requiredFlag: BIKKE_DEFEATED}
 - {type: canoe, x: 45, y: 50, requiredFlag: EARTH_CAVE_COMPLETE}

@@ -119,6 +119,14 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       }
     });
 
+    it.runIf(present)('the T6 townsfolk (vendor_f, farmer, burgher) are on the cornelia map and drawn from the 2x atlas', () => {
+      const cornelia = (readYaml<{ npcs?: Array<{ sprite: string }> }>('maps/ai/cornelia.yaml').npcs ?? []).map((n) => n.sprite);
+      for (const sp of ['vendor_f', 'farmer', 'burgher']) {
+        expect(cornelia, sp).toContain(sp);
+        expect(meta!.sheets[sp], `${sp} in characters-ai.json`).toBeDefined();
+      }
+    });
+
     it.runIf(present)('only lists known classes or NPC sprites, every block inside the image', () => {
       // NPC sprite names are the keys of the legacy character atlas that are not classes
       const compiledNpcSprites = readdirSync(join(assets, 'maps/ai'))
@@ -206,6 +214,10 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
 
     it('the act-1 temple and zone ids are referenced', () => {
       expect(referenced).toEqual(expect.arrayContaining(['temple', 'dark_forest', 'ruined_forest', 'shoreline']));
+    });
+
+    it('the overworld zone backdrops (T6h) are referenced by a map table, not only listed here', () => {
+      expect(mapIds).toEqual(expect.arrayContaining(['dark_forest', 'ruined_forest', 'shoreline']));
     });
 
     it.each(referenced)('background "%s" is a staged id with a 1920x1080 webp', (id) => {

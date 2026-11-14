@@ -129,15 +129,42 @@ describe('the castle rooms have a purpose (CA-7)', () => {
     expect(openRows.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('the 2F guard room has armour stands, a weapon rack, a table and a guard', () => {
+  it('the 2F guard room has armour stands, a weapon rack, the war-map table and a guard', () => {
     const objs = source('cornelia-castle-2f').objects ?? [];
     const count = (part: string) => objs.filter((o) => (o.parts ?? []).flat().includes(part)
       && inRect(o, 33, 4, 41, 14)).length;
     expect(count('armor_stand')).toBeGreaterThanOrEqual(2);
     expect(count('weapon_rack')).toBeGreaterThanOrEqual(1);
-    expect(count('table')).toBeGreaterThanOrEqual(1);
+    expect(count('map_table_l')).toBe(1);                                // CA-7 (T6h): the war-map table
+    expect(objs.find((o) => (o.parts ?? []).flat().includes('map_table_l'))?.parts).toEqual([['map_table_l', 'map_table_r']]);
+    expect(count('table')).toBe(0);
     const guard = compiled('cornelia-castle-2f').npcs!.find((n) => n.sprite === 'guard' && inRect(n, 33, 6, 41, 14));
     expect(guard?.dialog.flatMap((d) => (typeof d === 'string' ? [d] : d.text)).join(' ')).toMatch(/tower/);
+  });
+
+  it('the treasury has the gold heap at (36, 22) and the crown on its cushion at (38, 22) (T6h)', () => {
+    const objs = source('cornelia-castle').objects ?? [];
+    const at = (part: string) => objs.filter((o) => (o.parts ?? []).flat().includes(part)).map((o) => [o.x, o.y]);
+    expect(at('gold_heap')).toEqual([[36, 22]]);
+    expect(at('crown_cushion')).toEqual([[38, 22]]);
+    expect(at('globe')).toEqual([[38, 12]]);                              // in the library
+    const col = new CollisionMap(f1);
+    for (const [x, y] of [[36, 22], [38, 22]]) expect(col.isWalkable(x, y, walk), `(${x}, ${y}) is solid`).toBe(false);
+    // the chests in front stay reachable from the treasury floor
+    for (const c of f1.npcs!.filter((n) => n.chestItem && inRect(n, 32, 19, 41, 30))) {
+      expect([[0, 1], [1, 0], [-1, 0]].some(([dx, dy]) => col.isWalkable(c.x + dx, c.y + dy, walk)), c.id).toBe(true);
+    }
+  });
+
+  it('every CA-7 prop placed in the castle is cut from the approved castle/stairs_lib sheet (no placeholder)', () => {
+    const approved = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/castle/stairs_lib.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>> };
+    const cut = new Set(approved.cells.flat().filter((p): p is string => p !== null));
+    const props = ['map_table_l', 'map_table_r', 'gold_heap', 'crown_cushion', 'lectern', 'globe'];
+    for (const p of props) expect(cut.has(p), p).toBe(true);
+    const placed = FLOORS.flatMap((id) => (source(id).objects ?? []).flatMap((o) => (o.parts ?? []).flat()))
+      .filter((p): p is string => p !== null && props.includes(p));
+    expect(new Set(placed)).toEqual(new Set(props));
   });
 
   it('1F and 2F no longer share one carpet layout: the throne room runner is 4 wide, with a medallion', () => {

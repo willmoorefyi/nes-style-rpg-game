@@ -37,8 +37,8 @@ entrances:
 objects:
 - type: deco
   parts:
-  - [stairs_down_0_0, stairs_down_0_1]
-  - [stairs_down_1_0, stairs_down_1_1]
+  - [stairwell_0_0, stairwell_0_1]
+  - [stairwell_1_0, stairwell_1_1]
   x: 7
   y: 9
   walkable_rows: [0]

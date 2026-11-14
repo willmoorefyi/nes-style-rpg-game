@@ -23,15 +23,15 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import Grid, write_map  # noqa: E402
-from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BX, CX, CY, E_WARP, FOREST_ADD, FOREST_CUT,  # noqa: E402
-                              FOREST_ZONES, GULF, H, HEADER, JETTY, LAND, MOUNTAIN_BLOBS, N_APPROACH, N_STUB, N_WARP,
+from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BROKEN_BRIDGE, BX, CX, CY, E_WARP,  # noqa: E402
+                              FOREST_ADD, FOREST_CUT, FOREST_ZONES, GULF, H, HEADER, JETTY, LAND, MOUNTAIN_BLOBS, N_APPROACH, N_STUB, N_WARP,
                               NORTH_LAKE, NORTH_SHORE, PONDS, RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND,
                               SHORE_SEA, SOUND, SOUTH_BAY, SPINE, SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS,
                               TEMPLE_ROCK, TOMB, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
 from overworld_grid import (bfs, clear_disc, clear_rect, extend_to_sea, fill_unreachable, near, tidy_blobs,  # noqa: E402
                             tidy_land, walk_grid)
 from overworld_noise import blob, fbm, polyline_distance, signed_distance  # noqa: E402
-from overworld_zones import FIELDS, encounter_zones  # noqa: E402
+from overworld_zones import FIELDS, ZONE_BACKDROPS, encounter_zones  # noqa: E402
 
 
 def build() -> tuple[Grid, list[str]]:
@@ -180,6 +180,7 @@ def objects() -> list[dict]:
         {"type": "prefab", "prefab": "temple_icon", "name": "temple", "x": TX, "y": TY, "w": 2, "h": 2, "door": 1,
          "ridge_rows": 0, "collide": "alpha", "enter": {"map": "temple-of-fiends", "entrance": "entry"}},
         *(dict(o) for o in TOMB_OBJECTS),          # Erdrick's tomb
+        *(dict(o) for o in BROKEN_BRIDGE),         # OW-9: debris in the north bridge's gap (art only)
     ]
     for x, y in BOULDERS:          # a few boulders on open grass, never on a road
         objs.append({"type": "deco", "parts": [["boulder"]], "x": x, "y": y, "collide": "alpha"})
@@ -223,7 +224,8 @@ def main() -> None:
         "encounterZones": encounter_zones(g),
         # BA-12: sand compiles to TerrainType.Desert, so the beaches are keyed `desert` (keys are TerrainType names)
         "battleBackgrounds": {"default": "grassland", "terrain": {"forest": "forest", "desert": "shoreline",
-                                                                  "swamp": "swamp", "water": "ocean", "river": "river"}},
+                                                                  "swamp": "swamp", "water": "ocean", "river": "river"},
+                              "zones": ZONE_BACKDROPS},
         # OW-10 stays open: the ship waits off the jetty, the canoe on the east river
         "vehicles": [{"type": "ship", "x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "requiredFlag": "BIKKE_DEFEATED"},
                      {"type": "canoe", "x": canoe[0], "y": canoe[1], "requiredFlag": "EARTH_CAVE_COMPLETE"}],

@@ -135,6 +135,30 @@ describe('overworld layout (T3c)', () => {
     expect(reach(start, gateCells, rock).has(north)).toBe(true);
   });
 
+  it('OW-9: the broken-bridge debris lies over the gap as art only; the four gap cells stay water', () => {
+    const debris = source.objects.filter((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('bridge_gap_')));
+    expect(debris.length).toBe(1);
+    const d = debris[0] as typeof debris[0] & { block?: boolean; on_water?: boolean };
+    expect(d.parts).toEqual([['bridge_gap_0_0', 'bridge_gap_0_1'], ['bridge_gap_1_0', 'bridge_gap_1_1']]);
+    expect(d.block).toBe(false);
+    expect(d.on_water).toBe(true);
+    const footprint = [0, 1].flatMap((j) => [0, 1].map((i): Cell => [d.x + i, d.y + j]));
+    expect(footprint.map(([x, y]) => key(x, y)).sort()).toEqual(gap.map(([x, y]) => key(x, y)).sort());
+    for (const [x, y] of footprint) {
+      expect(terrain(x, y), `(${x}, ${y}) is water`).toBe(WATER);
+      expect(col.isWalkable(x, y, walking)).toBe(false);
+    }
+    // the parts are cut from the approved overworld/kit_grand sheet; temple_grand fell back (OW-8 keeps temple_icon)
+    const grand = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/overworld/grand.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>>; metrics: { skipped: string[] } };
+    for (const p of d.parts!.flat()) expect(grand.cells.flat()).toContain(p);
+    expect(grand.metrics.skipped).toContain('temple_grand');
+    const temple = source.objects.find((o) => o.type === 'prefab') as { prefab?: string } | undefined;
+    expect(temple?.prefab).toBe('temple_icon');
+    // the gates are unchanged: both south-stub cells still need BRIDGE_BUILT
+    expect(gates.map((g) => g.requiredFlag)).toEqual(['BRIDGE_BUILT', 'BRIDGE_BUILT']);
+  });
+
   it('OW-14: no walkable cell on the map edge', () => {
     for (let x = 0; x < map.width; x++) {
       for (const y of [0, map.height - 1]) expect(col.isWalkable(x, y, walking), `(${x},${y})`).toBe(false);
@@ -313,6 +337,12 @@ describe('overworld battle backgrounds (BA-12)', () => {
     }
     const zoneIds = new Set((map.encounterZones ?? []).map((z) => z.id));
     for (const id of Object.keys(bg.zones ?? {})) expect(zoneIds.has(id), `zone ${id}`).toBe(true);
+  });
+
+  it('the temple approach fights in the dark forest and the east pocket in the ruined forest (T6h)', () => {
+    expect(bg.zones?.temple_approach?.default).toBe('dark_forest');
+    expect(bg.zones?.east_pocket?.default).toBe('ruined_forest');
+    for (const z of ['temple_approach', 'east_pocket']) expect(bg.zones?.[z]?.terrain?.desert, z).toBe('shoreline');
   });
 
   it('beach sand compiles to Desert, and Desert battles use the shoreline background', () => {

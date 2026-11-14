@@ -97,8 +97,9 @@ class Room:
 
     def stairs_down(self, x, y, to_map, to_entrance):
         """A 2x2 stairwell in the floor; the first step onto its top row leads down (CA-1: the player never walks
-        across the drawn pit), and its lower row is solid."""
-        self.deco([["stairs_down_0_0", "stairs_down_0_1"], ["stairs_down_1_0", "stairs_down_1_1"]], x, y,
+        across the drawn pit), and its lower row is solid. The art is castle/kit_stairs_lib's top-down `stairwell`
+        (CA-1, T6h); the old oblique `stairs_down_*` parts stay in castle/furnish but are no longer placed."""
+        self.deco([["stairwell_0_0", "stairwell_0_1"], ["stairwell_1_0", "stairwell_1_1"]], x, y,
                   walkable_rows=[0])
         self.transitions += [{"x": x + i, "y": y, "targetMap": to_map, "targetEntrance": to_entrance} for i in (0, 1)]
 

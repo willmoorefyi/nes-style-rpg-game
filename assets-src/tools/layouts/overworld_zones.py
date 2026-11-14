@@ -23,6 +23,11 @@ TEMPLE_APPROACH = [{"groups": [_g("gr_imp", 2, 4)], "weight": 3},
 EAST_POCKET = [{"groups": [_g("wolf", 3, 5)], "weight": 3},
                {"groups": [_g("gr_imp", 3, 5)], "weight": 2},
                {"groups": [_g("gr_wolf", 1), _g("wolf", 0, 2)], "weight": 1}]
+# battle backgrounds per zone (BA-12, T6h): the temple approach fights in the dark forest, the east pocket in the
+# ruined forest; a zone table wins over the map's terrain table, so beaches and water keep their own backdrops
+_WET = {"desert": "shoreline", "water": "ocean", "river": "river"}
+ZONE_BACKDROPS = {"temple_approach": {"default": "dark_forest", "terrain": dict(_WET)},
+                  "east_pocket": {"default": "ruined_forest", "terrain": dict(_WET)}}
 
 
 def row_rects(cells: set[tuple[int, int]]) -> list[list[int]]:

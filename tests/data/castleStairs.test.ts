@@ -17,7 +17,8 @@ const castleSources = readdirSync(join(root, 'assets-src/maps'))
   .filter((f) => f.startsWith('cornelia-castle') && f.endsWith('.yaml'))
   .map((f) => parse(readFileSync(join(root, 'assets-src/maps', f), 'utf-8')) as Source);
 const compiled = (id: string) => parse(readFileSync(join(root, 'assets/maps/ai', `${id}.yaml`), 'utf-8')) as MapData;
-const isStairwell = (o: Deco) => o.type === 'deco' && (o.parts ?? []).flat().some((p) => p?.startsWith('stairs_down_'));
+const STAIR_PARTS = /^(stairs_down|stairwell)_\d_\d$/;
+const isStairwell = (o: Deco) => o.type === 'deco' && (o.parts ?? []).flat().some((p) => STAIR_PARTS.test(p ?? ''));
 const stairwells = castleSources.flatMap((s) => (s.objects ?? []).filter(isStairwell).map((o) => ({ id: s.id, o })));
 const walk = new WalkingMode();
 
@@ -50,6 +51,16 @@ describe('castle stairwells (CA-1)', () => {
       expect(col.isWalkable(o.x, o.y + 1, walk) || col.isWalkable(o.x + 1, o.y + 1, walk)).toBe(false);
       const above = Object.values(map.entrances ?? {}).some(([x, y]) => y === o.y - 1 && (x === o.x || x === o.x + 1));
       expect(above, `${id}: an entrance right above the stairwell`).toBe(true);
+    }
+  });
+
+  it('every stairwell uses the top-down `stairwell_*` art (T6h), not the oblique `stairs_down_*`', () => {
+    const approved = JSON.parse(readFileSync(join(root, 'assets-src/gen/approved/castle/stairs_lib.json'), 'utf-8')) as
+      { cells: Array<Array<string | null>> };
+    const cut = new Set(approved.cells.flat());
+    for (const { id, o } of stairwells) {
+      expect(o.parts, id).toEqual([['stairwell_0_0', 'stairwell_0_1'], ['stairwell_1_0', 'stairwell_1_1']]);
+      for (const p of o.parts!.flat()) expect(cut.has(p), `${id}: ${p} is cut from castle/stairs_lib`).toBe(true);
     }
   });
 });

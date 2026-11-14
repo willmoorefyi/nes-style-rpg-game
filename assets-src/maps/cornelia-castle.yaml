@@ -528,8 +528,8 @@ objects:
   on_wall: true
 - type: deco
   parts:
-  - [stairs_down_0_0, stairs_down_0_1]
-  - [stairs_down_1_0, stairs_down_1_1]
+  - [stairwell_0_0, stairwell_0_1]
+  - [stairwell_1_0, stairwell_1_1]
   x: 39
   y: 28
   walkable_rows: [0]
@@ -561,6 +561,16 @@ objects:
   on_wall: true
 - {type: barrel, x: 32, y: 21}
 - {type: barrel, x: 32, y: 22}
+- type: deco
+  parts:
+  - [gold_heap]
+  x: 36
+  y: 22
+- type: deco
+  parts:
+  - [crown_cushion]
+  x: 38
+  y: 22
 npcs:
 - id: hall_guard_w
   sprite: guard

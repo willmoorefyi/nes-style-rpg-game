@@ -74,7 +74,7 @@ for (x, y) in [(14, 18), (29, 18)]:
 for x in (12, 13, 15, 16, 17, 26, 27, 28, 30, 31):
     f1.deco([["bookshelf_top"], ["bookshelf_bottom"]], x, 2, on_wall=True)
 for x in (19, 24):
-    f1.deco([["lectern"]], x, 3)             # castle/kit_stairs_lib (a kit.py placeholder until it is approved)
+    f1.deco([["lectern"]], x, 3)             # castle/kit_stairs_lib
 for x in (21, 22):
     f1.deco([["stone_bench"]], x, 3)
 for x in (14, 18, 25, 29):
@@ -112,7 +112,7 @@ for (x, y) in [(35, 9), (38, 9), (35, 12)]:
     f1.deco([["desk"]], x, y)
 f1.deco([["orb_white"]], 41, 14)
 f1.deco([["plant"]], 32, 14)
-f1.deco([["globe"]], 38, 12)                 # castle/kit_stairs_lib (placeholder until approved)
+f1.deco([["globe"]], 38, 12)                 # castle/kit_stairs_lib
 # treasury, with the stair down to the cellar
 f1.wall([["banner"]], 34, 17)
 f1.wall([["torch"]], 39, 17)
@@ -125,7 +125,9 @@ f1.wall([["weapon_rack"]], 35, 17)          # not 37: that cell is in the librar
 f1.wall([["weapon_rack"]], 40, 17)
 for (x, y) in [(32, 21), (32, 22)]:          # CA-4: clear of the doorway from the hall at (32, 25-26)
     f1.objects.append({"type": "barrel", "x": x, "y": y})
-# CA-7: (36, 22) and (38, 22) are kept free for the gold heap and the crown (T6h, castle/kit_stairs_lib)
+# CA-7: the gold heap and the crown on its cushion, between the two chests (castle/kit_stairs_lib)
+f1.deco([["gold_heap"]], 36, 22)
+f1.deco([["crown_cushion"]], 38, 22)
 
 f1.npcs += [
     {"id": "hall_guard_w", "sprite": "guard", "x": 19, "y": 30, "dialog": ["Welcome to Cornelia Castle.",
@@ -227,7 +229,7 @@ for x in (2, 3, 4):
 f2.deco([["desk"]], 5, 22)
 f2.wall([["tapestry"]], 5, 16)
 f2.deco([["armor_stand"]], 10, 25)
-# the guard room, with the tower stair (CA-7); the table becomes the war-map table in T6h
+# the guard room, with the tower stair and the war-map table (CA-7)
 f2.stairs_up(37, 4, "cornelia-castle-tower", "stairs")
 f2.wall([["banner"]], 35, 4)
 f2.wall([["banner"]], 40, 4)
@@ -237,8 +239,7 @@ f2.statue(34, 6)
 f2.statue(41, 6)
 for y in (8, 10, 12):
     f2.deco([["armor_stand"]], 41, y)
-for x in (37, 38):
-    f2.deco([["table"]], x, 12)
+f2.deco([["map_table_l", "map_table_r"]], 37, 12)   # castle/kit_stairs_lib
 # chapel
 f2.deco([["orb_white"]], 36, 18)
 f2.deco([["orb_white"]], 38, 18)
