@@ -100,6 +100,23 @@ describe('BattleArt monster frames', () => {
     expect(f.anim).toBe(true);
   });
 
+  it('E16: warns once per sprite when the loaded atlas lacks its sheet; no warning before load()', async () => {
+    atlasJson = () => respond(JSON.stringify(aiMonsters));
+    // only the per-sheet warnings (the party atlas fetch, a 404 here, warns on its own)
+    const sheetWarnings = () => vi.mocked(console.warn).mock.calls.map((c) => String(c[0])).filter((m) => m.includes('no sheet'));
+    const art = new BattleArt();
+    expect(art.getMonsterFrames('wolf')).toBeNull();      // late-load path (A15): not loaded yet, so no warning
+    expect(sheetWarnings()).toEqual([]);
+    await art.load();
+    expect(art.getMonsterFrames('wolf')).toBeNull();
+    expect(art.getMonsterFrames('wolf')).toBeNull();
+    expect(art.getMonsterFrames('goblin')).not.toBeNull();
+    expect(sheetWarnings()).toHaveLength(1);
+    expect(sheetWarnings()[0]).toContain('"wolf"');
+    art.getMonsterFrames('ogre');
+    expect(sheetWarnings()).toHaveLength(2);
+  });
+
   it('a missing or broken atlas does not block battle', async () => {
     atlasJson = () => respond('<!doctype html>');
     const art = new BattleArt();

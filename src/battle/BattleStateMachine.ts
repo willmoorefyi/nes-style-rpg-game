@@ -10,7 +10,7 @@ import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
 import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
-import { tickStatus } from './StatusTick.js';
+import { losesTurn, tickStatus, type TickSubject } from './StatusTick.js';
 import { xpShare } from './Rewards.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { SpellExecutor } from './SpellExecutor.js';
@@ -315,6 +315,13 @@ export class BattleStateMachine {
     return !!member && member.currentHp > 0;
   }
 
+  /** E1: the next actor's start-of-turn tick is certain to end its turn (sleep, stun, stone, lethal poison). Pure. */
+  nextActorLosesTurn(): boolean {
+    const action = this._actionQueue[0];
+    const subject = action && this.isNextActorAlive() ? this.tickSubject(action.combatantId, action.isEnemy) : null;
+    return !!subject && losesTurn(subject);
+  }
+
   executeNextAction(): ActionResult {
     if (this._actionQueue.length === 0 || this.isOver) {
       return { done: true, messages: [], damageEvents: [], missed: false };
@@ -411,21 +418,20 @@ export class BattleStateMachine {
   }
 
   private tickCombatantStatus(id: string, isEnemy: boolean): boolean {
-    const say = (text: string) => this.messages.push({ text });
+    const subject = this.tickSubject(id, isEnemy);
+    return !!subject && tickStatus(subject, this.rng, (text) => this.messages.push({ text }));
+  }
+
+  /** The combatant as the status tick sees it (an enemy's max HP is its data's, a member's its character's). */
+  private tickSubject(id: string, isEnemy: boolean): TickSubject | null {
     if (isEnemy) {
       const enemy = this.enemies.find(e => e.id === id);
-      if (!enemy) return false;
-      return tickStatus({
-        name: enemy.displayName, maxHp: enemy.data.stats.hp, tracker: enemy.status, fallText: 'defeated!',
-        getHp: () => enemy.currentHp, setHp: (hp) => { enemy.currentHp = hp; },
-      }, this.rng, say);
+      return enemy ? { name: enemy.displayName, maxHp: enemy.data.stats.hp, tracker: enemy.status, fallText: 'defeated!',
+        getHp: () => enemy.currentHp, setHp: (hp) => { enemy.currentHp = hp; } } : null;
     }
     const char = this.getPartyMember(id);
-    if (!char) return false;
-    return tickStatus({
-      name: char.name, maxHp: char.maxHp, tracker: char.statusTracker, fallText: 'fell!',
-      getHp: () => char.currentHp, setHp: (hp) => { char.currentHp = hp; },
-    }, this.rng, say);
+    return char ? { name: char.name, maxHp: char.maxHp, tracker: char.statusTracker, fallText: 'fell!',
+      getHp: () => char.currentHp, setHp: (hp) => { char.currentHp = hp; } } : null;
   }
 
   private executeCommand(cmd: BattleCommand, isEnemy: boolean): void {

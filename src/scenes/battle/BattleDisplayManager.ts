@@ -227,6 +227,8 @@ export class BattleDisplayManager {
     for (let i = 0; i < enemies.length; i++) {
       if (enemies[i].currentHp <= 0 && this.enemySprites[i].visible && !dyingEnemies.has(i)) {
         dyingEnemies.set(i, 30);
+        // E17: a death with no damage event (poison, instant death) holds the dying pose too (a no-op after a hit)
+        this.enemyView?.poses.freezeDying(i);
       }
     }
   }

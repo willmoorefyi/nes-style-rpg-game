@@ -52,7 +52,7 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
     isOver: false,
     get actionQueueLength() { return queued; },
     peekNextAction: () => (queued > 0 ? peek : null),
-    isNextActorAlive: () => true,
+    isNextActorAlive: () => true, nextActorLosesTurn: vi.fn(() => false),
     executeNextAction: () => { queued = 0; return { done: true, damageEvents: events, messages: messages.map(text => ({ text })), missed }; },
     skipRemainingActions: vi.fn(),
   } as unknown as BattleStateMachine;
@@ -262,7 +262,7 @@ describe('B11: the lunge reaches a back-column target on the real layout', () =>
       get livingEnemies() { return [{}]; },
       get actionQueueLength() { return queued; },
       peekNextAction: () => (queued > 0 ? { actorId: 'party_1', actorName: 'THIEF', actionType: 'fight', targetId: `enemy_${back}`, targetName: 'Gr.Imp B' } : null),
-      isNextActorAlive: () => true,
+      isNextActorAlive: () => true, nextActorLosesTurn: vi.fn(() => false),
       executeNextAction: () => { queued = 0; return { done: true, damageEvents: [], messages: [{ text: 'THIEF missed!' }], missed: true }; },
       skipRemainingActions: vi.fn(),
     } as unknown as BattleStateMachine;
@@ -301,7 +301,7 @@ describe('U3: the melee advance meets a top-row target on its own row', () => {
       get livingEnemies() { return [{}]; },
       get actionQueueLength() { return queued; },
       peekNextAction: () => (queued > 0 ? { actorId: `party_${slot}`, actorName: 'HERO', actionType: 'fight', targetId: `enemy_${top}`, targetName: 'Goblin' } : null),
-      isNextActorAlive: () => true,
+      isNextActorAlive: () => true, nextActorLosesTurn: vi.fn(() => false),
       executeNextAction: () => { queued = 0; return { done: true, damageEvents: [], messages: [{ text: 'HERO missed!' }], missed: true }; },
       skipRemainingActions: vi.fn(),
     } as unknown as BattleStateMachine;

@@ -20,6 +20,18 @@ export function rollWake(currentHp: number, rng: () => number): boolean {
 }
 
 /**
+ * E1 lookahead, no RNG and no state change: true when the next `tickStatus` is certain to end the turn. Mirrors the
+ * tick: poison damage (> 0) that brings HP to 0, or sleep / stun / stone (skipTurn is decided before a status expires,
+ * so one turn left still skips). Fear is a roll at tick time and is not a certain loss.
+ */
+export function losesTurn(s: Pick<TickSubject, 'maxHp' | 'tracker' | 'getHp'>): boolean {
+  if (s.getHp() <= 0) return false;
+  const t = s.tracker;
+  const poison = t.has('poison') ? Math.floor(s.maxHp * 0.05) : 0;
+  return (poison > 0 && s.getHp() <= poison) || t.has('sleep') || t.has('stun') || t.has('stone');
+}
+
+/**
  * Start-of-turn status tick. Returns whether the actor may act. Poison hurts first; a sleeping or
  * paralysed actor loses the turn and then may wake (damage never wakes, as in FF1); fear skips half the time.
  */

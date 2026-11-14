@@ -112,8 +112,10 @@ export class BattleAnimationController {
         this.animTimer += dt;
         if (this.animTimer >= ANNOUNCE_FRAMES || confirmSkip) {
           this.animTimer = 0;
-          // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead
-          this.animPhase = this.animActorIsEnemy ? (this.startEnemyLunge() ? 'enemy_lunge' : 'execute') : 'step_forward';
+          // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead.
+          // E1: an enemy that is certain to lose its turn (sleep, stun, stone, lethal poison) never winds up.
+          const lunge = this.animActorIsEnemy && !this.battle.nextActorLosesTurn() && this.startEnemyLunge();
+          this.animPhase = this.animActorIsEnemy ? (lunge ? 'enemy_lunge' : 'execute') : 'step_forward';
         }
         break;
       }
