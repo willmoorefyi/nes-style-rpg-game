@@ -102,4 +102,26 @@ city, a river through the town, bent walls, several exits, and a castle with sev
 
 **Battle:** party melee attacks follow `attackChoreography.ts`. Styles are lunge (the default), dash, leap and classic, chosen with `?attack=`. Each hit draws a slash effect.
 
-**Images used:** 21 of the 100-image cap.
+**Images used:** 18 of the 100-image cap (the ledger guard count, which is authoritative; this line said 21 until the T6 correction).
+
+## T6 paid art (2026-11-14)
+
+Branch `t6-art`. One paid Gemini request per checkpoint, `--paid`, at most 2 retries per sheet (`docs/FIX_PLAN_PENINSULA.md` T6 §3 and revisions 8, 9, 13).
+
+| # | Sheet | Images | Result | Decision |
+|---|---|---|---|---|
+| 20 | overworld/kit_grand (seed 1234) | 1 | the temple door is in the middle of the icon (between the two bottom cells), and the icon is 73 px wide (it must be at least 82); the bridge gap is good but its planks are too dark and red (ΔE ≈ 17 from the deck) | rejected |
+| 21 | overworld/kit_grand (seed 1235, retry 1) | 1 | the temple is asymmetric and 91x92 px, but the door is 13 px wide and centred at x≈61 (the door cell's centre is 72); the bridge gap has painted water in the middle, so it isn't transparent | rejected |
+| 22 | overworld/kit_grand (seed 1236, retry 2) | 1 | the temple door is again narrow (≈11 px) and left of the door cell; the bridge gap is clean on magenta, its planks within ΔE ≈ 5–7 of the deck, 49 % transparent, with a faint dark-red outline | **approved for `bridge_gap` only** (OW-9). `temple_grand` gets `skip: true` and **OW-8 falls back to `temple_icon`** (revision 8) |
+| 23 | castle/kit_stairs_lib | 1 | the stairwell is top-down, descends from the top edge and has kerbs left, right and bottom. Map table, gold heap, crown on cushion, lectern, globe. Gemini used its own layout, so every piece has a source rect. The stairwell is cropped square and filled to 96x96 (all four corners opaque, top-edge luma +7 % of the marble). The gold heap's grey floor patch is keyed out | self-approved |
+| 24 | vendor_f/field | 1 | heights 86–92, 14 colours, outlined, faces readable. Side frames 1–2 were drawn facing right (`flip_frames left:1,2`). The back stand frame draws the shawl long (brown), so the colour flickers a little when walking up | self-approved |
+| 25 | farmer/field | 1 | heights 84–92, 13 colours; the side row was drawn facing right (`--flip left`) | self-approved |
+| 26 | burgher/field | 1 | heights 85–90, 14 colours; the side row was drawn facing right (`--flip left`) | self-approved |
+
+- The three townsfolk are distinct from `villager`, `villager_f`, `merchant` and `old_man` at 2x. Their walk in-betweens are clean (checked with `puppet.walk_row` and `review_walk`).
+- `build_assets.py field_ai` lists all three.
+- After each approval, `git diff --exit-code assets-src/gen/approved/` was clean apart from the new sheets, and `selftest.py` passed.
+- **Fallback used:** OW-8 keeps `temple_icon`, so T6h must not place `temple_grand`. The rejected temple of seed 1235 stays in the local cache (key `bc37fe12f510c3914a1a2d6a`). The user could still accept it later if the door rule were relaxed.
+- **T6h note:** the approved sheets are `approved/overworld/grand.json` and `approved/castle/stairs_lib.json`, not `ruins.json` / `vault.json` as §2 says.
+
+**Images used:** 25 of the 100-image cap (ledger guard: 87 + 7 = 94 Gemini attempts − `attempts_before` 69).
