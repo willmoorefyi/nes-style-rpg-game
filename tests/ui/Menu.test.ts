@@ -126,3 +126,19 @@ describe('Menu scrolling', () => {
     expect(menu.selectedIndex).toBe(0);
   });
 });
+
+describe('MS-5: MenuConfig.initialIndex', () => {
+  const items = [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }, { label: 'C', value: 'c' }];
+  it('starts on the given row', () => {
+    expect(new Menu({ items, initialIndex: 1 }).selectedIndex).toBe(1);
+  });
+  it('clamps to the list', () => {
+    expect(new Menu({ items, initialIndex: 7 }).selectedIndex).toBe(2);
+    expect(new Menu({ items, initialIndex: -3 }).selectedIndex).toBe(0);
+  });
+  it('scrolls a long list so the row is visible', () => {
+    const many = Array.from({ length: 12 }, (_, i) => ({ label: `I${i}`, value: String(i) }));
+    const menu = new Menu({ items: many, maxVisible: 4, initialIndex: 10 });
+    expect(menu.selectedItem.value).toBe('10');
+  });
+});

@@ -3,6 +3,7 @@ import { Container } from 'pixi.js';
 import { ExplorationScene } from '../../src/scenes/ExplorationScene.js';
 import type { Game } from '../../src/core/Game.js';
 import { createMockGame, createMapData, type MockGame } from '../helpers/testUtils.js';
+import { visibleLabels } from '../helpers/realData.js';
 
 describe('ExplorationScene', () => {
   let game: MockGame;
@@ -102,5 +103,34 @@ describe('ExplorationScene - tile redraw while scrolling', () => {
     walk(scene.container);
     // a screenful of tiles near the player (x ~ 100 tiles in) must be drawn, not only the first screen at the origin
     expect(xs.filter((x) => x > 90 * 48).length).toBeGreaterThan(20);
+  });
+});
+
+describe('IN-3: the HUD has no raw map id', () => {
+  const labels = (scene: ExplorationScene) => visibleLabels(scene.container);
+
+  it('a map without a name shows no map label', async () => {
+    const game = createMockGame(createMapData({ id: 'test-map' }));
+    const scene = new ExplorationScene(game as unknown as Game);
+    await scene.enter();
+    expect(labels(scene)).not.toContain('TEST-MAP');
+  });
+
+  it('a named map shows its name', async () => {
+    const game = createMockGame(createMapData({ id: 'test-map', name: 'Cornelia' }));
+    const scene = new ExplorationScene(game as unknown as Game);
+    await scene.enter();
+    expect(labels(scene)).toContain('CORNELIA');
+  });
+});
+
+describe('MS-8: canCamp', () => {
+  it('is false unless the map sets camp: true', async () => {
+    const town = new ExplorationScene(createMockGame(createMapData()) as unknown as Game);
+    await town.enter();
+    expect(town.canCamp()).toBe(false);
+    const world = new ExplorationScene(createMockGame(createMapData({ camp: true })) as unknown as Game);
+    await world.enter();
+    expect(world.canCamp()).toBe(true);
   });
 });

@@ -225,6 +225,8 @@ export function validateMapData(data: unknown): MapData {
       assertNumber(`MapData.noWander[${i}][1]`, p[1]);
     });
   }
+  if (data.camp !== undefined) assertType('MapData.camp', data.camp, 'boolean');
+  if (data.name !== undefined) assertString('MapData.name', data.name);
   if (data.encounters !== undefined) validateEncounterEntries('MapData.encounters', data.encounters);
   if (data.encounterZones !== undefined) {
     validateEncounterZones(data.encounterZones, data.width as number, data.height as number);

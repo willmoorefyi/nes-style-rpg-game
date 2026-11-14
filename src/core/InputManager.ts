@@ -22,6 +22,8 @@ export class InputManager {
   private mappings: InputMapping;
   private currentKeys = new Set<string>();
   private previousKeys = new Set<string>();
+  /** Keys whose (non-repeat) keydown arrived since the last update(); a tap that is released before the tick still counts. */
+  private pressedThisFrame = new Set<string>();
   private boundKeyDown: (e: KeyboardEvent) => void;
   private boundKeyUp: (e: KeyboardEvent) => void;
 
@@ -41,19 +43,23 @@ export class InputManager {
     window.removeEventListener('keyup', this.boundKeyUp);
     this.currentKeys.clear();
     this.previousKeys.clear();
+    this.pressedThisFrame.clear();
   }
 
   update(): void {
     this.previousKeys = new Set(this.currentKeys);
+    this.pressedThisFrame.clear();
   }
 
   isPressed(action: InputAction): boolean {
-    return this.getKeysForAction(action).some(k => this.currentKeys.has(k));
+    return this.getKeysForAction(action).some(
+      k => this.currentKeys.has(k) || this.pressedThisFrame.has(k)
+    );
   }
 
   isJustPressed(action: InputAction): boolean {
     return this.getKeysForAction(action).some(
-      k => this.currentKeys.has(k) && !this.previousKeys.has(k)
+      k => this.pressedThisFrame.has(k) || (this.currentKeys.has(k) && !this.previousKeys.has(k))
     );
   }
 
@@ -77,6 +83,7 @@ export class InputManager {
     if (e.code in this.mappings) {
       e.preventDefault();
       this.currentKeys.add(e.code);
+      if (!e.repeat) this.pressedThisFrame.add(e.code);
     }
   }
 

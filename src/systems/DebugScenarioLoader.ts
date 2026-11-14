@@ -15,6 +15,8 @@ export interface DebugScenario {
     level: number;
     equipment: string[];
     spells: { id: string; level: number }[];
+    /** Start with this HP instead of full (0: fallen), for item and inn checks. */
+    hp?: number;
   }[];
   items: Record<string, number>;
   gold: number;
@@ -96,7 +98,7 @@ export class DebugScenarioLoader {
         character.learnSpell(spell.id, spell.level);
       }
       character.restoreAllCharges();
-      character.currentHp = character.maxHp;
+      character.currentHp = member.hp ?? character.maxHp;
 
       if (!this.game.party.add(character)) console.error(`Debug scenario ${scenario.id}: could not add ${member.name}`);
     }

@@ -63,7 +63,7 @@ export class SceneManager {
 
     if (this.currentScene && this.currentName) {
       this.currentScene.onPause?.();
-      this.currentScene.container.visible = false;
+      this.currentScene.container.visible = next.transparent === true;
       this.sceneStack.push({ name: this.currentName, scene: this.currentScene });
     }
 

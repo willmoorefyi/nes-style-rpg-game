@@ -282,3 +282,40 @@
   gold: 100
   enemies: [goblin, goblin, goblin, goblin, goblin, goblin, wolf, wolf, wolf]
   background: assets/backgrounds/grassland.webp
+
+# T5 checks (docs/FIX_PLAN_PENINSULA.md T5; open with ?mute=1&scenario=<id>).
+# Battle Item list (no Tent; Phoenix Down targets only the fallen W.MAG, hp: 0).
+- id: t5_battle_items
+  name: T5 - battle items with a fallen member
+  party:
+    - { class: warrior, name: FGHTR, level: 3, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THIEF, level: 3, equipment: [rapier, leather_armor], spells: [], hp: 12 }
+    - { class: white_mage, name: W.MAG, level: 3, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 0 }
+    - { class: black_mage, name: B.MAG, level: 3, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { tent: 1, potion: 3, phoenix_down: 2 }
+  gold: 0
+  enemies: [goblin, goblin]
+  background: assets/backgrounds/grassland.webp
+# Cornelia outside the inn: a Tent is refused in town, the inn shows 0 G and "not enough gold".
+- id: t5_cornelia_field
+  name: T5 - Cornelia, hurt party, a Tent and 0 G
+  mode: field
+  map: cornelia
+  entrance: inn
+  party:
+    - { class: warrior, name: FGHTR, level: 2, equipment: [rapier, leather_armor], spells: [], hp: 5 }
+    - { class: white_mage, name: W.MAG, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 3 }
+  items: { tent: 1, potion: 2 }
+  gold: 0
+  enemies: []
+# Cornelia Castle 1F, on the arrival tile above the cellar stairwell (CA-1).
+- id: t5_castle
+  name: T5 - Cornelia Castle 1F stairs
+  mode: field
+  map: cornelia-castle
+  entrance: cellar
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []

@@ -84,6 +84,12 @@ describe('schemaValidation', () => {
       expect(() => validateMapData({ ...validMap, noWander: [[1, 'b']] })).toThrow(/noWander\[0\]\[1\]/);
     });
 
+    it('MS-8 / IN-3: camp is a boolean and name a string', () => {
+      expect(() => validateMapData({ ...validMap, camp: true, name: 'World Map' })).not.toThrow();
+      expect(() => validateMapData({ ...validMap, camp: 'yes' })).toThrow(/MapData.camp: expected boolean/);
+      expect(() => validateMapData({ ...validMap, name: 3 })).toThrow(/MapData.name/);
+    });
+
     it('validates inspect cells: in bounds, with plain or conditional text', () => {
       const ok = (inspect: unknown) => expect(() => validateMapData({ ...validMap, inspect })).not.toThrow();
       const bad = (inspect: unknown, re: RegExp) => expect(() => validateMapData({ ...validMap, inspect })).toThrow(re);

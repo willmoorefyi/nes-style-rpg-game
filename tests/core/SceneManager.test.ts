@@ -131,6 +131,22 @@ describe('SceneManager', () => {
       expect(scene1.pauseCalls).toBe(1);
     });
 
+    it('IN-6: pushing a transparent scene keeps the previous container visible; pop is unchanged', async () => {
+      const scene1 = createMockScene();
+      const overlay = { ...createMockScene(), transparent: true };
+      manager.register('s1', scene1);
+      manager.register('overlay', overlay);
+
+      await manager.switchTo('s1');
+      await manager.push('overlay');
+      expect(scene1.container.visible).toBe(true);
+      expect(scene1.pauseCalls).toBe(1);
+
+      await manager.pop();
+      expect(scene1.container.visible).toBe(true);
+      expect(scene1.resumeCalls).toBe(1);
+    });
+
     it('push hides previous scene container', async () => {
       const scene1 = createMockScene();
       const scene2 = createMockScene();
