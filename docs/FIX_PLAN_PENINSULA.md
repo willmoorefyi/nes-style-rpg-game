@@ -783,3 +783,12 @@ All 15 momus issues apply. Ownership and resolutions:
     - A static NPC creating a chokepoint in an interior is a compiler error.
 
 **Order:** T3a and T3e run in parallel and merge first. Then T3b, T3c and T3d run in parallel, each branched from `mainline` *after* that merge. Then all maps are rebuilt once on the integration branch.
+
+---
+
+## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
+
+1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.
+2. **Document** every finding in a new issue file, `docs/PLAYTEST_PENINSULA_2_<date>.md`.
+3. **Plan** a fix for each issue; momus validates the plan.
+4. **Implement** the fixes, validating each through tests and real gameplay in the browser, and commit tranche by tranche.
