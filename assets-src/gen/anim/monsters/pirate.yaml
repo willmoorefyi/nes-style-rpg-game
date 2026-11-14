@@ -111,9 +111,7 @@ masks:
     attack: [[3, 66], [14, 64], [17, 67], [17, 78], [3, 78]]
     hurt: [[31, 70], [45, 70], [45, 78], [31, 78]]
 holds: []
-paint:                       # notches at a part boundary (crotch apex, the slit under the moved blade in mid, elbow)
-  - {frame: atk_wind1, xy: [[38, 62]], rgb: [6, 4, 10]}
-  - {frame: atk_wind2, xy: [[38, 62]], rgb: [6, 4, 10]}
+paint:                       # cracks the moved parts opened (not art gaps): the slit under the moved blade in mid, an elbow notch
   - {frame: atk_mid, xy: [[37, 61], [38, 61]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[39, 61], [40, 61], [41, 61], [40, 60], [41, 60]], rgb: [41, 41, 74]}
   - {frame: atk_recover, xy: [[50, 36]], rgb: [6, 4, 10]}

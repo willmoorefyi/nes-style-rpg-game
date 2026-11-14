@@ -4,7 +4,6 @@ facing: right
 sampler: nearest
 breath: true
 planted: foot_n
-seam_tolerance: 2              # thin bones: natural 1 px gaps between bone parts (loincloth tatters, knees) count as seams
 weapon_hand: f
 attack_hand: f
 keyframes:
@@ -79,7 +78,7 @@ frames:
                                # and attack, so a pull-back cannot meet the wind2->mid IoU): elbow lifts, blade tips up, skull forward
     t: 0.30
     moves: [crown, neck, chest, sh_f, el_f]
-    tweaks: {crown: [2, 0], neck: [2, 0], hand_f: [-3, -1], tip: [-7, 5], el_n: [0, -1], hand_n: [0, -1]}
+    tweaks: {crown: [2, 0], neck: [2, 0], hand_f: [-2, -1], tip: [-5, 4], el_n: [0, -1], hand_n: [0, -1]}
   atk_mid:                     # torso keeps the attack lean (thin bones tear when the ribcage rotates); legs shifted, not
                                # rotated; sword arm 6 deg back toward the wind-up (rigid); skull 3 px back
     t: 0.35
@@ -94,17 +93,15 @@ frames:
     tweaks: {crown: [1, 1], neck: [1, 1], el_f: [-2, -1], hand_f: [-4, -2], tip: [-5, 1], el_n: [-1, 2], hand_n: [-1, 2]}
   hurt_in1:                    # flinch: skull snaps back 6 px and tilts, ribcage tilts, shield jerks up 6 px
     moves: [chest]
-    tweaks: {crown: [-9, 0], neck: [-6, 0], chest: [-1, -2], el_n: [0, -6], hand_n: [0, -6], el_f: [1, 1], hand_f: [2, 1], tip: [3, -3]}
+    tweaks: {crown: [-9, 0], neck: [-6, 0], chest: [0, -2], el_n: [0, -6], hand_n: [0, -6], el_f: [1, 1], hand_f: [2, 1], tip: [3, -3]}
   hurt_in2:                    # skull, ribcage and shield settle toward idle; sword arm 13 deg lower
     moves: [chest]
     tweaks: {crown: [5, 1], neck: [5, 1], chest: [2, 1], el_n: [-1, 4], hand_n: [-1, 4], el_f: [0, 3], hand_f: [0, 5], tip: [9, 10]}
-masks:                         # the see-through gaps of the skeleton must border parts that are not joined, else
-  farm_n:                      # rig_render's crack filler webs them shut: the round shield is one part with its forearm
+masks:
+  farm_n:                      # the round shield is one rigid part with its forearm (the torso radius would split it)
     idle: [[49, 29], [60, 29], [64, 34], [64, 46], [59, 51], [50, 51], [47, 46], [47, 33]]
     attack: [[52, 30], [62, 30], [67, 36], [67, 47], [62, 52], [52, 52], [49, 46], [49, 34]]
     hurt: [[44, 17], [58, 17], [63, 23], [63, 35], [58, 38], [48, 38], [44, 33]]
-  farm_f:                      # idle: the far arm beside the arm / ribcage gap
-    idle: [[21, 29], [29, 29], [29, 41], [21, 41]]
   weapon:
     idle: [[27, 46], [35, 48], [47, 53], [48, 57], [40, 57], [27, 51]]
     hurt: [[54, 22], [61, 4], [67, 4], [66, 10], [59, 24]]
@@ -117,4 +114,5 @@ masks:                         # the see-through gaps of the skeleton must borde
     attack: [[9, 66], [20, 66], [20, 78], [9, 78]]
     hurt: [[14, 69], [26, 69], [26, 78], [14, 78]]
 holds: []
-paint: []
+paint:                       # a 1 px shoulder crack the wind2 motion opens, outline ink
+  - {frame: atk_wind2, xy: [[42, 23]], rgb: [6, 4, 10]}
