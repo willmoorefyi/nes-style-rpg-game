@@ -152,15 +152,56 @@ FF1 uses a charge-based system:
 
 ### Charges per Level (by Character Level)
 
+FF1-style per-class tables, read from `spellCharges` in `assets/data/classes.yaml` (step breakpoints: a row holds
+until the next one; a class without a table has no charges). The schema allows at most 8 spell levels per row,
+levels that go up, and counts from 0 to 9. The exact FF1 MP tables are not certain (fix plan T4 §1.4, ≈); the
+structure is FF1's: Lv1 starts with 2 L1 charges, a new spell level opens about every 2 levels for White and Black
+Mages and every 3 for Red Mages, and the cap is 9.
+
+**White Mage, Black Mage, White Wizard, Black Wizard**
+
 | Char Lv | Lv1 | Lv2 | Lv3 | Lv4 | Lv5 | Lv6 | Lv7 | Lv8 |
 |---------|-----|-----|-----|-----|-----|-----|-----|-----|
 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 2 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 3 | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 4 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 5 | 4 | 2 | 1 | 0 | 0 | 0 | 0 | 0 |
-| 10 | 5 | 4 | 3 | 2 | 1 | 0 | 0 | 0 |
-| 20 | 7 | 6 | 5 | 5 | 4 | 3 | 2 | 1 |
+| 6 | 5 | 3 | 2 | 0 | 0 | 0 | 0 | 0 |
+| 7 | 5 | 3 | 2 | 1 | 0 | 0 | 0 | 0 |
+| 8 | 6 | 4 | 3 | 2 | 0 | 0 | 0 | 0 |
+| 9 | 6 | 4 | 3 | 2 | 1 | 0 | 0 | 0 |
+| 10 | 7 | 5 | 4 | 3 | 2 | 0 | 0 | 0 |
+| 11 | 7 | 5 | 4 | 3 | 2 | 1 | 0 | 0 |
+| 13 | 8 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+| 15 | 9 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+| 20 | 9 | 9 | 8 | 7 | 6 | 5 | 4 | 3 |
+| 30 | 9 | 9 | 9 | 9 | 8 | 7 | 6 | 5 |
+| 40 | 9 | 9 | 9 | 9 | 9 | 9 | 8 | 7 |
 | 50 | 9 | 9 | 9 | 9 | 9 | 9 | 9 | 9 |
 
-(Values are illustrative; [DEFERRED: PLAYTESTING] exact progression curve will be tuned during playtesting.)
+**Red Mage, Red Wizard**
+
+| Char Lv | Lv1 | Lv2 | Lv3 | Lv4 | Lv5 | Lv6 | Lv7 | Lv8 |
+|---------|-----|-----|-----|-----|-----|-----|-----|-----|
+| 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 3 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 4 | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 5 | 4 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 6 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 7 | 5 | 2 | 1 | 0 | 0 | 0 | 0 | 0 |
+| 9 | 5 | 3 | 2 | 0 | 0 | 0 | 0 | 0 |
+| 10 | 6 | 3 | 2 | 1 | 0 | 0 | 0 | 0 |
+| 13 | 6 | 4 | 3 | 2 | 1 | 0 | 0 | 0 |
+| 16 | 7 | 5 | 4 | 3 | 2 | 1 | 0 | 0 |
+| 20 | 8 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+| 30 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 0 |
+| 40 | 9 | 9 | 9 | 8 | 7 | 6 | 5 | 0 |
+| 50 | 9 | 9 | 9 | 9 | 9 | 8 | 7 | 0 |
+
+**Knight** (from Lv10): 10: [1]; 15: [2, 1]; 20: [3, 2, 1]; 30: [5, 4, 3]; 40: [7, 6, 5]; 50: [9, 8, 7].
+**Ninja** (from Lv10): 10: [1]; 15: [2, 1]; 20: [3, 2, 1]; 25: [4, 3, 2, 1]; 30: [5, 4, 3, 2]; 40: [7, 6, 5, 4];
+50: [9, 8, 7, 6]. **Warrior, Thief, Monk, Master:** no charges.
 
 ### Spell Slots
 - Each spell level has 3 spell slots per character
@@ -280,19 +321,29 @@ Story items that unlock progression:
 ## 7. Progression & Economy
 
 ### XP & Leveling
-- XP shared equally among living party members after battle
+- XP shared equally among living party members after battle (the victory line shows the share: "N XP each")
 - Level cap: 50
-- XP curve: exponential (each level requires ~1.5x previous)
+- XP curve: FF1's (NES) experience table, in `src/entities/ExperienceTable.ts` (fix plan T4 §2.2). Values past
+  Lv30 may be off by one; FF1 adds about 32,800 per level there.
+- A level-up adds the max-HP gain to current HP; it does not heal fully (FF1)
 
-| Level | Total XP | HP (Warrior) | HP (Black Mage) |
-|-------|----------|--------------|------------------|
-| 1 | 0 | 35 | 25 |
-| 10 | 10,000 | 150 | 80 |
-| 20 | 50,000 | 350 | 160 |
-| 30 | 150,000 | 550 | 250 |
-| 50 | 500,000 | 999 | 450 |
+Total XP needed to reach each level:
 
-[DEFERRED: PLAYTESTING] Exact XP table and stat growth per level will be tuned during playtesting.
+| Lv | XP | Lv | XP | Lv | XP | Lv | XP | Lv | XP |
+|---|---|---|---|---|---|---|---|---|---|
+| 2 | 40 | 12 | 19,735 | 22 | 129,131 | 32 | 399,250 | 42 | 727,245 |
+| 3 | 196 | 13 | 25,351 | 23 | 148,008 | 33 | 432,049 | 43 | 760,044 |
+| 4 | 547 | 14 | 31,942 | 24 | 168,639 | 34 | 464,849 | 44 | 792,844 |
+| 5 | 1,171 | 15 | 39,586 | 25 | 191,103 | 35 | 497,648 | 45 | 825,643 |
+| 6 | 2,146 | 16 | 48,361 | 26 | 215,479 | 36 | 530,448 | 46 | 858,443 |
+| 7 | 3,550 | 17 | 58,345 | 27 | 241,843 | 37 | 563,247 | 47 | 891,242 |
+| 8 | 5,461 | 18 | 69,617 | 28 | 270,275 | 38 | 596,047 | 48 | 924,042 |
+| 9 | 7,957 | 19 | 82,253 | 29 | 300,851 | 39 | 628,846 | 49 | 956,841 |
+| 10 | 11,116 | 20 | 96,332 | 30 | 333,651 | 40 | 661,646 | 50 | 989,641 |
+| 11 | 15,016 | 21 | 111,932 | 31 | 366,450 | 41 | 694,445 | | |
+
+Max HP is the class's `baseStats.hp + statGrowth.hp × (level − 1)` (`classes.yaml`): a Warrior has 35 at Lv1, 152 at
+Lv10, 282 at Lv20 and 672 at Lv50; a Black Mage 25, 79, 139 and 319.
 
 ### Gold Economy
 - Gold is the sole currency

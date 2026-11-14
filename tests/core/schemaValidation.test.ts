@@ -220,5 +220,38 @@ describe('schemaValidation: optional FF1 combat fields (T4a)', () => {
     expect(() => validateCharacterClassData({ ...cls, hitPercent: { base: 10 } })).toThrow('CharacterClassData.hitPercent.growth');
     expect(() => validateCharacterClassData({ ...cls, spellCharges: [[1, 2]] })).toThrow('CharacterClassData.spellCharges[0][1]');
   });
+
+  describe('spellCharges rows', () => {
+    const charges = (spellCharges: unknown): unknown => validateCharacterClassData({ ...cls, spellCharges });
+
+    it('accepts a full FF1 row (8 levels, 0-9 each) and an empty table', () => {
+      expect(() => charges([[1, [2]], [15, [9, 7, 6, 5, 4, 3, 2, 1]], [50, [9, 9, 9, 9, 9, 9, 9, 9]]])).not.toThrow();
+      expect(() => charges([[1, [0, 0]]])).not.toThrow();
+      expect(() => charges([])).not.toThrow();
+    });
+
+    it('rejects a row with more than 8 spell levels', () => {
+      expect(() => charges([[1, [1, 1, 1, 1, 1, 1, 1, 1, 1]]])).toThrow('CharacterClassData.spellCharges[0][1]: at most 8 spell levels, got 9');
+    });
+
+    it('rejects levels that do not go up', () => {
+      expect(() => charges([[3, [3, 1]], [1, [2]]])).toThrow('CharacterClassData.spellCharges[1][0]: levels must go up (1 after 3)');
+      expect(() => charges([[1, [2]], [1, [3]]])).toThrow('levels must go up (1 after 1)');
+      expect(() => charges([[0, [2]]])).toThrow('CharacterClassData.spellCharges[0][0]: expected a level >= 1, got 0');
+      expect(() => charges([[1.5, [2]]])).toThrow('expected a level >= 1, got 1.5');
+    });
+
+    it('rejects charge values that are not integers from 0 to 9', () => {
+      expect(() => charges([[1, [10]]])).toThrow('CharacterClassData.spellCharges[0][1][0]: expected an integer from 0 to 9, got 10');
+      expect(() => charges([[1, [2, -1]]])).toThrow('CharacterClassData.spellCharges[0][1][1]: expected an integer from 0 to 9, got -1');
+      expect(() => charges([[1, [2.5]]])).toThrow('expected an integer from 0 to 9, got 2.5');
+      expect(() => charges([[1, ['2']]])).toThrow('CharacterClassData.spellCharges[0][1][0]: expected number, got string');
+    });
+  });
+
+  it('unarmedMartial, when present, is a boolean', () => {
+    expect(() => validateCharacterClassData({ ...cls, unarmedMartial: true })).not.toThrow();
+    expect(() => validateCharacterClassData({ ...cls, unarmedMartial: 'yes' })).toThrow('CharacterClassData.unarmedMartial: expected boolean, got string');
+  });
 });
 

@@ -66,6 +66,8 @@
   # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
   hitPercent: { base: 5, growth: 3 }
   magicDefense: { base: 10, growth: 4 }
+  # FF1 martial arts: unarmed attack STR/2 + 2 x level with double hits; absorb >= level without body armour
+  unarmedMartial: true
 
 # ═══ WHITE MAGE ═══
 - id: white_mage
@@ -282,6 +284,8 @@
   # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
   hitPercent: { base: 5, growth: 3 }
   magicDefense: { base: 10, growth: 4 }
+  # FF1 martial arts: unarmed attack STR/2 + 2 x level with double hits; absorb >= level without body armour
+  unarmedMartial: true
 
 # ═══ WHITE WIZARD (upgraded White Mage) ═══
 - id: white_wizard

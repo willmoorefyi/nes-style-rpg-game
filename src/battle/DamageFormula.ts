@@ -1,4 +1,4 @@
-import { magicElementMultiplier, type ElementalProfile, type ElementType } from './Elements.js';
+import { magicElementMultiplier, type ElementalProfile, type ElementRelation, type ElementType } from './Elements.js';
 
 /** FF1 (NES) battle formulas. Every roll goes through the injected `rng` (0 ≤ rng() < 1). */
 
@@ -8,6 +8,8 @@ const PHYSICAL_HIT_BASE = 168;
 const MAGIC_HIT_BASE = 148;
 /** Bonus to hit a sleeping or paralysed target. */
 const HELPLESS_BONUS = 40;
+/** FF1: a spell's connect base rises by 40 against a weakness. */
+const WEAK_CONNECT_BONUS = 40;
 /** Spell accuracy when the data gives none (FF1's usual value). */
 export const DEFAULT_SPELL_ACCURACY = 24;
 
@@ -73,9 +75,14 @@ export function physicalAttack(
   return { damage, hitsLanded, critical, hit: hitsLanded > 0 };
 }
 
-/** True when a spell connects / a status spell lands: (148 + accuracy − magic defence) / 200. */
-export function statusHits(accuracy: number, magicDefense: number, rng: () => number = Math.random): boolean {
-  return roll200(rng, MAGIC_HIT_BASE + accuracy - magicDefense);
+/**
+ * True when a spell connects / a status spell lands: (base + accuracy − magic defence) / 200. The base is 148;
+ * FF1 raises it to 188 against an element the target is weak to and sets it to 0 against one it resists.
+ */
+export function statusHits(accuracy: number, magicDefense: number, rng: () => number = Math.random,
+  relation: ElementRelation = 'normal'): boolean {
+  const base = relation === 'resist' ? 0 : MAGIC_HIT_BASE + (relation === 'weak' ? WEAK_CONNECT_BONUS : 0);
+  return roll200(rng, base + accuracy - magicDefense);
 }
 
 export interface MagicSpell {
@@ -100,18 +107,19 @@ export interface MagicResult {
 
 /**
  * FF1 spell damage: rand(E, 2E), with E × 1.5 against a weakness and the damage halved against a
- * resistance; doubled when the spell connects. Caster INT is not used (as in FF1).
+ * resistance; doubled when the spell connects. The connect roll's base is 148, 188 against a weakness and 0
+ * against a resistance (FF1). Caster INT is not used (as in FF1).
  */
 export function magicDamage(
   spell: MagicSpell,
   target: MagicTarget,
   rng: () => number = Math.random,
 ): MagicResult {
-  const connected = statusHits(spell.accuracy ?? DEFAULT_SPELL_ACCURACY, target.magicDefense, rng);
   const mult = magicElementMultiplier((spell.element ?? 'none') as ElementType, target.elementalProfile ?? {
     weakness: target.weakness as ElementType | undefined,
     resist: target.resist as ElementType | undefined,
   });
+  const connected = statusHits(spell.accuracy ?? DEFAULT_SPELL_ACCURACY, target.magicDefense, rng, mult.relation);
   const e = Math.floor(Math.max(0, spell.power) * mult.effectivity);
   let damage = Math.floor(randInt(rng, e, 2 * e) * mult.damage);
   if (connected) damage *= 2;

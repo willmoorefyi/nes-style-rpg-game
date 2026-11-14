@@ -44,8 +44,20 @@ describe('T4d Garland (FF1 stats; 400 seeded battles per case)', () => {
     expect(garlandWinRate(2, 'full', 'sensible', 3)).toBeGreaterThanOrEqual(0.95);
   });
 
-  it('careless Lv1 Fight-only play with no gear wins <= 60 %', () => {
-    expect(garlandWinRate(1, 'naked', 'careless', 0)).toBeLessThanOrEqual(0.6);
+  // Bounds sit near the measured rates (400 seeds; in brackets), so a regression such as halving Garland's HP fails
+  // (that lifts the naked case to 18 % and the 400 G kit case to 100 %). Revision 1 only asks for <= 60 % naked.
+  it('careless Lv1 Fight-only play with no gear wins <= 5 % (0.25 %)', () => {
+    expect(garlandWinRate(1, 'naked', 'careless', 0)).toBeLessThanOrEqual(0.05);
+  });
+
+  it('careless Lv1 Fight-only play with the 400 G kit wins 90-99.5 % (98.25 %): FF1\'s Garland is easy once geared', () => {
+    const rate = garlandWinRate(1, 'start', 'careless', 0);
+    expect(rate).toBeGreaterThanOrEqual(0.9);
+    expect(rate).toBeLessThanOrEqual(0.995);
+  });
+
+  it('sensible Lv1 play with the 400 G kit wins >= 98 % (100 %)', () => {
+    expect(garlandWinRate(1, 'start', 'sensible', 0)).toBeGreaterThanOrEqual(0.98);
   });
 
   it('after a temple run (sensible, full kit, 3 shared potions) Lv2 wins >= 85 % and Lv3 >= 95 %', () => {
@@ -56,7 +68,8 @@ describe('T4d Garland (FF1 stats; 400 seeded battles per case)', () => {
   // §4.5 "SLEP every turn": sleep never locks him for good. Each SLEP that lands takes at most one turn (he wakes by
   // the HP rule), but a SLEP lands before each of his turns about 79 % of the time, and the turn order is by agility,
   // so a run of landed SLEPs can still hold him for a whole short fight. The check holds the fight open (nobody hurts
-  // him for 15 rounds): he never loses more turns than SLEPs landed, and he acts in almost every battle.
+  // him for 15 rounds): he never loses more turns than SLEPs landed, he acts in almost every battle, and he acts in
+  // about 21 % of the rounds (measured 0.214 over 400 seeds; the bound is ±0.04).
   it('with SLEP cast at him every round, Garland loses at most one turn per SLEP and acts in >= 95 % of battles (EB-5)', () => {
     let lockedOut = 0;
     let actedShare = 0;
@@ -83,6 +96,6 @@ describe('T4d Garland (FF1 stats; 400 seeded battles per case)', () => {
       actedShare += turns / Math.max(1, r.rounds);
     }
     expect(lockedOut / N).toBeLessThanOrEqual(0.05);
-    expect(actedShare / N).toBeGreaterThan(0.15);
+    expect(Math.abs(actedShare / N - 0.21)).toBeLessThanOrEqual(0.04);
   });
 });

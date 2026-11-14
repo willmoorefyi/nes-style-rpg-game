@@ -1,6 +1,7 @@
 /**
  * Battle policies for the balance tests (docs/FIX_PLAN_PENINSULA.md T4 §4, revision 11): an exact port of the
- * scratch simulation's `chooseCommands` (docs/sim/t4/model.ts), driving the real `BattleStateMachine`.
+ * scratch simulation's `chooseCommands` (the scratch copy is gone; the simulation is `tests/balance/` now), driving
+ * the real `BattleStateMachine`.
  *
  * - careless: Fight only, a random living target, no healing or items;
  * - sensible: CURE the most hurt member below 50 %, RUSE on self once against a big enemy (the §5 browser check),

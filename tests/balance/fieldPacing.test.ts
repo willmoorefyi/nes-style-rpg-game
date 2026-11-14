@@ -10,7 +10,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { runBattle, mulberry32 } from '../helpers/battlePolicies.js';
-import { makeParty, rollFormation, item, spell, SPELLS, SHOPS, PARTY, type Zone } from '../helpers/balanceData.js';
+import { makeParty, rollFormation, item, spell, kitCost, SPELLS, SHOPS, PARTY, START_KIT, type Zone } from '../helpers/balanceData.js';
 import { spellPrice } from '../../src/systems/SpellPurchase.js';
 import { slotOf } from '../../src/entities/EquipmentRules.js';
 import type { Character } from '../../src/entities/Character.js';
@@ -29,13 +29,15 @@ const SHOPPING: Array<{ who: string; item?: string; spell?: string }> = [
 ];
 const priceOf = (s: (typeof SHOPPING)[number]): number => (s.item ? item(s.item).price : spellPrice(spell(s.spell!)));
 const innPrice = SHOPS.find((s) => s.id === 'cornelia_inn')?.innPrice ?? 30;
+/** §1.5: what the party's 400 G starting kit costs at the real prices (370 G for Warrior / Thief / White / Black). */
+const START_KIT_COST = PARTY.reduce((sum, c) => sum + kitCost(START_KIT[c], spellPrice), 0);
 
 interface Campaign { reachedAt: Record<number, number>; wipes: number; inns: number; gold: number; bought: number; levels: number[] }
 
 function campaign(seed: number): Campaign {
   const rng = mulberry32(seed);
   const party: Character[] = makeParty(1, 'start', true);
-  let gold = START_GOLD - 370; // §1.5: the kit costs 370
+  let gold = START_GOLD - START_KIT_COST;
   let next = 0, inns = 0, wipes = 0, battles = 0;
   const reachedAt: Record<number, number> = {};
   const inn = (): void => {
@@ -94,8 +96,11 @@ describe('T4d field pacing (seeded campaign, §4.5)', () => {
     expect(l3.filter((b) => b === Infinity), 'runs that never reach Lv3 in 40 battles').toHaveLength(0);
   });
 
-  it('wipes fewer than 0.2 times per 40-battle run', () => {
-    expect(runs.reduce((s, r) => s + r.wipes, 0) / RUNS).toBeLessThan(0.2);
+  // §4.5 asks for < 0.2 wipes per run; the measured rate is 0 in all 200 runs, so the bound sits near it (at most 2
+  // wipes in 200 runs) to catch a regression in enemy damage or in the inn rule.
+  it('wipes at most 0.01 times per 40-battle run (§4.5: < 0.2; measured 0)', () => {
+    expect(START_KIT_COST).toBeLessThanOrEqual(START_GOLD);
+    expect(runs.reduce((s, r) => s + r.wipes, 0) / RUNS).toBeLessThanOrEqual(0.01);
   });
 
   it('leaves 200-1200 G after 40 battles on average, with at least 7 of the 8 full-kit purchases made', () => {

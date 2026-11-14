@@ -13,6 +13,7 @@ const monkClass = testClass('monk', {
   baseStats: { hp: 33, strength: 15, agility: 10, intelligence: 4, vitality: 10, luck: 5 },
   hitPercent: { base: 5, growth: 3 },
   magicDefense: { base: 10, growth: 4 },
+  unarmedMartial: true,
 });
 const warriorClass = testClass('warrior', {
   baseStats: { hp: 35, strength: 20, agility: 5, intelligence: 1, vitality: 10, luck: 5 },
@@ -34,6 +35,16 @@ describe('CombatStats: party (FF1)', () => {
     expect(partyHits(monk)).toBe(2);
     expect(partyAbsorb(monk)).toBe(1);
     expect(partyCrit(monk)).toBe(0);
+  });
+
+  it('the martial rules come from the class data, not the class id', () => {
+    const plain = new Character({ name: 'M', classData: { ...monkClass, unarmedMartial: undefined } });
+    expect(partyAttack(plain)).toBe(7);
+    expect(partyHits(plain)).toBe(1);
+    expect(partyAbsorb(plain)).toBe(0);
+    const brawler = new Character({ name: 'B', classData: testClass('brawler', { ...monkClass, id: 'brawler' }) });
+    expect(partyAttack(brawler)).toBe(9);
+    expect(partyHits(brawler)).toBe(2);
   });
 
   it('with a wooden nunchaku the Monk has attack 19 and 1 hit', () => {

@@ -41,6 +41,11 @@ export interface CharacterClassData {
   magicDefense?: ClassGrowth;
   /** Spell-charge step breakpoints `[[level, [l1..l8]], ...]` (read by the charge rules; missing means none). */
   spellCharges?: Array<[number, number[]]>;
+  /**
+   * FF1 Black Belt / Master rules: unarmed attack ⌊STR/2⌋ + 2 × level with double hits, and absorb at least the
+   * level without body armour. Missing means false.
+   */
+  unarmedMartial?: boolean;
 }
 
 /** A per-level class number: `base + growth * (level - 1)`. */

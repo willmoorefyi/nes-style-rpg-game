@@ -134,6 +134,10 @@ describe('T4d spells and classes', () => {
     expect(warrior.hitPercent).toEqual({ base: 10, growth: 3 });
   });
 
+  it('marks exactly the Monk and the Master as unarmed martial classes (data, not code)', () => {
+    expect(CLASSES.filter((c) => c.unarmedMartial === true).map((c) => c.id).sort()).toEqual(['master', 'monk']);
+  });
+
   it('has a power or an accuracy for every damage and status spell', () => {
     for (const s of SPELLS.filter((x) => x.effect.startsWith('damage') || x.effect.startsWith('status_'))) {
       expect(s.accuracy, s.id).toBeGreaterThan(0);

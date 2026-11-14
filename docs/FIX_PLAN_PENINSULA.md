@@ -1400,7 +1400,7 @@ This is BA-10 / EB-10, and it makes `FieldOrderScene` meaningful.
 
 ### 4. Simulation targets (and what the scratch simulation found)
 
-**Scratch simulation:** `/tmp/t4sim/`.
+**Scratch simulation:** `/tmp/t4sim/` (later committed as `docs/sim/t4/`, then removed in the T4 review fixes; the simulation lives in `tests/balance/` now).
 - `model.ts` patches the real `BattleStateMachine` and `SpellExecutor` prototypes with the §0 formulas. The turn order, queue, status tick, finish and boss plumbing are the real code; the patches double as a prototype of T4a.
 - `garland.test.ts` and `tune.test.ts` are the Garland scans; `field.test.ts` is the campaign and zones; `run.test.ts` is a temple run followed by Garland.
 - To run them: `npx vitest run --root /tmp/t4sim <file>` from the repo.
@@ -1639,6 +1639,33 @@ These are checked by `tests/balance/*` and by re-running the scratch simulation 
 
 **Order:** T4a and T4c run in parallel. T4b runs after T4a merges (revision 5). Then T4d, then T4e.
 
+### T4a result
+
+- **New pure modules** in `src/battle/`: `CombatStats` (party attack / hit% / hits / evade / absorb / magic defence / crit, Monk unarmed, enemy evade / hits / crit / accuracy), `PhysicalAttack` (the state machine's party and enemy attacks), `SpellStatus` (status, debuff and morale rolls) and `StatusTick` (start-of-turn status tick and wake roll). `BattleStateMachine` and `SpellExecutor` delegate to them and got smaller.
+- **Formulas (§0):** `physicalAttack` runs the per-hit loop (`(168 + hit% − evade)/200`, +40 against a helpless target, `rand(A, 2A) − absorb` min 1, a crit adds a roll that ignores absorb); `magicDamage` is `rand(E, 2E)` with E × 1.5 on a weakness, half damage on a resistance and double on a connect (`(148 + accuracy − MDef)/200`), no caster INT; `healAmount` is `rand(E, 2E)`, shared by battle and field CURE; `statusHits` for every `status_*`, `debuff_*` and `debuff_morale` spell, with "X is unaffected." on a miss.
+- **Sleep and paralysis:** the actor loses the turn, then wakes if `rand(0..80) < currentHp` ("X wakes up!"); damage doesn't wake (`StatusTracker.isHelpless()` added, `onHit()` documented as unused).
+- **Buffs:** RUSE / INVS / LOCK / FOG / TMPR take their amount from `spell.power`, and the formulas read them (evade, enemy evade, absorb, attack).
+- **Run (EB-9):** `calculateRunChance(luck, level)` = `luck / (level + 16)` for the acting member (15/17 for a Lv1 Thief).
+- **Targeting and XP (BA-10, EB-10):** `EnemyAI.selectTarget` weights the living by `FRONT_WEIGHTS` 4/2/1/1 in party order (BasicAI, BossAI and the state machine default); `retargetEnemyTarget` keeps the original slots (revision 14). `finish('victory')` sets `xpPerMember = xpShare(...)` and says "Victory! N XP each, G Gold."; `PartyManager.distributeXp` uses the same share.
+- **Messages:** "hits Goblin for 18! (2 hits)" (revision 6); `battleMessageUtils` handles "unaffected" and "wakes up".
+- **Types / schema:** the optional enemy (`accuracy`, `evade`, `hits`, `crit`), item (`hit`, `crit`, `weight`), spell (`accuracy`, `price`) and class (`hitPercent`, `magicDefense`, `spellCharges`) fields, checked when present.
+
+### T4b result
+
+- **XP (EB-3):** new `src/entities/ExperienceTable.ts` with the §2.2 FF1 table (`xpToReach`, `levelForXp`, `MAX_LEVEL` 50); `Character.xpForNextLevel` uses it. A level-up adds the max-HP gain to current HP instead of a full heal.
+- **Charges (NG-4):** `SpellCharges.maxChargesFor(classData, level, spellLevel)` reads the class's `spellCharges` step breakpoints (0 when the class has none); the shared `BREAKPOINTS` are gone. `classes.yaml` holds the §1.4 tables (Warrior, Thief, Monk and Master have none).
+- **`stats.attack`** is `partyAttack(c)` (revision 5), so Status, Equip and the shop show the battle number.
+- **Economy:** `PartyCreationScene` starts with 400 G (NG-5); a pure `spellPrice()` in `SpellPurchase.ts` (`spell.price`, or 100 / 400 / 1500 / 4000 / 8000 / 20000 / 45000 / 60000 by level) replaces `SPELL_PRICE_BASE`.
+- **Save compatibility (revision 16):** `fromJSON` clamps saved charges to the class table and recomputes the level upward from XP; the save version stays 1 (`tests/systems/SaveCompatT4.test.ts`).
+- **Tests:** the shared mage class fixture (`testMageClass`, `TEST_MAGE_CHARGES`) in `tests/helpers/testUtils.ts` (revision 4), including `ItemEffects.test.ts`.
+
+### T4c result
+
+- **Groups:** `EncounterEntry` is `{weight} & ({enemies} | {groups: [{id, min, max?}]})`. `EncounterTable.selectEnemies()` rolls each count in `[min, max]`, uses the first group's id once when every count is 0, and caps the total at `MAX_FORMATION = 9`, cutting from the end.
+- **Zones:** `EncounterZone = {id, rects, encounters, encounterRate?}` and `MapData.encounterZones`. `EncounterSystem.setZones` builds one table per zone on the shared RNG. A step uses the first zone whose (inclusive) rects contain it, else the map table, and the counter resets with that zone's rate, else the map's base rate, which is kept separate (revision 15). `ExplorationScene.loadMap` calls `setZones` next to `setEncounters`.
+- **Schema:** `src/core/encounterValidation.ts` (called from `validateMapData`): exactly one of `enemies` / `groups`, `0 <= min <= max <= 9`, zone rects of 4 integers inside the map.
+- **Layout:** `formationFits(sizes)` in `EnemyLayoutAi.ts` (scale 1 or 0.5, no overlap), used by `crossFileValidation`.
+
 ### T4d result
 
 - **Data:** §1.1 enemies (FF1 Garland 106 / 15 / 1 hit, no weakness, 130 XP; new `gr_imp`, `gr_wolf`; combat fields under `stats`), §1.2 items (`hit`/`crit`/`weight`, explicit `slot: armor` on body armour, Monk wears leather, Cap 80 G, Short Sword 15 / 550 G, Tent 75, Cabin 250), §1.3 spells (FF1 powers and accuracies; CURE 16), §1.4 `hitPercent`/`magicDefense` on every class, §1.5 Cornelia lists, six `t4_*` debug scenarios (§1.7's five plus `t4_garland_l1_naked` for revision 1's careless check).
@@ -1654,6 +1681,17 @@ These are checked by `tests/balance/*` and by re-running the scratch simulation 
 - **Temple** (source and legacy) and the **legacy overworld:** the §1.6 tables in group form, no zones.
 - **Deviation:** `temple_approach` measures "the city" as the nearest of its four gate arrivals, not only `ARRIVE["cornelia"]`. From the south gate the north bridge foot is 21 steps round the walls but 20 from the temple door, so the plan's rule would put the north road in the approach, against §1.6 and the §3 test. Unreachable cells count as infinitely far (revision 17). The temple door's own warp cell is left out (warps are never battle cells).
 - **Tests:** `overworldLayout` (zone order, arrival / bridge foot in the fields, door / tomb zoned, in bounds, walkable, disjoint, and both zones recomputed from the compiled collision), `actOneBalance` (no pirate in any act-1 table, compiled or legacy; legacy tables equal the compiled ones), new `tests/systems/actOneEncounters.test.ts` (the §3 rolls on the real `EncounterSystem`), and `balanceData.ZONE_TABLES` now reads the compiled maps (`fieldPacing`, `zones`, `garland` unchanged and passing).
+
+### T4 review fixes result
+
+- **Shop comparison (Monk / Master):** the panel compares `partyAttack` with the item equipped against `partyAttack` without it (armour: `partyAbsorb`), through `CombatStats.withEquipped`, a what-if view that leaves the character unchanged (`src/scenes/shopComparison.ts`). The hit count is shown when it changes or is above 1. An unarmed Lv1 Monk sees the Wooden Nunchaku as 9 (2 hits) → 19 (1 hit), +10. A Lv7 Monk's bare hands (33, 2 hits) beat it (31), −2. A Lv6 Monk with no body armour loses 2 absorb with Leather Armor.
+- **Martial classes are data:** `unarmedMartial: true` on `monk` and `master` in `classes.yaml`, in `CharacterClassData` and in the schema (a boolean). `CombatStats` no longer lists class ids.
+- **`spellCharges` schema:** each row's level is an integer ≥ 1 above the previous row's, a row has at most 8 counts, and each count is an integer from 0 to 9.
+- **FF1 element hit rule (implemented):** the spell connect roll's base is 148, 188 against a weakness and 0 against a resistance (`Elements.magicElementMultiplier` returns the `relation`, and `DamageFormula.statusHits` takes it). With accuracy 24 against MDef 16, a resisted spell connects 8/200 of the time instead of 156/200. Status spells have no element, so they are unchanged. The Garland numbers are unchanged (he has no weakness); the field campaign stays inside every bound (351 G left; T4d recorded 353 G).
+- **Balance bounds** near the measured values (400 seeds, FF1 Garland): careless Lv1 naked 0.25 % (bound ≤ 5 %), careless Lv1 with the 400 G kit 98.25 % (90–99.5 %), sensible Lv1 with the 400 G kit 100 % (≥ 98 %). Halving Garland's HP fails three cases (naked 18 %, 400 G kit 100 %). SLEP stress: Garland acts in 0.214 of the rounds (bound 0.21 ± 0.04) and is locked out in 2.75 % of the battles (bound ≤ 5 %). Field pacing: 0 wipes in 200 runs (bound ≤ 0.01 per run; §4.5 asks for < 0.2), Lv2 at battle 5 and Lv3 at 22 (median), 351 G left, 7.5 of 8 purchases. The starting-kit cost is `kitCost(START_KIT[c], spellPrice)` over the party (370 G).
+- **Encounter wiring:** `actOneEncounters` sets up `EncounterSystem` in `loadMap`'s order, step filter first (`encounterStepFilter(map)`). New cases check that warps, the broken north bridge, the temple entry and Garland's tile never count a step, that the temple-door arrival cell rolls `temple_approach`, and that filtered steps between zone steps don't change the zone's battles.
+- **Scratch simulation:** `docs/sim/t4/` is removed from version control (it used `as any` and private access, and did not run as committed). The simulation lives in `tests/balance/` now (`garland`, `fieldPacing`, `zones`, on `tests/helpers/battlePolicies.ts` and `balanceData.ts`). Nothing else under `docs/` holds tests, so `docs/**` left the vitest exclude.
+- **Docs:** `DESIGN_DOCUMENT.md` §5 (the per-class charge tables) and §7 (the FF1 XP table, level-up HP) now match the code.
 
 ---
 

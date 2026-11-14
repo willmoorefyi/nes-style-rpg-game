@@ -9,6 +9,6 @@ export default defineConfig({
   },
   test: {
     // agent worktrees (.claude/worktrees/*) are full repo copies; their tests are not this checkout's
-    exclude: [...configDefaults.exclude, '.claude/**', 'docs/**'],   // docs/sim holds scratch simulations
+    exclude: [...configDefaults.exclude, '.claude/**'],
   },
 });

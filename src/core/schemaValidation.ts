@@ -55,16 +55,38 @@ function assertOptionalGrowth(path: string, value: unknown): void {
   assertNumber(`${path}.growth`, value.growth);
 }
 
-/** `spellCharges: [[level, [l1..l8]], ...]`, when present. */
+/** FF1 has eight spell levels, and a charge count runs 0-9. */
+const MAX_SPELL_LEVELS = 8;
+const MAX_CHARGES = 9;
+
+/**
+ * `spellCharges: [[level, [l1..l8]], ...]`, when present: each row's character level is an integer above the
+ * previous row's, and it holds at most 8 charge counts, each an integer from 0 to 9.
+ */
 function assertOptionalChargeTable(path: string, value: unknown): void {
   if (value === undefined) return;
   assertArray(path, value);
+  let previous = 0;
   value.forEach((step, i) => {
-    assertArray(`${path}[${i}]`, step);
-    if (step.length !== 2) throw new ValidationError(`${path}[${i}]: expected [level, [charges...]]`);
-    assertNumber(`${path}[${i}][0]`, step[0]);
-    assertArray(`${path}[${i}][1]`, step[1]);
-    (step[1] as unknown[]).forEach((n, j) => assertNumber(`${path}[${i}][1][${j}]`, n));
+    const row = `${path}[${i}]`;
+    assertArray(row, step);
+    if (step.length !== 2) throw new ValidationError(`${row}: expected [level, [charges...]]`);
+    const level = step[0];
+    assertNumber(`${row}[0]`, level);
+    if (!Number.isInteger(level) || level < 1) throw new ValidationError(`${row}[0]: expected a level >= 1, got ${level}`);
+    if (level <= previous) throw new ValidationError(`${row}[0]: levels must go up (${level} after ${previous})`);
+    previous = level;
+    assertArray(`${row}[1]`, step[1]);
+    const charges = step[1] as unknown[];
+    if (charges.length > MAX_SPELL_LEVELS) {
+      throw new ValidationError(`${row}[1]: at most ${MAX_SPELL_LEVELS} spell levels, got ${charges.length}`);
+    }
+    charges.forEach((n, j) => {
+      assertNumber(`${row}[1][${j}]`, n);
+      if (!Number.isInteger(n) || n < 0 || n > MAX_CHARGES) {
+        throw new ValidationError(`${row}[1][${j}]: expected an integer from 0 to ${MAX_CHARGES}, got ${n}`);
+      }
+    });
   });
 }
 
@@ -228,6 +250,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   assertOptionalGrowth('CharacterClassData.hitPercent', data.hitPercent);
   assertOptionalGrowth('CharacterClassData.magicDefense', data.magicDefense);
   assertOptionalChargeTable('CharacterClassData.spellCharges', data.spellCharges);
+  if (data.unarmedMartial !== undefined) assertType('CharacterClassData.unarmedMartial', data.unarmedMartial, 'boolean');
   return data as unknown as import('../types/index.js').CharacterClassData;
 }
 

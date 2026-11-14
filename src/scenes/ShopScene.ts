@@ -8,6 +8,7 @@ import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ShopRegistry } from '../data/ShopRegistry.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { slotOf } from '../entities/EquipmentRules.js';
+import { compareEquip, hitsSuffix } from './shopComparison.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
@@ -259,15 +260,16 @@ export class ShopScene implements Scene {
         continue;
       }
       const equipped = char.getEquipped(slot);
-      const curStat = equipped ? ((isWeapon ? equipped.stats.attack : equipped.stats.defense) ?? 0) : 0;
       const curName = equipped?.name ?? '-';
-      const diff = newStat - curStat;
+      // the battle numbers with the item and without it (a Monk's bare hands can beat a weapon: negative)
+      const cmp = compareEquip(char, item, slot);
+      const diff = cmp.diff;
       const diffStr = diff > 0 ? `+${diff}` : `${diff}`;
       const diffColor = diff > 0 ? 0x00ff00 : diff < 0 ? 0xff0000 : 0xffffff;
 
       addLine(`${char.name}`);
-      addLine(`  Now: ${curName} ${statLabel}: ${curStat}`);
-      addLine(`  New: ${statLabel}: ${newStat}`);
+      addLine(`  Now: ${curName} ${cmp.label}: ${cmp.now}${hitsSuffix(cmp, cmp.nowHits)}`);
+      addLine(`  New: ${cmp.label}: ${cmp.next}${hitsSuffix(cmp, cmp.nextHits)}`);
       addLine(`  ${diffStr}`, diffColor);
       y += 4;
     }
