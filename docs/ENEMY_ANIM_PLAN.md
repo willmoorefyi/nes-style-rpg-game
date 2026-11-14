@@ -364,6 +364,15 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
 6. **Silhouette continuity (relative).**
    - Opaque area is 0.85-1.15 of S.
    - Bbox height is within ±4 px per 80 px of cell height (±4 small, ±6 large, ±10 boss) of the S→T lerp.
+   - **fx exemption (F1, `monster_check._silhouette`).** The area ratio and the bbox height leave out the pixels of
+     `kind: fx` parts in the frame, in S and in T. The frame's own new outline ink (`-2`) that is 8-adjacent to fx
+     pixels is left out as well (`anim_efix.fx_exclusion`). A spell effect that grows, shrinks or vanishes is the
+     intended motion, and the body is still judged. The adjacent-frame IoU and centroid checks below are unchanged.
+     - With `efix_gates` on (`check`, `review`) the exemption is strict.
+     - In the build until V.3 (gates off) it can only relax: the check passes when either the plain variant or the
+       fx-excluded variant passes.
+     - The fx parts are an allowlist: garland `glow`, lich `trail` and `crystal`, vampire `slash`. `selftest_efix`
+       enforces it. A new `kind: fx` needs orchestrator approval.
    - For **adjacent frames of the runtime sequence** (feet-aligned): `IoU ≥ min(0.55, IoU(spanning keyframe pair) +
      0.02)`: in-betweens must not pop worse than the approved keyframes themselves (orchestrator decision during T4/T5b;
      the earlier +0.10 was unreachable for pairs overlapping 0.42-0.51 with the legs pinned to different keyframes on
@@ -397,7 +406,7 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
      grounded in its source stays pinned exactly (±1).
    - A pinned frame that releases feet (a rearing hurt: `pins: [foot_n, foot_f]` on a quadruped) is judged on the
      ground contact of the paws it keeps: nothing below the plain, each kept paw keeps its ground row and x extent
-     (±1); the released paws may leave the bottom rows.
+     (±1); the released paws may leave the bottom rows. Only `hurt_in1` / `hurt_in2` may release feet (check 17).
    - Floating sprites keep their one shared offset.
 9. **No clipping.** No opaque pixel in the outer 1 px border of the cell.
 10. **Rotation cap and near-keyframe rule.**
@@ -414,6 +423,44 @@ depend on the art are **relative to the approved keyframes**, so legitimate big 
 13. **D8 prop carry.** In `hurt_in2` the prop's pixel count is greater than 0 and at most 60% of its count in
     `hurt_in1`.
 14. **Holds cap.** At most 1 `holds` entry per attack / hurt / cast sequence per sprite.
+
+**Wave-0 checks (docs/ENEMY_ANIM_ISSUES.md §2, `anim_efix.py`).**
+- `check_sprite(..., efix_gates=True)` runs checks 15-18 in `monster_anim.py check` and `review`.
+- The `monsters_ai` build passes `efix_gates=False` (`monster_atlas.sprite_frames`) until the integrator turns it on
+  in V.3.
+- Each check is RED first on a synthetic fixture in `selftest_efix.py`.
+
+15. **fx-mask integrity (F3).** Opaque pixels of a keyframe inside an fx part's `masks` polygon must not be
+    segmented as another part. The failure is reported under the keyframe's name, e.g.
+    `lich attack: fx mask trail: 1409 opaque px labelled as other parts (blade 1306) from (66, 35)`.
+    - For non-fx masks, the pixels another part claims go only into `<id>_report.json` (`mask_overlap`) and the
+      `review` printout, e.g. `mask garland hurt cape_h: 313 px ... {'sword': 310, ...}`. They do not fail.
+16. **Intra-part crease (F4).** A pixel of new ink (`-2`) is a crease pixel when all 8 of its neighbours are opaque
+    and the same part is on both sides of it (left/right, up/down or a diagonal pair). The check fails when the
+    largest 8-connected piece of crease pixels is at least `ceil(5 * cell_h / 80)`, e.g.
+    `intra-part crease 6 px >= 5 at (68, 19) in neck`.
+17. **Foot release only in a rearing hurt (F5, `anim_feet.released_feet`).** Check 8 exempts released feet through
+    the contact mask only in `hurt_in1` / `hurt_in2`. In any other pinned frame that releases feet, each foot that is
+    grounded in its source keeps its lowest row within ±1, e.g.
+    `foot paw_n released outside a rearing hurt: lowest row 74 vs source 76 (+-1)`.
+18. **Prop attached (F7).** In a frame without a carry, each drawn prop touches its grip parts (8-neighbour) with at
+    least 4 px, e.g. `prop club touches its grip farm_n by 2 px < 4`.
+    - The grip parts are the non-prop, non-fx parts that hold the prop's first joint in the source keyframe, or
+      else its parent joint.
+    - The measured minimum is 12 (goblin `atk_mid`). This is a regression guard only.
+
+**Edge roughness (F6, report only).** Spur pixels (opaque, at most one opaque 4-neighbour) plus notch pixels (empty,
+at least three opaque 4-neighbours) per 100 silhouette edge pixels, frame minus source. They are written to
+`<id>_report.json` (`roughness`), and `review` prints the top 10. Today the top 5 are cockatrice `hurt_in2` +6.50,
+vampire `atk_mid` +5.85, dragon `atk_follow` +5.28, ogre `hurt_in2` +5.21 and garland `atk_mid` +5.02.
+
+**Frame options added in wave 0 (`monster_render.py`).** Both default to today's code path.
+- `frames.<f>.scale: {part: s}` (F2): 0.25 ≤ s ≤ 1, for `kind: fx` parts only. The part is scaled about its first
+  joint and rendered by rotsprite, whose 8x8 block mode becomes a mode-downsample. Colours come only from the
+  source, alpha stays binary, and `_rigid_map` (the source-gap map) carries the same factor. s = 1 is
+  byte-identical to no scale.
+- `frames.<f>.sampler: nearest | rotsprite`: overrides the rig's `sampler` for the rigid parts of one frame.
+- A bad value raises `ValueError` naming the rig and the frame.
 
 ### 5.2 Review output (`python3 -I assets-src/gen/monster_anim.py review goblin`)
 

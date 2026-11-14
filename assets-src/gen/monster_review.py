@@ -124,9 +124,16 @@ def review(sprite: str, out: Path = OUT) -> dict:
         onion.append((b, im))
     _strip(onion).save(out / f"{sprite}_onion.png")
     stage(sprite, [get(n) for n in order], meta["bottom_row"], out)
-    report = {"sprite": sprite, "anim": bool(gen), "checks": rep, "ok": not any(rep.values()) if cfg else True}
+    report = {"sprite": sprite, "anim": bool(gen), "checks": rep, "ok": not any(rep.values()) if cfg else True,
+              "mask_overlap": MC.mask_report(cfg, kfs)[1] if cfg else {}, "roughness": roughness(gen, kfs)}
     (out / f"{sprite}_report.json").write_text(json.dumps(report, indent=2) + "\n")
     return report
+
+
+def roughness(gen: dict[str, dict], kfs: dict[str, Image.Image]) -> dict[str, float]:
+    """F6 (report only): edge roughness of each generated frame minus its source keyframe's (per 100 edge px)."""
+    from gen import anim_efix as E
+    return {n: round(E.roughness(f["img"]) - E.roughness(np.asarray(kfs[f["src"]])), 2) for n, f in gen.items()}
 
 
 def stage(sprite: str, frames: list[Image.Image], bottom: int, out: Path) -> None:
@@ -153,7 +160,7 @@ def main(argv: list[str]) -> int:
         return 2
     cmd, args = argv[0], argv[1:]
     entries = {e[0]: e for e in MA.load_entries()}
-    bad = 0
+    bad, rough = 0, []
     if cmd == "check" and "--calibrate" in args:
         print(f"{'sprite':<12} {'pair':<12} {'IoU':>5} {'centroid':>8}")
         for sid, pair, iou, shift in MC.calibrate(entries.values()):
@@ -167,6 +174,13 @@ def main(argv: list[str]) -> int:
             r = review(sid)
             bad += not r["ok"]
             print(f"{sid}: {'OK' if r['ok'] else 'CHECK'} (anim {r['anim']}) -> {OUT}")
+            for k, v in r["checks"].items():
+                for e in v:
+                    print(f"  {sid} {k}: {e}")
+            for kf, parts in r["mask_overlap"].items():
+                for p, d in parts.items():
+                    print(f"  mask {sid} {kf} {p}: {d['px']} px labelled as other parts {d['by']} (report only)")
+            rough += [(v, sid, n) for n, v in r["roughness"].items()]
         elif not cfg:
             print(f"{sid}: no rig (anim: false), nothing to {cmd}")
         elif cmd == "lock":
@@ -176,4 +190,8 @@ def main(argv: list[str]) -> int:
             fails = [f"{sid} {k}: {e}" for k, v in rep.items() for e in v]
             bad += bool(fails)
             print("\n".join(fails) if fails else f"{sid}: OK ({len(rep)} checks groups)")
+    if rough:
+        print("edge roughness, frame minus source per 100 edge px (F6, report only), top 10:")
+        for v, sid, n in sorted(rough, key=lambda t: (-t[0], t[1], t[2]))[:10]:
+            print(f"  {sid} {n}: {v:+.2f}")
     return 1 if bad else 0

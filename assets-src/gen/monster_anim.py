@@ -129,22 +129,13 @@ def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
     return over.get("moves", moves), list(over.get("pins", pins))
 
 
-def _warp_width(d: dict, mask: np.ndarray, chain: list) -> float:
-    """Half-width of a chain / cloth part's warp quads: `width` (a number, or `auto` = every masked pixel inside the
-    quads), else the segmentation radius (the biped default)."""
-    from gen import rig as R
-    if d.get("width") != "auto":
-        return float(d.get("width", d["radius"]))
-    ys, xs = np.nonzero(mask)
-    px = np.stack([xs, ys], 1).astype(float)
-    return float(np.min([R._seg_dist(px, a, b) for a, b in zip(chain, chain[1:])], 0).max()) + 1.5
-
-
 def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: dict) -> dict[str, dict]:
     """Every generated frame of a rigged sprite: {name: {img, labels, parts, u, src, toward, joints, rots, pinned,
-    prop_px}}. Held frames are skipped (the atlas aliases them to their source keyframe)."""
+    prop_px, ..., fx, grips, names (check-only, monster_render.check_info)}}. Held frames are skipped (the atlas
+    aliases them to their source keyframe). Parts are drawn by monster_render.render_part (F2 scale, frame sampler)."""
     from gen import anim_feet as AF, puppet as PU
     from gen import rig as R
+    from gen import monster_render as MR
     from gen import rig_render as RR
     cell = keyframes["idle"].size
     rig = R.Rig(cfg, cell)
@@ -183,8 +174,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         carried = [p for p, d in rig.parts.items() if r.get("carry") and d["kind"] == "prop" and d.get("carry_to")]
         z = [p for p in carried if rig.parts[p].get("carry_mode") == "behind"] + [p for p in z if p not in carried] + \
             [p for p in carried if rig.parts[p].get("carry_mode") != "behind"]
+        scales, sampler = MR.frame_options(rig, name, over)
         for part in z:
-            d = rig.parts[part]
             src_kf = "idle" if part in carried else r["src"]
             if part in drop or not rig.present(part, src_kf):
                 continue
@@ -192,28 +183,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
             mask = plab == pnames.index(part)
             if not mask.any():
                 continue
-            sj = rig.keyframes[src_kf]
-            js = rig.joints_of(part, src_kf)
-            if part in carried:
-                to = d["carry_to"]
-                par = rig.parent[to]
-                rot = R._wrap(R._ang(J[par], J[to]) - R._ang(rig.keyframes["idle"][par], rig.keyframes["idle"][to]))
-                if d.get("carry_mode") == "truncate":
-                    a, b = np.asarray(sj[js[0]]), np.asarray(sj[js[-1]])
-                    ys, xs = np.nonzero(mask)
-                    t = ((np.stack([xs, ys], 1) - a) @ (b - a)) / max(float((b - a) @ (b - a)), 1e-9)
-                    mask[ys[t < 0.5], xs[t < 0.5]] = False
-                rgba, hit, emp = RR.rigid(arrs[src_kf], mask, sj[js[0]], J[to], rot, size, gaps[src_kf])
-                rots[part] = (math.degrees(rot), "prop")
-            elif d["kind"] in ("chain", "cloth"):
-                rgba, hit, emp = RR.mesh_warp(arrs[src_kf], mask, [sj[j] for j in js], [J[j] for j in js],
-                                              _warp_width(d, mask, [sj[j] for j in js]), size, gaps[src_kf])
-                rots[part] = (R.part_rotation(rig, part, src_kf, sj, J), d["kind"])
-            else:
-                rot = math.radians(R.part_rotation(rig, part, src_kf, sj, J))
-                fn = RR.rotsprite if rig.sampler == "rotsprite" else RR.rigid
-                rgba, hit, emp = fn(arrs[src_kf], mask, sj[js[0]], J[js[0]], rot, size, gaps[src_kf])
-                rots[part] = (math.degrees(rot), d["kind"])
+            rgba, hit, emp, rots[part] = MR.render_part(rig, part, src_kf, arrs[src_kf], mask, J, size, gaps[src_kf],
+                                                        part in carried, scales.get(part, 1.0), sampler)
             layers.append((list(rig.parts).index(part), rgba, hit, emp))
         img, labels = RR.composite(layers, size, pairs)
         for patch in cfg.get("paint") or []:
@@ -230,7 +201,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                      and set(rig.feet) - set(pins) else None,
                      "src_labels": lab, "foot_parts": foot_parts,
                      "toward_labels": out[r["toward"]]["labels"] if r["toward"] in out else segs.get(r["toward"], (None,))[0],
-                     "carried": carried, "pairs": pairs, "seam_tolerance": int(cfg.get("seam_tolerance", 0))}
+                     "carried": carried, "pairs": pairs, "seam_tolerance": int(cfg.get("seam_tolerance", 0)),
+                     **MR.check_info(rig, r["src"], carried)}
     return out
 
 

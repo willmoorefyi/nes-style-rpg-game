@@ -402,6 +402,9 @@ def test_monster_anim() -> None:
     print("monster framework fixes (per-foot feet, IoU bound, pinned reach, cloth chains)")
     from gen import selftest_fixes as SF
     SF.run_fixes(check)
+    print("monster wave-0 framework (F1-F7, efix_gates, fx allowlist)")
+    from gen import selftest_efix as SE
+    SE.run_efix(check)
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

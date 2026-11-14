@@ -130,20 +130,24 @@ def new_holes(a: np.ndarray, src: np.ndarray, min_px: int = 4, labels: np.ndarra
 
 
 # 6: silhouette continuity
-def _height(a: np.ndarray) -> int:
-    rows = np.where(_solid(a).any(1))[0]
+def _rows(m: np.ndarray) -> int:
+    rows = np.where(m.any(1))[0]
     return int(rows.max() - rows.min() + 1) if len(rows) else 0
 
 
-def silhouette(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, cell_h: int) -> list[str]:
+def silhouette(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, cell_h: int,
+               excl: tuple | None = None) -> list[str]:
+    """Opaque area 0.85-1.15 of the source and bbox height within the cell's tolerance of the S->T lerp. `excl` =
+    (frame, source, target) masks of pixels left out of both (F1: fx parts and their own outline; None = none)."""
     out = []
-    ratio = _solid(a).sum() / max(int(_solid(src).sum()), 1)
+    fa, fs, ft = (_solid(x) & ~m if m is not None else _solid(x) for x, m in zip((a, src, toward), excl or (None,) * 3))
+    ratio = fa.sum() / max(int(fs.sum()), 1)
     if not 0.85 <= ratio <= 1.15:
         out.append(f"opaque area {ratio:.2f} of source (0.85-1.15)")
-    want = _height(src) + (_height(toward) - _height(src)) * u
+    want = _rows(fs) + (_rows(ft) - _rows(fs)) * u
     tol = 4 if cell_h <= 80 else 6 if cell_h <= 128 else 10
-    if abs(_height(a) - want) > tol:
-        out.append(f"bbox height {_height(a)} vs lerp {want:.1f} (+-{tol})")
+    if abs(_rows(fa) - want) > tol:
+        out.append(f"bbox height {_rows(fa)} vs lerp {want:.1f} (+-{tol})")
     return out
 
 

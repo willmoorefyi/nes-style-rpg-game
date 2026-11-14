@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import numpy as np
 
+REAR = ("hurt_in1", "hurt_in2")                            # F5: the only frames that may release a grounded foot
+
 
 def _solid(a: np.ndarray) -> np.ndarray:
     return a[..., 3] > 0
@@ -101,3 +103,20 @@ def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_ro
     if abs(f[0] - ref[0]) > tol or abs(f[1] - ref[1]) > tol:
         return [f"feet x {f} vs {tuple(round(v, 1) for v in ref)} (+-{tol})"]
     return []
+
+
+def released_feet(a: np.ndarray, labels: np.ndarray, src_labels: np.ndarray, foot_parts: dict, bottom: int) -> list[str]:
+    """F5 (docs/ENEMY_ANIM_ISSUES.md): a pinned frame other than a rearing hurt (REAR) may not release feet; each foot
+    grounded in its source (its parts have pixels in the bottom 3 rows) keeps its lowest row within +-1."""
+    out = []
+    for foot, idx in sorted(foot_parts.items()):
+        src = np.isin(src_labels, idx)
+        if not src[max(0, bottom - 2):bottom + 1].any():
+            continue                                       # lifted in the source
+        s_low = int(np.nonzero(src.any(1))[0].max())
+        rows = np.nonzero((_solid(a) & np.isin(labels, idx)).any(1))[0]
+        if not len(rows):
+            out.append(f"foot {foot} released outside a rearing hurt: not drawn (source row {s_low})")
+        elif abs(int(rows.max()) - s_low) > 1:
+            out.append(f"foot {foot} released outside a rearing hurt: lowest row {int(rows.max())} vs source {s_low} (+-1)")
+    return out
