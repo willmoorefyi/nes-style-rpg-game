@@ -1,6 +1,7 @@
 id: cornelia-armor-shop
 width: 8
 height: 6
+music: shop
 layers:
   - - 2
     - 2

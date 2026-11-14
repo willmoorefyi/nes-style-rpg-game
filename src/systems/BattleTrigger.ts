@@ -48,7 +48,8 @@ export class BattleTrigger {
     this.currentBossConfig = bossConfig ?? null;
 
     const spells = await this.game.data.loadSpells('assets/data/spells.yaml');
-    const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events };
+    // audio: the battle scene plays the battle and victory tracks itself (IN-1)
+    const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events, audio: this.game.audio };
     const sceneConfig: BattleSceneConfig = {
       party,
       enemies,

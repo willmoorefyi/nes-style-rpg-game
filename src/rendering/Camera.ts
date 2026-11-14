@@ -61,13 +61,20 @@ export class Camera {
   }
 
   private clampX(x: number): number {
-    const maxX = Math.max(0, this.mapWidth - VIEWPORT_WIDTH);
-    return Math.max(0, Math.min(x, maxX));
+    return Camera.clampAxis(x, this.mapWidth, VIEWPORT_WIDTH);
   }
 
   private clampY(y: number): number {
-    const maxY = Math.max(0, this.mapHeight - VIEWPORT_HEIGHT);
-    return Math.max(0, Math.min(y, maxY));
+    return Camera.clampAxis(y, this.mapHeight, VIEWPORT_HEIGHT);
+  }
+
+  /**
+   * Keep the view inside the map. An axis on which the map is smaller than the viewport is centred instead (a
+   * negative camera offset), so a small room sits in the middle of the screen, not in its top-left corner (IN-2).
+   */
+  private static clampAxis(pos: number, mapSize: number, viewSize: number): number {
+    if (mapSize < viewSize) return -(viewSize - mapSize) / 2;
+    return Math.max(0, Math.min(pos, mapSize - viewSize));
   }
 
   private applyTransform(): void {

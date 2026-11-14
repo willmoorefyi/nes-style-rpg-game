@@ -164,6 +164,8 @@ export class PlayerController {
   get gridY(): number { return this.tileY; }
   get direction(): Direction { return this.animation.direction; }
   get isMoving(): boolean { return this.state === 'moving'; }
+  /** The tile being stepped onto (the current tile when idle). */
+  get targetTile(): { x: number; y: number } { return { x: this.targetX, y: this.targetY }; }
   get facingTile(): { x: number; y: number } {
     const { dx, dy } = DIRECTION_VECTORS[this.animation.direction];
     return { x: this.tileX + dx, y: this.tileY + dy };

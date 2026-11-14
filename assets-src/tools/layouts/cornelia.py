@@ -278,6 +278,8 @@ doc = {
     "music": "town",
     "entrances": {"south_gate": [CX, 67], "west_gate": [4, 44], "east_gate": [55, 44], "castle_gate": [55, 24],
                   "north_postern": [6, 3]},
+    # the single-file north-postern route and its bridge (CT-3): wandering NPCs (the gardener) never plug it
+    "noWander": [[x, y] for x in range(8, 12) for y in range(17, 26)],
     "objects": objects,
     "npcs": npcs,
     "transitions": [*[{"x": x, "y": H - 1, "targetMap": OUT, "targetEntrance": "cornelia"} for x in (CX - 1, CX, CX + 1)],

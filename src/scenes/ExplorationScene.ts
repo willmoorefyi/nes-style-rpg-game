@@ -30,6 +30,8 @@ import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { createFieldStateSystems, openShopScene } from './exploration/FieldSystems.js';
 import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
+import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
+import { encounterStepFilter } from './exploration/FieldTiles.js';
 import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from '../core/LayoutConstants.js';
 
 export class ExplorationScene implements Scene {
@@ -68,6 +70,8 @@ export class ExplorationScene implements Scene {
   private fadeOverlay: FadeOverlay;
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
+  /** Tiles wandering NPCs never enter on this map (doors, warps, gates, entrances, the map's noWander list). */
+  private wanderForbidden: ReadonlySet<string> = new Set();
   // Stored reference for cleanup in exit() to prevent listener leaks
   private handleBattleEnd = (data: { victory: boolean; xpReward: number; goldReward: number }) => this.battleTrigger.onBattleEnd(data);
   private handleShowDialog = (data: { text: string; onComplete: () => void }) => {
@@ -223,11 +227,10 @@ export class ExplorationScene implements Scene {
     this.npcs = npcs;
     this.collisionMap = collisionMap;
     this.battleBackgrounds = mapData.battleBackgrounds;
-    
-    // Play map music
-    const musicTrack = mapData.music ?? 'overworld';
-    this.game.audio.playMusic(musicTrack);
-    
+    this.wanderForbidden = noWanderTiles(mapData, (x, y) => collisionMap.isWalkable(x, y, this.walkingMode));
+    this.playMapMusic();
+    // no random battle on a warp, gate or scripted-battle tile (EB-2)
+    this.encounterSystem.setStepFilter(encounterStepFilter(mapData));
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     // a map without an encounter table has no random battles (towns, castles, interiors); never keep the last map's
     this.encounterSystem.setEncounters(mapData.encounters ?? []);
@@ -320,10 +323,13 @@ export class ExplorationScene implements Scene {
     const wasMoving = this.player.isMoving;
     if (!wasMoving) this.stepOrigin = { x: this.player.gridX, y: this.player.gridY };
     this.player.update(dt);
-    // Update wandering NPCs
-    for (const npc of this.npcs) {
-      npc.update(dt, (x, y) => this.isNPCWalkable(x, y, npc));
-    }
+    // Wandering NPCs: near home, on foot-walkable ground, off doors and warps, still while the player is beside them
+    const collision = this.collisionMap;
+    updateWanderers(this.npcs, dt, {
+      isWalkable: (x, y) => collision?.isWalkable(x, y, this.walkingMode) ?? false,
+      forbidden: this.wanderForbidden,
+      playerTiles: [{ x: this.player.gridX, y: this.player.gridY }, this.player.targetTile],
+    });
     this.player.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
     // Track player position in game for save/load
     this.game.playerPosition = { x: this.player.gridX, y: this.player.gridY };
@@ -391,16 +397,6 @@ export class ExplorationScene implements Scene {
     }
     this.camera.update();
     this.tilemap?.render();
-  }
-
-  /** Check if a tile is walkable for NPC wandering (collision + no other NPC + not player) */
-  private isNPCWalkable(x: number, y: number, self: NPC): boolean {
-    if (!this.collisionMap || !this.collisionMap.isWalkable(x, y)) return false;
-    if (this.player && this.player.gridX === x && this.player.gridY === y) return false;
-    for (const npc of this.npcs) {
-      if (npc !== self && npc.tileX === x && npc.tileY === y) return false;
-    }
-    return true;
   }
 
   /** Handle NPC post-dialog actions (shop, class upgrade) */
@@ -554,9 +550,17 @@ export class ExplorationScene implements Scene {
     this.encounterSystem.stop();
   }
 
+  /** The current map's track (overworld when it names none); playMusic keeps a track that is already playing. */
+  private playMapMusic(): void {
+    const track = this.currentMapData?.music ?? 'overworld';
+    this.game.audio.playMusic(track).catch((e) => console.error(`Music ${track} failed:`, e));
+  }
+
   onResume(): void {
     this.paused = false;
     this.encounterSystem.start();
+    // back from a battle (battle / victory music) or a menu: the map's own track again
+    this.playMapMusic();
     this.refreshNpcPresence();
     // Cleanup temp shop scenes on resume
     this.cleanupTempScenes();

@@ -10,6 +10,8 @@ export class EncounterSystem {
   private onEncounter: ((enemies: string[]) => void) | null = null;
   private rng: () => number;
   private rateMultiplier = 1.0;
+  /** Tiles where a step is not a step (warps, gates, scripted battles): no countdown and no battle there. */
+  private stepFilter: ((x: number, y: number) => boolean) | null = null;
 
   constructor(events: EventBus, rng: () => number = Math.random) {
     this.events = events;
@@ -36,6 +38,11 @@ export class EncounterSystem {
     this.onEncounter = callback;
   }
 
+  /** `filter(x, y)` is true where a step counts; null counts every step. */
+  setStepFilter(filter: ((x: number, y: number) => boolean) | null): void {
+    this.stepFilter = filter;
+  }
+
   start(): void {
     this.events.on('playerMove', this.handleMove);
   }
@@ -44,8 +51,9 @@ export class EncounterSystem {
     this.events.off('playerMove', this.handleMove);
   }
 
-  private handleMove = (): void => {
+  private handleMove = (pos: { x: number; y: number }): void => {
     if (this.table.isEmpty) return;
+    if (this.stepFilter && !this.stepFilter(pos.x, pos.y)) return;
     // Rate multiplier of 0 means no encounters
     if (this.rateMultiplier <= 0) return;
     this.stepCounter--;

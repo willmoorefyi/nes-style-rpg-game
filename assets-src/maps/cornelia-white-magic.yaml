@@ -1,6 +1,7 @@
 # cornelia-white-magic interior, compiled by assets-src/tools/build_map.py (legend: W wall top, F back wall, _ floor, c counter)
 id: cornelia-white-magic
 kits: [interior, town]
+music: shop
 ground: |
   WWWWWWWWWW
   WFFFFFFFFW

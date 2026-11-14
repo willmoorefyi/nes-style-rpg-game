@@ -75,6 +75,13 @@ describe('schemaValidation', () => {
       expect(() => validateMapData({ ...validMap, entrances: { gate: ['a', 1] } })).toThrow(/gate\[0\]/);
     });
 
+    it('validates noWander as a list of [x, y] pairs', () => {
+      expect(() => validateMapData({ ...validMap, noWander: [[1, 1], [2, 1]] })).not.toThrow();
+      expect(() => validateMapData({ ...validMap, noWander: { a: [1, 1] } })).toThrow(/MapData.noWander/);
+      expect(() => validateMapData({ ...validMap, noWander: [[1]] })).toThrow(/noWander\[0\]: expected \[x, y\]/);
+      expect(() => validateMapData({ ...validMap, noWander: [[1, 'b']] })).toThrow(/noWander\[0\]\[1\]/);
+    });
+
     it('validates baked art chunk lists against the map size', () => {
       const art = { tile: 48, chunk: 16, below: ['b.png'], above: [null] };
       expect(() => validateMapData({ ...validMap, art })).not.toThrow();

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Container } from 'pixi.js';
-import { Camera } from '../../src/rendering/Camera.js';
+import { Camera, TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT } from '../../src/rendering/Camera.js';
 
 describe('Camera', () => {
   let container: Container;
@@ -108,5 +108,48 @@ describe('Camera', () => {
     camera.update();
     expect(camera.x).toBe(180);
     expect(camera.y).toBe(135);
+  });
+});
+
+describe('Camera on maps smaller than the viewport (IN-2)', () => {
+  it('centres a 10x8 room on both axes', () => {
+    const container = new Container();
+    const camera = new Camera(container);
+    camera.setMapBounds(10, 8);
+    camera.follow({ x: 5 * TILE_SIZE, y: 4 * TILE_SIZE });
+    camera.update();
+    expect(container.x).toBe((VIEWPORT_WIDTH - 10 * TILE_SIZE) / 2);
+    expect(container.y).toBe((VIEWPORT_HEIGHT - 8 * TILE_SIZE) / 2);
+    // the room stays centred wherever the hero walks inside it
+    camera.follow({ x: 0, y: 0 });
+    camera.update();
+    expect(container.x).toBe((VIEWPORT_WIDTH - 10 * TILE_SIZE) / 2);
+    camera.setPosition(9999, 9999);
+    expect(container.y).toBe((VIEWPORT_HEIGHT - 8 * TILE_SIZE) / 2);
+  });
+
+  it('centres the 16x13 tower on each axis that is smaller than the viewport', () => {
+    const container = new Container();
+    const camera = new Camera(container);
+    camera.setMapBounds(16, 13);
+    camera.follow({ x: 8 * TILE_SIZE, y: 12 * TILE_SIZE });
+    camera.update();
+    const w = 16 * TILE_SIZE;
+    const h = 13 * TILE_SIZE;
+    const followY = Math.max(0, Math.min(12 * TILE_SIZE - VIEWPORT_HEIGHT / 2, h - VIEWPORT_HEIGHT));
+    // (+ 0 folds -0 into 0) at 48 px tiles both axes are short; at 96 px only the width is
+    expect(container.x + 0).toBe(w < VIEWPORT_WIDTH ? (VIEWPORT_WIDTH - w) / 2 : 0);
+    expect(container.y + 0).toBe(h < VIEWPORT_HEIGHT ? (VIEWPORT_HEIGHT - h) / 2 : -followY);
+  });
+
+  it('centres only the short axis of a wide, low map', () => {
+    const container = new Container();
+    const camera = new Camera(container);
+    const wide = Math.ceil(VIEWPORT_WIDTH / TILE_SIZE) + 10;
+    camera.setMapBounds(wide, 4);
+    camera.follow({ x: wide * TILE_SIZE, y: 0 });
+    camera.update();
+    expect(camera.x).toBe(wide * TILE_SIZE - VIEWPORT_WIDTH);   // scrolls and clamps as before
+    expect(container.y).toBe((VIEWPORT_HEIGHT - 4 * TILE_SIZE) / 2);
   });
 });

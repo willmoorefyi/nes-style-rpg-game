@@ -1,6 +1,7 @@
 id: cornelia-item-shop
 width: 8
 height: 6
+music: shop
 layers:
   - - 2
     - 2
