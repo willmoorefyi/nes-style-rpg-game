@@ -29,7 +29,7 @@ def build() -> list[Path]:
     r.thing("barrel", 9, 7)
     keeper(r, "weapon-shop", "merchant", 2, 4, "Welcome to the Weapon Shop!", "cornelia_weapon")
     out.append(r.save("The weapon shop: an L-shaped counter round the keeper's corner, racks of blades behind it.",
-                          {"floor": wood(0.9), "in_wall_face": {"from": "castle_face", "shade": 0.85}}, music=SHOP))
+                      {"floor": wood(0.9), "in_wall_face": {"from": "castle_face", "shade": 0.85}}, music=SHOP))
 
     # armor shop: a counter across the back, stands on display in the middle of the floor
     r = shop("cornelia-armor-shop", "Armor Shop", 10, 9, [4, 5], "armor_shop")
@@ -50,7 +50,7 @@ def build() -> list[Path]:
     r.thing("crate", 8, 7)
     keeper(r, "armor-shop", "merchant", 4, 3, "Welcome to the Armor Shop!", "cornelia_armor")
     out.append(r.save("The armor shop: a counter across the back and armour stands on the shop floor.",
-                          {"floor_stone": "floor_stone", "floor": wood(1.0), "in_wall_face": STONE_FACE}, music=SHOP))
+                      {"floor_stone": "floor_stone", "floor": wood(1.0), "in_wall_face": STONE_FACE}, music=SHOP))
 
     # item shop: a short counter in front of shelves of potions, barrels and crates by the door
     r = shop("cornelia-item-shop", "Item Shop", 9, 8, [4], "item_shop")
@@ -71,7 +71,7 @@ def build() -> list[Path]:
     out.append(r.save("The item shop: a short counter before shelves of potions.", {"floor": wood(1.1)}, music=SHOP))
 
     # white magic: the counter guards an alcove of white orbs under an arched window
-    r = shop("cornelia-white-magic", "White Magic", 10, 9, [4, 5], "white_magic")
+    r = shop("cornelia-white-magic", "White Magic Shop", 10, 9, [4, 5], "white_magic")
     g = r.g
     g.carve(1, 4, 8, 7, "-")
     g.carve(3, 3, 6, 3, "-")                     # the orb alcove
@@ -87,12 +87,13 @@ def build() -> list[Path]:
     r.one("plant", 8, 4)
     r.one("plant", 1, 7)
     r.one("plant", 8, 7)
-    keeper(r, "white-magic", "mage", 4, 4, "Welcome to the White Magic!", "cornelia_white")
+    keeper(r, "white-magic", "mage", 4, 4,
+           "Welcome to the White Magic Shop! Healing arts, for those with the gift.", "cornelia_white")
     out.append(r.save("The white magic shop: a counter before an alcove of white orbs.",
-                          {"floor_stone": "marble", "in_wall_face": STONE_FACE}, [200, 210, 230], music=SHOP))
+                      {"floor_stone": "marble", "in_wall_face": STONE_FACE}, [200, 210, 230], music=SHOP))
 
     # black magic: a dark room, the counter on the east, black orbs in a west niche
-    r = shop("cornelia-black-magic", "Black Magic", 11, 9, [6], "black_magic")
+    r = shop("cornelia-black-magic", "Black Magic Shop", 11, 9, [6], "black_magic")
     g = r.g
     g.carve(3, 3, 9, 7, "-")
     g.carve(1, 4, 2, 6, "-")                     # the orb niche
@@ -109,11 +110,12 @@ def build() -> list[Path]:
     r.tall("bookshelf", 3, 3)
     r.one("desk", 9, 3)
     r.thing("crate", 9, 7)
-    keeper(r, "black-magic", "mage", 7, 3, "Welcome to the Black Magic!", "cornelia_black")
+    keeper(r, "black-magic", "mage", 7, 3,
+           "Welcome to the Black Magic Shop! Destructive arts, for those with the nerve.", "cornelia_black")
     out.append(r.save("The black magic shop: a dark room, a counter on the east side and black orbs in a niche.",
-                          {"floor_stone": "floor_stone", "floor": wood(0.7),
-                           "in_wall_face": {"from": "castle_face", "shade": 0.5}, "in_wall_top": SLATE_TOP},
-                          [120, 60, 160], music=SHOP))
+                      {"floor_stone": "floor_stone", "floor": wood(0.7),
+                       "in_wall_face": {"from": "castle_face", "shade": 0.5}, "in_wall_top": SLATE_TOP},
+                      [120, 60, 160], music=SHOP))
 
     # inn: a front room with the counter, and a back room of beds through a doorway
     r = shop("cornelia-inn", "Inn", 12, 11, [6], "inn")
@@ -139,5 +141,5 @@ def build() -> list[Path]:
     r.thing("barrel", 1, 9)
     keeper(r, "inn", "innkeeper", 2, 7, "Welcome to the Inn!", "cornelia_inn")
     out.append(r.save("The inn: a front counter, and a back room of beds through a doorway.",
-                          {"floor": wood(0.95)}, music=SHOP))
+                      {"floor": wood(0.95)}, music=SHOP))
     return out

@@ -39,8 +39,8 @@ def build() -> list[Path]:
                   "All four have dimmed. My instruments show it plainly.",
                   "Each of you carries an orb, dark as the crystals now. When a crystal wakes, its orb shines again."]}])
     out.append(r.save("A scholar's study: bookshelves, writing desks, a tapestry and a reading alcove.",
-                          {"floor": wood(0.8), "in_wall_face": {"from": "castle_face", "shade": 0.8}},
-                          [70, 110, 190]))
+                      {"floor": wood(0.8), "in_wall_face": {"from": "castle_face", "shade": 0.8}},
+                      [70, 110, 190]))
 
     # (52,37) green / white: the fisher's cottage, one room
     r = house("fisher", "Fisher's Cottage", 9, 8, [4])
@@ -87,7 +87,7 @@ def build() -> list[Path]:
                   "If you're heading out, travel together. They pick off stragglers.",
                   "There's an antidote in the chest by the door. Take it, take it."]}])
     out.append(r.save("The farmhouse by the crops: an earth floor, a hearth, sacks and crates in the store.",
-                          {"floor_stone": "dirt", "in_wall_face": {"from": "castle_face", "shade": 0.95}}))
+                      {"floor_stone": "dirt", "in_wall_face": {"from": "castle_face", "shade": 0.95}}))
 
     # (44,56) slate / white, 2 storeys: the retired knight's house, a hall and an armoury through an inner door
     r = house("knight", "Retired Knight's House", 13, 9, [4])
@@ -121,8 +121,8 @@ def build() -> list[Path]:
                   "He fights with great two-handed sweeps. Strike when the blade is still coming round.",
                   "Take what is in the chest in my armoury. An old man has no use for it now."]}])
     out.append(r.save("A retired knight's house: a hall with a hearth and tapestries, and an armoury beyond an inner door.",
-                          {"floor_stone": "floor_stone", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
-                          [190, 196, 206]))
+                      {"floor_stone": "floor_stone", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
+                      [190, 196, 206]))
 
     # (50,56) brown / rose: the weaver's shop-home, carpets laid out for sale
     r = house("weaver", "Weaver's House", 12, 8, [6])
@@ -147,5 +147,5 @@ def build() -> list[Path]:
         "Every rug in this room took me a season. That blue one took two.",
         "Garland bought a cloak from me once. Paid in full, and polite as a prince. I can't believe what they say."])
     out.append(r.save("The weaver's shop-home: rugs laid out on the floor, hangings on every wall.",
-                          {"floor": wood(0.95)}, [150, 60, 110]))
+                      {"floor": wood(0.95)}, [150, 60, 110]))
     return out

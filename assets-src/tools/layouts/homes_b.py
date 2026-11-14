@@ -33,7 +33,7 @@ def build() -> list[Path]:
         "Seedlings for the castle gardens. The princess chose every one herself.",
         "If you sleep out under the stars, a tent keeps the dew off. There's one in the chest. Go on."])
     out.append(r.save("The gardener's lodge by the castle gardens: a potting floor with seed racks, plants and flowers.",
-                          {"floor": wood(1.1)}))
+                      {"floor": wood(1.1)}))
 
     # (14,63) red / white: a family home, a living room and a bedroom joined by an inner door
     r = house("family", "Family Home", 13, 10, [3])
@@ -65,7 +65,7 @@ def build() -> list[Path]:
         "In my day the bridge to the north was always open. Ships came in, too, from the east.",
         "Mind you rest at the inn before a long road. Hurt is easier to mend than to carry."])
     out.append(r.save("A family home: a living room with a hearth and a bedroom beyond an inner door.",
-                          {"floor": wood(0.9)}, [200, 160, 70]))
+                      {"floor": wood(0.9)}, [200, 160, 70]))
 
     # (6,41) teal / plaster: the apprentice mage's room, orbs in a niche
     r = house("apprentice", "Apprentice's Room", 9, 9, [4])
@@ -89,8 +89,8 @@ def build() -> list[Path]:
         "A spell isn't cast from nothing. Each level has its own charges, and sleep restores them.",
         "Spend the strong ones on the strong foes. And an ether brings charges back, too. I keep one for emergencies."])
     out.append(r.save("An apprentice mage's room: a niche of orbs, potion shelves and a bookshelf.",
-                          {"floor": wood(0.85), "in_wall_face": {"from": "castle_face", "shade": 0.6},
-                           "in_wall_top": SLATE_TOP}, [90, 170, 170]))
+                      {"floor": wood(0.85), "in_wall_face": {"from": "castle_face", "shade": 0.6},
+                       "in_wall_top": SLATE_TOP}, [90, 170, 170]))
 
     # (46,60) blue / ochre: the tavern, a bar along the west wall, banquet tables and a hearth
     r = house("tavern", "The Crystal Tankard", 14, 10, [6, 7])
@@ -126,7 +126,7 @@ def build() -> list[Path]:
         {"text": ["Off duty. Don't tell the captain.",
                   "Garland's men say the temple to the north-west is crawling with wolves and worse."]}])
     out.append(r.save("The tavern: a bar with a barkeep behind it, banquet tables, barrels and a hearth.",
-                          {"floor": wood(0.7)}))
+                      {"floor": wood(0.7)}))
 
     # (35,62) red / stone, 2 storeys: the wayside shrine, a runner between pillars to a statue
     r = house("shrine", "Wayside Shrine", 11, 10, [5])
@@ -152,6 +152,6 @@ def build() -> list[Path]:
         "Rest here a moment, travellers. The light keeps no one waiting.",
         "Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down will do."])
     out.append(r.save("A wayside shrine: a runner between pillars to a statue, torches and a priestess.",
-                          {"floor_stone": "marble", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
-                          [214, 170, 64]))
+                      {"floor_stone": "marble", "in_wall_face": STONE_FACE, "in_wall_top": SLATE_TOP},
+                      [214, 170, 64]))
     return out

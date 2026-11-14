@@ -2,7 +2,7 @@
 # The white magic shop: a counter before an alcove of white orbs.
 # legend: W wall top  F wall face  _ wood floor  - stone / earth floor  + carpet  c counter
 id: cornelia-white-magic
-name: White Magic
+name: White Magic Shop
 kits:
 - interior
 - town
@@ -74,7 +74,7 @@ npcs:
   x: 4
   y: 4
   sprite: mage
-  dialog: [Welcome to the White Magic!]
+  dialog: ['Welcome to the White Magic Shop! Healing arts, for those with the gift.']
   shopId: cornelia_white
 transitions:
 - {x: 4, y: 8, targetMap: cornelia, targetEntrance: white_magic}

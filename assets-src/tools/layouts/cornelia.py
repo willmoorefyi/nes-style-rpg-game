@@ -235,7 +235,16 @@ obj(type="bench", x=53, y=59)
 for (x, y) in [(53, 50), (54, 50), (53, 52), (54, 52), (52, 58), (53, 58)]:
     obj(type="flowers", x=x, y=y)
 LANE_ENDS = [[7, 22], [54, 16], [54, 51], [53, 59]]   # the orchard well, the quiet garden's bench, the two gardens
-obj(type="signpost", x=CX + 2, y=66)
+SIGNPOST = (CX + 2, 66)                          # by the south gate, east of the high street
+obj(type="signpost", x=SIGNPOST[0], y=SIGNPOST[1])
+# CT-9: what the signpost says (checked against the layout: the high street runs north from the south gate past the
+# inn lane (y 60, west side) and the market square (y 38-48) to the castle; the magic shops stand south of the west
+# road (y 44-45), down the lane at x 9-10)
+INSPECT = [{"x": SIGNPOST[0], "y": SIGNPOST[1], "text": [
+    "The sign reads: \"CORNELIA, the royal city.\"",
+    "North, up the high street: the Inn (first lane on the left), then the Market Square, and the Castle at the top.",
+    "Magic Quarter: from the Market Square, west along the road, then south down the lane.",
+]}]
 
 # ── backdrop: woods behind the castle and outside the walls; turrets on the wall's bends ──
 for x in list(range(13, 23, 3)) + list(range(39, 49, 3)):
@@ -270,12 +279,23 @@ npcs = [
      "dialog": [{"condition": "INTRO_COMPLETE", "text": ["They say the King's builders are mending the bridge to the north.",
                                                          "Seek the four crystals across the land."]},
                 {"text": ["The four crystals have gone dark.", "Only the Warriors of Light can restore them."]}]},
-    {"id": "villager", "sprite": "villager", "x": 34, "y": 45, "wander": True,
+    {"id": "villager", "sprite": "burgher", "x": 34, "y": 45, "wander": True,
      "dialog": ["Buy spells early. Garland is no easy foe!"]},
-    {"id": "market_vendor_w", "sprite": "merchant", "x": 24, "y": 41,
-     "dialog": ["Fresh apples from the royal orchard!", "...Sorry, these are not for adventurers."]},
-    {"id": "market_vendor_e", "sprite": "merchant", "x": 37, "y": 41,
-     "dialog": ["Bread and cheese, the finest in Cornelia!"]},
+    # UI-2: the market vendors are townsfolk (the merchant sprite is kept for keepers with a shop), and they chat
+    {"id": "market_vendor_w", "sprite": "vendor_f", "x": 24, "y": 41,
+     "dialog": [{"condition": "PRINCESS_RESCUED",
+                 "text": ["Apples from the royal orchard! Half price today, for the princess is home.",
+                          "They say the King has builders out at the north bridge. Trade will come back, you'll see."]},
+                {"text": ["Apples from the royal orchard! Dear this week, I'm sorry to say.",
+                          "The carters won't use the roads. Wolves, right up to the walls, and in daylight too.",
+                          "Since the princess was taken, nobody has the heart to haggle."]}]},
+    {"id": "market_vendor_e", "sprite": "farmer", "x": 37, "y": 41,
+     "dialog": [{"condition": "PRINCESS_RESCUED",
+                 "text": ["Bread and cheese, the finest in Cornelia! Folk are buying again, now Her Highness is safe.",
+                          "Once the north bridge is mended I'll take my cheeses across. They fetch double over there."]},
+                {"text": ["Bread and cheese, the finest in Cornelia!",
+                          "With the north bridge broken, nothing comes in from across the water. Flour costs a fortune.",
+                          "And with the princess gone, who has an appetite?"]}]},
     {"id": "townswoman", "sprite": "villager_f", "x": 44, "y": 49, "wander": True,
      "dialog": ["The river runs right through the city.", "My grandmother says it once flooded the market square!"]},
     {"id": "gardener", "sprite": "villager", "x": 5, "y": 23, "wander": True,
@@ -305,6 +325,7 @@ doc = {
     "noWander": [[x, y] for x in range(8, 12) for y in range(17, 26)],
     "objects": objects,
     "npcs": npcs,
+    "inspect": INSPECT,
     # CT-6 / CT-7: every walkable edge cell leaves town; the castle precinct's side of the east edge (and its east
     # gate, (61, 24-25)) comes out north of the city icon, like the north edge and the postern
     "edge_exits": {"north": {"targetMap": OUT, "targetEntrance": "cornelia_north"},
