@@ -158,3 +158,26 @@ def run_generator(check: Callable[[bool, str], None]) -> None:
           "D8: the dagger is carried into hurt_in2, partly hidden behind the torso")
     check(len(one) == 8, f"a rigged monster gets 8 generated frames ({sorted(one)})")
     check(C.frame_hash(one["atk_mid"][0]) == C.frame_hash(two["atk_mid"][0]), "frame hashes are stable")
+    run_child_resolve(check)
+
+
+def run_child_resolve(check: Callable[[bool, str], None]) -> None:
+    """rig.solve: a child joint (a toe) follows its pinned / ground-clamped / IK-moved parent instead of keeping the
+    position it was solved at before the pins (or getting the body offset its pinned foot did not get)."""
+    import math
+    from gen import rig as R
+    from gen import selftest_rig as SR
+    toe = lambda kf, dx: {**kf, "toe_n": (kf["foot_n"][0] + dx, kf["foot_n"][1])}
+    S, T = toe(SR.IDLE, 5), toe({**SR.ATTACK, "foot_n": (52, 70), "knee_n": (50, 58)}, 5)
+    cfg = {**SR.RIG, "keyframes": {"idle": S, "attack": T, "hurt": SR.HURT},
+           "parts": {**SR.RIG["parts"], "ft_n": {"bone": ["foot_n", "toe_n"], "radius": 3.0}}}
+    rig = R.Rig(cfg, (80, 80))
+    J = R.solve(rig, S, T, 0.35, "all", ["foot_n"])
+    d = math.hypot(J["toe_n"][0] - J["foot_n"][0], J["toe_n"][1] - J["foot_n"][1])
+    check(abs(d - 5) <= 1, f"a pinned foot's toe stays attached ({J['foot_n']} -> {J['toe_n']}, length {d:.1f}, source 5)")
+    J = R.solve(rig, S, S, 0.0, ["crown"], list(R.LEGS), body_dy=2)
+    check(J["toe_n"] == S["toe_n"], f"body offset: the toe of a pinned foot is not shifted ({J['toe_n']} vs {S['toe_n']})")
+    J = R.solve(rig, S, S, 0.0, [], [], tweaks={"foot_n": [4, 4]})          # pushed below the ground line
+    d = math.hypot(J["toe_n"][0] - J["foot_n"][0], J["toe_n"][1] - J["foot_n"][1])
+    check(abs(d - 5) <= 1 and J["foot_n"][1] <= S["foot_n"][1],
+          f"a ground-clamped foot (IK) carries its toe ({J['foot_n']} -> {J['toe_n']}, length {d:.1f})")

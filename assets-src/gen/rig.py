@@ -185,9 +185,10 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
         if j in moves and j in T and p in T:
             a += _wrap(_ang(T[p], T[j]) - a) * u
         out[j] = (out[p][0] + L * math.cos(a), out[p][1] + L * math.sin(a))
-    for j in pins:
-        if j in S:
-            out[j] = S[j]
+    base = dict(out)
+    fixed = {j for j in pins if j in S}                    # joints placed absolutely after the tree solve
+    for j in fixed:
+        out[j] = S[j]
     if body_dy:
         out = {j: (v[0], v[1] + body_dy) if j not in pins and j not in LEGS else v for j, v in out.items()}
     for j, dv in (tweaks or {}).items():
@@ -200,6 +201,14 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
             continue
         if f in pins or out[f][1] > ground:              # keep the shin's length to a held / grounded foot
             out[k], out[f] = _ik(out[h], (out[f][0], min(out[f][1], ground)), S[h], S[k], S[f])
+            fixed |= {k, f}
+    follow: set[str] = set()                               # children (e.g. toes) of pinned / IK-moved joints keep
+    for j in rig.order:                                    # their solved offset from the parent (plus own tweak)
+        p = rig.parent.get(j)
+        if j in out and j not in fixed and p in out and (p in fixed or p in follow):
+            tw = (tweaks or {}).get(j, (0, 0))
+            out[j] = (out[p][0] + base[j][0] - base[p][0] + tw[0], out[p][1] + base[j][1] - base[p][1] + tw[1])
+            follow.add(j)
     return {j: (float(np.rint(v[0])), float(np.rint(v[1]))) for j, v in out.items()}
 
 

@@ -75,22 +75,27 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
-  atk_wind1: {pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
-  atk_wind2: {pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
-  atk_recover: {t: 0.22, pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]}
-  atk_mid:
-    t: 0.32
-    pins: [hip_n, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
-    tweaks: {knee_n: [2, 0], foot_n: [2, 0], toe_n: [2, 0], knee_f: [5, 0], foot_f: [5, 0], toe_f: [5, 0]}
-    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, tip, sh_f, el_f, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
-  atk_follow: {t: 1.10, pins: [foot_n, foot_f, toe_n, toe_f], tweaks: {hand_n: [-2, 1], tip: [-2, 1]}}
-  hurt_in1:
+  atk_wind1:                   # half of wind2: arm starting back, head leaning back
+    tweaks: {crown: [-1, 0], sh_n: [-1, 0], el_n: [-2, 0], hand_n: [-3, 0]}
+  atk_wind2:                   # striking arm pulled back behind the body (z idle: near arm behind torso), head and torso lean back
+    tweaks: {crown: [-2, 0], neck: [-1, 0], chest: [-1, 0], sh_n: [-3, -1], el_n: [-4, -1], hand_n: [-6, -1]}
+  atk_mid:                     # both feet must travel ~1/3 of the way back (feet lerp check): legs shifted, not rotated;
+    t: 0.32                    # head and forearm keep their attack angles (no rotation stair-steps / forearm stretch)
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {knee_n: [2, 0], foot_n: [2, 0], knee_f: [5, 0], foot_f: [5, 0]}
+    moves: [neck, chest, hip, sh_n, el_n, sh_f, el_f, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow: {t: 1.10, tweaks: {hand_n: [-2, 1], tip: [-2, 1]}}
+  atk_recover:                 # idle fist and forearm kept (only the upper arm reaches forward)
+    t: 0.22
+    moves: [crown, chest, sh_n, el_n]
+  hurt_in1:                    # flinch: head and torso tilt back, guard arms start to lift
     moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, sh_f, hip_n, knee_n, hip_f, knee_f]
-    tweaks: {el_f: [0, -3]}
-    pins: [foot_n, foot_f, toe_n, toe_f]
-  hurt_in2:
+    tweaks: {crown: [-3, 1], neck: [-1, 1], chest: [-1, 1], el_n: [0, -1], hand_n: [-1, -3], el_f: [0, -3], hand_f: [0, -3]}
+  hurt_in2:                    # thrown arm at shoulder height
     moves: [crown, neck, chest, hip, sh_f, el_f, hip_n, knee_n, hip_f, knee_f]
-    pins: [foot_n, foot_f, toe_n, toe_f]
+    tweaks: {el_f: [0, 1], hand_f: [1, 4]}
+z:
+  idle: [uarm_f, farm_f, thigh_f, shin_f, uarm_n, farm_n, torso, thigh_n, shin_n, head, dagger, ft_n, ft_f]
 masks:
   head:
     hurt: [[15, 12], [42, 12], [42, 22], [31, 22], [24, 21], [16, 20]]
@@ -105,6 +110,6 @@ masks:
     attack: [[0, 71], [18, 71], [18, 78], [0, 78]]
     hurt: [[20, 71], [39, 71], [39, 78], [20, 78]]
 holds: []
-paint:                       # 1 px joint cracks between the skirt / near thigh / near elbow, closed with outline ink
+paint:                       # 1 px joint cracks (skirt / near thigh, near elbow), closed with outline ink
   - {frame: atk_wind1, xy: [[44, 64]], rgb: [6, 4, 10]}
-  - {frame: hurt_in1, xy: [[49, 48], [44, 63]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[48, 47]], rgb: [6, 4, 10]}
