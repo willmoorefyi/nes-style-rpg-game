@@ -169,6 +169,10 @@ paint:
   - {frame: atk_mid, xy: [[89, 137], [89, 141]], rgb: [6, 4, 10]}
   - {frame: atk_follow, xy: [[129, 138], [130, 138]], rgb: [6, 4, 10]}
   - {frame: atk_follow, xy: [[120, 161], [121, 161]], rgb: [6, 4, 10]}
+  # V.1 follow-up: cracks in the cape's lower outline (a diagonal run in atk_follow, a small one in atk_mid) and
+  # a 1 px hole beside the sword in atk_follow
+  - {frame: atk_follow, xy: [[56, 118], [57, 119], [58, 120], [59, 121], [60, 122], [61, 122], [122, 162]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[58, 112], [60, 112], [59, 113], [60, 113]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[129, 134], [130, 134], [131, 134]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[136, 137], [137, 137], [137, 138], [138, 138], [139, 138], [140, 138], [139, 139]], rgb: [6, 4, 10]}
   - {frame: hurt_in1, xy: [[86, 55], [85, 56], [86, 56], [85, 57], [85, 58], [85, 59], [85, 60]], rgb: [6, 4, 10]}
