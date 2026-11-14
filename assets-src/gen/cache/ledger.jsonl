@@ -197,3 +197,5 @@
 {"event": "result", "key": "2b119549410186ccfeaadeef", "ok": true}
 {"event": "attempt", "ts": "2026-11-14T04:47:26", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vendor_f", "sheet": "field", "seed": 1234, "key": "c0b04dee287999463b761f24"}
 {"event": "result", "key": "c0b04dee287999463b761f24", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:49:05", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "farmer", "sheet": "field", "seed": 1234, "key": "667c4c0c244265344a924b4b"}
+{"event": "result", "key": "667c4c0c244265344a924b4b", "ok": true}
