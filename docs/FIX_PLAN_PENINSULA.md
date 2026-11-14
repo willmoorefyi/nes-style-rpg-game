@@ -2227,6 +2227,52 @@ All 17 momus issues apply. Resolutions:
 
 ---
 
+### T5 result
+
+**Commits:**
+
+| Part | Commit | Scope |
+|---|---|---|
+| T5a | `bb3a84d` | ST-6, BA-3, BA-4, BA-5, BA-7, MS-8 (effects and docs) |
+| T5b | `14b480d` | NG-9, BA-13, IN-6, IN-3 (HUD fallback), MS-5, MS-8 (camp runtime), the `t5_*` scenarios |
+| T5c | `7bef182` | the Cornelia unreachable cells, CT-4, CT-10, ST-9, ST-10, IN-3 (names), `camp` data |
+| T5d | `32ba358` | CA-1 (walkable row, black corner), TF-2 (contrast check), the temple name |
+
+Integration: the temple-name exemption is removed, and a full layout and map rebuild is clean (`ee0b656`).
+
+**Review fixes (momus):**
+- Phoenix Down with nobody fallen now says "No one to revive." (test added).
+- `AGENTS.md` now records `Scene.transparent`, `MapData.name` and `MapData.camp`, the debug-scenario `hp`, and the monitored oversize files.
+
+**Validation:**
+- 1927 tests pass; `tests/balance/*` is unchanged and green.
+- `build_map --selftest` passes 94 checks; `--check-determinism` passes on every map; `gen/selftest` passes.
+- Momus ran the changed tests against `mainline` code, and 54 of them fail there.
+
+**Browser checks** (all with `?mute=1`):
+- **Title:** a same-frame synthetic Enter tap opens party creation (NG-9).
+- **`scenario=t5_battle_items`:**
+  - battle items list only potion and phoenix_down (BA-4);
+  - Phoenix Down targets the fallen W.MAG, "W.MAG was revived", HP 1, one used (BA-5).
+
+  A queued item that never acts, because the battle ended first, is FF1-normal.
+- **`scenario=t5_cornelia_field`:**
+  - `canCamp()` is false in Cornelia (MS-8);
+  - the inn with 0 G shows "You don't have enough gold." over the visible room, and the HUD shows 0G (IN-6).
+- **`scenario=t5_castle`:** the arrival is just above the stair row, and the stair top row is the transition (CA-1).
+- **`scenario=act1_temple`:** the name is "Temple of Fiends". The wall tops are darker than the floor but stay textured and distinct from the void (TF-2, momus item 5).
+- **Console:** 0 errors.
+
+**Accepted deviations:**
+- the House row is removed from the design doc;
+- the oak is swapped for a fir at (53,5);
+- the treasury guard's second line changed;
+- the temple shading is wall 0.35 and floor 1.3;
+- the shop gold window is 696 px wide;
+- the debug-scenario `hp` field.
+
+**Note:** debug scenario `ai_boss_cast` now logs one expected `console.warn` when the Lich drops below half HP: `bossPhases` with an AI but no known pattern id. This is planned behaviour, not a regression.
+
 ## Final phase (after T6): second adversarial pass (requested by the user, 2026-11-14)
 
 1. **Start from New Game** and run a full adversarial playtest of the introduction: Cornelia, the overworld, the Temple of Fiends, Garland, the princess rescue, and returning her to the King. Probe edge cases and anything awkward or unusual to a modern RPG player.

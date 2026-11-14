@@ -33,7 +33,7 @@ A Final Fantasy I (1987) homage built with PixiJS 8 + TypeScript 5.3 + Vite 5. T
 2. **Injectable RNG** — `EncounterRng` and battle systems accept RNG functions for deterministic testing.
 3. **EventBus** — Loose coupling between systems. Audio reacts to game events, not direct calls.
 4. **Data-driven content** — All game content (items, spells, enemies, classes, shops, maps) loaded from YAML at runtime via `DataLoader`.
-5. **Scene stack** — Push/pop architecture with `onPause()`/`onResume()` lifecycle hooks for layered UI.
+5. **Scene stack** — Push/pop architecture with `onPause()`/`onResume()` lifecycle hooks for layered UI. A scene with `transparent = true` (the inn) leaves the scene below it visible when pushed.
 6. **Lazy scene loading** — `SceneManager.registerLazy()` with dynamic `import()` and factory caching. Only `TitleScene` is eagerly loaded; 10 other scenes are lazy-loaded, reducing the main bundle from 551KB to 430KB (−22%).
 
 ### Directory Map
@@ -74,7 +74,7 @@ All shared types live in `src/types/index.ts`. Key ones:
 - `EnemyData` / `EnemyInstance` — enemy definitions and battle instances
 - `SpellData` — spell definitions (level, type, effect, targeting, element)
 - `ItemData` — items (weapons, armor, consumables, key items)
-- `MapData` — tile maps with layers, NPCs, transitions, encounters
+- `MapData` — tile maps with layers, NPCs, transitions, encounters (`encounters`, `encounterZones`), `inspect` cells, `name` (the HUD label; no label when missing) and `camp` (Tent/Cabin allowed; world map only)
 - `BattleSceneDeps` — decoupled battle scene dependencies
 - `BattleCommand` — fight/magic/item/run commands
 - `ElementalProfile` — per-enemy elemental weaknesses and resistances
@@ -115,7 +115,7 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- `BattleStateMachine.ts` (~426 lines) is a known exception being monitored.
+- Known exceptions being monitored: `BattleStateMachine.ts`, `BattleScene.ts`, `ExplorationScene.ts`, `ShopScene.ts` (~330 lines; the detail panel is the split candidate), `Character.ts`, and the Python `layouts/overworld.py`, `layouts/interiors.py` and `map_checks.py`.
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
 
 ---
@@ -366,6 +366,7 @@ The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads 
     - class: warrior        # class ID from classes.yaml
       name: KNIGHT
       level: 10
+      hp: 40                # optional: start hurt (0 = fallen)
       equipment: [mythril_sword, iron_armor, iron_shield, iron_helm]
       spells: []
     - class: white_mage
@@ -402,7 +403,7 @@ The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads 
 
 2. **Data file mismatches** — If you add an item to a shop but forget to add it to `items.yaml`, the game breaks at runtime. Always run `npm test` after editing data files.
 
-3. **Scene stack lifecycle** — When pushing a scene, the previous scene's `onPause()` fires. When popping, `onResume()` fires. Forgetting to implement these causes bugs like encounters not pausing during menus.
+3. **Scene stack lifecycle** — When pushing a scene, the previous scene's `onPause()` fires (and it is hidden unless the pushed scene is `transparent`). When popping, `onResume()` fires. Forgetting to implement these causes bugs like encounters not pausing during menus.
 
 4. **PixiJS in tests** — Battle logic (`src/battle/`) has zero PixiJS dependencies by design. Keep it that way. Scene tests mock the rendering layer.
 

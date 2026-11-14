@@ -404,7 +404,12 @@ export class BattleScene implements Scene {
         this.uiState = 'command';
       },
       onNeedTarget: (itemId) => {
-        // BA-5: a revive item (Phoenix Down) targets the fallen
+        // BA-5: a revive item (Phoenix Down) targets the fallen; with nobody fallen, say so instead of a silent cancel
+        if (ItemEffects.isReviveItem(itemId) && !this.config.party.some((c) => c.currentHp <= 0)) {
+          this.cleanupItemUI();
+          this.showNotice('No one to revive.');
+          return;
+        }
         this.enterFieldTargeting(true, ItemEffects.isReviveItem(itemId), (targetId) => {
           this.battle.submitCommand(createItemCommand(actorId, targetId, itemId));
           this.cleanupItemUI();

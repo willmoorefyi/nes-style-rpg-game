@@ -144,4 +144,21 @@ describe('BattleScene: Phoenix Down from Item (BA-5)', () => {
     expect(inventory.has('tent')).toBe(true);
     submit.mockRestore();
   });
+
+  it('with nobody fallen, Phoenix Down says "No one to revive." instead of silently backing out', () => {
+    const input = createMockInput();
+    const deps = createMockBattleSceneDeps(input);
+    const inventory = new Inventory();
+    inventory.add('phoenix_down');
+    const scene = new BattleScene(deps, { party: [new Character({ name: 'Hero', classData: sturdy })], enemies: [harmless], inventory, rng: () => 0.5 });
+    scene.enter();
+    toCommandMenu(scene, input);
+    tick(scene, input, 'down');
+    tick(scene, input, 'down');
+    tick(scene, input, 'confirm'); // Item
+    tick(scene, input, 'confirm'); // Phoenix Down
+    expect(scene.uiPhase).toBe('notice');
+    expect(scene.messageLine).toBe('No one to revive.');
+    expect(inventory.has('phoenix_down')).toBe(true);
+  });
 });
