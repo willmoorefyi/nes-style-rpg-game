@@ -187,3 +187,17 @@
 {"event": "result", "key": "2961f956111fdd3a6d710a71", "ok": true}
 {"event": "attempt", "ts": "2026-11-13T19:49:11", "backend": "bedrock", "model": "inpaint", "character": "knight", "sheet": "anim_walk_inpaint", "seed": 1234, "key": "3cc52cedf2e29572afa18812"}
 {"event": "result", "key": "3cc52cedf2e29572afa18812", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:38:54", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_grand", "seed": 1234, "key": "0cfb1eeb81dc662e4d578bc0"}
+{"event": "result", "key": "0cfb1eeb81dc662e4d578bc0", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:41:27", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_grand", "seed": 1235, "key": "bc37fe12f510c3914a1a2d6a"}
+{"event": "result", "key": "bc37fe12f510c3914a1a2d6a", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:42:17", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "overworld", "sheet": "kit_grand", "seed": 1236, "key": "b398fc75dc4521f0a2e9f762"}
+{"event": "result", "key": "b398fc75dc4521f0a2e9f762", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:44:33", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "castle", "sheet": "kit_stairs_lib", "seed": 1234, "key": "2b119549410186ccfeaadeef"}
+{"event": "result", "key": "2b119549410186ccfeaadeef", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:47:26", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vendor_f", "sheet": "field", "seed": 1234, "key": "c0b04dee287999463b761f24"}
+{"event": "result", "key": "c0b04dee287999463b761f24", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:49:05", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "farmer", "sheet": "field", "seed": 1234, "key": "667c4c0c244265344a924b4b"}
+{"event": "result", "key": "667c4c0c244265344a924b4b", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T04:49:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "burgher", "sheet": "field", "seed": 1234, "key": "d50e89bf8b2990fcb6becace"}
+{"event": "result", "key": "d50e89bf8b2990fcb6becace", "ok": true}

@@ -490,6 +490,35 @@
         - {name: desk, source: [392, 748, 680, 996], key_border: true, at: [1, 3], tiles: [1, 1], wrap: prop,
            text: "a polished dark wooden writing desk with an open book, a quill and a candle."}
 
+    stairs_lib:
+      # T6-art (CA-1 + CA-7): a top-down stairwell (replaces the oblique stairs_down art) and treasury / library props
+      # Approved first try. Gemini used its own layout, so every piece has a source rect; the stairwell is cropped square
+      # to its kerbs (top edge luma +7 % of marble) and filled to its 2x2; the gold heap's grey floor patch is keyed out.
+      kind: swatches
+      seed: 1234
+      refs: [castle/furnish, castle/props, interior/furniture]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: stairwell, fill: true, fill_ratio: 1.0, source: [94, 85, 402, 393], at: [0, 0], tiles: [2, 2], wrap: prop,
+           parts: [[stairwell_0_0, stairwell_0_1], [stairwell_1_0, stairwell_1_1]],
+           text: "a square stairwell opening in a polished cream marble floor seen from STRAIGHT ABOVE (top-down, not at an angle): pale stone steps descend from the top edge toward the bottom edge, each step a horizontal band, getting darker step by step until the bottom quarter is in deep shadow; a low carved pale stone kerb runs along the left, right and bottom sides; the top edge is open where the first step starts; no side walls visible; it fills the box."}
+        - {name: map_table, source: [536, 26, 1004, 348], at: [2, 0], tiles: [2, 1], wrap: prop, parts: [[map_table_l, map_table_r]],
+           text: "a heavy dark wooden war table seen from the front in three-quarter view, with a large parchment map of a coastline spread on top, two candles and a dagger pinning the map, as wide as the box."}
+        - {name: gold_heap, source: [132, 512, 360, 664], key_border: true, key_tol: 90, at: [2, 1], tiles: [1, 1], wrap: prop,
+           text: "a heap of gold coins with a few red and blue gems on a stone floor."}
+        - {name: crown_cushion, source: [676, 430, 866, 696], at: [3, 1], tiles: [1, 1], wrap: prop,
+           text: "a golden crown resting on a red velvet cushion on a short carved stone pedestal."}
+        - {name: lectern, source: [144, 730, 350, 1018], at: [0, 2], tiles: [1, 1], wrap: prop,
+           text: "a carved dark wooden lectern holding a large open book."}
+        - {name: globe, source: [658, 730, 890, 1018], at: [1, 2], tiles: [1, 1], wrap: prop,
+           text: "a world globe in brass on a wooden stand."}
+
 - id: overworld
   kind: kit
   sheets:
@@ -556,6 +585,28 @@
            parts: [[city_0_0, city_0_1, city_0_2, city_0_3], [city_1_0, city_1_1, city_1_2, city_1_3],
                    [city_2_0, city_2_1, city_2_2, city_2_3], [city_3_0, city_3_1, city_3_2, city_3_3]],
            text: "a world-map icon of a large walled royal city seen from above at a three-quarter angle, filling the whole box: one ring of pale grey stone city walls with small round towers, enclosing a white castle with blue cone-roofed towers in the top half and many small red-roofed houses in the bottom half, a little blue river winding through the town; open arched gateways in the middle of the bottom wall, the middle of the left wall and the middle of the right wall, and a castle gate in the middle of the top wall; nothing outside the walls."}
+    grand:
+      # T6-art (OW-8 + OW-9): the grand temple icon (door centred on the door cell, the bottom-right one) and the
+      # collapsed north-bridge gap (drawn on water, the cells stay water). Approved attempt 3 of 3 (seed 1236): the
+      # bridge gap passes; temple_grand failed review on all three attempts (doorway 11-13 px wide and centred left of
+      # the door cell; FIX_PLAN T6 revision 13), so it is skipped and OW-8 keeps temple_icon (revision 8 fallback).
+      kind: swatches
+      seed: 1236
+      refs: [overworld/landmarks, overworld/city, temple/relics]
+      aspect: "1:1"
+      guide: [1024, 1024]
+      tile_px: 200
+      gap_px: 24
+      margin_px: 56
+      labels: absolute
+      scale: pitch
+      swatches:
+        - {name: temple_grand, skip: true, fill: true, source: [38, 30, 494, 508], at: [0, 0], tiles: [2, 2], wrap: prop,
+           parts: [[temple_grand_0_0, temple_grand_0_1], [temple_grand_1_0, temple_grand_1_1]],
+           text: "a world-map icon of an ancient ruined temple of evil seen from above at a three-quarter angle, as wide as it is tall and filling the whole square box edge to edge: a broad, low, stepped dark grey-blue stone temple on a cracked stone platform that spans the full width of the box. The building is ASYMMETRIC: on the LEFT side a squat stepped tower with a crumbling peaked roof and a short dark spire; the RIGHT side is a low pillared porch with a huge entrance. The entrance is NOT in the middle: a very wide, tall black arched doorway with a faint purple glow at the bottom edge, its left side at about 60 % and its right side at about 90 % of the box width (centred three quarters of the way from the left side, a third of the box wide), with a broken column on each side of it and a small brazier with a purple flame left of it. A little green moss and ivy; nothing outside the platform."}
+        - {name: bridge_gap, source: [528, 46, 980, 508], at: [2, 0], tiles: [2, 2], wrap: prop,
+           parts: [[bridge_gap_0_0, bridge_gap_0_1], [bridge_gap_1_0, bridge_gap_1_1]],
+           text: "the gap in a collapsed wooden bridge seen from straight above, on a plain magenta background: along the top edge and along the bottom edge, the snapped ends of plain mid-brown wooden deck planks (laid top to bottom; the same light mid-brown as a simple wooden bridge deck, about RGB 145, 106, 68, with thin dark brown gaps) stick out with jagged splintered tips and one plank hanging loose; four broken wooden piling stumps stand in the gap; a few loose planks and a coil of rope float in the middle; the middle of the box is empty: do NOT draw any water, sea or frame anywhere; leave flat magenta (#FF00FF) between all the pieces (the game draws its own sea under them)."}
 
 - id: temple
   kind: kit

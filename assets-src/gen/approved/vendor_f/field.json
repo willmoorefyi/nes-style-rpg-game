@@ -1,0 +1,36 @@
+{
+  "character": "vendor_f",
+  "sheet": "field",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "c0b04dee287999463b761f24",
+  "approved": "2026-11-14",
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "flip_frames": {
+    "left": [
+      1,
+      2
+    ]
+  },
+  "note": "T6-art checkpoint 3, attempt 1 of 3; side frames 1-2 were drawn facing right (flip_frames); the back stand frame shows the shawl long (brown), accepted"
+}

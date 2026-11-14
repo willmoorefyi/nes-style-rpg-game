@@ -1,0 +1,77 @@
+{
+  "kit": "castle",
+  "sheet": "kit_stairs_lib",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "2b119549410186ccfeaadeef",
+  "approved": "2026-11-14",
+  "tile": 48,
+  "cells": [
+    [
+      "stairwell_0_0",
+      "stairwell_0_1",
+      "map_table_l",
+      "map_table_r"
+    ],
+    [
+      "stairwell_1_0",
+      "stairwell_1_1",
+      "gold_heap",
+      "crown_cushion"
+    ],
+    [
+      "lectern",
+      "globe",
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "stairwell": [
+        96,
+        96
+      ],
+      "map_table": [
+        71,
+        48
+      ],
+      "gold_heap": [
+        45,
+        29
+      ],
+      "crown_cushion": [
+        34,
+        48
+      ],
+      "lectern": [
+        34,
+        48
+      ],
+      "globe": [
+        37,
+        48
+      ]
+    },
+    "scale": {
+      "stairwell": 1.0,
+      "map_table": 0.8,
+      "gold_heap": 1.0,
+      "crown_cushion": 0.96,
+      "lectern": 0.89,
+      "globe": 0.89
+    },
+    "skipped": [],
+    "pitch_px": 5.12,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "T6-art checkpoint 2, attempt 1 of 3: top-down stairwell (CA-1), map table, gold heap, crown cushion, lectern, globe (CA-7)"
+}

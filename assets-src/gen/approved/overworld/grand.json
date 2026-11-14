@@ -1,0 +1,48 @@
+{
+  "kit": "overworld",
+  "sheet": "kit_grand",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "b398fc75dc4521f0a2e9f762",
+  "approved": "2026-11-14",
+  "tile": 48,
+  "cells": [
+    [
+      null,
+      null,
+      "bridge_gap_0_0",
+      "bridge_gap_0_1"
+    ],
+    [
+      null,
+      null,
+      "bridge_gap_1_0",
+      "bridge_gap_1_1"
+    ]
+  ],
+  "materials": {},
+  "metrics": {
+    "wrap_before": {},
+    "wrap_after": {},
+    "fill": {},
+    "prop_px": {
+      "bridge_gap": [
+        94,
+        96
+      ]
+    },
+    "scale": {
+      "bridge_gap": 0.69
+    },
+    "skipped": [
+      "temple_grand"
+    ],
+    "pitch_px": 3.2,
+    "pass": {
+      "fits": true,
+      "not_tiny": true
+    }
+  },
+  "note": "T6-art checkpoint 1, attempt 3 of 3 (seed 1236): bridge_gap approved (OW-9); temple_grand skipped after failing review on all three attempts (doorway too narrow and not centred on the door cell, revision 13), OW-8 keeps temple_icon (revision 8 fallback)"
+}
