@@ -4,34 +4,40 @@ import type { Game } from '../core/Game.js';
 import type { ExplorationScene } from './ExplorationScene.js';
 import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
-import { TextRenderer } from '../ui/TextRenderer.js';
+import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
+import type { Character } from '../entities/Character.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
+import { isFallen } from '../systems/FieldSpellEffects.js';
 import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type Phase = 'selectItem' | 'selectTarget';
+
+/** A target row: `NAME  HP cur/max  STATUS` (MS-7), so the player sees who needs the item. */
+export function targetLabel(c: Character, nameWidth: number): string {
+  const status = isFallen(c) ? 'KO' : c.statusTracker.getAll().map((s) => s.effect.toUpperCase()).join(' ');
+  const hp = `HP ${String(c.currentHp).padStart(3)}/${String(c.maxHp).padStart(3)}`;
+  return `${c.name.padEnd(nameWidth)}  ${hp}${status ? `  ${status}` : ''}`;
+}
 
 export class ItemMenuScene implements Scene {
   readonly container = new Container();
   private game: Game;
   private itemWindow: Window;
-  private descWindow: Window;
+  private descWindow: HelpWindow;
   private targetWindow: Window;
   private itemMenu!: Menu;
   private targetMenu!: Menu;
-  private descText: TextRenderer;
   private phase: Phase = 'selectItem';
   private selectedItemId = '';
 
   constructor(game: Game) {
     this.game = game;
-    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 700 });
-    this.descWindow = new Window({ x: SCREEN_MARGIN, y: 748, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: 200 });
-    this.targetWindow = new Window({ x: 1200, y: SCREEN_MARGIN, width: 400, height: 300 });
+    // the list ends 24 px above the help bar at the bottom (y 900)
+    this.itemWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: GAME_WIDTH - 2 * SCREEN_MARGIN, height: HELP_RECT.y - 2 * SCREEN_MARGIN });
+    this.descWindow = new HelpWindow();
+    this.targetWindow = new Window({ x: 1000, y: SCREEN_MARGIN, width: 896, height: 300 });
     this.targetWindow.visible = false;
-    this.descText = new TextRenderer({ width: this.descWindow.contentWidth });
-    this.descText.position.set(this.descWindow.contentX, this.descWindow.contentY);
-    this.descWindow.addChild(this.descText);
     this.container.addChild(this.itemWindow, this.descWindow, this.targetWindow);
   }
 
@@ -65,7 +71,9 @@ export class ItemMenuScene implements Scene {
 
   private buildTargetMenu(): void {
     if (this.targetMenu) this.targetWindow.removeChild(this.targetMenu);
-    const items: MenuItem[] = this.game.party.all.map((c, i) => ({ label: c.name, value: String(i) }));
+    const party = this.game.party.all;
+    const nameWidth = Math.max(0, ...party.map((c) => c.name.length));
+    const items: MenuItem[] = party.map((c, i) => ({ label: targetLabel(c, nameWidth), value: String(i) }));
     this.targetMenu = new Menu({
       items,
       x: this.targetWindow.contentX,
@@ -91,9 +99,12 @@ export class ItemMenuScene implements Scene {
 
   exit(): void {}
 
+  /** The help bar's text (the highlighted item's description, or the last result). */
+  get helpText(): string { return this.descWindow.text; }
+
   private updateDescription(): void {
     const item = ItemRegistry.getItem(this.itemMenu.selectedItem.value);
-    this.descText.setText(item ? item.name : '', true);
+    this.descWindow.setText(item?.description ?? '');
   }
 
   private onItemSelect(item: MenuItem): void {
@@ -103,12 +114,12 @@ export class ItemMenuScene implements Scene {
       // MS-8: camping only where the map allows it (FF1: the world map); the item is kept
       const exploration = this.game.scenes.get<ExplorationScene>('exploration');
       if (!(exploration?.canCamp() ?? false)) {
-        this.descText.setText("You can't camp here.", true);
+        this.descWindow.setText("You can't camp here.");
         return;
       }
       const result = ItemEffects.applyPartyItemEffect(item.value, this.game.party.all, this.game.inventory);
-      this.descText.setText(result.message, true);
       this.buildItemMenu();
+      this.descWindow.setText(result.message);
       return;
     }
     this.phase = 'selectTarget';
@@ -118,12 +129,13 @@ export class ItemMenuScene implements Scene {
 
   private onTargetSelect(item: MenuItem): void {
     const target = this.game.party.get(Number(item.value));
+    let result: { message: string } | undefined;
     if (target) {
-      const result = ItemEffects.applyItemEffect(this.selectedItemId, target, this.game.inventory);
-      this.descText.setText(result.message, true);
+      result = ItemEffects.applyItemEffect(this.selectedItemId, target, this.game.inventory);
     }
     this.phase = 'selectItem';
     this.targetWindow.visible = false;
     this.buildItemMenu();
+    if (result) this.descWindow.setText(result.message);
   }
 }

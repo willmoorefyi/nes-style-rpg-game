@@ -5,29 +5,22 @@ import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { QuantitySelectorUI } from '../ui/QuantitySelector.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
-import { ShopRegistry } from '../data/ShopRegistry.js';
+import { buyItems, sellItems, isEquipmentShop } from './shop/shopLists.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import { slotOf } from '../entities/EquipmentRules.js';
-import { compareEquip, hitsSuffix } from './shopComparison.js';
+import { HelpWindow } from '../ui/HelpWindow.js';
+import { ShopDetailPanel, DETAIL_RECT, type ShopRect } from './shop/ShopDetailPanel.js';
 import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
 type ShopState = 'choice' | 'buy' | 'sell' | 'quantity';
 
-/** A window's rectangle on screen (for layout tests). */
-export interface ShopRect { x: number; y: number; width: number; height: number }
-
 const ITEM_WINDOW_Y = 288;
-const ITEM_WINDOW_HEIGHT = 700;
-/** The equipment comparison panel; the item list narrows to end before it while it is shown. */
-const DETAIL_RECT: ShopRect = { x: 1200, y: SCREEN_MARGIN + 116, width: 696, height: 584 };
+/** Ends at y 876, above the help bar (y 900). */
+const ITEM_WINDOW_HEIGHT = 588;
 const PANEL_GAP = 16;
-const LINE_STEP = FONT_SIZE + 8;
 const INPUT_ACTIONS = ['up', 'down', 'left', 'right', 'confirm', 'cancel'] as const;
 
 export class ShopScene implements Scene {
   readonly container = new Container();
-  private game: Game;
-  private shopId: string;
   private state: ShopState = 'choice';
   private prevState: ShopState = 'choice';
   private isBuying = true;
@@ -38,20 +31,17 @@ export class ShopScene implements Scene {
   private choiceWindow: Window;
   private itemWindow: Window;
   private goldWindow: Window;
-  private detailWindow: Window;
+  private detail = new ShopDetailPanel();
+  private help = new HelpWindow();
   private choiceMenu!: Menu;
   private itemMenu?: Menu;
   private qtySelector?: QuantitySelectorUI;
   private goldText: BitmapText;
-  private detailTexts: BitmapText[] = [];
   private lastSelectedIndex = -1;
   private itemRect: ShopRect;
   private resultText: BitmapText;
 
-  constructor(game: Game, shopId: string) {
-    this.game = game;
-    this.shopId = shopId;
-
+  constructor(private readonly game: Game, private readonly shopId: string) {
     this.choiceWindow = new Window({ x: SCREEN_MARGIN, y: SCREEN_MARGIN, width: 300, height: 240 });
     // As wide as the comparison panel below it, so "Bought N <item>." fits under the gold line.
     this.goldWindow = new Window({ x: DETAIL_RECT.x, y: SCREEN_MARGIN, width: DETAIL_RECT.width, height: 100 });
@@ -59,18 +49,17 @@ export class ShopScene implements Scene {
     this.itemWindow = new Window({ ...this.itemRect });
     this.itemWindow.visible = false;
 
-    // below the gold window (top right), so the party's gold stays visible while browsing equipment
-    this.detailWindow = new Window({ ...DETAIL_RECT });
-    this.detailWindow.visible = false;
+    const line = (dy: number): BitmapText => {
+      const t = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
+      t.position.set(this.goldWindow.contentX, this.goldWindow.contentY + dy);
+      return this.goldWindow.addChild(t);
+    };
+    this.goldText = line(0);
+    this.resultText = line(FONT_SIZE + 4);
 
-    this.goldText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
-    this.goldText.position.set(this.goldWindow.contentX, this.goldWindow.contentY);
-    this.goldWindow.addChild(this.goldText);
-    this.resultText = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff } });
-    this.resultText.position.set(this.goldWindow.contentX, this.goldWindow.contentY + FONT_SIZE + 4);
-    this.goldWindow.addChild(this.resultText);
-
-    this.container.addChild(this.choiceWindow, this.goldWindow, this.itemWindow, this.detailWindow);
+    // the detail panel sits below the gold window (top right), so the party's gold stays visible while browsing
+    this.help.visible = false;
+    this.container.addChild(this.choiceWindow, this.goldWindow, this.itemWindow, this.detail.window, this.help);
   }
 
   enter(): void {
@@ -112,11 +101,13 @@ export class ShopScene implements Scene {
   /** The comparison panel's rectangle. */
   get detailWindowRect(): ShopRect { return { ...DETAIL_RECT }; }
   /** Whether the comparison panel is shown. */
-  get detailVisible(): boolean { return this.detailWindow.visible; }
+  get detailVisible(): boolean { return this.detail.visible; }
   /** The comparison panel's lines, with their top y inside the panel. */
-  get detailLines(): Array<{ text: string; y: number }> {
-    return this.detailTexts.map((t) => ({ text: t.text, y: t.position.y }));
-  }
+  get detailLines(): Array<{ text: string; y: number }> { return this.detail.lines; }
+  /** The comparison panel's description of the highlighted item. */
+  get detailDescription(): string { return this.detail.description.text; }
+  /** The help bar's text, or '' while it is hidden. */
+  get helpText(): string { return this.help.visible ? this.help.text : ''; }
   /** The line under the gold ("Bought 2 Potion."), or ''. */
   get resultMessage(): string { return this.resultText.text; }
   /** The item list's cursor, or -1 when the list is closed. */
@@ -126,10 +117,8 @@ export class ShopScene implements Scene {
   private buildItemMenu(keepIndex = false): void {
     const initialIndex = keepIndex && this.itemMenu ? this.itemMenu.selectedIndex : undefined;
     if (this.itemMenu) this.itemWindow.removeChild(this.itemMenu);
-    const items: MenuItem[] = this.isBuying ? this.getBuyItems() : this.getSellItems();
-    if (items.length === 0) {
-      items.push({ label: '(Nothing)', value: '', enabled: false });
-    }
+    const items: MenuItem[] = this.isBuying ? buyItems(this.shopId, this.game.party.gold) : sellItems(this.game.inventory);
+    if (items.length === 0) items.push({ label: '(Nothing)', value: '', enabled: false });
     this.itemMenu = new Menu({
       items,
       x: this.itemWindow.contentX,
@@ -141,45 +130,18 @@ export class ShopScene implements Scene {
       onCancel: () => this.closeItemMenu(),
     });
     this.itemWindow.addChild(this.itemMenu);
-    this.lastSelectedIndex = -1;
-    this.setDetailVisible(this.isBuying && this.isEquipmentShop());
+    this.help.visible = true;
+    this.setDetailVisible(this.isBuying && isEquipmentShop(this.shopId));
+    this.refreshSelection();
   }
 
   private setDetailVisible(visible: boolean): void {
-    this.detailWindow.visible = visible;
+    this.detail.visible = visible;
     const width = visible ? DETAIL_RECT.x - PANEL_GAP - SCREEN_MARGIN : GAME_WIDTH - 2 * SCREEN_MARGIN;
     if (width !== this.itemRect.width) {
       this.itemRect = { ...this.itemRect, width };
       this.itemWindow.resize(width, this.itemRect.height);
     }
-  }
-
-  private isEquipmentShop(): boolean {
-    const shop = ShopRegistry.getShop(this.shopId);
-    return shop?.type === 'weapon' || shop?.type === 'armor';
-  }
-
-  private getBuyItems(): MenuItem[] {
-    const shop = ShopRegistry.getShop(this.shopId);
-    if (!shop) return [];
-    return shop.inventory.map(id => {
-      const item = ItemRegistry.getItem(id);
-      if (!item) return { label: id, value: id, enabled: false };
-      const canAfford = this.game.party.gold >= item.price;
-      return { label: `${item.name.padEnd(12)}${String(item.price).padStart(5)}G`, value: id, enabled: canAfford };
-    });
-  }
-
-  private getSellItems(): MenuItem[] {
-    const entries = this.game.inventory.getAll()
-      .map(({ itemId, quantity }) => ({ item: ItemRegistry.getItem(itemId), itemId, quantity }))
-      .filter((e): e is { item: NonNullable<typeof e.item>; itemId: string; quantity: number } => 
-        e.item != null && e.item.type !== 'key');
-    const maxLen = Math.max(12, ...entries.map(e => e.item.name.length));
-    return entries.map(({ item, itemId, quantity }) => {
-      const sellPrice = Math.floor(item.price / 2);
-      return { label: `${item.name.padEnd(maxLen)}x${quantity} ${String(sellPrice).padStart(4)}G`, value: itemId };
-    });
   }
 
   private onItemSelect(menuItem: MenuItem): void {
@@ -235,15 +197,14 @@ export class ShopScene implements Scene {
   }
 
   private cancelQuantity(): void {
-    if (this.qtySelector) {
-      this.itemWindow.removeChild(this.qtySelector);
-      this.qtySelector = undefined;
-    }
+    if (this.qtySelector) this.itemWindow.removeChild(this.qtySelector);
+    this.qtySelector = undefined;
     this.state = this.prevState;
   }
 
   private closeItemMenu(): void {
     this.itemWindow.visible = false;
+    this.help.visible = false;
     this.setDetailVisible(false);
     if (this.itemMenu) {
       this.itemWindow.removeChild(this.itemMenu);
@@ -267,62 +228,18 @@ export class ShopScene implements Scene {
       this.qtySelector.update(this.game.input);
     } else if (this.itemMenu) {
       this.itemMenu.update(this.game.input);
-      if (this.detailWindow.visible && this.itemMenu.selectedIndex !== this.lastSelectedIndex) {
-        this.lastSelectedIndex = this.itemMenu.selectedIndex;
-        this.updateDetailPanel();
-      }
+      // cancel closes the list inside update()
+      if (this.itemMenu && this.itemMenu.selectedIndex !== this.lastSelectedIndex) this.refreshSelection();
     }
   }
 
-  private updateDetailPanel(): void {
-    for (const t of this.detailTexts) this.detailWindow.removeChild(t);
-    this.detailTexts = [];
-
-    if (!this.itemMenu) return;
-    const menuItem = this.itemMenu.selectedItem;
-    if (!menuItem?.value) return;
-    const item = ItemRegistry.getItem(menuItem.value);
-    if (!item) return;
-
-    const slot = slotOf(item);
-    if (!slot) return;
-    const isWeapon = item.type === 'weapon';
-    const statLabel = isWeapon ? 'ATK' : 'DEF';
-    const newStat = (isWeapon ? item.stats.attack : item.stats.defense) ?? 0;
-
-    const cx = this.detailWindow.contentX;
-    const cy = this.detailWindow.contentY;
-    let y = cy;
-
-    const addLine = (text: string, color: number = 0xffffff): void => {
-      const bt = new BitmapText({ text, style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: color } });
-      bt.position.set(cx, y);
-      this.detailWindow.addChild(bt);
-      this.detailTexts.push(bt);
-      y += LINE_STEP;
-    };
-
-    addLine(`${item.name}  ${statLabel}: ${newStat}`);
-    y += 8;
-
-    // One line per member: `NAME  ATK cur->new  +d` (MS-5), so four members fit the panel.
-    const nameWidth = Math.max(0, ...this.game.party.all.map((c) => c.name.length));
-    for (const char of this.game.party.all) {
-      const name = char.name.padEnd(nameWidth);
-      // same rule as EquipScene: members whose class can't use the item get no +/- value
-      if (!char.canEquip(item)) {
-        addLine(`${name}  n/a`, 0x808080);
-        continue;
-      }
-      // the battle numbers with the item and without it (a Monk's bare hands can beat a weapon: negative)
-      const cmp = compareEquip(char, item, slot);
-      const diff = cmp.diff;
-      const diffStr = diff > 0 ? `+${diff}` : `${diff}`;
-      const diffColor = diff > 0 ? 0x00ff00 : diff < 0 ? 0xff0000 : 0xffffff;
-      const now = `${cmp.now}${hitsSuffix(cmp, cmp.nowHits)}`;
-      const next = `${cmp.next}${hitsSuffix(cmp, cmp.nextHits)}`;
-      addLine(`${name}  ${cmp.label} ${now}->${next}  ${diffStr}`, diffColor);
-    }
+  /** The help bar (any shop) and, while buying equipment, the comparison panel follow the cursor. */
+  private refreshSelection(): void {
+    this.lastSelectedIndex = this.itemMenu?.selectedIndex ?? -1;
+    const value = this.itemMenu?.selectedItem?.value;
+    const item = value ? ItemRegistry.getItem(value) : undefined;
+    this.help.setText(item?.description ?? '');
+    if (this.detail.visible) this.detail.show(item, this.game.party.all);
   }
 
   onPause(): void {}
