@@ -36,7 +36,8 @@ BEACH = (6, 10)                                    # px: automatic beach where t
 SHALLOW, SHALLOW_TINT, CYAN = 10, 0.35, np.array((96, 200, 216), np.float32)
 BANK = 3                                           # px: dithered earth banks along rivers and lakes
 CLUMP_STEP, CLUMP_OUT, CLUMP_BULGE = 40, 14, (2, 14)  # px: tree_clump spacing along forest outlines, stick-out
-FOOT, FOOT_COVER = 48, (0.40, 0.10)                 # px: foothill reach (one cell); rock cover at the range, at one cell
+FOOT, FOOT_COVER = 48, (0.30, 0.10)                 # px: foothill reach (one cell); rock cover at the range, at one cell
+FOOT_FLOOR, FOOT_FLOOR_R = 0.8, 12                 # W14: a foothill px is at least this share of the local grass luma
 FOOT_PATCH = 0.3                                   # foothill dither: Bayer, plus this much patchy noise
 FOOT_RISE, FOOT_FADE = (0.6, 8), 12                # cover starts at 60 % of itself, full after 8 px; fade px past the reach
 PEAK_SCALES = (0.6, 0.8, 1.0, 1.25)
@@ -47,6 +48,12 @@ SNOW = np.array((232, 236, 244), np.float32)
 OVERHANG = 8                                       # px: peaks may overhang a walkable cell by this much
 NEAR_LINE = [T - 2, T - 1, 0, 1, 2]                  # (coordinate mod T) of the px rows / columns near a cell line
 BAYER4 = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]], np.float32) + 0.5) / 16
+
+
+def _luma(rgb: np.ndarray) -> np.ndarray:
+    """Rec. 601 luma (0-255) of an (..., 3) array (a weighted sum, not a matmul: float32 matmul warns on macOS)."""
+    a = rgb.astype(np.float32)
+    return 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
 
 
 def _key(mat: np.ndarray) -> int:

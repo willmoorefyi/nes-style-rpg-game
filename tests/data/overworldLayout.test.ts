@@ -139,8 +139,9 @@ describe('overworld layout (T3c)', () => {
   it('OW-9: the broken-bridge debris lies over the gap as art only; the four gap cells stay water', () => {
     const debris = source.objects.filter((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('bridge_gap_')));
     expect(debris.length).toBe(1);
-    const d = debris[0] as typeof debris[0] & { block?: boolean; on_water?: boolean };
+    const d = debris[0] as typeof debris[0] & { block?: boolean; on_water?: boolean; style?: string };
     expect(d.parts).toEqual([['bridge_gap_0_0', 'bridge_gap_0_1'], ['bridge_gap_1_0', 'bridge_gap_1_1']]);
+    expect(d.style, 'W8: recoloured to the stubs\' pale stone (dE checked by build_map.py --selftest)').toBe('pale_stone');
     expect(d.block).toBe(false);
     expect(d.on_water).toBe(true);
     const footprint = [0, 1].flatMap((j) => [0, 1].map((i): Cell => [d.x + i, d.y + j]));
@@ -198,10 +199,10 @@ describe('overworld layout (T3c)', () => {
     for (const [name, [x, y]] of Object.entries(map.entrances!)) expect(warps.has(key(x, y)), name).toBe(false);
   });
 
-  it('OW-3 / CT-7: one warp per city gate, the north one into the castle precinct', () => {
-    expect(cityWarps.map((t) => t.targetEntrance).sort()).toEqual(['castle_gate', 'east_gate', 'south_gate', 'west_gate']);
+  it('OW-3 / CT-7 / M11: one warp per city gate, the north one to the castle door', () => {
+    expect(cityWarps.map((t) => t.targetEntrance).sort()).toEqual(['castle', 'east_gate', 'south_gate', 'west_gate']);
     const at = (e: string) => cityWarps.find((t) => t.targetEntrance === e)!;
-    expect(at('castle_gate').y).toBeLessThan(at('west_gate').y);
+    expect(at('castle').y).toBeLessThan(at('west_gate').y);
     expect(at('south_gate').y).toBeGreaterThan(at('west_gate').y);
     expect(at('west_gate').x).toBeLessThan(at('east_gate').x);
   });
@@ -244,7 +245,7 @@ describe('overworld layout (T3c)', () => {
     const foot: Cell = [gates[0].x, gates[0].y + 1];
     const temple = steps(start, entrance('temple'));
     const bridge = steps(start, foot);
-    expect(temple).toBeGreaterThanOrEqual(25);
+    expect(temple).toBeGreaterThanOrEqual(20);           // W6 (decision R-13): the footbridge shortens it 29 -> 23
     expect(temple).toBeLessThanOrEqual(40);
     expect(bridge).toBeGreaterThanOrEqual(18);
     expect(bridge).toBeLessThanOrEqual(30);
@@ -311,6 +312,13 @@ describe('overworld encounter zones (T4e, §1.6)', () => {
     // a warp cell (the temple door itself) is never a battle cell: the step filter skips it, so the zone may leave it out
     const warps = new Set(map.transitions.map((t) => key(t.x, t.y)));
     const want = new Set([...toTemple].filter(([k, d]) => d < (toCity.get(k) ?? Infinity) && !warps.has(k)).map(([k]) => k));
+    // W7: a forest component joins the zone whole when at least half of it is closer to the temple, else leaves whole
+    const reached = (k: string) => toTemple.has(k) || toCity.has(k);
+    for (const comp of components((x, y) => ch(x, y) === 'f' && reached(key(x, y)))) {
+      const ks = comp.map((c) => key(...c));
+      const join = 2 * ks.filter((k) => want.has(k)).length >= ks.length;
+      for (const k of ks) { if (join) want.add(k); else want.delete(k); }
+    }
     const got = new Set(cells('temple_approach').map((c) => key(...c)));
     expect([...got].filter((k) => !want.has(k)), 'zoned but not closer to the temple').toEqual([]);
     expect([...want].filter((k) => !got.has(k)), 'closer to the temple but not zoned').toEqual([]);
@@ -369,5 +377,81 @@ describe('overworld battle backgrounds (BA-12)', () => {
     expect(sand.length).toBeGreaterThan(0);
     for (const [x, y] of sand) expect(terrain(x, y), `sand at (${x},${y})`).toBe(TerrainType.Desert);
     expect(bg.terrain?.desert).toBe('shoreline');
+  });
+});
+
+describe('overworld second-pass fixes (R4b)', () => {
+  const cornelia = parse(readFileSync(join(root, 'assets/maps/ai/cornelia.yaml'), 'utf-8')) as MapData;
+  const city = source.objects.find((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('city_')))!;
+  const isWater = (x: number, y: number) => terrain(x, y) === WATER;
+
+  it('T1: both bridge gates say the builders are at work once the King has ordered it (INTRO_COMPLETE)', () => {
+    for (const g of gates) {
+      const msg = g.message as Array<{ condition?: string; text: string[] }>;
+      expect(Array.isArray(msg), `gate (${g.x},${g.y})`).toBe(true);
+      const after = msg.find((m) => m.condition === 'INTRO_COMPLETE');
+      const before = msg.find((m) => m.condition === undefined);
+      expect(after?.text.join(' ')).toMatch(/at work/);
+      expect(before?.text.join(' ')).toMatch(/collapsed/);
+      expect(after!.text).not.toEqual(before!.text);
+      expect(msg.indexOf(after!), 'the flagged line is checked first').toBeLessThan(msg.indexOf(before!));
+    }
+  });
+
+  it('M11 / W10: the north warp sits on the wall\'s top row and lands in front of the castle door', () => {
+    const north = cityWarps.find((t) => t.targetEntrance === 'castle')!;
+    expect(north.y, 'the city icon\'s top row').toBe(city.y);
+    const door = cornelia.transitions.find((t) => t.targetMap === 'cornelia-castle')!;
+    expect(cornelia.entrances!.castle).toEqual([door.x, door.y + 1]);
+  });
+
+  it('W10: every city gate road runs onto its warp cell', () => {
+    for (const t of cityWarps) expect(terrain(t.x, t.y), `${t.targetEntrance} at (${t.x},${t.y})`).toBe(ROAD);
+    const net = new Set(roadComps[0].map((c) => key(...c)));
+    for (const t of cityWarps) expect(net.has(key(t.x, t.y)), `${t.targetEntrance} in the road network`).toBe(true);
+  });
+
+  it('W6: a footbridge over the city stream: the field west of the stream is a few steps from the south gate', () => {
+    expect(steps(start, [24, 47])).toBeLessThanOrEqual(8);
+  });
+
+  it('W9: the jetty runs out between open water, and its end can be inspected', () => {
+    const ship = map.vehicles!.find((v) => v.type === 'ship')!;
+    const jetty: Cell[] = [];
+    for (let y = ship.y - 1; terrain(ship.x, y) === BRIDGE; y--) jetty.push([ship.x, y]);
+    expect(jetty.length).toBe(3);
+    for (const [x, y] of jetty) expect(isWater(x - 1, y) && isWater(x + 1, y), `jetty (${x},${y})`).toBe(true);
+    const end = (map.inspect ?? []).find((e) => e.x === ship.x && e.y === ship.y);
+    expect((end?.text as string[] | undefined)?.join(' ')).toMatch(/pier/i);
+  });
+
+  it('W11: no vines hang in mid-air (none on a cell below walkable ground or grass)', () => {
+    for (const o of source.objects) {
+      (o.parts ?? []).forEach((row, j) => row.forEach((p, i) => {
+        if (p !== 'vines') return;
+        const x = o.x + i, y = o.y + j;
+        expect(col.isWalkable(x, y - 1, walking) || ch(x, y - 1) === '.', `vines at (${x},${y})`).toBe(false);
+      }));
+    }
+  });
+
+  it('W12: the east pocket holds a chest (an Iron Shield), reachable only over the east bridge', () => {
+    const chests = (map.npcs ?? []).filter((n) => n.chestItem);
+    expect(chests.map((c) => [c.chestItem, c.chestFlag])).toEqual([['iron_shield', 'CHEST_ERDRICK_TOMB']]);
+    const pocket = map.encounterZones!.find((z) => z.id === 'east_pocket')!;
+    const [c] = chests;
+    expect(pocket.rects.some(([x0, y0, x1, y1]) => c.x >= x0 && c.x <= x1 && c.y >= y0 && c.y <= y1)).toBe(true);
+    const shut = reach(start, new Set(eastBridge.map((b) => key(...b))));
+    expect(DIRS.some(([dx, dy]) => shut.has(key(c.x + dx, c.y + dy)))).toBe(false);
+    expect(DIRS.some(([dx, dy]) => reach(start).has(key(c.x + dx, c.y + dy)))).toBe(true);
+  });
+
+  it('W7: no forest is split by the temple approach\'s edge', () => {
+    const zone = map.encounterZones!.find((z) => z.id === 'temple_approach')!;
+    const inZone = (x: number, y: number) => zone.rects.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1);
+    for (const comp of components((x, y) => ch(x, y) === 'f' && col.isWalkable(x, y, walking))) {
+      const n = comp.filter(([x, y]) => inZone(x, y)).length;
+      expect(n === 0 || n === comp.length, `forest at (${comp[0]}): ${n} of ${comp.length} cells zoned`).toBe(true);
+    }
   });
 });

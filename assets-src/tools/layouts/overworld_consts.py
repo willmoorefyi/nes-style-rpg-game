@@ -8,10 +8,10 @@ SEED = 1987
 
 # ───────────────────────────── fixed points ─────────────────────────────
 CX, CY = 26, 43                      # the city icon's top-left cell: a 5x4 footprint (the 4x4 art shifted 24 px right)
-# the gates: N is the keep's drawn door (its approach, the cell above, is walkable art), W / E the flank arches, S the
-# main arch
-N_WARP, W_WARP, E_WARP, S_WARP = (CX + 2, CY + 1), (CX, CY + 2), (CX + 4, CY + 2), (CX + 2, CY + 3)
-N_APPROACH = (CX + 2, CY)
+# the gates: N at the wall's top edge in front of the keep (W10: no longer inside the keep's art), W / E the flank
+# arches, S the main arch. Each gate road runs onto its warp cell. M11: the N warp lands at Cornelia's `castle`
+# entrance, in front of the castle door (not the precinct's east gate)
+N_WARP, W_WARP, E_WARP, S_WARP = (CX + 2, CY), (CX, CY + 2), (CX + 4, CY + 2), (CX + 2, CY + 3)
 ARRIVE = {"cornelia": (CX + 2, CY + 4), "cornelia_west": (CX - 1, CY + 2), "cornelia_east": (CX + 5, CY + 2),
           "cornelia_north": (CX + 2, CY - 1)}
 BX = 29                              # the north bridge (columns BX, BX+1): south stub, a 2-cell gap of open water, north stub
@@ -39,7 +39,9 @@ PONDS = [(CX, CY), (CX + 1, CY), (CX, CY + 1),                                  
          (CX + 4, CY + 3)]                                                                         # south-east
 UNDER_TOWN = [(CX + 4, CY + 1), (CX + 3, CY + 1), (CX + 3, CY + 2), (CX + 2, CY + 2), (CX + 1, CY + 2), (CX + 1, CY + 3),
               (CX, CY + 3)]
-STREAM = [(CX, CY + 3), (CX, CY + 5), (CX - 2, CY + 7), (CX - 4, CY + 9), (CX - 5, CY + 12)]
+# W6: the stream runs straight south for rows CY+4..CY+6 (one river cell), crossed by a footbridge west of the S gate
+STREAM = [(CX, CY + 3), (CX, CY + 7), (CX - 2, CY + 9), (CX - 4, CY + 10), (CX - 5, CY + 12)]
+FOOTBRIDGE, FOOT_ROAD = (CX, CY + 5), (CX + 1, CY + 5)     # the bridge cell, and the road cell joining the S road
 
 # the whole landmass (mainland and peninsula), then the waters cut out of it
 LAND = [(7, 8.5), (10, 6.6), (15, 7.4), (19, 6.2), (24, 7.2), (29, 6.4), (32.5, 7.8), (35.5, 10.2), (39.5, 10.8),  # north
@@ -65,11 +67,11 @@ RIVER = [(48, 39), (47, 41), (46, 43), (RX, RY - 1), (RX, RY + 1), (44, 49), (43
 RING = [(CX - 3, CY + 2), (CX - 3, CY - 1), (CX, CY - 4), (CX + 5, CY - 4), (CX + 8, CY - 1), (CX + 8, CY + 5),
         (CX + 5, CY + 8), (CX + 2, CY + 8)]                # round the city from the W gate to the S road (not across the stream)
 ROADS = [
-    [ARRIVE["cornelia_north"], (CX + 2, 37), (BX, 37), BRIDGE_FOOT],                 # N: to the north bridge
+    [N_WARP, ARRIVE["cornelia_north"], (CX + 2, 37), (BX, 37), BRIDGE_FOOT],         # N: to the north bridge
     RING,
-    [ARRIVE["cornelia_west"], (CX - 2, CY + 2)],                                     # W gate: onto the ring
+    [W_WARP, ARRIVE["cornelia_west"], (CX - 2, CY + 2)],                             # W gate: onto the ring
     [(CX - 4, CY - 1), (18, CY - 1), (16, 40), (TX + 1, 40), TEMPLE_DOOR],          # the temple road (W)
-    [ARRIVE["cornelia_east"], (CX + 7, CY + 2)],                                     # E gate: onto the ring
+    [E_WARP, ARRIVE["cornelia_east"], (CX + 7, CY + 2)],                             # E gate: onto the ring
     [(CX + 9, CY + 2), (RX - 1, RY)],                                                # E: to the east bridge
     [(RX + 2, RY), (TOMB[0] - 2, RY), (TOMB[0] - 2, TOMB_END[1] + 1), (TOMB[0], TOMB_END[1] + 1), TOMB_END],  # tomb
 ]
@@ -97,22 +99,32 @@ TOMB_ROCK = [(TOMB[0] - 1, TOMB[1] - 1), (TOMB[0], TOMB[1] - 1), (TOMB[0] + 1, T
              (TOMB[0], TOMB[1] - 2), (TOMB[0] + 1, TOMB[1] - 2), (TOMB[0], TOMB[1] - 3)]
 
 # Erdrick's tomb: a stone sarcophagus between two broken columns (both cells block: the rock behind them is the range's
-# foot, so there is no walkable pocket behind the tomb), flowers and vines in front
+# foot, so there is no walkable pocket behind the tomb), flowers in front. (W11: the free-standing vines are gone; the
+# nook east of the columns holds the tomb chest, TOMB_CHEST)
 TOMB_OBJECTS = [
     {"type": "deco", "parts": [["altar_l", "altar_r"]], "x": TOMB[0], "y": TOMB[1], "style": "stone"},
     {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": TOMB[0] - 1, "y": TOMB[1] - 1},
     {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": TOMB[0] + 2, "y": TOMB[1] - 1},
-    {"type": "deco", "parts": [["vines"]], "x": TOMB[0] + 3, "y": TOMB[1], "block": False},
     {"type": "flowers", "x": TOMB[0] - 1, "y": TOMB[1] + 1},
     {"type": "flowers", "x": TOMB[0] + 2, "y": TOMB[1] + 1},
 ]
+
+# W12: the east pocket's reward (the Iron Shield isn't sold in Cornelia)
+TOMB_CHEST = {"id": "chest_tomb", "sprite": "chest", "x": TOMB[0] + 3, "y": TOMB[1], "chestItem": "iron_shield",
+              "chestFlag": "CHEST_ERDRICK_TOMB", "dialog": ["You found an Iron Shield!"]}
+# W9: the pier's end, where the ship would wait (it needs BIKKE_DEFEATED, not in act 1)
+PIER_TEXT = ["The pier runs out into the bay. No ship calls at Cornelia while pirates rule the seas."]
+# T1: the north bridge's gate message, once the King has ordered the repair (INTRO_COMPLETE) and before
+GATE_MESSAGE = [{"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge, but it isn't finished yet."]},
+                {"text": ["The bridge has collapsed into the sea. Only the King's builders could repair it."]}]
 
 # OW-9: the snapped ends, pilings and loose planks of the north bridge (overworld/kit_grand `bridge_gap`), drawn over
 # the two open-water gap rows. Art only: the cells stay ocean in collision and BRIDGE_BUILT stays unset in act 1.
 # FIX_PLAN T6 note: the future bridge cutscene needs a built variant of the span (the gap cells become bridge in
 # collision and art, e.g. a flag-gated map variant), and that variant must drop BROKEN_BRIDGE.
 BROKEN_BRIDGE = [{"type": "deco", "parts": [["bridge_gap_0_0", "bridge_gap_0_1"], ["bridge_gap_1_0", "bridge_gap_1_1"]],
-                  "name": "broken_bridge", "x": BX, "y": N_STUB + 1, "block": False, "on_water": True}]
+                  "name": "broken_bridge", "x": BX, "y": N_STUB + 1, "block": False, "on_water": True,
+                  "style": "pale_stone"}]        # W8: recoloured to the stubs' pale stone (build_map.RECOLOR)
 
 HEADER = """GENERATED by assets-src/tools/layouts/overworld.py - edit the script, not this file.
 Act-1 overworld (original layout): the Cornelia peninsula hangs south-west from the mainland; the sound, the broken

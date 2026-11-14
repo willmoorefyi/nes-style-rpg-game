@@ -7,10 +7,10 @@ import numpy as np
 from PIL import Image
 
 import kit as K
-from .base import T, _tile
+from .base import FOOT_FLOOR, T, _bayer, _core, _luma, _tile
 from .metrics import RUN_MAX, _Recorder, boundary_stats, classify, fidelity, foothill_share, peak_stats
 from .outline import _PARTITION
-from .peaks import place_peaks, plan_peaks
+from .peaks import foothills, place_peaks, plan_peaks
 
 
 def _ground(mat_rows: list[str], kit: K.Kit, organic: bool, seed: int = 99) -> tuple[np.ndarray, np.ndarray]:
@@ -81,6 +81,7 @@ def selftest() -> int:
     assert not np.all(c.below == rim, axis=2).any() and c.collision[2, 2] == B.WATER
     ok += 1
     ok += _road_case(B, kit)
+    ok += _foothill_dark_case(kit)
     # determinism: the same pixels again, and under other string-hash seeds (subprocesses, as --check-determinism)
     _PARTITION.clear()
     _, again = _ground(block, kit, True)
@@ -143,3 +144,20 @@ def _road_case(B, kit: K.Kit) -> int:
     coll = [B.compile_map({**src, "terrain": t}, kit, check_interiors=False).collision for t in ("organic", "classic")]
     assert np.array_equal(*coll), "organic roads change the collision"
     return 2
+
+
+def _foothill_dark_case(kit: K.Kit) -> int:
+    """W14: on a grass strip beside a mountain strip, at most 1 % of the foothill px are darker than FOOT_FLOOR (0.8)
+    of the grass texture's 5th percentile (the raw copy dropped the rock's crevice px, luma 34 on grass of 120, as
+    black dots). The plan's bound, the 5th percentile itself, can't be met by a 0.8 floor: the grass is nearly flat."""
+    H, W = 4 * T, 8 * T
+    grass_tex, mtex = _tile(kit.material("grass"), H, W), _tile(kit.material("mountain"), H, W)
+    mountain = np.zeros((H, W), bool)
+    mountain[:, :3 * T] = True
+    below = grass_tex.copy()
+    foothills(below, mountain, ~mountain, np.zeros((H, W), bool), _core(H, W), _bayer(H, W), mtex, 5)
+    foot = np.any(below != grass_tex, axis=2) & ~mountain
+    assert foot.sum() > 0.02 * (~mountain).sum(), f"foothills: only {int(foot.sum())} px"
+    dark = _luma(below[foot]) < FOOT_FLOOR * np.percentile(_luma(grass_tex), 5) - 0.5
+    assert dark.mean() <= 0.01, f"foothills: {dark.mean():.1%} of the foothill px are darker than the grass"
+    return 1

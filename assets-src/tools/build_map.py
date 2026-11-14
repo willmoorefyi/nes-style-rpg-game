@@ -218,7 +218,7 @@ def footprint(o: dict) -> list[tuple[int, int]]:
 # streets can mix roof and wall colours (roof: blue, wall: stone, ...)
 RECOLOR = {"blue": (205, 0.75, 0.95), "green": (95, 0.7, 0.9), "teal": (160, 0.6, 0.9), "slate": (215, 0.3, 0.75),
            "brown": (15, 0.75, 0.75), "white": (0, 0.35, 1.08), "stone": (0, 0.15, 0.85), "ochre": (-12, 1.25, 0.97),
-           "rose": (-25, 1.1, 1.0), "bright": (0, 1.0, 1.2)}
+           "rose": (-25, 1.1, 1.0), "bright": (0, 1.0, 1.2), "pale_stone": (15, 0.4, 1.5)}   # pale_stone: W8
 
 
 def _recolor(img: Image.Image, hue: float, sat: float, val: float) -> Image.Image:

@@ -6,8 +6,9 @@ import numpy as np
 from PIL import Image
 
 import kit as K
-from .base import (BAYER4, FOOT, FOOT_COVER, FOOT_FADE, FOOT_PATCH, FOOT_RISE, FOOT_SCALES, OVERHANG, PEAK_SCALES,
-                   PEAK_SPACING, ROCK_CORE, SNOW, T, _core, _dist, _low_dist, _poisson, _resized, _shade, _up, _vnoise)
+from .base import (BAYER4, FOOT, FOOT_COVER, FOOT_FADE, FOOT_FLOOR, FOOT_FLOOR_R, FOOT_PATCH, FOOT_RISE, FOOT_SCALES,
+                   OVERHANG, PEAK_SCALES, PEAK_SPACING, ROCK_CORE, SNOW, T, _blur, _core, _dist, _low_dist, _luma,
+                   _poisson, _resized, _shade, _up, _vnoise)
 from .outline import _cached_partition
 
 _VARIANTS: dict[bytes, dict[str, tuple[np.ndarray, tuple[int, int]]]] = {}   # peak art -> variants
@@ -32,11 +33,22 @@ def foothills(below: np.ndarray, mountain: np.ndarray, grass: np.ndarray, ocean:
     b = 1 - a                                       # the CDF of the mix, so that cover = coverage
     thr = np.where(t < a, t * t / (2 * a * b), np.where(t <= b, (t - a / 2) / b, 1 - (1 - t) ** 2 / (2 * a * b)))
     foot = grass & ~mountain & (d > 0) & (cover > thr)
-    below[foot] = mtex[foot]
+    below[foot] = _lifted(mtex, below, grass, foot)
     if ocean.any():                                  # a dark rock rim where mountains meet the sea
         dm = _dist(ocean, 3)
         _shade(below, mountain & (dm <= 1.5), 0.5)
         _shade(below, mountain & (dm > 1.5) & (dm <= 3) & (bayer < 0.5), 0.7)
+
+
+def _lifted(mtex: np.ndarray, below: np.ndarray, grass: np.ndarray, foot: np.ndarray) -> np.ndarray:
+    """The mountain texture's px under `foot`, each lifted to at least FOOT_FLOOR of the local grass luma (the
+    grass px blurred over FOOT_FLOOR_R), so the texture's dark crevice px don't land on the grass as isolated black
+    dots (W14)."""
+    w = grass.astype(np.float32)
+    local = (_blur(_luma(below) * w, FOOT_FLOOR_R) / np.maximum(_blur(w, FOOT_FLOOR_R), 1e-3))[foot]
+    px = mtex[foot].astype(np.float32)
+    k = np.maximum(1.0, FOOT_FLOOR * local / np.maximum(_luma(px), 1.0))
+    return np.clip(px * k[:, None], 0, 255).astype(np.uint8)
 
 
 def _fill_holes(part: Image.Image) -> Image.Image:
