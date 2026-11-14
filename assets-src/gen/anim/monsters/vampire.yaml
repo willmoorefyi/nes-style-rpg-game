@@ -97,17 +97,18 @@ frames:
     t: 0.35
     pins: [knee_n, foot_n, knee_f, foot_f]
     tweaks: {knee_n: [3, 0], foot_n: [3, 0], knee_f: [3, 0], foot_f: [3, 0], ca_0: [4, 6], ca_1: [2, 10], ca_2: [-1, 14]}
-    moves: [neck, chest, hip, crown, sh_n, el_n, hand_n, hip_n, hip_f, knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    moves: [neck, chest, hip, crown, sh_n, hip_n, hip_f, knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    # E10: el_n / hand_n stay on the attack pose (moving them toward wind2 turned the forearm into a smear beside the slash)
     # tweaks ca_*: the wing is still opening: 15 deg less spread and 4/6 px lower, behind the body
   atk_follow:                  # claw and head follow through; the wing settles (15 deg down, 4/6 px lower)
     moves: [crown, sh_n, el_n, hand_n, slash_t]
     tweaks: {ca_0: [4, 6], ca_1: [2, 10], ca_2: [-1, 14]}
-  atk_recover:                 # landing from the swoop: head still forward and low, claw reaching, cape closed
+  atk_recover:                 # landing from the swoop: head a little forward and low (E5: a small slide, so the arm and torso keep the face, collar and buttons), claw reaching, cape closed
     t: 0.35
     dy: 1
     moves: [sh_n, el_n, hand_n]
     pins: [knee_n, foot_n, knee_f, foot_f, cv_2, cv_3]
-    tweaks: {crown: [5, 4], neck: [5, 4], cv_0: [3, 1], sh_n: [1, 0], el_n: [1, 0], hand_n: [2, 0]}
+    tweaks: {crown: [2, 1], neck: [2, 1], cv_0: [2, 1], sh_n: [1, 0], el_n: [1, 0], hand_n: [2, 0]}
   hurt_in1:                    # flinch: body up 1, head snaps back, claw arm jerks up toward the cape
     dy: -1
     moves: [crown, neck]
@@ -140,5 +141,5 @@ holds: []
 paint:                       # 1-2 px cracks enclosed by outline ink, closed with ink
   - {frame: atk_mid, xy: [[41, 31], [42, 31], [42, 32], [42, 33], [42, 34]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[44, 66], [45, 66], [46, 66], [45, 67], [46, 67]], rgb: [6, 4, 10]}
-  - {frame: atk_mid, xy: [[50, 53], [51, 53], [49, 54], [50, 54], [51, 54], [52, 54], [49, 55], [50, 55], [51, 55], [50, 56]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[37, 21]], rgb: [6, 4, 10]}       # E10: an isolated collar-trim pixel left beside the hood
   - {frame: hurt_in1, xy: [[29, 36], [28, 37], [29, 37], [27, 41], [26, 42], [27, 42], [26, 43]], rgb: [6, 4, 10]}

@@ -139,9 +139,9 @@ frames:
   hurt_in1:                    # body jolts 2 px forward and up off its legs, neck toward the hurt pose
     moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
     tweaks: {hip: [2, -2], chest: [2, -2], neck: [2, -2], head: [2, -2], beak: [2, -2], tail0: [2, -2], tail1: [2, -2], tail2: [2, -2], tail3: [2, -2], tail_tip: [2, -2]}
-  hurt_in2:                    # wings 20 / 30 deg down from the hurt spread
+  hurt_in2:                    # body settles back; the wings keep the hurt spread (E11: turning wing_n 20 deg forward put it under the neck as a thin strip)
     moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
-    tweaks: {hip: [-2, 1], chest: [-2, 1], neck: [-2, 1], head: [-2, 1], beak: [-2, 1], tail0: [-2, 1], tail1: [-2, 1], tail2: [-2, 1], tail3: [-2, 1], tail_tip: [-2, 1], wsh_n: [-2, 1], wtip_n: [7, 4], wsh_f: [-2, 1], wtip_f: [-2, 1]}
+    tweaks: {hip: [-2, 1], chest: [-2, 1], neck: [-2, 1], head: [-2, 1], beak: [-2, 1], tail0: [-2, 1], tail1: [-2, 1], tail2: [-2, 1], tail3: [-2, 1], tail_tip: [-2, 1], wsh_n: [-2, 1], wtip_n: [-2, 1], wsh_f: [-2, 1], wtip_f: [-2, 1]}
 holds: []
 paint:                         # 1 px joint cracks closed with outline ink
   - {frame: hurt_in1, xy: [[39, 67]], rgb: [6, 4, 10]}
