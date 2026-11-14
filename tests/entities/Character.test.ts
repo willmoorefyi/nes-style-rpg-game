@@ -127,3 +127,24 @@ describe('Character', () => {
     expect(char.getSpellCharges(2)).toBe(0);
   });
 });
+
+describe('upgraded classes keep their base class gear', () => {
+  const warrior: CharacterClassData = {
+    id: 'warrior', name: 'Warrior',
+    baseStats: { hp: 35, strength: 20, agility: 5, intelligence: 1, vitality: 10, luck: 5 },
+    statGrowth: { hp: 13, strength: 4, agility: 1, intelligence: 0, vitality: 3, luck: 1 },
+    usableEquipment: [], spellLevels: { white: 0, black: 0 },
+  };
+  const knight: CharacterClassData = { ...warrior, id: 'knight', name: 'Knight', upgradeFrom: 'warrior' };
+  const sword = { id: 'iron_sword', name: 'Iron Sword', type: 'weapon', price: 100, attack: 20, usableBy: ['warrior'] } as unknown as ItemData;
+  const staff = { id: 'staff', name: 'Staff', type: 'weapon', price: 5, attack: 6, usableBy: ['white_mage'] } as unknown as ItemData;
+
+  it('a Knight can use a warrior-only sword, and only in the weapon slot', () => {
+    const k = new Character({ name: 'KNT', classData: knight });
+    expect(k.canEquip(sword)).toBe(true);
+    expect(k.canEquipIn('weapon', sword)).toBe(true);
+    expect(k.canEquipIn('armor', sword)).toBe(false);
+    expect(k.canEquip(staff)).toBe(false);
+  });
+});
+

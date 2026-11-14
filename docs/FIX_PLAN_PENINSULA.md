@@ -333,3 +333,34 @@ Root causes are from the playtest; the implementer re-verifies each one before c
   - Cornelia: set `wander: False` for `gardener`, or add `noWander` for the north-postern route (8,17)–(8,25) and (9,17)–(11,25), in `layouts/cornelia.py`. Regenerate and recompile.
 - **IN-1.** Add `music: shop` to the six hand-written `assets-src/maps/cornelia-*` interiors and to their legacy copies in `assets/maps/`. While here, battle and victory music: `BattleTrigger` passes `audio` in the battle dependencies, and `onResume` restarts the map track. Verify both.
 - **IN-2.** `Camera` centres any axis smaller than the viewport. Test with `(GAME_W - w*TILE_SIZE)/2`, a 10x8 room, and the 16x13 tower (centred on one axis only).
+
+### T2 result
+
+**Fixed:**
+- **T2a:** NG-3 (sprite identity), BA-1 and BA-2, plus BA-6.
+- **T2b:** NG-3 (the name grid), NG-4 and MS-1 to MS-4, plus MS-6.
+- **T2c:** EB-2, CT-2, CT-3, CT-11, IN-1 and IN-2.
+
+**Also fixed:**
+- Battle, victory and boss music now play: the audio was never passed in, and music requests now resolve latest-wins.
+- The double victory fanfare.
+- Debug scenarios now equip weapons and body armour.
+- Upgraded classes keep their base class's gear.
+
+**How it was done:** three parallel worktrees, merged on `t2-integration`. Momus reviewed the plan (REVISE, folded in) and the implementation (REVISE: 5 issues, fixed; then OKAY).
+
+**Validation:**
+- Build passes; 1210 tests pass.
+- Browser, `?mute=1`:
+  - the name grid, with unique defaults (FGHTR, FGHTR2);
+  - mages start with charges;
+  - wanderers stay within 3 tiles over 25 s;
+  - Save is enabled in town;
+  - the weapon shop is centred, and its comparison shows `n/a` for both mages;
+  - a battle round goes back to the command menu with no input;
+  - Run escapes to the field, with the retry snapshot cleared and no Game Over;
+  - 15 entries through the city gate with the encounter counter at 1 start no battle, while an ordinary road tile does.
+
+**Known, not from T2:**
+- The map build is not deterministic: about 466 pixels change in two Cornelia chunks on some runs. Track it in T3.
+- `BattleStateMachine.ts` (620 lines) and `BattleScene.ts` (about 570) are over the size guideline.

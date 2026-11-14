@@ -141,3 +141,34 @@ describe('isMutedByUrl', () => {
     expect(isMutedByUrl('?art=ai')).toBe(false);
   });
 });
+
+describe('AudioManager music requests (latest wins)', () => {
+  it('a slow earlier load never replaces the track requested after it', async () => {
+    const started: string[] = [];
+    vi.stubGlobal('AudioContext', class {
+      state = 'running';
+      destination = {};
+      createGain() { return { gain: { value: 1, setValueAtTime() {}, linearRampToValueAtTime() {} }, connect() {}, disconnect() {} }; }
+      createBufferSource() {
+        const src = { buffer: null as unknown, loop: false, connect() {}, disconnect() {}, stop() {}, start() { started.push(String(src.buffer)); } };
+        return src;
+      }
+      async decodeAudioData(b: ArrayBuffer) { return new TextDecoder().decode(b) as unknown as AudioBuffer; }
+    });
+    const gates: Record<string, () => void> = {};
+    vi.stubGlobal('fetch', (path: string) => new Promise((resolve) => {
+      gates[path] = () => resolve({ ok: true, arrayBuffer: async () => new TextEncoder().encode(path).buffer });
+    }));
+    const audio = new AudioManager();
+    await audio.init({ music: { victory: 'victory.ogg', town: 'town.ogg' }, sfx: {} });
+    const victory = audio.playMusic('victory', false);   // battle won: fanfare (not cached yet)
+    const town = audio.playMusic('town');                // back in the field straight away
+    await new Promise((r) => setTimeout(r, 0));
+    gates['town.ogg']();
+    await town;
+    gates['victory.ogg']();                              // the fanfare finishes loading last
+    await victory;
+    expect(started).toEqual(['town.ogg']);
+    vi.unstubAllGlobals();
+  });
+});

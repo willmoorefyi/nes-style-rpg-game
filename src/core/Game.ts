@@ -123,7 +123,7 @@ export class Game {
     this.events.on('cursorCancel', () => this.audio.playSFX('cursor-cancel'));
     this.events.on('battleHit', () => this.audio.playSFX('battle-hit'));
     this.events.on('battleMiss', () => this.audio.playSFX('battle-miss'));
-    this.events.on('battleVictory', () => this.audio.playSFX('battle-victory'));
+    // battleVictory: the battle scene plays the victory fanfare track (no separate sound effect on top)
     this.events.on('spellCast', () => this.audio.playSFX('spell-cast'));
   }
 

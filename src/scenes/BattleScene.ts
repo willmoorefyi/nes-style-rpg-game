@@ -80,7 +80,7 @@ export class BattleScene implements Scene {
   }
 
   enter(): void {
-    this.deps.audio?.playMusic('battle');
+    this.deps.audio?.playMusic(this.config.music ?? 'battle');
     // Two-tone battle background
     const bg = new Graphics();
     bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x16213e);
@@ -526,7 +526,8 @@ export class BattleScene implements Scene {
         this.display.setVictory();
         this.deps.audio?.playMusic('victory', false);
       }
-      this.showMessages();
+      // the escape line was already shown with the action; go straight to the end screen
+      if (this.battle.outcome === 'escaped') this.checkBattleEnd(); else this.showMessages();
     } else {
       this.startCommandPhase();
     }
@@ -550,6 +551,12 @@ export class BattleScene implements Scene {
       });
     }
   }
+
+  /** Read-only views for tests and tools (no private access needed). */
+  get uiPhase(): string { return this.uiState; }
+  get battleState(): string { return this.battle.state; }
+  get outcome(): 'victory' | 'defeat' | 'escaped' | null { return this.battle.outcome; }
+  get messageLine(): string { return this.messageText.text; }
 
   onPause(): void {}
   onResume(): void {}

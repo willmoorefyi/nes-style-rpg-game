@@ -15,6 +15,8 @@ export class TextRenderer extends Container {
   private config: TextRendererConfig;
   private textObj: BitmapText;
   private fullText = '';
+  /** The whole current text (wrapped), whether or not it has finished revealing. */
+  get text(): string { return this.fullText; }
   private revealedCount = 0;
   private revealAccum = 0;
 

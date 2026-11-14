@@ -63,8 +63,8 @@ describe('Battle Integration', () => {
     scene.enter();
 
     // Access internal state for debugging
-    const getState = () => (scene as unknown as { uiState: string }).uiState;
-    const getBattleState = () => (scene as unknown as { battle: { state: string } }).battle.state;
+    const getState = () => scene.uiPhase;
+    const getBattleState = () => scene.battleState;
 
     // Advance from intro
     tick(scene, input, 'confirm');
@@ -104,8 +104,8 @@ describe('Battle Integration', () => {
     const scene = new BattleScene(deps, createConfig([hero], [strongEnemy]));
     scene.enter();
 
-    const getState = () => (scene as unknown as { uiState: string }).uiState;
-    const getBattleState = () => (scene as unknown as { battle: { state: string } }).battle.state;
+    const getState = () => scene.uiPhase;
+    const getBattleState = () => scene.battleState;
 
     tick(scene, input, 'confirm'); // intro
     waitGuard(scene, input);
@@ -134,7 +134,7 @@ describe('Battle Integration', () => {
     const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
     scene.enter();
 
-    const getState = () => (scene as unknown as { uiState: string }).uiState;
+    const getState = () => scene.uiPhase;
 
     tick(scene, input, 'confirm'); // intro
     expect(getState()).toBe('command');
@@ -169,7 +169,7 @@ describe('Battle Integration', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });   // agility 10 vs the Slime's 1: acts first
     const scene = new BattleScene(deps, createConfig([hero], [weakEnemy], rng));
     scene.enter();
-    const internals = scene as unknown as { uiState: string; battle: { state: string; outcome: string | null } };
+    const internals = scene;
     tick(scene, input, 'confirm'); // intro
     waitGuard(scene, input);
     tick(scene, input, 'down');    // Magic
@@ -182,11 +182,11 @@ describe('Battle Integration', () => {
   it('a successful escape ends the battle as escaped, with no Game Over', () => {
     const { scene, internals } = startRun(() => 0);   // 0 < run chance: always escapes
     let frames = 0;
-    while (internals.uiState !== 'end' && frames < 600) { tick(scene, input); frames++; }
+    while (internals.uiPhase !== 'end' && frames < 600) { tick(scene, input); frames++; }
 
-    expect(internals.uiState).toBe('end');
-    expect(internals.battle.state).toBe('escaped');
-    expect(internals.battle.outcome).toBe('escaped');
+    expect(internals.uiPhase).toBe('end');
+    expect(internals.battleState).toBe('escaped');
+    expect(internals.outcome).toBe('escaped');
 
     tick(scene, input, 'confirm');   // "Escaped!" closes on confirm
     const emitCalls = (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls;
@@ -198,11 +198,11 @@ describe('Battle Integration', () => {
   it('a failed escape continues the battle at the next command menu', () => {
     const { scene, internals } = startRun(() => 0.99);   // 99 >= run chance: never escapes
     let frames = 0;
-    while (internals.uiState !== 'command' && frames < 600) { tick(scene, input); frames++; }
+    while (internals.uiPhase !== 'command' && frames < 600) { tick(scene, input); frames++; }
 
-    expect(internals.uiState).toBe('command');
-    expect(internals.battle.state).toBe('command_select');
-    expect(internals.battle.outcome).toBeNull();
+    expect(internals.uiPhase).toBe('command');
+    expect(internals.battleState).toBe('command_select');
+    expect(internals.outcome).toBeNull();
     const emitCalls = (deps.events.emit as ReturnType<typeof vi.fn>).mock.calls;
     expect(emitCalls.some(c => c[0] === 'battleEnd')).toBe(false);
   });
@@ -212,19 +212,19 @@ describe('Battle Integration', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
     const scene = new BattleScene(deps, createConfig([hero], [strongEnemy], () => 0.99));
     scene.enter();
-    const internals = scene as unknown as { uiState: string; battle: { state: string } };
+    const internals = scene;
     tick(scene, input, 'confirm'); // intro
     waitGuard(scene, input);
     tick(scene, input, 'confirm'); // Fight
     tick(scene, input, 'confirm'); // target
-    expect(internals.uiState).toBe('executing');
+    expect(internals.uiPhase).toBe('executing');
 
     // Two actions (announce 30 + move + results 25 each + return) and round_end 20: well under 400 frames
     const BUDGET = 400;
     let frames = 0;
-    while (internals.uiState !== 'command' && frames < BUDGET) { tick(scene, input); frames++; }
-    expect(internals.uiState).toBe('command');
-    expect(internals.battle.state).toBe('command_select');
+    while (internals.uiPhase !== 'command' && frames < BUDGET) { tick(scene, input); frames++; }
+    expect(internals.uiPhase).toBe('command');
+    expect(internals.battleState).toBe('command_select');
     expect(hero.currentHp).toBeGreaterThan(0);
   });
 
@@ -232,7 +232,7 @@ describe('Battle Integration', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
     const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
     scene.enter();
-    const getState = () => (scene as unknown as { uiState: string }).uiState;
+    const getState = () => scene.uiPhase;
     tick(scene, input, 'confirm'); // intro
     expect(getState()).toBe('command');
     tick(scene, input, 'confirm'); // mashed: ignored
@@ -246,22 +246,22 @@ describe('Battle Integration', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
     const scene = new BattleScene(deps, createConfig([hero], [strongEnemy], () => 0.99));
     scene.enter();
-    const internals = scene as unknown as { uiState: string; messageText: { fullText: string } };
+    const internals = scene;
     tick(scene, input, 'confirm'); // intro
     waitGuard(scene, input);
     // One full round first, so the battle has old action messages that must not come back
     tick(scene, input, 'confirm'); // Fight
     tick(scene, input, 'confirm'); // target
-    for (let i = 0; i < 400 && internals.uiState !== 'command'; i++) tick(scene, input);
-    expect(internals.uiState).toBe('command');
+    for (let i = 0; i < 400 && internals.uiPhase !== 'command'; i++) tick(scene, input);
+    expect(internals.uiPhase).toBe('command');
     waitGuard(scene, input);
     tick(scene, input, 'down');    // Magic
     tick(scene, input, 'confirm'); // no spells
-    expect(internals.uiState).toBe('notice');
+    expect(internals.uiPhase).toBe('notice');
     const seen: string[] = [];
-    for (let i = 0; i < 60 && internals.uiState !== 'command'; i++) { tick(scene, input); seen.push(internals.messageText.fullText); }
-    expect(internals.uiState).toBe('command');
+    for (let i = 0; i < 60 && internals.uiPhase !== 'command'; i++) { tick(scene, input); seen.push(internals.messageLine); }
+    expect(internals.uiPhase).toBe('command');
     expect(seen.every(t => t === 'No spells available.' || t === "Hero's turn")).toBe(true);
-    expect(internals.messageText.fullText).toBe("Hero's turn");
+    expect(internals.messageLine).toBe("Hero's turn");
   });
 });

@@ -66,9 +66,15 @@ export class AudioManager {
 
   get isDisabled(): boolean { return this.disabled; }
 
+  /** Increments on every playMusic call; a load that finishes after a newer request is dropped. */
+  private musicRequest = 0;
+  /** Track whose file is still loading (counts as current for the same-track check). */
+  private requestedTrack: string | null = null;
+
   async playMusic(trackId: string, loop = true): Promise<void> {
     if (this.disabled) return;
-    if (this.currentMusic?.trackId === trackId) return;
+    // the latest request wins, even when an earlier one's file finishes loading later
+    if ((this.requestedTrack ?? this.currentMusic?.trackId) === trackId) return;
     const path = this.manifest?.music[trackId];
     if (!path) {
       console.warn(`Unknown music track: ${trackId}`);
@@ -76,7 +82,11 @@ export class AudioManager {
     }
     const ctx = this.ensureContext();
     if (!ctx) return;
+    this.requestedTrack = trackId;
+    const request = ++this.musicRequest;
     const buffer = await this.loadAudio(path);
+    if (request !== this.musicRequest) return;      // superseded while loading
+    this.requestedTrack = null;
     if (!buffer) return;
     this.stopMusic(0);
     const source = ctx.createBufferSource();
@@ -91,6 +101,9 @@ export class AudioManager {
   }
 
   stopMusic(fadeMs = 500): void {
+    // a track still loading must not start after a stop
+    this.musicRequest++;
+    this.requestedTrack = null;
     if (!this.currentMusic) return;
     const { source, gain } = this.currentMusic;
     if (fadeMs > 0 && this.ctx) {

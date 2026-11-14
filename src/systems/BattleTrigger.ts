@@ -60,6 +60,7 @@ export class BattleTrigger {
       spells,
       background,
       enemyAi,
+      music: bossConfig?.isBoss ? 'boss' : undefined,
     };
     const battleScene = new BattleScene(deps, sceneConfig);
     // Drop old scene references before creating new ones to prevent leaks

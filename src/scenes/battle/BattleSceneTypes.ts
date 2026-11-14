@@ -20,6 +20,8 @@ export interface BattleSceneConfig {
   canRun?: boolean;
   /** Battle stage background path (assets/backgrounds/<id>.webp) */
   background?: string;
+  /** Music track for the battle (default `battle`; boss battles use `boss`). */
+  music?: string;
   /** Optional per-enemy-id action patterns (debug scenarios): attached as BossAI after the battle is created. */
   enemyAi?: EnemyAiPatterns;
   /** Injectable RNG for the battle logic (deterministic tests); defaults to Math.random. */
