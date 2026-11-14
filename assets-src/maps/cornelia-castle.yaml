@@ -532,7 +532,10 @@ npcs:
   x: 6
   y: 24
   wander: true
-  dialog: [A feast for the princess's return is ready the moment she is home!]
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: [The feast is ready! Her Highness is home!]
+  - text: [A feast for the princess's return is ready the moment she is home!]
 - id: castle_maid
   sprite: villager_f
   x: 9
@@ -557,7 +560,7 @@ npcs:
   sprite: guard
   x: 36
   y: 23
-  dialog: [The King ordered the storeroom below opened for you., Take what you need for your journey.]
+  dialog: [The storeroom below is open to any who would face Garland., Take what you need before you set out.]
 transitions:
 - {x: 21, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}
 - {x: 22, y: 8, targetMap: cornelia-castle-2f, targetEntrance: stairs}

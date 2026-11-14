@@ -538,6 +538,8 @@ def main() -> None:
     gate = "The bridge has collapsed into the sea. Only the King's builders could repair it."
     doc = {
         "id": "overworld",
+        "name": "World Map",
+        "camp": True,                     # MS-8: Tent and Cabin work on the world map only (FF1)
         "kits": ["overworld", "town", "temple"],
         "music": "overworld",
         "terrain": "organic",

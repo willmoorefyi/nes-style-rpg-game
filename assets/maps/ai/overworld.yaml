@@ -106,6 +106,7 @@ transitions:
 - {x: 30, y: 45, targetMap: cornelia, targetEntrance: east_gate}
 - {x: 28, y: 46, targetMap: cornelia, targetEntrance: south_gate}
 - {x: 15, y: 38, targetMap: temple-of-fiends, targetEntrance: entry}
+name: World Map
 music: overworld
 encounterRate: {min: 15, max: 30}
 encounters:
@@ -225,3 +226,4 @@ encounterZones:
     - {id: gr_imp, min: 1, max: 2}
     - {id: wolf, min: 1, max: 2}
     weight: 2
+camp: true

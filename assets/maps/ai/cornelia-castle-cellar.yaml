@@ -42,7 +42,7 @@ npcs:
   sprite: old_man
   x: 13
   y: 6
-  dialog: ['Wine, grain and old armour, all the way to the walls.', 'The chests are yours, by royal order.']
+  dialog: ['Wine, grain and old armour, all the way to the walls.', Take what you need. The King would want it so.]
 transitions:
 - {x: 10, y: 3, targetMap: cornelia-castle, targetEntrance: cellar}
 - {x: 11, y: 3, targetMap: cornelia-castle, targetEntrance: cellar}

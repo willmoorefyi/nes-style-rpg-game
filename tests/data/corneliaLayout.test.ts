@@ -147,6 +147,24 @@ describe('Cornelia edges (CT-6)', () => {
     expect(n).toBeGreaterThan(150);
   });
 
+  it('every walkable cell can be reached from the south gate (CU), and the compiler checks it', () => {
+    expect(Object.keys(map.entrances ?? {})[0]).toBe('south_gate');
+    expect((town as Source & { no_unreachable_walkable?: boolean }).no_unreachable_walkable).toBe(true);
+    const seen = reachable({ ...map, npcs: [] });
+    const lost: string[] = [];
+    for (let y = 0; y < map.height; y++) {
+      for (let x = 0; x < map.width; x++) if (col.isWalkable(x, y, walk) && !seen.has(`${x},${y}`)) lost.push(`${x},${y}`);
+    }
+    expect(lost).toEqual([]);
+    expect(seen.size).toBeGreaterThan(2600);
+  });
+
+  it('no NPC stands on the 3-wide bridge head at the castle door (CT-4)', () => {
+    const onBridge = map.npcs.filter((n) => n.y === 19 && n.x >= 29 && n.x <= 31).map((n) => n.id);
+    expect(onBridge).toEqual([]);
+    for (const id of ['castle_door_guard_w', 'castle_door_guard_e']) expect(map.npcs.some((n) => n.id === id), id).toBe(true);
+  });
+
   it('every edge exit can be reached from the south gate, and arrivals stay at the gates', () => {
     const seen = reachable({ ...map, npcs: [] });
     for (const t of map.transitions.filter((tr) => tr.targetMap === 'overworld')) {

@@ -1216,6 +1216,7 @@ encounters:
   weight: 1
 height: 30
 id: temple-of-fiends
+name: Temple of Fiends
 layers:
 - - 2
   - 2
