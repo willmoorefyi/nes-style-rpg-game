@@ -55,6 +55,7 @@ entrances:
   cornelia_west: [25, 30]
   cornelia_east: [30, 30]
   castle: [28, 26]
+  cornelia_north: [28, 26]     # arrival north of the icon (town north edge, castle precinct); `castle` is its alias
 objects:
 - type: deco                   # Cornelia: one walled city (castle to the north, town to the south)
   parts:

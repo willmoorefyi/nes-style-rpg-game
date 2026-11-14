@@ -36,6 +36,11 @@ MATERIALS = {
     "rubble": ((110, 110, 115), "stones"),
     "in_wall_top": ((70, 50, 40), "speckle"),
     "in_wall_face": ((200, 180, 150), "bricks"),
+    # overworld (approved in the overworld kit; placeholders let offline tests compile wild terrain)
+    "forest": ((35, 95, 45), "speckle"),
+    "mountain": ((125, 110, 95), "stones"),
+    "sand": ((215, 195, 140), "speckle"),
+    "ocean": ((35, 80, 170), "ripple"),
 }
 
 ROOF_ROWS = ("ridge", "mid", "eave")
@@ -195,6 +200,42 @@ class Kit:
         return self.materials[name]
 
 
+def apply_paint(sheet: Image.Image, ops: list[dict], where: str = "sheet") -> Image.Image:
+    """Offline art fixes on an approved sheet, applied in order before the cells are cut (no paid art): each op
+    copies a rect of the sheet, `{"from": [x, y, w, h], "to": [x, y]}` in the sheet's native px, optionally
+    mirrored (`"flip": "h"` or `"v"`), replacing the target pixels (`"mode": "replace"`, default) or composited over
+    them (`"mode": "over"`). Kept by approve.py when a sheet is re-approved."""
+    if not ops:
+        return sheet
+    out = sheet.copy()
+    for n, op in enumerate(ops):
+        try:
+            x, y, w, h = (int(v) for v in op["from"])
+            tx, ty = (int(v) for v in op["to"])
+        except (KeyError, TypeError, ValueError) as e:
+            raise ValueError(f"{where}: paint {n} needs from: [x, y, w, h] and to: [x, y] ({e})") from e
+        if w <= 0 or h <= 0 or x < 0 or y < 0 or x + w > sheet.width or y + h > sheet.height:
+            raise ValueError(f"{where}: paint {n} source rect {op['from']} is outside the {sheet.size} sheet")
+        if tx < 0 or ty < 0 or tx + w > sheet.width or ty + h > sheet.height:
+            raise ValueError(f"{where}: paint {n} target {op['to']} (+{w}x{h}) is outside the {sheet.size} sheet")
+        patch = out.crop((x, y, x + w, y + h))
+        flip = op.get("flip")
+        if flip == "h":
+            patch = patch.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        elif flip == "v":
+            patch = patch.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+        elif flip is not None:
+            raise ValueError(f"{where}: paint {n} flip must be h or v, not {flip!r}")
+        mode = op.get("mode", "replace")
+        if mode == "replace":
+            out.paste(patch, (tx, ty))
+        elif mode == "over":
+            out.alpha_composite(patch, (tx, ty))
+        else:
+            raise ValueError(f"{where}: paint {n} mode must be replace or over, not {mode!r}")
+    return out
+
+
 def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool = False) -> Kit:
     kit = Kit(kit_id, {n: placeholder_part(n) for n in PART_NAMES}, {n: placeholder_material(n) for n in MATERIALS})
     root = approved_dir / kit_id
@@ -203,6 +244,7 @@ def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool
     for meta_path in sorted(root.glob("*.json")):
         meta = json.loads(meta_path.read_text())
         sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
+        sheet = apply_paint(sheet, meta.get("paint") or [], f"{kit_id}/{meta_path.name}")
         tile = meta.get("tile", T)
         for r, row in enumerate(meta.get("cells", [])):
             for c, name in enumerate(row):

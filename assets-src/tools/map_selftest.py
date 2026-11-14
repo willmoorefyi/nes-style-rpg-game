@@ -1,0 +1,215 @@
+"""Self-test cases for the map compiler's core features (run by `build_map.py --selftest`).
+
+Each case fails on the compiler before these features: hash-seed determinism, object offsets / styles /
+`collide: alpha`, edge exits, inspect cells, the map checks (map_checks.py), the map report and the preview.
+"""
+from __future__ import annotations
+
+import json
+import tempfile
+from collections import Counter
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+import kit as K
+import map_checks as MC
+import map_report as MR
+
+
+def run(B) -> int:
+    """B is the build_map module. Returns the number of checks passed (raises AssertionError on a failure)."""
+    kit = K.load_kit("town", placeholders_only=True)
+    T = B.T
+    ok = 0
+
+    def comp(src):
+        return B.compile_map(src, kit, check_interiors=False)
+
+    def expect_error(src, needle):
+        nonlocal ok
+        try:
+            comp(src)
+        except B.MapError as e:
+            assert needle in str(e), f"expected {needle!r} in: {e}"
+            ok += 1
+            return
+        raise AssertionError(f"expected MapError containing {needle!r}")
+
+    def grass_map(rows, cols, **kw):
+        return {"id": "t", "ground": "\n".join(["." * cols] * rows), "entrances": {"a": [0, rows - 1]}, **kw}
+
+    assert MC.BLOCKED == {B.WALL, B.WATER, B.COUNTER, B.TERRAIN["mountain"], B.TERRAIN["river"]}
+    assert MC.COUNTER == B.COUNTER and MC.WALL == B.WALL
+
+    # ── 1. determinism: a water cell outside the canal outline between 3 grass and 3 cobble cells
+    tie = {"id": "tie", "ground": ".....\n.#.:.\n.:~:.\n.#...\n.....", "entrances": {"a": [0, 0]}}
+    assert B.most_common_soft(Counter({"cobble": 3, "grass": 3})) == "grass", "ties go to the earlier SOFT material"
+    assert B.most_common_soft(Counter({"cobble": 4, "grass": 3})) == "cobble"
+    c = comp(tie)
+    cell = c.below[2 * T:3 * T, 2 * T:3 * T]
+    grass = B._tile(kit.material("grass"), *c.below.shape[:2])[2 * T:3 * T, 2 * T:3 * T]
+    assert np.all(cell == grass, axis=2).mean() > 0.9, "the tie cell shows grass (the earlier SOFT material)"
+    with tempfile.TemporaryDirectory() as tmp:
+        f = Path(tmp) / "tie.json"
+        f.write_text(json.dumps(tie))
+        below = {B.hash_run([], str(f), True, str(s))["tie"]["below"] for s in range(8)}
+    assert len(below) == 1, f"below differs across PYTHONHASHSEED 0..7: {len(below)} variants"
+    ok += 3
+
+    # ── 2. objects: offset, style, collide: alpha (null cells included), alpha_min, walk_cells, prefab
+    base = grass_map(4, 6)
+    shifted = comp({**base, "objects": [{"type": "deco", "parts": [["bush", None]], "x": 1, "y": 1,
+                                         "offset": [36, 0], "collide": "alpha"}]})
+    assert shifted.collision[1, 1] == B.GRASS and shifted.collision[1, 2] == B.WALL, \
+        f"collide: alpha follows the shifted art ({shifted.collision[1, 1:3]})"
+    bush = np.array([40, 120, 50])
+    at = lambda img, px, py: np.abs(img[py, px].astype(int) - bush).sum() < 30  # noqa: E731
+    assert at(shifted.below, T + 23 + 36, T + 26) and not at(shifted.below, T + 23, T + 26), "offset moves the part"
+    plain = comp({**base, "objects": [{"type": "deco", "parts": [["bush"]], "x": 1, "y": 1}]})
+    blue = comp({**base, "objects": [{"type": "deco", "parts": [["bush"]], "x": 1, "y": 1, "style": "blue"}]})
+    assert not np.array_equal(plain.below[T + 26, T + 23], blue.below[T + 26, T + 23]), "deco style recolours"
+    flowers = {"type": "deco", "parts": [["flowers"]], "x": 1, "y": 1}
+    assert comp({**base, "objects": [flowers]}).collision[1, 1] == B.WALL
+    assert comp({**base, "objects": [{**flowers, "collide": "alpha"}]}).collision[1, 1] == B.GRASS, \
+        "a cell with a few opaque pixels stays walkable"
+    one_bush = {"type": "deco", "parts": [["bush"]], "x": 1, "y": 1, "collide": "alpha"}
+    assert comp({**base, "objects": [one_bush]}).collision[1, 1] == B.WALL
+    assert comp({**base, "objects": [{**one_bush, "alpha_min": 0.9}]}).collision[1, 1] == B.GRASS, "alpha_min"
+    assert comp({**base, "objects": [{**one_bush, "walk_cells": [[0, 0]]}]}).collision[1, 1] == B.ROAD, "walk_cells win"
+    expect_error({**base, "objects": [{"type": "deco", "parts": [["bush", None]], "x": 1, "y": 1},
+                                      {"type": "bush", "x": 2, "y": 1}]}, "overlaps")   # null cells are footprint
+    expect_error({**base, "objects": [{**one_bush, "collide": "round"}]}, "collide must be")
+    pf = {"type": "prefab", "prefab": "pf", "x": 1, "y": 1, "w": 2, "h": 1, "ridge_rows": 0, "offset": [24, 0],
+          "collide": "alpha", "alpha_min": 0.6}
+    pc = comp({**base, "objects": [pf]})
+    assert pc.collision[1, 1] == B.GRASS and pc.collision[1, 2] == B.WALL, "prefab offset + collide: alpha"
+    ok += 9
+
+    # ── 3. edge exits
+    edge = {"id": "edge", "ground": "......\n......\n..##..\n......\n......", "entrances": {"a": [2, 1]},
+            "transitions": [{"x": 0, "y": 2, "targetMap": "explicit", "targetEntrance": "x"}],
+            "edge_exits": {s: {"targetMap": "overworld", "targetEntrance": s} for s in B.SIDES}}
+    edge["edge_exits"]["split"] = [{"side": "east", "from": 3, "to": 4, "targetEntrance": "e2"}]
+    ec = comp(edge)
+    by = {(t["x"], t["y"]): t for t in ec.transitions}
+    walk_edge = [p for p in MC.edge_cells(6, 5) if MC.walkable(ec.collision, *p)]
+    assert len(walk_edge) == 18 and all(p in by for p in walk_edge), "every walkable edge cell is an exit"
+    assert by[(0, 0)]["targetEntrance"] == "north" and by[(5, 4)]["targetEntrance"] == "south", "corners: N / S"
+    assert by[(5, 1)]["targetEntrance"] == "east" and by[(5, 3)]["targetEntrance"] == "e2", "split"
+    assert by[(0, 2)]["targetMap"] == "explicit" and len(ec.transitions) == 18, "explicit transitions win"
+    expect_error({**edge, "edge_exits": {"north": {"targetMap": "overworld", "targetEntrance": "n"}}},
+                 "walkable edge cells are not exits")
+    pocket = {**edge, "ground": ".#....\n.#....\n##....\n......", "entrances": {"a": [3, 3]}, "transitions": []}
+    expect_error(pocket, "can't be reached from the first entrance")
+    ok += 4
+
+    # ── 4. inspect cells
+    insp = {**grass_map(5, 6), "ground": "......\n......\n..##..\n......\n......",
+            "inspect": [{"x": 3, "y": 2, "text": ["Here lies Erdrick."]}]}
+    ic = comp(insp)
+    with tempfile.TemporaryDirectory() as tmp:
+        import yaml
+        doc = yaml.safe_load(B.write(insp, ic, Path(tmp)).read_text())
+        assert doc.get("inspect") == insp["inspect"], "inspect is passed through to the runtime map"
+    expect_error({**insp, "inspect": [{"x": 99, "y": 2, "text": ["?"]}]}, "off the map")
+    expect_error({**insp, "inspect": [{"x": 3, "y": 2, "text": []}]}, "non-empty text")
+    expect_error({**pocket, "edge_exits": None, "inspect": [{"x": 0, "y": 0, "text": ["?"]}]},
+                 "no reachable walkable neighbour")
+    ok += 1
+
+    # ── 5. map checks
+    ok_src = lambda s: comp(s) and True  # noqa: E731
+    open_map = grass_map(3, 5)
+    expect_error({**open_map, "sealed_edges": True}, "sealed_edges")
+    assert ok_src({"id": "s", "ground": "ooooo\no...o\nooooo", "entrances": {"a": [1, 1]}, "sealed_edges": True})
+    ok += 1
+    road = {"id": "r", "ground": "..........\n.,,,,,,,..\n..........", "entrances": {"a": [0, 1]}}
+    expect_error({**road, "road_check": {"materials": ["dirt"]}}, "dead ends")
+    assert ok_src({**road, "road_check": {"materials": ["dirt"], "ends": [[7, 1]]}})
+    expect_error({**road, "ground": "..........\n.,,,..,,..\n..........",
+                  "road_check": {"ends": [[3, 1], [6, 1], [7, 1]]}}, "separate networks")
+    expect_error({**road, "road_check": {"ends": [[7, 1]]}, "objects": [{"type": "bush", "x": 4, "y": 1}]},
+                 "under a blocked object")
+    wide = {"id": "w", "ground": "........\n.,,,,,..\n.,,,,,..\n........", "entrances": {"a": [0, 1]}}
+    expect_error({**wide, "road_check": {}}, "dead ends")                         # a 2-wide dead end
+    assert ok_src({**wide, "road_check": {"ends": [[6, 2]]}})
+    mask = np.zeros((8, 8), bool)
+    mask[1:3, 1:7] = True
+    mask[3:7, 5:7] = True
+    caps = sorted(sorted(cp) for cp in MC.road_caps(mask))
+    assert caps == [[(1, 1), (1, 2)], [(5, 6), (6, 6)]], f"a 2-wide bend has only its two ends as caps: {caps}"
+    ok += 3
+    warp = {"id": "wp", "ground": "#####\n.....\n.....", "entrances": {"a": [0, 2]},
+            "transitions": [{"x": 2, "y": 1, "targetMap": "x", "targetEntrance": "y"}], "warp_leaves": True,
+            "objects": [{"type": "deco", "parts": [["bush", "bush", "bush"]], "x": 1, "y": 1, "walk_cells": [[1, 0]]}]}
+    assert ok_src(warp)
+    expect_error({**warp, "ground": ".....\n.....\n....."}, "warp_leaves")
+    blob = {"id": "b", "ground": "......\n.m....\n......", "entrances": {"a": [5, 2]},
+            "min_blob": {"mountain": 3, "ocean_inlet": 2}}
+    expect_error(blob, "mountain patches smaller than 3")
+    assert ok_src({**blob, "ground": "......\n.mmm..\n......"})
+    expect_error({**blob, "ground": "oooooo\noooooo\n...o..\n......"}, "ocean narrower than 2")
+    assert ok_src({**blob, "ground": "oooooo\noooooo\n..oo..\n......"})
+    river = {"id": "rv", "ground": "mmmmmmm\n..rr...\n..==...\n..rr...\nooooooo", "entrances": {"a": [0, 2]},
+             "river_check": True}
+    assert ok_src(river)
+    expect_error({**river, "ground": "mmmmmmm\n..rr...\n..==...\n...rr..\nooooooo"}, "not the bridge span")
+    expect_error({**river, "ground": "mmmmmmm\n..rr...\n..==...\n..rr...\n......."}, "never reaches the ocean")
+    expect_error({**river, "ground": ".......\n..rr...\n..==...\n..rr...\nooooooo"}, "has no source")
+    ok += 3
+    walled = {"id": "n", "ground": ".....\n.###.\n.#.#.\n.###.\n.....", "entrances": {"a": [0, 0]},
+              "npcs": [{"id": "hermit", "x": 2, "y": 2, "sprite": "villager", "dialog": []}]}
+    expect_error(walled, "no reachable cell to be talked to")
+    shop = {"id": "sh", "ground": "#####\n##.##\n##c##\n.....", "entrances": {"a": [0, 3]},
+            "npcs": [{"id": "keeper", "x": 2, "y": 1, "sprite": "merchant", "dialog": []}]}
+    assert ok_src(shop), "talked to across a counter"
+    expect_error({**base, "art_coverage": True, "objects": [flowers]}, "invisible walls")
+    assert ok_src({**base, "art_coverage": True, "objects": [{**flowers, "parts": [["bush"]]}]})
+    choke = {"id": "ch", "ground": "#####\n.....\n##.##\n##.##", "entrances": {"a": [0, 1]},
+             "transitions": [{"x": 2, "y": 3, "targetMap": "x", "targetEntrance": "y"}],
+             "npcs": [{"id": "guard", "x": 2, "y": 2, "sprite": "guard", "dialog": []}], "no_static_chokepoints": True}
+    expect_error(choke, "static NPCs cut off the transition")
+    assert ok_src({**choke, "npcs": [{**choke["npcs"][0], "wander": True}]})
+    ok += 3
+
+    # ── 6. map report and 7. preview, on a compiled map written to a temp dir
+    with tempfile.TemporaryDirectory() as tmp:
+        src = {**choke, "no_static_chokepoints": False, "npcs": [{**choke["npcs"][0], "wander": True}]}
+        cc = comp(src)
+        B.write(src, cc, Path(tmp))
+        r = MR.report(MR.load("ch", Path(tmp)), {"door": (2, 3)})
+        assert [ch["cell"] for ch in r["chokepoints"]] == [(1, 1), (2, 1), (2, 2)], r["chokepoints"]
+        assert all(ch["cuts_off"] == ["x"] for ch in r["chokepoints"])
+        assert r["distances"][("a", "door")] == 4 and (0, 1) in r["edge_not_exit"]
+        assert MC.articulation_points(cc.collision, (0, 1)) == {(1, 1), (2, 1), (3, 1), (2, 2)}
+        out = B.preview("ch", 1, 1, 3, 3, Path(tmp) / "p.png", grid=True, collision=True, scale=0.5, out_dir=Path(tmp))
+        assert Image.open(out).size == (3 * T // 2, 3 * T // 2)
+        ok += 2
+
+    # ── kit `paint` fixes (copy-rect, applied before cutting) and the lake legend
+    with tempfile.TemporaryDirectory() as tmp:
+        d = Path(tmp) / "pt"
+        d.mkdir()
+        sheet = Image.new("RGBA", (2 * T, T), (0, 0, 255, 255))
+        sheet.paste((255, 0, 0, 255), (0, 0, T, T))
+        sheet.save(d / "s.png")
+        meta = {"tile": T, "cells": [["a", "b"]], "paint": [{"from": [0, 0, 24, T], "to": [T, 0]},
+                                                            {"from": [0, 0, 8, 8], "to": [T + 40, 40], "flip": "h"}]}
+        (d / "s.json").write_text(json.dumps(meta))
+        b = np.asarray(K.load_kit("pt", Path(tmp)).part("b"))
+        assert (b[:, :24, 0] == 255).all() and (b[:24, 24:40, 2] == 255).all() and (b[40:, 40:, 0] == 255).all(), \
+            "paint copies a rect of the sheet before the cells are cut"
+        (d / "s.json").write_text(json.dumps({**meta, "paint": [{"from": [90, 0, 24, T], "to": [0, 0]}]}))
+        try:
+            K.load_kit("pt", Path(tmp))
+            raise AssertionError("a paint rect outside the sheet must fail")
+        except ValueError as e:
+            assert "outside" in str(e)
+    lake = comp({"id": "lk", "ground": "....\n.≈≈.\n....", "entrances": {"a": [0, 0]}})
+    assert lake.collision[1, 1] == B.WATER and lake.mat[1, 2] == "lake"
+    if not __import__("importlib").util.find_spec("terrain"):
+        expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain.py")
+    ok += 2
+    return ok

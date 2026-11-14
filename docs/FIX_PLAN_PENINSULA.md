@@ -792,3 +792,15 @@ All 15 momus issues apply. Ownership and resolutions:
 2. **Document** every finding in a new issue file, `docs/PLAYTEST_PENINSULA_2_<date>.md`.
 3. **Plan** a fix for each issue; momus validates the plan.
 4. **Implement** the fixes, validating each through tests and real gameplay in the browser, and commit tranche by tranche.
+### T3a result
+
+**Done** (`build_map.py`, new `map_checks.py`, `map_report.py`, `map_selftest.py`; `kit.py`; `gen/approve.py`):
+- **Determinism:** the canal-bank tie now uses `Counter` and SOFT order (`most_common_soft`). The reproduction ran without `-I`, which ignores `PYTHONHASHSEED`. `--check-determinism [ids]` compiles every map in subprocesses (`-s`, env holding only the seed) under two seeds; all 13 maps match. The rebuild changes only Cornelia's cells (28,52) and (33,55): 932 px, which now show grass. One-off review against the parent commit: no other town or castle chunk changed.
+- **Objects:** `deco`/`prefab` `offset`, `deco` `style`, `collide: alpha` + `alpha_min` measured on the composited footprint alpha (null cells included; `walk_cells` win).
+- **Edge exits**, **inspect** (passthrough + validator), the **map checks**, `--preview`, `map_report.py`, the kit **`paint`** loader (kept by `approve.py`), and the `≈` lake legend (`lake`, painted as soft water until `terrain.py` takes over).
+- **Entrance contract:** `cornelia_north` is at [28,26] in `assets-src/maps/overworld.yaml`. In the legacy overworld it is at [8,12], the spot all its Cornelia arrivals share, because [28,26] means nothing on that map.
+
+**Hooks for T3b–T3d:**
+- `terrain: organic` dispatches to `terrain.paint_soft(below, mat, kit, seed)` and `terrain.place_peaks(canvas, mat, owner, kit, rng)`.
+- `--selftest` calls `terrain.selftest()`, and `--metrics [ids]` calls `terrain.metrics(src, compiled)`, once `terrain.py` exists.
+- Source keys: `edge_exits` (+`split`), `inspect`, `sealed_edges`, `road_check` (`materials`, `ends`, `cap_width`), `warp_leaves`, `min_blob` (with `ocean_inlet`), `river_check`, `art_coverage`, `no_static_chokepoints`, and `paint` in kit `.json`. Talkable NPCs are checked on every map.
