@@ -99,14 +99,17 @@ def run_daze(check: Callable[[bool, str], None]) -> None:
 
 
 def run_ledger(check: Callable[[bool, str], None]) -> None:
-    """FB-8 (plan §7): pass F's own Gemini cap in budget.json `passes`, enforced by check_budget, and the real ledger."""
+    """FB-8 (plan §7): pass F's own Gemini cap in budget.json `passes`, closed at R0 (docs/ROSTER_PLAN.md 6.4:
+    `gemini_end` = N0), and its slice of the real ledger."""
     import json
     from types import SimpleNamespace
     from gen import generate as GEN
-    cap = next(p for p in json.loads(GEN.BUDGET.read_text())["passes"] if p["name"].startswith("pass F"))
+    cap = next(p for p in json.loads(GEN.BUDGET.read_text())["passes"] if p["name"] == "pass F (FB-8)")
+    check("gemini_end" in cap, f"pass F is closed in budget.json (gemini_end = N0 at R0): {cap.get('gemini_end')}")
+    end = cap.get("gemini_end", 0)
     led = GEN.read_ledger()
     gem = [e for e in led if e.get("event") == "attempt" and e.get("backend") != "bedrock"]
-    new = gem[cap["gemini_before"]:]
+    new = gem[cap["gemini_before"]:end]
     per = {}
     for e in new:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1
@@ -115,23 +118,16 @@ def run_ledger(check: Callable[[bool, str], None]) -> None:
           and per.get(("garland", "boss_attack_raise"), 0) <= 2,
           f"ledger: pass F made {len(new)} Gemini attempts (<= {cap['max_new']}, <= {cap['max_per_sheet']} per sheet, "
           f"garland <= 2 by decision, garland / lich boss_attack_raise only): {per}")
-    end = cap["gemini_before"] - json.loads(GEN.BUDGET.read_text())["attempts_before"] + cap["max_new"]
-    check(len(gem) - json.loads(GEN.BUDGET.read_text())["attempts_before"] <= end,
-          f"the run budget ends at <= {end} (pass F's cap; 2026-11-15: the user raised it by one lich attempt)")
-
-    def refused(n_new: int, sheet: str) -> bool:
-        fake = gem[:cap["gemini_before"]] + [{"event": "attempt", "backend": "gemini", "character": "lich",
-                                               "sheet": sheet}] * n_new
-        req = SimpleNamespace(cached=False, character="lich", sheet=SimpleNamespace(name="boss_attack_raise"))
-        try:
-            GEN.check_budget([req], paid=True, max_paid=1, retry=True, ledger=fake)
-        except SystemExit as e:
-            return "refused" in str(e)          # pass F's cap, or the run's per-sheet cap when it is the same (3)
-        return False
-    per_sheet, total = cap["max_per_sheet"], cap["max_new"]
-    check(refused(per_sheet, "boss_attack_raise") and refused(total, "kit_x")
-          and not refused(per_sheet - 1, "boss_attack_raise"),
-          f"check_budget refuses attempt {per_sheet + 1} at one pass F sheet and attempt {total + 1} in total")
+    check(len(gem[69:end]) <= 31, f"the 100-image run ended at {len(gem[69:end])} of 100 (<= 31)")
+    fake = gem[:end] + [{"event": "attempt", "backend": "gemini", "character": "lich", "sheet": "boss_attack_raise"}]
+    req = SimpleNamespace(cached=False, character="lich", sheet=SimpleNamespace(name="boss_attack_raise"))
+    try:
+        GEN.check_budget([req], paid=True, max_paid=1, retry=True, ledger=fake)
+        err = ""
+    except SystemExit as e:
+        err = str(e)
+    check("pass F" not in err and not err, f"closed pass F is ignored: one more lich boss_attack_raise after N0 is "
+                                           f"not refused ({err[:80]!r})")
 
 
 def run_heavy(check: Callable[[bool, str], None]) -> None:

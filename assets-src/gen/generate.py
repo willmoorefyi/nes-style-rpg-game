@@ -44,6 +44,7 @@ OUT = HERE / "out"
 CACHE = HERE / "cache"
 LEDGER = CACHE / "ledger.jsonl"
 BUDGET = HERE / "budget.json"
+APPROVED = HERE / "approved"
 REFS = HERE / "refs"
 STYLE_REF = REFS / "style_reference.jpg"
 STYLE_REF_CROP = (300, 270, 2800, 1100)
@@ -366,8 +367,10 @@ def ledger_append(entry: dict, path: Path = LEDGER) -> None:
 
 
 def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: bool,
-                 ledger: list[dict], locked: bool = False) -> list[Request]:
-    """Return the requests that would be paid; raise SystemExit if the run is not allowed."""
+                 ledger: list[dict], locked: bool = False, budget: dict | None = None,
+                 approved_root: Path | None = None) -> list[Request]:
+    """Return the requests that would be paid; raise SystemExit if the run is not allowed. `budget` (default: budget.json)
+    and `approved_root` (default: approved/) are injectable for the selftests."""
     misses = [r for r in requests if not r.cached]
     if not misses:
         return []
@@ -380,8 +383,10 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
     if not paid:
         raise SystemExit(f"refused: {len(misses)} uncached request(s) need --paid (run --dry-run to inspect first)")
     attempts = [e for e in ledger if e.get("event") == "attempt" and e.get("backend") != "bedrock"]  # cap is Gemini-only
-    if BUDGET.exists():                              # the user's run-wide hard cap (budget.json)
-        b = json.loads(BUDGET.read_text())
+    if budget is None and BUDGET.exists():
+        budget = json.loads(BUDGET.read_text())
+    if budget is not None:                           # the user's run-wide hard cap (budget.json)
+        b = budget
         used = len(attempts) - b["attempts_before"]
         if used + len(misses) > b["cap"]:
             raise SystemExit(f"refused: the run cap of {b['cap']} paid images is reached ({used} used); only the user "
@@ -392,12 +397,20 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
             if n >= b["max_attempts_per_sheet"]:
                 raise SystemExit(f"refused: {r.character}/{r.sheet.name} already used {n} attempts this run "
                                  f"(max {b['max_attempts_per_sheet']})")
-        for cap in b.get("passes", []):              # a pass's own caps (pass F, FB-8): total and per sheet
+        for cap in b.get("passes", []):              # a pass's own caps (pass F, pass R build / fix): total and per sheet
+            if "gemini_end" in cap:                  # closed history (docs/ROSTER_PLAN.md 6.4): refuses nothing
+                continue
             new = attempts[cap["gemini_before"]:]
             if len(new) + len(misses) > cap["max_new"] or any(sum(e.get("character") == r.character and e.get(
                     "sheet") == r.sheet.name for e in new) >= cap["max_per_sheet"] for r in misses):
                 raise SystemExit(f"refused: {cap['name']} allows {cap['max_new']} new Gemini attempts "
                                  f"({cap['max_per_sheet']} per sheet); {len(new)} used")
+            if cap.get("only_approved"):             # the fix pass regenerates sprites that already have approved art
+                root = approved_root or APPROVED
+                for r in misses:
+                    if not (root / r.character).is_dir():
+                        raise SystemExit(f"refused: {cap['name']} only regenerates approved sprites; {r.character} has "
+                                         f"no {root.name}/{r.character}/")
     for r in misses:
         prior = [e for e in ledger if e.get("character") == r.character and e.get("sheet") == r.sheet.name
                  and e.get("event") == "attempt"]

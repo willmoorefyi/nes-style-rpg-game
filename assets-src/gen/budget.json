@@ -1,9 +1,10 @@
 {
-  "note": "User hard limit (2026-11-12): at most 100 more paid images unless the user explicitly approves more; at most 3 attempts (1 + 2 retries) per sheet in this run. Bedrock (Stability) requests are not counted against this cap (user, 2026-11-13); they are still logged in the ledger.",
-  "attempts_before": 69,
-  "cap": 100,
+  "note": "User 2026-11-15 (roster pass R, docs/ROSTER_PLAN.md 6): up to 300 Gemini images for building every enemy; the earlier 100-image cap is retired. 285 for building, the last 15 only for fix-pass regenerations of approved sprites. At most 3 attempts (1 + 2 retries) per sheet. Bedrock is not counted (user, 2026-11-13).",
+  "attempts_before": 100,
+  "cap": 300,
   "max_attempts_per_sheet": 3,
   "passes": [
-    {"name": "pass F (FB-8)", "note": "docs/FEEDBACK_PLAN_2026-11-14.md 3.7 / 7: garland and lich boss_attack_raise only, 1 image each plus at most 1 retry after a failed review (4). Raised 2026-11-15 by the user (the 100-image cap is lifted, a new 300-image budget follows): ONE more lich boss_attack_raise attempt after the independent image review (5 in total, 3 for the lich sheet); garland stays at 2 by decision, so the guard's per-sheet 3 is lich-only by policy", "gemini_before": 95, "max_new": 5, "max_per_sheet": 3}
+    {"name": "pass F (FB-8)", "note": "closed at R0 (N0 = 100). docs/FEEDBACK_PLAN_2026-11-14.md 3.7 / 7: garland and lich boss_attack_raise only, 1 image each plus at most 1 retry after a failed review (4). Raised 2026-11-15 by the user (the 100-image cap is lifted, a new 300-image budget follows): ONE more lich boss_attack_raise attempt after the independent image review (5 in total, 3 for the lich sheet); garland stays at 2 by decision, so the guard's per-sheet 3 is lich-only by policy", "gemini_before": 95, "gemini_end": 100, "max_new": 5, "max_per_sheet": 3},
+    {"name": "pass R build", "note": "docs/ROSTER_PLAN.md 6.2", "gemini_before": 100, "max_new": 285, "max_per_sheet": 3}
   ]
 }
