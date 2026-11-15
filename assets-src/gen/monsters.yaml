@@ -930,11 +930,13 @@
   prompt: >-
     a translucent green dome of slime resting on the ground, glossy with light highlights, small bubbles inside it and
     a half-dissolved white bone floating inside the slime, darker green near the base
-  attack: stretching and surging forward toward the heroes in a tall wave of slime
-  hurt: squashed flat and wide, quivering, the bubbles scattering
+  attack: >-
+    stretching and surging forward toward the heroes as a low leaning wave of slime, at most half again as tall as in
+    the idle cell, the same one bone inside
+  hurt: squashed flat and wide, quivering, the bubbles scattering, the same one bone inside
   face: no face, no eyes; the readable detail is the half-dissolved bone inside
-  extra_negative: eyes, a face, a mouth, legs, puddles, drips on the ground
-  seeds: [1234]
+  extra_negative: eyes, a face, a mouth, legs, puddles, drips on the ground, two bones, a skull
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R109): a tower attack with two bones
 - id: crawler
   # "Crawler" (028): many legs, eight hit attempts, paralysis
   size: small
