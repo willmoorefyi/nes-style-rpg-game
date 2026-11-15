@@ -533,14 +533,20 @@
     apart from the body; the raised hands and wing tips well below the top of the grey box, at the same pixel size as
     in Image 3
   hurt: >-
-    struck: recoiling back, the head thrown back, the glowing seams flaring brighter, the four arms flung outward out
-    of rhythm (two on the left side of the image, two on the right side), the wings faltering
+    struck, a pose clearly different from Image 3, every hand in a new place: the chest arched back and the head
+    thrown back with the face tilted up, the glowing seams flaring brighter; on the left side of the image the upper
+    arm flung up and out above the shoulder and the lower arm flung out low and wide, on the right side of the image
+    the upper arm flung out at shoulder height and the lower arm hanging down and back, all four clawed hands splayed
+    open; the wings drooping and faltering; the knees bent; exactly four arms, all four clearly visible and apart from
+    the body; at the same pixel size as in Image 3
   attack_raise: >-
-    the wind-up of a crushing blow, seen in the same three-quarter front view as Image 3 (chest and face toward the
-    viewer and the heroes on the right, never his back): both arms on the right side of the image raised high overhead
-    with fists clenched, the two arms on the left side of the image braced low, exactly four arms; the body crouched
-    with both knees bent so that the whole figure, raised fists, horns and wings included, stays inside the grey box at
-    exactly the same pixel size as in Image 3 (the raised fists are the highest point, well below the top of the image)
+    the wind-up of a crushing blow, a mirror-symmetric pose clearly different from Image 3, every hand in a new place:
+    the two upper arms raised high overhead, one from the left side of the image and one from the right side, their
+    two great fists clenched together above the horned crown; the two lower arms braced low and wide at the hips, one
+    on the left side and one on the right side; the body crouched with both knees bent and wide, so that the whole
+    figure, raised fists, horns and wings included, stays inside the grey box at exactly the same pixel size as in
+    Image 3 (the raised fists are the highest point, well below the top of the image); exactly four arms, all four
+    clearly visible
   face: the cracked obsidian face with two burning white eyes under the horned crown is readable
   extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
   seeds: [1234]
