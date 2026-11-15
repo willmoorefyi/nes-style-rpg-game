@@ -305,6 +305,34 @@ Images used: 174 of 300 (build 174 of 285, fix 0 of 15; ledger guard: 274 Gemini
 - Orchestrator item: `astos/boss_attack` shallow-lunge replacement (R122, the sheet's 3rd attempt) not approved: the
   crown still 41 px low, the robe still spread, idle IoU 0.374 < 0.415. R45 stays; the rig needs another route.
 
+## Batch B status (2026-11-15, open: swimmer paused)
+
+| Batch | Sprites approved | Waiting / deferred | Images | Expected (plan 6.2) | Retries by body type (images / sprites) |
+|---|---|---|---|---|---|
+| B (035-066) | **25 of 27**: wraith, anaconda, hyenadon, lesser_tiger, minotaur, hill_gigas, earth_elemental, wight, ochre_jelly, ogre_mage, sphinx, ankheg, crocodile, white_crocodile, ochu, neochu, hydra, horned_devil, pyrolisk, fire_elemental, fire_hydra, lava_worm, hellhound, fire_lizard, fire_gigas | **deferred:** piranha (R159); **paused:** red_piranha (1 of 3 used, swimmer 6.3 pause) | 57 (R127-R187; R137, R150, R155, R159 are no-image rows) | 36 | biped 17 / 7, quadruped 19 / 9, rooted 5 / 2, swimmer 4 / 2 (none approved), floating 4 / 2, arthropod 3 / 1, serpent 3 / 2, blob 1 / 1, bird 1 / 1 |
+
+- **Main cost: the cutter's fixed thirds.** 14 of the 30 rejections in batch B are a limb, weapon, tail, snout or vine
+  sliced flat where it crosses the raw's one-third or two-thirds line (the cut cell shows no border pixels, so only the
+  image review catches it). Wording that kept parts inside: "the whole <creature>, tail tip to snout, is no wider than
+  the grey box and sits in the middle of its own cell with empty space on both sides" (crocodiles), props "resting on
+  the shoulder / head on the ground just in front of the front foot / both hands across the chest" (hill and fire
+  gigas), "curling into hooks ... curls back well before the right edge" (ochu), "stabbing steeply down" (horned
+  devil), "the heads stay above and just in front of its front feet" (fire hydra). **Framework proposal (owner):**
+  split raw cells at the figure gaps nearest the thirds (or widen the raw cell with the guide), and add a cut check for
+  a straight run of fill pixels without outline ink at a cell's figure edge.
+- **Swimmer pause (6.3) and safety refusals:** three of four small-fish requests came back `PROHIBITED_CONTENT`
+  (R156, R158, R160; failed calls count). Proposed fix before `red_piranha` resumes: the bigeyes / shark R100 wording
+  without the "belly ... no lower than in the idle cell" clause (shared by the two later refusals). `white_shark`
+  (batch C) waits too.
+- Other lessons: a floating figure needs a level `motion:` line (fire elemental R177/R178; the default "tilt along a
+  strong diagonal" lets the action cells drop under the shared offset); multi-head counts hold with "one high, one in
+  the middle and one low, each on its own neck" (hydra R172); a big weapon swung at the heroes comes out as a backswing
+  unless the text says "at the end of a downward chop ... in front of him" (minotaur R135).
+- Fix-pass candidates added: `ogre_mage` (the staff switches hands in the attack), `ankheg` (attack mandible tip
+  sliced), `pyrolisk` (attack beak tip sliced), `minotaur` (small, idle 89 px).
+- Orchestrator: `astos/boss_attack` R122 (not approved, see batch A notes).
+
 ## Deferred sprites
 
+- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording.
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
