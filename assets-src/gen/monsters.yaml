@@ -1772,9 +1772,10 @@
   size: large
   body: bird
   prompt: >-
-    a green wyvern standing on two strong clawed legs, two large leathery green bat wings half raised (exactly two
-    wings, no front legs), a long neck and a horned reptile head with yellow eyes, a long tail ending in a barbed
-    stinger curled up behind it; the whole wyvern, wing tips and tail included, sits in the middle of its own cell with
+    a green wyvern standing upright like a big bird on only two strong clawed hind legs, the body tilted up, no front
+    legs or arms at all: its two large leathery green bat wings (exactly two) grow from the shoulders and fold at its
+    sides with a small claw at each wing joint, a long neck and a horned reptile head with yellow eyes, a long tail
+    ending in a big dark arrow-shaped barbed stinger curled up behind it; the whole wyvern, wing tips and tail included, sits in the middle of its own cell with
     empty space on both sides
   attack: >-
     the neck stretched forward with the jaws open at the heroes and the stinger tail arched over its back, the wings
@@ -1782,7 +1783,7 @@
   hurt: knocked back, the wings flared, the neck twisted back, both feet on the ground
   face: its horned reptile head with yellow eyes is readable
   extra_negative: front legs, four legs, a rider, fire breath, a third wing, feathers, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R201): drawn as a four-legged dragon, no stinger barb, the tail hidden in the hurt
 - id: wyrm
   # "Wyrm" (079): a wingless serpentine drake
   size: large
