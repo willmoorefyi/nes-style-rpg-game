@@ -1497,19 +1497,21 @@
   size: large
   body: quadruped
   prompt: >-
-    a three-headed crimson hydra on four thick legs seen from the side, dark red scales cracked with glowing orange
-    magma seams, exactly three long necks each ending in a spiked red dragon-like head with small wisps of smoke
-    from the nostrils (attached), glowing orange eyes, a spiked thick tail; the heads inside the box; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
+    a three-headed crimson hydra on four short thick legs seen from the side, a heavy low body hunched forward with a
+    row of tall black spines along the back, dark red scales cracked with glowing orange magma seams, exactly three
+    short thick necks each ending in a broad horned dragon head with a spiky black frill and glowing orange eyes,
+    wisps of smoke from the nostrils (attached), a spiked thick tail; the heads inside the box; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
   attack: >-
     the three heads striking forward toward the heroes with the jaws open and glowing inside: exactly three heads as
     in the idle cell, one high, one in the middle and one low, each on its own long neck and clearly apart from the
-    others (three necks, three heads, no more); all four feet on the ground, the heads well inside the middle cell
+    others (three necks, three heads, no more); all four feet on the ground, the necks bent so every snout stays well
+    before the right edge of the middle cell (not reaching the cell edge)
   hurt: >-
     knocked back, the three necks recoiling and twisting back, exactly three heads as in the idle cell, all four feet
     on the ground
   face: its three red heads with glowing orange eyes are readable
   extra_negative: a fourth head, two heads, wings, green scales, fire breath streams, flames outside the body, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R179): two attack snouts sliced at the raw cell line, the hydra's silhouette in red
 - id: lava_worm
   # "Lava Worm" (062): a black-crusted magma worm (distinct from the gigas worm: crust and magma, no pink)
   size: large
