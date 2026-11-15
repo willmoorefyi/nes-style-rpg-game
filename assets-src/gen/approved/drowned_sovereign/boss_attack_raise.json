@@ -1,0 +1,25 @@
+{
+  "character": "drowned_sovereign",
+  "sheet": "boss_attack_raise",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "022785aec3801d3ef614f352",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack_raise"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass R G1 R23: nits: sceptre held inverted, tentacles rise behind rather than through the robe front, small crown"
+}

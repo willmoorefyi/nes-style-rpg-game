@@ -286,18 +286,20 @@
     (the hand on the right side of the image); the robes stay as in Image 3: the same deep abyssal-teal outer robe with wide sleeves over the pearl-white inner robe, the hems pooling wide on the ground, the coral-red sceptre, at the same size as in Image 3
   attack_raise: >-
     the wind-up of his heaviest blow, the most revealing pose, seen in the same three-quarter front view as Image 3
-    (face and crown toward the viewer and the heroes on the right, never his back): the robes thrown fully open, a mass
+    (face and crown toward the viewer and the heroes on the right, never his back): the front of the robes flung wide
+    open from the collar to the hem, showing the writhing tentacle mass inside where his body should be; a mass
     of dark teal tentacles with pale suckers and a glimpse of something enormous folded beneath rising high behind him,
-    the coral-red sceptre raised; the crown and face exactly as in Image 3, the abyssal-teal outer robe with wide sleeves
+    the coral-red sceptre raised high in the same hand as in Image 3; the crown on his head and the face exactly as in
+    Image 3 (a crisp, readable aged face in profile with pale eyes, a clear nose and brow), the abyssal-teal outer robe with wide sleeves
     over the pearl-white inner robe as in Image 3; he sinks low into the pooled robes so that the
     whole figure, raised tentacles included, stays inside the grey box at exactly the same pixel size as in Image 3
     (the highest tentacle tip well below the top of the image)
   face: the aged human face under the crown, with calm pale eyes, is readable
   extra_negative: a second crown, a throne, a fish tail
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1236, boss_hurt: 1235}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem;
+  sheet_seeds: {boss_attack: 1236, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem;
   # 1235 (R17, the text without the robe anchor sentence): teal outer robe lost, smaller; boss_hurt 1234 (R20):
-  # the crown flew off, the sceptre switched hands
+  # the crown flew off, the sceptre switched hands; boss_attack_raise 1234 (R22): muddy face, robes closed
 - id: hollow_seraph
   # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
   # halo; her composure stays intact even when hurt
