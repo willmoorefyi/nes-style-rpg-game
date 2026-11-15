@@ -599,10 +599,15 @@
     hovers, nothing touches the ground; the eyestalks, the mouth and the trailing parts move with the motion.
   prompt: >-
     a large floating eye monster: a round fleshy body that is one huge green-irised eye with a black pupil, a wide
-    mouth of jagged fangs below the eye, four writhing eyestalks rising from the top, each ending in a small yellow
-    eye, mottled purple-brown hide; it hovers, nothing touches the ground
-  attack: surging forward toward the heroes, the fanged mouth gaping wide, the four eyestalks lashing forward
-  hurt: knocked back, the big eye squeezed shut, the mouth clenched, the eyestalks recoiling and curling
+    mouth of jagged fangs below the eye, exactly four writhing eyestalks rising from the top, each ending in a small
+    yellow eye, mottled purple-brown hide; it hovers, nothing touches the ground; in every cell the body floats at the
+    same height in its box with clear empty space below it, well above the bottom of the box
+  attack: >-
+    surging forward toward the heroes, the fanged mouth gaping wide, the same four eyestalks lashing forward, the body
+    at the same height as in the idle cell
+  hurt: >-
+    knocked back, the big eye squeezed shut, the mouth clenched, the same four eyestalks recoiling and curling, the
+    body at the same height as in the idle cell
   face: the big iris and pupil are the face, with the fanged mouth below it
   seeds: [1234]
 - id: dragon_zombie
