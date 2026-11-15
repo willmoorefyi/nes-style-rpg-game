@@ -1,0 +1,129 @@
+sprite: hill_gigas
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [65, 29]
+    neck: [62, 47]
+    chest: [58, 56]
+    hip: [60, 84]
+    sh_n: [74, 52]
+    el_n: [80, 70]
+    hand_n: [84, 56]
+    tip: [46, 25]
+    sh_f: [42, 49]
+    el_f: [36, 63]
+    hand_f: [64, 65]
+    hip_n: [72, 88]
+    knee_n: [80, 100]
+    foot_n: [78, 113]
+    toe_n: [89, 120]
+    hip_f: [47, 90]
+    knee_f: [42, 100]
+    foot_f: [38, 113]
+    toe_f: [44, 120]
+  attack:
+    crown: [74, 34]
+    neck: [72, 58]
+    chest: [62, 66]
+    hip: [60, 92]
+    sh_n: [77, 62]
+    el_n: [77, 78]
+    hand_n: [74, 96]
+    tip: [100, 114]
+    sh_f: [52, 48]
+    el_f: [58, 72]
+    hand_f: [67, 95]
+    hip_n: [68, 96]
+    knee_n: [70, 104]
+    foot_n: [71, 114]
+    toe_n: [80, 120]
+    hip_f: [48, 95]
+    knee_f: [38, 100]
+    foot_f: [24, 112]
+    toe_f: [27, 120]
+  hurt:
+    crown: [30, 33]
+    neck: [48, 48]
+    chest: [52, 60]
+    hip: [60, 85]
+    sh_n: [58, 42]
+    el_n: [68, 52]
+    hand_n: [80, 54]
+    tip: [93, 30]
+    sh_f: [34, 57]
+    el_f: [55, 63]
+    hand_f: [78, 61]
+    hip_n: [73, 90]
+    knee_n: [82, 100]
+    foot_n: [79, 113]
+    toe_n: [90, 120]
+    hip_f: [47, 90]
+    knee_f: [42, 102]
+    foot_f: [38, 113]
+    toe_f: [44, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  club:
+    kind: prop
+    bone: [hand_n, tip]
+    radius: 4.0
+    in: [idle, attack, hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid rotations about the hip / the club hand, written as tweaks (moves [])
+  atk_wind1:                   # lean back 5 (club rigid with the upper body), club hand 1 up
+    moves: []
+    t: -0.05
+    tweaks: {crown: [-5, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-3, -1], el_n: [-1, -3], hand_n: [-3, -3], tip: [-5, 0], sh_f: [-3, 2], el_f: [-2, 2], hand_f: [-2, 0]}
+  atk_wind2:                   # coil: lean back 7 (the club head drops behind the back with it), club hand 2 up, body 3 lower
+    moves: []
+    t: -0.1
+    dy: 3
+    tweaks: {crown: [-7, 0], neck: [-5, 0], chest: [-3, 0], sh_n: [-4, -1], el_n: [-2, -4], hand_n: [-4, -5], tip: [-7, 0], sh_f: [-4, 2], el_f: [-2, 3], hand_f: [-2, 0]}
+  atk_mid:                     # the club lands: the attack upper body leaned back 8 rigidly about the fists (hands and club stay on the ground)
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-9, 1], neck: [-5, 1], chest: [-4, 2], sh_n: [-5, 0], el_n: [-3, 0], sh_f: [-6, 4], el_f: [-3, 2], hand_f: [0, 1], knee_f: [6, 0], foot_f: [6, 0]}
+  atk_follow:                  # settle: the upper body 4 back about the fists
+    moves: []
+    t: 0.8
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 1], sh_n: [-2, 0], el_n: [-1, 0], sh_f: [-3, 2], el_f: [-2, 1]}
+  atk_recover:                 # upper body and club 2 forward and 2 lower (translated)
+    moves: []
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], tip: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil 1, lean back 6, head 12 further back
+    moves: []
+    tweaks: {crown: [-11, 0], neck: [-5, 0], chest: [-4, 0], sh_n: [-4, -1], el_n: [-3, -2], hand_n: [-4, -2], tip: [-7, 2], sh_f: [-5, 2], el_f: [-3, 3], hand_f: [-3, 0]}
+  hurt_in2:                    # the hurt pose leaned in 6, head 5 forward, club 8 back
+    moves: []
+    tweaks: {crown: [8, -4], neck: [5, -1], chest: [4, -1], sh_n: [6, 0], el_n: [4, 1], hand_n: [4, 2], tip: [3, 2], sh_f: [4, -3], el_f: [3, 0], hand_f: [3, 2]}
+  daze:                        # slump: the upper body (club included) 1 forward and 1 lower (translated), the head 1 more (the recipe head tweak less 1)
+    moves: []
+    dy: 1
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:                      
+    moves: []
+    dy: 2
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+z:
+  idle: [club, uarm_f, farm_f, thigh_f, shin_f, torso, thigh_n, shin_n, head, uarm_n, farm_n, ft_n, ft_f]
+masks:
+  head:                        # the bald head and the whole beard (the club bone runs behind it)
+    idle: [[52, 26], [72, 26], [75, 40], [73, 52], [60, 53], [51, 45], [50, 34]]
+  uarm_f:
+    idle: [[30, 45], [50, 45], [51, 57], [30, 60]]
+  farm_f:                      # the far forearm across the belly up to the fist
+    idle: [[30, 60], [51, 57], [65, 58], [66, 71], [32, 73]]
+  club:                        # the whole club head over the shoulder and the handle end past the fist
+    idle: [[35, 16], [60, 16], [60, 26], [54, 30], [52, 38], [48, 42], [38, 42], [34, 32]]
+    attack: [[76, 96], [90, 99], [108, 106], [108, 123], [86, 123], [85, 112]]
+    hurt: [[84, 22], [103, 22], [103, 40], [90, 50], [85, 55], [80, 50], [84, 38]]
+holds: []
+paint:                         # hurt_in2: 1 px crack-fill specks inside the rotated arm, closed with the skin around them
+  - {frame: hurt_in2, xy: [[59, 61], [42, 51], [43, 51]], rgb: [239, 148, 123]}
