@@ -2049,12 +2049,13 @@
     behind the body in every cell (never flying out behind it); centred in its own cell with empty space on both
     sides
   attack: >-
-    lunging forward and slashing both coral blades down in front of its chest at the heroes, the elbows bent so the
-    blades stay well inside the middle cell, exactly two blades as in the idle cell
+    lunging forward toward the heroes with both short coral blades held crossed in front of its chest, the elbows
+    bent so the blades stay well inside the middle cell, exactly two short solid blades as in the idle cell; only the
+    creature itself: no slash trail, curved streak, smear or motion arc
   hurt: knocked back, the head thrown back, both blades flung out to the sides, still one in each hand
   face: its regal fish face with gold eyes under the pearl circlet is readable
-  extra_negative: a trident, a spear, a shield, armour plates, a cloth cape, a crown, a third blade, an anglerfish lure, magenta, pink fins, a cape flying out behind
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R226): the attack's fin cape sliced at the raw cell line. Fins sea-green, not purple: bright violet is keyed out with the magenta background (ROSTER_LOG R222)
+  extra_negative: a trident, a spear, a shield, armour plates, a cloth cape, a crown, a third blade, an anglerfish lure, magenta, pink fins, a cape flying out behind, slash trails
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R226): the attack's fin cape sliced at the raw cell line; 1235 (R227): pink slash smears. Fins sea-green, not purple: bright violet is keyed out with the magenta background (ROSTER_LOG R222)
 - id: white_shark
   # "White Shark" (094): a great white shark, scarred, broader and paler than the shark. SWIMMER PAUSED (ROSTER_LOG
   # R160, plan 6.3): not requested until the swimmer wording fix is ruled on
