@@ -390,8 +390,9 @@
     ears, sharp cruel features with narrow glowing violet eyes, and a jagged black iron crown; layered robes of deep
     violet and black with silver trim, reaching to his shins, over thin fitted silver armour (a silver breastplate and
     small pauldrons) with a high collar, black boots; he holds a tall black staff ending in a curved silver sickle
-    blade upright in the hand on the left side of the image, the other hand open at his side; both feet on the ground,
-    the sickle blade tip well below the top of the grey box; palette of ash grey, white, deep violet, black and silver
+    blade upright in the hand on the left side of the image, the other hand open at his side; both feet on the ground;
+    the whole figure, crown and sickle blade included, well below the top of the grey box (the crown tips about a
+    tenth of the image below the top edge); palette of ash grey, white, deep violet, black and silver
   action_prompt: >-
     Astos, exactly as in Image 3: the same ash-grey skin, long white hair, long pointed ears, glowing violet eyes and
     jagged black iron crown, the same layered deep violet and black robes with silver trim over thin silver armour,
@@ -411,6 +412,7 @@
   face: his ash-grey elven face with narrow glowing violet eyes and long pointed ears is readable
   extra_negative: a shield, a second weapon, wings, a throne, a beard, a hood
   seeds: [1234]
+  sheet_seeds: {boss_idle: 1235}   # boss_idle 1234 (ROSTER_LOG R42): the crown cut by the cell top
 - id: warmech
   # "Warmech" (118), the ancient war machine: claw melee and Nuclear (cast)
   size: boss

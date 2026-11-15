@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 37 of 300 (build 37 of 285, fix 0 of 15; ledger guard: 137 Gemini attempts - 100)
+Images used: 38 of 300 (build 38 of 285, fix 0 of 15; ledger guard: 138 Gemini attempts - 100)
 
 ## Attempts
 
@@ -65,6 +65,7 @@ Images used: 37 of 300 (build 37 of 285, fix 0 of 15; ledger guard: 137 Gemini a
 | R40 | hollow_seraph/boss_attack_raise (1236, key `3a9eb0fb167b5a4d20f68338`, `--retry`, attempt 3 of 3) | 1 | Six wings folded upward and symmetric, the visor helm and white steel back, 170 px, lowest row 192, no border pixels, one piece, `pose_diff` 0.66. **Fails review:** solid magenta key patches behind the helm and between the wings (unoutlined, cannot be painted under the style lock), and no halo | **rejected** (no 4th attempt, D9) |
 | R41 | hollow_seraph/boss_attack_raise: approve R38 (1234, key `d6093d88bccd3a2763233363`) as best of 3 | 0 | R38 keeps the idle's identity (white steel and pale gold, the visor helm, the two-arc halo, the brass joints), is compact as the plan asks (x 46-154), clean (one figure + one halo arc, no border, no key colours). R39 has six symmetric wings but a cream re-palette, a hood and a skirt, which would read as a different creature for the whole raise hold; R40 is unusable. `attack_raise` text and seed in `monsters.yaml` back to the R38 request (the retry wordings kept as a comment). Recorded nits: **only three wings visible**, all on the left of the armour (a three-quarter turn; the right-side set is behind the body); the halo is one arc. **Fix-pass candidate** with `boss_cast` | **self-approved with nits** (best of 3) |
 | R42 | astos/boss_idle (1234, key `3549c1e79263cd6e8269d934`) | 1 | The design is right: a slender ash-grey dark elf with long white hair, pointed ears, violet eyes, a jagged black crown, layered violet and black robes with silver trim over a silver breastplate, black boots, the sickle staff upright in the left-side hand, facing right; one piece, binary alpha, 13 colours. **Fails review:** the crown is cut by the cell top (top row 0, 4 border pixels, 193 px tall; no headroom) | **rejected**; retry follows (seed 1235, `--retry`; the idle asks for the whole figure, crown and blade, well below the top of the box) |
+| R43 | astos/boss_idle (1235, key `dbacae95ebbf383adc2f29df`, `--retry`) | 1 | A tall slender dark elf in a three-quarter view facing right: ash-grey skin, long white hair, long pointed ears, narrow violet eyes, a jagged black iron crown; layered deep violet and black robes with silver trim over a silver breastplate, a high collar, black boots; the black staff with its curved silver sickle blade upright in the left-side hand, the right hand open. 184 px (band 140-168 +10 %), lowest row 192, top row 9 (headroom 9, the crown whole), x 50-150, no border pixels, binary alpha, 13 colours with the outline ink, one piece. Nits: a speckled dark panel in the robe between the legs; the silver armour shows only as the breastplate | **self-approved** (attempt 2 of 3) |
 
 ## G1 status (2026-11-15, closed)
 
