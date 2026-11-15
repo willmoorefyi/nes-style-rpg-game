@@ -2455,10 +2455,11 @@
     the point at knee height just ahead of his front foot, the whole sword well inside the middle cell (not raised
     overhead, not reaching the cell edge)
   hurt: >-
-    knocked back, the skull thrown back, the sword held upright across the chest, the cloak close behind
+    knocked back, the head thrown back with the horned helm still on the skull exactly as in the idle cell, the sword
+    held upright across the chest, the cloak close behind
   face: a grinning skull with two red eye lights inside the horned helm
-  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings, a shadowed face
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R260): the skull face lost in the dark cut
+  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings, a shadowed face, a bare skull without the helm
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R260): the skull face lost in the dark cut; 1235 (R261): the helm lost in the hurt
 - id: earth_medusa
   # "Earth Medusa" (113): a stony grey medusa with rock scales and a petrified-snake crown (small naga)
   size: small
