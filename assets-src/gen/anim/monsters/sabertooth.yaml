@@ -1,0 +1,142 @@
+sprite: sabertooth
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [30, 72]
+    back: [65, 50]
+    chest: [105, 45]
+    neck: [125, 50]
+    head: [138, 45]
+    snout: [170, 60]
+    tail0: [32, 56]
+    tail1: [28, 55]
+    tail2: [24, 55]
+    tail_tip: [21, 57]
+    sh_n: [95, 72]
+    el_n: [93, 95]
+    paw_n: [97, 110]
+    ftoe_n: [108, 119]
+    sh_f: [118, 82]
+    el_f: [127, 98]
+    paw_f: [137, 111]
+    ftoe_f: [148, 119]
+    hip_n: [28, 85]
+    knee_n: [19, 100]
+    foot_n: [18, 112]
+    toe_n: [30, 118]
+    hip_f: [60, 84]
+    knee_f: [57, 100]
+    foot_f: [62, 112]
+    toe_f: [75, 117]
+  attack:
+    hip: [35, 82]
+    back: [70, 60]
+    chest: [102, 50]
+    neck: [125, 55]
+    head: [140, 50]
+    snout: [176, 64]
+    tail0: [38, 67]
+    tail1: [33, 66]
+    tail2: [29, 67]
+    tail_tip: [27, 68]
+    sh_n: [98, 82]
+    el_n: [122, 97]
+    paw_n: [140, 111]
+    ftoe_n: [151, 119]
+    sh_f: [100, 80]
+    el_f: [124, 95]
+    paw_f: [142, 110]
+    ftoe_f: [153, 118]
+    hip_n: [28, 93]
+    knee_n: [16, 104]
+    foot_n: [10, 113]
+    toe_n: [22, 119]
+    hip_f: [55, 92]
+    knee_f: [50, 104]
+    foot_f: [52, 114]
+    toe_f: [63, 119]
+  hurt:
+    hip: [30, 70]
+    back: [68, 43]
+    chest: [105, 42]
+    neck: [124, 48]
+    head: [140, 52]
+    snout: [166, 78]
+    tail0: [30, 64]
+    tail1: [27, 64]
+    tail2: [25, 65]
+    tail_tip: [23, 66]
+    sh_n: [95, 72]
+    el_n: [97, 95]
+    paw_n: [103, 110]
+    ftoe_n: [114, 119]
+    sh_f: [118, 85]
+    el_f: [128, 100]
+    paw_f: [140, 110]
+    ftoe_f: [151, 118]
+    hip_n: [27, 85]
+    knee_n: [15, 100]
+    foot_n: [15, 112]
+    toe_n: [26, 119]
+    hip_f: [58, 85]
+    knee_f: [57, 98]
+    foot_f: [65, 110]
+    toe_f: [78, 115]
+parts:                         # the attack's far foreleg is hidden behind the near one: no far-fore pixels there
+  ufore_f: {in: [idle, hurt]}
+  lfore_f: {in: [idle, hurt]}
+  fpaw_f: {in: [idle, hurt]}
+masks:
+  body:                        # the pale belly over the far hind leg (thigh_f's radius took it: a crease in hurt_in1)
+    idle: [[38, 55], [84, 55], [84, 78], [38, 78]]
+    hurt: [[38, 50], [84, 50], [84, 83], [38, 83]]
+  head:                       # the whole head with the open jaw and sabre fangs (not the far foreleg under it)
+    idle: [[128, 36], [140, 31], [162, 30], [173, 50], [174, 68], [168, 82], [160, 86], [147, 85], [140, 76], [130, 70]]
+    attack: [[130, 42], [165, 40], [179, 55], [179, 70], [168, 86], [158, 94], [142, 94], [139, 80], [131, 70], [128, 60]]
+    hurt: [[125, 48], [145, 44], [162, 47], [169, 60], [171, 80], [166, 96], [158, 101], [148, 99], [140, 88], [125, 75]]
+  neck:                        # the attack's throat ruff above the foreleg: the neck warp bridges head and leg in follow
+    attack: [[118, 52], [133, 48], [139, 80], [133, 81], [125, 78], [118, 70]]
+    idle: [[112, 28], [126, 27], [128, 36], [130, 70], [114, 72]]   # the nape: the neck follows the head down in daze (no notch)
+  shin_n:                      # the near hind shin below the hock (the thigh's wide radius took it)
+    idle: [[12, 99], [29, 99], [29, 111], [12, 111]]
+    attack: [[3, 100], [24, 100], [24, 110], [3, 110]]
+    hurt: [[8, 98], [28, 98], [28, 110], [8, 110]]
+  hpaw_n:                      # the near hind paw on the ground line
+    idle: [[10, 111], [40, 111], [40, 123], [10, 123]]
+    attack: [[0, 110], [30, 110], [30, 123], [0, 123]]
+    hurt: [[5, 110], [35, 110], [35, 123], [5, 123]]
+frames:
+  atk_wind1:                    # crouch starts: body 1 px down, head drawn back and down
+    dy: 1
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {chest: [-1, 0], neck: [-1, 1], head: [-2, 1], snout: [-2, 1]}
+  atk_wind2:                    # coil (t only sets the bbox lerp: attack is 4 px shorter than idle)
+    t: -0.10                    # coil: body 2 px down, chest and head pulled back, tail stub down
+    dy: 2
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {back: [-1, 0], chest: [-2, 1], neck: [-3, 2], head: [-4, 2], snout: [-4, 2], tail_tip: [0, 1]}
+  atk_mid:
+    sampler: rotsprite         # the turned forelegs: nearest left specks on the chest ruff
+    pins: [foot_n, foot_f, knee_f]
+    moves: [hip, back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {foot_n: [3, 0], toe_n: [3, 0], knee_n: [2, 0], sh_n: [-2, 0], el_n: [-13, 0], paw_n: [-16, 0], ftoe_n: [-16, 0], sh_f: [-2, 0], el_f: [-13, 0], paw_f: [-16, 0], ftoe_f: [-16, 0]}
+  atk_follow:
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+  atk_recover:
+    t: 0.35
+    moves: [back, chest, neck, tail0, tail1, tail2, tail_tip, sh_n, sh_f]
+  daze:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 3]}
+  daze_b:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [0, 2], head: [0, 3], snout: [0, 4]}
+holds: []
+paint:                         # 1 px elbow crack on the near foreleg's back edge closed with outline ink
+  - {frame: daze_b, xy: [[82, 101]], rgb: [6, 4, 10]}
