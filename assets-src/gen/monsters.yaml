@@ -915,12 +915,14 @@
   prompt: >-
     a gaunt tall purple-grey undead standing hunched in a rotting pale burial shroud hanging in strips from its
     shoulders, very long thin arms reaching down past its knees ending in long bony fingers, a skull-like face with
-    stretched skin and glowing green eyes, thin legs
-  attack: lunging forward and reaching both long arms out at the heroes, the shroud strips flying
+    stretched skin and two bright glowing green eyes clearly visible, a lipless grin of teeth, thin legs
+  attack: >-
+    lunging forward and reaching both long arms out at the heroes, the shroud strips flying, the fingertips well inside
+    the cell
   hurt: knocked back, the long arms flung up, the head thrown back, the shroud flapping
-  face: its skull-like face with glowing green eyes is readable
-  extra_negative: a weapon, armour, a hood, a crouch on all fours
-  seeds: [1234]
+  face: its skull-like face with two bright glowing green eyes and a lipless grin is readable in every cell
+  extra_negative: a weapon, armour, a hood, a crouch on all fours, a cape
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R118): the face unreadable, the attack hand sliced at the cell edge
 - id: scorpion
   # "Scorpion" (025): poisonous, two hits
   size: small
