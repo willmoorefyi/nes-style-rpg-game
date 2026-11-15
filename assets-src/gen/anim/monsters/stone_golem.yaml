@@ -1,0 +1,151 @@
+sprite: stone_golem
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+attack_hand: n
+keyframes:
+  idle:
+    crown: [68, 28]
+    neck: [68, 40]
+    chest: [65, 58]
+    hip: [62, 92]
+    sh_n: [38, 48]
+    el_n: [30, 70]
+    hand_n: [42, 88]
+    sh_f: [88, 50]
+    el_f: [92, 70]
+    hand_f: [96, 88]
+    hip_n: [78, 95]
+    knee_n: [80, 104]
+    foot_n: [80, 113]
+    toe_n: [86, 117]
+    hip_f: [50, 95]
+    knee_f: [48, 104]
+    foot_f: [48, 113]
+    toe_f: [52, 117]
+  attack:
+    crown: [76, 30]
+    neck: [74, 47]
+    chest: [68, 62]
+    hip: [60, 92]
+    sh_n: [48, 55]
+    el_n: [62, 80]
+    hand_n: [72, 108]
+    sh_f: [80, 55]
+    el_f: [88, 68]
+    hand_f: [100, 66]
+    hip_n: [62, 95]
+    knee_n: [65, 103]
+    foot_n: [64, 112]
+    toe_n: [70, 117]
+    hip_f: [45, 90]
+    knee_f: [32, 98]
+    foot_f: [20, 108]
+    toe_f: [12, 113]
+    crk: [98, 115]
+  hurt:
+    crown: [68, 25]
+    neck: [65, 40]
+    chest: [65, 58]
+    hip: [62, 92]
+    sh_n: [32, 45]
+    el_n: [35, 62]
+    hand_n: [62, 52]
+    sh_f: [82, 52]
+    el_f: [86, 65]
+    hand_f: [98, 50]
+    hip_n: [78, 95]
+    knee_n: [82, 103]
+    foot_n: [85, 113]
+    toe_n: [92, 117]
+    hip_f: [45, 95]
+    knee_f: [40, 103]
+    foot_f: [35, 113]
+    toe_f: [32, 117]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+  crack:                       # the rubble crack under the smashing fist: exists only at the contact key
+    bone: [hand_n, crk]
+    radius: 2.0
+    in: [attack]
+frames:                        # rigid leans about the hip and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 3 (the smashing arm with the torso), the head 1 more
+    moves: []
+    t: -0.05
+    dy: 1
+    tweaks: {crown: [-6, -1], neck: [-5, -1], chest: [-4, 0], sh_n: [-4, -3], el_n: [-4, -5], hand_n: [-4, -6], sh_f: [-3, 0], el_f: [-2, 0], hand_f: [-1, 0]}
+  atk_wind2:                   # coil: lean back 5 (the smashing arm with the torso, its fist 2 back, held level), head 3 more, body 2 lower
+    moves: []
+    t: -0.1
+    dy: 2
+    tweaks: {crown: [-10, -2], neck: [-8, -1], chest: [-6, 0], sh_n: [-7, -5], el_n: [-8, -8], hand_n: [-8, -10], sh_f: [-6, -1], el_f: [-4, 0], hand_f: [-2, 0]}
+  atk_mid:                     # the smash comes in: the attack upper body leaned back about the hip, the fist already on the ground
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-8, -3], neck: [-6, -2], chest: [-5, -1], sh_n: [-3, -1], sh_f: [-5, -2], el_f: [-5, -2], hand_f: [-5, -2]}
+  atk_follow:                  # settle: the attack upper body 3 back about the hip
+    moves: []
+    t: 0.8
+    tweaks: {crown: [-3, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, -1], el_n: [-1, 0], hand_n: [0, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_recover:                 # upper body 2 forward and 2 lower (translated)
+    moves: []
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil: lean back 5, head 3 further back, fists 3 up
+    moves: []
+    tweaks: {crown: [-10, -2], neck: [-7, -1], chest: [-5, 0], sh_n: [-6, -3], el_n: [-6, -6], hand_n: [-6, -9], sh_f: [-6, -3], el_f: [-6, -5], hand_f: [-6, -8]}
+  hurt_in2:                    # the hurt pose 4 forward (translated), the head 2 more
+    moves: []
+    tweaks: {crown: [7, 0], neck: [6, 0], chest: [5, 0], sh_n: [5, 0], el_n: [5, 0], hand_n: [5, 0], sh_f: [5, 0], el_f: [5, 0], hand_f: [5, 0]}
+  daze:                        # slump: the upper body 1 forward and 2 lower, the head 2 forward and 1 lower more
+    moves: []
+    dy: 1
+    tweaks: {crown: [1, 1], neck: [1, 1], chest: [0, 1], sh_n: [0, 1], el_n: [0, 1], hand_n: [0, 1], sh_f: [0, 1], el_f: [0, 1], hand_f: [0, 1]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [1, 1], neck: [1, 1], chest: [0, 1], sh_n: [0, 1], el_n: [0, 1], hand_n: [0, 1], sh_f: [0, 1], el_f: [0, 1], hand_f: [0, 1]}
+masks:
+  uarm_n:                      # the near shoulder block at the back rides the smashing arm
+    attack: [[33, 50], [50, 46], [58, 56], [52, 74], [36, 74], [32, 62]]
+  crack:                       # the rubble band on the ground (the fist mask below wins over it)
+    attack: [[52, 106], [112, 106], [112, 122], [52, 122]]
+  farm_n:                      # the hanging fist block (its bottom edge is not the far thigh); the smashing forearm and fist
+    idle: [[20, 64], [52, 64], [55, 82], [55, 98], [48, 101], [42, 103], [38, 107], [30, 106], [20, 92]]
+    attack: [[56, 76], [72, 72], [90, 92], [100, 100], [101, 112], [96, 118], [74, 118], [72, 104], [60, 100], [55, 90]]
+holds: []
+paint:                         # pockets the translations close off, filled with their neighbours: recover between the far
+                               # forearm and the belly block, hurt_in2 between the near shin and foot
+  - {frame: atk_mid, rgb: [24, 24, 41], xy: [[77, 71]]}
+  - {frame: atk_mid, rgb: [33, 0, 41], xy: [[42, 102]]}
+  - {frame: atk_mid, rgb: [41, 41, 57], xy: [[69, 70], [69, 71]]}
+  - {frame: atk_mid, rgb: [66, 74, 90], xy: [[37, 77]]}
+  - {frame: atk_mid, rgb: [74, 90, 99], xy: [[36, 76], [45, 76]]}
+  - {frame: atk_mid, rgb: [82, 99, 107], xy: [[69, 72]]}
+  - {frame: atk_mid, rgb: [148, 156, 165], xy: [[66, 72], [67, 72]]}
+  - {frame: atk_follow, rgb: [33, 0, 41], xy: [[76, 77], [76, 78], [42, 102]]}
+  - {frame: atk_follow, rgb: [66, 74, 90], xy: [[38, 76]]}
+  - {frame: atk_follow, rgb: [74, 90, 99], xy: [[39, 76]]}
+  - {frame: atk_recover, rgb: [33, 0, 41], xy: [[85, 37], [68, 115], [68, 116]]}
+  - {frame: atk_recover, rgb: [41, 41, 57], xy: [[44, 69]]}
+  - {frame: atk_recover, rgb: [49, 57, 74], xy: [[86, 91]]}
+  - {frame: atk_recover, rgb: [66, 74, 90], xy: [[44, 70], [87, 94]]}
+  - {frame: atk_recover, rgb: [74, 90, 99], xy: [[85, 84]]}
+  - {frame: atk_recover, rgb: [148, 156, 165], xy: [[85, 87], [85, 88], [85, 89], [85, 90]]}
+  - {frame: hurt_in2, rgb: [33, 0, 41], xy: [[87, 95]]}
+  - {frame: hurt_in2, rgb: [49, 57, 74], xy: [[83, 68]]}
+  - {frame: hurt_in2, rgb: [66, 74, 90], xy: [[47, 41]]}
+  - {frame: hurt_in2, rgb: [74, 90, 99], xy: [[83, 69]]}
+  - {frame: daze, rgb: [33, 0, 41], xy: [[86, 39]]}
+  - {frame: daze, rgb: [41, 41, 57], xy: [[42, 69]]}
+  - {frame: daze, rgb: [66, 74, 90], xy: [[42, 70]]}
+  - {frame: daze_b, rgb: [33, 0, 41], xy: [[86, 40]]}
+  - {frame: daze_b, rgb: [41, 41, 57], xy: [[42, 70]]}
+  - {frame: daze_b, rgb: [66, 74, 90], xy: [[42, 71]]}
+  - {frame: hurt_in2, rgb: [33, 0, 41], xy: [[71, 111], [71, 112], [71, 113], [71, 114], [71, 115], [71, 116], [71, 117], [71, 118], [71, 119]]}
+  - {frame: atk_wind2, rgb: [33, 0, 41], xy: [[76, 45], [77, 44], [77, 45], [76, 46]]}
