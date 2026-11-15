@@ -1,0 +1,151 @@
+sprite: nightmare
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Black horse with a cold-blue flame mane, tail and hooves (nightmare). The attack is a charging kick with both
+# forelegs lifted and the head thrust down; the hurt is knocked back on four hooves with the head tossed up.
+# Approved-art nit: the attack's streaming flame-tail tip is cut flat at x 2 (ROSTER_LOG R225), left as is.
+keyframes:
+  idle:
+    hip: [45, 65]
+    back: [65, 62]
+    chest: [88, 62]
+    neck: [92, 45]
+    head: [103, 32]
+    snout: [118, 50]
+    tail0: [42, 57]
+    tail1: [25, 62]
+    tail2: [22, 80]
+    tail_tip: [17, 92]
+    hip_n: [40, 80]
+    knee_n: [36, 100]
+    foot_n: [36, 113]
+    toe_n: [38, 120]
+    hip_f: [55, 85]
+    knee_f: [55, 100]
+    foot_f: [58, 113]
+    toe_f: [60, 119]
+    sh_n: [82, 80]
+    el_n: [82, 95]
+    paw_n: [82, 112]
+    ftoe_n: [84, 120]
+    sh_f: [94, 80]
+    el_f: [96, 95]
+    paw_f: [97, 112]
+    ftoe_f: [99, 119]
+  attack:
+    hip: [40, 70]
+    back: [65, 60]
+    chest: [95, 62]
+    neck: [105, 55]
+    head: [115, 62]
+    snout: [128, 82]
+    tail0: [38, 60]
+    tail1: [25, 62]
+    tail2: [12, 65]
+    tail_tip: [2, 48]
+    hip_n: [35, 80]
+    knee_n: [28, 95]
+    foot_n: [22, 112]
+    toe_n: [21, 119]
+    hip_f: [50, 85]
+    knee_f: [48, 100]
+    foot_f: [45, 110]
+    toe_f: [48, 116]
+    sh_n: [80, 80]
+    el_n: [85, 90]
+    paw_n: [80, 98]
+    ftoe_n: [80, 104]
+    sh_f: [98, 80]
+    el_f: [105, 90]
+    paw_f: [100, 98]
+    ftoe_f: [98, 104]
+  hurt:
+    hip: [40, 68]
+    back: [60, 62]
+    chest: [85, 62]
+    neck: [88, 45]
+    head: [100, 38]
+    snout: [118, 38]
+    tail0: [35, 58]
+    tail1: [22, 65]
+    tail2: [15, 80]
+    tail_tip: [12, 90]
+    hip_n: [38, 80]
+    knee_n: [35, 100]
+    foot_n: [38, 113]
+    toe_n: [40, 120]
+    hip_f: [55, 85]
+    knee_f: [62, 100]
+    foot_f: [68, 110]
+    toe_f: [72, 114]
+    sh_n: [80, 80]
+    el_n: [85, 98]
+    paw_n: [88, 113]
+    ftoe_n: [90, 120]
+    sh_f: [95, 80]
+    el_f: [100, 98]
+    paw_f: [104, 110]
+    ftoe_f: [106, 117]
+masks:
+  neck:   # the flame mane rides the neck (the body chain took its crest)
+    idle: [[70, 42], [78, 30], [88, 18], [94, 10], [108, 16], [110, 26], [100, 36], [96, 56], [86, 64], [76, 60]]
+  head:   # the head with ears and forelock, not the mane behind it
+    idle: [[96, 24], [104, 20], [114, 28], [121, 44], [121, 56], [110, 57], [101, 46], [96, 36]]
+  hpaw_n:   # the near hind hoof as a rigid block on the ground line
+    idle: [[28, 112], [45, 112], [45, 124], [28, 124]]
+    attack: [[13, 112], [31, 112], [31, 124], [13, 124]]
+    hurt: [[30, 112], [47, 112], [47, 124], [30, 124]]
+frames:
+  atk_wind1:   # anticipation: the head drops and draws back, the body 1 px down
+    dy: 1
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-1, 0], chest: [-2, 0], neck: [-3, 1], head: [-3, 2], snout: [-3, 3]}
+  atk_wind2:   # coil: head low and well back, body 2 px down
+    dy: 2
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-3, 1], neck: [-5, 2], head: [-6, 4], snout: [-6, 5]}
+  atk_mid:   # the charge passes: from the kick, the head and mane lifted back toward the coil (translated)
+    moves: []
+    pins: [foot_n, foot_f]
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-3, -1], neck: [-4, -3], head: [-5, -4], snout: [-5, -4]}
+  atk_follow:   # the kick lands and the head comes back up, translated (an overshoot or a settle left follow->recover
+    moves: []                  # under the IoU floor and turned the neck past the cap)
+    pins: [foot_n, foot_f]
+    t: 1.0
+    tweaks: {back: [0, -1], chest: [-1, -2], neck: [-2, -4], head: [-3, -6], snout: [-3, -6]}
+  atk_recover:   # translated: the head eases forward and down toward the kick
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [1, 0], chest: [2, 0], neck: [3, 2], head: [5, 3], snout: [5, 3]}
+  hurt_in1:   # the flinch: head tossed back and up, the body pulled back; hooves planted
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-1, 0], chest: [-2, -1], neck: [-3, -2], head: [-4, -3], snout: [-4, -3]}
+  hurt_in2:   # from the hurt: the tossed head 1-2 px back down
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {neck: [1, 1], head: [1, 2], snout: [1, 2]}
+  daze:   # the head hangs, translated with its mane
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 3]}
+  daze_b:
+    moves: []
+    pins: [el_n, paw_n, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {neck: [0, 1], head: [0, 3], snout: [0, 4]}
+holds: []
+paint: []

@@ -1,0 +1,157 @@
+sprite: baretta
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Red-brown armoured burrower (baretta): a domed plated back, shovel claws. The attack rakes both fore claws far
+# forward (only the hind feet stay down); the hurt curls up into the plates and hides the tail.
+keyframes:
+  idle:
+    hip: [45, 85]
+    back: [75, 65]
+    chest: [100, 75]
+    neck: [106, 74]
+    head: [115, 72]
+    snout: [142, 93]
+    tail0: [32, 92]
+    tail1: [24, 94]
+    tail2: [14, 93]
+    tail_tip: [5, 92]
+    sh_n: [85, 85]
+    el_n: [88, 100]
+    paw_n: [95, 112]
+    ftoe_n: [103, 121]
+    sh_f: [110, 88]
+    el_f: [113, 100]
+    paw_f: [118, 110]
+    ftoe_f: [124, 118]
+    hip_n: [42, 92]
+    knee_n: [35, 105]
+    foot_n: [38, 116]
+    toe_n: [48, 121]
+    hip_f: [70, 90]
+    knee_f: [68, 102]
+    foot_f: [70, 115]
+    toe_f: [78, 118]
+  attack:
+    hip: [40, 90]
+    back: [70, 55]
+    chest: [100, 60]
+    neck: [108, 56]
+    head: [118, 55]
+    snout: [147, 66]
+    tail0: [32, 86]
+    tail1: [22, 83]
+    tail2: [13, 78]
+    tail_tip: [7, 74]
+    sh_n: [95, 80]
+    el_n: [115, 90]
+    paw_n: [130, 98]
+    ftoe_n: [158, 101]
+    sh_f: [105, 85]
+    el_f: [115, 98]
+    paw_f: [125, 105]
+    ftoe_f: [148, 108]
+    hip_n: [35, 95]
+    knee_n: [22, 105]
+    foot_n: [12, 116]
+    toe_n: [20, 121]
+    hip_f: [60, 95]
+    knee_f: [58, 108]
+    foot_f: [62, 118]
+    toe_f: [68, 120]
+  hurt:
+    hip: [35, 90]
+    back: [60, 55]
+    chest: [85, 70]
+    neck: [92, 76]
+    head: [98, 80]
+    snout: [122, 104]
+    tail0: [30, 92]
+    tail1: [28, 94]
+    tail2: [26, 95]
+    tail_tip: [24, 96]
+    sh_n: [68, 88]
+    el_n: [72, 100]
+    paw_n: [78, 110]
+    ftoe_n: [90, 121]
+    sh_f: [90, 95]
+    el_f: [95, 105]
+    paw_f: [100, 112]
+    ftoe_f: [113, 121]
+    hip_n: [35, 100]
+    knee_n: [28, 110]
+    foot_n: [30, 117]
+    toe_n: [42, 121]
+    hip_f: [60, 100]
+    knee_f: [58, 110]
+    foot_f: [62, 117]
+    toe_f: [68, 120]
+parts:
+  tail: {in: [idle, attack]}   # the hurt curls the tail out of sight under the plates
+masks:
+  body:   # the shell's front rim and spike above the head (the head's radius took them: a second ear in daze)
+    idle: [[92, 40], [112, 44], [119, 48], [117, 57], [116, 62], [104, 64], [98, 70], [92, 70]]
+  head:   # the head with its ear, not the shell's front spike nor the far foreleg under the jaw
+    idle: [[104, 64], [116, 62], [117, 57], [121, 52], [125, 54], [126, 62], [128, 66], [147, 88], [146, 99], [135, 100], [122, 90], [110, 88], [104, 80]]
+  hpaw_n:   # the near hind paw on the ground line (a rigid block: a turned shin dropped it)
+    idle: [[30, 114], [52, 114], [52, 124], [30, 124]]
+    attack: [[4, 113], [30, 113], [30, 124], [4, 124]]
+    hurt: [[24, 114], [46, 114], [46, 124], [24, 124]]
+frames:
+  atk_wind1:   # anticipation: the plated body shifts back and sinks, the snout drawn in and down
+    dy: 2
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-3, 0], neck: [-4, 1], head: [-5, 2], snout: [-5, 2]}
+  atk_wind2:   # coil: body 3 px down and back, the head pulled well in
+    dy: 3
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-3, 0], chest: [-5, 0], neck: [-7, 2], head: [-9, 3], snout: [-9, 3]}
+  atk_mid:   # the rake passes: the spine and head toward the coil, the claws keep the attack reach
+    moves: [back, chest, neck, head, snout]
+    pins: [foot_n, foot_f, sh_n, el_n, paw_n, sh_f, el_f, paw_f]
+    t: 0.12
+    tweaks: {knee_n: [3, 0], foot_n: [3, 0], toe_n: [3, 0]}
+  atk_follow:   # the rake drives on: shell and head 1 px further forward, translated (the claw is 3 px from the cell edge)
+    moves: []
+    pins: [paw_n, paw_f, el_n, el_f, foot_n, foot_f]
+    t: 1.0
+    tweaks: {back: [1, 0], chest: [1, 0], neck: [1, 0], head: [1, 0], snout: [1, 0]}
+  atk_recover:   # translated: the shell still 1 px forward, the snout 1 px low (a moved head left slivers on the far claw)
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [1, 0], chest: [1, 0], snout: [0, 1]}
+  hurt_in1:   # the flinch, translated: head jerked back and up, the shell pulled back
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {back: [-1, 0], chest: [-2, 0], neck: [-3, -1], head: [-4, -2], snout: [-4, -2]}
+  hurt_in2:
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, sh_n, sh_f, knee_n, knee_f]
+    t: 0.3
+  daze:   # the snout sinks (the whole front sinks: a head dropped alone opened the shell rim and showed its front spike as an ear)
+    moves: []
+    t: 0.0
+    dy: 2
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    tweaks: {head: [0, -1], snout: [0, 2]}
+  daze_b:
+    moves: []
+    t: 0.0
+    dy: 3
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    tweaks: {head: [0, -1], snout: [0, 3]}
+holds: []
+paint:   # a 1 px notch in the near thigh's outline the sunk body opens, outline ink
+  - {frame: atk_wind1, xy: [[56, 102]], rgb: [6, 4, 10]}
+  - {frame: atk_wind1, xy: [[102, 66], [103, 66]], rgb: [6, 4, 10]}              # pinholes in the head's top line
+  - {frame: atk_wind2, xy: [[101, 67], [105, 67], [100, 68]], rgb: [6, 4, 10]}
+  - {frame: atk_wind1, xy: [[79, 94], [79, 95]], rgb: [165, 49, 57]}            # ink specks on the near foreleg
+  - {frame: atk_wind2, xy: [[78, 89], [79, 94], [79, 95], [79, 96]], rgb: [165, 49, 57]}
