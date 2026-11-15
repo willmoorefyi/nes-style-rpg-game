@@ -85,11 +85,11 @@ masks:                          # every leg owns its whole column below the body
     attack: [[70, 100], [86, 100], [86, 124], [70, 124]]
     hurt: [[72, 93], [91, 93], [91, 126], [72, 126]]
   leg1_n:
-    idle: [[106, 100], [125, 100], [125, 124], [106, 124]]
+    idle: [[106, 102], [125, 102], [125, 124], [106, 124]]   # below the thorax's dark underside
     attack: [[80, 87], [91, 87], [113, 117], [113, 126], [98, 126], [80, 99]]
     hurt: [[108, 98], [126, 98], [126, 124], [108, 124]]
   leg1_f:
-    idle: [[126, 100], [140, 100], [140, 124], [126, 124]]
+    idle: [[126, 102], [130, 102], [131, 104], [140, 112], [140, 124], [126, 124]]   # not the mandible tip (it stayed pinned in hurt_in1)
     attack: [[114, 98], [152, 110], [152, 126], [124, 126]]
     hurt: [[138, 86], [164, 86], [164, 116], [138, 116]]
 frames:                         # legs held whole (pinned coxa, knee and tip); the thorax turns about the body joint
@@ -98,7 +98,7 @@ frames:                         # legs held whole (pinned coxa, knee and tip); t
   atk_mid: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [1, 5], head: [1, 6], abd: [1, 5], abd_end: [1, 3], coxa1_n: [5, 0], knee1_n: [5, 0], tip1_n: [5, 0], coxa1_f: [-4, 0], knee1_f: [-4, 0], tip1_f: [-4, 0], coxa3_n: [2, 0], knee3_n: [2, 0], tip3_n: [2, 0], coxa4_n: [8, 0], knee4_n: [8, 0], tip4_n: [8, 0]}}
   atk_follow: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [0, 3], head: [0, 3], abd: [0, 3], abd_end: [0, 2]}}
   atk_recover: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [1, 0], head: [1, 0], abd: [1, 0], abd_end: [1, 0]}}
-  hurt_in1: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [2, -1], head: [3, -3], abd: [2, -1], abd_end: [2, 0]}}
+  hurt_in1: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [2, -2], head: [2, -2], abd: [2, -1], abd_end: [2, 0]}}
   hurt_in2: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {body: [-2, 2], head: [-2, 2], abd: [-2, 2], abd_end: [-2, 2]}}
   daze: {moves: [], dy: 0, pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f]}
   daze_b: {moves: [], dy: 0, pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa3_n, knee3_n, tip3_n, coxa4_n, knee4_n, tip4_n, tip2_f, tip3_f, tip4_f], tweaks: {head: [1, 2]}}
@@ -106,3 +106,6 @@ holds: []
 paint:                          # 4-6 px pockets that close between legs and the lowered body: inked shut; 1 px crack
   - {frame: hurt_in2, xy: [[116, 95]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[94, 105]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[135, 103], [137, 103]], rgb: [6, 4, 10]}        # mandible underside outline closed
+  - {frame: hurt_in1, xy: [[127, 101]], rgb: [49, 41, 74]}                   # 1 px pinhole in the plate underside
+  - {frame: daze_b, xy: [[117, 91], [118, 92], [119, 93], [118, 94]], rgb: [82, 90, 115]}   # doubled crease on the cheek
