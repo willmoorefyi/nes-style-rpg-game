@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 46 of 300 (build 46 of 285, fix 0 of 15; ledger guard: 146 Gemini attempts - 100)
+Images used: 47 of 300 (build 47 of 285, fix 0 of 15; ledger guard: 147 Gemini attempts - 100)
 
 ## Attempts
 
@@ -74,6 +74,7 @@ Images used: 46 of 300 (build 46 of 285, fix 0 of 15; ledger guard: 146 Gemini a
 | R49 | warmech/boss_attack (1234, key `6326c663ad56b0bb05db299e`) | 1 | A long forward stride toward the heroes, the claw lifted high, palette and parts kept; 185 px, lowest row 192, top row 8, x 20-179, no border pixels, binary alpha, 16 colours (2 exact shared), one piece, `pose_diff` 0.70. **Fails review (identity drift):** the broad domed hull shrinks to a slim torso half the idle's width (another machine's proportions), the claw is raised above the head (a wind-up, not the smash), the cannon points back up-left | **rejected**; retry follows (seed 1235, `--retry`; the `attack` text adds the idle's bulk and proportions and puts the claw low in front) |
 | R50 | warmech/boss_attack (1235, key `e847fa340804e3e8fd352e4e`, `--retry`) | 1 | The idle's bulk is back: the broad domed hull pitched forward, a long stomping stride, the cannon level toward the heroes; 167 px, lowest row 192, top row 26, x 16-184, no border pixels, binary alpha, 16 colours (2 exact shared), one piece, `pose_diff` 0.76. **Fails review (limb count):** besides the left-side claw arm and the cannon, a large three-fingered claw hangs at the front knee, reading as a third arm | **rejected** but kept as the fallback; the last allowed attempt follows (seed 1236, `--retry`; the text counts exactly two arms) |
 | R51 | warmech/boss_attack (1236, key `e560d201c795d70ed13b8c5d`, `--retry`, attempt 3 of 3) | 1 | The claw smash: the broad domed hull pitched far forward over a long stride, the claw arm driven down low in front onto the ground toward the heroes, the cannon pulled in at the side pointing forward; exactly two arms, the idle's bulk, palette and parts. 188 px, lowest row 192, top row 5, x 3-229 of a **232 px wide cell** (the cutter's lunge widening, as the seraph attack), no border pixels, binary alpha, 15 colours (3 exact shared), one piece. Nits: headroom 5 px (garland #31 was accepted at 5; `atk_follow` may clamp); the claw tips touch the ground beside the front foot (the rig must keep the claw out of the feet pin) | **self-approved with nits** (attempt 3 of 3, over R49: a slim hull, and R50: an extra claw) |
+| R52 | warmech/boss_cast (1234, key `9fdfa69f1a3b1708005fc08e`) | 1 | The chest core blazes white-blue behind the grille, the cannon levelled at the heroes; 183 px, lowest row 192, top row 10, no border pixels, binary alpha, 16 colours (3 exact shared), one piece. **Fails review:** `pose_diff` 0.09 vs idle (under the 0.15 floor: the idle stance unchanged, no brace or lean), and the cannon muzzle turned into a two-pronged fork (a prop change) | **rejected**; retry follows (seed 1235, `--retry`; the `cast` text asks for a low wide brace, the hull tilted back and the idle's round muzzle) |
 
 ## G1 status (2026-11-15, closed)
 
