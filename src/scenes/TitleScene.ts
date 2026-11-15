@@ -6,7 +6,8 @@ import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { SaveManager } from '../systems/SaveManager.js';
 import { NES_FONT } from '../ui/NESFont.js';
-import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE } from '../core/LayoutConstants.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, WINDOW_PADDING } from '../core/LayoutConstants.js';
+import { takeBestiaryDeepLink } from './bestiary/bestiaryLink.js';
 
 export class TitleScene implements Scene {
   readonly container = new Container();
@@ -52,12 +53,12 @@ export class TitleScene implements Scene {
 
     // Menu window
     const hasSaves = SaveManager.getSaveSlots().some((s) => s !== null);
-    const menuWindow = new Window({ x: 760, y: 550, width: 400, height: 200 });
     const menuItems = [
         { label: 'New Game', value: 'new' },
         { label: 'Continue', value: 'continue', enabled: hasSaves },
-        ...(import.meta.env.DEV ? [{ label: 'Debug', value: 'debug' }] : []),
+        ...(import.meta.env.DEV ? [{ label: 'Debug', value: 'debug' }, { label: 'Bestiary', value: 'bestiary' }] : []),
       ];
+    const menuWindow = new Window({ x: 760, y: 550, width: 400, height: menuItems.length * 48 + 2 * WINDOW_PADDING });
     this.menu = new Menu({
       items: menuItems,
       x: menuWindow.contentX,
@@ -68,6 +69,7 @@ export class TitleScene implements Scene {
     });
     menuWindow.addChild(this.menu);
     this.container.addChild(menuWindow);
+    if (takeBestiaryDeepLink()) this.onSelect('bestiary');   // ?bestiary=<id> (dev), once per page load
   }
 
   update(_dt: number): void {
@@ -90,6 +92,8 @@ export class TitleScene implements Scene {
       Promise.resolve(this.game.scenes.push('loadMenu'))
         .then(() => this.game.scenes.get<LoadScene>('loadMenu')?.openedFromTitle())
         .catch(failed('Failed to open the load menu:'));
+    } else if (value === 'bestiary') {
+      Promise.resolve(this.game.scenes.push('bestiary')).catch(failed('Failed to open the bestiary:'));
     } else if (import.meta.env.DEV && value === 'debug') {
       // dev only (the gate lets Vite drop the debug chunks from production): ?scenario=<id> runs that scenario as
       // before; otherwise Debug opens the battle sandbox (docs/FEEDBACK_PLAN_2026-11-14.md §3.8)

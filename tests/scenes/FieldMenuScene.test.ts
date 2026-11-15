@@ -169,3 +169,32 @@ describe('FieldMenuScene', () => {
     expect(formatPlayTime(36000 + 61)).toBe('10:01:01');
   });
 });
+
+describe('Fh: the Bestiary row (docs/BESTIARY_PLAN.md BS-1)', () => {
+  const ROWS = ['Items', 'Magic', 'Equip', 'Status', 'Order', 'Bestiary', 'Save', 'Load', 'Config'];
+
+  it('the rows read Items, Magic, Equip, Status, Order, Bestiary, Save, Load, Config', () => {
+    const scene = new FieldMenuScene(createMockGameForMenu() as unknown as Game);
+    scene.enter();
+    expect(visibleLabels(scene.container).filter((l) => ROWS.includes(l))).toEqual(ROWS);
+  });
+
+  it('selecting Bestiary pushes the bestiary; Config is last and Load second to last', () => {
+    const game = createMockGameForMenu();
+    const scene = new FieldMenuScene(game as unknown as Game);
+    scene.enter();
+    for (let i = 0; i < 5; i++) game.input.tap('down', () => scene.update(1));
+    game.input.tap('confirm', () => scene.update(1));
+    expect(game.scenes.push).toHaveBeenCalledWith('bestiary');
+    game.input.tap('down', () => scene.update(1));     // Save
+    game.input.tap('down', () => scene.update(1));     // Load
+    game.input.tap('confirm', () => scene.update(1));
+    expect(game.scenes.push).toHaveBeenLastCalledWith('loadMenu');
+    game.input.tap('down', () => scene.update(1));     // Config
+    game.input.tap('confirm', () => scene.update(1));
+    expect(game.scenes.push).toHaveBeenLastCalledWith('config');
+    game.input.tap('down', () => scene.update(1));     // wraps to Items
+    game.input.tap('confirm', () => scene.update(1));
+    expect(game.scenes.push).toHaveBeenLastCalledWith('itemMenu');
+  });
+});

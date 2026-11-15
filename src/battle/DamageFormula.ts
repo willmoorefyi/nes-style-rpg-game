@@ -88,8 +88,18 @@ export function physicalAttack(
  */
 export function statusHits(accuracy: number, magicDefense: number, rng: () => number = Math.random,
   relation: ElementRelation = 'normal'): boolean {
+  return roll200(rng, statusRoll(accuracy, magicDefense, relation));
+}
+
+/** The connect roll's chance out of 200: base + accuracy − magic defence (shared by statusHits and statusChance). */
+function statusRoll(accuracy: number, magicDefense: number, relation: ElementRelation): number {
   const base = relation === 'resist' ? 0 : MAGIC_HIT_BASE + (relation === 'weak' ? WEAK_CONNECT_BONUS : 0);
-  return roll200(rng, base + accuracy - magicDefense);
+  return base + accuracy - magicDefense;
+}
+
+/** The probability (0..1) that statusHits succeeds (the bestiary's "Status hit"). */
+export function statusChance(accuracy: number, magicDefense: number, relation: ElementRelation = 'normal'): number {
+  return Math.max(0, Math.min(1, statusRoll(accuracy, magicDefense, relation) / 200));
 }
 
 export interface MagicSpell {
