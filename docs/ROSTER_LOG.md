@@ -223,6 +223,27 @@ Images used: 117 of 300 (build 117 of 285, fix 0 of 15; ledger guard: 217 Gemini
 - Process slip (R100): one wording edit failed its text match and the paid call was not chained to it, so attempt 3
   of `shark` went out with R99's text (it was approved; the log row says so). Edits and paid calls are chained since.
 
+## Batch A status (2026-11-15, closed)
+
+| Batch | Sprites approved | Waiting | Images | Expected (plan 6.2) | Retries by body type (images / sprites) |
+|---|---|---|---|---|---|
+| A (002-031) | **25 of 25** (the 19 above + sahagin, sahagin_chief, buccaneer, ghast, gargoyle, bloodbones) | none | 44 (R80-R126 without R122, the astos item; R95 and R121 are no-image best-of-3 rows) | 34 | biped 20 / 11, quadruped 4 / 3, arthropod 9 / 4, serpent 3 / 2, swimmer 3 / 1, floating 2 / 2, blob 3 / 2 |
+
+- The biped pause was lifted with per-sprite `motion:` strings (orchestrator): the biped line without "cape" plus
+  "draw only the parts and clothing named ..., no cape, cloak, scarf or extra cloth, and no slash trail, smear, motion
+  arc or motion lines". No cape, cloak or smear appeared in R114-R126.
+- **New failure (cutter limit, framework owner):** a small biped's long reach in the attack crosses the raw's
+  one-third line, and `monster.cut` splits the raw at fixed thirds, so the hands are sliced flat (R118-R120 ghast,
+  R123 gargoyle) while the cut cell has no border pixels (the checklist cannot see it; compare the raw). What fixed it
+  in the prompt: "the elbows bent so the claws/blades stay well inside the middle cell" (R124, R126); "centred with
+  space on both sides" alone did not. Proposed framework fix: split raw cells at the figure gaps nearest the thirds.
+- R118-R120 (ghast) were three rejected biped reviews in a row; the cause was this cutter limit, not the pause's
+  wording, and the bent-elbow wording fix was applied before the next biped (gargoyle).
+- Fix-pass candidates added: `ghast` (attack fingertips sliced at x 69, eyes lost in the cut), `sahagin_chief` (the
+  spear's head swings from back-left in the idle to forward in the attack).
+- Orchestrator item: `astos/boss_attack` shallow-lunge replacement (R122, the sheet's 3rd attempt) not approved: the
+  crown still 41 px low, the robe still spread, idle IoU 0.374 < 0.415. R45 stays; the rig needs another route.
+
 ## Deferred sprites
 
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
