@@ -228,7 +228,8 @@
     the bronze blade leading, the three far-side arms thrown back, the tail coil tightening around the altar
   cast: >-
     a sacred fire rite: she rises tall on the coiled tail, all six arms spread in a ritual formation, the sun disc
-    between the upper hands blazing white-gold, small sparks rising around her hands
+    between the upper hands blazing white-gold, small sparks rising around her hands; the bronze blade stays in the
+    lower left hand and the censer in the lower right hand, as in Image 3
   hurt: >-
     struck hard: recoiling back over the coil, the crack in the mask flaring brighter, the six arms flung outward out of
     rhythm, the censer chain swinging
@@ -242,6 +243,8 @@
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
+  sheet_seeds: {boss_cast: 1236}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
+  # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
