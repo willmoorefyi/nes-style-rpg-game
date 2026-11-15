@@ -219,8 +219,12 @@
     of charcoal scales with ember-lit undersides coiled around the broken stone altar; palette of charcoal, ember
     orange, white-gold, bronze and ash grey
   attack: >-
-    lunging forward on the coiled tail toward the heroes, the three near-side arms striking in one sweeping blow with
-    the bronze blade leading, the three far-side arms thrown back, the tail coil tightening around the altar
+    a ferocious melee slash: she lunges forward on the coiled tail toward the heroes on the right, torso leaning hard
+    to the right; the lower arm that holds the curved bronze blade in Image 3 sweeps across her body so the blade
+    slashes far out in front of her toward the heroes, the blade clearly leading the blow and the farthest point of
+    the figure on the right; the other two arms on that side strike forward with it, open-handed; the three arms on
+    the other side are thrown back behind her, one of them still holding the sun disc; the censer still hangs on its
+    chain from its hand exactly as in Image 3; the tail coil tightening around the altar
   cast: >-
     a sacred fire rite: she rises tall on the coiled tail, all six arms spread in a ritual formation, the sun disc
     between the upper hands blazing white-gold, small sparks rising around her hands
@@ -237,6 +241,8 @@
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1235}   # boss_attack 1234 (ROSTER_LOG R2): led by the sun disc, blade thrown back,
+  # censer without its chain
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
