@@ -1441,18 +1441,18 @@
     motion lines.
   prompt: >-
     a red-skinned devil standing on two hooved legs, curled black ram horns, two black bat wings half raised behind the
-    shoulders, a long thin barbed tail, yellow eyes and a fanged grin, a lean muscular body, holding one black iron
+    shoulders, a long thin barbed tail, two bright yellow eyes clearly visible and a fanged grin, a lean muscular body, holding one black iron
     trident in the hand on the right side of the image; centred in its own cell
   attack: >-
-    lunging forward and thrusting the trident at the heroes in the same hand as in the idle cell, the elbow bent so
-    the whole trident stays well inside the middle cell (not reaching the cell edge), the wings spread, the same one
-    trident as in the idle cell
+    lunging forward and stabbing the trident steeply down toward the heroes' feet in the same hand as in the idle
+    cell, the trident angled down in front of its legs, its prongs well inside the middle cell (not reaching the cell
+    edge), the wings spread, the same one trident as in the idle cell
   hurt: >-
     knocked back, the wings folding, the free arm thrown up, the trident held upright close to the body in the same
     hand as in the idle cell
   face: its red devil face with yellow eyes and a fanged grin under the ram horns is readable
   extra_negative: grey stone skin, feathers, a cape, fire, a sword, a third wing, a second trident
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R173): the attack trident prongs sliced at the raw cell line
 - id: pyrolisk
   # "Pyrolisk" (059): a small fiery bird-lizard (distinct from the cockatrice and basilisk)
   size: small
