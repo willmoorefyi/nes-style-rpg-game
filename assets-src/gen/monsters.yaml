@@ -1279,7 +1279,8 @@
   size: large
   body: arthropod
   prompt: >-
-    a big armoured rust-brown centipede seen from the side, a long body of overlapping shiny plates, many short
+    a big armoured rust-brown centipede seen from the side, a compact body of about eight overlapping shiny plates
+    (the whole centipede, tail end included, well inside its own cell with empty space on both sides), many short
     jointed legs on the ground, the front third raised up low with a plated head, two huge curved mandibles and a drop
     of green venom at their tips (attached), small black eyes; in every cell the raised front stays well below the top
     of the box
@@ -1288,11 +1289,12 @@
     in the idle cell (no taller than its idle height); the head and the mandible tips end well before the right edge
     of the middle cell (not reaching the cell edge)
   hurt: >-
-    knocked back, the front end curling down and back low over its body, the mandibles clenched, the legs scrabbling;
-    no taller than its idle height (no rearing up)
+    knocked back, still facing right with the head and mandibles toward the heroes on the right and the tail on the
+    left as in the idle cell, the head pulled down and back, the mandibles clenched, the legs scrabbling; no taller
+    than its idle height (no rearing up, never turned around)
   face: its plated head with small black eyes and huge mandibles is readable
   extra_negative: wings, a stinger tail, pincers, soft pale skin, a rear-up taller than the box
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R152): the attack mandible sliced at the raw cell line, a rear-up hurt
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R152): the attack mandible sliced, a rear-up hurt; 1235 (R153): the hurt turned around, the attack tail sliced
 - id: piranha
   # "Piranha" (051): a small biting fish (distinct from the red piranha: small, silver-green)
   size: small
