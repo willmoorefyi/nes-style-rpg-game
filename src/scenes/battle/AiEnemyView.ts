@@ -9,9 +9,13 @@ import { attackTable } from './enemyAttackTables.js';
 import { BattleLayers } from './BattleLayers.js';
 import { setTint, tintOf } from './actorTint.js';
 import { stoneTextures } from './fx/stoneTextures.js';
+import type { FxCuePoint } from './fx/index.js';
 
-/** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4. */
+/** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4; an enemy's
+ *  `pulseTint` replaces it (the pale lich takes a lighter one, so it does not turn muddy). */
 export const HOLD_PULSE_TINT = 0xffb0b0;
+export const pulseTintOf = (e: Pick<EnemyData, 'pulseTint'> | undefined): number =>
+  e?.pulseTint ? parseInt(e.pulseTint.slice(1), 16) : HOLD_PULSE_TINT;
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
 const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
@@ -38,8 +42,9 @@ export class AiEnemyView {
   private homeSlots: number[] | null = null;
   /** The sprites of the last update, so a pose cue can name the sprite it belongs to. */
   private sprites: Container[] = [];
-  /** An attack cue with its enemy's sprite (the battle hands it to ActionFx.playCue and, later, the screen shake). */
-  onCue: ((i: number, cue: PoseCue, sprite: Container) => void) | null = null;
+  /** An attack cue with its enemy's sprite (the battle hands it to ActionFx.playCue), and for `hold` the raised
+   *  weapon's tip (fractions of the sprite) when the atlas has it. */
+  onCue: ((i: number, cue: PoseCue, sprite: Container, at?: FxCuePoint) => void) | null = null;
 
   constructor(private readonly enemies: EnemyData[], private readonly art: MonsterArtSource = battleArt) {
     this.poses = new EnemyPoseController(enemies.length);
@@ -47,7 +52,11 @@ export class AiEnemyView {
       const sprite = this.sprites[i];
       if (!sprite) return;
       if (cue === 'contact' && this.poses.attackKind(i) === 'heavy') BattleLayers.containing(sprite)?.shake.start();
-      this.onCue?.(i, cue, sprite);
+      // a ranged attack (the dragon's breath) lands far from its feet: no impact dust
+      if (cue === 'contact' && this.enemies[i]?.attack === 'ranged') return;
+      const tip = cue === 'hold' ? this.frames[i]?.tip : undefined;
+      const cell = this.frames[i]?.cell;
+      this.onCue?.(i, cue, sprite, tip && cell ? { x: (tip[0] + 0.5) / cell[0], y: (tip[1] + 0.5) / cell[1] } : undefined);
     };
   }
 
@@ -141,7 +150,7 @@ export class AiEnemyView {
       }
       sprite.position.set(b.x + st.dx + (st.travelDx ?? 0), b.y + st.dy + (st.travelDy ?? 0));
       const hold = this.poses.holdFrame(i);
-      const pulse = hold !== null && Math.floor(hold / 4) % 2 === 0 ? HOLD_PULSE_TINT : null;
+      const pulse = hold !== null && Math.floor(hold / 4) % 2 === 0 ? pulseTintOf(this.enemies[i]) : null;
       if (tintOf(sprite, 'pulse') !== pulse) setTint(sprite, 'pulse', pulse);
     }
     const lunging = sprites.findIndex((_, i) => this.poses.isLunging(i));

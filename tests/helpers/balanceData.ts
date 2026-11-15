@@ -94,9 +94,13 @@ const zoneTable = (map: MapData, id: string): EncounterEntry[] => {
   if (!zone) throw new Error(`map ${map.id} has no encounter zone "${id}"`);
   return zone.encounters;
 };
-export const ZONE_TABLES: Record<'fields' | 'approach' | 'east' | 'temple', EncounterEntry[]> = {
+/** The formations of a table made only of wolves (the play test's wolf-heavy temple approach). */
+const wolvesOnly = (table: EncounterEntry[]): EncounterEntry[] =>
+  table.filter((e) => (e.groups ?? []).length > 0 && (e.groups ?? []).every((g) => g.id === 'wolf'));
+export const ZONE_TABLES: Record<'fields' | 'approach' | 'approach_wolves' | 'east' | 'temple', EncounterEntry[]> = {
   fields: OVERWORLD.encounters ?? [],
   approach: zoneTable(OVERWORLD, 'temple_approach'),
+  approach_wolves: wolvesOnly(zoneTable(OVERWORLD, 'temple_approach')),
   east: zoneTable(OVERWORLD, 'east_pocket'),
   temple: TEMPLE.encounters ?? [],
 };

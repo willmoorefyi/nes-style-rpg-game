@@ -6,32 +6,42 @@
  * its inn rule) with shopping disabled until the whole party is Lv 2. "Gold in hand" is the gold at the end of the
  * battle in which the last member reaches Lv 2, after that battle's reward and inn rule: what the player can spend.
  *
- * Measured (200 runs) with the FF1 gold (goblin 6, wolf 6, gr_imp 18, skeleton 3, gr_wolf 22) as "old" and the FB-1
- * gold (12 / 12 / 30 / 10 / 44) as "new". Every bound sits at least 3 points from the new value and fails the old one.
+ * Three routes: the default schedule (fields, then the temple approach), the temple approach only, and the
+ * approach's wolf-only formations (the final play test: wolves give 24 XP each, so the party hit Lv 2 in 3 battles
+ * holding 126 G). The play-test fix makes act-1 gold proportionate to XP (wolf 12 -> 26 G, gr_wolf 44 -> 100 G).
+ *
+ * Measured (200 runs), "FB-1" = goblin 12, wolf 12, gr_imp 30, skeleton 10, gr_wolf 44; "now" = wolf 26, gr_wolf 100:
+ *
+ * | route          | median FB-1 / now | p10 FB-1 / now | >= 190 G FB-1 / now | median battles to Lv 2 |
+ * | default        | 246 / 304         | 174 / 250      | 81.5 % / 100 %      | 5                      |
+ * | approach only  | 254 / 300         | 180 / 250      | 88.5 % / 100 %      | 4                      |
+ * | wolves only    | 126 / 238         | 114 / 212      | 0 % / 100 %         | 3                      |
+ *
+ * Every bound sits at least 3 points from the new value; the wolf route fails the FB-1 gold.
  */
 import { describe, it, expect } from 'vitest';
-import { campaign, median, percentile, RUNS } from './fieldCampaign.js';
+import { campaign, median, percentile, RUNS, APPROACH_ONLY, type CampaignOptions } from './fieldCampaign.js';
 
-const runs = Array.from({ length: RUNS }, (_, i) => campaign(i + 1, { noShopBeforeL2: true }));
-const goldAtL2 = runs.map((r) => r.goldAtL2 ?? -1);
+const ROUTES: Array<[string, CampaignOptions['schedule'], string, number]> = [
+  ['default (fields, then approach)', undefined, 'median 304, p10 250, 100 %; FB-1 246 / 174 / 81.5 %', 4],
+  ['temple approach only', APPROACH_ONLY, 'median 300, p10 250, 100 %; FB-1 254 / 180 / 88.5 %', 3],
+  ['wolf-only approach', [['approach_wolves', 20], ['temple', 10]], 'median 238, p10 212, 100 %; FB-1 126 / 114 / 0 %', 2],
+];
 
-describe('Item 1: gold in hand at whole-party Lv 2 (fieldPacing model, no shopping before Lv 2)', () => {
-  it('every run reaches whole-party Lv 2, in a median of 4-10 battles (new 5; old 5: XP is unchanged)', () => {
+describe.each(ROUTES)('Item 1: gold in hand at whole-party Lv 2, route %s (no shopping before Lv 2)', (_name, schedule, measured, minL2) => {
+  const runs = Array.from({ length: RUNS }, (_, i) => campaign(i + 1, { noShopBeforeL2: true, schedule }));
+  const goldAtL2 = runs.map((r) => r.goldAtL2 ?? -1);
+
+  it(`every run reaches whole-party Lv 2, in a median of ${minL2}-10 battles (default 5, approach 4, wolves 3)`, () => {
     expect(goldAtL2.filter((g) => g < 0)).toHaveLength(0);
     const l2 = median(runs.map((r) => r.reachedAt[2]));
-    expect(l2).toBeGreaterThanOrEqual(4);
+    expect(l2).toBeGreaterThanOrEqual(minL2);
     expect(l2).toBeLessThanOrEqual(10);
   });
 
-  it('the median gold in hand is >= 220 G (new 246; old 144)', () => {
+  it(`median >= 220 G, p10 >= 150 G, >= 75 % of runs hold >= 190 G (${measured})`, () => {
     expect(median(goldAtL2)).toBeGreaterThanOrEqual(220);
-  });
-
-  it('the p10 gold in hand is >= 150 G (new 174; old 102)', () => {
     expect(percentile(goldAtL2, 0.1)).toBeGreaterThanOrEqual(150);
-  });
-
-  it('>= 75 % of runs hold >= 190 G, a 100 G spell after one inn and one potion (new 81.5 %; old 4.5 %)', () => {
     expect(goldAtL2.filter((g) => g >= 190).length / RUNS).toBeGreaterThanOrEqual(0.75);
   });
 });

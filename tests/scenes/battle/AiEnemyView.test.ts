@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Container, Graphics, Sprite, Texture } from 'pixi.js';
-import { AiEnemyView, HOLD_PULSE_TINT, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import { AiEnemyView, HOLD_PULSE_TINT, pulseTintOf, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
 import { postureOf } from '../../../src/scenes/battle/fx/statusRules.js';
 import { stoneTextures } from '../../../src/scenes/battle/fx/stoneTextures.js';
 import { HURT_FRAMES } from '../../../src/scenes/battle/enemyChoreography.js';
@@ -233,5 +233,17 @@ describe("AiEnemyView draw order while travelling (D5')", () => {
     expect(tints[tints.length - 1]).toBeNull();
     expect(shookAt).toBe(contactAt);
     expect(layers.actors.position).toMatchObject({ x: 0, y: 0 });
+  });
+
+  it('final play test item 7: the pulse colour comes from the enemy data (`pulseTint`), else the default red', () => {
+    expect(pulseTintOf({ pulseTint: '#ffdcdc' })).toBe(0xffdcdc);
+    expect(pulseTintOf({})).toBe(HOLD_PULSE_TINT);
+    const { art } = fakeArt();
+    const view = new AiEnemyView([{ id: 'lich', name: 'Lich', size: 'large', attack: 'melee', attackAnim: 'heavy', pulseTint: '#ffdcdc' } as EnemyData], art);
+    const sprites = view.build();
+    view.playAttack(0, null);
+    const tints = new Set<number | null>();
+    for (let t = 0; t < 200; t++) { view.update(1, sprites); tints.add(tintOf(sprites[0], 'pulse')); }
+    expect(tints).toEqual(new Set([null, 0xffdcdc]));
   });
 });

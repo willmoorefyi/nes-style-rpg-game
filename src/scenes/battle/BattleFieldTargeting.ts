@@ -1,4 +1,4 @@
-import { BitmapText, Container, Graphics } from 'pixi.js';
+import { BitmapText, Container, Graphics, Sprite } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
@@ -6,7 +6,10 @@ import type { Character } from '../../entities/Character.js';
 import { mostHurtIndex } from '../../entities/partyTargets.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { PANEL_FONT } from './BattleSceneTypes.js';
-import { tagsFor, type StatusVisuals } from './fx/statusRules.js';
+import { iconsFor, tagsFor, type StatusVisuals } from './fx/statusRules.js';
+import { enemyIconRowTop } from './fx/statusIcons.js';
+import { headOf } from './fx/texturePixels.js';
+import { stoneTextures } from './fx/stoneTextures.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
 const TARGET_ARROW = 0xffff00;
@@ -142,11 +145,24 @@ export class BattleFieldTargeting {
     const enemy = isParty ? undefined : this.battle.allEnemies[target.spriteIndex];
     if (!enemy) return;
     const statuses = this.display.presented?.enemies[target.spriteIndex]?.statuses ?? [];
-    const label = new BitmapText({ text: targetLine(enemy.displayName ?? enemy.data.name, statuses, this.display.statusVisuals?.() ?? {}),
+    const visuals = this.display.statusVisuals?.() ?? {};
+    const label = new BitmapText({ text: targetLine(enemy.displayName ?? enemy.data.name, statuses, visuals),
       style: { fontFamily: NES_FONT, fontSize: PANEL_FONT, fill: TARGET_ARROW } });
-    label.position.set(Math.round(arrow.x + 24), Math.round(arrow.y - 10));
+    // play-test item 5: with status icons above the head, the label (and its arrow) sit above the icon row
+    const iconTop = iconsFor(statuses, visuals).length > 0 ? this.iconRowTop(sprite) : Infinity;
+    const labelY = Math.max(0, Math.min(Math.round(arrow.y - 10), Math.floor(iconTop - 4 - PANEL_FONT)));
+    arrow.y = labelY + 10;
+    label.position.set(Math.round(arrow.x + 24), labelY);
     this.mainContainer.addChild(label);
     this.targetLabel = label;
+  }
+
+  /** The top of an enemy's status icon row in this container's space (the head as statusFx finds it). */
+  private iconRowTop(sprite: Container): number {
+    const h = sprite instanceof Sprite ? headOf(stoneTextures.coloured(sprite.texture)) : null;
+    const b = sprite.getBounds();
+    const head = h ? this.mainContainer.toLocal(sprite.toGlobal(h)).y : this.mainContainer.toLocal({ x: b.x, y: b.y }).y + b.height * 0.33;
+    return enemyIconRowTop(head);
   }
 
   clearTargetArrow(): void {

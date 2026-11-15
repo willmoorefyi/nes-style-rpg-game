@@ -94,16 +94,16 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
 });
 
 describe('T4d act-1 enemies (FF1 counterparts)', () => {
-  it('Garland (pass F item 2, FB-2; U1 had 340 HP and 0.25): 400 HP, attack 9, two hits, accuracy 15, no weakness; 3 hits at <= 50 % HP', () => {
+  it('Garland (pass F item 2, FB-2; U1 had 340 HP and 0.25): 360 HP, attack 9, two hits, accuracy 15, no weakness; 3 hits at <= 75 % HP (play-test fix: 400 / 0.5 took 11-13 rounds)', () => {
     const g = enemy('garland');
-    expect(g.stats.hp).toBe(400);
+    expect(g.stats.hp).toBe(360);
     expect(g.stats.attack).toBe(9);
     expect(g.stats.accuracy).toBe(15);
     expect(g.stats.hits).toBe(2);
     expect(g.weakness).toBeUndefined();
     expect(g.xpReward).toBe(130);
     expect(g.goldReward).toBe(250);
-    expect(g.bossPhases).toEqual([{ hpThreshold: 0.5, patternId: 'aggressive', message: "Garland's attacks grow fiercer!", hits: 3 }]);
+    expect(g.bossPhases).toEqual([{ hpThreshold: 0.75, patternId: 'aggressive', message: "Garland's attacks grow fiercer!", hits: 3 }]);
   });
 
   it('maps the field enemies to IMP, GrIMP, WOLF, GrWOLF and BONE', () => {
@@ -120,9 +120,11 @@ describe('T4d act-1 enemies (FF1 counterparts)', () => {
     expect(enemy('gr_wolf').family).toBe('were');
   });
 
-  it('pays about twice the FF1 gold in act 1 (pass F item 1, FB-1; FF1: 6 / 6 / 18 / 3 / 22)', () => {
-    const want: Record<string, number> = { goblin: 12, wolf: 12, gr_imp: 30, skeleton: 10, gr_wolf: 44 };
+  it('pays gold proportionate to XP in act 1 (pass F item 1, FB-1, and the play-test fix: wolf and gr_wolf about 1 G per XP; FF1: 6 / 6 / 18 / 3 / 22)', () => {
+    const want: Record<string, number> = { goblin: 12, wolf: 26, gr_imp: 30, skeleton: 10, gr_wolf: 100 };
     for (const [id, gold] of Object.entries(want)) expect(enemy(id).goldReward, id).toBe(gold);
+    // no act-1 enemy levels the party faster than it pays (the play test's wolves: 24 XP for 12 G)
+    for (const id of Object.keys(want)) expect(enemy(id).goldReward / enemy(id).xpReward, `${id} G per XP`).toBeGreaterThanOrEqual(1);
   });
 });
 

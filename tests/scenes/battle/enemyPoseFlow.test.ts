@@ -108,11 +108,11 @@ describe('monster poses in the battle flow (preview art)', () => {
     expect(s.poses.state(1).pose).toBe('idle');
   });
 
-  it('E1: a sleeping enemy does not wind up or lunge on its lost turn', () => {
+  it('E1: a sleeping enemy does not wind up or lunge on its lost turn (play-test item 3: nor is it announced)', () => {
     for (const actionType of ['fight', 'magic']) {
       const s = setup({ actorId: 'enemy_0', actorName: 'Goblin A', actionType }, []);
       vi.mocked(s.battle.nextActorLosesTurn).mockReturnValue(true);
-      s.tick(ANNOUNCE());               // announce; its last frame would start the lunge
+      s.tick(1);                        // no announcement hold: straight to the tick line
       expect(s.ctrl.animPhase).toBe('execute');
       expect(s.poses.isAttacking(0)).toBe(false);
       expect(s.poses.state(0)).toMatchObject({ pose: 'idle', dx: 0, dy: 0 });
@@ -255,7 +255,7 @@ describe('travelling enemy attacks in the battle flow (pass F items 3 and 7)', (
   it('E1: a helpless enemy (sleep, stun, stone) never starts its travel', () => {
     const s = setup(FIGHT, [], 5, true, 1, { travel: 600, rise: 0 });
     vi.mocked(s.battle.nextActorLosesTurn).mockReturnValue(true);
-    s.tick(ANNOUNCE());
+    s.tick(1);
     expect(s.ctrl.animPhase).toBe('execute');
     expect(s.poses.isAttacking(0)).toBe(false);
     for (let k = 0; k < 60; k++) { expect(s.poses.state(0).travelDx).toBeUndefined(); s.tick(1); }

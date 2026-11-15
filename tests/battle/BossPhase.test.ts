@@ -1,6 +1,6 @@
 /**
  * ST-6 (docs/FIX_PLAN_PENINSULA.md T5a) and B1 (R2): Garland's `bossPhases` entry fires with no AI attached. At
- * or below his phase threshold (`floor(hpThreshold × hp)`, read from the data: 200 of 400 since pass F item 2, FB-2;
+ * or below his phase threshold (`floor(hpThreshold × hp)`, read from the data: 270 of 360 since the pass-F play-test fix (FB-2: 200 of 400);
  * U1 had 85 of 340) the phase line shows once and his attacks go from 2 hits to 3 (a battle-only `hits` buff, no extra
  * RNG draw for the phase itself).
  */

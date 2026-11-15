@@ -14,6 +14,8 @@ import { fxSource, type FxSource } from './fxSource.js';
 
 /** Effects started by an animation cue: the glint on a raised weapon (`hold`), the dust of a slam (`contact`). */
 export type FxCueId = 'glint' | 'impact_dust';
+/** Where a cue effect plays, as a fraction of its sprite's local bounds (the raised weapon's tip for the glint). */
+export interface FxCuePoint { x: number; y: number }
 
 /** What an effect needs besides the action: where it plays and what the action did to statuses. */
 export interface ActionFxContext {
@@ -31,8 +33,8 @@ export interface ActionFx {
   /** Start the action's effect; returns its impact frame (0: present at once). The number, the hurt pose and the
    *  result line wait for it. */
   play(info: NextActionInfo, result: ActionResult, ctx: ActionFxContext): number;
-  /** An effect started by an attack cue on `sprite`. */
-  playCue(id: FxCueId, sprite: Container): void;
+  /** An effect started by an attack cue on `sprite`; at `at` when given, else at the effect's anchor on the body. */
+  playCue(id: FxCueId, sprite: Container, at?: FxCuePoint): void;
 }
 
 export interface StatusFx {

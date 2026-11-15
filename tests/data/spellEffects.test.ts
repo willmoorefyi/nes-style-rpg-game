@@ -59,7 +59,7 @@ describe('spell-effects.yaml coverage', () => {
     expect(fx.effects.fire).toMatchObject({ frames: 30, impact: 18 });
     expect(fx.effects.lightning).toMatchObject({ frames: 24, impact: 10 });
     expect(fx.effects.revive).toMatchObject({ frames: 44, impact: 30 });
-    expect(fx.effects.glint).toMatchObject({ frames: 8, impact: 0 });
+    expect(fx.effects.glint).toMatchObject({ frames: 14, impact: 0 }); // the raised hold after its 4-frame delay (18 - 4)
     expect(fx.effects.impact_dust).toMatchObject({ frames: 14, impact: 0 });
   });
 });

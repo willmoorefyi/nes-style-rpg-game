@@ -4,10 +4,13 @@
  * panel tags in icon priority and the enemy target line ("Goblin B SLP PSN").
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { Container, Sprite, Texture } from 'pixi.js';
+import { Container, Sprite, Texture, TextureSource } from 'pixi.js';
+import { headOf } from '../../../src/scenes/battle/fx/texturePixels.js';
 import { BattleAnimationController } from '../../../src/scenes/battle/BattleAnimationController.js';
 import { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { BattleFieldTargeting, targetLine } from '../../../src/scenes/battle/BattleFieldTargeting.js';
+import { enemyIconRowTop } from '../../../src/scenes/battle/fx/statusIcons.js';
+import { PANEL_FONT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { createStatusFx, type ActionFx } from '../../../src/scenes/battle/fx/index.js';
 import { FxSource } from '../../../src/scenes/battle/fx/fxSource.js';
 import type { BattleStatusFx } from '../../../src/scenes/battle/fx/statusFx.js';
@@ -152,5 +155,35 @@ describe('status visuals in the battle', () => {
     expect(targeting.targetLabel?.text).toBe('Goblin B SLP PSN');
     targeting.clearTargetArrow();
     expect(targeting.targetLabel).toBeNull();
+  });
+
+  // final play test, pass F item 5: the yellow label sat on the status icons above the head (Garland: head 8 px
+  // below his cell's top, so the icon row reaches above the cell, where the label was)
+  it('with status icons the target label and arrow sit above the icon row; without, where they were', () => {
+    const s = setup();
+    const tex = new Texture({ source: new TextureSource({ width: 100, height: 100 }) });
+    const data = new Uint8ClampedArray(100 * 100 * 4);
+    for (let x = 40; x < 60; x++) data[(4 * 100 + x) * 4 + 3] = 255; // the head: row 4
+    headOf(tex, () => ({ data, w: 100, h: 100 }));
+    const sprite = new Sprite(tex);
+    sprite.position.set(600, 200);
+    sprite.scale.set(2);
+    s.display.layers.actors.addChild(sprite);
+    s.display.enemySprites[0] = sprite;
+    const targeting = new BattleFieldTargeting(s.display.layers.hud, s.battle, s.display, createMockInput() as unknown as InputManager);
+    targeting.enterFieldTargeting(false, false, () => {}, () => {});
+    const plain = { label: targeting.targetLabel!.y, arrow: targeting.targetArrow!.y };
+    expect(plain.arrow).toBe(sprite.y - 20);
+    targeting.clearTargetArrow();
+    s.enemies[0].status.apply('sleep');
+    s.enemies[0].status.apply('poison');
+    s.display.capturePresented();
+    targeting.enterFieldTargeting(false, false, () => {}, () => {});
+    const iconTop = enemyIconRowTop(200 + 4 * 2); // the head row, at x2
+    const label = targeting.targetLabel!;
+    expect(plain.label + PANEL_FONT).toBeGreaterThan(iconTop); // the old placement overlapped the row
+    expect(label.y + PANEL_FONT).toBeLessThanOrEqual(iconTop - 2);
+    expect(targeting.targetArrow!.y + 12).toBeLessThanOrEqual(iconTop);
+    expect(label.y).toBeGreaterThanOrEqual(0);
   });
 });

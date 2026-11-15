@@ -87,7 +87,7 @@ describe('AiEnemyView: playAttack(i, target) and the cue hand-off', () => {
     view.onCue?.(0, 'hold', sprites[0]);
     view.playAttack(0, null);
     for (let f = 0; f < ATTACK_OUT; f++) view.update(1, sprites);
-    expect(playCue.mock.calls).toEqual([['glint', sprites[0]], ['impact_dust', sprites[0]]]);
+    expect(playCue.mock.calls).toEqual([['glint', sprites[0], undefined], ['impact_dust', sprites[0], undefined]]);
   });
 });
 

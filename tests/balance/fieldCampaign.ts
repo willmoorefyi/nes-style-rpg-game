@@ -50,7 +50,17 @@ export interface Campaign {
   goldAtL2?: number;
 }
 
-export interface CampaignOptions { noShopBeforeL2?: boolean }
+export interface CampaignOptions {
+  noShopBeforeL2?: boolean;
+  /** The zones and battle counts to fight (default SCHEDULE). */
+  schedule?: Array<[Zone, number]>;
+}
+
+/**
+ * The temple-approach-only route (final play test, pass F): the party walks straight to the approach (wolves and
+ * Gr.Imps, no goblins) and levels on wolf XP. The gold at whole-party Lv 2 must hold on this route too.
+ */
+export const APPROACH_ONLY: Array<[Zone, number]> = [['approach', 20], ['temple', 10]];
 
 export function campaign(seed: number, opts: CampaignOptions = {}): Campaign {
   const rng = mulberry32(seed);
@@ -83,7 +93,7 @@ export function campaign(seed: number, opts: CampaignOptions = {}): Campaign {
     for (const c of party) { c.currentHp = c.maxHp; c.restoreAllCharges(); }
     if (!atL2 || !opts.noShopBeforeL2) shop();
   };
-  for (const [zone, count] of SCHEDULE) {
+  for (const [zone, count] of opts.schedule ?? SCHEDULE) {
     shop();
     for (let b = 0; b < count; b++) {
       const r = runBattle(party, rollFormation(zone, rng), SPELLS, 'sensible', rng);

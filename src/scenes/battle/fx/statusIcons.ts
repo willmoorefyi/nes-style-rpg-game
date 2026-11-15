@@ -12,6 +12,9 @@ export const ICON_GAP = 4;
 /** Screen px between the head and the bottom of the icon row. */
 export const ICON_LIFT = 8;
 
+/** The top of an enemy's icon row (screen px) for a head at `headY`: the row's bottom is ICON_LIFT above the head. */
+export const enemyIconRowTop = (headY: number): number => headY - ICON_LIFT - ICON_PX;
+
 /** Icon draws (key `<icon>.icon`) centred on `cx`, with the row's bottom edge at `bottom`. */
 export function iconDraws(icons: readonly string[], cx: number, bottom: number, alpha = 1): FxDraw[] {
   const width = icons.length * ICON_PX + (icons.length - 1) * ICON_GAP;

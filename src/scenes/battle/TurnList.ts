@@ -17,6 +17,7 @@ export function actionLabel(info: Pick<NextActionInfo, 'actionType' | 'spellName
     case 'magic': return (info.spellName ?? 'Magic').toUpperCase();
     case 'item': return info.itemName ?? 'Item';
     case 'run': return 'Run';
+    case 'skip': return ''; // no command (asleep, stunned): the entry reads `WAR Asleep`
     default: return info.actionType;
   }
 }

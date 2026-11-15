@@ -5,7 +5,8 @@ JSON: {scale: 2 (screen px per art px), texScale: 1 (PNG px per art px), sheets:
 frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAMES for a sheet with attack_raise; held
 or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
 hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
-opaque row), sequence_version, page}}}.
+opaque row), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
+attack_raise only), sequence_version, page}}}.
 """
 from __future__ import annotations
 
@@ -68,6 +69,15 @@ def anchors(idle: Image.Image) -> dict:
     return {"opaqueRight": int(xs.max()), "head": [int(round((row.min() + row.max()) / 2)), top]}
 
 
+def tip(raise_key: Image.Image) -> dict:
+    """The heavy attack's weapon tip (play-test fix): the topmost opaque pixel of `attack_raise` ([x, y], the centre of
+    its top row; the glint plays there during the raised hold). Meta only: no frame changes."""
+    a = np.asarray(raise_key)[..., 3] > 0
+    top = int(np.nonzero(a.any(axis=1))[0][0])
+    row = np.nonzero(a[top])[0]
+    return {"tip": [int(round((row.min() + row.max()) / 2)), top]}
+
+
 def build(out: Path) -> dict:
     from gen import monster as M
     entries = MA.load_entries()
@@ -114,7 +124,8 @@ def build(out: Path) -> dict:
                 raise SystemExit(f"monsters_ai: {sid} {n}: {bad[0]}")
         sheets[sid] = {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
                        "frames": fr, "anim": anim, "holds": holds, "lungePx": L, "hasRaise": "attack_raise" in frames,
-                       **anchors(frames["idle"]), "sequence_version": SEQUENCE_VERSION, "page": 0}
+                       **anchors(frames["idle"]), **(tip(frames["attack_raise"]) if "attack_raise" in frames else {}),
+                       "sequence_version": SEQUENCE_VERSION, "page": 0}
     out.mkdir(parents=True, exist_ok=True)
     atlas.save(out / "monsters-ai.png")
     meta_json = {"scale": SCALE, "texScale": TEX_SCALE, "sheets": sheets}
