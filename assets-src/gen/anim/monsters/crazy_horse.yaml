@@ -89,27 +89,42 @@ frames:
   atk_wind1:                  # the head drops and draws back, the body tips nose-down
     t: -0.10
     moves: [back, chest]
-    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1]}
+    dy: 1
+    tweaks: {back: [-1, 0], chest: [-1, 0], neck: [-2, 0], head: [-3, 0], snout: [-3, 0]}
   atk_wind2:                   # coil: body 2 lower, head pulled back and down
     t: -0.20
     dy: 2
     moves: [back, chest]
-    tweaks: {neck: [-2, 1], head: [-2, 1], snout: [-2, 1]}
-  atk_recover:                 # landing: the head comes down level, all four hooves planted (the shoulders stay: the far
+    tweaks: {back: [-1, 0], chest: [-1, 0], neck: [-3, -1], head: [-5, -2], snout: [-5, -2]}
+  atk_mid:                     # the tail keeps its attack fling (turning it toward the hanging wind tail spiked and frayed it)
+    moves: [hip, back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {tail0: [2, -5], tail1: [2, -5], tail2: [2, -5], tail_tip: [2, -5]}   # rides the hip's shift, unturned
+  atk_recover:               # landing: the head comes down level, all four hooves planted (the shoulders stay: the far
     t: 0.35                    # foreleg tears at the elbow when they ride the chest)
     moves: [back, neck, head, snout]
   hurt_in1:                    # the rear starts with all four hooves planted (the fore hooves are the ground row)
     t: 0.30
     pins: [foot_n, foot_f, knee_n, knee_f, paw_n, paw_f]
-    moves: [back, chest, neck, head, snout, sh_n, sh_f]
+    moves: [back, chest, sh_n, sh_f]
+    tweaks: {neck: [-1, -1], head: [-2, -3], snout: [-2, -3]}
   hurt_in2:                    # the rear settles: back and head toward idle, the raised forelegs ride (a chest move tears the
     t: 0.25                    # near fetlock off the leg)
     pins: [foot_n, foot_f]
-    moves: [back, neck, head, snout]
+    moves: [back]
+    tweaks: {neck: [1, 1], head: [1, 2], snout: [1, 2]}
+  daze:                        # the head drops, kept at its idle angle (a turned head scrambled eye, bridle and muzzle)
+    moves: [back, chest]
+    tweaks: {head: [0, 0], snout: [0, 0]}
+  daze_b:
+    moves: [back, chest]
+    tweaks: {head: [0, 0], snout: [0, 0]}
 holds: []
 paint:                         # 1 px cracks at the mane / neck, shoulder and tail roots, and tail-strand slits, outline ink
-  - {frame: atk_mid, xy: [[83, 65], [28, 85]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[83, 65]], rgb: [6, 4, 10]}
   - {frame: atk_follow, xy: [[73, 39], [72, 41], [86, 60], [25, 82]], rgb: [6, 4, 10]}
   - {frame: hurt_in1, xy: [[69, 54], [25, 103], [25, 104], [25, 105], [25, 106]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[70, 51], [28, 102], [28, 103], [28, 104], [28, 105]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[70, 53]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[29, 75], [30, 75], [31, 75], [28, 76], [30, 76], [29, 77], [29, 78], [30, 79]], rgb: [33, 24, 33]}   # rump specks and slits in the tail root
+  - {frame: atk_wind2, xy: [[54, 94]], rgb: [6, 4, 10]}                     # 1 px crack at the far hind thigh
+  - {frame: atk_mid, xy: [[84, 64]], rgb: [6, 4, 10]}                       # 1 px crack under the jaw
