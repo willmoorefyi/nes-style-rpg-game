@@ -1522,12 +1522,15 @@
     top end ringed with black stony teeth and glowing inside, small wisps of steam rising from its back (attached); in
     every cell the raised front end and the maw stay well below the top of the grey box and inside its cell
   attack: >-
-    the front end lunging down toward the heroes with the glowing maw wide open, the body stretching, the maw well
-    inside the middle cell
-  hurt: the front end recoiling back and up, the maw clenched shut, the magma seams dimming, the body curling
+    the front end lunging down toward the heroes with the glowing maw wide open, the tail end still coiled tight in
+    place on the ground as in the idle cell, the whole worm from coil to maw well inside the middle cell (not reaching
+    the cell edges)
+  hurt: >-
+    the front end recoiling back and up, the maw clenched shut, the body curling, the magma seams still glowing as
+    brightly as in the idle cell
   face: no eyes; the round glowing toothed maw is the readable feature
   extra_negative: eyes, a face, legs, pink skin, sand, a mound, lava pools, fire outside the body
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R182): the attack tail sliced at the raw cell line, the hurt's seams went dark
 - id: hellhound
   # "Hellhound" (063): a two-headed fire hound (large; distinct from wolf, warg, winter wolf)
   size: large
