@@ -483,14 +483,18 @@
     a lunging stare: the eye surging forward toward the heroes, the iris wide and the pupil narrowed, the ghostly
     tendrils lashing out toward the heroes, the grave cloth strips streaming behind; at the same pixel size as in Image 3
   cast: >-
-    a time gaze: the iris flaring bright with a violet clock-like glyph drawn inside the iris itself, the grave cloth
-    strips lifting, the tendrils spread wide; at the same pixel size as in Image 3
+    a time gaze: the eye opened wide, the same large sickly yellow iris and black slit pupil as in Image 3, at the same
+    size and colour, with a violet clock-like glyph (a ring of thin violet marks and two clock hands) drawn in thin
+    lines on the yellow iris itself, the white of the eye around the iris solid and opaque as in Image 3; the grave
+    cloth strips lifting, the tendrils spread wide below; the eyeball at the same pixel size as in Image 3
   hurt: >-
     struck: the eye squeezed half shut behind its grave cloth, tilted back away from the heroes, the bone crown knocked
     askew but still on top, the tendrils curling in
   face: the huge yellow iris and slit pupil are the face; no mouth, no other eyes
   extra_negative: a mouth, teeth, eyestalks, a second eye, arms, legs
   seeds: [1234]
+  sheet_seeds: {boss_cast: 1235}   # boss_cast 1234 (ROSTER_LOG R73, "the iris flaring bright with a violet clock-like
+  # glyph drawn inside the iris itself"): the flare keyed out as a transparent ring, the iris a detached island
 - id: chaos
   # "Chaos" (128), the final boss: an ORIGINAL primordial titan (plan 4.2, binding D13); it must not reproduce any
   # published Chaos art
