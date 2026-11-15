@@ -232,8 +232,10 @@
     lower left hand and the censer in the lower right hand, as in Image 3
   hurt: >-
     struck hard: recoiling back over the coil, away from the heroes to the left, the crack in the mask flaring
-    brighter, the six arms flung outward out of rhythm, the censer chain swinging; the bronze blade stays in the lower
-    left hand and the censer in the lower right hand, as in Image 3
+    brighter, the arms flung outward out of rhythm, the censer chain swinging; she still has exactly six arms, all six
+    clearly visible: three on the left side of the image (the upper one with the sun disc, the middle one open, the
+    lower one with the bronze blade) and three on the right side of the image (the upper one open, the middle one open,
+    the lower one with the censer on its chain), as in Image 3
   attack_raise: >-
     the wind-up of a crushing sunfire blow, seen in the same three-quarter front view as Image 3 (torso and mask turned
     toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, the
@@ -244,8 +246,8 @@
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1236}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
-  # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette
+  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
+  # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette; boss_hurt 1234 (R9): five arms
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
