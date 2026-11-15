@@ -2190,15 +2190,15 @@
   prompt: >-
     a living wave of blue water rising in a curling crest, the body formed of deep blue and pale aqua water with white
     foam edges and crisp black outlines, two arms of water, a stern face formed from the water itself; it hovers,
-    nothing touches the ground; in every cell it floats at the same height in its box with clear empty space below it,
-    well above the bottom of the box, centred in its own cell
+    nothing touches the ground; tall and large, filling most of the height of the grey box, with clear empty space
+    below it, well above the bottom of the box, centred in its own cell
   attack: >-
     surging forward toward the heroes, the crest curling over and both water arms reaching out with the elbows bent so
     they stay well inside the middle cell
   hurt: knocked back, the crest collapsing, the arms thrown up, the same blue colours as in the idle cell
   face: a stern face formed from the water itself (two pale eyes and a dark mouth), no human skin
   extra_negative: skin, legs, a fish tail, a trident, separate drops, splashes outside the body, a ground puddle
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R240): the attack and hurt drawn lower than the idle, sliced on the bottom row
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R240): the attack and hurt drawn lower than the idle, sliced on the bottom row; 1235 (R241): the idle 79 px, under the large band
 - id: water_naga
   # "Water Naga" (101): a blue-scaled naga with fin ears and a trident (large; distinct from medusa and spirit naga)
   size: large
