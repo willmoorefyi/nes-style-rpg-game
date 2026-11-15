@@ -2583,18 +2583,20 @@
     (no leap, no rearing up): reach the heads toward the heroes with the necks bent so every head stays well inside
     its own cell; the tail stays close to the body.
   prompt: >-
-    a heavy four-legged beast seen from the side with a hide of cracked grey stone plates, exactly three heads on
-    short thick necks from the shoulders, each clearly apart: a scaly grey lizard head with a spiky crest and yellow
-    eyes on top, a curled-horn ram head in the middle, and a maned grey lion head below in front; no wings, a short
-    thick stone tail; the whole beast, tail to snout, sits in the middle of its own cell with empty space on both sides
+    a heavy four-legged beast seen from the side with a hide of cracked grey stone plates and exactly three different
+    heads on short thick necks from the shoulders, the same three in every cell and each clearly apart: one scaly grey
+    lizard head with a spiky crest and yellow eyes high on top, one curled-horn ram head in the middle (only one ram
+    head), and one maned grey lion head low in front; no wings, a short thick stone tail; the whole beast, tail to snout, sits in the middle of its own cell with empty space on both sides
   attack: >-
-    lunging forward low, all three heads snapping and butting toward the heroes, the heads above and just in front of
+    lunging forward low, the same three heads as in the idle cell (lizard high, ram in the middle, lion low)
+    snapping and butting toward the heroes, the heads above and just in front of
     its front feet, all four feet on the ground, the whole beast well inside the middle cell; no breath
   hurt: >-
-    knocked back, all four feet on the ground, the three heads recoiling, a crack across the stone hide
+    knocked back, all four feet on the ground, the same three heads as in the idle cell (lizard high, ram in the
+    middle, lion low) recoiling, a crack across the stone hide
   face: the three heads (lizard, ram and lion) are clearly readable, the lion face with amber eyes in front
-  extra_negative: wings, a snake tail, a goat head, a dragon head, a fourth head, tawny fur, fire breath, rearing up
-  seeds: [1234]
+  extra_negative: wings, a snake tail, a goat head, a dragon head, a fourth head, two ram heads, tawny fur, fire breath, rearing up, impact lines
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R271): four heads (two rams)
 - id: purple_worm
   # "Purple Worm" (122): a colossal dark purple armoured worm with rows of teeth and a tail stinger
   size: large
