@@ -1,0 +1,124 @@
+sprite: water_naga
+body: naga                     # a finned naga with a gold trident, coiled on the ground
+facing: right
+sampler: nearest
+breath: true
+attack_hand: [n, f]            # both hands drive the trident down in the attack
+keyframes:
+  idle:
+    c_f: [35, 112]
+    c_n: [95, 112]
+    s0: [75, 102]
+    s1: [70, 90]
+    hip: [64, 72]
+    chest: [66, 48]
+    neck: [66, 44]
+    crown: [67, 23]
+    sh_n: [80, 50]
+    el_n: [83, 62]
+    hand_n: [88, 58]
+    tri: [89, 20]
+    sh_f: [52, 50]
+    el_f: [45, 66]
+    hand_f: [50, 80]
+  attack:
+    c_f: [35, 112]
+    c_n: [90, 112]
+    s0: [68, 104]
+    s1: [64, 90]
+    hip: [62, 74]
+    chest: [66, 50]
+    neck: [72, 46]
+    crown: [78, 30]
+    sh_n: [76, 50]
+    el_n: [82, 60]
+    hand_n: [78, 68]
+    tri_a: [98, 108]
+    sh_f: [60, 40]
+    el_f: [52, 36]
+    hand_f: [44, 40]
+    tail0: [44, 95]
+    tail1: [38, 86]
+    tail2: [30, 80]
+    tail_tip: [22, 74]
+  hurt:
+    c_f: [35, 112]
+    c_n: [95, 112]
+    s0: [78, 100]
+    s1: [70, 90]
+    hip: [62, 78]
+    chest: [58, 55]
+    neck: [52, 52]
+    crown: [40, 35]
+    sh_n: [70, 55]
+    el_n: [76, 60]
+    hand_n: [80, 62]
+    tri_h: [93, 25]
+    sh_f: [44, 56]
+    el_f: [34, 62]
+    hand_f: [32, 72]
+parts:
+  weapon: {remove: true}
+  tail: {in: [attack]}         # the free tail curl is drawn only in the attack
+  # the trident rides the near hand; own end-joint names per key (the stab turns it ~145 deg, so no frame
+  # interpolates it: it switches with the keyframe at atk_mid / hurt_in2)
+  trident: {bone: {idle: [hand_n, tri], attack: [hand_n, tri_a], hurt: [hand_n, tri_h]}, radius: 2.0}
+frames:
+  # Every frame translates (the keys' arms and trident turn 60-145 deg). The approved art has no pixels under the
+  # trident shaft, so the shaft never moves against what it crosses: in idle-sourced frames the trident hand stays
+  # put (moving it against the coil closed the shaft's gap into enclosed holes), and in the attack and hurt keys,
+  # where the shaft lies across the body, only the head and the free arm move. Torso, shoulders and the free arm
+  # move by one offset (different offsets left notches along the torso edge).
+  atk_wind1:                   # the upper body leans back from the planted trident
+    moves: []
+    tweaks: {hip: [-2, 0], chest: [-3, 0], neck: [-5, 1], crown: [-6, 1], sh_n: [-3, 0], el_n: [-1, 0], hand_n: [0, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0]}
+  atk_wind2:                   # further back and down, the head furthest; torso, hip and arms as one block (a
+    moves: []                  # rotating torso tore the arm seams), the head level with the chest (lower, the chin
+    dy: 1                      # covered the coral collar)
+    tweaks: {hip: [-3, 1], chest: [-3, 1], neck: [-8, 1], crown: [-10, 1], sh_n: [-3, 1], el_n: [-2, 1], hand_n: [0, 0], sh_f: [-3, 1], el_f: [-3, 1], hand_f: [-3, 1]}
+  atk_mid:                     # the stab key itself (a head or arm move against the shaft left seams on the chest);
+    t: 0.2                     # the runtime lunge carries the strike
+    moves: []
+  atk_follow:                  # held at the stab likewise
+    moves: []
+  atk_recover:                 # the head and chest ease toward the attack; the arms ride the chest
+    moves: [crown, neck, chest]
+  hurt_in1:                    # flinch: thrown back away from the trident, head furthest and up
+    moves: []
+    tweaks: {hip: [-4, 0], chest: [-5, 0], neck: [-8, -1], crown: [-10, -2], sh_n: [-5, 0], el_n: [-2, -1], hand_n: [0, 0], sh_f: [-5, 0], el_f: [-5, -2], hand_f: [-5, -3]}
+  hurt_in2:                    # the head and the free arm ease back toward idle
+    moves: []
+    tweaks: {neck: [3, 1], crown: [3, 1], sh_f: [1, 0], el_f: [2, 1], hand_f: [2, 1]}
+  daze:                        # the whole upper body sinks as one block, the head 2 px forward (these tweaks undo the
+    moves: []                  # recipe's head drop, which covered the collar); arms unmoved (a sagging free hand broke
+    dy: 2                      # up its coral fin), leaning on the trident
+    tweaks: {crown: [0, -2], neck: [0, -2]}
+  daze_b:
+    moves: []
+    dy: 3
+    tweaks: {crown: [0, -2], neck: [0, -2]}
+masks:
+  coil:                        # the resting coil below the rising body: static (pinned)
+    idle: [[0, 100], [128, 100], [128, 128], [0, 128]]
+    attack: [[0, 100], [128, 100], [128, 128], [0, 128]]
+    hurt: [[0, 100], [128, 100], [128, 128], [0, 128]]
+  head:                        # the finned head only, above the coral collar (the default radius and a looser box
+                               # took the collar and the far shoulder, which tore when the head moved)
+    idle: [[54, 16], [82, 16], [82, 43], [54, 43]]
+    attack: [[62, 22], [96, 22], [96, 44], [84, 48], [66, 48], [62, 44]]
+    hurt: [[18, 26], [64, 26], [64, 46], [52, 48], [30, 48], [18, 46]]
+  trident:
+    idle: [[80, 17], [100, 17], [100, 44], [94, 44], [94, 113], [86, 113], [86, 44], [80, 44]]
+    attack: [[20, 20], [29, 20], [88, 88], [106, 92], [106, 115], [84, 115], [82, 96], [20, 29]]
+    hurt: [[81, 20], [100, 20], [100, 47], [91, 47], [77, 86], [68, 86], [83, 47], [81, 47]]
+holds: []
+paint:
+  # the far upper arm's outline left on the chest when the arm eases back (re-coloured from the hurt key there)
+  - {frame: hurt_in2, xy: [[47, 55], [47, 56], [48, 56], [47, 57], [48, 57]], rgb: [189, 214, 214]}
+  - {frame: hurt_in2, xy: [[47, 58], [48, 58]], rgb: [156, 189, 198]}
+  - {frame: hurt_in2, xy: [[46, 59], [47, 59], [48, 59]], rgb: [82, 107, 132]}
+  - {frame: hurt_in2, xy: [[45, 60]], rgb: [99, 140, 156]}
+  - {frame: hurt_in2, xy: [[46, 60], [47, 60], [46, 61]], rgb: [123, 165, 181]}
+  - {frame: hurt_in2, xy: [[45, 61], [45, 62]], rgb: [57, 123, 173]}
+  - {frame: hurt_in2, xy: [[44, 62], [44, 63]], rgb: [49, 99, 148]}
+  - {frame: hurt_in2, xy: [[43, 63]], rgb: [41, 74, 115]}
