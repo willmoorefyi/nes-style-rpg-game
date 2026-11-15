@@ -1359,15 +1359,18 @@
     a huge pale albino crocodile, bone-white and pale pink scales, in a low sprawl seen from a three-quarter side view,
     the thick tail curved round behind it so the whole crocodile, tail included, is no wider than the grey box
     and sits in the middle of its own cell with empty space on both sides in every cell, clusters of grey barnacles crusted on its
-    back and tail, pink eyes, broad heavy jaws with yellowed teeth, old scars on the snout, thick splayed legs
+    back and tail, pink eyes, broad short heavy jaws with yellowed teeth (the snout tip well inside the cell), old
+    scars on the snout, thick splayed legs
     with claws; heavier and broader than a common crocodile
   attack: >-
     lunging forward low with the broad jaws snapping wide open at the heroes, all four feet on the ground, no taller
     than half again its idle height, the snout well inside the middle cell
-  hurt: knocked back low, the jaws snapped shut, the head turned away, the tail thrashing, all four feet down
+  hurt: >-
+    knocked back low, seen from the side as in the idle cell, the jaws snapped shut, the head pulled back, the tail
+    thrashing, all four feet down
   face: its broad toothed jaws and pink eye are readable
   extra_negative: water, green scales, dark scales, wings, rearing up, standing upright
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R163): the idle snout sliced at the raw cell line, a top-down twisted hurt
 - id: ochu
   # "Ochu" (055): a carnivorous plant (distinct from the neochu: green, one maw, four smooth vines)
   size: large
