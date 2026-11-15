@@ -107,8 +107,9 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
     """{frame, keyframe (F3), sequence: [failures]} for a rigged sprite (empty lists = pass)."""
     gen = gen if gen is not None else MA.generate(sprite, cfg, keyframes, meta)
     arrs = {k: np.asarray(v.convert("RGBA")) for k, v in keyframes.items()}
-    allowed = palette(keyframes)
+    allowed = palette(keyframes) | {tuple(c) for c in meta.get("kf_palette", ())}   # FW-P: the approved palette
     rep = {n: frame_checks(n, f, arrs, gen, meta, allowed, efix_gates) for n, f in gen.items()}
+    rep.update(painted_key_checks(meta, arrs, allowed))
     if efix_gates:
         rep.update(mask_report(cfg, keyframes)[0])
     imgs = {**arrs, **{n: f["img"] for n, f in gen.items()}}
@@ -127,12 +128,33 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
     if with_lock:
         lp = MA.lock_path(sprite)
         lock = json.loads(lp.read_text()) if lp.exists() else {}
-        rep["lock"] = C.lock_match({n: f["img"] for n, f in gen.items()}, lock) if lock else [f"no lock file {lp.name}"]
+        rep["lock"] = C.lock_match(lock_frames(gen, keyframes, meta), lock) if lock else [f"no lock file {lp.name}"]
     return rep
 
 
-def write_lock(sprite: str, gen: dict[str, dict]) -> dict[str, str]:
-    lock = {n: C.frame_hash(gen[n]["img"]) for n in sorted(gen)}
+def painted_key_checks(meta: dict, arrs: dict[str, np.ndarray], allowed: set) -> dict[str, list[str]]:
+    """FW-P: {kf:<name>: failures} for every painted key: palette, binary alpha, pieces (no new piece against the
+    approved key) and the outline (second ring, dark edge) against the approved key."""
+    out = {}
+    for k in meta.get("kf_painted", []):
+        a, raw = arrs[k], np.asarray(meta["kf_raw"][k].convert("RGBA"))
+        out[f"kf:{k}"] = C.palette_lock(a, allowed) + C.binary_alpha(a) + C.detached(a, raw) + C.outline_kept(a, raw)
+    return out
+
+
+def lock_frames(gen: dict[str, dict], keyframes: dict[str, Image.Image] | None = None,
+                meta: dict | None = None) -> dict[str, np.ndarray]:
+    """The arrays a lock file hashes: every generated frame, plus `kf:<name>` for each painted key (FW-P) only."""
+    out = {n: f["img"] for n, f in gen.items()}
+    for k in (meta or {}).get("kf_painted", []):
+        out[f"kf:{k}"] = np.asarray(keyframes[k].convert("RGBA"))
+    return out
+
+
+def write_lock(sprite: str, gen: dict[str, dict], keyframes: dict[str, Image.Image] | None = None,
+               meta: dict | None = None) -> dict[str, str]:
+    frames = lock_frames(gen, keyframes, meta)
+    lock = {n: C.frame_hash(frames[n]) for n in sorted(frames)}
     MA.lock_path(sprite).write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n")
     return lock
 

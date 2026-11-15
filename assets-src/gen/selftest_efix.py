@@ -272,7 +272,118 @@ def run_halo_brighten(check: Callable[[bool, str], None]) -> None:
           "FW-7: brighten refuses a non-fx part and steps outside 1..3, naming the rig")
 
 
+def _refused(fn, *words: str) -> bool:
+    try:
+        fn()
+    except ValueError as e:
+        return all(w in str(e) for w in words)
+    return False
+
+
+def run_kf_paint(check: Callable[[bool, str], None]) -> None:
+    """FW-P (docs/ROSTER_FIX_PLAN.md 3, D-F6): rig `paint` on a keyframe is applied in load_entries after
+    pad_keyframes. A patch changes that key's atlas cell and every frame cut from it, nothing else; the 160 px cap, the
+    approved-exception allowlist, the approved palette and the remap-only key are enforced; a painted key is locked as
+    `kf:<name>` and gets the palette, pieces and outline checks; a rig without keyframe paint is byte-identical."""
+    import contextlib
+    import io
+    import json
+    from gen import monster_anim as MA, monster_atlas as MAT, monster_check as MC, monster_keys as MK
+    entries = {e[0]: e for e in MA.load_entries()}
+    _, meta, kfs = entries["goblin"]
+    cfg = MA.load_rig("goblin")
+    idle = np.asarray(kfs["idle"].convert("RGBA"))
+    pal = sorted(MK.approved_palette(kfs))
+    old = tuple(int(v) for v in idle[45, 44, :3])
+    new = next(c for c in pal if c not in (old, MK.OUTLINE))
+    painted_cfg = copy.deepcopy(cfg)
+    painted_cfg.setdefault("paint", []).append({"frame": "idle", "xy": [[44, 45]], "rgb": list(new)})
+    same, none = MK.paint_keys("goblin", cfg, kfs)
+    check(none == [] and all(same[k] is kfs[k] for k in kfs), "FW-P: a rig without keyframe paint keeps the same key objects")
+    real = MA.load_rig
+    MA.load_rig = lambda s: painted_cfg if s == "goblin" else real(s)
+    try:
+        _, pmeta, pkfs = next(e for e in MA.load_entries() if e[0] == "goblin")
+    finally:
+        MA.load_rig = real
+    pa = np.asarray(pkfs["idle"].convert("RGBA"))
+    check(pmeta.get("kf_painted") == ["idle"] and tuple(pa[45, 44, :3]) == new and int((pa != idle).any(2).sum()) == 1,
+          f"FW-P: load_entries paints the idle key at (44, 45) only ({pmeta.get('kf_painted')})")
+    check(all(np.array_equal(np.asarray(pkfs[k]), np.asarray(kfs[k])) for k in kfs if k != "idle"),
+          "FW-P: the other keys are the approved ones")
+    base, gen = MA.generate("goblin", cfg, kfs, meta), MA.generate("goblin", painted_cfg, pkfs, pmeta)
+    from_idle = [n for n in gen if gen[n]["src"] == "idle"]
+    check(bool(from_idle) and all(not np.array_equal(gen[n]["img"], base[n]["img"]) for n in from_idle),
+          f"FW-P: every frame cut from the painted key changes ({len(from_idle)} frames)")
+    check(all(np.array_equal(gen[n]["img"], base[n]["img"]) for n in gen if gen[n]["src"] != "idle"),
+          "FW-P: every frame cut from another key is byte-identical")
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        frames = MAT.sprite_frames("goblin", pmeta, pkfs)[0]
+    check(np.array_equal(np.asarray(frames["idle"].convert("RGBA")), pa) and "goblin lock" in buf.getvalue(),
+          "FW-P: the atlas cell of the painted key is the painted key (the build warns on the stale lock)")
+    rep = MC.painted_key_checks(pmeta, {k: np.asarray(v.convert("RGBA")) for k, v in pkfs.items()}, set(pal))
+    check(rep == {"kf:idle": []}, f"FW-P: the painted key passes its palette, pieces and outline checks {rep}")
+    lock = MC.lock_frames(gen, pkfs, pmeta)
+    check("kf:idle" in lock and not [n for n in MC.lock_frames(base, kfs, meta) if n.startswith("kf:")],
+          "FW-P: a painted key is locked as kf:idle; an unpainted sheet's lock has no kf: entry")
+    from gen import anim_checks as C
+    stale = {**{n: C.frame_hash(a) for n, a in lock.items()}, "kf:idle": "0" * 64}
+    check(any(e.startswith("kf:idle: hash differs") for e in C.lock_match(lock, stale)),
+          "FW-P: a changed key paint fails the lock (kf:idle: hash differs)")
+    stray = copy.deepcopy(painted_cfg)
+    stray["paint"].append({"frame": "idle", "xy": [[2, 2]], "rgb": list(new)})
+    skfs, _ = MK.paint_keys("goblin", stray, kfs)
+    bad = MC.painted_key_checks({**pmeta, "kf_painted": ["idle"], "kf_raw": {"idle": kfs["idle"]}},
+                                {k: np.asarray(v.convert("RGBA")) for k, v in skfs.items()}, set(pal))
+    check(any("pieces" in e for e in bad["kf:idle"]), f"FW-P: a stray painted pixel fails the pieces check {bad}")
+
+    opaque = [[int(x), int(y)] for y, x in zip(*np.nonzero(idle[..., 3] > 0))]
+    big = copy.deepcopy(cfg)
+    big["paint"] = [{"frame": "idle", "xy": opaque[:161], "rgb": list(new)}]
+    check(_refused(lambda: MK.paint_keys("goblin", big, kfs), "goblin", "161 px", "160"), "FW-P: a 161 px key patch is refused")
+    big["paint"][0]["xy"] = opaque[:160]
+    check(MK.paint_keys("goblin", big, kfs)[1] == ["idle"], "FW-P: a 160 px key patch is allowed")
+    off = copy.deepcopy(painted_cfg)
+    off["paint"][-1]["rgb"] = [1, 2, 3]
+    check(_refused(lambda: MK.paint_keys("goblin", off, kfs), "goblin", "approved palette"), "FW-P: an off-palette colour is refused")
+    out = copy.deepcopy(painted_cfg)
+    out["paint"][-1]["xy"] = [[80, 3]]
+    check(_refused(lambda: MK.paint_keys("goblin", out, kfs), "outside"), "FW-P: a pixel outside the cell is refused")
+    nul = copy.deepcopy(painted_cfg)
+    nul["paint"][-1]["rgb"] = None
+    check(MK.paint_keys("goblin", nul, kfs)[1] == ["idle"], "FW-P: rgb null (transparent) is allowed")
+    for sid, caps in (("goblin", {"hurt": 200}), ("crocodile", {"hurt": 221}), ("crocodile", {"idle": 200}),
+                      ("drowned_sovereign", {"cast": 301})):
+        check(_refused(lambda: MK.paint_keys(sid, {"kf_paint_cap": caps}, kfs), sid, "not an approved exception"),
+              f"FW-P: kf_paint_cap {caps} on {sid} is refused (not in the allowlist)")
+    check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300} and MK.KF_PAINT_CAP == 160,
+          "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220 and drowned_sovereign/cast <= 300")
+    raw = {e[0]: e for e in MA.load_entries(paint=False)}
+    ck = raw["crocodile"][2]
+    ch = np.asarray(ck["hurt"].convert("RGBA"))
+    hurt_px = [[int(x), int(y)] for y, x in zip(*np.nonzero(ch[..., 3] > 0))]
+    cpal = sorted(MK.approved_palette(ck))
+    croc = {"kf_paint_cap": {"hurt": 220}, "paint": [{"frame": "hurt", "xy": hurt_px[:220], "rgb": list(cpal[1])}]}
+    check(MK.paint_keys("crocodile", croc, ck)[1] == ["hurt"], "FW-P: crocodile kf_paint_cap {hurt: 220} allows 220 px")
+    croc["paint"][0]["xy"] = hurt_px[:221]
+    check(_refused(lambda: MK.paint_keys("crocodile", croc, ck), "221 px"), "FW-P: crocodile hurt over 220 px is refused")
+    dk = raw["drowned_sovereign"][2]
+    dc = np.asarray(dk["cast"].convert("RGBA"))
+    blue = [[int(x), int(y)] for y, x in zip(*np.nonzero((dc[..., :3] == (33, 33, 165)).all(2) & (dc[..., 3] > 0)))]
+    remap = {"kf_paint_cap": {"cast": 300}, "paint": [{"frame": "cast", "xy": blue, "rgb": [41, 99, 99]}]}
+    check(MK.paint_keys("drowned_sovereign", remap, dk)[1] == ["cast"], "FW-P: the drowned cast remap (165 px) is allowed")
+    holes = [[int(x), int(y)] for y, x in zip(*np.nonzero(dc[..., 3] == 0))][:1]
+    for bad_p, why in (({"frame": "cast", "xy": blue[:1], "rgb": None}, "null"), ({"frame": "cast", "xy": holes, "rgb": [41, 99, 99]}, "transparent")):
+        check(_refused(lambda: MK.paint_keys("drowned_sovereign", {"kf_paint_cap": {"cast": 300}, "paint": [bad_p]}, dk),
+                       "remap only"), f"FW-P: drowned_sovereign/cast is a remap only ({why} refused)")
+    kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})]
+    kf_locks = [p.name for p in sorted(MA.RIGS.glob("*.lock.json")) if any(k.startswith("kf:") for k in json.loads(p.read_text()))]
+    check(len(list(MA.RIGS.glob("*.lock.json"))) >= 77 and kf_locks == sorted(f"{s}.lock.json" for s in kf_rigs),
+          f"FW-P: kf: lock entries exactly for the rigs with keyframe paint (rigs {kf_rigs}, locks {kf_locks})")
+
+
 def run_efix(check: Callable[[bool, str], None]) -> None:
     for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal,
-               run_halo_brighten):
+               run_halo_brighten, run_kf_paint):
         fn(check)

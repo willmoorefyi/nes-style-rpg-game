@@ -109,6 +109,12 @@
         78,
         16
       ],
+      "travelTop": 16,
+      "lungeRight": 123,
+      "homeX": [
+        12,
+        116
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -181,6 +187,12 @@
       "head": [
         96,
         25
+      ],
+      "travelTop": 25,
+      "lungeRight": 151,
+      "homeX": [
+        18,
+        140
       ],
       "sequence_version": 1,
       "page": 4
@@ -271,6 +283,12 @@
         64,
         7
       ],
+      "travelTop": 6,
+      "lungeRight": 184,
+      "homeX": [
+        17,
+        183
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -360,6 +378,12 @@
         119,
         9
       ],
+      "travelTop": 9,
+      "lungeRight": 191,
+      "homeX": [
+        15,
+        184
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -432,6 +456,12 @@
       "head": [
         52,
         23
+      ],
+      "travelTop": 22,
+      "lungeRight": 87,
+      "homeX": [
+        2,
+        88
       ],
       "sequence_version": 1,
       "page": 3
@@ -506,6 +536,12 @@
         38,
         32
       ],
+      "travelTop": 10,
+      "lungeRight": 97,
+      "homeX": [
+        6,
+        90
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -579,6 +615,12 @@
         39,
         10
       ],
+      "travelTop": 3,
+      "lungeRight": 66,
+      "homeX": [
+        7,
+        68
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -651,6 +693,12 @@
       "head": [
         46,
         10
+      ],
+      "travelTop": 3,
+      "lungeRight": 75,
+      "homeX": [
+        7,
+        68
       ],
       "sequence_version": 1,
       "page": 3
@@ -767,6 +815,12 @@
         116,
         12
       ],
+      "travelTop": 12,
+      "lungeRight": 194,
+      "homeX": [
+        5,
+        194
+      ],
       "sequence_version": 1,
       "page": 2
     },
@@ -839,6 +893,12 @@
       "head": [
         45,
         4
+      ],
+      "travelTop": 4,
+      "lungeRight": 78,
+      "homeX": [
+        11,
+        68
       ],
       "sequence_version": 1,
       "page": 3
@@ -913,6 +973,12 @@
         53,
         17
       ],
+      "travelTop": 12,
+      "lungeRight": 82,
+      "homeX": [
+        10,
+        76
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -985,6 +1051,12 @@
       "head": [
         58,
         7
+      ],
+      "travelTop": 7,
+      "lungeRight": 105,
+      "homeX": [
+        21,
+        91
       ],
       "sequence_version": 1,
       "page": 3
@@ -1059,6 +1131,12 @@
         92,
         37
       ],
+      "travelTop": 28,
+      "lungeRight": 110,
+      "homeX": [
+        16,
+        108
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -1132,6 +1210,12 @@
         25,
         57
       ],
+      "travelTop": 27,
+      "lungeRight": 141,
+      "homeX": [
+        2,
+        142
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -1204,6 +1288,12 @@
       "head": [
         34,
         3
+      ],
+      "travelTop": 2,
+      "lungeRight": 61,
+      "homeX": [
+        2,
+        65
       ],
       "sequence_version": 1,
       "page": 6
@@ -1294,6 +1384,12 @@
         116,
         42
       ],
+      "travelTop": 42,
+      "lungeRight": 179,
+      "homeX": [
+        31,
+        178
+      ],
       "sequence_version": 1,
       "page": 2
     },
@@ -1366,6 +1462,12 @@
       "head": [
         76,
         48
+      ],
+      "travelTop": 27,
+      "lungeRight": 117,
+      "homeX": [
+        10,
+        117
       ],
       "sequence_version": 1,
       "page": 6
@@ -1440,6 +1542,12 @@
         63,
         68
       ],
+      "travelTop": 21,
+      "lungeRight": 118,
+      "homeX": [
+        4,
+        118
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -1512,6 +1620,12 @@
       "head": [
         58,
         47
+      ],
+      "travelTop": 25,
+      "lungeRight": 124,
+      "homeX": [
+        5,
+        121
       ],
       "sequence_version": 1,
       "page": 1
@@ -1628,6 +1742,12 @@
         92,
         20
       ],
+      "travelTop": 20,
+      "lungeRight": 194,
+      "homeX": [
+        14,
+        187
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -1700,6 +1820,12 @@
       "head": [
         69,
         20
+      ],
+      "travelTop": 14,
+      "lungeRight": 109,
+      "homeX": [
+        12,
+        111
       ],
       "sequence_version": 1,
       "page": 4
@@ -1774,6 +1900,12 @@
         67,
         25
       ],
+      "travelTop": 25,
+      "lungeRight": 121,
+      "homeX": [
+        22,
+        112
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -1846,6 +1978,12 @@
       "head": [
         58,
         13
+      ],
+      "travelTop": 13,
+      "lungeRight": 116,
+      "homeX": [
+        14,
+        109
       ],
       "sequence_version": 1,
       "page": 4
@@ -1920,6 +2058,12 @@
         42,
         1
       ],
+      "travelTop": 1,
+      "lungeRight": 106,
+      "homeX": [
+        4,
+        105
+      ],
       "sequence_version": 1,
       "page": 5
     },
@@ -1992,6 +2136,12 @@
       "head": [
         68,
         41
+      ],
+      "travelTop": 25,
+      "lungeRight": 133,
+      "homeX": [
+        2,
+        132
       ],
       "sequence_version": 1,
       "page": 4
@@ -2066,6 +2216,12 @@
         40,
         30
       ],
+      "travelTop": 28,
+      "lungeRight": 215,
+      "homeX": [
+        6,
+        212
+      ],
       "sequence_version": 1,
       "page": 5
     },
@@ -2138,6 +2294,12 @@
       "head": [
         37,
         8
+      ],
+      "travelTop": 3,
+      "lungeRight": 71,
+      "homeX": [
+        6,
+        71
       ],
       "sequence_version": 1,
       "page": 3
@@ -2254,6 +2416,12 @@
         169,
         5
       ],
+      "travelTop": 2,
+      "lungeRight": 197,
+      "homeX": [
+        16,
+        190
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -2326,6 +2494,12 @@
       "head": [
         45,
         7
+      ],
+      "travelTop": 3,
+      "lungeRight": 70,
+      "homeX": [
+        18,
+        70
       ],
       "sequence_version": 1,
       "page": 3
@@ -2400,6 +2574,12 @@
         62,
         9
       ],
+      "travelTop": 4,
+      "lungeRight": 88,
+      "homeX": [
+        12,
+        80
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -2472,6 +2652,12 @@
       "head": [
         70,
         14
+      ],
+      "travelTop": 13,
+      "lungeRight": 119,
+      "homeX": [
+        22,
+        101
       ],
       "sequence_version": 1,
       "page": 3
@@ -2546,6 +2732,12 @@
         47,
         8
       ],
+      "travelTop": 3,
+      "lungeRight": 78,
+      "homeX": [
+        2,
+        69
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -2618,6 +2810,12 @@
       "head": [
         32,
         13
+      ],
+      "travelTop": 4,
+      "lungeRight": 70,
+      "homeX": [
+        2,
+        66
       ],
       "sequence_version": 1,
       "page": 0
@@ -2692,6 +2890,12 @@
         60,
         19
       ],
+      "travelTop": 16,
+      "lungeRight": 98,
+      "homeX": [
+        5,
+        91
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -2764,6 +2968,12 @@
       "head": [
         84,
         26
+      ],
+      "travelTop": 24,
+      "lungeRight": 108,
+      "homeX": [
+        5,
+        100
       ],
       "sequence_version": 1,
       "page": 3
@@ -2838,6 +3048,12 @@
         54,
         30
       ],
+      "travelTop": 22,
+      "lungeRight": 107,
+      "homeX": [
+        1,
+        105
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -2911,6 +3127,12 @@
         73,
         32
       ],
+      "travelTop": 27,
+      "lungeRight": 137,
+      "homeX": [
+        2,
+        130
+      ],
       "sequence_version": 1,
       "page": 5
     },
@@ -2983,6 +3205,12 @@
       "head": [
         48,
         18
+      ],
+      "travelTop": 18,
+      "lungeRight": 107,
+      "homeX": [
+        24,
+        104
       ],
       "sequence_version": 1,
       "page": 4
@@ -3097,6 +3325,12 @@
         84,
         34
       ],
+      "travelTop": 4,
+      "lungeRight": 216,
+      "homeX": [
+        17,
+        199
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -3169,6 +3403,12 @@
       "head": [
         43,
         8
+      ],
+      "travelTop": 4,
+      "lungeRight": 81,
+      "homeX": [
+        2,
+        81
       ],
       "sequence_version": 1,
       "page": 4
@@ -3243,6 +3483,12 @@
         72,
         27
       ],
+      "travelTop": 27,
+      "lungeRight": 111,
+      "homeX": [
+        21,
+        106
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -3315,6 +3561,12 @@
       "head": [
         64,
         17
+      ],
+      "travelTop": 11,
+      "lungeRight": 112,
+      "homeX": [
+        9,
+        104
       ],
       "sequence_version": 1,
       "page": 4
@@ -3389,6 +3641,12 @@
         58,
         4
       ],
+      "travelTop": 4,
+      "lungeRight": 102,
+      "homeX": [
+        2,
+        101
+      ],
       "sequence_version": 1,
       "page": 6
     },
@@ -3462,6 +3720,12 @@
         79,
         11
       ],
+      "travelTop": 11,
+      "lungeRight": 115,
+      "homeX": [
+        21,
+        109
+      ],
       "sequence_version": 1,
       "page": 5
     },
@@ -3534,6 +3798,12 @@
       "head": [
         82,
         22
+      ],
+      "travelTop": 18,
+      "lungeRight": 119,
+      "homeX": [
+        5,
+        109
       ],
       "sequence_version": 1,
       "page": 4
@@ -3650,6 +3920,12 @@
         28,
         22
       ],
+      "travelTop": 9,
+      "lungeRight": 194,
+      "homeX": [
+        4,
+        192
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -3722,6 +3998,12 @@
       "head": [
         81,
         23
+      ],
+      "travelTop": 23,
+      "lungeRight": 113,
+      "homeX": [
+        7,
+        106
       ],
       "sequence_version": 1,
       "page": 3
@@ -3796,6 +4078,12 @@
         34,
         35
       ],
+      "travelTop": 23,
+      "lungeRight": 125,
+      "homeX": [
+        8,
+        121
+      ],
       "sequence_version": 1,
       "page": 6
     },
@@ -3868,6 +4156,12 @@
       "head": [
         38,
         2
+      ],
+      "travelTop": 2,
+      "lungeRight": 77,
+      "homeX": [
+        12,
+        57
       ],
       "sequence_version": 1,
       "page": 6
@@ -3942,6 +4236,12 @@
         63,
         34
       ],
+      "travelTop": 28,
+      "lungeRight": 104,
+      "homeX": [
+        20,
+        103
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -4014,6 +4314,12 @@
       "head": [
         43,
         4
+      ],
+      "travelTop": 4,
+      "lungeRight": 78,
+      "homeX": [
+        14,
+        66
       ],
       "sequence_version": 1,
       "page": 0
@@ -4088,6 +4394,12 @@
         58,
         31
       ],
+      "travelTop": 26,
+      "lungeRight": 114,
+      "homeX": [
+        32,
+        100
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -4160,6 +4472,12 @@
       "head": [
         40,
         1
+      ],
+      "travelTop": 1,
+      "lungeRight": 80,
+      "homeX": [
+        3,
+        74
       ],
       "sequence_version": 1,
       "page": 4
@@ -4234,6 +4552,12 @@
         57,
         40
       ],
+      "travelTop": 25,
+      "lungeRight": 125,
+      "homeX": [
+        16,
+        111
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -4306,6 +4630,12 @@
       "head": [
         72,
         21
+      ],
+      "travelTop": 20,
+      "lungeRight": 125,
+      "homeX": [
+        10,
+        113
       ],
       "sequence_version": 1,
       "page": 0
@@ -4380,6 +4710,12 @@
         53,
         17
       ],
+      "travelTop": 6,
+      "lungeRight": 105,
+      "homeX": [
+        12,
+        100
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -4452,6 +4788,12 @@
       "head": [
         60,
         11
+      ],
+      "travelTop": 9,
+      "lungeRight": 105,
+      "homeX": [
+        17,
+        110
       ],
       "sequence_version": 1,
       "page": 4
@@ -4526,6 +4868,12 @@
         39,
         10
       ],
+      "travelTop": 3,
+      "lungeRight": 70,
+      "homeX": [
+        14,
+        72
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -4598,6 +4946,12 @@
       "head": [
         52,
         4
+      ],
+      "travelTop": 1,
+      "lungeRight": 74,
+      "homeX": [
+        10,
+        67
       ],
       "sequence_version": 1,
       "page": 1
@@ -4672,6 +5026,12 @@
         63,
         3
       ],
+      "travelTop": 3,
+      "lungeRight": 101,
+      "homeX": [
+        14,
+        91
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -4744,6 +5104,12 @@
       "head": [
         82,
         41
+      ],
+      "travelTop": 25,
+      "lungeRight": 174,
+      "homeX": [
+        9,
+        166
       ],
       "sequence_version": 1,
       "page": 6
@@ -4818,6 +5184,12 @@
         106,
         26
       ],
+      "travelTop": 24,
+      "lungeRight": 179,
+      "homeX": [
+        8,
+        175
+      ],
       "sequence_version": 1,
       "page": 6
     },
@@ -4890,6 +5262,12 @@
       "head": [
         37,
         3
+      ],
+      "travelTop": 3,
+      "lungeRight": 69,
+      "homeX": [
+        12,
+        66
       ],
       "sequence_version": 1,
       "page": 3
@@ -4964,6 +5342,12 @@
         48,
         3
       ],
+      "travelTop": 3,
+      "lungeRight": 80,
+      "homeX": [
+        2,
+        79
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -5036,6 +5420,12 @@
       "head": [
         34,
         8
+      ],
+      "travelTop": 3,
+      "lungeRight": 91,
+      "homeX": [
+        4,
+        89
       ],
       "sequence_version": 1,
       "page": 3
@@ -5110,6 +5500,12 @@
         54,
         1
       ],
+      "travelTop": 1,
+      "lungeRight": 96,
+      "homeX": [
+        2,
+        80
+      ],
       "sequence_version": 1,
       "page": 3
     },
@@ -5182,6 +5578,12 @@
       "head": [
         51,
         26
+      ],
+      "travelTop": 25,
+      "lungeRight": 110,
+      "homeX": [
+        20,
+        104
       ],
       "sequence_version": 1,
       "page": 3
@@ -5256,6 +5658,12 @@
         41,
         9
       ],
+      "travelTop": 3,
+      "lungeRight": 66,
+      "homeX": [
+        11,
+        75
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -5328,6 +5736,12 @@
       "head": [
         48,
         4
+      ],
+      "travelTop": 4,
+      "lungeRight": 92,
+      "homeX": [
+        19,
+        68
       ],
       "sequence_version": 1,
       "page": 6
@@ -5402,6 +5816,12 @@
         58,
         35
       ],
+      "travelTop": 27,
+      "lungeRight": 116,
+      "homeX": [
+        19,
+        108
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -5474,6 +5894,12 @@
       "head": [
         39,
         24
+      ],
+      "travelTop": 24,
+      "lungeRight": 101,
+      "homeX": [
+        4,
+        99
       ],
       "sequence_version": 1,
       "page": 3
@@ -5548,6 +5974,12 @@
         78,
         10
       ],
+      "travelTop": 10,
+      "lungeRight": 123,
+      "homeX": [
+        24,
+        122
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -5620,6 +6052,12 @@
       "head": [
         43,
         4
+      ],
+      "travelTop": 2,
+      "lungeRight": 76,
+      "homeX": [
+        9,
+        74
       ],
       "sequence_version": 1,
       "page": 0
@@ -5710,6 +6148,12 @@
         70,
         10
       ],
+      "travelTop": 5,
+      "lungeRight": 229,
+      "homeX": [
+        26,
+        206
+      ],
       "sequence_version": 1,
       "page": 1
     },
@@ -5782,6 +6226,12 @@
       "head": [
         53,
         4
+      ],
+      "travelTop": 2,
+      "lungeRight": 65,
+      "homeX": [
+        10,
+        65
       ],
       "sequence_version": 1,
       "page": 3
@@ -5856,6 +6306,12 @@
         35,
         48
       ],
+      "travelTop": 25,
+      "lungeRight": 171,
+      "homeX": [
+        4,
+        172
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -5928,6 +6384,12 @@
       "head": [
         60,
         27
+      ],
+      "travelTop": 25,
+      "lungeRight": 131,
+      "homeX": [
+        8,
+        119
       ],
       "sequence_version": 1,
       "page": 6
@@ -6002,6 +6464,12 @@
         40,
         4
       ],
+      "travelTop": 3,
+      "lungeRight": 67,
+      "homeX": [
+        2,
+        77
+      ],
       "sequence_version": 1,
       "page": 4
     },
@@ -6074,6 +6542,12 @@
       "head": [
         96,
         15
+      ],
+      "travelTop": 15,
+      "lungeRight": 116,
+      "homeX": [
+        12,
+        103
       ],
       "sequence_version": 1,
       "page": 6
@@ -6148,6 +6622,12 @@
         78,
         17
       ],
+      "travelTop": 2,
+      "lungeRight": 107,
+      "homeX": [
+        9,
+        101
+      ],
       "sequence_version": 1,
       "page": 0
     },
@@ -6220,6 +6700,12 @@
       "head": [
         39,
         5
+      ],
+      "travelTop": 5,
+      "lungeRight": 74,
+      "homeX": [
+        11,
+        65
       ],
       "sequence_version": 1,
       "page": 4
@@ -6294,6 +6780,12 @@
         75,
         25
       ],
+      "travelTop": 25,
+      "lungeRight": 113,
+      "homeX": [
+        24,
+        110
+      ],
       "sequence_version": 1,
       "page": 6
     },
@@ -6367,6 +6859,12 @@
         83,
         37
       ],
+      "travelTop": 31,
+      "lungeRight": 111,
+      "homeX": [
+        16,
+        109
+      ],
       "sequence_version": 1,
       "page": 6
     },
@@ -6439,6 +6937,12 @@
       "head": [
         38,
         3
+      ],
+      "travelTop": 3,
+      "lungeRight": 68,
+      "homeX": [
+        14,
+        58
       ],
       "sequence_version": 1,
       "page": 3

@@ -192,7 +192,7 @@ def main(argv: list[str]) -> int:
         elif not cfg:      # roster pass R: approved but not rigged yet; `check` prints the stable line `<id>: no rig`
             print(f"{sid}: no rig" if cmd == "check" else f"{sid}: no rig (anim: false), nothing to {cmd}")
         elif cmd == "lock":
-            print(sid, "locked", len(MC.write_lock(sid, MA.generate(sid, cfg, kfs, meta))), "frames")
+            print(sid, "locked", len(MC.write_lock(sid, MA.generate(sid, cfg, kfs, meta), kfs, meta)), "frames")
         else:
             rep = MC.check_sprite(sid, cfg, kfs, meta)
             fails = [f"{sid} {k}: {e}" for k, v in rep.items() for e in v]
