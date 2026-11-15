@@ -117,7 +117,7 @@ Images used: 72 of 300 (build 72 of 285, fix 0 of 15; ledger guard: 172 Gemini a
 - Fix-pass candidates: `hollow_seraph/boss_cast` (four wings, far side), `hollow_seraph/boss_attack_raise` (three
   wings), `ashen_queen/boss_attack_raise` (none approved), `ashen_queen/boss_cast` (barely distinct from idle).
 
-## G2 status (2026-11-15, paused)
+## G2 status (2026-11-15, closed)
 
 - Approved: `astos` 4 of 4 (R43, R45-R47), `warmech` 4 of 4 (R48, R51, R53, R54), `chaos` idle and attack (R55, R59,
   attack best of 3 with three arms), `piscodemon` (R60), `dragon_zombie` (R64, best of 3).
@@ -135,7 +135,24 @@ Images used: 72 of 300 (build 72 of 285, fix 0 of 15; ledger guard: 172 Gemini a
   approved boss attacks were cut into widened cells: `hollow_seraph/boss_attack` 218x200 (R28) and
   `warmech/boss_attack` 232x200 (R51). It was latent while the seraph was incomplete (skipped by `load_entries`).
   Every approved key still recomputes unchanged (FW-9 check passes); no committed atlas was built or changed.
+- **Resumed after the orchestrator's rulings (2026-11-15):** a 6.3 pause stops only the affected body type; multi-arm
+  and floating resumed with a `motion:` override (frontal, symmetric, composed, every limb placed by image side;
+  floating: frontal, untilted, the eye toward the viewer, nothing on the ground). The widened-cell selftest failures
+  are left to the framework owner.
+- **Closed:** `chaos` 5 of 5 (R55, R59, R67, R68, R70), `death_eye` 4 of 4 (R71, R72, R74, R76), `evil_eye` (R79, best
+  of 3). G2 = astos, warmech, chaos, death_eye (bosses) + piscodemon, evil_eye, dragon_zombie: **7 of 7 sprites, 21
+  sheets/poses approved** in 34 images (R42-R79: astos 6, warmech 7, chaos 10, death_eye 6, piscodemon 1, evil_eye
+  3, dragon_zombie 3); plan 6.2 expected 31.
+- What fixed the multi-arm and floating poses: the frontal line alone gives an idle copy (R66 0.04, R75 0.01); it
+  works when the pose text also **moves every limb to a new place, named by image side** (R67, R68, R70), and when a
+  hurt may tilt back (R76, a per-pose `motion:` map so the approved attack and cast keys stay). Counts drift on
+  3-pose sheets too (R78: eyestalks 4 / 5 / 5); "exactly N, as in the idle cell" plus "an N+1th ..." in the negative
+  held it (R79).
+- Fix-pass candidates added: `evil_eye` attack (a tail spike appears; the face barely changes), `chaos/boss_cast`
+  (small sphere, arms cover the wings; low priority).
+- **Ashen Queen heavy attack (orchestrator, final):** no more `boss_attack_raise` attempts; the rig makes the raise
+  with the coil fallback from the approved poses.
 
 ## Deferred sprites
 
-- `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34.
+- `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
