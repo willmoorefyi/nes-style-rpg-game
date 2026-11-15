@@ -1,0 +1,140 @@
+sprite: gr_wolf
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [30, 45]
+    back: [45, 38]
+    chest: [60, 40]
+    neck: [70, 38]
+    head: [78, 40]
+    snout: [92, 47]
+    tail0: [24, 50]
+    tail1: [18, 53]
+    tail2: [13, 55]
+    tail_tip: [8, 56]
+    sh_n: [56, 50]
+    el_n: [56, 62]
+    paw_n: [57, 71]
+    ftoe_n: [60, 75]
+    sh_f: [70, 50]
+    el_f: [72, 62]
+    paw_f: [73, 71]
+    ftoe_f: [76, 75]
+    hip_n: [28, 52]
+    knee_n: [22, 62]
+    foot_n: [21, 71]
+    toe_n: [24, 75]
+    hip_f: [38, 55]
+    knee_f: [40, 63]
+    foot_f: [40, 72]
+    toe_f: [43, 75]
+  attack:
+    hip: [22, 40]
+    back: [40, 36]
+    chest: [58, 42]
+    neck: [70, 45]
+    head: [80, 47]
+    snout: [97, 50]
+    tail0: [16, 35]
+    tail1: [12, 30]
+    tail2: [8, 28]
+    tail_tip: [3, 26]
+    sh_n: [55, 50]
+    el_n: [65, 60]
+    paw_n: [74, 71]
+    ftoe_n: [79, 76]
+    sh_f: [70, 55]
+    el_f: [82, 62]
+    paw_f: [90, 68]
+    ftoe_f: [96, 72]
+    hip_n: [20, 44]
+    knee_n: [14, 48]
+    foot_n: [10, 53]
+    toe_n: [8, 56]
+    hip_f: [26, 45]
+    knee_f: [22, 50]
+    foot_f: [20, 53]
+    toe_f: [18, 56]
+  hurt:
+    hip: [25, 48]
+    back: [38, 38]
+    chest: [55, 35]
+    neck: [65, 35]
+    head: [75, 38]
+    snout: [87, 44]
+    tail0: [18, 52]
+    tail1: [14, 56]
+    tail2: [15, 60]
+    tail_tip: [17, 64]
+    sh_n: [52, 50]
+    el_n: [55, 60]
+    paw_n: [55, 68]
+    ftoe_n: [58, 72]
+    sh_f: [62, 50]
+    el_f: [65, 60]
+    paw_f: [65, 68]
+    ftoe_f: [68, 72]
+    hip_n: [28, 55]
+    knee_n: [30, 64]
+    foot_n: [34, 72]
+    toe_n: [37, 75]
+    hip_f: [36, 57]
+    knee_f: [40, 65]
+    foot_f: [42, 72]
+    toe_f: [45, 75]
+frames:
+  atk_wind1:                   # crouch starts: spine tips nose-down, head sinks (the tail rides the body: its keys are far apart)
+    moves: [back, chest]
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1]}
+  atk_wind2:                   # coil: chest and head low, head pulled back
+    dy: 1
+    moves: [back, chest]
+    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1]}
+  atk_mid:                     # the lunge drawn back 3 and down 2 toward the coil; the far foreleg, hind legs and tail ride the
+    t: 0.31                    # body (their keys are far apart)
+    pins: []
+    dx: -3
+    dy: 2
+    moves: [hip, back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f]
+    tweaks: {el_n: [-1, -1], paw_n: [-2, -2], ftoe_n: [-2, -3], tail0: [2, 0], tail1: [3, 0], tail2: [3, 0], tail_tip: [3, 0]}
+  atk_follow:                  # a settle: the hind legs swing down toward the stance, body 2 back; head and forelegs keep the bite
+    t: 0.80
+    pins: [paw_n]
+    dx: -2
+    moves: [hip, back, chest, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+  atk_recover:                 # landing: all four paws planted, body lifted, head level
+    t: 0.35
+    moves: [back, chest, neck, sh_n, sh_f]
+    tweaks: {chest: [0, -1], neck: [0, -1], head: [0, -1], snout: [0, -1]}
+  hurt_in1:
+    t: 0.32
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    moves: [hip, back, chest, neck, head, snout, hip_n, knee_n, hip_f, knee_f, sh_n, el_n, sh_f, el_f]
+  hurt_in2:
+    t: 0.25
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    moves: [back, chest, neck, head, snout, sh_n, el_n, sh_f, el_f, knee_n, knee_f]
+  daze:
+    t: 0.0
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3]}
+  daze_b:
+    t: 0.0
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4]}
+masks:
+  head:                        # the open jaw and the whole muzzle are head (not the forelegs under them)
+    idle: [[74, 32], [95, 38], [95, 56], [74, 56]]
+    attack: [[79, 38], [99, 40], [99, 63], [79, 63]]
+    hurt: [[68, 26], [90, 34], [90, 52], [68, 52]]
+holds: []
+paint:                         # the 1 px channel between the forelegs (open to the ground in idle) kept open; seams closed with ink
+  - {frame: hurt_in1, xy: [[65, 71]], rgb: null}
+  - {frame: daze, xy: [[64, 70]], rgb: null}
+  - {frame: atk_wind2, xy: [[58, 62], [59, 62]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[75, 30], [77, 30], [75, 32]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[59, 65]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[74, 28], [74, 29], [75, 29], [59, 65]], rgb: [6, 4, 10]}

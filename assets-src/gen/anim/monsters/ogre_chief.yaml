@@ -1,0 +1,140 @@
+sprite: ogre_chief
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [64, 21]
+    neck: [64, 55]
+    chest: [62, 63]
+    hip: [62, 90]
+    sh_n: [80, 48]
+    el_n: [84, 66]
+    hand_n: [92, 78]
+    tip: [54, 82]
+    sh_f: [40, 45]
+    el_f: [34, 66]
+    hand_f: [36, 86]
+    hip_n: [72, 94]
+    knee_n: [78, 104]
+    foot_n: [79, 116]
+    toe_n: [86, 121]
+    hip_f: [46, 94]
+    knee_f: [42, 104]
+    foot_f: [38, 116]
+    toe_f: [43, 121]
+  attack:
+    crown: [78, 24]
+    neck: [76, 58]
+    chest: [70, 64]
+    hip: [64, 90]
+    sh_n: [84, 48]
+    el_n: [80, 34]
+    hand_n: [64, 24]
+    tip: [14, 17]
+    sh_f: [58, 46]
+    el_f: [56, 34]
+    hand_f: [60, 25]
+    hip_n: [74, 94]
+    knee_n: [84, 104]
+    foot_n: [84, 116]
+    toe_n: [92, 121]
+    hip_f: [54, 94]
+    knee_f: [42, 104]
+    foot_f: [32, 116]
+    toe_f: [36, 121]
+  hurt:
+    crown: [44, 34]
+    neck: [50, 55]
+    chest: [52, 63]
+    hip: [62, 88]
+    helm_r: [28, 30]
+    helm_c: [25, 26]
+    sh_n: [72, 55]
+    el_n: [84, 68]
+    hand_n: [88, 92]
+    tip: [48, 108]
+    sh_f: [36, 52]
+    el_f: [30, 70]
+    hand_f: [38, 88]
+    hip_n: [72, 92]
+    knee_n: [86, 98]
+    foot_n: [96, 106]
+    toe_n: [102, 108]
+    hip_f: [52, 92]
+    knee_f: [44, 97]
+    foot_f: [46, 104]
+    toe_f: [50, 108]
+parts:
+  helm:                        # the knocked-off helm exists only in the hurt key (idle and attack: the helm is the head)
+    bone: [helm_r, helm_c]       # own root: not joined to the head (the air gap between them is the approved art)
+    radius: 0.01
+    in: [hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 5.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 5.0}
+frames:                        # moves: [] everywhere: rigid rotations about the hip / shoulders written as tweaks (/tmp/rA/tools/rot.py)
+  atk_wind1:                   # coil forward (a lean-back loses the head overlap): lean in 3, the far hand comes 10 toward the grip
+    moves: []
+    sampler: rotsprite
+    tweaks: {crown: [4, 0], neck: [2, 0], chest: [1, 0], sh_n: [2, 1], el_n: [1, 1], hand_n: [1, 2], sh_f: [2, -1], el_f: [5, -1], hand_f: [7, -1]}
+  atk_wind2:                   # lean in 6, cleaver arm 8 forward, far arm 28 forward to the grip; body 2 lower (recipe dy)
+    moves: []
+    sampler: rotsprite
+    tweaks: {crown: [7, 1], neck: [4, 0], chest: [3, 0], sh_n: [4, 2], el_n: [5, 1], hand_n: [5, 0], tip: [5, 0], sh_f: [5, -2], el_f: [13, -1], hand_f: [20, -4]}
+  atk_mid:                     # the raise leaned back 4, both arms 6 lower, 2 lower; legs shifted ~1/3 toward idle
+    moves: []
+    dy: 2
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-5, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-3, -1], el_n: [-5, 0], hand_n: [-7, 3], tip: [-7, 11], sh_f: [-3, 1], el_f: [-5, 1], hand_f: [-7, 0], foot_f: [2, 0], foot_n: [-2, 0], knee_n: [-2, 0]}
+  atk_follow:                  # the chop starts: a settle, upper body 6 forward and 1 lower
+    t: 0.85
+    moves: []
+    dy: 1
+    tweaks: {crown: [7, 2], neck: [3, 1], chest: [3, 1], sh_n: [4, 2], el_n: [6, 2], hand_n: [7, 0], tip: [8, -5], sh_f: [5, 0], el_f: [6, -1], hand_f: [7, 0]}
+  atk_recover:                 # after the chop: leaning in 10, the far arm 8 forward
+    moves: []
+    sampler: rotsprite
+    tweaks: {crown: [12, 1], neck: [6, 1], chest: [5, 0], sh_n: [7, 4], el_n: [4, 4], hand_n: [2, 5], tip: [2, -1], sh_f: [8, -3], el_f: [7, -3], hand_f: [7, -3]}
+  hurt_in1:                    # recoil: lean back 6 with the arms (the cleaver must not leave the belly bare), head back 6 (translated)
+    moves: []
+    sampler: rotsprite
+    tweaks: {crown: [-6, 0], neck: [-5, 0], chest: [-3, 0], sh_n: [-4, -2], el_n: [-3, -2], hand_n: [-1, -3], tip: [-1, 1], sh_f: [-5, 3], el_f: [-2, 3], hand_f: [0, 3]}
+  hurt_in2:                    # the hurt key leaned 6 back toward upright, the flying helm with the head
+    moves: []
+    tweaks: {crown: [6, -2], neck: [4, -1], chest: [3, -1], helm_c: [6, -2], helm_r: [6, -2], sh_n: [3, 1], el_n: [2, 2], hand_n: [-1, 3], tip: [-2, -2], sh_f: [4, -3], el_f: [2, -3], hand_f: [0, -3]}
+  daze:                        # head and shoulders slump; the cleaver arms ride the body
+    moves: [crown, neck, chest]
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 3
+z:
+  idle: [uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, weapon]
+masks:
+  weapon:
+    idle: [[51, 73], [99, 70], [100, 84], [88, 92], [51, 92]]
+    attack: [[10, 5], [58, 8], [62, 19], [56, 29], [10, 29]]
+    hurt: [[40, 96], [70, 98], [86, 112], [84, 124], [56, 124], [40, 106]]
+  helm:
+    hurt: [[12, 12], [40, 12], [40, 41], [12, 41]]
+  ft_n:
+    idle: [[68, 115], [92, 115], [92, 125], [68, 125]]
+    attack: [[72, 114], [98, 114], [98, 125], [72, 125]]
+  ft_f:
+    idle: [[26, 115], [50, 115], [50, 125], [26, 125]]
+    attack: [[20, 110], [44, 110], [44, 125], [20, 125]]
+holds: []
+paint:                         # slits the rigid moves open between the arms, cleaver, belly and skirt, closed with outline ink
+  - {frame: atk_wind1, xy: [[68, 73], [69, 73], [70, 73], [71, 73], [72, 73]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[51, 88], [51, 89], [52, 89], [51, 90], [52, 90], [53, 90], [55, 90], [52, 91], [53, 91], [54, 91], [55, 91], [52, 92], [53, 92], [54, 92], [53, 93], [54, 93]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[72, 46], [72, 47], [72, 48], [72, 49], [72, 50], [72, 51]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[42, 61], [41, 62], [42, 62], [43, 62], [41, 63], [42, 63], [43, 63], [41, 64], [42, 64], [43, 64], [41, 65], [42, 65], [42, 66], [42, 67]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[42, 62], [41, 63], [42, 63], [43, 63], [41, 64], [42, 64], [43, 64], [41, 65], [42, 65], [43, 65], [41, 66], [42, 66], [42, 67], [42, 68]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[72, 104]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[69, 31], [70, 31], [71, 31], [71, 32], [72, 32]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[74, 100], [75, 100], [74, 101], [75, 101], [76, 101], [77, 101], [74, 102], [75, 102], [76, 102], [75, 103], [70, 104]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[60, 72], [61, 72], [62, 72], [63, 72]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[42, 55], [41, 56], [42, 56], [41, 57], [41, 58]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[44, 52], [44, 53], [43, 54], [44, 54], [43, 55], [43, 56], [43, 57], [44, 57], [43, 58], [44, 58], [43, 59]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[44, 53], [44, 54], [43, 55], [44, 55], [43, 56], [43, 57], [43, 58], [44, 58], [43, 59], [44, 59], [43, 60]], rgb: [6, 4, 10]}

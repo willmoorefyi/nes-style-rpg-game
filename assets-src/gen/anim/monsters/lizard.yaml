@@ -1,0 +1,132 @@
+sprite: lizard
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# low sprawl: the tail lies on the ground (idle curls it under the body, hurt curls it up); its keys are far apart, so
+# it is never in `moves` and rides the hip
+keyframes:
+  idle:
+    hip: [42, 55]
+    back: [58, 48]
+    chest: [72, 48]
+    neck: [80, 42]
+    head: [88, 36]
+    snout: [105, 38]
+    tail0: [35, 58]
+    tail1: [18, 62]
+    tail2: [20, 70]
+    tail_tip: [45, 73]
+    sh_n: [72, 58]
+    el_n: [72, 66]
+    paw_n: [76, 72]
+    ftoe_n: [82, 75]
+    sh_f: [85, 58]
+    el_f: [90, 64]
+    paw_f: [92, 68]
+    ftoe_f: [98, 71]
+    hip_n: [45, 58]
+    knee_n: [52, 64]
+    foot_n: [48, 70]
+    toe_n: [52, 74]
+    hip_f: [40, 57]
+    knee_f: [38, 64]
+    foot_f: [36, 70]
+    toe_f: [40, 74]
+  attack:
+    hip: [32, 58]
+    back: [50, 50]
+    chest: [70, 50]
+    neck: [80, 46]
+    head: [90, 40]
+    snout: [107, 40]
+    tail0: [25, 60]
+    tail1: [15, 61]
+    tail2: [7, 62]
+    tail_tip: [2, 66]
+    sh_n: [65, 58]
+    el_n: [68, 66]
+    paw_n: [72, 72]
+    ftoe_n: [78, 75]
+    sh_f: [85, 60]
+    el_f: [95, 64]
+    paw_f: [100, 68]
+    ftoe_f: [106, 71]
+    hip_n: [32, 62]
+    knee_n: [28, 67]
+    foot_n: [26, 72]
+    toe_n: [32, 75]
+    hip_f: [27, 61]
+    knee_f: [22, 66]
+    foot_f: [20, 71]
+    toe_f: [22, 74]
+  hurt:
+    hip: [40, 58]
+    back: [55, 48]
+    chest: [70, 47]
+    neck: [78, 44]
+    head: [85, 40]
+    snout: [102, 44]
+    tail0: [32, 60]
+    tail1: [15, 58]
+    tail2: [12, 47]
+    tail_tip: [33, 45]
+    sh_n: [66, 60]
+    el_n: [68, 66]
+    paw_n: [72, 72]
+    ftoe_n: [76, 75]
+    sh_f: [82, 60]
+    el_f: [88, 64]
+    paw_f: [92, 68]
+    ftoe_f: [98, 71]
+    hip_n: [42, 62]
+    knee_n: [40, 67]
+    foot_n: [36, 71]
+    toe_n: [40, 75]
+    hip_f: [38, 61]
+    knee_f: [35, 66]
+    foot_f: [32, 71]
+    toe_f: [35, 74]
+frames:
+  atk_wind1:                   # the head draws back and dips
+    moves: [back, chest]
+    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1]}
+  atk_wind2:                   # coil: chest low, head pulled back
+    dy: 1
+    moves: [back, chest]
+    tweaks: {neck: [-2, 1], head: [-2, 1], snout: [-2, 1]}
+  atk_mid:                     # the near fore paw ~1/3 back toward the coil (feet lerp)
+    tweaks: {paw_n: [2, 0], ftoe_n: [2, 0]}
+    moves: [hip, back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+  atk_follow:
+    t: 1.10
+    moves: [back, chest]
+  atk_recover:
+    t: 0.35
+    moves: [back, chest, neck, sh_n, sh_f]
+  hurt_in1:                    # flinch: body pulled back, head jerked back and up (the far hind leg rides: cap)
+    t: 0.30
+    moves: [hip, back, chest, neck, head, snout, sh_n, sh_f, hip_n]
+    tweaks: {neck: [-1, -1], head: [-2, -1], snout: [-2, -1]}
+  hurt_in2:                    # the near shoulder rides (cap)
+    moves: [hip, back, chest, neck, head, snout, sh_f, hip_n, hip_f]
+  daze:
+    t: 0.0
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 3]}
+  daze_b:
+    t: 0.0
+    moves: [back, chest, neck, head, snout]
+    dy: 1                      # the grounded tail would sink at the recipe's 2
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 4]}
+masks:
+  head:                        # the open jaw is head
+    idle: [[80, 22], [110, 30], [110, 50], [84, 50], [80, 40]]
+    attack: [[84, 24], [112, 30], [112, 62], [88, 62], [84, 44]]
+    hurt: [[78, 30], [108, 34], [108, 56], [80, 56], [78, 44]]
+holds: []
+paint:                         # 1 px knee crack the breath drop opens, outline ink
+  - {frame: atk_wind1, xy: [[51, 67]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[51, 67]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[51, 67]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[51, 67]], rgb: [6, 4, 10]}
