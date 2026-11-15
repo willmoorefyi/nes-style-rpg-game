@@ -349,3 +349,5 @@
 {"event": "result", "key": "cbc8259cea10898292f3e1e5", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T04:49:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_eye", "sheet": "boss_hurt", "seed": 1234, "key": "79e6adca8bcc32123fb06612"}
 {"event": "result", "key": "79e6adca8bcc32123fb06612", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:50:03", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_eye", "sheet": "boss_hurt", "seed": 1235, "key": "cb71d4705b73e74dee326cf4"}
+{"event": "result", "key": "cb71d4705b73e74dee326cf4", "ok": true}

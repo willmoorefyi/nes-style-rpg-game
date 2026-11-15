@@ -464,10 +464,18 @@
   design_ref: false
   floating: true
   body: floating
-  motion: >-
-    Keep the frontal view of Image 3: the eye faces the viewer, its iris looking toward the heroes on the right, and
-    the body is not tilted or turned along a diagonal; it stays hovering, nothing touches the ground; the movement is
-    in the iris, the grave cloth strips, the bone crown and the tendrils, and trailing parts lag behind the motion.
+  motion:
+    attack: &death_eye_motion >-
+      Keep the frontal view of Image 3: the eye faces the viewer, its iris looking toward the heroes on the right, and
+      the body is not tilted or turned along a diagonal; it stays hovering, nothing touches the ground; the movement is
+      in the iris, the grave cloth strips, the bone crown and the tendrils, and trailing parts lag behind the motion.
+    cast: *death_eye_motion
+    # the untilted line froze the hurt into an idle copy (R75, pose_diff 0.01)
+    hurt: >-
+      Keep the eye facing the viewer as in Image 3, never turned to a side profile; the whole body is knocked back
+      away from the heroes, pushed to the left and tilted back by about fifteen degrees; it stays hovering, nothing
+      touches the ground; the tendrils and grave cloth strips are flung forward toward the heroes by the blow, and
+      trailing parts lag behind the motion.
   prompt: >-
     the Death Eye, a colossal undead eyeball hovering in the air, seen from the front, bound in strips of torn grey
     grave cloth wrapped around it, a crown of yellowed bones and small skulls set on top, one huge sickly yellow iris
@@ -493,7 +501,7 @@
   face: the huge yellow iris and slit pupil are the face; no mouth, no other eyes
   extra_negative: a mouth, teeth, eyestalks, a second eye, arms, legs
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1235}   # boss_cast 1234 (ROSTER_LOG R73, "the iris flaring bright with a violet clock-like
+  sheet_seeds: {boss_cast: 1235, boss_hurt: 1235}   # boss_hurt 1234 (R75, the untilted line): an idle copy; boss_cast 1234 (ROSTER_LOG R73, "the iris flaring bright with a violet clock-like
   # glyph drawn inside the iris itself"): the flare keyed out as a transparent ring, the iris a detached island
 - id: chaos
   # "Chaos" (128), the final boss: an ORIGINAL primordial titan (plan 4.2, binding D13); it must not reproduce any

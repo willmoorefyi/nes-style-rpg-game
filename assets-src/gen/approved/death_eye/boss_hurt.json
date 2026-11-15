@@ -1,0 +1,25 @@
+{
+  "character": "death_eye",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "cb71d4705b73e74dee326cf4",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": true,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R76"
+}
