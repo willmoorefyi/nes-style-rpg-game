@@ -102,6 +102,25 @@ Images used: 57 of 300 (build 57 of 285, fix 0 of 15; ledger guard: 157 Gemini a
 - Fix-pass candidates: `hollow_seraph/boss_cast` (four wings, far side), `hollow_seraph/boss_attack_raise` (three
   wings), `ashen_queen/boss_attack_raise` (none approved), `ashen_queen/boss_cast` (barely distinct from idle).
 
+## G2 status (2026-11-15, paused)
+
+- Approved: `astos` 4 of 4 (R43, R45-R47), `warmech` 4 of 4 (R48, R51, R53, R54), `chaos` idle and attack (R55, R59,
+  attack best of 3 with three arms), `piscodemon` (R60), `dragon_zombie` (R64, best of 3).
+- **Pause triggers (plan 6.3) in this run:** naga (R13, R14, R33; no naga sheet left), floating six-wing (R38-R40;
+  none left), **multi-arm** (R56-R58, the four-arm count: `chaos` `boss_cast`, `boss_hurt`, `boss_attack_raise`
+  wait). `death_eye` and `evil_eye` (`body: floating`) are written in `monsters.yaml` but not requested: the
+  floating body is held until the orchestrator rules on the R38-R40 trigger.
+- Pattern for the wording fix: per-pose requests that need every limb visible (six arms, six wings, four arms) turn
+  the body to a three-quarter or side profile and drop the far set (R29-R31, R38, R56-R58), or copy the idle when
+  told to keep its view (R14, R33, R36). Side naming fixes props (R8, R10, R21, R37, R45) but not limb counts.
+- Fix-pass candidates added: `chaos/boss_attack` (three arms), `dragon_zombie` hurt (crouch, tail hidden).
+- **Framework issue (for the framework owner / integrator):** `selftest.py` now reports 3 FAILED in
+  `selftest_anim.run_build_locks` (the temp-dir `monsters_ai` build): `hollow_seraph atk_mid: atlas crop at (0, 200,
+  200, 200) differs from the frame`. `monster_atlas.build` takes one cell per sheet from the idle (200x200), but two
+  approved boss attacks were cut into widened cells: `hollow_seraph/boss_attack` 218x200 (R28) and
+  `warmech/boss_attack` 232x200 (R51). It was latent while the seraph was incomplete (skipped by `load_entries`).
+  Every approved key still recomputes unchanged (FW-9 check passes); no committed atlas was built or changed.
+
 ## Deferred sprites
 
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34.
