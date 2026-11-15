@@ -1,0 +1,28 @@
+# Sea Snake (pass R, serpent): a banded blue-and-white sea serpent coiled on the ground, the front raised in an S,
+# a fin crest on the head, the flat paddle tail lying in the coil. body: serpent (rig_serpent.py): the coil (with
+# the tail) is pinned, the S rises from body0 on the coil's right; the head is rigid from the crest to the snout.
+sprite: sea_snake
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [46, 120], c_n: [70, 120], body0: [86, 88], body1: [74, 72], neck: [64, 58], head: [62, 40], snout: [92, 45]}
+  attack: {c_f: [34, 120], c_n: [68, 120], body0: [70, 88], body1: [52, 72], neck: [64, 52], head: [82, 58], snout: [107, 63]}
+  hurt:   {c_f: [35, 120], c_n: [65, 120], body0: [84, 88], body1: [68, 72], neck: [56, 60], head: [50, 46], snout: [79, 46]}
+masks:
+  head:
+    idle: [[56, 24], [98, 24], [98, 56], [60, 56]]
+    attack: [[78, 44], [110, 44], [110, 80], [80, 80], [76, 60]]
+    hurt: [[42, 36], [82, 36], [82, 58], [44, 58]]
+frames:
+  # the head pulls back over the coil before it strikes (anaconda draws down as well; sea_snake stays upright)
+  atk_wind1: {t: 0.0, dy: 0, tweaks: {neck: [-1, 0], head: [-2, 0], snout: [-2, 0]}}
+  atk_wind2: {t: 0.0, dy: 0, tweaks: {body1: [-1, 0], neck: [-2, 0], head: [-4, 1], snout: [-4, 1]}}
+  # the attack head is 20 px right of and 18 px below the idle's: the strike frame carries it a third back up
+  atk_mid: {t: 0.0, moves: [], tweaks: {neck: [-2, -2], head: [-6, -6], snout: [-6, -6]}}
+  atk_follow: {t: 0.80}                            # a settle (the overshoot left recover below the IoU floor)
+  atk_recover: {t: 0.0, moves: [], tweaks: {neck: [2, 1], head: [6, 5], snout: [6, 5]}}   # the head returns from low and right
+  daze: {moves: [neck, head, snout], dy: 1}
+  daze_b: {moves: [neck, head, snout], dy: 2}
+holds: []
