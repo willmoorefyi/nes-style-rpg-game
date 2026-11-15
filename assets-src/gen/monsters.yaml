@@ -1341,7 +1341,8 @@
   body: quadruped
   prompt: >-
     a long dark green crocodile in a low sprawl seen from a three-quarter side view, the long tail curved round behind
-    it so the whole body fits the box, a ridged scaly back with rows of bumps, a pale yellow belly, long jaws open a
+    it so the whole crocodile, tail included, is no wider than the grey box
+    and sits in the middle of its own cell with empty space on both sides in every cell, a ridged scaly back with rows of bumps, a pale yellow belly, long jaws open a
     little showing jagged teeth, a yellow eye, short splayed legs with claws
   attack: >-
     lunging forward low with the long jaws snapping wide open at the heroes, all four feet on the ground, no taller
@@ -1349,14 +1350,15 @@
   hurt: knocked back low, the jaws snapped shut, the head turned away, the tail thrashing, all four feet down
   face: its long toothed jaws and yellow eye are readable
   extra_negative: water, white scales, barnacles, wings, rearing up, standing upright
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R161): the hurt's rear sliced at the raw cell line (196 px cell)
 - id: white_crocodile
   # "White Crocodile" (054): a larger pale albino crocodile with barnacles
   size: large
   body: quadruped
   prompt: >-
     a huge pale albino crocodile, bone-white and pale pink scales, in a low sprawl seen from a three-quarter side view,
-    the thick tail curved round behind it so the whole body fits the box, clusters of grey barnacles crusted on its
+    the thick tail curved round behind it so the whole crocodile, tail included, is no wider than the grey box
+    and sits in the middle of its own cell with empty space on both sides in every cell, clusters of grey barnacles crusted on its
     back and tail, pink eyes, broad heavy jaws with yellowed teeth, old scars on the snout, thick splayed legs
     with claws; heavier and broader than a common crocodile
   attack: >-

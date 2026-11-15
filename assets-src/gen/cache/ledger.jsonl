@@ -507,3 +507,5 @@
 {"event": "result", "key": "ad44028f068532ce2db485af", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}
 {"event": "attempt", "ts": "2026-11-15T05:47:18", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_piranha", "sheet": "monster_small", "seed": 1234, "key": "c58b5f1b9841f0e5dae20e96"}
 {"event": "result", "key": "c58b5f1b9841f0e5dae20e96", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}
+{"event": "attempt", "ts": "2026-11-15T05:47:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "crocodile", "sheet": "monster_large", "seed": 1234, "key": "4d14f37b51560faf47ed9f51"}
+{"event": "result", "key": "4d14f37b51560faf47ed9f51", "ok": true}
