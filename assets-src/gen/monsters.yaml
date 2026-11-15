@@ -2116,19 +2116,21 @@
   size: small
   body: arthropod
   prompt: >-
-    a red armoured lobster-scorpion seen from the side, a segmented red shell, two big heavy crusher claws in front, a
-    segmented tail arched over its back ending in a curved stinger, long thin antennae, small black eyes on stalks,
-    exactly eight jointed legs on the ground; the whole creature sits in the middle of its own cell with empty space on
-    both sides
+    a red armoured lobster-scorpion seen from the side, a segmented red shell, two big heavy crusher claws held in
+    front of its head, a segmented tail arched up over its back ending in a curved stinger in every cell (the tail
+    always over the back, never lying flat behind), long thin antennae, small black eyes on stalks, exactly eight
+    jointed legs on the ground; the whole creature, claws to tail, sits in the middle of its own cell with empty
+    space on both sides
   attack: >-
-    lunging forward low with both crusher claws snapping toward the heroes and the stinger poised over its back, the
-    claws well inside the middle cell; no venom spray, streak or motion line
+    lunging forward low with both crusher claws snapping just in front of its head toward the heroes, the stinger
+    poised over its back, the claws well before the right edge of the middle cell; no venom spray, streak or motion
+    line
   hurt: >-
-    knocked back, still facing right with the claws toward the heroes and the tail over the back on the left as in the
-    idle cell, the claws thrown up, the tail curling down
+    knocked back low, still facing right with the claws toward the heroes and the tail arched over the back as in the
+    idle cell, the claws pulled in, every leg on the ground, no taller than its idle height (no rearing up)
   face: its small black stalk eyes and antennae are readable
-  extra_negative: sand-yellow shell, thin pincers, wings, more than eight legs, water, bubbles
-  seeds: [1234]
+  extra_negative: sand-yellow shell, thin pincers, wings, more than eight legs, water, bubbles, rearing up, a flat tail
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R234): no tail over the back in the idle, the attack claw sliced, a rear-up hurt
 - id: sea_troll
   # "Sea Troll" (098): a hunched blue-green troll with kelp hair (distinct from the troll)
   size: large
