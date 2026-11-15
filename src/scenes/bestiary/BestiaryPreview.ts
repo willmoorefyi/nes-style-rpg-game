@@ -12,7 +12,7 @@ import { OutlinedText } from '../../ui/NESFont.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { battleBackgroundPath } from '../../rendering/BattleBackground.js';
 import { AiEnemyView, type MonsterArtSource } from '../battle/AiEnemyView.js';
-import type { EnemyPoseController, Freeze } from '../battle/EnemyPoseController.js';
+import type { EnemyPoseController, Posture } from '../battle/EnemyPoseController.js';
 import { ENEMY_REACH_OVERLAP } from '../battle/enemyReach.js';
 import { GAME_WIDTH, GAME_HEIGHT, WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER } from '../../core/LayoutConstants.js';
 import { BestiaryLoop, type LoopPoses } from './bestiaryAnim.js';
@@ -29,10 +29,10 @@ const REACH_MARGIN = 48;
 const PHANTOM = { w: 48, h: 160 };
 
 /**
- * R2 / BS-7, the one place the daze step touches the pose API: until Fe's posture API lands, the daze step holds the
- * still idle (Freeze 'still'); the after-Fe task swaps this for Fe's `'daze'` posture.
+ * R2 / BS-7, the one place the daze step touches the pose API: Fe's 'daze' posture (daze / daze_b, falling back to
+ * hurt_in1 until a sheet has daze frames).
  */
-const DAZE_POSTURE: Freeze = 'still';
+const DAZE_POSTURE: Posture = 'daze';
 
 /** What the preview shows for an entry. */
 export interface PreviewEntry { enemy: EnemyData; seen: boolean; hasSpells: boolean }
@@ -80,7 +80,7 @@ export class BestiaryPreview {
   private dead = false;
   private view: AiEnemyView | null = null;
   private sprite: Container | null = null;
-  private posture: Freeze = 'none';
+  private posture: Posture = 'none';
   private noArt = false;
 
   constructor(parent: Container, readonly art: CachedArt, private readonly loadTexture: (path: string) => Promise<Texture>,
