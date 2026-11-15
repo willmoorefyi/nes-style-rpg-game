@@ -2304,11 +2304,12 @@
     well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks, steam,
     smear or motion lines.
   prompt: >-
-    a four-legged bronze automaton sentinel seen from the side, a squat round bronze body of riveted plates on four
-    jointed metal legs with flat feet, a small domed head with one round glowing red lens eye, two jointed arms on
-    the front of the body each ending in a short spear blade, held pointing down in front of it close to the body;
-    weathered bronze with green patina spots; the whole machine sits in the middle of its own cell with empty space on
-    both sides
+    a four-legged bronze automaton sentinel seen from the side, built like a mechanical hound: a long low horizontal
+    body of riveted bronze plates carried on exactly four jointed metal legs, two at the front and two at the back,
+    all four feet flat on the ground; a small domed head at the front with one round glowing red lens eye, two
+    jointed arms on the chest each ending in a short spear blade, both held pointing down in front of it close to the
+    body, the same two spear blades in every cell; weathered bronze with green patina spots; the whole machine sits in
+    the middle of its own cell with empty space on both sides
   attack: >-
     leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
     glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
@@ -2316,8 +2317,8 @@
     knocked back, the body tilted back on its four legs, the spear arms pulled up, the lens flickering, all four feet
     on the ground
   face: one round glowing red lens eye in the domed head
-  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs
-  seeds: [1234]
+  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt
 - id: blue_dragon
   # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
   size: large
