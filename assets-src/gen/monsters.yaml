@@ -1621,10 +1621,12 @@
   attack: >-
     lunging forward low with the jaws wide open to bite the heroes, all four paws on the ground (no leap), no taller
     than half again its idle height, the head well inside the middle cell
-  hurt: knocked back, the head turned away with a yelp, the body hunched, the tail tucked
+  hurt: >-
+    knocked back low, the head turned away with a yelp, the body hunched, the tail tucked, all four paws on the
+    ground (no rearing up), no taller than its idle height
   face: its white wolf face with pale blue eyes and fangs is readable
   extra_negative: grey fur, black fur, brown fur, two heads, fire, a collar, a rider, ice breath stream, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R189): a rear-up hurt cut by the cell top
 - id: mindflayer
   # "Mindflayer" (070): a robed tentacle-faced caster
   size: small
