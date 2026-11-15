@@ -603,13 +603,14 @@
     yellow eye, mottled purple-brown hide; it hovers, nothing touches the ground; in every cell the body floats at the
     same height in its box with clear empty space below it, well above the bottom of the box
   attack: >-
-    surging forward toward the heroes, the fanged mouth gaping wide, the same four eyestalks lashing forward, the body
-    at the same height as in the idle cell
+    surging forward toward the heroes, the fanged mouth gaping wide, the same four eyestalks (exactly four, as in the
+    idle cell) lashing forward, the body at the same height as in the idle cell
   hurt: >-
-    knocked back, the big eye squeezed shut, the mouth clenched, the same four eyestalks recoiling and curling, the
-    body at the same height as in the idle cell
+    knocked back, the big eye squeezed shut, the mouth clenched, the same four eyestalks (exactly four, as in the idle
+    cell) recoiling and curling, the body at the same height as in the idle cell
   face: the big iris and pupil are the face, with the fanged mouth below it
-  seeds: [1234]
+  extra_negative: a fifth eyestalk, more than four eyestalks, tentacles below the body, arms, legs
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R77): attack and hurt sliced at the cell bottom, stalk count drifts; 1235 (R78): stalks 4 / 5 / 5
 - id: dragon_zombie
   # "Dragon Zombie" (092), the undead dragon: a paralysing bite; must read apart from the red dragon (plan 3.3)
   size: large
