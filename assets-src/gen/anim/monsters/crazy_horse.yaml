@@ -1,0 +1,115 @@
+sprite: crazy_horse
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [40, 72]
+    back: [55, 68]
+    chest: [75, 70]
+    neck: [83, 55]
+    head: [90, 48]
+    snout: [104, 62]
+    tail0: [30, 68]
+    tail1: [25, 78]
+    tail2: [24, 90]
+    tail_tip: [26, 103]
+    sh_n: [72, 80]
+    el_n: [72, 98]
+    paw_n: [72, 114]
+    ftoe_n: [74, 120]
+    sh_f: [80, 82]
+    el_f: [82, 98]
+    paw_f: [83, 112]
+    ftoe_f: [85, 118]
+    hip_n: [36, 80]
+    knee_n: [33, 98]
+    foot_n: [32, 112]
+    toe_n: [33, 119]
+    hip_f: [48, 84]
+    knee_f: [50, 98]
+    foot_f: [50, 110]
+    toe_f: [51, 116]
+  attack:
+    hip: [35, 85]
+    back: [52, 75]
+    chest: [70, 68]
+    neck: [80, 55]
+    head: [93, 52]
+    snout: [107, 63]
+    tail0: [30, 80]
+    tail1: [22, 82]
+    tail2: [15, 90]
+    tail_tip: [12, 103]
+    sh_n: [66, 78]
+    el_n: [78, 85]
+    paw_n: [74, 100]
+    ftoe_n: [72, 104]
+    sh_f: [76, 74]
+    el_f: [88, 82]
+    paw_f: [90, 95]
+    ftoe_f: [88, 101]
+    hip_n: [38, 88]
+    knee_n: [33, 103]
+    foot_n: [36, 115]
+    toe_n: [38, 121]
+    hip_f: [48, 92]
+    knee_f: [50, 100]
+    foot_f: [55, 112]
+    toe_f: [58, 116]
+  hurt:
+    hip: [42, 92]
+    back: [52, 82]
+    chest: [66, 70]
+    neck: [75, 55]
+    head: [84, 40]
+    snout: [92, 33]
+    tail0: [38, 86]
+    tail1: [30, 85]
+    tail2: [24, 92]
+    tail_tip: [22, 102]
+    sh_n: [70, 82]
+    el_n: [83, 92]
+    paw_n: [80, 108]
+    ftoe_n: [78, 112]
+    sh_f: [76, 78]
+    el_f: [90, 86]
+    paw_f: [93, 100]
+    ftoe_f: [92, 106]
+    hip_n: [42, 95]
+    knee_n: [38, 108]
+    foot_n: [46, 116]
+    toe_n: [50, 122]
+    hip_f: [55, 95]
+    knee_f: [62, 105]
+    foot_f: [66, 112]
+    toe_f: [70, 116]
+frames:
+  atk_wind1:                  # the head drops and draws back, the body tips nose-down
+    t: -0.10
+    moves: [back, chest]
+    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1]}
+  atk_wind2:                   # coil: body 2 lower, head pulled back and down
+    t: -0.20
+    dy: 2
+    moves: [back, chest]
+    tweaks: {neck: [-2, 1], head: [-2, 1], snout: [-2, 1]}
+  atk_recover:                 # landing: the head comes down level, all four hooves planted (the shoulders stay: the far
+    t: 0.35                    # foreleg tears at the elbow when they ride the chest)
+    moves: [back, neck, head, snout]
+  hurt_in1:                    # the rear starts with all four hooves planted (the fore hooves are the ground row)
+    t: 0.30
+    pins: [foot_n, foot_f, knee_n, knee_f, paw_n, paw_f]
+    moves: [back, chest, neck, head, snout, sh_n, sh_f]
+  hurt_in2:                    # the rear settles: back and head toward idle, the raised forelegs ride (a chest move tears the
+    t: 0.25                    # near fetlock off the leg)
+    pins: [foot_n, foot_f]
+    moves: [back, neck, head, snout]
+holds: []
+paint:                         # 1 px cracks at the mane / neck, shoulder and tail roots, and tail-strand slits, outline ink
+  - {frame: atk_mid, xy: [[83, 65], [28, 85]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[73, 39], [72, 41], [86, 60], [25, 82]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[69, 54], [25, 103], [25, 104], [25, 105], [25, 106]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[70, 51], [28, 102], [28, 103], [28, 104], [28, 105]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[70, 53]], rgb: [6, 4, 10]}
