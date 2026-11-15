@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 263 of 300 (build 263 of 285, fix 0 of 15; ledger guard: 363 Gemini attempts - 100)
+Images used: 264 of 300 (build 263 of 285, closed at N1 = 363; fix 1 of 37 open, the plan caps itself at 5; ledger guard: 364 Gemini attempts - 100)
 
 ## Attempts
 
@@ -524,3 +524,9 @@ Images used: 263 of 300 (build 263 of 285, fix 0 of 15; ledger guard: 363 Gemini
 - `red_piranha` (batch B): R160 and R277 refused, R282 accepted but its hurt sliced on the bottom row; 3 of 3 used, **deferred** (R283; a 0-image re-cut is possible, see "Swimmers").
 - `white_shark` (batch C): R278-R280 accepted but every action cell sliced on the bottom row (or an idle copy); 3 of 3 used, **deferred** (R281; a 0-image re-cut is possible).
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
+
+## Fix pass (pass R fix, opened at N1 = 363; ROSTER_FIX_PLAN.md 5, the plan caps itself at 5)
+
+| # | Sheet (seed) | n | Measured result | Decision |
+|---|---|---|---|---|
+| R284 | lich/boss_hurt (1235, key `5062660e8975aace5d8b9754`, `--retry`; ROSTER_FIX_PLAN defect 3: the new `hurt:` text, "the skull head with its ice crown stays upright on the neck ... one head only, the free arm thrown out to the side (never across the face)") | 1 | The identity defect is fixed: **one skull head with the ice crown**, centred on the neck, no helm, the same armour, pauldrons, mantle and glaive; 183 px, lowest row 192, top row 10, x 7-192, a 200x200 cell (no widening), no border pixels, binary alpha, 15 colours, one piece. **Fails review:** the glaive is held the other way round from the idle (the ice blade low on the left, the spearhead up on the right: a 180-degree prop flip the rig cannot bridge), and the pose reads as a turning stride toward the heroes with the mantle streaming back, not a recoil away from them | **rejected**; the one allowed retry follows (seed 1236, `--retry`; still facing right with the chest and skull toward the viewer as in Image 3, leaning back to the left, "the glaive held the same way round as in Image 3, in the same hand, its ice blade low on the right and its spearhead end up on the left") |

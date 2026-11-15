@@ -173,9 +173,12 @@
     arm thrust high overhead with a large crystal of freezing cyan magic forming above the open palm, the other arm
     swinging the glaive out wide to the side, feet planted wide apart, mantle billowing upward in a magical wind
   hurt: >-
-    violently knocked back by a heavy blow: torso bent and twisted away from the heroes, one arm thrown up across his
-    face, knees buckling, the glaive dipping toward the ground, cracks and small ice shards bursting from his chest
-    armour, mantle flung forward around him
+    staggered back by a heavy blow: still facing right with the chest and the skull face toward the viewer as in
+    Image 3, the whole body leaning back to the left away from the heroes, the skull head with its ice crown upright
+    on the neck and in full view, one head only, the free arm thrown out to the side (never across the face), knees
+    buckling; the glaive held the same way round as in Image 3, in the same hand, its ice blade low on the right and
+    its spearhead end up on the left, dipping toward the ground; cracks and small ice shards bursting from the chest
+    armour
   # pass F 3.7: the heavy attack's raised hold (fits the cell by crouching, as garland's)
   attack_raise: >-
     the wind-up of an overhead glaive strike: both gauntlets lifting the glaive high above his crowned skull, the long
@@ -189,7 +192,7 @@
   face: the skull face with two pale cyan eye lights and a toothed jaw is readable
   extra_negative: a helmet or mask covering the skull, a sword, skulls on the shoulders, a throne, a second weapon
   seeds: [1234]
-  sheet_seeds: {boss_attack_raise: 1236}   # 1234 painted the guide's ground line across both boots (ACT1_LOG #29);
+  sheet_seeds: {boss_attack_raise: 1236, boss_hurt: 1236}   # boss_hurt: pass R fix, ROSTER_FIX_PLAN defect 3 (1235, R284: glaive reversed, not a recoil). 1234 painted the guide's ground line across both boots (ACT1_LOG #29);
   # 1235 (#30) drew a broad flat cleaver without the rune inlay or spearhead and a muddy skull (retry #32)
 # ── pass R, G1: the New Fiends (docs/ROSTER_PLAN.md 4.1; lore: the bestiary spec's "New Fiends"). Original designs, one
 # image per pose like the lich; boss_idle first, every later pose sends it as the identity image. FW-9 fields:
