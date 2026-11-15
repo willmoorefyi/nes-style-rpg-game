@@ -1,6 +1,6 @@
 # Playthrough feedback plan (pass F), 2026-11-14
 
-**Status:** plan only, nothing implemented. **Base:** `mainline` at `6d8ef65`. All file:line references are to that commit.
+**Status:** plan only, nothing implemented. Momus review (REVISE, 25 items) folded into the body; the binding decisions are at the end. **Base:** `mainline` at `6d8ef65`. All file:line references are to that commit.
 
 **Input:** the user's playthrough feedback (8 items, below), plus the user's clarification of item 5 (a stunned/afflicted
 pose and a visual per status). The verbatim intent of each item opens its section in §3.
@@ -24,21 +24,26 @@ data in memory. The numbers in §3.1 and §3.2 come from these runs. The impleme
 - **Art:**
   - Approved sheets are never modified (style lock). New approved files may be added.
   - Paid Gemini use is 26 of 100 (`docs/ACT1_LOG.md`, last line; `assets-src/gen/budget.json` `attempts_before: 69`
-    with 95 Gemini attempts in the ledger). Only item 7 asks for paid images: 2, and at worst 6 with retries (§3.7).
+    with 95 Gemini attempts in the ledger). Only item 7 asks for paid images (binding decision FB-8): one
+    `attack_raise` image each for Garland and the lich, at most one retry each and only after a failed review, so at
+    most **4** attempts. The budget ends at **≤ 30 of 100** (§3.7).
+  - `budget.json` still allows 3 attempts per sheet, so pass F adds its own ledger check (§7): at most the current
+    count + 4 Gemini attempts in total, and at most 2 per new sheet.
   - Bedrock/Stability isn't budgeted, but it was rejected for in-betweens on 2026-11-13. It isn't used.
 - **File-size ceilings.** New files must be under 250 lines. The monitored files must not pass their ceilings:
 
   | File | Ceiling | Now | Pass F pressure |
   |---|---|---|---|
-  | `BattleScene.ts` | 594 | 473 | F0 hooks +10, Fb +20 |
-  | `BattleStateMachine.ts` | 592 | 586 | **not touched** by any tranche |
-  | `BattleAnimationController.ts` | 308 | 280 | F0 splits resolve/present (+12) and moves the timing constants out (−5) and `formatAnnouncement` into `battleMessageUtils.ts` (−9). Net ≈ 278 |
+  | `BattleScene.ts` | 594 | 473 | F0 hooks, layers update, `enemyStatus` +14; Fb +20 |
+  | `BattleStateMachine.ts` | 592 | 586 | only F0, only to add `spellId?` / `itemId?` to `NextActionInfo` and `ActionResult` (about 4 lines, so ≤ 590). No other tranche touches it |
+  | `BattleAnimationController.ts` | 308 | 280 | F0 splits resolve/present (+12), adds the effect phase and cue hand-off (+8), re-exports the timing constants (net −2) and moves `formatAnnouncement` into `battleMessageUtils.ts` (−9, re-exported). Net ≈ 289 |
+  | `EnemyPoseController.ts` | < 250 | 177 | F0 split offsets and cues +15; Fc travel and heavy +35 |
+  | `assets-src/gen/monster_anim.py` | < 250 | 222 | Ff first moves `RECIPES`, `FRAME_SOURCE`, `SEQUENCES` and `SPAN` into a new `monster_recipes.py` (about −35), then adds the recipes |
   | `SpellExecutor.ts` | 314 | 308 | not touched |
   | `BattleDisplayManager.ts` | < 250 | **243** | F0 first extracts the enemy-list code (`:182-205, 236-242`, about 35 lines) into a new `BattleEnemyList.ts` |
   | `src/core/schemaValidation.ts` | (375, an unlisted exception) | 375 | new validators go in a new `schemaValidationFx.ts`; +2 lines for the call |
   | `assets-src/build_assets.py` | (321, unlisted) | 321 | new stages are registered in at most 3 lines; their code is in new modules |
   | `assets-src/gen/{generate,spec}.py` | (819 / 322, unlisted) | | item 7 is ≤ +6 lines each |
-  | `assets-src/gen/monster_anim.py` | < 250 | 222 | +8 (two recipes, one keyframe name) |
 
 ---
 
@@ -64,7 +69,7 @@ data in memory. The numbers in §3.1 and §3.2 come from these runs. The impleme
   ],
   "pass_fail": [
     "npm run build and npm test pass; every new test fails on 6d8ef65",
-    "No approved PNG changes hash; the ledger grows by at most the item 7 requests the user approved",
+    "No approved PNG changes hash; the ledger grows by at most 4 Gemini attempts (at most 2 per new sheet) and the budget ends at <= 30 of 100",
     "File-size ceilings above hold",
     "Adversarial play test (section 6): no P0 or P1 open"
   ]
@@ -83,7 +88,7 @@ data in memory. The numbers in §3.1 and §3.2 come from these runs. The impleme
 | 4 | No spell effects | Fd (fx engine and spell effects) | F0; tuned after Fb |
 | 5 | Enemy statuses are invisible (+ clarification: dazed pose, per-status visuals, party too) | Ff (the `daze` frames) + Fe (overlays, icons, tints) | Fe after Fd and Fc |
 | 6 | Battle far too fast | Fb (pacing) | F0 |
-| 7 | Garland and the lich need a dramatic overhead attack | Ff (keyframes and rigs) + Fc (timeline) | F0; paid art needs decision FB-8 |
+| 7 | Garland and the lich need a dramatic overhead attack | Ff (keyframes and rigs) + Fc (timeline) | F0; paid art per binding FB-8 |
 | 8 | A richer debug menu | Fg (sandbox) | F0 |
 
 All 8 items are covered, including the item 5 clarification.
@@ -92,8 +97,27 @@ All 8 items are covered, including the item 5 clarification.
 
 ## 2. Shared contract (F0: one commit on an integration branch before any tranche)
 
-Tests and build pass. Behaviour is unchanged, which the existing suite proves (`enemyPoseFlow`, `BattleScene`,
-`AiEnemyView`, `BattleFlash` tests stay green unedited).
+Tests and build pass, and behaviour is unchanged. The existing suite proves it: `BattleScene`, `AiEnemyView`,
+`BattleFlash`, `meleeContact` and `enemyPoseFlow` stay green.
+
+**Compatibility rules (so the old tests keep working):**
+- `BattleAnimationController.ts` **re-exports** `ROUND_END_FRAMES`, `ANNOUNCE_FRAMES`, `RESULT_FRAMES` and
+  `ELEMENT_COLORS` from their new homes.
+- Its constructor still takes a `Container` as its first argument. If it isn't already a `BattleLayers` root, the
+  layers are built inside it.
+- `BattleDisplayManager` keeps **delegating getters and methods** for everything moved to `BattleEnemyList.ts`:
+  `enemyListTexts`, `enemyNameToListIndex`, `enemyList`, `updateEnemyList`, `listIndexFor` and
+  `updateEnemyListDeadTints`.
+- **The only test edits F0 makes**, and owns:
+  - **`tests/scenes/battle/meleeContact.test.ts:73`:** the floating-number lookup (`main.children.filter(… OutlinedText)`)
+    looks in the numbers layer through a new `tests/helpers/battleLayers.ts` `floatsIn(main)`, which searches the
+    whole tree.
+  - **`tests/scenes/battle/enemyPoseFlow.test.ts`:** its literal tick counts are rewritten as expressions of the
+    timing constants (`ANNOUNCE_FRAMES`, `ATTACK_OUT`, `RESULT_FRAMES`, `ROUND_END_FRAMES`, …), and a `beforeEach`
+    pins `setMessageSpeed(5)` (today's timing). Fb can then change values without editing that file.
+  - Any other edit that turns out to be unavoidable is listed in the F0 commit message with the reason.
+
+**Contract:**
 
 1. **`src/scenes/battle/battleTiming.ts` (new).**
    - It holds every battle UI hold:
@@ -102,39 +126,95 @@ Tests and build pass. Behaviour is unchanged, which the existing suite proves (`
      - `BATTLE_MESSAGE_FRAMES = 45` (the literal at `BattleScene.ts:386, 395`);
      - `INTRO_FRAMES = 60` (`BattleScene.ts:47`);
      - `ACTION_BEAT_FRAMES = 0` (new).
-   - It also exports `holdFrames(base, speed)`, which returns `base` while the setting is absent. The values stay as
-     today; Fb changes them.
+   - It also exports `holdFrames(base, speed)`. In F0 the multiplier is 1.0 at every speed, so the values stay as
+     today. Fb owns the values, the multipliers and `battleTiming.test.ts`.
 2. **`src/core/Settings.ts` (new):** `getSettings(): { messageSpeed: 1|2|3|4|5 }` and `setMessageSpeed(n)`.
-   - It is stored in `localStorage` under `ff.settings`.
-   - A storage error or an invalid value logs `console.warn` and falls back to the default.
-   - The default in F0 is **5**, which maps to today's timing (`holdFrames` multiplier 1.0 at 5). Fb moves the
-     default to 3 and sets the table.
-3. **`src/scenes/battle/BattleLayers.ts` (new).** `mainContainer` gets these children in order: `bg`, `ui`
-   (windows, as today, below the sprites), `actors` (enemy sprites, then party sprites), and `fx`.
-   - `fx` has four sublayers, `status`, `spell`, `flash` and `numbers`, in that order.
+   - It is stored in `localStorage` under `ff.settings`, **read once and cached**. `setMessageSpeed` writes through.
+   - When `localStorage` is absent (Node tests, a private context) it uses the default with **no warning**.
+   - A storage exception or an invalid stored value logs `console.warn` once and falls back to the default.
+   - The default in F0 is **5**. Fb moves it to 3.
+3. **`src/scenes/battle/BattleLayers.ts` (new).** `mainContainer` gets these children, in order:
+   - `bg`;
+   - `ui`: the enemy and command windows and the party panel, below the sprites as today;
+   - `actors`: enemy sprites, then party sprites;
+   - `fx`, with sublayers `status`, `spell`, `flash` and `numbers`, in that order;
+   - **`hud`**: the message window and the end prompt, above `fx`. A travelling or large enemy can never cover the
+     message text.
+
+   Placement:
    - `BattleDisplayManager` adds sprites to `actors`. `BattleEffects` adds flashes to `fx.flash` and floating numbers
-     to `fx.numbers`.
-   - The effective draw order equals today's (sprites over windows, flashes and numbers over sprites), which a new
-     `tests/scenes/battle/battleLayers.test.ts` pins.
+     to `fx.numbers`. `BattleScene.createUI` puts the message window in `hud`.
+   - `layers.update(dt)` is called once per frame from `BattleScene.update`. It is the hook for the screen shake (Fc)
+     and the status and effect followers (Fd, Fe).
    - `AiEnemyView.reorder` keeps working because it reorders inside its sprites' parent.
-4. **Action presentation split (in `BattleAnimationController`).** `executeAction` (`:184-200`) becomes
-   `resolveAction()` (state machine, store the result) plus `presentAction()` (floats, slash, panels, messages, turn
-   list, `statusFx.sync()`).
-   - A new phase `'effect'` sits between them and waits for `this.fx.play(info, result, ctx)` frames.
-   - In F0, `fx` is `noopActionFx` (returns 0), so present runs on the same frame as today.
-   - `fx` and `statusFx` come from `src/scenes/battle/fx/index.ts` (new: `createActionFx(layers, display)` and
-     `createStatusFx(layers, display, battle)`, both no-op in F0). `BattleScene` calls them once in `enter()`. Fd and
-     Fe replace the bodies of these factories only, never `BattleScene`.
-5. **Enemy attack target.** `startEnemyLunge` (`BattleAnimationController.ts:235-242`) passes the target sprite:
-   `view.playAttack(i, this.targetSprite)`. `AiEnemyView.playAttack(i, target)` (new, forwards to
-   `poses.playAttack(i)`) ignores the target in F0. Fc implements the travel.
-6. **Monster frame names.** `MonsterKeyframe` gains `'attack_raise'`. `MonsterFrame` (`enemyChoreography.ts:8-10`)
-   gains `'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing'`.
-   - `FRAME_SOURCE` fallbacks: `daze`, `daze_b` → `idle`; `atk_raise_in` → `idle`; `attack_raise`, `atk_raise_b` →
-     `idle`; `atk_swing` → `attack`.
-   - A new exported `LATE_FRAMES` set (those six) is excluded from the per-sheet key requirement in
+
+   The one visible change: a boss's head, if it reached y < 120, used to draw over the message window and now draws
+   under it. A new `tests/scenes/battle/battleLayers.test.ts` pins the order and checks that a sprite in `actors`
+   whose bounds overlap the message window is drawn below it (`hud` is the last child).
+4. **Action data (`BattleStateMachine.ts`, the only edit to that file in pass F, about 4 lines):**
+   - `NextActionInfo` and `ActionResult` gain `spellId?` and `itemId?`, set where the spell or item is already known.
+   - **Target set** for an effect:
+     - `info.targetId` when it is set;
+     - for `all`, `all_allies` and party-wide items, the living members of that side **captured at announce time** in
+       `peekNextAction` order.
+   - **"Landed"** for status effects: `BattleAnimationController` snapshots each target's status set (`getAll()`
+     effects) before `resolveAction` and diffs it after. Added statuses are "landed", removed ones "cleansed". The
+     diff goes to `fx.play` and `statusFx.sync`, so no message text is parsed.
+5. **Action presentation split (in `BattleAnimationController`).** `executeAction` (`:184-200`) becomes:
+   - `resolveAction()`: the state machine, store the result, take the status diff;
+   - `presentAction()`: floats, slash, panels, messages, turn list, `statusFx.sync(diff)`, and the
+     **presented-state update** (below).
+
+   A new phase `'effect'` sits between them and waits `this.fx.play(info, result, ctx)` frames. In F0, `fx` is
+   `noopActionFx` (it returns 0), so present runs on the same frame as today.
+
+   **Presented snapshot.** `BattleDisplayManager` keeps `presented: { hp: number; statuses: StatusEffect[] }[]` for
+   both sides. It is updated only by `presentAction`, `statusFx.sync` and round resolution. Everything visual reads
+   the snapshot, never the live state: the party `down` pose (`poseFor`, `:159-165`), enemy postures, the dying
+   trigger (`updateEnemySprites`, `:225-234`), panel HP and enemy-list tints. So a target never goes `down`, dazed or
+   fading before the effect's impact.
+
+   Test (`tests/scenes/battle/presentedState.test.ts`, F0): with a stub `fx` whose impact is 18, a lethal FIRE leaves
+   the target's sprite idle and opaque (no dying entry) for frames 0–17, and starts the fade at frame 18. The same for
+   a KO'd party member's `down` pose.
+
+   **Factories.** `fx` and `statusFx` come from `src/scenes/battle/fx/index.ts` (new: `createActionFx(layers,
+   display)` and `createStatusFx(layers, display, battle)`, both no-op in F0). `ActionFx` also has
+   **`playCue(id, sprite)`** (no-op in F0) for effects started by animation cues. `BattleScene` calls the factories
+   once in `enter()`. Fd and Fe replace the factory bodies only, never `BattleScene`.
+6. **Enemy attack target and cues.**
+   - `startEnemyLunge` (`BattleAnimationController.ts:235-242`) passes the target sprite:
+     `view.playAttack(i, this.targetSprite)`. `AiEnemyView.playAttack(i, target)` (new, forwarding to
+     `poses.playAttack(i)`) ignores the target in F0. Fc implements the travel.
+   - `EnemyPoseController` gains `onCue?: (i: number, cue: 'hold' | 'contact') => void`. It is raised when an
+     attack's held telegraph starts and at contact. `AiEnemyView` forwards it to `ActionFx.playCue('glint' |
+     'impact_dust', sprite)` and to the screen shake. In F0 nothing raises `hold`, `contact` is raised, and both cues
+     do nothing.
+   - **Split offsets:** `EnemyPoseController.state(i)` returns `{ pose, dx, dy, travelDx, travelDy }`. `dx` / `dy` are
+     the lunge, recoil and shake part, **scaled** by `scaleFactor` and rounded once (as today). `travelDx` /
+     `travelDy` are absolute screen px, **unscaled** (0 in F0). `AiEnemyView` adds both.
+   - Each enemy stores its own `contactAt` and `totalFrames` for the current attack. `attackOutDone` and `update`
+     read those instead of the global `ATTACK_OUT` / `ATTACK_FRAMES`, which stay exported as the travel-0 values.
+7. **Monster frame names.**
+   - `MonsterKeyframe` gains `'attack_raise'`.
+   - `MonsterFrame` (`enemyChoreography.ts:8-10`) gains `'daze' | 'daze_b'`, which **join `MONSTER_FRAMES`**, and
+     `'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2'`, which **join `BOSS_FRAMES`** together with
+     `'attack_raise'`. That is seven names; `atk_swing2` is item 14's new name for the heavy mid frame, so the existing
+     `atk_mid` and its lock hashes stay untouched.
+   - Fallbacks: `FRAME_SOURCE` becomes a chain (`FRAME_FALLBACK: Record<MonsterFrame, MonsterFrame>`, resolved until
+     an atlas key exists):
+     - `daze` → `hurt_in1` → `idle`;
+     - `daze_b` → `daze`;
+     - `atk_raise_in` → `atk_wind1`;
+     - `attack_raise` and `atk_raise_b` → `atk_wind2`;
+     - `atk_swing` → `atk_mid`;
+     - `atk_swing2` → `atk_mid`.
+   - `BattleArt.getMonsterFrames` gains a `hasRaise` flag (like `hasCast`): true when the sheet has its own
+     `attack_raise`. `HEAVY_ATTACK` uses the raise frames only when it is set, and the `atk_wind2` coil otherwise
+     (§3.7).
+   - A new exported `LATE_FRAMES` set (the seven names) is excluded from the per-sheet key requirement in
      `tests/data/assetCoverage.test.ts`. Ff removes the exclusion when its atlas lands.
-7. **Data fields and files:**
+8. **Data fields and files:**
    - **`EnemyData`** (`src/types/index.ts:88-103`) gains:
      - `attack?: 'melee' | 'ranged'` (missing means melee);
      - `attackEffect?: string` (an effect id, for ranged);
@@ -143,20 +223,42 @@ Tests and build pass. Behaviour is unchanged, which the existing suite proves (`
      Validation goes in the new `schemaValidationFx.ts`. `enemies.yaml` gets `attack: melee` on every enemy except
      `dragon: {attack: ranged, attackEffect: fire_breath}`, and `attackAnim: heavy` on `garland` and `lich`. These are
      data only; nothing reads them yet.
-   - **`assets/data/spell-effects.yaml`** (new; owner Fd): `effects: {}`, `spells: {}`, `items: {}`, `attacks: {}`.
-     **`assets/data/status-visuals.yaml`** (new; owner Fe): `statuses: {}`. Both get typed loaders in
-     `DataLoader.ts` and validators that log and drop bad entries (`console.error`).
+   - **`BattleSceneConfig`** (`BattleSceneTypes.ts`, in F0's ownership) gains `enemyStatus?: Record<number,
+     StatusEffect[]>`.
+   - **`assets/data/spell-effects.yaml`** (new; owner Fd): `effects`, `spells: {}`, `items: {}`, `attacks`. F0
+     **seeds** `attacks: {fire_breath: fire_breath}` and a minimal `effects.fire_breath` (`kind: cone`, 28 frames,
+     impact 16), so the `enemyAttack` data test passes from F0 on. Fd fills in the rest.
+   - **`assets/data/status-visuals.yaml`** (new; owner Fe): `statuses: {}`.
+
+     Both files get typed loaders in `DataLoader.ts` and validators that log and drop bad entries (`console.error`).
    - **`assets/data/kits.yaml`** (new; owner Fa after F0): `start` and `full` per class, copied from
-     `tests/helpers/balanceData.ts:40-55`, plus `naked`. `balanceData.ts` reads it. A test asserts the YAML kits
-     equal the old literals, so F0 is neutral.
+     `tests/helpers/balanceData.ts:40-55`, plus `naked`. `balanceData.ts` reads it.
+     `tests/data/kitsYaml.test.ts` asserts that **the old keys** (start for the 6 base classes, full for the 4 party
+     classes) equal the old literals, so F0 is neutral and Fa can add keys (`lv2`, `arrive`, `full.monk`,
+     `full.red_mage`).
    - **`DebugScenario`** gains `enemyStatus?: Record<number, string[]>`. It is passed through
-     `BattleTrigger.triggerBattle` → `BattleSceneConfig.enemyStatus` and applied in `BattleScene.enter` after
+     `BattleTrigger.triggerBattle` → `BattleSceneConfig.enemyStatus`, and applied in `BattleScene.enter` after
      `startBattle`. Unknown statuses log `console.error`.
-8. **Lazy scenes:** `main.ts` registers `config` and (dev only) `debugSandbox`, each pointing at a stub class in its
-   own new file (`src/scenes/ConfigScene.ts`, `src/scenes/debugSandbox/DebugSandboxScene.ts`). The stub logs and pops
-   itself. Fb and Fg own those files afterwards.
-9. **`assets/data/debug-scenarios.yaml`:** the `f_*` scenarios below. The file is frozen after F0, and later changes
-   go through the orchestrator (U revision 25).
+9. **`src/scenes/battle/actorTint.ts` (new, owner Fe after F0).** One **multiplying** tint per actor sprite.
+   - `setTint(sprite, source, rgb | null)` stores one colour per named source (`hero`, `pulse`, `status`, `dead`).
+   - `sprite.tint` is the channel-wise product of all sources; with none it is white.
+   - `ActiveHeroMarker`'s pulse (`ActiveHeroMarker.ts:64, 71`), the placeholder dead tint
+     (`BattleDisplayManager.ts:212-218`), Fc's red heavy-attack pulse and Fe's status tints all go through it. So
+     clearing one never wipes another; today `ActiveHeroMarker.hide` resets to white.
+   - F0 converts the two existing callers, behaviour-neutral, and adds `actorTint.test.ts`.
+10. **Dev clock (new `src/scenes/battle/battleDevClock.ts`, < 80 lines).** The existing `?enemyAnim=step` / `loop` and
+    `&slow=N` (`enemyAnimPreview.ts:4-6, 20-25`) become **scene-wide**.
+    - `BattleScene.update` passes its `dt` through the dev clock **before** anything else (`BattleScene.ts:168`).
+    - In step mode every system pauses and advances one frame per `.` key: enemy poses, party choreography, effects,
+      glints, shake, overlays, floating numbers and text holds.
+    - `&slow=N` divides `dt` for all of them.
+    - A new `?battleStep=1` gives step mode without the enemy loop driver.
+    - It is dev only (`import.meta.env.DEV`), and the key listener is removed on exit, as today.
+11. **Lazy scenes:** `main.ts` registers `config` and (dev only) `debugSandbox`, each pointing at a stub class in its
+    own new file (`src/scenes/ConfigScene.ts`, `src/scenes/debugSandbox/DebugSandboxScene.ts`). The stub logs and
+    pops itself. Fb and Fg own those files afterwards.
+12. **`assets/data/debug-scenarios.yaml`:** the `f_*` scenarios below. The file is frozen after F0, and later changes
+    go through the orchestrator (U revision 25).
 
    | id | mode | setup | used by |
    |---|---|---|---|
@@ -167,24 +269,33 @@ Tests and build pass. Behaviour is unchanged, which the existing suite proves (`
    | `f_melee_rows` | battle | KNGT / NINJ / MSTR / RDWZ at Lv 30, no gear; `[goblin, wolf, skeleton, goblin, wolf, skeleton]` with `enemyAi` fight only; grassland | 3 |
    | `f_melee_large` | battle | the same party; `[ogre, troll, mummy]` | 3 |
    | `f_ranged` | battle | the same party; `[dragon, goblin]`; desert | 3, 4 |
-   | `f_heavy_garland` | battle | the same party; `[garland]` with `enemyAi: {garland: [{type: fight, weight: 1}]}`; temple | 7 |
-   | `f_heavy_lich` | battle | the same party; `[lich]`, fight only; shoreline | 7 |
+   | `f_heavy_garland` | battle | 4 knights at **Lv 12, no weapons**, `chain_mail` only; `{potion: 9}`; `[garland]` with `enemyAi: {garland: [{type: fight, weight: 1}]}`; temple. Tuned so that **Garland acts at least 4 times in ≥ 95 % of seeds** and the party survives at least 4 of his attacks; F0 checks it with the balance sim helpers (the Lv and gear are adjusted until this holds) | 7 |
+   | `f_heavy_lich` | battle | the same party tuned the same way against `[lich]`, fight only; shoreline | 7 |
    | `f_spells_white` | battle | a WHM at Lv 30 knowing every white spell in `spells.yaml`; members with `status: [poison]`, `[silence, blind]` and `hp: 0`; `[mummy, mummy]` (undead, so HARM lands) | 4 |
    | `f_spells_black` | battle | a BLM at Lv 30 knowing every black spell; `[ogre, ogre, troll]` | 4 |
    | `f_items_fx` | battle | items `{potion: 3, hi_potion: 2, ether: 2, antidote: 2, soft: 2, phoenix_down: 2}`; members hurt, poisoned, stoned and KO; `[goblin]` | 4 |
    | `f_status_enemies` | battle | the Lv 30 party; 7 goblins with `enemyStatus` `{0: [sleep], 1: [poison], 2: [stun], 3: [blind], 4: [silence], 5: [fear], 6: [stone]}` | 5 |
    | `f_status_party` | battle | members with `status` `[sleep]`, `[poison, blind]`, `[silence]`, `[fear]`; `[goblin]` with `enemyAi` fight only | 5 |
-   | `f_status_combo` | battle | BLM Lv 30 (`slep`, `fire`, `hold`) and WHM (`fear`); `[goblin, goblin]` with `enemyStatus {0: [poison]}` | 5 (overlay + hurt + spell fx + death fade) |
+   | `f_status_combo` | battle | a **Lv 5** BLM (`slep`, `fire`, `hold`) and a Lv 5 WHM (`fear`), plus 2 Lv 5 fighters with no weapons; `[ogre, goblin]` with `enemyStatus {0: [poison]}`. The ogre (120 HP) survives several FIREs, so the overlays, the hurt from `daze` and the effects can be watched before it dies | 5 (overlay + hurt + spell fx + death fade) |
    | `f_enemy_casts` | battle | a Lv 5 party; `[goblin, goblin]` with `enemyAi: {goblin: [{type: magic, spellId: slep, weight: 1}]}` | 5 (party side, inflicted live) |
 
 **F0 tests:**
-- `battleLayers.test.ts`: the layer order;
-- `battleTiming.test.ts`: `holdFrames(x, 5) === x`;
-- `Settings.test.ts`: the default, invalid storage (warns, then defaults), the round trip;
+- `battleLayers.test.ts`: the layer order, and that `hud` covers `actors`;
+- `presentedState.test.ts`: the snapshot rule (item 5 above);
+- `actorTint.test.ts`: the product of sources, and that clearing one keeps the others;
+- `Settings.test.ts`:
+  - default 5;
+  - no `localStorage`: no warning;
+  - a throwing or invalid store: one warning, then the default;
+  - read once (a second `getSettings` doesn't touch storage);
+  - the round trip;
 - `schemaValidationFx.test.ts`: `attack` must be `melee` or `ranged`;
-- `kitsYaml.test.ts`: YAML kits equal the old literals;
+- `kitsYaml.test.ts`: the old keys equal the old literals;
 - `DebugScenarioBattle.test.ts`: `enemyStatus` applies, and an unknown status logs;
-- `wc -l` checks: `BattleDisplayManager.ts` < 250 and `BattleAnimationController.ts` ≤ 308.
+- `battleDevClock.test.ts`: step mode gives `dt` 0 until `.`, then exactly 1; `slow=4` gives `dt / 4`;
+- `enemyPoseFlow.test.ts` and `meleeContact.test.ts`: the compatibility edits above, still green;
+- `wc -l` checks: `BattleDisplayManager.ts` < 250, `BattleAnimationController.ts` ≤ 308, `BattleStateMachine.ts`
+  ≤ 592.
 
 ---
 
@@ -231,19 +342,35 @@ Garland's 250 G and every post-act-1 enemy are unchanged. Sim with the new value
 52.4 G per approach battle. At Lv 2 the party holds a median of **252 G**, p10 **174 G**, and 100 % of runs hold
 ≥ 130 G.
 
-**Acceptance (measured on the merged data):**
+**"Gold in hand" (definition for the test):**
+- It is measured at the end of the battle in which the **last** member reaches Lv 2, after that battle's reward and
+  inn rule.
+- The model **doesn't shop before that moment**: the `fieldPacing` campaign's `shop()` is disabled until Lv 2 for this
+  measurement. So the number is what the player can spend.
 
-| Case (the test: 200 seeded campaigns on the `fieldPacing` model, 400 G kit, sensible, its inn rule. The research sim used a simpler model: 6 fields battles then the approach, inn when someone is down or HP < 45 %, 400 runs) | Bound | Old (sim) | New (sim) |
-|---|---|---|---|
-| median gold in hand when the whole party first reaches Lv 2 | **≥ 220 G** | 144 | 252 |
-| p10 of that gold | **≥ 150 G** | 102 | 174 |
-| share of runs with ≥ 190 G at Lv 2 (a 100 G spell after one inn and one potion) | **≥ 75 %** | < 10 % (p75 was 162) | ≈ 82 % (interpolated between p10 174 and p25 210; measure it) |
-| median battles to whole-party Lv 2 (XP unchanged) | 4–10 (the existing bound) | 5 | 5 |
+**Acceptance (the test: 200 seeded campaigns on the `fieldPacing` model, 400 G kit, sensible play, its inn rule).**
+Momus re-measured the new values on that model. The research sim's simpler model (6 fields battles then the approach,
+inn when someone is down or HP < 45 %, 400 runs) is shown for comparison.
+
+| Case | Bound | Old (research sim) | New, `fieldPacing` model (momus) | New (research sim) |
+|---|---|---|---|---|
+| median gold in hand at whole-party Lv 2 | **≥ 220 G** | 144 | **246** | 252 |
+| p10 of that gold | **≥ 150 G** | 102 | **174** | 174 |
+| share of runs with ≥ 190 G at Lv 2 (a 100 G spell after one inn and one potion) | **≥ 75 %** | < 10 % (p75 162) | **80.5 %** | ≈ 82 % |
+| median battles to whole-party Lv 2 (XP unchanged) | 4–10 (the existing bound) | 5 | 5 | 5 |
 
 **Tests:**
-- **New `tests/balance/economy.test.ts`:** the three gold rows above. They fail on the old data: 144 < 220.
-- **`tests/balance/fieldPacing.test.ts:113-118`:** "200–1200 G after 40 battles" is re-measured and re-set with
-  ≥ 3 % margins. All 8 purchases should now happen, so the bound becomes `bought === 8` if the measurement allows.
+- **New `tests/balance/economy.test.ts`:** the three gold rows above, on the definition above. They fail on the old
+  data (median 144 < 220).
+- **`tests/balance/fieldPacing.test.ts:113-118`** ("200–1200 G after 40 battles, ≥ 7 of 8 purchases"):
+  - Momus measured a mean final gold of **1184 G** with the new values, only 1.3 % under the old 1200 ceiling. The
+    bound becomes **[measured − 25 %, measured + 25 %]**, about **890–1480 G**, rounded outwards and re-measured on
+    the merged tree. Record the old mean in the header.
+  - The purchase bound `≥ 7 of 8` stays, and a **new purchase-timing assertion** replaces the planned
+    `bought === 8`, which would have passed on the old data too. The median battle at which the **4th purchase**
+    (the third Cap) is made must be **≤ 9**. Old data, at about 22–30 G per battle, makes it later (about 12); the
+    implementer measures both and keeps ≥ 1 battle of margin. If the old value doesn't fail, pick the earliest
+    purchase index whose old median fails, and state it.
 - **`tests/data/actOneBalance.test.ts`:** pins the five new `goldReward` values.
 - Check `grep -rn goldReward tests` for tests that read the real data. Most use their own fixtures.
 
@@ -298,20 +425,61 @@ HP. Pure HP was measured too: 480 HP gives Lv 2 64.8 % but a median of 12 rounds
 | careless Lv 1, no gear | ≤ 10 % | 0 % |
 | fight length, sensible Lv 2 lv2-kit wins | median ≤ 11 rounds | median 10, p90 12 (8 / 10) |
 
-This **reverses U-1's "Lv 1 about one in three"** (U triage default 1). It must be reported to the user (FB-2). The
-full-kit rows (`garland.test.ts:87-96`), the "≥ 3 rounds" share (`:57-67`) and the SLEP acted share (`:103-130`, today
-0.402 ± 0.05) are re-measured and re-set with ≥ 3-point margins. If a bound can't be met with a 3-point margin, stop
-and report; don't loosen a bound.
+This **reverses U-1's "Lv 1 about one in three"** (U triage default 1), and must be reported to the user (FB-2). If a
+bound below can't be met with a 3-point margin on the merged tree, stop and report; don't loosen a bound.
+
+**Every existing `garland.test.ts` assertion, with its new bound.** "Momus" values were re-measured by the reviewer
+at 400 HP / phase 0.5; the rest are the research sim's; all are re-measured on the merged tree.
+
+| # | Assertion (line) | Old bound (old value) | New bound | New value |
+|---|---|---|---|---|
+| 1 | mage survival, W.MAG / B.MAG (`:64-66`) | ≥ 0.90 (95.35 / 95.63 %) | ≥ 0.90, unchanged | unchanged (attack and hits unchanged) |
+| 2 | sensible Lv 2, 400 G kit, 0 potions (`:69-70`) | ≥ 0.70 (96.75 %) | **0.60–0.80** (the upper bound catches "too easy" and fails the old data) | 73.0 % (momus) |
+| 3 | sensible Lv 2, full kit, 3 potions (`:69, 71`) | ≥ 0.97 (100 %) | ≥ 0.97, kept (ceiling-limited) | 100 % (momus) |
+| 4 | sensible Lv 1, 400 G kit (`:74-77`) | 0.25–0.55 (36.25 %) | **≤ 0.15** (replaces U-1's band) | 7.3 % |
+| 5 | sensible Lv 3, full kit, 3 potions (`:80-81`) | ≥ 0.97 (100 %) | ≥ 0.97, kept | 100 % (momus) |
+| 6 | Lv 2 full-kit win lasts ≥ 3 rounds in ≥ 90 % of wins (`:84-95`) | ≥ 0.90 (100 %, median 8) | ≥ 0.90, kept; the median is recorded | re-measured (expected 100 %) |
+| 7 | careless Lv 1, no gear (`:97-98`) | ≤ 0.10 (0 %) | ≤ 0.10, kept | 0 % |
+| 8 | careless Lv 1, 400 G kit (`:101-102`) | ≤ 0.07 (3 %) | **≤ 0.04** | 0.25 % (momus) |
+| 9 | careless Lv 2, 400 G kit (`:105-108`) | 0.45–0.60 (52.75 %) | **0.05–0.20** | 12.8 % |
+| 10 | careless Lv 3, 400 G kit (`:105, 110-111`) | 0.85–0.97 (92 %) | **0.55–0.75** | 64.0 % |
+| 11 | sensible Lv 1, full kit, 0 potions (`:114-115`) | ≥ 0.95 (100 %) | ≥ 0.95, kept (4.25-point margin) | 99.25 % (momus) |
+| 12 | temple run, then Garland, Lv 2, 400 G kit, 0 potions: `templeRunWinRate(2, 2, 'start', 0)` (`:118-119`) | ≥ 0.70 (89 %) | **0.55–0.70** | 61.25 % (momus) |
+| 13 | temple run, full kit, 3 shared potions, Lv 2 / Lv 3 (`:122-124`) | ≥ 0.95 each (100 %) | ≥ 0.95 each, kept | 100 % (momus) |
+| 14 | SLEP every round (`:133-159`): ≤ 5 % of battles with no Garland turn; acted share 0.40 ± 0.05; "always wakes" (`:154`) | as listed (0.402) | lockout ≤ 0.05 kept; acted share **re-centred on the new measurement** ± 0.05; the `:154` "always wakes" rule re-checked at 400 HP | re-measured |
+
+**Why row 12 is 0.55–0.70.** The bare 400 G kit after a temple run (no inn) is U's E2E path, and it is now harder by
+design.
+- The lower bound 0.55 (6.25 points under 61.25 %) keeps "more likely than not": a careful player who skips the
+  shops still wins most tries.
+- The upper bound 0.70 (8.75 points over) fails the old data (89 %) and catches a regression back to "too easy".
+- The new-kit temple case (40–58 %, below) is the "real challenge" number; this row is its floor without potions.
+
+**New assertions:**
+
+| Case | Bound | Value |
+|---|---|---|
+| sensible Lv 2, lv2 kit | 0.55–0.75 | 67.8 % |
+| sensible Lv 3, lv2 kit | ≥ 0.85 | 95.0 % |
+| temple run, Lv 2, lv2 kit | 0.40–0.58 | 47.8 % |
+| arrival kit (lv2 + 4 caps), 3 temple battles, Lv 2 | 0.50–0.70 | 57.5 % |
+| median rounds of sensible Lv 2 lv2-kit wins | ≤ 11 | 10 |
 
 **Tests:**
 - **`tests/balance/garland.test.ts`:**
-  - new header and describe title;
+  - the table above;
+  - a new header and describe title;
   - `garlandWinRate` and `templeRunWinRate` take a `KitName` that includes `'lv2'` and `'arrive'`, read from
-    `kits.yaml`, with their potions;
-  - the bounds above.
-  - Old data fails: Lv 2 lv2-kit 95.8 % > 75 %; the 400 G kit 96.75 % > 80 %; Lv 1 36.3 % > 15 %.
-- **`tests/battle/BossPhase.test.ts:3, 32, 37`:** the threshold is read from `enemy('garland').bossPhases[0].hpThreshold`
-  (`floor(threshold × hp)`) instead of the literal 0.25.
+    `kits.yaml` with their potions.
+  - Old data fails rows 2, 4, 9, 10 and 12 and the new lv2-kit row (95.8 % > 75 %).
+- **`kits.yaml` (Fa):** `full` gains **monk** and **red_mage** entries (the sandbox and `makeParty` with other
+  compositions need them):
+  - monk: `wooden_nunchaku`, `leather_armor`, `cap`;
+  - red_mage: `rapier`, `leather_armor`, `cap`, with spells `cure` and `fire`.
+
+  Each must equip with no refusal (checked by `makeMember`).
+- **`tests/battle/BossPhase.test.ts:3, 32, 37`:** the threshold is read from
+  `enemy('garland').bossPhases[0].hpThreshold` (`floor(threshold × hp)`) instead of the literal 0.25.
 - **`tests/data/actOneBalance.test.ts:86-95`:** pins 400 HP, the 0.5 phase and the unchanged rest.
 
 **Browser** (sensible play: CURE below half, LIT/FIRE while he is above 12 HP, a potion below 35 % when no CURE is
@@ -355,14 +523,17 @@ left, otherwise Fight):
   |---|---|---|---|
   | wind | 5 + 6 | `atk_wind1`, `atk_wind2` | 0 → −L/4 (as today) |
   | travel | N = clamp(round(8 + travel/60), 10, 24) | `atk_wind2` / `atk_mid` alternating every 4 frames | −L/4 → travel − L/4, ease-in; hop of 10 px (small), 6 (large) or 3 (boss), × `scaleFactor` |
-  | strike | 3 + 2 + 6 | `atk_mid`, `attack`, `attack` held | → travel + 0.75L → travel + L; **contact at the first `attack` frame = 14 + N** |
+  | strike | 3 + 2 + 6 | `atk_mid`, `attack`, `attack` held | → travel + 0.75L at the **first `attack` frame (contact = 14 + N)**, then travel + L two frames later |
   | follow | 4 + 5 | `atk_follow`, `atk_recover` | travel + L → travel + 0.58L → travel |
   | return | 16 | `atk_recover` for 5, then `idle` | travel → 0, ease-out, hop 8 (like the party's `returnAt`) |
 
   - Total 47 + N frames.
   - `dy` follows `rise` in step with the horizontal progress, as `advanceAt` does for the party
     (`attackChoreography.ts:81-85`).
-  - Travel is in absolute screen px; only the hops and L scale with `scaleFactor`.
+  - Travel is in absolute screen px; only the hops and L scale with `scaleFactor`. `state(i)` returns the two parts
+    separately (F0 item 6): `dx`/`dy` are the scaled lunge, hop and recoil, rounded once; `travelDx`/`travelDy` are the
+    unscaled travel and rise.
+  - Each enemy stores its own `contactAt` (14 + N) and `totalFrames` (47 + N) when `playAttack` starts.
   - `attackOutDone` stays true at contact, and `isAttacking` holds until the return ends, so `round_end` waits
     (`BattleAnimationController.ts:175`).
 - **Death or hit while away:** a hit during the enemy's own attack is ignored (existing rule). If it dies away from
@@ -370,8 +541,9 @@ left, otherwise Fight):
   screen.
 - **D5′ draw order (supersedes D5 for melee travel; decision FB-5):**
   - While a melee enemy is in its attack sequence it is the **top child of `actors`**, above every enemy and party
-    sprite, but below all of `fx` (numbers, flashes, overlays, spell effects) and below the windows that sit in their
-    own layer.
+    sprite. It stays below all of `fx` (numbers, flashes, overlays, spell effects) and below `hud` (the message
+    window). The windows in `ui` sit under the actors as today; the travel never reaches the bottom strip (party
+    feet ≤ 740, strip from 780).
   - On idle, `restoreOrder` puts the actors back in their original order (enemies by index, then party). A
     `swapSprite` during travel stays safe because the restore works from index order (as D5).
   - Ranged enemies keep D5 (raised among enemies only).
@@ -380,7 +552,8 @@ left, otherwise Fight):
 
 **Tests:**
 - **`tests/scenes/battle/enemyChoreography.test.ts`** (extended):
-  - melee with travel 600: contact frame = 14 + N(600) and its dx = 600 + L;
+  - melee with travel 600: contact frame = 14 + N(600); there `travelDx` = 600 and the lunge part = 0.75L; two
+    frames later the lunge part is L;
   - dx rises monotonically through the travel apart from the hop;
   - the last frame is dx 0;
   - total 47 + N;
@@ -388,9 +561,13 @@ left, otherwise Fight):
   - Old: no travel parameter.
 - **New `tests/scenes/battle/enemyTravel.test.ts`:**
   - on real layout boxes (`computeEnemyLayoutAi` for `f_melee_rows`' 6 enemies) and the real `PARTY_X` /
-    `PARTY_FEET_Y`, each enemy attacking each hero ends its contact frame with its opaque right edge within 30 px of
-    the target's left edge + 24, and its feet within 30 px of the target's feet;
-  - with 9 large enemies at `scaleFactor` 0.5 the same holds.
+    `PARTY_FEET_Y`, each enemy attacking each hero has, on its contact frame, its opaque right edge within **50 px**
+    of the target's left edge + 24 (the 0.75L contact leaves 0.25L, at most 10 px for the lich's L = 40, plus 30 px of
+    layout tolerance and margin), and its feet within 30 px of the target's feet;
+  - with 9 large enemies at `scaleFactor` 0.5 the same holds;
+  - a travelling Garland and lich: on every frame of the attack, the sprite is in `actors` and the message window in
+    `hud`, so the message text is drawn over any overlap (the hierarchy is asserted, and the text's bounds are
+    checked for at least one frame where they intersect).
   - Old: about 900 px short.
 - **`tests/scenes/battle/AiEnemyView.test.ts`** (updated to the new spec, not deleted):
   - during a melee attack the attacker is the last child of the actors parent, above a party sprite, and below a
@@ -430,14 +607,22 @@ left, otherwise Fight):
     - for a spell, `spells[spellId]`, else `byEffect[spell.effect]` with the element;
     - for an item, `items[itemId]`;
     - for a ranged enemy attack, `attacks[attackEffect]`.
-  - It spawns the effect on every target sprite, staggered 4 frames for all-target spells, in `fx.spell`.
+  - It reads `info.spellId` / `info.itemId` (F0 item 4), never message text.
+  - It spawns the effect on every sprite of the **target set** (F0 item 4: `targetId`, or the living side captured at
+    announce for `all` / `all_allies`), staggered 4 frames for all-target spells, in `fx.spell`.
+  - For `inflict_<status>` it uses the status diff: the burst plays on every target, and the overlay attaches only
+    where the status **landed**.
+  - `playCue(id, sprite)` plays `glint` and `impact_dust` for item 7's cues.
   - It returns the **impact frame**. `presentAction` runs then, so the number, the glow (`elementFlash`, kept as the
     impact flash), the hurt pose and the result line land on the effect's hit.
   - `emitters.ts`: pure, seeded-RNG particle kinds:
     - `rise` (flames, sparkles, bubbles), `fall` (shards), `bolt` (a jagged polyline from the top of the screen),
       `ring` (expanding pixel rings), `orbit` (stars), `burst`, `beam` (a column of light), `cone` (breath),
       `projectile` (a sprite flying from A to B), `chevrons` (arrows up or down);
-    - every position is snapped to the 2x pixel grid (2 screen px).
+    - every position is snapped to the 2x pixel grid (2 screen px);
+    - **pixel rules:** sprites draw at integer scales only (×2, or ×4 for big bursts); rotation is 0° or 90° only;
+      no blur and no `ColorMatrixFilter` or other filters; fades are stepped alpha (0, 0.25, 0.5, 0.75, 1), never
+      smooth gradients drawn in code.
   - `fxAtlas.ts`: loads `assets/sprites/battle-fx.{png,json}` (nearest). Missing art falls back to `Graphics`
     rectangles in the same palette colours with one `console.warn`, as missing battle art does today.
 - **Art: generated, free (decision FB-6, default).**
@@ -447,7 +632,11 @@ left, otherwise Fight):
     top-left, darkest→lightest), 2–4 frames each, and writes `assets/sprites/battle-fx.png` (×2 nearest) and `.json`.
   - The glyphs: flame tongue, ice shard, spark, bolt joint, sparkle (4-point), ring segment, bubble, Z (3 sizes),
     star, skull wisp, sweat drop, ellipsis bubble, ink puff, question mark, feather, chevron, dust puff, glint, plus
-    the status icons of §3.5.
+    the status icons of §3.5, plus two that used to be loose words:
+    - **heat shimmer:** a 2-frame sheet of 1-px wavy vertical lines in the fire ramp's two lightest colours, drawn over
+      the flames at 50 % stepped alpha;
+    - **glow:** a 3-frame dithered halo (a 50 % checker ring, 2 px thick) in the effect's lightest colour; it replaces
+      the "soft glow" wording for `heal`.
   - Deterministic: the same bytes on two runs. Binary alpha, every pixel on the palette.
   - No paid art and no Bedrock.
 - **Data (`assets/data/spell-effects.yaml`):** `effects` define each effect: emitter kind, glyph, palette ramp,
@@ -455,11 +644,11 @@ left, otherwise Fight):
 
   | Effect id | Used by | Look (60 fps) | Frames / impact |
   |---|---|---|---|
-  | `fire` / `fire_all` | FIRE, FIR2, AFIR (on the ally, as a shield) | 4–6 flame tongues rising from the feet, red→orange→yellow ramp, a heat shimmer flicker | 30 / 18 |
-  | `ice` / `ice_all` | ICE, ICE2, AICE | 5 shards falling and converging, a white frost burst at impact | 32 / 20 |
-  | `lightning` / `lit_all` | LIT, LIT2, ALIT | a 2-flicker bolt from the top edge, a 3-frame screen tint (≤ 2 flashes per cast, no strobing) | 24 / 10 |
+  | `fire` / `fire_all` | FIRE, FIR2 | 4–6 flame tongues rising from the feet, red→orange→yellow ramp, the `shimmer` glyph over them | 30 / 18 |
+  | `ice` / `ice_all` | ICE, ICE2 | 5 shards falling and converging, a white frost burst at impact | 32 / 20 |
+  | `lightning` / `lit_all` | LIT, LIT2 | a 2-flicker bolt from the top edge, a 3-frame screen tint (≤ 2 flashes per cast, no strobing) | 24 / 10 |
   | `holy` | HARM, HRM2 | white rings expanding from the target, sparkles | 30 / 16 |
-  | `heal` / `heal_all` | CURE, CURE2, CURE3, HEAL, Potion, Hi-Potion | green-white sparkles rising around the ally, a soft glow | 32 / 20 |
+  | `heal` / `heal_all` | CURE, CURE2, CURE3, HEAL, Potion, Hi-Potion | green-white sparkles rising around the ally, the `glow` halo | 32 / 20 |
   | `revive` | LIFE, Phoenix Down | a beam of light descending, a feather spiral | 44 / 30 |
   | `buff_def` / `buff_evade` / `buff_atk` / `buff_speed` | FOG, RUSE, INVS, TMPR, FAST | rising chevrons (DEF blue, evade cyan, ATK red, speed yellow), plus a small floating `DEF+` / `EVA+` / `ATK+` / `SPD+` label in the numbers layer | 28 / 14 |
   | `debuff_evade` / `debuff_speed` / `debuff_morale` | LOCK, LOK2, SLOW, FEAR | falling purple chevrons (FEAR: skull wisps) | 28 / 14 |
@@ -500,7 +689,7 @@ left, otherwise Fight):
   - `battle-fx.png` dimensions ≤ 4096.
 
 **Browser:** `?mute=1&scenario=f_spells_white`, `f_spells_black` and `f_items_fx`.
-- Cast every spell and use every item once. Step-mode screenshots (`&slow=4`) of each effect at frame 0, impact and
+- Cast every spell and use every item once. Scene-wide step-mode screenshots (`&battleStep=1`, F0 item 10) of each effect at frame 0, impact and
   tail.
 - Every effect reads as its element or kind at 1x, and the number appears at impact.
 - `f_ranged`: the breath, then the hit.
@@ -527,24 +716,46 @@ left, otherwise Fight):
     entry). Both are planned as reserved hooks.
 
 **Fix part (a), the dazed pose (Ff art + Fe runtime; supersedes D6's "freeze on the base idle" for sleep and stun):**
-- **Two new generated frames per base rig, from one shared recipe** in `monster_anim.py` `RECIPES`
-  (`:38-51`):
-  - `daze`: `{src: idle, toward: hurt, t: 0.25, moves: all, pins: feet, dy: 2}`, plus a shared head-drop tweak
-    (`crown`, `neck` +1 x, +2 y);
+- **Two new generated frames per base rig, from one shared recipe:**
+  - `daze`: `{src: idle, toward: hurt, t: 0.25, moves: all, pins: feet, dy: 2, tweaks: {head: [1, 2]}}`;
   - `daze_b`: the same with `dy: 3` (a slow sway).
 
-  Both obey the near-keyframe rule (|t| ≤ 0.35). The `SEQUENCES` table gains `daze: [idle, daze, daze_b]`.
+  Both obey the near-keyframe rule (|t| ≤ 0.35). `head` in the recipe is a symbolic joint resolved per body template
+  (below).
+- **Framework work in Ff (budgeted, about 3 h, before any rig):**
+  1. **Split first.** Move `RECIPES`, `FRAME_SOURCE`, `SEQUENCES`, `SPAN` and the frame lists out of
+     `monster_anim.py` (`:25-51`) into a new `assets-src/gen/monster_recipes.py`, imported back. `monster_anim.py`
+     drops about 35 lines and stays < 250 with the additions. `selftest.py` passes unchanged after the move.
+  2. **Shared recipe tweaks.** `generate()` (`monster_anim.py`, the `tweaks = dict(over.get("tweaks") or {})` line in
+     the recipe loop) today reads tweaks only from the per-rig override. It merges the recipe's own `tweaks` first,
+     then the rig's override (per joint, added).
+  3. **The head joint per template.** `head` resolves to `crown` and `neck` for bipeds (rigs: goblin, skeleton,
+     pirate, ogre, troll, mummy, vampire, garland, lich). For the quadruped and bird templates (`wolf`, `dragon`,
+     `cockatrice` have no `crown`) it resolves to the template's head-chain joints named in the `rig_templates.py`
+     docstring. A rig with no resolvable head joint **raises an error naming the rig**; it is never skipped silently.
+  4. **Tables:** `SPAN['daze'] = ('idle', 'hurt')`; `SEQUENCES['daze'] = ['idle', 'daze', 'daze_b']`. The
+     continuity checks in `anim_rules.py` iterate `SEQUENCES` by prefix, so the new `daze` and `heavy` (§3.7)
+     sequences are checked like `attack` and `hurt`; a test asserts both are visited.
+  5. **Hold fallback:** a rig that can't pass may declare `holds: [{frame: daze, reason}]`, which aliases `daze` to
+     **`hurt_in1`** (an existing in-between that already reads as a flinch), not to `idle`. `daze_b` then aliases to
+     `daze`. The TS fallback chain (F0 item 7) matches.
 - **No new approved frame and no paid image.** The recipe is shared, so a rig needs no edit unless a check fails;
-  then a per-rig `frames.daze` override, or as a last resort a `holds` alias `daze → hurt_in1` (one legal hold per
-  sequence).
+  then a per-rig `frames.daze` override (tweaks, `t`), at most 2 iterations, then the hold.
 - **Cost per monster:** 0 images. About 0.5 h per base rig (build, `monster_anim.py check`, review sheet, image-only
   reviewer, NEW_MONSTER_GUIDE §3.4). That is 12 base rigs (goblin, wolf, skeleton, pirate, ogre, troll, mummy,
-  cockatrice, vampire, dragon, garland, lich), about 6 h. Variants (`gr_imp`, `gr_wolf`, …) inherit at 0. The atlas
-  grows by 2 cells per sheet; the ≤ 4096 px page check still applies.
+  cockatrice, vampire, dragon, garland, lich), about 6 h, plus the 3 h of framework work. Variants (`gr_imp`,
+  `gr_wolf`, …) inherit at 0. The atlas grows by 2 cells per sheet; the ≤ 4096 px page check still applies. Existing
+  frames and their lock hashes are unchanged: the lock diff shows only the added `daze` / `daze_b` keys.
 - **Runtime:**
-  - `freezeOf` becomes `postureOf(status)` → `'none' | 'daze' | 'stone' | 'tremble'`;
-  - `idleFrame` returns `daze` / `daze_b` alternating every 48 frames for `daze`, `idle` with no breathing for
-    `stone`, and the breathing idle for `tremble`. The view adds ±1 px dx every 4 frames for `tremble`.
+  - `freezeOf` becomes `postureOf(presentedStatuses)` → `'none' | 'daze' | 'stone' | 'tremble'`. It reads the
+    presented snapshot (F0 item 5), not the live tracker.
+  - `idleFrame` returns:
+    - `daze` / `daze_b`, alternating every 48 frames, for `daze`;
+    - `idle` with no breathing for `stone`;
+    - the breathing idle for `tremble`.
+  - **Tremble without drift:** the ±1 px offset is a pure function of the clock, `[0, 1, 0, −1][floor(clock / 4) % 4]`,
+    added to `dx` on top of the base position each frame and never accumulated into it. It averages 0 and is 0 when
+    fear ends.
   - A dazed enemy still recoils when hit (the hurt sequence), then returns to `daze`, never `idle`. A stoned enemy
     shows no pose change and no offset when hit (as D6).
   - E1 is unchanged: a lost turn plays no wind-up; the overlay pulses once at its turn message.
@@ -556,7 +767,7 @@ left, otherwise Fight):
 | sleep | yes | `daze` | "zZz": Z glyphs rising from the head, small→large, every 40 frames, lilac/white ramp | — | Z | overlay; posture: `ready` held, no breathing (FB-7) |
 | stun | yes | `daze` | 3 yellow stars orbiting the head, 48-frame period | — | spark | as enemies |
 | poison | yes | normal | 2–3 green bubbles rising from the body and popping | a faint green pulse (tint 0xc8ffc8, 6 frames every 60) | drop | same |
-| stone | yes | idle, no breathing, no recoil | none | `ColorMatrixFilter` desaturate + tint 0xa8a8a8 | stone | same; party `ready` frozen |
+| stone | yes | idle, no breathing, no recoil | none | **fixed 5-bit grey mapping** (no filter): a cached grey texture per frame (below) | stone | same; party `ready` frozen |
 | blind | yes | normal | 2 dark ink puffs drifting round the head | — | eye-bar | same |
 | silence | yes | normal | an "…" speech bubble with a red slash bobbing beside the head | — | mute | same |
 | fear | yes | `tremble` | blue sweat drops falling from the head | a pale-blue tint 0xd8e4ff | sweat | same, ±1 px tremble |
@@ -577,7 +788,19 @@ left, otherwise Fight):
     (`BattleEffects.ts:86-90`).
   - Their alpha is `base × sprite.alpha`, so they fade with the death fade (`BattleEffects.ts:66-79`). They hide when
     the sprite is invisible, and are destroyed when the actor's sprite is hidden after death.
-  - A stone filter on the sprite leaves the element glow, a separate sprite copy, uncoloured, so hits still read.
+  - **Stone grey mapping (recorded here; no `ColorMatrixFilter`, no filters at all).** Each frame texture of a
+    stoned actor is swapped for a grey copy, built once per texture and cached in `fx/stoneTextures.ts` (a canvas
+    pass).
+    - Every opaque pixel's luma (0.299 R + 0.587 G + 0.114 B) maps to one of 8 greys, the 5-bit levels 3, 7, 11, 15,
+      19, 23, 27, 31 converted as `snes_palette.c15` does, `(v << 3) | (v >> 2)`: **24, 57, 90, 123, 156, 189, 222,
+      255** (R = G = B).
+    - The bands are equal: luma 0–31 → 24, 32–63 → 57, …, 224–255 → 255.
+    - The outline colour (the darkest band) stays 24, so the silhouette reads.
+  - The element glow, a separate sprite copy, takes the coloured texture of the current frame (not the grey one), so
+    hits on a stoned enemy still read.
+  - **Tints** (poison pulse, fear, reserved frozen) go through F0's multiplying `actorTint` with source `status`. They
+    never overwrite the hero pulse or Fc's red heavy-attack pulse, and clearing a status clears only its source.
+    `actorTint` is Fe's file in wave 2.
   - Overlays attach and detach in `statusFx.sync()`, called by `presentAction`. So a SLEP's zZz appears at the
     spell's **impact frame**, a wake-up at its result line, and a cure fades the overlay over 12 frames at the
     cleanse impact.
@@ -587,19 +810,27 @@ left, otherwise Fight):
 - **New `tests/scenes/battle/statusFx.test.ts`**, table-driven over `status-visuals.yaml`. For each real status, on a
   fake enemy and a fake party sprite:
   - after apply plus `sync`, an overlay of the listed emitter kind is in `fx.status`, with the icon count and the
-    tint or filter listed;
+    tint (or, for stone, the grey texture) listed; no actor has a `filters` entry;
   - after removal plus `sync`, it fades out by frame 12 and is destroyed;
   - with `sprite.alpha = 0.5` the overlay alpha is ≤ 0.5 × base; with `sprite.visible = false` it is hidden.
   - Old: no overlays.
 - **`AiEnemyView.test.ts` / `enemyChoreography.test.ts`** (updated, D6 → postures):
   - sleep and stun show `daze` / `daze_b` (not `idle`), still play hurt when hit, and return to `daze`;
   - stone keeps `idle`, offset 0, no recoil;
-  - fear gives dx ∈ {−1, 0, 1}.
+  - fear gives dx ∈ {−1, 0, 1}, and after 400 frames of fear the base position equals the start (no drift).
   - Old: `idle`.
+- **New `tests/scenes/battle/stoneTextures.test.ts`:** a synthetic texture maps to exactly the 8 recorded greys by
+  luma band, transparency is kept, and the cache returns the same texture on a second call.
+- **`actorTint.test.ts`** (Fe extends it): poison pulse × hero pulse multiply; clearing poison leaves the hero pulse.
 - **`actionFx.test.ts`:** SLEP's overlay attaches at its impact frame, not at resolve.
 - **`tests/data/statusVisuals.test.ts`:** every `StatusEffect` except `death` has an entry; `reserved` entries are not
   in `StatusEffect`; every icon and glyph is in `battle-fx.json`.
+- **Icons and glyphs:** Fe adds its icons and overlay glyphs to `assets-src/fx/glyphs.py` after Fd merges, and **owns
+  the `battle-fx.*` rebuild** from then on (`build_assets.py fx`, twice, no diff the second time; `assets-src/fx/selftest.py`).
 - **Art (Ff):**
+  - `monster_recipes.py` split: `selftest.py` passes before and after the move with no other change;
+  - a rig with no resolvable head joint fails `monster_anim.py check` with the rig's name (synthetic case in
+    `selftest.py`);
   - `assetCoverage.test.ts`: every sheet has `daze` and `daze_b` (the `LATE_FRAMES` exclusion removed);
   - `monster_anim.py check --all` passes;
   - `selftest.py` gains a synthetic `daze` render that fails a feet move of 1 px and |t| > 0.35;
@@ -607,7 +838,7 @@ left, otherwise Fight):
 
 **Browser:**
 - `?mute=1&scenario=f_status_enemies`: one screenshot showing all seven: zZz, bubbles, stars, ink, bubble, sweat, and
-  grey stone. Step-mode (`&enemyAnim=step`) frames of `daze` / `daze_b` for goblin, wolf and skeleton.
+  grey stone. Step-mode (`&battleStep=1`, which also steps the overlays) frames of `daze` / `daze_b` for goblin, wolf and skeleton.
 - `f_status_party`: the four party overlays and the panel tags.
 - `f_enemy_casts`: the goblins' SLEP lands on a hero; the zZz appears at the impact frame.
 - `f_status_combo`: SLEP the poisoned goblin (zZz + bubbles), FIRE it (flame effect over the overlays, hurt recoil
@@ -668,7 +899,8 @@ left, otherwise Fight):
   - enemy melee hit: **140–180**;
   - each extra result line: +60 ± 2.
   - Old: 95 and 80, which fail.
-- At speed 5, the party Fight takes ≤ 110 % of today's 95 frames.
+- At speed 5, the party Fight takes **≤ 112 %** of today's 95 frames (≤ 106). The new 8-frame beat is the only
+  addition at that speed.
 - One confirm press ends the current hold within 1 frame; two presses never skip two lines.
 - `Settings` default 3; ConfigScene changes and persists it; an unreadable store warns and uses 3.
 - `BattlePartyPanel.test`: after 30 damage the HP text reads intermediate values for 20 frames and the final value
@@ -697,24 +929,26 @@ left, otherwise Fight):
   it (rotating arm and blade 120°) breaks the 30° rotation cap and tears the cape.
 - The timing gives bosses the same 31-frame attack as a goblin (`enemyChoreography.ts:28-36`).
 
-**Fix (two parts; decision FB-8):**
-- **(a) Free, ships with Fc regardless:** a `HEAVY_ATTACK` timeline for `attackAnim: heavy`. It uses the new frame
-  names with their F0 fallbacks: `atk_raise_in` → `idle`, `attack_raise` and `atk_raise_b` → `idle` (shown as a long
-  coil on `atk_wind2` via the per-sheet alias), `atk_swing` → `attack`.
-  - It adds a **glint** fx at the sprite's top (Fd `glint`), a red pulse on the sprite during the hold, an
-    **8-frame screen shake** (6 px, decaying) and `impact_dust` at contact.
+**Fix (two parts; binding decision FB-8):**
+- **(a) Free, ships with Fc regardless:** a `HEAVY_ATTACK` timeline for `attackAnim: heavy`.
+  - When the sheet has no `attack_raise` (`hasRaise` false, F0 item 7), the raise segments show the existing frames:
+    `atk_raise_in` → `atk_wind1`, the hold → **`atk_wind2`** (a long coil), and `atk_swing` / `atk_swing2` →
+    `atk_mid`.
+  - It adds a **glint** at the sprite's top on the `hold` cue (`ActionFx.playCue('glint')`, Fd), a red pulse during
+    the hold (`actorTint` source `pulse`, 0xffb0b0, stepped), an **8-frame screen shake** (6 px, decaying) and
+    `impact_dust` on the `contact` cue.
   - Even before the art lands, Garland visibly coils, holds and slams.
-- **(b) Art (Ff), the real raise:**
+- **(b) Art (Ff), the real raise. Both Garland and the lich (binding FB-8):**
   - One new approved keyframe per boss, `attack_raise`, generated with Gemini through the existing per-pose boss
     pipeline. It is sent with the approved `boss_idle` as the identity reference (NEW_MONSTER_GUIDE §1.2), one request
-    per review checkpoint.
+    per review checkpoint (`--paid --max-paid 1`).
   - **Framework (≤ +6 lines each):**
     - `spec.py:281` `BOSS_POSES` gains `"attack_raise"`;
     - `monsters.yaml` gains an `attack_raise:` prompt per boss;
     - `generate.py:251-252` lists it;
     - `approve.py` accepts `boss_attack_raise`;
-    - `monster_anim.py` `KEYFRAMES` gains it as an optional key;
-    - `build_assets.py monsters_ai` packs it plus the generated frames below.
+    - `monster_recipes.py` `KEYFRAMES` gains it as an optional key;
+    - `build_assets.py monsters_ai` packs it plus the generated frames below, and writes `hasRaise`.
   - The dry run must report **cached** for every existing pose and **PAID 1** only for `boss_attack_raise`. If an
     existing cache key changes, stop.
   - Prompts (house style and outline as the other poses):
@@ -724,13 +958,21 @@ left, otherwise Fight):
     - lich: "the wind-up of an overhead glaive strike: he rises to full height, both gauntlets lifting the ice glaive
       high above his crowned skull, the blade swept back behind his head, mantle lifting, a short frost trail curling
       off the blade".
-  - **Cost:** 2 paid images (garland, lich). Retries need user approval (`--retry`) and are capped at 3 attempts per
-    sheet (`budget.json`), so the worst case is 6. **Budget: 26 → 28 of 100** (worst case 32).
-  - Garland is act 1 (inside the unattended act-1 run's self-approval). The **lich is not act 1**, so his request
-    waits for the user (FB-8).
-  - Base-sheet review checklist as NEW_MONSTER_GUIDE §1.4: band height, feet row, headroom for the raised blade
-    (≥ 10 px below the top border), one palette with the other four poses, `pose_diff` ≥ 15 % against `idle` and
-    `attack`.
+  - **Budget (binding):**
+    - **1 paid image per boss**: `garland/boss_attack_raise`, then `lich/boss_attack_raise`.
+    - **At most 1 retry per boss**, and only after that image **fails** the base-sheet review below. The failure is
+      written in `docs/ACT1_LOG.md` before the retry (`--retry`, seed + 1).
+    - **At most 4 Gemini attempts in total**, so the budget ends at **≤ 30 of 100**.
+    - No further retries without asking the user. If a retry also fails, that boss keeps the free fallback (a) and the
+      failure is reported.
+    - `budget.json` would allow 3 attempts per sheet, so the §7 ledger check enforces pass F's own caps: at most the
+      current Gemini count + 4 in total, at most 2 per new sheet.
+  - **Base-sheet review checklist** (NEW_MONSTER_GUIDE §1.4), all of which must hold:
+    - the figure height is in the band and the feet are on the band's row;
+    - there is headroom for the raised blade (≥ 10 px below the top border);
+    - it shares one palette with the other four poses;
+    - `pose_diff` is ≥ 15 % against both `idle` and `attack`;
+    - it faces right, has binary alpha, and the weapon is whole.
   - **Generated in-betweens** (rig, near-keyframe rule):
 
     | Frame | Pixel source | Toward | t |
@@ -738,44 +980,57 @@ left, otherwise Fight):
     | `atk_raise_in` | idle | attack_raise | 0.35 |
     | `atk_raise_b` | attack_raise | — | body 1 px down (a trembling hold) |
     | `atk_swing` | attack_raise | attack | 0.35 |
+    | `atk_swing2` | attack | attack_raise | 0.35 (the heavy mid frame) |
 
-    `atk_mid` for heavy sheets is re-sourced to `attack → attack_raise`, t 0.35 (a per-rig `toward` override, a small
-    framework change in `monster_anim.py`). The rigs gain `keyframes.attack_raise.<joints>` (marked with
-    `monster_anim.py mark`). Re-lock: `git diff` of `garland.lock.json` / `lich.lock.json` shows **only added keys**,
-    and the existing frame hashes are unchanged.
+    - `atk_swing2` is a **new name**. The existing `atk_mid` is not re-sourced, so its lock hash and the normal
+      attack are unchanged.
+    - A new `heavy` sequence `[idle, atk_raise_in, attack_raise, atk_swing, atk_swing2, attack, atk_follow,
+      atk_recover, idle]` goes in `monster_recipes.py` `SEQUENCES`, so `anim_rules.py` checks its continuity
+      (adjacent IoU, centroid, feet) like the attack sequence.
+    - The rigs gain `keyframes.attack_raise.<joints>` (marked with `monster_anim.py mark`).
+    - Re-lock: `git diff` of `garland.lock.json` / `lich.lock.json` shows **only added keys** (`attack_raise`'s four
+      in-betweens, and `daze` / `daze_b` from item 5). Every existing frame hash is unchanged.
 - **`HEAVY_ATTACK` timeline (`enemyChoreography.ts`, Fc), Garland and the lich only:**
 
-  | Seg | Frames | Pose | dx |
+  | Seg | Frames | Pose (with `hasRaise`; the fallback in brackets) | dx |
   |---|---|---|---|
-  | travel (melee, item 3) | N | `atk_wind1` / `atk_wind2` alternating, hop 3 | 0 → travel |
-  | raise | 6 | `atk_raise_in` | travel → travel − L/6 |
-  | hold (the telegraph) | 18 | `attack_raise` / `atk_raise_b` every 4 frames; `glint` at frame 4; red pulse | travel − L/4 |
-  | swing | 3 + 2 | `atk_swing`, `atk_mid` | → travel + 0.75L |
-  | slam | 12 | `attack`; **contact at its first frame = N + 29**; screen shake 8 frames; `impact_dust` | travel + L |
-  | follow | 6 + 6 | `atk_follow`, `atk_recover` | → travel |
-  | return | 16 | `idle` | → 0 |
+  | travel (melee, item 3) | N | `atk_wind1` / `atk_wind2` alternating, hop 3 | travel part 0 → travel |
+  | raise | 6 | `atk_raise_in` (`atk_wind1`) | lunge part 0 → −L/6 |
+  | hold (the telegraph) | 18 | `attack_raise` / `atk_raise_b` every 4 frames (`atk_wind2`); **`hold` cue** at its first frame (the glint plays 4 frames later); red pulse | −L/4 |
+  | swing | 3 + 2 | `atk_swing`, `atk_swing2` (`atk_mid`, `atk_mid`) | → 0.75L |
+  | slam | 12 | `attack`; **contact at its first frame = N + 29**, raising the **`contact` cue** (shake 8 frames, `impact_dust`) | 0.75L → L |
+  | follow | 6 + 6 | `atk_follow`, `atk_recover` | → 0 (the lunge part) |
+  | return | 16 | `idle` | travel part → 0 |
 
-  The total is N + 69 frames (about 1.5 s at N = 20). The boss cast table is unchanged. The screen shake offsets
-  `layers.actors` and `layers.fx` only (never the windows), and `battleLayers.test` checks that it returns to 0.
+  - The total is N + 69 frames (about 1.5 s at N = 20), stored per enemy as `contactAt` / `totalFrames` (F0 item 6).
+  - The boss cast table is unchanged.
+  - The screen shake offsets `layers.actors` and `layers.fx` only, never `ui` or `hud`. It runs from
+    `layers.update(dt)`, and `screenShake.test` checks that it returns to 0.
 
 **Tests:**
 - **`enemyChoreography.test.ts`:**
-  - the heavy table: contact at N + 29, the hold of 18 frames shows `attack_raise` / `atk_raise_b`, total N + 69;
-  - with an atlas lacking the frames, `FRAME_SOURCE` gives `idle` / `attack` (no crash);
+  - the heavy table: contact at N + 29; the 18-frame hold shows `attack_raise` / `atk_raise_b` with `hasRaise`, and
+    `atk_wind2` without; total N + 69;
+  - the `hold` and `contact` cues fire exactly once each, on the frames above;
+  - with an atlas lacking the frames, the fallback chain resolves with no crash;
   - a non-heavy enemy keeps `MELEE_ATTACK`.
 - **`enemyPoseFlow.test.ts`:** Garland's action resolves at N + 29.
-- **`tests/scenes/battle/screenShake.test.ts`:** offsets in [−6, 6], decaying to 0 by frame 8; windows never move.
+- **`tests/scenes/battle/screenShake.test.ts`:** offsets in [−6, 6], decaying to 0 by frame 8; `ui` and `hud` never
+  move.
 - **Art (Ff):**
-  - `assetCoverage.test.ts`: the garland and lich sheets have `attack_raise`, `atk_raise_in`, `atk_raise_b` and
-    `atk_swing`;
-  - `monster_anim.py check garland lich` passes;
+  - `assetCoverage.test.ts`: the garland and lich sheets have `attack_raise`, `atk_raise_in`, `atk_raise_b`,
+    `atk_swing` and `atk_swing2`, and `hasRaise: true` (or, for a boss whose image failed twice, `hasRaise: false`
+    with the fallback aliases, recorded);
+  - `monster_anim.py check garland lich` passes, including the `heavy` sequence;
   - `selftest.py`'s style lock is unchanged for every pre-existing `approved/**` file, and the new
-    `approved/garland/boss_attack_raise.*` is recorded;
-  - the ledger has exactly the approved new entries.
+    `approved/{garland,lich}/boss_attack_raise.*` are recorded;
+  - **the ledger check (§7):** at most 4 new Gemini attempts in total, at most 2 per new sheet, and each one is
+    logged in `docs/ACT1_LOG.md`.
 
 **Browser:**
-- `?mute=1&scenario=f_heavy_garland&enemyAnim=step`: screenshots at raise, hold (glint), swing and contact (shake).
-  Then a real round with `&enemyAnim=` unset: the raise reads at 1x and the slam lands on the hero's row.
+- `?mute=1&scenario=f_heavy_garland&battleStep=1` (scene-wide, so the glint and shake step too): screenshots at the
+  raise, the hold (glint), the swing and contact (shake). Then a real round without `battleStep`: the raise reads at
+  1x and the slam lands on the hero's row.
 - `f_heavy_lich`: the same.
 - With the art not yet built (Fc alone), the same scenarios show the coil-hold-slam fallback with no console warning
   beyond the existing missing-frame one.
@@ -822,7 +1077,8 @@ left, otherwise Fight):
   5. Background (auto, or any committed `assets/backgrounds/*.webp`);
   6. Message speed (item 6);
   7. **Fight!**
-  8. A results line: this session's W / L / escape per configuration, with the last battle's rounds and party HP %.
+  8. **Title** (back to the title screen; X does the same);
+  9. a results line: this session's W / L / escape per configuration, with the last battle's rounds and party HP %.
 - **Party scaling** uses the existing class growth: `new Character({ classData, level })`, gear and spells from the
   kit (`slotOf` + `equip`, `learnSpell`, as `DebugScenarioLoader.applyParty`, `:93-137`). That party builder moves to
   a shared `src/systems/debugParty.ts` used by both. A class the kit doesn't list gets `naked` and a `console.warn`.
@@ -840,7 +1096,7 @@ left, otherwise Fight):
     kit);
   - "Custom" caps at 9;
   - parsing the deep link and unknown ids.
-- **`tests/data/crossFileValidation.test.ts`** (a new `it`, in a new `tests/data/debugSandbox.test.ts`): every level's
+- **New `tests/data/debugSandbox.test.ts`:** every level's
   enemy, item, kit and background id exists.
 - **`tests/scenes/TitleScene.test.ts`:**
   - Debug without `?scenario=` pushes `debugSandbox`;
@@ -848,7 +1104,12 @@ left, otherwise Fight):
   - Old: always the first scenario.
 - **New `tests/systems/debugSandboxBattle.test.ts`:** with a fake BattleTrigger, a defeat ends in
   `switchTo('debugSandbox')` with no `gameover` and the tally L + 1. The same for victory and escape.
-- **Build check:** after `npm run build`, `grep -r "debugSandbox" dist/assets/*.js` finds nothing.
+- **Dev gate:** `TitleScene.ts:91`'s debug branch (`value === 'debug'`, `:91-100`) is wrapped in
+  `if (import.meta.env.DEV)`, so Vite drops its dynamic imports (`DebugScenarioLoader`, the sandbox) from production.
+  The item at `:57` is already dev-only.
+- **Build check:** after `npm run build`, `grep -rl "debugSandbox\|DebugScenarioLoader" dist/assets/*.js` finds
+  nothing. Run the same check on `6d8ef65` first and record the result. If the old build already passes it (Vite
+  may drop the chunk), the gate is defence in depth, and `TitleScene.test.ts` covers the routing instead.
 
 **Browser:** `http://127.0.0.1:5173/?mute=1`, then Debug.
 - The sandbox opens on "Fight!". Pick `l2_garland`, WAR / THF / WHM / BLM, kit lv2, Fight, lose or win; the sandbox
@@ -864,14 +1125,14 @@ left, otherwise Fight):
 
 | # | Items | Owns (source, data, tests) | Depends on |
 |---|---|---|---|
-| F0 | the contract (§2) | new `battleTiming.ts`, `Settings.ts`, `BattleLayers.ts`, `BattleEnemyList.ts`, `fx/index.ts`, `schemaValidationFx.ts`, the stub `ConfigScene.ts` / `DebugSandboxScene.ts`; edits to `BattleAnimationController.ts` (split, hooks, constants out), `BattleScene.ts` (layers, factories, `enemyStatus`), `BattleDisplayManager.ts` (extract, layers), `BattleEffects.ts` (layers), `AiEnemyView.ts` (`playAttack(i, target)` pass-through), `enemyChoreography.ts` (frame names, `LATE_FRAMES`), `battleMessageUtils.ts` (`formatAnnouncement` moved), `types/index.ts`, `DataLoader.ts`, `schemaValidation.ts` (+2), `main.ts`, `BattleTrigger.ts` / `DebugScenarioLoader.ts` (`enemyStatus`), `enemies.yaml` (the new fields only), the new `spell-effects.yaml` / `status-visuals.yaml` / `kits.yaml` (empty or copied), `debug-scenarios.yaml`, `tests/helpers/balanceData.ts` (reads `kits.yaml`), `assetCoverage.test.ts` (`LATE_FRAMES`), the F0 tests | none; first commit |
+| F0 | the contract (§2) | new `battleTiming.ts`, `Settings.ts`, `BattleLayers.ts`, `BattleEnemyList.ts`, `actorTint.ts`, `battleDevClock.ts`, `fx/index.ts`, `schemaValidationFx.ts`, the stub `ConfigScene.ts` / `DebugSandboxScene.ts`; edits to `BattleStateMachine.ts` (`spellId?` / `itemId?` only, ≤ 592), `BattleSceneTypes.ts` (`enemyStatus`), `BattleAnimationController.ts` (split, effect phase, status diff, cue hand-off, constants out and re-exported, Container constructor kept), `BattleScene.ts` (layers incl. `hud`, factories, `layers.update`, dev clock, `enemyStatus`), `BattleDisplayManager.ts` (extract with delegating getters, layers, presented snapshot), `BattleEffects.ts` (layers), `ActiveHeroMarker.ts` (via `actorTint`), `AiEnemyView.ts` (`playAttack(i, target)` pass-through, split offsets), `EnemyPoseController.ts` (split offsets, per-enemy `contactAt` / `totalFrames`, `onCue`), `enemyChoreography.ts` (frame names, fallback chain, `LATE_FRAMES`), `BattleArt.ts` (`hasRaise`, fallback chain), `enemyAnimPreview.ts` (moved onto the dev clock), `battleMessageUtils.ts` (`formatAnnouncement` moved), `types/index.ts`, `DataLoader.ts`, `schemaValidation.ts` (+2), `main.ts`, `BattleTrigger.ts` / `DebugScenarioLoader.ts` (`enemyStatus`), `enemies.yaml` (the new fields only), the new `spell-effects.yaml` (seeded `fire_breath`) / `status-visuals.yaml` / `kits.yaml`, `debug-scenarios.yaml`, `tests/helpers/balanceData.ts` (reads `kits.yaml`), new `tests/helpers/battleLayers.ts`, `assetCoverage.test.ts` (`LATE_FRAMES`); the compatibility edits to `meleeContact.test.ts:73` and `enemyPoseFlow.test.ts`; the F0 tests (§2) | none; first commit |
 | Fa | 1, then 2 | `assets/data/{enemies,kits}.yaml` (gold, Garland, the `lv2` and `arrive` kits); `tests/balance/**`, `tests/data/actOneBalance.test.ts`, `tests/battle/BossPhase.test.ts`, `tests/helpers/{balanceData,battlePolicies}.ts` | F0 |
-| Fb | 6 (+ 6b) | `battleTiming.ts` (values), `Settings.ts`, `BattleScene.ts`, `BattleAnimationController.ts`, `BattlePartyPanel.ts`, `floatingNumbers.ts`, `ConfigScene.ts`, `FieldMenuScene.ts`; `ControlsHint.ts` (the two silent catches); tests `battlePacing`, `Settings`, `BattlePartyPanel`, `FieldMenuScene`, `BattleScene` | F0 |
+| Fb | 6 (+ 6b) | `battleTiming.ts` (values, multipliers), `Settings.ts` (default 3), `BattleScene.ts`, `BattleAnimationController.ts`, `BattlePartyPanel.ts`, `floatingNumbers.ts`, `ConfigScene.ts`, `FieldMenuScene.ts`; `ControlsHint.ts` (the two silent catches); tests `battleTiming` (new), `battlePacing`, `Settings`, `BattlePartyPanel`, `FieldMenuScene`, `BattleScene` | F0 |
 | Fc | 3, 7 (runtime) | `enemyChoreography.ts`, `EnemyPoseController.ts`, `AiEnemyView.ts`, new `enemyReach.ts`, new `screenShake.ts`, `enemyAnimPreview.ts`, `BattleArt.ts` (meta `opaqueRight`, `head`), `BattleLayers.ts` (the shake offset); tests `enemyChoreography`, `EnemyPoseController`, `enemyPoseFlow`, `AiEnemyView`, `enemyTravel`, `screenShake`, `enemyAttack` | F0; final tuning after Fb merges |
 | Fd | 4 | `src/scenes/battle/fx/**` (except the `createStatusFx` body), `BattleEffects.ts`, `assets/data/spell-effects.yaml`, new `assets-src/fx/**`, `build_assets.py` (≤ 3 lines), `assets/sprites/battle-fx.*`; tests `actionFx`, `spellEffects`, `assets-src/fx/selftest.py` | F0; final tuning after Fb |
-| Ff | 5a, 7 (art) | `assets-src/gen/**` framework (`monster_anim.py`, `spec.py`, `generate.py`, `approve.py`, `selftest.py`, `monsters.yaml`), every `anim/monsters/*.yaml` / `*.lock.json`, the new `approved/{garland,lich}/boss_attack_raise.*`, `cache/**`, `ledger.jsonl`, `build_assets.py` `monsters_ai` (line-neutral), `assets/sprites/monsters-ai.*`; `assetCoverage.test.ts` (drops `LATE_FRAMES`); `docs/ACT1_LOG.md` entry | F0; the paid requests wait for FB-8 |
-| Fg | 8 | `src/scenes/debugSandbox/**`, new `src/systems/debugParty.ts`, `DebugScenarioLoader.ts`, `BattleTrigger.ts` (`onEnd`), `TitleScene.ts`, `assets/data/debug-sandbox.yaml`; tests `sandboxModel`, `debugSandbox` (data), `TitleScene`, `debugSandboxBattle`, `DebugScenarioBattle` | F0 |
-| Fe | 5b (+ 5a runtime) | `fx/statusFx.ts`, `fx/statusIcons.ts`, the `createStatusFx` body, `assets/data/status-visuals.yaml`, `AiEnemyView.ts` / `enemyChoreography.ts` / `EnemyPoseController.ts` (postures; taken over from Fc after it merges), `BattleDisplayManager.ts` (party posture), `BattleFieldTargeting.ts` (the tags on the target line); fx glyphs for the icons (via Fd's `assets-src/fx/glyphs.py`, taken over after Fd merges); tests `statusFx`, `statusVisuals`, `AiEnemyView`, `enemyChoreography` | Fc, Fd (merged); Ff for the real `daze` frames (falls back until then) |
+| Ff | 5a, 7 (art) | `assets-src/gen/**` framework (new `monster_recipes.py`, `monster_anim.py`, `anim_rules.py` (sequence prefix), `rig_templates.py` (head joints), `spec.py`, `generate.py`, `approve.py`, `selftest.py`, `monsters.yaml`), every `anim/monsters/*.yaml` / `*.lock.json`, the new `approved/{garland,lich}/boss_attack_raise.*`, `cache/**`, `ledger.jsonl`, `build_assets.py` `monsters_ai` (line-neutral; `hasRaise`, `opaqueRight`, `head` meta), `assets/sprites/monsters-ai.*`; `assetCoverage.test.ts` (drops `LATE_FRAMES`); `docs/ACT1_LOG.md` entries | F0; the paid requests follow binding FB-8 (garland and lich, ≤ 4 attempts) |
+| Fg | 8 | `src/scenes/debugSandbox/**`, new `src/systems/debugParty.ts`, `DebugScenarioLoader.ts`, `BattleTrigger.ts` (`onEnd`), `TitleScene.ts` (routing, the `import.meta.env.DEV` gate), `assets/data/debug-sandbox.yaml`; tests `tests/scenes/debugSandbox/sandboxModel.test.ts`, `tests/data/debugSandbox.test.ts`, `TitleScene`, `debugSandboxBattle`, `DebugScenarioBattle` | F0; Fa merged first (the `lv2` kit) |
+| Fe | 5b (+ 5a runtime) | `fx/statusFx.ts`, `fx/statusIcons.ts`, `fx/stoneTextures.ts`, the `createStatusFx` body, `actorTint.ts` (taken over from F0), `assets/data/status-visuals.yaml`, `AiEnemyView.ts` / `enemyChoreography.ts` / `EnemyPoseController.ts` (postures; taken over from Fc after it merges), `BattleDisplayManager.ts` (party posture), `BattleFieldTargeting.ts` (the tags on the target line), `assets-src/fx/glyphs.py` (icons and overlay glyphs) and the **`battle-fx.*` rebuild** (taken over from Fd after it merges); tests `statusFx`, `statusVisuals`, `stoneTextures`, `actorTint`, `AiEnemyView`, `enemyChoreography` | Fc, Fd (merged); Ff for the real `daze` frames (falls back until then) |
 
 **No file is shared within a wave:**
 - Wave 1 is Fa, Fb, Fc, Fd, Ff and Fg. `BattleAnimationController.ts` and `BattleScene.ts` are Fb's only. Fc and Fd
@@ -881,6 +1142,9 @@ left, otherwise Fight):
   lives in `assets-src/gen/`). If Ff needs a line there, it goes through the orchestrator after Fd's merge.
 - `assetCoverage.test.ts` is F0's, then Ff's.
 - `debug-scenarios.yaml` is frozen after F0.
+- `BattleStateMachine.ts` is edited by F0 only (the 4-line `spellId?` / `itemId?` change).
+- `actorTint.ts` is F0's, then Fe's (wave 2). Fb and Fc only call it.
+- `assets-src/fx/**` and `battle-fx.*` are Fd's in wave 1, then Fe's.
 
 **Order:**
 1. F0.
@@ -933,7 +1197,7 @@ records a verdict.
 | A6 | Travel edge cases | the target dies earlier in the round (retarget, B2/B6) while another enemy is about to attack it; the party member is KO'd (no target) | the travel measures the resolved target; no travel to an empty slot; no console error |
 | A7 | Ranged | `f_ranged` | the dragon breathes in place; the breath hits the right hero; no travel |
 | A8 | Heavy attack | `f_heavy_garland`, `f_heavy_lich`, step mode and real time | raise, hold, glint, slam and shake read; the art has no tears or pops (image-only reviewer, NEW_MONSTER_GUIDE §3.4); the windows don't shake |
-| A9 | Every spell and item | `f_spells_white`, `f_spells_black`, `f_items_fx` | each effect reads as its kind at 1x; the number appears at impact; Miss and No effect show at impact |
+| A9 | Every spell and item | `f_spells_white`, `f_spells_black`, `f_items_fx` | each effect reads as its kind at 1x; the number appears at impact; Miss and No effect show at impact; a lethal spell's target stays standing and opaque until impact (presented snapshot), and a KO'd hero drops to `down` only at impact |
 | A10 | Every status, both sides | `f_status_enemies`, `f_status_party`, `f_enemy_casts`, `anim_status` | each status's overlay, icon, tint and posture as the §3.5 table; the panel tags agree with the icons |
 | A11 | Composition | `f_status_combo`: SLEP + poison, FIRE (effect over the overlays), hurt from `daze`, death fade; also stone + element glow; a feared goblin that does attack travels with its tremble and sweat overlay following it | no overlay left floating after death; draw order status < spell < flash < numbers; no flicker |
 | A12 | Daze art | step-mode frames of `daze` / `daze_b` for all 12 base sprites (`anim_bipeds`, `anim_large`, `anim_beasts`, bosses) | the image-only reviewer passes each; feet don't move |
@@ -957,8 +1221,11 @@ python3 -I assets-src/build_assets.py monsters_ai fx && python3 -I assets-src/bu
 git diff --stat assets-src/gen/approved/        # only new boss_attack_raise.* files
 wc -l src/scenes/BattleScene.ts src/battle/BattleStateMachine.ts src/scenes/battle/BattleAnimationController.ts \
   src/scenes/battle/BattleDisplayManager.ts src/battle/SpellExecutor.ts      # 594 / 592 / 308 / <250 / 314
-git diff --name-only --diff-filter=A | xargs wc -l    # every new file < 250
-# Paid images: the ACT1_LOG line and the ledger agree (26 + the approved item 7 requests)
+git diff --name-only --diff-filter=A 6d8ef65..HEAD | grep -E '\.(ts|py)$' | xargs wc -l   # every new source file < 250
+# Paid images (binding FB-8): count Gemini attempts in the ledger before Ff and after it.
+#   after - before <= 4 in total, <= 2 for each of boss_attack_raise (garland) and boss_attack_raise (lich),
+#   and the ACT1_LOG "Images used" line reads <= 30 of 100 and matches the ledger guard
+python3 -I -c "import json; r=[json.loads(l) for l in open('assets-src/gen/cache/ledger.jsonl')]; print(sum('gemini' in json.dumps(x) for x in r))"
 ```
 
 Browser: every check in §3 and §6, with `?mute=1` and 0 console errors.
@@ -967,8 +1234,8 @@ Browser: every check in §3 and §6, with `?mute=1` and 0 console errors.
 
 ## 8. Decisions for the orchestrator
 
-Each decision has a recommended default. The orchestrator proceeds on the defaults unless told otherwise. FB-2 and
-FB-8 are reported to the user.
+Each decision has a recommended default. The orchestrator proceeds on the defaults unless told otherwise. FB-8 is
+binding as changed in "Orchestrator decisions"; FB-2 is reported to the user.
 
 1. **FB-1, gold (item 1):**
    - **Default:** raise the act-1 `goldReward` values in `enemies.yaml` about 2× (12 / 12 / 30 / 10 / 44).
@@ -996,11 +1263,11 @@ FB-8 are reported to the user.
    - **Default:** `ready` held with no breathing, plus the overlay. Code only, 0 cost.
    - Alternative: a puppet `daze` pose for the party (0 images, `gen/puppet.py` recipe for 12 classes, about 4 h of
      review).
-8. **FB-8, paid art (item 7):**
-   - **Default:** 1 Gemini image for `garland/boss_attack_raise` (act 1, inside the unattended run's self-approval).
-   - The `lich/boss_attack_raise` request waits for the user (not act 1).
-   - Retries only with user approval. Budget 26 → 28 of 100 (worst 32).
-   - The free coil-hold-slam fallback ships either way.
+8. **FB-8, paid art (item 7), binding (see "Orchestrator decisions"):**
+   - Both Garland and the lich get one paid `attack_raise` image; the user asked for the lich too.
+   - Each may have at most one retry, and only after its first image fails the base-sheet review.
+   - At most 4 images in total, so the budget ends at ≤ 30 of 100. No further retries without asking the user.
+   - The free coil-hold-slam fallback ships either way, and stays for a boss whose retry also fails.
 9. **FB-9, sandbox (item 8):**
    - **Default:** dev only; every outcome returns to the sandbox; the last configuration persists; `?scenario=` stays
      direct; `?sandbox=` deep links.
@@ -1035,15 +1302,16 @@ FB-8 are reported to the user.
 
 ## 10. TODOs
 
-- [ ] F0: contract commit (timing, settings, layers, action split and hooks, data fields and files, `f_*` scenarios, stubs, extractions) (priority: high, effort: 5h)
+- [ ] F0: contract commit (timing, settings, layers incl. `hud`, action data and split, presented snapshot, cues and split offsets, frame names and fallbacks, `actorTint`, dev clock, data fields and files, `f_*` scenarios, stubs, extractions, compatibility edits) (priority: high, effort: 8h)
 - [ ] Fa: item 1 gold values and `economy.test.ts`; `fieldPacing` re-set (priority: high, effort: 2h)
 - [ ] Fa: item 2 `lv2` / `arrive` kits, Garland 400 HP and phase 0.5, `garland.test.ts` / `BossPhase` / `actOneBalance` re-measured (priority: high, effort: 4h)
 - [ ] Fb: item 6 hold table, message speed, ConfigScene, `battlePacing.test.ts`; 6b HP roll (priority: high, effort: 4h)
 - [ ] Fc: item 3 travel, `MELEE_ATTACK`, D5′, `enemyReach`, tests (priority: high, effort: 5h)
 - [ ] Fc: item 7 `HEAVY_ATTACK` timeline, screen shake, the fallback (priority: medium, effort: 3h)
 - [ ] Fd: item 4 fx engine, glyph generator and stage, `spell-effects.yaml` for every spell, item and ranged attack, tests (priority: high, effort: 8h)
-- [ ] Ff: item 5a `daze` / `daze_b` recipe; 12 rigs checked and reviewed; atlas (priority: medium, effort: 6h)
-- [ ] Ff: item 7 framework for `attack_raise`; garland paid request (FB-8); lich after user approval; rigs and locks (priority: medium, effort: 5h)
+- [ ] Ff: `monster_recipes.py` split, shared recipe tweaks, head joint per template (error if missing), `SPAN` / `SEQUENCES` / `anim_rules` prefix, the `hurt_in1` hold fallback (priority: medium, effort: 3h)
+- [ ] Ff: item 5a `daze` / `daze_b` on 12 rigs, checked and reviewed; atlas (priority: medium, effort: 6h)
+- [ ] Ff: item 7 framework for `attack_raise` (`hasRaise`, `atk_swing2`, `heavy` sequence); garland and lich paid requests, 1 each, ≤ 1 retry each after a failed review, ≤ 4 total, budget ≤ 30/100 (binding FB-8); rigs and locks (only added keys); ledger check (priority: medium, effort: 5h)
 - [ ] Fg: item 8 sandbox scene, YAML, shared party builder, routing, persistence, deep link, tests (priority: high, effort: 6h)
 - [ ] Fe: item 5b overlays, icons, tints, postures, party side, `status-visuals.yaml`, tests (priority: high, effort: 6h)
 - [ ] Integration: atlases twice, re-measure items 1 and 2, every browser check, the adversarial play test §6 (priority: high, effort: 5h)
