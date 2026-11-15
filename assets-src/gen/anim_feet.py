@@ -30,6 +30,19 @@ def contact_mask(rig, src: str, seg: tuple, pins: list[str], bottom: int) -> np.
     return m
 
 
+def unshift(a: np.ndarray | None, shift) -> np.ndarray | None:
+    """A frame (or label map) moved back by its whole-figure shift (a rooted rig with `translate`): check 8 and the hole
+    check then judge it against its source as if unmoved, the way the float band adds the frame's dy. Pixels moved off
+    the cell are dropped; (0, 0) returns the array itself."""
+    if a is None or not shift or tuple(shift) == (0, 0):
+        return a
+    dx, dy = -int(shift[0]), -int(shift[1])
+    out = np.zeros_like(a) if a.dtype == np.uint8 else np.full_like(a, -1)
+    h, w = a.shape[:2]
+    out[max(0, dy):h + min(0, dy), max(0, dx):w + min(0, dx)] = a[max(0, -dy):h - max(0, dy), max(0, -dx):w - max(0, dx)]
+    return out
+
+
 def _feet_x(a: np.ndarray, bottom: int) -> tuple[int, int] | None:
     rows = _solid(a)[max(0, bottom - 2):bottom + 1]
     xs = np.where(rows.any(0))[0]

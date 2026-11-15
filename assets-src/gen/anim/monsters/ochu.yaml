@@ -1,0 +1,40 @@
+# Ochu (pass R, rooted): a carnivorous green plant, a bulb with a toothy maw on a root mass, four lashing vines.
+# body: rooted (rig_serpent.py preset): the mass never turns; tent1 / tent2 are the vines on the party's side (they
+# lead and whip), tent3 / tent4 the far vines (they sway at half the motion).
+# The approved attack key draws the whole plant ~10 px left of the idle (raw idle-attack IoU 0.525), so the rig uses
+# `translate`: the idle-sourced wind-up and recover frames carry the whole figure left by their dx (a pull-back), and
+# the mass meets the attack key's position before the strike.
+sprite: ochu
+body: rooted
+translate: true
+facing: right
+sampler: nearest
+breath: true
+lead: [1, 2]
+keyframes:
+  idle:   {root: [58, 112], maw: [65, 65],
+           k1_0: [78, 72], k1_1: [90, 62], k1_2: [95, 50], k1_3: [100, 46],
+           k2_0: [80, 85], k2_1: [95, 85], k2_2: [105, 92], k2_3: [98, 104],
+           k3_0: [45, 72], k3_1: [28, 62], k3_2: [22, 50], k3_3: [35, 45],
+           k4_0: [45, 85], k4_1: [25, 85], k4_2: [20, 95], k4_3: [30, 102]}
+  attack: {root: [48, 112], maw: [58, 66],
+           k1_0: [78, 62], k1_1: [100, 58], k1_2: [118, 45], k1_3: [105, 35],
+           k2_0: [80, 72], k2_1: [105, 75], k2_2: [122, 84], k2_3: [108, 95],
+           k3_0: [45, 65], k3_1: [28, 55], k3_2: [20, 52], k3_3: [25, 58],
+           k4_0: [45, 78], k4_1: [25, 72], k4_2: [12, 75], k4_3: [20, 85]}
+  hurt:   {root: [62, 112], maw: [65, 68],
+           k1_0: [80, 68], k1_1: [100, 70], k1_2: [108, 80], k1_3: [95, 95],
+           k2_0: [80, 85], k2_1: [95, 95], k2_2: [85, 100], k2_3: [70, 95],
+           k3_0: [45, 68], k3_1: [25, 72], k3_2: [25, 85], k3_3: [38, 95],
+           k4_0: [45, 85], k4_1: [30, 95], k4_2: [45, 100], k4_3: [55, 95]}
+frames:
+  atk_wind1: {t: -0.10, dx: -3, dy: 0, moves: []}
+  atk_wind2: {t: -0.20, dx: -6, dy: 0, moves: []}
+  atk_mid: {t: 0.15, moves: []}
+  atk_follow: {t: 1.0, moves: []}
+  atk_recover: {t: 0.30, dx: -5, moves: []}
+  hurt_in1: {dx: -2, moves: []}
+  hurt_in2: {dx: -1, moves: []}
+  daze: {moves: [], dy: 0, tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}
+  daze_b: {moves: [], dy: 0, tweaks: {k1_3: [0, 2], k2_3: [0, 2], k3_3: [0, 1], k4_3: [0, 1]}}
+holds: []

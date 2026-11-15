@@ -93,6 +93,9 @@ class Rig:
         self.floating, self.recipes = bool(b.get("floating", False)), dict(b.get("recipes", {}))
         self.idle_b = b.get("idle_b", "bob")                # FW-6: "sag" (blob: one interior row removed)
         self.half_default = rooted_half(cfg) if b.get("rooted") else set()   # FW-2: non-lead tentacles sway
+        self.translate = bool(cfg.get("translate"))        # rooted: frame dx/dy move the whole figure rigidly
+        if self.translate and not b.get("rooted"):
+            raise ValueError(f"rig {cfg.get('sprite')}: translate is a rooted-preset option (body {self.body})")
         self.cell = cell
         self.fwd = 1 if cfg.get("facing", "right") == "right" else -1
         self.sampler = cfg.get("sampler", "nearest")
@@ -275,11 +278,12 @@ def _wrap(a: float) -> float:
 
 
 def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, tweaks: dict | None = None,
-          grounded: bool = True, half: set | None = None, body_dx: int = 0) -> dict:
+          grounded: bool = True, half: set | None = None, body_dx: int = 0, shift: tuple[int, int] = (0, 0)) -> dict:
     """Angle-space interpolation from S toward T by u (u < 0 extrapolates away; `half` joints by u / 2), bone lengths
     from S, root lerp, pinned joints, body offset (dy, and FW-1's floating drift dx) and tweaks; a grounded foot never
     sinks below the source's ground line (two-bone IK on the knee); the template's `ground` joints (naga coil) never
-    move; every joint snapped to a whole pixel."""
+    move; every joint snapped to a whole pixel. `shift` (a rooted rig with `translate`) then moves every joint, the
+    ground ones included, by the frame's whole-figure offset."""
     moves = set(S) if moves == "all" else set(moves)
     half = half or set()
     out: dict[str, tuple[float, float]] = {}
@@ -322,7 +326,7 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
             tw = (tweaks or {}).get(j, (0, 0))
             out[j] = (out[p][0] + base[j][0] - base[p][0] + tw[0], out[p][1] + base[j][1] - base[p][1] + tw[1])
             follow.add(j)
-    return {j: (float(np.rint(v[0])), float(np.rint(v[1]))) for j, v in out.items()}
+    return {j: (float(np.rint(v[0])) + shift[0], float(np.rint(v[1])) + shift[1]) for j, v in out.items()}
 
 
 def part_rotation(rig: Rig, part: str, kf: str, S: dict, out: dict) -> float:
