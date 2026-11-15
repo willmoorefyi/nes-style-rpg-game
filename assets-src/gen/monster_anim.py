@@ -82,23 +82,40 @@ def lock_path(sprite: str) -> Path:
 
 
 # ───────── generation ─────────
+def hands(v) -> list[str]:
+    """An arm option (`attack_hand`, `cast_hand`, `half_hand`): one suffix or a list of them (FW-3, e.g. [n, n2, n3])."""
+    return [v] if isinstance(v, str) else list(v or [])
+
+
+def half_hands(name: str, cfg: dict) -> list[str]:
+    """The `half_hand` arms of a frame (they move with half the recipe's t); frames.<f>.half overrides the list."""
+    return hands(((cfg.get("frames") or {}).get(name) or {}).get("half", cfg.get("half_hand")))
+
+
+def half_joints(rig, name: str, cfg: dict) -> set[str]:
+    return {a.format(h=h) for h in half_hands(name, cfg) for a in ARM}
+
+
 def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
-    h = cfg.get("attack_hand", "n")
-    cast_h = cfg.get("cast_hand", "n")
+    hs, cast_hs = hands(cfg.get("attack_hand", "n")), hands(cfg.get("cast_hand", "n"))
     cloth = list(dict.fromkeys(j for p in rig.parts.values() if p["kind"] == "cloth"
                                for c in (p["chain"].values() if isinstance(p.get("chain"), dict) else [p.get("chain", [])])
                                for j in c[1:]))
-    arm = [a.format(h=h) for a in ARM]
+    arm = [a.format(h=h) for h in hs + half_hands(name, cfg) for a in ARM]
     if rig.moves:                                          # beast templates (rig_templates.py) name their own sets
         moves = {"all": "all", **{k: v + cloth for k, v in rig.moves.items()}}[r["moves"]]
-    else:
-        moves = {"all": "all", "wind": ["crown", "neck", "chest", *arm, "tip", *cloth],
-                 "follow": ["crown", "chest", *arm, "tip"], "cast": ["crown", "chest", *[a.format(h=s) for s in "nf" for a in ARM], *cloth],
-                 "release": ["crown", *[a.format(h=cast_h) for a in ARM], *cloth]}[r["moves"]]
+    else:                                                  # biped, naga (+ its `extra` serpent / tail joints)
+        ex = rig.extra
+        moves = {"all": "all", "wind": ["crown", "neck", "chest", *arm, "tip", *cloth, *ex.get("wind", [])],
+                 "follow": ["crown", "chest", *arm, "tip", *ex.get("follow", [])],
+                 "cast": ["crown", "chest", *[a.format(h=s) for s in rig.arms for a in ARM], *cloth, *ex.get("cast", [])],
+                 "release": ["crown", *[a.format(h=h) for h in cast_hs for a in ARM], *cloth,
+                             *ex.get("release", [])]}[r["moves"]]
     planted = [rig.planted] if isinstance(rig.planted, str) else list(rig.planted)
     pins = {"legs": list(rig.legs), "feet": list(rig.feet), "planted": planted}[r["pins"]]
     over = (cfg.get("frames") or {}).get(name, {})
-    return over.get("moves", moves), list(over.get("pins", pins))
+    pins = list(over.get("pins", pins))
+    return over.get("moves", moves), pins + [g for g in rig.ground if g not in pins]   # naga coil: pinned always
 
 
 def _tweaks(recipe: dict | None, rig: dict | None, head: tuple[str, ...]) -> dict[str, list[float]]:
@@ -154,10 +171,11 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         moves, pins = _joint_sets(rig, name, r, cfg)
         k = max(1, int(cell[1] / 80 + 0.5)) if r.get("cell_scale") else 1    # daze: px per 80 px of cell
         tweaks = _tweaks({j: [v[0] * k, v[1] * k] for j, v in (r.get("tweaks") or {}).items()}, over.get("tweaks"), head)
-        if r.get("raise"):
-            hand = f"hand_{cfg.get('cast_hand', 'n')}"
+        for h in (hands(cfg.get("cast_hand", "n")) if r.get("raise") else []):
+            hand = f"hand_{h}"
             tweaks[hand] = [tweaks.get(hand, [0, 0])[0], tweaks.get(hand, [0, 0])[1] - r["raise"]]
-        J = R.solve(rig, S, T, u, moves, pins, int(over.get("dy", r.get("dy", 0) * k)), tweaks, not meta.get("floating"))
+        J = R.solve(rig, S, T, u, moves, pins, int(over.get("dy", r.get("dy", 0) * k)), tweaks, not meta.get("floating"),
+                    half_joints(rig, name, cfg))
         layers, rots, prop_px = [], {}, {}
         lab, names = segs[r["src"]]
         drop = set(over.get("drop") or [])

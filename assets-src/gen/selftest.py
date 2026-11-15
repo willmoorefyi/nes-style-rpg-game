@@ -399,6 +399,9 @@ def test_monster_anim() -> None:
     print("monster body templates (quadruped, bird)")
     from gen import selftest_beasts as SB
     SB.run_beasts(check)
+    print("monster naga template (FW-3: coil contacts, arm lists, half_hand)")
+    from gen import selftest_naga as SN
+    SN.run_naga(check)
     print("monster framework fixes (per-foot feet, IoU bound, pinned reach, cloth chains)")
     from gen import selftest_fixes as SF
     SF.run_fixes(check)
