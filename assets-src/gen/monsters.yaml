@@ -326,9 +326,14 @@
     with their brass joints, their sharp metal feather tips pointing toward the heroes, the armour leaning forward;
     exactly six wings, as in Image 3, at exactly the same pixel size as in Image 3; the fractured halo in its two broken arcs above the helm, as in Image 3; no wind
     streaks, no effects; the whole figure well below the top of the grey box
+  # approved boss_cast is seed 1234 with this text (ROSTER_LOG R29, R32: best of 3); the retries (R30 "seen from the
+  # front like Image 3 ... symmetric like a fan", R31 "the same front-facing hovering posture as Image 3 ... every wing
+  # lifted higher") both came back with four wings
   cast: >-
-    a storm rite: the six wings raised high and spread wide, the halo crackling with white-blue lightning, both
-    gauntlets lifted
+    a storm rite: the six wings raised and spread wide to the sides, both gauntlets lifted, the halo crackling with
+    short white-blue lightning drawn on the two broken halo arcs themselves; exactly six wings, three growing from each
+    shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
+    included, at the same pixel size as in Image 3 and well below the top of the grey box
   hurt: >-
     a sharp jolt: cracks across the breastplate, one wing pair faltering downward, the armour tilted back only
     slightly; the posture stays upright and controlled, her composure intact
@@ -342,4 +347,5 @@
   seeds: [1234]
   sheet_seeds: {boss_idle: 1235, boss_attack: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
   # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
-  # too big
+  # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
+  # like a fan"): four wings, a wing chip
