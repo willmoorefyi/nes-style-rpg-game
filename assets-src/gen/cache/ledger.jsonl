@@ -279,3 +279,5 @@
 {"event": "result", "key": "a20476ccfac7c79bf8ebedc7", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T04:23:00", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_hurt", "seed": 1236, "key": "ae3a5b995c782c9115f90312"}
 {"event": "result", "key": "ae3a5b995c782c9115f90312", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:23:50", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack_raise", "seed": 1234, "key": "d6093d88bccd3a2763233363"}
+{"event": "result", "key": "d6093d88bccd3a2763233363", "ok": true}
