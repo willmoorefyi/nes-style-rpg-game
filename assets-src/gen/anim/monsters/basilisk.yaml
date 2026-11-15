@@ -1,0 +1,147 @@
+sprite: basilisk
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Grey-green six-legged basilisk, low sprawl. The template's four legs take the near hind, the far middle (marked as
+# the far hind), the near middle (near fore) and the front leg (far fore); the sixth leg rides the body. The tail lies
+# on the ground in idle and attack and curls forward under the body in the hurt, so it stays out of every `moves`.
+keyframes:
+  idle:
+    hip: [35, 60]
+    back: [50, 50]
+    chest: [68, 52]
+    neck: [72, 50]
+    head: [76, 46]
+    snout: [95, 52]
+    tail0: [28, 60]
+    tail1: [16, 64]
+    tail2: [9, 70]
+    tail_tip: [22, 75]
+    hip_n: [32, 64]
+    knee_n: [30, 70]
+    foot_n: [32, 74]
+    toe_n: [37, 76]
+    hip_f: [48, 64]
+    knee_f: [49, 70]
+    foot_f: [50, 74]
+    toe_f: [54, 75]
+    sh_n: [58, 60]
+    el_n: [60, 67]
+    paw_n: [62, 73]
+    ftoe_n: [66, 76]
+    sh_f: [76, 60]
+    el_f: [80, 66]
+    paw_f: [84, 72]
+    ftoe_f: [88, 74]
+  attack:
+    hip: [30, 64]
+    back: [45, 50]
+    chest: [65, 52]
+    neck: [76, 52]
+    head: [82, 47]
+    snout: [102, 52]
+    tail0: [25, 62]
+    tail1: [12, 62]
+    tail2: [6, 68]
+    tail_tip: [25, 73]
+    hip_n: [30, 66]
+    knee_n: [26, 70]
+    foot_n: [24, 73]
+    toe_n: [28, 75]
+    hip_f: [44, 64]
+    knee_f: [44, 68]
+    foot_f: [45, 72]
+    toe_f: [48, 73]
+    sh_n: [55, 62]
+    el_n: [56, 68]
+    paw_n: [57, 73]
+    ftoe_n: [62, 76]
+    sh_f: [70, 62]
+    el_f: [77, 66]
+    paw_f: [82, 70]
+    ftoe_f: [88, 72]
+  hurt:
+    hip: [30, 50]
+    back: [45, 38]
+    chest: [60, 40]
+    neck: [66, 40]
+    head: [70, 36]
+    snout: [88, 42]
+    tail0: [28, 58]
+    tail1: [32, 72]
+    tail2: [50, 75]
+    tail_tip: [75, 62]
+    hip_n: [25, 58]
+    knee_n: [20, 65]
+    foot_n: [16, 72]
+    toe_n: [12, 75]
+    hip_f: [45, 55]
+    knee_f: [48, 62]
+    foot_f: [50, 66]
+    toe_f: [54, 68]
+    sh_n: [52, 50]
+    el_n: [54, 58]
+    paw_n: [56, 64]
+    ftoe_n: [60, 68]
+    sh_f: [64, 48]
+    el_f: [66, 55]
+    paw_f: [68, 60]
+    ftoe_f: [70, 62]
+masks:
+  neck:   # the throat and chest under the jaw warp with the neck (a hard head edge left ink fragments there)
+    idle: [[60, 44], [67, 40], [70, 56], [80, 62], [76, 67], [64, 66], [58, 58]]
+  head:   # the whole head with the spike crown and the open jaw (the crown tips fell to the body)
+    idle: [[66, 40], [70, 30], [78, 25], [90, 31], [94, 44], [98, 52], [96, 60], [80, 62], [70, 58], [66, 50]]
+    attack: [[72, 42], [76, 31], [84, 27], [96, 33], [106, 46], [104, 64], [90, 68], [80, 62], [74, 56]]
+    hurt: [[64, 32], [68, 23], [86, 23], [94, 32], [96, 44], [90, 52], [74, 52], [66, 44]]
+frames:
+  atk_wind1:   # anticipation: the crowned head draws back and down, the body 1 px down
+    dy: 1
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-3, 0], neck: [-3, 1], head: [-4, 1], snout: [-4, 1]}
+  atk_wind2:   # coil: head pulled well back, body 2 px down
+    dy: 2
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-3, 0], chest: [-5, 1], neck: [-6, 1], head: [-7, 2], snout: [-7, 2]}
+  atk_mid:   # t 0.15: the legs stay planted at the lunge (a shifted hind leg left ink strokes on the tail root)
+    moves: [back, chest, neck, head, snout]
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.15
+  atk_follow:
+    moves: [back, chest, neck, head, snout]
+    t: 1.10
+  atk_recover:   # translated: the body and head still 1 px forward (a turned neck drew a seam at the skull)
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [1, 0], chest: [1, 0], neck: [1, 0], head: [1, 0], snout: [1, 0]}
+  hurt_in1:   # the flinch: head thrown back and up with the body pulled back toward the curl; legs planted
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {back: [-3, 0], chest: [-4, -1], neck: [-5, -1], head: [-5, -2], snout: [-5, -2]}
+  hurt_in2:   # the curl easing toward idle: head and spine 1-2 px back down and forward
+    moves: []
+    t: 0.0
+    tweaks: {back: [1, 1], chest: [1, 1], neck: [2, 1], head: [2, 2], snout: [2, 2]}
+  daze:   # the crowned head sinks, translated
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 3]}
+  daze_b:
+    moves: []
+    pins: [sh_n, el_n, paw_n, sh_f, el_f, paw_f, knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 2
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 3]}
+holds: []
+paint:   # 1 px cracks behind the front leg's elbow the coil opens, outline ink
+  - {frame: atk_wind1, xy: [[68, 66], [70, 67], [73, 68]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[61, 38], [45, 62], [44, 63], [34, 68]], rgb: [6, 4, 10]}   # back crack, open belly edge
