@@ -189,8 +189,8 @@ def main(argv: list[str]) -> int:
                 for p, d in parts.items():
                     print(f"  mask {sid} {kf} {p}: {d['px']} px labelled as other parts {d['by']} (report only)")
             rough += [(v, sid, n) for n, v in r["roughness"].items()]
-        elif not cfg:
-            print(f"{sid}: no rig (anim: false), nothing to {cmd}")
+        elif not cfg:      # roster pass R: approved but not rigged yet; `check` prints the stable line `<id>: no rig`
+            print(f"{sid}: no rig" if cmd == "check" else f"{sid}: no rig (anim: false), nothing to {cmd}")
         elif cmd == "lock":
             print(sid, "locked", len(MC.write_lock(sid, MA.generate(sid, cfg, kfs, meta))), "frames")
         else:

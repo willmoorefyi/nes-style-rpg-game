@@ -2,7 +2,7 @@
  * The bestiary's preview (docs/BESTIARY_PLAN.md 3.1, 3.6): the battle background and one enemy laid out exactly as a
  * lone enemy in battle (AiEnemyView, i.e. computeEnemyLayoutAi), in a stage container at screen (0, 0) masked to the
  * preview window's inner rect. The loop (bestiaryAnim.ts) plays the real attack toward an invisible phantom target
- * placed so the furthest lunge ends 16 px inside the panel. Frames are cached per sprite for the scene's life.
+ * placed so the furthest lunge ends 16 px inside the panel. Frames are cached for the shown entry only (FW-8).
  */
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
@@ -37,32 +37,53 @@ const DAZE_POSTURE: Posture = 'daze';
 /** What the preview shows for an entry. */
 export interface PreviewEntry { enemy: EnemyData; seen: boolean; hasSpells: boolean }
 
-/** Monster frames cached per sprite key; `dispose` destroys each unique texture view (not the shared atlas source). */
+/** Monster frames cached per sprite key (each holding its atlas page, FW-8); `keepOnly` and `dispose` destroy each unique
+ *  texture view (not the shared page source) and release the page. A sprite whose page is not loaded yet is not
+ *  cached, so it is asked again once the page arrives. */
 export class CachedArt implements MonsterArtSource {
   private readonly cache = new Map<string, MonsterFrames | null>();
+  private readonly releases = new Map<string, () => void>();
   constructor(private readonly source: MonsterArtSource) {}
 
   getMonsterFrames(sprite: string): MonsterFrames | null {
-    if (!this.cache.has(sprite)) this.cache.set(sprite, this.source.getMonsterFrames(sprite));
+    if (!this.cache.has(sprite)) {
+      const f = this.source.getMonsterFrames(sprite);
+      if (!f && this.source.isReady && !this.source.isReady(sprite)) return null;
+      this.cache.set(sprite, f);
+      if (f && this.source.hold) this.releases.set(sprite, this.source.hold(sprite));
+    }
     return this.cache.get(sprite) ?? null;
   }
+
+  ensure(sprites: string[]): Promise<void> { return this.source.ensure?.(sprites) ?? Promise.resolve(); }
+  isReady(sprite: string): boolean { return this.cache.has(sprite) || (this.source.isReady?.(sprite) ?? true); }
 
   get size(): number { return this.cache.size; }
 
   /** Every unique texture in the cache. */
   textures(): Set<Texture> {
-    const out = new Set<Texture>();
-    for (const f of this.cache.values()) {
-      if (!f) continue;
-      for (const t of [...Object.values(f.textures), f.idle, f.attack, f.cast, f.hurt]) out.add(t);
-    }
-    return out;
+    return new Set([...this.cache.keys()].flatMap((s) => [...texturesOf(this.cache.get(s) ?? null)]));
+  }
+
+  /** Drop (destroy and release) every cached sprite not in `sprites`: the bestiary's entry change. */
+  keepOnly(sprites: string[]): void {
+    for (const s of [...this.cache.keys()]) if (!sprites.includes(s)) this.drop(s);
   }
 
   dispose(): void {
-    for (const t of this.textures()) t.destroy(false);
-    this.cache.clear();
+    for (const s of [...this.cache.keys()]) this.drop(s);
   }
+
+  private drop(sprite: string): void {
+    for (const t of texturesOf(this.cache.get(sprite) ?? null)) t.destroy(false);
+    this.cache.delete(sprite);
+    this.releases.get(sprite)?.();
+    this.releases.delete(sprite);
+  }
+}
+
+function texturesOf(f: MonsterFrames | null): Set<Texture> {
+  return new Set(f ? [...Object.values(f.textures), f.idle, f.attack, f.cast, f.hurt] : []);
 }
 
 export class BestiaryPreview {
@@ -107,6 +128,7 @@ export class BestiaryPreview {
   /** Show an entry (null or unseen: no sprite) on the background `backgroundId`. */
   show(entry: PreviewEntry | null, backgroundId: string | null): void {
     this.clearEnemy();
+    this.art.keepOnly(entry?.seen ? [monsterSpriteKey(entry.enemy)] : []);   // FW-8: release the last entry's page
     if (backgroundId) this.setBackground(backgroundId);
     if (!entry || !entry.seen) { this.caption.text = ''; return; }
     const e = entry.enemy;

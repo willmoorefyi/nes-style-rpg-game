@@ -411,6 +411,9 @@ def test_monster_anim() -> None:
     print("roster pass R budget guard (285 build + 15 fix, 3 per sheet, closed passes, only_approved)")
     from gen import selftest_roster as SRo
     SRo.run_roster(check)
+    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line)")
+    from gen import selftest_pages as SP
+    SP.run_pages(check)
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

@@ -23,10 +23,9 @@ import type { FxCuePoint } from '../../../src/scenes/battle/fx/index.js';
 import type { FxAtlasMeta } from '../../../src/scenes/battle/fx/fxAtlas.js';
 import type { MonsterAtlasMeta, MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
-import { readRgbaPng } from '../../helpers/pngAlpha.js';
+import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 
 const ATLAS = JSON.parse(readFileSync('assets/sprites/monsters-ai.json', 'utf-8')) as MonsterAtlasMeta;
-const PNG = readRgbaPng('assets/sprites/monsters-ai.png');
 const yaml = <T>(file: string): T => parse(readFileSync(`assets/data/${file}`, 'utf-8')) as T;
 const ENEMIES = yaml<EnemyData[]>('enemies.yaml');
 
@@ -35,6 +34,7 @@ function cellPixels(sprite: string, frame: MonsterFrame): Pixels {
   const s = ATLAS.sheets[sprite];
   const [x0, y0] = s.frames[frame]!;
   const [w, h] = s.cell;
+  const PNG = monsterSheetPng(sprite);          // the sheet's atlas page (FW-8)
   const data = new Uint8ClampedArray(w * h * 4);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) for (let c = 0; c < 4; c++) data[(y * w + x) * 4 + c] = PNG.data[((y0 + y) * PNG.width + x0 + x) * 4 + c];

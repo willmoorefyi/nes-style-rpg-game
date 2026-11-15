@@ -6,6 +6,12 @@ import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 import { seenFlag } from '../scenes/bestiary/bestiaryModel.js';
+import { battleArt, monsterSpriteKey } from '../rendering/BattleArt.js';
+
+/** Loads the monster atlas pages a formation needs (BattleArt; tests inject their own). Never rejects. */
+export interface MonsterArtPreload {
+  ensure(sprites: string[]): Promise<void>;
+}
 
 export interface BattleEndData {
   victory: boolean;
@@ -51,7 +57,7 @@ export class BattleTrigger {
   /** Plays a post-victory cutscene in the field (provided by the exploration scene). */
   private cutscenePlayer: ((id: string) => Promise<void>) | null = null;
 
-  constructor(game: Game) {
+  constructor(game: Game, private readonly art: MonsterArtPreload = battleArt) {
     this.game = game;
   }
 
@@ -80,6 +86,9 @@ export class BattleTrigger {
     this.currentBossConfig = bossConfig ?? null;
 
     const spells = await this.game.data.loadSpells('assets/data/spells.yaml');
+    // FW-8: the formation's atlas pages load before the battle opens, so its art draws at once (a failed or slow page
+    // still opens the battle: those sprites take the late-art path)
+    await this.art.ensure(enemies.map(monsterSpriteKey));
     // audio: the battle scene plays the battle and victory tracks itself (IN-1)
     const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events, audio: this.game.audio };
     const sceneConfig: BattleSceneConfig = {

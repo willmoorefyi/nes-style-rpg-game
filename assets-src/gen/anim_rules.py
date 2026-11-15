@@ -9,7 +9,7 @@ import numpy as np
 
 from gen.monster_recipes import KEYFRAMES, SEQUENCES as _RUNS
 
-MAX_PAGE = 4096
+MAX_PAGE = 2048                    # docs/ROSTER_PLAN.md 8 (D10): every monster atlas page <= 2048x2048
 NEAR_KEYFRAME = 0.35
 ROT_CAP = {"rigid": 30.0, "torso": 20.0, "chain": 25.0, "cloth": 25.0, "prop": 30.0, "fx": 30.0}
 # the generated frames of every runtime sequence (monster_recipes.SEQUENCES: attack, hurt, cast, daze, heavy)

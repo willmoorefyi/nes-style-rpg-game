@@ -20,7 +20,8 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
 - **No AI for in-betweens.** Bedrock/Stability was tried and rejected on 2026-11-13: no identity lock, img2img
   redraws the figure, inpainting comes back grey. Bedrock is not counted against the Gemini cap, but don't use it here.
 - **The atlas is binary, with one owner.** Build it locally to test in the browser, then restore it before committing a
-  rig (`git checkout -- assets/sprites/monsters-ai.png assets/sprites/monsters-ai.json`); one integrator commits it.
+  rig (`git checkout -- 'assets/sprites/monsters-ai*'`, then delete any new untracked `monsters-ai-<n>.png`); one
+  integrator commits it. The atlas is paged (ROSTER_PLAN 8): `monsters-ai.json` lists `pages` and each sheet's `page`.
 - **Browser runs always add `?mute=1`.**
 
 ## 1. Base frames (Gemini)
@@ -322,7 +323,7 @@ them). Re-review and re-lock whenever a framework change alters frame bytes: `ch
 - **Status and death behaviour only shows in real battles** (no `enemyAnim`): sleep or stun in `anim_status`, lethal
   hits during the hold or return, and HP set to 0 through `window.__game` (dev only).
 - **Pixel-exact frames:** in step mode crop the sprite from a screenshot, reduce by the screen scale (nearest) and
-  compare with its rect in `monsters-ai.png` (V.2: 754 frames exact; no blur, half-pixel offset or wrong frame).
+  compare with its rect on its page `monsters-ai-<page>.png` (V.2: 754 frames exact; no blur, half-pixel offset or wrong frame).
 - **FPS:** read `__game.app.ticker.FPS` on `anim_crowd` (V.2: median 120 on a 120 Hz display).
 
 ### 3.6 Adversarial play-test probes (`ENEMY_ANIM_PLAN.md` §8; record a verdict per probe, severity P0/P1/P2)
@@ -346,7 +347,7 @@ P0/P1 findings go back to the rig owner. After 2 fix rounds, escalate.
 
 ```bash
 python3 -I assets-src/gen/selftest.py                        # ALL PASSED (worktree: --anim only)
-python3 -I assets-src/gen/monster_anim.py check --all        # only "<id>: OK" lines
+python3 -I assets-src/gen/monster_anim.py check --all        # only "<id>: OK" lines (rolling: also "<id>: no rig")
 python3 -I assets-src/build_assets.py monsters_ai battle_ai field_ai
 git diff --exit-code assets-src/gen/approved assets/sprites/battle-characters-ai.* assets/sprites/characters-ai.*
 PYTHONHASHSEED=0 python3 -s assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* > /tmp/a.sha
@@ -354,18 +355,22 @@ PYTHONHASHSEED=1 python3 -s assets-src/build_assets.py monsters_ai && shasum -c 
 npx tsc --noEmit && npm run build && npm test
 ```
 
-- [ ] Unchanged sprites are byte-equal **by frame rect** (the shelf packer moves cells, so a whole-PNG diff can't tell):
+- [ ] Unchanged sprites are byte-equal **by frame rect** across pages (the packer moves cells, so a whole-PNG diff
+  can't tell); this reads both the paged index and the R0 single-page shape (`docs/ROSTER_PLAN.md` 12.2):
 
 ```bash
-git show HEAD:assets/sprites/monsters-ai.png > /tmp/head.png && git show HEAD:assets/sprites/monsters-ai.json > /tmp/head.json
+mkdir -p /tmp/head && git show HEAD:assets/sprites/monsters-ai.json > /tmp/head/monsters-ai.json
+for f in $(python3 -I -c "import json; m = json.load(open('/tmp/head/monsters-ai.json')); print(*[p['file'] for p in m.get('pages', [{'file': 'monsters-ai.png'}])])"); do
+  git show "HEAD:assets/sprites/$f" > "/tmp/head/$f"; done
 python3 -I - <<'EOF'
-import json
+import json, os
 from PIL import Image
-def cells(png, js):
-    m = json.load(open(js)); im = Image.open(png).convert("RGBA")
-    return {(s, f): im.crop((x, y, x + v["cell"][0], y + v["cell"][1])).tobytes()
+def cells(d):
+    m = json.load(open(os.path.join(d, "monsters-ai.json")))
+    pages = [Image.open(os.path.join(d, p["file"])).convert("RGBA") for p in m.get("pages", [{"file": "monsters-ai.png"}])]
+    return {(s, f): pages[v.get("page", 0)].crop((x, y, x + v["cell"][0], y + v["cell"][1])).tobytes()
             for s, v in m["sheets"].items() for f, (x, y) in v["frames"].items()}
-a, b = cells("/tmp/head.png", "/tmp/head.json"), cells("assets/sprites/monsters-ai.png", "assets/sprites/monsters-ai.json")
+a, b = cells("/tmp/head"), cells("assets/sprites")
 for s in sorted({s for s, _ in a}):
     print(s, [f for (t, f) in a if t == s and a[(t, f)] != b.get((t, f))] or "same")
 EOF

@@ -19,14 +19,14 @@ import { BOSS_FRAMES, type MonsterFrame } from '../../../src/scenes/battle/enemy
 import type { FxAtlasMeta } from '../../../src/scenes/battle/fx/fxAtlas.js';
 import type { MonsterAtlasMeta, MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
-import { readRgbaPng } from '../../helpers/pngAlpha.js';
+import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 
 const ATLAS = JSON.parse(readFileSync('assets/sprites/monsters-ai.json', 'utf-8')) as MonsterAtlasMeta;
-const PNG = readRgbaPng('assets/sprites/monsters-ai.png');
 const yaml = <T>(file: string): T => parse(readFileSync(`assets/data/${file}`, 'utf-8')) as T;
 
 /** The topmost opaque row of a cell and the centre of its opaque run (art px; texScale 1). */
-function topmost([x0, y0]: [number, number], [w, h]: [number, number]): [number, number] {
+function topmost(sheet: string, [x0, y0]: [number, number], [w, h]: [number, number]): [number, number] {
+  const PNG = monsterSheetPng(sheet);             // the sheet's atlas page (FW-8)
   for (let y = 0; y < h; y++) {
     const xs: number[] = [];
     for (let x = 0; x < w; x++) if (PNG.data[((y0 + y) * PNG.width + x0 + x) * 4 + 3] > 0) xs.push(x);
@@ -39,7 +39,7 @@ describe('item 4: the glint at the raised weapon tip', () => {
   it.each(['garland', 'lich'])('%s: the atlas tip is the topmost opaque pixel of attack_raise, well away from the old anchor', (id) => {
     const sheet = ATLAS.sheets[id];
     expect(ATLAS.texScale).toBe(1);
-    const [mx, my] = topmost(sheet.frames.attack_raise!, sheet.cell);
+    const [mx, my] = topmost(id, sheet.frames.attack_raise!, sheet.cell);
     expect(sheet.tip![1]).toBe(my);
     expect(Math.abs(sheet.tip![0] - mx)).toBeLessThanOrEqual(1); // the build rounds half to even
     const [tx, ty] = sheet.tip!;

@@ -5,11 +5,12 @@ import { BattleArt } from '../../src/rendering/BattleArt.js';
 
 const atlas = {
   scale: 2, texScale: 1,
+  pages: [{ file: 'monsters-ai-0.png', w: 900, h: 180 }],
   sheets: {
-    garland: { cell: [100, 100], footRow: 96, floating: false, anim: true, lungePx: 40,
+    garland: { page: 0, cell: [100, 100], footRow: 96, floating: false, anim: true, lungePx: 40,
       frames: { idle: [0, 0], attack: [100, 0], hurt: [200, 0], cast: [300, 0], attack_raise: [400, 0], hurt_in1: [500, 0],
         atk_wind1: [600, 0], atk_wind2: [700, 0], atk_mid: [800, 0] } },
-    goblin: { cell: [80, 80], footRow: 76, floating: false, frames: { idle: [0, 100], attack: [80, 100], hurt: [160, 100] } },
+    goblin: { page: 0, cell: [80, 80], footRow: 76, floating: false, frames: { idle: [0, 100], attack: [80, 100], hurt: [160, 100] } },
   },
 };
 

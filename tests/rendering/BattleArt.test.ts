@@ -5,8 +5,9 @@ import { BOSS_FRAMES, FRAME_SOURCE } from '../../src/scenes/battle/enemyChoreogr
 
 const aiMonsters = {
   scale: 2,
+  pages: [{ file: 'monsters-ai-0.png', w: 240, h: 80 }],
   sheets: {
-    goblin: { cell: [80, 80], footRow: 76, floating: false, frames: { idle: [0, 0], attack: [80, 0], hurt: [160, 0] } },
+    goblin: { page: 0, cell: [80, 80], footRow: 76, floating: false, frames: { idle: [0, 0], attack: [80, 0], hurt: [160, 0] } },
   },
 };
 

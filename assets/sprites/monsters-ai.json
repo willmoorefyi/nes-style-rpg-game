@@ -1,6 +1,13 @@
 {
   "scale": 2,
   "texScale": 1,
+  "pages": [
+    {
+      "file": "monsters-ai-0.png",
+      "w": 2040,
+      "h": 1872
+    }
+  ],
   "sheets": {
     "cockatrice": {
       "cell": [
