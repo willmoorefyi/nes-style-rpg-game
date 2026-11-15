@@ -1,0 +1,26 @@
+{
+  "character": "nightmare",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "317f1edcfa50f29f4a623133",
+  "approved": "2026-11-15",
+  "grid": [
+    132,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": []
+}

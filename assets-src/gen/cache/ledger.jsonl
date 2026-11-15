@@ -599,3 +599,135 @@
 {"event": "result", "key": "b6afda1d6486786e630f46a8", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T06:14:51", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "baretta", "sheet": "monster_large", "seed": 1234, "key": "d08aeb416f21e529d8732836"}
 {"event": "result", "key": "d08aeb416f21e529d8732836", "ok": false, "error": "403 PERMISSION_DENIED. {'error': {'code': 403, 'message': 'Spend cap breached for project: projects/1067994254943 for service: generativelanguage.googleapis.com. Correlation id: 2513038147875607518', 'status': 'PERMISSION_DENIED'}}"}
+{"event": "attempt", "ts": "2026-11-15T11:36:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "baretta", "sheet": "monster_large", "seed": 1234, "key": "d08aeb416f21e529d8732836"}
+{"event": "result", "key": "d08aeb416f21e529d8732836", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:38:15", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "basilisk", "sheet": "monster_small", "seed": 1234, "key": "b080e460c56bf1932d503a16"}
+{"event": "result", "key": "b080e460c56bf1932d503a16", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:39:25", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "basilisk", "sheet": "monster_small", "seed": 1235, "key": "30f03884bfeb75cc8a70b48c"}
+{"event": "result", "key": "30f03884bfeb75cc8a70b48c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:40:27", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "allosaurus", "sheet": "monster_large", "seed": 1234, "key": "f75b4efc6ff731c5aca82fa8"}
+{"event": "result", "key": "f75b4efc6ff731c5aca82fa8", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:40:54", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "allosaurus", "sheet": "monster_large", "seed": 1235, "key": "937abed678fa116cfca7a13e"}
+{"event": "result", "key": "937abed678fa116cfca7a13e", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:42:27", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "weretiger", "sheet": "monster_small", "seed": 1234, "key": "d8a06ea9714997d87b32d731"}
+{"event": "result", "key": "d8a06ea9714997d87b32d731", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:43:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sand_worm", "sheet": "monster_large", "seed": 1234, "key": "92b86c53a72e1635d91e4a56"}
+{"event": "result", "key": "92b86c53a72e1635d91e4a56", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:43:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "minotaur_zombie", "sheet": "monster_large", "seed": 1234, "key": "76ecbcf2eb968ccf33e67d71"}
+{"event": "result", "key": "76ecbcf2eb968ccf33e67d71", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:44:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "minotaur_zombie", "sheet": "monster_large", "seed": 1235, "key": "faa8b7d870dbd15d8a94c6c0"}
+{"event": "result", "key": "faa8b7d870dbd15d8a94c6c0", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:45:56", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "king_mummy", "sheet": "monster_small", "seed": 1234, "key": "3368e0a9ddb5b8d2624e4fe1"}
+{"event": "result", "key": "3368e0a9ddb5b8d2624e4fe1", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:47:13", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "king_mummy", "sheet": "monster_small", "seed": 1235, "key": "a55e4222381279b7b6e1f8dd"}
+{"event": "result", "key": "a55e4222381279b7b6e1f8dd", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:48:17", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "medusa", "sheet": "monster_small", "seed": 1234, "key": "4f6ce4af953e2c4941d74443"}
+{"event": "result", "key": "4f6ce4af953e2c4941d74443", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:51:14", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "medusa", "sheet": "monster_small", "seed": 1235, "key": "5a1d7035949d34af3c24a2b6"}
+{"event": "result", "key": "5a1d7035949d34af3c24a2b6", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:52:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "rakshasa", "sheet": "monster_small", "seed": 1234, "key": "8de7f96680fb0abe95811486"}
+{"event": "result", "key": "8de7f96680fb0abe95811486", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:54:22", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "clay_golem", "sheet": "monster_large", "seed": 1234, "key": "e07b1fcba8028935d7f19234"}
+{"event": "result", "key": "e07b1fcba8028935d7f19234", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:55:32", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "nightmare", "sheet": "monster_large", "seed": 1234, "key": "5c441a05a00bbb8ec96c827d"}
+{"event": "result", "key": "5c441a05a00bbb8ec96c827d", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:56:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "nightmare", "sheet": "monster_large", "seed": 1235, "key": "317f1edcfa50f29f4a623133"}
+{"event": "result", "key": "317f1edcfa50f29f4a623133", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:56:57", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "nightmare", "sheet": "monster_large", "seed": 1236, "key": "e0c94f2ff48b6c5b8d3ca408"}
+{"event": "result", "key": "e0c94f2ff48b6c5b8d3ca408", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:58:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sahagin_prince", "sheet": "monster_small", "seed": 1234, "key": "bb176f6f1fdce21df8ac7ea7"}
+{"event": "result", "key": "bb176f6f1fdce21df8ac7ea7", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:59:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sahagin_prince", "sheet": "monster_small", "seed": 1235, "key": "60a41fbd1c2063b15417c133"}
+{"event": "result", "key": "60a41fbd1c2063b15417c133", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:00:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sahagin_prince", "sheet": "monster_small", "seed": 1236, "key": "aca5437daabb49e8a7d05167"}
+{"event": "result", "key": "aca5437daabb49e8a7d05167", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:02:13", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "deepeyes", "sheet": "monster_large", "seed": 1234, "key": "7510f9ab81f6c349054b2785"}
+{"event": "result", "key": "7510f9ab81f6c349054b2785", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:03:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "deepeyes", "sheet": "monster_large", "seed": 1235, "key": "fa97159a4e11836c4a3a735a"}
+{"event": "result", "key": "fa97159a4e11836c4a3a735a", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:03:51", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_snake", "sheet": "monster_large", "seed": 1234, "key": "e44a3e95015ae7efbe37ac0a"}
+{"event": "result", "key": "e44a3e95015ae7efbe37ac0a", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:05:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_snake", "sheet": "monster_large", "seed": 1235, "key": "f270e0179f7eb0aaa3ab8405"}
+{"event": "result", "key": "f270e0179f7eb0aaa3ab8405", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:06:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_scorpion", "sheet": "monster_small", "seed": 1234, "key": "7532cb515d6ea4d5416790bb"}
+{"event": "result", "key": "7532cb515d6ea4d5416790bb", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:07:24", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_scorpion", "sheet": "monster_small", "seed": 1235, "key": "4e020e0f7c097a5e2465096b"}
+{"event": "result", "key": "4e020e0f7c097a5e2465096b", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:08:23", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_scorpion", "sheet": "monster_small", "seed": 1236, "key": "8901cbfb81fe2c8734199fbe"}
+{"event": "result", "key": "8901cbfb81fe2c8734199fbe", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:09:43", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_troll", "sheet": "monster_large", "seed": 1234, "key": "f9ab2cb66c2b14368a332c52"}
+{"event": "result", "key": "f9ab2cb66c2b14368a332c52", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:10:38", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "sea_troll", "sheet": "monster_large", "seed": 1235, "key": "25e51eba5bb97ba33e11aeeb"}
+{"event": "result", "key": "25e51eba5bb97ba33e11aeeb", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:12:37", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ghost", "sheet": "monster_small", "seed": 1234, "key": "fdd556a102b3f75c95f6a6a9"}
+{"event": "result", "key": "fdd556a102b3f75c95f6a6a9", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:14:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "water_elemental", "sheet": "monster_large", "seed": 1234, "key": "65b83a428e8535a2784be074"}
+{"event": "result", "key": "65b83a428e8535a2784be074", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:15:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "water_elemental", "sheet": "monster_large", "seed": 1235, "key": "23381c747657e6a890627d0a"}
+{"event": "result", "key": "23381c747657e6a890627d0a", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:16:45", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "water_elemental", "sheet": "monster_large", "seed": 1236, "key": "46f81c6462adc14858885209"}
+{"event": "result", "key": "46f81c6462adc14858885209", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:18:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "water_naga", "sheet": "monster_large", "seed": 1234, "key": "ccb5ad2124aa9e7565955658"}
+{"event": "result", "key": "ccb5ad2124aa9e7565955658", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:24:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "tyrannosaur", "sheet": "monster_large", "seed": 1234, "key": "5ec34f392b0d7af8f40a8330"}
+{"event": "result", "key": "5ec34f392b0d7af8f40a8330", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:26:14", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_knight", "sheet": "monster_small", "seed": 1234, "key": "091ec6a36700c923e32b1d8c"}
+{"event": "result", "key": "091ec6a36700c923e32b1d8c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:27:21", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chimera", "sheet": "monster_large", "seed": 1234, "key": "9bdaefd553e32c069c59f7c0"}
+{"event": "result", "key": "9bdaefd553e32c069c59f7c0", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:28:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chimera", "sheet": "monster_large", "seed": 1235, "key": "bb3dda994697f5ed13976d36"}
+{"event": "result", "key": "bb3dda994697f5ed13976d36", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:29:56", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chimera", "sheet": "monster_large", "seed": 1236, "key": "4d9375967aedd0303d70b172"}
+{"event": "result", "key": "4d9375967aedd0303d70b172", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:31:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "guardian", "sheet": "monster_large", "seed": 1234, "key": "85745c662ca2a9361e952b47"}
+{"event": "result", "key": "85745c662ca2a9361e952b47", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:32:30", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "guardian", "sheet": "monster_large", "seed": 1235, "key": "6c9f5183b10fc0e39da9656f"}
+{"event": "result", "key": "6c9f5183b10fc0e39da9656f", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:33:18", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "guardian", "sheet": "monster_large", "seed": 1236, "key": "0683f05fb008f4c9a7c686a8"}
+{"event": "result", "key": "0683f05fb008f4c9a7c686a8", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:34:56", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "blue_dragon", "sheet": "monster_large", "seed": 1234, "key": "6eb6d4a73051d6cc8014be80"}
+{"event": "result", "key": "6eb6d4a73051d6cc8014be80", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:36:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "green_dragon", "sheet": "monster_large", "seed": 1234, "key": "39190bdb6b7c7b25b24d3d9e"}
+{"event": "result", "key": "39190bdb6b7c7b25b24d3d9e", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:37:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "stone_golem", "sheet": "monster_large", "seed": 1234, "key": "73e540804441e890021eb01c"}
+{"event": "result", "key": "73e540804441e890021eb01c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:38:23", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "air_elemental", "sheet": "monster_large", "seed": 1234, "key": "c3edc2ab26ebf4375b408764"}
+{"event": "result", "key": "c3edc2ab26ebf4375b408764", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:39:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "spirit_naga", "sheet": "monster_large", "seed": 1234, "key": "906ead9f55563f357be91fc8"}
+{"event": "result", "key": "906ead9f55563f357be91fc8", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:40:22", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "spirit_naga", "sheet": "monster_large", "seed": 1235, "key": "6f7e08887d7117112f1d0d24"}
+{"event": "result", "key": "6f7e08887d7117112f1d0d24", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:41:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_knight", "sheet": "monster_small", "seed": 1234, "key": "be8ba86f6a656d35f53fee9f"}
+{"event": "result", "key": "be8ba86f6a656d35f53fee9f", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:47:48", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_knight", "sheet": "monster_small", "seed": 1235, "key": "80854d55f2a4af8632d5bd07"}
+{"event": "result", "key": "80854d55f2a4af8632d5bd07", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:49:17", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_knight", "sheet": "monster_small", "seed": 1236, "key": "c09afba6ef72619519085f3a"}
+{"event": "result", "key": "c09afba6ef72619519085f3a", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:50:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "earth_medusa", "sheet": "monster_small", "seed": 1234, "key": "20d9b7ca49ef1fd75246a7a1"}
+{"event": "result", "key": "20d9b7ca49ef1fd75246a7a1", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:51:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "earth_medusa", "sheet": "monster_small", "seed": 1235, "key": "21101bd2d66071596820c601"}
+{"event": "result", "key": "21101bd2d66071596820c601", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:53:24", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "black_flan", "sheet": "monster_small", "seed": 1234, "key": "031a1fa9251a3e90df441104"}
+{"event": "result", "key": "031a1fa9251a3e90df441104", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:55:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "soldier", "sheet": "monster_large", "seed": 1234, "key": "1669cfced7d24c8b90b0384c"}
+{"event": "result", "key": "1669cfced7d24c8b90b0384c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:57:09", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vampire_lord", "sheet": "monster_small", "seed": 1234, "key": "3951c69d8e2b406a9eff2fe7"}
+{"event": "result", "key": "3951c69d8e2b406a9eff2fe7", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T12:59:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vampire_lord", "sheet": "monster_small", "seed": 1235, "key": "6d8bdaf542eb3bac2e3d0915"}
+{"event": "result", "key": "6d8bdaf542eb3bac2e3d0915", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:00:39", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "dark_fighter", "sheet": "monster_small", "seed": 1234, "key": "7c03a8d1930ebae7044cf603"}
+{"event": "result", "key": "7c03a8d1930ebae7044cf603", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:01:53", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "dark_fighter", "sheet": "monster_small", "seed": 1235, "key": "5ca85b3b11f2ce1e0df53640"}
+{"event": "result", "key": "5ca85b3b11f2ce1e0df53640", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:03:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "rhyos", "sheet": "monster_large", "seed": 1234, "key": "cbfe95f281444e99377369e0"}
+{"event": "result", "key": "cbfe95f281444e99377369e0", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:04:38", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "rhyos", "sheet": "monster_large", "seed": 1235, "key": "1fe4e1e8a5236512833a2f79"}
+{"event": "result", "key": "1fe4e1e8a5236512833a2f79", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:06:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "rhyos", "sheet": "monster_large", "seed": 1236, "key": "4ae135871c43ba825fbfa571"}
+{"event": "result", "key": "4ae135871c43ba825fbfa571", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:07:42", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "purple_worm", "sheet": "monster_large", "seed": 1234, "key": "be5526492374ec6ee0f08b58"}
+{"event": "result", "key": "be5526492374ec6ee0f08b58", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:09:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "iron_golem", "sheet": "monster_large", "seed": 1234, "key": "771097cababc1b5ede7f8dad"}
+{"event": "result", "key": "771097cababc1b5ede7f8dad", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:12:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_piranha", "sheet": "monster_small", "seed": 1235, "key": "90fa651cd28cab4f8d2b67e5"}
+{"event": "result", "key": "90fa651cd28cab4f8d2b67e5", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}

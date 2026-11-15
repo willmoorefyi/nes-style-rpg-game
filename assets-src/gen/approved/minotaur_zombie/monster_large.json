@@ -1,0 +1,26 @@
+{
+  "character": "minotaur_zombie",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "faa8b7d870dbd15d8a94c6c0",
+  "approved": "2026-11-15",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": []
+}

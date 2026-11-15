@@ -1,0 +1,26 @@
+{
+  "character": "sea_troll",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "25e51eba5bb97ba33e11aeeb",
+  "approved": "2026-11-15",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": []
+}

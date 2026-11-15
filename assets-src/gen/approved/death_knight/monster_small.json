@@ -1,0 +1,26 @@
+{
+  "character": "death_knight",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "c09afba6ef72619519085f3a",
+  "approved": "2026-11-15",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": []
+}

@@ -1,0 +1,26 @@
+{
+  "character": "king_mummy",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "a55e4222381279b7b6e1f8dd",
+  "approved": "2026-11-15",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": []
+}

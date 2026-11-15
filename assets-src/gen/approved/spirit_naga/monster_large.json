@@ -1,0 +1,26 @@
+{
+  "character": "spirit_naga",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "6f7e08887d7117112f1d0d24",
+  "approved": "2026-11-15",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": []
+}
