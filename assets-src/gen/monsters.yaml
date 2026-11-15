@@ -571,9 +571,11 @@
   attack: >-
     lunging its long neck forward in a biting snap with the jaws wide open, torn wings raised, the tail lashing, all
     four feet still on the ground and the whole head inside the cell
+  # approved: seed 1235 with this text (ROSTER_LOG R62, R64: best of 3); 1236's hurt (R63) "recoiling on all four legs
+  # (no rearing up): the neck twisted up and back ..., the long bony tail still clearly visible ..." reared up again
   hurt: >-
     recoiling on all four legs (no rearing up), the neck twisted back, the torn wings drooping, bones rattling at the
     joints
   face: the dragon skull with ghost-green glowing eye sockets and broken fangs is readable in every cell
   extra_negative: fire breath, red scales, a rider, horns
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R61): a tiny idle, the head cut, a rear-up hurt
+  seeds: [1235, 1234, 1236]   # 1234 (ROSTER_LOG R61): the head cut, a rear-up hurt; 1236 (R63): a rear-up hurt
