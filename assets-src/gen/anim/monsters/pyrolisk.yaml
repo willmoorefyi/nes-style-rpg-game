@@ -101,13 +101,13 @@ frames:
   atk_wind1:
     t: -0.2
     pins: [foot_n, foot_f]
-    moves: [chest, neck, head, beak]
+    moves: []                  # translation only: the turned neck warp tore the throat under the beak
     tweaks: {hip: [-2, 0], chest: [-2, 0], neck: [-3, 0], head: [-3, 0], beak: [-3, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
   atk_wind2:
     t: -0.3
     dy: 1
     pins: [foot_n, foot_f]
-    moves: [chest, neck, head, beak]
+    moves: []
     tweaks: {hip: [-4, 0], chest: [-4, 0], neck: [-5, 0], head: [-5, 0], beak: [-5, 0], tail0: [-4, 0], tail1: [-4, 0], tail2: [-4, 0], tail3: [-4, 0], tail_tip: [-4, 0]}
   atk_mid:
     t: 0.25
@@ -121,14 +121,14 @@ frames:
   atk_recover:
     t: 0.22
     pins: [foot_n, foot_f]
-    moves: [chest, neck, head, beak]
+    moves: []
     tweaks: {hip: [-3, 0], chest: [-3, 0], neck: [-3, 0], head: [-3, 0], beak: [-3, 0], tail0: [-3, 0], tail1: [-3, 0], tail2: [-3, 0], tail3: [-3, 0], tail_tip: [-3, 0]}
   hurt_in1:
     moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
   hurt_in2:                    # translation only: a 13 deg turn of the open-beaked head shredded the face
     pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
     moves: []
-    tweaks: {hip: [2, 0], chest: [2, 0], neck: [2, 0], head: [2, 0], beak: [2, 0], tail0: [2, 0], tail1: [2, 0], tail2: [2, 0], tail3: [2, 0], tail_tip: [2, 0], wsh_n: [2, 0], wel_n: [2, 0], wtip_n: [2, 0], wsh_f: [2, 0], wel_f: [2, 0], wtip_f: [2, 0]}
+    tweaks: {hip: [2, 0], chest: [2, 0], neck: [1, 1], head: [1, 2], beak: [1, 2], tail0: [2, 0], tail1: [2, 0], tail2: [2, 0], tail3: [2, 0], tail_tip: [2, 0], wsh_n: [2, 0], wel_n: [2, 1], wtip_n: [3, 3], wsh_f: [2, 0], wel_f: [3, 1], wtip_f: [4, 3]}
 holds: []
 paint:                         # 1 px joint crack (near thigh under the shifted belly) closed with outline ink
   - {frame: atk_follow, xy: [[43, 64]], rgb: [6, 4, 10]}
