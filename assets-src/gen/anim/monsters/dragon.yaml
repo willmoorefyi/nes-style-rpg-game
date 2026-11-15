@@ -223,3 +223,13 @@ paint:                         # outline ink: a 1 px neck/head crack (follow)
   # pass F daze: the 1 px wing / neck notch the slump opens, outline ink
   - {frame: daze, xy: [[73, 83]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[73, 83]], rgb: [6, 4, 10]}
+  # 2026-11-15 review 2: the ragged ink notch at the back of the neck under the jaw (head lowered over the neck) made one
+  # 1 px outline on a diagonal, the enclosed inner ink repainted with the neck's red ramp (daze_b: the head 1 px lower)
+  - {frame: daze, xy: [[81, 84], [80, 85]], rgb: [99, 24, 41]}
+  - {frame: daze, xy: [[82, 84], [81, 85], [80, 86]], rgb: [132, 24, 49]}
+  - {frame: daze, xy: [[82, 85], [83, 85], [81, 86]], rgb: [156, 33, 49]}
+  - {frame: daze_b, xy: [[80, 85], [79, 86], [78, 87]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[81, 85], [80, 86]], rgb: [99, 24, 41]}
+  - {frame: daze_b, xy: [[82, 85], [81, 86], [81, 87]], rgb: [132, 24, 49]}
+  - {frame: daze_b, xy: [[82, 86], [83, 86]], rgb: [156, 33, 49]}
+  - {frame: daze_b, xy: [[77, 88]], rgb: [49, 16, 33]}

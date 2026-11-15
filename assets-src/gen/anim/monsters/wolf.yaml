@@ -112,13 +112,14 @@ frames:
     pins: [foot_n, foot_f]
     moves: [back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, knee_n, knee_f]
   daze:                        # pass F 5a (+ review fix): head and neck hang 3-4 px with the nose dipped, tail lowered;
-    t: 0.0                     # the forelegs stay planted, the neck follows the head (no mane notch behind the ears)
+    t: 0.0                     # the forelegs stay planted, the neck follows the head (no mane notch behind the ears);
+                               # review 2: tail tip only 2 px down (was 5), so it keeps a 3 px upturn
     moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
-    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 5]}
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 2]}
   daze_b:                      # the sway's low point: back 1 px lower, head 4 px down
     t: 0.0
     moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
-    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 5]}
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 2]}
 masks:
   neck:                        # body/neck boundary off the withers: the neck warp sampled body pixels (E8 crease)
     idle: [[68, 25], [73, 25], [77, 28], [81, 29], [81, 38], [68, 38]]
@@ -128,3 +129,9 @@ holds: []
 paint:                         # build-time patches: open the leg gap the rear closed; fill the pockets the forearm left
   - {frame: hurt_in1, xy: [[37, 60]], rgb: null}
   - {frame: hurt_in2, xy: [[70, 41], [71, 41], [71, 42], [72, 42], [73, 42], [73, 43], [56, 46], [57, 46]], rgb: [41, 41, 57]}
+  # 2026-11-15 review 2: the tail's top outline evened out (a 2 px bump over the sag; daze_b 1 px lower) and the far
+  # ear's front edge stepped in at the same height as in daze, not 2 px lower (a 7 px straight edge read as boxy)
+  - {frame: daze, xy: [[22, 36], [23, 36]], rgb: null}
+  - {frame: daze, xy: [[22, 37], [23, 37]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[22, 37], [23, 37], [94, 28], [94, 29]], rgb: null}
+  - {frame: daze_b, xy: [[22, 38], [23, 38], [93, 28], [93, 29]], rgb: [6, 4, 10]}

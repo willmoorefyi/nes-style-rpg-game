@@ -136,6 +136,17 @@ seam_tolerance: 2              # atk_recover: the approved idle's thigh / torso 
 holds: []
 paint:                         # 1 px crack inside the mid streamer root, closed with outline ink
   - {frame: atk_mid, xy: [[24, 40]], rgb: [6, 4, 10]}
-  # daze: the chest wrapping the lowered far fist uncovered (the approved idle has none behind the fist), bandage tone
-  - {frame: daze, xy: [[32, 34], [34, 34], [34, 35], [35, 35], [35, 36], [36, 36], [35, 37]], rgb: [132, 115, 99]}
-  - {frame: daze_b, xy: [[32, 35], [34, 35], [34, 36], [35, 36], [35, 37], [36, 37], [35, 38]], rgb: [132, 115, 99]}
+  # daze (2026-11-15 review 2, replaces the bandage-tone patch): the lowered far forearm over the belly kept its inner
+  # outlines (the fist's top edge and the old forearm edge) as a dark scribble. One outer outline now (the ink row at
+  # y 34 under the chest), the inside shaded with the wrapping's mid tones; the slit the slump closes off between the
+  # near forearm and the hip (x 44) inked. daze_b is the same 1 px lower.
+  - {frame: daze, xy: [[31, 34], [32, 34], [34, 34], [44, 38], [44, 39], [44, 40], [44, 41], [44, 42]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[29, 35], [30, 35], [33, 35], [34, 35], [35, 35], [28, 36], [29, 36], [35, 36], [36, 36], [29, 37], [35, 37], [36, 37], [30, 38], [33, 38], [35, 38]], rgb: [132, 115, 99]}
+  - {frame: daze, xy: [[31, 35], [32, 35], [36, 35], [30, 36], [34, 36], [37, 36], [30, 37], [34, 37]], rgb: [148, 132, 107]}
+  - {frame: daze, xy: [[31, 36]], rgb: [198, 181, 156]}
+  - {frame: daze, xy: [[31, 38], [32, 38], [34, 38]], rgb: [115, 90, 90]}
+  - {frame: daze_b, xy: [[31, 35], [32, 35], [34, 35], [44, 39], [44, 40], [44, 41], [44, 42], [44, 43]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[29, 36], [30, 36], [33, 36], [34, 36], [35, 36], [28, 37], [29, 37], [35, 37], [36, 37], [29, 38], [35, 38], [36, 38], [30, 39], [33, 39], [35, 39]], rgb: [132, 115, 99]}
+  - {frame: daze_b, xy: [[31, 36], [32, 36], [36, 36], [30, 37], [34, 37], [37, 37], [30, 38], [34, 38]], rgb: [148, 132, 107]}
+  - {frame: daze_b, xy: [[31, 37]], rgb: [198, 181, 156]}
+  - {frame: daze_b, xy: [[31, 39], [32, 39], [34, 39]], rgb: [115, 90, 90]}

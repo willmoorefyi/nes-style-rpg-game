@@ -117,3 +117,8 @@ holds: []
 paint:                       # 1 px joint cracks (skirt / near thigh, near elbow), closed with outline ink
   - {frame: atk_wind1, xy: [[44, 64]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[48, 47]], rgb: [6, 4, 10]}
+  # 2026-11-15 review 2: the 1 px stray on the lowered fist's front outline; the knuckle row ends in ink at x 69
+  - {frame: daze, xy: [[70, 45]], rgb: null}
+  - {frame: daze, xy: [[69, 45]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[70, 46]], rgb: null}
+  - {frame: daze_b, xy: [[69, 46]], rgb: [6, 4, 10]}
