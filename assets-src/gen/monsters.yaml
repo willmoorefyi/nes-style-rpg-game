@@ -398,9 +398,10 @@
     jagged black iron crown, the same layered deep violet and black robes with silver trim over thin silver armour,
     black boots, and the same tall black staff ending in a curved silver sickle blade
   attack: >-
-    a sweeping sickle slash: he steps far forward toward the heroes and swings the sickle staff in a wide arc with both
-    hands, the curved silver blade sweeping down in front of him toward the heroes, robes and white hair streaming
-    behind him; the crown on his head; at the same pixel size as in Image 3
+    a sweeping sickle slash: he steps far forward toward the heroes and swings the sickle staff with both hands, the
+    staff held diagonally, its top end out in front of him toward the heroes with the curved silver sickle blade drawn
+    solid on it, the same size and shape as in Image 3; robes and white hair streaming behind him; the crown on his
+    head; no motion arc, smear or trail; at the same pixel size as in Image 3
   cast: >-
     casting a death curse: the staff held upright in the hand on the left side of the image as in Image 3, the other
     hand thrust forward toward the heroes with a black death sigil (a dark rune circle edged with violet light)
@@ -412,7 +413,8 @@
   face: his ash-grey elven face with narrow glowing violet eyes and long pointed ears is readable
   extra_negative: a shield, a second weapon, wings, a throne, a beard, a hood
   seeds: [1234]
-  sheet_seeds: {boss_idle: 1235}   # boss_idle 1234 (ROSTER_LOG R42): the crown cut by the cell top
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1235}   # boss_idle 1234 (ROSTER_LOG R42): the crown cut by the cell top;
+  # boss_attack 1234 (R44, "swings the sickle staff in a wide arc ..."): blade lost, a slash smear
 - id: warmech
   # "Warmech" (118), the ancient war machine: claw melee and Nuclear (cast)
   size: boss

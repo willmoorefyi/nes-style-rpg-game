@@ -1,0 +1,25 @@
+{
+  "character": "astos",
+  "sheet": "boss_attack",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "0bd7be3e482a6acaade3f5ab",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R45"
+}
