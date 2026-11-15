@@ -2081,19 +2081,19 @@
     it is knocked back to the left and tilted back by about fifteen degrees; it always hovers, nothing touches the
     ground; the tentacles trail and move with the motion.
   prompt: >-
-    a bulbous abyssal eye creature: a round dark blue-violet fleshy body that is one huge pale eye with a glowing teal
+    a bulbous abyssal eye creature: a round dark slate-blue fleshy body that is one huge pale eye with a glowing teal
     iris, exactly six thin dangling tentacles beneath it each ending in a small glowing teal light; it hovers, nothing
     touches the ground; in every cell the body floats at the same height in its box with clear empty space below the
     tentacle tips, centred in its own cell
   attack: >-
-    surging forward toward the heroes, the iris staring wide and glowing, the same six tentacles (exactly six, as in
-    the idle cell) reaching forward, the body at the same height as in the idle cell
+    surging forward toward the heroes, the iris staring wide and glowing, the same six tentacles as in the idle cell
+    (exactly six, no more) streaming back behind it to the left, the body at the same height as in the idle cell
   hurt: >-
-    knocked back, the eye squeezed half shut, the same six tentacles curling, the body at the same height as in the
-    idle cell
+    knocked back, the eye squeezed half shut, the same six tentacles as in the idle cell (exactly six, no more)
+    curling up under it, the body at the same height as in the idle cell
   face: the big iris and pupil are the face; no mouth
-  extra_negative: a mouth, teeth, eyestalks, fins, a crown, wrappings, a seventh tentacle, legs
-  seeds: [1234]
+  extra_negative: a mouth, teeth, eyestalks, fins, a crown, wrappings, a seventh tentacle, eight tentacles, legs
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R230): nine tentacles in the attack, about eight in the hurt
 - id: sea_snake
   # "Sea Snake" (096): a banded sea serpent with a paddle tail and fin crest
   size: large
