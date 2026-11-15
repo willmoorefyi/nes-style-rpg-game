@@ -156,7 +156,7 @@ def run_generator(check: Callable[[bool, str], None]) -> None:
     print(f"  info {len(tuning)} tuning findings on the stick figure (rig-tuning work, T1+): {tuning[:2]}")
     check(0 < one["hurt_in2"][1]["prop_px"]["dagger"] <= 0.6 * one["hurt_in1"][1]["prop_px"]["dagger"],
           "D8: the dagger is carried into hurt_in2, partly hidden behind the torso")
-    check(len(one) == 8, f"a rigged monster gets 8 generated frames ({sorted(one)})")
+    check(len(one) == 10, f"a rigged monster gets 10 generated frames ({sorted(one)})")
     check(C.frame_hash(one["atk_mid"][0]) == C.frame_hash(two["atk_mid"][0]), "frame hashes are stable")
     run_child_resolve(check)
 

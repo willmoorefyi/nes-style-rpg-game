@@ -2,8 +2,10 @@
 variants -> a native-size (texScale 1) shelf-packed atlas assets/sprites/monsters-ai.png and its JSON.
 
 JSON: {scale: 2 (screen px per art px), texScale: 1 (PNG px per art px), sheets: {id: {cell, footRow, floating,
-frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name; held or missing frames alias their source keyframe's
-rect), anim, holds, lungePx, sequence_version, page}}}.
+frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAMES for a sheet with attack_raise; held
+or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
+hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
+opaque row), sequence_version, page}}}.
 """
 from __future__ import annotations
 
@@ -57,6 +59,15 @@ def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[di
     return {**kfs, **{n: Image.fromarray(f["img"], "RGBA") for n, f in gen.items()}}, holds, True
 
 
+def anchors(idle: Image.Image) -> dict:
+    """Runtime anchors of the idle key (pass F): opaqueRight (enemy reach) and head (status overlays)."""
+    a = np.asarray(idle)[..., 3] > 0
+    ys, xs = np.nonzero(a)
+    top = int(ys.min())
+    row = np.nonzero(a[top])[0]
+    return {"opaqueRight": int(xs.max()), "head": [int(round((row.min() + row.max()) / 2)), top]}
+
+
 def build(out: Path) -> dict:
     from gen import monster as M
     entries = MA.load_entries()
@@ -78,7 +89,8 @@ def build(out: Path) -> dict:
                 raise SystemExit("monsters_ai: variant checks failed\n  " + "\n  ".join(bad))
             sprites[v["id"]] = (meta, vf, holds, anim, L)
     order = sorted(sprites)
-    items = [(sid, n) for sid in order for n in MA.frames_for("cast" in sprites[sid][1]) if n in sprites[sid][1]]
+    names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
+    items = [(sid, n) for sid in order for n in names_of[sid] if n in sprites[sid][1]]
     pos, w, h = shelf_pack([sprites[s][1][n].size for s, n in items])
     page = C.page_size(w, h)
     if page:
@@ -92,17 +104,17 @@ def build(out: Path) -> dict:
     sheets = {}
     for sid in order:
         meta, frames, holds, anim, L = sprites[sid]
-        names = MA.frames_for("cast" in frames)
-        fr = {n: rects[sid][n] if n in rects[sid] else rects[sid][MA.FRAME_SOURCE[n]] for n in names}
+        names = names_of[sid]
+        fr = {n: rects[sid][MA.resolve(n, rects[sid])] for n in names}
         cw, ch = frames["idle"].size
         for n in names:
-            img = frames.get(n) or frames[MA.FRAME_SOURCE[n]]
+            img = frames[MA.resolve(n, frames)]
             bad = C.atlas_exact(arr, (fr[n][0], fr[n][1], cw, ch), np.asarray(img))
             if bad:
                 raise SystemExit(f"monsters_ai: {sid} {n}: {bad[0]}")
         sheets[sid] = {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
-                       "frames": fr, "anim": anim, "holds": holds, "lungePx": L, "sequence_version": SEQUENCE_VERSION,
-                       "page": 0}
+                       "frames": fr, "anim": anim, "holds": holds, "lungePx": L, "hasRaise": "attack_raise" in frames,
+                       **anchors(frames["idle"]), "sequence_version": SEQUENCE_VERSION, "page": 0}
     out.mkdir(parents=True, exist_ok=True)
     atlas.save(out / "monsters-ai.png")
     meta_json = {"scale": SCALE, "texScale": TEX_SCALE, "sheets": sheets}

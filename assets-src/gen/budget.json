@@ -2,5 +2,8 @@
   "note": "User hard limit (2026-11-12): at most 100 more paid images unless the user explicitly approves more; at most 3 attempts (1 + 2 retries) per sheet in this run. Bedrock (Stability) requests are not counted against this cap (user, 2026-11-13); they are still logged in the ledger.",
   "attempts_before": 69,
   "cap": 100,
-  "max_attempts_per_sheet": 3
+  "max_attempts_per_sheet": 3,
+  "passes": [
+    {"name": "pass F (FB-8)", "note": "docs/FEEDBACK_PLAN_2026-11-14.md 3.7 / 7: garland and lich boss_attack_raise only, 1 image each plus at most 1 retry after a failed review; the budget ends at <= 30 of 100", "gemini_before": 95, "max_new": 4, "max_per_sheet": 2}
+  ]
 }

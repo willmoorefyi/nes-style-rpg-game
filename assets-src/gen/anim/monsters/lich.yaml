@@ -88,11 +88,32 @@ keyframes:
     cs_0: [105, 80]
     cs_1: [70, 60]
     cs_2: [35, 40]
+  attack_raise:                # pass F 3.7: the approved heavy-attack raise (crouch, glaive over the crown)
+    crown: [146, 66]
+    neck: [142, 100]
+    chest: [125, 112]
+    hip: [118, 140]
+    sh_n: [138, 100]
+    el_n: [150, 78]
+    hand_n: [150, 56]
+    hip_n: [130, 142]
+    knee_n: [152, 158]
+    foot_n: [142, 178]
+    toe_n: [158, 186]
+    hip_f: [105, 142]
+    knee_f: [88, 162]
+    foot_f: [75, 178]
+    toe_f: [63, 187]
+    gh: [140, 52]
+    gt: [75, 22]
+    cr_0: [110, 70]
+    cr_1: [75, 60]
+    cr_2: [30, 55]
 parts:
   weapon: {remove: true}
   head: {radius: 8.0}
   anc_g: {bone: [chest, gh], radius: 0.01}          # pixel-less: hangs the glaive grip from the chest
-  glaive: {bone: [gh, gt], radius: 1.0, in: [idle, attack, hurt]}
+  glaive: {bone: [gh, gt], radius: 1.0, in: [idle, attack, hurt, attack_raise]}
   staff: {bone: [hand_f, st], radius: 1.0, in: [cast]}
   trail: {kind: fx, bone: [gh, tra], radius: 1.0, in: [attack]}  # the drawn frost-arc trail
   crystal: {kind: fx, bone: {cast: [hand_n, cry]}, radius: 1.0, in: [cast]}   # the ice crystal: rigid in the fist, grows in via frames.<f>.scale (E4)
@@ -100,6 +121,7 @@ parts:
   wing: {bone: {attack: [ca_0, ca_1, ca_2]}, radius: 6.0}
   drape: {bone: {hurt: [neck, ch_0, ch_1, ch_2]}, radius: 6.0}
   spread: {bone: {cast: [cs_0, cs_1, cs_2]}, radius: 6.0}
+  flare: {bone: {attack_raise: [cr_0, cr_1, cr_2]}, radius: 6.0}   # pass F: the mantle flung back in the raise
   ft_n: {bone: [foot_n, toe_n], radius: 10.0}
   ft_f: {bone: [foot_f, toe_f], radius: 10.0}
 z:
@@ -107,6 +129,7 @@ z:
   attack: [wing, trail, thigh_f, shin_f, ft_f, torso, glaive, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
   hurt: [thigh_f, shin_f, ft_f, torso, drape, thigh_n, shin_n, ft_n, head, glaive]
   cast: [spread, uarm_f, farm_f, staff, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, crystal]
+  attack_raise: [flare, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, glaive]
 masks:
   cape:
     idle: [[72, 98], [86, 96], [88, 110], [87, 140], [86, 160], [82, 172], [72, 170], [62, 172], [60, 182], [52, 182], [46, 165], [48, 148], [56, 128], [64, 108]]
@@ -119,6 +142,7 @@ masks:
   trail:
     attack: [[131, 22], [100, 19], [68, 22], [62, 32], [67, 33], [77, 42], [84, 45], [87, 43], [100, 41], [119, 45], [138, 53], [148, 61], [151, 67], [151, 72], [167, 80], [171, 95], [160, 95], [154, 93], [155, 97], [175, 123], [191, 114], [194, 95], [194, 90], [187, 57], [173, 33], [164, 38], [158, 32]]
   glaive:
+    attack_raise: [[54, 18], [70, 12], [90, 11], [110, 14], [130, 18], [150, 24], [158, 30], [150, 30], [130, 26], [110, 24], [100, 30], [120, 40], [140, 50], [172, 64], [172, 70], [165, 70], [135, 56], [95, 36], [90, 38], [86, 30], [75, 27], [60, 24]]
     idle: [[5, 68], [20, 72], [40, 81], [60, 93], [82, 102], [106, 113], [124, 119], [150, 124], [175, 136], [195, 145], [192, 153], [165, 154], [140, 148], [124, 138], [122, 126], [104, 120], [80, 109], [58, 101], [38, 90], [18, 82], [6, 76]]
     attack: [[25, 28], [50, 32], [66, 34], [76, 43], [100, 54], [125, 63], [150, 73], [166, 81], [169, 93], [160, 93], [140, 85], [115, 75], [90, 63], [76, 57], [66, 60], [58, 54], [44, 46], [28, 37]]
     hurt: [[16, 86], [24, 87], [60, 107], [95, 129], [124, 148], [140, 156], [160, 167], [179, 179], [181, 189], [165, 191], [145, 187], [137, 179], [127, 168], [121, 160], [90, 139], [55, 116], [20, 95], [15, 90]]
@@ -126,7 +150,10 @@ masks:
     cast: [[15, 150], [30, 141], [50, 129], [62, 121], [75, 116], [84, 108], [92, 111], [82, 124], [72, 136], [55, 146], [35, 153], [17, 156]]
   crystal:
     cast: [[143, 1], [182, 1], [184, 41], [172, 45], [152, 44], [143, 32]]
+  flare:
+    attack_raise: [[28, 52], [45, 40], [62, 38], [80, 42], [100, 50], [112, 62], [112, 80], [105, 95], [95, 102], [70, 102], [50, 95], [40, 85], [30, 70]]
   head:
+    attack_raise: [[132, 62], [165, 60], [170, 75], [165, 100], [140, 102], [132, 90]]
     idle: [[106, 6], [140, 6], [140, 32], [136, 40], [134, 57], [112, 57], [108, 40], [104, 30]]
     attack: [[118, 58], [134, 58], [142, 60], [146, 64], [147, 70], [140, 76], [141, 86], [146, 92], [146, 100], [130, 102], [120, 90], [118, 70]]
     hurt: [[98, 42], [118, 42], [125, 64], [150, 66], [155, 80], [152, 100], [145, 104], [128, 105], [118, 100], [110, 80], [98, 70]]
@@ -184,7 +211,22 @@ frames:                        # translation-led in-betweens (no head / torso ro
     moves: []
     pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
     tweaks: {crown: [0, -1], neck: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -2], hand_n: [0, 0], cry: [0, -2], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], st: [0, -1], hip_n: [0, -1], hip_f: [0, -1], cs_0: [0, -1], cs_1: [2, -4], cs_2: [4, -7]}
-holds: []
+  daze:                       # pass F 5a: translations only (the shared toward-hurt move tilts the skull off the collar)
+    moves: []
+  daze_b:
+    moves: []
+  atk_swing:                  # pass F 3.7: the raise swinging forward: the upper body (skull, arms, glaive, mantle) one
+    t: 0.0                    # rigid piece turned 6 deg forward about the hip and 7 px toward the lunge, 4 down; legs pinned
+    moves: []
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [1, 7], neck: [-3, 7], chest: [-4, 5], sh_n: [-3, 6], el_n: [-1, 8], hand_n: [2, 8], gh: [2, 7], gt: [6, 0], cr_0: [0, 4], cr_1: [2, 0], cr_2: [2, -5], hip: [-7, 4], hip_n: [-7, 4], hip_f: [-7, 4]}
+  atk_swing2:                 # pass F 3.7: the heavy mid frame: the plain atk_mid pass with the upper body 8 px back toward
+    moves: []                 # the raise and 4 up (far knee half), the far leg 7 px less toward idle
+    pins: [foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [8, -12], neck: [8, -12], chest: [8, -12], hip: [8, -12], sh_n: [8, -12], el_n: [8, -12], hand_n: [8, -12], hip_n: [8, -12], hip_f: [16, -12], gh: [8, -12], gt: [8, -12], tra: [8, -12], ca_0: [8, -12], ca_1: [9, -5], ca_2: [14, 3], foot_f: [10, 0], toe_f: [10, 0], knee_f: [13, -2], foot_n: [1, 0], toe_n: [1, 0]}
+holds:
+  - {frame: atk_raise_in, reason: "the idle glaive lies low across the body, the raise holds it over the crown: a ~150 deg
+     turn no 30 deg-capped cut-out bridges in one frame; held, it shows the coiled atk_wind1 (the TS fallback too)"}
 paint:                         # outline ink in the 1-3 px cracks the translations open (head / collar, mantle / arm, drape)
   # V.1 follow-up: atk_follow drops the trail, but the glaive mask's lower end (x 160-169, y 81-93) kept a pale nub of
   # the trail's inner edge over the hidden shaft end (the approved attack key shows no butt spike there: the shaft
@@ -198,3 +240,7 @@ paint:                         # outline ink in the 1-3 px cracks the translatio
   # G1 (E4): ink on the head edge the deeper gather bow opens
   - {frame: cast_gather, xy: [[113, 32], [113, 33], [113, 40], [113, 42], [109, 46]], rgb: [6, 4, 10]}
   - {frame: cast_gather, xy: [[138, 42], [138, 44]], rgb: [6, 4, 10]}
+  # pass F heavy: pockets the swing opens in the mantle and between torso and far thigh, outline ink
+  - {frame: atk_swing, xy: [[51, 55], [51, 56], [52, 56], [52, 57], [53, 57], [52, 58], [53, 58]], rgb: [6, 4, 10]}
+  - {frame: atk_swing2, xy: [[103, 169], [102, 170], [103, 170], [102, 171], [102, 172], [103, 172], [102, 173]], rgb: [6, 4, 10]}
+  - {frame: atk_swing, xy: [[122, 71], [122, 72], [122, 73], [122, 74]], rgb: [6, 4, 10]}

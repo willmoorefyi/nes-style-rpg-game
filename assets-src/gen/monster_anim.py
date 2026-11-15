@@ -22,32 +22,11 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 APPROVED = HERE / "approved"
 RIGS = HERE / "anim" / "monsters"
-KEYFRAMES = ("idle", "attack", "hurt", "cast")
-MONSTER_FRAMES = ["idle", "idle_b", "atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover",
-                  "hurt_in1", "hurt_in2", "hurt"]
-BOSS_FRAMES = MONSTER_FRAMES + ["cast_gather", "cast_rise", "cast", "cast_release"]
-FRAME_SOURCE = {"idle_b": "idle", "atk_wind1": "idle", "atk_wind2": "idle", "atk_mid": "attack", "atk_follow": "attack",
-                "atk_recover": "idle", "hurt_in1": "idle", "hurt_in2": "hurt", "cast_gather": "idle", "cast_rise": "cast",
-                "cast_release": "cast"}
-SEQUENCES = {"attack": ["idle", "atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover", "idle"],
-             "hurt": ["idle", "hurt_in1", "hurt_in2", "hurt"],
-             "cast": ["idle", "cast_gather", "cast_rise", "cast", "cast_release"]}
-SPAN = {"attack": ("idle", "attack"), "hurt": ("idle", "hurt"), "cast": ("idle", "cast")}
-ARM = ("sh_{h}", "el_{h}", "hand_{h}")
-# frame -> pixel source, toward, t (table 3.1 terms; `over` = overshoot of toward->src), moves, pins, body_dy
-RECIPES = {
-    "atk_wind1": {"src": "idle", "toward": "attack", "t": -0.20, "moves": "wind", "pins": "legs", "dy": 1},
-    "atk_wind2": {"src": "idle", "toward": "attack", "t": -0.35, "moves": "wind", "pins": "legs", "dy": 2},
-    "atk_mid": {"src": "attack", "toward": "atk_wind2", "t": 0.35, "moves": "all", "pins": "planted"},
-    "atk_follow": {"src": "attack", "toward": "idle", "t": 1.10, "over": True, "moves": "follow", "pins": "feet"},
-    "atk_recover": {"src": "idle", "toward": "attack", "t": 0.30, "moves": "follow", "pins": "legs"},
-    "hurt_in1": {"src": "idle", "toward": "hurt", "t": 0.35, "moves": "all", "pins": "feet"},
-    "hurt_in2": {"src": "hurt", "toward": "idle", "t": 0.35, "moves": "all", "pins": "feet", "carry": True},
-    "cast_gather": {"src": "idle", "toward": "cast", "t": 0.25, "moves": "cast", "pins": "feet", "dy": 1},
-    "cast_rise": {"src": "cast", "toward": "idle", "t": 0.35, "moves": "cast", "pins": "feet"},
-    "cast_release": {"src": "cast", "toward": "idle", "t": 1.10, "over": True, "moves": "release", "pins": "feet",
-                     "raise": 2},
-}
+if str(HERE.parent) not in sys.path:                      # run as a script: make the `gen` package importable
+    sys.path.insert(0, str(HERE.parent))
+from gen.monster_recipes import (ARM, BOSS_FRAMES, FALLBACK, FRAME_SOURCE, HEAD, KEYFRAMES,  # noqa: E402,F401
+                                 MONSTER_FRAMES, NEEDS, RAISE_FRAMES, RECIPES, SEQUENCES, SPAN, frames_for,
+                                 generated_names, head_joints, held, resolve, span_of)
 
 
 def recipe_u(name: str, rig_cfg: dict | None = None) -> float:
@@ -55,14 +34,6 @@ def recipe_u(name: str, rig_cfg: dict | None = None) -> float:
     r = RECIPES[name]
     t = float(((rig_cfg or {}).get("frames") or {}).get(name, {}).get("t", r["t"]))
     return -(t - 1.0) if r.get("over") else t
-
-
-def frames_for(has_cast: bool) -> list[str]:
-    return BOSS_FRAMES if has_cast else MONSTER_FRAMES
-
-
-def generated_names(has_cast: bool) -> list[str]:
-    return [f for f in frames_for(has_cast) if f not in KEYFRAMES]
 
 
 # ───────── approved keyframes ─────────
@@ -81,7 +52,8 @@ def load_entries() -> list[tuple[str, dict, dict[str, Image.Image]]]:
         if not all(idle_meta.with_name(f"boss_{p}.json").exists() for p in ("idle", "attack", "hurt")):
             print(f"monsters_ai: {idle_meta.parent.name} boss poses incomplete, skipped")
             continue
-        poses = ["idle", "attack", "hurt"] + (["cast"] if idle_meta.with_name("boss_cast.json").exists() else [])
+        poses = ["idle", "attack", "hurt"] + [p for p in ("cast", "attack_raise")      # optional boss keyframes
+                                              if idle_meta.with_name(f"boss_{p}.json").exists()]
         metas, frames = [], {}
         for p in poses:
             path = idle_meta.with_name(f"boss_{p}.json")
@@ -129,6 +101,17 @@ def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
     return over.get("moves", moves), list(over.get("pins", pins))
 
 
+def _tweaks(recipe: dict | None, rig: dict | None, head: tuple[str, ...]) -> dict[str, list[float]]:
+    """The recipe's shared tweaks, then the rig's frames.<f>.tweaks added per joint. In the recipe `head` stands for
+    the body template's head joints (monster_recipes.HEAD); a rig's tweaks name real joints (a beast's `head`)."""
+    out: dict[str, list[float]] = {}
+    for src, symbolic in ((recipe or {}, True), (rig or {}, False)):
+        for j, (dx, dy) in src.items():
+            for k in (head if symbolic and j == HEAD else (j,)):
+                out[k] = [out.get(k, [0, 0])[0] + dx, out.get(k, [0, 0])[1] + dy]
+    return out
+
+
 def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: dict) -> dict[str, dict]:
     """Every generated frame of a rigged sprite: {name: {img, labels, parts, u, src, toward, joints, rots, pinned,
     prop_px, ..., fx, grips, names (check-only, monster_render.check_info)}}. Held frames are skipped (the atlas
@@ -142,31 +125,39 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     size = (cell[1], cell[0])
     arrs = {k: np.asarray(v.convert("RGBA")).copy() for k, v in keyframes.items()}
     segs = {k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes}
-    holds, pairs = {h["frame"] for h in cfg.get("holds") or []}, rig.joined_pairs()
+    holds, pairs = held(cfg.get("holds")), rig.joined_pairs()
     gaps = {k: RR.source_gaps(s[0], pairs) for k, s in segs.items()}     # the approved art's own part gaps
     foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
                   for ft in rig.feet}
-    has_cast = "cast" in keyframes
+    has_cast, has_raise = "cast" in keyframes, "attack_raise" in keyframes
+    if has_raise and "attack_raise" not in rig.keyframes:
+        raise ValueError(f"rig {sprite}: the approved attack_raise keyframe has no keyframes.attack_raise joints")
+    head = head_joints(rig.head, rig.body, sprite, rig.keyframes["idle"])
     out: dict[str, dict] = {}
-    if cfg.get("breath", True) and "idle_b" not in holds:
-        idle = keyframes["idle"]
-        img = np.asarray(PU.bob(idle, cell[1], 1) if meta.get("floating") else
-                         PU.bob(idle, int(round(rig.keyframes["idle"][rig.breath][1])), 1)).copy()
-        out["idle_b"] = {"img": img, "labels": None, "src": "idle", "toward": "idle", "u": 0.0, "joints": {}, "rots": {},
-                         "pinned": True, "prop_px": {}}
-    for name in generated_names(has_cast):
-        if name == "idle_b" or name in holds:
+    bobbed = [n for n, r in RECIPES.items() if r.get("bob") and n in generated_names(has_cast, has_raise)
+              and ((cfg.get("frames") or {}).get(n) or {}).get("bob", True)]
+    for name in (["idle_b"] if cfg.get("breath", True) else []) + bobbed:   # 1 px down above the breath joint's row
+        src = RECIPES[name]["src"] if name in RECIPES else "idle"
+        if name in holds:
+            continue
+        img = np.asarray(PU.bob(keyframes[src], cell[1], 1) if meta.get("floating") else
+                         PU.bob(keyframes[src], int(round(rig.keyframes[src][rig.breath][1])), 1)).copy()
+        out[name] = {"img": img, "labels": None, "src": src, "toward": src, "u": 0.0, "joints": {}, "rots": {},
+                     "pinned": True, "prop_px": {}}
+    for name in generated_names(has_cast, has_raise):
+        if name in out or name == "idle_b" or name in holds:
             continue
         r, over = RECIPES[name], (cfg.get("frames") or {}).get(name, {})
         u = recipe_u(name, cfg)
         S = rig.keyframes[r["src"]]
         T = out[r["toward"]]["joints"] if r["toward"] in out else rig.keyframes[r["toward"]]
         moves, pins = _joint_sets(rig, name, r, cfg)
-        tweaks = dict(over.get("tweaks") or {})
+        k = max(1, int(cell[1] / 80 + 0.5)) if r.get("cell_scale") else 1    # daze: px per 80 px of cell
+        tweaks = _tweaks({j: [v[0] * k, v[1] * k] for j, v in (r.get("tweaks") or {}).items()}, over.get("tweaks"), head)
         if r.get("raise"):
             hand = f"hand_{cfg.get('cast_hand', 'n')}"
             tweaks[hand] = [tweaks.get(hand, [0, 0])[0], tweaks.get(hand, [0, 0])[1] - r["raise"]]
-        J = R.solve(rig, S, T, u, moves, pins, int(over.get("dy", r.get("dy", 0))), tweaks, not meta.get("floating"))
+        J = R.solve(rig, S, T, u, moves, pins, int(over.get("dy", r.get("dy", 0) * k)), tweaks, not meta.get("floating"))
         layers, rots, prop_px = [], {}, {}
         lab, names = segs[r["src"]]
         drop = set(over.get("drop") or [])
@@ -217,6 +208,5 @@ def monster_frames(sprite: str, keyframes: dict[str, Image.Image] | None = None,
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, str(HERE.parent))
     from gen import monster_review as MR
     sys.exit(MR.main(sys.argv[1:]))

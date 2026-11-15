@@ -97,6 +97,10 @@ frames:
     moves: [chest]
     pins: [foot_f, knee_f]
     tweaks: {crown: [2, 3], neck: [2, 3], chest: [-1, 0], hand_n: [-1, 0], tip: [-2, 0], foot_n: [-4, 1], toe_n: [-4, 1], knee_n: [-2, 0]}
+  daze:                       # pass F 5a: t 0.05 keeps the slump inside the bbox band (the hurt key is much shorter)
+    t: 0.05
+  daze_b:
+    t: 0.05
 masks:
   uarm_f:                      # attack: the raised far sleeve next to the hat is arm, not head (else it rides the head)
     attack: [[26, 21], [33, 21], [37, 26], [37, 31], [30, 31], [25, 27]]

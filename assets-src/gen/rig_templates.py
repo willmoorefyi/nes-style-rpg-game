@@ -27,7 +27,9 @@ bird                                        root `hip`
 
 Per template: `legs` (pinned with the knees in wind-up / recover), `feet` (pinned in follow / hurt / cast; the ground
 line), `limbs` (two-bone IK chains that keep a held / grounded foot), `moves` (the joint sets of the recipes),
-`planted` (atk_mid's planted foot or feet) and `breath` (idle_b moves everything above this joint's row 1 px down).
+`planted` (atk_mid's planted foot or feet), `breath` (idle_b moves everything above this joint's row 1 px down) and
+`head` (the joints a recipe's symbolic `head` tweak moves, e.g. the daze slump: `head` + `snout` / `beak`; the biped's
+are `crown` + `neck` in rig.py; a rig missing one is an error).
 """
 from __future__ import annotations
 
@@ -70,6 +72,7 @@ QUADRUPED = {
     "moves": _moves(["back", "chest"], ["neck", "head", "snout", "jaw"]),
     "planted": ["foot_n", "foot_f"],
     "breath": "hip",
+    "head": ("head", "snout"),
 }
 
 BIRD = {
@@ -94,6 +97,7 @@ BIRD = {
     "moves": _moves(["chest"], ["neck", "head", "beak"]),
     "planted": ["foot_f"],
     "breath": "hip",
+    "head": ("head", "beak"),
 }
 
 BEASTS = {"quadruped": QUADRUPED, "bird": BIRD}

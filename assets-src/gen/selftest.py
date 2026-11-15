@@ -405,6 +405,9 @@ def test_monster_anim() -> None:
     print("monster wave-0 framework (F1-F7, efix_gates, fx allowlist)")
     from gen import selftest_efix as SE
     SE.run_efix(check)
+    print("monster pass F framework (daze recipe, head joints, hold fallback, heavy raise)")
+    from gen import selftest_daze as SD
+    SD.run_daze(check)
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

@@ -1,5 +1,5 @@
 import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
-import { BOSS_FRAMES, FRAME_SOURCE, LATE_FRAMES, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { BOSS_FRAMES, FRAME_FALLBACK, FRAME_SOURCE, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -28,8 +28,10 @@ const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.j
   scale: number;
   texScale?: number;
   sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>;
-    anim?: boolean; holds?: string[]; lungePx?: number }>;
+    anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number] }>;
 };
+/** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
+const RAISE_FRAMES = new Set<MonsterFrame>(['attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2']);
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
 const enemies = readYaml<Array<{ id: string; sprite?: string }>>('data/enemies.yaml');
 /** Battle art is looked up by `sprite` (palette-swap variants), like BattleArt.monsterSpriteKey. */
@@ -162,8 +164,8 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(w, 'page width (native px)').toBeLessThanOrEqual(4096 * ts);
       expect(h, 'page height (native px)').toBeLessThanOrEqual(4096 * ts);
       for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
-        // LATE_FRAMES (daze, the heavy raise) join the atlas with pass F's Ff, which drops this exclusion
-        const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !LATE_FRAMES.has(n));
+        // every sheet has daze / daze_b (pass F 5a); the heavy raise frames only with hasRaise (pass F 7)
+        const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n));
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
         for (const [x, y] of Object.values(e.frames)) {
           expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);
@@ -178,14 +180,29 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         const holds = e.holds ?? [];
         for (const n of Object.keys(e.frames) as MonsterFrame[]) {
           if (FRAME_SOURCE[n] === n) continue;
+          if (holds.includes(n)) {                 // a held frame shows its fallback (e.g. atk_raise_in -> atk_wind1)
+            expect(e.frames[n].join(), `${id} ${n}`).toBe(e.frames[FRAME_FALLBACK[n]].join());
+            continue;
+          }
           const own = e.frames[n].join() !== e.frames[FRAME_SOURCE[n]].join();
-          expect(own, `${id} ${n}`).toBe(!!e.anim && !holds.includes(n));
+          expect(own, `${id} ${n}`).toBe(!!e.anim);
         }
-        for (const prefix of ['atk_', 'hurt_in', 'cast_']) {
+        for (const prefix of ['atk_', 'hurt_in', 'cast_', 'daze']) {
           expect(holds.filter((f) => f.startsWith(prefix)).length, `${id} holds ${prefix}*`).toBeLessThanOrEqual(1);
         }
         expect(e.lungePx, id).toBeGreaterThanOrEqual(24);
         expect(e.lungePx, id).toBeLessThanOrEqual(40);
+      }
+    });
+
+    it('the bosses carry the heavy raise (hasRaise) and every sheet has its runtime anchors (opaqueRight, head)', () => {
+      for (const id of ['garland', 'lich']) expect(monsterAtlas.sheets[id].hasRaise, id).toBe(true);
+      for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
+        expect(e.hasRaise ?? false, id).toBe('attack_raise' in e.frames);
+        expect(e.opaqueRight, id).toBeGreaterThan(0);
+        expect(e.opaqueRight!, id).toBeLessThan(e.cell[0]);
+        const [hx, hy] = e.head!;
+        expect(hx >= 0 && hx < e.cell[0] && hy >= 0 && hy < e.footRow, id).toBe(true);
       }
     });
 

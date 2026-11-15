@@ -392,6 +392,12 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
             if n >= b["max_attempts_per_sheet"]:
                 raise SystemExit(f"refused: {r.character}/{r.sheet.name} already used {n} attempts this run "
                                  f"(max {b['max_attempts_per_sheet']})")
+        for cap in b.get("passes", []):              # a pass's own caps (pass F, FB-8): total and per sheet
+            new = attempts[cap["gemini_before"]:]
+            if len(new) + len(misses) > cap["max_new"] or any(sum(e.get("character") == r.character and e.get(
+                    "sheet") == r.sheet.name for e in new) >= cap["max_per_sheet"] for r in misses):
+                raise SystemExit(f"refused: {cap['name']} allows {cap['max_new']} new Gemini attempts "
+                                 f"({cap['max_per_sheet']} per sheet); {len(new)} used")
     for r in misses:
         prior = [e for e in ledger if e.get("character") == r.character and e.get("sheet") == r.sheet.name
                  and e.get("event") == "attempt"]

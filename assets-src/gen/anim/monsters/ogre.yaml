@@ -132,3 +132,5 @@ paint:                         # hurt_in1: the far arm / belly slit (open in idl
   # tusk / brow and in the armpit), closed with the outline
   - {frame: hurt_in1, xy: [[77, 83], [79, 86]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[58, 39], [71, 70]], rgb: [6, 4, 10]}
+  # pass F daze_b: the 5 px pocket between the far forearm and thigh the 2 px slump closes off, outline ink
+  - {frame: daze_b, xy: [[42, 90], [41, 91], [42, 91], [41, 92], [42, 92]], rgb: [6, 4, 10]}

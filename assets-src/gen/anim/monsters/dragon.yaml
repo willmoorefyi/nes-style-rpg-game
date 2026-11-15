@@ -167,6 +167,12 @@ frames:
     pins: []
     moves: [back, chest]      # neck and head keep the hurt angle (only the tweaks move them)
     tweaks: {hip: [-4, 10], back: [-4, 10], chest: [-4, 10], neck: [-4, 10], head: [-4, 10], snout: [-4, 10], tail0: [-4, 10], wr_n: [0, 14], wt_n: [0, 14], sh_n: [-4, 10], el_n: [-4, 10], paw_n: [-4, 10], ftoe_n: [-4, 10], hip_n: [-4, 6], hip_f: [-4, 6], knee_n: [-4, 3], knee_f: [-4, 3], foot_n: [-4, 0], foot_f: [-4, 2], toe_n: [-4, 0], toe_f: [-4, 2], tail1: [-4, 5], tail2: [-4, 0], tail3: [-4, 0], tail_tip: [-4, 0]}
+  daze:                       # pass F 5a: body slump only (the shared toward-hurt move rears the neck and flicks the tail)
+    t: 0.05
+    moves: [back, chest, neck, head, snout]
+  daze_b:
+    t: 0.05
+    moves: [back, chest, neck, head, snout]
 holds: []
 paint:                         # outline ink: a 1 px neck/head crack (follow)
   - {frame: atk_follow, xy: [[91, 83]], rgb: [6, 4, 10]}
@@ -210,3 +216,6 @@ paint:                         # outline ink: a 1 px neck/head crack (follow)
   - {frame: hurt_in2, xy: [[62, 115]], rgb: [99, 24, 41]}
   # hurt_in2: the thigh / far-leg crease thinned to one outline line (the rest in shadow)
   - {frame: hurt_in2, xy: [[67, 91], [66, 92], [68, 92], [65, 93], [67, 93], [64, 94], [66, 94], [67, 94], [62, 95], [63, 95]], rgb: [49, 16, 33]}
+  # pass F daze: the 1 px wing / neck notch the slump opens, outline ink
+  - {frame: daze, xy: [[73, 85]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[73, 87]], rgb: [6, 4, 10]}
