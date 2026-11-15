@@ -1,0 +1,178 @@
+sprite: sphinx
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Winged sphinx: lion body, eagle wings, striped headdress. The dragon's winged recipe: the folded-up idle wings (both,
+# near and far) are one rigid part (wing_i) on the withers; the raised attack wings and the hurt wings sit on their own
+# root joints (wr_n / wr_f), so idle-sourced frames keep the idle wings and attack- / hurt-sourced frames keep theirs.
+# The tail is hidden in the hurt key, so its part exists only in idle and attack. In the attack the near forepaw is
+# raised (a swipe), so atk_mid plants only the far forepaw and both hind feet.
+keyframes:
+  idle:
+    hip: [40, 90]
+    back: [55, 82]
+    chest: [75, 85]
+    neck: [82, 75]
+    head: [88, 62]
+    snout: [103, 72]
+    tail0: [35, 88]
+    tail1: [25, 95]
+    tail2: [18, 88]
+    tail_tip: [20, 78]
+    wtip_i: [35, 40]
+    sh_n: [75, 92]
+    el_n: [76, 106]
+    paw_n: [78, 116]
+    ftoe_n: [82, 120]
+    sh_f: [88, 92]
+    el_f: [92, 106]
+    paw_f: [98, 116]
+    ftoe_f: [102, 120]
+    hip_n: [38, 95]
+    knee_n: [32, 108]
+    foot_n: [32, 116]
+    toe_n: [36, 120]
+    hip_f: [55, 98]
+    knee_f: [55, 108]
+    foot_f: [55, 116]
+    toe_f: [60, 119]
+  attack:
+    hip: [35, 92]
+    back: [55, 85]
+    chest: [75, 90]
+    neck: [82, 82]
+    head: [90, 76]
+    snout: [105, 85]
+    tail0: [30, 88]
+    tail1: [17, 85]
+    tail2: [16, 70]
+    tail_tip: [22, 62]
+    wr_n: [62, 76]
+    wt_n: [35, 32]
+    wr_f: [70, 72]
+    wt_f: [72, 30]
+    sh_n: [80, 95]
+    el_n: [95, 100]
+    paw_n: [105, 102]
+    ftoe_n: [112, 104]
+    sh_f: [85, 98]
+    el_f: [90, 108]
+    paw_f: [95, 116]
+    ftoe_f: [100, 120]
+    hip_n: [32, 95]
+    knee_n: [25, 105]
+    foot_n: [20, 115]
+    toe_n: [22, 120]
+    hip_f: [42, 98]
+    knee_f: [40, 108]
+    foot_f: [38, 116]
+    toe_f: [42, 119]
+  hurt:
+    hip: [42, 95]
+    back: [58, 85]
+    chest: [75, 88]
+    neck: [80, 78]
+    head: [90, 68]
+    snout: [105, 78]
+    tail0: [37, 93]
+    tail1: [35, 96]
+    tail2: [34, 99]
+    tail_tip: [33, 101]
+    wr_n: [60, 80]
+    wt_n: [32, 38]
+    wr_f: [72, 72]
+    wt_f: [80, 40]
+    sh_n: [72, 95]
+    el_n: [74, 106]
+    paw_n: [75, 116]
+    ftoe_n: [80, 120]
+    sh_f: [85, 96]
+    el_f: [88, 106]
+    paw_f: [93, 116]
+    ftoe_f: [98, 120]
+    hip_n: [38, 98]
+    knee_n: [34, 108]
+    foot_n: [33, 116]
+    toe_n: [36, 120]
+    hip_f: [55, 100]
+    knee_f: [55, 110]
+    foot_f: [56, 117]
+    toe_f: [60, 120]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  wing_i: {bone: [chest, wtip_i], radius: 8.0, in: [idle]}
+  wing_n: {bone: [wr_n, wt_n], radius: 8.0, in: [attack, hurt]}
+  wing_f: {bone: [wr_f, wt_f], radius: 8.0, in: [attack, hurt]}
+  tail: {chain: [tail0, tail1, tail2, tail_tip], in: [idle, attack]}
+  body: {width: auto}
+masks:
+  neck:
+    idle: [[72, 76], [84, 74], [90, 84], [90, 98], [76, 98], [70, 86]]
+  wing_i:
+    idle: [[26, 36], [45, 42], [56, 37], [62, 38], [72, 42], [84, 46], [88, 50], [78, 55], [73, 62], [72, 72], [66, 80], [55, 78], [45, 70], [35, 60], [28, 50]]
+  wing_n:
+    attack: [[30, 28], [45, 38], [55, 50], [62, 60], [66, 70], [62, 80], [52, 78], [42, 65], [35, 52], [30, 40]]
+    hurt: [[28, 34], [45, 44], [56, 50], [62, 62], [64, 75], [58, 82], [48, 78], [40, 66], [34, 55], [28, 44]]
+  wing_f:
+    attack: [[68, 26], [74, 30], [80, 45], [82, 58], [76, 66], [70, 75], [64, 70], [64, 50], [66, 35]]
+    hurt: [[76, 36], [80, 40], [84, 52], [84, 62], [78, 68], [72, 74], [66, 66], [66, 50], [72, 40]]
+  head:
+    idle: [[86, 50], [98, 49], [106, 58], [106, 80], [100, 96], [84, 96], [76, 78], [72, 72], [73, 62], [78, 55]]
+    attack: [[76, 62], [95, 62], [106, 72], [106, 92], [92, 100], [80, 96], [74, 80]]
+    hurt: [[76, 62], [100, 62], [108, 72], [106, 90], [100, 100], [86, 100], [76, 90], [74, 72]]
+frames:
+  atk_wind1:   # anticipation: head drawn back and up, spine 1 px back
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {head: [-2, -1], snout: [-2, -2], neck: [-1, 0], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:   # coil: head reared back, spine 2 px back and 1 down
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-2, -1], head: [-4, -2], snout: [-4, -4], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  atk_mid:   # the pass: far forepaw and hind feet planted; the stretched near hind leg 3 px toward idle
+    t: 0.35
+    moves: [back, chest, neck, head, snout]
+    tweaks: {tail2: [0, 1], tail3: [0, 2], foot_n: [3, 0], toe_n: [3, 0], knee_n: [3, 0], hip_n: [3, 0]}
+    pins: [paw_f, foot_n, foot_f]
+  atk_follow:   # the settle (t 0.75), spine only: the raised swiping arm rides the chest (pinned in the air it cracked)
+    t: 0.75
+    moves: [back, chest]
+    tweaks: {tail2: [0, 1], tail3: [0, 2]}
+    pins: [paw_f, foot_n, foot_f, el_f]
+  atk_recover:   # 30% toward the swipe
+    t: 0.2
+    moves: [back, chest]
+  hurt_in1:   # the flinch starts: spine, neck and head 20% toward hurt, head jerks back and up (the hip stays: moving it tore the far hind leg); feet and elbows planted
+    t: 0.2
+    moves: [back, chest, neck, head, snout]
+    tweaks: {head: [-2, -2], snout: [-2, -2]}
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f]
+  hurt_in2:   # 30% back toward idle; legs, elbows and the far shoulder planted
+    t: 0.3
+    moves: [back, chest, neck, head, snout]
+    tweaks: {tail2: [0, 2], tail3: [0, 4], tail_tip: [12, 12]}
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f]
+  daze:   # head and snout hang (the neck stays put)
+    t: 0.0
+    dy: 0
+    moves: [back, chest, head, snout]
+    tweaks: {head: [-1, -1], snout: [-1, 0]}
+  daze_b:
+    t: 0.0
+    dy: 0
+    moves: [back, chest, head, snout]
+    tweaks: {head: [-1, -1], snout: [-1, 1]}
+holds: []
+paint:
+  - {frame: atk_mid, xy: [[22, 123], [23, 123]], rgb: null}
+  - {frame: atk_wind2, xy: [[60, 107]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[75, 67], [74, 68], [75, 68], [74, 69], [51, 69]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[88, 49], [87, 50], [88, 50], [85, 51], [86, 51], [87, 51], [84, 52]], rgb: [107, 66, 49]}
+  - {frame: daze_b, xy: [[88, 49], [87, 50], [88, 50], [85, 51], [86, 51], [87, 51], [84, 52], [85, 52], [84, 53]], rgb: [107, 66, 49]}
+  - {frame: daze, xy: [[82, 53], [83, 53], [80, 54], [81, 54], [79, 55], [80, 55]], rgb: [107, 66, 49]}

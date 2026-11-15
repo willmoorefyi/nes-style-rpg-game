@@ -1,0 +1,163 @@
+sprite: white_crocodile
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# The albino sibling of `crocodile`: larger and heavier, the tail folded over the back. Its tail keys differ a lot
+# (folded in idle, a raised arch in attack, flung up in hurt), so it stays out of every `moves` set and rides the body
+# (tweaks only: the arch top 1-2 px lower in mid / follow, the hurt tail lowered toward the fold in hurt_in2). The far
+# hind leg is hidden behind the near one, so its parts are removed (its segment tore a hole under the belly).
+keyframes:
+  idle:
+    hip: [35, 80]
+    back: [65, 72]
+    chest: [95, 78]
+    neck: [114, 80]
+    head: [124, 78]
+    snout: [170, 80]
+    tail0: [22, 78]
+    tail1: [10, 70]
+    tail2: [20, 57]
+    tail3: [35, 53]
+    tail_tip: [55, 59]
+    sh_n: [78, 92]
+    el_n: [77, 104]
+    paw_n: [80, 112]
+    ftoe_n: [88, 118]
+    sh_f: [120, 94]
+    el_f: [132, 102]
+    paw_f: [137, 107]
+    ftoe_f: [144, 111]
+    hip_n: [40, 88]
+    knee_n: [38, 100]
+    foot_n: [35, 108]
+    toe_n: [32, 113]
+    hip_f: [52, 88]
+    knee_f: [55, 94]
+    foot_f: [57, 98]
+    toe_f: [60, 101]
+  attack:
+    hip: [35, 75]
+    back: [70, 65]
+    chest: [100, 76]
+    neck: [116, 78]
+    head: [124, 76]
+    snout: [166, 74]
+    tail0: [25, 72]
+    tail1: [10, 60]
+    tail2: [12, 40]
+    tail3: [30, 32]
+    tail_tip: [62, 45]
+    sh_n: [72, 96]
+    el_n: [73, 106]
+    paw_n: [77, 113]
+    ftoe_n: [80, 120]
+    sh_f: [104, 92]
+    el_f: [108, 99]
+    paw_f: [111, 104]
+    ftoe_f: [116, 107]
+    hip_n: [35, 85]
+    knee_n: [28, 97]
+    foot_n: [25, 105]
+    toe_n: [20, 110]
+    hip_f: [48, 86]
+    knee_f: [52, 92]
+    foot_f: [55, 96]
+    toe_f: [58, 99]
+  hurt:
+    hip: [40, 85]
+    back: [70, 72]
+    chest: [100, 82]
+    neck: [114, 88]
+    head: [120, 88]
+    snout: [158, 90]
+    tail0: [22, 85]
+    tail1: [9, 72]
+    tail2: [24, 55]
+    tail3: [40, 42]
+    tail_tip: [18, 30]
+    sh_n: [65, 100]
+    el_n: [70, 108]
+    paw_n: [74, 115]
+    ftoe_n: [83, 119]
+    sh_f: [112, 100]
+    el_f: [117, 104]
+    paw_f: [121, 107]
+    ftoe_f: [127, 110]
+    hip_n: [30, 95]
+    knee_n: [22, 104]
+    foot_n: [18, 110]
+    toe_n: [14, 114]
+    hip_f: [48, 98]
+    knee_f: [52, 102]
+    foot_f: [54, 104]
+    toe_f: [57, 106]
+parts:
+  thigh_f: {remove: true}
+  shin_f: {remove: true}
+  hpaw_f: {remove: true}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: auto}
+masks:
+  head:
+    idle: [[112, 66], [140, 66], [160, 70], [173, 76], [173, 92], [150, 94], [124, 94], [112, 92]]
+    attack: [[112, 66], [140, 66], [158, 66], [172, 68], [172, 112], [150, 112], [130, 100], [114, 92]]
+    hurt: [[110, 76], [140, 78], [162, 84], [162, 102], [140, 104], [112, 100]]
+frames:
+  atk_wind1:   # anticipation: head drawn back and up, body 1 px back
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {head: [-2, -1], snout: [-2, -2], neck: [-1, 0], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:   # coil: head reared back, body 2 px back and 1 down
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-2, -1], head: [-4, -2], snout: [-4, -4], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  atk_mid:   # the pass: spine, neck and head 35% back; near forepaw and elbow planted
+    t: 0.35
+    moves: [back, chest, neck, head, snout]
+    tweaks: {tail2: [0, 1], tail3: [0, 2]}
+    pins: [paw_n, el_n, foot_n]
+  atk_follow:   # a settle (t 0.75): the snap closes a little, all feet and the near elbow planted
+    t: 0.75
+    moves: [back, chest, neck, head, snout]
+    tweaks: {tail2: [0, 1], tail3: [0, 2]}
+    pins: [paw_n, el_n, paw_f, foot_n, foot_f]
+  atk_recover:   # t 0.2: the idle tail stays folded, so a larger t overruns the bbox lerp
+    t: 0.2
+    moves: [back, chest, neck, head, snout]
+  hurt_in1:   # the flinch starts: head jerks back and up (t 0.2 for the same tail reason)
+    t: 0.2
+    moves: [hip, back, chest, neck, head, snout]
+    tweaks: {head: [-2, -2], snout: [-2, -2]}
+  hurt_in2:   # 30% back toward idle; the flung tail lowered toward the fold (centroid cap)
+    t: 0.3
+    moves: [back, chest, neck, head, snout]
+    tweaks: {tail2: [0, 2], tail3: [0, 4], tail_tip: [12, 12]}
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f]
+  daze:   # head and snout hang (the neck stays put: its warp pushed the snout onto the cell border)
+    t: 0.0
+    dy: 0
+    moves: [back, chest, head, snout]
+    tweaks: {head: [-1, 1], snout: [-2, 2]}
+  daze_b:
+    t: 0.0
+    dy: 0
+    moves: [back, chest, head, snout]
+    tweaks: {head: [-1, 1], snout: [-2, 3]}
+holds: []
+paint:
+  - {frame: atk_wind2, xy: [[125, 95], [126, 95], [127, 95], [128, 95]], rgb: [90, 57, 74]}
+  - {frame: atk_mid, xy: [[116, 91], [117, 92], [118, 93]], rgb: [206, 181, 165]}
+  - {frame: atk_mid, xy: [[123, 99]], rgb: [222, 198, 181]}
+  - {frame: atk_follow, xy: [[116, 92], [117, 93], [118, 94]], rgb: [206, 181, 165]}
+  - {frame: daze_b, xy: [[112, 69]], rgb: [214, 189, 173]}
+  - {frame: daze_b, xy: [[114, 63], [114, 64]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[114, 63], [114, 64]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[112, 97], [117, 100], [118, 100], [119, 100], [119, 101], [120, 101], [121, 101], [122, 101], [123, 101]], rgb: [231, 222, 198]}
+  - {frame: hurt_in2, xy: [[112, 98], [112, 99]], rgb: [239, 231, 206]}
+  - {frame: hurt_in2, xy: [[112, 100]], rgb: [206, 181, 165]}
+  - {frame: hurt_in2, xy: [[113, 100], [114, 100]], rgb: [222, 206, 189]}
+  - {frame: hurt_in2, xy: [[115, 100], [116, 100]], rgb: [222, 198, 181]}
+  - {frame: hurt_in2, xy: [[124, 100], [124, 101]], rgb: [231, 222, 198]}
