@@ -22,10 +22,15 @@ export function groupEnemies(enemies: readonly { data: { name: string }; current
   });
 }
 
+/** The width of one list column: the content box, or half of it past 5 lines. */
+export function listColumnWidth(count: number, contentWidth: number): number {
+  return Math.floor(contentWidth / (count > ROWS_PER_COLUMN ? 2 : 1));
+}
+
 /** Top-left of each line inside a window's content box (origin 0,0): one column up to 5 lines, else two. */
 export function enemyListCells(count: number, contentWidth: number): EnemyListCell[] {
   const columns = count > ROWS_PER_COLUMN ? 2 : 1;
   const rows = Math.ceil(count / columns);
-  const colWidth = Math.floor(contentWidth / columns);
+  const colWidth = listColumnWidth(count, contentWidth);
   return Array.from({ length: count }, (_, i) => ({ x: Math.floor(i / rows) * colWidth, y: (i % rows) * ENEMY_LIST_LINE }));
 }

@@ -19,7 +19,8 @@ export const DEFAULT_BESTIARY: BestiaryData = {
     luck: 'Luck', accuracy: 'Accuracy', evade: 'Evade', family: 'Family', size: 'Size', attacks: 'Attacks', xp: 'XP',
     gold: 'Gold', weak: 'Weak', resist: 'Resist', immune: 'Immune', absorb: 'Absorb', statusHit: 'Status hit',
     actions: 'Actions', spells: 'Spells', habitat: 'Habitat', none: 'None', unknown: '???', blank: '-', paused: 'Paused',
-    noArt: 'No art yet', noData: 'No bestiary data',
+    noArt: 'No art yet', noData: 'No bestiary data', info: 'Info', specials: 'Specials', onHit: 'On hit',
+    noDescription: 'No description yet',
     sizes: { small: 'Small', large: 'Large', boss: 'Boss' },
     attackKinds: { melee: 'Melee', heavy: 'Melee (heavy)', ranged: 'Ranged' },
     anim: { attack: 'Attack', heavy: 'Attack (heavy)', ranged: 'Attack (ranged)', hurt: 'Hurt', cast: 'Cast', daze: 'Dazed' },
@@ -28,11 +29,17 @@ export const DEFAULT_BESTIARY: BestiaryData = {
     entry: '{num} {name}', titleCount: '{entry}  {index}/{total}', damage: '{min}-{max}', hits: 'x{hits}',
     fight: 'Fight x{hits}', statusHit: '{pct}% (spell accuracy {acc})', phase: 'At {pct}% HP', phaseHits: 'Fight x{hits}',
     phaseAttack: 'Attack {attack}', phaseMessage: '"{message}"', habitatMain: '{map}', habitatZone: '{map} ({zones})',
-    habitatBoss: '{map} (boss)', notPlaced: 'Not placed yet', list: ', ',
+    habitatBoss: '{map} (boss)', notPlaced: 'Not placed yet', list: ', ', special: '{name} {pct}%',
+    loreTitle: 'Lore {page}/{pages}',
   },
   elements: { fire: 'Fire', ice: 'Ice', lightning: 'Bolt', earth: 'Earth', holy: 'Holy', dark: 'Dark', water: 'Water', wind: 'Wind' },
   families: {},
-  help: 'Up/Down: scroll   Left/Right: page   Z: next move   Shift: pause   X: close',
+  protections: { status: 'Status', poison_stone: 'Poison/Stone', death: 'Death', earth: 'Earth', time: 'Time' },
+  statuses: { poison: 'Poison', stun: 'Paralysis', sleep: 'Sleep', blind: 'Blind', stone: 'Stone', death: 'Death' },
+  spellNames: {},
+  specialNames: {},
+  lore: {},
+  help: 'Up/Down: scroll   Left/Right: page   Z: next move   C: info/lore   Shift: pause   X: close',
 };
 
 type Raw = Record<string, unknown>;
@@ -100,6 +107,15 @@ function templates(c: Checker, raw: unknown): BestiaryTemplates {
   return out;
 }
 
+/** `lore: {enemyId: [page, ...]}`: every page a non-empty printable-ASCII string (the NES font). */
+function lore(c: Checker, raw: unknown): Record<string, string[]> {
+  if (raw === undefined) return {};
+  const ok = (v: unknown): boolean => Array.isArray(v) && v.length > 0 && v.every((p) => isStr(p) && /^[\x20-\x7e\n]+$/.test(p));
+  if (isObj(raw) && Object.values(raw).every(ok)) return raw as Record<string, string[]>;
+  c.error('lore', 'is not a mapping of enemy id -> ASCII pages');
+  return {};
+}
+
 /** The bestiary data from parsed YAML; every problem is logged and that key takes its default. */
 export function validateBestiary(raw: unknown, path = 'bestiary.yaml'): BestiaryData {
   const c = new Checker(path);
@@ -135,6 +151,11 @@ export function validateBestiary(raw: unknown, path = 'bestiary.yaml'): Bestiary
     templates: templates(c, src.templates),
     elements: c.record(src.elements, d.elements, 'elements'),
     families: c.record(src.families, d.families, 'families'),
+    protections: c.record(src.protections, d.protections, 'protections'),
+    statuses: c.record(src.statuses, d.statuses, 'statuses'),
+    spellNames: c.record(src.spellNames, d.spellNames, 'spellNames'),
+    specialNames: c.record(src.specialNames, d.specialNames, 'specialNames'),
+    lore: lore(c, src.lore),
     help: c.value(src, 'help', d.help, isStr),
   };
 }

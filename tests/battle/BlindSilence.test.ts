@@ -83,7 +83,7 @@ describe('B8: silence', () => {
     while (bsm.state === 'command_select') bsm.submitCommand({ type: 'item', actorId: bsm.currentCommandActorId! });
     bsm.executeRound();
     const lines = bsm.currentMessages.map(m => m.text);
-    expect(lines).toContain('Lich is silenced!');
+    expect(lines).toContain('Rime Sovereign is silenced!');
     expect(lines.some(t => t.includes('casts ICE'))).toBe(false);
     expect(party.map(c => c.currentHp)).toEqual(hp);
   });

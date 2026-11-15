@@ -77,7 +77,8 @@ export function validateScriptedEncounters(value: unknown, npcIds: string[]): vo
   });
 }
 
-/** `bossPhases`: `hpThreshold` in (0, 1], a `patternId`, and the optional `message`, `hits` and `attack` (B1). */
+/** `bossPhases`: `hpThreshold` in (0, 1], a `patternId`, and the optional `message`, `hits`, `attack` (B1) and
+ * `attackAnim` (heavy from this phase on, ROSTER_PLAN 7.2). */
 export function validateBossPhases(value: unknown): void {
   expect('EnemyData.bossPhases', value, 'array');
   (value as unknown[]).forEach((phase, i) => {
@@ -91,5 +92,8 @@ export function validateBossPhases(value: unknown): void {
     optional(`${p}.message`, ph.message, 'string');
     optional(`${p}.hits`, ph.hits, 'number');
     optional(`${p}.attack`, ph.attack, 'number');
+    if (ph.attackAnim !== undefined && ph.attackAnim !== 'heavy') {
+      throw new ValidationError(`${p}.attackAnim: expected heavy, got ${String(ph.attackAnim)}`);
+    }
   });
 }

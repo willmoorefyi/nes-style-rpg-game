@@ -18,6 +18,7 @@ const DEFAULT_MAPPINGS: InputMapping = {
   Escape: 'cancel',
   ShiftLeft: 'select',
   ShiftRight: 'select',
+  KeyC: 'start',     // the bestiary's Info / lore page (ROSTER_PLAN 7.3)
 };
 
 export class InputManager {

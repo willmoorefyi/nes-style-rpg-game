@@ -23,6 +23,17 @@
   resist: ice                # Element this enemy resists (0.5x damage). Omit if none.
   # Valid elements: fire, ice, lightning, earth, holy, dark, water, wind, none
   #
+  # Optional roster fields (docs/ROSTER_PLAN.md 7.2):
+  # num: 5                   # spec number 1-128: the bestiary number and order
+  # description: "One or two in-world lines for the bestiary's Info page (ASCII)."
+  # protect: [status, poison_stone, death]   # also earth, time (shown only); blocks the status roll
+  # statusWeak: [poison_stone]               # shown in the Weak row
+  # attackStatus: [sleep]                    # poison stun sleep blind stone death; shown only
+  # spells: [fir2, slow]                     # spec codes, lowercase
+  # ai: {rate: 0.75, actions: [{type: magic, spellId: fir2, weight: 1}]}   # spells.yaml spells only
+  # specials: [{id: gaze, rate: 0.25}]       # shown only
+  # rematchOf: lich                          # a fiend rematch: name "<fiend> II", same sprite
+  #
   # Optional boss fields (omit for normal enemies):
   # bossPhases:
   #   - hpThreshold: 0.5    # Triggers when HP drops below 50%

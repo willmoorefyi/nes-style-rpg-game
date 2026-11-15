@@ -2,7 +2,7 @@
  * The bestiary (docs/BESTIARY_PLAN.md): every enemy in enemies.yaml with its stats, and beside them the enemy on a
  * battle background, looping its attack, hurt, cast and daze. Opened from the field menu (every build) and the title
  * (dev only, also `?bestiary=<id>`); X closes it (push / pop). Up/Down scroll, Left/Right page, Z plays the next
- * animation, Shift pauses. The preview rebuilds once the highlighted entry has been stable for 8 frames.
+ * animation, C (`start`) turns the panel to Info and lore and back (ROSTER_PLAN 7.3), Shift pauses. The preview rebuilds once the highlighted entry has been stable for 8 frames.
  */
 import { Assets, BitmapText, Container, type Texture } from 'pixi.js';
 import type { Scene } from '../../types/index.js';
@@ -21,6 +21,7 @@ import { resolveMapPath } from '../../systems/MapLoader.js';
 import { BestiaryPreview, CachedArt } from './BestiaryPreview.js';
 import { BestiaryStatsPanel } from './BestiaryStatsPanel.js';
 import { buildEntries, seenFlag, spellIdsOf, statLines, titleCount, type BestiaryEntry } from './bestiaryModel.js';
+import { pageCount, pageLines } from './bestiaryInfo.js';
 import { backgroundFor, habitatsOf, type Habitat } from './bestiaryHabitats.js';
 import { takeBestiaryStartEntry } from './bestiaryLink.js';
 import type { EnemyData, MapData } from '../../types/index.js';
@@ -49,6 +50,8 @@ export class BestiaryScene implements Scene {
   private book: Book | null = null;
   private devClock: BattleDevClock | null = null;
   private statsIndex = -1;
+  /** The panel page: 0 stats, 1 info, 2.. lore (kept while scrolling, clamped to each entry's pages). */
+  private page = 0;
   private previewIndex = -1;
   private stable = 0;
   private closing = false;
@@ -72,6 +75,7 @@ export class BestiaryScene implements Scene {
   get previewPoses() { return this.ui?.preview.poses ?? null; }
   get stats(): BestiaryStatsPanel | null { return this.ui?.stats ?? null; }
   get selectedIndex(): number { return this.ui?.menu.selectedIndex ?? -1; }
+  get panelPage(): number { return this.page; }
 
   private async load(): Promise<Book | null> {
     const d = this.game.data;
@@ -132,6 +136,7 @@ export class BestiaryScene implements Scene {
 
     this.ui = { book, entries, menu, preview, stats, count, boss };
     this.statsIndex = -1;
+    this.page = 0;
     this.previewIndex = -1;
     this.showStats(menu.selectedIndex);
     this.showPreview(menu.selectedIndex);
@@ -155,6 +160,10 @@ export class BestiaryScene implements Scene {
       ui.menu.setIndex(Math.max(0, Math.min(ui.entries.length - 1, to)));
     } else if (input.isJustPressed('select')) {
       ui.preview.togglePause();
+    } else if (input.isJustPressed('start')) {
+      const entry = ui.entries[ui.menu.selectedIndex];
+      if (entry) this.page = (this.page + 1) % pageCount(entry, ui.book.data);
+      this.statsIndex = -1;
     }
     ui.menu.update(input);
     if (this.closing || this.ui !== ui) return;
@@ -175,7 +184,9 @@ export class BestiaryScene implements Scene {
     if (!ui || !entry) return;
     this.statsIndex = i;
     const { data, spellNames } = ui.book;
-    ui.stats.setLines(statLines(entry, data, (id) => spellNames.get(id) ?? id));
+    this.page = Math.min(this.page, pageCount(entry, data) - 1);
+    const spellName = (id: string): string => spellNames.get(id) ?? data.spellNames[id] ?? id.toUpperCase();
+    ui.stats.setLines(pageLines(entry, data, this.page, () => statLines(entry, data, spellName)));
     ui.count.text = titleCount(entry, ui.entries.length, data);
     ui.boss.text = entry.boss ? data.labels.boss : '';
   }

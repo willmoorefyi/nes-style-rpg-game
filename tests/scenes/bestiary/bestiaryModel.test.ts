@@ -27,11 +27,27 @@ const cellOf = (e: BestiaryEntry, label: string): string | undefined =>
 afterEach(() => { vi.restoreAllMocks(); });
 
 describe('bestiary model: order and numbering', () => {
-  it('lists every enemy in enemies.yaml order, 001 Goblin ... 014 Lich', () => {
-    expect(entries.map((e) => e.id)).toEqual(enemies.map((e) => e.id));
+  it('lists every enemy by its spec number (ROSTER_PLAN 7.3), 001 Goblin ... 049 Rime Sovereign, 066 Red Dragon', () => {
+    expect(entries.map((e) => e.id)).toEqual([...enemies].sort((a, b) => a.num! - b.num!).map((e) => e.id));
     expect(entries[0].label).toBe('001 Goblin');
-    expect(entries[13].label).toBe('014 Lich');
-    expect(titleCount(byId('garland'), entries.length, data)).toBe('013 Garland  13/14');
+    expect(byId('lich').label).toBe('049 Rime Sovereign');
+    expect(entries[13].label).toBe('066 Red Dragon');
+    expect(titleCount(byId('garland'), entries.length, data)).toBe('012 Garland  6/14');
+    expect(titleCount(byId('lich'), entries.length, data)).toBe('049 Rime Sovereign  13/14');
+  });
+
+  it('a gap in the numbers: the label keeps num, the count is the list place of the listed entries', () => {
+    const [a, b] = buildEntries([{ ...enemies[0], id: 'b', name: 'Second', num: 49 }, { ...enemies[0], id: 'a', name: 'First', num: 2 }],
+      data, new Map(), () => true);
+    expect([a.id, a.label, b.label]).toEqual(['a', '002 First', '049 Second']);
+    expect(titleCount(b, 2, data)).toBe('049 Second  2/2');
+  });
+
+  it('an entry without num keeps its enemies.yaml place (1-based) and sorts by it', () => {
+    const { num: _n, ...plain } = enemies[0];
+    const list = buildEntries([{ ...plain, id: 'x' }, { ...plain, id: 'y', num: 1 }], data, new Map(), () => true);
+    expect(list.map((e) => e.label)).toEqual(['001 Goblin', '001 Goblin']);
+    expect(list.map((e) => e.id)).toEqual(['x', 'y']);
   });
 });
 
@@ -58,9 +74,30 @@ describe('bestiary model: stats', () => {
     expect(cellOf(g, 'At 75% HP')).toBe('Fight x3 "Garland\'s attacks grow fiercer!"');
   });
 
-  it('elements: wolf weak Fire / resist Ice; dragon weak Ice / resist Fire', () => {
+  it('elements: wolf weak Fire / resist Ice; the Red Dragon weak Ice and Poison/Stone (statusWeak) / resist Fire', () => {
     expect([cellOf(byId('wolf'), 'Weak'), cellOf(byId('wolf'), 'Resist')]).toEqual(['Fire', 'Ice']);
-    expect([cellOf(byId('dragon'), 'Weak'), cellOf(byId('dragon'), 'Resist')]).toEqual(['Ice', 'Fire']);
+    expect([cellOf(byId('dragon'), 'Weak'), cellOf(byId('dragon'), 'Resist')]).toEqual(['Ice, Poison/Stone', 'Fire']);
+  });
+
+  it('the Immune row: elemental immunities, then the status protections (protect, D5)', () => {
+    expect(cellOf(byId('goblin'), 'Immune')).toBe('None');
+    expect(cellOf(byId('skeleton'), 'Immune')).toBe('Status, Poison/Stone, Death');
+    expect(cellOf(byId('vampire'), 'Immune')).toBe('Status, Poison/Stone, Death, Earth');
+    expect(cellOf(byId('cockatrice'), 'Immune')).toBe('Earth');
+    const e: EnemyData = { ...enemies[0], id: 'mixed', protect: ['death', 'status'],
+      elementalProfile: { weaknesses: [], resistances: [], immunities: ['dark'], absorbs: [] } };
+    const [entry] = buildEntries([e], data, new Map(), () => true);
+    expect(cellOf(entry, 'Immune')).toBe('Dark, Status, Death');
+  });
+
+  it('the lich (Rime Sovereign): spells on full-width rows and its phase line, in 17 lines', () => {
+    const lich = byId('lich');
+    const lines = statLines(lich, data, (id) => id.toUpperCase());
+    expect(lines.length).toBeLessThanOrEqual(STAT_LINES);
+    const text = lines.map((l) => l.left).join('\n');
+    expect(text).toContain('Spells     ICE2, SLP2, FAST, LIT2, HOLD, FIR2, SLOW,');
+    expect(cellOf(lich, 'At 50% HP')).toBe('"The Rime Sovereign\'s skull fractures!"');
+    expect(cellOf(lich, 'Habitat')).toBe('Not placed yet');
   });
 
   it('merges the legacy fields and elementalProfile without duplicates; an unlabelled element shows its id once warned', () => {
@@ -143,7 +180,7 @@ describe('bestiary model: mode seen', () => {
 
   it('every returned string is printable ASCII', () => {
     for (const e of entries) {
-      for (const s of [e.label, titleCount(e, 14, data), ...flat(e)]) expect(s).toMatch(/^[\x20-\x7e]*$/);
+      for (const s of [e.label, titleCount(e, entries.length, data), ...flat(e)]) expect(s).toMatch(/^[\x20-\x7e]*$/);
     }
   });
 });

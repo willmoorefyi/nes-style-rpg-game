@@ -225,14 +225,14 @@ export class SpellExecutor {
     const power = spell.power ?? 0;
     const amount = power > 0 ? power : info.amount;
 
-    // Buffs target allies — self or single ally
+    // Buffs target the caster's side: itself (self), one ally, or all of them (an enemy's too: RUSE, FAST)
     const targets = spell.targeting === 'self'
-      ? (isEnemy ? [] : this.partyFilter(cmd.actorId, c => c.currentHp > 0))
+      ? (isEnemy ? this.deps.enemies.filter(e => e.id === cmd.actorId && e.currentHp > 0) : this.partyFilter(cmd.actorId, c => c.currentHp > 0))
       : cmd.targetId
         ? (isEnemy
           ? this.deps.enemies.filter(e => e.id === cmd.targetId && e.currentHp > 0)
           : this.partyFilter(cmd.targetId!, c => c.currentHp > 0))
-        : (isEnemy ? [] : this.deps.livingParty());
+        : (isEnemy ? this.deps.livingEnemies() : this.deps.livingParty());
 
     for (const target of targets) {
       if ('data' in target) {

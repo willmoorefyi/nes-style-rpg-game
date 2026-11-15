@@ -85,7 +85,7 @@ const descendants = (c: Container): number => c.children.reduce((n, ch) => n + 1
 afterEach(() => { vi.restoreAllMocks(); });
 
 describe('BestiaryScene', () => {
-  it('opens on 001 Goblin; Down shows Gr.Imp at once and rebuilds the preview after 8 stable frames', async () => {
+  it('opens on 001 Goblin; Down shows the Goblin Guard at once and rebuilds the preview after 8 stable frames', async () => {
     const { scene, tap, frame } = setup();
     await scene.enter();
     expect(visibleLabels(scene.container)).toContain('001 Goblin');
@@ -138,10 +138,10 @@ describe('BestiaryScene', () => {
   });
 
   it('never off-panel: goblin and garland stay inside the preview on every attack frame', async () => {
-    for (const index of [0, 12]) {
+    for (const index of [0, 5]) {
       const { scene, tap, frame, art } = setup();
       await scene.enter();
-      if (index) { tap('right'); tap('right'); frame(PREVIEW_DEBOUNCE_FRAMES); }
+      if (index) { tap('right'); tap('up'); frame(PREVIEW_DEBOUNCE_FRAMES); }   // 012 Garland is the 6th entry
       const id = index ? 'garland' : 'goblin';
       expect(scene.stats!.shown.join()).toBeTruthy();
       const f = art.getMonsterFrames(id)!;
@@ -183,7 +183,7 @@ describe('BestiaryScene', () => {
     const { scene, tap, frame, requests } = setup();
     await scene.enter();
     tap('right');
-    tap('right');                                   // garland: temple
+    tap('up');                                      // 012 Garland (6th by num): temple
     frame(PREVIEW_DEBOUNCE_FRAMES);
     const [a, b] = requests;
     expect([a.path, b.path]).toEqual(['assets/backgrounds/grassland.webp', 'assets/backgrounds/temple.webp']);
@@ -214,6 +214,37 @@ describe('BestiaryScene', () => {
     expect(textures.every((t) => t.destroyed)).toBe(true);
     expect(atlas.destroyed).toBe(false);
     expect(preview.art.size).toBe(0);
+  });
+
+  it('C (start) turns the panel: Stats -> Info -> Stats for the goblin; the lich adds its 3 lore pages (ROSTER_PLAN 7.3)', async () => {
+    const { scene, tap } = setup();
+    await scene.enter();
+    expect(statsText(scene)).toContain('HP         8');
+    tap('start');
+    expect(scene.panelPage).toBe(1);
+    expect(scene.stats!.shown[0]).toBe('Info');
+    expect(statsText(scene)).toContain('A small, spiteful raider');
+    tap('start');
+    expect(scene.panelPage).toBe(0);
+    expect(statsText(scene)).toContain('HP         8');
+    tap('right');
+    tap('right');                                   // 049 Rime Sovereign (13th by num)
+    expect(visibleLabels(scene.container)).toContain('049 Rime Sovereign  13/14');
+    tap('start');
+    expect(scene.stats!.shown[0]).toBe('Info');
+    expect(statsText(scene)).toContain('On hit     Paralysis');
+    tap('start');
+    expect(scene.stats!.shown[0]).toBe('Lore 1/3');
+    tap('start');
+    tap('start');
+    expect(scene.stats!.shown[0]).toBe('Lore 3/3');
+    tap('down');                                    // 066 Red Dragon has no lore: back to its Info page
+    expect(scene.panelPage).toBe(1);
+    expect(statsText(scene)).toContain('Specials   Blaze 50%');
+    tap('start');
+    expect(scene.panelPage).toBe(0);
+    for (const line of scene.stats!.shown) expect(line).toMatch(/^[\x20-\x7e|]*$/);
+    expect(scene.stats!.shown.length).toBeLessThanOrEqual(17);
   });
 
   it('a missing sheet shows the placeholder box and "No art yet", with no console.error', async () => {

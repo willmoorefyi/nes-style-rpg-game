@@ -2,7 +2,8 @@ import { Container, BitmapText } from 'pixi.js';
 import type { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { FONT_SIZE } from '../../core/LayoutConstants.js';
-import { groupEnemies, enemyListCells } from './enemyList.js';
+import { groupEnemies, enemyListCells, listColumnWidth } from './enemyList.js';
+import { fitToWidth } from './battleMessageUtils.js';
 
 const DEAD_TINT = 0x888888;
 
@@ -32,9 +33,11 @@ export class BattleEnemyList {
     // L1: no HP display
     const entries = groupEnemies(this.enemies());
     const cells = enemyListCells(entries.length, this.enemyWindow.contentWidth);
+    // a long name ("2x Minotaur Zombie" in the two-column list) is cut to its column (ROSTER_PLAN 7.5)
+    const column = listColumnWidth(entries.length, this.enemyWindow.contentWidth);
     entries.forEach((entry, i) => {
       const text = new BitmapText({
-        text: entry.label,
+        text: fitToWidth(entry.label, column, FONT_SIZE),
         style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
       });
       if (entry.alive === 0) text.tint = DEAD_TINT;
