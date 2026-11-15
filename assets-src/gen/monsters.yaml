@@ -457,17 +457,24 @@
   # 1235 (R50, + the bulk sentence): an extra claw at the front knee
 - id: death_eye
   # "Death Eye" (121), the undead eye of the final dungeon: paralysis, time gaze, death magic.
-  # HELD (ROSTER_LOG G2): body floating paused by the plan 6.3 trigger (R38-R40)
+  # the floating line ("tilt the whole body along a strong diagonal ...") is replaced for every action pose by a
+  # frontal, untilted line (orchestrator, 2026-11-15, after the R38-R40 floating pause)
   size: boss
   per_pose: true
   design_ref: false
   floating: true
   body: floating
+  motion: >-
+    Keep the frontal view of Image 3: the eye faces the viewer, its iris looking toward the heroes on the right, and
+    the body is not tilted or turned along a diagonal; it stays hovering, nothing touches the ground; the movement is
+    in the iris, the grave cloth strips, the bone crown and the tendrils, and trailing parts lag behind the motion.
   prompt: >-
-    the Death Eye, a colossal undead eyeball hovering in the air, bound in strips of torn grey grave cloth wrapped
-    around it, a crown of yellowed bones and small skulls set on top, one huge sickly yellow iris with a black slit
-    pupil and bloodshot veins, ghostly pale-violet tendrils trailing below it; nothing touches the ground; palette of
-    grave grey, bone yellow, sickly yellow, blood red and pale violet
+    the Death Eye, a colossal undead eyeball hovering in the air, seen from the front, bound in strips of torn grey
+    grave cloth wrapped around it, a crown of yellowed bones and small skulls set on top, one huge sickly yellow iris
+    with a black slit pupil and bloodshot veins, the iris turned slightly toward the heroes on the right, ghostly
+    pale-violet tendrils trailing below it, their tips well above the bottom of the grey box; nothing touches the
+    ground; the whole figure, crown included, well below the top of the grey box; palette of grave grey, bone yellow,
+    sickly yellow, blood red and pale violet
   action_prompt: >-
     the Death Eye, exactly as in Image 3: the same colossal undead eyeball bound in torn grey grave cloth, the crown of
     yellowed bones and small skulls, the huge sickly yellow iris with a black slit pupil, the ghostly pale-violet

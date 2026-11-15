@@ -339,3 +339,5 @@
 {"event": "result", "key": "ca2be15553175c59bb9ccfef", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T04:46:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chaos", "sheet": "boss_attack_raise", "seed": 1235, "key": "4231dfbf8167a1d0e608b9a8"}
 {"event": "result", "key": "4231dfbf8167a1d0e608b9a8", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:47:30", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "death_eye", "sheet": "boss_idle", "seed": 1234, "key": "5560f540ccfddbd1a3870cbb"}
+{"event": "result", "key": "5560f540ccfddbd1a3870cbb", "ok": true}
