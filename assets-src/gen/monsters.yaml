@@ -321,8 +321,11 @@
     articulated mechanical wings, three on each side, of overlapping metallic feathers in white steel with brass joints,
     thin hanging greaves; palette of white steel, pale gold, brass, storm grey and a cold white-blue glow
   attack: >-
-    the six wings sweep forward together toward the heroes, throwing a crescent of cutting wind: short pale streaks
-    attached to the wing tips
+    a cutting wing strike: the six wings swing forward in a wide arc toward the heroes on the right, the three near
+    wings fanned out in front of the armour and the three far wings fanned out behind it, all six separately visible
+    with their brass joints, their sharp metal feather tips pointing toward the heroes, the armour leaning forward;
+    exactly six wings, as in Image 3, at exactly the same pixel size as in Image 3; the fractured halo in its two broken arcs above the helm, as in Image 3; no wind
+    streaks, no effects; the whole figure well below the top of the grey box
   cast: >-
     a storm rite: the six wings raised high and spread wide, the halo crackling with white-blue lightning, both
     gauntlets lifted
@@ -337,4 +340,6 @@
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
-  sheet_seeds: {boss_idle: 1235}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell top, wind debris
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
+  # too big
