@@ -2278,20 +2278,22 @@
     (no leap, no rearing up): reach the heads toward the heroes with the necks bent so every head stays well inside
     its own cell; the wings and the snake tail move with the motion, kept close to the body.
   prompt: >-
-    a chimera on four legs seen from the side: a tawny lion body with a golden mane, exactly three heads, the lion
-    head in front, a horned goat head rising from the middle of the back, and a green scaly dragon head on a short
-    neck from the shoulder, each head clearly apart; exactly two leathery bat wings half raised, a live green snake for
+    a chimera on four legs seen from the side: a tawny lion body with a golden mane and exactly three different heads,
+    the same three in every cell and each clearly apart: one grey goat head with curled horns high on the back, one
+    green scaly dragon head on a neck in the middle above the shoulders, and one maned lion head low in front (only
+    one lion head); exactly two leathery bat wings half raised, a live green snake for
     a tail curled up behind the hips with its head raised; the whole creature, tail to snout, sits in the middle of its
     own cell with empty space on both sides; exactly one chimera in each of the three cells, filling its box (one
     row, three figures in all)
   attack: >-
-    lunging forward low, all three heads snapping toward the heroes with the jaws open, the heads above and just in
-    front of its front feet, all four feet on the ground, the whole chimera well inside the middle cell
+    lunging forward low, the same three heads as in the idle cell (goat high, dragon in the middle, lion low)
+    snapping toward the heroes with the jaws open, the heads above and just in front of its front feet, all four feet on the ground, the whole chimera well inside the middle cell
   hurt: >-
-    knocked back, all four feet on the ground, the three heads recoiling, the wings flared, the snake tail coiled
+    knocked back, all four feet on the ground, the same three heads as in the idle cell (goat high, dragon in the
+    middle, lion low) recoiling, the wings flared, the snake tail coiled
   face: the lion face with amber eyes is readable, and the goat and dragon heads are clearly visible
   extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up, a second row
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R247): two rows of figures in the raw, the cut mixed them
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R247): two rows of figures in the raw, the cut mixed them; 1235 (R248): the heads change between cells
 - id: guardian
   # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
   size: large
