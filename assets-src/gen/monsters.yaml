@@ -546,11 +546,12 @@
     on the left side and one on the right side; the body crouched with both knees bent and wide, so that the whole
     figure, raised fists, horns and wings included, stays inside the grey box at exactly the same pixel size as in
     Image 3 (the raised fists are the highest point, well below the top of the image); exactly four arms, all four
-    clearly visible
+    clearly visible; the two horns of the crown visible below the fists, the gap between the raised arms and the crown
+    is empty background; no ground line or floor under the feet
   face: the cracked obsidian face with two burning white eyes under the horned crown is readable
   extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1236, boss_cast: 1236}   # boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
+  sheet_seeds: {boss_attack: 1236, boss_cast: 1236, boss_attack_raise: 1235}   # boss_attack_raise 1234 (R69): guide line and box painted; boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
   # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
