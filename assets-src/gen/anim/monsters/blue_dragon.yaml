@@ -1,0 +1,158 @@
+sprite: blue_dragon
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Long wingless blue dragon (pass R batch D, quadruped): the white_dragon recipe without wings. The tail is a loop in
+# idle, a low sweep in the attack and a tight spiral in the hurt: it stays out of every move set (it rides the hip),
+# so each frame keeps its source key's tail. The head carries the forked horns (head mask per key). No breath fx: the
+# approved attack draws none.
+keyframes:
+  idle:
+    hip: [42, 90]
+    back: [62, 82]
+    chest: [82, 86]
+    neck: [92, 68]
+    head: [98, 50]
+    snout: [119, 58]
+    tail0: [34, 92]
+    tail1: [16, 92]
+    tail2: [8, 76]
+    tail3: [18, 64]
+    tail_tip: [34, 70]
+    sh_n: [76, 92]
+    el_n: [76, 104]
+    paw_n: [80, 114]
+    ftoe_n: [88, 120]
+    sh_f: [95, 92]
+    el_f: [94, 104]
+    paw_f: [97, 114]
+    ftoe_f: [106, 118]
+    hip_n: [40, 95]
+    knee_n: [37, 105]
+    foot_n: [37, 114]
+    toe_n: [46, 120]
+    hip_f: [57, 95]
+    knee_f: [57, 104]
+    foot_f: [60, 112]
+    toe_f: [67, 114]
+  attack:
+    hip: [32, 88]
+    back: [55, 76]
+    chest: [78, 88]
+    neck: [90, 94]
+    head: [100, 96]
+    snout: [124, 108]
+    tail0: [30, 82]
+    tail1: [14, 86]
+    tail2: [7, 98]
+    tail3: [10, 106]
+    tail_tip: [16, 112]
+    sh_n: [68, 94]
+    el_n: [70, 104]
+    paw_n: [74, 114]
+    ftoe_n: [82, 120]
+    sh_f: [86, 100]
+    el_f: [90, 108]
+    paw_f: [96, 114]
+    ftoe_f: [104, 117]
+    hip_n: [30, 94]
+    knee_n: [26, 104]
+    foot_n: [24, 113]
+    toe_n: [30, 119]
+    hip_f: [48, 94]
+    knee_f: [47, 104]
+    foot_f: [52, 112]
+    toe_f: [58, 115]
+  hurt:
+    hip: [45, 92]
+    back: [60, 76]
+    chest: [80, 82]
+    neck: [88, 64]
+    head: [92, 52]
+    snout: [116, 60]
+    tail0: [40, 96]
+    tail1: [25, 105]
+    tail2: [10, 95]
+    tail3: [15, 84]
+    tail_tip: [22, 90]
+    sh_n: [75, 92]
+    el_n: [76, 104]
+    paw_n: [80, 114]
+    ftoe_n: [88, 120]
+    sh_f: [90, 92]
+    el_f: [94, 104]
+    paw_f: [100, 114]
+    ftoe_f: [108, 118]
+    hip_n: [42, 98]
+    knee_n: [40, 108]
+    foot_n: [42, 115]
+    toe_n: [48, 120]
+    hip_f: [58, 98]
+    knee_f: [56, 106]
+    foot_f: [60, 112]
+    toe_f: [68, 114]
+parts:
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: 16}
+masks:
+  head:                        # the head with both forked horns and the jaw
+    idle: [[80, 26], [110, 26], [122, 52], [122, 66], [108, 68], [98, 64], [90, 58], [84, 44]]
+    attack: [[84, 66], [114, 66], [122, 96], [127, 104], [127, 118], [110, 118], [100, 112], [96, 102], [86, 92]]
+    hurt: [[64, 42], [100, 40], [120, 54], [120, 68], [104, 72], [92, 66], [84, 56], [70, 50]]
+frames:
+  atk_wind1:                   # anticipation: body sinks 1 and shifts 1 back, neck and head drawn back and low
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-2, 1], head: [-4, 2], snout: [-4, 3], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:                   # coil: body 2 down and 3 back, head pulled 9 back and 5 low, ready to lunge
+    t: 0.0
+    dy: 2
+    moves: []
+    tweaks: {neck: [-5, 3], head: [-9, 4], snout: [-9, 5], hip: [-2, 0], back: [-3, 0], chest: [-3, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  atk_mid:                     # the pass: the attack pose with the spine, neck and head lifted back toward the coil;
+    t: 0.1                     # the far shoulder rises with the neck with the neck lifted 8 px so its underside stays on the far foreleg
+    moves: []
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    tweaks: {back: [-1, -2], chest: [-2, -4], neck: [-4, -8], head: [-5, -11], snout: [-5, -11], sh_f: [0, -3]}
+  atk_follow:                  # settle after the bite: head and neck ease up 3-5 px
+    t: 0.9
+    moves: []
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    tweaks: {neck: [0, -1], head: [-1, -2], snout: [-1, -2]}
+  atk_recover:                 # idle with the body 1 lower and the head still low and forward
+    t: 0.3
+    dy: 1
+    moves: []
+    tweaks: {neck: [4, 7], head: [5, 13], snout: [5, 13], chest: [1, 2]}
+  hurt_in1:                    # the flinch: head snaps 5 back and 4 down toward the hurt key, body 1 down
+    t: 0.3
+    dy: 1
+    moves: []
+    tweaks: {neck: [-3, 2], head: [-5, 4], snout: [-5, 5], chest: [-1, 0]}
+  hurt_in2:                    # easing out of the recoil: head and neck 3 px back up toward idle
+    t: 0.3
+    moves: []
+    tweaks: {neck: [1, -2], head: [2, -4], snout: [2, -4], chest: [0, -1]}
+  daze:                        # sleep / stun: the neck sags, head hangs 4 px, nose dipped 6
+    t: 0.0
+    dy: 0
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 2], head: [1, 4], snout: [0, 6]}
+  daze_b:                      # the sway's low point: body 1 px lower
+    t: 0.0
+    dy: 1
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 2], head: [1, 4], snout: [0, 6]}
+holds: []
+paint:                         # 1 px cracks between the neck, head and body closed with outline ink; a 4 px pocket
+  # between the lifted horns and the crest in atk_mid inked
+  - {frame: atk_wind2, xy: [[80, 73], [82, 73], [30, 103]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[72, 108]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[104, 72], [78, 75]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[107, 71]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[107, 72]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[100, 75], [101, 75], [100, 76], [101, 76]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[60, 97], [59, 98], [60, 98], [59, 99], [58, 100], [59, 100], [58, 101]], rgb: [6, 4, 10]}   # the 1 px sliver between the hind legs the lifted spine closed
+  - {frame: atk_mid, xy: [[93, 97], [94, 97], [95, 97], [96, 97], [92, 98], [93, 98], [94, 98], [95, 98], [96, 98], [93, 99], [94, 99], [95, 99], [96, 99], [97, 99], [94, 100], [95, 100], [96, 100], [97, 100], [98, 100], [99, 100], [95, 101], [96, 101], [97, 101], [98, 101], [99, 101], [100, 101], [98, 102]], rgb: [33, 24, 66]}   # the pocket the lifted neck opens over the far shoulder, shadow
