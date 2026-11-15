@@ -10,6 +10,9 @@ afterEach(() => { vi.restoreAllMocks(); });
 
 const yaml = (file: string): unknown => parse(readFileSync(`assets/data/${file}`, 'utf-8'));
 
+/** Heavy from the start (ROSTER_PLAN 7.2: bosses with attack_raise); the Drowned Sovereign and the Ashen Queen only from phase 2. */
+const HEAVY = ['garland', 'lich', 'lich_2', 'hollow_seraph', 'hollow_seraph_2', 'chaos'];
+
 describe('enemy attack fields', () => {
   it('attack must be melee or ranged; attackEffect a string; attackAnim heavy; all optional', () => {
     expect(() => validateEnemyAttack({ id: 'a' })).not.toThrow();
@@ -35,14 +38,14 @@ describe('enemy attack fields', () => {
     expect(() => validateEnemyData({ ...testEnemy(), attack: 'thrown' })).toThrow(/EnemyData\(goblin\)\.attack/);
   });
 
-  it('enemies.yaml: every enemy is melee except the ranged dragon (fire_breath, in spell-effects attacks); Garland and the lich are heavy', () => {
+  it('enemies.yaml: every enemy is melee except the ranged dragon (fire_breath, in spell-effects attacks); the bosses with a raise are heavy', () => {
     const enemies = yaml('enemies.yaml') as Array<Record<string, unknown>>;
     const fx = validateSpellEffects(yaml('spell-effects.yaml'));
     for (const e of enemies) {
       expect(() => validateEnemyData(e), String(e.id)).not.toThrow();
       expect(e.attack, String(e.id)).toBe(e.id === 'dragon' ? 'ranged' : 'melee');
       if (e.attack === 'ranged') expect(fx.attacks[e.attackEffect as string], String(e.id)).toBeDefined();
-      expect(e.attackAnim, String(e.id)).toBe(e.id === 'garland' || e.id === 'lich' ? 'heavy' : undefined);
+      expect(e.attackAnim, String(e.id)).toBe(HEAVY.includes(String(e.id)) ? 'heavy' : undefined);
     }
     // the pale lich pulses lighter than the default red (each channel at least the default's)
     const lich = enemies.find((e) => e.id === 'lich')!;

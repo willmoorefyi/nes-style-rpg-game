@@ -31,9 +31,22 @@ describe('bestiary model: order and numbering', () => {
     expect(entries.map((e) => e.id)).toEqual([...enemies].sort((a, b) => a.num! - b.num!).map((e) => e.id));
     expect(entries[0].label).toBe('001 Goblin');
     expect(byId('lich').label).toBe('049 Rime Sovereign');
-    expect(entries[13].label).toBe('066 Red Dragon');
-    expect(titleCount(byId('garland'), entries.length, data)).toBe('012 Garland  6/14');
-    expect(titleCount(byId('lich'), entries.length, data)).toBe('049 Rime Sovereign  13/14');
+    expect(byId('dragon').label).toBe('066 Red Dragon');
+    expect(byId('lich_2').label).toBe('124 Rime Sovereign II');
+    expect(entries[entries.length - 1].label).toBe('128 Chaos');
+    // 1-49 are all listed, so the list place equals num up to the lich; the total is the listed count (88 of 128)
+    expect(titleCount(byId('garland'), entries.length, data)).toBe('012 Garland  12/88');
+    expect(titleCount(byId('lich'), entries.length, data)).toBe('049 Rime Sovereign  49/88');
+  });
+
+  it('the real numbering: every num from 001 to 128 at most once, in order; the gaps (unbuilt sprites) are skipped', () => {
+    const nums = entries.map((e) => Number(e.label.slice(0, 3)));
+    expect(nums.every((n, i) => n >= 1 && n <= 128 && (i === 0 || n > nums[i - 1]))).toBe(true);
+    for (const e of entries) expect(e.label, e.id).toBe(`${String(e.enemy.num).padStart(3, '0')} ${e.enemy.name}`);
+    // a gap: 050 Ankheg is followed by 053 Crocodile (051 and 052 have no art yet), and the count runs on by list place
+    const ankheg = entries.findIndex((e) => e.id === 'ankheg');
+    expect(entries[ankheg + 1].label).toBe('053 Crocodile');
+    expect(titleCount(entries[ankheg + 1], entries.length, data)).toBe(`053 Crocodile  ${ankheg + 2}/88`);
   });
 
   it('a gap in the numbers: the label keeps num, the count is the list place of the listed entries', () => {

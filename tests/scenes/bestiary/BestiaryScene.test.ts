@@ -80,6 +80,11 @@ function setup(opts: { missing?: string[] } = {}) {
 }
 
 const statsText = (scene: BestiaryScene): string => scene.stats!.shown.join('\n');
+/** The real list order (by spec number) and its places, so the walks follow enemies.yaml as it grows. */
+const ORDER = read<Array<{ id: string; num: number }>>('assets/data/enemies.yaml').sort((a, b) => a.num - b.num).map((e) => e.id);
+const place = (id: string): number => ORDER.indexOf(id);
+/** Down `n` times from the current entry. */
+const downs = (tap: (a: InputAction) => void, n: number): void => { for (let i = 0; i < n; i++) tap('down'); };
 const descendants = (c: Container): number => c.children.reduce((n, ch) => n + 1 + descendants(ch), 0);
 
 afterEach(() => { vi.restoreAllMocks(); });
@@ -104,13 +109,13 @@ describe('BestiaryScene', () => {
     await scene.enter();
     tap('right');
     expect(scene.selectedIndex).toBe(6);
+    const last = ORDER.length - 1;
+    for (let i = 0; i < Math.ceil(last / 6); i++) tap('right');
+    expect(scene.selectedIndex).toBe(last);
     tap('right');
-    tap('right');
-    expect(scene.selectedIndex).toBe(13);
-    tap('right');
-    expect(scene.selectedIndex).toBe(13);
+    expect(scene.selectedIndex).toBe(last);
     tap('left');
-    expect(scene.selectedIndex).toBe(7);
+    expect(scene.selectedIndex).toBe(last - 6);
   });
 
   it('a held Down moves again after 20 frames, then every 5', async () => {
@@ -138,11 +143,10 @@ describe('BestiaryScene', () => {
   });
 
   it('never off-panel: goblin and garland stay inside the preview on every attack frame', async () => {
-    for (const index of [0, 5]) {
+    for (const id of ['goblin', 'garland']) {
       const { scene, tap, frame, art } = setup();
       await scene.enter();
-      if (index) { tap('right'); tap('up'); frame(PREVIEW_DEBOUNCE_FRAMES); }   // 012 Garland is the 6th entry
-      const id = index ? 'garland' : 'goblin';
+      if (id === 'garland') { downs(tap, place('garland')); frame(PREVIEW_DEBOUNCE_FRAMES); }   // 012 Garland
       expect(scene.stats!.shown.join()).toBeTruthy();
       const f = art.getMonsterFrames(id)!;
       tap('confirm');
@@ -161,14 +165,14 @@ describe('BestiaryScene', () => {
     }
   });
 
-  it('scroll and leak: two walks over all 14 entries leave one enemy sprite and the same descendant count', async () => {
+  it('scroll and leak: two walks over every entry leave one enemy sprite and the same descendant count', async () => {
     const { scene, tap, frame, requests } = setup();
     await scene.enter();
     for (const r of requests) r.resolve(r.texture);
     await Promise.resolve();
     const before = descendants(scene.container);
     for (let walk = 0; walk < 2; walk++) {
-      for (let i = 0; i < 14; i++) { tap('down'); frame(PREVIEW_DEBOUNCE_FRAMES + 2); }
+      for (let i = 0; i < ORDER.length; i++) { tap('down'); frame(PREVIEW_DEBOUNCE_FRAMES + 2); }
       for (const r of requests) r.resolve(r.texture);
       await new Promise((res) => setTimeout(res, 0));
     }
@@ -182,8 +186,7 @@ describe('BestiaryScene', () => {
   it('background race: A then B, resolved B then A, B stays; a load resolved after exit adds nothing', async () => {
     const { scene, tap, frame, requests } = setup();
     await scene.enter();
-    tap('right');
-    tap('up');                                      // 012 Garland (6th by num): temple
+    downs(tap, place('garland'));                   // 012 Garland: temple (the entries between are debounced)
     frame(PREVIEW_DEBOUNCE_FRAMES);
     const [a, b] = requests;
     expect([a.path, b.path]).toEqual(['assets/backgrounds/grassland.webp', 'assets/backgrounds/temple.webp']);
@@ -227,9 +230,8 @@ describe('BestiaryScene', () => {
     tap('start');
     expect(scene.panelPage).toBe(0);
     expect(statsText(scene)).toContain('HP         8');
-    tap('right');
-    tap('right');                                   // 049 Rime Sovereign (13th by num)
-    expect(visibleLabels(scene.container)).toContain('049 Rime Sovereign  13/14');
+    downs(tap, place('lich'));                      // 049 Rime Sovereign
+    expect(visibleLabels(scene.container)).toContain(`049 Rime Sovereign  ${place('lich') + 1}/${ORDER.length}`);
     tap('start');
     expect(scene.stats!.shown[0]).toBe('Info');
     expect(statsText(scene)).toContain('On hit     Paralysis');
@@ -238,7 +240,7 @@ describe('BestiaryScene', () => {
     tap('start');
     tap('start');
     expect(scene.stats!.shown[0]).toBe('Lore 3/3');
-    tap('down');                                    // 066 Red Dragon has no lore: back to its Info page
+    downs(tap, place('dragon') - place('lich'));    // 066 Red Dragon has no lore: back to its Info page
     expect(scene.panelPage).toBe(1);
     expect(statsText(scene)).toContain('Specials   Blaze 50%');
     tap('start');

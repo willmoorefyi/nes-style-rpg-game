@@ -8,7 +8,20 @@ habitats:
   zones: {east_pocket: East pocket, temple_approach: Temple approach}
 backgrounds:
   default: grassland
-  enemies: {garland: temple, lich: shoreline, vampire: abandoned_castle, dragon: desert, pirate: shoreline, cockatrice: forest}
+  enemies: {garland: temple, lich: shoreline, vampire: abandoned_castle, dragon: desert, pirate: shoreline, cockatrice: forest,
+    # roster pass R (ROSTER_PLAN 7.3): by habitat, committed staged ids only; grassland ones use the default
+    black_widow: forest, werewolf: dark_forest, zombie: evil_temple, ghoul: marsh, lizard: desert, sahagin: ocean,
+    sahagin_chief: ocean, shark: ocean, bigeyes: ocean, buccaneer: shoreline, tarantula: marsh, ghast: marsh,
+    scorpion: desert, shadow: marsh, green_slime: marsh, crawler: marsh, gray_ooze: marsh, bloodbones: marsh,
+    piscodemon: marsh, gargoyle: abandoned_castle, astos: abandoned_castle, wraith: cave, anaconda: swamp,
+    lesser_tiger: forest, minotaur: cave, hill_gigas: cave, earth_elemental: cave, wight: cave, ochre_jelly: cave,
+    ogre_mage: cave, sphinx: desert, ankheg: cave, crocodile: river, white_crocodile: river, ochu: swamp, neochu: swamp,
+    horned_devil: cave, pyrolisk: cave, fire_elemental: cave, fire_hydra: cave, lava_worm: cave, hellhound: cave,
+    fire_lizard: cave, fire_gigas: cave, ashen_queen: evil_temple, white_dragon: cave, winter_wolf: cave,
+    mindflayer: cave, ice_gigas: cave, specter: cave, remorazz: cave, dark_wizard: cave, evil_eye: cave,
+    desert_baretta: desert, sabertooth: forest, wyrm: cave, manticore: desert, dragon_zombie: abandoned_castle,
+    drowned_sovereign: ocean, warmech: abandoned_castle, hollow_seraph: temple, death_eye: temple, chaos: evil_temple,
+    lich_2: evil_temple, ashen_queen_2: evil_temple, drowned_sovereign_2: evil_temple, hollow_seraph_2: evil_temple}
 anim:
   order: [attack, hurt, cast, daze]
   firstBreak: 30
@@ -83,10 +96,29 @@ statuses: {poison: Poison, stun: Paralysis, sleep: Sleep, blind: Blind, stone: S
 spellNames: {fir3: FIR3, lit3: LIT3, ice3: ICE3, nuke: NUKE, rub: RUB, xxxx: XXXX, brak: BRAK, bane: BANE, stop: STOP,
   zap: ZAP!, xfer: XFER, wall: WALL, fog2: FOG2, inv2: INV2, hel2: HEL2, hel3: HEL3, cur4: CUR4, stun: STUN, blnd: BLND,
   slo2: SLO2}
-specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: Ink}
+specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: Ink, squint: Death Gaze, scorch: Scorch,
+  heat: Heat, blizzard: Blizzard Breath, frost: Frost, trance: Mind Blast, glance: Glance, stare: Stare,
+  stinger: Poison Stinger, crack: Earthquake, thunder: Thunder Breath, poison: Poison Breath, nuclear: Nuclear,
+  glare: Time Gaze, inferno: Inferno, swirl: Tsunami, tornado: Tornado}
 lore:                        # enemy id -> pages (ASCII); a rematch shows its first battle's
   lich:
   - "Once a mortal knight-king, he swore that no enemy would ever take his people while he still stood to defend them. When famine weakened his kingdom and an invading army crossed its borders, he went down beneath his ancestral fortress to the ancient source of life buried in the earth. There he bound his crown, his bloodline and every soul sworn to his protection to a single command: his kingdom would endure."
   - "The earth answered. Its buried warmth flowed into the dying king, raising him from his deathbed and waking the soldiers in their graves. They drove the invaders back. Then the frost came.\nFields hardened beneath unmelting snow. Roots froze deep underground. As his subjects perished, they rose again to resume their duties: soldiers returned to the walls, servants tended empty chambers, and farmers walked the edges of fields that would never bear another harvest."
   - "The king had kept his oath. He could no longer understand why anyone would wish him to release them.\nNow called the Rime Sovereign, he stands gaunt in blackened-iron plate, frost tracing every edge. Icicles grow from the cracks of his bare skull, through the band of tarnished gold that still marks him as king. Cyan lights burn in his empty sockets. At half strength his skull fractures and the cold within him flares."
+  ashen_queen:
+  - "Once a revered sun priestess, she entered the sacred flame to save her people and came out wearing the shape of her god: six arms, a towering body and a vast serpent's tail. Whether it was an ascension or a monstrous imitation, no one who saw it could say."
+  - "Her six hands still make the gestures of worship: offering, blessing, judgment. Now each one ends in fire. A blessing becomes a consuming heat; an offering demands a life. A crown of gold rays frames her cracked white mask, and molten light shines through the fissures of her blackened body. Her tail coils around the ruined altar where she first entered the flame.\nShe believes that everything imperfect must burn before the world can be renewed."
+  - "She fights as she once prayed, each arm moving through its own rite, so a watchful eye can tell which one she is preparing. As she weakens, the ritual breaks down and the controlled sunfire becomes an uncontrolled inferno.\nAt Crescent Lake the sages still keep the hymns of the old sun temple. They sing them quietly now, and never near an open flame."
+  drowned_sovereign:
+  - "An ancient king who bargained with the abyss to save his sinking kingdom. He still presents himself as its human ruler: crowned, composed and dressed in magnificent ceremonial robes. The robes flow far beyond anything the water or the air could explain, and they hide a body whose proportions never quite make sense."
+  - "At rest the illusion is almost convincing: a human face beneath the crown, one pale hand from a wide sleeve. But whenever he strikes, casts or recoils from a blow, the robes open and his true shape shows: writhing tentacles, grasping suckers, and glimpses of something enormous folded beneath the royal garments.\nHe considers his drowned subjects saved. He means to extend that salvation to every kingdom above the waves."
+  - "Every action exposes a different part of the creature beneath, and the hardest blows reveal the most; then the robes close and the crown is a king's again.\nIn Onrac the fishermen tell of a crowned man seen walking the sea floor at low tide, and of the bells of a sunken city that ring when no wind blows."
+  hollow_seraph:
+  - "An ancient celestial guardian whose body joins sacred imagery to the machinery of a forgotten civilization. A hollow suit of white armour hangs beneath a fractured halo, surrounded by six articulated wings. Their metal feathers make constant, minute adjustments, as though she were balancing the air itself."
+  - "There is no face within her helm. Her voice comes from the fortress around her: whispered through vents, echoing through great chambers, carried on winds that arrive before she moves.\nMade to protect the world, she came to see movement and change as the sources of all suffering. She has gathered the winds into a vast, still storm around her fortress. Beyond it, sails hang slack and the seasons begin to fail."
+  - "She commands the air of the battlefield, and her storms strike the whole party at once. Her wings turn cutting gusts, her halo gathers lightning, and when she folds her wings tight the air is crushed before it bursts. A sudden silence warns of her worst.\nEven as her armour cracks she keeps making her precise corrections. In Gaia the windmills have not turned for a year, and the old folk say the sky is holding its breath."
+  astos:
+  - "The dark elf who cursed the Elf Prince into an endless sleep and stole the witch Matoya's crystal eye. In the ruined Western Keep he wears the shape of its lost king, and asks passing heroes to bring back the crown from the Marsh Cave. When they do, he drops the disguise and tries to kill them with a single word."
+  chaos:
+  - "A colossal titan of cracked obsidian with four arms, a horned crown and great tattered wings of shadow-flame. Seams of the four Fiends' lights run through it: frost cyan, ember orange, abyss teal and storm white.\nIt waits at the end of a loop of time, fed by the life the Fiends drain from the world, and it means for the loop never to break."
 help: "Up/Down: scroll   Left/Right: page   Z: next move   C: info/lore   Shift: pause   X: close"
