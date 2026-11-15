@@ -1305,14 +1305,15 @@
     pointed white teeth, a small red eye, small fins and a forked tail; it hovers horizontally, nothing touches the
     ground, no water drawn; in every cell it floats at the same height in its box with clear empty space below it
   attack: >-
-    darting forward toward the heroes, the jaws gaping wide, the body level and horizontal at the same height as in the
-    idle cell, the head well inside the middle cell
+    darting forward toward the heroes, the jaws gaping wide, the body level and horizontal, the same size as in the
+    idle cell and at the same height, its belly and lowest fin no lower than in the idle cell (no leap, no diagonal),
+    the head well inside the middle cell
   hurt: >-
-    knocked back, the body bent into a gentle curve while staying horizontal at the same height as in the idle cell,
-    the jaws clenched, the tail fin whipping
+    knocked back, the body bent into a gentle curve while staying horizontal, the same size and at the same height as
+    in the idle cell, its belly and tail no lower than in the idle cell, the jaws clenched
   face: its red eye and the toothy underbite are readable
-  extra_negative: water, bubbles, splashes, motion lines, armour plates, spines, legs, a vertical body
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R156): no image (PROHIBITED_CONTENT); the wording softened
+  extra_negative: water, bubbles, splashes, motion lines, streaks, armour plates, spines, legs, a vertical body
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R156): no image (PROHIBITED_CONTENT); 1235 (R157): attack and hurt drawn lower, sliced by the shared offset
 - id: red_piranha
   # "Red Piranha" (052): larger, blood-red and armour-plated
   size: small
