@@ -19,7 +19,8 @@ QUAD = {"hip": [20, 50], "back": [35, 45], "chest": [50, 45], "neck": [58, 30], 
         "sh_n": [52, 52], "el_n": [53, 64], "paw_n": [53, 74], "sh_f": [48, 52], "el_f": [47, 64], "paw_f": [47, 74],
         "hip_n": [22, 54], "knee_n": [24, 64], "foot_n": [22, 74], "hip_f": [18, 54], "knee_f": [16, 64], "foot_f": [14, 74]}
 HEADS = {"neck2": [52, 28], "head2": [50, 14], "snout2": [60, 12], "neck3": [62, 38], "head3": [70, 34], "snout3": [78, 36]}
-PROTOTYPES = {"gargoyle", "hydra", "fire_hydra", "warmech", "chaos", "hellhound"}  # hellhound: second head (head2)
+PROTOTYPES = {"gargoyle", "hydra", "fire_hydra", "warmech", "chaos", "hellhound",  # hellhound: second head (head2)
+              "soldier", "guardian", "chimera", "rhyos"}  # batch D: mechanical preset (soldier, guardian), extra heads (chimera, rhyos)
 
 
 def _cfg(body: str, idle: dict, **kw) -> dict:
