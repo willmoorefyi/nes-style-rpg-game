@@ -1398,7 +1398,8 @@
   prompt: >-
     a bigger carnivorous plant monster of purple-black flesh: two round bulbs side by side on one thick stalk, each
     with its own wide toothy maw, sitting on a heavy dark root mass that rests on the ground, exactly four thick
-    purple vine tentacles covered in sharp thorns, swollen sickly yellow-green poison sacs on the stalk; in every cell
+    heavy purple vine tentacles as thick as an arm, each one solid and joined to the stalk, with short sharp thorns
+    along them, swollen sickly yellow-green poison sacs on the stalk; in every cell
     the whole plant stays well inside its own cell
   attack: >-
     the bulbs lunging forward with both maws gaping wide, the two front thorned vines reaching toward the heroes and
@@ -1408,8 +1409,8 @@
   hurt: >-
     both bulbs recoiling back, the maws snapped shut, the thorned vines curling in, the root mass in place
   face: no eyes; the two toothy maws are the readable feature
-  extra_negative: eyes, a face, legs, a pot, green colour, a third maw, a fifth vine, a pink flower
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R168): the attack vines thrown up and out, cut at the cell top and the raw cell line
+  extra_negative: eyes, a face, legs, a pot, green colour, a third maw, a fifth vine, a pink flower, thin vines, loose thorns
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R168): the attack vines cut at the cell top and the raw cell line; 1235 (R169): thin broken vines, stray pieces
 - id: hydra
   # "Hydra" (057): three green heads on long necks (distinct from the fire hydra)
   size: large
