@@ -237,23 +237,29 @@
     clearly visible: three on the left side of the image (the upper one with the sun disc, the middle one open, the
     lower one with the bronze blade) and three on the right side of the image (the upper one open, the middle one open,
     the lower one with the censer on its chain), as in Image 3
+  # boss_attack_raise 1235 (R14) text: "... all six arms raised high overhead together, every one of the six hands
+  # lifted above the top of the radiant crown, the arms forming a tall V of three on each side ..." (a near copy of the
+  # idle); 1236 names every hand by image side (the wording that fixed the props in R8 / R10 / R21) and sinks the mask
   attack_raise: >-
-    the wind-up of a crushing sunfire blow, seen in the same three-quarter front view as Image 3 (torso and mask turned
-    toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, every
-    one of the six hands lifted above the top of the radiant crown, the arms forming a tall V of three on each side,
-    all six clearly visible; the bronze blade still in a left-side hand and the sun disc
-    in the upper left hand, both above the radiant crown, the censer on its chain still in a right-side hand; the mask
-    exactly as in Image 3; the tail coiled low and tight
-    around the altar; she sinks down into the coil so that the whole figure, crown and raised arms included, stays
-    inside the grey box at exactly the same pixel size as in Image 3 (crouched into the coil, not taller; the raised
-    blade is the highest point, well below the top of the image)
+    the wind-up of a crushing sunfire blow, in the same front view as Image 3 (torso and mask toward the viewer, never
+    her back): she sinks low into her coil, the torso lowered so that the mask sits near the middle of the image, and
+    lifts all six arms straight up above the radiant crown. On the left side of the image: the upper hand holds the sun
+    disc high above the crown, the middle hand is open above the crown, the lower hand grips the bronze blade raised
+    high above the crown. On the right side of the image: the upper hand is open above the crown, the middle hand is
+    open above the crown, the lower hand holds the censer chain up above the crown with the censer hanging from it.
+    Exactly six arms in a tall V, three on each side, all six clearly visible; the mask and crown exactly as in Image 3;
+    the tail coiled low and tight around the altar. This pose must look clearly different from Image 3: the mask much
+    lower and every hand above the crown. The whole figure, raised hands included, stays inside the grey box at exactly
+    the same pixel size as in Image 3 (the raised blade is the highest point, well below the top of the image)
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
+  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235, boss_attack_raise: 1236}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
   # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette; boss_hurt 1234 (R9): five arms;
   # 1235 (R10, approved as best of 3): pink key fringe on the smoke, forked tail tip; 1236 (R11, + "only a thin wisp
-  # of smoke from the censer"): clean but no recoil; boss_attack_raise 1234 (R13): guide box painted, arms not raised
+  # of smoke from the censer"): clean but no recoil; boss_attack_raise 1234 (R13): guide box painted, arms not raised;
+  # 1235 (R14): a near copy of the idle; 1236 (R33): an exact copy of the idle. No boss_attack_raise is approved
+  # (deferred, ROSTER_LOG R34)
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
