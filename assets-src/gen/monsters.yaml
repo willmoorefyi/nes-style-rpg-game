@@ -2080,7 +2080,7 @@
     the mouth closed, the tail fin whipping
   face: its shark head with a small black eye is readable
   extra_negative: water, waves, splashes, bubbles, water streaks, motion lines, legs, a vertical body, red
-  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R278): the attack a copy of the idle, the hurt sliced on the bottom row; 1235 (R279): both action cells sliced on the bottom row, a vertical hurt
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R278): the attack a copy of the idle, the hurt sliced on the bottom row; 1235 (R279): both action cells sliced on the bottom row, a vertical hurt; 1236 (R280): both action cells sliced on the bottom row. DEFERRED (R281): 3 of 3 used, none approvable
 - id: deepeyes
   # "Deepeyes" (095): a bulbous abyssal eye with luminous tentacles (distinct from bigeyes, evil eye, death eye)
   size: large
