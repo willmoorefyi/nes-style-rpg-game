@@ -899,13 +899,15 @@
     a sand-yellow scorpion seen from the side, a segmented armoured body, two large raised pincers in front, a long
     segmented tail arched high over its back ending in a dark curved stinger, a cluster of small dark eyes, exactly
     eight jointed legs planted wide
-  attack: lunging forward with the pincers snapping and the stinger striking forward over its back toward the heroes
+  attack: >-
+    lunging forward with the pincers snapping and the stinger itself striking forward over its back toward the
+    heroes; no venom spray, streak or motion line
   hurt: >-
     knocked back, still facing right with the head and pincers toward the heroes on the right and the tail over the
     back on the left as in the idle cell, the pincers thrown up, the tail curling down
   face: a small cluster of dark eyes and the pincers are readable
   extra_negative: red shell, lobster claws, wings, more than eight legs
-  seeds: [1234]
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R105): the hurt turned around; 1235 (R106): a venom streak in the attack
 - id: shadow
   # "Shadow" (026): an incorporeal undead whose touch blinds
   size: small

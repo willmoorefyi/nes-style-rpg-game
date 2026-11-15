@@ -1,0 +1,27 @@
+{
+  "character": "scorpion",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "733a880f2cc25ab34513e0cd",
+  "approved": "2026-11-15",
+  "grid": [
+    94,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R107"
+}
