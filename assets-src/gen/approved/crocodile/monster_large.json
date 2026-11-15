@@ -1,0 +1,27 @@
+{
+  "character": "crocodile",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "d2303f1eff8546c049487323",
+  "approved": "2026-11-15",
+  "grid": [
+    144,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R162"
+}

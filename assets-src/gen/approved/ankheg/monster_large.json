@@ -1,0 +1,27 @@
+{
+  "character": "ankheg",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "ac62623f21ef49da2cfb481b",
+  "approved": "2026-11-15",
+  "grid": [
+    154,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R154/R155 (best of 3)"
+}

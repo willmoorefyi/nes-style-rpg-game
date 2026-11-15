@@ -1,0 +1,27 @@
+{
+  "character": "ogre_mage",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "e6e6be2e6c675c05f1a0031d",
+  "approved": "2026-11-15",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R150 (R148, best of 3)"
+}

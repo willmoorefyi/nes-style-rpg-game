@@ -1,0 +1,27 @@
+{
+  "character": "buccaneer",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "d6786b4946f2aefc5c4c13d7",
+  "approved": "2026-11-15",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R117"
+}
