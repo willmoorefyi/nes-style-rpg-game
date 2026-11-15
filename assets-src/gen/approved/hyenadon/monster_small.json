@@ -1,0 +1,27 @@
+{
+  "character": "hyenadon",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "f3c25a309ad1a8c8cb8ab7f7",
+  "approved": "2026-11-15",
+  "grid": [
+    116,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R131"
+}
