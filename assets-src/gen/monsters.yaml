@@ -900,7 +900,9 @@
     segmented tail arched high over its back ending in a dark curved stinger, a cluster of small dark eyes, exactly
     eight jointed legs planted wide
   attack: lunging forward with the pincers snapping and the stinger striking forward over its back toward the heroes
-  hurt: knocked back, the pincers thrown up, the tail curling down
+  hurt: >-
+    knocked back, still facing right with the head and pincers toward the heroes on the right and the tail over the
+    back on the left as in the idle cell, the pincers thrown up, the tail curling down
   face: a small cluster of dark eyes and the pincers are readable
   extra_negative: red shell, lobster claws, wings, more than eight legs
   seeds: [1234]
