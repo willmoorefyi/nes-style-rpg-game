@@ -1316,25 +1316,30 @@
   # DEFERRED (ROSTER_LOG R159): 3 of 3 attempts used; 1236 (R158) refused again (PROHIBITED_CONTENT)
   seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R156): no image (PROHIBITED_CONTENT); 1235 (R157): attack and hurt drawn lower, sliced by the shared offset
 - id: red_piranha
-  # "Red Piranha" (052): larger, blood-red and armour-plated
+  # "Red Piranha" (052): larger, deep red and plated. Swimmer wording after the R156/R158/R160 refusals (ROSTER_LOG
+  # batch B): the accepted R157 / shark R100 phrasing, no "belly ... no lower" or "same size" clause, plus the
+  # floating "idle at its lowest" motion line (water_elemental R241)
   size: small
   floating: true
   body: swimmer
+  motion: >-
+    Keep the fish level and horizontal in every cell. The idle cell shows it at its lowest; in the attack and the
+    hurt it rises a little, with more empty space below it: in the attack it darts forward to the right; in the hurt
+    it is knocked back to the left with the body bent into a gentle curve; it always hovers, nothing touches the
+    ground; the fins and the tail move with the motion.
   prompt: >-
-    a big deep crimson armoured fish seen from the side, a heavy deep body covered in dark red bony scale plates, a
-    thick bony head plate, rows of spiny dorsal and belly fins, a big underbite with small white teeth, a yellow eye,
-    a ragged forked tail; it hovers horizontally, nothing touches the ground, no water drawn; in every cell it
-    floats at the same height in its box with clear empty space below it
+    a large deep red fish seen from the side, a deep heavy round body with rows of hard dark red scales, a thick bony
+    plate over the head, spiky dorsal and lower fins, a big underbite of small white teeth, a yellow eye, a ragged
+    forked tail; it hovers horizontally, nothing touches the ground, no water drawn; in every cell it floats in the
+    upper part of its box with clear empty space below it, centred in its own cell
   attack: >-
-    ramming forward toward the heroes, the jaws open, the body level and horizontal, the same size as in the idle
-    cell and at the same height, its belly and lowest fin no lower than in the idle cell (no leap, no diagonal), the
-    head well inside the middle cell
+    darting forward toward the heroes, the jaws open, the body level and horizontal, the head well inside the middle
+    cell
   hurt: >-
-    knocked back, the body bent into a gentle curve while staying horizontal, the same size and at the same height as
-    in the idle cell, its belly and tail no lower than in the idle cell, the jaws shut, the spiny fins flattened
-  face: its yellow eye under the bony head plate and the toothy underbite are readable
+    knocked back, the body bent into a gentle curve while staying horizontal, the jaws shut, the spiky fins flattened
+  face: its yellow eye under the bony head plate and the underbite are readable
   extra_negative: water, bubbles, splashes, motion lines, streaks, silver scales, green scales, legs, a vertical body
-  seeds: [1234]   # 1234 (ROSTER_LOG R160): no image (PROHIBITED_CONTENT); swimmer paused (plan 6.3)
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R160): no image (PROHIBITED_CONTENT); swimmer paused (plan 6.3), resumed with this wording
 - id: crocodile
   # "Crocodile" (053): a dark green crocodile (distinct from the white crocodile)
   size: large

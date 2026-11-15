@@ -729,3 +729,5 @@
 {"event": "result", "key": "be5526492374ec6ee0f08b58", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T13:09:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "iron_golem", "sheet": "monster_large", "seed": 1234, "key": "771097cababc1b5ede7f8dad"}
 {"event": "result", "key": "771097cababc1b5ede7f8dad", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:12:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "red_piranha", "sheet": "monster_small", "seed": 1235, "key": "90fa651cd28cab4f8d2b67e5"}
+{"event": "result", "key": "90fa651cd28cab4f8d2b67e5", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}
