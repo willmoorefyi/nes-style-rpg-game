@@ -1,6 +1,7 @@
 import { Assets, Rectangle, Texture } from 'pixi.js';
 import { characterAtlas, fetchJson } from './CharacterAtlas.js';
 import { MonsterPages, type MonsterAtlasPage, type PageIo } from './MonsterPages.js';
+import { monsterAnchors, type MonsterAnchors } from './monsterAnchors.js';
 import { BOSS_FRAMES, lungePx, resolveFrame, type MonsterFrame, type MonsterKeyframe } from '../scenes/battle/enemyChoreography.js';
 
 const MONSTER_DIR = 'assets/sprites/';
@@ -21,7 +22,8 @@ export interface MonsterAtlasMeta {
   texScale?: number;
   /** The atlas pages (PNG files next to the JSON); missing: one page, monsters-ai.png. */
   pages?: MonsterAtlasPage[];
-  sheets: Record<string, {
+  /** Plus the FW-A anchors `travelTop`, `lungeRight` and `homeX` (monsterAnchors.ts). */
+  sheets: Record<string, MonsterAnchors & {
     /** Index into `pages` (0 when missing). */
     page?: number;
     cell: [number, number];
@@ -41,8 +43,8 @@ export interface MonsterAtlasMeta {
   }>;
 }
 
-/** Everything the battle scene needs to draw and animate one monster. */
-export interface MonsterFrames {
+/** Everything the battle scene needs to draw and animate one monster (with the atlas anchors, monsterAnchors.ts). */
+export interface MonsterFrames extends MonsterAnchors {
   /** One texture per frame name; a missing frame shows its source keyframe (a boss-less cast shows attack). */
   textures: Record<MonsterFrame, Texture>;
   idle: Texture;
@@ -173,7 +175,7 @@ export class BattleArt {
       artScale: s / ts, cell: [w, h], footRow: entry.footRow, floating: entry.floating, hasCast: !!entry.frames.cast,
       hasRaise: !!entry.frames.attack_raise, lungePx: lungePx(entry), anim: !!entry.anim,
       opaqueRight: entry.opaqueRight ?? this.measureOpaqueRight(sprite, tex, entry.frames.idle, entry.cell, ts) ?? w,
-      ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}) };
+      ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...monsterAnchors(entry) };
   }
 
   /** The idle cell's rightmost opaque column + 1 (art px), read once from the atlas image; null outside a browser. */

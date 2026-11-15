@@ -1,0 +1,83 @@
+/**
+ * MonsterFrames stubs built from the committed atlas index (`monsters-ai.json`: cell, foot row, lunge and the FW-A
+ * anchors through the real `monsterAnchors` parser), plus per-frame opaque boxes read from the page PNGs, so tests
+ * measure what each displayed frame really draws instead of trusting the anchors (docs/ROSTER_FIX_PLAN.md R-1 to R-3).
+ */
+import { readFileSync } from 'node:fs';
+import { join, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parse } from 'yaml';
+import { Texture } from 'pixi.js';
+import { BOSS_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { monsterAnchors, type MonsterAnchors } from '../../src/rendering/monsterAnchors.js';
+import { monsterSpriteKey, type MonsterFrames } from '../../src/rendering/BattleArt.js';
+import type { EnemyBoxInput, EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
+import type { MonsterArtSource } from '../../src/scenes/battle/AiEnemyView.js';
+import type { EnemyData } from '../../src/types/index.js';
+import { opaqueBounds } from './pngAlpha.js';
+import { monsterSheetPng, readMonsterAtlas } from './monsterAtlas.js';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+export interface AtlasSheet extends MonsterAnchors {
+  page?: number; cell: [number, number]; footRow: number; floating: boolean; lungePx?: number; opaqueRight?: number;
+  frames: Record<string, [number, number]>;
+}
+export const atlas = readMonsterAtlas<{ scale: number; texScale?: number; sheets: Record<string, AtlasSheet> }>();
+export const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
+export const enemyById = (id: string): EnemyData => {
+  const e = enemyData.find((x) => x.id === id);
+  if (!e) throw new Error(`no enemy ${id}`);
+  return e;
+};
+
+const ts = atlas.texScale ?? atlas.scale;
+
+/** The atlas key a frame name shows (BattleArt's resolution: the fallback chain, then `attack`). */
+export function shownFrame(sheet: string, name: MonsterFrame): string {
+  const s = atlas.sheets[sheet];
+  return resolveFrame(name, (f) => !!s.frames[f]) ?? 'attack';
+}
+
+const boxes = new Map<string, [number, number, number, number]>();
+/** A frame's opaque box in art px [l, t, r, b) relative to the cell, read from the page PNG (cached per frame). */
+export function frameBox(sheet: string, name: MonsterFrame): [number, number, number, number] {
+  const key = `${sheet}/${shownFrame(sheet, name)}`;
+  let b = boxes.get(key);
+  if (!b) {
+    const s = atlas.sheets[sheet];
+    const [x, y] = s.frames[shownFrame(sheet, name)];
+    const px = opaqueBounds(monsterSheetPng(sheet), x * ts, y * ts, s.cell[0] * ts, s.cell[1] * ts);
+    if (!px) throw new Error(`${key} is empty`);
+    b = px.map((v) => v / ts) as [number, number, number, number];
+    boxes.set(key, b);
+  }
+  return b;
+}
+
+/** The idle frame's opaque right edge (exclusive), as BattleArt measures it when the index has none. */
+export const idleRight = (sheet: string): number => frameBox(sheet, 'idle')[2];
+
+/** A stub with one blank texture per frame and the atlas facts of `sheet` (null: no such sheet). */
+export function atlasFrames(sheet: string): MonsterFrames | null {
+  const s = atlas.sheets[sheet];
+  if (!s) return null;
+  const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
+  return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: atlas.scale,
+    artScale: atlas.scale / ts, cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
+    hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true, opaqueRight: s.opaqueRight ?? idleRight(sheet),
+    ...monsterAnchors(s) };
+}
+
+export const atlasArt: MonsterArtSource = { getMonsterFrames: atlasFrames };
+
+/** The layout input AiEnemyView builds for an enemy id (its size and its sheet's cell and home extent). */
+export function layoutInput(id: string): EnemyBoxInput {
+  const e = enemyById(id);
+  const s = atlas.sheets[monsterSpriteKey(e)];
+  const size: EnemySizeClass = e.size ?? 'small';
+  const box: EnemyBoxInput = { size, w: s.cell[0] * atlas.scale, h: s.cell[1] * atlas.scale };
+  const a = monsterAnchors(s);
+  if (a.homeX) { box.ox0 = a.homeX[0] * atlas.scale; box.ox1 = (a.homeX[1] + 1) * atlas.scale; }
+  return box;
+}

@@ -37,8 +37,11 @@ def recipe_u(name: str, rig_cfg: dict | None = None) -> float:
 
 
 # ───────── approved keyframes ─────────
-def load_entries() -> list[tuple[str, dict, dict[str, Image.Image]]]:
-    """Every approved monster sprite as (id, meta, {keyframe: image}); grid sheets first, then per-pose bosses."""
+def load_entries(paint: bool = True) -> list[tuple[str, dict, dict[str, Image.Image]]]:
+    """Every approved monster sprite as (id, meta, {keyframe: image}); grid sheets first, then per-pose bosses. The
+    rig's key edits (monster_keys: FW-R `raise: false`, FW-P keyframe paint; paint=False skips the paint) are applied
+    here, after pad_keyframes, so every consumer sees the same keys."""
+    from gen import monster_keys as MK
     entries = []
     for meta_path in sorted(APPROVED.glob("*/monster_*.json")):
         meta = json.loads(meta_path.read_text())
@@ -63,7 +66,11 @@ def load_entries() -> list[tuple[str, dict, dict[str, Image.Image]]]:
             metas.append(m)
         frames, meta = pad_keyframes(frames, {**metas[0], "poses": poses})
         entries.append((metas[0]["character"], meta, frames))
-    return entries
+    out = []
+    for sid, meta, frames in entries:
+        cfg = load_rig(sid)
+        out.append((sid, *MK.apply(sid, cfg, meta, frames, paint)) if cfg else (sid, meta, frames))
+    return out
 
 
 def pad_keyframes(kfs: dict[str, Image.Image], meta: dict) -> tuple[dict[str, Image.Image], dict]:

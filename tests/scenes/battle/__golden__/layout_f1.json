@@ -1,0 +1,1757 @@
+{
+ "note": "computeEnemyLayoutAi outputs at 95b31e2 (f = 1) for the anim_* scenarios and the sandbox formations, with their inputs (docs/ROSTER_FIX_PLAN.md defect 2)",
+ "cases": [
+  {
+   "source": "scenario anim_goblin",
+   "enemies": [
+    "goblin",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 641,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_goblin_cast",
+   "enemies": [
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 641,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_bipeds",
+   "enemies": [
+    "goblin",
+    "pirate",
+    "skeleton",
+    "mummy",
+    "vampire",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 28,
+     "ox1": 146
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 28,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 150
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 393,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 569,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 745,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_large",
+   "enemies": [
+    "ogre",
+    "troll",
+    "dragon"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 20,
+     "ox1": 228
+    },
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 48,
+     "ox1": 246
+    },
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 8,
+     "ox1": 238
+    }
+   ],
+   "out": [
+    {
+     "x": 570,
+     "feetY": 456,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    },
+    {
+     "x": 570,
+     "feetY": 728,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    },
+    {
+     "x": 850,
+     "feetY": 669,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_beasts",
+   "enemies": [
+    "wolf",
+    "gr_wolf",
+    "cockatrice"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 200,
+     "h": 160,
+     "ox0": 10,
+     "ox1": 184
+    },
+    {
+     "size": "small",
+     "w": 168,
+     "h": 160,
+     "ox0": 20,
+     "ox1": 154
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 377,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 200,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 729,
+     "w": 168,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_boss_garland",
+   "enemies": [
+    "garland"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 400,
+     "h": 400,
+     "ox0": 32,
+     "ox1": 382
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 673,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_boss_lich",
+   "enemies": [
+    "lich",
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "boss",
+     "w": 400,
+     "h": 400,
+     "ox0": 8,
+     "ox1": 386
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 600,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    },
+    {
+     "x": 922,
+     "feetY": 509,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 922,
+     "feetY": 685,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "scenario anim_status",
+   "enemies": [
+    "goblin",
+    "goblin",
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 597,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l1_fields #0",
+   "enemies": [
+    "goblin",
+    "goblin",
+    "goblin",
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 509,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 685,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l1_fields #1",
+   "enemies": [
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 641,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l1_fields #2",
+   "enemies": [
+    "goblin",
+    "goblin",
+    "goblin",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 588,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 597,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l1_fields #3",
+   "enemies": [
+    "gr_imp",
+    "gr_imp",
+    "goblin",
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 509,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 685,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l1_fields #4",
+   "enemies": [
+    "wolf",
+    "wolf",
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 588,
+     "feetY": 360,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 536,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 712,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 832,
+     "feetY": 597,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_approach #0",
+   "enemies": [
+    "gr_imp",
+    "gr_imp",
+    "gr_imp",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 597,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_approach #1",
+   "enemies": [
+    "wolf",
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 377,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 729,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_approach #2",
+   "enemies": [
+    "skeleton",
+    "skeleton",
+    "gr_imp",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 597,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_approach #3",
+   "enemies": [
+    "gr_imp",
+    "gr_imp",
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 588,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 712,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 832,
+     "feetY": 597,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_temple #0",
+   "enemies": [
+    "skeleton",
+    "skeleton",
+    "skeleton"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 377,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 729,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_temple #1",
+   "enemies": [
+    "skeleton",
+    "skeleton",
+    "gr_imp",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 22,
+     "ox1": 152
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 597,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_temple #2",
+   "enemies": [
+    "gr_imp",
+    "gr_imp",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 377,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 729,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l2_garland #0",
+   "enemies": [
+    "garland"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 400,
+     "h": 400,
+     "ox0": 32,
+     "ox1": 382
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 673,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l3_garland #0",
+   "enemies": [
+    "garland"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 400,
+     "h": 400,
+     "ox0": 32,
+     "ox1": 382
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 673,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l5_east #0",
+   "enemies": [
+    "wolf",
+    "wolf",
+    "wolf",
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 588,
+     "feetY": 360,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 536,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 588,
+     "feetY": 712,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 832,
+     "feetY": 509,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 832,
+     "feetY": 685,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l5_east #1",
+   "enemies": [
+    "gr_imp",
+    "gr_imp",
+    "gr_imp",
+    "gr_imp",
+    "gr_imp"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 360,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 536,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 618,
+     "feetY": 712,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 509,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 802,
+     "feetY": 685,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l5_east #2",
+   "enemies": [
+    "gr_wolf",
+    "wolf",
+    "wolf"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 200,
+     "h": 160,
+     "ox0": 10,
+     "ox1": 184
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    },
+    {
+     "size": "small",
+     "w": 220,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 204
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 377,
+     "w": 200,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 729,
+     "w": 220,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l10_mid #0",
+   "enemies": [
+    "ogre"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 20,
+     "ox1": 228
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 601,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l10_mid #1",
+   "enemies": [
+    "troll",
+    "troll"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 48,
+     "ox1": 246
+    },
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 48,
+     "ox1": 246
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 737,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l10_mid #2",
+   "enemies": [
+    "mummy",
+    "mummy"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 28,
+     "ox1": 134
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 28,
+     "ox1": 134
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 641,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l10_mid #3",
+   "enemies": [
+    "cockatrice",
+    "cockatrice"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 168,
+     "h": 160,
+     "ox0": 20,
+     "ox1": 154
+    },
+    {
+     "size": "small",
+     "w": 168,
+     "h": 160,
+     "ox0": 20,
+     "ox1": 154
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 465,
+     "w": 168,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 710,
+     "feetY": 641,
+     "w": 168,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l20_late #0",
+   "enemies": [
+    "vampire"
+   ],
+   "inputs": [
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 18,
+     "ox1": 150
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 553,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l20_late #1",
+   "enemies": [
+    "dragon"
+   ],
+   "inputs": [
+    {
+     "size": "large",
+     "w": 256,
+     "h": 256,
+     "ox0": 8,
+     "ox1": 238
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 601,
+     "w": 256,
+     "h": 256,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l30_lich #0",
+   "enemies": [
+    "lich"
+   ],
+   "inputs": [
+    {
+     "size": "boss",
+     "w": 400,
+     "h": 400,
+     "ox0": 8,
+     "ox1": 386
+    }
+   ],
+   "out": [
+    {
+     "x": 710,
+     "feetY": 673,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    }
+   ]
+  },
+  {
+   "source": "sandbox l30_lich #1",
+   "enemies": [
+    "lich",
+    "goblin",
+    "goblin"
+   ],
+   "inputs": [
+    {
+     "size": "boss",
+     "w": 400,
+     "h": 400,
+     "ox0": 8,
+     "ox1": 386
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    },
+    {
+     "size": "small",
+     "w": 160,
+     "h": 160,
+     "ox0": 4,
+     "ox1": 140
+    }
+   ],
+   "out": [
+    {
+     "x": 618,
+     "feetY": 600,
+     "w": 400,
+     "h": 400,
+     "scaleFactor": 1
+    },
+    {
+     "x": 922,
+     "feetY": 509,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    },
+    {
+     "x": 922,
+     "feetY": 685,
+     "w": 160,
+     "h": 160,
+     "scaleFactor": 1
+    }
+   ]
+  }
+ ]
+}

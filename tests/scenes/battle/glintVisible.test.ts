@@ -2,7 +2,8 @@
  * Browser re-test B: the heavy attack's glint played at the raised weapon's tip (Garland about (1332, 46), the lich
  * about (1030, 80)), under the top message window (y 0-120), so it was never seen. On the real layout and the committed
  * atlas: the glint's box never meets the message window, and its centre is on an opaque pixel of the raise frame on
- * the weapon (within a few px of the rig's weapon bone: Garland's blade hand_f-tip, the lich's glaive gh-gt).
+ * the weapon (within a few px of the rig's weapon bone: Garland's blade hand_f-tip, the lich's glaive gh-gt). Since
+ * the travel clamp (docs/ROSTER_FIX_PLAN.md defect 1) the raw tip itself no longer rises under the window.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -24,6 +25,7 @@ import type { FxAtlasMeta } from '../../../src/scenes/battle/fx/fxAtlas.js';
 import type { MonsterAtlasMeta, MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
 import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
+import { monsterAnchors } from '../../../src/rendering/monsterAnchors.js';
 
 const ATLAS = JSON.parse(readFileSync('assets/sprites/monsters-ai.json', 'utf-8')) as MonsterAtlasMeta;
 const yaml = <T>(file: string): T => parse(readFileSync(`assets/data/${file}`, 'utf-8')) as T;
@@ -51,7 +53,7 @@ const art: MonsterArtSource = {
     return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: ATLAS.scale,
       artScale: ATLAS.scale / (ATLAS.texScale ?? ATLAS.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
       hasCast: !!s.frames.cast, hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true,
-      ...(s.tip ? { tip: s.tip } : {}) };
+      ...(s.tip ? { tip: s.tip } : {}), ...monsterAnchors(s) };
   },
 };
 
@@ -113,7 +115,7 @@ describe('re-test B: the glint is visible below the message window', () => {
   it.each(['garland', 'lich'].flatMap((id) => PARTY_FEET_Y.map((_, j) => [id, j] as const)))(
     '%s attacking hero %i: the glint box never meets the message window and sits on the weapon', (id, j) => {
       const { artPt, boxes, cueTop } = heldGlint(id, j);
-      if (j === 0) expect(cueTop + ATLAS.sheets[id].tip![1] * 2, `${id}: the raw tip is under the window`).toBeLessThan(BATTLE_MESSAGE_HEIGHT);
+      if (j === 0) expect(cueTop + ATLAS.sheets[id].tip![1] * 2, `${id}: the raw tip is clear of the window`).toBeGreaterThanOrEqual(BATTLE_MESSAGE_HEIGHT);
       expect(boxes.length).toBeGreaterThan(0);
       for (const b of boxes) expect(b.top, `${id} glint top`).toBeGreaterThanOrEqual(BATTLE_MESSAGE_HEIGHT);
       const px = cellPixels(id, 'attack_raise');

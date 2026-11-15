@@ -925,7 +925,7 @@
   enemies: [lich, goblin, goblin]
   background: assets/backgrounds/shoreline.webp
 - id: anim_crowd
-  name: Anim - nine large enemies (half-size layout)
+  name: Anim - nine large enemies (opaque packing, full size)
   party:
     - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
     - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }

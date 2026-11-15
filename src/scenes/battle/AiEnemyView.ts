@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
+import { enemyBoxInput, travelTopOf } from '../../rendering/monsterAnchors.js';
 import { computeEnemyLayoutAi, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
 import { EnemyPoseController, type AttackPlan, type Posture, type PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
@@ -90,7 +91,8 @@ export class AiEnemyView {
     const origin = target.parent?.worldTransform ?? { tx: 0, ty: 0 };
     const scale = f.scale * box.scaleFactor;
     return enemyReach({ opaqueRight: b.x + (f.opaqueRight ?? f.cell[0]) * scale, feetY: box.feetY,
-      lunge: f.lungePx * box.scaleFactor, targetLeft: t.x - origin.tx, targetFeetY: t.y + t.height - origin.ty });
+      lunge: f.lungePx * box.scaleFactor, targetLeft: t.x - origin.tx, targetFeetY: t.y + t.height - origin.ty,
+      topY: b.y + travelTopOf(f) * scale });
   }
 
   /** Length in frames of enemy i's attack on `target` (the dev preview's loop). */
@@ -109,7 +111,7 @@ export class AiEnemyView {
     const boxes = computeEnemyLayoutAi(this.enemies.map((e, i) => {
       const size = e.size ?? 'small';
       const f = this.frames[i];
-      return f ? { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale } : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
+      return f ? enemyBoxInput(size, f) : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
     }));
     this.base = [];
     this.boxes = boxes;

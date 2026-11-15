@@ -1,6 +1,8 @@
 """FW-8 self-tests (docs/ROSTER_PLAN.md 8), run from selftest.py (test_monster_anim, also --anim): the paged packer
 (groups start pages, spills, no straddling, stable earlier pages, a sheet too big for a page), the group order, the
-committed atlas index (every page <= MAX_PAGE, every sheet's rects inside its page) and `check`'s `<id>: no rig` line."""
+committed atlas index (every page <= MAX_PAGE, every sheet's rects inside its page) and `check`'s `<id>: no rig` line.
+Fix pass (docs/ROSTER_FIX_PLAN.md 3): FW-A atlas anchors (travelTop, lungeRight, homeX; explicit constants from the
+atlas at 95b31e2) and FW-R (`raise: false`: no raise frames, the heavy tip from atk_wind2)."""
 from __future__ import annotations
 
 import contextlib
@@ -70,6 +72,110 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
     check(lines == [f"{sid}: no rig"] and code == 0,
           f"check prints the stable line '<id>: no rig' for an unrigged sheet and exits 0 ({buf.getvalue().strip()!r})")
     run_wide_cells(check)
+    run_anchors(check)
+    run_raise_off(check)
+
+
+# FW-A constants, measured from the atlas at 95b31e2 (inclusive extents; dragon is `attack: ranged`, so its homeX
+# includes the attack frames: home only it is [18, 110])
+ANCHORS = {"garland": {"travelTop": 2}, "lich": {"travelTop": 9}, "death_eye": {"travelTop": 42, "lungeRight": 179},
+           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 5}, "ogre": {"homeX": [10, 113], "lungeRight": 125},
+           "troll": {"homeX": [24, 122]}, "dragon": {"homeX": [4, 118]},
+           "earth_elemental": {"lungeRight": 109, "opaqueRight": 110}}
+
+
+def run_anchors(check: Callable[[bool, str], None]) -> None:
+    """FW-A: inclusive extents over the plan's frame lists (names resolve through MA.resolve), the ranged attack frames
+    in homeX, the explicit constants in the committed index, and the index agreeing with its own page pixels."""
+    import numpy as np
+    from PIL import Image
+    from gen import monster_anim as MA
+    from gen import monster_atlas as MAT
+    blank = lambda: np.zeros((20, 30, 4), np.uint8)
+    fr = {n: blank() for n in ("idle", "attack", "hurt", "atk_wind1", "hurt_in1")}
+    fr["idle"][10, 5:21] = 255                                     # idle: columns 5-20, row 10
+    fr["hurt_in1"][3, 7] = 255                                     # the highest row: 3 (a travel frame)
+    fr["atk_wind1"][12, 2:28] = 255                                # a wind-up reaching 2-27
+    fr["attack"][15, 4:29] = 255                                   # the lunge's right edge: 28
+    fr["hurt"][11, 6:9] = 255
+    ims = {n: Image.fromarray(a) for n, a in fr.items()}
+    names = MA.frames_for(False)                                   # every other name resolves to a key or wind1
+    a = MAT.travel_anchors(ims, names)
+    check(a == {"travelTop": 3, "lungeRight": 28, "homeX": [5, 20]}, f"FW-A: inclusive extents over the frame lists {a}")
+    r = MAT.travel_anchors(ims, names, ranged=True)
+    check(r["homeX"] == [2, 28] and r["travelTop"] == 3, f"FW-A: a ranged sheet's homeX includes its attack frames {r}")
+    check(MAT.ranged_sheets() == {"dragon"}, f"FW-A: the ranged sheets are the dragon's ({sorted(MAT.ranged_sheets())})")
+    check(MAT.LUNGE_FRAMES == MAT.TRAVEL_FRAMES[:11] and len(MAT.TRAVEL_FRAMES) == 15 and MAT.HOME_FRAMES ==
+          ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b"), "FW-A: the plan's frame lists")
+
+    meta = json.loads(ATLAS_JSON.read_text())
+    sheets = meta["sheets"]
+    missing = [s for s, v in sheets.items() if not all(k in v for k in ("travelTop", "lungeRight", "homeX"))]
+    check(not missing, f"FW-A: every sheet has travelTop, lungeRight and homeX {missing[:5]}")
+    bad = {s: {k: (sheets.get(s, {}).get(k), v) for k, v in want.items() if sheets.get(s, {}).get(k) != v}
+           for s, want in ANCHORS.items()}
+    bad = {s: d for s, d in bad.items() if d}
+    check(not bad, f"FW-A: the anchors match the constants measured at 95b31e2 {bad}")
+    el = sheets.get("earth_elemental", {})
+    check(el.get("lungeRight", 999) < el.get("opaqueRight", 0), "FW-A: earth_elemental lunges inside its idle edge (109 < 110)")
+    pages = [Image.open(ATLAS_JSON.parent / p["file"]).convert("RGBA") for p in meta["pages"]]
+    ranged, off = MAT.ranged_sheets(), []
+    for sid, v in sorted(sheets.items()):
+        if "travelTop" not in v:
+            continue
+        w, h = v["cell"]
+        crops = {n: pages[v["page"]].crop((x, y, x + w, y + h)) for n, (x, y) in v["frames"].items()}
+        got = MAT.travel_anchors(crops, list(v["frames"]), sid in ranged)
+        if any(got[k] != v[k] for k in got):
+            off.append(sid)
+    check(not off, f"FW-A: every sheet's anchors agree with its own frames on the committed pages {off[:5]}")
+
+
+def run_raise_off(check: Callable[[bool, str], None]) -> None:
+    """FW-R (D-F1): a rig with `raise: false` drops the approved attack_raise in load_entries (the padded cell is
+    kept), so the sheet has hasRaise false, none of the 5 raise frames, and a tip on an opaque atk_wind2 pixel; every
+    other sheet's keys are unchanged; a raise value other than true / false is an error naming the rig."""
+    import copy
+    import numpy as np
+    from gen import monster_anim as MA
+    from gen import monster_atlas as MAT
+    from gen import monster_keys as MK
+    real = MA.load_rig
+    cfg = copy.deepcopy(real("hollow_seraph"))
+    cfg["raise"] = False
+    before = {e[0]: e for e in MA.load_entries()}
+    MA.load_rig = lambda s: cfg if s == "hollow_seraph" else real(s)
+    try:
+        after = {e[0]: e for e in MA.load_entries()}
+        _, meta, kfs = after["hollow_seraph"]
+        check("attack_raise" not in kfs and meta.get("raise_off") is True and kfs["idle"].size == (218, 200)
+              and "attack_raise" not in meta["poses"], f"FW-R: no attack_raise key, the 218x200 cell kept ({sorted(kfs)})")
+        same = all(sid == "hollow_seraph" or (set(e[2]) == set(before[sid][2]) and all(
+            np.array_equal(np.asarray(e[2][k]), np.asarray(before[sid][2][k])) for k in e[2])) for sid, e in after.items())
+        check(same and set(after) == set(before), "FW-R: every other sheet's keys are unchanged")
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            frames, holds, anim = MAT.sprite_frames("hollow_seraph", meta, kfs)
+    finally:
+        MA.load_rig = real
+    names = MA.frames_for("cast" in frames, "attack_raise" in frames)
+    raise_names = [n for n in MA.RAISE_FRAMES if n in frames or n in names]
+    sheet = MAT.sheet_meta(meta, frames, names, {}, holds, anim, MA.lunge_px(frames["idle"]), 0, False)
+    w2 = np.asarray(frames[MA.resolve("atk_wind2", frames)].convert("RGBA"))
+    tx, ty = sheet.get("tip", (-1, -1))
+    check(sheet["hasRaise"] is False and not raise_names, f"FW-R: hasRaise false and no raise frames {raise_names}")
+    check(0 <= ty < w2.shape[0] and 0 <= tx < w2.shape[1] and w2[ty, tx, 3] > 0 and not (w2[:ty, :, 3] > 0).any(),
+          f"FW-R: the tip {sheet.get('tip')} is on atk_wind2's topmost opaque row")
+    _, cmeta, ckfs = before["chaos"]
+    committed = json.loads(ATLAS_JSON.read_text())["sheets"]["chaos"]
+    check(MAT.tip(ckfs["attack_raise"])["tip"] == committed.get("tip") and not cmeta.get("raise_off"),
+          "FW-R: a sheet with a raise keeps its attack_raise tip")
+    try:
+        MK.raise_off("x", {"raise": "no"})
+        refused = False
+    except ValueError as e:
+        refused = "rig x" in str(e)
+    check(refused, "FW-R: raise must be true or false (an error naming the rig)")
 
 
 def run_wide_cells(check: Callable[[bool, str], None]) -> None:
