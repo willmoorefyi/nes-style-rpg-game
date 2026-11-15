@@ -1,0 +1,123 @@
+sprite: death_knight
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: n
+attack_hand: n
+keyframes:
+  idle:
+    crown: [39, 11]
+    neck: [39, 24]
+    chest: [38, 31]
+    hip: [38, 48]
+    sh_n: [44, 27]
+    el_n: [46, 35]
+    hand_n: [46, 41]
+    sh_f: [31, 27]
+    el_f: [30, 35]
+    hand_f: [33, 42]
+    tip: [60, 11]
+    hip_n: [44, 54]
+    knee_n: [48, 63]
+    foot_n: [47, 72]
+    toe_n: [53, 75]
+    hip_f: [32, 52]
+    knee_f: [27, 62]
+    foot_f: [23, 72]
+    toe_f: [24, 75]
+  attack:
+    crown: [44, 15]
+    neck: [44, 28]
+    chest: [40, 34]
+    hip: [38, 50]
+    sh_n: [46, 30]
+    el_n: [46, 40]
+    hand_n: [43, 52]
+    sh_f: [31, 26]
+    el_f: [27, 33]
+    hand_f: [34, 40]
+    tip: [69, 69]
+    hip_n: [42, 57]
+    knee_n: [44, 64]
+    foot_n: [44, 72]
+    toe_n: [49, 75]
+    hip_f: [30, 54]
+    knee_f: [20, 62]
+    foot_f: [10, 72]
+    toe_f: [12, 75]
+  hurt:
+    crown: [22, 10]
+    neck: [28, 20]
+    chest: [33, 30]
+    hip: [36, 48]
+    sh_n: [40, 26]
+    el_n: [44, 30]
+    hand_n: [43, 35]
+    sh_f: [27, 27]
+    el_f: [24, 34]
+    hand_f: [26, 40]
+    tip: [46, 5]
+    hip_n: [42, 57]
+    knee_n: [44, 64]
+    foot_n: [41, 72]
+    toe_n: [46, 74]
+    hip_f: [30, 57]
+    knee_f: [24, 64]
+    foot_f: [16, 72]
+    toe_f: [17, 75]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # about half of wind2
+    t: -0.1
+    moves: []
+    sampler: rotsprite
+    tweaks: {crown: [0, 1], neck: [-1, 1], chest: [-1, 0], sh_n: [-1, 0], el_n: [-1, -1], hand_n: [-1, -1], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0], tip: [-8, -3]}
+  atk_wind2:                   # coil: the upper body 2 back and 3 down with the skull dipped (a crouch, where the black
+    t: -0.1                    # knight leans back upright), sword fist lifted 3, the blade cocked 26 deg back over the
+    moves: []                  # shoulder behind the helm
+    sampler: rotsprite
+    dy: 3
+    tweaks: {crown: [-1, 2], neck: [-2, 1], chest: [-2, 0], hip: [-1, 0], sh_n: [-2, 0], el_n: [-3, -3], hand_n: [-3, -3], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-18, -6], hip_n: [-1, 0], hip_f: [-1, 0]}
+  atk_mid:                     # the cut 26 deg short of the strike (rigid arm and blade), the lunge legs pinned and the
+    moves: []                  # back foot shifted a third toward idle
+    sampler: rotsprite
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-1, -1], neck: [-1, -1], chest: [-1, -1], sh_n: [-1, -1], el_n: [0, -1], hand_n: [2, -1], sh_f: [-1, -1], el_f: [-1, -1], hand_f: [-1, -1], tip: [7, -14], knee_f: [2, 0], foot_f: [4, 0]}
+  atk_recover:
+    sampler: rotsprite
+  daze:                        # slump: skull and shoulders sag forward and down, the sword arm hangs lower
+    moves: [crown, neck, chest]
+    dy: 1
+    tweaks: {crown: [1, 1], neck: [1, 1], el_n: [0, 1], hand_n: [0, 2], tip: [1, 2]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [1, -1], neck: [1, 0], el_n: [0, 1], hand_n: [0, 3], tip: [1, 3]}
+z:                             # the blade passes behind the helm when it is cocked over the shoulder
+  idle: [uarm_f, farm_f, thigh_f, shin_f, torso, thigh_n, shin_n, weapon, head, uarm_n, farm_n, ft_n, ft_f]
+masks:
+  torso:                       # the short cloak rides the body as one piece
+    idle: [[19, 34], [29, 30], [31, 40], [30, 57], [19, 57]]
+    attack: [[11, 44], [24, 34], [32, 38], [32, 56], [11, 56]]
+    hurt: [[19, 36], [27, 35], [28, 56], [19, 56]]
+  weapon:
+    idle: [[47, 37], [56, 12], [59, 9], [62, 10], [61, 14], [52, 39], [48, 41]]
+    attack: [[46, 52], [52, 54], [70, 66], [70, 70], [66, 70], [46, 57]]
+    hurt: [[42, 4], [49, 4], [49, 32], [42, 32]]
+  ft_n:
+    idle: [[43, 71], [58, 71], [58, 77], [43, 77]]
+    attack: [[39, 71], [54, 71], [54, 77], [39, 77]]
+    hurt: [[35, 70], [50, 70], [50, 77], [35, 77]]
+  ft_f:
+    idle: [[18, 71], [29, 71], [29, 77], [18, 77]]
+    attack: [[5, 68], [17, 68], [17, 77], [5, 77]]
+    hurt: [[11, 69], [23, 69], [23, 77], [11, 77]]
+holds: []
+paint:                         # slits the moved parts open between dark plates, closed with outline ink
+  - {frame: atk_mid, xy: [[43, 47], [42, 48], [43, 48], [42, 49], [43, 49], [42, 50], [43, 50], [42, 51], [43, 51], [42, 52], [43, 52], [43, 53]], rgb: [6, 4, 10]}
+  - {frame: atk_wind1, xy: [[46, 20], [46, 21], [46, 22], [46, 23]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[49, 18], [48, 19], [49, 19], [49, 20]], rgb: [6, 4, 10]}

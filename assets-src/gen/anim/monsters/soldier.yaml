@@ -1,0 +1,129 @@
+sprite: soldier
+body: biped
+preset: mechanical
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+attack_hand: f
+keyframes:
+  idle:
+    crown: [64, 8]
+    neck: [64, 38]
+    chest: [66, 44]
+    hip: [64, 66]
+    sh_n: [82, 30]
+    el_n: [84, 52]
+    hand_n: [104, 52]
+    sh_f: [36, 34]
+    el_f: [26, 58]
+    hand_f: [32, 76]
+    tip: [56, 116]
+    hip_n: [76, 70]
+    knee_n: [80, 94]
+    foot_n: [82, 116]
+    toe_n: [92, 119]
+    hip_f: [52, 70]
+    knee_f: [40, 92]
+    foot_f: [36, 114]
+    toe_f: [42, 119]
+  attack:
+    crown: [80, 20]
+    neck: [78, 40]
+    chest: [70, 48]
+    hip: [66, 70]
+    sh_n: [86, 40]
+    el_n: [88, 62]
+    hand_n: [104, 72]
+    sh_f: [46, 34]
+    el_f: [32, 56]
+    hand_f: [44, 72]
+    tip: [104, 118]
+    hip_n: [70, 76]
+    knee_n: [74, 96]
+    foot_n: [72, 114]
+    toe_n: [80, 119]
+    hip_f: [44, 70]
+    knee_f: [26, 90]
+    foot_f: [10, 112]
+    toe_f: [14, 119]
+  hurt:
+    crown: [36, 12]
+    neck: [44, 28]
+    chest: [52, 40]
+    hip: [58, 60]
+    sh_n: [70, 30]
+    el_n: [76, 40]
+    hand_n: [88, 28]
+    sh_f: [26, 40]
+    el_f: [24, 52]
+    hand_f: [44, 46]
+    tip: [76, 18]
+    hip_n: [70, 68]
+    knee_n: [84, 86]
+    foot_n: [88, 112]
+    toe_n: [96, 116]
+    hip_f: [52, 64]
+    knee_f: [48, 88]
+    foot_f: [38, 116]
+    toe_f: [44, 119]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # most of wind2 (translation first: the mechanical preset turns no bone past 15 deg)
+    t: 0
+    moves: []
+    dy: 1
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-4, -1], hand_n: [-4, -1], sh_f: [-3, 0], el_f: [-2, -3], hand_f: [-2, -3], tip: [-2, -3]}
+  atk_wind2:                   # coil: the hull 4 back and 2 down, the head 5, the claw pulled in 6; the blade arm draws
+    t: 0                       # up 5 along its own line (the far shin is drawn only where the blade does not cover it,
+    moves: []                  # so the blade cannot swing off it in an idle-sourced frame)
+    dy: 2
+    tweaks: {crown: [-5, 1], neck: [-4, 0], chest: [-4, 0], sh_n: [-4, 0], el_n: [-6, -2], hand_n: [-6, -2], sh_f: [-4, 0], el_f: [-3, -5], hand_f: [-3, -5], tip: [-3, -5]}
+  atk_mid:                     # the strike a beat early (t 0.20): the hull and claw arm 3 back and up, the blade left on
+    t: 0.20                    # the ground where the key draws it (it covers the near thigh, so it cannot move off it);
+    moves: []                  # legs pinned at the lunge, the back foot 4 toward idle
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-3, -3], neck: [-3, -3], chest: [-3, -3], hip: [0, -2], sh_n: [-3, -3], el_n: [-3, -3], hand_n: [-3, -3], sh_f: [-3, -3], el_f: [-3, -3], knee_f: [3, 0], foot_f: [4, 0]}
+  atk_follow:                  # a settle: the hull and blade 2 back (the tip stays on the ground), the head 3
+    t: 0.80
+    moves: []
+    tweaks: {crown: [-3, -1], neck: [-3, -1], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-2, 0]}
+  atk_recover:                 # the hull and claw 2 forward, the blade 1 down its line toward the strike
+    moves: []
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [1, 1], hand_f: [1, 1], tip: [1, 1]}
+  hurt_in1:                    # recoil: the hull 3 back, the head 4, the claw thrown up 5, the blade arm jerked up 5
+    moves: []                  # along its own line
+    tweaks: {crown: [-4, 0], neck: [-4, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-4, -5], hand_n: [-4, -5], sh_f: [-3, 0], el_f: [-3, -5], hand_f: [-3, -5], tip: [-3, -5]}
+  hurt_in2:                    # from hurt: the hull, both arms and the raised blade 3 toward idle and 1-2 down (the blade
+    moves: []                  # keeps its angle: turning it bared the chest drawn under it); the head 4
+    tweaks: {crown: [4, 1], neck: [4, 1], chest: [3, 1], sh_n: [3, 1], el_n: [3, 2], hand_n: [3, 2], sh_f: [3, 1], el_f: [3, 2], hand_f: [3, 2], tip: [3, 2]}
+  daze:                        # slump: the head-helm and hull sag, the claw hangs (no limb turns: mechanical); the blade
+                               # sinks only 1 px (it would cut into the far foot)
+    moves: []
+    dy: 2
+    tweaks: {crown: [1, 2], neck: [1, 1], el_n: [0, 2], hand_n: [0, 3], el_f: [0, -1], hand_f: [0, -1], tip: [0, -1]}
+  daze_b:
+    moves: []
+    dy: 3
+    tweaks: {crown: [1, 2], neck: [1, 1], el_n: [0, 3], hand_n: [0, 4], el_f: [0, -2], hand_f: [0, -2], tip: [0, -2]}
+masks:
+  weapon:                      # the whole blade arm-blade (nearest-bone split it over the shin and the torso)
+    idle: [[31, 72], [37, 73], [39, 82], [48, 100], [56, 110], [59, 116], [57, 119], [50, 119], [45, 112], [37, 100], [30, 90], [23, 82], [24, 77]]
+    attack: [[42, 68], [54, 68], [112, 118], [110, 123], [94, 123], [40, 78]]
+    hurt: [[76, 14], [80, 16], [78, 22], [54, 46], [48, 54], [40, 50], [42, 44], [66, 22]]
+  ft_n:
+    idle: [[74, 112], [100, 112], [100, 123], [74, 123]]
+    attack: [[62, 114], [90, 114], [90, 123], [62, 123]]
+    hurt: [[72, 108], [100, 108], [100, 123], [72, 123]]
+  ft_f:
+    idle: [[26, 113], [44, 113], [48, 118], [48, 123], [26, 123]]
+    attack: [[2, 104], [26, 104], [26, 123], [2, 123]]
+    hurt: [[28, 110], [50, 110], [50, 123], [28, 123]]
+holds: []
+paint:                         # 1 px cracks and slits the moved plates open, closed with outline ink
+  - {frame: atk_mid, xy: [[46, 60], [46, 61], [45, 62], [46, 62], [45, 63], [46, 63], [45, 64], [46, 64], [47, 64], [44, 65], [45, 65]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[25, 45]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[74, 49], [74, 50], [75, 50], [75, 51], [76, 51], [75, 52], [76, 52], [77, 52], [77, 53], [78, 53]], rgb: [6, 4, 10]}
