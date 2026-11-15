@@ -1,0 +1,128 @@
+sprite: winter_wolf
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [44, 48]
+    back: [58, 40]
+    chest: [72, 40]
+    neck: [80, 32]
+    head: [88, 26]
+    snout: [103, 37]
+    tail0: [38, 44]
+    tail1: [30, 47]
+    tail2: [22, 49]
+    tail_tip: [14, 46]
+    sh_n: [70, 48]
+    el_n: [71, 62]
+    paw_n: [72, 72]
+    ftoe_n: [76, 75]
+    sh_f: [80, 50]
+    el_f: [81, 63]
+    paw_f: [85, 70]
+    ftoe_f: [89, 73]
+    hip_n: [42, 52]
+    knee_n: [37, 61]
+    foot_n: [35, 72]
+    toe_n: [39, 74]
+    hip_f: [54, 50]
+    knee_f: [52, 62]
+    foot_f: [55, 71]
+    toe_f: [58, 72]
+  attack:
+    hip: [36, 40]
+    back: [54, 36]
+    chest: [72, 40]
+    neck: [82, 38]
+    head: [92, 42]
+    snout: [113, 48]
+    tail0: [34, 36]
+    tail1: [24, 32]
+    tail2: [14, 30]
+    tail_tip: [4, 34]
+    sh_n: [70, 50]
+    el_n: [78, 64]
+    paw_n: [88, 73]
+    ftoe_n: [95, 75]
+    sh_f: [80, 52]
+    el_f: [90, 62]
+    paw_f: [100, 70]
+    ftoe_f: [107, 72]
+    hip_n: [34, 46]
+    knee_n: [26, 54]
+    foot_n: [18, 68]
+    toe_n: [21, 71]
+    hip_f: [46, 48]
+    knee_f: [42, 60]
+    foot_f: [43, 67]
+    toe_f: [49, 69]
+  hurt:
+    hip: [40, 48]
+    back: [52, 34]
+    chest: [64, 36]
+    neck: [72, 38]
+    head: [80, 42]
+    snout: [96, 47]
+    tail0: [36, 52]
+    tail1: [28, 56]
+    tail2: [24, 62]
+    tail_tip: [28, 70]
+    sh_n: [64, 50]
+    el_n: [68, 62]
+    paw_n: [72, 72]
+    ftoe_n: [77, 75]
+    sh_f: [77, 58]
+    el_f: [80, 65]
+    paw_f: [85, 72]
+    ftoe_f: [89, 75]
+    hip_n: [40, 54]
+    knee_n: [36, 64]
+    foot_n: [34, 72]
+    toe_n: [37, 75]
+    hip_f: [52, 52]
+    knee_f: [50, 60]
+    foot_f: [58, 70]
+    toe_f: [61, 72]
+frames:
+  atk_wind1:
+    dy: 1
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [-1, 1], head: [-1, 1], snout: [-1, 1], tail_tip: [0, 1]}
+  atk_wind2:
+    dy: 2
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [-2, 1], head: [-3, 1], snout: [-3, 2], tail2: [0, 1], tail_tip: [0, 2]}
+  atk_mid:
+    t: 0.35
+    pins: [foot_n, foot_f, paw_n, paw_f, knee_f, hip_f, knee_n, hip_n]
+    moves: [back, chest, neck, head, snout]
+    tweaks: {paw_n: [-6, 0], head: [-2, 1], snout: [-2, 1]}
+  atk_follow:
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+  atk_recover:
+    t: 0.35
+    moves: [back, chest, neck, tail0, tail1, tail2, tail_tip, sh_n, sh_f]
+  hurt_in1:
+    moves: [hip, back, chest, neck, sh_n, el_n, sh_f, el_f, hip_f, knee_f]
+    tweaks: {neck: [-1, 1], head: [-2, 2], snout: [-2, 2], tail1: [0, 1], tail2: [0, 2], tail_tip: [0, 3]}
+  hurt_in2:
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f]
+    moves: [hip, back, chest, neck, head, snout, sh_n, sh_f, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {sh_f: [-1, 0]}
+  daze:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 2], tail_tip: [1, 2]}
+  daze_b:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 0], head: [0, 0], snout: [0, 4], tail1: [0, 1], tail2: [0, 2], tail_tip: [1, 2]}
+masks:
+  head:                        # the lowered face down to the snarling mouth is head, not the far foreleg
+    hurt: [[73, 30], [88, 31], [93, 40], [99, 46], [94, 52], [90, 62], [80, 64], [74, 60], [73, 48]]
+holds: []
+paint:                         # the gap between the far hind shin and the near forearm stays open to the ground (4-connected)
+  - {frame: hurt_in2, xy: [[62, 68], [63, 69]], rgb: null}

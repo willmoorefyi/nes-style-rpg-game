@@ -1,0 +1,267 @@
+sprite: manticore
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Wings: both bat wings are one rigid part on its own root (wr, not joined to the body) in every keyframe; the far
+# wing sits behind the mane, the near wing over the back. The scorpion tail is a 5-joint chain.
+keyframes:
+  idle:
+    hip: [40, 86]
+    back: [55, 82]
+    chest: [72, 80]
+    neck: [85, 78]
+    head: [98, 72]
+    snout: [112, 84]
+    tail0: [34, 80]
+    tail1: [22, 72]
+    tail2: [17, 60]
+    tail3: [19, 47]
+    tail_tip: [33, 41]
+    wr: [70, 72]
+    wt: [40, 52]
+    sh_n: [74, 90]
+    el_n: [76, 104]
+    paw_n: [77, 116]
+    ftoe_n: [83, 121]
+    sh_f: [90, 96]
+    el_f: [96, 106]
+    paw_f: [104, 116]
+    ftoe_f: [110, 121]
+    hip_n: [38, 90]
+    knee_n: [26, 105]
+    foot_n: [27, 116]
+    toe_n: [33, 121]
+    hip_f: [52, 95]
+    knee_f: [54, 105]
+    foot_f: [58, 116]
+    toe_f: [63, 121]
+  attack:
+    hip: [38, 92]
+    back: [55, 86]
+    chest: [75, 84]
+    neck: [88, 80]
+    head: [100, 72]
+    snout: [114, 86]
+    tail0: [32, 82]
+    tail1: [20, 76]
+    tail2: [12, 66]
+    tail3: [12, 54]
+    tail_tip: [28, 47]
+    wr: [72, 75]
+    wt: [40, 32]
+    sh_n: [82, 95]
+    el_n: [98, 104]
+    paw_n: [112, 112]
+    ftoe_n: [124, 116]
+    sh_f: [78, 96]
+    el_f: [82, 104]
+    paw_f: [85, 110]
+    ftoe_f: [90, 112]
+    hip_n: [40, 95]
+    knee_n: [25, 106]
+    foot_n: [18, 116]
+    toe_n: [24, 122]
+    hip_f: [50, 98]
+    knee_f: [48, 107]
+    foot_f: [50, 116]
+    toe_f: [56, 121]
+  hurt:
+    hip: [43, 92]
+    back: [57, 86]
+    chest: [73, 82]
+    neck: [86, 80]
+    head: [98, 76]
+    snout: [115, 90]
+    tail0: [36, 88]
+    tail1: [24, 95]
+    tail2: [15, 88]
+    tail3: [17, 74]
+    tail_tip: [28, 70]
+    wr: [70, 76]
+    wt: [33, 40]
+    sh_n: [74, 92]
+    el_n: [80, 104]
+    paw_n: [84, 115]
+    ftoe_n: [90, 121]
+    sh_f: [92, 100]
+    el_f: [100, 108]
+    paw_f: [108, 116]
+    ftoe_f: [116, 120]
+    hip_n: [40, 95]
+    knee_n: [28, 106]
+    foot_n: [27, 116]
+    toe_n: [33, 121]
+    hip_f: [52, 98]
+    knee_f: [52, 107]
+    foot_f: [55, 116]
+    toe_f: [61, 121]
+parts:
+  wings: {bone: [wr, wt], radius: 10.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: 16}
+masks:
+  wings:                       # both wings (the dark far wing behind the mane was head and neck)
+    idle: [[35, 49], [50, 48], [68, 50], [74, 40], [77, 35], [86, 39], [92, 45], [96, 52], [96, 57], [88, 58], [84, 60], [84, 72], [78, 75], [71, 77], [64, 74], [55, 70], [45, 63], [36, 57]]
+    attack: [[39, 29], [52, 32], [68, 37], [76, 29], [78, 22], [86, 29], [94, 39], [99, 52], [95, 60], [88, 60], [85, 63], [85, 74], [81, 78], [72, 79], [66, 72], [58, 62], [50, 60], [45, 52], [44, 40]]
+    hurt: [[32, 37], [48, 37], [66, 43], [78, 45], [80, 33], [86, 36], [92, 42], [97, 48], [100, 55], [100, 60], [93, 61], [88, 63], [86, 66], [86, 72], [82, 78], [72, 80], [66, 76], [58, 72], [48, 68], [42, 60], [37, 46]]
+  thigh_n:                     # the whole near haunch down to the hock (its lower edge was body: the warp closed the pocket)
+    idle: [[30, 84], [40, 82], [46, 87], [49, 95], [48, 100], [43, 104], [34, 106], [27, 104], [27, 95]]
+  thigh_f:                     # the far haunch with the belly strip in front of it (body: the pocket under it closed)
+    idle: [[49, 92], [58, 91], [66, 94], [69, 104], [66, 106], [62, 108], [56, 110], [50, 108], [48, 100]]
+frames:
+  idle:
+    hip: [40, 86]
+    back: [55, 82]
+    chest: [72, 80]
+    neck: [85, 78]
+    head: [98, 72]
+    snout: [112, 84]
+    tail0: [34, 80]
+    tail1: [22, 72]
+    tail2: [17, 60]
+    tail3: [19, 47]
+    tail_tip: [33, 41]
+    wr: [70, 72]
+    wt: [40, 52]
+    sh_n: [74, 90]
+    el_n: [76, 104]
+    paw_n: [77, 116]
+    ftoe_n: [83, 121]
+    sh_f: [90, 96]
+    el_f: [96, 106]
+    paw_f: [104, 116]
+    ftoe_f: [110, 121]
+    hip_n: [38, 90]
+    knee_n: [26, 105]
+    foot_n: [27, 116]
+    toe_n: [33, 121]
+    hip_f: [52, 95]
+    knee_f: [54, 105]
+    foot_f: [58, 116]
+    toe_f: [63, 121]
+  attack:
+    hip: [38, 92]
+    back: [55, 86]
+    chest: [75, 84]
+    neck: [88, 80]
+    head: [100, 72]
+    snout: [114, 86]
+    tail0: [32, 82]
+    tail1: [20, 76]
+    tail2: [12, 66]
+    tail3: [12, 54]
+    tail_tip: [28, 47]
+    wr: [72, 75]
+    wt: [40, 32]
+    sh_n: [82, 95]
+    el_n: [98, 104]
+    paw_n: [112, 112]
+    ftoe_n: [124, 116]
+    sh_f: [78, 96]
+    el_f: [82, 104]
+    paw_f: [85, 110]
+    ftoe_f: [90, 112]
+    hip_n: [40, 95]
+    knee_n: [25, 106]
+    foot_n: [18, 116]
+    toe_n: [24, 122]
+    hip_f: [50, 98]
+    knee_f: [48, 107]
+    foot_f: [50, 116]
+    toe_f: [56, 121]
+  hurt:
+    hip: [43, 92]
+    back: [57, 86]
+    chest: [73, 82]
+    neck: [86, 80]
+    head: [98, 76]
+    snout: [115, 90]
+    tail0: [36, 88]
+    tail1: [24, 95]
+    tail2: [15, 88]
+    tail3: [17, 74]
+    tail_tip: [28, 70]
+    wr: [70, 76]
+    wt: [33, 40]
+    sh_n: [74, 92]
+    el_n: [80, 104]
+    paw_n: [84, 115]
+    ftoe_n: [90, 121]
+    sh_f: [92, 100]
+    el_f: [100, 108]
+    paw_f: [108, 116]
+    ftoe_f: [116, 120]
+    hip_n: [40, 95]
+    knee_n: [28, 106]
+    foot_n: [27, 116]
+    toe_n: [33, 121]
+    hip_f: [52, 98]
+    knee_f: [52, 107]
+    foot_f: [55, 116]
+    toe_f: [61, 121]
+parts:
+  wings: {bone: [wr, wt], radius: 10.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: 16}
+masks:
+  wings:                       # both wings (the dark far wing behind the mane was head and neck)
+    idle: [[35, 49], [50, 48], [68, 50], [74, 40], [77, 35], [86, 39], [92, 45], [96, 52], [96, 57], [88, 58], [84, 60], [84, 72], [78, 75], [71, 77], [64, 74], [55, 70], [45, 63], [36, 57]]
+    attack: [[39, 29], [52, 32], [68, 37], [76, 29], [78, 22], [86, 29], [94, 39], [99, 52], [95, 60], [88, 60], [85, 63], [85, 74], [81, 78], [72, 79], [66, 72], [58, 62], [50, 60], [45, 52], [44, 40]]
+    hurt: [[32, 37], [48, 37], [66, 43], [78, 45], [80, 33], [86, 36], [92, 42], [97, 48], [100, 55], [100, 60], [93, 61], [88, 63], [86, 66], [86, 72], [82, 78], [72, 80], [66, 76], [58, 72], [48, 68], [42, 60], [37, 46]]
+  thigh_n:                     # the whole near haunch down to the hock (its lower edge was body: the warp closed the pocket)
+    idle: [[30, 84], [40, 82], [46, 87], [49, 95], [48, 100], [43, 104], [34, 106], [27, 104], [27, 95]]
+  thigh_f:                     # the far haunch with the belly strip in front of it (body: the pocket under it closed)
+    idle: [[49, 92], [58, 91], [66, 94], [69, 104], [66, 106], [62, 108], [56, 110], [50, 108], [48, 100]]
+  fpaw_f:                      # the whole far forepaw (its heel was lfore_f and dropped below the plain when turned)
+    idle: [[101, 114], [113, 114], [115, 123], [101, 123]]
+frames:
+  atk_wind1:                   # anticipation: head drawn back and down, wings start to lift, stinger cocks back
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {neck: [-1, 1], head: [-2, 1], snout: [-2, 1], wt: [2, -4], tail3: [-1, 0], tail_tip: [-1, -1]}
+  atk_wind2:                   # coil: body 1 px down, head low and back, wings lifted, stinger cocked over the back
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-3, 1], head: [-4, 1], snout: [-4, 1], wt: [3, -9], tail2: [-1, 0], tail3: [-2, -1], tail_tip: [-3, -2]}
+  atk_mid:                     # the pass: spine and tail 35% back toward the coil, head translated with them; the near foreleg
+    pins: [foot_n, foot_f, knee_f, knee_n]   # keeps its attack reach (out of moves: idle->attack turns it 110 deg)
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip, sh_f, el_f, paw_f, ftoe_f]
+    tweaks: {wr: [1, -1], wt: [1, -1], knee_n: [3, 0], foot_n: [3, 0], foot_f: [3, 0], knee_f: [2, 0]}
+  atk_follow:                  # follow-through: head and mane carry 2 px on past the bite, wings beat down, stinger whips
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {neck: [1, 0], head: [2, 1], snout: [2, 1], wr: [2, 1], wt: [0, 4], tail3: [-1, 0], tail_tip: [-2, 1]}
+  atk_recover:                 # settle: head and tail ease back, the body and legs stay on idle
+    t: 0.35
+    moves: [neck, head, snout, tail0, tail1, tail2, tail3, tail_tip, wr, wt]
+  hurt_in1:                    # the flinch starts: head snaps back, tail and wings 32% toward the hurt key (wings flung up); body and legs hold
+    t: 0.32
+    dy: 0
+    pins: [foot_n, foot_f, paw_n, paw_f, knee_n, knee_f, el_n, el_f]
+    moves: [neck, head, snout, tail0, tail1, tail2, tail3, tail_tip, wr, wt]
+    tweaks: {neck: [-1, 0], head: [-2, -1], snout: [-2, -1], wt: [2, -4]}
+  hurt_in2:                    # easing out: head, tail and wings 25% back toward idle; body and legs hold the hurt crouch
+    t: 0.25
+    pins: [foot_n, foot_f, paw_n, paw_f, knee_n, knee_f, el_n, el_f]
+    moves: [neck, head, snout, tail0, tail1, tail2, tail3, tail_tip, wt]   # wr held: a 1 px wing lift bared its lower ink on the back
+  daze:                        # sleep / stun: body 1 px lower, head and mane 1 px lower still (no forward slide:
+    t: 0.0                     # the mane must stay against the far wing), nose dipped, tail and wings ride the spine
+    dy: 1                      # (the recipe's 2 / 4 px at this cell squashed the pinned legs and cracked the ankles)
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail3, tail_tip, wr, wt]
+    tweaks: {head: [-2, -1], snout: [-2, 0]}
+  daze_b:                      # the sway's low point: everything 1 px lower
+    t: 0.0
+    dy: 2
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail3, tail_tip, wr, wt]
+    tweaks: {head: [-2, -1], snout: [-2, 0]}
+holds: []
+paint:                         # hurt_in2: the turned far wing's root left a 1 px ink line on the mane; the hurt key's reds back
+  - {frame: hurt_in2, xy: [[86, 72], [80, 78], [81, 78], [82, 78]], rgb: [82, 33, 41]}
+  - {frame: hurt_in2, xy: [[85, 74], [84, 75], [83, 77]], rgb: [132, 33, 49]}
+  # daze_b: a 2 px ink crease across the near forearm (the lowered shoulder) and a 1 px spur on the near hock
+  - {frame: daze_b, xy: [[68, 106]], rgb: [198, 123, 74]}
+  - {frame: daze_b, xy: [[69, 106]], rgb: [214, 140, 82]}
+  - {frame: daze_b, xy: [[18, 113]], rgb: null}

@@ -1,0 +1,161 @@
+sprite: hellhound
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Two heads on the quadruped template (no multi-head framework): the near head is the template's rigid `head`
+# (head -> snout); the far head is its own rigid part `head2` (h2 -> s2), hung from the near head by a pixel-less
+# anchor (head -> h2), so it rides the near head but turns on its own (in the hurt key it rears far higher).
+# The flame mane and the flame tail tip are art pixels on the neck / head / tail parts (no fx part).
+# The far hind leg is hidden in idle: its joints are marked only in attack and hurt.
+keyframes:
+  idle:
+    hip: [45, 72]
+    back: [60, 66]
+    chest: [78, 72]
+    neck: [90, 64]
+    head: [106, 58]
+    snout: [131, 72]
+    h2: [86, 56]
+    s2: [105, 70]
+    tail0: [34, 65]
+    tail1: [30, 69]
+    tail2: [20, 71]
+    tail3: [12, 62]
+    tail_tip: [9, 47]
+    sh_n: [68, 84]
+    el_n: [66, 102]
+    paw_n: [65, 114]
+    ftoe_n: [73, 121]
+    sh_f: [92, 88]
+    el_f: [101, 100]
+    paw_f: [110, 110]
+    ftoe_f: [119, 116]
+    hip_n: [42, 76]
+    knee_n: [31, 93]
+    foot_n: [27, 107]
+    toe_n: [33, 112]
+  attack:
+    hip: [40, 72]
+    back: [56, 66]
+    chest: [76, 72]
+    neck: [92, 70]
+    head: [110, 68]
+    snout: [137, 75]
+    h2: [88, 74]
+    s2: [108, 86]
+    tail0: [28, 62]
+    tail1: [20, 66]
+    tail2: [12, 62]
+    tail3: [10, 54]
+    tail_tip: [8, 40]
+    sh_n: [75, 90]
+    el_n: [85, 106]
+    paw_n: [93, 115]
+    ftoe_n: [103, 121]
+    sh_f: [98, 92]
+    el_f: [112, 102]
+    paw_f: [123, 108]
+    ftoe_f: [134, 113]
+    hip_n: [36, 76]
+    knee_n: [21, 88]
+    foot_n: [10, 99]
+    toe_n: [16, 105]
+    hip_f: [44, 80]
+    knee_f: [41, 91]
+    foot_f: [43, 98]
+    toe_f: [49, 100]
+  hurt:
+    hip: [42, 75]
+    back: [58, 66]
+    chest: [77, 62]
+    neck: [90, 52]
+    head: [103, 56]
+    snout: [130, 60]
+    h2: [84, 38]
+    s2: [107, 31]
+    tail0: [33, 61]
+    tail1: [20, 62]
+    tail2: [9, 60]
+    tail3: [7, 51]
+    tail_tip: [8, 38]
+    sh_n: [73, 88]
+    el_n: [78, 104]
+    paw_n: [84, 115]
+    ftoe_n: [94, 120]
+    sh_f: [95, 86]
+    el_f: [108, 95]
+    paw_f: [110, 106]
+    ftoe_f: [114, 111]
+    hip_n: [38, 78]
+    knee_n: [27, 90]
+    foot_n: [22, 104]
+    toe_n: [30, 109]
+    hip_f: [52, 78]
+    knee_f: [50, 92]
+    foot_f: [53, 102]
+    toe_f: [60, 106]
+parts:
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  h2a: {bone: [head, h2], radius: 0.01}          # pixel-less anchor: the far head hangs from the near head
+  head2: {bone: [h2, s2], radius: 4.0}
+z:
+  idle: [ufore_f, lfore_f, fpaw_f, thigh_f, shin_f, hpaw_f, tail, body, thigh_n, shin_n, hpaw_n, neck, head2, ufore_n, lfore_n, fpaw_n, head]
+  attack: [thigh_f, shin_f, hpaw_f, tail, body, thigh_n, shin_n, hpaw_n, neck, head2, ufore_f, lfore_f, fpaw_f, ufore_n, lfore_n, fpaw_n, head]
+  hurt: [thigh_f, shin_f, hpaw_f, tail, body, thigh_n, shin_n, hpaw_n, ufore_f, lfore_f, fpaw_f, neck, head2, ufore_n, lfore_n, fpaw_n, head]
+masks:
+  neck:                        # the withers, both necks and the mane over them (body keeps the back's flames)
+    idle: [[84, 34], [104, 34], [106, 84], [92, 86], [84, 84]]
+    attack: [[72, 50], [112, 50], [112, 96], [90, 98], [76, 90], [72, 80]]
+    hurt: [[70, 24], [104, 24], [104, 80], [92, 84], [80, 82], [70, 70]]
+  tail:                        # the flame tip and the thin tail
+    idle: [[4, 42], [20, 42], [20, 60], [30, 62], [34, 62], [34, 69], [26, 75], [14, 75], [4, 66]]
+    attack: [[3, 36], [16, 36], [16, 58], [26, 58], [28, 60], [28, 66], [18, 70], [8, 66], [3, 56]]
+    hurt: [[2, 34], [16, 34], [16, 56], [12, 58], [34, 58], [34, 62], [30, 64], [14, 67], [2, 60]]
+  head2:                       # the far head (eye, fangs, jaw)
+    idle: [[86, 52], [100, 52], [105, 62], [106, 72], [104, 78], [96, 80], [88, 76], [86, 64]]
+    attack: [[86, 72], [108, 70], [110, 84], [110, 96], [100, 100], [88, 96], [86, 84]]
+    hurt: [[80, 30], [92, 26], [110, 26], [110, 40], [100, 46], [88, 48], [80, 42]]
+  head:                        # the near head with its flame crest
+    idle: [[104, 40], [116, 44], [124, 50], [130, 58], [134, 70], [132, 82], [118, 86], [106, 82], [104, 70]]
+    attack: [[110, 62], [124, 62], [138, 68], [140, 82], [134, 94], [118, 96], [110, 90]]
+    hurt: [[98, 48], [112, 50], [124, 54], [134, 58], [132, 70], [116, 74], [104, 72], [100, 62]]
+frames:
+  atk_wind1:                   # crouch starts: body 1 px down, both heads drawn back 2 px and sinking, tail sinks
+    dy: 1
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {neck: [-1, 1], head: [-2, 1], snout: [-2, 1], h2: [-2, 1], s2: [-2, 1], tail3: [0, 1], tail_tip: [0, 1]}
+  atk_wind2:                   # coil: body 2 px down, both heads pulled back 4 px, far shoulder back 1, tail down
+    dy: 2
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {chest: [-1, 0], neck: [-3, 1], head: [-4, 1], snout: [-4, 1], h2: [-4, 1], s2: [-4, 1], sh_f: [-1, 0], tail3: [0, 1], tail_tip: [0, 2]}
+  atk_mid:                     # the pass: forelegs keep the reach (no shin rotation), body and heads ease back
+    t: 0.25
+    pins: [foot_n, foot_f, knee_n, knee_f, el_n, paw_n]
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {el_n: [-6, 0], paw_n: [-6, 0]}
+  atk_follow:                  # follow-through: spine and tail overshoot the leap (heads and forelegs keep the bite)
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+  atk_recover:                 # landing: paws planted, spine and shoulders 35 % toward the leap, heads ride the neck
+    t: 0.35
+    moves: [back, chest, neck, tail0, tail1, tail2, tail3, tail_tip, sh_n, sh_f]
+  hurt_in1:                    # flinch: spine 32 % toward the hurt rise, both heads thrown up and back 3-5 px as one
+    t: 0.32                    # (interpolating the neck toward the reared hurt neck tore the mane apart at the withers)
+    moves: [back, chest, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {neck: [-1, -2], head: [-2, -3], snout: [-2, -3], h2: [-2, -4], s2: [-2, -5]}
+  hurt_in2:                    # settling back toward idle, paws planted
+    t: 0.25
+    moves: [back, chest, neck, head, snout, h2, s2, sh_f]
+  daze:                        # both heads hang, tail lowered, forelegs planted
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], h2: [0, 1], s2: [0, 3], tail2: [0, 1], tail3: [0, 2], tail_tip: [1, 2]}
+  daze_b:                      # the sway's low point: heads 1 px lower
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail3, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 2], snout: [0, 4], h2: [0, 2], s2: [0, 4], tail2: [0, 1], tail3: [0, 2], tail_tip: [1, 2]}
+holds: []
+paint:                         # hurt_in1 joint cracks closed with outline ink: under the tail root (2 px), the near
+  # jaw over the far shoulder (2 px), the near hock (1 px)
+  - {frame: hurt_in1, xy: [[28, 72], [30, 72], [107, 75], [108, 75], [30, 94]], rgb: [6, 4, 10]}

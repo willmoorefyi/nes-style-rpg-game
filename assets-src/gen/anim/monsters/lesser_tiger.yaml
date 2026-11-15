@@ -1,0 +1,134 @@
+sprite: lesser_tiger
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [42, 40]
+    back: [58, 33]
+    chest: [76, 36]
+    neck: [84, 34]
+    head: [92, 33]
+    snout: [107, 42]
+    tail0: [36, 41]
+    tail1: [26, 47]
+    tail2: [14, 49]
+    tail_tip: [11, 38]
+    sh_n: [72, 46]
+    el_n: [73, 62]
+    paw_n: [74, 69]
+    ftoe_n: [79, 74]
+    sh_f: [84, 48]
+    el_f: [88, 58]
+    paw_f: [93, 66]
+    ftoe_f: [100, 72]
+    hip_n: [40, 48]
+    knee_n: [34, 58]
+    foot_n: [33, 67]
+    toe_n: [38, 71]
+    hip_f: [53, 48]
+    knee_f: [56, 58]
+    foot_f: [58, 66]
+    toe_f: [63, 69]
+  attack:
+    hip: [40, 43]
+    back: [58, 33]
+    chest: [78, 32]
+    neck: [90, 31]
+    head: [98, 29]
+    snout: [116, 38]
+    tail0: [40, 38]
+    tail1: [22, 39]
+    tail2: [8, 32]
+    tail_tip: [9, 21]
+    sh_n: [84, 46]
+    el_n: [98, 55]
+    paw_n: [110, 58]
+    ftoe_n: [117, 64]
+    sh_f: [90, 44]
+    el_f: [102, 52]
+    paw_f: [111, 54]
+    ftoe_f: [117, 55]
+    hip_n: [36, 50]
+    knee_n: [24, 61]
+    foot_n: [19, 70]
+    toe_n: [25, 74]
+    hip_f: [42, 55]
+    knee_f: [36, 63]
+    foot_f: [34, 70]
+    toe_f: [38, 73]
+  hurt:
+    hip: [50, 45]
+    back: [62, 30]
+    chest: [76, 33]
+    neck: [86, 33]
+    head: [94, 32]
+    snout: [108, 41]
+    tail0: [42, 48]
+    tail1: [32, 57]
+    tail2: [18, 62]
+    tail_tip: [9, 58]
+    sh_n: [74, 45]
+    el_n: [76, 62]
+    paw_n: [80, 70]
+    ftoe_n: [84, 75]
+    sh_f: [84, 47]
+    el_f: [88, 58]
+    paw_f: [94, 66]
+    ftoe_f: [101, 73]
+    hip_n: [52, 50]
+    knee_n: [48, 62]
+    foot_n: [55, 72]
+    toe_n: [60, 75]
+    hip_f: [60, 50]
+    knee_f: [62, 60]
+    foot_f: [65, 70]
+    toe_f: [70, 72]
+frames:
+  atk_wind1:
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1], tail_tip: [0, 1], sh_n: [0, -2]}
+  atk_wind2:                   # coil: forequarters 1 px down, head pulled back and low, tail down (no dy: haunch notch stays open)
+    dy: 0
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+    tweaks: {chest: [0, 1], neck: [-1, 2], head: [-1, 2], snout: [-1, 2], tail2: [0, 1], tail_tip: [0, 2], sh_n: [0, -2]}
+  atk_mid:                     # the pass: spine and head toward the coil, forepaws reaching forward and down, tail curl lowered
+    moves: [back, chest, neck, head, snout]
+    tweaks: {paw_n: [-3, 2], ftoe_n: [-3, 2], paw_f: [-3, 2], ftoe_f: [-3, 2], tail2: [1, 2], tail_tip: [1, 4]}
+  atk_follow:                  # settle: the leap's forelegs come down a third of the way toward landing
+    t: 0.65
+    pins: [foot_n, foot_f]
+    moves: [hip, back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f]
+    tweaks: {paw_n: [0, -2], ftoe_n: [0, -2], el_f: [0, -2], paw_f: [0, -5], ftoe_f: [0, -5]}
+  atk_recover:                 # landing: all four paws planted, chest and head carried forward and up, tail still raised
+    t: 0.35
+    moves: [back, chest, neck, head, snout, sh_n, sh_f, tail0, tail1, tail2, tail_tip]
+    tweaks: {chest: [1, -1], neck: [2, -1], head: [2, -1], snout: [2, -1], tail0: [-1, 1], tail2: [-1, -2], tail_tip: [-1, -3]}
+  hurt_in1:
+    t: 0.30
+    pins: [paw_n, paw_f, foot_n, foot_f, knee_n, knee_f, el_n, el_f]
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [-1, -1], head: [-2, -1], snout: [-2, -1]}
+  hurt_in2:                    # the crouch eases: haunch, spine, head and tail toward idle; every paw, knee and elbow pinned
+    pins: [paw_n, paw_f, foot_n, foot_f, knee_n, knee_f, el_n, el_f]
+    moves: [hip, back, chest, neck, head, snout, hip_n, hip_f, tail1, tail2, tail_tip]
+  daze:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 2], tail_tip: [1, 2], sh_n: [0, -1]}
+  daze_b:
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 3], sh_n: [0, -2]}
+masks:
+  body:                        # the hurt flank above the near foreleg is body, not upper foreleg (it split in hurt_in2)
+    hurt: [[66, 36], [84, 36], [84, 54], [66, 54]]
+  thigh_f:                     # the haunch notch's left edge rides the far thigh, so the body warp can't ink it shut
+    idle: [[45, 47], [50, 47], [50, 59], [45, 59]]
+  head:
+    attack: [[93, 40], [110, 40], [110, 52], [93, 52]]
+holds: []
+paint:                         # reopen the 1 px channel between the far hind paw and the near foreleg (open in idle)
+  - {frame: atk_wind1, xy: [[65, 65]], rgb: null}
+  - {frame: daze, xy: [[65, 65]], rgb: null}
