@@ -1,0 +1,140 @@
+sprite: spirit_naga
+body: naga                     # a naga sorceress with a jewelled staff in the far hand, coiled on the ground
+facing: right
+sampler: nearest
+breath: true
+attack_hand: n                 # the free near hand thrusts toward the heroes
+keyframes:
+  idle:
+    c_f: [32, 110]
+    c_n: [98, 110]
+    s0: [76, 100]
+    s1: [70, 82]
+    hip: [68, 62]
+    chest: [66, 44]
+    neck: [64, 40]
+    crown: [62, 12]
+    sh_n: [80, 48]
+    el_n: [84, 58]
+    hand_n: [90, 55]
+    sh_f: [52, 48]
+    el_f: [44, 56]
+    hand_f: [36, 57]
+    stf: [37, 13]
+    tail0: [30, 92]
+    tail1: [28, 86]
+    tail2: [30, 82]
+    tail_tip: [32, 78]
+  attack:
+    c_f: [30, 110]
+    c_n: [90, 110]
+    s0: [76, 100]
+    s1: [62, 80]
+    hip: [66, 62]
+    chest: [70, 42]
+    neck: [73, 38]
+    crown: [74, 14]
+    sh_n: [84, 46]
+    el_n: [96, 52]
+    hand_n: [106, 44]
+    sh_f: [58, 44]
+    el_f: [44, 46]
+    hand_f: [34, 46]
+    stf_a: [32, 8]
+    tail0: [30, 90]
+    tail1: [24, 84]
+    tail2: [26, 80]
+    tail_tip: [30, 78]
+  hurt:
+    c_f: [30, 110]
+    c_n: [100, 110]
+    s0: [82, 100]
+    s1: [76, 80]
+    hip: [68, 60]
+    chest: [58, 42]
+    neck: [54, 36]
+    crown: [44, 12]
+    sh_n: [64, 42]
+    el_n: [72, 32]
+    hand_n: [82, 18]
+    sh_f: [50, 46]
+    el_f: [44, 56]
+    hand_f: [34, 60]
+    stf_h: [20, 25]
+parts:
+  weapon: {remove: true}
+  tail: {in: [idle, attack]}   # the free tail curl (the hurt key lays it flat in the coil)
+  # the staff rides the far hand, own end-joint names per key (it tilts ~25 deg in the hurt), and is pinned in every
+  # frame: the approved art has no pixels under the shaft where it crosses the coil
+  staff: {bone: {idle: [hand_f, stf], attack: [hand_f, stf_a], hurt: [hand_f, stf_h]}, radius: 2.0}
+frames:
+  # Every frame translates with the staff hand pinned (the art has no pixels under the shaft where it crosses the
+  # coil). The hooded head never moves left by more than 1 px: it closed the narrow gap to the staff into a hole.
+  # So where the water naga leans back, the sorceress rises and lifts her free hand (gathering), then reaches.
+  atk_wind1:
+    moves: []
+    pins: [hand_f]
+    tweaks: {hip: [0, -1], chest: [0, -2], neck: [-1, -3], crown: [-1, -3], sh_f: [0, -2], sh_n: [0, -3], el_n: [0, -3], hand_n: [0, -3]}
+  atk_wind2:                   # risen 3-4 px, the free hand lifted 6
+    moves: []
+    pins: [hand_f]
+    dy: 0
+    tweaks: {hip: [0, -2], chest: [0, -3], neck: [-1, -4], crown: [-1, -4], sh_f: [0, -3], sh_n: [0, -6], el_n: [0, -6], hand_n: [0, -6]}
+  atk_mid:                     # the reach with the head and hand still drawn back
+    t: 0.15
+    moves: []
+    pins: [hand_f]
+    tweaks: {neck: [-4, 0], crown: [-4, 0], sh_n: [-4, 0], el_n: [-4, 0], hand_n: [-4, 0]}
+  atk_follow:                  # held at the reach (the runtime lunge carries it)
+    moves: []
+    pins: [hand_f]
+  atk_recover:                 # the head and the free arm ease toward the reach
+    moves: [crown, neck]
+    pins: [hand_f]
+    tweaks: {neck: [2, 0], crown: [2, 0], sh_n: [3, 0], el_n: [3, 0], hand_n: [3, 0]}
+  hurt_in1:                    # flinch: the body jolts up, the free hand flung up and out
+    moves: []
+    pins: [hand_f]
+    tweaks: {hip: [0, -1], chest: [0, -2], neck: [0, -2], crown: [0, -2], sh_f: [0, -2], sh_n: [0, -2], el_n: [1, -5], hand_n: [3, -8]}
+  hurt_in2:                    # the head eases back toward idle
+    moves: []
+    pins: [hand_f]
+    tweaks: {neck: [3, 1], crown: [3, 1]}
+  daze:                        # the upper body sinks as one block (these tweaks undo the recipe's head drop, which
+                               # covered the jewelled collar), the free hand sags
+    moves: []
+    pins: [hand_f]
+    dy: 2
+    tweaks: {crown: [0, -2], neck: [0, -2], el_n: [0, 1], hand_n: [0, 2]}
+  daze_b:
+    moves: []
+    pins: [hand_f]
+    dy: 3
+    tweaks: {crown: [0, -2], neck: [0, -2], el_n: [0, 2], hand_n: [0, 4]}
+masks:
+  coil:                        # the resting coil below the rising body: static (pinned)
+    idle: [[0, 100], [128, 100], [128, 128], [0, 128]]
+    attack: [[0, 100], [128, 100], [128, 128], [0, 128]]
+    hurt: [[0, 100], [128, 100], [128, 128], [0, 128]]
+  head:                        # the hooded head above the jewelled collar
+    idle: [[44, 6], [82, 6], [82, 39], [44, 39]]
+    attack: [[58, 10], [94, 10], [94, 37], [58, 37]]
+    hurt: [[24, 6], [64, 6], [64, 36], [50, 40], [24, 40]]
+  uarm_n:                      # hurt: the raised near elbow beside the hood (nearest-bone gave it to the head)
+    hurt: [[76, 28], [97, 28], [97, 45], [76, 45]]
+  staff:
+    idle: [[29, 7], [45, 7], [45, 24], [41, 24], [41, 121], [33, 121], [33, 24], [29, 24]]
+    attack: [[25, 1], [41, 1], [41, 19], [37, 19], [37, 108], [28, 108], [28, 19], [25, 19]]
+    hurt: [[13, 18], [29, 18], [29, 32], [55, 117], [55, 123], [47, 123], [23, 33], [13, 31]]
+holds: []
+paint:                         # the far shoulder's crack as the shoulder lifts off the pinned staff hand
+  - {frame: atk_wind2, xy: [[45, 46], [40, 48]], rgb: [6, 4, 10]}
+  # the far forearm's 1 px crack above the pinned staff hand as the body sinks
+  - {frame: daze, xy: [[43, 63]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[42, 65]], rgb: [6, 4, 10]}
+  # the line left across the far upper arm and the shoulder as they lift (re-coloured from the idle key, lifted 3 px)
+  - {frame: atk_wind2, xy: [[49, 41]], rgb: [82, 57, 41]}
+  - {frame: atk_wind2, xy: [[50, 41]], rgb: [148, 107, 66]}
+  - {frame: atk_wind2, xy: [[51, 41], [52, 41]], rgb: [132, 66, 99]}
+  - {frame: atk_wind2, xy: [[55, 41]], rgb: [99, 49, 82]}
+  - {frame: atk_wind2, xy: [[56, 41], [57, 41], [54, 42], [55, 42]], rgb: [82, 41, 66]}
