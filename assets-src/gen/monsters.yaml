@@ -1115,12 +1115,14 @@
     an orange tiger with black stripes and a white belly and muzzle, on four legs seen from the side, crouched low
     ready to pounce, the long striped tail curved, green eyes, small round ears
   attack: >-
-    pouncing forward low at the heroes with one front paw lifted and the claws out, the jaws open showing the fangs,
-    the hind feet on the ground, no taller than half again its idle height, the paw well inside the middle cell
+    lunging forward low at the heroes, the body stretched long and close to the ground, one front paw swiping out at
+    chest height with the claws out and the elbow bent, the jaws open showing the fangs, the hind feet and the other
+    front foot on the ground (no leap), no taller than its idle height, the head and the paw well inside the middle
+    cell
   hurt: knocked back, flinching low with the ears flat and the eyes shut, the tail lashing, all four feet down
   face: its tiger face with green eyes and fangs is readable
-  extra_negative: sabre teeth, wings, a mane, spots, rearing up
-  seeds: [1234]
+  extra_negative: sabre teeth, wings, a mane, spots, rearing up, a leap
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R132): a leap attack with the raised paw sliced
 - id: minotaur
   # "Minotaur" (039): a bull-headed brute with two big hits
   size: large
