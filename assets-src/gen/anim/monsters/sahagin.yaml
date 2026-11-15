@@ -1,0 +1,120 @@
+sprite: sahagin
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [40, 8]
+    neck: [40, 26]
+    chest: [40, 33]
+    hip: [39, 47]
+    sh_n: [46, 34]
+    el_n: [52, 38]
+    hand_n: [57, 39]
+    tip: [60, 12]
+    sh_f: [30, 31]
+    el_f: [26, 40]
+    hand_f: [24, 49]
+    hip_n: [44, 51]
+    knee_n: [46, 62]
+    foot_n: [46, 72]
+    toe_n: [53, 75]
+    hip_f: [33, 51]
+    knee_f: [31, 62]
+    foot_f: [29, 72]
+    toe_f: [33, 75]
+  attack:
+    crown: [47, 9]
+    neck: [44, 30]
+    chest: [41, 36]
+    hip: [39, 48]
+    sh_n: [47, 37]
+    el_n: [49, 43]
+    hand_n: [48, 50]
+    tip: [66, 66]
+    sh_f: [36, 25]
+    el_f: [25, 22]
+    hand_f: [13, 26]
+    hip_n: [43, 52]
+    knee_n: [47, 61]
+    foot_n: [46, 72]
+    toe_n: [53, 75]
+    hip_f: [33, 52]
+    knee_f: [22, 62]
+    foot_f: [10, 72]
+    toe_f: [12, 76]
+  hurt:
+    crown: [28, 12]
+    neck: [33, 27]
+    chest: [38, 34]
+    hip: [40, 47]
+    sh_n: [43, 31]
+    el_n: [50, 35]
+    hand_n: [54, 37]
+    tip: [51, 14]
+    sh_f: [26, 33]
+    el_f: [21, 41]
+    hand_f: [24, 50]
+    hip_n: [47, 48]
+    knee_n: [49, 57]
+    foot_n: [49, 66]
+    toe_n: [51, 69]
+    hip_f: [39, 51]
+    knee_f: [36, 62]
+    foot_f: [35, 73]
+    toe_f: [38, 76]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  # The trident flips ~130 deg between idle (upright) and attack (thrust down-forward), over the 30 deg cap, so it never
+  # turns: idle-sourced frames keep it upright, attack-sourced ones keep the thrust angle, and it only translates with the
+  # fist. The 2-3 px channel between the near leg and the shaft is open in idle: the shaft never moves left or down in
+  # idle-sourced frames (any closure is a new enclosed hole).
+  atk_wind1:                   # half of wind2: head back, trident fist hoisted 3 px
+    moves: [crown, neck, chest]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], el_n: [0, -2], hand_n: [0, -3]}
+  atk_wind2:                   # the swing starts (t +0.30 toward the strike, skeleton recipe: idle/attack IoU 0.42 cannot
+    t: 0.30                    # meet wind2->mid from a pull-back): far arm swings up, trident hoisted 4 px
+    moves: [crown, neck, chest, hip, sh_f, el_f, hand_f]
+    tweaks: {sh_n: [0, -1], el_n: [1, -2], hand_n: [1, -4]}
+  atk_mid:                     # both arms and the trident keep the attack grip (the far fist holds the shaft butt); legs
+    t: 0.35                    # pinned and shifted toward idle, not rotated
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [5, 0], foot_f: [6, 0]}
+  atk_follow:                  # a settle (t 0.65); the two-handed grip rides the chest as one piece, head 2 px back
+    t: 0.65
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0]}
+  atk_recover:                 # still leaning in (follow->recover IoU): body and far arm toward the strike, head 1 px,
+    t: 0.35                    # far knee free; the upright trident pushed forward clear of the snout and the leg
+    moves: [crown, neck, chest, hip, sh_f, el_f, hand_f, hip_n, hip_f, knee_f]
+    pins: [foot_n, foot_f, knee_n]
+    tweaks: {crown: [-1, 1], neck: [1, 1], chest: [1, 1], el_n: [3, -1], hand_n: [5, -2]}
+  hurt_in1:                    # flinch: head snaps back, fists jerk up (the trident up and forward, off the leg channel)
+    moves: [crown, neck, chest, sh_n, el_n, hand_n, sh_f, el_f, hand_f]
+    tweaks: {crown: [-3, 0], neck: [-1, 0], el_n: [1, -2], hand_n: [2, -3], el_f: [0, -2], hand_f: [0, -3]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, sh_f, el_f, hand_f, hip_n, knee_n, hip_f, knee_f]
+  daze:                        # the trident fist holds its height while the body slumps (leg channel stays open)
+    tweaks: {hand_n: [0, -1]}
+  daze_b:
+    tweaks: {hand_n: [0, -2]}
+masks:
+  weapon:
+    idle: [[53, 8], [64, 8], [67, 18], [62, 26], [60, 68], [53, 68], [56, 40], [58, 26], [55, 20]]
+    attack: [[10, 22], [16, 22], [30, 33], [50, 47], [62, 54], [70, 56], [70, 72], [60, 70], [56, 60], [46, 54], [30, 40], [12, 30]]
+    hurt: [[44, 11], [56, 11], [56, 22], [55, 30], [59, 56], [56, 59], [52, 40], [52, 30], [44, 24]]
+  ft_n:
+    idle: [[41, 71], [58, 71], [58, 78], [41, 78]]
+    attack: [[41, 71], [57, 71], [57, 78], [41, 78]]
+    hurt: [[45, 65], [55, 65], [55, 71], [45, 71]]
+  ft_f:
+    idle: [[24, 71], [36, 71], [36, 79], [24, 79]]
+    attack: [[6, 69], [16, 69], [16, 79], [6, 79]]
+    hurt: [[31, 71], [41, 71], [41, 79], [31, 79]]
+holds: []
+paint: []
