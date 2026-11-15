@@ -47,7 +47,7 @@ effects:
   ether: { kind: rise, frames: 26, impact: 14, glyph: sparkle, ramp: ether, count: 7 }
   drain: { kind: projectile, frames: 36, impact: 24, glyph: orb, ramp: curse, count: 5 }
   fire_breath: { kind: cone, frames: 28, impact: 16, glyph: fireball, ramp: fire, count: 12, accent: burst }
-  glint: { kind: burst, frames: 8, impact: 0, glyph: glint, ramp: holy, count: 0, at: top }
+  glint: { kind: burst, frames: 14, impact: 0, glyph: glint, ramp: holy, count: 0, at: top }
   impact_dust: { kind: burst, frames: 14, impact: 0, glyph: dust, ramp: dust, count: 4, accent: dust, at: feet }
 spells:
   cure: heal

@@ -23,6 +23,8 @@ export interface MonsterAtlasMeta {
     opaqueRight?: number;
     /** The head joint (art px in the cell), for cue effects placed on the head (the glint). */
     head?: [number, number];
+    /** The weapon tip in `attack_raise` (art px in the cell): the heavy attack's glint. Sheets with a raise only. */
+    tip?: [number, number];
   }>;
 }
 
@@ -54,6 +56,8 @@ export interface MonsterFrames {
   opaqueRight?: number;
   /** The head joint in art px, when the atlas has it. */
   head?: [number, number];
+  /** The raised weapon's tip in art px (the glint), when the atlas has it. */
+  tip?: [number, number];
 }
 
 /** Art id for an enemy: its `sprite` (palette-swap variants share code but not art), without a file extension. */
@@ -109,7 +113,7 @@ export class BattleArt {
       artScale: s / ts, cell: [w, h], footRow: entry.footRow, floating: entry.floating, hasCast: !!entry.frames.cast,
       hasRaise: !!entry.frames.attack_raise, lungePx: lungePx(entry), anim: !!entry.anim,
       opaqueRight: entry.opaqueRight ?? this.measureOpaqueRight(sprite, entry.frames.idle, entry.cell, ts) ?? w,
-      ...(entry.head ? { head: entry.head } : {}) };
+      ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}) };
   }
 
   /** The idle cell's rightmost opaque column + 1 (art px), read once from the atlas image; null outside a browser. */

@@ -3,7 +3,8 @@ import type { EnemyData, SpellData } from '../types/index.js';
 import type { Inventory } from '../entities/Inventory.js';
 import type { AIBehavior } from './AIBehavior.js';
 import type { BossPattern } from './BossAI.js';
-import { StatusTracker } from './StatusEffects.js';
+import type { StatusTracker } from './StatusEffects.js';
+import { makeEnemyInstances } from './enemyInstances.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
 import { selectTarget } from './EnemyAI.js';
 import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
@@ -130,28 +131,7 @@ export class BattleStateMachine {
   constructor(config: BattleConfig, rng: () => number = Math.random) {
     this.party = config.party;
     this.partyById = new Map(config.party.map((c, i) => [`party_${i}`, c]));
-    // Count occurrences of each enemy name for deduplication
-    const nameCounts = new Map<string, number>();
-    for (const e of config.enemies) {
-      nameCounts.set(e.name, (nameCounts.get(e.name) ?? 0) + 1);
-    }
-    const nameIndex = new Map<string, number>();
-    this.enemies = config.enemies.map((e, i) => {
-      const idx = nameIndex.get(e.name) ?? 0;
-      nameIndex.set(e.name, idx + 1);
-      const suffix = (nameCounts.get(e.name) ?? 1) > 1
-        ? ` ${String.fromCharCode(65 + idx)}`  // A, B, C...
-        : '';
-      return {
-        id: `enemy_${i}`,
-        data: e,
-        currentHp: e.stats.hp,
-        status: new StatusTracker(),
-        buffs: new Map(),
-        displayName: `${e.name}${suffix}`,
-        crossedPhases: new Set<number>(),
-      };
-    });
+    this.enemies = makeEnemyInstances(config.enemies);
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
@@ -234,23 +214,38 @@ export class BattleStateMachine {
     this.currentActorIndex = 0;
     this.commands = [];
     this.messages = [];
+    this.skipHelplessMembers();
   }
 
   submitCommand(command: BattleCommand): boolean {
     if (this._state !== 'command_select') return false;
     this.commands.push(command);
     this.currentActorIndex++;
-    if (this.currentActorIndex >= this.livingParty.length) {
-      this._state = 'execution';
-    }
+    if (this.currentActorIndex >= this.livingParty.length) this._state = 'execution';
+    else if (!command.skip) this.skipHelplessMembers();
     return true;
   }
 
-  /** Undo the last submitted command, returning to the previous actor. */
+  /**
+   * Play-test item 3: a member whose turn is certain to be lost (sleep, stun, stone, lethal poison: `losesTurn`) gets
+   * no command menu. A `skip` command keeps their place in the turn order, where the tick shows "X is asleep!".
+   */
+  private skipHelplessMembers(): void {
+    for (let id = this.currentCommandActorId; id && this._state === 'command_select'; id = this.currentCommandActorId) {
+      const subject = this.tickSubject(id, false);
+      if (!subject || !losesTurn(subject)) return;
+      this.submitCommand({ type: 'fight', actorId: id, skip: true });
+    }
+  }
+
+  /** Undo the last command chosen in the menu (and the skipped members after it), returning to its actor. */
   undoCommand(): boolean {
-    if (this._state !== 'command_select' || this.commands.length === 0) return false;
-    this.commands.pop();
-    this.currentActorIndex = Math.max(0, this.currentActorIndex - 1);
+    if (this._state !== 'command_select') return false;
+    let n = this.commands.length;
+    while (n > 0 && this.commands[n - 1].skip) n--;
+    if (n === 0) return false;
+    this.commands.length = n - 1;
+    this.currentActorIndex = n - 1;
     return true;
   }
 
@@ -321,7 +316,7 @@ export class BattleStateMachine {
   nextActorLosesTurn(): boolean {
     const action = this._actionQueue[0];
     const subject = action && this.isNextActorAlive() ? this.tickSubject(action.combatantId, action.isEnemy) : null;
-    return !!subject && losesTurn(subject);
+    return !!subject && (losesTurn(subject) || !!action.command.skip);
   }
 
   executeNextAction(): ActionResult {
@@ -344,11 +339,12 @@ export class BattleStateMachine {
     this._damageEvents = [];
     this._missed = false;
 
-    // Tick status effects at start of turn
-    const canAct = this.tickCombatantStatus(action.combatantId, action.isEnemy);
-    if (canAct) {
-      this.executeCommand(action.command, action.isEnemy);
-    }
+    // Tick status effects at start of turn; when the actor still acts, the tick's lines (poison) follow the action's
+    // result lines, so they never land between the view's announcement and its result
+    const tick: BattleMessage[] = [];
+    const canAct = this.tickCombatantStatus(action.combatantId, action.isEnemy, tick);
+    if (canAct && !action.command.skip) this.executeCommand(action.command, action.isEnemy);
+    this.messages.push(...tick);
 
     // An escape ends the battle mid-round: never overwrite the end state
     const done = this.isOver || this._actionQueue.length === 0;
@@ -382,7 +378,7 @@ export class BattleStateMachine {
     const result: NextActionInfo = {
       actorId: action.combatantId,
       actorName,
-      actionType: cmd.type,
+      actionType: cmd.skip ? 'skip' : cmd.type,
     };
 
     if (cmd.targetId) {
@@ -420,9 +416,9 @@ export class BattleStateMachine {
     this._damageEvents = allDamageEvents;
   }
 
-  private tickCombatantStatus(id: string, isEnemy: boolean): boolean {
+  private tickCombatantStatus(id: string, isEnemy: boolean, out: BattleMessage[]): boolean {
     const subject = this.tickSubject(id, isEnemy);
-    return !!subject && tickStatus(subject, this.rng, (text) => this.messages.push({ text }));
+    return !!subject && tickStatus(subject, this.rng, (text) => out.push({ text }));
   }
 
   /** The combatant as the status tick sees it (an enemy's max HP is its data's, a member's its character's). */
@@ -561,6 +557,7 @@ export class BattleStateMachine {
       this._state = 'command_select';
       this.currentActorIndex = 0;
       this.commands = [];
+      this.skipHelplessMembers();
     }
   }
 

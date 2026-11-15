@@ -4,8 +4,9 @@
  * inn, at each zone boundary and after the last battle).
  *
  * Pass F item 1 (docs/FEEDBACK_PLAN_2026-11-14.md §3.1, FB-1) doubled the act-1 gold. The mean gold after 40 battles
- * was 272.9 G with the FF1 gold (old) and is 1183.5 G with the FB-1 gold (new); the bound is new ± 25 %, rounded
- * outwards (885-1480 G), and fails the old data.
+ * was 272.9 G with the FF1 gold, 1183.5 G with the FB-1 gold, and is 1541.5 G since the play-test fix (wolf 26 G,
+ * gr_wolf 100 G; `economy.test.ts`); the bound is the current value ± 25 %, rounded
+ * outwards (1150-1930 G), and fails the FF1 data.
  */
 import { describe, it, expect } from 'vitest';
 import { campaign, median, RUNS, SHOPPING, START_GOLD, START_KIT_COST } from './fieldCampaign.js';
@@ -30,10 +31,10 @@ describe('T4d field pacing (seeded campaign, §4.5)', () => {
     expect(runs.reduce((s, r) => s + r.wipes, 0) / RUNS).toBeLessThanOrEqual(0.01);
   });
 
-  it('leaves 885-1480 G after 40 battles on average (new 1183.5; old 272.9), with at least 7 of the 8 full-kit purchases made (8)', () => {
+  it('leaves 1150-1930 G after 40 battles on average (1541.5; FB-1 1183.5; FF1 272.9), with at least 7 of the 8 full-kit purchases made (8)', () => {
     const gold = runs.reduce((s, r) => s + r.gold, 0) / RUNS;
-    expect(gold).toBeGreaterThanOrEqual(885);
-    expect(gold).toBeLessThanOrEqual(1480);
+    expect(gold).toBeGreaterThanOrEqual(1150);
+    expect(gold).toBeLessThanOrEqual(1930);
     expect(runs.reduce((s, r) => s + r.bought, 0) / RUNS).toBeGreaterThanOrEqual(SHOPPING.length - 1);
   });
 });

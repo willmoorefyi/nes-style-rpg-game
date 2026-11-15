@@ -21,6 +21,15 @@ describe('enemy attack fields', () => {
     expect(() => validateEnemyAttack({ id: 'a', attackAnim: 'light' })).toThrow(ValidationError);
   });
 
+  it('pulseTint (final play test, item 7): a "#rrggbb" string, on a heavy attacker only', () => {
+    expect(() => validateEnemyAttack({ id: 'a', attackAnim: 'heavy', pulseTint: '#ffdcdc' })).not.toThrow();
+    expect(() => validateEnemyAttack({ id: 'a', attackAnim: 'heavy', pulseTint: 'ffdcdc' })).toThrow(/pulseTint/);
+    expect(() => validateEnemyAttack({ id: 'a', attackAnim: 'heavy', pulseTint: '#fdc' })).toThrow(/pulseTint/);
+    expect(() => validateEnemyAttack({ id: 'a', attackAnim: 'heavy', pulseTint: 0xffdcdc })).toThrow(/pulseTint/);
+    expect(() => validateEnemyAttack({ id: 'a', pulseTint: '#ffdcdc' })).toThrow(/heavy attacker/);
+    expect(() => validateEnemyData({ ...testEnemy(), pulseTint: '#ffdcdc' })).toThrow(/EnemyData\(goblin\)\.pulseTint/);
+  });
+
   it('validateEnemyData checks them', () => {
     expect(() => validateEnemyData({ ...testEnemy(), attack: 'ranged', attackEffect: 'fire_breath' })).not.toThrow();
     expect(() => validateEnemyData({ ...testEnemy(), attack: 'thrown' })).toThrow(/EnemyData\(goblin\)\.attack/);
@@ -35,6 +44,14 @@ describe('enemy attack fields', () => {
       if (e.attack === 'ranged') expect(fx.attacks[e.attackEffect as string], String(e.id)).toBeDefined();
       expect(e.attackAnim, String(e.id)).toBe(e.id === 'garland' || e.id === 'lich' ? 'heavy' : undefined);
     }
+    // the pale lich pulses lighter than the default red (each channel at least the default's)
+    const lich = enemies.find((e) => e.id === 'lich')!;
+    expect(lich.pulseTint).toMatch(/^#[0-9a-f]{6}$/i);
+    const ch = (hex: number) => [hex >> 16, (hex >> 8) & 255, hex & 255];
+    const [r, g, b] = ch(parseInt(String(lich.pulseTint).slice(1), 16));
+    const [r0, g0, b0] = ch(0xffb0b0);
+    expect(r >= r0 && g > g0 && b > b0).toBe(true);
+    expect(enemies.find((e) => e.id === 'garland')!.pulseTint).toBeUndefined();
   });
 });
 

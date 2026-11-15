@@ -53,7 +53,7 @@ export class BattleAnimationController {
   readonly turnList: TurnList;
   get turnListTexts(): BitmapText[] { return this.turnList.texts; }
   private currentActionInfo: NextActionInfo | null = null;
-  private announcement = '';
+  private announcement = ''; private lostTurn = false;
   /** Spell / item effects and status overlays (BattleScene sets them from the fx factories; no-ops by default). */
   fx: ActionFx = noopActionFx; statusFx: StatusFx = noopStatusFx;
   /** The battle's spells (the target set of an all-target spell). */
@@ -78,7 +78,7 @@ export class BattleAnimationController {
     // `mainContainer` is the layer root (a plain Container gets the layers built inside it); attack cues start effects
     this.effects = new BattleEffects(mainContainer, () => display.enemySprites);
     this.turnList = new TurnList(turnListContainer, commandWindow);
-    if (display.enemyView) display.enemyView.onCue = (_i, cue, sprite) => this.fx.playCue(cue === 'hold' ? 'glint' : 'impact_dust', sprite);
+    if (display.enemyView) display.enemyView.onCue = (_i, cue, sprite, at) => this.fx.playCue(cue === 'hold' ? 'glint' : 'impact_dust', sprite, at);
   }
   /** The actor's sprite by battle id (party_i / enemy_i), so equal names never share a sprite. */
   findActorSprite(actorId: string): { sprite: Container; isEnemy: boolean } | null {
@@ -97,9 +97,11 @@ export class BattleAnimationController {
           if (!info) { this.onResolveRound(); return; }
           if (!this.battle.isNextActorAlive()) { this.battle.executeNextAction(); return; }
           this.currentActionInfo = info;
-          this.announcement = formatAnnouncement(info);
+          // play-test item 3: a turn certain to be lost (asleep, stunned, stone) is not announced; its tick line shows
+          this.lostTurn = this.battle.nextActorLosesTurn();
+          this.announcement = this.lostTurn ? '' : formatAnnouncement(info);
           this.targetIds = actionTargetIds(info, this.battle, this.spells.find((s) => s.id === info.spellId)?.targeting);
-          this.setMessageText(this.announcement);
+          if (!this.lostTurn) this.setMessageText(this.announcement);
           this.turnList.add(info);
           const found = this.findActorSprite(info.actorId);
           this.animActorSprite = found?.sprite ?? null;
@@ -115,16 +117,16 @@ export class BattleAnimationController {
               ({ dx: this.attackReachPx, dy: this.attackRisePx } = measureReach(this.animActorSprite, this.targetSprite));
             }
             // spells and items gather in place first; every party action then poses frame by frame in step_forward
-            if (!found!.isEnemy && info.actionType !== 'fight') this.display.setActorPose(this.animActorSprite, 'cast_gather');
+            if (!found!.isEnemy && info.actionType !== 'fight' && !this.lostTurn) this.display.setActorPose(this.animActorSprite, 'cast_gather');
           }
         }
         this.animTimer += dt;
-        if (this.animTimer >= holdFrames(ANNOUNCE_FRAMES) || confirmSkip) {
+        if (this.lostTurn || this.animTimer >= holdFrames(ANNOUNCE_FRAMES) || confirmSkip) {
           this.animTimer = 0;
           // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead.
-          // E1: an enemy that is certain to lose its turn (sleep, stun, stone, lethal poison) never winds up.
-          const lunge = this.animActorIsEnemy && !this.battle.nextActorLosesTurn() && this.startEnemyLunge();
-          this.animPhase = this.animActorIsEnemy ? (lunge ? 'enemy_lunge' : 'execute') : 'step_forward';
+          // E1: an actor that is certain to lose its turn (sleep, stun, stone, lethal poison) never winds up or steps.
+          const lunge = this.animActorIsEnemy && !this.lostTurn && this.startEnemyLunge();
+          this.animPhase = this.lostTurn || this.animActorIsEnemy ? (lunge ? 'enemy_lunge' : 'execute') : 'step_forward';
         }
         break;
       }
@@ -156,7 +158,7 @@ export class BattleAnimationController {
         // Auto-advance through result messages on timer (no confirm-wait)
         const hasMsg = this.animMessageIndex < this.animMessages.length;
         if (!hasMsg) {
-          if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; this.animTimer = 0; }
+          if (this.animActorIsEnemy || this.lostTurn) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; this.animTimer = 0; }
           break;
         }
         if (this.animTimer === 0) this.setMessageText(this.animMessages[this.animMessageIndex].text);
@@ -164,7 +166,7 @@ export class BattleAnimationController {
         if (this.animTimer >= holdFrames(RESULT_FRAMES) || confirmSkip) {
           this.animMessageIndex++; this.animTimer = 0;
           if (this.animMessageIndex >= this.animMessages.length) {
-            if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; }
+            if (this.animActorIsEnemy || this.lostTurn) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; }
           }
         }
         break;

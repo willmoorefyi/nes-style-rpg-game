@@ -15,10 +15,12 @@ import { createEmitter, seededRng, stepAlpha, type Emitter, type FxBox } from '.
 import { effectIdFor, type FxEffect } from './fxDefs.js';
 import { FxBatch, ScreenTint } from './fxRender.js';
 import type { FxSource } from './fxSource.js';
-import type { ActionFx, ActionFxContext, FxCueId } from './index.js';
+import type { ActionFx, ActionFxContext, FxCueId, FxCuePoint } from './index.js';
 
 /** Frames between the starts of an all-target effect on consecutive targets. */
 export const FX_STAGGER = 4;
+/** Frames from a cue to its effect: the glint shows 4 frames into the raised hold (§3.7), the dust at contact. */
+export const CUE_DELAY: Record<FxCueId, number> = { glint: 4, impact_dust: 0 };
 const LABEL_FRAMES = 40;
 const LABEL_FONT = 32;
 
@@ -71,21 +73,21 @@ export class BattleActionFx implements ActionFx {
     return e.impact + FX_STAGGER * (ctx.targets.length - 1);
   }
 
-  playCue(id: FxCueId, sprite: Container): void {
+  playCue(id: FxCueId, sprite: Container, at?: FxCuePoint): void {
     const e = this.source.data?.effects[id];
-    if (e) this.start(e, sprite, null, 0, {});
+    if (e) this.start(e, sprite, null, CUE_DELAY[id], {}, at ? () => this.point(sprite, at) : undefined);
   }
 
   /** Effects still playing (tests and the leak check). */
   get active(): number { return this.running.length + this.labels.length; }
 
   private start(e: FxEffect, sprite: Container, actor: FxBox | null, delay: number,
-    opts: { landed?: boolean; flashes?: number }): void {
+    opts: { landed?: boolean; flashes?: number }, place?: () => FxBox): void {
     const batch = new FxBatch(this.source.atlas);
     this.layers.fx.spell.addChild(batch.container);
     const rng = seededRng(this.seed++);
     // the target's box is measured when its effect starts (a stepping caster or a shaking enemy has settled)
-    const build = (): Emitter => createEmitter(e, { geom: { target: this.box(sprite), actor, screenTop: this.screenTop() }, rng,
+    const build = (): Emitter => createEmitter(e, { geom: { target: place ? place() : this.box(sprite), actor, screenTop: this.screenTop() }, rng,
       frameCount: (k) => this.source.atlas.frameCount(k), landed: opts.landed, flashes: opts.flashes });
     const tint = opts.flashes ? new ScreenTint(this.source.atlas.color(`${e.glyph}.${e.ramp}`)) : null;
     if (tint) this.layers.fx.flash.addChild(tint.g);
@@ -145,6 +147,14 @@ export class BattleActionFx implements ActionFx {
     const b = sprite.getBounds();
     const tl = this.layers.fx.spell.toLocal({ x: b.x, y: b.y });
     return { x: tl.x + b.width * 0.15, y: tl.y + b.height * 0.33, w: b.width * 0.7, h: b.height * 0.62 };
+  }
+
+  /** A point of a sprite (fractions of its local bounds) as an empty box in the effect layer's space: every anchor of
+   *  an empty box is the point itself. */
+  private point(sprite: Container, at: FxCuePoint): FxBox {
+    const b = sprite.getLocalBounds();
+    const p = this.layers.fx.spell.toLocal(sprite.toGlobal({ x: b.x + b.width * at.x, y: b.y + b.height * at.y }));
+    return { x: p.x, y: p.y, w: 0, h: 0 };
   }
 
   private screenTop(): number {

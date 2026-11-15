@@ -106,6 +106,8 @@ export interface EnemyData {
   attackEffect?: string;
   /** `heavy`: the raised overhead blow (Garland, the lich). */
   attackAnim?: 'heavy';
+  /** A heavy attacker's tint pulse in the raised hold, "#rrggbb" (default #ffb0b0; lighter on pale art, the lich). */
+  pulseTint?: string;
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';

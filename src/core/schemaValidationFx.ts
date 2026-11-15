@@ -13,7 +13,8 @@ const ATTACK_ANIMS = ['heavy'];
 
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-/** EnemyData's `attack` (melee | ranged), `attackEffect` (string) and `attackAnim` (heavy), all optional. */
+/** EnemyData's `attack` (melee | ranged), `attackEffect` (string), `attackAnim` (heavy) and `pulseTint` ("#rrggbb", a
+ *  heavy attacker only), all optional. */
 export function validateEnemyAttack(data: Record<string, unknown>): void {
   const id = typeof data.id === 'string' ? data.id : '?';
   if (data.attack !== undefined && !ATTACKS.includes(data.attack as string)) {
@@ -24,6 +25,12 @@ export function validateEnemyAttack(data: Record<string, unknown>): void {
   }
   if (data.attackAnim !== undefined && !ATTACK_ANIMS.includes(data.attackAnim as string)) {
     throw new ValidationError(`EnemyData(${id}).attackAnim: expected heavy, got ${String(data.attackAnim)}`);
+  }
+  if (data.pulseTint !== undefined) {
+    if (typeof data.pulseTint !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(data.pulseTint)) {
+      throw new ValidationError(`EnemyData(${id}).pulseTint: expected a "#rrggbb" colour, got ${String(data.pulseTint)}`);
+    }
+    if (data.attackAnim !== 'heavy') throw new ValidationError(`EnemyData(${id}).pulseTint: only a heavy attacker (attackAnim: heavy) pulses`);
   }
 }
 

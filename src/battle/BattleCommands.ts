@@ -6,6 +6,8 @@ export interface BattleCommand {
   targetId?: string;
   spellId?: string;
   itemId?: string;
+  /** No menu was shown: the member's turn is certain to be lost (play-test item 3); it never executes. */
+  skip?: boolean;
 }
 
 export function createSpellCommand(actorId: string, targetId: string | undefined, spellId: string): BattleCommand {

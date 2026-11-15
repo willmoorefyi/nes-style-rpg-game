@@ -49,13 +49,13 @@ describe('bestiary model: stats', () => {
     expect(g.boss).toBe(false);
   });
 
-  it('garland: Boss tag, Attack 9, x2, 9-18 and the 50% phase with Fight x3 and its message', () => {
+  it('garland: Boss tag, Attack 9, x2, 9-18 and the 75% phase with Fight x3 and its message', () => {
     const g = byId('garland');
     expect(g.boss).toBe(true);
     expect(cellOf(g, 'Attack')).toBe('9');
     expect(cellOf(g, 'Hits')).toBe('x2');
     expect(cellOf(g, 'Dmg/hit')).toBe('9-18');
-    expect(cellOf(g, 'At 50% HP')).toBe('Fight x3 "Garland\'s attacks grow fiercer!"');
+    expect(cellOf(g, 'At 75% HP')).toBe('Fight x3 "Garland\'s attacks grow fiercer!"');
   });
 
   it('elements: wolf weak Fire / resist Ice; dragon weak Ice / resist Fire', () => {

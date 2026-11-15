@@ -51,7 +51,7 @@
     accuracy: 5
     evade: 36
   xpReward: 24
-  goldReward: 12
+  goldReward: 26
   sprite: wolf
   attack: melee
   weakness: fire
@@ -72,7 +72,7 @@
     accuracy: 18
     evade: 36
   xpReward: 93
-  goldReward: 44
+  goldReward: 100
   sprite: gr_wolf
   attack: melee
   family: were
@@ -234,7 +234,7 @@
 - id: garland
   name: Garland
   stats:
-    hp: 400
+    hp: 360
     strength: 15
     agility: 8
     intelligence: 1
@@ -252,7 +252,7 @@
   attack: melee
   attackAnim: heavy
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 0.75
     patternId: aggressive
     message: Garland's attacks grow fiercer!
     hits: 3
@@ -274,6 +274,7 @@
   sprite: lich
   attack: melee
   attackAnim: heavy
+  pulseTint: "#ffdcdc" # lighter than the default #ffb0b0: the pale lich turned muddy under it (final play test)
   weakness: fire
   resist: ice
   bossPhases:
