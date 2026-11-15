@@ -710,11 +710,13 @@
     an upright brown wolf-man standing on two digitigrade wolf legs, a shaggy brown fur body with a pale chest, a wolf
     head with pointed ears and drooling fangs, long arms ending in hooked black claws, torn grey peasant trousers
     hanging in rags below the knees
-  attack: lunging forward and slashing with both clawed hands at the heroes, the jaws snapping
+  attack: >-
+    lunging forward and slashing with both clawed hands at the heroes, the jaws snapping; no slash trail, smear or
+    motion arc
   hurt: knocked back, the head thrown back with a howl, the claws flung up
   face: its wolf face with yellow eyes and drooling fangs is readable
-  extra_negative: four legs, a shirt, a weapon, a tail held high
-  seeds: [1234]
+  extra_negative: four legs, a shirt, a weapon, a tail
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R87): a slash smear and a tail only in the attack
 - id: zombie
   # "Zombie" (010): a weak walking corpse
   size: small
