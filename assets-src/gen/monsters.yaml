@@ -2015,20 +2015,24 @@
   extra_negative: a human face, stone blocks, metal, moss, a weapon, flying clay, a mound under it
   seeds: [1234]
 - id: nightmare
-  # "Nightmare" (091): a black horse with a flaming violet mane (distinct from the crazy horse)
+  # "Nightmare" (091): a black horse with a flaming mane (distinct from the crazy horse). The brief's violet flames
+  # are keyed out with the magenta background (ROSTER_LOG R222), so the flames are cold blue with cyan tips.
   size: large
   body: quadruped
   prompt: >-
-    a black horse seen from the side, a lean glossy black body, a flaming violet mane and tail of violet fire (drawn
-    as part of the body), smouldering violet hooves, glowing violet eyes; the whole horse, tail tip to muzzle, sits in
-    the middle of its own cell with empty space on both sides
+    a black horse seen from the side, a lean glossy black body, a mane and tail of cold blue fire with bright cyan
+    tips (drawn as part of the body, with dark outlines), smouldering blue hooves, glowing cyan eyes; the whole horse,
+    tail tip to muzzle, sits in the middle of its own cell with empty space on both sides
   attack: >-
-    a charging strike toward the heroes: the forelegs lifted only a little and kicking forward, the head thrust forward
-    with the teeth bared, the hind hooves on the ground, no rearing up tall, the head well inside the middle cell
-  hurt: knocked back, the head tossed up and back, one foreleg buckling, the flaming mane flattened
-  face: the horse's head with glowing violet eyes is readable
-  extra_negative: a rider, a saddle, a bridle, white patches, a horn, wings, orange fire, rearing up
-  seeds: [1234]
+    a charging strike toward the heroes: the forelegs lifted only a little and kicking forward, the head thrust
+    forward and down with the teeth bared, the muzzle just above and in front of its front hooves, the hind hooves on
+    the ground, no rearing up, the whole horse well inside the middle cell
+  hurt: >-
+    knocked back, all four hooves on the ground (no rearing up), the head tossed up a little, one foreleg buckling,
+    the blue flame mane flattened, no taller than its idle height
+  face: the horse's head with glowing cyan eyes is readable
+  extra_negative: a rider, a saddle, a bridle, white patches, a horn, wings, orange fire, purple fire, violet, pink, magenta, rearing up
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R222): the violet flames keyed out, a rear-up hurt
 - id: sahagin_prince
   # "Sahagin Prince" (093): a tall regal fish-man (distinct from the sahagin and the chief)
   size: small
