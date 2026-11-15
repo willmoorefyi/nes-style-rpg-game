@@ -1,0 +1,25 @@
+{
+  "character": "ashen_queen",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "56c009356b8317d20a8bab50",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass R G1 R12: seed 1235 (R10) approved as best of 3; nits: 48 px pale pink streaks by the censer smoke, forked tail tip"
+}
