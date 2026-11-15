@@ -237,3 +237,5 @@
 {"event": "result", "key": "71f1e2a38ac638d4ec561fc6", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T03:58:00", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack_raise", "seed": 1235, "key": "ec7e2da21a66dacb6250fbed"}
 {"event": "result", "key": "ec7e2da21a66dacb6250fbed", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:58:32", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_idle", "seed": 1234, "key": "78124850d181c85a756bc559"}
+{"event": "result", "key": "78124850d181c85a756bc559", "ok": true}

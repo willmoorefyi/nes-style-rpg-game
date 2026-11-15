@@ -1,0 +1,25 @@
+{
+  "character": "drowned_sovereign",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "78124850d181c85a756bc559",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass R G1 R15: the regal disguise, no tentacles; nits: noisy brocade texture, small eyes, both hands show"
+}
