@@ -1929,6 +1929,288 @@
   sprite: manticore
   attack: melee
   size: large
+- id: baretta
+  name: Baretta
+  num: 81
+  description: "A red-brown armoured burrower with shovel claws and a back of spiked plates. It digs up under travellers and strikes three times."
+  stats:
+    hp: 256
+    strength: 48
+    agility: 14
+    intelligence: 1
+    vitality: 21
+    luck: 5
+    attack: 60
+    defense: 38
+    magicDefense: 130
+    accuracy: 62
+    hits: 3
+    evade: 56
+  xpReward: 1428
+  goldReward: 300
+  sprite: baretta
+  attack: melee
+  size: large
+- id: basilisk
+  name: Basilisk
+  num: 82
+  description: "A low six-legged lizard with a crowned crest. Meet its gleaming eyes and your flesh turns to stone."
+  specials: [{id: glance, rate: 0.5}]
+  stats:
+    hp: 196
+    strength: 24
+    agility: 9
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 30
+    defense: 20
+    magicDefense: 92
+    accuracy: 52
+    evade: 24
+  xpReward: 1977
+  goldReward: 658
+  sprite: basilisk
+  attack: melee
+  family: magical
+  size: small
+- id: allosaurus
+  name: Allosaurus
+  num: 83
+  description: "A two-legged hunting dinosaur, all jaw and appetite. Its hide is thin, but it takes a great deal of killing."
+  stats:
+    hp: 480
+    strength: 52
+    agility: 15
+    intelligence: 1
+    vitality: 7
+    luck: 5
+    attack: 65
+    defense: 10
+    magicDefense: 200
+    accuracy: 132
+    evade: 60
+  xpReward: 3387
+  goldReward: 502
+  sprite: allosaurus
+  attack: melee
+  family: dragon
+  size: large
+- id: weretiger
+  name: Weretiger
+  num: 84
+  description: "A tiger-man who walks upright in a leather kilt. Its curved claws carry a poison that festers."
+  attackStatus: [poison]
+  stats:
+    hp: 160
+    strength: 24
+    agility: 13
+    intelligence: 1
+    vitality: 10
+    luck: 5
+    attack: 30
+    defense: 16
+    magicDefense: 94
+    accuracy: 38
+    hits: 2
+    evade: 48
+  xpReward: 780
+  goldReward: 780
+  sprite: weretiger
+  attack: melee
+  family: were
+  size: small
+- id: sand_worm
+  name: Sand Worm
+  num: 85
+  description: "An ochre worm that bursts from the dunes with a four-part jaw. When it shakes the ground, whole caravans sink."
+  protect: [earth]
+  specials: [{id: crack, rate: 0.5}]
+  stats:
+    hp: 200
+    strength: 37
+    agility: 15
+    intelligence: 1
+    vitality: 9
+    luck: 5
+    attack: 46
+    defense: 14
+    magicDefense: 104
+    accuracy: 48
+    evade: 62
+  xpReward: 2683
+  goldReward: 900
+  sprite: sand_worm
+  attack: melee
+  size: large
+- id: minotaur_zombie
+  name: Minotaur Zombie
+  num: 86
+  description: "A minotaur dead and risen, ribs bare and one horn broken. It swings its rusted cleaver slower, but no less hard."
+  protect: [status, poison_stone, death]
+  stats:
+    hp: 224
+    strength: 32
+    agility: 11
+    intelligence: 1
+    vitality: 9
+    luck: 5
+    attack: 40
+    defense: 14
+    magicDefense: 116
+    accuracy: 54
+    evade: 36
+  xpReward: 1050
+  goldReward: 1050
+  sprite: minotaur_zombie
+  attack: melee
+  weakness: fire
+  resist: ice
+  family: undead
+  size: large
+- id: king_mummy
+  name: King Mummy
+  num: 87
+  description: "A mummified king in gilded wrappings and a gold death mask. His touch brings a sleep like his own."
+  protect: [status, poison_stone, death]
+  attackStatus: [sleep]
+  stats:
+    hp: 188
+    strength: 34
+    agility: 9
+    intelligence: 1
+    vitality: 14
+    luck: 5
+    attack: 43
+    defense: 24
+    magicDefense: 96
+    accuracy: 46
+    evade: 24
+  xpReward: 984
+  goldReward: 1000
+  sprite: king_mummy
+  attack: melee
+  weakness: fire
+  resist: ice
+  family: undead
+  size: small
+- id: medusa
+  name: Medusa
+  num: 88
+  description: "A serpent-tailed woman crowned with living snakes. Her bite poisons, and her glance turns heroes to stone."
+  attackStatus: [poison]
+  specials: [{id: glance, rate: 0.5}]
+  stats:
+    hp: 68
+    strength: 16
+    agility: 11
+    intelligence: 1
+    vitality: 7
+    luck: 5
+    attack: 20
+    defense: 10
+    magicDefense: 56
+    accuracy: 16
+    evade: 36
+  xpReward: 699
+  goldReward: 699
+  sprite: medusa
+  attack: melee
+  family: magical
+  size: small
+- id: rakshasa
+  name: Rakshasa
+  num: 89
+  description: "A tiger-headed sorcerer in red and gold robes, its hands bent backward at the wrist. Spells slide off it; steel does not."
+  protect: [status, poison_stone, death, earth]
+  spells: [fir2, slow, dark, slep, fire, lit, cure]
+  stats:
+    hp: 110
+    strength: 16
+    agility: 15
+    intelligence: 22
+    vitality: 17
+    luck: 5
+    attack: 20
+    defense: 30
+    magicDefense: 62
+    accuracy: 28
+    hits: 3
+    evade: 60
+  xpReward: 603
+  goldReward: 800
+  ai:
+    rate: 0.75
+    actions:
+    - {type: magic, spellId: fir2, weight: 1}
+    - {type: magic, spellId: slow, weight: 1}
+    - {type: magic, spellId: dark, weight: 1}
+    - {type: magic, spellId: slep, weight: 1}
+    - {type: magic, spellId: fire, weight: 1}
+    - {type: magic, spellId: lit, weight: 1}
+    - {type: magic, spellId: cure, weight: 1}
+  sprite: rakshasa
+  attack: melee
+  elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  family: magical
+  size: small
+- id: clay_golem
+  name: Clay Golem
+  num: 90
+  description: "A crude clay giant still marked with its maker's handprints. A glyph on its brow keeps it working, and spells away."
+  protect: [status, poison_stone, death]
+  attackStatus: [poison]
+  spells: [fast]
+  stats:
+    hp: 176
+    strength: 51
+    agility: 10
+    intelligence: 4
+    vitality: 6
+    luck: 5
+    attack: 64
+    defense: 7
+    magicDefense: 94
+    accuracy: 42
+    evade: 28
+  xpReward: 1257
+  goldReward: 800
+  ai:
+    rate: 0.25
+    actions:
+    - {type: magic, spellId: fast, weight: 1}
+  sprite: clay_golem
+  attack: melee
+  elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  family: magical
+  size: large
+- id: nightmare
+  name: Nightmare
+  num: 91
+  description: "A black horse with a mane of cold blue flame. It gallops through bad dreams, and its snort blinds."
+  protect: [status, poison_stone, death, earth]
+  specials: [{id: snorting, rate: 0.25}]
+  stats:
+    hp: 200
+    strength: 24
+    agility: 27
+    intelligence: 1
+    vitality: 14
+    luck: 5
+    attack: 30
+    defense: 24
+    magicDefense: 100
+    accuracy: 48
+    hits: 3
+    evade: 132
+  xpReward: 1272
+  goldReward: 700
+  sprite: nightmare
+  attack: melee
+  weakness: ice
+  resist: fire
+  family: magical
+  size: large
 - id: dragon_zombie
   name: Dragon Zombie
   num: 92
@@ -1954,6 +2236,223 @@
   weakness: fire
   resist: ice
   family: undead
+  size: large
+- id: sahagin_prince
+  name: Sahagin Prince
+  num: 93
+  description: "A tall sahagin noble with a pearl circlet and twin coral blades. It leads from the front and cuts deep."
+  protect: [earth]
+  stats:
+    hp: 204
+    strength: 38
+    agility: 21
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 47
+    defense: 20
+    magicDefense: 102
+    accuracy: 50
+    evade: 96
+  xpReward: 882
+  goldReward: 882
+  sprite: sahagin_prince
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
+  size: small
+- id: deepeyes
+  name: Deepeyes
+  num: 95
+  description: "A bulbous eye from the abyss trailing luminous tentacles. Its flash blinds a whole crew; its gaze holds one fast."
+  protect: [earth]
+  specials: [{id: gaze, rate: 0.25}, {id: flash, rate: 0.25}]
+  stats:
+    hp: 304
+    strength: 24
+    agility: 9
+    intelligence: 1
+    vitality: 10
+    luck: 5
+    attack: 30
+    defense: 16
+    magicDefense: 156
+    accuracy: 74
+    hits: 2
+    evade: 24
+  xpReward: 3591
+  goldReward: 3591
+  sprite: deepeyes
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
+  size: large
+- id: sea_snake
+  name: Sea Snake
+  num: 96
+  description: "A banded sea serpent with a paddle tail and a fin crest. It hunts the reefs and bites with a crushing jaw."
+  protect: [earth]
+  stats:
+    hp: 224
+    strength: 28
+    agility: 13
+    intelligence: 1
+    vitality: 8
+    luck: 5
+    attack: 35
+    defense: 12
+    magicDefense: 116
+    accuracy: 54
+    evade: 48
+    crit: 0
+  xpReward: 957
+  goldReward: 600
+  sprite: sea_snake
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
+  size: large
+- id: sea_scorpion
+  name: Sea Scorpion
+  num: 97
+  description: "A red armoured sea scorpion with crusher claws. It strikes three times, and its sting carries poison."
+  protect: [earth]
+  attackStatus: [poison]
+  stats:
+    hp: 148
+    strength: 28
+    agility: 15
+    intelligence: 1
+    vitality: 11
+    luck: 5
+    attack: 35
+    defense: 18
+    magicDefense: 86
+    accuracy: 36
+    hits: 3
+    evade: 60
+  xpReward: 639
+  goldReward: 300
+  sprite: sea_scorpion
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
+  size: small
+- id: sea_troll
+  name: Sea Troll
+  num: 98
+  description: "A hunched troll of the tide pools, crusted with barnacles, with kelp for hair. Lightning drives it back."
+  protect: [earth]
+  stats:
+    hp: 216
+    strength: 32
+    agility: 13
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 40
+    defense: 20
+    magicDefense: 110
+    accuracy: 52
+    evade: 48
+  xpReward: 852
+  goldReward: 852
+  sprite: sea_troll
+  attack: melee
+  weakness: lightning
+  family: aquatic
+  size: large
+- id: ghost
+  name: Ghost
+  num: 99
+  description: "A wispy spirit with a skull for a face and grasping hands. Its touch freezes the living where they stand."
+  protect: [status, poison_stone, death, earth]
+  attackStatus: [stun]
+  stats:
+    hp: 180
+    strength: 74
+    agility: 11
+    intelligence: 1
+    vitality: 17
+    luck: 5
+    attack: 93
+    defense: 30
+    magicDefense: 86
+    accuracy: 44
+    evade: 36
+  xpReward: 990
+  goldReward: 990
+  sprite: ghost
+  attack: melee
+  weakness: fire
+  resist: ice
+  family: undead
+  size: small
+- id: water_elemental
+  name: Water Elemental
+  num: 100
+  description: "A living wave that rises in a crest with a face and arms. It strikes like the sea in a storm."
+  protect: [status, poison_stone, death, earth]
+  stats:
+    hp: 300
+    strength: 55
+    agility: 17
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 69
+    defense: 20
+    magicDefense: 130
+    accuracy: 66
+    evade: 72
+  xpReward: 1962
+  goldReward: 800
+  sprite: water_elemental
+  attack: melee
+  weakness: ice
+  resist: fire
+  family: magical
+  size: large
+- id: water_naga
+  name: Water Naga
+  num: 101
+  description: "A blue-scaled naga with fin ears and coral ornaments. She calls down lightning and binds her prey with spells."
+  protect: [earth]
+  attackStatus: [poison]
+  spells: [lit2, hold, slow, dark, lit, lock, slep]
+  stats:
+    hp: 356
+    strength: 7
+    agility: 17
+    intelligence: 22
+    vitality: 6
+    luck: 5
+    attack: 9
+    defense: 8
+    magicDefense: 116
+    accuracy: 70
+    evade: 72
+  xpReward: 2355
+  goldReward: 2355
+  ai:
+    rate: 0.75
+    actions:
+    - {type: magic, spellId: lit2, weight: 1}
+    - {type: magic, spellId: hold, weight: 1}
+    - {type: magic, spellId: slow, weight: 1}
+    - {type: magic, spellId: dark, weight: 1}
+    - {type: magic, spellId: lit, weight: 1}
+    - {type: magic, spellId: lock, weight: 1}
+    - {type: magic, spellId: slep, weight: 1}
+  sprite: water_naga
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
   size: large
 - id: drowned_sovereign
   name: Drowned Sovereign
@@ -1987,6 +2486,395 @@
     attackAnim: heavy
   family: aquatic
   size: boss
+- id: tyrannosaur
+  name: Tyrannosaur
+  num: 103
+  description: "A massive red-brown tyrant lizard with a head like a boulder. Its bite finds the vital spot more often than not."
+  stats:
+    hp: 600
+    strength: 92
+    agility: 15
+    intelligence: 1
+    vitality: 7
+    luck: 5
+    attack: 115
+    defense: 10
+    magicDefense: 200
+    accuracy: 142
+    evade: 60
+    crit: 30
+  xpReward: 7200
+  goldReward: 600
+  sprite: tyrannosaur
+  attack: melee
+  family: dragon
+  size: large
+- id: black_knight
+  name: Black Knight
+  num: 104
+  description: "A knight in plain black plate who has forgotten whom he serves. His two-handed sword swings twice."
+  stats:
+    hp: 260
+    strength: 35
+    agility: 11
+    intelligence: 1
+    vitality: 21
+    luck: 5
+    attack: 44
+    defense: 38
+    magicDefense: 136
+    accuracy: 64
+    hits: 2
+    evade: 36
+  xpReward: 1263
+  goldReward: 1800
+  sprite: black_knight
+  attack: melee
+  size: small
+- id: chimera
+  name: Chimera
+  num: 105
+  description: "A lion with goat and dragon heads, bat wings and a snake for a tail. The dragon head breathes fire on the whole party."
+  protect: [earth]
+  specials: [{id: cremate, rate: 0.5}]
+  stats:
+    hp: 300
+    strength: 24
+    agility: 17
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 30
+    defense: 20
+    magicDefense: 130
+    accuracy: 58
+    hits: 4
+    evade: 72
+  xpReward: 2064
+  goldReward: 2500
+  sprite: chimera
+  attack: melee
+  weakness: ice
+  resist: fire
+  size: large
+- id: guardian
+  name: Guardian
+  num: 106
+  description: "A four-legged bronze sentinel with a single lens for an eye. Its spear arms numb what they strike."
+  protect: [status, poison_stone, death]
+  attackStatus: [stun]
+  stats:
+    hp: 200
+    strength: 20
+    agility: 17
+    intelligence: 1
+    vitality: 22
+    luck: 5
+    attack: 25
+    defense: 40
+    magicDefense: 110
+    accuracy: 48
+    hits: 2
+    evade: 72
+  xpReward: 1224
+  goldReward: 400
+  sprite: guardian
+  attack: melee
+  weakness: lightning
+  size: large
+- id: blue_dragon
+  name: Blue Dragon
+  num: 107
+  description: "A long blue dragon with forked horns and a glowing crest. Its breath is a storm of lightning."
+  protect: [earth]
+  specials: [{id: thunder, rate: 0.5}]
+  stats:
+    hp: 454
+    strength: 74
+    agility: 21
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 92
+    defense: 20
+    magicDefense: 200
+    accuracy: 84
+    evade: 96
+  xpReward: 3274
+  goldReward: 2000
+  sprite: blue_dragon
+  attack: melee
+  resist: lightning
+  family: dragon
+  size: large
+- id: green_dragon
+  name: Green Dragon
+  num: 108
+  description: "A heavy green dragon with a bony frill and swollen throat sacs. Its breath is a cloud of choking venom."
+  protect: [earth]
+  specials: [{id: poison, rate: 0.5}]
+  stats:
+    hp: 353
+    strength: 58
+    agility: 21
+    intelligence: 1
+    vitality: 10
+    luck: 5
+    attack: 72
+    defense: 16
+    magicDefense: 200
+    accuracy: 66
+    evade: 96
+  xpReward: 4068
+  goldReward: 5000
+  sprite: green_dragon
+  attack: melee
+  weakness: ice
+  family: dragon
+  size: large
+- id: stone_golem
+  name: Stone Golem
+  num: 109
+  description: "A giant of carved stone blocks covered in runes. It hits like a falling wall and shrugs off most spells."
+  protect: [status, poison_stone, death, earth]
+  spells: [slow]
+  stats:
+    hp: 200
+    strength: 56
+    agility: 9
+    intelligence: 4
+    vitality: 10
+    luck: 5
+    attack: 70
+    defense: 16
+    magicDefense: 110
+    accuracy: 48
+    evade: 24
+  xpReward: 2385
+  goldReward: 1000
+  ai:
+    rate: 0.38
+    actions:
+    - {type: magic, spellId: slow, weight: 1}
+  sprite: stone_golem
+  attack: melee
+  elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  family: magical
+  size: large
+- id: air_elemental
+  name: Air Elemental
+  num: 110
+  description: "A whirlwind with a stern face, full of spinning debris. Few blades ever find it."
+  protect: [status, poison_stone, death, earth]
+  stats:
+    hp: 358
+    strength: 42
+    agility: 29
+    intelligence: 1
+    vitality: 4
+    luck: 5
+    attack: 53
+    defense: 4
+    magicDefense: 130
+    accuracy: 60
+    evade: 144
+  xpReward: 1614
+  goldReward: 807
+  sprite: air_elemental
+  attack: melee
+  family: magical
+  size: large
+- id: spirit_naga
+  name: Spirit Naga
+  num: 111
+  description: "A purple naga sorceress with a cobra-hood headdress and a jewelled staff. She hides, heals and hexes."
+  attackStatus: [poison]
+  spells: [ruse, mute, slow, dark, slep, fire, lit, heal]
+  stats:
+    hp: 420
+    strength: 6
+    agility: 13
+    intelligence: 25
+    vitality: 10
+    luck: 5
+    attack: 7
+    defense: 16
+    magicDefense: 144
+    accuracy: 86
+    evade: 48
+  xpReward: 3489
+  goldReward: 4000
+  ai:
+    rate: 0.75
+    actions:
+    - {type: magic, spellId: ruse, weight: 1}
+    - {type: magic, spellId: mute, weight: 1}
+    - {type: magic, spellId: slow, weight: 1}
+    - {type: magic, spellId: dark, weight: 1}
+    - {type: magic, spellId: slep, weight: 1}
+    - {type: magic, spellId: fire, weight: 1}
+    - {type: magic, spellId: lit, weight: 1}
+    - {type: magic, spellId: heal, weight: 1}
+  sprite: spirit_naga
+  attack: melee
+  family: magical
+  size: large
+- id: death_knight
+  name: Death Knight
+  num: 112
+  description: "A skeletal knight in spiked dark plate. His runed blade strips wards away, and his spells kill outright."
+  protect: [status, poison_stone, death]
+  spells: [xfer, nuke, xxxx, blnd]
+  stats:
+    hp: 190
+    strength: 44
+    agility: 12
+    intelligence: 13
+    vitality: 18
+    luck: 5
+    attack: 55
+    defense: 32
+    magicDefense: 174
+    accuracy: 46
+    evade: 42
+  xpReward: 2700
+  goldReward: 3000
+  sprite: death_knight
+  attack: melee
+  size: small
+- id: earth_medusa
+  name: Earth Medusa
+  num: 113
+  description: "A medusa of living rock with a crown of stone snakes. A flurry of small blows numbs; her glance petrifies."
+  protect: [earth]
+  attackStatus: [stun]
+  specials: [{id: glance, rate: 0.5}]
+  stats:
+    hp: 96
+    strength: 9
+    agility: 17
+    intelligence: 1
+    vitality: 8
+    luck: 5
+    attack: 11
+    defense: 12
+    magicDefense: 70
+    accuracy: 24
+    hits: 10
+    evade: 72
+  xpReward: 1218
+  goldReward: 1218
+  sprite: earth_medusa
+  attack: melee
+  weakness: fire
+  resist: ice
+  family: magical
+  size: small
+- id: black_flan
+  name: Black Flan
+  num: 114
+  description: "A glossy black pudding with a few yellow eyes. Blades sink in and do nothing; its touch poisons."
+  protect: [status, poison_stone, death, earth]
+  attackStatus: [poison]
+  stats:
+    hp: 156
+    strength: 39
+    agility: 9
+    intelligence: 1
+    vitality: 99
+    luck: 5
+    attack: 49
+    defense: 255
+    magicDefense: 86
+    accuracy: 38
+    evade: 24
+  xpReward: 1101
+  goldReward: 900
+  sprite: black_flan
+  attack: melee
+  elementalProfile: {weaknesses: [fire], resistances: [ice, lightning], immunities: [], absorbs: []}
+  size: small
+- id: soldier
+  name: Soldier
+  num: 115
+  description: "A heavy bronze war machine, riveted and tireless, with a blade for an arm. One blow can fell a hero."
+  protect: [status, poison_stone, death, earth]
+  stats:
+    hp: 400
+    strength: 82
+    agility: 21
+    intelligence: 1
+    vitality: 26
+    luck: 5
+    attack: 102
+    defense: 48
+    magicDefense: 160
+    accuracy: 88
+    evade: 96
+  xpReward: 4000
+  goldReward: 2000
+  sprite: soldier
+  attack: melee
+  elementalProfile: {weaknesses: [lightning], resistances: [fire, ice], immunities: [], absorbs: []}
+  size: large
+- id: vampire_lord
+  name: Vampire Lord
+  num: 116
+  description: "An elder vampire, white-haired and gaunt, his cape grown into bat wings. He casts as well as he bites."
+  protect: [status, poison_stone, death, earth]
+  attackStatus: [stun]
+  spells: [afir, mute, ice2, lit2, fir2]
+  specials: [{id: dazzle, rate: 0.19}]
+  stats:
+    hp: 300
+    strength: 72
+    agility: 17
+    intelligence: 16
+    vitality: 16
+    luck: 5
+    attack: 90
+    defense: 28
+    magicDefense: 84
+    accuracy: 40
+    evade: 72
+  xpReward: 2385
+  goldReward: 3000
+  ai:
+    rate: 0.25
+    actions:
+    - {type: magic, spellId: afir, weight: 1}
+    - {type: magic, spellId: mute, weight: 1}
+    - {type: magic, spellId: ice2, weight: 1}
+    - {type: magic, spellId: lit2, weight: 1}
+    - {type: magic, spellId: fir2, weight: 1}
+  sprite: vampire_lord
+  attack: melee
+  weakness: fire
+  resist: ice
+  family: undead
+  size: small
+- id: dark_fighter
+  name: Dark Fighter
+  num: 117
+  description: "A warrior-mage in dark half-plate and a hooded tabard. She heals herself, shields herself and strips your wards."
+  spells: [wall, xfer, hel3, fog2, inv2, cur4, hel2, cur3]
+  stats:
+    hp: 200
+    strength: 32
+    agility: 20
+    intelligence: 25
+    vitality: 21
+    luck: 5
+    attack: 40
+    defense: 38
+    magicDefense: 186
+    accuracy: 44
+    evade: 90
+  xpReward: 3420
+  goldReward: 3420
+  sprite: dark_fighter
+  attack: melee
+  size: small
 - id: warmech
   name: Warmech
   num: 118
@@ -2047,6 +2935,32 @@
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"
   size: boss
+- id: rhyos
+  name: Rhyos
+  num: 120
+  description: "A stone-hided cousin of the chimera with lizard, ram and lion heads. One breath burns; the other turns to stone."
+  protect: [earth]
+  specials: [{id: cremate, rate: 0.25}, {id: stone_breath, rate: 0.25}]
+  stats:
+    hp: 350
+    strength: 32
+    agility: 15
+    intelligence: 1
+    vitality: 11
+    luck: 5
+    attack: 40
+    defense: 18
+    magicDefense: 144
+    accuracy: 68
+    hits: 4
+    evade: 60
+  xpReward: 4584
+  goldReward: 5000
+  sprite: rhyos
+  attack: melee
+  weakness: ice
+  resist: fire
+  size: large
 - id: death_eye
   name: Death Eye
   num: 121
@@ -2117,6 +3031,54 @@
     message: "The Rime Sovereign's skull fractures!"
   family: undead
   size: boss
+- id: purple_worm
+  name: Purple Worm
+  num: 122
+  description: "A colossal violet worm with rows of teeth and a stinging tail. It tunnels under mountains and eats what it finds."
+  protect: [earth]
+  stats:
+    hp: 448
+    strength: 52
+    agility: 11
+    intelligence: 1
+    vitality: 7
+    luck: 5
+    attack: 65
+    defense: 10
+    magicDefense: 200
+    accuracy: 110
+    evade: 36
+    crit: 10
+  xpReward: 4344
+  goldReward: 1000
+  sprite: purple_worm
+  attack: melee
+  size: large
+- id: iron_golem
+  name: Iron Golem
+  num: 123
+  description: "A riveted iron giant with a furnace in its chest. Its toxic smoke can kill a whole party at once."
+  protect: [status, poison_stone, death, earth]
+  specials: [{id: toxic, rate: 0.13}]
+  stats:
+    hp: 304
+    strength: 74
+    agility: 9
+    intelligence: 1
+    vitality: 52
+    luck: 5
+    attack: 93
+    defense: 100
+    magicDefense: 144
+    accuracy: 74
+    evade: 24
+  xpReward: 6717
+  goldReward: 3000
+  sprite: iron_golem
+  attack: melee
+  elementalProfile: {weaknesses: [], resistances: [fire, ice], immunities: [], absorbs: []}
+  family: magical
+  size: large
 - id: ashen_queen_2
   name: Ashen Queen II
   num: 125

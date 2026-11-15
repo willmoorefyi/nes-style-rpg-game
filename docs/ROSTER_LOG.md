@@ -520,7 +520,7 @@ Images used: 263 of 300 (build 263 of 285, fix 0 of 15; ledger guard: 363 Gemini
 
 ## Deferred sprites
 
-- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording. Orchestrator (2026-11-15): no more attempts and no palette variant (the user wants no palette swaps); left for the user.
+- `piranha` (sprite, batch B): **cut (user, 2026-11-15)**: no sprite, `enemies.yaml` or bestiary entry for now (its `monsters.yaml` entry is left as the generator wrote it). History: R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording. Orchestrator (2026-11-15): no more attempts and no palette variant (the user wants no palette swaps); left for the user.
 - `red_piranha` (batch B): R160 and R277 refused, R282 accepted but its hurt sliced on the bottom row; 3 of 3 used, **deferred** (R283; a 0-image re-cut is possible, see "Swimmers").
 - `white_shark` (batch C): R278-R280 accepted but every action cell sliced on the bottom row (or an idle copy); 3 of 3 used, **deferred** (R281; a 0-image re-cut is possible).
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.

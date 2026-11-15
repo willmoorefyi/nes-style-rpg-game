@@ -245,7 +245,7 @@ Body = the rig recipe (section 5). Base imgs = Gemini images without retries. Th
 | 048 | Sphinx | `sphinx` | large | quadruped | B | 1 | tawny lion body, feathered eagle wings, stern human face with a striped headdress |
 | 049 | Rime Sovereign | `lich` | boss | biped | - | 0 | existing: frost knight-king, ice glaive (records 049 and 124) |
 | 050 | Ankheg | `ankheg` | large | arthropod | B | 1 | armoured rust-brown centipede rearing up, huge mandibles, dripping venom |
-| 051 | Piranha | `piranha` | small | swimmer | B | 1 | small silver-green piranha, underbite of needle teeth |
+| 051 | Piranha | `piranha` | small | swimmer | B | 1 | **cut (user, 2026-11-15):** no sprite, enemy or bestiary entry for now. Was: small silver-green piranha, underbite of needle teeth |
 | 052 | Red Piranha | `red_piranha` | small | swimmer | B | 1 | larger blood-red armour-plated piranha, bony head plate, spiny fins |
 | 053 | Crocodile | `crocodile` | large | quadruped | B | 1 | dark green crocodile, open jaws, ridged back, low sprawl |
 | 054 | White Crocodile | `white_crocodile` | large | quadruped | B | 1 | pale albino crocodile, pink eyes, barnacle-crusted back, larger |
