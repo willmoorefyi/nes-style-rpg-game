@@ -2043,17 +2043,18 @@
     cape is part of its body (fins joined to the shoulders and arms) and moves with the motion. Draw only the parts
     named in the description, the same in every cell: no cloth cape or cloak, and no slash trail, smear or motion lines.
   prompt: >-
-    a tall slender regal fish-man with deep violet-blue scales and a pale silver belly, a flowing cape of long
-    translucent purple fins joined to its shoulders and arms, a pearl circlet on its finned head, gold eyes, holding a
-    short curved blade of pink coral in each hand (exactly two blades, one in each hand); centred in its own cell with
-    empty space on both sides
+    a tall slender regal fish-man with deep indigo-blue scales and a pale silver belly, a flowing cape of long
+    sea-green fins with dark outlines joined to its shoulders and arms, a pearl circlet on its finned head, gold eyes, holding a
+    short curved blade of pink coral in each hand (exactly two blades, one in each hand); the fin cape hangs close
+    behind the body in every cell (never flying out behind it); centred in its own cell with empty space on both
+    sides
   attack: >-
     lunging forward and slashing both coral blades down in front of its chest at the heroes, the elbows bent so the
     blades stay well inside the middle cell, exactly two blades as in the idle cell
   hurt: knocked back, the head thrown back, both blades flung out to the sides, still one in each hand
   face: its regal fish face with gold eyes under the pearl circlet is readable
-  extra_negative: a trident, a spear, a shield, armour plates, a cloth cape, a crown, a third blade, an anglerfish lure
-  seeds: [1234]
+  extra_negative: a trident, a spear, a shield, armour plates, a cloth cape, a crown, a third blade, an anglerfish lure, magenta, pink fins, a cape flying out behind
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R226): the attack's fin cape sliced at the raw cell line. Fins sea-green, not purple: bright violet is keyed out with the magenta background (ROSTER_LOG R222)
 - id: white_shark
   # "White Shark" (094): a great white shark, scarred, broader and paler than the shark. SWIMMER PAUSED (ROSTER_LOG
   # R160, plan 6.3): not requested until the swimmer wording fix is ruled on
