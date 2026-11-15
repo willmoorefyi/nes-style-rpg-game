@@ -1364,13 +1364,14 @@
     with claws; heavier and broader than a common crocodile
   attack: >-
     lunging forward low with the broad jaws snapping wide open at the heroes, all four feet on the ground, no taller
-    than half again its idle height, the snout well inside the middle cell
+    than half again its idle height; the body a little shorter than in the idle cell, the tail curled up tight behind
+    the hips (not stretched back), the whole crocodile from tail tip to snout well inside the middle cell
   hurt: >-
     knocked back low, seen from the side as in the idle cell, the jaws snapped shut, the head pulled back, the tail
     thrashing, all four feet down
   face: its broad toothed jaws and pink eye are readable
   extra_negative: water, green scales, dark scales, wings, rearing up, standing upright
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R163): the idle snout sliced at the raw cell line, a top-down twisted hurt
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R163): the idle snout sliced, a top-down hurt; 1235 (R164): the attack tail sliced at the raw cell line
 - id: ochu
   # "Ochu" (055): a carnivorous plant (distinct from the neochu: green, one maw, four smooth vines)
   size: large

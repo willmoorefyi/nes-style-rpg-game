@@ -513,3 +513,5 @@
 {"event": "result", "key": "d2303f1eff8546c049487323", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T05:48:44", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_crocodile", "sheet": "monster_large", "seed": 1234, "key": "e44d3d7cb6075d46835e4d72"}
 {"event": "result", "key": "e44d3d7cb6075d46835e4d72", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T05:49:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "white_crocodile", "sheet": "monster_large", "seed": 1235, "key": "fe83bdf2896a2e477b78b36e"}
+{"event": "result", "key": "fe83bdf2896a2e477b78b36e", "ok": true}
