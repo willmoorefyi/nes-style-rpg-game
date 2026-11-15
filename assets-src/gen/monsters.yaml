@@ -2469,9 +2469,10 @@
     elbows bent so the hands stay well inside its own cell; tighten or loosen the coils; the tail tip stays on the
     ground beside the coils. Draw only the parts named in the description: no spell effects, smear or motion lines.
   prompt: >-
-    a stony serpent-tailed woman: a human upper body of grey stone with cracked rock-plate scales, a pale grey face
-    with two glowing amber eyes clearly visible, a crown of short stiff stone snakes frozen upright around her head,
-    rough granite armbands, two arms, no legs: below the waist a long grey rock-scaled snake tail coiled on the ground;
+    a stony serpent-tailed woman: a human upper body of pale grey stone with cracked rock-plate scales, a smooth pale
+    face with two large bright glowing orange eyes, each a clear bright spot, a crown of short stiff dark charcoal stone
+    snakes frozen upright around her head, clearly darker than the face, rough brown granite armbands, two arms, no
+    legs: below the waist a long dark grey rock-scaled snake tail with a pale belly coiled on the ground;
     centred in its own cell with empty space on both sides, the stone crown well below the top of the grey box
   attack: >-
     leaning forward over the coils toward the heroes, both stone hands reaching out with the elbows bent and the
@@ -2480,8 +2481,8 @@
     knocked back over the coils, the head tilted back with the face and amber eyes still visible, the arms flung up,
     a crack across the chest
   face: her pale grey stone face with two glowing amber eyes under the stone snake crown is readable
-  extra_negative: green skin, writhing snakes, bronze, a weapon, legs, wings, moss, a hidden face
-  seeds: [1234]
+  extra_negative: green skin, writhing snakes, bronze, a weapon, legs, wings, moss, a hidden face, text, labels
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R263): the amber eyes lost in the grey-on-grey cut
 - id: black_flan
   # "Black Flan" (114): a glossy black pudding blob with a few yellow eyes (distinct from slime, ooze, jelly)
   size: small
