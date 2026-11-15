@@ -503,3 +503,5 @@
 {"event": "result", "key": "e1188d52fec6ae8853d808ef", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}
 {"event": "attempt", "ts": "2026-11-15T05:46:26", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "piranha", "sheet": "monster_small", "seed": 1235, "key": "1fb82da3acde91f9bbe2f30c"}
 {"event": "result", "key": "1fb82da3acde91f9bbe2f30c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T05:46:52", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "piranha", "sheet": "monster_small", "seed": 1236, "key": "ad44028f068532ce2db485af"}
+{"event": "result", "key": "ad44028f068532ce2db485af", "ok": false, "error": "gemini-3.1-flash-lite-image returned no image: finish_reason=FinishReason.PROHIBITED_CONTENT"}
