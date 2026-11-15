@@ -1,0 +1,115 @@
+# Gargoyle (pass R batch A, FW-5 prototype: biped wings). A crouching stone gargoyle with two bat wings behind the
+# shoulders. body: biped with the FW-5 wing joints wsh -> wel -> wtip (uwing_*, fwing_*: drawn behind the body,
+# present only where marked); the wing joints join the wind / follow / cast sets, so the wings lift with the wind-up
+# toward the attack key's raised wings. The near wing shows only as the peak behind the head.
+sprite: gargoyle
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+keyframes:
+  idle:
+    crown: [50, 14]
+    neck: [49, 32]
+    chest: [42, 38]
+    hip: [40, 50]
+    sh_n: [50, 36]
+    el_n: [53, 43]
+    hand_n: [62, 45]
+    sh_f: [34, 36]
+    el_f: [34, 44]
+    hand_f: [42, 44]
+    hip_n: [46, 52]
+    knee_n: [57, 60]
+    foot_n: [54, 72]
+    toe_n: [57, 73]
+    hip_f: [36, 53]
+    knee_f: [33, 62]
+    foot_f: [25, 72]
+    toe_f: [28, 75]
+    wsh_f: [36, 27]
+    wel_f: [37, 10]
+    wtip_f: [16, 32]
+    wsh_n: [52, 17]
+    wel_n: [55, 13]
+    wtip_n: [57, 10]
+  attack:
+    crown: [52, 16]
+    neck: [50, 33]
+    chest: [42, 40]
+    hip: [38, 52]
+    sh_n: [46, 37]
+    el_n: [55, 42]
+    hand_n: [67, 42]
+    sh_f: [35, 37]
+    el_f: [34, 44]
+    hand_f: [37, 46]
+    hip_n: [44, 54]
+    knee_n: [54, 58]
+    foot_n: [47, 70]
+    toe_n: [50, 71]
+    hip_f: [33, 54]
+    knee_f: [30, 64]
+    foot_f: [22, 72]
+    toe_f: [24, 75]
+    wsh_f: [36, 25]
+    wel_f: [38, 7]
+    wtip_f: [12, 26]
+    wsh_n: [46, 17]
+    wel_n: [50, 11]
+    wtip_n: [55, 4]
+  hurt:
+    crown: [44, 10]
+    neck: [44, 26]
+    chest: [44, 34]
+    hip: [44, 48]
+    sh_n: [50, 27]
+    el_n: [58, 20]
+    hand_n: [66, 10]
+    sh_f: [32, 26]
+    el_f: [22, 22]
+    hand_f: [13, 14]
+    hip_n: [48, 52]
+    knee_n: [58, 58]
+    foot_n: [56, 71]
+    toe_n: [59, 72]
+    hip_f: [38, 53]
+    knee_f: [33, 62]
+    foot_f: [28, 73]
+    toe_f: [30, 75]
+    wsh_f: [25, 30]
+    wel_f: [18, 29]
+    wtip_f: [16, 44]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+masks:
+  fwing_f:
+    idle: [[13, 33], [16, 22], [24, 15], [30, 11], [39, 8], [40, 10], [37, 17], [36, 26], [30, 32], [24, 34]]
+    attack: [[11, 27], [14, 18], [22, 12], [34, 5], [41, 5], [37, 15], [36, 25], [30, 30], [20, 29]]
+    hurt: [[11, 28], [22, 26], [26, 30], [25, 44], [13, 47], [11, 40]]
+  fwing_n:
+    idle: [[51, 15], [55, 9], [59, 9], [58, 17], [54, 19]]
+    attack: [[42, 13], [48, 6], [54, 3], [58, 5], [53, 15], [46, 18], [42, 17]]
+holds: []
+paint:                         # 1-2 px cracks closed with outline ink (wing root, hip, far forearm)
+  - {frame: atk_wind2, xy: [[38, 27]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[30, 50]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[28, 15], [38, 27]], rgb: [6, 4, 10]}
+frames:
+  atk_wind1:                   # the striking arm back, head back; the wings ride the chest (tips lift 1 px)
+    moves: [crown, neck, chest, sh_n, el_n, hand_n]
+    tweaks: {crown: [-1, 0], sh_n: [-1, 0], el_n: [-2, 0], hand_n: [-3, 0], wtip_f: [0, -1], wtip_n: [0, -1]}
+  atk_wind2:
+    moves: [crown, neck, chest, sh_n, el_n, hand_n]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [-3, 0], el_n: [-4, 0], hand_n: [-5, 0], wtip_f: [0, -2], wtip_n: [0, -2]}
+  atk_mid:                     # the claw arrives: head and chest 35 % back, the striking arm translated 2 back
+    moves: [crown, chest, wsh_f, wel_f, wtip_f, wsh_n, wel_n, wtip_n]
+    tweaks: {knee_f: [2, 0], foot_f: [2, 0], toe_f: [2, 0], sh_n: [-1, 0], el_n: [-2, 0], hand_n: [-2, 0]}
+  hurt_in1:                    # flinch: head back, fists up 3, the wings fold toward the hurt key
+    moves: [crown, chest, wsh_f, wel_f, wtip_f]
+    tweaks: {crown: [-2, 0], el_n: [0, -2], hand_n: [1, -3]}
+  hurt_in2:                    # the hurt pose easing back: arms stay flung, head and chest settle
+    moves: [crown, chest]

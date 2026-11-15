@@ -1,0 +1,139 @@
+# Fire hydra (pass R batch B, FW-5 multi-head, second prototype): a heavy crimson three-headed hydra. body:
+# quadruped + heads 2 and 3 (neck<i> chain, head<i> rigid). Head 1 (low right) leads; translation-first like hydra.
+sprite: fire_hydra
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+lead_heads: [1]
+keyframes:
+  idle:
+    hip: [35, 95]
+    back: [55, 90]
+    chest: [80, 88]
+    neck: [100, 85]
+    head: [110, 82]
+    snout: [125, 86]
+    neck2: [98, 68]
+    head2: [112, 62]
+    snout2: [130, 66]
+    neck3: [78, 65]
+    head3: [82, 55]
+    snout3: [93, 58]
+    tail0: [25, 92]
+    tail1: [15, 85]
+    tail2: [10, 72]
+    tail_tip: [9, 64]
+    sh_n: [88, 100]
+    el_n: [92, 108]
+    paw_n: [95, 116]
+    ftoe_n: [105, 118]
+    hip_n: [50, 100]
+    knee_n: [55, 110]
+    foot_n: [60, 118]
+    toe_n: [70, 120]
+    hip_f: [30, 100]
+    knee_f: [28, 110]
+    foot_f: [30, 118]
+    toe_f: [36, 120]
+  attack:
+    hip: [30, 95]
+    back: [55, 90]
+    chest: [80, 92]
+    neck: [88, 100]
+    head: [92, 100]
+    snout: [102, 98]
+    neck2: [100, 80]
+    head2: [113, 78]
+    snout2: [130, 85]
+    neck3: [80, 60]
+    head3: [100, 38]
+    snout3: [112, 45]
+    tail0: [20, 90]
+    tail1: [10, 80]
+    tail2: [6, 70]
+    tail_tip: [5, 64]
+    sh_n: [92, 102]
+    el_n: [95, 110]
+    paw_n: [100, 115]
+    ftoe_n: [108, 117]
+    hip_n: [45, 102]
+    knee_n: [50, 112]
+    foot_n: [57, 120]
+    toe_n: [65, 121]
+    hip_f: [25, 102]
+    knee_f: [22, 110]
+    foot_f: [20, 117]
+    toe_f: [26, 119]
+  hurt:
+    hip: [30, 100]
+    back: [50, 92]
+    chest: [70, 85]
+    neck: [95, 72]
+    head: [108, 68]
+    snout: [123, 70]
+    neck2: [80, 52]
+    head2: [92, 38]
+    snout2: [110, 36]
+    neck3: [45, 55]
+    head3: [55, 38]
+    snout3: [65, 35]
+    tail0: [20, 98]
+    tail1: [8, 90]
+    tail2: [6, 82]
+    tail_tip: [12, 76]
+    sh_n: [80, 100]
+    el_n: [85, 110]
+    paw_n: [90, 117]
+    ftoe_n: [98, 120]
+    hip_n: [48, 105]
+    knee_n: [50, 112]
+    foot_n: [55, 120]
+    toe_n: [62, 121]
+    hip_f: [25, 105]
+    knee_f: [20, 112]
+    foot_f: [20, 118]
+    toe_f: [26, 120]
+frames:
+  atk_wind1:
+    moves: []
+    tweaks: {neck: [-1, 0], head: [-2, 0], snout: [-2, 0], head2: [-1, 0], snout2: [-1, 0], head3: [-1, 0], snout3: [-1, 0]}
+  atk_wind2:                   # back 4 / 2, the lead head up 1, the body sinks 1
+    moves: []
+    dy: 1
+    tweaks: {neck: [-2, 0], head: [-4, -1], snout: [-4, -1], neck2: [-1, 0], head2: [-2, 0], snout2: [-2, 0],
+             neck3: [-1, 0], head3: [-2, 0], snout3: [-2, 0]}
+  atk_mid:
+    moves: []
+    tweaks: {neck: [-2, 0], head: [-4, 0], snout: [-4, 0], head2: [-3, 0], snout2: [-3, 0], neck3: [-1, 3],
+             head3: [-3, 6], snout3: [-3, 6], foot_n: [2, 0], toe_n: [2, 0]}
+  atk_follow:
+    moves: []
+    tweaks: {head: [2, 1], snout: [2, 1], head2: [1, 0], snout2: [1, 0], head3: [2, 0], snout3: [2, 0]}
+  atk_recover:
+    moves: []
+    tweaks: {head: [2, 0], snout: [2, 0], neck: [1, 0], head2: [1, 0], snout2: [1, 0], head3: [2, 0], snout3: [2, 0]}
+  hurt_in1:                    # every head recoils; the body rocks 3 back toward the hurt key, head 3 rears 4
+    moves: []
+    dx: -2
+    tweaks: {head: [-3, -1], snout: [-3, -1], head2: [-2, -1], snout2: [-2, -1], neck3: [-2, -2], head3: [-3, -4],
+             snout3: [-3, -4], hip_f: [2, 0]}
+  hurt_in2:                    # the hurt key easing: the body 3 forward, the heads 2 forward, head 3 down 4
+    moves: []
+    dx: 2
+    tweaks: {head: [2, 0], snout: [2, 0], head2: [2, 0], snout2: [2, 0], neck3: [1, 1], head3: [3, 2], snout3: [3, 2], hip_f: [-2, 0]}
+  daze:
+    dy: 0
+  daze_b:
+    dy: 0
+holds: []
+paint:                         # 1 px cracks between the neck chains inked, one 15 px daze pocket filled (autopaint.py, reviewed)
+  - {frame: atk_wind1, xy: [[63, 64]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[58, 61]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[107, 73]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[90, 54], [98, 54], [92, 56], [93, 56]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[109, 70], [105, 71], [106, 71], [107, 71], [108, 71], [109, 71], [110, 71], [111, 71], [104, 72], [105, 72], [106, 72], [107, 72], [108, 72], [109, 72], [106, 73]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[104, 72], [86, 108]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[109, 70], [105, 71], [106, 71], [107, 71], [108, 71], [109, 71], [110, 71], [111, 71], [104, 72], [105, 72], [106, 72], [107, 72], [108, 72], [109, 72], [106, 73]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[104, 72], [86, 108]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[89, 55], [90, 55], [91, 55], [88, 56], [89, 56], [90, 56], [91, 56], [87, 57], [88, 57], [89, 57], [90, 57], [86, 58], [87, 58], [88, 58], [89, 58], [86, 59], [87, 59], [88, 59], [86, 60], [87, 60], [88, 60], [86, 61], [87, 61], [88, 61]], rgb: [6, 4, 10]}

@@ -291,10 +291,10 @@ def _painted_panel(rgb: np.ndarray, bg: np.ndarray, tol: int = 12) -> np.ndarray
     return PX.flood_bg(seed, 10.0) & near
 
 
-def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
-    """Foreground of one cell. Background = magenta (the requested key) plus anything near-white or magenta connected
-    to the cell border (Gemini sometimes draws magenta panels on a white page). Then keep the main figure: the largest
-    blob and any blob overlapping its bounding box (staffs, held items); drop stray blobs outside it (shadows)."""
+def _foreground(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
+    """Every non-background pixel of a cell (or of the whole strip): magenta (the requested key) plus anything
+    near-white or guide-grey connected to the border is background (Gemini sometimes draws magenta panels on a white
+    page), then a copied guide panel and the key fringe."""
     bg = PX.magenta_bg(rgb)
     if haze:   # opt-in (monsters.yaml `haze: true`): blended mist touching the background is background too
         bg = bg | _haze(rgb)
@@ -306,6 +306,13 @@ def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     fg = ~(bg | (loose & border_bg))
     fg &= ~_painted_panel(rgb, ~fg)
     fg &= ~PX.magenta_fringe(rgb, fg)
+    return fg
+
+
+def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
+    """Foreground of one cell (`_foreground`), then keep the main figure: the largest blob and any blob overlapping
+    its bounding box (staffs, held items); drop stray blobs outside it (shadows)."""
+    fg = _foreground(rgb, haze)
     lab, n = PX.components(fg)
     if n == 0:
         return fg
@@ -351,14 +358,96 @@ def native_art(raw: Image.Image, guide_width: int = S.MONSTER_GUIDE_CELL[0] * 3)
     return Image.fromarray(rgb).resize(size, Image.Resampling.BOX), meta
 
 
+CROSS_SHARE = 0.30          # a piece crossing a third line moves whole to its majority cell only if the minority
+                            # share is at most this (more = two figures fused across the line: keep the thirds)
+
+
+def split_cells(a: np.ndarray, n_cells: int, haze: bool = False, split: str = "gaps") -> tuple[list[np.ndarray], list[int], list[dict]]:
+    """Cut a raw strip of `n_cells` poses into cells. `split="thirds"` is the pre-roster cutter: fixed equal columns.
+    `"gaps"` (ROSTER_LOG batch B, for future cuts only): a foreground piece (4-connected) that crosses a nominal
+    line is moved whole into the cell holding most of its pixels: that cell is widened to the piece's extent and every
+    other pixel in the widened band becomes key colour, so a reach over the line is not sliced flat and the
+    neighbour's stray tip is not left at its border. With no piece crossing any line the cells are exactly the
+    thirds. A piece with more than CROSS_SHARE of its pixels on the minority side (two figures fused) keeps the thirds.
+    Returns the cells, each cell's left offset from its nominal left column (native px), and one report per line."""
+    h, w, _ = a.shape
+    edges = [round(i * w / n_cells) for i in range(n_cells + 1)]
+    nominal = [a[:, edges[i]:edges[i + 1]] for i in range(n_cells)]
+    if split == "thirds" or n_cells < 2:
+        return nominal, [0] * n_cells, []
+    fg = _foreground(a, haze)
+    lab, _ = PX.components(fg)
+    owner: dict[int, int] = {}                 # crossing piece label -> cell index
+    lines = []
+    for i in range(1, n_cells):
+        x = edges[i]
+        both = (lab[:, x - 1] == lab[:, x]) & (lab[:, x] > 0)
+        crossing = sorted({int(v) for v in lab[both, x]})
+        rep = {"line": x, "pieces": len(crossing), "moved": []}
+        for p in crossing:
+            xs = np.where(lab == p)[1]
+            counts = [int(((xs >= edges[k]) & (xs < edges[k + 1])).sum()) for k in range(n_cells)]
+            k = int(np.argmax(counts))
+            minority = 1.0 - counts[k] / max(1, sum(counts))
+            if minority <= CROSS_SHARE:
+                owner[p] = k
+                rep["moved"].append({"to": k, "px": sum(counts) - counts[k], "x": [int(xs.min()), int(xs.max())]})
+            else:
+                rep["fused"] = True
+        lines.append(rep)
+    if not owner:
+        return nominal, [0] * n_cells, lines
+    cells, offs = [], []
+    for k in range(n_cells):
+        mine = [p for p, c in owner.items() if c == k]
+        x0, x1 = edges[k], edges[k + 1]
+        for p in mine:
+            xs = np.where(lab == p)[1]
+            x0, x1 = min(x0, int(xs.min())), max(x1, int(xs.max()) + 1)
+        c = a[:, x0:x1].copy()
+        cl = lab[:, x0:x1]
+        cols = np.arange(x0, x1)[None, :].repeat(h, 0)
+        outside = (cols < edges[k]) | (cols >= edges[k + 1])
+        foreign = np.isin(cl, [p for p, o in owner.items() if o != k])        # moved pieces of other cells
+        stray = outside & (cl > 0) & ~np.isin(cl, mine)                      # the widened band's other pixels
+        c[foreign | stray] = (255, 0, 255)
+        cells.append(c)
+        offs.append(x0 - edges[k])
+    return cells, offs, lines
+
+
+def flat_edges(frame: Image.Image, run: int = 3) -> list[tuple[int, int, int]]:
+    """Cut check (ROSTER_LOG batch B): straight vertical runs of at least `run` edge pixels in one column, open to the
+    left or right, with no outline ink: the signature of a limb sliced flat by a cell line. [(x, y0, y1), ...]"""
+    a = np.asarray(frame.convert("RGBA"))
+    op = a[..., 3] > 0
+    ink = op & np.all(a[..., :3] == np.array(PX.OUTLINE), 2)
+    pad = np.pad(op, 1)
+    out = []
+    for side in (-1, 1):
+        open_side = op & ~pad[1:-1, 1 + side:pad.shape[1] - 1 + side]
+        bare = open_side & ~ink
+        for x in np.where(bare.any(0))[0]:
+            col = np.concatenate([[False], bare[:, x], [False]])
+            d = np.diff(col.astype(np.int8))
+            for y0, y1 in zip(np.where(d == 1)[0], np.where(d == -1)[0]):
+                if y1 - y0 >= run:
+                    out.append((int(x), int(y0), int(y1 - 1)))
+    return sorted(set(out))
+
+
 def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: int = 16,
         seed: int = 0, n_cells: int = 3, cell: int | None = None,
-        foot_row: int | None = None, haze: bool = False) -> tuple[list[Image.Image], dict]:
-    """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell)."""
+        foot_row: int | None = None, haze: bool = False, split: str = "gaps") -> tuple[list[Image.Image], dict]:
+    """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
+    splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
+    approved sheets are never re-cut)."""
     native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
-    cells = [a[:, round(i * w / n_cells):round((i + 1) * w / n_cells)] for i in range(n_cells)]
+    cells, offs, lines = split_cells(a, n_cells, haze, split)
+    if any(offs) or any(c.shape[1] != round((i + 1) * w / n_cells) - round(i * w / n_cells) for i, c in enumerate(cells)):
+        info["split"] = lines
     masks = [_figure_mask(c, haze) for c in cells]
     heights = []
     for m in masks:
@@ -378,7 +467,8 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         # dropping whole sprite pixels, as the character resample path does
         rgb_raw = np.asarray(raw.convert("RGB"))
         rh, rw, _ = rgb_raw.shape
-        raw_cells = [rgb_raw[:, round(i * rw / n_cells):round((i + 1) * rw / n_cells)] for i in range(n_cells)]
+        spans = [(round(i * w / n_cells) + o, round(i * w / n_cells) + o + c.shape[1]) for i, (c, o) in enumerate(zip(cells, offs))]
+        raw_cells = [rgb_raw[:, round(x0 * rw / w):round(x1 * rw / w)] for x0, x1 in spans]
         raw_masks = [np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize((rc.shape[1], rc.shape[0]),
                                 Image.Resampling.NEAREST)) > 0 for rc, m in zip(raw_cells, masks)]
         detail = np.concatenate([rc[PX.detail_mask(rc, rm, rc.shape[0] / max(1, c0.shape[0]))]
@@ -415,11 +505,15 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
 
     c = cell or band.cell
     foot = foot_row if foot_row is not None else band.foot_row
+    # a gap-split cell starts left of its nominal column (split_cells): its pixels sit `ox` further right in the
+    # nominal frame, so lunges and recoils stay relative to the idle pose (all 0 for the thirds)
+    oxs = [int(round(o * f)) for o in offs]
     ix0, iy0, ix1, iy1 = bbox(figs[0])
+    ix0, ix1 = ix0 + oxs[0], ix1 + oxs[0]
     # cell width: the band's square cell, widened (height unchanged) when a lunge or a long body needs more room;
     # one horizontal shift for all frames keeps lunges and recoils relative to the idle pose
-    lo_x = min(bbox(fg_)[0] for fg_ in figs)
-    hi_x = max(bbox(fg_)[2] for fg_ in figs)
+    lo_x = min(bbox(fg_)[0] + o for fg_, o in zip(figs, oxs))
+    hi_x = max(bbox(fg_)[2] + o for fg_, o in zip(figs, oxs))
     cw = max(c, hi_x - lo_x + 1 + 4)
     cw += cw % 2
     dx = cw // 2 - (ix0 + ix1 + 1) // 2
@@ -428,7 +522,9 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     dy_shared = foot - iy1
     frames, clipped = [], []
     info["cell_px"] = (cw, c)
+    dx0 = dx
     for k, fig in enumerate(figs):
+        dx = dx0 + oxs[k]
         x0, y0, x1, y1 = bbox(fig)
         dy = dy_shared if floating else foot - y1
         out = np.zeros((c, cw, 4), np.uint8)
@@ -457,8 +553,10 @@ def frame_report(frames: list[Image.Image], band: S.MonsterBand) -> dict:
     idle = alpha[0].sum() or 1
     diff = [round(float((alpha[0] ^ alpha[k]).sum()) / idle, 2) for k in range(1, len(alpha))]
     outline = all((x[m][:, :3] == np.array(PX.OUTLINE)).all(1).any() for x, m in zip(arr, alpha))
+    flat = [flat_edges(f) for f in frames]
     return {"heights": heights, "bottoms": bottoms, "colours": max(colours), "outline": outline,
             "pose_diff": diff,
+            "flat_edges": flat, "edges_ok": not any(flat),       # sliced-flat limbs (no outline ink on a straight edge)
             "height_ok": all(band.height[0] * (1 - HEIGHT_TOLERANCE) <= hh <= band.height[1] * (1 + HEIGHT_TOLERANCE)
                              for hh in heights),
             "diff_ok": all(d >= 0.15 for d in diff)}

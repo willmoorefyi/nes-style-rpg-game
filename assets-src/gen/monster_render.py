@@ -35,6 +35,8 @@ def frame_options(rig, name: str, over: dict) -> tuple[dict[str, float], str]:
     """({part: scale}, sampler) of one frame; a bad value raises ValueError naming the rig and frame."""
     who = f"rig {rig.cfg.get('sprite')} frame {name}"
     sampler = over.get("sampler", rig.sampler)
+    if getattr(rig, "preset", None) == "mechanical" and sampler != "nearest":    # FW-5: the preset is nearest only
+        raise ValueError(f"{who}: preset mechanical takes sampler nearest, not {sampler!r}")
     if sampler not in SAMPLERS:
         raise ValueError(f"{who}: sampler {sampler!r} is not one of {SAMPLERS}")
     scales = {}
@@ -163,3 +165,39 @@ def breath(rig, img: np.ndarray, labels: np.ndarray | None, floating: bool):
         lab[:cut] = -1
         lab[1:cut + 1] = np.where(keep[..., 0], ul, lab[1:cut + 1])
     return out, lab
+
+
+MAX_BRIGHTEN = 3
+
+
+def brighten(rig, name: str, over: dict, img: np.ndarray, labels: np.ndarray, segs: dict, arrs: dict) -> np.ndarray:
+    """FW-7 (docs/ROSTER_PLAN.md 5.3, hollow_seraph halo): `frames.<f>.brighten: {part: n}` moves every non-outline
+    pixel of a kind fx part n steps (1..MAX_BRIGHTEN) up its own colour ramp: the distinct colours the part
+    has in the approved keyframes, one ramp per hue family (warm: r - b > 20, else cool), each ordered by luminance
+    (ties by RGB). Every output colour is an approved colour of
+    the part, so the palette lock holds; the outline ink and the alpha are untouched. Without the key nothing runs."""
+    from gen import pixelize as PX
+    who = f"rig {rig.cfg.get('sprite')} frame {name}"
+    names = list(rig.parts)
+    for part, n in (over.get("brighten") or {}).items():
+        if part not in rig.parts or rig.parts[part]["kind"] != "fx":
+            raise ValueError(f"{who}: brighten on {part!r}; only kind fx parts brighten")
+        if not (isinstance(n, int) and 1 <= n <= MAX_BRIGHTEN):
+            raise ValueError(f"{who}: brighten {part} {n!r} is not a whole step 1..{MAX_BRIGHTEN}")
+        cols = set()
+        for kf, (plab, pnames) in segs.items():
+            if part in pnames:
+                m = plab == pnames.index(part)
+                cols |= {tuple(c) for c in arrs[kf][m][:, :3].tolist()}
+        cols.discard(tuple(PX.OUTLINE))
+        step = {}
+        for fam in (True, False):                        # warm (gold, ember) and cool (steel, white) ramps apart
+            ramp = sorted((c for c in cols if (c[0] - c[2] > 20) == fam),
+                          key=lambda c: (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2], c))
+            step.update({c: ramp[min(i + n, len(ramp) - 1)] for i, c in enumerate(ramp)})
+        ys, xs = np.nonzero((labels == names.index(part)) & (img[..., 3] > 0))
+        for y, x in zip(ys, xs):
+            c = tuple(int(v) for v in img[y, x, :3])
+            if c in step:
+                img[y, x, :3] = step[c]
+    return img

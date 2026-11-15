@@ -81,7 +81,12 @@ python3 -I assets-src/gen/approve.py lich boss_attack
 ```
 
 Output: `assets-src/gen/out/gemini/<id>/<seed>/` (`*_guide`, `*_raw`, the cut sheet, `review.png`, `frame_report`:
-heights, bottoms, colours, outline, pose_diff). `approve.py` writes `approved/<id>/monster_<size>.{png,json}` or
+heights, bottoms, colours, outline, pose_diff, `flat_edges` / `edges_ok`). **The 3-pose cutter splits at the figure gaps**
+(`monster.split_cells`, since roster batch C): a piece that crosses a third line of the raw moves whole into the cell
+holding most of it (that cell widens; `frame_report` lists it under `split`), so a reach is no longer sliced flat; with
+nothing crossing, the cut is the old fixed thirds byte for byte, and two figures fused across a line keep the thirds.
+`flat_edges` flags a straight run of 3+ edge pixels with no outline ink (a slice). Approved sheets were cut with the
+thirds (`cut(..., split="thirds")`) and are never re-cut. `approve.py` writes `approved/<id>/monster_<size>.{png,json}` or
 `boss_<pose>.*` and un-ignores the raw render; commit those, their `cache/<key>.{png,json}` and `ledger.jsonl`.
 
 **Base-sheet review checklist.** All must hold before you approve. A wrong base sheet makes every in-between harder.
@@ -89,6 +94,7 @@ heights, bottoms, colours, outline, pose_diff). `approve.py` writes `approved/<i
 - [ ] The figure height is in the band (±10 %). The lowest opaque row is exactly the band's feet row in every frame.
 - [ ] No opaque pixel on the 1 px border, and **headroom** for overshoots (`atk_follow`, `cast_release` go 10 % past
       the key): edge-to-edge attacks (goblin x2-78 of 80, lich x9-190 of 200) forced clamps and settles.
+- [ ] `edges_ok` (no limb, weapon, snout or tail sliced flat; compare the raw if `flat_edges` names a run).
 - [ ] Every frame faces right; attack and hurt each differ from idle by ≥ 15 % (`pose_diff`).
 - [ ] Props drawn whole and attached. A prop that appears or vanishes between keys costs carry rules (D8) or a pop.
 - [ ] No grey guide box, no stray props or sparks outside the figure, a readable face; bosses: the four pose files
@@ -161,6 +167,29 @@ Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and e
   bridge (scorpion, black_widow): regenerate a ground-level hurt or escalate.
 - **Any body:** `frames.idle_b.tweaks` (≤ 1 px per component) for wing flutter or robe sway.
 
+FW-5 options (`rig.py` `OPT_PARTS` / `_fw5`; a part exists only when the rig marks all its joints in some keyframe,
+so a rig that marks none is byte-identical):
+
+- **Biped wings** (gargoyle, horned devil, chaos): `wsh_<s> → wel_<s> → wtip_<s>` from `chest` (s = n, f) give
+  `uwing_<s>`, `fwing_<s>`, drawn behind the whole body (mask them per keyframe). The wing joints join the wind,
+  follow and cast sets, so they interpolate toward the attack / cast wings; `hurt_in1` folds them with `moves` and
+  tweaks (gargoyle: `moves: [crown, chest, wsh_f, wel_f, wtip_f]`).
+- **Extra biped arm pairs** (chaos): `sh_/el_/hand_{n2,f2,n3,f3}` give `uarm_*`, `farm_*`; near pairs are drawn in
+  front of the torso before the `n` arm, far pairs behind. Every marked arm joins the cast set; `attack_hand: [n, n2]`,
+  `half_hand: [f, f2]`, `cast_hand: [n, f]` take lists, as on the naga.
+- **Multi-head quadruped** (hydra, fire_hydra; chimera, rhyos, hellhound): `neck<i> → head<i> → snout<i>` (+ `jaw<i>`
+  as a rig part), i = 2..5, give a `neck<i>` chain `[chest, neck<i>, head<i>]` and a `head<i>` rigid part, drawn
+  behind head 1. The symbolic `head` (the daze slump) becomes every head. Heads not in `lead_heads` (default `[1]`,
+  the template head) lag at half the recipe's t in `atk_wind1` / `atk_wind2` only (`monster_anim.LAG_FRAMES`); they
+  strike and recoil with the lead. Every recipe set moves every head.
+- **`preset: mechanical`** (warmech; soldier, iron golem): only `rigid` / `torso` / `prop` / `fx` parts and sampler
+  `nearest` (rig and every frame; otherwise an error naming the rig), and every bone turns at most 15° (check 10).
+  Translation-first in-betweens (`moves: []` with `dx` / `dy`).
+- **Recipe notes from the prototypes.** Intertwined necks tear when they turn: translate heads and necks by tweaks
+  (`moves: []`; fire_hydra). A head that swaps sides between the keys (hydra) or a 40 px stride (warmech) cannot be
+  bridged under the continuity and 15° rules: regenerate the key or escalate. Small pockets and 1 px cracks between
+  big rigid parts: `paint` (chaos, fire_hydra).
+
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`
 
 One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. The keys the code reads:
@@ -181,8 +210,12 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
 
-- **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`); a new
-  `kind: fx` needs approval and an allowlist edit.
+- **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`,
+  hollow_seraph `halo`); a new `kind: fx` needs approval and an allowlist edit.
+- **`frames.<f>.brighten: {fxpart: n}`** (FW-7, kind fx only, n = 1..3): every non-outline pixel of the part steps n
+  colours up its own ramp (the part's colours in the approved keyframes, warm and cool hues ramped apart, by
+  luminance), so the palette lock holds. hollow_seraph: `cast_gather: {brighten: {halo: 1}}`, `cast_release:
+  {brighten: {halo: 2}}`. A frame without the key is byte-identical.
 - **Props (D8).** A prop rides its idle bone in `hurt_in1`. In `hurt_in2` the renderer takes its idle pixels and
   binds them to `carry_to`, a joint marked in idle and hurt whose parent bone sets the turn. `carry_mode: behind`
   draws it first; `truncate` keeps its distal half. It must show more than 0 and at most 60 % of the `hurt_in1`

@@ -36,6 +36,33 @@ BIPED_PARTS = {
 }
 BIPED_Z = ["uarm_f", "farm_f", "thigh_f", "shin_f", "torso", "thigh_n", "shin_n", "head", "uarm_n", "farm_n", "weapon"]
 TEMPLATES = {"biped": (BIPED_PARENT, BIPED_PARTS, BIPED_Z)}
+
+# FW-5 optional template parts: added to a rig only when every joint of the part is marked in at least one keyframe,
+# so a rig that marks none of them is byte-identical to before. {body: {part: (spec, z anchor, before?)}} plus the
+# parents of their joints. Biped wings (gargoyle, horned devil, chaos): wsh -> wel -> wtip from `chest`, drawn behind
+# the far arm; extra arm pairs n2 f2 n3 f3 (chaos): near pairs in front of the torso before uarm_n, far pairs behind.
+_WING = {"uwing_{s}": ("wsh_{s}", "wel_{s}", 6.0), "fwing_{s}": ("wel_{s}", "wtip_{s}", 8.0)}
+OPT_PARENT = {"biped": {**{f"wsh_{s}": "chest" for s in "nf"}, **{f"wel_{s}": f"wsh_{s}" for s in "nf"},
+                        **{f"wtip_{s}": f"wel_{s}" for s in "nf"},
+                        **{k: v for s in ("n2", "f2", "n3", "f3") for k, v in
+                           ((f"sh_{s}", "chest"), (f"el_{s}", f"sh_{s}"), (f"hand_{s}", f"el_{s}"))}},
+              "quadruped": {k: v for i in (2, 3, 4, 5) for k, v in
+                            ((f"neck{i}", "chest"), (f"head{i}", f"neck{i}"), (f"snout{i}", f"head{i}"),
+                             (f"jaw{i}", f"head{i}"))}}
+OPT_PARTS = {
+    "biped": {**{n.format(s=s): ({"bone": [a.format(s=s), b.format(s=s)], "radius": r}, 0, True)
+                 for s in "fn" for n, (a, b, r) in _WING.items()},
+              **{f"{p}_{s}": ({"bone": [f"{j0}_{s}", f"{j1}_{s}"], "radius": r},
+                              "uarm_f" if s[0] == "f" else "uarm_n", True)
+                 for s in ("f3", "f2", "n3", "n2") for p, j0, j1, r in (("uarm", "sh", "el", 3.5), ("farm", "el", "hand", 4.5))}},
+    "quadruped": {k: v for i in (2, 3, 4, 5) for k, v in
+                  ((f"neck{i}", ({"chain": ["chest", f"neck{i}", f"head{i}"], "radius": 6.0, "kind": "chain",
+                                  "width": "auto"}, "neck", True)),
+                   (f"head{i}", ({"bone": [f"head{i}", f"snout{i}"], "radius": 8.0}, "neck", True)))},
+}
+EXTRA_ARMS = ("n2", "f2", "n3", "f3")
+MECH_CAP = 15.0                   # FW-5 mechanical preset: every bone turns at most this far (degrees)
+MECH_KINDS = ("rigid", "torso", "prop", "fx")
 LEGS = ("knee_n", "knee_f", "foot_n", "foot_f")
 FEET = ("foot_n", "foot_f")
 # per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
@@ -74,6 +101,19 @@ class Rig:
         if "tip" in self.parent:
             self.parent["tip"] = f"hand_{wh}"
         scale = cell[1] / 80.0
+        parts, z = dict(parts), list(z)
+        marked = {j for kf in (cfg.get("keyframes") or {}).values() for j in (kf or {})}
+        self.optional: list[str] = []                      # FW-5 optional parts this rig uses
+        for name, (p, anchor, _) in OPT_PARTS.get(self.body, {}).items():
+            js = p.get("chain") or p["bone"]
+            if not (all(j in marked for j in js) or name in (cfg.get("parts") or {})):
+                continue
+            parts[name] = p
+            self.optional.append(name)
+            z.insert(0 if anchor == 0 else z.index(anchor) if anchor in z else len(z), name)
+            for j in js:
+                if j in OPT_PARENT[self.body]:
+                    self.parent[j] = OPT_PARENT[self.body][j]
         self.parts: dict[str, dict] = {}
         for name, p in parts.items():
             self.parts[name] = {"kind": "rigid", **p, "radius": p["radius"] * scale}
@@ -96,6 +136,45 @@ class Rig:
         self.z = {k: list(v) for k, v in (cfg.get("z") or {}).items()}
         self.default_z = z + [n for n in self.parts if n not in z]
         self.order = _topo(self.parent)
+        self._fw5(cfg, marked)
+
+    def _fw5(self, cfg: dict, marked: set) -> None:
+        """FW-5 (docs/ROSTER_PLAN.md 5.4): biped wings join the wind / follow / cast sets; extra biped arm pairs join
+        the cast set (`attack_hand` / `half_hand` lists pick the attack set, as the naga); extra quadruped heads make
+        the symbolic `head` a list and lag in the wind-up (half the recipe's t in atk_wind1 / atk_wind2) unless listed in
+        `lead_heads`; the
+        `preset: mechanical` validation. Nothing here changes a rig that uses none of them."""
+        opt = set(self.optional)
+        if self.body == "biped":
+            wings = [j for s in "nf" for j in (f"wsh_{s}", f"wel_{s}", f"wtip_{s}") if j in marked]
+            if wings:
+                self.extra = {**self.extra, **{k: [*self.extra.get(k, []), *wings] for k in ("wind", "follow", "cast")}}
+            extra_arms = [s for s in EXTRA_ARMS if f"uarm_{s}" in opt or f"farm_{s}" in opt]
+            if extra_arms:
+                self.arms = tuple(self.arms) + tuple(extra_arms)
+        self.lag: set[str] = set()                         # joints at half the t in monster_anim.LAG_FRAMES
+        heads = [i for i in (2, 3, 4, 5) if f"head{i}" in opt]
+        if heads:
+            idle = self.keyframes.get("idle", {})
+            self.head = tuple(self.head) + tuple(j for i in heads for j in (f"head{i}", f"snout{i}") if j in idle)
+            lead = cfg.get("lead_heads", [1])
+            lead = [lead] if isinstance(lead, int) else list(lead)
+            groups = {1: ["neck", "head", "snout", "jaw"], **{i: [f"neck{i}", f"head{i}", f"snout{i}", f"jaw{i}"]
+                                                               for i in heads}}
+            self.lag = {j for i, js in groups.items() if i not in lead for j in js}
+            add = [j for i in heads for j in groups[i]]
+            self.moves = {k: [*v, *[j for j in add if j not in v]] for k, v in self.moves.items()}
+        self.preset = cfg.get("preset")
+        self.rot_cap = None
+        if self.preset is not None:
+            if self.preset != "mechanical":
+                raise ValueError(f"rig {cfg.get('sprite')}: preset {self.preset!r} is not one of ['mechanical']")
+            bad = sorted(p for p, d in self.parts.items() if d["kind"] not in MECH_KINDS)
+            samplers = {self.sampler, *[(f or {}).get("sampler", "nearest") for f in (cfg.get("frames") or {}).values()]}
+            if bad or samplers != {"nearest"}:
+                raise ValueError(f"rig {cfg.get('sprite')}: preset mechanical needs rigid parts only ({MECH_KINDS}) "
+                                 f"and sampler nearest; got parts {bad} and samplers {sorted(samplers)}")
+            self.rot_cap = MECH_CAP
 
     def z_for(self, kf: str) -> list[str]:
         z = self.z.get(kf, self.default_z)

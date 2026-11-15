@@ -60,6 +60,15 @@ Gemini requests send: the pose guide, a crop of `refs/style_reference.jpg`, and 
 `characters.yaml` upscaled 8x. Backgrounds are requested as solid magenta and keyed by colour; older white
 renders fall back to a border flood fill.
 
+**Monster cutter (`monster.cut`, `split_cells`).** A 3-pose monster raw is split at the figure gaps, not at fixed
+thirds: a 4-connected foreground piece crossing a third line moves whole into the cell holding most of its pixels
+(the cell widens, everything else in the widened band becomes key colour, and the cell's left offset keeps lunges
+relative to the idle). Nothing crossing = the thirds byte for byte; a piece with more than `CROSS_SHARE` (30 %) on
+the minority side (two figures fused) keeps the thirds. `cut(..., split="thirds")` is the old cutter, which every
+approved sheet was cut with (approved sheets are copies, never re-cut). `frame_report` adds `flat_edges` (per frame,
+`(x, y0, y1)` runs of 3+ edge pixels with no outline ink, open to the side: a slice) and `edges_ok`; `info["split"]`
+lists the moved pieces. Selftest: `selftest_cut.py`.
+
 ## Adding a character
 
 Add an entry to `characters.yaml` with `prompt` (costume only), `battle_gear`, `field_gear` and `seeds`. Generate,
@@ -92,6 +101,18 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 - `frames.idle_b.tweaks: {joint: [dx, dy]}` (FW-6, any body; every component at most 1 px, more raises): idle_b is
   then a rig frame at t 0 from idle with those joints moved (wing flutter, robe sway), followed by the body's usual
   idle_b op (the bob, the floating sink or the blob sag). Without tweaks idle_b is byte-identical to before.
+
+### FW-5 template options (`rig.py`: `OPT_PARENT`, `OPT_PARTS`, `Rig._fw5`; selftest `selftest_fw5.py`)
+
+Optional template parts are added only when a rig marks every joint of the part in at least one keyframe (or names
+the part under `parts`), so rigs that mark none are byte-identical; `Rig.optional` lists the ones in use.
+
+| Option | Joints (parent) | Parts, z | Recipe effect | Prototype |
+|---|---|---|---|---|
+| biped wings | `wsh_<s>` (chest) → `wel_<s>` → `wtip_<s>`, s = n, f | `uwing_<s>` (r 6), `fwing_<s>` (r 8), behind everything | the wing joints join the wind / follow / cast sets | `gargoyle`, `chaos` |
+| biped arm pairs | `sh_<s>` (chest) → `el_<s>` → `hand_<s>`, s = n2 f2 n3 f3 | `uarm_<s>`, `farm_<s>`; near pairs before `uarm_n`, far pairs before `uarm_f` | `rig.arms` gains them (cast set); `attack_hand` / `half_hand` / `cast_hand` take lists | `chaos` |
+| quadruped heads | `neck<i>` (chest) → `head<i>` → `snout<i>` (+ `jaw<i>` as a rig part), i = 2..5 | `neck<i>` chain `[chest, neck<i>, head<i>]`, `head<i>` rigid; before `neck` | symbolic `head` = every head; every recipe set moves them; heads outside `lead_heads` (default `[1]`) lag at half t in `atk_wind1/2` (`monster_anim.LAG_FRAMES`) | `fire_hydra` (green), `hydra` (open) |
+| `preset: mechanical` | - | parts must be `rigid` / `torso` / `prop` / `fx`; sampler `nearest` in the rig and every frame (else `ValueError`) | rotation cap 15° on every part (`anim_rules.rotation_cap(rots, cap)`, frame key `rot_cap`) | `warmech` (open) |
 
 ### Roster templates (docs/ROSTER_PLAN.md 5.2; each module's docstring is the joint reference)
 
@@ -152,7 +173,9 @@ python3 -I assets-src/build_assets.py monsters_ai              # the build runs 
   rotsprite` overrides the rig's `sampler` in one frame (`monster_render.py`).
 - Checks: `anim_checks.py` (5.1 checks 1-14), `anim_efix.py` and `monster_check.py` (F1 fx exclusion, F3 fx-mask
   integrity, F4 intra-part crease, F5 foot release, F7 prop attached; F6 edge roughness is report only). The fx parts
-  are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`.
+  are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`, hollow_seraph
+  `halo`. `frames.<f>.brighten: {fxpart: n}` (FW-7, n 1..3, fx only) steps the part n colours up its own approved
+  ramp (warm and cool hues apart, by luminance; palette-safe); the seraph halo brightens in `cast_gather` / `cast_release`.
 - A frame whose bytes change fails `check` until it is reviewed and re-locked. The monster atlas must be identical
   under any `PYTHONHASHSEED`, and a `monsters_ai` build must leave the party atlases byte-identical.
 - Frame tables and recipes live in `monster_recipes.py` (pass F). Every rig gets `daze` / `daze_b` (sleep, stun) from

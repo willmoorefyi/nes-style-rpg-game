@@ -113,8 +113,12 @@ def half_hands(name: str, cfg: dict) -> list[str]:
     return hands(((cfg.get("frames") or {}).get(name) or {}).get("half", cfg.get("half_hand")))
 
 
+LAG_FRAMES = ("atk_wind1", "atk_wind2")   # FW-5: idle-sourced anticipation, where half the t = behind the lead head
+
+
 def half_joints(rig, name: str, cfg: dict) -> set[str]:
-    return {a.format(h=h) for h in half_hands(name, cfg) for a in ARM} | rig.half_default   # + FW-2 tentacles
+    lag = rig.lag if name in LAG_FRAMES else set()        # FW-5: the non-lead heads lag in the wind-up
+    return {a.format(h=h) for h in half_hands(name, cfg) for a in ARM} | rig.half_default | lag   # + FW-2 tentacles
 
 
 def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:
@@ -233,6 +237,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         if name == "idle_b":
             img, labels = MR.breath(rig, img, labels, floating)
             dy = 1
+        if over.get("brighten"):                          # FW-7: an fx part steps up its own colour ramp
+            img = MR.brighten(rig, name, over, img, labels, segs, arrs)
         for patch in cfg.get("paint") or []:
             if patch["frame"] == name:
                 for x, y in patch["xy"]:
@@ -249,6 +255,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                      "src_labels": lab, "foot_parts": foot_parts,
                      "toward_labels": out[r["toward"]]["labels"] if r["toward"] in out else segs.get(r["toward"], (None,))[0],
                      "carried": carried, "pairs": pairs, "seam_tolerance": int(cfg.get("seam_tolerance", 0)),
+                     **({"rot_cap": rig.rot_cap} if rig.rot_cap else {}),          # FW-5 mechanical preset
                      **MR.check_info(rig, r["src"], carried)}
     return out
 
