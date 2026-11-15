@@ -842,7 +842,7 @@
     the jaws clenched, the tail fin whipping
   face: its shark head with a small black eye and rows of white teeth is readable
   extra_negative: water, waves, splashes, bubbles, water streaks, motion lines, scars, legs
-  seeds: [1234]
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R98): a vertical hurt cut at the bottom, streaks; 1235 (R99): attack and hurt sliced at the bottom
 - id: bigeyes
   # "Bigeyes" (022): a fragile aquatic eye that paralyses with a gaze
   size: small
