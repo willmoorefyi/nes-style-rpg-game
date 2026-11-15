@@ -2314,11 +2314,12 @@
     leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
     glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
   hurt: >-
-    knocked back, the body tilted back on its four legs, the spear arms pulled up, the lens flickering, all four feet
-    on the ground
+    knocked back low, the body dropped and hunched with all four feet flat on the ground (no rearing up, the front
+    legs down), no taller than its idle height, the head ducked, the lens dimmed, the two spear arms pulled in close
+    under the chest
   face: one round glowing red lens eye in the domed head
   extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt; 1235 (R252): a rear-up hurt
 - id: blue_dragon
   # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
   size: large
