@@ -274,7 +274,8 @@
     revealing dark teal tentacles with pale suckers beneath
   attack: >-
     the robes part at the front and three dark teal tentacles with pale suckers lash out far toward the heroes; the
-    crown, face and robe outline stay as in Image 3
+    crown, face and robe outline stay as in Image 3: the same deep abyssal-teal outer robe with wide sleeves over the
+    pearl-white inner robe, the hems pooling wide on the ground, at the same size as in Image 3
   cast: >-
     an abyssal spell: the robes open wide like a fan and six dark teal tentacles spread in a circular ritual formation
     behind him, their tips glowing a deep abyssal blue; he raises the coral sceptre
@@ -291,7 +292,8 @@
   face: the aged human face under the crown, with calm pale eyes, is readable
   extra_negative: a second crown, a throne, a fish tail
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1235}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem
+  sheet_seeds: {boss_attack: 1236}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem;
+  # 1235 (R17, the text without the robe anchor sentence): teal outer robe lost, smaller
 - id: hollow_seraph
   # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
   # halo; her composure stays intact even when hurt
