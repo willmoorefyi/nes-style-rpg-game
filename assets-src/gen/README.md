@@ -92,6 +92,8 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 
 ## Monster animation (docs/ENEMY_ANIM_PLAN.md, docs/ENEMY_ANIM_ISSUES.md)
 
+Adding a new monster end to end (Gemini sheet, rig, checks, image review, play test, troubleshooting): `docs/NEW_MONSTER_GUIDE.md`.
+
 In-betweens are cut from the approved monster pixels by `monster_anim.py` (no AI, no Bedrock, no paid requests); the
 approved sheets are never modified. One rig per base sprite in `anim/monsters/<sprite>.yaml`; palette variants reuse it.
 

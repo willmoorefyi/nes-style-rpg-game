@@ -390,6 +390,7 @@ Run `python3 -I assets-src/gen/selftest.py` after changing the pipeline. Approve
 **Adding art for new content**
 - New class or NPC sprite name: add a `Look` to `ROSTER` in `characters.py` (keys must match the class id / the `sprite:` value in map YAML), then `npm run assets`.
 - New enemy: add it to `assets-src/gen/monsters.yaml` (or reuse a sprite / palette-swap `variants`), generate and approve its sheet (`generate.py <id> --backend gemini --sheets monster`, `approve.py <id> monster`), then `build_assets.py monsters_ai`.
+- New monster end to end (base frames, rig and in-betweens, review and play test, with the act-1 lessons): `docs/NEW_MONSTER_GUIDE.md`.
 - `tests/data/assetCoverage.test.ts` fails if a class, NPC sprite, enemy, or audio-manifest entry has no asset.
 
 **Runtime wiring**
