@@ -3,7 +3,8 @@
 # back in the wind-up and pushes it back in hurt_in1. Coordinates are the 218 px boss cell (the idle, hurt, cast and
 # raise keys are padded 9 px each side to the wide attack cell). The six wings are rigid parts on their own roots
 # (the gold wing disks), marked in idle only, so idle-sourced frames keep the idle wings and turn them by tweaks; in
-# the other keyframes the wings ride the body. The halo rides the helm (a rigid part, not fx).
+# the other keyframes the wings ride the body. The halo rides the helm as an fx part (allowlisted FW-7,
+# docs/ROSTER_PLAN.md 5.3): it brightens one / two steps up its own colour ramp in cast_gather / cast_release only.
 sprite: hollow_seraph
 body: floating
 facing: right
@@ -70,7 +71,7 @@ parts:
   uarm_f: {remove: true}
   farm_n: {bone: [sh_n, el_n, hand_n], radius: 4.5}
   farm_f: {bone: [sh_f, el_f, hand_f], radius: 4.5}
-  halo: {bone: [crown, halo], radius: 6.0}
+  halo: {bone: [crown, halo], radius: 6.0, kind: fx}
   w_l1: {bone: {idle: [il1r, il1t]}, radius: 8.0}
   w_l2: {bone: {idle: [il2r, il2t]}, radius: 8.0}
   w_l3: {bone: {idle: [il3r, il3t]}, radius: 8.0}
@@ -105,10 +106,10 @@ masks:
     cast: [[110, 54], [146, 54], [148, 76], [140, 92], [114, 92], [108, 74]]
     attack_raise: [[118, 54], [154, 54], [156, 76], [148, 94], [122, 94], [116, 74]]
   halo:
-    idle: [[98, 33], [146, 33], [146, 53], [136, 54], [118, 56], [98, 56]]
+    idle: [[98, 33], [146, 33], [146, 53], [136, 53], [118, 54], [98, 54]]
     attack: [[86, 42], [142, 42], [142, 58], [126, 60], [100, 60], [86, 60]]
-    hurt: [[86, 42], [120, 42], [120, 52], [106, 56], [96, 72], [86, 72]]
-    cast: [[108, 34], [146, 34], [146, 52], [132, 54], [120, 56], [108, 56]]
+    hurt: [[86, 42], [120, 42], [120, 52], [106, 54], [100, 56], [94, 72], [86, 72]]
+    cast: [[108, 34], [146, 34], [146, 51], [132, 52], [120, 52], [108, 52]]
     attack_raise: [[114, 34], [154, 34], [154, 52], [142, 54], [126, 56], [114, 56]]
 z:
   idle: [w_r1, w_r2, w_r3, w_l1, w_l2, w_l3, body, head, halo]
@@ -149,11 +150,14 @@ frames:
   cast_gather:                 # power gathers: the wings rise 4 deg, the helm lifts toward the cast, she leans in 2
     moves: [crown]
     dx: 2
+    brighten: {halo: 1}          # the halo kindles (FW-7)
     tweaks: {il1t: [3, -3], il2t: [1, -3], il3t: [-2, -2], ir1t: [-3, -3], ir2t: [-1, -3], ir3t: [2, -2]}
   cast_rise:                   # the cast pose 2 back and 1 low (the idle has no arm joints: the arms ride)
     moves: [crown]
     dx: -2
     dy: 1
+  cast_release:                # the halo flares two steps at the release
+    brighten: {halo: 2}
   atk_raise_in:                # glides 7 forward into the raise
     moves: []
     dx: 7
@@ -168,3 +172,5 @@ frames:
     dy: 2
     tweaks: {af_t: [-27, 29]}
 holds: []
+paint:                         # 1 px crack between the fx halo and the helm in hurt_in2, closed with outline ink
+  - {frame: hurt_in2, xy: [[99, 53]], rgb: [6, 4, 10]}

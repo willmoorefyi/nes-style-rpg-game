@@ -187,8 +187,12 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
 
-- **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`); a new
-  `kind: fx` needs approval and an allowlist edit.
+- **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`,
+  hollow_seraph `halo`); a new `kind: fx` needs approval and an allowlist edit.
+- **`frames.<f>.brighten: {fxpart: n}`** (FW-7, kind fx only, n = 1..3): every non-outline pixel of the part steps n
+  colours up its own ramp (the part's colours in the approved keyframes, warm and cool hues ramped apart, by
+  luminance), so the palette lock holds. hollow_seraph: `cast_gather: {brighten: {halo: 1}}`, `cast_release:
+  {brighten: {halo: 2}}`. A frame without the key is byte-identical.
 - **Props (D8).** A prop rides its idle bone in `hurt_in1`. In `hurt_in2` the renderer takes its idle pixels and
   binds them to `carry_to`, a joint marked in idle and hurt whose parent bone sets the turn. `carry_mode: behind`
   draws it first; `truncate` keeps its distal half. It must show more than 0 and at most 60 % of the `hurt_in1`

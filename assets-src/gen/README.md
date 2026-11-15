@@ -161,7 +161,9 @@ python3 -I assets-src/build_assets.py monsters_ai              # the build runs 
   rotsprite` overrides the rig's `sampler` in one frame (`monster_render.py`).
 - Checks: `anim_checks.py` (5.1 checks 1-14), `anim_efix.py` and `monster_check.py` (F1 fx exclusion, F3 fx-mask
   integrity, F4 intra-part crease, F5 foot release, F7 prop attached; F6 edge roughness is report only). The fx parts
-  are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`.
+  are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`, hollow_seraph
+  `halo`. `frames.<f>.brighten: {fxpart: n}` (FW-7, n 1..3, fx only) steps the part n colours up its own approved
+  ramp (warm and cool hues apart, by luminance; palette-safe); the seraph halo brightens in `cast_gather` / `cast_release`.
 - A frame whose bytes change fails `check` until it is reviewed and re-locked. The monster atlas must be identical
   under any `PYTHONHASHSEED`, and a `monsters_ai` build must leave the party atlases byte-identical.
 - Frame tables and recipes live in `monster_recipes.py` (pass F). Every rig gets `daze` / `daze_b` (sleep, stun) from

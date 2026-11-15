@@ -12,8 +12,9 @@ import numpy as np
 import yaml
 
 BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
-# revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4)
-FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}}
+# revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4); FW-7 (pass R,
+# orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
+FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
 FX_PENDING: set[tuple[str, str]] = set()
 
 
@@ -233,6 +234,45 @@ def run_lich_crystal(check: Callable[[bool, str], None]) -> None:
     check(cast > 0 and rise <= 0.4 * cast, f"E4: lich crystal in cast_rise is at most 40 % of cast ({rise} / {cast} px)")
 
 
+def run_halo_brighten(check: Callable[[bool, str], None]) -> None:
+    """FW-7 (ROSTER_PLAN 5.3): on the real hollow_seraph the fx halo brightens only where the rig says (cast_gather 1
+    step, cast_release 2), only to approved colours of the halo, and every other frame is byte-identical to the rig
+    without `brighten` (RED: with brighten stripped, the halo in cast_gather is not brighter). brighten on a non-fx
+    part, or a step outside 1..3, is an error naming the rig."""
+    from gen import monster_anim as MA, monster_render as MR, pixelize as PX, rig as R
+    cfg = MA.load_rig("hollow_seraph")
+    _, meta, kfs = next(e for e in MA.load_entries() if e[0] == "hollow_seraph")
+    plain = copy.deepcopy(cfg)
+    for f in (plain.get("frames") or {}).values():
+        f.pop("brighten", None)
+    on, off = MA.generate("hollow_seraph", cfg, kfs, meta), MA.generate("hollow_seraph", plain, kfs, meta)
+    rig = R.Rig(cfg, kfs["idle"].size)
+    hi = list(rig.parts).index("halo")
+    lum = lambda g, n: float((g[n]["img"][..., :3].astype(float) @ [0.299, 0.587, 0.114])[g[n]["labels"] == hi].mean())
+    bright = {n for n, f in (cfg.get("frames") or {}).items() if (f or {}).get("brighten")}
+    check(bright == {"cast_gather", "cast_release"}, f"FW-7: the seraph halo brightens in the cast frames only ({sorted(bright)})")
+    check(all(lum(on, n) > lum(off, n) + 5 for n in bright), "FW-7: brighten lifts the halo's luminance (RED without it)")
+    same = [n for n in on if n not in bright and np.array_equal(on[n]["img"], off[n]["img"])]
+    check(len(same) == len(on) - len(bright), f"FW-7: every other frame is byte-identical ({len(same)} of {len(on) - len(bright)})")
+    halo_cols = set()
+    for kf in kfs:
+        if kf in rig.keyframes:
+            lab, names = R.segment(rig, kf, np.asarray(kfs[kf].convert("RGBA")).copy())
+            halo_cols |= {tuple(c) for c in np.asarray(kfs[kf].convert("RGBA"))[lab == names.index("halo")][:, :3].tolist()}
+    got = {tuple(c) for n in bright for c in on[n]["img"][on[n]["labels"] == hi][:, :3].tolist()}
+    check(got <= halo_cols | {tuple(PX.OUTLINE)}, f"FW-7: brightened halo colours are approved halo colours ({len(got - halo_cols)} new)")
+
+    def refused(over) -> bool:
+        try:
+            MR.brighten(rig, "cast_gather", over, on["cast_gather"]["img"].copy(), on["cast_gather"]["labels"], {}, {})
+        except ValueError as e:
+            return "hollow_seraph" in str(e)
+        return False
+    check(refused({"brighten": {"body": 1}}) and refused({"brighten": {"halo": 4}}) and refused({"brighten": {"halo": 0}}),
+          "FW-7: brighten refuses a non-fx part and steps outside 1..3, naming the rig")
+
+
 def run_efix(check: Callable[[bool, str], None]) -> None:
-    for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal):
+    for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal,
+               run_halo_brighten):
         fn(check)

@@ -233,6 +233,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         if name == "idle_b":
             img, labels = MR.breath(rig, img, labels, floating)
             dy = 1
+        if over.get("brighten"):                          # FW-7: an fx part steps up its own colour ramp
+            img = MR.brighten(rig, name, over, img, labels, segs, arrs)
         for patch in cfg.get("paint") or []:
             if patch["frame"] == name:
                 for x, y in patch["xy"]:
