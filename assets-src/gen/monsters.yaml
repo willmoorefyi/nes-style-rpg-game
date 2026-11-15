@@ -1722,16 +1722,18 @@
     extra cloth, and no spell effects, smear or motion lines.
   prompt: >-
     a hunched old wizard in a long black robe patterned with small silver stars, a wide-brimmed tall pointed black hat,
-    a long grey beard, a hooked nose and glowing yellow eyes under the brim, holding one gnarled wooden staff in the
+    a long grey beard, a hooked nose and two bright glowing yellow eyes clearly visible under the brim, clearly
+    visible silver stars on the robe, holding one gnarled wooden staff in the
     hand on the right side of the image in every cell; centred in its own cell with empty space on both sides, the hat
     tip well below the top of the grey box
   attack: >-
-    leaning forward toward the heroes and thrusting the free hand out with the palm open, the staff held upright in
-    the same hand as in the idle cell
+    leaning forward toward the heroes with both hands on the staff, its top tilted forward toward the heroes and
+    glowing faintly, the staff tip well inside the middle cell (not reaching the cell edge), the glowing yellow eyes
+    wide under the brim
   hurt: knocked back, the hat tipped askew, the free hand thrown up, the staff upright in the same hand
   face: his bearded face with glowing yellow eyes under the hat brim is readable
   extra_negative: a sword, armour, a crown, an orb, spell effects, a cape, a second staff
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R196): the attack's free hand thrust back, away from the heroes; no stars or yellow eyes
 - id: desert_baretta
   # "Desert Baretta" (076): a sand ankylosaur with a club tail (distinct from the baretta)
   size: large
