@@ -1202,18 +1202,21 @@
     parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and no
     slash trail, smear, motion arc or motion lines.
   prompt: >-
-    an undead knight in corroded green-grey chain mail and a dented open-faced iron helm, grey withered flesh showing
-    at the face and hands, pale white eye lights in deep sockets, holding one rusted longsword in the hand on the right
+    an undead knight in grey steel chain mail spotted with green-brown rust and a dented open-faced iron helm with a
+    clear opening, a withered pale grey face inside it with two bright white eye lights in deep sockets clearly
+    visible, grey withered hands, holding one straight rusted longsword in the hand on the right
     side of the image, a torn dark tabard over the mail; centred in its own cell, and the whole sword stays well
     inside its cell in every cell
   attack: >-
     stepping forward toward the heroes at the end of a downward slash: the sword low in front of him in the same hand,
     the blade well inside the middle cell (not raised overhead, not reaching the cell edge), the same one sword as in
     the idle cell
-  hurt: knocked back, the helmed head thrown back, the sword arm flung out, still holding the sword
-  face: its withered grey face with pale white eye lights under the helm is readable
-  extra_negative: a shield, a cape, bare bones, a skull without flesh, horns, a second sword
-  seeds: [1234]
+  hurt: >-
+    knocked back, the helmed head thrown back with the helm still on, the sword arm flung out, still holding the
+    same straight sword
+  face: its withered pale grey face with two bright white eye lights inside the open helm is readable in every cell
+  extra_negative: a shield, a cape, bare bones, a skull without flesh, horns, a second sword, a curved blade, a closed visor
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R144): the face unreadable, the sword curved and the helm gone in the hurt
 - id: ochre_jelly
   # "Ochre Jelly" (044): stacked lumpy jelly (distinct from the slime, ooze and flan)
   size: small
