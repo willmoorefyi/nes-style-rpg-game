@@ -311,9 +311,10 @@
   prompt: >-
     the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
     showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
-    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread; thin hanging
-    greaves, no feet on the ground, a faint pale wind spiralling under her; palette of white steel, pale gold, brass,
-    storm grey and a cold white-blue glow
+    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread, the highest
+    wing tips well below the top of the grey box; thin hanging greaves, no feet on the ground, nothing below the
+    greaves (no wind, no debris, no shadow); palette of white steel, pale gold, brass, storm grey and a cold white-blue
+    glow
   action_prompt: >-
     the Hollow Seraph, exactly as in Image 3: a hovering hollow suit of elegant white and pale-gold armour with no body
     inside, the open helm showing only darkness, the fractured golden halo floating above the helm, exactly six
@@ -336,3 +337,4 @@
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
+  sheet_seeds: {boss_idle: 1235}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell top, wind debris
