@@ -2423,8 +2423,8 @@
   prompt: >-
     a naga sorceress: a slender humanoid upper body with dark plum-purple scales and a pale gold belly, gold armbands
     and a jewelled gold collar, a tall cobra-hood headdress of gold and dark plum framing her stern face with green
-    eyes, two arms, holding one tall gold staff topped with a green jewel upright in the hand on the right side of the
-    image, no legs: below the waist a long dark plum-purple serpent tail coiled on the ground; centred in its own cell
+    eyes, two arms, holding one tall gold staff topped with a green jewel upright in the hand on the left side of the
+    image (the far hand, behind her) in every cell, no legs: below the waist a long dark plum-purple serpent tail coiled on the ground; centred in its own cell
     with empty space on both sides, the staff top well below the top of the grey box
   attack: >-
     leaning forward over the coils toward the heroes, the free hand thrust forward with the fingers spread and the
@@ -2433,8 +2433,8 @@
   hurt: >-
     knocked back over the coils, the head tilted back, the free hand flung up, the staff upright in the same hand
   face: her stern face with green eyes under the cobra-hood headdress is readable
-  extra_negative: legs, a trident, a sword, snake hair, fins, wings, blue scales, green scales, bright violet, pink, spell effects
-  seeds: [1234]
+  extra_negative: legs, a trident, a sword, snake hair, fins, wings, blue scales, green scales, bright violet, pink, spell effects, a staff in each hand
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R258): the staff switches from the image-right hand (idle) to the image-left hand
 - id: death_knight
   # "Death Knight" (112): a skeletal knight in spiked dark plate with a tattered cloak and a runed black sword
   size: small
