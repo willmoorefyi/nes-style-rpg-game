@@ -1,0 +1,171 @@
+sprite: desert_baretta
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Sand-coloured armoured ankylosaur (desert_baretta), four-square stance. The club tail swings far between the keys
+# (raised behind the shell in idle, lifted overhead in attack, dropped onto the ground in hurt) and stays out of every
+# `moves` set: it rides the body, so the swing happens at the keyframe boundaries. The far hind leg hides behind the
+# near one (its parts are removed); the far foreleg under the jaw is masked off the head.
+keyframes:
+  attack:
+    back: [62, 72]
+    chest: [82, 82]
+    el_f: [95, 108]
+    el_n: [72, 108]
+    foot_f: [46, 112]
+    foot_n: [38, 114]
+    ftoe_f: [105, 120]
+    ftoe_n: [80, 121]
+    head: [95, 85]
+    hip: [45, 85]
+    hip_f: [50, 94]
+    hip_n: [45, 92]
+    knee_f: [48, 104]
+    knee_n: [40, 104]
+    neck: [90, 86]
+    paw_f: [100, 116]
+    paw_n: [75, 116]
+    sh_f: [88, 98]
+    sh_n: [72, 95]
+    snout: [112, 95]
+    tail0: [38, 78]
+    tail1: [25, 68]
+    tail2: [25, 48]
+    tail_tip: [40, 32]
+    toe_f: [47, 116]
+    toe_n: [36, 119]
+  hurt:
+    back: [65, 72]
+    chest: [85, 85]
+    el_f: [90, 110]
+    el_n: [72, 108]
+    foot_f: [57, 115]
+    foot_n: [45, 115]
+    ftoe_f: [96, 120]
+    ftoe_n: [75, 121]
+    head: [95, 92]
+    hip: [45, 90]
+    hip_f: [55, 98]
+    hip_n: [48, 95]
+    knee_f: [56, 108]
+    knee_n: [46, 106]
+    neck: [92, 90]
+    paw_f: [92, 117]
+    paw_n: [72, 116]
+    sh_f: [88, 100]
+    sh_n: [72, 95]
+    snout: [108, 100]
+    tail0: [35, 90]
+    tail1: [30, 100]
+    tail2: [22, 110]
+    tail_tip: [15, 114]
+    toe_f: [60, 119]
+    toe_n: [48, 120]
+  idle:
+    back: [65, 75]
+    chest: [84, 82]
+    el_f: [98, 106]
+    el_n: [78, 108]
+    foot_f: [42, 112]
+    foot_n: [47, 113]
+    ftoe_f: [104, 117]
+    ftoe_n: [85, 121]
+    head: [98, 82]
+    hip: [50, 85]
+    hip_f: [44, 95]
+    hip_n: [48, 92]
+    knee_f: [42, 104]
+    knee_n: [50, 104]
+    neck: [91, 84]
+    paw_f: [100, 113]
+    paw_n: [80, 116]
+    sh_f: [93, 96]
+    sh_n: [78, 95]
+    snout: [116, 88]
+    tail0: [42, 80]
+    tail1: [30, 76]
+    tail2: [22, 68]
+    tail_tip: [18, 58]
+    toe_f: [44, 116]
+    toe_n: [52, 118]
+parts:
+  body: {width: auto}
+  hpaw_f: {remove: true}
+  shin_f: {remove: true}
+  thigh_f: {remove: true}
+masks:
+  head:
+    attack: [[86, 72], [106, 74], [116, 85], [116, 102], [100, 104], [90, 98], [85, 88]]
+    hurt: [[85, 78], [104, 80], [112, 86], [112, 108], [96, 108], [88, 100], [84, 90]]
+    idle: [[92, 77], [100, 74], [108, 74], [119, 80], [119, 100], [104, 101], [92, 96], [88, 88]]
+frames:
+  atk_follow:   # the settle (t 0.75): spine only, the head keeps the bite (a lifted head opened the jaw / far leg seam)
+    moves: [back, chest]
+    pins: [paw_n, el_n, paw_f, foot_n, foot_f]
+    t: 0.75
+    tweaks: {tail2: [0, 1], tail_tip: [0, 3]}
+  atk_mid:   # the pass (spine only: a lifted head opened gaps over the far leg): near forepaw and elbow planted; the raised club 3 px lower (bbox lerp)
+    moves: [back, chest]
+    pins: [paw_n, el_n, foot_n]
+    t: 0.35
+    tweaks: {tail2: [0, 1], tail_tip: [0, 3]}
+  atk_recover:   # t 0.2 toward the bite, spine only (a moved head left a crack under the shell rim)
+    moves: [back, chest]
+    t: 0.2
+  atk_wind1:   # anticipation: head drawn back and up, spine 1 px back
+    dy: 0
+    moves: []
+    t: 0.0
+    tweaks: {back: [-1, 0], chest: [-1, 0], head: [-2, -1], hip: [-1, 0], neck: [-1, 0], snout: [-2, -2], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:   # coil: head reared back, spine 2 px back and 1 down
+    dy: 1
+    moves: []
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-2, 0], head: [-4, -2], hip: [-2, 0], neck: [-2, -1], snout: [-4, -4], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  daze:   # the nose dips about 2 px (the head mask stops under the shell rim spike; a larger drop tore the rim)
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-2, -1], snout: [-2, 0]}
+  daze_b:
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-2, -1], snout: [-2, 1]}
+  hurt_in1:   # the flinch starts: head jerks back and up; feet, elbows and the far shoulder planted
+    moves: [hip, back, chest, neck, head, snout]
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f, el_n]
+    t: 0.2
+    tweaks: {head: [-2, -2], snout: [-2, -2]}
+  hurt_in2:   # 30% back toward idle; legs, elbows and the far shoulder planted
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f]
+    t: 0.3
+    tweaks: {}
+holds: []
+paint:
+  - {frame: atk_wind2, xy: [[59, 104], [61, 104]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[96, 67]], rgb: [132, 90, 74]}
+  - {frame: daze, xy: [[96, 68]], rgb: [99, 66, 57]}
+  - {frame: daze, xy: [[95, 69]], rgb: [115, 82, 66]}
+  - {frame: daze, xy: [[96, 69], [95, 71]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[95, 70], [94, 71], [93, 74]], rgb: [206, 165, 115]}
+  - {frame: daze, xy: [[94, 72]], rgb: [198, 156, 107]}
+  - {frame: daze_b, xy: [[96, 67]], rgb: [132, 90, 74]}
+  - {frame: daze_b, xy: [[96, 68]], rgb: [99, 66, 57]}
+  - {frame: daze_b, xy: [[95, 69]], rgb: [115, 82, 66]}
+  - {frame: daze_b, xy: [[96, 69], [95, 71]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[95, 70], [94, 71]], rgb: [206, 165, 115]}
+  - {frame: daze_b, xy: [[94, 72]], rgb: [198, 156, 107]}
+  - {frame: daze_b, xy: [[94, 73]], rgb: [181, 148, 99]}
+  - {frame: daze_b, xy: [[93, 74], [93, 75]], rgb: [206, 165, 115]}
+  - {frame: daze_b, xy: [[94, 74]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[93, 76]], rgb: [115, 82, 66]}
+  - {frame: daze, xy: [[96, 69]], rgb: [115, 82, 66]}
+  - {frame: daze, xy: [[95, 71]], rgb: [206, 165, 115]}
+  - {frame: daze, xy: [[97, 67]], rgb: [132, 90, 74]}
+  - {frame: daze_b, xy: [[96, 69]], rgb: [115, 82, 66]}
+  - {frame: daze_b, xy: [[95, 71], [94, 74]], rgb: [206, 165, 115]}
+  - {frame: daze_b, xy: [[97, 67]], rgb: [132, 90, 74]}
+  - {frame: daze_b, xy: [[98, 67]], rgb: [6, 4, 10]}
