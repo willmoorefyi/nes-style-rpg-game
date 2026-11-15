@@ -1,0 +1,27 @@
+{
+  "character": "pyrolisk",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "59c66ab059bee85a75bd215b",
+  "approved": "2026-11-15",
+  "grid": [
+    104,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R175"
+}
