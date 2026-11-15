@@ -944,11 +944,15 @@
   prompt: >-
     a pale yellowish-white segmented carrion grub seen from the side, a long plump body of ten ringed segments, many
     short stubby legs along its underside, a ring of short wriggling pink feelers around a round mouth at the front end
-  attack: lunging its front end forward and up at the heroes, the feelers spread wide around the mouth
-  hurt: knocked back, the front end curling down and under, the feelers clenched
+  attack: >-
+    lunging forward along the ground toward the heroes, the body stretched long, only the two front segments lifted a
+    little, the feelers spread wide around the mouth; no taller than half again its idle height
+  hurt: >-
+    knocked back, the body bunched up short and low, the front end curling down and under, the feelers clenched; no
+    taller than half again its idle height
   face: no eyes; a ring of short feelers at the front end is readable
   extra_negative: eyes, a face, wings, pincers, a stinger, long legs
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R111): a rear-up attack
 - id: gray_ooze
   # "Gray Ooze" (029): amorphous, weak to lightning (distinct from the green slime: a flat puddle with pseudopods)
   size: small
