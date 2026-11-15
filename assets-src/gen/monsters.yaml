@@ -2143,14 +2143,17 @@
   prompt: >-
     a hunched blue-green sea troll, long arms with webbed clawed hands, a heavy brow and a wide mouth with tusks,
     tangled dark green kelp hair hanging over its shoulders, clusters of grey barnacles on its shoulders and back, a
-    ragged dark loincloth, webbed feet; centred in its own cell with empty space on both sides
+    ragged dark loincloth, webbed feet; hunched so its head and hair stay well below the top of the grey box in every
+    cell, centred in its own cell with empty space on both sides
   attack: >-
     lunging forward and raking both webbed claws down in front of its chest at the heroes, the elbows bent so the claws
     stay well inside the middle cell
-  hurt: knocked back, the head thrown back, the kelp hair flying, the arms flung up
+  hurt: >-
+    knocked back, the head thrown back, the kelp hair flying, the arms flung out to the sides at shoulder height (not
+    above the head), the hands and hair well below the top of the grey box
   face: its blue-green troll face with tusks under the heavy brow is readable
   extra_negative: a weapon, a mallet, a club, green skin, water, a cape, fins on the head
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R237): the hurt's raised hand and hair cut by the cell top
 - id: ghost
   # "Ghost" (099): a sheet-like spirit with a skull face (distinct from shadow, wraith, specter)
   size: small
