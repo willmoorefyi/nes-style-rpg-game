@@ -113,24 +113,24 @@ parts:
   a2: {bone: [chest, h2], radius: 0.01}         # pixel-less anchors: the upper heads hang from the withers
   a3: {bone: [chest, h3], radius: 0.01}
   a4: {bone: [chest, h4], radius: 0.01}
-  head2: {bone: [h2, s2], radius: 6.0}
-  head3: {bone: [h3, s3], radius: 6.0}
-  head4: {bone: [h4, s4], radius: 6.0}
+  ram_n: {bone: [h2, s2], radius: 6.0}
+  ram_f: {bone: [h3, s3], radius: 6.0}
+  lizard: {bone: [h4, s4], radius: 6.0}
   body: {width: auto}
 z:
-  idle: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, head4, head3, head2, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
-  attack: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, head4, head3, head2, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
-  hurt: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, head4, head3, head2, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  idle: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  attack: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  hurt: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
 masks:
-  head4:                       # the crested lizard head on top
+  lizard:                       # the crested lizard head on top
     idle: [[70, 26], [90, 26], [100, 38], [98, 50], [80, 52], [70, 46]]
     attack: [[70, 28], [92, 28], [101, 42], [98, 53], [80, 54], [70, 48]]
     hurt: [[70, 24], [90, 24], [100, 34], [98, 48], [80, 50], [70, 44]]
-  head3:                       # the far ram head with its curled horn
+  ram_f:                       # the far ram head with its curled horn
     idle: [[66, 50], [90, 50], [92, 68], [80, 72], [66, 68]]
     attack: [[66, 53], [92, 53], [93, 72], [80, 75], [66, 71]]
     hurt: [[67, 48], [92, 48], [93, 68], [80, 71], [67, 67]]
-  head2:                       # the near ram head with its curled horn
+  ram_n:                       # the near ram head with its curled horn
     idle: [[91, 47], [110, 47], [115, 62], [113, 71], [100, 71], [91, 63]]
     attack: [[92, 49], [111, 49], [115, 64], [114, 73], [100, 73], [92, 65]]
     hurt: [[92, 45], [111, 45], [115, 60], [113, 69], [100, 69], [92, 61]]
