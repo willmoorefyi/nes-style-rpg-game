@@ -296,6 +296,16 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       expect(scene.equipPromptRows).toEqual([]);
     });
 
+    it('the prompt sits over the comparison panel, clear of the item list and its prices (old: x 320 hid them)', async () => {
+      const { scene } = await buyRapiers(1);
+      const prompt = scene.equipPromptRect!;
+      const list = scene.itemWindowRect;
+      const panel = scene.detailWindowRect;
+      expect(prompt.x).toBeGreaterThanOrEqual(list.x + list.width);
+      expect(prompt.x + prompt.width).toBeLessThanOrEqual(panel.x + panel.width);
+      expect(prompt.y + prompt.height).toBeLessThanOrEqual(panel.y + panel.height);
+    });
+
     it('"Not now" leaves the Rapier in the bag', async () => {
       const { scene, tap, party, inventory } = await buyRapiers(1);
       tap('up'); // wraps to "Not now"

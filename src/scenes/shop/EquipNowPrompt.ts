@@ -10,12 +10,17 @@ import { NES_FONT } from '../../ui/NESFont.js';
 import { equipFromBag, slotOf } from '../../entities/EquipmentRules.js';
 import { compareEquip } from '../shopComparison.js';
 import { FONT_SIZE, LINE_HEIGHT, MENU_LINE_HEIGHT, WINDOW_PADDING } from '../../core/LayoutConstants.js';
+import { DETAIL_RECT } from './shopLayout.js';
 
 export const EQUIP_NOW_TITLE = 'Equip it now?';
 export const NOT_NOW = 'Not now';
-const PROMPT_X = 320;
-const PROMPT_Y = 300;
-const PROMPT_WIDTH = 860;
+/**
+ * Over the comparison panel (whose numbers the rows repeat), clear of the item list, so its price and Have columns
+ * stay visible (play test: at x 320 the prompt hid the prices).
+ */
+const PROMPT_X = DETAIL_RECT.x;
+const PROMPT_Y = DETAIL_RECT.y;
+const PROMPT_WIDTH = DETAIL_RECT.width;
 
 export interface EquipNowConfig {
   item: ItemData;
@@ -95,6 +100,12 @@ export class EquipNowPrompt extends Window {
   }
 
   get selectedIndex(): number { return this.menu.selectedIndex; }
+
+  /** The prompt's rectangle on screen (layout tests). */
+  get rect(): { x: number; y: number; width: number; height: number } {
+    const { x, y } = this.position;
+    return { x, y, width: PROMPT_WIDTH, height: this.contentHeight + 2 * WINDOW_PADDING };
+  }
 
   update(input: InputManager): void {
     if (!this.done) this.menu.update(input);

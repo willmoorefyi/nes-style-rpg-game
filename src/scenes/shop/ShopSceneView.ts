@@ -69,6 +69,8 @@ export abstract class ShopSceneView {
   get quantityMax(): number { return this.qtySelector ? this.maxQty : 0; }
   /** The "Equip it now?" rows while the prompt is open, else []. */
   get equipPromptRows(): Array<{ label: string; enabled: boolean }> { return this.equipPrompt?.labels ?? []; }
+  /** The "Equip it now?" window's rectangle while it is open, else null. */
+  get equipPromptRect(): ShopRect | null { return this.equipPrompt?.rect ?? null; }
 
   /** Show `text` on the help bar until the next input. */
   protected showMessage(text: string): void {

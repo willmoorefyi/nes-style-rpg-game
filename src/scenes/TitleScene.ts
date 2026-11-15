@@ -8,6 +8,7 @@ import { SaveManager } from '../systems/SaveManager.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, WINDOW_PADDING } from '../core/LayoutConstants.js';
 import { takeBestiaryDeepLink } from './bestiary/bestiaryLink.js';
+import { takeSandboxDeepLink } from './debugSandbox/sandboxLink.js';
 
 export class TitleScene implements Scene {
   readonly container = new Container();
@@ -70,6 +71,7 @@ export class TitleScene implements Scene {
     menuWindow.addChild(this.menu);
     this.container.addChild(menuWindow);
     if (takeBestiaryDeepLink()) this.onSelect('bestiary');   // ?bestiary=<id> (dev), once per page load
+    else if (takeSandboxDeepLink()) this.onSelect('debug');   // ?sandbox=<level> (dev): the sandbox starts its fight
   }
 
   update(_dt: number): void {

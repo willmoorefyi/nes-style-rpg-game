@@ -146,11 +146,14 @@ export class EquipScene implements Scene {
     for (const i of compatible) {
       if (this.game.inventory.has(i.id)) items.push({ label: i.name, value: i.id });
     }
+    // an empty slot opens on the first item ("(Unequip)" would do nothing there); a worn one on "(Unequip)"
+    const emptySlot = !char.getEquipped(this.selectedSlot);
     this.itemMenu = new Menu({
       items,
       x: this.itemWindow.contentX,
       y: this.itemWindow.contentY,
       maxVisible: 7,
+      initialIndex: emptySlot && items.length > 1 ? 1 : 0,
       onSelect: (item) => this.onEquipSelect(item),
       onCancel: () => {
         this.phase = 'selectSlot';

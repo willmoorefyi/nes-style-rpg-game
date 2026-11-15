@@ -164,9 +164,7 @@ describe('MS-7: the Equip screen (slot labels, live preview, descriptions)', () 
     const bare = partyAttack(w);
     expect(scene.statsLines).toBe(`ATK ${bare}\nDEF 0`);
     tap('confirm'); // member
-    tap('confirm'); // Weapon slot
-    expect(scene.statsLines).toBe(`ATK ${bare} -> ${bare}\nDEF 0 -> 0`); // (Unequip) on an empty slot
-    tap('down'); // Rapier (ATK 9)
+    tap('confirm'); // Weapon slot: empty, so the cursor opens on the first item, Rapier (ATK 9)
     expect(scene.statsLines).toBe(`ATK ${bare} -> ${bare + 9}  +9\nDEF 0 -> 0`);
     expect(scene.helpText).toBe(ItemRegistry.getItem('rapier')!.description);
     tap('down'); // Iron Sword (ATK 14)
@@ -174,6 +172,24 @@ describe('MS-7: the Equip screen (slot labels, live preview, descriptions)', () 
     tap('confirm'); // equip it
     expect(w.getEquipped('weapon')?.id).toBe('iron_sword');
     expect(scene.statsLines).toBe(`ATK ${bare + 14}\nDEF 0`);
+  });
+
+  it('an empty slot opens on the first item, not "(Unequip)"; a worn slot still opens on "(Unequip)"', async () => {
+    const { scene, tap, w } = await open(['rapier', 'iron_sword']);
+    tap('confirm'); // member
+    tap('confirm'); // Weapon: empty (old: the cursor was on "(Unequip)", which does nothing here)
+    expect(scene.helpText).toBe(ItemRegistry.getItem('rapier')!.description);
+    tap('confirm'); // Z equips the Rapier at once
+    expect(w.getEquipped('weapon')?.id).toBe('rapier');
+    tap('confirm'); // Weapon again: now worn
+    expect(scene.helpText).toBe('Take off the Rapier.');
+  });
+
+  it('an empty slot with nothing in the bag stays on "(Unequip)"', async () => {
+    const { scene, tap } = await open([]);
+    tap('confirm');
+    tap('confirm');
+    expect(scene.helpText).toBe('The slot is already empty.');
   });
 
   it('every window but the help bar ends above it (y 900)', async () => {

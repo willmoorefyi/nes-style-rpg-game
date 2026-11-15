@@ -279,6 +279,36 @@ describe('Fg: Debug opens the battle sandbox; ?scenario= still runs that scenari
     expect(run.mock.calls[0][0].id).toBe('r_menus');
     expect(game.scenes.push).not.toHaveBeenCalledWith('debugSandbox');
   });
+
+  it('?sandbox= pushes debugSandbox on the first enter with no press, once per page load (old: it needed Debug)', async () => {
+    const { resetSandboxDeepLink } = await import('../../src/scenes/debugSandbox/sandboxLink.js');
+    resetSandboxDeepLink();
+    window.history.replaceState({}, '', '/?mute=1&sandbox=l3_garland&party=knight,thief,white_mage,black_mage&enemies=garland');
+    const game = createMockGame();
+    game.input.isJustPressed = vi.fn(() => false);
+    game.scenes.push = vi.fn().mockResolvedValue(undefined);
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(game.scenes.push).toHaveBeenCalledWith('debugSandbox');
+    scene.onResume();
+    scene.exit();
+    scene.enter(); // Title from the sandbox: the title stays
+    await new Promise((r) => setTimeout(r, 0));
+    expect(game.scenes.push).toHaveBeenCalledTimes(1);
+  });
+
+  it('without ?sandbox= the title opens nothing by itself', async () => {
+    const { resetSandboxDeepLink } = await import('../../src/scenes/debugSandbox/sandboxLink.js');
+    resetSandboxDeepLink();
+    window.history.replaceState({}, '', '/?mute=1');
+    const game = createMockGame();
+    game.input.isJustPressed = vi.fn(() => false);
+    game.scenes.push = vi.fn().mockResolvedValue(undefined);
+    new TitleScene(game as unknown as Game).enter();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(game.scenes.push).not.toHaveBeenCalled();
+  });
 });
 
 describe('Fh: the dev Bestiary item and ?bestiary= (docs/BESTIARY_PLAN.md BS-1)', () => {
