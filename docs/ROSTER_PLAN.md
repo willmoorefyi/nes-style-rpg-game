@@ -1139,7 +1139,7 @@ EOF
 ## Orchestrator decisions (binding)
 
 - **D9, retries:** the user's instruction pre-approves up to 2 retries per sheet (3 attempts in all), the same as the act-1 run.
-- **D12, reserve:** keep 15 images back for the visual fix pass. Generation of new enemies stops at 285 roster images; the last 15 go only to fixes, and the overall halt stays at 300. With the expected total of about 195, this is unlikely to cut any enemy.
+- **D12, reserve:** keep 15 images back for the visual fix pass. Generation of new enemies stops at 285 roster images; the last 15 go only to fixes, and the overall halt stays at 300. With the expected total of about 200, this is unlikely to cut any enemy.
 - **D13, Chaos:** use the plan's default design.
 - **Other decisions:** the plan's defaults stand, including `protect` enforcement. Re-run the act-1 balance suite and report any change.
 - **Start condition:** the roster pass starts only after the feedback fixes are merged and validated. Recount the ledger then, before changing the budget.
