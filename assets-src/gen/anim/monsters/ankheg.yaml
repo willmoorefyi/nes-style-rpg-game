@@ -1,0 +1,145 @@
+sprite: ankheg
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+# A rearing centipede: the front half (thorax: body -> head) rears in idle and lunges in the attack; the rear half
+# is the abdomen bone; legs never interpolate (the body moves, the tips hold, the IK bends the knees).
+keyframes:
+  idle:
+    body: [82, 95]
+    head: [115, 45]
+    fang: [130, 68]
+    abd: [70, 92]
+    abd_end: [25, 88]
+    coxa1_n: [98, 100]
+    knee1_n: [104, 106]
+    tip1_n: [105, 118]
+    coxa1_f: [90, 100]
+    knee1_f: [94, 106]
+    tip1_f: [95, 118]
+    coxa2_n: [75, 102]
+    knee2_n: [80, 109]
+    tip2_n: [80, 122]
+    coxa2_f: [66, 103]
+    knee2_f: [68, 109]
+    tip2_f: [66, 121]
+    coxa3_n: [55, 104]
+    knee3_n: [57, 109]
+    tip3_n: [55, 121]
+    coxa3_f: [48, 104]
+    knee3_f: [45, 110]
+    tip3_f: [46, 122]
+    coxa4_n: [40, 103]
+    knee4_n: [34, 109]
+    tip4_n: [33, 121]
+    coxa4_f: [30, 100]
+    knee4_f: [24, 105]
+    tip4_f: [22, 117]
+  attack:
+    body: [72, 88]
+    head: [122, 58]
+    fang: [148, 70]
+    abd: [62, 92]
+    abd_end: [8, 102]
+    coxa1_n: [85, 92]
+    knee1_n: [94, 93]
+    tip1_n: [100, 100]
+    coxa1_f: [78, 98]
+    knee1_f: [85, 102]
+    tip1_f: [88, 112]
+    coxa2_n: [65, 102]
+    knee2_n: [71, 107]
+    tip2_n: [73, 118]
+    coxa2_f: [55, 104]
+    knee2_f: [57, 110]
+    tip2_f: [55, 122]
+    coxa3_n: [46, 106]
+    knee3_n: [44, 110]
+    tip3_n: [45, 120]
+    coxa3_f: [38, 106]
+    knee3_f: [35, 111]
+    tip3_f: [36, 122]
+    coxa4_n: [28, 106]
+    knee4_n: [23, 111]
+    tip4_n: [22, 122]
+    coxa4_f: [18, 105]
+    knee4_f: [12, 111]
+    tip4_f: [10, 123]
+  hurt:
+    body: [85, 95]
+    head: [110, 72]
+    fang: [125, 100]
+    abd: [70, 95]
+    abd_end: [38, 90]
+    coxa1_n: [105, 100]
+    knee1_n: [111, 103]
+    tip1_n: [113, 113]
+    coxa1_f: [98, 104]
+    knee1_f: [105, 109]
+    tip1_f: [108, 120]
+    coxa2_n: [88, 104]
+    knee2_n: [94, 108]
+    tip2_n: [95, 118]
+    coxa2_f: [75, 105]
+    knee2_f: [78, 111]
+    tip2_f: [78, 122]
+    coxa3_n: [65, 106]
+    knee3_n: [70, 111]
+    tip3_n: [70, 122]
+    coxa3_f: [58, 105]
+    knee3_f: [62, 110]
+    tip3_f: [62, 121]
+    coxa4_n: [48, 105]
+    knee4_n: [50, 110]
+    tip4_n: [48, 121]
+    coxa4_f: [40, 103]
+    knee4_f: [33, 107]
+    tip4_f: [30, 118]
+parts:
+  thorax: {radius: 18.0}
+  abdomen: {radius: 14.0}
+  fangs: {remove: true}           # the mandibles stay on the rigid thorax (as own parts they tore from the head)
+masks:
+  leg1_n:                       # the thin front legs under the reared thorax hold with the planted leg
+    idle: [[104, 96], [124, 96], [124, 122], [104, 122]]
+frames:                         # legs out of every interpolation: the body moves, the tips hold, the IK bends the knees
+  atk_wind1:                    # the reared front half draws back (a small turn about the body joint)
+    moves: []
+    pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+    tweaks: {head: [-4, 1], fang: [-4, 1]}
+  atk_wind2:
+    moves: []
+    pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+    tweaks: {head: [-8, 2], fang: [-8, 2]}
+  atk_mid:
+    t: 0.25
+    moves: [head]
+    pins: [tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+    tweaks: {tip2_n: [2, 1], tip2_f: [3, 0], tip3_n: [3, 0], tip3_f: [3, 0], tip4_n: [3, 0], tip4_f: [3, -1]}
+  atk_follow:
+    t: 0.9
+    moves: [head]
+    pins: [tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+  atk_recover:
+    t: 0.3
+    moves: [body, head, abd, abd_end]
+    pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+  hurt_in1:
+    moves: [body, head, fang, abd, abd_end]
+    pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+  hurt_in2:
+    moves: [body, head, fang, abd, abd_end]
+    pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f]
+  daze: {moves: [], dy: 0, tweaks: {head: [1, 1]}}
+  daze_b: {moves: [], dy: 1}
+holds: []
+paint:                          # 4-5 px pockets that close between bent legs: inked shut (the tarantula recipe)
+  - {frame: atk_wind1, xy: [[50, 115], [50, 116], [51, 113], [51, 114], [51, 115]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[50, 115], [50, 116], [51, 113], [51, 114], [51, 115]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[82, 115]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[108, 91]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[112, 95]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[114, 92]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[81, 112]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[84, 115]], rgb: [6, 4, 10]}

@@ -1,0 +1,140 @@
+sprite: wyvern
+body: bird
+facing: right
+sampler: nearest
+breath: true
+# The cockatrice / pyrolisk recipe: the idle wing is folded into the body; only attack and hurt mark wsh/wel/wtip, so
+# frames cut from attack / hurt keep their spread wings. The barbed tail is never interpolated (the attack coils it
+# over the back); it rides the body shift. Legs are translated, never rotated (short shins tear when they turn).
+keyframes:
+  idle:
+    hip: [60, 100]
+    chest: [82, 85]
+    neck: [80, 66]
+    head: [80, 50]
+    beak: [101, 53]
+    tail0: [45, 100]
+    tail1: [30, 90]
+    tail2: [28, 75]
+    tail3: [33, 64]
+    tail_tip: [38, 57]
+    hip_n: [55, 95]
+    knee_n: [52, 107]
+    foot_n: [49, 117]
+    toe_n: [55, 121]
+    hip_f: [72, 100]
+    knee_f: [76, 110]
+    foot_f: [80, 118]
+    toe_f: [86, 121]
+  attack:
+    hip: [48, 92]
+    chest: [72, 85]
+    neck: [88, 80]
+    head: [95, 75]
+    beak: [113, 80]
+    tail0: [45, 95]
+    tail1: [25, 88]
+    tail2: [18, 68]
+    tail3: [22, 50]
+    tail_tip: [32, 42]
+    wsh_n: [70, 78]
+    wel_n: [72, 58]
+    wtip_n: [74, 37]
+    wsh_f: [60, 80]
+    wel_f: [50, 60]
+    wtip_f: [40, 42]
+    hip_n: [42, 95]
+    knee_n: [37, 106]
+    foot_n: [34, 116]
+    toe_n: [38, 121]
+    hip_f: [58, 98]
+    knee_f: [60, 108]
+    foot_f: [60, 117]
+    toe_f: [63, 121]
+  hurt:
+    hip: [62, 100]
+    chest: [78, 88]
+    neck: [85, 75]
+    head: [95, 65]
+    beak: [112, 68]
+    tail0: [50, 92]
+    tail1: [32, 82]
+    tail2: [20, 72]
+    tail3: [25, 65]
+    tail_tip: [35, 68]
+    wsh_n: [72, 80]
+    wel_n: [76, 55]
+    wtip_n: [79, 32]
+    wsh_f: [62, 80]
+    wel_f: [48, 55]
+    wtip_f: [24, 35]
+    hip_n: [55, 96]
+    knee_n: [51, 109]
+    foot_n: [50, 117]
+    toe_n: [56, 121]
+    hip_f: [70, 100]
+    knee_f: [73, 110]
+    foot_f: [76, 118]
+    toe_f: [80, 121]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  wing_n: {bone: [wsh_n, wtip_n], radius: 8.0}
+  wing_f: {bone: [wsh_f, wtip_f], radius: 8.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+masks:
+  body:                        # the folded wing's claw beside the neck (nearest-bone gave it to the neck)
+    idle: [[56, 56], [73, 56], [74, 72], [56, 72]]
+  thigh_f:                     # the far leg's dark shank behind the belly (it rode the body and chopped in the jolt)
+    idle: [[76, 95], [91, 95], [91, 113], [76, 113]]
+  wing_f:                      # the far wing's wrist claw rides the wing
+    hurt: [[57, 48], [68, 48], [68, 58], [57, 58]]
+  head:                        # both horns ride the head
+    hurt: [[79, 52], [100, 52], [100, 63], [80, 63]]
+  toes_n:                      # whole feet
+    idle: [[42, 114], [60, 114], [60, 124], [42, 124]]
+    attack: [[26, 112], [44, 112], [44, 124], [26, 124]]
+    hurt: [[44, 114], [62, 114], [62, 124], [44, 124]]
+  toes_f:
+    idle: [[68, 113], [90, 113], [90, 124], [68, 124]]
+    attack: [[52, 113], [68, 113], [68, 124], [52, 124]]
+    hurt: [[66, 113], [84, 113], [84, 124], [66, 124]]
+z:
+  attack: [wing_f, thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, wing_n, neck, head]
+  hurt: [wing_f, thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, wing_n, neck, head]
+frames:
+  atk_wind1:                   # body leans 1 px back, head draws back and up, body sinks (legs pinned)
+    moves: []
+    tweaks: {hip: [-1, 0], chest: [-1, 0], neck: [-1, 0], head: [-2, -1], beak: [-2, -1], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:
+    moves: []
+    tweaks: {hip: [-2, 0], chest: [-2, 0], neck: [-2, 0], head: [-4, -2], beak: [-4, -2], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  atk_mid:
+    t: 0.25
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: [hip, chest, head, beak]
+    tweaks: {hip_n: [3, 0], knee_n: [3, 0], foot_n: [3, 0], toe_n: [3, 0], hip_f: [5, 0], knee_f: [5, 0], foot_f: [5, 0], toe_f: [5, 0]}
+  atk_follow:
+    t: 0.65
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: [hip, chest, head, beak]
+  atk_recover:                 # translation: body still 2 px back, head still low and forward after the bite
+    moves: []
+    tweaks: {hip: [-3, -1], chest: [-3, -1], neck: [-3, -1], head: [-1, -1], beak: [-1, -1], tail0: [-3, -1], tail1: [-3, -1], tail2: [-3, -1], tail3: [-3, -1], tail_tip: [-3, -1]}
+  hurt_in1:                    # jolt: body up off its legs (legs held), neck toward the hurt pose
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [1, -2], chest: [1, -2], neck: [2, -1], head: [4, 0], beak: [4, 0], tail0: [1, -2], tail1: [1, -2], tail2: [1, -2], tail3: [1, -2], tail_tip: [1, -2]}
+  hurt_in2:                    # the neck eases toward idle; the head translates with it (a turn shreds the face); wings start to fold
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: [hip, chest, neck]
+    dy: 2
+    tweaks: {head: [-3, -3], beak: [-3, -3], wel_f: [-10, 10], wtip_f: [-17, 25], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  daze: {moves: [], dy: 1}
+  daze_b: {moves: [], dy: 1, tweaks: {neck: [1, 1], head: [1, 2], beak: [1, 2]}}
+seam_tolerance: 2               # the approved sliver between the two spread wings (attack key, x 63-66, y 62-75)
+holds: []
+paint:                         # hurt_in2: the lowered far wing closes the tail loop's slit; filled with shaded membrane (the wing behind the loop)
+  - {frame: hurt_in2, xy: [[25, 78], [26, 78], [26, 79], [27, 77], [27, 78], [28, 77], [28, 78], [29, 77], [29, 78], [30, 77], [30, 78], [31, 77], [31, 78], [32, 78]], rgb: [74, 107, 66]}
