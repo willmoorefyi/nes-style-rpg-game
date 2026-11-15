@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 10 of 300 (build 10 of 285, fix 0 of 15; ledger guard: 110 Gemini attempts - 100)
+Images used: 11 of 300 (build 11 of 285, fix 0 of 15; ledger guard: 111 Gemini attempts - 100)
 
 ## Attempts
 
@@ -35,6 +35,7 @@ Images used: 10 of 300 (build 10 of 285, fix 0 of 15; ledger guard: 110 Gemini a
 | R10 | ashen_queen/boss_hurt (1235, key `56c009356b8317d20a8bab50`, `--retry`) | 1 | Clean cut: 186 px, lowest row 192, top row 7, x 17-183, no border pixels, binary alpha, 15 colours with the outline ink (5 shared), one piece, `pose_diff` 0.56 vs idle; **six arms** (three per side), every prop in its idle hand, the mask and crown thrown back, the arms out of rhythm, the censer swinging on its chain. **Fails review (key fringe):** 48 px of unoutlined pale pink (222, 165, 181) streaks under and beside the censer smoke, a magenta-blend residue that a keyframe cannot paint over; the tail tip forks into a spur; the censer is small under a large smoke plume | **rejected** but kept as the fallback; the last allowed attempt follows (seed 1236, `--retry`; same arm wording, the smoke kept small) |
 | R11 | ashen_queen/boss_hurt (1236, key `c805d2b8f1e281f9fa9396f5`, `--retry`, attempt 3 of 3) | 1 | The cleanest cut of the three: 186 px, lowest row 192, top row 7, x 17-183, no border pixels, binary alpha, 16 colours with the outline ink (6 shared), one piece, six arms, every prop in its idle hand, a thin smoke wisp, a smooth tail tip, `pose_diff` 0.49 (arms spread). **Fails review:** it does not read as a hurt: upright, the mask frontal, no recoil, no lean back, no flaring crack (the spread arms read as a cast or a taunt) | **rejected** (no 4th attempt, D9) |
 | R12 | ashen_queen/boss_hurt: approve R10 (1235, key `56c009356b8317d20a8bab50`) as best of 3 | 0 | R10 is the only attempt with six arms that reads as a hit (head and crown thrown back, arms out of rhythm, the censer swinging on its chain). `hurt` text and seed in `monsters.yaml` back to the R10 request. Recorded nits: 48 px of unoutlined pale pink (222, 165, 181) streaks under and beside the censer smoke (magenta-blend residue; at 2x they read as an ember flick, and the approved key cannot be painted); the tail tip forks into a short spur; a large smoke plume over a small censer | **self-approved with nits** (best of 3) |
+| R13 | ashen_queen/boss_attack_raise (1234, key `71f1e2a38ac638d4ec561fc6`) | 1 | 186 px, lowest row 192, top row 7, no border pixels, binary alpha, 15 colours (3 shared), one piece, six arms, props in their idle hands. **Fails review:** the light-grey guide box is painted behind the head (a grey disc) and inside the coil hole, a white speckle fringe runs along the outline, and no arm is raised overhead (an idle stance, `pose_diff` 0.29 vs idle) | **rejected**; retry follows (seed 1235, `--retry`; the text now asks for every hand above the crown) |
 
 ## Deferred sprites
 
