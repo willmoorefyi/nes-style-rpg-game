@@ -1,0 +1,140 @@
+sprite: minotaur_zombie
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: n
+keyframes:
+  idle:
+    crown: [76, 26]
+    neck: [70, 42]
+    chest: [62, 55]
+    hip: [62, 92]               # at the loincloth hem: torso pixels below the hip would swing the other way
+    sh_n: [80, 45]
+    el_n: [90, 62]
+    hand_n: [92, 78]
+    sh_f: [45, 38]
+    el_f: [35, 58]
+    hand_f: [33, 76]
+    tip: [62, 100]
+    hip_n: [75, 92]
+    knee_n: [80, 104]
+    foot_n: [84, 114]
+    toe_n: [90, 119]
+    hip_f: [48, 92]
+    knee_f: [42, 104]
+    foot_f: [42, 114]
+    toe_f: [45, 119]
+  attack:
+    crown: [88, 40]
+    neck: [80, 52]
+    chest: [65, 60]
+    hip: [62, 90]
+    sh_n: [78, 52]
+    el_n: [80, 72]
+    hand_n: [82, 90]
+    tip: [102, 95]
+    sh_f: [52, 45]
+    el_f: [48, 65]
+    hand_f: [55, 85]
+    hip_n: [75, 90]
+    knee_n: [78, 100]
+    foot_n: [78, 113]
+    toe_n: [85, 119]
+    hip_f: [45, 90]
+    knee_f: [30, 100]
+    foot_f: [25, 112]
+    toe_f: [20, 118]
+  hurt:
+    crown: [62, 22]
+    neck: [60, 38]
+    chest: [60, 52]
+    hip: [62, 90]
+    sh_n: [75, 45]
+    el_n: [80, 56]
+    hand_n: [82, 52]
+    tip: [92, 35]
+    sh_f: [35, 45]
+    el_f: [40, 58]
+    hand_f: [70, 55]
+    hip_n: [75, 92]
+    knee_n: [85, 104]
+    foot_n: [85, 114]
+    toe_n: [90, 119]
+    hip_f: [45, 92]
+    knee_f: [38, 104]
+    foot_f: [35, 114]
+    toe_f: [32, 119]
+parts:
+  weapon: {remove: true}
+  head: {radius: 14.0}
+  cleaver:                     # the approved cleaver changes hands between the keys (the image-left hand in idle, the
+                               # forward hand in attack and hurt): it swaps only where the pixel source switches
+    kind: prop
+    bone: {idle: [hand_f, tip], attack: [hand_n, tip], hurt: [hand_n, tip]}
+    radius: 4.0
+    in: [idle, attack, hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans about the hip and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 3, both clawed hands 3 back and 2 up
+    moves: []
+    t: -0.05
+    dy: 1
+    tweaks: {crown: [-5, 0], neck: [-4, 0], chest: [-3, 0], sh_n: [-4, -1], el_n: [-3, -1], hand_n: [-1, -1], sh_f: [-4, -1], el_f: [-4, -2], hand_f: [-4, -3], tip: [-4, -3]}
+  atk_wind2:                   # coil: lean back 5, both clawed hands 5 back and 5 up, head 3 more, body 2 lower
+    moves: []
+    t: -0.1
+    dy: 2
+    tweaks: {crown: [-10, -1], neck: [-8, -1], chest: [-5, 0], sh_n: [-7, -2], el_n: [-5, -3], hand_n: [-2, -3], sh_f: [-6, -1], el_f: [-6, -3], hand_f: [-6, -5], tip: [-6, -5]}
+  atk_mid:                     # the rake comes in: the attack upper body leaned back about the hip
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-11, -3], neck: [-9, -2], chest: [-6, -1], sh_n: [-6, -2], el_n: [-6, -2], hand_n: [-6, -2], sh_f: [-6, -2], el_f: [-6, -2], hand_f: [-6, -2], knee_f: [4, 0], foot_f: [4, 0], hip_f: [2, 0], knee_n: [2, 0], foot_n: [2, 0], hip_n: [1, 0]}
+  atk_follow:                  # settle: the attack upper body 3 back about the hip
+    moves: []
+    t: 0.8
+    tweaks: {crown: [-3, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_recover:                 # upper body 2 forward and 2 lower (translated)
+    moves: []
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil: lean back 5, head 3 further back, hands 4 up
+    moves: []
+    tweaks: {crown: [-9, -1], neck: [-7, -1], chest: [-5, 0], sh_n: [-5, -2], el_n: [-5, -3], hand_n: [-5, -4], sh_f: [-5, -2], el_f: [-5, -3], hand_f: [-5, -4], tip: [-5, -4]}
+  hurt_in2:                    # the hurt pose 4 forward (translated), the head 2 more
+    moves: []
+    tweaks: {crown: [5, 0], neck: [5, 0], chest: [4, 0], sh_n: [4, 0], el_n: [4, 0], hand_n: [4, 0], sh_f: [4, 0], el_f: [4, 0], hand_f: [4, 0], tip: [4, 0]}
+  daze:                        # slump: the upper body 1 forward and 2 lower, the head 1 forward and 1 lower more
+    moves: []
+    dy: 1
+    tweaks: {crown: [1, 1], neck: [1, 1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [1, 0], neck: [1, 0], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+masks:
+  cleaver:                     # the whole rusted cleaver, blade and grip, per key
+    idle: [[42, 79], [60, 82], [72, 84], [75, 92], [73, 103], [64, 105], [50, 100], [42, 94], [40, 86]]
+    attack: [[82, 84], [108, 86], [109, 104], [84, 105], [81, 96]]
+    hurt: [[76, 32], [90, 24], [102, 30], [97, 56], [84, 58], [78, 50]]
+holds: []
+paint:                         # pockets the moves close off (blade tip against the near thigh, crotch, shoulder), filled with their neighbours
+  - {frame: atk_recover, rgb: [33, 0, 41], xy: [[76, 99], [76, 100], [75, 101], [75, 102]]}
+  - {frame: atk_recover, rgb: [57, 66, 66], xy: [[76, 101]]}
+  - {frame: daze, rgb: [33, 0, 41], xy: [[76, 98], [75, 100], [75, 101]]}
+  - {frame: daze, rgb: [57, 66, 66], xy: [[76, 99], [76, 100]]}
+  - {frame: daze_b, rgb: [33, 0, 41], xy: [[76, 99], [76, 100], [75, 101], [75, 102]]}
+  - {frame: daze_b, rgb: [57, 66, 66], xy: [[76, 101]]}
+  - {frame: atk_wind1, rgb: [6, 4, 10], xy: [[39, 72]]}
+  - {frame: atk_mid, rgb: [6, 4, 10], xy: [[68, 51], [69, 52]]}
+  - {frame: hurt_in1, rgb: [6, 4, 10], xy: [[38, 70]]}
+  - {frame: hurt_in2, rgb: [6, 4, 10], xy: [[72, 97], [74, 97]]}
+  - {frame: atk_mid, rgb: [41, 41, 49], xy: [[52, 74], [52, 75]]}
+  - {frame: atk_mid, rgb: [57, 66, 66], xy: [[51, 73]]}
+  - {frame: atk_mid, rgb: [115, 115, 107], xy: [[51, 74]]}
+  - {frame: atk_mid, rgb: [99, 74, 57], xy: [[54, 82], [54, 83], [55, 83], [54, 84], [54, 85], [55, 86]]}
+  - {frame: atk_mid, rgb: [115, 115, 107], xy: [[52, 78]]}
+  - {frame: atk_mid, rgb: [123, 132, 115], xy: [[52, 79], [53, 79], [53, 80], [53, 81], [53, 82], [53, 83], [53, 84], [55, 84], [52, 85], [53, 85], [55, 85], [53, 86], [54, 86], [54, 87]]}
+  - {frame: atk_wind2, rgb: null, xy: [[50, 103], [52, 103], [53, 103], [50, 104], [51, 104], [52, 104], [53, 104], [54, 104], [55, 104], [50, 105], [51, 105], [52, 105], [53, 105], [54, 105], [55, 105], [56, 105], [50, 106], [52, 106], [53, 106], [54, 106], [55, 106], [56, 106], [53, 107], [54, 107], [55, 107], [53, 108]]}

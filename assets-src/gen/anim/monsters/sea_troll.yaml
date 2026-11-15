@@ -1,0 +1,121 @@
+sprite: sea_troll
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [72, 30]
+    neck: [70, 45]
+    chest: [62, 55]
+    hip: [62, 92]              # at the loincloth hem: torso pixels below the hip would swing the other way
+    sh_n: [82, 45]
+    el_n: [90, 68]
+    hand_n: [93, 88]
+    sh_f: [45, 42]
+    el_f: [38, 65]
+    hand_f: [36, 88]
+    hip_n: [75, 80]
+    knee_n: [78, 98]
+    foot_n: [80, 113]
+    toe_n: [90, 118]
+    hip_f: [50, 82]
+    knee_f: [45, 98]
+    foot_f: [42, 113]
+    toe_f: [38, 118]
+  attack:
+    crown: [80, 35]
+    neck: [74, 48]
+    chest: [62, 55]
+    hip: [58, 90]
+    sh_n: [85, 48]
+    el_n: [92, 62]
+    hand_n: [70, 72]
+    sh_f: [42, 35]
+    el_f: [32, 42]
+    hand_f: [58, 62]
+    hip_n: [70, 82]
+    knee_n: [80, 95]
+    foot_n: [75, 113]
+    toe_n: [80, 118]
+    hip_f: [45, 82]
+    knee_f: [32, 98]
+    foot_f: [22, 112]
+    toe_f: [18, 118]
+  hurt:
+    crown: [74, 30]
+    neck: [70, 45]
+    chest: [62, 55]
+    hip: [62, 92]
+    sh_n: [78, 50]
+    el_n: [92, 58]
+    hand_n: [105, 62]
+    sh_f: [50, 42]
+    el_f: [35, 48]
+    hand_f: [22, 58]
+    hip_n: [72, 88]
+    knee_n: [76, 100]
+    foot_n: [66, 113]
+    toe_n: [74, 119]
+    hip_f: [45, 85]
+    knee_f: [42, 98]
+    foot_f: [35, 113]
+    toe_f: [30, 118]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans about the hip and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 3, both clawed hands 3 back and 2 up
+    moves: []
+    t: -0.05
+    dy: 1
+    tweaks: {crown: [-5, 0], neck: [-4, 0], chest: [-3, 0], sh_n: [-4, -1], el_n: [-3, -1], hand_n: [-1, -1], sh_f: [-4, -1], el_f: [-4, -2], hand_f: [-4, -3]}
+  atk_wind2:                   # coil: lean back 5, both clawed hands 5 back and 5 up, head 3 more, body 2 lower
+    moves: []
+    t: -0.1
+    dy: 2
+    tweaks: {crown: [-10, -1], neck: [-8, -1], chest: [-5, 0], sh_n: [-7, -2], el_n: [-5, -3], hand_n: [-2, -3], sh_f: [-6, -1], el_f: [-6, -3], hand_f: [-6, -5]}
+  atk_mid:                     # the rake comes in: the attack upper body leaned back about the hip
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-7, -2], neck: [-6, -2], chest: [-4, -1], sh_n: [-5, -2], el_n: [-5, -2], hand_n: [-5, -2], sh_f: [-5, -2], el_f: [-5, -2], hand_f: [-5, -2], knee_f: [4, 0], foot_f: [4, 0], hip_f: [2, 0]}
+  atk_follow:                  # settle: the attack upper body 3 back about the hip
+    moves: []
+    t: 0.8
+    tweaks: {crown: [-3, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_recover:                 # upper body 2 forward and 2 lower (translated)
+    moves: []
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil: lean back 5, head 3 further back, hands 4 up
+    moves: []
+    tweaks: {crown: [-6, -1], neck: [-5, -1], chest: [-4, 0], sh_n: [-4, -1], el_n: [-3, -3], hand_n: [-2, -6], sh_f: [-6, -2], el_f: [-8, -6], hand_f: [-10, -12]}
+  hurt_in2:                    # the hurt pose 4 forward (translated), the head 2 more
+    moves: []
+    tweaks: {crown: [6, 0], neck: [5, 0], chest: [4, 0], sh_n: [4, 0], el_n: [2, 4], hand_n: [-1, 8], sh_f: [4, 0], el_f: [6, 4], hand_f: [8, 9]}
+  daze:                        # slump: the upper body 1 forward and 2 lower, the head 1 forward and 1 lower more
+    moves: []
+    dy: 1
+    tweaks: {crown: [1, 1], neck: [1, 1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [1, 0], neck: [1, 0], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+masks:
+  thigh_f:                     # the loincloth tatters below the belt hang with the legs (no seam at the hem)
+    idle: [[44, 82], [62, 82], [62, 97], [44, 97]]
+    attack: [[40, 82], [60, 82], [60, 97], [40, 97]]
+  thigh_n:
+    idle: [[62, 82], [82, 82], [82, 97], [62, 97]]
+    attack: [[60, 82], [82, 82], [82, 97], [60, 97]]
+holds: []
+paint:                         # pockets the moves close off (kelp strands in hurt_in2), filled with their neighbours
+  - {frame: hurt_in2, rgb: [41, 8, 57], xy: [[54, 31], [55, 31], [55, 32], [56, 32]]}
+  - {frame: hurt_in2, rgb: [41, 66, 66], xy: [[56, 33]]}
+  - {frame: hurt_in2, rgb: [41, 74, 90], xy: [[57, 33]]}
+  - {frame: hurt_in2, rgb: [66, 99, 74], xy: [[58, 34]]}
+  - {frame: hurt_in2, rgb: [107, 115, 123], xy: [[57, 34]]}
+  - {frame: daze_b, rgb: [41, 8, 57], xy: [[42, 89], [42, 90], [41, 91], [42, 91], [41, 92], [41, 93]]}
