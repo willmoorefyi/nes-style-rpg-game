@@ -1,0 +1,21 @@
+sprite: gray_ooze
+body: blob
+facing: right
+sampler: nearest
+breath: true
+attack_hand: n
+keyframes:
+  idle:   {base: [54, 70], mid: [54, 52], top: [54, 28], sh_n: [70, 50], el_n: [80, 46], hand_n: [86, 34],
+           sh_f: [38, 48], el_f: [30, 44], hand_f: [32, 34]}
+  attack: {base: [40, 68], mid: [52, 50], top: [56, 27], sh_n: [66, 46], el_n: [84, 40], hand_n: [100, 32]}
+  hurt:   {base: [50, 70], mid: [54, 58], top: [57, 37], sh_n: [70, 60], el_n: [80, 58], hand_n: [88, 54]}
+parts:
+  uarm_n: {radius: 5.0}
+  farm_n: {radius: 8.0}
+  uarm_f: {radius: 4.0, in: [idle]}
+  farm_f: {radius: 7.0, in: [idle]}
+holds: []
+frames:
+  atk_mid: {t: 0.10, moves: [mid, top]}   # the reaching fist sits at the cell edge: the base can't widen further;
+                                          # the fist rides the body (turning it opened a 5 px hole between the fingers)
+  hurt_in1: {moves: [mid, top]} # the fists ride the flinch; turning the near arm toward the curled hurt arm tore it

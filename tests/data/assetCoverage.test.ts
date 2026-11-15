@@ -217,17 +217,11 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       }
     });
 
-    it('palette-swap variants carry the same frame keys, anim flag and holds as their base sprite', () => {
+    it('no palette-swap variants remain: every enemy is its own drawn sprite (roster pass R)', () => {
       const specs = parse(readFileSync(join(assets, '../assets-src/gen/monsters.yaml'), 'utf-8')) as
         Array<{ id: string; variants?: Array<{ id: string }> }>;
-      const pairs = specs.flatMap((m) => (m.variants ?? []).map((v) => [m.id, v.id] as const));
-      expect(pairs.length).toBeGreaterThan(0);
-      for (const [base, variant] of pairs) {
-        const b = monsterAtlas.sheets[base];
-        const v = monsterAtlas.sheets[variant];
-        expect(Object.keys(v.frames).sort(), variant).toEqual(Object.keys(b.frames).sort());
-        expect([v.anim, v.holds, v.lungePx], variant).toEqual([b.anim, b.holds, b.lungePx]);
-      }
+      expect(specs.flatMap((m) => (m.variants ?? []).map((v) => v.id))).toEqual([]);
+      for (const id of ['gr_imp', 'gr_wolf']) expect(specs.some((m) => m.id === id), id).toBe(true);
     });
 
     it('only lists sprites some enemy uses', () => {

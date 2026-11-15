@@ -1,0 +1,19 @@
+sprite: cobra
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [20, 70], c_n: [58, 72], body0: [48, 54], body1: [46, 42], neck: [40, 28], head: [42, 14], snout: [56, 12]}
+  attack: {c_f: [20, 70], c_n: [56, 72], body0: [44, 56], body1: [35, 42], neck: [44, 26], head: [56, 16], snout: [70, 18],
+           t1: [16, 62], t2: [10, 52], t3: [10, 44], tail_tip: [11, 39]}
+  hurt:   {c_f: [20, 70], c_n: [60, 72], body0: [50, 56], body1: [50, 44], neck: [40, 32], head: [36, 18], snout: [50, 14]}
+parts:
+  tail: {in: [attack]}
+holds: []
+paint:                          # 1 px outline corner where the coil meets the shifted neck
+  - {frame: atk_wind2, xy: [[33, 41]], rgb: [6, 4, 10]}
+frames:
+  atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}   # visible draw-back (E12)
+  atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}  # the head draws back and down; the shared t -0.35 / dy 2 shrank the figure 6 px under the lerp
+  atk_mid: {t: 0.20, moves: [neck, head, snout], tweaks: {neck: [0, 2], head: [0, 4], snout: [0, 4]}}           # the attack arch swings 26 deg at 0.35 (chain cap 25) and lifts the head out of the cell

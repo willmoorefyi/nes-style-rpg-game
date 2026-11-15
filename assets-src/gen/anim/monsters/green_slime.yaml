@@ -1,0 +1,14 @@
+sprite: green_slime
+body: blob
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {base: [54, 70], mid: [54, 52], top: [54, 31]}
+  attack: {base: [50, 68], mid: [66, 50], top: [86, 23]}
+  hurt:   {base: [54, 70], mid: [56, 60], top: [56, 44]}
+frames:
+  atk_wind1: {t: 0.10}          # the attack leans 10 px (centroid): squash in place, then coil forward
+  atk_wind2: {t: 0.25, squash: {sx: 1.06, sy: 0.92}}   # a shallower crouch keeps atk_mid's centroid step <= 6
+  atk_follow: {t: 0.80}         # a settle: an overshoot leaves the cell (the crest is at x 107 of 110)
+holds: []

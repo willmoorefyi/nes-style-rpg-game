@@ -1,0 +1,49 @@
+sprite: tarantula
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {body: [62, 46], head: [76, 48], fang: [74, 56], abd: [52, 40], abd_end: [22, 34],
+           coxa4_n: [40, 46], knee4_n: [22, 52], tip4_n: [5, 73],
+           coxa3_n: [46, 48], knee3_n: [36, 56], tip3_n: [24, 75],
+           coxa3_f: [50, 50], knee3_f: [46, 58], tip3_f: [42, 73],
+           coxa2_n: [56, 52], knee2_n: [56, 62], tip2_n: [58, 75],
+           coxa1_f: [74, 50], knee1_f: [82, 52], tip1_f: [86, 73],
+           coxa1_n: [78, 46], knee1_n: [88, 50], tip1_n: [98, 74]}
+  attack: {body: [64, 48], head: [78, 50], fang: [76, 58], abd: [52, 41], abd_end: [20, 34],
+           coxa4_n: [40, 46], knee4_n: [20, 54], tip4_n: [4, 73],
+           coxa3_n: [46, 48], knee3_n: [34, 58], tip3_n: [24, 75],
+           coxa3_f: [50, 52], knee3_f: [44, 60], tip3_f: [40, 73],
+           coxa2_n: [58, 54], knee2_n: [64, 64], tip2_n: [70, 74],
+           coxa1_f: [74, 52], knee1_f: [80, 56], tip1_f: [82, 62],
+           coxa1_n: [80, 48], knee1_n: [90, 50], tip1_n: [100, 63]}
+  hurt:   {body: [56, 48], head: [66, 46], fang: [66, 56], abd: [40, 46], abd_end: [10, 38],
+           coxa4_n: [24, 52], knee4_n: [18, 62], tip4_n: [20, 72],
+           coxa3_n: [32, 54], knee3_n: [30, 64], tip3_n: [32, 75],
+           coxa3_f: [44, 54], knee3_f: [48, 64], tip3_f: [52, 74],
+           coxa2_n: [56, 56], knee2_n: [64, 64], tip2_n: [68, 74],
+           coxa1_f: [68, 52], knee1_f: [78, 60], tip1_f: [82, 74],
+           coxa1_n: [72, 48], knee1_n: [86, 54], tip1_n: [94, 74]}
+parts:
+  abdomen: {radius: 14.0}
+masks:                          # the abdomen owns every pixel inside its outline (legs drawn over it ride it)
+  abdomen:
+    idle: [[26, 30], [38, 24], [50, 26], [57, 34], [55, 44], [46, 50], [30, 50], [21, 44], [20, 36]]
+    attack: [[23, 30], [35, 24], [47, 26], [54, 34], [52, 44], [43, 50], [27, 50], [18, 44], [17, 36]]
+    hurt: [[10, 31], [22, 25], [34, 27], [42, 34], [42, 46], [34, 52], [16, 52], [6, 44], [5, 38]]
+frames:                         # (the black_widow recipe) legs out of the interpolation: the body moves, the tips
+                                # hold, the IK bends the knees
+  atk_mid: {moves: [body, head, fang, abd, abd_end, knee2_n, tip2_n], pins: ['tip4_n', 'tip3_n', 'tip3_f', 'tip1_f', 'tip1_n']}   # the stepping leg 2
+                                # moves toward wind2 (its tip is 12 px apart in the two keys)
+  atk_follow: {moves: [body, head, fang, abd, abd_end]}
+  atk_recover: {moves: [body, head, fang, abd, abd_end]}
+  hurt_in1: {moves: [body, head, fang, abd, abd_end]}
+  hurt_in2: {moves: [head, fang]}   # the curled hurt legs stay put (moving the body dipped a leg below the plain)
+  daze_b: {dy: 1}
+holds: []
+paint:                          # a 5 px pocket between legs 3f and 2n closes when the body lowers: inked shut
+  - {frame: atk_wind1, xy: [[48, 60], [49, 60], [48, 61], [49, 61], [48, 62]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[47, 59], [47, 60], [48, 60], [47, 61], [48, 61], [47, 63], [48, 63], [47, 64], [47, 65]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[47, 59], [47, 60], [47, 61], [48, 61], [48, 62], [47, 63], [47, 64], [48, 64], [47, 65]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[47, 59], [47, 60], [47, 61], [48, 61], [48, 62], [47, 63], [47, 64], [48, 64], [47, 65]], rgb: [6, 4, 10]}
