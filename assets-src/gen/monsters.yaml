@@ -413,6 +413,8 @@
   seeds: [1234]
   sheet_seeds: {boss_idle: 1235, boss_attack: 1235}   # boss_idle 1234 (ROSTER_LOG R42): the crown cut by the cell top;
   # boss_attack 1234 (R44, "swings the sickle staff in a wide arc ..."): blade lost, a slash smear
+  # boss_attack 1236 (R122, orchestrator's shallow-lunge replacement, attempt 3 of 3, + a per-pose motion line without
+  # a cape): crown still 41 px below the idle, robe still spread, idle IoU 0.374 < R45's 0.415; not approved, R45 stays
 - id: warmech
   # "Warmech" (118), the ancient war machine: claw melee and Nuclear (cast)
   size: boss
