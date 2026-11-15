@@ -164,4 +164,24 @@ paint:
   - {frame: daze_b, xy: [[88, 97], [88, 98], [88, 99]], rgb: [123, 99, 74]}
   - {frame: daze_b, xy: [[88, 101]], rgb: [165, 148, 107]}
   - {frame: atk_mid, xy: [[75, 102], [75, 103], [76, 103], [76, 104], [76, 105], [34, 105]], rgb: [6, 4, 10]}
-  - {frame: hurt_in2, xy: [[21, 87], [22, 87], [23, 87], [24, 87], [21, 88], [22, 88]], rgb: [6, 4, 10]}
+  # F3c (ROSTER_FIX_PLAN defect 4), FW-P keyframe paint on the approved hurt key, 158 px (<= 160, no cap needed):
+  # the 1 px ink seam between the tail-tip shard and the main curl (5 px), the 2 px bridge to the orphan ring on the
+  # curl's right side, the two enclosed holes under the curl (19 + 13 px) with 3 bridge px into the curl (4-neighbour
+  # mode colours; the mode's dark purple (33, 0, 33) replaced by the tail shadow (33, 49, 41)), then the see-through
+  # hollow inside the hook (109 px, two tail shades), 3 ink px closing the hook's right side and 4 bridge px, so the
+  # curl is one solid tail with one tip (the up-left flick). The old hurt_in2 ink patch over the hole is gone (the key
+  # has no hole now). Gate: fills crocodile hurt hurt_in1 hurt_in2 --box 0 40 40 90 --min 10
+  # --exclude 0 76 15 90 26 82 40 90 -> 1 component per frame; pieces --holes 2 -> none. Exclude list: the 79 px
+  # (x 3-13, y 78-89) and 35 px (x 28-39, y 83-89) pieces are the box-clipped tops of the tail-base / rump fill, one
+  # component below y 90 joined to the body, not the curl.
+  - {frame: hurt, xy: [[30, 84], [33, 84], [34, 84], [30, 85], [31, 85], [33, 85], [26, 86], [27, 86], [28, 86], [30, 86], [31, 86], [27, 87], [28, 87]], rgb: [33, 49, 41]}
+  - {frame: hurt, xy: [[32, 68], [33, 68], [32, 84], [22, 86], [21, 87], [27, 88]], rgb: [33, 49, 41]}
+  - {frame: hurt, xy: [[16, 52], [16, 53], [15, 54], [16, 58], [17, 59], [31, 84], [32, 85], [23, 86], [24, 86], [25, 86]], rgb: [41, 57, 49]}
+  - {frame: hurt, xy: [[32, 86], [33, 86], [34, 86]], rgb: [57, 82, 57]}
+  - {frame: hurt, xy: [[34, 85], [22, 87], [23, 87], [24, 87], [25, 87], [26, 87], [29, 87], [21, 88], [22, 88], [26, 88]], rgb: [82, 115, 82]}
+  # the hollow inside the hook (the ink-edge ring in the darker shade), its right-side ink, its bridges
+  - {frame: hurt, xy: [[27, 54], [28, 54], [29, 54], [30, 54], [23, 55], [24, 55], [25, 55], [26, 55], [31, 55], [32, 55], [33, 55], [34, 55], [22, 56], [34, 56], [21, 57], [30, 57], [35, 57], [21, 58], [29, 58], [31, 58], [32, 58], [33, 58], [36, 58], [21, 59], [28, 59], [34, 59], [35, 59], [36, 59], [21, 60], [22, 60], [29, 60], [23, 61], [30, 61], [31, 61], [23, 62], [24, 62], [31, 62], [25, 63], [26, 63], [27, 63], [31, 63], [28, 64], [29, 64], [31, 64], [30, 65]], rgb: [33, 49, 41]}
+  - {frame: hurt, xy: [[27, 55], [28, 55], [29, 55], [30, 55], [23, 56], [24, 56], [25, 56], [26, 56], [27, 56], [28, 56], [29, 56], [30, 56], [31, 56], [32, 56], [33, 56], [22, 57], [23, 57], [24, 57], [25, 57], [26, 57], [27, 57], [28, 57], [29, 57], [31, 57], [32, 57], [33, 57], [34, 57], [22, 58], [23, 58], [24, 58], [25, 58], [26, 58], [27, 58], [28, 58], [34, 58], [35, 58], [22, 59], [23, 59], [24, 59], [25, 59], [26, 59], [27, 59], [23, 60], [24, 60], [25, 60], [26, 60], [27, 60], [28, 60], [24, 61], [25, 61], [26, 61], [27, 61], [28, 61], [29, 61], [25, 62], [26, 62], [27, 62], [28, 62], [29, 62], [30, 62], [28, 63], [29, 63], [30, 63], [30, 64]], rgb: [41, 57, 49]}
+  - {frame: hurt, xy: [[37, 58], [37, 59], [36, 60]], rgb: [6, 4, 10]}
+  - {frame: hurt, xy: [[32, 54], [33, 54], [23, 63], [24, 63]], rgb: [33, 49, 41]}   # 4 bridge px: the hollow fill joins the tail fill
+  - {frame: hurt_in2, xy: [[34, 67], [33, 68]], rgb: [33, 49, 41]}   # the ring's bridge, re-derived (the body moves 1 px)
