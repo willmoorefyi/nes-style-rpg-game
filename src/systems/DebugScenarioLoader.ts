@@ -1,28 +1,13 @@
 import type { Game } from '../core/Game.js';
-import { Character } from '../entities/Character.js';
-import { ClassRegistry } from '../data/ClassRegistry.js';
-import { ItemRegistry } from '../data/ItemRegistry.js';
-import { slotOf } from '../entities/EquipmentRules.js';
 import { BattleTrigger, type BattleEndData } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
-
-const STATUSES: readonly StatusEffect[] = ['poison', 'stun', 'sleep', 'blind', 'silence', 'death', 'stone', 'fear'];
+import { applyDebugParty, isStatus, type DebugMember } from './debugParty.js';
 
 export interface DebugScenario {
   id: string;
   name: string;
-  party: {
-    class: string;
-    name: string;
-    level: number;
-    equipment: string[];
-    spells: { id: string; level: number }[];
-    /** Start with this HP instead of full (0: fallen), for item and inn checks. */
-    hp?: number;
-    /** Start with these status effects, e.g. `[poison]`, for menu and battle checks. */
-    status?: string[];
-  }[];
+  party: DebugMember[];
   /** Story flags set on the fresh game before the party is built, e.g. `[GARLAND_DEFEATED]`. */
   flags?: string[];
   items: Record<string, number>;
@@ -45,8 +30,6 @@ export function pickScenario<T extends { id: string }>(scenarios: T[], search: s
   const wanted = new URLSearchParams(search).get('scenario');
   return (wanted && scenarios.find((s) => s.id === wanted)) || scenarios[0];
 }
-
-const isStatus = (s: string): s is StatusEffect => (STATUSES as readonly string[]).includes(s);
 
 /** The scenario's `enemyStatus` with only known statuses (an unknown one logs `console.error` and is dropped). */
 export function enemyStatusOf(scenario: Pick<DebugScenario, 'id' | 'enemyStatus'>): Record<number, StatusEffect[]> | undefined {
@@ -112,47 +95,6 @@ export class DebugScenarioLoader {
   }
 
   private applyParty(scenario: DebugScenario): void {
-    // every scenario starts from a fresh game (no party, items, flags or retry state from an earlier run)
-    this.game.resetState();
-    for (const flag of scenario.flags ?? []) this.game.gameFlags.set(flag);
-
-    // Build party from scenario
-    for (const member of scenario.party) {
-      const classData = ClassRegistry.getClass(member.class);
-      if (!classData) {
-        console.error(`Debug scenario ${scenario.id}: unknown class '${member.class}' for ${member.name}`);
-        continue;
-      }
-      const character = new Character({ name: member.name, classData, level: member.level });
-
-      // Equip items
-      for (const itemId of member.equipment) {
-        const item = ItemRegistry.getItem(itemId);
-        const slot = item ? slotOf(item) : null;
-        if (!item || !slot || character.equip(slot, item) === false) {
-          console.warn(`Debug scenario ${scenario.id}: ${member.name} cannot equip '${itemId}'`);
-        }
-      }
-
-      // Learn spells and restore charges
-      for (const spell of member.spells) {
-        character.learnSpell(spell.id, spell.level);
-      }
-      character.restoreAllCharges();
-      character.currentHp = member.hp ?? character.maxHp;
-      for (const status of member.status ?? []) {
-        if (isStatus(status)) character.statusTracker.apply(status);
-        else console.error(`Debug scenario ${scenario.id}: unknown status '${status}' for ${member.name}`);
-      }
-
-      if (!this.game.party.add(character)) console.error(`Debug scenario ${scenario.id}: could not add ${member.name}`);
-    }
-
-    // Reset and set gold and inventory from scenario
-    this.game.party.setGold(scenario.gold);
-    this.game.inventory.clear();
-    for (const [itemId, qty] of Object.entries(scenario.items)) {
-      this.game.inventory.add(itemId, qty);
-    }
+    applyDebugParty(this.game, scenario);
   }
 }

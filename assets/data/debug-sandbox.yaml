@@ -1,0 +1,116 @@
+# The dev-only battle sandbox (docs/FEEDBACK_PLAN_2026-11-14.md §3.8, item 8; src/scenes/debugSandbox/).
+# Title > Debug (without ?scenario=) opens it. Deep link: ?sandbox=<level>&party=<4 class ids>&enemies=<ids>.
+#
+# classes:     the selectable classes per slot; `promoted` joins the cycle when the Promoted row is on.
+# kits:        the Kit row's choices (names in kits.yaml); "auto" is the level's own kit.
+# backgrounds: the Background row's choices (assets/backgrounds/<id>.webp); "auto" is the level's own background.
+# party:       the slots' default classes.
+# levels:      id, name, level (the party's level), kit, items, gold, formations (enemy-id lists, at most 9 each),
+#              optional background and enemyAi (per enemy id, as in debug-scenarios.yaml).
+classes:
+  base: [warrior, thief, monk, white_mage, black_mage, red_mage]
+  promoted: [knight, ninja, master, white_wizard, black_wizard, red_wizard]
+kits: [naked, start, lv2, arrive, full]
+backgrounds: [grassland, forest, dark_forest, ruined_forest, temple, evil_temple, abandoned_castle, cave, desert,
+  shoreline, ocean, river, marsh, swamp, waterfall]
+party: [warrior, thief, white_mage, black_mage]
+levels:
+  - id: l1_fields
+    name: Lv1 fields
+    level: 1
+    kit: start
+    items: { potion: 2 }
+    gold: 0
+    background: grassland
+    # the FIELDS packs at their largest roll (assets-src/tools/layouts/overworld_zones.py)
+    formations:
+      - [goblin, goblin, goblin, goblin, goblin]
+      - [wolf, wolf]
+      - [goblin, goblin, goblin, wolf]
+      - [gr_imp, gr_imp, goblin, goblin, goblin]
+      - [wolf, wolf, wolf, wolf]
+  - id: l2_approach
+    name: Lv2 approach
+    level: 2
+    kit: lv2
+    items: { potion: 2 }
+    gold: 0
+    background: grassland
+    # TEMPLE_APPROACH
+    formations:
+      - [gr_imp, gr_imp, gr_imp, gr_imp]
+      - [wolf, wolf, wolf]
+      - [skeleton, skeleton, gr_imp, gr_imp]
+      - [gr_imp, gr_imp, wolf, wolf]
+  - id: l2_temple
+    name: Lv2 temple
+    level: 2
+    kit: lv2
+    items: { potion: 2 }
+    gold: 0
+    background: temple
+    # the Temple of Fiends table (assets/maps/temple-of-fiends.yaml)
+    formations:
+      - [skeleton, skeleton, skeleton]
+      - [skeleton, skeleton, gr_imp, gr_imp]
+      - [gr_imp, gr_imp, gr_imp]
+  - id: l2_garland
+    name: Lv2 Garland
+    level: 2
+    kit: lv2
+    items: { potion: 2 }
+    gold: 0
+    background: temple
+    formations:
+      - [garland]
+  - id: l3_garland
+    name: Lv3 Garland
+    level: 3
+    kit: lv2
+    items: { potion: 2 }
+    gold: 0
+    background: temple
+    formations:
+      - [garland]
+  - id: l5_east
+    name: Lv5 east pocket
+    level: 5
+    kit: full
+    items: { potion: 3 }
+    gold: 0
+    background: grassland
+    # EAST_POCKET
+    formations:
+      - [wolf, wolf, wolf, wolf, wolf]
+      - [gr_imp, gr_imp, gr_imp, gr_imp, gr_imp]
+      - [gr_wolf, wolf, wolf]
+  - id: l10_mid
+    name: Lv10 mid
+    level: 10
+    kit: full
+    items: { potion: 5 }
+    gold: 0
+    formations:
+      - [ogre]
+      - [troll, troll]
+      - [mummy, mummy]
+      - [cockatrice, cockatrice]
+  - id: l20_late
+    name: Lv20 late
+    level: 20
+    kit: full
+    items: { potion: 5, hi_potion: 3 }
+    gold: 0
+    formations:
+      - [vampire]
+      - [dragon]
+  - id: l30_lich
+    name: Lv30 Lich
+    level: 30
+    kit: full
+    items: { potion: 5, hi_potion: 5 }
+    gold: 0
+    background: shoreline
+    formations:
+      - [lich]
+      - [lich, goblin, goblin]

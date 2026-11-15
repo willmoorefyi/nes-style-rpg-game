@@ -241,3 +241,42 @@ describe('TitleScene: Continue opens Load without the "lost" warning (U6, U revi
     }
   });
 });
+
+describe('Fg: Debug opens the battle sandbox; ?scenario= still runs that scenario (§3.8)', () => {
+  /** Down to Debug (New Game, Continue, Debug), then confirm: one action per update. */
+  async function pickDebug(search: string) {
+    window.history.replaceState({}, '', `/${search}`);
+    const game = createMockGame();
+    let now: string | undefined;
+    game.input.isJustPressed = vi.fn((a: string) => a === now);
+    game.scenes.push = vi.fn().mockResolvedValue(undefined);
+    const scene = new TitleScene(game as unknown as Game);
+    scene.enter();
+    for (const a of ['down', 'down', 'confirm']) { now = a; scene.update(1); }
+    now = undefined;
+    for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0));
+    return game;
+  }
+
+  afterEach(() => { window.history.replaceState({}, '', '/'); vi.restoreAllMocks(); });
+
+  it('without ?scenario= Debug pushes debugSandbox (old: it ran the first scenario)', async () => {
+    const { DebugScenarioLoader } = await import('../../src/systems/DebugScenarioLoader.js');
+    const load = vi.spyOn(DebugScenarioLoader.prototype, 'loadScenarios').mockResolvedValue([]);
+    const game = await pickDebug('?mute=1');
+    expect(game.scenes.push).toHaveBeenCalledWith('debugSandbox');
+    expect(load).not.toHaveBeenCalled();
+  });
+
+  it('with ?scenario=r_menus Debug runs pickScenario and that scenario, not the sandbox', async () => {
+    const { DebugScenarioLoader } = await import('../../src/systems/DebugScenarioLoader.js');
+    const scenarios = [{ id: 'first', name: 'f', party: [], items: {}, gold: 0, enemies: ['goblin'] },
+      { id: 'r_menus', name: 'r', party: [], items: {}, gold: 0, enemies: ['goblin'] }];
+    vi.spyOn(DebugScenarioLoader.prototype, 'loadScenarios').mockResolvedValue(scenarios);
+    const run = vi.spyOn(DebugScenarioLoader.prototype, 'run').mockResolvedValue(undefined);
+    const game = await pickDebug('?mute=1&scenario=r_menus');
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(run.mock.calls[0][0].id).toBe('r_menus');
+    expect(game.scenes.push).not.toHaveBeenCalledWith('debugSandbox');
+  });
+});
