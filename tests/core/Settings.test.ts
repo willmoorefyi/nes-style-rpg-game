@@ -1,0 +1,92 @@
+/** F0 (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 2): global settings in localStorage `ff.settings`, read once. */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { DEFAULT_MESSAGE_SPEED, SETTINGS_KEY, getSettings, resetSettingsCache, setMessageSpeed, type MessageSpeed } from '../../src/core/Settings.js';
+
+function fakeStore(initial: Record<string, string> = {}) {
+  const data = { ...initial };
+  return {
+    data,
+    getItem: vi.fn((k: string) => data[k] ?? null),
+    setItem: vi.fn((k: string, v: string) => { data[k] = v; }),
+    removeItem: vi.fn((k: string) => { delete data[k]; }),
+    clear: vi.fn(),
+  };
+}
+
+beforeEach(() => { resetSettingsCache(); });
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+  resetSettingsCache();
+});
+
+describe('Settings', () => {
+  it('defaults to message speed 5 (F0: today\'s timing)', () => {
+    expect(DEFAULT_MESSAGE_SPEED).toBe(5);
+    vi.stubGlobal('localStorage', fakeStore());
+    expect(getSettings().messageSpeed).toBe(5);
+  });
+
+  it('without localStorage it uses the default and warns nothing', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.stubGlobal('localStorage', undefined);
+    expect(getSettings().messageSpeed).toBe(5);
+    setMessageSpeed(2);
+    expect(getSettings().messageSpeed).toBe(2);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('a throwing store warns once and falls back to the default', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = fakeStore();
+    store.getItem.mockImplementation(() => { throw new Error('denied'); });
+    vi.stubGlobal('localStorage', store);
+    expect(getSettings().messageSpeed).toBe(5);
+    expect(getSettings().messageSpeed).toBe(5);
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('an invalid stored value warns once and falls back to the default', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    for (const raw of ['{"messageSpeed":9}', 'not json', '"3"']) {
+      resetSettingsCache();
+      warn.mockClear();
+      vi.stubGlobal('localStorage', fakeStore({ [SETTINGS_KEY]: raw }));
+      expect(getSettings().messageSpeed, raw).toBe(5);
+      getSettings();
+      expect(warn, raw).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('is read once: a second getSettings does not touch storage', () => {
+    const store = fakeStore({ [SETTINGS_KEY]: '{"messageSpeed":2}' });
+    vi.stubGlobal('localStorage', store);
+    expect(getSettings().messageSpeed).toBe(2);
+    expect(getSettings().messageSpeed).toBe(2);
+    expect(store.getItem).toHaveBeenCalledTimes(1);
+  });
+
+  it('round trip: setMessageSpeed writes through and a fresh read gets it back', () => {
+    const store = fakeStore();
+    vi.stubGlobal('localStorage', store);
+    setMessageSpeed(3);
+    expect(getSettings().messageSpeed).toBe(3);
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 3 });
+    resetSettingsCache();
+    expect(getSettings().messageSpeed).toBe(3);
+  });
+
+  it('a failed write is logged and the new speed still applies; an out-of-range speed is refused', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const store = fakeStore();
+    store.setItem.mockImplementation(() => { throw new Error('quota'); });
+    vi.stubGlobal('localStorage', store);
+    setMessageSpeed(1);
+    expect(getSettings().messageSpeed).toBe(1);
+    expect(warn).toHaveBeenCalledTimes(1);
+    setMessageSpeed(Number('7') as MessageSpeed);
+    expect(getSettings().messageSpeed).toBe(1);
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+});

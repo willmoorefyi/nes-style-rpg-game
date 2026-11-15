@@ -63,6 +63,16 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
     const { LoadScene } = await import('./scenes/LoadScene.js');
     return new LoadScene(game);
   });
+  game.scenes.registerLazy('config', async () => {
+    const { ConfigScene } = await import('./scenes/ConfigScene.js');
+    return new ConfigScene(game);
+  });
+  if (import.meta.env.DEV) {
+    game.scenes.registerLazy('debugSandbox', async () => {
+      const { DebugSandboxScene } = await import('./scenes/debugSandbox/DebugSandboxScene.js');
+      return new DebugSandboxScene(game);
+    });
+  }
   await game.scenes.switchTo('title');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {

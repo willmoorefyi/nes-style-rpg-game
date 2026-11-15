@@ -2,17 +2,18 @@ import { Container, BitmapText, Graphics, Sprite, Texture } from 'pixi.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
 import type { Window } from '../../ui/Window.js';
-import { NES_FONT } from '../../ui/NESFont.js';
-import { FONT_SIZE } from '../../core/LayoutConstants.js';
 import { battleArt } from '../../rendering/BattleArt.js';
 import { AiEnemyView, freezeOf } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 import { idlePose } from './attackChoreography.js';
 import { BattlePartyPanel } from './BattlePartyPanel.js';
-import { groupEnemies, enemyListCells } from './enemyList.js';
+import { BattleEnemyList } from './BattleEnemyList.js';
+import { BattleLayers } from './BattleLayers.js';
+import { setTint } from './actorTint.js';
+import { captureState, type PresentedState } from './presentedState.js';
 
 const HURT_FRAMES = 24;
-const DEAD_TINT = 0x888888;
+const PLACEHOLDER_DEAD_TINT = 0x666666;
 /** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
  *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-745, B13), and x per slot (a slight diagonal). */
 export const PARTY_FEET_Y = [425, 530, 635, 740];
@@ -41,28 +42,46 @@ export class BattleDisplayManager {
   private victory = false;
   /** BA-8: the compact party HP panel in the bottom strip (replaces the four status boxes). */
   readonly partyPanel: BattlePartyPanel;
-  // K3: Enemy list texts in the enemy window
-  enemyListTexts: BitmapText[] = [];
-  /** Base enemy name (species) -> list text index. */
-  readonly enemyNameToListIndex: Map<string, number> = new Map();
-  /** The enemy list container (hidden while a spell or item list uses the window). */
-  readonly enemyList = new Container();
+  /** K3: the enemy list in the enemy window. */
+  readonly enemyListView: BattleEnemyList;
+  readonly layers: BattleLayers;
+  /**
+   * What the screen shows (hp and statuses, both sides). Every visual reads it, never the live state: the party `down`
+   * pose, enemy postures, the dying trigger, panel HP and the list tints. It is captured only when an action is
+   * presented (at its effect's impact), by statusFx.sync and at round resolution (`capturePresented`).
+   */
+  presented: PresentedState;
 
   constructor(
-    private readonly mainContainer: Container,
+    mainContainer: Container,
     private readonly battle: BattleStateMachine,
     private readonly config: BattleSceneConfig,
-    private readonly enemyWindow: Window,
+    enemyWindow: Window,
   ) {
+    this.layers = BattleLayers.of(mainContainer);
     this.partyPanel = new BattlePartyPanel(config.party);
-    this.enemyList.position.set(enemyWindow.contentX, enemyWindow.contentY);
-    enemyWindow.addChild(this.enemyList);
+    this.presented = captureState(battle);
+    this.enemyListView = new BattleEnemyList(enemyWindow, () => this.battle.allEnemies.map((e, i) =>
+      ({ data: e.data, currentHp: this.presented.enemies[i]?.hp ?? e.currentHp })));
+  }
+
+  // the enemy list moved to BattleEnemyList; these delegate to it
+  get enemyListTexts(): BitmapText[] { return this.enemyListView.texts; }
+  get enemyNameToListIndex(): Map<string, number> { return this.enemyListView.nameToIndex; }
+  get enemyList(): Container { return this.enemyListView.container; }
+  updateEnemyList(): void { this.enemyListView.update(); }
+  listIndexFor(enemy: { data: { name: string } }): number | undefined { return this.enemyListView.indexFor(enemy); }
+  updateEnemyListDeadTints(): void { this.enemyListView.updateDeadTints(); }
+
+  /** Take the live hp and statuses as the presented state (an action's impact, statusFx.sync, round resolution). */
+  capturePresented(): void {
+    this.presented = captureState(this.battle);
   }
 
   createEnemySprites(): void {
     this.enemyView = new AiEnemyView(this.battle.allEnemies.map(e => e.data));
     for (const sprite of this.enemyView.build()) {
-      this.mainContainer.addChild(sprite);
+      this.layers.actors.addChild(sprite);
       this.enemySprites.push(sprite);
     }
     if (!battleArt.isLoaded) void battleArt.load().then(() => this.upgradeToArt());
@@ -113,11 +132,11 @@ export class BattleDisplayManager {
   }
 
   createPartySprites(): void {
-    this.mainContainer.addChild(this.partyPanel.window);
+    this.layers.ui.addChild(this.partyPanel.window);
     for (let i = 0; i < this.config.party.length; i++) {
       // M2: Party sprite at diagonal position
       const built = this.buildPartySprite(i);
-      this.mainContainer.addChild(built.sprite);
+      this.layers.actors.addChild(built.sprite);
       this.partySprites.push(built.sprite);
       this.partyFrames.push(built.frames);
     }
@@ -145,7 +164,8 @@ export class BattleDisplayManager {
   }
 
   update(dt: number): void {
-    this.enemyView?.update(dt, this.enemySprites, this.battle.allEnemies.map((e) => freezeOf(e.status)));
+    const statuses = this.presented.enemies.map((p) => new Set(p.statuses));
+    this.enemyView?.update(dt, this.enemySprites, this.battle.allEnemies.map((_, i) => freezeOf(statuses[i])));
     const before = this.idleClock;
     this.idleClock += dt;
     if (this.partySprites.some((_, i) => idlePose(before, i) !== idlePose(this.idleClock, i))) this.refreshPoses();
@@ -156,8 +176,9 @@ export class BattleDisplayManager {
     this.refreshPoses();
   }
 
-  private poseFor(i: number): BattlePose {
-    if (this.battle.allParty[i]?.currentHp <= 0) return 'down';
+  /** The pose party member i shows now (from the presented state: a KO'd member goes `down` only at the impact). */
+  partyPose(i: number): BattlePose {
+    if ((this.presented.party[i]?.hp ?? this.battle.allParty[i]?.currentHp) <= 0) return 'down';
     if (this.victory) return 'victory';
     const forced = this.poseOverride.get(i);
     if (forced) return forced;
@@ -169,53 +190,25 @@ export class BattleDisplayManager {
       const frames = this.partyFrames[i];
       const sprite = this.partySprites[i];
       if (!frames || !(sprite instanceof Sprite)) continue;
-      sprite.texture = frames[BATTLE_POSES.indexOf(this.poseFor(i))];
+      sprite.texture = frames[BATTLE_POSES.indexOf(this.partyPose(i))];
     }
   }
 
   updatePartyDisplay(): void {
+    this.capturePresented();
     // the left window lists the enemies; party HP is in the party panel
     this.partyPanel.refresh();
     this.updateEnemyList();
   }
 
-  updateEnemyList(): void {
-    for (const t of this.enemyListTexts) this.enemyList.removeChild(t);
-    this.enemyListTexts = [];
-    this.enemyNameToListIndex.clear();
-    // BA-8: one line per species ("6x Goblin"), two columns past 5 lines; dead species grey. L1: no HP display.
-    const entries = groupEnemies(this.battle.allEnemies);
-    const cells = enemyListCells(entries.length, this.enemyWindow.contentWidth);
-    entries.forEach((entry, i) => {
-      const text = new BitmapText({
-        text: entry.label,
-        style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: 0xffffff },
-      });
-      if (entry.alive === 0) text.tint = DEAD_TINT;
-      text.position.set(cells[i].x, cells[i].y);
-      this.enemyList.addChild(text);
-      this.enemyListTexts.push(text);
-      this.enemyNameToListIndex.set(entry.name, i);
-    });
-  }
-
-  /** The list line of an enemy's species, if listed. */
-  listIndexFor(enemy: { data: { name: string } }): number | undefined {
-    return this.enemyNameToListIndex.get(enemy.data.name);
-  }
-
   updatePartySprites(): void {
-    const party = this.battle.allParty;
-    for (let i = 0; i < party.length; i++) {
+    this.capturePresented();
+    for (let i = 0; i < this.partySprites.length; i++) {
       const sprite = this.partySprites[i];
-      if (!sprite) continue;
-      if (!this.partyFrames[i] && party[i].currentHp <= 0) {
-        sprite.alpha = 0.3;
-        sprite.tint = 0x666666;
-      } else {
-        sprite.alpha = 1.0;
-        sprite.tint = 0xffffff;
-      }
+      if (!sprite || !this.config.party[i]) continue;
+      const down = !this.partyFrames[i] && (this.presented.party[i]?.hp ?? 1) <= 0;
+      sprite.alpha = down ? 0.3 : 1.0;
+      setTint(sprite, 'dead', down ? PLACEHOLDER_DEAD_TINT : null);
     }
     this.partyPanel.refresh();
     this.refreshPoses();
@@ -223,21 +216,14 @@ export class BattleDisplayManager {
   }
 
   updateEnemySprites(dyingEnemies: Map<number, number>): void {
-    const enemies = this.battle.allEnemies;
+    this.capturePresented();
+    const enemies = this.presented.enemies;
     for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i].currentHp <= 0 && this.enemySprites[i].visible && !dyingEnemies.has(i)) {
+      if (enemies[i].hp <= 0 && this.enemySprites[i]?.visible && !dyingEnemies.has(i)) {
         dyingEnemies.set(i, 30);
         // E17: a death with no damage event (poison, instant death) holds the dying pose too (a no-op after a hit)
         this.enemyView?.poses.freezeDying(i);
       }
-    }
-  }
-
-  /** Restore the grey tint on list lines whose whole species is dead. */
-  updateEnemyListDeadTints(): void {
-    for (const entry of groupEnemies(this.battle.allEnemies)) {
-      const idx = this.enemyNameToListIndex.get(entry.name);
-      if (entry.alive === 0 && idx !== undefined && this.enemyListTexts[idx]) this.enemyListTexts[idx].tint = DEAD_TINT;
     }
   }
 }

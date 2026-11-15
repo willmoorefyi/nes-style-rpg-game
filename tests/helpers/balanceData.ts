@@ -33,26 +33,17 @@ export const enemyCopy = (id: string): EnemyData => structuredClone(enemy(id));
 
 export interface Kit { gear: string[]; spells: string[] }
 
+/** assets/data/kits.yaml: kit name -> class id -> gear and spells (F0 of docs/FEEDBACK_PLAN_2026-11-14.md). */
+export const KITS = read<Record<string, Record<string, Kit>>>('kits.yaml');
+
 /**
  * The 400 G starting kit per base class (§1.5, revision 10). The Red Mage starts with no spell: with one, a party of
  * the three mages and a Warrior would pass 400 G.
  */
-export const START_KIT: Record<string, Kit> = {
-  warrior: { gear: ['rapier', 'leather_armor', 'wooden_shield'], spells: [] },
-  thief: { gear: ['rapier', 'leather_armor'], spells: [] },
-  monk: { gear: ['wooden_nunchaku', 'cloth'], spells: [] },
-  white_mage: { gear: ['hammer', 'cloth'], spells: ['cure'] },
-  black_mage: { gear: ['small_knife', 'cloth'], spells: ['fire'] },
-  red_mage: { gear: ['rapier', 'cloth'], spells: [] },
-};
+export const START_KIT: Record<string, Kit> = KITS.start;
 
 /** The full kit (§4): + chain mail, caps, LIT, SLEP, RUSE (plus 3 potions, passed to the battle). */
-export const FULL_KIT: Record<string, Kit> = {
-  warrior: { gear: ['rapier', 'chain_mail', 'wooden_shield', 'cap'], spells: [] },
-  thief: { gear: ['rapier', 'leather_armor', 'cap'], spells: [] },
-  white_mage: { gear: ['hammer', 'cloth', 'cap'], spells: ['cure', 'ruse'] },
-  black_mage: { gear: ['small_knife', 'cloth', 'cap'], spells: ['fire', 'lit', 'slep'] },
-};
+export const FULL_KIT: Record<string, Kit> = KITS.full;
 
 /** The plan's party: Warrior / Thief / White Mage / Black Mage. */
 export const PARTY = ['warrior', 'thief', 'white_mage', 'black_mage'];

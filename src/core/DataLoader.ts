@@ -8,6 +8,8 @@ import type {
   MapData,
 } from '../types/index.js';
 import { validateEnemyData, validateMapData, validateShopData, validateCharacterClassData, validateItemData, validateSpellData } from './schemaValidation.js';
+import { validateSpellEffects, validateStatusVisuals } from './schemaValidationFx.js';
+import type { SpellEffectsData, StatusVisualsData } from '../types/fxData.js';
 
 export class DataLoader {
   constructor(private assets: AssetLoader) {}
@@ -84,6 +86,16 @@ export class DataLoader {
         throw new Error(`ShopData[${i}]: ${(e as Error).message}`);
       }
     });
+  }
+
+  /** assets/data/spell-effects.yaml: bad entries are logged and dropped (validateSpellEffects). */
+  async loadSpellEffects(path: string): Promise<SpellEffectsData> {
+    return validateSpellEffects(await this.assets.loadYaml<unknown>(path), path);
+  }
+
+  /** assets/data/status-visuals.yaml: bad entries are logged and dropped (validateStatusVisuals). */
+  async loadStatusVisuals(path: string): Promise<StatusVisualsData> {
+    return validateStatusVisuals(await this.assets.loadYaml<unknown>(path), path);
   }
 
   private assertArray(data: unknown, typeName: string): void {

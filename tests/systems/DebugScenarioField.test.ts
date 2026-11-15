@@ -113,7 +113,8 @@ describe('DebugScenarioLoader field mode', () => {
     const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE'];
     for (const s of scenarios) {
       for (const f of s.flags ?? []) expect(known, `${s.id} flag ${f}`).toContain(f);
-      for (const m of s.party) for (const st of m.status ?? []) expect(['poison', 'blind', 'silence', 'sleep', 'stun'], `${s.id}`).toContain(st);
+      // pass F's f_* scenarios also start members stoned and afraid
+      for (const m of s.party) for (const st of m.status ?? []) expect(['poison', 'blind', 'silence', 'sleep', 'stun', 'stone', 'fear'], `${s.id}`).toContain(st);
     }
   });
   it('U0: the u_* scenarios exist; battle ones use full background paths that exist (revisions 9, 12)', () => {

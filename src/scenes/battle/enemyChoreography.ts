@@ -4,21 +4,45 @@
  * factor 1 (EnemyPoseController scales and rounds them once).
  */
 
-/** Approved keyframes in monsters-ai.json (bosses add `cast`). */
-export type MonsterKeyframe = 'idle' | 'attack' | 'hurt' | 'cast';
+/** Approved keyframes in monsters-ai.json (bosses add `cast`; pass F's bosses add `attack_raise`). */
+export type MonsterKeyframe = 'idle' | 'attack' | 'hurt' | 'cast' | 'attack_raise';
 export type MonsterFrame = MonsterKeyframe | 'idle_b' | 'atk_wind1' | 'atk_wind2' | 'atk_mid' | 'atk_follow'
-  | 'atk_recover' | 'hurt_in1' | 'hurt_in2' | 'cast_gather' | 'cast_rise' | 'cast_release';
+  | 'atk_recover' | 'hurt_in1' | 'hurt_in2' | 'cast_gather' | 'cast_rise' | 'cast_release'
+  | 'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2';
 
 export const MONSTER_FRAMES: readonly MonsterFrame[] = ['idle', 'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'attack',
-  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt'];
-export const BOSS_FRAMES: readonly MonsterFrame[] = [...MONSTER_FRAMES, 'cast_gather', 'cast_rise', 'cast', 'cast_release'];
+  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt', 'daze', 'daze_b'];
+export const BOSS_FRAMES: readonly MonsterFrame[] = [...MONSTER_FRAMES, 'cast_gather', 'cast_rise', 'cast', 'cast_release',
+  'attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2'];
+/** Pass F frames no atlas has yet (the dazed pose and the heavy raise); the per-sheet key check skips them until the
+ *  atlas that draws them lands. */
+export const LATE_FRAMES: ReadonlySet<MonsterFrame> = new Set<MonsterFrame>(['daze', 'daze_b', 'attack_raise',
+  'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2']);
 
-/** The keyframe each frame is cut from: what an atlas without the frame (no rig, old atlas) shows instead. */
+/** The keyframe each frame is cut from in the end (where FRAME_FALLBACK finally lands on an old atlas). */
 export const FRAME_SOURCE: Record<MonsterFrame, MonsterKeyframe> = {
   idle: 'idle', attack: 'attack', hurt: 'hurt', cast: 'cast', idle_b: 'idle', atk_wind1: 'idle', atk_wind2: 'idle',
   atk_mid: 'attack', atk_follow: 'attack', atk_recover: 'idle', hurt_in1: 'idle', hurt_in2: 'hurt', cast_gather: 'idle',
-  cast_rise: 'cast', cast_release: 'cast',
+  cast_rise: 'cast', cast_release: 'cast', daze: 'idle', daze_b: 'idle', attack_raise: 'idle', atk_raise_in: 'idle',
+  atk_raise_b: 'idle', atk_swing: 'attack', atk_swing2: 'attack',
 };
+
+/** What an atlas without a frame shows instead, resolved step by step until a key exists (a keyframe maps to itself,
+ *  except a boss-less `cast`, which shows `attack`). */
+export const FRAME_FALLBACK: Record<MonsterFrame, MonsterFrame> = {
+  ...FRAME_SOURCE, cast: 'attack', daze: 'hurt_in1', daze_b: 'daze', atk_raise_in: 'atk_wind1',
+  attack_raise: 'atk_wind2', atk_raise_b: 'atk_wind2', atk_swing: 'atk_mid', atk_swing2: 'atk_mid',
+};
+
+/** The first frame along the fallback chain from `name` that `has` an atlas key; null when none does. */
+export function resolveFrame(name: MonsterFrame, has: (f: MonsterFrame) => boolean): MonsterFrame | null {
+  const seen = new Set<MonsterFrame>();
+  for (let f = name; !seen.has(f); f = FRAME_FALLBACK[f]) {
+    if (has(f)) return f;
+    seen.add(f);
+  }
+  return null;
+}
 
 type Ease = 'linear' | 'in' | 'out';
 /** One run of a frame: `len` frames moving the offset from `from` to `to`; `shake` adds ±shake every 2 frames. */

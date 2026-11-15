@@ -31,6 +31,8 @@ export interface DebugScenario {
   background?: string;
   /** Optional action patterns per enemy id, e.g. `{ lich: [{ type: magic, spellId: ice, weight: 1 }] }`. */
   enemyAi?: EnemyAiPatterns;
+  /** Optional starting statuses per enemy index, e.g. `{ 0: [sleep], 1: [poison] }` (unknown ones are logged). */
+  enemyStatus?: Record<number, string[]>;
   /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `entrance` (or the `spawn` cell). */
   mode?: 'battle' | 'field';
   map?: string;
@@ -42,6 +44,23 @@ export interface DebugScenario {
 export function pickScenario<T extends { id: string }>(scenarios: T[], search: string): T | undefined {
   const wanted = new URLSearchParams(search).get('scenario');
   return (wanted && scenarios.find((s) => s.id === wanted)) || scenarios[0];
+}
+
+const isStatus = (s: string): s is StatusEffect => (STATUSES as readonly string[]).includes(s);
+
+/** The scenario's `enemyStatus` with only known statuses (an unknown one logs `console.error` and is dropped). */
+export function enemyStatusOf(scenario: Pick<DebugScenario, 'id' | 'enemyStatus'>): Record<number, StatusEffect[]> | undefined {
+  if (!scenario.enemyStatus) return undefined;
+  const out: Record<number, StatusEffect[]> = {};
+  for (const [index, statuses] of Object.entries(scenario.enemyStatus)) {
+    const known: StatusEffect[] = [];
+    for (const s of statuses ?? []) {
+      if (isStatus(s)) known.push(s);
+      else console.error(`Debug scenario ${scenario.id}: unknown status '${s}' for enemy ${index}`);
+    }
+    out[Number(index)] = known;
+  }
+  return out;
 }
 
 export class DebugScenarioLoader {
@@ -84,7 +103,8 @@ export class DebugScenarioLoader {
     };
     events.on('battleEnd', onEnd);
     try {
-      await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi);
+      await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi,
+        enemyStatusOf(scenario));
     } catch (e) {
       events.off('battleEnd', onEnd);
       throw e;
@@ -121,7 +141,7 @@ export class DebugScenarioLoader {
       character.restoreAllCharges();
       character.currentHp = member.hp ?? character.maxHp;
       for (const status of member.status ?? []) {
-        if ((STATUSES as readonly string[]).includes(status)) character.statusTracker.apply(status as StatusEffect);
+        if (isStatus(status)) character.statusTracker.apply(status);
         else console.error(`Debug scenario ${scenario.id}: unknown status '${status}' for ${member.name}`);
       }
 

@@ -2,7 +2,7 @@ import { Container, Graphics, Sprite } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { computeEnemyLayoutAi, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
-import { EnemyPoseController, type Freeze } from './EnemyPoseController.js';
+import { EnemyPoseController, type Freeze, type PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
@@ -29,9 +29,23 @@ export class AiEnemyView {
   private frames: (MonsterFrames | null)[] = [];
   private base: { x: number; y: number }[] = [];
   private raised = -1;
+  /** The sprites of the last update, so a pose cue can name the sprite it belongs to. */
+  private sprites: Container[] = [];
+  /** An attack cue with its enemy's sprite (the battle hands it to ActionFx.playCue and, later, the screen shake). */
+  onCue: ((i: number, cue: PoseCue, sprite: Container) => void) | null = null;
 
   constructor(private readonly enemies: EnemyData[], private readonly art: MonsterArtSource = battleArt) {
     this.poses = new EnemyPoseController(enemies.length);
+    this.poses.onCue = (i, cue) => {
+      const sprite = this.sprites[i];
+      if (sprite) this.onCue?.(i, cue, sprite);
+    };
+  }
+
+  /** Enemy i attacks `target` (the hero's sprite, or null). F0 plays the in-place attack and ignores the target; pass
+   *  F's Fc measures the travel to it. */
+  playAttack(i: number, _target: Container | null): void {
+    this.poses.playAttack(i);
   }
 
   /** Build one sprite (or placeholder box) per enemy, in enemy order. */
@@ -45,7 +59,7 @@ export class AiEnemyView {
     this.base = [];
     return this.enemies.map((e, i) => {
       const f = this.frames[i];
-      this.poses.configure(i, { hasCast: f?.hasCast ?? false, scaleFactor: boxes[i].scaleFactor,
+      this.poses.configure(i, { hasCast: f?.hasCast ?? false, hasRaise: f?.hasRaise ?? false, scaleFactor: boxes[i].scaleFactor,
         ...(f ? { lungePx: f.lungePx } : {}) });
       return this.buildOne(e, f, boxes[i]);
     });
@@ -81,6 +95,7 @@ export class AiEnemyView {
 
   /** Advance pose timers and apply each sprite's frame texture, integer offset, freeze (D6) and draw order (D5). */
   update(dt: number, sprites: Container[], frozen: readonly Freeze[] = []): void {
+    this.sprites = sprites;
     for (let i = 0; i < sprites.length; i++) this.poses.setFreeze(i, frozen[i] ?? 'none');
     this.poses.update(dt);
     for (let i = 0; i < sprites.length; i++) {
@@ -90,7 +105,7 @@ export class AiEnemyView {
       if (!sprite || !b) continue;
       const st = this.poses.state(i);
       if (f && sprite instanceof Sprite) sprite.texture = f.textures[st.pose];
-      sprite.position.set(b.x + st.dx, b.y + st.dy);
+      sprite.position.set(b.x + st.dx + (st.travelDx ?? 0), b.y + st.dy + (st.travelDy ?? 0));
     }
     const lunging = sprites.findIndex((_, i) => this.poses.isLunging(i));
     if (lunging >= 0 && lunging !== this.raised) {

@@ -4,6 +4,7 @@ import type { AudioManager } from '../../core/AudioManager.js';
 import type { Character } from '../../entities/Character.js';
 import type { EnemyData, SpellData } from '../../types/index.js';
 import type { Inventory } from '../../entities/Inventory.js';
+import type { StatusEffect } from '../../battle/StatusEffects.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -24,6 +25,8 @@ export interface BattleSceneConfig {
   music?: string;
   /** Optional per-enemy-id action patterns (debug scenarios): attached as BossAI after the battle is created. */
   enemyAi?: EnemyAiPatterns;
+  /** Optional statuses per enemy index (debug scenarios), applied when the battle starts. */
+  enemyStatus?: Record<number, StatusEffect[]>;
   /** Injectable RNG for the battle logic (deterministic tests); defaults to Math.random. */
   rng?: () => number;
 }

@@ -30,10 +30,15 @@ export type Freeze = 'none' | 'still' | 'stone';
 
 export interface EnemyAnimConfig {
   hasCast: boolean;
+  /** The sheet has its own `attack_raise` keyframe (the heavy attack, pass F item 7). */
+  hasRaise: boolean;
   lungePx: number;
   scaleFactor: number;
   breath: boolean;
 }
+
+/** Animation cues: `hold` when an attack's held telegraph starts, `contact` on its contact frame. */
+export type PoseCue = 'hold' | 'contact';
 
 interface EnemyState extends EnemyAnimConfig {
   mode: Mode;
@@ -43,23 +48,36 @@ interface EnemyState extends EnemyAnimConfig {
   from: { dx: number; dy: number };
   /** Where in the dying in-phase it began (E13). */
   start: number;
+  /** The current attack's contact frame, held-telegraph start (null: none) and length, set when it starts. */
+  contactAt: number;
+  holdAt: number | null;
+  totalFrames: number;
+  /** Absolute screen px the current attack travels (unscaled; 0 = in place). */
+  travel: { dx: number; dy: number };
 }
 
+/** The frame to show and the screen offset: `dx` / `dy` are the lunge, recoil and shake (scaled by the layout factor,
+ *  rounded once); `travelDx` / `travelDy` are the attack's travel in absolute screen px (unscaled), omitted while 0. */
 export interface PoseState {
   pose: MonsterFrame;
   dx: number;
   dy: number;
+  travelDx?: number;
+  travelDy?: number;
 }
 
-const DEFAULTS: EnemyAnimConfig = { hasCast: false, lungePx: DEFAULT_LUNGE_PX, scaleFactor: 1, breath: true };
+const DEFAULTS: EnemyAnimConfig = { hasCast: false, hasRaise: false, lungePx: DEFAULT_LUNGE_PX, scaleFactor: 1, breath: true };
 
 export class EnemyPoseController {
   private states: EnemyState[];
   private clock = 0;
+  /** Raised from `update` when an attack reaches its held telegraph (`hold`) or its contact frame (`contact`). */
+  onCue: ((i: number, cue: PoseCue) => void) | undefined;
 
   constructor(count: number) {
     this.states = Array.from({ length: count }, () => ({ ...DEFAULTS, mode: 'idle' as Mode, t: 0, freeze: 'none' as Freeze,
-      from: { dx: 0, dy: 0 }, start: 0 }));
+      from: { dx: 0, dy: 0 }, start: 0, contactAt: ATTACK_OUT, holdAt: null, totalFrames: ATTACK_FRAMES,
+      travel: { dx: 0, dy: 0 } }));
   }
 
   /** Per-enemy art facts (from the atlas) and layout scale. */
@@ -81,11 +99,16 @@ export class EnemyPoseController {
     for (const s of this.states) { s.mode = 'idle'; s.t = 0; s.from = { dx: 0, dy: 0 }; }
   }
 
+  /** Start the attack. F0 plays the in-place table (travel 0); its contact and length are stored per enemy. */
   playAttack(i: number): void {
     const s = this.states[i];
     if (!s || s.mode === 'dying') return;
     s.mode = 'attack';
     s.t = 0;
+    s.contactAt = ATTACK_OUT;
+    s.holdAt = null;
+    s.totalFrames = ATTACK_FRAMES;
+    s.travel = { dx: 0, dy: 0 };
   }
 
   /** Spell stance. Like an attack, a hit never interrupts it. */
@@ -120,7 +143,7 @@ export class EnemyPoseController {
   attackOutDone(i: number): boolean {
     const s = this.states[i];
     if (!s) return true;
-    if (s.mode === 'attack') return s.t >= ATTACK_OUT;
+    if (s.mode === 'attack') return s.t >= s.contactAt;
     if (s.mode === 'cast') return s.t >= castOut(s.hasCast);
     return true;
   }
@@ -138,16 +161,22 @@ export class EnemyPoseController {
 
   update(dt: number): void {
     this.clock += dt;
-    for (const s of this.states) {
-      if (s.mode === 'idle') continue;
+    this.states.forEach((s, i) => {
+      if (s.mode === 'idle') return;
+      const before = s.t;
       s.t += dt;
-      if (s.mode === 'dying') continue;
-      const end = s.mode === 'attack' ? ATTACK_FRAMES : s.mode === 'cast' ? (s.hasCast ? CAST_FRAMES : PLAIN_CAST_FRAMES) : HURT_FRAMES;
+      if (s.mode === 'dying') return;
+      if (s.mode === 'attack') {
+        const crossed = (at: number | null) => at !== null && before < at && s.t >= at;
+        if (crossed(s.holdAt)) this.onCue?.(i, 'hold');
+        if (crossed(s.contactAt)) this.onCue?.(i, 'contact');
+      }
+      const end = s.mode === 'attack' ? s.totalFrames : s.mode === 'cast' ? (s.hasCast ? CAST_FRAMES : PLAIN_CAST_FRAMES) : HURT_FRAMES;
       if (s.t >= end) {
         s.mode = 'idle';
         s.t = 0;
       }
-    }
+    });
   }
 
   /** Frame name and unscaled offset of enemy i right now. */
@@ -161,12 +190,22 @@ export class EnemyPoseController {
     }
   }
 
-  /** The frame to show and the integer screen offset (scaled by the layout factor, rounded once). */
+  /** The frame to show and the integer screen offset: the lunge part scaled by the layout factor and rounded once, the
+   *  travel part (absolute px, only while an attack travels) as is. */
   state(i: number): PoseState {
     const s = this.states[i];
     if (!s) return { pose: 'idle', dx: 0, dy: 0 };
     const r = this.raw(s);
-    return { pose: r.frame, dx: Math.round(r.dx * s.scaleFactor) || 0, dy: Math.round(r.dy * s.scaleFactor) || 0 };
+    const st: PoseState = { pose: r.frame, dx: Math.round(r.dx * s.scaleFactor) || 0, dy: Math.round(r.dy * s.scaleFactor) || 0 };
+    const travel = s.mode === 'attack' ? s.travel : { dx: 0, dy: 0 };
+    if (travel.dx || travel.dy) { st.travelDx = Math.round(travel.dx); st.travelDy = Math.round(travel.dy); }
+    return st;
+  }
+
+  /** The current attack's contact frame and length (per enemy: a travelling attack is longer). */
+  attackTiming(i: number): { contactAt: number; totalFrames: number } {
+    const s = this.states[i];
+    return s ? { contactAt: s.contactAt, totalFrames: s.totalFrames } : { contactAt: ATTACK_OUT, totalFrames: ATTACK_FRAMES };
   }
 
   /** Current mode and time of enemy i (dev preview label). */

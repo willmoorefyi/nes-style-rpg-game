@@ -80,7 +80,7 @@ describe('T6 review: the active-hero marker survives late art', () => {
 
     const sprite = scene.partySprites[0];
     expect(sprite).toBeInstanceOf(Sprite);
-    expect(sprite.parent).toBe(scene.container);
+    expect(sprite.parent?.parent).toBe(scene.container);   // F0: in the scene's `actors` layer
     expect(sprite.x).toBe(partySpritePosition(0, frames).x - ACTIVE_STEP);   // stepped forward from its place
     expect(scene.partySprites[1].x).toBe(partySpritePosition(1, frames).x); // the other member stays in line
     const tints = new Set<number>();

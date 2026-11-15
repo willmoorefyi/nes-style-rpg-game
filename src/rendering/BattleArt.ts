@@ -1,6 +1,6 @@
 import { Assets, Rectangle, Texture } from 'pixi.js';
 import { characterAtlas, fetchJson } from './CharacterAtlas.js';
-import { BOSS_FRAMES, FRAME_SOURCE, lungePx, type MonsterFrame, type MonsterKeyframe } from '../scenes/battle/enemyChoreography.js';
+import { BOSS_FRAMES, lungePx, resolveFrame, type MonsterFrame, type MonsterKeyframe } from '../scenes/battle/enemyChoreography.js';
 
 const MONSTER_ATLAS = 'assets/sprites/monsters-ai';
 
@@ -41,6 +41,9 @@ export interface MonsterFrames {
   floating: boolean;
   /** The approved sheet has its own cast keyframe (boss). */
   hasCast: boolean;
+  /** The approved sheet has its own `attack_raise` keyframe (the heavy attack's raised hold; else it coils in
+   *  `atk_wind2`). Always set by `getMonsterFrames`; optional so hand-built frames (tests) may leave it out (= false). */
+  hasRaise?: boolean;
   lungePx: number;
   anim: boolean;
 }
@@ -79,7 +82,9 @@ export class BattleArt {
     const [w, h] = entry.cell;
     const cache = new Map<string, Texture>();
     const slice = (name: MonsterFrame): Texture => {
-      const [x, y] = entry.frames[name] ?? entry.frames[FRAME_SOURCE[name]] ?? entry.frames.attack;
+      // the FRAME_FALLBACK chain (e.g. daze → hurt_in1 → idle), then attack
+      const found = resolveFrame(name, (f) => !!entry.frames[f]);
+      const [x, y] = (found && entry.frames[found]) || entry.frames.attack;
       const key = `${x},${y}`;
       let t = cache.get(key);
       if (!t) {
@@ -92,7 +97,7 @@ export class BattleArt {
     const key = (k: MonsterKeyframe): Texture => textures[k];
     return { textures, idle: key('idle'), attack: key('attack'), cast: key('cast'), hurt: key('hurt'), scale: s,
       artScale: s / ts, cell: [w, h], footRow: entry.footRow, floating: entry.floating, hasCast: !!entry.frames.cast,
-      lungePx: lungePx(entry), anim: !!entry.anim };
+      hasRaise: !!entry.frames.attack_raise, lungePx: lungePx(entry), anim: !!entry.anim };
   }
 
   load(): Promise<void> {

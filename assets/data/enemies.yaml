@@ -15,6 +15,7 @@
   xpReward: 6
   goldReward: 6
   sprite: goblin
+  attack: melee
   weakness: fire
 - id: gr_imp
   name: Gr.Imp
@@ -33,6 +34,7 @@
   xpReward: 18
   goldReward: 18
   sprite: gr_imp
+  attack: melee
   weakness: fire
 - id: wolf
   name: Wolf
@@ -51,6 +53,7 @@
   xpReward: 24
   goldReward: 6
   sprite: wolf
+  attack: melee
   weakness: fire
   resist: ice
   family: were
@@ -71,6 +74,7 @@
   xpReward: 93
   goldReward: 22
   sprite: gr_wolf
+  attack: melee
   family: were
 - id: skeleton
   name: Skeleton
@@ -89,6 +93,7 @@
   xpReward: 9
   goldReward: 3
   sprite: skeleton
+  attack: melee
   weakness: fire
   resist: ice
   family: undead
@@ -109,6 +114,7 @@
   xpReward: 40
   goldReward: 40
   sprite: pirate
+  attack: melee
   weakness: lightning
 - id: ogre
   name: Ogre
@@ -125,6 +131,7 @@
   xpReward: 120
   goldReward: 80
   sprite: ogre
+  attack: melee
   weakness: lightning
   family: giant
   size: large
@@ -143,6 +150,7 @@
   xpReward: 100
   goldReward: 60
   sprite: troll
+  attack: melee
   weakness: fire
   family: giant
   size: large
@@ -161,6 +169,7 @@
   xpReward: 80
   goldReward: 50
   sprite: mummy
+  attack: melee
   weakness: fire
   resist: ice
   family: undead
@@ -179,6 +188,7 @@
   xpReward: 90
   goldReward: 70
   sprite: cockatrice
+  attack: melee
   weakness: ice
   family: magical
 - id: vampire
@@ -196,6 +206,7 @@
   xpReward: 400
   goldReward: 200
   sprite: vampire
+  attack: melee
   weakness: fire
   resist: dark
   family: undead
@@ -214,6 +225,8 @@
   xpReward: 500
   goldReward: 300
   sprite: dragon
+  attack: ranged
+  attackEffect: fire_breath
   weakness: ice
   resist: fire
   family: dragon
@@ -236,6 +249,8 @@
   xpReward: 130
   goldReward: 250
   sprite: garland
+  attack: melee
+  attackAnim: heavy
   bossPhases:
   - hpThreshold: 0.25
     patternId: aggressive
@@ -257,6 +272,8 @@
   xpReward: 2000
   goldReward: 1000
   sprite: lich
+  attack: melee
+  attackAnim: heavy
   weakness: fire
   resist: ice
   bossPhases:

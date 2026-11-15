@@ -1,5 +1,6 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { createFloatingNumber, FLOAT_FRAMES, type FloatKind } from './floatingNumbers.js';
+import { BattleLayers } from './BattleLayers.js';
 
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
@@ -18,16 +19,22 @@ export class BattleEffects {
   readonly dyingEnemies: Map<number, number> = new Map();
   readonly spellFlashes: { overlay: Container; age: number; maxAge: number; follow?: Container }[] = [];
 
-  constructor(private readonly mainContainer: Container, private readonly enemySprites: () => Container[]) {}
+  private readonly layers: BattleLayers;
+
+  /** `mainContainer`: the battle's layer root (a plain Container gets the layers built inside it). Floating numbers go
+   *  in `fx.numbers`, flashes in `fx.flash`. */
+  constructor(mainContainer: Container, private readonly enemySprites: () => Container[]) {
+    this.layers = BattleLayers.of(mainContainer);
+  }
 
   addFloating(label: string, kind: FloatKind, sprite: Container): void {
     const text = createFloatingNumber(label, kind, sprite);
-    this.mainContainer.addChild(text);
+    this.layers.fx.numbers.addChild(text);
     this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES });
   }
 
   addFlash(overlay: Container, maxAge: number, follow?: Container): void {
-    this.mainContainer.addChild(overlay);
+    this.layers.fx.flash.addChild(overlay);
     this.spellFlashes.push({ overlay, age: 0, maxAge, follow });
   }
 
@@ -57,7 +64,7 @@ export class BattleEffects {
       ft.text.y -= 1 * dt;
       ft.text.alpha = 1 - ft.age / ft.maxAge;
       if (ft.age >= ft.maxAge) {
-        this.mainContainer.removeChild(ft.text);
+        ft.text.parent?.removeChild(ft.text);
         this.floatingTexts.splice(i, 1);
       }
     }
@@ -89,7 +96,7 @@ export class BattleEffects {
         if (sf.overlay instanceof Sprite && sf.follow instanceof Sprite) sf.overlay.texture = sf.follow.texture;
       }
       if (sf.age >= sf.maxAge) {
-        this.mainContainer.removeChild(sf.overlay);
+        sf.overlay.parent?.removeChild(sf.overlay);
         this.spellFlashes.splice(i, 1);
       }
     }

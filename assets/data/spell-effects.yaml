@@ -1,0 +1,17 @@
+# Battle effects for spells, items and ranged enemy attacks (docs/FEEDBACK_PLAN_2026-11-14.md §3.4).
+# Loaded by DataLoader.loadSpellEffects; bad entries are logged and dropped (src/core/schemaValidationFx.ts).
+#
+# effects:  id -> { kind, frames, impact, glyph?, ramp?, count? }
+#           kind: rise | fall | bolt | ring | orbit | burst | beam | cone | projectile | chevrons
+#           frames: length at 60 fps; impact: the frame the number and the result line land on (0 <= impact < frames)
+# spells:   spell id (spells.yaml) -> effect id
+# items:    battle item id (items.yaml) -> effect id
+# attacks:  an enemy's attackEffect (enemies.yaml, attack: ranged) -> effect id
+#
+# Seeded in pass F's F0 with the dragon's breath only; Fd fills in the rest.
+effects:
+  fire_breath: { kind: cone, frames: 28, impact: 16, ramp: fire }
+spells: {}
+items: {}
+attacks:
+  fire_breath: fire_breath

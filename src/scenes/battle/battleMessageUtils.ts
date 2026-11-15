@@ -2,6 +2,18 @@ import { BitmapText } from 'pixi.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { CHAR_WIDTH, FONT_SIZE } from '../../core/LayoutConstants.js';
 import type { Window } from '../../ui/Window.js';
+import type { NextActionInfo } from '../../battle/BattleStateMachine.js';
+
+/** An action's announcement line ("Hero attacks Goblin A!", "B.MAG casts FIRE!"). */
+export function formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): string {
+  switch (info.actionType) {
+    case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
+    case 'magic': return `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
+    case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
+    case 'run': return `${info.actorName} tries to run!`;
+    default: return `${info.actorName} acts!`;
+  }
+}
 
 /** Capitalize first letter of a string. */
 export function capitalize(s: string): string {

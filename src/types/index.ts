@@ -100,6 +100,12 @@ export interface EnemyData {
   family?: string;
   /** Size category for grid layout: small (1x1), large (2x2), boss (fills screen) */
   size?: 'small' | 'large' | 'boss';
+  /** How its Fight reaches the party: `melee` travels to the target (missing means melee), `ranged` attacks in place. */
+  attack?: 'melee' | 'ranged';
+  /** A ranged attack's effect id (`attacks` in assets/data/spell-effects.yaml). */
+  attackEffect?: string;
+  /** `heavy`: the raised overhead blow (Garland, the lich). */
+  attackAnim?: 'heavy';
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';

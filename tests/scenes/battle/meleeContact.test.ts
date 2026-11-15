@@ -12,6 +12,7 @@ import { PARTY_X, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayM
 import { OutlinedText } from '../../../src/ui/NESFont.js';
 import { readFileSync } from 'node:fs';
 import { readRgbaPng, opaqueBounds } from '../../helpers/pngAlpha.js';
+import { floatsIn } from '../../helpers/battleLayers.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
 import type { InputManager } from '../../../src/core/InputManager.js';
@@ -70,7 +71,8 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
 const contactFrame = (style: AttackStyle) => 29 + advanceFrames(style);
 const REACH = attackReach(HOME_X, ENEMY_X + ENEMY_W);
 
-const floats = (main: Container) => main.children.filter((c): c is OutlinedText => c instanceof OutlinedText);
+/** F0: the numbers are in the layers' `fx.numbers`, inside `main`. */
+const floats = (main: Container): OutlinedText[] => floatsIn(main);
 
 /** Run frames until the advance reaches contact; returns per-frame snapshots. */
 function runToContact(s: ReturnType<typeof setup>, style: AttackStyle) {

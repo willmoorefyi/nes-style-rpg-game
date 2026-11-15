@@ -1,0 +1,7 @@
+# How each status shows in battle (docs/FEEDBACK_PLAN_2026-11-14.md §3.5): posture, looping overlay, tint, icon.
+# Loaded by DataLoader.loadStatusVisuals; bad entries are logged and dropped (src/core/schemaValidationFx.ts).
+#
+# statuses: status -> { posture?: none | daze | stone | tremble, overlay?, tint? (0xRRGGBB), icon?, reserved?, party? }
+#
+# Empty in pass F's F0; Fe fills it in.
+statuses: {}

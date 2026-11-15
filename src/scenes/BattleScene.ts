@@ -1,6 +1,11 @@
 import { Container, Graphics, Sprite, Assets, type BitmapText, type Texture } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import { type BattleSceneDeps, type BattleSceneConfig, type UIState } from './battle/BattleSceneTypes.js';
+import type { EnemyInstance } from '../battle/BattleStateMachine.js';
+import { BattleLayers } from './battle/BattleLayers.js';
+import { BATTLE_MESSAGE_FRAMES, INTRO_FRAMES, NOTICE_FRAMES, holdFrames } from './battle/battleTiming.js';
+import { createBattleDevClock, type BattleDevClock } from './battle/battleDevClock.js';
+import { createActionFx, createStatusFx } from './battle/fx/index.js';
 import { BattleDisplayManager } from './battle/BattleDisplayManager.js';
 import { BattleFieldTargeting } from './battle/BattleFieldTargeting.js';
 import { BattleAnimationController } from './battle/BattleAnimationController.js';
@@ -20,8 +25,6 @@ import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_LINE, BATTLE_MESSAGE_HEIGHT, STRIP_
 
 /** Frames after the command menu opens during which confirm is ignored, so mashing doesn't pick commands. */
 export const COMMAND_CONFIRM_GUARD_FRAMES = 10;
-/** Frames a one-off UI notice ("No spells available.") stays up before the menu returns. */
-const NOTICE_FRAMES = 30;
 
 export type { BattleSceneDeps, BattleSceneConfig } from './battle/BattleSceneTypes.js';
 
@@ -44,7 +47,7 @@ export class BattleScene implements Scene {
   private animation!: BattleAnimationController;
 
   private uiState: UIState = 'intro';
-  private introTimer = 60;
+  private introTimer = INTRO_FRAMES;
   private messageTimer = 0;
   private currentMessageIndex = 0;
   private commandGuard = 0;
@@ -52,6 +55,10 @@ export class BattleScene implements Scene {
   private endPrompt: BitmapText | null = null;
   private endPromptTimer = 0;
   private activeHero = new ActiveHeroMarker(this.container);
+  /** bg < ui < actors < fx < hud, built in the container on enter (BattleLayers.ts). */
+  private layers!: BattleLayers;
+  /** Dev only (`?battleStep=1`, `?enemyAnim=step`, `&slow=N`): the scene-wide clock every system runs on. */
+  private devClock: BattleDevClock | null = null;
   // K4: Turn list in commandWindow during execution
   private turnListContainer = new Container();
 
@@ -74,12 +81,15 @@ export class BattleScene implements Scene {
 
   enter(): void {
     this.deps.audio?.playMusic(this.config.music ?? 'battle');
+    this.layers = BattleLayers.of(this.container);
+    this.devClock = createBattleDevClock();
+    this.introTimer = holdFrames(INTRO_FRAMES);
     // Two-tone battle background
     const bg = new Graphics();
     bg.rect(0, 0, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x16213e);
     bg.rect(0, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT / 2).fill(0x1a1a2e);
     bg.rect(0, GAME_HEIGHT / 2 - 1, GAME_WIDTH, 2).fill(0x2a2a4e);
-    this.container.addChildAt(bg, 0);
+    this.layers.bg.addChild(bg);
 
     // Battle stage background (screen-ready 1920x1080; overlays the solid-color fallback)
     if (this.config.background) {
@@ -90,19 +100,21 @@ export class BattleScene implements Scene {
         sprite.scale.set(scale);
         sprite.x = (GAME_WIDTH - texture.width * scale) / 2;
         sprite.y = (GAME_HEIGHT - texture.height * scale) / 2;
-        this.container.addChildAt(sprite, 1);
+        this.layers.bg.addChild(sprite);
       }).catch((err) => console.warn('Failed to load battle background:', path, err));
     }
 
     this.createUI();
     this.display = new BattleDisplayManager(this.container, this.battle, this.config, this.enemyWindow);
+    // the hero arrow, the target arrow and outline are UI markers: in hud, above every effect
+    this.activeHero = new ActiveHeroMarker(this.layers.hud);
     // late art swaps a placeholder for the real sprite: the active-hero marker moves with it
     this.display.onSpriteSwap = (old, next) => this.activeHero.replace(old, next);
     this.display.createEnemySprites();
     this.display.createPartySprites();
     this.display.updatePartyDisplay();
     const emit = (event: 'cursorMove' | 'cursorSelect' | 'cursorCancel' | 'battleHit' | 'battleMiss' | 'spellCast') => this.deps.events.emit(event, {});
-    this.targeting = new BattleFieldTargeting(this.container, this.battle, this.display, this.deps.input, emit);
+    this.targeting = new BattleFieldTargeting(this.layers.hud, this.battle, this.display, this.deps.input, emit);
     this.animation = new BattleAnimationController(
       this.container, this.battle, this.display, this.deps.input,
       this.commandWindow, this.turnListContainer,
@@ -110,6 +122,9 @@ export class BattleScene implements Scene {
       () => this.resolveRound(),
       emit,
     );
+    this.animation.spells = this.spells;
+    this.animation.fx = createActionFx(this.layers, this.display);
+    this.animation.statusFx = createStatusFx(this.layers, this.display, this.battle);
     this.lists = new BattleListMenus({
       battle: this.battle, config: this.config, spells: this.spells, events: this.deps.events, listWindow: this.enemyWindow,
       showNotice: (text) => this.showNotice(text),
@@ -120,22 +135,33 @@ export class BattleScene implements Scene {
       closeList: (list) => this.closeListWindow(list),
     });
     this.battle.startBattle();
+    this.applyEnemyStatus();
     this.uiState = 'intro';
     this.showMessages();
+  }
+
+  /** Debug scenarios may start enemies with statuses (`enemyStatus`, by enemy index); the screen shows them at once. */
+  private applyEnemyStatus(): void {
+    for (const [index, statuses] of Object.entries(this.config.enemyStatus ?? {})) {
+      const enemy = this.battle.allEnemies[Number(index)];
+      if (!enemy) { console.error(`Battle: enemyStatus for enemy ${index}, but there are ${this.battle.allEnemies.length}`); continue; }
+      for (const status of statuses) enemy.status.apply(status);
+    }
+    this.display.capturePresented();
   }
 
   private createUI(): void {
     // BA-8 bottom strip: enemy list (left), command window (middle); the party panel (right) is the display's
     this.enemyWindow = new Window({ x: ENEMY_WINDOW.x, y: STRIP_Y, width: ENEMY_WINDOW.width, height: STRIP_HEIGHT });
-    this.container.addChild(this.enemyWindow);
+    this.layers.ui.addChild(this.enemyWindow);
     this.commandWindow = new Window({ x: COMMAND_WINDOW.x, y: STRIP_Y, width: COMMAND_WINDOW.width, height: STRIP_HEIGHT });
-    this.container.addChild(this.commandWindow);
+    this.layers.ui.addChild(this.commandWindow);
     this.createCommandMenu();
     this.turnListContainer.visible = false;
     this.commandWindow.addChild(this.turnListContainer);
     // Message window — full width, top
     this.messageWindow = new Window({ x: 0, y: 0, width: GAME_WIDTH, height: BATTLE_MESSAGE_HEIGHT });
-    this.container.addChild(this.messageWindow);
+    this.layers.hud.addChild(this.messageWindow);
     this.messageText = new TextRenderer({
       width: GAME_WIDTH - SCREEN_MARGIN * 2, revealSpeed: 2,
       fontSize: BATTLE_MESSAGE_FONT, lineHeight: BATTLE_MESSAGE_LINE, style: { outline: FLOAT_OUTLINE },
@@ -165,8 +191,10 @@ export class BattleScene implements Scene {
   }
 
   update(dt: number): void {
-    dt = enemyAnimPreview.tick(this.display, this.battle.allEnemies.map(e => e.displayName), this.container, dt);  // dev ?enemyAnim=
+    dt = this.devClock?.frameDt(dt) ?? dt;  // dev ?battleStep= / ?enemyAnim= / &slow=: before anything else
+    enemyAnimPreview.tick(this.display, this.battle.allEnemies.map(e => e.displayName), this.layers.hud, dt, this.devClock?.stepping);
     this.messageText.update(dt);
+    this.layers.update(dt);
     this.display.update(dt);
     this.animation.updateFloatingTexts(dt);
     this.animation.updateDyingEnemies(dt);
@@ -261,7 +289,7 @@ export class BattleScene implements Scene {
   /** A one-off message from the command menu; it never touches the battle's message list. */
   private showNotice(text: string): void {
     this.messageText.setText(text, true);
-    this.noticeTimer = NOTICE_FRAMES;
+    this.noticeTimer = holdFrames(NOTICE_FRAMES);
     this.uiState = 'notice';
   }
 
@@ -383,7 +411,7 @@ export class BattleScene implements Scene {
     }
     this.currentMessageIndex = 0;
     this.messageText.setText(messages[0].text, true);
-    this.messageTimer = 45;
+    this.messageTimer = holdFrames(BATTLE_MESSAGE_FRAMES);
     this.uiState = 'message';
   }
 
@@ -392,7 +420,7 @@ export class BattleScene implements Scene {
     this.currentMessageIndex++;
     if (this.currentMessageIndex < messages.length) {
       this.messageText.setText(messages[this.currentMessageIndex].text, true);
-      this.messageTimer = 45;
+      this.messageTimer = holdFrames(BATTLE_MESSAGE_FRAMES);
     } else if (this.battle.isOver) {
       this.checkBattleEnd();
     } else if (this.battle.state === 'intro') {
@@ -458,12 +486,17 @@ export class BattleScene implements Scene {
   get enemyListLines(): readonly string[] { return this.display.enemyListTexts.map(t => t.text); }
   /** The item ids the open battle item list offers (B5). */
   get itemListIds(): readonly string[] { return this.lists.listedItemIds; }
+  /** The battle's enemies (live state). */
+  get enemyInstances(): readonly EnemyInstance[] { return this.battle.allEnemies; }
 
   onPause(): void {}
   onResume(): void {}
 
   exit(): void {
     enemyAnimPreview.dispose(this.display);
+    this.devClock?.dispose();
+    this.devClock = null;
+    this.layers?.clearUpdaters();
     destroyPromptIndicator(this.endPrompt, this.messageWindow);
     this.endPrompt = null;
     this.activeHero.hide();

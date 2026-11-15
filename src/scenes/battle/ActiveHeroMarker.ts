@@ -1,4 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
+import { setTint } from './actorTint.js';
 
 /** BA-8: the hero whose command is being chosen steps this far toward the enemies. */
 export const ACTIVE_STEP = 24;
@@ -61,14 +62,14 @@ export class ActiveHeroMarker {
     if (!this.sprite) return;
     this.clock += dt;
     this.sprite.alpha = 1;
-    this.sprite.tint = pulseTint(0.5 - 0.5 * Math.cos(this.clock * PULSE_SPEED));
+    setTint(this.sprite, 'hero', pulseTint(0.5 - 0.5 * Math.cos(this.clock * PULSE_SPEED)));
   }
 
-  /** Put the sprite back in line, untinted, and remove the arrow. */
+  /** Put the sprite back in line, without the pulse (other tint sources stay), and remove the arrow. */
   hide(): void {
     if (this.sprite) {
       this.sprite.x = this.homeX;
-      this.sprite.tint = 0xffffff;
+      setTint(this.sprite, 'hero', null);
       this.sprite = null;
     }
     if (this.arrow) {

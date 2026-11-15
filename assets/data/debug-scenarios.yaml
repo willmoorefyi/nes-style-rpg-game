@@ -946,3 +946,259 @@
   gold: 100
   enemies: [goblin, goblin, goblin, goblin]
   background: assets/backgrounds/grassland.webp
+
+# Pass F (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 12): the f_* scenarios for the feedback tranches. This file is frozen
+# after F0; later changes go through the orchestrator. Open with ?mute=1&scenario=<id> (add &battleStep=1 to step every
+# battle system one frame per `.`). Kits: "400 G" is kits.yaml `start`; "lv2" is start + LIT for the B.MAG + 2 potions.
+# Every white (black) spell does not fit one caster (3 per spell level), so f_spells_white / f_spells_black share them
+# between two casters. f_heavy_*: the levels are tuned on the balance sim (4 knights, fists, chain mail, Fight only)
+# so the boss acts at least 4 times in 400 of 400 seeds and the party survives his first 4 attacks (Garland: Lv 3, Lv 5
+# gives 73.5 %; lich: Lv 7, Lv 9 gives 36 %).
+- id: f_gold_start
+  name: F1 - gold from Lv 1 to Lv 2 (overworld, 400 G kit, 30 G)
+  mode: field
+  map: overworld
+  entrance: cornelia
+  party:
+    - { class: warrior, name: WAR, level: 1, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THF, level: 1, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 1, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 1, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 30
+  enemies: []
+- id: f_garland_lv2kit
+  name: F2 - Garland at Lv 2 with the lv2 kit
+  party:
+    - { class: warrior, name: WAR, level: 2, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THF, level: 2, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 2, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 2, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }] }
+  items: { potion: 2 }
+  gold: 0
+  enemies: [garland]
+  background: assets/backgrounds/temple.webp
+- id: f_garland_lv3kit
+  name: F2 - Garland at Lv 3 with the lv2 kit
+  party:
+    - { class: warrior, name: WAR, level: 3, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THF, level: 3, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 3, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 3, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }] }
+  items: { potion: 2 }
+  gold: 0
+  enemies: [garland]
+  background: assets/backgrounds/temple.webp
+- id: f_pace
+  name: F6 - pacing (Lv 3, 400 G kit, goblins and a wolf)
+  party:
+    - { class: warrior, name: WAR, level: 3, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THF, level: 3, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 3, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 3, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: {}
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: f_melee_rows
+  name: F3 - melee travel to every row (six small enemies, Fight only)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, wolf, skeleton, goblin, wolf, skeleton]
+  enemyAi:
+    goblin: [{ type: fight, weight: 1 }]
+    wolf: [{ type: fight, weight: 1 }]
+    skeleton: [{ type: fight, weight: 1 }]
+  background: assets/backgrounds/grassland.webp
+- id: f_melee_large
+  name: F3 - melee travel, large enemies
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [ogre, troll, mummy]
+  background: assets/backgrounds/grassland.webp
+- id: f_ranged
+  name: F3/F4 - a ranged dragon and a melee goblin
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [dragon, goblin]
+  background: assets/backgrounds/desert.webp
+- id: f_heavy_garland
+  name: F7 - Garland's heavy attack (Fight only, 4+ attacks)
+  party:
+    - { class: knight, name: KNT1, level: 3, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT2, level: 3, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT3, level: 3, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT4, level: 3, equipment: [chain_mail], spells: [] }
+  items: { potion: 9 }
+  gold: 0
+  enemies: [garland]
+  enemyAi:
+    garland: [{ type: fight, weight: 1 }]
+  background: assets/backgrounds/temple.webp
+- id: f_heavy_lich
+  name: F7 - the lich's heavy attack (Fight only, 4+ attacks)
+  party:
+    - { class: knight, name: KNT1, level: 7, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT2, level: 7, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT3, level: 7, equipment: [chain_mail], spells: [] }
+    - { class: knight, name: KNT4, level: 7, equipment: [chain_mail], spells: [] }
+  items: { potion: 9 }
+  gold: 0
+  enemies: [lich]
+  enemyAi:
+    lich: [{ type: fight, weight: 1 }]
+  background: assets/backgrounds/shoreline.webp
+- id: f_spells_white
+  name: F4 - every white spell (two casters), hurt and afflicted members, undead
+  party:
+    - class: white_mage
+      name: WHM
+      level: 30
+      equipment: []
+      spells:
+        - { id: cure, level: 1 }
+        - { id: harm, level: 1 }
+        - { id: fog, level: 1 }
+        - { id: lamp, level: 2 }
+        - { id: mute, level: 2 }
+        - { id: alit, level: 2 }
+        - { id: cure2, level: 3 }
+        - { id: hrm2, level: 3 }
+        - { id: afir, level: 3 }
+        - { id: pure, level: 4 }
+        - { id: fear, level: 4 }
+        - { id: aice, level: 4 }
+        - { id: cure3, level: 5 }
+        - { id: life, level: 5 }
+    - class: white_mage
+      name: WHM2
+      level: 30
+      equipment: []
+      status: [poison]
+      spells:
+        - { id: ruse, level: 1 }
+        - { id: invs, level: 2 }
+        - { id: heal, level: 3 }
+        - { id: amut, level: 4 }
+    - { class: thief, name: THF, level: 30, equipment: [], spells: [], status: [silence, blind] }
+    - { class: warrior, name: WAR, level: 30, equipment: [], spells: [], hp: 0 }
+  items: {}
+  gold: 0
+  enemies: [mummy, mummy]
+  background: assets/backgrounds/abandoned_castle.webp
+- id: f_spells_black
+  name: F4 - every black spell (two casters)
+  party:
+    - class: black_mage
+      name: BLM
+      level: 30
+      equipment: []
+      spells:
+        - { id: fire, level: 1 }
+        - { id: lit, level: 1 }
+        - { id: slep, level: 1 }
+        - { id: ice, level: 2 }
+        - { id: dark, level: 2 }
+        - { id: tmpr, level: 2 }
+        - { id: fir2, level: 3 }
+        - { id: hold, level: 3 }
+        - { id: lit2, level: 3 }
+        - { id: slp2, level: 4 }
+        - { id: fast, level: 4 }
+        - { id: conf, level: 4 }
+    - class: black_mage
+      name: BLM2
+      level: 30
+      equipment: []
+      spells:
+        - { id: lock, level: 1 }
+        - { id: slow, level: 2 }
+        - { id: lok2, level: 3 }
+        - { id: ice2, level: 4 }
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+  items: {}
+  gold: 0
+  enemies: [ogre, ogre, troll]
+  background: assets/backgrounds/grassland.webp
+- id: f_items_fx
+  name: F4 - every battle item (hurt, poisoned, stoned and fallen members)
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: thief, name: THF, level: 10, equipment: [rapier, leather_armor], spells: [], status: [poison] }
+    - { class: white_mage, name: WHM, level: 10, equipment: [hammer, cloth], spells: [], status: [stone] }
+    - { class: black_mage, name: BLM, level: 10, equipment: [small_knife, cloth], spells: [], hp: 0 }
+  items: { potion: 3, hi_potion: 2, ether: 2, antidote: 2, soft: 2, phoenix_down: 2 }
+  gold: 0
+  enemies: [goblin]
+  background: assets/backgrounds/grassland.webp
+- id: f_status_enemies
+  name: F5 - every status on an enemy (seven goblins)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, goblin, goblin, goblin, goblin, goblin]
+  enemyStatus: { 0: [sleep], 1: [poison], 2: [stun], 3: [blind], 4: [silence], 5: [fear], 6: [stone] }
+  background: assets/backgrounds/grassland.webp
+- id: f_status_party
+  name: F5 - statuses on the party (sleep, poison + blind, silence, fear)
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], status: [sleep] }
+    - { class: thief, name: THF, level: 10, equipment: [rapier, leather_armor], spells: [], status: [poison, blind] }
+    - { class: white_mage, name: WHM, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [silence] }
+    - { class: black_mage, name: BLM, level: 10, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }], status: [fear] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin]
+  enemyAi:
+    goblin: [{ type: fight, weight: 1 }]
+  background: assets/backgrounds/grassland.webp
+- id: f_status_combo
+  name: F5 - overlays with hurt, spell effects and the death fade (a poisoned ogre)
+  party:
+    - class: black_mage
+      name: BLM
+      level: 5
+      equipment: []
+      spells: [{ id: slep, level: 1 }, { id: fire, level: 1 }, { id: hold, level: 3 }]
+    # Lv 7, not 5: FEAR is a level 4 spell, and a Lv 5 white mage has no level 4 charge
+    - { class: white_mage, name: WHM, level: 7, equipment: [], spells: [{ id: fear, level: 4 }] }
+    - { class: warrior, name: WAR, level: 5, equipment: [], spells: [] }
+    - { class: thief, name: THF, level: 5, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [ogre, goblin]
+  enemyStatus: { 0: [poison] }
+  background: assets/backgrounds/grassland.webp
+- id: f_enemy_casts
+  name: F5 - goblins cast SLEP on the party
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: thief, name: THF, level: 5, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 5, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 5, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin]
+  enemyAi:
+    goblin: [{ type: magic, spellId: slep, weight: 1 }]
+  background: assets/backgrounds/grassland.webp

@@ -1,0 +1,27 @@
+# Party kits per class (docs/FIX_PLAN_PENINSULA.md T4 §1.5, §4; docs/FEEDBACK_PLAN_2026-11-14.md §3.2):
+# kit -> class id -> { gear: [item ids], spells: [spell ids] }. Read by tests/helpers/balanceData.ts (balance tests)
+# and, later, the debug sandbox.
+#
+# start: the 400 G starting kit per base class. The Red Mage starts with no spell: with one, a party of the three
+#        mages and a Warrior would pass 400 G.
+# full:  + chain mail, caps, LIT, SLEP, RUSE (the balance tests add 3 potions).
+# naked: no gear and no spells.
+start:
+  warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
+  thief: { gear: [rapier, leather_armor], spells: [] }
+  monk: { gear: [wooden_nunchaku, cloth], spells: [] }
+  white_mage: { gear: [hammer, cloth], spells: [cure] }
+  black_mage: { gear: [small_knife, cloth], spells: [fire] }
+  red_mage: { gear: [rapier, cloth], spells: [] }
+full:
+  warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+  thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
+  black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
+naked:
+  warrior: { gear: [], spells: [] }
+  thief: { gear: [], spells: [] }
+  monk: { gear: [], spells: [] }
+  white_mage: { gear: [], spells: [] }
+  black_mage: { gear: [], spells: [] }
+  red_mage: { gear: [], spells: [] }

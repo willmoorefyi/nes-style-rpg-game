@@ -1,5 +1,5 @@
 import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
-import { BOSS_FRAMES, FRAME_SOURCE, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { BOSS_FRAMES, FRAME_SOURCE, LATE_FRAMES, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -162,7 +162,8 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(w, 'page width (native px)').toBeLessThanOrEqual(4096 * ts);
       expect(h, 'page height (native px)').toBeLessThanOrEqual(4096 * ts);
       for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
-        const want = 'cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES;
+        // LATE_FRAMES (daze, the heavy raise) join the atlas with pass F's Ff, which drops this exclusion
+        const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !LATE_FRAMES.has(n));
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
         for (const [x, y] of Object.values(e.frames)) {
           expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);

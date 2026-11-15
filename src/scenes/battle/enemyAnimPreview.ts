@@ -4,7 +4,9 @@
  *   ?enemyAnim=step   time is frozen; `.` steps 1 frame forward, `,` 1 back (replayed from t = 0); a corner label shows
  *                     `enemy: frame / t`
  *   &slow=N           divides dt
- * BattleScene calls enemyAnimPreview.tick() once per update and dispose() on exit (removes the key listener).
+ * In the battle these run on the scene-wide dev clock (battleDevClock.ts): it steps and slows every system, and the
+ * preview only drives the loop on that dt (`,` is not available there). BattleScene calls enemyAnimPreview.tick() once
+ * per update, after the dev clock, and dispose() on exit.
  */
 import { BitmapText, type Container } from 'pixi.js';
 import { NES_FONT } from '../../ui/NESFont.js';
@@ -107,9 +109,9 @@ export class EnemyAnimPreview {
     }).join('\n');
   }
 
-  /** Corner label (step mode). */
-  showLabel(parent: Container): void {
-    if (this.mode !== 'step') return;
+  /** Corner label (step mode, or `force` while the scene-wide dev clock steps). */
+  showLabel(parent: Container, force = false): void {
+    if (this.mode !== 'step' && !force) return;
     if (!this.label) {
       this.label = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: 24, fill: 0xffff00 } });
       this.label.position.set(LABEL_POS.x, LABEL_POS.y);
@@ -132,22 +134,21 @@ interface PreviewHost {
 
 const active = new WeakMap<object, EnemyAnimPreview>();
 
-/** BattleScene hooks: one call per update (returns the dt to run with), one on exit. No-op outside dev builds. */
+/** BattleScene hooks: one call per update with the dev clock's dt (the loop driver runs at slow 1 on it, since the clock
+ *  already slowed or stepped it; `stepping` shows the frame label), one on exit. No-op outside dev builds. */
 export const enemyAnimPreview = {
-  tick(host: PreviewHost, names: readonly string[], container: Container, dt: number): number {
-    if (!import.meta.env.DEV || typeof location === 'undefined' || !host.enemyView) return dt;
+  tick(host: PreviewHost, names: readonly string[], container: Container, dt: number, stepping = false): void {
+    if (!import.meta.env.DEV || typeof location === 'undefined' || !host.enemyView) return;
     let p = active.get(host);
     if (!p) {
-      const cfg = parseEnemyAnim(location.search);
-      if (!cfg) return dt;
+      if (!parseEnemyAnim(location.search)) return;
       const view = host.enemyView;
-      p = new EnemyAnimPreview(cfg.mode, cfg.slow, { poses: view.poses, count: host.enemySprites.length,
-        hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}` }, typeof window === 'undefined' ? null : window);
+      p = new EnemyAnimPreview('loop', 1, { poses: view.poses, count: host.enemySprites.length,
+        hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}` });
       active.set(host, p);
     }
-    const out = p.frameDt(dt);
-    p.showLabel(container);
-    return out;
+    p.frameDt(dt);
+    p.showLabel(container, stepping);
   },
   dispose(host: object): void {
     active.get(host)?.dispose();

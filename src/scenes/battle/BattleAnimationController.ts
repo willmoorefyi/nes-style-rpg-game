@@ -10,14 +10,18 @@ import { advanceAt, advanceFrames, returnAt, RETURN_FRAMES, parseAttackOverride,
 import { slashEffect } from './slashEffect.js';
 import { floatKind, floatLabel } from './floatingNumbers.js';
 import { BattleEffects } from './BattleEffects.js';
+import { ANNOUNCE_FRAMES, RESULT_FRAMES, ROUND_END_FRAMES, holdFrames } from './battleTiming.js';
+import { formatAnnouncement } from './battleMessageUtils.js';
+import { noopActionFx, noopStatusFx, type ActionFx, type StatusFx } from './fx/index.js';
+import { actionTargetIds, diffStatuses, statusSets, type StatusDiff } from './presentedState.js';
+import type { SpellData } from '../../types/index.js';
 export { ELEMENT_COLORS } from './BattleEffects.js';
-/** Frames the last result line stays up after a round before the next command menu (or the end screen). */
-export const ROUND_END_FRAMES = 20;
-/** Frames each action's announcement and each result line stay up; confirm skips either. */
-export const ANNOUNCE_FRAMES = 30;
-export const RESULT_FRAMES = 25;
+export { ANNOUNCE_FRAMES, RESULT_FRAMES, ROUND_END_FRAMES } from './battleTiming.js';
+export { formatAnnouncement } from './battleMessageUtils.js';
+/** Runs each action: announce, step forward / lunge, resolve, the effect until its impact, present, results, return.
+ *  The holds live in battleTiming.ts (re-exported above for older callers); confirm skips any of them. */
 export class BattleAnimationController {
-  animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'result' | 'step_back' | 'round_end' = 'announce';
+  animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'effect' | 'result' | 'step_back' | 'round_end' = 'announce';
   animTimer = 0;
   animActorSprite: Container | null = null;
   animActorOrigX = 0;
@@ -48,6 +52,13 @@ export class BattleAnimationController {
   get turnListTexts(): BitmapText[] { return this.turnList.texts; }
   private currentActionInfo: NextActionInfo | null = null;
   private announcement = '';
+  /** Spell / item effects and status overlays (BattleScene sets them from the fx factories; no-ops by default). */
+  fx: ActionFx = noopActionFx; statusFx: StatusFx = noopStatusFx;
+  /** The battle's spells (the target set of an all-target spell). */
+  spells: readonly SpellData[] = [];
+  /** The target set captured at announce time, the effect's impact frame, and the resolved action. */
+  private targetIds: string[] = []; private impactAt = 0;
+  private resolved: { result: ActionResult; diff: StatusDiff } | null = null;
   constructor(
     mainContainer: Container,
     private readonly battle: BattleStateMachine,
@@ -60,8 +71,10 @@ export class BattleAnimationController {
     /** I3: battle sound events (battleHit, battleMiss, spellCast), raised on the contact frame. */
     private readonly emit: (event: 'battleHit' | 'battleMiss' | 'spellCast', data: GameEvents['battleHit']) => void = () => {},
   ) {
+    // `mainContainer` is the layer root (a plain Container gets the layers built inside it); attack cues start effects
     this.effects = new BattleEffects(mainContainer, () => display.enemySprites);
     this.turnList = new TurnList(turnListContainer, commandWindow);
+    if (display.enemyView) display.enemyView.onCue = (_i, cue, sprite) => this.fx.playCue(cue === 'hold' ? 'glint' : 'impact_dust', sprite);
   }
   /** The actor's sprite by battle id (party_i / enemy_i), so equal names never share a sprite. */
   findActorSprite(actorId: string): { sprite: Container; isEnemy: boolean } | null {
@@ -70,15 +83,6 @@ export class BattleAnimationController {
     if (!Number.isInteger(i)) return null;
     const sprite = side === 'party' ? this.display.partySprites[i] : side === 'enemy' ? this.display.enemySprites[i] : undefined;
     return sprite ? { sprite, isEnemy: side === 'enemy' } : null;
-  }
-  formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): string {
-    switch (info.actionType) {
-      case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
-      case 'magic': return `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
-      case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
-      case 'run': return `${info.actorName} tries to run!`;
-      default: return `${info.actorName} acts!`;
-    }
   }
   updateAnimating(dt: number): void {
     const confirmSkip = this.input.isJustPressed('confirm');
@@ -89,7 +93,8 @@ export class BattleAnimationController {
           if (!info) { this.onResolveRound(); return; }
           if (!this.battle.isNextActorAlive()) { this.battle.executeNextAction(); return; }
           this.currentActionInfo = info;
-          this.announcement = this.formatAnnouncement(info);
+          this.announcement = formatAnnouncement(info);
+          this.targetIds = actionTargetIds(info, this.battle, this.spells.find((s) => s.id === info.spellId)?.targeting);
           this.setMessageText(this.announcement);
           this.turnList.add(info);
           const found = this.findActorSprite(info.actorId);
@@ -110,7 +115,7 @@ export class BattleAnimationController {
           }
         }
         this.animTimer += dt;
-        if (this.animTimer >= ANNOUNCE_FRAMES || confirmSkip) {
+        if (this.animTimer >= holdFrames(ANNOUNCE_FRAMES) || confirmSkip) {
           this.animTimer = 0;
           // N2: Enemies skip step_forward; with preview pose art they lunge in their attack pose instead.
           // E1: an enemy that is certain to lose its turn (sleep, stun, stone, lethal poison) never winds up.
@@ -126,16 +131,21 @@ export class BattleAnimationController {
         if (confirmSkip) this.animTimer = frames;
         this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, { dx: this.attackReachPx, dy: this.attackRisePx }) : castAt(this.animTimer));
         // BA-9: the action resolves on the contact frame itself, so the number and the result line meet the blow
-        if (this.animTimer >= frames) this.executeAction();
+        if (this.animTimer >= frames) this.resolveAction();
         break;
       }
       case 'enemy_lunge': {
         // wait until the lunge reaches the party side, then resolve the action (the return plays on its own)
-        if (this.display.enemyView?.poses.attackOutDone(this.animEnemyIndex) ?? true) this.executeAction();
+        if (this.display.enemyView?.poses.attackOutDone(this.animEnemyIndex) ?? true) this.resolveAction();
         break;
       }
       case 'execute': {
-        this.executeAction();
+        this.resolveAction();
+        break;
+      }
+      case 'effect': { // the action is presented at the effect's impact frame (animations are never skipped)
+        this.animTimer += dt;
+        if (this.animTimer >= this.impactAt) this.presentAction();
         break;
       }
       case 'result': {
@@ -147,7 +157,7 @@ export class BattleAnimationController {
         }
         if (this.animTimer === 0) this.setMessageText(this.animMessages[this.animMessageIndex].text);
         this.animTimer += dt;
-        if (this.animTimer >= RESULT_FRAMES || confirmSkip) {
+        if (this.animTimer >= holdFrames(RESULT_FRAMES) || confirmSkip) {
           this.animMessageIndex++; this.animTimer = 0;
           if (this.animMessageIndex >= this.animMessages.length) {
             if (this.animActorIsEnemy) { if (!this.enemyStillAttacking()) this.completeAction(); } else { this.animPhase = 'step_back'; }
@@ -171,8 +181,9 @@ export class BattleAnimationController {
         // The last result line stays up for a moment, then the round resolves by itself (confirm skips the wait).
         // Fades and lunges always finish first, so the next menu never opens over a dying or attacking enemy.
         this.animTimer += dt;
-        if (confirmSkip) this.animTimer = Math.max(this.animTimer, ROUND_END_FRAMES);
-        if (this.animTimer >= ROUND_END_FRAMES && this.dyingEnemies.size === 0 && !this.anyEnemyAttacking()) {
+        const hold = holdFrames(ROUND_END_FRAMES);
+        if (confirmSkip) this.animTimer = Math.max(this.animTimer, hold);
+        if (this.animTimer >= hold && this.dyingEnemies.size === 0 && !this.anyEnemyAttacking()) {
           this.animTimer = 0;
           this.onResolveRound();
         }
@@ -180,32 +191,46 @@ export class BattleAnimationController {
       }
     }
   }
-  /** Resolve the action: numbers, slash, panels, and the first result line, all on this frame. */
-  private executeAction(): void {
+  /** Run the action in the state machine and start its effect (the status diff snapshots every combatant around it);
+   *  it is presented now, or at the effect's impact frame. */
+  private resolveAction(): void {
+    const before = statusSets(this.battle);
     const result = this.battle.executeNextAction();
+    const diff = diffStatuses(before, statusSets(this.battle));
+    this.resolved = { result, diff };
+    const info = this.currentActionInfo;
+    const targets = this.targetIds.flatMap((id) => this.findActorSprite(id)?.sprite ?? []);
+    this.impactAt = info ? this.fx.play(info, result, { targetIds: this.targetIds, targets, actor: this.animActorSprite, diff }) : 0;
+    this.animTimer = 0;
+    if (this.impactAt > 0) this.animPhase = 'effect'; else this.presentAction();
+  }
+  /** Present the resolved action: numbers, slash, panels, statuses, the presented state and the first result line. */
+  private presentAction(): void {
+    if (!this.resolved) return;
+    const { result, diff } = this.resolved;
     const info = this.currentActionInfo;
     this.spawnFloatingTextsFromEvents(result.damageEvents);
     if (result.missed && this.targetSprite) this.effects.addFloating('Miss', 'miss', this.targetSprite);
     if (!this.animActorIsEnemy && info?.actionType === 'fight') this.slashTargets(result.damageEvents);
     if (info) this.emitSounds(info, result);
+    // these capture the presented state (hp, statuses), then statusFx attaches the overlays for this action
     this.display.updatePartyDisplay();
     this.display.updateEnemySprites(this.dyingEnemies);
     this.display.updatePartySprites();
+    this.statusFx.sync(diff);
     // B3: the announcement already said "X casts FIRE!"; the same line is not shown twice
     this.animMessages = result.messages.filter(m => m.text !== this.announcement);
     this.animMessageIndex = 0; this.animTimer = 0;
     if (this.animMessages.length > 0) this.setMessageText(this.animMessages[0].text);
     if (info) this.turnList.complete(info, result.messages);
-    this.animPhase = 'result';
+    this.animPhase = 'result'; this.resolved = null;
   }
-
   /** I3: a damaging Fight sounds a hit, a miss a miss, and a spell that really went off its cast (not when picked). */
   private emitSounds(info: NextActionInfo, result: ActionResult): void {
     if (result.missed) this.emit('battleMiss', {});
     else if (info.actionType === 'fight' && result.damageEvents.some(e => !e.isHeal && e.damage > 0)) this.emit('battleHit', {});
     if (info.actionType === 'magic' && result.messages.some(m => m.text.startsWith(`${info.actorName} casts `))) this.emit('spellCast', {});
   }
-
   /** BA-9 / B11: reach to the target sprite's right edge (its 2x cell, whose art sits 16-34 px inside); the minimum when
    *  there is no target. U3: and from the attacker's feet row (its box's bottom) to the target's. */
   private measureReach(actor: Container, target: Container | null): AttackReach {
@@ -214,7 +239,6 @@ export class BattleAnimationController {
     const a = actor.getBounds();
     return { dx: attackReach(actor.x, b.x + b.width), dy: attackRise(a.y + a.height, b.y + b.height) };
   }
-
   /** Moves the acting party member to an offset from its place in line and shows the frame's pose. */
   private placeActor(f: AttackFrame, remember = true): void {
     if (!this.animActorSprite) return;
@@ -237,7 +261,7 @@ export class BattleAnimationController {
     const type = this.currentActionInfo?.actionType;
     this.animEnemyIndex = this.animActorSprite ? this.display.enemySprites.indexOf(this.animActorSprite) : -1;
     if (!view || this.animEnemyIndex < 0 || (type !== 'fight' && type !== 'magic')) return false;
-    if (type === 'magic') view.poses.playCast(this.animEnemyIndex); else view.poses.playAttack(this.animEnemyIndex);
+    if (type === 'magic') view.poses.playCast(this.animEnemyIndex); else view.playAttack(this.animEnemyIndex, this.targetSprite);
     return true;
   }
   private anyEnemyAttacking(): boolean {
@@ -267,7 +291,6 @@ export class BattleAnimationController {
       this.effects.addFloating(floatLabel(evt), floatKind(evt), sprite);
     }
   }
-
   /** Preview pose art: a hit shows the hurt pose; a lethal hit holds it while the sprite fades out. */
   private reactEnemy(idx: number): void {
     const view = this.display.enemyView;

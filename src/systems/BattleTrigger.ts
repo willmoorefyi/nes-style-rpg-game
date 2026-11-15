@@ -3,6 +3,7 @@ import type { EnemyData } from '../types/index.js';
 import { BattleScene, type BattleSceneDeps, type BattleSceneConfig } from '../scenes/BattleScene.js';
 import { GameOverScene } from '../scenes/GameOverScene.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
+import type { StatusEffect } from '../battle/StatusEffects.js';
 import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 
 export interface BattleEndData {
@@ -37,7 +38,7 @@ export class BattleTrigger {
   }
 
   async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string,
-                      enemyAi?: EnemyAiPatterns): Promise<void> {
+                      enemyAi?: EnemyAiPatterns, enemyStatus?: Record<number, StatusEffect[]>): Promise<void> {
     const enemies = await this.loadEnemyData(enemyIds);
     if (enemies.length === 0) return;
 
@@ -60,6 +61,7 @@ export class BattleTrigger {
       spells,
       background,
       enemyAi,
+      enemyStatus,
       music: bossConfig?.isBoss ? 'boss' : undefined,
     };
     const battleScene = new BattleScene(deps, sceneConfig);

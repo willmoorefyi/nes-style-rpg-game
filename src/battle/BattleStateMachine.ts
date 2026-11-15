@@ -76,6 +76,8 @@ export interface ActionResult {
   damageEvents: DamageEvent[];
   /** True when the action was a fight that missed its target (the battle view shows a grey "Miss"). */
   missed: boolean;
+  /** The spell or item the action used (ids; the battle view picks its effect by these, never by message text). */
+  spellId?: string; itemId?: string;
 }
 
 export interface NextActionInfo {
@@ -85,8 +87,8 @@ export interface NextActionInfo {
   /** The (resolved, living) target's battle id: the view finds its sprite by this, never by name (B2/B6). */
   targetId?: string;
   targetName?: string;
-  /** The spell's display name (FIRE), not its id (B3). */
-  spellName?: string;
+  /** The spell's display name (FIRE), not its id (B3); `spellId` / `itemId` are the ids. */
+  spellName?: string; spellId?: string; itemId?: string;
   /** The item's display name (Potion) (B3). */
   itemName?: string;
   /** U15: a spell that hits every enemy (the turn list reads `>All`). */
@@ -354,7 +356,8 @@ export class BattleStateMachine {
       this._state = 'resolution';
     }
 
-    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed };
+    const { spellId, itemId } = action.command;
+    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed, ...(spellId ? { spellId } : {}), ...(itemId ? { itemId } : {}) };
   }
 
   /** The next queued action; `actorId` (party_i / enemy_i) identifies the actor's sprite, never its name. */
@@ -394,10 +397,10 @@ export class BattleStateMachine {
     }
 
     const spell = cmd.spellId ? this.spells.find(s => s.id === cmd.spellId) : undefined;
-    if (cmd.spellId) result.spellName = spell?.name ?? cmd.spellId;
+    if (cmd.spellId) Object.assign(result, { spellId: cmd.spellId, spellName: spell?.name ?? cmd.spellId });
     if (spell?.targeting === 'all') result.allTargets = true;
     if (cmd.type === 'magic' && silenced) result.silenced = true;
-    if (cmd.itemId) result.itemName = ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId;
+    if (cmd.itemId) Object.assign(result, { itemId: cmd.itemId, itemName: ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId });
 
     return result;
   }

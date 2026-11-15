@@ -104,8 +104,9 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     for (const n of used) expect(MONSTER_FRAMES, n).toContain(n);
     for (const n of names(frames((t) => castAt(t, true), 35))) expect(BOSS_FRAMES, n).toContain(n);
     for (const n of BOSS_FRAMES) expect(['idle', 'attack', 'hurt', 'cast']).toContain(FRAME_SOURCE[n]);
-    expect(MONSTER_FRAMES).toHaveLength(11);
-    expect(BOSS_FRAMES).toHaveLength(15);
+    // F0 (pass F): + daze, daze_b for every sheet; + attack_raise and its four in-betweens for bosses
+    expect(MONSTER_FRAMES).toHaveLength(13);
+    expect(BOSS_FRAMES).toHaveLength(22);
   });
 
   it('lungePx: the D2 formula at w = 55, 93, 185 and beyond the clamps; 24 when the atlas has none', () => {
