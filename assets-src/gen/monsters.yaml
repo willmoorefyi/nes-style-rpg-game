@@ -2122,15 +2122,15 @@
     jointed legs on the ground; the whole creature, claws to tail, sits in the middle of its own cell with empty
     space on both sides
   attack: >-
-    lunging forward low with both crusher claws snapping just in front of its head toward the heroes, the stinger
-    poised over its back, the claws well before the right edge of the middle cell; no venom spray, streak or motion
-    line
+    the body crouched low and the stinger tail struck forward over its back toward the heroes, both crusher claws
+    raised up in front of its face and pulled in close (not reaching forward), the claws and the antennae well before
+    the right edge of the middle cell; no venom spray, streak or motion line
   hurt: >-
     knocked back low, still facing right with the claws toward the heroes and the tail arched over the back as in the
     idle cell, the claws pulled in, every leg on the ground, no taller than its idle height (no rearing up)
   face: its small black stalk eyes and antennae are readable
   extra_negative: sand-yellow shell, thin pincers, wings, more than eight legs, water, bubbles, rearing up, a flat tail
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R234): no tail over the back in the idle, the attack claw sliced, a rear-up hurt
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R234): no tail over the back in the idle, the attack claw sliced, a rear-up hurt; 1235 (R235): the attack claw sliced
 - id: sea_troll
   # "Sea Troll" (098): a hunched blue-green troll with kelp hair (distinct from the troll)
   size: large
