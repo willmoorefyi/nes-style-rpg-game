@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 42 of 300 (build 42 of 285, fix 0 of 15; ledger guard: 142 Gemini attempts - 100)
+Images used: 43 of 300 (build 43 of 285, fix 0 of 15; ledger guard: 143 Gemini attempts - 100)
 
 ## Attempts
 
@@ -70,6 +70,7 @@ Images used: 42 of 300 (build 42 of 285, fix 0 of 15; ledger guard: 142 Gemini a
 | R45 | astos/boss_attack (1235, key `0bd7be3e482a6acaade3f5ab`, `--retry`) | 1 | A deep low lunge toward the heroes, the staff thrust diagonally forward with the curved silver sickle blade solid on its top end (the idle's shape), robes and white hair streaming back, the crown and the ash-grey face in profile kept; no smear. 127 px (the band floor 126; a deep crouch), lowest row 192, top row 66, x 8-191, no border pixels, binary alpha, 14 colours (5 shared), one piece, `pose_diff` 0.81. Nits: a one-handed thrust (the free fist drawn back), the lower half of the staff hidden behind the robe; much lower than the idle (the rig's `atk_wind` steps span 184 to 127 px) | **self-approved with nits** (attempt 2 of 3) |
 | R46 | astos/boss_cast (1234, key `8e142a946de181fbb2922091`) | 1 | A wide casting stance: the sickle staff upright in the left-side hand as in the idle, the free hand thrust toward the heroes with a black thorny death sigil at the palm (touching it, one piece), robes flaring back, crown, white hair and face kept. 173 px, lowest row 192, top row 20, x 12-187, no border pixels, binary alpha, 11 colours (5 shared), one piece, `pose_diff` 0.76. Nits: the sigil is a thin dark scribble (its violet edge did not survive the 11-colour cut; the runtime cast fx must carry the glow); the robe opens on a grey greave | **self-approved with nits** (attempt 1 of 3) |
 | R47 | astos/boss_hurt (1234, key `ab005c93e7ad652d02a334b1`) | 1 | Staggering: the head bowed and turned, the jagged crown tipped askew but still on his head, the free arm thrown up, the robes flung back in a wide sweep, the sickle staff still in his hand (held diagonally, the blade up toward the heroes). 175 px, lowest row 192, top row 18, x 15-184, no border pixels, binary alpha, 12 colours (3 exact shared, the same violets by eye), one piece, `pose_diff` 0.86. Nit: the staff tilts across the body instead of standing upright (a rotation for the rig, no prop swap) | **self-approved** (attempt 1 of 3) |
+| R48 | warmech/boss_idle (1234, key `5b75141e3ea6114cb6e8472a`) | 1 | A hulking bipedal war machine facing right: riveted bronze and weathered teal plates, two thick reverse-jointed legs with clawed metal feet on the ground row, a broad hull, a small domed sensor head, a grille-covered chest core, back pipes and vents; the long-barrelled cannon arm on the right side pointing at the heroes, the three-fingered steel claw on the left side. 183 px, lowest row 192, top row 10, x 10-189, no border pixels, binary alpha, 15 colours with the outline ink, one piece. Nits: the chest core glows pale pink (214, 181, 189; outlined, inside the grille, not a key fringe) instead of white-blue; the lens is a small orange dot | **self-approved** (attempt 1 of 3) |
 
 ## G1 status (2026-11-15, closed)
 
