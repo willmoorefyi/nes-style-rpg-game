@@ -1,0 +1,119 @@
+sprite: earth_elemental
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [70, 27]
+    neck: [68, 50]
+    chest: [58, 62]
+    hip: [56, 100]
+    sh_n: [84, 55]
+    el_n: [90, 68]
+    hand_n: [100, 72]
+    sh_f: [42, 40]
+    el_f: [25, 65]
+    hand_f: [48, 72]
+    hip_n: [70, 92]
+    knee_n: [75, 102]
+    foot_n: [78, 115]
+    toe_n: [88, 120]
+    hip_f: [45, 95]
+    knee_f: [40, 105]
+    foot_f: [38, 115]
+    toe_f: [42, 120]
+  attack:
+    crown: [82, 37]
+    neck: [78, 60]
+    chest: [60, 68]
+    hip: [55, 102]
+    sh_n: [80, 72]
+    el_n: [82, 88]
+    hand_n: [92, 108]
+    sh_f: [50, 38]
+    el_f: [35, 30]
+    hand_f: [28, 45]
+    hip_n: [66, 98]
+    knee_n: [65, 105]
+    foot_n: [63, 114]
+    toe_n: [70, 120]
+    hip_f: [42, 95]
+    knee_f: [30, 98]
+    foot_f: [20, 112]
+    toe_f: [15, 118]
+  hurt:
+    crown: [43, 22]
+    neck: [45, 45]
+    chest: [48, 60]
+    hip: [55, 100]
+    sh_n: [70, 45]
+    el_n: [80, 55]
+    hand_n: [92, 38]
+    sh_f: [35, 45]
+    el_f: [20, 55]
+    hand_f: [25, 40]
+    hip_n: [68, 92]
+    knee_n: [72, 102]
+    foot_n: [75, 115]
+    toe_n: [85, 120]
+    hip_f: [45, 95]
+    knee_f: [42, 105]
+    foot_f: [35, 115]
+    toe_f: [32, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans about the hip and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 4, the near (punching) arm 3 back
+    moves: []
+    t: -0.05
+    tweaks: {crown: [-5, -1], neck: [-4, -1], chest: [-3, 0], sh_n: [-6, -3], el_n: [-5, -3], hand_n: [-5, -4], sh_f: [-4, 1], el_f: [-2, 2], hand_f: [-2, 1]}
+  atk_wind2:                   # coil: lean back 6, the near (punching) arm 6 back, body 3 lower
+    moves: []
+    t: -0.1
+    dy: 3
+    tweaks: {crown: [-8, -1], neck: [-5, -1], chest: [-4, 0], sh_n: [-11, -3], el_n: [-10, -3], hand_n: [-9, -4], sh_f: [-6, 2], el_f: [-3, 3], hand_f: [-3, 1]}
+  atk_mid:                     # the punch comes in: the attack upper body leaned back 7 about the hip, the punching arm 15 higher with its fist still on the ground; the near foot 7 back toward the idle stance
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-8, -3], neck: [-5, -2], chest: [-4, 0], sh_n: [-4, -3], el_n: [-6, -1], hand_n: [-9, 0], sh_f: [-8, 1], el_f: [-9, 3], hand_f: [-7, 4], hip_n: [6, 0], knee_n: [7, 0], foot_n: [7, 0]}
+  atk_follow:                  # settle: the attack upper body 3 back about the hip, the punching arm 12 higher
+    moves: []
+    t: 0.8
+    tweaks: {crown: [-3, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, -1], el_n: [-4, -1], hand_n: [-7, 0], sh_f: [-3, 0], el_f: [-4, 1], hand_f: [-3, 1]}
+  atk_recover:                 # upper body 2 forward and 3 lower (translated), the punching arm 20 lower, the far arm 20 higher
+    moves: []
+    dy: 3
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [-3, 1], hand_n: [-5, 4], sh_f: [2, 0], el_f: [12, 4], hand_f: [13, -4]}
+  hurt_in1:                    # recoil 1, lean back 6, head 1 further back, the near fist 3 up
+    moves: []
+    tweaks: {crown: [-10, -1], neck: [-7, -1], chest: [-5, 0], sh_n: [-6, -3], el_n: [-5, -6], hand_n: [-4, -7], sh_f: [-7, 2], el_f: [-4, 3], hand_f: [-4, 1]}
+  hurt_in2:                    # the hurt pose 4 forward (translated), the head 2 more
+    moves: []
+    tweaks: {crown: [6, 0], neck: [6, 0], chest: [4, 0], sh_n: [4, 0], el_n: [4, 0], hand_n: [4, 0], sh_f: [4, 0], el_f: [4, 0], hand_f: [4, 0]}
+  daze:                        # slump: the upper body 1 forward and 1 lower (translated), the head 1 more
+    moves: []
+    dy: 1
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:                      
+    moves: []
+    dy: 2
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+masks:
+  farm_n:                      # the punching fist rests on the ground in front of the near foot
+    attack: [[74, 94], [109, 94], [109, 123], [74, 123]]
+  thigh_n:                     # the whole near leg moves as one in atk_mid (else a strip of it stays behind)
+    attack: [[55, 95], [74, 95], [74, 105], [55, 105]]
+  shin_n:
+    attack: [[53, 105], [74, 105], [74, 116], [53, 116]]
+  ft_n:
+    attack: [[53, 116], [74, 116], [74, 123], [53, 123]]
+holds: []
+paint:                         # pockets the moves close off, filled with outline ink: hurt_in1 between the raised near
+                               # forearm and the belly, hurt_in2 a 1 px notch at the crotch
+  - {frame: hurt_in1, xy: [[81, 80], [78, 81], [79, 81], [80, 81], [81, 81], [80, 82]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[60, 93]], rgb: [6, 4, 10]}
