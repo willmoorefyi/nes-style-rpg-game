@@ -211,7 +211,13 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
             hand = f"hand_{h}"
             tweaks[hand] = [tweaks.get(hand, [0, 0])[0], tweaks.get(hand, [0, 0])[1] - r["raise"]]
         dy, dx = int(over.get("dy", r.get("dy", 0) * k)), int(over.get("dx", r.get("dx", 0)))
-        J = R.solve(rig, S, T, u, moves, pins, dy, tweaks, not floating, half_joints(rig, name, cfg), dx)
+        shift = (0, 0)
+        if rig.translate:                                 # rooted: the frame's dx/dy move the whole figure rigidly
+            shift = (int(over.get("dx", 0)), int(over.get("dy", 0)))   # a frame dy replaces the recipe's body dy
+            dy, dx = (0 if "dy" in over else int(r.get("dy", 0) * k)), (0 if "dx" in over else int(r.get("dx", 0)))
+            tx, ty = out[r["toward"]].get("shift", (0, 0)) if r["toward"] in out else (0, 0)
+            T = {j: (v[0] - tx, v[1] - ty) for j, v in T.items()}   # a moved target pulls the pose, not the mass
+        J = R.solve(rig, S, T, u, moves, pins, dy, tweaks, not floating, half_joints(rig, name, cfg), dx, shift)
         layers, rots, prop_px = [], {}, {}
         lab, names = segs[r["src"]]
         drop = set(over.get("drop") or [])
@@ -256,6 +262,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                      "toward_labels": out[r["toward"]]["labels"] if r["toward"] in out else segs.get(r["toward"], (None,))[0],
                      "carried": carried, "pairs": pairs, "seam_tolerance": int(cfg.get("seam_tolerance", 0)),
                      **({"rot_cap": rig.rot_cap} if rig.rot_cap else {}),          # FW-5 mechanical preset
+                     **({"shift": shift} if rig.translate else {}),                # rooted whole-figure translate
                      **MR.check_info(rig, r["src"], carried)}
     return out
 

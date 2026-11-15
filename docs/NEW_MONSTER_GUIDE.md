@@ -160,6 +160,15 @@ Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and e
   the upper body by tweaks (cobra); a big attack arch: `atk_mid: {t: 0.20, moves: [neck, head, snout]}`.
 - **`rooted`** (same module: ochu, neochu). Ground `root`, `maw` and each tentacle root `k<i>_0`; chains `tent<i>`
   (`k<i>_0..k<i>_3`, i = 1..6); `lead: [1, 2]` = the tentacles that whip, the rest sway at half the motion.
+  **Whole-figure translate** (`translate: true`, rooted only; any other body is an error): when the approved attack
+  key draws the whole plant shifted (ochu: ~10 px left, raw idle-attack IoU 0.525 < 0.545), a frame's `dx` / `dy`
+  move the whole figure, root, maw and tentacle roots included, as one rigid unit (the pixels are the untranslated
+  frame shifted exactly; a frame `dy` replaces the recipe's body dy, so `dy: 0` still zeroes it). A target frame's
+  shift is taken off before the pose lerp (atk_mid toward a moved atk_wind2 keeps its pose). Check 8 (the root band,
+  the lowest row) and the hole check judge the frame moved back by its shift, as the float band adds `dy`. Without
+  `translate` frame dx / dy never move the ground joints (neochu). Ochu: `atk_wind1/2` dx -3 / -6 (the pull-back
+  meets the attack key's mass), `atk_recover` dx -5, `hurt_in1/2` dx -2 / -1, every frame `moves: []` (moving
+  `k1_1` / `k2_1` creased the thick vines); the strike lives in the keyframe switch.
 - **`arthropod`** (`rig_arthropod.py`, FW-4: spiders, scorpions, crawler, centipedes). Root `body`; `head`, `fang`;
   abdomen `abd → abd_end`; tail `tl0..tl3 → sting`; claws `sh_/el_/hand_{n,f}`; legs `coxa<i>_<s> → knee<i>_<s> →
   tip<i>_<s>` (i = 1..4, one `leg<i>_<s>` chain each, IK). Every tip is a pinned foot. Keep the legs out of `moves`

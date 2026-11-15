@@ -111,6 +111,8 @@ def run_serpent(check: Callable[[bool, str], None]) -> None:
         check(bool(fp) and all(fp.values()), f"{body}: check 8 judges the contacts per foot {sorted(fp)}")
     _cobra(check)
     _rooted(check)
+    from gen import selftest_translate as ST
+    ST.run_translate(check)
     _recipes_unchanged(check)
 
 

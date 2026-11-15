@@ -28,10 +28,12 @@ def palette(keyframes: dict[str, Image.Image]) -> set:
 
 
 def _per_foot(f: dict) -> dict | None:
-    """Part-label maps for the per-foot feet check (frame, pixel source, target keyframe), or None (no rig labels)."""
+    """Part-label maps for the per-foot feet check (frame, pixel source, target keyframe), or None (no rig labels). A
+    translated frame's own labels are moved back by its shift (rooted `translate`), like its pixels in frame_checks."""
     if f.get("labels") is None or f.get("src_labels") is None or not f.get("foot_parts"):
         return None                                        # FW-6: a feetless body (blob) is judged on the whole band
-    return {"frame": f["labels"], "src": f["src_labels"], "toward": f.get("toward_labels"), "parts": f["foot_parts"]}
+    return {"frame": AF.unshift(f["labels"], f.get("shift")), "src": f["src_labels"], "toward": f.get("toward_labels"),
+            "parts": f["foot_parts"]}
 
 
 def _efix(name: str, f: dict, meta: dict) -> list[str]:
@@ -41,7 +43,8 @@ def _efix(name: str, f: dict, meta: dict) -> list[str]:
     a, lab = f["img"], f["labels"]
     out = E.crease(a, lab, a.shape[0], f.get("names")) + E.prop_attached(lab, f.get("grips") or {}, f.get("names"))
     if f.get("contact") is not None and name not in AF.REAR:
-        out += AF.released_feet(a, lab, f["src_labels"], f["foot_parts"], meta["bottom_row"])
+        out += AF.released_feet(AF.unshift(a, f.get("shift")), AF.unshift(lab, f.get("shift")), f["src_labels"],
+                                f["foot_parts"], meta["bottom_row"])
     return out
 
 
@@ -63,12 +66,14 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     S = arrs[f["src"]]
     T = gen[f["toward"]]["img"] if f["toward"] in gen else arrs[f["toward"]]
     cell_h = a.shape[0]
-    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + C.new_holes(a, S, 4, f["labels"])
+    a0 = AF.unshift(a, f.get("shift"))                    # rooted translate: holes and feet judged as if unmoved
+    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + \
+        C.new_holes(a0, S, 4, AF.unshift(f["labels"], f.get("shift")))
     if f["labels"] is not None:
         out += C.seam_gaps(a, f["labels"], f.get("seam_tolerance", 0), f.get("pairs"))
     out += _silhouette(f, a, S, T, cell_h, efix_gates) + C.outline_kept(a, S)
     floating = bool(meta.get("floating") or f.get("floating"))       # FW-1: the float band replaces the feet check
-    out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
+    out += C.feet(a0, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
                   1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"), _per_foot(f),
                   f.get("squash"))
     out += C.clipping(a) + C.rotation_cap(f["rots"], f.get("rot_cap")) + C.whole_pixel(f["joints"])
