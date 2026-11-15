@@ -1137,12 +1137,13 @@
     brass nose ring, a bare muscular chest crossed by a brown leather harness with an iron buckle, a short leather
     kilt, holding one big double-bladed iron axe in both hands; centred in its own cell
   attack: >-
-    stepping forward and chopping the double-bladed axe down at the heroes in front of its body, the horns lowered,
-    the axe head well inside the middle cell
+    stepping forward toward the heroes at the end of a downward chop: the double-bladed axe head is out in front of
+    him on the right side of the image, low at knee height, both hands on the haft, the horns lowered, the axe head
+    well inside the middle cell (not swung back behind him)
   hurt: knocked back, the bull head thrown back with a bellow, the axe dragged low in one hand
   face: its bull face with the nose ring, wide nostrils and angry eyes is readable
-  extra_negative: a cape, a shield, a club, a second axe, armour plates, wings
-  seeds: [1234]
+  extra_negative: a cape, a shield, a club, a second axe, armour plates, wings, an axe swung back behind the body
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R134): the attack is a backswing away from the heroes
 - id: hill_gigas
   # "Hill Gigas" (040): a hill giant (furs and a tree club; distinct from the fire and ice gigas)
   size: large
