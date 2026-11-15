@@ -506,9 +506,11 @@
     crown, the cracked stone face with two burning white eyes, and the glowing seams in frost cyan, ember orange, abyss
     teal and storm white
   attack: >-
-    a crushing double blow: the two arms on the right side of the image smashing their fists down together toward the
-    heroes, the body leaning far forward over a planted front leg, the two arms on the left side of the image drawn
-    back, the wings flaring; exactly four arms, all four clearly visible; at the same pixel size as in Image 3
+    a crushing double blow, seen in the same front view as Image 3 (chest and face toward the viewer, never in side
+    profile): the two arms on the right side of the image raised and smashing their fists down together toward the
+    heroes on the right, the body leaning toward the heroes over a planted front leg, the two arms on the left side of
+    the image drawn back but still clearly visible beside the body, both wings flaring; exactly four arms, all four
+    clearly visible; at the same pixel size as in Image 3
   cast: >-
     channelling: all four hands held in front of the chest around a glowing sphere of swirling energy in the four seam
     colours (cyan, orange, teal and white), the sphere touching the hands, the wings spread wide, the seams blazing;
@@ -525,6 +527,7 @@
   face: the cracked obsidian face with two burning white eyes under the horned crown is readable
   extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1235}   # boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
   size: small

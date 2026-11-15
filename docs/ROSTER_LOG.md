@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 51 of 300 (build 51 of 285, fix 0 of 15; ledger guard: 151 Gemini attempts - 100)
+Images used: 52 of 300 (build 52 of 285, fix 0 of 15; ledger guard: 152 Gemini attempts - 100)
 
 ## Attempts
 
@@ -79,6 +79,7 @@ Images used: 51 of 300 (build 51 of 285, fix 0 of 15; ledger guard: 151 Gemini a
 | R54 | warmech/boss_hurt (1234, key `888c4e5ad9f9e7737562edf7`) | 1 | Damaged: the hull rocked back away from the heroes, the claw arm flung out behind, the back knee buckling, small sparks at the hull and leg seams (attached), the red lens lit, the cannon still on the right side and the claw on the left. 166 px, lowest row 192, top row 27, x 10-190, no border pixels, binary alpha, 16 colours (4 shared), one piece, `pose_diff` 0.72. Nit: the sparks are salmon and peach (222, 156, 156 / 239, 198, 173), close to a key-blend tint at 1x (read as hot sparks at 2x) | **self-approved** (attempt 1 of 3); warmech complete (4 poses) |
 | R55 | chaos/boss_idle (1234, key `fb4bd02e837ce1d90e7822d5`) | 1 | An original obsidian titan (not the published Chaos: no goat legs, tail or serpents): a massive cracked black-stone body on two thick legs, **exactly four arms** (two on each side, huge clawed stone hands), dark tattered wings half raised behind the shoulders, a horned obsidian crown with two curved horns, a stern cracked face with two white eyes, glowing seams through the cracks. Frontal like garland's idle. 173 px, lowest row 192, top row 20, x 9-191, no border pixels, binary alpha, 13 colours with the outline ink, one piece. Nits: the seams are only frost cyan and ember orange (no abyss teal or storm white survived the 13-colour cut); the wings are plain black membranes without the purple flame edge; a very dark overall value (staged backgrounds must keep it readable) | **self-approved** (attempt 1 of 3) |
 | R56 | chaos/boss_attack (1234, key `c60f63417be92ff3445408ea`) | 1 | A lunge to the right, both visible fists driven forward, horned crown and seams kept; 165 px, lowest row 192, top row 28, x 16-183, no border pixels, binary alpha, 15 colours (4 shared), one piece, `pose_diff` 0.58. **Fails review:** a full side profile in which only **two** arms and one wing show (the far pair is hidden), and the fists punch straight forward instead of smashing down | **rejected**; retry follows (seed 1235, `--retry`; the `attack` text keeps the idle's front view with all four arms visible) |
+| R57 | chaos/boss_attack (1235, key `0e132a663fb678d794a42c83`, `--retry`) | 1 | The front view is back (chest and face to the viewer), both wings, the horned crown; 173 px, lowest row 192, top row 20, x 12-187, no border pixels, binary alpha, 13 colours (5 shared), one piece, `pose_diff` 0.39. **Fails review:** only **three** arms (one on the left side), and the upper right arm is cocked high (a wind-up), not smashing down | **rejected**; the last allowed attempt follows (seed 1236, `--retry`; the text places each of the four arms by image side) |
 
 ## G1 status (2026-11-15, closed)
 
