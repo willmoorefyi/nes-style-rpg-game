@@ -727,8 +727,8 @@ python3 -I assets-src/gen/selftest.py
 python3 -I assets-src/gen/monster_anim.py check --all              # checks + lock files
 python3 -I assets-src/gen/monster_anim.py review goblin            # any id(s)
 python3 -I assets-src/build_assets.py monsters_ai
-PYTHONHASHSEED=0 python3 -I assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* > /tmp/a.sha
-PYTHONHASHSEED=1 python3 -I assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* | diff - /tmp/a.sha
+PYTHONHASHSEED=0 python3 -s assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* > /tmp/a.sha
+PYTHONHASHSEED=1 python3 -s assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* | diff - /tmp/a.sha
 python3 -I assets-src/gen/puppet.py review                          # party in-betweens still OK
 python3 -I assets-src/build_assets.py battle_ai field_ai
 git diff --exit-code assets-src/gen/approved assets/sprites/battle-characters-ai.* assets/sprites/characters-ai.*

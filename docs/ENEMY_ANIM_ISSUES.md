@@ -397,8 +397,8 @@ python3 -I assets-src/gen/selftest.py                         # incl. selftest_e
 python3 -I assets-src/gen/monster_anim.py check --all         # 0 failures, every lock matches
 python3 -I assets-src/gen/monster_anim.py review garland lich vampire cockatrice dragon wolf troll ogre pirate
 shasum assets/sprites/battle-characters-ai.* assets/sprites/characters-ai.* > /tmp/party.sha
-PYTHONHASHSEED=0 python3 -I assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* > /tmp/a.sha
-PYTHONHASHSEED=1 python3 -I assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* | diff - /tmp/a.sha
+PYTHONHASHSEED=0 python3 -s assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* > /tmp/a.sha
+PYTHONHASHSEED=1 python3 -s assets-src/build_assets.py monsters_ai && shasum assets/sprites/monsters-ai.* | diff - /tmp/a.sha
 shasum -c /tmp/party.sha && git diff --exit-code assets-src/gen/approved assets/sprites/battle-characters-ai.* assets/sprites/characters-ai.*
 npx tsc --noEmit && npm run build && npm test
 npx vitest run tests/scenes/battle/ tests/data/assetCoverage.test.ts tests/rendering/ tests/battle/
