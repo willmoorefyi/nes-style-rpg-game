@@ -1402,13 +1402,14 @@
     the whole plant stays well inside its own cell
   attack: >-
     the bulbs lunging forward with both maws gaping wide, the two front thorned vines reaching toward the heroes and
-    curling into hooks in front of the bulbs, the root mass in place, exactly four vines and two maws as in the idle
-    cell; every vine tip curls back well before the right edge of the middle cell (not reaching the cell edge)
+    curling into hooks in front of the bulbs at the height of the stalk, the root mass in place, exactly four vines
+    and two maws as in the idle cell; every vine stays below the bulbs and curls back well before the right edge of
+    the middle cell (no vine raised above the bulbs, none reaching the cell edge)
   hurt: >-
     both bulbs recoiling back, the maws snapped shut, the thorned vines curling in, the root mass in place
   face: no eyes; the two toothy maws are the readable feature
   extra_negative: eyes, a face, legs, a pot, green colour, a third maw, a fifth vine, a pink flower
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R168): the attack vines thrown up and out, cut at the cell top and the raw cell line
 - id: hydra
   # "Hydra" (057): three green heads on long necks (distinct from the fire hydra)
   size: large
