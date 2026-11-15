@@ -1,0 +1,25 @@
+{
+  "character": "warmech",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "5b75141e3ea6114cb6e8472a",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R48"
+}

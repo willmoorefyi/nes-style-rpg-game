@@ -9,7 +9,8 @@
 # `body` (biped | robed | quadruped | bird | floating | swimmer | serpent | rooted | naga | arthropod | blob) replaces the
 # fixed biped MOVEMENT wording with that body's motion and ground line (monster.BODY_LINES); `base` (e.g. "the broken
 # stone altar under her lowest coil") is drawn as part of the creature; `idle_negative` is avoided in the idle pose only
-# (boss_idle's Avoid list; the idle cell of a 3-pose sheet).
+# (boss_idle's Avoid list; the idle cell of a 3-pose sheet). `motion` (needs `body`) replaces that body's movement
+# line: a string for every action pose, or {pose: text} for only the poses it names (approved poses keep their keys).
 - id: goblin
   size: small
   prompt_rev: 1     # approved before the action wording; keeps its cache key
@@ -236,23 +237,29 @@
     clearly visible: three on the left side of the image (the upper one with the sun disc, the middle one open, the
     lower one with the bronze blade) and three on the right side of the image (the upper one open, the middle one open,
     the lower one with the censer on its chain), as in Image 3
+  # boss_attack_raise 1235 (R14) text: "... all six arms raised high overhead together, every one of the six hands
+  # lifted above the top of the radiant crown, the arms forming a tall V of three on each side ..." (a near copy of the
+  # idle); 1236 names every hand by image side (the wording that fixed the props in R8 / R10 / R21) and sinks the mask
   attack_raise: >-
-    the wind-up of a crushing sunfire blow, seen in the same three-quarter front view as Image 3 (torso and mask turned
-    toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, every
-    one of the six hands lifted above the top of the radiant crown, the arms forming a tall V of three on each side,
-    all six clearly visible; the bronze blade still in a left-side hand and the sun disc
-    in the upper left hand, both above the radiant crown, the censer on its chain still in a right-side hand; the mask
-    exactly as in Image 3; the tail coiled low and tight
-    around the altar; she sinks down into the coil so that the whole figure, crown and raised arms included, stays
-    inside the grey box at exactly the same pixel size as in Image 3 (crouched into the coil, not taller; the raised
-    blade is the highest point, well below the top of the image)
+    the wind-up of a crushing sunfire blow, in the same front view as Image 3 (torso and mask toward the viewer, never
+    her back): she sinks low into her coil, the torso lowered so that the mask sits near the middle of the image, and
+    lifts all six arms straight up above the radiant crown. On the left side of the image: the upper hand holds the sun
+    disc high above the crown, the middle hand is open above the crown, the lower hand grips the bronze blade raised
+    high above the crown. On the right side of the image: the upper hand is open above the crown, the middle hand is
+    open above the crown, the lower hand holds the censer chain up above the crown with the censer hanging from it.
+    Exactly six arms in a tall V, three on each side, all six clearly visible; the mask and crown exactly as in Image 3;
+    the tail coiled low and tight around the altar. This pose must look clearly different from Image 3: the mask much
+    lower and every hand above the crown. The whole figure, raised hands included, stays inside the grey box at exactly
+    the same pixel size as in Image 3 (the raised blade is the highest point, well below the top of the image)
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
+  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235, boss_attack_raise: 1236}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
   # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette; boss_hurt 1234 (R9): five arms;
   # 1235 (R10, approved as best of 3): pink key fringe on the smoke, forked tail tip; 1236 (R11, + "only a thin wisp
-  # of smoke from the censer"): clean but no recoil; boss_attack_raise 1234 (R13): guide box painted, arms not raised
+  # of smoke from the censer"): clean but no recoil; boss_attack_raise 1234 (R13): guide box painted, arms not raised;
+  # 1235 (R14): a near copy of the idle; 1236 (R33): an exact copy of the idle. No boss_attack_raise is approved
+  # (deferred, ROSTER_LOG R34)
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
@@ -308,6 +315,15 @@
   design_ref: false
   floating: true
   body: floating
+  # the floating line ("tilt the whole body along a strong diagonal ...") hid or bunched wings in R26-R31; only the
+  # poses not yet approved get this line (attack and cast keep their approved keys)
+  motion:
+    hurt: &seraph_motion >-
+      Keep the front or three-quarter front view of Image 3 and a symmetric, composed posture, the armour upright or
+      tilted only slightly; all six wings stay separately visible with their brass joints, three on the left side of
+      the image and three on the right side of the image, none hidden behind the armour or bunched together; the
+      movement is in the wings, gauntlets and halo, and trailing parts lag behind the motion.
+    attack_raise: *seraph_motion
   prompt: >-
     the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
     showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
@@ -335,17 +351,231 @@
     shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
     included, at the same pixel size as in Image 3 and well below the top of the grey box
   hurt: >-
-    a sharp jolt: cracks across the breastplate, one wing pair faltering downward, the armour tilted back only
-    slightly; the posture stays upright and controlled, her composure intact
+    a sharp jolt: bright cracks across the breastplate, the two broken halo arcs knocked askew above the helm, the
+    whole armour tilted back by about fifteen degrees, the helm with its visor bars around the dark opening exactly as
+    in Image 3; the three wings on the left side of the image and the three wings on the right
+    side of the image all stay visible, the lowest wing on each side faltering downward with its feathers splayed, the
+    upper wings flaring; the posture stays upright and controlled, her composure intact; no cape, cloth or ribbon
+    anywhere (Image 3 has none)
+  # approved boss_attack_raise is seed 1234 with this text (ROSTER_LOG R38, R41: best of 3). The retries asked for "seen
+  # squarely from the front like Image 3, ... mirror-symmetric ... all six wings folded upward and inward behind her"
+  # (1235, R39: six wings but cream palette, hood, skirt, smaller) and added "the same white steel and pale-gold armour
+  # colours ..., the same helm with its visor bars ..., as tall as in Image 3" (1236, R40: magenta key patches, no halo)
   attack_raise: >-
-    compressing the air before an explosive release, seen in the same three-quarter front view as Image 3: all six
-    wings folded tightly around the armour, the halo dim, cold light leaking at the wing seams, the whole figure compact
-    and hovering inside the grey box at exactly the same pixel size as in Image 3, the halo well below the top of the
-    image
+    compressing the air before an explosive release, seen in the same front view as Image 3: all six wings drawn in
+    and folded close against the armour like closed fans, the three wings on the left side of the image layered one
+    above the other on the left of the armour and the three on the right side of the image layered the same way on the
+    right, each wing with its brass joint still visible; the gauntlets drawn in to the chest, the halo dim, cold
+    white-blue light leaking between the folded wings; the whole figure narrow and compact, hovering inside the grey
+    box at exactly the same height as in Image 3, the halo well below the top of the image
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
-  sheet_seeds: {boss_idle: 1235, boss_attack: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
   # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
   # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
-  # like a fan"): four wings, a wing chip
+  # like a fan"): four wings, a wing chip; boss_hurt 1234 (R35, without the no-cape clause): six wings, a teal cape added;
+  # 1235 (R36, + no-cape clause): pose_diff 0.12, pink fringe strokes, helm without visor bars
+# ── pass R, G2: the other bosses (per pose, 4 or 5 images) and minibosses (3-pose sheets) (docs/ROSTER_PLAN.md 4.2;
+# the bestiary spec's entries 032, 033, 075, 092, 118, 121, 128). Original designs; limbs and props named by image side
+# (the G1 lesson: it kept props in their hands in R8, R10, R21, R37).
+- id: astos
+  # "Astos", the dark-elf usurper (033): death magic (RUB) and a sickle staff
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: biped
+  prompt: >-
+    Astos, a regal dark-elf usurper king, tall and slender, with ash-grey skin, long straight white hair, long pointed
+    ears, sharp cruel features with narrow glowing violet eyes, and a jagged black iron crown; layered robes of deep
+    violet and black with silver trim, reaching to his shins, over thin fitted silver armour (a silver breastplate and
+    small pauldrons) with a high collar, black boots; he holds a tall black staff ending in a curved silver sickle
+    blade upright in the hand on the left side of the image, the other hand open at his side; both feet on the ground;
+    the whole figure, crown and sickle blade included, well below the top of the grey box (the crown tips about a
+    tenth of the image below the top edge); palette of ash grey, white, deep violet, black and silver
+  action_prompt: >-
+    Astos, exactly as in Image 3: the same ash-grey skin, long white hair, long pointed ears, glowing violet eyes and
+    jagged black iron crown, the same layered deep violet and black robes with silver trim over thin silver armour,
+    black boots, and the same tall black staff ending in a curved silver sickle blade
+  attack: >-
+    a sweeping sickle slash: he steps far forward toward the heroes and swings the sickle staff with both hands, the
+    staff held diagonally, its top end out in front of him toward the heroes with the curved silver sickle blade drawn
+    solid on it, the same size and shape as in Image 3; robes and white hair streaming behind him; the crown on his
+    head; no motion arc, smear or trail; at the same pixel size as in Image 3
+  cast: >-
+    casting a death curse: the staff held upright in the hand on the left side of the image as in Image 3, the other
+    hand thrust forward toward the heroes with a black death sigil (a dark rune circle edged with violet light)
+    floating just in front of the open palm and touching it; robes billowing; the crown on his head; at the same pixel
+    size as in Image 3
+  hurt: >-
+    struck hard: staggering back, the jagged crown slipping askew but still on his head, the robes flung forward, the
+    free arm thrown up, the staff still in the hand on the left side of the image as in Image 3
+  face: his ash-grey elven face with narrow glowing violet eyes and long pointed ears is readable
+  extra_negative: a shield, a second weapon, wings, a throne, a beard, a hood
+  seeds: [1234]
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1235}   # boss_idle 1234 (ROSTER_LOG R42): the crown cut by the cell top;
+  # boss_attack 1234 (R44, "swings the sickle staff in a wide arc ..."): blade lost, a slash smear
+- id: warmech
+  # "Warmech" (118), the ancient war machine: claw melee and Nuclear (cast)
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: biped
+  prompt: >-
+    Warmech, an ancient towering bipedal war machine of riveted bronze and weathered teal armour plates: two thick
+    reverse-jointed mechanical legs with clawed metal feet planted on the ground, a broad armoured hull, a small domed
+    sensor head with one glowing red lens, a glowing white-blue reactor core behind a grille in the chest, exhaust
+    vents and pipes on its back; the arm on the right side of the image is a heavy long-barrelled cannon pointing
+    forward toward the heroes, the arm on the left side of the image ends in a large three-fingered steel claw; the
+    whole machine well below the top of the grey box; palette of bronze, teal, gunmetal grey, the red lens and the
+    white-blue core light
+  action_prompt: >-
+    Warmech, exactly as in Image 3: the same riveted bronze and weathered teal war machine on two reverse-jointed
+    mechanical legs, the small domed sensor head with one red lens, the white-blue reactor core in the chest, the
+    exhaust vents, the heavy cannon arm and the three-fingered steel claw arm
+  attack: >-
+    a claw smash with a forward stomp: one clawed foot stamping far forward toward the heroes, the hull pitched
+    forward, the three-fingered steel claw arm (the arm on the left side of the image in Image 3) swung over and
+    smashing down low in front of the hull toward the heroes, the claw below the head at the end of the blow, the
+    cannon arm pulled in at the side; exactly two arms, as in Image 3: the one claw arm and the one cannon arm, and
+    two legs ending in clawed feet, no other claws; the same broad, bulky domed hull, thick legs and proportions as in
+    Image 3, seen from the same angle, at the same pixel size as in Image 3
+  cast: >-
+    charging a nuclear blast, a pose clearly different from Image 3: the two legs spread much wider apart into a low
+    braced crouch, knees bent, the hull tilted back, the cannon arm (on the right side of the image, as in Image 3)
+    raised and levelled at the heroes with its same round muzzle as in Image 3 glowing bright white, the chest core
+    blazing white-blue through the grille, the claw arm dug down to the ground behind as a brace; the glow drawn on
+    the machine itself, no beam; at the same pixel size as in Image 3
+  hurt: >-
+    damaged: small sparks bursting from the hull seams, one reverse-jointed leg buckling, the hull tilting back away
+    from the heroes, the red lens flickering, the cannon arm still on the right side of the image and the claw arm on
+    the left side, as in Image 3
+  face: no face; the domed sensor head with one glowing red lens is the readable feature
+  extra_negative: a human pilot, a person in a cockpit, wheels, tank treads, wings, a sword, more than two legs
+  seeds: [1234]
+  sheet_seeds: {boss_attack: 1236, boss_cast: 1235}   # boss_cast 1234 (R52): an idle copy, a forked muzzle; boss_attack 1234 (ROSTER_LOG R49): a slim hull, the claw raised (wind-up);
+  # 1235 (R50, + the bulk sentence): an extra claw at the front knee
+- id: death_eye
+  # "Death Eye" (121), the undead eye of the final dungeon: paralysis, time gaze, death magic.
+  # HELD (ROSTER_LOG G2): body floating paused by the plan 6.3 trigger (R38-R40)
+  size: boss
+  per_pose: true
+  design_ref: false
+  floating: true
+  body: floating
+  prompt: >-
+    the Death Eye, a colossal undead eyeball hovering in the air, bound in strips of torn grey grave cloth wrapped
+    around it, a crown of yellowed bones and small skulls set on top, one huge sickly yellow iris with a black slit
+    pupil and bloodshot veins, ghostly pale-violet tendrils trailing below it; nothing touches the ground; palette of
+    grave grey, bone yellow, sickly yellow, blood red and pale violet
+  action_prompt: >-
+    the Death Eye, exactly as in Image 3: the same colossal undead eyeball bound in torn grey grave cloth, the crown of
+    yellowed bones and small skulls, the huge sickly yellow iris with a black slit pupil, the ghostly pale-violet
+    tendrils trailing below
+  attack: >-
+    a lunging stare: the eye surging forward toward the heroes, the iris wide and the pupil narrowed, the ghostly
+    tendrils lashing out toward the heroes, the grave cloth strips streaming behind; at the same pixel size as in Image 3
+  cast: >-
+    a time gaze: the iris flaring bright with a violet clock-like glyph drawn inside the iris itself, the grave cloth
+    strips lifting, the tendrils spread wide; at the same pixel size as in Image 3
+  hurt: >-
+    struck: the eye squeezed half shut behind its grave cloth, tilted back away from the heroes, the bone crown knocked
+    askew but still on top, the tendrils curling in
+  face: the huge yellow iris and slit pupil are the face; no mouth, no other eyes
+  extra_negative: a mouth, teeth, eyestalks, a second eye, arms, legs
+  seeds: [1234]
+- id: chaos
+  # "Chaos" (128), the final boss: an ORIGINAL primordial titan (plan 4.2, binding D13); it must not reproduce any
+  # published Chaos art
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: biped
+  prompt: >-
+    Chaos, a colossal primordial titan of cracked black obsidian standing on two thick legs, a massive muscular
+    humanoid body; exactly four arms, two on each side: on the left side of the image an upper arm and a lower arm, on
+    the right side of the image an upper arm and a lower arm, each ending in a huge clawed stone hand; great tattered
+    wings of shadow-flame (smoke-black membranes edged with purple flame) half raised behind the shoulders, their tips
+    well below the top of the grey box; a heavy horned crown of obsidian growing from the head with two great curved
+    horns; a stern face of cracked stone with two burning white eyes; glowing seams run through the cracks of the body
+    in four colours: frost cyan, ember orange, abyss teal and storm white; palette of obsidian black, deep purple and
+    the four seam colours
+  action_prompt: >-
+    Chaos, exactly as in Image 3: the same colossal titan of cracked black obsidian on two thick legs, exactly four
+    arms (two on each side) with huge clawed stone hands, the same tattered wings of shadow-flame, the horned obsidian
+    crown, the cracked stone face with two burning white eyes, and the glowing seams in frost cyan, ember orange, abyss
+    teal and storm white
+  attack: >-
+    a crushing double blow, seen in the same front view as Image 3 (chest and face toward the viewer, never in side
+    profile), the body leaning toward the heroes on the right over a planted front leg, both wings flaring. Exactly
+    four arms, all four clearly visible and separate: on the right side of the image, the upper arm and the lower arm
+    both swing down in front of the body, their two fists smashing down together low toward the heroes; on the left
+    side of the image, the upper arm is thrown back up behind the shoulder and the lower arm is braced at the hip, both
+    clearly visible beside the body; at the same pixel size as in Image 3
+  cast: >-
+    channelling: all four hands held in front of the chest around a glowing sphere of swirling energy in the four seam
+    colours (cyan, orange, teal and white), the sphere touching the hands, the wings spread wide, the seams blazing;
+    exactly four arms, two on each side, all four clearly visible; at the same pixel size as in Image 3
+  hurt: >-
+    struck: recoiling back, the head thrown back, the glowing seams flaring brighter, the four arms flung outward out
+    of rhythm (two on the left side of the image, two on the right side), the wings faltering
+  attack_raise: >-
+    the wind-up of a crushing blow, seen in the same three-quarter front view as Image 3 (chest and face toward the
+    viewer and the heroes on the right, never his back): both arms on the right side of the image raised high overhead
+    with fists clenched, the two arms on the left side of the image braced low, exactly four arms; the body crouched
+    with both knees bent so that the whole figure, raised fists, horns and wings included, stays inside the grey box at
+    exactly the same pixel size as in Image 3 (the raised fists are the highest point, well below the top of the image)
+  face: the cracked obsidian face with two burning white eyes under the horned crown is readable
+  extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
+  seeds: [1234]
+  sheet_seeds: {boss_attack: 1236}   # boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
+  # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
+- id: piscodemon
+  # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
+  size: small
+  body: biped
+  prompt: >-
+    a demon with the head of a deep-sea anglerfish on a hunched humanoid body: a huge underbitten jaw full of needle
+    teeth, small pale eyes, a glowing yellow-green lure dangling on a stalk from its brow, short fleshy tentacles
+    hanging from the chin like a beard, dark blue-green scale armour plates over the chest and shoulders, a ragged dark
+    purple loincloth, two muscular arms ending in webbed clawed hands, standing on two webbed feet
+  attack: lunging forward and raking both webbed claws at the heroes, the jaws gaping wide, the lure swinging
+  hurt: knocked back, jaws clamped shut, the clawed hands thrown up, the lure and chin tentacles whipping back
+  face: the anglerfish face (small pale eyes, the gaping toothy jaw and the glowing lure) is readable in every cell
+  seeds: [1234]
+- id: evil_eye
+  # "Evil Eye" (075), the Levistone guardian: gazes and death magic (Magic replays the attack frames, D6/D7).
+  # HELD (ROSTER_LOG G2): body floating paused by the plan 6.3 trigger (R38-R40)
+  size: large
+  floating: true
+  body: floating
+  prompt: >-
+    a large floating eye monster: a round fleshy body that is one huge green-irised eye with a black pupil, a wide
+    mouth of jagged fangs below the eye, four writhing eyestalks rising from the top, each ending in a small yellow
+    eye, mottled purple-brown hide; it hovers, nothing touches the ground
+  attack: surging forward toward the heroes, the fanged mouth gaping wide, the four eyestalks lashing forward
+  hurt: knocked back, the big eye squeezed shut, the mouth clenched, the eyestalks recoiling and curling
+  face: the big iris and pupil are the face, with the fanged mouth below it
+  seeds: [1234]
+- id: dragon_zombie
+  # "Dragon Zombie" (092), the undead dragon: a paralysing bite; must read apart from the red dragon (plan 3.3)
+  size: large
+  body: quadruped
+  prompt: >-
+    an undead dragon on four legs seen from the side: rotting grey-green hide stretched tight over bone, a long
+    skull-like head with empty eye sockets glowing ghost-green and a jaw of broken fangs, exposed white ribs along its
+    flank, torn tattered wing membranes hanging from bony wing arms, a long bony tail ending in bare vertebrae, a faint
+    ghost-green glow between the ribs; palette of bone white, rotting grey-green, dark brown and ghost green; drawn at
+    the same large size in all three cells, the body filling the box (as tall as the box with the wings), the head and
+    jaws inside the cell
+  attack: >-
+    lunging its long neck forward in a biting snap with the jaws wide open, torn wings raised, the tail lashing, all
+    four feet still on the ground and the whole head inside the cell
+  # approved: seed 1235 with this text (ROSTER_LOG R62, R64: best of 3); 1236's hurt (R63) "recoiling on all four legs
+  # (no rearing up): the neck twisted up and back ..., the long bony tail still clearly visible ..." reared up again
+  hurt: >-
+    recoiling on all four legs (no rearing up), the neck twisted back, the torn wings drooping, bones rattling at the
+    joints
+  face: the dragon skull with ghost-green glowing eye sockets and broken fangs is readable in every cell
+  extra_negative: fire breath, red scales, a rider, horns
+  seeds: [1235, 1234, 1236]   # 1234 (ROSTER_LOG R61): the head cut, a rear-up hurt; 1236 (R63): a rear-up hurt

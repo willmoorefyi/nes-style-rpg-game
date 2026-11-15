@@ -1,0 +1,25 @@
+{
+  "character": "astos",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "dbacae95ebbf383adc2f29df",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R43"
+}
