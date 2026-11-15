@@ -101,7 +101,7 @@ parts:
 masks:
   head:
     idle: [[112, 66], [140, 66], [160, 70], [173, 76], [173, 92], [150, 94], [124, 94], [112, 92]]
-    attack: [[112, 66], [140, 66], [158, 66], [172, 68], [172, 112], [150, 112], [130, 100], [114, 92]]
+    attack: [[112, 66], [140, 66], [158, 66], [172, 68], [172, 112], [150, 116], [128, 110], [112, 101], [110, 92]]   # the whole lower jaw (its edge creased in follow)
     hurt: [[110, 76], [140, 78], [162, 84], [162, 102], [140, 104], [112, 100]]
 frames:
   atk_wind1:   # anticipation: head drawn back and up, body 1 px back
@@ -149,9 +149,7 @@ frames:
 holds: []
 paint:
   - {frame: atk_wind2, xy: [[125, 95], [126, 95], [127, 95], [128, 95]], rgb: [90, 57, 74]}
-  - {frame: atk_mid, xy: [[116, 91], [117, 92], [118, 93]], rgb: [206, 181, 165]}
   - {frame: atk_mid, xy: [[123, 99]], rgb: [222, 198, 181]}
-  - {frame: atk_follow, xy: [[116, 92], [117, 93], [118, 94]], rgb: [206, 181, 165]}
   - {frame: daze_b, xy: [[112, 69]], rgb: [214, 189, 173]}
   - {frame: daze_b, xy: [[114, 63], [114, 64]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[114, 63], [114, 64]], rgb: [6, 4, 10]}
@@ -161,3 +159,8 @@ paint:
   - {frame: hurt_in2, xy: [[113, 100], [114, 100]], rgb: [222, 206, 189]}
   - {frame: hurt_in2, xy: [[115, 100], [116, 100]], rgb: [222, 198, 181]}
   - {frame: hurt_in2, xy: [[124, 100], [124, 101]], rgb: [231, 222, 198]}
+  - {frame: atk_mid, xy: [[111, 93]], rgb: [189, 148, 148]}                  # throat speck
+  - {frame: atk_follow, xy: [[111, 94]], rgb: [189, 148, 148]}               # throat speck
+  - {frame: atk_follow, xy: [[115, 102], [116, 103]], rgb: [123, 82, 90]}    # checkered jaw outline
+  - {frame: atk_follow, xy: [[32, 106]], rgb: [123, 82, 90]}                 # hind-paw speck
+  - {frame: atk_follow, xy: [[63, 99]], rgb: [148, 99, 107]}                 # far leg speck

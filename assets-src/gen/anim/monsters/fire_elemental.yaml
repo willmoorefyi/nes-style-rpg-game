@@ -20,7 +20,7 @@ parts:
   farm_f: {radius: 7.0}
 masks:                          # the face and crest only; the flame arms stay off the head
   head:
-    idle: [[52, 10], [88, 10], [88, 56], [52, 56]]
+    idle: [[56, 10], [88, 10], [88, 56], [56, 56]]
     attack: [[54, 18], [92, 18], [92, 63], [54, 63]]
     hurt: [[54, 18], [90, 18], [90, 63], [54, 63]]
 # Without arm joints no in-between could bridge idle -> attack (IoU 0.53 < 0.54 at best, translation included): the
@@ -36,3 +36,14 @@ frames:
   daze: {moves: [crown, neck]}  # the face droops, the flames sink
   daze_b: {moves: [crown, neck]}
 holds: []
+paint:                          # cracks where the dropped face meets the left flame tongue, the far upper arm's joint
+  - {frame: daze, xy: [[53, 49], [54, 50], [55, 51], [55, 52], [55, 53], [56, 53], [56, 54], [56, 55], [56, 56], [56, 57]], rgb: [247, 107, 24]}
+  - {frame: daze, xy: [[53, 42], [55, 42], [56, 44], [57, 45]], rgb: [156, 33, 33]}
+  - {frame: daze_b, xy: [[53, 51], [54, 52], [55, 53], [55, 54], [55, 55], [56, 55], [56, 56], [56, 57], [56, 58], [56, 59]], rgb: [247, 107, 24]}
+  - {frame: daze_b, xy: [[53, 44], [55, 44], [56, 46], [57, 47]], rgb: [156, 33, 33]}
+  - {frame: hurt_in1, xy: [[42, 46]], rgb: [41, 0, 33]}
+  - {frame: hurt_in1, xy: [[46, 45], [47, 46], [48, 46], [49, 46], [49, 47]], rgb: [247, 107, 24]}
+  - {frame: hurt_in1, xy: [[43, 46], [44, 46]], rgb: [181, 41, 24]}
+  - {frame: atk_mid, xy: [[41, 60], [42, 60], [43, 60], [44, 60], [45, 60], [46, 60], [47, 60], [48, 60], [49, 60]], rgb: [156, 33, 33]}
+  - {frame: atk_mid, xy: [[44, 61], [45, 61], [47, 61], [41, 62], [43, 62], [45, 62], [46, 62]], rgb: [206, 16, 74]}
+  - {frame: hurt_in1, xy: [[50, 47], [51, 48], [52, 49], [53, 52]], rgb: [255, 156, 33]}

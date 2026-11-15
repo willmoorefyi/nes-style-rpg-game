@@ -122,21 +122,35 @@ frames:
     sampler: rotsprite         # the turned forelegs: nearest left specks on the chest ruff
     pins: [foot_n, foot_f, knee_f]
     moves: [hip, back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
-    tweaks: {foot_n: [3, 0], toe_n: [3, 0], knee_n: [2, 0], sh_n: [-2, 0], el_n: [-13, 0], paw_n: [-16, 0], ftoe_n: [-16, 0], sh_f: [-2, 0], el_f: [-13, 0], paw_f: [-16, 0], ftoe_f: [-16, 0]}
+    tweaks: {foot_n: [3, 0], toe_n: [3, 0], knee_n: [2, 0], sh_n: [-6, 0], el_n: [-14, 0], paw_n: [-16, 0], ftoe_n: [-16, 0], sh_f: [-6, 0], el_f: [-14, 0], paw_f: [-16, 0], ftoe_f: [-16, 0]}
   atk_follow:
     t: 1.10
     moves: [back, chest, tail0, tail1, tail2, tail_tip]
   atk_recover:
     t: 0.35
-    moves: [back, chest, neck, tail0, tail1, tail2, tail_tip, sh_n, sh_f]
+    moves: [back, chest, neck, tail0, tail1, tail2, tail_tip]
+  hurt_in1:                     # neck and head ride the spine, translated (a turned head tore the ruff at x 125)
+    moves: [back, chest, tail0, tail1, tail2, tail_tip, sh_n, el_n, sh_f, el_f]
+    tweaks: {neck: [0, 1], head: [1, 2], snout: [1, 3]}
+  hurt_in2:                     # (the stub tail rides the body: its keyframe angles are 27 deg apart)
+    moves: [back, chest]
+    tweaks: {neck: [0, -1], head: [-1, -2], snout: [-1, -3]}
   daze:
     t: 0.0
     moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
-    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 3]}
+    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 2]}
   daze_b:
     t: 0.0
     moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
-    tweaks: {neck: [0, 2], head: [0, 3], snout: [0, 4]}
+    tweaks: {neck: [0, 2], head: [0, 3], snout: [0, 3]}
 holds: []
 paint:                         # 1 px elbow crack on the near foreleg's back edge closed with outline ink
   - {frame: daze_b, xy: [[82, 101]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[130, 75], [131, 75], [131, 76]], rgb: [57, 41, 33]}       # throat pocket under the lowered jaw
+  - {frame: hurt_in2, xy: [[105, 75], [106, 75], [105, 76], [107, 76]], rgb: [132, 99, 74]}   # shoulder specks
+  - {frame: atk_mid, xy: [[110, 82], [111, 82], [112, 82], [112, 83], [113, 83]], rgb: [57, 41, 33]}   # ruff hole
+  - {frame: atk_mid, xy: [[55, 85], [56, 85], [57, 85], [58, 85], [59, 85], [60, 85], [61, 85], [62, 85]], rgb: [132, 99, 74]}   # doubled thigh outline
+  - {frame: atk_mid, xy: [[61, 86], [62, 86], [63, 86]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[53, 106], [54, 106], [55, 107], [56, 107]], rgb: [115, 82, 66]}    # far hind leg notch
+  - {frame: atk_follow, xy: [[119, 80], [121, 80], [123, 81], [124, 81]], rgb: [156, 140, 115]}   # chest ruff dots
+  - {frame: atk_follow, xy: [[124, 36]], rgb: [206, 156, 99]}                        # back speck
