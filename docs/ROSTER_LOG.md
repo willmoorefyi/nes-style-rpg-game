@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 35 of 300 (build 35 of 285, fix 0 of 15; ledger guard: 135 Gemini attempts - 100)
+Images used: 36 of 300 (build 36 of 285, fix 0 of 15; ledger guard: 136 Gemini attempts - 100)
 
 ## Attempts
 
@@ -62,25 +62,23 @@ Images used: 35 of 300 (build 35 of 285, fix 0 of 15; ledger guard: 135 Gemini a
 | R37 | hollow_seraph/boss_hurt (1236, key `ae3a5b995c782c9115f90312`, `--retry`, attempt 3 of 3) | 1 | Struck: the whole armour tilted back about 15 degrees, white-blue lightning cracks across the breastplate, the helm with the idle's visor bars and dark opening, the halo arcs knocked askew; **six wings** (three on each side with brass joints, the lowest right wing faltering down below the gauntlet), upper wings flared; no cape, no fringe. 169 px (idle 174), lowest row 192 (greave tips, the shared floating offset), top row 24, x 14-186, no border pixels, binary alpha, 16 colours with the outline ink (3 exact shared, the same whites by eye), one piece, `pose_diff` 0.63. Nits: the halo arcs touch the helm (one piece; the rig takes the halo as part of the head here), the tilt reads a little more thrown than "composed" | **self-approved** (attempt 3 of 3, over R35: a teal cape added, and R36: idle copy with fringe) |
 | R38 | hollow_seraph/boss_attack_raise (1234, key `d6093d88bccd3a2763233363`; the `motion:` line plus a per-side fold text) | 1 | 159 px, lowest row 192, top row 34, x 46-154 (compact, as asked), no border pixels, binary alpha, 16 colours (2 exact shared), 2 pieces (figure + one halo arc), `pose_diff` 0.68; gauntlets drawn to the chest, wings folded, halo kept. **Fails review:** only **three** wings, all on the left of the armour: the body turns to a three-quarter profile and the right-side set is not drawn (the same failure as the casts) | **rejected**; retry follows (seed 1235, `--retry`; the text asks for a square front view, mirror-symmetric, the folded wings rising behind both shoulders) |
 | R39 | hollow_seraph/boss_attack_raise (1235, key `3a9eb0fb167b5a4d20f68338`, `--retry`) | 1 | **Six wings**, mirror-symmetric (three folded on each side, every brass joint visible, tips rising behind the shoulders), gauntlets to the chest, compact; 146 px, lowest row 192, top row 47, x 45-154, no border pixels, binary alpha, 16 colours (2 exact shared), one piece, `pose_diff` 0.64. **Fails review (identity drift):** the armour is re-paletted cream and ivory instead of white steel, the helm is a plain hood without the visor bars, a skirt now covers the greaves, and the figure is 16 % smaller than the idle (146 vs 174 px) | **rejected** but kept as the fallback; the last allowed attempt follows (seed 1236, `--retry`; the text adds the idle's white steel, visor helm, bare greaves and height) |
+| R40 | hollow_seraph/boss_attack_raise (1236, key `3a9eb0fb167b5a4d20f68338`, `--retry`, attempt 3 of 3) | 1 | Six wings folded upward and symmetric, the visor helm and white steel back, 170 px, lowest row 192, no border pixels, one piece, `pose_diff` 0.66. **Fails review:** solid magenta key patches behind the helm and between the wings (unoutlined, cannot be painted under the style lock), and no halo | **rejected** (no 4th attempt, D9) |
+| R41 | hollow_seraph/boss_attack_raise: approve R38 (1234, key `d6093d88bccd3a2763233363`) as best of 3 | 0 | R38 keeps the idle's identity (white steel and pale gold, the visor helm, the two-arc halo, the brass joints), is compact as the plan asks (x 46-154), clean (one figure + one halo arc, no border, no key colours). R39 has six symmetric wings but a cream re-palette, a hood and a skirt, which would read as a different creature for the whole raise hold; R40 is unusable. `attack_raise` text and seed in `monsters.yaml` back to the R38 request (the retry wordings kept as a comment). Recorded nits: **only three wings visible**, all on the left of the armour (a three-quarter turn; the right-side set is behind the body); the halo is one arc. **Fix-pass candidate** with `boss_cast` | **self-approved with nits** (best of 3) |
 
-## G1 status (2026-11-15, paused)
+## G1 status (2026-11-15, closed)
 
-- Approved 12 of 15 poses: `ashen_queen` idle, attack, cast, hurt; `drowned_sovereign` all five; `hollow_seraph` idle,
-  attack, cast. Open: `ashen_queen/boss_attack_raise` (2 of 3 attempts used), `hollow_seraph/boss_hurt` and
-  `boss_attack_raise` (0 of 3).
-- **Pause trigger (plan 6.3) fired for both open body types:** naga (R9-R11, R13-R14) and floating six-wing
-  (R29-R31). Diagnosis for the framework owner (FW-9 wording, `monster.py`): the `floating` action MOVEMENT line ("tilt
-  the whole body along a strong diagonal, reach the ... wings far from the body") turns the seraph into a profile in
-  which the near or far wing set is hidden or bunched (five, four or three wings in R26, R27, R29-R31); for the naga,
-  pose requests either copy the idle (R4, R11, R14: `pose_diff` 0.08-0.49 with no lunge or raise) or drop or mirror
-  arms and props (R3, R6, R7, R9). Proposed: a `floating` action line that keeps the front or three-quarter view and
-  every wing visible, and pose text that names each limb and prop by image side (that wording fixed the props in
-  R8, R10, R21).
-- `selftest.py` reports 1 FAILED: `selftest_roster._approved_keys` flags "FW-9 wording in an approved request" for the
-  fiends (their requests must contain `BODY:`). Every fiend key recomputes unchanged and cached; the rule should exempt
-  the pass-R `FIENDS` (framework owner).
-- Fix-pass candidates: `hollow_seraph/boss_cast` (four wings), `ashen_queen/boss_cast` (barely distinct from idle).
+- Approved 14 of 15 poses: `ashen_queen` idle, attack, cast, hurt; `drowned_sovereign` all five; `hollow_seraph` all
+  five. **Deferred (pose only): `ashen_queen/boss_attack_raise`** (R13, R14, R33: every attempt copies the idle or
+  paints the guide box; R34). The queen needs either a rig-made raise for `attackAnim: heavy` or a fix-pass request.
+- First generator's pause (naga R9-R14, floating six-wing R29-R31) handled by FW-9b (commit 304c941): `motion:` per
+  monster (a string, or {pose: text} so approved poses keep their keys); `hollow_seraph` hurt and attack_raise use a
+  frontal, symmetric six-wing line. It fixed the hurt (R37: six wings) but not the fold (R38: three wings; R39 six
+  but re-paletted; R40 key patches). The naga raise also failed with per-side hand naming (R33).
+- `selftest.py`: ALL PASSED after FW-9b (`_approved_keys` exempts FW-9 entries; `selftest_pages` ignores the "boss
+  poses incomplete" notice that a partly approved roster boss prints).
+- Fix-pass candidates: `hollow_seraph/boss_cast` (four wings, far side), `hollow_seraph/boss_attack_raise` (three
+  wings), `ashen_queen/boss_attack_raise` (none approved), `ashen_queen/boss_cast` (barely distinct from idle).
 
 ## Deferred sprites
 
-None.
+- `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34.

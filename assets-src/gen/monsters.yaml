@@ -357,20 +357,21 @@
     side of the image all stay visible, the lowest wing on each side faltering downward with its feathers splayed, the
     upper wings flaring; the posture stays upright and controlled, her composure intact; no cape, cloth or ribbon
     anywhere (Image 3 has none)
-  # boss_attack_raise 1234 (R38) text: "... seen in the same front view as Image 3: all six wings drawn in and folded
-  # close against the armour like closed fans, the three wings on the left side ... layered ..." (three wings drawn)
+  # approved boss_attack_raise is seed 1234 with this text (ROSTER_LOG R38, R41: best of 3). The retries asked for "seen
+  # squarely from the front like Image 3, ... mirror-symmetric ... all six wings folded upward and inward behind her"
+  # (1235, R39: six wings but cream palette, hood, skirt, smaller) and added "the same white steel and pale-gold armour
+  # colours ..., the same helm with its visor bars ..., as tall as in Image 3" (1236, R40: magenta key patches, no halo)
   attack_raise: >-
-    compressing the air before an explosive release, seen squarely from the front like Image 3, the armour facing the
-    viewer and mirror-symmetric left to right (not turned to the side): all six wings folded upward and inward behind
-    her, their feather tips rising together above the shoulders on both sides of the helm; three folded wings on the
-    left side of the image and three folded wings on the right side of the image, each with its brass joint visible;
-    the gauntlets drawn in to the chest, the halo dim, cold white-blue light leaking between the folded wings; the
-    whole figure narrow and compact, hovering inside the grey box at the same height as in Image 3, the wing tips and
-    the halo well below the top of the image
+    compressing the air before an explosive release, seen in the same front view as Image 3: all six wings drawn in
+    and folded close against the armour like closed fans, the three wings on the left side of the image layered one
+    above the other on the left of the armour and the three on the right side of the image layered the same way on the
+    right, each wing with its brass joint still visible; the gauntlets drawn in to the chest, the halo dim, cold
+    white-blue light leaking between the folded wings; the whole figure narrow and compact, hovering inside the grey
+    box at exactly the same height as in Image 3, the halo well below the top of the image
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
-  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236, boss_attack_raise: 1235}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
   # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
   # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
   # like a fan"): four wings, a wing chip; boss_hurt 1234 (R35, without the no-cape clause): six wings, a teal cape added;
