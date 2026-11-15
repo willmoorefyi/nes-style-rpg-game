@@ -819,18 +819,21 @@
     description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
     motion arc or motion lines.
   prompt: >-
-    a stocky teal fish-man warrior in armour of pink and white coral plates over the chest and shoulders, a tall red fin
-    crest on its head, a fish face with gold eyes and a heavy underbite, a round spiral seashell shield on the arm on
-    the left side of the image and a long barbed spear in the hand on the right side of the image, webbed feet
+    a stocky dark blue fish-man warrior wearing a few large clearly shaped plates of pink and white coral armour on the
+    chest and shoulders, a tall red fin crest on top of its head, a big fish face with large round gold eyes and a
+    heavy underbite of small teeth, clearly visible and not covered by the crest, exactly one round spiral seashell
+    shield on the arm on the right side of the image (toward the heroes) and a long barbed spear in the hand on the
+    left side of the image, webbed feet
   attack: >-
-    thrusting the barbed spear forward at the heroes, stepping forward, the one shell shield held up on the arm on the
-    left side of the image as in the idle cell
+    stepping forward and thrusting the barbed spear past the shield toward the heroes, the spear point on the right
+    side of the image ahead of the body, the one shell shield on the same arm as in the idle cell
   hurt: >-
-    knocked back, the shell shield raised in front of the chest on the same arm, the red crest flattened, the spear
+    knocked back, the shell shield on the same arm raised in front of the chest, the red crest flattened, the spear
     tilting back
-  face: its fish face with gold eyes and the heavy underbite is readable
-  extra_negative: a trident, a cape, a crown, twin blades, two shields, a fish tail instead of legs, an anglerfish lure
-  seeds: [1234]
+  face: its fish face with large round gold eyes and the heavy underbite is readable in every cell
+  extra_negative: a trident, a cape, a crown, twin blades, two shields, a fish tail instead of legs, an anglerfish lure, a spear pointing away from the heroes
+  # 1234 (ROSTER_LOG R115): the spear thrust to the left (away from the heroes), the face muddy
+  seeds: [1235, 1234]
 - id: buccaneer
   # "Buccaneer" (020): a roaming sea raider (no tricorn: distinct from the pirate)
   size: small
