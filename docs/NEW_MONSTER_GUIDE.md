@@ -217,6 +217,8 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `frames.<f>: {t, moves, pins, dy, tweaks, drop, scale, sampler}` | `moves: []` = no interpolation (tweaks only). `tweaks.<joint>: [dx, dy]`. `drop: [part]` hides a part. `scale: {fxpart: 0.25-1}` is fx only. `sampler` is per frame |
 | `holds: [{frame, reason}]` | alias a frame to its source; at most 1 per sequence |
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
+| `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220 and drowned_sovereign/cast <= 300, a remap), approved-palette colours or `null`, locked as `kf:<key>` |
+| `raise: false` | FW-R: drop the approved `attack_raise` key (cell kept): no raise frames, `hasRaise: false`, the heavy glint `tip` from `atk_wind2` (hollow_seraph, D-F1) |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
 
 - **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`,
@@ -319,6 +321,9 @@ python3 -I assets-src/gen/monster_anim.py check --all --calibrate   # keyframe-p
 - **Prop carry:** put `carry_to` (a child of `hip`) where the prop reads as dropped behind a shin or the loincloth.
   A prop carried in a raised hand passes the 30° cap only if the hand barely turns (ogre `club_h`). A prop may hide
   almost fully in `hurt_in2`: the pose change at that step hides the switch.
+- **Measure before and after a fix** with `python3 -I assets-src/gen/fixmeasure.py` (`travel`, `partc`, `pieces`,
+  `fills`, `colours`, `diff`; `select` turns colour / box / component / hole selectors into `paint` xy lists with the
+  4-neighbour mode colour; `--raw` = the approved keys without keyframe paint; boxes are `X0 Y0 X1 Y1`, end exclusive).
 - **Paint** only for 1-3 px cracks, holes and strays, in a colour of the surrounding approved palette; `rgb: null`
   reopens an approved gap. **Re-derive every patch after any rig or framework change** (stale ones became specks and
   blobs: E7, E10).

@@ -420,7 +420,7 @@ def test_monster_anim() -> None:
     print("monster framework fixes (per-foot feet, IoU bound, pinned reach, cloth chains)")
     from gen import selftest_fixes as SF
     SF.run_fixes(check)
-    print("monster wave-0 framework (F1-F7, efix_gates, fx allowlist)")
+    print("monster wave-0 framework (F1-F7, efix_gates, fx allowlist; FW-P keyframe paint)")
     from gen import selftest_efix as SE
     SE.run_efix(check)
     print("monster pass F framework (daze recipe, head joints, hold fallback, heavy raise)")
@@ -434,7 +434,10 @@ def test_monster_anim() -> None:
     print("FW-5 templates (biped wings, extra arm pairs, multi-head necks, preset mechanical)")
     from gen import selftest_fw5 as SF5
     SF5.run_fw5(check)
-    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line)")
+    print("roster fix pass measurements (FW-M: fixmeasure.py reproduces the fix plan's RED numbers)")
+    from gen import selftest_fixmeasure as SFM
+    SFM.run_fixmeasure(check)
+    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
     print("monster atlas build locks")
