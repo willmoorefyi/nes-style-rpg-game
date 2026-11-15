@@ -56,6 +56,24 @@ Images used: 29 of 300 (build 29 of 285, fix 0 of 15; ledger guard: 129 Gemini a
 | R31 | hollow_seraph/boss_cast (1236, key `1e6e336641442187d5834bf9`, `--retry`, attempt 3 of 3) | 1 | **Fails review:** the top wing tips are cut by the cell top (row 0, 4 border pixels), only **four** wings, the gauntlets turned purple-brown, no lightning, cruder shading (13 colours, 3 shared); 193 px, one piece, `pose_diff` 0.90 | **rejected** (no 4th attempt, D9) |
 | R32 | hollow_seraph/boss_cast: approve R29 (1234, key `b1755fc7de941893455877e5`) as best of 3 | 0 | All three casts break the six-wing rule; R29 is the cleanest: 182 px, lowest row 192, top row 11 (headroom 11, the halo whole), one piece, no border pixels, the idle's palette, both gauntlets lifted toward the heroes, the halo arcs above the helm, `pose_diff` 0.59. The `cast` text and seed in `monsters.yaml` are back to the R29 request (the retry wordings kept as a comment). Recorded nits: **four wings visible, all on the far side** (a three-quarter turn; the near three are not drawn), so the six-wing count holds only in idle, attack and the later poses; no lightning on the halo (the runtime cast fx must carry it). **First candidate for `pass R fix`** (a regeneration once the fix pass opens) | **self-approved with nits** (best of 3) |
 
+## G1 status (2026-11-15, paused)
+
+- Approved 12 of 15 poses: `ashen_queen` idle, attack, cast, hurt; `drowned_sovereign` all five; `hollow_seraph` idle,
+  attack, cast. Open: `ashen_queen/boss_attack_raise` (2 of 3 attempts used), `hollow_seraph/boss_hurt` and
+  `boss_attack_raise` (0 of 3).
+- **Pause trigger (plan 6.3) fired for both open body types:** naga (R9-R11, R13-R14) and floating six-wing
+  (R29-R31). Diagnosis for the framework owner (FW-9 wording, `monster.py`): the `floating` action MOVEMENT line ("tilt
+  the whole body along a strong diagonal, reach the ... wings far from the body") turns the seraph into a profile in
+  which the near or far wing set is hidden or bunched (five, four or three wings in R26, R27, R29-R31); for the naga,
+  pose requests either copy the idle (R4, R11, R14: `pose_diff` 0.08-0.49 with no lunge or raise) or drop or mirror
+  arms and props (R3, R6, R7, R9). Proposed: a `floating` action line that keeps the front or three-quarter view and
+  every wing visible, and pose text that names each limb and prop by image side (that wording fixed the props in
+  R8, R10, R21).
+- `selftest.py` reports 1 FAILED: `selftest_roster._approved_keys` flags "FW-9 wording in an approved request" for the
+  fiends (their requests must contain `BODY:`). Every fiend key recomputes unchanged and cached; the rule should exempt
+  the pass-R `FIENDS` (framework owner).
+- Fix-pass candidates: `hollow_seraph/boss_cast` (four wings), `ashen_queen/boss_cast` (barely distinct from idle).
+
 ## Deferred sprites
 
 None.
