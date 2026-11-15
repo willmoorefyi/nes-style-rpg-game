@@ -1,7 +1,10 @@
 """Pass R (docs/ROSTER_PLAN.md 6.4, FW-0) budget-guard self-tests, run from selftest.py (test_monster_anim, also --anim):
 the 286th `pass R build` attempt, the 301st pass-R attempt in total, the 4th attempt at one sheet, a closed pass, and
 `only_approved` in `pass R fix` are each tested on synthetic budgets over a fake ledger (the real ledger's first N0
-Gemini attempts plus fake ones); then the real budget.json entries and the real ledger."""
+Gemini attempts plus fake ones); then the real budget.json entries and the real ledger.
+
+`run_prompts` (FW-9): every approved request's cache key recomputed unchanged, and each new monsters.yaml prompt field
+(`idle_negative`, `body`, `base`) changes only its own text."""
 from __future__ import annotations
 
 import json
@@ -141,3 +144,123 @@ def run_roster(check: Callable[[bool, str], None]) -> None:
         root = GEN.HERE / "approved"
         bad = [e["character"] for e in gem[fix["gemini_before"]:] if not (root / e["character"]).is_dir()]
         check(not bad, f"ledger: every pass R fix attempt has an approved id ({bad[:3]})")
+
+
+# ───────────────── FW-9 prompt fields (docs/ROSTER_PLAN.md 5.4): no approved key moves, each field changes only its text ─
+
+FIENDS = ("ashen_queen", "drowned_sovereign", "hollow_seraph")
+
+
+def _approved_keys(check: Callable[[bool, str], None]) -> None:
+    """Every approved request (approved/*/*.json) re-planned from today's code and yaml reproduces its cache key."""
+    from gen import generate as GEN
+    have_style = GEN.STYLE_REF.exists()       # character sheets send the style reference (gen/refs, not committed)
+    metas = [json.loads(p.read_text()) for p in sorted((GEN.HERE / "approved").glob("*/*.json"))]
+    bad, done, skipped = [], 0, 0
+    for meta in metas:
+        cid = meta.get("character") or meta.get("kit")
+        char = GEN.load_character(cid)
+        if not (GEN.is_monster(char) or GEN.is_kit(char)) and not have_style:
+            skipped += 1
+            continue
+        req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
+        done += 1
+        if req.key != meta["cache_key"] or not req.cached:
+            bad.append(f"{cid} {meta['sheet']}: {req.key} != {meta['cache_key']}")
+        if GEN.is_monster(char) and any(t in req.prompt for t in ("BODY:", "BASE:", "idle cell only")):
+            bad.append(f"{cid} {meta['sheet']}: FW-9 wording in an approved request")
+    check(not bad and done + skipped == len(metas) and done >= 1,
+          f"FW-9: all {done} approved request keys recomputed unchanged and cached ({len(metas)} approved, {skipped} "
+          f"character sheets skipped without gen/refs) {bad[:3]}")
+    check(have_style, "FW-9: gen/refs present, so the character sheets' keys were recomputed too")
+
+
+def _only(check: Callable[[bool, str], None], label: str, before: str, after: str, old: str, new: str) -> None:
+    """`after` is `before` with its one `old` replaced by `new` (an insertion when `new` keeps `old` as an anchor)."""
+    ok = before.count(old) == 1 and after == before.replace(old, new, 1) and before != after
+    check(ok, f"FW-9: {label} changes only its own text")
+
+
+def _fields(check: Callable[[bool, str], None]) -> None:
+    from gen import generate as GEN
+    from gen import monster as M
+    from gen import spec as S
+    small, boss = S.MONSTER_BANDS["small"], S.MONSTER_BANDS["boss"]
+    sheet = {"id": "fw9_sheet", "prompt": "a test beast", "attack": "biting", "hurt": "flinching"}
+    pose = {"id": "fw9_boss", "prompt": "a test boss", "action_prompt": "a test boss in motion", "attack": "slashing",
+            "cast": "casting", "hurt": "staggering", "attack_raise": "raising", "extra_negative": "a throne"}
+
+    def p3(m: dict) -> str:
+        return M.prompt(m, small, False, has_monster_ref=True)
+
+    def pp(m: dict, p: str) -> str:
+        return M.pose_prompt(m, boss, p, p != "idle")
+
+    action_poses = [p for p in S.BOSS_POSES if p != "idle"]
+
+    # (a) idle_negative: boss_idle's Avoid list and the 3-pose sheet's idle cell; nowhere else
+    neg = "tentacles, suckers"
+    m = {**pose, "idle_negative": neg}
+    _only(check, "idle_negative (boss_idle Avoid list)", pp(pose, "idle"), pp(m, "idle"), "a throne.", f"a throne, {neg}.")
+    check(all(pp(pose, p) == pp(m, p) for p in action_poses),
+          f"FW-9: idle_negative leaves every action pose's request text unchanged ({', '.join(action_poses)})")
+    idle_cell = "- left cell: idle, a ready battle stance facing right."
+    _only(check, "idle_negative (3-pose idle cell)", p3(sheet), p3({**sheet, "idle_negative": neg}), idle_cell,
+          f"{idle_cell} In the idle cell only, show none of these: {neg}.")
+
+    # (b) body: replaces the fixed biped MOVEMENT wording only; every body has a line; an unknown body is refused
+    olds = [pp(pose, p).split("MOVEMENT: ", 1)[1].split("\n\n", 1)[0] for p in action_poses]
+    check(len(set(olds)) == 1 and "No mist, smoke or ground effects." in olds[0],
+          "FW-9: the fixed boss MOVEMENT paragraph is the same in every action pose")
+    for body in sorted(M.BODY_LINES):
+        mb = {**sheet, "body": body}
+        _only(check, f"body {body} (3-pose)", p3(sheet), p3(mb), M.ACTION_3, M.body_motion_3(mb))
+        bb = {**pose, "body": body}
+        anchor = "Pose: idle, a ready battle stance, facing right.\n\n"
+        _only(check, f"body {body} (boss_idle)", pp(pose, "idle"), pp(bb, "idle"), anchor,
+              anchor + M.body_motion_pose(bb, "idle"))
+        for p in action_poses:
+            _only(check, f"body {body} (boss_{p})", pp(pose, p), pp(bb, p), f"MOVEMENT: {olds[0]}\n\n",
+                  M.body_motion_pose(bb, p))
+    check(len({M.body_motion_3({**sheet, "body": b}) for b in M.BODY_LINES}) == len(M.BODY_LINES),
+          "FW-9: every body gets its own motion line")
+    try:
+        p3({**sheet, "body": "centaur"})
+        refused = False
+    except SystemExit as e:
+        refused = "centaur" in str(e)
+    check(refused, "FW-9: an unknown body is refused, naming it")
+
+    # (c) base: the base-is-the-creature sentence, nothing else
+    base = "the broken stone altar"
+    head3 = p3(sheet).split("Cells:\n", 1)[0]
+    _only(check, "base (3-pose)", p3(sheet), p3({**sheet, "base": base}), head3,
+          head3 + M.base_sentence({"base": base}, "cell"))
+    for p in S.BOSS_POSES:
+        anchor = "Pose: " + pp(pose, p).split("Pose: ", 1)[1].split("\n", 1)[0]
+        _only(check, f"base (boss_{p})", pp(pose, p), pp({**pose, "base": base}, p), anchor,
+              M.base_sentence({"base": base}, "pose") + anchor)
+    check(base in M.base_sentence({"base": base}, "pose") and M.base_sentence({}, "pose") == "",
+          "FW-9: the base sentence names the base and is empty without the field")
+
+    # the G1 fiend entries carry the fields the plan gives them (4.1)
+    q, d, h = (GEN.load_character(c) for c in FIENDS)
+    check(q.get("body") == "naga" and "altar" in (q.get("base") or "") and d.get("body") == "robed"
+          and "tentacles" in (d.get("idle_negative") or "") and h.get("body") == "floating" and h.get("floating") is True
+          and all(c.get("per_pose") and c.get("size") == "boss" and c.get("design_ref") is False for c in (q, d, h)),
+          "FW-9: ashen_queen naga + altar base, drowned_sovereign robed + idle_negative, hollow_seraph floating")
+
+    def avoid(p: str) -> str:
+        return pp(d, p).rsplit("Avoid: ", 1)[1]
+
+    check("tentacles" in avoid("idle") and all("tentacles" not in avoid(p) for p in action_poses),
+          "FW-9: the Drowned Sovereign bans tentacles in boss_idle only")
+    check(all("BASE: the broken stone altar" in pp(q, p) for p in S.BOSS_POSES)
+          and all("exactly six arms" in pp(q, p) for p in S.BOSS_POSES)
+          and all("exactly six articulated mechanical wings" in pp(h, p) for p in S.BOSS_POSES),
+          "FW-9: the altar sentence in every Ashen Queen pose; six arms / six wings in words in every pose")
+
+
+def run_prompts(check: Callable[[bool, str], None]) -> None:
+    _approved_keys(check)
+    _fields(check)

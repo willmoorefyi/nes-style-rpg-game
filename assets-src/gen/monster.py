@@ -3,7 +3,8 @@
 Kept apart from the character code so character prompts, guides and cache keys cannot change.
 
   guide(band, floating)        1680x720 layout guide: per cell a light-grey size box, ground line, facing arrow
-  prompt(m, band, n_images)    the request text
+  prompt(m, band, n_images)    the request text (pose_prompt: one boss pose); optional FW-9 fields `body`, `base`,
+                               `idle_negative` change the text only when set
   cut(raw, band, floating)     raw render -> three frames in the band's square output cell
   recolor(frame, variant)      palette-swap variant of an approved frame (no extra images)
 """
@@ -75,15 +76,102 @@ def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool, has_monster_ref: 
         f"Render as true pixel art: the monster about {band.height[0]}-{band.height[1]} pixels tall in sprite pixels, "
         "every sprite pixel a hard-edged square, no anti-aliasing, no gradients.\n\n"
         f"Monster: {m['prompt'].strip()}. Keep every detail identical in every cell. FACE: {face}.\n\n"
+        + base_sentence(m, "cell") +
         "Cells:\n"
-        "- left cell: idle, a ready battle stance facing right.\n"
+        "- left cell: idle, a ready battle stance facing right."
+        + (f" In the idle cell only, show none of these: {m['idle_negative'].strip()}." if m.get("idle_negative") else "")
+        + "\n"
         f"- middle cell: attack, {m['attack'].strip()}, facing right.\n"
         f"- right cell: hurt, {m['hurt'].strip()}, recoiling away from the heroes (leaning left), still facing right.\n\n"
-        + (ACTION_3 if m.get("prompt_rev", 2) >= 2 else "") +
+        + (body_motion_3(m) if m.get("body") else ACTION_3 if m.get("prompt_rev", 2) >= 2 else "") +
         "One monster per cell and nothing else: no props on the ground, no effects outside the monster, no text.\n"
         "Background: solid flat magenta (#FF00FF) everywhere, no floor, no shadows, no borders.\n"
         f"Avoid: {S.MONSTER_NEGATIVE}{', ' + m['extra_negative'] if m.get('extra_negative') else ''}."
     )
+
+
+# ───────────────── FW-9 prompt fields (docs/ROSTER_PLAN.md 4.3, 5.4) ─────────────────
+# Each addition is emitted ONLY when its field is set in monsters.yaml, so no approved request's text (and cache key)
+# changes: `body:` replaces the fixed biped MOVEMENT wording, `base:` adds the base-is-the-creature sentence,
+# `idle_negative:` is avoided in the idle pose only (boss_idle; the idle cell of a 3-pose sheet).
+# body -> (ground: staging rule for every pose, move: how the action poses move)
+BODY_LINES: dict[str, tuple[str, str]] = {
+    "biped": ("standing on two feet, both feet on the ground line",
+              "Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, "
+              "twist the torso, extend the arms and weapon far from the body, and let hair, cloth or a cape move with "
+              "the motion."),
+    "robed": ("a robed figure with no feet showing: the wide robe hem rests on the ground line in every pose and is "
+              "its ground contact",
+              "Use a strong diagonal line of action through the upper body: lean and twist the torso, extend the arms "
+              "and anything reaching out of the robe far from the body, and let the sleeves and loose hems flow with "
+              "the motion while the hem stays on the ground line."),
+    "quadruped": ("standing on four legs seen from the side, every paw on the ground line unless it is lifted to "
+                  "strike or rear",
+                  "Use a strong diagonal line of action through the whole body: coil or stretch the spine, reach the "
+                  "head, jaws and forelegs far from the body, and let the tail, mane or wings move with the motion."),
+    "bird": ("standing on two feet, both feet on the ground line",
+             "Use a strong diagonal line of action through the whole body: stretch the neck, beak or jaws far forward, "
+             "flare or fold the wings, and counter-swing the tail."),
+    "floating": ("hovering above the ground, nothing touches the ground, no shadow, no water",
+                 "Tilt the whole body along a strong diagonal, reach the limbs, wisps, tendrils or wings far from the "
+                 "body, and let trailing parts lag behind the motion."),
+    "swimmer": ("hovering above the ground as if swimming, nothing touches the ground, no shadow, no water, no "
+                "splashes",
+                "Bend the whole body in a strong S-curve, thrust the jaws far forward or arch away, and sweep the fins "
+                "and tail with the motion."),
+    "serpent": ("coiled upright inside the box, the lowest coil resting on the ground line",
+                "Coil and uncoil the body along a strong curve, strike the head and neck far toward the heroes or draw "
+                "them back, and let the tail tip lash."),
+    "rooted": ("coiled upright inside the box, the lowest coil resting on the ground line; the rooted base never "
+               "leaves the ground",
+               "Keep the base in place and whip the tentacles or vines far from the body along strong curves, the "
+               "lead ones toward the heroes, the others swaying behind."),
+    "naga": ("a humanoid upper body on a serpent tail, no legs: coiled upright inside the box, the lowest coil "
+             "resting on the ground line",
+             "Lean and twist the upper body along a strong diagonal above the coils, extend the arms and weapons far "
+             "from the body, tighten or loosen the coils, and let the tail tip lash."),
+    "arthropod": ("seen from the side, legs spread, every leg tip on the ground line",
+                  "Lower or raise the body along a strong diagonal, extend the fangs, pincers or stinger far toward the "
+                  "heroes, and splay the legs while their tips stay on the ground line."),
+    "blob": ("a single soft mass resting on the ground line, a clear dark outline",
+             "Squash and stretch the whole mass: stretch it far toward the heroes or flatten and bulge it, always one "
+             "soft mass."),
+}
+BODY_EFFECTS = "No mist, smoke or ground effects."
+
+
+def body_lines(m: dict) -> tuple[str, str]:
+    body = m["body"]
+    if body not in BODY_LINES:
+        raise SystemExit(f"refused: {m['id']} has body '{body}'; choose from {sorted(BODY_LINES)}")
+    return BODY_LINES[body]
+
+
+def body_motion_3(m: dict) -> str:
+    """The 3-pose sheet's MOVEMENT paragraph for `body:` (replaces ACTION_3)."""
+    ground, move = body_lines(m)
+    return ("MOVEMENT: the attack and hurt cells are dramatic ACTION frames, not static stances. " + move + " Each of "
+            f"the three silhouettes must be clearly different. BODY: in every cell, {ground}. {BODY_EFFECTS}\n\n")
+
+
+def body_motion_pose(m: dict, pose: str) -> str:
+    """A per-pose boss's body paragraph for `body:`: the ground rule in every pose, the movement (and, as in the
+    fixed wording, the no-effects rule) in action poses only; the idle keeps its staging details (mist, wind)."""
+    ground, move = body_lines(m)
+    if pose == "idle":
+        return f"BODY: {ground}.\n\n"
+    return ("MOVEMENT: this is a dramatic ACTION frame of a huge, intimidating boss, not a static stance. " + move +
+            " The silhouette must be very different from the idle reference. Any part of the body or weapon may reach "
+            f"beyond the sides of the grey box. BODY: {ground}. {BODY_EFFECTS}\n\n")
+
+
+def base_sentence(m: dict, where: str) -> str:
+    """`base:` (e.g. a broken altar, a sand mound): drawn as part of the creature, never as a separate prop."""
+    if not m.get("base"):
+        return ""
+    return (f"BASE: {m['base'].strip()} is part of the creature's own body, drawn joined to it with a shared black "
+            f"outline in every {where} and resting on the ground line as its ground contact; it is not a separate prop "
+            "or scenery.\n\n")
 
 
 def pose_guide(band: S.MonsterBand, floating: bool = False) -> Image.Image:
@@ -113,7 +201,7 @@ def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> 
                 "design, armour, colours, proportions and size; only the pose changes.\n\n") if has_identity else ""
     # action poses: the look without static staging details (e.g. mist), plus direction for movement
     look = (m.get("action_prompt") or m["prompt"]) if pose != "idle" else m["prompt"]
-    motion = ("" if pose == "idle" else
+    motion = (body_motion_pose(m, pose) if m.get("body") else "" if pose == "idle" else
               "MOVEMENT: this is a dramatic ACTION frame of a huge, intimidating boss, not a static stance. Use a "
               "strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist "
               "the torso, extend the limbs and weapon far from the body, and let the mantle and loose armour edges "
@@ -131,11 +219,13 @@ def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> 
         "every sprite pixel a hard-edged square, no anti-aliasing, no gradients, rich detail and 3-4 tones per "
         "colour like a premium modern pixel-art boss.\n\n"
         f"Boss: {look.strip()}. FACE: {face}.\n\n"
+        + base_sentence(m, "pose") +
         f"Pose: {action}, facing right.\n\n"
         + motion +
         "Only the boss: no other characters, no scenery, no floor tiles, no text.\n"
         "Background: solid flat magenta (#FF00FF) everywhere, no shadows, no borders, no panels.\n"
-        f"Avoid: {S.MONSTER_NEGATIVE}{', ' + m['extra_negative'] if m.get('extra_negative') else ''}."
+        f"Avoid: {S.MONSTER_NEGATIVE}{', ' + m['extra_negative'] if m.get('extra_negative') else ''}"
+        f"{', ' + m['idle_negative'].strip() if pose == 'idle' and m.get('idle_negative') else ''}."
     )
 
 

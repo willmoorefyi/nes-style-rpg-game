@@ -5,6 +5,11 @@
 # `floating: true` keeps one shared vertical offset (no ground line). `face` overrides the default readable-face rule.
 # `variants` (palette swaps, no extra images): [{id: <sprite>, map: {"#rrggbb": "#rrggbb"}} | {id, hue: <deg>, sat: <x>, val: <x>}]
 # `seeds` are tried in order; put the approved seed first.
+# FW-9 (docs/ROSTER_PLAN.md 4.3; each changes the request text only when set, so approved keys never move):
+# `body` (biped | robed | quadruped | bird | floating | swimmer | serpent | rooted | naga | arthropod | blob) replaces the
+# fixed biped MOVEMENT wording with that body's motion and ground line (monster.BODY_LINES); `base` (e.g. "the broken
+# stone altar under her lowest coil") is drawn as part of the creature; `idle_negative` is avoided in the idle pose only
+# (boss_idle's Avoid list; the idle cell of a 3-pose sheet).
 - id: goblin
   size: small
   prompt_rev: 1     # approved before the action wording; keeps its cache key
@@ -187,3 +192,122 @@
   seeds: [1234]
   sheet_seeds: {boss_attack_raise: 1236}   # 1234 painted the guide's ground line across both boots (ACT1_LOG #29);
   # 1235 (#30) drew a broad flat cleaver without the rune inlay or spearhead and a muddy skull (retry #32)
+# ── pass R, G1: the New Fiends (docs/ROSTER_PLAN.md 4.1; lore: the bestiary spec's "New Fiends"). Original designs, one
+# image per pose like the lich; boss_idle first, every later pose sends it as the identity image. FW-9 fields:
+# `body` picks the per-body motion line, `base` the base-is-the-creature sentence, `idle_negative` is avoided in
+# boss_idle only (so the disguise holds there and the action poses may reveal what it bans).
+- id: ashen_queen
+  # "the Ashen Queen", Fiend of Fire: a sun priestess who entered the sacred flame and took her god's shape
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: naga
+  base: the broken stone altar under her lowest coil
+  prompt: >-
+    the Ashen Queen, a towering six-armed sun priestess transformed by sacred fire; the upper body is a tall, graceful
+    humanoid torso of blackened, cracked stone-like skin with molten orange-gold light glowing through the fissures;
+    exactly six arms, three on each side: the upper pair raised holding a small radiant sun disc between them, the
+    middle pair in open blessing and offering gestures, the lower pair holding a curved ceremonial bronze blade (near
+    side) and a smoking censer on a chain (far side); a radiant crown of gold rays frames a cracked white ceremonial
+    mask; no legs: below the waist a vast serpentine tail of charcoal scales with ember-lit undersides, coiled around a
+    broken stone altar on the ground; palette of charcoal, ember orange, white-gold, bronze and ash grey
+  action_prompt: >-
+    the Ashen Queen, a towering six-armed sun priestess transformed by sacred fire, exactly as in Image 3: the tall
+    humanoid torso of blackened, cracked stone-like skin with molten orange-gold light in the fissures; exactly six
+    arms, three on each side, with the small radiant sun disc, the curved ceremonial bronze blade and the smoking censer
+    on a chain; the radiant crown of gold rays and the cracked white ceremonial mask; no legs: the vast serpentine tail
+    of charcoal scales with ember-lit undersides coiled around the broken stone altar; palette of charcoal, ember
+    orange, white-gold, bronze and ash grey
+  attack: >-
+    lunging forward on the coiled tail toward the heroes, the three near-side arms striking in one sweeping blow with
+    the bronze blade leading, the three far-side arms thrown back, the tail coil tightening around the altar
+  cast: >-
+    a sacred fire rite: she rises tall on the coiled tail, all six arms spread in a ritual formation, the sun disc
+    between the upper hands blazing white-gold, small sparks rising around her hands
+  hurt: >-
+    struck hard: recoiling back over the coil, the crack in the mask flaring brighter, the six arms flung outward out of
+    rhythm, the censer chain swinging
+  attack_raise: >-
+    the wind-up of a crushing sunfire blow, seen in the same three-quarter front view as Image 3 (torso and mask turned
+    toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, the
+    bronze blade and the sun disc above the radiant crown, the mask exactly as in Image 3; the tail coiled low and tight
+    around the altar; she sinks down into the coil so that the whole figure, crown and raised arms included, stays
+    inside the grey box at exactly the same pixel size as in Image 3 (crouched into the coil, not taller; the raised
+    blade is the highest point, well below the top of the image)
+  face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
+  extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
+  seeds: [1234]
+- id: drowned_sovereign
+  # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
+  # every action pose opens the robes on the abyssal creature beneath
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: robed
+  idle_negative: tentacles, suckers, fins, fish features
+  prompt: >-
+    the Drowned Sovereign, an ancient, composed human king crowned with tarnished gold set with pearls, an aged regal
+    face with calm pale eyes and wet grey hair; he wears magnificent ceremonial robes of deep abyssal teal and
+    pearl-white with gold embroidery; the robes are impossibly long and flowing, their hems drifting outward and upward
+    as if under water and pooling wide on the ground, hiding his whole body; one pale hand extends from a wide sleeve
+    holding a coral sceptre, the other is hidden; nothing inhuman is visible
+  action_prompt: >-
+    the Drowned Sovereign, exactly as in Image 3: the same tarnished gold crown set with pearls, the aged regal face
+    with pale eyes and wet grey hair, the same impossibly long pearl-white and abyssal-teal ceremonial robes with gold
+    embroidery, their hems pooling wide on the ground, and the coral sceptre; the robes are able to part and open,
+    revealing dark teal tentacles with pale suckers beneath
+  attack: >-
+    the robes part at the front and three dark teal tentacles with pale suckers lash out far toward the heroes; the
+    crown, face and robe outline stay as in Image 3
+  cast: >-
+    an abyssal spell: the robes open wide like a fan and six dark teal tentacles spread in a circular ritual formation
+    behind him, their tips glowing a deep abyssal blue; he raises the coral sceptre
+  hurt: >-
+    knocked back: dark teal tentacles erupt defensively from under the robe around him, face grimacing, crown knocked
+    askew
+  attack_raise: >-
+    the wind-up of his heaviest blow, the most revealing pose, seen in the same three-quarter front view as Image 3
+    (face and crown toward the viewer and the heroes on the right, never his back): the robes thrown fully open, a mass
+    of dark teal tentacles with pale suckers and a glimpse of something enormous folded beneath rising high behind him,
+    the coral sceptre raised; the crown and face exactly as in Image 3; he sinks low into the pooled robes so that the
+    whole figure, raised tentacles included, stays inside the grey box at exactly the same pixel size as in Image 3
+    (the highest tentacle tip well below the top of the image)
+  face: the aged human face under the crown, with calm pale eyes, is readable
+  extra_negative: a second crown, a throne, a fish tail
+  seeds: [1234]
+- id: hollow_seraph
+  # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
+  # halo; her composure stays intact even when hurt
+  size: boss
+  per_pose: true
+  design_ref: false
+  floating: true
+  body: floating
+  prompt: >-
+    the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
+    showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
+    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread; thin hanging
+    greaves, no feet on the ground, a faint pale wind spiralling under her; palette of white steel, pale gold, brass,
+    storm grey and a cold white-blue glow
+  action_prompt: >-
+    the Hollow Seraph, exactly as in Image 3: a hovering hollow suit of elegant white and pale-gold armour with no body
+    inside, the open helm showing only darkness, the fractured golden halo floating above the helm, exactly six
+    articulated mechanical wings, three on each side, of overlapping metallic feathers in white steel with brass joints,
+    thin hanging greaves; palette of white steel, pale gold, brass, storm grey and a cold white-blue glow
+  attack: >-
+    the six wings sweep forward together toward the heroes, throwing a crescent of cutting wind: short pale streaks
+    attached to the wing tips
+  cast: >-
+    a storm rite: the six wings raised high and spread wide, the halo crackling with white-blue lightning, both
+    gauntlets lifted
+  hurt: >-
+    a sharp jolt: cracks across the breastplate, one wing pair faltering downward, the armour tilted back only
+    slightly; the posture stays upright and controlled, her composure intact
+  attack_raise: >-
+    compressing the air before an explosive release, seen in the same three-quarter front view as Image 3: all six
+    wings folded tightly around the armour, the halo dim, cold light leaking at the wing seams, the whole figure compact
+    and hovering inside the grey box at exactly the same pixel size as in Image 3, the halo well below the top of the
+    image
+  face: no face; the empty dark helm opening and the halo are the readable features
+  extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
+  seeds: [1234]
