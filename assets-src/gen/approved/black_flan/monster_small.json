@@ -1,0 +1,26 @@
+{
+  "character": "black_flan",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "031a1fa9251a3e90df441104",
+  "approved": "2026-11-15",
+  "grid": [
+    86,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": []
+}
