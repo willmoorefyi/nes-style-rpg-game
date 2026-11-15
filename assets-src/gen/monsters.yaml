@@ -1676,10 +1676,13 @@
     ground just in front of his front foot, the body leaning in, the whole axe well inside the middle cell (not raised
     overhead, not reaching the cell edge)
   hurt: >-
-    knocked back, staggering, both hands still gripping the axe held up across his chest, the head thrown back
+    knocked back, staggering, the body leaning back to the left away from the heroes and the head thrown back, the
+    axe held exactly as in the idle cell: in the same hands, its ice blade up beside the same shoulder as in the idle
+    cell, the haft running down across his body the same way as in the idle cell, close to the body; the axe head
+    never crosses over to the other side of his body
   face: his pale blue face with a white icicle beard and cold blue eyes is readable
   extra_negative: fire, flames, a tree club, a hammer, a cape, horns, a helmet, snowflakes
-  seeds: [1234]
+  seeds: [1236, 1235, 1234]   # pass R fix, ROSTER_FIX_PLAN defect 6: 1234 (ROSTER_LOG R193) swings the axe head to the left side in the hurt; 1235 (R286, the hurt pinned to the image-right shoulder): the idle put the axe on the left shoulder instead
 - id: specter
   # "Specter" (072): a tall robed spirit with long hands (distinct from shadow, wraith, ghost)
   size: small
