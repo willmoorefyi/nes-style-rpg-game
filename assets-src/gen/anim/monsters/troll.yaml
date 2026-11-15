@@ -110,6 +110,10 @@ frames:                        # tweaks = rigid rotations about the hip / should
   hurt_in2:                    # 1 forward, hunch 8 less, guard arm 20 down; mallet dropped behind (cl_h)
     moves: []
     tweaks: {crown: [-7, 0], neck: [-3, -1], chest: [-3, 1], hip: [1, 0], sh_f: [-6, 3], el_f: [-4, 0], hand_f: [-6, -4]}
+  daze:                       # pass F 5a: head and chest only (the shared move lifts the club over the loincloth and
+    moves: [crown, neck, chest]   # roughens the hump)
+  daze_b:
+    moves: [crown, neck, chest]
 masks:
   torso:                       # E7: the belly flank beside the near arm is belly, not arm (else it swings out with the arm)
     idle: [[74, 46], [80, 46], [82, 64], [83, 85], [74, 85]]

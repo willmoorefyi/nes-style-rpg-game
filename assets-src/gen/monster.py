@@ -107,7 +107,8 @@ def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> 
     face = m.get("face") or "its face is clearly readable, drawn at the same sprite-pixel size as the body"
     action = {"idle": "idle, a ready battle stance", "attack": m["attack"].strip(),
               "cast": (m.get("cast") or "casting a spell, one hand raised with magic gathering").strip(),
-              "hurt": m["hurt"].strip() + ", recoiling away from the heroes (leaning left), still facing right"}[pose]
+              "hurt": m["hurt"].strip() + ", recoiling away from the heroes (leaning left), still facing right",
+              "attack_raise": (m.get("attack_raise") or "").strip()}[pose]     # pass F: the heavy attack's raise
     identity = ("Image 3 is the APPROVED LOOK of this exact boss in its idle pose (pixel art). Keep the identical "
                 "design, armour, colours, proportions and size; only the pose changes.\n\n") if has_identity else ""
     # action poses: the look without static staging details (e.g. mist), plus direction for movement

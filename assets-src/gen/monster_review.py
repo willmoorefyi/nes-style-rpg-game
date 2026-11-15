@@ -18,7 +18,12 @@ TIMELINES = {"attack": [("atk_wind1", 5), ("atk_wind2", 6), ("atk_mid", 3), ("at
              "hurt": [("hurt_in1", 2), ("hurt_in2", 2), ("hurt", 10), ("hurt_in2", 3), ("hurt_in1", 3), ("idle", 12)],
              "cast": [("cast_gather", 6), ("cast_rise", 4), ("cast", 10), ("cast_release", 4), ("cast_rise", 3),
                       ("cast_gather", 3), ("idle", 12)],
-             "idle": [("idle", 36), ("idle_b", 36)]}
+             "idle": [("idle", 36), ("idle_b", 36)],
+             "daze": [("idle", 24), ("daze", 48), ("daze_b", 48), ("daze", 48), ("daze_b", 48)],
+             "heavy": [("atk_raise_in", 6), ("attack_raise", 4), ("atk_raise_b", 4), ("attack_raise", 4), ("atk_raise_b", 4),
+                       ("attack_raise", 2), ("atk_swing", 3), ("atk_swing2", 2), ("attack", 12), ("atk_follow", 6),
+                       ("atk_recover", 6), ("idle", 16)]}
+SKIP = {"cast": "cast", "heavy": "attack_raise"}         # sequences that need an optional keyframe
 PART_COLOURS = [(230, 25, 75), (60, 180, 75), (255, 225, 25), (0, 130, 200), (245, 130, 48), (145, 30, 180),
                 (70, 240, 240), (240, 50, 230), (210, 245, 60), (250, 190, 212), (0, 128, 128), (170, 110, 40),
                 (128, 0, 0), (170, 255, 195), (128, 128, 0), (0, 0, 128)]
@@ -93,12 +98,12 @@ def review(sprite: str, out: Path = OUT) -> dict:
     cfg = MA.load_rig(sprite)
     gen = MA.generate(sprite, cfg, kfs, meta) if cfg else {}
     frames = {**kfs, **{n: Image.fromarray(f["img"], "RGBA") for n, f in gen.items()}}
-    get = lambda n: frames.get(n) or frames[MA.FRAME_SOURCE.get(n, "attack")]
+    get = lambda n: frames[MA.resolve(n, frames)]
     rep = MC.check_sprite(sprite, cfg, kfs, meta, gen) if cfg else {"rig": [f"no rig file anim/monsters/{sprite}.yaml (anim: false)"]}
     mark(sprite, out=out)
     L = MA.lunge_px(kfs["idle"]) // 2
     for seq, tl in TIMELINES.items():
-        if seq == "cast" and "cast" not in kfs:
+        if SKIP.get(seq, "idle") not in kfs:
             continue
         names = list(dict.fromkeys(n for n, _ in tl)) if seq != "hurt" else [n for n, _ in tl]
         _strip([(n, get(n)) for n in names]).save(out / f"{sprite}_{seq}.png")
@@ -109,12 +114,15 @@ def review(sprite: str, out: Path = OUT) -> dict:
         for n, frames_n in tl:
             canvas = Image.new("RGBA", (w + 2 * L, h), (60, 60, 70, 255))
             dx = {"atk_wind1": -L // 6, "atk_wind2": -L // 4, "atk_mid": int(0.75 * L), "attack": L,
-                  "atk_follow": int(0.58 * L)}.get(n, 0) if seq == "attack" else (-3 if n == "hurt" else 0)
+                  "atk_follow": int(0.58 * L), "atk_raise_in": -L // 6, "attack_raise": -L // 4, "atk_raise_b": -L // 4,
+                  "atk_swing": int(0.5 * L), "atk_swing2": int(0.75 * L)}.get(n, 0) if seq in ("attack", "heavy") \
+                else (-3 if n == "hurt" else 0)
             canvas.alpha_composite(get(n), (L + dx, 0))
             imgs.append(_zoom(canvas, 4).convert("RGB"))
             durs.append(round(frames_n * 1000 / 60))
         imgs[0].save(out / f"{sprite}_{seq}.gif", save_all=True, append_images=imgs[1:], duration=durs, loop=0)
-    order = [n for n in MA.SEQUENCES["attack"][:-1] + MA.SEQUENCES["hurt"][1:] + (MA.SEQUENCES["cast"][1:] if "cast" in kfs else [])]
+    order = [n for n in MA.SEQUENCES["attack"][:-1] + MA.SEQUENCES["hurt"][1:] + (MA.SEQUENCES["cast"][1:] if "cast" in kfs else [])
+             + MA.SEQUENCES["daze"] + (MA.SEQUENCES["heavy"][1:] if "attack_raise" in kfs else [])]
     onion = []
     for a, b in zip(order, order[1:]):
         pa, pb = np.asarray(get(a)).astype(float), np.asarray(get(b))

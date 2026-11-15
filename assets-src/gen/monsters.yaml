@@ -122,6 +122,14 @@
   hurt: >-
     knocked back by a heavy blow: staggering with one knee buckling, torso twisted away from the heroes, one arm thrown
     up, the greatsword dragging low, cape flung forward
+  # pass F (docs/FEEDBACK_PLAN_2026-11-14.md 3.7): the heavy attack's raised hold; the idle already fills the cell
+  # height, so the raise must fit by crouching (same sprite size as Image 3), not by growing taller
+  attack_raise: >-
+    the wind-up of a crushing overhead blow: both hands gripping the greatsword raised high above his horned helm, the
+    blade angled back over his shoulder, chest open toward the heroes, front foot planted forward, cape lifting behind
+    him; he sinks into a deep crouch with both knees bent so that the whole figure, horns and raised blade included,
+    stays inside the grey box at exactly the same pixel size as in Image 3 (the raised blade's tip is the highest point,
+    well below the top of the image)
   face: the face is hidden by the horned helm; two glowing red eyes in the visor slit are readable
   extra_negative: a bare face, a skull, a shield, a second weapon
   seeds: [1234]
@@ -160,6 +168,14 @@
     violently knocked back by a heavy blow: torso bent and twisted away from the heroes, one arm thrown up across his
     face, knees buckling, the glaive dipping toward the ground, cracks and small ice shards bursting from his chest
     armour, mantle flung forward around him
+  # pass F 3.7: the heavy attack's raised hold (fits the cell by crouching, as garland's)
+  attack_raise: >-
+    the wind-up of an overhead glaive strike: both gauntlets lifting the ice glaive high above his crowned skull, the
+    blade swept back behind his head, mantle lifting, a short frost trail curling off the blade; he sinks into a deep
+    crouch with both knees bent so that the whole figure, icicle crown and raised glaive included, stays inside the grey
+    box at exactly the same pixel size as in Image 3 (the raised blade is the highest point, well below the top of the
+    image)
   face: the skull face with two pale cyan eye lights and a toothed jaw is readable
   extra_negative: a helmet or mask covering the skull, a sword, skulls on the shoulders, a throne, a second weapon
   seeds: [1234]
+  sheet_seeds: {boss_attack_raise: 1235}   # 1234 painted the guide's ground line across both boots (ACT1_LOG #29)

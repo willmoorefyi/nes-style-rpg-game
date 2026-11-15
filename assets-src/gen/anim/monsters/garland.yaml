@@ -105,6 +105,28 @@ keyframes:
     toe_f: [68, 190]
     cc_0: [95, 60]
     cc_1: [40, 30]
+  attack_raise:               # pass F 3.7: the approved heavy-attack raise (crouch, greatsword over the helm)
+    crown: [137, 65]
+    neck: [133, 86]
+    chest: [126, 100]
+    hip: [122, 124]
+    sh_n: [155, 80]
+    el_n: [163, 70]
+    hand_n: [166, 58]
+    sh_f: [108, 80]
+    el_f: [126, 64]
+    hand_f: [158, 55]
+    tip: [70, 18]
+    hip_n: [138, 128]
+    knee_n: [160, 146]
+    foot_n: [148, 180]
+    toe_n: [160, 188]
+    hip_f: [108, 128]
+    knee_f: [88, 160]
+    foot_f: [62, 181]
+    toe_f: [67, 189]
+    cr_0: [104, 76]
+    cr_1: [30, 160]
 parts:
   weapon: {remove: true}
   head: {radius: 22.0}
@@ -118,12 +140,13 @@ parts:
   thigh_f: {radius: 10.0}
   shin_f: {radius: 11.0}
   sword:
-    bone: {idle: [hand_f, tip], attack: [hand_f, tip], hurt: [hand_n, tip_h], cast: [hand_f, tip]}
+    bone: {idle: [hand_f, tip], attack: [hand_f, tip], hurt: [hand_n, tip_h], cast: [hand_f, tip], attack_raise: [hand_f, tip]}
     radius: 0.5
   cape_i: {kind: cloth, bone: {idle: [ci_0, ci_m, ci_1]}, radius: 0.1, width: auto}
   cape_a: {bone: {attack: [ca_0, ca_1]}, radius: 0.1}
   cape_h: {bone: {hurt: [ch_0, ch_1]}, radius: 0.1}
   cape_c: {bone: {cast: [cc_0, cc_1]}, radius: 0.1}
+  cape_r: {bone: {attack_raise: [cr_0, cr_1]}, radius: 0.1}
   glow:
     kind: fx
     bone: {cast: [hand_n, gl_t]}
@@ -142,11 +165,29 @@ frames:
   cast_gather: {dy: -1, moves: [], pins: [knee_n, knee_f, foot_n, foot_f], tweaks: {el_n: [14, -5], hand_n: [26, -10], ci_m: [-4, -10], ci_1: [-8, -26]}}
   cast_rise: {dy: 2, moves: [], pins: [knee_n, knee_f, foot_n, foot_f], tweaks: {el_n: [4, 7], hand_n: [10, 15], gl_t: [12, 18], cc_0: [7, 8], cc_1: [0, 38]}}
   cast_release: {moves: [], pins: [knee_n, knee_f, foot_n, foot_f], tweaks: {el_n: [-1, -1], hand_n: [-3, -2], gl_t: [-4, -3], cc_1: [3, -6]}}
+  daze:                       # pass F 5a: translations only (as every garland frame); the cape hem pinned on the plain, the
+    moves: []                 # helm 2 px back up so no collar hole opens
+    pins: [knee_n, knee_f, foot_n, foot_f, ci_1]
+    tweaks: {crown: [-2, -1], neck: [-2, -1]}
+  daze_b:
+    moves: []
+    pins: [knee_n, knee_f, foot_n, foot_f, ci_1]
+    tweaks: {crown: [-2, -1], neck: [-2, -1]}
+  atk_swing:                  # pass F 3.7: the raise swinging forward: blade 18 deg toward vertical over the helm, the
+    t: 0.0                    # body 3 px toward the lunge and 6 down, knees and feet pinned (t 0: bbox height of the raise)
+    moves: []
+    pins: [knee_n, knee_f, foot_n, foot_f]
+    tweaks: {crown: [-3, 6], neck: [-3, 6], chest: [-3, 6], hip: [-3, 6], sh_n: [-3, 6], sh_f: [-3, 6], hip_n: [-3, 6], hip_f: [-3, 6], cr_0: [-3, 6], el_n: [-3, 12], el_f: [-3, 12], hand_n: [-3, 16], hand_f: [-3, 16], tip: [13, -9]}
+  atk_swing2:                 # pass F 3.7: the heavy mid frame = the plain atk_mid pose (the whole figure rotated about the
+    moves: []                 # sword tip); turning only the blade toward the raise uncovers a knee the attack art never drew
+    pins: []
+    tweaks: {crown: [7, -11], neck: [6, -12], chest: [6, -12], hip: [5, -12], sh_n: [6, -11], el_n: [5, -12], hand_n: [6, -12], sh_f: [6, -13], el_f: [5, -13], hand_f: [6, -13], hip_n: [4, -11], knee_n: [3, -8], foot_n: [0, -8], toe_n: [-1, -6], hip_f: [4, -14], knee_f: [10, 0], foot_f: [10, 0], toe_f: [10, 0], ca_0: [11, -15], ca_1: [21, -4]}
 z:
   idle: [cape_i, cape_a, cape_h, cape_c, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, sword, glow]
   attack: [cape_i, cape_a, cape_h, cape_c, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, sword, glow]
   hurt: [cape_i, cape_a, cape_h, cape_c, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, sword, glow]
   cast: [cape_i, cape_a, cape_h, cape_c, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, sword, glow]
+  attack_raise: [cape_r, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, sword]
 masks:
   cape_i:
     idle: [[50, 82], [55, 82], [55, 103], [50, 103], [50, 112], [57, 113], [61, 115], [63, 117], [63, 123], [64, 125], [64, 135], [62, 137], [62, 150], [62, 175], [60, 188], [10, 190], [10, 183], [26, 150], [40, 120], [44, 90]]
@@ -156,14 +197,21 @@ masks:
     hurt: [[118, 70], [100, 72], [60, 70], [40, 62], [25, 60], [35, 75], [40, 100], [45, 120], [55, 135], [75, 135], [95, 140], [110, 135], [115, 110], [118, 90]]
   cape_c:
     cast: [[127, 14], [120, 7], [100, 5], [85, 8], [70, 13], [55, 21], [45, 21], [40, 13], [33, 14], [20, 24], [12, 35], [12, 59], [22, 67], [35, 74], [55, 79], [69, 80], [71, 70], [76, 55], [83, 48], [92, 44], [90, 35], [92, 25], [100, 18], [112, 15], [126, 17]]
+  head:
+    attack_raise: [[118, 42], [124, 42], [132, 55], [146, 52], [150, 41], [155, 42], [153, 60], [152, 78], [128, 80], [122, 62], [117, 50]]
+  cape_r:
+    attack_raise: [[104, 70], [95, 78], [70, 95], [45, 110], [28, 125], [22, 145], [26, 165], [32, 170], [40, 160], [50, 145], [58, 140], [70, 145], [85, 160], [100, 170], [112, 172], [108, 150], [102, 120], [100, 95], [106, 80]]
   sword:
     idle: [[51, 104], [58, 104], [86, 116], [100, 119], [150, 140], [172, 153], [188, 167], [184, 173], [165, 171], [150, 164], [135, 154], [120, 146], [95, 136], [84, 132], [60, 115], [51, 112]]
     attack: [[84, 129], [100, 132], [122, 141], [140, 149], [170, 167], [194, 189], [191, 195], [160, 189], [130, 171], [105, 158], [87, 148]]
     hurt: [[26, 183], [28, 179], [60, 153], [85, 135], [100, 124], [112, 117], [118, 121], [110, 130], [95, 140], [85, 150], [70, 163], [50, 176], [35, 185]]
     cast: [[52, 104], [60, 105], [88, 117], [100, 120], [150, 142], [172, 154], [187, 167], [183, 172], [150, 161], [120, 148], [95, 138], [85, 133], [58, 115], [52, 110]]
+    attack_raise: [[63, 13], [74, 11], [122, 29], [152, 41], [174, 53], [183, 63], [181, 72], [167, 69], [148, 59], [116, 45], [67, 25], [62, 20]]
   glow:
     cast: [[148, 20], [158, 17], [172, 22], [178, 32], [176, 40], [160, 44], [150, 40], [146, 30]]
-holds: []
+holds:
+  - {frame: atk_raise_in, reason: "the idle sword points down-right, the raise's up-left over the helm: a ~180 deg flip no
+     30 deg-capped cut-out can bridge in one frame; held, it shows the coiled atk_wind1 (the TS fallback too)"}
 paint:
   - {frame: atk_mid, xy: [[125, 130], [126, 130]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[89, 137], [89, 141]], rgb: [6, 4, 10]}
@@ -210,3 +258,12 @@ paint:
   # leg's dark fill; one background pixel in the outline by the gauntlet / guard (atk_follow), closed with the ink
   - {frame: atk_mid, xy: [[125, 159], [126, 160]], rgb: [24, 24, 49]}
   - {frame: atk_follow, xy: [[131, 137]], rgb: [6, 4, 10]}
+  # pass F heavy: atk_swing2 repeats atk_mid's patches; the 8 px pocket between helm and far arm in atk_swing
+  - {frame: atk_swing2, xy: [[125,  130],  [126,  130]], rgb: [6,  4,  10]}
+  - {frame: atk_swing2, xy: [[89,  137],  [89,  141]], rgb: [6,  4,  10]}
+  - {frame: atk_swing2, xy: [[58,  112],  [60,  112],  [59,  113],  [60,  113]], rgb: [6,  4,  10]}
+  - {frame: atk_swing2, xy: [[125,  159],  [126,  160]], rgb: [24,  24,  49]}
+  - {frame: atk_swing, xy: [[120, 73], [119, 74], [120, 74], [120, 75], [118, 76], [119, 76], [120, 76], [121, 76]], rgb: [6, 4, 10]}
+  - {frame: atk_swing, xy: [[98, 113], [98, 114], [98, 115], [98, 116], [98, 117], [98, 118], [98, 119]], rgb: [6, 4, 10]}
+  - {frame: atk_swing, xy: [[104, 150], [104, 151], [104, 152], [104, 153]], rgb: [6, 4, 10]}
+  - {frame: atk_swing, xy: [[105, 154], [105, 155], [105, 156], [105, 157], [105, 158]], rgb: [6, 4, 10]}

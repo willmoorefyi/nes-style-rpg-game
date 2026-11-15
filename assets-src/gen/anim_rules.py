@@ -7,10 +7,13 @@ import hashlib
 
 import numpy as np
 
+from gen.monster_recipes import KEYFRAMES, SEQUENCES as _RUNS
+
 MAX_PAGE = 4096
 NEAR_KEYFRAME = 0.35
 ROT_CAP = {"rigid": 30.0, "torso": 20.0, "chain": 25.0, "cloth": 25.0, "prop": 30.0, "fx": 30.0}
-SEQUENCES = {"attack": ("atk_",), "hurt": ("hurt_in",), "cast": ("cast_",)}
+# the generated frames of every runtime sequence (monster_recipes.SEQUENCES: attack, hurt, cast, daze, heavy)
+SEQUENCES = {seq: tuple(dict.fromkeys(n for n in names if n not in KEYFRAMES)) for seq, names in _RUNS.items()}
 
 
 # 10: rotation cap, near-keyframe rule, whole pixels
@@ -66,8 +69,8 @@ def prop_carry(n_in1: int, n_in2: int) -> list[str]:
 
 def holds_cap(holds: list[str]) -> list[str]:
     out = []
-    for seq, prefixes in SEQUENCES.items():
-        n = [h for h in holds if h.startswith(prefixes)]
+    for seq, frames in SEQUENCES.items():
+        n = [h for h in holds if h in frames]
         if len(n) > 1:
             out.append(f"{len(n)} holds in the {seq} sequence {n} (max 1)")
     return out

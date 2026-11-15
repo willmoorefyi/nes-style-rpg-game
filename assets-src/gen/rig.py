@@ -35,10 +35,10 @@ LEGS = ("knee_n", "knee_f", "foot_n", "foot_f")
 FEET = ("foot_n", "foot_f")
 # per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
 BODY = {"biped": {"legs": LEGS, "feet": FEET, "limbs": tuple((f"hip_{s}", f"knee_{s}", f"foot_{s}") for s in "nf"),
-                  "moves": None, "planted": "foot_f", "breath": "hip"}}
+                  "moves": None, "planted": "foot_f", "breath": "hip", "head": ("crown", "neck")}}
 for _name, _t in BEASTS.items():                          # quadruped, bird (rig_templates.py, T5a)
     TEMPLATES[_name] = (_t["parent"], _t["parts"], _t["z"])
-    BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath")}
+    BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath", "head")}
 
 
 class Rig:
@@ -51,7 +51,7 @@ class Rig:
             raise ValueError(f"rig {cfg.get('sprite')}: body template {self.body!r} is not implemented (T5a)")
         parent, parts, z = TEMPLATES[self.body]
         b = BODY[self.body]
-        self.legs, self.feet, self.limbs, self.moves = b["legs"], b["feet"], b["limbs"], b["moves"]
+        self.legs, self.feet, self.limbs, self.moves, self.head = b["legs"], b["feet"], b["limbs"], b["moves"], b["head"]
         self.planted, self.breath = cfg.get("planted", b["planted"]), cfg.get("breath_joint", b["breath"])
         self.cell = cell
         self.fwd = 1 if cfg.get("facing", "right") == "right" else -1

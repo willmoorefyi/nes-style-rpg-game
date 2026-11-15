@@ -203,3 +203,9 @@
 {"event": "result", "key": "d50e89bf8b2990fcb6becace", "ok": true}
 {"event": "attempt", "ts": "2026-11-14T07:44:47", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "town", "sheet": "kit_gates", "seed": 1234, "key": "3750f22e440fed09b2478d13"}
 {"event": "result", "key": "3750f22e440fed09b2478d13", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T23:21:20", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "garland", "sheet": "boss_attack_raise", "seed": 1234, "key": "eeccce6b59e52b7e824a5705"}
+{"event": "result", "key": "eeccce6b59e52b7e824a5705", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T23:33:51", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_attack_raise", "seed": 1234, "key": "9b23f8bd8299a6527f831956"}
+{"event": "result", "key": "9b23f8bd8299a6527f831956", "ok": true}
+{"event": "attempt", "ts": "2026-11-14T23:34:46", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_attack_raise", "seed": 1235, "key": "01447ea32ceac64855ace8f8"}
+{"event": "result", "key": "01447ea32ceac64855ace8f8", "ok": true}

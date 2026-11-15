@@ -105,15 +105,15 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
         rep.update(mask_report(cfg, keyframes)[0])
     imgs = {**arrs, **{n: f["img"] for n, f in gen.items()}}
     cell_h = arrs["idle"].shape[0]
-    for seq, names in MA.SEQUENCES.items():
-        if seq == "cast" and "cast" not in arrs:
+    for seq, names in MA.SEQUENCES.items():           # every sequence (daze, heavy too), each step against its span
+        if MA.NEEDS.get(seq, "idle") not in arrs:
             continue
-        span = tuple(arrs[k] for k in MA.SPAN[seq])
         fails = []
-        for a, b in zip(names, names[1:]):
+        for i, (a, b) in enumerate(zip(names, names[1:])):
             if a in gen or b in gen:                     # a pair of keyframes (holds) is the approved art itself
-                fails += [f"{a}->{b}: {e}" for e in C.continuity(imgs.get(a, arrs[MA.FRAME_SOURCE.get(a, a)]),
-                                                                    imgs.get(b, arrs[MA.FRAME_SOURCE.get(b, b)]), span, cell_h)]
+                span = tuple(arrs[k] for k in MA.span_of(seq, i))
+                fails += [f"{a}->{b}: {e}" for e in C.continuity(imgs[MA.resolve(a, imgs)], imgs[MA.resolve(b, imgs)],
+                                                                    span, cell_h)]
         rep[f"sequence:{seq}"] = fails
     rep["holds"] = C.holds_cap([h["frame"] for h in cfg.get("holds") or []])
     if with_lock:
@@ -134,8 +134,9 @@ def calibrate(entries) -> list[tuple[str, str, float, float]]:
     rows = []
     for sid, _meta, kfs in entries:
         a = {k: np.asarray(v) for k, v in kfs.items()}
-        for k in ("attack", "hurt", "cast"):
-            if k in a:
-                (x0, y0), (x1, y1) = C.centroid(a["idle"]), C.centroid(a[k])
-                rows.append((sid, f"idle-{k}", C.iou(a["idle"], a[k]), float(np.hypot(x1 - x0, y1 - y0))))
+        for s, k in (("idle", "attack"), ("idle", "hurt"), ("idle", "cast"), ("idle", "attack_raise"),
+                     ("attack_raise", "attack")):
+            if s in a and k in a:
+                (x0, y0), (x1, y1) = C.centroid(a[s]), C.centroid(a[k])
+                rows.append((sid, f"{s}-{k}", C.iou(a[s], a[k]), float(np.hypot(x1 - x0, y1 - y0))))
     return rows

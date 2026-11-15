@@ -132,7 +132,7 @@ def run_beasts(check: Callable[[bool, str], None]) -> None:
             continue
         check(sorted(one) == sorted(two) and all(np.array_equal(one[k]["img"], two[k]["img"]) for k in one),
               f"synthetic {body} renders deterministically ({len(one)} frames)")
-        check(len(one) == 8, f"a rigged {body} gets 8 generated frames ({sorted(one)})")
+        check(len(one) == 10, f"a rigged {body} gets 10 generated frames (with daze, daze_b) ({sorted(one)})")
         rep = MC.check_sprite(cfg["sprite"], cfg, keyframes(cfg), META, one, with_lock=False)
         every = [f"{k}: {e}" for k, v in rep.items() for e in v]
         fails = [e for e in every if not any(t in e for t in SR.TUNING)]

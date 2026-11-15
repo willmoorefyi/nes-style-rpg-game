@@ -278,7 +278,7 @@ class CharacterSpec:
 # multiple of it because monsters are cut by their own path (monster.py), which measures Gemini's pixel grid.
 MONSTER_POSES = ["idle", "attack", "hurt"]
 # Per-pose bosses also get a spell-casting stance (not wired into battle yet; the atlas carries it as `cast`).
-BOSS_POSES = ["idle", "attack", "cast", "hurt"]
+BOSS_POSES = ["idle", "attack", "cast", "hurt", "attack_raise"]   # attack_raise: pass F heavy-attack raise (optional)
 MONSTER_GUIDE_CELL = (560, 720)
 MONSTER_EXPECTED_PITCH = 5.33     # guide px per sprite px seen on the character sheets; pilot A measures the real one
 

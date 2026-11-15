@@ -111,6 +111,14 @@ frames:
     t: 0.25
     pins: [foot_n, foot_f]
     moves: [back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, knee_n, knee_f]
+  daze:                       # pass F 5a: body and head only (the forelegs stay planted); the neck follows the head so
+    t: 0.05                   # no mane notch opens behind the ears
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 1]}
+  daze_b:
+    t: 0.05
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [1, 1]}
 masks:
   neck:                        # body/neck boundary off the withers: the neck warp sampled body pixels (E8 crease)
     idle: [[68, 25], [73, 25], [77, 28], [81, 29], [81, 38], [68, 38]]

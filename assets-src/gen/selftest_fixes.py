@@ -89,7 +89,7 @@ def run_cloth_chain(check: Callable[[bool, str], None]) -> None:
     except (TypeError, KeyError, ValueError) as e:
         check(False, f"cloth with a per-keyframe chain builds and renders ({type(e).__name__}: {e})")
         return
-    check(len(gen) == 8 and rig.parent.get("c1") == "chest" and rig.parent.get("c3") == "c1",
+    check(len(gen) == 10 and rig.parent.get("c1") == "chest" and rig.parent.get("c3") == "c1",
           f"cloth with a per-keyframe chain builds and renders ({len(gen)} frames)")
     check({"c1", "c2", "c3"} <= set(moves), f"per-keyframe cloth joints join the wind moves {sorted(moves)[-4:]}")
 

@@ -115,5 +115,10 @@ python3 -I assets-src/build_assets.py monsters_ai              # the build runs 
   are an allowlist in `selftest_efix.py`: garland `glow`, lich `trail` and `crystal`, vampire `slash`.
 - A frame whose bytes change fails `check` until it is reviewed and re-locked. The monster atlas must be identical
   under any `PYTHONHASHSEED`, and a `monsters_ai` build must leave the party atlases byte-identical.
+- Frame tables and recipes live in `monster_recipes.py` (pass F). Every rig gets `daze` / `daze_b` (sleep, stun) from
+  one shared recipe whose symbolic `head` tweak resolves per body template (`rig.BODY[...]["head"]`; a missing joint is
+  an error); a rig may override `frames.daze`, or hold `daze` (it then shows `hurt_in1`). A boss with an approved
+  `boss_attack_raise` gets `attack_raise` plus `atk_raise_in`, `atk_raise_b` (a 1 px bob of the raise), `atk_swing`,
+  `atk_swing2` and the `heavy` continuity sequence; the atlas writes `hasRaise`, `opaqueRight` and `head` per sheet.
 - `python3 -I assets-src/gen/selftest.py` covers the monster pipeline (`selftest_anim`, `selftest_beasts`,
   `selftest_fixes`, `selftest_efix`, including the real-lich crystal size check: `cast_rise` ≤ 40 % of `cast`).
