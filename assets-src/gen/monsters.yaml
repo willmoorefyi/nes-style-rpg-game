@@ -1201,10 +1201,12 @@
   prompt: >-
     an undead knight in corroded green-grey chain mail and a dented open-faced iron helm, grey withered flesh showing
     at the face and hands, pale white eye lights in deep sockets, holding one rusted longsword in the hand on the right
-    side of the image, a torn dark tabard over the mail; centred in its own cell
+    side of the image, a torn dark tabard over the mail; centred in its own cell, and the whole sword stays well
+    inside its cell in every cell
   attack: >-
-    stepping forward and slashing the rusted sword down in front of its body at the heroes, the blade well inside the
-    middle cell, the same one sword as in the idle cell
+    stepping forward toward the heroes at the end of a downward slash: the sword low in front of him in the same hand,
+    the blade well inside the middle cell (not raised overhead, not reaching the cell edge), the same one sword as in
+    the idle cell
   hurt: knocked back, the helmed head thrown back, the sword arm flung out, still holding the sword
   face: its withered grey face with pale white eye lights under the helm is readable
   extra_negative: a shield, a cape, bare bones, a skull without flesh, horns, a second sword
@@ -1238,9 +1240,12 @@
     tall gnarled wooden staff topped with a pale blue ice orb in the hand on the right side of the image; the robe hem
     above its bare blue feet; centred in its own cell
   attack: >-
-    stepping forward and thrusting the staff toward the heroes, the ice orb pointed at them and glowing a little
-    brighter, the orb well inside the middle cell
-  hurt: knocked back, the hood flapping, the free hand thrown up, the staff tilted back in the same hand
+    stepping forward and thrusting the staff toward the heroes in the same hand as in the idle cell, the ice orb
+    pointed at them and glowing a little brighter, the elbow bent so the whole staff stays well inside the middle cell
+    (not reaching the cell edge)
+  hurt: >-
+    knocked back, the free hand thrown up, the staff held upright close to the body in the same hand as in the idle
+    cell
   face: its blue ogre face with the single horn, tusks and small eyes is readable
   extra_negative: a club, a cleaver, armour, two horns, a helmet, tan skin, grey skin, an ice beam, snowflakes
   seeds: [1234]
@@ -1412,9 +1417,12 @@
     shoulders, a long thin barbed tail, yellow eyes and a fanged grin, a lean muscular body, holding one black iron
     trident in the hand on the right side of the image; centred in its own cell
   attack: >-
-    lunging forward and thrusting the trident at the heroes, the wings spread, the trident points well inside the
-    middle cell, the same one trident as in the idle cell
-  hurt: knocked back, the wings folding, the free arm thrown up, the trident tilted back in the same hand
+    lunging forward and thrusting the trident at the heroes in the same hand as in the idle cell, the elbow bent so
+    the whole trident stays well inside the middle cell (not reaching the cell edge), the wings spread, the same one
+    trident as in the idle cell
+  hurt: >-
+    knocked back, the wings folding, the free arm thrown up, the trident held upright close to the body in the same
+    hand as in the idle cell
   face: its red devil face with yellow eyes and a fanged grin under the ram horns is readable
   extra_negative: grey stone skin, feathers, a cape, fire, a sword, a third wing, a second trident
   seeds: [1234]
@@ -1528,11 +1536,15 @@
   prompt: >-
     a huge giant with charred black-grey skin cracked with glowing orange molten veins, a mane of flaming orange hair
     and a flaming beard (drawn as part of the head), a scorched leather smith's apron and iron bracers, holding one huge
-    iron forge hammer in both hands; centred in its own cell
+    iron forge hammer; in the idle cell the hammer rests on his shoulder close to the body; tall and filling the box,
+    centred in its own cell, and the whole hammer stays well inside its cell in every cell
   attack: >-
-    stepping forward and slamming the forge hammer down in front of its body at the heroes, the hammer head well inside
-    the middle cell
-  hurt: knocked back, staggering, the flaming hair flattened, the hammer dragged low in one hand
+    stepping forward toward the heroes at the end of a downward slam: the hammer held in both hands, its head on the
+    ground just in front of his front foot, the body leaning in, the whole hammer well inside the middle cell (not
+    raised overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, staggering, both hands still gripping the hammer held up across his chest, the flaming hair
+    flattened
   face: its charred face with glowing orange eyes inside the flaming hair is readable
   extra_negative: furs, a tree club, ice, a cape, a sword, an anvil, flames outside the body, sparks
   seeds: [1234]
