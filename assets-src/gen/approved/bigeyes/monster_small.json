@@ -1,0 +1,27 @@
+{
+  "character": "bigeyes",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "f41e62dd4d8a144c5432fa96",
+  "approved": "2026-11-15",
+  "grid": [
+    90,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": true,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R101"
+}

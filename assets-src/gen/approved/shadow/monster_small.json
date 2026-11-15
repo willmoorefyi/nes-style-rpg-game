@@ -1,0 +1,27 @@
+{
+  "character": "shadow",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "af3de4953c45a78565fcda99",
+  "approved": "2026-11-15",
+  "grid": [
+    98,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": true,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R108"
+}
