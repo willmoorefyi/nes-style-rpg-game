@@ -793,32 +793,53 @@
   # "Sahagin" (018): a basic fish-man (bare, trident)
   size: small
   body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and the trident far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
-    a blue-green fish-man standing on two webbed feet, a lean scaly body with a pale belly, a fish head with big round
-    black eyes and a wide mouth of small teeth, a tall spiny fin crest on its head and back, webbed clawed hands holding
-    a bone trident, no armour or clothes
-  attack: lunging forward and stabbing the bone trident at the heroes, the fin crest raised
-  hurt: knocked back, the fin crest flattened, the mouth gaping, the trident tilted back
+    a lean sea-green fish-man standing upright on two webbed feet, a scaly body with a pale belly, a fish head with big
+    round black eyes and a wide mouth of small teeth, a tall spiny yellow fin crest on its head and down its back,
+    webbed clawed hands holding one long bone trident in the hand on the right side of the image, no armour or clothes
+  attack: >-
+    lunging forward and stabbing the bone trident at the heroes with both hands, the fin crest raised, the same one
+    trident as in the idle cell
+  hurt: knocked back, the fin crest flattened, the mouth gaping, the trident tilted back in the same hand
   face: its fish face with big round black eyes and a wide mouth is readable
-  extra_negative: armour, a shield, a cape, a crown, a spear, a fish tail instead of legs
+  extra_negative: armour, a shield, a cape, a crown, a spear, a second trident, a fish tail instead of legs, an anglerfish lure
   seeds: [1234]
 - id: sahagin_chief
   # "Sahagin Chief" (019): coral armour, red crest, barbed spear and shell shield
   size: small
   body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and the spear far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
     a stocky teal fish-man warrior in armour of pink and white coral plates over the chest and shoulders, a tall red fin
     crest on its head, a fish face with gold eyes and a heavy underbite, a round spiral seashell shield on the arm on
     the left side of the image and a long barbed spear in the hand on the right side of the image, webbed feet
-  attack: thrusting the barbed spear forward at the heroes behind the raised shell shield, stepping forward
-  hurt: knocked back behind the shell shield, the red crest flattened, the spear tilting back
+  attack: >-
+    thrusting the barbed spear forward at the heroes, stepping forward, the one shell shield held up on the arm on the
+    left side of the image as in the idle cell
+  hurt: >-
+    knocked back, the shell shield raised in front of the chest on the same arm, the red crest flattened, the spear
+    tilting back
   face: its fish face with gold eyes and the heavy underbite is readable
-  extra_negative: a trident, a cape, a crown, twin blades, a fish tail instead of legs
+  extra_negative: a trident, a cape, a crown, twin blades, two shields, a fish tail instead of legs, an anglerfish lure
   seeds: [1234]
 - id: buccaneer
   # "Buccaneer" (020): a roaming sea raider (no tricorn: distinct from the pirate)
   size: small
   body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and the axe far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
     a lanky sea raider in a red bandana tied over long black hair, a red-and-white striped shirt with rolled sleeves, a
     wide leather belt, baggy dark trousers and boots, a scruffy beard and an eye patch, an iron hook in place of the
@@ -882,6 +903,12 @@
   # "Ghast" (024): a tougher ghoul-like undead in a shroud, long arms (distinct from the zombie and the ghoul)
   size: small
   body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and the long fingers far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth beyond the shroud strips, which swing with the
+    motion, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
     a gaunt tall purple-grey undead standing hunched in a rotting pale burial shroud hanging in strips from its
     shoulders, very long thin arms reaching down past its knees ending in long bony fingers, a skull-like face with
@@ -969,6 +996,13 @@
   # "Gargoyle" (030): winged stone creature, four weak hits, earth protection
   size: small
   body: biped
+  motion: >-
+    The two stone bat wings stay attached behind the shoulders in every cell and spread or fold with the motion
+    (exactly two wings, as in the idle cell).
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and claws far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
     a crouching grey stone gargoyle on two clawed feet, cracked stone skin with chipped edges, two bat wings of stone
     half raised behind the shoulders, two short curved horns, a snarling face with a wide fanged mouth and glowing
@@ -976,18 +1010,26 @@
   attack: springing forward at the heroes with both clawed hands raking, the wings spread wide
   hurt: knocked back, the wings folding, stone chips flying from its chest, the arms thrown up
   face: its snarling stone face with glowing orange eyes and fangs is readable
-  extra_negative: red skin, a trident, a pedestal, feathers, a weapon
+  extra_negative: red skin, a trident, a pedestal, feathers, a weapon, a third wing, a cape
   seeds: [1234]
 - id: bloodbones
   # "Bloodbones" (031): a heavily strengthened skeleton (distinct from the skeleton: larger, breastplate, two blades)
   size: small
   body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and both blades far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
   prompt: >-
     a large heavy-boned red-stained skeleton standing upright, dark red-brown blood stains on its bones, a rusted iron
     breastplate over the ribs, a horned skull with burning red eye lights, holding a notched curved blade in each hand,
     one in the hand on the left side of the image and one in the hand on the right side of the image
-  attack: lunging forward and slashing both notched blades across at the heroes
-  hurt: knocked back, the horned skull thrown back, both blades flung out to the sides
+  attack: >-
+    lunging forward and slashing both notched blades across at the heroes, exactly two blades, one in each hand, as in
+    the idle cell
+  hurt: >-
+    knocked back, the horned skull thrown back, both blades flung out to the sides, still one in each hand
   face: its horned skull with burning red eye lights is readable
-  extra_negative: a shield, a loincloth, yellow bones, a single sword, a helmet
+  extra_negative: a shield, a loincloth, yellow bones, a single sword, a third blade, a helmet, a cape
   seeds: [1234]
