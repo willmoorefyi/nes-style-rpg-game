@@ -60,6 +60,15 @@ Gemini requests send: the pose guide, a crop of `refs/style_reference.jpg`, and 
 `characters.yaml` upscaled 8x. Backgrounds are requested as solid magenta and keyed by colour; older white
 renders fall back to a border flood fill.
 
+**Monster cutter (`monster.cut`, `split_cells`).** A 3-pose monster raw is split at the figure gaps, not at fixed
+thirds: a 4-connected foreground piece crossing a third line moves whole into the cell holding most of its pixels
+(the cell widens, everything else in the widened band becomes key colour, and the cell's left offset keeps lunges
+relative to the idle). Nothing crossing = the thirds byte for byte; a piece with more than `CROSS_SHARE` (30 %) on
+the minority side (two figures fused) keeps the thirds. `cut(..., split="thirds")` is the old cutter, which every
+approved sheet was cut with (approved sheets are copies, never re-cut). `frame_report` adds `flat_edges` (per frame,
+`(x, y0, y1)` runs of 3+ edge pixels with no outline ink, open to the side: a slice) and `edges_ok`; `info["split"]`
+lists the moved pieces. Selftest: `selftest_cut.py`.
+
 ## Adding a character
 
 Add an entry to `characters.yaml` with `prompt` (costume only), `battle_gear`, `field_gear` and `seeds`. Generate,

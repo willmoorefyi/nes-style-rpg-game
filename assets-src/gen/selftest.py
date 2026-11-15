@@ -312,6 +312,9 @@ def test_monsters() -> None:
     check((va[..., 3] == fa[..., 3]).all() and np.all(va[out_px][:, :3] == np.array(PX.OUTLINE)),
           "recolour keeps alpha and the outline")
     check(not np.array_equal(va, fa), "recolour changes the body colours")
+    print("monster cutter (gap split for future cuts, flat-edge check)")
+    from gen import selftest_cut as SC
+    SC.run_cut(check)
 
 
 def test_size_ref() -> None:

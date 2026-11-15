@@ -81,7 +81,12 @@ python3 -I assets-src/gen/approve.py lich boss_attack
 ```
 
 Output: `assets-src/gen/out/gemini/<id>/<seed>/` (`*_guide`, `*_raw`, the cut sheet, `review.png`, `frame_report`:
-heights, bottoms, colours, outline, pose_diff). `approve.py` writes `approved/<id>/monster_<size>.{png,json}` or
+heights, bottoms, colours, outline, pose_diff, `flat_edges` / `edges_ok`). **The 3-pose cutter splits at the figure gaps**
+(`monster.split_cells`, since roster batch C): a piece that crosses a third line of the raw moves whole into the cell
+holding most of it (that cell widens; `frame_report` lists it under `split`), so a reach is no longer sliced flat; with
+nothing crossing, the cut is the old fixed thirds byte for byte, and two figures fused across a line keep the thirds.
+`flat_edges` flags a straight run of 3+ edge pixels with no outline ink (a slice). Approved sheets were cut with the
+thirds (`cut(..., split="thirds")`) and are never re-cut. `approve.py` writes `approved/<id>/monster_<size>.{png,json}` or
 `boss_<pose>.*` and un-ignores the raw render; commit those, their `cache/<key>.{png,json}` and `ledger.jsonl`.
 
 **Base-sheet review checklist.** All must hold before you approve. A wrong base sheet makes every in-between harder.
@@ -89,6 +94,7 @@ heights, bottoms, colours, outline, pose_diff). `approve.py` writes `approved/<i
 - [ ] The figure height is in the band (±10 %). The lowest opaque row is exactly the band's feet row in every frame.
 - [ ] No opaque pixel on the 1 px border, and **headroom** for overshoots (`atk_follow`, `cast_release` go 10 % past
       the key): edge-to-edge attacks (goblin x2-78 of 80, lich x9-190 of 200) forced clamps and settles.
+- [ ] `edges_ok` (no limb, weapon, snout or tail sliced flat; compare the raw if `flat_edges` names a run).
 - [ ] Every frame faces right; attack and hurt each differ from idle by ≥ 15 % (`pose_diff`).
 - [ ] Props drawn whole and attached. A prop that appears or vanishes between keys costs carry rules (D8) or a pop.
 - [ ] No grey guide box, no stray props or sparks outside the figure, a readable face; bosses: the four pose files
