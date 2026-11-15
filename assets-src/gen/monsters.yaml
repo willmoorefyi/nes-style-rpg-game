@@ -1135,7 +1135,8 @@
   prompt: >-
     a huge muscular minotaur standing upright on hooved legs, a brown-furred bull head with two long curved horns and a
     brass nose ring, a bare muscular chest crossed by a brown leather harness with an iron buckle, a short leather
-    kilt, holding one big double-bladed iron axe in both hands; centred in its own cell
+    kilt, holding one big double-bladed iron axe in both hands; centred in its own cell, and in every cell the horn
+    tips stay well below the top of the grey box (about a tenth of the box below its top edge)
   attack: >-
     stepping forward toward the heroes at the end of a downward chop: the double-bladed axe head is out in front of
     him on the right side of the image, low at knee height, both hands on the haft, the horns lowered, the axe head
@@ -1143,7 +1144,7 @@
   hurt: knocked back, the bull head thrown back with a bellow, the axe dragged low in one hand
   face: its bull face with the nose ring, wide nostrils and angry eyes is readable
   extra_negative: a cape, a shield, a club, a second axe, armour plates, wings, an axe swung back behind the body
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R134): the attack is a backswing away from the heroes
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R134): the attack is a backswing away from the heroes; 1235 (R135): the idle horns cut by the cell top
 - id: hill_gigas
   # "Hill Gigas" (040): a hill giant (furs and a tree club; distinct from the fire and ice gigas)
   size: large
