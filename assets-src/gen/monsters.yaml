@@ -435,8 +435,10 @@
     exhaust vents, the heavy cannon arm and the three-fingered steel claw arm
   attack: >-
     a claw smash with a forward stomp: one clawed foot stamping far forward toward the heroes, the hull pitched
-    forward, the three-fingered steel claw arm (the arm on the left side of the image in Image 3) swung high over and
-    smashing down toward the heroes, the cannon arm pulled back; at the same pixel size as in Image 3
+    forward, the three-fingered steel claw arm (the arm on the left side of the image in Image 3) swung over and
+    smashing down low in front of the hull toward the heroes, the claw below the head at the end of the blow, the
+    cannon arm pulled in at the side; the same broad, bulky domed hull, thick legs and proportions as in Image 3, seen
+    from the same angle, at the same pixel size as in Image 3
   cast: >-
     charging a nuclear blast: legs braced wide apart, the hull leaning back, the cannon arm (on the right side of the
     image, as in Image 3) levelled straight at the heroes with its muzzle glowing bright white, the chest core blazing
@@ -449,6 +451,7 @@
   face: no face; the domed sensor head with one glowing red lens is the readable feature
   extra_negative: a human pilot, a person in a cockpit, wheels, tank treads, wings, a sword, more than two legs
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1235}   # boss_attack 1234 (ROSTER_LOG R49): a slim hull, the claw raised (wind-up)
 - id: death_eye
   # "Death Eye" (121), the undead eye of the final dungeon: paralysis, time gaze, death magic.
   # HELD (ROSTER_LOG G2): body floating paused by the plan 6.3 trigger (R38-R40)
