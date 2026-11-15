@@ -20,8 +20,7 @@
   attack: lunging forward and stabbing with the dagger held out toward the heroes
   hurt: knocked back, flinching with eyes squeezed shut and the dagger arm thrown back
   seeds: [1234]
-  variants:
-    - {id: gr_imp, hue: -95, sat: 1.1}    # Gr.Imp (T4 §1.1): a redder imp
+  # the gr_imp palette swap (T4 1.1) is gone: Goblin Guard has its own sheet (ROSTER_PLAN 3.1 rule 3, ROSTER_LOG R81)
 - id: wolf
   size: small
   prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
@@ -641,14 +640,14 @@
   body: biped
   prompt: >-
     stocky red-brown goblin soldier standing upright with a broad chest, a dented iron pot helm with a nose guard,
-    patched hide armour with a leather shoulder pad, a small round wooden shield with an iron rim on the arm on the left
-    side of the image and a short iron-tipped spear held upright in the hand on the right side of the image, small
-    fierce yellow eyes, thick bare legs and feet
-  attack: thrusting the spear forward at the heroes behind the raised shield, one foot stepping forward
-  hurt: knocked back behind the shield, the pot helm tipped over the eyes, the spear tilting back
+    patched hide armour, exactly one small round wooden shield with an iron rim held in front on the side toward the
+    heroes (the right side of the image) and a short iron-tipped spear held upright in the other hand, small fierce
+    yellow eyes, thick bare legs and feet
+  attack: thrusting the spear forward at the heroes beside the one raised shield, one foot stepping forward
+  hurt: knocked back behind the one shield, the pot helm tipped over the eyes, the spear tilting back
   face: its red-brown goblin face under the helm brim (small yellow eyes, a hooked nose, a snarl) is readable
-  extra_negative: a dagger, a vest, a sword, a bow, a cape
-  seeds: [1234]
+  extra_negative: two shields, a shield on the back, a dagger, a vest, a sword, a bow, a cape
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R80): two shields in the idle
 - id: crazy_horse
   # "Crazy Horse" (004): a wild horse with two hits
   size: large
