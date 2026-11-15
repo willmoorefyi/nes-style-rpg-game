@@ -1,0 +1,111 @@
+sprite: mindflayer
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [44, 5]
+    neck: [44, 24]
+    chest: [42, 34]
+    hip: [42, 52]
+    sh_n: [49, 30]
+    el_n: [52, 40]
+    hand_n: [53, 49]
+    sh_f: [35, 30]
+    el_f: [33, 40]
+    hand_f: [32, 49]
+    hip_n: [47, 55]
+    knee_n: [49, 64]
+    foot_n: [51, 73]
+    toe_n: [54, 76]
+    hip_f: [37, 55]
+    knee_f: [35, 64]
+    foot_f: [33, 73]
+    toe_f: [32, 76]
+  attack:
+    crown: [46, 12]
+    neck: [47, 26]
+    chest: [42, 36]
+    hip: [38, 52]
+    sh_n: [50, 30]
+    el_n: [60, 29]
+    hand_n: [74, 27]
+    sh_f: [34, 33]
+    el_f: [26, 38]
+    hand_f: [20, 42]
+    hip_n: [44, 56]
+    knee_n: [46, 65]
+    foot_n: [44, 73]
+    toe_n: [48, 76]
+    hip_f: [34, 56]
+    knee_f: [22, 63]
+    foot_f: [11, 71]
+    toe_f: [9, 75]
+  hurt:
+    crown: [17, 15]
+    neck: [34, 22]
+    chest: [40, 32]
+    hip: [43, 50]
+    sh_n: [48, 28]
+    el_n: [52, 23]
+    hand_n: [52, 16]
+    sh_f: [40, 26]
+    el_f: [40, 22]
+    hand_f: [43, 16]
+    hip_n: [48, 55]
+    knee_n: [52, 64]
+    foot_n: [51, 72]
+    toe_n: [53, 75]
+    hip_f: [40, 57]
+    knee_f: [33, 65]
+    foot_f: [29, 72]
+    toe_f: [28, 76]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:
+    moves: []
+    tweaks: {crown: [-1, 0], neck: [-1, 0], sh_n: [-1, 0], el_n: [-2, 0], hand_n: [-3, -1]}
+  atk_wind2:
+    t: -0.05
+    moves: []
+    tweaks: {crown: [-3, 0], neck: [-2, 0], sh_n: [-2, -1], el_n: [-4, -2], hand_n: [-6, -3]}
+  atk_mid:
+    t: 0.35
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {knee_n: [2, 0], foot_n: [2, 0], knee_f: [7, 0], foot_f: [7, 0]}
+    moves: [neck, chest, hip, sh_n, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:
+    t: 0.68
+    moves: [crown, chest, sh_n, el_n]
+  atk_recover:
+    t: 0.33
+    moves: [crown, neck, chest, hip, sh_n, el_n, hip_n, hip_f]
+  hurt_in1:
+    moves: [chest]
+    tweaks: {crown: [-5, 1], neck: [-2, 0], chest: [-1, 0], el_n: [0, -2], hand_n: [0, -3], el_f: [0, -2], hand_f: [0, -3]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+  daze:                        # head droops 1 px, both hands hang 2 px lower (translated, crisp fingers)
+    moves: [crown, neck, chest]
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 2], hand_n: [0, 2], el_f: [0, 2], hand_f: [0, 2]}
+  daze_b:
+    moves: [crown, neck, chest]
+    tweaks: {crown: [0, 1], el_n: [0, 2], hand_n: [0, 2], el_f: [0, 2], hand_f: [0, 2]}
+masks:
+  head:
+    idle: [[39, 4], [50, 4], [52, 18], [50, 34], [43, 34], [41, 20]]
+  ft_n:
+    idle: [[47, 73], [60, 73], [60, 78], [47, 78]]
+    attack: [[40, 72], [55, 72], [55, 78], [40, 78]]
+    hurt: [[47, 70], [57, 70], [57, 78], [47, 78]]
+  ft_f:
+    idle: [[27, 73], [38, 73], [38, 78], [27, 78]]
+    attack: [[4, 68], [16, 68], [16, 78], [4, 78]]
+    hurt: [[22, 69], [35, 69], [35, 78], [22, 78]]
+holds: []
+paint: []
