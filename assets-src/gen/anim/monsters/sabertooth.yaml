@@ -100,6 +100,7 @@ masks:
   neck:                        # the attack's throat ruff above the foreleg: the neck warp bridges head and leg in follow
     attack: [[118, 52], [133, 48], [139, 80], [133, 81], [125, 78], [118, 70]]
     idle: [[112, 28], [126, 27], [128, 36], [130, 70], [114, 72]]   # the nape: the neck follows the head down in daze (no notch)
+    hurt: [[104, 70], [124, 70], [125, 75], [134, 83], [110, 84], [104, 80]]   # the chest ruff (the far foreleg's turn creased it in hurt_in2)
   shin_n:                      # the near hind shin below the hock (the thigh's wide radius took it)
     idle: [[12, 99], [29, 99], [29, 111], [12, 111]]
     attack: [[3, 100], [24, 100], [24, 110], [3, 110]]
@@ -152,5 +153,8 @@ paint:                         # 1 px elbow crack on the near foreleg's back edg
   - {frame: atk_mid, xy: [[55, 85], [56, 85], [57, 85], [58, 85], [59, 85], [60, 85], [61, 85], [62, 85]], rgb: [132, 99, 74]}   # doubled thigh outline
   - {frame: atk_mid, xy: [[61, 86], [62, 86], [63, 86]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[53, 106], [54, 106], [55, 107], [56, 107]], rgb: [115, 82, 66]}    # far hind leg notch
+  - {frame: atk_mid, xy: [[119, 78], [124, 81], [115, 84], [116, 84], [120, 84], [116, 85], [117, 85], [118, 85], [119, 85], [118, 86], [119, 86], [120, 86]], rgb: [156, 140, 115]}   # ruff crack line over the turned near foreleg
+  - {frame: atk_wind1, xy: [[108, 78], [109, 77]], rgb: [189, 140, 90]}               # shoulder tick
+  - {frame: atk_wind1, xy: [[107, 79]], rgb: [214, 165, 107]}
   - {frame: atk_follow, xy: [[119, 80], [121, 80], [123, 81], [124, 81]], rgb: [156, 140, 115]}   # chest ruff dots
   - {frame: atk_follow, xy: [[124, 36]], rgb: [206, 156, 99]}                        # back speck
