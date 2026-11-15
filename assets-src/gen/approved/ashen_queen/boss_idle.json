@@ -1,0 +1,25 @@
+{
+  "character": "ashen_queen",
+  "sheet": "boss_idle",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "8e23d14cf040a2850a4db92b",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "idle"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass R G1 #1: six arms, serpent tail, altar joined, cracked mask, ray crown; nits: sun disc on one upper hand, altar mostly behind the coil"
+}

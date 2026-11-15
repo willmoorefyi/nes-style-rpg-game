@@ -213,3 +213,61 @@
 {"event": "result", "key": "f98cf659f26ded791c9fb262", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T00:18:31", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "lich", "sheet": "boss_attack_raise", "seed": 1236, "key": "0584887494033aec0cbf7eed"}
 {"event": "result", "key": "0584887494033aec0cbf7eed", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:49:20", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_idle", "seed": 1234, "key": "8e23d14cf040a2850a4db92b"}
+{"event": "result", "key": "8e23d14cf040a2850a4db92b", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:50:45", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack", "seed": 1234, "key": "dff206cd48da9ec0a2535987"}
+{"event": "result", "key": "dff206cd48da9ec0a2535987", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:51:52", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack", "seed": 1235, "key": "f11fb83bb845b81df7f35cfc"}
+{"event": "result", "key": "f11fb83bb845b81df7f35cfc", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:52:45", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack", "seed": 1236, "key": "c3d017fdc4d86292def35439"}
+{"event": "result", "key": "c3d017fdc4d86292def35439", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:53:37", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_cast", "seed": 1234, "key": "3529788f54db918a30395c89"}
+{"event": "result", "key": "3529788f54db918a30395c89", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:54:12", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_cast", "seed": 1235, "key": "083914478e09012536186ea3"}
+{"event": "result", "key": "083914478e09012536186ea3", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:54:45", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_cast", "seed": 1236, "key": "f354d64f3415665db6f31a36"}
+{"event": "result", "key": "f354d64f3415665db6f31a36", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:55:38", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_hurt", "seed": 1234, "key": "a95f9add588aaf798365f843"}
+{"event": "result", "key": "a95f9add588aaf798365f843", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:56:10", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_hurt", "seed": 1235, "key": "56c009356b8317d20a8bab50"}
+{"event": "result", "key": "56c009356b8317d20a8bab50", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:56:50", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_hurt", "seed": 1236, "key": "c805d2b8f1e281f9fa9396f5"}
+{"event": "result", "key": "c805d2b8f1e281f9fa9396f5", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:57:36", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack_raise", "seed": 1234, "key": "71f1e2a38ac638d4ec561fc6"}
+{"event": "result", "key": "71f1e2a38ac638d4ec561fc6", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:58:00", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "ashen_queen", "sheet": "boss_attack_raise", "seed": 1235, "key": "ec7e2da21a66dacb6250fbed"}
+{"event": "result", "key": "ec7e2da21a66dacb6250fbed", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:58:32", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_idle", "seed": 1234, "key": "78124850d181c85a756bc559"}
+{"event": "result", "key": "78124850d181c85a756bc559", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:59:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_attack", "seed": 1234, "key": "88ac2126a86eb4c22c79bc57"}
+{"event": "result", "key": "88ac2126a86eb4c22c79bc57", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T03:59:42", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_attack", "seed": 1235, "key": "f37f04d2d51e17eedde34b78"}
+{"event": "result", "key": "f37f04d2d51e17eedde34b78", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:00:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_attack", "seed": 1236, "key": "42532d476c42f0a2577a0b08"}
+{"event": "result", "key": "42532d476c42f0a2577a0b08", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:00:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_cast", "seed": 1234, "key": "c5e7eb5c6a56bafbfaef0bc2"}
+{"event": "result", "key": "c5e7eb5c6a56bafbfaef0bc2", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:01:15", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_hurt", "seed": 1234, "key": "ef605855eec4a92a4295a3e6"}
+{"event": "result", "key": "ef605855eec4a92a4295a3e6", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:01:41", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_hurt", "seed": 1235, "key": "61d1f4523ef4f20aaa390958"}
+{"event": "result", "key": "61d1f4523ef4f20aaa390958", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:02:06", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_attack_raise", "seed": 1234, "key": "35357bd79197e12cff11d1a6"}
+{"event": "result", "key": "35357bd79197e12cff11d1a6", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:02:40", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "drowned_sovereign", "sheet": "boss_attack_raise", "seed": 1235, "key": "022785aec3801d3ef614f352"}
+{"event": "result", "key": "022785aec3801d3ef614f352", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:03:25", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_idle", "seed": 1234, "key": "7d32a287ca307915e131418f"}
+{"event": "result", "key": "7d32a287ca307915e131418f", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:03:56", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_idle", "seed": 1235, "key": "d0a454c671a5aa6d6415d916"}
+{"event": "result", "key": "d0a454c671a5aa6d6415d916", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:04:39", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1234, "key": "e43ce4aeb0614188f6356fd5"}
+{"event": "result", "key": "e43ce4aeb0614188f6356fd5", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:05:05", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1235, "key": "b706150e08f51e79f507011b"}
+{"event": "result", "key": "b706150e08f51e79f507011b", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:05:30", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1236, "key": "0cede2c0d74f95ac6c94bb20"}
+{"event": "result", "key": "0cede2c0d74f95ac6c94bb20", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:06:27", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_cast", "seed": 1234, "key": "b1755fc7de941893455877e5"}
+{"event": "result", "key": "b1755fc7de941893455877e5", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:06:50", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_cast", "seed": 1235, "key": "008f0a26528b33fec8392e80"}
+{"event": "result", "key": "008f0a26528b33fec8392e80", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:07:17", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_cast", "seed": 1236, "key": "1e6e336641442187d5834bf9"}
+{"event": "result", "key": "1e6e336641442187d5834bf9", "ok": true}

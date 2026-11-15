@@ -1,0 +1,25 @@
+{
+  "character": "drowned_sovereign",
+  "sheet": "boss_attack",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "42532d476c42f0a2577a0b08",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass R G1 R18: seed 1236 (attempt 3 of 3); nit: the coral sceptre reads brown"
+}

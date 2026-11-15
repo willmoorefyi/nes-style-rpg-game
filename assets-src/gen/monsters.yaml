@@ -218,25 +218,41 @@
     on a chain; the radiant crown of gold rays and the cracked white ceremonial mask; no legs: the vast serpentine tail
     of charcoal scales with ember-lit undersides coiled around the broken stone altar; palette of charcoal, ember
     orange, white-gold, bronze and ash grey
+  # approved boss_attack is seed 1234 with this text (ROSTER_LOG R2, R5: best of 3). The two retries asked for the blade
+  # leading the sweep: 1235 "the lower arm that holds the curved bronze blade in Image 3 sweeps across her body so the
+  # blade slashes far out in front of her toward the heroes ..." (R3: grey box background, four arms, props swapped);
+  # 1236 "... every prop stays in the same hand as in Image 3 ... sweeps it across the front of her body ..." (R4: an
+  # idle stance with the blade held flat across the waist, no lunge)
   attack: >-
     lunging forward on the coiled tail toward the heroes, the three near-side arms striking in one sweeping blow with
     the bronze blade leading, the three far-side arms thrown back, the tail coil tightening around the altar
   cast: >-
     a sacred fire rite: she rises tall on the coiled tail, all six arms spread in a ritual formation, the sun disc
-    between the upper hands blazing white-gold, small sparks rising around her hands
+    between the upper hands blazing white-gold, small sparks rising around her hands; the bronze blade stays in the
+    lower left hand and the censer in the lower right hand, as in Image 3
   hurt: >-
-    struck hard: recoiling back over the coil, the crack in the mask flaring brighter, the six arms flung outward out of
-    rhythm, the censer chain swinging
+    struck hard: recoiling back over the coil, away from the heroes to the left, the crack in the mask flaring
+    brighter, the arms flung outward out of rhythm, the censer chain swinging; she still has exactly six arms, all six
+    clearly visible: three on the left side of the image (the upper one with the sun disc, the middle one open, the
+    lower one with the bronze blade) and three on the right side of the image (the upper one open, the middle one open,
+    the lower one with the censer on its chain), as in Image 3
   attack_raise: >-
     the wind-up of a crushing sunfire blow, seen in the same three-quarter front view as Image 3 (torso and mask turned
-    toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, the
-    bronze blade and the sun disc above the radiant crown, the mask exactly as in Image 3; the tail coiled low and tight
+    toward the viewer and the heroes on the right, never her back): all six arms raised high overhead together, every
+    one of the six hands lifted above the top of the radiant crown, the arms forming a tall V of three on each side,
+    all six clearly visible; the bronze blade still in a left-side hand and the sun disc
+    in the upper left hand, both above the radiant crown, the censer on its chain still in a right-side hand; the mask
+    exactly as in Image 3; the tail coiled low and tight
     around the altar; she sinks down into the coil so that the whole figure, crown and raised arms included, stays
     inside the grey box at exactly the same pixel size as in Image 3 (crouched into the coil, not taller; the raised
     blade is the highest point, well below the top of the image)
   face: the cracked white ceremonial mask with two burning slits is readable; no human face shows
   extra_negative: legs, feet, four arms, eight arms, a second blade, a throne, wings
   seeds: [1234]
+  sheet_seeds: {boss_cast: 1236, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_cast 1234 (ROSTER_LOG R6): props swapped sides, frayed tail tip; 1235 (R7,
+  # with a long per-hand prop clause): magenta hole and fringe, five arms, muddy palette; boss_hurt 1234 (R9): five arms;
+  # 1235 (R10, approved as best of 3): pink key fringe on the smoke, forked tail tip; 1236 (R11, + "only a thin wisp
+  # of smoke from the censer"): clean but no recoil; boss_attack_raise 1234 (R13): guide box painted, arms not raised
 - id: drowned_sovereign
   # "the Drowned Sovereign", Fiend of Water: an ancient king in impossibly flowing robes; the idle is the disguise,
   # every action pose opens the robes on the abyssal creature beneath
@@ -258,23 +274,32 @@
     revealing dark teal tentacles with pale suckers beneath
   attack: >-
     the robes part at the front and three dark teal tentacles with pale suckers lash out far toward the heroes; the
-    crown, face and robe outline stay as in Image 3
+    crown, face and robe outline stay as in Image 3: the same deep abyssal-teal outer robe with wide sleeves over the
+    pearl-white inner robe, the hems pooling wide on the ground, at the same size as in Image 3
   cast: >-
     an abyssal spell: the robes open wide like a fan and six dark teal tentacles spread in a circular ritual formation
-    behind him, their tips glowing a deep abyssal blue; he raises the coral sceptre
+    behind him, their tips glowing a deep abyssal blue; he raises the coral sceptre; the crown, face and robes stay as in
+    Image 3: the same deep abyssal-teal outer robe with wide sleeves over the pearl-white inner robe, the hems pooling wide on the ground, the coral-red sceptre, at the same size as in Image 3
   hurt: >-
-    knocked back: dark teal tentacles erupt defensively from under the robe around him, face grimacing, crown knocked
-    askew
+    knocked back: dark teal tentacles erupt defensively from under the robe around him, face grimacing, the crown
+    tilted askew but still sitting on his head, touching it; the coral-red sceptre still in the same hand as in Image 3
+    (the hand on the right side of the image); the robes stay as in Image 3: the same deep abyssal-teal outer robe with wide sleeves over the pearl-white inner robe, the hems pooling wide on the ground, the coral-red sceptre, at the same size as in Image 3
   attack_raise: >-
     the wind-up of his heaviest blow, the most revealing pose, seen in the same three-quarter front view as Image 3
-    (face and crown toward the viewer and the heroes on the right, never his back): the robes thrown fully open, a mass
+    (face and crown toward the viewer and the heroes on the right, never his back): the front of the robes flung wide
+    open from the collar to the hem, showing the writhing tentacle mass inside where his body should be; a mass
     of dark teal tentacles with pale suckers and a glimpse of something enormous folded beneath rising high behind him,
-    the coral sceptre raised; the crown and face exactly as in Image 3; he sinks low into the pooled robes so that the
+    the coral-red sceptre raised high in the same hand as in Image 3; the crown on his head and the face exactly as in
+    Image 3 (a crisp, readable aged face in profile with pale eyes, a clear nose and brow), the abyssal-teal outer robe with wide sleeves
+    over the pearl-white inner robe as in Image 3; he sinks low into the pooled robes so that the
     whole figure, raised tentacles included, stays inside the grey box at exactly the same pixel size as in Image 3
     (the highest tentacle tip well below the top of the image)
   face: the aged human face under the crown, with calm pale eyes, is readable
   extra_negative: a second crown, a throne, a fish tail
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1236, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem;
+  # 1235 (R17, the text without the robe anchor sentence): teal outer robe lost, smaller; boss_hurt 1234 (R20):
+  # the crown flew off, the sceptre switched hands; boss_attack_raise 1234 (R22): muddy face, robes closed
 - id: hollow_seraph
   # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
   # halo; her composure stays intact even when hurt
@@ -286,20 +311,29 @@
   prompt: >-
     the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
     showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
-    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread; thin hanging
-    greaves, no feet on the ground, a faint pale wind spiralling under her; palette of white steel, pale gold, brass,
-    storm grey and a cold white-blue glow
+    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread, the highest
+    wing tips well below the top of the grey box; thin hanging greaves, no feet on the ground, nothing below the
+    greaves (no wind, no debris, no shadow); palette of white steel, pale gold, brass, storm grey and a cold white-blue
+    glow
   action_prompt: >-
     the Hollow Seraph, exactly as in Image 3: a hovering hollow suit of elegant white and pale-gold armour with no body
     inside, the open helm showing only darkness, the fractured golden halo floating above the helm, exactly six
     articulated mechanical wings, three on each side, of overlapping metallic feathers in white steel with brass joints,
     thin hanging greaves; palette of white steel, pale gold, brass, storm grey and a cold white-blue glow
   attack: >-
-    the six wings sweep forward together toward the heroes, throwing a crescent of cutting wind: short pale streaks
-    attached to the wing tips
+    a cutting wing strike: the six wings swing forward in a wide arc toward the heroes on the right, the three near
+    wings fanned out in front of the armour and the three far wings fanned out behind it, all six separately visible
+    with their brass joints, their sharp metal feather tips pointing toward the heroes, the armour leaning forward;
+    exactly six wings, as in Image 3, at exactly the same pixel size as in Image 3; the fractured halo in its two broken arcs above the helm, as in Image 3; no wind
+    streaks, no effects; the whole figure well below the top of the grey box
+  # approved boss_cast is seed 1234 with this text (ROSTER_LOG R29, R32: best of 3); the retries (R30 "seen from the
+  # front like Image 3 ... symmetric like a fan", R31 "the same front-facing hovering posture as Image 3 ... every wing
+  # lifted higher") both came back with four wings
   cast: >-
-    a storm rite: the six wings raised high and spread wide, the halo crackling with white-blue lightning, both
-    gauntlets lifted
+    a storm rite: the six wings raised and spread wide to the sides, both gauntlets lifted, the halo crackling with
+    short white-blue lightning drawn on the two broken halo arcs themselves; exactly six wings, three growing from each
+    shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
+    included, at the same pixel size as in Image 3 and well below the top of the grey box
   hurt: >-
     a sharp jolt: cracks across the breastplate, one wing pair faltering downward, the armour tilted back only
     slightly; the posture stays upright and controlled, her composure intact
@@ -311,3 +345,7 @@
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
+  # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
+  # like a fan"): four wings, a wing chip
