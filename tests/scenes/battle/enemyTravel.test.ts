@@ -2,7 +2,8 @@
  * Pass F item 3 (docs/FEEDBACK_PLAN_2026-11-14.md §3.3): on real layout boxes, the real party slots and the committed
  * monster atlas, every melee enemy reaches the hero it attacks on its contact frame (opaque right edge within 50 px of
  * the hero's box left + 24, feet within 30 px of the hero's feet). Old code: a 24-40 px lunge, about 900 px short.
- * Item 7 / F0 item 3: a travelling Garland or lich stays in `actors`, under the message window in `hud`.
+ * Item 7 / F0 item 3: a travelling Garland or lich stays in `actors`, under the message window in `hud`. Defect 1 / D-F3
+ * (docs/ROSTER_FIX_PLAN.md): no travelling boss's art (each frame's own opaque box) ever overlaps the message text.
  */
 import { describe, it, expect } from 'vitest';
 import { Container, Graphics, Texture } from 'pixi.js';
@@ -19,12 +20,15 @@ import { ENEMY_REACH_OVERLAP } from '../../../src/scenes/battle/enemyReach.js';
 import { opaqueBounds } from '../../helpers/pngAlpha.js';
 import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
+import { monsterAnchors, type MonsterAnchors } from '../../../src/rendering/monsterAnchors.js';
+import { frameBox } from '../../helpers/atlasFrames.js';
 import type { EnemyData } from '../../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const meta = JSON.parse(readFileSync(join(root, 'assets/sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number; texScale?: number;
-  sheets: Record<string, { cell: [number, number]; footRow: number; floating: boolean; lungePx?: number; frames: Record<string, [number, number]> }>;
+  sheets: Record<string, MonsterAnchors & { cell: [number, number]; footRow: number; floating: boolean; lungePx?: number;
+    frames: Record<string, [number, number]> }>;
 };
 const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
 const scenarios = parse(readFileSync(join(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as { id: string; enemies?: string[] }[];
@@ -47,7 +51,7 @@ const art: MonsterArtSource = {
     return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: meta.scale,
       artScale: meta.scale / (meta.texScale ?? meta.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
       hasCast: !!s.frames.cast, hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true,
-      opaqueRight: opaque(sprite)[2] };
+      opaqueRight: opaque(sprite)[2], ...monsterAnchors(s) };
   },
 };
 
@@ -101,13 +105,14 @@ describe('enemy travel reaches the target (item 3)', () => {
     expect(b.sprites.map((s) => [s.x, s.y])).toEqual(fresh.sprites.map((s) => [s.x, s.y]));
   });
 
-  it('nine large enemies at scale factor 0.5 land on every hero row too', () => {
-    const b = battle(Array(9).fill('troll'));
-    expect(b.view.poses.attackTiming(0)).toBeDefined();
+  it.each([['troll', 1], ['white_crocodile', 0.5]] as const)('nine %ss at scale factor %s land on every hero row', (id, factor) => {
+    const b = battle(Array(9).fill(id));
+    const f = art.getMonsterFrames(id)!;
+    expect(b.sprites.map((s) => s.scale.x)).toEqual(Array(9).fill(f.artScale * factor));
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 4; j++) {
         const c = contact(b, i, j);
-        expect(Math.abs(c.right - (c.targetLeft + ENEMY_REACH_OVERLAP)), `troll ${i} -> hero ${j}`).toBeLessThanOrEqual(50);
+        expect(Math.abs(c.right - (c.targetLeft + ENEMY_REACH_OVERLAP)), `${id} ${i} -> hero ${j}`).toBeLessThanOrEqual(50);
         expect(Math.abs(c.feet - c.targetFeet)).toBeLessThanOrEqual(30);
       }
     }
@@ -122,11 +127,11 @@ describe('enemy travel reaches the target (item 3)', () => {
   });
 });
 
-describe('a travelling boss never covers the message text (F0 item 3, item 7)', () => {
-  it.each(['garland', 'lich'])('%s: in actors on every frame, hud last, and its art overlaps the text on some frame', (id) => {
+describe('a travelling boss never covers the message text (F0 item 3, item 7, defect 1)', () => {
+  const bosses = ['garland', 'hollow_seraph', 'warmech', 'ashen_queen', 'lich', 'astos', 'chaos', 'drowned_sovereign', 'death_eye'];
+  it.each(bosses)('%s: in actors on every frame, hud last, and no frame\'s art overlaps the text', (id) => {
     const b = battle([id]);
     const f = art.getMonsterFrames(id)!;
-    const [l, t, r, btm] = opaque(id);
     b.view.playAttack(0, b.party[0]);
     const total = b.view.poses.attackTiming(0).totalFrames;
     const text = b.text.getBounds();
@@ -138,9 +143,10 @@ describe('a travelling boss never covers the message text (F0 item 3, item 7)', 
       expect(s.parent).toBe(b.layers.actors);
       expect(b.main.children[b.main.children.length - 1]).toBe(b.layers.hud);
       const scale = (s.scale.x / f.artScale) * f.scale;
+      const [l, t, r, btm] = frameBox(id, b.view.poses.state(0).pose);
       const box = { x0: s.x + l * scale, y0: s.y + t * scale, x1: s.x + r * scale, y1: s.y + btm * scale };
       if (box.x0 < text.x + text.width && text.x < box.x1 && box.y0 < text.y + text.height && text.y < box.y1) overlaps++;
     }
-    expect(overlaps).toBeGreaterThan(0);
+    expect(overlaps).toBe(0);
   });
 });

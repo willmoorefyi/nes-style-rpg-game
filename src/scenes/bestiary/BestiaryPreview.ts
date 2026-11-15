@@ -2,7 +2,9 @@
  * The bestiary's preview (docs/BESTIARY_PLAN.md 3.1, 3.6): the battle background and one enemy laid out exactly as a
  * lone enemy in battle (AiEnemyView, i.e. computeEnemyLayoutAi), in a stage container at screen (0, 0) masked to the
  * preview window's inner rect. The loop (bestiaryAnim.ts) plays the real attack toward an invisible phantom target
- * placed so the furthest lunge ends 16 px inside the panel. Frames are cached for the shown entry only (FW-8).
+ * placed so the furthest lunge ends REACH_MARGIN inside the panel, or further left when the attack art reaches past
+ * the idle edge (ROSTER_FIX_PLAN 12d: death_eye's lunge touched the border). Frames are cached for the shown entry
+ * only (FW-8).
  */
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
@@ -11,6 +13,7 @@ import { Window } from '../../ui/Window.js';
 import { OutlinedText } from '../../ui/NESFont.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { battleBackgroundPath } from '../../rendering/BattleBackground.js';
+import { lungeOvershoot } from '../../rendering/monsterAnchors.js';
 import { AiEnemyView, type MonsterArtSource } from '../battle/AiEnemyView.js';
 import type { EnemyPoseController, Posture } from '../battle/EnemyPoseController.js';
 import { ENEMY_REACH_OVERLAP } from '../battle/enemyReach.js';
@@ -27,6 +30,8 @@ export const PREVIEW_INNER = { left: PREVIEW_RECT.x + BORDER, top: PREVIEW_RECT.
  *  the idle edge (the goblin's knife) then touched the border; 48 keeps it in view. */
 const REACH_MARGIN = 48;
 const PHANTOM = { w: 48, h: 160 };
+/** 12d: the attack art's furthest edge (the idle edge plus the atlas `lungeRight` overshoot) ends this far inside. */
+const ART_MARGIN = 12;
 
 /**
  * R2 / BS-7, the one place the daze step touches the pose API: Fe's 'daze' posture (daze / daze_b, falling back to
@@ -138,9 +143,15 @@ export class BestiaryPreview {
     this.actors.addChildAt(sprite, 0);
     const f = this.art.getMonsterFrames(monsterSpriteKey(e));
     this.noArt = !f;
+    this.actors.x = 0;
     if (f) {
       const feetY = sprite.y + (f.footRow + 1) * f.scale;
-      this.phantom.position.set(PREVIEW_INNER.right - REACH_MARGIN - ENEMY_REACH_OVERLAP - 0.25 * f.lungePx, feetY - PHANTOM.h);
+      const past = (lungeOvershoot(f) + 1) * f.scale;     // the attack art's right edge past the idle edge column
+      const margin = Math.max(REACH_MARGIN, ART_MARGIN + past);
+      this.phantom.position.set(PREVIEW_INNER.right - margin - ENEMY_REACH_OVERLAP - 0.25 * f.lungePx, feetY - PHANTOM.h);
+      // an enemy too wide to travel at all (warmech) lunges in place: the actors move left instead
+      const inPlace = sprite.x + (f.opaqueRight ?? f.cell[0]) * f.scale + f.lungePx + past;
+      this.actors.x = Math.min(0, Math.floor(PREVIEW_INNER.right - ART_MARGIN - inPlace));
     }
     const label: BestiaryAnimLabel = e.attack === 'ranged' ? 'ranged' : e.attackAnim === 'heavy' ? 'heavy' : 'attack';
     this.loop.start({ hasCast: this.view.hasCast(0), hasDaze: !!f && f.textures.daze !== f.textures.hurt_in1,

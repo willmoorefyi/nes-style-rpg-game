@@ -18,6 +18,8 @@ import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { InputAction } from '../../../src/core/InputManager.js';
 import type { Game } from '../../../src/core/Game.js';
 import { visibleLabels } from '../../helpers/realData.js';
+import { atlas as monsterAtlas } from '../../helpers/atlasFrames.js';
+import { monsterAnchors } from '../../../src/rendering/monsterAnchors.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = <T>(f: string): T => parse(readFileSync(join(root, f), 'utf-8')) as T;
@@ -48,7 +50,8 @@ function fakeArt(missing: string[] = []): MonsterArtSource {
       textures.daze = textures.hurt_in1;
       textures.daze_b = textures.hurt_in1;
       return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: 2, artScale: 2,
-        cell, footRow: cell[1] - 3, floating: false, hasCast: big, hasRaise: false, lungePx: big ? 38 : 24, anim: true, opaqueRight: big ? 184 : 68 };   // the real atlas idle edges (garland 184, goblin 68)
+        cell, footRow: cell[1] - 3, floating: false, hasCast: big, hasRaise: false, lungePx: big ? 38 : 24, anim: true, opaqueRight: big ? 184 : 68,   // the real atlas idle edges (garland 184, goblin 68)
+        ...monsterAnchors(monsterAtlas.sheets[big ? 'garland' : 'goblin']) };   // and its FW-A anchors
     },
   };
 }
