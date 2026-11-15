@@ -187,6 +187,29 @@ Images used: 105 of 300 (build 105 of 285, fix 0 of 15; ledger guard: 205 Gemini
 - **Ashen Queen heavy attack (orchestrator, final):** no more `boss_attack_raise` attempts; the rig makes the raise
   with the coil fallback from the approved poses.
 
+## Batch A status (2026-11-15, paused: biped)
+
+| Batch | Sprites approved | Waiting | Images | Expected (plan 6.2) | Retries by body type (images / sprites) |
+|---|---|---|---|---|---|
+| A (002-031) | **19 of 25**: gr_imp, crazy_horse, black_widow, gigas_worm, gr_wolf, werewolf, zombie, ghoul, cobra, ogre_chief, lizard, shark, bigeyes, tarantula, scorpion, shadow, green_slime, crawler, gray_ooze | 6 bipeds (6.3 pause): sahagin, sahagin_chief, buccaneer, ghast, gargoyle, bloodbones (entries written in `monsters.yaml`, not requested) | 33 (R80-R113; R95 is a no-image best-of-3 row) | 34 for all 25 | biped 9 / 5, quadruped 4 / 3, arthropod 9 / 4, serpent 3 / 2, swimmer 3 / 1, floating 2 / 2, blob 3 / 2 |
+
+- `gr_imp` and `gr_wolf` have their own sheets; the `goblin` / `wolf` variant rows are deleted (both keys unchanged,
+  both still `size: small`). The integrator's atlas build must pick the new sheets up (no atlas was built here).
+- **Pause trigger (plan 6.3): biped**, R92-R94 (ogre_chief: a helm knocked off, then armour lost with a cape, then a
+  clipped cleaver with a cloak). Likely cause in the shared wording: `monster.BODY_LINES["biped"]` ends "let hair,
+  cloth or a cape move with the motion", and R93/R94 (and R87's smear) add capes, cloaks and smears the design does
+  not have. Proposed fix (framework owner, keys of approved requests unchanged because only entries with `body:`
+  get the line): drop "or a cape", add "no capes, smears or motion arcs unless the design has them"; or the
+  generator sets a per-sprite `motion:` string for the six waiting bipeds.
+- Lessons for the next batches: "rearing / forward and up" wording makes Gemini rear low creatures to twice their
+  height (R96, R102, R111): attacks must say "low ... no taller than half again its idle height"; floating sheets
+  need "the same height in its box with clear empty space below" or the shared offset slices the action cells
+  (R77, R99); named counts need "exactly N, as in the idle cell" (R78, R80).
+- Fix-pass candidates added: `ogre_chief` hurt (helm detached), `gr_wolf` (very dark, 8-9 colours: check on
+  `ruined_forest`), `evil_eye` attack (tail spike).
+- Process slip (R100): one wording edit failed its text match and the paid call was not chained to it, so attempt 3
+  of `shark` went out with R99's text (it was approved; the log row says so). Edits and paid calls are chained since.
+
 ## Deferred sprites
 
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
