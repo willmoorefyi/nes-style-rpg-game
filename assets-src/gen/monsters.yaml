@@ -1944,12 +1944,15 @@
     one gold sceptre with a hooked top in the hand on the right side of the image in every cell; centred in its own
     cell with empty space on both sides
   attack: >-
-    stepping forward toward the heroes, the free hand reaching out to grab with the elbow bent, the sceptre held up in
-    the same hand as in the idle cell
-  hurt: knocked back, the masked head thrown back, the free hand flung up, the sceptre in the same hand
+    turned three-quarters toward the heroes on the right and leaning his body far forward to the right, raising the
+    sceptre upright in front of his chest with both hands, the sceptre vertical (not pointed forward), its hooked top
+    level with the headdress, the whole sceptre well inside the middle cell; nothing reaches back to the left
+  hurt: >-
+    knocked back to the left, the masked head tilted back, the free hand flung up, the sceptre upright in the same
+    hand, the headdress on the head as in the idle cell
   face: the gold death mask with two dark eye holes
   extra_negative: a hunched pose, loose trailing bandages, a crown, a sword, a skull face, a cape, a second sceptre
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R216): the attack reaches back to the left, away from the heroes
 - id: medusa
   # "Medusa" (088): a serpent-tailed woman with snake hair (small naga; distinct from the other nagas)
   size: small
