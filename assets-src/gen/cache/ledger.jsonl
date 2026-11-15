@@ -601,3 +601,5 @@
 {"event": "result", "key": "d08aeb416f21e529d8732836", "ok": false, "error": "403 PERMISSION_DENIED. {'error': {'code': 403, 'message': 'Spend cap breached for project: projects/1067994254943 for service: generativelanguage.googleapis.com. Correlation id: 2513038147875607518', 'status': 'PERMISSION_DENIED'}}"}
 {"event": "attempt", "ts": "2026-11-15T11:36:11", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "baretta", "sheet": "monster_large", "seed": 1234, "key": "d08aeb416f21e529d8732836"}
 {"event": "result", "key": "d08aeb416f21e529d8732836", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T11:38:15", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "basilisk", "sheet": "monster_small", "seed": 1234, "key": "b080e460c56bf1932d503a16"}
+{"event": "result", "key": "b080e460c56bf1932d503a16", "ok": true}

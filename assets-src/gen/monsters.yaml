@@ -1837,16 +1837,18 @@
   size: small
   body: quadruped
   prompt: >-
-    a low grey-green lizard seen from the side with exactly six short clawed legs (three on each side, all on the
-    ground), a long body with darker bands, a crown-like crest of pale spikes on its head, large gleaming yellow eyes,
-    a long tail on the ground; the whole lizard sits in the middle of its own cell with empty space on both sides
+    a low grey-green lizard seen from the side with a long low body and exactly six short clawed legs in three pairs
+    spaced evenly along the body: a front pair under the shoulders, a middle pair under the belly and a hind pair
+    under the hips, the three near-side legs clearly apart from each other and every foot on the ground; darker bands
+    on the body, a crown-like crest of pale spikes on its head, large gleaming yellow eyes, a long tail on the ground;
+    the whole lizard sits in the middle of its own cell with empty space on both sides
   attack: >-
     lunging forward low with the jaws open and the gleaming eyes wide toward the heroes, all six feet on the ground (no
     leap), no taller than its idle height, the head well inside the middle cell
   hurt: knocked back low, the eyes squeezed shut, the crest flattened, the tail curling, all six feet on the ground
   face: its crowned lizard head with large gleaming yellow eyes is readable
   extra_negative: four legs, eight legs, wings, feathers, a frill, orange colour, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R208): the six legs read as four
 - id: allosaurus
   # "Allosaurus" (083): a two-legged predatory dinosaur
   size: large
