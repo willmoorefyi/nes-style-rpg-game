@@ -715,3 +715,5 @@
 {"event": "result", "key": "3951c69d8e2b406a9eff2fe7", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T12:59:49", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "vampire_lord", "sheet": "monster_small", "seed": 1235, "key": "6d8bdaf542eb3bac2e3d0915"}
 {"event": "result", "key": "6d8bdaf542eb3bac2e3d0915", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T13:00:39", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "dark_fighter", "sheet": "monster_small", "seed": 1234, "key": "7c03a8d1930ebae7044cf603"}
+{"event": "result", "key": "7c03a8d1930ebae7044cf603", "ok": true}

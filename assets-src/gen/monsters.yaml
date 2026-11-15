@@ -2563,17 +2563,17 @@
   prompt: >-
     a warrior-mage in dark steel half-plate over a hooded deep crimson tabard, the hood up over a shadowed face with
     two pale eyes, holding one straight sword in the hand on the right side of the image and one round dark shield
-    with a glowing teal glyph on the other arm, close to the body; in the idle cell the sword is held upright beside
+    with a simple glowing teal crescent-moon emblem on the other arm, close to the body; in the idle cell the sword is held upright beside
     the shield; centred in its own cell with empty space on both sides, the sword point well below the top of the
     grey box
   attack: >-
-    stepping forward toward the heroes behind the raised glyph shield, the sword thrust low past the shield's edge
-    with the elbow bent, the whole sword well inside the middle cell, the glyph glowing brighter
+    stepping forward toward the heroes behind the raised shield, the sword thrust low past the shield's edge
+    with the elbow bent, the whole sword well inside the middle cell, the crescent emblem glowing brighter
   hurt: >-
     knocked back, the hooded head thrown back, the shield lifted up in front of the chest, the sword in the same hand
   face: a shadowed face with two pale eyes inside the hood
-  extra_negative: a cape, a helmet, a second sword, a staff, a plume, a skull face, black plate, a spell effect away from the shield
-  seeds: [1234]
+  extra_negative: a cape, a helmet, a second sword, a staff, a plume, a skull face, black plate, a spell effect away from the shield, runes, letters, crosses, hooked symbols
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R269): the shield glyph cut to a hooked-cross shape
 - id: rhyos
   # "Rhyos" (120): a stone-hided chimera kin with a basilisk head, a ram head and a lion head (no wings)
   size: large
