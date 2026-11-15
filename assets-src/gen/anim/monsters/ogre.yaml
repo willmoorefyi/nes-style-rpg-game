@@ -92,9 +92,9 @@ frames:                        # tweaks from /tmp/t3/pose.py: rigid rotations ab
     t: 0.80
     moves: []
     tweaks: {crown: [8, 2], neck: [4, 2], chest: [3, 0], sh_n: [4, 3], el_n: [7, 4], hand_n: [9, 2], tip: [8, -5], sh_f: [4, -1], el_f: [7, -1], hand_f: [9, -1]}
-  atk_recover:                 # club arm 26 forward of hanging
+  atk_recover:                 # club arm translated 3 forward, 2 up (F3b 12f: recover->idle club step <= 10, no club turn)
     moves: []
-    tweaks: {crown: [2, 0], el_n: [7, -2], hand_n: [13, -6], tip: [15, -15]}
+    tweaks: {el_n: [2, -1], hand_n: [3, -2], tip: [3, -2]}
   hurt_in1:                    # recoil 3 back, lean back 13, head back 28, club arm lifts
     moves: []
     tweaks: {crown: [-25, 2], neck: [-11, -1], chest: [-9, 1], hip: [-1, 0], sh_n: [-10, -3], el_n: [-5, -5], hand_n: [0, -7], tip: [2, -13], sh_f: [-10, 6], el_f: [-4, 9], hand_f: [2, 7]}
