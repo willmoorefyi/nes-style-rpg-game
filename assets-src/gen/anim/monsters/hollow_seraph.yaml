@@ -11,6 +11,10 @@ facing: right
 sampler: nearest
 breath: true
 cast_hand: f
+# ROSTER_FIX_PLAN defect 5 (D-F1, FW-R): the approved attack_raise key (a turned pose with three wings and a flat
+# cyan panel behind the helm) is dropped; the heavy attack coils in atk_wind1 / atk_wind2 and its glint tip comes
+# from atk_wind2. The approved PNG stays on disk; the cell is kept.
+raise: false
 half_hand: [n, f]
 keyframes:
   idle:
@@ -59,12 +63,6 @@ keyframes:
     sh_f: [138, 84]
     el_f: [152, 76]
     hand_f: [164, 60]
-  attack_raise:
-    core: [125, 112]
-    base: [125, 190]
-    neck: [138, 92]
-    crown: [138, 58]
-    halo: [140, 44]
 parts:
   weapon: {remove: true}
   uarm_n: {remove: true}
@@ -86,7 +84,6 @@ masks:
     attack: [[0, 0], [217, 0], [217, 199], [0, 199]]
     hurt: [[0, 0], [217, 0], [217, 199], [0, 199]]
     cast: [[0, 0], [217, 0], [217, 199], [0, 199]]
-    attack_raise: [[0, 0], [217, 0], [217, 199], [0, 199]]
   w_l1: {idle: [[28, 14], [70, 38], [92, 54], [97, 72], [97, 86], [89, 87], [79, 76], [55, 77], [36, 70], [24, 45]]}
   w_l2: {idle: [[10, 77], [80, 77], [87, 84], [97, 88], [97, 99], [80, 99], [70, 104], [40, 104], [12, 96]]}
   w_l3: {idle: [[28, 146], [52, 104], [70, 103], [96, 103], [96, 113], [86, 116], [82, 136], [62, 147]]}
@@ -104,13 +101,11 @@ masks:
     attack: [[88, 60], [126, 58], [130, 80], [122, 102], [94, 102], [86, 82]]
     hurt: [[96, 56], [128, 54], [132, 76], [126, 96], [100, 96], [94, 76]]
     cast: [[110, 54], [146, 54], [148, 76], [140, 92], [114, 92], [108, 74]]
-    attack_raise: [[118, 54], [154, 54], [156, 76], [148, 94], [122, 94], [116, 74]]
   halo:
     idle: [[98, 33], [146, 33], [146, 53], [136, 53], [118, 54], [98, 54]]
     attack: [[86, 42], [142, 42], [142, 58], [126, 60], [100, 60], [86, 60]]
     hurt: [[86, 42], [120, 42], [120, 52], [106, 54], [100, 56], [94, 72], [86, 72]]
     cast: [[108, 34], [146, 34], [146, 51], [132, 52], [120, 52], [108, 52]]
-    attack_raise: [[114, 34], [154, 34], [154, 52], [142, 54], [126, 56], [114, 56]]
 z:
   idle: [w_r1, w_r2, w_r3, w_l1, w_l2, w_l3, body, head, halo]
 # The keyframes differ hugely (idle-attack IoU 0.45, attack_raise-attack 0.33), so the in-betweens are mostly
@@ -118,17 +113,18 @@ z:
 # disks by tweaks only. Before the dive she rises and draws back (wind), the dive overshoots down (follow) and she
 # floats back up and in (recover).
 frames:
-  atk_wind1:                   # rise 1 and draw back 2; wings lift 4 deg on their disks, helm back 1
-    moves: []
-    dx: -2
-    dy: -1
-    tweaks: {crown: [-1, 0], il1t: [3, -3], il2t: [1, -3], il3t: [-2, -2], ir1t: [-3, -3], ir2t: [-1, -3], ir3t: [2, -2]}
-  atk_wind2:                   # rise 2, back 6; the lower four wings lift 8 deg, the top pair 4 (bbox), helm back 2
-    moves: []
-    dx: -6
-    dy: -2
-    tweaks: {crown: [-2, 0], il1t: [3, -3], il2t: [1, -3], il3t: [-4, -5], ir1t: [-3, -3], ir2t: [-1, -6], ir3t: [4, -5]}
+  atk_wind1:                   # defect 5 review: the wind-up is the heavy telegraph now (no raise), so it must read:
+    moves: []                  # rise 3 and draw back 5; wings lift on their disks (no helm turn: it cut dashes under the halo)
+    dx: -5
+    dy: -3
+    tweaks: {il1t: [4, -5], il2t: [2, -5], il3t: [-3, -3], ir1t: [-4, -5], ir2t: [-2, -5], ir3t: [3, -3]}
+  atk_wind2:                   # the coil's extreme (the heavy hold shows it 18 frames): rise 5, back 10; the wings
+    moves: []                  # spread up hard on their disks
+    dx: -10
+    dy: -5
+    tweaks: {il1t: [4, -4], il2t: [2, -7], il3t: [-5, -7], ir1t: [-4, -4], ir2t: [-2, -8], ir3t: [5, -7]}
   atk_mid:                     # the dive arriving: the attack 4 px lower and 1 px back toward the wind-up overlap
+    t: 0.15                    # (t 0.15: the float band lerps less toward the higher wind-up)
     moves: []
     dx: 1
     dy: 4
@@ -158,19 +154,12 @@ frames:
     dy: 1
   cast_release:                # the halo flares two steps at the release
     brighten: {halo: 2}
-  atk_raise_in:                # glides 7 forward into the raise
-    moves: []
-    dx: 7
-  atk_swing:                   # the raise swept 14 back and 2 down: the swing starts
-    t: 0.30
-    moves: []
-    dx: -14
-    dy: 2
-  atk_swing2:                  # the dive with its lower-right and forward fans still closed (25 deg); they snap
-    t: 0.30                      # open at contact
-    moves: []
-    dy: 2
-    tweaks: {af_t: [-27, 29]}
 holds: []
 paint:                         # 1 px crack between the fx halo and the helm in hurt_in2, closed with outline ink
   - {frame: hurt_in2, xy: [[99, 53]], rgb: [6, 4, 10]}
+  # defect 5 review: a 5 px feather gap the stronger wind2 wing lift opens in the top-left wing (4-neighbour mode)
+  - {frame: atk_wind2, rgb: [24, 41, 49], xy: [[35, 48], [36, 49]]}
+  - {frame: atk_wind2, rgb: [123, 140, 140], xy: [[34, 49], [35, 49]]}
+  - {frame: atk_wind2, rgb: [206, 214, 214], xy: [[37, 49]]}
+  - {frame: atk_wind2, rgb: [181, 189, 189], xy: [[85, 85]]}
+  - {frame: atk_wind2, rgb: [206, 214, 214], xy: [[83, 84], [84, 84], [85, 84], [86, 84], [86, 85]]}
