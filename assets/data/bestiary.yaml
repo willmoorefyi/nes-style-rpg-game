@@ -1,0 +1,73 @@
+# The bestiary (docs/BESTIARY_PLAN.md 3.4). Stats come from enemies.yaml; this file holds the mode, the loop timing,
+# the habitat scan, the backgrounds and every label and template the bestiary shows (ASCII only: the NES font).
+mode: all                    # all | seen (seen: enemies not met yet list as "???")
+order: data                  # data (enemies.yaml order); hook for name | level later
+listRows: 6
+habitats:
+  maps: [overworld, temple-of-fiends]     # compiled map ids scanned (every map with encounters must be listed)
+  zones: {east_pocket: East pocket, temple_approach: Temple approach}
+backgrounds:
+  default: grassland
+  enemies: {garland: temple, lich: shoreline, vampire: abandoned_castle, dragon: desert, pirate: shoreline, cockatrice: forest}
+anim:
+  order: [attack, hurt, cast, daze]
+  firstBreak: 30
+  idleBreak: 60              # frames of the bestiary clock; not scaled by the battle message speed
+  dazeHold: 144
+labels:
+  title: BESTIARY
+  boss: Boss
+  hp: HP
+  attack: Attack
+  hits: Hits
+  damage: Dmg/hit
+  defense: Defense
+  magicDefense: Mag.Def
+  strength: Strength
+  agility: Agility
+  intelligence: Intellect
+  vitality: Vitality
+  luck: Luck
+  accuracy: Accuracy
+  evade: Evade
+  family: Family
+  size: Size
+  attacks: Attacks
+  xp: XP
+  gold: Gold
+  weak: Weak
+  resist: Resist
+  immune: Immune
+  absorb: Absorb
+  statusHit: Status hit
+  actions: Actions
+  spells: Spells
+  habitat: Habitat
+  none: None
+  unknown: "???"
+  blank: "-"
+  paused: Paused
+  noArt: No art yet
+  noData: No bestiary data
+  sizes: {small: Small, large: Large, boss: Boss}
+  attackKinds: {melee: Melee, heavy: Melee (heavy), ranged: Ranged}
+  anim: {attack: Attack, heavy: Attack (heavy), ranged: Attack (ranged), hurt: Hurt, cast: Cast, daze: Dazed}
+templates:                   # {name} placeholders, filled by the model
+  entry: "{num} {name}"                      # "013 Garland"; num is 3 digits
+  titleCount: "{entry}  {index}/{total}"     # "013 Garland  13/14"
+  damage: "{min}-{max}"
+  hits: "x{hits}"
+  fight: "Fight x{hits}"
+  statusHit: "{pct}% (spell accuracy {acc})"
+  phase: "At {pct}% HP"
+  phaseHits: "Fight x{hits}"
+  phaseAttack: "Attack {attack}"
+  phaseMessage: '"{message}"'
+  habitatMain: "{map}"                       # in the map's main table
+  habitatZone: "{map} ({zones})"             # only in zones: "World Map (East pocket, Temple approach)"
+  habitatBoss: "{map} (boss)"                # a scripted isBoss encounter
+  notPlaced: "Not placed yet"
+  list: ", "
+elements: {fire: Fire, ice: Ice, lightning: Bolt, earth: Earth, holy: Holy, dark: Dark, water: Water, wind: Wind}
+families: {were: Were, undead: Undead, giant: Giant, magical: Magical, dragon: Dragon}
+help: "Up/Down: scroll   Left/Right: page   Z: next move   Shift: pause   X: close"

@@ -280,3 +280,66 @@ describe('Fg: Debug opens the battle sandbox; ?scenario= still runs that scenari
     expect(game.scenes.push).not.toHaveBeenCalledWith('debugSandbox');
   });
 });
+
+describe('Fh: the dev Bestiary item and ?bestiary= (docs/BESTIARY_PLAN.md BS-1)', () => {
+  afterEach(() => { window.history.replaceState({}, '', '/'); vi.restoreAllMocks(); });
+
+  async function title(search: string) {
+    const { resetBestiaryDeepLink } = await import('../../src/scenes/bestiary/bestiaryLink.js');
+    resetBestiaryDeepLink();
+    window.history.replaceState({}, '', `/${search}`);
+    const game = createMockGame();
+    let now: string | undefined;
+    game.input.isJustPressed = vi.fn((a: string) => a === now);
+    game.scenes.push = vi.fn().mockResolvedValue(undefined);
+    const scene = new TitleScene(game as unknown as Game);
+    const press = async (...actions: string[]) => {
+      for (const a of actions) { now = a; scene.update(1); }
+      now = undefined;
+      for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0));
+    };
+    return { game, scene, press };
+  }
+
+  it('dev: Bestiary (after Debug) pushes the bestiary; the window is items x 48 + 48 tall', async () => {
+    const { game, scene, press } = await title('?mute=1');
+    scene.enter();
+    const { Window } = await import('../../src/ui/Window.js');
+    const win = scene.container.children.find((c): c is InstanceType<typeof Window> => c instanceof Window)!;
+    expect(win.contentHeight + 48).toBe(4 * 48 + 48);   // contentHeight = height - 2 x padding
+    await press('down', 'down', 'down', 'confirm');
+    expect(game.scenes.push).toHaveBeenCalledWith('bestiary');
+    expect(game.scenes.push).toHaveBeenCalledTimes(1);
+  });
+
+  it('?bestiary=garland pushes the bestiary once on the first enter, not on onResume or a later enter', async () => {
+    const { game, scene } = await title('?mute=1&bestiary=garland');
+    scene.enter();
+    expect(game.scenes.push).toHaveBeenCalledWith('bestiary');
+    const { takeBestiaryStartEntry } = await import('../../src/scenes/bestiary/bestiaryLink.js');
+    expect(takeBestiaryStartEntry()).toBe('garland');
+    scene.onResume();
+    scene.exit();
+    scene.enter();
+    expect(game.scenes.push).toHaveBeenCalledTimes(1);
+  });
+
+  it('an unknown id warns and the bestiary opens on 001', async () => {
+    const { game, scene } = await title('?mute=1&bestiary=nobody');
+    scene.enter();
+    expect(game.scenes.push).toHaveBeenCalledWith('bestiary');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { BestiaryScene } = await import('../../src/scenes/bestiary/BestiaryScene.js');
+    const { validateBestiary, DEFAULT_BESTIARY } = await import('../../src/core/bestiaryValidation.js');
+    const enemy = { id: 'goblin', name: 'Goblin', xpReward: 1, goldReward: 1, sprite: 'goblin',
+      stats: { hp: 5, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1, attack: 1, defense: 0, magicDefense: 0 } };
+    const mock = { ...game, data: { loadBestiary: async () => validateBestiary({ ...DEFAULT_BESTIARY, habitats: { maps: [], zones: {} } }),
+      loadEnemies: async () => [enemy, { ...enemy, id: 'wolf', name: 'Wolf' }], loadSpells: async () => [] } };
+    const bestiary = new BestiaryScene(mock as unknown as Game, { art: { getMonsterFrames: () => null },
+      loadTexture: () => new Promise(() => {}) });
+    await bestiary.enter();
+    expect(bestiary.selectedIndex).toBe(0);
+    expect(warn.mock.calls.some((c) => String(c[0]).includes('nobody'))).toBe(true);
+    bestiary.exit();
+  });
+});

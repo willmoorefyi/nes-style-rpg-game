@@ -10,6 +10,7 @@ import type {
 import { validateEnemyData, validateMapData, validateShopData, validateCharacterClassData, validateItemData, validateSpellData } from './schemaValidation.js';
 import { validateSpellEffects, validateStatusVisuals } from './schemaValidationFx.js';
 import type { SpellEffectsData, StatusVisualsData } from '../types/fxData.js';
+import { validateBestiary } from './bestiaryValidation.js';
 
 export class DataLoader {
   constructor(private assets: AssetLoader) {}
@@ -96,6 +97,11 @@ export class DataLoader {
   /** assets/data/status-visuals.yaml: bad entries are logged and dropped (validateStatusVisuals). */
   async loadStatusVisuals(path: string): Promise<StatusVisualsData> {
     return validateStatusVisuals(await this.assets.loadYaml<unknown>(path), path);
+  }
+
+  /** assets/data/bestiary.yaml: bad keys are logged and take their defaults (validateBestiary). */
+  async loadBestiary(path: string): Promise<ReturnType<typeof validateBestiary>> {
+    return validateBestiary(await this.assets.loadYaml<unknown>(path), path);
   }
 
   private assertArray(data: unknown, typeName: string): void {

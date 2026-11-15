@@ -67,6 +67,10 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
     const { ConfigScene } = await import('./scenes/ConfigScene.js');
     return new ConfigScene(game);
   });
+  game.scenes.registerLazy('bestiary', async () => {
+    const { BestiaryScene } = await import('./scenes/bestiary/BestiaryScene.js');
+    return new BestiaryScene(game);
+  });
   if (import.meta.env.DEV) {
     game.scenes.registerLazy('debugSandbox', async () => {
       const { DebugSandboxScene } = await import('./scenes/debugSandbox/DebugSandboxScene.js');

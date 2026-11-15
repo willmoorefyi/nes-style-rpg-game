@@ -23,6 +23,13 @@ export interface MapLoaderOptions {
   loadTextures?: (art: NonNullable<MapData['art']>) => Promise<BakedTextures>;
 }
 
+/** Path of a map: the compiled file when `preferCompiled` and the manifest lists the id, else the legacy file. */
+export async function resolveMapPath(loader: Pick<DataLoader, 'loadMapManifest'>, mapId: string, preferCompiled: boolean,
+  manifest = () => loader.loadMapManifest(COMPILED_MANIFEST).then((ids) => new Set(ids))): Promise<string> {
+  if (preferCompiled && (await manifest()).has(mapId)) return `assets/maps/ai/${mapId}.yaml`;
+  return `assets/maps/${mapId}.yaml`;
+}
+
 export class MapLoader {
   private readonly preferCompiled: boolean;
   private readonly loadTextures: NonNullable<MapLoaderOptions['loadTextures']>;
@@ -35,11 +42,8 @@ export class MapLoader {
 
   /** Path of a map: the compiled file when previewing and the manifest lists the id, else the legacy file. */
   async mapPath(mapId: string): Promise<string> {
-    if (this.preferCompiled) {
-      this.compiled ??= this.dataLoader.loadMapManifest(COMPILED_MANIFEST).then((ids) => new Set(ids));
-      if ((await this.compiled).has(mapId)) return `assets/maps/ai/${mapId}.yaml`;
-    }
-    return `assets/maps/${mapId}.yaml`;
+    return resolveMapPath(this.dataLoader, mapId, this.preferCompiled,
+      () => (this.compiled ??= this.dataLoader.loadMapManifest(COMPILED_MANIFEST).then((ids) => new Set(ids))));
   }
 
   /** `hasFlag` filters NPCs by their `showIf` / `hideIf` story flags (all NPCs when omitted). */

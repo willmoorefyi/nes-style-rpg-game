@@ -1,0 +1,206 @@
+/**
+ * The bestiary's preview (docs/BESTIARY_PLAN.md 3.1, 3.6): the battle background and one enemy laid out exactly as a
+ * lone enemy in battle (AiEnemyView, i.e. computeEnemyLayoutAi), in a stage container at screen (0, 0) masked to the
+ * preview window's inner rect. The loop (bestiaryAnim.ts) plays the real attack toward an invisible phantom target
+ * placed so the furthest lunge ends 16 px inside the panel. Frames are cached per sprite for the scene's life.
+ */
+import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
+import type { EnemyData } from '../../types/index.js';
+import type { BestiaryData, BestiaryAnimLabel } from '../../types/bestiaryData.js';
+import { Window } from '../../ui/Window.js';
+import { OutlinedText } from '../../ui/NESFont.js';
+import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
+import { battleBackgroundPath } from '../../rendering/BattleBackground.js';
+import { AiEnemyView, type MonsterArtSource } from '../battle/AiEnemyView.js';
+import type { EnemyPoseController, Freeze } from '../battle/EnemyPoseController.js';
+import { ENEMY_REACH_OVERLAP } from '../battle/enemyReach.js';
+import { GAME_WIDTH, GAME_HEIGHT, WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER } from '../../core/LayoutConstants.js';
+import { BestiaryLoop, type LoopPoses } from './bestiaryAnim.js';
+
+/** The preview window (screen px). */
+export const PREVIEW_RECT = { x: 24, y: 120, width: 976, height: 756 } as const;
+const BORDER = WINDOW_BORDER_OUTER + WINDOW_BORDER_INNER;
+/** Inside the borders: the stage's mask. */
+export const PREVIEW_INNER = { left: PREVIEW_RECT.x + BORDER, top: PREVIEW_RECT.y + BORDER,
+  right: PREVIEW_RECT.x + PREVIEW_RECT.width - BORDER, bottom: PREVIEW_RECT.y + PREVIEW_RECT.height - BORDER } as const;
+/** The furthest lunge's idle-measured edge ends this far inside the panel. The plan said 16, but a weapon drawn past
+ *  the idle edge (the goblin's knife) then touched the border; 48 keeps it in view. */
+const REACH_MARGIN = 48;
+const PHANTOM = { w: 48, h: 160 };
+
+/**
+ * R2 / BS-7, the one place the daze step touches the pose API: until Fe's posture API lands, the daze step holds the
+ * still idle (Freeze 'still'); the after-Fe task swaps this for Fe's `'daze'` posture.
+ */
+const DAZE_POSTURE: Freeze = 'still';
+
+/** What the preview shows for an entry. */
+export interface PreviewEntry { enemy: EnemyData; seen: boolean; hasSpells: boolean }
+
+/** Monster frames cached per sprite key; `dispose` destroys each unique texture view (not the shared atlas source). */
+export class CachedArt implements MonsterArtSource {
+  private readonly cache = new Map<string, MonsterFrames | null>();
+  constructor(private readonly source: MonsterArtSource) {}
+
+  getMonsterFrames(sprite: string): MonsterFrames | null {
+    if (!this.cache.has(sprite)) this.cache.set(sprite, this.source.getMonsterFrames(sprite));
+    return this.cache.get(sprite) ?? null;
+  }
+
+  get size(): number { return this.cache.size; }
+
+  /** Every unique texture in the cache. */
+  textures(): Set<Texture> {
+    const out = new Set<Texture>();
+    for (const f of this.cache.values()) {
+      if (!f) continue;
+      for (const t of [...Object.values(f.textures), f.idle, f.attack, f.cast, f.hurt]) out.add(t);
+    }
+    return out;
+  }
+
+  dispose(): void {
+    for (const t of this.textures()) t.destroy(false);
+    this.cache.clear();
+  }
+}
+
+export class BestiaryPreview {
+  readonly window = new Window({ ...PREVIEW_RECT });
+  /** A direct child of the scene container at (0, 0), unscaled: the battle's screen space. */
+  readonly stage = new Container();
+  private readonly actors = new Container();
+  private readonly maskShape = new Graphics();
+  private readonly caption = new OutlinedText({ outline: 0x000000 });
+  private readonly phantom = new Graphics();
+  private readonly loop: BestiaryLoop;
+  private bg: Sprite | null = null;
+  private bgId: string | null = null;
+  private token = 0;
+  private dead = false;
+  private view: AiEnemyView | null = null;
+  private sprite: Container | null = null;
+  private posture: Freeze = 'none';
+  private noArt = false;
+
+  constructor(parent: Container, readonly art: CachedArt, private readonly loadTexture: (path: string) => Promise<Texture>,
+    private readonly data: BestiaryData) {
+    const inner = PREVIEW_INNER;
+    this.maskShape.rect(inner.left, inner.top, inner.right - inner.left, inner.bottom - inner.top).fill(0xffffff);
+    this.stage.mask = this.maskShape;
+    this.phantom.rect(0, 0, PHANTOM.w, PHANTOM.h).fill(0xffffff);
+    this.phantom.alpha = 0;                     // never visible = false: invisible objects have empty bounds
+    this.stage.addChild(this.actors);
+    this.actors.addChild(this.phantom);
+    this.caption.position.set(PREVIEW_RECT.x + 30, inner.bottom - 48);
+    parent.addChild(this.window, this.stage, this.maskShape, this.caption);
+    this.loop = new BestiaryLoop(this.livePoses, { attack: () => this.view?.playAttack(0, this.phantom),
+      setDazed: (on) => { this.posture = on ? DAZE_POSTURE : 'none'; } }, data.anim);
+  }
+
+  /** The current enemy's pose controller (read-only use: tests and the scene's debug view). */
+  get poses(): EnemyPoseController | null { return this.view?.poses ?? null; }
+  get enemySprite(): Container | null { return this.sprite; }
+  get phantomTarget(): Container { return this.phantom; }
+  get loopStep(): string { return this.loop.current; }
+
+  /** Show an entry (null or unseen: no sprite) on the background `backgroundId`. */
+  show(entry: PreviewEntry | null, backgroundId: string | null): void {
+    this.clearEnemy();
+    if (backgroundId) this.setBackground(backgroundId);
+    if (!entry || !entry.seen) { this.caption.text = ''; return; }
+    const e = entry.enemy;
+    this.view = new AiEnemyView([e], this.art);
+    const [sprite] = this.view.build();
+    this.sprite = sprite;
+    this.actors.addChildAt(sprite, 0);
+    const f = this.art.getMonsterFrames(monsterSpriteKey(e));
+    this.noArt = !f;
+    if (f) {
+      const feetY = sprite.y + (f.footRow + 1) * f.scale;
+      this.phantom.position.set(PREVIEW_INNER.right - REACH_MARGIN - ENEMY_REACH_OVERLAP - 0.25 * f.lungePx, feetY - PHANTOM.h);
+    }
+    const label: BestiaryAnimLabel = e.attack === 'ranged' ? 'ranged' : e.attackAnim === 'heavy' ? 'heavy' : 'attack';
+    this.loop.start({ hasCast: this.view.hasCast(0), hasDaze: !!f && f.textures.daze !== f.textures.hurt_in1,
+      hasSpells: entry.hasSpells }, label);
+    this.view.update(0, [sprite], [this.posture]);
+    this.refreshCaption();
+  }
+
+  /** One frame of the bestiary clock (dt 0 in step mode). */
+  update(dt: number): void {
+    if (!this.view || !this.sprite) return;
+    this.loop.update(dt);
+    this.view.update(dt, [this.sprite], [this.posture]);
+    this.refreshCaption();
+  }
+
+  /** Z: the next animation now (queued during an attack, hurt or cast). */
+  skip(): void { if (this.view) this.loop.skip(); }
+
+  /** Shift: pause or resume the loop. */
+  togglePause(): void {
+    this.loop.togglePause();
+    this.refreshCaption();
+  }
+
+  get paused(): boolean { return this.loop.paused; }
+
+  private refreshCaption(): void {
+    const L = this.data.labels;
+    const step = this.loop.currentLabel();
+    const parts = [this.noArt ? L.noArt : '', this.loop.paused ? L.paused : step ? L.anim[step] : ''].filter((s) => s);
+    const text = this.view ? parts.join('   ') : '';
+    if (this.caption.text !== text) this.caption.text = text;
+  }
+
+  private get livePoses(): LoopPoses {
+    return {
+      playHurt: (i) => this.view?.poses.playHurt(i),
+      playCast: (i) => this.view?.poses.playCast(i),
+      isAttacking: (i) => this.view?.poses.isAttacking(i) ?? false,
+      debug: (i) => this.view?.poses.debug(i) ?? { mode: 'idle' },
+    };
+  }
+
+  /** A new background; an older load that resolves later, or one after destroy, is dropped (3.2). */
+  private setBackground(id: string): void {
+    if (id === this.bgId) return;
+    this.bgId = id;
+    const token = ++this.token;
+    const path = battleBackgroundPath(id);
+    this.loadTexture(path).then((texture) => {
+      if (token !== this.token || this.dead) return;
+      const sprite = new Sprite(texture);
+      const scale = Math.max(GAME_WIDTH / texture.width, GAME_HEIGHT / texture.height);
+      sprite.scale.set(scale);
+      sprite.position.set((GAME_WIDTH - texture.width * scale) / 2, (GAME_HEIGHT - texture.height * scale) / 2);
+      this.bg?.destroy({ texture: false });
+      this.bg = sprite;
+      this.stage.addChildAt(sprite, 0);
+    }).catch((err: unknown) => console.warn('Bestiary: failed to load the background', path, err));
+  }
+
+  private clearEnemy(): void {
+    this.posture = 'none';
+    this.sprite?.destroy({ children: true, texture: false });
+    this.sprite = null;
+    this.view = null;
+    this.noArt = false;
+  }
+
+  /** Destroy the sprites and the stage (not the cached background textures), then the frames cache. */
+  destroy(): void {
+    this.dead = true;
+    this.token++;
+    this.clearEnemy();
+    this.bg?.destroy({ texture: false });
+    this.bg = null;
+    this.bgId = null;
+    this.stage.destroy({ children: true });
+    this.maskShape.destroy();
+    this.caption.destroy({ children: true });
+    this.window.destroy({ children: true });
+    this.art.dispose();
+  }
+}

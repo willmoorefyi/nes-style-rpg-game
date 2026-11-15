@@ -5,6 +5,7 @@ import { GameOverScene } from '../scenes/GameOverScene.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
+import { seenFlag } from '../scenes/bestiary/bestiaryModel.js';
 
 export interface BattleEndData {
   victory: boolean;
@@ -70,6 +71,7 @@ export class BattleTrigger {
 
     const party = [...this.game.party.all];
     if (party.length === 0) return;
+    for (const e of enemies) this.game.gameFlags.set(seenFlag(e.id));   // the bestiary's seen marks (BS-2)
 
     const { onEnd } = options;
     // Game Over > Retry Battle puts the game back exactly as it is now (a caller-ended battle never retries)

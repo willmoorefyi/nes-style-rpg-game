@@ -23,6 +23,7 @@ const COMMANDS: ReadonlyArray<MenuItem & { help: string }> = [
   { label: 'Equip', value: 'equip', help: 'Change weapons and armour.' },
   { label: 'Status', value: 'status', help: 'Look at a member\'s stats, spells and gear.' },
   { label: 'Order', value: 'order', help: 'Change the marching order.' },
+  { label: 'Bestiary', value: 'bestiary', help: 'Look up the monsters: stats, weaknesses and moves.' },
   { label: 'Save', value: 'save', help: 'Record your journey.' },
   { label: 'Load', value: 'load', help: 'Resume a saved journey.' },
   { label: 'Config', value: 'config', help: 'Set the battle message speed.' },
@@ -142,6 +143,9 @@ export class FieldMenuScene implements Scene {
         break;
       case 'order':
         this.game.scenes.push('fieldOrder');
+        break;
+      case 'bestiary':
+        this.game.scenes.push('bestiary');
         break;
       case 'config':
         this.game.scenes.push('config');

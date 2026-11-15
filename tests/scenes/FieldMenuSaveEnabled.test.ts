@@ -44,7 +44,7 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
     const { scene, game } = menuFor(true);
     expect(fillOf(scene.container, 'Save')).toBe(WHITE);
     const input = game.input;
-    for (let i = 0; i < 5; i++) input.tap('down', () => scene.update(1));   // Config is gone (MS-7): Save is 5 down
+    for (let i = 0; i < 6; i++) input.tap('down', () => scene.update(1));   // Save is 6 down (after Order and Bestiary, Fh)
     input.tap('confirm', () => scene.update(1));
     expect(game.scenes.push).toHaveBeenCalledWith('saveMenu');
   });
