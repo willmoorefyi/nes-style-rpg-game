@@ -1,0 +1,136 @@
+sprite: fire_gigas
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [57, 8]
+    neck: [62, 48]
+    chest: [55, 62]
+    hip: [60, 98]              # at the apron hem: torso pixels below the hip would swing the other way
+    sh_n: [78, 42]
+    el_n: [85, 55]
+    hand_n: [90, 45]
+    tip: [35, 15]
+    sh_f: [35, 42]
+    el_f: [32, 62]
+    hand_f: [38, 80]
+    hip_n: [72, 90]
+    knee_n: [78, 105]
+    foot_n: [78, 115]
+    toe_n: [86, 120]
+    hip_f: [46, 90]
+    knee_f: [42, 105]
+    foot_f: [38, 115]
+    toe_f: [40, 120]
+  attack:
+    crown: [70, 15]
+    neck: [72, 58]
+    chest: [60, 62]
+    hip: [55, 100]
+    sh_n: [78, 58]
+    el_n: [80, 75]
+    hand_n: [80, 88]
+    tip: [95, 108]
+    sh_f: [50, 45]
+    el_f: [55, 70]
+    hand_f: [75, 85]
+    hip_n: [68, 92]
+    knee_n: [68, 108]
+    foot_n: [70, 115]
+    toe_n: [78, 120]
+    hip_f: [44, 92]
+    knee_f: [28, 100]
+    foot_f: [14, 112]
+    toe_f: [12, 120]
+  hurt:
+    crown: [25, 25]
+    neck: [50, 45]
+    chest: [50, 60]
+    hip: [58, 98]
+    sh_n: [62, 50]
+    el_n: [70, 58]
+    hand_n: [42, 60]
+    tip: [15, 42]
+    sh_f: [35, 50]
+    el_f: [40, 62]
+    hand_f: [45, 60]
+    hip_n: [68, 90]
+    knee_n: [70, 105]
+    foot_n: [68, 115]
+    toe_n: [75, 120]
+    hip_f: [46, 90]
+    knee_f: [40, 105]
+    foot_f: [30, 115]
+    toe_f: [28, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  hammer:
+    kind: prop
+    bone: [hand_n, tip]
+    radius: 4.0
+    in: [idle, attack, hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans about the hip (marked at the apron hem) and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 4 (the hammer rigid with the upper body), hammer hand 1 up, body 2 lower
+    moves: []
+    t: 0.0
+    dy: 2
+    tweaks: {crown: [-6, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-4, -1], el_n: [-3, -3], hand_n: [-4, -3], tip: [-6, 1], sh_f: [-4, 2], el_f: [-2, 2], hand_f: [-1, 2]}
+  atk_wind2:                   # coil: lean back 6 (the hammer head drops behind the back), hammer hand 2 up, crouched 4 lower
+    moves: []
+    t: 0.0
+    dy: 4
+    tweaks: {crown: [-9, 1], neck: [-5, 0], chest: [-4, 1], sh_n: [-6, -2], el_n: [-5, -4], hand_n: [-6, -5], tip: [-9, 1], sh_f: [-6, 3], el_f: [-4, 3], hand_f: [-2, 2]}
+  atk_mid:                     # the downswing: the attack upper body (hammer included) leaned back 12 about the hip and 4 higher; the back leg 8 in, the front foot 2 back
+    moves: []
+    dy: -4
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    sampler: rotsprite
+    tweaks: {crown: [-18, -1], neck: [-9, -3], chest: [-8, 0], sh_n: [-9, -4], el_n: [-6, -5], hand_n: [-3, -5], tip: [1, -8], sh_f: [-11, 2], el_f: [-6, 1], hand_f: [-4, -4], knee_f: [8, 0], foot_f: [8, 0], knee_n: [2, 0], foot_n: [2, 0]}
+  atk_follow:                  # settle: the attack upper body 3 back about the hip and 3 higher (rising off the slam)
+    moves: []
+    t: 0.8
+    dy: -3
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-4, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, -1], el_n: [-1, -1], hand_n: [-1, -1], tip: [0, -2], sh_f: [-3, 0], el_f: [-2, 0], hand_f: [-1, -1]}
+  atk_recover:                 # upper body and hammer 2 forward and 5 lower (still crouched from the slam) (translated)
+    moves: []
+    dy: 5
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], tip: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil 1, lean back 7
+    moves: []
+    tweaks: {crown: [-12, 1], neck: [-7, 0], chest: [-5, 1], sh_n: [-8, -2], el_n: [-6, -3], hand_n: [-8, -3], tip: [-11, 4], sh_f: [-8, 3], el_f: [-5, 4], hand_f: [-3, 3]}
+  hurt_in2:                    # the hurt pose 4 forward (translated)
+    moves: []
+    tweaks: {crown: [4, 0], neck: [4, 0], chest: [4, 0], sh_n: [4, 0], el_n: [4, 0], hand_n: [4, 0], tip: [4, 0], sh_f: [4, 0], el_f: [4, 0], hand_f: [4, 0]}
+  daze:                        # slump: the upper body 1 forward and 1 lower (translated), the head 1 more
+    moves: []
+    dy: 1
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:                      
+    moves: []
+    dy: 2
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+z:
+  idle: [hammer, uarm_f, farm_f, thigh_f, shin_f, torso, thigh_n, shin_n, head, uarm_n, farm_n, ft_n, ft_f]
+masks:
+  head:                        # the flaming hair and the beard (the hammer bone runs behind them)
+    idle: [[40, 2], [77, 2], [80, 30], [77, 52], [55, 53], [45, 36], [42, 16]]
+  shin_n:                      # the near leg below the apron (its inner edge was torso by distance)
+    idle: [[64, 99], [82, 99], [82, 113], [64, 113]]
+  ft_n:
+    idle: [[64, 113], [92, 113], [92, 123], [64, 123]]
+  hammer:                      # the forge hammer head (over the shoulder / on the ground / held out behind)
+    idle: [[24, 3], [42, 3], [44, 33], [25, 35]]
+    attack: [[84, 93], [109, 93], [109, 123], [84, 123]]
+    hurt: [[5, 27], [28, 27], [28, 61], [5, 61]]
+holds: []
+paint:                         # pockets the leans close off between the arms / the apron and the legs, outline ink
+  - {frame: atk_mid, xy: [[66, 81], [67, 81], [67, 82], [68, 81], [68, 82], [68, 83], [69, 82], [69, 83], [70, 83]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[65, 104], [65, 105], [65, 106], [66, 105], [70, 105], [70, 106], [70, 107], [70, 108], [71, 107]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[64, 98], [65, 98], [66, 98], [67, 98]], rgb: [6, 4, 10]}
