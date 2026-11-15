@@ -1,0 +1,141 @@
+sprite: ice_gigas
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [60, 10]
+    neck: [58, 36]
+    chest: [50, 50]
+    hip: [52, 90]              # at the loincloth hem: torso pixels below the hip would swing the other way
+    sh_n: [68, 28]
+    el_n: [72, 42]
+    hand_n: [74, 40]
+    tip: [92, 35]
+    sh_f: [38, 30]
+    el_f: [35, 50]
+    hand_f: [52, 65]
+    hip_n: [65, 82]
+    knee_n: [68, 100]
+    foot_n: [72, 113]
+    toe_n: [80, 120]
+    hip_f: [42, 82]
+    knee_f: [40, 100]
+    foot_f: [38, 113]
+    toe_f: [42, 120]
+  attack:
+    crown: [70, 25]
+    neck: [68, 48]
+    chest: [55, 55]
+    hip: [55, 95]
+    sh_n: [78, 45]
+    el_n: [80, 70]
+    hand_n: [75, 92]
+    tip: [95, 108]
+    sh_f: [45, 35]
+    el_f: [50, 60]
+    hand_f: [68, 88]
+    hip_n: [65, 90]
+    knee_n: [70, 105]
+    foot_n: [72, 113]
+    toe_n: [80, 120]
+    hip_f: [42, 88]
+    knee_f: [25, 100]
+    foot_f: [15, 112]
+    toe_f: [10, 120]
+  hurt:
+    crown: [88, 22]
+    neck: [80, 45]
+    chest: [62, 55]
+    hip: [55, 92]
+    sh_n: [85, 50]
+    el_n: [75, 58]
+    hand_n: [42, 42]
+    tip: [15, 32]
+    sh_f: [55, 40]
+    el_f: [48, 46]
+    hand_f: [44, 40]
+    hip_n: [62, 85]
+    knee_n: [65, 100]
+    foot_n: [70, 113]
+    toe_n: [77, 120]
+    hip_f: [40, 85]
+    knee_f: [35, 100]
+    foot_f: [35, 113]
+    toe_f: [30, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  axe:
+    kind: prop
+    bone: [hand_n, tip]
+    radius: 4.0
+    in: [idle, attack, hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans about the hip (marked at the loincloth hem) and translations, written as tweaks (moves [])
+  atk_wind1:                   # lean back 3, the axe arm drawn 4 back (a sweep, not a chop), body 2 lower
+    moves: []
+    t: 0.0
+    dy: 2
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-7, -1], el_n: [-7, -1], hand_n: [-7, -1], tip: [-7, -2], sh_f: [-3, 1], el_f: [-2, 1], hand_f: [-1, 0]}
+  atk_wind2:                   # coil: lean back 3, the axe arm drawn 6 back and 2 down, crouched 6 lower
+    moves: []
+    t: 0.0
+    dy: 6
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-9, 1], el_n: [-9, 1], hand_n: [-9, 1], tip: [-9, 0], sh_f: [-3, 1], el_f: [-2, 1], hand_f: [-1, 0]}
+  atk_mid:                     # the sweep comes in: the attack upper body leaned back 6 about the axe hand and 3 higher, the axe stays down (the boot behind it has no pixels); the back leg 8 in
+    moves: []
+    dy: -3
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    sampler: rotsprite
+    tweaks: {crown: [-7, 1], neck: [-5, 1], chest: [-4, 2], sh_n: [-5, 0], el_n: [-2, 0], sh_f: [-6, 3], el_f: [-3, 3], hand_f: [0, 1], knee_f: [8, 0], foot_f: [8, 0], knee_n: [1, 0], foot_n: [1, 0], hand_n: [0, 3], tip: [0, 3]}
+  atk_follow:                  # settle: the attack upper body 3 back about the axe hand and 3 higher, the axe stays down
+    moves: []
+    t: 0.8
+    dy: -3
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-3, 0], neck: [-2, 0], chest: [-2, 1], sh_n: [-2, 0], el_n: [-1, 0], sh_f: [-3, 2], el_f: [-2, 1], hand_n: [0, 3], tip: [0, 3]}
+  atk_recover:                 # upper body and axe 2 forward and 7 lower (translated, still crouched from the sweep), the axe arm 4 lower
+    moves: []
+    dy: 7
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 4], hand_n: [2, 4], tip: [2, 4], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0]}
+  hurt_in1:                    # recoil: upper body 3 back (translated), head 2 more, the axe arm 3 up
+    moves: []
+    tweaks: {crown: [-5, 0], neck: [-5, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-3, -3], hand_n: [-3, -3], tip: [-3, -3], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0]}
+  hurt_in2:                    # the hurt pose 4 back toward idle (translated)
+    moves: []
+    tweaks: {crown: [-4, 0], neck: [-4, 0], chest: [-4, 0], sh_n: [-4, 0], el_n: [-4, 0], hand_n: [-4, 0], tip: [-4, 0], sh_f: [-4, 0], el_f: [-4, 0], hand_f: [-4, 0]}
+  daze:                        # slump: the upper body 1 forward and 1 lower (translated), the head 1 more
+    moves: []
+    dy: 1
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  daze_b:                      
+    moves: []
+    dy: 2
+    tweaks: {crown: [0, -1], neck: [0, -1], chest: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+masks:
+  shin_f:                      # the fur cuffs and boots ride the planted legs (else a cuff tears when the body lifts or sinks)
+    idle: [[27, 94], [51, 94], [51, 113], [27, 113]]
+  shin_n:
+    idle: [[57, 94], [86, 94], [86, 113], [57, 113]]
+    attack: [[60, 92], [81, 92], [81, 112], [60, 112]]
+  ft_f:
+    idle: [[25, 113], [51, 113], [51, 123], [25, 123]]
+  ft_n:
+    idle: [[57, 113], [90, 113], [90, 123], [57, 123]]
+    attack: [[58, 112], [81, 112], [81, 123], [58, 123]]
+  axe:                         # the ice-shard axe head (held up / on the ground / thrown out behind)
+    idle: [[75, 19], [103, 17], [103, 53], [80, 56], [76, 44]]
+    attack: [[80, 89], [98, 87], [107, 100], [107, 123], [78, 123], [76, 116], [76, 107], [80, 100]]
+    hurt: [[3, 18], [45, 18], [45, 48], [3, 48]]
+holds: []
+paint:                         # small pockets the moves close off at limb / beard / axe boundaries, outline ink
+  - {frame: atk_wind2, xy: [[70, 45], [70, 46], [71, 44], [71, 45], [71, 46], [71, 47]], rgb: [6, 4, 10]}
+  # atk_follow: the slit the 3 px rise opens between the thigh and the planted fur cuff, filled with the boot shadow
+  - {frame: atk_follow, xy: [[71, 89], [72, 90], [73, 89], [73, 90], [74, 89], [74, 90], [75, 90], [75, 91], [76, 90], [76, 91]], rgb: [24, 33, 57]}
+  - {frame: atk_follow, xy: [[43, 89]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[81, 49], [81, 50], [82, 48], [82, 49], [82, 50], [82, 51]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[39, 55], [40, 54], [40, 55], [41, 55]], rgb: [6, 4, 10]}
