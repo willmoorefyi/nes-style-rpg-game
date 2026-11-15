@@ -1,0 +1,167 @@
+sprite: crocodile
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Dark green crocodile, low sprawl. The tail curls up behind the rump in every key at very different angles (a low curl
+# in idle, a raised arch in attack, curled up in hurt), so it stays out of every `moves` set and rides the body;
+# idle-sourced frames keep the idle curl, attack/hurt-sourced frames keep theirs. The far hind leg is hidden behind
+# the near one (its parts are removed). Continuity: idle -> attack lifts the rump 18 px and the centroid 11 px (pair
+# IoU 0.48), so mid and follow drop the rump, tail and the (lifted) hind leg 10 px toward idle, the spine tapering
+# to the planted forepaw (wind2 -> mid IoU 0.50+, centroid under the cap).
+keyframes:
+  idle:
+    hip: [45, 88]
+    back: [62, 80]
+    chest: [80, 86]
+    neck: [92, 88]
+    head: [100, 88]
+    snout: [140, 97]
+    tail0: [38, 90]
+    tail1: [22, 97]
+    tail2: [8, 86]
+    tail3: [14, 72]
+    tail_tip: [27, 60]
+    sh_n: [70, 94]
+    el_n: [68, 107]
+    paw_n: [72, 116]
+    ftoe_n: [78, 121]
+    sh_f: [106, 98]
+    el_f: [106, 106]
+    paw_f: [108, 111]
+    ftoe_f: [114, 114]
+    hip_n: [42, 92]
+    knee_n: [40, 103]
+    foot_n: [38, 111]
+    toe_n: [34, 116]
+    hip_f: [48, 94]
+    knee_f: [46, 103]
+    foot_f: [44, 110]
+    toe_f: [42, 113]
+  attack:
+    hip: [36, 70]
+    back: [55, 66]
+    chest: [72, 78]
+    neck: [88, 86]
+    head: [98, 90]
+    snout: [140, 98]
+    tail0: [30, 68]
+    tail1: [14, 62]
+    tail2: [7, 47]
+    tail3: [18, 34]
+    tail_tip: [54, 40]
+    sh_n: [66, 98]
+    el_n: [74, 108]
+    paw_n: [81, 115]
+    ftoe_n: [88, 120]
+    sh_f: [78, 98]
+    el_f: [82, 106]
+    paw_f: [86, 112]
+    ftoe_f: [90, 116]
+    hip_n: [32, 76]
+    knee_n: [26, 87]
+    foot_n: [22, 96]
+    toe_n: [18, 101]
+    hip_f: [38, 80]
+    knee_f: [32, 88]
+    foot_f: [28, 95]
+    toe_f: [26, 99]
+  hurt:
+    hip: [46, 88]
+    back: [65, 76]
+    chest: [84, 86]
+    neck: [96, 92]
+    head: [104, 92]
+    snout: [140, 101]
+    tail0: [36, 92]
+    tail1: [16, 98]
+    tail2: [11, 75]
+    tail3: [20, 56]
+    tail_tip: [22, 40]
+    sh_n: [70, 96]
+    el_n: [70, 108]
+    paw_n: [72, 117]
+    ftoe_n: [75, 122]
+    sh_f: [100, 100]
+    el_f: [102, 108]
+    paw_f: [105, 113]
+    ftoe_f: [110, 116]
+    hip_n: [43, 93]
+    knee_n: [41, 104]
+    foot_n: [40, 112]
+    toe_n: [44, 116]
+    hip_f: [49, 95]
+    knee_f: [47, 104]
+    foot_f: [46, 111]
+    toe_f: [47, 114]
+parts:
+  thigh_f: {remove: true}
+  shin_f: {remove: true}
+  hpaw_f: {remove: true}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: auto}
+masks:
+  head:
+    idle: [[93, 76], [115, 76], [122, 86], [142, 90], [142, 108], [124, 108], [121, 103], [103, 103], [100, 108], [88, 108], [88, 92]]
+    attack: [[90, 80], [112, 76], [128, 72], [143, 74], [143, 122], [118, 118], [96, 108], [86, 100], [86, 86]]
+    hurt: [[94, 84], [122, 90], [143, 96], [143, 112], [90, 112], [90, 90]]
+frames:
+  atk_follow:   # the settle (t 0.75) with the same rump drop
+    moves: [back, chest, neck, head, snout, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    pins: [paw_n, el_n, paw_f]
+    t: 0.75
+    tweaks: {hip: [0, 10], hip_n: [0, 10], knee_n: [0, 10], foot_n: [0, 10], toe_n: [0, 10], hip_f: [0, 10], knee_f: [0, 10], foot_f: [0, 10], toe_f: [0, 10], tail0: [0, 10], tail1: [0, 10], tail2: [0, 10], tail3: [0, 10], tail_tip: [0, 10], back: [0, 7], chest: [0, 4], sh_n: [0, 4], sh_f: [0, 4], neck: [0, 2]}
+  atk_mid:   # the pass: rump, tail and hind leg 10 px down (spine tapering), near forepaw 3 px toward idle
+    moves: [back, chest, neck, head, snout, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    pins: [paw_n, el_n, paw_f]
+    t: 0.35
+    tweaks: {hip: [0, 10], hip_n: [0, 10], knee_n: [0, 10], foot_n: [0, 10], toe_n: [0, 10], hip_f: [0, 10], knee_f: [0, 10], foot_f: [0, 10], toe_f: [0, 10], tail0: [0, 10], tail1: [0, 10], tail2: [0, 10], tail3: [0, 10], tail_tip: [0, 10], back: [0, 7], chest: [0, 4], sh_n: [0, 4], sh_f: [0, 4], neck: [0, 2], paw_n: [-3, -1], ftoe_n: [-3, -1], el_n: [-2, 0]}
+  atk_recover:   # t 0.2: the idle tail stays curled, so a larger t overruns the bbox lerp
+    moves: [back, chest, neck, head, snout]
+    t: 0.2
+  atk_wind1:   # anticipation: head drawn back and up, spine 1 px back (the tail stays: it already touches the cell edge)
+    dy: 0
+    moves: []
+    t: 0.0
+    tweaks: {back: [-1, 0], chest: [-1, 0], head: [-2, -1], neck: [-1, 0], snout: [-2, -2]}
+  atk_wind2:   # coil: head reared back, spine 2 px back and 1 down
+    dy: 1
+    moves: []
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-2, 0], head: [-4, -2], neck: [-2, -1], snout: [-4, -4]}
+  daze:   # head and snout hang (the neck stays put)
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-1, 1], snout: [-2, 2]}
+  daze_b:
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-1, 1], snout: [-2, 3]}
+  hurt_in1:   # the flinch starts: head jerks back and up
+    moves: [hip, back, chest, neck, head, snout]
+    t: 0.2
+    tweaks: {head: [-2, -2], snout: [-2, -2]}
+  hurt_in2:   # 25% back toward idle; legs, elbows and the far shoulder planted
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f, el_n]
+    t: 0.3
+    tweaks: {}
+holds: []
+paint:
+  - {frame: atk_recover, xy: [[87, 103], [87, 104], [87, 105], [87, 106]], rgb: [222, 206, 115]}
+  - {frame: atk_recover, xy: [[87, 102]], rgb: [165, 148, 107]}
+  - {frame: atk_recover, xy: [[87, 107]], rgb: [165, 148, 90]}
+  - {frame: atk_recover, xy: [[87, 108], [87, 109]], rgb: [57, 82, 57]}
+  - {frame: daze, xy: [[88, 96]], rgb: [41, 57, 49]}
+  - {frame: daze, xy: [[88, 97]], rgb: [57, 82, 57]}
+  - {frame: daze, xy: [[88, 98], [88, 99], [88, 100], [88, 101]], rgb: [123, 99, 74]}
+  - {frame: daze, xy: [[88, 102]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[88, 103]], rgb: [165, 148, 107]}
+  - {frame: daze, xy: [[88, 104], [88, 105], [88, 106], [88, 107]], rgb: [222, 206, 115]}
+  - {frame: daze_b, xy: [[88, 96]], rgb: [57, 82, 57]}
+  - {frame: daze_b, xy: [[88, 97], [88, 98], [88, 99]], rgb: [123, 99, 74]}
+  - {frame: daze_b, xy: [[88, 101]], rgb: [165, 148, 107]}
+  - {frame: atk_mid, xy: [[75, 102], [75, 103], [76, 103], [76, 104], [76, 105], [34, 105]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[21, 87], [22, 87], [23, 87], [24, 87], [21, 88], [22, 88]], rgb: [6, 4, 10]}
