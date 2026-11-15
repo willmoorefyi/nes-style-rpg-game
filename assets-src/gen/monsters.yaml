@@ -1557,12 +1557,14 @@
     smouldering back plates with glowing orange edges and thin wisps of smoke rising from them (attached), rough orange
     and brown scales, a blunt head with a yellow eye, clawed feet, a long thick tail curled up behind it; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
   attack: >-
-    lunging forward low with the jaws open in a snapping bite at the heroes, the frill flared wide, all four feet on
-    the ground (no leap), no taller than half again its idle height, the head well inside the middle cell
+    lunging forward low with the jaws open in a snapping bite at the heroes, the frill flared wide, all four feet
+    planted on the ground line (no leap, no dive, the hind legs on the ground), the body low and level, the tail
+    curled up behind the hips as in the idle cell, no taller than its idle height, the whole lizard well inside the
+    middle cell
   hurt: knocked back low, the frill folded, the head pulled in, the tail curling, all four feet down
   face: its blunt head with the yellow eye and jagged teeth is readable
   extra_negative: green scales, wings, fire breath, flames outside the body, standing upright, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R185): a diving leap attack, the tail tip at the cell edge
 - id: fire_gigas
   # "Fire Gigas" (065): a forge giant (molten skin, flaming hair, iron hammer; distinct from hill and ice gigas)
   size: large
