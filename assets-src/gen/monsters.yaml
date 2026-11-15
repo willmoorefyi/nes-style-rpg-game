@@ -856,7 +856,7 @@
   prompt: >-
     a small floating eyeball creature: a round white eyeball with a big blue iris and a black pupil, red veins, two
     small translucent blue fish fins on its sides and a short forked blue tail fin behind it; it hovers, nothing
-    touches the ground
+    touches the ground; in every cell it floats at the same height in its box with clear empty space below it
   attack: darting forward toward the heroes, the iris staring wide, the fins swept back
   hurt: knocked back, the eye squeezed half shut, the fins folding
   face: the blue iris and pupil are the face; no mouth
