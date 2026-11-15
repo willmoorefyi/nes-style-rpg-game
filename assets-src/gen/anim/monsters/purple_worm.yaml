@@ -1,0 +1,27 @@
+# Purple Worm (pass R, serpent): a colossal worm of dark purple armour plates with pale lilac rings, reared in an S
+# from a heavy ground coil, a round maw of white teeth, a black stinger on the tail tip beside the coil. body: serpent
+# (rig_serpent.py): the coil (with the stinger) is pinned, the S rises from body0; the head is rigid from the last
+# plate to the maw (the gigas_worm layout).
+sprite: purple_worm
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [50, 121], c_n: [81, 121], body0: [76, 90], body1: [58, 58], neck: [46, 36], head: [76, 26], snout: [98, 28]}
+  attack: {c_f: [46, 121], c_n: [69, 121], body0: [70, 90], body1: [55, 62], neck: [42, 40], head: [84, 36], snout: [112, 36]}
+  hurt:   {c_f: [43, 121], c_n: [69, 121], body0: [70, 90], body1: [50, 62], neck: [40, 44], head: [78, 44], snout: [98, 46]}
+masks:
+  head:
+    idle: [[72, 8], [104, 8], [104, 42], [74, 42]]
+    attack: [[80, 18], [116, 18], [116, 58], [82, 58]]
+    hurt: [[74, 28], [102, 28], [102, 60], [76, 60]]
+frames:
+  # the colossus rears up and back, the maw lifted high, before it crashes down (gigas_worm draws back and down,
+  # lava_worm ducks its head, sand_worm sinks into its mound)
+  atk_wind1: {t: -0.10, dy: 0, tweaks: {body1: [0, -1], neck: [-1, -1], head: [-1, -2], snout: [-1, -2]}}
+  atk_wind2: {t: -0.20, dy: 0, tweaks: {body1: [-1, -1], neck: [-2, -2], head: [-2, -4], snout: [-2, -4]}}
+  atk_mid: {t: 0.20, moves: [neck, head, snout]}   # the attack coil is 4-12 px narrower (the coil never moves)
+  daze: {moves: [neck, head, snout], dy: 1}        # the head sinks toward the coil
+  daze_b: {moves: [neck, head, snout], dy: 2}
+holds: []
