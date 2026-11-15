@@ -131,10 +131,10 @@ describe('large crowds pack by their home art (defect 2)', () => {
     }
   });
 
-  it('nine of every large sheet whose home art is <= 118 px wide lay out at scale factor 1 (27 sheets)', () => {
+  it('nine of every large sheet whose home art is <= 118 px wide lay out at scale factor 1 (45 sheets with batches C-D)', () => {
     const large = [...new Set(enemyData.filter((e) => e.size === 'large').map((e) => monsterSpriteKey(e)))];
     const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) <= 118);
-    expect(s.length).toBe(27);
+    expect(s.length).toBe(45);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);
