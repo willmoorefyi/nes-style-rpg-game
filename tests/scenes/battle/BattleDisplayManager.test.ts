@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { Container } from 'pixi.js';
 import { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
-import { BattlePartyPanel } from '../../../src/scenes/battle/BattlePartyPanel.js';
+import { BattlePartyPanel, HP_ROLL_FRAMES } from '../../../src/scenes/battle/BattlePartyPanel.js';
 import { ENEMY_WINDOW, PARTY_PANEL, PANEL_FONT, STRIP_HEIGHT, STRIP_Y } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { ENEMY_LIST_LINE, groupEnemies } from '../../../src/scenes/battle/enemyList.js';
 import { Window } from '../../../src/ui/Window.js';
@@ -103,6 +103,7 @@ describe('BA-8: the party panel', () => {
     members[1].currentHp = 0;
     members[2].currentHp = 5;
     panel.refresh();
+    panel.update(HP_ROLL_FRAMES);   // Fb 6b: the HP number rolls to the new value
     expect(panel.rows[1].status.text).toBe('KO');
     expect(panel.rows[2].hp.text).toBe(`5/${members[2].maxHp}`);
     panel.setActive(2);

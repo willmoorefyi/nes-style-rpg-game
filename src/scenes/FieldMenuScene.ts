@@ -25,6 +25,7 @@ const COMMANDS: ReadonlyArray<MenuItem & { help: string }> = [
   { label: 'Order', value: 'order', help: 'Change the marching order.' },
   { label: 'Save', value: 'save', help: 'Record your journey.' },
   { label: 'Load', value: 'load', help: 'Resume a saved journey.' },
+  { label: 'Config', value: 'config', help: 'Set the battle message speed.' },
 ];
 
 /** Play time in seconds as H:MM:SS. */
@@ -141,6 +142,9 @@ export class FieldMenuScene implements Scene {
         break;
       case 'order':
         this.game.scenes.push('fieldOrder');
+        break;
+      case 'config':
+        this.game.scenes.push('config');
         break;
       case 'save':
         this.game.scenes.push('saveMenu');

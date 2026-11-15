@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { Container, Graphics } from 'pixi.js';
-import { BattleAnimationController } from '../../../src/scenes/battle/BattleAnimationController.js';
+import { BattleAnimationController, ANNOUNCE_FRAMES } from '../../../src/scenes/battle/BattleAnimationController.js';
+import { holdFrames } from '../../../src/scenes/battle/battleTiming.js';
 import { ATTACK_STYLES, advanceFrames, attackReach, type AttackStyle } from '../../../src/scenes/battle/attackChoreography.js';
 import { FLOAT_FONT, FLOAT_COLORS } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
@@ -67,8 +68,8 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
   return { ctrl, hero, hero2, goblins, display, main, lines, sounds };
 }
 
-/** The frame index (0-based) on which the advance reaches contact: 30 announce frames, then the advance. */
-const contactFrame = (style: AttackStyle) => 29 + advanceFrames(style);
+/** The frame index (0-based) on which the advance reaches contact: the announce frames, then the advance. */
+const contactFrame = (style: AttackStyle) => holdFrames(ANNOUNCE_FRAMES) - 1 + advanceFrames(style);
 const REACH = attackReach(HOME_X, ENEMY_X + ENEMY_W);
 
 /** F0: the numbers are in the layers' `fx.numbers`, inside `main`. */
@@ -77,7 +78,7 @@ const floats = (main: Container): OutlinedText[] => floatsIn(main);
 /** Run frames until the advance reaches contact; returns per-frame snapshots. */
 function runToContact(s: ReturnType<typeof setup>, style: AttackStyle) {
   const frames: { phase: string; x: number; lines: number; floats: number }[] = [];
-  for (let i = 0; i < 31 + advanceFrames(style) + 3; i++) {
+  for (let i = 0; i < holdFrames(ANNOUNCE_FRAMES) + 1 + advanceFrames(style) + 3; i++) {
     s.ctrl.updateAnimating(1);
     frames.push({ phase: s.ctrl.animPhase, x: s.hero.x, lines: s.lines.length, floats: floats(s.main).length });
   }
@@ -163,7 +164,7 @@ describe('B2 / B6: the target sprite comes from the target id, never the name', 
   it('two heroes named alike: a wolf missing party_1 shows the Miss over partySprites[1] (old: index 0)', () => {
     const peek = { actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetId: 'party_1', targetName: 'Hero' };
     const s = setup('lunge', ['Goblin A missed!'], [], ENEMY_X, true, peek);
-    for (let i = 0; i < 40; i++) s.ctrl.updateAnimating(1);
+    for (let i = 0; i < holdFrames(ANNOUNCE_FRAMES) + 10; i++) s.ctrl.updateAnimating(1);
     const miss = floats(s.main)[0];
     expect(miss.text).toBe('Miss');
     const b = s.hero2.getBounds();
@@ -174,7 +175,7 @@ describe('B2 / B6: the target sprite comes from the target id, never the name', 
   it('a hit on party_1 flashes partySprites[1]', () => {
     const peek = { actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetId: 'party_1', targetName: 'Hero' };
     const s = setup('lunge', ['Goblin A hits Hero for 4!'], [{ targetId: 'party_1', damage: 4, isHeal: false, isCrit: false }], ENEMY_X, false, peek);
-    for (let i = 0; i < 40; i++) s.ctrl.updateAnimating(1);
+    for (let i = 0; i < holdFrames(ANNOUNCE_FRAMES) + 10; i++) s.ctrl.updateAnimating(1);
     expect(s.display.flashHurt).toHaveBeenCalledWith(1);
   });
 });

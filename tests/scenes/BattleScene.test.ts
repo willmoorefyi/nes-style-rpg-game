@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { setMessageSpeed } from '../../src/core/Settings.js';
 import { Container } from 'pixi.js';
 import { BattleScene, COMMAND_CONFIRM_GUARD_FRAMES, type BattleSceneConfig } from '../../src/scenes/BattleScene.js';
 import { BattleStateMachine } from '../../src/battle/BattleStateMachine.js';
@@ -119,6 +120,36 @@ describe('BattleScene: a boss phase line (ST-6)', () => {
     for (let i = 0; i < 5; i++) { tick(scene, input); lines.push(scene.messageLine); }
     expect(lines.some(l => /attacks/.test(l))).toBe(true);
   });
+});
+
+describe('BattleScene: message speed (pass F item 6)', () => {
+  function intro() {
+    const input = createMockInput();
+    const scene = new BattleScene(createMockBattleSceneDeps(input), { party: [new Character({ name: 'Hero', classData: sturdy })], enemies: [harmless], rng: () => 0.5 });
+    scene.enter();
+    expect(scene.uiPhase).toBe('message');   // "A Goblin appears!"
+    return { scene, input };
+  }
+  afterEach(() => { setMessageSpeed(3); });
+
+  it('the intro line holds 90 frames at speed 3 (old 45) and 50 at speed 5', () => {
+    for (const [speed, frames] of [[3, 90], [5, 50]] as const) {
+      setMessageSpeed(speed);
+      const { scene, input } = intro();
+      for (let i = 0; i < frames - 1; i++) tick(scene, input);
+      expect(scene.uiPhase, `speed ${speed}`).toBe('message');
+      tick(scene, input);
+      expect(scene.uiPhase, `speed ${speed}`).toBe('command');
+    }
+  });
+
+  it('confirm still skips the intro line at once', () => {
+    setMessageSpeed(1);
+    const { scene, input } = intro();
+    tick(scene, input, 'confirm');
+    expect(scene.uiPhase).toBe('command');
+  });
+
 });
 
 describe('BattleScene: Phoenix Down from Item (BA-5)', () => {

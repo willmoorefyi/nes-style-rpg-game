@@ -3,7 +3,7 @@
  * blinking); the acting member's row keeps a blue name tint, so the two never look alike.
  */
 import { describe, it, expect } from 'vitest';
-import { BattlePartyPanel } from '../../../src/scenes/battle/BattlePartyPanel.js';
+import { BattlePartyPanel, HP_ROLL_FRAMES } from '../../../src/scenes/battle/BattlePartyPanel.js';
 import { Character } from '../../../src/entities/Character.js';
 import { testClass } from '../../helpers/testUtils.js';
 
@@ -38,5 +38,52 @@ describe('BattlePartyPanel targeting (B10)', () => {
     panel.setActive(2);
     panel.setTarget(2);
     expect(panel.rows.map(r => r.cursor.visible)).toEqual([false, false, true, false]);
+  });
+});
+
+describe('6b: the HP number and bar roll to the new value (pass F item 6)', () => {
+  it('after 30 damage the HP text reads intermediate values for 20 frames and the final value after (old: at once)', () => {
+    const members = party();
+    expect(members[0].maxHp).toBe(50);
+    const panel = new BattlePartyPanel(members);
+    expect(panel.rows[0].hp.text).toBe('50/50');
+    members[0].currentHp = 20;
+    panel.refresh();
+    const seen: number[] = [];
+    for (let f = 0; f < HP_ROLL_FRAMES - 1; f++) {
+      expect(panel.rows[0].hp.text).not.toBe('20/50');
+      panel.update(1);
+      seen.push(parseInt(panel.rows[0].hp.text, 10));
+    }
+    expect(seen.every((hp) => hp > 20 && hp < 50)).toBe(true);
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeLessThanOrEqual(seen[i - 1]);   // damage counts down
+    panel.update(1);
+    expect(panel.rows[0].hp.text).toBe('20/50');
+    panel.update(10);
+    expect(panel.rows[0].hp.text).toBe('20/50');
+  });
+
+  it('a heal counts up; a new change mid-roll starts from the number on screen', () => {
+    const members = party();
+    const panel = new BattlePartyPanel(members);
+    members[1].currentHp = 10;
+    panel.refresh();
+    panel.update(HP_ROLL_FRAMES / 2);
+    expect(panel.shownHp(1)).toBe(30);
+    members[1].currentHp = 50;
+    panel.refresh();
+    expect(panel.shownHp(1)).toBe(30);
+    panel.update(1);
+    expect(panel.shownHp(1)).toBeGreaterThan(30);
+    panel.update(HP_ROLL_FRAMES);
+    expect(panel.rows[1].hp.text).toBe('50/50');
+  });
+
+  it('a refresh without an HP change does not start a roll', () => {
+    const members = party();
+    const panel = new BattlePartyPanel(members);
+    const before = panel.rows[2].hp.text;
+    panel.refresh();
+    expect(panel.rows[2].hp.text).toBe(before);
   });
 });

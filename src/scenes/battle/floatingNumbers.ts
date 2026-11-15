@@ -1,12 +1,21 @@
 import type { Container } from 'pixi.js';
 import type { DamageEvent } from '../../battle/BattleStateMachine.js';
 import { OutlinedText } from '../../ui/NESFont.js';
+import { getSettings, type MessageSpeed } from '../../core/Settings.js';
+import { SPEED_MULTIPLIER } from './battleTiming.js';
 import { FLOAT_COLORS, FLOAT_FONT, FLOAT_OUTLINE } from './BattleSceneTypes.js';
 
 export type FloatKind = keyof typeof FLOAT_COLORS;
 
-/** Frames a floating number stays up (it rises 1 px per frame and fades out). */
-export const FLOAT_FRAMES = 48;
+/** Frames a floating number stays up at message speed 3 (it rises 1 px per frame and fades out; was 48). */
+export const FLOAT_FRAMES = 72;
+/** The shortest life (speed 5: today's 48); slower speeds never make it longer than `FLOAT_FRAMES`. */
+export const MIN_FLOAT_FRAMES = 48;
+
+/** A floating number's life at `speed`: 72 at speeds 1-3, 54 at 4, 48 at 5. */
+export function floatFrames(speed: MessageSpeed = getSettings().messageSpeed): number {
+  return Math.max(MIN_FLOAT_FRAMES, Math.min(FLOAT_FRAMES, Math.round(FLOAT_FRAMES * SPEED_MULTIPLIER[speed])));
+}
 
 export function floatKind(evt: DamageEvent): FloatKind {
   if (evt.isHeal) return 'heal';

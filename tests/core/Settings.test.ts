@@ -21,16 +21,16 @@ afterEach(() => {
 });
 
 describe('Settings', () => {
-  it('defaults to message speed 5 (F0: today\'s timing)', () => {
-    expect(DEFAULT_MESSAGE_SPEED).toBe(5);
+  it('defaults to message speed 3 (Fb: slower than the old timing, about speed 5; old default 5)', () => {
+    expect(DEFAULT_MESSAGE_SPEED).toBe(3);
     vi.stubGlobal('localStorage', fakeStore());
-    expect(getSettings().messageSpeed).toBe(5);
+    expect(getSettings().messageSpeed).toBe(3);
   });
 
   it('without localStorage it uses the default and warns nothing', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.stubGlobal('localStorage', undefined);
-    expect(getSettings().messageSpeed).toBe(5);
+    expect(getSettings().messageSpeed).toBe(DEFAULT_MESSAGE_SPEED);
     setMessageSpeed(2);
     expect(getSettings().messageSpeed).toBe(2);
     expect(warn).not.toHaveBeenCalled();
@@ -41,8 +41,8 @@ describe('Settings', () => {
     const store = fakeStore();
     store.getItem.mockImplementation(() => { throw new Error('denied'); });
     vi.stubGlobal('localStorage', store);
-    expect(getSettings().messageSpeed).toBe(5);
-    expect(getSettings().messageSpeed).toBe(5);
+    expect(getSettings().messageSpeed).toBe(DEFAULT_MESSAGE_SPEED);
+    expect(getSettings().messageSpeed).toBe(DEFAULT_MESSAGE_SPEED);
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
@@ -52,7 +52,7 @@ describe('Settings', () => {
       resetSettingsCache();
       warn.mockClear();
       vi.stubGlobal('localStorage', fakeStore({ [SETTINGS_KEY]: raw }));
-      expect(getSettings().messageSpeed, raw).toBe(5);
+      expect(getSettings().messageSpeed, raw).toBe(3);
       getSettings();
       expect(warn, raw).toHaveBeenCalledTimes(1);
     }
@@ -69,11 +69,11 @@ describe('Settings', () => {
   it('round trip: setMessageSpeed writes through and a fresh read gets it back', () => {
     const store = fakeStore();
     vi.stubGlobal('localStorage', store);
-    setMessageSpeed(3);
-    expect(getSettings().messageSpeed).toBe(3);
-    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 3 });
+    setMessageSpeed(4);
+    expect(getSettings().messageSpeed).toBe(4);
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 4 });
     resetSettingsCache();
-    expect(getSettings().messageSpeed).toBe(3);
+    expect(getSettings().messageSpeed).toBe(4);
   });
 
   it('a failed write is logged and the new speed still applies; an out-of-range speed is refused', () => {

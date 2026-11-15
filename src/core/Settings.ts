@@ -11,8 +11,8 @@ export interface GameSettings {
 }
 
 export const SETTINGS_KEY = 'ff.settings';
-/** F0 keeps today's timing (5); pass F's Fb moves the default to 3. */
-export const DEFAULT_MESSAGE_SPEED: MessageSpeed = 5;
+/** Speed 3 (pass F item 6): slower than the old timing, which is about speed 5. */
+export const DEFAULT_MESSAGE_SPEED: MessageSpeed = 3;
 
 let cache: GameSettings | null = null;
 
