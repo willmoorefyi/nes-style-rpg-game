@@ -23,6 +23,8 @@ export class TitleScene implements Scene {
     this.starting = false;
     this.playTitleMusic();
     this.container.removeChildren();
+    // a scene pushed over the title (the debug sandbox) hid it; switchTo('title') brings it back without showing it
+    this.container.visible = true;
 
     // Black background
     const bg = new Graphics();
@@ -88,11 +90,18 @@ export class TitleScene implements Scene {
       Promise.resolve(this.game.scenes.push('loadMenu'))
         .then(() => this.game.scenes.get<LoadScene>('loadMenu')?.openedFromTitle())
         .catch(failed('Failed to open the load menu:'));
-    } else if (value === 'debug') {
+    } else if (import.meta.env.DEV && value === 'debug') {
+      // dev only (the gate lets Vite drop the debug chunks from production): ?scenario=<id> runs that scenario as
+      // before; otherwise Debug opens the battle sandbox (docs/FEEDBACK_PLAN_2026-11-14.md §3.8)
+      const search = typeof location === 'undefined' ? '' : location.search;
+      if (!new URLSearchParams(search).has('scenario')) {
+        Promise.resolve(this.game.scenes.push('debugSandbox')).catch(failed('Failed to open the debug sandbox:'));
+        return;
+      }
       import('../systems/DebugScenarioLoader.js').then(({ DebugScenarioLoader, pickScenario }) => {
         const loader = new DebugScenarioLoader(this.game);
         return loader.loadScenarios().then((scenarios) => {
-          const scenario = pickScenario(scenarios, typeof location === 'undefined' ? '' : location.search);
+          const scenario = pickScenario(scenarios, search);
           if (scenario) return loader.run(scenario);
           console.error('No debug scenario to run');
           this.starting = false;

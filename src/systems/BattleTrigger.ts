@@ -16,6 +16,31 @@ export interface BattleEndData {
 
 export type { BossBattleConfig } from './BattleRetry.js';
 
+/** How a battle went, for a caller that ends it itself (`TriggerOptions.onEnd`). */
+export interface BattleOutcomeData extends BattleEndData {
+  /** Rounds that reached the execution phase. */
+  rounds: number;
+}
+
+export interface TriggerOptions {
+  /**
+   * End the battle here instead of `onBattleEnd` (the debug sandbox): called once for victory, escape and defeat,
+   * with no rewards, no Game Over and no retry snapshot. The callback moves on to the next scene.
+   */
+  onEnd?: (data: BattleOutcomeData) => void;
+}
+
+/** A battle scene that counts the rounds that reached execution (for `TriggerOptions.onEnd`). */
+class RoundCountingBattleScene extends BattleScene {
+  rounds = 0;
+
+  update(dt: number): void {
+    const before = this.battleState;
+    super.update(dt);
+    if (before !== 'execution' && this.battleState === 'execution') this.rounds++;
+  }
+}
+
 export class BattleTrigger {
   private game: Game;
   private enemyDataCache: Map<string, EnemyData> = new Map();
@@ -38,15 +63,17 @@ export class BattleTrigger {
   }
 
   async triggerBattle(enemyIds: string[], bossConfig?: BossBattleConfig, background?: string,
-                      enemyAi?: EnemyAiPatterns, enemyStatus?: Record<number, StatusEffect[]>): Promise<void> {
+                      enemyAi?: EnemyAiPatterns, enemyStatus?: Record<number, StatusEffect[]>,
+                      options: TriggerOptions = {}): Promise<void> {
     const enemies = await this.loadEnemyData(enemyIds);
     if (enemies.length === 0) return;
 
     const party = [...this.game.party.all];
     if (party.length === 0) return;
 
-    // Game Over > Retry Battle puts the game back exactly as it is now
-    this.game.battleRetry = captureBattleSnapshot(this.game, { enemyIds, bossConfig, background, enemyAi });
+    const { onEnd } = options;
+    // Game Over > Retry Battle puts the game back exactly as it is now (a caller-ended battle never retries)
+    this.game.battleRetry = onEnd ? null : captureBattleSnapshot(this.game, { enemyIds, bossConfig, background, enemyAi });
     this.onBattleTriggered?.();
     this.currentBossConfig = bossConfig ?? null;
 
@@ -64,13 +91,33 @@ export class BattleTrigger {
       enemyStatus,
       music: bossConfig?.isBoss ? 'boss' : undefined,
     };
-    const battleScene = new BattleScene(deps, sceneConfig);
+    const counting = onEnd ? new RoundCountingBattleScene(deps, sceneConfig) : null;
+    const battleScene = counting ?? new BattleScene(deps, sceneConfig);
     // Drop old scene references before creating new ones to prevent leaks
     this.game.scenes.unregister('battle');
     this.game.scenes.unregister('gameover');
     this.game.scenes.register('battle', battleScene);
     this.game.scenes.register('gameover', new GameOverScene(this.game));
-    await this.game.scenes.push('battle');
+    const stop = counting && onEnd ? this.endWith(counting, onEnd) : () => {};
+    try {
+      await this.game.scenes.push('battle');
+    } catch (e) {
+      stop();
+      throw e;
+    }
+  }
+
+  /** Listen for this battle's end once and hand it to `onEnd`; returns the unsubscribe. */
+  private endWith(scene: RoundCountingBattleScene, onEnd: (data: BattleOutcomeData) => void): () => void {
+    const events = this.game.events;
+    const handler = (data: BattleEndData): void => {
+      events.off('battleEnd', handler);
+      this.currentBossConfig = null;
+      this.game.battleRetry = null;
+      onEnd({ ...data, rounds: scene.rounds });
+    };
+    events.on('battleEnd', handler);
+    return () => events.off('battleEnd', handler);
   }
 
   onBattleEnd(data: BattleEndData): void {
