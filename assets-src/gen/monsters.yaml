@@ -869,14 +869,15 @@
   prompt: >-
     a big hairy tarantula seen from the side, covered in bristly brown fur with orange bands on the legs, a stout round
     furry abdomen, a cluster of small black eyes on its head, two large raised curved fangs, exactly eight thick hairy
-    jointed legs planted wide
+    jointed legs planted wide; in every cell the spider is low and wide, its top about a fifth of the box below the
+    top edge
   attack: >-
     lunging forward low toward the heroes to bite, the body pushed forward, the two front legs raised only a little,
     the big fangs bared; the body no taller than in the idle cell
   hurt: knocked back, the body tipped back, the legs curling in
   face: a small cluster of shiny black eyes on the front of the head and the two large fangs are readable in every cell
   extra_negative: a glossy body, an hourglass mark, a web, more than eight legs
-  seeds: [1234]
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R102): a rear-up attack; 1235 (R103): the idle touches the cell top
 - id: ghast
   # "Ghast" (024): a tougher ghoul-like undead in a shroud, long arms (distinct from the zombie and the ghoul)
   size: small
