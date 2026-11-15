@@ -1,0 +1,25 @@
+{
+  "character": "hollow_seraph",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "ae3a5b995c782c9115f90312",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": true,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R37: attempt 3 of 3; six wings, cracks, tilt back"
+}

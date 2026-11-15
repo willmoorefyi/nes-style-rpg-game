@@ -351,8 +351,12 @@
     shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
     included, at the same pixel size as in Image 3 and well below the top of the grey box
   hurt: >-
-    a sharp jolt: cracks across the breastplate, one wing pair faltering downward, the armour tilted back only
-    slightly; the posture stays upright and controlled, her composure intact
+    a sharp jolt: bright cracks across the breastplate, the two broken halo arcs knocked askew above the helm, the
+    whole armour tilted back by about fifteen degrees, the helm with its visor bars around the dark opening exactly as
+    in Image 3; the three wings on the left side of the image and the three wings on the right
+    side of the image all stay visible, the lowest wing on each side faltering downward with its feathers splayed, the
+    upper wings flaring; the posture stays upright and controlled, her composure intact; no cape, cloth or ribbon
+    anywhere (Image 3 has none)
   attack_raise: >-
     compressing the air before an explosive release, seen in the same three-quarter front view as Image 3: all six
     wings folded tightly around the armour, the halo dim, cold light leaking at the wing seams, the whole figure compact
@@ -361,7 +365,8 @@
   face: no face; the empty dark helm opening and the halo are the readable features
   extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
   seeds: [1234]
-  sheet_seeds: {boss_idle: 1235, boss_attack: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
   # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
   # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
-  # like a fan"): four wings, a wing chip
+  # like a fan"): four wings, a wing chip; boss_hurt 1234 (R35, without the no-cape clause): six wings, a teal cape added;
+  # 1235 (R36, + no-cape clause): pose_diff 0.12, pink fringe strokes, helm without visor bars
