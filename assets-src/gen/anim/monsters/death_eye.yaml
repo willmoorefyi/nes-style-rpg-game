@@ -1,0 +1,30 @@
+# Death Eye (pass R, boss, floating): a colossal undead eye bound in grave cloth under a crown of bones, spectral
+# tendrils below. body: floating (rig_floating.py), judged by the float band. Per-pose boss: idle, attack, hurt, cast
+# (no attack_raise). The ball is the `body` (core -> base runs through the tendrils), the bone crown the `head`.
+sprite: death_eye
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [98, 108], base: [96, 180], neck: [98, 75], crown: [98, 48]}
+  attack: {core: [138, 118], base: [90, 185], neck: [128, 80], crown: [125, 58]}
+  hurt:   {core: [84, 120], base: [100, 185], neck: [80, 85], crown: [78, 62]}
+  cast:   {core: [116, 112], base: [100, 185], neck: [112, 78], crown: [110, 52]}
+# The keyframe balls sit 20 px apart (centroid), and turning the body swings the tendrils out of the float band, so
+# every in-between moves the whole sprite (moves: [], dx / dy), placed where adjacent silhouettes overlap most: the
+# attack overlaps the idle best 14 px left and 8 px up (IoU 0.62 vs 0.49 raw), the hurt 14 px right and 8 up (0.68).
+frames:
+  atk_wind1: {moves: [], dx: 2, dy: 1}       # the eye gathers itself, sinking and leaning in
+  atk_wind2: {moves: [], dx: 4, dy: 2}
+  atk_mid: {t: 0.0, moves: [], dx: -10, dy: -6}   # the lunge arriving: the attack 10 back and 6 up
+  atk_follow: {t: 1.0, moves: [], dx: -4, dy: -3}  # pulls back out of the stare
+  atk_recover: {t: 0.0, moves: [], dx: 8, dy: 4}   # the idle 8 ahead, settling back
+  hurt_in1: {moves: [], dx: -4, dy: 2}       # knocked back and down
+  hurt_in2: {t: 0.0, moves: [], dx: 10, dy: -6}   # the squint arriving from the idle spot
+  cast_gather: {moves: [], dx: 1, dy: 1}     # the glyph gathers: a 1 px sink
+  cast_rise: {t: 0.0, moves: [], dy: -3}     # the flared iris rising out of the gather
+  cast_release: {t: 1.0, moves: [], dy: -4}  # the release lifts it 4 px
+  daze: {moves: [], dy: 2}                   # sinks 2 / 3 px (the whole eye: the tendrils hold their shape)
+  daze_b: {moves: [], dy: 3}
+holds: []
