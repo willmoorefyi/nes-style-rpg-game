@@ -98,6 +98,8 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 | Body (module) | Root / contacts (pinned every frame) | Joints and default parts | Recipe notes |
 |---|---|---|---|
 | `blob` (`rig_blob.py`, FW-6) | `base` (ground: ignores dy and tweaks); mark it at the top of the planted band | `base → mid → top` = `body` (`kind: shear`); pods/arms `mid → sh_<s> → el_<s> → hand_<s>` (`uarm_<s>`, `farm_<s>`, s = n, f, drawn only when marked) | squash per frame (below); `idle_b` = one interior row removed (sag); `head` = `top` |
+| `serpent` (`rig_serpent.py`, FW-2) | `c_f` (root), `c_n` (coil ground contacts = feet, judged per foot), `body0`, `t1` (all ground) | `coil` rigid `c_f → c_n`; `body` chain `body0 → body1 → neck`; `head` rigid `head → snout` (+ `jaw`); `tail` chain `t1 → t2 → t3 → tail_tip` | moves = `body1`, neck/head/snout/jaw, tail; `idle_b` above `neck`; `head` = head + snout. A tail raised only in the attack key: mark it only there with `parts: {tail: {in: [attack]}}` |
+| `rooted` (`rig_serpent.py`, FW-2 preset) | `root` (feet), `maw`, every `k<i>_0` (ground: the mass never turns) | `mass` rigid `root → maw`; `tent<i>` chains `k<i>_0 → k<i>_1 → k<i>_2 → k<i>_3`, i = 1..6, each on its own root | rig key `lead: [i, ...]`: the lead tentacles move with the recipe's t, the others with half (sway); daze droops via the shared dy |
 
 **`squash` frame op (FW-6, `anim_squash.py`).** `frames.<f>.squash: {sx, sy}` (any body; 0.80-1.25 each, sx·sy
 0.85-1.15), `auto`, or `null` (turns a template squash off). Whole interior rows and columns are removed or duplicated
@@ -111,6 +113,11 @@ height (no resampling, no vertical motion; the lean is capped at 25°). Blob def
 / `{1.08, 0.88}` with no dy, atk_mid / atk_follow / hurt_in2 `auto`, recover `{0.97, 1.03}`, hurt_in1 `{1.10, 0.90}`,
 daze / daze_b sy 0.94 / 0.92. Prototypes: `green_slime` (wind t 0.10/0.25 coil forward, follow settle 0.80),
 `gray_ooze` (atk_mid t 0.10 with the fist riding, hurt_in1 `moves: [mid, top]`).
+
+**Serpent recipe (cobra prototype).** The shared wind barely moves a hooded head: translate the upper body instead
+(`atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}`, wind2 about twice
+that with `t: -0.25`); bending only the neck tears it. When the attack arch turns more than the 25° chain cap at 0.35,
+use `atk_mid: {t: 0.20, moves: [neck, head, snout]}` and lower the head by tweak if it rises out of the lerp height.
 
 ## Monster animation (docs/ENEMY_ANIM_PLAN.md, docs/ENEMY_ANIM_ISSUES.md)
 

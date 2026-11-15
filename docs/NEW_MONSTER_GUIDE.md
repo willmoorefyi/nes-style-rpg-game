@@ -147,6 +147,13 @@ Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and e
   centre; caps 0.80-1.25, area 0.85-1.15). `idle_b` sags one row. Recipe: the wind-up squashes; when the attack key
   leans far (green_slime: 10 px centroid) coil forward (`atk_wind1/2.t` 0.10 / 0.25) and settle the follow (`t` 0.80);
   a fist at the cell edge: `atk_mid: {t: 0.10, moves: [mid, top]}` (gray_ooze).
+- **`serpent`** (`rig_serpent.py`, FW-2: cobra, anaconda, worms, wyrm, sea snake). Ground joints `c_f` (root), `c_n`
+  (the coil's ground contacts, judged per foot), `body0` (where the body leaves the coil), `t1` (where the tail leaves
+  it): pinned in every frame. Chains `body0 → body1 → neck` and `t1 → t2 → t3 → tail_tip`, `head` rigid `head →
+  snout` (+ `jaw`), `coil` rigid. A tail raised only in the attack: `parts: {tail: {in: [attack]}}`. Wind: translate
+  the upper body by tweaks (cobra); a big attack arch: `atk_mid: {t: 0.20, moves: [neck, head, snout]}`.
+- **`rooted`** (same module: ochu, neochu). Ground `root`, `maw` and each tentacle root `k<i>_0`; chains `tent<i>`
+  (`k<i>_0..k<i>_3`, i = 1..6); `lead: [1, 2]` = the tentacles that whip, the rest sway at half the motion.
 - **Any body:** `frames.idle_b.tweaks` (≤ 1 px per component) for wing flutter or robe sway.
 
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`

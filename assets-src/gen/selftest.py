@@ -408,6 +408,9 @@ def test_monster_anim() -> None:
     print("monster blob template (FW-6: squash op, blob sag, idle_b tweaks with a 1 px cap)")
     from gen import selftest_blob as SBl
     SBl.run_blob(check)
+    print("monster serpent template and rooted preset (FW-2: coil contacts, attack-only tail, lead tentacles)")
+    from gen import selftest_serpent as SSe
+    SSe.run_serpent(check)
     print("monster framework fixes (per-foot feet, IoU bound, pinned reach, cloth chains)")
     from gen import selftest_fixes as SF
     SF.run_fixes(check)

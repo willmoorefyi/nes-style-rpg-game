@@ -114,7 +114,7 @@ def half_hands(name: str, cfg: dict) -> list[str]:
 
 
 def half_joints(rig, name: str, cfg: dict) -> set[str]:
-    return {a.format(h=h) for h in half_hands(name, cfg) for a in ARM}
+    return {a.format(h=h) for h in half_hands(name, cfg) for a in ARM} | rig.half_default   # + FW-2 tentacles
 
 
 def _joint_sets(rig, name: str, r: dict, cfg: dict) -> tuple[object, list[str]]:

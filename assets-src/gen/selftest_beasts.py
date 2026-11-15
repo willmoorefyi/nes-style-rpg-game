@@ -150,7 +150,7 @@ def run_beasts(check: Callable[[bool, str], None]) -> None:
         check(lost == 0, f"{body}: hurt_in1 at t = 0 keeps every idle pixel ({lost} of {int(src.sum())} lost or changed)")
     run_rearing(check)
     try:
-        R.Rig({**QUAD, "body": "serpent"}, (110, 80))
+        R.Rig({**QUAD, "body": "centaur"}, (110, 80))    # (was "serpent", implemented since FW-2)
         check(False, "an unknown body template is rejected")
     except ValueError:
         check(True, "an unknown body template is rejected")
