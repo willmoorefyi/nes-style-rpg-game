@@ -1,0 +1,125 @@
+sprite: tyrannosaur
+body: bird
+facing: right
+sampler: nearest
+breath: true
+# Wingless bird template (biped dinosaur). The heavy, stomping sibling of the allosaurus: the huge head rears back and
+# up while the body sinks onto its knees, then the head slams down. The curled tail is never interpolated (the
+# keyframe coils differ); it rides the body shift. Legs are translated, never rotated.
+keyframes:
+  idle:
+    hip: [50, 75]
+    chest: [80, 70]
+    neck: [82, 52]
+    head: [85, 35]
+    beak: [118, 45]
+    claw_n: [90, 82]
+    tail0: [38, 80]
+    tail1: [18, 72]
+    tail2: [17, 52]
+    tail_tip: [38, 43]
+    hip_n: [48, 88]
+    knee_n: [42, 100]
+    foot_n: [38, 116]
+    toe_n: [50, 121]
+    hip_f: [75, 90]
+    knee_f: [73, 103]
+    foot_f: [77, 115]
+    toe_f: [88, 118]
+  attack:
+    hip: [45, 78]
+    chest: [82, 78]
+    neck: [88, 72]
+    head: [95, 70]
+    beak: [120, 82]
+    claw_n: [78, 98]
+    tail0: [32, 80]
+    tail1: [15, 65]
+    tail2: [17, 45]
+    tail_tip: [36, 37]
+    hip_n: [40, 92]
+    knee_n: [35, 103]
+    foot_n: [30, 116]
+    toe_n: [42, 121]
+    hip_f: [65, 95]
+    knee_f: [65, 105]
+    foot_f: [68, 115]
+    toe_f: [80, 118]
+  hurt:
+    hip: [50, 78]
+    chest: [82, 75]
+    neck: [85, 62]
+    head: [90, 47]
+    beak: [118, 62]
+    claw_n: [90, 88]
+    tail0: [38, 82]
+    tail1: [18, 75]
+    tail2: [16, 58]
+    tail_tip: [35, 48]
+    hip_n: [46, 92]
+    knee_n: [40, 105]
+    foot_n: [36, 116]
+    toe_n: [48, 121]
+    hip_f: [72, 92]
+    knee_f: [72, 105]
+    foot_f: [75, 115]
+    toe_f: [86, 118]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  arm_n: {bone: [chest, claw_n], radius: 4.0}
+masks:
+  head:                        # the open lower jaw rides the head (the neck warp pulled it away: a hole in the mouth)
+    attack: [[90, 64], [124, 64], [124, 112], [97, 112], [92, 90]]
+  toes_n:
+    idle: [[30, 112], [56, 112], [56, 124], [30, 124]]
+    attack: [[23, 112], [48, 112], [48, 124], [23, 124]]
+    hurt: [[29, 112], [53, 112], [53, 124], [29, 124]]
+  toes_f:
+    idle: [[68, 111], [94, 111], [94, 121], [68, 121]]
+    attack: [[60, 111], [86, 111], [86, 121], [60, 121]]
+    hurt: [[66, 111], [92, 111], [92, 121], [66, 121]]
+z:
+  idle: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, head, arm_n]
+  attack: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, arm_n, head]
+  hurt: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, head, arm_n]
+frames:
+  atk_wind1:                   # heavy crouch: the body sinks onto its knees, the huge head draws back (held high)
+    moves: []
+    dy: 1
+    tweaks: {chest: [-1, 0], claw_n: [-1, 0], neck: [-2, -1], head: [-3, -2], beak: [-3, -2]}
+  atk_wind2:
+    moves: []
+    dy: 2
+    tweaks: {hip: [-1, 0], chest: [-3, 0], claw_n: [-3, 0], neck: [-4, -2], head: [-6, -3], beak: [-6, -3], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail_tip: [-1, 0]}
+  atk_mid:                     # translation: the head comes down from high over the planted legs (a turn tore the neck)
+    t: 0.35
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip_n: [3, 0], knee_n: [3, 0], foot_n: [3, 0], toe_n: [3, 0], hip_f: [3, 0], knee_f: [3, 0], foot_f: [3, 0], toe_f: [3, 0], hip: [0, -2], chest: [-2, -5], claw_n: [-2, -5], neck: [-3, -7], head: [-4, -10], beak: [-4, -10]}
+  atk_follow:                  # after the slam the head lifts slowly, the body stays down
+    t: 0.65
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [1, -1], chest: [1, -2], claw_n: [1, -2], neck: [0, -4], head: [-1, -7], beak: [-1, -7]}
+  atk_recover:                 # translation: the body still low after the slam, the head still down
+    moves: []
+    dy: 1
+    tweaks: {chest: [0, 1], claw_n: [0, 1], neck: [0, 3], head: [0, 5], beak: [0, 5]}
+  hurt_in1:                    # the blow shoves the head back and down, the body jolts back
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [-1, 0], chest: [-1, 1], claw_n: [-1, 1], neck: [-2, 2], head: [-3, 3], beak: [-3, 3], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail_tip: [-1, 0]}
+  hurt_in2:
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [1, 0], chest: [1, -1], claw_n: [1, -1], neck: [1, -2], head: [1, -3], beak: [1, -3], tail0: [1, 0], tail1: [1, 0], tail2: [1, 0], tail_tip: [1, 0]}
+  daze: {moves: [], dy: 1}
+  daze_b: {moves: [], dy: 1, tweaks: {neck: [0, 1], head: [0, 1], beak: [0, 1]}}
+holds: []
+paint:                         # 1 px joint cracks (throat under the arm, back of the neck) closed with outline ink
+  - {frame: atk_follow, xy: [[85, 97]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[77, 51]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[23, 61]], rgb: [6, 4, 10]}

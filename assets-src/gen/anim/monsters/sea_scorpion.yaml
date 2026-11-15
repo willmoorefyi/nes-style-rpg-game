@@ -1,0 +1,139 @@
+sprite: sea_scorpion
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+attack_hand: [f]
+# A lobster-scorpion: thorax (body -> head, the stalk eyes and antennae ride it), the lobster abdomen under the tail
+# root, the arched tail tl0..sting, two crusher claws (the far one is raised in the attack) and six visible legs
+# (leg4 is not drawn). The hurt key hides the four front legs behind the grounded claw: they are left unmarked there.
+keyframes:
+  idle:
+    body: [55, 45]
+    head: [70, 42]
+    abd: [45, 44]
+    abd_end: [34, 42]
+    tl0: [28, 40]
+    tl1: [24, 24]
+    tl2: [32, 11]
+    tl3: [45, 8]
+    sting: [54, 20]
+    sh_n: [60, 52]
+    el_n: [70, 55]
+    hand_n: [88, 54]
+    sh_f: [68, 42]
+    el_f: [78, 44]
+    hand_f: [92, 46]
+    coxa1_n: [73, 57]
+    knee1_n: [77, 62]
+    tip1_n: [78, 72]
+    coxa1_f: [62, 60]
+    knee1_f: [67, 63]
+    tip1_f: [68, 72]
+    coxa2_n: [52, 58]
+    knee2_n: [52, 64]
+    tip2_n: [52, 70]
+    coxa2_f: [40, 55]
+    knee2_f: [39, 62]
+    tip2_f: [45, 76]
+    coxa3_n: [33, 55]
+    knee3_n: [29, 58]
+    tip3_n: [28, 74]
+    coxa3_f: [33, 52]
+    knee3_f: [21, 56]
+    tip3_f: [17, 74]
+  attack:
+    body: [45, 47]
+    head: [62, 45]
+    abd: [35, 45]
+    abd_end: [24, 45]
+    tl0: [20, 45]
+    tl1: [16, 30]
+    tl2: [22, 18]
+    tl3: [35, 16]
+    sting: [48, 24]
+    sh_n: [52, 50]
+    el_n: [62, 52]
+    hand_n: [70, 50]
+    sh_f: [62, 42]
+    el_f: [72, 40]
+    hand_f: [90, 32]
+    coxa1_n: [62, 58]
+    knee1_n: [70, 62]
+    tip1_n: [75, 72]
+    coxa1_f: [58, 58]
+    knee1_f: [63, 62]
+    tip1_f: [64, 72]
+    coxa2_n: [50, 58]
+    knee2_n: [52, 63]
+    tip2_n: [52, 70]
+    coxa2_f: [32, 58]
+    knee2_f: [30, 64]
+    tip2_f: [29, 76]
+    coxa3_n: [25, 56]
+    knee3_n: [18, 60]
+    tip3_n: [14, 74]
+    coxa3_f: [20, 56]
+    knee3_f: [10, 60]
+    tip3_f: [4, 71]
+  hurt:
+    body: [50, 52]
+    head: [66, 50]
+    abd: [38, 50]
+    abd_end: [25, 50]
+    tl0: [20, 48]
+    tl1: [18, 35]
+    tl2: [28, 24]
+    tl3: [40, 24]
+    sting: [45, 36]
+    sh_n: [58, 60]
+    el_n: [68, 64]
+    hand_n: [85, 65]
+    sh_f: [68, 50]
+    el_f: [78, 52]
+    hand_f: [90, 56]
+    coxa2_f: [38, 60]
+    knee2_f: [36, 67]
+    tip2_f: [40, 76]
+    coxa3_n: [30, 60]
+    knee3_n: [26, 66]
+    tip3_n: [28, 75]
+    coxa3_f: [25, 60]
+    knee3_f: [14, 65]
+    tip3_f: [6, 70]
+frames:                         # legs held whole (coxa, knee and tip pinned); the body, claws and tail translate
+  atk_wind1:                    # the body draws back and sinks, the far crusher claw and the stinger cock up
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [-1, 1], head: [-1, 1], abd: [-1, 1], abd_end: [-1, 1], tl0: [-1, 1], tl1: [-1, 0], tl2: [-1, 0], tl3: [-1, 0], sting: [-1, 0], sh_n: [-1, 1], el_n: [-1, 1], hand_n: [-1, 1], sh_f: [-1, 0], el_f: [-1, -1], hand_f: [-1, -2]}
+  atk_wind2:
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [-2, 2], head: [-2, 2], abd: [-2, 2], abd_end: [-2, 2], tl0: [-2, 1], tl1: [-2, 0], tl2: [-2, -2], tl3: [-2, -3], sting: [-2, -2], sh_n: [-2, 2], el_n: [-2, 2], hand_n: [-2, 2], sh_f: [-2, 1], el_f: [-2, -1], hand_f: [-2, -3]}
+  atk_mid:                      # the strike from the approved attack, the body a little back toward the wind-up
+    t: 0.10
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [1, 1], head: [1, 1], abd: [1, 1], abd_end: [1, 1], tl0: [1, 1], tl1: [1, 1], tl2: [1, 1], tl3: [1, 1], sting: [1, 1], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1], sh_f: [1, 1], el_f: [1, 2], hand_f: [0, 3], coxa2_f: [2, 0], knee2_f: [2, 0], tip2_f: [2, 0], coxa3_n: [1, 0], knee3_n: [1, 0], tip3_n: [1, 0], coxa3_f: [1, 0], knee3_f: [1, 0], tip3_f: [1, 0]}
+  atk_follow:                   # the claw snaps shut and starts to drop
+    t: 0.75
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [1, 0], head: [1, 0], abd: [1, 0], abd_end: [1, 0], tl0: [1, 0], tl1: [1, 0], tl2: [1, 0], tl3: [1, 0], sting: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 1], el_f: [1, 2], hand_f: [0, 3]}
+  atk_recover:
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [-2, 0], head: [-2, 0], abd: [-2, 0], abd_end: [-2, 0], tl0: [-2, 0], tl1: [-2, 0], tl2: [-2, 0], tl3: [-2, 0], sting: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, -1], el_f: [-2, -2], hand_f: [-2, -3]}
+  hurt_in1:                     # the blow knocks the body back and down, the claws drop, the tail sags
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [-2, 2], head: [-2, 2], abd: [-2, 2], abd_end: [-2, 2], tl0: [-2, 2], tl1: [-2, 3], tl2: [-2, 3], tl3: [-2, 3], sting: [-2, 3], sh_n: [-2, 2], el_n: [-2, 2], hand_n: [-2, 3], sh_f: [-2, 2], el_f: [-2, 2], hand_f: [-2, 3]}
+  hurt_in2:
+    moves: []
+    pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]
+    tweaks: {body: [1, -2], head: [1, -2], abd: [1, -2], abd_end: [1, -2], tl0: [1, -2], tl1: [1, -2], tl2: [1, -2], tl3: [1, -2], sting: [1, -2], sh_n: [1, -2], el_n: [1, -2], hand_n: [1, -2], sh_f: [1, -2], el_f: [1, -2], hand_f: [1, -2]}
+  daze: {moves: [], dy: 1, pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]}
+  daze_b: {moves: [], dy: 2, pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f]}
+holds: []
+paint:                          # a 6 px pocket between the back leg and the lifted body closes: inked shut (tarantula recipe)
+  - {frame: hurt_in2, rgb: [6, 4, 10], xy: [[24, 57], [25, 57], [26, 57], [23, 58], [24, 58], [25, 58]]}

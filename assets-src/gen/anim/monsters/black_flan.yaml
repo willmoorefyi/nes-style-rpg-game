@@ -1,0 +1,16 @@
+sprite: black_flan
+body: blob
+facing: right
+sampler: nearest
+breath: true
+# A glossy pudding: the wind-up squashes, the attack surges forward and up with a trailing smear (the smear comes
+# with the attack key at the wind2 -> mid switch), the hurt flattens.
+keyframes:
+  idle:   {base: [46, 68], mid: [46, 52], top: [46, 31]}
+  attack: {base: [45, 68], mid: [58, 48], top: [62, 26]}
+  hurt:   {base: [46, 70], mid: [48, 60], top: [50, 43]}
+frames:
+  atk_wind1: {t: 0.10}          # squash in place, then coil forward toward the surge (the green_slime recipe)
+  atk_wind2: {t: 0.25, squash: {sx: 1.06, sy: 0.92}}
+  atk_mid: {t: 0.10, moves: [mid, top]}
+holds: []
