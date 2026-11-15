@@ -1637,16 +1637,17 @@
     Draw only the parts and clothing named in the description, the same in every cell: no cape, cloak or extra cloth,
     and no spell effects, smear or motion lines.
   prompt: >-
-    a tall thin humanoid with purple skin in a long dark violet robe with a tall stiff collar rising behind the head,
-    a bald domed purple head with two white pupil-less eyes and exactly four short tentacles hanging from the face in
-    place of a mouth, long thin purple fingers; centred in its own cell with empty space on both sides
+    a tall thin humanoid with pale lilac-mauve skin in a long black robe with dark red trim and a tall stiff black
+    collar rising behind the head like a fan, a bald domed lilac head with two white pupil-less eyes and exactly four
+    long tentacles hanging from the lower face like a beard in place of a mouth, clearly visible in every cell, long
+    thin lilac fingers; centred in its own cell with empty space on both sides
   attack: >-
     leaning forward toward the heroes, one thin hand reaching out with the fingers spread, the four face tentacles
     lashing forward, exactly four tentacles as in the idle cell
   hurt: knocked back, the head thrown back, the face tentacles curling, the hands thrown up
   face: its domed purple head with white eyes and four face tentacles is readable
-  extra_negative: a mouth, a nose, a weapon, a staff, a hood, armour, a fifth tentacle, a cape
-  seeds: [1234]
+  extra_negative: a mouth, a nose, a weapon, a staff, a hood, armour, a fifth tentacle, a cape, sparkles
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R191): monochrome purple, the face tentacles lost in the attack, no collar
 - id: ice_gigas
   # "Ice Gigas" (071): a frost giant (distinct from hill and fire gigas)
   size: large
