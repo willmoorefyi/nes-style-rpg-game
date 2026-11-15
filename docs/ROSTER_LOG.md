@@ -447,7 +447,7 @@ Images used: 263 of 300 (build 263 of 285, fix 0 of 15; ledger guard: 363 Gemini
 
 | Batch | Sprites approved | Waiting / deferred | Images | Expected (plan 6.2) | Retries by body type (images / sprites approved) |
 |---|---|---|---|---|---|
-| C (068-101) | **31 of 32**: the 12 above + baretta, basilisk, allosaurus, weretiger, sand_worm, minotaur_zombie, king_mummy, medusa, rakshasa, clay_golem, nightmare (best of 3), sahagin_prince (best of 3), deepeyes, sea_snake, sea_scorpion, sea_troll, ghost, water_elemental (best of 3), water_naga | **white_shark** (swimmer; not requested, the swimmer stop after R277) | 54 (R188-R244; 19 before the spend-cap stop, 35 in this run; R225, R229, R243 are no-image best-of-3 rows) | 43 for all 32 | quadruped 14 / 8, biped 18 / 10, bird 4 / 2, floating 7 / 4, arthropod 4 / 2, serpent 4 / 3, naga 3 / 2 |
+| C (068-101) | **31 of 32** (white_shark deferred, R281): the 12 above + baretta, basilisk, allosaurus, weretiger, sand_worm, minotaur_zombie, king_mummy, medusa, rakshasa, clay_golem, nightmare (best of 3), sahagin_prince (best of 3), deepeyes, sea_snake, sea_scorpion, sea_troll, ghost, water_elemental (best of 3), water_naga | **white_shark** (swimmer; not requested, the swimmer stop after R277) | 54 (R188-R244; 19 before the spend-cap stop, 35 in this run; R225, R229, R243 are no-image best-of-3 rows) | 43 for all 32 | quadruped 14 / 8, biped 18 / 10, bird 4 / 2, floating 7 / 4, arthropod 4 / 2, serpent 4 / 3, naga 3 / 2 |
 
 - **Cuts are still the main cost** (12 of the 31 rejected attempts of this run, R207-R277): 9 where an attack snout or
   claw, a muzzle, a streaming tail, a fin cape, a trailing cape or a flung blade crosses the raw's one-third or
@@ -507,9 +507,20 @@ Images used: 263 of 300 (build 263 of 285, fix 0 of 15; ledger guard: 363 Gemini
   silver-green R157 text, the "idle at its lowest" floating `motion:` line and no added clauses (the R157 cut failed only
   on the bottom-row slice that line now fixes).
 
+- **Orchestrator ruling (2026-11-15) and result:** `white_shark` requested with no "fierce / teeth / bloody" wording,
+  3 attempts (R278-R280), all accepted by Gemini but none approvable: every action cell is drawn lower than the idle,
+  so the shared floating offset slices it on the bottom row (or the attack copies the idle). `red_piranha` final
+  attempt R282 with the bronze / rust, anatomical-jaw wording was **accepted** (the refusals are solved by the colour and
+  wording), but its hurt is sliced on the bottom row the same way. Both **deferred** (R281, R283). `piranha`: no more
+  attempts and no palette variant (user rule); deferred, for the user.
+- **0-image recovery for both:** their raws are whole (cache keys `19a3bccfa97e214bd940ce6a` red_piranha R282,
+  `a26f0533cd1218a802a1d4bd` / `a275a7679bb6b3bb25e4bc59` / `38351be46753975f50cd80dd` white_shark R278-R280; the cache
+  files are git-ignored and live only in the main checkout). A framework clamp in `monster.cut` that lifts a floating
+  action frame clear of the bottom row would let `generate.py --repixelize` re-cut them offline.
+
 ## Deferred sprites
 
-- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording. Proposal recorded under "Swimmers" (2026-11-15).
-- `red_piranha` (batch B, open): R160 and R277 refused (`PROHIBITED_CONTENT`); 2 of 3 used. Waits for the orchestrator (see "Swimmers").
-- `white_shark` (batch C, open): not requested (the swimmer stop); 0 of 3 used.
+- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording. Orchestrator (2026-11-15): no more attempts and no palette variant (the user wants no palette swaps); left for the user.
+- `red_piranha` (batch B): R160 and R277 refused, R282 accepted but its hurt sliced on the bottom row; 3 of 3 used, **deferred** (R283; a 0-image re-cut is possible, see "Swimmers").
+- `white_shark` (batch C): R278-R280 accepted but every action cell sliced on the bottom row (or an idle copy); 3 of 3 used, **deferred** (R281; a 0-image re-cut is possible).
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
