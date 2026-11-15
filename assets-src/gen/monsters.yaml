@@ -1036,14 +1036,18 @@
     description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
     motion arc or motion lines.
   prompt: >-
-    a large heavy-boned red-stained skeleton standing upright, dark red-brown blood stains on its bones, a rusted iron
-    breastplate over the ribs, a horned skull with burning red eye lights, holding a notched curved blade in each hand,
-    one in the hand on the left side of the image and one in the hand on the right side of the image; in every cell the whole figure is centred in its own cell with empty space on both sides, and its reaching arms and blades stop well before the edges of its cell
+    a large heavy-boned skeleton standing upright, thick bones of pale bone colour splashed with dark red blood stains,
+    a rusted iron breastplate over the ribs, a skull with two curved horns and burning red eye lights; in every cell it
+    holds exactly two notched curved blades, one in each bony hand, both blades clearly visible and apart from the
+    body: in the idle cell the blade in the hand on the left side of the image is held low and the blade in the hand
+    on the right side of the image is raised toward the heroes; in every cell the whole figure is centred in its own
+    cell with empty space on both sides, and its arms and blades stop well before the edges of its cell
   attack: >-
-    lunging forward and slashing both notched blades across at the heroes, exactly two blades, one in each hand, as in
-    the idle cell
+    lunging forward toward the heroes, the near arm slashing its blade down in front of the body and the far arm
+    raising its blade high behind the skull, the elbows bent so the blades stay well inside the middle cell; exactly
+    two blades, one in each hand, as in the idle cell, each one solid and clearly drawn
   hurt: >-
     knocked back, the horned skull thrown back, both blades flung out to the sides, still one in each hand
   face: its horned skull with burning red eye lights is readable
-  extra_negative: a shield, a loincloth, yellow bones, a single sword, a third blade, a helmet, a cape
-  seeds: [1234]
+  extra_negative: a shield, a loincloth, yellow bones, a single sword, a third blade, a helmet, a cape, blurred or doubled blades
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R125): one blade in the idle, a muddle of blade streaks in the attack

@@ -443,3 +443,5 @@
 {"event": "result", "key": "0b6c39ea868f59865651f5cc", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T05:30:24", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "gargoyle", "sheet": "monster_small", "seed": 1235, "key": "f979a82b636da22c9eac9a91"}
 {"event": "result", "key": "f979a82b636da22c9eac9a91", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T05:30:54", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "bloodbones", "sheet": "monster_small", "seed": 1234, "key": "d7fc988adf529ea13c2922bd"}
+{"event": "result", "key": "d7fc988adf529ea13c2922bd", "ok": true}
