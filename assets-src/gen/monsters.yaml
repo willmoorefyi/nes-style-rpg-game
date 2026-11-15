@@ -1859,12 +1859,15 @@
     paler belly and dark stripes on the back; the whole dinosaur, tail tip to snout, sits in the middle of its own cell
     with empty space on both sides
   attack: >-
-    lunging the head forward and down with the jaws wide open at the heroes, the tail raised to balance, both feet on
-    the ground, the head well inside the middle cell
-  hurt: knocked back, the head thrown up and back, the jaws shut, both feet on the ground
+    snapping the head down low with the jaws wide open at the heroes, the head just above and in front of its front
+    foot (not stretched out to the cell edge), the tail raised to balance, both feet on the ground, the whole dinosaur
+    from tail tip to snout well inside the middle cell
+  hurt: >-
+    knocked back a step, still seen from the side facing right with the body level, the head pulled back a little,
+    the eyes squeezed shut and the jaws shut, both feet on the ground (not standing upright, not turned around)
   face: its big head with brow horns, a yellow eye and jagged teeth is readable
-  extra_negative: feathers, wings, four legs, red-brown colour, a rider, rearing up vertical
-  seeds: [1234]
+  extra_negative: feathers, wings, four legs, red-brown colour, a rider, rearing up vertical, a front view
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R210): the attack snout sliced at the raw cell line, an upright turned hurt
 - id: weretiger
   # "Weretiger" (084): an upright tiger-man (distinct from werewolf and rakshasa)
   size: small
