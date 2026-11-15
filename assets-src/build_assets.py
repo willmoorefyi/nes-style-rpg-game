@@ -304,6 +304,7 @@ STAGES = {
     "monsters_ai": build_monsters_ai,
     "maps": build_maps,
     "audio": lambda: build_optional("audio"),
+    "fx": lambda: __import__("importlib").import_module("fx.build_fx").build(ASSETS),  # battle-fx atlas (assets-src/fx)
 }
 
 

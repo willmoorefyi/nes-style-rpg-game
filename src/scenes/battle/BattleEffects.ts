@@ -1,18 +1,23 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
 import { createFloatingNumber, FLOAT_FRAMES, type FloatKind } from './floatingNumbers.js';
 import { BattleLayers } from './BattleLayers.js';
+import { stepAlpha } from './fx/emitterCore.js';
 
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
   water: 0x0066ff, earth: 0x886622, wind: 0x88ff88, heal: 0x44ff44,
 };
 
+/** The impact glow's starting alpha (an element-coloured copy of the target's silhouette). */
+const FLASH_ALPHA = 0.75;
+
 /** Frames a dying enemy takes to fade out. */
 export const DYING_FRAMES = 30;
 
 /**
  * Short-lived battle effects: floating numbers, spell and slash flashes, and the dying-enemy fade. Split out of
- * BattleAnimationController, which decides when they start.
+ * BattleAnimationController, which decides when they start. The element glow is the spell effects' impact flash
+ * (fx/ActionFx.ts plays the build-up; the controller presents the number and this glow at the effect's impact).
  */
 export class BattleEffects {
   readonly floatingTexts: { text: Container; age: number; maxAge: number }[] = [];
@@ -53,7 +58,7 @@ export class BattleEffects {
       overlay = box;
     }
     overlay.position.set(sprite.x, sprite.y);
-    overlay.alpha = 0.6;
+    overlay.alpha = FLASH_ALPHA;
     this.addFlash(overlay, 18, sprite);
   }
 
@@ -89,7 +94,8 @@ export class BattleEffects {
     for (let i = this.spellFlashes.length - 1; i >= 0; i--) {
       const sf = this.spellFlashes[i];
       sf.age += dt;
-      sf.overlay.alpha = 0.6 * (1 - sf.age / sf.maxAge);
+      // the effects' pixel rule: stepped fades (0.75, 0.5, 0.25), never a smooth ramp
+      sf.overlay.alpha = stepAlpha(FLASH_ALPHA * (1 - sf.age / sf.maxAge));
       // follow the sprite (lunge, shake) and its current pose frame
       if (sf.follow) {
         sf.overlay.position.set(sf.follow.x, sf.follow.y);

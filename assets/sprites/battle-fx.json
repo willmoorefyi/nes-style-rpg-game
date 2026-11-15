@@ -1,0 +1,1089 @@
+{
+ "glyphs": {
+  "beam.gold": {
+   "cell": [
+    20,
+    32
+   ],
+   "color": "#ffe784",
+   "frames": [
+    [
+     0,
+     0
+    ],
+    [
+     42,
+     0
+    ]
+   ],
+   "tile": "v"
+  },
+  "bolt.bolt": {
+   "cell": [
+    12,
+    16
+   ],
+   "color": "#ffff8c",
+   "frames": [
+    [
+     84,
+     0
+    ],
+    [
+     110,
+     0
+    ],
+    [
+     136,
+     0
+    ]
+   ],
+   "tile": "v"
+  },
+  "bubble.poison": {
+   "cell": [
+    8,
+    8
+   ],
+   "color": "#a5ef4a",
+   "frames": [
+    [
+     162,
+     0
+    ],
+    [
+     180,
+     0
+    ]
+   ]
+  },
+  "burst.blind": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#7b7ba5",
+   "frames": [
+    [
+     198,
+     0
+    ],
+    [
+     248,
+     0
+    ],
+    [
+     298,
+     0
+    ],
+    [
+     348,
+     0
+    ]
+   ]
+  },
+  "burst.fire": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#ffb529",
+   "frames": [
+    [
+     398,
+     0
+    ],
+    [
+     448,
+     0
+    ],
+    [
+     498,
+     0
+    ],
+    [
+     548,
+     0
+    ]
+   ]
+  },
+  "burst.ice": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#ade7ff",
+   "frames": [
+    [
+     598,
+     0
+    ],
+    [
+     648,
+     0
+    ],
+    [
+     698,
+     0
+    ],
+    [
+     748,
+     0
+    ]
+   ]
+  },
+  "burst.poison": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#a5ef4a",
+   "frames": [
+    [
+     798,
+     0
+    ],
+    [
+     848,
+     0
+    ],
+    [
+     898,
+     0
+    ],
+    [
+     948,
+     0
+    ]
+   ]
+  },
+  "burst.silence": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#ffad9c",
+   "frames": [
+    [
+     0,
+     66
+    ],
+    [
+     50,
+     66
+    ],
+    [
+     100,
+     66
+    ],
+    [
+     150,
+     66
+    ]
+   ]
+  },
+  "burst.sleep": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#dec6ff",
+   "frames": [
+    [
+     200,
+     66
+    ],
+    [
+     250,
+     66
+    ],
+    [
+     300,
+     66
+    ],
+    [
+     350,
+     66
+    ]
+   ]
+  },
+  "burst.stun": {
+   "cell": [
+    24,
+    24
+   ],
+   "color": "#ffff6b",
+   "frames": [
+    [
+     400,
+     66
+    ],
+    [
+     450,
+     66
+    ],
+    [
+     500,
+     66
+    ],
+    [
+     550,
+     66
+    ]
+   ]
+  },
+  "chevron_down.curse": {
+   "cell": [
+    11,
+    9
+   ],
+   "color": "#ce7bff",
+   "frames": [
+    [
+     600,
+     66
+    ],
+    [
+     624,
+     66
+    ]
+   ]
+  },
+  "chevron_up.atk": {
+   "cell": [
+    11,
+    9
+   ],
+   "color": "#ff8c73",
+   "frames": [
+    [
+     648,
+     66
+    ],
+    [
+     672,
+     66
+    ]
+   ]
+  },
+  "chevron_up.def": {
+   "cell": [
+    11,
+    9
+   ],
+   "color": "#94c6ff",
+   "frames": [
+    [
+     696,
+     66
+    ],
+    [
+     720,
+     66
+    ]
+   ]
+  },
+  "chevron_up.evade": {
+   "cell": [
+    11,
+    9
+   ],
+   "color": "#84ffff",
+   "frames": [
+    [
+     744,
+     66
+    ],
+    [
+     768,
+     66
+    ]
+   ]
+  },
+  "chevron_up.speed": {
+   "cell": [
+    11,
+    9
+   ],
+   "color": "#ffff6b",
+   "frames": [
+    [
+     792,
+     66
+    ],
+    [
+     816,
+     66
+    ]
+   ]
+  },
+  "dust.dust": {
+   "cell": [
+    14,
+    12
+   ],
+   "color": "#d6b57b",
+   "frames": [
+    [
+     840,
+     66
+    ],
+    [
+     870,
+     66
+    ],
+    [
+     900,
+     66
+    ]
+   ]
+  },
+  "ellipsis.icon": {
+   "cell": [
+    16,
+    12
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     930,
+     66
+    ]
+   ]
+  },
+  "feather.gold": {
+   "cell": [
+    13,
+    17
+   ],
+   "color": "#ffe784",
+   "frames": [
+    [
+     964,
+     66
+    ],
+    [
+     992,
+     66
+    ]
+   ]
+  },
+  "fireball.fire": {
+   "cell": [
+    18,
+    16
+   ],
+   "color": "#ffb529",
+   "frames": [
+    [
+     0,
+     116
+    ],
+    [
+     38,
+     116
+    ],
+    [
+     76,
+     116
+    ]
+   ]
+  },
+  "flame.fire": {
+   "cell": [
+    12,
+    18
+   ],
+   "color": "#ffb529",
+   "frames": [
+    [
+     114,
+     116
+    ],
+    [
+     140,
+     116
+    ],
+    [
+     166,
+     116
+    ]
+   ]
+  },
+  "glint.holy": {
+   "cell": [
+    11,
+    11
+   ],
+   "color": "#eff7ff",
+   "frames": [
+    [
+     192,
+     116
+    ],
+    [
+     216,
+     116
+    ],
+    [
+     240,
+     116
+    ],
+    [
+     264,
+     116
+    ]
+   ]
+  },
+  "glow.heal": {
+   "cell": [
+    56,
+    68
+   ],
+   "color": "#a5ff84",
+   "frames": [
+    [
+     288,
+     116
+    ],
+    [
+     402,
+     116
+    ],
+    [
+     516,
+     116
+    ]
+   ]
+  },
+  "icon_blind.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     630,
+     116
+    ]
+   ]
+  },
+  "icon_confuse.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     650,
+     116
+    ]
+   ]
+  },
+  "icon_fear.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     670,
+     116
+    ]
+   ]
+  },
+  "icon_frozen.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     690,
+     116
+    ]
+   ]
+  },
+  "icon_poison.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     710,
+     116
+    ]
+   ]
+  },
+  "icon_silence.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     730,
+     116
+    ]
+   ]
+  },
+  "icon_sleep.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     750,
+     116
+    ]
+   ]
+  },
+  "icon_stone.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     770,
+     116
+    ]
+   ]
+  },
+  "icon_stun.icon": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     790,
+     116
+    ]
+   ]
+  },
+  "ink.blind": {
+   "cell": [
+    16,
+    14
+   ],
+   "color": "#7b7ba5",
+   "frames": [
+    [
+     810,
+     116
+    ],
+    [
+     844,
+     116
+    ]
+   ]
+  },
+  "orb.curse": {
+   "cell": [
+    8,
+    8
+   ],
+   "color": "#ce7bff",
+   "frames": [
+    [
+     878,
+     116
+    ],
+    [
+     896,
+     116
+    ]
+   ]
+  },
+  "question.icon": {
+   "cell": [
+    8,
+    11
+   ],
+   "color": "#ffffff",
+   "fixed": true,
+   "frames": [
+    [
+     914,
+     116
+    ]
+   ]
+  },
+  "ring.holy": {
+   "cell": [
+    32,
+    32
+   ],
+   "color": "#eff7ff",
+   "frames": [
+    [
+     0,
+     254
+    ],
+    [
+     66,
+     254
+    ],
+    [
+     132,
+     254
+    ],
+    [
+     198,
+     254
+    ]
+   ]
+  },
+  "shard.ice": {
+   "cell": [
+    10,
+    17
+   ],
+   "color": "#ade7ff",
+   "frames": [
+    [
+     264,
+     254
+    ],
+    [
+     286,
+     254
+    ]
+   ]
+  },
+  "shield.bolt": {
+   "cell": [
+    48,
+    56
+   ],
+   "color": "#ffff8c",
+   "frames": [
+    [
+     308,
+     254
+    ],
+    [
+     406,
+     254
+    ],
+    [
+     504,
+     254
+    ]
+   ]
+  },
+  "shield.fire": {
+   "cell": [
+    48,
+    56
+   ],
+   "color": "#ffb529",
+   "frames": [
+    [
+     602,
+     254
+    ],
+    [
+     700,
+     254
+    ],
+    [
+     798,
+     254
+    ]
+   ]
+  },
+  "shield.ice": {
+   "cell": [
+    48,
+    56
+   ],
+   "color": "#ade7ff",
+   "frames": [
+    [
+     0,
+     368
+    ],
+    [
+     98,
+     368
+    ],
+    [
+     196,
+     368
+    ]
+   ]
+  },
+  "shimmer.fire": {
+   "cell": [
+    12,
+    16
+   ],
+   "color": "#ffb529",
+   "fixed": true,
+   "frames": [
+    [
+     294,
+     368
+    ],
+    [
+     320,
+     368
+    ]
+   ],
+   "tile": "v"
+  },
+  "skull.fear": {
+   "cell": [
+    12,
+    15
+   ],
+   "color": "#ad94d6",
+   "frames": [
+    [
+     346,
+     368
+    ],
+    [
+     372,
+     368
+    ]
+   ]
+  },
+  "spark.bolt": {
+   "cell": [
+    7,
+    7
+   ],
+   "color": "#ffff8c",
+   "frames": [
+    [
+     398,
+     368
+    ],
+    [
+     414,
+     368
+    ]
+   ]
+  },
+  "spark.silence": {
+   "cell": [
+    7,
+    7
+   ],
+   "color": "#ffad9c",
+   "frames": [
+    [
+     430,
+     368
+    ],
+    [
+     446,
+     368
+    ]
+   ]
+  },
+  "spark.stun": {
+   "cell": [
+    7,
+    7
+   ],
+   "color": "#ffff6b",
+   "frames": [
+    [
+     462,
+     368
+    ],
+    [
+     478,
+     368
+    ]
+   ]
+  },
+  "sparkle.bolt": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffff8c",
+   "frames": [
+    [
+     494,
+     368
+    ],
+    [
+     514,
+     368
+    ],
+    [
+     534,
+     368
+    ]
+   ]
+  },
+  "sparkle.ether": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#8cceff",
+   "frames": [
+    [
+     554,
+     368
+    ],
+    [
+     574,
+     368
+    ],
+    [
+     594,
+     368
+    ]
+   ]
+  },
+  "sparkle.fire": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffb529",
+   "frames": [
+    [
+     614,
+     368
+    ],
+    [
+     634,
+     368
+    ],
+    [
+     654,
+     368
+    ]
+   ]
+  },
+  "sparkle.heal": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#a5ff84",
+   "frames": [
+    [
+     674,
+     368
+    ],
+    [
+     694,
+     368
+    ],
+    [
+     714,
+     368
+    ]
+   ]
+  },
+  "sparkle.holy": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#eff7ff",
+   "frames": [
+    [
+     734,
+     368
+    ],
+    [
+     754,
+     368
+    ],
+    [
+     774,
+     368
+    ]
+   ]
+  },
+  "sparkle.ice": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ade7ff",
+   "frames": [
+    [
+     794,
+     368
+    ],
+    [
+     814,
+     368
+    ],
+    [
+     834,
+     368
+    ]
+   ]
+  },
+  "sparkle.poison": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#a5ef4a",
+   "frames": [
+    [
+     854,
+     368
+    ],
+    [
+     874,
+     368
+    ],
+    [
+     894,
+     368
+    ]
+   ]
+  },
+  "sparkle.silence": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffad9c",
+   "frames": [
+    [
+     914,
+     368
+    ],
+    [
+     934,
+     368
+    ],
+    [
+     954,
+     368
+    ]
+   ]
+  },
+  "sparkle.sleep": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#dec6ff",
+   "frames": [
+    [
+     0,
+     482
+    ],
+    [
+     20,
+     482
+    ],
+    [
+     40,
+     482
+    ]
+   ]
+  },
+  "sparkle.stone": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#9494bd",
+   "frames": [
+    [
+     60,
+     482
+    ],
+    [
+     80,
+     482
+    ],
+    [
+     100,
+     482
+    ]
+   ]
+  },
+  "star.stun": {
+   "cell": [
+    9,
+    9
+   ],
+   "color": "#ffff6b",
+   "frames": [
+    [
+     120,
+     482
+    ],
+    [
+     140,
+     482
+    ]
+   ]
+  },
+  "sweat.ether": {
+   "cell": [
+    6,
+    8
+   ],
+   "color": "#8cceff",
+   "frames": [
+    [
+     160,
+     482
+    ]
+   ]
+  },
+  "z.sleep": {
+   "cell": [
+    11,
+    11
+   ],
+   "color": "#dec6ff",
+   "frames": [
+    [
+     174,
+     482
+    ],
+    [
+     198,
+     482
+    ],
+    [
+     222,
+     482
+    ]
+   ]
+  }
+ },
+ "scale": 2
+}
