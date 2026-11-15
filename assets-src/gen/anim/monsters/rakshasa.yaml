@@ -1,0 +1,128 @@
+sprite: rakshasa
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# idle: upright in long robes, the hands held before the chest; attack: a wide low stance, the near claw thrust out at
+# the heroes, the far arm flung back; hurt: thrown back roaring, both hands flung up and out, the far sleeve hanging.
+# The robe skirt is the two legs (the feet show under the hem)
+keyframes:
+  idle:
+    crown: [41, 4]
+    neck: [42, 20]
+    chest: [40, 28]
+    hip: [40, 42]
+    sh_n: [47, 22]
+    el_n: [52, 28]
+    hand_n: [54, 38]
+    sh_f: [33, 20]
+    el_f: [28, 28]
+    hand_f: [37, 31]
+    hip_n: [46, 46]
+    knee_n: [50, 58]
+    foot_n: [52, 69]
+    toe_n: [57, 72]
+    hip_f: [34, 46]
+    knee_f: [30, 58]
+    foot_f: [25, 69]
+    toe_f: [24, 74]
+  attack:
+    crown: [47, 13]
+    neck: [46, 27]
+    chest: [40, 32]
+    hip: [38, 46]
+    sh_n: [47, 30]
+    el_n: [56, 32]
+    hand_n: [60, 40]
+    sh_f: [36, 20]
+    el_f: [28, 18]
+    hand_f: [22, 26]
+    hip_n: [44, 48]
+    knee_n: [50, 56]
+    foot_n: [50, 68]
+    toe_n: [55, 71]
+    hip_f: [32, 46]
+    knee_f: [22, 58]
+    foot_f: [12, 69]
+    toe_f: [10, 73]
+  hurt:
+    crown: [22, 8]
+    neck: [26, 20]
+    chest: [30, 28]
+    hip: [36, 40]
+    sh_n: [36, 24]
+    el_n: [48, 22]
+    hand_n: [54, 12]
+    sh_f: [22, 26]
+    el_f: [12, 32]
+    hand_f: [9, 22]
+    hip_n: [44, 44]
+    knee_n: [48, 56]
+    foot_n: [51, 69]
+    toe_n: [56, 72]
+    hip_f: [32, 44]
+    knee_f: [28, 56]
+    foot_f: [24, 69]
+    toe_f: [24, 74]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: the crouch starts (coil forward), knees give, claw drawn back
+    t: 0.15
+    dy: 2
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [-1, -1], el_n: [-3, -2], hand_n: [-4, -3]}
+  atk_wind2:                   # coil forward (t +0.35, IoU to mid): crouched 4 on bent knees, upper body leaning back, claw drawn back
+    t: 0.35
+    dy: 4
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
+    moves: [crown, neck, chest, hip, hip_n, hip_f]
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-3, -1], el_n: [-6, -4], hand_n: [-9, -6]}
+  atk_mid:
+    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [3, 0], foot_f: [4, 0], toe_f: [4, 0], knee_n: [1, 0], foot_n: [1, 0], toe_n: [1, 0], el_n: [-1, -2], hand_n: [-2, -4]}
+    moves: [crown, neck, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:                  # overshoot: the claw and head drive on past the contact
+    t: 1.10
+    moves: [crown, neck, chest, sh_n, el_n, hand_n]
+    tweaks: {crown: [1, 0], sh_n: [1, 0], hand_n: [4, 1], el_n: [2, 0]}
+  atk_recover:
+    t: 0.35
+    dy: 2
+    moves: [crown, neck, chest, hip]
+  hurt_in1:                    # flinch: head knocked back (translated), both hands jerk up
+    moves: []
+    tweaks: {crown: [-5, 0], neck: [-3, 0], chest: [-1, 0], sh_n: [0, -1], el_n: [1, -3], hand_n: [2, -7]}
+  hurt_in2:
+    moves: [crown, neck, chest]
+  daze:                        # head droops, both hands sink
+    moves: [crown, neck, chest]
+    dy: 1
+    tweaks: {crown: [2, 1], neck: [1, 1], el_f: [0, 2], hand_f: [0, 3]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [2, 1], neck: [1, 1], el_f: [0, 2], hand_f: [0, 3]}
+masks:
+  head:
+    idle: [[32, 2], [51, 2], [51, 16], [49, 22], [45, 24], [37, 24], [33, 19], [32, 16]]
+  uarm_n:
+    idle: [[45, 16], [52, 16], [53, 22], [50, 26], [46, 25]]
+  farm_n:
+    idle: [[51, 21], [58, 21], [59, 41], [49, 41], [49, 27]]
+  uarm_f:
+    idle: [[23, 15], [33, 15], [34, 19], [36, 24], [33, 27], [24, 27]]
+  ft_n:
+    idle: [[45, 68], [61, 68], [61, 78], [45, 78]]
+    attack: [[44, 66], [59, 66], [59, 78], [44, 78]]
+    hurt: [[45, 68], [60, 68], [60, 78], [45, 78]]
+  ft_f:
+    idle: [[18, 68], [31, 68], [31, 78], [18, 78]]
+    attack: [[6, 67], [18, 67], [18, 78], [6, 78]]
+    hurt: [[17, 68], [30, 68], [30, 78], [17, 78]]
+holds: []
+paint: []
