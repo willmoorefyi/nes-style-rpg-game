@@ -1,0 +1,193 @@
+sprite: rhyos
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Rhyos (pass R batch D, quadruped, many heads): a stone-plated beast with a lion head in front (the template's
+# `head`, it leads), two curled-horn ram heads (h2 near / h3 far; the approved sheet draws two rams, a recorded
+# fix-pass nit: three heads were asked for) and a crested lizard head on top (h4). The upper heads are packed on top
+# of each other, so (the hellhound recipe) each is a rigid part on a pixel-less anchor from the withers and moves by
+# translation only (moves: [] with tweaks): turning them tore the stacked horns. They lag the lion in the wind-up.
+# The same four heads are in every key, so nothing appears or vanishes. No breath fx.
+keyframes:
+  idle:
+    hip: [40, 85]
+    back: [55, 75]
+    chest: [72, 78]
+    neck: [82, 82]
+    head: [88, 76]
+    snout: [108, 90]
+    h2: [98, 54]
+    s2: [112, 64]
+    h3: [74, 58]
+    s3: [88, 64]
+    h4: [80, 36]
+    s4: [98, 42]
+    tail0: [30, 80]
+    tail1: [22, 78]
+    tail2: [17, 73]
+    tail_tip: [16, 68]
+    sh_n: [65, 88]
+    el_n: [68, 102]
+    paw_n: [72, 112]
+    ftoe_n: [80, 120]
+    sh_f: [88, 92]
+    el_f: [90, 102]
+    paw_f: [95, 112]
+    ftoe_f: [102, 117]
+    hip_n: [35, 92]
+    knee_n: [28, 100]
+    foot_n: [28, 112]
+    toe_n: [36, 118]
+    hip_f: [50, 92]
+    knee_f: [50, 103]
+    foot_f: [52, 112]
+    toe_f: [57, 117]
+  attack:
+    hip: [35, 85]
+    back: [52, 75]
+    chest: [70, 80]
+    neck: [84, 84]
+    head: [92, 78]
+    snout: [115, 90]
+    h2: [100, 56]
+    s2: [113, 66]
+    h3: [76, 62]
+    s3: [88, 66]
+    h4: [82, 38]
+    s4: [98, 46]
+    tail0: [28, 75]
+    tail1: [25, 68]
+    tail2: [23, 64]
+    tail_tip: [22, 60]
+    sh_n: [62, 90]
+    el_n: [72, 102]
+    paw_n: [82, 112]
+    ftoe_n: [93, 120]
+    sh_f: [90, 95]
+    el_f: [98, 105]
+    paw_f: [105, 112]
+    ftoe_f: [113, 117]
+    hip_n: [30, 92]
+    knee_n: [22, 100]
+    foot_n: [15, 106]
+    toe_n: [24, 111]
+    hip_f: [46, 92]
+    knee_f: [46, 100]
+    foot_f: [48, 106]
+    toe_f: [52, 110]
+  hurt:
+    hip: [38, 88]
+    back: [52, 72]
+    chest: [70, 75]
+    neck: [82, 82]
+    head: [90, 76]
+    snout: [108, 92]
+    h2: [100, 52]
+    s2: [112, 62]
+    h3: [76, 58]
+    s3: [88, 62]
+    h4: [82, 34]
+    s4: [98, 38]
+    tail0: [28, 78]
+    tail1: [20, 74]
+    tail2: [15, 70]
+    tail_tip: [14, 66]
+    sh_n: [65, 88]
+    el_n: [68, 102]
+    paw_n: [74, 112]
+    ftoe_n: [84, 120]
+    sh_f: [90, 92]
+    el_f: [98, 104]
+    paw_f: [104, 112]
+    ftoe_f: [112, 117]
+    hip_n: [35, 92]
+    knee_n: [26, 100]
+    foot_n: [24, 110]
+    toe_n: [30, 116]
+    hip_f: [50, 92]
+    knee_f: [48, 103]
+    foot_f: [50, 112]
+    toe_f: [56, 116]
+parts:
+  a2: {bone: [chest, h2], radius: 0.01}         # pixel-less anchors: the upper heads hang from the withers
+  a3: {bone: [chest, h3], radius: 0.01}
+  a4: {bone: [chest, h4], radius: 0.01}
+  ram_n: {bone: [h2, s2], radius: 6.0}
+  ram_f: {bone: [h3, s3], radius: 6.0}
+  lizard: {bone: [h4, s4], radius: 6.0}
+  body: {width: auto}
+z:
+  idle: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  attack: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  hurt: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, body, lizard, ram_f, ram_n, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+masks:
+  lizard:                       # the crested lizard head on top
+    idle: [[70, 26], [90, 26], [100, 38], [98, 50], [80, 52], [70, 46]]
+    attack: [[70, 28], [92, 28], [101, 42], [98, 53], [80, 54], [70, 48]]
+    hurt: [[70, 24], [90, 24], [100, 34], [98, 48], [80, 50], [70, 44]]
+  ram_f:                       # the far ram head with its curled horn
+    idle: [[66, 50], [90, 50], [92, 68], [80, 72], [66, 68]]
+    attack: [[66, 53], [92, 53], [93, 72], [80, 75], [66, 71]]
+    hurt: [[67, 48], [92, 48], [93, 68], [80, 71], [67, 67]]
+  ram_n:                       # the near ram head with its curled horn
+    idle: [[91, 47], [110, 47], [115, 62], [113, 71], [100, 71], [91, 63]]
+    attack: [[92, 49], [111, 49], [115, 64], [114, 73], [100, 73], [92, 65]]
+    hurt: [[92, 45], [111, 45], [115, 60], [113, 69], [100, 69], [92, 61]]
+  head:                        # the maned lion head in front
+    idle: [[78, 69], [104, 69], [111, 82], [111, 98], [96, 101], [82, 99], [78, 88]]
+    attack: [[80, 71], [108, 71], [117, 82], [117, 99], [104, 103], [86, 101], [80, 89]]
+    hurt: [[78, 70], [104, 70], [111, 84], [111, 101], [96, 103], [82, 101], [78, 88]]
+frames:
+  atk_wind1:                   # anticipation: bulk 1 down and 1 back, the lion draws back 3, the upper heads lag at 1-2
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-2, 0], head: [-3, 0], snout: [-3, 0], h2: [-2, 0], s2: [-2, 0], h3: [-1, 0], s3: [-1, 0], h4: [-1, 0], s4: [-1, 0], hip: [-1, 0], back: [-1, 0], chest: [-1, 0]}
+  atk_wind2:                   # the coil: bulk 2 down and 2 back, the lion pulled 6 back and 1 low, the others 3-4
+    t: 0.0
+    dy: 2
+    moves: []
+    tweaks: {neck: [-4, 1], head: [-6, 1], snout: [-6, 1], h2: [-4, 0], s2: [-4, 0], h3: [-3, 0], s3: [-3, 0], h4: [-3, 0], s4: [-3, 0], hip: [-1, 0], back: [-2, 0], chest: [-2, 0]}
+  atk_mid:                     # the lunge passing: attack pose, every head still 2-3 back
+    t: 0.1
+    moves: []
+    tweaks: {neck: [-2, 0], head: [-3, 0], snout: [-3, 0], h2: [-2, 0], s2: [-2, 0], h3: [-2, 0], s3: [-2, 0], h4: [-2, 0], s4: [-2, 0]}
+  atk_follow:                  # follow-through: the lion bites 2 further, the upper heads 1
+    t: 1.1
+    moves: []
+    tweaks: {neck: [1, 0], head: [2, 1], snout: [2, 1], h2: [1, 0], s2: [1, 0], h3: [1, 0], s3: [1, 0], h4: [1, 0], s4: [1, 0]}
+  atk_recover:                 # settle: the lion still 3 forward and 1 low
+    t: 0.3
+    moves: []
+    tweaks: {neck: [2, 0], head: [3, 1], snout: [3, 1], h2: [1, 0], s2: [1, 0], h3: [1, 0], s3: [1, 0], h4: [1, 0], s4: [1, 0]}
+  hurt_in1:                    # the flinch: every head thrown back and up, the lion 4, the upper heads 3
+    t: 0.3
+    moves: []
+    tweaks: {neck: [-2, -1], head: [-4, -2], snout: [-4, -2], h2: [-3, -2], s2: [-3, -2], h3: [-3, -2], s3: [-3, -2], h4: [-3, -3], s4: [-3, -3], chest: [-1, 0]}
+  hurt_in2:                    # easing out of the hurt key: heads 2 back down toward idle
+    t: 0.3
+    moves: []
+    tweaks: {head: [1, 1], snout: [1, 1], h2: [0, 1], s2: [0, 1], h3: [0, 1], s3: [0, 1], h4: [0, 2], s4: [0, 2]}
+  daze:                        # sleep / stun: every head droops, the lizard and rams 2, the lion 3
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {neck: [0, 1], head: [-1, 1], snout: [-1, 2], h2: [0, 2], s2: [0, 3], h3: [0, 2], s3: [0, 3], h4: [0, 3], s4: [0, 4]}
+  daze_b:                      # the sway's low point: body 1 lower
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [0, 1], head: [-1, 1], snout: [-1, 2], h2: [0, 2], s2: [0, 3], h3: [0, 2], s3: [0, 3], h4: [0, 3], s4: [0, 4]}
+holds: []
+paint:
+  - {frame: hurt_in2, xy: [[56, 104], [57, 104], [57, 105], [58, 105], [57, 106], [58, 106], [57, 107], [58, 107], [54, 108], [55, 108], [57, 108], [56, 109], [57, 109]], rgb: null}   # the approved gap between the far hind leg and the foreleg, reopened
+  - {frame: atk_wind1, xy: [[35, 108]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
+  - {frame: atk_wind2, xy: [[90, 69], [91, 69], [91, 70], [92, 70]], rgb: [6, 4, 10]}   # 4 px pocket between parts filled
+  - {frame: atk_follow, xy: [[84, 71], [85, 71], [86, 71], [87, 71]], rgb: [6, 4, 10]}   # 4 px pocket between parts filled
+  - {frame: atk_recover, xy: [[94, 66], [94, 67], [95, 67], [94, 68], [95, 68], [95, 69]], rgb: [6, 4, 10]}   # 6 px pocket between parts filled
+  - {frame: hurt_in1, xy: [[82, 98], [83, 98], [84, 98], [82, 99], [83, 99], [84, 99], [85, 99], [86, 99]], rgb: [6, 4, 10]}   # 8 px pocket between parts filled
+  - {frame: daze, xy: [[93, 69], [92, 70], [93, 70], [93, 71]], rgb: [6, 4, 10]}   # 4 px pocket between parts filled
+  - {frame: daze_b, xy: [[93, 70], [92, 71], [93, 71], [93, 72]], rgb: [6, 4, 10]}   # 4 px pocket between parts filled
+  - {frame: daze_b, xy: [[35, 108]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
+  - {frame: atk_recover, xy: [[78, 89], [79, 89], [80, 89], [79, 90], [80, 90], [79, 91], [80, 91], [81, 91], [79, 92], [80, 92], [81, 92], [80, 93], [81, 93], [80, 94], [81, 94], [82, 94], [81, 95], [82, 95], [81, 96], [82, 96], [83, 96], [82, 97], [83, 97], [83, 98], [83, 99], [84, 99]], rgb: [6, 4, 10]}   # 26 px pocket between parts filled

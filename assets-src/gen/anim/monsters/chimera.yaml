@@ -1,0 +1,203 @@
+sprite: chimera
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Chimera (pass R batch D, quadruped, three heads): a tawny lion body with the maned lion head in front (the template's
+# `head`, it leads), a grey goat head on the back (h2), a green dragon head above the shoulders (h3), two bat wings
+# (one rigid part on its own root, wr -> wt) and a green snake tail. The approved attack and hurt keys draw a second
+# dragon head (h4, a recorded fix-pass nit, ROSTER_LOG R250): its part exists only in those keys, so it appears at the
+# idle -> attack / hurt key switch and never mid-way. The stacked heads hang from pixel-less anchors on the withers and
+# move by translation only (the rhyos recipe); the tail stays out of every move set. No breath fx.
+keyframes:
+  idle:
+    hip: [45, 85]
+    back: [70, 78]
+    chest: [100, 82]
+    neck: [110, 80]
+    head: [118, 72]
+    snout: [142, 82]
+    h2: [85, 40]
+    s2: [100, 62]
+    h3: [118, 40]
+    s3: [146, 44]
+    wr: [85, 70]
+    wt: [35, 45]
+    tail0: [35, 82]
+    tail1: [25, 88]
+    tail2: [20, 75]
+    tail_tip: [35, 65]
+    sh_n: [92, 90]
+    el_n: [94, 104]
+    paw_n: [98, 114]
+    ftoe_n: [108, 120]
+    sh_f: [118, 92]
+    el_f: [120, 104]
+    paw_f: [126, 114]
+    ftoe_f: [138, 119]
+    hip_n: [48, 92]
+    knee_n: [42, 105]
+    foot_n: [44, 115]
+    toe_n: [52, 120]
+    hip_f: [68, 92]
+    knee_f: [68, 105]
+    foot_f: [72, 112]
+    toe_f: [82, 116]
+  attack:
+    hip: [35, 85]
+    back: [60, 78]
+    chest: [90, 82]
+    neck: [105, 85]
+    head: [112, 84]
+    snout: [138, 100]
+    h2: [78, 48]
+    s2: [95, 65]
+    h3: [108, 40]
+    s3: [138, 48]
+    h4: [125, 66]
+    s4: [162, 74]
+    wr: [75, 70]
+    wt: [15, 35]
+    tail0: [30, 80]
+    tail1: [12, 80]
+    tail2: [10, 68]
+    tail_tip: [22, 62]
+    sh_n: [68, 92]
+    el_n: [78, 104]
+    paw_n: [84, 114]
+    ftoe_n: [88, 120]
+    sh_f: [115, 100]
+    el_f: [125, 108]
+    paw_f: [135, 114]
+    ftoe_f: [148, 118]
+    hip_n: [30, 92]
+    knee_n: [22, 104]
+    foot_n: [16, 114]
+    toe_n: [22, 120]
+    hip_f: [45, 92]
+    knee_f: [42, 102]
+    foot_f: [45, 110]
+    toe_f: [50, 112]
+  hurt:
+    hip: [40, 85]
+    back: [65, 78]
+    chest: [95, 82]
+    neck: [105, 82]
+    head: [112, 76]
+    snout: [140, 88]
+    h2: [82, 42]
+    s2: [98, 62]
+    h3: [110, 38]
+    s3: [135, 46]
+    h4: [118, 64]
+    s4: [152, 72]
+    wr: [75, 70]
+    wt: [10, 38]
+    tail0: [35, 80]
+    tail1: [18, 82]
+    tail2: [12, 72]
+    tail_tip: [22, 64]
+    sh_n: [75, 92]
+    el_n: [78, 104]
+    paw_n: [84, 114]
+    ftoe_n: [92, 120]
+    sh_f: [112, 95]
+    el_f: [116, 106]
+    paw_f: [122, 114]
+    ftoe_f: [135, 119]
+    hip_n: [35, 92]
+    knee_n: [25, 104]
+    foot_n: [24, 114]
+    toe_n: [30, 120]
+    hip_f: [55, 92]
+    knee_f: [52, 104]
+    foot_f: [56, 114]
+    toe_f: [66, 118]
+parts:
+  a2: {bone: [chest, h2], radius: 0.01}         # pixel-less anchors: the upper heads hang from the withers
+  a3: {bone: [chest, h3], radius: 0.01}
+  a4: {bone: [chest, h4], radius: 0.01, in: [attack, hurt]}
+  goat: {bone: [h2, s2], radius: 6.0}
+  dragon: {bone: [h3, s3], radius: 6.0}
+  dragon2: {bone: [h4, s4], radius: 6.0, in: [attack, hurt]}
+  wings: {bone: [wr, wt], radius: 10.0}
+  body: {width: auto}
+  tail: {width: auto, radius: 6.0}
+z:
+  idle: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, wings, body, dragon, goat, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  attack: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, wings, body, dragon, dragon2, goat, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+  hurt: [thigh_f, shin_f, hpaw_f, ufore_f, lfore_f, fpaw_f, tail, wings, body, dragon, dragon2, goat, thigh_n, shin_n, hpaw_n, ufore_n, lfore_n, fpaw_n, neck, head]
+masks:
+  tail:                        # the snake tail's hooked end (its outer edge fell outside the chain)
+    attack: [[0, 56], [30, 56], [32, 70], [42, 74], [42, 86], [20, 88], [0, 88]]
+    hurt: [[0, 56], [32, 56], [34, 70], [44, 74], [44, 90], [20, 92], [0, 92]]
+  wings:                       # both bat wings on the back
+    idle: [[28, 40], [60, 36], [80, 32], [90, 42], [90, 70], [72, 72], [60, 73], [52, 72], [32, 56]]
+    attack: [[12, 32], [40, 32], [66, 36], [80, 44], [80, 72], [64, 74], [44, 62], [24, 52], [12, 40]]
+    hurt: [[5, 33], [40, 32], [66, 38], [78, 46], [78, 74], [62, 74], [42, 64], [20, 52], [5, 40]]
+  goat:                       # the grey goat head with its curled horns
+    idle: [[78, 30], [108, 30], [110, 50], [108, 70], [96, 72], [84, 64], [78, 46]]
+    attack: [[70, 35], [100, 35], [102, 55], [100, 72], [88, 74], [74, 66], [70, 50]]
+    hurt: [[72, 33], [104, 33], [106, 52], [104, 72], [92, 74], [78, 66], [72, 48]]
+  dragon:                       # the green dragon head with its neck
+    idle: [[112, 26], [136, 26], [150, 38], [150, 52], [128, 56], [118, 64], [110, 62], [110, 40]]
+    attack: [[100, 28], [124, 28], [142, 40], [142, 56], [124, 60], [110, 64], [100, 62], [100, 40]]
+    hurt: [[102, 26], [124, 26], [140, 38], [140, 52], [122, 58], [110, 62], [102, 60], [102, 38]]
+  dragon2:                       # the second dragon head of the approved action keys
+    attack: [[112, 58], [140, 56], [166, 64], [166, 80], [150, 90], [130, 88], [114, 76]]
+    hurt: [[108, 58], [134, 56], [158, 64], [158, 80], [144, 84], [124, 82], [110, 74]]
+  head:                        # the lion head with its whole mane (a cut through the mane left an ink line when it moved)
+    idle: [[104, 58], [140, 56], [148, 70], [148, 96], [136, 108], [114, 108], [104, 96], [100, 76]]
+    attack: [[94, 72], [128, 70], [142, 86], [144, 106], [132, 118], [102, 116], [92, 100], [90, 84]]
+    hurt: [[100, 62], [132, 60], [144, 74], [144, 98], [134, 110], [108, 108], [98, 94], [96, 76]]
+frames:
+  # Every head and the neck move as one group (translation only): moving the lion against the goat and dragon behind
+  # it opened ink lines along the mask edges in the mane; the withers stay put in the wind (moving them dragged the near
+  # foreleg over the belly crease).
+  atk_wind1:                   # anticipation: the heads 3 back as one, bulk 1 down, wings start to lift
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-3, 0], head: [-3, 0], snout: [-3, 0], h2: [-3, 0], s2: [-3, 0], h3: [-3, 0], s3: [-3, 0], wr: [-2, 0], wt: [0, -3]}
+  atk_wind2:                   # the coil: the heads pulled 6 back and 1 down as one, bulk 2 down, wings raised
+    t: 0.0
+    dy: 2
+    moves: []
+    tweaks: {neck: [-6, 1], head: [-6, 1], snout: [-6, 1], h2: [-6, 1], s2: [-6, 1], h3: [-6, 1], s3: [-6, 1], wr: [-4, 0], wt: [0, -6]}
+  atk_mid:                     # the lunge passing: the attack pose with the front still 3 back
+    t: 0.0
+    moves: []
+    tweaks: {neck: [-3, 0], head: [-3, 0], snout: [-3, 0], h2: [-3, 0], s2: [-3, 0], h3: [-3, 0], s3: [-3, 0], h4: [-3, 0], s4: [-3, 0]}
+  atk_follow:                  # follow-through: the front 1 further toward the heroes
+    t: 1.1
+    moves: []
+    tweaks: {neck: [1, 0], head: [1, 0], snout: [1, 0], h2: [1, 0], s2: [1, 0], h3: [1, 0], s3: [1, 0], h4: [1, 0], s4: [1, 0], wr: [1, 0], wt: [1, 0]}
+  atk_recover:                 # settle: the front still 3 forward
+    t: 0.3
+    moves: []
+    tweaks: {neck: [3, 0], head: [3, 0], snout: [3, 0], h2: [3, 0], s2: [3, 0], h3: [3, 0], s3: [3, 0], wr: [3, 0], wt: [3, 0]}
+  hurt_in1:                    # the flinch: the heads thrown 5 back and 2 up as one, wings flung up and back
+    t: 0.3
+    moves: []
+    tweaks: {neck: [-5, -2], head: [-5, -2], snout: [-5, -2], h2: [-5, -2], s2: [-5, -2], h3: [-5, -2], s3: [-5, -2], wr: [-2, 0], wt: [-9, -5]}
+  hurt_in2:                    # easing out of the hurt key: the goat and dragons 1 down, the wings fold in (the lion holds: moving it inked its mask edge in the mane)
+    t: 0.3
+    moves: []
+    tweaks: {h2: [1, 1], s2: [1, 1], h3: [1, 1], s3: [1, 1], h4: [1, 1], s4: [1, 1], wr: [1, 1], wt: [7, 4]}
+  daze:                        # sleep / stun: the heads sag 3 as one over the planted body (a body dy, or a head moved
+    t: 0.0                     # against the mane, opened ink wedges along the mane)
+    dy: 0
+    moves: []
+    tweaks: {neck: [0, 3], head: [-2, 1], snout: [-2, 1], h2: [0, 3], s2: [0, 3], h3: [0, 3], s3: [0, 3]}   # the recipe adds [2, 2] to the lion head
+  daze_b:                      # the sway's low point: the heads 4 down
+    t: 0.0
+    dy: 0
+    moves: []
+    tweaks: {neck: [0, 4], head: [-2, 2], snout: [-2, 2], h2: [0, 4], s2: [0, 4], h3: [0, 4], s3: [0, 4]}
+holds: []
+paint:
+  - {frame: atk_mid, xy: [[102, 114], [103, 114], [100, 115], [101, 115], [102, 115], [103, 115], [104, 115]], rgb: [49, 33, 41]}   # 7 px pocket the moved mane closes under the forelegs, leg shadow
+  - {frame: atk_recover, xy: [[102, 73], [100, 74], [101, 74], [102, 74], [100, 75], [101, 75], [102, 75], [100, 76], [101, 76], [102, 76], [100, 77], [101, 77], [102, 77], [101, 78]], rgb: [49, 33, 41]}   # 14 px pocket between parts filled
+  - {frame: atk_recover, xy: [[102, 79], [102, 80], [102, 81], [102, 82], [103, 82], [102, 83], [103, 83], [102, 84], [103, 84], [104, 84], [102, 85], [103, 85], [104, 85], [102, 86], [103, 86], [104, 86], [103, 87], [103, 88]], rgb: [49, 33, 41]}   # 18 px pocket between parts filled
+  - {frame: atk_recover, xy: [[104, 89], [104, 90], [104, 91], [104, 92], [104, 93]], rgb: [6, 4, 10]}   # 5 px pocket between parts filled
+  - {frame: atk_recover, xy: [[105, 94], [105, 95], [104, 96], [105, 96], [106, 96], [106, 97], [107, 97], [107, 98]], rgb: [49, 33, 41]}   # 8 px pocket between parts filled
