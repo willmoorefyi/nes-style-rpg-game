@@ -163,3 +163,16 @@ Branch `feedback`, worktree. `docs/FEEDBACK_PLAN_2026-11-14.md` §3.7 (item 7) a
 - Rigs re-marked for #31 / #32 (`keyframes.attack_raise`, the head / cape / weapon masks); `atk_swing` and `atk_swing2` re-tuned and the old patches re-derived; `monster_anim.py check garland lich` prints only lock lines (the new frames are not locked).
 
 **Images used:** 31 of the 100-image cap (ledger guard: 100 Gemini attempts − `attempts_before` 69; pass F's own cap in `budget.json` `passes`, raised by the user on 2026-11-15 to 5 in total and 3 per sheet: 5 of 5, garland 2, lich 3). The user lifted the 100-image cap the same day; a new 300-image budget applies to later work.
+
+## Pass R, tranche G1 art (2026-11-15)
+
+Branch `roster`, main checkout. `docs/ROSTER_PLAN.md` 4.1 (designs), 6 (budget) and 9 (process), binding decisions D9
+(at most 2 retries per sheet, self-approved on the binary checklist) and D12 (`pass R build` 285). The authoritative
+pass-R log is `docs/ROSTER_LOG.md`; the same rows are mirrored here per the generator brief. Every paid request is
+made with `--paid --max-paid 1` after a dry run.
+
+| # | Sheet (seed) | Images | Result | Decision |
+|---|---|---|---|---|
+| R1 | ashen_queen/boss_idle (1234, key `8e23d14cf040a2850a4db92b`) | 1 | Six arms (3 per side: upper pair raised, one holding the sun disc; middle pair open in blessing; lower pair with the curved bronze blade and the chained censer with smoke), no legs, a charcoal serpent tail with ember-lit underside coiled on the ground, the broken stone altar joined to the coil (one 4-connected piece) on the ground row, a cracked white mask with two burning slits, a gold ray crown. 186 px tall (garland 189, lich 184), lowest row 192, top row 7, x 25-175, no border pixels, binary alpha, 16 colours with the outline ink. Near-frontal with the mask turned slightly right, as the approved garland and lich idles; the same pixel size, outline and top-left light. Nits: the sun disc sits on one upper hand, not between two; the altar column stands mostly behind the coil | **self-approved** (attempt 1 of 3) |
+
+**Images used (pass R):** 1 of 300 (build 1 of 285; ledger guard: 101 Gemini attempts − N0 100).
