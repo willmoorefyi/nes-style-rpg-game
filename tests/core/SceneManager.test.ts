@@ -53,6 +53,18 @@ describe('SceneManager', () => {
     expect(stage.children).toContain(scene.container);
   });
 
+  it('a scene hidden under a push is visible again when switched back to', async () => {
+    const a = createMockScene();
+    const b = createMockScene();
+    manager.register('a', a);
+    manager.register('b', b);
+    await manager.switchTo('a');
+    await manager.push('b');
+    expect(a.container.visible).toBe(false);
+    await manager.switchTo('a');
+    expect(a.container.visible).toBe(true);
+  });
+
   it('throws when switching to unregistered scene', async () => {
     await expect(manager.switchTo('missing')).rejects.toThrow("Scene 'missing' not found");
   });

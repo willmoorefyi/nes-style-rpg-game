@@ -91,6 +91,7 @@ export class SceneManager {
       this.currentScene = next;
       this.currentName = name;
       this.stage.addChild(next.container);
+      next.container.visible = true; // a scene hidden under an earlier push comes back visible
       await next.enter();
     });
   }
