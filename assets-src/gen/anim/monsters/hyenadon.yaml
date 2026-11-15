@@ -1,0 +1,121 @@
+sprite: hyenadon
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [36, 45]
+    back: [52, 32]
+    chest: [68, 40]
+    neck: [76, 34]
+    head: [80, 33]
+    snout: [101, 42]
+    tail0: [30, 44]
+    tail1: [25, 47]
+    tail2: [20, 47]
+    tail_tip: [16, 42]
+    sh_n: [54, 50]
+    el_n: [56, 63]
+    paw_n: [58, 71]
+    ftoe_n: [66, 75]
+    sh_f: [76, 50]
+    el_f: [82, 62]
+    paw_f: [87, 70]
+    ftoe_f: [95, 75]
+    hip_n: [33, 52]
+    knee_n: [23, 63]
+    foot_n: [21, 71]
+    toe_n: [26, 75]
+    hip_f: [44, 52]
+    knee_f: [44, 63]
+    foot_f: [45, 71]
+    toe_f: [51, 75]
+  attack:
+    hip: [30, 50]
+    back: [50, 33]
+    chest: [70, 42]
+    neck: [80, 46]
+    head: [87, 47]
+    snout: [111, 57]
+    tail0: [25, 43]
+    tail1: [20, 40]
+    tail2: [15, 36]
+    tail_tip: [11, 31]
+    sh_n: [64, 55]
+    el_n: [70, 65]
+    paw_n: [76, 72]
+    ftoe_n: [84, 75]
+    sh_f: [78, 54]
+    el_f: [86, 64]
+    paw_f: [99, 72]
+    ftoe_f: [108, 75]
+    hip_n: [28, 55]
+    knee_n: [13, 64]
+    foot_n: [8, 71]
+    toe_n: [12, 75]
+    hip_f: [36, 55]
+    knee_f: [32, 63]
+    foot_f: [33, 70]
+    toe_f: [37, 73]
+  hurt:
+    hip: [32, 47]
+    back: [50, 28]
+    chest: [68, 34]
+    neck: [76, 30]
+    head: [80, 28]
+    snout: [103, 39]
+    tail0: [26, 44]
+    tail1: [20, 48]
+    tail2: [15, 47]
+    tail_tip: [12, 41]
+    sh_n: [52, 50]
+    el_n: [56, 62]
+    paw_n: [57, 70]
+    ftoe_n: [66, 75]
+    sh_f: [68, 50]
+    el_f: [74, 60]
+    paw_f: [80, 69]
+    ftoe_f: [89, 73]
+    hip_n: [28, 52]
+    knee_n: [19, 62]
+    foot_n: [15, 70]
+    toe_n: [21, 75]
+    hip_f: [40, 52]
+    knee_f: [37, 62]
+    foot_f: [38, 70]
+    toe_f: [43, 75]
+frames:
+  atk_wind1:                   # crouch starts: spine tips nose-down, head sinks; the tail rides the body and starts to lift
+    dy: 1
+    moves: [back, chest]
+    tweaks: {neck: [-1, 0], head: [-1, 0], snout: [-1, 0], tail2: [0, -1], tail_tip: [0, -2]}
+  atk_wind2:                   # coil: chest and head low, head pulled back, tail lifting
+    dy: 2
+    moves: [back, chest]
+    tweaks: {neck: [-2, 0], head: [-3, 0], snout: [-3, 0], tail1: [0, -1], tail2: [0, -2], tail_tip: [-1, -5]}
+  atk_mid:                     # the pass: near hind paw part-way back toward idle, far forepaw part-way back; tail kept
+    pins: [foot_n, foot_f, knee_n, paw_f, el_f, paw_n, el_n]
+    moves: [back, chest, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {foot_n: [5, 0], knee_n: [5, 0], paw_f: [-2, 0], el_f: [-2, 0], paw_n: [-5, 0], el_n: [-5, 0]}
+  atk_follow:                  # follow-through: spine and tail overshoot the lunge (head and forelegs keep the bite)
+    t: 1.10
+    moves: [back, chest, tail0, tail1, tail2, tail_tip]
+  hurt_in1:                    # flinch: spine pitched up and back toward the hurt hunch; paws rigid on the ground
+    pins: [paw_n, paw_f, foot_n, foot_f, ftoe_n, ftoe_f, toe_n, toe_f, knee_n, el_n]
+  hurt_in2:                    # back out of the hunch; the far forearm held so the elbow does not flip
+    pins: [paw_n, paw_f, foot_n, foot_f, ftoe_n, ftoe_f, toe_n, toe_f, el_f]
+  daze:                        # head and neck hang, nose dipped, tail lowered; forelegs planted
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 2], tail_tip: [1, 2]}
+  daze_b:                      # the sway's low point: head 1 px lower
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 2], tail_tip: [1, 2]}
+masks:
+  head:                        # the whole ear ring and the open lower jaw are head (not neck, not the far foreleg)
+    attack: [[80, 40], [92, 39], [101, 45], [114, 51], [114, 63], [100, 64], [100, 74], [86, 74], [86, 60], [80, 56]]
+holds: []
+paint:                         # build-time patches
+  - {frame: atk_follow, xy: [[75, 65]], rgb: null}   # reopen the approved gap under the near elbow
