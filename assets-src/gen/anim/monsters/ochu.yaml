@@ -38,3 +38,12 @@ frames:
   daze: {moves: [], dy: 0, tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}
   daze_b: {moves: [], dy: 0, tweaks: {k1_3: [0, 2], k2_3: [0, 2], k3_3: [0, 1], k4_3: [0, 1]}}
 holds: []
+paint:
+  # F3c (ROSTER_FIX_PLAN 12a), FW-P keyframe paint on the approved attack key, 23 px: the stray light/pink pixels on
+  # the outer edge of the k2 tendril tip (10 near-white (231, 214, 222), 3 khaki, 2 rose, 1 mauve) and the light
+  # (173, 165, 123) strip at x 121, y 37-43 on the k1 vine, recoloured to their 4-neighbour mode among the vine ramp
+  # (fixmeasure select). atk_mid and atk_follow follow. The idle tooth highlight (231, 214, 222) at (69, 64-65) stays.
+  - {frame: attack, xy: [[121, 43], [124, 80], [124, 81], [124, 88], [124, 89], [124, 90], [124, 91]], rgb: [33, 41, 33]}
+  - {frame: attack, xy: [[121, 37], [121, 38], [121, 39], [121, 40], [121, 41], [121, 42], [121, 76], [122, 92], [123, 93]], rgb: [41, 66, 41]}
+  - {frame: attack, xy: [[122, 77], [123, 77], [122, 78], [123, 78], [122, 93], [121, 94]], rgb: [57, 99, 57]}
+  - {frame: attack, xy: [[123, 92]], rgb: [107, 165, 66]}
