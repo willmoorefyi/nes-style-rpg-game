@@ -1,0 +1,121 @@
+sprite: gr_imp
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+attack_hand: f
+keyframes:
+  idle:
+    crown: [42, 15]
+    neck: [42, 34]
+    chest: [40, 40]
+    hip: [40, 52]
+    sh_n: [48, 38]
+    el_n: [50, 44]
+    hand_n: [55, 46]
+    sh_f: [31, 38]
+    el_f: [27, 42]
+    hand_f: [22, 46]
+    tip: [22, 15]
+    hip_n: [47, 56]
+    knee_n: [48, 64]
+    foot_n: [48, 72]
+    toe_n: [54, 75]
+    hip_f: [33, 56]
+    knee_f: [29, 64]
+    foot_f: [24, 72]
+    toe_f: [29, 75]
+  attack:
+    crown: [45, 16]
+    neck: [45, 35]
+    chest: [42, 42]
+    hip: [40, 53]
+    sh_n: [50, 33]
+    el_n: [54, 40]
+    hand_n: [61, 37]
+    sh_f: [34, 31]
+    el_f: [27, 30]
+    hand_f: [22, 34]
+    tip: [48, 40]
+    hip_n: [46, 55]
+    knee_n: [48, 63]
+    foot_n: [48, 72]
+    toe_n: [53, 75]
+    hip_f: [32, 56]
+    knee_f: [24, 63]
+    foot_f: [14, 71]
+    toe_f: [19, 75]
+  hurt:
+    crown: [33, 20]
+    neck: [36, 37]
+    chest: [38, 42]
+    hip: [40, 52]
+    sh_n: [44, 37]
+    el_n: [49, 40]
+    hand_n: [53, 37]
+    sh_f: [27, 36]
+    el_f: [19, 40]
+    hand_f: [15, 32]
+    tip: [29, 11]
+    hip_n: [47, 54]
+    knee_n: [55, 59]
+    foot_n: [61, 64]
+    toe_n: [66, 65]
+    hip_f: [37, 55]
+    knee_f: [37, 63]
+    foot_f: [42, 72]
+    toe_f: [46, 75]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: spear starts to tip back, head back 1
+    t: -0.06
+    tweaks: {crown: [-1, 0]}
+  atk_wind2:                   # spear tipped back over the shoulder, torso 2 px down (recipe dy), head back
+    t: -0.13
+    tweaks: {crown: [-2, 0], neck: [-1, 0]}
+  atk_mid:
+    t: 0.35
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {knee_f: [2, 0], foot_f: [3, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0], tip: [1, 0]}
+  atk_follow:
+    t: 1.10
+    moves: [crown, neck]
+  atk_recover:
+    t: 0.25
+    moves: [crown, chest, sh_n, el_n, hand_n]
+  hurt_in1:                    # flinch: head back 3, shield jerked up 3, spear tipped back
+    moves: [chest, hip, sh_n, el_n, hand_n, sh_f, hip_n, knee_n, hip_f, knee_f]   # head translated, not turned
+    tweaks: {hand_f: [1, 0], tip: [3, 0], crown: [-4, 1], neck: [-3, 1], sh_n: [0, -1], el_n: [0, -3], hand_n: [0, -3]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, sh_f, hip_n, knee_n, hip_f, knee_f]
+z:
+  idle: [weapon, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
+masks:
+  weapon:                      # the whole spear with the far fist on it (one rigid piece)
+    idle: [[18, 12], [26, 12], [26, 71], [18, 71]]
+    attack: [[1, 32], [18, 28], [26, 28], [30, 37], [49, 38], [49, 42], [31, 42], [18, 40], [1, 39]]
+    hurt: [[27, 2], [34, 2], [33, 13], [21, 30], [6, 55], [1, 55], [1, 49], [11, 30]]
+  farm_n:                      # the round shield is one rigid part with its forearm
+    idle: [[52, 35], [60, 35], [64, 40], [65, 52], [61, 58], [52, 58], [48, 53], [48, 40]]
+    attack: [[55, 24], [64, 25], [69, 31], [70, 45], [66, 52], [56, 52], [53, 46], [54, 32]]
+    hurt: [[50, 25], [58, 25], [64, 31], [66, 43], [62, 48], [52, 48], [47, 42], [47, 30]]
+  ft_n:
+    idle: [[43, 72], [58, 72], [58, 78], [43, 78]]
+    attack: [[42, 72], [57, 72], [57, 78], [42, 78]]
+    hurt: [[57, 61], [69, 61], [69, 69], [57, 69]]
+  ft_f:
+    idle: [[18, 72], [32, 72], [32, 78], [18, 78]]
+    attack: [[9, 70], [22, 70], [22, 78], [9, 78]]
+    hurt: [[37, 72], [50, 72], [50, 78], [37, 78]]
+holds: []
+paint:                         # 1 px pockets the moves enclose, closed with outline ink
+  - {frame: atk_mid, xy: [[49, 32], [49, 33], [50, 33], [51, 33]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[45, 37], [45, 38], [45, 39], [45, 40], [46, 41]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[30, 33], [29, 34], [30, 34], [30, 35], [30, 36], [30, 37]], rgb: [6, 4, 10]}
+  # the slit the shield arm opens against the belly as it swings back toward idle
+  - {frame: hurt_in2, xy: [[45, 45], [46, 45], [47, 45], [48, 45], [46, 46], [47, 46], [48, 46], [49, 46], [48, 47], [49, 47], [50, 47], [49, 48], [50, 48], [51, 49], [52, 50]], rgb: [6, 4, 10]}
