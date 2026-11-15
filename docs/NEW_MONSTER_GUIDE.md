@@ -154,6 +154,11 @@ Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and e
   the upper body by tweaks (cobra); a big attack arch: `atk_mid: {t: 0.20, moves: [neck, head, snout]}`.
 - **`rooted`** (same module: ochu, neochu). Ground `root`, `maw` and each tentacle root `k<i>_0`; chains `tent<i>`
   (`k<i>_0..k<i>_3`, i = 1..6); `lead: [1, 2]` = the tentacles that whip, the rest sway at half the motion.
+- **`arthropod`** (`rig_arthropod.py`, FW-4: spiders, scorpions, crawler, centipedes). Root `body`; `head`, `fang`;
+  abdomen `abd → abd_end`; tail `tl0..tl3 → sting`; claws `sh_/el_/hand_{n,f}`; legs `coxa<i>_<s> → knee<i>_<s> →
+  tip<i>_<s>` (i = 1..4, one `leg<i>_<s>` chain each, IK). Every tip is a pinned foot. Keep the legs out of `moves`
+  (the body moves, the IK bends the knees), mask the abdomen, ink small leg pockets. A rear-up hurt key does not
+  bridge (scorpion, black_widow): regenerate a ground-level hurt or escalate.
 - **Any body:** `frames.idle_b.tweaks` (≤ 1 px per component) for wing flutter or robe sway.
 
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`

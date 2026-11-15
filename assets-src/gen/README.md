@@ -100,6 +100,7 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 | `blob` (`rig_blob.py`, FW-6) | `base` (ground: ignores dy and tweaks); mark it at the top of the planted band | `base → mid → top` = `body` (`kind: shear`); pods/arms `mid → sh_<s> → el_<s> → hand_<s>` (`uarm_<s>`, `farm_<s>`, s = n, f, drawn only when marked) | squash per frame (below); `idle_b` = one interior row removed (sag); `head` = `top` |
 | `serpent` (`rig_serpent.py`, FW-2) | `c_f` (root), `c_n` (coil ground contacts = feet, judged per foot), `body0`, `t1` (all ground) | `coil` rigid `c_f → c_n`; `body` chain `body0 → body1 → neck`; `head` rigid `head → snout` (+ `jaw`); `tail` chain `t1 → t2 → t3 → tail_tip` | moves = `body1`, neck/head/snout/jaw, tail; `idle_b` above `neck`; `head` = head + snout. A tail raised only in the attack key: mark it only there with `parts: {tail: {in: [attack]}}` |
 | `rooted` (`rig_serpent.py`, FW-2 preset) | `root` (feet), `maw`, every `k<i>_0` (ground: the mass never turns) | `mass` rigid `root → maw`; `tent<i>` chains `k<i>_0 → k<i>_1 → k<i>_2 → k<i>_3`, i = 1..6, each on its own root | rig key `lead: [i, ...]`: the lead tentacles move with the recipe's t, the others with half (sway); daze droops via the shared dy |
+| `arthropod` (`rig_arthropod.py`, FW-4) | `body` (root); every `tip<i>_<s>` is a foot (pinned in every recipe, judged per foot) | `thorax` rigid `body → head`; `fangs` `head → fang`; `abdomen` rigid `abd → abd_end` (from `body`); `tail` chain `abd_end → tl0 → tl1 → tl2 → tl3 → sting`; claws `sh_/el_/hand_{n,f}` from `body`; legs `coxa<i>_<s> → knee<i>_<s> → tip<i>_<s>` = `leg<i>_<s>` chain (i = 1..4 front to back), each an IK limb | moves = body, head, fang, abdomen, tail, claws (knees follow by IK); `head` = head; `idle_b` above `body`. Mark only the legs the art shows |
 
 **`squash` frame op (FW-6, `anim_squash.py`).** `frames.<f>.squash: {sx, sy}` (any body; 0.80-1.25 each, sx·sy
 0.85-1.15), `auto`, or `null` (turns a template squash off). Whole interior rows and columns are removed or duplicated
@@ -118,6 +119,16 @@ daze / daze_b sy 0.94 / 0.92. Prototypes: `green_slime` (wind t 0.10/0.25 coil f
 (`atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}`, wind2 about twice
 that with `t: -0.25`); bending only the neck tears it. When the attack arch turns more than the 25° chain cap at 0.35,
 use `atk_mid: {t: 0.20, moves: [neck, head, snout]}` and lower the head by tweak if it rises out of the lerp height.
+
+**Arthropod recipe (tarantula, scorpion, black_widow prototypes).** Never interpolate legs (their keys are 40-60° apart):
+`moves: [body, head, fang, abd, abd_end]` (+ tail and claw joints for a scorpion) in mid / follow / recover / hurt, so
+the body moves, the tips hold and the IK bends the knees. Mask the abdomen per keyframe (legs drawn over it ride it).
+A leg whose tip steps between the keys (tarantula leg 2): add its knee and tip to `atk_mid.moves` and leave it out of
+`pins`. Pins only on tips grounded in the attack key when the attack lifts the body (`atk_mid.pins: [tip2_f]`).
+Small pockets that close between bent legs (4-7 px `new hole`) are inked shut with `paint`; a pincer gap is not
+(keep the claw out of `moves` instead). daze: `moves: [head]`, `dy: 0 / 1` so a raised tail keeps its height. Open
+issue: a rear-up hurt key (scorpion, black_widow: idle-hurt IoU 0.28-0.29) can't bridge `hurt_in1 -> hurt_in2`
+continuity; see the FW-4 hand-off.
 
 ## Monster animation (docs/ENEMY_ANIM_PLAN.md, docs/ENEMY_ANIM_ISSUES.md)
 

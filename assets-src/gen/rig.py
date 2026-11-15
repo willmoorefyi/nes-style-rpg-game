@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from gen import rig_ik as RI
+from gen.rig_arthropod import ARTHROPOD
 from gen.rig_blob import BLOB
 from gen.rig_serpent import SERPENTS, rooted_half
 from gen.rig_floating import FLOATERS
@@ -40,7 +41,8 @@ FEET = ("foot_n", "foot_f")
 # per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
 BODY = {"biped": {"legs": LEGS, "feet": FEET, "limbs": tuple((f"hip_{s}", f"knee_{s}", f"foot_{s}") for s in "nf"),
                   "moves": None, "planted": "foot_f", "breath": "hip", "head": ("crown", "neck")}}
-for _name, _t in {**BEASTS, "naga": NAGA, **FLOATERS, "blob": BLOB, **SERPENTS}.items():   # T5a, FW-3, FW-1, FW-6, FW-2
+for _name, _t in {**BEASTS, "naga": NAGA, **FLOATERS, "blob": BLOB, **SERPENTS,
+                     "arthropod": ARTHROPOD}.items():   # T5a, FW-3, FW-1, FW-6, FW-2, FW-4
     TEMPLATES[_name] = (_t["parent"], _t["parts"], _t["z"])
     BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath", "head", "arms", "extra",
                                       "ground", "floating", "recipes", "idle_b", "rooted") if k in _t}

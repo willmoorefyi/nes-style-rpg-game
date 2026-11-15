@@ -411,6 +411,9 @@ def test_monster_anim() -> None:
     print("monster serpent template and rooted preset (FW-2: coil contacts, attack-only tail, lead tentacles)")
     from gen import selftest_serpent as SSe
     SSe.run_serpent(check)
+    print("monster arthropod template (FW-4: leg chains, every tip pinned, IK knees, tail and claws)")
+    from gen import selftest_arthropod as SAr
+    SAr.run_arthropod(check)
     print("monster framework fixes (per-foot feet, IoU bound, pinned reach, cloth chains)")
     from gen import selftest_fixes as SF
     SF.run_fixes(check)
