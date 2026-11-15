@@ -16,7 +16,8 @@ import { BOSS_FRAMES, type MonsterFrame } from '../../../src/scenes/battle/enemy
 import { PARTY_FEET_Y, partySpritePosition } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { BATTLE_MESSAGE_HEIGHT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { ENEMY_REACH_OVERLAP } from '../../../src/scenes/battle/enemyReach.js';
-import { readRgbaPng, opaqueBounds } from '../../helpers/pngAlpha.js';
+import { opaqueBounds } from '../../helpers/pngAlpha.js';
+import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
 
@@ -25,7 +26,6 @@ const meta = JSON.parse(readFileSync(join(root, 'assets/sprites/monsters-ai.json
   scale: number; texScale?: number;
   sheets: Record<string, { cell: [number, number]; footRow: number; floating: boolean; lungePx?: number; frames: Record<string, [number, number]> }>;
 };
-const png = readRgbaPng(join(root, 'assets/sprites/monsters-ai.png'));
 const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
 const scenarios = parse(readFileSync(join(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as { id: string; enemies?: string[] }[];
 const byId = (id: string): EnemyData => enemyData.find((e) => e.id === id)!;
@@ -35,7 +35,7 @@ const opaque = (sprite: string): [number, number, number, number] => {
   const s = meta.sheets[sprite];
   const ts = meta.texScale ?? meta.scale;
   const [x, y] = s.frames.idle;
-  const b = opaqueBounds(png, x * ts, y * ts, s.cell[0] * ts, s.cell[1] * ts)!;
+  const b = opaqueBounds(monsterSheetPng(sprite), x * ts, y * ts, s.cell[0] * ts, s.cell[1] * ts)!;
   return b.map((v) => v / ts) as [number, number, number, number];
 };
 

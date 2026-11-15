@@ -501,6 +501,7 @@ export class BattleScene implements Scene {
   onResume(): void {}
 
   exit(): void {
+    this.display?.enemyView?.release();               // the atlas may free this battle's monster pages (FW-8)
     enemyAnimPreview.dispose(this.display);
     this.devClock?.dispose();
     this.devClock = null;

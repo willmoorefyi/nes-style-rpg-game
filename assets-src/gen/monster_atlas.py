@@ -1,12 +1,14 @@
 """monsters_ai build stage (docs/ENEMY_ANIM_PLAN.md 6.1): approved keyframes + generated in-betweens + palette-swap
-variants -> a native-size (texScale 1) shelf-packed atlas assets/sprites/monsters-ai.png and its JSON.
+variants -> native-size (texScale 1) shelf-packed atlas pages assets/sprites/monsters-ai-<n>.png (each <= MAX_PAGE,
+2048 px a side; page groups in gen/monster_pages.py, docs/ROSTER_PLAN.md 8) and one JSON index, monsters-ai.json.
 
-JSON: {scale: 2 (screen px per art px), texScale: 1 (PNG px per art px), sheets: {id: {cell, footRow, floating,
+JSON: {scale: 2 (screen px per art px), texScale: 1 (PNG px per art px), pages: [{file, w, h}] (file names relative
+to the JSON), sheets: {id: {cell, footRow, floating,
 frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAMES for a sheet with attack_raise; held
 or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
 hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
 opaque row), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
-attack_raise only), sequence_version, page}}}.
+attack_raise only), sequence_version, page (index into pages)}}}.
 """
 from __future__ import annotations
 
@@ -19,25 +21,11 @@ from PIL import Image
 
 from gen import anim_checks as C
 from gen import monster_anim as MA
+from gen import monster_pages as MP
 
 SCALE = 2
 TEX_SCALE = 1
-SHELF_W = 2048
 SEQUENCE_VERSION = 1
-
-
-def shelf_pack(sizes: list[tuple[int, int]], cap: int = SHELF_W) -> tuple[list[tuple[int, int]], int, int]:
-    """Deterministic shelf packer in the given order: left to right, a new shelf when the row is full."""
-    x = y = shelf_h = width = 0
-    pos = []
-    for w, h in sizes:
-        if x and x + w > cap:
-            y, x, shelf_h = y + shelf_h, 0, 0
-        pos.append((x, y))
-        x += w
-        shelf_h = max(shelf_h, h)
-        width = max(width, x)
-    return pos, width, y + shelf_h
 
 
 def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict[str, Image.Image], list[str], bool]:
@@ -98,38 +86,56 @@ def build(out: Path) -> dict:
             if bad:
                 raise SystemExit("monsters_ai: variant checks failed\n  " + "\n  ".join(bad))
             sprites[v["id"]] = (meta, vf, holds, anim, L)
-    order = sorted(sprites)
+    groups = MP.group_order(sorted(sprites))
+    order = [sid for _, ids in groups for sid in ids]
     names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
-    items = [(sid, n) for sid in order for n in names_of[sid] if n in sprites[sid][1]]
-    pos, w, h = shelf_pack([sprites[s][1][n].size for s, n in items])
-    page = C.page_size(w, h)
-    if page:
-        raise SystemExit(f"monsters_ai: {page[0]}")
-    atlas = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}
+    sizes, placed = MP.pack_pages([[(sid, [sprites[sid][1][n].size for n in items[sid]]) for sid in ids]
+                                   for _, ids in groups])
+    for w, h in sizes:
+        page = C.page_size(w, h)
+        if page:
+            raise SystemExit(f"monsters_ai: {page[0]}")
+    atlases = [Image.new("RGBA", (w, h), (0, 0, 0, 0)) for w, h in sizes]
     rects: dict[str, dict[str, list[int]]] = {s: {} for s in order}
-    for (sid, n), (x, y) in zip(items, pos):
-        atlas.paste(sprites[sid][1][n], (x, y))
-        rects[sid][n] = [x, y]
-    arr = np.asarray(atlas)
-    sheets = {}
     for sid in order:
+        pg, pos = placed[sid]
+        for n, (x, y) in zip(items[sid], pos):
+            atlases[pg].paste(sprites[sid][1][n], (x, y))
+            rects[sid][n] = [x, y]
+    arrs = [np.asarray(a) for a in atlases]
+    sheets = {}
+    for sid in sorted(order):                        # JSON key order stays sorted by id (as at R0)
         meta, frames, holds, anim, L = sprites[sid]
         names = names_of[sid]
+        pg = placed[sid][0]
         fr = {n: rects[sid][MA.resolve(n, rects[sid])] for n in names}
         cw, ch = frames["idle"].size
         for n in names:
             img = frames[MA.resolve(n, frames)]
-            bad = C.atlas_exact(arr, (fr[n][0], fr[n][1], cw, ch), np.asarray(img))
+            bad = C.atlas_exact(arrs[pg], (fr[n][0], fr[n][1], cw, ch), np.asarray(img))
             if bad:
                 raise SystemExit(f"monsters_ai: {sid} {n}: {bad[0]}")
         sheets[sid] = {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
                        "frames": fr, "anim": anim, "holds": holds, "lungePx": L, "hasRaise": "attack_raise" in frames,
                        **anchors(frames["idle"]), **(tip(frames["attack_raise"]) if "attack_raise" in frames else {}),
-                       "sequence_version": SEQUENCE_VERSION, "page": 0}
+                       "sequence_version": SEQUENCE_VERSION, "page": pg}
     out.mkdir(parents=True, exist_ok=True)
-    atlas.save(out / "monsters-ai.png")
-    meta_json = {"scale": SCALE, "texScale": TEX_SCALE, "sheets": sheets}
+    files = [page_file(i) for i in range(len(atlases))]
+    for stale in sorted(out.glob("monsters-ai*.png")):   # the R0 single page and pages past the last one
+        if stale.name not in files:
+            stale.unlink()
+    for a, f in zip(atlases, files):
+        a.save(out / f)
+    meta_json = {"scale": SCALE, "texScale": TEX_SCALE,
+                 "pages": [{"file": f, "w": w, "h": h} for f, (w, h) in zip(files, sizes)], "sheets": sheets}
     (out / "monsters-ai.json").write_text(json.dumps(meta_json, indent=2) + "\n")
-    print(f"monsters_ai: {len(sheets)} sheets, atlas {w}x{h} native (texScale {TEX_SCALE}); "
-          f"animated {[s for s in order if sheets[s]['anim']]}")
+    print(f"monsters_ai: {len(sheets)} sheets on {len(files)} page(s) "
+          f"{', '.join(f'{w}x{h}' for w, h in sizes)} native (texScale {TEX_SCALE}, max {C.MAX_PAGE}); "
+          f"animated {[s for s in sorted(order) if sheets[s]['anim']]}")
     return meta_json
+
+
+def page_file(i: int) -> str:
+    """The PNG of atlas page i, next to monsters-ai.json."""
+    return f"monsters-ai-{i}.png"

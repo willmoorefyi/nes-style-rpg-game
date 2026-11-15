@@ -27,7 +27,8 @@ const battleAtlas = JSON.parse(readFileSync(join(assets, 'sprites/battle-charact
 const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number;
   texScale?: number;
-  sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>;
+  pages: { file: string; w: number; h: number }[];
+  sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>; page: number;
     anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number] }>;
 };
 /** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
@@ -156,14 +157,24 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(monsterAtlas.sheets[sprite]).toBeDefined();
     });
 
-    it('every entry has every MONSTER_FRAMES key (bosses with cast: every BOSS_FRAMES key) inside the image, feet inside the cell', () => {
-      const png = readFileSync(join(assets, 'sprites/monsters-ai.png'));
-      const w = png.readUInt32BE(16);
-      const h = png.readUInt32BE(20);
+    it('every atlas page is a PNG of its listed size, at most 2048x2048 native (FW-8)', () => {
       const ts = monsterAtlas.texScale ?? monsterAtlas.scale;     // PNG px per art px (1 = native atlas)
-      expect(w, 'page width (native px)').toBeLessThanOrEqual(4096 * ts);
-      expect(h, 'page height (native px)').toBeLessThanOrEqual(4096 * ts);
+      expect(monsterAtlas.pages.length).toBeGreaterThan(0);
+      monsterAtlas.pages.forEach((p, i) => {
+        expect(p.file, `page ${i}`).toBe(`monsters-ai-${i}.png`);
+        const png = readFileSync(join(assets, 'sprites', p.file));
+        expect([png.readUInt32BE(16), png.readUInt32BE(20)], p.file).toEqual([p.w * ts, p.h * ts]);
+        expect(Math.max(p.w, p.h), `${p.file} (native px)`).toBeLessThanOrEqual(2048);
+      });
+      expect(existsSync(join(assets, 'sprites/monsters-ai.png')), 'the R0 single-page atlas is gone').toBe(false);
+    });
+
+    it('every entry has every MONSTER_FRAMES key (bosses with cast: every BOSS_FRAMES key) inside its page, feet inside the cell', () => {
+      const ts = monsterAtlas.texScale ?? monsterAtlas.scale;     // PNG px per art px (1 = native atlas)
       for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
+        const page = monsterAtlas.pages[e.page];
+        expect(page, `${id} page ${e.page}`).toBeDefined();
+        const [w, h] = [page.w * ts, page.h * ts];
         // every sheet has daze / daze_b (pass F 5a); the heavy raise frames only with hasRaise (pass F 7)
         const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n));
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());

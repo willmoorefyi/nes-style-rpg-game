@@ -14,7 +14,6 @@ import { Menu } from '../../ui/Menu.js';
 import { HelpWindow } from '../../ui/HelpWindow.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { CHAR_WIDTH, FONT_SIZE } from '../../core/LayoutConstants.js';
-import { battleArt } from '../../rendering/BattleArt.js';
 import type { MonsterArtSource } from '../battle/AiEnemyView.js';
 import { createBattleDevClock, type BattleDevClock } from '../battle/battleDevClock.js';
 import { resolveMapPath } from '../../systems/MapLoader.js';
@@ -24,6 +23,8 @@ import { buildEntries, seenFlag, spellIdsOf, statLines, titleCount, type Bestiar
 import { pageCount, pageLines } from './bestiaryInfo.js';
 import { backgroundFor, habitatsOf, type Habitat } from './bestiaryHabitats.js';
 import { takeBestiaryStartEntry } from './bestiaryLink.js';
+import { neighbourSprites, showWhenReady } from './bestiaryPages.js';
+import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
 import type { EnemyData, MapData } from '../../types/index.js';
 
 export const BESTIARY_PATH = 'assets/data/bestiary.yaml';
@@ -198,7 +199,9 @@ export class BestiaryScene implements Scene {
     this.previewIndex = i;
     const data = ui.book.data;
     const bg = entry.seen ? backgroundFor(entry.id, entry.habitats, data) : data.backgrounds.default;
-    ui.preview.show({ enemy: entry.enemy, seen: entry.seen, hasSpells: spellIdsOf(entry.enemy).length > 0 }, bg);
+    const show = (): void => ui.preview.show({ enemy: entry.enemy, seen: entry.seen, hasSpells: spellIdsOf(entry.enemy).length > 0 }, bg);
+    showWhenReady(this.deps.art ?? battleArt, entry.seen ? monsterSpriteKey(entry.enemy) : null, neighbourSprites(ui.entries, i),
+      show, () => this.ui === ui && this.previewIndex === i);
   }
 
   private close(): void {

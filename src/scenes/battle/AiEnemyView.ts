@@ -25,6 +25,12 @@ const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, bo
 /** Where monster frames come from (the shared atlas; tests inject their own). */
 export interface MonsterArtSource {
   getMonsterFrames(sprite: string): MonsterFrames | null;
+  /** Keep the sprite's atlas page loaded while its frames are shown (paged atlas, MonsterPages); returns the release. */
+  hold?(sprite: string): () => void;
+  /** Load the atlas pages of `sprites` (never rejects); absent: the source is always ready. */
+  ensure?(sprites: string[]): Promise<void>;
+  /** The sprite's page is loaded; absent: always ready. */
+  isReady?(sprite: string): boolean;
 }
 
 /**
@@ -44,6 +50,8 @@ export class AiEnemyView {
   private homeSlots: number[] | null = null;
   /** The sprites of the last update, so a pose cue can name the sprite it belongs to. */
   private sprites: Container[] = [];
+  /** Releases of the atlas pages this view's frames come from (dropped on rebuild and `release`). */
+  private holds: (() => void)[] = [];
   /** An attack cue with its enemy's sprite (the battle hands it to ActionFx.playCue), and for `hold` the raised
    *  weapon's tip (fractions of the sprite) when the atlas has it. */
   onCue: ((i: number, cue: PoseCue, sprite: Container, at?: FxCuePoint) => void) | null = null;
@@ -95,6 +103,9 @@ export class AiEnemyView {
   /** Build one sprite (or placeholder box) per enemy, in enemy order. */
   build(): Container[] {
     this.frames = this.enemies.map((e) => this.art.getMonsterFrames(monsterSpriteKey(e)));
+    const holds = this.enemies.flatMap((e, i) => (this.frames[i] && this.art.hold ? [this.art.hold(monsterSpriteKey(e))] : []));
+    this.release();
+    this.holds = holds;
     const boxes = computeEnemyLayoutAi(this.enemies.map((e, i) => {
       const size = e.size ?? 'small';
       const f = this.frames[i];
@@ -108,6 +119,12 @@ export class AiEnemyView {
         heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[e.size ?? 'small'], ...(f ? { lungePx: f.lungePx } : {}) });
       return this.buildOne(e, f, boxes[i]);
     });
+  }
+
+  /** Let the atlas free this view's pages (the battle's exit; the bestiary's entry change). */
+  release(): void {
+    for (const r of this.holds) r();
+    this.holds = [];
   }
 
   /** The sprite has a boss cast keyframe (else a spell plays its attack frames, D4). */

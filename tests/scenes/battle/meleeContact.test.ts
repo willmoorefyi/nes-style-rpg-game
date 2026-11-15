@@ -13,6 +13,7 @@ import { PARTY_X, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayM
 import { OutlinedText } from '../../../src/ui/NESFont.js';
 import { readFileSync } from 'node:fs';
 import { readRgbaPng, opaqueBounds } from '../../helpers/pngAlpha.js';
+import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 import { floatsIn } from '../../helpers/battleLayers.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
@@ -202,8 +203,8 @@ interface HeroAtlas { scale: number; cell: [number, number]; poses: string[]; sh
 
 function monsterRightInset(ids: string[]): number {
   const meta = JSON.parse(readFileSync('assets/sprites/monsters-ai.json', 'utf8')) as MonsterAtlas;
-  const img = readRgbaPng('assets/sprites/monsters-ai.png');
   return Math.max(...ids.map((id) => {
+    const img = monsterSheetPng(id);              // the sheet's atlas page (FW-8)
     const sheet = meta.sheets[id];
     const [fx, fy] = sheet.frames.idle;
     const [w, h] = sheet.cell.map(v => v * meta.scale);

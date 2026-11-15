@@ -413,6 +413,9 @@ def test_monster_anim() -> None:
     SRo.run_roster(check)
     print("roster pass R prompt fields (FW-9: idle_negative, body, base; every approved key unchanged)")
     SRo.run_prompts(check)
+    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line)")
+    from gen import selftest_pages as SP
+    SP.run_pages(check)
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

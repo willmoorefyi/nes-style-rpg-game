@@ -83,7 +83,8 @@ def run_checks(check: Callable[[bool, str], None]) -> None:
     atlas = np.zeros((100, 200, 4), np.uint8); atlas[5:85, 7:87] = src
     red("11a atlas exactness (crop off by one)", C.atlas_exact(atlas, (7, 5, 80, 80), src),
         C.atlas_exact(atlas, (8, 5, 80, 80), src))
-    red("11b atlas page <= 4096", C.page_size(4096, 2000), C.page_size(4097, 100))
+    red("11b atlas page <= 2048", C.page_size(2048, 2000), C.page_size(2049, 100))
+    check(bool(C.page_size(100, 2049)), "11b atlas page: a page taller than 2048 fails")
     lock = {"atk_mid": C.frame_hash(src)}
     red("12 lock hash", C.lock_match({"atk_mid": src}, lock), C.lock_match({"atk_mid": figure(dx=1)}, lock))
     red("13 D8 prop carry (prop missing from hurt_in2)", C.prop_carry(50, 20), C.prop_carry(50, 0))
@@ -114,11 +115,14 @@ def run_build_locks(check: Callable[[bool, str], None]) -> None:
                     "from pathlib import Path; MA.build(Path(%r))") % (str(HERE.parent), str(out))
             r = subprocess.run([sys.executable, "-I", "-c", code], env=env, capture_output=True, text=True)
             check(r.returncode == 0, f"monsters_ai build (PYTHONHASHSEED={seed}) exits 0 {r.stderr.strip()[-300:]}")
-            outs.append({n: (out / n).read_bytes() for n in ("monsters-ai.png", "monsters-ai.json") if (out / n).exists()})
-        check(len(outs[0]) == 2 and outs[0] == outs[1], "monsters_ai PNG and JSON identical under PYTHONHASHSEED 0 and 1")
-        if outs[0]:
-            meta = json.loads(outs[0]["monsters-ai.json"])
+            outs.append({p.name: p.read_bytes() for p in sorted(out.glob("monsters-ai*")) if p.is_file()})
+        meta = json.loads(outs[0]["monsters-ai.json"]) if "monsters-ai.json" in outs[0] else {}
+        pages = [p["file"] for p in meta.get("pages", [])]
+        check(bool(pages) and set(outs[0]) == {"monsters-ai.json", *pages} and outs[0] == outs[1],
+              f"monsters_ai pages {pages} and JSON identical under PYTHONHASHSEED 0 and 1")
+        if meta:
             check(meta.get("texScale") == 1 and meta.get("scale") == 2, "atlas is native size (texScale 1, scale 2)")
+            check(all(0 <= s.get("page", -1) < len(pages) for s in meta["sheets"].values()), "every sheet names a page")
     check(_approved_hashes() == approved, "style lock: approved monster_*.png / boss_*.png unchanged by a build")
     check(_party_hashes() == party, "party atlases unchanged by a monsters_ai build")
 
