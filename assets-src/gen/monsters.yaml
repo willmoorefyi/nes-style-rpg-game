@@ -2026,13 +2026,14 @@
   attack: >-
     a charging strike toward the heroes: the forelegs lifted only a little and kicking forward, the head thrust
     forward and down with the teeth bared, the muzzle just above and in front of its front hooves, the hind hooves on
-    the ground, no rearing up, the whole horse well inside the middle cell
+    the ground, no rearing up, the flame tail curled up close behind the hips (not streaming back), the whole horse
+    from tail tip to muzzle well inside the middle cell
   hurt: >-
     knocked back, all four hooves on the ground (no rearing up), the head tossed up a little, one foreleg buckling,
     the blue flame mane flattened, no taller than its idle height
   face: the horse's head with glowing cyan eyes is readable
   extra_negative: a rider, a saddle, a bridle, white patches, a horn, wings, orange fire, purple fire, violet, pink, magenta, rearing up
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R222): the violet flames keyed out, a rear-up hurt
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R222): the violet flames keyed out, a rear-up hurt; 1235 (R223): the attack's streaming tail sliced at the raw cell line
 - id: sahagin_prince
   # "Sahagin Prince" (093): a tall regal fish-man (distinct from the sahagin and the chief)
   size: small
