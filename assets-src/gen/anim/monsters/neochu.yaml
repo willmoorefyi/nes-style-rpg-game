@@ -14,28 +14,65 @@ keyframes:
            k1_0: [70, 62], k1_1: [82, 60], k1_2: [90, 65], k1_3: [86, 72],
            k2_0: [72, 85], k2_1: [88, 82], k2_2: [94, 90], k2_3: [90, 98],
            k3_0: [52, 62], k3_1: [40, 55], k3_2: [32, 60], k3_3: [36, 70],
-           k4_0: [50, 85], k4_1: [38, 85], k4_2: [36, 95], k4_3: [44, 100]}
+           k4_0: [50, 85], k4_1: [38, 85], k4_2: [36, 95], k4_3: [44, 100],
+           hd_a: [62, 56], hd_b: [62, 40]}
   attack: {root: [60, 112], maw: [60, 70],
            k1_0: [70, 60], k1_1: [85, 58], k1_2: [95, 45], k1_3: [100, 42],
            k2_0: [72, 75], k2_1: [92, 76], k2_2: [106, 72], k2_3: [108, 66],
            k3_0: [50, 55], k3_1: [35, 48], k3_2: [22, 55], k3_3: [25, 68],
-           k4_0: [48, 72], k4_1: [36, 75], k4_2: [32, 88], k4_3: [40, 95]}
+           k4_0: [48, 72], k4_1: [36, 75], k4_2: [32, 88], k4_3: [40, 95],
+           hd_a: [60, 57], hd_b: [62, 40]}
   hurt:   {root: [62, 112], maw: [64, 72],
            k1_0: [72, 62], k1_1: [84, 62], k1_2: [92, 68], k1_3: [88, 76],
            k2_0: [74, 85], k2_1: [90, 84], k2_2: [96, 92], k2_3: [90, 100],
            k3_0: [52, 62], k3_1: [40, 58], k3_2: [34, 64], k3_3: [38, 72],
-           k4_0: [50, 85], k4_1: [38, 88], k4_2: [38, 98], k4_3: [46, 102]}
+           k4_0: [50, 85], k4_1: [38, 88], k4_2: [38, 98], k4_3: [46, 102],
+           hd_a: [68, 60], hd_b: [68, 45]}
+parts:
+  heads:                         # both maws on their own root (pixel-rigid): they pull back, strike, flinch and droop
+    bone: [hd_a, hd_b]
+    radius: 0.01
+z:
+  idle: [tent6, tent5, tent4, tent3, tent2, tent1, mass, heads]
+  attack: [tent6, tent5, tent4, tent3, tent2, tent1, mass, heads]
+  hurt: [tent6, tent5, tent4, tent3, tent2, tent1, mass, heads]
+masks:
+  heads:
+    idle: [[46, 29], [70, 28], [80, 32], [91, 37], [92, 57], [72, 58], [50, 56], [45, 45]]
+    attack: [[39, 36], [58, 33], [63, 29], [70, 23], [86, 25], [87, 40], [82, 52], [66, 58], [41, 59], [38, 45]]
+    hurt: [[44, 32], [95, 32], [96, 59], [70, 62], [45, 61]]
 frames:
   idle_b: {tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}   # the vine tips sway 1 px with the breath
-  atk_wind1: {t: -0.10, dy: 0, moves: [k1_1, k2_1]}
-  atk_wind2: {t: -0.20, dy: 0, moves: [k1_1, k2_1]}
-  atk_mid: {t: 0.15, moves: []}
-  atk_follow: {t: 1.0, moves: [k1_1, k2_1]}
-  atk_recover: {t: 0.30, moves: [k1_1, k2_1]}
-  hurt_in1: {moves: [k1_1, k2_1]}
-  hurt_in2: {moves: [k1_1, k2_1]}
-  daze: {moves: [], dy: 0, tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}
-  daze_b: {moves: [], dy: 0, tweaks: {k1_3: [0, 2], k2_3: [0, 2], k3_3: [0, 1], k4_3: [0, 1]}}
+  atk_wind1:                    # the maws pull back and down, the lead vines start to coil in
+    {t: -0.10, dy: 0, moves: [k1_1, k2_1],
+     tweaks: {hd_a: [-1, 2], hd_b: [-1, 2], k1_2: [-1, 1], k1_3: [-2, 2], k2_2: [-1, 0], k2_3: [-2, 1]}}
+  atk_wind2:                    # coiled: maws 2 back and 4 down, the vine tips 4-5 px in
+    {t: -0.20, dy: 0, moves: [k1_1, k2_1],
+     tweaks: {hd_a: [-2, 5], hd_b: [-2, 5], k1_2: [-2, 2], k1_3: [-4, 4], k2_2: [-2, 1], k2_3: [-4, 2]}}
+  atk_mid:                      # the strike comes in: the attack maws still 2 back and 3 low, the vines 3 short
+    {t: 0.15, moves: [], tweaks: {hd_a: [-2, 3], hd_b: [-2, 3], k1_3: [-2, 1], k2_3: [-2, 1]}}
+  atk_follow:                   # past the bite: maws 2 further forward and 1 down, the vine tips 2 further out
+    {t: 1.0, moves: [k1_1, k2_1], tweaks: {hd_a: [2, 1], hd_b: [2, 1], k1_3: [2, -1], k2_3: [2, 0]}}
+  atk_recover:                  # easing out: the maws still 1 forward and 1 up
+    {t: 0.30, moves: [k1_1, k2_1], tweaks: {hd_a: [1, -1], hd_b: [1, -1]}}
+  hurt_in1:                     # halfway to the flinch: maws 3 down and 2 forward (as the hurt key), the vines start to curl
+    {moves: [k1_1, k2_1], tweaks: {hd_a: [2, 3], hd_b: [2, 3], k1_3: [0, 2], k2_3: [-1, 1], k3_3: [0, 1], k4_3: [0, 1]}}
+  hurt_in2:                     # the flinch easing: maws 3 back toward idle (lifting them parted the thin stalks)
+    {moves: [k1_1, k2_1], tweaks: {hd_a: [-3, 0], hd_b: [-3, 0]}}
+  daze:                         # droop: the maws sag 3 onto the stalks, the vine tips 1
+    {moves: [], dy: 0, tweaks: {hd_a: [1, 5], hd_b: [1, 5], k1_3: [0, 1], k2_3: [0, 1]}}
+  daze_b:
+    {moves: [], dy: 0, tweaks: {hd_a: [2, 6], hd_b: [2, 6], k1_3: [0, 2], k2_3: [0, 2], k3_3: [0, 1], k4_3: [0, 1]}}
 holds: []
 paint:                          # the 1 px breath sink closed the gap under the left stalk into a 5 px hole: reopened
   - {frame: idle_b, xy: [[55, 70]], rgb: null}
+  # the lowered maws close the notch between the two stalks into a pocket: filled with the stalk shadow
+  - {frame: atk_wind2, xy: [[60, 58], [61, 58], [59, 59], [60, 59], [61, 59], [59, 60], [60, 60], [61, 60], [60, 61], [61, 61]], rgb: [41, 24, 49]}
+  - {frame: daze, xy: [[62, 59], [61, 60], [62, 60], [60, 61], [61, 61], [62, 61], [61, 62], [62, 62], [62, 63]], rgb: [41, 24, 49]}
+  - {frame: daze_b, xy: [[62, 61], [61, 62], [62, 62], [62, 63]], rgb: [41, 24, 49]}
+  - {frame: atk_wind2, xy: [[71, 61], [70, 62], [71, 62], [72, 62], [73, 62], [68, 63], [69, 63], [70, 63], [72, 63], [73, 63]], rgb: [41, 24, 49]}
+  - {frame: daze, xy: [[70, 61], [70, 62], [71, 62], [68, 63], [69, 63], [70, 63]], rgb: [41, 24, 49]}
+  - {frame: atk_wind2, xy: [[88, 67], [88, 68], [87, 69], [88, 69]], rgb: [41, 24, 49]}
+  - {frame: hurt_in1, xy: [[64, 56], [65, 56], [63, 57], [64, 57]], rgb: [41, 24, 49]}
+  - {frame: daze, xy: [[74, 61], [73, 62], [74, 62], [75, 62], [72, 63], [73, 63]], rgb: [41, 24, 49]}
+  - {frame: hurt_in1, xy: [[59, 58], [62, 58], [59, 59], [60, 59], [61, 59], [62, 59], [59, 60], [60, 60], [61, 60], [62, 60], [60, 61], [61, 61], [62, 61], [61, 62], [62, 62], [62, 63]], rgb: [41, 24, 49]}

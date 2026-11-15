@@ -97,8 +97,9 @@ frames:
   hurt_in1:                    # flinch: head snaps back (translated), claws lift; the body stays (the gap under the hump stays open)
     moves: [hip_n, knee_n, hip_f, knee_f]
     tweaks: {crown: [-3, 1], neck: [-2, 1], el_n: [0, -2], hand_n: [0, -3]}
-  hurt_in2:                    # the arms stay up in front of the face (they ride the shoulders)
-    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+  hurt_in2:                    # the arms stay up in front of the face (they ride the shoulders); the far thigh keeps its
+    moves: [crown, neck, chest, hip, hip_n, knee_n]   # hurt pose, so the gap under the belly stays open (no ink blob)
+    tweaks: {hip_f: [0, 3]}
   daze:                        # head and shoulders slump; the ground claw stays put (no arm swing across the gap)
     moves: [crown, neck, chest]
   daze_b:
@@ -114,4 +115,4 @@ holds: []
 paint:                         # 1 px seams between moved parts (hip / thigh, shoulder / arm), outline ink
   - {frame: atk_follow, xy: [[46, 52]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[55, 36]], rgb: [6, 4, 10]}
-  - {frame: hurt_in2, xy: [[44, 38], [45, 38], [46, 38], [47, 40], [48, 40], [47, 41]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[43, 38]], rgb: [6, 4, 10]}
