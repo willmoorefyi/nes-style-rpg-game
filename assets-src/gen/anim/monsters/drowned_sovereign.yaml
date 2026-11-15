@@ -1,0 +1,251 @@
+sprite: drowned_sovereign
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# Robed reveal rig (ROSTER_PLAN 4.1 / 5.2): the hem pool is the ground contact, so foot_n / foot_f are the hem contact
+# points and the whole skirt is one rigid part on them (both always pinned: the hem never moves). The template legs are
+# removed. Tentacles are per-keyframe parts that exist only in attack / hurt / cast / attack_raise, so every
+# idle-sourced frame keeps the regal disguise.
+keyframes:
+  idle:
+    crown: [108, 33]
+    neck: [109, 60]
+    chest: [110, 80]
+    hip: [112, 122]
+    sh_n: [127, 72]
+    el_n: [138, 96]
+    hand_n: [146, 86]
+    tip: [164, 64]
+    sb: [138, 124]
+    sh_f: [92, 72]
+    el_f: [86, 100]
+    hand_f: [96, 114]
+    hip_n: [122, 126]
+    knee_n: [124, 150]
+    foot_n: [150, 192]
+    hip_f: [102, 126]
+    knee_f: [96, 150]
+    foot_f: [60, 192]
+  attack:
+    crown: [106, 33]
+    neck: [104, 56]
+    chest: [104, 76]
+    hip: [108, 122]
+    sh_n: [118, 62]
+    el_n: [130, 62]
+    hand_n: [137, 67]
+    tip: [164, 54]
+    sb: [120, 78]
+    sh_f: [78, 72]
+    el_f: [62, 88]
+    hand_f: [82, 100]
+    hip_n: [118, 126]
+    knee_n: [120, 150]
+    foot_n: [150, 192]
+    hip_f: [98, 126]
+    knee_f: [92, 150]
+    foot_f: [60, 192]
+    ta_0: [118, 112]
+    ta_1: [186, 112]
+  hurt:
+    crown: [60, 36]
+    neck: [70, 58]
+    chest: [82, 78]
+    hip: [100, 122]
+    sh_n: [108, 68]
+    el_n: [128, 70]
+    hand_n: [137, 74]
+    tip: [182, 57]
+    sb: [124, 78]
+    sh_f: [62, 80]
+    el_f: [45, 95]
+    hand_f: [68, 100]
+    hip_n: [112, 126]
+    knee_n: [114, 150]
+    foot_n: [150, 192]
+    hip_f: [90, 126]
+    knee_f: [84, 150]
+    foot_f: [50, 192]
+    th_0: [130, 118]
+    th_1: [156, 118]
+  cast:
+    crown: [128, 42]
+    neck: [125, 62]
+    chest: [122, 82]
+    hip: [115, 122]
+    sh_n: [132, 70]
+    el_n: [148, 72]
+    hand_n: [158, 66]
+    tip: [181, 44]
+    sb: [132, 92]
+    hip_n: [125, 126]
+    knee_n: [127, 150]
+    foot_n: [155, 192]
+    hip_f: [105, 126]
+    knee_f: [100, 150]
+    foot_f: [55, 192]
+    tl_0: [90, 90]
+    tl_1: [30, 90]
+    tr_0: [134, 112]
+    tr_1: [176, 112]
+  attack_raise:
+    crown: [138, 64]
+    neck: [138, 92]
+    chest: [128, 108]
+    hip: [118, 135]
+    sh_n: [124, 74]
+    el_n: [130, 62]
+    hand_n: [141, 54]
+    tip: [175, 82]
+    sh_f: [138, 108]
+    el_f: [145, 118]
+    hand_f: [152, 125]
+    hip_n: [128, 138]
+    knee_n: [134, 160]
+    foot_n: [170, 192]
+    hip_f: [108, 138]
+    knee_f: [96, 160]
+    foot_f: [50, 192]
+    tm_0: [90, 110]
+    tm_1: [80, 40]
+parts:
+  weapon: {remove: true}
+  thigh_n: {remove: true}
+  shin_n: {remove: true}
+  thigh_f: {remove: true}
+  shin_f: {remove: true}
+  head: {radius: 12.0}
+  skirt: {bone: [foot_f, foot_n], radius: 40.0}             # the hem pool: rigid on the two hem contact points
+  sceptre: {bone: [hand_n, tip], radius: 2.0}
+  sc_butt: {bone: [hand_n, sb], radius: 2.0}
+  tent_a: {bone: {attack: [ta_0, ta_1]}, radius: 14.0, in: [attack]}
+  tent_h: {bone: {hurt: [th_0, th_1]}, radius: 10.0, in: [hurt]}
+  tent_l: {bone: {cast: [tl_0, tl_1]}, radius: 20.0, in: [cast]}
+  tent_r: {bone: {cast: [tr_0, tr_1]}, radius: 12.0, in: [cast]}
+  tent_m: {bone: {attack_raise: [tm_0, tm_1]}, radius: 24.0, in: [attack_raise]}
+z:
+  idle: [skirt, torso, uarm_f, farm_f, head, uarm_n, sc_butt, sceptre, farm_n]
+  attack: [tent_a, skirt, torso, uarm_f, farm_f, head, uarm_n, sc_butt, sceptre, farm_n]
+  hurt: [skirt, torso, tent_h, uarm_f, farm_f, head, uarm_n, sc_butt, sceptre, farm_n]
+  cast: [tent_l, tent_r, skirt, torso, head, uarm_n, sc_butt, sceptre, farm_n]
+  attack_raise: [tent_m, skirt, torso, head, uarm_n, sc_butt, sceptre, farm_n, uarm_f, farm_f]
+masks:
+  skirt:
+    idle: [[0, 128], [199, 128], [199, 199], [0, 199]]
+    attack: [[0, 128], [118, 128], [199, 156], [199, 199], [0, 199]]
+    hurt: [[0, 128], [199, 128], [199, 199], [0, 199]]
+    cast: [[0, 128], [199, 128], [199, 199], [0, 199]]
+    attack_raise: [[0, 138], [199, 138], [199, 199], [0, 199]]
+  tent_a:
+    attack: [[120, 80], [150, 76], [175, 76], [188, 80], [197, 100], [197, 112], [186, 124], [190, 140], [182, 154], [150, 154], [130, 146], [120, 138], [104, 132], [104, 92], [118, 84]]
+  tent_h:
+    hurt: [[128, 84], [150, 84], [158, 100], [162, 120], [160, 152], [140, 152], [130, 136], [128, 110]]
+  tent_l:
+    cast: [[8, 60], [20, 40], [50, 28], [100, 28], [104, 40], [96, 60], [92, 80], [88, 100], [80, 120], [66, 146], [30, 146], [8, 110]]
+  tent_r:
+    cast: [[132, 84], [150, 78], [178, 78], [188, 96], [172, 102], [170, 118], [172, 142], [150, 144], [134, 124], [132, 100]]
+  tent_m:
+    attack_raise: [[28, 60], [45, 35], [60, 28], [90, 16], [127, 20], [127, 50], [118, 56], [118, 100], [105, 115], [95, 132], [45, 134], [28, 115]]
+  sceptre:
+    idle: [[158, 60], [170, 60], [170, 74], [150, 100], [146, 98], [156, 72]]
+    attack: [[140, 60], [155, 50], [168, 50], [168, 60], [150, 66], [140, 70]]
+    hurt: [[140, 66], [170, 58], [176, 52], [188, 52], [186, 62], [170, 64], [142, 74]]
+    cast: [[160, 60], [172, 48], [178, 38], [186, 38], [186, 48], [172, 58], [162, 66]]
+    attack_raise: [[123, 38], [130, 37], [180, 78], [181, 88], [174, 90], [123, 44]]
+  farm_n:
+    idle: [[129, 76], [140, 78], [150, 84], [152, 92], [147, 97], [148, 110], [143, 126], [134, 126], [131, 110], [129, 95]]
+  sc_butt:
+    idle: [[146, 98], [150, 100], [142, 127], [136, 125]]
+    attack: [[112, 80], [136, 66], [139, 69], [116, 84]]
+    cast: [[130, 88], [156, 64], [160, 66], [160, 70], [136, 94], [130, 94]]
+  head:
+    idle: [[98, 28], [122, 28], [122, 58], [116, 63], [100, 63], [98, 50]]
+    attack: [[90, 28], [116, 28], [116, 56], [110, 60], [96, 60], [92, 50]]
+    hurt: [[40, 30], [70, 30], [76, 50], [74, 62], [60, 64], [48, 56], [40, 45]]
+    cast: [[118, 38], [140, 38], [140, 58], [134, 64], [122, 64], [118, 55]]
+    attack_raise: [[126, 62], [151, 62], [151, 84], [146, 92], [132, 92], [126, 80]]
+frames:
+  # disguise: settles 1 px, head 2 back, sceptre arm drawn 2 back
+  atk_wind1:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 1
+    tweaks: {crown: [-2, 0], neck: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], tip: [-2, 0], sb: [-2, 0]}
+  # disguise: coiled 2 px lower, head 3 back, sceptre arm 4 back and 1 up
+  atk_wind2:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [-3, 0], neck: [-3, 0], sh_n: [-4, -1], el_n: [-4, -1], hand_n: [-4, -1], tip: [-4, -1], sb: [-4, -1]}
+  # the reveal (wind2 -> mid): attack pose 2 px low, tentacles 4 px still inside the robe
+  atk_mid:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [-1, 0], neck: [-1, 0], ta_0: [-4, 0], ta_1: [-4, 0]}
+    t: 0.1
+  # settle: tentacles slide 3 px back under the robe, body 1 px down
+  atk_follow:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 1
+    tweaks: {crown: [1, 0], neck: [1, 0], ta_0: [-3, 0], ta_1: [-3, 0]}
+  # disguise restored, still leaning in
+  atk_recover:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 1
+    tweaks: {crown: [1, 0], neck: [1, 0]}
+  # disguise flinch: body 2 down, head back 4, sceptre arm up 3
+  hurt_in1:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [-4, 1], neck: [-4, 1], sh_n: [0, -3], el_n: [0, -3], hand_n: [0, -3], tip: [0, -3], sb: [0, -3]}
+  # tentacles erupt: hurt pose 1 px toward idle (a 2 px shift jogs the sash at the hem line; a drop closes a 224 px hole)
+  hurt_in2:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [1, 0], hip: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], tip: [1, 0], sb: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0], hip_n: [1, 0], hip_f: [1, 0], th_0: [1, 0], th_1: [1, 0]}
+  # disguise: bows, sceptre lifts
+  cast_gather:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [1, 1], sh_n: [0, -2], el_n: [0, -2], hand_n: [0, -2], tip: [0, -2], sb: [0, -2]}
+  # tentacles still drawing out of the robe
+  cast_rise:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {tl_0: [4, 2], tl_1: [4, 2], tr_0: [-3, 1], tr_1: [-3, 1], hand_n: [0, 1], tip: [0, 1], sb: [0, 1]}
+  # release: sceptre fist 2 px higher (recipe), tentacles held
+  cast_release:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {tip: [0, -2], sb: [0, -2]}
+  daze:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+  daze_b:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+  # the heavy swing begins: head bows 2, tentacle mass 3 px down
+  atk_swing:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [0, 2], neck: [0, 2], tm_0: [0, 3], tm_1: [0, 3]}
+  # heavy mid: tentacles 4 px still inside the robe
+  atk_swing2:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [1, 0], neck: [1, 0], ta_0: [-4, 0], ta_1: [-4, 0]}
+    t: 0.0
+holds:
+  - {frame: atk_raise_in, reason: 'the idle sceptre points up-right low in the fist, the raise holds it inverted over the crown with the tentacle mass out: a ~100 deg turn plus a reveal no capped cut-out bridges; held, it shows the coiled atk_wind1'}
+paint:
+  - {frame: atk_wind2, xy: [[119, 55]], rgb: [6, 4, 10]}
