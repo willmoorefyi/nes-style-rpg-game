@@ -247,3 +247,24 @@ describe("AiEnemyView draw order while travelling (D5')", () => {
     expect(tints).toEqual(new Set([null, 0xffdcdc]));
   });
 });
+
+describe('AiEnemyView wide boss cells (roster: a sheet cell is the max of its keyframes)', () => {
+  /** A boss whose keyframes were padded (centred) from 200 to `w` native px: the idle figure stays where it was. */
+  function bossAt(w: number) {
+    const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
+    const frames: MonsterFrames = { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt,
+      scale: 2, artScale: 2, cell: [w, 200], footRow: 192, floating: false, hasCast: true, lungePx: 40, anim: false };
+    const view = new AiEnemyView([{ id: 'warmech', name: 'WarMech', size: 'boss' } as EnemyData], { getMonsterFrames: () => frames });
+    const [sprite] = view.build();
+    return { sprite, box: computeEnemyLayoutAi([{ size: 'boss', w: w * 2, h: 400 }])[0] };
+  }
+
+  it('a 232 px cell is centred on the box like a 200 px one, so the padded idle figure and the feet do not move', () => {
+    const narrow = bossAt(200);
+    const wide = bossAt(232);
+    expect(wide.sprite.x + ((232 - 200) / 2) * 2).toBe(narrow.sprite.x);   // 16 native px of padding at scale 2
+    expect(wide.sprite.y).toBe(narrow.sprite.y);
+    expect(wide.box.feetY).toBe(narrow.box.feetY);
+    expect(wide.sprite.y + (192 + 1) * 2).toBe(wide.box.feetY);
+  });
+});

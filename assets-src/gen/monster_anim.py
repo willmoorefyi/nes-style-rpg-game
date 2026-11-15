@@ -61,8 +61,29 @@ def load_entries() -> list[tuple[str, dict, dict[str, Image.Image]]]:
             f = Image.open(path.with_suffix(".png")).convert("RGBA")
             frames[p] = f.transpose(Image.Transpose.FLIP_LEFT_RIGHT) if 0 in m.get("flip_frames", []) else f
             metas.append(m)
-        entries.append((metas[0]["character"], {**metas[0], "poses": poses}, frames))
+        frames, meta = pad_keyframes(frames, {**metas[0], "poses": poses})
+        entries.append((metas[0]["character"], meta, frames))
     return entries
+
+
+def pad_keyframes(kfs: dict[str, Image.Image], meta: dict) -> tuple[dict[str, Image.Image], dict]:
+    """Wide boss cells (ROSTER_LOG G2): one cell per sheet, the max of its keyframes. A per-pose boss cut centres each
+    figure in its own cell (monster.py), so a narrower keyframe is padded centred horizontally (left pad floor) and at
+    the top (the feet row moves down by the idle's top pad; bottom_row follows), never cropped. A uniform sheet comes
+    back untouched (the same image objects), so every existing frame and lock is byte-identical."""
+    w = max(im.size[0] for im in kfs.values())
+    h = max(im.size[1] for im in kfs.values())
+    if all(im.size == (w, h) for im in kfs.values()):
+        return kfs, meta
+    out = {}
+    for k, im in kfs.items():
+        if im.size == (w, h):
+            out[k] = im
+            continue
+        c = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        c.paste(im, ((w - im.size[0]) // 2, h - im.size[1]))
+        out[k] = c
+    return out, {**meta, "bottom_row": meta["bottom_row"] + h - kfs["idle"].size[1], "grid": [w, h]}
 
 
 def lunge_px(idle: Image.Image) -> int:
@@ -129,6 +150,14 @@ def _tweaks(recipe: dict | None, rig: dict | None, head: tuple[str, ...]) -> dic
     return out
 
 
+def sink(im: Image.Image, dy: int) -> np.ndarray:
+    """The whole sprite dy px down (FW-1: a floating idle_b has no breath cut; the cell's bottom rows are empty)."""
+    a = np.asarray(im.convert("RGBA"))
+    out = np.zeros_like(a)
+    out[dy:] = a[:a.shape[0] - dy]
+    return out
+
+
 def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: dict) -> dict[str, dict]:
     """Every generated frame of a rigged sprite: {name: {img, labels, parts, u, src, toward, joints, rots, pinned,
     prop_px, ..., fx, grips, names (check-only, monster_render.check_info)}}. Held frames are skipped (the atlas
@@ -150,6 +179,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     if has_raise and "attack_raise" not in rig.keyframes:
         raise ValueError(f"rig {sprite}: the approved attack_raise keyframe has no keyframes.attack_raise joints")
     head = head_joints(rig.head, rig.body, sprite, rig.keyframes["idle"])
+    floating = bool(meta.get("floating")) or rig.floating   # FW-1: a floating sheet or body has no ground
     out: dict[str, dict] = {}
     bobbed = [n for n, r in RECIPES.items() if r.get("bob") and n in generated_names(has_cast, has_raise)
               and ((cfg.get("frames") or {}).get(n) or {}).get("bob", True)]
@@ -157,14 +187,14 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         src = RECIPES[name]["src"] if name in RECIPES else "idle"
         if name in holds:
             continue
-        img = np.asarray(PU.bob(keyframes[src], cell[1], 1) if meta.get("floating") else
-                         PU.bob(keyframes[src], int(round(rig.keyframes[src][rig.breath][1])), 1)).copy()
+        img = sink(keyframes[src], 1) if floating else \
+            np.asarray(PU.bob(keyframes[src], int(round(rig.keyframes[src][rig.breath][1])), 1)).copy()
         out[name] = {"img": img, "labels": None, "src": src, "toward": src, "u": 0.0, "joints": {}, "rots": {},
-                     "pinned": True, "prop_px": {}}
+                     "pinned": True, "prop_px": {}, "dy": 1, "floating": floating}
     for name in generated_names(has_cast, has_raise):
         if name in out or name == "idle_b" or name in holds:
             continue
-        r, over = RECIPES[name], (cfg.get("frames") or {}).get(name, {})
+        r, over = {**RECIPES[name], **rig.recipes.get(name, {})}, (cfg.get("frames") or {}).get(name, {})
         u = recipe_u(name, cfg)
         S = rig.keyframes[r["src"]]
         T = out[r["toward"]]["joints"] if r["toward"] in out else rig.keyframes[r["toward"]]
@@ -174,8 +204,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         for h in (hands(cfg.get("cast_hand", "n")) if r.get("raise") else []):
             hand = f"hand_{h}"
             tweaks[hand] = [tweaks.get(hand, [0, 0])[0], tweaks.get(hand, [0, 0])[1] - r["raise"]]
-        J = R.solve(rig, S, T, u, moves, pins, int(over.get("dy", r.get("dy", 0) * k)), tweaks, not meta.get("floating"),
-                    half_joints(rig, name, cfg))
+        dy, dx = int(over.get("dy", r.get("dy", 0) * k)), int(over.get("dx", r.get("dx", 0)))
+        J = R.solve(rig, S, T, u, moves, pins, dy, tweaks, not floating, half_joints(rig, name, cfg), dx)
         layers, rots, prop_px = [], {}, {}
         lab, names = segs[r["src"]]
         drop = set(over.get("drop") or [])
@@ -205,7 +235,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                 prop_px[p] = int((labels == list(rig.parts).index(p)).sum())
         pinned = r["pins"] in ("legs", "feet")
         out[name] = {"img": img, "labels": labels, "src": r["src"], "toward": r["toward"], "u": u, "joints": J,
-                     "rots": rots, "pinned": pinned, "prop_px": prop_px,
+                     "rots": rots, "pinned": pinned, "prop_px": prop_px, "dy": dy, "dx": dx, "floating": floating,
                      "contact": AF.contact_mask(rig, r["src"], segs[r["src"]], pins, meta["bottom_row"]) if pinned
                      and set(rig.feet) - set(pins) else None,
                      "src_labels": lab, "foot_parts": foot_parts,

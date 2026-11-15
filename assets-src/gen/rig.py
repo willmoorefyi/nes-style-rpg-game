@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from gen import rig_ik as RI
+from gen.rig_floating import FLOATERS
 from gen.rig_naga import NAGA
 from gen.rig_templates import BEASTS
 
@@ -37,10 +38,10 @@ FEET = ("foot_n", "foot_f")
 # per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
 BODY = {"biped": {"legs": LEGS, "feet": FEET, "limbs": tuple((f"hip_{s}", f"knee_{s}", f"foot_{s}") for s in "nf"),
                   "moves": None, "planted": "foot_f", "breath": "hip", "head": ("crown", "neck")}}
-for _name, _t in {**BEASTS, "naga": NAGA}.items():       # quadruped, bird (rig_templates.py, T5a), naga (FW-3)
+for _name, _t in {**BEASTS, "naga": NAGA, **FLOATERS}.items():   # quadruped, bird (T5a), naga (FW-3), floating (FW-1)
     TEMPLATES[_name] = (_t["parent"], _t["parts"], _t["z"])
     BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath", "head", "arms", "extra",
-                                      "ground") if k in _t}
+                                      "ground", "floating", "recipes") if k in _t}
 
 
 class Rig:
@@ -57,6 +58,8 @@ class Rig:
         self.planted, self.breath = cfg.get("planted", b["planted"]), cfg.get("breath_joint", b["breath"])
         # arm suffixes of the cast set, extra recipe joints per set, contact joints pinned in every frame (naga)
         self.arms, self.extra, self.ground = b.get("arms", ("n", "f")), b.get("extra", {}), tuple(b.get("ground", ()))
+        # FW-1: no ground (float band, ungrounded solve, whole-sprite idle_b) and per-frame recipe overrides (dx, dy)
+        self.floating, self.recipes = bool(b.get("floating", False)), dict(b.get("recipes", {}))
         self.cell = cell
         self.fwd = 1 if cfg.get("facing", "right") == "right" else -1
         self.sampler = cfg.get("sampler", "nearest")
@@ -187,11 +190,11 @@ def _wrap(a: float) -> float:
 
 
 def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, tweaks: dict | None = None,
-          grounded: bool = True, half: set | None = None) -> dict:
+          grounded: bool = True, half: set | None = None, body_dx: int = 0) -> dict:
     """Angle-space interpolation from S toward T by u (u < 0 extrapolates away; `half` joints by u / 2), bone lengths
-    from S, root lerp, pinned joints, body offset and tweaks; a grounded foot never sinks below the source's ground
-    line (two-bone IK on the knee); the template's `ground` joints (naga coil) never move; every joint snapped to a
-    whole pixel."""
+    from S, root lerp, pinned joints, body offset (dy, and FW-1's floating drift dx) and tweaks; a grounded foot never
+    sinks below the source's ground line (two-bone IK on the knee); the template's `ground` joints (naga coil) never
+    move; every joint snapped to a whole pixel."""
     moves = set(S) if moves == "all" else set(moves)
     half = half or set()
     out: dict[str, tuple[float, float]] = {}
@@ -213,8 +216,8 @@ def solve(rig: Rig, S: dict, T: dict, u: float, moves, pins, body_dy: int = 0, t
     fixed = {j for j in pins if j in S}                    # joints placed absolutely after the tree solve
     for j in fixed:
         out[j] = S[j]
-    if body_dy:
-        out = {j: (v[0], v[1] + body_dy) if j not in pins and j not in rig.legs else v for j, v in out.items()}
+    if body_dy or body_dx:
+        out = {j: (v[0] + body_dx, v[1] + body_dy) if j not in pins and j not in rig.legs else v for j, v in out.items()}
     for j, dv in (tweaks or {}).items():
         if j in out and j not in rig.ground:              # naga contact joints ignore tweaks too
             out[j] = (out[j][0] + dv[0], out[j][1] + dv[1])

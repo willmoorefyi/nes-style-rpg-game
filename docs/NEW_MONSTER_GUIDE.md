@@ -131,7 +131,11 @@ decision |`, plus "Images used: N of 100"). Self-approve only if the user author
 
 `body: biped` (`rig.py`; joints `crown neck chest hip sh_/el_/hand_{n,f} hip_/knee_/foot_{n,f} tip`), `quadruped` and
 `bird` (`rig_templates.py`: its docstring is the joint reference; see `gen/README.md`). `_n` is near, `_f` is far, and
-coordinates are the approved image's own, facing right. There is no `floating` body. `two_handed` and `prop_colors`
+coordinates are the approved image's own, facing right. `naga` (`rig_naga.py`, FW-3) and `floating` / `swimmer`
+(`rig_floating.py`, FW-1: root `core`, no feet; the **float band** replaces check 8: the lowest row stays within ±1 of
+the source's, lerped toward the target, plus the frame's `dy`; frames take a whole-body `dx` like `dy`; idle_b moves
+the whole sprite). A boss sheet's cell is the widest keyframe's: narrower poses are padded centred
+(`monster_anim.pad_keyframes`), so rig coordinates are in the padded cell. `two_handed` and `prop_colors`
 from the plan draft are **not implemented**: rigs do these with tweaks and masks.
 
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`

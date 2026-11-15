@@ -69,3 +69,45 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
     lines = [ln for ln in buf.getvalue().splitlines() if ln.strip() and not ln.endswith("boss poses incomplete, skipped")]
     check(lines == [f"{sid}: no rig"] and code == 0,
           f"check prints the stable line '<id>: no rig' for an unrigged sheet and exits 0 ({buf.getvalue().strip()!r})")
+    run_wide_cells(check)
+
+
+def run_wide_cells(check: Callable[[bool, str], None]) -> None:
+    """Wide boss cells: a sheet's cell is the max of its keyframes; smaller keyframes are padded, centred (the per-pose
+    cut centres each figure in its own cell), feet row kept, never cropped. Uniform sheets come back unchanged."""
+    import numpy as np
+    from PIL import Image
+    from gen import monster_anim as MA
+    pad = getattr(MA, "pad_keyframes", None)
+    check(pad is not None, "monster_anim.pad_keyframes exists")
+    if pad is None:
+        return
+    idle = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
+    idle.putpixel((0, 199), (9, 9, 9, 255))
+    idle.putpixel((199, 0), (8, 8, 8, 255))
+    wide = Image.new("RGBA", (218, 200), (1, 2, 3, 255))
+    kfs, meta = pad({"idle": idle, "attack": wide}, {"bottom_row": 192})
+    check({k: v.size for k, v in kfs.items()} == {"idle": (218, 200), "attack": (218, 200)},
+          f"every keyframe gets the widest keyframe's cell {[v.size for v in kfs.values()]}")
+    a = np.asarray(kfs["idle"])
+    check(a[199, 9, 3] == 255 and a[0, 208, 3] == 255 and a[:, :9, 3].max() == 0 and a[:, 209:, 3].max() == 0,
+          "a narrower keyframe is centred ((218 - 200) / 2 = 9 px each side), nothing cropped")
+    check(kfs["attack"] is wide and meta["bottom_row"] == 192, "the widest keyframe and the feet row are unchanged")
+    same = {"idle": idle, "hurt": idle.copy()}
+    k2, _ = pad(same, {"bottom_row": 192})
+    check(all(k2[k] is same[k] for k in same), "a uniform sheet's keyframes come back untouched (same objects)")
+    raw = {}
+    for sid in ("hollow_seraph", "warmech"):
+        for p in ("idle", "attack", "hurt", "cast", "attack_raise"):
+            f = MA.APPROVED / sid / f"boss_{p}.png"
+            if f.exists():
+                raw[(sid, p)] = Image.open(f).convert("RGBA")
+    entries = {e[0]: e for e in MA.load_entries()}
+    for sid in ("hollow_seraph", "warmech"):
+        if sid not in entries:
+            continue
+        kf = entries[sid][2]
+        w = max(raw[(s, p)].size[0] for (s, p) in raw if s == sid)
+        ok = all(im.size == (w, 200) and np.array_equal(np.asarray(im)[:, (w - raw[(sid, p)].size[0]) // 2:][:, :raw[(sid, p)].size[0]],
+                                                         np.asarray(raw[(sid, p)])) for p, im in kf.items())
+        check(ok, f"{sid}: every keyframe padded to the {w} px cell, approved pixels intact")
