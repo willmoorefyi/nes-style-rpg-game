@@ -1284,12 +1284,15 @@
     of green venom at their tips (attached), small black eyes; in every cell the raised front stays well below the top
     of the box
   attack: >-
-    lunging the head forward toward the heroes with the mandibles spread wide, the front a little lower than in the
-    idle cell (no taller than its idle height), the head well inside the middle cell
-  hurt: knocked back, the front end curling down and back, the mandibles clenched, the legs scrabbling
+    lunging the head forward and down toward the heroes with the mandibles spread wide, the front a little lower than
+    in the idle cell (no taller than its idle height); the head and the mandible tips end well before the right edge
+    of the middle cell (not reaching the cell edge)
+  hurt: >-
+    knocked back, the front end curling down and back low over its body, the mandibles clenched, the legs scrabbling;
+    no taller than its idle height (no rearing up)
   face: its plated head with small black eyes and huge mandibles is readable
   extra_negative: wings, a stinger tail, pincers, soft pale skin, a rear-up taller than the box
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R152): the attack mandible sliced at the raw cell line, a rear-up hurt
 - id: piranha
   # "Piranha" (051): a small biting fish (distinct from the red piranha: small, silver-green)
   size: small
