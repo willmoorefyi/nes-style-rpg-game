@@ -1051,3 +1051,477 @@
   face: its horned skull with burning red eye lights is readable
   extra_negative: a shield, a loincloth, yellow bones, a single sword, a third blade, a helmet, a cape, blurred or doubled blades
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R125): one blade in the idle, a muddle of blade streaks in the attack
+# ── pass R, batch B (docs/ROSTER_PLAN.md 3.2, records 035-066): regular 3-pose sheets. Lessons from batch A (ROSTER_LOG
+# batch A status): bipeds get a `motion:` string without "cape" and with bent elbows (a reach that crosses the raw's
+# one-third line is sliced by the cutter); low creatures keep attacks "no taller than half again" the idle; floating
+# and swimming sheets keep every body "at the same height ... with clear empty space below"; counts are "exactly N, as
+# in the idle cell" with the N+1th in the negative.
+- id: wraith
+  # "Wraith" (035): an incorporeal hooded undead, chains, cold glow (distinct from the shadow: hood and chains)
+  size: small
+  floating: true
+  body: floating
+  prompt: >-
+    a hooded spectral figure with no legs, a tattered grey-blue hooded robe whose lower part fades into ragged wisps,
+    rusted iron chains wrapped twice around the torso, two thin pale grey hands with long fingers, a cold pale blue
+    glow on the robe edges; it hovers, nothing touches the ground; in every cell it floats at the same height in its
+    box with clear empty space below it, centred in its own cell
+  attack: >-
+    swooping forward toward the heroes, both thin hands reaching out with the elbows bent so the fingers stay well
+    inside the middle cell, the chains swinging, the wisps trailing back
+  hurt: knocked back, the hood thrown back a little, the hands flung up, the chains rattling, at the same height
+  face: a dark hood opening with two cold blue lights, no other face
+  extra_negative: legs, feet, a skull face, a scythe, a weapon, a lantern, black smoke silhouette
+  seeds: [1234]
+- id: anaconda
+  # "Anaconda" (036): a large constrictor (no hood: distinct from the cobra)
+  size: large
+  body: serpent
+  prompt: >-
+    a thick heavy green-brown constrictor snake in a raised coil, olive-green scales with large dark brown blotches, a
+    pale yellow belly, a broad flat head with small yellow eyes and no hood, the thick body coiled in loops on the
+    ground with the head and neck raised; in every cell the raised head stays well below the top of the grey box and
+    well inside its cell
+  attack: >-
+    the head striking forward toward the heroes with the jaws wide open, the neck stretched, the coils tightening, the
+    head well inside the middle cell
+  hurt: the head recoiling back, the jaws shut, the coils bunching up tight
+  face: its broad snake head with small yellow eyes is readable
+  extra_negative: a hood, a rattle, legs, a second head, bands of bright colour
+  seeds: [1234]
+- id: hyenadon
+  # "Hyenadon" (037): a prehistoric hyena-beast with a crushing bite
+  size: small
+  body: quadruped
+  prompt: >-
+    a prehistoric hyena-beast on four legs seen from the side, a sloped back with high heavy shoulders and low hips,
+    tan fur with dark brown spots, a short bristly mane along the neck, a huge heavy head with a massive bone-crushing
+    jaw and big teeth, small dark eyes, round ears, a short tail
+  attack: >-
+    lunging forward low with the huge jaws wide open to bite the heroes, the head thrust forward, all four feet still
+    on the ground (no leap), no taller than half again its idle height
+  hurt: knocked back, the head turned away with the jaws snapped shut, the back hunched, all four feet on the ground
+  face: its huge jaw and small dark eyes are readable
+  extra_negative: stripes, a mane of long hair, horns, a saddle, rearing up
+  seeds: [1234]
+- id: lesser_tiger
+  # "Lesser Tiger" (038): a big cat
+  size: small
+  body: quadruped
+  prompt: >-
+    an orange tiger with black stripes and a white belly and muzzle, on four legs seen from the side, crouched low
+    ready to pounce, the long striped tail curved, green eyes, small round ears
+  attack: >-
+    pouncing forward low at the heroes with one front paw lifted and the claws out, the jaws open showing the fangs,
+    the hind feet on the ground, no taller than half again its idle height, the paw well inside the middle cell
+  hurt: knocked back, flinching low with the ears flat and the eyes shut, the tail lashing, all four feet down
+  face: its tiger face with green eyes and fangs is readable
+  extra_negative: sabre teeth, wings, a mane, spots, rearing up
+  seeds: [1234]
+- id: minotaur
+  # "Minotaur" (039): a bull-headed brute with two big hits
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the axe with the elbows bent, so every reaching part stays well inside its own cell. Draw only the
+    parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and no
+    slash trail, smear, motion arc or motion lines.
+  prompt: >-
+    a huge muscular minotaur standing upright on hooved legs, a brown-furred bull head with two long curved horns and a
+    brass nose ring, a bare muscular chest crossed by a brown leather harness with an iron buckle, a short leather
+    kilt, holding one big double-bladed iron axe in both hands; centred in its own cell
+  attack: >-
+    stepping forward and chopping the double-bladed axe down at the heroes in front of its body, the horns lowered,
+    the axe head well inside the middle cell
+  hurt: knocked back, the bull head thrown back with a bellow, the axe dragged low in one hand
+  face: its bull face with the nose ring, wide nostrils and angry eyes is readable
+  extra_negative: a cape, a shield, a club, a second axe, armour plates, wings
+  seeds: [1234]
+- id: hill_gigas
+  # "Hill Gigas" (040): a hill giant (furs and a tree club; distinct from the fire and ice gigas)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the club with the elbows bent, so every reaching part stays well inside its own cell. Draw only the
+    parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and no
+    slash trail, smear, motion arc or motion lines.
+  prompt: >-
+    a ruddy-skinned hill giant with a big belly and a shaggy brown beard, a tunic of patched brown and grey furs, a
+    rope belt with a lumpy sack tied to it, bare feet, holding one huge club made from a tree trunk with stubs of
+    branches; centred in its own cell
+  attack: >-
+    stepping forward and swinging the tree-trunk club down at the heroes in front of its body, the club head well
+    inside the middle cell
+  hurt: knocked back, staggering, the club dragged along the ground, a hand on its head
+  face: its ruddy bearded face with small eyes and a big nose is readable
+  extra_negative: armour, a helmet, horns, a cape, flames, ice, a metal weapon, a second club
+  seeds: [1234]
+- id: earth_elemental
+  # "Earth Elemental" (041): a lumbering boulder giant (a biped, distinct from the other elementals)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the boulder arms with the elbows bent, so every reaching part stays well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no cloth, no debris flying, and no smear, motion
+    arc or motion lines.
+  prompt: >-
+    a lumbering giant made of packed brown earth and grey boulders, a hunched heavy body, huge arms ending in boulder
+    fists, short thick legs, patches of green moss and dangling roots, glowing amber cracks running through its body,
+    a blank boulder head; centred in its own cell
+  attack: >-
+    stepping forward and smashing both boulder fists down in front of its body at the heroes, the fists well inside
+    the middle cell
+  hurt: knocked back, staggering, chunks cracking at its shoulders (still attached), the arms thrown back
+  face: a blank boulder head with two glowing amber eye slits, no mouth or skin
+  extra_negative: a human face, skin, flames, water, a weapon, flying rocks, a mound under it
+  seeds: [1234]
+- id: wight
+  # "Wight" (043): an armoured undead knight (corroded mail with flesh; distinct from skeleton and bloodbones)
+  size: small
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the sword with the elbows bent, so every reaching part stays well inside its own cell. Draw only the
+    parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and no
+    slash trail, smear, motion arc or motion lines.
+  prompt: >-
+    an undead knight in corroded green-grey chain mail and a dented open-faced iron helm, grey withered flesh showing
+    at the face and hands, pale white eye lights in deep sockets, holding one rusted longsword in the hand on the right
+    side of the image, a torn dark tabard over the mail; centred in its own cell
+  attack: >-
+    stepping forward and slashing the rusted sword down in front of its body at the heroes, the blade well inside the
+    middle cell, the same one sword as in the idle cell
+  hurt: knocked back, the helmed head thrown back, the sword arm flung out, still holding the sword
+  face: its withered grey face with pale white eye lights under the helm is readable
+  extra_negative: a shield, a cape, bare bones, a skull without flesh, horns, a second sword
+  seeds: [1234]
+- id: ochre_jelly
+  # "Ochre Jelly" (044): stacked lumpy jelly (distinct from the slime, ooze and flan)
+  size: small
+  body: blob
+  prompt: >-
+    a stacked lumpy mustard-yellow jelly resting on the ground, three soft glossy round lumps piled on each other, the
+    biggest at the bottom, a bright glossy sheen and a few thick drips running down its sides (attached to it)
+  attack: >-
+    the top lumps surging forward toward the heroes as a low leaning mass, at most half again as tall as in the idle
+    cell, the same three lumps
+  hurt: squashed down flat and wide, the lumps sagging into each other, quivering
+  face: no face, no eyes; the readable detail is the glossy stacked lumps
+  extra_negative: eyes, a face, a mouth, bones inside, green colour, grey colour, puddles on the ground, drips on the ground
+  seeds: [1234]
+- id: ogre_mage
+  # "Ogre Mage" (047): a sorcerer ogre (robed, one horn, staff and ice orb; distinct from ogre and ogre_chief)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and thrust the staff with the elbows bent, so every reaching part stays well inside its own cell. Draw only
+    the parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and
+    no spell effects, smear, motion arc or motion lines.
+  prompt: >-
+    a big blue-skinned ogre sorcerer in a long hooded patchwork robe of dark purple and brown patches with the hood
+    down, a single short horn on its forehead, a wild white mane of hair, two small tusks, gold earrings, holding one
+    tall gnarled wooden staff topped with a pale blue ice orb in the hand on the right side of the image; the robe hem
+    above its bare blue feet; centred in its own cell
+  attack: >-
+    stepping forward and thrusting the staff toward the heroes, the ice orb pointed at them and glowing a little
+    brighter, the orb well inside the middle cell
+  hurt: knocked back, the hood flapping, the free hand thrown up, the staff tilted back in the same hand
+  face: its blue ogre face with the single horn, tusks and small eyes is readable
+  extra_negative: a club, a cleaver, armour, two horns, a helmet, tan skin, grey skin, an ice beam, snowflakes
+  seeds: [1234]
+- id: sphinx
+  # "Sphinx" (048): lion body, eagle wings, human face
+  size: large
+  body: quadruped
+  prompt: >-
+    a sphinx on four legs seen from the side: a tawny lion body with big paws, two large feathered eagle wings folded
+    half up on its back (exactly two wings), a stern human face with a striped blue-and-gold headdress hanging to the
+    shoulders, a lion tail with a tuft; the head and wings inside the box
+  attack: >-
+    lunging forward low with one big front paw swiping at the heroes, the wings raised, the face snarling, the hind
+    feet on the ground, no taller than half again its idle height, the paw well inside the middle cell
+  hurt: knocked back, the wings flared, the head turned away, all four feet on the ground
+  face: its stern human face under the striped headdress is readable
+  extra_negative: a lion face, a mane, a beard, horns, a third wing, a rider, rearing up
+  seeds: [1234]
+- id: ankheg
+  # "Ankheg" (050): an armoured burrowing centipede, venom
+  size: large
+  body: arthropod
+  prompt: >-
+    a big armoured rust-brown centipede seen from the side, a long body of overlapping shiny plates, many short
+    jointed legs on the ground, the front third raised up low with a plated head, two huge curved mandibles and a drop
+    of green venom at their tips (attached), small black eyes; in every cell the raised front stays well below the top
+    of the box
+  attack: >-
+    lunging the head forward toward the heroes with the mandibles spread wide, the front a little lower than in the
+    idle cell (no taller than its idle height), the head well inside the middle cell
+  hurt: knocked back, the front end curling down and back, the mandibles clenched, the legs scrabbling
+  face: its plated head with small black eyes and huge mandibles is readable
+  extra_negative: wings, a stinger tail, pincers, soft pale skin, a rear-up taller than the box
+  seeds: [1234]
+- id: piranha
+  # "Piranha" (051): a small biting fish (distinct from the red piranha: small, silver-green)
+  size: small
+  floating: true
+  body: swimmer
+  prompt: >-
+    a small silver-green piranha fish seen from the side, a deep round body, an orange-red belly, a big underbite of
+    needle teeth, a small fierce red eye, small fins and a forked tail; it hovers horizontally, nothing touches the
+    ground, no water drawn; in every cell it floats at the same height in its box with clear empty space below it
+  attack: >-
+    darting forward toward the heroes, the jaws gaping wide, the body level and horizontal at the same height as in the
+    idle cell, the head well inside the middle cell
+  hurt: >-
+    knocked back, the body bent into a gentle curve while staying horizontal at the same height as in the idle cell,
+    the jaws clenched, the tail fin whipping
+  face: its fierce red eye and the needle-toothed underbite are readable
+  extra_negative: water, bubbles, splashes, motion lines, armour plates, spines, legs, a vertical body
+  seeds: [1234]
+- id: red_piranha
+  # "Red Piranha" (052): larger, blood-red and armour-plated
+  size: small
+  floating: true
+  body: swimmer
+  prompt: >-
+    a big blood-red armour-plated piranha seen from the side, a heavy deep body covered in dark red bony scale plates,
+    a thick bony head plate, rows of spiny dorsal and belly fins, a huge underbite of needle teeth, a glowing yellow
+    eye, a ragged forked tail; it hovers horizontally, nothing touches the ground, no water drawn; in every cell it
+    floats at the same height in its box with clear empty space below it
+  attack: >-
+    ramming forward toward the heroes, the jaws gaping wide, the body level and horizontal at the same height as in the
+    idle cell, the head well inside the middle cell
+  hurt: >-
+    knocked back, the body bent into a gentle curve while staying horizontal at the same height as in the idle cell,
+    the jaws clenched, the spiny fins flattened
+  face: its glowing yellow eye under the bony head plate and the needle-toothed underbite are readable
+  extra_negative: water, bubbles, splashes, motion lines, silver scales, green scales, legs, a vertical body
+  seeds: [1234]
+- id: crocodile
+  # "Crocodile" (053): a dark green crocodile (distinct from the white crocodile)
+  size: large
+  body: quadruped
+  prompt: >-
+    a long dark green crocodile in a low sprawl seen from a three-quarter side view, the long tail curved round behind
+    it so the whole body fits the box, a ridged scaly back with rows of bumps, a pale yellow belly, long jaws open a
+    little showing jagged teeth, a yellow eye, short splayed legs with claws
+  attack: >-
+    lunging forward low with the long jaws snapping wide open at the heroes, all four feet on the ground, no taller
+    than half again its idle height, the snout well inside the middle cell
+  hurt: knocked back low, the jaws snapped shut, the head turned away, the tail thrashing, all four feet down
+  face: its long toothed jaws and yellow eye are readable
+  extra_negative: water, white scales, barnacles, wings, rearing up, standing upright
+  seeds: [1234]
+- id: white_crocodile
+  # "White Crocodile" (054): a larger pale albino crocodile with barnacles
+  size: large
+  body: quadruped
+  prompt: >-
+    a huge pale albino crocodile, bone-white and pale pink scales, in a low sprawl seen from a three-quarter side view,
+    the thick tail curved round behind it so the whole body fits the box, clusters of grey barnacles crusted on its
+    back and tail, pink eyes, broad heavy jaws with yellowed teeth, old scars on the snout, thick splayed legs
+    with claws; heavier and broader than a common crocodile
+  attack: >-
+    lunging forward low with the broad jaws snapping wide open at the heroes, all four feet on the ground, no taller
+    than half again its idle height, the snout well inside the middle cell
+  hurt: knocked back low, the jaws snapped shut, the head turned away, the tail thrashing, all four feet down
+  face: its broad toothed jaws and pink eye are readable
+  extra_negative: water, green scales, dark scales, wings, rearing up, standing upright
+  seeds: [1234]
+- id: ochu
+  # "Ochu" (055): a carnivorous plant (distinct from the neochu: green, one maw, four smooth vines)
+  size: large
+  body: rooted
+  prompt: >-
+    a carnivorous green plant monster: a big round green bulb with a wide toothy maw full of thorn-like teeth, sitting
+    on a tangled brown root mass that rests on the ground, exactly four thick green vine tentacles growing from the
+    bulb, two on each side, a few broad leaves at its base, a small pink flower on top; in every cell the whole plant
+    stays well inside its own cell
+  attack: >-
+    the two front vine tentacles lashing forward toward the heroes and the maw gaping wide, the bulb leaning forward,
+    the root mass in place on the ground, exactly four vines as in the idle cell, the vine tips well inside the middle
+    cell
+  hurt: >-
+    the bulb recoiling back, the maw snapped shut, the vines curling in, the root mass in place, exactly four vines as
+    in the idle cell
+  face: no eyes; the toothy maw is the readable feature
+  extra_negative: eyes, a face, legs, a pot, a second maw, a fifth vine, thorns on the vines, purple colour
+  seeds: [1234]
+- id: neochu
+  # "Neochu" (056): a bigger purple-black thorned ochu with two maws and poison sacs
+  size: large
+  body: rooted
+  prompt: >-
+    a bigger carnivorous plant monster of purple-black flesh: two round bulbs side by side on one thick stalk, each
+    with its own wide toothy maw, sitting on a heavy dark root mass that rests on the ground, exactly four thick
+    purple vine tentacles covered in sharp thorns, swollen sickly yellow-green poison sacs on the stalk; in every cell
+    the whole plant stays well inside its own cell
+  attack: >-
+    the two front thorned vines lashing forward toward the heroes and both maws gaping wide, the bulbs leaning
+    forward, the root mass in place, exactly four vines and two maws as in the idle cell, the vine tips well inside the
+    middle cell
+  hurt: >-
+    both bulbs recoiling back, the maws snapped shut, the thorned vines curling in, the root mass in place
+  face: no eyes; the two toothy maws are the readable feature
+  extra_negative: eyes, a face, legs, a pot, green colour, a third maw, a fifth vine, a pink flower
+  seeds: [1234]
+- id: hydra
+  # "Hydra" (057): three green heads on long necks (distinct from the fire hydra)
+  size: large
+  body: quadruped
+  prompt: >-
+    a three-headed green hydra on four thick legs seen from the side, a heavy scaly green body with a pale belly,
+    exactly three long necks each ending in a horned green serpent head with yellow eyes, the three heads spread apart
+    at different heights, a thick tail; the heads inside the box
+  attack: >-
+    the three heads striking forward toward the heroes together with the jaws open, exactly three heads as in the idle
+    cell, all four feet on the ground, the heads well inside the middle cell
+  hurt: >-
+    knocked back, the three necks recoiling and twisting back, exactly three heads as in the idle cell, all four feet
+    on the ground
+  face: its three serpent heads with yellow eyes are readable
+  extra_negative: a fourth head, two heads, wings, fire, smoke, red scales, rearing up
+  seeds: [1234]
+- id: horned_devil
+  # "Horned Devil" (058): a winged devil with a trident
+  size: small
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and thrust the trident with the elbows bent, so every reaching part stays well inside its own cell. The two
+    bat wings stay attached behind the shoulders in every cell (exactly two wings, as in the idle cell). Draw only the
+    parts named in the description, the same in every cell: no cape, cloak or cloth, and no smear, motion arc or
+    motion lines.
+  prompt: >-
+    a red-skinned devil standing on two hooved legs, curled black ram horns, two black bat wings half raised behind the
+    shoulders, a long thin barbed tail, yellow eyes and a fanged grin, a lean muscular body, holding one black iron
+    trident in the hand on the right side of the image; centred in its own cell
+  attack: >-
+    lunging forward and thrusting the trident at the heroes, the wings spread, the trident points well inside the
+    middle cell, the same one trident as in the idle cell
+  hurt: knocked back, the wings folding, the free arm thrown up, the trident tilted back in the same hand
+  face: its red devil face with yellow eyes and a fanged grin under the ram horns is readable
+  extra_negative: grey stone skin, feathers, a cape, fire, a sword, a third wing, a second trident
+  seeds: [1234]
+- id: pyrolisk
+  # "Pyrolisk" (059): a small fiery bird-lizard (distinct from the cockatrice and basilisk)
+  size: small
+  body: bird
+  prompt: >-
+    a small fiery bird-lizard standing on two scaly lizard legs, a body of ember-orange and red feathers with glowing
+    yellow tips, small flame-edged wings, a hooked black beak, burning yellow eyes, a long scaly lizard tail curving
+    behind it; centred in its own cell
+  attack: >-
+    darting forward with the neck stretched to peck at the heroes, the wings flared, the tail counter-swinging, the
+    beak well inside the middle cell, no taller than half again its idle height
+  hurt: knocked back, the feathers ruffled, the wings flailing, the beak open in a screech
+  face: its burning yellow eyes and hooked beak are readable
+  extra_negative: a snake tail head, a rooster comb, a crest crown, six legs, fire breath, flames outside the body
+  seeds: [1234]
+- id: fire_elemental
+  # "Fire Elemental" (060): a living pillar of flame (floating; distinct from the other elementals)
+  size: large
+  floating: true
+  body: floating
+  prompt: >-
+    a living pillar of flame with a molten glowing core in its chest, the fire shaped into a tall figure with two
+    flame arms, the flames orange, yellow and deep red with crisp black outlines, the lower part tapering into a
+    flickering point; it hovers, nothing touches the ground; in every cell it floats at the same height in its box
+    with clear empty space below it, centred in its own cell
+  attack: >-
+    surging forward toward the heroes, both flame arms reaching out with the elbows bent so they stay well inside the
+    middle cell, the flames streaming back, at the same height as in the idle cell
+  hurt: knocked back, the flames flattened and guttering, the arms thrown up, the core dimming, at the same height
+  face: a fierce face formed from the flame itself (two bright yellow eyes and a dark open mouth), no human skin
+  extra_negative: skin, a human body, legs, a rock body, smoke, sparks outside the body, fireballs, a ground fire
+  seeds: [1234]
+- id: fire_hydra
+  # "Fire Hydra" (061): three red smoking heads, magma-cracked scales (distinct from the hydra)
+  size: large
+  body: quadruped
+  prompt: >-
+    a three-headed crimson hydra on four thick legs seen from the side, dark red scales cracked with glowing orange
+    magma seams, exactly three long necks each ending in a spiked red dragon-like head with small wisps of smoke
+    from the nostrils (attached), glowing orange eyes, a spiked thick tail; the heads inside the box
+  attack: >-
+    the three heads striking forward toward the heroes together with the jaws open and glowing inside, exactly three
+    heads as in the idle cell, all four feet on the ground, the heads well inside the middle cell
+  hurt: >-
+    knocked back, the three necks recoiling and twisting back, exactly three heads as in the idle cell, all four feet
+    on the ground
+  face: its three red heads with glowing orange eyes are readable
+  extra_negative: a fourth head, two heads, wings, green scales, fire breath streams, flames outside the body, rearing up
+  seeds: [1234]
+- id: lava_worm
+  # "Lava Worm" (062): a black-crusted magma worm (distinct from the gigas worm: crust and magma, no pink)
+  size: large
+  body: serpent
+  prompt: >-
+    a huge worm with a black cracked rock crust over its ringed body, glowing orange-yellow magma showing through the
+    seams between the rings, reared up in an S curve with the tail end coiled on the ground, a round open maw at the
+    top end ringed with black stony teeth and glowing inside, small wisps of steam rising from its back (attached); in
+    every cell the raised front end and the maw stay well below the top of the grey box and inside its cell
+  attack: >-
+    the front end lunging down toward the heroes with the glowing maw wide open, the body stretching, the maw well
+    inside the middle cell
+  hurt: the front end recoiling back and up, the maw clenched shut, the magma seams dimming, the body curling
+  face: no eyes; the round glowing toothed maw is the readable feature
+  extra_negative: eyes, a face, legs, pink skin, sand, a mound, lava pools, fire outside the body
+  seeds: [1234]
+- id: hellhound
+  # "Hellhound" (063): a two-headed fire hound (large; distinct from wolf, warg, winter wolf)
+  size: large
+  body: quadruped
+  prompt: >-
+    a big two-headed black hound on four legs seen from the side, exactly two heads side by side on two thick necks,
+    each head with burning orange eyes and bared fangs, ember-orange manes of flickering fire along both necks and the
+    back (drawn as part of the body), a lean muscular black body, a thin whip tail with a flame tip
+  attack: >-
+    lunging forward low with both heads snapping at the heroes, the jaws wide open, exactly two heads as in the idle
+    cell, all four feet on the ground, no taller than half again its idle height, the heads well inside the middle cell
+  hurt: >-
+    knocked back, both heads turned away with a yelp, the fire manes flattened, exactly two heads as in the idle cell,
+    all four feet on the ground
+  face: its two hound heads with burning orange eyes and fangs are readable
+  extra_negative: a third head, one head, grey fur, white fur, wings, fire breath, flames outside the body, rearing up
+  seeds: [1234]
+- id: fire_lizard
+  # "Fire Lizard" (064): a large frilled fire lizard (distinct from the small green lizard)
+  size: large
+  body: quadruped
+  prompt: >-
+    a large orange fire lizard in a low sprawl seen from the side, a wide spiny neck frill of red and yellow, dark
+    smouldering back plates with glowing orange edges and thin wisps of smoke rising from them (attached), rough orange
+    and brown scales, a blunt head with a yellow eye, clawed feet, a long thick tail curved behind it so the whole
+    body fits the box
+  attack: >-
+    lunging forward low with the jaws open in a snapping bite at the heroes, the frill flared wide, all four feet on
+    the ground (no leap), no taller than half again its idle height, the head well inside the middle cell
+  hurt: knocked back low, the frill folded, the head pulled in, the tail curling, all four feet down
+  face: its blunt head with the yellow eye and jagged teeth is readable
+  extra_negative: green scales, wings, fire breath, flames outside the body, standing upright, rearing up
+  seeds: [1234]
+- id: fire_gigas
+  # "Fire Gigas" (065): a forge giant (molten skin, flaming hair, iron hammer; distinct from hill and ice gigas)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the hammer with the elbows bent, so every reaching part stays well inside its own cell. Draw only
+    the parts and clothing named in the description, the same in every cell: no cape, cloak, scarf or extra cloth, and
+    no smear, motion arc, motion lines or sparks.
+  prompt: >-
+    a huge giant with charred black-grey skin cracked with glowing orange molten veins, a mane of flaming orange hair
+    and a flaming beard (drawn as part of the head), a scorched leather smith's apron and iron bracers, holding one huge
+    iron forge hammer in both hands; centred in its own cell
+  attack: >-
+    stepping forward and slamming the forge hammer down in front of its body at the heroes, the hammer head well inside
+    the middle cell
+  hurt: knocked back, staggering, the flaming hair flattened, the hammer dragged low in one hand
+  face: its charred face with glowing orange eyes inside the flaming hair is readable
+  extra_negative: furs, a tree club, ice, a cape, a sword, an anvil, flames outside the body, sparks
+  seeds: [1234]
