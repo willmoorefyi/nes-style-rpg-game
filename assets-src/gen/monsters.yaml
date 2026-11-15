@@ -1301,8 +1301,8 @@
   floating: true
   body: swimmer
   prompt: >-
-    a small silver-green piranha fish seen from the side, a deep round body, an orange-red belly, a big underbite of
-    needle teeth, a small fierce red eye, small fins and a forked tail; it hovers horizontally, nothing touches the
+    a small round silver-green fish seen from the side, a deep round body, an orange belly, a big underbite of small
+    pointed white teeth, a small red eye, small fins and a forked tail; it hovers horizontally, nothing touches the
     ground, no water drawn; in every cell it floats at the same height in its box with clear empty space below it
   attack: >-
     darting forward toward the heroes, the jaws gaping wide, the body level and horizontal at the same height as in the
@@ -1310,16 +1310,16 @@
   hurt: >-
     knocked back, the body bent into a gentle curve while staying horizontal at the same height as in the idle cell,
     the jaws clenched, the tail fin whipping
-  face: its fierce red eye and the needle-toothed underbite are readable
+  face: its red eye and the toothy underbite are readable
   extra_negative: water, bubbles, splashes, motion lines, armour plates, spines, legs, a vertical body
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R156): no image (PROHIBITED_CONTENT); the wording softened
 - id: red_piranha
   # "Red Piranha" (052): larger, blood-red and armour-plated
   size: small
   floating: true
   body: swimmer
   prompt: >-
-    a big blood-red armour-plated piranha seen from the side, a heavy deep body covered in dark red bony scale plates,
+    a big deep crimson armour-plated piranha fish seen from the side, a heavy deep body covered in dark red bony scale plates,
     a thick bony head plate, rows of spiny dorsal and belly fins, a huge underbite of needle teeth, a glowing yellow
     eye, a ragged forked tail; it hovers horizontally, nothing touches the ground, no water drawn; in every cell it
     floats at the same height in its box with clear empty space below it
