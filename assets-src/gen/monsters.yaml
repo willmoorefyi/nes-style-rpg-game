@@ -761,17 +761,17 @@
   size: large
   body: biped
   prompt: >-
-    a grey-skinned ogre warlord, huge and bulky, wearing a riveted iron breastplate covering the whole chest and
-    iron shoulder plates (in every cell), an iron helm with two
+    a grey-skinned ogre warlord, huge and bulky, wearing riveted iron chest and shoulder plates, an iron helm with two
     curved horns, a belt hung with small skulls over a leather kilt, iron-shod boots, holding a huge two-handed
     cleaver with a notched blade, a jutting underbite with two tusks, small angry eyes
   attack: swinging the cleaver down in a great overhead chop at the heroes, stepping forward, the body leaning in
-  hurt: >-
-    knocked back, staggering and leaning far back away from the heroes, the horned helm knocked askew but still on
-    his head, the cleaver dragged low
+  # approved: seed 1234 with this text (ROSTER_LOG R92, R95: best of 3). 1235 (R93, "... knocked askew but still on his
+  # head ..."): armour lost, cape; 1236 (R94, + "a riveted iron breastplate covering the whole chest ... (in every
+  # cell)", a hurt "leaning far back", a cape/cloak/bare chest in the negative): the cleaver cut at the top, a cloak
+  hurt: knocked back, staggering, the helm knocked askew, the cleaver dragged low
   face: its grey ogre face with small angry eyes and tusks under the horned helm is readable
-  extra_negative: a cape, a cloak, a bare chest, a club, a loincloth only, tan skin, a shield
-  seeds: [1234]
+  extra_negative: a club, a loincloth only, tan skin, a shield
+  seeds: [1234, 1235, 1236]
 - id: lizard
   # "Lizard" (016): solid hide, frequent critical hits
   size: small
