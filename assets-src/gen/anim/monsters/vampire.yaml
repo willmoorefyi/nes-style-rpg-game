@@ -164,3 +164,9 @@ paint:                       # 1-2 px cracks enclosed by outline ink, closed wit
   # 2026-11-15 review 2: 1 px pinholes in the ink between the cape and the lowered arm, outline ink
   - {frame: daze, xy: [[26, 62], [26, 63], [25, 66]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[26, 63]], rgb: [6, 4, 10]}
+  # F3d / 10a (FW-P keyframe paint on idle, 8 px): a 2 px red eye in the brow shadow, in the sprite's own brightest
+  # red; 2 px of face light on the cheek (the face ramp's light tone); the 2x2 skin speck in the hair above-left of
+  # the eye, which read as a second eye, in the hair colour around it. The idle-sourced in-betweens follow
+  - {frame: idle, xy: [[45, 17], [46, 17]], rgb: [189, 16, 123]}
+  - {frame: idle, xy: [[46, 20], [47, 20]], rgb: [189, 173, 189]}
+  - {frame: idle, xy: [[44, 14], [45, 14], [44, 15], [45, 15]], rgb: [57, 16, 49]}

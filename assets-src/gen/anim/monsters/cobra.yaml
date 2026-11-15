@@ -13,6 +13,12 @@ parts:
 holds: []
 paint:                          # 1 px outline corner where the coil meets the shifted neck
   - {frame: atk_wind2, xy: [[33, 41]], rgb: [6, 4, 10]}
+  # F3d / 10b (FW-P keyframe paint): an eye per key, so the head reads as a head under the hood: a cream glint
+  # beside an ink pupil, in the sprite's own colours (idle 3 px: a 2 px glint over a 1 px pupil; attack and hurt 1 px ring the pupil the art has)
+  - {frame: idle, xy: [[47, 9], [48, 9]], rgb: [231, 222, 181]}
+  - {frame: idle, xy: [[48, 10]], rgb: [6, 4, 10]}
+  - {frame: attack, xy: [[65, 15]], rgb: [231, 222, 181]}
+  - {frame: hurt, xy: [[44, 16]], rgb: [231, 222, 181]}
 frames:
   atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}   # visible draw-back (E12)
   atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}  # the head draws back and down; the shared t -0.35 / dy 2 shrank the figure 6 px under the lerp
