@@ -3,8 +3,8 @@
   "sheet": "monster_large",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "77ab2399bba0387747c6dd52",
+  "seed": 1236,
+  "cache_key": "48646dd0fad693e88a9b4fc0",
   "approved": "2026-11-15",
   "grid": [
     128,
@@ -23,5 +23,5 @@
   "size": "large",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R193"
+  "note": "fix pass R287 (seed 1236): axe stays on the right shoulder in hurt (defect 6)"
 }
