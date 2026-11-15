@@ -1916,9 +1916,10 @@
     no slash trail, smear or motion lines.
   prompt: >-
     a rotting undead minotaur, grey-green decaying hide torn open to show white ribs on one side, a bull skull head
-    with one long horn and one broken stump of a horn, glowing pale green eye sockets, a tattered loincloth, holding one
-    big rusted cleaver; in the idle cell the cleaver hangs low in the hand on the right side of the image; tall and
-    filling the box, centred in its own cell, the whole cleaver well inside its cell in every cell
+    with two short horns curving out to the sides, one whole and one snapped off halfway, the same two horns in every
+    cell, glowing pale green eye sockets, a tattered loincloth, holding one big rusted cleaver; in the idle cell the
+    cleaver hangs low in one hand; the horn tips well below the top of the grey box, centred in its own cell, the
+    whole cleaver well inside its cell in every cell
   attack: >-
     stepping forward toward the heroes at the end of a downward chop: the cleaver in both hands, its blade low in front
     of him at knee height, the body leaning in, the whole cleaver well inside the middle cell (not raised overhead, not
@@ -1926,8 +1927,8 @@
   hurt: >-
     knocked back, the skull head thrown back, the cleaver held up across the chest in both hands
   face: its bull skull with glowing green eye sockets and the broken horn is readable
-  extra_negative: a nose ring, a harness, brown fur, a double-bladed axe, a cape, two whole horns
-  seeds: [1234]
+  extra_negative: a nose ring, a harness, brown fur, a double-bladed axe, a cape, two whole horns, long horns, a hornless skull
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R214): the idle horn cut by the cell top, the horns lost in the attack and hurt
 - id: king_mummy
   # "King Mummy" (087): an upright regal mummy (distinct from the hunched mummy)
   size: small
