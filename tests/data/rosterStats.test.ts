@@ -54,8 +54,9 @@ describe('roster stats: the pre-roster entries (D4)', () => {
     }
   });
 
-  it('only the pre-roster entries are tuned', () => {
-    expect(enemies.filter((e) => e.tuned).map((e) => e.id).sort()).toEqual(Object.keys(PRE_ROSTER).sort());
+  it('only the pre-roster entries (and lich_2, scaled from the tuned lich) are tuned', () => {
+    expect(enemies.filter((e) => e.tuned).map((e) => e.id).sort()).toEqual([...Object.keys(PRE_ROSTER), 'lich_2'].sort());
+    expect(enemies.find((e) => e.id === 'lich_2')?.stats.agility).toBe(enemies.find((e) => e.id === 'lich')?.stats.agility);
   });
 
   it('display names follow the spec: Goblin Guard, Warg Wolf, Red Dragon, Rime Sovereign', () => {

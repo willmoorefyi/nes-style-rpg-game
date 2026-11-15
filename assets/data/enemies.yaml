@@ -2090,6 +2090,7 @@
   name: Rime Sovereign II
   num: 124
   rematchOf: lich
+  tuned: true   # scaled from the lich's tuned numbers; agility kept at the lich's 12 (no evade data to derive it)
   description: "The Rime Sovereign, raised again in the temple of the past. The fire that once hurt him no longer burns."
   protect: [status, poison_stone, death]
   attackStatus: [stun]
@@ -2097,7 +2098,7 @@
   stats:
     hp: 1000
     strength: 35
-    agility: 5
+    agility: 12
     intelligence: 13
     vitality: 15
     luck: 5
