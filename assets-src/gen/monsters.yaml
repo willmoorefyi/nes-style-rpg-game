@@ -125,15 +125,19 @@
   # pass F (docs/FEEDBACK_PLAN_2026-11-14.md 3.7): the heavy attack's raised hold; the idle already fills the cell
   # height, so the raise must fit by crouching (same sprite size as Image 3), not by growing taller
   attack_raise: >-
-    the wind-up of a crushing overhead blow: both hands gripping the greatsword raised high above his horned helm, the
-    blade angled back over his shoulder, chest open toward the heroes, front foot planted forward, cape lifting behind
-    him; he sinks into a deep crouch with both knees bent so that the whole figure, horns and raised blade included,
-    stays inside the grey box at exactly the same pixel size as in Image 3 (the raised blade's tip is the highest point,
-    well below the top of the image)
+    the wind-up of a crushing overhead blow, seen in the same three-quarter front view as Image 3 (body and helm turned
+    toward the viewer and the heroes on the right, never his back): the full-size horned helm exactly as in Image 3,
+    both large curved ivory horns, the visor slit with two glowing red eyes facing the viewer; the large layered
+    gold-trimmed pauldrons as big as in Image 3; both hands gripping the greatsword raised high above the helm, the
+    blade angled back over his shoulder, the greatsword the same length and the same broad width as in Image 3; chest
+    open toward the heroes, front foot planted forward, cape lifting behind him; he sinks into a deep crouch with both
+    knees bent so that the whole figure, horns and raised blade included, stays inside the grey box at exactly the same
+    pixel size as in Image 3 (the raised blade's tip is the highest point, well below the top of the image)
   face: the face is hidden by the horned helm; two glowing red eyes in the visor slit are readable
   extra_negative: a bare face, a skull, a shield, a second weapon
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1235}   # 1234 drew a stiff crouch with the guide box painted between the legs
+  sheet_seeds: {boss_attack: 1235, boss_attack_raise: 1235}   # boss_attack 1234: a stiff crouch with the guide box painted
+  # between the legs; boss_attack_raise 1234 (ACT1_LOG #28): back view, small helm, short thin sword (retry #31)
 - id: lich
   # "the Rime Sovereign": original frost-undead knight-king boss (no legacy design reference; one image per pose)
   size: boss
@@ -170,12 +174,16 @@
     armour, mantle flung forward around him
   # pass F 3.7: the heavy attack's raised hold (fits the cell by crouching, as garland's)
   attack_raise: >-
-    the wind-up of an overhead glaive strike: both gauntlets lifting the ice glaive high above his crowned skull, the
-    blade swept back behind his head, mantle lifting, a short frost trail curling off the blade; he sinks into a deep
-    crouch with both knees bent so that the whole figure, icicle crown and raised glaive included, stays inside the grey
-    box at exactly the same pixel size as in Image 3 (the raised blade is the highest point, well below the top of the
-    image)
+    the wind-up of an overhead glaive strike: both gauntlets lifting the glaive high above his crowned skull, the long
+    haft held diagonally with the blade swept back high behind his head; it is exactly the glaive of Image 3, as long as
+    in Image 3 (its dark haft nearly spans the image), with the same slim curved blade of clouded blue ice, the thin cyan
+    rune line inlaid along the blade, and the small spearhead point at its tip; no frost trail, smear or motion arc on
+    the blade. The skull face as crisp and readable as in Image 3 (cracked bone, two pale cyan eye lights, a toothed
+    jaw) and the tall crown of jagged icicles as in Image 3; mantle lifting; he sinks into a deep crouch with both knees
+    bent so that the whole figure, icicle crown and raised glaive included, stays inside the grey box at exactly the
+    same pixel size as in Image 3 (the raised blade is the highest point, well below the top of the image)
   face: the skull face with two pale cyan eye lights and a toothed jaw is readable
   extra_negative: a helmet or mask covering the skull, a sword, skulls on the shoulders, a throne, a second weapon
   seeds: [1234]
-  sheet_seeds: {boss_attack_raise: 1235}   # 1234 painted the guide's ground line across both boots (ACT1_LOG #29)
+  sheet_seeds: {boss_attack_raise: 1236}   # 1234 painted the guide's ground line across both boots (ACT1_LOG #29);
+  # 1235 (#30) drew a broad flat cleaver without the rune inlay or spearhead and a muddy skull (retry #32)

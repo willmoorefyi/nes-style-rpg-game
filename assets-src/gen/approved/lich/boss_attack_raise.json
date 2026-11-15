@@ -3,9 +3,9 @@
   "sheet": "boss_attack_raise",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1235,
-  "cache_key": "01447ea32ceac64855ace8f8",
-  "approved": "2026-11-14",
+  "seed": 1236,
+  "cache_key": "0584887494033aec0cbf7eed",
+  "approved": "2026-11-15",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "pass F 3.7 (FB-8) retry seed 1235: crouched overhead glaive raise, blade swept back over the crown; 182 px, feet 192, headroom 11 px; nit: the blade reads broader than the idle's curved glaive"
+  "note": "pass F 3.7 (FB-8) retry after the 2026-11-15 image review (user-approved 3rd attempt): the idle's slim curved glaive at full length with the spearhead and butt spike, crisp skull and icicle crown, crouched; 171 px, feet 192, headroom 22 px"
 }

@@ -111,10 +111,13 @@ def run_ledger(check: Callable[[bool, str], None]) -> None:
     for e in new:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1
     check(len(new) <= cap["max_new"] and all(n <= cap["max_per_sheet"] for n in per.values())
-          and all(s == "boss_attack_raise" and c in ("garland", "lich") for c, s in per),
+          and all(s == "boss_attack_raise" and c in ("garland", "lich") for c, s in per)
+          and per.get(("garland", "boss_attack_raise"), 0) <= 2,
           f"ledger: pass F made {len(new)} Gemini attempts (<= {cap['max_new']}, <= {cap['max_per_sheet']} per sheet, "
-          f"garland / lich boss_attack_raise only): {per}")
-    check(len(gem) - json.loads(GEN.BUDGET.read_text())["attempts_before"] <= 30, "the run budget ends at <= 30 of 100")
+          f"garland <= 2 by decision, garland / lich boss_attack_raise only): {per}")
+    end = cap["gemini_before"] - json.loads(GEN.BUDGET.read_text())["attempts_before"] + cap["max_new"]
+    check(len(gem) - json.loads(GEN.BUDGET.read_text())["attempts_before"] <= end,
+          f"the run budget ends at <= {end} (pass F's cap; 2026-11-15: the user raised it by one lich attempt)")
 
     def refused(n_new: int, sheet: str) -> bool:
         fake = gem[:cap["gemini_before"]] + [{"event": "attempt", "backend": "gemini", "character": "lich",
@@ -123,10 +126,12 @@ def run_ledger(check: Callable[[bool, str], None]) -> None:
         try:
             GEN.check_budget([req], paid=True, max_paid=1, retry=True, ledger=fake)
         except SystemExit as e:
-            return "pass F" in str(e)
+            return "refused" in str(e)          # pass F's cap, or the run's per-sheet cap when it is the same (3)
         return False
-    check(refused(2, "boss_attack_raise") and refused(4, "kit_x") and not refused(1, "boss_attack_raise"),
-          "check_budget refuses a 3rd attempt at one pass F sheet and a 5th pass F attempt in total")
+    per_sheet, total = cap["max_per_sheet"], cap["max_new"]
+    check(refused(per_sheet, "boss_attack_raise") and refused(total, "kit_x")
+          and not refused(per_sheet - 1, "boss_attack_raise"),
+          f"check_budget refuses attempt {per_sheet + 1} at one pass F sheet and attempt {total + 1} in total")
 
 
 def run_heavy(check: Callable[[bool, str], None]) -> None:
