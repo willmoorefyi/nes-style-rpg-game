@@ -837,9 +837,11 @@
     a slim grey shark arched in a curve as if leaping, seen from the side, a pale belly, a tall dorsal fin, a crescent
     tail fin, small black eyes, the jaws slightly open showing rows of white teeth; no water drawn
   attack: lunging forward toward the heroes with the jaws gaping wide, the body straightening
-  hurt: arching away from the heroes, the jaws clenched, the tail fin whipping
+  hurt: >-
+    arching its body away from the heroes in a curve while staying horizontal, at the same height as in the idle cell,
+    the jaws clenched, the tail fin whipping
   face: its shark head with a small black eye and rows of white teeth is readable
-  extra_negative: water, waves, splashes, scars, legs
+  extra_negative: water, waves, splashes, bubbles, water streaks, motion lines, scars, legs
   seeds: [1234]
 - id: bigeyes
   # "Bigeyes" (022): a fragile aquatic eye that paralyses with a gaze
