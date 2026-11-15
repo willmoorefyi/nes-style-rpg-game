@@ -11,7 +11,8 @@ import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
 import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
-import { losesTurn, tickStatus, type TickSubject } from './StatusTick.js';
+import { losesTurn, type PresentHold, type TickSubject } from './StatusTick.js';
+import { runTurn } from './turnTick.js';
 import { xpShare } from './Rewards.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { SpellExecutor } from './SpellExecutor.js';
@@ -79,6 +80,8 @@ export interface ActionResult {
   missed: boolean;
   /** The spell or item the action used (ids; the battle view picks its effect by these, never by message text). */
   spellId?: string; itemId?: string;
+  /** Re-test A, D: changes the view shows only once their line is up (a wake, end-of-turn poison). */
+  holds?: PresentHold[];
 }
 
 export interface NextActionInfo {
@@ -227,7 +230,7 @@ export class BattleStateMachine {
   }
 
   /**
-   * Play-test item 3: a member whose turn is certain to be lost (sleep, stun, stone, lethal poison: `losesTurn`) gets
+   * Play-test item 3: a member whose turn is certain to be lost (sleep, stun, stone: `losesTurn`; poison hurts after the action, so it never costs the turn) gets
    * no command menu. A `skip` command keeps their place in the turn order, where the tick shows "X is asleep!".
    */
   private skipHelplessMembers(): void {
@@ -312,7 +315,7 @@ export class BattleStateMachine {
     return !!member && member.currentHp > 0;
   }
 
-  /** E1: the next actor's start-of-turn tick is certain to end its turn (sleep, stun, stone, lethal poison). Pure. */
+  /** E1: the next actor's start-of-turn tick is certain to end its turn (sleep, stun, stone). Pure. */
   nextActorLosesTurn(): boolean {
     const action = this._actionQueue[0];
     const subject = action && this.isNextActorAlive() ? this.tickSubject(action.combatantId, action.isEnemy) : null;
@@ -339,12 +342,13 @@ export class BattleStateMachine {
     this._damageEvents = [];
     this._missed = false;
 
-    // Tick status effects at start of turn; when the actor still acts, the tick's lines (poison) follow the action's
-    // result lines, so they never land between the view's announcement and its result
-    const tick: BattleMessage[] = [];
-    const canAct = this.tickCombatantStatus(action.combatantId, action.isEnemy, tick);
-    if (canAct && !action.command.skip) this.executeCommand(action.command, action.isEnemy);
-    this.messages.push(...tick);
+    // Re-test A: the start-of-turn tick may cost the turn; the action runs; poison hurts at the end of the turn
+    const subject = this.tickSubject(action.combatantId, action.isEnemy);
+    const holds = !subject ? [] : runTurn(subject, action.combatantId, this.rng, {
+      say: (text) => { const line = { text }; this.messages.push(line); return line; },
+      act: () => { if (!action.command.skip) this.executeCommand(action.command, action.isEnemy); },
+      decided: () => this.isOver || this.livingEnemies.length === 0 || this.livingParty.length === 0,
+    });
 
     // An escape ends the battle mid-round: never overwrite the end state
     const done = this.isOver || this._actionQueue.length === 0;
@@ -353,7 +357,7 @@ export class BattleStateMachine {
     }
 
     const { spellId, itemId } = action.command;
-    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed, ...(spellId ? { spellId } : {}), ...(itemId ? { itemId } : {}) };
+    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed, holds, ...(spellId ? { spellId } : {}), ...(itemId ? { itemId } : {}) };
   }
 
   /** The next queued action; `actorId` (party_i / enemy_i) identifies the actor's sprite, never its name. */
@@ -414,11 +418,6 @@ export class BattleStateMachine {
     }
     this.messages = allMessages;
     this._damageEvents = allDamageEvents;
-  }
-
-  private tickCombatantStatus(id: string, isEnemy: boolean, out: BattleMessage[]): boolean {
-    const subject = this.tickSubject(id, isEnemy);
-    return !!subject && tickStatus(subject, this.rng, (text) => out.push({ text }));
   }
 
   /** The combatant as the status tick sees it (an enemy's max HP is its data's, a member's its character's). */

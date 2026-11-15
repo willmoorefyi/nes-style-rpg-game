@@ -4,6 +4,7 @@ import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { PANEL_FONT, PARTY_PANEL, STRIP_HEIGHT, STRIP_Y } from './BattleSceneTypes.js';
 import { byPriority, type StatusVisuals } from './fx/statusRules.js';
+import type { PresentedActor } from './presentedState.js';
 
 /** Column offsets inside a row (content px). */
 const COL = { cursor: 0, name: 44, hp: 220, bar: 420, status: 800 } as const;
@@ -50,7 +51,11 @@ export class BattlePartyPanel {
   /** status-visuals.yaml (set by createStatusFx): the tags and their order, the same priority as the icons. */
   statusVisuals: () => StatusVisuals = () => ({});
 
-  constructor(private readonly party: readonly Character[]) {
+  constructor(
+    private readonly party: readonly Character[],
+    /** Re-test D: the presented HP and statuses per member (the tags follow what the screen shows); live when absent. */
+    private readonly presented: () => readonly PresentedActor[] | undefined = () => undefined,
+  ) {
     this.window = new Window({ x: PARTY_PANEL.x, y: STRIP_Y, width: PARTY_PANEL.width, height: STRIP_HEIGHT });
     const rowHeight = this.rowHeight;
     party.forEach((_, i) => {
@@ -83,16 +88,22 @@ export class BattlePartyPanel {
       const row = this.rows[i];
       if (!row) return;
       row.name.text = c.name;
+      const hp = this.hpOf(i);
       const roll = this.hpRoll[i];
-      if (!roll) this.hpRoll[i] = { from: c.currentHp, to: c.currentHp, t: HP_ROLL_FRAMES };
-      else if (roll.to !== c.currentHp) this.hpRoll[i] = { from: this.shownHp(i), to: c.currentHp, t: 0 };
+      if (!roll) this.hpRoll[i] = { from: hp, to: hp, t: HP_ROLL_FRAMES };
+      else if (roll.to !== hp) this.hpRoll[i] = { from: this.shownHp(i), to: hp, t: 0 };
       this.drawHp(i);
       const v = this.statusVisuals();
-      const tags = c.currentHp <= 0 ? ['KO'] : byPriority(c.statusTracker.getAll().map(s => s.effect), v)
-        .map(s => v[s]?.tag ?? STATUS_TAGS[s] ?? s.toUpperCase());
+      const statuses = this.presented()?.[i]?.statuses ?? c.statusTracker.getAll().map(s => s.effect);
+      const tags = hp <= 0 ? ['KO'] : byPriority(statuses, v).map(s => v[s]?.tag ?? STATUS_TAGS[s] ?? s.toUpperCase());
       row.status.text = tags.slice(0, 2).join(' ');
     });
     this.applyHighlight();
+  }
+
+  /** Member i's HP as presented (the live HP when there is no presented state). */
+  private hpOf(i: number): number {
+    return this.presented()?.[i]?.hp ?? this.party[i]?.currentHp ?? 0;
   }
 
   /** 6b: advance the HP rolls (heals count up, damage counts down). */
@@ -146,16 +157,16 @@ export class BattlePartyPanel {
 
   private applyHighlight(): void {
     const targeting = this.targeted >= 0;
-    this.party.forEach((c, i) => {
+    this.party.forEach((_, i) => {
       const row = this.rows[i];
       if (!row) return;
       const lit = targeting ? i === this.targeted : i === this.active;
       row.cursor.visible = lit;
       row.cursor.tint = targeting ? TARGET_CURSOR : 0xffffff;
       const actorTint = targeting && i === this.active && !lit ? ACTOR_WHILE_TARGETING : null;
-      const tint = c.currentHp <= 0 ? DEAD : lit ? HIGHLIGHT : actorTint ?? 0xffffff;
-      row.name.tint = tint;
-      row.hp.tint = c.currentHp <= 0 ? DEAD : lit ? HIGHLIGHT : 0xffffff;
+      const down = this.hpOf(i) <= 0;
+      row.name.tint = down ? DEAD : lit ? HIGHLIGHT : actorTint ?? 0xffffff;
+      row.hp.tint = down ? DEAD : lit ? HIGHLIGHT : 0xffffff;
     });
   }
 }

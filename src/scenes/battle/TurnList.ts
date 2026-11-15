@@ -33,7 +33,8 @@ export function compactResult(messages: Array<{ text: string }>, actorName: stri
   const texts = messages.map(m => m.text);
   if (texts.includes(`${actorName} is silenced!`)) return 'Silenced';
   if (texts.includes(`${actorName} has no charges!`)) return 'No charges';
-  if (texts.some(t => t.endsWith("'s HP is full!"))) return '+0';
+  // +0 only when nobody recovered anything (a party HEAL that heals one member reads +N)
+  if (texts.some(t => t.endsWith("'s HP is full!")) && !texts.some(t => / recover(?:s|ed) \d+ HP/.test(t))) return '+0';
   const concise = formatConciseResult(messages, actorName);
   const heal = concise.match(/^→ (\d+) HP to /);
   if (heal) return `+${heal[1]}`;

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { formatConciseResult } from '../../../src/scenes/battle/battleMessageUtils.js';
+import { compactResult } from '../../../src/scenes/battle/TurnList.js';
 
 const msgs = (...texts: string[]) => texts.map(text => ({ text }));
 
@@ -76,6 +77,21 @@ describe('formatConciseResult: present-tense item lines with and without "!" (B4
     expect(formatConciseResult(msgs('FGHTR is revived!'), 'W.MAG')).toBe('→ Revived FGHTR');
     expect(formatConciseResult(msgs('FGHTR is revived'), 'W.MAG')).toBe('→ Revived FGHTR');
     expect(formatConciseResult(msgs('FGHTR was revived'), 'W.MAG')).toBe('→ Revived FGHTR');
+  });
+});
+
+describe('re-test A: the turn list shows the action; the end-of-turn poison follows it', () => {
+  it('a poisoned hit reads as the hit, not as the poison', () => {
+    expect(formatConciseResult(msgs('THF hits Goblin for 12!', 'THF takes 4 poison damage!'), 'THF')).toBe('→ 12 to Goblin');
+  });
+
+  it('a poisoned HEAL on a full party reads +0; a HEAL that heals one member reads its number', () => {
+    expect(compactResult(msgs("WHM2's HP is full!", "WAR's HP is full!", 'WHM2 takes 9 poison damage!'), 'WHM2')).toBe('+0');
+    expect(compactResult(msgs("WHM2's HP is full!", 'WAR recovers 20 HP!', 'WHM2 takes 9 poison damage!'), 'WHM2')).toBe('+20');
+  });
+
+  it('poison alone (nothing else happened) still reads as poison', () => {
+    expect(compactResult(msgs('THF takes 4 poison damage!', 'THF fell!'), 'THF')).toBe('Poison 4KO');
   });
 });
 

@@ -50,15 +50,16 @@ describe('E1: nextActorLosesTurn', () => {
     expect(goblin.status.has('sleep')).toBe(false);
   });
 
-  it('lethal poison (enemy max HP from data.stats.hp): lost; the tick kills it', () => {
+  it('lethal poison (enemy max HP from data.stats.hp): not lost (re-test A), the goblin acts and then falls to it', () => {
     const { bsm, goblin } = goblinFirst((g) => {
       g.status.apply('poison');
       g.data.stats.hp = 100;                              // 5 poison damage per tick
       g.currentHp = 5;
     });
-    expect(goblin.currentHp).toBeGreaterThan(0);
-    expect(bsm.nextActorLosesTurn()).toBe(true);
-    bsm.executeNextAction();
+    expect(bsm.nextActorLosesTurn()).toBe(false);
+    const texts = bsm.executeNextAction().messages.map((m) => m.text);
+    expect(texts.slice(-2)).toEqual([expect.stringMatching(/ takes 5 poison damage!$/), expect.stringMatching(/ defeated!$/)]);
+    expect(texts.length).toBeGreaterThan(2);              // the goblin's own action came first
     expect(goblin.currentHp).toBe(0);
   });
 

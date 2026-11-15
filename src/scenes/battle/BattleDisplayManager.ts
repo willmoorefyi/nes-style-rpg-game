@@ -10,7 +10,7 @@ import { BattlePartyPanel } from './BattlePartyPanel.js';
 import { BattleEnemyList } from './BattleEnemyList.js';
 import { BattleLayers } from './BattleLayers.js';
 import { setTint } from './actorTint.js';
-import { captureState, type PresentedState } from './presentedState.js';
+import { applyHolds, captureState, type PresentHold, type PresentedState } from './presentedState.js';
 import { trembleDx, type Posture } from './enemyChoreography.js';
 import { postureOf, type StatusVisuals } from './fx/statusRules.js';
 import { stoneTextures } from './fx/stoneTextures.js';
@@ -54,6 +54,8 @@ export class BattleDisplayManager {
    * presented (at its effect's impact), by statusFx.sync and at round resolution (`capturePresented`).
    */
   presented: PresentedState;
+  /** Re-test A, D: the action's changes still waiting for their line (`applyHolds`); set by the animation controller. */
+  holds: readonly PresentHold[] = [];
   /** status-visuals.yaml (set by createStatusFx): the postures of both sides. */
   statusVisuals: () => StatusVisuals = () => ({});
 
@@ -64,8 +66,8 @@ export class BattleDisplayManager {
     enemyWindow: Window,
   ) {
     this.layers = BattleLayers.of(mainContainer);
-    this.partyPanel = new BattlePartyPanel(config.party);
     this.presented = captureState(battle);
+    this.partyPanel = new BattlePartyPanel(config.party, () => this.presented.party);
     this.enemyListView = new BattleEnemyList(enemyWindow, () => this.battle.allEnemies.map((e, i) =>
       ({ data: e.data, currentHp: this.presented.enemies[i]?.hp ?? e.currentHp })));
   }
@@ -80,7 +82,7 @@ export class BattleDisplayManager {
 
   /** Take the live hp and statuses as the presented state (an action's impact, statusFx.sync, round resolution). */
   capturePresented(): void {
-    this.presented = captureState(this.battle);
+    this.presented = applyHolds(captureState(this.battle), this.holds);
   }
 
   createEnemySprites(): void {

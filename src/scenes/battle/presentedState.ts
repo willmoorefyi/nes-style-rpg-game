@@ -4,6 +4,8 @@
  */
 import type { StatusEffect } from '../../battle/StatusEffects.js';
 import type { NextActionInfo } from '../../battle/BattleStateMachine.js';
+import type { PresentHold } from '../../battle/StatusTick.js';
+export type { PresentHold } from '../../battle/StatusTick.js';
 import type { SpellTargeting } from '../../types/index.js';
 
 export interface PresentedActor { hp: number; statuses: StatusEffect[] }
@@ -24,6 +26,28 @@ export function captureState(battle: BattleStateSource): PresentedState {
     party: (battle.allParty ?? []).map((c) => ({ hp: c.currentHp, statuses: statusesOf(c.statusTracker) })),
     enemies: (battle.allEnemies ?? []).map((e) => ({ hp: e.currentHp, statuses: statusesOf(e.status) })),
   };
+}
+
+/**
+ * Re-test A, D: `state` with each held actor shown as its earliest hold says (its HP and statuses before the change),
+ * so a waking sleeper keeps SLP and a poisoned actor its HP until the line that changes them is on screen.
+ */
+export function applyHolds(state: PresentedState, holds: readonly PresentHold[]): PresentedState {
+  const seen = new Set<string>();
+  for (const h of holds) {
+    const [side, index] = h.actorId.split('_');
+    const list = side === 'party' ? state.party : side === 'enemy' ? state.enemies : null;
+    const i = Number(index);
+    if (!list?.[i] || seen.has(h.actorId)) continue;
+    seen.add(h.actorId);
+    list[i] = { hp: h.hp, statuses: [...h.statuses] };
+  }
+  return state;
+}
+
+/** The holds still waiting once line `shown` of `lines` is on screen (a hold whose line is not in `lines` is dropped). */
+export function pendingHolds(holds: readonly PresentHold[], lines: readonly { text: string }[], shown: number): PresentHold[] {
+  return holds.filter((h) => lines.indexOf(h.line) > shown);
 }
 
 /** Status sets by battle id (`party_i`, `enemy_i`). */

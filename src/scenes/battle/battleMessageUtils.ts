@@ -32,6 +32,11 @@ export function formatConciseResult(messages: Array<{ text: string }>, actorName
   const poisonMatch = texts.find(t => t.match(new RegExp(`^${escRe(actorName)} takes (\\d+) poison damage!$`)));
   const hasSleepStun = texts.some(t => t === `${actorName} is asleep!` || t === `${actorName} is stunned!`);
   const hasFear = texts.some(t => t === `${actorName} is trembling with fear!`);
+  if (poisonMatch && !hasSleepStun && !hasFear) {
+    // re-test A: poison hurts at the end of the turn, after the action's lines; the entry shows the action's result
+    const action = messages.slice(0, texts.indexOf(poisonMatch));
+    if (action.length > 0) return formatConciseResult(action, actorName);
+  }
   if (poisonMatch) {
     const n = poisonMatch.match(/takes (\d+) poison/)![1];
     const died = texts.some(t => /defeated!$|fell!$/.test(t));

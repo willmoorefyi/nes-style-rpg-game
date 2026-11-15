@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite } from 'pixi.js';
+import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { computeEnemyLayoutAi, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
@@ -10,6 +10,8 @@ import { BattleLayers } from './BattleLayers.js';
 import { setTint, tintOf } from './actorTint.js';
 import { stoneTextures } from './fx/stoneTextures.js';
 import type { FxCuePoint } from './fx/index.js';
+import { glintTip } from './glintPoint.js';
+import { readPixels, type Pixels } from './fx/texturePixels.js';
 
 /** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4; an enemy's
  *  `pulseTint` replaces it (the pale lich takes a lighter one, so it does not turn muddy). */
@@ -45,6 +47,8 @@ export class AiEnemyView {
   /** An attack cue with its enemy's sprite (the battle hands it to ActionFx.playCue), and for `hold` the raised
    *  weapon's tip (fractions of the sprite) when the atlas has it. */
   onCue: ((i: number, cue: PoseCue, sprite: Container, at?: FxCuePoint) => void) | null = null;
+  /** Reads a frame's pixels (the glint's walk down the weapon; tests inject the atlas PNG). */
+  pixels: (t: Texture) => Pixels | null = readPixels;
 
   constructor(private readonly enemies: EnemyData[], private readonly art: MonsterArtSource = battleArt) {
     this.poses = new EnemyPoseController(enemies.length);
@@ -54,8 +58,10 @@ export class AiEnemyView {
       if (cue === 'contact' && this.poses.attackKind(i) === 'heavy') BattleLayers.containing(sprite)?.shake.start();
       // a ranged attack (the dragon's breath) lands far from its feet: no impact dust
       if (cue === 'contact' && this.enemies[i]?.attack === 'ranged') return;
-      const tip = cue === 'hold' ? this.frames[i]?.tip : undefined;
-      const cell = this.frames[i]?.cell;
+      // re-test B: the tip, or the highest point of the weapon clear of the message window
+      const f = this.frames[i];
+      const tip = cue === 'hold' && f ? glintTip(f, sprite, this.pixels) : undefined;
+      const cell = f?.cell;
       this.onCue?.(i, cue, sprite, tip && cell ? { x: (tip[0] + 0.5) / cell[0], y: (tip[1] + 0.5) / cell[1] } : undefined);
     };
   }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { StatusTracker } from '../../src/battle/StatusEffects.js';
-import { rollWake, tickStatus } from '../../src/battle/StatusTick.js';
+import { rollWake, startTurn } from '../../src/battle/StatusTick.js';
 
 describe('StatusTracker', () => {
   it('applies and checks status effects', () => {
@@ -180,7 +180,7 @@ describe('helpless and the wake rule (FF1, EB-5)', () => {
     const s = subject(50);
     s.tracker.apply('sleep');
     const said: string[] = [];
-    expect(tickStatus(s, () => 0.1, t => said.push(t))).toBe(false);
+    expect(startTurn(s, () => 0.1, (t: string) => said.push(t)).canAct).toBe(false);
     expect(said).toEqual(['X is asleep!', 'X wakes up!']);
     expect(s.tracker.has('sleep')).toBe(false);
   });
@@ -188,11 +188,11 @@ describe('helpless and the wake rule (FF1, EB-5)', () => {
   it('a paralysed actor (stun) wakes by the same rule; stone never does', () => {
     const stunned = subject(50);
     stunned.tracker.apply('stun');
-    tickStatus(stunned, () => 0.1, () => undefined);
+    startTurn(stunned, () => 0.1, () => undefined);
     expect(stunned.tracker.has('stun')).toBe(false);
     const stone = subject(50);
     stone.tracker.apply('stone');
-    expect(tickStatus(stone, () => 0.1, () => undefined)).toBe(false);
+    expect(startTurn(stone, () => 0.1, () => undefined).canAct).toBe(false);
     expect(stone.tracker.has('stone')).toBe(true);
   });
 
@@ -200,7 +200,7 @@ describe('helpless and the wake rule (FF1, EB-5)', () => {
     const s = subject(5);
     s.tracker.apply('sleep');
     const said: string[] = [];
-    tickStatus(s, () => 0.5, t => said.push(t));
+    startTurn(s, () => 0.5, (t: string) => said.push(t));
     expect(said).toEqual(['X is asleep!']);
     expect(s.tracker.has('sleep')).toBe(true);
   });
