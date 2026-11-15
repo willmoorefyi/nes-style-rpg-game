@@ -1,0 +1,18 @@
+# Bigeyes (pass R, floating): a small floating eyeball with fish fins and a tail fin. body: floating
+# (rig_floating.py), judged by the float band. The eyeball is one rigid ball (head on its upper rim, body below);
+# turning either half would tear the iris, so every in-between moves the whole sprite (moves: []), and the fins
+# change only at keyframe boundaries.
+sprite: bigeyes
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [54, 50], base: [54, 75], neck: [54, 35], crown: [54, 24]}
+  attack: {core: [57, 50], base: [57, 76], neck: [57, 35], crown: [57, 23]}
+  hurt:   {core: [55, 52], base: [55, 77], neck: [55, 36], crown: [55, 24]}
+frames:
+  atk_wind1: {moves: [], dx: -2, dy: 1}      # backs off 2 and sinks (the shared 1 / 2 px drift barely read)
+  atk_wind2: {moves: [], dx: -4, dy: 2}
+  hurt_in1: {moves: [], dx: -3}              # knocked back 3
+holds: []
