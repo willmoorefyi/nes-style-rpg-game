@@ -187,12 +187,15 @@ frames:
   atk_recover:
     moves: *follow
     tweaks: {tail_tip: [2, -2]}
-  hurt_in1:                    # the flinch: every arm at full t, the orb arm kept clear of the tilting crown
+  hurt_in1:                    # the flinch: every arm at full t, the orb arm kept clear of the tilting crown; the
+    half: []                   # free tail starts its lash (12g: rises toward the hurt lash; more closes an 1800 px
+                               # loop with the censer smoke)
+    tweaks: {el_f: [-5, 0], hand_f: [-5, 0], orb: [-5, 0], tail1: [1, -2], tail2: [2, -6], tail_tip: [3, -10]}
+  hurt_in2:                    # the censer keeps its swing (moving it back toward idle closed a 2000 px loop between
+                               # body, smoke and tail); 12g: the tail lash lowered toward the hurt_in1 tail (translated
+                               # down, not swung back), so its centroid steps 4.0 px hurt_in1->hurt_in2 (body 2.6)
     half: []
-    tweaks: {el_f: [-5, 0], hand_f: [-5, 0], orb: [-5, 0]}
-  hurt_in2:                    # the tail stays in its hurt lash and the censer keeps its swing (either one moving
-                               # back toward idle closed a 2000 px loop between body, smoke and tail)
-    half: []
+    tweaks: {tail1: [-1, 3], tail2: [-2, 8], tail_tip: [-4, 14]}
     moves: [s1, hip, chest, neck, crown, sh_n, el_n, hand_n, sh_f, el_f, hand_f, orb, sh_n2, el_n2, hand_n2, sh_f2,
             el_f2, hand_f2, sh_n3, el_n3, hand_n3, sh_f3, el_f3, hand_f3, tip]
   daze:                        # the shared slump, the crown only drooping 1 px against the lowered body
