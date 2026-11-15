@@ -491,6 +491,17 @@
   per_pose: true
   design_ref: false
   body: biped
+  # the biped line ("strong diagonal ..., twist the torso") turned him to a side or three-quarter profile and dropped
+  # arms in R56-R58 (the multi-arm pause); only the poses not yet approved get this line (orchestrator, 2026-11-15)
+  motion:
+    cast: &chaos_motion >-
+      Keep the frontal view of Image 3, chest and face toward the viewer, and a symmetric, composed posture, never
+      turned to a side or three-quarter profile; all four arms stay separately visible and apart from the body, the
+      upper arm and the lower arm on the left side of the image and the upper arm and the lower arm on the right side
+      of the image, none hidden behind the body, merged or crossed; the movement is in the arms, the wings and the head,
+      and the wings move with the motion.
+    hurt: *chaos_motion
+    attack_raise: *chaos_motion
   prompt: >-
     Chaos, a colossal primordial titan of cracked black obsidian standing on two thick legs, a massive muscular
     humanoid body; exactly four arms, two on each side: on the left side of the image an upper arm and a lower arm, on
@@ -513,9 +524,11 @@
     side of the image, the upper arm is thrown back up behind the shoulder and the lower arm is braced at the hip, both
     clearly visible beside the body; at the same pixel size as in Image 3
   cast: >-
-    channelling: all four hands held in front of the chest around a glowing sphere of swirling energy in the four seam
-    colours (cyan, orange, teal and white), the sphere touching the hands, the wings spread wide, the seams blazing;
-    exactly four arms, two on each side, all four clearly visible; at the same pixel size as in Image 3
+    channelling: a glowing sphere of swirling energy in the four seam colours (cyan, orange, teal and white) floats
+    in front of his chest; the two arms on the left side of the image and the two arms on the right side of the image
+    spread around it like a frame, the two upper hands open beside the upper half of the sphere and the two lower hands
+    open beside its lower half, the sphere touching the hands; the wings spread wide, the seams blazing; exactly four
+    arms, two on each side, all four clearly visible; at the same pixel size as in Image 3
   hurt: >-
     struck: recoiling back, the head thrown back, the glowing seams flaring brighter, the four arms flung outward out
     of rhythm (two on the left side of the image, two on the right side), the wings faltering
