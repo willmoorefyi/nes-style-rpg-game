@@ -2588,15 +2588,16 @@
     lizard head with a spiky crest and yellow eyes high on top, one curled-horn ram head in the middle (only one ram
     head), and one maned grey lion head low in front; no wings, a short thick stone tail; the whole beast, tail to snout, sits in the middle of its own cell with empty space on both sides
   attack: >-
-    lunging forward low, the same three heads as in the idle cell (lizard high, ram in the middle, lion low)
-    snapping and butting toward the heroes, the heads above and just in front of
+    lunging forward low with the lion head roaring toward the heroes, the lizard head and the ram head staying on
+    top of the shoulders exactly as in the idle cell (three heads in all, no new head), the heads above and just in front of
     its front feet, all four feet on the ground, the whole beast well inside the middle cell; no breath
   hurt: >-
-    knocked back, all four feet on the ground, the same three heads as in the idle cell (lizard high, ram in the
-    middle, lion low) recoiling, a crack across the stone hide
+    knocked back, all four feet on the ground, the lion head flinching with the eyes shut, the lizard head and the
+    ram head staying on top of the shoulders exactly as in the idle cell (three heads in all, no new head), a crack
+    across the stone hide
   face: the three heads (lizard, ram and lion) are clearly readable, the lion face with amber eyes in front
   extra_negative: wings, a snake tail, a goat head, a dragon head, a fourth head, two ram heads, tawny fur, fire breath, rearing up, impact lines
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R271): four heads (two rams)
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R271): four heads (two rams); 1235 (R272): a fourth head in the attack and hurt
 - id: purple_worm
   # "Purple Worm" (122): a colossal dark purple armoured worm with rows of teeth and a tail stinger
   size: large
