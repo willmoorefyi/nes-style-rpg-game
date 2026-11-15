@@ -1420,14 +1420,15 @@
     exactly three long necks each ending in a horned green serpent head with yellow eyes, the three heads spread apart
     at different heights, a thick tail; the heads inside the box; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
   attack: >-
-    the three heads striking forward toward the heroes together with the jaws open, exactly three heads as in the idle
-    cell, all four feet on the ground, the heads well inside the middle cell
+    the three heads striking forward toward the heroes with the jaws open: exactly three heads as in the idle cell,
+    one high, one in the middle and one low, each on its own long neck and clearly apart from the others (three necks,
+    three heads, no more); all four feet on the ground, the heads well inside the middle cell
   hurt: >-
     knocked back, the three necks recoiling and twisting back, exactly three heads as in the idle cell, all four feet
     on the ground
   face: its three serpent heads with yellow eyes are readable
   extra_negative: a fourth head, two heads, wings, fire, smoke, red scales, rearing up
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R171): four heads in the attack
 - id: horned_devil
   # "Horned Devil" (058): a winged devil with a trident
   size: small
