@@ -1,0 +1,114 @@
+sprite: wight
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+attack_hand: f
+keyframes:
+  idle:
+    crown: [41, 6]
+    neck: [41, 22]
+    chest: [40, 28]
+    hip: [40, 50]
+    sh_n: [47, 27]
+    el_n: [50, 38]
+    hand_n: [52, 47]
+    sh_f: [30, 25]
+    el_f: [26, 36]
+    hand_f: [27, 47]
+    tip: [67, 65]
+    hip_n: [44, 54]
+    knee_n: [46, 64]
+    foot_n: [47, 74]
+    toe_n: [53, 77]
+    hip_f: [33, 54]
+    knee_f: [28, 64]
+    foot_f: [25, 74]
+    toe_f: [26, 77]
+  attack:
+    crown: [43, 13]
+    neck: [44, 27]
+    chest: [39, 33]
+    hip: [36, 50]
+    sh_n: [45, 31]
+    el_n: [46, 42]
+    hand_n: [48, 52]
+    sh_f: [28, 30]
+    el_f: [23, 40]
+    hand_f: [22, 47]
+    tip: [61, 66]
+    hip_n: [40, 55]
+    knee_n: [42, 64]
+    foot_n: [42, 74]
+    toe_n: [48, 77]
+    hip_f: [28, 57]
+    knee_f: [20, 64]
+    foot_f: [11, 73]
+    toe_f: [11, 77]
+  hurt:
+    crown: [14, 9]
+    neck: [20, 19]
+    chest: [30, 28]
+    hip: [35, 50]
+    sh_n: [16, 27]
+    el_n: [10, 38]
+    hand_n: [8, 51]
+    sh_f: [30, 22]
+    el_f: [40, 23]
+    hand_f: [49, 25]
+    tip: [67, 5]
+    hip_n: [40, 56]
+    knee_n: [42, 64]
+    foot_n: [41, 74]
+    toe_n: [44, 77]
+    hip_f: [27, 57]
+    knee_f: [20, 65]
+    foot_f: [17, 74]
+    toe_f: [18, 77]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2
+    moves: []
+    tweaks: {crown: [-2, 0], neck: [-1, 0], chest: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0], tip: [-2, -1], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0]}
+  atk_wind2:                   # coil: torso down 2 (recipe dy), the whole upper body 2 px back (arms with it: moving
+    moves: []                  # the sword arm alone opened a hole at its elbow), hood back 4, blade tipped up
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, -1], tip: [-4, -3], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0]}
+  atk_mid:                     # legs held at the lunge and shifted (not rotated) a third of the way back
+    t: 0.35
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [neck, chest, hip, crown, sh_f, el_f, hand_f, tip, sh_n, el_n, hand_n, hip_n, hip_f, toe_n, toe_f]
+    tweaks: {knee_n: [1, 0], foot_n: [2, 0], knee_f: [3, 0], foot_f: [5, 0]}
+  atk_follow:                  # a settle (20% back toward idle) rather than an overshoot: follow->recover centroid cap
+    t: 0.80
+    moves: [crown, neck, chest, hip, sh_f, el_f, hand_f, tip, sh_n, el_n, hand_n, knee_n, knee_f]
+  atk_recover:                 # both arms with the body (the far-arm-only default opened a hole by the near hand)
+    t: 0.30
+    moves: [crown, neck, chest, sh_f, el_f, hand_f, tip, sh_n, el_n, hand_n]
+  hurt_in1:                    # flinch: hood knocked back and down (translated), torso and hips 35% toward the recoil, near
+    moves: [chest, hip, hip_n, hip_f, knee_n, knee_f]   # arm thrown back, sword jerked up 4 px (translated: no blade turn)
+    tweaks: {crown: [-8, 3], neck: [-5, 2], chest: [-2, 0], sh_n: [-2, 0], el_n: [-3, -2], hand_n: [-4, -3], el_f: [0, -2], hand_f: [0, -4], tip: [0, -4]}
+  hurt_in2:                    # body and legs 35% back toward idle, hood 6 px toward the body; the raised sword arm keeps
+    moves: [chest, hip, hip_n, hip_f, knee_n, knee_f]   # its angle, the blade turns 25 deg down (tip 8/12 px)
+    tweaks: {crown: [6, 1], neck: [5, 1], chest: [3, 0], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1], el_f: [0, 2], hand_f: [0, 3], tip: [8, 12]}
+  daze:                        # hood and chest only (the shared move swings the sword arm forward)
+    moves: [crown, neck, chest]
+  daze_b:
+    moves: [crown, neck, chest]
+masks:
+  weapon:                      # the whole blade (the thigh bones took the part crossing the legs)
+    idle: [[30, 47], [50, 54], [62, 59], [70, 64], [69, 68], [62, 68], [48, 61], [33, 55], [29, 52]]
+    attack: [[25, 47], [45, 55], [55, 60], [64, 65], [63, 69], [56, 69], [42, 62], [27, 55], [23, 51]]
+  ft_n:
+    idle: [[41, 72], [59, 72], [59, 79], [41, 79]]
+    attack: [[37, 72], [52, 72], [52, 79], [37, 79]]
+    hurt: [[35, 72], [47, 72], [47, 79], [35, 79]]
+  ft_f:
+    idle: [[19, 72], [32, 72], [32, 79], [19, 79]]
+    attack: [[5, 70], [18, 70], [18, 79], [5, 79]]
+    hurt: [[11, 72], [24, 72], [24, 79], [11, 79]]
+holds: []
+paint: []

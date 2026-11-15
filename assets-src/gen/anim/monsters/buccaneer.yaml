@@ -1,0 +1,132 @@
+sprite: buccaneer
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+attack_hand: f
+keyframes:
+  idle:
+    crown: [46, 12]
+    neck: [46, 25]
+    chest: [45, 33]
+    hip: [45, 45]
+    sh_n: [54, 30]
+    el_n: [59, 37]
+    hand_n: [64, 29]
+    hook: [66, 21]
+    sh_f: [36, 31]
+    el_f: [30, 38]
+    hand_f: [27, 47]
+    tip: [16, 52]
+    hip_n: [51, 47]
+    knee_n: [57, 60]
+    foot_n: [57, 72]
+    toe_n: [62, 75]
+    hip_f: [40, 47]
+    knee_f: [34, 60]
+    foot_f: [31, 72]
+    toe_f: [27, 75]
+  attack:
+    crown: [50, 16]
+    neck: [47, 31]
+    chest: [42, 37]
+    hip: [43, 49]
+    sh_n: [53, 32]
+    el_n: [58, 30]
+    hand_n: [60, 22]
+    hook: [61, 10]
+    sh_f: [46, 40]
+    el_f: [53, 44]
+    hand_f: [60, 49]
+    tip: [70, 50]
+    hip_n: [48, 50]
+    knee_n: [50, 62]
+    foot_n: [48, 72]
+    toe_n: [53, 75]
+    hip_f: [36, 50]
+    knee_f: [27, 60]
+    foot_f: [18, 72]
+    toe_f: [15, 76]
+  hurt:
+    crown: [25, 10]
+    neck: [31, 25]
+    chest: [33, 33]
+    hip: [40, 44]
+    sh_n: [42, 24]
+    el_n: [46, 22]
+    hand_n: [48, 17]
+    hook: [52, 7]
+    sh_f: [23, 36]
+    el_f: [24, 44]
+    hand_f: [27, 52]
+    tip: [37, 60]
+    hip_n: [48, 44]
+    knee_n: [58, 50]
+    foot_n: [63, 61]
+    toe_n: [66, 63]
+    hip_f: [42, 47]
+    knee_f: [46, 60]
+    foot_f: [50, 72]
+    toe_f: [54, 75]
+parts:
+  hook: {bone: [hand_n, hook], radius: 3.0}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: axe drawn back, head back
+    moves: [crown, neck]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], el_f: [-1, -1], hand_f: [-2, -1], tip: [-3, -2], el_n: [0, -1], hand_n: [0, -1], hook: [0, -1]}
+  atk_wind2:                   # coil: axe pulled back and up behind the body, head leans back, hook raised
+    moves: [crown, neck]
+    tweaks: {crown: [-4, 0], neck: [-2, 0], sh_f: [-1, 0], el_f: [-2, -1], hand_f: [-3, -1], tip: [-4, -2], el_n: [0, -2], hand_n: [0, -2], hook: [0, -2]}
+  atk_mid:                     # axe arm keeps its attack angle (the swing is ~150 deg, past the rotation cap) and is
+    t: 0.35                    # translated back; legs pinned and shifted a third toward idle
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [neck, chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f]
+    tweaks: {knee_n: [3, 0], foot_n: [3, 0], knee_f: [5, 0], foot_f: [5, 0]}
+  atk_follow:                  # a settle; the axe arm rides the torso at its attack angle, pushed 2 px on
+    t: 0.72
+    moves: [crown, neck, chest, hip, knee_n, knee_f]
+    tweaks: {el_f: [1, 1], hand_f: [2, 2], tip: [2, 2]}
+  atk_recover:                 # idle axe arm translated toward the strike (crisp fist)
+    t: 0.35                    # (follow->recover IoU: the axe arm is still reaching forward)
+    moves: [crown, neck, chest, hip, knee_n, knee_f]
+    tweaks: {el_f: [3, 0], hand_f: [5, 0], tip: [6, 0]}
+  hurt_in1:                    # flinch: head back, hook jerks up, axe pulled in
+    moves: [chest]
+    tweaks: {crown: [-4, -1], neck: [-2, -1], chest: [-1, 0], el_n: [0, -3], hand_n: [0, -3], hook: [0, -3], el_f: [-1, -1], hand_f: [-2, -1], tip: [-2, -1]}
+  hurt_in2:                    # from hurt: head settles toward the body, lifted foot swings down
+    moves: []
+    pins: [foot_f, knee_f]
+    tweaks: {crown: [3, 2], neck: [2, 2], chest: [1, 1], foot_n: [-3, 2], toe_n: [-3, 2], knee_n: [-2, 1]}
+  daze:
+    t: 0.05
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 2], hand_n: [0, 2], hook: [0, 2]}
+  daze_b:
+    t: 0.05
+    tweaks: {crown: [0, 1], el_n: [0, 3], hand_n: [0, 3], hook: [0, 3]}
+z:
+  idle: [uarm_f, farm_f, weapon, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, hook]
+  attack: [uarm_n, farm_n, hook, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_f, farm_f, weapon]
+  hurt: [thigh_n, shin_n, ft_n, uarm_n, farm_n, hook, thigh_f, shin_f, ft_f, torso, head, uarm_f, farm_f, weapon]
+masks:
+  farm_n:                      # attack: the raised hook forearm next to the face is arm, not head
+    attack: [[56, 17], [64, 17], [64, 31], [56, 31]]
+  hook:
+    attack: [[57, 6], [65, 6], [65, 17], [57, 17]]
+  weapon:
+    idle: [[12, 43], [26, 43], [26, 58], [12, 58]]
+    attack: [[64, 42], [76, 42], [76, 58], [64, 58]]
+    hurt: [[30, 55], [42, 55], [42, 64], [30, 64]]
+  ft_n:
+    idle: [[51, 71], [67, 71], [67, 78], [51, 78]]
+    attack: [[44, 71], [59, 71], [59, 78], [44, 78]]
+    hurt: [[59, 58], [70, 58], [70, 66], [59, 66]]
+  ft_f:
+    idle: [[25, 71], [37, 71], [37, 78], [25, 78]]
+    attack: [[12, 69], [24, 69], [24, 78], [12, 78]]
+    hurt: [[46, 71], [60, 71], [60, 78], [46, 78]]
+holds: []
+paint: []

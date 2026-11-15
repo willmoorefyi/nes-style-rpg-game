@@ -1,0 +1,134 @@
+sprite: bloodbones
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: n
+attack_hand: n
+keyframes:
+  idle:
+    crown: [45, 13]
+    neck: [45, 25]
+    chest: [44, 32]
+    hip: [44, 47]
+    sh_n: [51, 33]
+    el_n: [55, 39]
+    hand_n: [61, 41]
+    tip: [65, 22]
+    sh_f: [36, 30]
+    el_f: [32, 38]
+    hand_f: [29, 47]
+    ftip: [14, 38]
+    fb_h: [24, 44]
+    hip_n: [48, 50]
+    knee_n: [51, 60]
+    foot_n: [51, 72]
+    toe_n: [57, 75]
+    hip_f: [39, 50]
+    knee_f: [34, 60]
+    foot_f: [28, 72]
+    toe_f: [27, 75]
+  attack:
+    crown: [50, 19]
+    neck: [48, 30]
+    chest: [43, 38]
+    hip: [43, 52]
+    sh_n: [50, 32]
+    el_n: [55, 24]
+    hand_n: [57, 17]
+    tip: [37, 5]
+    sh_f: [38, 32]
+    el_f: [37, 42]
+    hand_f: [36, 55]
+    ftip: [14, 38]
+    hip_n: [47, 57]
+    knee_n: [49, 64]
+    foot_n: [49, 72]
+    toe_n: [55, 75]
+    hip_f: [38, 57]
+    knee_f: [28, 64]
+    foot_f: [19, 72]
+    toe_f: [17, 76]
+  hurt:
+    crown: [33, 13]
+    neck: [37, 26]
+    chest: [37, 33]
+    hip: [38, 45]
+    sh_n: [44, 34]
+    el_n: [51, 37]
+    hand_n: [57, 38]
+    tip: [65, 22]
+    sh_f: [31, 31]
+    el_f: [21, 32]
+    hand_f: [11, 32]
+    fb_h: [34, 42]
+    hip_n: [41, 48]
+    knee_n: [41, 61]
+    foot_n: [32, 71]
+    toe_n: [31, 75]
+    hip_f: [33, 47]
+    knee_f: [25, 58]
+    foot_f: [14, 70]
+    toe_f: [13, 75]
+parts:
+  blade_f:                     # the far blade: drawn in idle and attack only (the hurt key drops it); carried behind the ribcage
+    kind: prop
+    bone: {idle: [hand_f, ftip], attack: [hand_f, ftip], hurt: [hip, fb_h]}
+    radius: 2.0
+    in: [idle, attack]
+    carry_to: fb_h
+    carry_mode: behind
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: skull back, blade arm lifting
+    moves: [crown, neck]
+    tweaks: {crown: [-1, 0], neck: [-1, 0], sh_n: [0, -1], el_n: [0, -2], hand_n: [-1, -2], tip: [-2, -3]}
+  atk_wind2:                   # the swing starts toward the strike (the near blade turns ~120 deg between idle and attack,
+    t: 0.25                    # so a pull-back cannot meet wind2->mid): blade arm lifted 4 px (translated, under the cap),
+    dy: 0                      # skull back; no body drop (the attack key is taller: bbox lerp)
+    moves: [crown, neck, chest]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [0, -1], el_n: [-1, -3], hand_n: [-2, -4], tip: [-5, -4]}
+  atk_mid:                     # skull 2 px back; legs pinned at the attack and shifted toward idle (not rotated)
+    t: 0.35
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [neck, crown, sh_n]
+    tweaks: {knee_f: [1, 0], foot_f: [2, 0], crown: [-2, 0], neck: [-2, 0]}
+  atk_follow:                  # a settle: the raised arm keeps its attack angle (rigid; a turn tears it from the skull) and
+    moves: [knee_n, knee_f]    # drops 1 px with the skull
+    tweaks: {crown: [-2, 1], neck: [-2, 1], sh_n: [-1, 1], el_n: [-1, 1], hand_n: [-1, 1], tip: [-1, 1]}
+  atk_recover:                 # t 0.20: the skull sinks less (the attack key is taller, bbox lerp)
+    t: 0.20
+    moves: [crown, neck, chest, hip, sh_f]
+    tweaks: {el_n: [-1, -1], hand_n: [-2, -2], tip: [-3, -1]}
+  hurt_in1:                    # flinch: skull snaps back 6, near blade arm jerks up 3, far arm thrown out (translated)
+    moves: [chest, hip, hip_n, hip_f, knee_n, knee_f]
+    tweaks: {crown: [-6, 0], neck: [-3, 0], chest: [-1, -1], el_n: [0, -3], hand_n: [0, -3], tip: [0, -3], el_f: [-3, -2], hand_f: [-3, -2], ftip: [-3, -2]}
+  hurt_in2:                    # skull settles 2 px; the far blade is carried behind the ribcage
+    moves: [chest]
+    tweaks: {crown: [2, 0], neck: [1, 0]}
+  daze:
+    moves: [crown, neck, chest]
+  daze_b:
+    moves: [crown, neck, chest]
+masks:
+  farm_n:                      # attack: the raised forearm and fist beside the skull are arm, not head
+    attack: [[55, 13], [64, 13], [64, 24], [58, 30], [54, 30], [54, 22]]
+  weapon:
+    idle: [[58, 20], [70, 20], [70, 44], [63, 49], [58, 49], [62, 42]]
+    attack: [[34, 2], [50, 2], [62, 12], [62, 21], [55, 21], [47, 12], [34, 8]]
+    hurt: [[58, 20], [70, 20], [70, 41], [62, 45], [58, 45], [62, 38]]
+  blade_f:
+    idle: [[12, 36], [18, 36], [28, 44], [26, 49], [20, 49], [12, 42]]
+    attack: [[12, 36], [17, 36], [35, 52], [33, 57], [29, 57], [12, 41]]
+  ft_n:
+    idle: [[45, 71], [62, 71], [62, 78], [45, 78]]
+    attack: [[44, 71], [60, 71], [60, 78], [44, 78]]
+    hurt: [[27, 70], [38, 70], [38, 78], [27, 78]]
+  ft_f:
+    idle: [[22, 71], [34, 71], [34, 78], [22, 78]]
+    attack: [[12, 69], [24, 69], [24, 78], [12, 78]]
+    hurt: [[8, 68], [18, 68], [18, 78], [8, 78]]
+holds: []
+paint: []

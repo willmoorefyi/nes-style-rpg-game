@@ -1,0 +1,117 @@
+sprite: dark_wizard
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [38, 6]
+    neck: [42, 30]
+    chest: [42, 36]
+    hip: [41, 52]
+    sh_n: [47, 34]
+    el_n: [51, 40]
+    hand_n: [57, 40]
+    tip: [58, 17]
+    sh_f: [33, 33]
+    el_f: [28, 40]
+    hand_f: [28, 47]
+    hip_n: [46, 56]
+    knee_n: [47, 65]
+    foot_n: [50, 73]
+    toe_n: [54, 75]
+    hip_f: [36, 56]
+    knee_f: [32, 65]
+    foot_f: [27, 73]
+    toe_f: [26, 75]
+  attack:
+    crown: [30, 9]
+    neck: [40, 31]
+    chest: [40, 36]
+    hip: [36, 50]
+    sh_n: [44, 30]
+    el_n: [48, 34]
+    hand_n: [52, 28]
+    tip: [55, 9]
+    sh_f: [36, 32]
+    el_f: [46, 38]
+    hand_f: [53, 34]
+    hip_n: [42, 55]
+    knee_n: [45, 65]
+    foot_n: [44, 72]
+    toe_n: [48, 75]
+    hip_f: [32, 55]
+    knee_f: [22, 63]
+    foot_f: [12, 71]
+    toe_f: [9, 74]
+  hurt:
+    crown: [14, 12]
+    neck: [30, 32]
+    chest: [36, 36]
+    hip: [36, 50]
+    sh_n: [44, 32]
+    el_n: [47, 33]
+    hand_n: [50, 32]
+    tip: [51, 11]
+    sh_f: [33, 30]
+    el_f: [36, 24]
+    hand_f: [39, 15]
+    hip_n: [44, 55]
+    knee_n: [47, 65]
+    foot_n: [48, 73]
+    toe_n: [52, 75]
+    hip_f: [30, 55]
+    knee_f: [24, 65]
+    foot_f: [19, 73]
+    toe_f: [18, 75]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:
+    moves: []
+    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [-1, -1], el_n: [-1, -1], hand_n: [-1, -2], tip: [-1, -2]}
+  atk_wind2:
+    moves: []
+    tweaks: {crown: [-4, 0], neck: [-2, 0], el_n: [-1, -2], hand_n: [-2, -4], tip: [-2, -4]}
+  atk_mid:
+    t: 0.35
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {knee_n: [1, 0], foot_n: [1, 0], knee_f: [7, 0], foot_f: [7, 0]}
+    moves: [neck, chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:
+    t: 0.75
+    moves: [crown, chest, sh_n, el_n, hand_n, tip, sh_f, el_f, hand_f]
+  atk_recover:
+    moves: []
+    tweaks: {crown: [-2, 1], neck: [-1, 1], el_n: [0, -1], hand_n: [-1, -1], tip: [-1, -1]}
+  hurt_in1:
+    moves: [chest]
+    tweaks: {crown: [-4, 0], neck: [-2, 0], chest: [-1, 0], el_n: [0, -1], hand_n: [0, -1], tip: [0, -1]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, tip, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {crown: [1, 1]}
+    pins: [knee_n, foot_n, knee_f, foot_f]
+  daze:
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 1], hand_n: [0, 1], tip: [3, 2]}
+  daze_b:
+    tweaks: {crown: [0, 1], el_n: [0, 1], hand_n: [0, 1], tip: [3, 2]}
+masks:
+  torso:
+    idle: [[44, 43], [56, 43], [56, 56], [44, 56]]
+  weapon:
+    idle: [[54, 13], [63, 13], [63, 37], [61, 44], [61, 77], [55, 77], [55, 44], [54, 37]]
+    attack: [[51, 4], [60, 4], [60, 24], [58, 37], [58, 64], [52, 64], [52, 37], [51, 24]]
+    hurt: [[48, 7], [56, 7], [56, 30], [56, 36], [55, 70], [49, 70], [49, 36], [48, 30]]
+  ft_n:
+    idle: [[46, 72], [59, 72], [59, 78], [46, 78]]
+    attack: [[40, 71], [51, 71], [51, 78], [40, 78]]
+    hurt: [[44, 72], [55, 72], [55, 78], [44, 78]]
+  ft_f:
+    idle: [[21, 72], [32, 72], [32, 78], [21, 78]]
+    attack: [[5, 69], [17, 69], [17, 78], [5, 78]]
+    hurt: [[14, 71], [24, 71], [24, 78], [14, 78]]
+holds: []
+paint:                         # 1 px crack the settle opens in the robe under the beard, robe colour
+  - {frame: atk_follow, xy: [[44, 32]], rgb: [57, 49, 49]}
