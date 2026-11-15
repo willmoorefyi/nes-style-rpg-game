@@ -435,9 +435,74 @@ Images used: 259 of 300 (build 259 of 285, fix 0 of 15; ledger guard: 359 Gemini
   (batch B 2.3). The remaining failures were design misses (a four-legged wyvern, a hand thrust backwards, a swipe
   smear, a rear-up hurt) and one more cutter slice (dark_wizard R197, a staff pointed forward; a vertical staff fixed
   it).
-- Batch D (103-123) has no `monsters.yaml` entries yet.
+- Batch D (103-123) had no `monsters.yaml` entries yet (written and generated in the resumed run; see "Batch D result").
+
+## Batch C result (2026-11-15, resumed after the user raised the Gemini project spend cap; open: white_shark)
+
+| Batch | Sprites approved | Waiting / deferred | Images | Expected (plan 6.2) | Retries by body type (images / sprites approved) |
+|---|---|---|---|---|---|
+| C (068-101) | **31 of 32**: the 12 above + baretta, basilisk, allosaurus, weretiger, sand_worm, minotaur_zombie, king_mummy, medusa, rakshasa, clay_golem, nightmare (best of 3), sahagin_prince (best of 3), deepeyes, sea_snake, sea_scorpion, sea_troll, ghost, water_elemental (best of 3), water_naga | **white_shark** (swimmer; not requested, the swimmer stop after R277) | 54 (R188-R244; 19 before the spend-cap stop, 35 in this run; R225, R229, R243 are no-image best-of-3 rows) | 43 for all 32 | quadruped 14 / 8, biped 18 / 10, bird 4 / 2, floating 7 / 4, arthropod 4 / 2, serpent 4 / 3, naga 3 / 2 |
+
+- **The cutter's fixed thirds are still the main cost** (12 of the 22 rejections in C and D): an attack claw, a muzzle, a
+  streaming tail, a fin cape, a trailing cape or a flung blade crosses the raw's one-third or two-thirds line and is
+  sliced (baretta R207 tip, nightmare R223/R224, sahagin_prince R226/R228, sea_snake R232, sea_scorpion R234/R235,
+  vampire_lord R267). What held: tails "resting on the ground close beside the coils (never raised or stretched out)",
+  claws "raised up in front of its face and pulled in close (not reaching forward)", capes "kept close to the body (not
+  flung out behind)". The framework proposal (split the raw at the figure gaps nearest the thirds) would remove most of
+  these retries.
+- **Key colour: bright violet is keyed out** with the magenta background (nightmare R222 lost its whole flame mane).
+  Violet / purple designs were moved to key-safe colours: nightmare cold blue flames, sahagin_prince sea-green fins,
+  deepeyes slate blue, spirit_naga and purple_worm dark plum / dark purple (both survived). Worth a framework note: any
+  bright violet, pink or magenta design needs a different key or a recolour.
+- **Floating sheets:** "the idle cell shows it at its lowest; in the attack and the hurt it rises a little" (water
+  elemental R241) fixes the shared-offset slice on the bottom row where "the same height as in the idle cell" did not.
+- **Small faces at 1x:** green-on-green (medusa R218) and grey-on-grey (earth_medusa R263) and dark plate (death_knight
+  R260) lose the eyes in the 11-13 colour cut; "a clear pale face with two large bright ... eyes, each a clear bright
+  spot", the hair "clearly darker than the face" fixed all three.
+- Fix-pass candidates added: `minotaur_zombie` (the cleaver changes hands), `nightmare` (attack flame-tail tip cut,
+  blue not violet), `sahagin_prince` (attack fin-cape tip cut), `water_elemental` (idle 79 px, under the large band),
+  `ghost` (a detached stroke in the hurt).
+
+## Batch D result (2026-11-15, closed)
+
+| Batch | Sprites approved | Waiting / deferred | Images | Expected (plan 6.2) | Retries by body type (images / sprites approved) |
+|---|---|---|---|---|---|
+| D (103-123) | **18 of 18**: tyrannosaur, black_knight, chimera (best of 3), guardian, blue_dragon, green_dragon, stone_golem, air_elemental, spirit_naga, death_knight, earth_medusa, black_flan, soldier, vampire_lord, dark_fighter, rhyos (best of 3), purple_worm, iron_golem | none | 30 (R245-R276; R250 and R274 are no-image best-of-3 rows) | 24 | biped 11 / 7, quadruped 11 / 5, naga 4 / 2, bird 1 / 1, floating 1 / 1, blob 1 / 1, serpent 1 / 1 |
+
+- Entries were written with the B/C lessons from the start (centring, props upright or close, per-sprite `motion:`
+  lines, explicit counts, "no leap, no rearing up", the floating "idle at its lowest" line, no bright violet): 11 of 18
+  were approved on the first image.
+- **Multi-head counts drift in the action cells** (chimera R248/R249, rhyos R271-R273): a lunge invites an extra
+  striking head even with "exactly three ... the same three in every cell" and high / middle / low placement (which held
+  the idle). Fixing the side heads ("the lizard head and the ram head staying on top of the shoulders exactly as in the
+  idle cell, no new head") gave a consistent layout in every cell (rhyos R273, but four heads). Both sheets are best of
+  3 with a count nit and are fix-pass candidates.
+- **Content check:** dark_fighter R269's free-form "glyph" came out as a hooked-cross shape on the shield; rejected, and
+  the emblem became a crescent moon with "runes, letters, crosses, hooked symbols" in the negative. Avoid free-form
+  "glyph / rune / sigil" wording on flat surfaces.
+- Gemini sometimes paints pose labels ("IDLE POSE"), a ground line or a pale guide frame into the raw; the cutter drops
+  them (checked row by row each time), so they are not defects of the cut.
+- Fix-pass candidates added: `chimera` (a second dragon head in the attack and hurt), `rhyos` (four heads), `death_knight`
+  (small skull at 1x), `black_knight` and `vampire_lord` (very dark, 6-9 colours).
+
+## Swimmers (2026-11-15, stopped: repeated safety refusals)
+
+- `red_piranha` R277 with the logged proposal (the R157 / shark R100 phrasing, no "belly ... no lower" or "same size"
+  clause) was refused again (`PROHIBITED_CONTENT`): small-fish requests are 4 refused of 5. Generation stopped by the
+  hard rule; `red_piranha` keeps 1 attempt, `white_shark` 3 (not requested).
+- **Proposal for the orchestrator (not tried):** the refused texts share a toothy fish that is red or "fierce"; the one
+  accepted fish (R157) was silver-green. Option A: `red_piranha` as a **dark bronze / rust-orange** armoured fish with
+  "a closed underbite" (no "teeth" word), one attempt. Option B: `piranha` and `red_piranha` both as `variants` of one
+  approved fish sheet (0 images) once any small fish is approved. `white_shark` is a different case (large, the shark
+  R98-R100 texts were accepted) and can go next with the shark wording plus the floating "idle at its lowest" line.
+- **`piranha` (3 of 3 used, deferred):** no further attempt in pass R build. Proposal: reuse R157's design as a
+  palette `variant` of whichever small fish is approved first (0 images), or one `pass R fix` regeneration with the
+  silver-green R157 text, the "idle at its lowest" floating `motion:` line and no added clauses (the R157 cut failed only
+  on the bottom-row slice that line now fixes).
 
 ## Deferred sprites
 
-- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording.
+- `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording. Proposal recorded under "Swimmers" (2026-11-15).
+- `red_piranha` (batch B, open): R160 and R277 refused (`PROHIBITED_CONTENT`); 2 of 3 used. Waits for the orchestrator (see "Swimmers").
+- `white_shark` (batch C, open): not requested (the swimmer stop); 0 of 3 used.
 - `ashen_queen/boss_attack_raise` (pose only; the sprite ships with idle, attack, cast and hurt): R34. **Final** (orchestrator, 2026-11-15): not regenerated; the rig uses the coil fallback for `attackAnim: heavy`.
