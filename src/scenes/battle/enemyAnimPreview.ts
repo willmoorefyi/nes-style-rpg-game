@@ -1,6 +1,7 @@
 /**
  * Dev-only monster animation preview (docs/ENEMY_ANIM_PLAN.md 6.2), no battle logic:
- *   ?enemyAnim=loop   every enemy cycles attack, pause, hurt, pause, cast (if it has one), pause; staggered 20 frames
+ *   ?enemyAnim=loop   every enemy cycles attack, pause, hurt, pause, cast (if it has one), pause; staggered 20 frames;
+ *                     melee enemies travel to the first living party sprite and back (pass F item 3)
  *   ?enemyAnim=step   time is frozen; `.` steps 1 frame forward, `,` 1 back (replayed from t = 0); a corner label shows
  *                     `enemy: frame / t`
  *   &slow=N           divides dt
@@ -32,6 +33,10 @@ export interface PreviewTarget {
   count: number;
   hasCast(i: number): boolean;
   name(i: number): string;
+  /** Start enemy i's attack (the view measures its travel); the poses' in-place attack when absent. */
+  attack?(i: number): void;
+  /** Enemy i's attack length (a travelling attack is longer); ATTACK_FRAMES when absent. */
+  attackFrames?(i: number): number;
 }
 
 type Action = 'attack' | 'hurt' | 'cast';
@@ -41,9 +46,9 @@ interface KeySource {
 }
 
 /** The loop for one enemy: [action, start frame] pairs inside a cycle, and the cycle length. */
-export function schedule(hasCast: boolean): { cycle: number; events: [Action, number][] } {
-  const events: [Action, number][] = [['attack', 0], ['hurt', ATTACK_FRAMES + PAUSE]];
-  let t = ATTACK_FRAMES + PAUSE + HURT_FRAMES + PAUSE;
+export function schedule(hasCast: boolean, attackFrames = ATTACK_FRAMES): { cycle: number; events: [Action, number][] } {
+  const events: [Action, number][] = [['attack', 0], ['hurt', attackFrames + PAUSE]];
+  let t = attackFrames + PAUSE + HURT_FRAMES + PAUSE;
   if (hasCast) { events.push(['cast', t]); t += CAST_FRAMES + PAUSE; }
   return { cycle: t, events };
 }
@@ -52,6 +57,8 @@ export class EnemyAnimPreview {
   private clock = 0;
   private started = false;
   private label: BitmapText | null = null;
+  /** Each enemy's loop, fixed when the preview starts. */
+  private readonly loops = new Map<number, ReturnType<typeof schedule>>();
   private readonly onKey = (e: { key: string }): void => {
     if (this.mode !== 'step') return;
     if (e.key === '.') this.stepTo(this.clock + 1);
@@ -70,11 +77,17 @@ export class EnemyAnimPreview {
     for (let i = 0; i < this.target.count; i++) {
       const local = f - i * STAGGER;
       if (local < 0) continue;
-      const { cycle, events } = schedule(this.target.hasCast(i));
+      let loop = this.loops.get(i);
+      if (!loop) {
+        loop = schedule(this.target.hasCast(i), this.target.attackFrames?.(i) ?? ATTACK_FRAMES);
+        this.loops.set(i, loop);
+      }
+      const { cycle, events } = loop;
       for (const [action, at] of events) {
         if (local % cycle !== at) continue;
         const p = this.target.poses;
-        if (action === 'attack') p.playAttack(i); else if (action === 'hurt') p.playHurt(i); else p.playCast(i);
+        if (action === 'attack') { if (this.target.attack) this.target.attack(i); else p.playAttack(i); }
+        else if (action === 'hurt') p.playHurt(i); else p.playCast(i);
       }
     }
   }
@@ -128,8 +141,16 @@ export class EnemyAnimPreview {
 }
 
 interface PreviewHost {
-  enemyView: { poses: EnemyPoseController; hasCast(i: number): boolean } | null;
+  enemyView: { poses: EnemyPoseController; hasCast(i: number): boolean; playAttack?(i: number, target: Container | null): void;
+    attackLength?(i: number, target: Container | null): number } | null;
   enemySprites: readonly unknown[];
+  /** The party sprites: melee enemies travel to the first living (visible) one. */
+  partySprites?: readonly Container[];
+}
+
+/** The first party sprite still shown (a fallen hero fades or drops; the preview only needs a visible target). */
+function firstLiving(sprites: readonly Container[] | undefined): Container | null {
+  return sprites?.find((s) => s.visible && s.alpha > 0) ?? null;
 }
 
 const active = new WeakMap<object, EnemyAnimPreview>();
@@ -143,8 +164,11 @@ export const enemyAnimPreview = {
     if (!p) {
       if (!parseEnemyAnim(location.search)) return;
       const view = host.enemyView;
+      const target = () => firstLiving(host.partySprites);
       p = new EnemyAnimPreview('loop', 1, { poses: view.poses, count: host.enemySprites.length,
-        hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}` });
+        hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}`,
+        ...(view.playAttack ? { attack: (i: number) => view.playAttack?.(i, target()) } : {}),
+        ...(view.attackLength ? { attackFrames: (i: number) => view.attackLength?.(i, target()) ?? ATTACK_FRAMES } : {}) });
       active.set(host, p);
     }
     p.frameDt(dt);

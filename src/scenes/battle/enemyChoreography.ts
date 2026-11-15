@@ -44,7 +44,7 @@ export function resolveFrame(name: MonsterFrame, has: (f: MonsterFrame) => boole
   return null;
 }
 
-type Ease = 'linear' | 'in' | 'out';
+export type Ease = 'linear' | 'in' | 'out';
 /** One run of a frame: `len` frames moving the offset from `from` to `to`; `shake` adds ±shake every 2 frames. */
 interface Seg { frame: MonsterFrame; len: number; from: number; to: number; ease?: Ease; shake?: number }
 
@@ -111,7 +111,7 @@ export const IDLE_PERIOD = 72;
 
 export interface FrameAt { frame: MonsterFrame; dx: number; dy: number }
 
-function ease(x: number, e: Ease = 'linear'): number {
+export function ease(x: number, e: Ease = 'linear'): number {
   return e === 'in' ? x * x : e === 'out' ? 1 - (1 - x) * (1 - x) : x;
 }
 

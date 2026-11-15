@@ -2,7 +2,9 @@
  * Pure timing for monster battle poses (no PixiJS): a cursor per enemy over the tables in enemyChoreography.ts
  * (docs/ENEMY_ANIM_PLAN.md 3.2, 6.2).
  *
- * attack: wind-up, lunge (contact at ATTACK_CONTACT: attackOutDone), follow-through, recover; 31 frames.
+ * attack: wind-up, lunge (contact at ATTACK_CONTACT: attackOutDone), follow-through, recover; 31 frames in place. With
+ *         a travel (pass F item 3) it runs to the target and back (contact 14 + N); a heavy one (item 7) raises, holds
+ *         and slams (contact N + 29). Contact and length are stored per enemy.
  * hurt:   in-phase, held recoil with shake, return; a re-hit in the in-phase lets it finish (a full hold follows), in
  *         the hold restarts the hold, in the return jumps back to hurt_in2; never interrupts an attack or a cast.
  * cast:   boss gather / rise / hold / release; a monster without a cast frame plays its attack frames, no lunge.
@@ -11,9 +13,10 @@
  */
 import {
   ATTACK_CONTACT, ATTACK_FRAMES, CAST_FRAMES, DEFAULT_LUNGE_PX, HURT_FRAMES, HURT_HOLD_END, HURT_HOLD_START,
-  DYING_IN, HURT_REHIT_AT, PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame,
+  DYING_IN, HURT_REHIT_AT, PLAIN_CAST_FRAMES, castAt, castOut, dyingAt, hurtAt, idleFrame,
   type FrameAt, type MonsterFrame, type MonsterKeyframe,
 } from './enemyChoreography.js';
+import { HEAVY_HOLD_FRAMES, attackTable, travelAttackAt, type AttackKind } from './enemyAttackTables.js';
 
 /** Approved keyframe names (atlas keys). */
 export type MonsterPose = MonsterKeyframe;
@@ -35,7 +38,14 @@ export interface EnemyAnimConfig {
   lungePx: number;
   scaleFactor: number;
   breath: boolean;
+  /** `attackAnim: heavy` (Garland, the lich): the raised-hold attack. */
+  heavy: boolean;
+  /** Travel hop in px at scale factor 1 (10 small, 6 large, 3 boss). */
+  hopPx: number;
 }
+
+/** Where an attack goes: the travel (absolute screen px, toward the party) and the rise to the target's feet. */
+export interface AttackPlan { travel: number; rise: number }
 
 /** Animation cues: `hold` when an attack's held telegraph starts, `contact` on its contact frame. */
 export type PoseCue = 'hold' | 'contact';
@@ -52,8 +62,11 @@ interface EnemyState extends EnemyAnimConfig {
   contactAt: number;
   holdAt: number | null;
   totalFrames: number;
-  /** Absolute screen px the current attack travels (unscaled; 0 = in place). */
+  /** Absolute screen px the current attack travels (unscaled; 0 = in place), and its table. */
   travel: { dx: number; dy: number };
+  kind: AttackKind;
+  /** The travel offset held while dying away from home (no ease back across the screen). */
+  held: { dx: number; dy: number };
 }
 
 /** The frame to show and the screen offset: `dx` / `dy` are the lunge, recoil and shake (scaled by the layout factor,
@@ -66,7 +79,9 @@ export interface PoseState {
   travelDy?: number;
 }
 
-const DEFAULTS: EnemyAnimConfig = { hasCast: false, hasRaise: false, lungePx: DEFAULT_LUNGE_PX, scaleFactor: 1, breath: true };
+const DEFAULTS: EnemyAnimConfig = { hasCast: false, hasRaise: false, lungePx: DEFAULT_LUNGE_PX, scaleFactor: 1, breath: true,
+  heavy: false, hopPx: 10 };
+const ZERO = { dx: 0, dy: 0 };
 
 export class EnemyPoseController {
   private states: EnemyState[];
@@ -77,7 +92,7 @@ export class EnemyPoseController {
   constructor(count: number) {
     this.states = Array.from({ length: count }, () => ({ ...DEFAULTS, mode: 'idle' as Mode, t: 0, freeze: 'none' as Freeze,
       from: { dx: 0, dy: 0 }, start: 0, contactAt: ATTACK_OUT, holdAt: null, totalFrames: ATTACK_FRAMES,
-      travel: { dx: 0, dy: 0 } }));
+      travel: ZERO, kind: 'inplace' as AttackKind, held: ZERO }));
   }
 
   /** Per-enemy art facts (from the atlas) and layout scale. */
@@ -96,19 +111,19 @@ export class EnemyPoseController {
   /** Back to idle at t = 0 everywhere (the dev step preview replays from here). */
   reset(): void {
     this.clock = 0;
-    for (const s of this.states) { s.mode = 'idle'; s.t = 0; s.from = { dx: 0, dy: 0 }; }
+    for (const s of this.states) { s.mode = 'idle'; s.t = 0; s.from = ZERO; s.held = ZERO; }
   }
 
-  /** Start the attack. F0 plays the in-place table (travel 0); its contact and length are stored per enemy. */
-  playAttack(i: number): void {
+  /** Start the attack: in place without a travel (ranged, no target), else melee (heavy for a heavy enemy) to the
+   *  target and back. Its contact, telegraph start and length are stored per enemy. */
+  playAttack(i: number, plan: AttackPlan = { travel: 0, rise: 0 }): void {
     const s = this.states[i];
     if (!s || s.mode === 'dying') return;
-    s.mode = 'attack';
-    s.t = 0;
-    s.contactAt = ATTACK_OUT;
-    s.holdAt = null;
-    s.totalFrames = ATTACK_FRAMES;
-    s.travel = { dx: 0, dy: 0 };
+    const travel = Math.max(0, plan.travel);
+    s.kind = s.heavy ? 'heavy' : travel > 0 ? 'melee' : 'inplace';
+    const table = attackTable(s.kind, travel);
+    Object.assign(s, { mode: 'attack', t: 0, contactAt: table.contactAt, holdAt: table.holdAt, totalFrames: table.total,
+      travel: travel > 0 ? { dx: travel, dy: plan.rise } : ZERO, held: ZERO });
   }
 
   /** Spell stance. Like an attack, a hit never interrupts it. */
@@ -134,6 +149,7 @@ export class EnemyPoseController {
     if (!s || s.mode === 'dying') return;
     const cur = this.raw(s);
     s.from = { dx: cur.dx, dy: cur.dy };
+    s.held = s.mode === 'attack' ? { dx: s.travel.dx * cur.k, dy: s.travel.dy * cur.k } : ZERO;
     s.start = cur.frame === 'hurt' ? DYING_IN : cur.frame === 'hurt_in2' ? HURT_REHIT_AT : 0;
     s.mode = 'dying';
     s.t = s.start;
@@ -159,6 +175,20 @@ export class EnemyPoseController {
     return this.states[i]?.mode === 'attack';
   }
 
+  /** The attack playing (null: none): `melee` and `heavy` travel and draw above every actor (D5'); `heavy` shakes. */
+  attackKind(i: number): AttackKind | null {
+    const s = this.states[i];
+    return s?.mode === 'attack' ? s.kind : null;
+  }
+
+  /** Frames into the heavy attack's held telegraph, or null outside it (the red pulse). */
+  holdFrame(i: number): number | null {
+    const s = this.states[i];
+    if (s?.mode !== 'attack' || s.holdAt === null) return null;
+    const local = s.t - s.holdAt;
+    return local >= 0 && local < HEAVY_HOLD_FRAMES ? local : null;
+  }
+
   update(dt: number): void {
     this.clock += dt;
     this.states.forEach((s, i) => {
@@ -180,24 +210,24 @@ export class EnemyPoseController {
   }
 
   /** Frame name and unscaled offset of enemy i right now. */
-  private raw(s: EnemyState): FrameAt {
+  private raw(s: EnemyState): FrameAt & { k: number } {
     switch (s.mode) {
-      case 'attack': return attackAt(s.t, s.lungePx);
-      case 'cast': return castAt(s.t, s.hasCast);
-      case 'hurt': return hurtAt(s.t);
-      case 'dying': return dyingAt(s.t, s.from, s.start);
-      default: return { frame: idleFrame(this.clock, this.states.indexOf(s), s.breath, s.freeze !== 'none'), dx: 0, dy: 0 };
+      case 'attack': return travelAttackAt(s.kind, s.t, { lunge: s.lungePx, travel: s.travel.dx, hop: s.hopPx, hasRaise: s.hasRaise });
+      case 'cast': return { ...castAt(s.t, s.hasCast), k: 0 };
+      case 'hurt': return { ...hurtAt(s.t), k: 0 };
+      case 'dying': return { ...dyingAt(s.t, s.from, s.start), k: 0 };
+      default: return { frame: idleFrame(this.clock, this.states.indexOf(s), s.breath, s.freeze !== 'none'), dx: 0, dy: 0, k: 0 };
     }
   }
 
   /** The frame to show and the integer screen offset: the lunge part scaled by the layout factor and rounded once, the
-   *  travel part (absolute px, only while an attack travels) as is. */
+   *  travel part (absolute px, while an attack travels or a dying enemy is held away from home) as is. */
   state(i: number): PoseState {
     const s = this.states[i];
     if (!s) return { pose: 'idle', dx: 0, dy: 0 };
     const r = this.raw(s);
     const st: PoseState = { pose: r.frame, dx: Math.round(r.dx * s.scaleFactor) || 0, dy: Math.round(r.dy * s.scaleFactor) || 0 };
-    const travel = s.mode === 'attack' ? s.travel : { dx: 0, dy: 0 };
+    const travel = s.mode === 'attack' ? { dx: s.travel.dx * r.k, dy: s.travel.dy * r.k } : s.mode === 'dying' ? s.held : ZERO;
     if (travel.dx || travel.dy) { st.travelDx = Math.round(travel.dx); st.travelDy = Math.round(travel.dy); }
     return st;
   }

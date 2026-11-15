@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { Container, Sprite, Texture } from 'pixi.js';
-import { AiEnemyView, freezeOf, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import { Container, Graphics, Sprite, Texture } from 'pixi.js';
+import { AiEnemyView, HOLD_PULSE_TINT, freezeOf, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import { BattleLayers } from '../../../src/scenes/battle/BattleLayers.js';
+import { tintOf } from '../../../src/scenes/battle/actorTint.js';
 import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 import { BOSS_FRAMES, type MonsterFrame } from '../../../src/scenes/battle/enemyChoreography.js';
 import { ATTACK_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
@@ -107,5 +109,100 @@ describe('AiEnemyView frames, freeze (D6) and scale', () => {
     for (let t = 0; t < 80; t++) { view.update(1, sprites); seen.add((sprites[0] as Sprite).texture); }
     expect(seen.has(textures.idle_b)).toBe(true);
     expect(freezeOf(undefined)).toBe('none');
+  });
+});
+
+/** Pass F item 3 (D5'): a travelling melee attacker is the top actor, below every effect; order restored on idle. */
+describe("AiEnemyView draw order while travelling (D5')", () => {
+  function layered(ranged = false) {
+    const { art, textures } = fakeArt();
+    const enemies = goblins(3).map((e, i) => ({ ...e, attack: ranged && i === 0 ? 'ranged' as const : 'melee' as const }));
+    const view = new AiEnemyView(enemies, art);
+    const layers = BattleLayers.of(new Container());
+    const sprites = view.build();
+    layers.actors.addChild(...sprites);
+    const hero = new Graphics().rect(0, 0, 160, 160).fill(0x4488ff);
+    hero.position.set(1380, 271);
+    const hero2 = new Sprite();
+    layers.actors.addChild(hero, hero2);
+    const number = new Sprite();
+    layers.fx.numbers.addChild(number);
+    return { view, layers, sprites, hero, hero2, number, textures };
+  }
+  const drawOrder = (layers: BattleLayers, c: Container): number => {
+    const all: Container[] = [];
+    const walk = (n: Container) => { all.push(n); n.children.forEach(walk); };
+    walk(layers.root);
+    return all.indexOf(c);
+  };
+
+  it('the attacker is the last child of actors (above the party), below a child of fx; restored on idle', () => {
+    const { view, layers, sprites, hero, hero2, number } = layered();
+    const before = layers.actors.children.slice();
+    view.playAttack(0, hero);
+    expect(view.poses.attackKind(0)).toBe('melee');
+    const total = view.poses.attackTiming(0).totalFrames;
+    for (let t = 0; t < total - 1; t++) {
+      view.update(1, sprites);
+      expect(layers.actors.children[layers.actors.children.length - 1]).toBe(sprites[0]);
+      expect(drawOrder(layers, sprites[0])).toBeGreaterThan(drawOrder(layers, hero2));
+      expect(drawOrder(layers, sprites[0])).toBeLessThan(drawOrder(layers, number));
+    }
+    view.update(1, sprites);
+    expect(view.poses.isAttacking(0)).toBe(false);
+    expect(layers.actors.children).toEqual(before);
+  });
+
+  it('a sprite swapped in mid-travel stays on top and the order is restored by enemy index', () => {
+    const { view, layers, sprites, hero } = layered();
+    const before = layers.actors.children.slice();
+    view.playAttack(1, hero);
+    for (let t = 0; t < 12; t++) view.update(1, sprites);
+    const next = new Sprite();                         // BattleDisplayManager.swapSprite: same child index
+    layers.actors.addChildAt(next, layers.actors.getChildIndex(sprites[1]));
+    layers.actors.removeChild(sprites[1]);
+    sprites[1] = next;
+    view.update(1, sprites);
+    expect(layers.actors.children[layers.actors.children.length - 1]).toBe(next);
+    for (let t = 0; t < 120; t++) view.update(1, sprites);
+    expect(layers.actors.children).toEqual(before.map((c) => (c === before[1] ? next : c)));
+  });
+
+  it('a ranged attacker stays below the party sprites (D5: the highest enemy slot only)', () => {
+    const { view, layers, sprites, hero } = layered(true);
+    view.playAttack(0, hero);
+    expect(view.poses.attackKind(0)).toBe('inplace');
+    view.update(1, sprites);
+    expect(layers.actors.getChildIndex(sprites[0])).toBe(2);
+    expect(layers.actors.getChildIndex(sprites[0])).toBeLessThan(layers.actors.getChildIndex(hero));
+  });
+
+  it('item 7: a heavy attacker pulses red only in its hold and shakes the layers on contact', () => {
+    const { art } = fakeArt();
+    const view = new AiEnemyView([{ id: 'garland', name: 'Garland', size: 'large', attack: 'melee', attackAnim: 'heavy' } as EnemyData], art);
+    const layers = BattleLayers.of(new Container());
+    const sprites = view.build();
+    layers.actors.addChild(...sprites);
+    const hero = new Graphics().rect(0, 0, 160, 160).fill(0x4488ff);
+    hero.position.set(1380, 271);
+    layers.actors.addChild(hero);
+    view.playAttack(0, hero);
+    const { contactAt, totalFrames } = view.poses.attackTiming(0);
+    const holdAt = contactAt - 23;
+    const tints: (number | null)[] = [];
+    let shookAt = -1;
+    for (let t = 1; t <= totalFrames; t++) {
+      view.update(1, sprites);
+      tints.push(tintOf(sprites[0], 'pulse'));
+      layers.update(1);
+      if (shookAt < 0 && layers.actors.x !== 0) shookAt = t;
+    }
+    const pulsed = tints.flatMap((v, k) => (v === null ? [] : [k + 1]));
+    expect(pulsed[0]).toBe(holdAt);
+    expect(Math.max(...pulsed)).toBeLessThan(holdAt + 18);
+    expect(new Set(tints.filter((v) => v !== null))).toEqual(new Set([HOLD_PULSE_TINT]));
+    expect(tints[tints.length - 1]).toBeNull();
+    expect(shookAt).toBe(contactAt);
+    expect(layers.actors.position).toMatchObject({ x: 0, y: 0 });
   });
 });

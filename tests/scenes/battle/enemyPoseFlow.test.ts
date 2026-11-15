@@ -3,6 +3,8 @@ import { Container, Sprite } from 'pixi.js';
 import { BattleAnimationController, ANNOUNCE_FRAMES, ROUND_END_FRAMES } from '../../../src/scenes/battle/BattleAnimationController.js';
 import { EnemyPoseController, ATTACK_FRAMES, ATTACK_OUT, CAST_FRAMES, PLAIN_CAST_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
 import { holdFrames } from '../../../src/scenes/battle/battleTiming.js';
+import { travelFrames } from '../../../src/scenes/battle/enemyAttackTables.js';
+import type { AttackPlan } from '../../../src/scenes/battle/EnemyPoseController.js';
 import { setMessageSpeed } from '../../../src/core/Settings.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
@@ -17,13 +19,13 @@ beforeEach(() => { setMessageSpeed(5); });
 const ANNOUNCE = () => holdFrames(ANNOUNCE_FRAMES);
 const ROUND_END = () => holdFrames(ROUND_END_FRAMES);
 
-function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview = true, partySize = 1) {
+function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview = true, partySize = 1, plan?: AttackPlan) {
   const enemySprites: Container[] = [new Sprite(), new Sprite()];
   const partySprites: Container[] = Array.from({ length: partySize }, () => new Sprite());
   const poses = new EnemyPoseController(2);
   const display = {
     enemySprites, partySprites,
-    enemyView: preview ? { poses, playAttack: (i: number) => poses.playAttack(i) } : null,
+    enemyView: preview ? { poses, playAttack: (i: number) => poses.playAttack(i, plan) } : null,
     setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
     updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
@@ -212,5 +214,50 @@ describe('round end pacing (BA-2)', () => {
     s.ctrl.dyingEnemies.clear();
     s.tick(1);
     expect(s.onResolveRound).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('travelling enemy attacks in the battle flow (pass F items 3 and 7)', () => {
+  const FIGHT: Action = { actorId: 'enemy_0', actorName: 'Goblin A', actionType: 'fight', targetName: 'Hero' };
+  const N = travelFrames(600);
+
+  it('a melee enemy travelling 600 px resolves on frame 14 + N, and round_end waits for its 47 + N frames', () => {
+    const s = setup(FIGHT, [hit('party_0')], 5, true, 1, { travel: 600, rise: 100 });
+    s.tick(ANNOUNCE());
+    expect(s.ctrl.animPhase).toBe('enemy_lunge');
+    s.tick(14 + N - 1);
+    expect(s.executed()).toBe(0);
+    expect(s.poses.state(0).travelDx).toBeGreaterThan(0);
+    s.tick(1);
+    expect(s.executed()).toBe(1);
+    expect(s.poses.state(0)).toMatchObject({ pose: 'attack', travelDx: 600, travelDy: 100 });
+    let frames = 14 + N;
+    while (s.poses.isAttacking(0) && frames < 400) { s.tick(1); frames++; }
+    expect(frames).toBe(47 + N);
+    s.tick(ROUND_END());
+    expect(s.onResolveRound).toHaveBeenCalledTimes(1);
+  });
+
+  it('a heavy (Garland) attack resolves at N + 29 and the round waits for N + 69', () => {
+    const s = setup({ ...FIGHT, actorName: 'Garland' }, [hit('party_0')], 5, true, 1, { travel: 600, rise: -50 });
+    s.poses.configure(0, { heavy: true });
+    s.tick(ANNOUNCE());
+    s.tick(N + 28);
+    expect(s.executed()).toBe(0);
+    expect(s.poses.state(0).pose).toBe('atk_mid');
+    s.tick(1);
+    expect(s.executed()).toBe(1);
+    let frames = N + 29;
+    while (s.poses.isAttacking(0) && frames < 400) { s.tick(1); frames++; }
+    expect(frames).toBe(N + 69);
+  });
+
+  it('E1: a helpless enemy (sleep, stun, stone) never starts its travel', () => {
+    const s = setup(FIGHT, [], 5, true, 1, { travel: 600, rise: 0 });
+    vi.mocked(s.battle.nextActorLosesTurn).mockReturnValue(true);
+    s.tick(ANNOUNCE());
+    expect(s.ctrl.animPhase).toBe('execute');
+    expect(s.poses.isAttacking(0)).toBe(false);
+    for (let k = 0; k < 60; k++) { expect(s.poses.state(0).travelDx).toBeUndefined(); s.tick(1); }
   });
 });
