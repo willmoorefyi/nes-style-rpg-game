@@ -1,0 +1,19 @@
+# Evil Eye (pass R, floating): a large floating eye with a fanged mouth and four eyestalks. body: floating
+# (rig_floating.py), judged by the float band. The ball is one rigid mass (head = the stalk crown on its upper rim,
+# body = the ball); turning either half would tear the iris or the teeth, so the in-betweens move the whole sprite
+# (moves: []) and the stalks and the attack's tail fin change only at keyframe boundaries. No cast key: Magic replays
+# the attack frames in place.
+sprite: evil_eye
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [64, 85], base: [64, 120], neck: [64, 60], crown: [64, 30]}
+  attack: {core: [60, 85], base: [60, 120], neck: [62, 60], crown: [62, 33]}
+  hurt:   {core: [60, 88], base: [60, 122], neck: [62, 62], crown: [62, 32]}
+frames:
+  atk_wind1: {moves: [], dx: -2, dy: 1}      # backs off and sinks (the shared 1 / 2 px drift barely read on a
+  atk_wind2: {moves: [], dx: -5, dy: 2}      # 128 px ball)
+  hurt_in1: {moves: [], dx: -4}              # knocked back 4
+holds: []
