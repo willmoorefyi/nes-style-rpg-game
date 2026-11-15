@@ -291,6 +291,7 @@
   face: the aged human face under the crown, with calm pale eyes, is readable
   extra_negative: a second crown, a throne, a fish tail
   seeds: [1234]
+  sheet_seeds: {boss_attack: 1235}   # boss_attack 1234 (ROSTER_LOG R16): guide ground line painted pink under the hem
 - id: hollow_seraph
   # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
   # halo; her composure stays intact even when hurt

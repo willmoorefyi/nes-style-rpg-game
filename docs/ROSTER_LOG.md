@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 13 of 300 (build 13 of 285, fix 0 of 15; ledger guard: 113 Gemini attempts - 100)
+Images used: 14 of 300 (build 14 of 285, fix 0 of 15; ledger guard: 114 Gemini attempts - 100)
 
 ## Attempts
 
@@ -38,6 +38,7 @@ Images used: 13 of 300 (build 13 of 285, fix 0 of 15; ledger guard: 113 Gemini a
 | R13 | ashen_queen/boss_attack_raise (1234, key `71f1e2a38ac638d4ec561fc6`) | 1 | 186 px, lowest row 192, top row 7, no border pixels, binary alpha, 15 colours (3 shared), one piece, six arms, props in their idle hands. **Fails review:** the light-grey guide box is painted behind the head (a grey disc) and inside the coil hole, a white speckle fringe runs along the outline, and no arm is raised overhead (an idle stance, `pose_diff` 0.29 vs idle) | **rejected**; retry follows (seed 1235, `--retry`; the text now asks for every hand above the crown) |
 | R14 | ashen_queen/boss_attack_raise (1235, key `ec7e2da21a66dacb6250fbed`, `--retry`) | 1 | Clean cut (186 px, lowest row 192, top row 7, no border pixels, binary alpha, 16 colours, 8 shared, one piece) but **fails review:** a near copy of the idle (`pose_diff` 0.08 vs idle, under the 0.15 floor): no arm overhead, the blade arm only lifted to the shoulder, the left-side arms muddled | **rejected**. **Pause trigger (plan 6.3):** R9-R11 and R13-R14 are rejected naga attempts in a row, so the naga body type stops here; the last `attack_raise` attempt waits for an offline wording fix, and generation continues with `drowned_sovereign` |
 | R15 | drowned_sovereign/boss_idle (1234, key `78124850d181c85a756bc559`) | 1 | The disguise holds: **no tentacles**, suckers or fins; a three-quarter view facing right, a tarnished gold crown with pearls, an aged pale face with wet grey hair, pearl-white and abyssal-teal robes with gold embroidery, the hems pooling wide and curling upward on both sides (cloth with an outline and pearl edging), the coral sceptre in the right hand. 162 px (band 140-168), lowest row 192, top row 31 (headroom 31), x 15-184, no border pixels, binary alpha, 16 colours with the outline ink, one piece. Nits: the brocade cuts to a busy, noisy texture (busier than garland's crisp plate; reads as embroidery at 2x); the eyes are tiny; both hands show (the prompt hid one) | **self-approved** (attempt 1 of 3) |
+| R16 | drowned_sovereign/boss_attack (1234, key `88ac2126a86eb4c22c79bc57`) | 1 | The pose is right: the robes part and four dark teal tentacles with pale suckers lash far toward the heroes, the sceptre arm thrust forward, crown, face and robe outline as in the idle; 170 px, lowest row 192, x 6-194, no border pixels, binary alpha, 16 colours, one piece, `pose_diff` 0.92. **Fails review:** the guide's ground line is painted under the hem as a pink (255, 198, 247) bar with a stem, 162 px on rows 180-192 (x 7-144), the lich #29 defect; the approved key cannot be painted | **rejected**; retry follows (seed 1235, `--retry`, same wording: the defect is the guide line, not the pose) |
 
 ## Deferred sprites
 
