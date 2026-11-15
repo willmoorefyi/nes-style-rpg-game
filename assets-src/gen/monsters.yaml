@@ -2061,31 +2061,26 @@
   seeds: [1234, 1235, 1236]   # approved R226 (best of 3, R229). 1235 (R227, + "the fin cape hangs close behind the body in every cell (never flying out behind it)", "a cape flying out behind"): pink slash smears; 1236 (R228, + the attack "with both short coral blades held crossed in front of its chest ... no slash trail, curved streak, smear or motion arc", "slash trails"): the hurt's blade sliced. Fins sea-green, not purple: bright violet is keyed out with the magenta background (ROSTER_LOG R222)
 - id: white_shark
   # "White Shark" (094): a great white shark, scarred, broader and paler than the shark. Swimmer wording per the
-  # orchestrator ruling after R277: no "fierce / teeth / bloody", the mouth only slightly open, the floating
-  # "idle at its lowest" motion line (water_elemental R241)
+  # orchestrator ruling after R277 (no "fierce / teeth / bloody", the mouth slightly open). Attempt 3 follows the
+  # approved shark (R100): an arched idle (its lowest point is the low tail), a straightening attack and a horizontal
+  # hurt at the idle's height, with the default swimmer body line
   size: large
   floating: true
   body: swimmer
-  motion: >-
-    Keep the shark level and horizontal in every cell. The idle cell shows it at its lowest; in the attack and the
-    hurt it rises a little, with more empty space below it: in the attack it surges forward to the right; in the hurt
-    it is knocked back to the left with the body bent into a gentle curve; it always hovers, nothing touches the
-    ground; the fins and the tail move with the motion.
   prompt: >-
-    a great white shark seen from the side, a broad heavy body wider and paler than a common shark, a slate-grey back
-    and a white belly, a few old pale scars along its flank, a tall dorsal fin, a crescent tail fin, a small black eye,
-    the mouth slightly open; no water drawn; it hovers horizontally, nothing touches the ground; in every cell it floats
-    in the upper part of its box with clear empty space below it, the whole shark from tail to snout centred in its
-    own cell with empty space on both sides
+    a great white shark arched in a gentle curve as if gliding down, seen from the side, a broad heavy body wider and
+    paler than a common shark, a slate-grey back and a white belly, a few old pale scars along its flank, a tall dorsal
+    fin, a crescent tail fin, a small black eye, the mouth slightly open; no water drawn; the whole shark from tail to
+    snout centred in its own cell with empty space on both sides
   attack: >-
-    surging forward toward the heroes in a clear lunge: the snout dipped forward, the mouth opened a little wider, the
-    tail fin swept up high behind, the whole body bent in a forward arch, the snout well inside the middle cell
+    lunging forward toward the heroes, the mouth opened a little wider, the body straightening, the snout well inside
+    the middle cell
   hurt: >-
-    knocked back, the snout tipped up and the tail hanging down, the body bent into a curve, the mouth closed, the
-    whole shark drawn higher in its box than in the idle cell with plenty of empty space below it
+    arching its body away from the heroes in a curve while staying horizontal, at the same height as in the idle cell,
+    the mouth closed, the tail fin whipping
   face: its shark head with a small black eye is readable
-  extra_negative: water, waves, splashes, bubbles, motion lines, streaks, legs, a vertical body, red, a leap
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R278): the attack a copy of the idle, the hurt drawn lower and sliced on the bottom row
+  extra_negative: water, waves, splashes, bubbles, water streaks, motion lines, legs, a vertical body, red
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R278): the attack a copy of the idle, the hurt sliced on the bottom row; 1235 (R279): both action cells sliced on the bottom row, a vertical hurt
 - id: deepeyes
   # "Deepeyes" (095): a bulbous abyssal eye with luminous tentacles (distinct from bigeyes, evil eye, death eye)
   size: large
