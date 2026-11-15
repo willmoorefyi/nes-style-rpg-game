@@ -59,6 +59,7 @@ export interface ClassGrowth {
 }
 
 import type { ElementalProfile } from '../battle/Elements.js';
+import type { EnemyRosterFields } from './enemyRoster.js';
 
 /** Boss phase: HP-threshold behavior change */
 export interface BossPhase {
@@ -68,6 +69,8 @@ export interface BossPhase {
   /** Overrides applied once the phase is crossed (B1): hits per attack, and the attack number. */
   hits?: number;
   attack?: number;
+  /** `heavy` from this phase on (ROSTER_PLAN 7.2; validated, played by the boss rigs that need it). */
+  attackAnim?: 'heavy';
 }
 
 /** Enemy combat numbers (FF1). The optional ones default to accuracy 0, evade 0, hits 1, crit 1 (out of 200). */
@@ -85,7 +88,7 @@ export interface EnemyCombatStats {
   crit?: number;
 }
 
-export interface EnemyData {
+export interface EnemyData extends EnemyRosterFields {
   id: string;
   name: string;
   stats: StatBlock & EnemyCombatStats;

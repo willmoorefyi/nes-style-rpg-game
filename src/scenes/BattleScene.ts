@@ -13,6 +13,7 @@ import { Window } from '../ui/Window.js';
 import { Menu, type MenuItem } from '../ui/Menu.js';
 import { TextRenderer } from '../ui/TextRenderer.js';
 import { BossAI } from '../battle/BossAI.js';
+import { dataDrivenAI } from '../battle/enemyAiPattern.js';
 import { BattleStateMachine } from '../battle/BattleStateMachine.js';
 import type { BattleCommand } from '../battle/BattleCommands.js';
 import { BattleListMenus, canOpenItems, canOpenSpells } from './battle/BattleListMenus.js';
@@ -70,12 +71,15 @@ export class BattleScene implements Scene {
     this.attachEnemyAi(config);
   }
 
-  /** Debug scenarios can give enemies an action pattern (e.g. a boss that casts): BossAI per matching enemy. */
+  /**
+   * Debug scenarios can give enemies an action pattern (e.g. a boss that casts): BossAI per matching enemy. Without
+   * one, an enemy's data `ai` (its spells, ROSTER_PLAN 7.2) applies. Both target by the spell's side.
+   */
   private attachEnemyAi(config: BattleSceneConfig): void {
-    if (!config.enemyAi) return;
     config.enemies.forEach((data, i) => {
       const actions = config.enemyAi?.[data.id];
-      if (actions?.length) this.battle.setEnemyAI(i, new BossAI({ actions }));
+      const ai = actions?.length ? new BossAI({ actions }, this.spells) : data.ai ? dataDrivenAI(data.ai, this.spells) : null;
+      if (ai) this.battle.setEnemyAI(i, ai);
     });
   }
 

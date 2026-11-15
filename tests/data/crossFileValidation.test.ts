@@ -6,6 +6,9 @@ import { parse } from 'yaml';
 import { STORY_FLAGS } from '../../src/core/GameFlags.js';
 import { formationFits, type EnemyBoxInput, type EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import { MAX_FORMATION } from '../../src/systems/EncounterTable.js';
+import { validateEnemyData } from '../../src/core/schemaValidation.js';
+import { validateBestiary } from '../../src/core/bestiaryValidation.js';
+import type { EnemyData } from '../../src/types/index.js';
 
 // Load all YAML data files using readFileSync (asset files, not modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -476,5 +479,53 @@ describe('debug scenarios', () => {
         slots.add(slot);
       }
     }
+  });
+});
+
+// ROSTER_PLAN 7.2 (FW-D): the roster fields' cross-file references
+describe('Cross-file validation: roster fields (num, protect, spells, ai, rematches)', () => {
+  const roster: EnemyData[] = parse(readFileSync(join(dataDir, 'enemies.yaml'), 'utf-8'));
+  const bestiary = validateBestiary(parse(readFileSync(join(dataDir, 'bestiary.yaml'), 'utf-8')));
+  const spellIds = new Set(spells.map((s) => s.id));
+
+  it('every enemy validates against the schema (roster fields included)', () => {
+    for (const e of roster) expect(() => validateEnemyData(e), e.id).not.toThrow();
+  });
+
+  it('num is unique and from 1 to 128', () => {
+    const nums = roster.filter((e) => e.num !== undefined).map((e) => e.num!);
+    expect(new Set(nums).size).toBe(nums.length);
+    for (const n of nums) expect(n >= 1 && n <= 128, String(n)).toBe(true);
+  });
+
+  it('every ai spellId is in spells.yaml', () => {
+    for (const e of roster) for (const a of e.ai?.actions ?? []) expect(spellIds.has(a.spellId), `${e.id}: ${a.spellId}`).toBe(true);
+  });
+
+  it('every ai spell is one of the enemy\'s own spells', () => {
+    for (const e of roster) for (const a of e.ai?.actions ?? []) expect(e.spells ?? [], e.id).toContain(a.spellId);
+  });
+
+  it('every spell code is in spells.yaml or named by bestiary.yaml spellNames', () => {
+    for (const e of roster) {
+      for (const s of e.spells ?? []) expect(spellIds.has(s) || s in bestiary.spellNames, `${e.id}: ${s}`).toBe(true);
+    }
+  });
+
+  it('protect and statusWeak categories have bestiary labels; attackStatus ids have status labels', () => {
+    for (const e of roster) {
+      for (const c of [...(e.protect ?? []), ...(e.statusWeak ?? [])]) expect(bestiary.protections[c], `${e.id}: ${c}`).toBeDefined();
+      for (const s of e.attackStatus ?? []) expect(bestiary.statuses[s], `${e.id}: ${s}`).toBeDefined();
+    }
+  });
+
+  it('a rematch names an existing first battle and uses its sprite; lore keys are enemies', () => {
+    const byId = new Map(roster.map((e) => [e.id, e]));
+    for (const e of roster.filter((x) => x.rematchOf)) {
+      const first = byId.get(e.rematchOf!);
+      expect(first, `${e.id}: ${e.rematchOf}`).toBeDefined();
+      expect(e.sprite).toBe(first?.sprite);
+    }
+    for (const id of Object.keys(bestiary.lore)) expect(byId.has(id), id).toBe(true);
   });
 });

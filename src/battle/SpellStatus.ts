@@ -1,5 +1,6 @@
 import type { Character } from '../entities/Character.js';
 import type { SpellData } from '../types/index.js';
+import type { ProtectCategory } from '../types/enemyRoster.js';
 import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellExecutorDeps } from './SpellExecutor.js';
 import type { StatusEffect } from './StatusEffects.js';
@@ -28,9 +29,40 @@ function magicDefenseOf(t: SpellTarget): number {
   return 'data' in t ? t.data.stats.magicDefense : partyMagicDefense(t);
 }
 
-/** Roll the spell against one target; on a miss, say so. */
+/**
+ * D5 (docs/ROSTER_PLAN.md 7.2): the protection that blocks each inflicted effect. `status` covers sleep, paralysis
+ * (HOLD, and CONF, which inflicts it), blind, silence and fear, plus the Slow debuff and Confuse; `poison_stone`
+ * covers poison and stone; `death` covers death. `earth` and `time` block nothing yet (no spell uses them).
+ */
+const PROTECT_OF_STATUS: Record<StatusEffect, ProtectCategory> = {
+  sleep: 'status', stun: 'status', blind: 'status', silence: 'status', fear: 'status',
+  poison: 'poison_stone', stone: 'poison_stone', death: 'death',
+};
+const PROTECT_OF_EFFECT: Record<string, ProtectCategory> = { debuff_speed: 'status', debuff_morale: 'status' };
+const PROTECT_OF_SPELL: Record<string, ProtectCategory> = { conf: 'status' };
+
+/** The protection category a status, debuff or morale spell is blocked by (null: nothing blocks it, e.g. LOCK). */
+export function protectCategoryOf(spell: SpellData): ProtectCategory | null {
+  const bySpell = PROTECT_OF_SPELL[spell.id] ?? PROTECT_OF_EFFECT[spell.effect];
+  if (bySpell) return bySpell;
+  if (!spell.effect.startsWith('status_')) return null;
+  return PROTECT_OF_STATUS[spell.effect.replace('status_', '') as StatusEffect] ?? null;
+}
+
+/** An enemy whose `protect` covers the spell (heroes have no protections yet). */
+export function isProtected(t: SpellTarget, spell: SpellData): boolean {
+  if (!('data' in t) || !t.data.protect) return false;
+  const category = protectCategoryOf(spell);
+  return category !== null && t.data.protect.includes(category);
+}
+
+/**
+ * Roll the spell against one target; on a miss, say so. A protected target misses the same way; its roll is still
+ * drawn, so the battle's RNG stream does not depend on the protection.
+ */
 function lands(deps: Deps, spell: SpellData, t: SpellTarget): boolean {
-  if (statusHits(spell.accuracy ?? DEFAULT_SPELL_ACCURACY, magicDefenseOf(t), deps.rng)) return true;
+  const hit = statusHits(spell.accuracy ?? DEFAULT_SPELL_ACCURACY, magicDefenseOf(t), deps.rng);
+  if (hit && !isProtected(t, spell)) return true;
   deps.addMessage(`${nameOf(t)} is unaffected.`);
   return false;
 }

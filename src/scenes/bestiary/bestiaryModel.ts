@@ -39,18 +39,26 @@ export function bossTag(enemy: EnemyData, habitats: readonly Habitat[] = []): bo
   return (enemy.bossPhases?.length ?? 0) > 0 || enemy.size === 'boss' || habitats.some((h) => h.boss);
 }
 
+/** The bestiary number: the spec's `num`, else the 1-based place in enemies.yaml. */
+export const entryNum = (enemy: EnemyData, index: number): number => enemy.num ?? index + 1;
+
+/**
+ * `order: data`: by `num` (ROSTER_PLAN 7.3), an entry without one at its enemies.yaml place (stable). The label
+ * carries the number, so a gap in the spec numbers shows ("049 Rime Sovereign" after "046 Vampire").
+ */
 export function buildEntries(enemies: readonly EnemyData[], data: BestiaryData, habitats: Map<string, Habitat[]>,
   isSeen: (id: string) => boolean): BestiaryEntry[] {
-  return enemies.map((enemy, index) => {
+  const sorted = enemies.map((enemy, i) => ({ enemy, n: entryNum(enemy, i) })).sort((a, b) => a.n - b.n);
+  return sorted.map(({ enemy, n }, index) => {
     const seen = data.mode === 'all' || isSeen(enemy.id);
     const hab = habitats.get(enemy.id) ?? [];
-    const num = String(index + 1).padStart(3, '0');
+    const num = String(n).padStart(3, '0');
     return { id: enemy.id, enemy, index, seen, boss: seen && bossTag(enemy, hab), habitats: hab,
       label: fill(data, 'entry', { num, name: seen ? enemy.name : data.labels.unknown }) };
   });
 }
 
-/** The title bar's "013 Garland  13/14". */
+/** The title bar's "049 Rime Sovereign  13/14": the label, then the list place of the listed count (gaps allowed). */
 export function titleCount(entry: BestiaryEntry, total: number, data: BestiaryData): string {
   return fill(data, 'titleCount', { entry: entry.label, index: entry.index + 1, total });
 }
@@ -83,10 +91,25 @@ function elementList(ids: readonly string[], data: BestiaryData): string {
 
 const rank = (order: string[], id: string): number => (order.includes(id) ? order.indexOf(id) : order.length);
 
-/** A future `spells` list (BS-F3): its names, else none. */
+/** The enemy's spell codes (`spells`, ROSTER_PLAN 7.2). */
 export function spellIdsOf(enemy: EnemyData): string[] {
-  const spells = (enemy as EnemyData & { spells?: unknown }).spells;
-  return Array.isArray(spells) ? spells.filter((s): s is string => typeof s === 'string') : [];
+  return Array.isArray(enemy.spells) ? enemy.spells.filter((s): s is string => typeof s === 'string') : [];
+}
+
+/** Labels from a bestiary.yaml table, in its key order (an unknown id shows as itself, warned once). */
+export function labelList(ids: readonly string[], table: Record<string, string>, what: string): string[] {
+  const order = Object.keys(table);
+  return [...new Set(ids)].sort((a, b) => rank(order, a) - rank(order, b)).map((id) => {
+    if (table[id] === undefined) warnOnce(`${what}:${id}`, `Bestiary: no label for ${what} "${id}" in bestiary.yaml`);
+    return table[id] ?? id;
+  });
+}
+
+/** Elements, then protection categories (`protect` / `statusWeak`); "None" when both are empty. */
+function withProtections(elements: readonly string[], categories: readonly string[] | undefined, data: BestiaryData): string {
+  const prot = labelList(categories ?? [], data.protections, 'protection');
+  if (prot.length === 0) return elementList(elements, data);
+  return [...(elements.length ? [elementList(elements, data)] : []), ...prot].join(data.templates.list);
 }
 
 const clip = (s: string, n: number): string => (s.length <= n ? s : `${s.slice(0, n - 3)}...`);
@@ -123,6 +146,7 @@ export function statLines(entry: BestiaryEntry, data: BestiaryData, spellName: (
   const el = elementSummary(e);
   const spells = spellIdsOf(e);
   const pair = (a: string, av: string | number, b: string, bv: string | number): StatLine => ({ left: cell(a, v(av)), right: cell(b, v(bv)) });
+  const phaseCount = entry.seen ? e.bossPhases?.length ?? 0 : 0;
   const lines: StatLine[] = [
     pair(L.hp, s.hp, L.attack, s.attack),
     pair(L.hits, fill(data, 'hits', { hits }), L.damage, fill(data, 'damage', { min: s.attack, max: 2 * s.attack })),
@@ -133,19 +157,40 @@ export function statLines(entry: BestiaryEntry, data: BestiaryData, spellName: (
     pair(L.evade, s.evade ?? 0, L.family, family),
     pair(L.size, L.sizes[e.size ?? 'small'], L.attacks, L.attackKinds[kind]),
     pair(L.xp, e.xpReward, L.gold, e.goldReward),
-    ...wrapped(L.weak, v(elementList(el.weak, data)), 2, `${e.id}:weak`),
-    ...wrapped(L.resist, v(elementList(el.resist, data)), 2, `${e.id}:resist`),
-    pair(L.immune, elementList(el.immune, data), L.absorb, elementList(el.absorb, data)),
     ...wrapped(L.statusHit, v(fill(data, 'statusHit', { pct: Math.round(100 * statusChance(DEFAULT_SPELL_ACCURACY, s.magicDefense)),
       acc: DEFAULT_SPELL_ACCURACY })), 1, `${e.id}:status`),
-    pair(L.actions, fill(data, 'fight', { hits }), L.spells, spells.length > 0 ? spells.map(spellName).join(data.templates.list) : L.none),
   ];
+  // ROSTER_PLAN 7.3: Weak (elements, then status weaknesses), Resist, Immune (elements, then `protect`), Absorb, Actions
+  // and Spells, packed: two short values (17 characters) share a line, a longer one wraps on full-width rows
+  const flow: [string, string][] = [
+    [L.weak, v(withProtections(el.weak, e.statusWeak, data))], [L.resist, v(elementList(el.resist, data))],
+    [L.immune, v(withProtections(el.immune, e.protect, data))], [L.absorb, v(elementList(el.absorb, data))],
+    [L.actions, v(fill(data, 'fight', { hits }))],
+    [L.spells, v(spells.length > 0 ? spells.map(spellName).join(data.templates.list) : L.none)],
+  ];
+  const short = (i: number): boolean => i < flow.length && flow[i][1].length <= COLUMN_CHARS - LABEL_CHARS;
+  for (let i = 0; i < flow.length; i++) {
+    const [label, value] = flow[i];
+    if (short(i) && short(i + 1)) {
+      lines.push({ left: cell(label, value), right: cell(flow[i + 1][0], flow[i + 1][1]) });
+      i++;
+    } else if (short(i)) {
+      lines.push({ left: cell(label, value) });
+    } else {
+      // up to 2 lines; the last row (Spells) leaves a line for each boss phase and the habitat
+      const room = i === flow.length - 1 ? Math.max(1, Math.min(2, STAT_LINES - lines.length - 1 - phaseCount)) : 2;
+      lines.push(...wrapped(label, value, room, `${e.id}:${label}`));
+    }
+  }
   const phases = entry.seen ? e.bossPhases ?? [] : [];
   for (const [i, p] of phases.entries()) {
     const room = STAT_LINES - lines.length - 1 - (phases.length - 1 - i);
     if (room < 1) { warnOnce(`${e.id}:phases`, `Bestiary: ${e.id} has more boss phases than the panel shows`); break; }
-    const parts = [fill(data, 'phaseHits', { hits: p.hits ?? hits }), ...(p.attack !== undefined ? [fill(data, 'phaseAttack', { attack: p.attack })] : []),
+    // what the phase changes: its hits and attack (when overridden), then its line; "Fight xN" alone if nothing else
+    const changes = [...(p.hits !== undefined ? [fill(data, 'phaseHits', { hits: p.hits })] : []),
+      ...(p.attack !== undefined ? [fill(data, 'phaseAttack', { attack: p.attack })] : []),
       ...(p.message ? [fill(data, 'phaseMessage', { message: p.message })] : [])];
+    const parts = changes.length > 0 ? changes : [fill(data, 'phaseHits', { hits })];
     lines.push(...wrapped(fill(data, 'phase', { pct: Math.round(p.hpThreshold * 100) }), parts.join(' '), room, `${e.id}:phase${i}`));
   }
   lines.push(...wrapped(L.habitat, v(habitatText(entry.habitats, data)), STAT_LINES - lines.length, `${e.id}:habitat`));

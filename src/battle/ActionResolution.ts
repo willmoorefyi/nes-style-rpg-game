@@ -69,12 +69,13 @@ export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, 
     enemy.crossedPhases?.add(i);
     applyPhaseOverrides(enemy, phases[i]);
     const ai = enemy.aiBehavior;
-    if (ai) {
+    // a pattern AI (BossAI) swaps its pattern; a data-driven `ai` (no setPattern) keeps its actions
+    if (ai && 'setPattern' in ai) {
       const newPattern = bossPatterns.get(phases[i].patternId);
       if (!newPattern) {
         // crossedPhases makes this fire once per phase
         console.warn(`${enemy.data.id}: boss phase pattern "${phases[i].patternId}" is not in bossPatterns`);
-      } else if ('setPattern' in ai) {
+      } else {
         (ai as { setPattern(p: BossPattern): void }).setPattern(newPattern);
       }
     }

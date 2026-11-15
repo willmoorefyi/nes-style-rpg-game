@@ -1,5 +1,8 @@
 - id: goblin
   name: Goblin
+  num: 1
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A small, spiteful raider of the Cornelia fields. Alone it is a nuisance; in a pack it bleeds travellers dry."
   stats:
     hp: 8
     strength: 5
@@ -18,7 +21,10 @@
   attack: melee
   weakness: fire
 - id: gr_imp
-  name: Gr.Imp
+  name: Goblin Guard
+  num: 2
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A stockier goblin in a dented pot helm, set to watch the roads for its chieftain. It hits harder than it looks."
   stats:
     hp: 16
     strength: 5
@@ -38,6 +44,9 @@
   weakness: fire
 - id: wolf
   name: Wolf
+  num: 3
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A lean grey hunter of the peninsula. Wolves rarely come alone, and they circle before they bite."
   stats:
     hp: 20
     strength: 6
@@ -58,7 +67,10 @@
   resist: ice
   family: were
 - id: gr_wolf
-  name: Gr.Wolf
+  name: Warg Wolf
+  num: 8
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A great wolf half again the size of its kin, with the wind to run a horse into the ground."
   stats:
     hp: 72
     strength: 6
@@ -78,6 +90,10 @@
   family: were
 - id: skeleton
   name: Skeleton
+  num: 5
+  tuned: true                # D4: keeps its tuned numbers
+  description: "The restless bones of the old dead, raised by the Fiends' corruption. Fire and holy light undo them."
+  protect: [status, poison_stone, death]
   stats:
     hp: 10
     strength: 8
@@ -99,6 +115,9 @@
   family: undead
 - id: pirate
   name: Pirate
+  num: 17
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A cutthroat of the Pravoka docks. Brave in a crowd, quick to break when the fight turns."
   stats:
     hp: 6
     strength: 10
@@ -118,6 +137,9 @@
   weakness: lightning
 - id: ogre
   name: Ogre
+  num: 14
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A hulking brute who lives on plunder. One swing of its club can fell an unready warrior."
   stats:
     hp: 120
     strength: 22
@@ -137,6 +159,9 @@
   size: large
 - id: troll
   name: Troll
+  num: 42
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A long-armed beast of the hills that strikes three times in a blink. It fears only fire."
   stats:
     hp: 100
     strength: 18
@@ -156,6 +181,11 @@
   size: large
 - id: mummy
   name: Mummy
+  num: 34
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A corpse bound in grave wrappings, walking the tombs it was laid in. Its touch carries a deathly sleep."
+  protect: [status, poison_stone, death]
+  attackStatus: [sleep]
   stats:
     hp: 80
     strength: 16
@@ -175,6 +205,11 @@
   family: undead
 - id: cockatrice
   name: Cockatrice
+  num: 45
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A crowing bird-serpent no taller than a hound. Its peck is weak, but it turns flesh to stone."
+  protect: [earth]
+  attackStatus: [stone]
   stats:
     hp: 90
     strength: 14
@@ -193,6 +228,12 @@
   family: magical
 - id: vampire
   name: Vampire
+  num: 46
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A noble of the old dead who holds the Cavern of Earth. Its gaze locks the limbs of the living."
+  protect: [status, poison_stone, death, earth]
+  attackStatus: [stun]
+  specials: [{id: dazzle, rate: 0.25}]
   stats:
     hp: 280
     strength: 28
@@ -211,7 +252,13 @@
   resist: dark
   family: undead
 - id: dragon
-  name: Dragon
+  name: Red Dragon
+  num: 66
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A great fire wyrm that roosts in the hot places of the world. Its breath sweeps over a whole party."
+  protect: [earth]
+  statusWeak: [poison_stone]
+  specials: [{id: blaze, rate: 0.5}]
   stats:
     hp: 400
     strength: 35
@@ -233,6 +280,9 @@
   size: large
 - id: garland
   name: Garland
+  num: 12
+  tuned: true                # D4: keeps its tuned numbers
+  description: "The knight who once guarded Cornelia's princess. Something in the old temple turned his oath to ash."
   stats:
     hp: 360
     strength: 15
@@ -258,7 +308,13 @@
     hits: 3
   size: large
 - id: lich
-  name: Lich
+  name: Rime Sovereign
+  num: 49
+  tuned: true                # D4: keeps its tuned numbers
+  description: "A knight-king who swore his kingdom would endure, and bound the life of the earth to keep it. Now only the frost endures."
+  protect: [status, poison_stone, death]
+  attackStatus: [stun]
+  spells: [ice2, slp2, fast, lit2, hold, fir2, slow, slep]
   stats:
     hp: 800
     strength: 20
@@ -271,6 +327,17 @@
     magicDefense: 20
   xpReward: 2000
   goldReward: 1000
+  ai:                        # the spec's 75 % spell-use rate over its eight spells
+    rate: 0.75
+    actions:
+    - {type: magic, spellId: ice2, weight: 1}
+    - {type: magic, spellId: slp2, weight: 1}
+    - {type: magic, spellId: fast, weight: 1}
+    - {type: magic, spellId: lit2, weight: 1}
+    - {type: magic, spellId: hold, weight: 1}
+    - {type: magic, spellId: fir2, weight: 1}
+    - {type: magic, spellId: slow, weight: 1}
+    - {type: magic, spellId: slep, weight: 1}
   sprite: lich
   attack: melee
   attackAnim: heavy
@@ -280,6 +347,6 @@
   bossPhases:
   - hpThreshold: 0.5
     patternId: aggressive
-    message: The Lich's form shifts!
+    message: The Rime Sovereign's skull fractures!
   family: undead
   size: boss

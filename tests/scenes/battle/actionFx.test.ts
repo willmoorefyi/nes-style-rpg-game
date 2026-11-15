@@ -176,7 +176,7 @@ describe('ActionFx', () => {
     const fx = new BattleActionFx(s.layers, source());
     const ctx = { targetIds: ['party_0'], targets: [s.display.partySprites[0]], actor: s.display.enemySprites[0], diff: [] };
     const none = { done: true, messages: [], damageEvents: [], missed: false };
-    expect(fx.play({ actorId: 'enemy_0', actorName: 'Dragon', actionType: 'fight', targetId: 'party_0' }, none, ctx)).toBe(16);
+    expect(fx.play({ actorId: 'enemy_0', actorName: 'Red Dragon', actionType: 'fight', targetId: 'party_0' }, none, ctx)).toBe(16);
     fx.playCue('glint', s.display.enemySprites[0]);
     fx.playCue('impact_dust', s.display.enemySprites[0]);
     expect(fx.active).toBe(3);

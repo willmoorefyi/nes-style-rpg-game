@@ -1,7 +1,7 @@
 # The bestiary (docs/BESTIARY_PLAN.md 3.4). Stats come from enemies.yaml; this file holds the mode, the loop timing,
 # the habitat scan, the backgrounds and every label and template the bestiary shows (ASCII only: the NES font).
 mode: all                    # all | seen (seen: enemies not met yet list as "???")
-order: data                  # data (enemies.yaml order); hook for name | level later
+order: data                  # data: by the spec number `num` (enemies.yaml order without one); hook for name | level later
 listRows: 6
 habitats:
   maps: [overworld, temple-of-fiends]     # compiled map ids scanned (every map with encounters must be listed)
@@ -49,6 +49,10 @@ labels:
   paused: Paused
   noArt: No art yet
   noData: No bestiary data
+  info: Info                 # the Info page (C): description, specials, on-hit statuses
+  specials: Specials
+  onHit: On hit
+  noDescription: No description yet
   sizes: {small: Small, large: Large, boss: Boss}
   attackKinds: {melee: Melee, heavy: Melee (heavy), ranged: Ranged}
   anim: {attack: Attack, heavy: Attack (heavy), ranged: Attack (ranged), hurt: Hurt, cast: Cast, daze: Dazed}
@@ -68,6 +72,21 @@ templates:                   # {name} placeholders, filled by the model
   habitatBoss: "{map} (boss)"                # a scripted isBoss encounter
   notPlaced: "Not placed yet"
   list: ", "
+  special: "{name} {pct}%"                   # "Dazzle 25%"
+  loreTitle: "Lore {page}/{pages}"
 elements: {fire: Fire, ice: Ice, lightning: Bolt, earth: Earth, holy: Holy, dark: Dark, water: Water, wind: Wind}
-families: {were: Were, undead: Undead, giant: Giant, magical: Magical, dragon: Dragon}
-help: "Up/Down: scroll   Left/Right: page   Z: next move   Shift: pause   X: close"
+families: {were: Were, undead: Undead, giant: Giant, magical: Magical, dragon: Dragon, aquatic: Aquatic}
+# protect / statusWeak categories (ROSTER_PLAN 7.2 D5), in display order; the Immune and Weak rows
+protections: {status: Status, poison_stone: Poison/Stone, death: Death, earth: Earth, time: Time}
+statuses: {poison: Poison, stun: Paralysis, sleep: Sleep, blind: Blind, stone: Stone, death: Death}
+# spec spell codes that spells.yaml does not have yet (the spec glossary; E-F3)
+spellNames: {fir3: FIR3, lit3: LIT3, ice3: ICE3, nuke: NUKE, rub: RUB, xxxx: XXXX, brak: BRAK, bane: BANE, stop: STOP,
+  zap: ZAP!, xfer: XFER, wall: WALL, fog2: FOG2, inv2: INV2, hel2: HEL2, hel3: HEL3, cur4: CUR4, stun: STUN, blnd: BLND,
+  slo2: SLO2}
+specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: Ink}
+lore:                        # enemy id -> pages (ASCII); a rematch shows its first battle's
+  lich:
+  - "Once a mortal knight-king, he swore that no enemy would ever take his people while he still stood to defend them. When famine weakened his kingdom and an invading army crossed its borders, he went down beneath his ancestral fortress to the ancient source of life buried in the earth. There he bound his crown, his bloodline and every soul sworn to his protection to a single command: his kingdom would endure."
+  - "The earth answered. Its buried warmth flowed into the dying king, raising him from his deathbed and waking the soldiers in their graves. They drove the invaders back. Then the frost came.\nFields hardened beneath unmelting snow. Roots froze deep underground. As his subjects perished, they rose again to resume their duties: soldiers returned to the walls, servants tended empty chambers, and farmers walked the edges of fields that would never bear another harvest."
+  - "The king had kept his oath. He could no longer understand why anyone would wish him to release them.\nNow called the Rime Sovereign, he stands gaunt in blackened-iron plate, frost tracing every edge. Icicles grow from the cracks of his bare skull, through the band of tarnished gold that still marks him as king. Cyan lights burn in his empty sockets. At half strength his skull fractures and the cold within him flares."
+help: "Up/Down: scroll   Left/Right: page   Z: next move   C: info/lore   Shift: pause   X: close"

@@ -11,7 +11,7 @@ export type BestiaryAttackKind = 'melee' | 'heavy' | 'ranged';
 export const BESTIARY_LABEL_KEYS = ['title', 'boss', 'hp', 'attack', 'hits', 'damage', 'defense', 'magicDefense',
   'strength', 'agility', 'intelligence', 'vitality', 'luck', 'accuracy', 'evade', 'family', 'size', 'attacks', 'xp', 'gold',
   'weak', 'resist', 'immune', 'absorb', 'statusHit', 'actions', 'spells', 'habitat', 'none', 'unknown', 'blank', 'paused',
-  'noArt', 'noData'] as const;
+  'noArt', 'noData', 'info', 'specials', 'onHit', 'noDescription'] as const;
 export type BestiaryLabelKey = (typeof BESTIARY_LABEL_KEYS)[number];
 
 export type BestiaryLabels = Record<BestiaryLabelKey, string> & {
@@ -37,6 +37,8 @@ export const TEMPLATE_PLACEHOLDERS = {
   habitatBoss: ['map'],
   notPlaced: [],
   list: [],
+  special: ['name', 'pct'],
+  loreTitle: ['page', 'pages'],
 } as const satisfies Record<string, readonly string[]>;
 export type BestiaryTemplateKey = keyof typeof TEMPLATE_PLACEHOLDERS;
 export type BestiaryTemplates = Record<BestiaryTemplateKey, string>;
@@ -71,5 +73,15 @@ export interface BestiaryData {
   /** Element id -> label, in display order. */
   elements: Record<string, string>;
   families: Record<string, string>;
+  /** Protection category (`protect`, `statusWeak`) -> label, in display order (ROSTER_PLAN 7.3). */
+  protections: Record<string, string>;
+  /** Status id (`attackStatus`) -> label. */
+  statuses: Record<string, string>;
+  /** Spell codes not in spells.yaml (the spec glossary) -> display name. */
+  spellNames: Record<string, string>;
+  /** Special ability id -> display name (missing: the id, capitalised). */
+  specialNames: Record<string, string>;
+  /** Enemy id -> lore pages (ASCII; a rematch shows its first battle's). */
+  lore: Record<string, string[]>;
   help: string;
 }

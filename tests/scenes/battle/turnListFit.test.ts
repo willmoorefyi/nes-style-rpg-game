@@ -11,9 +11,10 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { Container } from 'pixi.js';
 import { BattleAnimationController } from '../../../src/scenes/battle/BattleAnimationController.js';
-import { COMMAND_WINDOW } from '../../../src/scenes/battle/BattleSceneTypes.js';
+import { COMMAND_WINDOW, ENEMY_WINDOW } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { glyphWidth, fitToWidth } from '../../../src/scenes/battle/battleMessageUtils.js';
-import { WINDOW_PADDING } from '../../../src/core/LayoutConstants.js';
+import { FONT_SIZE, WINDOW_PADDING } from '../../../src/core/LayoutConstants.js';
+import { groupEnemies, listColumnWidth } from '../../../src/scenes/battle/enemyList.js';
 import { TURN_FONT, TURN_PITCH, actionLabel, compactResult, fitEntry } from '../../../src/scenes/battle/TurnList.js';
 import { NAME_MAX_LENGTH } from '../../../src/ui/NameEntryGrid.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
@@ -161,5 +162,45 @@ describe('T6 review / B12: turn-list lines', () => {
   it('fitToWidth cuts at the glyph count and marks the cut', () => {
     expect(fitToWidth('abcdef', glyphWidth(16) * 4, 16)).toBe('abc…');
     expect(fitToWidth('abcd', glyphWidth(16) * 4, 16)).toBe('abcd');
+  });
+});
+
+/**
+ * ROSTER_PLAN 7.5: the roster's long names, as actor and as target, in the turn list (`fitEntry`) and the battle enemy
+ * list (one line per species, `2x <name>`; two 256 px columns past 5 species). The spec names are listed until their
+ * entries land with their art; the real enemies.yaml names are checked too.
+ */
+describe('roster long names (FW-D)', () => {
+  const SPEC_LONG = ['Drowned Sovereign II', 'Minotaur Zombie', 'White Crocodile', 'Rime Sovereign II'];
+  const NAMES = [...new Set([...SPEC_LONG, ...enemies.map((e) => e.name)])];
+  const W = MAX_CHARS * glyphWidth(TURN_FONT);
+
+  it.each(NAMES)('%s: as a lettered target and as the actor, the entry fits and keeps the actor and the result', (name) => {
+    for (const [actor, label, target, result] of [
+      [LONG_HERO, 'FIRE', `${name} B`, 'x3 157!KO'], [LONG_HERO, '', `${name} B`, '19'], [`${name} B`, 'FIR2', '', '57'],
+      [`${name} B`, '', 'WWWWWW', 'Miss']] as const) {
+      const entry = fitEntry(actor, label, target, result, W);
+      expect(entry.length * glyphWidth(TURN_FONT), entry).toBeLessThanOrEqual(CONTENT_WIDTH);
+      expect(entry.endsWith(` ${result}`), entry).toBe(true);
+      if (actor === LONG_HERO) expect(entry.startsWith(actor), entry).toBe(true);
+    }
+  });
+
+  it.each(NAMES)('%s: the enemy list line fits its column (one column up to 5 species, two past)', (name) => {
+    const content = ENEMY_WINDOW.width - 2 * WINDOW_PADDING;
+    const one = groupEnemies(Array.from({ length: 9 }, () => ({ data: { name }, currentHp: 1 })));
+    expect(one[0].label.length * glyphWidth(FONT_SIZE), one[0].label).toBeLessThanOrEqual(listColumnWidth(1, content));
+    const six = groupEnemies([...[0, 1, 2, 3, 4].map((i) => ({ data: { name: `E${i}` }, currentHp: 1 })),
+      { data: { name }, currentHp: 1 }, { data: { name }, currentHp: 1 }]);
+    const line = fitToWidth(six[5].label, listColumnWidth(six.length, content), FONT_SIZE);
+    expect(line.length * glyphWidth(FONT_SIZE), line).toBeLessThanOrEqual(listColumnWidth(six.length, content));
+    expect(line.startsWith('2x '), line).toBe(true);
+  });
+
+  it('the cut is visible only where a name is too long: "2x Minotaur Zombie" in a two-column list', () => {
+    const content = ENEMY_WINDOW.width - 2 * WINDOW_PADDING;
+    expect(fitToWidth('2x Minotaur Zombie', listColumnWidth(6, content), FONT_SIZE)).toBe('2x Minotaur Zomb…');
+    expect(fitToWidth('2x Goblin Guard', listColumnWidth(6, content), FONT_SIZE)).toBe('2x Goblin Guard');
+    expect(fitToWidth('Drowned Sovereign II', listColumnWidth(1, content), FONT_SIZE)).toBe('Drowned Sovereign II');
   });
 });

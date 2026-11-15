@@ -2,6 +2,7 @@ import type { EnemyData, MapData, ShopData, StatBlock } from '../types/index.js'
 import { validateEncounterEntries, validateEncounterZones } from './encounterValidation.js';
 import { validateBossPhases, validateKeyItemGates, validateScriptedEncounters } from './mapValidators.js';
 import { validateEnemyAttack } from './schemaValidationFx.js';
+import { validateEnemyRoster } from './enemyRosterValidation.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -111,6 +112,7 @@ export function validateEnemyData(data: unknown): EnemyData {
   assertNumber('EnemyData.goldReward', data.goldReward);
   assertString('EnemyData.sprite', data.sprite);
   validateEnemyAttack(data);
+  validateEnemyRoster(data);
   assertObject('EnemyData.stats', data.stats);
   validateStatBlock('EnemyData.stats', data.stats);
   assertNumber('EnemyData.stats.attack', (data.stats as Record<string, unknown>).attack);
