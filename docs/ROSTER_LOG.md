@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 18 of 300 (build 18 of 285, fix 0 of 15; ledger guard: 118 Gemini attempts - 100)
+Images used: 19 of 300 (build 19 of 285, fix 0 of 15; ledger guard: 119 Gemini attempts - 100)
 
 ## Attempts
 
@@ -43,6 +43,7 @@ Images used: 18 of 300 (build 18 of 285, fix 0 of 15; ledger guard: 118 Gemini a
 | R18 | drowned_sovereign/boss_attack (1236, key `42532d476c42f0a2577a0b08`, `--retry`, attempt 3 of 3) | 1 | The robes part at the front and **three** dark teal tentacles with pale suckers lash far toward the heroes; the crown, the aged face and the robes as in the idle (abyssal-teal outer robe with wide sleeves over the pearl inner robe, hems pooling wide), the sceptre arm thrust forward. 161 px (idle 162), lowest row 192, top row 32, x 6-194, no border pixels, no guide colours, binary alpha, 15 colours with the outline ink, one piece, `pose_diff` 0.50. Nit: the coral sceptre reads brown (the idle's coral red is not in this file's 15 colours) | **self-approved** (attempt 3 of 3, over R16 and R17) |
 | R19 | drowned_sovereign/boss_cast (1234, key `c5e7eb5c6a56bafbfaef0bc2`) | 1 | The robes open and seven dark teal tentacles with pale suckers fan out in a ring behind him, their tips glowing abyssal blue; the coral-red sceptre raised toward the heroes; the crown, the aged face and the teal-over-pearl robes with pooled hems as in the idle. 163 px (idle 162), lowest row 192, top row 30, x 14-186, no border pixels, no guide colours, binary alpha, 16 colours with the outline ink, one piece, `pose_diff` 0.54 vs idle. Nit: seven tentacles where the plan says six (reads as a ring, fine for the rite) | **self-approved** (attempt 1 of 3) |
 | R20 | drowned_sovereign/boss_hurt (1234, key `ef605855eec4a92a4295a3e6`) | 1 | 179 px, lowest row 192, top row 14, no border pixels, binary alpha, 14 colours, `pose_diff` 0.51; a strong recoil (head thrown back, grimace, arms flung wide, tentacles erupting from the robe front). **Fails review:** the crown flies off above the head as a detached 290 px piece (2 pieces; the crown is a design anchor and must stay on the head), and the sceptre switched to the far hand (a prop swap against the idle) | **rejected**; retry follows (seed 1235, `--retry`; the `hurt` text now keeps the tilted crown on the head and the sceptre in its idle hand) |
+| R21 | drowned_sovereign/boss_hurt (1235, key `61d1f4523ef4f20aaa390958`, `--retry`) | 1 | Knocked back: torso and head leaning away from the heroes, a grimace, the crown tilted askew and still on the head, the coral-red sceptre in its idle hand, dark teal tentacles with pale suckers erupting from under the robe on both sides; the teal-over-pearl robes with pooled hems as in the idle. 160 px, lowest row 192, top row 33, x 14-186, no border pixels, no guide colours, binary alpha, 16 colours with the outline ink (9 shared), one piece, `pose_diff` 0.52 vs idle | **self-approved** (attempt 2 of 3) |
 
 ## Deferred sprites
 
