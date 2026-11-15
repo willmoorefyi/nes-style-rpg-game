@@ -111,14 +111,14 @@ frames:
     t: 0.25
     pins: [foot_n, foot_f]
     moves: [back, chest, neck, head, snout, sh_n, el_n, paw_n, ftoe_n, sh_f, el_f, paw_f, ftoe_f, knee_n, knee_f]
-  daze:                       # pass F 5a: body and head only (the forelegs stay planted); the neck follows the head so
-    t: 0.05                   # no mane notch opens behind the ears
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [1, 1]}
-  daze_b:
-    t: 0.05
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [1, 1]}
+  daze:                        # pass F 5a (+ review fix): head and neck hang 3-4 px with the nose dipped, tail lowered;
+    t: 0.0                     # the forelegs stay planted, the neck follows the head (no mane notch behind the ears)
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 3], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 5]}
+  daze_b:                      # the sway's low point: back 1 px lower, head 4 px down
+    t: 0.0
+    moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
+    tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 5]}
 masks:
   neck:                        # body/neck boundary off the withers: the neck warp sampled body pixels (E8 crease)
     idle: [[68, 25], [73, 25], [77, 28], [81, 29], [81, 38], [68, 38]]

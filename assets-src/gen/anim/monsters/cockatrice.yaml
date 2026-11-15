@@ -142,6 +142,10 @@ frames:
   hurt_in2:                    # body settles back; the wings keep the hurt spread (E11: turning wing_n 20 deg forward put it under the neck as a thin strip)
     moves: [hip, chest, neck, head, beak, hip_n, knee_n, hip_f, knee_f]
     tweaks: {hip: [-2, 1], chest: [-2, 1], neck: [-2, 1], head: [-2, 1], beak: [-2, 1], tail0: [-2, 1], tail1: [-2, 1], tail2: [-2, 1], tail3: [-2, 1], tail_tip: [-2, 1], wsh_n: [-2, 1], wtip_n: [-2, 1], wsh_f: [-2, 1], wtip_f: [-2, 1]}
+  daze:                        # review nit: the snake tail's head droops 4 px with the slump
+    tweaks: {tail3: [0, 1], tail_tip: [1, 4]}
+  daze_b:
+    tweaks: {tail3: [0, 1], tail_tip: [1, 4]}
 holds: []
 paint:                         # 1 px joint cracks closed with outline ink
   - {frame: hurt_in1, xy: [[39, 67]], rgb: [6, 4, 10]}

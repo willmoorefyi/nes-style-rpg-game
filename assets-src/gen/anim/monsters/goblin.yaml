@@ -94,6 +94,10 @@ frames:
   hurt_in2:                    # thrown arm at shoulder height
     moves: [crown, neck, chest, hip, sh_f, el_f, hip_n, knee_n, hip_f, knee_f]
     tweaks: {el_f: [0, 1], hand_f: [1, 4]}
+  daze:                        # review fix: the boxing guard drops (near fist 6 px down, hanging loose), head 3 px down
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 1], hand_n: [-1, 6]}
+  daze_b:                      # the sway's low point: the torso 1 px lower (recipe dy), the head kept at daze height
+    tweaks: {crown: [0, 1], el_n: [0, 1], hand_n: [-1, 6]}
 z:
   idle: [uarm_f, farm_f, thigh_f, shin_f, uarm_n, farm_n, torso, thigh_n, shin_n, head, dagger, ft_n, ft_f]
 masks:

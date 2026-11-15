@@ -118,6 +118,12 @@ frames:
     t: 0.25
     moves: [crown, neck]
     pins: [knee_n, foot_n, knee_f, foot_f]
+  daze:                        # review fix: the head translated, not turned (the toward-hurt move turned it and smeared the
+    moves: [chest]             # eye and mouth): crown and neck share one offset, so daze_b's face is daze's 1 px lower
+    tweaks: {crown: [0, 1], neck: [0, 1]}
+  daze_b:
+    moves: [chest]
+    tweaks: {crown: [0, 1], neck: [0, 1]}
 z:
   idle: [cape, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
   attack: [wing, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, slash]
@@ -152,3 +158,6 @@ paint:                       # 1-2 px cracks enclosed by outline ink, closed wit
   # isolated red pixels inside the dark-purple lapel (atk_recover), repainted with the lapel colour
   - {frame: atk_follow, xy: [[42, 34]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[37, 36], [39, 38]], rgb: [74, 66, 99]}
+  # daze: the 1 px cape pinhole the slump opens, outline ink
+  - {frame: daze, xy: [[31, 51]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[31, 52]], rgb: [6, 4, 10]}

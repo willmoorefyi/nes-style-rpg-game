@@ -113,6 +113,10 @@ frames:
     t: 0.25
     moves: [crown, sh_n, el_n, hand_n]
     pins: [knee_n, foot_n, knee_f, foot_f]
+  daze:                        # review fix: the boxing guard drops (near fist 6 px, far fist 4 px down), head 3 px down
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [-1, 2], hand_n: [-2, 6], sh_f: [0, 1], el_f: [0, 2], hand_f: [0, 4]}
+  daze_b:                      # the sway's low point: the torso 1 px lower (recipe dy), the head kept at daze height
+    tweaks: {crown: [0, 1], el_n: [-1, 2], hand_n: [-2, 6], sh_f: [0, 1], el_f: [0, 2], hand_f: [0, 4]}
 z:
   idle: [uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
   attack: [str1, str2, str3, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
@@ -132,3 +136,6 @@ seam_tolerance: 2              # atk_recover: the approved idle's thigh / torso 
 holds: []
 paint:                         # 1 px crack inside the mid streamer root, closed with outline ink
   - {frame: atk_mid, xy: [[24, 40]], rgb: [6, 4, 10]}
+  # daze: the chest wrapping the lowered far fist uncovered (the approved idle has none behind the fist), bandage tone
+  - {frame: daze, xy: [[32, 34], [34, 34], [34, 35], [35, 35], [35, 36], [36, 36], [35, 37]], rgb: [132, 115, 99]}
+  - {frame: daze_b, xy: [[32, 35], [34, 35], [34, 36], [35, 36], [35, 37], [36, 37], [35, 38]], rgb: [132, 115, 99]}
