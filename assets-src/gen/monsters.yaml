@@ -2542,14 +2542,15 @@
     fingers; centred in its own cell with empty space on both sides, the collar points well below the top of the grey
     box
   attack: >-
-    leaning forward toward the heroes, one clawed hand reaching out with the elbow bent, the bat-wing cape spread
-    with the arms, the hand and the cape well inside the middle cell
+    leaning forward toward the heroes, one clawed hand reaching out with the elbow bent and its bat-wing cape spread
+    under that arm, the other arm and its half of the cape kept close to the body (not flung out behind), the hand
+    and the whole cape well inside the middle cell
   hurt: >-
     knocked back, the white hair flying, both arms raised in front of the face with the bat-wing cape folded across
     the body
   face: his gaunt pale face with red eyes under long white hair is readable
   extra_negative: slicked black hair, a red vest, a separate cape, a crown on the head, a weapon, real bat wings on the back, a young face
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R267): the attack's trailing cape sliced at the raw cell line
 - id: dark_fighter
   # "Dark Fighter" (117): a warrior-mage in dark half-plate and a hooded tabard, a sword and a glowing glyph shield
   size: small
