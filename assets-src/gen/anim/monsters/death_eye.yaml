@@ -25,6 +25,10 @@ frames:
   cast_gather: {moves: [], dx: 1, dy: 1}     # the glyph gathers: a 1 px sink
   cast_rise: {t: 0.0, moves: [], dy: -3}     # the flared iris rising out of the gather
   cast_release: {t: 1.0, moves: [], dy: -4}  # the release lifts it 4 px
-  daze: {moves: [], dy: 2}                   # sinks 2 / 3 px (the whole eye: the tendrils hold their shape)
-  daze_b: {moves: [], dy: 3}
+  # daze sinks the whole eye 2 / 3 px (the tendrils hold their shape). F3c (ROSTER_FIX_PLAN 12c): the daze recipe
+  # lerps the joints 0.15 toward the hurt, which carried neck and crown +3, +3 while the core only sank, so the torso
+  # warp sheared the ball and split the pupil (a stray iris pixel inside it, its tip in fragments). The tweaks cancel
+  # that drift: every joint moves by dy alone, a pure shift of the idle.
+  daze: {moves: [], dy: 2, tweaks: {neck: [-3, -3], crown: [-3, -3]}}
+  daze_b: {moves: [], dy: 3, tweaks: {neck: [-3, -3], crown: [-3, -3]}}
 holds: []

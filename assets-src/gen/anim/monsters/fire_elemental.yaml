@@ -45,5 +45,8 @@ paint:                          # cracks where the dropped face meets the left f
   - {frame: hurt_in1, xy: [[46, 45], [47, 46], [48, 46], [49, 46], [49, 47]], rgb: [247, 107, 24]}
   - {frame: hurt_in1, xy: [[43, 46], [44, 46]], rgb: [181, 41, 24]}
   - {frame: atk_mid, xy: [[41, 60], [42, 60], [43, 60], [44, 60], [45, 60], [46, 60], [47, 60], [48, 60], [49, 60]], rgb: [156, 33, 33]}
-  - {frame: atk_mid, xy: [[44, 61], [45, 61], [47, 61], [41, 62], [43, 62], [45, 62], [46, 62]], rgb: [206, 16, 74]}
+  # F3c (ROSTER_FIX_PLAN 12b): the elbow crack is closed in the flame ramp, not rose: the 7 px once painted (206, 16, 74)
+  # and the 5 rendered rose px in x 40-49, y 60-62, by 4-neighbour mode among the flanking flame colours
+  - {frame: atk_mid, xy: [[41, 61], [42, 61], [43, 61], [44, 61], [45, 61], [47, 61], [42, 62], [43, 62], [44, 62], [45, 62], [46, 62]], rgb: [156, 33, 33]}
+  - {frame: atk_mid, xy: [[41, 62]], rgb: [41, 0, 33]}
   - {frame: hurt_in1, xy: [[50, 47], [51, 48], [52, 49], [53, 52]], rgb: [255, 156, 33]}
