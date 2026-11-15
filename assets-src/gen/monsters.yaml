@@ -587,10 +587,16 @@
   seeds: [1234]
 - id: evil_eye
   # "Evil Eye" (075), the Levistone guardian: gazes and death magic (Magic replays the attack frames, D6/D7).
-  # HELD (ROSTER_LOG G2): body floating paused by the plan 6.3 trigger (R38-R40)
+  # the floating line ("tilt the whole body along a strong diagonal ...") is replaced by a frontal line (orchestrator,
+  # 2026-11-15); the hurt may tilt back a little (R75: a fully untilted hurt copies the idle)
   size: large
   floating: true
   body: floating
+  motion: >-
+    Keep the frontal view in every cell: the big eye faces the viewer with its iris looking toward the heroes on the
+    right, never turned to a side profile; in the attack the whole body surges forward to the right, level, not tilted
+    along a diagonal; in the hurt it is knocked back to the left and tilted back by about fifteen degrees; it always
+    hovers, nothing touches the ground; the eyestalks, the mouth and the trailing parts move with the motion.
   prompt: >-
     a large floating eye monster: a round fleshy body that is one huge green-irised eye with a black pupil, a wide
     mouth of jagged fangs below the eye, four writhing eyestalks rising from the top, each ending in a small yellow
