@@ -351,6 +351,21 @@ Images used: 193 of 300 (build 193 of 285, fix 0 of 15; ledger guard: 293 Gemini
   sliced), `pyrolisk` (attack beak tip sliced), `minotaur` (small, idle 89 px).
 - Orchestrator: `astos/boss_attack` R122 (not approved, see batch A notes).
 
+## Batch C status (2026-11-15, stopped: Gemini project spend cap)
+
+| Batch | Sprites approved | Waiting | Images | Expected (plan 6.2) | Retries by body type (images / sprites approved) |
+|---|---|---|---|---|---|
+| C (068-101) | **12 of 32** so far: white_dragon, winter_wolf, mindflayer, ice_gigas, specter, remorazz, dark_wizard, desert_baretta, sabertooth, wyvern, wyrm, manticore | 20: baretta (R206 failed call, 2 attempts left), basilisk, allosaurus, weretiger, sand_worm, minotaur_zombie, king_mummy, medusa, rakshasa, clay_golem, nightmare, sahagin_prince, white_shark (swimmer pause), deepeyes, sea_snake, sea_scorpion, sea_troll, ghost, water_elemental, water_naga (all written in `monsters.yaml`, not requested) | 19 (R188-R206) | 43 for all 32 | quadruped 8 / 5, biped 6 / 3, bird 2 / 1, floating 1 / 1, arthropod 1 / 1, serpent 1 / 1 |
+
+- **Stop:** R206 came back `403 PERMISSION_DENIED`, "Spend cap breached for project ... generativelanguage", the
+  Google Cloud project's own spend cap (not `budget.json`, which still allows 92 build images). Generation cannot
+  resume until the user raises that cap. The failed call counts in the ledger.
+- With the batch-B wording built into every C entry from the start, batch C ran at 1.6 images per approved sprite
+  (batch B 2.3). The remaining failures were design misses (a four-legged wyvern, a hand thrust backwards, a swipe
+  smear, a rear-up hurt) and one more cutter slice (dark_wizard R197, a staff pointed forward; a vertical staff fixed
+  it).
+- Batch D (103-123) has no `monsters.yaml` entries yet.
+
 ## Deferred sprites
 
 - `piranha` (sprite, batch B): R156 and R158 refused by Gemini, R157 sliced; 3 of 3 attempts used (R159). Options: a `variant` of `red_piranha` once that is approved (0 images), or a fix-pass request with new wording.
