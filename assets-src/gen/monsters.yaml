@@ -1095,15 +1095,16 @@
   body: quadruped
   prompt: >-
     a prehistoric hyena-beast on four legs seen from the side, a sloped back with high heavy shoulders and low hips,
-    tan fur with dark brown spots, a short bristly mane along the neck, a huge heavy head with a massive bone-crushing
-    jaw and big teeth, small dark eyes, round ears, a short tail
+    tan fur with dark brown spots, a short bristly mane along the neck, an oversized prehistoric head, much bigger than
+    a hyena's, with a massive bone-crushing jaw and big blunt teeth, small dark eyes, round ears, a short tail
   attack: >-
     lunging forward low with the huge jaws wide open to bite the heroes, the head thrust forward, all four feet still
-    on the ground (no leap), no taller than half again its idle height
+    on the ground (no leap), no taller than half again its idle height; only the animal itself: no motion arc,
+    swoosh, smear or trail
   hurt: knocked back, the head turned away with the jaws snapped shut, the back hunched, all four feet on the ground
   face: its huge jaw and small dark eyes are readable
-  extra_negative: stripes, a mane of long hair, horns, a saddle, rearing up
-  seeds: [1234]
+  extra_negative: stripes, a mane of long hair, horns, a saddle, rearing up, a motion arc, a swoosh, a smear
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R129): a swoosh arc over the attack
 - id: lesser_tiger
   # "Lesser Tiger" (038): a big cat
   size: small
