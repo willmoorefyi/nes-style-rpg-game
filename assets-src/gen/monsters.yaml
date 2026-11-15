@@ -1016,12 +1016,16 @@
   prompt: >-
     a crouching grey stone gargoyle on two clawed feet, cracked stone skin with chipped edges, two bat wings of stone
     half raised behind the shoulders, two short curved horns, a snarling face with a wide fanged mouth and glowing
-    orange eyes, long arms with clawed hands, a short pointed tail
-  attack: springing forward at the heroes with both clawed hands raking, the wings spread wide
-  hurt: knocked back, the wings folding, stone chips flying from its chest, the arms thrown up
+    orange eyes, long arms with clawed hands, a short pointed tail; in every cell the whole figure is centred in its own cell with empty space on both sides, and its reaching claws and wings stop well before the edges of its cell
+  attack: >-
+    springing forward at the heroes with both clawed hands raking down in front of its chest, the elbows bent so the
+    claws stay well inside the middle cell, the two wings raised up behind it (exactly two wings, as in the idle cell)
+  hurt: >-
+    knocked back, both wings still visible behind the shoulders and half folded (exactly two wings, as in the idle
+    cell), cracks across its chest, the arms thrown up
   face: its snarling stone face with glowing orange eyes and fangs is readable
-  extra_negative: red skin, a trident, a pedestal, feathers, a weapon, a third wing, a cape
-  seeds: [1234]
+  extra_negative: red skin, a trident, a pedestal, feathers, a weapon, a third wing, a cape, flying stone chips
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R123): the attack claws sliced at the raw's one-third line, one wing in the hurt
 - id: bloodbones
   # "Bloodbones" (031): a heavily strengthened skeleton (distinct from the skeleton: larger, breastplate, two blades)
   size: small
@@ -1034,7 +1038,7 @@
   prompt: >-
     a large heavy-boned red-stained skeleton standing upright, dark red-brown blood stains on its bones, a rusted iron
     breastplate over the ribs, a horned skull with burning red eye lights, holding a notched curved blade in each hand,
-    one in the hand on the left side of the image and one in the hand on the right side of the image
+    one in the hand on the left side of the image and one in the hand on the right side of the image; in every cell the whole figure is centred in its own cell with empty space on both sides, and its reaching arms and blades stop well before the edges of its cell
   attack: >-
     lunging forward and slashing both notched blades across at the heroes, exactly two blades, one in each hand, as in
     the idle cell
