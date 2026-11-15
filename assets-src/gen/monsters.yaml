@@ -1727,13 +1727,13 @@
     hand on the right side of the image in every cell; centred in its own cell with empty space on both sides, the hat
     tip well below the top of the grey box
   attack: >-
-    leaning forward toward the heroes with both hands on the staff, its top tilted forward toward the heroes and
-    glowing faintly, the staff tip well inside the middle cell (not reaching the cell edge), the glowing yellow eyes
-    wide under the brim
+    leaning his body far forward toward the heroes and raising the staff upright in front of his chest with both
+    hands, the staff vertical (not pointed forward), its top level with the hat brim and glowing faintly, the whole
+    staff well inside the middle cell, the glowing yellow eyes wide under the brim
   hurt: knocked back, the hat tipped askew, the free hand thrown up, the staff upright in the same hand
   face: his bearded face with glowing yellow eyes under the hat brim is readable
   extra_negative: a sword, armour, a crown, an orb, spell effects, a cape, a second staff
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R196): the attack's free hand thrust back, away from the heroes; no stars or yellow eyes
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R196): the attack hand thrust back; 1235 (R197): the forward staff sliced at the raw cell line
 - id: desert_baretta
   # "Desert Baretta" (076): a sand ankylosaur with a club tail (distinct from the baretta)
   size: large
