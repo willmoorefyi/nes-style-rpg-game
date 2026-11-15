@@ -2445,8 +2445,9 @@
     behind the body in every cell (never flying out). Draw only the parts named in the description, the same in every
     cell: no second cape, and no slash trail, smear or motion lines.
   prompt: >-
-    a skeletal knight in spiked dark gunmetal plate armour, a horned open helm showing a grinning skull with two red
-    eye lights, a short tattered dark red cloak hanging close behind the shoulders, holding one black sword with glowing
+    a skeletal knight in spiked mid-grey steel plate armour with dark outlines, a horned open-faced helm with a big
+    bone-white grinning skull face filling the opening, clearly visible and bright against the armour, with two bright
+    red eye lights, a short tattered dark red cloak hanging close behind the shoulders, holding one black sword with glowing
     red runes on the blade; in the idle cell the sword is held point down in front of the body; centred in its own
     cell with empty space on both sides, the helm horns well below the top of the grey box
   attack: >-
@@ -2456,8 +2457,8 @@
   hurt: >-
     knocked back, the skull thrown back, the sword held upright across the chest, the cloak close behind
   face: a grinning skull with two red eye lights inside the horned helm
-  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings
-  seeds: [1234]
+  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings, a shadowed face
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R260): the skull face lost in the dark cut
 - id: earth_medusa
   # "Earth Medusa" (113): a stony grey medusa with rock scales and a petrified-snake crown (small naga)
   size: small
