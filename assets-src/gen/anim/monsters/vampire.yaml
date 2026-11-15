@@ -161,3 +161,6 @@ paint:                       # 1-2 px cracks enclosed by outline ink, closed wit
   # daze: the 1 px cape pinhole the slump opens, outline ink
   - {frame: daze, xy: [[31, 51]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[31, 52]], rgb: [6, 4, 10]}
+  # 2026-11-15 review 2: 1 px pinholes in the ink between the cape and the lowered arm, outline ink
+  - {frame: daze, xy: [[26, 62], [26, 63], [25, 66]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[26, 63]], rgb: [6, 4, 10]}

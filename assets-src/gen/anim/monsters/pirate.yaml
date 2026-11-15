@@ -122,3 +122,8 @@ paint:                       # cracks the moved parts opened (not art gaps): the
   - {frame: atk_mid, xy: [[37, 61], [38, 61]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[39, 61], [40, 61], [41, 61], [40, 60], [41, 60]], rgb: [41, 41, 74]}
   - {frame: atk_recover, xy: [[50, 36]], rgb: [6, 4, 10]}
+  # 2026-11-15 review 2: the 1 px bump on the blade's back outline (a muddy edge pixel and two ink pixels at x 72)
+  - {frame: daze, xy: [[72, 29], [72, 30]], rgb: null}
+  - {frame: daze, xy: [[70, 29]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[72, 31], [72, 32]], rgb: null}
+  - {frame: daze_b, xy: [[70, 31]], rgb: [6, 4, 10]}
