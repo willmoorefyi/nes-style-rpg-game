@@ -3,6 +3,7 @@ import type { Character } from '../../entities/Character.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { PANEL_FONT, PARTY_PANEL, STRIP_HEIGHT, STRIP_Y } from './BattleSceneTypes.js';
+import { byPriority, type StatusVisuals } from './fx/statusRules.js';
 
 /** Column offsets inside a row (content px). */
 const COL = { cursor: 0, name: 44, hp: 220, bar: 420, status: 800 } as const;
@@ -14,7 +15,7 @@ const TARGET_CURSOR = 0xffff00;
 const ACTOR_WHILE_TARGETING = 0x88ccff;
 /** 6b: frames the HP number and bar take to roll from the old value to the new one (not scaled by message speed). */
 export const HP_ROLL_FRAMES = 20;
-/** Short tags for the status column. */
+/** Short tags for the status column when status-visuals.yaml has none (its `tag`s win). */
 const STATUS_TAGS: Record<string, string> = {
   poison: 'PSN', stun: 'STUN', sleep: 'SLP', blind: 'BLND', silence: 'MUTE', death: 'KO', stone: 'STON', fear: 'FEAR',
 };
@@ -45,6 +46,9 @@ export class BattlePartyPanel {
   private targeted = -1;
   /** 6b: per member, the HP on screen and the roll toward the presented HP (`t` frames into `HP_ROLL_FRAMES`). */
   private readonly hpRoll: { from: number; to: number; t: number }[] = [];
+
+  /** status-visuals.yaml (set by createStatusFx): the tags and their order, the same priority as the icons. */
+  statusVisuals: () => StatusVisuals = () => ({});
 
   constructor(private readonly party: readonly Character[]) {
     this.window = new Window({ x: PARTY_PANEL.x, y: STRIP_Y, width: PARTY_PANEL.width, height: STRIP_HEIGHT });
@@ -83,7 +87,9 @@ export class BattlePartyPanel {
       if (!roll) this.hpRoll[i] = { from: c.currentHp, to: c.currentHp, t: HP_ROLL_FRAMES };
       else if (roll.to !== c.currentHp) this.hpRoll[i] = { from: this.shownHp(i), to: c.currentHp, t: 0 };
       this.drawHp(i);
-      const tags = c.currentHp <= 0 ? ['KO'] : c.statusTracker.getAll().map(s => STATUS_TAGS[s.effect] ?? s.effect.toUpperCase());
+      const v = this.statusVisuals();
+      const tags = c.currentHp <= 0 ? ['KO'] : byPriority(c.statusTracker.getAll().map(s => s.effect), v)
+        .map(s => v[s]?.tag ?? STATUS_TAGS[s] ?? s.toUpperCase());
       row.status.text = tags.slice(0, 2).join(' ');
     });
     this.applyHighlight();

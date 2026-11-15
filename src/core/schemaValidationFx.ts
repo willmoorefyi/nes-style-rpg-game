@@ -79,7 +79,11 @@ export function validateSpellEffects(data: unknown, path = 'spell-effects.yaml')
 function visualProblem(v: unknown): string | null {
   if (!isObject(v)) return 'not an object';
   if (v.posture !== undefined && !(STATUS_POSTURES as readonly unknown[]).includes(v.posture)) return `unknown posture ${String(v.posture)}`;
-  for (const key of ['overlay', 'icon'] as const) if (v[key] !== undefined && typeof v[key] !== 'string') return `${key} must be a string`;
+  for (const key of ['overlay', 'icon', 'tag'] as const) if (v[key] !== undefined && typeof v[key] !== 'string') return `${key} must be a string`;
+  const p = v.pulse;
+  if (p !== undefined && !(Array.isArray(p) && p.length === 2 && p.every((n) => Number.isInteger(n) && n > 0) && p[0] < p[1])) {
+    return 'pulse must be [on, period] with 0 < on < period';
+  }
   if (v.tint !== undefined && (typeof v.tint !== 'number' || v.tint < 0 || v.tint > 0xffffff)) return 'tint must be 0x000000-0xffffff';
   for (const key of ['reserved', 'party'] as const) if (v[key] !== undefined && typeof v[key] !== 'boolean') return `${key} must be true or false`;
   return null;

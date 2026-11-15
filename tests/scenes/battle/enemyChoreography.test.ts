@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   ATTACK_CONTACT, ATTACK_FRAMES, BOSS_FRAMES, CAST_FRAMES, DYING_DX, DYING_IN, FRAME_SOURCE, HURT_FRAMES, HURT_HOLD_START,
   HURT_REHIT_AT, MONSTER_FRAMES,
-  PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame, lungePx, type FrameAt, type MonsterFrame,
+  PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame, lungePx, trembleDx, type FrameAt, type MonsterFrame,
 } from '../../../src/scenes/battle/enemyChoreography.js';
 import { EnemyPoseController } from '../../../src/scenes/battle/EnemyPoseController.js';
 
@@ -117,11 +117,16 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
   });
 
   it('idle breathing: period 72, phase index * 17; idle when frozen or when the rig turns breathing off', () => {
-    expect([0, 35, 36, 71, 72].map((c) => idleFrame(c, 0, true, false))).toEqual(['idle', 'idle', 'idle_b', 'idle_b', 'idle']);
-    expect(idleFrame(19, 1, true, false)).toBe('idle_b');
-    expect(idleFrame(18, 1, true, false)).toBe('idle');
-    expect(idleFrame(40, 0, true, true)).toBe('idle');
-    expect(idleFrame(40, 0, false, false)).toBe('idle');
+    expect([0, 35, 36, 71, 72].map((c) => idleFrame(c, 0, true, 'none'))).toEqual(['idle', 'idle', 'idle_b', 'idle_b', 'idle']);
+    expect(idleFrame(19, 1, true, 'none')).toBe('idle_b');
+    expect(idleFrame(18, 1, true, 'none')).toBe('idle');
+    expect(idleFrame(40, 0, true, 'stone')).toBe('idle');
+    expect(idleFrame(40, 0, true, 'still')).toBe('idle');
+    expect(idleFrame(40, 0, false, 'none')).toBe('idle');
+    // pass F 5a: daze / daze_b alternate every 48 frames (old: idle); fear breathes as normal
+    expect([0, 47, 48, 95, 96].map((c) => idleFrame(c, 0, true, 'daze'))).toEqual(['daze', 'daze', 'daze_b', 'daze_b', 'daze']);
+    expect(idleFrame(36, 0, true, 'tremble')).toBe('idle_b');
+    expect([0, 4, 8, 12, 16].map(trembleDx)).toEqual([0, 1, 0, -1, 0]);
   });
 
   it('at scaleFactor 0.5 every offset is an integer, rounded once from recoil + shake', () => {

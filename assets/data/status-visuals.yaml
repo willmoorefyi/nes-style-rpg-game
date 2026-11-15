@@ -1,7 +1,63 @@
 # How each status shows in battle (docs/FEEDBACK_PLAN_2026-11-14.md §3.5): posture, looping overlay, tint, icon.
 # Loaded by DataLoader.loadStatusVisuals; bad entries are logged and dropped (src/core/schemaValidationFx.ts).
 #
-# statuses: status -> { posture?: none | daze | stone | tremble, overlay?, tint? (0xRRGGBB), icon?, reserved?, party? }
-#
-# Empty in pass F's F0; Fe fills it in.
-statuses: {}
+# statuses: status -> {
+#   posture?: none | daze | stone | tremble | still   (an enemy's pose; party: daze / stone / still hold `ready`)
+#   overlay?: an overlay loop in src/scenes/battle/fx/statusEmitters.ts (zzz, stars, bubbles, ink, mute, sweat,
+#             frost, confuse)
+#   tint?: 0xRRGGBB, multiplied into the sprite (actorTint source `status`)
+#   pulse?: [on, period]  the tint shows `on` frames out of every `period` (no pulse: always on)
+#   icon?: a glyph in battle-fx.json (12x12 native, shown above the head)
+#   tag?: the short label (party panel, the enemy target line)
+#   reserved?: true for a hook the battle does not have yet (no StatusEffect)
+#   party?: false to show it on enemies only (default true)
+# }
+# Stone's grey is not a tint: posture `stone` swaps each frame for a cached grey copy (src/scenes/battle/fx/stoneTextures.ts).
+# The order here is the icon priority (at most 3 icons per actor, first listed first).
+statuses:
+  stone:
+    posture: stone
+    icon: icon_stone
+    tag: STON
+  stun:
+    posture: daze
+    overlay: stars
+    icon: icon_stun
+    tag: STUN
+  sleep:
+    posture: daze
+    overlay: zzz
+    icon: icon_sleep
+    tag: SLP
+  fear:
+    posture: tremble
+    overlay: sweat
+    tint: 0xd8e4ff
+    icon: icon_fear
+    tag: FEAR
+  silence:
+    overlay: mute
+    icon: icon_silence
+    tag: MUTE
+  blind:
+    overlay: ink
+    icon: icon_blind
+    tag: BLND
+  poison:
+    overlay: bubbles
+    tint: 0xc8ffc8
+    pulse: [6, 60]
+    icon: icon_poison
+    tag: PSN
+  frozen:
+    reserved: true
+    posture: still
+    overlay: frost
+    tint: 0x9cc8ff
+    icon: icon_frozen
+    tag: FRZN
+  confuse:
+    reserved: true
+    overlay: confuse
+    icon: icon_confuse
+    tag: CONF

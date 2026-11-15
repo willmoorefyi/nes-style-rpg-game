@@ -459,8 +459,8 @@
   },
   "icon_blind.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
@@ -473,112 +473,112 @@
   },
   "icon_confuse.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     650,
+     656,
      116
     ]
    ]
   },
   "icon_fear.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     670,
+     682,
      116
     ]
    ]
   },
   "icon_frozen.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     690,
+     708,
      116
     ]
    ]
   },
   "icon_poison.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     710,
+     734,
      116
     ]
    ]
   },
   "icon_silence.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     730,
+     760,
      116
     ]
    ]
   },
   "icon_sleep.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     750,
+     786,
      116
     ]
    ]
   },
   "icon_stone.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     770,
+     812,
      116
     ]
    ]
   },
   "icon_stun.icon": {
    "cell": [
-    9,
-    9
+    12,
+    12
    ],
    "color": "#ffffff",
    "fixed": true,
    "frames": [
     [
-     790,
+     838,
      116
     ]
    ]
@@ -591,11 +591,11 @@
    "color": "#7b7ba5",
    "frames": [
     [
-     810,
+     864,
      116
     ],
     [
-     844,
+     898,
      116
     ]
    ]
@@ -608,11 +608,11 @@
    "color": "#ce7bff",
    "frames": [
     [
-     878,
+     932,
      116
     ],
     [
-     896,
+     950,
      116
     ]
    ]
@@ -626,7 +626,7 @@
    "fixed": true,
    "frames": [
     [
-     914,
+     968,
      116
     ]
    ]

@@ -9,6 +9,7 @@ import type { BattleDisplayManager } from '../BattleDisplayManager.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import type { StatusDiff } from '../presentedState.js';
 import { BattleActionFx } from './ActionFx.js';
+import { BattleStatusFx } from './statusFx.js';
 import { fxSource, type FxSource } from './fxSource.js';
 
 /** Effects started by an animation cue: the glint on a raised weapon (`hold`), the dust of a slam (`contact`). */
@@ -55,7 +56,11 @@ export function createActionFx(layers: BattleLayers, _display: BattleDisplayMana
   return new BattleActionFx(layers, source);
 }
 
-/** The status overlays, icons and tints (Fe). F0: none. */
-export function createStatusFx(_layers: BattleLayers, _display: BattleDisplayManager, _battle: BattleStateMachine): StatusFx {
-  return noopStatusFx;
+/** The status overlays, icons and tints (fx/statusFx.ts), and the postures the display reads: both from
+ *  status-visuals.yaml in the shared source (empty until it loads, during the intro). */
+export function createStatusFx(layers: BattleLayers, display: BattleDisplayManager, _battle: BattleStateMachine,
+  source: FxSource = fxSource): StatusFx {
+  if (source === fxSource && typeof document !== 'undefined' && !source.isLoaded) void source.load();
+  display.statusVisuals = display.partyPanel.statusVisuals = () => source.statusVisuals;
+  return new BattleStatusFx(layers, display, source.atlas, () => source.statusVisuals);
 }

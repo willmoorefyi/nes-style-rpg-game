@@ -1,14 +1,22 @@
-import { Container, Graphics } from 'pixi.js';
+import { BitmapText, Container, Graphics } from 'pixi.js';
 import type { InputManager } from '../../core/InputManager.js';
 import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import type { Character } from '../../entities/Character.js';
 import { mostHurtIndex } from '../../entities/partyTargets.js';
+import { NES_FONT } from '../../ui/NESFont.js';
+import { PANEL_FONT } from './BattleSceneTypes.js';
+import { tagsFor, type StatusVisuals } from './fx/statusRules.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
 const TARGET_ARROW = 0xffff00;
 /** Frames per blink of the target row's cursor in the party panel. */
 const BLINK_FRAMES = 15;
+
+/** The enemy target line beside the arrow: the enemy's name and its presented status tags ("Goblin B SLP PSN"). */
+export function targetLine(name: string, statuses: readonly string[], visuals: StatusVisuals): string {
+  return [name, ...tagsFor(statuses, visuals)].join(' ');
+}
 
 export type TargetingSound = 'cursorMove' | 'cursorSelect' | 'cursorCancel';
 
@@ -25,6 +33,8 @@ export class BattleFieldTargeting {
   fieldTargetCancelCallback: (() => void) | null = null;
   fieldTargetRevive: boolean = false;
   targetArrow: Graphics | null = null;
+  /** The enemy target line (name and status tags) beside the arrow. */
+  targetLabel: BitmapText | null = null;
   // L3: Outline around hovered target sprite
   targetOutline: Graphics | null = null;
   // L4: Shared flash timer for target selection effects
@@ -129,12 +139,25 @@ export class BattleFieldTargeting {
     arrow.position.set(sprite.x + offsetX, sprite.y - 20);
     this.mainContainer.addChild(arrow);
     this.targetArrow = arrow;
+    const enemy = isParty ? undefined : this.battle.allEnemies[target.spriteIndex];
+    if (!enemy) return;
+    const statuses = this.display.presented?.enemies[target.spriteIndex]?.statuses ?? [];
+    const label = new BitmapText({ text: targetLine(enemy.displayName ?? enemy.data.name, statuses, this.display.statusVisuals?.() ?? {}),
+      style: { fontFamily: NES_FONT, fontSize: PANEL_FONT, fill: TARGET_ARROW } });
+    label.position.set(Math.round(arrow.x + 24), Math.round(arrow.y - 10));
+    this.mainContainer.addChild(label);
+    this.targetLabel = label;
   }
 
   clearTargetArrow(): void {
     if (this.targetArrow) {
       this.mainContainer.removeChild(this.targetArrow);
       this.targetArrow = null;
+    }
+    if (this.targetLabel) {
+      this.mainContainer.removeChild(this.targetLabel);
+      this.targetLabel.destroy();
+      this.targetLabel = null;
     }
     // L3: Clear outline
     if (this.targetOutline) {

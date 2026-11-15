@@ -9,12 +9,13 @@
  *         the hold restarts the hold, in the return jumps back to hurt_in2; never interrupts an attack or a cast.
  * cast:   boss gather / rise / hold / release; a monster without a cast frame plays its attack frames, no lunge.
  * dying:  the hurt in-phase (eased from the current offset, e.g. mid-lunge), then `hurt` held while the sprite fades.
- * idle:   breathing idle / idle_b, out of phase per enemy; frozen (sleep, stun, stone) enemies hold idle.
+ * idle:   breathing idle / idle_b, out of phase per enemy; postures (pass F item 5a): sleep / stun sway daze / daze_b
+ *         (and recoil back into it), stone holds idle with no recoil, fear trembles ±1 px (never accumulated).
  */
 import {
   ATTACK_CONTACT, ATTACK_FRAMES, CAST_FRAMES, DEFAULT_LUNGE_PX, HURT_FRAMES, HURT_HOLD_END, HURT_HOLD_START,
-  DYING_IN, HURT_REHIT_AT, PLAIN_CAST_FRAMES, castAt, castOut, dyingAt, hurtAt, idleFrame,
-  type FrameAt, type MonsterFrame, type MonsterKeyframe,
+  DYING_IN, HURT_REHIT_AT, PLAIN_CAST_FRAMES, castAt, castOut, dyingAt, hurtAt, idleFrame, trembleDx,
+  type FrameAt, type Posture, type MonsterFrame, type MonsterKeyframe,
 } from './enemyChoreography.js';
 import { HEAVY_HOLD_FRAMES, attackTable, travelAttackAt, type AttackKind } from './enemyAttackTables.js';
 
@@ -28,8 +29,7 @@ export const CAST_OUT = castOut(true);
 export const LUNGE_PX = DEFAULT_LUNGE_PX;
 
 type Mode = 'idle' | 'attack' | 'cast' | 'hurt' | 'dying';
-/** D6: still = sleep / stun (no breathing, still recoils); stone = no pose change at all. */
-export type Freeze = 'none' | 'still' | 'stone';
+export type { Posture };
 
 export interface EnemyAnimConfig {
   hasCast: boolean;
@@ -53,7 +53,7 @@ export type PoseCue = 'hold' | 'contact';
 interface EnemyState extends EnemyAnimConfig {
   mode: Mode;
   t: number;
-  freeze: Freeze;
+  posture: Posture;
   /** Unscaled offset when the lethal hit landed (dying eases from it). */
   from: { dx: number; dy: number };
   /** Where in the dying in-phase it began (E13). */
@@ -90,7 +90,7 @@ export class EnemyPoseController {
   onCue: ((i: number, cue: PoseCue) => void) | undefined;
 
   constructor(count: number) {
-    this.states = Array.from({ length: count }, () => ({ ...DEFAULTS, mode: 'idle' as Mode, t: 0, freeze: 'none' as Freeze,
+    this.states = Array.from({ length: count }, () => ({ ...DEFAULTS, mode: 'idle' as Mode, t: 0, posture: 'none' as Posture,
       from: { dx: 0, dy: 0 }, start: 0, contactAt: ATTACK_OUT, holdAt: null, totalFrames: ATTACK_FRAMES,
       travel: ZERO, kind: 'inplace' as AttackKind, held: ZERO }));
   }
@@ -101,11 +101,12 @@ export class EnemyPoseController {
     if (s) Object.assign(s, cfg);
   }
 
-  setFreeze(i: number, freeze: Freeze): void {
+  /** The status posture (from the presented snapshot); stone cuts a running recoil short. */
+  setPosture(i: number, posture: Posture): void {
     const s = this.states[i];
     if (!s) return;
-    s.freeze = freeze;
-    if (freeze === 'stone' && s.mode === 'hurt') { s.mode = 'idle'; s.t = 0; }
+    s.posture = posture;
+    if (posture === 'stone' && s.mode === 'hurt') { s.mode = 'idle'; s.t = 0; }
   }
 
   /** Back to idle at t = 0 everywhere (the dev step preview replays from here). */
@@ -136,7 +137,7 @@ export class EnemyPoseController {
 
   playHurt(i: number): void {
     const s = this.states[i];
-    if (!s || s.mode === 'dying' || s.mode === 'attack' || s.mode === 'cast' || s.freeze === 'stone') return;
+    if (!s || s.mode === 'dying' || s.mode === 'attack' || s.mode === 'cast' || s.posture === 'stone') return;
     if (s.mode !== 'hurt') { s.mode = 'hurt'; s.t = 0; return; }
     if (s.t < HURT_HOLD_START) return;                  // in-phase: finishes, then a full hold
     s.t = s.t < HURT_HOLD_END ? HURT_HOLD_START : HURT_REHIT_AT;
@@ -216,7 +217,7 @@ export class EnemyPoseController {
       case 'cast': return { ...castAt(s.t, s.hasCast), k: 0 };
       case 'hurt': return { ...hurtAt(s.t), k: 0 };
       case 'dying': return { ...dyingAt(s.t, s.from, s.start), k: 0 };
-      default: return { frame: idleFrame(this.clock, this.states.indexOf(s), s.breath, s.freeze !== 'none'), dx: 0, dy: 0, k: 0 };
+      default: return { frame: idleFrame(this.clock, this.states.indexOf(s), s.breath, s.posture), dx: 0, dy: 0, k: 0 };
     }
   }
 
@@ -226,7 +227,8 @@ export class EnemyPoseController {
     const s = this.states[i];
     if (!s) return { pose: 'idle', dx: 0, dy: 0 };
     const r = this.raw(s);
-    const st: PoseState = { pose: r.frame, dx: Math.round(r.dx * s.scaleFactor) || 0, dy: Math.round(r.dy * s.scaleFactor) || 0 };
+    const shiver = s.posture === 'tremble' && s.mode !== 'dying' ? trembleDx(this.clock) : 0;
+    const st: PoseState = { pose: r.frame, dx: Math.round(r.dx * s.scaleFactor) + shiver || 0, dy: Math.round(r.dy * s.scaleFactor) || 0 };
     const travel = s.mode === 'attack' ? { dx: s.travel.dx * r.k, dy: s.travel.dy * r.k } : s.mode === 'dying' ? s.held : ZERO;
     if (travel.dx || travel.dy) { st.travelDx = Math.round(travel.dx); st.travelDy = Math.round(travel.dy); }
     return st;
