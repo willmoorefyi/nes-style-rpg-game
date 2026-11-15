@@ -1807,15 +1807,16 @@
   prompt: >-
     a manticore on four legs seen from the side: a tawny lion body with a thick dark red mane, two dark leathery bat
     wings half raised (exactly two wings), a bearded snarling human-like face inside the mane with sharp teeth, a
-    segmented scorpion tail arched up over its back ending in a dark stinger; the whole creature sits in the middle of
+    segmented scorpion tail arched up over its back ending in a big curved black stinger; the whole creature sits in the middle of
     its own cell with empty space on both sides
   attack: >-
     lunging forward low with one front paw swiping and the scorpion tail striking forward over its back toward the
-    heroes, the wings raised, the hind feet on the ground (no leap), the paw and stinger well inside the middle cell
+    heroes, the wings raised, the hind feet on the ground (no leap), the paw and stinger well inside the middle cell;
+    only the animal itself: no swipe trail, smear or motion arc
   hurt: knocked back, the wings flared, the tail curling down, all four feet on the ground
   face: its bearded human-like face inside the red mane is readable
-  extra_negative: feathered wings, a headdress, a lion's muzzle, a third wing, two tails, rearing up
-  seeds: [1234]
+  extra_negative: feathered wings, a headdress, a lion's muzzle, a third wing, two tails, rearing up, a swipe trail, a smear
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R204): a pale swipe smear under the attack paw, no stinger tip
 - id: baretta
   # "Baretta" (081): a red-brown armoured burrower with shovel claws (no club tail)
   size: large
