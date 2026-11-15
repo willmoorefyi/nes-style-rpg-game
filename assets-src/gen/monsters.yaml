@@ -1382,15 +1382,15 @@
     bulb, two on each side, a few broad leaves at its base, a small pink flower on top; in every cell the whole plant
     stays well inside its own cell
   attack: >-
-    the two front vine tentacles lashing forward toward the heroes and the maw gaping wide, the bulb leaning forward,
-    the root mass in place on the ground, exactly four vines as in the idle cell, the vine tips well inside the middle
-    cell
+    the bulb lunging forward with the maw gaping wide, the two front vines reaching toward the heroes and curling
+    into hooks in front of the bulb, the root mass in place on the ground, exactly four vines as in the idle cell;
+    every vine tip curls back well before the right edge of the middle cell (not reaching the cell edge)
   hurt: >-
     the bulb recoiling back, the maw snapped shut, the vines curling in, the root mass in place, exactly four vines as
     in the idle cell
   face: no eyes; the toothy maw is the readable feature
   extra_negative: eyes, a face, legs, a pot, a second maw, a fifth vine, thorns on the vines, purple colour
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R166): the attack vines sliced at the raw cell line, five or six vines
 - id: neochu
   # "Neochu" (056): a bigger purple-black thorned ochu with two maws and poison sacs
   size: large
@@ -1401,9 +1401,9 @@
     purple vine tentacles covered in sharp thorns, swollen sickly yellow-green poison sacs on the stalk; in every cell
     the whole plant stays well inside its own cell
   attack: >-
-    the two front thorned vines lashing forward toward the heroes and both maws gaping wide, the bulbs leaning
-    forward, the root mass in place, exactly four vines and two maws as in the idle cell, the vine tips well inside the
-    middle cell
+    the bulbs lunging forward with both maws gaping wide, the two front thorned vines reaching toward the heroes and
+    curling into hooks in front of the bulbs, the root mass in place, exactly four vines and two maws as in the idle
+    cell; every vine tip curls back well before the right edge of the middle cell (not reaching the cell edge)
   hurt: >-
     both bulbs recoiling back, the maws snapped shut, the thorned vines curling in, the root mass in place
   face: no eyes; the two toothy maws are the readable feature
