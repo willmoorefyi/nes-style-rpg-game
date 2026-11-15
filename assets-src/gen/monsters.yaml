@@ -1486,10 +1486,12 @@
   attack: >-
     surging forward toward the heroes, both flame arms reaching out with the elbows bent so they stay well inside the
     middle cell, the flames streaming back, at the same height as in the idle cell
-  hurt: knocked back, the flames flattened and guttering, the arms thrown up, the core dimming, at the same height
+  hurt: >-
+    knocked back, the flames flattened and streaming back, the arms thrown up, at the same height, still burning in the
+    same bright orange, yellow and red as in the idle cell
   face: a fierce face formed from the flame itself (two bright yellow eyes and a dark open mouth), no human skin
-  extra_negative: skin, a human body, legs, a rock body, smoke, sparks outside the body, fireballs, a ground fire
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R176): attack and hurt drawn lower, sliced on the bottom row by the shared offset
+  extra_negative: skin, a human body, legs, a rock body, smoke, sparks outside the body, fireballs, a ground fire, dull brown colours
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R176): attack and hurt sliced on the bottom row; 1235 (R177): the hurt dimmed to a dull brown
 - id: fire_hydra
   # "Fire Hydra" (061): three red smoking heads, magma-cracked scales (distinct from the hydra)
   size: large
