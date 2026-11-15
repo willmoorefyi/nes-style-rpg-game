@@ -66,11 +66,18 @@ export function makeMember(cls: string, level: number, kit: Kit, index = 0): Cha
   return c;
 }
 
-export type KitName = 'start' | 'full' | 'naked';
+export type KitName = 'start' | 'lv2' | 'arrive' | 'full' | 'naked';
+/**
+ * The potions that go with each kit in the balance tests (docs/FEEDBACK_PLAN_2026-11-14.md §3.2): the `lv2` and
+ * `arrive` kits carry the 2 potions the pass-F gold buys at Lv 2; `full` carries 3 (T4 §4). kits.yaml holds gear and
+ * spells per class only, so its every entry stays a class kit (the sandbox gives its levels their own `items`).
+ */
+export const KIT_POTIONS: Record<KitName, number> = { start: 0, lv2: 2, arrive: 2, full: 3, naked: 0 };
 /** The plan's party (or `comp`) at `level` with a kit; careless play knows no spells (the simulation's rule). */
 export function makeParty(level: number, kit: KitName, withSpells: boolean, comp: string[] = PARTY): Character[] {
   return comp.map((cls, i) => {
-    const k = kit === 'naked' ? { gear: [], spells: [] } : (kit === 'start' ? START_KIT : FULL_KIT)[cls];
+    const k = KITS[kit]?.[cls];
+    if (!k) throw new Error(`kits.yaml has no ${kit}.${cls}`);
     return makeMember(cls, level, { gear: k.gear, spells: withSpells ? k.spells : [] }, i);
   });
 }

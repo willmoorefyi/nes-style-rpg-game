@@ -13,7 +13,7 @@
     accuracy: 2
     evade: 6
   xpReward: 6
-  goldReward: 6
+  goldReward: 12
   sprite: goblin
   attack: melee
   weakness: fire
@@ -32,7 +32,7 @@
     accuracy: 4
     evade: 9
   xpReward: 18
-  goldReward: 18
+  goldReward: 30
   sprite: gr_imp
   attack: melee
   weakness: fire
@@ -51,7 +51,7 @@
     accuracy: 5
     evade: 36
   xpReward: 24
-  goldReward: 6
+  goldReward: 12
   sprite: wolf
   attack: melee
   weakness: fire
@@ -72,7 +72,7 @@
     accuracy: 18
     evade: 36
   xpReward: 93
-  goldReward: 22
+  goldReward: 44
   sprite: gr_wolf
   attack: melee
   family: were
@@ -91,7 +91,7 @@
     accuracy: 9
     evade: 12
   xpReward: 9
-  goldReward: 3
+  goldReward: 10
   sprite: skeleton
   attack: melee
   weakness: fire
@@ -234,7 +234,7 @@
 - id: garland
   name: Garland
   stats:
-    hp: 340
+    hp: 400
     strength: 15
     agility: 8
     intelligence: 1
@@ -252,7 +252,7 @@
   attack: melee
   attackAnim: heavy
   bossPhases:
-  - hpThreshold: 0.25
+  - hpThreshold: 0.5
     patternId: aggressive
     message: Garland's attacks grow fiercer!
     hits: 3

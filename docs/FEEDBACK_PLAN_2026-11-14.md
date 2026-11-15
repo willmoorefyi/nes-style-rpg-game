@@ -374,6 +374,26 @@ inn when someone is down or HP < 45 %, 400 runs) is shown for comparison.
 - **`tests/data/actOneBalance.test.ts`:** pins the five new `goldReward` values.
 - Check `grep -rn goldReward tests` for tests that read the real data. Most use their own fixtures.
 
+**Measured (Fa, on `feedback` 23ae4dc + Fa; `fieldPacing` model, 200 runs; the campaign moved into
+`tests/balance/fieldCampaign.ts`, shared by `fieldPacing.test.ts` and the new `economy.test.ts`):**
+
+| Case | Bound | Old (FF1 gold) | New (FB-1 gold) |
+|---|---|---|---|
+| median gold in hand at whole-party Lv 2 | ≥ 220 G | 144 | **246** |
+| p10 of that gold | ≥ 150 G | 102 | **174** |
+| share of runs with ≥ 190 G at Lv 2 | ≥ 75 % | 4.5 % | **81.5 %** |
+| median battles to whole-party Lv 2 | 4–10 | 5 | 5 |
+| mean gold after 40 battles (`fieldPacing`) | **885–1480 G** (new ± 25 %, rounded outwards) | 272.9 | **1183.5** |
+| mean full-kit purchases (`fieldPacing`) | ≥ 7 of 8 | 8 | 8 |
+| median battle of the 4th purchase (`fieldPacing`) | plan: ≤ 9 | 20 | **19: misses the target, not asserted** |
+
+The purchase-timing target can't be met on this model: the campaign shops only at an inn stay, a zone boundary and
+the end, and with the inn rule the party rests a median of **1** time in 40 battles, so most purchases land at the
+fields → approach boundary (battle 20) with either gold table (4th purchase: 95 of 200 runs at battle 20, the
+earliest at 9; old median 20). No purchase index has a new median ≤ 9 (the 1st purchase's is 19 too). The
+assertion is left out pending an orchestrator decision (e.g. a shop visit when the party passes through town, which
+changes the model); the gold-mean bound already fails the old data.
+
 **Browser (E2E, no state edits):** `?mute=1&scenario=f_gold_start`.
 - Fight on the overworld until all four members are Lv 2. Record the battle count, gold, inn stays and potions
   bought.
@@ -481,6 +501,36 @@ design.
 - **`tests/battle/BossPhase.test.ts:3, 32, 37`:** the threshold is read from
   `enemy('garland').bossPhases[0].hpThreshold` (`floor(threshold × hp)`) instead of the literal 0.25.
 - **`tests/data/actOneBalance.test.ts:86-95`:** pins 400 HP, the 0.5 phase and the unchanged rest.
+
+**Measured (Fa, on `feedback` 23ae4dc + Fa, with the item-1 gold; 400 seeds, mage survival 4000 rolls). Old =
+340 HP / phase 0.25; new = 400 HP / phase 0.5.** Every bound holds with ≥ 3 points of margin:
+
+| # | Case | Bound | Old | New |
+|---|---|---|---|---|
+| 1 | mage survival W.MAG / B.MAG | ≥ 90 % | 95.35 / 95.63 % | 95.35 / 95.63 % |
+| 2 | sensible Lv 2, 400 G kit, 0 potions | 60–80 % | 96.75 % | **73.0 %** |
+| 3 | sensible Lv 2, full kit, 3 potions | ≥ 97 % | 100 % | 100 % |
+| 4 | sensible Lv 1, 400 G kit | ≤ 15 % | 36.25 % | **7.25 %** |
+| 5 | sensible Lv 3, full kit, 3 potions | ≥ 97 % | 100 % | 100 % |
+| 6 | Lv 2 full-kit wins lasting ≥ 3 rounds | ≥ 90 % | 100 % (median 8) | 100 % (median 10) |
+| 7 | careless Lv 1, no gear | ≤ 10 % | 0 % | 0 % |
+| 8 | careless Lv 1, 400 G kit | ≤ 4 % | 3.0 % | **0.25 %** |
+| 9 | careless Lv 2, 400 G kit | 5–20 % | 52.75 % | **12.75 %** |
+| 10 | careless Lv 3, 400 G kit | 55–75 % | 92.0 % | **64.0 %** |
+| 11 | sensible Lv 1, full kit, 0 potions | ≥ 95 % | 100 % | 99.25 % |
+| 12 | temple run, Lv 2, 400 G kit, 0 potions | 55–70 % | 89.0 % | **61.25 %** |
+| 13 | temple run, full kit, 3 potions, Lv 2 / Lv 3 | ≥ 95 % each | 100 / 100 % | 100 / 100 % |
+| 14 | SLEP every round: lockout / acted share / always wakes | ≤ 5 % / 0.40 ± 0.05 / yes | 0 % / 0.4016 / yes | 0 % / 0.4016 / yes (nobody hurts him, so HP doesn't matter) |
+| N1 | sensible Lv 2, lv2 kit (+ 2 potions) | 55–75 % | 95.75 % | **67.75 %** |
+| N2 | sensible Lv 3, lv2 kit | ≥ 85 % | 100 % | 95.0 % |
+| N3 | temple run (2), Lv 2, lv2 kit | 40–58 % | 85.5 % | **51.75 %** |
+| N4 | arrival kit, 3 temple battles, Lv 2 | 50–70 % | 88.0 % | **61.0 %** |
+| N5 | median rounds of N1's wins | ≤ 11 | 8 (p90 10) | 10 (p90 12) |
+
+Kit potions: `kits.yaml` keeps one `{gear, spells}` entry per class (F0's `kitsYaml.test.ts` and the sandbox read
+every entry as a class kit), so the potions per kit are `KIT_POTIONS` in `tests/helpers/balanceData.ts` (lv2 2,
+arrive 2, full 3) and the sandbox levels carry their own `items`. `lv2` and `arrive` cover all 6 base classes;
+`full` gained monk and red_mage.
 
 **Browser** (sensible play: CURE below half, LIT/FIRE while he is above 12 HP, a potion below 35 % when no CURE is
 left, otherwise Fight):

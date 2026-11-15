@@ -1,7 +1,8 @@
 /**
  * ST-6 (docs/FIX_PLAN_PENINSULA.md T5a) and B1 (R2): Garland's `bossPhases` entry fires with no AI attached. At
- * <= 25 % HP (`floor(0.25 × hp)`, 85 of 340 since U1) the phase line shows once and his attacks go from 2 hits to 3 (a battle-only `hits` buff,
- * no extra RNG draw for the phase itself).
+ * or below his phase threshold (`floor(hpThreshold × hp)`, read from the data: 200 of 400 since pass F item 2, FB-2;
+ * U1 had 85 of 340) the phase line shows once and his attacks go from 2 hits to 3 (a battle-only `hits` buff, no extra
+ * RNG draw for the phase itself).
  */
 import { describe, it, expect, vi } from 'vitest';
 import { BattleStateMachine, type DamageEvent } from '../../src/battle/BattleStateMachine.js';
@@ -27,17 +28,19 @@ function idleRound(bsm: BattleStateMachine): void {
 }
 
 const count = (bsm: BattleStateMachine) => bsm.currentMessages.filter(m => m.text === LINE).length;
-/** Garland's HP and the phase threshold from the data (U1: not literals). */
+/** Garland's HP and the phase threshold from the data (U1, FB-2: not literals). */
 const HP = enemyCopy('garland').stats.hp;
-const QUARTER = Math.floor(0.25 * HP);
+const THRESHOLD = enemyCopy('garland').bossPhases?.[0].hpThreshold ?? NaN;
+const PHASE_HP = Math.floor(THRESHOLD * HP);
 
 describe('boss phase with no AI (ST-6)', () => {
-  it(`Garland at ${QUARTER}/${HP} HP: the next round says the phase line exactly once, and later rounds never repeat it`, () => {
+  it(`Garland at ${PHASE_HP}/${HP} HP: the next round says the phase line exactly once, and later rounds never repeat it`, () => {
     const garland = enemyCopy('garland');
-    expect(garland.bossPhases?.[0].hpThreshold).toBe(0.25);
+    expect(THRESHOLD).toBeGreaterThan(0);
+    expect(THRESHOLD).toBeLessThan(1);
     expect(garland.bossPhases?.[0].message).toBe(LINE);
     const bsm = newBattle(garland, 7);
-    bsm.allEnemies[0].currentHp = QUARTER;
+    bsm.allEnemies[0].currentHp = PHASE_HP;
     idleRound(bsm);
     expect(count(bsm)).toBe(1);
     expect(bsm.currentMessages[0].text).toBe(LINE); // before any action's lines
@@ -47,9 +50,9 @@ describe('boss phase with no AI (ST-6)', () => {
     }
   });
 
-  it(`above a quarter HP (${QUARTER + 1}/${HP}) there is no line and he keeps 2 hits`, () => {
+  it(`above the phase threshold (${PHASE_HP + 1}/${HP}) there is no line and he keeps 2 hits`, () => {
     const bsm = newBattle(enemyCopy('garland'), 7);
-    bsm.allEnemies[0].currentHp = QUARTER + 1;
+    bsm.allEnemies[0].currentHp = PHASE_HP + 1;
     idleRound(bsm);
     expect(count(bsm)).toBe(0);
     expect(bsm.allEnemies[0].buffs.get('hits') ?? 0).toBe(0);
@@ -62,7 +65,7 @@ describe('boss phase with no AI (ST-6)', () => {
         const garland = enemyCopy('garland');
         if (!withPhases) delete garland.bossPhases;
         const bsm = newBattle(garland, seed);
-        bsm.allEnemies[0].currentHp = Math.floor(HP / 2); // reach the phase within a few rounds
+        bsm.allEnemies[0].currentHp = PHASE_HP + Math.floor(HP / 4); // reach the phase within a few rounds
         const rounds: { events: DamageEvent[]; lines: string[] }[] = [];
         for (let r = 0; r < 12 && !bsm.isOver; r++) {
           while (bsm.state === 'command_select') bsm.submitCommand({ type: 'fight', actorId: bsm.currentCommandActorId!, targetId: 'enemy_0' });

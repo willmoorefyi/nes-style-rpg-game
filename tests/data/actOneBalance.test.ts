@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-  CLASSES, SHOPS, SPELLS, START_KIT, OVERWORLD, TEMPLE, enemy, item, kitCost, spell, makeMember, readMap,
+  CLASSES, KITS, SHOPS, SPELLS, START_KIT, OVERWORLD, TEMPLE, enemy, item, kitCost, spell, makeMember, readMap,
 } from '../helpers/balanceData.js';
 import type { EncounterEntry } from '../../src/types/index.js';
 import { spellPrice } from '../../src/systems/SpellPurchase.js';
@@ -80,19 +80,30 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
     expect(parties).toBe(15);
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
   });
+
+  it('pass F kits (§3.2): lv2, arrive and full cover every base class; lv2 is the start kit + LIT (100 G), arrive is lv2 + a Cap each', () => {
+    for (const name of ['lv2', 'arrive', 'full']) expect(Object.keys(KITS[name]).sort(), name).toEqual([...baseClasses].sort());
+    const party = ['warrior', 'thief', 'white_mage', 'black_mage'];
+    const total = (name: string) => party.reduce((s, x) => s + kitCost(KITS[name][x], spellPrice), 0);
+    expect(total('lv2')).toBe(470);
+    expect(KITS.lv2.black_mage.spells).toEqual([...START_KIT.black_mage.spells, 'lit']);
+    for (const cls of baseClasses) {
+      expect(KITS.arrive[cls], cls).toEqual({ gear: [...KITS.lv2[cls].gear, 'cap'], spells: KITS.lv2[cls].spells });
+    }
+  });
 });
 
 describe('T4d act-1 enemies (FF1 counterparts)', () => {
-  it('Garland (U1, decision U-1): 340 HP, attack 9, two hits, accuracy 15, no weakness; 3 hits at <= 25 % HP', () => {
+  it('Garland (pass F item 2, FB-2; U1 had 340 HP and 0.25): 400 HP, attack 9, two hits, accuracy 15, no weakness; 3 hits at <= 50 % HP', () => {
     const g = enemy('garland');
-    expect(g.stats.hp).toBe(340);
+    expect(g.stats.hp).toBe(400);
     expect(g.stats.attack).toBe(9);
     expect(g.stats.accuracy).toBe(15);
     expect(g.stats.hits).toBe(2);
     expect(g.weakness).toBeUndefined();
     expect(g.xpReward).toBe(130);
     expect(g.goldReward).toBe(250);
-    expect(g.bossPhases).toEqual([{ hpThreshold: 0.25, patternId: 'aggressive', message: "Garland's attacks grow fiercer!", hits: 3 }]);
+    expect(g.bossPhases).toEqual([{ hpThreshold: 0.5, patternId: 'aggressive', message: "Garland's attacks grow fiercer!", hits: 3 }]);
   });
 
   it('maps the field enemies to IMP, GrIMP, WOLF, GrWOLF and BONE', () => {
@@ -107,6 +118,11 @@ describe('T4d act-1 enemies (FF1 counterparts)', () => {
     }
     expect(enemy('gr_imp').sprite).toBe('gr_imp');
     expect(enemy('gr_wolf').family).toBe('were');
+  });
+
+  it('pays about twice the FF1 gold in act 1 (pass F item 1, FB-1; FF1: 6 / 6 / 18 / 3 / 22)', () => {
+    const want: Record<string, number> = { goblin: 12, wolf: 12, gr_imp: 30, skeleton: 10, gr_wolf: 44 };
+    for (const [id, gold] of Object.entries(want)) expect(enemy(id).goldReward, id).toBe(gold);
   });
 });
 
