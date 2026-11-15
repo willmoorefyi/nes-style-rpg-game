@@ -167,7 +167,9 @@ def _approved_keys(check: Callable[[bool, str], None]) -> None:
         done += 1
         if req.key != meta["cache_key"] or not req.cached:
             bad.append(f"{cid} {meta['sheet']}: {req.key} != {meta['cache_key']}")
-        if GEN.is_monster(char) and any(t in req.prompt for t in ("BODY:", "BASE:", "idle cell only")):
+        # FW-9 entries (`body:` set, e.g. the pass-R FIENDS) were approved with that wording; every other must not have it
+        fw9 = bool(char.get("body")) or cid in FIENDS
+        if GEN.is_monster(char) and not fw9 and any(t in req.prompt for t in ("BODY:", "BASE:", "idle cell only")):
             bad.append(f"{cid} {meta['sheet']}: FW-9 wording in an approved request")
     check(not bad and done + skipped == len(metas) and done >= 1,
           f"FW-9: all {done} approved request keys recomputed unchanged and cached ({len(metas)} approved, {skipped} "
@@ -231,6 +233,32 @@ def _fields(check: Callable[[bool, str], None]) -> None:
         refused = "centaur" in str(e)
     check(refused, "FW-9: an unknown body is refused, naming it")
 
+    # (b2) motion: replaces only the body's movement line, in the action poses it names; idle never changes
+    mo = "Keep a composed front view, every wing visible."
+    for body in ("floating", "naga"):
+        bb = {**pose, "body": body}
+        move = M.BODY_LINES[body][1]
+        check(pp({**bb, "motion": mo}, "idle") == pp(bb, "idle"), f"FW-9: motion leaves boss_idle unchanged ({body})")
+        for p in action_poses:
+            _only(check, f"motion str ({body}, boss_{p})", pp(bb, p), pp({**bb, "motion": mo}, p), move, mo)
+        md = {**bb, "motion": {"hurt": mo, "attack_raise": mo}}
+        for p in action_poses:
+            if p in ("hurt", "attack_raise"):
+                _only(check, f"motion map ({body}, boss_{p})", pp(bb, p), pp(md, p), move, mo)
+            else:
+                check(pp(md, p) == pp(bb, p), f"FW-9: a motion map leaves boss_{p} unchanged when it does not name it")
+        mb = {**sheet, "body": body}
+        _only(check, f"motion str ({body}, 3-pose)", p3(mb), p3({**mb, "motion": mo}), move, mo)
+    for bad, label in (({**pose, "motion": mo}, "motion without body"),
+                       ({**pose, "body": "floating", "motion": {"idle": mo}}, "a motion map naming idle"),
+                       ({**sheet, "body": "floating", "motion": {"attack": mo}}, "a motion map on a 3-pose sheet")):
+        try:
+            (pp(bad, "attack") if "action_prompt" in bad else p3(bad))
+            refused = False
+        except SystemExit as e:
+            refused = bad["id"] in str(e)
+        check(refused, f"FW-9: {label} is refused")
+
     # (c) base: the base-is-the-creature sentence, nothing else
     base = "the broken stone altar"
     head3 = p3(sheet).split("Cells:\n", 1)[0]
@@ -259,6 +287,11 @@ def _fields(check: Callable[[bool, str], None]) -> None:
           and all("exactly six arms" in pp(q, p) for p in S.BOSS_POSES)
           and all("exactly six articulated mechanical wings" in pp(h, p) for p in S.BOSS_POSES),
           "FW-9: the altar sentence in every Ashen Queen pose; six arms / six wings in words in every pose")
+    hm = h.get("motion") or {}
+    check(isinstance(hm, dict) and set(hm) == {"hurt", "attack_raise"} and all("six wings" in v for v in hm.values())
+          and all(M.BODY_LINES["floating"][1] not in pp(h, p) and hm[p].strip() in pp(h, p) for p in hm)
+          and all(M.BODY_LINES["floating"][1] in pp(h, p) for p in ("attack", "cast")),
+          "FW-9: hollow_seraph motion (six wings visible) only in hurt and attack_raise; approved attack/cast keep the line")
 
 
 def run_prompts(check: Callable[[bool, str], None]) -> None:

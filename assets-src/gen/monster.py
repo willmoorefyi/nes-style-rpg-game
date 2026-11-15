@@ -4,7 +4,7 @@ Kept apart from the character code so character prompts, guides and cache keys c
 
   guide(band, floating)        1680x720 layout guide: per cell a light-grey size box, ground line, facing arrow
   prompt(m, band, n_images)    the request text (pose_prompt: one boss pose); optional FW-9 fields `body`, `base`,
-                               `idle_negative` change the text only when set
+                               `idle_negative`, `motion` change the text only when set
   cut(raw, band, floating)     raw render -> three frames in the band's square output cell
   recolor(frame, variant)      palette-swap variant of an approved frame (no extra images)
 """
@@ -55,6 +55,7 @@ def guide(band: S.MonsterBand, floating: bool = False) -> Image.Image:
 # ───────────────────────────── prompt ─────────────────────────────
 
 def prompt(m: dict, band: S.MonsterBand, has_design_ref: bool, has_monster_ref: bool = False) -> str:
+    _motion_needs_body(m)
     face = m.get("face") or ("its face (eyes, mouth or muzzle) is clearly readable in every cell, drawn at the same "
                              "sprite-pixel size as the body")
     ref = ("Image 3 is the DESIGN REFERENCE: our current sprite of this exact creature. Keep its design, colours, "
@@ -147,9 +148,33 @@ def body_lines(m: dict) -> tuple[str, str]:
     return BODY_LINES[body]
 
 
+def _motion_needs_body(m: dict) -> None:
+    if m.get("motion") is not None and not m.get("body"):
+        raise SystemExit(f"refused: {m['id']} sets motion without body")
+
+
+def body_move(m: dict, pose: str | None, move: str) -> str:
+    """`motion:` (needs `body:`) replaces the body's movement line: a string for every action pose (and the 3-pose
+    sheet), or a mapping {pose: text} for only those per-pose boss poses (so already approved poses keep their keys)."""
+    motion = m.get("motion")
+    if motion is None:
+        return move
+    if not m.get("body"):
+        raise SystemExit(f"refused: {m['id']} sets motion without body")
+    if isinstance(motion, str):
+        return motion.strip()
+    if not isinstance(motion, dict) or pose is None:
+        raise SystemExit(f"refused: {m['id']} motion must be a string (or a pose mapping on a per-pose boss)")
+    unknown = sorted(set(motion) - set(S.BOSS_POSES) | ({"idle"} & set(motion)))
+    if unknown:
+        raise SystemExit(f"refused: {m['id']} motion names poses {unknown}; use action poses of {list(S.BOSS_POSES)}")
+    return motion[pose].strip() if pose in motion else move
+
+
 def body_motion_3(m: dict) -> str:
     """The 3-pose sheet's MOVEMENT paragraph for `body:` (replaces ACTION_3)."""
     ground, move = body_lines(m)
+    move = body_move(m, None, move)
     return ("MOVEMENT: the attack and hurt cells are dramatic ACTION frames, not static stances. " + move + " Each of "
             f"the three silhouettes must be clearly different. BODY: in every cell, {ground}. {BODY_EFFECTS}\n\n")
 
@@ -160,6 +185,7 @@ def body_motion_pose(m: dict, pose: str) -> str:
     ground, move = body_lines(m)
     if pose == "idle":
         return f"BODY: {ground}.\n\n"
+    move = body_move(m, pose, move)
     return ("MOVEMENT: this is a dramatic ACTION frame of a huge, intimidating boss, not a static stance. " + move +
             " The silhouette must be very different from the idle reference. Any part of the body or weapon may reach "
             f"beyond the sides of the grey box. BODY: {ground}. {BODY_EFFECTS}\n\n")
@@ -192,6 +218,7 @@ def pose_guide(band: S.MonsterBand, floating: bool = False) -> Image.Image:
 
 
 def pose_prompt(m: dict, band: S.MonsterBand, pose: str, has_identity: bool) -> str:
+    _motion_needs_body(m)
     face = m.get("face") or "its face is clearly readable, drawn at the same sprite-pixel size as the body"
     action = {"idle": "idle, a ready battle stance", "attack": m["attack"].strip(),
               "cast": (m.get("cast") or "casting a spell, one hand raised with magic gathering").strip(),

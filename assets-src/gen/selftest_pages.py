@@ -65,5 +65,7 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
             code = MR.main(["check", sid])
     finally:
         MA.load_rig = real
-    check(buf.getvalue().strip() == f"{sid}: no rig" and code == 0,
+    # load_entries notes partly approved bosses ("boss poses incomplete") while a roster boss is being generated
+    lines = [ln for ln in buf.getvalue().splitlines() if ln.strip() and not ln.endswith("boss poses incomplete, skipped")]
+    check(lines == [f"{sid}: no rig"] and code == 0,
           f"check prints the stable line '<id>: no rig' for an unrigged sheet and exits 0 ({buf.getvalue().strip()!r})")

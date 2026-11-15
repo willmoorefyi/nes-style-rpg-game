@@ -9,7 +9,8 @@
 # `body` (biped | robed | quadruped | bird | floating | swimmer | serpent | rooted | naga | arthropod | blob) replaces the
 # fixed biped MOVEMENT wording with that body's motion and ground line (monster.BODY_LINES); `base` (e.g. "the broken
 # stone altar under her lowest coil") is drawn as part of the creature; `idle_negative` is avoided in the idle pose only
-# (boss_idle's Avoid list; the idle cell of a 3-pose sheet).
+# (boss_idle's Avoid list; the idle cell of a 3-pose sheet). `motion` (needs `body`) replaces that body's movement
+# line: a string for every action pose, or {pose: text} for only the poses it names (approved poses keep their keys).
 - id: goblin
   size: small
   prompt_rev: 1     # approved before the action wording; keeps its cache key
@@ -308,6 +309,15 @@
   design_ref: false
   floating: true
   body: floating
+  # the floating line ("tilt the whole body along a strong diagonal ...") hid or bunched wings in R26-R31; only the
+  # poses not yet approved get this line (attack and cast keep their approved keys)
+  motion:
+    hurt: &seraph_motion >-
+      Keep the front or three-quarter front view of Image 3 and a symmetric, composed posture, the armour upright or
+      tilted only slightly; all six wings stay separately visible with their brass joints, three on the left side of
+      the image and three on the right side of the image, none hidden behind the armour or bunched together; the
+      movement is in the wings, gauntlets and halo, and trailing parts lag behind the motion.
+    attack_raise: *seraph_motion
   prompt: >-
     the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
     showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
