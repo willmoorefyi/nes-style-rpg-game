@@ -141,7 +141,7 @@ Images used: 72 of 300 (build 72 of 285, fix 0 of 15; ledger guard: 172 Gemini a
   are left to the framework owner.
 - **Closed:** `chaos` 5 of 5 (R55, R59, R67, R68, R70), `death_eye` 4 of 4 (R71, R72, R74, R76), `evil_eye` (R79, best
   of 3). G2 = astos, warmech, chaos, death_eye (bosses) + piscodemon, evil_eye, dragon_zombie: **7 of 7 sprites, 21
-  sheets/poses approved** in 34 images (R42-R79: astos 6, warmech 7, chaos 10, death_eye 6, piscodemon 1, evil_eye
+  sheets/poses approved** in 36 images (R42-R79: astos 6, warmech 7, chaos 10, death_eye 6, piscodemon 1, evil_eye
   3, dragon_zombie 3); plan 6.2 expected 31.
 - What fixed the multi-arm and floating poses: the frontal line alone gives an idle copy (R66 0.04, R75 0.01); it
   works when the pose text also **moves every limb to a new place, named by image side** (R67, R68, R70), and when a
