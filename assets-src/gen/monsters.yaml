@@ -1334,7 +1334,7 @@
     in the idle cell, its belly and tail no lower than in the idle cell, the jaws shut, the spiny fins flattened
   face: its yellow eye under the bony head plate and the toothy underbite are readable
   extra_negative: water, bubbles, splashes, motion lines, streaks, silver scales, green scales, legs, a vertical body
-  seeds: [1234]
+  seeds: [1234]   # 1234 (ROSTER_LOG R160): no image (PROHIBITED_CONTENT); swimmer paused (plan 6.3)
 - id: crocodile
   # "Crocodile" (053): a dark green crocodile (distinct from the white crocodile)
   size: large

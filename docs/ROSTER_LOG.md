@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 146 of 300 (build 146 of 285, fix 0 of 15; ledger guard: 246 Gemini attempts - 100)
+Images used: 147 of 300 (build 147 of 285, fix 0 of 15; ledger guard: 247 Gemini attempts - 100)
 
 ## Attempts
 
@@ -182,6 +182,7 @@ Images used: 146 of 300 (build 146 of 285, fix 0 of 15; ledger guard: 246 Gemini
 | R157 | piranha/monster (1235, key `1fb82da3acde91f9bbe2f30c`, `--retry`; the softened wording) | 1 | Accepted by Gemini: a round silver-green piranha with an orange belly, a red eye and an underbite of white teeth, readable. **Fails review:** the attack is a diagonal leap drawn bigger and lower than the idle and the hurt bends the tail up high, so the shared floating offset slices both on the cell's bottom row (lowest row 79, 7 and 12 border pixels; the shark R99 failure); a detached 34 px streak beside the hurt; `pose_diff` 1.16 / 0.56 | **rejected**; the last allowed attempt follows (seed 1236, `--retry`; the same size as the idle with "its belly and lowest fin no lower than in the idle cell (no leap, no diagonal)", "streaks" in the negative) |
 | R158 | piranha/monster (1236, key `ad44028f068532ce2db485af`, `--retry`, attempt 3 of 3; the same size and height as the idle, "no leap, no diagonal") | 1 | **No image:** refused again (`finish_reason=PROHIBITED_CONTENT`), with the softened text (no "fierce" or "needle"); counted as spent | **failed call** (no 4th attempt, D9) |
 | R159 | piranha/monster: none approvable | 0 | R156 and R158 returned no image; R157 is sliced on the bottom row in the attack and hurt (7 / 12 border pixels) with a stray streak and a leap, below the binary checklist | **deferred** (no data entry; the plan's `red_piranha` gets its own sheet and the piranha could later reuse it as a `variant` at 0 images, or a fix-pass request). The refusals look like a safety false positive on a small biting fish; `red_piranha`'s wording drops "piranha", "needle" and "blood" before its first request |
+| R160 | red_piranha/monster (1234, key `c58b5f1b9841f0e5dae20e96`, small 3-pose sheet, `body: swimmer`, floating; "a big deep crimson armoured fish", no "piranha", "needle" or "blood" in the text) | 1 | **No image:** refused (`finish_reason=PROHIBITED_CONTENT`), counted as spent. Prompt diff against the one accepted fish request (R157): the refused texts (R158, R160) share the new clause "its belly and lowest fin / belly and tail no lower than in the idle cell" and "the same size as in the idle cell"; R156 had "fierce" and "needle teeth". The cause is not certain (the safety filter gives no reason) | **failed call**. **Pause trigger (plan 6.3): swimmer**, R156, R157, R158 (and R160) are rejected or refused swimmer attempts in a row, so `red_piranha` (2 attempts left) and the batch-C swimmer `white_shark` wait for an offline wording fix (proposal: drop the "belly ... no lower" clause and ask for "the whole fish in the upper part of its box, the same height in every cell", as the accepted shark R100 and bigeyes texts) |
 
 ## G1 status (2026-11-15, closed)
 
