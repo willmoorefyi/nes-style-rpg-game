@@ -62,6 +62,9 @@ RECIPES = {
     "atk_swing2": {"src": "attack", "toward": "attack_raise", "t": 0.35, "moves": "all", "pins": "planted"},
 }
 
+# FW-6: a tweaked idle_b (frames.idle_b.tweaks, 1 px cap) is a rig frame at t 0 from idle, then the body's idle_b op
+IDLE_B = {"src": "idle", "toward": "idle", "t": 0.0, "moves": "wind", "pins": "feet"}
+
 
 def frames_for(has_cast: bool, has_raise: bool = False) -> list[str]:
     return (BOSS_FRAMES if has_cast else MONSTER_FRAMES) + (RAISE_FRAMES if has_raise else [])

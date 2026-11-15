@@ -138,6 +138,17 @@ the whole sprite). A boss sheet's cell is the widest keyframe's: narrower poses 
 (`monster_anim.pad_keyframes`), so rig coordinates are in the padded cell. `two_handed` and `prop_colors`
 from the plan draft are **not implemented**: rigs do these with tweaks and masks.
 
+Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and each module's docstring):
+
+- **`blob`** (`rig_blob.py`, FW-6: slimes, oozes, jellies, flans). Joints `base` (ground, pinned in every frame; mark
+  it at the top of the planted band, rows at or below it never slide), `mid`, `top`; optional pods/arms
+  `sh_/el_/hand_{n,f}` from `mid` (`uarm_*`, `farm_*`). The body is `kind: shear` (rows slide sideways, never
+  resampled). Frames take `squash: {sx, sy} | auto | null` (whole rows/columns removed or duplicated about the bottom
+  centre; caps 0.80-1.25, area 0.85-1.15). `idle_b` sags one row. Recipe: the wind-up squashes; when the attack key
+  leans far (green_slime: 10 px centroid) coil forward (`atk_wind1/2.t` 0.10 / 0.25) and settle the follow (`t` 0.80);
+  a fist at the cell edge: `atk_mid: {t: 0.10, moves: [mid, top]}` (gray_ooze).
+- **Any body:** `frames.idle_b.tweaks` (≤ 1 px per component) for wing flutter or robe sway.
+
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`
 
 One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. The keys the code reads:

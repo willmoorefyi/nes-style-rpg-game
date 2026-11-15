@@ -29,8 +29,8 @@ def palette(keyframes: dict[str, Image.Image]) -> set:
 
 def _per_foot(f: dict) -> dict | None:
     """Part-label maps for the per-foot feet check (frame, pixel source, target keyframe), or None (no rig labels)."""
-    if f.get("labels") is None or f.get("src_labels") is None:
-        return None
+    if f.get("labels") is None or f.get("src_labels") is None or not f.get("foot_parts"):
+        return None                                        # FW-6: a feetless body (blob) is judged on the whole band
     return {"frame": f["labels"], "src": f["src_labels"], "toward": f.get("toward_labels"), "parts": f["foot_parts"]}
 
 
@@ -49,10 +49,11 @@ def _silhouette(f: dict, a, S, T, cell_h: int, efix_gates: bool) -> list[str]:
     """Check 6 area / height with F1 (fx parts and their own outline left out of frame, source and target). With the
     gates off (the build until V.3) F1 can only relax the check: the plain or the fx-excluded variant passing is enough."""
     excl = tuple(E.fx_exclusion(m, f.get("fx") or []) for m in (f["labels"], f.get("src_labels"), f.get("toward_labels")))
-    strict = C.silhouette(a, S, T, f["u"], cell_h, excl)
+    sy = (f.get("squash") or (1.0, 1.0, 0))[1]
+    strict = C.silhouette(a, S, T, f["u"], cell_h, excl, sy)
     if efix_gates or not strict:
         return strict
-    plain = C.silhouette(a, S, T, f["u"], cell_h)
+    plain = C.silhouette(a, S, T, f["u"], cell_h, None, sy)
     return [] if not plain else strict
 
 
@@ -68,7 +69,8 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     out += _silhouette(f, a, S, T, cell_h, efix_gates) + C.outline_kept(a, S)
     floating = bool(meta.get("floating") or f.get("floating"))       # FW-1: the float band replaces the feet check
     out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
-                  1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"), _per_foot(f))
+                  1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"), _per_foot(f),
+                  f.get("squash"))
     out += C.clipping(a) + C.rotation_cap(f["rots"]) + C.whole_pixel(f["joints"])
     if name != "idle_b":
         out += C.near_keyframe(f["u"])

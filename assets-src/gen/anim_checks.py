@@ -136,15 +136,16 @@ def _rows(m: np.ndarray) -> int:
 
 
 def silhouette(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, cell_h: int,
-               excl: tuple | None = None) -> list[str]:
+               excl: tuple | None = None, sy: float = 1.0) -> list[str]:
     """Opaque area 0.85-1.15 of the source and bbox height within the cell's tolerance of the S->T lerp. `excl` =
-    (frame, source, target) masks of pixels left out of both (F1: fx parts and their own outline; None = none)."""
+    (frame, source, target) masks of pixels left out of both (F1: fx parts and their own outline; None = none). `sy`
+    (FW-6): a squashed frame's lerp height is scaled by its squash sy (the area band is not)."""
     out = []
     fa, fs, ft = (_solid(x) & ~m if m is not None else _solid(x) for x, m in zip((a, src, toward), excl or (None,) * 3))
     ratio = fa.sum() / max(int(fs.sum()), 1)
     if not 0.85 <= ratio <= 1.15:
         out.append(f"opaque area {ratio:.2f} of source (0.85-1.15)")
-    want = _rows(fs) + (_rows(ft) - _rows(fs)) * u
+    want = (_rows(fs) + (_rows(ft) - _rows(fs)) * u) * sy
     tol = 4 if cell_h <= 80 else 6 if cell_h <= 128 else 10
     if abs(_rows(fa) - want) > tol:
         out.append(f"bbox height {_rows(fa)} vs lerp {want:.1f} (+-{tol})")

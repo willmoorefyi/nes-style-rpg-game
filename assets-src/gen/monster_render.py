@@ -5,6 +5,10 @@ carried props, chain / cloth mesh warps, rigid parts (nearest or rotsprite), plu
   frames.<frame>.scale: {part: s}      # 0.25 <= s <= 1, kind fx only; rendered by rotsprite (mode sampling) about
                                        # the part's first joint; s = 1 takes the unscaled code path unchanged
   frames.<frame>.sampler: rotsprite    # or nearest; overrides the rig's `sampler` for the rigid parts of that frame
+
+FW-6 post-composite ops: `post_squash` (frames.<f>.squash or the template recipe's, anim_squash.py, anchored on the
+solved `base` joint), `breath` (the idle_b op on a rendered frame and its labels: the bob above the breath row, a
+floating sink, the blob sag) and `idle_b_tweaks` (frames.idle_b.tweaks, every component at most 1 px).
 """
 from __future__ import annotations
 
@@ -64,6 +68,10 @@ def render_part(rig, part: str, kf: str, arr: np.ndarray, mask: np.ndarray, J: d
             mask[ys[t < 0.5], xs[t < 0.5]] = False
         rgba, hit, emp = RR.rigid(arr, mask, sj[js[0]], J[to], rot, size, gaps)
         return rgba, hit, emp, (math.degrees(rot), "prop")
+    if d["kind"] == "shear":                              # FW-6 blob body: rows slide sideways, never resampled
+        from gen import anim_squash as SQ
+        rgba, hit, emp, ang = SQ.shear_part(arr, mask, [sj[j] for j in js], [J[j] for j in js], size, gaps)
+        return rgba, hit, emp, (ang, "shear")
     if d["kind"] in ("chain", "cloth"):
         rgba, hit, emp = RR.mesh_warp(arr, mask, [sj[j] for j in js], [J[j] for j in js],
                                       warp_width(d, mask, [sj[j] for j in js]), size, gaps)
@@ -94,3 +102,64 @@ def check_info(rig, kf: str, carried: list[str]) -> dict:
                 grips[names.index(p)] = g
                 break
     return {"fx": fx, "grips": grips, "names": names}
+
+
+IDLE_B_CAP = 1
+
+
+def idle_b_tweaks(rig, cfg: dict) -> dict | None:
+    """frames.idle_b.tweaks ({joint: [dx, dy]}, |dx|, |dy| <= 1 px: wing flutter, robe sway) or None; over the cap
+    raises ValueError naming the rig."""
+    tw = ((cfg.get("frames") or {}).get("idle_b") or {}).get("tweaks")
+    if not tw:
+        return None
+    big = {j: v for j, v in tw.items() if max(abs(float(v[0])), abs(float(v[1]))) > IDLE_B_CAP}
+    if big:
+        raise ValueError(f"rig {cfg.get('sprite')} frame idle_b: tweaks {big} over the {IDLE_B_CAP} px cap")
+    return tw
+
+
+def post_squash(rig, name: str, r: dict, over: dict, img: np.ndarray, labels: np.ndarray, J: dict,
+                src: np.ndarray | None = None, toward: np.ndarray | None = None, u: float = 0.0):
+    """(img, labels, (sx, sy, cx) or None): the frame's squash (frames.<f>.squash wins; null = none). `auto` sizes the
+    frame toward the S -> T lerp (anim_squash.auto_counts) and returns None: the checks then judge it by the lerp."""
+    from gen import anim_squash as SQ
+    sq = over["squash"] if "squash" in over else r.get("squash")
+    if not sq:
+        return img, labels, None
+    base = J.get("base")
+    cx = int(base[0]) if base else None
+    if sq == "auto":
+        rows, cols = SQ.auto_counts(img, src, toward, u, rows_only=r["pins"] in ("legs", "feet"))
+        return (*SQ.squash_px(img, labels, rows, cols, cx)[:2], None)
+    sx, sy = SQ.validate(sq, f"rig {rig.cfg.get('sprite')} frame {name}")
+    img, labels, info = SQ.squash(img, labels, sx, sy, cx)
+    return img, labels, (info["sx"], info["sy"], info["cx"])
+
+
+def breath(rig, img: np.ndarray, labels: np.ndarray | None, floating: bool):
+    """The idle_b op on a frame and its labels: floating sink 1 px, blob sag (one interior row out), else everything
+    above the breath joint's idle row 1 px down (puppet.bob with dy 1)."""
+    from gen import anim_squash as SQ
+    lab = None if labels is None else labels.copy()
+    if floating:
+        out = np.zeros_like(img)
+        out[1:] = img[:-1]
+        if lab is not None:
+            lab = np.full_like(labels, -1)
+            lab[1:] = labels[:-1]
+        return out, lab
+    if rig.idle_b == "sag":
+        base = rig.keyframes["idle"].get("base")
+        return SQ.squash_px(img, labels, -1, 0, int(base[0]) if base else None)[:2]
+    cut = int(round(rig.keyframes["idle"][rig.breath][1]))
+    up = img[:cut].copy()
+    out = img.copy()
+    out[:cut] = 0
+    keep = up[..., 3:] > 0
+    out[1:cut + 1] = np.where(keep, up, out[1:cut + 1])
+    if lab is not None:
+        ul = labels[:cut].copy()
+        lab[:cut] = -1
+        lab[1:cut + 1] = np.where(keep[..., 0], ul, lab[1:cut + 1])
+    return out, lab

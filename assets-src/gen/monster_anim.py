@@ -24,14 +24,14 @@ APPROVED = HERE / "approved"
 RIGS = HERE / "anim" / "monsters"
 if str(HERE.parent) not in sys.path:                      # run as a script: make the `gen` package importable
     sys.path.insert(0, str(HERE.parent))
-from gen.monster_recipes import (ARM, BOSS_FRAMES, FALLBACK, FRAME_SOURCE, HEAD, KEYFRAMES,  # noqa: E402,F401
+from gen.monster_recipes import (ARM, BOSS_FRAMES, FALLBACK, FRAME_SOURCE, HEAD, IDLE_B, KEYFRAMES,  # noqa: E402,F401
                                  MONSTER_FRAMES, NEEDS, RAISE_FRAMES, RECIPES, SEQUENCES, SPAN, frames_for,
                                  generated_names, head_joints, held, resolve, span_of)
 
 
 def recipe_u(name: str, rig_cfg: dict | None = None) -> float:
     """Signed fraction of the way from the pixel source toward `toward` (the 35% rule is |u| <= 0.35)."""
-    r = RECIPES[name]
+    r = RECIPES.get(name, IDLE_B)
     t = float(((rig_cfg or {}).get("frames") or {}).get(name, {}).get("t", r["t"]))
     return -(t - 1.0) if r.get("over") else t
 
@@ -181,20 +181,22 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     head = head_joints(rig.head, rig.body, sprite, rig.keyframes["idle"])
     floating = bool(meta.get("floating")) or rig.floating   # FW-1: a floating sheet or body has no ground
     out: dict[str, dict] = {}
+    tweaked = cfg.get("breath", True) and MR.idle_b_tweaks(rig, cfg) is not None   # FW-6: idle_b as a rig frame
     bobbed = [n for n, r in RECIPES.items() if r.get("bob") and n in generated_names(has_cast, has_raise)
               and ((cfg.get("frames") or {}).get(n) or {}).get("bob", True)]
     for name in (["idle_b"] if cfg.get("breath", True) else []) + bobbed:   # 1 px down above the breath joint's row
         src = RECIPES[name]["src"] if name in RECIPES else "idle"
-        if name in holds:
+        if name in holds or (name == "idle_b" and tweaked):
             continue
-        img = sink(keyframes[src], 1) if floating else \
+        img = sink(keyframes[src], 1) if floating else MR.breath(rig, arrs[src], None, False)[0] \
+            if name == "idle_b" and rig.idle_b == "sag" else \
             np.asarray(PU.bob(keyframes[src], int(round(rig.keyframes[src][rig.breath][1])), 1)).copy()
         out[name] = {"img": img, "labels": None, "src": src, "toward": src, "u": 0.0, "joints": {}, "rots": {},
                      "pinned": True, "prop_px": {}, "dy": 1, "floating": floating}
     for name in generated_names(has_cast, has_raise):
-        if name in out or name == "idle_b" or name in holds:
+        if name in out or name in holds or (name == "idle_b" and not tweaked):
             continue
-        r, over = {**RECIPES[name], **rig.recipes.get(name, {})}, (cfg.get("frames") or {}).get(name, {})
+        r, over = {**RECIPES.get(name, IDLE_B), **rig.recipes.get(name, {})}, (cfg.get("frames") or {}).get(name, {})
         u = recipe_u(name, cfg)
         S = rig.keyframes[r["src"]]
         T = out[r["toward"]]["joints"] if r["toward"] in out else rig.keyframes[r["toward"]]
@@ -226,6 +228,11 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                                                         part in carried, scales.get(part, 1.0), sampler)
             layers.append((list(rig.parts).index(part), rgba, hit, emp))
         img, labels = RR.composite(layers, size, pairs)
+        img, labels, squashed = MR.post_squash(rig, name, r, over, img, labels, J, arrs[r["src"]],
+                                               out[r["toward"]]["img"] if r["toward"] in out else arrs[r["toward"]], u)
+        if name == "idle_b":
+            img, labels = MR.breath(rig, img, labels, floating)
+            dy = 1
         for patch in cfg.get("paint") or []:
             if patch["frame"] == name:
                 for x, y in patch["xy"]:
@@ -236,6 +243,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         pinned = r["pins"] in ("legs", "feet")
         out[name] = {"img": img, "labels": labels, "src": r["src"], "toward": r["toward"], "u": u, "joints": J,
                      "rots": rots, "pinned": pinned, "prop_px": prop_px, "dy": dy, "dx": dx, "floating": floating,
+                     "squash": squashed,
                      "contact": AF.contact_mask(rig, r["src"], segs[r["src"]], pins, meta["bottom_row"]) if pinned
                      and set(rig.feet) - set(pins) else None,
                      "src_labels": lab, "foot_parts": foot_parts,

@@ -89,6 +89,28 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
 - A `cloth` part may give its `chain` per keyframe (`chain: {idle: [...], attack: [...]}`); its joints join the wind
   and cast move sets like a plain chain.
 - `breath_joint:` moves the `idle_b` cut (default `hip`).
+- `frames.idle_b.tweaks: {joint: [dx, dy]}` (FW-6, any body; every component at most 1 px, more raises): idle_b is
+  then a rig frame at t 0 from idle with those joints moved (wing flutter, robe sway), followed by the body's usual
+  idle_b op (the bob, the floating sink or the blob sag). Without tweaks idle_b is byte-identical to before.
+
+### Roster templates (docs/ROSTER_PLAN.md 5.2; each module's docstring is the joint reference)
+
+| Body (module) | Root / contacts (pinned every frame) | Joints and default parts | Recipe notes |
+|---|---|---|---|
+| `blob` (`rig_blob.py`, FW-6) | `base` (ground: ignores dy and tweaks); mark it at the top of the planted band | `base → mid → top` = `body` (`kind: shear`); pods/arms `mid → sh_<s> → el_<s> → hand_<s>` (`uarm_<s>`, `farm_<s>`, s = n, f, drawn only when marked) | squash per frame (below); `idle_b` = one interior row removed (sag); `head` = `top` |
+
+**`squash` frame op (FW-6, `anim_squash.py`).** `frames.<f>.squash: {sx, sy}` (any body; 0.80-1.25 each, sx·sy
+0.85-1.15), `auto`, or `null` (turns a template squash off). Whole interior rows and columns are removed or duplicated
+about the lowest row and the anchor column (the solved `base` x, else the bottom-band centre); the 2 outermost rows
+and columns are never touched; per band the straightest line is taken (deterministic); an interior pixel left on the
+edge is re-inked with the outline colour. `auto` sizes the frame toward the S→T lerp (height, and the bottom band's
+left/right extents; columns only for unpinned frames, never past the cell border). The feet check scales the base
+reference by sx about the anchor and the bbox-height check scales the lerp by sy for explicit squashes; `auto` frames
+are judged by the plain lerp. `kind: shear` parts slide each row sideways by the chain's solved x displacement at its
+height (no resampling, no vertical motion; the lean is capped at 25°). Blob defaults: wind1/wind2 `{sx 1.04, sy 0.94}`
+/ `{1.08, 0.88}` with no dy, atk_mid / atk_follow / hurt_in2 `auto`, recover `{0.97, 1.03}`, hurt_in1 `{1.10, 0.90}`,
+daze / daze_b sy 0.94 / 0.92. Prototypes: `green_slime` (wind t 0.10/0.25 coil forward, follow settle 0.80),
+`gray_ooze` (atk_mid t 0.10 with the fist riding, hurt_in1 `moves: [mid, top]`).
 
 ## Monster animation (docs/ENEMY_ANIM_PLAN.md, docs/ENEMY_ANIM_ISSUES.md)
 

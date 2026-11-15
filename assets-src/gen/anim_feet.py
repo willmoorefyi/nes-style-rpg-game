@@ -1,7 +1,8 @@
 """Monster animation check 8, feet anchored (docs/ENEMY_ANIM_PLAN.md 5.1): the lowest row on the plain, then the feet
 judged on the whole bottom band, per foot (part labels; a foot lifted in either keyframe of the span is skipped), or on
 the ground contact a pinned frame that releases feet keeps (a rearing hurt); for a floating sheet or body (FW-1) the
-float band instead. Re-exported by anim_checks.py."""
+float band instead. A squashed frame (FW-6, `squash` = (sx, sy, cx)) is judged against the reference x extents scaled by
+sx about the anchor column cx. Re-exported by anim_checks.py."""
 from __future__ import annotations
 
 import numpy as np
@@ -61,7 +62,15 @@ def _band_x(m: np.ndarray, bottom: int) -> tuple[int, int] | None:
     return (int(xs.min()), int(xs.max())) if len(xs) else None
 
 
-def _per_foot(a: np.ndarray, pf: dict, u: float, bottom: int, pinned: bool) -> list[str]:
+def _scaled(ref, squash) -> tuple[float, float]:
+    """FW-6: x extents scaled by the frame's squash sx about its anchor column (unchanged without a squash)."""
+    if not squash:
+        return ref
+    sx, _sy, cx = squash
+    return (cx + (ref[0] - cx) * sx, cx + (ref[1] - cx) * sx)
+
+
+def _per_foot(a: np.ndarray, pf: dict, u: float, bottom: int, pinned: bool, squash=None) -> list[str]:
     """Per foot (`pf`: {"frame", "src", "toward"}: part-label maps, "parts": {foot: [part index, ...]}): its pixels in
     the bottom 3 rows. A foot lifted in either keyframe of the span is skipped; a pinned frame keeps every foot
     grounded in its source within +-1, any other frame keeps every foot grounded in both within +-2 of the lerp."""
@@ -74,6 +83,7 @@ def _per_foot(a: np.ndarray, pf: dict, u: float, bottom: int, pinned: bool) -> l
             continue                                       # lifted in the source or the target keyframe
         f = _band_x(solid & np.isin(pf["frame"], idx), bottom)
         ref, tol = (s, 1) if pinned else ((s[0] + (t[0] - s[0]) * u, s[1] + (t[1] - s[1]) * u), 2)
+        ref = _scaled(ref, squash)
         if f is None:
             out.append(f"foot {foot} left the ground (source x {s})")
         elif abs(f[0] - ref[0]) > tol or abs(f[1] - ref[1]) > tol:
@@ -82,7 +92,8 @@ def _per_foot(a: np.ndarray, pf: dict, u: float, bottom: int, pinned: bool) -> l
 
 
 def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_row: int, pinned: bool,
-         floating: bool, float_dy: int = 0, contact: np.ndarray | None = None, per_foot: dict | None = None) -> list[str]:
+         floating: bool, float_dy: int = 0, contact: np.ndarray | None = None, per_foot: dict | None = None,
+         squash: tuple | None = None) -> list[str]:
     rows = np.where(_solid(a).any(1))[0]
     if not len(rows):
         return ["empty frame"]
@@ -94,11 +105,12 @@ def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_ro
     if low != bottom_row:
         return [f"lowest opaque row {low} != {bottom_row}"]
     if per_foot:
-        return _per_foot(a, per_foot, u, bottom_row, pinned)
+        return _per_foot(a, per_foot, u, bottom_row, pinned, squash)
     f, s, t = _feet_x(a, bottom_row), _feet_x(src, bottom_row), _feet_x(toward, bottom_row)
     if f is None or s is None:
         return ["no foot pixels"]
     ref, tol = (s, 1) if pinned or t is None else ((s[0] + (t[0] - s[0]) * u, s[1] + (t[1] - s[1]) * u), 2)
+    ref = _scaled(ref, squash)
     if abs(f[0] - ref[0]) > tol or abs(f[1] - ref[1]) > tol:
         return [f"feet x {f} vs {tuple(round(v, 1) for v in ref)} (+-{tol})"]
     return []

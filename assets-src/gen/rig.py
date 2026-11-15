@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from gen import rig_ik as RI
+from gen.rig_blob import BLOB
 from gen.rig_floating import FLOATERS
 from gen.rig_naga import NAGA
 from gen.rig_templates import BEASTS
@@ -38,10 +39,10 @@ FEET = ("foot_n", "foot_f")
 # per template: legs, feet, IK limbs, recipe joint sets (None = the biped sets in monster_anim), planted, breath joint
 BODY = {"biped": {"legs": LEGS, "feet": FEET, "limbs": tuple((f"hip_{s}", f"knee_{s}", f"foot_{s}") for s in "nf"),
                   "moves": None, "planted": "foot_f", "breath": "hip", "head": ("crown", "neck")}}
-for _name, _t in {**BEASTS, "naga": NAGA, **FLOATERS}.items():   # quadruped, bird (T5a), naga (FW-3), floating (FW-1)
+for _name, _t in {**BEASTS, "naga": NAGA, **FLOATERS, "blob": BLOB}.items():   # T5a, naga FW-3, floating FW-1, blob FW-6
     TEMPLATES[_name] = (_t["parent"], _t["parts"], _t["z"])
     BODY[_name] = {k: _t[k] for k in ("legs", "feet", "limbs", "moves", "planted", "breath", "head", "arms", "extra",
-                                      "ground", "floating", "recipes") if k in _t}
+                                      "ground", "floating", "recipes", "idle_b") if k in _t}
 
 
 class Rig:
@@ -60,6 +61,7 @@ class Rig:
         self.arms, self.extra, self.ground = b.get("arms", ("n", "f")), b.get("extra", {}), tuple(b.get("ground", ()))
         # FW-1: no ground (float band, ungrounded solve, whole-sprite idle_b) and per-frame recipe overrides (dx, dy)
         self.floating, self.recipes = bool(b.get("floating", False)), dict(b.get("recipes", {}))
+        self.idle_b = b.get("idle_b", "bob")                # FW-6: "sag" (blob: one interior row removed)
         self.cell = cell
         self.fwd = 1 if cfg.get("facing", "right") == "right" else -1
         self.sampler = cfg.get("sampler", "nearest")

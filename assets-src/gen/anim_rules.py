@@ -11,7 +11,8 @@ from gen.monster_recipes import KEYFRAMES, SEQUENCES as _RUNS
 
 MAX_PAGE = 2048                    # docs/ROSTER_PLAN.md 8 (D10): every monster atlas page <= 2048x2048
 NEAR_KEYFRAME = 0.35
-ROT_CAP = {"rigid": 30.0, "torso": 20.0, "chain": 25.0, "cloth": 25.0, "prop": 30.0, "fx": 30.0}
+ROT_CAP = {"rigid": 30.0, "torso": 20.0, "chain": 25.0, "cloth": 25.0, "prop": 30.0, "fx": 30.0,
+           "shear": 25.0}                  # FW-6 blob body: its lean angle (anim_squash.shear_part)
 # the generated frames of every runtime sequence (monster_recipes.SEQUENCES: attack, hurt, cast, daze, heavy)
 SEQUENCES = {seq: tuple(dict.fromkeys(n for n in names if n not in KEYFRAMES)) for seq, names in _RUNS.items()}
 
