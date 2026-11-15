@@ -1,0 +1,126 @@
+sprite: weretiger
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# idle: upright guard, the near arm bent forward low, the far arm hanging; attack: a crouched lunge, the near claw
+# raking down in front of the chest, the far arm hunched over the back; hurt: thrown back, both claws flung up
+keyframes:
+  idle:
+    crown: [50, 8]
+    neck: [49, 23]
+    chest: [46, 31]
+    hip: [44, 45]
+    sh_n: [53, 29]
+    el_n: [56, 38]
+    hand_n: [63, 42]
+    sh_f: [35, 23]
+    el_f: [26, 32]
+    hand_f: [28, 44]
+    hip_n: [50, 48]
+    knee_n: [54, 58]
+    foot_n: [53, 69]
+    toe_n: [59, 73]
+    hip_f: [38, 50]
+    knee_f: [33, 58]
+    foot_f: [25, 69]
+    toe_f: [26, 74]
+    tail_tip: [13, 46]
+  attack:
+    crown: [55, 15]
+    neck: [51, 29]
+    chest: [42, 32]
+    hip: [40, 45]
+    sh_n: [50, 31]
+    el_n: [58, 37]
+    hand_n: [66, 43]
+    sh_f: [40, 23]
+    el_f: [30, 21]
+    hand_f: [27, 34]
+    hip_n: [48, 48]
+    knee_n: [52, 57]
+    foot_n: [47, 68]
+    toe_n: [54, 72]
+    hip_f: [33, 48]
+    knee_f: [24, 57]
+    foot_f: [15, 69]
+    toe_f: [14, 74]
+    tail_tip: [7, 45]
+  hurt:
+    crown: [32, 7]
+    neck: [36, 20]
+    chest: [38, 28]
+    hip: [40, 41]
+    sh_n: [46, 22]
+    el_n: [53, 17]
+    hand_n: [56, 8]
+    sh_f: [28, 23]
+    el_f: [17, 23]
+    hand_f: [13, 8]
+    hip_n: [47, 45]
+    knee_n: [54, 52]
+    foot_n: [52, 64]
+    toe_n: [56, 68]
+    hip_f: [36, 45]
+    knee_f: [33, 56]
+    foot_f: [26, 69]
+    toe_f: [27, 74]
+    tail_tip: [11, 52]
+parts:
+  weapon: {remove: true}
+  tail: {bone: [hip, tail_tip], radius: 3.5}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: the crouch starts (coil forward), claws drawn back
+    t: 0.15
+    dy: 2
+    moves: [crown, neck, chest, hip]
+    tweaks: {sh_n: [-1, -1], el_n: [-3, -3], hand_n: [-4, -4]}
+  atk_wind2:                   # coil forward (t +0.30 toward the lunge, IoU to mid): crouched 3, claws pulled back to the chest
+    t: 0.35
+    dy: 3
+    moves: [crown, neck, chest, hip]
+    tweaks: {sh_n: [-2, -1], el_n: [-5, -4], hand_n: [-7, -6]}
+  atk_mid:                     # attack arms kept; legs shifted ~1/3 back toward idle, not rotated
+    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [3, 0], foot_f: [3, 0], toe_f: [3, 0]}
+    moves: [chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:
+    t: 0.80
+    moves: [crown, neck, chest]
+  atk_recover:
+    t: 0.25
+    moves: [crown, neck, chest]
+  hurt_in1:                    # flinch: head snapped back (translated), claws jerk up
+    moves: []
+    tweaks: {crown: [-4, -1], neck: [-3, 0], chest: [-1, 0], sh_n: [-1, -1], el_n: [-1, -3], hand_n: [-1, -5], sh_f: [-1, 0], el_f: [-2, -1], hand_f: [-2, -2]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+  daze:                        # slump: the upper body 2 px down, head dropped forward 2 more, both arms hang lower
+    moves: [crown, neck, chest]
+    dy: 1
+    tweaks: {crown: [2, 1], neck: [1, 1], el_n: [3, 1], hand_n: [5, 3], el_f: [0, 2], hand_f: [0, 3]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [1, 0], el_n: [3, 1], hand_n: [5, 3], el_f: [0, 2], hand_f: [0, 3]}
+z:
+  idle: [tail, uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
+masks:
+  tail:
+    idle: [[10, 43], [29, 50], [29, 59], [10, 59]]
+    attack: [[4, 42], [22, 50], [22, 56], [4, 56]]
+    hurt: [[8, 49], [28, 49], [28, 60], [8, 60]]
+  ft_n:
+    idle: [[46, 68], [63, 68], [63, 78], [46, 78]]
+    attack: [[42, 68], [60, 68], [60, 78], [42, 78]]
+    hurt: [[46, 64], [61, 64], [61, 72], [46, 72]]
+  ft_f:
+    idle: [[18, 69], [33, 69], [33, 78], [18, 78]]
+    attack: [[5, 65], [21, 65], [21, 78], [5, 78]]
+    hurt: [[18, 69], [34, 69], [34, 78], [18, 78]]
+holds: []
+paint:                         # a sliver of the back of the head dragged up over the far shoulder in follow, cleared
+  - {frame: atk_follow, xy: [[35, 14], [36, 14], [37, 14], [38, 14], [37, 15], [38, 15], [39, 15], [37, 16], [38, 16], [39, 16]], rgb: null}

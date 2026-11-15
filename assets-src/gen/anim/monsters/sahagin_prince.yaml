@@ -1,0 +1,133 @@
+sprite: sahagin_prince
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# idle: upright, two coral blades held before the chest, the sea-green fin cape hanging behind; attack: a low lunge
+# slashing both blades toward the heroes, the cape streaming back (its lower tip is cut flat at x 10 in the approved
+# key, a recorded nit); hurt: thrown back, the blades flung out, the near foot lifted. The blades never turn: they ride
+# their forearms (masks) and only translate in idle-sourced frames. The cape is torso (it rides the chest).
+keyframes:
+  idle:
+    crown: [41, 4]
+    neck: [42, 19]
+    chest: [40, 28]
+    hip: [41, 44]
+    sh_n: [46, 24]
+    el_n: [50, 32]
+    hand_n: [52, 37]
+    sh_f: [34, 24]
+    el_f: [37, 32]
+    hand_f: [44, 28]
+    hip_n: [46, 46]
+    knee_n: [47, 58]
+    foot_n: [47, 70]
+    toe_n: [53, 74]
+    hip_f: [36, 46]
+    knee_f: [34, 58]
+    foot_f: [31, 70]
+    toe_f: [31, 74]
+  attack:
+    crown: [51, 11]
+    neck: [50, 24]
+    chest: [44, 32]
+    hip: [42, 48]
+    sh_n: [48, 28]
+    el_n: [54, 34]
+    hand_n: [60, 33]
+    sh_f: [42, 30]
+    el_f: [44, 38]
+    hand_f: [52, 43]
+    hip_n: [46, 50]
+    knee_n: [54, 57]
+    foot_n: [47, 69]
+    toe_n: [50, 73]
+    hip_f: [36, 50]
+    knee_f: [26, 57]
+    foot_f: [16, 70]
+    toe_f: [16, 74]
+  hurt:
+    crown: [26, 10]
+    neck: [30, 22]
+    chest: [38, 30]
+    hip: [44, 46]
+    sh_n: [44, 26]
+    el_n: [52, 25]
+    hand_n: [60, 25]
+    sh_f: [32, 26]
+    el_f: [36, 30]
+    hand_f: [42, 22]
+    hip_n: [50, 48]
+    knee_n: [52, 58]
+    foot_n: [48, 68]
+    toe_n: [50, 72]
+    hip_f: [38, 50]
+    knee_f: [37, 60]
+    foot_f: [34, 70]
+    toe_f: [33, 74]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: the crouch starts (coil forward), knees give, blades drawn back
+    t: 0.15
+    dy: 2
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
+    moves: [crown, neck, chest, hip, hip_n, hip_f]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [-1, -1], el_n: [-2, -2], hand_n: [-3, -3], el_f: [-1, -1], hand_f: [-1, -1]}
+  atk_wind2:                   # coil forward (t +0.35, IoU to mid): crouched 4, the upper body leaning back, blades drawn back
+    t: 0.35
+    dy: 3
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
+    moves: [crown, neck, chest, hip, hip_n, hip_f]
+    tweaks: {sh_n: [-2, -1], el_n: [-4, -4], hand_n: [-6, -6], el_f: [0, -1], hand_f: [0, -1]}
+  atk_mid:
+    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [3, 0], foot_f: [4, 0], toe_f: [4, 0]}
+    moves: [crown, neck, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:
+    t: 0.80
+    moves: [crown, neck, chest]
+  atk_recover:
+    t: 0.30
+    moves: [crown, neck, chest]
+  hurt_in1:                    # flinch: head knocked back (translated), the blades jerk up
+    moves: []
+    tweaks: {crown: [-4, 0], neck: [-2, 0], chest: [-1, 0], sh_n: [0, -1], el_n: [0, -2], hand_n: [0, -3]}
+  hurt_in2:
+    moves: [crown, neck]
+  daze:                        # slump: head dropped forward, both blades sink
+    moves: [crown, neck, chest]
+    tweaks: {crown: [2, 1], neck: [1, 1], el_n: [0, 1], hand_n: [0, 2], el_f: [0, 1], hand_f: [0, 2]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [2, 1], neck: [1, 1], el_n: [0, 1], hand_n: [0, 2], el_f: [0, 1], hand_f: [0, 2]}
+masks:
+  head:
+    hurt: [[15, 8], [40, 8], [40, 22], [30, 24], [22, 22], [15, 16]]
+  torso:
+    idle: [[17, 20], [33, 19], [33, 68], [17, 68]]
+    attack: [[8, 20], [41, 20], [41, 26], [30, 40], [16, 52], [8, 52]]
+    hurt: [[12, 30], [22, 22], [40, 22], [44, 30], [46, 44], [36, 48], [22, 63], [12, 63]]
+  farm_n:
+    idle: [[48, 18], [62, 18], [62, 42], [48, 42]]
+    attack: [[56, 19], [70, 19], [70, 48], [56, 48]]
+    hurt: [[46, 12], [66, 12], [66, 30], [46, 30]]
+  farm_f:
+    idle: [[42, 18], [48, 18], [48, 32], [42, 32]]
+    attack: [[33, 38], [56, 38], [56, 47], [33, 47]]
+    hurt: [[39, 12], [46, 12], [46, 26], [39, 26]]
+  ft_n:
+    idle: [[41, 69], [57, 69], [57, 78], [41, 78]]
+    attack: [[42, 67], [55, 67], [55, 75], [42, 75]]
+    hurt: [[44, 67], [55, 67], [55, 74], [44, 74]]
+  ft_f:
+    idle: [[25, 69], [37, 69], [37, 78], [25, 78]]
+    attack: [[10, 69], [23, 69], [23, 78], [10, 78]]
+    hurt: [[28, 69], [40, 69], [40, 78], [28, 78]]
+holds: []
+paint:                         # 1 px crack between the shifted thighs, outline ink
+  - {frame: atk_mid, xy: [[41, 53]], rgb: [6, 4, 10]}
