@@ -1,0 +1,27 @@
+# Air Elemental (pass R, floating): a whirlwind column with a stern face, two wind arms, rocks in the swirl.
+# body: floating (rig_floating.py), judged by the float band. Light, swirling character, unlike its water sibling:
+# the wind-up lifts and leans back (dy -2 / -4) instead of sinking, the follow lifts past the key. The dark diagonal
+# stroke at the upper left of the hurt rim is in the approved hurt key.
+sprite: air_elemental
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [65, 75], base: [66, 121], neck: [75, 72], crown: [70, 36],
+           sh_n: [83, 75], el_n: [95, 80], hand_n: [92, 93], sh_f: [48, 75], el_f: [33, 80], hand_f: [42, 95]}
+  attack: {core: [65, 72], base: [62, 121], neck: [76, 70], crown: [72, 30],
+           sh_n: [82, 72], el_n: [95, 68], hand_n: [106, 67], sh_f: [44, 70], el_f: [30, 68], hand_f: [37, 82]}
+  hurt:   {core: [67, 75], base: [72, 120], neck: [75, 72], crown: [65, 28],
+           sh_n: [85, 72], el_n: [98, 62], hand_n: [100, 47], sh_f: [48, 62], el_f: [35, 52], hand_f: [22, 55]}
+frames:
+  atk_wind1: {moves: [], t: 0.0, dx: -3, dy: -2, tweaks: {crown: [-1, 0], sh_n: [-3, -1], el_n: [-3, -1], hand_n: [-3, -1]}}
+  atk_wind2: {moves: [], t: 0.0, dx: -6, dy: -4, tweaks: {crown: [-1, 0], sh_n: [-3, -1], el_n: [-3, -1], hand_n: [-3, -1]}}
+  atk_mid: {t: 0.20, dy: -2}
+  atk_follow: {moves: [], t: 1.0, dx: 3, dy: -1}
+  atk_recover: {t: 0.25, dy: -1}
+  hurt_in1: {moves: [crown, neck], dx: -4, dy: -2}
+  hurt_in2: {moves: [crown, neck], dx: -2}
+  daze: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [-1, -1], neck: [-2, -2], hand_n: [0, 2], el_n: [0, 1], hand_f: [0, 2], el_f: [0, 1]}}
+  daze_b: {moves: [], t: 0.0, dy: 4, tweaks: {crown: [-1, -1], neck: [-2, -2], hand_n: [0, 3], el_n: [0, 2], hand_f: [0, 3], el_f: [0, 2]}}
+holds: []

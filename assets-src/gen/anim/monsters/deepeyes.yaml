@@ -1,0 +1,24 @@
+# Deepeyes (pass R, floating): a dark slate-blue abyssal eye with six dangling glowing tentacles. body: floating
+# (rig_floating.py), judged by the float band. The ball is rigid (turning either half tears the iris), so every
+# in-between moves the whole sprite (moves: []); the tentacles change only at the key switches. Nit (approved art):
+# the hurt's curled tentacles tangle, so the count reads 5-6.
+sprite: deepeyes
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [64, 60], base: [64, 120], neck: [64, 45], crown: [64, 36]}
+  attack: {core: [77, 60], base: [50, 116], neck: [77, 45], crown: [77, 36]}
+  hurt:   {core: [66, 63], base: [64, 115], neck: [66, 50], crown: [66, 43]}
+frames:
+  atk_wind1: {moves: [], t: 0.0, dx: -4, dy: 1}
+  atk_wind2: {moves: [], t: 0.0, dx: -6, dy: 2}
+  atk_mid: {moves: [], t: 0.0, dx: -8}
+  atk_follow: {moves: [], t: 1.0, dx: -2}
+  atk_recover: {moves: [], t: 0.0, dx: 5}
+  hurt_in1: {moves: [], t: 0.0, dx: -5, dy: -1}
+  hurt_in2: {moves: [], t: 0.0, dx: -4, dy: 1}
+  daze: {moves: [], t: 0.0, dy: 3, tweaks: {crown: [-2, -1], neck: [-2, -1]}}
+  daze_b: {moves: [], t: 0.0, dy: 4, tweaks: {crown: [-2, -1], neck: [-2, -1]}}
+holds: []

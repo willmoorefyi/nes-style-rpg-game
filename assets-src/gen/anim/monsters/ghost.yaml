@@ -1,0 +1,24 @@
+# Ghost (pass R, floating): a small white sheet ghost with a skull face and two clawed hands. body: floating
+# (rig_floating.py), judged by the float band. The hands are drawn into the sheet (no arm joints): the sheet is
+# `body`, the head the `head`. Nits (approved art): a detached 40 px pale stroke beside the hurt hem (2 pieces in
+# hurt and hurt_in2) and 1 px headroom; the 80 px cell leaves daze_b 1 px above the bottom border.
+sprite: ghost
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [55, 40], base: [55, 76], neck: [57, 28], crown: [56, 4]}
+  attack: {core: [50, 45], base: [10, 55], neck: [64, 30], crown: [66, 6]}
+  hurt:   {core: [48, 40], base: [50, 76], neck: [44, 26], crown: [44, 3]}
+frames:
+  atk_wind1: {moves: [], t: 0.0, dx: -3, dy: 1}
+  atk_wind2: {moves: [], t: 0.0, dx: -6, dy: 1}
+  atk_mid: {t: 0.20, dx: -4, tweaks: {base: [-2, -5]}}
+  atk_follow: {t: 0.85, moves: [crown, neck, base], tweaks: {base: [0, -7]}}
+  atk_recover: {moves: [], t: 0.0, dx: 1, dy: -1}
+  hurt_in1: {moves: [crown, neck], dx: -4}
+  hurt_in2: {moves: [], t: 0.0, dx: 2}
+  daze: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [0, 1], neck: [-1, 0]}}
+  daze_b: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [0, 3], neck: [-1, 1]}}
+holds: []
