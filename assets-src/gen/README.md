@@ -102,6 +102,18 @@ beast templates (T5a) are in `rig_templates.py`, whose docstring is the referenc
   then a rig frame at t 0 from idle with those joints moved (wing flutter, robe sway), followed by the body's usual
   idle_b op (the bob, the floating sink or the blob sag). Without tweaks idle_b is byte-identical to before.
 
+### FW-5 template options (`rig.py`: `OPT_PARENT`, `OPT_PARTS`, `Rig._fw5`; selftest `selftest_fw5.py`)
+
+Optional template parts are added only when a rig marks every joint of the part in at least one keyframe (or names
+the part under `parts`), so rigs that mark none are byte-identical; `Rig.optional` lists the ones in use.
+
+| Option | Joints (parent) | Parts, z | Recipe effect | Prototype |
+|---|---|---|---|---|
+| biped wings | `wsh_<s>` (chest) → `wel_<s>` → `wtip_<s>`, s = n, f | `uwing_<s>` (r 6), `fwing_<s>` (r 8), behind everything | the wing joints join the wind / follow / cast sets | `gargoyle`, `chaos` |
+| biped arm pairs | `sh_<s>` (chest) → `el_<s>` → `hand_<s>`, s = n2 f2 n3 f3 | `uarm_<s>`, `farm_<s>`; near pairs before `uarm_n`, far pairs before `uarm_f` | `rig.arms` gains them (cast set); `attack_hand` / `half_hand` / `cast_hand` take lists | `chaos` |
+| quadruped heads | `neck<i>` (chest) → `head<i>` → `snout<i>` (+ `jaw<i>` as a rig part), i = 2..5 | `neck<i>` chain `[chest, neck<i>, head<i>]`, `head<i>` rigid; before `neck` | symbolic `head` = every head; every recipe set moves them; heads outside `lead_heads` (default `[1]`) lag at half t in `atk_wind1/2` (`monster_anim.LAG_FRAMES`) | `fire_hydra` (green), `hydra` (open) |
+| `preset: mechanical` | - | parts must be `rigid` / `torso` / `prop` / `fx`; sampler `nearest` in the rig and every frame (else `ValueError`) | rotation cap 15° on every part (`anim_rules.rotation_cap(rots, cap)`, frame key `rot_cap`) | `warmech` (open) |
+
 ### Roster templates (docs/ROSTER_PLAN.md 5.2; each module's docstring is the joint reference)
 
 | Body (module) | Root / contacts (pinned every frame) | Joints and default parts | Recipe notes |

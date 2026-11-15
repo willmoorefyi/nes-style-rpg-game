@@ -18,9 +18,12 @@ SEQUENCES = {seq: tuple(dict.fromkeys(n for n in names if n not in KEYFRAMES)) f
 
 
 # 10: rotation cap, near-keyframe rule, whole pixels
-def rotation_cap(rots: dict[str, tuple[float, str]]) -> list[str]:
-    bad = [f"{p} {d:.1f} deg > {ROT_CAP.get('torso' if p == 'torso' else k, 30.0)}" for p, (d, k) in sorted(rots.items())
-           if abs(d) > ROT_CAP.get("torso" if p == "torso" else k, 30.0)]
+def rotation_cap(rots: dict[str, tuple[float, str]], cap: float | None = None) -> list[str]:
+    """`cap` (FW-5 preset mechanical: 15) lowers every kind's cap to at most that."""
+    def lim(p: str, k: str) -> float:
+        c = ROT_CAP.get("torso" if p == "torso" else k, 30.0)
+        return min(c, cap) if cap else c
+    bad = [f"{p} {d:.1f} deg > {lim(p, k)}" for p, (d, k) in sorted(rots.items()) if abs(d) > lim(p, k)]
     return [f"rotation cap: {', '.join(bad)}"] if bad else []
 
 

@@ -35,6 +35,8 @@ def frame_options(rig, name: str, over: dict) -> tuple[dict[str, float], str]:
     """({part: scale}, sampler) of one frame; a bad value raises ValueError naming the rig and frame."""
     who = f"rig {rig.cfg.get('sprite')} frame {name}"
     sampler = over.get("sampler", rig.sampler)
+    if getattr(rig, "preset", None) == "mechanical" and sampler != "nearest":    # FW-5: the preset is nearest only
+        raise ValueError(f"{who}: preset mechanical takes sampler nearest, not {sampler!r}")
     if sampler not in SAMPLERS:
         raise ValueError(f"{who}: sampler {sampler!r} is not one of {SAMPLERS}")
     scales = {}

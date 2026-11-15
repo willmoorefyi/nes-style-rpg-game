@@ -167,6 +167,29 @@ Roster templates (FW-2/4/6; full API in `gen/README.md` "Roster templates" and e
   bridge (scorpion, black_widow): regenerate a ground-level hurt or escalate.
 - **Any body:** `frames.idle_b.tweaks` (≤ 1 px per component) for wing flutter or robe sway.
 
+FW-5 options (`rig.py` `OPT_PARTS` / `_fw5`; a part exists only when the rig marks all its joints in some keyframe,
+so a rig that marks none is byte-identical):
+
+- **Biped wings** (gargoyle, horned devil, chaos): `wsh_<s> → wel_<s> → wtip_<s>` from `chest` (s = n, f) give
+  `uwing_<s>`, `fwing_<s>`, drawn behind the whole body (mask them per keyframe). The wing joints join the wind,
+  follow and cast sets, so they interpolate toward the attack / cast wings; `hurt_in1` folds them with `moves` and
+  tweaks (gargoyle: `moves: [crown, chest, wsh_f, wel_f, wtip_f]`).
+- **Extra biped arm pairs** (chaos): `sh_/el_/hand_{n2,f2,n3,f3}` give `uarm_*`, `farm_*`; near pairs are drawn in
+  front of the torso before the `n` arm, far pairs behind. Every marked arm joins the cast set; `attack_hand: [n, n2]`,
+  `half_hand: [f, f2]`, `cast_hand: [n, f]` take lists, as on the naga.
+- **Multi-head quadruped** (hydra, fire_hydra; chimera, rhyos, hellhound): `neck<i> → head<i> → snout<i>` (+ `jaw<i>`
+  as a rig part), i = 2..5, give a `neck<i>` chain `[chest, neck<i>, head<i>]` and a `head<i>` rigid part, drawn
+  behind head 1. The symbolic `head` (the daze slump) becomes every head. Heads not in `lead_heads` (default `[1]`,
+  the template head) lag at half the recipe's t in `atk_wind1` / `atk_wind2` only (`monster_anim.LAG_FRAMES`); they
+  strike and recoil with the lead. Every recipe set moves every head.
+- **`preset: mechanical`** (warmech; soldier, iron golem): only `rigid` / `torso` / `prop` / `fx` parts and sampler
+  `nearest` (rig and every frame; otherwise an error naming the rig), and every bone turns at most 15° (check 10).
+  Translation-first in-betweens (`moves: []` with `dx` / `dy`).
+- **Recipe notes from the prototypes.** Intertwined necks tear when they turn: translate heads and necks by tweaks
+  (`moves: []`; fire_hydra). A head that swaps sides between the keys (hydra) or a 40 px stride (warmech) cannot be
+  bridged under the continuity and 15° rules: regenerate the key or escalate. Small pockets and 1 px cracks between
+  big rigid parts: `paint` (chaos, fire_hydra).
+
 ### 2.3 Rig file `assets-src/gen/anim/monsters/<sprite>.yaml`
 
 One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. The keys the code reads:

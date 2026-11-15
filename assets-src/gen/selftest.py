@@ -431,6 +431,9 @@ def test_monster_anim() -> None:
     SRo.run_roster(check)
     print("roster pass R prompt fields (FW-9: idle_negative, body, base; every approved key unchanged)")
     SRo.run_prompts(check)
+    print("FW-5 templates (biped wings, extra arm pairs, multi-head necks, preset mechanical)")
+    from gen import selftest_fw5 as SF5
+    SF5.run_fw5(check)
     print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
