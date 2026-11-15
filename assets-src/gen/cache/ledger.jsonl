@@ -357,3 +357,5 @@
 {"event": "result", "key": "02c12a480c56fbfb27de72fe", "ok": true}
 {"event": "attempt", "ts": "2026-11-15T04:51:42", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "evil_eye", "sheet": "monster_large", "seed": 1236, "key": "af20279b977795c051dbbc3c"}
 {"event": "result", "key": "af20279b977795c051dbbc3c", "ok": true}
+{"event": "attempt", "ts": "2026-11-15T04:54:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "gr_imp", "sheet": "monster_small", "seed": 1234, "key": "85f4a9a917e2beb745932cba"}
+{"event": "result", "key": "85f4a9a917e2beb745932cba", "ok": true}

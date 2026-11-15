@@ -633,3 +633,338 @@
   face: the dragon skull with ghost-green glowing eye sockets and broken fangs is readable in every cell
   extra_negative: fire breath, red scales, a rider, horns
   seeds: [1235, 1234, 1236]   # 1234 (ROSTER_LOG R61): the head cut, a rear-up hurt; 1236 (R63): a rear-up hurt
+# ── pass R, batch A (docs/ROSTER_PLAN.md 3.2, records 002-031): regular 3-pose sheets, original designs from the plan's
+# design briefs and the bestiary spec's roles; siblings must differ in silhouette, prop and posture (plan 3.3).
+- id: gr_imp
+  # "Goblin Guard" (002, was a palette swap of the goblin): tougher, armoured, upright, shield and spear
+  size: small
+  body: biped
+  prompt: >-
+    stocky red-brown goblin soldier standing upright with a broad chest, a dented iron pot helm with a nose guard,
+    patched hide armour with a leather shoulder pad, a small round wooden shield with an iron rim on the arm on the left
+    side of the image and a short iron-tipped spear held upright in the hand on the right side of the image, small
+    fierce yellow eyes, thick bare legs and feet
+  attack: thrusting the spear forward at the heroes behind the raised shield, one foot stepping forward
+  hurt: knocked back behind the shield, the pot helm tipped over the eyes, the spear tilting back
+  face: its red-brown goblin face under the helm brim (small yellow eyes, a hooked nose, a snarl) is readable
+  extra_negative: a dagger, a vest, a sword, a bow, a cape
+  seeds: [1234]
+- id: crazy_horse
+  # "Crazy Horse" (004): a wild horse with two hits
+  size: large
+  body: quadruped
+  prompt: >-
+    a wild-eyed piebald horse, white with large dark brown patches, seen from the side, a matted tangled black mane and
+    tail, flared nostrils, rolling white-rimmed eyes, a broken leather bridle with a snapped rein trailing from its
+    muzzle, muscular legs with dark hooves
+  attack: >-
+    a wild bucking strike toward the heroes: the forelegs lifted only a little off the ground and kicking forward, the
+    head thrust forward with the teeth bared, the mane and the broken rein flying; the hind hooves on the ground; no
+    rearing up tall
+  hurt: knocked back, the head tossed up and back, the eyes rolling, one foreleg buckling, the mane flying
+  face: the horse's head with the wild white-rimmed eye and flared nostrils is readable
+  extra_negative: a rider, a saddle, a horn, wings
+  seeds: [1234]
+- id: black_widow
+  # "Black Widow" (006): a basic spider (no poison in NES)
+  size: small
+  body: arthropod
+  prompt: >-
+    a glossy black spider seen from the side in a low wide stance, a big round shiny black abdomen with a bright red
+    hourglass mark on its side, a small head with a cluster of tiny red eyes and two short fangs, exactly eight long
+    thin jointed black legs, the two front legs raised
+  attack: lunging forward low toward the heroes, the two front legs reaching out and the fangs bared
+  hurt: knocked back, the body tipped up, the legs curling in, the front legs thrown up
+  face: a small cluster of tiny red eyes and the two fangs are readable
+  extra_negative: hair, fur, a web, a human face, more than eight legs
+  seeds: [1234]
+- id: gigas_worm
+  # "Gigas Worm" (007): a large crawling worm, weak to fire
+  size: large
+  body: serpent
+  prompt: >-
+    a huge pink-grey segmented earthworm reared up in an S curve, thick glistening ringed segments with a paler band
+    near the front, a round open maw ringed with rows of small hooked teeth at the top end, the tail end coiled on the
+    ground
+  attack: the front end lunging down toward the heroes with the toothed maw wide open, the body stretching
+  hurt: the front end recoiling back and up, the maw clenched shut, the body curling
+  face: no eyes; the round toothed maw is the readable feature
+  extra_negative: eyes, a face, legs, spikes, sand, a mound
+  seeds: [1234]
+- id: gr_wolf
+  # "Warg Wolf" (008, was a palette swap of the wolf): bulkier, black, maned, scarred
+  size: small
+  body: quadruped
+  prompt: >-
+    a bulky heavy black warg on four legs seen from the side, much broader and heavier than a wolf, a thick bristling
+    mane of coarse fur over the shoulders and neck, a scarred muzzle with a heavy jaw and big yellowed fangs, small red
+    eyes, thick legs with big paws, a short bushy tail held low
+  attack: lunging forward low toward the heroes with the heavy jaws wide open, the mane bristling, all four paws pushing
+  hurt: knocked back, the head turned away with a yelp, the body hunched, the tail tucked
+  face: its scarred muzzle with red eyes and heavy fangs is readable
+  extra_negative: grey fur, white fur, a collar, a rider
+  seeds: [1234]
+- id: werewolf
+  # "Werewolf" (009): a humanoid wolf whose bite poisons
+  size: small
+  body: biped
+  prompt: >-
+    an upright brown wolf-man standing on two digitigrade wolf legs, a shaggy brown fur body with a pale chest, a wolf
+    head with pointed ears and drooling fangs, long arms ending in hooked black claws, torn grey peasant trousers
+    hanging in rags below the knees
+  attack: lunging forward and slashing with both clawed hands at the heroes, the jaws snapping
+  hurt: knocked back, the head thrown back with a howl, the claws flung up
+  face: its wolf face with yellow eyes and drooling fangs is readable
+  extra_negative: four legs, a shirt, a weapon, a tail held high
+  seeds: [1234]
+- id: zombie
+  # "Zombie" (010): a weak walking corpse
+  size: small
+  body: biped
+  prompt: >-
+    a shambling grey-green corpse standing upright in rotten brown peasant rags, a torn shirt and frayed trousers, bare
+    feet, one arm hanging limp at its side, the other arm reaching forward, a slack open jaw, sunken white eyes, patchy
+    thin hair
+  attack: lurching forward and grabbing at the heroes with the reaching arm, the jaw gaping, the limp arm swinging
+  hurt: jolted back, the head lolling to one side, the limp arm flopping, the body sagging
+  face: its rotting face with sunken white eyes and a slack open jaw is readable
+  extra_negative: bandages, a shroud, claws, a weapon, a crouch
+  seeds: [1234]
+- id: ghoul
+  # "Ghoul" (011): three hits and paralysis; crouched and clawed (distinct from the zombie)
+  size: small
+  body: biped
+  prompt: >-
+    a crouched hairless grey ghoul low on bent legs, a thin wiry body with visible ribs, long arms reaching the ground
+    with long black claws, hollow cheeks, a lipless mouth of sharp teeth, small glowing yellow eyes, pointed ears, a
+    tattered dark loincloth
+  attack: springing forward low at the heroes, both clawed hands raking out, the teeth bared
+  hurt: knocked back on its haunches, the claws thrown up in front of its face, hissing
+  face: its gaunt grey face with glowing yellow eyes and sharp teeth is readable
+  extra_negative: clothes, a shirt, a shroud, a weapon, hair, standing upright
+  seeds: [1234]
+- id: cobra
+  # "Cobra" (013): a small venomous snake
+  size: small
+  body: serpent
+  prompt: >-
+    an olive-green cobra coiled on the ground with its front third raised upright, a wide spread hood with dark bands
+    and a pale eye-like marking, a cream belly with scale rings, small golden eyes and bared white fangs, a flicking
+    forked tongue
+  attack: striking forward and down at the heroes with the fangs bared and the hood flared wide
+  hurt: recoiling back and up, the hood folding, the mouth snapping shut, the coils tightening
+  face: its golden eyes and bared fangs on the hooded head are readable
+  extra_negative: legs, a second head, a rattle, a human face
+  seeds: [1234]
+- id: ogre_chief
+  # "Ogre Chief" (015): a better-armoured ogre leader (distinct from the ogre: iron plate, horned helm, cleaver)
+  size: large
+  body: biped
+  prompt: >-
+    a grey-skinned ogre warlord, huge and bulky, wearing riveted iron chest and shoulder plates, an iron helm with two
+    curved horns, a belt hung with small skulls over a leather kilt, iron-shod boots, holding a huge two-handed
+    cleaver with a notched blade, a jutting underbite with two tusks, small angry eyes
+  attack: swinging the cleaver down in a great overhead chop at the heroes, stepping forward, the body leaning in
+  hurt: knocked back, staggering, the helm knocked askew, the cleaver dragged low
+  face: its grey ogre face with small angry eyes and tusks under the horned helm is readable
+  extra_negative: a club, a loincloth only, tan skin, a shield
+  seeds: [1234]
+- id: lizard
+  # "Lizard" (016): solid hide, frequent critical hits
+  size: small
+  body: quadruped
+  prompt: >-
+    a stocky green iguana-like lizard in a low sprawl seen from the side, rough pebbled green scales with darker bands,
+    a spiky dorsal crest along its back, a hanging throat dewlap, a blunt head with a golden eye, short strong legs
+    with clawed feet, a long thick tail lying on the ground
+  attack: lunging forward low with the jaws open in a snapping bite at the heroes, the crest raised
+  hurt: knocked back, the head turned away, the body arching, the tail curling
+  face: its blunt lizard head with the golden eye and open jaws is readable
+  extra_negative: wings, a frill, fire, horns, standing upright
+  seeds: [1234]
+- id: sahagin
+  # "Sahagin" (018): a basic fish-man (bare, trident)
+  size: small
+  body: biped
+  prompt: >-
+    a blue-green fish-man standing on two webbed feet, a lean scaly body with a pale belly, a fish head with big round
+    black eyes and a wide mouth of small teeth, a tall spiny fin crest on its head and back, webbed clawed hands holding
+    a bone trident, no armour or clothes
+  attack: lunging forward and stabbing the bone trident at the heroes, the fin crest raised
+  hurt: knocked back, the fin crest flattened, the mouth gaping, the trident tilted back
+  face: its fish face with big round black eyes and a wide mouth is readable
+  extra_negative: armour, a shield, a cape, a crown, a spear, a fish tail instead of legs
+  seeds: [1234]
+- id: sahagin_chief
+  # "Sahagin Chief" (019): coral armour, red crest, barbed spear and shell shield
+  size: small
+  body: biped
+  prompt: >-
+    a stocky teal fish-man warrior in armour of pink and white coral plates over the chest and shoulders, a tall red fin
+    crest on its head, a fish face with gold eyes and a heavy underbite, a round spiral seashell shield on the arm on
+    the left side of the image and a long barbed spear in the hand on the right side of the image, webbed feet
+  attack: thrusting the barbed spear forward at the heroes behind the raised shell shield, stepping forward
+  hurt: knocked back behind the shell shield, the red crest flattened, the spear tilting back
+  face: its fish face with gold eyes and the heavy underbite is readable
+  extra_negative: a trident, a cape, a crown, twin blades, a fish tail instead of legs
+  seeds: [1234]
+- id: buccaneer
+  # "Buccaneer" (020): a roaming sea raider (no tricorn: distinct from the pirate)
+  size: small
+  body: biped
+  prompt: >-
+    a lanky sea raider in a red bandana tied over long black hair, a red-and-white striped shirt with rolled sleeves, a
+    wide leather belt, baggy dark trousers and boots, a scruffy beard and an eye patch, an iron hook in place of the
+    hand on the left side of the image and a short boarding axe in the hand on the right side of the image
+  attack: lunging forward and swinging the boarding axe down at the heroes, the hook raised
+  hurt: knocked back, the bandana slipping, the hook thrown up, the axe swinging low
+  face: his bearded face with an eye patch under the red bandana is readable
+  extra_negative: a tricorn hat, a coat, a cutlass, a sword, a pistol, a parrot
+  seeds: [1234]
+- id: shark
+  # "Shark" (021): a sea predator; a swimmer drawn without water (plan 4.3)
+  size: large
+  floating: true
+  body: swimmer
+  prompt: >-
+    a slim grey shark arched in a curve as if leaping, seen from the side, a pale belly, a tall dorsal fin, a crescent
+    tail fin, small black eyes, the jaws slightly open showing rows of white teeth; no water drawn
+  attack: lunging forward toward the heroes with the jaws gaping wide, the body straightening
+  hurt: arching away from the heroes, the jaws clenched, the tail fin whipping
+  face: its shark head with a small black eye and rows of white teeth is readable
+  extra_negative: water, waves, splashes, scars, legs
+  seeds: [1234]
+- id: bigeyes
+  # "Bigeyes" (022): a fragile aquatic eye that paralyses with a gaze
+  size: small
+  floating: true
+  body: floating
+  motion: >-
+    Keep the frontal view in every cell: the big eye faces the viewer with its iris looking toward the heroes on the
+    right, never turned to a side profile; in the attack the whole body darts forward to the right, level; in the hurt
+    it is knocked back to the left and tilted back by about fifteen degrees; it always hovers, nothing touches the
+    ground; the fins and the tail fin move with the motion.
+  prompt: >-
+    a small floating eyeball creature: a round white eyeball with a big blue iris and a black pupil, red veins, two
+    small translucent blue fish fins on its sides and a short forked blue tail fin behind it; it hovers, nothing
+    touches the ground
+  attack: darting forward toward the heroes, the iris staring wide, the fins swept back
+  hurt: knocked back, the eye squeezed half shut, the fins folding
+  face: the blue iris and pupil are the face; no mouth
+  extra_negative: a mouth, teeth, eyestalks, tentacles, a crown, legs
+  seeds: [1234]
+- id: tarantula
+  # "Tarantula" (023): a venomous spider, stouter and hairy (distinct from the black widow)
+  size: small
+  body: arthropod
+  prompt: >-
+    a big hairy tarantula seen from the side, covered in bristly brown fur with orange bands on the legs, a stout round
+    furry abdomen, a cluster of small black eyes on its head, two large raised curved fangs, exactly eight thick hairy
+    jointed legs planted wide
+  attack: rearing its front end up and lunging toward the heroes with the fangs raised to bite
+  hurt: knocked back, the body tipped back, the legs curling in
+  face: a small cluster of black eyes and the two large fangs are readable
+  extra_negative: a glossy body, an hourglass mark, a web, more than eight legs
+  seeds: [1234]
+- id: ghast
+  # "Ghast" (024): a tougher ghoul-like undead in a shroud, long arms (distinct from the zombie and the ghoul)
+  size: small
+  body: biped
+  prompt: >-
+    a gaunt tall purple-grey undead standing hunched in a rotting pale burial shroud hanging in strips from its
+    shoulders, very long thin arms reaching down past its knees ending in long bony fingers, a skull-like face with
+    stretched skin and glowing green eyes, thin legs
+  attack: lunging forward and reaching both long arms out at the heroes, the shroud strips flying
+  hurt: knocked back, the long arms flung up, the head thrown back, the shroud flapping
+  face: its skull-like face with glowing green eyes is readable
+  extra_negative: a weapon, armour, a hood, a crouch on all fours
+  seeds: [1234]
+- id: scorpion
+  # "Scorpion" (025): poisonous, two hits
+  size: small
+  body: arthropod
+  prompt: >-
+    a sand-yellow scorpion seen from the side, a segmented armoured body, two large raised pincers in front, a long
+    segmented tail arched high over its back ending in a dark curved stinger, a cluster of small dark eyes, exactly
+    eight jointed legs planted wide
+  attack: lunging forward with the pincers snapping and the stinger striking forward over its back toward the heroes
+  hurt: knocked back, the pincers thrown up, the tail curling down
+  face: a small cluster of dark eyes and the pincers are readable
+  extra_negative: red shell, lobster claws, wings, more than eight legs
+  seeds: [1234]
+- id: shadow
+  # "Shadow" (026): an incorporeal undead whose touch blinds
+  size: small
+  floating: true
+  body: floating
+  prompt: >-
+    a drifting pitch-black silhouette of a man from the waist up, no legs, the lower body and the ragged edges
+    dissolving into wisps of black smoke, long thin black arms with clawed fingers, two glowing white eye points in the
+    dark head; it hovers, nothing touches the ground
+  attack: drifting forward and reaching a long clawed black hand out at the heroes, the smoke wisps trailing back
+  hurt: knocked back, the silhouette tearing at the edges, the arms flung up, the wisps scattering
+  face: two white eye points in the black silhouette, nothing else
+  extra_negative: a face, a mouth, clothes, a hood, chains, legs, colours other than black and grey
+  seeds: [1234]
+- id: green_slime
+  # "Green Slime" (027): a slime with near-impenetrable physical defence
+  size: small
+  body: blob
+  prompt: >-
+    a translucent green dome of slime resting on the ground, glossy with light highlights, small bubbles inside it and
+    a half-dissolved white bone floating inside the slime, darker green near the base
+  attack: stretching and surging forward toward the heroes in a tall wave of slime
+  hurt: squashed flat and wide, quivering, the bubbles scattering
+  face: no face, no eyes; the readable detail is the half-dissolved bone inside
+  extra_negative: eyes, a face, a mouth, legs, puddles, drips on the ground
+  seeds: [1234]
+- id: crawler
+  # "Crawler" (028): many legs, eight hit attempts, paralysis
+  size: small
+  body: arthropod
+  prompt: >-
+    a pale yellowish-white segmented carrion grub seen from the side, a long plump body of ten ringed segments, many
+    short stubby legs along its underside, a ring of short wriggling pink feelers around a round mouth at the front end
+  attack: lunging its front end forward and up at the heroes, the feelers spread wide around the mouth
+  hurt: knocked back, the front end curling down and under, the feelers clenched
+  face: no eyes; a ring of short feelers at the front end is readable
+  extra_negative: eyes, a face, wings, pincers, a stinger, long legs
+  seeds: [1234]
+- id: gray_ooze
+  # "Gray Ooze" (029): amorphous, weak to lightning (distinct from the green slime: a flat puddle with pseudopods)
+  size: small
+  body: blob
+  prompt: >-
+    a low wide spreading grey puddle-blob resting on the ground, a dull mottled grey surface with a slight sheen, two
+    thick lumpy pseudopods raised up from its body like arms
+  attack: lashing both pseudopods forward toward the heroes, the body stretching toward them
+  hurt: the pseudopods pulled back down, the whole body flattened and rippling
+  face: no face, no eyes; the readable detail is the two raised pseudopods
+  extra_negative: eyes, a face, a mouth, bones inside, green colour, a dome shape
+  seeds: [1234]
+- id: gargoyle
+  # "Gargoyle" (030): winged stone creature, four weak hits, earth protection
+  size: small
+  body: biped
+  prompt: >-
+    a crouching grey stone gargoyle on two clawed feet, cracked stone skin with chipped edges, two bat wings of stone
+    half raised behind the shoulders, two short curved horns, a snarling face with a wide fanged mouth and glowing
+    orange eyes, long arms with clawed hands, a short pointed tail
+  attack: springing forward at the heroes with both clawed hands raking, the wings spread wide
+  hurt: knocked back, the wings folding, stone chips flying from its chest, the arms thrown up
+  face: its snarling stone face with glowing orange eyes and fangs is readable
+  extra_negative: red skin, a trident, a pedestal, feathers, a weapon
+  seeds: [1234]
+- id: bloodbones
+  # "Bloodbones" (031): a heavily strengthened skeleton (distinct from the skeleton: larger, breastplate, two blades)
+  size: small
+  body: biped
+  prompt: >-
+    a large heavy-boned red-stained skeleton standing upright, dark red-brown blood stains on its bones, a rusted iron
+    breastplate over the ribs, a horned skull with burning red eye lights, holding a notched curved blade in each hand,
+    one in the hand on the left side of the image and one in the hand on the right side of the image
+  attack: lunging forward and slashing both notched blades across at the heroes
+  hurt: knocked back, the horned skull thrown back, both blades flung out to the sides
+  face: its horned skull with burning red eye lights is readable
+  extra_negative: a shield, a loincloth, yellow bones, a single sword, a helmet
+  seeds: [1234]
