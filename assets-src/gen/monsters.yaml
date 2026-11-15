@@ -2217,3 +2217,415 @@
   face: its blue-scaled face with fin ears and gold eyes is readable
   extra_negative: legs, a second trident, a shield, snake hair, a hood headdress, green scales, wings
   seeds: [1234]
+# ── pass R, batch D (docs/ROSTER_PLAN.md 3.2, records 103-123; bosses warmech and death_eye are G2). Batch B/C lessons
+# built in from the start (ROSTER_LOG batch B/C status): the whole figure in the middle of its own cell with empty
+# space on both sides (the cutter splits the raw at fixed thirds), props held upright or close to the body, reaching
+# parts with bent elbows / necks, "no leap, no rearing up" for four-legged bodies, explicit anatomy counts, per-sprite
+# `motion:` lines (no cape, smear or motion arc unless the design has one), floating figures lowest in the idle cell,
+# no bright violet, pink or magenta (keyed out with the background, R222).
+- id: tyrannosaur
+  # "Tyrannosaur" (103): a massive two-legged predator (distinct from the allosaurus: red-brown, huge head, tiny arms)
+  size: large
+  body: bird
+  motion: >-
+    Use a strong diagonal line of action through the whole body: lower the huge head and open the jaws toward the
+    heroes with the neck bent so the head stays just in front of the front foot, counter-swing the tail kept curved
+    up close behind the hips, so every part stays well inside its own cell. Both feet stay on the ground.
+  prompt: >-
+    a massive red-brown tyrannosaur standing on two thick legs seen from the side, a huge heavy head with a deep jaw
+    full of big teeth and a small orange eye, two tiny two-fingered arms, a heavy body held level, a thick tail curved
+    up behind the hips, rough red-brown scales with a paler tan throat and belly; the whole dinosaur, tail tip to snout,
+    sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    snapping the huge head down low with the jaws wide open at the heroes, the head just above and in front of its
+    front foot (not stretched out to the cell edge), both feet on the ground, the whole tyrannosaur well inside the
+    middle cell
+  hurt: >-
+    knocked back a step, still seen from the side facing right with the body level, the head pulled back a little,
+    the eye squeezed shut and the jaws shut, both feet on the ground (not standing upright, not turned around)
+  face: its huge head with a small orange eye and big teeth is readable
+  extra_negative: feathers, wings, four legs, olive green colour, brow horns, stripes, a rider, standing upright, a front view
+  seeds: [1234]
+- id: black_knight
+  # "Black Knight" (104): plain black plate, closed helm, a two-handed sword (distinct from death knight, dark fighter)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so the sword stays well inside its own cell. Draw only the parts named in the
+    description, the same in every cell: no cape, cloak, tabard or extra cloth, and no slash trail, smear or motion
+    lines.
+  prompt: >-
+    a knight in plain smooth black plate armour with dull grey edges, a closed black great helm with one narrow
+    visor slit, no crest or plume, holding one long two-handed sword with both hands; in the idle cell the sword is
+    held upright in front of the body, its point well below the top of the grey box; centred in its own cell with
+    empty space on both sides
+  attack: >-
+    stepping forward toward the heroes at the end of a downward cut: the sword in both hands, its blade angled down in
+    front of him with the point at knee height just ahead of his front foot, the whole sword well inside the middle
+    cell (not raised overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, staggering, the helm tipped back, the sword held upright across the chest in both hands
+  face: a closed black great helm with a narrow visor slit
+  extra_negative: a cape, a cloak, a shield, spikes, a skull, a plume, horns, gold trim, a second sword, a face
+  seeds: [1234]
+- id: chimera
+  # "Chimera" (105): lion body with goat and dragon heads, two bat wings, a snake tail (distinct from rhyos, manticore)
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the heads toward the heroes with the necks bent so every head stays well inside
+    its own cell; the wings and the snake tail move with the motion, kept close to the body.
+  prompt: >-
+    a chimera on four legs seen from the side: a tawny lion body with a golden mane, exactly three heads, the lion
+    head in front, a horned goat head rising from the middle of the back, and a green scaly dragon head on a short
+    neck from the shoulder, each head clearly apart; exactly two leathery bat wings half raised, a live green snake for
+    a tail curled up behind the hips with its head raised; the whole creature, tail to snout, sits in the middle of its
+    own cell with empty space on both sides
+  attack: >-
+    lunging forward low, all three heads snapping toward the heroes with the jaws open, the heads above and just in
+    front of its front feet, all four feet on the ground, the whole chimera well inside the middle cell
+  hurt: >-
+    knocked back, all four feet on the ground, the three heads recoiling, the wings flared, the snake tail coiled
+  face: the lion face with amber eyes is readable, and the goat and dragon heads are clearly visible
+  extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up
+  seeds: [1234]
+- id: guardian
+  # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the body but keep all four legs on the ground and the body low (no
+    leap, no rearing up): thrust the two spear arms toward the heroes with the joints bent, so the spear tips stay
+    well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks, steam,
+    smear or motion lines.
+  prompt: >-
+    a four-legged bronze automaton sentinel seen from the side, a squat round bronze body of riveted plates on four
+    jointed metal legs with flat feet, a small domed head with one round glowing red lens eye, two jointed arms on
+    the front of the body each ending in a short spear blade, held pointing down in front of it close to the body;
+    weathered bronze with green patina spots; the whole machine sits in the middle of its own cell with empty space on
+    both sides
+  attack: >-
+    leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
+    glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
+  hurt: >-
+    knocked back, the body tilted back on its four legs, the spear arms pulled up, the lens flickering, all four feet
+    on the ground
+  face: one round glowing red lens eye in the domed head
+  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs
+  seeds: [1234]
+- id: blue_dragon
+  # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the head toward the heroes with the neck bent so the head stays well inside its
+    own cell; the long tail stays curled close behind the hips.
+  prompt: >-
+    a long sleek blue dragon on four short legs seen from the side, no wings, a long low body of deep blue scales with
+    a pale blue belly, a glowing yellow crest of small fins along the spine, a narrow head with two branching horns
+    shaped like forked lightning, bright yellow eyes, a long tail curled up close behind the hips; the whole dragon,
+    tail tip to snout, sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    lunging the head forward and down with the jaws open toward the heroes, the head above and just in front of its
+    front feet, the crest glowing brighter, all four feet on the ground, the whole dragon well inside the middle cell
+  hurt: >-
+    knocked back, all four feet on the ground, the neck pulled back, the eyes shut, the tail coiled tight
+  face: its narrow blue head with yellow eyes and forked horns is readable
+  extra_negative: wings, red scales, green scales, white scales, lightning bolts, breath, sparks, rearing up, a rider
+  seeds: [1234]
+- id: green_dragon
+  # "Green Dragon" (108): a heavy green dragon with toxic throat sacs and a bony frill
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the head toward the heroes with the short neck bent so the head stays well inside
+    its own cell; the wings stay folded close and the tail stays curled behind the hips.
+  prompt: >-
+    a heavy bulky green dragon on four thick legs seen from the side, a short thick neck, a broad head with a bony
+    frill of spikes around the back of the skull, swollen yellow-green poison sacs under the throat, two small folded
+    leathery wings on the back (exactly two), dark green scales with a pale yellow belly, a thick tail curled behind the
+    hips; the whole dragon sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    lunging the broad head forward and down with the jaws open toward the heroes, the throat sacs swollen, the head
+    above and just in front of its front feet, all four feet on the ground, the whole dragon well inside the middle
+    cell; no breath, gas or cloud
+  hurt: >-
+    knocked back, all four feet on the ground, the head pulled back and the frill flattened, the eyes shut
+  face: its broad green head with a bony frill and yellow eyes is readable
+  extra_negative: blue scales, red scales, a long thin neck, large spread wings, gas clouds, breath, rearing up, a rider
+  seeds: [1234]
+- id: stone_golem
+  # "Stone Golem" (109): carved grey stone blocks with runes and a lintel head (distinct from clay and iron golems)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the stone fists with the elbows bent, so every reaching part stays well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no cloth, no flying rocks, dust, smear or motion
+    lines.
+  prompt: >-
+    a giant built of square carved grey stone blocks fitted together, glowing pale blue runes cut into the chest and
+    arms, thick block arms with square stone fists, short block legs, the head a flat stone lintel beam with two
+    glowing blue rune eyes cut under it; drawn compact with the arms close to the body, tall and filling the box,
+    centred in its own cell with empty space on both sides
+  attack: >-
+    stepping forward and smashing one stone fist down onto the ground just in front of its front foot, the elbow
+    bent, the fist well inside the middle cell (not reaching the cell edge)
+  hurt: >-
+    knocked back, leaning away from the heroes, both block arms raised in front of the chest, a crack across one block
+  face: a flat stone lintel head with two glowing blue rune eyes
+  extra_negative: a human face, clay, metal, rivets, moss, a weapon, flying rocks, a mound under it
+  seeds: [1234]
+- id: air_elemental
+  # "Air Elemental" (110): a whirlwind column with a stern face and debris caught in it
+  size: large
+  floating: true
+  body: floating
+  motion: >-
+    Keep the figure upright and level in every cell. The idle cell shows it at its lowest; in the attack and the hurt
+    it rises a little, so its lowest point is clearly higher than in the idle cell, with more empty space below it: in
+    the attack it leans its top and wind arms toward the heroes; in the hurt it is knocked back up and to the left and
+    tilted back by about fifteen degrees; it always hovers, nothing touches the ground; the swirl moves with the
+    motion, every streak attached to the body.
+  prompt: >-
+    a living whirlwind: a tall spinning column of pale grey-white and pale teal wind bands with crisp dark outlines,
+    wider at the top and narrowing to a twisting point below, two arms of swirling wind, a stern face formed from the
+    wind bands near the top (two hollow eyes and a frowning mouth), a few small brown rocks and leaves caught inside
+    the swirl and drawn within the wind, none flying loose; it hovers, nothing touches the ground; centred in its own
+    cell with empty space on both sides
+  attack: >-
+    the column leaning toward the heroes, both wind arms reaching out with the elbows bent so they stay well inside
+    the middle cell, the swirl spinning tighter
+  hurt: >-
+    knocked back, the column bent and fraying at the top, the arms thrown up, the same pale grey-white and teal colours
+    as in the idle cell
+  face: a stern face formed from the wind itself (two hollow eyes and a frowning mouth), no skin
+  extra_negative: skin, legs, a body, water, fire, separate rocks flying, loose streaks, lightning, a ground cloud, dust
+  seeds: [1234]
+- id: spirit_naga
+  # "Spirit Naga" (111): a naga sorceress with a cobra-hood headdress and a jewelled staff (large)
+  size: large
+  body: naga
+  motion: >-
+    Lean and twist the upper body above the coils along a clear diagonal, bend the elbows and keep the staff upright
+    and close to the body, so every part stays well inside its own cell; tighten or loosen the coils; the tail tip
+    stays on the ground beside the coils. Draw only the parts named in the description: no cape, no spell effects,
+    smear or motion lines.
+  prompt: >-
+    a naga sorceress: a slender humanoid upper body with dark plum-purple scales and a pale gold belly, gold armbands
+    and a jewelled gold collar, a tall cobra-hood headdress of gold and dark plum framing her stern face with green
+    eyes, two arms, holding one tall gold staff topped with a green jewel upright in the hand on the right side of the
+    image, no legs: below the waist a long dark plum-purple serpent tail coiled on the ground; centred in its own cell
+    with empty space on both sides, the staff top well below the top of the grey box
+  attack: >-
+    leaning forward over the coils toward the heroes, the free hand thrust forward with the fingers spread and the
+    elbow bent, the staff held upright in the same hand as in the idle cell, the green jewel glowing, both hands well
+    inside the middle cell
+  hurt: >-
+    knocked back over the coils, the head tilted back, the free hand flung up, the staff upright in the same hand
+  face: her stern face with green eyes under the cobra-hood headdress is readable
+  extra_negative: legs, a trident, a sword, snake hair, fins, wings, blue scales, green scales, bright violet, pink, spell effects
+  seeds: [1234]
+- id: death_knight
+  # "Death Knight" (112): a skeletal knight in spiked dark plate with a tattered cloak and a runed black sword
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so the sword stays well inside its own cell. The tattered cloak hangs close
+    behind the body in every cell (never flying out). Draw only the parts named in the description, the same in every
+    cell: no second cape, and no slash trail, smear or motion lines.
+  prompt: >-
+    a skeletal knight in spiked dark gunmetal plate armour, a horned open helm showing a grinning skull with two red
+    eye lights, a short tattered dark red cloak hanging close behind the shoulders, holding one black sword with glowing
+    red runes on the blade; in the idle cell the sword is held point down in front of the body; centred in its own
+    cell with empty space on both sides, the helm horns well below the top of the grey box
+  attack: >-
+    stepping forward toward the heroes at the end of a downward cut, the black sword angled down in front of him with
+    the point at knee height just ahead of his front foot, the whole sword well inside the middle cell (not raised
+    overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, the skull thrown back, the sword held upright across the chest, the cloak close behind
+  face: a grinning skull with two red eye lights inside the horned helm
+  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings
+  seeds: [1234]
+- id: earth_medusa
+  # "Earth Medusa" (113): a stony grey medusa with rock scales and a petrified-snake crown (small naga)
+  size: small
+  body: naga
+  motion: >-
+    Lean and twist the upper body above the coils along a clear diagonal, reach the arms toward the heroes with the
+    elbows bent so the hands stay well inside its own cell; tighten or loosen the coils; the tail tip stays on the
+    ground beside the coils. Draw only the parts named in the description: no spell effects, smear or motion lines.
+  prompt: >-
+    a stony serpent-tailed woman: a human upper body of grey stone with cracked rock-plate scales, a pale grey face
+    with two glowing amber eyes clearly visible, a crown of short stiff stone snakes frozen upright around her head,
+    rough granite armbands, two arms, no legs: below the waist a long grey rock-scaled snake tail coiled on the ground;
+    centred in its own cell with empty space on both sides, the stone crown well below the top of the grey box
+  attack: >-
+    leaning forward over the coils toward the heroes, both stone hands reaching out with the elbows bent and the
+    amber eyes glaring wide, the hands well inside the middle cell
+  hurt: >-
+    knocked back over the coils, the head tilted back with the face and amber eyes still visible, the arms flung up,
+    a crack across the chest
+  face: her pale grey stone face with two glowing amber eyes under the stone snake crown is readable
+  extra_negative: green skin, writhing snakes, bronze, a weapon, legs, wings, moss, a hidden face
+  seeds: [1234]
+- id: black_flan
+  # "Black Flan" (114): a glossy black pudding blob with a few yellow eyes (distinct from slime, ooze, jelly)
+  size: small
+  body: blob
+  motion: >-
+    Squash and stretch the whole mass: stretch it toward the heroes or flatten and bulge it, always one soft mass
+    resting on the ground, staying well inside its own cell; the same three eyes in every cell.
+  prompt: >-
+    a glossy black pudding blob resting on the ground, a rounded wobbly mound with bright white shine highlights and a
+    dark blue-grey rim light, exactly three small round yellow eyes on its front surface, no mouth; centred in its own
+    cell with empty space on both sides
+  attack: >-
+    the whole mass lunging and stretching forward toward the heroes in one soft wave, the three yellow eyes wide,
+    staying well inside the middle cell
+  hurt: >-
+    flattened and squashed down low, rippling, the three yellow eyes squeezed half shut
+  face: only three small yellow eyes on the glossy black surface, no mouth
+  extra_negative: a mouth, teeth, bones inside, green colour, grey colour, a fourth eye, arms, drips falling off, a puddle
+  seeds: [1234]
+- id: soldier
+  # "Soldier" (115): a heavy bronze mechanical soldier with riveted plates and a blade arm (distinct from warmech, guardian)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the blade arm with the elbow bent, so every reaching part stays well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no cape, sparks, steam, smear or motion lines.
+  prompt: >-
+    a heavy humanoid mechanical soldier of riveted bronze plates, broad shoulders, a barrel-shaped chest, thick
+    jointed legs with flat metal feet, a rounded bronze helm-head with one horizontal glowing amber visor slit, the
+    right arm ending in a long broad metal blade held pointing down at its side, the left arm a three-fingered metal
+    hand; tall and filling the box, centred in its own cell with empty space on both sides, the blade well inside its
+    cell in every cell
+  attack: >-
+    stepping forward toward the heroes at the end of a downward chop: the blade arm swung down in front of him with
+    the blade tip on the ground just ahead of his front foot, the body leaning in, the whole blade well inside the
+    middle cell (not raised overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, the body leaning away from the heroes, the blade arm raised up across the chest, the visor
+    flickering
+  face: a rounded bronze helm-head with one glowing amber visor slit
+  extra_negative: a cannon, a domed head with a lens, teal plates, four legs, a shield, a cape, flesh, a face, sparks, steam
+  seeds: [1234]
+- id: vampire_lord
+  # "Vampire Lord" (116): a tall elder vampire, white hair, a bat-wing cape joined to the arms (not a recolour)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so every reaching part stays well inside its own cell. The bat-wing cape is
+    joined to the arms and moves with them, kept within the cell. Draw only the parts named in the description: no
+    second cape, and no smear or motion lines.
+  prompt: >-
+    a tall gaunt elder vampire with long straight white hair, a pale grey face with sunken red eyes and small fangs, a
+    tall stiff black collar rising behind the head like a crown with sharp points, a long black coat with dark red
+    trim, a black cape shaped like bat wings joined from the shoulders along both arms to the wrists, long clawed
+    fingers; centred in its own cell with empty space on both sides, the collar points well below the top of the grey
+    box
+  attack: >-
+    leaning forward toward the heroes, one clawed hand reaching out with the elbow bent, the bat-wing cape spread
+    with the arms, the hand and the cape well inside the middle cell
+  hurt: >-
+    knocked back, the white hair flying, both arms raised in front of the face with the bat-wing cape folded across
+    the body
+  face: his gaunt pale face with red eyes under long white hair is readable
+  extra_negative: slicked black hair, a red vest, a separate cape, a crown on the head, a weapon, real bat wings on the back, a young face
+  seeds: [1234]
+- id: dark_fighter
+  # "Dark Fighter" (117): a warrior-mage in dark half-plate and a hooded tabard, a sword and a glowing glyph shield
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes behind the shield, the elbows bent, so the sword and shield stay well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no cape or cloak, and no slash trail, spell
+    effects, smear or motion lines.
+  prompt: >-
+    a warrior-mage in dark steel half-plate over a hooded deep crimson tabard, the hood up over a shadowed face with
+    two pale eyes, holding one straight sword in the hand on the right side of the image and one round dark shield
+    with a glowing teal glyph on the other arm, close to the body; in the idle cell the sword is held upright beside
+    the shield; centred in its own cell with empty space on both sides, the sword point well below the top of the
+    grey box
+  attack: >-
+    stepping forward toward the heroes behind the raised glyph shield, the sword thrust low past the shield's edge
+    with the elbow bent, the whole sword well inside the middle cell, the glyph glowing brighter
+  hurt: >-
+    knocked back, the hooded head thrown back, the shield lifted up in front of the chest, the sword in the same hand
+  face: a shadowed face with two pale eyes inside the hood
+  extra_negative: a cape, a helmet, a second sword, a staff, a plume, a skull face, black plate, a spell effect away from the shield
+  seeds: [1234]
+- id: rhyos
+  # "Rhyos" (120): a stone-hided chimera kin with a basilisk head, a ram head and a lion head (no wings)
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the heads toward the heroes with the necks bent so every head stays well inside
+    its own cell; the tail stays close to the body.
+  prompt: >-
+    a heavy four-legged beast seen from the side with a hide of cracked grey stone plates, exactly three heads on
+    short thick necks from the shoulders, each clearly apart: a scaly grey lizard head with a spiky crest and yellow
+    eyes on top, a curled-horn ram head in the middle, and a maned grey lion head below in front; no wings, a short
+    thick stone tail; the whole beast, tail to snout, sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    lunging forward low, all three heads snapping and butting toward the heroes, the heads above and just in front of
+    its front feet, all four feet on the ground, the whole beast well inside the middle cell; no breath
+  hurt: >-
+    knocked back, all four feet on the ground, the three heads recoiling, a crack across the stone hide
+  face: the three heads (lizard, ram and lion) are clearly readable, the lion face with amber eyes in front
+  extra_negative: wings, a snake tail, a goat head, a dragon head, a fourth head, tawny fur, fire breath, rearing up
+  seeds: [1234]
+- id: purple_worm
+  # "Purple Worm" (122): a colossal dark purple armoured worm with rows of teeth and a tail stinger
+  size: large
+  body: serpent
+  motion: >-
+    Coil and uncoil along a strong curve, strike the head toward the heroes with the front end bent so the maw stays
+    well inside its own cell, and keep the stinger tail tip on the ground beside the coils.
+  prompt: >-
+    a colossal worm of overlapping dark purple armour plates with pale lilac-grey rings between them and dark outlines,
+    reared up in an S from a heavy coil on the ground, the top end a round open maw lined with many rows of white teeth,
+    the tail tip ending in a curved black stinger resting on the ground beside the coil; in every cell the raised
+    front end stays well below the top of the grey box and the whole worm, stinger included, sits in the middle of its
+    own cell with empty space on both sides
+  attack: >-
+    the front end arched forward and down toward the heroes with the toothed maw gaping, the coil and the stinger in
+    place on the ground, the maw well inside the middle cell
+  hurt: >-
+    the front end recoiling back and up, the maw clenched shut, the coil tightening, the stinger in place
+  face: no eyes; the round maw with rows of teeth is the readable feature
+  extra_negative: eyes, a face, legs, pink skin, ochre colour, lava, sand, bright violet, magenta, a raised stinger
+  seeds: [1234]
+- id: iron_golem
+  # "Iron Golem" (123): a riveted iron golem with a furnace chest and chain-wrapped fists (distinct from clay, stone)
+  size: large
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and swing the iron fists with the elbows bent, so every reaching part stays well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no loose chains, sparks, smoke, smear or motion
+    lines.
+  prompt: >-
+    a huge iron golem of dark grey riveted iron plates, a barrel chest with a glowing orange furnace grate in the
+    middle, a small square head with two glowing orange eye slits, thick arms with huge iron fists wrapped tight in
+    heavy chains, thick legs; drawn compact with the arms close to the body, tall and filling the box, centred in its
+    own cell with empty space on both sides
+  attack: >-
+    stepping forward and smashing one chain-wrapped fist down onto the ground just in front of its front foot, the
+    elbow bent, the furnace glowing brighter, the fist well inside the middle cell (not reaching the cell edge)
+  hurt: >-
+    knocked back, leaning away from the heroes, both fists raised in front of the chest, the furnace flickering
+  face: a small square iron head with two glowing orange eye slits
+  extra_negative: a human face, bronze, stone blocks, clay, a blade arm, a cannon, swinging chains, loose chains, smoke, flames outside the grate
+  seeds: [1234]
