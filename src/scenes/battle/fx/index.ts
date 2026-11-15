@@ -1,13 +1,15 @@
 /**
  * Battle effect hooks (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 5). BattleScene calls the two factories once in
  * `enter()` and hands the results to BattleAnimationController; pass F's Fd (spell and item effects) and Fe (status
- * overlays) replace the factory bodies only. In F0 both are no-ops, so every action presents on its resolve frame.
+ * overlays) replace the factory bodies only. With no effect data an action presents on its resolve frame.
  */
 import type { Container } from 'pixi.js';
 import type { ActionResult, BattleStateMachine, NextActionInfo } from '../../../battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from '../BattleDisplayManager.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import type { StatusDiff } from '../presentedState.js';
+import { BattleActionFx } from './ActionFx.js';
+import { fxSource, type FxSource } from './fxSource.js';
 
 /** Effects started by an animation cue: the glint on a raised weapon (`hold`), the dust of a slam (`contact`). */
 export type FxCueId = 'glint' | 'impact_dust';
@@ -46,9 +48,11 @@ export const noopStatusFx: StatusFx = {
   sync: () => {},
 };
 
-/** The spell and item effects (Fd). F0: none. */
-export function createActionFx(_layers: BattleLayers, _display: BattleDisplayManager): ActionFx {
-  return noopActionFx;
+/** The spell, item and ranged-attack effects (Fd, fx/ActionFx.ts). The shared data and atlas start loading on the
+ *  first battle in a browser (the intro covers it); until they arrive an action presents at once, as before. */
+export function createActionFx(layers: BattleLayers, _display: BattleDisplayManager, source: FxSource = fxSource): ActionFx {
+  if (source === fxSource && typeof document !== 'undefined' && !source.isLoaded) void source.load();
+  return new BattleActionFx(layers, source);
 }
 
 /** The status overlays, icons and tints (Fe). F0: none. */

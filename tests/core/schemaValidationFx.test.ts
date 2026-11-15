@@ -39,13 +39,13 @@ describe('enemy attack fields', () => {
 });
 
 describe('spell-effects.yaml', () => {
-  it('the seeded file: fire_breath (cone, 28 frames, impact 16) and attacks.fire_breath', () => {
+  it('the file: fire_breath (cone, 28 frames, impact 16) and attacks.fire_breath; Fd filled spells and items', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const fx = validateSpellEffects(yaml('spell-effects.yaml'));
     expect(fx.effects.fire_breath).toMatchObject({ kind: 'cone', frames: 28, impact: 16 });
     expect(fx.attacks).toEqual({ fire_breath: 'fire_breath' });
-    expect(fx.spells).toEqual({});
-    expect(fx.items).toEqual({});
+    expect(fx.spells.fire).toBe('fire');
+    expect(fx.items.potion).toBe('heal');
     expect(error).not.toHaveBeenCalled();
   });
 
