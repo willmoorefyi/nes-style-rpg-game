@@ -524,12 +524,14 @@
     side of the image, the upper arm is thrown back up behind the shoulder and the lower arm is braced at the hip, both
     clearly visible beside the body; at the same pixel size as in Image 3
   cast: >-
-    channelling, a mirror-symmetric pose: a glowing sphere of swirling energy in the four seam colours (cyan, orange,
-    teal and white) floats in front of his chest; on the left side of the image TWO arms, one above the other: the
-    upper left arm reaching out at shoulder height and the lower left arm reaching out at waist height, both hands
-    open toward the sphere; on the right side of the image the same two arms as a mirror image; four open clawed hands
-    framing the sphere, the sphere touching them; the wings spread wide, the seams blazing; exactly four arms, all four
-    clearly visible and apart from the body; at the same pixel size as in Image 3
+    channelling, a mirror-symmetric pose clearly different from Image 3, every hand in a new place: the two upper
+    arms raised high, elbows bent, their open clawed hands up beside the horned crown, one on the left side of the
+    image and one on the right side; the two lower arms spread wide out to the sides at waist height, palms up, one on
+    the left side and one on the right side; a glowing sphere of swirling energy in the four seam colours (cyan,
+    orange, teal and white) floats in front of his chest, touching his body; the wings lifted higher and spread wider
+    than in Image 3, the legs planted wider apart, the seams blazing; exactly four arms, all four clearly visible and
+    apart from the body; the raised hands and wing tips well below the top of the grey box, at the same pixel size as
+    in Image 3
   hurt: >-
     struck: recoiling back, the head thrown back, the glowing seams flaring brighter, the four arms flung outward out
     of rhythm (two on the left side of the image, two on the right side), the wings faltering
@@ -542,7 +544,7 @@
   face: the cracked obsidian face with two burning white eyes under the horned crown is readable
   extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1236}   # boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
+  sheet_seeds: {boss_attack: 1236, boss_cast: 1236}   # boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
   # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
