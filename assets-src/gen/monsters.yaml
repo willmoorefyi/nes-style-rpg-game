@@ -2182,10 +2182,11 @@
   floating: true
   body: floating
   motion: >-
-    Keep the figure upright and level in every cell, its lower part at the same height as in the idle cell: in the
-    attack it surges forward to the right, leaning only its crest and arms toward the heroes; in the hurt it is knocked
-    back to the left and tilted back by about fifteen degrees; it always hovers, nothing touches the ground; the
-    water crest and spray move with the motion, attached to the body.
+    Keep the figure upright and level in every cell. The idle cell shows it at its lowest; in the attack and the hurt
+    it rises a little, so its lowest point is clearly higher than in the idle cell, with more empty space below it: in
+    the attack it surges forward and up to the right, leaning only its crest and arms toward the heroes; in the hurt
+    it is knocked back up and to the left and tilted back by about fifteen degrees; it always hovers, nothing touches
+    the ground; the water crest moves with the motion, attached to the body, with no separate drops.
   prompt: >-
     a living wave of blue water rising in a curling crest, the body formed of deep blue and pale aqua water with white
     foam edges and crisp black outlines, two arms of water, a stern face formed from the water itself; it hovers,
@@ -2197,7 +2198,7 @@
   hurt: knocked back, the crest collapsing, the arms thrown up, the same blue colours as in the idle cell
   face: a stern face formed from the water itself (two pale eyes and a dark mouth), no human skin
   extra_negative: skin, legs, a fish tail, a trident, separate drops, splashes outside the body, a ground puddle
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R240): the attack and hurt drawn lower than the idle, sliced on the bottom row
 - id: water_naga
   # "Water Naga" (101): a blue-scaled naga with fin ears and a trident (large; distinct from medusa and spirit naga)
   size: large
