@@ -1,0 +1,24 @@
+# Gigas Worm (pass R, serpent): a huge pink-grey segmented earthworm reared up in an S, ringed maw of teeth. body:
+# serpent (rig_serpent.py): the bottom curl is the pinned coil, the S rises from body0; the head is rigid from the
+# S's top bend to the maw (the anaconda layout).
+sprite: gigas_worm
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [48, 121], c_n: [86, 121], body0: [80, 90], body1: [55, 62], neck: [46, 38], head: [64, 22], snout: [98, 33]}
+  attack: {c_f: [32, 121], c_n: [78, 121], body0: [75, 92], body1: [52, 72], neck: [34, 46], head: [55, 30], snout: [115, 60]}
+  hurt:   {c_f: [46, 121], c_n: [84, 121], body0: [85, 95], body1: [60, 68], neck: [45, 45], head: [60, 26], snout: [95, 50]}
+masks:
+  head:
+    idle: [[54, 10], [104, 10], [104, 50], [62, 50], [54, 36]]
+    attack: [[40, 20], [122, 20], [122, 80], [86, 80], [62, 47], [40, 46]]
+    hurt: [[50, 18], [100, 18], [100, 62], [70, 62], [56, 44], [50, 42]]
+frames:
+  atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}
+  atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}
+  atk_mid: {t: 0.15, moves: [neck, head, snout]}   # the attack curl is 16 px further left (the curl never moves):
+                                                   # past t 0.15 its bottom band leaves the lerp (+-2)
+  hurt_in2: {t: 0.25}                              # at 0.35 the S bend cracked 1 px where it meets the head
+holds: []
