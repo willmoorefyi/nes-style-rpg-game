@@ -200,11 +200,15 @@ export class BattleScene implements Scene {
     this.animation.updateDyingEnemies(dt);
     this.animation.updateSpellFlashes(dt);
     this.activeHero.update(dt);
+    this.display.partyPanel.update(dt);   // 6b: the HP roll
+    // the scene's text holds share the animation's skip guard: one confirm press skips one line
+    const holding = this.uiState === 'intro' || this.uiState === 'message' || this.uiState === 'notice';
+    const skip = holding && this.animation.skipGuard.take(this.deps.input.isJustPressed('confirm'), dt);
 
     switch (this.uiState) {
       case 'intro':
         this.introTimer -= dt;
-        if (this.introTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
+        if (this.introTimer <= 0 || skip) {
           this.battle.advanceFromIntro();
           this.startCommandPhase();
         }
@@ -238,14 +242,14 @@ export class BattleScene implements Scene {
 
       case 'message':
         this.messageTimer -= dt;
-        if (this.messageTimer <= 0 || this.deps.input.isJustPressed('confirm')) {
+        if (this.messageTimer <= 0 || skip) {
           this.advanceMessage();
         }
         break;
 
       case 'notice':
         this.noticeTimer -= dt;
-        if (this.noticeTimer <= 0 || this.deps.input.isJustPressed('confirm')) this.closeNotice();
+        if (this.noticeTimer <= 0 || skip) this.closeNotice();
         break;
 
       case 'end':

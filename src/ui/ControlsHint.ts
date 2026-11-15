@@ -60,7 +60,11 @@ export class ControlsHint {
   private dismiss(): void {
     this.dismissed = true;
     this.container.visible = false;
-    try { localStorage.setItem(STORAGE_KEY, 'true'); } catch { /* noop */ }
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } catch (err) {
+      console.warn(`ControlsHint: cannot store ${STORAGE_KEY}; the hint may show again`, err);
+    }
   }
 
   get isDismissed(): boolean {
@@ -68,6 +72,11 @@ export class ControlsHint {
   }
 
   static hasBeenSeen(): boolean {
-    try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch { return false; }
+    try {
+      return localStorage.getItem(STORAGE_KEY) === 'true';
+    } catch (err) {
+      console.warn(`ControlsHint: cannot read ${STORAGE_KEY}; showing the hint`, err);
+      return false;
+    }
   }
 }

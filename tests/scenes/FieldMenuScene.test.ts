@@ -44,7 +44,8 @@ describe('FieldMenuScene', () => {
       scene.enter();
       expect(game.scenes.get).toHaveBeenCalledWith('exploration');
       expect(visibleLabels(scene.container)).toContain('Load');
-      game.input.tap('up', () => scene.update(1));          // wraps to the last item
+      game.input.tap('up', () => scene.update(1));          // wraps to the last item (Config, Fb)
+      game.input.tap('up', () => scene.update(1));          // Load
       game.input.tap('confirm', () => scene.update(1));
       expect(game.scenes.push).toHaveBeenCalledWith('loadMenu');
     });
@@ -72,12 +73,22 @@ describe('FieldMenuScene', () => {
   });
 
   describe('MS-7: the menu redesign', () => {
-    it('lists Items, Magic, Equip, Status, Order, Save, Load and no Config', () => {
+    it('lists Items, Magic, Equip, Status, Order, Save, Load, and Config last (pass F item 6; old: no Config)', () => {
       const scene = new FieldMenuScene(createMockGameForMenu() as unknown as Game);
       scene.enter();
       const labels = visibleLabels(scene.container);
-      for (const l of ['Items', 'Magic', 'Equip', 'Status', 'Order', 'Save', 'Load']) expect(labels).toContain(l);
-      expect(labels).not.toContain('Config');
+      for (const l of ['Items', 'Magic', 'Equip', 'Status', 'Order', 'Save', 'Load', 'Config']) expect(labels).toContain(l);
+    });
+
+    it('Config (the last row) opens the config scene; its help names the message speed', () => {
+      const game = createMockGameForMenu();
+      const scene = new FieldMenuScene(game as unknown as Game);
+      scene.enter();
+      const bar = scene.container.children.find((c): c is HelpWindow => c instanceof HelpWindow)!;
+      game.input.tap('up', () => scene.update(1));          // wraps to the last item
+      expect(bar.text).toMatch(/message speed/i);
+      game.input.tap('confirm', () => scene.update(1));
+      expect(game.scenes.push).toHaveBeenCalledWith('config');
     });
 
     it('the party panel shows every member\'s name, Lv, HP and Next, and charges only for casters', () => {
@@ -129,7 +140,7 @@ describe('FieldMenuScene', () => {
       const scene = new FieldMenuScene(game as unknown as Game);
       scene.enter();
       const bar = scene.container.children.find((c): c is HelpWindow => c instanceof HelpWindow)!;
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 8; i++) {
         expect(bar.text).not.toMatch(/sort/i);
         game.input.tap('down', () => scene.update(1));
       }
