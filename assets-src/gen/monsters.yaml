@@ -565,9 +565,15 @@
     an undead dragon on four legs seen from the side: rotting grey-green hide stretched tight over bone, a long
     skull-like head with empty eye sockets glowing ghost-green and a jaw of broken fangs, exposed white ribs along its
     flank, torn tattered wing membranes hanging from bony wing arms, a long bony tail ending in bare vertebrae, a faint
-    ghost-green glow between the ribs; palette of bone white, rotting grey-green, dark brown and ghost green
-  attack: lunging its long neck forward in a biting snap with the jaws wide open, torn wings raised, the tail lashing
-  hurt: recoiling, the neck twisted back, the torn wings drooping, bones rattling at the joints
+    ghost-green glow between the ribs; palette of bone white, rotting grey-green, dark brown and ghost green; drawn at
+    the same large size in all three cells, the body filling the box (as tall as the box with the wings), the head and
+    jaws inside the cell
+  attack: >-
+    lunging its long neck forward in a biting snap with the jaws wide open, torn wings raised, the tail lashing, all
+    four feet still on the ground and the whole head inside the cell
+  hurt: >-
+    recoiling on all four legs (no rearing up), the neck twisted back, the torn wings drooping, bones rattling at the
+    joints
   face: the dragon skull with ghost-green glowing eye sockets and broken fangs is readable in every cell
   extra_negative: fire breath, red scales, a rider, horns
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R61): a tiny idle, the head cut, a rear-up hurt
