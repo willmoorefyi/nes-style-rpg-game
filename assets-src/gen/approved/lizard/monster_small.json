@@ -1,0 +1,27 @@
+{
+  "character": "lizard",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "2b5dcd06cee3e17be3a60d04",
+  "approved": "2026-11-15",
+  "grid": [
+    116,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R97"
+}

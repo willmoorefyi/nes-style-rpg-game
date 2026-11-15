@@ -780,11 +780,15 @@
     a stocky green iguana-like lizard in a low sprawl seen from the side, rough pebbled green scales with darker bands,
     a spiky dorsal crest along its back, a hanging throat dewlap, a blunt head with a golden eye, short strong legs
     with clawed feet, a long thick tail lying on the ground
-  attack: lunging forward low with the jaws open in a snapping bite at the heroes, the crest raised
-  hurt: knocked back, the head turned away, the body arching, the tail curling
+  attack: >-
+    lunging forward low with the jaws open in a snapping bite at the heroes, the crest raised, the body stretched long
+    and low, all four feet still on the ground (no leap)
+  hurt: >-
+    flinching back low, the head turned away and pulled in, the back arching a little, the tail curling, all four feet
+    still on the ground (no rearing up)
   face: its blunt lizard head with the golden eye and open jaws is readable
   extra_negative: wings, a frill, fire, horns, standing upright
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R96): a leap attack and a rear-up hurt
 - id: sahagin
   # "Sahagin" (018): a basic fish-man (bare, trident)
   size: small
