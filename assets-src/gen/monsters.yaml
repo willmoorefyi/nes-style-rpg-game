@@ -1244,17 +1244,19 @@
     a big blue-skinned ogre sorcerer in a long hooded patchwork robe of dark purple and brown patches with the hood
     down, a single short horn on its forehead, a wild white mane of hair, two small tusks, gold earrings, holding one
     tall gnarled wooden staff topped with a pale blue ice orb in the hand on the right side of the image; the robe hem
-    above its bare blue feet; centred in its own cell
+    above its bare blue feet; centred in its own cell, and in every cell the orb stays well below the top of the
+    grey box
   attack: >-
-    stepping forward and thrusting the staff toward the heroes in the same hand as in the idle cell, the ice orb
-    pointed at them and glowing a little brighter, the elbow bent so the whole staff stays well inside the middle cell
-    (not reaching the cell edge)
+    stepping forward and leaning toward the heroes, the staff held upright in front of his chest in the same hand as
+    in the idle cell, the ice orb raised beside his head and glowing brighter, the free hand thrust forward with the
+    palm open; the whole staff and orb stay well inside the middle cell (the staff stays vertical, not pointed at the
+    cell edge)
   hurt: >-
     knocked back, the free hand thrown up, the staff held upright close to the body in the same hand as in the idle
     cell
   face: its blue ogre face with the single horn, tusks and small eyes is readable
   extra_negative: a club, a cleaver, armour, two horns, a helmet, tan skin, grey skin, an ice beam, snowflakes
-  seeds: [1234]
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R147): the attack orb sliced at the raw's cell line, the hurt orb on row 1
 - id: sphinx
   # "Sphinx" (048): lion body, eagle wings, human face
   size: large
