@@ -1958,17 +1958,20 @@
   size: small
   body: naga
   prompt: >-
-    a serpent-tailed woman: a human upper body with green scaled skin, bronze armlets and a bronze breastband, a head
-    of writhing green snakes for hair, fierce yellow eyes, two arms, no legs: below the waist a long green snake tail
-    coiled on the ground; centred in its own cell with empty space on both sides, the snake hair well below the top of
-    the grey box
+    a serpent-tailed woman: a human upper body with pale sage-green skin, bronze armlets and a bronze breastband, a
+    clear pale face with two large bright yellow eyes and a dark mouth, a head of about eight thick dark emerald snakes
+    for hair with small heads, clearly darker than the face, two arms, no legs: below the waist a long dark green snake
+    tail with a pale yellow belly coiled on the ground; centred in its own cell with empty space on both sides, the
+    snake hair well below the top of the grey box
   attack: >-
     leaning forward over the coils toward the heroes, both clawed hands reaching out with the elbows bent, the snake
     hair lashing forward, the hands well inside the middle cell
-  hurt: knocked back over the coils, the head thrown back, the snake hair writhing, the arms flung up
-  face: her green-skinned face with fierce yellow eyes under the snake hair is readable
-  extra_negative: legs, a weapon, a bow, a shield, a crown, wings, a fish tail, stone colour
-  seeds: [1234]
+  hurt: >-
+    knocked back over the coils, the head tilted back with the pale face and yellow eyes still visible, the snake
+    hair writhing, the arms flung up
+  face: her pale sage-green face with two large bright yellow eyes under the dark snake hair is readable
+  extra_negative: legs, a weapon, a bow, a shield, a crown, wings, a fish tail, stone colour, a hidden face
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R218): the face and eyes lost in green-on-green at 1x
 - id: rakshasa
   # "Rakshasa" (089): a tiger-headed sorcerer in rich robes (distinct from the weretiger)
   size: small
