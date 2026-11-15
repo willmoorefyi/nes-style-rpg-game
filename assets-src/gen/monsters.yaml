@@ -1185,10 +1185,12 @@
   attack: >-
     stepping forward and smashing both boulder fists down in front of its body at the heroes, the fists well inside
     the middle cell
-  hurt: knocked back, staggering, chunks cracking at its shoulders (still attached), the arms thrown back
+  hurt: >-
+    knocked back, staggering, leaning away from the heroes, both boulder arms pulled in and raised in front of its
+    chest, the elbows bent so both fists stay well inside the right cell, cracks glowing brighter
   face: a blank boulder head with two glowing amber eye slits, no mouth or skin
-  extra_negative: a human face, skin, flames, water, a weapon, flying rocks, a mound under it
-  seeds: [1234]
+  extra_negative: a human face, skin, flames, water, a weapon, flying rocks, loose chips, a mound under it
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R141): the hurt's arm thrown back across the raw's one-third line and sliced
 - id: wight
   # "Wight" (043): an armoured undead knight (corroded mail with flesh; distinct from skeleton and bloodbones)
   size: small
