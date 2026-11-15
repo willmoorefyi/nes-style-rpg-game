@@ -3,6 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { Container, Graphics } from 'pixi.js';
 import { combinedTint, multiplyTint, setTint, tintOf } from '../../../src/scenes/battle/actorTint.js';
 import { ActiveHeroMarker } from '../../../src/scenes/battle/ActiveHeroMarker.js';
+import { statusTint } from '../../../src/scenes/battle/fx/statusRules.js';
+import { loadStatusVisuals } from '../../helpers/statusVisuals.js';
 
 describe('actorTint', () => {
   it('the tint is the channel-wise product of every source; white with none', () => {
@@ -40,5 +42,18 @@ describe('actorTint', () => {
     expect(sprite.tint).toBe(multiplyTint(0xd8e4ff, tintOf(sprite, 'hero')!));
     marker.hide();
     expect(sprite.tint).toBe(0xd8e4ff);
+  });
+
+  it('Fe: the status tints (statusRules.statusTint) multiply with the hero pulse; clearing poison leaves the hero pulse', () => {
+    const visuals = loadStatusVisuals();
+    const s = new Container();
+    setTint(s, 'hero', 0xffffa0);
+    setTint(s, 'status', statusTint(['poison', 'fear'], visuals, 0));
+    expect(s.tint).toBe(multiplyTint(multiplyTint(0xffffa0, 0xc8ffc8), 0xd8e4ff));
+    setTint(s, 'status', statusTint(['poison'], visuals, 30));     // the poison pulse is off at frame 30
+    expect(s.tint).toBe(0xffffa0);
+    setTint(s, 'status', statusTint([], visuals, 0));
+    expect(s.tint).toBe(0xffffa0);
+    expect(tintOf(s, 'hero')).toBe(0xffffa0);
   });
 });

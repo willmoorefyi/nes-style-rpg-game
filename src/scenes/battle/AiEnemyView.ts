@@ -2,24 +2,19 @@ import { Container, Graphics, Sprite } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { computeEnemyLayoutAi, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
-import { EnemyPoseController, type AttackPlan, type Freeze, type PoseCue } from './EnemyPoseController.js';
+import { EnemyPoseController, type AttackPlan, type Posture, type PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { TRAVEL_HOP, enemyReach } from './enemyReach.js';
 import { attackTable } from './enemyAttackTables.js';
 import { BattleLayers } from './BattleLayers.js';
 import { setTint, tintOf } from './actorTint.js';
+import { stoneTextures } from './fx/stoneTextures.js';
 
 /** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4. */
 export const HOLD_PULSE_TINT = 0xffb0b0;
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
 const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
-
-/** D6: sleep and stun hold the base idle (still recoil when hit); stone shows no pose change at all. */
-export function freezeOf(status: { has(effect: 'sleep' | 'stun' | 'stone'): boolean } | undefined): Freeze {
-  if (!status) return 'none';
-  return status.has('stone') ? 'stone' : status.has('sleep') || status.has('stun') ? 'still' : 'none';
-}
 
 /** Where monster frames come from (the shared atlas; tests inject their own). */
 export interface MonsterArtSource {
@@ -128,10 +123,11 @@ export class AiEnemyView {
     return g;
   }
 
-  /** Advance pose timers and apply each sprite's frame texture, integer offset, freeze (D6) and draw order (D5). */
-  update(dt: number, sprites: Container[], frozen: readonly Freeze[] = []): void {
+  /** Advance pose timers and apply each sprite's frame texture (a stoned enemy's grey copy, stoneTextures), integer
+   *  offset, status posture (pass F item 5a: daze, stone, tremble) and draw order (D5). */
+  update(dt: number, sprites: Container[], postures: readonly Posture[] = []): void {
     this.sprites = sprites;
-    for (let i = 0; i < sprites.length; i++) this.poses.setFreeze(i, frozen[i] ?? 'none');
+    for (let i = 0; i < sprites.length; i++) this.poses.setPosture(i, postures[i] ?? 'none');
     this.poses.update(dt);
     for (let i = 0; i < sprites.length; i++) {
       const sprite = sprites[i];
@@ -139,7 +135,10 @@ export class AiEnemyView {
       const b = this.base[i];
       if (!sprite || !b) continue;
       const st = this.poses.state(i);
-      if (f && sprite instanceof Sprite) sprite.texture = f.textures[st.pose];
+      if (f && sprite instanceof Sprite) {
+        const tex = f.textures[st.pose];
+        sprite.texture = postures[i] === 'stone' ? stoneTextures.of(tex) : tex;
+      }
       sprite.position.set(b.x + st.dx + (st.travelDx ?? 0), b.y + st.dy + (st.travelDy ?? 0));
       const hold = this.poses.holdFrame(i);
       const pulse = hold !== null && Math.floor(hold / 4) % 2 === 0 ? HOLD_PULSE_TINT : null;

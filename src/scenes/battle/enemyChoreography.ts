@@ -3,6 +3,7 @@
  * tune lives here. `t` is in 60 fps frames; dx > 0 is toward the party, dy < 0 is up; offsets are screen px at scale
  * factor 1 (EnemyPoseController scales and rounds them once).
  */
+import type { StatusPosture } from '../../types/fxData.js';
 
 /** Approved keyframes in monsters-ai.json (bosses add `cast`; pass F's bosses add `attack_raise`). */
 export type MonsterKeyframe = 'idle' | 'attack' | 'hurt' | 'cast' | 'attack_raise';
@@ -154,9 +155,22 @@ export function dyingAt(t: number, from: { dx: number; dy: number }, start = 0):
   return { frame: hurtAt(t).frame, dx: from.dx + (DYING_DX - from.dx) * k, dy: from.dy * (1 - k) };
 }
 
-/** Breathing idle (idle / idle_b every half period, out of phase per enemy); frozen or breathless enemies hold idle. */
-export function idleFrame(clock: number, index: number, breath: boolean, frozen: boolean): MonsterFrame {
-  if (frozen || !breath) return 'idle';
+/** Frames each dazed frame holds (daze, daze_b, daze, ...: a slow sway). */
+export const DAZE_PERIOD = 48;
+/** Fear's tremble, ±1 screen px by the clock: [0, 1, 0, -1] every 4 frames. A pure function of the clock, added on
+ *  top of the position each frame and never accumulated, so it averages 0 and is 0 when fear ends. */
+export const TREMBLE_STEPS = [0, 1, 0, -1] as const;
+export const trembleDx = (clock: number): number => TREMBLE_STEPS[Math.floor(clock / 4) % 4];
+
+/** What a status does to the idle (status-visuals.yaml `posture`): `daze` (sleep, stun) sways daze / daze_b, `stone`
+ *  and `still` hold idle (no breathing), `tremble` (fear) breathes as normal (the tremble is an offset). */
+export type Posture = StatusPosture;
+
+/** The idle frame: dazed enemies alternate daze / daze_b every DAZE_PERIOD; stone and still ones (and sheets without
+ *  breathing) hold idle; the rest breathe (idle / idle_b every half period, out of phase per enemy). */
+export function idleFrame(clock: number, index: number, breath: boolean, posture: Posture = 'none'): MonsterFrame {
+  if (posture === 'daze') return Math.floor(clock / DAZE_PERIOD) % 2 === 0 ? 'daze' : 'daze_b';
+  if (posture === 'stone' || posture === 'still' || !breath) return 'idle';
   return Math.floor((clock + index * 17) / (IDLE_PERIOD / 2)) % 2 === 0 ? 'idle' : 'idle_b';
 }
 

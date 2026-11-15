@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { Container, Graphics, Sprite, Texture } from 'pixi.js';
-import { AiEnemyView, HOLD_PULSE_TINT, freezeOf, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import { AiEnemyView, HOLD_PULSE_TINT, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import { postureOf } from '../../../src/scenes/battle/fx/statusRules.js';
+import { stoneTextures } from '../../../src/scenes/battle/fx/stoneTextures.js';
+import { HURT_FRAMES } from '../../../src/scenes/battle/enemyChoreography.js';
+import { loadStatusVisuals } from '../../helpers/statusVisuals.js';
+
+const VISUALS = loadStatusVisuals();
 import { BattleLayers } from '../../../src/scenes/battle/BattleLayers.js';
 import { tintOf } from '../../../src/scenes/battle/actorTint.js';
 import { computeEnemyLayoutAi } from '../../../src/scenes/battle/EnemyLayoutAi.js';
@@ -77,30 +83,53 @@ describe('AiEnemyView frames, freeze (D6) and scale', () => {
     expect((sprites[0] as Sprite).texture).toBe(textures.atk_wind1);
   });
 
-  it('a sleeping or stunned enemy holds idle (no idle_b) and still recoils when hit', () => {
+  it('pass F 5a: a sleeping or stunned enemy sways daze / daze_b (old: idle), recoils when hit and returns to daze', () => {
     const { view, sprites, textures } = stage(1);
-    const still = [freezeOf({ has: (e) => e === 'sleep' })];
-    for (let t = 0; t < 80; t++) {
-      view.update(1, sprites, still);
-      expect((sprites[0] as Sprite).texture).toBe(textures.idle);
+    for (const status of ['sleep', 'stun']) {
+      const dazed = [postureOf([status], VISUALS)];
+      expect(dazed[0]).toBe('daze');
+      const seen = new Set<Texture>();
+      for (let t = 0; t < 100; t++) { view.update(1, sprites, dazed); seen.add((sprites[0] as Sprite).texture); }
+      expect([...seen].sort()).toEqual([textures.daze, textures.daze_b].sort());
+      expect(seen.has(textures.idle)).toBe(false);
+      view.poses.playHurt(0);
+      view.update(1, sprites, dazed);
+      expect((sprites[0] as Sprite).texture).toBe(textures.hurt_in1);
+      for (let t = 0; t < HURT_FRAMES; t++) view.update(1, sprites, dazed);
+      expect([textures.daze, textures.daze_b]).toContain((sprites[0] as Sprite).texture);
     }
-    view.poses.playHurt(0);
-    view.update(1, sprites, still);
-    expect((sprites[0] as Sprite).texture).toBe(textures.hurt_in1);
-    expect(freezeOf({ has: (e) => e === 'stun' })).toBe('still');
   });
 
-  it('a stoned enemy keeps idle and offset 0 when hit (only the flash shows)', () => {
+  it('a stoned enemy keeps idle (its grey copy) and offset 0 when hit (only the flash shows)', () => {
     const { view, sprites, textures } = stage(1);
-    const stone = [freezeOf({ has: (e) => e === 'stone' })];
+    const grey = new Texture();
+    stoneTextures.setBuilder((t) => (t === textures.idle ? grey : null));
+    const stone = [postureOf(['stone', 'poison'], VISUALS)];
+    expect(stone[0]).toBe('stone');
     view.update(1, sprites, stone);
     const at = { x: sprites[0].x, y: sprites[0].y };
     view.poses.playHurt(0);
     for (let t = 0; t < 10; t++) {
       view.update(1, sprites, stone);
-      expect((sprites[0] as Sprite).texture).toBe(textures.idle);
+      expect((sprites[0] as Sprite).texture).toBe(grey);
+      expect(stoneTextures.coloured(grey)).toBe(textures.idle);
       expect({ x: sprites[0].x, y: sprites[0].y }).toEqual(at);
     }
+    view.update(1, sprites, ['none']);
+    expect((sprites[0] as Sprite).texture).not.toBe(grey);
+  });
+
+  it('fear trembles ±1 px by the clock and never drifts: after 400 frames the base position is the start', () => {
+    const { view, sprites } = stage(1);
+    view.update(0, sprites);
+    const home = sprites[0].x;
+    const fear = [postureOf(['fear'], VISUALS)];
+    expect(fear[0]).toBe('tremble');
+    const seen = new Set<number>();
+    for (let t = 0; t < 400; t++) { view.update(1, sprites, fear); seen.add(sprites[0].x - home); }
+    expect([...seen].sort()).toEqual([-1, 0, 1]);
+    view.update(1, sprites, ['none']);
+    expect(sprites[0].x).toBe(home);
   });
 
   it('awake enemies breathe (idle_b appears)', () => {
@@ -108,7 +137,7 @@ describe('AiEnemyView frames, freeze (D6) and scale', () => {
     const seen = new Set<Texture>();
     for (let t = 0; t < 80; t++) { view.update(1, sprites); seen.add((sprites[0] as Sprite).texture); }
     expect(seen.has(textures.idle_b)).toBe(true);
-    expect(freezeOf(undefined)).toBe('none');
+    expect(postureOf([], VISUALS)).toBe('none');
   });
 });
 

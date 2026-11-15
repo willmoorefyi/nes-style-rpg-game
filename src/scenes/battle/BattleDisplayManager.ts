@@ -3,7 +3,7 @@ import type { BattleStateMachine } from '../../battle/BattleStateMachine.js';
 import type { BattleSceneConfig } from './BattleSceneTypes.js';
 import type { Window } from '../../ui/Window.js';
 import { battleArt } from '../../rendering/BattleArt.js';
-import { AiEnemyView, freezeOf } from './AiEnemyView.js';
+import { AiEnemyView } from './AiEnemyView.js';
 import { BATTLE_POSES, characterAtlas, type BattlePose } from '../../rendering/CharacterAtlas.js';
 import { idlePose } from './attackChoreography.js';
 import { BattlePartyPanel } from './BattlePartyPanel.js';
@@ -11,6 +11,9 @@ import { BattleEnemyList } from './BattleEnemyList.js';
 import { BattleLayers } from './BattleLayers.js';
 import { setTint } from './actorTint.js';
 import { captureState, type PresentedState } from './presentedState.js';
+import { trembleDx, type Posture } from './enemyChoreography.js';
+import { postureOf, type StatusVisuals } from './fx/statusRules.js';
+import { stoneTextures } from './fx/stoneTextures.js';
 
 const HURT_FRAMES = 24;
 const PLACEHOLDER_DEAD_TINT = 0x666666;
@@ -51,6 +54,8 @@ export class BattleDisplayManager {
    * presented (at its effect's impact), by statusFx.sync and at round resolution (`capturePresented`).
    */
   presented: PresentedState;
+  /** status-visuals.yaml (set by createStatusFx): the postures of both sides. */
+  statusVisuals: () => StatusVisuals = () => ({});
 
   constructor(
     mainContainer: Container,
@@ -164,10 +169,12 @@ export class BattleDisplayManager {
   }
 
   update(dt: number): void {
-    const statuses = this.presented.enemies.map((p) => new Set(p.statuses));
-    this.enemyView?.update(dt, this.enemySprites, this.battle.allEnemies.map((_, i) => freezeOf(statuses[i])));
+    const visuals = this.statusVisuals();
+    this.enemyView?.update(dt, this.enemySprites, this.battle.allEnemies.map((_, i) => postureOf(this.presented.enemies[i]?.statuses ?? [], visuals)));
     const before = this.idleClock;
     this.idleClock += dt;
+    // fear: ±1 px through the pivot, so the position (lunge step, active step) is never touched and nothing drifts
+    this.partySprites.forEach((sp, i) => { sp.pivot.x = this.partyPosture(i) === 'tremble' ? -trembleDx(this.idleClock) / (sp.scale.x || 1) || 0 : 0; });
     if (this.partySprites.some((_, i) => idlePose(before, i) !== idlePose(this.idleClock, i))) this.refreshPoses();
     if (this.hurtTimers.size === 0) return;
     for (const [i, t] of this.hurtTimers) {
@@ -179,6 +186,10 @@ export class BattleDisplayManager {
   /** The pose party member i shows now (from the presented state: a KO'd member goes `down` only at the impact). */
   partyPose(i: number): BattlePose {
     if ((this.presented.party[i]?.hp ?? this.battle.allParty[i]?.currentHp) <= 0) return 'down';
+    // FB-7: sleep and stun hold `ready` with no breathing (and still flinch); stone holds it through hits
+    const posture = this.partyPosture(i);
+    if (posture === 'stone' || posture === 'still') return 'ready';
+    if (posture === 'daze') return this.hurtTimers.has(i) ? 'hurt' : 'ready';
     if (this.victory) return 'victory';
     const forced = this.poseOverride.get(i);
     if (forced) return forced;
@@ -190,8 +201,14 @@ export class BattleDisplayManager {
       const frames = this.partyFrames[i];
       const sprite = this.partySprites[i];
       if (!frames || !(sprite instanceof Sprite)) continue;
-      sprite.texture = frames[BATTLE_POSES.indexOf(this.partyPose(i))];
+      const tex = frames[BATTLE_POSES.indexOf(this.partyPose(i))];
+      sprite.texture = this.partyPosture(i) === 'stone' ? stoneTextures.of(tex) : tex;
     }
+  }
+
+  /** Party member i's status posture, from the presented snapshot. */
+  partyPosture(i: number): Posture {
+    return postureOf(this.presented.party[i]?.statuses ?? [], this.statusVisuals());
   }
 
   updatePartyDisplay(): void {

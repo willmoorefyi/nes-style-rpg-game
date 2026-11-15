@@ -2,6 +2,7 @@ import { Container, Graphics, Sprite } from 'pixi.js';
 import { createFloatingNumber, FLOAT_FRAMES, type FloatKind } from './floatingNumbers.js';
 import { BattleLayers } from './BattleLayers.js';
 import { stepAlpha } from './fx/emitterCore.js';
+import { stoneTextures } from './fx/stoneTextures.js';
 
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
@@ -48,7 +49,8 @@ export class BattleEffects {
     const color = ELEMENT_COLORS[element] ?? 0xffffff;
     let overlay: Container;
     if (sprite instanceof Sprite) {
-      const glow = new Sprite(sprite.texture);
+      // the coloured frame, not a stoned actor's grey copy, so a hit on stone still reads
+      const glow = new Sprite(stoneTextures.coloured(sprite.texture));
       glow.tint = color;
       glow.scale.copyFrom(sprite.scale);
       overlay = glow;
@@ -99,7 +101,7 @@ export class BattleEffects {
       // follow the sprite (lunge, shake) and its current pose frame
       if (sf.follow) {
         sf.overlay.position.set(sf.follow.x, sf.follow.y);
-        if (sf.overlay instanceof Sprite && sf.follow instanceof Sprite) sf.overlay.texture = sf.follow.texture;
+        if (sf.overlay instanceof Sprite && sf.follow instanceof Sprite) sf.overlay.texture = stoneTextures.coloured(sf.follow.texture);
       }
       if (sf.age >= sf.maxAge) {
         sf.overlay.parent?.removeChild(sf.overlay);

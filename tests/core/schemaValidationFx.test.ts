@@ -77,8 +77,10 @@ describe('spell-effects.yaml', () => {
 });
 
 describe('status-visuals.yaml', () => {
-  it('the seeded file is an empty table', () => {
-    expect(validateStatusVisuals(yaml('status-visuals.yaml'))).toEqual({ statuses: {} });
+  it('the shipped file validates with nothing dropped (Fe filled it in)', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(Object.keys(validateStatusVisuals(yaml('status-visuals.yaml')).statuses)).toContain('sleep');
+    expect(error).not.toHaveBeenCalled();
   });
 
   it('bad entries are logged and dropped', () => {
@@ -88,8 +90,11 @@ describe('status-visuals.yaml', () => {
       fear: { posture: 'shiver' },
       poison: { tint: 'green' },
       frozen: { reserved: 'yes' },
+      stun: { pulse: [60, 6] },
+      blind: { tag: 3 },
+      stone: { posture: 'still', pulse: [6, 60], tag: 'STON' },
     } });
-    expect(Object.keys(v.statuses)).toEqual(['sleep']);
-    expect(error).toHaveBeenCalledTimes(3);
+    expect(Object.keys(v.statuses)).toEqual(['sleep', 'stone']);
+    expect(error).toHaveBeenCalledTimes(5);
   });
 });

@@ -34,10 +34,12 @@ export interface SpellEffectsData {
   byEffect?: Record<string, string>;
 }
 
-export const STATUS_POSTURES = ['none', 'daze', 'stone', 'tremble'] as const;
+/** An actor's pose while a status lasts: `daze` (sleep, stun: the dazed frames), `stone` (grey, no breathing, no recoil),
+ *  `tremble` (fear: ±1 px), `still` (no breathing; the reserved frozen). */
+export const STATUS_POSTURES = ['none', 'daze', 'stone', 'tremble', 'still'] as const;
 export type StatusPosture = typeof STATUS_POSTURES[number];
 
-/** How one status shows on an actor (pass F's Fe fills these in). */
+/** How one status shows on an actor (assets/data/status-visuals.yaml). */
 export interface StatusVisual {
   /** An enemy's pose while the status lasts. */
   posture?: StatusPosture;
@@ -45,8 +47,12 @@ export interface StatusVisual {
   overlay?: string;
   /** Multiplying tint 0xRRGGBB (actorTint source `status`). */
   tint?: number;
+  /** The tint shows `on` frames out of every `period` (no pulse: always on). */
+  pulse?: [number, number];
   /** Icon glyph in the fx atlas. */
   icon?: string;
+  /** Short label (the party panel, the enemy target line). */
+  tag?: string;
   /** A hook for a status the battle does not have yet (frozen, confuse). */
   reserved?: boolean;
   /** Whether party members show it too (default true). */
