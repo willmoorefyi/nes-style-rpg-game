@@ -66,8 +66,9 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     if f["labels"] is not None:
         out += C.seam_gaps(a, f["labels"], f.get("seam_tolerance", 0), f.get("pairs"))
     out += _silhouette(f, a, S, T, cell_h, efix_gates) + C.outline_kept(a, S)
-    out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], bool(meta.get("floating")), 1 if name == "idle_b" else 0,
-                  f.get("contact"), _per_foot(f))
+    floating = bool(meta.get("floating") or f.get("floating"))       # FW-1: the float band replaces the feet check
+    out += C.feet(a, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
+                  1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"), _per_foot(f))
     out += C.clipping(a) + C.rotation_cap(f["rots"]) + C.whole_pixel(f["joints"])
     if name != "idle_b":
         out += C.near_keyframe(f["u"])

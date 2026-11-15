@@ -1,6 +1,7 @@
 """Monster animation check 8, feet anchored (docs/ENEMY_ANIM_PLAN.md 5.1): the lowest row on the plain, then the feet
 judged on the whole bottom band, per foot (part labels; a foot lifted in either keyframe of the span is skipped), or on
-the ground contact a pinned frame that releases feet keeps (a rearing hurt). Re-exported by anim_checks.py."""
+the ground contact a pinned frame that releases feet keeps (a rearing hurt); for a floating sheet or body (FW-1) the
+float band instead. Re-exported by anim_checks.py."""
 from __future__ import annotations
 
 import numpy as np
@@ -88,12 +89,10 @@ def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_ro
     if contact is not None and pinned and not floating and contact.any():
         return _kept_contact(a, contact, bottom_row)
     low = int(rows.max())
-    srows = np.where(_solid(src).any(1))[0]
-    want_low = (int(srows.max()) + float_dy) if floating else bottom_row
-    if low != want_low:
-        return [f"lowest opaque row {low} != {want_low}"]
     if floating:
-        return []
+        return float_band(low, src, toward, u, float_dy)
+    if low != bottom_row:
+        return [f"lowest opaque row {low} != {bottom_row}"]
     if per_foot:
         return _per_foot(a, per_foot, u, bottom_row, pinned)
     f, s, t = _feet_x(a, bottom_row), _feet_x(src, bottom_row), _feet_x(toward, bottom_row)
@@ -102,6 +101,17 @@ def feet(a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, bottom_ro
     ref, tol = (s, 1) if pinned or t is None else ((s[0] + (t[0] - s[0]) * u, s[1] + (t[1] - s[1]) * u), 2)
     if abs(f[0] - ref[0]) > tol or abs(f[1] - ref[1]) > tol:
         return [f"feet x {f} vs {tuple(round(v, 1) for v in ref)} (+-{tol})"]
+    return []
+
+
+def float_band(low: int, src: np.ndarray, toward: np.ndarray, u: float, dy: int, band: int = 1) -> list[str]:
+    """FW-1, check 8 for a floating sheet or body (no feet, no ground row): the lowest opaque row stays within +-band of
+    the source keyframe's lowest row lerped toward the target's by u, plus the frame's body dy (its sink; idle_b 1)."""
+    s = int(np.where(_solid(src).any(1))[0].max())
+    trows = np.where(_solid(toward).any(1))[0]
+    want = s + ((int(trows.max()) - s) * u if len(trows) else 0.0) + dy
+    if abs(low - want) > band:
+        return [f"float band: lowest opaque row {low} vs {want:.1f} (+-{band})"]
     return []
 
 
