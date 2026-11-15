@@ -1,0 +1,22 @@
+# Wraith (pass R, floating): a hooded legless spirit with chains around the torso. body: floating (rig_floating.py),
+# judged by the float band. The arms are drawn into the robe (no arm joints): the robe is `body`, the hood `head`.
+sprite: wraith
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [38, 40], base: [36, 74], neck: [40, 24], crown: [40, 6]}
+  attack: {core: [35, 40], base: [6, 66], neck: [46, 28], crown: [45, 11]}
+  hurt:   {core: [38, 42], base: [30, 72], neck: [38, 28], crown: [36, 10]}
+frames:
+  atk_wind1: {t: 0.0, dx: -2, dy: 1}         # drifts back and sinks (the shared t -0.20 / -0.35 sinks the hem
+  atk_wind2: {t: 0.0, dx: -4, dy: 1}         # out of the float band: the attack hem is 8 px higher)
+  atk_mid: {t: 0.20, tweaks: {base: [-2, -2]}}   # the long trailing hem kept high (turned 35 % it sank 7 px)
+  atk_follow: {t: 1.0}                       # holds the reach (the overshoot clips the hem at x 0)
+  atk_recover: {t: 0.20}
+  hurt_in1: {moves: [crown, neck]}           # the hood snaps back toward the flinch
+  hurt_in2: {moves: [crown, neck], dx: -1, dy: -1}
+holds: []
+paint:                          # 1 px crack where the turned robe meets the outstretched sleeve, inked
+  - {frame: atk_mid, xy: [[51, 38]], rgb: [6, 4, 10]}

@@ -1,0 +1,32 @@
+# Wyrm (pass R, serpent): a wingless bronze serpentine drake, horned head, short clawed forelegs. body: serpent
+# (rig_serpent.py): the lower loop is the pinned coil. In the attack and hurt keys the body arches into an S: the
+# head is rigid from the arch's top-left bend to the snout, forelegs included (the anaconda layout); in the idle the
+# neck stands up and the head is the head alone.
+sprite: wyrm
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [37, 121], c_n: [80, 121], body0: [90, 98], body1: [68, 78], neck: [70, 55], head: [75, 38], snout: [97, 47]}
+  attack: {c_f: [35, 121], c_n: [90, 121], body0: [90, 100], body1: [45, 75], neck: [36, 55], head: [50, 40], snout: [110, 60]}
+  hurt:   {c_f: [37, 121], c_n: [92, 121], body0: [90, 100], body1: [45, 78], neck: [36, 55], head: [50, 40], snout: [104, 52]}
+masks:
+  head:
+    idle: [[60, 22], [100, 22], [100, 52], [60, 52]]
+    attack: [[32, 36], [116, 36], [116, 78], [50, 78], [40, 56], [32, 52]]
+    hurt: [[32, 34], [106, 34], [106, 72], [50, 72], [40, 56], [32, 52]]
+frames:
+  atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}
+  atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}
+  atk_mid: {t: 0.15, moves: [neck, head, snout]}   # at 0.20 the arch creased 11 px where it meets the loop
+  atk_follow: {t: 0.90}                            # a settle: the overshoot closed the S into a 288 px hole
+  atk_recover: {t: 0.20, moves: [neck, head, snout]}   # body1 held: turning it opened the lower loop (13 px)
+  hurt_in1: {moves: [head, snout], tweaks: {head: [-2, -1], snout: [-2, -1]}}   # the head snaps back and up
+  hurt_in2: {t: 0.25, tweaks: {neck: [2, 0], head: [2, 0], snout: [2, 0]}}      # the arch 2 px forward, where it
+                                                   # overlaps the idle best (idle-hurt IoU 0.54 raw, 0.58 2 px apart)
+  daze: {moves: [neck, head, snout], dy: 1}        # the head sinks toward the loop
+  daze_b: {moves: [head, snout], dy: 1}
+holds: []
+paint:                          # 1 px crack under the sunk jaw, where the head meets the neck, inked
+  - {frame: daze_b, xy: [[82, 52], [81, 53], [82, 53]], rgb: [6, 4, 10]}

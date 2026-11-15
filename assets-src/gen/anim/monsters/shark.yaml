@@ -1,0 +1,26 @@
+# Shark (pass R, swimmer): a grey shark arched as if leaping, open jaws, no water drawn. body: swimmer (the
+# rig_floating.py preset), judged by the float band: the head rigid head -> snout, the body an S-chain core -> b1 ->
+# b2 -> tail_tip (the dorsal and pectoral fins ride it).
+sprite: shark
+body: swimmer
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [60, 55], head: [72, 46], snout: [101, 48], b1: [32, 80], b2: [45, 100], tail_tip: [58, 118]}
+  attack: {core: [62, 62], head: [85, 48], snout: [110, 47], b1: [40, 78], b2: [22, 95], tail_tip: [8, 100]}
+  hurt:   {core: [50, 55], head: [70, 46], snout: [99, 50], b1: [25, 80], b2: [55, 105], tail_tip: [78, 85]}
+# The keyframe arches differ hugely (idle-attack IoU 0.41; the body chain turned 38-50 deg past the 25 deg cap and
+# swung the tail out of the float band), so the in-betweens move the whole fish (moves: [], dx / dy), placed where
+# adjacent silhouettes overlap most: the attack overlaps the idle best 8 px up (0.52), the hurt 5 px right (0.72).
+frames:
+  atk_wind1: {t: 0.0, moves: [], dy: 1}            # dips, coiling for the leap (the attack tail touches x 2: the
+  atk_wind2: {t: 0.0, moves: [], dx: 1, dy: 2}      # strike frames can't sit further left, so the wind can't draw back)
+  atk_mid: {t: 0.0, moves: [], dy: -6}              # the leap arriving 6 px high of the key
+  atk_follow: {t: 1.0, moves: [], dy: -4}           # the bite holds, rising past the key
+  atk_recover: {t: 0.0, moves: [], dx: 1, dy: 4}    # the idle arch 4 px low, rising back in
+  hurt_in1: {moves: [], dx: -3}                     # knocked back 3
+  hurt_in2: {t: 0.0, moves: [], dx: 2}              # the curl arriving 2 px ahead of the key
+  daze: {t: 0.0, moves: [], dy: 2}                  # sinks 2 / 3 px (the whole fish: a turn bent the tail out)
+  daze_b: {t: 0.0, moves: [], dy: 3}
+holds: []

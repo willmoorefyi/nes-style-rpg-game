@@ -1,0 +1,32 @@
+# Lava Worm (pass R, serpent): a black-crusted worm with glowing magma seams, reared up. body: serpent
+# (rig_serpent.py): the bottom curl is the pinned coil, the S rises from body0; the head is rigid from the S's top
+# bend to the glowing maw (the anaconda layout).
+sprite: lava_worm
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [58, 121], c_n: [80, 121], body0: [85, 90], body1: [60, 62], neck: [50, 42], head: [62, 20], snout: [102, 30]}
+  attack: {c_f: [30, 121], c_n: [68, 121], body0: [72, 95], body1: [50, 72], neck: [40, 45], head: [60, 24], snout: [112, 45]}
+  hurt:   {c_f: [40, 121], c_n: [82, 121], body0: [85, 95], body1: [58, 68], neck: [44, 45], head: [62, 24], snout: [100, 32]}
+masks:
+  head:
+    idle: [[54, 8], [110, 8], [110, 48], [60, 48], [54, 36]]
+    attack: [[44, 16], [118, 16], [118, 60], [64, 60], [48, 44], [44, 40]]
+    hurt: [[50, 14], [104, 14], [104, 50], [64, 50], [50, 40]]
+frames:
+  # the head ducks 1 / 2 px into the S; body1 stays (moving it cracked the crust where the body leaves the curl). A
+  # draw-back (t -0.25, head 4 back) left the strike 0.51 IoU away (< 0.52): the curl pins atk_mid near the key
+  atk_wind1: {t: 0.0, dy: 0, moves: [neck, head, snout], tweaks: {head: [0, 1], snout: [0, 1]}}
+  atk_wind2: {t: 0.0, dy: 0, moves: [neck, head, snout], tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 2]}}
+  atk_mid: {t: 0.08, moves: [neck, head, snout]}   # the attack curl is 26 px further left (the curl never moves):
+                                                   # past t 0.08 its bottom band leaves the lerp (+-2)
+  atk_follow: {t: 1.0}                             # holds the strike (the overshoot left recover at 0.52 < 0.52)
+  hurt_in1: {moves: [neck, head, snout], dy: -1}
+  hurt_in2: {t: 0.25, moves: [neck, head, snout]}
+  daze: {moves: [neck, head, snout], dy: 1}        # the head sinks toward the curl
+  daze_b: {moves: [neck, head, snout], dy: 2}
+holds: []
+paint:                          # 1 px cracks where the sunk body meets the curl's crust, inked
+  - {frame: daze_b, xy: [[66, 84], [65, 85], [69, 87], [70, 88]], rgb: [6, 4, 10]}

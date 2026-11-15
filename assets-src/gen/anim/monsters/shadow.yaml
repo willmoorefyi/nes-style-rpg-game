@@ -1,0 +1,33 @@
+# Shadow (pass R, floating): a drifting black silhouette of a man, two white eyes. body: floating (rig_floating.py),
+# judged by the float band. The keyframes differ hugely (idle-attack IoU 0.36, idle-hurt 0.35; translation can't
+# raise idle-hurt past 0.35), so the attack in-betweens are mostly whole-figure moves placed where adjacent silhouettes
+# overlap most (attack 5 px right of idle: IoU 0.39), and the hurt bridge leans only the head (arms hold: the hurt
+# arms are thrown up 110-150 deg from the idle ones, far past the 30 deg cap).
+sprite: shadow
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [48, 40], base: [44, 74], neck: [53, 20], crown: [54, 2],
+           sh_n: [58, 22], el_n: [65, 42], hand_n: [78, 58], sh_f: [37, 22], el_f: [26, 38], hand_f: [20, 62]}
+  attack: {core: [36, 44], base: [8, 66], neck: [54, 26], crown: [56, 10],
+           sh_n: [57, 30], el_n: [70, 40], hand_n: [90, 38], sh_f: [32, 24], el_f: [22, 27], hand_f: [12, 30]}
+  hurt:   {core: [45, 42], base: [42, 73], neck: [38, 27], crown: [32, 10],
+           sh_n: [52, 30], el_n: [62, 22], hand_n: [66, 8], sh_f: [27, 32], el_f: [12, 25], hand_f: [6, 10]}
+frames:
+  atk_wind1: {t: 0.0, moves: [crown, neck], dx: -2, dy: 1}   # draws back and sinks, the head starts to lean in
+  atk_wind2: {t: 0.0, moves: [], dx: -5, dy: 2}              # drawn back 5, sunk 2
+  atk_mid: {t: 0.10, moves: [], dy: 1}                       # the lunge arriving, 5 px ahead of the wind-up
+  atk_follow: {t: 0.90, moves: [], dx: 2}                    # holds the reach (an overshoot leaves the cell)
+  atk_recover: {t: 0.0, moves: [], dx: -3, dy: 1}            # drifts back 3 and settles in
+  hurt_in1: {moves: [crown, neck], dy: 1}                    # the head snaps back toward the hurt lean
+  hurt_in2: {moves: [crown, neck]}
+  daze: {moves: [crown, neck], tweaks: {neck: [-1, -1]}}     # sinks, the head droops (neck held: moving it opened
+  daze_b: {moves: [crown, neck], tweaks: {neck: [-1, -1]}}   # a 9 px slit at the shoulder)
+holds: []
+paint:                          # 1-3 px cracks where the turned head meets the shoulder, closed with the body black
+  - {frame: hurt_in1, xy: [[52, 27]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[26, 37]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[56, 28], [57, 28], [56, 29]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[56, 29], [57, 29], [56, 30]], rgb: [6, 4, 10]}

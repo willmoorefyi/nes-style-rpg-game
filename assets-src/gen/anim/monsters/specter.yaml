@@ -1,0 +1,21 @@
+# Specter (pass R, floating): a tall pale-blue robed spirit, faceless hood with two lights. body: floating
+# (rig_floating.py), judged by the float band. The hands are drawn into the robe, so the rig has no arm joints: the
+# robe is the `body` part and the hood the `head`.
+sprite: specter
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [45, 40], base: [45, 74], neck: [47, 22], crown: [47, 5]}
+  attack: {core: [40, 45], base: [20, 72], neck: [52, 28], crown: [54, 11]}
+  hurt:   {core: [46, 45], base: [46, 74], neck: [40, 27], crown: [34, 11]}
+frames:
+  atk_wind1: {t: -0.10, dx: -2, dy: 1}       # drifts back and sinks; the robe starts to lean
+  atk_wind2: {t: -0.20, dx: -4, dy: 1}       # drawn back 4 (the shared -0.35 / dy 2 left the strike 0.45 IoU away)
+  atk_mid: {tweaks: {base: [-2, -2]}}        # the trailing hem kept long and high: turned toward idle it sank 3 px
+  atk_follow: {t: 1.0}                       # holds the reach: the overshoot left follow -> recover at 0.46 < 0.46
+  atk_recover: {t: 0.35}
+  hurt_in1: {moves: [crown, neck], dx: -1}   # the hood snaps back, the robe pushed back 1
+  hurt_in2: {moves: [], dx: -2}              # the recoil 2 px past the key (idle-hurt overlap peaks 4 px left)
+holds: []

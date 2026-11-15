@@ -1,0 +1,17 @@
+# Ochre Jelly (pass R, blob): a stacked lumpy mustard-yellow jelly. body: blob (rig_blob.py): the base band is
+# planted, the body shears (rows slide, never resampled) and squashes per frame. No pods: the lumps are all body.
+sprite: ochre_jelly
+body: blob
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {base: [40, 70], mid: [40, 45], top: [40, 5]}
+  attack: {base: [32, 70], mid: [40, 40], top: [50, 10]}
+  hurt:   {base: [40, 70], mid: [40, 58], top: [48, 32]}
+frames:
+  atk_mid: {t: 0.05, squash: auto}   # the attack spans x 2-79 of 82: the base band can't widen toward the idle's
+  atk_recover: {squash: null}   # the idle crown is on row 1: the template's 1.03 stretch leaves the cell
+  hurt_in1: {squash: auto}      # the hurt key is 28 px lower: the explicit 0.90 left the flinch 9 px tall
+  hurt_in2: {t: 0.20, squash: auto}   # the flattened key re-stretched toward the idle: area 1.20 at 0.35
+holds: []

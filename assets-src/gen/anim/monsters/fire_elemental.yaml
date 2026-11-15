@@ -1,0 +1,38 @@
+# Fire Elemental (pass R, floating): a living pillar of flame with a molten core and a fierce face. body: floating
+# (rig_floating.py), judged by the float band. The pillar is `body`, the face and its flame crest the `head`, the
+# two flame arms `uarm_* / farm_*`.
+sprite: fire_elemental
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [64, 70], base: [64, 118], neck: [70, 52], crown: [68, 18],
+           sh_n: [82, 52], el_n: [88, 72], hand_n: [86, 88], sh_f: [50, 52], el_f: [42, 72], hand_f: [44, 90]}
+  attack: {core: [62, 75], base: [45, 118], neck: [72, 60], crown: [72, 26],
+           sh_n: [78, 62], el_n: [95, 68], hand_n: [110, 66], sh_f: [50, 55], el_f: [32, 58], hand_f: [18, 60]}
+  hurt:   {core: [68, 75], base: [64, 118], neck: [74, 60], crown: [76, 28],
+           sh_n: [84, 58], el_n: [100, 50], hand_n: [110, 42], sh_f: [52, 55], el_f: [38, 42], hand_f: [28, 32]}
+parts:
+  uarm_n: {radius: 6.0}
+  farm_n: {radius: 7.0}
+  uarm_f: {radius: 6.0}
+  farm_f: {radius: 7.0}
+masks:                          # the face and crest only; the flame arms stay off the head
+  head:
+    idle: [[52, 10], [88, 10], [88, 56], [52, 56]]
+    attack: [[54, 18], [92, 18], [92, 63], [54, 63]]
+    hurt: [[54, 18], [90, 18], [90, 63], [54, 63]]
+# Without arm joints no in-between could bridge idle -> attack (IoU 0.53 < 0.54 at best, translation included): the
+# flame arms swinging out are what the two keys don't share. The arm swings cap the t values (forearm 30 deg).
+frames:
+  atk_wind1: {t: -0.12, moves: [crown, neck]}   # drifts back and sinks, the face draws back; the arms ride (turned
+  atk_wind2: {t: -0.25, moves: [crown, neck]}   # away from the attack they sliced the fists with outline cracks)
+  atk_mid: {t: 0.20}            # 50 deg at 0.35
+  atk_follow: {t: 1.0}          # holds the reach (the overshoot left recover at 0.54 < 0.54)
+  atk_recover: {t: 0.25}
+  hurt_in1: {moves: [crown, neck], dy: 1}         # the face snaps back; the arms (110-150 deg from the raised
+  hurt_in2: {moves: [crown, neck], dx: -1, dy: -1}   # hurt arms) change at the keyframe boundary
+  daze: {moves: [crown, neck]}  # the face droops, the flames sink
+  daze_b: {moves: [crown, neck]}
+holds: []

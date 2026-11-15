@@ -1,0 +1,31 @@
+# Anaconda (pass R, serpent): a thick green-brown constrictor in a raised coil. body: serpent (rig_serpent.py): the
+# coil is pinned in every frame, the S-curved body rises from body0, the tail is raised only in the attack key.
+# The head is rigid from the S's top bend to the snout (`neck` sits on the rising left side): the bend turned as the
+# end of the body chain lifted a spur of scales above the head.
+sprite: anaconda
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [47, 121], c_n: [101, 121], body0: [85, 78], body1: [78, 58], neck: [58, 36], head: [66, 22], snout: [98, 30]}
+  attack: {c_f: [27, 121], c_n: [93, 121], body0: [86, 85], body1: [62, 56], neck: [44, 38], head: [60, 22], snout: [122, 32],
+           t1: [16, 92], t2: [14, 82], t3: [13, 72], tail_tip: [12, 66]}
+  hurt:   {c_f: [47, 121], c_n: [101, 121], body0: [95, 72], body1: [70, 52], neck: [40, 38], head: [52, 22], snout: [108, 30]}
+parts:
+  tail: {in: [attack]}
+masks:
+  head:
+    idle: [[48, 14], [100, 14], [100, 38], [48, 38]]
+    attack: [[38, 16], [126, 16], [126, 52], [96, 52], [92, 42], [38, 40]]
+    hurt: [[32, 14], [112, 14], [112, 40], [32, 40]]
+frames:
+  atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}
+  atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}
+  atk_mid: {t: 0.05, moves: [neck, head, snout]}   # the attack coil is 25 px narrower than the idle's and the coil
+                                                   # never moves: past t 0.07 its bottom band leaves the lerp (+-2)
+  hurt_in1: {moves: [neck, head, snout], dy: -2}   # the head snaps back, the body rears 2 px (the hurt coil is a ring
+  hurt_in2: {t: 0.20, moves: [neck, head, snout], dy: 2}   # taller: its centroid sits 8 px higher)
+  daze: {moves: [neck, head, snout], dy: 1}        # the head sinks toward the coil
+  daze_b: {moves: [neck, head, snout], dy: 2}
+holds: []

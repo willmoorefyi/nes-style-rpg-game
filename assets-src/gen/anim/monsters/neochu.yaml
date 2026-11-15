@@ -1,0 +1,41 @@
+# Neochu (pass R, rooted): a purple-black thorned ochu with two maws, spiked vines and poison sacs. body: rooted
+# (rig_serpent.py preset): the mass (root, stalks, both maws) never moves; tent1 / tent2 are the vines on the party's
+# side. The vines are thin and 50-60 deg apart between keys (chain cap 25 deg), and every frame that turned more than
+# their first joint tore them or closed loops into holes, so the in-betweens move only k1_1 / k2_1 and the strike
+# lives in the keyframe switch (idle-attack IoU 0.55: moves past this left wind2 -> mid at 0.54 < 0.55).
+sprite: neochu
+body: rooted
+facing: right
+sampler: nearest
+breath: true
+lead: [1, 2]
+keyframes:
+  idle:   {root: [62, 112], maw: [62, 70],
+           k1_0: [70, 62], k1_1: [82, 60], k1_2: [90, 65], k1_3: [86, 72],
+           k2_0: [72, 85], k2_1: [88, 82], k2_2: [94, 90], k2_3: [90, 98],
+           k3_0: [52, 62], k3_1: [40, 55], k3_2: [32, 60], k3_3: [36, 70],
+           k4_0: [50, 85], k4_1: [38, 85], k4_2: [36, 95], k4_3: [44, 100]}
+  attack: {root: [60, 112], maw: [60, 70],
+           k1_0: [70, 60], k1_1: [85, 58], k1_2: [95, 45], k1_3: [100, 42],
+           k2_0: [72, 75], k2_1: [92, 76], k2_2: [106, 72], k2_3: [108, 66],
+           k3_0: [50, 55], k3_1: [35, 48], k3_2: [22, 55], k3_3: [25, 68],
+           k4_0: [48, 72], k4_1: [36, 75], k4_2: [32, 88], k4_3: [40, 95]}
+  hurt:   {root: [62, 112], maw: [64, 72],
+           k1_0: [72, 62], k1_1: [84, 62], k1_2: [92, 68], k1_3: [88, 76],
+           k2_0: [74, 85], k2_1: [90, 84], k2_2: [96, 92], k2_3: [90, 100],
+           k3_0: [52, 62], k3_1: [40, 58], k3_2: [34, 64], k3_3: [38, 72],
+           k4_0: [50, 85], k4_1: [38, 88], k4_2: [38, 98], k4_3: [46, 102]}
+frames:
+  idle_b: {tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}   # the vine tips sway 1 px with the breath
+  atk_wind1: {t: -0.10, dy: 0, moves: [k1_1, k2_1]}
+  atk_wind2: {t: -0.20, dy: 0, moves: [k1_1, k2_1]}
+  atk_mid: {t: 0.15, moves: []}
+  atk_follow: {t: 1.0, moves: [k1_1, k2_1]}
+  atk_recover: {t: 0.30, moves: [k1_1, k2_1]}
+  hurt_in1: {moves: [k1_1, k2_1]}
+  hurt_in2: {moves: [k1_1, k2_1]}
+  daze: {moves: [], dy: 0, tweaks: {k1_3: [0, 1], k2_3: [0, 1]}}
+  daze_b: {moves: [], dy: 0, tweaks: {k1_3: [0, 2], k2_3: [0, 2], k3_3: [0, 1], k4_3: [0, 1]}}
+holds: []
+paint:                          # the 1 px breath sink closed the gap under the left stalk into a 5 px hole: reopened
+  - {frame: idle_b, xy: [[55, 70]], rgb: null}
