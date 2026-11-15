@@ -88,7 +88,13 @@ masks:
   body:                        # the folded wing's claw beside the neck (nearest-bone gave it to the neck)
     idle: [[56, 56], [73, 56], [74, 72], [56, 72]]
   thigh_f:                     # the far leg's dark shank behind the belly (it rode the body and chopped in the jolt)
-    idle: [[76, 95], [91, 95], [91, 113], [76, 113]]
+    idle: [[61, 98], [76, 95], [91, 95], [91, 113], [61, 113]]   # and the bent far thigh under the belly (recover clutter)
+    attack: [[48, 99], [56, 95], [66, 94], [74, 97], [74, 112], [48, 112]]   # the whole bent far leg (the body slid over it in follow)
+  thigh_n:                     # the near thigh under the belly (body-owned, it sawtoothed in follow)
+    attack: [[33, 94], [44, 90], [50, 96], [50, 110], [33, 110]]
+    idle: [[46, 93], [52, 88], [61, 90], [62, 111], [46, 111]]
+  shin_n:                      # the near shin's back edge (body-owned, it doubled in recover)
+    idle: [[41, 104], [46, 101], [49, 104], [53, 108], [53, 114], [41, 114]]
   wing_f:                      # the far wing's wrist claw rides the wing
     hurt: [[57, 48], [68, 48], [68, 58], [57, 58]]
   head:                        # both horns ride the head
@@ -120,6 +126,7 @@ frames:
     t: 0.65
     pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
     moves: [hip, chest, head, beak]
+    tweaks: {hip_n: [3, 0], knee_n: [2, 0], hip_f: [4, 0], knee_f: [2, 0]}   # hips and knees ease toward idle, feet planted
   atk_recover:                 # translation: body still 2 px back, head still low and forward after the bite
     moves: []
     tweaks: {hip: [-3, -1], chest: [-3, -1], neck: [-3, -1], head: [-1, -1], beak: [-1, -1], tail0: [-3, -1], tail1: [-3, -1], tail2: [-3, -1], tail3: [-3, -1], tail_tip: [-3, -1]}
@@ -131,10 +138,9 @@ frames:
     pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
     moves: [hip, chest, neck]
     dy: 2
-    tweaks: {head: [-3, -3], beak: [-3, -3], wel_f: [-10, 10], wtip_f: [-17, 25], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+    tweaks: {head: [-3, -3], beak: [-3, -3], wel_f: [2, 1], wtip_f: [5, 2], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
   daze: {moves: [], dy: 1}
   daze_b: {moves: [], dy: 1, tweaks: {neck: [1, 1], head: [1, 2], beak: [1, 2]}}
 seam_tolerance: 2               # the approved sliver between the two spread wings (attack key, x 63-66, y 62-75)
 holds: []
-paint:                         # hurt_in2: the lowered far wing closes the tail loop's slit; filled with shaded membrane (the wing behind the loop)
-  - {frame: hurt_in2, xy: [[25, 78], [26, 78], [26, 79], [27, 77], [27, 78], [28, 77], [28, 78], [29, 77], [29, 78], [30, 77], [30, 78], [31, 77], [31, 78], [32, 78]], rgb: [74, 107, 66]}
+paint: []
