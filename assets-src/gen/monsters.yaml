@@ -441,10 +441,11 @@
     two legs ending in clawed feet, no other claws; the same broad, bulky domed hull, thick legs and proportions as in
     Image 3, seen from the same angle, at the same pixel size as in Image 3
   cast: >-
-    charging a nuclear blast: legs braced wide apart, the hull leaning back, the cannon arm (on the right side of the
-    image, as in Image 3) levelled straight at the heroes with its muzzle glowing bright white, the chest core blazing
-    white-blue through the grille, the claw arm braced behind; the glow drawn on the machine itself, no beam; at the
-    same pixel size as in Image 3
+    charging a nuclear blast, a pose clearly different from Image 3: the two legs spread much wider apart into a low
+    braced crouch, knees bent, the hull tilted back, the cannon arm (on the right side of the image, as in Image 3)
+    raised and levelled at the heroes with its same round muzzle as in Image 3 glowing bright white, the chest core
+    blazing white-blue through the grille, the claw arm dug down to the ground behind as a brace; the glow drawn on
+    the machine itself, no beam; at the same pixel size as in Image 3
   hurt: >-
     damaged: small sparks bursting from the hull seams, one reverse-jointed leg buckling, the hull tilting back away
     from the heroes, the red lens flickering, the cannon arm still on the right side of the image and the claw arm on
@@ -452,7 +453,7 @@
   face: no face; the domed sensor head with one glowing red lens is the readable feature
   extra_negative: a human pilot, a person in a cockpit, wheels, tank treads, wings, a sword, more than two legs
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1236}   # boss_attack 1234 (ROSTER_LOG R49): a slim hull, the claw raised (wind-up);
+  sheet_seeds: {boss_attack: 1236, boss_cast: 1235}   # boss_cast 1234 (R52): an idle copy, a forked muzzle; boss_attack 1234 (ROSTER_LOG R49): a slim hull, the claw raised (wind-up);
   # 1235 (R50, + the bulk sentence): an extra claw at the front knee
 - id: death_eye
   # "Death Eye" (121), the undead eye of the final dungeon: paralysis, time gaze, death magic.
