@@ -1,4 +1,5 @@
 import { Container } from 'pixi.js';
+import { ScreenShake } from './screenShake.js';
 
 /** The effects layer: overlays and icons (status) < spell effects < flashes < floating numbers. */
 export class FxLayer extends Container {
@@ -29,7 +30,8 @@ const registry = new WeakMap<Container, BattleLayers>();
  * `bg` (backdrop) < `ui` (enemy list, command window, party panel) < `actors` (enemy sprites, then party sprites) <
  * `fx` (status < spell < flash < numbers) < `hud` (the message window and end prompt), so nothing covers the text.
  *
- * `update(dt)` runs once per frame from the scene; effects, followers and the screen shake hook in with `onUpdate`.
+ * `update(dt)` runs once per frame from the scene; effects and followers hook in with `onUpdate`. It also moves
+ * `actors` and `fx` (never `ui` or `hud`) by the screen shake (`shake.start()`, the heavy attack's slam).
  */
 export class BattleLayers {
   readonly bg = layer('bg');
@@ -37,6 +39,7 @@ export class BattleLayers {
   readonly actors = layer('actors');
   readonly fx = new FxLayer();
   readonly hud = layer('hud');
+  readonly shake = new ScreenShake();
   private updaters: LayerUpdater[] = [];
 
   private constructor(readonly root: Container) {
@@ -46,6 +49,15 @@ export class BattleLayers {
 
   /** The layers of `root`: the ones already built in it, else new ones appended to it (old callers pass a plain
    *  Container; whatever it already holds stays below the layers). */
+  /** The layers whose root holds `c` (walking up its parents), or null. */
+  static containing(c: Container): BattleLayers | null {
+    for (let p: Container | null = c; p; p = p.parent) {
+      const l = registry.get(p);
+      if (l && l.bg.parent === p) return l;
+    }
+    return null;
+  }
+
   static of(root: Container): BattleLayers {
     const existing = registry.get(root);
     if (existing && existing.bg.parent === root) return existing;
@@ -60,6 +72,10 @@ export class BattleLayers {
 
   update(dt: number): void {
     for (const fn of [...this.updaters]) fn(dt);
+    const o = this.shake.offset();
+    this.actors.position.set(o.x, o.y);
+    this.fx.position.set(o.x, o.y);
+    this.shake.update(dt);
   }
 
   /** Drop every update hook (scene exit). */

@@ -45,6 +45,20 @@ describe('enemy animation preview (dev ?enemyAnim=)', () => {
     expect(t.poses.state(1).pose).toMatch(/^cast_/);
   });
 
+  it('pass F item 3: the loop starts the view\'s attack (the travel) and spaces the hurt after its longer length', () => {
+    const t = target(1);
+    const attack = vi.fn((i: number) => t.poses.playAttack(i, { travel: 600, rise: 0 }));
+    const len = 47 + 18;
+    const p = new EnemyAnimPreview('loop', 1, { ...t, attack, attackFrames: () => len });
+    expect(schedule(false, len).events).toEqual([['attack', 0], ['hurt', len + PAUSE]]);
+    const tick = (n: number) => { for (let k = 0; k < n; k++) t.poses.update(p.frameDt(1)); };
+    tick(1);
+    expect(attack).toHaveBeenCalledWith(0);
+    expect(t.poses.attackKind(0)).toBe('melee');
+    tick(len + PAUSE);
+    expect(t.poses.state(0).pose).toBe('hurt_in1');
+  });
+
   it('slow=N divides dt', () => {
     const p = new EnemyAnimPreview('loop', 4, target(1));
     expect(p.frameDt(1)).toBe(0.25);
