@@ -2282,15 +2282,16 @@
     head in front, a horned goat head rising from the middle of the back, and a green scaly dragon head on a short
     neck from the shoulder, each head clearly apart; exactly two leathery bat wings half raised, a live green snake for
     a tail curled up behind the hips with its head raised; the whole creature, tail to snout, sits in the middle of its
-    own cell with empty space on both sides
+    own cell with empty space on both sides; exactly one chimera in each of the three cells, filling its box (one
+    row, three figures in all)
   attack: >-
     lunging forward low, all three heads snapping toward the heroes with the jaws open, the heads above and just in
     front of its front feet, all four feet on the ground, the whole chimera well inside the middle cell
   hurt: >-
     knocked back, all four feet on the ground, the three heads recoiling, the wings flared, the snake tail coiled
   face: the lion face with amber eyes is readable, and the goat and dragon heads are clearly visible
-  extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up
-  seeds: [1234]
+  extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up, a second row
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R247): two rows of figures in the raw, the cut mixed them
 - id: guardian
   # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
   size: large
