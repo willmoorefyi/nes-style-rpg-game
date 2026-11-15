@@ -443,10 +443,11 @@ Images used: 259 of 300 (build 259 of 285, fix 0 of 15; ledger guard: 359 Gemini
 |---|---|---|---|---|---|
 | C (068-101) | **31 of 32**: the 12 above + baretta, basilisk, allosaurus, weretiger, sand_worm, minotaur_zombie, king_mummy, medusa, rakshasa, clay_golem, nightmare (best of 3), sahagin_prince (best of 3), deepeyes, sea_snake, sea_scorpion, sea_troll, ghost, water_elemental (best of 3), water_naga | **white_shark** (swimmer; not requested, the swimmer stop after R277) | 54 (R188-R244; 19 before the spend-cap stop, 35 in this run; R225, R229, R243 are no-image best-of-3 rows) | 43 for all 32 | quadruped 14 / 8, biped 18 / 10, bird 4 / 2, floating 7 / 4, arthropod 4 / 2, serpent 4 / 3, naga 3 / 2 |
 
-- **The cutter's fixed thirds are still the main cost** (12 of the 22 rejections in C and D): an attack claw, a muzzle, a
-  streaming tail, a fin cape, a trailing cape or a flung blade crosses the raw's one-third or two-thirds line and is
-  sliced (baretta R207 tip, nightmare R223/R224, sahagin_prince R226/R228, sea_snake R232, sea_scorpion R234/R235,
-  vampire_lord R267). What held: tails "resting on the ground close beside the coils (never raised or stretched out)",
+- **Cuts are still the main cost** (12 of the 31 rejected attempts of this run, R207-R277): 9 where an attack snout or
+  claw, a muzzle, a streaming tail, a fin cape, a trailing cape or a flung blade crosses the raw's one-third or
+  two-thirds line and is sliced (allosaurus R210, nightmare R223/R224, sahagin_prince R226/R228, sea_snake R232,
+  sea_scorpion R234/R235, vampire_lord R267; baretta R207 lost 1-2 px and was approved), and 3 cut by the cell's top or
+  bottom row (minotaur_zombie R214, sea_troll R237, water_elemental R240). What held: tails "resting on the ground close beside the coils (never raised or stretched out)",
   claws "raised up in front of its face and pulled in close (not reaching forward)", capes "kept close to the body (not
   flung out behind)". The framework proposal (split the raw at the figure gaps nearest the thirds) would remove most of
   these retries.
