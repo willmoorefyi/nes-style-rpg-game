@@ -147,7 +147,8 @@ frames:
 holds: []
 paint:                         # 1 px elbow crack on the near foreleg's back edge closed with outline ink
   - {frame: daze_b, xy: [[82, 101]], rgb: [6, 4, 10]}
-  - {frame: daze_b, xy: [[130, 75], [131, 75], [131, 76]], rgb: [57, 41, 33]}       # throat pocket under the lowered jaw
+  - {frame: daze_b, xy: [[130, 75], [131, 75], [131, 76]], rgb: [6, 4, 10]}        # throat pocket under the lowered jaw (solid ink, no face glyph)
+  - {frame: daze_b, xy: [[129, 72], [130, 72], [131, 72], [132, 72], [130, 73], [132, 73]], rgb: [181, 156, 132]}   # stray dots above the pocket -> ruff beige
   - {frame: hurt_in2, xy: [[105, 75], [106, 75], [105, 76], [107, 76]], rgb: [132, 99, 74]}   # shoulder specks
   - {frame: atk_mid, xy: [[110, 82], [111, 82], [112, 82], [112, 83], [113, 83]], rgb: [57, 41, 33]}   # ruff hole
   - {frame: atk_mid, xy: [[55, 85], [56, 85], [57, 85], [58, 85], [59, 85], [60, 85], [61, 85], [62, 85]], rgb: [132, 99, 74]}   # doubled thigh outline
