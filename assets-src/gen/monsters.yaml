@@ -1157,17 +1157,18 @@
   prompt: >-
     a ruddy-skinned hill giant with a big belly and a shaggy brown beard, a tunic of patched brown and grey furs, a
     rope belt with a lumpy sack tied to it, bare feet, holding one huge club made from a tree trunk with stubs of
-    branches in the hand on the right side of the image (toward the heroes) in every cell; tall and filling the box,
-    centred in its own cell
+    branches; in the idle cell the club rests on his shoulder, held close to the body in the hand on the right side
+    of the image; tall and filling the box, centred in its own cell, and the whole club stays well inside its cell in
+    every cell
   attack: >-
-    stepping forward toward the heroes at the end of a downward smash: the club head is low in front of him on the
-    right side of the image, held in both hands, the body leaning in, the club head well inside the middle cell (not
-    raised overhead)
+    stepping forward toward the heroes at the end of a downward smash: the club held in both hands, its head on the
+    ground just in front of his front foot, the body leaning in, the whole club well inside the middle cell (not
+    raised overhead, not reaching the cell edge)
   hurt: >-
-    knocked back, staggering, the club dragged low in the same hand as in the idle cell, the other hand on its head
+    knocked back, staggering, both hands still gripping the club held up across his chest, the head thrown back
   face: its ruddy bearded face with small eyes and a big nose is readable
   extra_negative: armour, a helmet, horns, a cape, flames, ice, a metal weapon, a second club, a club raised overhead
-  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R138): an overhead wind-up attack, the club switched hands in the hurt
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R138): an overhead wind-up attack, the club switched hands in the hurt; 1235 (R139): the club sliced at the raw cell edges, switched hands again
 - id: earth_elemental
   # "Earth Elemental" (041): a lumbering boulder giant (a biped, distinct from the other elementals)
   size: large
