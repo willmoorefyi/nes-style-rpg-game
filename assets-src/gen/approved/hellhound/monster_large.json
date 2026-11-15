@@ -1,0 +1,27 @@
+{
+  "character": "hellhound",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "161677d4feea7ef318992830",
+  "approved": "2026-11-15",
+  "grid": [
+    140,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R184"
+}
