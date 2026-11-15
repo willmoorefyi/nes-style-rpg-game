@@ -1,0 +1,126 @@
+sprite: allosaurus
+body: bird
+facing: right
+sampler: nearest
+breath: true
+# Wingless bird template (biped dinosaur). The quick, lunging sibling of the tyrannosaur: a short sharp coil forward
+# and down into the strike, a snappy follow. The stiff tail is never interpolated (the attack raises it high); it
+# rides the body shift. Legs are translated, never rotated. The idle snout ends at x 131 of 134: no frame moves the
+# head right.
+keyframes:
+  idle:
+    hip: [63, 80]
+    chest: [92, 76]
+    neck: [96, 64]
+    head: [104, 52]
+    beak: [130, 60]
+    claw_n: [104, 92]
+    tail0: [52, 72]
+    tail1: [38, 66]
+    tail2: [22, 60]
+    tail_tip: [8, 57]
+    hip_n: [63, 88]
+    knee_n: [58, 101]
+    foot_n: [51, 116]
+    toe_n: [62, 121]
+    hip_f: [85, 92]
+    knee_f: [85, 103]
+    foot_f: [84, 114]
+    toe_f: [98, 118]
+  attack:
+    hip: [55, 80]
+    chest: [82, 80]
+    neck: [94, 86]
+    head: [104, 88]
+    beak: [130, 97]
+    claw_n: [92, 104]
+    tail0: [45, 72]
+    tail1: [35, 58]
+    tail2: [25, 42]
+    tail_tip: [12, 28]
+    hip_n: [52, 90]
+    knee_n: [44, 102]
+    foot_n: [36, 116]
+    toe_n: [47, 121]
+    hip_f: [75, 95]
+    knee_f: [73, 105]
+    foot_f: [76, 114]
+    toe_f: [90, 118]
+  hurt:
+    hip: [55, 78]
+    chest: [86, 76]
+    neck: [90, 66]
+    head: [97, 55]
+    beak: [122, 64]
+    claw_n: [94, 92]
+    tail0: [45, 70]
+    tail1: [33, 62]
+    tail2: [20, 52]
+    tail_tip: [5, 46]
+    hip_n: [52, 88]
+    knee_n: [46, 100]
+    foot_n: [37, 116]
+    toe_n: [48, 121]
+    hip_f: [72, 95]
+    knee_f: [69, 104]
+    foot_f: [70, 114]
+    toe_f: [84, 117]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  arm_n: {bone: [chest, claw_n], radius: 4.0}
+masks:
+  thigh_n:                     # the near knee rides the leg, not the body (the body slid over it: a doubled shin edge)
+    idle: [[47, 94], [66, 94], [66, 106], [47, 106]]
+    hurt: [[34, 95], [54, 95], [54, 106], [34, 106]]
+  toes_n:
+    idle: [[44, 112], [68, 112], [68, 124], [44, 124]]
+    attack: [[29, 112], [54, 112], [54, 124], [29, 124]]
+    hurt: [[29, 112], [54, 112], [54, 124], [29, 124]]
+  toes_f:
+    idle: [[79, 110], [104, 110], [104, 121], [79, 121]]
+    attack: [[71, 110], [97, 110], [97, 121], [71, 121]]
+    hurt: [[64, 110], [90, 110], [90, 121], [64, 121]]
+z:
+  idle: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, head, arm_n]
+  attack: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, arm_n, head]
+  hurt: [thigh_f, shin_f, toes_f, tail, body, thigh_n, shin_n, toes_n, neck, head, arm_n]
+frames:
+  atk_wind1:                   # coil: the body sinks over the planted feet, head and jaws drop, tail lifts (legs pinned)
+    moves: []
+    dy: 1
+    tweaks: {chest: [0, 1], claw_n: [0, 1], neck: [-1, 2], head: [-1, 3], beak: [-1, 3], tail1: [0, -1], tail2: [0, -2], tail_tip: [0, -2]}
+  atk_wind2:
+    moves: []
+    dy: 2
+    tweaks: {chest: [0, 1], claw_n: [0, 1], neck: [-2, 3], head: [-2, 6], beak: [-2, 6], tail1: [0, -2], tail2: [0, -4], tail_tip: [0, -5]}
+  atk_mid:
+    t: 0.25
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: [hip, chest, head, beak, claw_n]
+    tweaks: {hip_n: [5, 0], knee_n: [5, 0], foot_n: [5, 0], toe_n: [5, 0], hip_f: [4, 0], knee_f: [4, 0], foot_f: [4, 0], toe_f: [4, 0], neck: [-2, 0], head: [-2, 0], beak: [-2, 0]}
+  atk_follow:                  # the snap settles: head lifts back toward idle, the raised tail starts to drop
+    t: 0.65
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: [tail0, tail1, tail2, tail_tip]
+    tweaks: {hip: [0, -2], chest: [0, -3], claw_n: [0, -3], neck: [0, -4], head: [0, -5], beak: [0, -5], tail2: [0, 1], tail_tip: [0, 1]}
+  atk_recover:                 # translation: the body still low after the snap, head and jaws still down, tail high
+    moves: []
+    tweaks: {hip: [0, 1], chest: [0, 2], claw_n: [0, 2], neck: [0, 2], head: [0, 2], beak: [0, 2], tail1: [0, -1], tail2: [0, -2], tail_tip: [0, -3]}
+  hurt_in1:
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [-1, -1], chest: [-1, -2], claw_n: [-1, -2], neck: [-3, -2], head: [-4, -4], beak: [-4, -4], tail0: [-1, -1], tail1: [-1, -1], tail2: [-1, -1], tail_tip: [-1, -1]}
+  hurt_in2:
+    pins: [hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
+    moves: []
+    tweaks: {hip: [2, 1], chest: [2, 1], claw_n: [2, 1], neck: [3, 1], head: [3, 1], beak: [3, 1], tail0: [2, 1], tail1: [2, 1], tail2: [2, 1], tail_tip: [2, 1]}
+  daze: {moves: [], dy: 1, tweaks: {head: [-2, 0], beak: [-2, 0]}}          # cancels the recipe's forward head nudge (edge)
+  daze_b: {moves: [], dy: 1, tweaks: {neck: [0, 1], head: [-2, 1], beak: [-2, 1]}}
+holds: []
+paint:                         # 1 px cracks (far thigh under the belly, near arm crook) closed with outline ink
+  - {frame: atk_wind1, xy: [[90, 102]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[90, 102]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[90, 102]], rgb: [6, 4, 10]}
