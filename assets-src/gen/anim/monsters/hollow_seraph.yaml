@@ -1,0 +1,151 @@
+# Hollow Seraph (V8 F4 redesign: R324 idle, R326 attack, R331 cast; no approved hurt: FW-H `hurt_from: idle`).
+# A floating empty suit of armour of separate hovering pieces: the faceless brass helm, the broken gear halo in two
+# arcs, the shoulder plates and cuirass with the gold gear heart, four hilt-less blade wings of cold light in brass
+# frames (two per side, joined to the shoulders), two gauntlets floating free (no arms) and the long split skirt.
+# body: floating (rig_floating.py): no feet, the float band judges every frame. All keys are 200x200 cells.
+# Every in-between is a whole-cell translation of its source key (moves: [], frame dx / dy; the chaos / v2 recipe),
+# placed where the key switch overlaps best (measured IoU vs the idle: attack best d (2, 6) 0.569, cast (0, 6) 0.444).
+# The whole cell is one rigid `body` per key, so no blade, frame or plate is resampled, fused or torn: the four blade
+# wings are in every frame. Only the two free gauntlets (separate pieces; masks = their convex hulls + 1 px) and the
+# halo (the allowlisted fx part, FW-7) move on their own roots: the pieces hover apart. The halo brightens one / two
+# steps up its own ramp in cast_gather / cast_release only.
+# Hurt (FW-H): the hurt key is the idle, knocked back 3 px and down 2 (key_offset), with the gear heart dimmed one
+# step down its gold ramp and the helm slit gone grey (keyframe paint, 116 of 160 px): the heart flickers out in the
+# hit and comes back in the idle. hurt_in1 throws the free gauntlets out (the halo stays: one arc touches the helm
+# outline, moving it would split a piece); hurt_in2 settles them.
+sprite: hollow_seraph
+body: floating
+facing: right
+sampler: nearest
+breath: true
+raise: false                   # D-V9, FW-R: no attack_raise key; the heavy glint tip comes from atk_wind2
+hurt_from: idle                # FW-H (HURT_FROM_ALLOW): the hurt key is derived from the idle, the recoil below
+key_offset:
+  hurt: [-3, 2]                # knocked back (away from the heroes) and down
+keyframes:
+  idle:
+    core: [110, 108]
+    base: [105, 190]
+    neck: [109, 94]
+    crown: [109, 72]
+    halo: [107, 62]
+    gl_r: [75, 121]
+    gl_t: [75, 153]
+    gr_r: [131, 121]
+    gr_t: [138, 152]
+  attack:
+    core: [112, 100]
+    base: [100, 190]
+    neck: [116, 85]
+    crown: [116, 65]
+    halo: [116, 55]
+  hurt:                        # the idle's joints (written in the unmoved art; key_offset moves them)
+    core: [110, 108]
+    base: [105, 190]
+    neck: [109, 94]
+    crown: [109, 72]
+    halo: [107, 62]
+    gl_r: [75, 121]
+    gl_t: [75, 153]
+    gr_r: [131, 121]
+    gr_t: [138, 152]
+  cast:
+    core: [110, 105]
+    base: [110, 190]
+    neck: [111, 95]
+    crown: [111, 73]
+    halo: [109, 64]
+parts:
+  weapon: {remove: true}
+  tail: {remove: true}
+  wing_n: {remove: true}
+  wing_f: {remove: true}
+  halo: {bone: [crown, halo], radius: 6.0, kind: fx, in: [idle, cast]}
+  g_l: {bone: [gl_r, gl_t], radius: 8.0, in: [idle, hurt]}      # image-left floating gauntlet
+  g_r: {bone: [gr_r, gr_t], radius: 8.0, in: [idle, hurt]}      # image-right floating gauntlet
+masks:
+  body:
+    idle: [[0, 0], [199, 0], [199, 199], [0, 199]]
+    attack: [[0, 0], [199, 0], [199, 199], [0, 199]]
+    hurt: [[0, 0], [199, 0], [199, 199], [0, 199]]
+    cast: [[0, 0], [199, 0], [199, 199], [0, 199]]
+  g_l:
+    idle: &gl [[67, 144], [68, 121], [70, 119], [78, 119], [81, 121], [83, 123], [84, 143], [84, 149], [81, 154], [80, 155],
+           [73, 155], [69, 151], [67, 147]]
+    hurt: *gl
+  g_r:
+    idle: &gr [[123, 124], [124, 123], [130, 120], [136, 120], [137, 121], [141, 133], [143, 140], [143, 150], [140, 153],
+           [137, 153], [134, 152], [132, 151], [131, 150], [123, 130]]
+    hurt: *gr
+  halo:
+    idle: [[88, 52], [127, 52], [127, 69], [88, 69]]
+    cast: [[93, 58], [125, 58], [125, 71], [93, 71]]
+z:
+  idle: [body, g_l, g_r, halo]
+  hurt: [body, g_l, g_r]
+  cast: [body, halo]
+frames:
+  atk_wind1:                   # the coil starts: she rises 2 and draws back 1, the gauntlets draw back 1
+    moves: []
+    dx: -1
+    dy: -2
+    tweaks: {gl_r: [-1, 0], gl_t: [-1, 0], gr_r: [-1, 0], gr_t: [-1, 0]}
+  atk_wind2:                   # coiled: risen 4, back 2, the gauntlets 2 back and 1 up
+    moves: []
+    dx: -2
+    dy: -4
+    tweaks: {gl_r: [-2, -1], gl_t: [-2, -1], gr_r: [-2, -1], gr_t: [-2, -1]}
+  atk_mid:                     # the strike arriving: the attack key 2 low (its best overlap with the coiled idle)
+    moves: []
+    t: 0.0
+    dy: 2
+  atk_follow:                  # after the strike she sinks back toward the idle overlap
+    moves: []
+    t: 1.0
+    dx: 1
+    dy: 3
+  atk_recover:                 # floats back: the idle 1 back and 3 high (the attack-key overlap)
+    moves: []
+    t: 0.0
+    dx: -1
+    dy: -3
+  hurt_in1:                    # the jolt: knocked back 2 and down 1, the free gauntlets flung out
+    moves: []
+    t: 0.0
+    dx: -2
+    dy: 1
+    tweaks: {gl_r: [-2, 1], gl_t: [-2, 1], gr_r: [2, 1], gr_t: [2, 1]}
+  hurt_in2:                    # the hurt key (dimmed heart), the gauntlets still 1 out, settling
+    moves: []
+    t: 0.0
+    tweaks: {gl_r: [-1, 0], gl_t: [-1, 0], gr_r: [1, 0], gr_t: [1, 0]}
+  cast_gather:                 # power gathers: she rises 2, the gauntlets lift 2, the halo kindles (FW-7)
+    moves: []
+    t: 0.0
+    dy: -2
+    brighten: {halo: 1}
+    tweaks: {gl_r: [0, -2], gl_t: [0, -2], gr_r: [0, -2], gr_t: [0, -2]}
+  cast_rise:                   # the cast key 4 low (its best overlap with the risen idle)
+    moves: []
+    t: 0.0
+    dy: 4
+  cast_release:                # the release: risen 2, the halo flares two steps
+    moves: []
+    t: 1.0
+    dy: -2
+    brighten: {halo: 2}
+  daze:                        # sleep / stun: sinks 1, the gauntlets droop 1 (crown / neck cancel the recipe head [3, 3])
+    moves: []
+    dy: 1
+    tweaks: {crown: [-3, -3], neck: [-3, -3], gl_r: [0, 1], gl_t: [0, 1], gr_r: [0, 1], gr_t: [0, 1]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [-3, -3], neck: [-3, -3], gl_r: [0, 1], gl_t: [0, 1], gr_r: [0, 1], gr_t: [0, 1]}
+holds: []
+paint:                         # FW-P keyframe paint on the derived hurt key (unmoved idle xy; 116 of 160 px): the gear
+                               # heart one step down its gold ramp, the helm slit grey (the light flickers out)
+  - {frame: hurt, rgb: [222, 189, 115], xy: [[107, 105], [109, 108], [108, 112], [107, 113], [108, 113], [109, 113], [108, 114], [110, 114], [111, 114], [112, 114], [111, 115], [112, 115], [113, 115], [112, 116]]}
+  - {frame: hurt, rgb: [198, 165, 99], xy: [[108, 106], [111, 106], [114, 106], [108, 107], [111, 107], [112, 107], [113, 107], [114, 107], [115, 107], [108, 108], [110, 108], [111, 108], [108, 109], [110, 109], [113, 109], [107, 110], [109, 110], [110, 110], [112, 110], [113, 111], [107, 112], [111, 112], [110, 113], [111, 113], [114, 113], [107, 114], [114, 114], [108, 115], [116, 115], [117, 115], [108, 116], [109, 116], [113, 116], [115, 116], [117, 116], [110, 117], [113, 117], [116, 117], [107, 118], [110, 118], [113, 118], [114, 118], [113, 119], [114, 119]]}
+  - {frame: hurt, rgb: [165, 132, 82], xy: [[104, 101], [117, 101], [105, 104], [118, 104], [105, 105], [118, 105], [105, 106], [113, 106], [105, 107], [119, 107], [119, 108], [114, 109], [119, 109], [105, 110], [114, 110], [115, 110], [105, 111], [110, 111], [114, 111], [120, 111], [105, 112], [112, 112], [120, 112], [105, 113], [115, 113], [120, 113], [104, 114], [105, 114], [113, 114], [120, 114], [114, 115], [109, 117], [115, 117], [117, 117], [119, 117], [108, 118], [119, 118], [107, 119], [119, 119], [109, 120], [112, 120]]}
+  - {frame: hurt, rgb: [132, 140, 140], xy: [[107, 85], [108, 85], [109, 85], [110, 85], [111, 85], [112, 85], [113, 85], [114, 85], [115, 85], [116, 85], [109, 86], [110, 86], [111, 86], [112, 86], [113, 86], [114, 86], [115, 86]]}
