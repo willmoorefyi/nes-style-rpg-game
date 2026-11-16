@@ -117,7 +117,7 @@ def run_pieces(check: Callable[[bool, str], None]) -> None:
     nlab, _ = PX.components(M._foreground(np.asarray(native.convert("RGB"))))
     big = int((np.bincount(nlab.ravel())[1:] >= 40).sum())
     check(big == R298_PIECES, f"keep_pieces: the R298 render has {R298_PIECES} pieces >= 40 native px ({big})")
-    char = GEN.load_character("hollow_seraph")
+    char = {k: v for k, v in GEN.load_character("hollow_seraph").items() if k != "cut"}  # the plain cut, whatever the live entry opts into
     sheet = GEN.SHEETS["boss_idle"]
     plain = GEN.cut_frames(raw, Image.new("RGB", (4, 4)), sheet, char, 1235)
     pinfo = dict(GEN.LAST_RESAMPLE["boss_idle"])
