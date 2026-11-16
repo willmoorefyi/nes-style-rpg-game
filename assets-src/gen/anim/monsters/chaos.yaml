@@ -1,0 +1,233 @@
+# Chaos (pass V redesign, R299-R308; C2 per D-V6: the normal 200 px boss cell, shown at display scale 3). A frontal
+# overlord: a void-black robe pooled on the ground hides the legs, a black-and-gold armoured upper body, exactly two
+# gauntleted arms (D-V10), a crown of living flame for a head, four orbs in the Fiends' lights around it.
+# Robed recipe (FW-5, drowned_sovereign): the hem pool is the ground contact, so foot_n / foot_f are the hem's two ends
+# and the whole skirt is one rigid part on them, pinned in every frame (the hem never moves). The template legs are
+# removed. The orbs ride the head (head mask), so they keep their ring around the flame. Every in-between is a
+# translation of its source key (moves: []): the upper body moves as a group by tweaks, the striking arm a little more.
+sprite: chaos
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [100, 28]
+    neck: [100, 56]
+    chest: [100, 75]
+    hip: [100, 100]
+    sh_n: [125, 64]
+    el_n: [142, 90]
+    hand_n: [165, 108]
+    sh_f: [76, 64]
+    el_f: [60, 90]
+    hand_f: [38, 108]
+    hip_n: [112, 104]
+    knee_n: [114, 140]
+    foot_n: [185, 190]
+    hip_f: [88, 104]
+    knee_f: [86, 140]
+    foot_f: [15, 190]
+  attack:
+    crown: [100, 28]
+    neck: [100, 56]
+    chest: [102, 75]
+    hip: [102, 100]
+    sh_n: [128, 64]
+    el_n: [148, 115]
+    hand_n: [178, 170]
+    sh_f: [74, 64]
+    el_f: [50, 85]
+    hand_f: [68, 108]
+    hip_n: [112, 104]
+    knee_n: [114, 140]
+    foot_n: [185, 190]
+    hip_f: [88, 104]
+    knee_f: [86, 140]
+    foot_f: [15, 190]
+  hurt:
+    crown: [100, 28]
+    neck: [100, 56]
+    chest: [100, 75]
+    hip: [100, 100]
+    sh_n: [125, 66]
+    el_n: [148, 95]
+    hand_n: [175, 90]
+    sh_f: [76, 62]
+    el_f: [50, 65]
+    hand_f: [22, 42]
+    hip_n: [112, 104]
+    knee_n: [114, 140]
+    foot_n: [185, 190]
+    hip_f: [88, 104]
+    knee_f: [86, 140]
+    foot_f: [15, 190]
+  cast:
+    crown: [100, 28]
+    neck: [100, 56]
+    chest: [100, 75]
+    hip: [100, 100]
+    sh_n: [126, 66]
+    el_n: [145, 80]
+    hand_n: [158, 55]
+    sh_f: [74, 66]
+    el_f: [55, 80]
+    hand_f: [42, 52]
+    hip_n: [112, 104]
+    knee_n: [114, 140]
+    foot_n: [185, 190]
+    hip_f: [88, 104]
+    knee_f: [86, 140]
+    foot_f: [15, 190]
+  attack_raise:
+    crown: [100, 55]
+    neck: [100, 82]
+    chest: [100, 98]
+    hip: [100, 118]
+    sh_n: [130, 85]
+    el_n: [150, 60]
+    hand_n: [115, 25]
+    sh_f: [72, 85]
+    el_f: [52, 60]
+    hand_f: [88, 25]
+    hip_n: [112, 122]
+    knee_n: [114, 150]
+    foot_n: [178, 190]
+    hip_f: [88, 122]
+    knee_f: [86, 150]
+    foot_f: [25, 190]
+parts:
+  weapon: {remove: true}
+  thigh_n: {remove: true}
+  shin_n: {remove: true}
+  thigh_f: {remove: true}
+  shin_f: {remove: true}
+  skirt: {bone: [foot_f, foot_n], radius: 40.0}             # the hem pool: rigid on the two hem ends
+z:
+  idle: [skirt, uarm_f, farm_f, torso, head, uarm_n, farm_n]
+  attack: [skirt, uarm_f, farm_f, torso, head, uarm_n, farm_n]
+  hurt: [skirt, uarm_f, farm_f, torso, head, uarm_n, farm_n]
+  cast: [skirt, uarm_f, farm_f, torso, head, uarm_n, farm_n]
+  attack_raise: [skirt, torso, head, uarm_f, farm_f, uarm_n, farm_n]
+masks:
+  skirt:
+    idle: [[62, 104], [140, 104], [148, 124], [199, 124], [199, 199], [0, 199], [0, 124], [54, 124]]
+    attack: [[78, 104], [126, 104], [129, 110], [132, 116], [135, 124], [137, 132], [142, 145], [147, 158], [146, 170],
+             [150, 187], [199, 187], [199, 199], [0, 199], [0, 124], [60, 124], [78, 120]]
+    hurt: [[62, 104], [140, 104], [140, 199], [199, 199], [0, 199], [0, 104]]
+    cast: [[62, 104], [140, 104], [140, 199], [199, 199], [0, 199], [0, 104]]
+    attack_raise: [[60, 122], [142, 122], [199, 122], [199, 199], [0, 199], [0, 122]]
+  head:
+    idle: [[64, 2], [138, 2], [138, 49], [118, 50], [110, 58], [90, 58], [82, 50], [64, 49]]
+    attack: [[64, 2], [138, 2], [138, 49], [118, 50], [110, 58], [90, 58], [82, 50], [64, 49]]
+    hurt: [[64, 2], [138, 2], [138, 49], [118, 50], [110, 58], [90, 58], [82, 50], [64, 49]]
+    cast: [[62, 2], [140, 2], [140, 50], [118, 51], [110, 58], [90, 58], [82, 51], [62, 50]]
+frames:
+  atk_wind1:                   # the coil starts: settles 1, leans 3 back (the head 4), the striking arm 6 back and 3 up
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 1
+    tweaks: {crown: [-4, 0], neck: [-4, 0], chest: [-3, 0], hip: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0],
+             sh_n: [-4, -1], el_n: [-5, -2], hand_n: [-6, -3]}
+  atk_wind2:                   # coiled: 2 lower, leans 4 back (the head 7), the striking arm 12 back and 6 up
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [-7, 0], neck: [-7, 0], chest: [-4, 0], hip: [-4, 0], sh_f: [-4, 0], el_f: [-4, 0], hand_f: [-4, 0],
+             sh_n: [-6, -2], el_n: [-10, -4], hand_n: [-12, -6]}
+  atk_mid:                     # the smash arriving: the attack key with the striking arm 4 back and up
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {crown: [-1, 0], neck: [-1, 0], sh_n: [-3, -2], el_n: [-4, -3], hand_n: [-5, -4]}
+  atk_follow:                  # the impact: the attack key leaning 2 further in, 1 lower
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 1.0
+    dy: 1
+    tweaks: {crown: [1, 0], neck: [1, 0], chest: [1, 0], hip: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0],
+             sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0], hip_n: [1, 0], hip_f: [1, 0]}
+  atk_recover:                 # the idle with the striking arm still reaching down and in
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {crown: [1, 0], neck: [1, 0], el_n: [2, 3], hand_n: [3, 4]}
+  hurt_in1:                    # the flinch: 2 lower, the upper body knocked 3 back (the head 6), the near hand 4 up
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 2
+    tweaks: {crown: [-6, 0], neck: [-6, 0], chest: [-3, 0], hip: [-3, 0], sh_n: [-3, 0], el_n: [-3, -2], hand_n: [-3, -4],
+             sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0]}
+  hurt_in2:                    # the hurt key 1 toward the idle
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {crown: [1, 0], neck: [1, 0], el_f: [1, 1], hand_f: [2, 2], el_n: [0, 1], hand_n: [0, 2]}
+  cast_gather:                 # the hands begin to rise, the body settles 1
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {hand_n: [0, -5], hand_f: [0, -5]}
+  cast_rise:                   # the cast with the hands 3 lower, settled 1
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {el_n: [0, 1], hand_n: [0, 3], el_f: [0, 1], hand_f: [0, 3]}
+  cast_release:                # the cast held, the hands 2 higher
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 1.0
+    tweaks: {hand_n: [0, -2], el_n: [0, -1], hand_f: [0, -2], el_f: [0, -1]}
+  daze:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 1
+    tweaks: {crown: [-1, 1], neck: [-1, 1]}
+  daze_b:
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    dy: 2
+    tweaks: {crown: [-1, 1], neck: [-1, 1]}
+  atk_raise_in:                # the hands begin to climb toward the raise
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 0
+    tweaks: {hand_n: [0, -5], hand_f: [0, -5]}
+  atk_swing:                   # the raise breaking: the clenched fists 4 forward and down
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    dy: 1
+    tweaks: {crown: [3, 3], neck: [3, 3], chest: [3, 3], hip: [3, 3], sh_n: [3, 3], el_n: [3, 3], hand_n: [3, 3],
+             sh_f: [3, 3], el_f: [3, 3], hand_f: [3, 3]}
+  atk_swing2:                  # the attack with the striking arm 5 back and up (still swinging down)
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {crown: [-1, 0], neck: [-1, 0], sh_n: [-4, -3], el_n: [-5, -4], hand_n: [-6, -6]}
+holds: []
+paint:                         # FW-P keyframe paint (pass V nits: orb colours in attack and cast, five orbs in the raise),
+                               # approved-palette colours of the idle orbs; attack 110, cast 40, attack_raise 147 px (cap 160)
+  # the grey frost orb back to the idle teal (40 px)
+  - {frame: attack, rgb: [66, 132, 148], xy: [[120, 18], [121, 18], [119, 19], [120, 19], [121, 19], [122, 19], [118, 20], [119, 20], [120, 20], [121, 20], [122, 20], [123, 20], [117, 21], [118, 21], [119, 21], [120, 21], [121, 21], [122, 21], [123, 21], [124, 21], [117, 22], [118, 22], [119, 22], [120, 22], [121, 22], [122, 22], [123, 22], [124, 22], [118, 23], [119, 23], [120, 23], [121, 23], [122, 23], [123, 23], [119, 24], [120, 24], [121, 24], [122, 24], [120, 25], [121, 25]]}
+  # the dull ember orb: mid tone to the idle ember (56 px)
+  - {frame: attack, rgb: [165, 90, 49], xy: [[128, 34], [129, 34], [124, 35], [125, 35], [126, 35], [127, 35], [128, 35], [129, 35], [130, 35], [123, 36], [124, 36], [125, 36], [129, 36], [130, 36], [131, 36], [123, 37], [125, 37], [130, 37], [131, 37], [132, 37], [133, 37], [123, 38], [132, 38], [133, 38], [122, 39], [132, 39], [133, 39], [134, 39], [122, 40], [133, 40], [134, 40], [122, 41], [133, 41], [134, 41], [122, 42], [132, 42], [133, 42], [134, 42], [132, 43], [122, 44], [123, 44], [124, 44], [131, 44], [132, 44], [123, 45], [124, 45], [125, 45], [130, 45], [131, 45], [124, 46], [125, 46], [126, 46], [128, 46], [129, 46], [126, 47], [129, 47]]}
+  # and its rim to the idle ember rim (14 px)
+  - {frame: attack, rgb: [148, 41, 74], xy: [[126, 34], [127, 34], [131, 35], [132, 36], [122, 38], [121, 41], [122, 43], [133, 43], [133, 44], [132, 45], [130, 46], [131, 46], [127, 47], [128, 47]]}
+  # the brown abyss orb back to the idle teal (40 px)
+  - {frame: cast, rgb: [66, 132, 148], xy: [[120, 18], [121, 18], [119, 19], [120, 19], [121, 19], [122, 19], [118, 20], [119, 20], [120, 20], [121, 20], [122, 20], [123, 20], [117, 21], [118, 21], [119, 21], [120, 21], [121, 21], [122, 21], [123, 21], [124, 21], [117, 22], [118, 22], [119, 22], [120, 22], [121, 22], [122, 22], [123, 22], [124, 22], [118, 23], [119, 23], [120, 23], [121, 23], [122, 23], [123, 23], [119, 24], [120, 24], [121, 24], [122, 24], [120, 25], [121, 25]]}
+  # the fifth (grey) orb inside the left arm removed (74 px)
+  - {frame: attack_raise, rgb: null, xy: [[88, 51], [82, 43], [83, 43], [84, 43], [81, 44], [82, 44], [83, 44], [84, 44], [85, 44], [86, 44], [80, 45], [81, 45], [82, 45], [83, 45], [84, 45], [85, 45], [86, 45], [87, 45], [80, 46], [81, 46], [82, 46], [83, 46], [84, 46], [85, 46], [86, 46], [87, 46], [80, 47], [81, 47], [82, 47], [83, 47], [84, 47], [85, 47], [86, 47], [87, 47], [88, 47], [80, 48], [81, 48], [82, 48], [83, 48], [84, 48], [85, 48], [86, 48], [87, 48], [88, 48], [80, 49], [81, 49], [82, 49], [83, 49], [84, 49], [85, 49], [86, 49], [87, 49], [88, 49], [80, 50], [81, 50], [82, 50], [83, 50], [84, 50], [85, 50], [86, 50], [87, 50], [88, 50], [81, 51], [82, 51], [83, 51], [84, 51], [85, 51], [86, 51], [87, 51], [82, 52], [83, 52], [84, 52], [85, 52], [86, 52]]}
+  # the arm edge it covered re-inked (9 px)
+  - {frame: attack_raise, rgb: [6, 4, 10], xy: [[81, 43], [79, 49], [79, 50], [80, 51], [81, 52], [82, 53], [83, 53], [84, 53], [85, 53]]}
+  # the small ember orb at upper right recoloured as the idle teal orb (39 px)
+  - {frame: attack_raise, rgb: [66, 132, 148], xy: [[121, 46], [122, 46], [119, 47], [120, 47], [121, 47], [122, 47], [123, 47], [119, 48], [120, 48], [121, 48], [122, 48], [123, 48], [124, 48], [118, 49], [119, 49], [120, 49], [121, 49], [122, 49], [123, 49], [124, 49], [125, 49], [119, 50], [120, 50], [121, 50], [122, 50], [123, 50], [124, 50], [119, 51], [120, 51], [121, 51], [122, 51], [123, 51], [124, 51], [120, 52], [121, 52], [122, 52], [123, 52], [121, 53], [122, 53]]}
+  # and its rim as the idle teal orb rim (25 px)
+  - {frame: attack_raise, rgb: [41, 41, 49], xy: [[120, 44], [121, 44], [119, 45], [120, 45], [121, 45], [122, 45], [118, 46], [119, 46], [120, 46], [118, 47], [117, 48], [118, 48], [117, 49], [117, 50], [118, 50], [125, 50], [117, 51], [118, 51], [125, 51], [118, 52], [119, 52], [124, 52], [119, 53], [120, 53], [121, 54]]}
