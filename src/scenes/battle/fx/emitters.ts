@@ -12,20 +12,25 @@ import { burst, beam, cone, projectile, chevrons } from './emittersMore.js';
 
 export * from './emitterCore.js';
 
+/** A body box taller than this gets the big-box rise (V8 F7, D-O6): more particles, started over its lower two
+ *  thirds, all at glyph scale 2; boxes up to it draw exactly as before. */
+export const RISE_BIG_H = 300;
+
 /** Particles rising from the feet (flames, sparkles), with the accent (heat shimmer, healing halo) over them. */
 const rise: Kind = (e, o, key) => {
   const { target: b } = o.geom;
-  const n = e.count ?? 5;
+  const big = b.h > RISE_BIG_H;
+  const n = (e.count ?? 5) * Math.min(3, Math.max(1, Math.round(b.h / 240)));
   const main = key(e.glyph);
   const nf = o.frameCount(main);
   const feet = anchor(b, 'feet');
   const ps = Array.from({ length: n }, (_, i) => {
     const birth = i === 0 ? 0 : Math.round((i / n) * e.impact * 0.6 + o.rng() * 2);
-    return {
-      birth, life: Math.max(8, e.impact - birth + 6 + Math.round(o.rng() * 6)),
-      x: feet.x + (o.rng() - 0.5) * b.w * 0.6, y: feet.y - o.rng() * b.h * 0.12,
-      dist: b.h * (0.35 + o.rng() * 0.35), phase: Math.floor(o.rng() * 8), big: e.scale === 2 && i % 2 === 0,
-    };
+    const life = Math.max(8, e.impact - birth + 6 + Math.round(o.rng() * 6));
+    const x = feet.x + (o.rng() - 0.5) * b.w * 0.6;
+    const y = clampTop(big ? b.y + b.h * (1 - o.rng() * (2 / 3)) : feet.y - o.rng() * b.h * 0.12, o);
+    return { birth, life, x, y, dist: b.h * (0.35 + o.rng() * 0.35), phase: Math.floor(o.rng() * 8),
+      big: big || (e.scale === 2 && i % 2 === 0) };
   });
   const accent = e.accent ? key(e.accent, e.accentRamp) : null;
   const center = anchor(b, 'center');

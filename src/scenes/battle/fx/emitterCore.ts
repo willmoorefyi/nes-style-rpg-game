@@ -54,6 +54,12 @@ export function seededRng(seed: number): () => number {
   };
 }
 
+/** The body inside a sprite's bounds: battle art stands on the bottom of a square cell with empty space above and
+ *  beside it, so the body is the cell's lower 62 % and middle 70 % (ActionFx's target box). */
+export function bodyBox(b: { x: number; y: number; width: number; height: number }): FxBox {
+  return { x: b.x + b.width * 0.15, y: b.y + b.height * 0.33, w: b.width * 0.7, h: b.height * 0.62 };
+}
+
 /** Anchor points on a box: the art sits in the lower part of its cell, feet near the bottom. */
 export function anchor(b: FxBox, at: string | undefined): { x: number; y: number } {
   const cx = b.x + b.w / 2;

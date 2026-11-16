@@ -16,6 +16,13 @@ import { toFxData } from '../../../src/scenes/battle/fx/fxDefs.js';
 import { validateSpellEffects } from '../../../src/core/schemaValidationFx.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { GAME_HEIGHT } from '../../../src/core/LayoutConstants.js';
+import { createHash } from 'node:crypto';
+import { Container } from 'pixi.js';
+import { AiEnemyView } from '../../../src/scenes/battle/AiEnemyView.js';
+import { bodyBox, type FxDraw } from '../../../src/scenes/battle/fx/emitters.js';
+import type { FxEffect } from '../../../src/scenes/battle/fx/fxDefs.js';
+import { partySpritePosition } from '../../../src/scenes/battle/BattleDisplayManager.js';
+import { enemyById, sizedAtlasFrames } from '../../helpers/atlasFrames.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const DATA = toFxData(validateSpellEffects(parse(readFileSync(join(root, 'assets/data/spell-effects.yaml'), 'utf-8'))));
@@ -61,4 +68,61 @@ describe('effect anchors on the titan and tier-H boxes', () => {
     if (!SKY_KINDS.has(e.kind)) expect(lo, `${id} highest point`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
     expect(hi, `${id} lowest point`).toBeLessThanOrEqual(GAME_HEIGHT);
   });
+});
+
+/** V8 F7: the body box ActionFx.box() gives a real sprite (bodyBox of its bounds), alone in its formation. */
+function bodyOf(id: string): FxBox {
+  const view = new AiEnemyView([enemyById(id)], { getMonsterFrames: (sheet) => sizedAtlasFrames(sheet) });
+  const sprite: Container = view.build()[0];
+  const b = sprite.getBounds();
+  return bodyBox({ x: b.x, y: b.y, width: b.width, height: b.height });
+}
+const heroBody = (() => {
+  const p = partySpritePosition(1, { footRow: 76, scale: 2 });
+  return bodyBox({ x: p.x, y: p.y, width: 160, height: 160 });
+})();
+
+/** Every draw of an effect over its life for seeds 1..3 (the byte-identity fingerprint). */
+function drawsOf(e: FxEffect, target: FxBox, actor: FxBox): FxDraw[][] {
+  const out: FxDraw[][] = [];
+  for (let seed = 1; seed <= 3; seed++) {
+    const emit = createEmitter(e, { geom: { target, actor, screenTop: 0 }, rng: seededRng(seed), frameCount: () => 4,
+      landed: true, flashes: 1 });
+    for (let t = 0; t < e.frames + 40; t++) out.push(emit(t).draws);
+  }
+  return out;
+}
+const digest = (v: unknown): string => createHash('sha256').update(JSON.stringify(v)).digest('hex').slice(0, 16);
+const GOLDEN = JSON.parse(readFileSync(join(root, 'tests/scenes/battle/__golden__/fx_small_boxes_v8.json'), 'utf-8')) as Record<string, string>;
+const SMALL: [string, () => FxBox][] = [['goblin', () => bodyOf('goblin')], ['ogre', () => bodyOf('ogre')],
+  ['hill_gigas', () => bodyOf('hill_gigas')], ['hero', () => heroBody]];
+
+describe('rise on big boxes, byte-identical on the rest (V8 F7)', () => {
+  it('the boxes: goblin, ogre, a tier-H sheet and a hero are <= 300 px tall; chaos is taller', () => {
+    for (const [name, box] of SMALL) expect(box().h, name).toBeLessThanOrEqual(300);
+    expect(bodyOf('chaos').h).toBeGreaterThan(300);
+  });
+
+  const small = Object.entries(DATA.effects).flatMap(([id, e]) => SMALL.map(([name, box]) => [`${id} on ${name}`, e, box] as const));
+  it.each(small)('%s: draws byte-identical to before, every point y >= 124', (name, e, box) => {
+    const target = box();
+    const actor = target === heroBody ? bodyOf('goblin') : heroBody;
+    const draws = drawsOf(e, target, actor);
+    expect(digest(draws), name).toBe(GOLDEN[name]);
+    if (SKY_KINDS.has(e.kind)) return;
+    for (const d of draws.flat()) expect(d.y, name).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
+  });
+
+  it.each(Object.entries(DATA.effects).filter(([, e]) => e.kind === 'rise' && e.glyph === 'flame'))(
+    '%s on chaos: >= 10 flames on the body at the impact, every point y >= 124', (_, e) => {
+      const b = bodyOf('chaos');
+      for (let seed = 1; seed <= 20; seed++) {
+        const emit = createEmitter(e, { geom: { target: b, actor: heroBody, screenTop: 0 }, rng: seededRng(seed),
+          frameCount: () => 4, landed: true, flashes: 1 });
+        const flames = emit(e.impact - 1).draws.filter((d) => d.key.startsWith('flame.'));
+        const inside = flames.filter((d) => d.x >= b.x && d.x <= b.x + b.w && d.y >= b.y && d.y <= b.y + b.h);
+        expect(inside.length, `seed ${seed}`).toBeGreaterThanOrEqual(10);
+        for (let t = 0; t < e.frames + 10; t++) for (const d of emit(t).draws) expect(d.y).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
+      }
+    });
 });

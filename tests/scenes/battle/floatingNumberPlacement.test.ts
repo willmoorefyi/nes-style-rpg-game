@@ -5,41 +5,25 @@
  * real atlas (cell, foot row, scale, idle head row) laid out by AiEnemyView.
  */
 import { describe, it, expect } from 'vitest';
-import { Container, Texture, TextureSource } from 'pixi.js';
+import { Container } from 'pixi.js';
 import { AiEnemyView, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
 import { ActionNumbers } from '../../../src/scenes/battle/actionNumbers.js';
 import { BattleEffects } from '../../../src/scenes/battle/BattleEffects.js';
 import { FLOAT_FRAMES } from '../../../src/scenes/battle/floatingNumbers.js';
 import { FLOAT_FONT } from '../../../src/scenes/battle/BattleSceneTypes.js';
-import { headOf } from '../../../src/scenes/battle/fx/texturePixels.js';
 import { ICON_LIFT, ICON_PX } from '../../../src/scenes/battle/fx/statusIcons.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, atlasFrames, enemyById, idleBoxOf } from '../../helpers/atlasFrames.js';
+import { atlas, enemyById, idleBoxOf, sizedAtlasFrames } from '../../helpers/atlasFrames.js';
 import { loadStatusVisuals } from '../../helpers/statusVisuals.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { StatusEffect } from '../../../src/battle/StatusEffects.js';
-import type { MonsterFrame } from '../../../src/scenes/battle/enemyChoreography.js';
 
 const VISUALS = loadStatusVisuals();
 const ts = atlas.texScale ?? atlas.scale;
 
-/** atlasFrames with cell-sized textures whose topmost opaque row is the idle box's top (the head statusFx finds). */
-const sizedArt: MonsterArtSource = {
-  getMonsterFrames(sheet) {
-    const f = atlasFrames(sheet);
-    if (!f) return null;
-    const [w, h] = [f.cell[0] * ts, f.cell[1] * ts];
-    const tex = new Texture({ source: new TextureSource({ width: w, height: h }) });
-    const [l, t, r] = idleBoxOf(sheet);
-    const data = new Uint8ClampedArray(w * h * 4);
-    for (let x = l * ts; x <= r * ts; x++) data[(t * ts * w + x) * 4 + 3] = 255;
-    headOf(tex, () => ({ data, w, h }));
-    const textures = Object.fromEntries(Object.keys(f.textures).map((k) => [k, tex])) as Record<MonsterFrame, Texture>;
-    return { ...f, textures, idle: tex, attack: tex, cast: tex, hurt: tex };
-  },
-};
+const sizedArt: MonsterArtSource = { getMonsterFrames: (sheet) => sizedAtlasFrames(sheet, true) };
 
 interface Rect { x0: number; y0: number; x1: number; y1: number }
 const hit = (a: Rect, b: Rect): boolean => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;

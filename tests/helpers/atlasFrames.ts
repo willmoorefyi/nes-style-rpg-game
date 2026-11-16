@@ -7,7 +7,8 @@ import { readFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { Texture } from 'pixi.js';
+import { Texture, TextureSource } from 'pixi.js';
+import { headOf } from '../../src/scenes/battle/fx/texturePixels.js';
 import { BOSS_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { monsterAnchors, type MonsterAnchors } from '../../src/rendering/monsterAnchors.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../src/rendering/BattleArt.js';
@@ -98,4 +99,21 @@ export function layoutInput(id: string): EnemyBoxInput {
   const a = monsterAnchors(s);
   if (a.homeX) { box.ox0 = a.homeX[0] * sc; box.ox1 = (a.homeX[1] + 1) * sc; }
   return box;
+}
+
+/** atlasFrames with one cell-sized texture for every frame (so a sprite's bounds are its cell at its scale); `head`
+ *  also primes headOf with the idle box's top row as the topmost opaque row (the head statusFx anchors icons on). */
+export function sizedAtlasFrames(sheet: string, head = false): MonsterFrames | null {
+  const f = atlasFrames(sheet);
+  if (!f) return null;
+  const [w, h] = [f.cell[0] * ts, f.cell[1] * ts];
+  const tex = new Texture({ source: new TextureSource({ width: w, height: h }) });
+  if (head) {
+    const [l, t, r] = idleBoxOf(sheet);
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let x = l * ts; x <= r * ts; x++) data[(t * ts * w + x) * 4 + 3] = 255;
+    headOf(tex, () => ({ data, w, h }));
+  }
+  const textures = Object.fromEntries(Object.keys(f.textures).map((k) => [k, tex])) as Record<MonsterFrame, Texture>;
+  return { ...f, textures, idle: tex, attack: tex, cast: tex, hurt: tex };
 }

@@ -11,7 +11,7 @@ import { SpellRegistry } from '../../../data/SpellRegistry.js';
 import { OutlinedText } from '../../../ui/NESFont.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import { FLOAT_OUTLINE } from '../BattleSceneTypes.js';
-import { createEmitter, seededRng, stepAlpha, type Emitter, type FxBox } from './emitters.js';
+import { bodyBox, createEmitter, seededRng, stepAlpha, type Emitter, type FxBox } from './emitters.js';
 import { effectIdFor, type FxEffect } from './fxDefs.js';
 import { FxBatch, ScreenTint } from './fxRender.js';
 import type { FxSource } from './fxSource.js';
@@ -141,12 +141,11 @@ export class BattleActionFx implements ActionFx {
     r.tint?.set(frame.screen);
   }
 
-  /** The body inside a sprite's bounds, in the effect layer's space: battle art stands on the bottom of a square cell
-   *  with empty space above and beside it, so the body is the cell's lower 62 % and middle 70 %. */
+  /** The body inside a sprite's bounds (bodyBox), in the effect layer's space. */
   private box(sprite: Container): FxBox {
     const b = sprite.getBounds();
     const tl = this.layers.fx.spell.toLocal({ x: b.x, y: b.y });
-    return { x: tl.x + b.width * 0.15, y: tl.y + b.height * 0.33, w: b.width * 0.7, h: b.height * 0.62 };
+    return bodyBox({ x: tl.x, y: tl.y, width: b.width, height: b.height });
   }
 
   /** A point of a sprite (fractions of its local bounds) as an empty box in the effect layer's space: every anchor of
