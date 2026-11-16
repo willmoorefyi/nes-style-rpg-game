@@ -791,3 +791,9 @@
 {"event": "result", "key": "b9329bf6f74e90ed5e30ea9f", "ok": true}
 {"event": "attempt", "ts": "2026-11-16T04:05:19", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "dragon", "sheet": "monster_large", "seed": 1236, "key": "c45d47377fc351e4f393a835"}
 {"event": "result", "key": "c45d47377fc351e4f393a835", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T05:01:59", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1236, "key": "db2b3408c29d6d4aa682bfb4"}
+{"event": "result", "key": "db2b3408c29d6d4aa682bfb4", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T05:02:55", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1237, "key": "6f316dc347104c0c896fc575"}
+{"event": "result", "key": "6f316dc347104c0c896fc575", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T05:03:50", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1238, "key": "9930651761e987e3df821a78"}
+{"event": "result", "key": "9930651761e987e3df821a78", "ok": true}
