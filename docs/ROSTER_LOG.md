@@ -1200,3 +1200,48 @@ threshold.
   `colossus.py inpaint <form> <image> --mask M` subcommand with purpose f4_variant (2 of 4 left). The chest mask
   comes from `chaos_horizon_core.py`'s band, so everything outside the mask stays byte-identical. The alternative is a
   hand-painted core layer by RIG.
+
+## Pass C - C3' (rev 4, D-U10: painted colossus art; generator, main checkout `roster`, 2026-11-16)
+
+**Step 1.** The pixel masters are archived as `chaos_horizon_v1` and `chaos_orrery_v1` (`retire.py --colossus`,
+RETIRED_SPRITES rows). The stale pixel crack files were removed from `approved/chaos_forms/chaos_horizon/`; their
+archive copies are in `chaos_horizon_v1`.
+
+**F3 conservative upscale.**
+
+| # | Call | Purpose | Result |
+|---|---|---|---|
+| C18 | conservative upscale of the picked render (1800x720), creativity 0.2, seed 4501, png | f3_upscale | **fail (spent)**: the first id's error was hidden (only the last id's on-demand error was logged) |
+| C19 | the same on a 4-row edge-padded copy (1800x728) | f3_upscale | **fail (spent)**: `bedrock.invoke` now logs every id's error, and the real one is "Response payload size 17867950 bytes exceeds the limit" (a ~4x PNG) |
+| C20 | the same with `--output-format webp` (new `upscale` option; saved as PNG) | f3_upscale | **pass**: 4888x1976, upfit to 2700x1080 (Lanczos), no new bright blobs; faithful in a 1:1 crop |
+
+**F3 cut and glow (0 calls).**
+- Cut: the C7 remove_bg alpha, Lanczos-upscaled x1.5.
+- Ring measured on the render (circular-profile search): centre (900, 335), r 350, band ~32 px (25 % of peak). At
+  2700 wide that is (1350, 502), r 525, band 48. Momus's estimate was (900, 380), 375, 50.
+- `glow` G1 "diff": at the default sky opening (radius 60) the corona ratio was 0.53 (FAIL); at radius 140, sigma 60
+  every check passes:
+
+  | Check | Value |
+  |---|---|
+  | glow strength, ring annulus | 1.08 |
+  | glow strength, corona | 0.86 |
+  | sky clean | 0.13 luma |
+  | despill | ok |
+  | fidelity | PSNR 37.9 dB, delta E 1.77 |
+- Mock at scale 1, place (-527, -210), sky dim 0.6, party and windows:
+  `gen/out/colossus/review/chaos_horizon_c3p_mock.png`; side-by-side sheet `chaos_horizon_side.png`.
+- **The visible ring arc is 23.1 % of the circle** (in the field, not under body alpha >= 0.5), so the pin is
+  **>= 20.1 %**.
+
+**Fresh image-only review (side by side with the picked original): SHIP WITH NITS.**
+- It keeps the same look, detail and colour, the ring and rays are present, there is no pixelation or blockiness,
+  nothing is invented, it reads planet-sized, and the party is readable.
+- Nits:
+  - the ring's top is cut by the message window, so it reads as two side arcs;
+  - the ring and the long rays are weaker over the bright arena;
+  - the corona top is slightly hot;
+  - the warrior and thief stand over the dark arm.
+- **Approved:** `approved/chaos_forms/chaos_horizon/master.png` (body, 2700x1080 soft alpha) plus `glow.png` and
+  `sky_base.png`, with `meta.json` (chain, checks, cache keys).
+- Showing more of the ring (place_y nearer -60) is a placement / user call (18.4); I did not change it.

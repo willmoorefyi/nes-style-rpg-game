@@ -38,3 +38,5 @@
 {"event": "result", "key": "c0bfe75d2fe9c332b9be2cb1", "ok": false, "error": "Bedrock rejected every model id for upscale_conservative: us.stability.stable-conservative-upscale-v1:0: An error occurred (ValidationException) when calling the InvokeModel operation: {\"detail\":\"Response payload size 17867950 bytes exceeds the  | stability.stable-conservative-upscale-v1:0: An error"}
 {"event": "request", "ts": "2026-11-16T16:05:45", "tool": "colossus.py", "model": "upscale_conservative", "purpose": "f3_upscale", "seed": 4501, "key": "506909aa09af9788357c7db5", "pass": "C"}
 {"event": "result", "key": "506909aa09af9788357c7db5", "ok": true, "served": "us.stability.stable-conservative-upscale-v1:0"}
+{"event": "request", "ts": "2026-11-16T16:11:21", "tool": "colossus.py", "model": "upscale_conservative", "purpose": "rim_upscale", "seed": 5151, "key": "a09503b7b15086b6bff4e223", "pass": "C"}
+{"event": "result", "key": "a09503b7b15086b6bff4e223", "ok": true, "served": "us.stability.stable-conservative-upscale-v1:0"}

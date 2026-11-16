@@ -1,69 +1,80 @@
 {
-  "approved": "2026-11-16, user ruling (structure render C4 + face removal C6 = the F3 look; docs/ROSTER_LOG.md Pass C - C3); fresh image-only review SHIP WITH NITS, nits fixed offline",
-  "art_size": [
-    900,
-    362
-  ],
+  "approved": "2026-11-16 C3' (fresh image-only side-by-side review vs the user-picked original: SHIP WITH NITS; same look, ring + rays present, no pixelation, nothing invented)",
+  "body": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/body.png",
   "cache_keys": [
     "d95ade61d71a34a63f132b44",
     "1411f3b8f9ac434f8e17c2d6",
-    "2a8b813b7505e5aadf6cfef1"
+    "2a8b813b7505e5aadf6cfef1",
+    "506909aa09af9788357c7db5"
+  ],
+  "canvas": [
+    2700,
+    1080
   ],
   "chain": [
-    {
-      "call": "C4 structure",
-      "control": "assets-src/gen/colossus/chaos_horizon_control.png (top 720 rows)",
-      "control_strength": 0.85,
-      "key": "d95ade61d71a34a63f132b44",
-      "prompt_file": "assets-src/gen/colossus/chaos_horizon.structure.prompt.md (s2)",
-      "seed": 4102
+    "structure C4 + face removal C6 (the picked render)",
+    "conservative upscale seed 4501 creativity 0.2 on a 4-row padded copy (webp response) -> 4888x1976 -> upfit 2700x1080 (no new blobs)",
+    "cut: the C7 remove_bg alpha Lanczos-upscaled x1.5 (0 calls)",
+    "glow G1 diff, sky open radius 140 sigma 60, ring (1350,502,525,48), corona (1347,510,230)"
+  ],
+  "checks": {
+    "despill": {
+      "band": 210.08,
+      "interior": 25.86,
+      "ok": true
     },
-    {
-      "call": "C6 search_replace",
-      "edit": {
-        "grow_mask": 8,
-        "negative_prompt": "face, eyes, mouth, skull, mask, head",
-        "output_format": "png",
-        "prompt": "a perfectly empty, featureless, pitch-black eclipse disc, a flat hole of pure black void, nothing inside it",
-        "search_prompt": "the stone face with glowing eyes inside the black disc",
-        "seed": 4201
+    "fidelity": {
+      "delta_e": 1.767,
+      "ok": true,
+      "psnr": 37.87
+    },
+    "glow_strength": {
+      "annulus": {
+        "glow": 51.86,
+        "ratio": 1.081,
+        "raw_minus_far": 47.99
       },
-      "key": "1411f3b8f9ac434f8e17c2d6"
+      "corona": {
+        "glow": 92.59,
+        "ratio": 0.859,
+        "raw_minus_far": 107.73
+      },
+      "far_sky": 50.46,
+      "ok": true
     },
-    {
-      "call": "C7 remove_bg",
-      "key": "2a8b813b7505e5aadf6cfef1"
+    "sky_clean": {
+      "diff": 0.13,
+      "inside": 46.55,
+      "ok": true,
+      "outside": 46.68
     }
-  ],
-  "display_scale": 3,
-  "finish": {
-    "cut": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_nobg.png",
-    "disc": [
-      898,
-      340
-    ],
-    "disc_r": 92,
-    "grid": "902x362 -> crop (1, 0, 901, 362); art = render / 2 (+2 rows: the cut top 240 lands on art row 122)",
-    "levels": [
-      10.0,
-      221.0
-    ],
-    "palette_problems": [],
-    "raw": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png",
-    "size": [
-      900,
-      362
-    ]
   },
-  "finish_script": "assets-src/gen/colossus/chaos_horizon_finish.py",
+  "extras": {
+    "glow": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/glow.png",
+    "sky_base": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/sky_base.png"
+  },
   "form": "chaos_horizon",
-  "glow": "glow.png (corona, additive, GLOW_LEVELS/GLOW_COLOURS)",
-  "notes": "no floorFront: drawn over the far floor, party in front; disc centre art (449, 172); torso base behind the bottom strip",
-  "pix": "assets-src/gen/out/colossus/chaos_horizon/f3_finish/master.png",
-  "proposed_place": [
-    -390,
-    -224
+  "nits": [
+    "ring top cut by the message window at place_y -210 (more ring needs place_y nearer -60 or a ruling)",
+    "ring and long rays weaker over the bright arena",
+    "corona top slightly hot (screen x 640-1000, y 125-200)",
+    "warrior and thief over the dark right arm"
   ],
-  "render_px_per_art_px": 2,
-  "title": "Chaos, the Last Horizon (F3)"
+  "place": [
+    -527,
+    -210
+  ],
+  "ring_arc_pin_pct": 20.1,
+  "ring_arc_visible_pct": 23.1,
+  "ring_render_measured": {
+    "band": 32,
+    "centre": [
+      900,
+      335
+    ],
+    "r": 350
+  },
+  "scale": 1,
+  "source": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png (user-picked)",
+  "title": "Chaos, the Last Horizon (F3), painted (rev 4, D-U10)"
 }
