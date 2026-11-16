@@ -1,0 +1,143 @@
+# Hydra (roster T-K, ROSTER_FIX_PLAN_2.md 5): a green three-headed hydra on four thick legs, keyframe-only until now.
+# body: quadruped + heads 2 and 3 (FW-5 multi-head prototype). Head 1 = the right head in idle (the middle one in the
+# attack), head 2 = the top head, head 3 = the left head in idle, which swaps to the bottom right in the attack key.
+# Every in-between is translation-only (`moves: []`, `dy: 0`): the three heads and their necks move as one group by
+# tweaks, the body and legs stay put (moving the body over pinned legs rotated the short shins past the caps), feet
+# 1 px only in atk_mid. Masks: the tail (its tip sits next to the left neck; the gap between them must stay open,
+# and the mask follows that gap so no neck pixel rides with the tail) and each head per key, so the jaws travel
+# whole. The tail tip follows the heads where the left neck passes over it (winds, recover, hurt_in2, daze). The
+# plan's whole-figure table missed by 0.002; with the heads translated back and down (wind1 -3/+1, wind2 and the
+# attack-sourced mid/follow -6/+3, recover -4/+2) the switch bridges without the FW-Q alias.
+# fixmeasure.py switch --rig (IoU / centroid step; need 0.550, cap 9.6):
+#   attack: idle->wind1 0.811/1.4, wind1->wind2 0.798/1.9, wind2->mid 0.597/6.7, mid->attack 0.740/3.1,
+#           attack->follow 0.750/3.0, follow->recover 0.582/6.1, recover->idle 0.747/2.3
+#   hurt:   idle->hurt_in1 0.839/1.3, hurt_in1->hurt_in2 0.660/1.4, hurt_in2->hurt 0.833/1.6
+#   daze:   idle->daze 0.843/1.8, daze->daze_b 0.938/0.6 (heads 2 / 3 down)
+# Review (2 iterations, fresh image-only reviewers): iteration 1 ITERATE (a neck shard in hurt_in1: the tail mask
+# took the left neck's edge; weak wind-up); iteration 2 SHIP WITH NITS. Fixed: the atk_wind1 chin line and a stale
+# 1 px paint. Recorded nits: the feet jump at the idle/attack key switches (front foot about 7 px, from the approved
+# keys); 1-2 px foot drift attack-sourced mid vs the key (feet tweak -1, the atk_mid check); the hurt key itself
+# sits forward of the idle (approved art); the daze slump is gentle (heads 2 / 3 px; deeper closed the tail gap).
+sprite: hydra
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+lead_heads: [1]
+keyframes:
+  idle:
+    hip: [48, 98]
+    back: [60, 92]
+    chest: [75, 90]
+    neck: [78, 68]
+    head: [92, 60]
+    snout: [104, 72]
+    neck2: [64, 55]
+    head2: [76, 36]
+    snout2: [86, 45]
+    neck3: [42, 65]
+    head3: [52, 52]
+    snout3: [62, 58]
+    tail0: [38, 100]
+    tail1: [25, 98]
+    tail2: [25, 85]
+    tail_tip: [32, 73]
+    sh_n: [82, 100]
+    el_n: [85, 110]
+    paw_n: [88, 118]
+    ftoe_n: [93, 121]
+    hip_n: [58, 100]
+    knee_n: [57, 110]
+    foot_n: [62, 118]
+    toe_n: [68, 121]
+    hip_f: [38, 105]
+    knee_f: [34, 112]
+    foot_f: [33, 118]
+    toe_f: [38, 121]
+  attack:
+    hip: [45, 100]
+    back: [60, 95]
+    chest: [80, 95]
+    neck: [82, 65]
+    head: [98, 55]
+    snout: [110, 60]
+    neck2: [60, 55]
+    head2: [75, 37]
+    snout2: [88, 40]
+    neck3: [85, 82]
+    head3: [95, 80]
+    snout3: [110, 86]
+    tail0: [35, 98]
+    tail1: [22, 92]
+    tail2: [22, 80]
+    tail_tip: [30, 62]
+    sh_n: [85, 100]
+    el_n: [90, 110]
+    paw_n: [95, 117]
+    ftoe_n: [101, 121]
+    hip_n: [60, 102]
+    knee_n: [58, 112]
+    foot_n: [65, 118]
+    toe_n: [73, 121]
+    hip_f: [38, 105]
+    knee_f: [34, 113]
+    foot_f: [33, 118]
+    toe_f: [40, 121]
+  hurt:
+    hip: [50, 100]
+    back: [62, 95]
+    chest: [78, 90]
+    neck: [78, 70]
+    head: [90, 55]
+    snout: [104, 62]
+    neck2: [72, 55]
+    head2: [78, 36]
+    snout2: [90, 35]
+    neck3: [50, 65]
+    head3: [60, 46]
+    snout3: [72, 50]
+    tail0: [40, 100]
+    tail1: [28, 95]
+    tail2: [28, 82]
+    tail_tip: [35, 72]
+    sh_n: [84, 100]
+    el_n: [88, 110]
+    paw_n: [93, 117]
+    ftoe_n: [99, 121]
+    hip_n: [60, 103]
+    knee_n: [60, 112]
+    foot_n: [66, 118]
+    toe_n: [73, 121]
+    hip_f: [42, 105]
+    knee_f: [38, 113]
+    foot_f: [38, 118]
+    toe_f: [44, 121]
+frames:
+  atk_wind1: {moves: [], dy: 0, tweaks: {tail2: [-3, 1], tail_tip: [-3, 1], neck: [-3, 1], head: [-3, 1], snout: [-3, 1], neck2: [-3, 1], head2: [-3, 1], snout2: [-3, 1], neck3: [-3, 1], head3: [-3, 1], snout3: [-3, 1]}}
+  atk_wind2: {moves: [], dy: 0, tweaks: {tail1: [-2, 1], tail2: [-6, 3], tail_tip: [-6, 3], neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-6, 3], head3: [-6, 3], snout3: [-6, 3]}}
+  atk_mid: {moves: [], dy: 0, tweaks: {neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-4, 2], head3: [-6, 3], snout3: [-6, 3], foot_n: [-1, 0], foot_f: [-1, 0], paw_n: [-1, 0], toe_n: [-1, 0], ftoe_n: [-1, 0]}}
+  atk_follow: {moves: [], dy: 0, tweaks: {neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-4, 2], head3: [-6, 3], snout3: [-6, 3]}}
+  atk_recover: {moves: [], dy: 0, tweaks: {tail1: [-2, 1], tail2: [-6, 3], tail_tip: [-6, 3], neck: [-4, 2], head: [-4, 2], snout: [-4, 2], neck2: [-4, 2], head2: [-4, 2], snout2: [-4, 2], neck3: [-4, 2], head3: [-4, 2], snout3: [-4, 2]}}
+  hurt_in1: {moves: [], dy: 0, tweaks: {neck: [3, -1], head: [3, -1], snout: [3, -1], neck2: [3, -1], head2: [3, -1], snout2: [3, -1], neck3: [3, -1], head3: [3, -1], snout3: [3, -1]}}
+  hurt_in2: {moves: [], dy: 0, tweaks: {tail1: [-2, 0], tail2: [-3, 1], tail_tip: [-3, 1], neck: [-3, 1], head: [-3, 1], snout: [-3, 1], neck2: [-3, 1], head2: [-3, 1], snout2: [-3, 1], neck3: [-3, 1], head3: [-3, 1], snout3: [-3, 1]}}
+  daze: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], neck2: [0, 2], head2: [0, 2], snout2: [0, 2], neck3: [0, 2], head3: [0, 2], snout3: [0, 2]}}
+  daze_b: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [1, 3], head: [1, 3], snout: [1, 3], neck2: [1, 3], head2: [1, 3], snout2: [1, 3], neck3: [1, 3], head3: [1, 3], snout3: [1, 3]}}
+masks:
+  tail:
+    idle: [[26, 68], [33, 68], [39, 71], [41, 74], [43, 76], [43, 80], [41, 89], [36, 92], [36, 95], [40, 97], [40, 101], [33, 103], [21, 103], [20, 100], [20, 80], [30, 76], [26, 72]]
+    hurt: [[25, 67], [44, 67], [45, 80], [45, 89], [38, 93], [38, 95], [42, 98], [42, 102], [30, 104], [24, 101], [24, 85], [34, 78], [26, 73]]
+  head2:
+    idle: [[66, 27], [82, 27], [87, 40], [87, 49], [78, 49], [68, 42]]
+    attack: [[66, 32], [84, 32], [90, 38], [90, 46], [84, 52], [74, 50], [68, 42]]
+    hurt: [[67, 31], [86, 31], [91, 36], [91, 43], [76, 44], [68, 40]]
+  head3:
+    idle: [[44, 44], [56, 44], [64, 56], [64, 62], [56, 63], [47, 56]]
+    attack: [[88, 72], [100, 72], [113, 80], [113, 88], [104, 93], [94, 92], [88, 84]]
+    hurt: [[52, 38], [62, 38], [72, 46], [75, 54], [66, 56], [56, 52]]
+  head:
+    idle: [[86, 52], [102, 52], [107, 70], [107, 76], [98, 76], [86, 66]]
+    attack: [[89, 49], [100, 49], [112, 56], [112, 64], [104, 70], [92, 68], [89, 60]]
+    hurt: [[84, 49], [96, 49], [106, 58], [106, 65], [96, 66], [86, 62]]
+holds: []
+paint:                         # atk_wind1: the left head's chin line over the middle neck closed with outline ink
+  - {frame: atk_wind1, xy: [[54, 73], [55, 73]], rgb: [6, 4, 10]}
