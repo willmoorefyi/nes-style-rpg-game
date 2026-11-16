@@ -1,0 +1,25 @@
+{
+  "character": "chaos",
+  "sheet": "boss_cast",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "751b73facde53dff2cd1bdcb",
+  "approved": "2026-11-16",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "cast"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass V R302: self-approved with nits (teal orb colour)"
+}

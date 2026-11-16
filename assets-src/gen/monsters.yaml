@@ -549,9 +549,10 @@
     pooled on the ground; at the same pixel size as in Image 3
   cast: >-
     channelling the end of the world, a mirror-symmetric pose: both arms raised high with open clawed hands beside the
-    burning head, the flame crown blazing taller and brighter but its tips still well below the top of the grey box,
-    the four orbs flaring and spread a little wider but still touching the flames; exactly two arms; at the same pixel
-    size as in Image 3
+    burning head, the flame crown blazing brighter but no taller than in Image 3, its tips well below the top of the
+    grey box; exactly four orbs and no fifth, the same four in the same places as in Image 3 (one above the flames,
+    one on the left side of the image and two on the right side of the image), flaring brighter; exactly two arms; at
+    the same pixel size as in Image 3
   hurt: >-
     struck: the upper body arched back, the flame crown guttering and bent back, the four orbs knocked loose from their
     ring but each still touching the flames, both arms flung out wide with the clawed hands splayed open, the robe
@@ -566,6 +567,7 @@
     four arms, six arms, legs, feet, wings, a tail, horns, a second head, a weapon, purple fire, violet, pink, magenta,
     a human face with skin, orbs floating apart from the body, a ground line
   seeds: [1234]
+  sheet_seeds: {boss_cast: 1235}   # boss_cast 1234 (ROSTER_LOG R301): five orbs, a flame wisp on row 2
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells. Pass V redesign
   # (docs/REDESIGN_PLAN.md 3.1, D-V11 stats unchanged): a squat young deep-sea psychic horror, distinct from the tall
