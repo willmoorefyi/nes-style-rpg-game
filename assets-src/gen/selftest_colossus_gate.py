@@ -43,10 +43,10 @@ def run_gate(check) -> None:
 def _forms(check) -> None:
     from gen import colossus as C
     f3, f2 = C.FORMS["chaos_horizon"], C.FORMS["chaos_orrery"]
-    check(f3["canvas"] == (2700, 1080) and f3["place"] == (-527, -210) and f3["upscale"] == "f3_upscale"
-          and f2["canvas"] == (1320, 900) and f2["place"] == (40, -20) and f2["upscale"] == "f2_upscale"
+    check(f3["canvas"] == (2700, 1080) and f3["place"] == (-527, -60) and f3["upscale"] == "f3_upscale"
+          and f2["canvas"] == (1320, 900) and f2["place"] == (40, 25) and f2["upscale"] == "f2_upscale"
           and f3["sky_dim"] == 0.6 and f2["sky_dim"] == 1.0,
-          "FORMS: F3 2700x1080 at (-527, -210), sky dim 0.6; F2 1320x900 at (40, -20); upscale purposes (18.4, 18.2)")
+          "FORMS: F3 2700x1080 at (-527, -60), sky dim 0.6; F2 1320x900 at (40, 25); upscale purposes (18.4, 18.2; C3' rulings)")
     err = io.StringIO()
     with contextlib.redirect_stderr(err):
         code, out = _main(C, ["pix", "chaos_horizon", "x.png"])

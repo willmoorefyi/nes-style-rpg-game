@@ -67,12 +67,23 @@
     "corona top slightly hot (screen x 640-1000, y 125-200)",
     "warrior and thief over the dark right arm"
   ],
+  "pan_limits_at_rest": {
+    "dx": [
+      -247,
+      521
+    ],
+    "dy": [
+      -230,
+      174
+    ]
+  },
   "place": [
     -527,
-    -210
+    -60
   ],
-  "ring_arc_pin_pct": 20.1,
-  "ring_arc_visible_pct": 23.1,
+  "place_note": "user ruling 2026-11-16: lowered from (-527, -210) so more of the halo shows; the ring's very top is cut by the source render and the glow's 120 px top feather, so it stays under the message window at any place_y <= 0",
+  "ring_arc_pin_pct": 20.6,
+  "ring_arc_visible_pct": 23.6,
   "ring_render_measured": {
     "band": 32,
     "centre": [

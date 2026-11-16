@@ -1294,3 +1294,26 @@ archive copies are in `chaos_horizon_v1`.
 - About $1.5 at list prices (the upscale price is not yet confirmed).
 - Masters approved: F3 (painted) and its crack frame, F2 (painted), and the rim switched. F4 open: stopped, needs a
   ruling.
+
+**User rulings (2026-11-16, relayed by the coordinator; plan 15.1 D-U11, D-U12).**
+- (1) Lower F3 a bit so the halo ring's top arc clears the message window.
+- (2) Retry F4 with up to 2 more masked inpaints, using the reworded prompt.
+
+**D-U11 done (0 calls).**
+- Measured over place_y -210 / -150 / -100 / -60 / -30 / 0 / +40:
+
+  | place_y | Visible ring arc | Top-half arc in the field |
+  |---|---|---|
+  | -210 | 23.1 % | 21 % |
+  | -60 | 23.6 % | 42 % |
+  | 0 | 23.9 % | 52 % |
+
+- The very top of the ring is cut by the source render and by the glow's 120 px top feather, so it cannot clear the
+  window at any place_y <= 0.
+- **Chosen: (-527, -60)**, the top of the plan's tuning range. The disc centre is at screen y 450, and the party band
+  std is 56.6 (rim alone 41.5).
+- Visible ring arc **23.6 %**, re-pinned **>= 20.6 %**. Pan limits at this rest: dx [-247, +521], dy [-230, +174].
+- `colossus.py FORMS`: F3 place (-527, -60) and the measured ring / corona; F2 place (40, 25).
+- `selftest_colossus_gate` re-pinned (selftest_colossus ALL PASSED). The approved `meta.json` is updated.
+- Mock: `gen/out/colossus/review/chaos_horizon_c3p_mock.png`.
+- **TS owner files that pin the old placement are listed in plan 15.1 D-U11; they are not edited here.**

@@ -46,14 +46,15 @@ REVIEW = OUT / "review"
 GEM_LEDGER = HERE / "cache" / "ledger.jsonl"
 GITIGNORE = HERE.parent.parent / ".gitignore"
 # the painted forms (rev 4, 18.4): canvas = screen px at scale 1, the rest place, the purposes, and for F3 the halo
-# geometry (estimates at 2700 wide: ring centre, radius, band width; the corona disc) the glow checks default to.
+# geometry (measured at C3' on the picked render x 1.5: ring centre, radius, band width; the corona disc) the glow
+# checks default to. Places: F3 (-527, -60) (user ruling 2026-11-16: lowered so more of the halo shows), F2 (40, 25).
 # F4 (chaos_horizon_core) reuses F3's art.
 FORMS = {
-    "chaos_orrery": {"aspect": "16:9", "canvas": (1320, 900), "place": (40, -20), "sky_dim": 1.0,
+    "chaos_orrery": {"aspect": "16:9", "canvas": (1320, 900), "place": (40, 25), "sky_dim": 1.0,
                      "gen": "f2_gen", "nobg": "f2_nobg", "upscale": "f2_upscale"},
-    "chaos_horizon": {"aspect": "21:9", "canvas": (2700, 1080), "place": (-527, -210), "sky_dim": 0.6,
+    "chaos_horizon": {"aspect": "21:9", "canvas": (2700, 1080), "place": (-527, -60), "sky_dim": 0.6,
                       "gen": "f3_gen", "nobg": "f3_nobg", "upscale": "f3_upscale",
-                      "ring": (1350.0, 570.0, 562.0, 75.0), "corona": (1347.0, 510.0, 260.0)},
+                      "ring": (1350.0, 502.0, 525.0, 48.0), "corona": (1347.0, 510.0, 230.0)},
 }
 
 
