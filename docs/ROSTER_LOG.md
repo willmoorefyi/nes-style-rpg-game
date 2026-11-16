@@ -1115,3 +1115,28 @@ pass.
 2. If more calls are allowed: one outpaint down/right to give the right arm a hand that reaches the rim (f3_gen,
    1-2 calls), and one search_replace with a simple search ("right hand") if needed.
 3. The face problem is solved by search_replace, not by prompts.
+
+## Pass C - C3 (generator, main checkout `roster`, 2026-11-16)
+
+**User ruling (2026-11-16, relayed by the coordinator).**
+- `s2_st_4102_sr_4201_raw.png`, the face-removed structure render (C4 + C6), is **the F3 "Last Horizon" look,
+  approved as the master base** ("looks amazing"). `s2_st_4102_raw.png`, the one with the face, is rejected.
+- Outstretched arms are not required, and the gripping-hand outpaint is dropped; the art is cropped and placed as the
+  composition needs.
+- New direction: **the body splits open as the fight nears its end**. F4 "Core Laid Bare" is the same colossus with
+  the stone chest torn open down the middle, revealing a blazing molten core. It is made with `search_replace` /
+  `structure` on the approved F3 image (purpose f4_variant) and keeps everything else identical. An optional
+  intermediate "cracking" state is allowed.
+- Then F2 "Orrery": black-gold armillary rings around an eclipse, visually related to F3's eclipse, an original design.
+  Everything stays within the 80-call cap.
+
+**F3 finish (0 calls).** `gen/colossus/chaos_horizon_finish.py` takes the render (C6) and its cut (C7):
+- the disc and its rim are forced opaque, and the corona fragments and the notch are cleared into the glow;
+- the darks are lifted (levels 10..226, gamma 0.72), with rim light from the upper left (gold 45 % on sky-facing top
+  edges, ember 22 % on lower edges) and the base mist mirrored;
+- `CL.pix` at exactly 2 render px per art px gives **master 900x362 art px** (palette OK, 24 free colours + base);
+- the **corona glow layer** is `glow.png` (900x362, 4 stepped levels, additive).
+
+Mock at scale 3, place (-390, -224), drawn over the floor with no floorFront, the party in front, and the windows
+(`gen/out/colossus/review/chaos_horizon_c3_mock.png`): coverage above the horizon 81.8 %, art 56 % of the field,
+edge contrast 100.5 (>= 100), party band std 82.8 (rim 41.1).
