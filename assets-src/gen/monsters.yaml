@@ -410,9 +410,13 @@
     anywhere, no effects
   cast: >-
     a rite of judgement, a small change from Image 3 and mirror-symmetric: the four blade wings stay in the same four
-    places as in Image 3 (two upper wings pointing up and out, two lower wings pointing down and out) but the two
-    upper wings swing a little higher and the two lower wings a little wider; both gauntlets lifted to shoulder height
-    with open hands; the gear heart blazing bright white; the halo, the helm, the hollow cuirass and the long wide
+    places as in Image 3 (two upper wings pointing up and out, two lower wings pointing down and out) and only spread
+    a little wider to the sides, the upper wing tips no higher than the top of the halo, exactly as high as in Image 3;
+    the two separate floating gauntlets (no arms: empty background between each gauntlet and the shoulder plates, as
+    in Image 3) rise to chest height with open palms, mirror images of each other at the same height, one on each side
+    of the cuirass, both visible; the helm, the cuirass halves, the shoulder plates, the gauntlets and
+    the skirt stay separate pieces hovering apart with the same narrow empty gaps as in Image 3; the gear heart
+    blazing bright white; the halo, the helm, the hollow cuirass and the long wide
     segmented skirt of plates exactly as in Image 3 (the same shapes, holes, widths and colours, the halo plain brass
     without a glow); exactly four blade wings and no fifth, each a tapering blade of cold white-blue light with no
     hilt and no cross-guard, as in Image 3; no blade in front of the body; the whole figure as tall as in Image 3, the
@@ -420,13 +424,15 @@
     top of the grey box; no other effects, no light rays or trails
   hurt: >-
     a violent jolt, a small change from Image 3: the floating plates knocked a little further apart, the cuirass
-    halves tilted, the helm tipped back, the halo knocked askew, the gear heart flickering dim; the four blade wings
+    halves tilted, the helm tipped back, the halo knocked askew, the gear heart flickering dim; the two separate
+    floating gauntlets (no arms: empty background between each gauntlet and the shoulder plates, as in Image 3)
+    knocked down and out, one on each side, both visible; the four blade wings
     stay in the same four places as in Image 3 (two upper, two lower) with the two lower wings faltering downward;
     the halo, the helm, the hollow cuirass and the long wide segmented skirt of plates as in Image 3 (the same shapes,
     holes, widths and colours, the halo plain brass); exactly four blade wings and no fifth, each a tapering blade of
     cold white-blue light with no hilt and no cross-guard, as in Image 3; no blade in front of the body; the posture
     stays upright and controlled; the whole figure as tall as in Image 3, at exactly the same pixel size, well below
-    the top of the grey box; no effects
+    the top of the grey box; no arms, no effects
   face: no face; the faceless brass helm-mask with its glowing slit and the gear heart are the readable features
   extra_negative: >-
     a face, skin, a body or bones inside the armour, feathers, feathered wings, more or fewer than four wings, six
@@ -436,7 +442,7 @@
   seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0; 1236 = R309 (hollow_seraph_v2)
   # V8 (docs/REDESIGN_FIX_PLAN.md F4, D-U1 = b; the pass-V set R313/R316/R318/R319 is archived as hollow_seraph_v2):
   # each pose's seed is one not used for it in the ledger (G-S).
-  sheet_seeds: {boss_idle: 1237, boss_attack: 1240, boss_cast: 1238, boss_hurt: 1237}   # boss_attack 1239 (R325): an armoured arm, the plates fused into one piece
+  sheet_seeds: {boss_idle: 1237, boss_attack: 1240, boss_cast: 1239, boss_hurt: 1237}   # boss_attack 1239 (R325): an armoured arm, the plates fused into one piece; boss_cast 1238 (R327): 177 px (wings raised high), not symmetric
 # ── pass R, G2: the other bosses (per pose, 4 or 5 images) and minibosses (3-pose sheets) (docs/ROSTER_PLAN.md 4.2;
 # the bestiary spec's entries 032, 033, 075, 092, 118, 121, 128). Original designs; limbs and props named by image side
 # (the G1 lesson: it kept props in their hands in R8, R10, R21, R37).
