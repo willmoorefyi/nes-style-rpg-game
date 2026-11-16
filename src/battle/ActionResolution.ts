@@ -10,6 +10,13 @@ import { retargetEnemyTarget } from './EnemyAI.js';
  * (B5) and boss-phase overrides (B1). Pure logic on the battle's own objects; no rendering.
  */
 
+/** One battle line. `interlude` (CHAOS_FORMS_PLAN 18.8 row 2c, B5): the view plays that battle-interludes.yaml script in
+ *  place of the line (the script shows the text as its message step); a view without the script shows the text. */
+export interface BattleMessage {
+  text: string;
+  interlude?: string;
+}
+
 export interface TargetContext {
   /** Party battle ids in party order (party_0 …), for the enemies' front-weighted retarget. */
   partyIds: readonly string[];
@@ -64,9 +71,10 @@ export function applyPhaseOverrides(enemy: EnemyInstance, phase: BossPhase): voi
 /**
  * ST-6 / B1: an enemy that has crossed a boss-phase HP threshold. Each phase fires once: its overrides apply, its
  * message is said, and the pattern swaps for an AI with `setPattern` when `bossPatterns` knows the id. An enemy with
- * no AI (Garland) keeps the default targeting, so no RNG draw is added.
+ * no AI (Garland) keeps the default targeting, so no RNG draw is added. A phase that names an interlude (B5) says one
+ * line `{text: message, interlude}` in place of its plain line; the interlude shows the message.
  */
-export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, BossPattern>, say: (text: string) => void): void {
+export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, BossPattern>, say: (line: BattleMessage) => void): void {
   const phases = enemy.data.bossPhases;
   if (!phases) return;
   const hpPercent = enemy.currentHp / enemy.data.stats.hp;
@@ -86,6 +94,8 @@ export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, 
         (ai as { setPattern(p: BossPattern): void }).setPattern(newPattern);
       }
     }
-    if (phases[i].message) say(phases[i].message!);
+    const { message, interlude } = phases[i];
+    if (interlude) say({ text: message ?? '', interlude });
+    else if (message) say({ text: message });
   }
 }

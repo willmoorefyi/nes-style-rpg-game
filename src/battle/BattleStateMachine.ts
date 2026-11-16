@@ -8,7 +8,7 @@ import { makeEnemyInstances } from './enemyInstances.js';
 import { sortByAgility, type Combatant } from './TurnOrder.js';
 import { selectTarget } from './EnemyAI.js';
 import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
-import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
+import { checkBossPhases, reservedItems, resolveActionTarget, type BattleMessage, type TargetContext } from './ActionResolution.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { executeFight, type PhysicalHitDeps } from './physicalHit.js';
 import { resolvePendingForms, type FormChangeResult, type FormContext, type FormState } from './bossForms.js';
@@ -63,9 +63,7 @@ export interface BattleResult {
   goldReward: number;
 }
 
-export interface BattleMessage {
-  text: string;
-}
+export type { BattleMessage } from './ActionResolution.js';
 
 export interface DamageEvent {
   targetId: string;
@@ -279,7 +277,7 @@ export class BattleStateMachine {
     // Check boss phase transitions before generating enemy commands (a reached form floor first: R5)
     resolvePendingForms(this.formCtx, text => this.messages.push({ text }));
     for (const enemy of this.livingEnemies) {
-      checkBossPhases(enemy, this.bossPatterns, text => this.messages.push({ text }));
+      checkBossPhases(enemy, this.bossPatterns, line => this.messages.push(line));
     }
 
     // Generate enemy commands using AI behavior or default random targeting

@@ -1,12 +1,16 @@
-# ═══ BATTLE INTERLUDES (docs/CHAOS_FORMS_PLAN.md 2.3, section 3) ═══
+# ═══ BATTLE INTERLUDES (docs/CHAOS_FORMS_PLAN.md 2.3, section 3; rev 4: 18.4, 18.8 row 2c) ═══
 # A form-bearing boss phase (`bossPhases[].interlude`) plays one of these when the form changes, right after the
-# action that reached the phase's HP floor. Validated by src/data/interludeScripts.ts (tests/data/interludes.test.ts).
+# action that reached the phase's HP floor. A non-form phase may name one too (B5): its round-start line arrives as a
+# BattleMessage with `interlude: <id>`, and the script shows the phase's message itself (chaos_crack on F3's 0.25).
+# Validated by src/data/interludeScripts.ts (tests/data/interludes.test.ts); read by src/data/InterludeRegistry.ts.
 # Steps: message (text), wait (frames), flash (color, frames, alpha), shake (times), tint (color, alpha, frames),
-#   fade (alpha, frames), dissolve (frames, style: flicker | fade | sink), swap, rise (frames, from_dy art px),
-#   pose (name: attack | cast | hurt | roar), variant (layer, frame), pan (from: [dx, dy] art px, frames, ease),
-#   music (id). `with: previous` starts a step on the same frame as the one before it.
+#   fade (alpha, frames), dissolve (frames, style: flicker | fade | sink), swap, rise (frames, from_dy screen px below
+#   its end), pose (name: attack | cast | hurt | roar), variant (layer, frame), pan (from: [dx, dy] screen px from rest,
+#   frames, ease), music (id). `with: previous` starts a step on the same frame as the one before it. A rise ends at the
+#   next pan's `from` (or at rest); every pan offset stays inside the B4 border limits (F3: dx [-247, 521], dy [-80, 324]).
 # Unskipped time at message speed 3 (90 frames per message, 8 per shake) is at most 480 frames (600 for chaos_i2,
-# D-O15); each script's total is pinned in the test: chaos_i1 436, chaos_i2 577, chaos_i3 130.
+# D-O15); each script's total is pinned in the test: chaos_i1 436, chaos_i2 577, chaos_i3 130, chaos_crack 102.
+interludes:
 
 # F1 -> F2: the Sovereign's robe burns away and the Orrery rises (3.2)
 - id: chaos_i1
@@ -23,7 +27,8 @@
     - {type: tint, color: "#ff7a2a", alpha: 0, frames: 20}
     - {type: message, text: "Chaos casts off its shape. The Orrery turns!"}
 
-# F2 -> F3: the rings shatter and the Last Horizon climbs over the rim; the reveal pan settles to rest (3.3, A1, A2)
+# F2 -> F3: the rings shatter and the Last Horizon climbs into the sky; the rise ends at the pan start (+480, +120),
+# and the pan sweeps from the left shoulder and arm to the eclipse at rest (18.4, A1 total unchanged)
 - id: chaos_i2
   steps:
     - {type: message, text: "The rings shatter!"}
@@ -32,12 +37,21 @@
     - {type: fade, alpha: 0.6, frames: 20}
     - {type: shake, times: 3}
     - {type: swap}
-    - {type: rise, frames: 120, from_dy: 300}
+    - {type: rise, frames: 120, from_dy: 700}
     - {type: fade, alpha: 0, frames: 60, with: previous}
     - {type: shake, times: 2, with: previous}
-    - {type: pan, from: [0, -60], frames: 120, ease: out}
+    - {type: pan, from: [480, 120], frames: 120, ease: out}
     - {type: flash, color: "#ffffff", frames: 8, alpha: 1}
     - {type: message, text: "Chaos, the Last Horizon, fills the sky!"}
+
+# F3 at 0.25 of the pool (a non-form phase, hits 4): the chest fissure cracks; no swap, the core layer shows its crack
+# frame, then the phase's own line (18.8 row 2c)
+- id: chaos_crack
+  steps:
+    - {type: shake, times: 1}
+    - {type: flash, color: "#ffffff", frames: 4, alpha: 1}
+    - {type: variant, layer: core, frame: crack}
+    - {type: message, text: "The horizon groans; core revealed!"}
 
 # F3 -> F4: the core tears open; same art, so no swap: the core layer switches to its open frame (3.4, R19)
 - id: chaos_i3

@@ -3327,7 +3327,7 @@
 - id: chaos_horizon
   name: Chaos
   formOf: chaos
-  description: "The Last Horizon. Its shoulders are mountain ranges, its head a black sun crowned in flame, and one hand grips the rim of the world."
+  description: "The Last Horizon. It fills the sky: its shoulders are mountain ranges, its arms span the world, and its head is a black sun inside a great halo of light."
   protect: [status, poison_stone, death, earth, time]
   attackStatus: [stun]
   spells: [ice, fir2, ice2, lit2]
@@ -3348,7 +3348,7 @@
   xpReward: 0
   goldReward: 0
   # the slam (R9): its 0.6 share of the non-spell turns; the beam is ICE, the strongest single-target black damage
-  # spell (2.4); the moons cast the -2 spells
+  # spell (2.4); it casts the -2 spells itself (rev 4, 18.0: the painted F3 has no moons)
   ai:
     rate: 0.5
     actions:
@@ -3364,10 +3364,12 @@
   # one resistance: the legacy field (the 7.1 convention; no resistance to the four elements, 3.3)
   resist: earth
   bossPhases:
+  # B5 (18.8 row 2c): the phase plays chaos_crack, which shows this line (the phase does not say it itself)
   - hpThreshold: 0.25
     patternId: aggressive
     message: "The horizon groans; core revealed!"
     hits: 4
+    interlude: chaos_crack
   - hpThreshold: 0.15
     patternId: aggressive
     form: chaos_horizon_core

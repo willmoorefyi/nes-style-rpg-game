@@ -83,7 +83,13 @@ describe('R0 shared contract: validators', () => {
       expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: 3 }] })).toThrow('bossPhases[0].form');
       expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: '' }] })).toThrow('bossPhases[0].form');
       expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: 'x', interlude: ['i1'] }] })).toThrow('bossPhases[0].interlude');
-      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, interlude: 'i1' }] })).toThrow('bossPhases[0].interlude');
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, interlude: '' }] })).toThrow('bossPhases[0].interlude');
+    });
+
+    // 18.8 row 2c (B5): a non-form phase may name an interlude too (F3's 0.25 phase plays chaos_crack)
+    it('accepts an interlude on a non-form phase', () => {
+      const data = { ...enemy, bossPhases: [{ ...phase, interlude: 'chaos_crack' }] };
+      expect(validateEnemyData(data).bossPhases![0]).toEqual({ ...phase, interlude: 'chaos_crack' });
     });
   });
 

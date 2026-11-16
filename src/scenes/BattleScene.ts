@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, Assets, type BitmapText, type Texture } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import { type BattleSceneDeps, type BattleSceneConfig, type UIState } from './battle/BattleSceneTypes.js';
-import type { EnemyInstance } from '../battle/BattleStateMachine.js';
+import type { BattleMessage, EnemyInstance } from '../battle/BattleStateMachine.js';
 import { BattleLayers } from './battle/BattleLayers.js';
 import { BATTLE_MESSAGE_FRAMES, INTRO_FRAMES, NOTICE_FRAMES, holdFrames } from './battle/battleTiming.js';
 import { createBattleDevClock, type BattleDevClock } from './battle/battleDevClock.js';
@@ -51,6 +51,8 @@ export class BattleScene implements Scene {
   private uiState: UIState = 'intro';
   private introTimer = INTRO_FRAMES;
   private messageTimer = 0;
+  /** The shown line is an interlude (B5: chaos_crack), played by the form view until it ends. */
+  private lineInterlude = false;
   private currentMessageIndex = 0;
   private commandGuard = 0;
   private noticeTimer = 0;
@@ -248,6 +250,10 @@ export class BattleScene implements Scene {
         break;
 
       case 'message':
+        if (this.lineInterlude) {
+          if (this.animation.formView.update(dt, skip)) { this.lineInterlude = false; this.advanceMessage(); }
+          break;
+        }
         this.messageTimer -= dt;
         if (this.messageTimer <= 0 || skip) {
           this.advanceMessage();
@@ -421,17 +427,23 @@ export class BattleScene implements Scene {
       return;
     }
     this.currentMessageIndex = 0;
-    this.messageText.setText(messages[0].text, true);
-    this.messageTimer = holdFrames(BATTLE_MESSAGE_FRAMES);
+    this.showLine(messages[0]);
     this.uiState = 'message';
+  }
+
+  /** One battle line, or the interlude it names in its place (B5; its text when the script is missing). */
+  private showLine(line: BattleMessage): void {
+    this.lineInterlude = this.animation.formView.startLine(line);
+    if (this.lineInterlude) return;
+    this.messageText.setText(line.text, true);
+    this.messageTimer = holdFrames(BATTLE_MESSAGE_FRAMES);
   }
 
   private advanceMessage(): void {
     const messages = this.battle.currentMessages;
     this.currentMessageIndex++;
     if (this.currentMessageIndex < messages.length) {
-      this.messageText.setText(messages[this.currentMessageIndex].text, true);
-      this.messageTimer = holdFrames(BATTLE_MESSAGE_FRAMES);
+      this.showLine(messages[this.currentMessageIndex]);
     } else if (this.battle.isOver) {
       this.checkBattleEnd();
     } else if (this.battle.state === 'intro') {
@@ -453,6 +465,7 @@ export class BattleScene implements Scene {
     this.display.updatePartySprites();
 
     if (this.battle.isOver) {
+      this.display.colossus.clearSky();                 // B8: the sky dim ends with the battle
       if (this.battle.outcome === 'victory') {
         this.deps.events.emit('battleVictory', {});
         this.display.setVictory();
@@ -467,6 +480,7 @@ export class BattleScene implements Scene {
 
   private checkBattleEnd(): void {
     if (!this.battle.isOver) return;
+    this.display.colossus.clearSky();
     this.uiState = 'end';
     this.endPromptTimer = 0;
     if (!this.endPrompt) this.endPrompt = createPromptIndicator(this.messageWindow);

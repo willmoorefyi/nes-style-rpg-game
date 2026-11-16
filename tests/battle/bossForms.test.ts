@@ -258,3 +258,32 @@ describe('formChain: the records reachable from a battle\'s roots (loaded with t
     expect(formChain([testEnemy()], [F1, ...FORMS])).toEqual([]);
   });
 });
+
+describe('an interlude on a non-form phase (CHAOS_FORMS_PLAN 18.8 row 2c, B5)', () => {
+  const CRACK = form('f3c', { colossus: 'f3', slam: { targets: 2 }, bossPhases: [
+    { hpThreshold: 0.25, patternId: 'p', message: 'The horizon groans!', hits: 4, interlude: 'crack' },
+    { hpThreshold: 0.15, patternId: 'p', form: 'f4', interlude: 'i3' },
+  ] }, { hits: 3 });
+  const lines = (rs: ActionResult[]) => rs.flatMap((r) => r.messages);
+
+  it('pushes one BattleMessage {text, interlude} in place of the plain line; the phase still applies (hits 4)', () => {
+    const bsm = battle([hero()], () => 0.5, [CRACK]);
+    setEnemyHp(boss(bsm), 1400);   // under 0.25 (1500), above the form floor (900)
+    const rs = round(bsm, idle);
+    expect(rs[0].messages).toEqual([{ text: 'The horizon groans!', interlude: 'crack' }]);
+    expect(lines(rs).filter((m) => m.text === 'The horizon groans!')).toHaveLength(1);
+    expect(enemyHits(boss(bsm))).toBe(4);
+    expect([boss(bsm).data.id, changes(rs)]).toEqual(['f3c', []]);
+    // once per phase: the next round says nothing
+    expect(round(bsm, idle)[0].messages).toEqual([]);
+  });
+
+  it('a phase without an interlude keeps its plain line (no interlude key)', () => {
+    const bsm = battle([hero(9999)]);
+    round(bsm, fight);
+    round(bsm, fight);
+    setEnemyHp(boss(bsm), 1400);
+    const rs = round(bsm, idle);
+    expect(rs[0].messages).toEqual([{ text: 'The horizon groans!' }]);
+  });
+});

@@ -1,11 +1,13 @@
 /**
  * Plays one interlude script (formInterlude.ts) against a host (docs/CHAOS_FORMS_PLAN.md 2.3): each step's start, its
  * per-frame progress (the dissolve, tint, fade, rise and pan) and its end. Pure of PixiJS: the host does the drawing
- * (formChangeView.ts), so the order and timing are testable on their own.
+ * (formChangeView.ts), so the order and timing are testable on their own. A rise ends at the next pan's `from`
+ * (riseSpan, 18.4): the swap builds the form at that pan offset, `from_dy` below it, so the pan starts without a jump.
  */
 import { InterludeClock, type DissolveStyle, type InterludePose, type InterludeStep } from './formInterlude.js';
 import { panAt, riseAt } from './colossus/colossusChoreography.js';
 import { SHAKE_FRAMES } from './screenShake.js';
+import { riseSpan } from '../../data/interludeScripts.js';
 
 export interface InterludeHost {
   message(text: string): void;
@@ -18,8 +20,9 @@ export interface InterludeHost {
   fade(alpha: number): void;
   /** The outgoing form leaves: u in [0, 1], t its frame. */
   dissolve(style: DissolveStyle, u: number, t: number): void;
-  /** Build the incoming form, `riseFrom` art px below its rest (the next rise's start). */
+  /** Build the incoming form, `riseFrom` screen px below its rise's end (the next rise's start). */
   swap(riseFrom: number): void;
+  /** Screen px below the rise's end (the pan offset set at the swap, or rest). */
   rise(dy: number): void;
   pose(name: InterludePose): void;
   variant(layer: string, frame: string): void;
@@ -77,8 +80,10 @@ export class FormInterludePlayer {
       case 'tint': this.tintFrom = this.tintNow; break;
       case 'fade': this.fadeFrom = this.fadeNow; break;
       case 'swap': {
-        const next = this.steps.slice(i + 1).find((x) => x.type === 'rise');
-        h.swap(next?.type === 'rise' ? next.from_dy : 0);
+        const r = this.steps.findIndex((x, j) => j > i && x.type === 'rise');
+        const span = r > 0 ? riseSpan(this.steps, r) : null;
+        h.swap(span ? span.from[1] - span.to[1] : 0);
+        if (span && (span.to[0] !== 0 || span.to[1] !== 0)) h.pan(span.to[0], span.to[1]);
         break;
       }
       case 'rise': h.rise(s.from_dy); this.fadeFrom = this.fadeNow; break;

@@ -1,13 +1,16 @@
 /**
- * Transformation interludes as a pure timeline (docs/CHAOS_FORMS_PLAN.md 2.3, R18, A1, A2, R19). Steps run in order;
- * a step with `with: previous` starts on the same frame as the step before it, and a group (a step and its `with`
- * partners) lasts as long as its longest member. The unskipped total counts a message at 90 frames (the validator is
- * pinned to message speed 3) and a shake at 8 frames per shake. Confirm advances a message step only.
+ * Transformation interludes as a pure timeline (docs/CHAOS_FORMS_PLAN.md 2.3, R18, A1, R19; rev 4: 18.4 B4). Steps run
+ * in order; a step with `with: previous` starts on the same frame as the step before it, and a group (a step and its
+ * `with` partners) lasts as long as its longest member. The unskipped total counts a message at 90 frames (the validator
+ * is pinned to message speed 3) and a shake at 8 frames per shake. Confirm advances a message step only. Offsets (rise,
+ * pan) are screen px; a rise ends at the next pan's `from` (riseSpan), so a pan may not run beside its rise, and every pan
+ * stays inside the B4 border limits of the form it reveals (rev 4 replaces R13's art px limits and A2's start rule).
  */
 import { BATTLE_MESSAGE_FRAMES } from './battleTiming.js';
 import { SHAKE_FRAMES } from './screenShake.js';
 import { TIMELINE_FRAMES, type PanEase } from './colossus/colossusChoreography.js';
-import { panLimits, type ColossusFormSpec } from './colossus/colossusIndex.js';
+import type { ColossusFormSpec } from './colossus/colossusIndex.js';
+import { panLimits } from '../../data/interludeScripts.js';
 
 type With = { with?: 'previous' };
 export type DissolveStyle = 'flicker' | 'fade' | 'sink';
@@ -15,9 +18,9 @@ export type InterludePose = 'cast' | 'attack' | 'hurt' | 'roar';
 export type InterludeStep = With & (
   | { type: 'message'; text: string }
   | { type: 'wait'; frames: number }
-  | { type: 'flash'; color: string; frames: number; alpha: number }
+  | { type: 'flash'; color: `#${string}`; frames: number; alpha: number }
   | { type: 'shake'; times: number }
-  | { type: 'tint'; color: string; alpha: number; frames: number }
+  | { type: 'tint'; color: `#${string}`; alpha: number; frames: number }
   | { type: 'fade'; alpha: number; frames: number }
   | { type: 'dissolve'; frames: number; style: DissolveStyle }
   | { type: 'swap' }
@@ -122,7 +125,7 @@ export class InterludeClock {
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const COLOR = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/;
 
-/** Problems with one script (empty: valid): fields and values per step, the caps, the A2 pan start, swaps. */
+/** Problems with one script (empty: valid): fields and values per step, the caps, swaps, a pan beside its rise. */
 export function interludeProblems(id: string, steps: readonly InterludeStep[]): string[] {
   const out: string[] = [];
   const p = (i: number, m: string): void => { out.push(`interlude ${id} step ${i + 1}: ${m}`); };
@@ -143,7 +146,11 @@ export function interludeProblems(id: string, steps: readonly InterludeStep[]): 
     if (s.type === 'pan') {
       const [dx, dy] = Array.isArray(s.from) ? s.from : [NaN, NaN];
       if (!Number.isInteger(dx) || !Number.isInteger(dy)) p(i, 'from must be two whole numbers');
-      else if (dx > 0 || dy < -70 || dy > 0) p(i, `pan start ${dx},${dy}: A2 needs dx <= 0 and dy in [-70, 0]`);
+      let h = i;
+      while (h > 0 && steps[h].with === 'previous') h--;
+      let e = i + 1;
+      while (e < steps.length && steps[e].with === 'previous') e++;
+      if (steps.slice(h, e).some((x) => x.type === 'rise')) p(i, 'a pan beside a rise (the rise ends where the pan starts)');
       if (s.ease !== 'linear' && s.ease !== 'out') p(i, 'ease must be linear or out');
     }
   });
@@ -154,7 +161,7 @@ export function interludeProblems(id: string, steps: readonly InterludeStep[]): 
   return out;
 }
 
-/** Every pan offset inside the coverage limits of the form it reveals (R13; the limits come from colossus.json). */
+/** Every pan offset inside the B4 border limits of the form it reveals (18.4; the geometry comes from colossus.json). */
 export function panProblems(steps: readonly InterludeStep[], form: ColossusFormSpec): string[] {
   const { dx, dy } = panLimits(form);
   return steps.flatMap((s, i) => (s.type === 'pan' && (s.from[0] < dx[0] || s.from[0] > dx[1] || s.from[1] < dy[0] || s.from[1] > dy[1])
