@@ -653,20 +653,32 @@
   extra_negative: two shields, a shield on the back, a dagger, a vest, a sword, a bow, a cape
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R80): two shields in the idle
 - id: crazy_horse
-  # "Crazy Horse" (004): a wild horse with two hits
+  # "Crazy Horse" (004): pass V redesign (docs/REDESIGN_PLAN.md 3.1): a gaunt otherworldly horse from another plane,
+  # lesser than a nightmare (the piebald wild horse is archived as crazy_horse_v1, docs/RETIRED_SPRITES.md)
   size: large
   body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep the hind hooves on the ground and the body low
+    (no leap, no rearing up): thrust the head toward the heroes with the neck bent so the head stays well inside its
+    own cell; the smoke mane and tail move with the motion, kept close to the body.
   prompt: >-
-    a wild-eyed piebald horse, white with large dark brown patches, seen from the side, a matted tangled black mane and
-    tail, flared nostrils, rolling white-rimmed eyes, a broken leather bridle with a snapped rein trailing from its
-    muzzle, muscular legs with dark hooves
+    a gaunt, otherworldly horse from another plane, seen from the side: an ash-grey hide stretched tight over a bony
+    frame, a ridge of short bone spines along the neck and the back, deep cracks across the flanks and neck glowing a
+    sickly yellow-green from inside, a long narrow skull-like head with two burning yellow-green eyes, a mane and tail
+    of drifting black smoke edged with small yellow-green embers (drawn as part of the body, with dark outlines), thin
+    long legs ending in dark iron hooves; the whole horse, tail tip to muzzle, sits in the middle of its own cell with
+    empty space on both sides; palette of ash grey, charcoal, bone white and sickly yellow-green
   attack: >-
-    a wild bucking strike toward the heroes: the forelegs lifted only a little off the ground and kicking forward, the
-    head thrust forward with the teeth bared, the mane and the broken rein flying; the hind hooves on the ground; no
-    rearing up tall
-  hurt: knocked back, the head tossed up and back, the eyes rolling, one foreleg buckling, the mane flying
-  face: the horse's head with the wild white-rimmed eye and flared nostrils is readable
-  extra_negative: a rider, a saddle, a horn, wings
+    a lunging strike toward the heroes: the head thrust forward and down with the long jaw open, the forelegs lifted
+    only a little and striking forward, the hind hooves on the ground, the smoke mane streaming back close to the neck;
+    no rearing up; the whole horse well inside the middle cell
+  hurt: >-
+    knocked back, all four hooves on the ground, the head tossed up a little, the glowing cracks flaring brighter, one
+    foreleg buckling; no taller than its idle height
+  face: the narrow skull-like head with two burning yellow-green eyes, each a clear bright spot, is readable
+  extra_negative: >-
+    a rider, a saddle, a bridle, white or brown patches, a horn, wings, blue fire, violet, purple, pink, magenta,
+    rearing up
   seeds: [1234]
 - id: black_widow
   # "Black Widow" (006): a basic spider (no poison in NES)

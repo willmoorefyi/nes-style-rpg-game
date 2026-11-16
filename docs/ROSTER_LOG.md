@@ -678,7 +678,17 @@ number). Written as a literal into `budget.json` `attempts_before`, `pass R fix.
 pinned by `selftest_passv.py`. Pass V: 50 images, only the 7 redesigned ids and their `only_sheets`, at most 3 per
 sheet (fresh counts from 367).
 
-Images used: 0 of 50 (ledger guard: 367 - 367).
+Images used: 1 of 50 (ledger guard: 368 - 367).
+
+### Pass V attempts (V3, generator, main checkout `roster`)
+
+Main-checkout `selftest.py` ALL PASSED (1022 ok checks) at 674857b (V-gen) before the first paid request. Each id is
+archived with `retire.py` (commit quoted) before its first request; `--move-rig` (and for a boss `--prune`) runs in the
+approval commit.
+
+| # | Sheet (seed) | n | Measured result | Decision |
+|---|---|---|---|---|
+| R290 | crazy_horse/monster_large (1234, key `8bc875977bdf6a8fbe2280ad`, `--retry`, pass-V attempt 1 of 3; archive 04c0539) | 1 | The plan 3.1 design: a gaunt ash-grey horse, a ridge of bone spines on neck and back, yellow-green glowing cracks (dim in the idle, flaring in the hurt), a long narrow skull-like head with one bright yellow-green eye spot, a black smoke mane and tail, thin legs, dark hooves; facing right in every cell. Heights 90 / 69 / 91 (large band 96-120; idle inside the -10 % tolerance), feet on row 122, 128 px cells, x 17-110 / 2-117 / 20-105, no border pixels, one piece per cell, binary alpha, 16 colours with the outline ink, `pose_diff` 0.94 / 0.58. `flat_edges` names the attack's upper jaw tip (x 117, y 96-98): the raw tip ends there with mid-grey ink, nothing sliced (checked against the raw). Attack = a low forward lunge with the long jaw open; hurt = head tossed up, cracks flaring. Sibling check vs `nightmare` (glossy black, blue flame mane and hooves) and the archived piebald `crazy_horse_v1`: clearly different creatures. Nits: the attack is a long low lunge (69 px, `height_ok` false); the hurt lifts the forelegs (a half rear, top row 32 vs idle 33, no height gain) instead of "all four hooves on the ground"; the small floating embers of the raw are dropped by the cutter (mane embers mostly gone) | **self-approved with nits**; `retire.py --move-rig crazy_horse` in the same commit |
 
 ### V1 framework (framework owner, `v-fw`, 2026-11-16, 0 images)
 
