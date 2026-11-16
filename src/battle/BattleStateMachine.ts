@@ -10,7 +10,7 @@ import { selectTarget } from './EnemyAI.js';
 import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
 import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
-import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
+import { executeFight, type PhysicalHitDeps } from './physicalHit.js';
 import { losesTurn, type PresentHold, type TickSubject } from './StatusTick.js';
 import { runTurn } from './turnTick.js';
 import { xpShare } from './Rewards.js';
@@ -128,6 +128,7 @@ export class BattleStateMachine {
   private spellExecutor: SpellExecutor;
   private spells: SpellData[];
   private targets: TargetContext;
+  private hitDeps: PhysicalHitDeps;
   /** Maps unique party IDs (party_0, party_1, ...) to their Character */
   private partyById: Map<string, Character>;
 
@@ -143,6 +144,10 @@ export class BattleStateMachine {
     this.targets = {
       partyIds: this.party.map((_, i) => this.getPartyId(i)), livingEnemyIds: () => this.livingEnemies.map(e => e.id),
       isAlive: id => this.isTargetAlive(id), spells: this.spells, rng: this.rng,
+    };
+    this.hitDeps = {
+      rng: this.rng, enemies: this.enemies, partyMember: id => this.getPartyMember(id), say: text => this.messages.push({ text }),
+      damage: e => this._damageEvents.push(e), missed: () => { this._missed = true; },
     };
     this.spellExecutor = new SpellExecutor(
       {
@@ -465,45 +470,7 @@ export class BattleStateMachine {
       return;
     }
 
-    // the target was resolved before the action (resolveActionTarget)
-    if (cmd.type === 'fight' && cmd.targetId) {
-      if (isEnemy) this.executeEnemyAttack(cmd.actorId, cmd.targetId);
-      else this.executePartyAttack(cmd.actorId, cmd.targetId);
-    }
-  }
-
-  private executePartyAttack(actorId: string, targetId: string): void {
-    const actor = this.getPartyMember(actorId);
-    const target = this.enemies.find(e => e.id === targetId);
-    if (!actor || !target || actor.currentHp <= 0 || target.currentHp <= 0) return;
-
-    const result = resolvePartyAttack(actor, target, this.rng);
-    if (!result.hit) {
-      this._missed = true;
-      this.messages.push({ text: `${actor.name} missed!` });
-      return;
-    }
-    target.currentHp = Math.max(0, target.currentHp - result.damage);
-    this.messages.push({ text: attackLine(actor.name, target.displayName, result) });
-    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-    if (target.currentHp <= 0) this.messages.push({ text: `${target.displayName} defeated!` });
-  }
-
-  private executeEnemyAttack(enemyId: string, targetId: string): void {
-    const enemy = this.enemies.find(e => e.id === enemyId);
-    const target = this.getPartyMember(targetId);
-    if (!enemy || !target || enemy.currentHp <= 0 || target.currentHp <= 0) return;
-
-    const result = resolveEnemyAttack(enemy, target, this.rng);
-    if (!result.hit) {
-      this._missed = true;
-      this.messages.push({ text: `${enemy.displayName} missed!` });
-      return;
-    }
-    target.currentHp = target.currentHp - result.damage;
-    this.messages.push({ text: attackLine(enemy.displayName, target.name, result) });
-    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-    if (target.currentHp <= 0) this.messages.push({ text: `${target.name} fell!` });
+    executeFight(this.hitDeps, cmd, isEnemy);
   }
 
   private isTargetAlive(id: string): boolean {
