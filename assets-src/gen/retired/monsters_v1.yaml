@@ -54,3 +54,30 @@
   extra_negative: a cape, a cloak, a shield, spikes, a skull, a plume, horns, gold trim, a second sword, a face
   seeds: [1234]
   retired_as: black_knight_v1
+- id: guardian
+  # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the body but keep all four legs on the ground and the body low (no
+    leap, no rearing up): thrust the two spear arms toward the heroes with the joints bent, so the spear tips stay
+    well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks, steam,
+    smear or motion lines.
+  prompt: >-
+    a four-legged bronze automaton sentinel seen from the side, built like a mechanical hound: a long low horizontal
+    body of riveted bronze plates carried on exactly four jointed metal legs, two at the front and two at the back,
+    all four feet flat on the ground; a small domed head at the front with one round glowing red lens eye, two
+    jointed arms on the chest each ending in a short spear blade, both held pointing down in front of it close to the
+    body, the same two spear blades in every cell; weathered bronze with green patina spots; the whole machine sits in
+    the middle of its own cell with empty space on both sides
+  attack: >-
+    leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
+    glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
+  hurt: >-
+    knocked back low, the body dropped and hunched with all four feet flat on the ground (no rearing up, the front
+    legs down), no taller than its idle height, the head ducked, the lens dimmed, the two spear arms pulled in close
+    under the chest
+  face: one round glowing red lens eye in the domed head
+  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt; 1235 (R252): a rear-up hurt
+  retired_as: guardian_v1
