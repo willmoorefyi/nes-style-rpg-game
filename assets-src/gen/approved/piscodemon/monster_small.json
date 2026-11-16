@@ -3,11 +3,11 @@
   "sheet": "monster_small",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "0d4cd6b25d7cad960dbab2b9",
+  "seed": 1236,
+  "cache_key": "0ce22ed29368387b4c8a8675",
   "approved": "2026-11-16",
   "grid": [
-    80,
+    82,
     80
   ],
   "bottom_row": 76,
@@ -23,5 +23,5 @@
   "size": "small",
   "floating": false,
   "flip_frames": [],
-  "note": "pass V R291: self-approved with nits (eyes cut to cream, not yellow)"
+  "note": "V8 F2 attempt 2 (seed 1236): R323"
 }

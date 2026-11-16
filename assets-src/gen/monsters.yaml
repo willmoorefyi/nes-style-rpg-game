@@ -629,26 +629,39 @@
     toward the heroes with the elbows bent, so both clawed hands and all six face tentacles stay well inside its own
     cell. Draw only the parts named in the description, the same in every cell: no robe, cloth or extra limbs, and no
     smear, glow trails or motion lines.
+  # V8 (docs/REDESIGN_FIX_PLAN.md F2): the R291 sheet was not terrifying (the yellow eyes cut to a round pale cream eye
+  # that read sad, a soft teal ramp); archived as piscodemon_v2. Narrow slanted yellow-orange eyes under a heavy brow are
+  # the only light accent on a dark body; the tentacles are spread three per side.
   prompt: >-
-    a squat, hunched young deep-sea horror with a humanoid body: a large bulbous ridged head like an octopus mantle,
-    two large round glowing yellow eyes with black slit pupils, exactly six short thick tentacles hanging from the
-    lower face in place of a mouth, mottled sea-green and slate-blue skin with pale yellow spots, crusted shell plates
-    on the shoulders and forearms, a bare ribbed chest, two long arms ending in three-fingered webbed claws held close
-    in front of the body, short bent legs on webbed feet; centred in its own cell with empty space on both sides;
-    palette of sea green, slate blue, pale yellow and bone white
+    a squat, hunched, menacing young deep-sea psychic horror with a humanoid body: a large bulbous ridged head like an
+    octopus mantle with deep shadows, in darker sea green and near-black slate; two narrow slanted eyes glowing bright
+    yellow-orange with black slit pupils, each a large bright spot, under a heavy brow ridge, the eyes the only light
+    colour on the whole body; the head turned three-quarters toward the viewer so the whole face is seen; exactly six
+    long thick tentacles hanging from the lower face in place of a mouth, fanned wide apart like spread fingers with
+    clear gaps of background between them, each tentacle ending in its own curled tip, all six tips separately
+    visible; mottled dark sea-green and
+    slate-blue skin; crusted dark grey-green shell plates on the shoulders and forearms; a bare ribbed chest; two long
+    arms ending in three-fingered webbed claws held close in front of the body; short bent legs on webbed feet;
+    centred in its own cell with empty space on both sides; palette of dark sea green, near-black slate, dark
+    grey-green and a bright yellow-orange eye glow
   attack: >-
-    lunging toward the heroes, both clawed hands reaching forward but pulled in close in front of its chest (not
-    stretched to the cell edge), the six face tentacles lashing forward, the yellow eyes blazing; exactly six tentacles
-    as in the idle cell
+    a low lunge toward the heroes: the whole body leaning far forward and down, the head pushed out ahead of the body,
+    the six face tentacles fanned wide open toward the heroes with clear gaps between them, both clawed hands reaching
+    forward but pulled in close below the tentacles (not stretched to the cell edge), the narrow slanted yellow-orange
+    eyes blazing under the heavy brow; exactly six tentacles as in the idle cell; clearly a different pose from the
+    idle
   hurt: >-
-    knocked back, the head thrown back, the six face tentacles curling up, the clawed hands thrown up close to the head
+    knocked back, the head thrown back, the six face tentacles spread apart and curling up, the clawed hands thrown up
+    close to the head, the narrow yellow-orange eyes still glowing
   face: >-
-    the bulbous head with two large bright yellow eyes, each a clear bright spot, and six face tentacles is readable at
-    small size
+    the bulbous head with two narrow slanted bright yellow-orange eyes under a heavy brow ridge, each a large bright
+    spot, and six spread face tentacles is readable at small size
   extra_negative: >-
     a robe, a cloak, a collar, a staff, a weapon, a fish head, a lure, fins, a mouth, a third eye, violet, purple,
-    lilac, pink, magenta, five tentacles, seven tentacles
+    lilac, pink, magenta, five tentacles, seven tentacles, round eyes, pale eyes, white eyes, big cute eyes, pastel
+    colours, pale or cream shell plates, yellow spots
   seeds: [1234]
+  sheet_seeds: {monster_small: 1236}   # V8 attempt 2 (REDESIGN_FIX_PLAN F2 G-S); 1234 = R291 (piscodemon_v2); 1235 (R322): 3-4 tentacle tips visible, attack an idle copy
 - id: evil_eye
   # "Evil Eye" (075), the Levistone guardian: gazes and death magic (Magic replays the attack frames, D6/D7).
   # the floating line ("tilt the whole body along a strong diagonal ...") is replaced by a frontal line (orchestrator,
