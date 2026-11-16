@@ -91,6 +91,10 @@ describe('bestiary model: stats', () => {
   it('elements: wolf weak Fire / resist Ice; the Red Dragon weak Ice and Poison/Stone (statusWeak) / resist Fire', () => {
     expect([cellOf(byId('wolf'), 'Weak'), cellOf(byId('wolf'), 'Resist')]).toEqual(['Fire', 'Ice']);
     expect([cellOf(byId('dragon'), 'Weak'), cellOf(byId('dragon'), 'Resist')]).toEqual(['Ice, Poison/Stone', 'Fire']);
+    // V8 F9: by design the dragon's 17-character Weak value takes a full-width row (no Resist beside it), so it can
+    // never run into the next label
+    const weak = statLines(byId('dragon'), data).find((l) => l.left.startsWith('Weak'));
+    expect(weak?.right).toBeUndefined();
   });
 
   it('the Immune row: elemental immunities, then the status protections (protect, D5)', () => {
@@ -155,7 +159,11 @@ describe('bestiary model: the 17-line budget', () => {
     expect(lines.length).toBeLessThanOrEqual(STAT_LINES);
     for (const l of lines) {
       if (l.right === undefined) expect(l.left.length).toBeLessThanOrEqual(FULL_CHARS);
-      else expect(Math.max(l.left.length, l.right.length)).toBeLessThanOrEqual(COLUMN_CHARS);
+      else {
+        // V8 F9: a left cell with a right cell beside it keeps a trailing space before the right column
+        expect(l.left.trimEnd().length, `${e.id}: ${l.left}|${l.right}`).toBeLessThanOrEqual(COLUMN_CHARS - 1);
+        expect(l.right.length).toBeLessThanOrEqual(COLUMN_CHARS);
+      }
     }
   };
 

@@ -161,14 +161,15 @@ export function statLines(entry: BestiaryEntry, data: BestiaryData, spellName: (
       acc: DEFAULT_SPELL_ACCURACY })), 1, `${e.id}:status`),
   ];
   // ROSTER_PLAN 7.3: Weak (elements, then status weaknesses), Resist, Immune (elements, then `protect`), Absorb, Actions
-  // and Spells, packed: two short values (17 characters) share a line, a longer one wraps on full-width rows
+  // and Spells, packed: two short values (16 characters, so a space is left before the right column, V8 F9) share a
+  // line, a longer one wraps on full-width rows
   const flow: [string, string][] = [
     [L.weak, v(withProtections(el.weak, e.statusWeak, data))], [L.resist, v(elementList(el.resist, data))],
     [L.immune, v(withProtections(el.immune, e.protect, data))], [L.absorb, v(elementList(el.absorb, data))],
     [L.actions, v(fill(data, 'fight', { hits }))],
     [L.spells, v(spells.length > 0 ? spells.map(spellName).join(data.templates.list) : L.none)],
   ];
-  const short = (i: number): boolean => i < flow.length && flow[i][1].length <= COLUMN_CHARS - LABEL_CHARS;
+  const short = (i: number): boolean => i < flow.length && flow[i][1].length <= COLUMN_CHARS - LABEL_CHARS - 1;
   for (let i = 0; i < flow.length; i++) {
     const [label, value] = flow[i];
     if (short(i) && short(i + 1)) {

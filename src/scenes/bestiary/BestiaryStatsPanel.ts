@@ -5,7 +5,8 @@
 import { BitmapText, Container } from 'pixi.js';
 import { Window } from '../../ui/Window.js';
 import { NES_FONT } from '../../ui/NESFont.js';
-import { CHAR_WIDTH, FONT_SIZE, LINE_HEIGHT } from '../../core/LayoutConstants.js';
+import { FONT_SIZE, LINE_HEIGHT } from '../../core/LayoutConstants.js';
+import { glyphWidth } from '../battle/battleMessageUtils.js';
 import { COLUMN_CHARS, type StatLine } from './bestiaryModel.js';
 
 /** The stats window (screen px). 872 wide: two 28-character columns (56 x ~14.5 px) fit inside the padding. */
@@ -22,7 +23,8 @@ export class BestiaryStatsPanel {
     this.left = text();
     this.right = text();
     this.left.position.set(this.window.contentX, this.window.contentY);
-    this.right.position.set(this.window.contentX + COLUMN_CHARS * CHAR_WIDTH, this.window.contentY);
+    // V8 F9: the right column past 28 measured glyphs (14.4 px at 24 px), not 28 x CHAR_WIDTH 14 (392 < 403)
+    this.right.position.set(this.window.contentX + Math.ceil(COLUMN_CHARS * glyphWidth(FONT_SIZE)), this.window.contentY);
     this.window.addChild(this.left, this.right);
     parent.addChild(this.window);
   }
