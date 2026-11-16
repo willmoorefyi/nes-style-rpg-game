@@ -74,6 +74,74 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
     run_wide_cells(check)
     run_anchors(check)
     run_raise_off(check)
+    run_alias(check)
+
+
+def run_alias(check: Callable[[bool, str], None]) -> None:
+    """FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a rig `alias: [hurt]` (or [attack]) leaves that sequence's in-betweens out
+    of generate, so the atlas aliases them to their source keys as on a keyframe-only sheet; idle_b, daze / daze_b and
+    the other sequences are still generated, byte-identical to the same rig without the alias; `check` prints
+    `OK (aliased: hurt; ...)`. Only MA.FWQ_ALLOW entries (selftest_efix pins the list), one per rig. The live
+    allowlist has no rigged sheet yet, so a goblin entry is added for the test only."""
+    import copy
+    import tempfile
+    import numpy as np
+    from gen import anim_checks as C
+    from gen import monster_anim as MA
+    from gen import monster_atlas as MAT
+    from gen import monster_review as MR
+    sid = "goblin"
+    _, meta, kfs = next(e for e in MA.load_entries() if e[0] == sid)
+    cfg = MA.load_rig(sid)
+    base = MA.generate(sid, cfg, kfs, meta)
+    hurt = {**copy.deepcopy(cfg), "alias": ["hurt"]}
+    check(_raises_value(lambda: MA.generate(sid, hurt, kfs, meta), sid, "FWQ_ALLOW"),
+          "FW-Q: an alias not in FWQ_ALLOW is refused (naming the rig)")
+    allow, real_rig, real_lock = set(MA.FWQ_ALLOW), MA.load_rig, MA.lock_path
+    MA.FWQ_ALLOW |= {(sid, "hurt"), (sid, "attack")}
+    try:
+        gh = MA.generate(sid, hurt, kfs, meta)
+        ga = MA.generate(sid, {**copy.deepcopy(cfg), "alias": ["attack"]}, kfs, meta)
+        check(_raises_value(lambda: MA.generate(sid, {**cfg, "alias": ["hurt", "attack"]}, kfs, meta), "one"),
+              "FW-Q: a second alias is refused (at most one aliased sequence per rig)")
+        check(_raises_value(lambda: MA.generate(sid, {**cfg, "alias": ["cast"]}, kfs, meta), "cast"),
+              "FW-Q: only hurt or attack can be aliased")
+        MA.load_rig = lambda s: hurt if s == sid else real_rig(s)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            frames, _, anim = MAT.sprite_frames(sid, meta, kfs)
+        lock = {n: C.frame_hash(f["img"]) for n, f in gh.items()}
+        with tempfile.TemporaryDirectory() as d:
+            lp = Path(d) / f"{sid}.lock.json"
+            lp.write_text(json.dumps(lock))
+            MA.lock_path = lambda s: lp if s == sid else real_lock(s)
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                code = MR.main(["check", sid])
+    finally:
+        MA.FWQ_ALLOW.clear()
+        MA.FWQ_ALLOW.update(allow)
+        MA.load_rig, MA.lock_path = real_rig, real_lock
+    gone = {"hurt_in1", "hurt_in2"}
+    check(not gone & set(gh) and {"daze", "daze_b", "idle_b", "atk_wind1"} <= set(gh),
+          f"FW-Q: alias [hurt] generates no hurt_in1 / hurt_in2; daze, daze_b, idle_b and the attack are generated ({sorted(gh)})")
+    check(set(gh) == set(base) - gone and all(np.array_equal(gh[n]["img"], base[n]["img"]) for n in gh),
+          "FW-Q: every other frame is byte-identical to the same rig without the alias")
+    atk = {"atk_wind1", "atk_wind2", "atk_mid", "atk_follow", "atk_recover"}
+    check(set(ga) == set(base) - atk, f"FW-Q: alias [attack] leaves out exactly the five attack in-betweens ({sorted(set(base) - set(ga))})")
+    check(anim and not gone & set(frames) and MA.resolve("hurt_in1", frames) == "idle" and MA.resolve("hurt_in2", frames) == "hurt",
+          "FW-Q: the atlas aliases hurt_in1 -> idle and hurt_in2 -> hurt (as a keyframe-only sheet)")
+    lines = [ln for ln in buf.getvalue().splitlines() if ln.strip() and not ln.endswith("boss poses incomplete, skipped")]
+    check(code == 0 and len(lines) == 1 and lines[0].startswith(f"{sid}: OK (aliased: hurt"),
+          f"FW-Q: check prints 'OK (aliased: hurt; ...)' ({lines})")
+
+
+def _raises_value(fn: Callable[[], object], *words: str) -> bool:
+    try:
+        fn()
+    except ValueError as e:
+        return all(w in str(e) for w in words)
+    return False
 
 
 # FW-A constants, measured from the atlas at 95b31e2 (inclusive extents; dragon is `attack: ranged`, so its homeX

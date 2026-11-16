@@ -14,6 +14,9 @@ import yaml
 BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4); FW-7 (pass R,
 # orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
+# FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the pre-allowlisted partial-rig aliases; G6 removes the unused ones
+FWQ_ALLOW = {("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
+             ("black_knight", "hurt"), ("astos", "attack")}
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
 FX_PENDING: set[tuple[str, str]] = set()
 
@@ -214,6 +217,15 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
     check(not missing, f"fx allowlist: every approved fx part is declared {sorted(missing)}")
 
 
+def run_fwq_allowlist(check: Callable[[bool, str], None]) -> None:
+    """FW-Q: the code's allowlist is exactly this one, and every live rig's alias is on it (at most one per rig)."""
+    from gen import monster_anim as MA
+    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the 6 pre-allowlisted entries "
+          f"({sorted(getattr(MA, 'FWQ_ALLOW', set()))})")
+    live = {(p.stem, a) for p in sorted(MA.RIGS.glob("*.yaml")) for a in (yaml.safe_load(p.read_text()) or {}).get("alias") or []}
+    check(live <= FWQ_ALLOW, f"FW-Q: every live rig alias is allowlisted ({sorted(live)})")
+
+
 def lich_crystal_ratio(cfg: dict | None = None) -> tuple[int, int]:
     """(crystal px in the generated lich cast_rise, crystal px in the approved cast keyframe), from the real rig and
     sheet; `cfg` overrides the rig file (the RED-first run sets the rise scale back to 1.0 in memory)."""
@@ -392,5 +404,5 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
 def run_efix(check: Callable[[bool, str], None]) -> None:
     from gen.selftest_keyoffset import run_key_offset     # FW-O (ROSTER_FIX_PLAN_2.md 4)
     for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal,
-               run_halo_brighten, run_kf_paint, run_key_offset):
+               run_halo_brighten, run_kf_paint, run_key_offset, run_fwq_allowlist):
         fn(check)
