@@ -149,6 +149,7 @@ frames:
     t: 0.3
     tweaks: {}
 holds: []
+kf_paint_cap: {hurt: 220}   # N-1a/N-1b: the allowlisted crocodile/hurt exception (ROSTER_FIX_PLAN rev 3)
 paint:
   - {frame: atk_recover, xy: [[87, 103], [87, 104], [87, 105], [87, 106]], rgb: [222, 206, 115]}
   - {frame: atk_recover, xy: [[87, 102]], rgb: [165, 148, 107]}
@@ -185,3 +186,12 @@ paint:
   - {frame: hurt, xy: [[37, 58], [37, 59], [36, 60]], rgb: [6, 4, 10]}
   - {frame: hurt, xy: [[32, 54], [33, 54], [23, 63], [24, 63]], rgb: [33, 49, 41]}   # 4 bridge px: the hollow fill joins the tail fill
   - {frame: hurt_in2, xy: [[34, 67], [33, 68]], rgb: [33, 49, 41]}   # the ring's bridge, re-derived (the body moves 1 px)
+  # N-1a (ROSTER_FIX_PLAN_2 3): the 18 px of the darkest purple (33, 0, 33) left inside the curl take the tail ramp
+  # (4-neighbour mode among the tail fills; 8-neighbour mode for the px walled in by ink). N-1b: the tail tip's bare 4x2
+  # ink block becomes a tapered tip (2 corner ink px nulled, 2 px of tail fill under a 2 px ink cap) and the strand's
+  # 2 bare ink corners (29, 43) and (23, 44) are nulled. Key patch 158 + 18 + 6 = 182 px <= the allowlisted 220.
+  - {frame: hurt, xy: [[25, 45]], rgb: [57, 82, 57]}
+  - {frame: hurt, xy: [[31, 52], [32, 52], [33, 52], [31, 53], [28, 84], [29, 84]], rgb: [41, 57, 49]}
+  - {frame: hurt, xy: [[32, 53], [33, 53], [36, 56], [30, 59], [9, 73], [10, 73], [35, 79], [35, 80], [35, 83], [28, 85], [29, 85]], rgb: [33, 49, 41]}
+  - {frame: hurt, xy: [[17, 38], [20, 38], [29, 43], [23, 44]], rgb: null}
+  - {frame: hurt, xy: [[18, 39], [19, 39]], rgb: [57, 82, 57]}
