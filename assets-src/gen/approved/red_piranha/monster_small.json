@@ -1,0 +1,27 @@
+{
+  "character": "red_piranha",
+  "sheet": "monster_small",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1236,
+  "cache_key": "19a3bccfa97e214bd940ce6a",
+  "approved": "2026-11-15",
+  "grid": [
+    88,
+    80
+  ],
+  "bottom_row": 76,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "small",
+  "floating": true,
+  "flip_frames": [],
+  "note": "pass R fix 2: FW-C re-cut of R282, 0 images"
+}

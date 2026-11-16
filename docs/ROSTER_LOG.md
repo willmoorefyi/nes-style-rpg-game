@@ -596,3 +596,15 @@ lift attack 34, hurt 36; lifted rows attack 31-125, hurt 28-125 of the 128 px ce
 **G1 exit check** (no rig or lock changed): `build_assets.py monsters_ai` -> every `assets/sprites/monsters-ai*` file
 equals 3ebbe1d (`shasum -c`, 10 OK); `check --all` 112 `OK` + 9 `no rig`, nothing else; `git diff --exit-code
 assets-src/gen/anim/monsters/` clean; `selftest.py --anim` ALL PASSED (556 checks); `selftest.py` ALL PASSED (930 checks).
+
+### Fix pass 2: swimmer re-cuts (generator, main checkout, 0 images)
+
+The FW-C cutter (merged at 450901c, `LIFT_MAX` 36) re-cut the cached raws offline with `generate.py --repixelize`; no
+paid request, the ledger is unchanged by this step.
+Both requests re-plan from the current `monsters.yaml` text to their last attempt's cached key (R282, R280), so no old
+prompt text was restored.
+
+| # | Sheet (seed) | n | Measured result | Decision |
+|---|---|---|---|---|
+| R288 | red_piranha/monster (1236, key `19a3bccfa97e214bd940ce6a`, the R282 raw re-cut by FW-C) | 0 | `clipped == []`, `lifted == {"hurt": 8}`; heights 51 / 52 / 51, bottoms 76 / 77 / 77, an 88 px cell, no border pixels, binary alpha, 16 colours with the outline ink, one piece per cell, `pose_diff` 0.26 / 0.44, `edges_ok`, `height_ok`, `diff_ok`; the hurt's belly and lower fin are now whole. One stocky rust-orange and bronze fish with a bony head plate, a heavy jutting jaw and a yellow eye in every cell, facing right; attack = darting forward with the jaw dropped open. Sibling check vs `bigeyes` (side by side: a white eyeball with blue fins) and `shark` / `white_shark`: a deep-bodied armoured river fish. Nit: a modest attack (0.26) | **self-approved** (`approve.py red_piranha monster_small`) |
+| R289 | white_shark/monster (1236, key `38351be46753975f50cd80dd`, the R280 raw re-cut by FW-C) | 0 | `clipped == []`, `lifted == {"attack": 34, "hurt": 36}` (inside `LIFT_MAX` 36); heights 57 / 95 / 98, bottoms 122 / 125 / 125, tops 66 / 31 / 28, a 128 px cell, no border pixels, binary alpha, 16 colours with the outline ink, one piece per cell, `pose_diff` 1.85 / 1.72, `edges_ok`, `diff_ok`; the tails are whole. One broad slate-grey great white with a white belly and the same pale cross scars in every cell, facing right; attack = an arched lunge with the mouth open; hurt = recoiled in a curve, the mouth shut. Sibling check vs `shark` (side by side: slimmer, paler, no scars, arched in every cell): broader, darker back, scarred. Nits: **the idle is small and level (57 px; `height_ok` false) while both action cells are arched and 95-98 px tall**, a very large idle-to-action change; whether the float band (check 8) and the in-betweens can carry it is the G3d rig decision (plan 6 step 2: deferred again if the rig cannot pass check 8 in 3 iterations) | **self-approved with nits** (`approve.py white_shark monster_large`); G3d decides |
