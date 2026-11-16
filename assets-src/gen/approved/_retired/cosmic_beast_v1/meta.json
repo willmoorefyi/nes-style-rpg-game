@@ -1,0 +1,53 @@
+{
+  "source": "Stability AI Stable Image Core (stability.stable-image-core-v1:1), AWS Bedrock us-west-2",
+  "date": "2026-11-16",
+  "seed": 4242,
+  "aspect_ratio": "21:9",
+  "prompt_file": "prompt.md",
+  "background_removal": "stability remove_bg",
+  "pixelized_by": "pixelize.pixelize (block vote, 24-colour k-means, 15-bit snap, 1 px outline); mirrored to face right",
+  "note": "Kept by the user for a future monster (not chaos). Not in any build; not rigged; not approved through approve.py.",
+  "stats": {
+    "raw": [
+      2304,
+      960
+    ],
+    "bbox": [
+      1931,
+      868
+    ],
+    "partial_alpha": 0.321,
+    "s2": {
+      "art_px": [
+        630,
+        283
+      ],
+      "screen_px": [
+        1260,
+        566
+      ],
+      "colors": 22,
+      "alpha": [
+        0,
+        255
+      ],
+      "sec": 2.6
+    },
+    "s3": {
+      "art_px": [
+        420,
+        189
+      ],
+      "screen_px": [
+        1260,
+        567
+      ],
+      "colors": 22,
+      "alpha": [
+        0,
+        255
+      ],
+      "sec": 2.6
+    }
+  }
+}
