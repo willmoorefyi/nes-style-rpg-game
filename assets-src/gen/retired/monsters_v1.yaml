@@ -81,3 +81,13 @@
   extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
   seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt; 1235 (R252): a rear-up hurt
   retired_as: guardian_v1
+- id: vampire
+  size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
+  prompt: >-
+    pale vampire with slicked-back black hair, red eyes and small fangs, a high-collared black cape with a red lining,
+    a dark red vest, reaching out with a clawed hand
+  attack: swooping forward low with the cape spread like wings and a clawed hand raking at the heroes
+  hurt: recoiling sharply, twisting away behind the raised cape, hissing with fangs bared
+  seeds: [1234]
+  retired_as: vampire_v1
