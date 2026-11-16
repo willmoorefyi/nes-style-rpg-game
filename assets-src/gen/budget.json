@@ -40,7 +40,7 @@
     },
     {
       "name": "pass V",
-      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy); dragon (red) added 2026-11-16 by the orchestrator (its low, wide approved pose cannot reach the size step by rescale: a redesign within the same 50, monster_large only)",
+      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy); dragon (red) added 2026-11-16 by the orchestrator (its low, wide approved pose cannot reach the size step by rescale: a redesign within the same 50, monster_large only); FW-V8 (docs/REDESIGN_FIX_PLAN.md 1, rev 5; user D-U1 = b, D-U2 = b, 2026-11-16): sheet_caps raise these sheets above 3 (every other sheet stays 3), read by both per-sheet rules; crazy_horse's 4th and 5th only after its regular 2 fail review; V8 halt: this round stops generating at 47 pass-V images (by procedure and selftest_passv.py's ledger check; the guard's cap stays 50)",
       "gemini_before": 367,
       "max_new": 50,
       "max_per_sheet": 3,
@@ -86,6 +86,13 @@
         "dragon": [
           "monster_large"
         ]
+      },
+      "sheet_caps": {
+        "hollow_seraph/boss_idle": 6,
+        "hollow_seraph/boss_attack": 6,
+        "hollow_seraph/boss_cast": 5,
+        "hollow_seraph/boss_hurt": 4,
+        "crazy_horse/monster_large": 5
       }
     }
   ]

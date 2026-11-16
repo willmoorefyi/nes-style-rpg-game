@@ -369,14 +369,32 @@ def ledger_append(entry: dict, path: Path = LEDGER) -> None:
         f.write(json.dumps(entry) + "\n")
 
 
+SHEET_CAP_MIN, SHEET_CAP_MAX = 3, 6                 # FW-V8: the allowed range of a `sheet_caps` value
+
+
+def sheet_limit(caps: dict | None, character: str, sheet: str, default: int) -> int:
+    """FW-V8: the per-sheet limit for one request, `sheet_caps.get("<id>/<sheet>", default)`."""
+    return (caps or {}).get(f"{character}/{sheet}", default)
+
+
 def budget_consistency(b: dict, n_attempts: int) -> None:
     """FW-V0 (docs/REDESIGN_PLAN.md 6): refuse every paid request when budget.json is inconsistent: a top-level
     `attempts_before` past the ledger's Gemini attempts, or (with a `pass V` entry) the closed `pass R fix` end, the open
-    `pass V` start and `attempts_before` not all equal. `history` is never read."""
+    `pass V` start and `attempts_before` not all equal. FW-V8 (docs/REDESIGN_FIX_PLAN.md 1): a pass's `sheet_caps`
+    key must be `<id>/<sheet>` with the id in its `only_ids` and the sheet in its `only_sheets`, the value an integer in
+    3..6. `history` is never read."""
     n0 = b["attempts_before"]
     if n0 > n_attempts:
         raise SystemExit(f"refused: budget.json is inconsistent: attempts_before {n0} > the ledger's {n_attempts} "
                          "Gemini attempts")
+    for p in b.get("passes", []):
+        for key, n in (p.get("sheet_caps") or {}).items():
+            cid, _, sheet = str(key).partition("/")
+            if cid not in (p.get("only_ids") or []) or sheet not in ((p.get("only_sheets") or {}).get(cid) or []) \
+                    or type(n) is not int or not SHEET_CAP_MIN <= n <= SHEET_CAP_MAX:
+                raise SystemExit(f"refused: budget.json is inconsistent: {p.get('name')} sheet_caps entry {key}: {n!r} "
+                                 f"(the key must name an only_ids id and one of its only_sheets, the value an integer "
+                                 f"in {SHEET_CAP_MIN}..{SHEET_CAP_MAX})")
     named = {p.get("name"): p for p in b.get("passes", [])}
     pv = named.get("pass V")
     if pv is None:
@@ -416,11 +434,14 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
             raise SystemExit(f"refused: the run cap of {b['cap']} paid images is reached ({used} used); only the user "
                              "may approve more")
         run = attempts[b["attempts_before"]:]
+        caps = {k: n for p in b.get("passes", []) if "gemini_end" not in p   # FW-V8: the open passes' sheet_caps
+                for k, n in (p.get("sheet_caps") or {}).items()}
         for r in misses:
             n = sum(1 for e in run if e.get("character") == r.character and e.get("sheet") == r.sheet.name)
-            if n >= b["max_attempts_per_sheet"]:
+            limit = sheet_limit(caps, r.character, r.sheet.name, b["max_attempts_per_sheet"])
+            if n >= limit:
                 raise SystemExit(f"refused: {r.character}/{r.sheet.name} already used {n} attempts this run "
-                                 f"(max {b['max_attempts_per_sheet']})")
+                                 f"(max {limit})")
         for cap in b.get("passes", []):              # a pass's own caps (pass F, pass R build / fix): total and per sheet
             if "gemini_end" in cap:                  # closed history (docs/ROSTER_PLAN.md 6.4): refuses nothing
                 continue
@@ -434,9 +455,12 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
                                      f"{r.character}/{r.sheet.name} is not listed (only_sheets)")
             new = attempts[cap["gemini_before"]:]
             if len(new) + len(misses) > cap["max_new"] or any(sum(e.get("character") == r.character and e.get(
-                    "sheet") == r.sheet.name for e in new) >= cap["max_per_sheet"] for r in misses):
+                    "sheet") == r.sheet.name for e in new) >= sheet_limit(cap.get("sheet_caps"), r.character,
+                                                                           r.sheet.name, cap["max_per_sheet"])
+                    for r in misses):
                 raise SystemExit(f"refused: {cap['name']} allows {cap['max_new']} new Gemini attempts "
-                                 f"({cap['max_per_sheet']} per sheet); {len(new)} used")
+                                 f"({cap['max_per_sheet']} per sheet, sheet_caps {cap.get('sheet_caps') or {}}); "
+                                 f"{len(new)} used")
             if cap.get("only_approved"):             # the fix pass regenerates sprites that already have approved art
                 root = approved_root or APPROVED
                 for r in misses:
