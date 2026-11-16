@@ -29,13 +29,13 @@ import chaos_horizon_finish as HF  # noqa: E402
 DISC, DISC_R, STAR_R = (660, 235), 64, 0
 RIM_W = 0.0                              # C3' (painted): the render's own rim; the white-gold lift made a double ring at full res
 STORM = ((558, 795), 60)                 # the storm planet's old spot (filled)
-STORM_AT = (391, 368)                    # its new place, on the upper-left ring
+STORM_AT = (338, 382)                    # its new place, on the upper-left ring
 _UNUSED = 0                 # the storm-white planet, enlarged and banded in place
 DARK = np.array([22, 20, 27], float)
-SLABS: list = []                         # C3': kept (at place y +25 they sit behind the bottom strip); the box cut
-                                         # sliced the forearms (a straight edge at y 752)
-GAUNTLETS = [((245, 805), 72, 105), ((1000, 805), 78, 105)]
-PLANETS = [((1222, 402), 46), ((172, 652), 52), ((812, 680), 52), ((391, 368), 52)]
+SLABS = [(120, 757, 450, 900), (875, 757, 1205, 900)]   # C3': cleared only below render row 757, which at place y +25
+                                         # is behind the bottom strip (the old cut at 752 sliced the forearms on screen)
+GAUNTLETS = [((245, 790), 70, 40), ((1000, 790), 76, 40)]
+PLANETS = [((1222, 402), 46), ((172, 652), 52), ((812, 680), 52), ((338, 382), 52)]
 
 
 def finish(cut: np.ndarray) -> np.ndarray:
@@ -67,7 +67,7 @@ def finish(cut: np.ndarray) -> np.ndarray:
     inside = np.hypot(px, py) <= tr - 2
     lum = (tpl[..., :3] @ np.array([0.299, 0.587, 0.114])) / 255
     band = 1 + 0.10 * np.sin(py * 0.42 + 0.8 * np.sin(px * 0.11))
-    col = (np.array([86, 92, 108.0]) * (1 - lum[..., None]) + np.array([244, 244, 238.0]) * lum[..., None]) * band[..., None]
+    col = (np.array([92, 96, 128.0]) * (1 - lum[..., None]) + np.array([240, 242, 252.0]) * lum[..., None]) * band[..., None]
     (sx, sy) = STORM_AT
     dst = a[sy - tr:sy + tr, sx - tr:sx + tr]
     dst[inside, :3] = np.clip(col[inside], 0, 255)

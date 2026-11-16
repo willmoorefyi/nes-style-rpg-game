@@ -49,7 +49,14 @@
       "outside": 46.68
     }
   },
+  "core_crack": {
+    "file": "core_crack.png (2700x1080 canvas patch, normal blend)",
+    "review": "ITERATE (whole-mask repaint, seams) -> SHIP WITH NITS -> nits fixed (start lower, shorter, spill)",
+    "source": "inpaint C23 (seed 4602, f4_inpaint) on the 900x900 chest crop at canvas (900,180), merged inside chest_mask2; patch alpha = the fissure and its lit edges (brightness difference), feathered, faded at both ends, warm spill"
+  },
+  "core_open": "not made: inpaint C22 (a face) and C23 (a thin crack) rejected for open, 2 in a row -> stopped (18.2)",
   "extras": {
+    "core_crack": "assets-src/gen/out/colossus/chaos_horizon/f4/core_crack.png",
     "glow": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/glow.png",
     "sky_base": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/sky_base.png"
   },

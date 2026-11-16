@@ -1258,3 +1258,39 @@ archive copies are in `chaos_horizon_v1`.
 - **Switched:** stage_rim `RIM` now reads `rim-src-up.png`, and `selftest_colossus_art.py` / `selftest_colossus_up.py`
   are re-pinned (both ALL PASSED / exit 0). `rim-src.png` (the accepted raw) is kept, and the selftest still checks
   that it stages byte-identical to the accepted preview.
+
+**F2 painted (step 4, 0 calls).**
+- The master is re-made from the full-res finish; `chaos_orrery_finish.py` no longer runs `CL.pix` for the master.
+- At full res the white-gold rim lift made a double ring, so it was dropped. The finish edits are baked into the raw
+  (`o12_metal_edit_raw.png`) so that G1 `glow` sees them; without this, the glow brought back the lit star orb.
+- The glow is masked to the crown and the four planet halos, with nothing over the body and nothing inside the disc.
+- Review 1 (side by side with the source): **ITERATE**. The storm planet looked flat and pasted on the belt, the
+  plinths stayed, a straight mask cut ran across the forearm, a gold sliver sat on the disc, and the disc was flat
+  black.
+- Fixed:
+  - the storm planet repainted glossy from the cyan planet's own shading, pale blue-violet, with a soft halo, placed
+    on the upper-left ring at render (338, 382); its old spot was filled from the mirrored armour;
+  - a faint disc gradient, and the sliver removed;
+  - place y +25, which puts the plinths behind the strip; they are cleared only below render row 757, so the cut
+    line is hidden and the forearm is no longer sliced.
+- Review 2: **SHIP WITH NITS** (open nits: thin grey crown rays over the bright sky, the flame wisps beside the head).
+- **Approved:** `approved/chaos_forms/chaos_orrery/` master (1320x900 soft alpha) + glow + sky_base, place (40, 25).
+
+**F4 / F3 crack (step 5).**
+- C22: inpaint (f4_inpaint, seed 4601) on a 900x900 chest crop of the upscaled F3 (canvas (900, 180)), with a broad
+  chest mask. **Reject:** it painted a grinning face with glowing eyes into the chest.
+- C23: inpaint (seed 4602), a narrower vertical mask and a rock-and-magma-only prompt with face words negated. The
+  result is a thin molten fissure, which is **rejected as `open`**: 2 rejections in a row, so **the open variant is
+  stopped** (18.2) and F4 is not made.
+- C23 was kept as the **crack**. `inpaint_merge` changed 60,220 px, 0 of them outside the grown mask.
+  - Review 1: **ITERATE**, because the inpaint repainted the whole mask in a different brick style, which left seams.
+  - Fixed offline: the patch alpha is only where the result is brighter than the source (the fissure and its lit
+    edges), feathered, starting below the corona, fading out inside the chest, with a warm spill.
+  - Review 2: **SHIP WITH NITS**, and its nits (start lower, shorter, spill) were applied.
+- **Approved:** `approved/chaos_forms/chaos_horizon/core_crack.png`, a 2700x1080 canvas patch with normal blend.
+
+**C3' summary.**
+- Bedrock **23 of 80**: f3_upscale 3 (2 failed), rim_upscale 1, f4_inpaint 2. Gemini 405 = N_C0.
+- About $1.5 at list prices (the upscale price is not yet confirmed).
+- Masters approved: F3 (painted) and its crack frame, F2 (painted), and the rim switched. F4 open: stopped, needs a
+  ruling.
