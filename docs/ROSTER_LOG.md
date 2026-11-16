@@ -943,3 +943,25 @@ except the expected sandbox warning):
 - Form records `chaos_orrery`, `chaos_horizon`, `chaos_horizon_core` (`formOf: chaos`, no `num`), pool 6000 at
   0.70 / 0.40 / 0.15 (floors 4200 / 2400 / 900). Until an approved colossus master exists they keep `sprite: chaos`
   as the art fallback beside their `colossus:` id.
+
+## Pass C - C-base (integrator, 2026-11-16, `roster-int`)
+
+C1 merged (c1-fw 9f21b43, c1-tsb cf738b9, c1-tsv 71703f1, R11 helper fix 42543da) = **C-base**; 0 Bedrock calls,
+0 Gemini calls. Gate (docs/CHAOS_FORMS_PLAN.md 10, 11; details in the plan's "C-base result"): atlas rebuilt at
+PYTHONHASHSEED 0 and 1, byte-identical to each other and to HEAD (9 pages <= 2048, act 1 on page 0, party atlases
+unchanged); `colossus` stage a no-op (exit 0, no file changed); `check --all` 123 OK; `selftest.py --anim` and
+`selftest.py` ALL PASSED; `colossus.py budget --check` OK (Bedrock 0 / 80); tsc, build and vitest (4805 tests) clean;
+the R28 gate files unchanged and green.
+
+**V8 N-1 (hollow_seraph at display scale 3), held off C-base on local branch `seraph-scale3` (afa70cc), not merged.**
+`hollow_seraph: 3` in `gen/monster_scale.yaml` (pages byte-identical; the JSON gains only its `scale: 3`), and a
+scale-3 boss whose art fits ENEMY_AREA (travelTop to the cell bottom <= 545 screen px) stays the boss class instead of
+the titan class (`layoutSizeOf(size, scale, artH)`, `layoutSizeOfArt`, `EnemyBoxInput.oy0`; chaos, 582 px, stays a
+titan). Measured at scale 3: idle 504 x 414 on screen (lich 370 x 368, garland 336 x 378, warmech 360 x 366; V8 was
+336 x 276), home feet y 708, travel to hero 0 397 px; the lunge's highest row is y 124 on heroes 0 and 1 (=
+TRAVEL_CLEAR_Y, 4 px under the 120 px window), 191 and 281 on heroes 2 and 3. **Blocker:** the R28 gate test
+`lungeClearance` "hollow_seraph on hero 0: ... feet within 100 px" fails (feet gap 149): at scale 3 the seraph's art
+from its travel top to its feet is 450 px, and hero 0's feet line (425) + 100 - 124 leaves only 401 px, so the strike
+cannot both stay under the window and land within 100 px of hero 0's feet. Every other test (4804) passes on that
+branch. Needs a ruling: relax that pin for a scale-3 boss (R28 says unchanged), keep the seraph at scale 2, or another
+size.
