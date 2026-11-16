@@ -119,6 +119,12 @@
         64,
         34
       ],
+      "idleBox": [
+        28,
+        34,
+        100,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 114,
       "homeX": [
@@ -197,6 +203,12 @@
       "head": [
         108,
         36
+      ],
+      "idleBox": [
+        6,
+        36,
+        131,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 132,
@@ -277,6 +289,12 @@
         78,
         16
       ],
+      "idleBox": [
+        12,
+        16,
+        116,
+        122
+      ],
       "travelTop": 16,
       "lungeRight": 123,
       "homeX": [
@@ -355,6 +373,12 @@
       "head": [
         96,
         25
+      ],
+      "idleBox": [
+        18,
+        25,
+        136,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 151,
@@ -451,6 +475,12 @@
         64,
         7
       ],
+      "idleBox": [
+        25,
+        7,
+        175,
+        192
+      ],
       "travelTop": 6,
       "lungeRight": 187,
       "homeX": [
@@ -546,6 +576,12 @@
         119,
         9
       ],
+      "idleBox": [
+        50,
+        9,
+        150,
+        192
+      ],
       "travelTop": 9,
       "lungeRight": 191,
       "homeX": [
@@ -624,6 +660,12 @@
       "head": [
         82,
         32
+      ],
+      "idleBox": [
+        3,
+        32,
+        143,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 161,
@@ -704,6 +746,12 @@
         77,
         27
       ],
+      "idleBox": [
+        6,
+        27,
+        95,
+        76
+      ],
       "travelTop": 23,
       "lungeRight": 103,
       "homeX": [
@@ -782,6 +830,12 @@
       "head": [
         52,
         23
+      ],
+      "idleBox": [
+        8,
+        23,
+        87,
+        76
       ],
       "travelTop": 22,
       "lungeRight": 87,
@@ -862,6 +916,12 @@
         44,
         30
       ],
+      "idleBox": [
+        13,
+        30,
+        78,
+        76
+      ],
       "travelTop": 25,
       "lungeRight": 84,
       "homeX": [
@@ -940,6 +1000,12 @@
       "head": [
         48,
         4
+      ],
+      "idleBox": [
+        25,
+        4,
+        54,
+        76
       ],
       "travelTop": 4,
       "lungeRight": 71,
@@ -1020,6 +1086,12 @@
         38,
         32
       ],
+      "idleBox": [
+        6,
+        32,
+        90,
+        76
+      ],
       "travelTop": 10,
       "lungeRight": 97,
       "homeX": [
@@ -1098,6 +1170,12 @@
       "head": [
         39,
         10
+      ],
+      "idleBox": [
+        12,
+        10,
+        68,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 66,
@@ -1178,6 +1256,12 @@
         98,
         27
       ],
+      "idleBox": [
+        7,
+        27,
+        120,
+        122
+      ],
       "travelTop": 27,
       "lungeRight": 125,
       "homeX": [
@@ -1256,6 +1340,12 @@
       "head": [
         46,
         10
+      ],
+      "idleBox": [
+        11,
+        10,
+        68,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 75,
@@ -1374,6 +1464,12 @@
         75,
         20
       ],
+      "idleBox": [
+        9,
+        20,
+        191,
+        192
+      ],
       "tip": [
         116,
         12
@@ -1457,6 +1553,12 @@
         124,
         27
       ],
+      "idleBox": [
+        18,
+        27,
+        148,
+        122
+      ],
       "travelTop": 27,
       "lungeRight": 148,
       "homeX": [
@@ -1535,6 +1637,12 @@
       "head": [
         76,
         6
+      ],
+      "idleBox": [
+        21,
+        6,
+        107,
+        122
       ],
       "travelTop": 5,
       "lungeRight": 109,
@@ -1615,6 +1723,12 @@
         45,
         4
       ],
+      "idleBox": [
+        11,
+        4,
+        68,
+        76
+      ],
       "travelTop": 4,
       "lungeRight": 78,
       "homeX": [
@@ -1693,6 +1807,12 @@
       "head": [
         53,
         17
+      ],
+      "idleBox": [
+        11,
+        17,
+        64,
+        76
       ],
       "travelTop": 12,
       "lungeRight": 82,
@@ -1775,6 +1895,12 @@
         58,
         7
       ],
+      "idleBox": [
+        21,
+        7,
+        88,
+        76
+      ],
       "travelTop": 7,
       "lungeRight": 105,
       "homeX": [
@@ -1853,6 +1979,12 @@
       "head": [
         92,
         37
+      ],
+      "idleBox": [
+        21,
+        37,
+        106,
+        122
       ],
       "travelTop": 28,
       "lungeRight": 110,
@@ -1933,6 +2065,12 @@
         25,
         57
       ],
+      "idleBox": [
+        2,
+        57,
+        141,
+        122
+      ],
       "travelTop": 27,
       "lungeRight": 141,
       "homeX": [
@@ -2012,6 +2150,12 @@
         38,
         4
       ],
+      "idleBox": [
+        18,
+        4,
+        61,
+        76
+      ],
       "travelTop": 4,
       "lungeRight": 66,
       "homeX": [
@@ -2090,6 +2234,12 @@
       "head": [
         34,
         3
+      ],
+      "idleBox": [
+        22,
+        3,
+        62,
+        76
       ],
       "travelTop": 2,
       "lungeRight": 61,
@@ -2186,6 +2336,12 @@
         116,
         42
       ],
+      "idleBox": [
+        53,
+        42,
+        146,
+        192
+      ],
       "travelTop": 42,
       "lungeRight": 179,
       "homeX": [
@@ -2264,6 +2420,12 @@
       "head": [
         32,
         6
+      ],
+      "idleBox": [
+        19,
+        6,
+        60,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 75,
@@ -2344,6 +2506,12 @@
         64,
         35
       ],
+      "idleBox": [
+        36,
+        35,
+        92,
+        122
+      ],
       "travelTop": 34,
       "lungeRight": 105,
       "homeX": [
@@ -2422,6 +2590,12 @@
       "head": [
         76,
         48
+      ],
+      "idleBox": [
+        11,
+        48,
+        117,
+        122
       ],
       "travelTop": 27,
       "lungeRight": 117,
@@ -2502,6 +2676,12 @@
         63,
         68
       ],
+      "idleBox": [
+        18,
+        68,
+        109,
+        122
+      ],
       "travelTop": 21,
       "lungeRight": 118,
       "homeX": [
@@ -2580,6 +2760,12 @@
       "head": [
         58,
         47
+      ],
+      "idleBox": [
+        8,
+        47,
+        119,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 124,
@@ -2698,6 +2884,12 @@
         117,
         31
       ],
+      "idleBox": [
+        15,
+        31,
+        184,
+        192
+      ],
       "tip": [
         92,
         20
@@ -2781,6 +2973,12 @@
         69,
         20
       ],
+      "idleBox": [
+        17,
+        20,
+        110,
+        122
+      ],
       "travelTop": 14,
       "lungeRight": 109,
       "homeX": [
@@ -2859,6 +3057,12 @@
       "head": [
         40,
         3
+      ],
+      "idleBox": [
+        15,
+        3,
+        64,
+        76
       ],
       "travelTop": 2,
       "lungeRight": 70,
@@ -2939,6 +3143,12 @@
         67,
         25
       ],
+      "idleBox": [
+        26,
+        25,
+        108,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 121,
       "homeX": [
@@ -3017,6 +3227,12 @@
       "head": [
         58,
         13
+      ],
+      "idleBox": [
+        35,
+        13,
+        93,
+        122
       ],
       "travelTop": 13,
       "lungeRight": 116,
@@ -3097,6 +3313,12 @@
         42,
         1
       ],
+      "idleBox": [
+        24,
+        1,
+        104,
+        122
+      ],
       "travelTop": 1,
       "lungeRight": 106,
       "homeX": [
@@ -3175,6 +3397,12 @@
       "head": [
         68,
         41
+      ],
+      "idleBox": [
+        8,
+        41,
+        132,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 133,
@@ -3255,6 +3483,12 @@
         40,
         30
       ],
+      "idleBox": [
+        6,
+        30,
+        211,
+        122
+      ],
       "travelTop": 28,
       "lungeRight": 215,
       "homeX": [
@@ -3333,6 +3567,12 @@
       "head": [
         37,
         8
+      ],
+      "idleBox": [
+        13,
+        8,
+        66,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 71,
@@ -3451,6 +3691,12 @@
         94,
         4
       ],
+      "idleBox": [
+        16,
+        4,
+        183,
+        192
+      ],
       "tip": [
         169,
         5
@@ -3534,6 +3780,12 @@
         45,
         7
       ],
+      "idleBox": [
+        22,
+        7,
+        57,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 70,
       "homeX": [
@@ -3612,6 +3864,12 @@
       "head": [
         56,
         3
+      ],
+      "idleBox": [
+        32,
+        3,
+        83,
+        76
       ],
       "travelTop": 1,
       "lungeRight": 105,
@@ -3692,6 +3950,12 @@
         62,
         9
       ],
+      "idleBox": [
+        12,
+        9,
+        78,
+        76
+      ],
       "travelTop": 4,
       "lungeRight": 88,
       "homeX": [
@@ -3770,6 +4034,12 @@
       "head": [
         70,
         14
+      ],
+      "idleBox": [
+        28,
+        14,
+        100,
+        122
       ],
       "travelTop": 13,
       "lungeRight": 119,
@@ -3850,6 +4120,12 @@
         47,
         8
       ],
+      "idleBox": [
+        13,
+        8,
+        67,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 78,
       "homeX": [
@@ -3928,6 +4204,12 @@
       "head": [
         32,
         13
+      ],
+      "idleBox": [
+        17,
+        13,
+        62,
+        76
       ],
       "travelTop": 4,
       "lungeRight": 70,
@@ -4008,6 +4290,12 @@
         60,
         19
       ],
+      "idleBox": [
+        6,
+        19,
+        91,
+        76
+      ],
       "travelTop": 16,
       "lungeRight": 98,
       "homeX": [
@@ -4086,6 +4374,12 @@
       "head": [
         84,
         26
+      ],
+      "idleBox": [
+        16,
+        26,
+        94,
+        76
       ],
       "travelTop": 24,
       "lungeRight": 108,
@@ -4166,6 +4460,12 @@
         102,
         25
       ],
+      "idleBox": [
+        9,
+        25,
+        133,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 141,
       "homeX": [
@@ -4244,6 +4544,12 @@
       "head": [
         54,
         30
+      ],
+      "idleBox": [
+        16,
+        30,
+        92,
+        76
       ],
       "travelTop": 22,
       "lungeRight": 107,
@@ -4324,6 +4630,12 @@
         76,
         26
       ],
+      "idleBox": [
+        9,
+        26,
+        142,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 145,
       "homeX": [
@@ -4403,6 +4715,12 @@
         73,
         32
       ],
+      "idleBox": [
+        5,
+        32,
+        129,
+        122
+      ],
       "travelTop": 27,
       "lungeRight": 137,
       "homeX": [
@@ -4481,6 +4799,12 @@
       "head": [
         48,
         18
+      ],
+      "idleBox": [
+        30,
+        18,
+        97,
+        122
       ],
       "travelTop": 18,
       "lungeRight": 107,
@@ -4577,6 +4901,12 @@
         34,
         19
       ],
+      "idleBox": [
+        19,
+        19,
+        199,
+        192
+      ],
       "tip": [
         28,
         10
@@ -4660,6 +4990,12 @@
         43,
         8
       ],
+      "idleBox": [
+        6,
+        8,
+        81,
+        76
+      ],
       "travelTop": 4,
       "lungeRight": 82,
       "homeX": [
@@ -4738,6 +5074,12 @@
       "head": [
         72,
         27
+      ],
+      "idleBox": [
+        21,
+        27,
+        106,
+        122
       ],
       "travelTop": 26,
       "lungeRight": 111,
@@ -4818,6 +5160,12 @@
         64,
         17
       ],
+      "idleBox": [
+        15,
+        17,
+        101,
+        76
+      ],
       "travelTop": 11,
       "lungeRight": 112,
       "homeX": [
@@ -4896,6 +5244,12 @@
       "head": [
         60,
         0
+      ],
+      "idleBox": [
+        25,
+        0,
+        103,
+        122
       ],
       "travelTop": 0,
       "lungeRight": 110,
@@ -4976,6 +5330,12 @@
         65,
         33
       ],
+      "idleBox": [
+        24,
+        33,
+        104,
+        122
+      ],
       "travelTop": 32,
       "lungeRight": 106,
       "homeX": [
@@ -5054,6 +5414,12 @@
       "head": [
         35,
         4
+      ],
+      "idleBox": [
+        19,
+        4,
+        60,
+        76
       ],
       "travelTop": 4,
       "lungeRight": 60,
@@ -5134,6 +5500,12 @@
         79,
         11
       ],
+      "idleBox": [
+        21,
+        11,
+        107,
+        122
+      ],
       "travelTop": 11,
       "lungeRight": 115,
       "homeX": [
@@ -5212,6 +5584,12 @@
       "head": [
         82,
         22
+      ],
+      "idleBox": [
+        9,
+        22,
+        108,
+        76
       ],
       "travelTop": 18,
       "lungeRight": 119,
@@ -5330,6 +5708,12 @@
         127,
         9
       ],
+      "idleBox": [
+        8,
+        9,
+        192,
+        192
+      ],
       "tip": [
         28,
         22
@@ -5413,6 +5797,12 @@
         81,
         23
       ],
+      "idleBox": [
+        10,
+        23,
+        105,
+        76
+      ],
       "travelTop": 23,
       "lungeRight": 113,
       "homeX": [
@@ -5491,6 +5881,12 @@
       "head": [
         34,
         35
+      ],
+      "idleBox": [
+        12,
+        35,
+        115,
+        122
       ],
       "travelTop": 23,
       "lungeRight": 125,
@@ -5571,6 +5967,12 @@
         42,
         3
       ],
+      "idleBox": [
+        15,
+        3,
+        64,
+        76
+      ],
       "travelTop": 2,
       "lungeRight": 74,
       "homeX": [
@@ -5649,6 +6051,12 @@
       "head": [
         38,
         2
+      ],
+      "idleBox": [
+        25,
+        2,
+        55,
+        76
       ],
       "travelTop": 2,
       "lungeRight": 77,
@@ -5729,6 +6137,12 @@
         63,
         34
       ],
+      "idleBox": [
+        26,
+        34,
+        102,
+        122
+      ],
       "travelTop": 28,
       "lungeRight": 104,
       "homeX": [
@@ -5807,6 +6221,12 @@
       "head": [
         64,
         9
+      ],
+      "idleBox": [
+        29,
+        9,
+        99,
+        122
       ],
       "travelTop": 7,
       "lungeRight": 112,
@@ -5887,6 +6307,12 @@
         43,
         4
       ],
+      "idleBox": [
+        14,
+        4,
+        62,
+        76
+      ],
       "travelTop": 4,
       "lungeRight": 78,
       "homeX": [
@@ -5965,6 +6391,12 @@
       "head": [
         58,
         31
+      ],
+      "idleBox": [
+        32,
+        31,
+        96,
+        122
       ],
       "travelTop": 26,
       "lungeRight": 114,
@@ -6045,6 +6477,12 @@
         90,
         11
       ],
+      "idleBox": [
+        14,
+        11,
+        120,
+        122
+      ],
       "travelTop": 8,
       "lungeRight": 129,
       "homeX": [
@@ -6123,6 +6561,12 @@
       "head": [
         40,
         1
+      ],
+      "idleBox": [
+        13,
+        1,
+        67,
+        76
       ],
       "travelTop": 1,
       "lungeRight": 80,
@@ -6203,6 +6647,12 @@
         57,
         40
       ],
+      "idleBox": [
+        18,
+        40,
+        109,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 125,
       "homeX": [
@@ -6281,6 +6731,12 @@
       "head": [
         72,
         21
+      ],
+      "idleBox": [
+        22,
+        21,
+        106,
+        122
       ],
       "travelTop": 20,
       "lungeRight": 110,
@@ -6361,6 +6817,12 @@
         53,
         17
       ],
+      "idleBox": [
+        27,
+        17,
+        100,
+        122
+      ],
       "travelTop": 6,
       "lungeRight": 105,
       "homeX": [
@@ -6439,6 +6901,12 @@
       "head": [
         60,
         11
+      ],
+      "idleBox": [
+        27,
+        11,
+        101,
+        122
       ],
       "travelTop": 9,
       "lungeRight": 105,
@@ -6519,6 +6987,12 @@
         39,
         10
       ],
+      "idleBox": [
+        15,
+        10,
+        64,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 70,
       "homeX": [
@@ -6597,6 +7071,12 @@
       "head": [
         52,
         4
+      ],
+      "idleBox": [
+        13,
+        4,
+        66,
+        76
       ],
       "travelTop": 1,
       "lungeRight": 74,
@@ -6677,6 +7157,12 @@
         74,
         7
       ],
+      "idleBox": [
+        25,
+        7,
+        102,
+        122
+      ],
       "travelTop": 2,
       "lungeRight": 113,
       "homeX": [
@@ -6755,6 +7241,12 @@
       "head": [
         63,
         3
+      ],
+      "idleBox": [
+        16,
+        3,
+        87,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 101,
@@ -6835,6 +7327,12 @@
         41,
         3
       ],
+      "idleBox": [
+        19,
+        3,
+        60,
+        76
+      ],
       "travelTop": 2,
       "lungeRight": 68,
       "homeX": [
@@ -6913,6 +7411,12 @@
       "head": [
         48,
         26
+      ],
+      "idleBox": [
+        8,
+        26,
+        85,
+        76
       ],
       "travelTop": 26,
       "lungeRight": 85,
@@ -6993,6 +7497,12 @@
         82,
         41
       ],
+      "idleBox": [
+        9,
+        41,
+        164,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 174,
       "homeX": [
@@ -7071,6 +7581,12 @@
       "head": [
         78,
         27
+      ],
+      "idleBox": [
+        15,
+        27,
+        113,
+        122
       ],
       "travelTop": 24,
       "lungeRight": 118,
@@ -7151,6 +7667,12 @@
         106,
         26
       ],
+      "idleBox": [
+        11,
+        26,
+        173,
+        122
+      ],
       "travelTop": 24,
       "lungeRight": 179,
       "homeX": [
@@ -7229,6 +7751,12 @@
       "head": [
         37,
         3
+      ],
+      "idleBox": [
+        13,
+        3,
+        66,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 69,
@@ -7309,6 +7837,12 @@
         48,
         3
       ],
+      "idleBox": [
+        3,
+        3,
+        72,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 80,
       "homeX": [
@@ -7387,6 +7921,12 @@
       "head": [
         40,
         3
+      ],
+      "idleBox": [
+        18,
+        3,
+        61,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 67,
@@ -7467,6 +8007,12 @@
         73,
         26
       ],
+      "idleBox": [
+        25,
+        26,
+        103,
+        122
+      ],
       "travelTop": 24,
       "lungeRight": 116,
       "homeX": [
@@ -7545,6 +8091,12 @@
       "head": [
         34,
         8
+      ],
+      "idleBox": [
+        4,
+        8,
+        89,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 92,
@@ -7625,6 +8177,12 @@
         41,
         4
       ],
+      "idleBox": [
+        15,
+        4,
+        94,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 98,
       "homeX": [
@@ -7703,6 +8261,12 @@
       "head": [
         76,
         27
+      ],
+      "idleBox": [
+        27,
+        27,
+        100,
+        122
       ],
       "travelTop": 27,
       "lungeRight": 107,
@@ -7783,6 +8347,12 @@
         70,
         17
       ],
+      "idleBox": [
+        27,
+        17,
+        100,
+        122
+      ],
       "travelTop": 7,
       "lungeRight": 102,
       "homeX": [
@@ -7861,6 +8431,12 @@
       "head": [
         54,
         1
+      ],
+      "idleBox": [
+        18,
+        1,
+        80,
+        76
       ],
       "travelTop": 1,
       "lungeRight": 96,
@@ -7941,6 +8517,12 @@
         51,
         26
       ],
+      "idleBox": [
+        26,
+        26,
+        102,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 110,
       "homeX": [
@@ -8019,6 +8601,12 @@
       "head": [
         41,
         9
+      ],
+      "idleBox": [
+        18,
+        9,
+        62,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 66,
@@ -8099,6 +8687,12 @@
         62,
         5
       ],
+      "idleBox": [
+        16,
+        5,
+        112,
+        122
+      ],
       "travelTop": 5,
       "lungeRight": 114,
       "homeX": [
@@ -8177,6 +8771,12 @@
       "head": [
         48,
         4
+      ],
+      "idleBox": [
+        23,
+        4,
+        66,
+        76
       ],
       "travelTop": 4,
       "lungeRight": 92,
@@ -8257,6 +8857,12 @@
         58,
         35
       ],
+      "idleBox": [
+        19,
+        35,
+        108,
+        122
+      ],
       "travelTop": 27,
       "lungeRight": 116,
       "homeX": [
@@ -8335,6 +8941,12 @@
       "head": [
         69,
         5
+      ],
+      "idleBox": [
+        25,
+        5,
+        103,
+        122
       ],
       "travelTop": 1,
       "lungeRight": 111,
@@ -8415,6 +9027,12 @@
         52,
         18
       ],
+      "idleBox": [
+        20,
+        18,
+        107,
+        122
+      ],
       "travelTop": 14,
       "lungeRight": 109,
       "homeX": [
@@ -8493,6 +9111,12 @@
       "head": [
         39,
         24
+      ],
+      "idleBox": [
+        4,
+        24,
+        99,
+        76
       ],
       "travelTop": 24,
       "lungeRight": 101,
@@ -8573,6 +9197,12 @@
         78,
         10
       ],
+      "idleBox": [
+        24,
+        10,
+        103,
+        122
+      ],
       "travelTop": 10,
       "lungeRight": 119,
       "homeX": [
@@ -8651,6 +9281,12 @@
       "head": [
         90,
         25
+      ],
+      "idleBox": [
+        9,
+        25,
+        119,
+        122
       ],
       "travelTop": 24,
       "lungeRight": 121,
@@ -8731,6 +9367,12 @@
         43,
         4
       ],
+      "idleBox": [
+        13,
+        4,
+        68,
+        76
+      ],
       "travelTop": 2,
       "lungeRight": 76,
       "homeX": [
@@ -8809,6 +9451,12 @@
       "head": [
         38,
         4
+      ],
+      "idleBox": [
+        19,
+        4,
+        60,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 68,
@@ -8905,6 +9553,12 @@
         70,
         10
       ],
+      "idleBox": [
+        26,
+        10,
+        205,
+        192
+      ],
       "travelTop": 2,
       "lungeRight": 229,
       "homeX": [
@@ -8983,6 +9637,12 @@
       "head": [
         72,
         44
+      ],
+      "idleBox": [
+        29,
+        44,
+        98,
+        122
       ],
       "travelTop": 26,
       "lungeRight": 110,
@@ -9063,6 +9723,12 @@
         89,
         19
       ],
+      "idleBox": [
+        28,
+        19,
+        99,
+        122
+      ],
       "travelTop": 19,
       "lungeRight": 102,
       "homeX": [
@@ -9141,6 +9807,12 @@
       "head": [
         49,
         7
+      ],
+      "idleBox": [
+        11,
+        7,
+        68,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 72,
@@ -9221,6 +9893,12 @@
         53,
         4
       ],
+      "idleBox": [
+        15,
+        4,
+        65,
+        76
+      ],
       "travelTop": 2,
       "lungeRight": 65,
       "homeX": [
@@ -9299,6 +9977,12 @@
       "head": [
         35,
         48
+      ],
+      "idleBox": [
+        6,
+        48,
+        171,
+        122
       ],
       "travelTop": 25,
       "lungeRight": 171,
@@ -9379,6 +10063,12 @@
         60,
         27
       ],
+      "idleBox": [
+        8,
+        27,
+        118,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 131,
       "homeX": [
@@ -9457,6 +10147,12 @@
       "head": [
         62,
         66
+      ],
+      "idleBox": [
+        11,
+        66,
+        116,
+        122
       ],
       "travelTop": 28,
       "lungeRight": 123,
@@ -9537,6 +10233,12 @@
         40,
         4
       ],
+      "idleBox": [
+        19,
+        4,
+        67,
+        76
+      ],
       "travelTop": 3,
       "lungeRight": 67,
       "homeX": [
@@ -9615,6 +10317,12 @@
       "head": [
         96,
         15
+      ],
+      "idleBox": [
+        13,
+        15,
+        103,
+        76
       ],
       "travelTop": 15,
       "lungeRight": 116,
@@ -9695,6 +10403,12 @@
         78,
         17
       ],
+      "idleBox": [
+        9,
+        17,
+        101,
+        76
+      ],
       "travelTop": 2,
       "lungeRight": 107,
       "homeX": [
@@ -9773,6 +10487,12 @@
       "head": [
         39,
         5
+      ],
+      "idleBox": [
+        24,
+        5,
+        58,
+        76
       ],
       "travelTop": 5,
       "lungeRight": 74,
@@ -9853,6 +10573,12 @@
         75,
         25
       ],
+      "idleBox": [
+        26,
+        25,
+        102,
+        122
+      ],
       "travelTop": 25,
       "lungeRight": 113,
       "homeX": [
@@ -9932,6 +10658,12 @@
         83,
         37
       ],
+      "idleBox": [
+        24,
+        37,
+        103,
+        122
+      ],
       "travelTop": 31,
       "lungeRight": 111,
       "homeX": [
@@ -10010,6 +10742,12 @@
       "head": [
         38,
         3
+      ],
+      "idleBox": [
+        22,
+        3,
+        57,
+        76
       ],
       "travelTop": 3,
       "lungeRight": 68,

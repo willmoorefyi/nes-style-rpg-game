@@ -7,7 +7,8 @@ to the JSON), sheets: {id: {cell, footRow, floating,
 frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAMES for a sheet with attack_raise; held
 or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
 hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
-opaque row), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
+opaque row), idleBox ([l, t, r, b]: the idle key's opaque box, inclusive; FW-A2), scale (only for a sheet listed in
+gen/monster_scale.yaml: its integer display scale, FW-S), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
 attack_raise only, or atk_wind2's for a rig with `raise: false`, FW-R), travelTop / lungeRight / homeX (FW-A, below),
 sequence_version, page (index into pages)}}}.
 
@@ -38,6 +39,8 @@ LUNGE_FRAMES = TRAVEL_FRAMES[:11]
 HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b")
 RANGED_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover")
 ENEMIES = MA.HERE.parent.parent / "assets" / "data" / "enemies.yaml"
+SCALE_TABLE = MA.HERE / "monster_scale.yaml"
+DISPLAY_SCALES = (2, 3)            # FW-S: integer screen px per art px only (no stair-steps)
 
 
 def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict[str, Image.Image], list[str], bool]:
@@ -61,12 +64,30 @@ def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[di
 
 
 def anchors(idle: Image.Image) -> dict:
-    """Runtime anchors of the idle key (pass F): opaqueRight (enemy reach) and head (status overlays)."""
+    """Runtime anchors of the idle key (pass F): opaqueRight (enemy reach) and head (status overlays); FW-A2
+    (docs/REDESIGN_PLAN.md 1): idleBox [l, t, r, b], the idle frame's opaque box (inclusive; the bestiary centres it)."""
     a = np.asarray(idle)[..., 3] > 0
     ys, xs = np.nonzero(a)
     top = int(ys.min())
     row = np.nonzero(a[top])[0]
-    return {"opaqueRight": int(xs.max()), "head": [int(round((row.min() + row.max()) / 2)), top]}
+    return {"opaqueRight": int(xs.max()), "head": [int(round((row.min() + row.max()) / 2)), top],
+            "idleBox": [int(xs.min()), top, int(xs.max()), int(ys.max())]}
+
+
+def load_scale(sprites: list[str] | set[str], path: Path | None = None) -> dict[str, int]:
+    """FW-S (docs/REDESIGN_PLAN.md 2.2, D-V1 S1): the per-sheet integer display scale table gen/monster_scale.yaml,
+    {sprite: 3}. Allowed values: 2 and 3; a sprite that is not an atlas sheet is refused. Empty = every sheet at the
+    atlas SCALE (no JSON change)."""
+    path = path or SCALE_TABLE
+    table = (yaml.safe_load(path.read_text()) if path.exists() else None) or {}
+    if not isinstance(table, dict):
+        raise SystemExit(f"monsters_ai: {path.name} must map sprite ids to a scale ({table!r})")
+    bad = {k: v for k, v in table.items() if v not in DISPLAY_SCALES or isinstance(v, bool)}
+    unknown = sorted(set(table) - set(sprites))
+    if bad or unknown:
+        raise SystemExit(f"monsters_ai: {path.name}: scales must be one of {DISPLAY_SCALES} ({bad}); unknown sprites "
+                         f"{unknown}")
+    return dict(table)
 
 
 def tip(raise_key: Image.Image) -> dict:
@@ -116,7 +137,7 @@ def sheet_meta(meta: dict, frames: dict[str, Image.Image], names: list[str], fr:
             **travel_anchors(frames, names, ranged), "sequence_version": SEQUENCE_VERSION, "page": page}
 
 
-def build(out: Path) -> dict:
+def build(out: Path, scale_table: Path | None = None) -> dict:
     from gen import monster as M
     entries = MA.load_entries()
     if not entries:
@@ -136,6 +157,7 @@ def build(out: Path) -> dict:
             if bad:
                 raise SystemExit("monsters_ai: variant checks failed\n  " + "\n  ".join(bad))
             sprites[v["id"]] = (meta, vf, holds, anim, L)
+    scales = load_scale(set(sprites), scale_table)
     groups = MP.group_order(sorted(sprites))
     order = [sid for _, ids in groups for sid in ids]
     names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
@@ -167,6 +189,8 @@ def build(out: Path) -> dict:
             if bad:
                 raise SystemExit(f"monsters_ai: {sid} {n}: {bad[0]}")
         sheets[sid] = sheet_meta(meta, frames, names, fr, holds, anim, L, pg, sid in ranged)
+        if sid in scales:                            # FW-S: the sheet's own display scale (BattleArt: entry.scale ?? scale)
+            sheets[sid]["scale"] = scales[sid]
     out.mkdir(parents=True, exist_ok=True)
     files = [page_file(i) for i in range(len(atlases))]
     for stale in sorted(out.glob("monsters-ai*.png")):   # the R0 single page and pages past the last one
