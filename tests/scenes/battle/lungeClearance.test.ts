@@ -114,7 +114,9 @@ describe('a boss strike still lands after the clamp (defect 1)', () => {
     const centre = s.y + ((t + btm) / 2) * scale;
     expect(centre, 'box centre').toBeGreaterThanOrEqual(hero.y);
     expect(centre, 'box centre').toBeLessThanOrEqual(PARTY_FEET_Y[0]);
-    expect(s.y + (f.footRow + 1) * scale - PARTY_FEET_Y[0], 'feet gap').toBeLessThanOrEqual(100);
+    // 100 px at the 2x art scale; a 3x boss (hollow_seraph, V8 N-1) is 1.5x taller, so the same contact reads at 150 px
+    // (its art top-to-feet is 450 px: under the window at y 124 it cannot get closer to hero 0's feet at y 425)
+    expect(s.y + (f.footRow + 1) * scale - PARTY_FEET_Y[0], 'feet gap').toBeLessThanOrEqual(100 * (f.scale / 2));
   });
 
   it('chaos (scale 3, the titan class) attacks every hero in place: travel 0, shown at 3 px per art px', () => {
