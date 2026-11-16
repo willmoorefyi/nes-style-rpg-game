@@ -1,7 +1,8 @@
-# Chaos forms plan (pass C), 2026-11-16 (rev 3: momus BLOCKED (2/5) -> rev 2 with R1-R30; re-review APPROVE WITH REVISIONS -> A1-A8 applied in place; section 17; rulings in section 15)
+# Chaos forms plan (pass C), 2026-11-16 (rev 4 + momus B1-B8: user ruling "colossus forms are full-resolution painted art", section 18; rev 3 = momus R1-R30 + A1-A8, section 17; rulings in section 15)
 
-**Precedence.** Where an earlier paragraph and section 17 or a section 15 ruling disagree, section 17 and section 15
-win. Every revision was also applied in place.
+**Precedence.** **Section 18 (rev 4) wins over every earlier section** for the colossus forms (F2, F3, F4): their
+art, layers, geometry, textures, animation and tests. Then section 17 and the section 15 rulings win over the body
+text. The rev-4 changes are also marked in place with "(rev 4: 18.x)".
 
 **Request (user direction, binding, 2026-11-16).** Chaos moves through many forms during the final battle. Its
 **final form takes the entire battlefield and looks planet-sized**: far more imposing than any other enemy, like
@@ -68,6 +69,8 @@ the existing characters each form must not resemble.
 - [14 Risks](#14-risks)
 - [15 Decisions](#15-decisions)
 - [16 TODOs](#16-todos)
+- [17 Momus revisions](#17-momus-revisions-rev-2)
+- [18 Rev 4: painted colossus art](#18-rev-4-full-resolution-painted-colossus-art-user-ruling-binding)
 
 ---
 
@@ -79,18 +82,19 @@ the existing characters each form must not resemble.
     "One Chaos battle passes through every form in order (F1 -> F2 -> F3 -> F4), each change triggered by a form-bearing bossPhases entry at its HP threshold; a lethal or overkill hit can never skip a form (HP floor, 2.2)",
     "Each form has its own sprite or colossus art, stats (except the shared pool HP), elemental profile, spells, AI and attack style; after a change the next enemy action comes from the new form's AI",
     "Each form change plays a data-driven transformation interlude (battle-interludes.yaml) with messages, flashes, shake, dissolve of the old form and rise of the new one, in <= 8 s of unskipped time (<= 10 s for chaos_i2, the F3 reveal, D-O15); its lines can be advanced with confirm",
-    "F3/F4 (the centrepiece) span the world: the colossus canvas is >= 1.4x the screen in width and height (>= 2688x1512 screen px; planned 2700x1560), extends past the left, right and top screen edges, its visible fraction (the canvas's intersection with the rect (0, 0, 1920, 780), over the canvas area) is <= 45 % at rest (planned 35.6 %), and at rest and in every idle / attack / cast / hurt / pan frame (rise and dying exempt) its art covers 100 % of the field width (x 0..1920) and the field height above the horizon (y 120..370) with opaque or glow pixels; its overhang parts (a hand gripping the arena rim) sit in front of the far floor; the party, the bottom strip windows and the message window all draw over it",
+    "F3/F4 (the centrepiece, rev 4: 18.4) span the world: the canvas is >= 1.4x the screen width (planned 2700x1080 screen px at display scale 1), extends past the left, right and top screen edges, and at rest and in every idle / attack / cast / hurt / pan frame (rise and dying exempt) its body spans every screen column x 0..1919 (>= 1 pixel with alpha >= 0.5 in y 120..780) and no canvas border with alpha > 0 is visible (column-span and border tests); its visible fraction (canvas intersection with (0, 0, 1920, 780) over the canvas area) is <= 55 % (planned 51.4 %); the great halo ring and the rays stay visible (>= 50 % of the ring arc inside the field and not under the body); the party, the bottom strip windows and the message window all draw over it",
+    "Colossus art is full-resolution painted art (rev 4, 18.1): full colour and soft alpha, no pixelization, quantization, palette lock or binary alpha; textures linear-filtered; the body keeps the user-picked render's detail and colour (fidelity test 18.7: PSNR >= 30 dB and mean CIE76 delta E <= 3 against the original inside the body mask) and the glow layer (halo ring, rays, corona) is drawn with additive blend",
     "The rise of F3 includes a reveal pan (2.3 `pan`): the camera travels over the canvas in whole px so the player sees more of the being than one screen holds before it settles",
-    "Colossus forms never lunge: their attack, cast, hurt and dying move the art by whole screen px within +-12 px horizontally (shake included); the pan moves it only within the json-derived coverage limits (R13)",
+    "Colossus forms never lunge: their attack, cast, hurt and dying move the art within +-12 px horizontally (shake included; sub-pixel motion allowed for the painted art, rev 4); the pan moves it only within the json-derived limits (18.4)",
     "Phase and buff rules across form changes hold (R4-R7): crossedPhases reset per form, phaseBuffs subtracted on change while spell buffs (e.g. fast) persist, a queued Chaos command is re-chosen by the new form's AI, and a scenario enemyAi override is dropped at the first change",
     "Damage numbers, the target cursor, status icons, spell fx and the hero melee approach point anchor on named colossus anchors inside the field (y 140..760, x 0..1900), never on the box top/centre",
     "The arena backdrop 'rim' (the user-accepted /tmp/stab2 sd35 v3 render, staged with its own stage entry and `--check rim` limits, 0 Bedrock calls) is used by every Chaos form; colossus forms rise from behind its horizon (the floor-front layer covers their base)",
-    "The bestiary shows Chaos with one sub-entry per art form (F1, F2, F3; F4 is a page of F3), each preview whole, centred and at an integer scale, unlocked when that form has been seen",
+    "The bestiary shows Chaos with one sub-entry per art form (F1, F2, F3; F4 is a page of F3), each preview whole and centred (rev 4: superseded by 18.8 for colossus forms: a pre-composited still at scale 1), unlocked when that form has been seen",
     "No replaced chaos art is lost: anything replaced (none planned; F1 is kept) is archived with retire.py first and indexed in docs/RETIRED_SPRITES.md; cosmic_beast_v1 is untouched"
   ],
   "observable": [
     "docs/ROSTER_LOG.md 'Pass C' table: one row per Bedrock call (model, seed, purpose, verdict) and 'Bedrock calls: U of 80' equal to the BR ledger count; Gemini calls 0 (D-U6: no Gemini fallback); the read-only AWS identity and list-foundation-models outputs recorded (R30)",
-    "gen/out/colossus/review/<form>_* outputs (stage mock, layer split, timeline strips, GIFs) and a recorded image-only verdict (SHIP or SHIP WITH NITS) per colossus form, plus one for the staged backdrop",
+    "gen/out/colossus/review/<form>_* outputs (stage mock, layer split, timeline strips, GIFs, and for F3 a side-by-side sheet of the user-picked original vs the final composite, 18.7) and a recorded image-only verdict (SHIP or SHIP WITH NITS) per colossus form, plus one for the staged backdrop",
     "Browser screenshots of /?mute=1&scenario=chaos_forms at every interlude and form, and of /?mute=1&scenario=chaos_final&enemyAnim=loop, with a fresh reviewer's yes to the 4 questions in 11.3",
     "docs/ROSTER_PLAYTEST.md 'Pass C test' rows, and a fix round if any P0/P1/P2 is open"
   ],
@@ -98,12 +102,13 @@ the existing characters each form must not resemble.
     "BR ledger: pass-C calls <= 80 (D-U5) and each purpose <= its 5.6 cap, checked by `colossus.py budget --check` (exit 0); every logical request logged inside bedrock.invoke before its first try, paid=True required, refused over cap and from any linked worktree (selftest_colossus.py)",
     "Main-checkout Gemini ledger: gem[N_C0:] == 0 (no Gemini fallback, D-U6)",
     "Regression gate (R28), green unchanged at C-base and after C4: BossPhase.test, BossBattle.test, tierHTravel, lungeClearance, fxBigBoxes, floatingNumberPlacement, enemyTravel, bestiaryCentre",
-    "Colossus textures use scaleMode 'nearest' and are all destroyed on battle end and bestiary exit (texture count before == after, scene test)",
+    "Colossus textures use scaleMode 'linear' (rev 4; atlas monsters stay nearest), every texture <= 2048 px a side, total colossus texture memory <= 24 MB (18.6), and all are destroyed on battle end and bestiary exit (texture count before == after, scene test)",
+    "The Python build writes exactly the colossus.json shape the TS reader accepts (18.5): a committed fixture built by colossus_build.py passes colossusIndex.ts formProblems with zero problems (contract test on both sides)",
     "npx tsc --noEmit && npm run build && npx vitest run: exit 0",
     "python3 -I assets-src/gen/selftest.py (main checkout), selftest.py --anim and selftest_colossus.py (worktree): ALL PASSED",
     "check --all: the same lines as at C-base (F1's chaos rig and lock untouched; colossus art is not an atlas sheet)",
     "Monster atlas pages byte-identical to C-base (the colossus forms add no atlas sheet); party atlases byte-identical; colossus build identical under PYTHONHASHSEED 0 and 1",
-    "Every colossus texture <= 2048x2048; total colossus texture memory <= 24 MB (RGBA, measured by the build)",
+    "Every colossus texture <= 2048x2048; total colossus texture memory <= 24 MB (RGBA, measured by the build, 18.6)",
     "Line ceilings hold: BattleStateMachine.ts <= 592, BattleAnimationController.ts <= 308, SpellExecutor.ts <= 314, BattleScene.ts <= 594, and the 250 limit for BattleDisplayManager.ts (248), BestiaryPreview.ts (247), AiEnemyView.ts (240), BattleFieldTargeting.ts (235), tools/stage_backgrounds.py (249); new files <= 250 (R16)",
     "tests/balance/chaosForms.test.ts: the bounds pinned at C7 hold (each >= 3 points from its measured value)",
     "After the fix round: no open P0/P1 in docs/ROSTER_PLAYTEST.md 'Pass C test'"
@@ -374,6 +379,8 @@ i.e. 4200, 2400 and 900.
   | `pan` | `from: [dx, dy]` (art px offset of the canvas from its rest `place`), `frames`, `ease: linear / out` | the reveal pan: the colossus canvas (and its overhang) slides in whole art px from a far offset to rest. `floorFront`, `bg` and the party stay still, so the being is felt to be larger than the screen. Only colossus forms |
   | `music` | `id` | optional track change (`audio-manifest.json` id) |
 
+- *(rev 4: the F3 numbers in the next two bullets are superseded by 18.4: canvas 2700x1080 at place (-527, -210),
+  scale 1, pan from (+480, +120) screen px.)*
 - **Pan limits (R13).** The allowed offset is derived from `colossus.json` so the canvas still covers the field. For
   the planned F3 (canvas at (-390, -300), 2700x1560 screen px at scale 3), the limits in art px are
   dx in [-128, +128] and dy in [-160, +138].
@@ -449,7 +456,9 @@ it rests on the rim.
 | Moons | the four orbs (frost cyan, ember orange, abyss teal, storm white) as moons with soft halos, orbiting slowly in front of the chest | each moon is the size of the party |
 | Palette | void black, gold, ember, white plus the four orb colours (the F1 base palette, 5.3); the nebula haze in the rim backdrop's rose and violet so it sits in the arena's light | one being, one arena |
 
-**Composition on screen at rest (F3 canvas about 2700 x 1560 screen px at scale 3; *estimate*, fixed at C3).**
+**Composition on screen at rest.** *(rev 4: superseded by 18.4. The user-picked render has arms outstretched to both
+canvas edges and no hand gripping the rim, and the canvas is 2700x1080 at scale 1. The sketch below is the rev-3
+intent, kept for history.)*
 
 ```
  screen x: 0                          960                         1920
@@ -467,7 +476,8 @@ The canvas extends about 390 screen px past the left edge, 390 past the right an
 part continues behind `floorFront` and the strip.
 - **Visible fraction (R12):** the canvas's intersection with the rect (0, 0, 1920, 780), over the canvas area. For the
   planned canvas, (1920 x 780) / (2700 x 1560) = **35.6 %** (criterion <= 45 %).
-- **Size bound:** 1.4x the screen is >= 2688x1512 screen px; the planned 2700x1560 passes.
+- **Size bound:** 1.4x the screen is >= 2688x1512 screen px; the planned 2700x1560 passes. *(rev 4: the height bound
+  is replaced by the column-span and border rules of 18.4; width >= 2688 stays.)*
 
 **Scale effects (runtime, 4.3), in priority order:**
 1. **Reveal pan** in the F2 -> F3 interlude. The canvas rises from below the horizon (`rise`), then the camera pans
@@ -649,7 +659,7 @@ table.
   | Form | Art canvas (art px) | Scale | Screen canvas | Place (x, y) | Visible extent |
   |---|---|---|---|---|---|
   | F2 | 440 x 300 | 3 | 1320 x 900 | (-60, 60) | x 0-1260, y 120-780 (base hidden by `floorFront` below y about 520) |
-  | F3/F4 | 900 x 520 (no upper limit) | 3 | 2700 x 1560 | (-390, -300) | the whole field and past every edge but the bottom (strip); visible fraction 35.6 % (R12) |
+  | F3/F4 (rev 4: 18.4 = 2700 x 1080 at scale 1, place (-527, -210)) | 900 x 520 (no upper limit) | 3 | 2700 x 1560 | (-390, -300) | the whole field and past every edge but the bottom (strip); visible fraction 35.6 % (R12) |
 
   F2 is placed left of the party (party x 1380-1515), like an enemy. F3 is the world: the party stands *in front of*
   its right hand, which grips the rim at about x 900-1300, y 330-470 screen (*estimate*).
@@ -661,6 +671,8 @@ table.
 
 ### 4.3 Art layers and animation (light, no rig in-betweens)
 
+- *(rev 4: for the painted forms, 18.3 replaces the layer kinds, the masks, the alpha rule and the limb bake below:
+  there are no limb layers, no rotsprite, soft alpha and an additive glow; motion may be sub-pixel.)*
 - **Why not the rig:** the monster rig tools are built around cells of 200 to 300 px. `monster_render` caps cells,
   `MAX_PAGE` is 2048, and a 900x520 rig with joint masks is untested and costly. **A layered puppet is used
   instead:** a few hand-masked layers, each with a few baked frames, moved in whole art px.
@@ -772,6 +784,7 @@ New files: `colossus/ColossusView.ts`, `colossus/colossusChoreography.ts`, `colo
 - **Textures:** dedicated PNGs, not the monster atlas: `assets/sprites/colossus/<form>/<layer>[_<frame>].png`, each
   cropped to its layer's opaque box (+1 px), plus the index `assets/sprites/colossus.json` (layers, frame boxes,
   offsets, pivots, anchors, `place`, `scale`, timelines' frame names).
+- *(rev 4: memory, filtering and tiles are in 18.6: linear filtering, about 21.2 MB total.)*
 - **Memory estimate** (art-px RGBA, scaled on the GPU like the atlas): F3 is about 900x520x4 = 1.9 MB per full layer.
   Most layers are cropped far smaller, so about 8 layers plus about 12 limb frames come to about 12 MB; F2 is about
   5 MB; total about 17 MB. The criterion is <= 24 MB, measured by the build. If F3's approved canvas is larger, the
@@ -798,6 +811,7 @@ New `assets-src/gen/colossus.py`, whose subcommands do not touch `generate.py` m
 - `gen <form> --model core|sd35|ultra --seed N --paid`: text-to-image (maps to `bedrock.invoke(..., paid=True, purpose=...)`; without `--paid` it only prints the request) at 21:9 (F3) or 16:9 (F2). The prompt comes
   from `gen/colossus/<form>.prompt.md`.
 - `nobg <form> <raw>`: `remove_bg`.
+- *(rev 4: `pix` is not used for colossus forms; 18.2 adds `upscale`, `glow` (extraction), `despill` and `inpaint`.)*
 - `pix <form> <nobg> --scale 2|3 --colors N`: alpha >= 128, drops specks < 0.2 % of the largest blob (the `/tmp/stab`
   `pix.py` rules), fits to the form's canvas by a pitch-aware block vote (`pixelize_native`), a 15-bit snap, the
   chaos palette lock (5.3) and a 1 px outline.
@@ -862,6 +876,7 @@ image-only review by a fresh reviewer:
 - **One master per form, no multi-pose generation.** Every pose comes from the runtime layers (4.3). This is the main
   answer to the unproven Stability multi-pose consistency. The only second key is F4's core (V0-d), with a
   0-image paint fallback.
+- *(rev 4: the palette lock and the stepped glow are dropped for colossus forms; 18.2 and 18.3.)*
 - **Palette lock across forms:** `pix` snaps every form to a shared base palette taken from F1's approved sheets
   (void black, gold, ember, white and the four orb colours, as exact 15-bit values) plus up to N free colours per form
   (D-O3: 24 for F3, 20 for F2). `selftest_colossus.py` checks that the base colours are present and no other colours
@@ -949,6 +964,7 @@ fixed offline and the orchestrator agrees.
 ### 5.4 Layer split and limb bake (rigger, 0 images)
 
 - The rigger writes the layer yaml (masks, pivots, fills, anchors, moon paths).
+- *(rev 4: no limb bake for the painted forms; 18.3.)*
 - `colossus.py bake` rotates the limb layers with the existing `rotsprite` sampler from `monster_render.py`: angles
   per frame, cap 20 degrees like the rig rotation cap; `raise`, `slam` and `recoil` per limb.
 - Checks, reusing `anim_checks` where they apply: binary alpha, palette lock, no detached pixels, an outline on cut
@@ -1071,6 +1087,7 @@ Under pass C, `bedrock.invoke` refuses any call whose `purpose` is not one of th
   - An unseen form shows "???" with no preview (`mode: seen`); `mode: all` shows them all.
   - **From C1 (R11),** records with `formOf` are filtered out of the top-level list. They appear only as sub-entries
     under their root.
+- *(rev 4: the colossus preview is a pre-composited still at fit size, 18.8.)*
 - **Preview of a colossus form:** `BestiaryPreview` builds a `ColossusView` at **scale 1** (art px = screen px, an
   integer scale) inside `PREVIEW_INNER` (940x720), in the new `bestiaryColossus.ts` (R16).
   - F2's 440x300 fits whole and is centred on the panel (`fitShift` uses the colossus `visibleBox` from the json
@@ -1115,19 +1132,22 @@ Existing tests are updated only where this plan changes the pinned behaviour (na
 |---|---|
 | `tests/scenes/battle/battleLayers.test.ts` (existing, updated) | order bg, colossus, ui, actors, fx, hud |
 | `tests/scenes/battle/screenShake.test.ts` (existing, updated) | shake moves actors, fx, colossus; never bg, ui, hud |
-| `tests/scenes/battle/ColossusView.test.ts` | on the **900x520 art px fixture** (or the size read from the json, R22): placement from the json; integer scale; `scaleMode: 'nearest'`; every frame of idle / attack / cast / hurt / roar / dying at whole screen px; abs(dx) <= 12 over every timeline; coverage of x 0..1920, y 120..370 (R14: at rest and in idle / attack / cast / hurt / pan frames; rise and dying exempt); per-layer white flash on hurt with no `generateTexture` call (R15, spy); no call to `computeEnemyLayoutAi` / `formationFits` for colossus data (spy) |
-| `tests/scenes/battle/colossusWorld.test.ts` (the centrepiece) | F3 canvas >= 2688x1512 screen px (R12); at rest it passes the left, right and top screen edges; visible fraction (intersection with (0, 0, 1920, 780) / canvas area) <= 45 %; coverage of x 0..1920, y 120..370 = 100 % under the R14 scope; the `overhang` layer is above `floorFront` and below every `ui` / `actors` child; **at the first `pan` frame the hand's box is inside the field (y >= 120)** (A2) and **at the last `pan` frame the hand lies on the rim** (alignment with `floorFront`, R13); layers > 2048 are tiled and the tiles abut with no gap or overlap |
+| `tests/scenes/battle/ColossusView.test.ts` | *(rev 4: superseded by 18.7)* on the **900x520 art px fixture** (or the size read from the json, R22): placement from the json; integer scale; `scaleMode: 'nearest'`; every frame of idle / attack / cast / hurt / roar / dying at whole screen px; abs(dx) <= 12 over every timeline; coverage of x 0..1920, y 120..370 (R14: at rest and in idle / attack / cast / hurt / pan frames; rise and dying exempt); per-layer white flash on hurt with no `generateTexture` call (R15, spy); no call to `computeEnemyLayoutAi` / `formationFits` for colossus data (spy) |
+| `tests/scenes/battle/colossusWorld.test.ts` (the *(rev 4: superseded by 18.4 and 18.7)* centrepiece) | F3 canvas >= 2688x1512 screen px (R12); at rest it passes the left, right and top screen edges; visible fraction (intersection with (0, 0, 1920, 780) / canvas area) <= 45 %; coverage of x 0..1920, y 120..370 = 100 % under the R14 scope; the `overhang` layer is above `floorFront` and below every `ui` / `actors` child; **at the first `pan` frame the hand's box is inside the field (y >= 120)** (A2) and **at the last `pan` frame the hand lies on the rim** (alignment with `floorFront`, R13); layers > 2048 are tiled and the tiles abut with no gap or overlap |
 | `tests/scenes/battle/enemyAnimPreviewColossus.test.ts` | `&enemyAnim=loop` and `=step` drive the colossus timelines; the step label shows `enemy: frame / t` (R17) |
 | `tests/scenes/battle/colossusTextures.test.ts` | texture count before a colossus battle == after it ends, and the same for a bestiary visit (R27) |
 | `tests/scenes/battle/colossusAnchors.test.ts` | damage number origin = `core` clamped to y 140..740; target arrow and bracket inside the field and label y >= 124; status icon row inside y 140..760; `effectBox()` inside the field and all emitter anchors in y 124..1080 (the `fxBigBoxes` rule); melee point x <= 1250 and hero travel >= 150 |
 | `tests/scenes/battle/formChangeView.test.ts` | on `formChange`: F1's `AiEnemyView` sprite is removed after `dissolve`, a `ColossusView` and the invisible proxy at `targetRect` exist after `swap` (R15); **each enumerated consumer** (actionNumbers, BattleEffects incl. `elementFlash` routed to the colossus hurt flash, BattleFieldTargeting, statusFx, BattleAnimationController, enemyAnimPreview, BattleDisplayManager with the `upgradeToArt` guard, BattleScene) gets the proxy or the colossus path; `battle:formChange` emitted at `swap` (R20); the enemy list label stays "Chaos"; targeting index 0 still selects the boss; the controller waits for the interlude end |
-| `tests/scenes/battle/drawOrder.test.ts` | with F3 active: party sprites, the bottom-strip windows and the message window are above the colossus in the scene graph; `floorFront` above the colossus art |
+| `tests/scenes/battle/drawOrder.test.ts` | *(rev 4: superseded by 18.0 (no floorFront for F3))* with F3 active: party sprites, the bottom-strip windows and the message window are above the colossus in the scene graph; `floorFront` above the colossus art |
 | `tests/rendering/colossusAssets.test.ts` | `colossus.json` schema; every texture <= 2048; anchors and rects inside the canvas; total RGBA bytes <= 24 MB; every form id in `enemies.yaml` with `colossus:` **and an approved master** has an entry (A5; also `assetCoverage.test.ts`, extended). Forms without an approved master yet show the placeholder box |
-| `tests/scenes/bestiary/bestiaryForms.test.ts` | form records absent from the top-level list (R11); sub-entries in chain order; unseen form hidden under `mode: seen`; colossus preview at scale 1 centred within 1 px of the panel centre (the `bestiaryCentre` rule on `visibleBox`); a fixture canvas wider than 940 art px shows the rest-view crop (R22); F1 entry unchanged |
+| `tests/scenes/bestiary/bestiaryForms.test.ts` | *(rev 4: superseded by 18.8 (the colossus preview is a still))* form records absent from the top-level list (R11); sub-entries in chain order; unseen form hidden under `mode: seen`; colossus preview at scale 1 centred within 1 px of the panel centre (the `bestiaryCentre` rule on `visibleBox`); a fixture canvas wider than 940 art px shows the rest-view crop (R22); F1 entry unchanged |
 | **Regression gate (R28)** | unchanged and green at C-base and after C4: `BossPhase.test`, `BossBattle.test`, `tierHTravel`, `lungeClearance`, `fxBigBoxes`, `floatingNumberPlacement`, `enemyTravel`, `bestiaryCentre` |
 | `tests/rendering/rimBackdrop.test.ts` | `rim_floor.webp` overlaps `rim.webp` pixel-exact below the horizon; alpha 0 above the horizon row |
 
 ### 9.3 Pipeline (framework owner)
+
+*(rev 4: the binary-alpha, glow-level and palette checks below are replaced by the 18.7 checks; the tests are
+rewritten, not deleted.)*
 
 `assets-src/gen/selftest_colossus.py` covers:
 - the BR ledger guard inside `bedrock.invoke` (5.1, R23)
@@ -1167,6 +1187,9 @@ At most **4 agents at once**.
 | C2 | GEN (+ FW-C on call) | the rim source copied into the repo first; the R30 read-only identity and model list; V0 (<= 12 calls, per-row caps); stage and commit rim (0 calls) | G-C0 report + ruling: continue, or **stop and report to the user** (D-U6) |
 | C3 | GEN, RIG (2) | F3 master first (the user's headline), then F2: generate -> nobg -> pix -> mock -> image-only review -> approve; RIG starts each form's layer yaml right after its approval | each master approved, logged, committed |
 | C4 | RIG, TS-V, TS-B (3) | RIG: split, glow, bake, review, lock, **commit right after lock**. TS-V: real `colossus.json` wired, bestiary sub-entries. TS-B: interlude scripts, form data final, the `chaos_forms` / `chaos_final` / `chaos_interlude_*` debug scenarios (with `background: assets/backgrounds/rim.webp` and `enemyStatus` presets, R21) | `check --all` == C-base lines; `selftest_colossus` OK; forms locked; the R28 regression gate green |
+| C2' (rev 4) | FW-C, TS-V, TS-B (3) | FW-C on `c2-fw2`: `upscale`, `inpaint`, `glow --method diff/lum`, despill; the `colossus.json` shape fix (18.5) and `selftest_colossus_art.py` updates; the rev-4 caps in `budget.json`; `retire.py --colossus` for the v1 masters. TS-V: linear filtering, `blend` / `alpha` from the json, sub-pixel motion, the per-layer hurt flash filter, the rev-4 timelines, the `rise`-ends-at-pan rule, the border, column-span and ring tests on a 2700x1080 fixture, the contract test, the bestiary still. TS-B: interludes on non-form phases, `chaos_crack`, F3 / F4 data (`colossus`, the anchors via the json) | merged into `roster-int`; `tsc` / build / vitest, selftests, `budget --check` green; R28 gate unchanged |
+| C3' (rev 4) | GEN, RIG (2) | archive the v1 masters; **F3 first**: upscale -> nobg -> glow -> despill -> mock + side-by-side -> review -> approve -> commit; then F2 from its full-res finish (0-1 calls); then F4 `open` and F3 `crack` via inpaint on the upscaled chest, composited inside the mask (<= 8 calls) | each master approved against its original, logged, committed; calls within the 18.9 caps |
+| C4 (rev 4) | RIG, TS-V, TS-B (3) | RIG: layer yaml for the painted forms (body, glow, corona, core frames), the anchors measured, place_y tuned for the ring arc, the build, **lock and commit right after lock**. TS-V / TS-B: wire the real json, the previews, the scenarios | contract and world tests green on the real json; the A5 gate |
 | C5 | integrator | build `colossus` stage, section 11 validation, browser checks 11.3 | all pass/fail criteria except play test; **A5 gate: `colossus.json` has entries for all three colossus forms (F2, F3, F4) with approved masters** |
 | C6 | 1 fresh play tester | section 12 | rows in ROSTER_PLAYTEST |
 | C7 | <= 3 | fix round (plan, momus, fixes, re-test), balance bounds pinned | no open P0/P1 |
@@ -1334,6 +1357,14 @@ Every answer must be yes.
 | AWS credentials are an admin / production role | low / high | read-only identity and model list first, recorded; stop and ask if the role matches Admin or Prod (R30) |
 | Chaos's 6 missing spell ids make the forms' AI thinner than intended | certain / low | D-O9: design only with the 34 that exist |
 | The retry snapshot restarts the long fight from F1 and annoys | medium / low | D-U8 (user): from F1; the play test reports it |
+| (rev 4) Conservative Upscale invents detail or shifts colour away from the picked original | medium / high | low `creativity`; the side-by-side review; the fidelity and new-blob checks (18.7); one retry, then stop and report |
+| (rev 4) The 2.5:1 render is at the upscaler's aspect limit, or remove_bg refuses 2.9 MP | medium / low | local checks before any call; pad 4 rows (0 calls); the C7 alpha upscaled offline (0 calls) |
+| (rev 4) The additive halo washes out on the light arena sky | medium / high | the sky dim (D-O19); G1 keeps the full light; reviewed in the mock; the ring-arc measure |
+| (rev 4) The halo ring's top arc hides under the message window | high / medium | the visible arc is measured and pinned (B2, about >= 20 %); reviewer question 2; showing more ring needs a user ruling (15.1) |
+| (rev 4) A soft-alpha fringe (dark sky colour) shows on the light arena | medium / medium | despill (18.2 step 4) and the despill check |
+| (rev 4) Inpaint loses identity outside the chest or makes a "laid-on" shape again | medium / medium | composite only inside the mask (byte-identical outside); the cavity review; 2 rejections in a row stop and report |
+| (rev 4) Larger textures (about 21 MB) on weak GPUs | low / medium | tiles <= 2048, the glow at half res, F2 released after the swap, the fps probe in the play test |
+| (rev 4) The Python / TS json drift returns | low / medium | the committed fixture and the two-sided contract test (18.5) |
 
 ---
 
@@ -1351,7 +1382,13 @@ Every answer must be yes.
 | D-U6 | Gemini fallback if V0 fails | **no**. If Stability fails validation, stop and report to the user |
 | D-U7 | Which rim render is final | **sd35 v3 accepted as is** (`/tmp/stab2/sd35_v3_raw.png`, horizon 485, zoom 1.05, screen horizon 370) |
 | D-U8 | Retry after a loss | **restart from F1** |
-| D-U9 | F3 composition | **as proposed** (3.0) |
+| D-U9 | F3 composition | **as proposed** (3.0); rev 4: the composition is the user-picked render's (outstretched arms, halo ring, rays), 18.4 |
+| D-U10 | Colossus art style (2026-11-16, rev 4) | **full-resolution painted art, not pixel art**: the pixel F3 master is rejected; the look is `out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png` (detail, colour, the halo ring and rays kept); the arena backdrop replaces the render's sky; F2 and F4 follow the same rules (section 18) |
+
+**Note (rev 4, B2).** At the user-picked composition and scale 1, the halo ring's top arc lies under the message
+window and its lower half behind the shoulders. The plan pins the visible arc it measures (about 20 %) and does not
+move the being to show more ring. **Showing more of the ring would need a user ruling**, for example a smaller upscale
+factor, a lower placement that covers more of the party, or a different composition.
 
 ### 15.2 Orchestrator rulings (the defaults, ruled 2026-11-16)
 
@@ -1372,6 +1409,17 @@ Every answer must be yes.
 | D-O13 | Cut order if time or budget runs short | F3 is never cut or shrunk. Cut first: F2's art (F2 becomes a data form shown as F1's sprite with a tint, or is dropped and F1 goes to F3 directly), then the bestiary colossus loop (a still image), then F4's core variant (paint), then the interlude polish |
 | D-O14 | F3 generation strategy | S-B (render + outpaint) if V0-e passes, else S-A |
 | D-O15 | Interlude cap for `chaos_i2` (rise + reveal pan) | 600 frames (others 480) |
+| D-O16 (rev 4) | Moons in F3 | none (the picked render has none; the four orbs stay in F1 and F2); the user may ask to add them as a painted layer |
+| D-O17 (rev 4) | F3 resolution and display scale | Conservative Upscale to 2700x1080 (1.5x), shown at **scale 1** with linear filtering. 1:1 keeps the painting's detail with no runtime resampling and matches the planned 2700 px canvas width. A small factor lets the upscale invent least. It fits the 24 MB budget (18.6). 2x (3600x1440, about 41 MB, more of the ring off-screen) and a runtime fractional 1.5x of the 1800 render (blurs the detail) are rejected |
+| D-O18 (rev 4) | F3 floor front | none (like F2): the torso continues behind the bottom strip |
+| D-O19 (rev 4) | Sky dim behind F3 / F4 | `bg` multiply 0.6, reviewed in the mock |
+| D-O20 (rev 4) | Glow extraction | G1 "diff" (render minus cut over the sky base), G2 luminance key as the fallback |
+| D-O21 (rev 4) | Bestiary preview for colossus forms | a pre-composited still at fit size (18.8) |
+| D-O22 (rev 4) | Glow storage | half res, shown at 2x linear (low-frequency light) |
+| B2 (rev 4) | Ring criterion | one criterion, pinned from measurement on the approved art with a 3-point margin (about >= 20 % visible arc); ring geometry corrected (centre about render (900, 380), r about 375, band about 50 render px / 75 px at 2700); place_y tuned for party readability only |
+| B3 (rev 4) | Glow at half res | a per-frame `texScale` field (`formProblems`, the build, the contract fixture and test) |
+| B7 (rev 4) | Budget | `f4_variant` cap 2 (used), 2 freed to `reserve` (31); the reserve only for calls <= $0.08; the true worst case for the remaining calls is $7.60; pinned thresholds may only tighten the floors |
+| Superseded (rev 4) | D-O2 (scale 3, nearest), D-O3 (palette colours), D-O14 (outpaint strategy) | replaced by D-O17 and 18.1 for colossus forms; D-O4 (light layered animation) and D-O11 (additive glow) stand |
 
 ### 15.3 Orchestrator rulings on momus's open points (2026-11-16)
 
@@ -1405,6 +1453,13 @@ Every answer must be yes.
 - [ ] C2 FW-C/GEN: stage rim (entry 485 / 1.05 / 370, user-accepted, 0 calls); --check rim; rim_floor cut; commit rim.webp + rim_floor.webp (medium, 2h)
 - [ ] C3 GEN: **F3 master first** (S-B render + outpaint, <= 24 gen + 10 nobg), stage mock, review, approve, commit (high, 1d)
 - [ ] C3 GEN: F2 master (<= 8 gen + 4 nobg), review, approve, commit; cut first under D-O13 (medium, 3h)
+- [ ] C2' FW-C (`c2-fw2`): upscale + inpaint + glow (diff/lum) + despill subcommands via bedrock.invoke; rev-4 caps in budget.json; colossus.json shape = the TS contract (frames.base / at / size / frame-relative tiles, targetRect [x,y,w,h], blend, alpha); selftest_colossus_art.py:200-204 + the 18.7 checks; committed contract fixture; retire.py --colossus for the v1 masters (high, 1d)
+- [ ] C2' TS-V (+ momus B3/B5/B8): `texScale` per frame in formProblems, BattleMessage.interlude?, the sky-dim reset + skyDim.test, linear textures, blend add + rest alpha from the json (drop colossusChoreography.ts:92's 0.5), sub-pixel motion, per-layer hurt filter, painted timelines (18.3), rise-ends-at-pan, border / column-span / ring tests on a 2700x1080 fixture, colossusContract.test, bestiary still, F2 release after swap (high, 1.5d)
+- [ ] C2' TS-B: interludes on non-form phases; chaos_crack (variant core crack) on F3's 0.25 phase; F3/F4 data and anchors from the json; interludes.test totals (medium, 4h)
+- [ ] C3' GEN: archive chaos_horizon_v1 / chaos_orrery_v1; **F3 first**: upscale (<= 2) -> nobg (<= 1) -> glow -> despill -> mock + side-by-side -> fresh review vs the picked original -> approve -> commit (high, 1d)
+- [ ] C3' GEN: F2 from f2_finish/finish.png at 1320x900 (0-1 calls), glow from o12_metal raw/nobg, review, approve, commit (medium, 4h)
+- [ ] C3' GEN/RIG: F4 open + F3 crack via inpaint on the upscaled chest (<= 4 + 4), composite inside the mask, review, approve, commit (high, 1d)
+- [ ] C4 RIG (rev 4): painted layer yaml (body, glow, corona, core frames), measured anchors, place_y tuned for the ring arc, build, lock, commit right after lock (high, 1d)
 - [ ] C4 RIG: F3 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
 - [ ] C4 RIG: F2 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
 - [ ] C4 RIG/GEN: F4 core variant (search_replace <= 4 or paint), lock (medium, 2h)
@@ -1471,3 +1526,352 @@ Verdict on rev 2: **APPROVE WITH REVISIONS**. A1-A8 were applied in place with t
 | A7 | Two formatting errors | the `music` row moved back into the 2.3 step table; the header restored on the split line-headroom table in section 1 |
 | A8 | Test wording | the `enemyHp.test.ts` row says "revive (HP 1)" (9.1) |
 
+### 17.2 Rev 4 (user ruling: painted colossus art) and the RIG findings
+
+| # | Change | Where |
+|---|---|---|
+| U-1 | The colossus forms are full-resolution painted art; the pixel F3 master is rejected; the picked render is the look | 18.0, 18.1, D-U10 |
+| U-2 | `pix`, quantize, palette lock, binary alpha and the 4-level glow are dropped for colossus layers; soft alpha, full colour, linear filtering | 18.1, criteria, 9.3 note |
+| U-3 | Conservative Upscale to 2700x1080, shown at scale 1 (D-O17, justified) | 18.2, 15.2 |
+| U-4 | A glow layer extracted from the original (G1 diff, G2 luminance), additive | 18.2, 18.3, D-O20 |
+| U-5 | The render's sky is not kept (arena backdrop), plus a sky dim | 18.0, 18.3, D-O19 |
+| U-6 | Re-review against the picked original, side by side; fidelity checks | 18.7 |
+| U-7 | Memory (about 21 MB), tiles, disposal | 18.6 |
+| U-8 | F2 from its full-res finish; F4 / crack via masked inpaint | 18.2 |
+| RIG-1 | The json shape mismatch; Python matches TS; selftest lines 200-204; contract test | 18.5 |
+| RIG-2 | The additive glow, glow rest alpha, the crack variant step | 18.8 |
+| RIG-3 | The pan exposed the cut bottom; geometry re-derived | 18.4 |
+| RIG-4 | The glow alpha-level rule | moot (18.8) |
+| B-1 | The budget re-tabled at 17 of 80 used | 18.9 |
+| T-1 | Tranches C2', C3', C4; TODOs; risks | 10, 16, 14 |
+| B1 | `sky_base` at a scale above the halo (opening radius >= 1.5x the band half-width, about 60 px at 2700, or a far-field fit); the tautological reconstruction check replaced by glow strength (>= 0.7 x (raw - far-field sky mean) in the annulus and the corona disc where a < 0.05) and a sky-base-clean check (inside vs outside the annulus within 4 luma); glow computed after despill | 18.2, 18.7 |
+| B2 | Ring: one measured criterion with a 3-point margin (about >= 20 %); corrected geometry; place_y for party readability only; more ring needs a user ruling | 18.4, 14, 15.1 note, 15.2 |
+| B3 | Per-frame `texScale` (the glow at 2) in `formProblems` (`colossusIndex.ts:99-104`), the Python build and the contract fixture / test | 18.5 |
+| B4 | The pan-limit formula (border rule minus the motion envelope of every layer moving during the pan); today dy [-80, +324], dx [-247, +521]; pinned in `interludes.test` | 18.4 |
+| B5 | The interlude id reaches the view as `BattleMessage.interlude?`, pushed in place of the plain line (no state-machine lines); a phase that names an interlude does not `say` its message | 18.8 row 2c |
+| B6 | Stale rows marked "(rev 4: superseded by 18.x)": section 0's bestiary criterion; the 9.2 ColossusView / colossusWorld / drawOrder / bestiaryForms rows; 4.6 "about 21.2 MB" | 0, 4.6, 9.2 |
+| B7 | `f4_variant` 2, `reserve` 31 (<= $0.08 calls only), total 80; the true worst case is $7.60 for the remaining calls; thresholds only tighten | 18.9, 18.7, 15.2 |
+| B8 | The sky dim resets on victory, defeat, retry and the next battle start; `skyDim.test.ts` | 18.3 |
+| (non-binding) | Hurt flash by an additive white copy of the body sprite; peak memory about 21 MB colossus + about 16 MB F1 atlas page | 18.3, 18.6 |
+
+---
+
+## 18. Rev 4: full-resolution painted colossus art (user ruling, binding)
+
+### 18.0 The ruling and what it replaces
+
+**User ruling (2026-11-16, relayed by the coordinator; D-U10).** The colossus forms (F2 Orrery, F3 Last Horizon, F4
+Core Laid Bare) are **full-resolution painted art, not pixel art**.
+
+The user **rejected** the approved F3 master `approved/chaos_forms/chaos_horizon/master.png`. To make it, the 1800x720
+render was halved to 900x362, quantised to 17 colours and shown at 3x nearest, and `remove_bg` stripped the halo ring
+and rays the user liked (*measured*: 18 colours, binary alpha; its glow 5 colours).
+
+**The look** is `assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png` (main checkout; 1800x720,
+94,897 colours, *measured*): the C4 structure render with the C6 face removal. The plan keeps its detail, its colour,
+**the great halo ring and the light rays**. Its sky is not kept: the user chose the arena backdrop (18.4).
+
+**Superseded for colossus forms (F1 and every atlas monster are unchanged):**
+
+| Rev-3 rule | Rev 4 |
+|---|---|
+| `pix`: block vote, 15-bit snap, 1 px outline, `--colors N` (5.1, 5.3a) | not used. The art keeps full 24-bit colour |
+| palette lock and base palette (5.3, D-O3) | dropped. Continuity with F1 is reviewed by eye (18.7) |
+| binary alpha outside `glow`; 4 stepped glow alpha levels (4.3, 9.3) | soft 8-bit alpha everywhere |
+| integer display scale 3, `scaleMode: 'nearest'` (4.2, R27, D-O2) | **display scale 1** at the upscaled size (18.2), `scaleMode: 'linear'` |
+| whole-px motion (4.3, 9.2) | sub-pixel motion allowed for colossus layers. Shake stays whole px |
+| limb layers and the rotsprite bake (4.3, 5.4) | none for the painted forms. Whole-body motion plus light layers (18.3) |
+| outpaint to reach the canvas (S-B, V0-e, D-O14) | moot. The canvas comes from the Conservative Upscale of the picked render |
+| the gripping hand, `overhang`, `floorFront` for F3 (3.0, 4.1) | none: the picked render has outstretched arms and no grip; F3 draws no floor front, like F2 (D-O18) |
+| the four moons in front of F3 (3.0) | none: the picked render has none; the four orbs live in F1 and F2 (D-O16) |
+
+### 18.1 Art rules for colossus layers
+
+- **Full colour, soft alpha.** Layers are 8-bit RGBA PNGs with straight alpha.
+  - No quantization, no despeckle that removes detail, and no outline.
+  - Edge **despill** is allowed: un-mix the semi-transparent band against the sky base (18.2 step 4), so no dark-sky
+    fringe shows on the light arena.
+- **Fidelity to the picked original** is the acceptance (18.7).
+  - Offline finishing is limited to the fixes a reviewer names. Each fix is checked against the original side by side.
+  - The rev-3 F3 finish (`chaos_horizon_finish.py`: the disc edge, lifted darks, rim light) is **not** carried over by
+    default: it was tuned for the pixel master.
+- **Textures:** `scaleMode: 'linear'`, no mipmaps (shown at scale 1, or the glow at 2x, 18.6), tiles <= 2048 px a side.
+
+### 18.2 Pipeline per form (generator + framework; tooling on branch `c2-fw2`)
+
+**FW-C on `c2-fw2` adds** three subcommands, all through `bedrock.invoke` with a purpose:
+- **`colossus.py upscale <form> <image> --creativity C`:** Stability **Conservative Upscale** (model id confirmed
+  read-only with `list-foundation-models`, R30, then added to `bedrock.MODELS`). Purposes `f3_upscale`, `f2_upscale`.
+  - Local range checks before any call: the input pixel count and an aspect ratio <= 2.5:1 per the model's documented
+    limits. The F3 render is exactly 2.5:1.
+  - If the input is refused locally, the tool pads 4 edge-replicated rows top and bottom and crops after. This costs
+    0 extra calls.
+- **`colossus.py inpaint <form> <image> --mask M --prompt P --seed N`:** Stability **inpaint**
+  (`us.stability.stable-image-inpaint-v1:0`, listed at R30). Purpose `f4_inpaint`.
+  - The result is **composited back only inside the mask** (feather <= 8 px). Pixels outside the mask are
+    byte-identical to the input (selftest).
+- **`colossus.py glow <form> --raw R --cut C [--method diff|lum]`:** the glow extraction (step 3 below), offline.
+
+**F3 (the centrepiece):**
+1. **Archive first:** `retire.py --colossus chaos_horizon` -> `approved/_retired/chaos_horizon_v1/` (the pixel master,
+   its glow, the crack variant, `meta.json`, the lock) and a `docs/RETIRED_SPRITES.md` row. `approve` refuses to
+   overwrite without it.
+2. **Upscale** the picked raw, with its sky so the cut and the glow share one geometry, to reach about 1:1 display
+   (D-O17).
+   - The target canvas is **2700x1080**, 1.5x the 1800x720 render.
+   - The Conservative Upscale output (model-determined, expected >= 2x) is Lanczos-downscaled offline to exactly
+     2700x1080.
+   - If the output is narrower than 2700, the generator stops and reports. There is no runtime upscale.
+   - `creativity` is low (start 0.2). One retry at a lower value is allowed if the reviewer finds invented features.
+3. **Cut and glow.** `remove_bg` runs on the upscaled raw (`f3_nobg`).
+   - If the 2.9 MP input is refused locally, the tool Lanczos-upscales the existing C7 cut's alpha instead (0 calls).
+   - **Glow** (halo ring, rays, corona), method **G1 "diff"** (default, D-O20):
+     `glow = clamp(raw - (a * cut_rgb + (1 - a) * sky_base), 0)`, where `cut_rgb` is the **despilled** cut (step 4
+     runs before this step, B1).
+   - **`sky_base` at a scale above the halo (B1).** It is the render's sky with the bright features removed: a grey
+     opening whose radius is >= 1.5x the ring band's half-width (about 60 px at 2700 wide), then a Gaussian blur with
+     sigma 40 px. Or, if the reviewer finds residual ring light, a smooth fit (low-order 2-D polynomial) to far-field
+     sky samples outside the ring annulus and the rays. Either way, the halo cannot leak into `sky_base`.
+   - The glow is then the light `remove_bg` removed, minus the sky.
+   - Method **G2 "lum"** (fallback): `raw * smoothstep(L, t0, t1)` outside the body.
+   - Pick by the glow-strength and sky-base checks (18.7) and the side-by-side review.
+   - The glow's top rows get a 120 px alpha feather, because the render's top edge cuts the ring (18.4).
+4. **Despill** the body's soft edge: `rgb_fg = (rgb - (1 - a) * sky_base) / a`, clamped, for 0 < a < 0.95.
+   **Order (B1): sky_base, then despill (step 4), then the glow (step 3).** The numbering is kept for reference.
+5. **Mock** on the rim backdrop with the party at the 18.4 placement, plus the **side-by-side sheet**: the original
+   raw, and the in-game composite (body + additive glow over a sky_base-coloured plate, and over rim).
+6. **Image-only review** by a fresh reviewer against the original (18.7), then approve. **Commit right after.**
+
+**F2:**
+- Archive first (`chaos_orrery_v1`).
+- The master is re-made from its full-res finish, `out/colossus/chaos_orrery/f2_finish/finish.png`: 1320x900,
+  196,112 colours, soft alpha (*measured*). That is already its 1320x900 screen canvas at scale 1, so **no upscale**
+  (`f2_upscale` is unused unless the review asks for detail).
+- Its glow comes from `o12_metal_raw.png` against `o12_metal_nobg.png` (G1).
+- The rev-3 finish's offline edits stay, because they were made at full res before `CL.pix`: the eclipse disc and
+  rim, the storm planet, the cleared slabs. Only the final `CL.pix` and despeckle are dropped.
+- Review against the approved F2 look for identity, then approve. 0-1 calls (an `f2_nobg` re-cut only if the edges
+  fail despill).
+
+**F4 (open core) and F3's crack:**
+- Done with `inpaint` on a chest crop of the **upscaled** F3 (about 900x900 screen px around the fissure), with a
+  chest mask (the rev-3 `open_mask` / `crack_mask`, upscaled 3x from the 900x362 pixel masks, then smoothed).
+- `open`: up to 4 calls. `crack`: up to 4 calls (purpose `f4_inpaint`).
+- Each result is composited only inside the mask and stored as a `core` frame patch (18.3).
+- Each is reviewed against F3 base: identity outside the mask, and a real cavity with depth and spill light (the
+  rev-3 ITERATE reason).
+- If 2 inpaint results in a row are rejected, generation stops and the orchestrator reports to the user.
+
+### 18.3 Layers and animation for the painted forms
+
+| Layer | Content | Blend | Rest alpha | Runtime |
+|---|---|---|---|---|
+| `body` | the despilled cut, full res | normal | 1 | breathing: dy 0 -> -4 px, sinusoidal, 144-frame loop (sub-pixel); the attack dip / slam; per-layer hurt flash |
+| `glow` | the G1 / G2 extraction (halo ring + rays + corona), stored at half res and shown at 2x (18.6) | **add** | **1.0** | slow pulse 0.85 <-> 1.0 (288 frames); cast / beam flare to 1.0 plus 10 % scale-free brightening via alpha 1 and the `corona` layer |
+| `corona` | the inner ring around the disc, a full-res patch cut from the glow | **add** | 1.0 | faster pulse 0.8 <-> 1.0 (96 frames); beam flare |
+| `core` | chest patch frames: `crack` (F3 below 0.25) and `open` (F4); `base` is empty (the body carries it) | normal | 1 | the `variant` step |
+
+- **Slam, whole body (no limb layers):** dip dy -12 px over 12 frames (the wind-up), hold 8, slam +8 px over 4
+  frames (contact: screen shake, the 2 damage events, a glow flare), then return over 20. No rotation.
+- **Hurt:** a white flash on `body`, 2 frames on / 2 off x2. Preferred (momus, non-binding): an **additive white copy
+  of the body sprite** (the same texture, `tint` white, `blendMode: 'add'`, alpha 0.6) rather than a ColorMatrix
+  filter, which costs a full-size render target. No
+  `generateTexture`. Plus its own shake of +-3 px (whole px).
+- **Dying:** a corona and glow flare to 1, the body sinks 2 px per frame and fades, then the white fade (3.4).
+- **Sky dim for F3 / F4 (D-O19):** while F3 or F4 is on screen, `bg` gets a multiply tint of 0.6, set at the end of
+  `chaos_i2` and reviewed in the mock.
+  - **B8:** the dim resets on victory, defeat, retry and the next battle start.
+  - Test: `tests/scenes/battle/skyDim.test.ts` covers each of the four, and checks that a new battle's `bg` tint is
+    0xffffff. This keeps the user's arena backdrop and gives the additive halo contrast on
+  its light sky.
+
+### 18.4 F3 geometry at scale 1 (re-derived for the 2700x1080 canvas; RIG finding 3)
+
+- **Canvas** 2700x1080 screen px (= art px at scale 1). **Place at rest** (-527, -210) (*estimate*, tuned at C3' in
+  the place_y range [-210, -60], 18.7).
+  - The disc centre, render (898, 340) x 1.5 = canvas (1347, 510), lands on screen (820, 300), left of the party (x
+    1380-1515).
+  - The arm tips, render x about 10 and 1790, land on screen about -512 and 2158: past both edges.
+  - The torso's bottom (canvas row 1080) is at screen 870, behind the bottom strip (`STRIP_Y` 780).
+- **Borders (RIG finding 3: the rev-3 pan exposed F3's cut-off bottom edge).**
+  - The body has opaque pixels on the canvas's left, right and bottom borders, so those must stay off-screen or
+    behind the strip in every frame: left <= -6, right >= 1926, bottom >= 786 (6 px shake margin).
+  - The top border is glow only, feathered 120 px (18.2), and is kept at y <= 114 (behind the message window) outside
+    `rise` and `dying`.
+- **Pan limits (B4).** The formula, per axis, in screen px offset from rest: the border rule (each opaque border
+  off-screen by the 6 px shake margin) **minus the motion envelope of every layer that moves during the pan** (the
+  body's breathing, up to 4 px; the slam dip does not run in an interlude).
+
+  | Axis | From the borders alone | Minus the envelope (today) |
+  |---|---|---|
+  | dx | [-247, +521] | [-247, +521] (no layer moves horizontally during the pan) |
+  | dy | [-80, +324] | [-80, +324] with the 4 px breathing taken from the shake margin's side |
+
+  - The validator computes these from the json and the choreography tables, so they are not hand-written constants.
+  - `interludes.test.ts` pins today's values: **dx in [-247, +521], dy in [-80, +324]**.
+  - These replace R13's art-px limits and A2's start rule for F3.
+- **`chaos_i2` reveal:**
+  - `rise` from_dy 700 over 120 frames, **ending at the pan's start offset**. New validator rule: a `rise` followed by
+    a `pan` ends at that pan's `from`, so there is no jump.
+  - Then `pan` from **(+480, +120)** to rest over 120 frames, ease out. It sweeps from the left shoulder and arm to the
+    eclipse, and the left arm crosses the field.
+  - The A1 total (577 frames) is unchanged.
+  - Test: at the first pan frame the disc (`core` anchor) is inside the field, and every border rule holds on every
+    pan frame.
+- **Anchors** (screen px at rest, *estimate*, measured at C4 from the approved art):
+
+  | Anchor | Value |
+  |---|---|
+  | `core` = `target` | (820, 300) |
+  | `head` | (820, 200) |
+  | `targetRect` [x, y, w, h] | canvas [1170, 345, 360, 495] = screen x 643-1003, y 135-630 |
+  | `hands` (on-screen forearm points; the hands are off-screen) | l (120, 470), r (1260, 420) |
+  | `melee` (right forearm) | (1220, 380): hero travel 160 >= 150 |
+  | `feet` | (820, 740) |
+
+- **Visible fraction:** (1920 x 780) / (2700 x 1080) = **51.4 %**. The criterion becomes <= 55 % (it was 45 %; the
+  canvas height is set by the picked render's 2.5:1 aspect).
+- **Halo ring (B2, corrected geometry):**
+  - The ring centre is about render (900, 380), radius about 375, band about 50 render px wide. At 2700 wide
+    (x 1.5) that is centre canvas (1350, 570), screen (823, 360) at rest, radius about 562, band about 75 px. Its top
+    arc above y 120 hides under the message window, and its lower half lies behind the shoulders.
+  - **One criterion, pinned from measurement (B2 ruling).** At C4 the visible ring arc (inside the field, not under body
+    pixels with alpha >= 0.5) is measured on the approved art at the chosen place_y. The criterion is pinned **3
+    points below** the measurement, expected **>= 20 % of the circle**. It is tested on the real json.
+  - **place_y is tuned for party readability only** (the 14 rule), in [-210, -60]. It is not tuned for the ring.
+  - Showing more of the ring would mean a different scale or composition, which needs a user ruling (15.1 note).
+- **Column span:** the arms span every screen column at rest. Tested in idle, attack, cast, hurt and pan frames.
+- **F2** (rev 3, measured): canvas 1320x900 at scale 1, place (40, -20), no floor front, party clear by about 110 px.
+  The same border rules apply: its cut edges stay off-screen or behind the windows.
+
+### 18.5 Data contract: `colossus.json` (RIG finding 1)
+
+The TS reader (`src/scenes/battle/colossus/colossusIndex.ts`) is the contract. **The Python side changes to match
+it.**
+
+- **Shape:**
+  - A form is `{canvas: [w, h], scale, place: [x, y], anchors, targetRect: [x, y, w, h], coverBox?, visibleBox?,
+    layers}`.
+  - A layer is `{name, kind, over?, blend?: 'normal' | 'add', alpha?, frames: {base: F, crack?: F, open?: F, ...}}`.
+  - A frame `F` is `{at: [x, y], size: [w, h], tiles: [{file, x, y, w, h}], pivot?}`. **The tile x and y are relative
+    to the frame**, and the frame's `at` is on the canvas (art px).
+  - Variants are frames, keyed by the variant name.
+- **`colossus_build.py`** drops `image`, `variants` and the canvas-relative tile coordinates. It writes `frames.base`
+  (plus `crack` / `open`) as above, `blend` and `alpha` per layer, and `targetRect` as [x, y, w, h], refusing w or
+  h <= 0 or a rect outside the canvas.
+- **TS additions** (`ColossusLayerSpec`): `blend?: 'normal' | 'add'` and `alpha?: number` (rest alpha, default 1).
+  `formProblems` validates both.
+- **Per-frame `texScale` (B3 ruling).** `ColossusFrameSpec` gains `texScale?: number` (default 1). The frame's PNG
+  pixels are `size / texScale` per side, and the sprite is drawn at `texScale`; the glow is `texScale: 2` (half-res
+  storage, 18.6). `tiles` stay in **texture** px.
+  - `formProblems` (`colossusIndex.ts:99-104`) checks tiles against `ceil(size / texScale)`, so the tile area equals
+    the texture frame exactly.
+  - `colossus_build.py` writes `texScale` for the glow.
+  - The contract fixture gains a `texScale: 2` glow frame, and the contract test checks it.
+- **Tests:**
+  - **`selftest_colossus_art.py:200-204` updated:** assert `frames["base"]["tiles"]` with frame-relative tiles,
+    `targetRect == [x, y, w, h]`, the glow `blend == "add"` and `alpha == 1.0`, and no `image` / `variants` key.
+  - **Contract test, both sides:**
+    - `colossus_build.py` writes the fixture form into the committed `tests/fixtures/colossus/colossus.json`
+      (regenerated by the selftest, which fails if it differs from the committed file).
+    - The new `tests/scenes/battle/colossusContract.test.ts` reads it through `formProblems` and expects zero
+      problems, a `base` frame per layer, the glow `blend: 'add'`, and the tiles abutting inside their frame.
+
+### 18.6 Textures, memory and disposal
+
+| Form | Layer | Stored size (px) | RGBA MB | Tiles |
+|---|---|---|---|---|
+| F3 | body (cropped to rows 360-1079) | 2700 x 720 | 7.8 | 2048 + 652 wide |
+| F3 | glow (half res, shown at 2x linear) | 1350 x 540 | 2.9 | 1 |
+| F3 | corona patch (full res) | about 700 x 700 | 2.0 | 1 |
+| F3 / F4 | core `crack`, `open` patches | about 600 x 600 each | 2.9 | 1 each |
+| F2 | body (cropped) | about 1320 x 850 | 4.5 | 1 |
+| F2 | glow (half res) | 660 x 450 | 1.2 | 1 |
+| **Total** | | | **about 21.3** | |
+
+- The criterion is <= 24 MB, measured by the build. A larger approved crop needs an orchestrator ruling; size is
+  never cut to fit the budget.
+- **Loading:** `BattleArt.ensureColossus` loads all forms of the chain at battle start, so the peak is about 21 MB
+  of colossus textures plus the F1 atlas page (about 16 MB, a 2048x2048 RGBA page), about 37 MB.
+- **Release:** F2's textures are released right after the F2 -> F3 `swap`, because the chain never returns to F2.
+  Everything is destroyed on battle end and bestiary exit (`colossusTextures.test.ts`, R27).
+- `rim_floor.webp` stays committed but is not loaded by any colossus form (no floor front, D-O18).
+
+### 18.7 Review and checks (re-review against the user-picked original)
+
+- **Side-by-side review (fresh reviewer, image-only).** The sheet shows the original raw (1800x720), the in-game
+  composite at rest (on rim with the party, after the sky dim) and a 1:1 detail crop (disc, ring, a shoulder).
+  Questions:
+  1. Are the detail and colour kept?
+  2. Is the halo ring and its rays present and strong?
+  3. Is anything invented by the upscale?
+  4. Does it read planet-sized and is the party readable?
+  5. Any fringe?
+
+  The verdict is SHIP / SHIP WITH NITS / ITERATE, with at most 4 iterations per form.
+- **Offline checks in `selftest_colossus_art.py`.** The thresholds are *estimates*, pinned after the first
+  measurement with margin. **B7 ruling: a pinned threshold may only tighten the floors written here, never loosen
+  them.**
+  - **body fidelity:** the final body, Lanczos-downscaled to 1800x720, against the raw inside `a >= 0.9`: PSNR >= 30 dB
+    and mean CIE76 delta E <= 3
+  - **glow strength (B1; it replaces the tautological reconstruction check):** inside the measured ring annulus and the
+    corona disc, wherever a < 0.05, the mean glow luminance is >= 0.7 x (raw luminance - the far-field sky mean)
+  - **sky base clean (B1):** the mean `sky_base` luma just inside the ring annulus and just outside it differ by
+    <= 4 luma (0-255), so no halo leaked into the sky base
+  - **despill:** the mean luminance of the 0 < a < 0.95 band is >= the interior mean minus 20 %
+  - **upscale:** the output size, and no new connected bright blob over 0.1 % of the canvas absent from the
+    nearest-upscaled raw
+  - **inpaint:** byte-identical outside the mask
+  - **tiles:** <= 2048 and abutting; the memory sum is <= 24 MB
+  - **determinism:** under `PYTHONHASHSEED` 0 and 1 (R26)
+- **TS tests (9.2, updated, not deleted):**
+  - `ColossusView.test`: `scaleMode: 'linear'`, finite positions, shake whole px, the glow `blendMode` `'add'` from
+    the json, rest alpha from the json (RIG finding 2: today `colossusChoreography.ts:92` hard-codes 0.5)
+  - `colossusWorld.test`: canvas width >= 2688; the column span; the border rules on every R14-scoped frame and every
+    pan frame; visible fraction <= 55 %; the ring-arc measure on the real json, pinned per B2
+  - `interludes.test`: `rise` ends at the next `pan`'s `from`; F3 pan limits from the json; the `chaos_crack` total
+    pinned
+  - `colossusContract.test` (18.5)
+
+### 18.8 Fixes from the RIG agent's findings
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | `colossus_build.py` writes a json shape the TS reader rejects (`frames.base` with `at` / `size` / frame-relative tiles; `targetRect` [x, y, w, h]) | 18.5: Python matches TS; `selftest_colossus_art.py:200-204` updated; contract test |
+| 2a | No additive blend on the glow layer in TS | `ColossusView` sets `blendMode = 'add'` from the layer's `blend` |
+| 2b | Glow alpha 0.5 at rest | rest alpha from the json (glow 1.0), pulse 0.85-1.0; the constant at `colossusChoreography.ts:92` is removed |
+| 2c | No step shows the `crack` variant | non-form phases may name an `interlude` (validator). **B5:** the interlude id reaches the view through the existing message list. `checkBossPhases` pushes a `BattleMessage` with `interlude?: <id>` **in place of** the plain line, adding no state-machine lines. A phase that names an interlude does not `say` its message itself; the interlude shows it as its `message` step. F3's 0.25 phase gets `interlude: chaos_crack`: shake x1, flash white 4, `variant {layer: core, frame: crack}`, then the phase message. There is no `swap`; the total is pinned in `interludes.test`. F4's `colossusVariant: {core: open}` then shows `open` |
+| 3 | The pan start exposes F3's cut-off bottom edge (canvas 362 rows, not 520) | 18.4: geometry re-derived for 2700x1080 at scale 1; border rules; new pan limits and start; `rise` ends at the pan start |
+| 4 | The glow alpha-level rule fails on the extracted glow | moot: soft alpha is allowed (18.1); the selftest's 4-level check is replaced by the 18.7 checks |
+
+- **Bestiary (replaces 8's colossus preview):** the build writes a pre-composited **still** per colossus form,
+  `preview.png`: body + additive glow over the matching crop of `rim.webp` with the sky dim, Lanczos-fit offline into
+  940x720 and opaque. `BestiaryPreview` shows it centred at scale 1 (D-O21).
+
+### 18.9 Budget (Bedrock 17 of 80 used, *measured* in ROSTER_LOG; caps re-tabled, sum 80)
+
+| Purpose | Used | Cap (rev 4) | Planned in C3' |
+|---|---|---|---|
+| `v0` | 9 | 9 (closed) | 0 |
+| `f3_gen` | 0 | 12 | 0 (only if the user asks for a re-render) |
+| `f3_upscale` (new) | 0 | 6 | 1-2 |
+| `f3_nobg` | 0 | 4 | 0-1 |
+| `f2_gen` | 0 | 2 | 0 |
+| `f2_upscale` (new) | 0 | 2 | 0 |
+| `f2_nobg` | 1 | 4 | 0-1 |
+| `f4_variant` (search_replace, closed route) | 2 | **2** (closed; 2 freed to `reserve`, B7) | 0 |
+| `f4_inpaint` (new: open + crack) | 0 | 8 | 2-8 |
+| `reserve` | 5 | **31** | 0 (orchestrator only, F3 first; **only calls costing <= $0.08: no upscale from the reserve**, B7) |
+| **Total** | **17** | **80** | **about 3-12, ending at about 20-29 of 80** |
+
+- **Cost** (*estimate*, confirmed from the Bedrock pricing page at the first call and logged): Conservative Upscale
+  is about $0.25-0.40 per call, inpaint and remove_bg about $0.04-0.08.
+  - The planned C3' spend is about $1-2.
+  - **The true worst case for the remaining 63 calls (B7):** the upscales can only come from `f3_upscale` (6) and
+    `f2_upscale` (2), at most 8 x $0.40 = $3.20. Every other remaining call (55: `f3_gen` 12, `f3_nobg` 4, `f2_gen` 2,
+    `f2_nobg` 3, `f4_inpaint` 8, `reserve` 26) costs <= $0.08, at most $4.40. That totals **$7.60**, about $8.50 with
+    the $0.9 already spent.
+  - If the confirmed upscale price is p, the worst case is 8p + $4.40.
+  - Spent so far: about $0.9.
+- `budget.json` gets the new caps in one commit. `selftest_passv` and `budget --check` must stay green, and the A6
+  rule (an unknown purpose is refused) covers `f3_upscale`, `f2_upscale` and `f4_inpaint` only once they are listed.
