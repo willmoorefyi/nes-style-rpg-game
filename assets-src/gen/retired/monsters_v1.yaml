@@ -231,3 +231,13 @@
   sheet_seeds: {boss_attack: 1236, boss_cast: 1236, boss_attack_raise: 1235}   # boss_attack_raise 1234 (R69): guide line and box painted; boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
   # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
   retired_as: chaos_v1
+- id: dragon
+  size: large
+  prompt: >-
+    red dragon on four powerful clawed legs, crimson scales with darker red plating along the back, large bat-like
+    wings with dark red membranes, two backward-curving ivory horns, a row of pale bone spikes from head to tail, a
+    ridged cream belly, yellow slit eyes, a long jaw full of sharp teeth, a long tail ending in a spade tip
+  attack: lunging its long neck forward in a fierce bite, wings thrown up high, tail whipping behind
+  hurt: rearing back in pain, neck twisted away, wings half folded and flinching
+  seeds: [1234]
+  retired_as: dragon_v1
