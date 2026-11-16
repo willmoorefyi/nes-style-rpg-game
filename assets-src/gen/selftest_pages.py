@@ -83,13 +83,15 @@ V4_RESCALED = ("bigeyes", "shark", "minotaur", "ochu", "neochu", "hydra", "earth
                "water_elemental", "air_elemental", "hill_gigas", "fire_gigas", "ice_gigas", "dragon", "white_dragon",
                "blue_dragon", "green_dragon", "dragon_zombie", "white_shark", "minotaur_zombie", "fire_hydra", "deepeyes",
                "evil_eye")
+# V6 (REDESIGN_PLAN 4.2, D-V6 = C2): the redesigned chaos, boss band 200 shown at scale 3 (by design, not a rescale).
+V6_SCALED = ("chaos",)
 
 
 def run_scale(check: Callable[[bool, str], None]) -> None:
     """FW-S (docs/REDESIGN_PLAN.md 2.2, 7): gen/monster_scale.yaml -> the atlas sheet field `scale`, nothing else. On a
     two-sprite fixture build: an explicit {}, a missing file and a comment-only table give byte-identical pages and
     JSON; {goblin: 3} keeps every page byte-identical and adds only `"scale": 3` to goblin's JSON; a value of 4 or an
-    unknown sprite is refused. The real table (empty at V1) holds the 23 V4 sheets at 3 since V4 (REDESIGN_PLAN 2.4); it
+    unknown sprite is refused. The real table (empty at V1) holds the 23 V4 sheets at 3 since V4 (REDESIGN_PLAN 2.4) and chaos since V6 (D-V6 = C2); it
     names sprites the fixture lacks, so the fixture builds take explicit tables only."""
     import tempfile
     from gen import monster_atlas as MAT
@@ -97,7 +99,8 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     real = MAT.load_scale(set(json.loads(ATLAS_JSON.read_text())["sheets"]))
     check(all(v in MAT.DISPLAY_SCALES for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
                                                                  f"({len(real)} entries)")
-    check(real == {s: 3 for s in V4_RESCALED}, f"FW-S: the real table is the 23 V4 sheets at 3 ({sorted(real)})")
+    check(real == {s: 3 for s in V4_RESCALED + V6_SCALED},
+          f"FW-S: the real table is the 23 V4 sheets + chaos (V6) at 3 ({sorted(real)})")
     with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):
         t = Path(tmp)
 

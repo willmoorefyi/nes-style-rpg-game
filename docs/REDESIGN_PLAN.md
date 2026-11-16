@@ -1131,14 +1131,14 @@ first image; the acceptance is ">= 172 art px at scale 3" (4.2).
 - [x] V2 TS-2: per-sheet scale, lunge scaling once in getMonsterFrames, huge/titan classes, integer-scale passes + pass-4 refusal, layout_f1 byte-identity, TITAN_AREA, titan in place, bossTag titan, effect-anchor test; tests (high, 1d)
 - [x] V3 archive: retire.py for the 7 ids; docs/RETIRED_SPRITES.md rows; commit before each first paid request (high, 1h)
 - [x] V3 generate crazy_horse, piscodemon, black_knight, guardian, vampire (<= 3 each), log rows, approvals (high, 0.5d): R290-R296, 7 images
-- [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d): **paused at boss_idle 2 of 3** (R297, R298; the cutter drops the separate pieces), orchestrator decision pending
+- [x] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d): idle R313 (R309 re-cut with `keep_pieces` + `fit: headroom`), attack R316, cast R318, hurt R319
 - [x] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator (0 of 80, section 17); D-V6 re-confirm pending (orchestrator) (high, 1h)
 - [x] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d; ROSTER_LOG 'Pass V' V4: 22 SHIP / SHIP WITH NITS, dragon ITERATE escalated)
 - [x] V3 generate chaos idle -> attack -> cast -> hurt -> raise (<= 3 each; **C2 per D-V6 ruling after G-T0**: boss band 200, display scale 3); piece comparison per pose (high, 0.5d): R299-R308, 9 images, raise best of 3
-- [ ] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d)
-- [ ] V5 wave 2 rigs: vampire, hollow_seraph (cast), chaos (titan, cast + raise) (high, 2d)
-- [ ] TS-3 / TS-4: descriptions, lore, size labels, scenarios, formationFits data test (medium, 4h)
-- [ ] V6: final integration, section 11 validation, frame-rect diff == the 7 ids, docs (13) (high, 4h)
+- [x] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d): all locked
+- [x] V5 wave 2 rigs: vampire, hollow_seraph (cast), chaos (C2 boss band, cast + raise), plus the redrawn dragon (high, 2d): all locked
+- [x] TS-3 / TS-4: descriptions, lore, size labels, scenarios, formationFits data test (medium, 4h): V6 (descriptions of the 8 redesigned ids, seraph and chaos lore, `anim_pass_v_*` scenarios)
+- [x] V6: final integration, section 11 validation, frame-rect diff == the 8 redesigned ids (the 7 + dragon), docs (13) (high, 4h): `ROSTER_LOG.md` 'Pass V: V6'
 - [ ] V7: fresh adversarial play test; "Pass V test" rows (high, 4h)
 - [ ] V8: fix round if needed (plan, momus, fixes, re-test) (medium, 1-2d)
 ```
@@ -1179,6 +1179,6 @@ orchestrator's rulings on the open choices are in section 15.
 | Cached boss renders reaching >= 258 native at scale 1.0, grid mode | 0 of about 80 expected (momus: max 255) | **0 of 80** (every ledger boss render in the main-checkout cache; `out/gemini` held only duplicates). 75 grid mode, 5 no grid; 0 accepted by the fail-closed titan cut. Native figure height (the cut's mask) max 215 (hollow_seraph boss_cast, pitch 4.26), then 205, 202, 197, 193; chaos 165-181 (idle 173), lich 149-188 (idle 183), all chaos / lich at pitch 5.12. Pitches: 5.12 x63, 4.26 x6, 4.0 x3, 5.7-5.8 x4, 4.7, 3.42, 3.2, 3.04; the 3 renders finer than 3.5 px had no detectable grid (conf 0.10-0.39) |
 | Titan guide box | <= 914 guide px today (`monster.py:214`) | 914 guide px (capped; 278 x 5.33 = 1482 asked); = 178.5 art px at pitch 5.12, 214.6 at 4.26, 228.5 at 4.0, 267-301 at 3.0-3.4. Figures fill about 97 % of the box (chaos idle 173 of 178.5), so at the common pitch 5.12 a 258 figure needs a 1321 px box, larger than the 1024 guide |
 | D-V6 after G-T0 | C1 re-confirm or C2 | **C2** (orchestrator, 2026-11-16): boss band 200 at display scale 3; the C1 rows of this table stay unused |
-| Chaos box on screen, cell top with feet at 745 | 600x600, y 159 | |
-| Chaos bestiary plain-clamp shift | -6 px for h = 278 (0 for h <= 272); C2 about -2 px | |
-| Atlas page count after pass V | 10 planned under C1 | |
+| Chaos box on screen, cell top with feet at 745 | 600x600, y 159 | C2 (V6): 600x600 at scale 3 in `TITAN_AREA` (`layoutSizeOf`: a boss sheet at scale 3 is the titan class), cell top 145, idle top y 182, every frame's top >= 179 over a loop (browser), attacks in place |
+| Chaos bestiary plain-clamp shift | -6 px for h = 278 (0 for h <= 272); C2 about -2 px | C2 (V6): idle 187 art px (561 screen px, 1.52x the lich's 368): plain clamp, feet 770, centre -8.5 px (`bestiaryCentre` CLAMPED) |
+| Atlas page count after pass V | 10 planned under C1 | 9 (C2, V6): 2040x1872, 2048x1856, 2032x1200, 2048x1536, 2048x2000, 2008x768, 2048x2032, 2048x1152, 2048x1792 |

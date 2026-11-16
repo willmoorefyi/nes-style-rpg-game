@@ -69,6 +69,19 @@ approved sheet was cut with (approved sheets are copies, never re-cut). `frame_r
 `(x, y0, y1)` runs of 3+ edge pixels with no outline ink, open to the side: a slice) and `edges_ok`; `info["split"]`
 lists the moved pieces. Selftest: `selftest_cut.py`.
 
+**Pass V tools (docs/REDESIGN_PLAN.md).**
+- `cut:` options per `monsters.yaml` entry (no cache key change, so a ledgered render re-cuts at 0 images with
+  `generate.py --repixelize`): `keep_pieces: all_in_cell` keeps separate floating pieces inside the figure's cell
+  (`selftest_pieces.py`); `fit: headroom, top_margin: N` shrinks a figure that would reach above row N
+  (`selftest_headroom.py`).
+- `retire.py <id>` archives an approved sprite before its redesign (`approved/_retired/<id>_vN/`,
+  `anim/monsters/_retired/`, `retired/monsters_vN.yaml`); `--move-rig`, `--prune`, `--revive <id>_vN --as <new_id>`;
+  index `docs/RETIRED_SPRITES.md`; never built or checked (`selftest_retire.py`).
+- `monster_scale.yaml` (FW-S): per-sheet integer display scale (2 or 3) written into the atlas JSON `scale`; pixels,
+  rigs and locks unchanged. Since V6: the 23 rescaled sheets and chaos (D-V6 = C2).
+- FW-T titan band (`size: titan`, 300 cell, feet row 292, fail-closed cut; `monster.py --titan-probe`): in the
+  framework, unused (chaos is C2).
+
 ## Adding a character
 
 Add an entry to `characters.yaml` with `prompt` (costume only), `battle_gear`, `field_gear` and `seeds`. Generate,

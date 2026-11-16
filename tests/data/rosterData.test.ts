@@ -54,15 +54,17 @@ describe('roster data: coverage and numbering', () => {
     }
   });
 
-  it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6): huge sheets and bigeyes at scale 3, every other at 2', () => {
-    // V4: 22 tier-H `huge` enemies + bigeyes (`large`, FF1 large class) carry `scale: 3` from gen/monster_scale.yaml
+  it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6, 4.2): huge sheets, bigeyes and chaos at scale 3, every other at 2', () => {
+    // V4: 22 tier-H `huge` enemies + bigeyes (`large`, FF1 large class) carry `scale: 3` from gen/monster_scale.yaml;
+    // V6 (D-V6 = C2): chaos keeps `size: boss` (the 200 px boss band) and is shown at scale 3
     const scaleOf = (e: EnemyData): number => atlas.sheets[e.sprite ?? e.id].scale ?? atlas.scale;
     for (const e of enemies) {
-      const want = e.size === 'huge' || e.sprite === 'bigeyes' ? 3 : 2;
+      const want = e.size === 'huge' || e.sprite === 'bigeyes' || e.sprite === 'chaos' ? 3 : 2;
       expect(scaleOf(e), `${e.id} (${e.size ?? 'small'})`).toBe(want);
     }
     expect(enemies.filter((e) => e.size === 'huge').length).toBe(22);
     expect(byId('bigeyes').size).toBe('large');
+    expect(byId('chaos').size).toBe('boss');
   });
 });
 

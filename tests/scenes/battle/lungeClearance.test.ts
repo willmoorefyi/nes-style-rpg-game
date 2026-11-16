@@ -18,7 +18,9 @@ import type { EnemyData } from '../../../src/types/index.js';
 
 /** The clearance line: 4 px under the 120 px message window. */
 const CLEAR_Y = BATTLE_MESSAGE_HEIGHT + 4;
-const BOSS_SHEETS = ['garland', 'hollow_seraph', 'warmech', 'ashen_queen', 'lich', 'astos', 'chaos',
+// V6 (REDESIGN_PLAN 4.2, D-V6 = C2, D-V7): chaos is a boss sheet at scale 3, laid out as the titan class, and attacks
+// in place (its own case below), so it no longer travels to the hero
+const BOSS_SHEETS = ['garland', 'hollow_seraph', 'warmech', 'ashen_queen', 'lich', 'astos',
   'drowned_sovereign', 'death_eye'];
 
 /** One enemy per sheet and distinct (size, attackAnim, attack): what decides its layout and attack table. */
@@ -113,5 +115,12 @@ describe('a boss strike still lands after the clamp (defect 1)', () => {
     expect(centre, 'box centre').toBeGreaterThanOrEqual(hero.y);
     expect(centre, 'box centre').toBeLessThanOrEqual(PARTY_FEET_Y[0]);
     expect(s.y + (f.footRow + 1) * scale - PARTY_FEET_Y[0], 'feet gap').toBeLessThanOrEqual(100);
+  });
+
+  it('chaos (scale 3, the titan class) attacks every hero in place: travel 0, shown at 3 px per art px', () => {
+    const b = battle([enemyById('chaos')]);
+    for (const hero of b.party) expect(b.view.attackPlan(0, hero)).toEqual({ travel: 0, rise: 0 });
+    const f = atlasFrames('chaos')!;
+    expect((b.sprites[0].scale.x / f.artScale) * f.scale).toBe(3);
   });
 });

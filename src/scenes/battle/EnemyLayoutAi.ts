@@ -51,6 +51,14 @@ const ORDER: EnemySizeClass[] = ['titan', 'boss', 'huge', 'large', 'small'];
 /** The atlas screen scale of a sheet without its own (`monsters-ai.json` `scale`). */
 export const DEFAULT_SHEET_SCALE = 2;
 
+/** The layout class of an enemy: its data `size`, except that a boss sheet shown at scale 3 (chaos under D-V6 = C2,
+ *  docs/REDESIGN_PLAN.md 4.2: the 200 px boss band at display scale 3, a 600 px box) is laid out, hops and attacks in
+ *  place as the titan class (TITAN_AREA, travel 0). */
+export function layoutSizeOf(size: EnemySizeClass | undefined, sheetScale: number | undefined): EnemySizeClass {
+  const s = size ?? 'small';
+  return s === 'boss' && sheetScale === 3 ? 'titan' : s;
+}
+
 interface Column { size: EnemySizeClass; items: number[]; w: number; h: number }
 /** How a layout attempt packs its columns: by the cells (gap 24) or by the opaque extents (gap 16), and the whole
  *  screen scale each box is shown at (`target`; the layout factor is target / the sheet's scale). */

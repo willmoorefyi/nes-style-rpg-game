@@ -230,7 +230,7 @@
   name: Vampire
   num: 46
   tuned: true                # D4: keeps its tuned numbers
-  description: "A noble of the old dead who holds the Cavern of Earth. Its gaze locks the limbs of the living."
+  description: "A young noble of the old dead in a red-lined cape, who holds the Cavern of Earth. His red gaze locks the limbs of the living."
   protect: [status, poison_stone, death, earth]
   attackStatus: [stun]
   specials: [{id: dazzle, rate: 0.25}]
@@ -255,7 +255,7 @@
   name: Red Dragon
   num: 66
   tuned: true                # D4: keeps its tuned numbers
-  description: "A great fire wyrm that roosts in the hot places of the world. Its breath sweeps over a whole party."
+  description: "A great crimson dragon that rears upright on its hind legs, wings folded and horned head high. It roosts in the hot places of the world; its breath sweeps over a whole party."
   protect: [earth]
   statusWeak: [poison_stone]
   specials: [{id: blaze, rate: 0.5}]
@@ -357,7 +357,7 @@
 - id: crazy_horse
   name: Crazy Horse
   num: 4
-  description: "A wild horse driven mad by the Fiends' taint, a broken bridle still trailing. It kicks twice before you can raise a shield."
+  description: "A gaunt grey horse from another plane, bone spines down its back and yellow-green fire in its cracks and eyes. It kicks twice before you can raise a shield."
   stats:
     hp: 64
     strength: 8
@@ -901,7 +901,7 @@
 - id: piscodemon
   name: Piscodemon
   num: 32
-  description: "An anglerfish-headed demon that guards the marsh's sunken treasure. Its glowing lure draws the curious close."
+  description: "A hunched deep-sea horror with an octopus head, six face tentacles and glowing yellow eyes. It guards the marsh's sunken treasure."
   protect: [status, poison_stone]
   stats:
     hp: 84
@@ -2559,7 +2559,7 @@
 - id: black_knight
   name: Black Knight
   num: 104
-  description: "A knight in plain black plate who has forgotten whom he serves. His two-handed sword swings twice."
+  description: "A towering knight in jagged black plate, his horned helm's visor burning red. He has forgotten whom he serves; his greatsword swings twice."
   stats:
     hp: 260
     strength: 35
@@ -2607,7 +2607,7 @@
 - id: guardian
   name: Guardian
   num: 106
-  description: "A four-legged bronze sentinel with a single lens for an eye. Its spear arms numb what they strike."
+  description: "A four-legged war machine of gunmetal and rust that stalks like a hunting beast, three red eyes in its wedge head. Its scythe arms numb what they strike."
   protect: [status, poison_stone, death]
   attackStatus: [stun]
   stats:
@@ -2960,7 +2960,7 @@
 - id: hollow_seraph
   name: Hollow Seraph
   num: 119
-  description: "An empty suit of white armour under a broken halo, borne on six mechanical wings. She has stilled the winds of the world."
+  description: "A hollow shell of black steel and brass plates hovering apart around a clockwork heart, under a broken gear halo and four blade wings of light. She has stilled the winds of the world."
   protect: [earth]
   statusWeak: [poison_stone]
   specials: [{id: thunder, rate: 0.125}, {id: poison, rate: 0.125}, {id: blizzard, rate: 0.125}, {id: blaze, rate: 0.125}]
@@ -3241,7 +3241,7 @@
 - id: chaos
   name: Chaos
   num: 128
-  description: "The primordial titan at the end of the loop of time, fed by the four Fiends. It would end everything that has been."
+  description: "A colossal overlord in a star-flecked void robe, its head a crown of living flame ringed by the four Fiends' orbs. It waits at the end of the loop of time and would end everything that has been."
   protect: [status, poison_stone, death, earth, time]
   attackStatus: [stun]
   spells: [ice3, lit3, slo2, cur4, fir3, ice2, fast, nuke]

@@ -30,3 +30,6 @@ minotaur_zombie: 3
 fire_hydra: 3
 deepeyes: 3
 evil_eye: 3
+# V6 (docs/REDESIGN_PLAN.md 4.2, ruling D-V6 = C2 after G-T0): the redesigned chaos, cut in the normal 200 px boss band
+# (`size: boss` kept, no titan page group), shown at 3 screen px per art px so it is the largest monster on screen.
+chaos: 3

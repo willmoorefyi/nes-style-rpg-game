@@ -946,6 +946,48 @@
   gold: 100
   enemies: [goblin, goblin, goblin, goblin]
   background: assets/backgrounds/grassland.webp
+# Pass V (docs/REDESIGN_PLAN.md 8 TS-4, 12): the redesigned and rescaled sheets in battle. Open with
+# ?mute=1&scenario=<id> (&enemyAnim=loop to cycle every enemy's attack, hurt and cast).
+- id: anim_pass_v_regulars
+  name: Anim - the five pass-V regular redesigns
+  party: &pass_v_party
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: white_wizard, name: WWIZ, level: 30, equipment: [], spells: [{ id: cure, level: 1 }, { id: heal, level: 3 }] }
+    - { class: black_wizard, name: BWIZ, level: 30, equipment: [], spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [crazy_horse, guardian, piscodemon, black_knight, vampire]
+  background: assets/backgrounds/grassland.webp
+- id: anim_pass_v_seraph
+  name: Anim - the pass-V hollow_seraph alone
+  party: *pass_v_party
+  items: { potion: 3 }
+  gold: 100
+  enemies: [hollow_seraph]
+  background: assets/backgrounds/temple.webp
+- id: anim_pass_v_chaos
+  name: Anim - the pass-V chaos alone (scale 3), poisoned for the status icon
+  party: *pass_v_party
+  items: { potion: 3 }
+  gold: 100
+  enemies: [chaos]
+  enemyStatus: { 0: [poison] }
+  background: assets/backgrounds/evil_temple.webp
+- id: anim_pass_v_huge
+  name: Anim - three tier-H sheets (scale 3)
+  party: *pass_v_party
+  items: { potion: 3 }
+  gold: 100
+  enemies: [dragon, hill_gigas, green_dragon]
+  background: assets/backgrounds/desert.webp
+- id: anim_pass_v_mixed
+  name: Anim - two tier-L, one tier-H and three small
+  party: *pass_v_party
+  items: { potion: 3 }
+  gold: 100
+  enemies: [ogre, guardian, shark, goblin, black_knight, vampire]
+  background: assets/backgrounds/desert.webp
 
 # Pass F (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 12): the f_* scenarios for the feedback tranches. This file is frozen
 # after F0; later changes go through the orchestrator. Open with ?mute=1&scenario=<id> (add &battleStep=1 to step every

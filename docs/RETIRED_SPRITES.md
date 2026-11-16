@@ -43,3 +43,19 @@ One row per retired sprite (the generator adds each row, from the line `retire.p
 | `hollow_seraph_v1` | `hollow_seraph` | boss_idle, boss_attack, boss_cast, boss_hurt, boss_attack_raise | boss_idle `d0a454c671a5aa6d6415d916` (R25); boss_attack `0cede2c0d74f95ac6c94bb20` (R28); boss_cast `b1755fc7de941893455877e5` (R29/R32); boss_hurt `ae3a5b995c782c9115f90312` (R37); boss_attack_raise `d6093d88bccd3a2763233363` (R38/R41, unused by the rig, FW-R) | pass V redesign (REDESIGN_PLAN 4.1: a steampunk angel of separate hovering plates with four blade-of-light wings; the white-and-gold six-feathered-wing seraph is replaced) | rig + lock (locked; `halo` fx, `raise: false`) | `retire.py --revive hollow_seraph_v1 --as <new_id>` |
 | `chaos_v1` | `chaos` | boss_idle, boss_attack, boss_cast, boss_hurt, boss_attack_raise | boss_idle `fb4bd02e837ce1d90e7822d5` (R55); boss_attack `a53174205b082f2dd9915dd2` (R58/R59); boss_cast `d1d7f2cf7f40881cd74bd566` (R67); boss_hurt `b7905062c7067cc80e157701` (R68); boss_attack_raise `4231dfbf8167a1d0e608b9a8` (R70) | pass V redesign (REDESIGN_PLAN 4.2: a robed two-armed overlord with a flame crown and four orbs; the four-armed obsidian titan with shadow-flame wings is replaced) | rig + lock (locked; heavy raise set) | `retire.py --revive chaos_v1 --as <new_id>` |
 | `dragon_v1` | `dragon` | monster_large | monster_large `4647a60ad314a1ce2f3b375b` (act 1, `docs/ACT1_LOG.md`) | pass V redesign (orchestrator ruling 2026-11-16: the low, wide red dragon (idle 55 px) cannot read as a size step at the rescale factor 3; redrawn tall and upright) | rig + lock (locked) | `retire.py --revive dragon_v1 --as <new_id>` |
+
+## Replacements (pass V, integrated at V6)
+
+Every retired id above has its replacement approved, rigged and locked under the same id (`ROSTER_LOG.md` "Pass V");
+the archive copies are untouched and never built.
+
+| Retired id | Replacement (approved R-rows) | Rig | Display |
+|---|---|---|---|
+| `crazy_horse_v1` | an ash-grey otherworldly horse, bone spines, yellow-green cracks (R290) | locked (V5) | scale 2, `large` |
+| `piscodemon_v1` | a hunched octopus-headed deep-sea horror, six face tentacles (R291) | locked (V5) | scale 2, small |
+| `black_knight_v1` | a horned knight in jagged black plate, red visor, greatsword (R293) | locked (V5) | scale 2, small |
+| `guardian_v1` | a four-legged gunmetal war machine, three red eyes, scythe arms (R295) | locked (V5) | scale 2, `large` |
+| `vampire_v1` | the young noble vampire redrawn clean, red-lined cape (R296; act-1 page 0) | locked (V5), no fx part | scale 2, small |
+| `hollow_seraph_v1` | hovering black-steel and brass plates, clockwork heart, gear halo, four blade wings (idle R313 = R309 re-cut, attack R316, cast R318, hurt R319; no raise, D-V9) | locked (V5), `halo` fx | scale 2, `boss` |
+| `chaos_v1` | a two-armed overlord in a star-flecked void robe, flame-crown head, four Fiend orbs (idle R299, attack R300, cast R302, hurt R304, raise R306) | locked (V5) | scale 3, `boss` (D-V6 = C2) |
+| `dragon_v1` | the red dragon redrawn tall and upright (R320 = R312 re-cut with `fit: headroom`) | locked (V5) | scale 3, `huge` |

@@ -786,3 +786,58 @@ it (only scales 2 and 3 are allowed; the art is a low, wide ranged pose), so it 
 - **After R313-R320 (5edf948):** all 8 pass-V ids approved and complete (hollow_seraph and dragon rescued at 0 images by `fit: headroom` re-cuts of R309 / R312). Main-checkout `selftest.py`: **1 FAILED, outside the 9.4 table, for the framework owner:** `selftest_pieces.py:120-128` "keep_pieces RED: the default cut of R298 keeps 7 pieces" cuts R298 with the **live** hollow_seraph entry, which now carries `cut: {keep_pieces: all_in_cell, fit: headroom, top_margin: 10}`, so the "default" cut keeps 12 pieces; the fix is to strip `cut` from `char` for the plain cut (a framework-owned selftest; not edited by the generator).
 - Lessons: (1) **small bright features are lost in the colour cut** (piscodemon's yellow eyes cut cream, black_knight's visor 4-5 px and none in the attack, chaos's cyan / teal orbs white / grey in some poses): name them large, and expect rig `paint` fixes; (2) **very dark designs collapse to black** at 10 colours (black_knight R292): ask for dark grey with bright edges; (3) a **ground line joined to the feet survives the cut** (guardian R294): put "a ground line, a floor" in the negative; (4) **floating separate pieces are dropped** by `_figure_mask` unless they touch the main mass (seraph R298); (5) **orb counts drift in action poses** (chaos cast / hurt / raise: 5-6 orbs); naming each orb by colour and image side fixed the hurt, and leaving the head unchanged (attack) kept the count, but a raised-arms pose hides or adds orbs.
 - Fix-pass candidates: hollow_seraph (all 4 poses, 1 idle attempt left + 3 each for attack / cast / hurt); chaos boss_attack_raise (five orbs; sheet at 3 of 3, rig paint route); chaos orb colours in attack / cast (rig paint); black_knight attack visor (rig paint); piscodemon eye colour.
+
+### Pass V: V6 final integration (integrator, `roster-int`, 2026-11-16, 0 images)
+
+All 8 pass-V redesigns (crazy_horse, piscodemon, black_knight, guardian, vampire, hollow_seraph, chaos, dragon) are
+approved, rigged and locked (state E, 9.4); the archives are complete (`docs/RETIRED_SPRITES.md`, "Replacements").
+
+**Data.** `gen/monster_scale.yaml`: `chaos: 3` (D-V6 = C2; chaos keeps `size: boss`, the 200 px boss band, no titan
+page group). `layoutSizeOf` (`EnemyLayoutAi.ts`) lays a boss sheet at scale 3 out as the titan class: alone in
+`TITAN_AREA`, `TRAVEL_HOP` 0 and attacking in place (D-V7); without it the 600 px box did not fit the 545 px
+`ENEMY_AREA` and chaos fell to scale 2 (lich size). The dragon entry stays at 3. Piscodemon stats unchanged (D-V11).
+`enemies.yaml` descriptions rewritten for the 8 (ASCII, the stat flavour kept); `bestiary.yaml` lore: chaos page and
+hollow_seraph pages 1-3 describe the new looks (four blade wings, plates hovering apart, clockwork heart; the robed,
+flame-headed two-armed overlord). TS-4: `anim_pass_v_regulars`, `_seraph`, `_chaos` (poisoned, for the status
+icon), `_huge` (3 tier-H), `_mixed` (2 L + 1 H + 3 small) in `debug-scenarios.yaml`.
+
+**Measured heights (idle, opaque rows).**
+
+| Sheet | Art px | Scale | Screen px | vs |
+|---|---|---|---|---|
+| chaos | 184 x 187 | 3 | 552 x 561 | 1.52x the lich (185 x 184, 368 tall); ashen_queen 372, seraph 366, warmech 366 |
+| lich | 185 x 184 | 2 | 370 x 368 | |
+| dragon (red, redrawn) | 87 x 118 | 3 | 261 x 354 | 1.74x the ogre (85 x 102, 204 tall); troll 226; white 288, blue 288, green 294, dragon_zombie 228 |
+
+The red dragon now reads larger than the ogre and is the tallest dragon (it was 165 screen px, below the ogre, at V4).
+
+| Gate | Result |
+|---|---|
+| Atlas | 123 sheets, **9 pages** (2040x1872, 2048x1856, 2032x1200, 2048x1536, 2048x2000, 2008x768, 2048x2032, 2048x1152, 2048x1792), all <= 2048; the 14 act-1 sheets on page 0; page 8 grew 1696 -> 1792 |
+| Party atlases | byte-identical (`battle_ai`, `field_ai` rebuilt, `git diff --exit-code` clean) |
+| Determinism | `PYTHONHASHSEED` 0 and 1: all 10 `monsters-ai*` files identical to the first build |
+| Frame-rect diff vs 9fe129c | content changed on exactly the 8 redesigned sheets (13 frames each for the 6 regulars, seraph 17, chaos 22); every other sheet `same`; JSON-only: `idleBox` on all (FW-A2, after 9fe129c) and `scale: 3` on the 23 rescaled sheets (+ chaos, whose content also changed) |
+| `monster_anim.py check --all` | 123 `OK` (4 FWQ `aliased:` notes), nothing else |
+| `selftest.py --anim` | ALL PASSED, 705 ok checks |
+| `selftest.py` (worktree) | ALL PASSED, 1080 ok checks |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | exit 0; vitest 225 files, 4534 tests |
+
+**By-design test updates (commented in place).** `selftest_pages.run_scale`: the real table is the 23 V4 sheets +
+chaos. `rosterData`: chaos at scale 3 with `size: boss`. `EnemyLayoutAi`: the tier-L "nine at factor 1" set 26 -> 27
+(the new guardian's home art is 118 art px = 236 screen px; the hound was 274); the scaled-sheet list adds chaos
+(`layoutInput` mirrors `layoutSizeOf`: chaos is `titan` for the layout). `lungeClearance`: chaos leaves the boss
+"strike lands" list (it attacks in place) and gets its own travel-0 case. `bestiaryCentre`: chaos in `CLAMPED` (plain
+clamp, dy -8.5; the plan's C2 estimate was -2 for 183 art px); the C1 titan fixture pinned to scale 2.
+
+**Browser** (headless Chromium, dev server 127.0.0.1, every URL `mute=1`; `/tmp/v6/`):
+- Bestiary (`&enemyAnim=loop` and `&battleStep=1`): the 8 redesigns and shark, hill_gigas, white_dragon, bigeyes,
+  fire_hydra centred within 1 px of (512, 498); chaos shifted -8 px by the plain clamp (feet 770, top 209), shown whole.
+- Chaos alone (`sandbox=l30_lich&enemies=chaos&enemyAnim=loop`): scale 3, box 552 x 561, whole-px positions, highest
+  frame top y 179 (message window 120), in place; `scenario=anim_pass_v_chaos`: Fight damage numbers (73, 66) and FIRE
+  (8) drawn on its head below the window, the PSN target label and the poison bubbles on it, its attack in place.
+- hollow_seraph alone (loop): lunge to x 1371, highest top y 124 (the clearance line), wings whole.
+- Nine-crowd (ogre, troll, dragon, crazy_horse, gigas_worm, ogre_chief, shark, anaconda, minotaur): every box at
+  screen scale 2 (pass 3), whole px, no home overlap. `dragon, hill_gigas, green_dragon`: all three at scale 3, no
+  overlap; hill_gigas' lunge top 130.
+- The red dragon (ranged): its breath plays in place (x 559-896 over the loop, home 566-827).
+- No page errors or console errors in any run.

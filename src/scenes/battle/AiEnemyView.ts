@@ -2,7 +2,7 @@ import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { enemyBoxInput, travelTopOf } from '../../rendering/monsterAnchors.js';
-import { computeEnemyLayoutAi, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
+import { computeEnemyLayoutAi, layoutSizeOf, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
 import { EnemyPoseController, type AttackPlan, type Posture, type PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { TRAVEL_HOP, enemyReach } from './enemyReach.js';
@@ -86,7 +86,7 @@ export class AiEnemyView {
     const box = this.boxes[i];
     const b = this.base[i];
     const e = this.enemies[i];
-    if (!target || !f || !box || !b || e?.attack === 'ranged' || e?.size === 'titan') return { travel: 0, rise: 0 };
+    if (!target || !f || !box || !b || e?.attack === 'ranged' || layoutSizeOf(e?.size, f.scale) === 'titan') return { travel: 0, rise: 0 };
     const t = target.getBounds();
     // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions);
     // toLocal reads the layer's current transform (its cached worldTransform lags a move made since the last render,
@@ -112,8 +112,8 @@ export class AiEnemyView {
     this.release();
     this.holds = holds;
     const boxes = computeEnemyLayoutAi(this.enemies.map((e, i) => {
-      const size = e.size ?? 'small';
       const f = this.frames[i];
+      const size = layoutSizeOf(e.size, f?.scale);
       return f ? enemyBoxInput(size, f) : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
     }));
     this.base = [];
@@ -121,7 +121,7 @@ export class AiEnemyView {
     return this.enemies.map((e, i) => {
       const f = this.frames[i];
       this.poses.configure(i, { hasCast: f?.hasCast ?? false, hasRaise: f?.hasRaise ?? false, scaleFactor: boxes[i].scaleFactor,
-        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[e.size ?? 'small'], ...(f ? { lungePx: f.lungePx } : {}) });
+        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[layoutSizeOf(e.size, f?.scale)], ...(f ? { lungePx: f.lungePx } : {}) });
       return this.buildOne(e, f, boxes[i]);
     });
   }

@@ -11,7 +11,7 @@ import { Texture } from 'pixi.js';
 import { BOSS_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { monsterAnchors, type MonsterAnchors } from '../../src/rendering/monsterAnchors.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../src/rendering/BattleArt.js';
-import type { EnemyBoxInput, EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
+import { layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import type { MonsterArtSource } from '../../src/scenes/battle/AiEnemyView.js';
 import type { EnemyData } from '../../src/types/index.js';
 import { opaqueBounds } from './pngAlpha.js';
@@ -91,8 +91,9 @@ export const atlasArt: MonsterArtSource = { getMonsterFrames: atlasFrames };
 export function layoutInput(id: string): EnemyBoxInput {
   const e = enemyById(id);
   const s = atlas.sheets[monsterSpriteKey(e)];
-  const size: EnemySizeClass = e.size ?? 'small';
   const sc = sheetScale(monsterSpriteKey(e));
+  // as AiEnemyView: a boss sheet at scale 3 (chaos, D-V6 = C2) is laid out as the titan class
+  const size: EnemySizeClass = layoutSizeOf(e.size, sc);
   const box: EnemyBoxInput = { size, w: s.cell[0] * sc, h: s.cell[1] * sc, scale: sc };
   const a = monsterAnchors(s);
   if (a.homeX) { box.ox0 = a.homeX[0] * sc; box.ox1 = (a.homeX[1] + 1) * sc; }

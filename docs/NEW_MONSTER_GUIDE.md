@@ -124,6 +124,27 @@ thirds (`cut(..., split="thirds")`) and are never re-cut. `approve.py` writes `a
 **Log it** in the current run's table of `docs/ACT1_LOG.md` (`| # | <id>/<sheet> (seed) | 1 | measured result |
 decision |`, plus "Images used: N of 100"). Self-approve only if the user authorised it for the run.
 
+**Pass V lessons (redesigns, 2026-11-16; `docs/ROSTER_LOG.md` "Pass V").**
+- **Retire before you regenerate.** `retire.py <id>` and its commit come before the first paid request; `--move-rig`
+  (and a boss's `--prune`) go in the commit that approves the first new sheet, so no old rig ever runs on new pixels.
+  Add the `docs/RETIRED_SPRITES.md` row from the line `retire.py` prints. The archive is never built or checked; a
+  retired look comes back only through `retire.py --revive <id>_vN --as <new_id>`.
+- **Re-cut before you re-buy.** `cut:` options change no cache key, so a ledgered render that failed on headroom or on
+  dropped pieces is re-cut at 0 images (`generate.py --repixelize ...`). `fit: headroom` rescued hollow_seraph (R309
+  -> R313, `top_margin: 10`) and the red dragon (R312 -> R320, `top_margin: 4`) after both sheets were at 3 of 3.
+- **`keep_pieces: all_in_cell` for designs made of separate pieces** (the seraph's hovering plates and blade wings):
+  the default `_figure_mask` keeps the largest blob and blobs near its box and silently drops the rest (R298 lost its
+  wings). Ask in the prompt for each piece to touch or nearly touch the main mass, then compare render and cut piece by
+  piece before approving.
+- **Counts:** name every limb, wing or orb with its count and image side ("exactly two arms", "four blade wings, two
+  per side", each orb by colour); raised-arm poses still add or hide orbs (chaos raise: best of 3).
+- **Small bright features are lost in the 10-16 colour cut** (eyes, visor slits, orb colours): draw them large, and
+  plan rig `paint` fixes; very dark designs collapse to black: ask for dark grey with bright edges.
+- **Size tiers come from the display scale, not the cell:** a sheet in `monster_scale.yaml` at 3 must read larger than
+  the ogre (204 screen px) and its lesser siblings; a low, wide pose cannot (the old red dragon, 165 px at scale 3, was
+  redrawn upright). A boss sheet at scale 3 (chaos, D-V6 = C2) is laid out as the titan class: alone, in
+  `TITAN_AREA`, attacking in place (`layoutSizeOf`, `EnemyLayoutAi.ts`).
+
 ### 1.5 Wire it into the game
 
 1. Add `assets/data/enemies.yaml` with `sprite: <id>` (or a variant id), stats and rewards.

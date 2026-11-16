@@ -10,7 +10,9 @@
  * figure sat where a lone battle enemy stands (screen x 710), and the backdrop was centred on the screen (x 960).
  *
  * Clamps: a sheet whose reach clamp (12d, the in-place lunge) or plain clamp (feet line inside y 360-770) binds is named
- * in CLAMPED with its shift; no silent exceptions. Measured at the fix: none.
+ * in CLAMPED with its shift; no silent exceptions. Measured at the fix: none. V6 (REDESIGN_PLAN 4.2, rev 17): chaos (C2,
+ * idle 187 art px at scale 3 = 561 screen px) is clamped by the plain, feet at 770, centre 8.5 px above the panel's
+ * (the plan's C2 estimate for 183 art px was -2).
  */
 import { describe, it, expect } from 'vitest';
 import { Container, Sprite, Texture, TextureSource } from 'pixi.js';
@@ -30,8 +32,8 @@ import type { EnemyData } from '../../../src/types/index.js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const data = validateBestiary(parse(readFileSync(join(root, 'assets/data/bestiary.yaml'), 'utf-8')));
 const [CX, CY] = panelCentre(PREVIEW_INNER);
-/** Sheets whose clamp binds, with the measured shift of the figure centre from the panel centre (none today). */
-const CLAMPED: Record<string, { dx: number; dy: number }> = {};
+/** Sheets whose clamp binds, with the measured shift of the figure centre from the panel centre. */
+const CLAMPED: Record<string, { dx: number; dy: number }> = { chaos: { dx: 0, dy: -8.5 } };
 
 /** One enemy per sheet and attack variant (the bestiaryReach loop). */
 const variants = (() => {
@@ -155,7 +157,8 @@ describe('tier H and the titan in the bestiary', () => {
 
   it('a titan of the C1 maximum (278 art px) is clamped by the plain: feet at 770, shift -6', () => {
     const base = atlasFrames('chaos')!;
-    const titan: MonsterFrames = { ...base, cell: [300, 300], footRow: 292, idleBox: [21, 15, 278, 292], opaqueRight: 279,
+    // the C1 fixture is at scale 2 (the live chaos sheet is C2, scale 3, since V6)
+    const titan: MonsterFrames = { ...base, scale: 2, artScale: (base.artScale * 2) / base.scale, cell: [300, 300], footRow: 292, idleBox: [21, 15, 278, 292], opaqueRight: 279,
       homeX: [21, 278], travelTop: 15, lungeRight: 280 };
     const e = { ...enemyById('chaos'), size: 'titan' as const };
     const preview = new BestiaryPreview(new Container(), new CachedArt({ getMonsterFrames: () => titan }), never, data);

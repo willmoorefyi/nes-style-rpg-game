@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { computeEnemyLayoutAi, formationFits, ENEMY_AREA, TITAN_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { computeEnemyLayoutAi, formationFits, layoutSizeOf, ENEMY_AREA, TITAN_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
 import { seededRng } from '../../../src/scenes/battle/fx/emitterCore.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
@@ -142,13 +142,14 @@ describe('large crowds pack by their home art (defect 2)', () => {
     }
   });
 
-  it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (26 sheets, re-measured at V4)', () => {
+  it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (27 sheets, re-measured at V6)', () => {
     const large = [...new Set(enemyData.filter((e) => e.size === 'large').map((e) => monsterSpriteKey(e)))];
     const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) * sheetScale(k) <= 236);
     // 46 at fix pass 2 G4 (45 at F5 + white_shark; 118 art px at scale 2); V4 (REDESIGN_PLAN 2.6): the 20 of them now
     // `huge` (tier H) leave the large class: 26. bigeyes joins the large class at scale 3 but its home art is 87 x 3 =
-    // 261 screen px, so it is not in this set (nine bigeyes: the next case)
-    expect(s.length).toBe(26);
+    // 261 screen px, so it is not in this set (nine bigeyes: the next case). V6: the pass-V guardian (128 cell, home art
+    // 118 art px = 236 screen px; the retired hound was 274) joins the set: 27
+    expect(s.length).toBe(27);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);
@@ -186,12 +187,17 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   /** An enemy's layout input from the real data (V4: the sheet scale and size are in the atlas and enemies.yaml). */
   const rescaled = layoutInput;
 
-  it('the 23 rescaled sheets have scale 3 in the atlas and their V4 size in enemies.yaml; no other sheet has a scale', () => {
+  it('the 23 rescaled sheets and chaos have scale 3 in the atlas and their size in enemies.yaml; no other sheet has a scale', () => {
     for (const id of [...TIER_H, 'bigeyes']) {
       expect([layoutInput(id).size, layoutInput(id).scale], id).toEqual([id === 'bigeyes' ? 'large' : 'huge', 3]);
     }
+    // V6 (REDESIGN_PLAN 4.2, D-V6 = C2): chaos keeps `size: boss`, is shown at scale 3 and laid out as the titan class
+    expect(enemyData.find((e) => e.id === 'chaos')!.size).toBe('boss');
+    expect([layoutInput('chaos').size, layoutInput('chaos').scale]).toEqual(['titan', 3]);
+    expect([layoutSizeOf('boss', 3), layoutSizeOf('boss', 2), layoutSizeOf('huge', 3), layoutSizeOf(undefined, 3)])
+      .toEqual(['titan', 'boss', 'huge', 'small']);
     const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale !== undefined).sort();
-    expect(scaled).toEqual([...TIER_H, 'bigeyes'].sort());
+    expect(scaled).toEqual([...TIER_H, 'bigeyes', 'chaos'].sort());
   });
   const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
   const screenScales = (inputs: EnemyBoxInput[]) =>
