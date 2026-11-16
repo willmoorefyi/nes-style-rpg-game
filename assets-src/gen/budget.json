@@ -95,5 +95,20 @@
         "crazy_horse/monster_large": 5
       }
     }
-  ]
+  ],
+  "bedrock": {
+    "note": "Pass C (docs/CHAOS_FORMS_PLAN.md 5.1, 5.6, 6; user D-U5, D-U6, 2026-11-16): Stability-on-Bedrock calls, read only by bedrock.invoke (the BR ledger cache/bedrock_ledger.jsonl, one row per logical request) and colossus.py budget --check. cap 80 = the sum of per_purpose_caps; any purpose not listed is refused under pass C (A6), reserve needs reserve:<reason>. gemini_before = N_C0, the main-checkout Gemini attempts at C1: pass C makes no Gemini call (gem[N_C0:] == 0, no fallback). The Gemini guard (generate.check_budget) never reads this block.",
+    "pass": "C",
+    "cap": 80,
+    "per_purpose_caps": {
+      "v0": 12,
+      "f3_gen": 24,
+      "f3_nobg": 10,
+      "f2_gen": 8,
+      "f2_nobg": 4,
+      "f4_variant": 4,
+      "reserve": 18
+    },
+    "gemini_before": 405
+  }
 }

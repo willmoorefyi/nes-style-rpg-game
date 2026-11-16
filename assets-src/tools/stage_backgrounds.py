@@ -1,7 +1,6 @@
 """One-time remap of hand-made battle backgrounds onto the battle stage (docs/ART_BATTLE_PLAN.md).
 
-  python3 -I assets-src/tools/stage_backgrounds.py [--src DIR] [ID ...]   # default: every id; DIR defaults to
-                                                                          # ~/temp/ffgame-assets/tiles/backgrounds/hd
+  python3 -I assets-src/tools/stage_backgrounds.py [--src DIR] [ID ...]   # default: every id; `rim`: stage_rim.py
   python3 -I assets-src/tools/stage_backgrounds.py --check [ID ...] [--image FILE]   # measure CHECKS (see below)
 
 Each source (1536x1024) is scaled to the 1920 px screen width and shifted so its horizon (where the scenery meets the
@@ -221,9 +220,10 @@ def stage(src: Path, horizon: int, zoom: float = 1.0, align: str = "center", hor
 
 
 def main(argv: list[str]) -> None:
+    if "rim" in argv[1:]: return __import__("runpy").run_path(str(Path(__file__).with_name("stage_rim.py")))["main"](argv)  # noqa: E701
     ap = argparse.ArgumentParser(description="Stage hand-made battle backgrounds (see the module docstring).")
     ap.add_argument("ids", nargs="*", help="background ids to (re)stage; default: all of STAGES")
-    ap.add_argument("--src", default=DEFAULT_SRC, help="directory with the *-hd.png sources")
+    ap.add_argument("--src", default=DEFAULT_SRC, help=f"directory with the *-hd.png sources (default {DEFAULT_SRC})")
     ap.add_argument("--check", action="store_true", help="measure the committed images instead of staging")
     ap.add_argument("--image", help="with --check: measure this file instead of the committed one")
     args = ap.parse_args(argv[1:])

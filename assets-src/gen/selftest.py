@@ -473,6 +473,10 @@ def test_monster_anim() -> None:
     print("rig option hurt_from (FW-H: hurt_from: idle builds a boss's missing hurt key from the idle; HURT_FROM_ALLOW)")
     from gen import selftest_hurtfrom as SHf
     SHf.run_hurt_from(check)
+    print("pass C colossus framework (FW-C: BR ledger + gate inside bedrock.invoke, budget --check, pix, layers, glow, "
+          "bake, locks, the colossus stage, approve / retire --colossus, stage_rim)")
+    from gen import selftest_colossus as SCo
+    SCo.run_colossus(check)
     print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP

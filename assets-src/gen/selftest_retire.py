@@ -91,6 +91,7 @@ def run_retire(check: Callable[[bool, str], None]) -> None:
         _exclusion(check, gen)
         _gate(check, RT, tree)
         _revive(check, RT, tree)
+    _colossus(check, RT)
     _static(check)
     _real_tree(check)
 
@@ -296,6 +297,40 @@ def _revive(check, RT, tree) -> None:
 # ───────── static: no recursive glob over the approved or rig trees ─────────
 _RECURSE = re.compile(r"rglob\(|glob\(\s*[rbf]?[\"'][^\"']*\*\*")
 _TREES = re.compile(r"APPROVED|approved|RIGS|anim/monsters|\"anim\"\s*/\s*\"monsters\"|\bANIM\b")
+
+
+def _colossus(check, RT) -> None:
+    """retire.py --colossus (docs/CHAOS_FORMS_PLAN.md 5.5) on a fixture form: master, meta.json, layer yaml, lock and
+    cache keys archived as <form>_v1, idempotent, the next master as <form>_v2, a differing target refused, and the
+    colossus stage never reads the archive."""
+    from gen import colossus_build as CB
+    with tempfile.TemporaryDirectory() as tmp:
+        gen = Path(tmp) / "gen"
+        form = gen / "approved" / "chaos_forms" / "chaos_orrery"
+        form.mkdir(parents=True)
+        (form / "master.png").write_bytes(b"master-1")
+        (form / "meta.json").write_text(json.dumps({"cache_keys": ["k1"]}))
+        (gen / "colossus").mkdir()
+        (gen / "colossus" / "chaos_orrery.yaml").write_text("form: chaos_orrery\n")
+        (gen / "colossus" / "chaos_orrery.lock.json").write_text("{}\n")
+        (gen / "cache").mkdir()
+        (gen / "cache" / "k1.png").write_bytes(b"png")
+        tree = RT.Tree(gen)
+        rid = RT.retire_colossus(tree, "chaos_orrery")
+        arch = tree.archive / rid
+        names = sorted(p.relative_to(arch).as_posix() for p in arch.rglob("*") if p.is_file())
+        check(rid == "chaos_orrery_v1" and names == ["cache/k1.png", "chaos_orrery.lock.json", "chaos_orrery.yaml",
+                                                     "master.png", "meta.json"],
+              f"--colossus: master, meta.json, layer yaml, lock and cache keys archived as {rid} ({names})")
+        check(RT.retire_colossus(tree, "chaos_orrery") == rid, "--colossus: idempotent (the same bytes, the same id)")
+        (form / "master.png").write_bytes(b"master-2")
+        check(RT.retire_colossus(tree, "chaos_orrery") == "chaos_orrery_v2", "--colossus: a new master archives as _v2")
+        check(_refused(lambda: RT.retire_colossus(tree, "chaos_orrery", "chaos_orrery_v1"), "different bytes"),
+              "--colossus: an archive id holding different bytes is refused")
+        check(_refused(lambda: RT.retire_colossus(tree, "chaos_orrery", "chaos_v9")), "--colossus: a foreign id is refused")
+        check(CB.masters(gen / "approved" / "chaos_forms") == ["chaos_orrery"]
+              and CB.APPROVED == HERE / "approved" / "chaos_forms",
+              "--colossus: the colossus stage reads approved/chaos_forms/* only (the archive is approved/_retired)")
 
 
 def recursive_glob_hits(root: Path) -> list[str]:
