@@ -1,0 +1,130 @@
+# Black Knight v2 (pass V R293, docs/REDESIGN_PLAN.md 3.1): a horned gunmetal plate knight with a notched two-handed
+# greatsword. The keys are far apart (the attack is a downward cut, the hurt a stagger), so every in-between is a
+# translation-only copy of its source key (moves: []): the upper body, sword and hips move as one piece, the knees by
+# about half and the feet by at most 1 px (2 in atk_mid); the motion lives in the key switch.
+# fixmeasure.py switch (no rig): attack need 0.550 cap 6.0 d (5, 0), IoU 0.695; hurt d (0, 1), IoU 0.784.
+# Keyframe paint (FW-P): the attack key lost the crimson visor slit in the colour cut (ROSTER_LOG R293 nit); 5 px of
+# the idle's own visor colours restore it under the face plate, as in the idle and the hurt.
+sprite: black_knight
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: n
+attack_hand: n
+keyframes:
+  idle:
+    crown: [39, 7]
+    neck: [39, 20]
+    chest: [38, 28]
+    hip: [38, 45]
+    sh_n: [46, 22]
+    el_n: [47, 30]
+    hand_n: [46, 38]
+    sh_f: [24, 22]
+    el_f: [24, 32]
+    hand_f: [42, 40]
+    tip: [61, 4]
+    hip_n: [43, 48]
+    knee_n: [47, 59]
+    foot_n: [47, 72]
+    toe_n: [53, 74]
+    hip_f: [31, 48]
+    knee_f: [26, 60]
+    foot_f: [22, 72]
+    toe_f: [24, 75]
+  attack:
+    crown: [41, 9]
+    neck: [41, 22]
+    chest: [36, 31]
+    hip: [35, 46]
+    sh_n: [44, 25]
+    el_n: [42, 35]
+    hand_n: [38, 46]
+    sh_f: [22, 28]
+    el_f: [17, 36]
+    hand_f: [34, 46]
+    tip: [67, 68]
+    hip_n: [39, 50]
+    knee_n: [42, 62]
+    foot_n: [43, 72]
+    toe_n: [49, 74]
+    hip_f: [30, 48]
+    knee_f: [20, 62]
+    foot_f: [12, 72]
+    toe_f: [14, 75]
+  hurt:
+    crown: [31, 6]
+    neck: [33, 19]
+    chest: [35, 28]
+    hip: [36, 44]
+    sh_n: [46, 22]
+    el_n: [46, 30]
+    hand_n: [40, 38]
+    sh_f: [24, 25]
+    el_f: [20, 32]
+    hand_f: [37, 40]
+    tip: [61, 4]
+    hip_n: [43, 50]
+    knee_n: [47, 58]
+    foot_n: [50, 68]
+    toe_n: [55, 69]
+    hip_f: [31, 50]
+    knee_f: [24, 63]
+    foot_f: [21, 72]
+    toe_f: [24, 75]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # the upper body 1 px back: the coil starts
+    t: 0
+    moves: []
+    tweaks: {crown: [-1, 0], neck: [-1, 0], chest: [-1, 0], hip: [-1, 0], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0], tip: [-1, 0], hip_n: [-1, 0], hip_f: [-1, 0]}
+  atk_wind2:                   # 2 px back and 3 down (the coil), knees and feet 1 back
+    t: 0
+    moves: []
+    dy: 3
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-2, 0], hip: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-1, 0], knee_f: [-1, 0], foot_n: [-1, 0], foot_f: [-1, 0]}
+  atk_mid:                     # the cut key 3 px short (toward the idle) as one piece, knees and feet 2
+    t: 0
+    moves: []
+    tweaks: {crown: [3, 0], neck: [3, 0], chest: [3, 0], hip: [3, 0], sh_n: [3, 0], el_n: [3, 0], hand_n: [3, 0], sh_f: [3, 0], el_f: [3, 0], hand_f: [3, 0], tip: [3, 0], hip_n: [3, 0], hip_f: [3, 0], knee_n: [2, 0], knee_f: [2, 0], foot_n: [2, 0], foot_f: [2, 0], toe_n: [2, 0], toe_f: [2, 0]}
+  atk_follow:                  # the cut key 2 px further through (overshoot), knees and feet 1
+    t: 1.0
+    moves: []
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], hip: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], tip: [2, 0], hip_n: [2, 0], hip_f: [2, 0], knee_n: [1, 0], knee_f: [1, 0], foot_n: [1, 0], foot_f: [1, 0], toe_n: [1, 0], toe_f: [1, 0]}
+  atk_recover:                 # the idle 2 px back and 1 down (settling), knees and feet 1 back
+    t: 0
+    moves: []
+    tweaks: {crown: [-2, 1], neck: [-2, 1], chest: [-2, 1], hip: [-2, 1], sh_n: [-2, 1], el_n: [-2, 1], hand_n: [-2, 1], sh_f: [-2, 1], el_f: [-2, 1], hand_f: [-2, 1], tip: [-2, 1], hip_n: [-2, 1], hip_f: [-2, 1], knee_n: [-1, 0], knee_f: [-1, 0], foot_n: [-1, 0], foot_f: [-1, 0]}
+  hurt_in1:                    # flinch: the upper body and hips 2 back, the helm 3 (translated, feet planted)
+    moves: []
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-2, 0], hip: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-1, 0], knee_f: [-1, 0]}
+  hurt_in2:                    # from the hurt: the upper body 2 toward the idle, the hips 1
+    moves: []
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], tip: [2, 0], hip: [1, 0], hip_n: [1, 0], hip_f: [1, 0]}
+  daze:                        # slump: the helm nods 1 forward and down over a 1 px body sink, translated
+    moves: []
+    tweaks: {crown: [1, 1], neck: [1, 1]}
+  daze_b:
+    moves: []
+    tweaks: {crown: [1, 2], neck: [1, 2]}
+masks:
+  weapon:
+    idle: [[57, 2], [64, 3], [64, 8], [59, 19], [53, 31], [49, 36], [40, 36], [40, 33], [48, 19], [55, 5]]
+    attack: [[34, 46], [41, 46], [56, 56], [69, 66], [69, 72], [56, 72], [49, 67], [43, 63], [39, 61], [35, 56], [33, 50]]
+    hurt: [[57, 2], [64, 3], [64, 8], [58, 19], [50, 30], [45, 36], [38, 36], [39, 32], [48, 18], [55, 5]]
+  ft_n:
+    idle: [[41, 71], [57, 71], [57, 77], [41, 77]]
+    attack: [[37, 70], [53, 70], [53, 77], [37, 77]]
+    hurt: [[43, 66], [58, 66], [58, 71], [43, 71]]
+  ft_f:
+    idle: [[17, 71], [29, 71], [29, 77], [17, 77]]
+    attack: [[6, 69], [19, 69], [19, 77], [6, 77]]
+    hurt: [[16, 70], [29, 70], [29, 77], [16, 77]]
+holds: []
+paint:                         # FW-P: the attack visor slit (the idle's crimson (148, 24, 82) and dark (74, 0, 66))
+  - {frame: attack, xy: [[41, 17], [45, 17]], rgb: [74, 0, 66]}
+  - {frame: attack, xy: [[42, 17], [43, 17], [44, 17]], rgb: [148, 24, 82]}
