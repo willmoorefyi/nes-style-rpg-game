@@ -24,4 +24,7 @@ frames:
   atk_mid: {t: 0.20, moves: [neck, head, snout]}   # the attack mound is 8 px further left (the mound never moves)
   daze: {moves: [neck, head, snout], dy: 1}
   daze_b: {moves: [neck, head, snout], dy: 2}
+  # P2-2 (ROSTER_FIX_PLAN_2): any chain or head move toward idle folds the lower S arc over the curl (t 0.10: inner ink
+  # +25, the default +46 vs hurt; dy -2 +15); the recoil settles as the hurt S lifted 1 px (moves: [], dy -1: +1)
+  hurt_in2: {moves: [], dy: -1}
 holds: []

@@ -7,6 +7,9 @@ attack_hand: [n, n2, n3]       # the near (right-hand) set reaches toward the pa
 half_hand: [f, f2, f3]         # the far set (orb, open hand, blade) moves half as far
 cast_hand: [f, n]              # the two raised hands lift in cast_release
 weapon_hand: f3                # the sickle blade in the lowest far hand
+# N-4 (ROSTER_FIX_PLAN_2, FW-O): the approved hurt, attack and cast keys sit 8 / 3 / 3 px left of the idle coil and
+# altar (rows 170-198 left edge 20 / 25 / 25 vs 28); moved right so the coil stays planted
+key_offset: {hurt: [8, 0], attack: [3, 0], cast: [3, 0]}
 keyframes:
   idle:
     c_f: [40, 170]
@@ -44,10 +47,10 @@ keyframes:
     hand_f3: [60, 104]
     tip: [26, 76]
   attack:
-    c_f: [40, 170]
-    c_n: [125, 186]
-    alt: [133, 140]
-    tail0: [150, 187]
+    c_f: [37, 170]
+    c_n: [122, 186]
+    alt: [130, 140]
+    tail0: [147, 187]
     tail1: [160, 178]
     tail2: [160, 160]
     tail_tip: [156, 140]
@@ -79,10 +82,10 @@ keyframes:
     hand_f3: [52, 82]
     tip: [18, 50]
   cast:
-    c_f: [40, 170]
-    c_n: [125, 186]
-    alt: [133, 140]
-    tail0: [150, 187]
+    c_f: [37, 170]
+    c_n: [122, 186]
+    alt: [130, 140]
+    tail0: [147, 187]
     tail1: [161, 178]
     tail2: [163, 160]
     tail_tip: [157, 140]
@@ -114,10 +117,10 @@ keyframes:
     hand_f3: [55, 108]
     tip: [24, 78]
   hurt:
-    c_f: [40, 170]
-    c_n: [125, 186]
-    alt: [133, 140]
-    tail0: [148, 187]
+    c_f: [32, 170]
+    c_n: [117, 186]
+    alt: [125, 140]
+    tail0: [140, 187]
     tail1: [158, 170]
     tail2: [165, 145]
     tail_tip: [180, 112]
@@ -254,23 +257,23 @@ masks:
   streak:
     hurt: [[138, 114], [171, 110], [171, 125], [138, 125]]
 holds: []
-paint:                         # joint cracks and small enclosed gaps where crossing arms meet, closed with the
+paint:                         # (N-4: re-derived after key_offset: atk_mid, cast_* +3 px, hurt_in2 +8, hurt_in1 refitted)
+                               # joint cracks and small enclosed gaps where crossing arms meet, closed with the
                                # neighbouring approved colour (re-derived after every rig change)
   - {frame: atk_wind1, xy: [[83, 84]], rgb: [6, 4, 10]}
   - {frame: atk_wind2, xy: [[87, 93]], rgb: [6, 4, 10]}
-  - {frame: atk_mid, xy: [[83, 63], [84, 63], [82, 64], [83, 64], [85, 64], [86, 64], [88, 64], [87, 65]], rgb: [6, 4, 10]}
-  - {frame: atk_mid, xy: [[85, 63]], rgb: [41, 41, 49]}
-  - {frame: atk_mid, xy: [[86, 63], [87, 64]], rgb: [57, 49, 57]}
+  - {frame: atk_mid, xy: [[86, 63], [87, 63], [85, 64], [86, 64], [88, 64], [89, 64], [91, 64], [90, 65]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[88, 63]], rgb: [41, 41, 49]}
+  - {frame: atk_mid, xy: [[89, 63], [90, 64]], rgb: [57, 49, 57]}
   - {frame: atk_recover, xy: [[96, 55]], rgb: [49, 41, 49]}
   - {frame: atk_recover, xy: [[88, 88], [90, 88], [92, 88]], rgb: [6, 4, 10]}
-  - {frame: hurt_in1, xy: [[81, 55], [118, 81], [119, 81], [121, 81], [122, 81], [120, 82], [121, 82], [122, 82], [123, 82], [124, 82]], rgb: [6, 4, 10]}
-  - {frame: hurt_in1, xy: [[119, 82]], rgb: [33, 33, 41]}
-  - {frame: hurt_in2, xy: [[68, 87]], rgb: [33, 33, 41]}
-  - {frame: hurt_in2, xy: [[69, 87], [70, 87], [68, 88]], rgb: [6, 4, 10]}
-  - {frame: hurt_in2, xy: [[67, 88]], rgb: [49, 41, 57]}
+  - {frame: hurt_in1, xy: [[84, 54], [122, 81], [124, 81], [125, 81], [125, 82], [126, 82], [127, 82]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[76, 87]], rgb: [33, 33, 41]}
+  - {frame: hurt_in2, xy: [[77, 87], [78, 87], [76, 88]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[75, 88]], rgb: [49, 41, 57]}
   - {frame: daze, xy: [[88, 55], [89, 57]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[88, 58], [89, 60]], rgb: [6, 4, 10]}
   - {frame: cast_gather, xy: [[89, 51], [88, 52], [87, 53], [86, 54], [88, 55]], rgb: [6, 4, 10]}
-  - {frame: cast_rise, xy: [[113, 54]], rgb: [6, 4, 10]}
-  - {frame: cast_release, xy: [[74, 86], [75, 86], [72, 87], [73, 87], [74, 87], [70, 88], [72, 88]], rgb: [6, 4, 10]}
-  - {frame: cast_release, xy: [[71, 88]], rgb: [49, 41, 49]}
+  - {frame: cast_rise, xy: [[116, 54]], rgb: [6, 4, 10]}
+  - {frame: cast_release, xy: [[77, 86], [78, 86], [75, 87], [76, 87], [77, 87], [73, 88], [75, 88]], rgb: [6, 4, 10]}
+  - {frame: cast_release, xy: [[74, 88]], rgb: [49, 41, 49]}

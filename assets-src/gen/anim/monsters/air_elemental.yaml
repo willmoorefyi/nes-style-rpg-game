@@ -21,7 +21,9 @@ frames:
   atk_follow: {moves: [], t: 1.0, dx: 3, dy: -1}
   atk_recover: {t: 0.25, dy: -1}
   hurt_in1: {moves: [crown, neck], dx: -4, dy: -2}
-  hurt_in2: {moves: [crown, neck], dx: -2}
+  # P2-7 (ROSTER_FIX_PLAN_2): moving crown and neck toward idle swung the hurt rim's dark stroke across the funnel
+  # (inner ink +15 vs hurt); the head now only tilts 1 / 2 px back by tweak (+1)
+  hurt_in2: {moves: [], dx: -2, tweaks: {crown: [1, 2]}}
   daze: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [-1, -1], neck: [-2, -2], hand_n: [0, 2], el_n: [0, 1], hand_f: [0, 2], el_f: [0, 1]}}
   daze_b: {moves: [], t: 0.0, dy: 4, tweaks: {crown: [-1, -1], neck: [-2, -2], hand_n: [0, 3], el_n: [0, 2], hand_f: [0, 3], el_f: [0, 2]}}
 holds: []
