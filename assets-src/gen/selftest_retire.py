@@ -26,7 +26,8 @@ if __name__ == "__main__":
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
-REDESIGNED = ("crazy_horse", "piscodemon", "black_knight", "guardian", "vampire", "hollow_seraph", "chaos")
+# the pass-V ids (budget.json only_ids; dragon is the orchestrator's V3 addition)
+REDESIGNED = ("crazy_horse", "piscodemon", "black_knight", "guardian", "vampire", "hollow_seraph", "chaos", "dragon")
 SEED = "goblin"                          # the fixture sprite foo is a byte copy of it (sheet, rig, lock)
 
 
@@ -325,10 +326,12 @@ def _tracked(paths: list[Path]) -> bool:
 
 def _real_tree(check) -> None:
     from gen import retire as RT
+    from gen.selftest_passv import ONLY_IDS
     tree = RT.Tree()
+    check(list(REDESIGNED) == ONLY_IDS, f"real tree: REDESIGNED is pass V's only_ids ({REDESIGNED})")
     keys = [HERE / "cache" / f"{json.loads(j.read_text())['cache_key']}.{e}"
             for i in REDESIGNED for j in sorted((HERE / "approved" / i).glob("*.json")) for e in ("png", "json")]
-    check(bool(keys) and _tracked(keys), f"real tree: the cache files of the 7 redesigned ids' approved sheets are "
+    check(bool(keys) and _tracked(keys), f"real tree: the cache files of the {len(REDESIGNED)} redesigned ids' approved sheets are "
                                          f"git-tracked ({len(keys)} files)")
     done = []
     for sid in REDESIGNED:
