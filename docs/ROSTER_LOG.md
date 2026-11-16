@@ -985,6 +985,9 @@ size.
   the generator stopped before any Bedrock call and asks the user.** Options: (a) the user confirms that this Admin
   role in account 360323539990 may be used for `bedrock-runtime:InvokeModel` only (no resource created, modified or
   deleted), or (b) the user provides a least-privilege (Bedrock invoke / ReadOnly) profile. V0 has not started.
+- **User ruling (2026-11-16, relayed by the coordinator): the Admin-role `bedrock` profile is authorised for image
+  generation only**: Bedrock InvokeModel calls through `bedrock.py` within the pass-C caps; nothing created, changed
+  or deleted. V0-a and V0-b proceed with the current tooling; V0-e / V0-d wait for FW-C's `c2-fw` subcommands.
 
 **Rim backdrop (7.1, 7.2; 0 calls; done).**
 - `/tmp/stab2/sd35_v3_raw.png` copied to `assets-src/backgrounds/rim-src.png`, sha256
@@ -996,6 +999,41 @@ size.
 - `--check rim`: coverage 100.0 %, boss edge_delta 149.1 (>= 100), party band contrast 0.85 (>= 0.8), seam 27.6
   (<= 30): ok.
 
-**G-C0 report: not reached.** V0-a..e: not run (0 of 12 calls; budget --check OK, Bedrock 0 of 80, Gemini 405 =
-N_C0). No mocks. Recommendation: resolve the credential question first; then add the outpaint model id and the
-outpaint / search_replace / structure subcommands (FW-C, 0 paid) and run V0 as planned.
+**V0 calls (pass C BR ledger; one call per background command + Monitor; `budget --check` OK after each).**
+
+| # | Row | Model, seed | Prompt | Key | Cost (list, est.) | Verdict |
+|---|---|---|---|---|---|---|
+| C1 | V0-a | core, 3101, 21:9 (2304x960) | v1 = the 5.3a seed (`gen/colossus/chaos_horizon.prompt_v1.txt`) | `0b3bc1ad44f6505d9cf75109` | ~$0.04 | **FAIL (0 of 5)**: a landscape (mountain ridges, desert, starfield) with a cracked black-gold dome on a tiered machine tower and three small planets; no being, no eclipse/corona, no arms, no fissure. "horizon", "edge of the universe" and "mountain ranges" read as scenery; the "plain dark grey background" was ignored |
+| C2 | V0-a | sd35, 3102, 21:9 (1536x640) | v2 (`gen/colossus/chaos_horizon.prompt.md`: one isolated creature, chest-up bust, scenery words negated) | `69c0713a627616eec1b77876` | ~$0.08 | **FAIL (2 of 5)**: a generic black-rock golem, full figure with legs, on a flat periwinkle background with a ground strip, about half the frame wide. Present: a glowing chest fissure (ember, not white-hot), two arms. Missing: shoulder ranges, the eclipse head and corona (it has a **face-like head with glowing eyes**: close to the 3.5 "helmeted head" look-alike), the four moons, the hand grip. Already chunky pixel art (~16 render px blocks, about 96 native px across) |
+
+Bedrock calls: **2 of 80** (V0 2 of 12; V0-a 2 of its 3). Cost so far about $0.12. Gemini 405 = N_C0.
+
+**V0-c (offline, 0 calls; illustrative only, on the failed C2 render).** C2 colour-keyed against its flat background
+(distance > 60; not `remove_bg`), the ground strip dropped, `colossus.py pix --scale 3` (900x520) and `--scale 2`
+(1350x780), mocks on the staged rim with the party, the message window and the bottom strip
+(`gen/out/colossus/review/chaos_horizon_v0c_sd35_3102_{s3,s2}{,_nofloor}.png`):
+- At the planned place (-390, -300) with floorFront, only a 250 px slab of torso shows above the horizon (y 120-370):
+  coverage of the field above the horizon 73.5 %, 66.7 % of columns fully covered (criterion 100 %); visible
+  fraction 35.6 %; edge contrast 155 (>= 100). It does not read as a being: the design depends on the overhang hand
+  and a wide, head-at-the-top composition that C2 lacks.
+- Head at the field top, no floorFront (`_nofloor`): a huge golem filling x 330-1830 and the whole field height;
+  the party stays readable in front of it. It reads as the biggest thing in the game but as a large golem, not a
+  planet-sized being; scale 2 and 3 look the same because C2's own ~16 px blocks set the pitch (each block becomes
+  ~27 screen px at scale 3): a pitch problem for any SD 3.5 "pixel art" render.
+- V0-c is **not judged** (no render passed V0-a).
+
+**V0-b, V0-d, V0-e: not run.** V0-b needs a V0-a render that passes; V0-d / V0-e wait for FW-C's `c2-fw`.
+
+**G-C0 report.**
+- V0-a: **2 of 2 renders rejected**, two rejections in a row (5.3a stops F3 generation until the wording is fixed
+  offline and the orchestrator agrees). Under 5.2 "V0-a fails twice" is the D-U6 stop condition, so **the generator
+  stopped and asks for a ruling before spending V0-a's third call**. The plan's no-Gemini rule (D-U6) stands.
+- Findings: Core turns the scene words into a landscape and ignores the background instruction; SD 3.5 follows
+  "isolated creature on a flat background" but defaults to a generic golem with a face, and drops the eclipse, the
+  corona and the moons. Neither drew the planned "bust filling the frame edge to edge".
+- Recommendation: (1) the orchestrator rules whether C1 + C2 count as "fails twice" (stop and report to the user) or
+  whether the third V0-a call (cap 3) is spent on a v3 wording. If it is: SD 3.5 (it obeyed the isolation and
+  background words), a shorter prompt that leads with the eclipse ("a colossal black eclipse sun with a blazing
+  corona of flame as its head, set on enormous rocky shoulders...") and moves "no face, no eyes, no legs" into the
+  negative, and asks for a "half-length bust, the bottom of the image cutting through its chest". (2) For V0-c, the
+  mock needs the overhang hand drawn in front of the floor (the rigger's layer) to judge the planned composition.

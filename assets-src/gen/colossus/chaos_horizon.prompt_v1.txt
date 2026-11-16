@@ -1,0 +1,20 @@
+# chaos_horizon (F3, "Chaos, the Last Horizon"): docs/CHAOS_FORMS_PLAN.md 3.0, 5.3, 5.3a (the prompt seed, v1)
+
+Original design (3.5): no face on a sphere (the head is an eclipse), no horns, wings, throne, helmet or ringed planet.
+
+## prompt
+16-bit SNES-era pixel art, a world-sized cosmic colossus rising over the horizon at the edge of the universe, seen
+from the front, filling the frame edge to edge: its two shoulders are vast mountain ranges of black stone with gold
+seams curving away like the rim of a planet, its body a crust of black stone plates veined with glowing ember
+fissures and gold, thin bands of rose and violet nebula cloud drifting across its shoulders and chest; in place of a
+head a perfect black eclipse disc ringed by an enormous corona of ember orange, gold and white flame streamers, two
+tiny white star-points deep in the disc; a vast vertical fissure down the middle of its chest, white-hot at the
+centre and gold at the edges; its right hand, a colossal hand of black-gold stone with five ridged claws, grips the
+near edge of the ground at the bottom right; four small glowing moons in front of its chest, one frost cyan, one
+ember orange, one abyss teal, one storm white; plain flat dark grey background, no ground, no scenery, hard pixel
+edges, flat cel shading, light from the upper left.
+
+## negative_prompt
+face, mouth, nose, human face, helmet, horns, wings, tail, throne, tree, planet with a face, ringed planet, legs,
+feet, weapon, text, watermark, frame, border, scenery, landscape, mountains in the background, sky, stars in the
+background, photorealistic, 3d render, blurry, small subject, cropped head with a face.

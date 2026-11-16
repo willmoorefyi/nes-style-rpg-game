@@ -1,0 +1,4 @@
+{"event": "request", "ts": "2026-11-16T13:28:17", "tool": "colossus.py", "model": "core", "purpose": "v0", "seed": 3101, "key": "0b3bc1ad44f6505d9cf75109", "pass": "C"}
+{"event": "result", "key": "0b3bc1ad44f6505d9cf75109", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-16T13:29:15", "tool": "colossus.py", "model": "sd35", "purpose": "v0", "seed": 3102, "key": "69c0713a627616eec1b77876", "pass": "C"}
+{"event": "result", "key": "69c0713a627616eec1b77876", "ok": true, "served": "stability.sd3-5-large-v1:0"}
