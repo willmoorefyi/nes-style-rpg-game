@@ -1,0 +1,69 @@
+{
+  "approved": "2026-11-16, user ruling (structure render C4 + face removal C6 = the F3 look; docs/ROSTER_LOG.md Pass C - C3); fresh image-only review SHIP WITH NITS, nits fixed offline",
+  "art_size": [
+    900,
+    362
+  ],
+  "cache_keys": [
+    "d95ade61d71a34a63f132b44",
+    "1411f3b8f9ac434f8e17c2d6",
+    "2a8b813b7505e5aadf6cfef1"
+  ],
+  "chain": [
+    {
+      "call": "C4 structure",
+      "control": "assets-src/gen/colossus/chaos_horizon_control.png (top 720 rows)",
+      "control_strength": 0.85,
+      "key": "d95ade61d71a34a63f132b44",
+      "prompt_file": "assets-src/gen/colossus/chaos_horizon.structure.prompt.md (s2)",
+      "seed": 4102
+    },
+    {
+      "call": "C6 search_replace",
+      "edit": {
+        "grow_mask": 8,
+        "negative_prompt": "face, eyes, mouth, skull, mask, head",
+        "output_format": "png",
+        "prompt": "a perfectly empty, featureless, pitch-black eclipse disc, a flat hole of pure black void, nothing inside it",
+        "search_prompt": "the stone face with glowing eyes inside the black disc",
+        "seed": 4201
+      },
+      "key": "1411f3b8f9ac434f8e17c2d6"
+    },
+    {
+      "call": "C7 remove_bg",
+      "key": "2a8b813b7505e5aadf6cfef1"
+    }
+  ],
+  "display_scale": 3,
+  "finish": {
+    "cut": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_nobg.png",
+    "disc": [
+      898,
+      340
+    ],
+    "disc_r": 92,
+    "grid": "902x362 -> crop (1, 0, 901, 362); art = render / 2 (+2 rows: the cut top 240 lands on art row 122)",
+    "levels": [
+      10.0,
+      221.0
+    ],
+    "palette_problems": [],
+    "raw": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png",
+    "size": [
+      900,
+      362
+    ]
+  },
+  "finish_script": "assets-src/gen/colossus/chaos_horizon_finish.py",
+  "form": "chaos_horizon",
+  "glow": "glow.png (corona, additive, GLOW_LEVELS/GLOW_COLOURS)",
+  "notes": "no floorFront: drawn over the far floor, party in front; disc centre art (449, 172); torso base behind the bottom strip",
+  "pix": "assets-src/gen/out/colossus/chaos_horizon/f3_finish/master.png",
+  "proposed_place": [
+    -390,
+    -224
+  ],
+  "render_px_per_art_px": 2,
+  "title": "Chaos, the Last Horizon (F3)"
+}
