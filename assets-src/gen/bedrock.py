@@ -42,7 +42,12 @@ MODELS = {
     "style_guide": "us.stability.stable-image-style-guide-v1:0",
     "remove_bg": "us.stability.stable-image-remove-background-v1:0",
     "search_replace": "us.stability.stable-image-search-replace-v1:0",
+    "inpaint": "us.stability.stable-image-inpaint-v1:0",  # masked inpaint (colossus.py inpaint, F4; AWS Bedrock docs)
     "outpaint": "us.stability.stable-outpaint-v1:0",      # inference profile only (us-west-2, ROSTER_LOG Pass C - C2)
+    # upscale (colossus.py upscale; listed read-only in us-west-2 by the orchestrator, FW-C rim fix)
+    "upscale_conservative": "us.stability.stable-conservative-upscale-v1:0",
+    "upscale_creative": "us.stability.stable-creative-upscale-v1:0",
+    "upscale_fast": "us.stability.stable-fast-upscale-v1:0",
 }
 
 _client = None
