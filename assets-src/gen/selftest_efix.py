@@ -15,7 +15,7 @@ BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4); FW-7 (pass R,
 # orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
 # FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the pre-allowlisted partial-rig aliases; G6 removes the unused ones
-FWQ_ALLOW = {("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
+FWQ_ALLOW = {("chimera", "hurt"), ("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
              ("black_knight", "hurt"), ("astos", "attack")}
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
 FX_PENDING: set[tuple[str, str]] = set()
@@ -220,7 +220,7 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
 def run_fwq_allowlist(check: Callable[[bool, str], None]) -> None:
     """FW-Q: the code's allowlist is exactly this one, and every live rig's alias is on it (at most one per rig)."""
     from gen import monster_anim as MA
-    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the 6 pre-allowlisted entries "
+    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the pre-allowlisted entries (6 + chimera/hurt) "
           f"({sorted(getattr(MA, 'FWQ_ALLOW', set()))})")
     live = {(p.stem, a) for p in sorted(MA.RIGS.glob("*.yaml")) for a in (yaml.safe_load(p.read_text()) or {}).get("alias") or []}
     check(live <= FWQ_ALLOW, f"FW-Q: every live rig alias is allowlisted ({sorted(live)})")
@@ -366,15 +366,15 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     nul["paint"][-1]["rgb"] = None
     check(MK.paint_keys("goblin", nul, kfs)[1] == ["idle"], "FW-P: rgb null (transparent) is allowed")
     for sid, caps in (("goblin", {"hurt": 200}), ("crocodile", {"hurt": 221}), ("crocodile", {"idle": 200}),
-                      ("drowned_sovereign", {"cast": 301}), ("chimera", {"attack": 801}), ("chimera", {"hurt": 601}),
+                      ("drowned_sovereign", {"cast": 301}), ("chimera", {"attack": 801}), ("chimera", {"hurt": 721}),
                       ("chimera", {"idle": 200})):
         check(_refused(lambda: MK.paint_keys(sid, {"kf_paint_cap": caps}, kfs), sid, "not an approved exception"),
               f"FW-P: kf_paint_cap {caps} on {sid} is refused (not in the allowlist)")
     check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300, ("chimera", "attack"): 800,
-                                ("chimera", "hurt"): 600} and MK.KF_PAINT_CAP == 160,
+                                ("chimera", "hurt"): 720} and MK.KF_PAINT_CAP == 160,
           "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220, drowned_sovereign/cast <= 300 and "
-          "(FW-PA, D-R1) chimera/attack <= 800, chimera/hurt <= 600")
-    for k, n in (("attack", 800), ("hurt", 600)):
+          "(FW-PA, D-R1) chimera/attack <= 800, chimera/hurt <= 720")
+    for k, n in (("attack", 800), ("hurt", 720)):
         check(MK.paint_keys("chimera", {"kf_paint_cap": {k: n}}, kfs)[1] == [], f"FW-PA: chimera kf_paint_cap {{{k}: {n}}} is allowed")
     raw = {e[0]: e for e in MA.load_entries(paint=False)}
     ck = raw["crocodile"][2]

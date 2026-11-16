@@ -30,7 +30,7 @@ KF_PAINT_CAP = 160
 # orchestrator-approved per-sprite caps (ROSTER_FIX_PLAN.md 10: rev 3 and rev 15 rulings; ROSTER_FIX_PLAN_2.md 12
 # D-R1, FW-PA: the chimera's second dragon head erased from its attack and hurt keys); nothing else may raise one
 KF_PAINT_ALLOW = {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300, ("chimera", "attack"): 800,
-                  ("chimera", "hurt"): 600}
+                  ("chimera", "hurt"): 720}  # hurt raised 600 -> 720 (orchestrator, round 2: measured erase >= 689 px)
 # rev 15: drowned_sovereign/cast is a colour remap only: every patched pixel is opaque and stays opaque
 KF_REMAP_ONLY = {("drowned_sovereign", "cast")}
 OUTLINE = (6, 4, 10)
