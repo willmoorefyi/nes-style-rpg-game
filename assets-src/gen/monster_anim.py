@@ -52,19 +52,29 @@ def load_entries(paint: bool = True) -> list[tuple[str, dict, dict[str, Image.Im
             frames[i] = frames[i].transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         entries.append((meta["character"], meta, dict(zip(meta["poses"], frames))))
     for idle_meta in sorted(APPROVED.glob("*/boss_idle.json")):
-        if not all(idle_meta.with_name(f"boss_{p}.json").exists() for p in ("idle", "attack", "hurt")):
+        has = {p: idle_meta.with_name(f"boss_{p}.json").exists() for p in ("idle", "attack", "hurt")}
+        # FW-H: an allowlisted rig's `hurt_from: idle` stands in for the missing approved hurt (monster_keys)
+        derive = MK.hurt_from(idle_meta.parent.name, load_rig(idle_meta.parent.name))
+        if derive and has["hurt"]:
+            raise ValueError(f"rig {idle_meta.parent.name}: hurt_from with an approved boss_hurt (drop one of them)")
+        if not (has["idle"] and has["attack"] and (has["hurt"] or derive)):
             print(f"monsters_ai: {idle_meta.parent.name} boss poses incomplete, skipped")
             continue
         poses = ["idle", "attack", "hurt"] + [p for p in ("cast", "attack_raise")      # optional boss keyframes
                                               if idle_meta.with_name(f"boss_{p}.json").exists()]
         metas, frames = [], {}
         for p in poses:
+            if p == "hurt" and derive:
+                continue
             path = idle_meta.with_name(f"boss_{p}.json")
             m = json.loads(path.read_text())
             f = Image.open(path.with_suffix(".png")).convert("RGBA")
             frames[p] = f.transpose(Image.Transpose.FLIP_LEFT_RIGHT) if 0 in m.get("flip_frames", []) else f
             metas.append(m)
         frames, meta = pad_keyframes(frames, {**metas[0], "poses": poses})
+        if derive:
+            frames = {p: frames[p] if p != "hurt" else frames[derive].copy() for p in poses}
+            meta = {**meta, "kf_derived": {"hurt": derive}}
         entries.append((metas[0]["character"], meta, frames))
     out = []
     for sid, meta, frames in entries:

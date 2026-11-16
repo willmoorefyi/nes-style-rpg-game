@@ -466,6 +466,13 @@ def test_monster_anim() -> None:
           "R309, R310-R312; default unchanged)")
     from gen import selftest_headroom as SHr
     SHr.run_headroom(check)
+    print("cutter option match_height (cut: {match_height: idle, tolerance: t}: an action pose scaled to the idle's "
+          "height +- t; user ruling 2026-11-16, R328; default unchanged)")
+    from gen import selftest_match as SMh
+    SMh.run_match(check)
+    print("rig option hurt_from (FW-H: hurt_from: idle builds a boss's missing hurt key from the idle; HURT_FROM_ALLOW)")
+    from gen import selftest_hurtfrom as SHf
+    SHf.run_hurt_from(check)
     print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP

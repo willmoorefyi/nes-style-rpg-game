@@ -52,6 +52,13 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
   already clear of row N is cut unchanged; no cache key changes, so a ledgered attempt re-cuts at 0 images with
   `generate.py --repixelize out/gemini/<id>/<seed> --sheets <sheet>`, which says whether `approve.py` can approve it
   (`selftest_headroom.py`).
+- **Size is normalised, never a rejection reason** (user ruling 2026-11-16): a pose too big or too small is resized in
+  the pipeline, not rejected or regenerated. Per-pose sprites: `cut: {match_height: idle, tolerance: 0.10}` (or an
+  integer px reference; combinable with `keep_pieces` and `fit: headroom`) scales an action pose whose figure is
+  outside the approved boss_idle's height +- tolerance, nearest-neighbour, to the nearer band edge (feet on the feet
+  row, every piece kept, capped by the headroom rows); a pose inside the band and the idle are cut unchanged; a
+  non-integer nearest scale stair-steps diagonals (an upscale doubles single rows, worse than a shrink); no cache key
+  changes, re-cut at 0 images with `--repixelize` (R328: 183 -> 150 px against the 138 px idle; `selftest_match.py`).
 - **Titan** (`size: titan`, FW-T, chaos only): per-pose, 300x300 cell, feet row 292, figure 258-278 art px (top row
   >= 15). The cut is fail-closed: a render that would need a rescale (`info["scale"] != 1.0`) or has no detectable pixel
   grid (mode not `grid`) raises, and the attempt counts as rejected. Check cached renders offline first:
@@ -260,6 +267,7 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
 | `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220, drowned_sovereign/cast <= 300 (a remap), chimera/attack <= 800 and chimera/hurt <= 600), approved-palette colours or `null`, locked as `kf:<key>` |
 | `key_offset: {key: [dx, dy]}` | FW-O: move an approved key by whole px (<= 12, nothing may leave the cell; before keyframe paint, also with `--raw`); its joints, `masks.*.<key>` and keyframe paint are written in the unmoved art and translated with it; in-between paint is not moved (re-derive it); locked as `kf:<key>` (ashen_queen coil, N-4) |
+| `hurt_from: idle` | FW-H: a per-pose boss with no approved `boss_hurt` gets its hurt key from the padded idle key (only `HURT_FROM_ALLOW` = hollow_seraph, orchestrator ruling after R329 / R330); give `keyframes.hurt` joints, make the recoil with `key_offset` / keyframe `paint` on `hurt`; the hurt in-betweens and daze are generated, the derived key is locked as `kf:hurt`; refused with an approved hurt (`selftest_hurtfrom.py`) |
 | `alias: [hurt]` or `[attack]` | FW-Q partial rig: that sequence's in-betweens are not generated and resolve to their source keys (as keyframe-only); daze and the rest stay generated; `check` prints `OK (aliased: <seq>; ...)`; only `FWQ_ALLOW` sheets (`monster_anim.py`, pinned in `selftest_efix.py`), one per rig |
 | `raise: false` | FW-R: drop the approved `attack_raise` key (cell kept): no raise frames, `hasRaise: false`, the heavy glint `tip` from `atk_wind2` (hollow_seraph, D-F1) |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |

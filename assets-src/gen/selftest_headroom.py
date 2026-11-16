@@ -90,13 +90,16 @@ def _pieces(frame: Image.Image, least: int) -> list[int]:
 
 
 def _entry(cid: str) -> list[dict]:
-    """The entries that may plan a ledgered attempt's key: the live monsters.yaml entry and, while the redesign is
-    parked, its pass-V text in retired/pending_<id>.yaml."""
+    """The entries that may plan a ledgered attempt's key: the live monsters.yaml entry, while the redesign is parked
+    its pass-V text in retired/pending_<id>.yaml, and once the sprite is redesigned again its archived text in
+    retired/monsters_v<N>.yaml (hollow_seraph R309 is the hollow_seraph_v2 text since V8 F4)."""
     from gen import generate as GEN
     out = [GEN.load_character(cid)]
-    pend = HERE / "retired" / f"pending_{cid}.yaml"
-    if pend.exists():
-        out += [{**e, "kind": "monster"} for e in yaml.safe_load(pend.read_text()) if e.get("id") == cid]
+    texts = [HERE / "retired" / f"pending_{cid}.yaml"] + sorted((HERE / "retired").glob("monsters_v*.yaml"))
+    for path in texts:
+        if path.exists():
+            out += [{**{k: v for k, v in e.items() if k != "retired_as"}, "kind": "monster"}
+                    for e in yaml.safe_load(path.read_text()) or [] if e.get("id") == cid]
     return out
 
 
@@ -191,7 +194,7 @@ def run_headroom(check: Callable[[bool, str], None]) -> None:
             e1 = {**e, "cut": {**(e.get("cut") or {}), "fit": "headroom", "top_margin": n}}
             k1 = GEN.plan_request(e1, GEN.SHEETS[sheet], seed, "gemini", None).key
             planned.append((k0, k1))
-        if name in ("R309", "R312"):          # the parked pass-V texts are these attempts' (R310 / R311 were reworded)
+        if name in ("R309", "R312"):          # the parked / archived pass-V texts are these attempts' (R310 / R311 reworded)
             check((key, key) in planned, f"headroom: {name}'s entry re-plans key {key} with and without the option "
                                          f"(approve.py finds it cached) {planned}")
 
