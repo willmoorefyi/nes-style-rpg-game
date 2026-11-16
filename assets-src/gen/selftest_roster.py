@@ -157,14 +157,32 @@ def run_roster(check: Callable[[bool, str], None]) -> None:
 FIENDS = ("ashen_queen", "drowned_sovereign", "hollow_seraph")
 
 
+def approved_metas(root: Path) -> list[Path]:
+    """The approved jsons, one level deep (approved/<id>/*.json): approved/_retired/<id>_vN/ is never listed."""
+    return sorted(root.glob("*/*.json"))
+
+
+def revived_ok(meta: dict, cache: Path) -> bool:
+    """FW-RT revival (docs/REDESIGN_PLAN.md 5): a json with `revived_from` was approved under the old id and prompt, so
+    it is checked against the archived key's committed cache file instead of a re-plan."""
+    key = meta.get("cache_key")
+    return bool(key) and (cache / f"{key}.png").is_file() and (cache / f"{key}.json").is_file()
+
+
 def _approved_keys(check: Callable[[bool, str], None]) -> None:
     """Every approved request (approved/*/*.json) re-planned from today's code and yaml reproduces its cache key."""
     from gen import generate as GEN
     have_style = GEN.STYLE_REF.exists()       # character sheets send the style reference (gen/refs, not committed)
-    metas = [json.loads(p.read_text()) for p in sorted((GEN.HERE / "approved").glob("*/*.json"))]
+    metas = [json.loads(p.read_text()) for p in approved_metas(GEN.HERE / "approved")]
     bad, done, skipped = [], 0, 0
     for meta in metas:
         cid = meta.get("character") or meta.get("kit")
+        if meta.get("revived_from"):
+            done += 1
+            if not revived_ok(meta, GEN.CACHE):
+                bad.append(f"{cid} {meta['sheet']}: revived from {meta['revived_from']}, cache/{meta.get('cache_key')} "
+                           "missing")
+            continue
         char = GEN.load_character(cid)
         if not (GEN.is_monster(char) or GEN.is_kit(char)) and not have_style:
             skipped += 1

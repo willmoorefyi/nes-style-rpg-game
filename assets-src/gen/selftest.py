@@ -249,6 +249,11 @@ def test_style_lock() -> None:
     for path in sorted((HERE / "approved").glob("*/*.json")):
         meta = json.loads(path.read_text())
         meta.setdefault("character", meta.get("kit"))       # kit sheets are keyed by kit id
+        if meta.get("revived_from"):                         # FW-RT revival: the archived key's committed cache file
+            from gen import selftest_roster as SRo
+            check(SRo.revived_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: revived from "
+                                                   f"{meta['revived_from']}, cache/{meta['cache_key']} present")
+            continue
         char = GEN.load_character(meta["character"])
         req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
         check(req.key == meta["cache_key"] and req.cached,
@@ -440,6 +445,9 @@ def test_monster_anim() -> None:
     print("pass V budget guard (FW-V0: 50 new, 3 per sheet, only_ids, only_sheets, consistency, history never read)")
     from gen import selftest_passv as SPV
     SPV.run_passv(check)
+    print("retired sprites (FW-RT: retire.py archive / prune / move-rig / revive, approve gate, exclusion proof)")
+    from gen import selftest_retire as SRt
+    SRt.run_retire(check)
     print("roster pass R prompt fields (FW-9: idle_negative, body, base; every approved key unchanged)")
     SRo.run_prompts(check)
     print("FW-5 templates (biped wings, extra arm pairs, multi-head necks, preset mechanical)")

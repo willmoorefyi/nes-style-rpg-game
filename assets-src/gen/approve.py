@@ -19,7 +19,10 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE.parent))
 
 from gen import generate as GEN  # noqa: E402
+from gen import retire as RT  # noqa: E402
 from gen import spec as S  # noqa: E402
+
+APPROVED = HERE / "approved"
 
 
 # hand-made fixes stored in an approved sheet's .json that a re-approval must not drop
@@ -44,6 +47,24 @@ def _monster_cell(png: Path, geom) -> tuple[int, int]:
     return (w // geom.layout[0], h // geom.layout[1])
 
 
+def overwrite_gate(cid: str, sheet_name: str, new_png: Path, approved: Path | None = None) -> None:
+    """FW-RT (docs/REDESIGN_PLAN.md 5): a monster sheet or boss pose (`monster_*`, `boss_*`; party, field and kit sheets
+    are not gated) may replace approved/<id>/<sheet>.png only when the new bytes are identical, or a byte-identical copy
+    of the old file exists under approved/_retired/<id>_vN/ (retire.py; a sheet approved in pass V needs
+    `retire.py <id> --as <id>_v2` first)."""
+    if not sheet_name.startswith(("monster_", "boss_")):
+        return
+    root = approved or APPROVED
+    old = root / cid / f"{sheet_name}.png"
+    if not old.exists() or old.read_bytes() == new_png.read_bytes():
+        return
+    if RT.has_archived_copy(RT.Tree(root.parent), cid, old.name, old.read_bytes()):
+        return
+    raise SystemExit(f"refused: approved/{cid}/{old.name} would be overwritten and has no byte-identical copy under "
+                     f"{root / '_retired'}/{cid}_vN/; run retire.py {cid} first (a sheet approved in pass V: "
+                     f"retire.py {cid} --as {cid}_v2)")
+
+
 def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
             flip_frames: dict[str, list[int]] | None = None) -> Path:
     char = GEN.load_character(cid)
@@ -55,7 +76,9 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     if not req.cached:
         raise SystemExit(f"{cid}/{sheet_name}: request {req.key} is not cached; generate and review it first")
     src = GEN.OUT / "gemini" / cid / str(seed)
-    dst = HERE / "approved" / cid
+    dst = APPROVED / cid
+    if not GEN.is_kit(char):
+        overwrite_gate(cid, sheet_name, src / f"{sheet_name}.png")
     dst.mkdir(parents=True, exist_ok=True)
     if GEN.is_kit(char):
         # kit sheet: the cut 48 px tiles plus the cell table the map compiler slices by (assets-src/tools/kit.py)
