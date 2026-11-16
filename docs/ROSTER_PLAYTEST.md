@@ -278,3 +278,60 @@ Nits (not filed): chaos robe folds / stars invisible at 1x; guardian attack eye 
 
 - No P0. One P1 (P1-1, crazy_horse idle does not meet user goal 2). Eight P2s (P2-1 .. P2-8; P2-8 pre-existing).
 - Goals: 1 MET, 2 PARTLY, 3 MET, 4 PARTLY (guardian MET; piscodemon and black_knight PARTLY), 5 MET, 6 PARTLY, 7 MET; red dragon MET.
+
+---
+
+## V8 re-test (W5), 2026-11-16
+
+Scope: `roster-int` at f49aaa9 (123 sheets, 9 pages), against the V7 tested commit 711c5c0. Fresh tester, own dev server (127.0.0.1:5491) and headless Chromium (Playwright scripts), every URL with `mute=1`; server stopped afterwards.
+Evidence (local, not committed): `/tmp/vpt5/` (`strips/<id>.png` every atlas frame now, `ostrips/<id>.png` the same at 711c5c0, `best/<id>_*.jpg` bestiary, `best_changed.json`, `best_reg.json`, `bt/{regulars,seraph,chaos}/` step loops (`battleStep=1&enemyAnim=loop`), `p_*.json` per-frame sprite records, `fx/c1_*` (real-time chaos fight), `fx2/f_*` (the same fight stepped, 4 frames per shot), `fx3/g_*` (goblin / ogre / dragon fight), `sb_*.jpg` sandbox, `fps.txt`, `regress.txt`, `z/*` crops and montages; scripts in `js/` and `*.py`).
+
+Automated pre-pass:
+- Frame diff vs 711c5c0 (`regress.txt`): 118 sheets byte-identical in every frame; changed exactly black_knight (paint, 75-93 px per frame), chaos (the five raise frames gone, atk_wind1/2 redrawn), crazy_horse (cell 128 -> 132 wide), hollow_seraph (cell 218 -> 200 wide), piscodemon (cell 80 -> 82 wide). No new or missing sheet.
+- Bestiary (23 entries: the 9 changed / compared plus 14 unchanged): the idle box centre is on the panel centre (512, 498) to the pixel in all, chaos at dy -8 as in V7; the art of every frame of a 160-step loop stays inside the panel. The 14 unchanged entries have the same sprite boxes as V7.
+- FPS (GPU-backed headless, 10 s `enemyAnim=loop`): 9 ogres / trolls (= `anim_crowd`) 120.5 median (p2 107.5); chaos alone 120.5 (p2 107.5); crazy_horse + piscodemon + black_knight + hollow_seraph 120.5 (p2 107.5).
+- No console error or warning in any bestiary entry, scenario or fight, except the intended sandbox refusal warning.
+
+### A. V7 findings
+
+| # | V7 finding | Verdict | Evidence |
+|---|---|---|---|
+| P1-1 | crazy_horse: an ordinary gaunt grey horse in idle / attack / daze | **FIXED** | New art in all 13 frames: a bare skull head with a glowing yellow-green eye, a black smoke mane and tail, smoke-tendril hooves, a row of bone spines and ribs along the back, and bright yellow-green cracks over the body in idle, attack and daze (not only in hurt). At 1x in battle and in the bestiary it reads as an undead demon steed; the horse outline is still there, and the skull, smoke and cracks read without zooming. The head-down charge in the attack shows the skull. Distinct from nightmare (pale bone vs a black horse with a blue flame mane). Nits: on grass the yellow-green cracks have less contrast than on stone; crazy_horse now looks more monstrous than the stronger nightmare (not a defect, it is still clearly a different creature). `strips/crazy_horse.png` vs `ostrips/crazy_horse.png`, `z/ch_best_1x_zoom2.png`, `z/reg_ch_3.png` (attack), `z/reg_ch_16.png` (hurt), `z/nm.png`, `bt/regulars/s_0000.jpg` |
+| P2-1 | piscodemon not terrifying | **FIXED** (nit) | Dark slate-teal hunched brute with a domed head, narrow slanted orange eyes and 5-6 face tentacles that fan out in the attack and hurt frames. Reads as menacing (the sad round eye is gone). Distinct from mindflayer (hunched and armoured vs a slim purple figure in a black robe). Nit: a small sheet (106 x 146 px on screen), so the eyes are a few pixels wide at 1x, and the dark palette has low contrast on dark backgrounds. `strips/piscodemon.png`, `z/reg_pisc_x3.png`, `z/pisc_vs_mf.png`, `best/piscodemon_screen.jpg` |
+| P2-2 | black_knight: round horns read as ears; tiny visor glow | **FIXED** (nit) | The painted horns are pointed, pale, curve up and out: they read as horns at 1x in all 13 frames. A magenta T visor (slit and bar) reads in the 3x zoom; at 1x it is a magenta spot in the black helm. Heavy, horned, faceless: menacing at 96 x 150 px. Nit: the T shape itself needs a zoom. `strips/black_knight.png`, `z/reg_bk_x3.png`, `best/black_knight_screen.jpg` |
+| P2-3 | hollow_seraph: blades read as cream swords; body not hollow | **FIXED** | Four hilt-less blades of pale cold blue light on brass struts, two up and two down, in all 17 frames: they read as wings of light, not swords. The helm, breastplate, gauntlets and skirt float apart with dark gaps between them, and in the cast keys the chest opens on a white light: reads as hollow, floating armour. Heavy-attack red telegraph reads; lunge top 128 (>= 124). Hurt (taken from the idle, shifted (-3, 2) art px, with 116 px of visor and heart dimming): it reads as a hit because the visor slit and chest light go dark and the runtime shake shows, but there is no flinch pose (nit). The cast_gather -> cast_rise key change is a visible pose switch (wings raised, chest opens), by design. A new P2 on size is below (N-1). `strips/hollow_seraph.png`, `best/hollow_seraph_screen.jpg`, `z/m_seraph.jpg`, `z/sera_hurt.jpg`, `z/sera_v7_v8.jpg` |
+| P2-4 | chaos heavy-attack raise: doubled arms, head sinks into the chest | **FIXED** | The raise frames are gone from the atlas (`regress.txt`). The heavy sequence plays `idle atk_wind1 atk_wind2 atk_mid attack atk_follow atk_recover` with a red pulse as the telegraph, which reads. The flame head's top is at art y 19-22 in every attack frame (idle 20): it never sinks. Two arms in every frame; the attack key's banded arm is a little bulkier than the idle's, with no doubling. `strips/chaos.png`, `z/m_chaos.jpg`, `p_chaos.json` |
+| P2-5 | chaos damage number on the poison icon and top orb | **FIXED** | On poisoned chaos the numbers (2, 108, 25) spawn below the green drop with a clear gap of about 25 screen px; no overlap with the icon row in any frame. The number still lies over the top orb, which is art (accepted, as noted in the brief). `z/c1_num_15.png`, `z/c1_num_21.png`, `fx/c1_*` |
+| P2-6 | FIR2 flames tiny at chaos's robe hem | **FIXED** | Stepped capture: about 10 large flames rise over the robe, waist and shoulders, followed by the red tint. They are plainly visible on the black robe. The real-time capture (120 ms sampling) caught only 1-3 flames, a sampling artefact. `z/fir2_stepped.jpg`, `fx2/f_052.jpg`, `fx2/f_054.jpg` |
+| P2-7 | sandbox: 6-9 tier-H silently shrink | **FIXED** | `sandbox=l30_lich&enemies=<9 tier-H>`: the sandbox stays on its menu, warns `sandbox: formation does not fit at an integer scale >= 2: dragon, white_dragon, ...` and pushes no battle; pressing Fight! again refuses again, with the same warning. The 6 tier-H start at screen scale 2 (the D-O10 nit, by design). The 3-huge formation (scale 3) and the mixed six (2, 2, 3, 2, 2, 2) start. Note: the refusal shows only in the console, with no message on screen (D-O7 as ruled; dev only). `sb_H9.jpg`, `sb_H9_press.jpg`, `sb_H6.jpg`, `sb_H3.jpg`, `sb_MIX.jpg` |
+| P2-8 | bestiary Weak runs into Resist | **FIXED** | dragon: "Weak  Ice, Poison/Stone" takes the full row and Resist moves to the next line; no overlap. hollow_seraph (Weak Poison/Stone, Resist Fire, Ice, Bolt), vampire, sahagin_chief, blue_dragon, shark: no overlap. `best/dragon_screen.jpg`, `z/weak_rows.jpg` |
+
+No-status fight (`sandbox=l30_lich&enemies=goblin,ogre,dragon`, Fight x4): numbers 143 (ogre), 70 and 294 (red dragon), 46 (goblin) appear at and over each head and rise as in V7 (the F6 change applies only with an icon; the commit's no-icon path is unchanged). `z/g_nums.jpg`, `fx3/g_*`.
+
+### B. Regression sample
+
+- 10+ unchanged sheets (goblin, wolf, ogre, troll, lich, garland, astos, warmech, death_eye, green_dragon, plus vampire, shark, blue_dragon, nightmare, mindflayer, death_knight, dragon): byte-identical to 711c5c0; bestiary centred, sprite boxes as in V7 (astos only moved page in the atlas). guardian and vampire in `anim_pass_v_regulars`: unchanged and clean.
+- Lunge tops in `anim_pass_v_regulars`: 235-285 (no enemy near the window).
+
+### C. New findings
+
+| # | Sev | Kind | Enemy | Finding | Repro (`http://127.0.0.1:<port>/?mute=1&...`) | Evidence |
+|---|---|---|---|---|---|---|
+| N-1 | P2 | art / size | hollow_seraph | The regenerated boss is about 25 % smaller than in V7: idle art 336 x 276 px on screen vs 426 x 366 (the cell went from 218 to 200 wide and the body is shorter). It is now clearly smaller than the other late bosses (lich 370 x 368, garland 336 x 378, warmech 360 x 366) and only a little taller than the ogre (204), which weakens the "angel of doom" presence. | `bestiary=hollow_seraph`; `scenario=anim_pass_v_seraph` | `z/sera_v7_v8.jpg`, `best_changed.json` vs `/tmp/vpt4/best_centre.txt` |
+| N-2 | P3 | layout (observation) | crazy_horse | The wider V8 sheet (home art 126 art px) no longer fits a crowd with tier-H sheets, so the sandbox refuses it (the reason f49aaa9 moved nightmare into the layout test's crowd). Nine crazy_horse still lay out at screen scale 1 (pass 4, allowed for scale-2 sheets, as before). No authored encounter uses crazy_horse yet. | `sandbox=l30_lich&enemies=crazy_horse x9` | `sb_CH9.jpg` |
+
+Nits (not filed): seraph hurt has no flinch pose (lights dim plus shake only); black_knight T visor and piscodemon eyes need a zoom at 1x; crazy_horse cracks have less contrast on grass; the sandbox refusal has no on-screen message; chaos number over the top orb (art).
+
+### D. The user's pass-V goals
+
+| # | Goal | Verdict | Evidence |
+|---|---|---|---|
+| 2 | crazy_horse much more evil and otherworldly, a weaker nightmare-steed, clearly not "just a horse", distinct from nightmare | **MET** | skull head, glowing eye, smoke mane and hooves, spines and glowing cracks in every frame at 1x; distinct from nightmare (P1-1) |
+| 4 | piscodemon a terrifying junior mind-flayer; black_knight terrifying even at small size (guardian MET in V7) | **MET** (nits) | piscodemon: slanted glowing eyes, dark palette, fanned tentacles, distinct from mindflayer; black_knight: pointed horns and a glowing visor at 150 px. Both are menacing rather than truly terrifying at their small size (P2-1, P2-2 nits) |
+| 6 | hollow_seraph hollow, disconnected, modern-robotic steampunk angel of doom with metallic blade-of-light wings | **MET** (one P2) | four blade-of-light wings on brass struts, floating disconnected armour, open light-filled chest in the cast; the presence is weakened by the smaller size (N-1) |
+
+### Status
+
+- 9 V7 items re-tested (P1-1, P2-1 .. P2-8): **9 FIXED**, 0 NOT FIXED, 0 REGRESSED. No-status numbers unchanged. Regression sample clean.
+- No P0, no P1. New: one P2 (N-1, hollow_seraph about 25 % smaller than in V7) and one P3 observation (N-2).
+- Goals 2, 4 and 6: MET (4 with nits, 6 with N-1). Plan 4.3 done criterion (P1-1 FIXED, every P2 FIXED or a decided nit, no new P0 / P1): **met**.
