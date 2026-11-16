@@ -44,6 +44,12 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
 - **Bosses** add `size: boss`, `per_pose: true`, `design_ref: false`, `action_prompt` and `cast`: one request per pose,
   200x200 cell, feet on row 192. Optional: `extra_negative`, `haze: true` (mist keyed out), `sheet_seeds: {boss_attack:
   1235}` (redraw one pose, other cache keys unchanged). `floating: true` = one shared offset, no ground line.
+- **Titan** (`size: titan`, FW-T, chaos only): per-pose, 300x300 cell, feet row 292, figure 258-278 art px (top row
+  >= 15). The cut is fail-closed: a render that would need a rescale (`info["scale"] != 1.0`) or has no detectable pixel
+  grid (mode not `grid`) raises, and the attempt counts as rejected. Check cached renders offline first:
+  `python3 -I assets-src/gen/monster.py --titan-probe <raw.png ...>`.
+- **Display scale** (FW-S): only integer screen scales. A sheet listed in `assets-src/gen/monster_scale.yaml`
+  (`{sprite: 3}`, values 2 or 3) gets that `scale` in the atlas JSON; pixels, rigs and locks are unchanged.
 - New entries get prompt rev 3 (omit `prompt_rev`). **Reuse first:** a `variant` costs 0 images and inherits every rig
   frame; a new enemy on an existing `sprite:` costs nothing.
 
@@ -65,8 +71,13 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
   `--max-paid` (default 1) per run: **one request per review checkpoint**.
 - Every attempt is logged in `assets-src/gen/cache/ledger.jsonl` *before* the call; failures count as spent. A second
   attempt at the same id+sheet needs `--retry`, which needs **user approval**.
-- `assets-src/gen/budget.json` is the run cap: 100 images after `attempts_before` (26 used on 2026-11-14),
-  `max_attempts_per_sheet: 3`. Only the user can raise it.
+- `assets-src/gen/budget.json` is the run cap (pass V since 2026-11-16: 50 images after `attempts_before` 367,
+  `max_attempts_per_sheet: 3`, the open pass's `only_ids` / `only_sheets`; `history` is documentation, never read). The
+  guard refuses everything when the budget is inconsistent. Only the user can raise it (`selftest_passv.py` pins it).
+- **Redesigning an approved sprite:** archive it first, `python3 -I assets-src/gen/retire.py <id>` (committed before
+  the first paid request; `docs/RETIRED_SPRITES.md`). `approve.py` refuses to overwrite a `monster_*` / `boss_*` sheet
+  without a byte-identical archive copy. In the commit that approves the first new sheet run `retire.py --move-rig
+  <id>` (and for a boss's new idle `retire.py --prune <id> boss_attack boss_cast boss_hurt boss_attack_raise`).
 
 ### 1.4 Generate, review, approve
 
