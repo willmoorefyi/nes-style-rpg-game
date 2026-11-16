@@ -325,74 +325,67 @@
   # 1235 (R17, the text without the robe anchor sentence): teal outer robe lost, smaller; boss_hurt 1234 (R20):
   # the crown flew off, the sceptre switched hands; boss_attack_raise 1234 (R22): muddy face, robes closed
 - id: hollow_seraph
-  # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
-  # halo; her composure stays intact even when hurt
+  # "the Hollow Seraph", Fiend of Wind. Pass V redesign (docs/REDESIGN_PLAN.md 4.1, D-V9: four blade wings, no raise
+  # pose): an original floating steampunk angel of doom built of separate hovering plates (the white-and-gold
+  # six-feathered-wing seraph is archived as hollow_seraph_v1, docs/RETIRED_SPRITES.md). The plates float apart, so
+  # the cut keeps every in-cell piece (orchestrator ruling after R298: `cut: {keep_pieces: all_in_cell}`).
   size: boss
+  cut: {keep_pieces: all_in_cell, fit: headroom, top_margin: 10}   # R309: the fine-pitch render is 210 native px; shrunk to rows 10-192 (orchestrator ruling (b))
   per_pose: true
   design_ref: false
   floating: true
   body: floating
-  # the floating line ("tilt the whole body along a strong diagonal ...") hid or bunched wings in R26-R31; only the
-  # poses not yet approved get this line (attack and cast keep their approved keys)
   motion:
-    hurt: &seraph_motion >-
+    attack: &seraph_motion >-
       Keep the front or three-quarter front view of Image 3 and a symmetric, composed posture, the armour upright or
-      tilted only slightly; all six wings stay separately visible with their brass joints, three on the left side of
-      the image and three on the right side of the image, none hidden behind the armour or bunched together; the
-      movement is in the wings, gauntlets and halo, and trailing parts lag behind the motion.
-    attack_raise: *seraph_motion
+      tilted only slightly; all four blade wings stay separately visible in their brass frames, two on the left side
+      of the image and two on the right side of the image, none hidden behind the armour or bunched together; the
+      plates keep their narrow gaps; the idle shows it at its lowest, here it hovers a little higher; the movement is
+      in the wings, gauntlets and halo, and trailing parts lag behind the motion.
+    cast: *seraph_motion
+    hurt: *seraph_motion
   prompt: >-
-    the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
-    showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
-    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread, the highest
-    wing tips well below the top of the grey box; thin hanging greaves, no feet on the ground, nothing below the
-    greaves (no wind, no debris, no shadow); palette of white steel, pale gold, brass, storm grey and a cold white-blue
-    glow
+    the Hollow Seraph, a steampunk angel of doom hovering in the air, built of separate pieces that float apart: a
+    hollow shell of blackened steel and polished brass armour plates (a helm-mask, a chest cuirass in two halves, two
+    shoulder plates, two gauntlets and a long segmented skirt of plates), each plate a solid riveted shape hovering a
+    little apart from the others with narrow empty gaps between them and nothing inside; in the gap at the centre of
+    the chest a brass clockwork heart of interlocking gears glows white-gold; the faceless brass helm-mask has one
+    narrow horizontal slit glowing cold white; a broken brass halo ring with gear teeth floats close above the helm;
+    exactly four great wings in all, two on each side and no more: on the left side of the image one upper wing
+    pointing up and out and one lower wing pointing down and out, and the same two on the right side of the image,
+    with empty space between the upper and the lower wing (no wing pointing straight out to the side); each wing one
+    straight blade of pale gold-white light held in a brass frame, like a sword blade, each wing's brass frame joined
+    to a shoulder plate; the wings are short, each blade no longer than the helm-to-skirt height of the armour: the
+    upper wing tips reach no higher than the top of the halo and the lower wing tips no lower than the bottom of the
+    skirt, all four tips well inside the grey box on the left and the right; the whole figure, halo and wing tips
+    included, fills only the lower nine tenths of the grey box with clear empty space above the halo; the gaps between
+    the plates are narrow and the whole figure stays compact; nothing below the skirt (no feet, no wind, no shadow); palette of blackened steel, brass, gold, a cold
+    white glow and pale gold light
   action_prompt: >-
-    the Hollow Seraph, exactly as in Image 3: a hovering hollow suit of elegant white and pale-gold armour with no body
-    inside, the open helm showing only darkness, the fractured golden halo floating above the helm, exactly six
-    articulated mechanical wings, three on each side, of overlapping metallic feathers in white steel with brass joints,
-    thin hanging greaves; palette of white steel, pale gold, brass, storm grey and a cold white-blue glow
+    the Hollow Seraph, exactly as in Image 3: the same separate hovering plates of blackened steel and brass with
+    narrow empty gaps, the glowing clockwork gear heart in the chest gap, the faceless brass helm-mask with the glowing
+    slit, the broken gear-toothed halo close above the helm, exactly four straight blade wings of pale gold-white light
+    in brass frames joined to the shoulder plates, two on each side
   attack: >-
-    a cutting wing strike: the six wings swing forward in a wide arc toward the heroes on the right, the three near
-    wings fanned out in front of the armour and the three far wings fanned out behind it, all six separately visible
-    with their brass joints, their sharp metal feather tips pointing toward the heroes, the armour leaning forward;
-    exactly six wings, as in Image 3, at exactly the same pixel size as in Image 3; the fractured halo in its two broken arcs above the helm, as in Image 3; no wind
-    streaks, no effects; the whole figure well below the top of the grey box
-  # approved boss_cast is seed 1234 with this text (ROSTER_LOG R29, R32: best of 3); the retries (R30 "seen from the
-  # front like Image 3 ... symmetric like a fan", R31 "the same front-facing hovering posture as Image 3 ... every wing
-  # lifted higher") both came back with four wings
+    a cutting strike: the four blade wings swing forward in a wide arc toward the heroes on the right, all four
+    separately visible, two on the left side of the image and two on the right side, their points toward the heroes,
+    the plates leaning forward; exactly four blade wings, as in Image 3, at exactly the same pixel size as in Image 3;
+    no light trails, no effects; the whole figure well below the top of the grey box
   cast: >-
-    a storm rite: the six wings raised and spread wide to the sides, both gauntlets lifted, the halo crackling with
-    short white-blue lightning drawn on the two broken halo arcs themselves; exactly six wings, three growing from each
-    shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
-    included, at the same pixel size as in Image 3 and well below the top of the grey box
+    a rite of judgement: the four blade wings raised high and spread wide to the sides, both gauntlets lifted, the
+    gear heart blazing bright white, the halo glowing; exactly four blade wings, two on each side, all separately
+    visible, as in Image 3; no other effects; the whole figure, wing tips and halo included, at the same pixel size as
+    in Image 3 and well below the top of the grey box
   hurt: >-
-    a sharp jolt: bright cracks across the breastplate, the two broken halo arcs knocked askew above the helm, the
-    whole armour tilted back by about fifteen degrees, the helm with its visor bars around the dark opening exactly as
-    in Image 3; the three wings on the left side of the image and the three wings on the right
-    side of the image all stay visible, the lowest wing on each side faltering downward with its feathers splayed, the
-    upper wings flaring; the posture stays upright and controlled, her composure intact; no cape, cloth or ribbon
-    anywhere (Image 3 has none)
-  # approved boss_attack_raise is seed 1234 with this text (ROSTER_LOG R38, R41: best of 3). The retries asked for "seen
-  # squarely from the front like Image 3, ... mirror-symmetric ... all six wings folded upward and inward behind her"
-  # (1235, R39: six wings but cream palette, hood, skirt, smaller) and added "the same white steel and pale-gold armour
-  # colours ..., the same helm with its visor bars ..., as tall as in Image 3" (1236, R40: magenta key patches, no halo)
-  attack_raise: >-
-    compressing the air before an explosive release, seen in the same front view as Image 3: all six wings drawn in
-    and folded close against the armour like closed fans, the three wings on the left side of the image layered one
-    above the other on the left of the armour and the three on the right side of the image layered the same way on the
-    right, each wing with its brass joint still visible; the gauntlets drawn in to the chest, the halo dim, cold
-    white-blue light leaking between the folded wings; the whole figure narrow and compact, hovering inside the grey
-    box at exactly the same height as in Image 3, the halo well below the top of the image
-  face: no face; the empty dark helm opening and the halo are the readable features
-  extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
-  seeds: [1234]
-  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
-  # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
-  # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
-  # like a fan"): four wings, a wing chip; boss_hurt 1234 (R35, without the no-cape clause): six wings, a teal cape added;
-  # 1235 (R36, + no-cape clause): pose_diff 0.12, pink fringe strokes, helm without visor bars
+    a violent jolt: the floating plates knocked a little further apart, the cuirass halves tilted, the gear heart
+    flickering, the halo knocked askew, the lowest blade wing on each side faltering downward; all four blade wings
+    stay visible, two on each side, exactly four as in Image 3; the posture stays upright and controlled; at the same
+    pixel size as in Image 3
+  face: no face; the faceless brass helm-mask with its glowing slit and the gear heart are the readable features
+  extra_negative: >-
+    a face, skin, a body or bones inside the armour, feathers, feathered wings, more or fewer than four wings, six wings, three wings on a side, a horizontal middle wing, a sword
+    in the hands, white-and-gold armour, a cape, violet, purple, pink, magenta
+  seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0
 # ── pass R, G2: the other bosses (per pose, 4 or 5 images) and minibosses (3-pose sheets) (docs/ROSTER_PLAN.md 4.2;
 # the bestiary spec's entries 032, 033, 075, 092, 118, 121, 128). Original designs; limbs and props named by image side
 # (the G1 lesson: it kept props in their hands in R8, R10, R21, R37).
