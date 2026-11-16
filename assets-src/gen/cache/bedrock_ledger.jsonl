@@ -40,3 +40,7 @@
 {"event": "result", "key": "506909aa09af9788357c7db5", "ok": true, "served": "us.stability.stable-conservative-upscale-v1:0"}
 {"event": "request", "ts": "2026-11-16T16:11:21", "tool": "colossus.py", "model": "upscale_conservative", "purpose": "rim_upscale", "seed": 5151, "key": "a09503b7b15086b6bff4e223", "pass": "C"}
 {"event": "result", "key": "a09503b7b15086b6bff4e223", "ok": true, "served": "us.stability.stable-conservative-upscale-v1:0"}
+{"event": "request", "ts": "2026-11-16T16:18:45", "tool": "colossus.py", "model": "inpaint", "purpose": "f4_inpaint", "seed": 4601, "key": "dd59364b2c0d9ad295eda1e2", "pass": "C"}
+{"event": "result", "key": "dd59364b2c0d9ad295eda1e2", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
+{"event": "request", "ts": "2026-11-16T16:19:50", "tool": "colossus.py", "model": "inpaint", "purpose": "f4_inpaint", "seed": 4602, "key": "3f10084baf950ef269124a66", "pass": "C"}
+{"event": "result", "key": "3f10084baf950ef269124a66", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
