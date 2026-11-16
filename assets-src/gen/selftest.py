@@ -462,6 +462,10 @@ def test_monster_anim() -> None:
     print("cutter option keep_pieces (cut: {keep_pieces: all_in_cell}: every in-cell piece kept; R298; default unchanged)")
     from gen import selftest_pieces as SPc
     SPc.run_pieces(check)
+    print("cutter option headroom (cut: {fit: headroom, top_margin: N}: a figure reaching above row N shrunk to fit; "
+          "R309, R310-R312; default unchanged)")
+    from gen import selftest_headroom as SHr
+    SHr.run_headroom(check)
     print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP

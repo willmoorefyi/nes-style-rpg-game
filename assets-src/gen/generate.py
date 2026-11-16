@@ -4,8 +4,11 @@
   python3 -I assets-src/gen/generate.py knight --backend gemini --sheets battle --seeds 1234 --dry-run
   # make the single paid request for one checkpoint
   python3 -I assets-src/gen/generate.py knight --backend gemini --sheets battle --seeds 1234 --paid
-  # re-pixelize existing raws offline (never imports a backend)
+  # re-pixelize existing raws offline (never imports a backend); --sheets limits it to the named sheets
   python3 -I assets-src/gen/generate.py --repixelize assets-src/gen/out/gemini/knight/1234
+  # re-cut one ledgered monster attempt at 0 images (e.g. after a `cut:` option change); prints whether approve.py
+  # would approve the re-cut (the live entry must re-plan the cached key whose render is this raw)
+  python3 -I assets-src/gen/generate.py --repixelize assets-src/gen/out/gemini/dragon/1236 --sheets monster_large
 
 Budget guard (docs/ART_2X_PLAN.md, hard rule 1):
   - --backend is required; uncached requests need --paid; more than --max-paid (default 1) uncached requests
@@ -479,7 +482,8 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
                              n_cells=1 if sheet.name.startswith("boss_") else 3,
                              cell=pg.grid[0] if sheet.name.startswith("boss_") else None,
                              foot_row=pg.bottom_row if sheet.name.startswith("boss_") else None,
-                             haze=bool(char.get("haze")), keep_pieces=M.cut_options(char))
+                             haze=bool(char.get("haze")), keep_pieces=M.cut_options(char),
+                             top_margin=M.cut_fit(char))
         info["report"] = M.frame_report(frames, monster_band(char))
         LAST_RESAMPLE[sheet.name] = info
         return frames
@@ -689,15 +693,33 @@ def write_outputs(outdir: Path, sheet: Sheet, guide: Image.Image, raw: Image.Ima
     native_sheet(frames, sheet.geom).save(outdir / f"{sheet.name}.png")
 
 
-def repixelize(outdir: Path) -> None:
-    """Offline: rebuild guides from the current spec and re-pixelize every compatible *_raw.png in outdir."""
+def recut_source(char: dict, sheet_name: str, seed: int, raw: bytes, cache: Path | None = None) -> tuple[str, bool, str]:
+    """Is a re-cut of `raw` (an out/ dir's <sheet>_raw.png) approvable? approve.py re-plans the request from the live
+    entry at `seed_for` and copies the out/ sheet, so the re-cut is approvable only when that seed is the out/ dir's
+    and the planned key is cached with exactly these render bytes (`cache`: injectable for the selftests). (key, ok,
+    why)"""
+    if seed_for(char, sheet_name) != seed:
+        return "", False, f"the live entry's seed for {sheet_name} is {seed_for(char, sheet_name)}, not {seed}"
+    key = plan_request(char, SHEETS[sheet_name], seed, "gemini", None).key
+    png = (cache or CACHE) / f"{key}.png"
+    if not png.exists():
+        return key, False, f"the live entry plans key {key}, which is not cached (restore the attempt's text)"
+    if png.read_bytes() != raw:
+        return key, False, f"cache/{key}.png is a different render from this raw"
+    return key, True, f"the raw is cache/{key}.png"
+
+
+def repixelize(outdir: Path, only: list[str] | None = None) -> None:
+    """Offline: rebuild guides from the current spec and re-pixelize every compatible *_raw.png in outdir (`only`: just
+    these sheets). A monster / boss sheet is cut with the live monsters.yaml entry (its `cut:` options included), and
+    the line after it says whether approve.py can approve the re-cut (`recut_source`)."""
     seed = int(outdir.name) if outdir.name.isdigit() else 0
     char_id = outdir.parent.name
     char = {"id": char_id, "palette_size": S.PALETTE_SIZE}
     results = {}
     for name, sheet in SHEETS.items():
         raw_path = outdir / f"{name}_raw.png"
-        if not raw_path.exists():
+        if not raw_path.exists() or (only is not None and name not in only):
             continue
         if name.startswith(("monster_", "boss_")):
             mchar = load_character(char_id)
@@ -705,6 +727,12 @@ def repixelize(outdir: Path) -> None:
             frames = cut_frames(raw, M.guide(monster_band(mchar)), sheet, mchar, seed)
             native_sheet(frames, sheet.geom).save(outdir / f"{name}.png")
             results[name] = (raw, frames)
+            key, ok, why = recut_source(mchar, name, seed, raw_path.read_bytes()) if name in allowed_sheets(mchar) \
+                else ("", False, f"{char_id} has no {name} sheet")
+            info = LAST_RESAMPLE[name]
+            print(f"{name}: scale {info.get('scale')}, heights {info['report']['heights']}, clipped "
+                  f"{info.get('clipped')}{', fit ' + json.dumps(info['fit']) if 'fit' in info else ''}; "
+                  f"{'approvable' if ok else 'NOT approvable'}: {why}")
             continue
         guide = G.sheet(sheet.poses, sheet.order, sheet.geom)
         raw = Image.open(raw_path).convert("RGBA")
@@ -800,7 +828,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("character", nargs="?")
     ap.add_argument("--backend", choices=["gemini", "bedrock"])
     ap.add_argument("--model", default=None)
-    ap.add_argument("--sheets", default="battle")
+    ap.add_argument("--sheets", default=None, help="comma-separated sheets (default battle; with --repixelize: all)")
     ap.add_argument("--seeds", default="")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--paid", action="store_true", help="allow uncached (billed) requests")
@@ -817,13 +845,13 @@ def main(argv: list[str] | None = None) -> None:
                 req = plan_request(kit, SHEETS[name], int(args.repixelize.name), "gemini", None)
                 write_kit(args.repixelize, kit, req, Image.open(raw_path).convert("RGB"), req.seed)
             return
-        repixelize(args.repixelize)
+        repixelize(args.repixelize, args.sheets.split(",") if args.sheets else None)
         return
     if not args.character or not args.backend:
         ap.error("character and --backend are required (or use --repixelize OUT_DIR)")
     char = load_character(args.character)
     seeds = [int(s) for s in args.seeds.split(",")] if args.seeds else char.get("seeds", [1234])
-    names = [allowed_sheets(char)[0] if n == "monster" else n for n in args.sheets.split(",")]
+    names = [allowed_sheets(char)[0] if n == "monster" else n for n in (args.sheets or "battle").split(",")]
     unknown = [n for n in names if n not in SHEETS]
     if unknown:
         ap.error(f"unknown sheets {unknown}; choose from {list(SHEETS)}")

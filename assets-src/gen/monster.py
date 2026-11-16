@@ -327,17 +327,43 @@ KEEP_PIECES = ("all_in_cell",)  # monsters.yaml `cut: {keep_pieces: all_in_cell}
 KEEP_MIN_PX = 24                # all_in_cell: a piece under this many native px is a speck and is dropped
 
 
+FITS = ("headroom",)            # monsters.yaml `cut: {fit: headroom, top_margin: N}` (V3, R309 / R310-R312)
+TOP_MARGIN_MAX = 32             # headroom: the largest allowed top margin (rows)
+HEADROOM_TRIES = 4              # headroom: the target is lowered by a row at most this many times minus one
+
+
 def cut_options(char: dict) -> str | None:
-    """The `keep_pieces` value of a monsters.yaml entry's `cut:` block (None when absent); anything else is refused."""
+    """The `keep_pieces` value of a monsters.yaml entry's `cut:` block (None when absent); the whole block is validated
+    (`keep_pieces`, `fit` + `top_margin`, `cut_fit`) and anything else is refused."""
     opts = char.get("cut")
     if opts is None:
         return None
-    if not isinstance(opts, dict) or set(opts) - {"keep_pieces"}:
-        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces ({opts!r})")
+    if not isinstance(opts, dict) or set(opts) - {"keep_pieces", "fit", "top_margin"}:
+        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces, fit and top_margin ({opts!r})")
     kp = opts.get("keep_pieces")
     if kp is not None and kp not in KEEP_PIECES:
         raise ValueError(f"{char.get('id')}: cut.keep_pieces must be one of {', '.join(KEEP_PIECES)} ({kp!r})")
+    cut_fit(char)
     return kp
+
+
+def cut_fit(char: dict) -> int | None:
+    """The headroom top margin of a monsters.yaml entry's `cut: {fit: headroom, top_margin: N}` (None without `fit`):
+    a figure that would reach above row N is shrunk to fit rows N..feet row (`cut`). `fit` needs an integer
+    `top_margin` 1..TOP_MARGIN_MAX and `top_margin` needs `fit`; anything else is refused naming the sprite."""
+    opts = char.get("cut")
+    if opts is None:
+        return None
+    if not isinstance(opts, dict) or set(opts) - {"keep_pieces", "fit", "top_margin"}:
+        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces, fit and top_margin ({opts!r})")
+    fit, n = opts.get("fit"), opts.get("top_margin")
+    if fit is None and n is None:
+        return None
+    if fit not in FITS:
+        raise ValueError(f"{char.get('id')}: cut.fit must be one of {', '.join(FITS)} ({fit!r})")
+    if type(n) is not int or not 1 <= n <= TOP_MARGIN_MAX:
+        raise ValueError(f"{char.get('id')}: cut.fit headroom needs an integer top_margin 1-{TOP_MARGIN_MAX} ({n!r})")
+    return n
 
 
 def _all_in_cell(fg: np.ndarray, lab: np.ndarray, n: int) -> np.ndarray:
@@ -495,14 +521,19 @@ def flat_edges(frame: Image.Image, run: int = 3) -> list[tuple[int, int, int]]:
 def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: int = 16,
         seed: int = 0, n_cells: int = 3, cell: int | None = None,
         foot_row: int | None = None, haze: bool = False, split: str = "gaps",
-        keep_pieces: str | None = None) -> tuple[list[Image.Image], dict]:
+        keep_pieces: str | None = None, top_margin: int | None = None) -> tuple[list[Image.Image], dict]:
     """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
     splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
     approved sheets are never re-cut). A floating cell drawn so low that the shared offset would put it below the cell's
     2 px bottom margin is lifted by that overflow alone (FW-C, new cuts only; info["lifted"] = {pose: px}); a lift over
     LIFT_MAX, or a lifted figure above row 2, refuses the cut (ValueError naming the pose). `keep_pieces` (monsters.yaml
     `cut: {keep_pieces: all_in_cell}`, `cut_options`) keeps every in-cell piece (`_all_in_cell`); None is the default
-    figure mask, byte-identical to the cutter before the option."""
+    figure mask, byte-identical to the cutter before the option. `top_margin` N (monsters.yaml `cut: {fit: headroom,
+    top_margin: N}`, `cut_fit`): a figure that would reach above row N (with its feet on the feet row; floating: the
+    cells' shared offset from the idle's bottom) is shrunk through the shrink path below to fit rows N..feet row, the
+    target lowered a row at a time (at most HEADROOM_TRIES) if the re-pixelized figure still reaches above row N;
+    info["fit"] records the margin, the need, the target and the result. A figure that already leaves N rows free is
+    cut exactly as without the option; None is the cutter before the option."""
     native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
@@ -523,6 +554,17 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     # keep Gemini's pixels 1:1 unless the figure is clearly outside the band (rescaling by a few % drops or doubles
     # single pixel rows); far outside, nearest-neighbour scale to the band edge
     f = hi / tallest if tallest > hi * (1 + HEIGHT_TOLERANCE) else lo / tallest if tallest < lo * (1 - HEIGHT_TOLERANCE) else 1.0
+    fit = None
+    if top_margin is not None:
+        rows = [np.where(m.any(1))[0] for m in masks]
+        need = tallest
+        if floating and len(rows[0]):     # floating cells share the idle's offset: span from the highest top to its feet
+            need = max(need, int(rows[0].max()) - min(int(r.min()) for r in rows if len(r)) + 1)
+        avail = (foot_row if foot_row is not None else band.foot_row) + 1 - top_margin
+        fit = {"top_margin": top_margin, "need": need, "avail": avail}
+        if need * f > avail:
+            f = avail / need
+            fit["target"] = avail
     info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / n_cells, 1), h)})
     if band.size == "titan" and (info["scale"] != 1.0 or info.get("mode") != "grid"):
         # FW-T fail-closed (docs/REDESIGN_PLAN.md 4.2): never resample the titan (a non-integer nearest scale is S4's
@@ -533,88 +575,110 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         err.info = info                                   # read by titan_probe
         raise err
 
-    if f < 1.0:
-        # shrinking: re-pixelize from the full-resolution render (block vote with facial-detail protection) instead of
-        # dropping whole sprite pixels, as the character resample path does
-        rgb_raw = np.asarray(raw.convert("RGB"))
-        rh, rw, _ = rgb_raw.shape
-        spans = [(round(i * w / n_cells) + o, round(i * w / n_cells) + o + c.shape[1]) for i, (c, o) in enumerate(zip(cells, offs))]
-        raw_cells = [rgb_raw[:, round(x0 * rw / w):round(x1 * rw / w)] for x0, x1 in spans]
-        raw_masks = [np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize((rc.shape[1], rc.shape[0]),
-                                Image.Resampling.NEAREST)) > 0 for rc, m in zip(raw_cells, masks)]
-        detail = np.concatenate([rc[PX.detail_mask(rc, rm, rc.shape[0] / max(1, c0.shape[0]))]
-                                 for rc, rm, c0 in zip(raw_cells, raw_masks, cells)])
-        palette = PX.sheet_palette([rc[rm] for rc, rm in zip(raw_cells, raw_masks)], colors, seed, detail_px=detail)
-        figs = []
-        for rc, rm, c0 in zip(raw_cells, raw_masks, cells):
-            grid = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
-            art = rc.copy()
-            art[~rm] = (255, 0, 255)
-            figs.append(np.asarray(PX.pixelize(Image.fromarray(art), rm, grid, colors=colors, seed=seed,
-                                               palette=palette)))
-        info["shrink"] = "re-pixelized from the render"
-    else:
-        scaled, smasks = [], []
-        for c0, m in zip(cells, masks):
-            size = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
-            scaled.append(np.asarray(Image.fromarray(c0).resize(size, Image.Resampling.NEAREST)))
-            smasks.append(np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize(size, Image.Resampling.NEAREST)) > 0)
-        pixel_sets = [s0[m] for s0, m in zip(scaled, smasks)]
-        detail = np.concatenate([s0[PX.detail_mask(s0, m, 1.0)] for s0, m in zip(scaled, smasks)])
-        palette = PX.sheet_palette(pixel_sets, colors, seed, detail_px=detail)
-        figs = []
-        for s0, m in zip(scaled, smasks):
-            art = s0.copy()
-            art[~m] = (255, 0, 255)        # only the kept figure: background and dropped blobs become key colour
-            fig, _ = PX.pixelize_native(Image.fromarray(art), m, (art.shape[1], art.shape[0]), colors=colors,
-                                        seed=seed, palette=palette)
-            figs.append(np.asarray(fig))
+    headroom = fit is not None and "target" in fit
 
-    def bbox(fig: np.ndarray) -> tuple[int, int, int, int]:
-        ys, xs = np.where(fig[..., 3] > 0)
-        return int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
+    def place(f: float) -> tuple[list[Image.Image], list[str], dict]:
+        # a headroom shrink takes the nearest-neighbour path below (orchestrator ruling (b); R309: every render piece
+        # survives at top_margin 10, the block vote here closes one 1 px gap between plates)
+        if f < 1.0 and not headroom:
+            # shrinking: re-pixelize from the full-resolution render (block vote with facial-detail protection) instead of
+            # dropping whole sprite pixels, as the character resample path does
+            rgb_raw = np.asarray(raw.convert("RGB"))
+            rh, rw, _ = rgb_raw.shape
+            spans = [(round(i * w / n_cells) + o, round(i * w / n_cells) + o + c.shape[1]) for i, (c, o) in enumerate(zip(cells, offs))]
+            raw_cells = [rgb_raw[:, round(x0 * rw / w):round(x1 * rw / w)] for x0, x1 in spans]
+            raw_masks = [np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize((rc.shape[1], rc.shape[0]),
+                                    Image.Resampling.NEAREST)) > 0 for rc, m in zip(raw_cells, masks)]
+            detail = np.concatenate([rc[PX.detail_mask(rc, rm, rc.shape[0] / max(1, c0.shape[0]))]
+                                     for rc, rm, c0 in zip(raw_cells, raw_masks, cells)])
+            palette = PX.sheet_palette([rc[rm] for rc, rm in zip(raw_cells, raw_masks)], colors, seed, detail_px=detail)
+            figs = []
+            for rc, rm, c0 in zip(raw_cells, raw_masks, cells):
+                grid = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
+                art = rc.copy()
+                art[~rm] = (255, 0, 255)
+                figs.append(np.asarray(PX.pixelize(Image.fromarray(art), rm, grid, colors=colors, seed=seed,
+                                                   palette=palette)))
+            info["shrink"] = "re-pixelized from the render"
+        else:
+            scaled, smasks = [], []
+            for c0, m in zip(cells, masks):
+                size = (max(1, round(c0.shape[1] * f)), max(1, round(c0.shape[0] * f)))
+                scaled.append(np.asarray(Image.fromarray(c0).resize(size, Image.Resampling.NEAREST)))
+                smasks.append(np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize(size, Image.Resampling.NEAREST)) > 0)
+            pixel_sets = [s0[m] for s0, m in zip(scaled, smasks)]
+            detail = np.concatenate([s0[PX.detail_mask(s0, m, 1.0)] for s0, m in zip(scaled, smasks)])
+            palette = PX.sheet_palette(pixel_sets, colors, seed, detail_px=detail)
+            figs = []
+            for s0, m in zip(scaled, smasks):
+                art = s0.copy()
+                art[~m] = (255, 0, 255)        # only the kept figure: background and dropped blobs become key colour
+                fig, _ = PX.pixelize_native(Image.fromarray(art), m, (art.shape[1], art.shape[0]), colors=colors,
+                                            seed=seed, palette=palette)
+                figs.append(np.asarray(fig))
+            if headroom:
+                info["shrink"] = "nearest-neighbour (headroom)"
 
-    c = cell or band.cell
-    foot = foot_row if foot_row is not None else band.foot_row
-    # a gap-split cell starts left of its nominal column (split_cells): its pixels sit `ox` further right in the
-    # nominal frame, so lunges and recoils stay relative to the idle pose (all 0 for the thirds)
-    oxs = [int(round(o * f)) for o in offs]
-    ix0, iy0, ix1, iy1 = bbox(figs[0])
-    ix0, ix1 = ix0 + oxs[0], ix1 + oxs[0]
-    # cell width: the band's square cell, widened (height unchanged) when a lunge or a long body needs more room;
-    # one horizontal shift for all frames keeps lunges and recoils relative to the idle pose
-    lo_x = min(bbox(fg_)[0] + o for fg_, o in zip(figs, oxs))
-    hi_x = max(bbox(fg_)[2] + o for fg_, o in zip(figs, oxs))
-    cw = max(c, hi_x - lo_x + 1 + 4)
-    cw += cw % 2
-    dx = cw // 2 - (ix0 + ix1 + 1) // 2
-    if lo_x + dx < 2 or hi_x + dx > cw - 3:
-        dx = 2 - lo_x if lo_x + dx < 2 else cw - 3 - hi_x
-    dy_shared = foot - iy1
-    frames, clipped, lifted = [], [], {}
-    info["cell_px"] = (cw, c)
-    dx0 = dx
-    for k, fig in enumerate(figs):
-        dx = dx0 + oxs[k]
-        x0, y0, x1, y1 = bbox(fig)
-        dy = dy_shared if floating else foot - y1
-        over = (y1 + dy_shared) - (c - 3) if floating else 0          # FW-C: rows past the 2 px bottom margin
-        if over > 0:
-            pose = S.MONSTER_POSES[k] if n_cells == 3 else f"cell {k}"
-            if over > LIFT_MAX:
-                raise ValueError(f"cut: the floating {pose} cell needs a {over} px lift > LIFT_MAX {LIFT_MAX}")
-            if y0 + dy - over < 2:
-                raise ValueError(f"cut: the floating {pose} cell lifted {over} px would start at row {y0 + dy - over} < 2")
-            dy, lifted[pose] = dy - over, over
-        out = np.zeros((c, cw, 4), np.uint8)
-        sx0, sy0 = max(0, -dx), max(0, -dy)
-        tx0, ty0 = max(0, dx), max(0, dy)
-        ww = min(fig.shape[1] - sx0, cw - tx0)
-        hh = min(fig.shape[0] - sy0, c - ty0)
-        out[ty0:ty0 + hh, tx0:tx0 + ww] = fig[sy0:sy0 + hh, sx0:sx0 + ww]
-        if (x0 + dx < 0 or x1 + dx >= cw or y0 + dy < 0 or y1 + dy >= c):
-            clipped.append(S.MONSTER_POSES[k])
-        frames.append(Image.fromarray(out, "RGBA"))
+        def bbox(fig: np.ndarray) -> tuple[int, int, int, int]:
+            ys, xs = np.where(fig[..., 3] > 0)
+            return int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
+
+        c = cell or band.cell
+        foot = foot_row if foot_row is not None else band.foot_row
+        # a gap-split cell starts left of its nominal column (split_cells): its pixels sit `ox` further right in the
+        # nominal frame, so lunges and recoils stay relative to the idle pose (all 0 for the thirds)
+        oxs = [int(round(o * f)) for o in offs]
+        ix0, iy0, ix1, iy1 = bbox(figs[0])
+        ix0, ix1 = ix0 + oxs[0], ix1 + oxs[0]
+        # cell width: the band's square cell, widened (height unchanged) when a lunge or a long body needs more room;
+        # one horizontal shift for all frames keeps lunges and recoils relative to the idle pose
+        lo_x = min(bbox(fg_)[0] + o for fg_, o in zip(figs, oxs))
+        hi_x = max(bbox(fg_)[2] + o for fg_, o in zip(figs, oxs))
+        cw = max(c, hi_x - lo_x + 1 + 4)
+        cw += cw % 2
+        dx = cw // 2 - (ix0 + ix1 + 1) // 2
+        if lo_x + dx < 2 or hi_x + dx > cw - 3:
+            dx = 2 - lo_x if lo_x + dx < 2 else cw - 3 - hi_x
+        dy_shared = foot - iy1
+        frames, clipped, lifted = [], [], {}
+        info["cell_px"] = (cw, c)
+        dx0 = dx
+        for k, fig in enumerate(figs):
+            dx = dx0 + oxs[k]
+            x0, y0, x1, y1 = bbox(fig)
+            dy = dy_shared if floating else foot - y1
+            over = (y1 + dy_shared) - (c - 3) if floating else 0          # FW-C: rows past the 2 px bottom margin
+            if over > 0:
+                pose = S.MONSTER_POSES[k] if n_cells == 3 else f"cell {k}"
+                if over > LIFT_MAX:
+                    raise ValueError(f"cut: the floating {pose} cell needs a {over} px lift > LIFT_MAX {LIFT_MAX}")
+                if y0 + dy - over < 2:
+                    raise ValueError(f"cut: the floating {pose} cell lifted {over} px would start at row {y0 + dy - over} < 2")
+                dy, lifted[pose] = dy - over, over
+            out = np.zeros((c, cw, 4), np.uint8)
+            sx0, sy0 = max(0, -dx), max(0, -dy)
+            tx0, ty0 = max(0, dx), max(0, dy)
+            ww = min(fig.shape[1] - sx0, cw - tx0)
+            hh = min(fig.shape[0] - sy0, c - ty0)
+            out[ty0:ty0 + hh, tx0:tx0 + ww] = fig[sy0:sy0 + hh, sx0:sx0 + ww]
+            if (x0 + dx < 0 or x1 + dx >= cw or y0 + dy < 0 or y1 + dy >= c):
+                clipped.append(S.MONSTER_POSES[k])
+            frames.append(Image.fromarray(out, "RGBA"))
+        return frames, clipped, lifted
+
+    frames, clipped, lifted = place(f)
+    if fit is not None and "target" in fit:
+        for k in range(1, HEADROOM_TRIES):
+            top = min(int(np.where(np.asarray(fr)[..., 3].any(1))[0].min()) for fr in frames)
+            if top >= top_margin:
+                break
+            f = (fit["avail"] - k) / fit["need"]           # rounding in the re-pixelize left a row too many
+            fit["target"] = fit["avail"] - k
+            frames, clipped, lifted = place(f)
+        info["scale"] = round(f, 3)
+    if fit is not None:
+        fit["top_row"] = min(int(np.where(np.asarray(fr)[..., 3].any(1))[0].min()) for fr in frames)
+        info["fit"] = fit
     info["clipped"] = clipped
     if lifted:
         info["lifted"] = lifted
