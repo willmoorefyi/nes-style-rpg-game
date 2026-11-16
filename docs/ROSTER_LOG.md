@@ -726,3 +726,19 @@ group). G-T0: 0 of 80 cached boss renders reach the titan band (`REDESIGN_PLAN.m
 | `selftest.py` (worktree, with gen/refs) | ALL PASSED, 1022 ok checks; 535 s (the main-checkout run follows the fast-forward) |
 | `npx vitest run` (re-measured at V1) | 220 files, 4171 tests passed; 9.5 s wall (10 s with npx start-up) |
 | Archive fixtures (scratch worktree, never committed) | with chaos, hollow_seraph, black_knight, vampire archived and seraph in state C (`--move-rig`, `--prune`), the pinned selftests (`selftest_pages`, `run_halo_brighten`, `run_fx_allowlist`, `run_fwq_allowlist`, fixmeasure, `_fields`, `selftest_passv`) pass on the archives; `selftest_retire` fails only its "archived files git-tracked" check (uncommitted archive: the gate works) |
+
+### V3 status (generator, 2026-11-16; 18 of 50 images, ledger 367 -> 385)
+
+| Id | State | Sheets (pass-V attempts) |
+|---|---|---|
+| crazy_horse | C (approved, `--move-rig`) | monster_large R290 (1) |
+| piscodemon | C | monster_small R291 (1) |
+| black_knight | C | monster_small R293 (2) |
+| guardian | C | monster_large R295 (2) |
+| vampire | C | monster_small R296 (1) |
+| chaos | C, complete (C2, `size: boss`) | boss_idle R299 (1), boss_attack R300 (1), boss_cast R302 (2), boss_hurt R304 (2), boss_attack_raise R306 (3, best of 3) |
+| hollow_seraph | **B, paused** (pass-V text declared; old art, rig and lock live) | boss_idle 2 of 3 (R297 six wings, R298 four wings but the cutter dropped the helm, the halo and 3 wings); waits for the orchestrator (R298 row: a keep-pieces cutter option, or touching-pieces wording) |
+
+- Main-checkout `selftest.py` at 104df0f: **7 FAILED, all the state-B key re-plan of hollow_seraph's five old poses** (the per-pose key check, `_approved_keys` FW-9, FW-T "approved boss pose keys unchanged"); every other check passes (state C of the other six ids ALL PASSED at 47cd770 before the seraph text was declared).
+- Lessons: (1) **small bright features are lost in the colour cut** (piscodemon's yellow eyes cut cream, black_knight's visor 4-5 px and none in the attack, chaos's cyan / teal orbs white / grey in some poses): name them large, and expect rig `paint` fixes; (2) **very dark designs collapse to black** at 10 colours (black_knight R292): ask for dark grey with bright edges; (3) a **ground line joined to the feet survives the cut** (guardian R294): put "a ground line, a floor" in the negative; (4) **floating separate pieces are dropped** by `_figure_mask` unless they touch the main mass (seraph R298); (5) **orb counts drift in action poses** (chaos cast / hurt / raise: 5-6 orbs); naming each orb by colour and image side fixed the hurt, and leaving the head unchanged (attack) kept the count, but a raised-arms pose hides or adds orbs.
+- Fix-pass candidates: hollow_seraph (all 4 poses, 1 idle attempt left + 3 each for attack / cast / hurt); chaos boss_attack_raise (five orbs; sheet at 3 of 3, rig paint route); chaos orb colours in attack / cast (rig paint); black_knight attack visor (rig paint); piscodemon eye colour.

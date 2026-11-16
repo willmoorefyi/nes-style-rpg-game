@@ -1129,11 +1129,11 @@ first image; the acceptance is ">= 172 art px at scale 3" (4.2).
 - [ ] V1 exit check -> V-base (rigs/sheets unchanged, pages byte-identical, check --all 123 OK, selftests) (high, 1h)
 - [ ] V2 TS-1: bestiary centring + backdrop; bestiaryCentre.test RED -> GREEN; browser check (high, 3h)
 - [ ] V2 TS-2: per-sheet scale, lunge scaling once in getMonsterFrames, huge/titan classes, integer-scale passes + pass-4 refusal, layout_f1 byte-identity, TITAN_AREA, titan in place, bossTag titan, effect-anchor test; tests (high, 1d)
-- [ ] V3 archive: retire.py for the 7 ids; docs/RETIRED_SPRITES.md rows; commit before each first paid request (high, 1h)
-- [ ] V3 generate crazy_horse, piscodemon, black_knight, guardian, vampire (<= 3 each), log rows, approvals (high, 0.5d)
-- [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d)
+- [x] V3 archive: retire.py for the 7 ids; docs/RETIRED_SPRITES.md rows; commit before each first paid request (high, 1h)
+- [x] V3 generate crazy_horse, piscodemon, black_knight, guardian, vampire (<= 3 each), log rows, approvals (high, 0.5d): R290-R296, 7 images
+- [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d): **paused at boss_idle 2 of 3** (R297, R298; the cutter drops the separate pieces), orchestrator decision pending
 - [x] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator (0 of 80, section 17); D-V6 re-confirm pending (orchestrator) (high, 1h)
-- [ ] V3 generate chaos idle -> attack -> cast -> hurt -> raise (<= 3 each; **C2 per D-V6 ruling after G-T0**: boss band 200, display scale 3); piece comparison per pose (high, 0.5d)
+- [x] V3 generate chaos idle -> attack -> cast -> hurt -> raise (<= 3 each; **C2 per D-V6 ruling after G-T0**: boss band 200, display scale 3); piece comparison per pose (high, 0.5d): R299-R308, 9 images, raise best of 3
 - [ ] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d)
 - [ ] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d)
 - [ ] V5 wave 2 rigs: vampire, hollow_seraph (cast), chaos (titan, cast + raise) (high, 2d)
