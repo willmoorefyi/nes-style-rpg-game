@@ -1,0 +1,37 @@
+# dragon pass-V text (orchestrator ruling 2026-11-16: a tall, imposing red dragon), moved here by the fallback
+# (docs/REDESIGN_PLAN.md 5, rev 7) after monster_large used 3 of 3 attempts without an approvable cut (ROSTER_LOG
+# R310-R312: the idle's horn tips on row 0). Not read by the generator.
+- id: dragon
+  # "Red Dragon": pass V redesign (orchestrator ruling 2026-11-16: the low, wide approved pose (idle 55 px) cannot read
+  # as a size step at the rescale factor 3): the classic red fire dragon, an original design standing tall and
+  # imposing; distinct from white / blue / green dragons, wyrm and wyvern (the old sheet is archived as dragon_v1,
+  # docs/RETIRED_SPRITES.md)
+  size: large
+  body: quadruped
+  motion: >-
+    Keep the tall, upright stance of the idle cell in every cell: the hind legs planted, the chest high, the long neck
+    raised; the action is in the neck, the head, the forelegs and the wings, which stay folded close to the body; the
+    whole dragon stays inside its own cell and never taller than in the idle cell (no leap, no flying).
+  prompt: >-
+    a huge red dragon standing tall and imposing, seen from the side and a little from the front: planted on its two
+    thick hind legs with the chest lifted high and the forelegs raised in front of the chest with their claws curled,
+    the long neck curved forward in a deep C so the horned head is held level with the top of the folded wings (not
+    raised above them), looking down toward the heroes; crimson scales with darker red armour plating along the back, a ridged cream belly, two great bat-like
+    wings with dark red membranes folded up close behind the shoulders (their tips below the head), two backward-
+    curving ivory horns, a row of pale bone spikes from the head down the neck and back, burning yellow eyes, a long
+    tail curled on the ground behind the hind feet; the wing tips and the horn tips are the highest points and stay
+    below the top of the grey box, with empty background above them as tall as the head, and the dragon sits in the
+    middle of its own cell with empty space on both sides; palette of crimson, dark red, cream, ivory and yellow
+  attack: >-
+    striking down toward the heroes from its tall stance: the neck arching forward and down so the head with the jaws
+    open lunges low in front of its chest, the forelegs reaching forward with the claws spread, the hind legs planted,
+    the wings still folded close, a small flicker of flame drawn inside the open jaws; never taller than the idle cell;
+    the whole dragon well inside the middle cell
+  hurt: >-
+    recoiling: the neck pulled back, the head tossed to the side with the eyes shut, the forelegs drawn in against the
+    chest, the hind legs planted, the wings folded tight; a little lower than in the idle cell
+  face: the horned red head with a burning yellow eye, a clear bright spot, is readable
+  extra_negative: >-
+    flying, a leap, spread wings in open air, a rider, a breath of fire in open air, smoke, two heads, white scales,
+    blue scales, green scales, violet, purple, pink, magenta, a ground line, a floor
+  seeds: [1236]   # 1234 (ROSTER_LOG R310), 1235 (R311): the idle 126 native px, the horn tips clipped on row 0
