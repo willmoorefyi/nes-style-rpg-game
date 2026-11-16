@@ -84,10 +84,15 @@ describe('ColossusView: placement, scale and textures (18.1, 18.4)', () => {
     for (const name of ['body', 'core']) for (const s of tiles(v.layerNode(name)!)) expect(s.blendMode, name).toBe('normal');
   });
 
-  it('the rest alpha comes from the json (glow 1.0 in the fixture; a 0.7 entry rests at 0.7), never 0.5', async () => {
+  it('the rest alpha comes from the json (glow 1.0 in the fixture, pulsing 1 <-> 0.7; a 0.7 entry rests at 0.7), never 0.5', async () => {
     const { v } = await view();
     v.apply(poseAt('idle', 0, 0, v.layerInfo));
     expect(v.layerNode('glow')!.alpha).toBe(1);
+    expect(GLOW_PULSE_MIN).toBe(0.7);
+    const rest: number[] = [];
+    for (let c = 0; c < 288; c++) { v.apply(poseAt('idle', c % 144, c, v.layerInfo)); rest.push(v.layerNode('glow')!.alpha); }
+    expect(Math.min(...rest)).toBeCloseTo(0.7, 3);
+    expect(Math.max(...rest)).toBeCloseTo(1, 3);
     const f = form();
     const dim: ColossusFormSpec = { ...f, layers: f.layers.map((l) => (l.name === 'glow' ? { ...l, alpha: 0.7 } : l)) };
     const { v: w } = await view(dim);

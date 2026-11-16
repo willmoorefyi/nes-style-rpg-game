@@ -4,7 +4,7 @@
  * only the hurt shake is whole screen px. A colossus never lunges, so |dx| <= 12 on every frame. Alphas are the layer's
  * rest alpha (colossus.json, default 1) times its pulse.
  *
- *   idle  144 loop  breathing: the canvas dy 0 -> -4 -> 0 px (cosine); glow pulse 1 <-> 0.85 (288 frames), corona
+ *   idle  144 loop  breathing: the canvas dy 0 -> -4 -> 0 px (cosine); glow pulse 1 <-> 0.7 (288 frames), corona
  *                   1 <-> 0.8 (96 frames); moons orbit 1 art px / 4 frames; clouds drift 1 art px / 20 frames
  *   slam   44       the dip dy -12 px (12, the wind-up), hold (8), slam to +8 (4; contact at 24: the shake, the hit and
  *                   a glow flare), back to rest (20); limbs (a layered form) raise / slam / recoil
@@ -32,8 +32,8 @@ export const BREATH_PX = 4;
 /** The slam's dip (up) and its slam (down) past rest, screen px. */
 export const SLAM_DIP_PX = 12;
 export const SLAM_DROP_PX = 8;
-/** Glow and corona pulse floors (18.3), as a fraction of the rest alpha. */
-export const GLOW_PULSE_MIN = 0.85;
+/** Glow and corona pulse floors (18.3), as a fraction of the rest alpha (glow deepened 0.85 -> 0.7 at C5). */
+export const GLOW_PULSE_MIN = 0.7;
 export const CORONA_PULSE_MIN = 0.8;
 
 export type ColossusCue = 'contact' | 'release' | 'shake';
