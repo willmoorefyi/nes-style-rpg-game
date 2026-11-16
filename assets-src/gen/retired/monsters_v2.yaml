@@ -28,3 +28,35 @@
     rearing up
   seeds: [1234]
   retired_as: crazy_horse_v2
+- id: piscodemon
+  # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells. Pass V redesign
+  # (docs/REDESIGN_PLAN.md 3.1, D-V11 stats unchanged): a squat young deep-sea psychic horror, distinct from the tall
+  # robed mindflayer (the anglerfish demon is archived as piscodemon_v1, docs/RETIRED_SPRITES.md)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes with the elbows bent, so both clawed hands and all six face tentacles stay well inside its own
+    cell. Draw only the parts named in the description, the same in every cell: no robe, cloth or extra limbs, and no
+    smear, glow trails or motion lines.
+  prompt: >-
+    a squat, hunched young deep-sea horror with a humanoid body: a large bulbous ridged head like an octopus mantle,
+    two large round glowing yellow eyes with black slit pupils, exactly six short thick tentacles hanging from the
+    lower face in place of a mouth, mottled sea-green and slate-blue skin with pale yellow spots, crusted shell plates
+    on the shoulders and forearms, a bare ribbed chest, two long arms ending in three-fingered webbed claws held close
+    in front of the body, short bent legs on webbed feet; centred in its own cell with empty space on both sides;
+    palette of sea green, slate blue, pale yellow and bone white
+  attack: >-
+    lunging toward the heroes, both clawed hands reaching forward but pulled in close in front of its chest (not
+    stretched to the cell edge), the six face tentacles lashing forward, the yellow eyes blazing; exactly six tentacles
+    as in the idle cell
+  hurt: >-
+    knocked back, the head thrown back, the six face tentacles curling up, the clawed hands thrown up close to the head
+  face: >-
+    the bulbous head with two large bright yellow eyes, each a clear bright spot, and six face tentacles is readable at
+    small size
+  extra_negative: >-
+    a robe, a cloak, a collar, a staff, a weapon, a fish head, a lure, fins, a mouth, a third eye, violet, purple,
+    lilac, pink, magenta, five tentacles, seven tentacles
+  seeds: [1234]
+  retired_as: piscodemon_v2
