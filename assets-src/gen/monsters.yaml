@@ -358,7 +358,7 @@
   # V8 (REDESIGN_FIX_PLAN F4): the R313 set read as cream swords with hilts on a solid body; regenerated in full with
   # hilt-less blades of cold white-blue light and hollow shell plates.
   size: boss
-  cut: {keep_pieces: all_in_cell, fit: headroom, top_margin: 10}   # R309: the fine-pitch render is 210 native px; shrunk to rows 10-192 (orchestrator ruling (b))
+  cut: {keep_pieces: all_in_cell, fit: headroom, top_margin: 10, match_height: idle, tolerance: 0.10}   # V8: action poses scaled to the idle height (user ruling: size is normalised). R309: the fine-pitch render is 210 native px; shrunk to rows 10-192 (orchestrator ruling (b))
   per_pose: true
   design_ref: false
   floating: true

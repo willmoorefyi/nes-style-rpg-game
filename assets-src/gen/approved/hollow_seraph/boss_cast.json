@@ -1,0 +1,25 @@
+{
+  "character": "hollow_seraph",
+  "sheet": "boss_cast",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1239,
+  "cache_key": "1faaad62d498f39cd15c9c6c",
+  "approved": "2026-11-16",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "cast"
+  ],
+  "size": "boss",
+  "floating": true,
+  "flip_frames": [],
+  "note": "V8 F4 R331: R328 re-cut with match_height idle (0 images)"
+}
