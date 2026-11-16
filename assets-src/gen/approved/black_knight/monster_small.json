@@ -3,9 +3,9 @@
   "sheet": "monster_small",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "091ec6a36700c923e32b1d8c",
-  "approved": "2026-11-15",
+  "seed": 1235,
+  "cache_key": "8b9bd381fc5e4851cfef270d",
+  "approved": "2026-11-16",
   "grid": [
     80,
     80
@@ -22,5 +22,6 @@
   ],
   "size": "small",
   "floating": false,
-  "flip_frames": []
+  "flip_frames": [],
+  "note": "pass V R293: self-approved with nits (visor a small crimson spot, none in the attack)"
 }

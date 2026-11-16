@@ -2295,7 +2295,9 @@
   extra_negative: feathers, wings, four legs, olive green colour, brow horns, stripes, a rider, standing upright, a front view
   seeds: [1234]
 - id: black_knight
-  # "Black Knight" (104): plain black plate, closed helm, a two-handed sword (distinct from death knight, dark fighter)
+  # "Black Knight" (104): pass V redesign (docs/REDESIGN_PLAN.md 3.1): a towering, menacing knight in jagged black
+  # plate with pale steel edges, a horned great helm and an ember-red visor (distinct from death knight, dark fighter;
+  # the plain black knight is archived as black_knight_v1, docs/RETIRED_SPRITES.md)
   size: small
   body: biped
   motion: >-
@@ -2304,19 +2306,25 @@
     description, the same in every cell: no cape, cloak, tabard or extra cloth, and no slash trail, smear or motion
     lines.
   prompt: >-
-    a knight in plain smooth black plate armour with dull grey edges, a closed black great helm with one narrow
-    visor slit, no crest or plume, holding one long two-handed sword with both hands; in the idle cell the sword is
-    held upright in front of the body, its point well below the top of the grey box; centred in its own cell with
-    empty space on both sides
+    a towering, menacing knight in heavy jagged dark gunmetal-grey plate armour (dark grey, not pure black), every
+    plate edge and rivet lit in bright pale steel grey so each plate reads clearly, broad layered pauldrons with short
+    hooked points, a closed dark great helm with two large curled ram horns of pale ash grey, and a wide T-shaped
+    visor glowing bright ember orange-red from inside, the glowing visor large and clearly visible, a heavy broad two-handed greatsword with a
+    notched edge held in both gauntlets, its blade upright in front of the body and its point well below the top of
+    the grey box; a hunched, threatening stance; centred in its own cell with empty space on both sides; palette of
+    dark gunmetal grey, bright pale steel grey, pale ash grey, dull bronze trim and bright ember orange-red
   attack: >-
-    stepping forward toward the heroes at the end of a downward cut: the sword in both hands, its blade angled down in
-    front of him with the point at knee height just ahead of his front foot, the whole sword well inside the middle
-    cell (not raised overhead, not reaching the cell edge)
+    stepping forward toward the heroes at the end of a downward cut: the greatsword in both hands, its blade angled
+    down in front of him with the point at knee height just ahead of his front foot, the whole sword well inside the
+    middle cell (not raised overhead, not reaching the cell edge), the wide T visor glowing bright
   hurt: >-
-    knocked back, staggering, the helm tipped back, the sword held upright across the chest in both hands
-  face: a closed black great helm with a narrow visor slit
-  extra_negative: a cape, a cloak, a shield, spikes, a skull, a plume, horns, gold trim, a second sword, a face
-  seeds: [1234]
+    knocked back, staggering, the horned helm tipped back with the glowing T visor still visible, the greatsword held
+    upright across the chest in both hands
+  face: the closed great helm with pale ash-grey horns and the wide glowing ember orange-red T visor, the visor a clear bright spot
+  extra_negative: >-
+    a cape, a cloak, a tabard, a shield, a skull, bones, a plume, gold armour, a second sword, a face, a crown, violet,
+    purple, an all-black silhouette, pure black armour
+  seeds: [1235]   # 1234 (ROSTER_LOG R292): the cut armour nearly all black, the visor and horns lost
 - id: chimera
   # "Chimera" (105): lion body with goat and dragon heads, two bat wings, a snake tail (distinct from rhyos, manticore)
   size: large
