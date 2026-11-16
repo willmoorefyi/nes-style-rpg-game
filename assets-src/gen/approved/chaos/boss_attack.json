@@ -1,0 +1,25 @@
+{
+  "character": "chaos",
+  "sheet": "boss_attack",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "13e9ad9bc62dbbd5c0a7a4cc",
+  "approved": "2026-11-16",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass V R300: self-approved with nits (orb colours)"
+}
