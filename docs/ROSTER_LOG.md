@@ -1037,3 +1037,5 @@ Bedrock calls: **2 of 80** (V0 2 of 12; V0-a 2 of its 3). Cost so far about $0.1
   corona of flame as its head, set on enormous rocky shoulders...") and moves "no face, no eyes, no legs" into the
   negative, and asks for a "half-length bust, the bottom of the image cutting through its chest". (2) For V0-c, the
   mock needs the overhang hand drawn in front of the floor (the rigger's layer) to judge the planned composition.
+
+**FW-C follow-up (worktree `c2-fw`, 0 Bedrock calls).** `bedrock.MODELS["outpaint"]` = `us.stability.stable-outpaint-v1:0`; `colossus.py outpaint | search_replace | structure` (`colossus_edit.py`, Stability Bedrock schemas, local input / range checks, per-subcommand 5.6 purposes, all through `bedrock.invoke`); `selftest_colossus.py` 34 RED -> GREEN on a mocked client. V0-e and V0-d are unblocked on the tooling side; the R30 credential ruling is still open.

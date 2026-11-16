@@ -4,6 +4,8 @@ main checkout only) cannot be bypassed. One call per command (R29): run each in 
 
   python3 -I assets-src/gen/colossus.py gen <form> --model core|sd35|ultra --seed N [--purpose P] [--paid]
   python3 -I assets-src/gen/colossus.py nobg <form> <raw.png> [--purpose P] [--paid]       # remove_bg
+  python3 -I assets-src/gen/colossus.py outpaint|search_replace|structure <form> <raw.png> --seed N ... [--paid]
+                                                                     # edits (colossus_edit.py; V0-e, V0-d, F4)
   python3 -I assets-src/gen/colossus.py pix <form> <nobg.png> [--scale 2|3] [--colors N] [--canvas WxH] [--out F]
   python3 -I assets-src/gen/colossus.py glow|bake|review|check|lock <form>                  # after the layer yaml
   python3 -I assets-src/gen/colossus.py mock <form> [--image F] [--bg F] [--floor F]       # stage mock on rim
@@ -199,6 +201,7 @@ def cmd_budget(a, gem_ledger: Path | None = None, gem_count: int | None = None) 
 
 
 def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_count: int | None = None) -> int:
+    from gen import colossus_edit as CE
     from gen import colossus_review as CR
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -220,13 +223,15 @@ def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_coun
         sub.add_parser(name).add_argument("form")
     m = sub.add_parser("mock")
     m.add_argument("form"); m.add_argument("--image"); m.add_argument("--bg"); m.add_argument("--floor")
+    CE.add_parsers(sub)
     b = sub.add_parser("budget")
     b.add_argument("--check", action="store_true")
     a = ap.parse_args(argv)
     if a.cmd == "budget":
         return cmd_budget(a, gem_ledger, gem_count)
     cmds = {"gen": cmd_gen, "nobg": cmd_nobg, "pix": cmd_pix, "approve": cmd_approve, "glow": CR.cmd_glow,
-            "bake": CR.cmd_bake, "review": CR.cmd_review, "check": CR.cmd_check, "lock": CR.cmd_lock, "mock": CR.cmd_mock}
+            "bake": CR.cmd_bake, "review": CR.cmd_review, "check": CR.cmd_check, "lock": CR.cmd_lock, "mock": CR.cmd_mock,
+            **{k: CE.cmd_edit for k in CE.PURPOSES}}
     return cmds[a.cmd](a)
 
 

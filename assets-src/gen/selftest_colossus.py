@@ -47,10 +47,12 @@ class _FakeClient:
 
     def __init__(self, fail: bool = False, reject: tuple[str, ...] = ()):
         self.calls: list[str] = []
+        self.bodies: list[dict] = []
         self.fail, self.reject = fail, reject
 
     def invoke_model(self, modelId, body, accept, contentType):     # noqa: N803 (boto3 names)
         self.calls.append(modelId)
+        self.bodies.append(json.loads(body))
         if self.fail:
             raise RuntimeError("mocked network failure")
         if modelId in self.reject:
@@ -110,7 +112,8 @@ def sections(check: Callable[[bool, str], None], *fns: Callable) -> None:
 
 
 def run_colossus(check: Callable[[bool, str], None]) -> None:
-    sections(check, _pinned, _guard, _generate_paths, _budget_check, _approve)
+    sections(check, _pinned, _guard, _generate_paths, _budget_check, _approve, _edit_models, _edit_bodies,
+             _edit_gate, _edit_cache)
     from gen import selftest_colossus_art as SCA
     SCA.run_art(check)
 
@@ -300,6 +303,185 @@ def _approve(check) -> None:
         check(dst2.read_bytes() == pix.read_bytes(), "approve: with the archive in place the overwrite is allowed")
         r = _refused(lambda: RT.retire_colossus(tree, "chaos_horizon", "chaos_horizon_v1"), "different")
         check(bool(r), f"retire.py --colossus: refuses an existing archive id with different bytes ({r[:80]!r})")
+
+
+# ───────────── the edit subcommands: outpaint, search_replace, structure (V0-e, V0-d, C3 / F4; 0 paid) ─────────────
+
+OUTPAINT_ID = "us.stability.stable-outpaint-v1:0"       # confirmed read-only in us-west-2 (ROSTER_LOG Pass C - C2)
+
+
+def _src(tmp: Path, size=(256, 112), mode="RGB") -> Path:
+    from PIL import Image
+    p = tmp / "core_11_raw.png"
+    Image.new(mode, size, (40, 40, 44) if mode == "RGB" else (40, 40, 44, 255)).save(p)
+    p.with_suffix(".json").write_text(json.dumps({"seed": 11, "model": "core", "cache_keys": ["k0"]}))
+    return p
+
+
+def _main(C, argv: list[str]) -> tuple[int | None, str]:
+    """(exit code | None on a refusal, stdout + refusal text)."""
+    out = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out):
+            code = C.main(argv)
+    except SystemExit as e:
+        return None, out.getvalue() + str(e)
+    return code, out.getvalue()
+
+
+def _edit_argv(kind: str, src: Path, *extra: str) -> list[str]:
+    base = {"outpaint": ["outpaint", "chaos_horizon", str(src), "--left", "512", "--right", "384", "--up", "256",
+                         "--prompt", "the far shoulder range", "--seed", "11"],
+            "search_replace": ["search_replace", "chaos_horizon", str(src), "--search", "the chest fissure",
+                               "--prompt", "a torn-open fissure, white-hot core", "--seed", "12"],
+            "structure": ["structure", "chaos_horizon", str(src), "--prompt", "arms raised", "--seed", "13"]}[kind]
+    return base + list(extra)
+
+
+def _edit_models(check) -> None:
+    from gen import bedrock as B
+    check(B.MODELS.get("outpaint") == OUTPAINT_ID, f"bedrock.MODELS: outpaint = {OUTPAINT_ID} ({B.MODELS.get('outpaint')})")
+    check(B.MODELS.get("search_replace") == "us.stability.stable-image-search-replace-v1:0"
+          and B.MODELS.get("structure") == "us.stability.stable-image-control-structure-v1:0",
+          "bedrock.MODELS: search_replace and structure keep their inference-profile ids")
+
+
+def _edit_bodies(check) -> None:
+    import base64
+    from PIL import Image
+    from gen import colossus as C
+    want = {"outpaint": ({"image", "left", "right", "up", "down", "prompt", "creativity", "seed", "output_format"},
+                         {"left": 512, "right": 384, "up": 256, "down": 0, "creativity": 0.5, "seed": 11,
+                          "prompt": "the far shoulder range"}, OUTPAINT_ID),
+            "search_replace": ({"image", "prompt", "search_prompt", "seed", "output_format", "grow_mask"},
+                               {"search_prompt": "the chest fissure", "prompt": "a torn-open fissure, white-hot core",
+                                "grow_mask": 5, "seed": 12}, "us.stability.stable-image-search-replace-v1:0"),
+            "structure": ({"image", "prompt", "control_strength", "seed", "output_format"},
+                          {"prompt": "arms raised", "control_strength": 0.7, "seed": 13},
+                          "us.stability.stable-image-control-structure-v1:0")}
+    for kind, (keys, vals, mid) in want.items():
+        with sandbox(_budget()) as (B, tmp, cl):
+            src = _src(tmp)
+            code, out = _main(C, _edit_argv(kind, src, "--purpose", "v0", "--paid"))
+            body = cl.bodies[0] if cl.bodies else {}
+            img = Image.open(io.BytesIO(base64.b64decode(body.get("image", "")))) if body.get("image") else None
+            check(code == 0 and set(body) == keys and all(body.get(k) == v for k, v in vals.items())
+                  and body.get("output_format") == "png" and img is not None and img.size == (256, 112)
+                  and img.format == "PNG" and cl.calls[:1] == [mid],
+                  f"{kind}: body keys {sorted(keys)}, the given values, image = the source as base64 PNG, "
+                  f"output_format png, sent to {mid} ({code}, {sorted(body)}, {cl.calls})")
+            dst = [p for p in tmp.glob("*_raw.png") if p != src]
+            side = json.loads(dst[0].with_suffix(".json").read_text()) if len(dst) == 1 else {}
+            check(len(dst) == 1 and side.get("model") == kind and side.get("purpose") == "v0"
+                  and side.get("source") == str(src) and len(side.get("cache_keys", [])) == 2
+                  and side["cache_keys"][0] == "k0",
+                  f"{kind}: writes one *_raw.png next to the source with a sidecar (model, purpose, source, the "
+                  f"source's cache keys plus this one) ({[p.name for p in dst]}, {side})")
+    with sandbox(_budget()) as (B, tmp, cl):
+        src = _src(tmp, mode="RGBA")
+        _main(C, _edit_argv("structure", src, "--control-strength", "0.4", "--negative", "a face", "--purpose", "v0",
+                            "--paid"))
+        b = cl.bodies[0] if cl.bodies else {}
+        img = Image.open(io.BytesIO(base64.b64decode(b["image"]))) if b.get("image") else None
+        check(b.get("control_strength") == 0.4 and b.get("negative_prompt") == "a face" and img is not None
+              and img.mode == "RGB", f"structure: --control-strength / --negative reach the body; an RGBA source is "
+                                     f"sent as RGB ({ {k: v for k, v in b.items() if k != 'image'} })")
+    bad = (("outpaint with no direction", ["outpaint", "chaos_horizon", "{src}", "--seed", "1"], "direction"),
+           ("outpaint over 2000 px", _edit_argv("outpaint", Path("{src}"), "--down", "2001"), "2000"),
+           ("creativity out of range", _edit_argv("outpaint", Path("{src}"), "--creativity", "1.5"), "creativity"),
+           ("control_strength out of range", _edit_argv("structure", Path("{src}"), "--control-strength", "1.2"),
+            "control_strength"),
+           ("grow_mask out of range", _edit_argv("search_replace", Path("{src}"), "--grow-mask", "21"), "grow_mask"),
+           ("seed 0 (random, not repeatable)", _edit_argv("structure", Path("{src}"))[:-1] + ["0"], "seed"),
+           ("an unknown form", ["structure", "chaos_nope", "{src}", "--prompt", "x", "--seed", "1"], "unknown form"))
+    for label, argv, word in bad:
+        with sandbox(_budget()) as (B, tmp, cl):
+            src = _src(tmp)
+            code, out = _main(C, [a.replace("{src}", str(src)) for a in argv] + ["--purpose", "v0", "--paid"])
+            check(code != 0 and word in out and not cl.calls and not _rows(B),
+                  f"edit: {label} is refused before any request, nothing sent or logged ({out.strip()[-90:]!r})")
+    for label, size in (("a side under 64 px", (63, 100)), ("an aspect over 2.5:1", (260, 100)),
+                        ("over 9,437,184 px", (4000, 2400))):
+        with sandbox(_budget()) as (B, tmp, cl):
+            src = _src(tmp, size=size)
+            code, out = _main(C, _edit_argv("search_replace", src, "--purpose", "v0", "--paid"))
+            check(code != 0 and "input image" in out and not cl.calls and not _rows(B),
+                  f"edit: a source with {label} {size} is refused before any request ({out.strip()[-90:]!r})")
+
+
+def _edit_gate(check) -> None:
+    from gen import colossus as C
+    real = _budget()
+    with sandbox(real) as (B, tmp, cl):
+        src = _src(tmp)
+        code, out = _main(C, _edit_argv("outpaint", src, "--purpose", "v0"))
+        check(code == 0 and "dry run" in out and '"left": 512' in out and not cl.calls and not _rows(B)
+              and not [p for p in tmp.glob("*_raw.png") if p != src],
+              "edit: without --paid an uncached request is only printed (no call, no row, no file)")
+    defaults = (("outpaint", "f3_gen"), ("search_replace", "f4_variant"), ("structure", "v0"))
+    for kind, purpose in defaults:
+        with sandbox(real) as (B, tmp, cl):
+            _main(C, _edit_argv(kind, _src(tmp), "--paid"))
+            rows = _rows(B)
+            check([r["event"] for r in rows] == ["request", "result"] and rows[0]["purpose"] == purpose
+                  and rows[0]["model"] == kind and rows[0]["pass"] == "C" and rows[1]["ok"] is True
+                  and rows[1]["served"] == cl.calls[-1],
+                  f"{kind}: the default purpose is {purpose}; one request row (model {kind}, pass C) before the call "
+                  f"and one result row naming the serving id ({rows})")
+    wrong = (("outpaint", "f4_variant"), ("outpaint", "f3_nobg"), ("search_replace", "f3_gen"),
+             ("structure", "f3_gen"), ("structure", "f4_variant"))
+    for kind, purpose in wrong:
+        with sandbox(real) as (B, tmp, cl):
+            code, out = _main(C, _edit_argv(kind, _src(tmp), "--purpose", purpose, "--paid"))
+            check(code is None and "refused" in out and purpose in out and not cl.calls and not _rows(B),
+                  f"{kind}: purpose {purpose} is not one of its 5.6 purposes, refused before invoke "
+                  f"({out.strip()[-90:]!r})")
+    with sandbox(real) as (B, tmp, cl):
+        r = _main(C, _edit_argv("outpaint", _src(tmp), "--purpose", "reserve:F3 first, orchestrator note", "--paid"))
+        check(r[0] == 0 and _rows(B)[0]["purpose"] == "reserve:F3 first, orchestrator note",
+              "outpaint: reserve:<reason> passes through to the ledger row")
+    with sandbox(real) as (B, tmp, cl):
+        code, out = _main(C, _edit_argv("outpaint", _src(tmp), "--purpose", "reserve", "--paid"))
+        check(code is None and "reserve" in out and not cl.calls, "outpaint: a bare reserve is refused by invoke")
+    with sandbox(real) as (B, tmp, cl):
+        _seed_ledger(B, _fake_rows("v0", PURPOSE_CAPS["v0"]))
+        code, out = _main(C, _edit_argv("structure", _src(tmp), "--purpose", "v0", "--paid"))
+        check(code is None and "cap" in out and not cl.calls and len(_rows(B)) == PURPOSE_CAPS["v0"],
+              f"structure: refused at the v0 cap ({PURPOSE_CAPS['v0']} rows), nothing sent or logged "
+              f"({out.strip()[-80:]!r})")
+    with sandbox(real) as (B, tmp, cl):
+        _seed_ledger(B, _fake_rows("f3_gen", PURPOSE_CAPS["f3_gen"]))
+        code, out = _main(C, _edit_argv("outpaint", _src(tmp), "--paid"))
+        check(code is None and "f3_gen" in out and not cl.calls, "outpaint: refused at the f3_gen cap (gen + outpaint "
+                                                                 "share it, 5.6)")
+    with sandbox(real, linked=True) as (B, tmp, cl):
+        code, out = _main(C, _edit_argv("search_replace", _src(tmp), "--purpose", "v0", "--paid"))
+        check(code is None and "worktree" in out and not cl.calls and not _rows(B),
+              "search_replace: refused from a linked worktree, nothing sent or logged")
+    with sandbox(real, client=_FakeClient(fail=True)) as (B, tmp, cl):
+        with contextlib.suppress(RuntimeError):
+            _main(C, _edit_argv("outpaint", _src(tmp), "--purpose", "v0", "--paid"))
+        rows = _rows(B)
+        check([r["event"] for r in rows] == ["request", "result"] and rows[1]["ok"] is False,
+              f"outpaint: a failed call is logged and counts as spent ({rows})")
+
+
+def _edit_cache(check) -> None:
+    from gen import colossus as C
+    with sandbox(_budget()) as (B, tmp, cl):
+        src = _src(tmp)
+        _main(C, _edit_argv("outpaint", src, "--purpose", "v0", "--paid"))
+        n_rows, n_calls, key = len(_rows(B)), len(cl.calls), _rows(B)[0]["key"]
+        code, out = _main(C, _edit_argv("outpaint", src, "--purpose", "v0"))
+        check(code == 0 and len(_rows(B)) == n_rows and len(cl.calls) == n_calls and '"cached": true' in out
+              and (B.CACHE / f"{key}.png").exists(),
+              "outpaint: the same request again is a cache hit by request hash (free without --paid, no row, no call)")
+        check(key == B.cache_key("outpaint", cl.bodies[0]), "outpaint: the ledger key is the hash of the sent body")
+        _main(C, _edit_argv("outpaint", src)[:-1] + ["12", "--purpose", "v0", "--paid"])
+        _main(C, _edit_argv("outpaint", src, "--down", "64", "--purpose", "v0", "--paid"))
+        keys = [r["key"] for r in _rows(B) if r["event"] == "request"]
+        check(len(cl.calls) == n_calls + 2 and len(set(keys)) == 3,
+              f"outpaint: another seed or another direction is a new request (new key, new row) ({keys})")
 
 
 if __name__ == "__main__":
