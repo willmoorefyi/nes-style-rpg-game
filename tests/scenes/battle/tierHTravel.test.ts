@@ -1,12 +1,12 @@
 /**
- * TS-2 on fixtures (docs/REDESIGN_PLAN.md 2.5, 4.2; 9.5 lungeClearance / enemyTravel rows): the real atlas sheets of
- * the 22 tier-H enemies as FW-S will ship them (`scale: 3`, lungePx x 1.5 as BattleArt.getMonsterFrames scales it),
- * and chaos as a titan (alone in TITAN_AREA, attacking in place).
+ * Tier H in battle (docs/REDESIGN_PLAN.md 2.5, 4.2; 9.5 lungeClearance / enemyTravel rows). Since V4 on the real data:
+ * the 22 tier-H enemies are `size: huge` in enemies.yaml and their atlas sheets carry the FW-S `scale: 3` (lungePx
+ * x 1.5, as BattleArt.getMonsterFrames scales it); chaos is still checked as a titan fixture (alone in TITAN_AREA,
+ * attacking in place) until its titan sheet is integrated.
  * - Every tier-H sheet, alone and in a 3-huge formation, attacking every hero: every displayed frame's own opaque top
  *   (atlas PNG) stays under the message window (TRAVEL_CLEAR_Y), the sprite at a whole screen scale (3 or 2) and a
  *   whole-px position.
  * - The titan: travel 0 on every hero (the heavy table in place), TRAVEL_HOP 0, and no frame above the clear line.
- * When the FW-S atlas and the TS-3 sizes land (V4), the real-data lungeClearance / enemyTravel loops cover the same.
  */
 import { describe, it, expect } from 'vitest';
 import { Container, Graphics } from 'pixi.js';
@@ -14,21 +14,15 @@ import { AiEnemyView, type MonsterArtSource } from '../../../src/scenes/battle/A
 import { PARTY_FEET_Y, partySpritePosition } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { TRAVEL_CLEAR_Y, TRAVEL_HOP } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../../src/rendering/BattleArt.js';
-import { atlasFrames, enemyById, frameBox } from '../../helpers/atlasFrames.js';
+import { atlas, atlasFrames, enemyById, frameBox } from '../../helpers/atlasFrames.js';
 import type { EnemyData } from '../../../src/types/index.js';
 
 const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
   'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
   'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
 
-/** The atlas frames at the sheet scale 3 (what BattleArt returns for an FW-S `scale: 3` sheet). */
-function scaled(sheet: string): MonsterFrames | null {
-  const f = atlasFrames(sheet);
-  if (!f || !TIER_H.includes(sheet)) return f;
-  return { ...f, scale: 3, artScale: 3 / (f.scale / f.artScale), lungePx: (f.lungePx * 3) / f.scale };
-}
-const art: MonsterArtSource = { getMonsterFrames: scaled };
-const huge = (id: string): EnemyData => ({ ...enemyById(id), size: 'huge' });
+const art: MonsterArtSource = { getMonsterFrames: atlasFrames };
+const huge = (id: string): EnemyData => enemyById(id);
 const titan = (): EnemyData => ({ ...enemyById('chaos'), size: 'titan' });
 
 function battle(enemies: EnemyData[]) {
@@ -61,11 +55,12 @@ function highest(b: ReturnType<typeof battle>, sheet: string, f: MonsterFrames):
   return top;
 }
 
-describe('tier H travels under the message window at a whole screen scale (TS-2 fixtures)', () => {
+describe('tier H travels under the message window at a whole screen scale (real data since V4)', () => {
   it.each(TIER_H)('%s: alone and in a 3-huge formation', (id) => {
     const sheet = monsterSpriteKey(enemyById(id));
-    const f = scaled(sheet)!;
-    expect(f.lungePx).toBe(((atlasFrames(sheet)!.lungePx) * 3) / 2);
+    const f = atlasFrames(sheet)!;
+    expect([enemyById(id).size, atlas.sheets[sheet].scale, f.scale]).toEqual(['huge', 3, 3]);
+    expect(f.lungePx).toBe(((atlas.sheets[sheet].lungePx ?? 24) * 3) / atlas.scale);
     const others = TIER_H.filter((x) => x !== id).slice(0, 2);
     for (const layout of [[huge(id)], [huge(id), ...others.map(huge)]]) {
       const b = battle(layout);

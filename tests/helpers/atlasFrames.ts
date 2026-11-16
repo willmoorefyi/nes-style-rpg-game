@@ -21,6 +21,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
 export interface AtlasSheet extends MonsterAnchors {
   page?: number; cell: [number, number]; footRow: number; floating: boolean; lungePx?: number; opaqueRight?: number;
+  /** FW-S per-sheet screen scale (gen/monster_scale.yaml; absent: the atlas scale). */
+  scale?: number;
   frames: Record<string, [number, number]>;
 }
 export const atlas = readMonsterAtlas<{ scale: number; texScale?: number; sheets: Record<string, AtlasSheet> }>();
@@ -66,26 +68,33 @@ export function idleBoxOf(sheet: string): [number, number, number, number] {
   return [l, t, r - 1, b - 1];
 }
 
+/** A sheet's screen px per art px: its FW-S `scale` (3 for the rescaled sheets), else the atlas scale (2). */
+export const sheetScale = (sheet: string): number => atlas.sheets[sheet].scale ?? atlas.scale;
+
 /** A stub with one blank texture per frame and the atlas facts of `sheet` (null: no such sheet). */
 export function atlasFrames(sheet: string): MonsterFrames | null {
   const s = atlas.sheets[sheet];
   if (!s) return null;
   const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
-  return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: atlas.scale,
-    artScale: atlas.scale / ts, cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
-    hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true, opaqueRight: s.opaqueRight ?? idleRight(sheet),
+  // as BattleArt.getMonsterFrames: the sheet's own screen scale (FW-S), its lunge scaled once by scale / atlas scale
+  const sc = sheetScale(sheet);
+  return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: sc,
+    artScale: sc / ts, cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
+    hasRaise: !!s.frames.attack_raise, lungePx: ((s.lungePx ?? 24) * sc) / atlas.scale, anim: true,
+    opaqueRight: s.opaqueRight ?? idleRight(sheet),
     ...monsterAnchors(s), idleBox: idleBoxOf(sheet) };
 }
 
 export const atlasArt: MonsterArtSource = { getMonsterFrames: atlasFrames };
 
-/** The layout input AiEnemyView builds for an enemy id (its size and its sheet's cell and home extent). */
+/** The layout input AiEnemyView builds for an enemy id (enemyBoxInput: its size, its sheet's cell, home extent and scale). */
 export function layoutInput(id: string): EnemyBoxInput {
   const e = enemyById(id);
   const s = atlas.sheets[monsterSpriteKey(e)];
   const size: EnemySizeClass = e.size ?? 'small';
-  const box: EnemyBoxInput = { size, w: s.cell[0] * atlas.scale, h: s.cell[1] * atlas.scale };
+  const sc = sheetScale(monsterSpriteKey(e));
+  const box: EnemyBoxInput = { size, w: s.cell[0] * sc, h: s.cell[1] * sc, scale: sc };
   const a = monsterAnchors(s);
-  if (a.homeX) { box.ox0 = a.homeX[0] * atlas.scale; box.ox1 = (a.homeX[1] + 1) * atlas.scale; }
+  if (a.homeX) { box.ox0 = a.homeX[0] * sc; box.ox1 = (a.homeX[1] + 1) * sc; }
   return box;
 }

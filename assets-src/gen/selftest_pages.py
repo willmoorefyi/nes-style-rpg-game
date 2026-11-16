@@ -78,17 +78,26 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
     run_alias(check)
 
 
+# V4 (docs/REDESIGN_PLAN.md 2.4, D-V2, D-V3): bigeyes (large) and the 22 tier-H (huge) sheets at display scale 3
+V4_RESCALED = ("bigeyes", "shark", "minotaur", "ochu", "neochu", "hydra", "earth_elemental", "fire_elemental",
+               "water_elemental", "air_elemental", "hill_gigas", "fire_gigas", "ice_gigas", "dragon", "white_dragon",
+               "blue_dragon", "green_dragon", "dragon_zombie", "white_shark", "minotaur_zombie", "fire_hydra", "deepeyes",
+               "evil_eye")
+
+
 def run_scale(check: Callable[[bool, str], None]) -> None:
     """FW-S (docs/REDESIGN_PLAN.md 2.2, 7): gen/monster_scale.yaml -> the atlas sheet field `scale`, nothing else. On a
-    two-sprite fixture build: the real table (empty at V1), an explicit {} and a missing file give byte-identical pages
-    and JSON; {goblin: 3} keeps every page byte-identical and adds only `"scale": 3` to goblin's JSON; a value of 4 or
-    an unknown sprite is refused."""
+    two-sprite fixture build: an explicit {}, a missing file and a comment-only table give byte-identical pages and
+    JSON; {goblin: 3} keeps every page byte-identical and adds only `"scale": 3` to goblin's JSON; a value of 4 or an
+    unknown sprite is refused. The real table (empty at V1) holds the 23 V4 sheets at 3 since V4 (REDESIGN_PLAN 2.4); it
+    names sprites the fixture lacks, so the fixture builds take explicit tables only."""
     import tempfile
     from gen import monster_atlas as MAT
     from gen import retire as RT
     real = MAT.load_scale(set(json.loads(ATLAS_JSON.read_text())["sheets"]))
     check(all(v in MAT.DISPLAY_SCALES for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
                                                                  f"({len(real)} entries)")
+    check(real == {s: 3 for s in V4_RESCALED}, f"FW-S: the real table is the 23 V4 sheets at 3 ({sorted(real)})")
     with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):
         t = Path(tmp)
 
@@ -98,10 +107,10 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
                 table.write_text(text)
             out = t / name
             with contextlib.redirect_stdout(io.StringIO()):
-                MAT.build(out, table if name != "real" else None)
+                MAT.build(out, table)
             return {p.name: p.read_bytes() for p in sorted(out.iterdir())}
-        base = build("real", None)
-        same = [build("empty", "{}\n"), build("missing", None), build("comments", "# nothing\n")]
+        base = build("empty", "{}\n")
+        same = [build("missing", None), build("comments", "# nothing\n")]
         check(bool(base) and all(b == base for b in same) and "scale" not in json.loads(base["monsters-ai.json"])
               ["sheets"]["goblin"], "FW-S: an empty, missing or comment-only table gives byte-identical pages and JSON")
         one = build("one", "goblin: 3\n")

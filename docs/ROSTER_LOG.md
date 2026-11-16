@@ -696,3 +696,34 @@ group). G-T0: 0 of 80 cached boss renders reach the titan band (`REDESIGN_PLAN.m
 | `selftest.py` (worktree, with gen/refs) | ALL PASSED, 1022 ok checks; 535 s (the main-checkout run follows the fast-forward) |
 | `npx vitest run` (re-measured at V1) | 220 files, 4171 tests passed; 9.5 s wall (10 s with npx start-up) |
 | Archive fixtures (scratch worktree, never committed) | with chaos, hollow_seraph, black_knight, vampire archived and seraph in state C (`--move-rig`, `--prune`), the pinned selftests (`selftest_pages`, `run_halo_brighten`, `run_fx_allowlist`, `run_fwq_allowlist`, fixmeasure, `_fields`, `selftest_passv`) pass on the archives; `selftest_retire` fails only its "archived files git-tracked" check (uncommitted archive: the gate works) |
+
+### V4 rescale integration (integrator + TS/data, `roster-int`, 2026-11-16, 0 images)
+
+`gen/monster_scale.yaml`: 23 sheets at display scale 3 (D-V1 S1, D-V2, D-V3): bigeyes (`size: small -> large`) and
+the 22 tier-H enemies (`size: large -> huge`): shark, minotaur, ochu, neochu, hydra, earth / fire / water / air
+elemental, hill / fire / ice gigas, dragon, white / blue / green dragon, dragon_zombie, white_shark, minotaur_zombie,
+fire_hydra, deepeyes, evil_eye. The 7 redesigned ids are untouched (chaos stays `size: boss` until its titan sheet is
+integrated).
+
+| Gate | Result |
+|---|---|
+| Atlas JSON vs V-base | only `"scale": 3` added on exactly the 23 sheets; the 9 pages byte-identical (2040x1872, 2048x1856, 2032x1200, 2048x1536, 2048x2000, 2008x768, 2048x2032, 2048x1152, 2048x1696) |
+| Party atlases | byte-identical (`battle_ai`, `field_ai` rebuilt) |
+| Determinism | `PYTHONHASHSEED` 0 and 1: all 10 `monsters-ai*` files identical |
+| Approved sheets, rigs, locks | `git diff --exit-code 0309552 -- assets-src/gen/approved/ assets-src/gen/anim/monsters/` clean |
+| `monster_anim.py check --all` | 123 `OK` (4 FWQ `aliased:` notes), nothing else |
+| Block test (2.7) | 23 of 23 PASS: sprite x, y whole px, scale 3, `scaleMode` nearest, every fully-inside art px's 3x3 screen block equal to the atlas colour (0 mismatches over 2,211-6,042 art px per sheet); negative control (shark shifted 1 px) fails with 792 mismatches |
+| `selftest.py --anim` / `selftest.py` (worktree) | ALL PASSED, 647 / 1023 ok checks (the first `--anim` run failed: the `selftest_retire` exclusion build and `selftest_pages.run_scale` fixture builds read the real table, whose 23 sprites the fixtures lack; fixed below) |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | exit 0; vitest 225 files, 4519 tests |
+| Selftest fixtures | `selftest_retire.patched_tree` also points `monster_atlas.SCALE_TABLE` at the fixture tree; `selftest_pages.run_scale` builds the fixture with explicit tables only and pins the real table to the 23 V4 sheets |
+| Tests | the by-design updates: `atlasFrames` / `enemyTravel` stubs read the sheet scale (lunge x scale / 2); the play-test crowd re-stated (whole scales, all shown at 2 px: the 3 tier-H at pass 3); "nine of every large sheet" re-measured over tier L: 46 -> 26 (20 sheets left for `huge`; bigeyes 87 x 3 = 261 screen px is over the 236 bound and gets its own case: nine at pass 3); size/scale cross-check in `rosterData`; tier-H travel and bestiary cases on the real data |
+
+Image-only rescale review (2 fresh reviewers, battle screenshot next to the ogre and the party at 1x, a 2x nearest
+crop, the bestiary page; `/tmp/v4/`): no blur and no uneven pixel rows or columns on any of the 23; the 3 px density
+step "acceptable, not jarring" (both reviewers). SHIP: bigeyes, shark, minotaur, ochu, hydra, earth / fire / air
+elemental, hill / fire / ice gigas, white / blue dragon, dragon_zombie, minotaur_zombie, evil_eye. SHIP WITH NITS:
+neochu (narrower than ochu, dark palette: less presence than its weaker sibling), water_elemental (smallest
+elemental), green_dragon (noisy shading at 3 px), white_shark (longer but lower than the shark), fire_hydra (wider but
+shorter than the hydra), deepeyes (body no bigger than bigeyes' eye). **ITERATE: dragon** (red): idle 276x165 screen
+px, shorter than the ogre (204) and about 0.6x the other dragons' height; not a size-tier step. The rescale cannot fix
+it (only scales 2 and 3 are allowed; the art is a low, wide ranged pose), so it goes to the orchestrator.

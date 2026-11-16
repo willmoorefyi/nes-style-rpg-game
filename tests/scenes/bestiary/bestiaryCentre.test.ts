@@ -113,23 +113,21 @@ describe('fitShift clamps', () => {
 });
 
 /**
- * TS-2 fixtures until FW-S and TS-3 land: the 22 tier-H sheets at their scale 3 (lungePx x 1.5, as BattleArt scales
- * it) are centred and keep the 12d reach rule over a full loop; a titan of the C1 maximum (300 cell, feet row 292,
- * idle 278 art px tall at scale 2) is clamped by the plain: feet at 770, 6 px above centre (REDESIGN_PLAN 4.2).
+ * Tier H and the titan (REDESIGN_PLAN 2.5, 4.2). Since V4 on the real data: the 22 tier-H enemies are `size: huge` and
+ * their sheets (plus bigeyes) carry the FW-S `scale: 3`; each is centred and keeps the 12d reach rule over a full loop.
+ * A titan of the C1 maximum (300 cell, feet row 292, idle 278 art px tall at scale 2; a fixture until the chaos titan
+ * sheet is integrated) is clamped by the plain: feet at 770, 6 px above centre.
  */
-describe('tier H and the titan in the bestiary (TS-2 fixtures)', () => {
+describe('tier H and the titan in the bestiary', () => {
   const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
     'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
-    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
-  const scaled = (sheet: string): MonsterFrames | null => {
-    const f = atlasFrames(sheet);
-    return f && TIER_H.includes(sheet) ? { ...f, scale: 3, artScale: 3, lungePx: (f.lungePx * 3) / 2 } : f;
-  };
-  const art: MonsterArtSource = { getMonsterFrames: scaled };
+    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye', 'bigeyes'];
+  const art: MonsterArtSource = atlasArt;
 
   it.each(TIER_H)('%s at scale 3: centred within 1 px, every frame of a full loop <= the inner right - 8', (id) => {
-    const e = { ...enemyById(id), size: 'huge' as const };
+    const e = enemyById(id);
     const sheet = monsterSpriteKey(e);
+    expect([e.size, atlas.sheets[sheet].scale]).toEqual([id === 'bigeyes' ? 'large' : 'huge', 3]);
     const preview = new BestiaryPreview(new Container(), new CachedArt(art), never, data);
     preview.show({ enemy: e, seen: true, hasSpells: false }, null);
     preview.update(0);

@@ -6,7 +6,7 @@ import { computeEnemyLayoutAi, formationFits, ENEMY_AREA, TITAN_AREA, type Enemy
 import { seededRng } from '../../../src/scenes/battle/fx/emitterCore.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, enemyData, frameBox, layoutInput } from '../../helpers/atlasFrames.js';
+import { atlas, enemyData, frameBox, layoutInput, sheetScale } from '../../helpers/atlasFrames.js';
 
 const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
@@ -95,6 +95,11 @@ describe('formationFits (T4c)', () => {
 });
 
 /** Opaque packing (docs/ROSTER_FIX_PLAN.md defect 2): boxes from the real atlas (cell and FW-A `homeX`). */
+/** V4: the play-test crowd's shown screen scales (sheet scale x factor), measured: the 3 tier-H sheets at pass 3
+ *  (factor 2/3 of scale 3), the 6 tier-L at factor 1, every one at 2 screen px per art px. */
+const CROWD_SHOWN = [2, 2, 2, 2, 2, 2, 2, 2, 2];
+/** V4: nine bigeyes, measured: pass 3 (factor 2/3), 2 screen px per art px. */
+const BIGEYES_NINE = 2;
 describe('large crowds pack by their home art (defect 2)', () => {
   const opaqueRect = (b: EnemyBox, input: EnemyBoxInput) => {
     const left = b.x - b.w / 2;
@@ -119,28 +124,40 @@ describe('large crowds pack by their home art (defect 2)', () => {
   }
   const homeWidth = (sheet: string) => { const [l, r] = atlas.sheets[sheet].homeX!; return r - l + 1; };
 
-  it('the play-test crowd lays out at scale factor 1; the dragon\'s rect holds its breath', () => {
+  // V4 (REDESIGN_PLAN 2.6): dragon, shark and minotaur are tier H (scale 3) now, so the nine no longer fit at factor 1;
+  // re-stated: whole screen scales, no overlap, and the dragon's rect still holds its breath at its shown scale (the
+  // 6 tier-L members alone at factor 1 and 3 tier-H side by side are pinned in the TS-2 block below)
+  it('the play-test crowd (3 tier-H since V4) lays out with whole screen scales and no overlap; the dragon\'s rect holds its breath', () => {
     const crowd = ['ogre', 'troll', 'dragon', 'crazy_horse', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
     const out = packed(crowd);
-    expect(out.map((b) => b.scaleFactor)).toEqual(Array(9).fill(1));
+    const shown = out.map((b, i) => sheetScale(crowd[i]) * b.scaleFactor);
+    expect(shown, 'measured at V4').toEqual(CROWD_SHOWN);
     const d = crowd.indexOf('dragon');
     const rect = opaqueRect(out[d], layoutInput('dragon'));
     const left = out[d].x - out[d].w / 2;
     for (const fr of ['idle', 'atk_wind1', 'atk_wind2', 'atk_mid', 'attack', 'atk_follow', 'atk_recover'] as const) {
       const [l, , r] = frameBox('dragon', fr);
-      expect(left + l * atlas.scale, fr).toBeGreaterThanOrEqual(rect.l);
-      expect(left + r * atlas.scale, fr).toBeLessThanOrEqual(rect.r);
+      expect(left + l * shown[d], fr).toBeGreaterThanOrEqual(rect.l);
+      expect(left + r * shown[d], fr).toBeLessThanOrEqual(rect.r);
     }
   });
 
-  it('nine of every large sheet whose home art is <= 118 px wide lay out at scale factor 1 (46 sheets: batches C-D plus white_shark, fix pass 2 G4)', () => {
+  it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (26 sheets, re-measured at V4)', () => {
     const large = [...new Set(enemyData.filter((e) => e.size === 'large').map((e) => monsterSpriteKey(e)))];
-    const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) <= 118);
-    expect(s.length).toBe(46);                      // 45 at F5 + white_shark (home art <= 118 px), ROSTER_FIX_PLAN_2 G4
+    const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) * sheetScale(k) <= 236);
+    // 46 at fix pass 2 G4 (45 at F5 + white_shark; 118 art px at scale 2); V4 (REDESIGN_PLAN 2.6): the 20 of them now
+    // `huge` (tier H) leave the large class: 26. bigeyes joins the large class at scale 3 but its home art is 87 x 3 =
+    // 261 screen px, so it is not in this set (nine bigeyes: the next case)
+    expect(s.length).toBe(26);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);
     }
+  });
+
+  it('nine bigeyes (large at scale 3 since V4) lay out with whole screen scales, inside the area, no overlap', () => {
+    const out = packed(Array(9).fill('bigeyes'));
+    expect(out.map((b) => 3 * b.scaleFactor), 'measured at V4').toEqual(Array(9).fill(BIGEYES_NINE));
   });
 
   it('nine fire_lizards (207 px) and nine white_crocodiles (169 px) still fall to half size', () => {
@@ -158,22 +175,24 @@ describe('large crowds pack by their home art (defect 2)', () => {
 });
 
 /**
- * TS-2 (docs/REDESIGN_PLAN.md 2.5, 2.6, 4.2), on fixtures until the FW-S atlas lands: the 23 rescaled sheets as the
- * layout will see them (tier H `huge` at the sheet scale 3, bigeyes `large` at scale 3), the titan alone in TITAN_AREA.
+ * TS-2 (docs/REDESIGN_PLAN.md 2.5, 2.6, 4.2), on the real data since V4: the 23 rescaled sheets as the layout sees them
+ * (tier H `huge` in enemies.yaml at the FW-S sheet scale 3, bigeyes `large` at scale 3), the titan alone in TITAN_AREA
+ * (a fixture until the chaos titan sheet is integrated).
  */
 describe('integer screen scales, tier H and the titan (TS-2)', () => {
   const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
     'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
     'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
-  /** An enemy's layout input with the rescale applied (cell x 3 instead of x 2). */
-  const rescaled = (id: string): EnemyBoxInput => {
-    const b = layoutInput(id);
-    const big = TIER_H.includes(id) || id === 'bigeyes';
-    if (!big) return { ...b, scale: 2 };
-    const k = 3 / 2;
-    return { size: id === 'bigeyes' ? 'large' : 'huge', w: b.w * k, h: b.h * k, scale: 3,
-      ...(b.ox0 !== undefined ? { ox0: b.ox0 * k, ox1: b.ox1! * k } : {}) };
-  };
+  /** An enemy's layout input from the real data (V4: the sheet scale and size are in the atlas and enemies.yaml). */
+  const rescaled = layoutInput;
+
+  it('the 23 rescaled sheets have scale 3 in the atlas and their V4 size in enemies.yaml; no other sheet has a scale', () => {
+    for (const id of [...TIER_H, 'bigeyes']) {
+      expect([layoutInput(id).size, layoutInput(id).scale], id).toEqual([id === 'bigeyes' ? 'large' : 'huge', 3]);
+    }
+    const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale !== undefined).sort();
+    expect(scaled).toEqual([...TIER_H, 'bigeyes'].sort());
+  });
   const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
   const screenScales = (inputs: EnemyBoxInput[]) =>
     computeEnemyLayoutAi(inputs).map((b, i) => (inputs[i].scale ?? 2) * b.scaleFactor);

@@ -28,7 +28,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const meta = JSON.parse(readFileSync(join(root, 'assets/sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number; texScale?: number;
   sheets: Record<string, MonsterAnchors & { cell: [number, number]; footRow: number; floating: boolean; lungePx?: number;
-    frames: Record<string, [number, number]> }>;
+    scale?: number; frames: Record<string, [number, number]> }>;
 };
 const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
 const scenarios = parse(readFileSync(join(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as { id: string; enemies?: string[] }[];
@@ -48,9 +48,10 @@ const art: MonsterArtSource = {
     const s = meta.sheets[sprite];
     if (!s) return null;
     const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
-    return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: meta.scale,
-      artScale: meta.scale / (meta.texScale ?? meta.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
-      hasCast: !!s.frames.cast, hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true,
+    const sc = s.scale ?? meta.scale; // FW-S per-sheet scale, lunge scaled once (as BattleArt.getMonsterFrames)
+    return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: sc,
+      artScale: sc / (meta.texScale ?? meta.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
+      hasCast: !!s.frames.cast, hasRaise: !!s.frames.attack_raise, lungePx: ((s.lungePx ?? 24) * sc) / meta.scale, anim: true,
       opaqueRight: opaque(sprite)[2], ...monsterAnchors(s) };
   },
 };

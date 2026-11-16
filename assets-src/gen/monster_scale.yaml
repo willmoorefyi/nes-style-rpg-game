@@ -3,4 +3,30 @@
 # frames are generated, checked and locked at native size; the GPU draws each art px as a scale x scale block.
 # Format: {<sprite id>: 3}. Allowed values 2 and 3; an id that is not an atlas sheet is refused (monster_atlas.load_scale).
 # Empty: every sheet at the atlas scale 2 (the JSON has no `scale` field per sheet). The integrator fills the entries (V4).
-{}
+# V4 (docs/REDESIGN_PLAN.md 2.3, 2.4; D-V1 S1, D-V2, D-V3): 23 sheets at 3 screen px per art px.
+# tier L, small -> large (FF1 large class):
+bigeyes: 3
+# tier H `huge`, the user's 17 (D-V2; "all dragons" = dragon (red), white, blue, green, dragon_zombie):
+shark: 3
+minotaur: 3
+ochu: 3
+neochu: 3
+hydra: 3
+earth_elemental: 3
+fire_elemental: 3
+water_elemental: 3
+air_elemental: 3
+hill_gigas: 3
+fire_gigas: 3
+ice_gigas: 3
+dragon: 3
+white_dragon: 3
+blue_dragon: 3
+green_dragon: 3
+dragon_zombie: 3
+# tier H siblings (D-V3), so no lesser sibling outgrows its greater one:
+white_shark: 3
+minotaur_zombie: 3
+fire_hydra: 3
+deepeyes: 3
+evil_eye: 3

@@ -1134,7 +1134,7 @@ switches chaos to C2 before its first image).
 - [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d)
 - [x] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator (0 of 80, section 17); D-V6 re-confirm pending (orchestrator) (high, 1h)
 - [ ] V3 generate chaos idle (<= 2 at the titan band, 3rd reserved for C2) -> attack -> cast -> hurt -> raise (<= 3 each); piece comparison per pose (high, 0.5d)
-- [ ] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d)
+- [x] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d; ROSTER_LOG 'Pass V' V4: 22 SHIP / SHIP WITH NITS, dragon ITERATE escalated)
 - [ ] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d)
 - [ ] V5 wave 2 rigs: vampire, hollow_seraph (cast), chaos (titan, cast + raise) (high, 2d)
 - [ ] TS-3 / TS-4: descriptions, lore, size labels, scenarios, formationFits data test (medium, 4h)

@@ -40,14 +40,17 @@ def _refused(fn: Callable[[], object], *words: str) -> bool:
 
 @contextlib.contextmanager
 def patched_tree(gen: Path):
-    """Point monster_anim's APPROVED / RIGS (every build and check reads them) at a fixture tree."""
+    """Point monster_anim's APPROVED / RIGS (every build and check reads them) and monster_atlas's FW-S SCALE_TABLE at a
+    fixture tree (the fixture has no monster_scale.yaml: every sheet at the atlas scale; V4 filled the real table with
+    23 sprites the fixture does not have, which load_scale refuses as unknown)."""
     from gen import monster_anim as MA
-    real = MA.APPROVED, MA.RIGS
-    MA.APPROVED, MA.RIGS = gen / "approved", gen / "anim" / "monsters"
+    from gen import monster_atlas as MAT
+    real = MA.APPROVED, MA.RIGS, MAT.SCALE_TABLE
+    MA.APPROVED, MA.RIGS, MAT.SCALE_TABLE = gen / "approved", gen / "anim" / "monsters", gen / "monster_scale.yaml"
     try:
         yield
     finally:
-        MA.APPROVED, MA.RIGS = real
+        MA.APPROVED, MA.RIGS, MAT.SCALE_TABLE = real
 
 
 def make_fixture(gen: Path) -> None:

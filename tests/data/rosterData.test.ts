@@ -18,7 +18,7 @@ const read = <T>(f: string): T => parse(readFileSync(join(root, f), 'utf-8')) as
 const enemies = read<EnemyData[]>('assets/data/enemies.yaml');
 const bestiary = validateBestiary(read('assets/data/bestiary.yaml'));
 const atlas = JSON.parse(readFileSync(join(root, 'assets/sprites/monsters-ai.json'), 'utf-8')) as {
-  sheets: Record<string, { cell: [number, number]; frames: Record<string, unknown> }>;
+  scale: number; sheets: Record<string, { cell: [number, number]; scale?: number; frames: Record<string, unknown> }>;
 };
 const byId = (id: string): EnemyData => {
   const e = enemies.find((x) => x.id === id);
@@ -52,6 +52,17 @@ describe('roster data: coverage and numbering', () => {
       expect(['small', 'large', 'huge', 'boss', 'titan'].includes(e.size ?? 'small'), e.id).toBe(true);
       expect(['melee', 'ranged']).toContain(e.attack);
     }
+  });
+
+  it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6): huge sheets and bigeyes at scale 3, every other at 2', () => {
+    // V4: 22 tier-H `huge` enemies + bigeyes (`large`, FF1 large class) carry `scale: 3` from gen/monster_scale.yaml
+    const scaleOf = (e: EnemyData): number => atlas.sheets[e.sprite ?? e.id].scale ?? atlas.scale;
+    for (const e of enemies) {
+      const want = e.size === 'huge' || e.sprite === 'bigeyes' ? 3 : 2;
+      expect(scaleOf(e), `${e.id} (${e.size ?? 'small'})`).toBe(want);
+    }
+    expect(enemies.filter((e) => e.size === 'huge').length).toBe(22);
+    expect(byId('bigeyes').size).toBe('large');
   });
 });
 

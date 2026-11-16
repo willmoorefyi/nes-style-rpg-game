@@ -277,7 +277,7 @@
   weakness: ice
   resist: fire
   family: dragon
-  size: large
+  size: huge
 - id: garland
   name: Garland
   num: 12
@@ -656,7 +656,7 @@
   weakness: lightning
   resist: fire
   family: aquatic
-  size: large
+  size: huge
 - id: bigeyes
   name: Bigeyes
   num: 22
@@ -682,7 +682,7 @@
   weakness: lightning
   resist: fire
   family: aquatic
-  size: small
+  size: large
 - id: tarantula
   name: Tarantula
   num: 23
@@ -1071,7 +1071,7 @@
   goldReward: 489
   sprite: minotaur
   attack: melee
-  size: large
+  size: huge
 - id: hill_gigas
   name: Hill Gigas
   num: 40
@@ -1093,7 +1093,7 @@
   sprite: hill_gigas
   attack: melee
   family: giant
-  size: large
+  size: huge
 - id: earth_elemental
   name: Earth Elemental
   num: 41
@@ -1117,7 +1117,7 @@
   attack: melee
   elementalProfile: {weaknesses: [fire], resistances: [ice, lightning], immunities: [], absorbs: []}
   family: magical
-  size: large
+  size: huge
 - id: wight
   name: Wight
   num: 43
@@ -1344,7 +1344,7 @@
   attack: melee
   weakness: lightning
   resist: fire
-  size: large
+  size: huge
 - id: neochu
   name: Neochu
   num: 56
@@ -1367,7 +1367,7 @@
   goldReward: 500
   sprite: neochu
   attack: melee
-  size: large
+  size: huge
 - id: hydra
   name: Hydra
   num: 57
@@ -1390,7 +1390,7 @@
   sprite: hydra
   attack: melee
   family: dragon
-  size: large
+  size: huge
 - id: horned_devil
   name: Horned Devil
   num: 58
@@ -1473,7 +1473,7 @@
   weakness: ice
   resist: fire
   family: magical
-  size: large
+  size: huge
 - id: fire_hydra
   name: Fire Hydra
   num: 61
@@ -1499,7 +1499,7 @@
   weakness: ice
   resist: fire
   family: dragon
-  size: large
+  size: huge
 - id: lava_worm
   name: Lava Worm
   num: 62
@@ -1595,7 +1595,7 @@
   weakness: ice
   resist: fire
   family: giant
-  size: large
+  size: huge
 - id: ashen_queen
   name: Ashen Queen
   num: 67
@@ -1657,7 +1657,7 @@
   attack: melee
   elementalProfile: {weaknesses: [fire, lightning], resistances: [ice], immunities: [], absorbs: []}
   family: dragon
-  size: large
+  size: huge
 - id: winter_wolf
   name: Winter Wolf
   num: 69
@@ -1731,7 +1731,7 @@
   weakness: fire
   resist: ice
   family: giant
-  size: large
+  size: huge
 - id: specter
   name: Specter
   num: 72
@@ -1835,7 +1835,7 @@
   sprite: evil_eye
   attack: melee
   family: magical
-  size: large
+  size: huge
 - id: desert_baretta
   name: Desert Baretta
   num: 76
@@ -2089,7 +2089,7 @@
   weakness: fire
   resist: ice
   family: undead
-  size: large
+  size: huge
 - id: king_mummy
   name: King Mummy
   num: 87
@@ -2258,7 +2258,7 @@
   weakness: fire
   resist: ice
   family: undead
-  size: large
+  size: huge
 - id: sahagin_prince
   name: Sahagin Prince
   num: 93
@@ -2308,7 +2308,7 @@
   weakness: lightning
   resist: fire
   family: aquatic
-  size: large
+  size: huge
 - id: deepeyes
   name: Deepeyes
   num: 95
@@ -2335,7 +2335,7 @@
   weakness: lightning
   resist: fire
   family: aquatic
-  size: large
+  size: huge
 - id: sea_snake
   name: Sea Snake
   num: 96
@@ -2463,7 +2463,7 @@
   weakness: ice
   resist: fire
   family: magical
-  size: large
+  size: huge
 - id: water_naga
   name: Water Naga
   num: 101
@@ -2653,7 +2653,7 @@
   attack: melee
   resist: lightning
   family: dragon
-  size: large
+  size: huge
 - id: green_dragon
   name: Green Dragon
   num: 108
@@ -2678,7 +2678,7 @@
   attack: melee
   weakness: ice
   family: dragon
-  size: large
+  size: huge
 - id: stone_golem
   name: Stone Golem
   num: 109
@@ -2730,7 +2730,7 @@
   sprite: air_elemental
   attack: melee
   family: magical
-  size: large
+  size: huge
 - id: spirit_naga
   name: Spirit Naga
   num: 111
