@@ -20,3 +20,15 @@
 {"event": "result", "key": "4afe96f3a94a52f187f0c726", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
 {"event": "request", "ts": "2026-11-16T14:21:04", "tool": "colossus.py", "model": "search_replace", "purpose": "f4_variant", "seed": 4302, "key": "a6648d0eb54b70adf787f52e", "pass": "C"}
 {"event": "result", "key": "a6648d0eb54b70adf787f52e", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:25:44", "tool": "colossus.py", "model": "structure", "purpose": "reserve:f2-structure (coordinator relay of user ruling 2026-11-16: F2 master via the F3 structure route, within the 80 cap)", "seed": 5201, "key": "29e22d7952891fa1359044d1", "pass": "C"}
+{"event": "result", "key": "29e22d7952891fa1359044d1", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:26:35", "tool": "colossus.py", "model": "structure", "purpose": "reserve:f2-structure (coordinator relay of user ruling 2026-11-16: F2 master via the F3 structure route, within the 80 cap)", "seed": 5202, "key": "6ec8982726b6f02c0ba81070", "pass": "C"}
+{"event": "result", "key": "6ec8982726b6f02c0ba81070", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:28:04", "tool": "colossus.py", "model": "search_replace", "purpose": "reserve:f2-edit (coordinator relay of user ruling 2026-11-16: F2 master, within the 80 cap)", "seed": 5301, "key": "21ff88d972d06f566958c2d6", "pass": "C"}
+{"event": "result", "key": "21ff88d972d06f566958c2d6", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:29:51", "tool": "colossus.py", "model": "search_replace", "purpose": "reserve:f2-edit (coordinator relay of user ruling 2026-11-16: F2 master, within the 80 cap)", "seed": 5302, "key": "f7747bee5638aeff7d1cfa48", "pass": "C"}
+{"event": "result", "key": "f7747bee5638aeff7d1cfa48", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:31:04", "tool": "colossus.py", "model": "remove_bg", "purpose": "f2_nobg", "seed": null, "key": "b2cff3e92335d8e1960ca49d", "pass": "C"}
+{"event": "result", "key": "b2cff3e92335d8e1960ca49d", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:32:24", "tool": "colossus.py", "model": "structure", "purpose": "reserve:f4-structure (coordinator relay of user ruling 2026-11-16: F4 = F3 with the chest torn open; chest region composited back, within the 80 cap)", "seed": 4401, "key": "f1f9409a5ad473d8e28b95b9", "pass": "C"}
+{"event": "result", "key": "f1f9409a5ad473d8e28b95b9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}

@@ -9,9 +9,10 @@ Reads approved/chaos_forms/chaos_horizon/master.png (900x362) and writes, in DIR
 gen/out/colossus/chaos_horizon/core):
   open.png / open_glow.png / open_mask.png    F4: the torso pulled apart along a jagged vertical split under the disc (the halves
                                               stretched apart, 0 at the band edges),
-                                              a stone bridge under the disc, dark inner walls, a
-                                              cluster-textured molten core, floating fragments, warm light on the
-                                              nearby stone, short 2 px cracks, an additive core glow; the mask = art px that differ
+                                              a stone bridge under the disc, an uneven outline, dark
+                                              lips with core-lit inner faces, lifted plate edges, a clustered core
+                                              (white only in small clusters), warm light falling off over 6 px,
+                                              short diagonal 2 px cracks, an additive core glow; the mask = art px that differ
   crack.png / crack_glow.png / crack_mask.png F3 below its own threshold: the same line as a thin glowing fissure with
                                               shorter cracks, nothing pulled apart
 Only pixels inside the torso band (x CX +- BAND) change, and every colour is a 15-bit palette colour.
@@ -31,7 +32,9 @@ from gen import colossus_layers as CL  # noqa: E402
 from gen import pixelize as PX  # noqa: E402
 
 MASTER = HERE.parent / "approved" / "chaos_forms" / "chaos_horizon" / "master.png"
-CX, TOP, BAND = 449, 224, 110                  # the split's centre column, its top (under the disc rim), the band
+CX, TOP, BAND = 449, 224, 110 
+OPEN_END, CRACK_END = 326, 300   # art rows (screen 754 / 676 at place y -224)
+                 # the split's centre column, its top (under the disc rim), the band
 P = CL.BASE_PALETTE
 WHITE, GOLD, EMBER, VOID = (np.array(P[k], np.uint8) for k in ("white", "gold", "ember", "void_black"))
 ORANGE = PX.snap15(np.array([239.0, 140.0, 41.0])).astype(np.uint8)    # the molten mid tone (15-bit)
@@ -77,16 +80,19 @@ def variant(master: Image.Image, open_: bool, seed: int = 7) -> tuple[Image.Imag
     src = np.asarray(master.convert("RGBA"))
     out = src.copy()
     h, w = src.shape[:2]
-    top = TOP + (18 if open_ else 10)               # a stone bridge under the disc rim
-    ys = np.arange(top, h)
-    t = (ys - top) / (h - top)
+    top = TOP + (14 if open_ else 16)               # a stone bridge under the disc rim
+    end = OPEN_END if open_ else CRACK_END          # the split closes again well above the frame bottom
+    ys = np.arange(top, end)
+    t = (ys - top) / (end - top)
     cx = np.round(CX + _smooth(np.cumsum(rng.integers(-1, 2, size=len(ys))).astype(float), 3)).astype(int)
     cx = np.clip(cx, CX - 6, CX + 6)
-    if open_:
-        push = np.round(_smooth(3 + 24 * np.sin(np.pi * np.clip(t * 1.1, 0, 1)) ** 0.7, 6)).astype(int)
-        jag_l = np.repeat(rng.integers(-3, 4, size=len(ys) // 3 + 1), 3)[:len(ys)]
-        jag_r = np.repeat(rng.integers(-3, 4, size=len(ys) // 3 + 1), 3)[:len(ys)]
-        left, right = cx - np.maximum(1, push + jag_l), cx + np.maximum(1, push + jag_r)
+    if open_:                                       # an uneven split: the left edge peaks high, the right low
+        jag_l = np.repeat(rng.integers(-3, 4, size=len(ys) // 4 + 1), 4)[:len(ys)]
+        jag_r = np.repeat(rng.integers(-3, 4, size=len(ys) // 4 + 1), 4)[:len(ys)]
+        wl = _smooth(2 + 20 * np.sin(np.pi * np.clip(t, 0, 1) ** 0.6), 3) + jag_l
+        wr = _smooth(2 + 28 * np.sin(np.pi * np.clip(t, 0, 1) ** 1.35), 3) + jag_r
+        push = np.round((wl + wr) / 2).astype(int)
+        left, right = cx - np.maximum(1, np.round(wl)).astype(int), cx + np.maximum(1, np.round(wr)).astype(int)
     else:
         zig = np.repeat(rng.integers(-1, 2, size=len(ys) // 2 + 1), 2)[:len(ys)]
         cx = np.clip(cx + zig, CX - 7, CX + 7)
@@ -94,7 +100,7 @@ def variant(master: Image.Image, open_: bool, seed: int = 7) -> tuple[Image.Imag
         left, right = cx - wid, cx + 1
         push = np.zeros(len(ys), int)
     core = np.zeros((h, w), bool)
-    noise = _cluster_noise(h, w, rng)
+    noise = _cluster_noise(h, w, rng, 4 if open_ else 3)
     for i, y in enumerate(ys):
         c, d, l, r = cx[i], push[i], left[i], right[i]
         if not src[y, c, 3]:
@@ -107,33 +113,27 @@ def variant(master: Image.Image, open_: bool, seed: int = 7) -> tuple[Image.Imag
             out[y, lo:c - d] = src[y, np.round(lo + (xl - lo) * (c - lo) / (c - d - lo)).astype(int)]
         for x in range(l, r + 1):
             if open_:
-                f = abs(x - (l + r) / 2) / max(1.0, (r - l) / 2)
-                if f > 0.66:                         # the inner walls: shadowed on the left, lit ember on the right
-                    col = VOID if x < c else DEEP
+                dl, dr = x - l, r - x
+                if min(dl, dr) == 0:                  # the dark broken lip
+                    col, hot = VOID, False
+                elif min(dl, dr) <= 3:                # the inner rock faces, lit by the core
+                    col, hot = (EMBER if min(dl, dr) == 1 else ORANGE), False
                 else:
-                    v = f + (noise[y, x] - 0.5) * 0.45
-                    col = WHITE if v < 0.22 else GOLD if v < 0.45 else ORANGE if v < 0.68 else EMBER
+                    f = abs(x - (l + r) / 2) / max(1.0, (r - l) / 2 - 3)
+                    v = f + (noise[y, x] - 0.5) * 0.5
+                    col = WHITE if (v < 0.12 and noise[y, x] < 0.45) else GOLD if v < 0.45 else ORANGE
+                    hot = True
+                core[y, x] = hot
             else:
-                col = WHITE if (x == c and noise[y, x] < 0.55) else GOLD
+                col = GOLD if noise[y, x] < 0.6 else ORANGE
+                core[y, x] = True
             out[y, x, :3], out[y, x, 3] = col, 255
-            core[y, x] = not (open_ and abs(x - (l + r) / 2) / max(1.0, (r - l) / 2) > 0.66)
-        if open_:
-            for x, col in ((l - 1, GOLD), (r + 1, EMBER)):   # the torn stone lips (light from the upper left)
-                if 0 <= x < w and out[y, x, 3]:
-                    out[y, x, :3] = col
-    if open_:                                       # broken stone fragments floating in the molten core
-        for _ in range(7):
-            i = int(rng.integers(len(ys) // 6, len(ys) - 4))
-            if right[i] - left[i] < 14:
-                continue
-            fy, fx = int(ys[i]), int(rng.integers(left[i] + 5, right[i] - 5))
-            fw, fh = int(rng.integers(3, 6)), int(rng.integers(2, 5))
-            out[fy:fy + fh, fx:fx + fw, :3] = VOID
-            out[fy, fx:fx + fw, :3] = GOLD                   # the lit top edge
-            out[fy + fh - 1, fx:fx + fw, :3] = DEEP
-            core[fy:fy + fh, fx:fx + fw] = False
+        if open_ and i % 7 == 3:                      # lifted plate edges: a gold top edge just outside each lip
+            for x0 in (l - 4, r + 1):
+                if 0 <= x0 and x0 + 3 < w and out[y, x0, 3]:
+                    out[y, x0:x0 + 3, :3] = GOLD
     # cracks at the stone's cluster scale: 2 px wide, short, stepping in 2 px
-    for _ in range(9 if open_ else 5):
+    for _ in range(6 if open_ else 4):
         i = int(rng.integers(len(ys) // 8, len(ys)))
         y = int(ys[i])
         side = 1 if rng.random() < 0.5 else -1
@@ -146,16 +146,20 @@ def variant(master: Image.Image, open_: bool, seed: int = 7) -> tuple[Image.Imag
                         out[yy, xx, :3] = ORANGE
                         core[yy, xx] = True
             x += 2 * side
-            y += int(rng.choice([-2, 0, 2]))
-    near = _dist(core, 7 if open_ else 4)
-    _warm(out, src, near, rng, 0.85 if open_ else 0.6)
+            y += int(rng.choice([-2, 2]))
+    lit = core.copy()
+    for i, y in enumerate(ys):                      # the opening's whole width lights the stone around it
+        if src[y, cx[i], 3]:
+            lit[y, left[i]:right[i] + 1] = True
+    near = _dist(lit, 6 if open_ else 2) ** 1.5
+    _warm(out, src, near, rng, 0.8 if open_ else 0.7)
     out[core] = np.where(out[core][:, 3:4] > 0, out[core], out[core])
     glow = np.zeros_like(src)
     g = _dist(core, 3)
     for lo_, lvl, col in ((0.6, 191, "gold"), (0.35, 128, "ember"), (0.01, 64, "ember")):
         sel = (g >= lo_) & (glow[..., 3] == 0) & ~core
         glow[sel] = (*P[col], lvl)
-    glow[core] = (*P["white"], 80 if open_ else 48)
+    glow[core] = (*P["gold"], 64 if open_ else 40)
     mask = (out != src).any(-1)
     return Image.fromarray(out, "RGBA"), Image.fromarray(glow, "RGBA"), mask
 
