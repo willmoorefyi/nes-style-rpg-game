@@ -128,7 +128,9 @@ describe('large crowds pack by their home art (defect 2)', () => {
   // re-stated: whole screen scales, no overlap, and the dragon's rect still holds its breath at its shown scale (the
   // 6 tier-L members alone at factor 1 and 3 tier-H side by side are pinned in the TS-2 block below)
   it('the play-test crowd (3 tier-H since V4) lays out with whole screen scales and no overlap; the dragon\'s rect holds its breath', () => {
-    const crowd = ['ogre', 'troll', 'dragon', 'crazy_horse', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
+    // V8: the regenerated crazy_horse (home art 126 art px) no longer fits this crowd at a whole scale (the sandbox refuses
+    // it, F8); the crowd keeps its shape with nightmare in that slot
+    const crowd = ['ogre', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
     const out = packed(crowd);
     const shown = out.map((b, i) => sheetScale(crowd[i]) * b.scaleFactor);
     expect(shown, 'measured at V4').toEqual(CROWD_SHOWN);
@@ -246,7 +248,9 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   });
 
   it('the play-test crowd with dragon, shark and minotaur rescaled: whole scales, no overlap; the 6 tier-L at factor 1 alone', () => {
-    const crowd = ['ogre', 'troll', 'dragon', 'crazy_horse', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
+    // V8: the regenerated crazy_horse (home art 126 art px) no longer fits this crowd at a whole scale (the sandbox refuses
+    // it, F8); the crowd keeps its shape with nightmare in that slot
+    const crowd = ['ogre', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
     const inputs = crowd.map(rescaled);
     expect(screenScales(inputs).every(whole)).toBe(true);
     expect(formationFits(inputs)).toBe(true);
