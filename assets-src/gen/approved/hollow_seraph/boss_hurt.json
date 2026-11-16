@@ -4,8 +4,8 @@
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
   "seed": 1236,
-  "cache_key": "ae3a5b995c782c9115f90312",
-  "approved": "2026-11-15",
+  "cache_key": "af6d027191f2ed6c5f40fe54",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": true,
   "flip_frames": [],
-  "note": "ROSTER_LOG R37: attempt 3 of 3; six wings, cracks, tilt back"
+  "note": "pass V R319: stray 39 px dash for rig paint"
 }

@@ -3,11 +3,11 @@
   "sheet": "boss_idle",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1235,
-  "cache_key": "d0a454c671a5aa6d6415d916",
-  "approved": "2026-11-15",
+  "seed": 1236,
+  "cache_key": "ea9c18f6205f82d369da51b5",
+  "approved": "2026-11-16",
   "grid": [
-    200,
+    218,
     200
   ],
   "bottom_row": 192,
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": true,
   "flip_frames": [],
-  "note": "pass R G1 R25: six wings, hollow helm, fractured halo (two floating arcs); nits: 50 px lilac glow rim on the helm, visor bars"
+  "note": "pass V R313: R309 re-cut with fit: headroom (0 images)"
 }

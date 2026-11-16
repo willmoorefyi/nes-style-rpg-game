@@ -3,11 +3,11 @@
   "sheet": "boss_attack",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "0cede2c0d74f95ac6c94bb20",
-  "approved": "2026-11-15",
+  "seed": 1238,
+  "cache_key": "9930651761e987e3df821a78",
+  "approved": "2026-11-16",
   "grid": [
-    218,
+    200,
     200
   ],
   "bottom_row": 192,
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": true,
   "flip_frames": [],
-  "note": "pass R G1 R28: seed 1236, best of 3; nits: an ambiguous 7th wing fan, 218 px cell, 4 px headroom, dark feather-edge spurs"
+  "note": "pass V R316"
 }
