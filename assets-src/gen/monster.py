@@ -22,6 +22,12 @@ GUIDE_BOX = (200, 200, 200)
 GUIDE_LINE = (150, 150, 150)
 GUIDE_ARROW = (120, 120, 120)
 HEIGHT_TOLERANCE = 0.10   # figures within 10% of the height band are kept at 1:1
+# FW-C (docs/ROSTER_FIX_PLAN_2.md 6, rev-14 ruling): the most a floating cell drawn lower than the idle is lifted (px)
+# to clear the cell's 2 px bottom margin; a larger need refuses the cut naming the pose. Default 24; white_shark R280:
+# the action cells are drawn 34-36 px lower than the idle (measured lift attack 34, hurt 36; lifted rows 31-125 and
+# 28-125); lifted, they fit the large cell, so 36 (the need rounded up to a multiple of 4). Back to 24 if G3d defers
+# white_shark again (its rig fails the float band); red_piranha R282 needs 8 (hurt).
+LIFT_MAX = 36
 STRAY_FRAC = 0.04     # drop separate blobs smaller than this share of the largest blob (sparks, stray pixels)
 
 
@@ -441,7 +447,9 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         foot_row: int | None = None, haze: bool = False, split: str = "gaps") -> tuple[list[Image.Image], dict]:
     """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
     splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
-    approved sheets are never re-cut)."""
+    approved sheets are never re-cut). A floating cell drawn so low that the shared offset would put it below the cell's
+    2 px bottom margin is lifted by that overflow alone (FW-C, new cuts only; info["lifted"] = {pose: px}); a lift over
+    LIFT_MAX, or a lifted figure above row 2, refuses the cut (ValueError naming the pose)."""
     native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
@@ -520,13 +528,21 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     if lo_x + dx < 2 or hi_x + dx > cw - 3:
         dx = 2 - lo_x if lo_x + dx < 2 else cw - 3 - hi_x
     dy_shared = foot - iy1
-    frames, clipped = [], []
+    frames, clipped, lifted = [], [], {}
     info["cell_px"] = (cw, c)
     dx0 = dx
     for k, fig in enumerate(figs):
         dx = dx0 + oxs[k]
         x0, y0, x1, y1 = bbox(fig)
         dy = dy_shared if floating else foot - y1
+        over = (y1 + dy_shared) - (c - 3) if floating else 0          # FW-C: rows past the 2 px bottom margin
+        if over > 0:
+            pose = S.MONSTER_POSES[k] if n_cells == 3 else f"cell {k}"
+            if over > LIFT_MAX:
+                raise ValueError(f"cut: the floating {pose} cell needs a {over} px lift > LIFT_MAX {LIFT_MAX}")
+            if y0 + dy - over < 2:
+                raise ValueError(f"cut: the floating {pose} cell lifted {over} px would start at row {y0 + dy - over} < 2")
+            dy, lifted[pose] = dy - over, over
         out = np.zeros((c, cw, 4), np.uint8)
         sx0, sy0 = max(0, -dx), max(0, -dy)
         tx0, ty0 = max(0, dx), max(0, dy)
@@ -537,6 +553,8 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
             clipped.append(S.MONSTER_POSES[k])
         frames.append(Image.fromarray(out, "RGBA"))
     info["clipped"] = clipped
+    if lifted:
+        info["lifted"] = lifted
     return frames, info
 
 

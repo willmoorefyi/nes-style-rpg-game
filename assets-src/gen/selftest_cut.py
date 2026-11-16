@@ -6,6 +6,7 @@ a line. Approved sheets are never re-cut (approve.py copies the reviewed cut); t
 selftest_roster (FW-9) and their PNGs by `git diff --exit-code assets-src/gen/approved`."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Callable
 
 import numpy as np
@@ -79,3 +80,63 @@ def run_cut(check: Callable[[bool, str], None]) -> None:
     one, _ = M.cut(_raw(), band, n_cells=1, cell=200, foot_row=192)
     one_t, _ = M.cut(_raw(), band, n_cells=1, cell=200, foot_row=192, split="thirds")
     check(_same(one, one_t), "cut: a one-pose boss cut is unchanged")
+    run_float_lift(check)
+
+
+# ───────── FW-C (docs/ROSTER_FIX_PLAN_2.md 6): the floating lift ─────────
+FW, FH = 150, 175                                     # art px per cell (pitch 5): room for a 100 px figure 40 px low
+
+
+def _float_raw(attack_low: int = 0) -> Image.Image:
+    """Three 100-px floating figures (the large band, 96-120) on magenta; the attack is drawn `attack_low` px lower."""
+    art = Image.new("RGB", (FW * 3, FH), (255, 0, 255))
+    d = ImageDraw.Draw(art)
+    for i, (dx, low) in enumerate(((0, 0), (6, attack_low), (-4, 0))):
+        x0, y1 = i * FW + 40 + dx, 120 + low
+        d.rectangle([x0, y1 - 99, x0 + 60, y1], fill=(60, 140, 60), outline=(0, 0, 0))
+        d.rectangle([x0 + 6, y1 - 94, x0 + 54, y1 - 70], fill=(230, 190, 150))
+    return art.resize((art.width * PITCH, art.height * PITCH), Image.Resampling.NEAREST)
+
+
+def _digest(frames: list[Image.Image]) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    for f in frames:
+        h.update(f"{f.size}".encode() + np.asarray(f).tobytes())
+    return h.hexdigest()[:16]
+
+
+# the cutter's output before FW-C (3ebbe1d), so "unchanged" is pinned rather than recomputed by the changed cutter
+TODAY = {"low10_idle": "e239cf4ba5bc4d70", "low10_hurt": "c3858810103bab0d", "float": "bcbd335faba4f5f6",
+         "ground": "bcbd335faba4f5f6"}
+
+
+def run_float_lift(check: Callable[[bool, str], None]) -> None:
+    band = S.MONSTER_BANDS["large"]
+    low, info = M.cut(_float_raw(10), band, floating=True)
+    check(info["clipped"] == [] and info.get("lifted") == {"attack": 7},
+          f"FW-C: a floating attack drawn 10 px low is lifted 7 px (132 - 125), not clipped ({info['clipped']}, {info.get('lifted')})")
+    bottom = int(np.nonzero((np.asarray(low[1])[..., 3] > 0).any(1))[0].max())
+    check(bottom == band.cell - 3, f"FW-C: the lifted attack's lowest row is the cell's 2 px margin ({bottom})")
+    got = {"low10_idle": _digest([low[0]]), "low10_hurt": _digest([low[2]]),
+           "float": _digest(M.cut(_float_raw(0), band, floating=True)[0]), "ground": _digest(M.cut(_float_raw(10), band)[0])}
+    check(got == TODAY, f"FW-C: the idle and hurt cells, a floating raw with no low cell and a grounded raw are "
+          f"byte-identical to the cutter before FW-C ({got})")
+    check("lifted" not in M.cut(_float_raw(0), band, floating=True)[1] and "lifted" not in M.cut(_float_raw(10), band)[1],
+          "FW-C: no `lifted` entry without a low floating cell")
+    over = M.LIFT_MAX + 1 + 3                          # the lift is the drop minus the 3 px (2 px margin + the foot row gap)
+    try:
+        M.cut(_float_raw(over), band, floating=True)
+        refused = ""
+    except ValueError as e:
+        refused = str(e)
+    check("attack" in refused and str(M.LIFT_MAX) in refused, f"FW-C: a lift of LIFT_MAX + 1 is refused naming the pose ({refused!r})")
+    import os
+    import subprocess
+    import sys
+    code = ("import sys; sys.path.insert(0, sys.argv[1]); from gen import selftest_cut as T, monster as M, spec as S; "
+            "print(T._digest(M.cut(T._float_raw(10), S.MONSTER_BANDS['large'], floating=True)[0]))")
+    root = str(Path(__file__).resolve().parents[1])
+    outs = {subprocess.run([sys.executable, "-I", "-c", code, root], capture_output=True, text=True,
+                           env={**os.environ, "PYTHONHASHSEED": s}).stdout.strip() for s in ("0", "1")}
+    check(len(outs) == 1 and _digest(low) in outs, f"FW-C: PYTHONHASHSEED 0 and 1 give the same bytes ({outs})")

@@ -14,6 +14,9 @@ import yaml
 BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4); FW-7 (pass R,
 # orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
+# FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the pre-allowlisted partial-rig aliases; G6 removes the unused ones
+FWQ_ALLOW = {("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
+             ("black_knight", "hurt"), ("astos", "attack")}
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
 FX_PENDING: set[tuple[str, str]] = set()
 
@@ -214,6 +217,15 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
     check(not missing, f"fx allowlist: every approved fx part is declared {sorted(missing)}")
 
 
+def run_fwq_allowlist(check: Callable[[bool, str], None]) -> None:
+    """FW-Q: the code's allowlist is exactly this one, and every live rig's alias is on it (at most one per rig)."""
+    from gen import monster_anim as MA
+    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the 6 pre-allowlisted entries "
+          f"({sorted(getattr(MA, 'FWQ_ALLOW', set()))})")
+    live = {(p.stem, a) for p in sorted(MA.RIGS.glob("*.yaml")) for a in (yaml.safe_load(p.read_text()) or {}).get("alias") or []}
+    check(live <= FWQ_ALLOW, f"FW-Q: every live rig alias is allowlisted ({sorted(live)})")
+
+
 def lich_crystal_ratio(cfg: dict | None = None) -> tuple[int, int]:
     """(crystal px in the generated lich cast_rise, crystal px in the approved cast keyframe), from the real rig and
     sheet; `cfg` overrides the rig file (the RED-first run sets the rise scale back to 1.0 in memory)."""
@@ -354,11 +366,16 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     nul["paint"][-1]["rgb"] = None
     check(MK.paint_keys("goblin", nul, kfs)[1] == ["idle"], "FW-P: rgb null (transparent) is allowed")
     for sid, caps in (("goblin", {"hurt": 200}), ("crocodile", {"hurt": 221}), ("crocodile", {"idle": 200}),
-                      ("drowned_sovereign", {"cast": 301})):
+                      ("drowned_sovereign", {"cast": 301}), ("chimera", {"attack": 801}), ("chimera", {"hurt": 601}),
+                      ("chimera", {"idle": 200})):
         check(_refused(lambda: MK.paint_keys(sid, {"kf_paint_cap": caps}, kfs), sid, "not an approved exception"),
               f"FW-P: kf_paint_cap {caps} on {sid} is refused (not in the allowlist)")
-    check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300} and MK.KF_PAINT_CAP == 160,
-          "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220 and drowned_sovereign/cast <= 300")
+    check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300, ("chimera", "attack"): 800,
+                                ("chimera", "hurt"): 600} and MK.KF_PAINT_CAP == 160,
+          "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220, drowned_sovereign/cast <= 300 and "
+          "(FW-PA, D-R1) chimera/attack <= 800, chimera/hurt <= 600")
+    for k, n in (("attack", 800), ("hurt", 600)):
+        check(MK.paint_keys("chimera", {"kf_paint_cap": {k: n}}, kfs)[1] == [], f"FW-PA: chimera kf_paint_cap {{{k}: {n}}} is allowed")
     raw = {e[0]: e for e in MA.load_entries(paint=False)}
     ck = raw["crocodile"][2]
     ch = np.asarray(ck["hurt"].convert("RGBA"))
@@ -377,13 +394,15 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     for bad_p, why in (({"frame": "cast", "xy": blue[:1], "rgb": None}, "null"), ({"frame": "cast", "xy": holes, "rgb": [41, 99, 99]}, "transparent")):
         check(_refused(lambda: MK.paint_keys("drowned_sovereign", {"kf_paint_cap": {"cast": 300}, "paint": [bad_p]}, dk),
                        "remap only"), f"FW-P: drowned_sovereign/cast is a remap only ({why} refused)")
-    kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})]
+    kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})
+               or (yaml.safe_load(p.read_text()) or {}).get("key_offset")]            # FW-O: an offset key is locked too
     kf_locks = [p.name for p in sorted(MA.RIGS.glob("*.lock.json")) if any(k.startswith("kf:") for k in json.loads(p.read_text()))]
     check(len(list(MA.RIGS.glob("*.lock.json"))) >= 77 and kf_locks == sorted(f"{s}.lock.json" for s in kf_rigs),
-          f"FW-P: kf: lock entries exactly for the rigs with keyframe paint (rigs {kf_rigs}, locks {kf_locks})")
+          f"FW-P / FW-O: kf: lock entries exactly for the rigs with keyframe paint or key_offset (rigs {kf_rigs}, locks {kf_locks})")
 
 
 def run_efix(check: Callable[[bool, str], None]) -> None:
+    from gen.selftest_keyoffset import run_key_offset     # FW-O (ROSTER_FIX_PLAN_2.md 4)
     for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal,
-               run_halo_brighten, run_kf_paint):
+               run_halo_brighten, run_kf_paint, run_key_offset, run_fwq_allowlist):
         fn(check)

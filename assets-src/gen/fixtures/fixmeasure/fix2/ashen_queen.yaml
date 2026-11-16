@@ -1,0 +1,276 @@
+sprite: ashen_queen
+body: naga                     # FW-3: six arms on a serpent tail, resting on the coil and the altar
+facing: right
+sampler: nearest
+breath: true
+attack_hand: [n, n2, n3]       # the near (right-hand) set reaches toward the party
+half_hand: [f, f2, f3]         # the far set (orb, open hand, blade) moves half as far
+cast_hand: [f, n]              # the two raised hands lift in cast_release
+weapon_hand: f3                # the sickle blade in the lowest far hand
+keyframes:
+  idle:
+    c_f: [40, 170]
+    c_n: [125, 186]
+    alt: [133, 140]
+    tail0: [150, 187]
+    tail1: [161, 178]
+    tail2: [163, 160]
+    tail_tip: [157, 140]
+    s0: [116, 155]
+    s1: [110, 125]
+    hip: [101, 97]
+    chest: [101, 58]
+    neck: [102, 50]
+    crown: [102, 24]
+    sh_n: [115, 58]
+    el_n: [132, 60]
+    hand_n: [139, 38]
+    sh_f: [88, 58]
+    el_f: [62, 60]
+    hand_f: [57, 34]
+    orb: [61, 18]
+    sh_n2: [113, 73]
+    el_n2: [132, 79]
+    hand_n2: [150, 75]
+    sh_f2: [86, 74]
+    el_f2: [68, 80]
+    hand_f2: [50, 74]
+    sh_n3: [112, 86]
+    el_n3: [130, 93]
+    hand_n3: [146, 96]
+    cen: [148, 120]
+    sh_f3: [88, 88]
+    el_f3: [74, 99]
+    hand_f3: [60, 104]
+    tip: [26, 76]
+  attack:
+    c_f: [40, 170]
+    c_n: [125, 186]
+    alt: [133, 140]
+    tail0: [150, 187]
+    tail1: [160, 178]
+    tail2: [160, 160]
+    tail_tip: [156, 140]
+    s0: [113, 160]
+    s1: [100, 125]
+    hip: [99, 93]
+    chest: [120, 64]
+    neck: [127, 58]
+    crown: [130, 34]
+    sh_n: [122, 65]
+    el_n: [145, 64]
+    hand_n: [160, 58]
+    orb_a: [168, 57]
+    sh_f: [100, 62]
+    el_f: [75, 48]
+    hand_f: [55, 35]
+    sh_n2: [120, 75]
+    el_n2: [145, 78]
+    hand_n2: [170, 78]
+    sh_f2: [98, 72]
+    el_f2: [72, 62]
+    hand_f2: [48, 58]
+    sh_n3: [115, 88]
+    el_n3: [135, 95]
+    hand_n3: [142, 104]
+    cen_a: [141, 113]
+    sh_f3: [95, 82]
+    el_f3: [70, 80]
+    hand_f3: [52, 82]
+    tip: [18, 50]
+  cast:
+    c_f: [40, 170]
+    c_n: [125, 186]
+    alt: [133, 140]
+    tail0: [150, 187]
+    tail1: [161, 178]
+    tail2: [163, 160]
+    tail_tip: [157, 140]
+    s0: [116, 155]
+    s1: [108, 125]
+    hip: [98, 96]
+    chest: [98, 58]
+    neck: [98, 50]
+    crown: [98, 22]
+    sh_n: [112, 60]
+    el_n: [130, 62]
+    hand_n: [138, 38]
+    sh_f: [84, 60]
+    el_f: [60, 62]
+    hand_f: [55, 35]
+    orb: [60, 18]
+    sh_n2: [112, 75]
+    el_n2: [132, 80]
+    hand_n2: [148, 75]
+    sh_f2: [84, 76]
+    el_f2: [65, 80]
+    hand_f2: [45, 76]
+    sh_n3: [110, 88]
+    el_n3: [128, 95]
+    hand_n3: [143, 98]
+    cen: [143, 120]
+    sh_f3: [86, 90]
+    el_f3: [70, 100]
+    hand_f3: [55, 108]
+    tip: [24, 78]
+  hurt:
+    c_f: [40, 170]
+    c_n: [125, 186]
+    alt: [133, 140]
+    tail0: [148, 187]
+    tail1: [158, 170]
+    tail2: [165, 145]
+    tail_tip: [180, 112]
+    s0: [115, 158]
+    s1: [100, 128]
+    hip: [98, 100]
+    chest: [96, 60]
+    neck: [94, 54]
+    crown: [82, 30]
+    sh_n: [110, 58]
+    el_n: [126, 56]
+    hand_n: [130, 36]
+    sh_f: [85, 62]
+    el_f: [56, 60]
+    hand_f: [49, 32]
+    orb: [55, 18]
+    sh_n2: [110, 72]
+    el_n2: [130, 75]
+    hand_n2: [148, 72]
+    sh_f2: [82, 74]
+    el_f2: [62, 80]
+    hand_f2: [40, 75]
+    sh_n3: [108, 85]
+    el_n3: [125, 90]
+    hand_n3: [140, 95]
+    cen: [165, 108]
+    stk: [150, 119]
+    sh_f3: [82, 88]
+    el_f3: [62, 100]
+    hand_f3: [48, 103]
+    tip: [18, 75]
+parts:
+  head: {radius: 9.0}
+  torso: {radius: 7.0}
+  altar: {bone: [c_n, alt], radius: 4.0}                       # the altar is part of the body: static on the coil
+  # the sun disc is in the upper far hand except in the attack (upper near hand): own joint names per hand, so no
+  # frame interpolates it across the body
+  orb: {bone: {idle: [hand_f, orb], attack: [hand_n, orb_a], cast: [hand_f, orb], hurt: [hand_f, orb]}, radius: 3.0}
+  # censer, chain and smoke ride the lowest near hand (the attack draws only the cup)
+  censer: {bone: {idle: [hand_n3, cen], attack: [hand_n3, cen_a], cast: [hand_n3, cen], hurt: [hand_n3, cen]}, radius: 3.0}
+  # the hurt key's pale streak under the censer (approved nit): its own part riding the hand unturned (turning with the
+  # censer it came loose)
+  streak: {bone: {hurt: [hand_n3, stk]}, radius: 1.0, in: [hurt]}
+frames:
+  # The head rides the chest in every cut but the hurt flinch (it is not in `moves`, so it keeps its source angle):
+  # turning it opened the crown rays' contacts with the shoulders (seams, enclosed holes).
+  # wind-up: the near set draws back with the torso, the open hand and the blade follow at half t; the orb arm only
+  # rides the chest, shifted left with the lean (turning it closed the gap to the crown rays); the free tail curls back
+  atk_wind1:
+    half: [f2, f3]
+    moves: &wind [chest, hip, s1, sh_n, el_n, hand_n, sh_n2, el_n2, hand_n2, sh_n3, el_n3, hand_n3, sh_f2, el_f2, hand_f2,
+                  sh_f3, el_f3, hand_f3, tip, tail1, tail2, tail_tip]
+    tweaks: {tail2: [-1, 1], tail_tip: [-2, 2], el_f: [-1, 0], hand_f: [-1, 0], orb: [-1, 0]}
+  atk_wind2:
+    half: [f2, f3]
+    moves: *wind
+    tweaks: {tail2: [-2, 1], tail_tip: [-4, 3], el_f: [-2, 0], hand_f: [-2, 0], orb: [-2, 0]}
+  atk_mid:                     # the arms and the serpent body toward the wind-up; the torso and head keep the attack lean
+    moves: [s1, hip, sh_n, el_n, hand_n, sh_f, el_f, hand_f, sh_n2, el_n2, hand_n2, sh_f2, el_f2, hand_f2,
+            sh_n3, el_n3, hand_n3, sh_f3, el_f3, hand_f3, tip, tail1, tail2, tail_tip]
+    tweaks: {tail_tip: [-2, 1]}
+  # the tail lashes out after the strike, then settles
+  atk_follow:
+    moves: &follow [chest, hip, s1, sh_n, el_n, hand_n, sh_n2, el_n2, hand_n2, sh_n3, el_n3, hand_n3, sh_f, el_f, hand_f,
+                    sh_f2, el_f2, hand_f2, sh_f3, el_f3, hand_f3, tip, tail1, tail2, tail_tip]
+    tweaks: {tail2: [2, -2], tail_tip: [5, -5]}
+  atk_recover:
+    moves: *follow
+    tweaks: {tail_tip: [2, -2]}
+  hurt_in1:                    # the flinch: every arm at full t, the orb arm kept clear of the tilting crown; the
+    half: []                   # free tail starts its lash (12g: rises toward the hurt lash; more closes an 1800 px
+                               # loop with the censer smoke)
+    tweaks: {el_f: [-5, 0], hand_f: [-5, 0], orb: [-5, 0], tail1: [1, -2], tail2: [2, -6], tail_tip: [3, -10]}
+  hurt_in2:                    # the censer keeps its swing (moving it back toward idle closed a 2000 px loop between
+                               # body, smoke and tail); 12g: the tail lash lowered toward the hurt_in1 tail (translated
+                               # down, not swung back), so its centroid steps 4.0 px hurt_in1->hurt_in2 (body 2.6)
+    half: []
+    tweaks: {tail1: [-1, 3], tail2: [-2, 8], tail_tip: [-4, 14]}
+    moves: [s1, hip, chest, neck, crown, sh_n, el_n, hand_n, sh_f, el_f, hand_f, orb, sh_n2, el_n2, hand_n2, sh_f2,
+            el_f2, hand_f2, sh_n3, el_n3, hand_n3, sh_f3, el_f3, hand_f3, tip]
+  daze:                        # the shared slump, the crown only drooping 1 px against the lowered body
+    tweaks: {crown: [-2, -2], neck: [-3, -3]}
+  daze_b:
+    tweaks: {crown: [-2, -2], neck: [-3, -3]}
+  # cast: the six hands gather toward the body, the raised pair lifts, then all are flung up and out
+  cast_gather:
+    moves: &cast [chest, hip, s1, sh_n, el_n, hand_n, sh_f, el_f, hand_f, sh_n2, el_n2, hand_n2, sh_f2, el_f2, hand_f2,
+                  sh_n3, el_n3, hand_n3, sh_f3, el_f3, hand_f3, tail1, tail2, tail_tip]
+    tweaks: {hand_f: [0, 2], orb: [0, 2], hand_n: [-2, 2], hand_n2: [-3, 1], hand_f2: [3, 1],
+             hand_n3: [-2, 0], cen: [-2, 0], hand_f3: [2, 0], tip: [2, 0]}
+  cast_rise:
+    moves: *cast
+    tweaks: {el_f: [0, -1], hand_f: [0, -3], orb: [0, -3], el_n: [0, -1], hand_n: [0, -3]}
+  cast_release:
+    tweaks: {orb: [0, -2], hand_n2: [3, -2], hand_f2: [-3, -2], el_n2: [1, -1], el_f2: [-1, -1]}
+z:
+  idle: [coil, altar, tail, body, uarm_f3, weapon, farm_f3, uarm_f2, farm_f2, uarm_f, farm_f, orb, torso, head, uarm_n3, farm_n3, censer, uarm_n2, farm_n2, uarm_n, farm_n]
+masks:
+  coil:                        # the resting column and belly below s0: static with the coil (pinned)
+    idle: [[0, 159], [147, 159], [147, 196], [0, 196]]
+    attack: [[0, 162], [147, 162], [147, 196], [0, 196]]
+    cast: [[0, 159], [147, 159], [147, 196], [0, 196]]
+    hurt: [[0, 161], [132, 161], [132, 196], [0, 196]]
+  torso:
+    idle: [[90, 54], [112, 54], [116, 66], [113, 84], [108, 97], [94, 97], [88, 84], [86, 66]]
+    attack: [[103, 58], [126, 58], [128, 70], [118, 86], [108, 95], [94, 95], [94, 82], [100, 68]]
+    cast: [[87, 54], [110, 54], [114, 66], [111, 84], [106, 96], [91, 96], [85, 84], [83, 66]]
+    hurt: [[84, 56], [108, 56], [112, 68], [110, 86], [106, 100], [91, 100], [84, 86], [81, 68]]
+  head:                        # the whole ray crown (its tips went to the orb arm)
+    idle: [[78, 30], [84, 14], [100, 6], [118, 12], [127, 26], [126, 44], [116, 52], [90, 52], [80, 46], [73, 44], [73, 38], [78, 37]]
+    attack: [[108, 40], [112, 22], [128, 14], [144, 22], [150, 38], [146, 55], [134, 62], [118, 60], [110, 52]]
+    cast: [[74, 34], [80, 16], [98, 6], [116, 14], [124, 30], [122, 46], [110, 56], [86, 56], [76, 46]]
+    hurt: [[62, 40], [70, 24], [86, 20], [102, 26], [112, 40], [108, 54], [96, 60], [76, 58], [64, 50]]
+  altar:
+    idle: [[122, 134], [142, 130], [144, 193], [106, 193], [106, 180], [122, 178]]
+    attack: [[122, 134], [142, 130], [144, 193], [106, 193], [106, 180], [122, 178]]
+    cast: [[122, 134], [142, 130], [144, 193], [106, 193], [106, 180], [122, 178]]
+    hurt: [[122, 134], [142, 130], [144, 193], [106, 193], [106, 180], [122, 178]]
+  weapon:                      # the sickle blade (nearest-bone gave its tip to the open hand)
+    idle: [[22, 72], [30, 74], [36, 86], [46, 96], [56, 98], [60, 102], [58, 112], [48, 112], [38, 104], [28, 94], [23, 84]]
+    attack: [[14, 46], [20, 46], [24, 58], [32, 70], [42, 76], [50, 78], [52, 84], [46, 90], [36, 86], [24, 76], [16, 62]]
+    cast: [[20, 74], [28, 76], [34, 88], [44, 98], [54, 100], [58, 104], [56, 114], [46, 114], [36, 106], [26, 96], [21, 86]]
+    hurt: [[15, 72], [22, 74], [28, 86], [36, 95], [46, 97], [50, 101], [48, 110], [38, 110], [28, 102], [19, 92], [15, 82]]
+  orb:
+    idle: [[46, 5], [76, 5], [76, 29], [46, 29]]
+    attack: [[158, 40], [184, 40], [184, 66], [168, 66], [168, 73], [163, 73], [163, 57], [158, 50]]
+    cast: [[45, 3], [77, 3], [77, 30], [45, 30]]
+    hurt: [[42, 4], [70, 4], [70, 30], [42, 30]]
+  censer:
+    idle: [[139, 100], [152, 100], [152, 92], [178, 92], [178, 122], [158, 122], [158, 134], [139, 134]]
+    attack: [[134, 107], [149, 107], [149, 121], [134, 121]]
+    cast: [[136, 100], [150, 100], [150, 66], [180, 66], [180, 125], [154, 125], [154, 133], [136, 133]]
+    hurt: [[150, 96], [150, 62], [186, 52], [186, 100], [170, 108], [160, 125], [138, 125], [140, 104]]
+  streak:
+    hurt: [[138, 114], [171, 110], [171, 125], [138, 125]]
+holds: []
+paint:                         # joint cracks and small enclosed gaps where crossing arms meet, closed with the
+                               # neighbouring approved colour (re-derived after every rig change)
+  - {frame: atk_wind1, xy: [[83, 84]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[87, 93]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[83, 63], [84, 63], [82, 64], [83, 64], [85, 64], [86, 64], [88, 64], [87, 65]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[85, 63]], rgb: [41, 41, 49]}
+  - {frame: atk_mid, xy: [[86, 63], [87, 64]], rgb: [57, 49, 57]}
+  - {frame: atk_recover, xy: [[96, 55]], rgb: [49, 41, 49]}
+  - {frame: atk_recover, xy: [[88, 88], [90, 88], [92, 88]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[81, 55], [118, 81], [119, 81], [121, 81], [122, 81], [120, 82], [121, 82], [122, 82], [123, 82], [124, 82]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[119, 82]], rgb: [33, 33, 41]}
+  - {frame: hurt_in2, xy: [[68, 87]], rgb: [33, 33, 41]}
+  - {frame: hurt_in2, xy: [[69, 87], [70, 87], [68, 88]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[67, 88]], rgb: [49, 41, 57]}
+  - {frame: daze, xy: [[88, 55], [89, 57]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[88, 58], [89, 60]], rgb: [6, 4, 10]}
+  - {frame: cast_gather, xy: [[89, 51], [88, 52], [87, 53], [86, 54], [88, 55]], rgb: [6, 4, 10]}
+  - {frame: cast_rise, xy: [[113, 54]], rgb: [6, 4, 10]}
+  - {frame: cast_release, xy: [[74, 86], [75, 86], [72, 87], [73, 87], [74, 87], [70, 88], [72, 88]], rgb: [6, 4, 10]}
+  - {frame: cast_release, xy: [[71, 88]], rgb: [49, 41, 49]}

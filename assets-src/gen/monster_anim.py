@@ -101,8 +101,34 @@ def lunge_px(idle: Image.Image) -> int:
 
 
 def load_rig(sprite: str) -> dict | None:
+    """The rig file, with FW-O's `key_offset` translation of the offset keys' joints, masks and keyframe paint."""
+    from gen import monster_keys as MK
     p = RIGS / f"{sprite}.yaml"
-    return (yaml.safe_load(p.read_text()) or {}) if p.exists() else None
+    return MK.offset_cfg(sprite, yaml.safe_load(p.read_text()) or {}) if p.exists() else None
+
+
+# FW-Q (ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens out,
+# so they resolve to their source keys as on a keyframe-only sheet. Only these sheets (rev-20 ruling, pinned by
+# selftest_efix.FWQ_ALLOW; G6 removes the unused ones), one aliased sequence per rig.
+FWQ_ALLOW = {("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
+             ("black_knight", "hurt"), ("astos", "attack")}
+ALIAS_FRAMES = {"hurt": ("hurt_in1", "hurt_in2"),
+                "attack": ("atk_wind1", "atk_wind2", "atk_mid", "atk_follow", "atk_recover")}
+
+
+def aliased(sprite: str, cfg: dict | None) -> tuple[list[str], set[str]]:
+    """FW-Q: (aliased sequences, the frame names they leave out); a ValueError naming the rig for an alias that is
+    not hurt / attack, not in FWQ_ALLOW, or a second one."""
+    seqs = list((cfg or {}).get("alias") or [])
+    for s in seqs:
+        if s not in ALIAS_FRAMES:
+            raise ValueError(f"rig {sprite}: alias {s!r}: only {' or '.join(ALIAS_FRAMES)} can be aliased")
+        if (sprite, s) not in FWQ_ALLOW:
+            raise ValueError(f"rig {sprite}: alias {s!r} is not in FWQ_ALLOW "
+                             f"({', '.join(f'{a}/{b}' for a, b in sorted(FWQ_ALLOW))})")
+    if len(seqs) > 1:
+        raise ValueError(f"rig {sprite}: alias {seqs}: at most one aliased sequence per rig")
+    return seqs, {n for s in seqs for n in ALIAS_FRAMES[s]}
 
 
 def lock_path(sprite: str) -> Path:
@@ -182,7 +208,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     size = (cell[1], cell[0])
     arrs = {k: np.asarray(v.convert("RGBA")).copy() for k, v in keyframes.items()}
     segs = {k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes}
-    holds, pairs = held(cfg.get("holds")), rig.joined_pairs()
+    holds, pairs = held(cfg.get("holds")) | aliased(sprite, cfg)[1], rig.joined_pairs()   # FW-Q: aliased = held
     gaps = {k: RR.source_gaps(s[0], pairs) for k, s in segs.items()}     # the approved art's own part gaps
     foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
                   for ft in rig.feet}

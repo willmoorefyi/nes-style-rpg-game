@@ -557,3 +557,42 @@ and 35 new batch C/D rigs. 112 locked rigs; black_knight and water_elemental sta
 - FW-A constant re-measured: ogre `lungeRight` 125 -> 110 (125 was the old atk_recover club; F3b eased it).
 - Open for F6: the accepted nits (ogre missing downswing, ochu motion, ashen_queen coil-base registration in the
   approved hurt / attack keys) and T-K for the 9 keyframe-only sheets.
+
+## Fix pass 2 (ROSTER_FIX_PLAN_2.md, G1 framework, 2026-11-15)
+
+G1 on `fix2-fw` (off `roster-int` 3ebbe1d): FW-M2 (`fixmeasure.py edges | match | poly | switch | rowspan | sweep`,
+`colours` / `select` with `--vs --shift --poly --not-mask --masks`; code in `fixmeasure_edges.py` / `fixmeasure_seq.py`),
+FW-PA (chimera attack 800 / hurt 600), FW-O (`key_offset`), FW-Q (`alias`, 6 pre-allowlisted entries), FW-C (floating
+lift, `LIFT_MAX` 36). The RED pins use rig fixtures `gen/fixtures/fixmeasure/fix2/` (the rigs at 3ebbe1d).
+
+**RED numbers re-taken with FW-M2** (where they differ from the plan's pre-measure, the tool's number is the pin):
+chimera |E| (`poly ... --poly dragon2@<key> --not-mask head dragon`) attack 732, atk_mid 691, atk_follow 746, hurt
+234, hurt_in2 233; chimera colour gate (`--not-mask dragon@<key>`) attack 375 (box 120 54 168 92 holds 393 greens, not
+369), hurt 374 (box 106 54 160 88); crocodile `edges hurt --box 15 36 30 47` bare ink **7** (the tip block x 17-20, y 38
+plus (17, 39) is the plan's 5; (29, 43) and (23, 44) are bare too), spurs 0; the others as the plan (sea_troll gaps
+29 / 44 / 38, basilisk (4, 74, 0) / (4, 119, 3) / (3, 130, 8), ice_gigas 8 / 9 / 5, sand_worm 482 -> 528, king_mummy
+7 / 5, earth_medusa 19, ashen_queen rows 170-199 left 28 / 25 / 20 / 25, `switch black_knight attack` need 0.462, d (4, -1)).
+After G3 removes chimera's `dragon2` masks, the poly gate needs `--masks assets-src/gen/fixtures/fixmeasure/fix2/chimera.yaml`.
+`switch` without a rig shifts without wrap-around (the pre-measure used `np.roll`): warmech attack's best d is (-30, 1)
+(IoU 0.467, the search edge), not (-24, 0); the pre-check is not a gate.
+
+**FW-M2 roster sweep** (`fixmeasure.py sweep`, whole frames, report only): 106 of 112 locked rigs have a frame with
+edge gaps; 46 approved keys have some (dragon attack 29, ogre idle 19, nightmare attack 16, piscodemon attack 16).
+Top 20 in-betweens (edge gaps): chaos daze 66, chaos daze_b 64, chaos atk_raise_in 63, chaos hurt_in1 57, chaos
+cast_gather 52, ogre_mage hurt_in2 47, sea_troll atk_wind2 44, dragon_zombie atk_follow 40, sea_troll hurt_in1 38, chaos
+atk_recover 34, ogre_chief hurt_in1 34, dragon_zombie atk_mid 33, ashen_queen atk_mid 32, chaos atk_wind2 32, garland
+atk_swing 32, ogre_mage hurt_in1 30, fire_gigas hurt_in2 29, sea_troll atk_wind1 29, crazy_horse atk_mid 28, iron_golem
+atk_mid 28. The G7 tester looks at the first 10 at 4x.
+
+**FW-C white_shark measurement** (scratch re-cut of R280 = `out/gemini/white_shark/1236`, main checkout raw, 0 images):
+lift attack 34, hurt 36; lifted rows attack 31-125, hurt 28-125 of the 128 px cell (top >= 2, bottom <= 125), idle
+66-122; so `LIFT_MAX` = 36 (rev-14 ruling; back to 24 if G3d defers white_shark again). red_piranha R282: hurt 8, rows
+27-77 of 80. R278 / R279 (not used): hurt 17; attack 5, hurt 26.
+
+**Measured durations** (this machine, worktree): `fixmeasure.py` one sprite 2-6 s; `fixmeasure.py sweep` 250 s;
+`build_assets.py monsters_ai` 148 s; `monster_anim.py check --all` 156 s; `selftest.py --anim` 459 s;
+`selftest.py` 481 s.
+
+**G1 exit check** (no rig or lock changed): `build_assets.py monsters_ai` -> every `assets/sprites/monsters-ai*` file
+equals 3ebbe1d (`shasum -c`, 10 OK); `check --all` 112 `OK` + 9 `no rig`, nothing else; `git diff --exit-code
+assets-src/gen/anim/monsters/` clean; `selftest.py --anim` ALL PASSED (556 checks); `selftest.py` ALL PASSED (930 checks).

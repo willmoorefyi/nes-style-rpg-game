@@ -10,6 +10,8 @@
   python3 -I assets-src/gen/fixmeasure.py select <sprite> <frame> [--rgb ...] [--box ...] [--component X,Y]
                                           [--holes N] [--to R,G,B | --to null]   # -> rig `paint` entries (YAML)
   every subcommand: --raw (the approved keys without keyframe paint, FW-P)
+  FW-M2 (docs/ROSTER_FIX_PLAN_2.md 4; fixmeasure_edges.py): edges | match | poly | switch | rowspan | sweep, and
+  colours / select with --vs KEY --shift DX,DY --poly PART@KEY --not-mask PART[@KEY] --masks RIG.yaml
 
 Conventions (the plan's measurement conventions): native px in the sprite's padded cell. A box is X0 Y0 X1 Y1 with X1
 and Y1 exclusive (numpy slices: `--box 0 40 40 90` is x 0-39, y 40-89); reported boxes are inclusive [x0, y0, x1, y1].
@@ -32,6 +34,7 @@ if str(HERE.parent) not in sys.path:                      # run as a script: mak
     sys.path.insert(0, str(HERE.parent))
 from gen import monster_anim as MA  # noqa: E402
 from gen import fixmeasure_px as PX  # noqa: E402
+from gen import monster_keys as MK  # noqa: E402
 from gen.fixmeasure_px import (INK, Box, _in_box, _public, _rgb_mask, colour_count, fill_components,  # noqa: E402,F401
                                fill_mask, holes, pieces_of, select)
 
@@ -39,8 +42,8 @@ from gen.fixmeasure_px import (INK, Box, _in_box, _public, _rgb_mask, colour_cou
 @contextlib.contextmanager
 def _rig_override(sprite: str, rig: dict | None):
     real = MA.load_rig
-    if rig is not None:
-        MA.load_rig = lambda s: rig if s == sprite else real(s)
+    if rig is not None:                                   # FW-O: a rig dict reads as its file would (key_offset)
+        MA.load_rig = lambda s: MK.offset_cfg(s, rig) if s == sprite else real(s)
     try:
         yield
     finally:
@@ -217,7 +220,10 @@ def _box(vals) -> Box | None:
 
 
 def main(argv: list[str]) -> int:
+    from gen import fixmeasure_edges as FE
     cmds = ("travel", "partc", "pieces", "fills", "colours", "diff", "select")
+    if argv and (argv[0] in FE.CMDS or argv[0] in ("colours", "select") and set(FE.EXTENDED) & set(_opts(argv[1:])[1])):
+        return FE.main(argv)
     if not argv or argv[0] not in cmds:
         print(__doc__)
         return 2

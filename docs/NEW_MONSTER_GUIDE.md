@@ -74,6 +74,7 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
 python3 -I assets-src/gen/generate.py hobgoblin --backend gemini --sheets monster --dry-run   # 0 cost: PAID/cached + inputs
 python3 -I assets-src/gen/generate.py hobgoblin --backend gemini --sheets monster --paid      # the one paid call
 python3 -I assets-src/gen/generate.py --repixelize assets-src/gen/out/gemini/hobgoblin/1234   # offline re-cut
+# FW-C: a floating cell drawn lower than the idle is lifted to the 2 px bottom margin (info['lifted']; at most monster.LIFT_MAX = 36 px, else the cut is refused)
 python3 -I assets-src/gen/approve.py hobgoblin monster [--flip-frames row:1] [--note "..."]   # mirror one wrong-facing cell
 # bosses: --sheets monster means boss_idle only; then boss_attack, boss_cast, boss_hurt, one checkpoint each
 python3 -I assets-src/gen/generate.py lich --backend gemini --sheets boss_attack --paid
@@ -217,7 +218,9 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `frames.<f>: {t, moves, pins, dy, tweaks, drop, scale, sampler}` | `moves: []` = no interpolation (tweaks only). `tweaks.<joint>: [dx, dy]`. `drop: [part]` hides a part. `scale: {fxpart: 0.25-1}` is fx only. `sampler` is per frame |
 | `holds: [{frame, reason}]` | alias a frame to its source; at most 1 per sequence |
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
-| `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220 and drowned_sovereign/cast <= 300, a remap), approved-palette colours or `null`, locked as `kf:<key>` |
+| `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220, drowned_sovereign/cast <= 300 (a remap), chimera/attack <= 800 and chimera/hurt <= 600), approved-palette colours or `null`, locked as `kf:<key>` |
+| `key_offset: {key: [dx, dy]}` | FW-O: move an approved key by whole px (<= 12, nothing may leave the cell; before keyframe paint, also with `--raw`); its joints, `masks.*.<key>` and keyframe paint are written in the unmoved art and translated with it; in-between paint is not moved (re-derive it); locked as `kf:<key>` (ashen_queen coil, N-4) |
+| `alias: [hurt]` or `[attack]` | FW-Q partial rig: that sequence's in-betweens are not generated and resolve to their source keys (as keyframe-only); daze and the rest stay generated; `check` prints `OK (aliased: <seq>; ...)`; only `FWQ_ALLOW` sheets (`monster_anim.py`, pinned in `selftest_efix.py`), one per rig |
 | `raise: false` | FW-R: drop the approved `attack_raise` key (cell kept): no raise frames, `hasRaise: false`, the heavy glint `tip` from `atk_wind2` (hollow_seraph, D-F1) |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
 
@@ -323,7 +326,9 @@ python3 -I assets-src/gen/monster_anim.py check --all --calibrate   # keyframe-p
   almost fully in `hurt_in2`: the pose change at that step hides the switch.
 - **Measure before and after a fix** with `python3 -I assets-src/gen/fixmeasure.py` (`travel`, `partc`, `pieces`,
   `fills`, `colours`, `diff`; `select` turns colour / box / component / hole selectors into `paint` xy lists with the
-  4-neighbour mode colour; `--raw` = the approved keys without keyframe paint; boxes are `X0 Y0 X1 Y1`, end exclusive).
+  4-neighbour mode colour; `--raw` = the approved keys without keyframe paint; boxes are `X0 Y0 X1 Y1`, end exclusive;
+  round 2 adds `edges` (spurs, inner ink, edge gaps, bare ink; `--vs KEY --shift dx,dy`), `match`, `poly`, `switch`
+  (continuity pairs of a sequence, or the key-switch pre-check without a rig), `rowspan` and `sweep`).
 - **Paint** only for 1-3 px cracks, holes and strays, in a colour of the surrounding approved palette; `rgb: null`
   reopens an approved gap. **Re-derive every patch after any rig or framework change** (stale ones became specks and
   blobs: E7, E10).

@@ -10,8 +10,16 @@ edited.
   orchestrator-approved exception (KF_PAINT_ALLOW). Colours must be in the approved palette (the union of the
   sprite's approved key colours, as monster_atlas computes it for variants) or null (transparent). A painted key is
   locked as `kf:<name>` (monster_check.write_lock) and gets the palette, pieces and outline checks.
+- FW-O (ROSTER_FIX_PLAN_2.md 4, N-4): `key_offset: {key: [dx, dy]}` moves an approved key's pixels by whole px
+  (transparent fill, no content change; after FW-R, before FW-P, and with paint=False too). offset_cfg (applied by
+  monster_anim.load_rig) translates that key's keyframe joints, `masks.*.<key>` polygons and keyframe paint xy, so
+  every coordinate a rig writes for the key is in its unmoved art; in-between paint is not moved (the rig agent
+  re-derives it). Refused: |dx| or |dy| > KEY_OFFSET_MAX, a non-integer, a key the sheet does not have, an opaque px
+  leaving the cell. An offset key is locked as `kf:<name>`.
 """
 from __future__ import annotations
+
+import copy
 
 import numpy as np
 from PIL import Image
@@ -19,11 +27,15 @@ from PIL import Image
 from gen.monster_recipes import KEYFRAMES
 
 KF_PAINT_CAP = 160
-# orchestrator-approved per-sprite caps (ROSTER_FIX_PLAN.md 10: rev 3 and rev 15 rulings); nothing else may raise one
-KF_PAINT_ALLOW = {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300}
+# orchestrator-approved per-sprite caps (ROSTER_FIX_PLAN.md 10: rev 3 and rev 15 rulings; ROSTER_FIX_PLAN_2.md 12
+# D-R1, FW-PA: the chimera's second dragon head erased from its attack and hurt keys); nothing else may raise one
+KF_PAINT_ALLOW = {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300, ("chimera", "attack"): 800,
+                  ("chimera", "hurt"): 600}
 # rev 15: drowned_sovereign/cast is a colour remap only: every patched pixel is opaque and stays opaque
 KF_REMAP_ONLY = {("drowned_sovereign", "cast")}
 OUTLINE = (6, 4, 10)
+KEY_OFFSET_MAX = 12
+_OFFSET_DONE = "_key_offset_applied"      # offset_cfg's marker: the translation is applied once
 
 
 def approved_palette(kfs: dict[str, Image.Image]) -> set[tuple[int, int, int]]:
@@ -49,6 +61,62 @@ def drop_raise(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Imag
         return meta, kfs
     keys = {k: v for k, v in kfs.items() if k != "attack_raise"}
     return {**meta, "poses": [p for p in meta.get("poses", list(kfs)) if p != "attack_raise"], "raise_off": True}, keys
+
+
+def key_offsets(sid: str, cfg: dict | None) -> dict[str, tuple[int, int]]:
+    """FW-O: {key: (dx, dy)} of a rig's `key_offset` (validated: keyframe names, whole px, |d| <= KEY_OFFSET_MAX)."""
+    out = {}
+    for k, d in ((cfg or {}).get("key_offset") or {}).items():
+        if k not in KEYFRAMES:
+            raise ValueError(f"rig {sid}: key_offset {k}: not a keyframe ({', '.join(KEYFRAMES)})")
+        if not (isinstance(d, (list, tuple)) and len(d) == 2 and all(isinstance(v, int) and not isinstance(v, bool)
+                                                                    for v in d)):
+            raise ValueError(f"rig {sid}: key_offset {k}: {d!r} is not [dx, dy] in whole px")
+        if max(abs(d[0]), abs(d[1])) > KEY_OFFSET_MAX:
+            raise ValueError(f"rig {sid}: key_offset {k}: {list(d)} is over {KEY_OFFSET_MAX} px")
+        out[k] = (int(d[0]), int(d[1]))
+    return out
+
+
+def offset_cfg(sid: str, cfg: dict | None) -> dict | None:
+    """FW-O: the rig with each offset key's joints, mask polygons and keyframe paint moved by its (dx, dy); a rig
+    without key_offset (or already translated) comes back as the same object."""
+    offs = key_offsets(sid, cfg)
+    if not offs or cfg.get(_OFFSET_DONE):
+        return cfg
+    out = copy.deepcopy(cfg)
+    for k, (dx, dy) in offs.items():
+        kf = (out.get("keyframes") or {}).get(k) or {}
+        for j, v in kf.items():
+            kf[j] = [v[0] + dx, v[1] + dy]
+        for per_kf in (out.get("masks") or {}).values():
+            if per_kf and per_kf.get(k):
+                per_kf[k] = [[x + dx, y + dy] for x, y in per_kf[k]]
+        for p in out.get("paint") or []:
+            if p.get("frame") == k:
+                p["xy"] = [[x + dx, y + dy] for x, y in p["xy"]]
+    out[_OFFSET_DONE] = True
+    return out
+
+
+def offset_keys(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict, dict]:
+    """FW-O: (meta, keys) with each offset key moved by whole px (meta gains kf_offset); else unchanged."""
+    offs = key_offsets(sid, cfg)
+    if not offs:
+        return meta, kfs
+    out = dict(kfs)
+    for k, (dx, dy) in offs.items():
+        if k not in kfs:
+            raise ValueError(f"rig {sid}: key_offset on keyframe {k}, which the sheet does not have")
+        a = np.asarray(kfs[k].convert("RGBA"))
+        h, w = a.shape[:2]
+        ys, xs = np.nonzero(a[..., 3] > 0)
+        if len(xs) and (xs.min() + dx < 0 or xs.max() + dx >= w or ys.min() + dy < 0 or ys.max() + dy >= h):
+            raise ValueError(f"rig {sid}: key_offset {k}: {[dx, dy]} would make opaque px leave the {w}x{h} cell")
+        b = np.zeros_like(a)
+        b[max(0, dy):h + min(0, dy), max(0, dx):w + min(0, dx)] = a[max(0, -dy):h - max(0, dy), max(0, -dx):w - max(0, dx)]
+        out[k] = Image.fromarray(b)
+    return {**meta, "kf_offset": [k for k in KEYFRAMES if k in offs]}, out
 
 
 def kf_patches(cfg: dict | None) -> list[dict]:
@@ -101,9 +169,12 @@ def paint_keys(sid: str, cfg: dict | None, kfs: dict[str, Image.Image]) -> tuple
 
 
 def apply(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Image], paint: bool = True) -> tuple[dict, dict]:
-    """FW-R, then FW-P (paint=False: the approved keys, for fixmeasure's RED states). A painted sheet's meta gains
-    `kf_painted` (names), `kf_raw` (the unpainted keys) and `kf_palette` (the approved palette)."""
+    """FW-R, FW-O, then FW-P (paint=False: the approved keys, offset but unpainted, for fixmeasure's RED states). A
+    painted sheet's meta gains `kf_painted` (names), `kf_raw` (the unpainted keys) and `kf_palette` (the approved
+    palette); an offset sheet's gains `kf_offset`."""
+    cfg = offset_cfg(sid, cfg)
     meta, kfs = drop_raise(sid, cfg, meta, kfs)
+    meta, kfs = offset_keys(sid, cfg, meta, kfs)
     if not paint:
         return meta, kfs
     keys, painted = paint_keys(sid, cfg, kfs)

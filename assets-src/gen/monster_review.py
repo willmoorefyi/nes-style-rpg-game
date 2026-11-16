@@ -197,7 +197,9 @@ def main(argv: list[str]) -> int:
             rep = MC.check_sprite(sid, cfg, kfs, meta)
             fails = [f"{sid} {k}: {e}" for k, v in rep.items() for e in v]
             bad += bool(fails)
-            print("\n".join(fails) if fails else f"{sid}: OK ({len(rep)} checks groups)")
+            al = MA.aliased(sid, cfg)[0]                  # FW-Q: a partial rig names its aliased sequence
+            print("\n".join(fails) if fails else f"{sid}: OK (aliased: {al[0]}; {len(rep)} checks groups)" if al
+                  else f"{sid}: OK ({len(rep)} checks groups)")
     if rough:
         print("edge roughness, frame minus source per 100 edge px (F6, report only), top 10:")
         for v, sid, n in sorted(rough, key=lambda t: (-t[0], t[1], t[2]))[:10]:
