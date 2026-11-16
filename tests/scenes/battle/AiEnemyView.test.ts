@@ -268,3 +268,21 @@ describe('AiEnemyView wide boss cells (roster: a sheet cell is the max of its ke
     expect(wide.sprite.y + (192 + 1) * 2).toBe(wide.box.feetY);
   });
 });
+
+describe('AiEnemyView.attackPlan reads the layer\'s current transform', () => {
+  it('a layer moved since the last render (the bestiary centring shift) does not shorten the travel', () => {
+    const { art } = fakeArt();
+    const plan = (shift: number) => {
+      const layer = new Container();
+      const view = new AiEnemyView(goblins(1), art);
+      layer.addChild(...view.build());
+      const hero = new Graphics().rect(0, 0, 160, 160).fill(0xffffff);
+      hero.position.set(1500, 400);
+      layer.addChild(hero);
+      layer.x = shift;                 // no render: the cached worldTransform still says 0
+      return view.attackPlan(0, hero);
+    };
+    expect(plan(-199)).toEqual(plan(0));
+    expect(plan(0).travel).toBeGreaterThan(0);
+  });
+});

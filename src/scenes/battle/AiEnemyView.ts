@@ -88,11 +88,13 @@ export class AiEnemyView {
     const e = this.enemies[i];
     if (!target || !f || !box || !b || e?.attack === 'ranged' || e?.size === 'titan') return { travel: 0, rise: 0 };
     const t = target.getBounds();
-    // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions)
-    const origin = target.parent?.worldTransform ?? { tx: 0, ty: 0 };
+    // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions);
+    // toLocal reads the layer's current transform (its cached worldTransform lags a move made since the last render,
+    // e.g. the bestiary's centring shift)
+    const corner = target.parent ? target.parent.toLocal({ x: t.x, y: t.y + t.height }) : { x: t.x, y: t.y + t.height };
     const scale = f.scale * box.scaleFactor;
     return enemyReach({ opaqueRight: b.x + (f.opaqueRight ?? f.cell[0]) * scale, feetY: box.feetY,
-      lunge: f.lungePx * box.scaleFactor, targetLeft: t.x - origin.tx, targetFeetY: t.y + t.height - origin.ty,
+      lunge: f.lungePx * box.scaleFactor, targetLeft: corner.x, targetFeetY: corner.y,
       topY: b.y + travelTopOf(f) * scale });
   }
 
