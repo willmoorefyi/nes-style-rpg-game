@@ -3,8 +3,9 @@
   python3 -I assets-src/gen/colossus/chaos_orrery_finish.py CUT OUTDIR
 
 CUT is the remove_bg result of `o12_metal_raw.png` (chaos_orrery_compose.py). At render resolution (1320x900):
-  1. the eclipse: inside the head disc (r < DISC_R - 7 around DISC) the lit orb becomes a dark disc, keeping only a
-     tiny star point at its centre (r < STAR_R) and the bright rim, so the head reads as F3's eclipse;
+  1. the eclipse: inside the head disc (r < DISC_R - 4 around DISC) the lit orb becomes a dark disc (no centre dot,
+     which read as a pupil), and the rim is lifted toward F3's white-gold, so the head reads as F3's eclipse;
+     the storm-white planet is repainted larger (STORM) with cloud bands and a dark outline;
   2. the two pedestal slabs under the gauntlets (cut-out debris) are cleared outside an ellipse around each gauntlet;
   3. cold blue steel glints on the armour (outside the planets) are warmed to grey-gold;
 then CL.pix to the 440x300 canvas (about 3 render px per art px) and the palette-safe despeck of F3's finish.
@@ -25,11 +26,12 @@ sys.path.insert(0, str(HERE))
 from gen import colossus_layers as CL  # noqa: E402
 import chaos_horizon_finish as HF  # noqa: E402
 
-DISC, DISC_R, STAR_R = (660, 235), 64, 5
+DISC, DISC_R, STAR_R = (660, 235), 64, 0
+STORM = ((558, 795), 60)                 # the storm-white planet, enlarged and banded in place
 DARK = np.array([22, 20, 27], float)
 SLABS = [(120, 752, 450, 900), (875, 752, 1205, 900)]
 GAUNTLETS = [((245, 805), 72, 105), ((1000, 805), 78, 105)]
-PLANETS = [((1222, 402), 52), ((172, 652), 52), ((812, 680), 52), ((558, 798), 52)]
+PLANETS = [((1222, 402), 52), ((172, 652), 52), ((812, 680), 52), ((558, 795), 66)]
 
 
 def finish(cut: np.ndarray) -> np.ndarray:
@@ -37,9 +39,21 @@ def finish(cut: np.ndarray) -> np.ndarray:
     h, w = a.shape[:2]
     yy, xx = np.mgrid[:h, :w]
     r = np.hypot(xx - DISC[0], yy - DISC[1])
-    inner = (r < DISC_R - 7) & (r >= STAR_R)
-    edge = np.clip((DISC_R - 7 - r) / 6, 0, 1)                 # a 6 px blend into the rim
+    inner = (r < DISC_R - 4) & (r >= STAR_R)
+    edge = np.clip((DISC_R - 4 - r) / 5, 0, 1)                 # a 5 px blend into the rim (no dot, no ridge)
     a[inner, :3] = a[inner, :3] * (1 - edge[inner, None]) + DARK * edge[inner, None]
+    rim = (r >= DISC_R - 4) & (r < DISC_R + 5) & (a[..., 3] > 0)  # the rim toward F3's white-gold
+    a[rim, :3] = a[rim, :3] * 0.4 + np.array([245, 232, 190]) * 0.6
+    (sx, sy), sr = STORM
+    d = np.hypot(xx - sx, yy - sy)
+    ball = d <= sr
+    band = np.sin((yy - sy) * 0.32 + 0.9 * np.sin((xx - sx) * 0.08))
+    shade = np.clip(1.05 - 0.55 * np.hypot(xx - sx + sr * 0.35, yy - sy + sr * 0.35) / (1.6 * sr), 0.35, 1)
+    base = np.where(band[..., None] > 0.35, np.array([236, 236, 226.0]), np.array([168, 168, 176.0]))
+    a[ball, :3] = base[ball] * shade[ball, None]
+    a[ball, 3] = 255
+    a[(d > sr) & (d <= sr + 3), :3] = DARK
+    a[(d > sr) & (d <= sr + 3), 3] = 255
     for (x0, y0, x1, y1), ((gx, gy), rx, ry) in zip(SLABS, GAUNTLETS):
         box = (xx >= x0) & (xx < x1) & (yy >= y0) & (yy < y1)
         keep = ((xx - gx) / rx) ** 2 + ((yy - gy) / ry) ** 2 <= 1

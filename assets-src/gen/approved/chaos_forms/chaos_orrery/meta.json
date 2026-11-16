@@ -1,0 +1,28 @@
+{
+  "approved": "2026-11-16 C3 (coordinator relay of user ruling: F2 via the F3 structure route); fresh image-only review SHIP WITH NITS (iteration 2), nits fixed offline",
+  "art_size": [
+    440,
+    300
+  ],
+  "cache_keys": [
+    "29e22d7952891fa1359044d1",
+    "6ec8982726b6f02c0ba81070",
+    "b2cff3e92335d8e1960ca49d"
+  ],
+  "chain": [
+    "structure 5201 (o1, prompt o1) + structure 5202 (o2, prompt o2) on assets-src/gen/colossus/chaos_orrery_control.png, strength 0.85 / 0.9",
+    "chaos_orrery_compose.py: o1 head onto o2, planets recoloured, ribbon rings -> iron-gold (offline)",
+    "remove_bg (f2_nobg)",
+    "chaos_orrery_finish.py: dark eclipse disc + white-gold rim, storm planet repainted, slabs cleared, warm steel; CL.pix 440x300 + despeck"
+  ],
+  "display_scale": 3,
+  "form": "chaos_orrery",
+  "notes": "no floorFront; the crown top is cut by the message window by design; party clear (gap ~110 px)",
+  "pix": "assets-src/gen/out/colossus/chaos_orrery/f2_finish/master.png",
+  "proposed_place": [
+    40,
+    -20
+  ],
+  "render_px_per_art_px": 3,
+  "title": "Chaos, the Orrery (F2)"
+}

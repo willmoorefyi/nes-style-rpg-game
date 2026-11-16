@@ -1156,3 +1156,47 @@ un-ignored), plus `glow.png` (the corona layer).
 **Note for C4:** with an approved master, `colossusAssets.test.ts` and `chaosForms.test.ts` require a `colossus.json`
 entry for `chaos_horizon` (A5), and the `colossus` stage needs `gen/colossus/chaos_horizon.yaml` (RIG). vitest on
 `roster` is red on those two checks until C4 wires them.
+
+**C3 calls after the F3 approval (BR ledger; `budget --check` OK after each).**
+
+| # | Call | Purpose | Result |
+|---|---|---|---|
+| C10 | search_replace on the F3 render, search "torso", seed 4301 | f4_variant | **reject**: the whole body became white shattered tiles and the disc a sun (22 % of px changed) |
+| C11 | search_replace on a torso-only crop (600x275), search "chest", seed 4302 | f4_variant | **reject**: the chest became a volcanic spire and the crop turned grey |
+| C12 | structure on `chaos_orrery_control.png`, strength 0.85, seed 5201, prompt o1 | reserve:f2-structure | **base (head)**: an armoured eclipse-headed sovereign with a flame crown (one star point in the disc); the rings are orange fire ribbons; two orange planets |
+| C13 | structure, the same control, strength 0.9, seed 5202, prompt o2 | reserve:f2-structure | **base (body)**: four planets, but all orange; the head has a cross visor seam that reads as a helmet (3.5) |
+| C14 | search_replace on C12, the star in the disc, seed 5301 | reserve:f2-edit | **reject**: the star was removed but the whole corona was bleached grey |
+| C15 | search_replace on the composite, search "the glowing orange ribbons", seed 5302 | reserve:f2-edit | **reject**: the whole figure was rebuilt as a clockwork orrery (33 % of px changed) |
+| C16 | remove_bg on `o12_metal_raw.png` | f2_nobg | **pass**: rings, planets and crown cut whole |
+| C17 | structure on the F3 render (as its own control), strength 0.9, seed 4401 | reserve:f4-structure | **reject**: pale stone, a lit sun head, the chest not opened |
+
+Bedrock calls: **17 of 80** (v0 9/12, f4_variant 2/4, f2_nobg 1/4, reserve 5/18, f3/f2 gen 0); about $0.9 at list prices.
+Gemini 405 = N_C0.
+
+**F2 "Orrery" approved (C3).**
+- `chaos_orrery_compose.py` (offline): C12's head pasted onto C13 (the heads line up within ~5 px), the four planets
+  recoloured by hue (frost cyan, ember orange, deep teal, storm white), and the ribbon rings recoloured to black-iron
+  bands with gold highlights.
+- C16 cut. `chaos_orrery_finish.py`: a dark eclipse disc with F3's white-gold rim (no centre dot, which read as a
+  pupil), the storm planet repainted larger with cloud bands, the pedestal slabs cleared, cold steel glints warmed;
+  `CL.pix` 440x300 (3 render px per art px) and despeck.
+- Reviews (fresh multimodal-looker): iteration 1 **ITERATE** (the head a lit orb, slabs, specks); iteration 2
+  **SHIP WITH NITS**, and its nits (dot and ridge, rim, storm planet) were fixed.
+- Mock at place (40, -20), no floorFront: edge contrast 119, party clear by ~110 px.
+- `approve chaos_orrery` wrote `approved/chaos_forms/chaos_orrery/master.png` and `meta.json` (cache keys
+  un-ignored).
+
+**F3 "cracking" state (offline, 0 calls).** `chaos_horizon_core.py` crack, 4 iterations; the last review gave it
+**SHIP WITH NITS** (open nits: a dark 1 px edge, taper, the lumpy branch). It is stored as
+`approved/chaos_forms/chaos_horizon/variant_crack{,_glow,_mask}.png`, the variant layer for F3 below its own
+threshold.
+
+**F4 "Core Laid Bare": NOT approved, stopped at the iteration cap.**
+- Model routes: four attempts, all rejected (C10, C11, C17, and C9 earlier, which lit the disc instead).
+  search_replace cannot target the chest, and structure on the render loses identity.
+- Offline paint: 4 iterations, and every review returned **ITERATE**. It reads as a glowing almond or teardrop laid
+  on the chest, not a cavity with broken lips, depth and spill light.
+- Recommendation: a masked edit. Bedrock lists `us.stability.stable-image-inpaint-v1:0` (R30). FW-C would add a
+  `colossus.py inpaint <form> <image> --mask M` subcommand with purpose f4_variant (2 of 4 left). The chest mask
+  comes from `chaos_horizon_core.py`'s band, so everything outside the mask stays byte-identical. The alternative is a
+  hand-painted core layer by RIG.
