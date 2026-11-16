@@ -1,0 +1,168 @@
+# Guardian (pass V redesign R295, docs/REDESIGN_PLAN.md 3.1): a four-legged hunter-killer war machine with two scythe
+# arms, gunmetal plates and a row of three red sensor eyes. Preset mechanical, translation-only (guide 2.5 "hard
+# sheets"): in every in-between the hull, head and both scythes move as one rigid unit (`moves: []`, the same tweak
+# on every hull joint) over planted legs (knees, elbows and feet pinned; only the thighs and upper forelegs turn a
+# few degrees to reach them). The strike lives in the idle -> attack key switch. The far foreleg is not drawn: its
+# parts are pixel-less anchors (pinned like the others). In the attack key the right-hand element is the second
+# scythe, its tip on the ground (masked onto spear_f); the hurt key shows only one scythe clearly (approved art,
+# ROSTER_LOG pass V nit), so spear_f rides the head plate there.
+# `fixmeasure.py switch guardian <seq> --rig` (IoU / step vs need 0.550 / cap 9.6); pre-check without a rig: attack
+# d (3, -1) IoU 0.566, hurt d (2, -2) IoU 0.706:
+#   attack: idle->wind1 0.915 / 1.3, wind1->wind2 0.852 / 2.3, wind2->mid 0.590 / 4.5, mid->attack 0.926 / 0.7,
+#           attack->follow 0.896 / 1.0, follow->recover 0.551 / 7.3, recover->idle 0.900 / 1.7
+#   hurt:   idle->in1 0.883 / 1.8, in1->in2 0.665 / 0.9, in2->hurt 0.941 / 0.9;  daze: 0.851 / 2.2, 0.863 / 2.0
+# Image review (V5, 1 iteration): SHIP WITH NITS. Recorded nits: the wind-up is small (wind2 -4 px is the most the 15 deg
+# mechanical cap allows on the far thigh: -5 gives 16.3 deg), atk_mid is close to the attack key and atk_recover close
+# to the idle (follow->recover sits at the 0.55 continuity floor), hurt_in1 is a 2 px jolt before the key switch, the
+# daze is a subtle bob; the hurt key shows one scythe (approved art).
+sprite: guardian
+body: quadruped
+preset: mechanical
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:
+    hip: [35, 50]
+    back: [55, 42]
+    chest: [78, 48]
+    neck: [84, 44]
+    head: [88, 42]
+    snout: [114, 44]
+    hip_n: [32, 55]
+    knee_n: [22, 82]
+    foot_n: [16, 112]
+    toe_n: [16, 120]
+    hip_f: [60, 62]
+    knee_f: [58, 82]
+    foot_f: [66, 111]
+    toe_f: [71, 119]
+    sh_n: [83, 62]
+    el_n: [92, 82]
+    paw_n: [104, 111]
+    ftoe_n: [110, 119]
+    sh_f: [82, 60]
+    el_f: [91, 80]
+    paw_f: [103, 110]
+    ftoe_f: [109, 118]
+    ash_n: [45, 45]
+    sp_n: [9, 62]
+    ash_f: [93, 53]
+    sp_f: [114, 74]
+  attack:
+    hip: [35, 55]
+    back: [55, 45]
+    chest: [75, 55]
+    neck: [82, 55]
+    head: [86, 55]
+    snout: [112, 63]
+    hip_n: [30, 55]
+    knee_n: [18, 83]
+    foot_n: [11, 113]
+    toe_n: [11, 120]
+    hip_f: [48, 75]
+    knee_f: [52, 95]
+    foot_f: [64, 113]
+    toe_f: [68, 118]
+    sh_n: [84, 72]
+    el_n: [90, 82]
+    paw_n: [100, 100]
+    ftoe_n: [104, 108]
+    sh_f: [83, 71]
+    el_f: [89, 81]
+    paw_f: [99, 99]
+    ftoe_f: [103, 107]
+    ash_n: [50, 90]
+    sp_n: [101, 117]
+    ash_f: [88, 78]
+    sp_f: [108, 118]
+  hurt:
+    hip: [35, 55]
+    back: [55, 45]
+    chest: [78, 52]
+    neck: [84, 50]
+    head: [88, 46]
+    snout: [115, 48]
+    hip_n: [32, 58]
+    knee_n: [20, 83]
+    foot_n: [14, 113]
+    toe_n: [14, 120]
+    hip_f: [55, 70]
+    knee_f: [55, 88]
+    foot_f: [64, 112]
+    toe_f: [70, 120]
+    sh_n: [80, 70]
+    el_n: [88, 84]
+    paw_n: [102, 112]
+    ftoe_n: [108, 120]
+    sh_f: [79, 68]
+    el_f: [87, 82]
+    paw_f: [101, 110]
+    ftoe_f: [107, 118]
+    ash_n: [45, 38]
+    sp_n: [6, 48]
+    ash_f: [70, 42]
+    sp_f: [100, 40]
+parts:
+  body: {bone: [hip, chest], kind: torso, radius: 12.0}
+  neck: {remove: true}
+  tail: {remove: true}
+  head: {bone: [head, snout], radius: 9.0}
+  ufore_f: {bone: [sh_f, el_f], radius: 0.01}
+  lfore_f: {bone: [el_f, paw_f], radius: 0.01}
+  fpaw_f: {bone: [paw_f, ftoe_f], radius: 0.01}
+  uarm_n: {bone: [chest, ash_n], radius: 0.01}
+  spear_n: {bone: [ash_n, sp_n], radius: 3.0}
+  uarm_f: {bone: [chest, ash_f], radius: 0.01}
+  spear_f: {bone: [ash_f, sp_f], radius: 3.0}
+masks:   # applied in order, later masks win
+  spear_f:
+    attack: [[86, 73], [96, 73], [114, 112], [114, 122], [103, 122], [85, 86]]
+frames:   # translation-first (preset mechanical): hull, head and scythes shifted as one unit, the legs planted
+  atk_wind1:   # anticipation: the hull, head and both scythes 2 px back, the legs planted
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [-2, 0], back: [-2, 0], chest: [-2, 0], neck: [-2, 0], head: [-2, 0], snout: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], ash_n: [-2, 0], sp_n: [-2, 0], ash_f: [-2, 0], sp_f: [-2, 0]}
+  atk_wind2:   # the coil: the hull 4 px back and 2 down (the thighs turn <= 9 deg to the pinned knees)
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [-4, 2], back: [-4, 2], chest: [-4, 2], neck: [-4, 2], head: [-4, 2], snout: [-4, 2], hip_n: [-4, 2], hip_f: [-4, 2], ash_n: [-4, 2], sp_n: [-4, 2], ash_f: [-4, 2], sp_f: [-4, 2]}
+  atk_mid:   # from the attack key, the hull and scythes 1 px up (the blades just above the ground)
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    t: 0.0
+    tweaks: {hip: [0, -1], back: [0, -1], chest: [0, -1], neck: [0, -1], head: [0, -1], snout: [0, -1], hip_n: [0, -1], hip_f: [0, -1], ash_n: [0, -1], sp_n: [0, -1], ash_f: [0, -1], sp_f: [0, -1], sh_n: [0, -1], sh_f: [0, -1], el_n: [0, -1], el_f: [0, -1], paw_n: [0, -1], paw_f: [0, -1]}
+  atk_follow:   # a settle from the attack key: the hull 1 px back toward the idle and 1 up; forepaws pinned
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, paw_n, paw_f]
+    t: 1.0
+    tweaks: {hip: [1, -1], back: [1, -1], chest: [1, -1], neck: [1, -1], head: [1, -1], snout: [1, -1], hip_n: [1, -1], hip_f: [1, -1], ash_n: [1, -1], sp_n: [1, -1], ash_f: [1, -1], sp_f: [1, -1], sh_n: [1, -1], sh_f: [1, -1], el_n: [1, -1], el_f: [1, -1], paw_n: [1, -1], paw_f: [1, -1]}
+  atk_recover:   # the idle hull 3 px back, easing home
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [-3, 0], back: [-3, 0], chest: [-3, 0], neck: [-3, 0], head: [-3, 0], snout: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0], ash_n: [-3, 0], sp_n: [-3, 0], ash_f: [-3, 0], sp_f: [-3, 0]}
+  hurt_in1:   # the hit: the idle hull knocked 2 px back and 2 down
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [-2, 2], back: [-2, 2], chest: [-2, 2], neck: [-2, 2], head: [-2, 2], snout: [-2, 2], hip_n: [-2, 2], hip_f: [-2, 2], ash_n: [-2, 2], sp_n: [-2, 2], ash_f: [-2, 2], sp_f: [-2, 2]}
+  hurt_in2:   # from the hurt key, the hull 1 px forward and 1 up toward the idle
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [1, -1], back: [1, -1], chest: [1, -1], neck: [1, -1], head: [1, -1], snout: [1, -1], hip_n: [1, -1], hip_f: [1, -1], ash_n: [1, -1], sp_n: [1, -1], ash_f: [1, -1], sp_f: [1, -1]}
+  daze:   # the hull sags 1 px
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [0, 1], back: [0, 1], chest: [0, 1], neck: [0, 1], head: [0, 1], snout: [0, 1], hip_n: [0, 1], hip_f: [0, 1], ash_n: [0, 1], sp_n: [0, 1], ash_f: [0, 1], sp_f: [0, 1]}
+  daze_b:   # the hull sags 2 px
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f, sh_n, sh_f, el_n, paw_n, el_f, paw_f]
+    t: 0.0
+    tweaks: {hip: [0, 2], back: [0, 2], chest: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], hip_n: [0, 2], hip_f: [0, 2], ash_n: [0, 2], sp_n: [0, 2], ash_f: [0, 2], sp_f: [0, 2]}
+holds: []
+paint: []
