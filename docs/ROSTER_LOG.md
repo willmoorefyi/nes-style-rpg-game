@@ -17,7 +17,7 @@ first. `docs/ACT1_LOG.md` stays closed; every pass-R Gemini attempt gets one row
 (100 Gemini, 7 Bedrock), 107 `result` and 1 pre-ledger `note`, so a line count overstates it. Pass F closed at
 `gemini_end` 100; `pass R build` opened at `gemini_before` 100 with `max_new` 285.
 
-Images used: 266 of 300 (build 263 of 285, closed at N1 = 363; fix 3 of 37 open, the plan caps itself at 5; ledger guard: 366 Gemini attempts - 100)
+Images used: 266 of 300 (build 263 of 285, closed at N1 = 363; fix 4 of 37 open, the plan caps itself at 5; ledger guard: 367 Gemini attempts - 100)
 
 ## Attempts
 
@@ -533,3 +533,27 @@ Images used: 266 of 300 (build 263 of 285, closed at N1 = 363; fix 3 of 37 open,
 | R285 | lich/boss_hurt (1236, key `3304619948e1b2589d8b5689`, `--retry`, the one allowed retry; still facing right with the chest and skull toward the viewer, leaning back, the glaive held the same way round as in the idle) | 1 | **One skull head with the ice crown**, upright and centred on the neck, the cyan eye lights and toothed jaw readable; the same blackened-iron plate, frozen-wing pauldrons, tattered mantle (blown back to the left) and glaive, **held the same way round as in the idle** (spearhead up on the left, ice blade low on the right, in the image-left hand); leaning back with the free arm thrown out to the side, knees bent, no arm across the face. 169 px (idle 184), lowest row 192, top row 24, x 8-191, **a 200x200 cell** (no widening), no border pixels, binary alpha, 16 colours, one piece. **Cell check (defect 3 (d)):** all five lich keyframes are 200x200, so `pad_keyframes` returns them untouched (grid [200, 200], `bottom_row` 192, as before); `boss_idle`, `boss_attack`, `boss_cast`, `boss_attack_raise` (.png/.json) are byte-identical to HEAD, so their atlas frames cannot change (the integrator's frame-rect diff confirms after the rebuild); all five lich request keys recompute to their approved, cached keys. Nits: the recoil is moderate (an upright lean back rather than a heavy stagger); the free arm reaches toward the heroes' side | **self-approved** (pass R fix, attempt 2 of 2 planned); rig follows (defect 3 rig step, `fix-rig-lich`) |
 | R286 | ice_gigas/monster (1235, key `c9f338aa182ad088aab25d29`, `--retry`, pass-R attempt 2 of 3; ROSTER_FIX_PLAN defect 6: only the `hurt:` text, the axe pinned "up beside his shoulder on the right side of the image") | 1 | A whole new sheet (all three cells regenerate): the frost giant with pale ice-blue skin, an icicle beard, a white fur mantle, a dark blue kilt and now brown fur boots, one ice axe; attack = the blade driven onto the ground in front of the front foot; hurt = thrown back with the axe up beside the image-right shoulder. Heights 119 / 105 / 118, feet on row 122, 128 px cells, no border pixels, binary alpha, 15-16 colours, one piece per cell, `pose_diff` 0.70 / 0.44. **Fails review (the defect again, mirrored):** this idle rests the axe on the **image-left** shoulder (the old idle had it on the right), so the axe head still crosses sides between the idle and the hurt | **rejected**; the last allowed attempt follows (seed 1236, `--retry`; the hurt text made side-neutral: "its ice blade up beside the same shoulder as in the idle cell, the haft running down across his body the same way ... the axe head never crosses over to the other side") |
 | R287 | ice_gigas/monster (1236, key `48646dd0fad693e88a9b4fc0`, `--retry`, pass-R attempt 3 of 3; side-neutral hurt text) | 1 | The frost giant with the ice axe on the **image-right shoulder in idle**, a downward chop onto the ground in front of the front foot in attack, and in hurt a lean back with the axe still upright on the **same (image-right) side**, same hand; heights 123 / 106 / 114, feet on row 122, no border pixels, nothing sliced, one ice axe in every cell | **approved** (orchestrator review, pass R fix); the old rig is invalid (new sheet): full re-rig follows |
+
+## Fix pass result (F5 integration, 2026-11-15)
+
+Integrated on `roster-int` at d7c887b: F1 framework (FW-M, FW-A, FW-P, FW-R), F2 runtime (R-1 travel clamp, R-2 crowd
+packing, R-3 bestiary reach), every F3 rig fix, F4 (lich `boss_hurt` R285 + re-rig; ice_gigas sheet R287 + full re-rig)
+and 35 new batch C/D rigs. 112 locked rigs; black_knight and water_elemental stay keyframe-only with the older seven
+(9 `no rig` sheets for tranche T-K).
+
+| Gate | Result |
+|---|---|
+| Fix images (main-checkout ledger) | 4 of the plan's 5 (lich/boss_hurt 2, ice_gigas/monster_large 2: one more than the planned worst case for ice_gigas, inside the total); approved ids only; max per sheet in pass R 3; pass R 267 of 300 |
+| `build_assets.py monsters_ai` | 121 sheets, 112 animated, **9 pages** (largest 2048x2048, all <= 2048); identical for PYTHONHASHSEED 0 and 1; party atlases byte-identical |
+| `monster_anim.py check --all` | 112 `OK`, 9 `no rig` (astos, black_knight, black_widow, crawler, horned_devil, hydra, scorpion, warmech, water_elemental), nothing else |
+| fixmeasure (plan 6) | ice_gigas axe max step 11.9 (<= 32); ogre recover->idle 3.6, troll 9.0 (<= 10); ashen_queen tail 4.0 vs body 2.6 (within 3); crocodile one tail component per hurt frame (the 79 / 35 px rump clips excluded, F3c); garland lavender 0, no holes >= 4, smear JOINED; ochu stray 0; drowned_sovereign the three blues 0 |
+| Frame-rect diff vs 95b31e2 | exactly the 14 section-5 sheets (ashen_queen, cobra, crocodile, death_eye, drowned_sovereign, fire_elemental, garland, hollow_seraph (5 raise frames removed), ice_gigas, lich (3 hurt frames), ochu, ogre (atk_recover), troll (atk_recover), vampire) plus the 37 batch C/D sheets that 95b31e2 did not have |
+| Frame-rect diff vs HEAD (d7c887b's committed atlas) | 49 sheets = the 14 above + the 35 newly rigged; black_knight and water_elemental unchanged |
+| 12.2 vs `roster-r0` | every R0 sheet `same` except `CHANGED_ON_PURPOSE` = gr_imp, gr_wolf + lich, garland, vampire, ogre, troll |
+| `selftest.py --anim`, `selftest.py` | ALL PASSED (506 / 874 checks) after the FW-A ogre constant update |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | clean; 220 files, 4154 tests (no by-design count changed: the crowd set S stays 45, the golden layouts 33) |
+| Browser (headless, `&mute=1`) | 7 boss lunges (chaos, hollow_seraph, warmech, drowned_sovereign, garland, lich, death_eye) stepped frame by frame: no art under the message window; the 9-large play-test crowd at full size with no overlap; bestiary lich and lich_2 hurt: one skull with the crown, glaive the same way round; bestiary loops for tyrannosaur, chimera, black_flan, sea_scorpion, air_elemental play with no console errors |
+
+- FW-A constant re-measured: ogre `lungeRight` 125 -> 110 (125 was the old atk_recover club; F3b eased it).
+- Open for F6: the accepted nits (ogre missing downswing, ochu motion, ashen_queen coil-base registration in the
+  approved hurt / attack keys) and T-K for the 9 keyframe-only sheets.

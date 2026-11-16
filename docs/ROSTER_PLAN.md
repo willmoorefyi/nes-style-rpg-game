@@ -1031,7 +1031,8 @@ def cells(d):
             out[(s, f)] = im.crop((x, y, x + v['cell'][0], y + v['cell'][1])).tobytes()
     return out
 a, b = cells('/tmp/r0'), cells('assets/sprites')
-CHANGED_ON_PURPOSE = {'gr_imp', 'gr_wolf'}
+# fix pass F5 (ROSTER_FIX_PLAN.md 5): the act-1 sprites whose frames change on purpose
+CHANGED_ON_PURPOSE = {'gr_imp', 'gr_wolf', 'lich', 'garland', 'vampire', 'ogre', 'troll'}
 bad = {}
 for s in sorted({s for s, _ in a} - CHANGED_ON_PURPOSE):
     diff = [f for (t, f) in a if t == s and a[(t, f)] != b.get((t, f))]
@@ -1116,7 +1117,7 @@ EOF
 - [ ] Rigs A (25), B (27), C (32), D (18): per-sprite checklist, image-only review, lock (high, ~45 agent-days)
 - [ ] Boss rigs: 3 fiends + 4 bosses (high, ~10 agent-days)
 - [ ] Data: one enemies.yaml + description + background key per approved sheet; sandbox levels and anim_roster scenarios per batch (high, rolling)
-- [ ] INT: rolling atlas pages and rolling gate; final full validation (section 12 incl. 12.2); docs: AGENTS.md art table, NEW_MONSTER_GUIDE 2.2 templates, gen/README.md (high, 1d)
+- [x] INT: rolling atlas pages and rolling gate; final full validation (section 12 incl. 12.2); docs: AGENTS.md art table, NEW_MONSTER_GUIDE 2.2 templates, gen/README.md (high, 1d) (F5, 2026-11-15: ROSTER_LOG.md "Fix pass result"; 9 keyframe-only sheets left, so `check --all` is the rolling form)
 - [ ] PT: contact sheet + distinctness report (calibrated thresholds); image-only adversarial review; browser play test; ROSTER_PLAYTEST.md (high, 1-2d)
 - [ ] FIX: close pass R build, open pass R fix; ROSTER_FIX_PLAN.md -> momus OKAY -> fixes -> re-test until no P0/P1 (high, 2-4d)
 - [ ] Final report: images used vs 300 (build/fix split), built / deferred sprites, open P2s, act-1 balance changes, follow-ups (high, 1h)

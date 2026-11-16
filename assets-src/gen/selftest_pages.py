@@ -77,9 +77,11 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
 
 
 # FW-A constants, measured from the atlas at 95b31e2 (inclusive extents; dragon is `attack: ranged`, so its homeX
-# includes the attack frames: home only it is [18, 110])
+# includes the attack frames: home only it is [18, 110]). Re-measured at F5 (roster-int, after the F3/F4 rig fixes):
+# only ogre's lungeRight moved, 125 -> 110, because 125 was its old atk_recover (the club thrown out past the attack
+# key; F3b pulled the recover back toward idle, recover->idle 3.6 px), so its lunge frames now reach 110.
 ANCHORS = {"garland": {"travelTop": 2}, "lich": {"travelTop": 9}, "death_eye": {"travelTop": 42, "lungeRight": 179},
-           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 5}, "ogre": {"homeX": [10, 113], "lungeRight": 125},
+           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 5}, "ogre": {"homeX": [10, 113], "lungeRight": 110},
            "troll": {"homeX": [24, 122]}, "dragon": {"homeX": [4, 118]},
            "earth_elemental": {"lungeRight": 109, "opaqueRight": 110}}
 
@@ -115,7 +117,7 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
     bad = {s: {k: (sheets.get(s, {}).get(k), v) for k, v in want.items() if sheets.get(s, {}).get(k) != v}
            for s, want in ANCHORS.items()}
     bad = {s: d for s, d in bad.items() if d}
-    check(not bad, f"FW-A: the anchors match the constants measured at 95b31e2 {bad}")
+    check(not bad, f"FW-A: the anchors match the constants measured at 95b31e2 / F5 {bad}")
     el = sheets.get("earth_elemental", {})
     check(el.get("lungeRight", 999) < el.get("opaqueRight", 0), "FW-A: earth_elemental lunges inside its idle edge (109 < 110)")
     pages = [Image.open(ATLAS_JSON.parent / p["file"]).convert("RGBA") for p in meta["pages"]]
