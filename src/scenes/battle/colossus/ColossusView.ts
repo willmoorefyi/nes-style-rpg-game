@@ -90,7 +90,6 @@ export class ColossusView implements ColossusAnchorSource {
   get form(): ColossusFormSpec { return this.spec; }
   /** The art the layers show (an `art` entry shares its form's, colossusEntries.ts). */
   get artId(): string { return artIdOf(this.id, this.spec); }
-
   /** Take another entry of the same art (F3 -> F4, D-U13): its rest, anchors and target rect, the layers kept. The
    *  canvas stays put on screen: the pan offset takes old rest - new (F4: (0, +225)); the script's pan brings it home. */
   rebase(formId: string, form: ColossusFormSpec): void {
