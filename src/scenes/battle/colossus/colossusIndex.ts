@@ -6,6 +6,7 @@
  * every colossus consumer shares (anchors, the border rules, column span, visible fraction).
  */
 import type { EnemyData } from '../../../types/index.js';
+import { resolveArtEntries } from './colossusEntries.js';
 
 export type XY = [number, number];
 /** [left, top, right, bottom], right / bottom exclusive. */
@@ -49,6 +50,10 @@ export interface ColossusFormSpec {
   visibleBox?: Box;
   /** The backdrop's multiply while this form is on screen (D-O19: F3 / F4 0.6; missing: none), in (0, 1]. */
   skyDim?: number;
+  /** The form whose art this entry draws at its own geometry (F4 on F3's, D-U13; colossusEntries.ts); missing: its own. */
+  art?: string;
+  /** The bestiary still (18.8), relative to the index; missing: the build's `colossus/<art>/preview.png`. */
+  preview?: string;
   layers: ColossusLayerSpec[];
 }
 export interface ColossusIndex { forms: Record<string, ColossusFormSpec> }
@@ -98,6 +103,7 @@ export function formProblems(id: string, f: ColossusFormSpec): string[] {
     || r[1] + r[3] > f.canvas[1]) p('targetRect must be inside the canvas');
   for (const key of ['coverBox', 'visibleBox'] as const) if (f[key] !== undefined && !isBox(f[key])) p(`${key} must be 4 integers`);
   if (f.skyDim !== undefined && !unit(f.skyDim, false)) p('skyDim must be in (0, 1]');
+  for (const key of ['art', 'preview'] as const) if (f[key] !== undefined && (typeof f[key] !== 'string' || f[key] === '')) p(`${key} must be a name`);
   if (!Array.isArray(f.layers) || f.layers.length === 0) p('layers must be a non-empty list');
   for (const l of f.layers ?? []) {
     if (!LAYER_KINDS.includes(l.kind)) p(`layer ${l.name}: unknown kind ${String(l.kind)}`);
@@ -127,7 +133,7 @@ export function readColossusIndex(raw: unknown): ColossusIndex {
     return { forms: {} };
   }
   const out: Record<string, ColossusFormSpec> = {};
-  for (const [id, f] of Object.entries(forms)) {
+  for (const [id, f] of Object.entries(resolveArtEntries(forms))) {
     const problems = formProblems(id, f);
     if (problems.length) { for (const m of problems) console.error(m); continue; }
     out[id] = f;

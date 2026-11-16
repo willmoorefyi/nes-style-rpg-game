@@ -97,8 +97,8 @@ export class FormChangeView implements FormChangeHook {
     // the scripts load on the first form change (its result lines cover it); ordinary battles never fetch them
     if (!this.deps.interludes && typeof document !== 'undefined') void sharedInterludes.load();
     // the next form's tiles load during the lines before the swap
-    const form = colossusOf(this.deps.battle.allEnemies[fc.enemyIndex]?.data);
-    if (form) void colossusArt.ensure([form]);
+    const data = this.deps.battle.allEnemies[fc.enemyIndex]?.data;
+    if (data && colossusOf(data)) void colossusArt.ensureFor(data);
   }
 
   start(): boolean {
@@ -109,6 +109,13 @@ export class FormChangeView implements FormChangeHook {
     if (!steps) {
       if (fc.interlude) console.error(`Form change ${fc.from} -> ${fc.to}: no interlude "${fc.interlude}"; swapping at once`);
       steps = [...(fc.message ? [{ type: 'message', text: fc.message } as const] : []), { type: 'swap' }];
+    }
+    // a change that keeps the art (F3 -> F4, no swap): the view takes the new form's own rest where it stands (D-U13;
+    // the script's pan heaves it there), and the form change is announced now, as no swap will
+    if (fc.from !== fc.to && !steps.some((s) => s.type === 'swap')) {
+      const data = this.deps.battle.allEnemies[fc.enemyIndex]?.data;
+      if (data) this.deps.display.colossus.rest(fc.enemyIndex, data);
+      this.deps.events.emit('battle:formChange', { from: fc.from, to: fc.to });
     }
     this.player = new FormInterludePlayer(steps, this.host(fc), holdFrames(BATTLE_MESSAGE_FRAMES));
     return true;
@@ -162,7 +169,8 @@ export class FormChangeView implements FormChangeHook {
       swap: (riseFrom) => {
         const data = this.deps.battle.allEnemies[i]?.data;
         const view = d.colossus.view(i);
-        if (data && colossusOf(data) && view && view.formId === colossusOf(data)) {
+        if (data && colossusOf(data) && view && view.artId === colossusOf(data)) {
+          d.colossus.rest(i, data);
           for (const [layer, frame] of Object.entries(variantOf(data))) view.setVariant(layer, frame);
         } else if (data && colossusOf(data)) d.colossus.swapIn(i, data, riseFrom);
         else console.error(`Form change ${fc.from} -> ${fc.to}: ${data?.id ?? '?'} has no colossus form; the sprite stays`);

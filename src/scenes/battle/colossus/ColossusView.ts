@@ -10,6 +10,7 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
 import type { Texture } from 'pixi.js';
 import type { ColossusPoseFrame, LayerInfo } from './colossusChoreography.js';
+import { artIdOf } from './colossusEntries.js';
 import { canvasRect, screenAnchors, targetRectOnScreen, type ColossusFormSpec, type ColossusLayerSpec, type Offset } from './colossusIndex.js';
 import { EFFECT_BOX, SLASH_BOX, registerProxy, unregisterProxy, type ColossusAnchorSource, type Rect } from './colossusProxy.js';
 
@@ -59,8 +60,13 @@ export class ColossusView implements ColossusAnchorSource {
   /** The dying's white fade (ColossusSlots draws it over the battle). */
   overlay = 0;
 
-  constructor(readonly formId: string, readonly form: ColossusFormSpec, private readonly src: ColossusTextureSource,
+  private id: string;
+  private spec: ColossusFormSpec;
+  private readonly proxyBox: Graphics;
+  constructor(formId: string, form: ColossusFormSpec, private readonly src: ColossusTextureSource,
     variant: Record<string, string> = {}) {
+    this.id = formId;
+    this.spec = form;
     this.variants = { ...variant };
     this.root.label = `colossus.${formId}`;
     this.art.label = 'colossus.art';
@@ -71,7 +77,7 @@ export class ColossusView implements ColossusAnchorSource {
     this.layerInfo = form.layers.map((l) => ({ name: l.name, kind: l.kind, frames: Object.keys(l.frames),
       ...(l.orbit ? { orbit: l.orbit } : {}), ...(l.alpha !== undefined ? { alpha: l.alpha } : {}) }));
     const r = targetRectOnScreen(form);
-    const box = new Graphics().rect(0, 0, r.width, r.height).fill(0xffffff);
+    const box = this.proxyBox = new Graphics().rect(0, 0, r.width, r.height).fill(0xffffff);
     box.renderable = false;
     this.proxy.label = 'colossus.proxy';
     this.proxy.addChild(box);
@@ -79,6 +85,25 @@ export class ColossusView implements ColossusAnchorSource {
     this.place();
   }
 
+  /** The index entry drawn (F4's own after a re-base). */
+  get formId(): string { return this.id; }
+  get form(): ColossusFormSpec { return this.spec; }
+  /** The art the layers show (an `art` entry shares its form's, colossusEntries.ts). */
+  get artId(): string { return artIdOf(this.id, this.spec); }
+
+  /** Take another entry of the same art (F3 -> F4, D-U13): its rest, anchors and target rect, the layers kept. The
+   *  canvas stays put on screen: the pan offset takes old rest - new (F4: (0, +225)); the script's pan brings it home. */
+  rebase(formId: string, form: ColossusFormSpec): void {
+    const keep = this.canvas();
+    this.id = formId;
+    this.spec = form;
+    this.root.label = `colossus.${formId}`;
+    const r = targetRectOnScreen(form);
+    this.proxyBox.clear().rect(0, 0, r.width, r.height).fill(0xffffff);
+    const now = this.canvas();
+    this.pan = { x: this.pan.x + keep.x - now.x, y: this.pan.y + keep.y - now.y };
+    this.place();
+  }
   private addLayer(spec: ColossusLayerSpec): void {
     const node = new Container();
     node.label = `colossus.layer.${spec.name}`;
