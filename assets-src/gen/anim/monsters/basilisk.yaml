@@ -145,3 +145,21 @@ holds: []
 paint:   # 1 px cracks behind the front leg's elbow the coil opens, outline ink
   - {frame: atk_wind1, xy: [[68, 66], [70, 67], [73, 68]], rgb: [6, 4, 10]}
   - {frame: hurt_in1, xy: [[61, 38], [45, 62], [44, 63], [34, 68]], rgb: [6, 4, 10]}   # back crack, open belly edge
+  # P2-1 (ROSTER_FIX_PLAN_2 2): the coiled jaw lands on the foreleg/chest join; the new inner ink there (box 66 58 84 68,
+  # vs idle at (0, 0): the leg is pinned) takes the 4-neighbour mode of the leg/chest fill, and every silhouette edge gap is inked
+  - {frame: atk_wind1, rgb: [74, 82, 82], xy: [[69, 58], [75, 64], [78, 64], [74, 65], [75, 65], [78, 65], [77, 66], [70, 67]]}
+  - {frame: atk_wind1, rgb: [82, 99, 90], xy: [[71, 59], [72, 59]]}
+  - {frame: atk_wind1, rgb: [49, 49, 57], xy: [[75, 60], [74, 61], [66, 65], [68, 66]]}
+  - {frame: atk_wind1, rgb: [66, 66, 66], xy: [[78, 60], [79, 60], [76, 61], [77, 61], [78, 61], [79, 61], [72, 62], [73, 62], [75, 62], [77, 62], [70, 63], [75, 63], [68, 64], [69, 64], [73, 65]]}
+  - {frame: atk_wind1, rgb: [6, 4, 10], xy: [[62, 43], [7, 66], [34, 70]]}
+  - {frame: atk_wind2, rgb: [74, 82, 82], xy: [[66, 60], [74, 63], [75, 63], [77, 63], [74, 64], [78, 64], [78, 65]]}
+  - {frame: atk_wind2, rgb: [82, 99, 90], xy: [[68, 61], [69, 61], [69, 64]]}
+  - {frame: atk_wind2, rgb: [49, 49, 57], xy: [[72, 62], [73, 62], [71, 63]]}
+  - {frame: atk_wind2, rgb: [66, 66, 66], xy: [[75, 62], [76, 62], [73, 63], [76, 63], [70, 64], [68, 65], [72, 65], [74, 65]]}
+  - {frame: atk_wind2, rgb: [6, 4, 10], xy: [[33, 49], [33, 50], [32, 51], [7, 67], [47, 72], [49, 73], [52, 73], [53, 73]]}
+  - {frame: atk_wind2, rgb: [140, 148, 132], xy: [[58, 45], [59, 45], [60, 45], [59, 46], [60, 46]]}   # neck notch: the ink block where the pulled-back crest meets the back takes the back fill
+  # iteration 2 (reviewer): the leg's maroon rim px left mid-leg under the coiled jaw take the leg fill; the jaw underline closed in ink; the crest/back join of atk_wind1 cleaned (stray ink px nulled, the back outline made continuous, a 1 px hole closed)
+  - {frame: atk_wind1, rgb: [66, 66, 66], xy: [[74, 62], [76, 62], [71, 63], [74, 63], [76, 63], [77, 63], [74, 64], [76, 64], [77, 64], [76, 65], [77, 65], [74, 66]]}
+  - {frame: atk_wind2, rgb: [66, 66, 66], xy: [[74, 62], [77, 62], [69, 65], [71, 65]]}
+  - {frame: atk_wind1, rgb: [6, 4, 10], xy: [[77, 60], [78, 60], [79, 60], [80, 60], [81, 60], [82, 60], [59, 41], [61, 41], [63, 43]]}
+  - {frame: atk_wind1, rgb: null, xy: [[59, 40], [61, 40]]}
