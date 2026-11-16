@@ -354,11 +354,16 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     nul["paint"][-1]["rgb"] = None
     check(MK.paint_keys("goblin", nul, kfs)[1] == ["idle"], "FW-P: rgb null (transparent) is allowed")
     for sid, caps in (("goblin", {"hurt": 200}), ("crocodile", {"hurt": 221}), ("crocodile", {"idle": 200}),
-                      ("drowned_sovereign", {"cast": 301})):
+                      ("drowned_sovereign", {"cast": 301}), ("chimera", {"attack": 801}), ("chimera", {"hurt": 601}),
+                      ("chimera", {"idle": 200})):
         check(_refused(lambda: MK.paint_keys(sid, {"kf_paint_cap": caps}, kfs), sid, "not an approved exception"),
               f"FW-P: kf_paint_cap {caps} on {sid} is refused (not in the allowlist)")
-    check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300} and MK.KF_PAINT_CAP == 160,
-          "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220 and drowned_sovereign/cast <= 300")
+    check(MK.KF_PAINT_ALLOW == {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300, ("chimera", "attack"): 800,
+                                ("chimera", "hurt"): 600} and MK.KF_PAINT_CAP == 160,
+          "FW-P: the cap is 160 px; the exceptions are exactly crocodile/hurt <= 220, drowned_sovereign/cast <= 300 and "
+          "(FW-PA, D-R1) chimera/attack <= 800, chimera/hurt <= 600")
+    for k, n in (("attack", 800), ("hurt", 600)):
+        check(MK.paint_keys("chimera", {"kf_paint_cap": {k: n}}, kfs)[1] == [], f"FW-PA: chimera kf_paint_cap {{{k}: {n}}} is allowed")
     raw = {e[0]: e for e in MA.load_entries(paint=False)}
     ck = raw["crocodile"][2]
     ch = np.asarray(ck["hurt"].convert("RGBA"))
