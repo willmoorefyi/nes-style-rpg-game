@@ -11,7 +11,7 @@
  * - `idleBox`: the idle frame's opaque box [left, top, right, bottom] (FW-A2, docs/REDESIGN_PLAN.md 1); the bestiary
  *   centres it in the preview panel. Missing: measured from the atlas image in a browser, else no centring.
  */
-import type { EnemyBoxInput, EnemySizeClass } from '../scenes/battle/EnemyLayoutAi.js';
+import { layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from '../scenes/battle/EnemyLayoutAi.js';
 
 /** The anchor fields of an atlas sheet entry (monster_atlas.py) and of MonsterFrames (optional, so hand-built test
  *  frames may leave them out). */
@@ -54,5 +54,13 @@ export function lungeOvershoot(f: AnchoredFrames): number {
 export function enemyBoxInput(size: EnemySizeClass, f: AnchoredFrames): EnemyBoxInput {
   const box: EnemyBoxInput = { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale, scale: f.scale };
   if (f.homeX) { box.ox0 = f.homeX[0] * f.scale; box.ox1 = (f.homeX[1] + 1) * f.scale; }
+  // a scale-3 boss is fitted by its art, not its cell (EnemyBoxInput.oy0; hollow_seraph, V8 N-1)
+  if (size === 'boss' && f.scale === 3 && f.travelTop !== undefined) box.oy0 = f.travelTop * f.scale;
   return box;
+}
+
+/** The layout class of an enemy (layoutSizeOf) with its art's height: the travel frames' top to the cell bottom, screen
+ *  px (unknown without art or `travelTop`, so a scale-3 boss then stays the titan class). */
+export function layoutSizeOfArt(size: EnemySizeClass | undefined, f: AnchoredFrames | null | undefined): EnemySizeClass {
+  return layoutSizeOf(size, f?.scale, f && f.travelTop !== undefined ? (f.cell[1] - f.travelTop) * f.scale : undefined);
 }

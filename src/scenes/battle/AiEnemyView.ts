@@ -1,8 +1,8 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
-import { travelTopOf } from '../../rendering/monsterAnchors.js';
-import { computeEnemyLayoutAi, formationFits, layoutSizeOf, type EnemyBox } from './EnemyLayoutAi.js';
+import { layoutSizeOfArt, travelTopOf } from '../../rendering/monsterAnchors.js';
+import { computeEnemyLayoutAi, formationFits, type EnemyBox } from './EnemyLayoutAi.js';
 import { atlasLayout, colossusOf, formationWarning } from './formationCheck.js';
 import { EnemyActorPoses } from './colossus/enemyActorView.js';
 import type { AttackPlan, Posture, PoseCue } from './EnemyPoseController.js';
@@ -87,7 +87,7 @@ export class AiEnemyView {
     const box = this.boxes[i];
     const b = this.base[i];
     const e = this.enemies[i];
-    if (!target || !f || !box || !b || e?.attack === 'ranged' || layoutSizeOf(e?.size, f.scale) === 'titan') return { travel: 0, rise: 0 };
+    if (!target || !f || !box || !b || e?.attack === 'ranged' || layoutSizeOfArt(e?.size, f) === 'titan') return { travel: 0, rise: 0 };
     const t = target.getBounds();
     // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions);
     // toLocal reads the layer's current transform (its cached worldTransform lags a move made since the last render,
@@ -124,7 +124,7 @@ export class AiEnemyView {
     return this.enemies.map((e, i) => {
       const f = this.frames[i];
       this.poses.configure(i, { hasCast: f?.hasCast ?? false, hasRaise: f?.hasRaise ?? false, scaleFactor: boxes[i].scaleFactor,
-        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[layoutSizeOf(e.size, f?.scale)], ...(f ? { lungePx: f.lungePx } : {}) });
+        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[layoutSizeOfArt(e.size, f)], ...(f ? { lungePx: f.lungePx } : {}) });
       return this.buildOne(e, f, boxes[i]);
     });
   }

@@ -201,7 +201,7 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   /** An enemy's layout input from the real data (V4: the sheet scale and size are in the atlas and enemies.yaml). */
   const rescaled = layoutInput;
 
-  it('the 23 rescaled sheets and chaos have scale 3 in the atlas and their size in enemies.yaml; no other sheet has a scale', () => {
+  it('the 23 rescaled sheets, chaos and hollow_seraph have scale 3 in the atlas and their size in enemies.yaml; no other sheet has a scale', () => {
     for (const id of [...TIER_H, 'bigeyes']) {
       expect([layoutInput(id).size, layoutInput(id).scale], id).toEqual([id === 'bigeyes' ? 'large' : 'huge', 3]);
     }
@@ -210,8 +210,16 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
     expect([layoutInput('chaos').size, layoutInput('chaos').scale]).toEqual(['titan', 3]);
     expect([layoutSizeOf('boss', 3), layoutSizeOf('boss', 2), layoutSizeOf('huge', 3), layoutSizeOf(undefined, 3)])
       .toEqual(['titan', 'boss', 'huge', 'small']);
+    // V8 N-1: hollow_seraph (and hollow_seraph_2) keep `size: boss` at scale 3; their art (471 px) fits ENEMY_AREA (545),
+    // so they stay the boss class; chaos's art (582 px) does not, so it stays the titan class
+    expect([layoutSizeOf('boss', 3, 545), layoutSizeOf('boss', 3, 546), layoutSizeOf('boss', 3, undefined)])
+      .toEqual(['boss', 'titan', 'titan']);
+    for (const id of ['hollow_seraph', 'hollow_seraph_2']) {
+      expect(enemyData.find((e) => e.id === id)!.size, id).toBe('boss');
+      expect([layoutInput(id).size, layoutInput(id).scale, layoutInput(id).oy0], id).toEqual(['boss', 3, 129]);
+    }
     const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale !== undefined).sort();
-    expect(scaled).toEqual([...TIER_H, 'bigeyes', 'chaos'].sort());
+    expect(scaled).toEqual([...TIER_H, 'bigeyes', 'chaos', 'hollow_seraph'].sort());
   });
   const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
   const screenScales = (inputs: EnemyBoxInput[]) =>

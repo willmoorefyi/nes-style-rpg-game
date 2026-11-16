@@ -1,13 +1,14 @@
 /**
  * V8 F8 (docs/REDESIGN_FIX_PLAN.md, D-O7): does a formation lay out at an integer screen scale >= 2? The layout
  * boxes are built as AiEnemyView builds them (the atlas cell at the sheet's scale, its home extent, the titan class for
- * a scale-3 boss; a placeholder box when there is no art), then checked by `formationFits`. The debug sandbox refuses
- * a formation that does not fit; AiEnemyView warns once when a battle lays one out anyway.
+ * a scale-3 boss whose art does not fit ENEMY_AREA; a placeholder box when there is no art), then checked by
+ * `formationFits`. The debug sandbox refuses a formation that does not fit; AiEnemyView warns once when a battle lays
+ * one out anyway.
  */
 import type { EnemyData } from '../../types/index.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
-import { enemyBoxInput } from '../../rendering/monsterAnchors.js';
-import { formationFits, layoutSizeOf, type EnemyBox, type EnemyBoxInput, type EnemySizeClass } from './EnemyLayoutAi.js';
+import { enemyBoxInput, layoutSizeOfArt } from '../../rendering/monsterAnchors.js';
+import { formationFits, type EnemyBox, type EnemyBoxInput, type EnemySizeClass } from './EnemyLayoutAi.js';
 import { colossusOf } from './colossus/colossusIndex.js';
 
 export { colossusOf };
@@ -17,7 +18,7 @@ export const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 
 
 /** The layout input of one enemy: its frames' cell, scale and home extent, else its placeholder box. */
 export function boxInputOf(e: EnemyData, f: MonsterFrames | null | undefined): EnemyBoxInput {
-  const size = layoutSizeOf(e.size, f?.scale);
+  const size = layoutSizeOfArt(e.size, f);
   return f ? enemyBoxInput(size, f) : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
 }
 
