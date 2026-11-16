@@ -135,3 +135,71 @@ Counts: 26 OK, 1 P1 (chimera), 10 P2, 0 P0.
 
 - No P0. One new P1 (chimera head count, base art). Every P1 from the first test is FIXED.
 - P2s: 10 new in batch C/D; the first test's P2s are fixed or on the nit list. The new nits are the crocodile tail lump, the ice_gigas knee strand and the garland smear hook.
+
+## Re-test (G7), 2026-11-16
+
+Scope: `roster-int` at dd521b6 (123 sheets, 9 pages, 127 bestiary entries). Fresh tester, own dev server (127.0.0.1:5393) and headless Chromium (Playwright scripts), every URL with `mute=1`; server stopped afterwards.
+Evidence (local, not committed): `/tmp/vpt3/` (`strips/<id>.png` every atlas frame, `z/z_*.png` zooms, `z/reg1.png` / `z/reg2.png` regression contact sheets, `z/sib_pir.png` swimmer siblings, `best/<id>_*.jpg` bestiary, `bt/T1..T4/` step loops (astos, warmech, swimmers on shoreline, T-K mix), `p_*.json` per-frame sprite bounds, `best_all.json` / `best_daze.json`, `df1..3.txt` Dark Fighter battle text and `df3_cur3_*.jpg`, `regress.txt`, `check_all.txt`, `roster_report.txt`, `fixmeasure.txt`, `sweep.txt`, `fps_*.jpg`, scripts `regress.py`, `top.py`, `ana3.py`, `meas.py`, `mont3.py`, `js/*.js`).
+
+Automated pre-pass:
+- Frame-rect diff vs b6b1346 (by sheet and frame name, `regress.py`): 100 sheets byte-identical in every frame; 21 changed = exactly the plan 9 list (G3: air_elemental, ashen_queen, basilisk, chimera, clay_golem, crocodile, earth_medusa, ice_gigas, king_mummy, sand_worm, sea_troll, stone_golem; T-K: astos, black_knight, black_widow, crawler, horned_devil, hydra, scorpion, warmech, water_elemental); 2 new (red_piranha, white_shark). Keyframes changed only where planned (chimera attack 787 / hurt 719 px, clay_golem attack 39, crocodile hurt 24, king_mummy hurt 21, earth_medusa idle 19, ashen_queen attack/hurt/cast by the FW-O offset).
+- `monster_anim.py check --all`: 123 `OK`, exit 0, no `no rig`; aliased exactly chimera/hurt, black_widow/hurt, crawler/attack, astos/attack.
+- `monster_roster_report.py`: no recolour flag. New watch pair bigeyes / red_piranha 0.80 / 0.39: distinct at 2x (white eyeball vs brown piranha, `z/sib_pir.png`). shark / white_shark 0.24 / 0.12.
+- Fix gates re-run independently (`fixmeasure.txt`): edge gaps 0 in every flagged frame of sea_troll, stone_golem, earth_medusa, sand_worm, air_elemental, ice_gigas, basilisk; sand_worm hurt_in2 inner ink +1, air_elemental +1; crocodile box bare ink 0, (33,0,33) 0; king_mummy gold 28 / 26; ashen_queen rows 170-198 x 28-165 in idle, attack, hurt and cast; earth_medusa chest ink 0.
+- No console errors or warnings in 23 bestiary entries, 13 step-loop battles and 3 real fights.
+- Performance (GPU-backed headless Chromium, 10 s `enemyAnim=loop`): 9 ogres/trolls (the `anim_crowd` formation) median 120.5, p2 99; the 9-large mixed crowd 120.5 / 99, every sprite at scale 2; 9 new sheets 120.5 / 97. (Without GPU flags headless Chromium caps at 30 even for one goblin; not a game defect.)
+
+### A. Round-2 items
+
+| # | Item | Verdict | Evidence |
+|---|---|---|---|
+| P1 | chimera head count | **FIXED** | lion, goat and one dragon head in all 13 frames at 1x and 5-7x (idle .. atk_follow, hurt_in1/2, hurt, daze). No erase scar: the lion face and mane in attack / hurt read as continuous ramp, no flat patch or hole. hurt is aliased (FW-Q) so hurt_in1 = idle, hurt_in2 = hurt. `strips/chimera.png`, `z/z_chimera_*.png` |
+| P2-1 | basilisk notch, atk_wind1/2 | **FIXED** | no dark notch at the foreleg/chest join; edge gaps 0. `z/z_basilisk_idle.png` |
+| P2-2 | sand_worm fold, hurt_in2 | **FIXED** | one continuous body; hurt_in2 is now the hurt pose (inner ink +1 vs hurt). The switch from the idle curl to the hurt pose happens at hurt_in1 -> hurt_in2 (it is the key change). `z/z_sand_worm_hurt_in1.png` |
+| P2-3 | king_mummy gold staff | **FIXED** | the crook is gold in hurt_in2 and hurt (28 / 26 gate px). `z/z_king_mummy_idle.png` |
+| P2-4 | clay_golem rune | **FIXED** | the same "R" in idle, atk_mid, attack, atk_follow, hurt. `z/z_clay_golem_idle.png` |
+| P2-5 | sea_troll knee spurs, finger outlines | **FIXED** | knees clean, fingers outlined in atk_wind1/2; edge gaps 0, spurs below idle's. Nit: in hurt_in1 the near hand opens into a mitten (fingers merge), 1x invisible. `z/z_sea_troll_hands.png` |
+| P2-6 | stone_golem seams + far-shoulder spike | **FIXED** (nit) | edge gaps 0; no spike at the far shoulder. Residual: a 3 px diagonal ink hook under the near fist in hurt_in1 (rows 95-98, x 91-93), about 2 px at 1x. Chest runes: accepted (D-R6). `z/z_stone_golem_*.png` |
+| P2-7 | air_elemental crease, hurt_in2 | **FIXED** | no line across the body. `z/z_air_elemental_hurt_in1.png` |
+| P2-8 | earth_medusa chest box | **FIXED** | no box in idle, idle_b, atk_wind1, hurt_in1 (ink in the box 0) |
+| P2-8c | earth_medusa arm fragments, hurt_in1 | **FIXED** (nit) | the arm reads whole, spurs 0, edge gaps 0; a 2 px ragged step on the shoulder top at 8x only |
+| P2-9 | water_elemental bestiary background | **FIXED** | `shoreline`; the blue figure reads clearly against the brown rocks. Size pop / small idle: accepted (D-R6). `best/water_elemental_screen.jpg` |
+| N-1a | crocodile curl lump | **FIXED** | no (33,0,33) inside the curl; it reads as tail |
+| N-1b | crocodile tip strand | **NOT FIXED visually -> accepted nit by name (D-R6)** | the gate passes (bare ink 0, spurs 0), but at 6x the tip is still a thin 2 px stalk ending in a round knob, like an antenna; at 1x a thin hook. `z/z_crocodile_idle.png` |
+| N-2 | ice_gigas knee strand | **FIXED** | no hanging strand in atk_wind1/2, atk_recover; the fur cuff bulges slightly (reads as fur). `z/z_ice_gigas_idle.png` |
+| N-4 | ashen_queen coil planted | **FIXED** | coil base and altar stay put across all 17 frames, idle / attack / hurt / cast rows 170-198 at x 28-165. Tail lash in hurt: accepted nit. `strips/ashen_queen.png` |
+| 7 | Dark Fighter casts CUR3 | **FIXED** | real fights at `sandbox=l30_lich`: (1) `enemies=iron_golem,dark_fighter`, party hits the golem: she casts CUR3 on the golem while she is at full HP ("Dark Fighter casts CUR3!", +69, +85); (2) `party=white_mage,white_mage,black_mage,black_mage&enemies=dark_fighter,iron_golem`: she heals herself when she is the most hurt ("Dark Fighter recovers 35 HP!", +13, +4). Log lines name CUR3. `df1.txt`, `df3.txt`, `df3_cur3_1.jpg` |
+
+### B. Newly rigged sheets, first test
+
+Method: every frame in `strips/<id>.png` and zooms; the bestiary page (attack, hurt, cast, daze steps; art right edge at most 970 vs the panel's 982); step loops on the shoreline (`bt/T1..T4`, highest opaque y, lunge reach). Every T-K in-between is translation-only, so each sequence still has one key switch (by design); listed below only where it reads as a pop.
+
+| Enemy | Verdict | Finding | Evidence |
+|---|---|---|---|
+| astos | P2 | attack aliased (by design); cast and daze animate (daze: head bows); lunge top y 124 (window 120). Hurt: at hurt_in1 -> hurt_in2 the staff jumps from his right hand (screen left, vertical) to a diagonal across the other side and the cape balloons out, about 70 px at 2x; the crown lifts off the head in the hurt key (base art, reads as knocked up) | `z/z_astos_hurt_in1.png`, `p_T1.json` |
+| warmech | P2 | daze slumps and reads; boss lunge top y 124, below the window; contact with the warrior. Hurt key is a smaller, thinner mech: height 183 -> 166, area -26 %, the near pauldron and back exhaust are gone; at hurt_in1 -> hurt_in2 it reads as a different model (base art) | `z/z_warmech_hurt_in1.png`, `bt/T2/s_0030.jpg` |
+| water_elemental | OK (nit) | in-betweens smooth; the daze base sinks 3 px below the foot line (lowest row 125 vs 122) | `strips/water_elemental.png` |
+| black_knight | OK | dark (accepted, D-R6); readable on shoreline | `bt/T4/` |
+| horned_devil | OK | - | `strips/horned_devil.png` |
+| scorpion | OK | hurt rears up (big but readable key change) | `strips/scorpion.png` |
+| hydra | OK | 3 heads in every frame | `strips/hydra.png` |
+| black_widow | OK | hurt aliased (by design); idle 45 px tall, small but readable | `strips/black_widow.png` |
+| crawler | P2 | attack aliased (by design). The attack key's tail end is cut flat at x 2 with no outline on the cut (approved key; shows in atk_mid / attack / atk_follow) | `z/z_crawler_attack.png` |
+| red_piranha | OK (nit) | in-betweens clean. Bestiary (`ocean`, ship deck): orange-brown fish on orange wood; it reads only by its outline | `z/pir_bg.png` |
+| white_shark | OK (nit) | scale fits the swimmers (106 x 57 idle vs shark 77 x 97; similar area); lunge reaches the top hero from the back row. Same grey palette as shark: reads as the same species with scars (sibling, by design?) | `bt/T3/s_0000.jpg`, `z/sib_pir.png` |
+
+Runtime nit seen in the swimmer and warmech lunges (existing behaviour, not new art): the impact dust spawns on the lunge's foot line, so under a leaping shark / white_shark it floats in mid-air, and under warmech it lands between the legs instead of at the front claw. `z/T3_mont.jpg`, `z/blob_seq.png`
+
+Counts: 8 OK (3 with nits), 3 P2, 0 P1, 0 P0.
+
+### C. Regression sample and sweep
+
+- **Sample (15 + bosses):** goblin, wolf, cockatrice, green_slime, cobra, ochu, shark, lich, garland, hollow_seraph, chaos, death_eye, drowned_sovereign, vampire, ogre, troll. All byte-identical to b6b1346; at 2x (`z/reg1.png`, `z/reg2.png`) the round-1 fixes hold (lich one skull, garland no hip hole, seraph 6 wings, cobra head, vampire face, ochu no specks). Boss lunges, highest opaque y: chaos 124, hollow_seraph 121, garland 128, lich 124, death_eye 137, drowned_sovereign 148, ashen_queen 124, astos 124, warmech 124 (same as F6 where measured).
+- **9-large crowd:** all 9 at scale 2 (`p_L1.json`).
+- **FW-M2 sweep top 10** (`sweep.txt`: chaos daze 66, daze_b 64, atk_raise_in 63, hurt_in1 57, cast_gather 52, ogre_mage hurt_in2 47, dragon_zombie atk_follow 40, chaos atk_recover 34, ogre_chief hurt_in1 34, dragon_zombie atk_mid 33) at 4-5x: mostly broken outline runs on very dark art, not visible at 1x. One visible: chaos hurt_in1, a straight background slit opens between the near horn and the right wing's leading edge, which is cut straight (`z/z_chaos_idle.png`). ogre_mage, dragon_zombie, ogre_chief: ragged edge px only. For D-R6 or a later round.
+
+### Status
+
+- No P0, no P1. The chimera P1 is FIXED (second round).
+- Every round-2 P2 and nit is FIXED except the crocodile tip strand, which is on the D-R6 list by name.
+- New P2s: astos hurt staff/cape switch, warmech hurt key smaller and missing parts, crawler attack tail sliced flat. New nits: stone_golem 3 px hook (hurt_in1), water_elemental daze 3 px below the feet, red_piranha bestiary contrast, white_shark same palette as shark, impact dust in mid-air under swimmers, chaos hurt_in1 wing slit (sweep).
