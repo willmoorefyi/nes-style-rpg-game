@@ -1,0 +1,143 @@
+# Horned Devil (T-K, docs/ROSTER_FIX_PLAN_2.md section 5): a red winged devil with a trident, keyframe-only until now.
+# body: biped; every in-between is a translation of its own key (moves: [], the upper body tweaked as one piece,
+# knees half, feet and toes pinned), so the strike and the flinch live in the key switch and no part crease appears.
+# The wings, horns and tail ride the torso, head and far arm and move with them; the trident head is masked to the
+# weapon and the hurt's far wing is its own part (fwing_f), so the cell edges (trident x 81 in idle, wing x 2 in hurt)
+# bound the shifts: the trident and the far wing move less than the body where a full shift would touch the border.
+# fixmeasure.py switch horned_devil <seq> --rig (2026-11-15; replaces the plan's pre-measure, d attack (-5, 3) /
+# hurt (-6, 1), which assumed a whole-figure shift with the feet moving):
+#   attack: wind1 (1, -1), wind2 / recover (1, -2), mid / follow (-3, 0); weakest wind2->mid and follow->recover
+#           IoU 0.439 / step 4.0 vs need 0.428 / cap 6.0; idle->wind1 0.842, mid->attack 0.689, recover->idle 0.760
+#   hurt:   in1 (3, 1) (near hand and trident +1, tip -1), in2 (-2, 2) (far wing -1); in1->in2 IoU 0.419 / step 4.1
+#           vs need 0.413 / cap 6.0; idle->in1 0.683, in2->hurt 0.689
+#   daze:   the recipe slump as a translation (moves: []); idle->daze 0.824, daze->daze_b 0.881
+# Image review (fresh image-only reviewer): SHIP WITH NITS: wind1 is a 1 px lift (the wind can only lean toward
+# the attack key's mass, right and up); hurt_in1 jolts 3 px right before the hurt key throws the body left (the
+# key switch needs the idle mass moved toward the hurt key's); 2-3 px jumps at the key switches.
+sprite: horned_devil
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+keyframes:
+  idle:
+    crown: [49, 14]
+    neck: [48, 30]
+    chest: [44, 35]
+    hip: [40, 49]
+    sh_n: [49, 33]
+    el_n: [51, 40]
+    hand_n: [60, 41]
+    tip: [76, 20]
+    sh_f: [31, 32]
+    el_f: [27, 42]
+    hand_f: [28, 50]
+    hip_n: [44, 50]
+    knee_n: [50, 58]
+    foot_n: [52, 70]
+    toe_n: [57, 72]
+    hip_f: [36, 50]
+    knee_f: [33, 60]
+    foot_f: [26, 70]
+    toe_f: [29, 74]
+  attack:
+    crown: [51, 11]
+    neck: [50, 28]
+    chest: [42, 29]
+    hip: [36, 45]
+    sh_n: [52, 26]
+    el_n: [53, 40]
+    hand_n: [54, 53]
+    tip: [76, 72]
+    sh_f: [30, 23]
+    el_f: [29, 31]
+    hand_f: [30, 37]
+    hip_n: [42, 44]
+    knee_n: [44, 52]
+    foot_n: [44, 61]
+    toe_n: [48, 64]
+    hip_f: [32, 44]
+    knee_f: [26, 52]
+    foot_f: [16, 61]
+    toe_f: [14, 66]
+  hurt:
+    crown: [40, 11]
+    neck: [41, 29]
+    chest: [40, 34]
+    hip: [41, 50]
+    sh_n: [48, 34]
+    el_n: [56, 36]
+    hand_n: [63, 34]
+    tip: [69, 7]
+    sh_f: [32, 30]
+    el_f: [22, 22]
+    hand_f: [16, 13]
+    hip_n: [48, 46]
+    knee_n: [56, 56]
+    foot_n: [58, 66]
+    toe_n: [63, 70]
+    hip_f: [40, 50]
+    knee_f: [40, 58]
+    foot_f: [33, 68]
+    toe_f: [35, 74]
+    wsh_f: [24, 29]
+    wel_f: [13, 24]
+    wtip_f: [3, 33]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+masks:                         # the trident head is the weapon's (not the head's); the hurt's far wing is its own part
+  weapon:
+    idle: [[62, 16], [83, 16], [83, 31], [73, 38], [66, 41], [62, 38]]
+  fwing_f:
+    hurt: [[0, 23], [12, 20], [19, 25], [19, 38], [0, 38]]
+frames:
+  atk_wind1:   # translation (1, -1) of the idle; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [1, -1], neck: [1, -1], chest: [1, -1], hip: [1, -1], sh_n: [1, -1], el_n: [1, -1], hand_n: [1, -1], sh_f: [1, -1], el_f: [1, -1], hand_f: [1, -1], tip: [1, -1], hip_n: [1, -1], hip_f: [1, -1], knee_n: [1, -1], knee_f: [1, -1]}
+  atk_wind2:   # translation (1, -2) of the idle; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [1, -2], neck: [1, -2], chest: [1, -2], hip: [1, -2], sh_n: [1, -2], el_n: [1, -2], hand_n: [1, -2], sh_f: [1, -2], el_f: [1, -2], hand_f: [1, -2], tip: [1, -2], hip_n: [1, -2], hip_f: [1, -2], knee_n: [1, -2], knee_f: [1, -2]}
+  atk_mid:   # translation (-3, 0) of the key; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-3, 0], hip: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0], tip: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0], knee_n: [-3, 0], knee_f: [-3, 0]}
+  atk_follow:   # translation (-3, 0) of the key; feet planted
+    t: 1.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-3, 0], hip: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0], tip: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0], knee_n: [-3, 0], knee_f: [-3, 0]}
+  atk_recover:   # translation (1, -2) of the idle; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [1, -2], neck: [1, -2], chest: [1, -2], hip: [1, -2], sh_n: [1, -2], el_n: [1, -2], hand_n: [1, -2], sh_f: [1, -2], el_f: [1, -2], hand_f: [1, -2], tip: [1, -2], hip_n: [1, -2], hip_f: [1, -2], knee_n: [1, -2], knee_f: [1, -2]}
+  hurt_in1:   # translation (3, 1) of the idle; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [3, 1], neck: [3, 1], chest: [3, 1], hip: [3, 1], sh_n: [3, 1], el_n: [2, 0], hand_n: [1, 1], sh_f: [3, 1], el_f: [3, 1], hand_f: [3, 1], tip: [-1, 1], hip_n: [3, 1], hip_f: [3, 1], knee_n: [3, 0], knee_f: [3, 1]}
+  hurt_in2:   # translation (-2, 2) of the key; feet planted
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-2, 2], neck: [-2, 2], chest: [-2, 2], hip: [-2, 2], sh_n: [-2, 2], el_n: [-2, 2], hand_n: [-2, 2], sh_f: [-2, 2], el_f: [-2, 2], hand_f: [-2, 2], tip: [-2, 2], hip_n: [-2, 2], hip_f: [-2, 2], knee_n: [-2, 2], knee_f: [-2, 2], wsh_f: [-2, 1], wel_f: [-1, 1], wtip_f: [-1, 1]}
+  daze:   # the recipe slump (body 1 px down, head 1, 1) as a translation: no trident turn
+    moves: []
+  daze_b:
+    moves: []
+holds: []
+paint: []
