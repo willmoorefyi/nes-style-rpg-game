@@ -29,10 +29,12 @@ export interface BattleSceneConfig {
   enemyStatus?: Record<number, StatusEffect[]>;
   /** Injectable RNG for the battle logic (deterministic tests); defaults to Math.random. */
   rng?: () => number;
+  /** The boss form records reachable from `enemies` (CHAOS_FORMS_PLAN 2.2), passed on to the battle logic. */
+  forms?: EnemyData[];
 }
 
 /** Weighted actions an enemy may take, keyed by enemy id (e.g. make a boss cast). */
-export type EnemyAiPatterns = Record<string, { type: 'fight' | 'magic'; spellId?: string; weight: number }[]>;
+export type EnemyAiPatterns = Record<string, { type: 'fight' | 'magic' | 'slam'; spellId?: string; weight: number }[]>;
 
 /**
  * Battle-only text sizes (BA-8; the global FONT_SIZE is unchanged). The message window keeps its 120 px: two lines

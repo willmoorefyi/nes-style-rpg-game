@@ -84,7 +84,9 @@ function setup(opts: { missing?: string[] } = {}) {
 
 const statsText = (scene: BestiaryScene): string => scene.stats!.shown.join('\n');
 /** The real list order (by spec number) and its places, so the walks follow enemies.yaml as it grows. */
-const ORDER = read<Array<{ id: string; num: number }>>('assets/data/enemies.yaml').sort((a, b) => a.num - b.num).map((e) => e.id);
+// CHAOS_FORMS_PLAN R11: the boss form records (`formOf`, no num) are not top-level entries
+const ORDER = read<Array<{ id: string; num: number; formOf?: string }>>('assets/data/enemies.yaml').filter((e) => !e.formOf)
+  .sort((a, b) => a.num - b.num).map((e) => e.id);
 const place = (id: string): number => ORDER.indexOf(id);
 /** Down `n` times from the current entry. */
 const downs = (tap: (a: InputAction) => void, n: number): void => { for (let i = 0; i < n; i++) tap('down'); };

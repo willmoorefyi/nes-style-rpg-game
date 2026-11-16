@@ -8,6 +8,10 @@
 # 3. Define items and gold
 # 4. Define enemies (IDs from enemies.yaml)
 # 5. The scenario will appear in the debug menu automatically
+#
+# `enemyAi` (per enemy id: fight / magic / slam actions) overrides an enemy's data `ai`. For a boss with forms
+# (CHAOS_FORMS_PLAN 2.2, R7) it applies to the first form only: the first form change rebuilds the AI from the new
+# form record's `ai` and drops the override.
 
 - id: basic_battle
   name: Basic Battle

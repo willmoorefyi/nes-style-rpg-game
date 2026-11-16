@@ -29,7 +29,7 @@ function rate(id: string, key: string, value: unknown): void {
   if (typeof value !== 'number' || !(value >= 0 && value <= 1)) fail(id, key, 'a rate from 0 to 1', value);
 }
 
-function validateAi(id: string, value: unknown): void {
+function validateAi(id: string, value: unknown, slam: unknown): void {
   if (kind(value) !== 'object') fail(id, 'ai', 'an object {rate, actions}', value);
   const ai = value as Record<string, unknown>;
   const extra = Object.keys(ai).filter((k) => k !== 'rate' && k !== 'actions');
@@ -40,10 +40,41 @@ function validateAi(id: string, value: unknown): void {
     const p = `ai.actions[${i}]`;
     if (kind(a) !== 'object') fail(id, p, 'an object', a);
     const act = a as Record<string, unknown>;
-    if (act.type !== 'magic') fail(id, `${p}.type`, 'magic', act.type);
+    if (act.type === 'slam') {
+      // CHAOS_FORMS_PLAN 2.2 item 9: the slam's share of the non-spell turns, on a record with `slam`
+      if (typeof act.weight !== 'number' || !(act.weight > 0 && act.weight <= 1)) fail(id, `${p}.weight`, 'a slam share in (0, 1]', act.weight);
+      if (slam === undefined) fail(id, `${p}`, 'a slam action only on a record with slam', 'slam');
+      return;
+    }
+    if (act.type !== 'magic') fail(id, `${p}.type`, 'magic or slam', act.type);
     if (typeof act.spellId !== 'string' || act.spellId === '') fail(id, `${p}.spellId`, 'a spell id', act.spellId);
     if (typeof act.weight !== 'number' || !(act.weight > 0)) fail(id, `${p}.weight`, 'a number above 0', act.weight);
   });
+}
+
+/**
+ * The boss-form fields (CHAOS_FORMS_PLAN 2.2, 3.6): `formOf` (a form record has no `num`), `colossus` (an art id),
+ * `colossusVariant` (layer -> frame names) and `slam` (`{targets: 2}`, only on a colossus record, R9).
+ */
+function validateForms(id: string, data: Record<string, unknown>): void {
+  for (const key of ['formOf', 'colossus'] as const) {
+    if (data[key] !== undefined && (typeof data[key] !== 'string' || data[key] === '')) fail(id, key, 'an id', data[key]);
+  }
+  if (data.formOf !== undefined && data.num !== undefined) fail(id, 'num', 'no num on a form record (formOf)', data.num);
+  if (data.colossusVariant !== undefined) {
+    const v = data.colossusVariant;
+    if (kind(v) !== 'object' || !Object.values(v as object).every((f) => typeof f === 'string' && f !== '')) {
+      fail(id, 'colossusVariant', 'an object of layer: frame names', v);
+    }
+    if (data.colossus === undefined) fail(id, 'colossusVariant', 'a colossus record', 'no colossus');
+  }
+  if (data.slam === undefined) return;
+  if (kind(data.slam) !== 'object') fail(id, 'slam', 'an object {targets: 2}', data.slam);
+  const slam = data.slam as Record<string, unknown>;
+  const extra = Object.keys(slam).filter((k) => k !== 'targets');
+  if (extra.length) fail(id, 'slam', 'only targets', extra.join(', '));
+  if (slam.targets !== 2) fail(id, 'slam.targets', '2', slam.targets);
+  if (data.colossus === undefined) fail(id, 'slam', 'a colossus record (colossus:)', 'no colossus');
 }
 
 function validateSpecials(id: string, value: unknown): void {
@@ -56,7 +87,8 @@ function validateSpecials(id: string, value: unknown): void {
   });
 }
 
-/** `num`, `tuned`, `rematchOf`, `description`, `protect`, `statusWeak`, `attackStatus`, `spells`, `ai`, `specials`. */
+/** `num`, `tuned`, `rematchOf`, `description`, `protect`, `statusWeak`, `attackStatus`, `spells`, `ai`, `specials`, and
+ * the boss-form fields `formOf`, `colossus`, `colossusVariant`, `slam`. */
 export function validateEnemyRoster(data: Record<string, unknown>): void {
   const id = typeof data.id === 'string' ? data.id : '?';
   const num = data.num;
@@ -82,6 +114,7 @@ export function validateEnemyRoster(data: Record<string, unknown>): void {
       if (typeof s !== 'string' || !/^[a-z0-9]+$/.test(s)) fail(id, `spells[${i}]`, 'a lowercase spell code', s);
     });
   }
-  if (data.ai !== undefined) validateAi(id, data.ai);
+  if (data.ai !== undefined) validateAi(id, data.ai, data.slam);
+  validateForms(id, data);
   if (data.specials !== undefined) validateSpecials(id, data.specials);
 }

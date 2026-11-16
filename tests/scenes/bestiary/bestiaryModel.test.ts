@@ -28,7 +28,9 @@ afterEach(() => { vi.restoreAllMocks(); });
 
 describe('bestiary model: order and numbering', () => {
   it('lists every enemy by its spec number (ROSTER_PLAN 7.3), 001 Goblin ... 049 Rime Sovereign, 066 Red Dragon', () => {
-    expect(entries.map((e) => e.id)).toEqual([...enemies].sort((a, b) => a.num! - b.num!).map((e) => e.id));
+    // CHAOS_FORMS_PLAN R11: the boss form records (`formOf`, no num) are not top-level entries
+    expect(entries.map((e) => e.id)).toEqual(enemies.filter((e) => !e.formOf).sort((a, b) => a.num! - b.num!).map((e) => e.id));
+    expect(enemies.filter((e) => e.formOf).map((e) => e.id)).toEqual(['chaos_orrery', 'chaos_horizon', 'chaos_horizon_core']);
     expect(entries[0].label).toBe('001 Goblin');
     expect(byId('lich').label).toBe('049 Rime Sovereign');
     expect(byId('dragon').label).toBe('066 Red Dragon');

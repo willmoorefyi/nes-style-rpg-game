@@ -1,4 +1,5 @@
-export type CommandType = 'fight' | 'magic' | 'item' | 'run';
+/** `slam` is an enemy-only multi-target physical attack (CHAOS_FORMS_PLAN 2.2 item 9). */
+export type CommandType = 'fight' | 'magic' | 'item' | 'run' | 'slam';
 
 export interface BattleCommand {
   type: CommandType;

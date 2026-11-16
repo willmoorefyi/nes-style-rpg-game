@@ -25,8 +25,11 @@ describe('bestiary Weak / Resist spacing (V8 F9)', () => {
     const enemies = read<EnemyData[]>('assets/data/enemies.yaml');
     const data = validateBestiary(read<unknown>('assets/data/bestiary.yaml'));
     const entries = buildEntries(enemies, data, new Map(), () => true);
-    expect(entries.length).toBe(enemies.length);
-    for (const e of entries) expect(statLines(e, data).length, e.id).toBeLessThanOrEqual(STAT_LINES);
+    // CHAOS_FORMS_PLAN R11: the 3 boss form records (`formOf`) are not top-level entries; their pages must fit too
+    const forms = enemies.filter((e) => e.formOf);
+    expect([entries.length, forms.length]).toEqual([enemies.length - 3, 3]);
+    const formEntries = buildEntries(forms.map((e) => ({ ...e, formOf: undefined })), data, new Map(), () => true);
+    for (const e of [...entries, ...formEntries]) expect(statLines(e, data).length, e.id).toBeLessThanOrEqual(STAT_LINES);
     expect(warn.mock.calls.filter((c) => String(c[0]).startsWith('Bestiary:'))).toEqual([]);
     warn.mockRestore();
   });

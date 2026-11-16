@@ -75,6 +75,16 @@ describe('R0 shared contract: validators', () => {
         .toThrow('EnemyData.bossPhases[0].hits: expected number, got string');
       expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, attack: null }] })).toThrow('bossPhases[0].attack');
     });
+
+    // CHAOS_FORMS_PLAN 2.2 item 1: a form phase names the next form's enemy id and its interlude
+    it('accepts form and interlude; refuses them with the wrong type or empty', () => {
+      const data = { ...enemy, bossPhases: [{ ...phase, form: 'chaos_orrery', interlude: 'chaos_i1' }] };
+      expect(validateEnemyData(data).bossPhases![0]).toEqual({ ...phase, form: 'chaos_orrery', interlude: 'chaos_i1' });
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: 3 }] })).toThrow('bossPhases[0].form');
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: '' }] })).toThrow('bossPhases[0].form');
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: 'x', interlude: ['i1'] }] })).toThrow('bossPhases[0].interlude');
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, interlude: 'i1' }] })).toThrow('bossPhases[0].interlude');
+    });
   });
 
   it('every shipped map and enemy passes the new checks', () => {

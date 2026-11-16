@@ -48,7 +48,8 @@ export const entryNum = (enemy: EnemyData, index: number): number => enemy.num ?
  */
 export function buildEntries(enemies: readonly EnemyData[], data: BestiaryData, habitats: Map<string, Habitat[]>,
   isSeen: (id: string) => boolean): BestiaryEntry[] {
-  const sorted = enemies.map((enemy, i) => ({ enemy, n: entryNum(enemy, i) })).sort((a, b) => a.n - b.n);
+  // CHAOS_FORMS_PLAN R11: a boss form record (`formOf`) is not a top-level entry (its sub-entry lives under the root)
+  const sorted = enemies.map((enemy, i) => ({ enemy, n: entryNum(enemy, i) })).filter((x) => !x.enemy.formOf).sort((a, b) => a.n - b.n);
   return sorted.map(({ enemy, n }, index) => {
     const seen = data.mode === 'all' || isSeen(enemy.id);
     const hab = habitats.get(enemy.id) ?? [];

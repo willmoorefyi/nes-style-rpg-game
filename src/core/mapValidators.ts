@@ -77,8 +77,9 @@ export function validateScriptedEncounters(value: unknown, npcIds: string[]): vo
   });
 }
 
-/** `bossPhases`: `hpThreshold` in (0, 1], a `patternId`, and the optional `message`, `hits`, `attack` (B1) and
- * `attackAnim` (heavy from this phase on, ROSTER_PLAN 7.2). */
+/** `bossPhases`: `hpThreshold` in (0, 1], a `patternId`, and the optional `message`, `hits`, `attack` (B1),
+ * `attackAnim` (heavy from this phase on, ROSTER_PLAN 7.2), `form` (the next form's enemy id) and `interlude` (its
+ * battle-interludes.yaml id, only on a form phase; CHAOS_FORMS_PLAN 2.2 item 1). */
 export function validateBossPhases(value: unknown): void {
   expect('EnemyData.bossPhases', value, 'array');
   (value as unknown[]).forEach((phase, i) => {
@@ -95,5 +96,11 @@ export function validateBossPhases(value: unknown): void {
     if (ph.attackAnim !== undefined && ph.attackAnim !== 'heavy') {
       throw new ValidationError(`${p}.attackAnim: expected heavy, got ${String(ph.attackAnim)}`);
     }
+    for (const key of ['form', 'interlude'] as const) {
+      if (ph[key] !== undefined && (typeof ph[key] !== 'string' || ph[key] === '')) {
+        throw new ValidationError(`${p}.${key}: expected an id, got ${JSON.stringify(ph[key])}`);
+      }
+    }
+    if (ph.interlude !== undefined && ph.form === undefined) throw new ValidationError(`${p}.interlude: only on a form phase`);
   });
 }

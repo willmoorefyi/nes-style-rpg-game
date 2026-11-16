@@ -890,3 +890,11 @@ Images used: 38 of 50 (ledger guard: 405 - 367; V8 halt 47).
   wings each; R330 also a changed skirt); no further hurt image is generated. The hurt key will be **derived from the
   approved R324 idle** by a framework rig option (framework owner), and the rig agent adds the recoil in the rig (0
   images). The cast waits for the size-normalising re-cut of R328 (user ruling). The generator stops here.
+
+## Pass C (docs/CHAOS_FORMS_PLAN.md) - C1 TS-B notes (battle logic, 0 images)
+
+- The beam (2.4, R9): **`ice`**, the strongest single-target black damage spell in spells.yaml (power 20; fire and
+  lit are 10). F3 `chaos_horizon` and F4 `chaos_horizon_core` cast it (ai weights 2 and 4).
+- Form records `chaos_orrery`, `chaos_horizon`, `chaos_horizon_core` (`formOf: chaos`, no `num`), pool 6000 at
+  0.70 / 0.40 / 0.15 (floors 4200 / 2400 / 900). Until an approved colossus master exists they keep `sprite: chaos`
+  as the art fallback beside their `colossus:` id.
