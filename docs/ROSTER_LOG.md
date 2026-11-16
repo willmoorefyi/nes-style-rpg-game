@@ -1361,3 +1361,21 @@ archive copies are in `chaos_horizon_v1`.
   - The approve gate required an archive, so the painted set was archived as `chaos_horizon_v2` (a RETIRED_SPRITES
     row; master, glow and sky_base unchanged).
   - Re-approved with the moved `core_crack.png`.
+
+**User ruling D-U13 (2026-11-16): F4 approved as is.**
+- `approved/chaos_forms/chaos_horizon/core_open.png` (from `f4/core_open_fix.png`) is a 2700x1080 canvas patch: the
+  `core` layer's `open` frame, shown at F4's rest (-527, -285).
+- The reviewer's remaining nits are recorded as accepted in `meta.json`: a bonfire-like flame rather than a molten
+  mass, little cavity depth, little light on the pectorals, the teardrop outline.
+- The C24 cache key is tracked.
+
+**C3' approved colossus art (final), all in `assets-src/gen/approved/chaos_forms/`.**
+
+| Form | Files | Size | Place |
+|---|---|---|---|
+| F2 `chaos_orrery/` | `master.png` (body), `glow.png`, `sky_base.png`, `meta.json` | 1320x900 | (40, 25) |
+| F3 `chaos_horizon/` | `master.png` (body), `glow.png`, `sky_base.png`, `core_crack.png` (F3 below 0.25), `meta.json` | 2700x1080 | (-527, -60) |
+| F4 (`chaos_horizon_core`, F3's art) | `chaos_horizon/core_open.png` (the open frame) | 2700x1080 | (-527, -285) |
+
+The archives `_retired/chaos_horizon_v1` (pixel), `_retired/chaos_horizon_v2` (the first painted crack) and
+`_retired/chaos_orrery_v1` (pixel) are kept. Bedrock 25 of 80; Gemini 405 = N_C0.
