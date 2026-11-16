@@ -126,8 +126,10 @@ def run_ledger(check: Callable[[bool, str], None]) -> None:
         err = ""
     except SystemExit as e:
         err = str(e)
-    check("pass F" not in err and not err, f"closed pass F is ignored: one more lich boss_attack_raise after N0 is "
-                                           f"not refused ({err[:80]!r})")
+    # pass V (docs/REDESIGN_PLAN.md 6): the real guard now refuses this request (lich is not in pass V's only_ids, and
+    # the fake ledger stops before attempts_before; selftest_passv.py covers both), so only the closed pass F is checked
+    check("pass F" not in err, f"closed pass F is ignored: one more lich boss_attack_raise after N0 is not refused by "
+                               f"pass F ({err[:80]!r})")
 
 
 def run_heavy(check: Callable[[bool, str], None]) -> None:

@@ -119,30 +119,36 @@ def run_roster(check: Callable[[bool, str], None]) -> None:
         vb = _verdict(at_r0, base, "rs_unbuilt", "monster", approved)
         check(vb == "", f"pass R build (no only_approved) allows an unbuilt id ({vb[:60]!r})")
 
-    # the real budget.json entries (FW-0) and the real ledger
+    # the real budget.json entries and the real ledger. Since pass V (docs/REDESIGN_PLAN.md 6, FW-V0) the top level is
+    # pass V's; pass R's bounds are read from `history["pass R"]` and the closed `pass R build` / `pass R fix` entries
     if build is None:
         return
+    hist = next((h for h in real.get("history", []) if isinstance(h, dict) and h.get("name") == "pass R"), {})
+    end = hist.get("gemini_end")                         # N_V0: pass R ends where pass V opens
     f = next((p for p in real["passes"] if p["name"] == "pass F (FB-8)"), {})
-    check(real["attempts_before"] == n0 and real["cap"] == TOTAL_CAP and real["max_attempts_per_sheet"] == PER_SHEET
+    check(hist.get("attempts_before") == n0 and hist.get("cap") == TOTAL_CAP
+          and hist.get("max_attempts_per_sheet") == PER_SHEET and isinstance(end, int)
           and f.get("gemini_end") == n0 and build["max_new"] == BUILD_MAX and build["max_per_sheet"] == PER_SHEET,
-          f"budget.json: attempts_before = N0 = {n0}, cap {TOTAL_CAP}, 3 per sheet; pass F closed at N0; pass R build "
-          f"{BUILD_MAX}")
+          f"budget.json history 'pass R': attempts_before = N0 = {n0}, cap {TOTAL_CAP}, 3 per sheet, ended at {end}; "
+          f"pass F closed at N0; pass R build {BUILD_MAX}")
     fix = next((p for p in real["passes"] if p["name"] == "pass R fix"), None)
-    if fix is not None:
-        n1 = build.get("gemini_end")
-        check(n1 == fix["gemini_before"] and fix["max_new"] == TOTAL_CAP - (n1 - n0) and fix.get("only_approved") is True,
-              f"budget.json: pass R build closed at N1 = {n1}, pass R fix opens there with {TOTAL_CAP} - (N1 - N0)")
-    run = gem[n0:]
+    n1 = build.get("gemini_end")
+    check(fix is not None and n1 == fix["gemini_before"] and fix["max_new"] == TOTAL_CAP - (n1 - n0)
+          and fix.get("only_approved") is True and fix.get("gemini_end") == end,
+          f"budget.json: pass R build closed at N1 = {n1}, pass R fix opens there with {TOTAL_CAP} - (N1 - N0) and is "
+          f"closed at the pass-R end {end}")
+    run = gem[n0:end]
     per: dict = {}
     for e in run:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1
-    built = gem[n0:build.get("gemini_end", len(gem))]
+    built = gem[n0:n1]
     check(len(run) <= TOTAL_CAP and len(built) <= BUILD_MAX and all(n <= PER_SHEET for n in per.values()),
           f"ledger: pass R used {len(run)} of {TOTAL_CAP} (build {len(built)} of {BUILD_MAX}), max per sheet "
           f"{max(per.values(), default=0)} <= {PER_SHEET}")
     if fix is not None:
         root = GEN.HERE / "approved"
-        bad = [e["character"] for e in gem[fix["gemini_before"]:] if not (root / e["character"]).is_dir()]
+        bad = [e["character"] for e in gem[fix["gemini_before"]:fix.get("gemini_end", end)]
+               if not (root / e["character"]).is_dir()]
         check(not bad, f"ledger: every pass R fix attempt has an approved id ({bad[:3]})")
 
 

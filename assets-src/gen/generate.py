@@ -366,6 +366,26 @@ def ledger_append(entry: dict, path: Path = LEDGER) -> None:
         f.write(json.dumps(entry) + "\n")
 
 
+def budget_consistency(b: dict, n_attempts: int) -> None:
+    """FW-V0 (docs/REDESIGN_PLAN.md 6): refuse every paid request when budget.json is inconsistent: a top-level
+    `attempts_before` past the ledger's Gemini attempts, or (with a `pass V` entry) the closed `pass R fix` end, the open
+    `pass V` start and `attempts_before` not all equal. `history` is never read."""
+    n0 = b["attempts_before"]
+    if n0 > n_attempts:
+        raise SystemExit(f"refused: budget.json is inconsistent: attempts_before {n0} > the ledger's {n_attempts} "
+                         "Gemini attempts")
+    named = {p.get("name"): p for p in b.get("passes", [])}
+    pv = named.get("pass V")
+    if pv is None:
+        return
+    fix = named.get("pass R fix") or {}
+    bounds = {"attempts_before": n0, "pass V.gemini_before": pv.get("gemini_before"),
+              "pass R fix.gemini_end": fix.get("gemini_end")}
+    if len(set(bounds.values())) != 1:
+        raise SystemExit(f"refused: budget.json is inconsistent: {bounds} must all be equal (pass R fix closed where "
+                         "pass V opens)")
+
+
 def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: bool,
                  ledger: list[dict], locked: bool = False, budget: dict | None = None,
                  approved_root: Path | None = None) -> list[Request]:
@@ -385,8 +405,9 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
     attempts = [e for e in ledger if e.get("event") == "attempt" and e.get("backend") != "bedrock"]  # cap is Gemini-only
     if budget is None and BUDGET.exists():
         budget = json.loads(BUDGET.read_text())
-    if budget is not None:                           # the user's run-wide hard cap (budget.json)
+    if budget is not None:                           # the user's run-wide hard cap (budget.json); never reads `history`
         b = budget
+        budget_consistency(b, len(attempts))
         used = len(attempts) - b["attempts_before"]
         if used + len(misses) > b["cap"]:
             raise SystemExit(f"refused: the run cap of {b['cap']} paid images is reached ({used} used); only the user "
@@ -400,6 +421,14 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
         for cap in b.get("passes", []):              # a pass's own caps (pass F, pass R build / fix): total and per sheet
             if "gemini_end" in cap:                  # closed history (docs/ROSTER_PLAN.md 6.4): refuses nothing
                 continue
+            for r in misses:                         # pass V (docs/REDESIGN_PLAN.md 6): only these ids and sheets
+                if "only_ids" in cap and r.character not in cap["only_ids"]:
+                    raise SystemExit(f"refused: {cap['name']} only generates {', '.join(cap['only_ids'])}; "
+                                     f"{r.character} is not listed (only_ids)")
+                if "only_sheets" in cap and r.sheet.name not in (cap["only_sheets"].get(r.character) or []):
+                    raise SystemExit(f"refused: {cap['name']} allows {r.character} only "
+                                     f"{', '.join(cap['only_sheets'].get(r.character) or []) or 'no sheet'}; "
+                                     f"{r.character}/{r.sheet.name} is not listed (only_sheets)")
             new = attempts[cap["gemini_before"]:]
             if len(new) + len(misses) > cap["max_new"] or any(sum(e.get("character") == r.character and e.get(
                     "sheet") == r.sheet.name for e in new) >= cap["max_per_sheet"] for r in misses):
