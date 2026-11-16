@@ -3,9 +3,9 @@
   "sheet": "boss_cast",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "d1d7f2cf7f40881cd74bd566",
-  "approved": "2026-11-15",
+  "seed": 1235,
+  "cache_key": "751b73facde53dff2cd1bdcb",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R67"
+  "note": "pass V R302: self-approved with nits (teal orb colour)"
 }

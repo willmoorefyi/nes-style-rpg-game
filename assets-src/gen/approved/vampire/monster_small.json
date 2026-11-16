@@ -4,8 +4,8 @@
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
   "seed": 1234,
-  "cache_key": "fdcaf07fd5789e2d402f4f7d",
-  "approved": "2026-11-12",
+  "cache_key": "4482e264b1a1fbf8bcca14f6",
+  "approved": "2026-11-16",
   "grid": [
     80,
     80
@@ -22,5 +22,6 @@
   ],
   "size": "small",
   "floating": false,
-  "flip_frames": []
+  "flip_frames": [],
+  "note": "pass V R296: self-approved (clean redraw)"
 }

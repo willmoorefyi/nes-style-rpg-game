@@ -4,8 +4,8 @@
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
   "seed": 1234,
-  "cache_key": "a6f48aea1aa31985939c381c",
-  "approved": "2026-11-15",
+  "cache_key": "0d4cd6b25d7cad960dbab2b9",
+  "approved": "2026-11-16",
   "grid": [
     80,
     80
@@ -23,5 +23,5 @@
   "size": "small",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R60"
+  "note": "pass V R291: self-approved with nits (eyes cut to cream, not yellow)"
 }

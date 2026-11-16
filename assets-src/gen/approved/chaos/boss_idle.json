@@ -4,8 +4,8 @@
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
   "seed": 1234,
-  "cache_key": "fb4bd02e837ce1d90e7822d5",
-  "approved": "2026-11-15",
+  "cache_key": "ef10c40ea67b330a62a6a06c",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R55"
+  "note": "pass V R299: self-approved (C2, D-V6)"
 }

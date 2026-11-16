@@ -1,0 +1,25 @@
+{
+  "character": "chaos",
+  "sheet": "boss_hurt",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "b7905062c7067cc80e157701",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "hurt"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R68"
+}

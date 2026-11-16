@@ -3,9 +3,9 @@
   "sheet": "boss_hurt",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "b7905062c7067cc80e157701",
-  "approved": "2026-11-15",
+  "seed": 1235,
+  "cache_key": "e3007d12a2349726757ccb2f",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R68"
+  "note": "pass V R304: self-approved with nits (mild recoil)"
 }

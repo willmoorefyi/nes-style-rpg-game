@@ -1,0 +1,25 @@
+{
+  "character": "hollow_seraph",
+  "sheet": "boss_attack_raise",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1234,
+  "cache_key": "d6093d88bccd3a2763233363",
+  "approved": "2026-11-15",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack_raise"
+  ],
+  "size": "boss",
+  "floating": true,
+  "flip_frames": [],
+  "note": "ROSTER_LOG R38/R41: best of 3; three wings visible (folded, far set hidden)"
+}

@@ -4,8 +4,8 @@
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
   "seed": 1235,
-  "cache_key": "4231dfbf8167a1d0e608b9a8",
-  "approved": "2026-11-15",
+  "cache_key": "518b0207faffd5ee4f19d12a",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R70"
+  "note": "pass V R306: best of 3 (five orbs)"
 }

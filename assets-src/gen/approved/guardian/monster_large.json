@@ -3,11 +3,11 @@
   "sheet": "monster_large",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "0683f05fb008f4c9a7c686a8",
-  "approved": "2026-11-15",
+  "seed": 1235,
+  "cache_key": "da4b3a94a09197fb0d323be5",
+  "approved": "2026-11-16",
   "grid": [
-    148,
+    128,
     128
   ],
   "bottom_row": 122,
@@ -22,5 +22,6 @@
   ],
   "size": "large",
   "floating": false,
-  "flip_frames": []
+  "flip_frames": [],
+  "note": "pass V R295: self-approved with nits (hurt shows one scythe clearly)"
 }

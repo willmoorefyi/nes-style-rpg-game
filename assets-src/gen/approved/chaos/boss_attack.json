@@ -3,9 +3,9 @@
   "sheet": "boss_attack",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "a53174205b082f2dd9915dd2",
-  "approved": "2026-11-15",
+  "seed": 1234,
+  "cache_key": "13e9ad9bc62dbbd5c0a7a4cc",
+  "approved": "2026-11-16",
   "grid": [
     200,
     200
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": false,
   "flip_frames": [],
-  "note": "ROSTER_LOG R58/R59: best of 3; three arms visible"
+  "note": "pass V R300: self-approved with nits (orb colours)"
 }

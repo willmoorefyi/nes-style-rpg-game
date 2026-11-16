@@ -1,0 +1,233 @@
+# Retired monsters.yaml entries (v1), written by retire.py (docs/REDESIGN_PLAN.md 5). Not read by the generator.
+- id: crazy_horse
+  # "Crazy Horse" (004): a wild horse with two hits
+  size: large
+  body: quadruped
+  prompt: >-
+    a wild-eyed piebald horse, white with large dark brown patches, seen from the side, a matted tangled black mane and
+    tail, flared nostrils, rolling white-rimmed eyes, a broken leather bridle with a snapped rein trailing from its
+    muzzle, muscular legs with dark hooves
+  attack: >-
+    a wild bucking strike toward the heroes: the forelegs lifted only a little off the ground and kicking forward, the
+    head thrust forward with the teeth bared, the mane and the broken rein flying; the hind hooves on the ground; no
+    rearing up tall
+  hurt: knocked back, the head tossed up and back, the eyes rolling, one foreleg buckling, the mane flying
+  face: the horse's head with the wild white-rimmed eye and flared nostrils is readable
+  extra_negative: a rider, a saddle, a horn, wings
+  seeds: [1234]
+  retired_as: crazy_horse_v1
+- id: piscodemon
+  # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
+  size: small
+  body: biped
+  prompt: >-
+    a demon with the head of a deep-sea anglerfish on a hunched humanoid body: a huge underbitten jaw full of needle
+    teeth, small pale eyes, a glowing yellow-green lure dangling on a stalk from its brow, short fleshy tentacles
+    hanging from the chin like a beard, dark blue-green scale armour plates over the chest and shoulders, a ragged dark
+    purple loincloth, two muscular arms ending in webbed clawed hands, standing on two webbed feet
+  attack: lunging forward and raking both webbed claws at the heroes, the jaws gaping wide, the lure swinging
+  hurt: knocked back, jaws clamped shut, the clawed hands thrown up, the lure and chin tentacles whipping back
+  face: the anglerfish face (small pale eyes, the gaping toothy jaw and the glowing lure) is readable in every cell
+  seeds: [1234]
+  retired_as: piscodemon_v1
+- id: black_knight
+  # "Black Knight" (104): plain black plate, closed helm, a two-handed sword (distinct from death knight, dark fighter)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so the sword stays well inside its own cell. Draw only the parts named in the
+    description, the same in every cell: no cape, cloak, tabard or extra cloth, and no slash trail, smear or motion
+    lines.
+  prompt: >-
+    a knight in plain smooth black plate armour with dull grey edges, a closed black great helm with one narrow
+    visor slit, no crest or plume, holding one long two-handed sword with both hands; in the idle cell the sword is
+    held upright in front of the body, its point well below the top of the grey box; centred in its own cell with
+    empty space on both sides
+  attack: >-
+    stepping forward toward the heroes at the end of a downward cut: the sword in both hands, its blade angled down in
+    front of him with the point at knee height just ahead of his front foot, the whole sword well inside the middle
+    cell (not raised overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, staggering, the helm tipped back, the sword held upright across the chest in both hands
+  face: a closed black great helm with a narrow visor slit
+  extra_negative: a cape, a cloak, a shield, spikes, a skull, a plume, horns, gold trim, a second sword, a face
+  seeds: [1234]
+  retired_as: black_knight_v1
+- id: guardian
+  # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the body but keep all four legs on the ground and the body low (no
+    leap, no rearing up): thrust the two spear arms toward the heroes with the joints bent, so the spear tips stay
+    well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks, steam,
+    smear or motion lines.
+  prompt: >-
+    a four-legged bronze automaton sentinel seen from the side, built like a mechanical hound: a long low horizontal
+    body of riveted bronze plates carried on exactly four jointed metal legs, two at the front and two at the back,
+    all four feet flat on the ground; a small domed head at the front with one round glowing red lens eye, two
+    jointed arms on the chest each ending in a short spear blade, both held pointing down in front of it close to the
+    body, the same two spear blades in every cell; weathered bronze with green patina spots; the whole machine sits in
+    the middle of its own cell with empty space on both sides
+  attack: >-
+    leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
+    glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
+  hurt: >-
+    knocked back low, the body dropped and hunched with all four feet flat on the ground (no rearing up, the front
+    legs down), no taller than its idle height, the head ducked, the lens dimmed, the two spear arms pulled in close
+    under the chest
+  face: one round glowing red lens eye in the domed head
+  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt; 1235 (R252): a rear-up hurt
+  retired_as: guardian_v1
+- id: vampire
+  size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
+  prompt: >-
+    pale vampire with slicked-back black hair, red eyes and small fangs, a high-collared black cape with a red lining,
+    a dark red vest, reaching out with a clawed hand
+  attack: swooping forward low with the cape spread like wings and a clawed hand raking at the heroes
+  hurt: recoiling sharply, twisting away behind the raised cape, hissing with fangs bared
+  seeds: [1234]
+  retired_as: vampire_v1
+- id: hollow_seraph
+  # "the Hollow Seraph", Fiend of Wind: an empty celestial guardian of white armour, mechanical wings and a broken
+  # halo; her composure stays intact even when hurt
+  size: boss
+  per_pose: true
+  design_ref: false
+  floating: true
+  body: floating
+  # the floating line ("tilt the whole body along a strong diagonal ...") hid or bunched wings in R26-R31; only the
+  # poses not yet approved get this line (attack and cast keep their approved keys)
+  motion:
+    hurt: &seraph_motion >-
+      Keep the front or three-quarter front view of Image 3 and a symmetric, composed posture, the armour upright or
+      tilted only slightly; all six wings stay separately visible with their brass joints, three on the left side of
+      the image and three on the right side of the image, none hidden behind the armour or bunched together; the
+      movement is in the wings, gauntlets and halo, and trailing parts lag behind the motion.
+    attack_raise: *seraph_motion
+  prompt: >-
+    the Hollow Seraph, a hovering hollow suit of elegant white and pale-gold armour with no body inside, the open helm
+    showing only darkness; a fractured golden halo floats above the helm; exactly six articulated mechanical wings,
+    three on each side, of overlapping metallic feathers in white steel with brass joints, half spread, the highest
+    wing tips well below the top of the grey box; thin hanging greaves, no feet on the ground, nothing below the
+    greaves (no wind, no debris, no shadow); palette of white steel, pale gold, brass, storm grey and a cold white-blue
+    glow
+  action_prompt: >-
+    the Hollow Seraph, exactly as in Image 3: a hovering hollow suit of elegant white and pale-gold armour with no body
+    inside, the open helm showing only darkness, the fractured golden halo floating above the helm, exactly six
+    articulated mechanical wings, three on each side, of overlapping metallic feathers in white steel with brass joints,
+    thin hanging greaves; palette of white steel, pale gold, brass, storm grey and a cold white-blue glow
+  attack: >-
+    a cutting wing strike: the six wings swing forward in a wide arc toward the heroes on the right, the three near
+    wings fanned out in front of the armour and the three far wings fanned out behind it, all six separately visible
+    with their brass joints, their sharp metal feather tips pointing toward the heroes, the armour leaning forward;
+    exactly six wings, as in Image 3, at exactly the same pixel size as in Image 3; the fractured halo in its two broken arcs above the helm, as in Image 3; no wind
+    streaks, no effects; the whole figure well below the top of the grey box
+  # approved boss_cast is seed 1234 with this text (ROSTER_LOG R29, R32: best of 3); the retries (R30 "seen from the
+  # front like Image 3 ... symmetric like a fan", R31 "the same front-facing hovering posture as Image 3 ... every wing
+  # lifted higher") both came back with four wings
+  cast: >-
+    a storm rite: the six wings raised and spread wide to the sides, both gauntlets lifted, the halo crackling with
+    short white-blue lightning drawn on the two broken halo arcs themselves; exactly six wings, three growing from each
+    shoulder, all six separately visible, as in Image 3; no other effects; the whole figure, wing tips and halo
+    included, at the same pixel size as in Image 3 and well below the top of the grey box
+  hurt: >-
+    a sharp jolt: bright cracks across the breastplate, the two broken halo arcs knocked askew above the helm, the
+    whole armour tilted back by about fifteen degrees, the helm with its visor bars around the dark opening exactly as
+    in Image 3; the three wings on the left side of the image and the three wings on the right
+    side of the image all stay visible, the lowest wing on each side faltering downward with its feathers splayed, the
+    upper wings flaring; the posture stays upright and controlled, her composure intact; no cape, cloth or ribbon
+    anywhere (Image 3 has none)
+  # approved boss_attack_raise is seed 1234 with this text (ROSTER_LOG R38, R41: best of 3). The retries asked for "seen
+  # squarely from the front like Image 3, ... mirror-symmetric ... all six wings folded upward and inward behind her"
+  # (1235, R39: six wings but cream palette, hood, skirt, smaller) and added "the same white steel and pale-gold armour
+  # colours ..., the same helm with its visor bars ..., as tall as in Image 3" (1236, R40: magenta key patches, no halo)
+  attack_raise: >-
+    compressing the air before an explosive release, seen in the same front view as Image 3: all six wings drawn in
+    and folded close against the armour like closed fans, the three wings on the left side of the image layered one
+    above the other on the left of the armour and the three on the right side of the image layered the same way on the
+    right, each wing with its brass joint still visible; the gauntlets drawn in to the chest, the halo dim, cold
+    white-blue light leaking between the folded wings; the whole figure narrow and compact, hovering inside the grey
+    box at exactly the same height as in Image 3, the halo well below the top of the image
+  face: no face; the empty dark helm opening and the halo are the readable features
+  extra_negative: a face, a body or skin inside the armour, feathered bird wings, more or fewer than six wings, a sword
+  seeds: [1234]
+  sheet_seeds: {boss_idle: 1235, boss_attack: 1236, boss_hurt: 1236}   # boss_idle 1234 (ROSTER_LOG R24): wing tips cut by the cell
+  # top, wind debris; boss_attack 1234 (R26): five wings, detached wind crescents; 1235 (R27): one wing side only,
+  # too big; boss_cast 1234 (R29): four wings, all on the far side; 1235 (R30, "seen from the front ... symmetric
+  # like a fan"): four wings, a wing chip; boss_hurt 1234 (R35, without the no-cape clause): six wings, a teal cape added;
+  # 1235 (R36, + no-cape clause): pose_diff 0.12, pink fringe strokes, helm without visor bars
+  retired_as: hollow_seraph_v1
+- id: chaos
+  # "Chaos" (128), the final boss: an ORIGINAL primordial titan (plan 4.2, binding D13); it must not reproduce any
+  # published Chaos art
+  size: boss
+  per_pose: true
+  design_ref: false
+  body: biped
+  # the biped line ("strong diagonal ..., twist the torso") turned him to a side or three-quarter profile and dropped
+  # arms in R56-R58 (the multi-arm pause); only the poses not yet approved get this line (orchestrator, 2026-11-15)
+  motion:
+    cast: &chaos_motion >-
+      Keep the frontal view of Image 3, chest and face toward the viewer, and a symmetric, composed posture, never
+      turned to a side or three-quarter profile; all four arms stay separately visible and apart from the body, the
+      upper arm and the lower arm on the left side of the image and the upper arm and the lower arm on the right side
+      of the image, none hidden behind the body, merged or crossed; the movement is in the arms, the wings and the head,
+      and the wings move with the motion.
+    hurt: *chaos_motion
+    attack_raise: *chaos_motion
+  prompt: >-
+    Chaos, a colossal primordial titan of cracked black obsidian standing on two thick legs, a massive muscular
+    humanoid body; exactly four arms, two on each side: on the left side of the image an upper arm and a lower arm, on
+    the right side of the image an upper arm and a lower arm, each ending in a huge clawed stone hand; great tattered
+    wings of shadow-flame (smoke-black membranes edged with purple flame) half raised behind the shoulders, their tips
+    well below the top of the grey box; a heavy horned crown of obsidian growing from the head with two great curved
+    horns; a stern face of cracked stone with two burning white eyes; glowing seams run through the cracks of the body
+    in four colours: frost cyan, ember orange, abyss teal and storm white; palette of obsidian black, deep purple and
+    the four seam colours
+  action_prompt: >-
+    Chaos, exactly as in Image 3: the same colossal titan of cracked black obsidian on two thick legs, exactly four
+    arms (two on each side) with huge clawed stone hands, the same tattered wings of shadow-flame, the horned obsidian
+    crown, the cracked stone face with two burning white eyes, and the glowing seams in frost cyan, ember orange, abyss
+    teal and storm white
+  attack: >-
+    a crushing double blow, seen in the same front view as Image 3 (chest and face toward the viewer, never in side
+    profile), the body leaning toward the heroes on the right over a planted front leg, both wings flaring. Exactly
+    four arms, all four clearly visible and separate: on the right side of the image, the upper arm and the lower arm
+    both swing down in front of the body, their two fists smashing down together low toward the heroes; on the left
+    side of the image, the upper arm is thrown back up behind the shoulder and the lower arm is braced at the hip, both
+    clearly visible beside the body; at the same pixel size as in Image 3
+  cast: >-
+    channelling, a mirror-symmetric pose clearly different from Image 3, every hand in a new place: the two upper
+    arms raised high, elbows bent, their open clawed hands up beside the horned crown, one on the left side of the
+    image and one on the right side; the two lower arms spread wide out to the sides at waist height, palms up, one on
+    the left side and one on the right side; a glowing sphere of swirling energy in the four seam colours (cyan,
+    orange, teal and white) floats in front of his chest, touching his body; the wings lifted higher and spread wider
+    than in Image 3, the legs planted wider apart, the seams blazing; exactly four arms, all four clearly visible and
+    apart from the body; the raised hands and wing tips well below the top of the grey box, at the same pixel size as
+    in Image 3
+  hurt: >-
+    struck, a pose clearly different from Image 3, every hand in a new place: the chest arched back and the head
+    thrown back with the face tilted up, the glowing seams flaring brighter; on the left side of the image the upper
+    arm flung up and out above the shoulder and the lower arm flung out low and wide, on the right side of the image
+    the upper arm flung out at shoulder height and the lower arm hanging down and back, all four clawed hands splayed
+    open; the wings drooping and faltering; the knees bent; exactly four arms, all four clearly visible and apart from
+    the body; at the same pixel size as in Image 3
+  attack_raise: >-
+    the wind-up of a crushing blow, a mirror-symmetric pose clearly different from Image 3, every hand in a new place:
+    the two upper arms raised high overhead, one from the left side of the image and one from the right side, their
+    two great fists clenched together above the horned crown; the two lower arms braced low and wide at the hips, one
+    on the left side and one on the right side; the body crouched with both knees bent and wide, so that the whole
+    figure, raised fists, horns and wings included, stays inside the grey box at exactly the same pixel size as in
+    Image 3 (the raised fists are the highest point, well below the top of the image); exactly four arms, all four
+    clearly visible; the two horns of the crown visible below the fists, the gap between the raised arms and the crown
+    is empty background; no ground line or floor under the feet
+  face: the cracked obsidian face with two burning white eyes under the horned crown is readable
+  extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
+  seeds: [1234]
+  sheet_seeds: {boss_attack: 1236, boss_cast: 1236, boss_attack_raise: 1235}   # boss_attack_raise 1234 (R69): guide line and box painted; boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
+  # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
+  retired_as: chaos_v1
