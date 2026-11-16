@@ -965,3 +965,37 @@ from its travel top to its feet is 450 px, and hero 0's feet line (425) + 100 - 
 cannot both stay under the window and land within 100 px of hero 0's feet. Every other test (4804) passes on that
 branch. Needs a ruling: relax that pin for a scale-3 boss (R28 says unchanged), keep the seraph at scale 2, or another
 size.
+
+## Pass C - C2 (generator, main checkout `roster` at 3562b9f, 2026-11-16): **stopped at R30, 0 Bedrock calls**
+
+**R30 read-only AWS checks (docs/CHAOS_FORMS_PLAN.md 6).**
+- `aws sts get-caller-identity --profile bedrock`: account `360323539990`, ARN
+  `arn:aws:sts::360323539990:assumed-role/Admin/wlmmoor-Isengard` (role name **`Admin`**).
+- `aws bedrock list-foundation-models --region us-west-2 --by-provider stability --profile bedrock` (ON_DEMAND):
+  `stability.sd3-5-large-v1:0`, `stability.stable-image-core-v1:1`, `stability.stable-image-ultra-v1:1`. The edit
+  models are cross-region inference profiles only (`aws bedrock list-inference-profiles`, read-only, all ACTIVE):
+  `us.stability.stable-image-remove-background-v1:0`, `us.stability.stable-image-search-replace-v1:0`,
+  `us.stability.stable-image-control-structure-v1:0`, `us.stability.stable-image-inpaint-v1:0`,
+  `us.stability.stable-image-erase-object-v1:0`, `us.stability.stable-image-search-recolor-v1:0`,
+  `us.stability.stable-image-style-guide-v1:0`, `us.stability.stable-style-transfer-v1:0`,
+  `us.stability.stable-image-control-sketch-v1:0`, the three upscalers, and the **outpaint id
+  `us.stability.stable-outpaint-v1:0`** (V0-e; not yet in `bedrock.py MODELS`, and `colossus.py` has no
+  outpaint / search_replace / structure subcommand: FW-C work before V0-e and V0-d).
+- **The role name matches `Admin`, so by the plan's rule (R30, 6 "AWS safety") and the global production-safety rules
+  the generator stopped before any Bedrock call and asks the user.** Options: (a) the user confirms that this Admin
+  role in account 360323539990 may be used for `bedrock-runtime:InvokeModel` only (no resource created, modified or
+  deleted), or (b) the user provides a least-privilege (Bedrock invoke / ReadOnly) profile. V0 has not started.
+
+**Rim backdrop (7.1, 7.2; 0 calls; done).**
+- `/tmp/stab2/sd35_v3_raw.png` copied to `assets-src/backgrounds/rim-src.png`, sha256
+  `827331a150042a86a9a2abbd46fa5f3af15baf55dfb589eff463d198f29e7a51` (1344x768), with `rim-src.json` (model sd35,
+  seed 5151, v3 prompt and negative prompt, stage numbers; no fire-spot clean-up).
+- `stage_backgrounds.py rim`: scale 1.5, top -358, bottom 794, left 48 (horizon 485 / zoom 1.05 / screen 370).
+  `assets/backgrounds/rim.webp` is **byte-identical** to the accepted `/tmp/stab2/sd35_v3_bg.webp` (sha256
+  `c1522131961af9cbe155e6da3ef10f0139a7009d5e73d9bb2befb85d06596538`); `rim_floor.webp` 1944x1080 written.
+- `--check rim`: coverage 100.0 %, boss edge_delta 149.1 (>= 100), party band contrast 0.85 (>= 0.8), seam 27.6
+  (<= 30): ok.
+
+**G-C0 report: not reached.** V0-a..e: not run (0 of 12 calls; budget --check OK, Bedrock 0 of 80, Gemini 405 =
+N_C0). No mocks. Recommendation: resolve the credential question first; then add the outpaint model id and the
+outpaint / search_replace / structure subcommands (FW-C, 0 paid) and run V0 as planned.

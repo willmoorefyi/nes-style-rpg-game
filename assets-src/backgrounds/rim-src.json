@@ -1,0 +1,33 @@
+{
+  "note": "The user-accepted rim arena backdrop (docs/CHAOS_FORMS_PLAN.md 7.1, D-U7, 2026-11-16): copied as is from /tmp/stab2/sd35_v3_raw.png at C2 (0 Bedrock calls; the call itself was the 2026-11-16 Stability experiment, before the pass-C BR ledger). No fire-spot clean-up applied.",
+  "source": "/tmp/stab2/sd35_v3_raw.png",
+  "sha256": "827331a150042a86a9a2abbd46fa5f3af15baf55dfb589eff463d198f29e7a51",
+  "size": [
+    1344,
+    768
+  ],
+  "model": "sd35",
+  "model_id": "stability.sd3-5-large-v1:0",
+  "body": {
+    "aspect_ratio": "16:9",
+    "seed": 5151,
+    "output_format": "png",
+    "mode": "text-to-image"
+  },
+  "prompt": "16-bit SNES-era pixel art RPG battle background, the edge of the universe. The upper third of the image is deep outer space: a vast swirling nebula of rose, amber and violet gas, a bright jagged white cosmic rift in the centre, thousands of tiny white stars, dying red giant stars, a large ringed planet in the upper right, glowing nebula and stars across the whole width out to the left and right edges. A high, straight, level horizon about 30% down from the top. Below the horizon, the lower two thirds of the image is one calm, flat, empty crystal floor that stretches to the edges: smooth pale lavender and soft rose crystal tiles, gentle soft tile seams in a slightly darker lilac, very low contrast, evenly lit by the nebula, faint pink glow reflected on it. Side view, flat cel shading, hard pixel edges, limited palette.",
+  "negative_prompt": "text, letters, watermark, logo, frame, border, UI, creatures, monsters, people, characters, statues, pillars, towers, crystal spires, shards, boulders, rocks, rubble, debris on the floor, black cracks, dark cracks, high contrast floor, busy floor, black floor, water, lake, ocean, reflection of the sky, grass, trees, mountains, clouds, daytime sky, plain flat sky, photorealistic, 3d render, blurry, low horizon, horizon in the middle, tilted horizon, curved horizon",
+  "stage": {
+    "horizon_src": 485,
+    "zoom": 1.05,
+    "align": "center",
+    "horizon_y": 370,
+    "scale": 1.5,
+    "top": -358,
+    "bottom": 794
+  },
+  "accepted_preview": {
+    "file": "/tmp/stab2/sd35_v3_bg.webp",
+    "sha256": "c1522131961af9cbe155e6da3ef10f0139a7009d5e73d9bb2befb85d06596538"
+  },
+  "cleanup": null
+}
