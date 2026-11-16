@@ -2351,31 +2351,38 @@
   extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up, a second row
   seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R247): two rows of figures in the raw, the cut mixed them; 1235 (R248): the heads change between cells
 - id: guardian
-  # "Guardian" (106): a four-legged bronze automaton sentinel with a single lens eye and two spear arms
+  # "Guardian" (106): pass V redesign (docs/REDESIGN_PLAN.md 3.1): a four-legged hunter-killer war machine with scythe
+  # arms (distinct from warmech, soldier, iron_golem; the bronze hound is archived as guardian_v1,
+  # docs/RETIRED_SPRITES.md)
   size: large
   body: quadruped
   motion: >-
     Use a clear diagonal line of action through the body but keep all four legs on the ground and the body low (no
-    leap, no rearing up): thrust the two spear arms toward the heroes with the joints bent, so the spear tips stay
-    well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks, steam,
-    smear or motion lines.
+    leap, no rearing up): swing the two scythe arms toward the heroes with the joints bent, so the blade tips stay
+    well inside its own cell. Draw only the parts named in the description, the same in every cell: no sparks in open
+    air, steam, smear or motion lines.
   prompt: >-
-    a four-legged bronze automaton sentinel seen from the side, built like a mechanical hound: a long low horizontal
-    body of riveted bronze plates carried on exactly four jointed metal legs, two at the front and two at the back,
-    all four feet flat on the ground; a small domed head at the front with one round glowing red lens eye, two
-    jointed arms on the chest each ending in a short spear blade, both held pointing down in front of it close to the
-    body, the same two spear blades in every cell; weathered bronze with green patina spots; the whole machine sits in
-    the middle of its own cell with empty space on both sides
+    a four-legged hunter-killer war machine seen from the side, built like a stalking predator: a long low armoured
+    body of dark gunmetal-grey plates (grey, not black) with bright steel edges, rust streaks and bolts, carried high on exactly four long segmented metal legs with
+    clawed steel feet, all four feet flat on the ground, two legs at the front and two at the back; a long angular wedge-shaped head at the front with a
+    horizontal row of three large glowing bright red sensor eyes; two long scythe-blade arms mounted at the shoulders, folded
+    forward close beside the head with the blade tips pointing forward and down; exposed pistons and cables at the
+    joints; the whole machine sits in the middle of its own cell with empty space on both sides; palette of gunmetal
+    grey, dark grey, rust orange, bright cold steel highlights and bright red sensor light
   attack: >-
-    leaning forward and stabbing both spear arms down toward the heroes just in front of its front feet, the lens
-    glowing brighter, all four feet on the ground, the spear tips well inside the middle cell
+    a scything strike toward the heroes: the body low and lunging forward on all four planted legs (no leap, no
+    rearing up), both scythe arms swung forward and down in front of the head, their tips just above the ground in
+    front of its front feet, the red eyes flaring; exactly four legs and two scythe arms, as in the idle cell; the
+    whole machine well inside the middle cell
   hurt: >-
-    knocked back low, the body dropped and hunched with all four feet flat on the ground (no rearing up, the front
-    legs down), no taller than its idle height, the head ducked, the lens dimmed, the two spear arms pulled in close
-    under the chest
-  face: one round glowing red lens eye in the domed head
-  extra_negative: two eyes, a face, a cannon, wheels, wings, a rider, flesh, steam, sparks, two legs, standing upright, a round egg body
-  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R251): drawn on two legs, a spear blade lost in the hurt; 1235 (R252): a rear-up hurt
+    knocked back on all four legs, the body tilted back a little, the head jerked up a little, both scythe arms (two,
+    as in the idle cell, both clearly visible) pulled back close along the top of the body, small sparks drawn on the
+    joints themselves, the red eyes flickering; no taller than its idle height
+  face: the wedge head with the row of three red sensor eyes, each a clear bright spot
+  extra_negative: >-
+    a rider, a pilot, wheels, treads, a cannon, a dome head, bronze plates, teal, more than four legs, a human face,
+    sparks in open air, violet, purple, a ground line, a floor, a shadow under the feet, a single scythe arm
+  seeds: [1235]   # 1234 (ROSTER_LOG R294): a ground line drawn under the feet in every cell, one scythe in the hurt
 - id: blue_dragon
   # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
   size: large
