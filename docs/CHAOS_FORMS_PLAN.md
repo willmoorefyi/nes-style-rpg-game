@@ -1,4 +1,4 @@
-# Chaos forms plan (pass C), 2026-11-16 (rev 2: momus BLOCKED (2/5) -> OKAY with R1-R14; R1-R30 applied in place, section 17; user and orchestrator rulings in section 15)
+# Chaos forms plan (pass C), 2026-11-16 (rev 3: momus BLOCKED (2/5) -> rev 2 with R1-R30; re-review APPROVE WITH REVISIONS -> A1-A8 applied in place; section 17; rulings in section 15)
 
 **Precedence.** Where an earlier paragraph and section 17 or a section 15 ruling disagree, section 17 and section 15
 win. Every revision was also applied in place.
@@ -162,6 +162,8 @@ These facts are why the forms need new mechanics. Each fact names the plan item 
   | `SpellExecutor.ts` | 308 | 314 |
   | `BattleScene.ts` | 515 | 594 |
 
+  | File | Lines | Limit (250) |
+  |---|---|---|
   | `BattleDisplayManager.ts` | 248 | 250 |
   | `BestiaryPreview.ts` | 247 | 250 |
   | `AiEnemyView.ts` | 240 | 250 |
@@ -319,18 +321,35 @@ i.e. 4200, 2400 and 900.
    | `BattleStateMachine.ts` | 7 | hook in `executeNextAction`, at most 5 lines, plus the `prepareRound` call, 1 line. The 2 HP writes become `setEnemyHp` (line-neutral). `ActionResult.formChange?` lives in `src/battle/` types: 1 line. Total at most 7. |
    | `SpellExecutor.ts` | 6 | 2 writes become `setEnemyHp` (line-neutral) |
 
-   - **Fallback (decided in advance):** if the count does not fit at C1, the integrator first extracts
-     `executePartyAttack` (`:475-490`) into `src/battle/physicalHit.ts`, then adds the hook.
+   - **Required first step of C1 TS-B (A3 ruling):** extract `executePartyAttack` (`:475-490`) into
+     `src/battle/physicalHit.ts`, behaviour-neutral (the full battle suite stays green), **before** any hook is added.
+     This frees headroom for the form hook and the slam dispatch.
 9. **F3's one scoped new mechanic: the slam (R9, ruling).**
    - `EnemyData.slam?: {targets: 2}`: a multi-target physical attack. It is chosen as an AI action
      `{type: 'slam', weight}`, it hits 2 different living heroes, and each hit is rolled with the normal physical
      formula.
    - Data: the type, the validator (`targets` is 2 and only allowed on records with `colossus:`), and a cross-file
      test.
-   - Tests: `tests/battle/colossusSlam.test.ts`: 2 distinct targets; 1 target if only 1 hero lives; a miss rolls per
-     target; the events in order.
-   - Line budget: in `src/battle/slamAttack.ts` (new). The state machine dispatch is part of the 7-line budget above,
-     or `physicalHit.ts` if the extraction ran.
+   - **Touch points (A4 ruling):**
+
+     | Where | Change |
+     |---|---|
+     | `enemyRosterValidation.ts:43` | allow the action type `'slam'` |
+     | `enemyAiPattern.ts:18` | the slam weight comes from the non-spell share `1 - rate`, alongside Fight |
+     | the `EnemyAiAction` union (`enemyRoster.ts:19`) | add `'slam'` |
+     | `BattleCommand` | a slam command (enemy only) |
+     | `peekNextAction` | returns `actionType: 'slam'`, so the view picks the slam timeline |
+     | events | **two damage events, one per target**, in target order |
+     | the pin `tests/data/crossFileValidation.test.ts:452` | updated to allow `'slam'` (not deleted) |
+
+   - Tests: `tests/battle/colossusSlam.test.ts`:
+     - 2 distinct targets, with 2 damage events
+     - 1 target and 1 event if only 1 hero lives
+     - a miss rolls per target
+     - the events in order
+     - `peekNextAction` reports `'slam'`
+     - the weight comes from `1 - rate`
+   - Line budget: in `src/battle/slamAttack.ts` (new), dispatched from `physicalHit.ts` (A3).
    - No other new mechanic. F2 and F4 use only the existing knobs: `ai.rate`, spell weights, `hits`, `attack` and
      `elementalProfile`.
 
@@ -353,23 +372,26 @@ i.e. 4200, 2400 and 900.
   | `pose` | `name` | the colossus plays `cast` / `attack` / `hurt` / `roar` once (R19) |
   | `variant` | `layer`, `frame` | swaps one colossus layer to a named frame, e.g. `{layer: core, frame: open}` for F4 (R19); no view rebuild |
   | `pan` | `from: [dx, dy]` (art px offset of the canvas from its rest `place`), `frames`, `ease: linear / out` | the reveal pan: the colossus canvas (and its overhang) slides in whole art px from a far offset to rest. `floorFront`, `bg` and the party stay still, so the being is felt to be larger than the screen. Only colossus forms |
+  | `music` | `id` | optional track change (`audio-manifest.json` id) |
 
 - **Pan limits (R13).** The allowed offset is derived from `colossus.json` so the canvas still covers the field. For
   the planned F3 (canvas at (-390, -300), 2700x1560 screen px at scale 3), the limits in art px are
   dx in [-128, +128] and dy in [-160, +138].
   - The validator reads the json and refuses an offset outside the limits.
-  - The pan **starts at a negative dy**, e.g. `from: [+40, -120]`, to show the gripping hand first; then it settles to
-    rest.
+  - **The pan start (A2 ruling):** `from: [0, -60]`. A pan start must have dy in [-70, 0] art px and dx <= 0
+    (validator), inside the coverage limits above. The canvas starts raised by 60 art px, with the hand still on
+    screen. A test checks that at the first pan frame the hand's box is inside the field (y >= 120). Then the canvas
+    settles to rest.
   - At the last pan frame the overhang hand lies exactly on the rim. A test checks the hand's alignment with
     `floorFront` at that frame.
 - **Timing and concurrency (R18).**
   - **Unskipped time** is the sum of every step's frames, where a `message` step counts at the `battleTiming.ts`
-    message timer value (the round-start line value) and is not skipped.
+    message timer value and is not skipped. **A1 ruling:** the validator is pinned to message speed 3,
+    `BATTLE_MESSAGE_FRAMES` = 90 frames per message step. A `shake` counts `SHAKE_FRAMES` (8) per shake.
   - Steps are **sequential**. A step with `with: previous` starts on the same frame as the step before it (e.g. a
     `shake` during a `rise`); the total is the longest branch.
   - Each script has one total, within the cap (480 frames; 600 for `chaos_i2`, D-O15).
   - Input: only confirm, and only on `message` steps, where it advances the line. Every other input is ignored.
-  | `music` | `id` | optional track change (`audio-manifest.json` id) |
 
 - **Player:** `src/scenes/battle/formInterlude.ts` is a pure timeline: steps become a frame-indexed list of events,
   so it is testable without PixiJS. `FormInterludePlayer` drives it.
@@ -448,8 +470,8 @@ part continues behind `floorFront` and the strip.
 
 **Scale effects (runtime, 4.3), in priority order:**
 1. **Reveal pan** in the F2 -> F3 interlude. The canvas rises from below the horizon (`rise`), then the camera pans
-   over it (`pan` from (+40, -120) art px to rest over 150 frames, within the R13 limits dx [-128, +128], dy
-   [-160, +138]). The pan starts with the canvas raised, so the hand gripping the rim shows first; then the view
+   over it (`pan` from (0, -60) art px to rest over 120 frames, within the R13 limits and the A2 start rule). The pan
+   starts with the canvas raised and the hand gripping the rim still on screen; then the view
    travels up the arm to the core and the eclipse as the canvas settles, and the hand lands exactly on the rim at
    rest.
 2. **Slow world-breath:** the whole canvas drifts by 1 art px (3 screen px) over a 6 s loop, out of step with the
@@ -525,22 +547,21 @@ C7). Spells use only ids that exist in `spells.yaml` (D-O9).
 - **Phase within the form:** at 0.25 of the pool, message "The horizon groans; its core shows through!", `hits: 4`.
 - **Interlude `chaos_i2` (F2 -> F3), about 8 s:**
   1. message "The rings shatter!"
-  2. `pose` roar
+  2. `pose` roar, 60 frames
   3. F2 `dissolve` sink 45 frames (down behind the horizon)
   4. fade 0.6, 20 frames
-  5. wait 30 frames
-  6. shake x3 (no sprite)
-  7. `swap`
-  8. F3 `rise` from_dy 300 art px over 120 frames, in 2-art-px steps (the colossus climbs over the horizon while the
+  5. shake x3 (no sprite), 24 frames
+  6. `swap`
+  7. F3 `rise` from_dy 300 art px over 120 frames, in 2-art-px steps (the colossus climbs over the horizon while the
      fade clears)
-  9. shake x2 (the hand lands on the rim)
-  10. `pan` from (+40, -120) art px over 150 frames, ease out: the reveal from the hand up to the eclipse (R13)
-  11. flash white 8 frames
-  12. message "Chaos, the Last Horizon, fills the sky!"
+  8. shake x2, `with: previous` (the hand lands on the rim), adds 0 frames
+  9. `pan` from (0, -60) art px over 120 frames, ease out: the reveal settles from the raised canvas to rest (A2)
+  10. flash white 8 frames
+  11. message "Chaos, the Last Horizon, fills the sky!"
 
-  That is about 9.5 s, against D-O15's cap of 600 frames for this one interlude (the others 480). Total under R18: the
-  steps are sequential, with step 9 `with: previous` on the end of the rise. `tests/data/interludes.test.ts` pins the
-  computed total.
+  **A1 re-timing:** the 30-frame wait was dropped and the pan trimmed to 120 frames. The computed total is
+  2 x 90 (messages) + 60 + 45 + 20 + 24 + 0 + 120 + 0 + 120 + 8 = **577 frames**, within D-O15's cap of 600 (the
+  others 480). `tests/data/interludes.test.ts` pins each script's computed total.
 
 ### 3.4 F4, "the Core Laid Bare" (`chaos_horizon_core`, data form, F3's art plus one variant layer)
 
@@ -806,6 +827,8 @@ New `assets-src/gen/colossus.py`, whose subcommands do not touch `generate.py` m
 - `selftest_colossus.py` covers these as RED cases:
   - refused without `paid`
   - refused at the cap and at a purpose cap
+  - **under pass C, refused when the call's `purpose` is not in `per_purpose_caps`**, including `generate.py`'s
+    character-sheet Bedrock path (A6)
   - refused from a linked worktree
   - one row written before the first try (a mocked client that raises)
   - a cache hit not logged
@@ -960,7 +983,7 @@ fixed offline and the orchestrator agrees.
 | reserve | any, **F3 first** | 18 | orchestrator only |
 | **Total cap** | | **80** | D-U5 (user); V0 + F3 = 46 of 80, plus F3's first call on the 18 reserve |
 
-These are the `per_purpose_caps` in `budget.json` (purposes `v0`, `f3_gen`, `f3_nobg`, `f2_gen`, `f2_nobg`,
+Under pass C, `bedrock.invoke` refuses any call whose `purpose` is not one of these keys, whatever the caller (A6). These are the `per_purpose_caps` in `budget.json` (purposes `v0`, `f3_gen`, `f3_nobg`, `f2_gen`, `f2_nobg`,
 `f4_variant`, `reserve`). The `reserve` purpose needs an orchestrator note in the ledger row's `purpose` field
 (`reserve:<reason>`).
 
@@ -1076,12 +1099,12 @@ Existing tests are updated only where this plan changes the pinned behaviour (na
 | `tests/battle/bossForms.test.ts` | F1 -> F2 at 0.70: `enemy.data.id` becomes `chaos_orrery`, `currentHp` unchanged, max HP unchanged; **HP exactly 4200 triggers** (R5); the next enemy action is drawn from F2's `ai`; F2's elemental profile is used by the next spell; **`phaseBuffs` of F1 subtracted while `fast` survives F1 -> F2** (R6); **F3's `hits: 4` does not leak to F4** (R6); **overkill**: a 9999 hit on F1 at full HP leaves HP at 4200 and the form changes (no skip); two thresholds reached by one hit (F1 at 4300, a 9999 hit): stops at 4200, one change per action; **F1 -> F2 -> F3 in one battle, F3 by a normal hit, with `crossedPhases` reset so F3's 0.25 line fires** (R4); `checkBossPhases` never applies a form phase as a plain phase (R5); **a still-queued Chaos command is re-chosen by the new AI, turn order kept; a null AI gives Fight** (R7); **a scenario `enemyAi` override is dropped at the first change** (R7); heal after the change does not revert; `formChange` exactly once per form; the last form at 0 HP: victory; the poison tick across a floor changes the form through the `executeNextAction` hook (R8) |
 | `tests/battle/colossusSlam.test.ts` | the F3 slam (R9): 2 distinct living targets; 1 if only 1 lives; per-target hit rolls; event order; validator refuses `slam` without `colossus:` and `targets` != 2 |
 | `tests/systems/battleTriggerForms.test.ts` | `battle:formChange` sets `SEEN:<to>`; the subscription is removed at battle end (R20) |
-| `tests/battle/enemyHp.test.ts` | the 5 write sites route through `setEnemyHp` (behaviour: floors respected for spell damage, physical damage, status tick, survive-at-1); no other `currentHp =` write on enemies in `src/battle` (static grep test) |
+| `tests/battle/enemyHp.test.ts` | the 5 write sites route through `setEnemyHp` (behaviour: floors respected for spell damage, physical damage, status tick, revive (HP 1)); no other `currentHp =` write on enemies in `src/battle` (static grep test) |
 | `tests/battle/BossPhase.test.ts`, `BossBattle.test.ts` (existing) | **unchanged**, must pass (regression gate R28) |
 | **Pins updated (R11), never deleted** | `tests/data/rosterData.test.ts:37-41`, `tests/data/rosterStats.test.ts:41-46` (the agility rule: form records follow it, or the tuned F2/F3/F4 values are pinned with a reason), `tests/scenes/bestiary/bestiaryModel.test.ts:36-44`, `tests/scenes/battle/EnemyLayoutAi.test.ts:200`, `tests/core/schemaValidationFx.test.ts:14`, `tests/data/assetCoverage.test.ts`: each gains an explicit `formOf` filter (records with `formOf` have no `num`) and a case that the filter excludes exactly the 3 form records |
 | `tests/core/mapValidators.test.ts` (existing, extended) | `form` and `interlude` accepted; bad types refused |
-| `tests/data/chaosForms.test.ts` | chain chaos -> orrery -> horizon -> horizon_core; equal `stats.hp`; strictly descending thresholds; no cycle; every `interlude` exists; form records are in no encounter table or formation on their own; every `ai.actions` spell id exists in `spells.yaml` (all enemies; would have caught nothing missing today because ai uses ice2/fast, but guards new forms); `colossus` forms have a `colossus.json` entry |
-| `tests/data/interludes.test.ts` | every script validates; the unskipped total (R18 definition) <= 480 frames (600 for `chaos_i2`), pinned per script; every `pan` offset within the json-derived limits (R13: F3 dx [-128, +128], dy [-160, +138]); exactly one `swap` when the art id changes, **zero for F3 -> F4** (R19); `rise` only after `swap`; `variant` only on a colossus form |
+| `tests/data/chaosForms.test.ts` | chain chaos -> orrery -> horizon -> horizon_core; equal `stats.hp`; strictly descending thresholds; no cycle; every `interlude` exists; form records are in no encounter table or formation on their own; every `ai.actions` spell id exists in `spells.yaml` (all enemies; would have caught nothing missing today because ai uses ice2/fast, but guards new forms); `colossus` forms **with an approved master** have a `colossus.json` entry (A5) |
+| `tests/data/interludes.test.ts` | every script validates; the unskipped total (R18 definition at message speed 3, 90 frames per message, A1) <= 480 frames (600 for `chaos_i2`), and **each script's computed total pinned** (`chaos_i2` 577); every `pan` offset within the json-derived limits (R13: F3 dx [-128, +128], dy [-160, +138]) and the A2 start rule (dy in [-70, 0], dx <= 0); exactly one `swap` when the art id changes, **zero for F3 -> F4** (R19); `rise` only after `swap`; `variant` only on a colossus form |
 | `tests/scenes/battle/formInterlude.test.ts` | the pure timeline: event frames, the swap frame, `with: previous` concurrency, total duration, confirm advances only `message` steps, every other input ignored, the 24-frame hold-off at the end (R18) |
 | `tests/balance/chaosForms.test.ts` | seeded runs (`battlePolicies.ts`) with the `chaos_forms` endgame debug party: win rate, rounds per form (each form >= 3 rounds median), party KO count; bounds pinned at C7 >= 3 points from measured |
 
@@ -1092,13 +1115,13 @@ Existing tests are updated only where this plan changes the pinned behaviour (na
 | `tests/scenes/battle/battleLayers.test.ts` (existing, updated) | order bg, colossus, ui, actors, fx, hud |
 | `tests/scenes/battle/screenShake.test.ts` (existing, updated) | shake moves actors, fx, colossus; never bg, ui, hud |
 | `tests/scenes/battle/ColossusView.test.ts` | on the **900x520 art px fixture** (or the size read from the json, R22): placement from the json; integer scale; `scaleMode: 'nearest'`; every frame of idle / attack / cast / hurt / roar / dying at whole screen px; abs(dx) <= 12 over every timeline; coverage of x 0..1920, y 120..370 (R14: at rest and in idle / attack / cast / hurt / pan frames; rise and dying exempt); per-layer white flash on hurt with no `generateTexture` call (R15, spy); no call to `computeEnemyLayoutAi` / `formationFits` for colossus data (spy) |
-| `tests/scenes/battle/colossusWorld.test.ts` (the centrepiece) | F3 canvas >= 2688x1512 screen px (R12); at rest it passes the left, right and top screen edges; visible fraction (intersection with (0, 0, 1920, 780) / canvas area) <= 45 %; coverage of x 0..1920, y 120..370 = 100 % under the R14 scope; the `overhang` layer is above `floorFront` and below every `ui` / `actors` child; **at the last `pan` frame the hand lies on the rim** (alignment with `floorFront`, R13); layers > 2048 are tiled and the tiles abut with no gap or overlap |
+| `tests/scenes/battle/colossusWorld.test.ts` (the centrepiece) | F3 canvas >= 2688x1512 screen px (R12); at rest it passes the left, right and top screen edges; visible fraction (intersection with (0, 0, 1920, 780) / canvas area) <= 45 %; coverage of x 0..1920, y 120..370 = 100 % under the R14 scope; the `overhang` layer is above `floorFront` and below every `ui` / `actors` child; **at the first `pan` frame the hand's box is inside the field (y >= 120)** (A2) and **at the last `pan` frame the hand lies on the rim** (alignment with `floorFront`, R13); layers > 2048 are tiled and the tiles abut with no gap or overlap |
 | `tests/scenes/battle/enemyAnimPreviewColossus.test.ts` | `&enemyAnim=loop` and `=step` drive the colossus timelines; the step label shows `enemy: frame / t` (R17) |
 | `tests/scenes/battle/colossusTextures.test.ts` | texture count before a colossus battle == after it ends, and the same for a bestiary visit (R27) |
 | `tests/scenes/battle/colossusAnchors.test.ts` | damage number origin = `core` clamped to y 140..740; target arrow and bracket inside the field and label y >= 124; status icon row inside y 140..760; `effectBox()` inside the field and all emitter anchors in y 124..1080 (the `fxBigBoxes` rule); melee point x <= 1250 and hero travel >= 150 |
 | `tests/scenes/battle/formChangeView.test.ts` | on `formChange`: F1's `AiEnemyView` sprite is removed after `dissolve`, a `ColossusView` and the invisible proxy at `targetRect` exist after `swap` (R15); **each enumerated consumer** (actionNumbers, BattleEffects incl. `elementFlash` routed to the colossus hurt flash, BattleFieldTargeting, statusFx, BattleAnimationController, enemyAnimPreview, BattleDisplayManager with the `upgradeToArt` guard, BattleScene) gets the proxy or the colossus path; `battle:formChange` emitted at `swap` (R20); the enemy list label stays "Chaos"; targeting index 0 still selects the boss; the controller waits for the interlude end |
 | `tests/scenes/battle/drawOrder.test.ts` | with F3 active: party sprites, the bottom-strip windows and the message window are above the colossus in the scene graph; `floorFront` above the colossus art |
-| `tests/rendering/colossusAssets.test.ts` | `colossus.json` schema; every texture <= 2048; anchors and rects inside the canvas; total RGBA bytes <= 24 MB; every form id in `enemies.yaml` with `colossus:` has an entry (also `assetCoverage.test.ts`, extended) |
+| `tests/rendering/colossusAssets.test.ts` | `colossus.json` schema; every texture <= 2048; anchors and rects inside the canvas; total RGBA bytes <= 24 MB; every form id in `enemies.yaml` with `colossus:` **and an approved master** has an entry (A5; also `assetCoverage.test.ts`, extended). Forms without an approved master yet show the placeholder box |
 | `tests/scenes/bestiary/bestiaryForms.test.ts` | form records absent from the top-level list (R11); sub-entries in chain order; unseen form hidden under `mode: seen`; colossus preview at scale 1 centred within 1 px of the panel centre (the `bestiaryCentre` rule on `visibleBox`); a fixture canvas wider than 940 art px shows the rest-view crop (R22); F1 entry unchanged |
 | **Regression gate (R28)** | unchanged and green at C-base and after C4: `BossPhase.test`, `BossBattle.test`, `tierHTravel`, `lungeClearance`, `fxBigBoxes`, `floatingNumberPlacement`, `enemyTravel`, `bestiaryCentre` |
 | `tests/rendering/rimBackdrop.test.ts` | `rim_floor.webp` overlaps `rim.webp` pixel-exact below the horizon; alpha 0 above the horizon row |
@@ -1143,7 +1166,7 @@ At most **4 agents at once**.
 | C2 | GEN (+ FW-C on call) | the rim source copied into the repo first; the R30 read-only identity and model list; V0 (<= 12 calls, per-row caps); stage and commit rim (0 calls) | G-C0 report + ruling: continue, or **stop and report to the user** (D-U6) |
 | C3 | GEN, RIG (2) | F3 master first (the user's headline), then F2: generate -> nobg -> pix -> mock -> image-only review -> approve; RIG starts each form's layer yaml right after its approval | each master approved, logged, committed |
 | C4 | RIG, TS-V, TS-B (3) | RIG: split, glow, bake, review, lock, **commit right after lock**. TS-V: real `colossus.json` wired, bestiary sub-entries. TS-B: interlude scripts, form data final, the `chaos_forms` / `chaos_final` / `chaos_interlude_*` debug scenarios (with `background: assets/backgrounds/rim.webp` and `enemyStatus` presets, R21) | `check --all` == C-base lines; `selftest_colossus` OK; forms locked; the R28 regression gate green |
-| C5 | integrator | build `colossus` stage, section 11 validation, browser checks 11.3 | all pass/fail criteria except play test |
+| C5 | integrator | build `colossus` stage, section 11 validation, browser checks 11.3 | all pass/fail criteria except play test; **A5 gate: `colossus.json` has entries for all three colossus forms (F2, F3, F4) with approved masters** |
 | C6 | 1 fresh play tester | section 12 | rows in ROSTER_PLAYTEST |
 | C7 | <= 3 | fix round (plan, momus, fixes, re-test), balance bounds pinned | no open P0/P1 |
 
@@ -1356,7 +1379,8 @@ Every answer must be yes.
 - [ ] C1 FW-C: colossus.py (gen/nobg/pix/glow/bake/mock/review/approve/lock/budget --check); BR ledger + cap + paid/purpose gate + linked-worktree refusal inside bedrock.invoke; generate.py Bedrock path passes paid/purpose; budget.json `bedrock` block (cap 80, per-purpose caps); ledger tracked in git; selftest_colossus.py RED -> GREEN, wired into selftest.py --anim; selftest_passv.py green (high, 1d)
 - [ ] C1 FW-C: tools/stage_rim.py (src_size, `rim` CHECKS profile, floor-front cut with bleed, pad_bottom), imported by stage_backgrounds.py in <= 1 line (medium, 3h)
 - [ ] C1 FW-C: `colossus` build stage (no-op exit 0 with no masters, deterministic with --out + sha256 manifest, tiles <= 2048, memory report) + retire.py --colossus (medium, 4h)
-- [ ] C1 TS-B: enemyHp.ts single write path (5 sites, static test), bossForms.ts (floor at ceil(t*pool), pending, hook in executeNextAction + prepareRound, checkBossPhases skips form phases, crossedPhases reset, phaseBuffs, queued command re-chosen, enemyAi override dropped, FormChangeResult), slamAttack.ts, types + validators + cross-file rules, 3.6 records as stubs, R11 formOf filters + pin updates; 9.1 tests RED -> GREEN; ceilings held (high, 1.5d)
+- [ ] C1 TS-B **first step (A3):** extract executePartyAttack -> src/battle/physicalHit.ts, behaviour-neutral, battle suite green (high, 2h)
+- [ ] C1 TS-B: enemyHp.ts single write path (5 sites, static test), bossForms.ts (floor at ceil(t*pool), pending, hook in executeNextAction + prepareRound, checkBossPhases skips form phases, crossedPhases reset, phaseBuffs, queued command re-chosen, enemyAi override dropped, FormChangeResult), slamAttack.ts with the A4 touch points (validation :43, aiPattern :18, EnemyAiAction, BattleCommand, peekNextAction 'slam', 2 damage events, crossFileValidation :452 pin), types + validators + cross-file rules, 3.6 records as stubs, R11 formOf filters + pin updates; 9.1 tests RED -> GREEN; ceilings held (high, 1.5d)
 - [ ] C1 TS-V: BattleLayers `colossus`, shake on colossus, ColossusView + colossusChoreography + ColossusPoseController behind EnemyActorView, anchor overrides (numbers, cursor bracket, status row, effectBox, melee point), proxy Container + consumer routing + upgradeToArt guard, per-layer hurt flash, nearest scaleMode + texture release, enemyAnimPreview support, InterludeRegistry + formInterlude (R18 timing, with: previous) + FormInterludePlayer + variant/pan steps, formChangeView + battle:formChange; 900x520 fixture; 9.2 tests RED -> GREEN; R16 line budgets (high, 2.5d)
 - [ ] C1 exit -> C-base: merge, tsc/build/vitest, selftests, atlas byte-identical, check --all unchanged, colossus stage no-op, R28 regression gate (high, 1h)
 - [ ] C2 GEN (first step): copy /tmp/stab2/sd35_v3_raw.png -> assets-src/backgrounds/rim-src.png (+ rim-src.json, sha256 in ROSTER_LOG) before /tmp can be lost (high, 0.25h)
@@ -1395,7 +1419,7 @@ were applied in place. The open points were ruled by the orchestrator (15.3), an
 | R10 | Inherited / explicit fields per form | new 3.6 table: `protect`, `attackStatus`, `specials`, `size: boss` (bossTag), `xp` / `gold`, `sprite` / `colossus`, `num`, tuned stats; no implicit inheritance; data test |
 | R11 | `formOf` records in roster tests | ruling 15.3; 2.2 item 1; 8; 9.1 "pins updated" row listing `rosterData.test.ts:37-41`, `rosterStats.test.ts:41-46`, `bestiaryModel.test.ts:36-44`, `EnemyLayoutAi.test.ts:200`, `schemaValidationFx.test.ts:14`, `assetCoverage` |
 | R12 | Define "visible"; fix the 1.4x bound | criteria, 3.0, 4.2, 9.2: intersection with (0, 0, 1920, 780) over the canvas area = 35.6 % planned; bound >= 2688x1512 |
-| R13 | Pan coverage limits and direction | 2.3: limits from the json, F3 dx [-128, +128], dy [-160, +138] art px; start (+40, -120) so the hand shows first; hand alignment test at the last pan frame; 3.0 and 3.3 interlude updated |
+| R13 | Pan coverage limits and direction | 2.3: limits from the json, F3 dx [-128, +128], dy [-160, +138] art px; start (+40, -120) so the hand shows first (superseded by A2: `from: [0, -60]`); hand alignment test at the last pan frame; 3.0 and 3.3 interlude updated |
 | R14 | Coverage band and scope | y 120..370 in both tests; rest / idle / attack / cast / hurt / pan frames, rise and dying exempt (criteria, 4.3, 9.2) |
 | R15 | Sprite consumers after the swap | ruling 15.3; 4.4 proxy + consumer table (actionNumbers 3, BattleEffects 2 incl. `elementFlash` at `BattleEffects.ts:59-62`, BattleFieldTargeting 2, statusFx 2, BAC 9, enemyAnimPreview 5, BDM 11 with the `upgradeToArt` guard at `BDM:94`, BattleScene 1); per-layer flash (4.3); `formChangeView.test` enumerates them |
 | R16 | More line ceilings | section 1 table; new 4.5 per-file budget and module names (`colossusSprites.ts`, `colossusCursor.ts`, `enemyActorView.ts`, `bestiaryColossus.ts`, `tools/stage_rim.py`); the BAC adapter counted with the interlude hook |
@@ -1414,3 +1438,19 @@ were applied in place. The open points were ruled by the orchestrator (15.3), an
 | R29 | Background + Monitor per command | 10 watchdog rules; 11.1 preface; one Bedrock call per checkpoint with `EXIT=` in its log, no call loops in one foreground command |
 | R30 | AWS identity record | 6: read-only `get-caller-identity` and `list-foundation-models` outputs in ROSTER_LOG; stop if the role name matches Admin or Prod |
 | Mislabels | (coordinator) | 1: `SpellExecutor:279` is `executeReviveSpell`; the physical block is `executePartyAttack` (`BSM:475-490`); `dataDrivenAI(ai, spells)` at `enemyAiPattern.ts:27` |
+
+### 17.1 Momus re-review of rev 2 (rev 3)
+
+Verdict on rev 2: **APPROVE WITH REVISIONS**. A1-A8 were applied in place with the orchestrator's rulings.
+
+| # | Revision | How it was applied |
+|---|---|---|
+| A1 | Interlude timing pinned; `chaos_i2` over its cap | ruling: the validator is pinned to message speed 3 (`BATTLE_MESSAGE_FRAMES` 90); `chaos_i2` re-timed (the 30-frame wait dropped, the pan trimmed to 120 frames) = **577 frames**, within the D-O15 cap of 600 (caps kept); each script's computed total pinned in `interludes.test.ts` (2.3, 3.3, 9.1) |
+| A2 | The pan start must keep the hand visible | ruling: `from: [0, -60]`; the start rule dy in [-70, 0] art px and dx <= 0 (validator); test: at the first pan frame the hand's box is inside the field (y >= 120) (2.3, 3.0, 3.3, 9.1, 9.2) |
+| A3 | Make the extraction certain | ruling: `executePartyAttack` -> `physicalHit.ts` is the **required first step** of C1 TS-B (2.2 item 8, TODOs) |
+| A4 | Name the slam touch points | ruling: `enemyRosterValidation.ts:43`, `enemyAiPattern.ts:18` (weight from `1 - rate`, alongside Fight), the `EnemyAiAction` union (`enemyRoster.ts:19`), `BattleCommand`, `peekNextAction` `'slam'`, two damage events, the pin `crossFileValidation.test.ts:452` updated (2.2 item 9, tests, TODOs) |
+| A5 | `colossus.json` coverage before the art exists | ruling: the tests require entries only for forms with an approved master; a C5 gate requires all three (9.1, 9.2, 10) |
+| A6 | An unknown Bedrock purpose | ruling: under pass C any call whose purpose is not in `per_purpose_caps` is refused, including `generate.py`'s character-sheet path; selftest case (5.1, 5.6) |
+| A7 | Two formatting errors | the `music` row moved back into the 2.3 step table; the header restored on the split line-headroom table in section 1 |
+| A8 | Test wording | the `enemyHp.test.ts` row says "revive (HP 1)" (9.1) |
+
