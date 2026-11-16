@@ -554,20 +554,24 @@
     one on the left side of the image and two on the right side of the image), flaring brighter; exactly two arms; at
     the same pixel size as in Image 3
   hurt: >-
-    struck: the upper body arched back, the flame crown guttering and bent back, the four orbs knocked loose from their
-    ring but each still touching the flames, both arms flung out wide with the clawed hands splayed open, the robe
-    still pooled on the ground; exactly two arms; at the same pixel size as in Image 3
+    struck: the upper body arched back, the flame crown guttering and bent back, both arms flung out wide with the
+    clawed hands splayed open, the robe still pooled on the ground; exactly four orbs, each drawn once, knocked a little
+    out of their places but each still close beside the flames: one pale orb above the flames, one pale orb on the left
+    side of the image, one dark teal orb and one orange orb on the right side of the image; no fifth orb, no other round
+    shape near the head;
+    exactly two arms; at the same pixel size as in Image 3
   attack_raise: >-
     the wind-up of a crushing blow, a mirror-symmetric pose: both arms raised overhead, the two great gauntlets
     clenched together above the flame crown, the upper body sunk lower into the pooled robe so that the whole figure,
     raised fists included, stays inside the grey box at exactly the same pixel size as in Image 3; exactly two arms;
-    the gap between the raised arms and the flames is empty background
+    exactly four orbs and no fifth, in the same places as in Image 3 beside the flames; the gap between the raised arms
+    and the flames is empty background
   face: the dark face with two blazing white eyes inside the flame crown is readable
   extra_negative: >-
     four arms, six arms, legs, feet, wings, a tail, horns, a second head, a weapon, purple fire, violet, pink, magenta,
     a human face with skin, orbs floating apart from the body, a ground line
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1235}   # boss_cast 1234 (ROSTER_LOG R301): five orbs, a flame wisp on row 2
+  sheet_seeds: {boss_cast: 1235, boss_hurt: 1235}   # boss_cast 1234 (ROSTER_LOG R301): five orbs, a flame wisp on row 2; boss_hurt 1234 (R303): five orbs
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells. Pass V redesign
   # (docs/REDESIGN_PLAN.md 3.1, D-V11 stats unchanged): a squat young deep-sea psychic horror, distinct from the tall

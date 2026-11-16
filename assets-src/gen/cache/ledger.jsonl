@@ -773,3 +773,7 @@
 {"event": "result", "key": "022b147049b111b3d8f0f4d1", "ok": true}
 {"event": "attempt", "ts": "2026-11-16T03:10:53", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chaos", "sheet": "boss_cast", "seed": 1235, "key": "751b73facde53dff2cd1bdcb"}
 {"event": "result", "key": "751b73facde53dff2cd1bdcb", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T03:12:01", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chaos", "sheet": "boss_hurt", "seed": 1234, "key": "4e021ac07e92701c55ee09f3"}
+{"event": "result", "key": "4e021ac07e92701c55ee09f3", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T03:12:37", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "chaos", "sheet": "boss_hurt", "seed": 1235, "key": "e3007d12a2349726757ccb2f"}
+{"event": "result", "key": "e3007d12a2349726757ccb2f", "ok": true}
