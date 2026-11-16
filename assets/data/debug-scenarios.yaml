@@ -1248,3 +1248,49 @@
   enemyAi:
     goblin: [{ type: magic, spellId: slep, weight: 1 }]
   background: assets/backgrounds/grassland.webp
+
+# Pass C (docs/CHAOS_FORMS_PLAN.md 7.2 R21, 11.3, 12): the Chaos form chain on the rim backdrop (no map claim). Open with
+# ?mute=1&scenario=<id> (&enemyAnim=loop | step on chaos_final, &slow=N on an interlude). chaos_forms plays F1 -> F4;
+# chaos_final is F3 alone with the status icon row (Chaos protects against status, so the preset sets it; the plan's
+# `slow` is not a StatusEffect here, so poison and blind);
+# chaos_interlude_N starts on the form before interlude N (1: F1 -> F2, 2: F2 -> F3 rise and pan, 3: F3 -> F4 heave).
+- id: chaos_forms
+  name: Chaos - the four forms (F1 -> F4), endgame party
+  party: &chaos_party
+    - { class: knight, name: KNGT, level: 50, equipment: [masamune, dragon_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: ninja, name: NINJ, level: 50, equipment: [masamune], spells: [] }
+    - { class: master, name: MSTR, level: 50, equipment: [], spells: [] }
+    - { class: white_wizard, name: WWIZ, level: 50, equipment: [], spells: [{ id: cure3, level: 5 }, { id: life, level: 5 }, { id: heal, level: 3 }, { id: cure2, level: 3 }] }
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5 }
+  gold: 1000
+  enemies: [chaos]
+  background: assets/backgrounds/rim.webp
+- id: chaos_final
+  name: Chaos - the Last Horizon (F3) alone, poisoned and blinded for the status icon row
+  party: *chaos_party
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5 }
+  gold: 1000
+  enemies: [chaos_horizon]
+  enemyStatus: { 0: [poison, blind] }
+  background: assets/backgrounds/rim.webp
+- id: chaos_interlude_1
+  name: Chaos - interlude 1 (the Sovereign burns; the Orrery rises)
+  party: *chaos_party
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5 }
+  gold: 1000
+  enemies: [chaos]
+  background: assets/backgrounds/rim.webp
+- id: chaos_interlude_2
+  name: Chaos - interlude 2 (the rings shatter; the Last Horizon rises and pans)
+  party: *chaos_party
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5 }
+  gold: 1000
+  enemies: [chaos_orrery]
+  background: assets/backgrounds/rim.webp
+- id: chaos_interlude_3
+  name: Chaos - interlude 3 (the core is laid bare; the horizon heaves up)
+  party: *chaos_party
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5 }
+  gold: 1000
+  enemies: [chaos_horizon]
+  background: assets/backgrounds/rim.webp
