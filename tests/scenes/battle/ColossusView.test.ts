@@ -48,13 +48,13 @@ const box = (c: Container) => { const b = c.getBounds(); return { x: b.x, y: b.y
 const TIMELINES: ColossusTimeline[] = ['idle', 'slam', 'beam', 'cast', 'hurt', 'roar', 'dying'];
 
 describe('ColossusView: placement, scale and textures (18.1, 18.4)', () => {
-  it('places the 2700x1080 canvas at the json place (-527, -210) at scale 1; the body is cropped to rows 360-1079', async () => {
+  it('places the 2700x1080 canvas at the json place (-527, -60) at scale 1; the body is cropped to rows 360-1079', async () => {
     const { v } = await view();
     const f = form();
     expect(f.scale).toBe(1);
     expect(v.art.scale.x).toBe(1);
-    expect({ x: v.art.x, y: v.art.y }).toEqual({ x: -527, y: -210 });
-    expect(box(v.layerNode('body')!)).toEqual({ x: -527, y: 150, w: 2700, h: 720 });
+    expect({ x: v.art.x, y: v.art.y }).toEqual({ x: -527, y: -60 });
+    expect(box(v.layerNode('body')!)).toEqual({ x: -527, y: 300, w: 2700, h: 720 });
   });
 
   it('the glow is stored at half res and drawn at its texScale 2 over the whole canvas', async () => {
@@ -62,7 +62,7 @@ describe('ColossusView: placement, scale and textures (18.1, 18.4)', () => {
     const glow = v.layerNode('glow')!;
     const [t] = tiles(glow);
     expect({ w: t.texture.width, h: t.texture.height }).toEqual({ w: 1350, h: 540 });
-    expect(box(glow)).toEqual({ x: -527, y: -210, w: 2700, h: 1080 });
+    expect(box(glow)).toEqual({ x: -527, y: -60, w: 2700, h: 1080 });
   });
 
   it('every tile texture is linear-filtered with no mipmaps', async () => {
@@ -107,9 +107,9 @@ describe('ColossusView: placement, scale and textures (18.1, 18.4)', () => {
     expect(tiles(v.layerNode('core')!).filter((s) => drawn(v.root, s))).toHaveLength(1);
   });
 
-  it('the proxy is a measurable, never-drawn box at the target rect (screen x 643-1003, y 135-630)', async () => {
+  it('the proxy is a measurable, never-drawn box at the target rect (screen x 643-1003, y 285-780)', async () => {
     const { v } = await view();
-    expect(box(v.proxy)).toEqual({ x: 643, y: 135, w: 360, h: 495 });
+    expect(box(v.proxy)).toEqual({ x: 643, y: 285, w: 360, h: 495 });
     for (const c of v.proxy.children) expect(c.renderable).toBe(false);
   });
 });
@@ -145,12 +145,12 @@ describe('ColossusView: every timeline frame', () => {
     }
   });
 
-  it('the pan limits come from the json and the breathing envelope: dx [-247, +521], dy [-80, +324] (B4)', () => {
+  it('the pan limits come from the json and the breathing envelope: dx [-247, +521], dy [-230, +174] (B4)', () => {
     const bobs = Array.from({ length: 144 }, (_, c) => poseAt('idle', c, c, []).bob);
     expect(Math.min(...bobs)).toBeCloseTo(-BREATH_PX, 6);
     expect(Math.max(...bobs)).toBeCloseTo(0, 6);
     expect(PAN_ENVELOPE.up).toBe(BREATH_PX);
-    expect(panLimits(form())).toEqual({ dx: [-247, 521], dy: [-80, 324] });
+    expect(panLimits(form())).toEqual({ dx: [-247, 521], dy: [-230, 174] });
   });
 });
 

@@ -8,6 +8,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { formProblems, readColossusIndex, colossusOf, type ColossusIndex } from '../../src/scenes/battle/colossus/colossusIndex.js';
+import { entryIdFor } from '../../src/scenes/battle/colossus/colossusEntries.js';
 import { ColossusArt, textureBytes } from '../../src/rendering/ColossusArt.js';
 import type { EnemyData } from '../../src/types/index.js';
 import { fixtureIo, fixtureRaw, HORIZON } from '../helpers/colossusFixture.js';
@@ -49,14 +50,15 @@ describe('colossus.json', () => {
     expect(err).toHaveBeenCalled();
   });
 
-  it('every enemy with colossus: and an approved master has an entry (A5); none is required before the masters', () => {
+  it('every enemy with colossus: and an approved master has its own entry (A5, keyed by the record id); none before the masters', () => {
     const enemies = parse(readFileSync('assets/data/enemies.yaml', 'utf8')) as EnemyData[] | { enemies: EnemyData[] };
     const list = Array.isArray(enemies) ? enemies : enemies.enemies;
     const index = existsSync(BUILT) ? readColossusIndex(JSON.parse(readFileSync(BUILT, 'utf8'))) : { forms: {} };
     for (const e of list) {
       const form = colossusOf(e as EnemyData & { colossus?: string });
       if (!form || !existsSync(`assets-src/gen/approved/chaos_forms/${form}/master.png`)) continue;
-      expect(index.forms[form], `${e.id} -> ${form}`).toBeDefined();
+      expect(index.forms[e.id], `${e.id} -> ${form}`).toBeDefined();
+      expect(entryIdFor(index, e), e.id).toBe(e.id);
     }
   });
 

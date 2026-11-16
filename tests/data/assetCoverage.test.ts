@@ -272,6 +272,8 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
     const stageScript = readFileSync(join(assets, '../assets-src/tools/stage_backgrounds.py'), 'utf-8');
     const stagesBody = stageScript.slice(stageScript.indexOf('STAGES = {'), stageScript.indexOf('\n}\n'));
     const stageIds = new Set([...stagesBody.matchAll(/^\s+"(\w+)": \(/gm)].map((m) => m[1]));
+    // `rim` (the Chaos arena, CHAOS_FORMS_PLAN 7.2) is staged by tools/stage_rim.py, which stage_backgrounds.py dispatches to
+    if (/if "rim" in argv\[1:\]: return .*stage_rim\.py/.test(stageScript)) stageIds.add('rim');
 
     /** Width and height of a WebP file (lossy VP8, lossless VP8L or extended VP8X). */
     const webpSize = (buf: Buffer): [number, number] => {

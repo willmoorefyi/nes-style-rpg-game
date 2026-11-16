@@ -8,6 +8,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
+import { readColossusIndex } from '../../src/scenes/battle/colossus/colossusIndex.js';
+import { artIdOf, entryIdFor } from '../../src/scenes/battle/colossus/colossusEntries.js';
 import { formChainErrors } from '../../src/core/formValidation.js';
 import { validateEnemyData } from '../../src/core/schemaValidation.js';
 import type { EnemyData, SpellData } from '../../src/types/index.js';
@@ -146,12 +148,18 @@ describe('the Chaos form chain', () => {
     expect(used).toEqual([]);
   });
 
-  it('colossus forms with an approved master have a colossus.json entry (A5)', () => {
+  it('colossus forms with an approved master have their own colossus.json entry (A5: F2, F3 and F4; F4 draws F3\'s art at its own rest, D-U13)', () => {
     const json = existsSync('assets/sprites/colossus.json')
-      ? JSON.parse(readFileSync('assets/sprites/colossus.json', 'utf-8')) as { forms?: Record<string, unknown> } : {};
-    for (const e of ENEMIES.filter((x) => x.colossus)) {
-      if (!existsSync(`assets-src/gen/approved/chaos_forms/${e.colossus}/master.png`)) continue;
-      expect(json.forms?.[e.colossus!], e.id).toBeDefined();
+      ? JSON.parse(readFileSync('assets/sprites/colossus.json', 'utf-8')) as { forms?: Record<string, { art?: string; place?: number[] }> } : {};
+    const forms = readColossusIndex(json).forms;
+    const required = ENEMIES.filter((x) => x.colossus && existsSync(`assets-src/gen/approved/chaos_forms/${x.colossus}/master.png`));
+    expect(required.map((e) => e.id).sort()).toEqual(['chaos_horizon', 'chaos_horizon_core', 'chaos_orrery']);
+    for (const e of required) {
+      expect(forms[e.id], e.id).toBeDefined();
+      expect(entryIdFor({ forms }, e), e.id).toBe(e.id);
+      expect(artIdOf(e.id, forms[e.id]), e.id).toBe(e.colossus);
     }
+    expect(forms.chaos_horizon_core.place).toEqual([-527, -285]);
+    expect(forms.chaos_horizon.place).toEqual([-527, -60]);
   });
 });

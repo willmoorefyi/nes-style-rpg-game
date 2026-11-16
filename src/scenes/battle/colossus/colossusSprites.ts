@@ -24,6 +24,9 @@ import type { EnemyActorPoses } from './enemyActorView.js';
 /** What the slots need from the art (ColossusArt). */
 export interface ColossusArtLike extends ColossusTextureSource {
   form(id: string): ColossusFormSpec | null;
+  /** The entry a record draws (its own, else its art's; colossusEntries.ts). */
+  entryFor(data: EnemyData): string | null;
+  ensureFor(data: EnemyData): Promise<void>;
   isReady(id: string): boolean;
   ensure(ids: string[]): Promise<void>;
   release(ids?: string[]): void;
@@ -97,12 +100,12 @@ export class ColossusSlots {
   /** The swap: enemy i draws `data`'s colossus form from now on (its old sprite or view is destroyed). `riseFrom`:
    *  the view starts that many art px below its rest (the interlude's `rise` brings it up). */
   swapIn(i: number, data: EnemyData, riseFrom = 0): ColossusView {
-    const formId = colossusOf(data);
+    const formId = colossusOf(data) ? this.art.entryFor(data) : null;
     if (!formId) throw new Error(`ColossusSlots.swapIn: ${data.id} has no colossus form`);
     const old = this.slots.get(i);
     const ready = this.art.isReady(formId);
     const form = ready ? this.art.form(formId) : null;
-    if (!ready) void this.art.ensure([formId]).then(() => this.upgrade(i, formId));
+    if (!ready) void this.art.ensureFor(data).then(() => this.upgrade(i, data));
     const view = new ColossusView(formId, form ?? placeholderForm(), this.art, variantOf(data));
     const ctl = old && old.formId === formId && !old.placeholder && form ? old.ctl : new ColossusPoseController(view.layerInfo);
     if (old) this.layers.colossus.addChildAt(view.root, this.layers.colossus.getChildIndex(old.view.root));
@@ -120,11 +123,27 @@ export class ColossusSlots {
   }
 
   /** The form's art arrived after a placeholder was drawn: rebuild the view in place (its rise kept). */
-  private upgrade(i: number, formId: string): void {
+  private upgrade(i: number, data: EnemyData): void {
     const s = this.slots.get(i);
-    if (this.disposed || !s || s.formId !== formId || !s.placeholder || !this.art.isReady(formId)) return;
+    const id = this.art.entryFor(data);
+    if (this.disposed || !s || s.data !== data || !s.placeholder || !id || !this.art.isReady(id)) return;
     this.swapIn(i, s.data);
     if (this.skyOnArt) this.settleSky();
+  }
+
+  /** A form change that keeps the art (F3 -> F4, no swap): the view takes `data`'s own entry (its rest, D-U13) where it
+   *  stands on screen (the script's `variant` steps show its frames). False (nothing re-based) when the art differs or
+   *  the entry is the same. */
+  rest(i: number, data: EnemyData): boolean {
+    const s = this.slots.get(i);
+    const id = this.art.entryFor(data);
+    const form = id && this.art.isReady(id) ? this.art.form(id) : null;
+    if (!s || !id || !form || s.placeholder || s.view.artId !== colossusOf(data)) return false;
+    s.data = data;
+    if (id === s.formId) return false;
+    s.formId = id;
+    s.view.rebase(id, form);
+    return true;
   }
 
   /** The sprites AiEnemyView may pose: a detached stand-in replaces each colossus proxy. */

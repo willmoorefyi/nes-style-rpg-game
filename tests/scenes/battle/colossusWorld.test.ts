@@ -24,7 +24,7 @@ describe('F3 spans the world (R12, 18.4)', () => {
     const f = fixtureIndex().forms[HORIZON];
     const c = canvasRect(f);
     expect(c.w).toBeGreaterThanOrEqual(2688);
-    expect(c).toEqual({ x: -527, y: -210, w: 2700, h: 1080 });
+    expect(c).toEqual({ x: -527, y: -60, w: 2700, h: 1080 });
     expect(visibleFraction(f)).toBeLessThanOrEqual(0.55);
     expect(visibleFraction(f)).toBeCloseTo((1920 * 780) / (2700 * 1080), 3);
     expect(spansColumns(f)).toBe(true);
@@ -77,7 +77,7 @@ describe('the chaos_i2 reveal (18.4)', () => {
     }
     const first = offsets[panStart];
     const core = v.anchors().core;
-    expect(core).toEqual({ x: 820, y: 300 });
+    expect(core).toEqual({ x: 820, y: 450 });
     v.setRise(0);
     v.setPan(first.x, first.y);
     const c = v.anchors().target;

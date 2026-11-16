@@ -7,9 +7,10 @@
 #   fade (alpha, frames), dissolve (frames, style: flicker | fade | sink), swap, rise (frames, from_dy screen px below
 #   its end), pose (name: attack | cast | hurt | roar), variant (layer, frame), pan (from: [dx, dy] screen px from rest,
 #   frames, ease), music (id). `with: previous` starts a step on the same frame as the one before it. A rise ends at the
-#   next pan's `from` (or at rest); every pan offset stays inside the B4 border limits (F3: dx [-247, 521], dy [-80, 324]).
+#   next pan's `from` (or at rest); every pan offset stays inside the B4 border limits of the form it reveals
+#   (F3 at (-527, -60): dx [-247, 521], dy [-230, 174]; F4 at (-527, -285): dx [-247, 521], dy [-5, 399]).
 # Unskipped time at message speed 3 (90 frames per message, 8 per shake) is at most 480 frames (600 for chaos_i2,
-# D-O15); each script's total is pinned in the test: chaos_i1 436, chaos_i2 577, chaos_i3 130, chaos_crack 102.
+# D-O15); each script's total is pinned in the test: chaos_i1 436, chaos_i2 577, chaos_i3 190, chaos_crack 102.
 interludes:
 
 # F1 -> F2: the Sovereign's robe burns away and the Orrery rises (3.2)
@@ -53,11 +54,14 @@ interludes:
     - {type: variant, layer: core, frame: crack}
     - {type: message, text: "The horizon groans; core revealed!"}
 
-# F3 -> F4: the core tears open; same art, so no swap: the core layer switches to its open frame (3.4, R19)
+# F3 -> F4: the core tears open; same art, so no swap: the core layer switches to its open frame (3.4, R19). F4 rests
+# higher (-527, -285; D-U13) so the cavity clears the bottom strip: the form change re-bases the view on F4's rest at
+# the screen spot F3 held (offset (0, +225) = F3's rest), and the pan heaves it up to F4's rest (dy -225)
 - id: chaos_i3
   steps:
     - {type: shake, times: 2}
     - {type: flash, color: "#ffffff", frames: 4, alpha: 1}
     - {type: pose, name: hurt}
     - {type: variant, layer: core, frame: open}
+    - {type: pan, from: [0, 225], frames: 60, ease: out}
     - {type: message, text: "The core is laid bare! Strike now!"}

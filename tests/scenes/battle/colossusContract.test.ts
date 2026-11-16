@@ -27,7 +27,7 @@ describe('colossus.json contract (18.5)', () => {
     const f = form();
     const allowed = ['canvas', 'scale', 'place', 'anchors', 'targetRect', 'coverBox', 'visibleBox', 'skyDim', 'layers'];
     expect(Object.keys(f).filter((k) => !allowed.includes(k))).toEqual([]);
-    expect(f).toMatchObject({ canvas: [2700, 1080], scale: 1, place: [-527, -210], skyDim: 0.6, targetRect: [1170, 345, 360, 495] });
+    expect(f).toMatchObject({ canvas: [2700, 1080], scale: 1, place: [-527, -60], skyDim: 0.6, targetRect: [1170, 345, 360, 495] });
     const [x, y, w, h] = f.targetRect;
     expect(w > 0 && h > 0 && x + w <= f.canvas[0] && y + h <= f.canvas[1]).toBe(true);
   });

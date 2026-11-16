@@ -48,7 +48,7 @@ def images() -> dict[str, Image.Image]:
 
 
 def spec() -> dict:
-    return {"form": FORM, "canvas": list(CANVAS), "scale": 1, "place": [-527, -210], "sky_dim": 0.6,
+    return {"form": FORM, "canvas": list(CANVAS), "scale": 1, "place": [-527, -60], "sky_dim": 0.6,
             "anchors": {"target": [1347, 510], "core": [1347, 510], "head": [1347, 410],
                         "hands": [[647, 680], [1787, 630]], "melee": [1747, 590], "feet": [1347, 950]},
             "target_rect": [1170, 345, 360, 495],

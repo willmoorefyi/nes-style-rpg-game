@@ -1,11 +1,13 @@
 /**
- * The bestiary preview of a colossus form (docs/CHAOS_FORMS_PLAN.md 8, R22): a ColossusView at scale 1 (art px = screen
+ * The bestiary preview of a colossus form (docs/CHAOS_FORMS_PLAN.md 8, R22; rev 4: 18.8, D-O21). A built form shows
+ * the build's still (`colossus/<form>/preview.png`: the rest view over rim, fit into 940 x 720) centred at scale 1, with
+ * no layer tiles loaded. Without a still (the synthetic fixture, or a failed load) it shows a ColossusView at scale 1 (art px = screen
  * px, an integer scale) inside the preview panel. A canvas that fits (<= 940 x 720 art px) is drawn whole with its
  * `visibleBox` centred on the panel; a larger one shows the rest-view crop (the part inside `visibleBox`, masked), and
  * if even that does not fit, a crop centred on `core` clipped by the panel. A 1/n downscale is never used. One form is
  * loaded at a time (the last one's textures are released), and the loop plays idle, then attack, hurt and cast.
  */
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { colossusArt } from '../../rendering/ColossusArt.js';
 import { ColossusView } from '../battle/colossus/ColossusView.js';
@@ -24,8 +26,14 @@ const FIRST_WAIT = 40;
 const WAIT = 30;
 const LOOP = ['attack', 'hurt', 'cast'] as const;
 
+/** What the preview needs from the art (ColossusArt). */
+export type BestiaryColossusArt = ColossusArtLike & { loadedForms(): string[]; preview(id: string): Promise<Texture | null>;
+  releasePreview(): void };
+
 export class BestiaryColossus {
   view: ColossusView | null = null;
+  /** The build's still, when the form has one (18.8). */
+  still: Sprite | null = null;
   /** True when the canvas is cropped to the rest view (or the core) instead of drawn whole. */
   cropped = false;
   private ctl: ColossusPoseController | null = null;
@@ -36,7 +44,7 @@ export class BestiaryColossus {
   private wait = FIRST_WAIT;
   private next = 0;
 
-  constructor(private readonly parent: Container, private readonly art: ColossusArtLike & { loadedForms(): string[] } = colossusArt,
+  constructor(private readonly parent: Container, private readonly art: BestiaryColossusArt = colossusArt,
     private readonly inner: Inner = PANEL) {}
 
   get mode(): ColossusTimeline { return this.ctl?.timeline ?? 'idle'; }
@@ -44,14 +52,28 @@ export class BestiaryColossus {
   /** Show `enemy`'s colossus form (null or an atlas enemy: nothing). Resolves once drawn. */
   async show(enemy: EnemyData | null): Promise<void> {
     this.clear();
-    const id = colossusOf(enemy);
     const token = ++this.token;
+    this.art.releasePreview();
+    const id = enemy && colossusOf(enemy) ? this.art.entryFor(enemy) : null;
     this.art.release(this.art.loadedForms().filter((f) => f !== id));
     if (!id || !enemy) return;
-    await this.art.ensure([id]);
+    const tex = await this.art.preview(id);
     if (token !== this.token) return;
-    const spec = this.art.isReady(id) ? this.art.form(id) : null;
-    this.build(id, spec ?? placeholderForm(), variantOf(enemy));
+    if (tex) { this.showStill(tex); return; }
+    const entry = this.art.entryFor(enemy) ?? id;
+    await this.art.ensure([entry]);
+    if (token !== this.token) return;
+    const spec = this.art.isReady(entry) ? this.art.form(entry) : null;
+    this.build(entry, spec ?? placeholderForm(), variantOf(enemy));
+  }
+
+  private showStill(tex: Texture): void {
+    const [cx, cy] = panelCentre(this.inner);
+    const s = this.still = new Sprite(tex);
+    s.label = 'colossus.still';
+    s.position.set(Math.round(cx - tex.width / 2), Math.round(cy - tex.height / 2));
+    this.centre = { x: s.x + tex.width / 2, y: s.y + tex.height / 2 };
+    this.parent.addChild(s);
   }
 
   private build(id: string, spec: ColossusFormSpec, variant: Record<string, string>): void {
@@ -100,6 +122,8 @@ export class BestiaryColossus {
 
   /** Remove the shown form (its textures stay until the next show or dispose). */
   clear(): void {
+    this.still?.destroy();
+    this.still = null;
     this.view?.destroy();
     this.view = null;
     this.ctl = null;

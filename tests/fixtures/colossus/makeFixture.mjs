@@ -1,10 +1,12 @@
 // Writes the synthetic colossus fixtures (docs/CHAOS_FORMS_PLAN.md 9.2, R22; rev 4: 18.3-18.5): colossus.json plus its
 // PNG tiles, and contract.json (the json shape the Python build must write, 18.5; no tiles). Not game art.
-// - fixture_horizon: a painted F3 stand-in at the rev-4 geometry (canvas 2700x1080 at scale 1, place (-527, -210)):
+// - fixture_horizon: a painted F3 stand-in at the rev-4 geometry (canvas 2700x1080 at scale 1, place (-527, -60), D-U11):
 //   soft-alpha body cropped to rows 360-1079 (two tiles, 2048 + 652), an additive halo glow stored at half res
 //   (texScale 2), an additive corona patch, core patches `crack` / `open` (its `base` is empty: the body carries it).
 // - fixture_orrery: the rev-3 layered puppet (limbs, moons; flat boxes at scale 3), still supported by the view.
 // - fixture_wide: one 2600 px body (two tiles).
+// - chaos_orrery / chaos_horizon / chaos_horizon_core: the real ids on those tiles for `?colossus=fixture` (F4 an `art`
+//   entry at (-527, -285)).
 // Run: node tests/fixtures/colossus/makeFixture.mjs (deterministic; no dependencies).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -105,7 +107,7 @@ function openPx(x, y) {
 
 /** The rev-4 F3 form (18.3-18.5) under the id `id` (its tile files under `id/`). */
 const horizonForm = (id) => ({
-  canvas: [2700, 1080], scale: 1, place: [-527, -210], skyDim: 0.6,
+  canvas: [2700, 1080], scale: 1, place: [-527, -60], skyDim: 0.6,
   anchors: { target: [1347, 510], core: [1347, 510], head: [1347, 410], hands: [[647, 680], [1787, 630]], melee: [1747, 590], feet: [1347, 950] },
   targetRect: [1170, 345, 360, 495],
   layers: [
@@ -144,7 +146,10 @@ const wide = {
   layers: [layer(W, 'body', 'body', [['base', [0, 0], [2600, 300], 0x182030]])],
 };
 
-const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide } };
+// The browser check (`?colossus=fixture`): the real form ids on the fixture tiles. F3 is the horizon stand-in, F4 an `art`
+// entry at its own rest (D-U13), F2 the rev-3 puppet.
+const browser = { chaos_orrery: orrery, chaos_horizon: horizon, chaos_horizon_core: { art: 'chaos_horizon', place: [-527, -285] } };
+const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide, ...browser } };
 const tiles = new Map(files);
 files.clear();
 const contract = { version: 1, forms: { contract_form: horizonForm('contract_form') } };   // its tiles are not written

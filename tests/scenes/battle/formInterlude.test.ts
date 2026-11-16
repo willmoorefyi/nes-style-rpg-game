@@ -94,12 +94,13 @@ describe('validation', () => {
     expect(interludeProblems('x', [{ type: 'flash', color: '#fff', frames: 4, alpha: 1.5 }]).join()).toMatch(/alpha/);
   });
 
-  it('pan offsets stay inside the B4 border limits of the form they reveal (dx [-247, 521], dy [-80, 324] on F3)', () => {
+  it('pan offsets stay inside the B4 border limits of the form they reveal (dx [-247, 521], dy [-230, 174] on F3)', () => {
     const f = fixtureIndex().forms[HORIZON];
     expect(panProblems(I2, f)).toEqual([]);
-    expect(panProblems([{ type: 'pan', from: [0, -81], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
+    expect(panProblems([{ type: 'pan', from: [0, -231], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
+    expect(panProblems([{ type: 'pan', from: [0, 175], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
     expect(panProblems([{ type: 'pan', from: [522, 0], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
-    expect(panProblems([{ type: 'pan', from: [-247, 324], frames: 10, ease: 'out' }], f)).toEqual([]);
+    expect(panProblems([{ type: 'pan', from: [-247, 174], frames: 10, ease: 'out' }], f)).toEqual([]);
   });
 
   it('the registry reads the real battle-interludes.yaml: all four scripts, chaos_i2 with its rev-4 pan', () => {
