@@ -1,0 +1,197 @@
+sprite: ice_gigas
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:                        # R287: the far fist on the belly holds the haft; the axe head rests by the near (image-right) shoulder
+    crown: [60, 6]
+    neck: [60, 32]
+    chest: [52, 50]
+    hip: [54, 88]              # at the loincloth hem
+    sh_n: [72, 30]
+    el_n: [76, 52]
+    hand_n: [78, 74]
+    tip: [90, 28]
+    sh_f: [38, 28]
+    el_f: [30, 46]
+    hand_f: [62, 52]
+    hip_n: [68, 82]
+    knee_n: [70, 98]
+    foot_n: [72, 113]
+    toe_n: [80, 120]
+    hip_f: [45, 82]
+    knee_f: [42, 98]
+    foot_f: [38, 113]
+    toe_f: [42, 120]
+  attack:                      # the downward chop: both fists low at the haft, the axe head on the ground in front
+    crown: [72, 18]
+    neck: [70, 45]
+    chest: [55, 55]
+    hip: [52, 88]
+    sh_n: [78, 45]
+    el_n: [78, 70]
+    hand_n: [78, 92]
+    tip: [95, 110]
+    sh_f: [45, 32]
+    el_f: [52, 62]
+    hand_f: [74, 88]
+    hip_n: [63, 88]
+    knee_n: [66, 98]
+    foot_n: [66, 113]
+    toe_n: [76, 120]
+    hip_f: [42, 82]
+    knee_f: [28, 95]
+    foot_f: [10, 112]
+    toe_f: [8, 120]
+  hurt:                        # hunched back to the left, the near fist still holds the axe up on the right
+    crown: [25, 10]
+    neck: [35, 30]
+    chest: [45, 45]
+    hip: [55, 88]
+    sh_n: [50, 40]
+    el_n: [60, 46]
+    hand_n: [72, 42]
+    tip: [90, 32]
+    sh_f: [22, 32]
+    el_f: [20, 48]
+    hand_f: [55, 58]
+    hip_n: [68, 80]
+    knee_n: [68, 97]
+    foot_n: [66, 113]
+    toe_n: [75, 120]
+    hip_f: [40, 80]
+    knee_f: [32, 97]
+    foot_f: [28, 113]
+    toe_f: [24, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  axe:
+    kind: prop
+    bone: {idle: [hand_f, tip], attack: [hand_n, tip], hurt: [hand_n, tip]}
+    radius: 1.5
+    in: [idle, attack, hurt]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # the upper body (hip up, both arms, the axe) translated as one piece (moves []): no part
+                               # moves against another, so no seam ink opens; only the attack-sourced axe turns (atk_mid)
+  atk_wind1:                   # lean back 3, crouched 3 lower
+    moves: []
+    t: 0.0
+    dy: 3
+    tweaks: {hip: [-3, 0], chest: [-3, 0], neck: [-3, 0], crown: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], tip: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0]}
+  atk_wind2:                   # coil: lean back 5, crouched 8 lower (t 0.15: the crouch is the attack's height)
+    moves: []
+    t: 0.15
+    dy: 8
+    tweaks: {hip: [-5, 0], chest: [-5, 0], neck: [-5, 0], crown: [-5, 0], sh_n: [-5, 0], el_n: [-5, 0], hand_n: [-5, 0], tip: [-5, 0], sh_f: [-5, 0], el_f: [-5, 0], hand_f: [-5, 0]}
+  atk_mid:                     # the chop comes down: the attack upper body 7 back (hip 2) and 5 higher, the axe 27 deg up (still swinging)
+    moves: []
+    dy: -5
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-2, 0], chest: [-7, 0], neck: [-7, 0], crown: [-7, 0], sh_n: [-7, 0], el_n: [-7, 0], hand_n: [-7, 0], tip: [-3, -10], sh_f: [-7, 0], el_f: [-7, 0], hand_f: [-7, 0], knee_f: [8, 0], foot_f: [8, 0], knee_n: [3, 0], foot_n: [3, 0], hip_n: [0, 5], hip_f: [0, 5]}
+  atk_follow:                  # rebound: the attack upper body and axe 2 back and 3 up
+    moves: []
+    t: 0.8
+    dy: -3
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-2, 0], chest: [-2, 0], neck: [-2, 0], crown: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], tip: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_recover:                 # idle pixels still crouched 9 from the chop and 3 back, the axe back on the shoulder
+    moves: []
+    dy: 9
+    tweaks: {hip: [-3, 0], chest: [-3, 0], neck: [-3, 0], crown: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], tip: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0]}
+  hurt_in1:                    # recoil: the upper body and axe 3 back and 1 down
+    moves: []
+    tweaks: {hip: [-3, 1], chest: [-3, 1], neck: [-3, 1], crown: [-3, 1], sh_n: [-3, 1], el_n: [-3, 1], hand_n: [-3, 1], tip: [-3, 1], sh_f: [-3, 1], el_f: [-3, 1], hand_f: [-3, 1]}
+  hurt_in2:                    # the hurt pose 4 back toward idle (translated)
+    moves: []
+    tweaks: {chest: [4, 0], neck: [4, 0], crown: [4, 0], sh_n: [4, 0], el_n: [4, 0], hand_n: [4, 0], tip: [4, 0], sh_f: [4, 0], el_f: [4, 0], hand_f: [4, 0]}
+  daze:                        # slump: the upper body 3 lower and 1 forward
+    moves: []
+    dy: 2
+    tweaks: {hip: [1, 1], chest: [1, 1], neck: [1, 1], crown: [1, 1], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1], tip: [1, 1], sh_f: [1, 1], el_f: [1, 1], hand_f: [1, 1]}
+  daze_b:                      # the slump 1 lower
+    moves: []
+    dy: 3
+    tweaks: {hip: [1, 1], chest: [1, 1], neck: [1, 1], crown: [1, 1], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1], tip: [1, 1], sh_f: [1, 1], el_f: [1, 1], hand_f: [1, 1]}
+masks:
+  head:                        # head and beard only: the fur mantle stays with the shoulders and torso
+    idle: [[50, 1], [71, 1], [73, 20], [71, 40], [66, 49], [56, 49], [52, 40], [50, 20]]
+    attack: [[61, 15], [82, 15], [84, 40], [78, 72], [70, 72], [62, 45], [60, 25]]
+    hurt: [[16, 7], [38, 7], [40, 30], [30, 34], [16, 28]]
+  farm_f:                      # the whole far forearm (else the pec / belly wedge between its edges tears off it)
+    hurt: [[14, 44], [30, 46], [50, 50], [62, 54], [64, 60], [58, 66], [30, 63], [16, 53]]
+    attack: [[40, 55], [52, 56], [66, 68], [80, 86], [80, 94], [72, 96], [58, 78], [44, 64]]
+  axe:
+    idle: [[59, 54], [75, 22], [74, 12], [104, 12], [104, 45], [80, 45], [79, 30], [66, 54]]   # head and the whole haft (in front of the beard)
+    attack: [[77, 91], [92, 96], [100, 95], [108, 100], [108, 124], [82, 124], [82, 118], [78, 112], [74, 104], [76, 98]]   # the near boot toe stays off the axe
+    hurt: [[76, 18], [104, 18], [104, 50], [76, 50]]
+  ft_f:
+    idle: [[25, 113], [51, 113], [51, 124], [25, 124]]
+  ft_n:
+    idle: [[57, 113], [90, 113], [90, 124], [57, 124]]
+holds: []
+paint:
+  # atk_wind2 / atk_follow: 1 px notches the hip shift opens between the loincloth hem and the thighs, outline ink
+  - {frame: atk_wind2, rgb: [6, 4, 10], xy: [[61, 90]]}
+  - {frame: atk_follow, rgb: [6, 4, 10], xy: [[55, 87], [57, 87], [42, 90], [39, 91]]}
+  # atk_follow: ink specks the 3 px lift leaves on the near fur cuff, cuff colours
+  - {frame: atk_follow, rgb: [99, 115, 140], xy: [[62, 97]]}
+  - {frame: atk_follow, rgb: [123, 148, 165], xy: [[61, 97]]}
+  - {frame: atk_follow, rgb: [156, 173, 189], xy: [[64, 97]]}
+  # hurt_in2: the ink cracks the 4 px shift opens along the far forearm / chest edge and at the near wrist, the hurt key's own colours
+  - {frame: hurt_in2, rgb: [123, 148, 165], xy: [[43, 38], [44, 39], [35, 43]]}
+  - {frame: hurt_in2, rgb: [66, 82, 107], xy: [[46, 38], [37, 45]]}
+  - {frame: hurt_in2, rgb: [74, 107, 140], xy: [[47, 39], [40, 47], [62, 52]]}
+  - {frame: hurt_in2, rgb: [24, 33, 57], xy: [[50, 39]]}
+  - {frame: hurt_in2, rgb: [99, 115, 140], xy: [[36, 44]]}
+  - {frame: hurt_in2, rgb: [33, 49, 82], xy: [[38, 46]]}
+  - {frame: hurt_in2, rgb: [49, 90, 123], xy: [[39, 46]]}
+  - {frame: hurt_in2, rgb: [90, 140, 165], xy: [[41, 47], [42, 47]]}
+  - {frame: hurt_in2, rgb: [107, 173, 189], xy: [[43, 47], [61, 52]]}
+  - {frame: hurt_in2, rgb: [165, 206, 222], xy: [[61, 51]]}
+  - {frame: hurt_in2, rgb: [156, 173, 189], xy: [[63, 52]]}
+  # atk_mid: pinholes the 5 px lean (hip 2) opens in the loincloth and at the hem, loincloth shadow
+  - {frame: atk_mid, rgb: [24, 33, 57], xy: [[61, 62], [38, 76], [38, 77], [39, 77], [54, 85]]}
+  - {frame: atk_mid, rgb: [41, 66, 99], xy: [[37, 77]]}
+  # atk_mid: the ink crack the lean opens along the far forearm's top edge (and at the far shoulder), the attack key's skin colours
+  - {frame: atk_mid, rgb: [189, 231, 231], xy: [[29, 47], [33, 52], [33, 53], [53, 56], [53, 57], [54, 57], [54, 58], [55, 58], [55, 59], [56, 59], [56, 60], [57, 60], [58, 60], [58, 61], [59, 61], [59, 62], [60, 62], [60, 63], [61, 64]]}
+  - {frame: atk_mid, rgb: [156, 173, 189], xy: [[34, 54]]}
+  - {frame: atk_mid, rgb: [165, 206, 222], xy: [[49, 54], [52, 55], [52, 56], [61, 63]]}
+  - {frame: atk_mid, rgb: [132, 189, 206], xy: [[51, 55]]}
+  # daze / daze_b / atk_follow: ink cracks the translations open inside the mantle, loincloth and near cuff, restored to the
+  # source key's colours at the shifted spot
+  - {frame: daze, rgb: [132, 189, 206], xy: [[53, 15], [53, 16]]}
+  - {frame: daze, rgb: [156, 173, 189], xy: [[34, 22], [46, 29]]}
+  - {frame: daze, rgb: [165, 206, 222], xy: [[35, 22], [47, 30], [56, 31], [61, 44]]}
+  - {frame: daze, rgb: [189, 231, 231], xy: [[45, 27], [46, 28]]}
+  - {frame: daze, rgb: [66, 82, 107], xy: [[55, 31]]}
+  - {frame: daze, rgb: [123, 148, 165], xy: [[47, 32]]}
+  - {frame: daze, rgb: [24, 33, 57], xy: [[57, 38]]}
+  - {frame: daze, rgb: [33, 49, 82], xy: [[69, 78]]}
+  - {frame: daze_b, rgb: [132, 189, 206], xy: [[53, 16], [53, 17]]}
+  - {frame: daze_b, rgb: [156, 173, 189], xy: [[34, 23], [46, 30]]}
+  - {frame: daze_b, rgb: [165, 206, 222], xy: [[35, 23], [47, 31], [56, 32], [61, 45]]}
+  - {frame: daze_b, rgb: [189, 231, 231], xy: [[45, 28], [46, 29]]}
+  - {frame: daze_b, rgb: [66, 82, 107], xy: [[55, 32]]}
+  - {frame: daze_b, rgb: [123, 148, 165], xy: [[47, 33]]}
+  - {frame: daze_b, rgb: [24, 33, 57], xy: [[57, 39]]}
+  - {frame: daze_b, rgb: [33, 49, 82], xy: [[69, 79]]}
+  - {frame: atk_follow, rgb: [24, 33, 57], xy: [[39, 74], [36, 82]]}
+  - {frame: atk_follow, rgb: [33, 49, 82], xy: [[40, 75], [35, 81]]}
+  - {frame: atk_follow, rgb: [41, 66, 99], xy: [[39, 76], [37, 79], [36, 80]]}
+  - {frame: atk_follow, rgb: [90, 140, 165], xy: [[32, 81], [62, 81]]}
+  - {frame: atk_follow, rgb: [49, 90, 123], xy: [[59, 83]]}
+  - {frame: atk_follow, rgb: [74, 107, 140], xy: [[60, 84]]}
+  - {frame: atk_follow, rgb: [24, 33, 57], xy: [[58, 96]]}
+  - {frame: atk_follow, rgb: [165, 206, 222], xy: [[66, 97]]}
+  - {frame: atk_follow, rgb: [189, 231, 231], xy: [[66, 98], [73, 99]]}
+  # daze / daze_b: the pinhole and its ink ring the slump opens in the far-shoulder mantle, the idle colours
+  - {frame: daze, rgb: [156, 173, 189], xy: [[46, 30], [47, 31]]}
+  - {frame: daze, rgb: [99, 115, 140], xy: [[46, 31]]}
+  - {frame: daze, rgb: [33, 49, 82], xy: [[46, 32]]}
+  - {frame: daze_b, rgb: [156, 173, 189], xy: [[46, 31], [47, 32]]}
+  - {frame: daze_b, rgb: [99, 115, 140], xy: [[46, 32]]}
+  - {frame: daze_b, rgb: [33, 49, 82], xy: [[46, 33]]}

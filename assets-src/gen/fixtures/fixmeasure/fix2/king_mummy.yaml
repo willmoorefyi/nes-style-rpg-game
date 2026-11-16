@@ -1,0 +1,126 @@
+sprite: king_mummy
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# idle: upright, the crook sceptre upright in the near fist, the far arm hanging; attack: a long lunge to the right, the
+# sceptre raised upright before the chest in both hands; hurt: knocked back to the left, the masked head tilted back,
+# the free (far) hand flung up, the sceptre upright in the near fist, the near foot lifted
+keyframes:
+  idle:
+    crown: [34, 5]
+    neck: [36, 25]
+    chest: [36, 33]
+    hip: [36, 49]
+    sh_n: [44, 30]
+    el_n: [47, 38]
+    hand_n: [54, 34]
+    tip: [56, 15]
+    sh_f: [27, 28]
+    el_f: [24, 38]
+    hand_f: [23, 48]
+    hip_n: [41, 52]
+    knee_n: [43, 62]
+    foot_n: [44, 71]
+    toe_n: [49, 74]
+    hip_f: [31, 52]
+    knee_f: [28, 62]
+    foot_f: [26, 71]
+    toe_f: [24, 75]
+  attack:
+    crown: [30, 9]
+    neck: [33, 26]
+    chest: [34, 33]
+    hip: [32, 46]
+    sh_n: [38, 30]
+    el_n: [41, 35]
+    hand_n: [46, 30]
+    tip: [50, 7]
+    sh_f: [28, 29]
+    el_f: [37, 33]
+    hand_f: [46, 22]
+    hip_n: [37, 47]
+    knee_n: [43, 57]
+    foot_n: [42, 70]
+    toe_n: [46, 74]
+    hip_f: [28, 48]
+    knee_f: [20, 58]
+    foot_f: [11, 69]
+    toe_f: [9, 73]
+  hurt:
+    crown: [11, 17]
+    neck: [24, 30]
+    chest: [30, 36]
+    hip: [33, 48]
+    sh_n: [36, 33]
+    el_n: [42, 31]
+    hand_n: [50, 31]
+    tip: [51, 14]
+    sh_f: [30, 29]
+    el_f: [36, 24]
+    hand_f: [38, 14]
+    hip_n: [38, 50]
+    knee_n: [44, 56]
+    foot_n: [46, 66]
+    toe_n: [52, 67]
+    hip_f: [29, 50]
+    knee_f: [29, 60]
+    foot_f: [22, 71]
+    toe_f: [22, 74]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: head back, sceptre fist hoisted
+    t: 0.15
+    dy: 2
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-1, 0], sh_n: [-1, 0], el_n: [-2, -1], hand_n: [-3, -3], tip: [-3, -3]}
+  atk_wind2:                   # crouch (recipe dy 2), head drawn back, the sceptre hoisted and pulled back
+    t: 0.35
+    dy: 4
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f]
+    tweaks: {crown: [-5, 0], neck: [-4, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-5, -3], hand_n: [-7, -6], tip: [-7, -6]}
+  atk_mid:
+    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [4, 0], foot_f: [5, 0], toe_f: [5, 0], knee_n: [1, 0], foot_n: [1, 0], toe_n: [1, 0]}
+    moves: [chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:
+    t: 0.65
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, tip, hip_n, knee_n, hip_f, knee_f]
+  atk_recover:
+    t: 0.35
+    pins: [foot_n, foot_f, toe_n, toe_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f, sh_n, el_n, hand_n, tip]
+    tweaks: {crown: [-1, 0], neck: [-1, 0], knee_f: [-1, 0]}
+  hurt_in1:                    # flinch: head knocked back (translated), the free hand jerks up, the sceptre fist up
+    moves: []
+    tweaks: {crown: [-5, 1], neck: [-3, 1], chest: [-1, 0], sh_f: [0, -1], el_f: [1, -3], hand_f: [2, -5], el_n: [0, -1], hand_n: [0, -2], tip: [0, -2]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+  daze:                        # slump: head dropped forward, the free arm hangs lower, the sceptre fist sinks
+    moves: [crown, neck, chest]
+    tweaks: {crown: [2, 1], neck: [1, 1], el_f: [0, 2], hand_f: [0, 3], hand_n: [0, 1], tip: [0, 1]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [2, 0], neck: [1, 0], el_f: [0, 2], hand_f: [0, 3], hand_n: [0, 1], tip: [0, 1]}
+masks:
+  weapon:
+    idle: [[50, 12], [61, 12], [61, 30], [59, 30], [59, 54], [51, 54], [51, 37], [50, 30]]
+    attack: [[43, 3], [57, 3], [57, 18], [52, 18], [52, 45], [43, 45], [44, 34], [44, 18]]
+    hurt: [[46, 11], [57, 11], [57, 28], [54, 28], [54, 50], [47, 50], [48, 34], [47, 22]]
+  ft_n:
+    idle: [[38, 69], [54, 69], [54, 78], [38, 78]]
+    attack: [[36, 69], [52, 69], [52, 78], [36, 78]]
+    hurt: [[42, 64], [56, 64], [56, 71], [42, 71]]
+  ft_f:
+    idle: [[19, 69], [32, 69], [32, 78], [19, 78]]
+    attack: [[4, 66], [17, 66], [17, 78], [4, 78]]
+    hurt: [[15, 69], [29, 69], [29, 78], [15, 78]]
+holds: []
+paint:                         # 1 px crack between the shins the bent near knee opens, outline ink
+  - {frame: atk_wind1, xy: [[39, 60]], rgb: [6, 4, 10]}

@@ -113,11 +113,12 @@ def _mode_fill(a: np.ndarray, sel: np.ndarray) -> dict[tuple[int, int], tuple[in
 
 
 def select(a: np.ndarray, rgb=None, box: Box | None = None, component: tuple[int, int] | None = None,
-           holes_min: int | None = None, mode: bool = True, to=None) -> list[dict]:
+           holes_min: int | None = None, mode: bool = True, to=None, within: np.ndarray | None = None) -> list[dict]:
     """Selected pixels as rig `paint` entries [{rgb, xy}] (no `frame`): by colour (`rgb`), the fill component holding
     pixel `component`, or the enclosed holes >= holes_min, each limited to `box`. With `to` every pixel gets that colour
-    (None with mode=False: null = transparent); with `mode` each gets its 4-neighbour mode colour."""
-    sel = _in_box(a.shape, box)
+    (None with mode=False: null = transparent); with `mode` each gets its 4-neighbour mode colour. `within` (FW-M2)
+    limits the selection to a region mask."""
+    sel = _in_box(a.shape, box) & (within if within is not None else True)
     if rgb:
         sel &= _rgb_mask(a, rgb)
     if component is not None:

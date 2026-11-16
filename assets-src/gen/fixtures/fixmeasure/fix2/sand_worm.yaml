@@ -1,0 +1,27 @@
+# Sand Worm (pass R, serpent): an ochre worm of armoured rings bursting up in an S from a pale sand mound, a
+# four-lobed bud jaw. body: serpent (rig_serpent.py): the mound is the pinned coil, the S rises from body0; the head is
+# rigid from the bud's back to its tip (the gigas_worm layout).
+sprite: sand_worm
+body: serpent
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {c_f: [47, 121], c_n: [92, 121], body0: [72, 99], body1: [62, 80], neck: [48, 46], head: [72, 36], snout: [100, 40]}
+  attack: {c_f: [39, 121], c_n: [84, 121], body0: [62, 99], body1: [49, 78], neck: [38, 48], head: [80, 44], snout: [112, 52]}
+  hurt:   {c_f: [49, 121], c_n: [94, 121], body0: [74, 99], body1: [64, 78], neck: [50, 52], head: [72, 46], snout: [100, 52]}
+masks:
+  body:
+    hurt: [[78, 66], [98, 66], [98, 98], [78, 98]]
+  head:
+    idle: [[68, 24], [106, 24], [106, 58], [72, 58], [68, 44]]
+    attack: [[76, 26], [120, 26], [120, 76], [80, 76], [76, 52]]
+    hurt: [[68, 30], [106, 30], [106, 70], [72, 70], [68, 52]]
+frames:
+  # the worm sinks into its mound and leans into the strike (gigas_worm draws back, lava_worm ducks only its head)
+  atk_wind1: {t: 0.10, dy: 1}
+  atk_wind2: {t: 0.20, dy: 2}
+  atk_mid: {t: 0.20, moves: [neck, head, snout]}   # the attack mound is 8 px further left (the mound never moves)
+  daze: {moves: [neck, head, snout], dy: 1}
+  daze_b: {moves: [neck, head, snout], dy: 2}
+holds: []
