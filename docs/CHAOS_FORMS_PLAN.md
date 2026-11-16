@@ -1434,6 +1434,8 @@ factor, a lower placement that covers more of the party, or a different composit
 | D-O20 (rev 4) | Glow extraction | G1 "diff" (render minus cut over the sky base), G2 luminance key as the fallback |
 | D-O21 (rev 4) | Bestiary preview for colossus forms | a pre-composited still at fit size (18.8) |
 | D-O22 (rev 4) | Glow storage | half res, shown at 2x linear (low-frequency light) |
+| D-O23 (C5) | Glow pulse depth | the glow's rest-alpha pulse deepened 1.0 <-> 0.7 (was 0.85) so it reads; corona and the flares unchanged (`GLOW_PULSE_MIN`, `ColossusView.test`) |
+| D-O24 (C5) | F4 place | kept at (-527, -285) (user ruling); about 45 px of the disc top sits under the message window at F4's rest: an accepted nit, for the C6 play test to judge |
 | B2 (rev 4) | Ring criterion | one criterion, pinned from measurement on the approved art with a 3-point margin (about >= 20 % visible arc); ring geometry corrected (centre about render (900, 380), r about 375, band about 50 render px / 75 px at 2700); place_y tuned for party readability only |
 | B3 (rev 4) | Glow at half res | a per-frame `texScale` field (`formProblems`, the build, the contract fixture and test) |
 | B7 (rev 4) | Budget | `f4_variant` cap 2 (used), 2 freed to `reserve` (31); the reserve only for calls <= $0.08; the true worst case for the remaining calls is $7.60; pinned thresholds may only tighten the floors |
@@ -1465,25 +1467,25 @@ factor, a lower placement that covers more of the party, or a different composit
 - [x] C1 TS-B: enemyHp.ts single write path (5 sites, static test), bossForms.ts (floor at ceil(t*pool), pending, hook in executeNextAction + prepareRound, checkBossPhases skips form phases, crossedPhases reset, phaseBuffs, queued command re-chosen, enemyAi override dropped, FormChangeResult), slamAttack.ts with the A4 touch points (validation :43, aiPattern :18, EnemyAiAction, BattleCommand, peekNextAction 'slam', 2 damage events, crossFileValidation :452 pin), types + validators + cross-file rules, 3.6 records as stubs, R11 formOf filters + pin updates; 9.1 tests RED -> GREEN; ceilings held (high, 1.5d)
 - [x] C1 TS-V: BattleLayers `colossus`, shake on colossus, ColossusView + colossusChoreography + ColossusPoseController behind EnemyActorView, anchor overrides (numbers, cursor bracket, status row, effectBox, melee point), proxy Container + consumer routing + upgradeToArt guard, per-layer hurt flash, nearest scaleMode + texture release, enemyAnimPreview support, InterludeRegistry + formInterlude (R18 timing, with: previous) + FormInterludePlayer + variant/pan steps, formChangeView + battle:formChange; 900x520 fixture; 9.2 tests RED -> GREEN; R16 line budgets (high, 2.5d)
 - [x] C1 exit -> C-base: merge, tsc/build/vitest, selftests, atlas byte-identical, check --all unchanged, colossus stage no-op, R28 regression gate (high, 1h) — C-base recorded 2026-11-16 on `roster-int` (section 10, "C-base result")
-- [ ] C2 GEN (first step): copy /tmp/stab2/sd35_v3_raw.png -> assets-src/backgrounds/rim-src.png (+ rim-src.json, sha256 in ROSTER_LOG) before /tmp can be lost (high, 0.25h)
+- [x] C2 GEN (first step): copy /tmp/stab2/sd35_v3_raw.png -> assets-src/backgrounds/rim-src.png (+ rim-src.json, sha256 in ROSTER_LOG) before /tmp can be lost (high, 0.25h)
 - [x] C2 FW-C follow-up: `outpaint` in `bedrock.py MODELS`; `colossus.py outpaint / search_replace / structure` (`colossus_edit.py`), selftested RED -> GREEN, 0 paid (medium, 2h)
-- [ ] C2 GEN: read-only identity + list-foundation-models recorded (stop on Admin/Prod), prices -> ROSTER_LOG; V0-a..e for F3 (<= 12 calls: a3 e4 b2 d2 spare1), one call per background command; report -> G-C0: continue or stop and report to the user (high, 4h)
-- [ ] C2 FW-C/GEN: stage rim (entry 485 / 1.05 / 370, user-accepted, 0 calls); --check rim; rim_floor cut; commit rim.webp + rim_floor.webp (medium, 2h)
-- [ ] C3 GEN: **F3 master first** (S-B render + outpaint, <= 24 gen + 10 nobg), stage mock, review, approve, commit (high, 1d)
-- [ ] C3 GEN: F2 master (<= 8 gen + 4 nobg), review, approve, commit; cut first under D-O13 (medium, 3h)
-- [ ] C2' FW-C (`c2-fw2`): upscale + inpaint + glow (diff/lum) + despill subcommands via bedrock.invoke; rev-4 caps in budget.json; colossus.json shape = the TS contract (frames.base / at / size / frame-relative tiles, targetRect [x,y,w,h], blend, alpha); selftest_colossus_art.py:200-204 + the 18.7 checks; committed contract fixture; retire.py --colossus for the v1 masters (high, 1d)
-- [ ] C2' TS-V (+ momus B3/B5/B8): `texScale` per frame in formProblems, BattleMessage.interlude?, the sky-dim reset + skyDim.test, linear textures, blend add + rest alpha from the json (drop colossusChoreography.ts:92's 0.5), sub-pixel motion, per-layer hurt filter, painted timelines (18.3), rise-ends-at-pan, border / column-span / ring tests on a 2700x1080 fixture, colossusContract.test, bestiary still, F2 release after swap (high, 1.5d)
-- [ ] C2' TS-B: interludes on non-form phases; chaos_crack (variant core crack) on F3's 0.25 phase; F3/F4 data and anchors from the json; interludes.test totals (medium, 4h)
-- [ ] C3' GEN: archive chaos_horizon_v1 / chaos_orrery_v1; **F3 first**: upscale (<= 2) -> nobg (<= 1) -> glow -> despill -> mock + side-by-side -> fresh review vs the picked original -> approve -> commit (high, 1d)
-- [ ] C3' GEN: F2 from f2_finish/finish.png at 1320x900 (0-1 calls), glow from o12_metal raw/nobg, review, approve, commit (medium, 4h)
-- [ ] C3' GEN/RIG: F4 open + F3 crack via inpaint on the upscaled chest (<= 4 + 4), composite inside the mask, review, approve, commit (high, 1d)
-- [ ] C4 RIG (rev 4): painted layer yaml (body, glow, corona, core frames), measured anchors, place_y tuned for the ring arc, build, lock, commit right after lock (high, 1d)
-- [ ] C4 RIG: F3 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
-- [ ] C4 RIG: F2 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
-- [ ] C4 RIG/GEN: F4 core variant (search_replace <= 4 or paint), lock (medium, 2h)
-- [ ] C4 TS-B: interludes chaos_i1..i3, final form data, scenarios chaos_forms / chaos_final (enemyStatus preset) / chaos_interlude_1..3 with background: assets/backgrounds/rim.webp, bestiary data + lore (medium, 4h)
-- [ ] C4 TS-V: real colossus.json wiring, bestiary sub-entries + colossus preview (rest-view crop for > 940 px) (medium, 4h)
-- [ ] C5: section 11 validation (each long command background + Monitor), browser checks, fresh screenshot review (4 questions), docs (13), C results table (high, 4h)
+- [x] C2 GEN: read-only identity + list-foundation-models recorded (stop on Admin/Prod), prices -> ROSTER_LOG; V0-a..e for F3 (<= 12 calls: a3 e4 b2 d2 spare1), one call per background command; report -> G-C0: continue or stop and report to the user (high, 4h)
+- [x] C2 FW-C/GEN: stage rim (entry 485 / 1.05 / 370, user-accepted, 0 calls); --check rim; rim_floor cut; commit rim.webp + rim_floor.webp (medium, 2h)
+- [x] (rev 4: superseded by C3', the pixel master archived as chaos_horizon_v1) C3 GEN: **F3 master first** (S-B render + outpaint, <= 24 gen + 10 nobg), stage mock, review, approve, commit (high, 1d)
+- [x] (rev 4: superseded by C3', archived as chaos_orrery_v1) C3 GEN: F2 master (<= 8 gen + 4 nobg), review, approve, commit; cut first under D-O13 (medium, 3h)
+- [x] C2' FW-C (`c2-fw2`): upscale + inpaint + glow (diff/lum) + despill subcommands via bedrock.invoke; rev-4 caps in budget.json; colossus.json shape = the TS contract (frames.base / at / size / frame-relative tiles, targetRect [x,y,w,h], blend, alpha); selftest_colossus_art.py:200-204 + the 18.7 checks; committed contract fixture; retire.py --colossus for the v1 masters (high, 1d)
+- [x] C2' TS-V (+ momus B3/B5/B8): `texScale` per frame in formProblems, BattleMessage.interlude?, the sky-dim reset + skyDim.test, linear textures, blend add + rest alpha from the json (drop colossusChoreography.ts:92's 0.5), sub-pixel motion, per-layer hurt filter, painted timelines (18.3), rise-ends-at-pan, border / column-span / ring tests on a 2700x1080 fixture, colossusContract.test, bestiary still, F2 release after swap (high, 1.5d)
+- [x] C2' TS-B: interludes on non-form phases; chaos_crack (variant core crack) on F3's 0.25 phase; F3/F4 data and anchors from the json; interludes.test totals (medium, 4h)
+- [x] C3' GEN: archive chaos_horizon_v1 / chaos_orrery_v1; **F3 first**: upscale (<= 2) -> nobg (<= 1) -> glow -> despill -> mock + side-by-side -> fresh review vs the picked original -> approve -> commit (high, 1d)
+- [x] C3' GEN: F2 from f2_finish/finish.png at 1320x900 (0-1 calls), glow from o12_metal raw/nobg, review, approve, commit (medium, 4h)
+- [x] (D-U12, D-U13) C3' GEN/RIG: F4 open + F3 crack via inpaint on the upscaled chest (<= 4 + 4), composite inside the mask, review, approve, commit (high, 1d)
+- [x] C4 RIG (rev 4): painted layer yaml (body, glow, corona, core frames), measured anchors, place_y tuned for the ring arc, build, lock, commit right after lock (high, 1d)
+- [x] (rev 4: painted layers, no bake) C4 RIG: F3 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
+- [x] (rev 4: painted layers, no bake) C4 RIG: F2 layers/glow/bake, review (<= 4 iter), lock, commit right after lock (high, 1d)
+- [x] (rev 4: inpaint, D-U13) C4 RIG/GEN: F4 core variant (search_replace <= 4 or paint), lock (medium, 2h)
+- [x] C4 TS-B: interludes chaos_i1..i3, final form data, scenarios chaos_forms / chaos_final (enemyStatus preset) / chaos_interlude_1..3 with background: assets/backgrounds/rim.webp, bestiary data + lore (medium, 4h)
+- [x] C4 TS-V: real colossus.json wiring, bestiary sub-entries + colossus preview (rest-view crop for > 940 px) (medium, 4h)
+- [ ] C5 (2026-11-16, ROSTER_LOG "Pass C: C5"): 11.1 / 11.2 gates all green, browser checks run, docs (13: AGENTS.md, NEW_MONSTER_GUIDE 3.8) done; **open:** the bestiary form sub-entries are not wired into the scene (P1), and the fresh review answered 'partly' to questions 3 and 4. Original item: section 11 validation (each long command background + Monitor), browser checks, fresh screenshot review (4 questions), docs (13), C results table (high, 4h)
 - [ ] C6: fresh adversarial play test; 'Pass C test' rows (high, 4h)
 - [ ] C7: fix round if needed (plan, momus, fixes, re-test); pin balance bounds (medium, 1-2d)
 ```
@@ -1685,7 +1687,7 @@ and rays the user liked (*measured*: 18 colours, binary alpha; its glow 5 colour
 | Layer | Content | Blend | Rest alpha | Runtime |
 |---|---|---|---|---|
 | `body` | the despilled cut, full res | normal | 1 | breathing: dy 0 -> -4 px, sinusoidal, 144-frame loop (sub-pixel); the attack dip / slam; per-layer hurt flash |
-| `glow` | the G1 / G2 extraction (halo ring + rays + corona), stored at half res and shown at 2x (18.6) | **add** | **1.0** | slow pulse 0.85 <-> 1.0 (288 frames); cast / beam flare to 1.0 plus 10 % scale-free brightening via alpha 1 and the `corona` layer |
+| `glow` | the G1 / G2 extraction (halo ring + rays + corona), stored at half res and shown at 2x (18.6) | **add** | **1.0** | slow pulse **0.7** <-> 1.0 (288 frames; deepened from 0.85 at C5, orchestrator ruling, so the pulse is noticeable); cast / beam flare to 1.0 plus 10 % scale-free brightening via alpha 1 and the `corona` layer |
 | `corona` | the inner ring around the disc, a full-res patch cut from the glow | **add** | 1.0 | faster pulse 0.8 <-> 1.0 (96 frames); beam flare |
 | `core` | chest patch frames: `crack` (F3 below 0.25) and `open` (F4); `base` is empty (the body carries it) | normal | 1 | the `variant` step |
 
@@ -1893,3 +1895,18 @@ it.**
   - Spent so far: about $0.9.
 - `budget.json` gets the new caps in one commit. `selftest_passv` and `budget --check` must stay green, and the A6
   rule (an unknown purpose is refused) covers `f3_upscale`, `f2_upscale` and `f4_inpaint` only once they are listed.
+
+---
+
+## C results (measured at C5, 2026-11-16)
+
+| Item | Value |
+|---|---|
+| F2 `chaos_orrery` | canvas 1320x900, scale 1, place (40, 25); layers body, glow (add, rest 1.0) |
+| F3 `chaos_horizon` | canvas 2700x1080, scale 1, place (-527, -60); layers body, core (crack, open), glow (add, rest 1.0, texScale 2) |
+| F4 `chaos_horizon_core` | F3's art at place (-527, -285), `colossusVariant: {core: open}`; about 45 px of the disc top under the message window (accepted, D-O24) |
+| Glow pulse | 1.0 <-> 0.7 over 288 frames (D-O23); corona 1.0 <-> 0.8 over 96 |
+| Colossus memory | 16.9 MB RGBA, 10 files (cap 24); 5 tiles live at F3 / F4, 0 after the battle |
+| Bedrock calls / cost | 25 of 80 (BR ledger); about $0.9 spent before C3' (18.9), C3' calls in ROSTER_LOG |
+| Gemini | 405 = N_C0 (no pass-C Gemini call) |
+| Tests | 249 files, 4871 tests |

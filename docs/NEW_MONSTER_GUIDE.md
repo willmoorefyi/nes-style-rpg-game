@@ -516,6 +516,37 @@ EOF
 - [ ] `docs/ACT1_LOG.md` has the image rows; AGENTS.md / `gen/README.md` updated if pipeline behaviour changed.
 - [ ] `git status` shows no `.env`, `out/`, scratch `cache/` entries or `/tmp` tools.
 
+## 3.8 Colossus forms (a painted, battlefield-scale boss; pass C, `docs/CHAOS_FORMS_PLAN.md` 18)
+
+A colossus form is a boss larger than the battlefield (Chaos F2 Orrery, F3 Last Horizon, F4 Core Laid Bare). It is
+**not** an atlas sheet and gets **no rig in-betweens**: it is full-resolution painted art at display scale 1 with soft
+alpha, linear filtering and light layered animation (breathing, glow / corona pulse, slam dip, hurt flash, dying).
+
+- **Art: Stability on Bedrock, only through `gen/colossus.py`.** Bedrock is allowed for colossus masters and their
+  edits (`gen`, `nobg`, `upscale` (Conservative), `inpaint` + `inpaint_merge` for chest variants, `structure`,
+  `search_replace`). The 2026-11-13 rejection still applies to in-betweens. Every call goes through
+  `bedrock.invoke(..., paid=True, purpose=P)`: P must be in `budget.json` `bedrock.per_purpose_caps`, the pass cap is
+  80, main checkout only, one row per request in the tracked `cache/bedrock_ledger.jsonl`. One call per background
+  command; check with `colossus.py budget --check`.
+- **Finish offline:** `colossus.py glow` (sky_base, despill, then the G1 diff / G2 luminance glow, with the 18.7
+  checks), `mock` (rim backdrop, party, side-by-side with the picked original), then a fresh image-only review against
+  the original (SHIP / SHIP WITH NITS / ITERATE, <= 4 iterations) and `approve` (archive first with
+  `retire.py --colossus <form>`; `approve` refuses to overwrite without it).
+- **Layers and place:** `gen/colossus/<form>.yaml` names the layers (`body` normal, `glow` and `corona` additive,
+  `core` variant frames such as `crack` / `open`), the rest `place`, anchors (core / target, head, hands, melee, feet)
+  and `targetRect`. Opaque canvas borders must stay off-screen or behind the windows in every frame (left <= -6, right
+  >= 1926, bottom >= 786; only feathered glow may sit under the message window). A data form (F4) reuses another
+  form's art with its own place and `colossusVariant`.
+- **Build:** `build_assets.py colossus` writes `assets/sprites/colossus/<art>/...` tiles (<= 2048), `preview.png` (the
+  bestiary still) and `colossus.json`, the contract `src/scenes/battle/colossus/colossusIndex.ts` reads
+  (`tests/scenes/battle/colossusContract.test.ts`). It must be deterministic (`--out DIR` under PYTHONHASHSEED 0 / 1);
+  the memory total is <= 24 MB. Then `colossus.py check <form>` and `lock <form>`; commit right after the lock.
+- **Data:** the form records carry `formOf: <base>` (no `num`; filtered from the bestiary list, shown as sub-entries),
+  `colossus: <art id>`, optional `colossusVariant`, `slam` (F3 only). The base boss's `bossPhases` name the next form
+  (`form`) and its `interlude` (`assets/data/battle-interludes.yaml`; cap 480 frames, `chaos_i2` 600).
+- **Browser:** `?mute=1&scenario=chaos_forms` (F1 -> F4), `chaos_final` (F3 with the status row; `&enemyAnim=loop`),
+  `chaos_interlude_1..3`, `&bestiary=<form id>`. Check numbers, cursor, status icons and the windows over the art.
+
 ## 4. Troubleshooting (symptom → cause → fix)
 
 | Symptom | Cause | Fix |

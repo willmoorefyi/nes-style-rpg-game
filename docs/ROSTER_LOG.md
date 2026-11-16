@@ -1379,3 +1379,72 @@ archive copies are in `chaos_horizon_v1`.
 
 The archives `_retired/chaos_horizon_v1` (pixel), `_retired/chaos_horizon_v2` (the first painted crack) and
 `_retired/chaos_orrery_v1` (pixel) are kept. Bedrock 25 of 80; Gemini 405 = N_C0.
+
+## Pass C: C5 (integrator, `roster-int`, 2026-11-16, 0 Bedrock calls, 0 Gemini calls)
+
+C1-C4 merged at 3561b5b. Orchestrator rulings applied first:
+- **Glow pulse deepened (D-O23):** the colossus glow's rest-alpha pulse is 1.0 <-> **0.7** (was 0.85), so it reads in
+  play; corona (0.8) and the cast / beam / slam flares unchanged. `GLOW_PULSE_MIN` in `colossusChoreography.ts`;
+  `ColossusView.test` pins the 0.7 floor and the 1.0 peak on the fixture.
+- **F4 place kept at (-527, -285) (D-O24, user ruling).** RIG note, accepted nit: at F4's rest about 45 px of the
+  disc's top sits under the message window (seen in the browser: `/tmp/c5/i3_f4_target.png`). The C6 play test
+  judges it.
+
+**Gate (plan 11.1-11.2), all green:**
+
+| Check | Result |
+|---|---|
+| `npm run assets` (every stage) | EXIT 0; party atlases, the 9 monster pages + index and the colossus outputs byte-identical to HEAD (16 + 12 sha1); pages <= 2048 (2040x1872 ... 2048x1792); the 14 act-1 sheets on page 0; the audio stage re-encodes the .ogg files (bytes differ, not committed) |
+| `monsters_ai` at PYTHONHASHSEED 1 | byte-identical again |
+| `colossus --out` at PYTHONHASHSEED 0 / 1 | manifests and `diff -r` identical; json identical to the committed one; 3 forms, 10 files, 16.9 MB RGBA (<= 24); tiles <= 2048 |
+| `monster_anim.py check --all` | 123 `OK` lines, nothing else |
+| `colossus.py check` chaos_orrery / chaos_horizon / chaos_horizon_core | OK / OK / OK |
+| `selftest.py`, `selftest.py --anim` | ALL PASSED, ALL PASSED |
+| `colossus.py budget --check` | OK (Bedrock 25 of 80; Gemini 405 = N_C0) |
+| `stage_backgrounds.py --check rim` | ok (coverage 100 %, edge_delta 149.1, band contrast 0.86, seam 22.6 <= 30) |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | clean; 249 files, 4871 tests |
+| A5 gate (`chaosForms.test`) | colossus.json has F2, F3 and F4 (F4 an art entry of F3 at its own place) |
+| R28 gate files | green; unchanged since C-base except `lungeClearance.test.ts` (3562b9f, the earlier ruled seraph scale-3 feet-gap pin) |
+| static (11.2) | F1 approved art and rig, `_retired/cosmic_beast_v1` unchanged since C-base; the BR ledger is tracked |
+
+**Browser (plan 11.3; headless Chromium, dev server 127.0.0.1, every URL `mute=1`; screenshots in `/tmp/c5/`):**
+- `chaos_forms` (debug HP nudges 100 above each floor, `__game` hook): F1 -> i1 -> F2 -> i2 (sink, fade, rise from
+  dy +700, pan from (+480, +120) to rest) -> F3 -> crack at 0.25 -> i3 (open core, heave dy -225 to -285) -> F4 ->
+  victory. Every swap seen once, no form doubled, no interlude stuck. Contact sheet `sheet_forms.png`; F3 cursor
+  `forms_34.png`; damage number on the disc `forms_24.png`.
+- `chaos_interlude_3` (F4 kept alive by debug HP): F4 command phase, target bracket and label, damage numbers
+  (`i3_f4_target.png`, `i3_f4_round_*.png`, `sheet_i3.png`).
+- `chaos_final`: the status icons (blind, poison) sit on the corona above the disc and read (`final_rest.png`);
+  `&enemyAnim=loop` (`sheet_loop.png`): no edge exposed. Headless rAF 23 fps (software GL; not the dev-machine fps
+  probe of plan 12).
+- Textures: colossus tiles 5 live at F3, still 5 at F4 (F3's tiles shared), **0 after the battle** (released).
+- Console: no errors; only the headless GL "GPU stall due to ReadPixels" warning.
+
+**Findings (for C6 / C7):**
+- **P1 - bestiary form sub-entries are not wired.** `formSubEntries` / `formPages` (`bestiaryForms.ts`) are used only by
+  `bestiaryForms.test`; the bestiary list ends at "128 Chaos" (Down wraps to 001) and shows F1 only, so the colossus
+  stills (`preview.png`) are never shown; `?bestiary=chaos_orrery | chaos_horizon | chaos_horizon_core` logs
+  "no enemy ...; opening on 001" (`bestiary_chaos*.png`, `sheet_bestiary.png`). The C4 TS-V TODO ("bestiary
+  sub-entries") is not met in the scene.
+- **P2 - the crack interlude is skipped when F3 falls from above 0.25 to the 0.15 floor in one round**
+  (`chaos_interlude_3`: HP 1600 -> 1054 -> 900): the core goes base -> open with no `chaos_crack` and no "core
+  revealed" line. It played when the round started below 0.25 (`chaos_forms`).
+- **P2 - forms can pass without a command phase.** With the level-50 `chaos_forms` party, F2 (4200 -> 2400 floor) and
+  F4 (900) fell in the round they appeared (the debug HP nudges made it easier). No form was skipped (the floor
+  holds), but F2 and F4 got no turn shown. Balance for C7.
+- **P3 - the i2 `fade` dims the bottom windows** (command, list, party) but not the message window
+  (`forms_15.png`).
+- **P3 - the F4 target label** (yellow "Chaos") sits on the yellow-orange flame of the open core and is hard to read.
+- Accepted nits (rulings): F4's disc top under the message window (D-O24); the bonfire-like core (D-U13).
+
+**Fresh image-only review (plan 11.3, the four questions; 8 screenshots, no plan context):**
+1. Final form largest, planet-sized: **yes** (full width, arms past both edges; F3's arms read partly as terrain).
+2. Party readable: **yes, mostly** (the knight's dark armour is weaker on F3/F4's dark arm).
+3. Numbers, cursor, status icons visible: **partly**. The brackets and label are clear on F3. The F4 label is lost on
+   the flame (P1 to the reviewer). The status icons on the corona are small and low contrast (P1 to the reviewer).
+   A damage number caught mid-fade on the black disc reads low contrast (P3).
+4. Same being changing: **partly**. F1 -> F2 and F3 -> F4 are linked; F2 -> F3 keeps only the eclipse head.
+Other reviewer notes: F2's ring bottom and teal orb sit under the command windows, and its body is cut at the waist
+(P2). In an F4 round frame the active-hero marker sits between the ninja and the monk (P2).
+**Not every answer is yes**, so the 11.3 review gate is **open**. With the bestiary P1, C5 is not closed: these go
+to C6 / C7.
