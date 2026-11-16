@@ -106,9 +106,16 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     check(tuple(ig[40, 40]) == (*pal[2], 255), "FW-O: in-between paint stays at its written xy (the rig agent re-derives it)")
 
     lock = MC.lock_frames(MA.generate(sid, ocfg, okfs, ometa), okfs, ometa)
-    check("kf:hurt" in lock and np.array_equal(lock["kf:hurt"], oh) and not [n for n in MC.lock_frames(base, kfs, meta)
-                                                                             if n.startswith("kf:")],
-          "FW-O: the lock gains kf:hurt for the offset key; a rig without key_offset or key paint has no kf: entry")
+    # the live chimera rig paints its attack key since ROSTER_FIX_PLAN_2 G3b (D-R1 B, kf:attack in its lock), so the
+    # "no key paint" case drops the rig's paint list rather than use the live rig as is
+    bare = {k: v for k, v in copy.deepcopy(cfg).items() if k not in ("paint", "kf_paint_cap")}
+    _, nmeta, nkfs = _entries(sid, bare)
+    plain = MC.lock_frames(MA.generate(sid, bare, nkfs, nmeta), nkfs, nmeta)
+    check("kf:hurt" in lock and np.array_equal(lock["kf:hurt"], oh) and not [n for n in plain if n.startswith("kf:")]
+          and sorted(n for n in MC.lock_frames(base, kfs, meta) if n.startswith("kf:"))
+          == sorted(f"kf:{k}" for k in meta.get("kf_painted", [])),
+          "FW-O: the lock gains kf:hurt for the offset key; a rig without key_offset or key paint has no kf: entry "
+          "(the live rig: only its painted keys)")
 
     for bad, words in (({"hurt": [13, 0]}, ("12",)), ({"hurt": [0, 0.5]}, ("whole",)), ({"cast": [1, 0]}, ("cast",)),
                        ({"hurt": [0, 12]}, ("leave the",))):

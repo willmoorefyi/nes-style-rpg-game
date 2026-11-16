@@ -608,3 +608,36 @@ prompt text was restored.
 |---|---|---|---|---|
 | R288 | red_piranha/monster (1236, key `19a3bccfa97e214bd940ce6a`, the R282 raw re-cut by FW-C) | 0 | `clipped == []`, `lifted == {"hurt": 8}`; heights 51 / 52 / 51, bottoms 76 / 77 / 77, an 88 px cell, no border pixels, binary alpha, 16 colours with the outline ink, one piece per cell, `pose_diff` 0.26 / 0.44, `edges_ok`, `height_ok`, `diff_ok`; the hurt's belly and lower fin are now whole. One stocky rust-orange and bronze fish with a bony head plate, a heavy jutting jaw and a yellow eye in every cell, facing right; attack = darting forward with the jaw dropped open. Sibling check vs `bigeyes` (side by side: a white eyeball with blue fins) and `shark` / `white_shark`: a deep-bodied armoured river fish. Nit: a modest attack (0.26) | **self-approved** (`approve.py red_piranha monster_small`) |
 | R289 | white_shark/monster (1236, key `38351be46753975f50cd80dd`, the R280 raw re-cut by FW-C) | 0 | `clipped == []`, `lifted == {"attack": 34, "hurt": 36}` (inside `LIFT_MAX` 36); heights 57 / 95 / 98, bottoms 122 / 125 / 125, tops 66 / 31 / 28, a 128 px cell, no border pixels, binary alpha, 16 colours with the outline ink, one piece per cell, `pose_diff` 1.85 / 1.72, `edges_ok`, `diff_ok`; the tails are whole. One broad slate-grey great white with a white belly and the same pale cross scars in every cell, facing right; attack = an arched lunge with the mouth open; hurt = recoiled in a curve, the mouth shut. Sibling check vs `shark` (side by side: slimmer, paler, no scars, arched in every cell): broader, darker back, scarred. Nits: **the idle is small and level (57 px; `height_ok` false) while both action cells are arched and 95-98 px tall**, a very large idle-to-action change; whether the float band (check 8) and the in-betweens can carry it is the G3d rig decision (plan 6 step 2: deferred again if the rig cannot pass check 8 in 3 iterations) | **self-approved with nits** (`approve.py white_shark monster_large`); G3d decides |
+
+### Fix pass 2: G4 integration (integrator, `roster-int`, 2026-11-15)
+
+Integrated at 5aaf0ca: G1 framework, G2 data, G3a (king_mummy, clay_golem, sea_troll, stone_golem, ice_gigas), G3b
+(chimera **attack only**, basilisk, crocodile), G3c (sand_worm, air_elemental, earth_medusa, ashen_queen) and the
+swimmer sheets R288 / R289. Chimera's hurt is still open on `fix2-rig-chimera` (its hurt and hurt_in2 frames are
+unchanged from b6b1346). Swimmer data added here (plan 6 "Data and atlas", rev 19), keyframes only until the G3d rigs.
+
+| Gate | Result |
+|---|---|
+| Images | 0 (pass R fix stays at 33 remaining) |
+| `build_assets.py monsters_ai battle_ai field_ai` | **123 sheets, 112 animated, 9 pages**: 2040x1872, 2048x1728, 2000x800, 2040x1312, 2048x2048, 1976x640, 2048x2032, 2048x1024, 2048x1792 (all <= 2048; red_piranha lands on page 4, white_shark on page 7; only page 7 grows, 2016x1024 at b6b1346 -> 2048x1024); identical for PYTHONHASHSEED 0 and 1 (10 files `shasum -c` OK); party atlases byte-identical (153 s) |
+| `monster_anim.py check --all` | 112 `OK`, 11 `no rig` (astos, black_knight, black_widow, crawler, horned_devil, hydra, scorpion, warmech, water_elemental + red_piranha, white_shark), nothing else |
+| Frame-rect diff vs b6b1346 (by sheet and frame name) | new: red_piranha, white_shark; changed: exactly the 12 G3 sheets of plan 9 (air_elemental hurt_in2; ashen_queen 13 frames (key_offset attack / hurt / cast and their in-betweens); basilisk atk_wind1/2; chimera atk_mid, attack, atk_follow, atk_recover; clay_golem atk_mid, attack, atk_follow; crocodile hurt_in2, hurt; earth_medusa idle, idle_b, atk_wind1/2, atk_recover, hurt_in1, daze, daze_b; ice_gigas atk_wind1/2, atk_recover; king_mummy hurt_in2, hurt; sand_worm hurt_in2; sea_troll and stone_golem atk_wind1/2, hurt_in1); every other sheet `same` |
+| `selftest.py --anim`, `selftest.py` | ALL PASSED (556 / 932 checks; the first `--anim` run failed only the FW-O "no kf: entry" check, fixed below) |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | clean; 220 files, 4171 tests |
+| Browser (headless Chromium, dev server on 127.0.0.1, `mute=1`) | bestiary red_piranha (052, 51/127, ocean = the ship deck) and white_shark (094, 93/127): art, stats and "Not placed yet" as in `enemies.yaml`; ashen_queen hurt / cast: the coil planted on the floor; king_mummy hurt: the staff gold top to bottom; earth_medusa: no chest box; sandbox `l30_lich` with 2 red_piranha + white_shark (`enemyAnim=loop`): both swimmers float, lunge and recoil on their keyframes; no console errors. Screenshots in `/tmp/g4/` |
+
+By-design updates (each with a comment): `bestiaryModel.test.ts` listed count 125 -> 127 and the 050 gap now ends at
+052 Red Piranha (then 053 Crocodile); `EnemyLayoutAi.test.ts` crowd set S 45 -> 46 (white_shark's home art is <= 118
+px, and nine of it pack at factor 1); `selftest_keyoffset.py`: the "no `kf:` entry" case now strips the rig's paint,
+because the live chimera rig paints its attack key since G3b (its lock has `kf:attack` only).
+
+Swimmer data (D4 rules): red_piranha num 52, HP 172, attack 37, defense 20, evade 72, magicDefense 84, accuracy 42,
+agility 17, strength 30, vitality 12, 546 XP / 46 G, no weakness, resistance or protection (spec), small; white_shark
+num 94, HP 344, attack 50, defense 8, evade 72, magicDefense 170, accuracy 84, agility 17, strength 40, vitality 6,
+2361 XP / 600 G, weak lightning, resist fire, protect earth, large. Both `family: aquatic`, `attack: melee`, bestiary
+background `ocean`, no placement (no act-1 table or sandbox level names them).
+
+Notes for G3d / G7: white_shark's level 57 px idle reads no bigger than a small red_piranha in battle, and the jump to
+its 95-98 px arched attack / hurt keys pops without in-betweens (R289 nit; the rig decides). `tests/integration/
+battle.test.ts` "command selection" failed once under full CPU load (an unseeded 300-tick fight that did not end) and
+passed 3 of 3 alone; unrelated to this change.

@@ -34,19 +34,20 @@ describe('bestiary model: order and numbering', () => {
     expect(byId('dragon').label).toBe('066 Red Dragon');
     expect(byId('lich_2').label).toBe('124 Rime Sovereign II');
     expect(entries[entries.length - 1].label).toBe('128 Chaos');
-    // 1-49 are all listed, so the list place equals num up to the lich; the total is the listed count (125 of 128)
-    expect(titleCount(byId('garland'), entries.length, data)).toBe('012 Garland  12/125');
-    expect(titleCount(byId('lich'), entries.length, data)).toBe('049 Rime Sovereign  49/125');
+    // 1-49 are all listed, so the list place equals num up to the lich; the total is the listed count (127 of 128)
+    expect(titleCount(byId('garland'), entries.length, data)).toBe('012 Garland  12/127');
+    expect(titleCount(byId('lich'), entries.length, data)).toBe('049 Rime Sovereign  49/127');
   });
 
   it('the real numbering: every num from 001 to 128 at most once, in order; the gaps (unbuilt sprites) are skipped', () => {
     const nums = entries.map((e) => Number(e.label.slice(0, 3)));
     expect(nums.every((n, i) => n >= 1 && n <= 128 && (i === 0 || n > nums[i - 1]))).toBe(true);
     for (const e of entries) expect(e.label, e.id).toBe(`${String(e.enemy.num).padStart(3, '0')} ${e.enemy.name}`);
-    // a gap: 050 Ankheg is followed by 053 Crocodile (051 Piranha is cut, 052 has no art yet), and the count runs on by list place
+    // a gap: 050 Ankheg is followed by 052 Red Piranha (051 Piranha is cut), and the count runs on by list place
     const ankheg = entries.findIndex((e) => e.id === 'ankheg');
-    expect(entries[ankheg + 1].label).toBe('053 Crocodile');
-    expect(titleCount(entries[ankheg + 1], entries.length, data)).toBe(`053 Crocodile  ${ankheg + 2}/125`);
+    expect(entries[ankheg + 1].label).toBe('052 Red Piranha');
+    expect(titleCount(entries[ankheg + 1], entries.length, data)).toBe(`052 Red Piranha  ${ankheg + 2}/127`);
+    expect(entries[ankheg + 2].label).toBe('053 Crocodile');
   });
 
   it('a gap in the numbers: the label keeps num, the count is the list place of the listed entries', () => {

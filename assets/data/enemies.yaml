@@ -1245,6 +1245,28 @@
   sprite: ankheg
   attack: melee
   size: large
+- id: red_piranha
+  name: Red Piranha
+  num: 52
+  description: "A blood-red piranha plated in bone from snout to spine. It shrugs off blows that would gut its silver kin."
+  stats:
+    hp: 172
+    strength: 30
+    agility: 17
+    intelligence: 1
+    vitality: 12
+    luck: 5
+    attack: 37
+    defense: 20
+    magicDefense: 84
+    accuracy: 42
+    evade: 72
+  xpReward: 546
+  goldReward: 46
+  sprite: red_piranha
+  attack: melee
+  family: aquatic
+  size: small
 - id: crocodile
   name: Crocodile
   num: 53
@@ -2262,6 +2284,31 @@
   resist: fire
   family: aquatic
   size: small
+- id: white_shark
+  name: White Shark
+  num: 94
+  description: "A scarred white giant of the deep, broader and paler than any reef shark. One bite can split a hull."
+  protect: [earth]
+  stats:
+    hp: 344
+    strength: 40
+    agility: 17
+    intelligence: 1
+    vitality: 6
+    luck: 5
+    attack: 50
+    defense: 8
+    magicDefense: 170
+    accuracy: 84
+    evade: 72
+  xpReward: 2361
+  goldReward: 600
+  sprite: white_shark
+  attack: melee
+  weakness: lightning
+  resist: fire
+  family: aquatic
+  size: large
 - id: deepeyes
   name: Deepeyes
   num: 95

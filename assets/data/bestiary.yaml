@@ -11,7 +11,8 @@ backgrounds:
   enemies: {garland: temple, lich: shoreline, vampire: abandoned_castle, dragon: desert, pirate: shoreline, cockatrice: forest,
     # roster pass R (ROSTER_PLAN 7.3): by habitat, committed staged ids only; grassland ones use the default
     black_widow: forest, werewolf: dark_forest, zombie: evil_temple, ghoul: marsh, lizard: desert, sahagin: ocean,
-    sahagin_chief: ocean, shark: ocean, bigeyes: ocean, buccaneer: shoreline, tarantula: marsh, ghast: marsh,
+    sahagin_chief: ocean, shark: ocean, bigeyes: ocean, red_piranha: ocean, white_shark: ocean, buccaneer: shoreline,
+    tarantula: marsh, ghast: marsh,
     scorpion: desert, shadow: marsh, green_slime: marsh, crawler: marsh, gray_ooze: marsh, bloodbones: marsh,
     piscodemon: marsh, gargoyle: abandoned_castle, astos: abandoned_castle, wraith: cave, anaconda: swamp,
     lesser_tiger: forest, minotaur: cave, hill_gigas: cave, earth_elemental: cave, wight: cave, ochre_jelly: cave,
