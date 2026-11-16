@@ -1,0 +1,131 @@
+sprite: scorpion
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+attack_hand: [n, f]
+# A desert scorpion: thorax (body -> head), abdomen under the tail root, the arched tail tl0..sting, one raised claw
+# (f) in idle and hurt, both claws in the attack (the near claw n lies low in front, hidden in idle), seven visible
+# legs (leg2_f is hidden in the attack-side hurt). Every in-between is a pure translation of the upper body (legs held
+# whole: coxa, knee and tip pinned), by the ROSTER_FIX_PLAN_2 5 key-switch table.
+# fixmeasure.py switch --rig (weakest pairs, IoU / step vs need / cap): attack wind2->mid 0.661 / 0.7 vs 0.550 / 6.0,
+# follow->recover 0.644 / 1.1; hurt in1->in2 0.317 / 4.1 vs 0.313 / 6.0 (the rear-up switch, bridged without the FW-Q
+# alias: hurt_in1 lifts the front 3 px and the abdomen 1 px, hurt_in2 lowers the rear-up 2 px with the tail 2 px right);
+# daze idle->daze 0.911 / 0.7, daze->daze_b 0.917 / 0.6. The wind-up cocks the tail 1 px up (bbox height vs the lerp).
+keyframes:
+  idle:
+    body: [46, 53]
+    head: [64, 55]
+    abd: [38, 51]
+    abd_end: [28, 47]
+    tl0: [24, 42]
+    tl1: [21, 31]
+    tl2: [24, 18]
+    tl3: [33, 10]
+    sting: [41, 22]
+    sh_f: [66, 54]
+    el_f: [74, 52]
+    hand_f: [88, 46]
+    coxa1_n: [67, 58]
+    knee1_n: [70, 65]
+    tip1_n: [75, 74]
+    coxa1_f: [61, 60]
+    knee1_f: [63, 66]
+    tip1_f: [66, 73]
+    coxa2_n: [51, 57]
+    knee2_n: [54, 63]
+    tip2_n: [55, 72]
+    coxa2_f: [36, 61]
+    knee2_f: [34, 66]
+    tip2_f: [35, 73]
+    coxa3_n: [36, 57]
+    knee3_n: [38, 65]
+    tip3_n: [40, 75]
+    coxa3_f: [29, 58]
+    knee3_f: [25, 66]
+    tip3_f: [22, 75]
+    coxa4_n: [23, 56]
+    knee4_n: [14, 64]
+    tip4_n: [7, 74]
+  attack:
+    body: [42, 54]
+    head: [60, 56]
+    abd: [32, 52]
+    abd_end: [22, 48]
+    tl0: [17, 42]
+    tl1: [13, 30]
+    tl2: [20, 18]
+    tl3: [32, 15]
+    sting: [52, 23]
+    sh_f: [64, 56]
+    el_f: [72, 55]
+    hand_f: [90, 49]
+    sh_n: [50, 62]
+    el_n: [58, 65]
+    hand_n: [74, 64]
+    coxa1_f: [64, 66]
+    knee1_f: [68, 70]
+    tip1_f: [71, 74]
+    coxa2_n: [50, 64]
+    knee2_n: [55, 69]
+    tip2_n: [57, 74]
+    coxa2_f: [33, 62]
+    knee2_f: [33, 67]
+    tip2_f: [33, 72]
+    coxa3_n: [35, 60]
+    knee3_n: [38, 68]
+    tip3_n: [42, 75]
+    coxa3_f: [24, 58]
+    knee3_f: [22, 66]
+    tip3_f: [20, 75]
+    coxa4_n: [18, 57]
+    knee4_n: [10, 65]
+    tip4_n: [4, 74]
+  hurt:
+    body: [47, 46]
+    head: [44, 28]
+    abd: [40, 59]
+    abd_end: [26, 61]
+    tl0: [17, 59]
+    tl1: [9, 50]
+    tl2: [9, 40]
+    tl3: [15, 35]
+    sting: [22, 43]
+    sh_n: [36, 35]
+    el_n: [27, 31]
+    hand_n: [18, 15]
+    sh_f: [52, 32]
+    el_f: [59, 22]
+    hand_f: [47, 5]
+    coxa1_n: [68, 58]
+    knee1_n: [77, 64]
+    tip1_n: [84, 74]
+    coxa1_f: [63, 59]
+    knee1_f: [67, 66]
+    tip1_f: [70, 74]
+    coxa2_n: [52, 60]
+    knee2_n: [58, 66]
+    tip2_n: [60, 72]
+    coxa3_n: [43, 61]
+    knee3_n: [46, 68]
+    tip3_n: [49, 74]
+    coxa3_f: [33, 62]
+    knee3_f: [27, 68]
+    tip3_f: [25, 74]
+    coxa4_n: [28, 62]
+    knee4_n: [18, 68]
+    tip4_n: [13, 74]
+frames:
+  atk_wind1: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [-1, 1], head: [-1, 1], abd: [-1, 1], abd_end: [-1, 1], tl0: [-1, 1], tl1: [-1, 1], tl2: [-1, 0], tl3: [-1, 0], sting: [-1, 0], sh_n: [-1, 1], el_n: [-1, 1], hand_n: [-1, 1], sh_f: [-1, 1], el_f: [-1, 1], hand_f: [-1, 1]}}
+  atk_wind2: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [-2, 1], head: [-2, 1], abd: [-2, 1], abd_end: [-2, 1], tl0: [-2, 1], tl1: [-2, 0], tl2: [-2, -1], tl3: [-2, -1], sting: [-2, -1], sh_n: [-2, 1], el_n: [-2, 1], hand_n: [-2, 1], sh_f: [-2, 1], el_f: [-2, 1], hand_f: [-2, 1]}}
+  atk_mid: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [1, 0], head: [1, 0], abd: [1, 0], abd_end: [1, 0], tl0: [1, 0], tl1: [1, 0], tl2: [1, 0], tl3: [1, 0], sting: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}}
+  atk_follow: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [1, 0], head: [1, 0], abd: [1, 0], abd_end: [1, 0], tl0: [1, 0], tl1: [1, 0], tl2: [1, 0], tl3: [1, 0], sting: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}}
+  atk_recover: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [-2, 1], head: [-2, 1], abd: [-2, 1], abd_end: [-2, 1], tl0: [-2, 1], tl1: [-2, 1], tl2: [-2, 1], tl3: [-2, 1], sting: [-2, 1], sh_n: [-2, 1], el_n: [-2, 1], hand_n: [-2, 1], sh_f: [-2, 1], el_f: [-2, 1], hand_f: [-2, 1]}}
+  hurt_in1: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [2, -3], head: [2, -3], abd: [2, -1], abd_end: [2, -1], tl0: [2, -1], tl1: [2, -3], tl2: [2, -3], tl3: [2, -3], sting: [2, -3], sh_n: [2, -3], el_n: [2, -3], hand_n: [2, -3], sh_f: [2, -3], el_f: [2, -3], hand_f: [2, -3]}}
+  hurt_in2: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], tweaks: {body: [0, 2], head: [0, 2], abd: [2, 0], abd_end: [2, 0], tl0: [2, 0], tl1: [2, 0], tl2: [2, 0], tl3: [2, 0], sting: [2, 0], sh_n: [0, 2], el_n: [0, 2], hand_n: [0, 2], sh_f: [0, 2], el_f: [0, 2], hand_f: [0, 2]}}
+  daze: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], dy: 1}
+  daze_b: {moves: [], pins: [coxa1_n, knee1_n, tip1_n, coxa1_f, knee1_f, tip1_f, coxa2_n, knee2_n, tip2_n, coxa2_f, knee2_f, tip2_f, coxa3_n, knee3_n, tip3_n, coxa3_f, knee3_f, tip3_f, coxa4_n, knee4_n, tip4_n, tip4_f], dy: 2}
+holds: []
+paint:
+  - {frame: atk_wind2, xy: [[48, 69]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[65, 60], [64, 61], [65, 61], [64, 62], [65, 62], [65, 63]], rgb: [6, 4, 10]}
