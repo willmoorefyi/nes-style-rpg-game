@@ -182,7 +182,7 @@ def _stage_rim(check) -> None:
     import stage_rim as SR
     lines = len((TOOLS / "stage_backgrounds.py").read_text().splitlines())
     check(lines <= 249, f"stage_backgrounds.py stays line-neutral ({lines} <= 249 lines)")
-    check(SR.RIM == ("rim-src.png", 485, 1.05, "center", 370), f"stage_rim: the user-accepted entry {SR.RIM}")
+    check(SR.RIM == ("rim-src-up.png", 485, 1.05, "center", 370), f"stage_rim: the user-accepted entry {SR.RIM}")
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
         yy, xx = np.mgrid[0:768, 0:1344]

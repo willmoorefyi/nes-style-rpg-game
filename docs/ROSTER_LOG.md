@@ -1245,3 +1245,16 @@ archive copies are in `chaos_horizon_v1`.
 - **Approved:** `approved/chaos_forms/chaos_horizon/master.png` (body, 2700x1080 soft alpha) plus `glow.png` and
   `sky_base.png`, with `meta.json` (chain, checks, cache keys).
 - Showing more of the ring (place_y nearer -60) is a placement / user call (18.4); I did not change it.
+
+**Rim backdrop upscale (step 3).**
+- C21: `upscale assets-src/backgrounds/rim-src.png --model conservative --creativity 0.35 --seed 5151` with the
+  rim-src.json prompt and webp output; purpose rim_upscale. Result 4112x2352, written to `rim-src-up.png` with a
+  sidecar.
+- Staged with `stage_backgrounds.py rim --file`: scale 0.49 with the horizon row scaled (1485.3), top -358,
+  bottom 795.
+- `--check rim`: coverage 100 %, edge 149.1, party band 0.86, seam 22.6 (the old staging had 27.6).
+- Old vs new crops: the new rim has no nearest-neighbour staircase and its edges are anti-aliased. The source's own
+  drawn pixel-art blocks stay, because they are part of the painting.
+- **Switched:** stage_rim `RIM` now reads `rim-src-up.png`, and `selftest_colossus_art.py` / `selftest_colossus_up.py`
+  are re-pinned (both ALL PASSED / exit 0). `rim-src.png` (the accepted raw) is kept, and the selftest still checks
+  that it stages byte-identical to the accepted preview.

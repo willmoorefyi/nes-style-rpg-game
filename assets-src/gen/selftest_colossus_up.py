@@ -214,7 +214,7 @@ def _pattern(h: int = 768, w: int = 1344) -> np.ndarray:
 def _stage_hires(check) -> None:
     sys.path.insert(0, str(TOOLS))
     import stage_rim as SR
-    check(SR.RIM == ("rim-src.png", 485, 1.05, "center", 370) and getattr(SR, "RIM_SRC_H", None) == 768,
+    check(SR.RIM == ("rim-src-up.png", 485, 1.05, "center", 370) and getattr(SR, "RIM_SRC_H", None) == 768,
           f"stage_rim: the accepted entry {SR.RIM}; the horizon row is recorded at RIM_SRC_H = 768 px source height")
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)

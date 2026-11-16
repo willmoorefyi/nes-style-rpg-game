@@ -1,0 +1,19 @@
+{
+  "cache_keys": [
+    "a09503b7b15086b6bff4e223"
+  ],
+  "model": "upscale_conservative",
+  "purpose": "rim_upscale",
+  "source": "assets-src/backgrounds/rim-src.png",
+  "src_size": [
+    1344,
+    768
+  ],
+  "upscale": {
+    "creativity": 0.35,
+    "negative_prompt": "text, letters, watermark, logo, frame, border, UI, creatures, monsters, people, characters, statues, pillars, towers, crystal spires, shards, boulders, rocks, rubble, debris on the floor, black cracks, dark cracks, high contrast floor, busy floor, black floor, water, lake, ocean, reflection of the sky, grass, trees, mountains, clouds, daytime sky, plain flat sky, photorealistic, 3d render, blurry, low horizon, horizon in the middle, tilted horizon, curved horizon",
+    "output_format": "webp",
+    "prompt": "16-bit SNES-era pixel art RPG battle background, the edge of the universe. The upper third of the image is deep outer space: a vast swirling nebula of rose, amber and violet gas, a bright jagged white cosmic rift in the centre, thousands of tiny white stars, dying red giant stars, a large ringed planet in the upper right, glowing nebula and stars across the whole width out to the left and right edges. A high, straight, level horizon about 30% down from the top. Below the horizon, the lower two thirds of the image is one calm, flat, empty crystal floor that stretches to the edges: smooth pale lavender and soft rose crystal tiles, gentle soft tile seams in a slightly darker lilac, very low contrast, evenly lit by the nebula, faint pink glow reflected on it. Side view, flat cel shading, hard pixel edges, limited palette.",
+    "seed": 5151
+  }
+}

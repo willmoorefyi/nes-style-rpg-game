@@ -37,7 +37,7 @@ import stage_backgrounds as SB  # noqa: E402
 ROOT = SB.ROOT
 SRC_DIR = ROOT / "assets-src" / "backgrounds"
 # (source file, horizon row in the source, zoom, align, screen horizon y): the user-accepted values (D-U7)
-RIM = ("rim-src.png", 485, 1.05, "center", 370)
+RIM = ("rim-src-up.png", 485, 1.05, "center", 370)   # C3': the conservative upscale of rim-src.png (C21); the accepted raw stays
 RIM_SRC_H = 768                  # the source height RIM's horizon row 485 is recorded at (the accepted 1344x768 render)
 BLEED = 12
 FIELD_BAND = (0, SB.FIELD_TOP, 1920, 780)
