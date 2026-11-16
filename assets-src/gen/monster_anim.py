@@ -101,8 +101,10 @@ def lunge_px(idle: Image.Image) -> int:
 
 
 def load_rig(sprite: str) -> dict | None:
+    """The rig file, with FW-O's `key_offset` translation of the offset keys' joints, masks and keyframe paint."""
+    from gen import monster_keys as MK
     p = RIGS / f"{sprite}.yaml"
-    return (yaml.safe_load(p.read_text()) or {}) if p.exists() else None
+    return MK.offset_cfg(sprite, yaml.safe_load(p.read_text()) or {}) if p.exists() else None
 
 
 def lock_path(sprite: str) -> Path:

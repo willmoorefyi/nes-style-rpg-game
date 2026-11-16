@@ -167,7 +167,8 @@ def _d(o: dict) -> tuple[int, int] | None:
 
 
 def _masks(o: dict) -> dict | None:
-    return yaml.safe_load(Path(o["masks"][0]).read_text()) if o.get("masks") else None
+    from gen import monster_keys as MK
+    return MK.offset_cfg("--masks", yaml.safe_load(Path(o["masks"][0]).read_text())) if o.get("masks") else None
 
 
 def _fmt(m: dict) -> str:

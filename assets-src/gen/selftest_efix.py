@@ -382,13 +382,15 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     for bad_p, why in (({"frame": "cast", "xy": blue[:1], "rgb": None}, "null"), ({"frame": "cast", "xy": holes, "rgb": [41, 99, 99]}, "transparent")):
         check(_refused(lambda: MK.paint_keys("drowned_sovereign", {"kf_paint_cap": {"cast": 300}, "paint": [bad_p]}, dk),
                        "remap only"), f"FW-P: drowned_sovereign/cast is a remap only ({why} refused)")
-    kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})]
+    kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})
+               or (yaml.safe_load(p.read_text()) or {}).get("key_offset")]            # FW-O: an offset key is locked too
     kf_locks = [p.name for p in sorted(MA.RIGS.glob("*.lock.json")) if any(k.startswith("kf:") for k in json.loads(p.read_text()))]
     check(len(list(MA.RIGS.glob("*.lock.json"))) >= 77 and kf_locks == sorted(f"{s}.lock.json" for s in kf_rigs),
-          f"FW-P: kf: lock entries exactly for the rigs with keyframe paint (rigs {kf_rigs}, locks {kf_locks})")
+          f"FW-P / FW-O: kf: lock entries exactly for the rigs with keyframe paint or key_offset (rigs {kf_rigs}, locks {kf_locks})")
 
 
 def run_efix(check: Callable[[bool, str], None]) -> None:
+    from gen.selftest_keyoffset import run_key_offset     # FW-O (ROSTER_FIX_PLAN_2.md 4)
     for fn in (run_f1, run_f2, run_f3_f7, run_f4, run_f5, run_gates, run_fx_allowlist, run_lich_crystal,
-               run_halo_brighten, run_kf_paint):
+               run_halo_brighten, run_kf_paint, run_key_offset):
         fn(check)

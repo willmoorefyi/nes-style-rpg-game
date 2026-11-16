@@ -34,6 +34,7 @@ if str(HERE.parent) not in sys.path:                      # run as a script: mak
     sys.path.insert(0, str(HERE.parent))
 from gen import monster_anim as MA  # noqa: E402
 from gen import fixmeasure_px as PX  # noqa: E402
+from gen import monster_keys as MK  # noqa: E402
 from gen.fixmeasure_px import (INK, Box, _in_box, _public, _rgb_mask, colour_count, fill_components,  # noqa: E402,F401
                                fill_mask, holes, pieces_of, select)
 
@@ -41,8 +42,8 @@ from gen.fixmeasure_px import (INK, Box, _in_box, _public, _rgb_mask, colour_cou
 @contextlib.contextmanager
 def _rig_override(sprite: str, rig: dict | None):
     real = MA.load_rig
-    if rig is not None:
-        MA.load_rig = lambda s: rig if s == sprite else real(s)
+    if rig is not None:                                   # FW-O: a rig dict reads as its file would (key_offset)
+        MA.load_rig = lambda s: MK.offset_cfg(s, rig) if s == sprite else real(s)
     try:
         yield
     finally:
