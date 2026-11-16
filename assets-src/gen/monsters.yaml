@@ -510,74 +510,62 @@
   sheet_seeds: {boss_cast: 1235, boss_hurt: 1235}   # boss_hurt 1234 (R75, the untilted line): an idle copy; boss_cast 1234 (ROSTER_LOG R73, "the iris flaring bright with a violet clock-like
   # glyph drawn inside the iris itself"): the flare keyed out as a transparent ring, the iris a detached island
 - id: chaos
-  # "Chaos" (128), the final boss: an ORIGINAL primordial titan (plan 4.2, binding D13); it must not reproduce any
-  # published Chaos art
+  # "Chaos" (128), the final boss. Pass V redesign (docs/REDESIGN_PLAN.md 4.2, D-V10 two arms): an ORIGINAL colossal
+  # overlord from beyond the edge of the world (no published Chaos art and no film character recreated). D-V6 ruling
+  # after G-T0 (0 of 80 cached renders reach the titan band): C2, the normal 200 px boss band, shown at display scale
+  # 3 (FW-S, monster_scale.yaml, integrator). The four-armed obsidian titan is archived as chaos_v1
+  # (docs/RETIRED_SPRITES.md). The four orbs touch the flame crown so the cutter keeps them (rev 13).
   size: boss
   per_pose: true
   design_ref: false
-  body: biped
-  # the biped line ("strong diagonal ..., twist the torso") turned him to a side or three-quarter profile and dropped
-  # arms in R56-R58 (the multi-arm pause); only the poses not yet approved get this line (orchestrator, 2026-11-15)
+  body: robed
   motion:
-    cast: &chaos_motion >-
-      Keep the frontal view of Image 3, chest and face toward the viewer, and a symmetric, composed posture, never
-      turned to a side or three-quarter profile; all four arms stay separately visible and apart from the body, the
-      upper arm and the lower arm on the left side of the image and the upper arm and the lower arm on the right side
-      of the image, none hidden behind the body, merged or crossed; the movement is in the arms, the wings and the head,
-      and the wings move with the motion.
+    attack: &chaos_motion >-
+      Keep the frontal view of Image 3, chest and burning head toward the viewer, never turned to a side or
+      three-quarter profile; exactly two arms, the arm on the left side of the image and the arm on the right side of
+      the image, both separately visible and apart from the body, none hidden, merged or crossed; the pooled robe stays
+      on the ground in every pose; the movement is in the arms, the flame crown and the orbs.
+    cast: *chaos_motion
     hurt: *chaos_motion
     attack_raise: *chaos_motion
   prompt: >-
-    Chaos, a colossal primordial titan of cracked black obsidian standing on two thick legs, a massive muscular
-    humanoid body; exactly four arms, two on each side: on the left side of the image an upper arm and a lower arm, on
-    the right side of the image an upper arm and a lower arm, each ending in a huge clawed stone hand; great tattered
-    wings of shadow-flame (smoke-black membranes edged with purple flame) half raised behind the shoulders, their tips
-    well below the top of the grey box; a heavy horned crown of obsidian growing from the head with two great curved
-    horns; a stern face of cracked stone with two burning white eyes; glowing seams run through the cracks of the body
-    in four colours: frost cyan, ember orange, abyss teal and storm white; palette of obsidian black, deep purple and
-    the four seam colours
+    Chaos, a colossal overlord from beyond the edge of the world, towering and enormous: a vast floor-length robe of
+    dark void-black cloth pools wide on the ground and hides the legs, its deep folds speckled with tiny pale points
+    like distant stars; a broad upper body in black-and-gold armour plates; exactly two huge arms in black-and-gold
+    gauntlets with long gold claws, held out low at the sides with the palms open; in place of a head, a tall crown of
+    living flame in ember orange, gold and white rises from the armoured collar around a dark empty face with two
+    blazing white eyes; four orbs of light set in a ring around the burning head, each orb touching the edge of the
+    flame crown, one frost cyan, one ember orange, one abyss teal and one storm white; the flame tips well below the
+    top of the grey box; palette of void black, gold, ember orange, white and the four orb colours
   action_prompt: >-
-    Chaos, exactly as in Image 3: the same colossal titan of cracked black obsidian on two thick legs, exactly four
-    arms (two on each side) with huge clawed stone hands, the same tattered wings of shadow-flame, the horned obsidian
-    crown, the cracked stone face with two burning white eyes, and the glowing seams in frost cyan, ember orange, abyss
-    teal and storm white
+    Chaos, exactly as in Image 3: the same pooled void-black star-speckled robe hiding the legs, the black-and-gold
+    armoured upper body, exactly two huge arms with gold-clawed gauntlets, the tall crown of living flame around the
+    dark face with two blazing white eyes, and the ring of four orbs (frost cyan, ember orange, abyss teal, storm
+    white), each orb touching the edge of the flame crown
   attack: >-
-    a crushing double blow, seen in the same front view as Image 3 (chest and face toward the viewer, never in side
-    profile), the body leaning toward the heroes on the right over a planted front leg, both wings flaring. Exactly
-    four arms, all four clearly visible and separate: on the right side of the image, the upper arm and the lower arm
-    both swing down in front of the body, their two fists smashing down together low toward the heroes; on the left
-    side of the image, the upper arm is thrown back up behind the shoulder and the lower arm is braced at the hip, both
-    clearly visible beside the body; at the same pixel size as in Image 3
+    a crushing blow, seen in the same front view as Image 3: the upper body leaning toward the heroes on the right,
+    the arm on the right side of the image swung down in front of the body, its huge clawed gauntlet smashing down low
+    toward the heroes, the arm on the left side of the image drawn back at the hip; exactly two arms; the robe still
+    pooled on the ground; at the same pixel size as in Image 3
   cast: >-
-    channelling, a mirror-symmetric pose clearly different from Image 3, every hand in a new place: the two upper
-    arms raised high, elbows bent, their open clawed hands up beside the horned crown, one on the left side of the
-    image and one on the right side; the two lower arms spread wide out to the sides at waist height, palms up, one on
-    the left side and one on the right side; a glowing sphere of swirling energy in the four seam colours (cyan,
-    orange, teal and white) floats in front of his chest, touching his body; the wings lifted higher and spread wider
-    than in Image 3, the legs planted wider apart, the seams blazing; exactly four arms, all four clearly visible and
-    apart from the body; the raised hands and wing tips well below the top of the grey box, at the same pixel size as
-    in Image 3
+    channelling the end of the world, a mirror-symmetric pose: both arms raised high with open clawed hands beside the
+    burning head, the flame crown blazing taller and brighter but its tips still well below the top of the grey box,
+    the four orbs flaring and spread a little wider but still touching the flames; exactly two arms; at the same pixel
+    size as in Image 3
   hurt: >-
-    struck, a pose clearly different from Image 3, every hand in a new place: the chest arched back and the head
-    thrown back with the face tilted up, the glowing seams flaring brighter; on the left side of the image the upper
-    arm flung up and out above the shoulder and the lower arm flung out low and wide, on the right side of the image
-    the upper arm flung out at shoulder height and the lower arm hanging down and back, all four clawed hands splayed
-    open; the wings drooping and faltering; the knees bent; exactly four arms, all four clearly visible and apart from
-    the body; at the same pixel size as in Image 3
+    struck: the upper body arched back, the flame crown guttering and bent back, the four orbs knocked loose from their
+    ring but each still touching the flames, both arms flung out wide with the clawed hands splayed open, the robe
+    still pooled on the ground; exactly two arms; at the same pixel size as in Image 3
   attack_raise: >-
-    the wind-up of a crushing blow, a mirror-symmetric pose clearly different from Image 3, every hand in a new place:
-    the two upper arms raised high overhead, one from the left side of the image and one from the right side, their
-    two great fists clenched together above the horned crown; the two lower arms braced low and wide at the hips, one
-    on the left side and one on the right side; the body crouched with both knees bent and wide, so that the whole
-    figure, raised fists, horns and wings included, stays inside the grey box at exactly the same pixel size as in
-    Image 3 (the raised fists are the highest point, well below the top of the image); exactly four arms, all four
-    clearly visible; the two horns of the crown visible below the fists, the gap between the raised arms and the crown
-    is empty background; no ground line or floor under the feet
-  face: the cracked obsidian face with two burning white eyes under the horned crown is readable
-  extra_negative: goat legs, hooves, a tail, snakes, a cape, a weapon, fur, two arms, six arms, a second head
+    the wind-up of a crushing blow, a mirror-symmetric pose: both arms raised overhead, the two great gauntlets
+    clenched together above the flame crown, the upper body sunk lower into the pooled robe so that the whole figure,
+    raised fists included, stays inside the grey box at exactly the same pixel size as in Image 3; exactly two arms;
+    the gap between the raised arms and the flames is empty background
+  face: the dark face with two blazing white eyes inside the flame crown is readable
+  extra_negative: >-
+    four arms, six arms, legs, feet, wings, a tail, horns, a second head, a weapon, purple fire, violet, pink, magenta,
+    a human face with skin, orbs floating apart from the body, a ground line
   seeds: [1234]
-  sheet_seeds: {boss_attack: 1236, boss_cast: 1236, boss_attack_raise: 1235}   # boss_attack_raise 1234 (R69): guide line and box painted; boss_cast 1234 (R65): three arms; 1235 (R66, mirror-symmetric framing): an idle copy; boss_attack 1234 (ROSTER_LOG R56): a side profile, two arms visible; 1235 (R57,
-  # "the two arms on the right side ... smashing ... the two arms on the left side ... drawn back"): three arms
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells. Pass V redesign
   # (docs/REDESIGN_PLAN.md 3.1, D-V11 stats unchanged): a squat young deep-sea psychic horror, distinct from the tall
