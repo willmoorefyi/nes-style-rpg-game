@@ -49,6 +49,8 @@ export class ColossusSlots {
   private disposed = false;
   /** The sky dim now on `bg` (1 = none). */
   private skyNow = 1;
+  /** The battle started on a colossus whose art is still loading: its dim lands with the art. */
+  private skyOnArt = false;
 
   constructor(private readonly layers: BattleLayers, private readonly art: ColossusArtLike = colossusArt,
     private readonly castKind: (i: number) => ColossusCastKind = () => 'cast') {}
@@ -59,6 +61,7 @@ export class ColossusSlots {
     this.poses = poses;
     enemies.forEach((e, i) => { if (colossusOf(e)) this.swapIn(i, e); });
     this.settleSky();
+    this.skyOnArt = [...this.slots.values()].some((s) => s.placeholder);
   }
 
   /** The sky dim the live forms on screen ask for (the lowest `skyDim`; 1 = none). */
@@ -73,6 +76,7 @@ export class ColossusSlots {
 
   /** Put the forms' sky dim on `bg` (battle start, an interlude's end); returns the tint. */
   settleSky(): number {
+    this.skyOnArt = false;
     this.skyNow = this.skyDim();
     const tint = greyTint(this.skyNow);
     this.layers.bg.tint = tint;
@@ -81,6 +85,7 @@ export class ColossusSlots {
 
   /** Victory or defeat: the backdrop is shown undimmed again (B8). */
   clearSky(): void {
+    this.skyOnArt = false;
     this.skyNow = 1;
     this.layers.bg.tint = 0xffffff;
   }
@@ -119,6 +124,7 @@ export class ColossusSlots {
     const s = this.slots.get(i);
     if (this.disposed || !s || s.formId !== formId || !s.placeholder || !this.art.isReady(formId)) return;
     this.swapIn(i, s.data);
+    if (this.skyOnArt) this.settleSky();
   }
 
   /** The sprites AiEnemyView may pose: a detached stand-in replaces each colossus proxy. */

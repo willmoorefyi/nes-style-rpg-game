@@ -60,6 +60,20 @@ describe('the sky dim (D-O19, B8)', () => {
     s.exit();
   });
 
+  it('a battle that starts on F3 before its art has loaded dims bg once the art arrives (browser finding)', async () => {
+    const { colossusArt } = await import('../../../src/rendering/ColossusArt.js');
+    const { fixtureIo } = await import('../../helpers/colossusFixture.js');
+    const restore = colossusArt.setIo(fixtureIo());
+    uninstall = () => { colossusArt.release(); restore(); };
+    mockArt();
+    const { s, bg } = scene([colossusEnemy(HORIZON)], hero());
+    expect(bg()).toBe(0xffffff);                      // the placeholder form has no skyDim yet
+    await colossusArt.ensure([HORIZON]);
+    for (let i = 0; i < 5; i++) await Promise.resolve();
+    expect(bg()).toBe(DIM);
+    s.exit();
+  });
+
   it('defeat resets it', async () => {
     uninstall = await installFixtureArt();
     mockArt();
