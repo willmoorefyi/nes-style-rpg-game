@@ -375,10 +375,15 @@
     blade in front of the chest; the whole figure as tall as in Image 3 (halo to skirt) and at exactly the same pixel
     size; no slash arcs, no crescent smears, no light trails or motion lines anywhere, no effects
   cast: >-
-    a rite of judgement: the four blade wings raised high and spread wide to the sides, both gauntlets lifted, the
-    gear heart blazing bright white, the halo glowing; exactly four blade wings, two on each side, all separately
-    visible, as in Image 3; no other effects; the whole figure, wing tips and halo included, at the same pixel size as
-    in Image 3 and well below the top of the grey box
+    a rite of judgement, a small change from Image 3 and mirror-symmetric: the four blade wings stay in the same four
+    places as in Image 3 (two upper wings pointing up and out, two lower wings pointing down and out) but the two
+    upper wings swing a little higher and the two lower wings a little wider; both gauntlets lifted to shoulder height
+    with open hands; the gear heart blazing bright white; the halo, the helm, the cuirass and the long wide segmented
+    skirt of plates exactly as in Image 3 (the same shapes, widths and colours, the halo plain brass without a glow);
+    exactly four blade wings and no fifth,
+    each a plain straight blade with its cross-guard frame as in Image 3; no blade in front of the body; the whole
+    figure as tall as in Image 3, the halo top and the skirt bottom in the same places as in Image 3, at exactly the
+    same pixel size, well below the top of the grey box; no other effects, no light rays or trails
   hurt: >-
     a violent jolt: the floating plates knocked a little further apart, the cuirass halves tilted, the gear heart
     flickering, the halo knocked askew, the lowest blade wing on each side faltering downward; all four blade wings
@@ -388,7 +393,7 @@
   extra_negative: >-
     a face, skin, a body or bones inside the armour, feathers, feathered wings, more or fewer than four wings, six wings, three wings on a side, a horizontal middle wing, a sword
     in the hands, white-and-gold armour, a cape, violet, purple, pink, magenta
-  sheet_seeds: {boss_attack: 1238}   # boss_attack 1236 (ROSTER_LOG R314): crescent slash smears, 147 px; 1237 (R315): five blades
+  sheet_seeds: {boss_attack: 1238, boss_cast: 1237}   # boss_attack 1236 (ROSTER_LOG R314): crescent slash smears, 147 px; 1237 (R315): five blades; boss_cast 1236 (R317): thin skirt, 157 px
   seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0
 # ── pass R, G2: the other bosses (per pose, 4 or 5 images) and minibosses (3-pose sheets) (docs/ROSTER_PLAN.md 4.2;
 # the bestiary spec's entries 032, 033, 075, 092, 118, 121, 128). Original designs; limbs and props named by image side
