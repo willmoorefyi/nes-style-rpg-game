@@ -1,13 +1,18 @@
 """The rim arena backdrop (docs/CHAOS_FORMS_PLAN.md 7.2; FW-C): staging, the floor-front cut and the `rim` check profile.
 stage_backgrounds.py hands every command naming `rim` to this module (its 1-line hook, R16).
 
-  python3 -I assets-src/tools/stage_backgrounds.py rim [--src DIR]          # DIR default assets-src/backgrounds
+  python3 -I assets-src/tools/stage_backgrounds.py rim [--src DIR | --file PNG] [--out DIR]
+                                                     # --src default assets-src/backgrounds, --out assets/backgrounds
   python3 -I assets-src/tools/stage_backgrounds.py --check rim [--image FILE]
 
 Why not stage_backgrounds.stage(): the source is 1344x768, not 1536x1024 (`src_size` is read from the image), the
 user-accepted render (/tmp/stab2/sd35_v3_bg.webp, D-U7) was upscaled nearest (scale 1.5) and leaves the screen bottom
-uncovered below y 794 (behind the bottom strip). `pad_bottom` mirrors the floor upwards from its last row into that
-gap, exactly like the accepted render (so the staged rim.webp is byte-identical to it). Outputs in assets/backgrounds/:
+uncovered below y 794 (behind the bottom strip). A higher-resolution source (the Bedrock conservative upscale of
+rim-src.png, 7.3) stages to the same composition: the horizon row is recorded at RIM_SRC_H = 768 px and scaled with the
+source height (485 -> 1940 at 4x), the scale comes from the source width (0.375 at 4x), and a source larger than the
+stage is downsampled with Lanczos (a smaller one is still upscaled nearest, which keeps the accepted render).
+`pad_bottom` mirrors the floor upwards from its last row into the gap below y 794, exactly like the accepted render
+(so the staged rim.webp is byte-identical to it). Outputs in assets/backgrounds/:
   rim.webp        1920x1080, lossy quality 90 (the accepted encoding)
   rim_floor.webp  1944x1080 lossless RGBA: the floor below the horizon row with a hard edge on it (alpha 0 above),
                   12 px of bleed each side (from the same wide stage), pixel-exact with the decoded rim.webp below
@@ -33,6 +38,7 @@ ROOT = SB.ROOT
 SRC_DIR = ROOT / "assets-src" / "backgrounds"
 # (source file, horizon row in the source, zoom, align, screen horizon y): the user-accepted values (D-U7)
 RIM = ("rim-src.png", 485, 1.05, "center", 370)
+RIM_SRC_H = 768                  # the source height RIM's horizon row 485 is recorded at (the accepted 1344x768 render)
 BLEED = 12
 FIELD_BAND = (0, SB.FIELD_TOP, 1920, 780)
 CHECKS_RIM = {"coverage": 1.0, "edge_delta": 100.0, "party_contrast": 0.8, "seam": 30.0}
@@ -51,10 +57,13 @@ def _pad_bottom(a: np.ndarray, bottom: int) -> np.ndarray:
     return a
 
 
-def stage(src: Path, horizon: int, zoom: float, align: str, horizon_y: int, bleed: int = BLEED):
-    """(screen 1920x1080 RGB, wide (1920 + 2 bleed)x1080 RGB, info). Nearest upscale (scale >= 1), horizon row
-    `horizon` of the source at screen y `horizon_y`, pad_bottom below the source."""
+def stage(src: Path, horizon: int, zoom: float, align: str, horizon_y: int, bleed: int = BLEED,
+          ref_h: int = RIM_SRC_H):
+    """(screen 1920x1080 RGB, wide (1920 + 2 bleed)x1080 RGB, info). Nearest upscale (scale >= 1) or Lanczos
+    downsample (scale < 1); horizon row `horizon` (recorded at a `ref_h`-high source, scaled with the source height)
+    at screen y `horizon_y`, pad_bottom below the source."""
     im = Image.open(src).convert("RGB")
+    horizon = horizon * im.height / ref_h
     scale = SB.SCREEN[0] / im.width * zoom
     rs = Image.Resampling.NEAREST if scale >= 1 else Image.Resampling.LANCZOS
     big = im.resize((round(im.width * scale), round(im.height * scale)), rs)
@@ -72,7 +81,7 @@ def stage(src: Path, horizon: int, zoom: float, align: str, horizon_y: int, blee
         canvas.paste(big, (-x0, top))
         out.append(Image.fromarray(_pad_bottom(np.asarray(canvas), min(bottom, SB.SCREEN[1]))))
     info = {"src_size": im.size, "scale": round(scale, 3), "top": top, "bottom": bottom, "left": left,
-            "horizon_src": horizon, "horizon_y": horizon_y, "zoom": zoom}
+            "horizon_src": round(horizon, 2), "horizon_y": horizon_y, "zoom": zoom}
     return out[0], out[1], info
 
 
@@ -150,6 +159,8 @@ def main(argv: list[str]) -> None:
     ap = argparse.ArgumentParser(description="Stage or check the rim backdrop (see the module docstring).")
     ap.add_argument("ids", nargs="+")
     ap.add_argument("--src", help=f"directory with {RIM[0]} (default {SRC_DIR.relative_to(ROOT)})")
+    ap.add_argument("--file", help="stage this source image instead (e.g. the upscaled rim source)")
+    ap.add_argument("--out", help=f"output directory (default {SB.OUT.relative_to(ROOT)})")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--image", help="with --check: measure this file instead of assets/backgrounds/rim.webp")
     a = ap.parse_args(argv[1:])
@@ -161,10 +172,12 @@ def main(argv: list[str]) -> None:
         if not ok:
             raise SystemExit("--check failed: rim")
         return
-    src = (Path(a.src).expanduser() if a.src else SRC_DIR) / RIM[0]
+    if a.src and a.file:
+        raise SystemExit("rim: give --src DIR or --file PNG, not both")
+    src = Path(a.file).expanduser() if a.file else (Path(a.src).expanduser() if a.src else SRC_DIR) / RIM[0]
     screen, wide, info = stage(src, *RIM[1:])
-    rim, fl = write(screen, wide)
-    print(f"rim              <- {src.name:26s} {info} -> {rim.relative_to(ROOT)}, {fl.relative_to(ROOT)}")
+    rim, fl = write(screen, wide, Path(a.out).expanduser() if a.out else SB.OUT)
+    print(f"rim              <- {src.name:26s} {info} -> {rim}, {fl}")
 
 
 if __name__ == "__main__":

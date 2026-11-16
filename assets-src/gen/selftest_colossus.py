@@ -25,7 +25,8 @@ HERE = Path(__file__).resolve().parent
 # literals (pass C, docs/CHAOS_FORMS_PLAN.md 5.6 / 6): never computed from the ledgers
 N_C0 = 405                      # Gemini attempts in the main-checkout ledger at C1 (counted 2026-11-16)
 CAP_C = 80                      # D-U5 (user)
-PURPOSE_CAPS = {"v0": 12, "f3_gen": 24, "f3_nobg": 10, "f2_gen": 8, "f2_nobg": 4, "f4_variant": 4, "reserve": 18}
+PURPOSE_CAPS = {"v0": 12, "f3_gen": 24, "f3_nobg": 10, "f2_gen": 8, "f2_nobg": 4, "f4_variant": 4, "reserve": 16,
+                "rim_upscale": 2}   # rim_upscale: 2 of the reserve's 18 (orchestrator, FW-C rim fix, 2026-11-16)
 
 
 def _refused(fn: Callable[[], object], *words: str) -> str:
@@ -115,7 +116,11 @@ def run_colossus(check: Callable[[bool, str], None]) -> None:
     sections(check, _pinned, _guard, _generate_paths, _budget_check, _approve, _edit_models, _edit_bodies,
              _edit_gate, _edit_cache)
     from gen import selftest_colossus_art as SCA
+    from gen import selftest_colossus_ip as SCI
+    from gen import selftest_colossus_up as SCU
     SCA.run_art(check)
+    SCU.run_up(check)
+    SCI.run_ip(check)
 
 
 def _pinned(check) -> None:

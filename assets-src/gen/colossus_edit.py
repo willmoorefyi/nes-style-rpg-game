@@ -12,6 +12,15 @@ means random and could not be repeated), so a malformed request never spends a c
 5.6 purposes it is planned for (outpaint: v0 / f3_gen / f2_gen, search_replace: v0 / f4_variant, structure: v0; plus
 reserve:<reason>); the cap check stays in invoke. The output is `<source stem>_<tag>_raw.png` next to the source, with
 a sidecar holding the source's cache keys plus this one.
+
+`upscale <src> --model conservative|creative|fast` (7.3, the rim backdrop fix; purpose `rim_upscale`, cap 2, or
+reserve:<reason>) takes no form. Its bodies and local input limits (AWS Bedrock Stability Image Services, Upscale):
+  conservative  {image, prompt, [negative_prompt], creativity 0.2-0.5 (default 0.35), seed, output_format}
+                every side >= 64 px, <= 9,437,184 px, aspect 1:2.5..2.5:1 (the model is meant for <= 1 MP inputs)
+  creative      {image, prompt, [negative_prompt], creativity 0.1-0.5 (default 0.3), seed, output_format}
+                every side >= 64 px, 4,096..1,048,576 px
+  fast          {image, output_format}   (4x; no prompt, creativity or seed) sides 32..1,536 px, 1,024..1,048,576 px
+The output is `<src stem>_up_<model>_<seed>.png` next to the source (or --out), with a sidecar.
 """
 from __future__ import annotations
 
@@ -98,6 +107,76 @@ def cmd_edit(a) -> int:
     return C._call(kind, body, purpose, a.paid, dst, meta)
 
 
+UPSCALE_PURPOSES = ("rim_upscale",)
+# model: (min side, max side, min px, max px, max aspect, creativity range, default creativity); None = no limit
+UPSCALE = {"conservative": (64, None, 0, MAX_PX, MAX_ASPECT, (0.2, 0.5), 0.35),
+           "creative": (64, None, 4_096, 1_048_576, None, (0.1, 0.5), 0.3),
+           "fast": (32, 1_536, 1_024, 1_048_576, None, None, None)}
+
+
+def check_upscale_input(model: str, img: Image.Image) -> None:
+    lo, hi, pmin, pmax, asp, _, _ = UPSCALE[model]
+    w, h = img.size
+    if min(w, h) < lo or (hi and max(w, h) > hi) or not pmin <= w * h <= pmax or (asp and max(w / h, h / w) > asp):
+        _refuse(f"input image {w}x{h} does not fit {model} upscale: every side >= {lo} px"
+                + (f" and <= {hi:,} px" if hi else "") + f", {pmin:,}..{pmax:,} px"
+                + (f", an aspect within 1:{asp}..{asp}:1" if asp else ""))
+
+
+def upscale_body(a, image_b64: str) -> tuple[dict, str]:
+    """(request body, output-name tag) for one upscale; refuses a malformed request."""
+    if a.model not in UPSCALE:
+        _refuse(f"unknown upscale model {a.model!r} ({', '.join(UPSCALE)})")
+    crange, cdef = UPSCALE[a.model][5:]
+    body: dict = {"image": image_b64}
+    if a.model == "fast":
+        given = [n for n, v in (("--prompt", a.prompt), ("--negative", a.negative), ("--creativity", a.creativity),
+                                ("--seed", a.seed)) if v is not None]
+        if given:
+            _refuse(f"fast upscale takes no {', '.join(given)} (its body is image and output_format only)")
+        body["output_format"] = "png"
+        return body, "up_fast"
+    if a.seed is None:
+        _refuse(f"{a.model} upscale needs --seed (>= 1; 0 means random and could not be repeated)")
+    _range("seed", a.seed, 1, MAX_SEED)
+    if not (a.prompt or "").strip():
+        _refuse(f"{a.model} upscale needs a non-empty --prompt (a required parameter)")
+    crea = cdef if a.creativity is None else a.creativity
+    _range("creativity", crea, *crange)
+    body.update(prompt=a.prompt, creativity=crea)
+    if a.negative:
+        body["negative_prompt"] = a.negative
+    body.update(seed=a.seed, output_format="png")
+    return body, f"up_{a.model}_{a.seed}"
+
+
+def cmd_upscale(a) -> int:
+    from gen import bedrock as B
+    from gen import colossus as C
+    purpose = a.purpose or UPSCALE_PURPOSES[0]
+    if B.purpose_key(purpose) not in (*UPSCALE_PURPOSES, "reserve"):
+        _refuse(f"purpose {purpose!r} is not an upscale purpose ({', '.join(UPSCALE_PURPOSES)}, reserve:<reason>)")
+    src = Path(a.src)
+    body, tag = upscale_body(a, "")
+    img = Image.open(src)
+    check_upscale_input(a.model, img)
+    body["image"] = B.png_b64(img.convert("RGB"))
+    meta = {"source": str(src), "upscale": {k: v for k, v in body.items() if k != "image"}, "src_size": list(img.size)}
+    dst = Path(a.out) if a.out else src.with_name(f"{src.stem}_{tag}.png")
+    return C._call(f"upscale_{a.model}", body, purpose, a.paid, dst, meta)
+
+
+def add_upscale_parser(sub: argparse._SubParsersAction) -> None:
+    p = sub.add_parser("upscale", help="Stability upscale of one image (purpose rim_upscale)")
+    p.add_argument("src", help="the image to upscale (PNG; sent as RGB)")
+    p.add_argument("--model", required=True, help=f"one of {', '.join(UPSCALE)}")
+    p.add_argument("--prompt"); p.add_argument("--negative")
+    p.add_argument("--creativity", type=float); p.add_argument("--seed", type=int)
+    p.add_argument("--purpose", help=f"{', '.join(UPSCALE_PURPOSES)} (default) or reserve:<reason>")
+    p.add_argument("--out", help="output PNG (default: <src stem>_up_<model>_<seed>.png next to the source)")
+    p.add_argument("--paid", action="store_true")
+
+
 def add_parsers(sub: argparse._SubParsersAction) -> None:
     for kind in PURPOSES:
         p = sub.add_parser(kind)
@@ -118,3 +197,4 @@ def add_parsers(sub: argparse._SubParsersAction) -> None:
             p.add_argument("--grow-mask", type=int, default=5)
         if kind == "structure":
             p.add_argument("--control-strength", type=float, default=0.7)
+    add_upscale_parser(sub)

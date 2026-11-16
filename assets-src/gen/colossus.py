@@ -6,6 +6,10 @@ main checkout only) cannot be bypassed. One call per command (R29): run each in 
   python3 -I assets-src/gen/colossus.py nobg <form> <raw.png> [--purpose P] [--paid]       # remove_bg
   python3 -I assets-src/gen/colossus.py outpaint|search_replace|structure <form> <raw.png> --seed N ... [--paid]
                                                                      # edits (colossus_edit.py; V0-e, V0-d, F4)
+  python3 -I assets-src/gen/colossus.py upscale <src.png> --model conservative --prompt P --seed N [--creativity C]
+                                                    [--out F] [--paid]   # 7.3 rim fix, purpose rim_upscale (cap 2)
+  python3 -I assets-src/gen/colossus.py inpaint <src> --mask M --prompt P --seed N [--paid]; inpaint_merge <src> <raw>
+                                        --mask M      # F4 masked edit (colossus_inpaint.py; merge is offline)
   python3 -I assets-src/gen/colossus.py pix <form> <nobg.png> [--scale 2|3] [--colors N] [--canvas WxH] [--out F]
   python3 -I assets-src/gen/colossus.py glow|bake|review|check|lock <form>                  # after the layer yaml
   python3 -I assets-src/gen/colossus.py mock <form> [--image F] [--bg F] [--floor F]       # stage mock on rim
@@ -202,6 +206,7 @@ def cmd_budget(a, gem_ledger: Path | None = None, gem_count: int | None = None) 
 
 def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_count: int | None = None) -> int:
     from gen import colossus_edit as CE
+    from gen import colossus_inpaint as CI
     from gen import colossus_review as CR
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -224,6 +229,7 @@ def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_coun
     m = sub.add_parser("mock")
     m.add_argument("form"); m.add_argument("--image"); m.add_argument("--bg"); m.add_argument("--floor")
     CE.add_parsers(sub)
+    CI.add_parsers(sub)
     b = sub.add_parser("budget")
     b.add_argument("--check", action="store_true")
     a = ap.parse_args(argv)
@@ -231,6 +237,7 @@ def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_coun
         return cmd_budget(a, gem_ledger, gem_count)
     cmds = {"gen": cmd_gen, "nobg": cmd_nobg, "pix": cmd_pix, "approve": cmd_approve, "glow": CR.cmd_glow,
             "bake": CR.cmd_bake, "review": CR.cmd_review, "check": CR.cmd_check, "lock": CR.cmd_lock, "mock": CR.cmd_mock,
+            "upscale": CE.cmd_upscale, "inpaint": CI.cmd_inpaint, "inpaint_merge": CI.cmd_merge,
             **{k: CE.cmd_edit for k in CE.PURPOSES}}
     return cmds[a.cmd](a)
 

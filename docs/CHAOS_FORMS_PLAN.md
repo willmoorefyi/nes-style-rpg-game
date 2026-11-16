@@ -992,16 +992,17 @@ fixed offline and the orchestrator agrees.
 |---|---|---|---|
 | V0 (F3-focused) | core, sd35, remove_bg, search_replace, structure, outpaint | 12 | 5.2 (a 3, e 4, b 2, d 2, spare 1) |
 | rim backdrop | none (accepted as is) | 0 | 7.1; the optional fire-spot clean-up is offline paint (0 calls) |
+| rim upscale (`rim_upscale`) | upscale_conservative | 2 | 7.3: the user found the staged rim blocky; taken from the reserve (orchestrator, 2026-11-16) |
 | **F3 master gen + outpaint** (centrepiece) | core / sd35 + outpaint | 24 | 2 rejections in a row stop generation until the wording is fixed offline and the orchestrator agrees |
 | **F3 remove_bg** | remove_bg | 10 | |
 | F2 master | core (sd35 if V0 prefers it) | 8 | secondary: cut first if the cap is near (D-O13) |
 | F2 remove_bg | remove_bg | 4 | one per kept render |
-| F4 core variant | search_replace | 4 | 0 if paint (V0-d) |
-| reserve | any, **F3 first** | 18 | orchestrator only |
-| **Total cap** | | **80** | D-U5 (user); V0 + F3 = 46 of 80, plus F3's first call on the 18 reserve |
+| F4 core variant | search_replace or masked inpaint | 4 | 0 if paint (V0-d); inpaint (`colossus.py inpaint`, orchestrator ruling 2026-11-16) edits only a hand-drawn mask, and the offline `inpaint_merge` keeps every pixel outside it byte-identical |
+| reserve | any, **F3 first** | 16 | orchestrator only (18 until 2 moved to `rim_upscale`) |
+| **Total cap** | | **80** | D-U5 (user); V0 + F3 = 46 of 80, plus F3's first call on the 16 reserve |
 
 Under pass C, `bedrock.invoke` refuses any call whose `purpose` is not one of these keys, whatever the caller (A6). These are the `per_purpose_caps` in `budget.json` (purposes `v0`, `f3_gen`, `f3_nobg`, `f2_gen`, `f2_nobg`,
-`f4_variant`, `reserve`). The `reserve` purpose needs an orchestrator note in the ledger row's `purpose` field
+`f4_variant`, `rim_upscale`, `reserve`). The `reserve` purpose needs an orchestrator note in the ledger row's `purpose` field
 (`reserve:<reason>`).
 
 ---
@@ -1074,6 +1075,20 @@ Under pass C, `bedrock.invoke` refuses any call whose `purpose` is not one of th
   of scope. During `chaos_i2` the `tint` / `fade` steps darken the sky.
 - **Status-icon probe (R21):** Chaos protects against status, so `chaos_final` uses the scenario preset
   `enemyStatus: {0: [poison, slow]}` (the `anim_pass_v_chaos` pattern) to show the icon row.
+
+### 7.3 Higher-resolution source (`rim_upscale`, user feedback 2026-11-16)
+
+- The staged rim (1344x768 upscaled nearest x1.5) looks blocky next to the 1920x1080 backdrops. The fix is one
+  Stability **Conservative Upscale** call on Bedrock (`us.stability.stable-conservative-upscale-v1:0`, us-west-2)
+  through `colossus.py upscale` (purpose `rim_upscale`, cap 2, from the reserve):
+  `{image, prompt, [negative_prompt], creativity 0.2-0.5, seed, output_format: png}`; the input is checked locally
+  first (every side >= 64 px, <= 9,437,184 px, aspect 1:2.5..2.5:1; the 1344x768 source is 1.03 MP).
+- `stage_rim.py` takes the larger source unchanged in composition: the horizon row 485 is recorded at 768 px
+  (`RIM_SRC_H`) and scales with the source height, the scale comes from the width, and a source larger than the stage
+  is downsampled with Lanczos. The staged top -358, bottom 794, horizon y 370 and zoom 1.05 stay; `--check rim` must
+  pass. `stage_backgrounds.py rim --file <upscaled.png>` stages it (selftest_colossus_up.py: a 4x fixture gives the
+  same geometry).
+- The raw 1344x768 `rim-src.png` is kept; the upscaled source and its sidecar are recorded in `rim-src.json`.
 
 ---
 
