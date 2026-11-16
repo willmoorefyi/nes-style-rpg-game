@@ -203,3 +203,78 @@ Counts: 8 OK (3 with nits), 3 P2, 0 P1, 0 P0.
 - No P0, no P1. The chimera P1 is FIXED (second round).
 - Every round-2 P2 and nit is FIXED except the crocodile tip strand, which is on the D-R6 list by name.
 - New P2s: astos hurt staff/cape switch, warmech hurt key smaller and missing parts, crawler attack tail sliced flat. New nits: stone_golem 3 px hook (hurt_in1), water_elemental daze 3 px below the feet, red_piranha bestiary contrast, white_shark same palette as shark, impact dust in mid-air under swimmers, chaos hurt_in1 wing slit (sweep).
+
+## Pass V play test (V7), 2026-11-16
+
+Scope: `roster-int` at 711c5c0 (123 sheets, 9 pages). Fresh tester, own dev server (127.0.0.1:5417) and headless Chromium (Playwright scripts), every URL with `mute=1`; server stopped afterwards. Changed enemies: the 7 redesigns (crazy_horse, piscodemon, black_knight, guardian, vampire, hollow_seraph, chaos), the redesigned red `dragon`, and the 23 rescaled sheets (display scale 3), plus chaos at scale 3 (D-V6 = C2).
+Evidence (local, not committed): `/tmp/vpt4/` (`strips/<id>.png` every atlas frame, `z/on_*.png` old (V-base) vs new keys at screen scale, `z/z_*.png` zooms, `z/sib_*.jpg` and `z/g_sib.jpg` sibling battles, `z/dark_bg.jpg` backgrounds, `best/<id>_*.jpg` bestiary, `best_centre.txt`, `best_step.txt`, `bt/<scenario>/` step loops of the five `anim_pass_v_*` scenarios, `bt/H6`, `bt/H9`, `bt/R1`, `bt/B_<boss>/`, `fx/c1_*` (chaos fight) and `fx/h1_*` (3-huge fight), `p_*.json` per-frame sprite records, `regress.txt`, `check_all.txt`, `roster_report.txt`, `blk.txt` (block test), `fps.txt`; scripts `regress.py`, `ana4.py`, `blockchk.py`, `oldnew.py`, `zk.py`, `darkbg.py`, `js/*.js`).
+
+Automated pre-pass:
+- Frame-rect diff vs V-base (0309552, by sheet and frame, content): 115 sheets byte-identical in every frame; changed exactly crazy_horse, piscodemon, black_knight, guardian (cell 148 -> 128), vampire, hollow_seraph, chaos, dragon. No new or missing sheet. Atlas JSON `scale: 3` on exactly the 23 rescaled sheets plus chaos.
+- `monster_anim.py check --all`: 123 `OK`, exit 0.
+- `monster_roster_report.py` (not run in V6): no recolour flag. Three new watch pairs, all with a redesign: vampire / vampire_lord 0.80 / 0.21, black_knight / death_knight 0.75 / 0.37, rakshasa / vampire 0.75 / 0.29. Judged side by side at screen scale (`z/on_vamp.png`, `z/on_bk.png`, `z/sib_kn_000.jpg`): all distinct (red-lined cape and pale face vs the all-black, white-haired lord; tiger head in red robes; black plate with greatsword vs skull face, horned helm and red cape). Named pairs: crazy_horse / nightmare 0.70 / 0.34, mindflayer / piscodemon 0.53 / 0.23, death_eye / hollow_seraph 0.45 / 0.26, astos / chaos 0.53 / 0.24, dragon vs its four siblings <= 0.46.
+- Block test (plan 2.7, PNG at DPR 1, every art pixel whose 3x3 footprint is opaque against the atlas colour, `blk.txt`): all 24 scale-3 sheets at integer positions, `scaleMode nearest`, 0 mismatches (2,417 to 14,031 blocks per sheet); fire_gigas 13 at y 224-227, which is the dev step label drawn over it, not the art.
+- Bestiary centring (`best_centre.txt`, 46 entries: the 8 redesigns, the 23 rescaled, 15 unchanged): the idle box centre is on the panel centre (512, 498) to the pixel in all 46; chaos is 8 px high (its 561 px box is clamped inside the panel). Every idle box inside the panel inner rect. Bestiary step loops (`best_step.txt`, 260 steps, 10 sheets incl. chaos, seraph, dragon, ice_gigas, green_dragon): the art of every shown frame stays inside the panel.
+- Performance (GPU-backed headless Chromium, 10 s `enemyAnim=loop`): 9 ogres/trolls 120.5 median (p2 97); 3 tier-H (dragon, hill_gigas, green_dragon) 120.5 (p2 98); chaos alone 120.5; the mixed six 120.5 (p2 99).
+- No console errors or warnings (besides the GPU ReadPixels notice) in 46 bestiary entries, 5 scenarios, 13 sandbox battles and 2 real fights.
+
+### A. The user's pass-V goals
+
+| # | Goal | Verdict | Evidence |
+|---|---|---|---|
+| 1 | Bestiary enemies centred in the panel, not the screen | **MET** | idle box centre = panel centre (512, 498) +-0 px in 46 entries (chaos dy -8); the art of every step-loop frame inside the panel. `best_centre.txt`, `best_step.txt`, `best/chaos_screen.jpg` |
+| 2 | crazy_horse much more evil and otherworldly, a weaker nightmare-steed, clearly not "just a horse", distinct from nightmare | **PARTLY** | Distinct from nightmare: yes (ash grey vs black with blue flame mane; smaller, 178 vs 222 px tall). Otherworldly: only in the hurt keys, where the yellow-green cracks blaze. In idle / attack at 1x it reads as a gaunt, sick grey horse: a plain horse silhouette, the cracks are faint olive lines, the eye a 2 px dot, the neck spines small. See P1-1. `z/on_horse.png`, `z/z_ch_hurt.png`, `bt/regulars/s_0000.jpg` |
+| 3 | shark, bigeyes, minotaur, ochu, neochu, hydra, the elementals, all gigas, all dragons noticeably larger (ogre-size or above) and filling the field sensibly | **MET** (one P2) | Idle height on screen: every rescaled sheet >= 225 px vs ogre 202 (dragon_zombie 225 x 333 wide, water_elemental 234, ochu 246, up to ice_gigas 366, fire_gigas 363, dragon 351); bigeyes (large) 162 x 240. Siblings in step (lesser <= greater: bigeyes < deepeyes < evil_eye; shark / white_shark; minotaur < minotaur_zombie; hydra / fire_hydra), no blur (block test). 3-huge and mixed formations: no overlap at rest, integer scales, lunges below the window (hill_gigas travel top 130). Crowds of 4+ tier-H fall back (P2-7). `z/on_resc1.png`, `z/on_drag.png`, `z/g_sib.jpg`, `bt/huge/`, `bt/mixed/`, `p_huge.json`, `p_mixed.json` |
+| 4a | piscodemon a terrifying junior mind-flayer, distinct from mindflayer | **PARTLY** | Junior mind-flayer: yes (octopus head, face tentacles, hunched body, bone pauldrons). Distinct: yes (teal, no robe vs pink head in a black robe; silhouette 0.53). Terrifying: no; the big round pale eye with a small pupil and the soft teal ramp read as sad or goofy, not menacing; no glow or teeth. P2-1. `z/z_pisc.png`, `z/z_pisc_face.png` |
+| 4b | black_knight terrifying even at small size | **PARTLY** | Bulky black plate, gold trim, greatsword, magenta visor slit: reads as a heavy dark knight. At 1x (146 px) the curled ram horns are two round grey blobs that read as mouse / bear ears, and the visor glow is 2-3 px; more "chunky toy knight" than terrifying. Distinct from death_knight / dark_fighter: yes. P2-2. `z/on_bk.png`, `z/bk_best.png` |
+| 4c | guardian an evil robot killing machine | **MET** | Gunmetal four-legged insectoid mech, two scythe blades, three red eye lights; reads as a killing machine at 1x; distinct from warmech (bronze biped), iron_golem, soldier. `z/z_guard.png`, `z/sib_guard_000.jpg` |
+| 5 | vampire clean, not pixelated or messy | **MET** | crisp outlines, flat clean ramps, readable red eyes and pale face in all 13 frames; no specks. `z/z_vamp.png` |
+| 6 | hollow_seraph: hollow, disconnected, modern-robotic steampunk angel of doom with metallic blade-of-light wings | **PARTLY** | Disconnected: yes (helm, torso, gauntlets and skirt float apart with gaps). Steampunk: yes (brass trim, cog halo, chest clockwork). 4 blade wings in every frame. But the "wings" are four cream swords with hilts and crossguards (main colours (247,247,222) and (231,214,165)): they read as orbiting swords, not as wings, and neither metallic nor light (no glow, no steel ramp). "Hollow" does not read: the parts are solid, nothing seen through them. Angel: weak (no wing shape). P2-3. `z/on_sera.png`, `z/z_sera.png`, `best/hollow_seraph_screen.jpg` |
+| 7 | chaos by far the biggest, a huge cosmic overlord final boss | **MET** (P2 nits) | 558 x 549 px on screen vs the next largest 376 (garland); dominates the enemy side; top 179, bottom 745, never under the window; attacks in place (art reaches x 1054, party at 1410); flame head, gold-trimmed armour, starry black robe, 2 arms, 4 orbs. Robe readable on every committed background (all mid-to-light; evil_temple is teal), but its folds and stars do not read at 1x (a flat black mass). P2-4, P2-5, P2-6. `bt/chaos/`, `z/g_chaos.jpg`, `z/dark_bg.jpg` |
+| + | red dragon: an imposing red dragon larger than ogre and its siblings | **MET** | rearing, winged, horned; 351 px tall vs ogre 202 and white / blue / green 285-291 (narrower: 258 vs 330-372 wide); consistent across all 13 frames. `z/on_drag.png`, `strips/dragon.png`, `bt/huge/s_0000.jpg` |
+
+### B. Changed enemies
+
+Method: every frame in `strips/<id>.png` and zooms; bestiary (centring, step loop); battle step loops in the five `anim_pass_v_*` scenarios and sandbox formations (`p_*.json`: highest opaque y, reach, overlap at rest).
+
+| Enemy | Verdict | Finding | Evidence |
+|---|---|---|---|
+| crazy_horse | **P1** | see P1-1; frames otherwise clean, hurt_in1 -> hurt_in2 key switch (rears, mane shrinks; by design) | `strips/crazy_horse.png` |
+| piscodemon | P2 | P2-1; 13 frames clean; tentacle count: 4-5 strands visible at 8x, not the 6 the plan names | `z/z_pisc_face.png` |
+| black_knight | P2 | P2-2; frames clean; attack key switches the sword from upright to a low thrust (key change) | `z/z_bk.png` |
+| guardian | OK (nit) | 4 legs + 2 blades in every frame; in atk_mid / attack the eye row becomes a red splash at 4x (reads as an eye flare at 1x) | `z/z_guard.png` |
+| vampire | OK | clean; new watch pairs distinct (above) | `z/z_vamp.png` |
+| hollow_seraph | P2 | P2-3; lunge top 124 (window 120, same as G7 121); heavy-attack red tint telegraph reads; 15 of 17 frames seen in battle | `bt/seraph/`, `z/g_sera.jpg` |
+| chaos | P2 | P2-4 / 5 / 6; 2 arms + 4 orbs in all 22 frames; heavy raise and cast read in the loop | `strips/chaos.png`, `bt/chaos/` |
+| dragon | OK | above | `strips/dragon.png` |
+| bigeyes, shark, minotaur, ochu, neochu, hydra, earth_elemental, fire_elemental, water_elemental, air_elemental, hill_gigas, fire_gigas, ice_gigas, white_dragon, blue_dragon, green_dragon, dragon_zombie, white_shark, minotaur_zombie, fire_hydra, deepeyes, evil_eye (22 rescaled, plus dragon above) | OK | art and rigs byte-identical to V-base; scale 3, block test 0 mismatches; bestiary centred; larger than the ogre in battle; siblings in order (`z/g_sib.jpg`); the 3x pixel blocks next to 2x neighbours are visible (accepted, D-V1) | `blk.txt`, `best_centre.txt` |
+
+Effects on the big boxes (real fights, `fx/`): KNGT Fight, NINJ Fight, WWIZ HEAL (all), BWIZ FIR2 (all).
+- chaos (`anim_pass_v_chaos`, poisoned): slash effect across the body, damage numbers (64, poison 15) at the head, below the window (y about 155); poison bubbles drift over the robe; HEAL on the party fine. Two P2s: P2-5, P2-6.
+- 3 tier-H (`anim_pass_v_huge`): FIR2 tints each enemy red, numbers 50 / 52 / 43 at each head, on screen and below the window; KNGT's 419 on the red dragon at its head; HEAL fine; hill_gigas' lunge to WWIZ makes contact and draws over green_dragon. `fx/h1_019_run.jpg`, `fx/h1_046_run.jpg`
+
+### C. Defects
+
+| # | Sev | Kind | Enemy | Defect | Repro (`http://127.0.0.1:<port>/?mute=1&...`) | Evidence |
+|---|---|---|---|---|---|---|
+| P1-1 | P1 | art (user goal 2) | crazy_horse | Idle / attack / daze (11 of 13 frames) read as an ordinary gaunt grey horse at 1x: plain horse silhouette, faint olive cracks, 2 px eye; the otherworldly glow is only in hurt_in2 / hurt. Needs the glow cracks and eyes (and something non-equine: smoke legs, a split skull, spines) visible in idle | `bestiary=crazy_horse&battleStep=1`; `scenario=anim_pass_v_regulars` (Debug) | `z/on_horse.png`, `z/z_ch_hurt.png`, `bt/regulars/s_0000.jpg` |
+| P2-1 | P2 | art (goal 4) | piscodemon | Not terrifying: big round pale eye, soft teal; tentacles 4-5 visible, not 6 | `bestiary=piscodemon` | `z/z_pisc_face.png` |
+| P2-2 | P2 | art (goal 4) | black_knight | Round curled horns read as mouse / bear ears at 1x; visor glow tiny | `bestiary=black_knight` | `z/bk_best.png` |
+| P2-3 | P2 | art (goal 6) | hollow_seraph | The four blade wings read as cream swords with hilts, not metallic light-blade wings; the body does not read hollow | `bestiary=hollow_seraph` | `z/z_sera.png` |
+| P2-4 | P2 | art | chaos | attack_raise / atk_raise_b / atk_swing: the arms double in thickness and the flame head drops about 40 art px into the chest (identity and proportion pop from atk_raise_in = idle) | `bestiary=chaos&battleStep=1` | `strips/chaos.png` row 4 |
+| P2-5 | P2 | runtime | chaos | The poison status icon (green drop) and the top orb sit inside the damage number ("6" drop "4") | `scenario=anim_pass_v_chaos`, Fight | `z/fx_num64.png` |
+| P2-6 | P2 | runtime | chaos (scale 3) | FIR2's flames spawn as two small flames at the robe hem; on a 558 px boss they are barely visible on the black robe (the tier-H boxes show the red tint instead) | `scenario=anim_pass_v_chaos`, BWIZ Magic FIR2 | `z/fx_fir2.png` |
+| P2-7 | P2 | layout | tier-H crowds | 6 tier-H (shark, minotaur, ochu, hydra, earth_elemental, ice_gigas) drop to scale 2 (ogre size); 9 tier-H mix drops to scale 1 (dragons 113 x 120 px, smaller than a scale-2 goblin), shown without a warning. Plan 2.5 calls 5+ tier-H unsupported (`formationFits` false) and no authored formation has them, but the sandbox still runs it | `sandbox=l30_lich&enemies=dragon,white_dragon,blue_dragon,green_dragon,dragon_zombie,fire_gigas,neochu,evil_eye,air_elemental&enemyAnim=step` | `bt/H6/`, `bt/H9/`, `p_H9.json` |
+| P2-8 | P2 | UI (pre-existing, not pass V) | dragon (and any long Weak row) | Bestiary stats: "Weak Ice, Poison/Stone" runs into the "Resist" label ("Poison/StoneResist") | `bestiary=dragon` | `best/dragon_screen.jpg` |
+
+Nits (not filed): chaos robe folds / stars invisible at 1x; guardian attack eye splash at 4x; mixed pixel density of 3x sheets beside 2x ones (D-V1 accepted).
+
+### D. Regression sample
+
+- **15 unchanged sheets** (goblin, wolf, cockatrice, green_slime, cobra, ogre, troll, ashen_queen, lich, garland, astos, warmech, death_eye, drowned_sovereign, nightmare) plus mindflayer: byte-identical to V-base; bestiary centred (+-0 px); in battle (`bt/R1`, `bt/B_<boss>`) no overlap at rest, integer scale 2. Boss lunges, highest opaque y: ashen_queen 124, lich 124, garland 128, astos 124, warmech 124, death_eye 137, drowned_sovereign 148: identical to G7. chaos + 2 goblins: no overlap, goblins at scale 2.
+- The three open G7 P2s (astos hurt, warmech hurt, crawler tail) not re-tested (D-V16).
+
+### Status
+
+- No P0. One P1 (P1-1, crazy_horse idle does not meet user goal 2). Eight P2s (P2-1 .. P2-8; P2-8 pre-existing).
+- Goals: 1 MET, 2 PARTLY, 3 MET, 4 PARTLY (guardian MET; piscodemon and black_knight PARTLY), 5 MET, 6 PARTLY, 7 MET; red dragon MET.
