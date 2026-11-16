@@ -23,21 +23,29 @@ const script = (id: string): InterludeScript => SCRIPTS.find((s) => s.id === id)
 
 /**
  * The colossus geometry the pan limits come from: colossus.json once it has the form (A5, the 18.5 contract shape), else
- * the planned rev-4 geometry (18.4: F3 canvas 2700 x 1080 at scale 1, rest place (-527, -210), the disc `core` at canvas
- * (1347, 510); F2 1320 x 900 at scale 1, place (40, -20)).
+ * the planned rev-4 geometry (18.4, D-U11, D-U13: F3 canvas 2700 x 1080 at scale 1, rest place (-527, -60), the disc `core`
+ * at canvas (1347, 510); F4 chaos_horizon_core F3's art at its own rest (-527, -285); F2 1320 x 900 at scale 1, place
+ * (40, 25)). A record's geometry is its own entry (keyed by the record id, F4) or its art's (`colossus:`).
  */
 type Geometry = PanGeometry & { anchors?: { core: [number, number] } };
 const PLANNED: Record<string, Geometry> = {
-  chaos_horizon: { canvas: [2700, 1080], scale: 1, place: [-527, -210], anchors: { core: [1347, 510] } },
-  chaos_orrery: { canvas: [1320, 900], scale: 1, place: [40, -20] },
+  chaos_horizon: { canvas: [2700, 1080], scale: 1, place: [-527, -60], anchors: { core: [1347, 510] } },
+  chaos_horizon_core: { canvas: [2700, 1080], scale: 1, place: [-527, -285], anchors: { core: [1347, 510] } },
+  chaos_orrery: { canvas: [1320, 900], scale: 1, place: [40, 25] },
 };
-function geometryOf(art: string): Geometry | undefined {
-  const path = 'assets/sprites/colossus.json';
-  const json = existsSync(path) ? JSON.parse(readFileSync(path, 'utf-8')) as { forms?: Record<string, Geometry> } : {};
-  return json.forms?.[art] ?? PLANNED[art];
+type Json = { forms?: Record<string, Geometry & { art?: string }> };
+const JSON_PATH = 'assets/sprites/colossus.json';
+const JSON_FORMS = (existsSync(JSON_PATH) ? JSON.parse(readFileSync(JSON_PATH, 'utf-8')) as Json : {}).forms ?? {};
+/** The geometry a form id draws at: the built json's entry (an F4-style entry inherits its art's canvas), else the plan's. */
+function geometryOf(id: string): Geometry | undefined {
+  const own = JSON_FORMS[id];
+  const art = own?.art ? JSON_FORMS[own.art] : undefined;
+  return own ? { ...art, ...own } as Geometry : PLANNED[id];
 }
-function limitsOf(art: string): PanLimits | undefined {
-  const g = geometryOf(art);
+/** The geometry a record draws at: its own entry (F4), else its art's. */
+const recordGeometry = (e: EnemyData): Geometry | undefined => (JSON_FORMS[e.id] || PLANNED[e.id] ? geometryOf(e.id) : geometryOf(e.colossus ?? ''));
+function limitsOf(id: string): PanLimits | undefined {
+  const g = geometryOf(id);
   return g ? panLimits(g) : undefined;
 }
 
@@ -58,7 +66,7 @@ describe('battle-interludes.yaml', () => {
 
   it('each script\'s unskipped total at message speed 3 is pinned and within its cap (480; 600 for chaos_i2)', () => {
     const totals = Object.fromEntries(SCRIPTS.map((s) => [s.id, interludeFrames(s)]));
-    expect(totals).toEqual({ chaos_crack: 102, chaos_i1: 436, chaos_i2: 577, chaos_i3: 130 });
+    expect(totals).toEqual({ chaos_crack: 102, chaos_i1: 436, chaos_i2: 577, chaos_i3: 190 });
     for (const s of SCRIPTS) expect(interludeFrames(s), s.id).toBeLessThanOrEqual(interludeCap(s.id));
     expect([interludeCap('chaos_i1'), interludeCap('chaos_i2'), interludeCap('chaos_i3'), interludeCap('chaos_crack')])
       .toEqual([INTERLUDE_CAP_FRAMES, 600, 480, 480]);
@@ -67,7 +75,10 @@ describe('battle-interludes.yaml', () => {
   it('every phase with an interlude keeps the swap / rise / variant / pan rules (R13, R19, B4, B5)', () => {
     expect(PAIRS.map(([id, a, b]) => `${id}: ${a.id} -> ${b.id}`)).toEqual(['chaos_i1: chaos -> chaos_orrery',
       'chaos_i2: chaos_orrery -> chaos_horizon', 'chaos_crack: chaos_horizon -> chaos_horizon', 'chaos_i3: chaos_horizon -> chaos_horizon_core']);
-    for (const [id, from, to] of PAIRS) expect(interludeFormErrors(script(id), from, to, limitsOf(to.colossus ?? '')), id).toEqual([]);
+    for (const [id, from, to] of PAIRS) {
+      const g = recordGeometry(to);
+      expect(interludeFormErrors(script(id), from, to, g ? panLimits(g) : undefined), id).toEqual([]);
+    }
     const swaps = (id: string) => script(id).steps.filter((s) => s.type === 'swap').length;
     expect(['chaos_i1', 'chaos_i2', 'chaos_i3', 'chaos_crack'].map(swaps)).toEqual([1, 1, 0, 0]);
   });
@@ -81,11 +92,38 @@ describe('battle-interludes.yaml', () => {
     ]);
   });
 
-  it('B4: the F3 pan limits are the border rule minus the motion envelope: dx [-247, +521], dy [-80, +324]', () => {
+  it('B4: the F3 pan limits at its rest (-527, -60) are the border rule minus the motion envelope: dx [-247, +521], dy [-230, +174]', () => {
     expect(PAN_ENVELOPE).toEqual({ up: 4, down: 0, left: 0, right: 0 });
-    expect(limitsOf('chaos_horizon')).toEqual({ dx: [-247, 521], dy: [-80, 324] });
+    expect(geometryOf('chaos_horizon')!.place).toEqual([-527, -60]);
+    expect(limitsOf('chaos_horizon')).toEqual({ dx: [-247, 521], dy: [-230, 174] });
     // the borders alone (no layer moving): the bottom gives up the 4 px of breathing
-    expect(panLimits(PLANNED.chaos_horizon, { up: 0, down: 0, left: 0, right: 0 })).toEqual({ dx: [-247, 521], dy: [-84, 324] });
+    expect(panLimits(PLANNED.chaos_horizon, { up: 0, down: 0, left: 0, right: 0 })).toEqual({ dx: [-247, 521], dy: [-234, 174] });
+    // F4 at its own rest (-527, -285, D-U13): dx [-247, +521], dy [-5, +399]
+    expect(geometryOf('chaos_horizon_core')!.place).toEqual([-527, -285]);
+    expect(limitsOf('chaos_horizon_core')).toEqual({ dx: [-247, 521], dy: [-5, 399] });
+  });
+
+  it('chaos_i3 heaves the colossus from F3\'s rest to F4\'s (dy -225): a pan from F3 - F4 to F4\'s rest, borders held on every frame', () => {
+    const f3 = geometryOf('chaos_horizon')!;
+    const f4 = recordGeometry(byId('chaos_horizon_core'))!;
+    const heave: [number, number] = [f3.place[0] - f4.place[0], f3.place[1] - f4.place[1]];
+    expect(heave).toEqual([0, 225]);
+    const steps = script('chaos_i3').steps;
+    expect(steps.filter((s) => s.type === 'swap')).toEqual([]);
+    const pans = steps.filter((s) => s.type === 'pan');
+    expect(pans).toEqual([{ type: 'pan', from: heave, frames: 60, ease: 'out' }]);
+    const pan = pans[0];
+    if (pan.type !== 'pan') throw new Error('no pan');
+    const lim = panLimits(f4);
+    // every frame from the heave's start (F3's rest) to F4's rest, and the time before it at the start offset
+    for (let f = 0; f <= pan.frames; f++) {
+      const u = 1 - (1 - f / pan.frames) ** 2;
+      const dy = pan.from[1] * (1 - u);
+      expect(dy >= lim.dy[0] && dy <= lim.dy[1] && pan.from[0] >= lim.dx[0] && pan.from[0] <= lim.dx[1], `frame ${f}: ${dy}`).toBe(true);
+    }
+    // the variant (the open core) shows before the heave, so the cavity comes up into the field
+    expect(steps.findIndex((s) => s.type === 'variant')).toBeLessThan(steps.indexOf(pan));
+    expect(interludeFrames(script('chaos_i3'))).toBeLessThanOrEqual(interludeCap('chaos_i3'));
   });
 
   it('chaos_i2 (18.4): rise from_dy 700 over 120 frames ending at the pan start, then the pan from (+480, +120) to rest', () => {
@@ -111,7 +149,7 @@ describe('battle-interludes.yaml', () => {
     }
     const core = PLANNED.chaos_horizon.anchors!.core;
     const disc = [g.place[0] + pan.from[0] + core[0] * g.scale, g.place[1] + pan.from[1] + core[1] * g.scale];
-    expect(disc).toEqual([1300, 420]);
+    expect(disc).toEqual([1300, 570]);
     expect(disc[0] > 0 && disc[0] < 1920 && disc[1] > 120 && disc[1] < 780).toBe(true);
   });
 });

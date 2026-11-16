@@ -140,8 +140,8 @@ export function validateInterludeScript(script: InterludeScript): void {
  * The pan limits (B4, 18.4): the border rule minus the motion envelope, per axis, in screen px from rest. The canvas's
  * left, right and bottom borders carry opaque body pixels, so they stay off-screen (left <= -margin, right >= w +
  * margin) or behind the bottom strip (bottom >= 780 + margin); the top border is glow only and stays behind the message
- * window (top <= 120 - margin). For the planned F3 ((-527, -210), 2700 x 1080 at scale 1, the 4 px breathing):
- * dx [-247, +521], dy [-80, +324].
+ * window (top <= 120 - margin). For F3 at its rest (-527, -60) (D-U11; 2700 x 1080 at scale 1, the 4 px breathing):
+ * dx [-247, +521], dy [-230, +174]; for F4 at its own rest (-527, -285) (D-U13): dx [-247, +521], dy [-5, +399].
  */
 export function panLimits(g: PanGeometry, env: PanEnvelope = PAN_ENVELOPE,
   field = { w: 1920, top: 120, bottom: 780 }, margin = 6): PanLimits {
