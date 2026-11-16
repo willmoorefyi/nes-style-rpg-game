@@ -1,0 +1,35 @@
+# White shark (pass R fix 2, swimmer; R289 = the FW-C re-cut of R280): a broad slate-grey great white with a white
+# belly and pale cross scars, facing right. body: floating (rig_floating.py), judged by the float band. The idle is
+# small and level (57 px, rows 66-122) while the attack and hurt keys are arched and 95-98 px tall (rows 28-125), so
+# no part move can bridge them; every in-between is a pure translation of its pixel-source key (moves: [], the
+# water_elemental recipe): the idle-sourced frames rise about 13 px toward the arched keys' mass (centroid 27-28 px
+# higher), the key-sourced frames sit on their keys (their bottoms are at row 125: at most +1 px down).
+# fixmeasure.py switch (no rig): no translation within +-12 dy (the keys' centroids sit 27 / 28 px above the idle's).
+# fixmeasure.py switch --rig (this file), need / cap attack 0.105 / 13.7, hurt 0.140 / 14.3:
+#   attack wind2->mid IoU 0.221 / step 13.3, follow->recover 0.224 / 13.1, recover->idle 0.362 / 13.0
+#   hurt idle->in1 0.336 / 14.0, in1->in2 0.196 / 13.5
+# The float band (check 8) passes in every frame: the plan-6 step-2 decision is ship (LIFT_MAX stays 36).
+# Review (G3d iteration 1, image-only): SHIP WITH NITS; it reads as a shark breaching and lunging, then rearing when
+# hit, one shark, no seam. Nits (forced by the centroid cap: 27 px of rise in two steps <= 13.7): the 13-14 px drop
+# from atk_recover and the returning hurt_in1 onto the idle key; atk_mid / atk_follow sit 4 px ahead of the contact key (the
+# dx that keeps wind2->mid under the cap); the hurt starts with a 14 px hop up (30 ms); no pull-back in the wind-up.
+sprite: white_shark
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [66, 97], base: [66, 122], neck: [90, 92], crown: [100, 88]}
+  attack: {core: [62, 70], base: [40, 125], neck: [86, 60], crown: [100, 56]}
+  hurt:   {core: [68, 69], base: [68, 125], neck: [92, 58], crown: [104, 52]}
+frames:
+  atk_wind1: {moves: [], t: 0.0, dy: -6}           # rears up, gathering for the lunge
+  atk_wind2: {moves: [], t: 0.0, dy: -13}
+  atk_mid: {moves: [], t: 0.0, dx: 4, dy: 1}       # the arched lunge arriving onto the key
+  atk_follow: {moves: [], t: 1.0, dx: 4, dy: 1}
+  atk_recover: {moves: [], t: 0.0, dy: -13}        # the level idle, settling back down
+  hurt_in1: {moves: [], t: 0.0, dx: 1, dy: -14}    # jolted up by the hit
+  hurt_in2: {moves: [], t: 0.0, dx: -1, dy: 1}     # the recoil curl arriving onto the key
+  daze: {moves: [], t: 0.0, dy: 2}                 # sinks 2 / 3 px (the whole fish)
+  daze_b: {moves: [], t: 0.0, dy: 3}
+holds: []

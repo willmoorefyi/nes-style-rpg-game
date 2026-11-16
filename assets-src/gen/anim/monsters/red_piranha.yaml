@@ -1,0 +1,30 @@
+# Red piranha (pass R fix 2, swimmer; R288 = the FW-C re-cut of R282): a stocky rust-orange armoured river fish with
+# a bony head plate and a heavy jutting jaw, facing right. body: floating (rig_floating.py), judged by the float band.
+# The scaled body is one rigid mass (turning it or the head plate creased the scales), so every in-between is a pure
+# translation of its pixel-source key (moves: [], the water_elemental recipe); the jaw opens and the body curls only
+# at the key switches.
+# fixmeasure.py switch (no rig): attack d (4, 0) IoU 0.897, hurt d (3, -1) IoU 0.646 (need 0.550, cap 6.0).
+# fixmeasure.py switch --rig (this file): attack weakest wind2->mid IoU 0.805 / step 3.9; hurt in1->in2 IoU 0.646 /
+# step 1.6 (need 0.550, cap 6.0).
+# Review (G3d iteration 1, image-only): SHIP WITH NITS. Nits: a modest wind-up (2-4 px back, mouth shut); the jaw is
+# open from atk_mid (the switch onto the key); the hurt tail tip sits 2-3 px from the left cell edge.
+sprite: red_piranha
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [48, 53], base: [48, 76], neck: [62, 45], crown: [66, 32]}
+  attack: {core: [46, 53], base: [46, 77], neck: [62, 45], crown: [66, 32]}
+  hurt:   {core: [46, 53], base: [46, 77], neck: [64, 48], crown: [62, 34]}
+frames:                         # idle-sourced frames shift by -round(d/2), key-sourced ones by d - round(d/2)
+  atk_wind1: {moves: [], t: 0.0, dx: -2, dy: 1}    # backs off and sinks, coiling for the dart
+  atk_wind2: {moves: [], t: 0.0, dx: -4, dy: 1}
+  atk_mid: {moves: [], t: 0.0, dx: 2}              # the open jaw darting in onto the key
+  atk_follow: {moves: [], t: 1.0, dx: 2}
+  atk_recover: {moves: [], t: 0.0, dx: -2}
+  hurt_in1: {moves: [], t: 0.0, dx: -2}            # knocked back 2
+  hurt_in2: {moves: [], t: 0.0, dx: 1, dy: -1}     # the curl arriving 1 px off the key
+  daze: {moves: [], t: 0.0, dy: 1}                 # sinks 1 / 2 px (the whole fish; 3 touches the cell floor)
+  daze_b: {moves: [], t: 0.0, dy: 2}
+holds: []
