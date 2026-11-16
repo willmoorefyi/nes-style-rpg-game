@@ -1,16 +1,20 @@
 /**
- * The interlude timeline (docs/CHAOS_FORMS_PLAN.md 2.3, R18, A1, A2): steps run in order, a `with: previous` step
- * starts with the one before it (the total is the longest branch), message steps count 90 frames (speed 3) and are the
- * only steps confirm advances, and the registry drops a bad script with console.error.
+ * The interlude timeline (docs/CHAOS_FORMS_PLAN.md 2.3, R18, A1; rev 4: 18.4 B4): steps run in order, a `with: previous`
+ * step starts with the one before it (the total is the longest branch), message steps count 90 frames (speed 3) and are
+ * the only steps confirm advances, and the registry drops a bad script with console.error. Rev 4 drops A2's pan start
+ * rule (dx <= 0, dy in [-70, 0]): the B4 border limits of the json geometry replace it, and a pan may not run beside its
+ * rise (the rise ends at the pan's `from`). The registry reads the real battle-interludes.yaml, chaos_i2 included.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { InterludeClock, compileInterlude, interludeProblems, panProblems, type InterludeStep } from '../../../src/scenes/battle/formInterlude.js';
 import { InterludeRegistry } from '../../../src/data/InterludeRegistry.js';
+import { readFileSync } from 'node:fs';
+import { parse } from 'yaml';
 import { fixtureIndex, HORIZON } from '../../helpers/colossusFixture.js';
 
 afterEach(() => { vi.restoreAllMocks(); });
 
-/** chaos_i2 as section 3.3 writes it (A1 re-timing). */
+/** chaos_i2 as 18.4 writes it (A1 total unchanged; the rise of 700 ends at the pan start (+480, +120)). */
 const I2: InterludeStep[] = [
   { type: 'message', text: 'The rings shatter!' },
   { type: 'pose', name: 'roar' },
@@ -18,9 +22,9 @@ const I2: InterludeStep[] = [
   { type: 'fade', alpha: 0.6, frames: 20 },
   { type: 'shake', times: 3 },
   { type: 'swap' },
-  { type: 'rise', frames: 120, from_dy: 300 },
+  { type: 'rise', frames: 120, from_dy: 700 },
   { type: 'shake', times: 2, with: 'previous' },
-  { type: 'pan', from: [0, -60], frames: 120, ease: 'out' },
+  { type: 'pan', from: [480, 120], frames: 120, ease: 'out' },
   { type: 'flash', color: '#ffffff', frames: 8, alpha: 1 },
   { type: 'message', text: 'Chaos, the Last Horizon, fills the sky!' },
 ];
@@ -78,20 +82,32 @@ describe('InterludeClock', () => {
 });
 
 describe('validation', () => {
-  it('caps: 480 frames, 600 for chaos_i2 (D-O15); the A2 pan start rule; one swap; rise only after it', () => {
+  it('caps: 480 frames, 600 for chaos_i2 (D-O15); no A2 start rule (rev 4); a pan beside its rise; one swap; rise after it', () => {
     expect(interludeProblems('chaos_i2', I2)).toEqual([]);
     expect(interludeProblems('chaos_i1', I2).join()).toMatch(/577 frames > 480/);
-    expect(interludeProblems('x', [{ type: 'swap' }, { type: 'pan', from: [10, -60], frames: 10, ease: 'out' }]).join()).toMatch(/dx <= 0/);
-    expect(interludeProblems('x', [{ type: 'swap' }, { type: 'pan', from: [0, -80], frames: 10, ease: 'out' }]).join()).toMatch(/dy in \[-70, 0\]/);
+    expect(interludeProblems('x', [{ type: 'swap' }, { type: 'pan', from: [480, 120], frames: 10, ease: 'out' }])).toEqual([]);
+    expect(interludeProblems('x', [{ type: 'swap' }, { type: 'pan', from: [0, -80], frames: 10, ease: 'out' }])).toEqual([]);
+    expect(interludeProblems('x', [{ type: 'swap' }, { type: 'rise', frames: 10, from_dy: 10 },
+      { type: 'pan', from: [0, 0], frames: 10, ease: 'out', with: 'previous' }]).join()).toMatch(/beside a rise/);
     expect(interludeProblems('x', [{ type: 'rise', frames: 10, from_dy: 10 }, { type: 'swap' }]).join()).toMatch(/rise before the swap/);
     expect(interludeProblems('x', [{ type: 'swap' }, { type: 'swap' }]).join()).toMatch(/more than one swap/);
     expect(interludeProblems('x', [{ type: 'flash', color: '#fff', frames: 4, alpha: 1.5 }]).join()).toMatch(/alpha/);
   });
 
-  it('pan offsets stay inside the json-derived limits of the form they reveal (R13)', () => {
+  it('pan offsets stay inside the B4 border limits of the form they reveal (dx [-247, 521], dy [-80, 324] on F3)', () => {
     const f = fixtureIndex().forms[HORIZON];
     expect(panProblems(I2, f)).toEqual([]);
-    expect(panProblems([{ type: 'pan', from: [0, -200], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
+    expect(panProblems([{ type: 'pan', from: [0, -81], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
+    expect(panProblems([{ type: 'pan', from: [522, 0], frames: 10, ease: 'out' }], f).join()).toMatch(/outside/);
+    expect(panProblems([{ type: 'pan', from: [-247, 324], frames: 10, ease: 'out' }], f)).toEqual([]);
+  });
+
+  it('the registry reads the real battle-interludes.yaml: all four scripts, chaos_i2 with its rev-4 pan', () => {
+    const err = vi.spyOn(console, 'error');
+    const reg = InterludeRegistry.from(parse(readFileSync('assets/data/battle-interludes.yaml', 'utf-8')));
+    expect(reg.ids.sort()).toEqual(['chaos_crack', 'chaos_i1', 'chaos_i2', 'chaos_i3']);
+    expect(reg.get('chaos_i2')!.find((s) => s.type === 'pan')).toMatchObject({ from: [480, 120] });
+    expect(err).not.toHaveBeenCalled();
   });
 
   it('the registry drops an unknown step type or a bad value with console.error and keeps the rest', () => {

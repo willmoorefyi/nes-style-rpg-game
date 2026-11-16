@@ -1,5 +1,5 @@
 /**
- * Colossus anchors (docs/CHAOS_FORMS_PLAN.md 4.4) in a real battle on the F3-like fixture: damage numbers at `core`
+ * Colossus anchors (docs/CHAOS_FORMS_PLAN.md 4.4; rev 4: the 18.4 estimates) in a real battle on the painted F3 fixture: damage numbers at `core`
  * (y 140..740), the target arrow and bracket inside the field with the label at y >= 124, the status icon row inside
  * y 140..760, the effect box inside the field with every emitter anchor in y 124..1080 (the fxBigBoxes rule), and the
  * melee point at x <= 1250 so heroes travel at least 150 px.
@@ -38,11 +38,11 @@ describe('damage numbers', () => {
 
   it('the core is clamped to y 140..740 and the head to the rows that keep its icon row and label clear', () => {
     const f: ColossusFormSpec = { ...fixtureIndex().forms[HORIZON] };
-    f.anchors = { ...f.anchors, core: [450, 20], head: [450, 10] };
+    f.anchors = { ...f.anchors, core: [1347, 20], head: [1347, 10] };
     const a = screenAnchors(f);
     expect(a.core.y).toBe(140);
     expect(a.head.y - ICON_LIFT - ICON_PX).toBeGreaterThanOrEqual(140);
-    f.anchors = { ...f.anchors, core: [450, 500] };
+    f.anchors = { ...f.anchors, core: [1347, 1060] };
     expect(screenAnchors(f).core.y).toBe(740);
   });
 });
@@ -61,7 +61,7 @@ describe('the target cursor', () => {
     const r = s.display.enemySprites[0].getBounds();
     expect(b.x).toBeGreaterThanOrEqual(r.x - 16);
     expect(b.x + b.width).toBeLessThanOrEqual(r.x + r.width + 16);
-    expect(inField(b.x, b.y) && inField(b.x + b.width, b.y + b.height)).toBe(true);
+    expect(inField(b.x, b.y) && inField(b.x + b.width, b.y + b.height), JSON.stringify([b.x, b.y, b.width, b.height])).toBe(true);
   });
 });
 
@@ -83,7 +83,7 @@ describe('status icons, effects and the melee point', () => {
     expect(inField(e.x, e.y) && inField(e.x + e.width, e.y + e.height)).toBe(true);
     const core = c.anchors().core;
     expect(e.x + e.width / 2).toBe(core.x);
-    expect(e.y + e.height / 2).toBe(core.y);
+    expect(e.y).toBe(Math.max(140, core.y - e.height / 2));   // centred on the core, kept below the message window
     for (const at of [undefined, 'top', 'head', 'feet', 'front']) {
       const p = anchor(bodyBox(e), at);
       expect(p.y, String(at)).toBeGreaterThanOrEqual(124);

@@ -1,5 +1,6 @@
 import type { EnemyData } from '../types/index.js';
 import { ValidationError } from '../core/schemaValidation.js';
+import { BREATH_PX } from '../scenes/battle/colossus/colossusChoreography.js';
 
 /**
  * The transformation interlude scripts (assets/data/battle-interludes.yaml; docs/CHAOS_FORMS_PLAN.md 2.3): the step
@@ -22,7 +23,7 @@ export const POSE_FRAMES: Readonly<Record<string, number>> = { attack: 44, cast:
  * The motion envelope of the layers that move during a pan (B4), screen px: the body's breathing (18.3: dy 0 -> -4)
  * lifts the bottom border, nothing moves sideways, and the slam dip never runs in an interlude.
  */
-export const PAN_ENVELOPE: Readonly<PanEnvelope> = { up: 4, down: 0, left: 0, right: 0 };
+export const PAN_ENVELOPE: Readonly<PanEnvelope> = { up: BREATH_PX, down: 0, left: 0, right: 0 };
 
 type Hex = `#${string}`;
 interface Concurrent { with?: 'previous' }

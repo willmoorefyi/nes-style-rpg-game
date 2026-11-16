@@ -3,63 +3,59 @@
  "forms": {
   "fixture_horizon": {
    "canvas": [
-    900,
-    520
+    2700,
+    1080
    ],
-   "scale": 3,
+   "scale": 1,
    "place": [
-    -390,
-    -302
+    -527,
+    -210
    ],
-   "coverBox": [
-    0,
-    0,
-    900,
-    386
-   ],
-   "rimRow": 224,
+   "skyDim": 0.6,
    "anchors": {
     "target": [
-     450,
-     220
+     1347,
+     510
     ],
     "core": [
-     450,
-     240
+     1347,
+     510
     ],
     "head": [
-     450,
-     150
+     1347,
+     410
     ],
     "hands": [
      [
-      40,
-      300
+      647,
+      680
      ],
      [
-      466,
-      224
+      1787,
+      630
      ]
     ],
     "melee": [
-     530,
-     274
+     1747,
+     590
     ],
     "feet": [
-     450,
-     230
+     1347,
+     950
     ]
    },
    "targetRect": [
-    380,
-    180,
-    140,
-    120
+    1170,
+    345,
+    360,
+    495
    ],
    "layers": [
     {
-     "name": "body",
-     "kind": "body",
+     "name": "glow",
+     "kind": "glow",
+     "blend": "add",
+     "alpha": 1,
      "frames": {
       "base": {
        "at": [
@@ -67,123 +63,49 @@
         0
        ],
        "size": [
-        900,
-        520
+        2700,
+        1080
        ],
+       "texScale": 2,
        "tiles": [
         {
-         "file": "fixture_horizon/body_base.png",
+         "file": "fixture_horizon/glow_base.png",
          "x": 0,
          "y": 0,
-         "w": 900,
-         "h": 520
+         "w": 1350,
+         "h": 540
         }
        ]
       }
      }
     },
     {
-     "name": "arm_l",
-     "kind": "limb",
+     "name": "body",
+     "kind": "body",
      "frames": {
       "base": {
        "at": [
         0,
-        260
+        360
        ],
        "size": [
-        200,
-        260
+        2700,
+        720
        ],
        "tiles": [
         {
-         "file": "fixture_horizon/arm_l_base.png",
+         "file": "fixture_horizon/body_base_0.png",
          "x": 0,
          "y": 0,
-         "w": 200,
-         "h": 260
-        }
-       ]
-      },
-      "raise": {
-       "at": [
-        0,
-        240
-       ],
-       "size": [
-        200,
-        260
-       ],
-       "tiles": [
+         "w": 2048,
+         "h": 720
+        },
         {
-         "file": "fixture_horizon/arm_l_raise.png",
-         "x": 0,
+         "file": "fixture_horizon/body_base_1.png",
+         "x": 2048,
          "y": 0,
-         "w": 200,
-         "h": 260
-        }
-       ]
-      },
-      "slam": {
-       "at": [
-        0,
-        270
-       ],
-       "size": [
-        200,
-        250
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/arm_l_slam.png",
-         "x": 0,
-         "y": 0,
-         "w": 200,
-         "h": 250
-        }
-       ]
-      },
-      "recoil": {
-       "at": [
-        0,
-        262
-       ],
-       "size": [
-        200,
-        258
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/arm_l_recoil.png",
-         "x": 0,
-         "y": 0,
-         "w": 200,
-         "h": 258
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "cloud",
-     "kind": "cloud",
-     "frames": {
-      "base": {
-       "at": [
-        0,
-        150
-       ],
-       "size": [
-        900,
-        60
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/cloud_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 900,
-         "h": 60
+         "w": 652,
+         "h": 720
         }
        ]
       }
@@ -195,64 +117,50 @@
      "frames": {
       "base": {
        "at": [
-        400,
-        190
+        1047,
+        300
        ],
        "size": [
-        100,
-        120
+        600,
+        600
+       ],
+       "tiles": []
+      },
+      "crack": {
+       "at": [
+        1047,
+        300
+       ],
+       "size": [
+        600,
+        600
        ],
        "tiles": [
         {
-         "file": "fixture_horizon/core_base.png",
+         "file": "fixture_horizon/core_crack.png",
          "x": 0,
          "y": 0,
-         "w": 100,
-         "h": 120
+         "w": 600,
+         "h": 600
         }
        ]
       },
       "open": {
        "at": [
-        390,
-        180
+        1047,
+        300
        ],
        "size": [
-        120,
-        140
+        600,
+        600
        ],
        "tiles": [
         {
          "file": "fixture_horizon/core_open.png",
          "x": 0,
          "y": 0,
-         "w": 120,
-         "h": 140
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "glow",
-     "kind": "glow",
-     "frames": {
-      "base": {
-       "at": [
-        330,
-        120
-       ],
-       "size": [
-        240,
-        260
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/glow_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 240,
-         "h": 260
+         "w": 600,
+         "h": 600
         }
        ]
       }
@@ -261,191 +169,25 @@
     {
      "name": "corona",
      "kind": "corona",
+     "blend": "add",
+     "alpha": 1,
      "frames": {
       "base": {
        "at": [
-        250,
-        0
+        997,
+        160
        ],
        "size": [
-        400,
-        160
+        700,
+        700
        ],
        "tiles": [
         {
          "file": "fixture_horizon/corona_base.png",
          "x": 0,
          "y": 0,
-         "w": 400,
-         "h": 160
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "moon_frost",
-     "kind": "moon",
-     "orbit": 6,
-     "frames": {
-      "base": {
-       "at": [
-        300,
-        280
-       ],
-       "size": [
-        40,
-        40
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/moon_frost_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 40,
-         "h": 40
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "moon_ember",
-     "kind": "moon",
-     "orbit": 6,
-     "frames": {
-      "base": {
-       "at": [
-        560,
-        280
-       ],
-       "size": [
-        40,
-        40
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/moon_ember_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 40,
-         "h": 40
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "moon_abyss",
-     "kind": "moon",
-     "orbit": 6,
-     "frames": {
-      "base": {
-       "at": [
-        340,
-        340
-       ],
-       "size": [
-        40,
-        40
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/moon_abyss_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 40,
-         "h": 40
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "moon_storm",
-     "kind": "moon",
-     "orbit": 6,
-     "frames": {
-      "base": {
-       "at": [
-        520,
-        340
-       ],
-       "size": [
-        40,
-        40
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/moon_storm_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 40,
-         "h": 40
-        }
-       ]
-      }
-     }
-    },
-    {
-     "name": "hand",
-     "kind": "overhang",
-     "over": true,
-     "frames": {
-      "base": {
-       "at": [
-        430,
-        210
-       ],
-       "size": [
-        133,
-        47
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/hand_base.png",
-         "x": 0,
-         "y": 0,
-         "w": 133,
-         "h": 47
-        }
-       ]
-      },
-      "lift": {
-       "at": [
-        430,
-        196
-       ],
-       "size": [
-        133,
-        47
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/hand_lift.png",
-         "x": 0,
-         "y": 0,
-         "w": 133,
-         "h": 47
-        }
-       ]
-      },
-      "slam": {
-       "at": [
-        430,
-        214
-       ],
-       "size": [
-        133,
-        47
-       ],
-       "tiles": [
-        {
-         "file": "fixture_horizon/hand_slam.png",
-         "x": 0,
-         "y": 0,
-         "w": 133,
-         "h": 47
+         "w": 700,
+         "h": 700
         }
        ]
       }
@@ -725,6 +467,8 @@
     {
      "name": "glow",
      "kind": "glow",
+     "blend": "add",
+     "alpha": 0.8,
      "frames": {
       "base": {
        "at": [

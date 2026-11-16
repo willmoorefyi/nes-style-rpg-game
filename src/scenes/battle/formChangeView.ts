@@ -5,6 +5,11 @@
  * backdrop tint and fade, the old form's dissolve, the swap (the ColossusView and its proxy, ColossusSlots), the rise,
  * poses, variants and the reveal pan. `battle:formChange {from, to}` is emitted at the swap (BattleTrigger sets
  * SEEN:<to>). A missing script swaps at once. Confirm advances message lines only; a 24-frame confirm hold-off follows.
+ *
+ * B5 (18.8 row 2c): a round-start line that names an interlude (a non-form phase: chaos_crack on F3's 0.25) plays that
+ * script in place of the line (`startLine`, from BattleScene.showMessages); without the script the line's text shows.
+ * At an interlude's end the backdrop takes the forms' sky dim (D-O19: set at the end of chaos_i2), and a `tint` step
+ * multiplies with the dim in force.
  */
 import { Graphics } from 'pixi.js';
 import type { ActionResult } from '../../battle/BattleStateMachine.js';
@@ -16,6 +21,7 @@ import { interludes as sharedInterludes, type InterludeSource } from '../../data
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import { BATTLE_MESSAGE_FRAMES, holdFrames } from './battleTiming.js';
 import { colossusOf, variantOf } from './colossus/colossusIndex.js';
+import { greyTint } from './colossus/colossusSprites.js';
 import { END_HOLDOFF, type DissolveStyle, type InterludePose, type InterludeStep } from './formInterlude.js';
 import { FormInterludePlayer, type InterludeHost } from './FormInterludePlayer.js';
 
@@ -37,8 +43,17 @@ export interface FormChangeHook {
   start(): boolean;
   /** One frame of the running interlude; true once it has ended. */
   update(dt: number, confirm: boolean): boolean;
+  /** B5: start the script a round-start line names, in place of the line; false (show the text) when it names none or
+   *  the script is missing. */
+  startLine(line: { text: string }): boolean;
 }
-export const noopFormChange: FormChangeHook = { queue: () => {}, start: () => false, update: () => true };
+export const noopFormChange: FormChangeHook = { queue: () => {}, start: () => false, update: () => true, startLine: () => false };
+
+/** The interlude a battle line names (`BattleMessage.interlude`, TS-B), or null. */
+export function lineInterlude(line: { text: string } | null | undefined): string | null {
+  const id = line && 'interlude' in line ? (line as { interlude?: unknown }).interlude : null;
+  return typeof id === 'string' && id.length > 0 ? id : null;
+}
 
 export interface FormChangeDeps {
   battle: { readonly allEnemies: readonly { data: EnemyData }[] };
@@ -55,6 +70,11 @@ const mix = (color: number, a: number): number => {
   const ch = (shift: number): number => Math.round(255 + (((color >> shift) & 255) - 255) * a) << shift;
   return ch(16) | ch(8) | ch(0);
 };
+/** Two multiply tints in one (per channel a * b / 255). */
+const multiply = (a: number, b: number): number => {
+  const ch = (shift: number): number => Math.round((((a >> shift) & 255) * ((b >> shift) & 255)) / 255) << shift;
+  return ch(16) | ch(8) | ch(0);
+};
 
 export class FormChangeView implements FormChangeHook {
   private readonly pending: FormChange[] = [];
@@ -65,6 +85,9 @@ export class FormChangeView implements FormChangeHook {
 
   constructor(private readonly deps: FormChangeDeps) {
     this.source = deps.interludes ?? sharedInterludes;
+    // a battle whose boss names an interlude on a non-form phase (B5) needs the scripts before its first form change
+    const named = deps.battle.allEnemies.some((e) => e.data.bossPhases?.some((p) => p.interlude && !p.form));
+    if (named && !deps.interludes && typeof document !== 'undefined') void sharedInterludes.load();
   }
 
   queue(result: ActionResult): void {
@@ -88,6 +111,20 @@ export class FormChangeView implements FormChangeHook {
       steps = [...(fc.message ? [{ type: 'message', text: fc.message } as const] : []), { type: 'swap' }];
     }
     this.player = new FormInterludePlayer(steps, this.host(fc), holdFrames(BATTLE_MESSAGE_FRAMES));
+    return true;
+  }
+
+  startLine(line: { text: string }): boolean {
+    const id = lineInterlude(line);
+    if (!id || this.player) return false;
+    const steps = this.source.get(id);
+    if (!steps) { console.error(`Battle line "${line.text}": no interlude "${id}"; showing the line`); return false; }
+    // the enemy whose phase names it (else the first colossus): its view takes the variant and pose steps
+    const enemies = this.deps.battle.allEnemies;
+    const named = enemies.findIndex((e) => e.data.bossPhases?.some((p) => p.interlude === id));
+    const i = named >= 0 ? named : Math.max(0, enemies.findIndex((e) => colossusOf(e.data)));
+    const data = enemies[i]?.data.id ?? '?';
+    this.player = new FormInterludePlayer(steps, this.host({ enemyIndex: i, from: data, to: data, interlude: id }), holdFrames(BATTLE_MESSAGE_FRAMES));
     return true;
   }
 
@@ -119,7 +156,7 @@ export class FormChangeView implements FormChangeHook {
       message: (text) => this.deps.setMessage(text),
       flash: (color, alpha) => this.overlay('flashG', color, alpha),
       shake: () => layers.shake.start(),
-      tint: (color, alpha) => { layers.bg.tint = alpha > 0 ? mix(color, alpha) : 0xffffff; },
+      tint: (color, alpha) => { layers.bg.tint = multiply(alpha > 0 ? mix(color, alpha) : 0xffffff, greyTint(d.colossus.sky)); },
       fade: (alpha) => this.overlay('fadeG', 0x000000, alpha),
       dissolve: (style, u, t) => this.dissolve(style, u, t, i),
       swap: (riseFrom) => {
@@ -144,7 +181,7 @@ export class FormChangeView implements FormChangeHook {
       end: () => {
         this.overlay('flashG', 0, 0);
         this.overlay('fadeG', 0, 0);
-        layers.bg.tint = 0xffffff;
+        d.colossus.settleSky();
         this.deps.input.holdOff(END_HOLDOFF, ['confirm']);
       },
     };
@@ -157,7 +194,7 @@ export class FormChangeView implements FormChangeHook {
     if (!target) return;
     if (style === 'flicker') target.alpha = u >= 1 ? 1 : Math.floor(t / 2) % 2 === 0 ? 0.25 : 1;
     else if (style === 'fade') target.alpha = step4(1 - u);
-    else if (view) view.setSink(Math.round(u * 200));
+    else if (view) view.setSink(Math.round(u * 600));   // screen px (rev 3: 200 art px at scale 3)
     else { target.pivot.y = -Math.round(u * target.height); target.alpha = u >= 1 ? 0 : 1; }
   }
 }

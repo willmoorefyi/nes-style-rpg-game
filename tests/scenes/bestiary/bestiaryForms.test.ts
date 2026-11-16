@@ -71,7 +71,7 @@ describe('the colossus preview (scale 1)', () => {
   }
 
   it('a canvas that fits is drawn whole at scale 1 with its visibleBox centred on the panel (1 px)', async () => {
-    for (const form of [ORRERY, HORIZON]) {
+    for (const form of [ORRERY]) {
       const b = await shown(form);
       expect(b.view!.art.scale.x).toBe(1);
       expect(b.cropped).toBe(false);
@@ -80,6 +80,13 @@ describe('the colossus preview (scale 1)', () => {
       expect(Math.abs(c.y - CY), form).toBeLessThanOrEqual(1);
       b.dispose();
     }
+  });
+
+  it('rev 4: the painted F3 (2700x1080) is cropped until its pre-composited still lands (18.8, D-O21)', async () => {
+    const b = await shown(HORIZON);
+    expect(b.view!.art.scale.x).toBe(1);
+    expect(b.cropped).toBe(true);
+    b.dispose();
   });
 
   it('a canvas wider than 940 art px shows the rest-view crop, centred and masked to the panel', async () => {

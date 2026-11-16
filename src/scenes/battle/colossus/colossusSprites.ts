@@ -5,6 +5,10 @@
  * (EnemyActorPoses). AiEnemyView still lays out and poses the atlas enemies only: it is handed a detached stand-in for
  * each colossus slot, and a late atlas load never replaces a proxy (the `upgradeToArt` guard). Missing colossus art
  * draws the placeholder box (warned once) and is swapped for the real art when it arrives.
+ *
+ * The sky dim (D-O19, B8; 18.3): while a form with `skyDim` (F3 / F4) is on screen, `bg` is multiplied by that grey.
+ * It is set when the battle starts on such a form and at the end of an interlude (`settleSky`, the end of chaos_i2), and
+ * reset on victory and defeat (`clearSky`); a retry or the next battle builds new layers, so its `bg` starts untinted.
  */
 import { Container, Graphics } from 'pixi.js';
 import type { EnemyData, SpellData } from '../../../types/index.js';
@@ -33,6 +37,9 @@ export function castKindFor(info: Pick<NextActionInfo, 'spellId'> | null, spells
 
 interface Slot { formId: string; data: EnemyData; view: ColossusView; ctl: ColossusPoseController; placeholder: boolean }
 
+/** The multiply tint of a grey `dim` (0.6 -> 0x999999). */
+export const greyTint = (dim: number): number => { const v = Math.round(255 * Math.min(1, Math.max(0, dim))); return (v << 16) | (v << 8) | v; };
+
 export class ColossusSlots {
   private readonly slots = new Map<number, Slot>();
   private readonly standIns = new Map<number, Container>();
@@ -40,6 +47,8 @@ export class ColossusSlots {
   private poses: EnemyActorPoses | null = null;
   private overlay: Graphics | null = null;
   private disposed = false;
+  /** The sky dim now on `bg` (1 = none). */
+  private skyNow = 1;
 
   constructor(private readonly layers: BattleLayers, private readonly art: ColossusArtLike = colossusArt,
     private readonly castKind: (i: number) => ColossusCastKind = () => 'cast') {}
@@ -49,6 +58,31 @@ export class ColossusSlots {
     this.sprites = sprites;
     this.poses = poses;
     enemies.forEach((e, i) => { if (colossusOf(e)) this.swapIn(i, e); });
+    this.settleSky();
+  }
+
+  /** The sky dim the live forms on screen ask for (the lowest `skyDim`; 1 = none). */
+  skyDim(): number {
+    let dim = 1;
+    for (const s of this.slots.values()) if (!s.ctl.gone && s.view.root.visible) dim = Math.min(dim, s.view.form.skyDim ?? 1);
+    return dim;
+  }
+
+  /** The dim on `bg` now (an interlude's tint multiplies with it). */
+  get sky(): number { return this.skyNow; }
+
+  /** Put the forms' sky dim on `bg` (battle start, an interlude's end); returns the tint. */
+  settleSky(): number {
+    this.skyNow = this.skyDim();
+    const tint = greyTint(this.skyNow);
+    this.layers.bg.tint = tint;
+    return tint;
+  }
+
+  /** Victory or defeat: the backdrop is shown undimmed again (B8). */
+  clearSky(): void {
+    this.skyNow = 1;
+    this.layers.bg.tint = 0xffffff;
   }
 
   has(i: number): boolean { return this.slots.has(i); }

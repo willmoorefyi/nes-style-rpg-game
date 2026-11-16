@@ -1,6 +1,7 @@
 /**
  * With an F3-like colossus active (docs/CHAOS_FORMS_PLAN.md 4.1, 9.2): the party sprites, the bottom-strip windows
- * and the message window are all above the colossus in the scene graph, and `floorFront` is above the colossus art.
+ * and the message window are all above the colossus in the scene graph (rev 4, D-O18: F3 draws no floor front, so the
+ * rev-3 "floorFront over its art" row is superseded; the art is the view's only child).
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { Container } from 'pixi.js';
@@ -18,7 +19,7 @@ let uninstall: () => void = () => {};
 afterEach(() => { uninstall(); vi.restoreAllMocks(); });
 
 describe('draw order with a colossus', () => {
-  it('party, strip windows and the message window draw over the colossus; floorFront over its art', async () => {
+  it('party, strip windows and the message window draw over the colossus; no floor front (D-O18)', async () => {
     uninstall = await installFixtureArt();
     vi.spyOn(battleArt, 'isLoaded', 'get').mockReturnValue(true);
     vi.spyOn(characterAtlas, 'hasBattleArt', 'get').mockReturnValue(true);
@@ -29,9 +30,8 @@ describe('draw order with a colossus', () => {
     const layers = BattleLayers.of(s.container);
     const order = [s.container, ...descendants(s.container, (c): c is Container => c instanceof Container)];
     const art = descendants(layers.colossus, (c): c is Container => c.label === 'colossus.art')[0];
-    const floor = descendants(layers.colossus, (c): c is Container => c.label === 'colossus.floorFront')[0];
     expect(art).toBeDefined();
-    expect(order.indexOf(floor)).toBeGreaterThan(order.indexOf(art));
+    expect(descendants(layers.colossus, (c): c is Container => c.label === 'colossus.floorFront')).toHaveLength(0);
     const top = Math.max(...descendants(layers.colossus, (_c): _c is Container => true).map((c) => order.indexOf(c)));
     const windows = [...layers.ui.children, ...layers.hud.children].filter((c): c is Window => c instanceof Window);
     expect(windows).toHaveLength(4);

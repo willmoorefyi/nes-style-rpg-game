@@ -71,7 +71,7 @@ describe('FormChangeView: the swap', () => {
     expect(c).not.toBeNull();
     expect(proxy.parent).toBe(s.layers.actors);
     const b = proxy.getBounds();
-    expect({ x: b.x, y: b.y, w: b.width, h: b.height }).toEqual({ x: 750, y: 238, w: 420, h: 360 });
+    expect({ x: b.x, y: b.y, w: b.width, h: b.height }).toEqual({ x: 643, y: 135, w: 360, h: 495 });
     expect(s.layers.colossus.children.length).toBe(1);
     expect(s.lines).toEqual(['The rings shatter!', 'Chaos fills the sky!']);
     expect(s.input.holdOff).toHaveBeenCalledWith(24, ['confirm']);

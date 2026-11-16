@@ -23,6 +23,12 @@ export const FIXTURE_DIR = 'tests/fixtures/colossus/';
 export const HORIZON = 'fixture_horizon';
 export const ORRERY = 'fixture_orrery';
 export const WIDE = 'fixture_wide';
+/** The rev-4 json contract shared with the Python build (18.5): one form, no tiles on disk. */
+export const CONTRACT = 'contract_form';
+
+export function contractRaw(): unknown {
+  return JSON.parse(readFileSync(`${FIXTURE_DIR}contract.json`, 'utf8'));
+}
 
 export function fixtureRaw(): unknown {
   return JSON.parse(readFileSync(`${FIXTURE_DIR}colossus.json`, 'utf8'));
@@ -42,7 +48,6 @@ export function fixtureIo(raw: unknown = fixtureRaw()): ColossusIo & { made: Tex
     fetchIndex: () => Promise.resolve(raw),
     load: (_file, w, h) => { const t = blank(w, h); made.push(t); return Promise.resolve(t); },
     unload: (_file, t) => { t.destroy(true); },
-    white: (t) => { const w = blank(t.width, t.height); made.push(w); return w; },
   };
 }
 

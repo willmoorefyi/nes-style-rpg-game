@@ -27,7 +27,7 @@ const registry = new WeakMap<Container, BattleLayers>();
 
 /**
  * The battle scene's draw order (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 3), as children of the scene's main container:
- * `bg` (backdrop) < `colossus` (a battlefield-scale form, its floor front and overhang; docs/CHAOS_FORMS_PLAN.md 4.1) <
+ * `bg` (backdrop) < `colossus` (a battlefield-scale form; docs/CHAOS_FORMS_PLAN.md 4.1, 18.0) <
  * `ui` (enemy list, command window, party panel) < `actors` (enemy sprites, then party sprites) < `fx` (status < spell <
  * flash < numbers) < `hud` (the message window and end prompt), so nothing covers the text and no colossus covers a window.
  *

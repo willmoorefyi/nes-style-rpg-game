@@ -1,5 +1,6 @@
 /**
- * R27 (docs/CHAOS_FORMS_PLAN.md 4.6): every colossus texture is nearest-scaled and destroyed when the battle ends or
+ * R27 (docs/CHAOS_FORMS_PLAN.md 4.6; rev 4: 18.1, 18.6): every colossus texture is linear-filtered (no mipmaps; rev 3's
+ * nearest is superseded for colossus forms, the atlas stays nearest) and destroyed when the battle ends or
  * the bestiary closes: the live texture count before a colossus battle equals the count after it, and the same for a
  * bestiary visit (one form loaded at a time).
  */
@@ -20,7 +21,7 @@ afterEach(() => { colossusArt.release(); restore(); vi.restoreAllMocks(); });
 const flush = async (): Promise<void> => { for (let i = 0; i < 5; i++) await Promise.resolve(); };
 
 describe('colossus textures (R27)', () => {
-  it('a colossus battle loads its textures (nearest) and leaves none behind when it ends', async () => {
+  it('a colossus battle loads its textures (linear) and leaves none behind when it ends', async () => {
     const io = fixtureIo();
     restore = colossusArt.setIo(io);
     vi.spyOn(battleArt, 'isLoaded', 'get').mockReturnValue(true);
@@ -34,7 +35,7 @@ describe('colossus textures (R27)', () => {
     await flush();
     s.update(1);
     expect(colossusArt.liveTextures).toBeGreaterThan(before);
-    for (const t of io.made) if (!t.destroyed) expect(t.source.scaleMode).toBe('nearest');
+    for (const t of io.made) if (!t.destroyed) expect(t.source.scaleMode).toBe('linear');
     s.exit();
     expect(colossusArt.liveTextures).toBe(before);
     expect(io.made.every((t) => t.destroyed)).toBe(true);

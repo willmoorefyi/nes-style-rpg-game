@@ -1,6 +1,11 @@
-// Writes the synthetic colossus fixture (docs/CHAOS_FORMS_PLAN.md 9.2, R22): colossus.json plus flat-colour PNG tiles.
-// Not game art: plain boxes with a 2 px outline, so the runtime and the browser check have a 900x520 art px canvas
-// before any master is approved. Run: node tests/fixtures/colossus/makeFixture.mjs (deterministic; no dependencies).
+// Writes the synthetic colossus fixtures (docs/CHAOS_FORMS_PLAN.md 9.2, R22; rev 4: 18.3-18.5): colossus.json plus its
+// PNG tiles, and contract.json (the json shape the Python build must write, 18.5; no tiles). Not game art.
+// - fixture_horizon: a painted F3 stand-in at the rev-4 geometry (canvas 2700x1080 at scale 1, place (-527, -210)):
+//   soft-alpha body cropped to rows 360-1079 (two tiles, 2048 + 652), an additive halo glow stored at half res
+//   (texScale 2), an additive corona patch, core patches `crack` / `open` (its `base` is empty: the body carries it).
+// - fixture_orrery: the rev-3 layered puppet (limbs, moons; flat boxes at scale 3), still supported by the view.
+// - fixture_wide: one 2600 px body (two tiles).
+// Run: node tests/fixtures/colossus/makeFixture.mjs (deterministic; no dependencies).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,55 +25,100 @@ function chunk(type, data) {
   const crc = Buffer.alloc(4); crc.writeUInt32BE(crc32(td));
   return Buffer.concat([len, td, crc]);
 }
-/** A w x h RGBA PNG: `fill` inside, `edge` on a 2 px border. */
-function png(w, h, fill, edge) {
+/** A w x h RGBA PNG; `px(x, y)` returns [r, g, b, a] (straight alpha). */
+function paint(w, h, px) {
   const raw = Buffer.alloc((w * 4 + 1) * h);
   for (let y = 0; y < h; y++) {
     raw[y * (w * 4 + 1)] = 0;
-    for (let x = 0; x < w; x++) {
-      const c = x < 2 || y < 2 || x >= w - 2 || y >= h - 2 ? edge : fill;
-      raw.set([c >> 16 & 255, c >> 8 & 255, c & 255, 255], y * (w * 4 + 1) + 1 + x * 4);
-    }
+    for (let x = 0; x < w; x++) raw.set(px(x, y).map((v) => Math.max(0, Math.min(255, Math.round(v)))), y * (w * 4 + 1) + 1 + x * 4);
   }
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr.set([8, 6, 0, 0, 0], 8);
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
 }
+const rgb = (c) => [c >> 16 & 255, c >> 8 & 255, c & 255];
+/** A flat box: `fill` inside, `edge` on a 2 px border. */
+const box = (w, h, fill, edge) => paint(w, h, (x, y) => [...rgb(x < 2 || y < 2 || x >= w - 2 || y >= h - 2 ? edge : fill), 255]);
 
 const files = new Map();
-/** A frame at `at` of size `size`, cut into tiles of <= 2048 px. */
-function frame(form, layer, name, at, size, fill, edge = 0xd8b048) {
+/** A frame at `at` of size `size` (canvas px), its texture `size / texScale`, cut into tiles of <= 2048 px. `px(x, y)`
+ *  paints in canvas px (null: a flat box). */
+function frame(form, layer, name, at, size, fill, { texScale = 1, px = null } = {}) {
+  const tw = Math.ceil(size[0] / texScale);
+  const th = Math.ceil(size[1] / texScale);
   const tiles = [];
-  for (let x = 0, n = 0; x < size[0]; x += 2048) {
-    const w = Math.min(2048, size[0] - x);
-    const file = `${form}/${layer}_${name}${size[0] > 2048 ? `_${n++}` : ''}.png`;
-    files.set(file, png(w, size[1], fill, edge));
-    tiles.push({ file, x, y: 0, w, h: size[1] });
+  for (let x = 0, n = 0; x < tw; x += 2048) {
+    const w = Math.min(2048, tw - x);
+    const file = `${form}/${layer}_${name}${tw > 2048 ? `_${n++}` : ''}.png`;
+    files.set(file, px ? paint(w, th, (u, v) => px(at[0] + (x + u) * texScale, at[1] + v * texScale)) : box(w, th, fill, 0xd8b048));
+    tiles.push({ file, x, y: 0, w, h: th });
   }
-  return { at, size, tiles };
+  return { at, size, ...(texScale !== 1 ? { texScale } : {}), tiles };
 }
 const layer = (form, name, kind, frames, extra = {}) => ({ name, kind, ...extra,
-  frames: Object.fromEntries(frames.map(([f, at, size, fill]) => [f, frame(form, name, f, at, size, fill)])) });
+  frames: Object.fromEntries(frames.map(([f, at, size, fill, opts]) => [f, frame(form, name, f, at, size, fill, opts)])) });
+
+// ---- the painted F3 stand-in (canvas px) ----
+const smooth = (e0, e1, v) => { const t = Math.max(0, Math.min(1, (v - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+const DISC = [1347, 510];
+const RING = { c: [1350, 570], r: 562, half: 37 };
+/** Body coverage: the torso (an ellipse to the bottom edge), the outstretched arms (a band to both side edges), the
+ *  head; 2 px soft edge. */
+function bodyAlpha(x, y) {
+  const torso = 1 - Math.hypot((x - 1350) / 400, (y - 1000) / 560);
+  const armY = 640 - 90 * Math.cos(((x - 1350) / 1350) * Math.PI * 0.5);
+  const arms = (70 - Math.abs(y - armY)) / 70;
+  const head = 1 - Math.hypot((x - DISC[0]) / 120, (y - 430) / 110);
+  return smooth(-0.004, 0.004, Math.max(torso, arms * 0.12, head));
+}
+function bodyPx(x, y) {
+  const a = bodyAlpha(x, y);
+  if (a <= 0) return [0, 0, 0, 0];
+  const d = Math.hypot(x - DISC[0], y - DISC[1]);
+  if (d < 104) return [8, 6, 14, 255 * a];                                  // the eclipse disc
+  if (d < 112) return [250, 214, 150, 255 * a];                             // its lit rim
+  const shade = 0.55 + 0.45 * smooth(1080, 380, y) * smooth(2700, 0, x + y);  // light from the top-left
+  return [58 * shade + 20, 34 * shade + 14, 82 * shade + 20, 255 * a];
+}
+function glowPx(x, y) {
+  const d = Math.hypot(x - RING.c[0], y - RING.c[1]);
+  const ring = Math.exp(-(((d - RING.r) / RING.half) ** 2));
+  const ang = Math.atan2(y - RING.c[1], x - RING.c[0]);
+  const rays = Math.max(0, Math.cos(ang * 12)) ** 24 * smooth(RING.r + 500, RING.r, d) * smooth(RING.r - 80, RING.r, d);
+  const halo = Math.exp(-((Math.hypot(x - DISC[0], y - DISC[1]) / 260) ** 2)) * 0.6;
+  const a = Math.min(1, ring + rays * 0.7 + halo) * smooth(0, 120, y);   // the 120 px top feather (18.2)
+  return [255, 196 + 40 * ring, 120 + 60 * halo, 255 * a];
+}
+function coronaPx(x, y) {
+  const d = Math.hypot(x - DISC[0], y - DISC[1]);
+  return [255, 236, 190, 255 * Math.exp(-(((d - 150) / 22) ** 2))];
+}
+function crackPx(x, y) {
+  const zig = DISC[0] + 18 * Math.sin((y - DISC[1]) / 14);
+  const a = smooth(5, 1, Math.abs(x - zig)) * smooth(330, 250, Math.abs(y - (DISC[1] + 220)));
+  return [255, 170, 60, 255 * a];
+}
+function openPx(x, y) {
+  const e = 1 - Math.hypot((x - DISC[0]) / 150, (y - (DISC[1] + 200)) / 190);
+  return e <= 0 ? [0, 0, 0, 0] : [255, 120 + 120 * e, 40 + 60 * e, 255 * smooth(0, 0.05, e)];
+}
+
+/** The rev-4 F3 form (18.3-18.5) under the id `id` (its tile files under `id/`). */
+const horizonForm = (id) => ({
+  canvas: [2700, 1080], scale: 1, place: [-527, -210], skyDim: 0.6,
+  anchors: { target: [1347, 510], core: [1347, 510], head: [1347, 410], hands: [[647, 680], [1787, 630]], melee: [1747, 590], feet: [1347, 950] },
+  targetRect: [1170, 345, 360, 495],
+  layers: [
+    layer(id, 'glow', 'glow', [['base', [0, 0], [2700, 1080], 0, { texScale: 2, px: glowPx }]], { blend: 'add', alpha: 1 }),
+    layer(id, 'body', 'body', [['base', [0, 360], [2700, 720], 0, { px: bodyPx }]]),
+    { name: 'core', kind: 'core', frames: { base: { at: [1047, 300], size: [600, 600], tiles: [] },
+      ...layer(id, 'core', 'core', [['crack', [1047, 300], [600, 600], 0, { px: crackPx }], ['open', [1047, 300], [600, 600], 0, { px: openPx }]]).frames } },
+    layer(id, 'corona', 'corona', [['base', [997, 160], [700, 700], 0, { px: coronaPx }]], { blend: 'add', alpha: 1 }),
+  ],
+});
 
 const H = 'fixture_horizon';
-const horizon = {
-  canvas: [900, 520], scale: 3, place: [-390, -302], coverBox: [0, 0, 900, 386], rimRow: 224,
-  anchors: { target: [450, 220], core: [450, 240], head: [450, 150], hands: [[40, 300], [466, 224]], melee: [530, 274], feet: [450, 230] },
-  targetRect: [380, 180, 140, 120],
-  layers: [
-    layer(H, 'body', 'body', [['base', [0, 0], [900, 520], 0x1c1028]]),
-    layer(H, 'arm_l', 'limb', [['base', [0, 260], [200, 260], 0x2a1838], ['raise', [0, 240], [200, 260], 0x342040],
-      ['slam', [0, 270], [200, 250], 0x3c2448], ['recoil', [0, 262], [200, 258], 0x302040]]),
-    layer(H, 'cloud', 'cloud', [['base', [0, 150], [900, 60], 0x6a4a78]]),
-    layer(H, 'core', 'core', [['base', [400, 190], [100, 120], 0xf0d070], ['open', [390, 180], [120, 140], 0xffffff]]),
-    layer(H, 'glow', 'glow', [['base', [330, 120], [240, 260], 0x806020]]),
-    layer(H, 'corona', 'corona', [['base', [250, 0], [400, 160], 0xc06020]]),
-    ...[['moon_frost', [300, 280], 0x60c8e8], ['moon_ember', [560, 280], 0xe07030], ['moon_abyss', [340, 340], 0x208878],
-      ['moon_storm', [520, 340], 0xe8e8f0]].map(([n, at, c]) => layer(H, n, 'moon', [['base', at, [40, 40], c]], { orbit: 6 })),
-    layer(H, 'hand', 'overhang', [['base', [430, 210], [133, 47], 0x3a2a18], ['lift', [430, 196], [133, 47], 0x4a3a20],
-      ['slam', [430, 214], [133, 47], 0x5a4a28]], { over: true }),
-  ],
-};
+const horizon = horizonForm(H);
 const O = 'fixture_orrery';
 const orrery = {
   canvas: [440, 300], scale: 3, place: [-60, 60], visibleBox: [20, 20, 420, 240],
@@ -81,7 +131,7 @@ const orrery = {
     layer(O, 'gauntlet_r', 'limb', [['base', [320, 120], [100, 80], 0x5a4020], ['raise', [320, 100], [100, 80], 0x6a5028],
       ['slam', [320, 130], [100, 80], 0x7a6030], ['recoil', [320, 124], [100, 80], 0x604828]]),
     layer(O, 'core', 'core', [['base', [190, 30], [60, 60], 0x101010]]),
-    layer(O, 'glow', 'glow', [['base', [150, 0], [140, 120], 0x806020]]),
+    layer(O, 'glow', 'glow', [['base', [150, 0], [140, 120], 0x806020]], { blend: 'add', alpha: 0.8 }),
     ...[['moon_frost', [100, 60], 0x60c8e8], ['moon_ember', [310, 60], 0xe07030], ['moon_abyss', [130, 220], 0x208878],
       ['moon_storm', [280, 220], 0xe8e8f0]].map(([n, at, c]) => layer(O, n, 'moon', [['base', at, [30, 30], c]], { orbit: 4 })),
   ],
@@ -95,9 +145,13 @@ const wide = {
 };
 
 const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide } };
-for (const [file, data] of files) {
+const tiles = new Map(files);
+files.clear();
+const contract = { version: 1, forms: { contract_form: horizonForm('contract_form') } };   // its tiles are not written
+for (const [file, data] of tiles) {
   mkdirSync(dirname(join(DIR, file)), { recursive: true });
   writeFileSync(join(DIR, file), data);
 }
 writeFileSync(join(DIR, 'colossus.json'), `${JSON.stringify(index, null, 1)}\n`);
-console.log(`wrote colossus.json and ${files.size} tiles`);
+writeFileSync(join(DIR, 'contract.json'), `${JSON.stringify(contract, null, 1)}\n`);
+console.log(`wrote colossus.json, contract.json and ${tiles.size} tiles`);
