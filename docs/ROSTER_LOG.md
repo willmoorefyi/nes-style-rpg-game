@@ -890,3 +890,49 @@ Images used: 38 of 50 (ledger guard: 405 - 367; V8 halt 47).
   wings each; R330 also a changed skirt); no further hurt image is generated. The hurt key will be **derived from the
   approved R324 idle** by a framework rig option (framework owner), and the rig agent adds the recoil in the rig (0
   images). The cast waits for the size-normalising re-cut of R328 (user ruling). The generator stops here.
+
+### V8 integration (integrator, `roster-int`, W4, 2026-11-16, 0 images)
+
+Merged before W4: F6-F9 (TS), F5 chaos `raise: false`, F3 black_knight keyframe paint, FW-V8 `sheet_caps`, cutter
+`match_height` and rig `hurt_from: idle`, the R321 crazy_horse, R323 piscodemon and R324 / R326 / R331 hollow_seraph
+(hurt derived from the idle) re-rigs, and the selftest pin fixes (a32e42b).
+
+| Gate | Result |
+|---|---|
+| Budget (main checkout, ledger) | pass V 38 of 50 (ledger 405 - 367), V8 halt 47 not reached; no sheet over its cap (`sheet_caps` or 3); no foreign sheet |
+| Archives | `selftest_retire.py` ALL PASSED; `crazy_horse_v2`, `piscodemon_v2`, `hollow_seraph_v2` (sheets, rig, lock) tracked; no `black_knight_v2` (the paint passed IR, the fallback image never ran) |
+| Atlas | 123 sheets, **9 pages** (2040x1872, **2008x1728** (was 2048x1856), 2032x1200, 2048x1536, 2048x2000, 2008x768, 2048x2032, 2048x1152, 2048x1792), all <= 2048; the 14 act-1 sheets on page 0 (page 0 byte-identical) |
+| Party atlases | byte-identical (`battle_ai`, `field_ai` rebuilt, `git diff --exit-code` clean) |
+| Determinism | `PYTHONHASHSEED` 0 and 1: all 10 `monsters-ai*` files identical |
+| Frame-rect diff vs a7c7dd6 | content changed on exactly black_knight (13 frames), crazy_horse (13), piscodemon (13), hollow_seraph (17), chaos (`atk_wind1`, `atk_wind2` changed: the coil now leads to the attack key, not the raise; `attack_raise`, `atk_raise_in`, `atk_raise_b`, `atk_swing`, `atk_swing2` gone, `hasRaise` false, `tip` [102, 11] -> [92, 8] on `atk_wind2`); every other sheet `same`, no JSON-only change elsewhere |
+| `monster_anim.py check --all` | 123 `OK` (4 FWQ `aliased:` notes: black_widow, chimera, crawler, astos), nothing else |
+| `selftest.py --anim` | ALL PASSED, 760 ok checks |
+| `selftest.py` (worktree, full) | ALL PASSED, 1134 ok checks |
+| `npx tsc --noEmit`, `npm run build` | exit 0 |
+| `npx vitest run` | **2 failed** of 4692 (227 files), both in `EnemyLayoutAi.test.ts`: the pass-R play-test nine-crowd (`ogre, troll, dragon, crazy_horse, gigas_worm, ogre_chief, shark, anaconda, minotaur`) no longer fits (`formationFits` false); see below |
+
+**Anchors of the changed sheets (a7c7dd6 -> W4).** crazy_horse cell 128 -> 132 x 128, `homeX` [15, 112] -> [2, 127]
+(98 -> 126 art px; the hurt recoil reaches x 2, `hurt_in2` x 4), `lungeRight` 119 -> 130, `travelTop` 31 -> 26;
+piscodemon cell 80 -> 82, `homeX` [5, 69] -> [10, 69]; hollow_seraph cell 218 -> 200, `homeX` [1, 215] -> [13, 183],
+`travelTop` 2 -> 43; black_knight `travelTop` 3 -> 2; chaos anchors unchanged.
+
+**By-design test updates (commented in place).** `EnemyLayoutAi`: the tier-L "nine at factor 1" set 27 -> 26 (the R321
+crazy_horse's home art is 126 art px = 252 screen px > 236; R290 was 98). `heavyGlint`: new pinned case `chaos: raise
+off (V8 F5), tip from atk_wind2` (no raise frames, the tip opaque on `atk_wind2`).
+
+**Open (not changed, needs a ruling).** The wider crazy_horse makes the old play-test nine-crowd fail to fit at any
+integer scale >= 2, so two `EnemyLayoutAi` cases are red and the sandbox refuses that URL (`console.warn`
+"sandbox: formation does not fit at an integer scale >= 2: ...", F8 working as designed); with `nightmare` in its
+place the same nine still run. No authored formation is affected (the scale-aware data test passes). Options: re-pin
+the two cases to the new truth (refused, plus a fitting variant), or a rig fix that shortens crazy_horse's hurt recoil
+(a `homeX` from x >= 15 brings it back to <= 236 screen px). Not relaxed by the integrator.
+
+**Browser** (headless Chromium, dev server 127.0.0.1, every URL `mute=1`; `/tmp/v8w4/`; no page or console errors
+except the expected sandbox warning):
+- Bestiary `&battleStep=1` (steps 0 / 20 / 40 / 60 / 90) for crazy_horse, piscodemon, black_knight, hollow_seraph,
+  chaos: every frame changes under `.`, sprites whole and centred (`contact_bestiary.png`); chaos's heavy sequence has
+  no raise pose, no doubled arm, no head drop.
+- `scenario=anim_pass_v_chaos` (poisoned): Fight numbers 2, 1, Miss, 103 and FIR2's 17 spawn below the poison drop,
+  digits and drop apart (`zoom_chaos_103.png`); the top orb (art) still sits behind the middle digit (F6 scopes the
+  status icon row only; a W5 note). BWIZ FIR2: flames on the chest, arms and robe (`fir2_chaos.png`, F7).
+- `sandbox=l30_lich&enemies=goblin,ogre` (no status): numbers 185, 81, 432 at the cell top rising as before.

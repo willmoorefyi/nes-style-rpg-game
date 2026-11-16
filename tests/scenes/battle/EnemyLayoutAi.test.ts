@@ -142,14 +142,15 @@ describe('large crowds pack by their home art (defect 2)', () => {
     }
   });
 
-  it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (27 sheets, re-measured at V6)', () => {
+  it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (26 sheets, re-measured at V8 W4)', () => {
     const large = [...new Set(enemyData.filter((e) => e.size === 'large').map((e) => monsterSpriteKey(e)))];
     const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) * sheetScale(k) <= 236);
     // 46 at fix pass 2 G4 (45 at F5 + white_shark; 118 art px at scale 2); V4 (REDESIGN_PLAN 2.6): the 20 of them now
     // `huge` (tier H) leave the large class: 26. bigeyes joins the large class at scale 3 but its home art is 87 x 3 =
     // 261 screen px, so it is not in this set (nine bigeyes: the next case). V6: the pass-V guardian (128 cell, home art
-    // 118 art px = 236 screen px; the retired hound was 274) joins the set: 27
-    expect(s.length).toBe(27);
+    // 118 art px = 236 screen px; the retired hound was 274) joins the set: 27. V8 W4 (REDESIGN_FIX_PLAN F1): the R321
+    // crazy_horse (132 cell, home art 2-127 = 126 art px = 252 screen px, its hurt recoils to x 2; R290 was 98) leaves: 26
+    expect(s.length).toBe(26);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);

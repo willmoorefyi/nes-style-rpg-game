@@ -9,8 +9,8 @@
     },
     {
       "file": "monsters-ai-1.png",
-      "w": 2048,
-      "h": 1856
+      "w": 2008,
+      "h": 1728
     },
     {
       "file": "monsters-ai-2.png",
@@ -500,71 +500,71 @@
       "floating": false,
       "frames": {
         "idle": [
-          320,
+          82,
           1200
         ],
         "idle_b": [
-          520,
+          282,
           1200
         ],
         "atk_wind1": [
-          320,
+          82,
           1200
         ],
         "atk_wind2": [
-          320,
+          82,
           1200
         ],
         "atk_mid": [
-          720,
+          482,
           1200
         ],
         "attack": [
-          720,
+          482,
           1200
         ],
         "atk_follow": [
-          720,
+          482,
           1200
         ],
         "atk_recover": [
-          320,
+          82,
           1200
         ],
         "hurt_in1": [
-          920,
+          682,
           1200
         ],
         "hurt_in2": [
-          1120,
+          882,
           1200
         ],
         "hurt": [
-          1320,
+          1082,
           1200
         ],
         "daze": [
-          1520,
+          1282,
           1200
         ],
         "daze_b": [
-          1720,
+          1482,
           1200
         ],
         "cast_gather": [
+          1682,
+          1200
+        ],
+        "cast_rise": [
           0,
           1400
         ],
-        "cast_rise": [
+        "cast": [
           200,
           1400
         ],
-        "cast": [
-          400,
-          1400
-        ],
         "cast_release": [
-          600,
+          400,
           1400
         ]
       },
@@ -1000,16 +1000,16 @@
       "hasRaise": false,
       "opaqueRight": 63,
       "head": [
-        62,
-        3
+        36,
+        2
       ],
       "idleBox": [
         16,
-        3,
+        2,
         63,
         76
       ],
-      "travelTop": 3,
+      "travelTop": 2,
       "lungeRight": 70,
       "homeX": [
         13,
@@ -1027,15 +1027,15 @@
       "floating": false,
       "frames": {
         "idle": [
-          1664,
+          1716,
           0
         ],
         "idle_b": [
-          1764,
+          1816,
           0
         ],
         "atk_wind1": [
-          1864,
+          1916,
           0
         ],
         "atk_wind2": [
@@ -1059,7 +1059,7 @@
           128
         ],
         "hurt_in1": [
-          1664,
+          1716,
           0
         ],
         "hurt_in2": [
@@ -1434,32 +1434,12 @@
         "cast_release": [
           800,
           1000
-        ],
-        "attack_raise": [
-          1000,
-          1000
-        ],
-        "atk_raise_in": [
-          1200,
-          1000
-        ],
-        "atk_raise_b": [
-          1400,
-          1000
-        ],
-        "atk_swing": [
-          1600,
-          1000
-        ],
-        "atk_swing2": [
-          1800,
-          1000
         ]
       },
       "anim": true,
       "holds": [],
       "lungePx": 40,
-      "hasRaise": true,
+      "hasRaise": false,
       "opaqueRight": 191,
       "head": [
         100,
@@ -1472,8 +1452,8 @@
         192
       ],
       "tip": [
-        102,
-        11
+        92,
+        8
       ],
       "travelTop": 6,
       "lungeRight": 192,
@@ -1914,7 +1894,7 @@
     },
     "crazy_horse": {
       "cell": [
-        128,
+        132,
         128
       ],
       "footRow": 122,
@@ -1925,74 +1905,74 @@
           0
         ],
         "idle_b": [
-          128,
+          132,
           0
         ],
         "atk_wind1": [
-          256,
+          264,
           0
         ],
         "atk_wind2": [
-          384,
+          396,
           0
         ],
         "atk_mid": [
-          512,
+          528,
           0
         ],
         "attack": [
-          640,
+          660,
           0
         ],
         "atk_follow": [
-          768,
+          792,
           0
         ],
         "atk_recover": [
-          896,
+          924,
           0
         ],
         "hurt_in1": [
-          1024,
+          1056,
           0
         ],
         "hurt_in2": [
-          1152,
+          1188,
           0
         ],
         "hurt": [
-          1280,
+          1320,
           0
         ],
         "daze": [
-          1408,
+          1452,
           0
         ],
         "daze_b": [
-          1536,
+          1584,
           0
         ]
       },
       "anim": true,
       "holds": [],
-      "lungePx": 29,
+      "lungePx": 31,
       "hasRaise": false,
-      "opaqueRight": 110,
+      "opaqueRight": 125,
       "head": [
-        88,
-        33
+        94,
+        26
       ],
       "idleBox": [
         17,
-        33,
-        110,
+        26,
+        125,
         122
       ],
-      "travelTop": 31,
-      "lungeRight": 119,
+      "travelTop": 26,
+      "lungeRight": 130,
       "homeX": [
-        15,
-        112
+        2,
+        127
       ],
       "sequence_version": 1,
       "page": 3
@@ -2704,56 +2684,56 @@
       "floating": false,
       "frames": {
         "idle": [
-          512,
+          256,
           1600
         ],
         "idle_b": [
-          640,
+          384,
           1600
         ],
         "atk_wind1": [
-          768,
+          512,
           1600
         ],
         "atk_wind2": [
-          896,
+          640,
           1600
         ],
         "atk_mid": [
-          1024,
+          768,
           1600
         ],
         "attack": [
-          1152,
+          896,
           1600
         ],
         "atk_follow": [
-          1280,
+          1024,
           1600
         ],
         "atk_recover": [
-          1408,
+          1152,
           1600
         ],
         "hurt_in1": [
-          1536,
+          1280,
           1600
         ],
         "hurt_in2": [
-          1664,
+          1408,
           1600
         ],
         "hurt": [
-          1792,
+          1536,
           1600
         ],
         "daze": [
-          1920,
+          1664,
           1600
         ],
         "daze_b": [
-          0,
-          1728
+          1792,
+          1600
         ]
       },
       "anim": true,
@@ -3088,55 +3068,55 @@
       "floating": true,
       "frames": {
         "idle": [
-          800,
+          600,
           1400
         ],
         "idle_b": [
-          928,
+          728,
           1400
         ],
         "atk_wind1": [
-          1056,
+          856,
           1400
         ],
         "atk_wind2": [
-          1184,
+          984,
           1400
         ],
         "atk_mid": [
-          1312,
+          1112,
           1400
         ],
         "attack": [
-          1440,
+          1240,
           1400
         ],
         "atk_follow": [
-          1568,
+          1368,
           1400
         ],
         "atk_recover": [
-          1696,
+          1496,
           1400
         ],
         "hurt_in1": [
-          1824,
+          1624,
           1400
         ],
         "hurt_in2": [
+          1752,
+          1400
+        ],
+        "hurt": [
+          1880,
+          1400
+        ],
+        "daze": [
           0,
           1600
         ],
-        "hurt": [
-          128,
-          1600
-        ],
-        "daze": [
-          256,
-          1600
-        ],
         "daze_b": [
-          384,
+          128,
           1600
         ]
       },
@@ -4829,7 +4809,7 @@
     },
     "hollow_seraph": {
       "cell": [
-        218,
+        200,
         200
       ],
       "footRow": 192,
@@ -4840,7 +4820,7 @@
           600
         ],
         "idle_b": [
-          1818,
+          1800,
           600
         ],
         "atk_wind1": [
@@ -4848,86 +4828,86 @@
           800
         ],
         "atk_wind2": [
-          218,
+          200,
           800
         ],
         "atk_mid": [
-          436,
+          400,
           800
         ],
         "attack": [
-          654,
+          600,
           800
         ],
         "atk_follow": [
-          872,
+          800,
           800
         ],
         "atk_recover": [
-          1090,
+          1000,
           800
         ],
         "hurt_in1": [
-          1308,
+          1200,
           800
         ],
         "hurt_in2": [
-          1526,
+          1400,
           800
         ],
         "hurt": [
-          1744,
+          1600,
           800
         ],
         "daze": [
+          1800,
+          800
+        ],
+        "daze_b": [
           0,
           1000
         ],
-        "daze_b": [
-          218,
-          1000
-        ],
         "cast_gather": [
-          436,
+          200,
           1000
         ],
         "cast_rise": [
-          654,
+          400,
           1000
         ],
         "cast": [
-          872,
+          600,
           1000
         ],
         "cast_release": [
-          1090,
+          800,
           1000
         ]
       },
       "anim": true,
       "holds": [],
-      "lungePx": 40,
+      "lungePx": 38,
       "hasRaise": false,
-      "opaqueRight": 215,
+      "opaqueRight": 183,
       "head": [
-        198,
-        10
+        109,
+        55
       ],
       "idleBox": [
-        3,
-        10,
-        215,
+        16,
+        55,
+        183,
         192
       ],
       "tip": [
-        197,
-        2
+        107,
+        51
       ],
-      "travelTop": 2,
-      "lungeRight": 216,
+      "travelTop": 43,
+      "lungeRight": 182,
       "homeX": [
-        1,
-        215
+        13,
+        183
       ],
       "sequence_version": 1,
       "page": 1
@@ -7022,62 +7002,62 @@
     },
     "piscodemon": {
       "cell": [
-        80,
+        82,
         80
       ],
       "footRow": 76,
       "floating": false,
       "frames": {
         "idle": [
-          1308,
+          1000,
           1000
         ],
         "idle_b": [
-          1388,
+          1082,
           1000
         ],
         "atk_wind1": [
-          1468,
+          1164,
           1000
         ],
         "atk_wind2": [
-          1548,
+          1246,
           1000
         ],
         "atk_mid": [
-          1628,
+          1328,
           1000
         ],
         "attack": [
-          1708,
+          1410,
           1000
         ],
         "atk_follow": [
-          1788,
+          1492,
           1000
         ],
         "atk_recover": [
-          1868,
+          1574,
           1000
         ],
         "hurt_in1": [
-          1948,
+          1656,
           1000
         ],
         "hurt_in2": [
-          0,
-          1200
+          1738,
+          1000
         ],
         "hurt": [
-          80,
-          1200
+          1820,
+          1000
         ],
         "daze": [
-          160,
-          1200
+          1902,
+          1000
         ],
         "daze_b": [
-          240,
+          0,
           1200
         ]
       },
@@ -7085,21 +7065,21 @@
       "holds": [],
       "lungePx": 24,
       "hasRaise": false,
-      "opaqueRight": 69,
+      "opaqueRight": 66,
       "head": [
-        38,
+        43,
         4
       ],
       "idleBox": [
-        11,
+        14,
         4,
-        69,
+        66,
         76
       ],
       "travelTop": 3,
-      "lungeRight": 70,
+      "lungeRight": 79,
       "homeX": [
-        5,
+        10,
         69
       ],
       "sequence_version": 1,

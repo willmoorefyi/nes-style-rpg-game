@@ -63,3 +63,16 @@ the archive copies are untouched and never built.
 | `hollow_seraph_v1` | hovering black-steel and brass plates, clockwork heart, gear halo, four blade wings (idle R313 = R309 re-cut, attack R316, cast R318, hurt R319; no raise, D-V9) | locked (V5), `halo` fx | scale 2, `boss` |
 | `chaos_v1` | a two-armed overlord in a star-flecked void robe, flame-crown head, four Fiend orbs (idle R299, attack R300, cast R302, hurt R304, raise R306) | locked (V5) | scale 3, `boss` (D-V6 = C2) |
 | `dragon_v1` | the red dragon redrawn tall and upright (R320 = R312 re-cut with `fit: headroom`) | locked (V5) | scale 3, `huge` |
+
+## Replacements (V8 fix round, integrated at W4)
+
+`docs/REDESIGN_FIX_PLAN.md`; the `_v2` archives above hold the pass-V looks they replace, untouched and never built.
+
+| Retired id | Replacement (approved R-rows) | Rig | Display |
+|---|---|---|---|
+| `crazy_horse_v2` | an otherworldly beast with a bare horse-skull head, ribs through the ash-grey hide, bone spines, bright yellow-green cracks in every pose, smoke-column legs (R321) | locked (V8 W3, ae5a0c1) | scale 2, `large` |
+| `piscodemon_v2` | the squat octopus-headed horror in dark sea green, two narrow slanted yellow-orange eyes under a heavy brow (R323) | locked (V8 W3, ff9fab6) | scale 2, small |
+| `hollow_seraph_v2` | floating empty brass armour, four hilt-less blade wings of cold light, gear halo and heart (idle R324, attack R326, cast R331 = R328 re-cut with `match_height: idle`; hurt derived from the idle, `hurt_from: idle`, orchestrator ruling b) | locked (V8 W3, ab909d9), `halo` fx, `raise: false` | scale 2, `boss` |
+
+black_knight was not regenerated (the F3 keyframe paint passed IR; no `black_knight_v2`), and chaos keeps its pass-V
+art (F5 is the rig's `raise: false`; no archive).

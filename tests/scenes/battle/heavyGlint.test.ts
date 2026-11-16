@@ -88,6 +88,17 @@ describe('item 4: the glint at the raised weapon tip', () => {
     expect(noRaise).toContain('hollow_seraph'); // docs/ROSTER_FIX_PLAN.md defect 5 (D-F1, FW-R)
   });
 
+  it('chaos: raise off (V8 F5), tip from atk_wind2', () => {
+    // docs/REDESIGN_FIX_PLAN.md F5 / D-O4: the heavy raise set is gone, the glint tip sits on atk_wind2's art
+    const s = ATLAS.sheets.chaos;
+    expect(rigDropsRaise('chaos')).toBe(true);
+    expect(s.frames.attack_raise).toBeUndefined();
+    for (const f of ['atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2']) expect(s.frames[f as MonsterFrame], f).toBeUndefined();
+    const px = cellPixels('chaos', 'atk_wind2');
+    expect(s.tip).toBeDefined();
+    expect(px.data[(s.tip![1] * px.w + s.tip![0]) * 4 + 3], `tip ${s.tip} on atk_wind2's art`).toBeGreaterThan(0);
+  });
+
   const frames = (tip?: [number, number]): MonsterFrames => {
     const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
     return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: 2,
