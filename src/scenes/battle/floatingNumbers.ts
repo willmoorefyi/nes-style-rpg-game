@@ -27,11 +27,24 @@ export function floatLabel(evt: DamageEvent): string {
   return evt.isHeal ? `+${evt.damage}` : `${evt.damage}`;
 }
 
-/** BA-8: a 48 px number with a dark outline, centred over the top of `sprite`. */
-export function createFloatingNumber(label: string, kind: FloatKind, sprite: Container): OutlinedText {
+/** V8 F6: px between an enemy's status icon row and a number below it, and the least rise the number keeps there. */
+export const ICON_CLEAR = 4;
+export const RISE_MIN = 24;
+
+/** Where a number spawns (`y`) and the highest it rises to (`minY`): at the cell top, rising freely, unless the
+ *  target shows a status icon row (its bottom at `iconRowBottom`); then it starts RISE_MIN below the row's clearance
+ *  (never above the cell top) and stops ICON_CLEAR px under the row, so its top never enters the row (D-O5). */
+export function floatPlacement(top: number, iconRowBottom: number | null): { y: number; minY: number | null } {
+  if (iconRowBottom === null) return { y: Math.round(top), minY: null };
+  const minY = Math.round(iconRowBottom + ICON_CLEAR);
+  return { y: Math.max(Math.round(top), minY + RISE_MIN), minY };
+}
+
+/** BA-8: a 48 px number with a dark outline, centred over the top of `sprite` (below its icon row, F6). */
+export function createFloatingNumber(label: string, kind: FloatKind, sprite: Container, y = Math.round(sprite.y)): OutlinedText {
   const text = new OutlinedText({ text: label, fontSize: FLOAT_FONT, fill: FLOAT_COLORS[kind], outline: FLOAT_OUTLINE, outlineWidth: 3 });
   // the NES font is monospace at about 0.6 em per glyph
   const approxWidth = label.length * FLOAT_FONT * 0.6;
-  text.position.set(Math.round(sprite.x + sprite.width / 2 - approxWidth / 2), Math.round(sprite.y));
+  text.position.set(Math.round(sprite.x + sprite.width / 2 - approxWidth / 2), y);
   return text;
 }

@@ -1,5 +1,5 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
-import { createFloatingNumber, FLOAT_FRAMES, type FloatKind } from './floatingNumbers.js';
+import { createFloatingNumber, floatPlacement, FLOAT_FRAMES, type FloatKind } from './floatingNumbers.js';
 import { BattleLayers } from './BattleLayers.js';
 import { stepAlpha } from './fx/emitterCore.js';
 import { stoneTextures } from './fx/stoneTextures.js';
@@ -21,7 +21,7 @@ export const DYING_FRAMES = 30;
  * (fx/ActionFx.ts plays the build-up; the controller presents the number and this glow at the effect's impact).
  */
 export class BattleEffects {
-  readonly floatingTexts: { text: Container; age: number; maxAge: number }[] = [];
+  readonly floatingTexts: { text: Container; age: number; maxAge: number; minY: number | null }[] = [];
   readonly dyingEnemies: Map<number, number> = new Map();
   readonly spellFlashes: { overlay: Container; age: number; maxAge: number; follow?: Container }[] = [];
 
@@ -33,10 +33,12 @@ export class BattleEffects {
     this.layers = BattleLayers.of(mainContainer);
   }
 
-  addFloating(label: string, kind: FloatKind, sprite: Container): void {
-    const text = createFloatingNumber(label, kind, sprite);
+  /** `iconRowBottom`: the bottom of the target's status icon row in the sprite's space (null: no icon, F6). */
+  addFloating(label: string, kind: FloatKind, sprite: Container, iconRowBottom: number | null = null): void {
+    const { y, minY } = floatPlacement(sprite.y, iconRowBottom);
+    const text = createFloatingNumber(label, kind, sprite, y);
     this.layers.fx.numbers.addChild(text);
-    this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES });
+    this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES, minY });
   }
 
   addFlash(overlay: Container, maxAge: number, follow?: Container): void {
@@ -69,6 +71,7 @@ export class BattleEffects {
       const ft = this.floatingTexts[i];
       ft.age += dt;
       ft.text.y -= 1 * dt;
+      if (ft.minY !== null && ft.text.y < ft.minY) ft.text.y = ft.minY;
       ft.text.alpha = 1 - ft.age / ft.maxAge;
       if (ft.age >= ft.maxAge) {
         ft.text.parent?.removeChild(ft.text);
