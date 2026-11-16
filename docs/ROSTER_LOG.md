@@ -872,7 +872,7 @@ Images used: 38 of 50 (ledger guard: 405 - 367; V8 halt 47).
 |---|---|---|
 | crazy_horse | C (`--move-rig`), approved with nits | monster_large 1 (R321); D-U2 extras not needed |
 | piscodemon | C (`--move-rig`), approved with nits (G2b borderline in idle / hurt) | monster_small 2 (R322 rejected, R323) |
-| hollow_seraph | **C, incomplete** (`--move-rig`, `--prune`; idle + attack approved; "boss poses incomplete, skipped" until cast and hurt) | boss_idle 1 (R324), boss_attack 2 (R325 rejected, R326), boss_cast 2 (R327 rejected; R328 **size to be normalised** under the user ruling, design OK, awaiting the FW re-cut), boss_hurt 2 rejected (R329, R330; **stopped after 2 in a row**, orchestrator; pass-V 3 of 4, 1 left) |
+| hollow_seraph | **C, incomplete** (`--move-rig`, `--prune`; idle + attack approved; "boss poses incomplete, skipped" until cast and hurt) | boss_idle 1 (R324), boss_attack 2 (R325 rejected, R326), boss_cast 2 (R327 rejected; R328 **size to be normalised** under the user ruling, design OK, awaiting the FW re-cut), boss_hurt 2 rejected (R329, R330); **orchestrator ruling (b): no more hurt images, the hurt key is derived from the idle** by a coming rig option (the rig agent adds the recoil; 0 images; pass-V 3 of 4 used, the 4th unspent) |
 
 - **User ruling (2026-11-16, via the orchestrator, binding):** a pose is never rejected only for its size (size is
   normalised in the pipeline by a coming cut option that scales an action pose to the idle's figure height). Under it
@@ -885,3 +885,7 @@ Images used: 38 of 50 (ledger guard: 405 - 367; V8 halt 47).
   (2) `selftest_headroom.py` "R309's entry re-plans key ea9c18f6205f82d369da51b5": the R309 case re-plans from the live
   `hollow_seraph` entry, which now holds the V8 text; it should read the archived entry (`retired/monsters_v2.yaml`).
   crazy_horse and piscodemon in state C: ALL PASSED (a5996aa).
+- **Orchestrator ruling (2026-11-16) on hollow_seraph boss_hurt, option (b):** R329 and R330 stay rejected (five blade
+  wings each; R330 also a changed skirt); no further hurt image is generated. The hurt key will be **derived from the
+  approved R324 idle** by a framework rig option (framework owner), and the rig agent adds the recoil in the rig (0
+  images). The cast waits for the size-normalising re-cut of R328 (user ruling). The generator stops here.
