@@ -1335,3 +1335,29 @@ archive copies are in `chaos_horizon_v1`.
 - **Note for the orchestrator:** at the lowered place (-527, -60) the chest (canvas rows 650-1080) mostly falls
   behind the bottom strip. The approved `core_crack` patch (canvas rows ~686-1000) shows only its upper part at rest
   (screen 626-780). A chest variant needs either a pan / `place` change when it is shown, or a higher patch.
+
+**Orchestrator ruling (2026-11-16, 0 calls): F4 = the first retry's cavity (C24) at its own, higher rest place.**
+- **F4 place (-527, -285)**, recorded in `colossus.py FORMS` as `chaos_horizon_core` (art chaos_horizon, variant
+  core: open).
+  - The cavity (canvas rows 700-1050) sits at screen 415-765, all above the strip.
+  - The canvas bottom is at 795 (>= 786); the top is glow only.
+  - Party band std 58.0.
+  - **TS owner:** chaos_i3 must heave the colossus up from F3's rest (-527, -60) to F4's rest (-527, -285), a pan or
+    rise of dy -225. The interlude total is pinned in interludes.test, and the json needs a per-form place for F4.
+- **F4 review 1 (side by side with F3): ITERATE.**
+  - Same being, no face, the party readable.
+  - Nits: an almond / spade outline with a top spike near the disc, a flat flame interior with no inner walls,
+    a downward streak, the rubble crisper than the body.
+  - Offline fixes: the top spike faded (alpha from canvas row 735), the streak faded (to row 945), the rubble toned
+    to the body (feathered, stone pixels only).
+- **F4 review 2: ITERATE**, though the reviewer said it would be "a weak SHIP WITH NITS if the budget stop holds".
+  - Open: a bonfire-like flame instead of a molten mass, little cavity depth, little light on the pectorals, the
+    teardrop outline.
+- **Not approved** under the ruling; the candidate is `gen/out/colossus/chaos_horizon/f4/core_open_fix.png`
+  (2700x1080 canvas patch).
+- **Crack at F3's rest (-60):** the approved patch (canvas rows 722-967) showed only its top at screen 662-780.
+  - It was moved up and shortened offline to canvas rows 662-812 (screen 602-752), with its column sides softened.
+  - Review: **SHIP WITH NITS**, and the nits (soft sides, end above y 760) were applied.
+  - The approve gate required an archive, so the painted set was archived as `chaos_horizon_v2` (a RETIRED_SPRITES
+    row; master, glow and sky_base unchanged).
+  - Re-approved with the moved `core_crack.png`.

@@ -1,0 +1,98 @@
+{
+  "approved": "2026-11-16 C3' (fresh image-only side-by-side review vs the user-picked original: SHIP WITH NITS; same look, ring + rays present, no pixelation, nothing invented)",
+  "body": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/body.png",
+  "cache_keys": [
+    "d95ade61d71a34a63f132b44",
+    "1411f3b8f9ac434f8e17c2d6",
+    "2a8b813b7505e5aadf6cfef1",
+    "506909aa09af9788357c7db5"
+  ],
+  "canvas": [
+    2700,
+    1080
+  ],
+  "chain": [
+    "structure C4 + face removal C6 (the picked render)",
+    "conservative upscale seed 4501 creativity 0.2 on a 4-row padded copy (webp response) -> 4888x1976 -> upfit 2700x1080 (no new blobs)",
+    "cut: the C7 remove_bg alpha Lanczos-upscaled x1.5 (0 calls)",
+    "glow G1 diff, sky open radius 140 sigma 60, ring (1350,502,525,48), corona (1347,510,230)"
+  ],
+  "checks": {
+    "despill": {
+      "band": 210.08,
+      "interior": 25.86,
+      "ok": true
+    },
+    "fidelity": {
+      "delta_e": 1.767,
+      "ok": true,
+      "psnr": 37.87
+    },
+    "glow_strength": {
+      "annulus": {
+        "glow": 51.86,
+        "ratio": 1.081,
+        "raw_minus_far": 47.99
+      },
+      "corona": {
+        "glow": 92.59,
+        "ratio": 0.859,
+        "raw_minus_far": 107.73
+      },
+      "far_sky": 50.46,
+      "ok": true
+    },
+    "sky_clean": {
+      "diff": 0.13,
+      "inside": 46.55,
+      "ok": true,
+      "outside": 46.68
+    }
+  },
+  "core_crack": {
+    "file": "core_crack.png (2700x1080 canvas patch, normal blend)",
+    "review": "ITERATE (whole-mask repaint, seams) -> SHIP WITH NITS -> nits fixed (start lower, shorter, spill)",
+    "source": "inpaint C23 (seed 4602, f4_inpaint) on the 900x900 chest crop at canvas (900,180), merged inside chest_mask2; patch alpha = the fissure and its lit edges (brightness difference), feathered, faded at both ends, warm spill"
+  },
+  "core_open": "not made: inpaint C22 (a face) and C23 (a thin crack) rejected for open, 2 in a row -> stopped (18.2)",
+  "extras": {
+    "core_crack": "assets-src/gen/out/colossus/chaos_horizon/f4/core_crack.png",
+    "glow": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/glow.png",
+    "sky_base": "assets-src/gen/out/colossus/chaos_horizon/f3_paint/sky_base.png"
+  },
+  "form": "chaos_horizon",
+  "nits": [
+    "ring top cut by the message window at place_y -210 (more ring needs place_y nearer -60 or a ruling)",
+    "ring and long rays weaker over the bright arena",
+    "corona top slightly hot (screen x 640-1000, y 125-200)",
+    "warrior and thief over the dark right arm"
+  ],
+  "pan_limits_at_rest": {
+    "dx": [
+      -247,
+      521
+    ],
+    "dy": [
+      -230,
+      174
+    ]
+  },
+  "place": [
+    -527,
+    -60
+  ],
+  "place_note": "user ruling 2026-11-16: lowered from (-527, -210) so more of the halo shows; the ring's very top is cut by the source render and the glow's 120 px top feather, so it stays under the message window at any place_y <= 0",
+  "ring_arc_pin_pct": 20.6,
+  "ring_arc_visible_pct": 23.6,
+  "ring_render_measured": {
+    "band": 32,
+    "centre": [
+      900,
+      335
+    ],
+    "r": 350
+  },
+  "scale": 1,
+  "source": "assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png (user-picked)",
+  "title": "Chaos, the Last Horizon (F3), painted (rev 4, D-U10)"
+}

@@ -55,6 +55,11 @@ FORMS = {
     "chaos_horizon": {"aspect": "21:9", "canvas": (2700, 1080), "place": (-527, -60), "sky_dim": 0.6,
                       "gen": "f3_gen", "nobg": "f3_nobg", "upscale": "f3_upscale",
                       "ring": (1350.0, 502.0, 525.0, 48.0), "corona": (1347.0, 510.0, 230.0)},
+    # F4: F3's art with the `core` layer's `open` frame, at its own rest place (orchestrator ruling 2026-11-16, C3'):
+    # raised so the whole chest cavity (canvas rows 700-1050) is above the bottom strip (screen 415-765); the canvas
+    # bottom stays at 795 >= 786. chaos_i3 heaves the colossus up from F3's rest (-527, -60) to here (TS owner).
+    "chaos_horizon_core": {"art": "chaos_horizon", "canvas": (2700, 1080), "place": (-527, -285), "sky_dim": 0.6,
+                           "variant": {"core": "open"}},
 }
 
 
