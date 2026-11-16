@@ -761,7 +761,7 @@ elemental), green_dragon (noisy shading at 3 px), white_shark (longer but lower 
 shorter than the hydra), deepeyes (body no bigger than bigeyes' eye). **ITERATE: dragon** (red): idle 276x165 screen
 px, shorter than the ogre (204) and about 0.6x the other dragons' height; not a size-tier step. The rescale cannot fix
 it (only scales 2 and 3 are allowed; the art is a low, wide ranged pose), so it goes to the orchestrator.
-### V3 status (generator, 2026-11-16; 18 of 50 images, ledger 367 -> 385)
+### V3 status (generator, 2026-11-16; 22 of 50 images, ledger 367 -> 389; updated after R309-R312)
 
 | Id | State | Sheets (pass-V attempts) |
 |---|---|---|
@@ -774,6 +774,6 @@ it (only scales 2 and 3 are allowed; the art is a low, wide ranged pose), so it 
 | dragon | **A, restored** (fallback after R312; the act-1 art, rig and entry live; the pass-V text in `retired/pending_dragon.yaml`) | monster_large 3 of 3 (R310, R311, R312: the idle's horn tips on row 0; R312 loses nothing); escalated |
 | hollow_seraph | **A, restored** (boss fallback after R309; the pass-R art, rig and entry live; the pass-V text in `retired/pending_hollow_seraph.yaml`) | boss_idle 3 of 3 (R297 six wings, R298 pieces dropped, R309 clipped at the top with `keep_pieces`); escalated |
 
-- Main-checkout `selftest.py` at 104df0f: **7 FAILED, all the state-B key re-plan of hollow_seraph's five old poses** (the per-pose key check, `_approved_keys` FW-9, FW-T "approved boss pose keys unchanged"); every other check passes (state C of the other six ids ALL PASSED at 47cd770 before the seraph text was declared).
+- Main-checkout `selftest.py` at 30c5a8b (after both fallbacks): **ALL PASSED** (no id in state B). Earlier, at 104df0f: 7 FAILED, all the state-B key re-plan of hollow_seraph's five old poses** (the per-pose key check, `_approved_keys` FW-9, FW-T "approved boss pose keys unchanged"); every other check passes (state C of the other six ids ALL PASSED at 47cd770 before the seraph text was declared).
 - Lessons: (1) **small bright features are lost in the colour cut** (piscodemon's yellow eyes cut cream, black_knight's visor 4-5 px and none in the attack, chaos's cyan / teal orbs white / grey in some poses): name them large, and expect rig `paint` fixes; (2) **very dark designs collapse to black** at 10 colours (black_knight R292): ask for dark grey with bright edges; (3) a **ground line joined to the feet survives the cut** (guardian R294): put "a ground line, a floor" in the negative; (4) **floating separate pieces are dropped** by `_figure_mask` unless they touch the main mass (seraph R298); (5) **orb counts drift in action poses** (chaos cast / hurt / raise: 5-6 orbs); naming each orb by colour and image side fixed the hurt, and leaving the head unchanged (attack) kept the count, but a raised-arms pose hides or adds orbs.
 - Fix-pass candidates: hollow_seraph (all 4 poses, 1 idle attempt left + 3 each for attack / cast / hurt); chaos boss_attack_raise (five orbs; sheet at 3 of 3, rig paint route); chaos orb colours in attack / cast (rig paint); black_knight attack visor (rig paint); piscodemon eye colour.
