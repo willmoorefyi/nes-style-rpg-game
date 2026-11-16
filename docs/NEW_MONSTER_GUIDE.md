@@ -47,6 +47,11 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
 - **Separate floating pieces** (any sheet): `cut: {keep_pieces: all_in_cell}` keeps every piece inside the figure's
   own cell (the default keeps only the largest blob and blobs near its box; specks under 24 native px, thin guide lines
   and pieces touching the cell border are still dropped); no cache key changes (`selftest_pieces.py`).
+- **Headroom** (any sheet, combinable with `keep_pieces`): `cut: {fit: headroom, top_margin: N}` (N 1-32) shrinks a
+  figure that would reach above row N, nearest-neighbour, to fit rows N..feet row (feet stay on the feet row); a figure
+  already clear of row N is cut unchanged; no cache key changes, so a ledgered attempt re-cuts at 0 images with
+  `generate.py --repixelize out/gemini/<id>/<seed> --sheets <sheet>`, which says whether `approve.py` can approve it
+  (`selftest_headroom.py`).
 - **Titan** (`size: titan`, FW-T, chaos only): per-pose, 300x300 cell, feet row 292, figure 258-278 art px (top row
   >= 15). The cut is fail-closed: a render that would need a rescale (`info["scale"] != 1.0`) or has no detectable pixel
   grid (mode not `grid`) raises, and the attempt counts as rejected. Check cached renders offline first:
