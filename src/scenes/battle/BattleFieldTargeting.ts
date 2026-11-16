@@ -10,6 +10,7 @@ import { iconsFor, tagsFor, type StatusVisuals } from './fx/statusRules.js';
 import { enemyIconRowTop } from './fx/statusIcons.js';
 import { headOf } from './fx/texturePixels.js';
 import { stoneTextures } from './fx/stoneTextures.js';
+import { colossusArrowAt, colossusIconRowTop, drawColossusBracket, labelFloor } from './colossus/colossusCursor.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
 const TARGET_ARROW = 0xffff00;
@@ -139,7 +140,7 @@ export class BattleFieldTargeting {
     const arrow = new Graphics();
     arrow.poly([0, 0, 16, 0, 8, 12]).fill(TARGET_ARROW);
     const offsetX = isParty ? 24 : 40;
-    arrow.position.set(sprite.x + offsetX, sprite.y - 20);
+    arrow.position.set(...(colossusArrowAt(sprite) ?? [sprite.x + offsetX, sprite.y - 20]));
     this.mainContainer.addChild(arrow);
     this.targetArrow = arrow;
     const enemy = isParty ? undefined : this.battle.allEnemies[target.spriteIndex];
@@ -150,7 +151,7 @@ export class BattleFieldTargeting {
       style: { fontFamily: NES_FONT, fontSize: PANEL_FONT, fill: TARGET_ARROW } });
     // play-test item 5: with status icons above the head, the label (and its arrow) sit above the icon row
     const iconTop = iconsFor(statuses, visuals).length > 0 ? this.iconRowTop(sprite) : Infinity;
-    const labelY = Math.max(0, Math.min(Math.round(arrow.y - 10), Math.floor(iconTop - 4 - PANEL_FONT)));
+    const labelY = Math.max(labelFloor(sprite), Math.min(Math.round(arrow.y - 10), Math.floor(iconTop - 4 - PANEL_FONT)));
     arrow.y = labelY + 10;
     label.position.set(Math.round(arrow.x + 24), labelY);
     this.mainContainer.addChild(label);
@@ -159,6 +160,8 @@ export class BattleFieldTargeting {
 
   /** The top of an enemy's status icon row in this container's space (the head as statusFx finds it). */
   private iconRowTop(sprite: Container): number {
+    const top = colossusIconRowTop(sprite);
+    if (top !== null) return top;
     const h = sprite instanceof Sprite ? headOf(stoneTextures.coloured(sprite.texture)) : null;
     const b = sprite.getBounds();
     const head = h ? this.mainContainer.toLocal(sprite.toGlobal(h)).y : this.mainContainer.toLocal({ x: b.x, y: b.y }).y + b.height * 0.33;
@@ -203,8 +206,10 @@ export class BattleFieldTargeting {
           this.mainContainer.addChild(this.targetOutline);
         }
         this.targetOutline.clear();
-        this.targetOutline.rect(-3, -3, sprite.width + 6, sprite.height + 6).stroke({ width: 2, color: 0xffffff });
-        this.targetOutline.position.set(sprite.x, sprite.y);
+        if (!drawColossusBracket(this.targetOutline, sprite)) {   // a colossus: the bracket, never an off-screen outline
+          this.targetOutline.rect(-3, -3, sprite.width + 6, sprite.height + 6).stroke({ width: 2, color: 0xffffff });
+          this.targetOutline.position.set(sprite.x, sprite.y);
+        }
         this.targetOutline.alpha = 0.3 + 0.7 * Math.abs(Math.sin(this.targetFlashTimer * 0.12));
       }
     }

@@ -7,20 +7,22 @@
  * the idle edge (ROSTER_FIX_PLAN 12d: death_eye's lunge touched the border). Frames are cached for the shown entry
  * only (FW-8).
  */
-import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
+import { Container, Graphics, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import type { BestiaryData, BestiaryAnimLabel } from '../../types/bestiaryData.js';
 import { Window } from '../../ui/Window.js';
 import { OutlinedText } from '../../ui/NESFont.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
-import { battleBackgroundPath } from '../../rendering/BattleBackground.js';
 import { lungeOvershoot } from '../../rendering/monsterAnchors.js';
 import { AiEnemyView, type MonsterArtSource } from '../battle/AiEnemyView.js';
 import type { EnemyPoseController, Posture } from '../battle/EnemyPoseController.js';
 import { ENEMY_REACH_OVERLAP } from '../battle/enemyReach.js';
-import { GAME_WIDTH, GAME_HEIGHT, WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER } from '../../core/LayoutConstants.js';
+import { WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER } from '../../core/LayoutConstants.js';
 import { BestiaryLoop, type LoopPoses } from './bestiaryAnim.js';
-import { backdropPosition, fitShift, type Fit } from './bestiaryFit.js';
+import { fitShift, type Fit } from './bestiaryFit.js';
+import { BestiaryBackdrop } from './bestiaryBackdrop.js';
+import { BestiaryColossus } from './bestiaryColossus.js';
+import { colossusOf } from '../battle/colossus/colossusIndex.js';
 
 /** The preview window (screen px). */
 export const PREVIEW_RECT = { x: 24, y: 120, width: 976, height: 756 } as const;
@@ -102,18 +104,18 @@ export class BestiaryPreview {
   private readonly caption = new OutlinedText({ outline: 0x000000 });
   private readonly phantom = new Graphics();
   private readonly loop: BestiaryLoop;
-  private bg: Sprite | null = null;
-  private bgId: string | null = null;
-  private token = 0;
-  private dead = false;
+  private readonly backdrop: BestiaryBackdrop;
+  /** Pass C: a colossus form's preview at scale 1 (docs/CHAOS_FORMS_PLAN.md 8). */
+  private readonly colossus = new BestiaryColossus(this.actors);
   private view: AiEnemyView | null = null;
   private sprite: Container | null = null;
   private posture: Posture = 'none';
   private noArt = false;
   private fit: Fit | null = null;
 
-  constructor(parent: Container, readonly art: CachedArt, private readonly loadTexture: (path: string) => Promise<Texture>,
+  constructor(parent: Container, readonly art: CachedArt, loadTexture: (path: string) => Promise<Texture>,
     private readonly data: BestiaryData) {
+    this.backdrop = new BestiaryBackdrop(this.stage, loadTexture, PREVIEW_INNER);
     const inner = PREVIEW_INNER;
     this.maskShape.rect(inner.left, inner.top, inner.right - inner.left, inner.bottom - inner.top).fill(0xffffff);
     this.stage.mask = this.maskShape;
@@ -139,8 +141,9 @@ export class BestiaryPreview {
   show(entry: PreviewEntry | null, backgroundId: string | null): void {
     this.clearEnemy();
     this.art.keepOnly(entry?.seen ? [monsterSpriteKey(entry.enemy)] : []);   // FW-8: release the last entry's page
-    if (backgroundId) this.setBackground(backgroundId);
-    if (!entry || !entry.seen) { this.caption.text = ''; return; }
+    if (backgroundId) this.backdrop.set(backgroundId);
+    void this.colossus.show(entry?.seen ? entry.enemy : null);   // releases a shown colossus; draws a colossus form
+    if (!entry || !entry.seen || colossusOf(entry.enemy)) { this.caption.text = ''; return; }
     const e = entry.enemy;
     this.view = new AiEnemyView([e], this.art);
     const [sprite] = this.view.build();
@@ -170,6 +173,7 @@ export class BestiaryPreview {
 
   /** One frame of the bestiary clock (dt 0 in step mode). */
   update(dt: number): void {
+    this.colossus.update(dt);
     if (!this.view || !this.sprite) return;
     this.loop.update(dt);
     this.view.update(dt, [this.sprite], [this.posture]);
@@ -204,24 +208,6 @@ export class BestiaryPreview {
     };
   }
 
-  /** A new background; an older load that resolves later, or one after destroy, is dropped (3.2). */
-  private setBackground(id: string): void {
-    if (id === this.bgId) return;
-    this.bgId = id;
-    const token = ++this.token;
-    const path = battleBackgroundPath(id);
-    this.loadTexture(path).then((texture) => {
-      if (token !== this.token || this.dead) return;
-      const sprite = new Sprite(texture);
-      const scale = Math.max(GAME_WIDTH / texture.width, GAME_HEIGHT / texture.height);
-      sprite.scale.set(scale);
-      sprite.position.set(...backdropPosition(texture.width, texture.height, scale, PREVIEW_INNER, GAME_HEIGHT));
-      this.bg?.destroy({ texture: false });
-      this.bg = sprite;
-      this.stage.addChildAt(sprite, 0);
-    }).catch((err: unknown) => console.warn('Bestiary: failed to load the background', path, err));
-  }
-
   private clearEnemy(): void {
     this.posture = 'none';
     this.sprite?.destroy({ children: true, texture: false });
@@ -232,12 +218,9 @@ export class BestiaryPreview {
 
   /** Destroy the sprites and the stage (not the cached background textures), then the frames cache. */
   destroy(): void {
-    this.dead = true;
-    this.token++;
     this.clearEnemy();
-    this.bg?.destroy({ texture: false });
-    this.bg = null;
-    this.bgId = null;
+    this.colossus.dispose();
+    this.backdrop.destroy();
     this.stage.destroy({ children: true });
     this.maskShape.destroy();
     this.caption.destroy({ children: true });

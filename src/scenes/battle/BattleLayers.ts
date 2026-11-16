@@ -27,14 +27,17 @@ const registry = new WeakMap<Container, BattleLayers>();
 
 /**
  * The battle scene's draw order (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 3), as children of the scene's main container:
- * `bg` (backdrop) < `ui` (enemy list, command window, party panel) < `actors` (enemy sprites, then party sprites) <
- * `fx` (status < spell < flash < numbers) < `hud` (the message window and end prompt), so nothing covers the text.
+ * `bg` (backdrop) < `colossus` (a battlefield-scale form, its floor front and overhang; docs/CHAOS_FORMS_PLAN.md 4.1) <
+ * `ui` (enemy list, command window, party panel) < `actors` (enemy sprites, then party sprites) < `fx` (status < spell <
+ * flash < numbers) < `hud` (the message window and end prompt), so nothing covers the text and no colossus covers a window.
  *
  * `update(dt)` runs once per frame from the scene; effects and followers hook in with `onUpdate`. It also moves
- * `actors` and `fx` (never `ui` or `hud`) by the screen shake (`shake.start()`, the heavy attack's slam).
+ * `actors`, `fx` and `colossus` (never `bg`, `ui` or `hud`) by the screen shake (`shake.start()`, the heavy attack's slam):
+ * the being reads as near and the sky as far.
  */
 export class BattleLayers {
   readonly bg = layer('bg');
+  readonly colossus = layer('colossus');
   readonly ui = layer('ui');
   readonly actors = layer('actors');
   readonly fx = new FxLayer();
@@ -43,7 +46,7 @@ export class BattleLayers {
   private updaters: LayerUpdater[] = [];
 
   private constructor(readonly root: Container) {
-    root.addChild(this.bg, this.ui, this.actors, this.fx, this.hud);
+    root.addChild(this.bg, this.colossus, this.ui, this.actors, this.fx, this.hud);
     registry.set(root, this);
   }
 
@@ -75,6 +78,7 @@ export class BattleLayers {
     const o = this.shake.offset();
     this.actors.position.set(o.x, o.y);
     this.fx.position.set(o.x, o.y);
+    this.colossus.position.set(o.x, o.y);
     this.shake.update(dt);
   }
 

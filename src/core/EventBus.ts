@@ -18,6 +18,8 @@ export interface GameEvents {
   /** The party was fully healed by a cutscene (T2). */
   partyHealed: Record<string, never>;
   showDialog: { text: string; onComplete: () => void };
+  /** A boss changed form; emitted at the interlude's swap (docs/CHAOS_FORMS_PLAN.md 2.2 item 7: SEEN:<to>). */
+  'battle:formChange': { from: string; to: string };
 }
 
 type Callback<T> = (data: T) => void;

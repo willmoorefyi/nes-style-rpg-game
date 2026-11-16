@@ -3,8 +3,9 @@ import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { travelTopOf } from '../../rendering/monsterAnchors.js';
 import { computeEnemyLayoutAi, formationFits, layoutSizeOf, type EnemyBox } from './EnemyLayoutAi.js';
-import { boxInputOf, formationWarning } from './formationCheck.js';
-import { EnemyPoseController, type AttackPlan, type Posture, type PoseCue } from './EnemyPoseController.js';
+import { atlasLayout, colossusOf, formationWarning } from './formationCheck.js';
+import { EnemyActorPoses } from './colossus/enemyActorView.js';
+import type { AttackPlan, Posture, PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { TRAVEL_HOP, enemyReach } from './enemyReach.js';
 import { attackTable } from './enemyAttackTables.js';
@@ -40,7 +41,7 @@ export interface MonsterArtSource {
  * is drawn above the other enemy sprites only (D5). A heavy attack pulses red in its hold and shakes the screen on contact.
  */
 export class AiEnemyView {
-  readonly poses: EnemyPoseController;
+  readonly poses: EnemyActorPoses;
   private frames: (MonsterFrames | null)[] = [];
   private base: { x: number; y: number }[] = [];
   private boxes: EnemyBox[] = [];
@@ -60,7 +61,7 @@ export class AiEnemyView {
   pixels: (t: Texture) => Pixels | null = readPixels;
 
   constructor(private readonly enemies: EnemyData[], private readonly art: MonsterArtSource = battleArt) {
-    this.poses = new EnemyPoseController(enemies.length);
+    this.poses = new EnemyActorPoses(enemies.length);
     this.poses.onCue = (i, cue) => {
       const sprite = this.sprites[i];
       if (!sprite) return;
@@ -107,16 +108,17 @@ export class AiEnemyView {
 
   /** Build one sprite (or placeholder box) per enemy, in enemy order. */
   build(): Container[] {
-    this.frames = this.enemies.map((e) => this.art.getMonsterFrames(monsterSpriteKey(e)));
+    this.frames = this.enemies.map((e) => (colossusOf(e) ? null : this.art.getMonsterFrames(monsterSpriteKey(e))));
     const holds = this.enemies.flatMap((e, i) => (this.frames[i] && this.art.hold ? [this.art.hold(monsterSpriteKey(e))] : []));
     this.release();
     this.holds = holds;
-    const inputs = this.enemies.map((e, i) => boxInputOf(e, this.frames[i]));
-    if (!this.warned && !formationFits(inputs)) {
+    // a colossus form is placed by its ColossusView, never laid out or checked here (docs/CHAOS_FORMS_PLAN.md 4.2)
+    const { inputs, boxesOf } = atlasLayout(this.enemies, this.frames);
+    if (!this.warned && inputs.length > 0 && !formationFits(inputs)) {
       this.warned = true;
       console.warn(formationWarning(this.enemies.map((e) => e.id)));
     }
-    const boxes = computeEnemyLayoutAi(inputs);
+    const boxes = boxesOf(inputs.length > 0 ? computeEnemyLayoutAi(inputs) : []);
     this.base = [];
     this.boxes = boxes;
     return this.enemies.map((e, i) => {

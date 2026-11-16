@@ -1,6 +1,7 @@
 /**
- * F0 (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 3): the battle draws bg < ui < actors < fx (status < spell < flash <
- * numbers) < hud, so nothing on the field (a travelling or tall enemy) ever covers the message text.
+ * F0 (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 3): the battle draws bg < colossus < ui < actors < fx (status < spell <
+ * flash < numbers) < hud, so nothing on the field (a travelling or tall enemy) ever covers the message text. Pass C
+ * (docs/CHAOS_FORMS_PLAN.md 4.1) added `colossus` between bg and ui: a screen-filling form never covers the windows.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { Container, Graphics } from 'pixi.js';
@@ -34,10 +35,10 @@ function scene(): { scene: BattleScene; layers: BattleLayers } {
 }
 
 describe('battle layers', () => {
-  it('the scene container holds bg, ui, actors, fx, hud in that order; fx holds status, spell, flash, numbers', () => {
+  it('the scene container holds bg, colossus, ui, actors, fx, hud in that order; fx holds status, spell, flash, numbers', () => {
     const { scene: s, layers } = scene();
-    expect(s.container.children).toEqual([layers.bg, layers.ui, layers.actors, layers.fx, layers.hud]);
-    expect(s.container.children.map((c) => c.label)).toEqual(['bg', 'ui', 'actors', 'fx', 'hud']);
+    expect(s.container.children).toEqual([layers.bg, layers.colossus, layers.ui, layers.actors, layers.fx, layers.hud]);
+    expect(s.container.children.map((c) => c.label)).toEqual(['bg', 'colossus', 'ui', 'actors', 'fx', 'hud']);
     expect(layers.fx.children).toEqual([layers.fx.status, layers.fx.spell, layers.fx.flash, layers.fx.numbers]);
     expect(s.container.children[s.container.children.length - 1]).toBe(layers.hud);
   });

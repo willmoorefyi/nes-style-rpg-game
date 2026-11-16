@@ -41,7 +41,7 @@ export function floatPlacement(top: number, iconRowBottom: number | null): { y: 
 }
 
 /** BA-8: a 48 px number with a dark outline, centred over the top of `sprite` (below its icon row, F6). */
-export function createFloatingNumber(label: string, kind: FloatKind, sprite: Container, y = Math.round(sprite.y)): OutlinedText {
+export function createFloatingNumber(label: string, kind: FloatKind, sprite: Pick<Container, 'x' | 'width'> & { y?: number }, y = Math.round(sprite.y ?? 0)): OutlinedText {
   const text = new OutlinedText({ text: label, fontSize: FLOAT_FONT, fill: FLOAT_COLORS[kind], outline: FLOAT_OUTLINE, outlineWidth: 3 });
   // the NES font is monospace at about 0.6 em per glyph
   const approxWidth = label.length * FLOAT_FONT * 0.6;

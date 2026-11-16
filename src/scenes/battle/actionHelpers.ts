@@ -2,6 +2,7 @@ import type { Container } from 'pixi.js';
 import type { GameEvents } from '../../core/EventBus.js';
 import type { ActionResult, NextActionInfo } from '../../battle/BattleStateMachine.js';
 import { attackReach, attackRise, MIN_ATTACK_REACH, type AttackReach } from './attackChoreography.js';
+import { colossusAt } from './colossus/colossusProxy.js';
 
 /** Pure helpers of BattleAnimationController (split out to keep it under its line ceiling). */
 
@@ -13,6 +14,8 @@ export function measureReach(actor: Container, target: Container | null): Attack
   if (!target) return { dx: MIN_ATTACK_REACH, dy: 0 };
   const b = target.getBounds();
   const a = actor.getBounds();
+  const m = colossusAt(target)?.anchors().melee;      // a colossus: run to its melee point (CHAOS_FORMS_PLAN 4.4)
+  if (m) return { dx: attackReach(actor.x, m.x), dy: attackRise(a.y + a.height, m.y) };
   return { dx: attackReach(actor.x, b.x + b.width), dy: attackRise(a.y + a.height, b.y + b.height) };
 }
 
