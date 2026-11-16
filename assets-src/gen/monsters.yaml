@@ -561,17 +561,19 @@
     shape near the head;
     exactly two arms; at the same pixel size as in Image 3
   attack_raise: >-
-    the wind-up of a crushing blow, a mirror-symmetric pose: both arms raised overhead, the two great gauntlets
-    clenched together above the flame crown, the upper body sunk lower into the pooled robe so that the whole figure,
-    raised fists included, stays inside the grey box at exactly the same pixel size as in Image 3; exactly two arms;
-    exactly four orbs and no fifth, in the same places as in Image 3 beside the flames; the gap between the raised arms
-    and the flames is empty background
+    the wind-up of a crushing blow, a mirror-symmetric pose: both arms raised high overhead, the two great gauntlets
+    pressed together into one double fist high above the flame crown, the elbows out to the sides; the upper body
+    sunk lower into the pooled robe so that the whole figure, the joined fists included, stays inside the grey box at
+    exactly the same pixel size as in Image 3; exactly two arms; the four orbs of Image 3, and only those four, sit
+    close around the flames inside the space framed by the raised arms: one pale orb low on the left of the flames,
+    one pale orb low on the right, one dark teal orb and one orange orb just above the shoulders, one on each side; no
+    other orbs or round shapes anywhere
   face: the dark face with two blazing white eyes inside the flame crown is readable
   extra_negative: >-
     four arms, six arms, legs, feet, wings, a tail, horns, a second head, a weapon, purple fire, violet, pink, magenta,
     a human face with skin, orbs floating apart from the body, a ground line
   seeds: [1234]
-  sheet_seeds: {boss_cast: 1235, boss_hurt: 1235}   # boss_cast 1234 (ROSTER_LOG R301): five orbs, a flame wisp on row 2; boss_hurt 1234 (R303): five orbs
+  sheet_seeds: {boss_cast: 1235, boss_hurt: 1235, boss_attack_raise: 1235}   # boss_cast 1234 (ROSTER_LOG R301): five orbs, a flame wisp on row 2; boss_hurt 1234 (R303): five orbs; boss_attack_raise 1234 (R305): six orbs, fists apart; 1235 (R306, approved best of 3): five orbs; 1236 (R307, head-copy text): one orb visible, fists apart
 - id: piscodemon
   # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells. Pass V redesign
   # (docs/REDESIGN_PLAN.md 3.1, D-V11 stats unchanged): a squat young deep-sea psychic horror, distinct from the tall

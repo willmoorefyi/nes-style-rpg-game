@@ -1,0 +1,25 @@
+{
+  "character": "chaos",
+  "sheet": "boss_attack_raise",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "518b0207faffd5ee4f19d12a",
+  "approved": "2026-11-16",
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "layout": [
+    1,
+    1
+  ],
+  "poses": [
+    "attack_raise"
+  ],
+  "size": "boss",
+  "floating": false,
+  "flip_frames": [],
+  "note": "pass V R306: best of 3 (five orbs)"
+}
