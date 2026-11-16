@@ -1,0 +1,323 @@
+{
+  "bytes": 16850728,
+  "forms": {
+    "chaos_horizon": {
+      "anchors": {
+        "core": [
+          1347,
+          510
+        ],
+        "feet": [
+          1347,
+          800
+        ],
+        "hands": [
+          [
+            647,
+            680
+          ],
+          [
+            1787,
+            630
+          ]
+        ],
+        "head": [
+          1347,
+          360
+        ],
+        "melee": [
+          1747,
+          590
+        ],
+        "target": [
+          1347,
+          510
+        ]
+      },
+      "canvas": [
+        2700,
+        1080
+      ],
+      "layers": [
+        {
+          "frames": {
+            "base": {
+              "at": [
+                0,
+                312
+              ],
+              "size": [
+                2700,
+                768
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_horizon/body_base_0.png",
+                  "h": 768,
+                  "w": 2048,
+                  "x": 0,
+                  "y": 0
+                },
+                {
+                  "file": "colossus/chaos_horizon/body_base_1.png",
+                  "h": 768,
+                  "w": 652,
+                  "x": 2048,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "body",
+          "name": "body"
+        },
+        {
+          "frames": {
+            "base": {
+              "at": [
+                1188,
+                661
+              ],
+              "size": [
+                330,
+                285
+              ],
+              "tiles": []
+            },
+            "crack": {
+              "at": [
+                1301,
+                661
+              ],
+              "size": [
+                143,
+                152
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_horizon/core_crack.png",
+                  "h": 152,
+                  "w": 143,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            },
+            "open": {
+              "at": [
+                1188,
+                735
+              ],
+              "size": [
+                330,
+                211
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_horizon/core_open.png",
+                  "h": 211,
+                  "w": 330,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "core",
+          "name": "core"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                0,
+                0
+              ],
+              "size": [
+                2700,
+                1080
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_horizon/glow_base.png",
+                  "h": 540,
+                  "w": 1350,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "glow",
+          "name": "glow"
+        }
+      ],
+      "place": [
+        -527,
+        -60
+      ],
+      "scale": 1,
+      "skyDim": 0.6,
+      "targetRect": [
+        1170,
+        345,
+        360,
+        480
+      ]
+    },
+    "chaos_horizon_core": {
+      "anchors": {
+        "core": [
+          1350,
+          840
+        ],
+        "feet": [
+          1347,
+          1060
+        ],
+        "hands": [
+          [
+            647,
+            680
+          ],
+          [
+            1787,
+            630
+          ]
+        ],
+        "head": [
+          1347,
+          480
+        ],
+        "melee": [
+          1747,
+          590
+        ],
+        "target": [
+          1350,
+          840
+        ]
+      },
+      "art": "chaos_horizon",
+      "place": [
+        -527,
+        -285
+      ],
+      "preview": "colossus/chaos_horizon_core/preview.png",
+      "targetRect": [
+        1170,
+        420,
+        360,
+        540
+      ]
+    },
+    "chaos_orrery": {
+      "anchors": {
+        "core": [
+          660,
+          455
+        ],
+        "feet": [
+          660,
+          740
+        ],
+        "hands": [
+          [
+            300,
+            690
+          ],
+          [
+            1030,
+            690
+          ]
+        ],
+        "head": [
+          665,
+          170
+        ],
+        "melee": [
+          970,
+          560
+        ],
+        "target": [
+          660,
+          455
+        ]
+      },
+      "canvas": [
+        1320,
+        900
+      ],
+      "layers": [
+        {
+          "frames": {
+            "base": {
+              "at": [
+                56,
+                0
+              ],
+              "size": [
+                1216,
+                900
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/body_base.png",
+                  "h": 900,
+                  "w": 1216,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "body",
+          "name": "body"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                92,
+                16
+              ],
+              "size": [
+                1206,
+                744
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/glow_base.png",
+                  "h": 372,
+                  "w": 603,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "glow",
+          "name": "glow"
+        }
+      ],
+      "place": [
+        40,
+        25
+      ],
+      "scale": 1,
+      "targetRect": [
+        380,
+        130,
+        580,
+        610
+      ]
+    }
+  },
+  "version": 1
+}

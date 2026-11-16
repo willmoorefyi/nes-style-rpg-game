@@ -20,6 +20,9 @@ Layer yaml (written by the rigger): form, canvas, scale (1), place, anchors {tar
 feet}, target_rect [x, y, w, h], cover_box?, visible_box?, sky_dim? (the preview's bg multiply; F3 / F4 0.6), layers:
 [{name, kind, over?, blend?, alpha?, tex_scale?, box? [x0, y0, x1, y1], frames: {base: <png> | null, <variant>: <png>}}];
 each png is canvas-sized RGBA in the form's approved dir; a frame is its alpha box (+1 px) inside `box`.
+An alias yaml (`art: <form>`, `variant: {layer: frame}`; F4 chaos_horizon_core) reads that form's approved files with the
+same layers and boxes; its json entry is the reader's `art:` entry {art, place, the fields that differ, preview} and its
+textures are the art's files, stored and counted once.
 """
 from __future__ import annotations
 
@@ -203,6 +206,13 @@ def build(out: Path | None = None, approved: Path = APPROVED, specs: Path = SPEC
         still = preview(entry, spec, approved, spec.get("art", form), bg)
         if still is not None:
             files[f"colossus/{form}/preview.png"] = _png(still)
+    for form in aliases(approved, specs) if forms else []:  # the TS reader's `art:` entry: own fields over the art's
+        e, art = meta["forms"][form], yaml.safe_load((specs / f"{form}.yaml").read_text())["art"]
+        if e["layers"] != meta["forms"][art]["layers"]:
+            raise ValueError(f"colossus {form}: its layers must equal {art}'s (an `art:` entry shares them)")
+        meta["forms"][form] = {"art": art, "place": e["place"], **{k: v for k, v in e.items()
+                               if k != "layers" and meta["forms"][art].get(k) != v},
+                               **({"preview": f"colossus/{form}/preview.png"} if bg is not None and bg.exists() else {})}
     if meta["bytes"] > max_bytes:
         raise ValueError(f"colossus: {meta['bytes']:,} RGBA bytes > the {max_bytes:,} budget (18.6); size is never cut "
                          "to fit: ask the orchestrator")
