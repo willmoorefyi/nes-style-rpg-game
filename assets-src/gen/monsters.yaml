@@ -355,6 +355,8 @@
   # pose): an original floating steampunk angel of doom built of separate hovering plates (the white-and-gold
   # six-feathered-wing seraph is archived as hollow_seraph_v1, docs/RETIRED_SPRITES.md). The plates float apart, so
   # the cut keeps every in-cell piece (orchestrator ruling after R298: `cut: {keep_pieces: all_in_cell}`).
+  # V8 (REDESIGN_FIX_PLAN F4): the R313 set read as cream swords with hilts on a solid body; regenerated in full with
+  # hilt-less blades of cold white-blue light and hollow shell plates.
   size: boss
   cut: {keep_pieces: all_in_cell, fit: headroom, top_margin: 10}   # R309: the fine-pitch render is 210 native px; shrunk to rows 10-192 (orchestrator ruling (b))
   per_pose: true
@@ -373,57 +375,74 @@
   prompt: >-
     the Hollow Seraph, a steampunk angel of doom hovering in the air, built of separate pieces that float apart: a
     hollow shell of blackened steel and polished brass armour plates (a helm-mask, a chest cuirass in two halves, two
-    shoulder plates, two gauntlets and a long segmented skirt of plates), each plate a solid riveted shape hovering a
-    little apart from the others with narrow empty gaps between them and nothing inside; in the gap at the centre of
-    the chest a brass clockwork heart of interlocking gears glows white-gold; the faceless brass helm-mask has one
-    narrow horizontal slit glowing cold white; a broken brass halo ring with gear teeth floats close above the helm;
-    exactly four great wings in all, two on each side and no more: on the left side of the image one upper wing
+    shoulder plates, two gauntlets and a long segmented skirt of plates); the armour plates are thin hollow shells,
+    each plate a curved rim of riveted metal around an open hole, so through the gaps between the plates and through
+    the open holes in the plates the background is seen; nothing inside the armour, it is empty; in the gap at the
+    centre of the chest a brass clockwork heart of interlocking gears glows white-gold; the faceless brass helm-mask
+    has one narrow horizontal slit glowing cold white; a broken brass halo ring with gear teeth floats close above the
+    helm; exactly four great wings in all, two on each side and no more: on the left side of the image one upper wing
     pointing up and out and one lower wing pointing down and out, and the same two on the right side of the image,
-    with empty space between the upper and the lower wing (no wing pointing straight out to the side); each wing one
-    straight blade of pale gold-white light held in a brass frame, like a sword blade, each wing's brass frame joined
-    to a shoulder plate; the wings are short, each blade no longer than the helm-to-skirt height of the armour: the
-    upper wing tips reach no higher than the top of the halo and the lower wing tips no lower than the bottom of the
-    skirt, all four tips well inside the grey box on the left and the right; the whole figure, halo and wing tips
-    included, fills only the lower nine tenths of the grey box with clear empty space above the halo; the gaps between
-    the plates are narrow and the whole figure stays compact; nothing below the skirt (no feet, no wind, no shadow); palette of blackened steel, brass, gold, a cold
-    white glow and pale gold light
+    with empty space between the upper and the lower wing (no wing pointing straight out to the side); each wing a
+    long tapering blade of cold white-blue light, glowing, with no hilt, no cross-guard and no handle, set into a
+    brass wing frame of three thin struts joined to the shoulder plate; the wings are short, each blade no longer than
+    the helm-to-skirt height of the armour: the upper wing tips reach no higher than the top of the halo and the lower
+    wing tips no lower than the bottom of the skirt, all four tips well inside the grey box on the left and the right;
+    the whole figure, halo and wing tips included, fills only the lower nine tenths of the grey box with clear empty
+    space above the halo; the gaps between the plates are narrow and the whole figure stays compact; nothing below
+    the skirt (no feet, no wind, no shadow); palette of blackened steel, brass, gold, cold white and pale steel blue
   action_prompt: >-
-    the Hollow Seraph, exactly as in Image 3: the same separate hovering plates of blackened steel and brass with
-    narrow empty gaps, the glowing clockwork gear heart in the chest gap, the faceless brass helm-mask with the glowing
-    slit, the broken gear-toothed halo close above the helm, exactly four straight blade wings of pale gold-white light
-    in brass frames joined to the shoulder plates, two on each side
+    the Hollow Seraph, exactly as in Image 3: the same separate hovering hollow shell plates of blackened steel and
+    brass with open holes and narrow empty gaps, the background seen through them, the glowing clockwork gear heart
+    in the chest gap, the faceless brass helm-mask with the glowing slit, the broken gear-toothed halo close above the
+    helm, exactly four tapering blade wings of cold white-blue light without hilts in brass strut frames joined to
+    the shoulder plates, two on each side
   attack: >-
     a cutting strike, a small change from Image 3: the four blade wings stay in the same four places as in Image 3
     (two upper wings pointing up and out, two lower wings pointing down and out, one of each on the left and on the
     right side of the image) and only tilt forward toward the heroes on the right by about twenty degrees, their
-    points toward the heroes; both gauntlets thrust forward toward the heroes; the plates lean forward a little;
-    exactly four blade wings and no fifth, each a plain straight blade with its cross-guard frame as in Image 3; no
-    blade in front of the chest; the whole figure as tall as in Image 3 (halo to skirt) and at exactly the same pixel
-    size; no slash arcs, no crescent smears, no light trails or motion lines anywhere, no effects
+    points toward the heroes; the two separate floating gauntlets (no arms: empty background between each gauntlet
+    and the shoulder plates, exactly as in Image 3) drift a little forward toward the heroes, both visible, one on
+    each side of the skirt; the helm, the cuirass halves, the shoulder plates, the two gauntlets and the skirt stay
+    separate pieces hovering apart with the same narrow empty gaps as in Image 3, the plates leaning forward a little;
+    exactly four blade wings and no fifth, each a tapering blade of cold white-blue light with no hilt and no
+    cross-guard, as in Image 3; no blade in front of the chest; the whole figure as tall as in Image 3 (halo to skirt)
+    and at exactly the same pixel size; no arms, no slash arcs, no crescent smears, no light trails or motion lines
+    anywhere, no effects
   cast: >-
     a rite of judgement, a small change from Image 3 and mirror-symmetric: the four blade wings stay in the same four
-    places as in Image 3 (two upper wings pointing up and out, two lower wings pointing down and out) but the two
-    upper wings swing a little higher and the two lower wings a little wider; both gauntlets lifted to shoulder height
-    with open hands; the gear heart blazing bright white; the halo, the helm, the cuirass and the long wide segmented
-    skirt of plates exactly as in Image 3 (the same shapes, widths and colours, the halo plain brass without a glow);
-    exactly four blade wings and no fifth,
-    each a plain straight blade with its cross-guard frame as in Image 3; no blade in front of the body; the whole
-    figure as tall as in Image 3, the halo top and the skirt bottom in the same places as in Image 3, at exactly the
-    same pixel size, well below the top of the grey box; no other effects, no light rays or trails
+    places as in Image 3 (two upper wings pointing up and out, two lower wings pointing down and out) and only spread
+    a little wider to the sides, the upper wing tips no higher than the top of the halo, exactly as high as in Image 3;
+    the two separate floating gauntlets (no arms: empty background between each gauntlet and the shoulder plates, as
+    in Image 3) rise to chest height with open palms, mirror images of each other at the same height, one on each side
+    of the cuirass, both visible; the helm, the cuirass halves, the shoulder plates, the gauntlets and
+    the skirt stay separate pieces hovering apart with the same narrow empty gaps as in Image 3; the gear heart
+    blazing bright white; the halo, the helm, the hollow cuirass and the long wide
+    segmented skirt of plates exactly as in Image 3 (the same shapes, holes, widths and colours, the halo plain brass
+    without a glow); exactly four blade wings and no fifth, each a tapering blade of cold white-blue light with no
+    hilt and no cross-guard, as in Image 3; no blade in front of the body; the whole figure as tall as in Image 3, the
+    halo top and the skirt bottom in the same places as in Image 3, at exactly the same pixel size, well below the
+    top of the grey box; no other effects, no light rays or trails
   hurt: >-
     a violent jolt, a small change from Image 3: the floating plates knocked a little further apart, the cuirass
-    halves tilted, the helm tipped back, the halo knocked askew, the gear heart flickering dim; the four blade wings
+    halves tilted, the helm tipped back, the halo knocked askew, the gear heart flickering dim; the two separate
+    floating gauntlets (no arms: empty background between each gauntlet and the shoulder plates, as in Image 3)
+    knocked down and out, one on each side, both visible; the four blade wings
     stay in the same four places as in Image 3 (two upper, two lower) with the two lower wings faltering downward;
-    the halo, the helm, the cuirass and the long wide segmented skirt of plates as in Image 3 (the same shapes, widths
-    and colours, the halo plain brass); exactly four blade wings and no fifth, each a plain straight blade with its
-    cross-guard frame as in Image 3; no blade in front of the body; the posture stays upright and controlled; the whole
-    figure as tall as in Image 3, at exactly the same pixel size, well below the top of the grey box; no effects
+    the halo, the helm, the hollow cuirass and the long wide segmented skirt of plates as in Image 3 (the same shapes,
+    holes, widths and colours, the halo plain brass); exactly four blade wings and no fifth, each a tapering blade of
+    cold white-blue light with no hilt and no cross-guard, as in Image 3; no blade in front of the body; the posture
+    stays upright and controlled; the whole figure as tall as in Image 3, at exactly the same pixel size, well below
+    the top of the grey box; no arms, no effects
   face: no face; the faceless brass helm-mask with its glowing slit and the gear heart are the readable features
   extra_negative: >-
-    a face, skin, a body or bones inside the armour, feathers, feathered wings, more or fewer than four wings, six wings, three wings on a side, a horizontal middle wing, a sword
-    in the hands, white-and-gold armour, a cape, violet, purple, pink, magenta
-  sheet_seeds: {boss_attack: 1238, boss_cast: 1237}   # boss_attack 1236 (ROSTER_LOG R314): crescent slash smears, 147 px; 1237 (R315): five blades; boss_cast 1236 (R317): thin skirt, 157 px
-  seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0
+    a face, skin, a body or bones inside the armour, feathers, feathered wings, more or fewer than four wings, six
+    wings, three wings on a side, a horizontal middle wing, a sword in the hands, a sword, a hilt, a cross-guard, a
+    pommel, a handle, solid armour, cream or gold-white blades, white-and-gold armour, a cape, violet, purple, pink,
+    magenta
+  seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0; 1236 = R309 (hollow_seraph_v2)
+  # V8 (docs/REDESIGN_FIX_PLAN.md F4, D-U1 = b; the pass-V set R313/R316/R318/R319 is archived as hollow_seraph_v2):
+  # each pose's seed is one not used for it in the ledger (G-S).
+  sheet_seeds: {boss_idle: 1237, boss_attack: 1240, boss_cast: 1239, boss_hurt: 1237}   # boss_attack 1239 (R325): an armoured arm, the plates fused into one piece; boss_cast 1238 (R327): 177 px (wings raised high), not symmetric
 # ── pass R, G2: the other bosses (per pose, 4 or 5 images) and minibosses (3-pose sheets) (docs/ROSTER_PLAN.md 4.2;
 # the bestiary spec's entries 032, 033, 075, 092, 118, 121, 128). Original designs; limbs and props named by image side
 # (the G1 lesson: it kept props in their hands in R8, R10, R21, R37).

@@ -3,8 +3,8 @@
   "sheet": "boss_attack",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1238,
-  "cache_key": "9930651761e987e3df821a78",
+  "seed": 1240,
+  "cache_key": "b7055e3da595a02e0f382ecb",
   "approved": "2026-11-16",
   "grid": [
     200,
@@ -21,5 +21,5 @@
   "size": "boss",
   "floating": true,
   "flip_frames": [],
-  "note": "pass V R316"
+  "note": "V8 F4 attack attempt 2 (seed 1240): R326"
 }

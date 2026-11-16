@@ -809,3 +809,13 @@
 {"event": "result", "key": "6f1c2bfe329b445d48e053bf", "ok": true}
 {"event": "attempt", "ts": "2026-11-16T08:01:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "piscodemon", "sheet": "monster_small", "seed": 1236, "key": "0ce22ed29368387b4c8a8675"}
 {"event": "result", "key": "0ce22ed29368387b4c8a8675", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:46:25", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_idle", "seed": 1237, "key": "9d395ef3e4ceaf8dc4efb1f1"}
+{"event": "result", "key": "9d395ef3e4ceaf8dc4efb1f1", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:48:07", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1239, "key": "4c715f093d62db6a88568de5"}
+{"event": "result", "key": "4c715f093d62db6a88568de5", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:48:51", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_attack", "seed": 1240, "key": "b7055e3da595a02e0f382ecb"}
+{"event": "result", "key": "b7055e3da595a02e0f382ecb", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:49:56", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_cast", "seed": 1238, "key": "d71f64f482d1717695488096"}
+{"event": "result", "key": "d71f64f482d1717695488096", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:50:38", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_cast", "seed": 1239, "key": "1faaad62d498f39cd15c9c6c"}
+{"event": "result", "key": "1faaad62d498f39cd15c9c6c", "ok": true}
