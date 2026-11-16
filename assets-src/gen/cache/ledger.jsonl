@@ -809,3 +809,5 @@
 {"event": "result", "key": "6f1c2bfe329b445d48e053bf", "ok": true}
 {"event": "attempt", "ts": "2026-11-16T08:01:08", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "piscodemon", "sheet": "monster_small", "seed": 1236, "key": "0ce22ed29368387b4c8a8675"}
 {"event": "result", "key": "0ce22ed29368387b4c8a8675", "ok": true}
+{"event": "attempt", "ts": "2026-11-16T09:46:25", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_idle", "seed": 1237, "key": "9d395ef3e4ceaf8dc4efb1f1"}
+{"event": "result", "key": "9d395ef3e4ceaf8dc4efb1f1", "ok": true}
