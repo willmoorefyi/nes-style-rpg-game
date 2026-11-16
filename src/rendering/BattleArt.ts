@@ -2,6 +2,7 @@ import { Assets, Rectangle, Texture } from 'pixi.js';
 import { characterAtlas, fetchJson } from './CharacterAtlas.js';
 import { MonsterPages, type MonsterAtlasPage, type PageIo } from './MonsterPages.js';
 import { monsterAnchors, type MonsterAnchors } from './monsterAnchors.js';
+import { measureOpaqueBox } from './measureOpaque.js';
 import { BOSS_FRAMES, lungePx, resolveFrame, type MonsterFrame, type MonsterKeyframe } from '../scenes/battle/enemyChoreography.js';
 
 const MONSTER_DIR = 'assets/sprites/';
@@ -97,8 +98,8 @@ export class BattleArt {
   private readonly warned = new Set<string>();
   /** Sprites already reported as waiting for their page (one warning each). */
   private readonly late = new Set<string>();
-  /** Opaque right edges measured from the atlas image for sheets whose meta has none. */
-  private readonly opaque = new Map<string, number | null>();
+  /** Idle opaque boxes measured from the atlas image for sheets whose meta lacks `opaqueRight` or `idleBox`. */
+  private readonly opaque = new Map<string, [number, number, number, number] | null>();
 
   constructor(io: PageIo = PIXI_PAGES) {
     this.pages = new MonsterPages(MONSTER_DIR, io);
@@ -153,8 +154,7 @@ export class BattleArt {
       return null;
     }
     const source = tex.source;
-    const s = this.meta.scale;
-    const ts = this.meta.texScale ?? s;
+    const ts = this.meta.texScale ?? this.meta.scale;
     const [w, h] = entry.cell;
     const cache = new Map<string, Texture>();
     const slice = (name: MonsterFrame): Texture => {
@@ -171,36 +171,24 @@ export class BattleArt {
     };
     const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, slice(n)])) as Record<MonsterFrame, Texture>;
     const key = (k: MonsterKeyframe): Texture => textures[k];
+    const anchors = monsterAnchors(entry);
+    const measured = entry.opaqueRight === undefined || !anchors.idleBox
+      ? this.measureIdle(sprite, tex, entry.frames.idle, entry.cell, ts) : null;
+    const idleBox = anchors.idleBox ?? measured ?? undefined;
+    const s = this.meta.scale;
     return { textures, idle: key('idle'), attack: key('attack'), cast: key('cast'), hurt: key('hurt'), scale: s,
       artScale: s / ts, cell: [w, h], footRow: entry.footRow, floating: entry.floating, hasCast: !!entry.frames.cast,
       hasRaise: !!entry.frames.attack_raise, lungePx: lungePx(entry), anim: !!entry.anim,
-      opaqueRight: entry.opaqueRight ?? this.measureOpaqueRight(sprite, tex, entry.frames.idle, entry.cell, ts) ?? w,
-      ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...monsterAnchors(entry) };
+      opaqueRight: entry.opaqueRight ?? (measured ? measured[2] + 1 : w),
+      ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...anchors,
+      ...(idleBox ? { idleBox } : {}) };
   }
 
-  /** The idle cell's rightmost opaque column + 1 (art px), read once from the atlas image; null outside a browser. */
-  private measureOpaqueRight(sprite: string, tex: Texture, [x, y]: [number, number], [w, h]: [number, number],
-    ts: number): number | null {
-    if (this.opaque.has(sprite)) return this.opaque.get(sprite) ?? null;
-    let right: number | null = null;
-    if (typeof document !== 'undefined') {
-      try {
-        const [pw, ph] = [Math.round(w * ts), Math.round(h * ts)];
-        const canvas = document.createElement('canvas');
-        canvas.width = pw;
-        canvas.height = ph;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx?.drawImage(tex.source.resource as CanvasImageSource, x * ts, y * ts, pw, ph, 0, 0, pw, ph);
-        const data = ctx?.getImageData(0, 0, pw, ph).data;
-        for (let col = pw - 1; data && right === null && col >= 0; col--) {
-          for (let row = 0; row < ph; row++) if (data[(row * pw + col) * 4 + 3] > 0) { right = (col + 1) / ts; break; }
-        }
-      } catch (err) {
-        console.warn(`Monster art: could not measure the opaque edge of "${sprite}"; using its cell width`, err);
-      }
-    }
-    this.opaque.set(sprite, right);
-    return right;
+  /** The idle frame's opaque box (art px, inclusive), read once from the atlas image; null outside a browser. */
+  private measureIdle(sprite: string, tex: Texture, frame: [number, number], cell: [number, number], ts: number):
+    [number, number, number, number] | null {
+    if (!this.opaque.has(sprite)) this.opaque.set(sprite, measureOpaqueBox(sprite, tex, frame, cell, ts));
+    return this.opaque.get(sprite) ?? null;
   }
 
   /** The character atlas, the monster index and page 0 (act 1) on the first call, plus the pages of sprites asked

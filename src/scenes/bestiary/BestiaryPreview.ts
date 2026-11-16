@@ -1,7 +1,8 @@
 /**
- * The bestiary's preview (docs/BESTIARY_PLAN.md 3.1, 3.6): the battle background and one enemy laid out exactly as a
- * lone enemy in battle (AiEnemyView, i.e. computeEnemyLayoutAi), in a stage container at screen (0, 0) masked to the
- * preview window's inner rect. The loop (bestiaryAnim.ts) plays the real attack toward an invisible phantom target
+ * The bestiary's preview (docs/BESTIARY_PLAN.md 3.1, 3.6): the battle background and one enemy laid out as a lone
+ * enemy in battle (AiEnemyView, i.e. computeEnemyLayoutAi), in a stage container at screen (0, 0) masked to the
+ * preview window's inner rect; the actors then move so the idle figure and the backdrop are centred on the panel
+ * (docs/REDESIGN_PLAN.md 1, bestiaryFit.ts). The loop (bestiaryAnim.ts) plays the real attack toward an invisible phantom target
  * placed so the furthest lunge ends REACH_MARGIN inside the panel, or further left when the attack art reaches past
  * the idle edge (ROSTER_FIX_PLAN 12d: death_eye's lunge touched the border). Frames are cached for the shown entry
  * only (FW-8).
@@ -19,6 +20,7 @@ import type { EnemyPoseController, Posture } from '../battle/EnemyPoseController
 import { ENEMY_REACH_OVERLAP } from '../battle/enemyReach.js';
 import { GAME_WIDTH, GAME_HEIGHT, WINDOW_BORDER_INNER, WINDOW_BORDER_OUTER } from '../../core/LayoutConstants.js';
 import { BestiaryLoop, type LoopPoses } from './bestiaryAnim.js';
+import { backdropPosition, fitShift, type Fit } from './bestiaryFit.js';
 
 /** The preview window (screen px). */
 export const PREVIEW_RECT = { x: 24, y: 120, width: 976, height: 756 } as const;
@@ -108,6 +110,7 @@ export class BestiaryPreview {
   private sprite: Container | null = null;
   private posture: Posture = 'none';
   private noArt = false;
+  private fit: Fit | null = null;
 
   constructor(parent: Container, readonly art: CachedArt, private readonly loadTexture: (path: string) => Promise<Texture>,
     private readonly data: BestiaryData) {
@@ -129,6 +132,8 @@ export class BestiaryPreview {
   get enemySprite(): Container | null { return this.sprite; }
   get phantomTarget(): Container { return this.phantom; }
   get loopStep(): string { return this.loop.current; }
+  /** The shown entry's centring shift and the clamps that bound it (null: no art). */
+  get lastFit(): Fit | null { return this.fit; }
 
   /** Show an entry (null or unseen: no sprite) on the background `backgroundId`. */
   show(entry: PreviewEntry | null, backgroundId: string | null): void {
@@ -143,15 +148,18 @@ export class BestiaryPreview {
     this.actors.addChildAt(sprite, 0);
     const f = this.art.getMonsterFrames(monsterSpriteKey(e));
     this.noArt = !f;
-    this.actors.x = 0;
+    this.actors.position.set(0, 0);
+    this.fit = null;
     if (f) {
       const feetY = sprite.y + (f.footRow + 1) * f.scale;
       const past = (lungeOvershoot(f) + 1) * f.scale;     // the attack art's right edge past the idle edge column
       const margin = Math.max(REACH_MARGIN, ART_MARGIN + past);
       this.phantom.position.set(PREVIEW_INNER.right - margin - ENEMY_REACH_OVERLAP - 0.25 * f.lungePx, feetY - PHANTOM.h);
-      // an enemy too wide to travel at all (warmech) lunges in place: the actors move left instead
+      // in local space; an enemy too wide to travel (warmech) lunges in place: that bounds the centring shift right
       const inPlace = sprite.x + (f.opaqueRight ?? f.cell[0]) * f.scale + f.lungePx + past;
-      this.actors.x = Math.min(0, Math.floor(PREVIEW_INNER.right - ART_MARGIN - inPlace));
+      this.fit = fitShift(f, PREVIEW_INNER, { x: sprite.x, y: sprite.y, scale: sprite.scale.x / f.artScale * f.scale,
+        inPlaceRight: inPlace, limitRight: PREVIEW_INNER.right - ART_MARGIN });
+      this.actors.position.set(this.fit.dx, this.fit.dy);
     }
     const label: BestiaryAnimLabel = e.attack === 'ranged' ? 'ranged' : e.attackAnim === 'heavy' ? 'heavy' : 'attack';
     this.loop.start({ hasCast: this.view.hasCast(0), hasDaze: !!f && f.textures.daze !== f.textures.hurt_in1,
@@ -207,7 +215,7 @@ export class BestiaryPreview {
       const sprite = new Sprite(texture);
       const scale = Math.max(GAME_WIDTH / texture.width, GAME_HEIGHT / texture.height);
       sprite.scale.set(scale);
-      sprite.position.set((GAME_WIDTH - texture.width * scale) / 2, (GAME_HEIGHT - texture.height * scale) / 2);
+      sprite.position.set(...backdropPosition(texture.width, texture.height, scale, PREVIEW_INNER, GAME_HEIGHT));
       this.bg?.destroy({ texture: false });
       this.bg = sprite;
       this.stage.addChildAt(sprite, 0);

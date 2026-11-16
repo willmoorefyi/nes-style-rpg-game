@@ -58,6 +58,14 @@ export function frameBox(sheet: string, name: MonsterFrame): [number, number, nu
 /** The idle frame's opaque right edge (exclusive), as BattleArt measures it when the index has none. */
 export const idleRight = (sheet: string): number => frameBox(sheet, 'idle')[2];
 
+/** The idle frame's opaque box, inclusive art px [l, t, r, b]: the atlas `idleBox` (FW-A2), else read from the PNG. */
+export function idleBoxOf(sheet: string): [number, number, number, number] {
+  const a = monsterAnchors(atlas.sheets[sheet]);
+  if (a.idleBox) return a.idleBox;
+  const [l, t, r, b] = frameBox(sheet, 'idle');
+  return [l, t, r - 1, b - 1];
+}
+
 /** A stub with one blank texture per frame and the atlas facts of `sheet` (null: no such sheet). */
 export function atlasFrames(sheet: string): MonsterFrames | null {
   const s = atlas.sheets[sheet];
@@ -66,7 +74,7 @@ export function atlasFrames(sheet: string): MonsterFrames | null {
   return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: atlas.scale,
     artScale: atlas.scale / ts, cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
     hasRaise: !!s.frames.attack_raise, lungePx: s.lungePx ?? 24, anim: true, opaqueRight: s.opaqueRight ?? idleRight(sheet),
-    ...monsterAnchors(s) };
+    ...monsterAnchors(s), idleBox: idleBoxOf(sheet) };
 }
 
 export const atlasArt: MonsterArtSource = { getMonsterFrames: atlasFrames };

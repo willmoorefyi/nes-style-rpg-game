@@ -8,6 +8,8 @@
  * - `homeX`: the opaque extent [left, right] over the home frames (idle, breath, hurt, daze; plus the attack frames
  *   for a ranged sheet, whose in-place breath must not reach a neighbour); the layout packs by it when cells overflow.
  *   Missing: the whole cell.
+ * - `idleBox`: the idle frame's opaque box [left, top, right, bottom] (FW-A2, docs/REDESIGN_PLAN.md 1); the bestiary
+ *   centres it in the preview panel. Missing: measured from the atlas image in a browser, else no centring.
  */
 import type { EnemyBoxInput, EnemySizeClass } from '../scenes/battle/EnemyLayoutAi.js';
 
@@ -17,6 +19,7 @@ export interface MonsterAnchors {
   travelTop?: number;
   lungeRight?: number;
   homeX?: [number, number];
+  idleBox?: [number, number, number, number];
 }
 
 const isIndex = (v: unknown, size: number): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < size;
@@ -29,6 +32,9 @@ export function monsterAnchors(entry: MonsterAnchors & { cell: [number, number] 
   if (isIndex(entry.lungeRight, w)) out.lungeRight = entry.lungeRight;
   const hx = entry.homeX;
   if (Array.isArray(hx) && isIndex(hx[0], w) && isIndex(hx[1], w) && hx[0] <= hx[1]) out.homeX = [hx[0], hx[1]];
+  const ib = entry.idleBox;
+  if (Array.isArray(ib) && ib.length === 4 && isIndex(ib[0], w) && isIndex(ib[2], w) && isIndex(ib[1], h) && isIndex(ib[3], h)
+    && ib[0] <= ib[2] && ib[1] <= ib[3]) out.idleBox = [ib[0], ib[1], ib[2], ib[3]];
   return out;
 }
 
