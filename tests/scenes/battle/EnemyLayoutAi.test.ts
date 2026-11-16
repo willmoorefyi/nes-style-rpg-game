@@ -6,7 +6,7 @@ import { computeEnemyLayoutAi, formationFits, layoutSizeOf, ENEMY_AREA, TITAN_AR
 import { seededRng } from '../../../src/scenes/battle/fx/emitterCore.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, enemyData, frameBox, layoutInput, sheetScale } from '../../helpers/atlasFrames.js';
+import { atlas, enemyById, enemyData, formRecords, frameBox, layoutInput, sheetScale } from '../../helpers/atlasFrames.js';
 
 const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
@@ -34,6 +34,17 @@ function check(input: EnemyBoxInput[]): EnemyBox[] {
   }
   return out;
 }
+
+// CHAOS_FORMS_PLAN R11: the atlas helper's enemy list (walked by the sprite-iterating tests) leaves out exactly the 3
+// boss form records; they are colossus forms (ColossusView), never laid out by computeEnemyLayoutAi
+describe('the atlas enemy list and the boss form records', () => {
+  it('the formOf filter excludes exactly chaos_orrery, chaos_horizon and chaos_horizon_core', () => {
+    expect(formRecords.map((e) => e.id)).toEqual(['chaos_orrery', 'chaos_horizon', 'chaos_horizon_core']);
+    expect(formRecords.every((e) => e.formOf === 'chaos' && e.colossus !== undefined)).toBe(true);
+    expect(enemyData.some((e) => e.formOf)).toBe(false);
+    expect(enemyById('chaos_horizon').id).toBe('chaos_horizon');
+  });
+});
 
 describe('computeEnemyLayoutAi', () => {
   it('fits every size mix up to 9 enemies with at most one boss, without overlaps', () => {

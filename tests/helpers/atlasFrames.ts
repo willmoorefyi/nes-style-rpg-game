@@ -27,9 +27,17 @@ export interface AtlasSheet extends MonsterAnchors {
   frames: Record<string, [number, number]>;
 }
 export const atlas = readMonsterAtlas<{ scale: number; texScale?: number; sheets: Record<string, AtlasSheet> }>();
-export const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
+/** Every record of enemies.yaml, the boss form records included (`enemyById` looks them up here). */
+const allEnemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
+/**
+ * The enemies drawn through the monster atlas, which the sprite-iterating tests walk. CHAOS_FORMS_PLAN R11: the boss
+ * form records (`formOf`: chaos_orrery, chaos_horizon, chaos_horizon_core) are colossus forms drawn by ColossusView,
+ * never laid out or animated as atlas sheets (their `sprite: chaos` is only the art fallback), so they are filtered.
+ */
+export const enemyData = allEnemyData.filter((e) => !e.formOf);
+export const formRecords = allEnemyData.filter((e) => e.formOf);
 export const enemyById = (id: string): EnemyData => {
-  const e = enemyData.find((x) => x.id === id);
+  const e = allEnemyData.find((x) => x.id === id);
   if (!e) throw new Error(`no enemy ${id}`);
   return e;
 };

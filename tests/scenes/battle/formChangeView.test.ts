@@ -44,7 +44,7 @@ function setup(script: InterludeStep[] = SCRIPT) {
   const change = (): ActionResult => {
     s.battle.allEnemies[0].data = F3();             // TS-B re-points the instance (bossForms.applyFormChange)
     return { done: true, messages: [], damageEvents: [], missed: false,
-      formChange: { enemyIndex: 0, from: 'chaos', to: 'chaos_horizon', interlude: 'chaos_i2', message: null } } as ActionResult;
+      formChange: { enemyIndex: 0, from: 'chaos', to: 'chaos_horizon', interlude: 'chaos_i2', message: undefined } } as ActionResult;
   };
   const frame = (confirm = false): boolean => { s.layers.update(1); s.display.update(1); return view.update(1, confirm); };
   return { ...s, view, emit, lines, change, frame };
@@ -86,7 +86,7 @@ describe('FormChangeView: the swap', () => {
     while (s.emit.mock.calls.length === 0 && f < 400) { s.frame(true); f++; }
     expect(f).toBeLessThan(90);                     // the dissolve was not skipped, but the 90-frame line was
     const bare = setup([]);
-    bare.view.queue({ ...bare.change(), formChange: { enemyIndex: 0, from: 'chaos', to: 'chaos_horizon', interlude: 'none', message: null } } as ActionResult);
+    bare.view.queue({ ...bare.change(), formChange: { enemyIndex: 0, from: 'chaos', to: 'chaos_horizon', interlude: 'none', message: undefined } } as ActionResult);
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     bare.view.start();
     for (let i = 0; i < 5 && !bare.frame(); i++) { /* runs to its end */ }
