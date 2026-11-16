@@ -1,0 +1,65 @@
+sprite: black_widow
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+alias: [hurt]
+# A black widow: the round abdomen with the red hourglass at the back, the small cephalothorax and red eyes in front,
+# the front leg (leg1_n) raised in idle and attack, seven drawn legs (leg4_f undrawn; every tip is still pinned, so
+# the feet check stays out of its rearing mode). The approved attack is a pounce drawn about 10 px higher with the legs
+# lifted. In-betweens: the upper body (body, head, fang, abd, abd_end) translates by tweaks with every knee and tip
+# pinned; the raised front leg (coxa1_n, knee1_n, tip1_n) translates with the body in the idle-sourced frames.
+# winds dx -1 / -2 (t 0), atk_mid t 0.25 toward wind2 + (3, 3), atk_follow a settle t 0.75 + (2, 2), atk_recover
+# dx -2 (t 0); daze / daze_b dx -1 / -2 over the recipe's 1 / 2 px sink. Hurt is a rear-up (guide 2.2, plan 5: no
+# translation within the cap): FW-Q alias [hurt].
+# fixmeasure.py switch --rig (IoU / step vs need / cap): attack idle->wind1 0.918 / 0.6, wind1->wind2 0.910 / 0.8,
+# wind2->mid 0.492 / 5.5 vs 0.435 / 6.0 (weakest), mid->attack 0.740 / 4.8, attack->follow 0.784 / 3.6,
+# follow->recover 0.493 / 5.3, recover->idle 0.879 / 0.7; daze idle->daze 0.909 / 0.6, daze->daze_b 0.908 / 0.8
+# vs 0.299 / 7.9; hurt aliased (no generated pairs).
+keyframes:
+  idle:   {body: [62, 56], head: [70, 55], fang: [66, 63], abd: [52, 50], abd_end: [28, 40],
+           coxa1_n: [70, 50], knee1_n: [80, 37], tip1_n: [89, 49],
+           coxa2_n: [72, 54], knee2_n: [80, 50], tip2_n: [89, 76],
+           coxa1_f: [68, 60], knee1_f: [74, 60], tip1_f: [79, 76],
+           coxa2_f: [62, 62], knee2_f: [66, 66], tip2_f: [70, 76],
+           coxa3_n: [42, 58], knee3_n: [36, 66], tip3_n: [33, 76],
+           coxa3_f: [36, 56], knee3_f: [28, 62], tip3_f: [22, 76],
+           coxa4_n: [30, 50], knee4_n: [16, 60], tip4_n: [8, 76]}
+  attack: {body: [58, 46], head: [66, 46], fang: [63, 55], abd: [47, 43], abd_end: [22, 30],
+           coxa1_n: [66, 42], knee1_n: [78, 35], tip1_n: [97, 48],
+           coxa2_n: [68, 48], knee2_n: [78, 50], tip2_n: [89, 69],
+           coxa1_f: [56, 52], knee1_f: [64, 64], tip1_f: [76, 76],
+           coxa2_f: [46, 52], knee2_f: [43, 60], tip2_f: [41, 67],
+           coxa3_n: [36, 50], knee3_n: [30, 60], tip3_n: [26, 72],
+           coxa3_f: [30, 46], knee3_f: [22, 57], tip3_f: [16, 69],
+           coxa4_n: [24, 42], knee4_n: [12, 52], tip4_n: [3, 69]}
+  hurt:   {body: [52, 40], head: [57, 38], fang: [54, 48], abd: [44, 33], abd_end: [18, 15],
+           coxa1_n: [58, 30], knee1_n: [65, 12], tip1_n: [85, 18],
+           coxa2_n: [60, 48], knee2_n: [75, 52], tip2_n: [74, 72],
+           coxa1_f: [55, 50], knee1_f: [62, 62], tip1_f: [65, 75],
+           coxa2_f: [48, 50], knee2_f: [45, 62], tip2_f: [58, 76],
+           coxa3_n: [40, 50], knee3_n: [28, 56], tip3_n: [29, 76],
+           coxa3_f: [38, 48], knee3_f: [22, 52], tip3_f: [20, 72],
+           coxa4_n: [36, 46], knee4_n: [16, 58], tip4_n: [17, 70]}
+parts:
+  abdomen: {radius: 12.0}
+masks:                          # the ball and the cephalothorax own every pixel inside their outlines
+  abdomen:
+    idle: [[27, 42], [30, 37], [35, 34], [45, 33], [51, 37], [54, 43], [54, 49], [48, 53], [36, 53], [29, 49]]
+    attack: [[19, 32], [23, 26], [30, 23], [40, 23], [47, 27], [50, 34], [49, 41], [43, 45], [28, 45], [21, 40]]
+  thorax:
+    idle: [[57, 52], [62, 49], [68, 50], [72, 54], [72, 60], [68, 64], [60, 65], [56, 60]]
+    attack: [[53, 42], [58, 38], [64, 39], [68, 44], [68, 52], [64, 58], [56, 56], [52, 50]]
+frames:
+  atk_wind1: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.0, tweaks: {abd: [-1, 0], abd_end: [-1, 0], body: [-1, 0], coxa1_n: [-1, 0], fang: [-1, 0], head: [-1, 0], knee1_n: [-1, 0], tip1_n: [-1, 0]}}
+  atk_wind2: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.0, tweaks: {abd: [-2, 0], abd_end: [-2, 0], body: [-2, 0], coxa1_n: [-2, 0], fang: [-2, 0], head: [-2, 0], knee1_n: [-2, 0], tip1_n: [-2, 0]}}
+  atk_mid: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.25, tweaks: {abd: [3, 3], abd_end: [3, 3], body: [3, 3], fang: [3, 3], head: [3, 3]}}
+  atk_follow: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.75, tweaks: {abd: [2, 2], abd_end: [2, 2], body: [2, 2], fang: [2, 2], head: [2, 2]}}
+  atk_recover: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.0, tweaks: {abd: [-2, 0], abd_end: [-2, 0], body: [-2, 0], coxa1_n: [-2, 0], fang: [-2, 0], head: [-2, 0], knee1_n: [-2, 0], tip1_n: [-2, 0]}}
+  daze: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.0, tweaks: {abd: [-1, 0], abd_end: [-1, 0], body: [-1, 0], coxa1_n: [-1, 0], fang: [-1, 0], head: [-1, 0], knee1_n: [-1, 0], tip1_n: [-1, 0]}}
+  daze_b: {moves: [body, head, fang, abd, abd_end], pins: [tip1_n, tip1_f, tip2_n, tip2_f, tip3_n, tip3_f, tip4_n, tip4_f, knee1_n, knee1_f, knee2_n, knee2_f, knee3_n, knee3_f, knee4_n, knee4_f], t: 0.0, tweaks: {abd: [-2, 0], abd_end: [-2, 0], body: [-2, 0], coxa1_n: [-2, 0], fang: [-2, 0], head: [-2, 0], knee1_n: [-2, 0], tip1_n: [-2, 0]}}
+holds: []
+paint:                          # 1-4 px cracks and a leg pocket opened by the body translation: inked shut
+  - {frame: atk_mid, xy: [[22, 50], [23, 50], [21, 51], [22, 51], [71, 45], [77, 57]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[66, 44], [64, 45], [71, 47], [71, 51]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[65, 45], [63, 46], [69, 51]], rgb: [6, 4, 10]}
