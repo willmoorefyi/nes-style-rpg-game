@@ -6,14 +6,14 @@
 RAW is the face-removed structure render `s2_st_4102_sr_4201_raw.png` (1800x720) and CUT its remove_bg result. Steps,
 all at render resolution before the pixel pass:
   1. alpha = CUT >= 128; the eclipse disc and its white-hot rim (r <= DISC_R + 8 around DISC) are forced opaque, and
-     the corona fragments remove_bg kept above the shoulders (DISC_R + 8 < r < 230, y < 305) are cleared, and so are
-     bright corona pixels beside the disc (lum > 110 within r < 230, y < its centre + 5): a clean, notch-free edge; specks < 0.2 % of the body are dropped by `pix`;
+     the bright corona pixels beside the disc (lum > 110 within r < 230, y < its centre + 5): a clean, notch-free edge; specks < 0.2 % of the body are dropped by `pix`;
   2. darks lifted: a levels stretch of the stone (2..99.5 %, gamma GAMMA, red x 0.92), the disc kept black;
   3. rim light from the upper left: opaque pixels with sky within 3 px above / above-left blend 45 % toward gold, with
      sky within 2 px below 22 % toward ember (separates the arms from the sky);
   4. the base of the torso is made solid below y 690 and its colours below MIST_Y mirror the rows above it (the render's
      pale floor mist), behind the bottom strip in play;
-  5. `colossus.py pix`-equivalent: CL.pix on a 902x362 canvas (exactly 2 render px per art px), cropped to 900x362;
+  5. `colossus.py pix`-equivalent: CL.pix on a 902x362 canvas (exactly 2 render px per art px), cropped to 900x362,
+     then single bright specks replaced by their neighbours' median;
   6. the corona glow layer: the raw's sky within 440 render px of the disc and above
      its centre + 30, outside the alpha, in 4 stepped levels
      (GLOW_LEVELS / GLOW_COLOURS: ember, ember, gold, white), at the same art grid, for additive blending.
@@ -52,7 +52,6 @@ def alpha_of(cut: np.ndarray) -> np.ndarray:
     yy, xx = np.mgrid[:a.shape[0], :a.shape[1]]
     r = np.hypot(xx - DISC[0], yy - DISC[1])
     a[r <= DISC_R + 8] = True
-    a[(r > DISC_R + 8) & (r < 230) & (yy < 305)] = False
     return a
 
 
@@ -91,9 +90,26 @@ def finish_rgb(raw: np.ndarray, a: np.ndarray, levels: tuple[float, float] | Non
     return np.clip(out, 0, 255).astype(np.uint8), (lo, hi)
 
 
+def despeck(im: Image.Image) -> Image.Image:
+    """Single opaque pixels much brighter than all 8 neighbours take the colour of their median-luminance neighbour
+    (stray specks; an existing palette colour, so the palette lock holds)."""
+    a = np.asarray(im).copy()
+    lum = a[..., :3].astype(float) @ np.array([0.299, 0.587, 0.114])
+    h, w = lum.shape
+    nb = np.stack([np.pad(lum, 1, mode="edge")[1 + dy:h + 1 + dy, 1 + dx:w + 1 + dx]
+                   for dy in (-1, 0, 1) for dx in (-1, 0, 1) if dy or dx])
+    spot = (a[..., 3] > 0) & (lum - nb.max(0) > 60)
+    for y, x in zip(*np.where(spot)):
+        y0, y1, x0, x1 = max(0, y - 1), min(h, y + 2), max(0, x - 1), min(w, x + 2)
+        nbh = [tuple(a[yy, xx, :3]) for yy in range(y0, y1) for xx in range(x0, x1) if (yy, xx) != (y, x)]
+        nbh.sort(key=lambda c: 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2])
+        a[y, x, :3] = nbh[len(nbh) // 2]
+    return Image.fromarray(a, "RGBA")
+
+
 def pix_grid(rgba: np.ndarray) -> Image.Image:
     im = CL.pix(Image.fromarray(rgba, "RGBA"), (902, 362), 24, seed=0)
-    return im.crop((1, 0, 901, 362))
+    return despeck(im.crop((1, 0, 901, 362)))
 
 
 def glow_of(raw: np.ndarray, a: np.ndarray) -> Image.Image:

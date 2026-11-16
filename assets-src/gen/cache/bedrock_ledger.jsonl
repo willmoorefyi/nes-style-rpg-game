@@ -16,3 +16,5 @@
 {"event": "result", "key": "04a9765cd37ef1b2d149e54c", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
 {"event": "request", "ts": "2026-11-16T13:59:20", "tool": "colossus.py", "model": "search_replace", "purpose": "v0", "seed": 4203, "key": "91279bc2676fd3be21e891bf", "pass": "C"}
 {"event": "result", "key": "91279bc2676fd3be21e891bf", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
+{"event": "request", "ts": "2026-11-16T14:17:59", "tool": "colossus.py", "model": "search_replace", "purpose": "f4_variant", "seed": 4301, "key": "4afe96f3a94a52f187f0c726", "pass": "C"}
+{"event": "result", "key": "4afe96f3a94a52f187f0c726", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}

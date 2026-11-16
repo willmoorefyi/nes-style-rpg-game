@@ -1140,3 +1140,19 @@ pass.
 Mock at scale 3, place (-390, -224), drawn over the floor with no floorFront, the party in front, and the windows
 (`gen/out/colossus/review/chaos_horizon_c3_mock.png`): coverage above the horizon 81.8 %, art 56 % of the field,
 edge contrast 100.5 (>= 100), party band std 82.8 (rim 41.1).
+
+**F3 approved (C3).** A fresh image-only review (multimodal-looker, given only the mock, the 2x master and the source)
+returned **SHIP WITH NITS**: the largest thing on screen, one vast being, no face, none of the 3.5 look-alikes. Its
+nits were fixed offline:
+- the shoulder clear-cut beside the disc removed, keeping only the bright-corona rule;
+- a palette-safe despeck of the stray bright pixel;
+- gamma held at 0.72, so the boss edge contrast stays >= 100 (100.9);
+- not changed: the blocky glow holes (minor over the bright sky), the warrior and thief standing over the right arm
+  (they read; reviewer optional).
+
+Final mock: coverage above the horizon 81.8 %, edge 100.9, party band std 83.0. `colossus.py approve chaos_horizon`
+wrote `approved/chaos_forms/chaos_horizon/master.png` (900x362) and `meta.json` (chain C4 -> C6 -> C7, cache keys
+un-ignored), plus `glow.png` (the corona layer).
+**Note for C4:** with an approved master, `colossusAssets.test.ts` and `chaosForms.test.ts` require a `colossus.json`
+entry for `chaos_horizon` (A5), and the `colossus` stage needs `gen/colossus/chaos_horizon.yaml` (RIG). vitest on
+`roster` is red on those two checks until C4 wires them.
