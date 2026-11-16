@@ -680,6 +680,8 @@ sheet (fresh counts from 367).
 
 Images used: 9 of 50 (ledger guard: 376 - 367).
 
+**Orchestrator ruling D-V6 (2026-11-16, after G-T0: 0 of 80 cached boss renders reach the titan band):** chaos uses **C2**, the normal 200 px boss band (`size: boss`), shown at display scale 3 through FW-S; no titan (C1) attempt is made (`REDESIGN_PLAN.md` 15, 17).
+
 ### Pass V attempts (V3, generator, main checkout `roster`)
 
 Main-checkout `selftest.py` ALL PASSED (1022 ok checks) at 674857b (V-gen) before the first paid request. Each id is

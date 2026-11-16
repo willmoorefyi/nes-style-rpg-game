@@ -1091,7 +1091,7 @@ are **out of scope** (D-V16).
 | D-V3 | Sibling additions | **accepted**: white_shark, minotaur_zombie, fire_hydra, deepeyes, evil_eye (23 rescaled sheets in total) |
 | D-V4 | Optional additions (wyrm, wyvern, tyrannosaur, purple_worm, golems) | no (default) |
 | D-V5 | Data classes `huge` and `titan`, labels "Huge" / "Titan" | yes (default) |
-| D-V6 | Chaos cell | **C1, the titan 300 px cell**, subject to the G-T0 re-confirm (4.2); at most 2 C1 `boss_idle` attempts, the 3rd reserved for the C2 fallback (rev 1(c) ruling) |
+| D-V6 | Chaos cell | **C1, the titan 300 px cell**, subject to the G-T0 re-confirm (4.2); at most 2 C1 `boss_idle` attempts, the 3rd reserved for the C2 fallback (rev 1(c) ruling) ; **re-decided 2026-11-16 after G-T0 (0 of 80 cached boss renders cut at the titan band): C2**, chaos is generated in the normal 200 px boss band (`size: boss`) and shown at display scale 3 (FW-S, a `monster_scale.yaml` entry by the integrator); no titan C1 attempt, no `titan` page group; FW-T stays in the framework, unused |
 | D-V7 | Chaos attacks in place | yes (default) |
 | D-V8 | Bestiary backdrop centred on the panel | yes (default) |
 | D-V9 | Hollow seraph | **four blade wings, no raise pose** (`only_sheets` refuses `boss_attack_raise`; rig `raise: false`) |
@@ -1108,8 +1108,8 @@ are **out of scope** (D-V16).
 | Rev 9 ruling | Bestiary centring box | FW-A2 `idleBox [l, t, r, b]` from the idle frame |
 | Rev 15 ruling | Long commands | background command writing `EXIT=$?` to a log; Monitor `until grep -q EXIT=` with timeout <= 240 s, re-armed; never two `monsters_ai` builds in one worktree; no self-matching `pgrep` |
 
-**Still open (re-confirm points):** D-V6 after G-T0 (the orchestrator re-confirms C1 with the measured numbers, or
-switches chaos to C2 before its first image).
+**Re-confirm point closed:** D-V6 after G-T0: the orchestrator ruled **C2** (ruling D-V6, 2026-11-16) before chaos's
+first image; the acceptance is ">= 172 art px at scale 3" (4.2).
 
 ---
 
@@ -1133,7 +1133,7 @@ switches chaos to C2 before its first image).
 - [ ] V3 generate crazy_horse, piscodemon, black_knight, guardian, vampire (<= 3 each), log rows, approvals (high, 0.5d)
 - [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d)
 - [x] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator (0 of 80, section 17); D-V6 re-confirm pending (orchestrator) (high, 1h)
-- [ ] V3 generate chaos idle (<= 2 at the titan band, 3rd reserved for C2) -> attack -> cast -> hurt -> raise (<= 3 each); piece comparison per pose (high, 0.5d)
+- [ ] V3 generate chaos idle -> attack -> cast -> hurt -> raise (<= 3 each; **C2 per D-V6 ruling after G-T0**: boss band 200, display scale 3); piece comparison per pose (high, 0.5d)
 - [ ] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d)
 - [ ] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d)
 - [ ] V5 wave 2 rigs: vampire, hollow_seraph (cast), chaos (titan, cast + raise) (high, 2d)
@@ -1178,6 +1178,7 @@ orchestrator's rulings on the open choices are in section 15.
 | Chaos idle height range at scale 2 (C1) | 258-278 art px (516-556 screen px) | G-T0: not reached by any cached render (max cut figure 215 native) |
 | Cached boss renders reaching >= 258 native at scale 1.0, grid mode | 0 of about 80 expected (momus: max 255) | **0 of 80** (every ledger boss render in the main-checkout cache; `out/gemini` held only duplicates). 75 grid mode, 5 no grid; 0 accepted by the fail-closed titan cut. Native figure height (the cut's mask) max 215 (hollow_seraph boss_cast, pitch 4.26), then 205, 202, 197, 193; chaos 165-181 (idle 173), lich 149-188 (idle 183), all chaos / lich at pitch 5.12. Pitches: 5.12 x63, 4.26 x6, 4.0 x3, 5.7-5.8 x4, 4.7, 3.42, 3.2, 3.04; the 3 renders finer than 3.5 px had no detectable grid (conf 0.10-0.39) |
 | Titan guide box | <= 914 guide px today (`monster.py:214`) | 914 guide px (capped; 278 x 5.33 = 1482 asked); = 178.5 art px at pitch 5.12, 214.6 at 4.26, 228.5 at 4.0, 267-301 at 3.0-3.4. Figures fill about 97 % of the box (chaos idle 173 of 178.5), so at the common pitch 5.12 a 258 figure needs a 1321 px box, larger than the 1024 guide |
+| D-V6 after G-T0 | C1 re-confirm or C2 | **C2** (orchestrator, 2026-11-16): boss band 200 at display scale 3; the C1 rows of this table stay unused |
 | Chaos box on screen, cell top with feet at 745 | 600x600, y 159 | |
 | Chaos bestiary plain-clamp shift | -6 px for h = 278 (0 for h <= 272); C2 about -2 px | |
 | Atlas page count after pass V | 10 planned under C1 | |
