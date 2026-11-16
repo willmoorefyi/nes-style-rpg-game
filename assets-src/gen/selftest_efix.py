@@ -20,7 +20,7 @@ FWQ_ALLOW = {("chimera", "hurt"), ("black_widow", "hurt"), ("crawler", "attack")
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "hollow_seraph": {"halo"}}
 # FW-FX (docs/REDESIGN_PLAN.md 7, 9.5): the vampire and hollow_seraph rigs are retired in pass V; a pending entry
 # tolerates the missing part until the new rig re-confirms it (back to FX_ALLOWED only) or drops it (from both)
-FX_PENDING: set[tuple[str, str]] = {("hollow_seraph", "halo")}  # vampire/slash dropped: the pass-V vampire rig has no fx part
+FX_PENDING: set[tuple[str, str]] = set()  # pass V: vampire/slash dropped (no fx part); hollow_seraph/halo re-confirmed by its new rig
 
 
 def _canvas() -> tuple[np.ndarray, np.ndarray]:
