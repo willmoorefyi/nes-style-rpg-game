@@ -10,9 +10,9 @@ import { parse } from 'yaml';
 import { Texture, TextureSource } from 'pixi.js';
 import { headOf } from '../../src/scenes/battle/fx/texturePixels.js';
 import { BOSS_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
-import { monsterAnchors, type MonsterAnchors } from '../../src/rendering/monsterAnchors.js';
+import { enemyBoxInput, layoutSizeOfArt, monsterAnchors, type MonsterAnchors } from '../../src/rendering/monsterAnchors.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../src/rendering/BattleArt.js';
-import { layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
+import type { EnemyBoxInput } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import type { MonsterArtSource } from '../../src/scenes/battle/AiEnemyView.js';
 import type { EnemyData } from '../../src/types/index.js';
 import { opaqueBounds } from './pngAlpha.js';
@@ -101,12 +101,10 @@ export function layoutInput(id: string): EnemyBoxInput {
   const e = enemyById(id);
   const s = atlas.sheets[monsterSpriteKey(e)];
   const sc = sheetScale(monsterSpriteKey(e));
-  // as AiEnemyView: a boss sheet at scale 3 (chaos, D-V6 = C2) is laid out as the titan class
-  const size: EnemySizeClass = layoutSizeOf(e.size, sc);
-  const box: EnemyBoxInput = { size, w: s.cell[0] * sc, h: s.cell[1] * sc, scale: sc };
-  const a = monsterAnchors(s);
-  if (a.homeX) { box.ox0 = a.homeX[0] * sc; box.ox1 = (a.homeX[1] + 1) * sc; }
-  return box;
+  // as AiEnemyView (boxInputOf): a boss sheet at scale 3 is the titan class unless its art fits ENEMY_AREA (chaos is a
+  // titan, hollow_seraph a boss, V8 N-1); a scale-3 boss box carries its art top `oy0`
+  const f = { ...monsterAnchors(s), cell: s.cell, scale: sc };
+  return enemyBoxInput(layoutSizeOfArt(e.size, f), f);
 }
 
 /** atlasFrames with one cell-sized texture for every frame (so a sprite's bounds are its cell at its scale); `head`

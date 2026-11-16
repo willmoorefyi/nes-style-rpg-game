@@ -4910,7 +4910,8 @@
         183
       ],
       "sequence_version": 1,
-      "page": 1
+      "page": 1,
+      "scale": 3
     },
     "horned_devil": {
       "cell": [

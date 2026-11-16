@@ -20,6 +20,9 @@ export interface EnemyBoxInput {
   /** The home art's opaque extent in box px from the box's left: `ox0` inclusive, `ox1` exclusive (defaults 0, w). */
   ox0?: number;
   ox1?: number;
+  /** A boss box only: its art's highest row (the travel frames' top) in box px from the box's top. The opaque passes
+   *  fit and place a boss by its art, not its cell (the scale-3 hollow_seraph: a 600 px cell, 471 px of art). */
+  oy0?: number;
   /** The sheet's screen px per art px (FW-S: 3 for the rescaled sheets; default 2): the passes keep it whole. */
   scale?: number;
 }
@@ -51,12 +54,14 @@ const ORDER: EnemySizeClass[] = ['titan', 'boss', 'huge', 'large', 'small'];
 /** The atlas screen scale of a sheet without its own (`monsters-ai.json` `scale`). */
 export const DEFAULT_SHEET_SCALE = 2;
 
-/** The layout class of an enemy: its data `size`, except that a boss sheet shown at scale 3 (chaos under D-V6 = C2,
- *  docs/REDESIGN_PLAN.md 4.2: the 200 px boss band at display scale 3, a 600 px box) is laid out, hops and attacks in
- *  place as the titan class (TITAN_AREA, travel 0). */
-export function layoutSizeOf(size: EnemySizeClass | undefined, sheetScale: number | undefined): EnemySizeClass {
+/** The layout class of an enemy: its data `size`, except that a boss sheet shown at scale 3 whose art (`artH`: the
+ *  highest frame row to the cell bottom, screen px) does not fit ENEMY_AREA's height, or is unknown, is laid out, hops
+ *  and attacks in place as the titan class (TITAN_AREA, travel 0): chaos under D-V6 = C2 (docs/REDESIGN_PLAN.md 4.2,
+ *  582 px of art). A scale-3 boss whose art fits (hollow_seraph, V8 N-1: 471 px) stays a boss in ENEMY_AREA. */
+export function layoutSizeOf(size: EnemySizeClass | undefined, sheetScale: number | undefined, artH?: number): EnemySizeClass {
   const s = size ?? 'small';
-  return s === 'boss' && sheetScale === 3 ? 'titan' : s;
+  if (s !== 'boss' || sheetScale !== 3) return s;
+  return artH !== undefined && artH <= ENEMY_AREA.y1 - ENEMY_AREA.y0 ? 'boss' : 'titan';
 }
 
 interface Column { size: EnemySizeClass; items: number[]; w: number; h: number }
@@ -68,6 +73,8 @@ const sheetScale = (b: EnemyBoxInput): number => b.scale ?? DEFAULT_SHEET_SCALE;
 /** A box length at the pass's screen scale (multiplied first, so 384 at 2/3 is exactly 256). */
 const at = (v: number, b: EnemyBoxInput, p: Packing): number => (v * p.target(sheetScale(b))) / sheetScale(b);
 const factorOf = (b: EnemyBoxInput, p: Packing): number => p.target(sheetScale(b)) / sheetScale(b);
+/** The empty rows above a column's first box that the opaque passes leave out of its height (a boss's `oy0`). */
+const topTrim = (b: EnemyBoxInput, p: Packing): number => (p.opaque ? at(b.oy0 ?? 0, b, p) : 0);
 
 /** The opaque extent of a box in a pass, box px from its left: [left, right). */
 const extentAt = (b: EnemyBoxInput, p: Packing): [number, number] => [at(b.ox0 ?? 0, b, p), at(b.ox1 ?? b.w, b, p)];
@@ -92,7 +99,8 @@ function columns(boxes: EnemyBoxInput[], p: Packing): Column[] {
         const [l, r] = extentAt(boxes[i], p);
         return p.opaque ? r - l : at(boxes[i].w, boxes[i], p);
       }));
-      const h = items.reduce((sum, i) => sum + at(boxes[i].h, boxes[i], p), 0) + ROW_GAP * (items.length - 1);
+      const h = items.reduce((sum, i) => sum + at(boxes[i].h, boxes[i], p), 0) + ROW_GAP * (items.length - 1)
+        - topTrim(boxes[items[0]], p);
       cols.push({ size, items, w, h });
     }
   }
@@ -124,7 +132,8 @@ function layout(boxes: EnemyBoxInput[]): { out: EnemyBox[]; pass: number } {
     let y = area.y0 + slack / 2 + (ci % 2 === 1 ? s / 2 : -s / 2);
     // feet on the battle plain even for shrunk boxes: the first enemy's feet at STAGE_FEET.min or lower
     const first = boxes[col.items[0]];
-    y = Math.min(Math.max(y, STAGE_FEET.min - at(first.h, first, p)), area.y1 - col.h);
+    const trim = topTrim(first, p);
+    y = Math.min(Math.max(y, STAGE_FEET.min - at(first.h, first, p) + trim), area.y1 - col.h) - trim;
     for (const i of col.items) {
       const b = boxes[i];
       const w = at(b.w, b, p);
@@ -149,7 +158,7 @@ export const MAX_LAYOUT = 9;
 
 /**
  * True when a formation (the boxes of its maximum roll) holds 1 to MAX_LAYOUT enemies and lays out with every opaque
- * rect (the box's opaque extent, its full height) inside its area and no two overlapping. Refused: a titan with any
+ * rect (the box's opaque extent, its full height less a boss's `oy0`) inside its area and no two overlapping. Refused: a titan with any
  * other enemy (it fights alone), and a formation with a scale-3 sheet that only fits at pass 4 (screen scale 1).
  */
 export function formationFits(sizes: EnemyBoxInput[]): boolean {
@@ -161,7 +170,7 @@ export function formationFits(sizes: EnemyBoxInput[]): boolean {
   const area: Area = titan ? TITAN_AREA : ENEMY_AREA;
   const rs = out.map((b, i) => {
     const [l, r] = extent(sizes[i], b.scaleFactor);
-    return { l: b.x - b.w / 2 + l, r: b.x - b.w / 2 + r, t: b.feetY - b.h, btm: b.feetY };
+    return { l: b.x - b.w / 2 + l, r: b.x - b.w / 2 + r, t: b.feetY - b.h + (sizes[i].oy0 ?? 0) * b.scaleFactor, btm: b.feetY };
   });
   const inside = rs.every((r) => r.l >= area.x0 && r.r <= area.x1 && r.t >= area.y0 && r.btm <= area.y1);
   if (!inside) return false;

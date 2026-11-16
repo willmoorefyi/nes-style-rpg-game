@@ -33,3 +33,7 @@ evil_eye: 3
 # V6 (docs/REDESIGN_PLAN.md 4.2, ruling D-V6 = C2 after G-T0): the redesigned chaos, cut in the normal 200 px boss band
 # (`size: boss` kept, no titan page group), shown at 3 screen px per art px so it is the largest monster on screen.
 chaos: 3
+# V8 N-1 (orchestrator ruling, docs/ROSTER_PLAYTEST.md): the regenerated hollow_seraph (200 px boss cell, idle 168 x 138
+# art px) is shown at 3 screen px per art px (idle 504 x 414) so it is no longer smaller than lich / garland / warmech;
+# hollow_seraph_2 shares the sprite. `size: boss` kept; its art (471 px) fits ENEMY_AREA, so it lays out as a boss.
+hollow_seraph: 3
