@@ -2,7 +2,9 @@
 --anim). The real budget.json is pinned field by field to the literals below; the guard is then driven with the real
 budget over fake ledgers (the real ledger's first N_V0 Gemini attempts plus fake ones): the 51st pass-V attempt, the
 4th attempt at one sheet, fresh per-sheet counts at N_V0, `only_ids`, `only_sheets` (hollow_seraph/boss_attack_raise
-under D-V9), the consistency guard, and that `history` is never read. Last, the real ledger's pass-V slice.
+under D-V9), the consistency guard, and that `history` is never read. FW-V8 (docs/REDESIGN_FIX_PLAN.md 1, rev 5):
+the pass-V `sheet_caps` map, read by both per-sheet rules of `check_budget` and checked by `budget_consistency`.
+Last, the real ledger's pass-V slice (within the caps and the V8 halt of 47).
 
   python3 -I assets-src/gen/selftest_passv.py
 """
@@ -31,6 +33,10 @@ ONLY_SHEETS = {"crazy_horse": ["monster_large"], "piscodemon": ["monster_small"]
                "hollow_seraph": ["boss_idle", "boss_attack", "boss_cast", "boss_hurt"],
                "chaos": ["boss_idle", "boss_attack", "boss_cast", "boss_hurt", "boss_attack_raise"],
                "dragon": ["monster_large"]}
+# FW-V8 (rev 5 ruling, D-U1 = b, D-U2 = b; user 2026-11-16): per-sheet caps above PER_SHEET; every other sheet stays 3
+SHEET_CAPS = {"hollow_seraph/boss_idle": 6, "hollow_seraph/boss_attack": 6, "hollow_seraph/boss_cast": 5,
+              "hollow_seraph/boss_hurt": 4, "crazy_horse/monster_large": 5}
+V8_HALT = 47                    # this round stops generating at 47 pass-V images (the guard's cap stays CAP_V)
 # append-only: later passes may add entries after this prefix, never change it
 HISTORY_PREFIX = [{"name": "pass R", "attempts_before": PASS_R[0], "cap": PASS_R[1], "gemini_end": N_V0,
                    "max_attempts_per_sheet": 3}]
@@ -81,11 +87,35 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
     v51, v50 = v(real, led, "chaos", "boss_idle"), v(real, led[:-1], "chaos", "boss_idle")
     check(_refused(v51) and v50 == "", f"pass V: attempt {CAP_V + 1} is refused ({v51[:80]!r}), attempt {CAP_V} is "
                                        f"not ({v50[:60]!r})")
-    # 4th attempt at one sheet in pass V refused, 3rd not
-    led3 = base + [_fake("crazy_horse", "monster_large")] * PER_SHEET
-    v4, v3 = v(real, led3, "crazy_horse", "monster_large"), v(real, led3[:-1], "crazy_horse", "monster_large")
-    check(_refused(v4) and v3 == "", f"pass V: attempt {PER_SHEET + 1} at one sheet is refused ({v4[:80]!r}), attempt "
-                                     f"{PER_SHEET} is not ({v3[:60]!r})")
+    # 4th attempt at a sheet without a sheet_caps entry refused, 3rd not
+    led3 = base + [_fake("piscodemon", "monster_small")] * PER_SHEET
+    v4, v3 = v(real, led3, "piscodemon", "monster_small"), v(real, led3[:-1], "piscodemon", "monster_small")
+    check(_refused(v4) and v3 == "", f"pass V: attempt {PER_SHEET + 1} at piscodemon/monster_small (no sheet_caps "
+                                     f"entry) is refused ({v4[:80]!r}), attempt {PER_SHEET} is not ({v3[:60]!r})")
+
+    # FW-V8: the literal sheet_caps map, then each cap allows its last attempt and refuses the next
+    check(pv.get("sheet_caps") == SHEET_CAPS, f"budget.json: pass V sheet_caps is the rev-5 map ({pv.get('sheet_caps')})")
+    for key, n in SHEET_CAPS.items():
+        cid, sheet = key.split("/")
+        led_n = base + [_fake(cid, sheet)] * n
+        over, last, fourth = v(real, led_n, cid, sheet), v(real, led_n[:-1], cid, sheet), v(real, led_n[:N_V0 + 3], cid, sheet)
+        check(_refused(over) and last == "" and fourth == "",
+              f"sheet_caps: {key} attempt 4 and attempt {n} allowed, attempt {n + 1} refused "
+              f"({fourth[:40]!r}, {last[:40]!r}, {over[:70]!r})")
+    # both per-sheet rules read sheet_caps: either rule alone at 3 would refuse the 4th hollow_seraph/boss_idle
+    led_s = base + [_fake("hollow_seraph", "boss_idle")] * 3
+    no_caps = copy.deepcopy(real)
+    _passes(no_caps).get("pass V", {}).pop("sheet_caps", None)
+    top_only = copy.deepcopy(real)                  # the pass rule loosened: only the top-level rule can refuse
+    _passes(top_only).get("pass V", {}).update(max_per_sheet=9, sheet_caps={})
+    pass_only = {**copy.deepcopy(real), "max_attempts_per_sheet": 9}   # only the pass rule can refuse
+    _passes(pass_only).get("pass V", {}).pop("sheet_caps", None)
+    vn, vt, vp = (v(b, led_s, "hollow_seraph", "boss_idle") for b in (no_caps, top_only, pass_only))
+    check(_refused(vn) and _refused(vt) and "max 3" in vt and _refused(vp) and "per sheet" in vp,
+          f"sheet_caps: without the map the 4th hollow_seraph/boss_idle is refused by the top-level rule ({vt[:70]!r}) "
+          f"and by the pass rule ({vp[:70]!r})")
+    vb3 = v(real, base + [_fake("black_knight", "monster_small")] * 3, "black_knight", "monster_small")
+    check(_refused(vb3), f"sheet_caps: black_knight/monster_small (2 used, cap 3) is refused at its 4th ({vb3[:70]!r})")
     # fresh counts: chaos/boss_attack has 3 pass-R attempts and still gets its 1st pass-V attempt
     prior = sum(e.get("character") == "chaos" and e.get("sheet") == "boss_attack" for e in base[PASS_R[0]:])
     vf = v(real, base, "chaos", "boss_attack")
@@ -125,6 +155,17 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
             continue
         vb = v(bad, base, "chaos", "boss_idle")
         check(_refused(vb) and "inconsistent" in vb, f"consistency: a different {label} is refused ({vb[:100]!r})")
+    # FW-V8: a bad sheet_caps entry refuses every paid request and names the entry
+    for label, caps in (("a cap of 7", {"hollow_seraph/boss_idle": 7}), ("a cap of 2", {"crazy_horse/monster_large": 2}),
+                        ("a non-integer cap", {"hollow_seraph/boss_idle": "6"}), ("a bool cap", {"vampire/monster_small": True}),
+                        ("an unknown sheet", {"hollow_seraph/boss_attack_raise": 4}),
+                        ("a non-listed id", {"goblin/monster_small": 4}), ("a key without a sheet", {"hollow_seraph": 4})):
+        bad = copy.deepcopy(real)
+        _passes(bad)["pass V"]["sheet_caps"] = {**SHEET_CAPS, **caps}
+        bad_key = next(iter(caps))
+        verdicts = [v(bad, base, c, s) for c, s in (("chaos", "boss_idle"), ("dragon", "monster_large"))]
+        check(all(_refused(x) and "inconsistent" in x and "sheet_caps" in x and bad_key in x for x in verdicts),
+              f"consistency: {label} in sheet_caps refuses every paid request, naming {bad_key} ({verdicts[0][:110]!r})")
     open_fix = copy.deepcopy(real)
     _passes(open_fix).get("pass R fix", {}).pop("gemini_end", None)
     vo2 = v(open_fix, base, "chaos", "boss_idle")
@@ -135,6 +176,8 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
     junk = {**real, "history": [{"name": "pass R", "attempts_before": 0, "cap": 0, "gemini_end": 0}, "junk"]}
     same = all(v(b, base, c, s) == v(real, base, c, s) for b in (no_hist, junk)
                for c, s in (("chaos", "boss_attack"), ("goblin", "monster_small"), ("hollow_seraph", "boss_attack_raise")))
+    led6 = base + [_fake("hollow_seraph", "boss_idle")] * 5
+    same = same and all(v(b, led6, "hollow_seraph", "boss_idle") == "" for b in (no_hist, junk))
     check(same, "the guard never reads history (no history, or a junk history, gives the same verdicts)")
 
     # the real ledger's pass-V slice
@@ -143,9 +186,10 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
     for e in run:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1
     foreign = sorted(k for k in per if k[1] not in ONLY_SHEETS.get(k[0], []))
-    check(len(run) <= CAP_V and not foreign and all(n <= PER_SHEET for n in per.values()),
-          f"ledger: pass V used {len(run)} of {CAP_V}, max per sheet {max(per.values(), default=0)} <= {PER_SHEET}, "
-          f"foreign {foreign}")
+    over = sorted(f"{c}/{s}: {n}" for (c, s), n in per.items() if n > SHEET_CAPS.get(f"{c}/{s}", PER_SHEET))
+    check(len(run) <= V8_HALT <= CAP_V and not foreign and not over,
+          f"ledger: pass V used {len(run)} of {CAP_V} (V8 halt {V8_HALT}), every sheet within {PER_SHEET} or its "
+          f"sheet_caps entry (over: {over}), foreign {foreign}")
 
 
 if __name__ == "__main__":
