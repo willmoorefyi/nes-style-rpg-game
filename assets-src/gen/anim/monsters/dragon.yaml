@@ -1,0 +1,160 @@
+sprite: dragon
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Pass V redesign (R320): a tall upright red fire dragon on its thick hind legs, the S-curved neck and horned head
+# high, the forelegs raised in front of the chest, bat wings folded behind the shoulders, the tail curled on the ground.
+# The attack (ranged, in place) is the neck arched forward and down with the jaws open; the hurt is the head knocked
+# back and down, the forelegs drawn in. Every in-between is a translation-only copy of its source key (moves: []):
+# the upper body (spine, wings, forelegs) as one group, the tail still on the ground, the neck and head a little further; the hind knees and
+# feet pinned; the folded wings are one rigid part on the withers. The key switches carry the pose change. Distinct
+# from white_dragon's lean-back bite: the red dragon draws itself up and back for an inhale, the wings lifting.
+keyframes:
+  idle:
+    hip: [58, 95]
+    back: [62, 75]
+    chest: [68, 55]
+    neck: [72, 38]
+    head: [80, 24]
+    snout: [102, 32]
+    tail0: [50, 100]
+    tail1: [36, 108]
+    tail2: [24, 108]
+    tail_tip: [26, 100]
+    wtip: [58, 17]
+    sh_n: [64, 58]
+    el_n: [76, 64]
+    paw_n: [92, 62]
+    ftoe_n: [102, 58]
+    sh_f: [72, 56]
+    el_f: [80, 58]
+    paw_f: [84, 60]
+    ftoe_f: [86, 62]
+    hip_n: [55, 92]
+    knee_n: [52, 104]
+    foot_n: [52, 115]
+    toe_n: [58, 121]
+    hip_f: [74, 92]
+    knee_f: [80, 100]
+    foot_f: [80, 112]
+    toe_f: [90, 118]
+  attack:
+    hip: [55, 95]
+    back: [60, 75]
+    chest: [66, 52]
+    neck: [70, 32]
+    head: [88, 40]
+    snout: [107, 57]
+    tail0: [47, 100]
+    tail1: [33, 108]
+    tail2: [20, 108]
+    tail_tip: [23, 100]
+    wtip: [55, 18]
+    sh_n: [62, 68]
+    el_n: [80, 70]
+    paw_n: [100, 72]
+    ftoe_n: [110, 76]
+    sh_f: [70, 68]
+    el_f: [80, 74]
+    paw_f: [86, 76]
+    ftoe_f: [88, 78]
+    hip_n: [52, 92]
+    knee_n: [49, 104]
+    foot_n: [49, 115]
+    toe_n: [55, 121]
+    hip_f: [71, 92]
+    knee_f: [76, 100]
+    foot_f: [77, 112]
+    toe_f: [87, 118]
+  hurt:
+    hip: [55, 95]
+    back: [60, 75]
+    chest: [66, 55]
+    neck: [72, 40]
+    head: [80, 34]
+    snout: [102, 42]
+    tail0: [47, 100]
+    tail1: [33, 108]
+    tail2: [20, 108]
+    tail_tip: [23, 100]
+    wtip: [60, 26]
+    sh_n: [64, 62]
+    el_n: [76, 68]
+    paw_n: [84, 72]
+    ftoe_n: [88, 74]
+    sh_f: [70, 60]
+    el_f: [80, 66]
+    paw_f: [86, 70]
+    ftoe_f: [89, 72]
+    hip_n: [52, 92]
+    knee_n: [49, 104]
+    foot_n: [49, 115]
+    toe_n: [55, 121]
+    hip_f: [71, 92]
+    knee_f: [76, 100]
+    foot_f: [77, 112]
+    toe_f: [87, 118]
+parts:
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
+  wing: {bone: [chest, wtip], radius: 8.0}
+frames:
+  atk_wind1:   # anticipation: the dragon draws itself up to inhale: the upper body 1 px back, the neck and head 2 px back and 1 up, the folded wings 1 px up; hind feet planted
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-1, 0], back: [-1, 0], chest: [-1, 0], neck: [-2, -1], head: [-2, -1], snout: [-2, -1], wtip: [-1, -1], sh_n: [-1, 0], el_n: [-1, 0], paw_n: [-1, 0], ftoe_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], paw_f: [-1, 0], ftoe_f: [-1, 0], hip_n: [-1, 0], hip_f: [-1, 0]}
+  atk_wind2:   # the full inhale: the upper body 2 px back and 1 up, the head reared 4 px back and 2 up, the wings 2 px up
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-2, -1], back: [-2, -1], chest: [-2, -1], neck: [-4, -2], head: [-4, -2], snout: [-4, -2], wtip: [-2, -2], sh_n: [-2, -1], el_n: [-2, -1], paw_n: [-2, -1], ftoe_n: [-2, -1], sh_f: [-2, -1], el_f: [-2, -1], paw_f: [-2, -1], ftoe_f: [-2, -1], hip_n: [-2, -1], hip_f: [-2, -1]}
+  atk_mid:   # the breath arriving: the attack key 1 px back toward the coil and 1 up, the head 2 px up; hind feet 1 px toward idle
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [1, -1], back: [1, -1], chest: [1, -1], neck: [1, -2], head: [1, -2], snout: [1, -2], wtip: [1, -1], sh_n: [1, -1], el_n: [1, -1], paw_n: [1, -1], ftoe_n: [1, -1], sh_f: [1, -1], el_f: [1, -1], paw_f: [1, -1], ftoe_f: [1, -1], hip_n: [1, -1], hip_f: [1, -1], knee_n: [1, 0], foot_n: [1, 0], knee_f: [1, 0], foot_f: [1, 0]}
+  atk_follow:   # the breath pushed out: the attack key with the neck and head 1 px further forward and down
+    t: 1.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [1, 0], back: [1, 0], chest: [1, 0], neck: [2, 1], head: [2, 1], snout: [2, 1], wtip: [1, 0], sh_n: [1, 0], el_n: [1, 0], paw_n: [1, 0], ftoe_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], paw_f: [1, 0], ftoe_f: [1, 0], hip_n: [1, 0], hip_f: [1, 0]}
+  atk_recover:   # settling back: the idle key 2 px back, the head 1 px low
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-2, 0], back: [-2, 0], chest: [-2, 0], neck: [-2, 1], head: [-2, 1], snout: [-2, 1], wtip: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], paw_n: [-2, 0], ftoe_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], paw_f: [-2, 0], ftoe_f: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0]}
+  hurt_in1:   # the flinch: the upper body 2 px back and 1 down, the head knocked 3 px back and 3 down toward the hurt key
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [-2, 1], back: [-2, 1], chest: [-2, 1], neck: [-3, 3], head: [-3, 3], snout: [-3, 3], wtip: [-2, 1], sh_n: [-2, 1], el_n: [-2, 1], paw_n: [-2, 1], ftoe_n: [-2, 1], sh_f: [-2, 1], el_f: [-2, 1], paw_f: [-2, 1], ftoe_f: [-2, 1], hip_n: [-2, 1], hip_f: [-2, 1]}
+  hurt_in2:   # coming out of the recoil: the hurt key 1 px forward
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [1, 0], back: [1, 0], chest: [1, 0], neck: [1, 0], head: [1, 0], snout: [1, 0], wtip: [1, 0], sh_n: [1, 0], el_n: [1, 0], paw_n: [1, 0], ftoe_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], paw_f: [1, 0], ftoe_f: [1, 0]}
+  daze:   # the head hangs (the recipe adds its head slump), the upper body 1 px down
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [0, 1], back: [0, 1], chest: [0, 1], neck: [0, 1], head: [0, 1], snout: [0, 1], wtip: [0, 1], sh_n: [0, 1], el_n: [0, 1], paw_n: [0, 1], ftoe_n: [0, 1], sh_f: [0, 1], el_f: [0, 1], paw_f: [0, 1], ftoe_f: [0, 1], hip_n: [0, 1], hip_f: [0, 1]}
+  daze_b:   # the sway's low point: the upper body 2 px down
+    t: 0.0
+    moves: []
+    dy: 0
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {hip: [0, 2], back: [0, 2], chest: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], wtip: [0, 2], sh_n: [0, 2], el_n: [0, 2], paw_n: [0, 2], ftoe_n: [0, 2], sh_f: [0, 2], el_f: [0, 2], paw_f: [0, 2], ftoe_f: [0, 2], hip_n: [0, 2], hip_f: [0, 2]}
+holds: []
+paint: []
