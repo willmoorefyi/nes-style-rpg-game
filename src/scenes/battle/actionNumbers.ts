@@ -12,6 +12,7 @@ import { ICON_LIFT } from './fx/statusIcons.js';
 import { iconsFor } from './fx/statusRules.js';
 import { stoneTextures } from './fx/stoneTextures.js';
 import { headOf } from './fx/texturePixels.js';
+import { colossusAt } from './colossus/colossusProxy.js';
 
 export class ActionNumbers {
   constructor(
@@ -33,7 +34,7 @@ export class ActionNumbers {
       if (!evt.targetId.startsWith('enemy_') || evt.isHeal) continue;
       const sprite = this.display.enemySprites[parseInt(evt.targetId.split('_')[1], 10)];
       if (!sprite) continue;
-      this.effects.addFlash(slashEffect(sprite), 12);
+      this.effects.addFlash(slashEffect(colossusAt(sprite)?.slashBox() ?? sprite), 12);   // a colossus: at its melee point
     }
   }
 
@@ -56,6 +57,8 @@ export class ActionNumbers {
     const statuses = this.display.presented?.enemies[idx]?.statuses ?? [];
     if (iconsFor(statuses, this.display.statusVisuals?.() ?? {}).length === 0) return null;
     const h = sprite instanceof Sprite ? headOf(stoneTextures.coloured(sprite.texture)) : null;
+    const c = colossusAt(sprite);
+    if (c) return c.anchors().head.y - ICON_LIFT;
     const headY = h ? sprite.y + h.y * sprite.scale.y : sprite.y + sprite.height * 0.33;
     return headY - ICON_LIFT;
   }

@@ -5,6 +5,8 @@
  *   ?enemyAnim=step   time is frozen; `.` steps 1 frame forward, `,` 1 back (replayed from t = 0); a corner label shows
  *                     `enemy: frame / t`
  *   &slow=N           divides dt
+ * A colossus form (docs/CHAOS_FORMS_PLAN.md 4.3, R17) loops slam, beam, cast and hurt (its own timelines, in place),
+ * and its step label reads `enemy: <timeline> / <frame>`.
  * In the battle these run on the scene-wide dev clock (battleDevClock.ts): it steps and slows every system, and the
  * preview only drives the loop on that dt (`,` is not available there). BattleScene calls enemyAnimPreview.tick() once
  * per update, after the dev clock, and dispose() on exit.
@@ -13,6 +15,8 @@ import { BitmapText, type Container } from 'pixi.js';
 import { NES_FONT } from '../../ui/NESFont.js';
 import { BATTLE_MESSAGE_HEIGHT } from './BattleSceneTypes.js';
 import { ATTACK_FRAMES, CAST_FRAMES, HURT_FRAMES, type EnemyPoseController } from './EnemyPoseController.js';
+import { EnemyActorPoses } from './colossus/enemyActorView.js';
+import { TIMELINE_FRAMES } from './colossus/colossusChoreography.js';
 
 export type PreviewMode = 'loop' | 'step';
 export const STAGGER = 20;
@@ -37,9 +41,15 @@ export interface PreviewTarget {
   attack?(i: number): void;
   /** Enemy i's attack length (a travelling attack is longer); ATTACK_FRAMES when absent. */
   attackFrames?(i: number): number;
+  /** Enemy i is a colossus form (it loops colossusSchedule). */
+  colossus?(i: number): boolean;
+  /** Start enemy i's beam (a colossus). */
+  beam?(i: number): void;
+  /** The step label's pose text for enemy i (a colossus's timeline and frame), or null for the pose name. */
+  label?(i: number): string | null;
 }
 
-type Action = 'attack' | 'hurt' | 'cast';
+type Action = 'attack' | 'hurt' | 'cast' | 'beam';
 interface KeySource {
   addEventListener(type: 'keydown', fn: (e: { key: string }) => void): void;
   removeEventListener(type: 'keydown', fn: (e: { key: string }) => void): void;
@@ -50,6 +60,15 @@ export function schedule(hasCast: boolean, attackFrames = ATTACK_FRAMES): { cycl
   const events: [Action, number][] = [['attack', 0], ['hurt', attackFrames + PAUSE]];
   let t = attackFrames + PAUSE + HURT_FRAMES + PAUSE;
   if (hasCast) { events.push(['cast', t]); t += CAST_FRAMES + PAUSE; }
+  return { cycle: t, events };
+}
+
+/** A colossus's loop: slam, beam, cast and hurt, each followed by the pause. */
+export function colossusSchedule(): { cycle: number; events: [Action, number][] } {
+  const events: [Action, number][] = [];
+  let t = 0;
+  for (const [a, n] of [['attack', TIMELINE_FRAMES.slam], ['beam', TIMELINE_FRAMES.beam], ['cast', TIMELINE_FRAMES.cast],
+    ['hurt', TIMELINE_FRAMES.hurt]] as [Action, number][]) { events.push([a, t]); t += n + PAUSE; }
   return { cycle: t, events };
 }
 
@@ -79,7 +98,7 @@ export class EnemyAnimPreview {
       if (local < 0) continue;
       let loop = this.loops.get(i);
       if (!loop) {
-        loop = schedule(this.target.hasCast(i), this.target.attackFrames?.(i) ?? ATTACK_FRAMES);
+        loop = this.target.colossus?.(i) ? colossusSchedule() : schedule(this.target.hasCast(i), this.target.attackFrames?.(i) ?? ATTACK_FRAMES);
         this.loops.set(i, loop);
       }
       const { cycle, events } = loop;
@@ -87,7 +106,7 @@ export class EnemyAnimPreview {
         if (local % cycle !== at) continue;
         const p = this.target.poses;
         if (action === 'attack') { if (this.target.attack) this.target.attack(i); else p.playAttack(i); }
-        else if (action === 'hurt') p.playHurt(i); else p.playCast(i);
+        else if (action === 'hurt') p.playHurt(i); else if (action === 'beam') this.target.beam?.(i); else p.playCast(i);
       }
     }
   }
@@ -118,7 +137,7 @@ export class EnemyAnimPreview {
   labelText(): string {
     return Array.from({ length: this.target.count }, (_, i) => {
       const st = this.target.poses.state(i);
-      return `${this.target.name(i)}: ${st.pose} / ${Math.floor(this.target.poses.debug(i).t)}`;
+      return `${this.target.name(i)}: ${this.target.label?.(i) ?? `${st.pose} / ${Math.floor(this.target.poses.debug(i).t)}`}`;
     }).join('\n');
   }
 
@@ -153,6 +172,16 @@ function firstLiving(sprites: readonly Container[] | undefined): Container | nul
   return sprites?.find((s) => s.visible && s.alpha > 0) ?? null;
 }
 
+/** The preview's view of a battle display: the poses (routed for a colossus, EnemyActorPoses), the view's travel. */
+export function previewTarget(host: PreviewHost, names: readonly string[], target: () => Container | null): PreviewTarget {
+  const view = host.enemyView!;
+  const routed = view.poses instanceof EnemyActorPoses ? view.poses : null;
+  return { poses: view.poses, count: host.enemySprites.length, hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}`,
+    ...(view.playAttack ? { attack: (i: number) => view.playAttack?.(i, target()) } : {}),
+    ...(view.attackLength ? { attackFrames: (i: number) => view.attackLength?.(i, target()) ?? ATTACK_FRAMES } : {}),
+    ...(routed ? { colossus: (i: number) => routed.colossus(i) !== null, beam: (i: number) => routed.playBeam(i), label: (i: number) => routed.label(i) } : {}) };
+}
+
 const active = new WeakMap<object, EnemyAnimPreview>();
 
 /** BattleScene hooks: one call per update with the dev clock's dt (the loop driver runs at slow 1 on it, since the clock
@@ -163,12 +192,7 @@ export const enemyAnimPreview = {
     let p = active.get(host);
     if (!p) {
       if (!parseEnemyAnim(location.search)) return;
-      const view = host.enemyView;
-      const target = () => firstLiving(host.partySprites);
-      p = new EnemyAnimPreview('loop', 1, { poses: view.poses, count: host.enemySprites.length,
-        hasCast: (i) => view.hasCast(i), name: (i) => names[i] ?? `enemy ${i}`,
-        ...(view.playAttack ? { attack: (i: number) => view.playAttack?.(i, target()) } : {}),
-        ...(view.attackLength ? { attackFrames: (i: number) => view.attackLength?.(i, target()) ?? ATTACK_FRAMES } : {}) });
+      p = new EnemyAnimPreview('loop', 1, previewTarget(host, names, () => firstLiving(host.partySprites)));
       active.set(host, p);
     }
     p.frameDt(dt);

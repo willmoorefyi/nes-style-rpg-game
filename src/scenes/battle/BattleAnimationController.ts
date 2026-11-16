@@ -16,6 +16,7 @@ import { noopActionFx, noopStatusFx, type ActionFx, type StatusFx } from './fx/i
 import { actionTargetIds, diffStatuses, pendingHolds, statusSets, type StatusDiff } from './presentedState.js';
 import { afraidSkip, isAfraid } from './fearAnnounce.js';
 import type { SpellData } from '../../types/index.js';
+import { noopFormChange, type FormChangeHook } from './formChangeView.js';
 export { ELEMENT_COLORS } from './BattleEffects.js';
 export { ANNOUNCE_FRAMES, RESULT_FRAMES, ROUND_END_FRAMES } from './battleTiming.js';
 export { formatAnnouncement } from './battleMessageUtils.js';
@@ -23,7 +24,7 @@ export { formatAnnouncement } from './battleMessageUtils.js';
  *  then a still beat before the next announcement. The holds live in battleTiming.ts (re-exported above for older
  *  callers) and scale with the message speed; confirm skips any of them, one hold per press. */
 export class BattleAnimationController {
-  animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'effect' | 'result' | 'step_back' | 'beat' | 'round_end' = 'announce';
+  animPhase: 'announce' | 'step_forward' | 'enemy_lunge' | 'execute' | 'effect' | 'result' | 'step_back' | 'beat' | 'round_end' | 'interlude' = 'announce';
   animTimer = 0;
   animActorSprite: Container | null = null;
   animActorOrigX = 0;
@@ -55,7 +56,7 @@ export class BattleAnimationController {
   private currentActionInfo: NextActionInfo | null = null;
   private announcement = ''; private lostTurn = false;
   /** Spell / item effects and status overlays (BattleScene sets them from the fx factories; no-ops by default). */
-  fx: ActionFx = noopActionFx; statusFx: StatusFx = noopStatusFx;
+  fx: ActionFx = noopActionFx; statusFx: StatusFx = noopStatusFx; formView: FormChangeHook = noopFormChange;
   /** The battle's spells (the target set of an all-target spell). */
   spells: readonly SpellData[] = [];
   /** The target set captured at announce time, the effect's impact frame, and the resolved action. */
@@ -197,6 +198,7 @@ export class BattleAnimationController {
         if (this.animTimer >= holdFrames(ACTION_BEAT_FRAMES) || confirmSkip) { this.animTimer = 0; this.animPhase = 'announce'; }
         break;
       }
+      case 'interlude': if (this.formView.update(dt, confirmSkip)) this.completeAction(); break;   // pass C: a form change
       case 'round_end': {
         // The last result line stays up for a moment, then the round resolves by itself (confirm skips the wait).
         // Fades and lunges always finish first, so the next menu never opens over a dying or attacking enemy.
@@ -233,7 +235,7 @@ export class BattleAnimationController {
     if (!this.resolved) return;
     const { result, diff } = this.resolved;
     const info = this.currentActionInfo;
-    this.spawnFloatingTextsFromEvents(result.damageEvents);
+    this.spawnFloatingTextsFromEvents(result.damageEvents); this.formView.queue(result);
     if (result.missed && this.targetSprite) this.numbers.addFloat('Miss', 'miss', this.targetSprite);
     if (!this.animActorIsEnemy && info?.actionType === 'fight') this.numbers.slashTargets(result.damageEvents);
     if (info) emitActionSounds(info, result, this.emit);
@@ -272,7 +274,7 @@ export class BattleAnimationController {
     const view = this.display.enemyView;
     const type = this.currentActionInfo?.actionType;
     this.animEnemyIndex = this.animActorSprite ? this.display.enemySprites.indexOf(this.animActorSprite) : -1;
-    if (!view || this.animEnemyIndex < 0 || (type !== 'fight' && type !== 'magic')) return false;
+    if (!view || this.animEnemyIndex < 0 || (type !== 'fight' && type !== 'magic' && type !== 'slam')) return false;
     if (type === 'magic') view.poses.playCast(this.animEnemyIndex); else view.playAttack(this.animEnemyIndex, this.targetSprite);
     return true;
   }
@@ -285,6 +287,7 @@ export class BattleAnimationController {
   }
   /** K4: Gray out completed action and advance to next or end-of-round */
   private completeAction(): void {
+    if (this.formView.start()) { this.animPhase = 'interlude'; return; }
     if (this.display.holds.length > 0) { this.display.holds = []; this.presentState(); }
     this.turnList.advance();
     if (this.animActorSprite) this.display.setActorPose(this.animActorSprite, null);

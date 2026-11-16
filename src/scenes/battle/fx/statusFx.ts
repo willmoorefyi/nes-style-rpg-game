@@ -21,6 +21,7 @@ import { iconsFor, shownOn, statusTint, type StatusVisuals } from './statusRules
 import { stoneTextures } from './stoneTextures.js';
 import { headOf } from './texturePixels.js';
 import type { StatusFx } from './index.js';
+import { colossusAt, colossusStatusAnchor } from '../colossus/colossusProxy.js';
 
 /** Frames an overlay takes to fade out after its status ends. */
 export const STATUS_FADE_FRAMES = 12;
@@ -180,6 +181,8 @@ export class BattleStatusFx implements StatusFx {
 
   /** The head (the frame's topmost opaque row, else the body box's top-centre) and the body box, in fx.status space. */
   private anchorOf(sprite: Container, side: 'party' | 'enemy'): StatusAnchor {
+    const c = colossusAt(sprite);
+    if (c) return colossusStatusAnchor(c);           // the head anchor's row, inside y 140-760 (CHAOS_FORMS_PLAN 4.4)
     const b = sprite.getBounds();
     const tl = this.layers.fx.status.toLocal({ x: b.x, y: b.y });
     const box: FxBox = { x: tl.x + b.width * 0.15, y: tl.y + b.height * 0.33, w: b.width * 0.7, h: b.height * 0.62 };

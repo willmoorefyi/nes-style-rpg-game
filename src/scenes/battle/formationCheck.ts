@@ -7,7 +7,10 @@
 import type { EnemyData } from '../../types/index.js';
 import { monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
 import { enemyBoxInput } from '../../rendering/monsterAnchors.js';
-import { formationFits, layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from './EnemyLayoutAi.js';
+import { formationFits, layoutSizeOf, type EnemyBox, type EnemyBoxInput, type EnemySizeClass } from './EnemyLayoutAi.js';
+import { colossusOf } from './colossus/colossusIndex.js';
+
+export { colossusOf };
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
 export const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
@@ -27,3 +30,15 @@ export function formationFitsArt(enemies: readonly EnemyData[],
 /** The warning for a refused formation, naming its enemy ids. */
 export const formationWarning = (ids: readonly string[]): string =>
   `sandbox: formation does not fit at an integer scale >= 2: ${ids.join(', ')}`;
+
+/** The layout inputs of the atlas enemies only (a colossus record is placed by its ColossusView, never laid out or
+ *  checked, docs/CHAOS_FORMS_PLAN.md 4.2), and the map of their boxes back to enemy order (a colossus gets an empty box). */
+export function atlasLayout(enemies: readonly EnemyData[], frames: readonly (MonsterFrames | null | undefined)[]):
+  { inputs: EnemyBoxInput[]; boxesOf: (boxes: EnemyBox[]) => EnemyBox[] } {
+  const atlas = enemies.map((e, i) => (colossusOf(e) ? null : boxInputOf(e, frames[i])));
+  const inputs = atlas.filter((b): b is EnemyBoxInput => b !== null);
+  return { inputs, boxesOf: (boxes) => {
+    let k = 0;
+    return atlas.map((b) => (b ? boxes[k++] : { x: 0, feetY: 0, w: 0, h: 0, scaleFactor: 1 }));
+  } };
+}

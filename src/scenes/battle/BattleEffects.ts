@@ -3,6 +3,7 @@ import { createFloatingNumber, floatPlacement, FLOAT_FRAMES, type FloatKind } fr
 import { BattleLayers } from './BattleLayers.js';
 import { stepAlpha } from './fx/emitterCore.js';
 import { stoneTextures } from './fx/stoneTextures.js';
+import { colossusAt } from './colossus/colossusProxy.js';
 
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
@@ -35,8 +36,10 @@ export class BattleEffects {
 
   /** `iconRowBottom`: the bottom of the target's status icon row in the sprite's space (null: no icon, F6). */
   addFloating(label: string, kind: FloatKind, sprite: Container, iconRowBottom: number | null = null): void {
-    const { y, minY } = floatPlacement(sprite.y, iconRowBottom);
-    const text = createFloatingNumber(label, kind, sprite, y);
+    // a colossus (its proxy) takes the number at its core anchor, kept inside the field (docs/CHAOS_FORMS_PLAN.md 4.4)
+    const core = colossusAt(sprite)?.anchors().core;
+    const { y, minY } = floatPlacement(core?.y ?? sprite.y, iconRowBottom);
+    const text = createFloatingNumber(label, kind, core ? { x: core.x, width: 0 } : sprite, y);
     this.layers.fx.numbers.addChild(text);
     this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES, minY });
   }
@@ -49,6 +52,8 @@ export class BattleEffects {
   /** A coloured glow over `sprite` (its silhouette when it is art, else a box) for a spell's element. */
   elementFlash(sprite: Container, element: string): void {
     const color = ELEMENT_COLORS[element] ?? 0xffffff;
+    // R15: a colossus flashes white layer by layer; no box over its proxy
+    if (colossusAt(sprite)) { colossusAt(sprite)!.flashWhite(); return; }
     let overlay: Container;
     if (sprite instanceof Sprite) {
       // the coloured frame, not a stoned actor's grey copy, so a hit on stone still reads

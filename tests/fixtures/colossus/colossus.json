@@ -1,0 +1,940 @@
+{
+ "version": 1,
+ "forms": {
+  "fixture_horizon": {
+   "canvas": [
+    900,
+    520
+   ],
+   "scale": 3,
+   "place": [
+    -390,
+    -302
+   ],
+   "coverBox": [
+    0,
+    0,
+    900,
+    386
+   ],
+   "rimRow": 224,
+   "anchors": {
+    "target": [
+     450,
+     220
+    ],
+    "core": [
+     450,
+     240
+    ],
+    "head": [
+     450,
+     150
+    ],
+    "hands": [
+     [
+      40,
+      300
+     ],
+     [
+      466,
+      224
+     ]
+    ],
+    "melee": [
+     530,
+     274
+    ],
+    "feet": [
+     450,
+     230
+    ]
+   },
+   "targetRect": [
+    380,
+    180,
+    140,
+    120
+   ],
+   "layers": [
+    {
+     "name": "body",
+     "kind": "body",
+     "frames": {
+      "base": {
+       "at": [
+        0,
+        0
+       ],
+       "size": [
+        900,
+        520
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/body_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 900,
+         "h": 520
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "arm_l",
+     "kind": "limb",
+     "frames": {
+      "base": {
+       "at": [
+        0,
+        260
+       ],
+       "size": [
+        200,
+        260
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/arm_l_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 200,
+         "h": 260
+        }
+       ]
+      },
+      "raise": {
+       "at": [
+        0,
+        240
+       ],
+       "size": [
+        200,
+        260
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/arm_l_raise.png",
+         "x": 0,
+         "y": 0,
+         "w": 200,
+         "h": 260
+        }
+       ]
+      },
+      "slam": {
+       "at": [
+        0,
+        270
+       ],
+       "size": [
+        200,
+        250
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/arm_l_slam.png",
+         "x": 0,
+         "y": 0,
+         "w": 200,
+         "h": 250
+        }
+       ]
+      },
+      "recoil": {
+       "at": [
+        0,
+        262
+       ],
+       "size": [
+        200,
+        258
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/arm_l_recoil.png",
+         "x": 0,
+         "y": 0,
+         "w": 200,
+         "h": 258
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "cloud",
+     "kind": "cloud",
+     "frames": {
+      "base": {
+       "at": [
+        0,
+        150
+       ],
+       "size": [
+        900,
+        60
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/cloud_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 900,
+         "h": 60
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "core",
+     "kind": "core",
+     "frames": {
+      "base": {
+       "at": [
+        400,
+        190
+       ],
+       "size": [
+        100,
+        120
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/core_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 120
+        }
+       ]
+      },
+      "open": {
+       "at": [
+        390,
+        180
+       ],
+       "size": [
+        120,
+        140
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/core_open.png",
+         "x": 0,
+         "y": 0,
+         "w": 120,
+         "h": 140
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "glow",
+     "kind": "glow",
+     "frames": {
+      "base": {
+       "at": [
+        330,
+        120
+       ],
+       "size": [
+        240,
+        260
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/glow_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 240,
+         "h": 260
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "corona",
+     "kind": "corona",
+     "frames": {
+      "base": {
+       "at": [
+        250,
+        0
+       ],
+       "size": [
+        400,
+        160
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/corona_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 400,
+         "h": 160
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_frost",
+     "kind": "moon",
+     "orbit": 6,
+     "frames": {
+      "base": {
+       "at": [
+        300,
+        280
+       ],
+       "size": [
+        40,
+        40
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/moon_frost_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 40,
+         "h": 40
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_ember",
+     "kind": "moon",
+     "orbit": 6,
+     "frames": {
+      "base": {
+       "at": [
+        560,
+        280
+       ],
+       "size": [
+        40,
+        40
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/moon_ember_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 40,
+         "h": 40
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_abyss",
+     "kind": "moon",
+     "orbit": 6,
+     "frames": {
+      "base": {
+       "at": [
+        340,
+        340
+       ],
+       "size": [
+        40,
+        40
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/moon_abyss_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 40,
+         "h": 40
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_storm",
+     "kind": "moon",
+     "orbit": 6,
+     "frames": {
+      "base": {
+       "at": [
+        520,
+        340
+       ],
+       "size": [
+        40,
+        40
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/moon_storm_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 40,
+         "h": 40
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "hand",
+     "kind": "overhang",
+     "over": true,
+     "frames": {
+      "base": {
+       "at": [
+        430,
+        210
+       ],
+       "size": [
+        133,
+        47
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/hand_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 133,
+         "h": 47
+        }
+       ]
+      },
+      "lift": {
+       "at": [
+        430,
+        196
+       ],
+       "size": [
+        133,
+        47
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/hand_lift.png",
+         "x": 0,
+         "y": 0,
+         "w": 133,
+         "h": 47
+        }
+       ]
+      },
+      "slam": {
+       "at": [
+        430,
+        214
+       ],
+       "size": [
+        133,
+        47
+       ],
+       "tiles": [
+        {
+         "file": "fixture_horizon/hand_slam.png",
+         "x": 0,
+         "y": 0,
+         "w": 133,
+         "h": 47
+        }
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "fixture_orrery": {
+   "canvas": [
+    440,
+    300
+   ],
+   "scale": 3,
+   "place": [
+    -60,
+    60
+   ],
+   "visibleBox": [
+    20,
+    20,
+    420,
+    240
+   ],
+   "anchors": {
+    "target": [
+     220,
+     120
+    ],
+    "core": [
+     220,
+     140
+    ],
+    "head": [
+     220,
+     60
+    ],
+    "hands": [
+     [
+      60,
+      150
+     ],
+     [
+      380,
+      150
+     ]
+    ],
+    "melee": [
+     330,
+     170
+    ],
+    "feet": [
+     220,
+     153
+    ]
+   },
+   "targetRect": [
+    150,
+    80,
+    140,
+    140
+   ],
+   "layers": [
+    {
+     "name": "body",
+     "kind": "body",
+     "frames": {
+      "base": {
+       "at": [
+        60,
+        20
+       ],
+       "size": [
+        320,
+        280
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/body_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 320,
+         "h": 280
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "gauntlet_l",
+     "kind": "limb",
+     "frames": {
+      "base": {
+       "at": [
+        20,
+        120
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_l_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "raise": {
+       "at": [
+        20,
+        100
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_l_raise.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "slam": {
+       "at": [
+        20,
+        130
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_l_slam.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "recoil": {
+       "at": [
+        20,
+        124
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_l_recoil.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "gauntlet_r",
+     "kind": "limb",
+     "frames": {
+      "base": {
+       "at": [
+        320,
+        120
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_r_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "raise": {
+       "at": [
+        320,
+        100
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_r_raise.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "slam": {
+       "at": [
+        320,
+        130
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_r_slam.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      },
+      "recoil": {
+       "at": [
+        320,
+        124
+       ],
+       "size": [
+        100,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/gauntlet_r_recoil.png",
+         "x": 0,
+         "y": 0,
+         "w": 100,
+         "h": 80
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "core",
+     "kind": "core",
+     "frames": {
+      "base": {
+       "at": [
+        190,
+        30
+       ],
+       "size": [
+        60,
+        60
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/core_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 60,
+         "h": 60
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "glow",
+     "kind": "glow",
+     "frames": {
+      "base": {
+       "at": [
+        150,
+        0
+       ],
+       "size": [
+        140,
+        120
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/glow_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 140,
+         "h": 120
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_frost",
+     "kind": "moon",
+     "orbit": 4,
+     "frames": {
+      "base": {
+       "at": [
+        100,
+        60
+       ],
+       "size": [
+        30,
+        30
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/moon_frost_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 30,
+         "h": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_ember",
+     "kind": "moon",
+     "orbit": 4,
+     "frames": {
+      "base": {
+       "at": [
+        310,
+        60
+       ],
+       "size": [
+        30,
+        30
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/moon_ember_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 30,
+         "h": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_abyss",
+     "kind": "moon",
+     "orbit": 4,
+     "frames": {
+      "base": {
+       "at": [
+        130,
+        220
+       ],
+       "size": [
+        30,
+        30
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/moon_abyss_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 30,
+         "h": 30
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "moon_storm",
+     "kind": "moon",
+     "orbit": 4,
+     "frames": {
+      "base": {
+       "at": [
+        280,
+        220
+       ],
+       "size": [
+        30,
+        30
+       ],
+       "tiles": [
+        {
+         "file": "fixture_orrery/moon_storm_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 30,
+         "h": 30
+        }
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "fixture_wide": {
+   "canvas": [
+    2600,
+    300
+   ],
+   "scale": 1,
+   "place": [
+    -340,
+    100
+   ],
+   "anchors": {
+    "target": [
+     1300,
+     150
+    ],
+    "core": [
+     1300,
+     150
+    ],
+    "head": [
+     1300,
+     60
+    ],
+    "hands": [
+     [
+      100,
+      250
+     ],
+     [
+      2500,
+      250
+     ]
+    ],
+    "melee": [
+     1500,
+     200
+    ],
+    "feet": [
+     1300,
+     290
+    ]
+   },
+   "targetRect": [
+    1100,
+    50,
+    400,
+    200
+   ],
+   "layers": [
+    {
+     "name": "body",
+     "kind": "body",
+     "frames": {
+      "base": {
+       "at": [
+        0,
+        0
+       ],
+       "size": [
+        2600,
+        300
+       ],
+       "tiles": [
+        {
+         "file": "fixture_wide/body_base_0.png",
+         "x": 0,
+         "y": 0,
+         "w": 2048,
+         "h": 300
+        },
+        {
+         "file": "fixture_wide/body_base_1.png",
+         "x": 2048,
+         "y": 0,
+         "w": 552,
+         "h": 300
+        }
+       ]
+      }
+     }
+    }
+   ]
+  }
+ }
+}

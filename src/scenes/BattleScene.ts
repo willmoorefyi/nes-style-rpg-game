@@ -21,6 +21,7 @@ import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
 import { enemyAnimPreview } from './battle/enemyAnimPreview.js';
+import { FormChangeView } from './battle/formChangeView.js';
 import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_LINE, BATTLE_MESSAGE_HEIGHT, STRIP_Y, STRIP_HEIGHT, ENEMY_WINDOW, COMMAND_WINDOW,
   FLOAT_OUTLINE } from './battle/BattleSceneTypes.js';
 
@@ -129,6 +130,8 @@ export class BattleScene implements Scene {
     this.animation.spells = this.spells;
     this.animation.fx = createActionFx(this.layers, this.display);
     this.animation.statusFx = createStatusFx(this.layers, this.display, this.battle);
+    this.animation.formView = new FormChangeView({ battle: this.battle, display: this.display, events: this.deps.events, input: this.deps.input,
+      setMessage: (text) => this.messageText.setText(text, true), music: (id) => { void this.deps.audio?.playMusic(id); } });
     this.lists = new BattleListMenus({
       battle: this.battle, config: this.config, spells: this.spells, events: this.deps.events, listWindow: this.enemyWindow,
       showNotice: (text) => this.showNotice(text),
@@ -502,6 +505,7 @@ export class BattleScene implements Scene {
 
   exit(): void {
     this.display?.enemyView?.release();               // the atlas may free this battle's monster pages (FW-8)
+    this.display?.colossus.dispose();                 // every colossus texture is destroyed (R27)
     enemyAnimPreview.dispose(this.display);
     this.devClock?.dispose();
     this.devClock = null;

@@ -11,6 +11,7 @@ import { SpellRegistry } from '../../../data/SpellRegistry.js';
 import { OutlinedText } from '../../../ui/NESFont.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import { FLOAT_OUTLINE } from '../BattleSceneTypes.js';
+import { colossusAt } from '../colossus/colossusProxy.js';
 import { bodyBox, createEmitter, seededRng, stepAlpha, type Emitter, type FxBox } from './emitters.js';
 import { effectIdFor, type FxEffect } from './fxDefs.js';
 import { FxBatch, ScreenTint } from './fxRender.js';
@@ -143,6 +144,8 @@ export class BattleActionFx implements ActionFx {
 
   /** The body inside a sprite's bounds (bodyBox), in the effect layer's space. */
   private box(sprite: Container): FxBox {
+    const c = colossusAt(sprite);
+    if (c) return bodyBox(c.effectBox());             // a colossus: its synthetic body box at the core (layer space)
     const b = sprite.getBounds();
     const tl = this.layers.fx.spell.toLocal({ x: b.x, y: b.y });
     return bodyBox({ x: tl.x, y: tl.y, width: b.width, height: b.height });

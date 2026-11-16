@@ -1,7 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 
 /** Three bright diagonal strokes across a target's art (a melee hit); the caller fades and removes it. */
-export function slashEffect(target: Container): Graphics {
+export function slashEffect(target: Pick<Container, 'x' | 'y' | 'width' | 'height'>): Graphics {
   const w = Math.max(48, target.width);
   const h = Math.max(48, target.height);
   const cx = target.x + w / 2;
