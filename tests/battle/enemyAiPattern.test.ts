@@ -43,6 +43,22 @@ describe('data-driven enemy ai', () => {
     expect([...counts.keys()].sort()).toEqual(['fight', 'fir2', 'fast', 'hold', 'ice2', 'lit2', 'slep', 'slow', 'slp2'].sort());
   });
 
+  it('Dark Fighter casts CUR3 (rate 0.5) at the most hurt living ally, herself when she is the most hurt', () => {
+    const df = enemyCopy('dark_fighter');
+    expect(df.ai?.rate).toBe(0.5);
+    const ai = dataDrivenAI(df.ai!, SPELLS)!;
+    const party = makeParty(10, 'start', false);
+    const mk = (id: string, hp: number): EnemyInstance =>
+      ({ id, data: df, currentHp: hp, status: new StatusTracker(), buffs: new Map(), displayName: 'Dark Fighter' });
+    const spell = () => 0.9; // past the Fight share (0.5): the spell
+    const self = mk('enemy_0', 200);
+    const allies = [self, mk('enemy_1', 120), mk('enemy_2', 0), mk('enemy_3', 180)];
+    expect(ai.selectAction(self, party, allies, 1, spell)).toMatchObject({ type: 'magic', spellId: 'cure3', targetId: 'enemy_1' });
+    self.currentHp = 50;
+    expect(ai.selectAction(self, party, allies, 1, spell)).toMatchObject({ type: 'magic', spellId: 'cure3', targetId: 'enemy_0' });
+    expect(ai.selectAction(self, party, allies, 1, () => 0.2).type).toBe('fight');
+  });
+
   it('a boss phase keeps the data ai without a pattern warning, and still says its line', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const lich = enemyCopy('lich');

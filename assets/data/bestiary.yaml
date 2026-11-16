@@ -24,7 +24,7 @@ backgrounds:
     baretta: desert, basilisk: cave, allosaurus: forest, weretiger: forest, sand_worm: desert, minotaur_zombie: cave,
     king_mummy: temple, medusa: ocean, rakshasa: cave, clay_golem: cave, nightmare: dark_forest,
     sahagin_prince: ocean, deepeyes: ocean, sea_snake: ocean, sea_scorpion: shoreline, sea_troll: shoreline,
-    ghost: abandoned_castle, water_elemental: waterfall, water_naga: ocean, tyrannosaur: forest,
+    ghost: abandoned_castle, water_elemental: shoreline, water_naga: ocean, tyrannosaur: forest,
     black_knight: abandoned_castle, chimera: desert, guardian: temple, blue_dragon: temple, green_dragon: swamp,
     stone_golem: temple, air_elemental: temple, spirit_naga: temple, death_knight: evil_temple, earth_medusa: cave,
     black_flan: marsh, soldier: temple, vampire_lord: abandoned_castle, dark_fighter: evil_temple, rhyos: cave,
@@ -103,7 +103,7 @@ statuses: {poison: Poison, stun: Paralysis, sleep: Sleep, blind: Blind, stone: S
 # spec spell codes that spells.yaml does not have yet (the spec glossary; E-F3)
 spellNames: {fir3: FIR3, lit3: LIT3, ice3: ICE3, nuke: NUKE, rub: RUB, xxxx: XXXX, brak: BRAK, bane: BANE, stop: STOP,
   zap: ZAP!, xfer: XFER, wall: WALL, fog2: FOG2, inv2: INV2, hel2: HEL2, hel3: HEL3, cur4: CUR4, stun: STUN, blnd: BLND,
-  slo2: SLO2, cur3: CUR3}
+  slo2: SLO2}
 specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: Ink, squint: Death Gaze, scorch: Scorch,
   heat: Heat, blizzard: Blizzard Breath, frost: Frost, trance: Mind Blast, glance: Glance, stare: Stare,
   stinger: Poison Stinger, crack: Earthquake, thunder: Thunder Breath, poison: Poison Breath, nuclear: Nuclear,

@@ -19,7 +19,7 @@ const mapsDir = resolve(__dirname, '../../assets/maps');
 const items: Array<{ id: string; usableBy: string[] }> = parse(
   readFileSync(join(dataDir, 'items.yaml'), 'utf-8')
 );
-const spells: Array<{ id: string; element: string; effect: string }> = parse(
+const spells: Array<{ id: string; name: string; element: string; effect: string }> = parse(
   readFileSync(join(dataDir, 'spells.yaml'), 'utf-8')
 );
 const enemies: Array<{ id: string; weakness?: string; resist?: string; sprite?: string; size?: EnemySizeClass }> = parse(
@@ -509,6 +509,13 @@ describe('Cross-file validation: roster fields (num, protect, spells, ai, rematc
   it('every spell code is in spells.yaml or named by bestiary.yaml spellNames', () => {
     for (const e of roster) {
       for (const s of e.spells ?? []) expect(spellIds.has(s) || s in bestiary.spellNames, `${e.id}: ${s}`).toBe(true);
+    }
+  });
+
+  it('no spellNames display name is the name of a spells.yaml spell (use the spell id instead)', () => {
+    const names = new Map(spells.map((s) => [s.name, s.id]));
+    for (const [code, name] of Object.entries(bestiary.spellNames)) {
+      expect(names.get(name), `spellNames ${code}: ${name} is spells.yaml ${names.get(name)}`).toBeUndefined();
     }
   });
 

@@ -174,4 +174,8 @@ describe('roster data: bestiary lore and backgrounds', () => {
       'river', 'ruined_forest', 'shoreline', 'swamp', 'temple', 'waterfall'];
     for (const [id, bg] of Object.entries(bestiary.backgrounds.enemies)) expect(staged, id).toContain(bg);
   });
+
+  it('the water elemental stands on the shoreline (contrast; ROSTER_FIX_PLAN_2 P2-9)', () => {
+    expect(bestiary.backgrounds.enemies.water_elemental).toBe('shoreline');
+  });
 });

@@ -2857,7 +2857,7 @@
   name: Dark Fighter
   num: 117
   description: "A warrior-mage in dark half-plate and a hooded tabard. She heals herself, shields herself and strips your wards."
-  spells: [wall, xfer, hel3, fog2, inv2, cur4, hel2, cur3]
+  spells: [wall, xfer, hel3, fog2, inv2, cur4, hel2, cure3]
   stats:
     hp: 200
     strength: 32
@@ -2872,6 +2872,12 @@
     evade: 90
   xpReward: 3420
   goldReward: 3420
+  # rate 0.5: the median of the spell-casting roster entries of similar tier (ogre_mage, horned_devil, death_eye,
+  # hollow_seraph_2, chaos); no spec value is recorded for this entry. CUR3 is her only spell that exists.
+  ai:
+    rate: 0.5
+    actions:
+    - {type: magic, spellId: cure3, weight: 1}
   sprite: dark_fighter
   attack: melee
   size: small
