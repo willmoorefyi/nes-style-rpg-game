@@ -6,6 +6,7 @@ import type { StatusEffect } from './StatusEffects.js';
 import { healAmount, magicDamage } from './DamageFormula.js';
 import { partyMagicDefense } from './CombatStats.js';
 import { applyDebuffSpell, applyMoraleSpell, applyStatusSpell } from './SpellStatus.js';
+import { setEnemyHp } from './enemyHp.js';
 
 import type { DamageEvent } from './BattleStateMachine.js';
 
@@ -151,7 +152,7 @@ export class SpellExecutor {
         // EnemyInstance
         const enemy = target as EnemyInstance;
         const before = enemy.currentHp;
-        enemy.currentHp = Math.min(enemy.data.stats.hp, enemy.currentHp + heal);
+        setEnemyHp(enemy, Math.min(enemy.data.stats.hp, enemy.currentHp + heal));
         this.reportHeal(enemy.displayName, enemy.id, enemy.currentHp - before, spell.element);
       } else {
         // Character — skip fallen allies
@@ -199,7 +200,7 @@ export class SpellExecutor {
           resist: enemy.data.resist,
           elementalProfile: enemy.data.elementalProfile,
         }, this.deps.rng);
-        enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+        setEnemyHp(enemy, Math.max(0, enemy.currentHp - damage));
         this.deps.addMessage(`${enemy.displayName} takes ${damage} damage!`);
         this.deps.addDamageEvent({ targetId: enemy.id, damage, isHeal: false, isCrit: false, spellElement: spell.element });
         if (enemy.currentHp <= 0) this.deps.addMessage(`${enemy.displayName} defeated!`);
@@ -276,7 +277,7 @@ export class SpellExecutor {
         const enemy = target as EnemyInstance;
         if (enemy.currentHp <= 0) {
           enemy.status.remove('death');
-          enemy.currentHp = 1;
+          setEnemyHp(enemy, 1);
           this.deps.addMessage(`${enemy.displayName} is revived!`);
         } else {
           this.deps.addMessage('No effect.');

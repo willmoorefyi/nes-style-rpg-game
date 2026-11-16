@@ -449,7 +449,8 @@ describe('debug scenarios', () => {
     for (const [enemy, actions] of Object.entries(s.enemyAi ?? {})) {
       expect((s.enemies ?? []).includes(enemy), `enemyAi for ${enemy} not in the battle`).toBe(true);
       for (const a of actions) {
-        expect(['fight', 'magic']).toContain(a.type);
+        // A4: `slam` (an enemy-only multi-target Fight, CHAOS_FORMS_PLAN 2.2 item 9) is allowed alongside fight and magic
+        expect(['fight', 'magic', 'slam']).toContain(a.type);
         if (a.type === 'magic') expect(spellIds.has(a.spellId ?? ''), `spell ${a.spellId}`).toBe(true);
       }
     }
@@ -499,12 +500,23 @@ describe('Cross-file validation: roster fields (num, protect, spells, ai, rematc
     for (const n of nums) expect(n >= 1 && n <= 128, String(n)).toBe(true);
   });
 
+  // CHAOS_FORMS_PLAN 2.2 item 9: a `slam` action (F3 / F4) has no spell; every magic action names one
+  const magicActions = (e: EnemyData) => (e.ai?.actions ?? []).flatMap((a) => (a.type === 'magic' ? [a] : []));
+
   it('every ai spellId is in spells.yaml', () => {
-    for (const e of roster) for (const a of e.ai?.actions ?? []) expect(spellIds.has(a.spellId), `${e.id}: ${a.spellId}`).toBe(true);
+    for (const e of roster) for (const a of magicActions(e)) expect(spellIds.has(a.spellId), `${e.id}: ${a.spellId}`).toBe(true);
   });
 
   it('every ai spell is one of the enemy\'s own spells', () => {
-    for (const e of roster) for (const a of e.ai?.actions ?? []) expect(e.spells ?? [], e.id).toContain(a.spellId);
+    for (const e of roster) for (const a of magicActions(e)) expect(e.spells ?? [], e.id).toContain(a.spellId);
+  });
+
+  it('a slam ai action only on a record with slam: {targets: 2} and colossus: (R9)', () => {
+    for (const e of roster) {
+      if (!(e.ai?.actions ?? []).some((a) => a.type === 'slam')) continue;
+      expect([e.slam, typeof e.colossus], e.id).toEqual([{ targets: 2 }, 'string']);
+    }
+    expect(roster.filter((e) => e.slam).map((e) => e.id)).toEqual(['chaos_horizon', 'chaos_horizon_core']);
   });
 
   it('every spell code is in spells.yaml or named by bestiary.yaml spellNames', () => {

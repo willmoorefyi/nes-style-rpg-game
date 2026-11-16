@@ -411,7 +411,8 @@ i.e. 4200, 2400 and 900.
 - New AI keys are out of scope, except F3's `slam` action (2.2 item 9, R9 ruling).
 - A scenario `enemyAi` override applies to F1 only and is dropped at the first form change (R7 ruling).
 - **The beam (R9).** It is a named existing single-target black damage spell. TS-B picks the strongest one in
-  `spells.yaml` at C1 and records its id here and in ROSTER_LOG.
+  `spells.yaml` at C1 and records its id here and in ROSTER_LOG. **Picked at C1: `ice`** (power 20; `fire` and `lit`
+  are 10).
   - The view plays the beam timeline for any single-target black damage spell cast by a colossus form.
   - The colossus timelines are keyed by the presence of `colossus:` on the record, never by `attackAnim`: the
     validators allow only `'heavy'` there.

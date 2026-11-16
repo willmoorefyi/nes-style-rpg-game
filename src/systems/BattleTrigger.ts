@@ -7,6 +7,7 @@ import type { StatusEffect } from '../battle/StatusEffects.js';
 import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 import { seenFlag } from '../scenes/bestiary/bestiaryModel.js';
 import { battleArt, monsterSpriteKey } from '../rendering/BattleArt.js';
+import { formChain } from '../battle/bossForms.js';
 
 /** Loads the monster atlas pages a formation needs (BattleArt; tests inject their own). Never rejects. */
 export interface MonsterArtPreload {
@@ -78,6 +79,9 @@ export class BattleTrigger {
     const party = [...this.game.party.all];
     if (party.length === 0) return;
     for (const e of enemies) this.game.gameFlags.set(seenFlag(e.id));   // the bestiary's seen marks (BS-2)
+    // CHAOS_FORMS_PLAN 2.2: the form records load with the battle (Retry restarts from the root, D-U8)
+    const forms = formChain(enemies, [...this.enemyDataCache.values()]);
+    this.watchForms();
 
     const { onEnd } = options;
     // Game Over > Retry Battle puts the game back exactly as it is now (a caller-ended battle never retries)
@@ -101,6 +105,7 @@ export class BattleTrigger {
       enemyAi,
       enemyStatus,
       music: bossConfig?.isBoss ? 'boss' : undefined,
+      ...(forms.length > 0 ? { forms } : {}),
     };
     const counting = onEnd ? new RoundCountingBattleScene(deps, sceneConfig) : null;
     const battleScene = counting ?? new BattleScene(deps, sceneConfig);
@@ -116,6 +121,21 @@ export class BattleTrigger {
       stop();
       throw e;
     }
+  }
+
+  /**
+   * For this battle's lifetime (R20), a boss form change (`battle:formChange`, emitted at the interlude's swap) marks
+   * the new form seen in the bestiary; the subscription ends with the battle.
+   */
+  private watchForms(): void {
+    const events = this.game.events;
+    const onForm = ({ to }: { to: string }): void => this.game.gameFlags.set(seenFlag(to));
+    const onEnd = (): void => {
+      events.off('battle:formChange', onForm);
+      events.off('battleEnd', onEnd);
+    };
+    events.on('battle:formChange', onForm);
+    events.on('battleEnd', onEnd);
   }
 
   /** Listen for this battle's end once and hand it to `onEnd`; returns the unsubscribe. */

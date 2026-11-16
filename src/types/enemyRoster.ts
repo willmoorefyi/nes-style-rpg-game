@@ -15,11 +15,19 @@ export const ATTACK_STATUSES = ['poison', 'stun', 'sleep', 'blind', 'stone', 'de
 export type AttackStatus = (typeof ATTACK_STATUSES)[number];
 
 /** One data-driven enemy action: a spell from spells.yaml and its share of the casting turns. */
-export interface EnemyAiAction {
+export interface EnemyAiMagicAction {
   type: 'magic';
   spellId: string;
   weight: number;
 }
+
+/** CHAOS_FORMS_PLAN 2.2 item 9: the slam's share (0, 1] of the non-spell turns (`1 - rate`); the rest are Fight. */
+export interface EnemyAiSlamAction {
+  type: 'slam';
+  weight: number;
+}
+
+export type EnemyAiAction = EnemyAiMagicAction | EnemyAiSlamAction;
 
 /**
  * `ai`: the spec's spell-use rate (0..1, the chance a turn is a spell) and the spells it picks from, by weight. The

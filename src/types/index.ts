@@ -71,6 +71,10 @@ export interface BossPhase {
   attack?: number;
   /** `heavy` from this phase on (ROSTER_PLAN 7.2; validated, played by the boss rigs that need it). */
   attackAnim?: 'heavy';
+  /** A form phase (CHAOS_FORMS_PLAN 2.2): reaching the threshold re-points the instance to this enemy id. */
+  form?: string;
+  /** The transformation interlude id (battle-interludes.yaml) a form phase plays. */
+  interlude?: string;
 }
 
 /** Enemy combat numbers (FF1). The optional ones default to accuracy 0, evade 0, hits 1, crit 1 (out of 200). */
@@ -111,6 +115,14 @@ export interface EnemyData extends EnemyRosterFields {
   attackAnim?: 'heavy';
   /** A heavy attacker's tint pulse in the raised hold, "#rrggbb" (default #ffb0b0; lighter on pale art, the lich). */
   pulseTint?: string;
+  /** A boss form record (CHAOS_FORMS_PLAN 2.2, 3.6): the id of the battle's first form. Such records have no `num`. */
+  formOf?: string;
+  /** A colossus form (ColossusView): its art id in assets/sprites/colossus.json. */
+  colossus?: string;
+  /** Colossus layer frames that differ from the art's rest (F4: `{core: open}`). */
+  colossusVariant?: Record<string, string>;
+  /** F3's slam (R9): one physical attack on `targets` (2) different living heroes; only on colossus records. */
+  slam?: { targets: number };
 }
 
 export type ItemType = 'weapon' | 'armor' | 'consumable' | 'key';

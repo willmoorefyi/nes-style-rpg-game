@@ -34,11 +34,19 @@ describe('roster data: coverage and numbering', () => {
     expect([...sprites].filter((s) => !atlas.sheets[s])).toEqual([]);
   });
 
+  // CHAOS_FORMS_PLAN R11: a boss form record (`formOf`) has no num; it is listed under its root, never on its own
+  const numbered = enemies.filter((e) => !e.formOf);
+
+  it('the formOf filter excludes exactly the 3 Chaos form records, and none of them has a num', () => {
+    expect(enemies.filter((e) => e.formOf).map((e) => [e.id, e.num])).toEqual([
+      ['chaos_orrery', undefined], ['chaos_horizon', undefined], ['chaos_horizon_core', undefined]]);
+  });
+
   it('every enemy has a num; they are unique, from 1 to 128, and each new sheet uses its own id as the sprite', () => {
-    const nums = enemies.map((e) => e.num);
+    const nums = numbered.map((e) => e.num);
     expect(nums.every((n) => Number.isInteger(n) && n! >= 1 && n! <= 128)).toBe(true);
     expect(new Set(nums).size).toBe(nums.length);
-    for (const e of roster.filter((x) => !x.rematchOf)) expect(e.sprite, e.id).toBe(e.id);
+    for (const e of roster.filter((x) => !x.rematchOf && !x.formOf)) expect(e.sprite, e.id).toBe(e.id);
   });
 
   it('the fiends and Chaos sit at their spec numbers with the New Fiends names', () => {
@@ -73,7 +81,8 @@ describe('roster data: the 7.1 conversion', () => {
     expect([byId('crawler').stats.attack, byId('crawler').stats.hits]).toEqual([1, 8]);
     expect([byId('green_slime').stats.defense, byId('green_slime').stats.vitality]).toEqual([255, 99]);
     const chaos = byId('chaos');
-    expect([chaos.stats.hp, chaos.stats.magicDefense, chaos.stats.accuracy, chaos.xpReward, chaos.goldReward]).toEqual([2000, 200, 198, 0, 0]);
+    // CHAOS_FORMS_PLAN D-U3: the spec's 2000 HP became the 6000 HP pool shared by the four forms
+    expect([chaos.stats.hp, chaos.stats.magicDefense, chaos.stats.accuracy, chaos.xpReward, chaos.goldReward]).toEqual([6000, 200, 198, 0, 0]);
     const eye = byId('death_eye');
     expect([eye.xpReward, eye.goldReward, eye.stats.crit]).toEqual([1, 1, 40]);
     expect(byId('desert_baretta').goldReward).toBe(1);
@@ -120,7 +129,7 @@ describe('roster data: the 7.1 conversion', () => {
   it('ai: only spells.yaml spells, at the spec use rate; codes without a spell stay display-only', () => {
     expect(byId('astos').ai?.rate).toBe(0.75);
     expect(byId('astos').spells).toContain('rub');
-    expect(byId('astos').ai?.actions.map((a) => a.spellId)).toEqual(['fast', 'fir2', 'lit2', 'slow', 'dark', 'slep']);
+    expect(byId('astos').ai?.actions.map((a) => (a.type === 'magic' ? a.spellId : a.type))).toEqual(['fast', 'fir2', 'lit2', 'slow', 'dark', 'slep']);
     expect(byId('dark_wizard').spells?.length).toBe(6);
     expect(byId('dark_wizard').ai).toBeUndefined();
     expect(byId('lich_2').ai).toBeUndefined();

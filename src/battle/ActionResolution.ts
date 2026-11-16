@@ -28,7 +28,7 @@ export interface TargetContext {
 export function resolveActionTarget(action: QueuedAction, ctx: TargetContext): void {
   const cmd = action.command;
   if (!cmd.targetId || ctx.isAlive(cmd.targetId)) return;
-  if (cmd.type === 'fight' && action.isEnemy) {
+  if ((cmd.type === 'fight' || cmd.type === 'slam') && action.isEnemy) {
     // enemies retarget by the original party slots, so the front stays favoured
     const id = retargetEnemyTarget(ctx.partyIds, ctx.isAlive, ctx.rng);
     if (id) action.command = { ...cmd, targetId: id };
@@ -47,12 +47,18 @@ export function reservedItems(commands: readonly BattleCommand[], itemId: string
   return commands.filter((c) => c.type === 'item' && c.itemId === itemId).length;
 }
 
-/** B1: a crossed phase's `hits` / `attack` overrides, kept as battle-only buffs (the shared data never changes). */
+/**
+ * B1: a crossed phase's `hits` / `attack` overrides, kept as battle-only buffs (the shared data never changes). The
+ * deltas are also tracked in `phaseBuffs`, so a form change takes them off again while spell buffs stay (R6).
+ */
 export function applyPhaseOverrides(enemy: EnemyInstance, phase: BossPhase): void {
-  if (phase.hits !== undefined) enemy.buffs.set('hits', phase.hits - (enemy.data.stats.hits ?? 1));
-  if (phase.attack !== undefined) {
-    enemy.buffs.set('attack', (enemy.buffs.get('attack') ?? 0) + phase.attack - enemy.data.stats.attack);
-  }
+  const add = (stat: string, next: number): void => {
+    const before = enemy.buffs.get(stat) ?? 0;
+    enemy.buffs.set(stat, next);
+    (enemy.phaseBuffs ??= new Map()).set(stat, (enemy.phaseBuffs.get(stat) ?? 0) + next - before);
+  };
+  if (phase.hits !== undefined) add('hits', phase.hits - (enemy.data.stats.hits ?? 1));
+  if (phase.attack !== undefined) add('attack', (enemy.buffs.get('attack') ?? 0) + phase.attack - enemy.data.stats.attack);
 }
 
 /**
@@ -65,7 +71,8 @@ export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, 
   if (!phases) return;
   const hpPercent = enemy.currentHp / enemy.data.stats.hp;
   for (let i = 0; i < phases.length; i++) {
-    if (enemy.crossedPhases?.has(i) || hpPercent > phases[i].hpThreshold) continue;
+    // a form phase is never a plain phase: bossForms changes the form at its floor (CHAOS_FORMS_PLAN 2.2, R5)
+    if (phases[i].form || enemy.crossedPhases?.has(i) || hpPercent > phases[i].hpThreshold) continue;
     enemy.crossedPhases?.add(i);
     applyPhaseOverrides(enemy, phases[i]);
     const ai = enemy.aiBehavior;

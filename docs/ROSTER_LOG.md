@@ -936,3 +936,10 @@ except the expected sandbox warning):
   digits and drop apart (`zoom_chaos_103.png`); the top orb (art) still sits behind the middle digit (F6 scopes the
   status icon row only; a W5 note). BWIZ FIR2: flames on the chest, arms and robe (`fir2_chaos.png`, F7).
 - `sandbox=l30_lich&enemies=goblin,ogre` (no status): numbers 185, 81, 432 at the cell top rising as before.
+## Pass C (docs/CHAOS_FORMS_PLAN.md) - C1 TS-B notes (battle logic, 0 images)
+
+- The beam (2.4, R9): **`ice`**, the strongest single-target black damage spell in spells.yaml (power 20; fire and
+  lit are 10). F3 `chaos_horizon` and F4 `chaos_horizon_core` cast it (ai weights 2 and 4).
+- Form records `chaos_orrery`, `chaos_horizon`, `chaos_horizon_core` (`formOf: chaos`, no `num`), pool 6000 at
+  0.70 / 0.40 / 0.15 (floors 4200 / 2400 / 900). Until an approved colossus master exists they keep `sprite: chaos`
+  as the art fallback beside their `colossus:` id.

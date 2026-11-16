@@ -3247,7 +3247,7 @@
   spells: [ice3, lit3, slo2, cur4, fir3, ice2, fast, nuke]
   specials: [{id: crack, rate: 0.0625}, {id: inferno, rate: 0.0625}, {id: swirl, rate: 0.0625}, {id: tornado, rate: 0.0625}]
   stats:
-    hp: 2000
+    hp: 6000
     strength: 80
     agility: 22
     intelligence: 25
@@ -3270,8 +3270,146 @@
   attack: melee
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  # CHAOS_FORMS_PLAN 3.1 (D-U2, D-U3): one 6000 HP pool shared by the four form records; at 0.70 the Sovereign
+  # becomes the Orrery (the HP floor 4200 means no hit can skip it)
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 0.70
     patternId: aggressive
-    message: "Chaos draws on all four Fiends!"
+    form: chaos_orrery
+    interlude: chaos_i1
+  size: boss
+# ═══ CHAOS FORMS (docs/CHAOS_FORMS_PLAN.md 3.2-3.6) ═══
+# Form records of the final battle: `formOf: chaos`, no `num` (the bestiary lists them under Chaos), the same 6000 HP
+# pool, and every field written out (3.6: nothing is inherited). Planning stats (the secondary stats and agility follow
+# the 7.1 rules: strength 0.8 x attack, vitality defense / 2 + 2, intelligence 1 + 3 per spell, agility 5 + evade / 6),
+# tuned by tests/balance at C7. Until a
+# colossus master is approved the records keep F1's sprite as the art fallback; `colossus:` names the art id.
+- id: chaos_orrery
+  name: Chaos
+  formOf: chaos
+  description: "The Sovereign's robe burns away. Within, black-gold armillary rings turn around an armoured torso, an eclipse ringed by flame where the head was."
+  protect: [status, poison_stone, death, earth, time]
+  attackStatus: []
+  spells: [fir2, ice2, lit2, fast]
+  specials: []
+  stats:
+    hp: 6000
+    strength: 72
+    agility: 24
+    intelligence: 13
+    vitality: 72
+    luck: 5
+    attack: 90
+    defense: 140
+    magicDefense: 220
+    accuracy: 198
+    hits: 1
+    evade: 114
+  xpReward: 0
+  goldReward: 0
+  ai:
+    rate: 0.7
+    actions:
+    - {type: magic, spellId: fir2, weight: 1}
+    - {type: magic, spellId: ice2, weight: 1}
+    - {type: magic, spellId: lit2, weight: 1}
+    - {type: magic, spellId: fast, weight: 1}
+  sprite: chaos
+  colossus: chaos_orrery
+  attack: melee
+  elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  bossPhases:
+  - hpThreshold: 0.40
+    patternId: aggressive
+    form: chaos_horizon
+    interlude: chaos_i2
+  size: boss
+- id: chaos_horizon
+  name: Chaos
+  formOf: chaos
+  description: "The Last Horizon. Its shoulders are mountain ranges, its head a black sun crowned in flame, and one hand grips the rim of the world."
+  protect: [status, poison_stone, death, earth, time]
+  attackStatus: [stun]
+  spells: [ice, fir2, ice2, lit2]
+  specials: []
+  stats:
+    hp: 6000
+    strength: 96
+    agility: 18
+    intelligence: 13
+    vitality: 62
+    luck: 5
+    attack: 120
+    defense: 120
+    magicDefense: 240
+    accuracy: 198
+    hits: 3
+    evade: 78
+  xpReward: 0
+  goldReward: 0
+  # the slam (R9): its 0.6 share of the non-spell turns; the beam is ICE, the strongest single-target black damage
+  # spell (2.4); the moons cast the -2 spells
+  ai:
+    rate: 0.5
+    actions:
+    - {type: slam, weight: 0.6}
+    - {type: magic, spellId: ice, weight: 2}
+    - {type: magic, spellId: fir2, weight: 1}
+    - {type: magic, spellId: ice2, weight: 1}
+    - {type: magic, spellId: lit2, weight: 1}
+  sprite: chaos
+  colossus: chaos_horizon
+  slam: {targets: 2}
+  attack: melee
+  # one resistance: the legacy field (the 7.1 convention; no resistance to the four elements, 3.3)
+  resist: earth
+  bossPhases:
+  - hpThreshold: 0.25
+    patternId: aggressive
+    message: "The horizon groans; core revealed!"
+    hits: 4
+  - hpThreshold: 0.15
+    patternId: aggressive
+    form: chaos_horizon_core
+    interlude: chaos_i3
+  size: boss
+- id: chaos_horizon_core
+  name: Chaos
+  formOf: chaos
+  description: "The Core Laid Bare. The fissure down the horizon's chest is torn open, and the white-hot heart of the end of all things shows through."
+  protect: [status, poison_stone, death, earth, time]
+  attackStatus: [stun]
+  spells: [ice, fir2, ice2, lit2]
+  specials: []
+  stats:
+    hp: 6000
+    strength: 104
+    agility: 18
+    intelligence: 13
+    vitality: 47
+    luck: 5
+    attack: 130
+    defense: 90
+    magicDefense: 240
+    accuracy: 198
+    hits: 4
+    evade: 78
+  xpReward: 0
+  goldReward: 0
+  # a desperate pattern: more spells, the beam weighted up, the slam at 4 hits (3.4)
+  ai:
+    rate: 0.65
+    actions:
+    - {type: slam, weight: 0.7}
+    - {type: magic, spellId: ice, weight: 4}
+    - {type: magic, spellId: fir2, weight: 1}
+    - {type: magic, spellId: ice2, weight: 1}
+    - {type: magic, spellId: lit2, weight: 1}
+  sprite: chaos
+  colossus: chaos_horizon
+  colossusVariant: {core: open}
+  slam: {targets: 2}
+  attack: melee
+  # one resistance: the legacy field (the 7.1 convention; no resistance to the four elements, 3.3)
+  resist: earth
   size: boss

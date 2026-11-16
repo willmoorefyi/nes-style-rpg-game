@@ -10,7 +10,9 @@ import { selectTarget } from './EnemyAI.js';
 import { calculateRunChance, type BattleCommand } from './BattleCommands.js';
 import { checkBossPhases, reservedItems, resolveActionTarget, type TargetContext } from './ActionResolution.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
-import { attackLine, resolveEnemyAttack, resolvePartyAttack } from './PhysicalAttack.js';
+import { executeFight, type PhysicalHitDeps } from './physicalHit.js';
+import { resolvePendingForms, type FormChangeResult, type FormContext, type FormState } from './bossForms.js';
+import { setEnemyHp } from './enemyHp.js';
 import { losesTurn, type PresentHold, type TickSubject } from './StatusTick.js';
 import { runTurn } from './turnTick.js';
 import { xpShare } from './Rewards.js';
@@ -22,7 +24,7 @@ export type BattleState = 'intro' | 'command_select' | 'execution' | 'resolution
 /** How a battle ended; decided only in `BattleStateMachine.finish`. */
 export type BattleOutcome = 'victory' | 'defeat' | 'escaped';
 
-export interface EnemyInstance {
+export interface EnemyInstance extends FormState {
   id: string;
   data: EnemyData;
   currentHp: number;
@@ -46,6 +48,8 @@ export interface BattleConfig {
   canRun?: boolean;
   /** Map of patternId → BossPattern for multi-phase bosses */
   bossPatterns?: Map<string, BossPattern>;
+  /** The form records the enemies can change into (CHAOS_FORMS_PLAN 2.2; `formChain`). */
+  forms?: EnemyData[];
 }
 
 export interface BattleResult {
@@ -82,6 +86,8 @@ export interface ActionResult {
   spellId?: string; itemId?: string;
   /** Re-test A, D: changes the view shows only once their line is up (a wake, end-of-turn poison). */
   holds?: PresentHold[];
+  /** A boss form change right after this action (CHAOS_FORMS_PLAN 2.2 item 3): the view plays its interlude. */
+  formChange?: FormChangeResult;
 }
 
 export interface NextActionInfo {
@@ -128,6 +134,8 @@ export class BattleStateMachine {
   private spellExecutor: SpellExecutor;
   private spells: SpellData[];
   private targets: TargetContext;
+  private hitDeps: PhysicalHitDeps;
+  private formCtx: FormContext;
   /** Maps unique party IDs (party_0, party_1, ...) to their Character */
   private partyById: Map<string, Character>;
 
@@ -144,6 +152,12 @@ export class BattleStateMachine {
       partyIds: this.party.map((_, i) => this.getPartyId(i)), livingEnemyIds: () => this.livingEnemies.map(e => e.id),
       isAlive: id => this.isTargetAlive(id), spells: this.spells, rng: this.rng,
     };
+    this.hitDeps = {
+      rng: this.rng, enemies: this.enemies, partyMember: id => this.getPartyMember(id), say: text => this.messages.push({ text }),
+      damage: e => this._damageEvents.push(e), missed: () => { this._missed = true; }, partyIds: this.targets.partyIds,
+    };
+    this.formCtx = { forms: new Map((config.forms ?? []).map(f => [f.id, f])), spells: this.spells, party: this.party,
+      enemies: this.enemies, queue: () => this._actionQueue, turn: () => this.turnNumber, rng: this.rng };
     this.spellExecutor = new SpellExecutor(
       {
         party: this.party,
@@ -262,7 +276,8 @@ export class BattleStateMachine {
     this.messages = [];
     this.turnNumber++;
 
-    // Check boss phase transitions before generating enemy commands
+    // Check boss phase transitions before generating enemy commands (a reached form floor first: R5)
+    resolvePendingForms(this.formCtx, text => this.messages.push({ text }));
     for (const enemy of this.livingEnemies) {
       checkBossPhases(enemy, this.bossPatterns, text => this.messages.push({ text }));
     }
@@ -349,6 +364,8 @@ export class BattleStateMachine {
       act: () => { if (!action.command.skip) this.executeCommand(action.command, action.isEnemy); },
       decided: () => this.isOver || this.livingEnemies.length === 0 || this.livingParty.length === 0,
     });
+    // CHAOS_FORMS_PLAN 2.2 item 3 (R8): a form floor reached by this action (hero, boss or poison) changes the form now
+    const formChange = resolvePendingForms(this.formCtx, text => this.messages.push({ text }));
 
     // An escape ends the battle mid-round: never overwrite the end state
     const done = this.isOver || this._actionQueue.length === 0;
@@ -357,7 +374,7 @@ export class BattleStateMachine {
     }
 
     const { spellId, itemId } = action.command;
-    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed, holds, ...(spellId ? { spellId } : {}), ...(itemId ? { itemId } : {}) };
+    return { done, messages: [...this.messages], damageEvents: [...this._damageEvents], missed: this._missed, holds, ...(spellId ? { spellId } : {}), ...(itemId ? { itemId } : {}), ...(formChange ? { formChange } : {}) };
   }
 
   /** The next queued action; `actorId` (party_i / enemy_i) identifies the actor's sprite, never its name. */
@@ -425,7 +442,7 @@ export class BattleStateMachine {
     if (isEnemy) {
       const enemy = this.enemies.find(e => e.id === id);
       return enemy ? { name: enemy.displayName, maxHp: enemy.data.stats.hp, tracker: enemy.status, fallText: 'defeated!',
-        getHp: () => enemy.currentHp, setHp: (hp) => { enemy.currentHp = hp; } } : null;
+        getHp: () => enemy.currentHp, setHp: (hp) => setEnemyHp(enemy, hp) } : null;
     }
     const char = this.getPartyMember(id);
     return char ? { name: char.name, maxHp: char.maxHp, tracker: char.statusTracker, fallText: 'fell!',
@@ -465,45 +482,7 @@ export class BattleStateMachine {
       return;
     }
 
-    // the target was resolved before the action (resolveActionTarget)
-    if (cmd.type === 'fight' && cmd.targetId) {
-      if (isEnemy) this.executeEnemyAttack(cmd.actorId, cmd.targetId);
-      else this.executePartyAttack(cmd.actorId, cmd.targetId);
-    }
-  }
-
-  private executePartyAttack(actorId: string, targetId: string): void {
-    const actor = this.getPartyMember(actorId);
-    const target = this.enemies.find(e => e.id === targetId);
-    if (!actor || !target || actor.currentHp <= 0 || target.currentHp <= 0) return;
-
-    const result = resolvePartyAttack(actor, target, this.rng);
-    if (!result.hit) {
-      this._missed = true;
-      this.messages.push({ text: `${actor.name} missed!` });
-      return;
-    }
-    target.currentHp = Math.max(0, target.currentHp - result.damage);
-    this.messages.push({ text: attackLine(actor.name, target.displayName, result) });
-    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-    if (target.currentHp <= 0) this.messages.push({ text: `${target.displayName} defeated!` });
-  }
-
-  private executeEnemyAttack(enemyId: string, targetId: string): void {
-    const enemy = this.enemies.find(e => e.id === enemyId);
-    const target = this.getPartyMember(targetId);
-    if (!enemy || !target || enemy.currentHp <= 0 || target.currentHp <= 0) return;
-
-    const result = resolveEnemyAttack(enemy, target, this.rng);
-    if (!result.hit) {
-      this._missed = true;
-      this.messages.push({ text: `${enemy.displayName} missed!` });
-      return;
-    }
-    target.currentHp = target.currentHp - result.damage;
-    this.messages.push({ text: attackLine(enemy.displayName, target.name, result) });
-    this._damageEvents.push({ targetId, damage: result.damage, isHeal: false, isCrit: result.critical });
-    if (target.currentHp <= 0) this.messages.push({ text: `${target.name} fell!` });
+    executeFight(this.hitDeps, cmd, isEnemy);
   }
 
   private isTargetAlive(id: string): boolean {
