@@ -3,9 +3,9 @@
   "sheet": "monster_large",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "4647a60ad314a1ce2f3b375b",
-  "approved": "2026-11-12",
+  "seed": 1236,
+  "cache_key": "c45d47377fc351e4f393a835",
+  "approved": "2026-11-16",
   "grid": [
     128,
     128
@@ -22,5 +22,6 @@
   ],
   "size": "large",
   "floating": false,
-  "flip_frames": []
+  "flip_frames": [],
+  "note": "pass V R320: R312 re-cut with fit: headroom (0 images)"
 }
