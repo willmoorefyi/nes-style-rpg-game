@@ -177,6 +177,7 @@ def invoke(model: str, body: dict, *, paid: bool, purpose: str,
     _append(gate(model, body, key, paid=paid, purpose=purpose))       # before the first try: a failure is spent
     ids = model_ids or (MODELS[model], MODELS[model].removeprefix("us."))
     last: Exception | None = None
+    errs: list[str] = []                                           # every id's error (diagnosis)
     try:
         for mid in ids:
             try:
@@ -185,8 +186,9 @@ def invoke(model: str, body: dict, *, paid: bool, purpose: str,
                 break
             except client().exceptions.ValidationException as err:   # e.g. inference-profile id not accepted
                 last = err
+                errs.append(f"{mid}: {str(err)[:140]}")
         else:
-            raise RuntimeError(f"Bedrock rejected every model id for {model}: {last}")
+            raise RuntimeError(f"Bedrock rejected every model id for {model}: {' | '.join(errs) or last}")
         out = json.loads(resp["body"].read())
         reasons = out.get("finish_reasons") or [None]
         if reasons[0] not in (None, "SUCCESS"):

@@ -136,7 +136,7 @@ def upscale_body(a, image_b64: str) -> tuple[dict, str]:
                                 ("--seed", a.seed)) if v is not None]
         if given:
             _refuse(f"fast upscale takes no {', '.join(given)} (its body is image and output_format only)")
-        body["output_format"] = "png"
+        body["output_format"] = getattr(a, "output_format", None) or "png"
         return body, "up_fast"
     if a.seed is None:
         _refuse(f"{a.model} upscale needs --seed (>= 1; 0 means random and could not be repeated)")
@@ -148,7 +148,8 @@ def upscale_body(a, image_b64: str) -> tuple[dict, str]:
     body.update(prompt=a.prompt, creativity=crea)
     if a.negative:
         body["negative_prompt"] = a.negative
-    body.update(seed=a.seed, output_format="png")
+    # webp keeps a large upscale under Bedrock's response payload limit (a 4x PNG of the F3 render was 17.9 MB, C19)
+    body.update(seed=a.seed, output_format=getattr(a, "output_format", None) or "png")
     return body, f"up_{a.model}_{a.seed}"
 
 
@@ -186,6 +187,8 @@ def add_upscale_parser(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--form", help="a colossus form: purpose f3_upscale / f2_upscale and the fit to its canvas (18.2)")
     p.add_argument("--purpose", help=f"{', '.join(UPSCALE_PURPOSES)} (default rim_upscale, or the form's)")
     p.add_argument("--out", help="output PNG (default: <src stem>_up_<model>_<seed>.png next to the source)")
+    p.add_argument("--output-format", choices=["png", "webp", "jpeg"], help="the response format (default png; webp "
+                   "for a large upscale: Bedrock caps the response payload; the result is still saved as PNG)")
     p.add_argument("--paid", action="store_true")
 
 
