@@ -7,6 +7,9 @@ import {
   backgroundOf, backgroundPath, configKey, enemiesOf, kitOf, levelOf, type SandboxConfig, type SandboxData,
 } from './sandboxModel.js';
 import { sandboxSession, type SandboxOutcome, type SandboxSession } from './sandboxSession.js';
+import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
+import { formationFitsArt, formationWarning } from '../battle/formationCheck.js';
+import type { MonsterArtSource } from '../battle/AiEnemyView.js';
 
 export const SANDBOX_SCENE = 'debugSandbox';
 
@@ -37,17 +40,32 @@ export function partyHpPercent(game: Game): number {
   return max === 0 ? 0 : Math.round((100 * members.reduce((n, m) => n + m.currentHp, 0)) / max);
 }
 
+/** F8: the formation lays out at an integer screen scale >= 2 (its atlas pages loaded first); else warned. */
+async function formationOk(game: Game, ids: string[], art: MonsterArtSource): Promise<boolean> {
+  const all = await game.data.loadEnemies('assets/data/enemies.yaml');
+  const formation = ids.flatMap((id) => all.filter((e) => e.id === id).slice(0, 1));
+  // ids without data are dropped by the trigger as before (nothing of theirs to lay out)
+  if (formation.length === 0) return true;
+  await art.ensure?.(formation.map(monsterSpriteKey));
+  if (formationFitsArt(formation, art)) return true;
+  console.warn(formationWarning(ids));
+  return false;
+}
+
 /**
  * Fight the configured battle. Victory, escape and defeat all record the result and switch back to the sandbox
- * (never Game Over or the title). Resolves once the battle is on screen; false if it could not start.
+ * (never Game Over or the title). Resolves once the battle is on screen; false if it could not start (no enemies, or
+ * a formation that does not fit the screen: warned, no battle).
  */
 export async function startSandboxBattle(game: Game, data: SandboxData, config: SandboxConfig, kits: Kits,
-  session: SandboxSession = sandboxSession, trigger: BattleTrigger = new BattleTrigger(game)): Promise<boolean> {
+  session: SandboxSession = sandboxSession, trigger: BattleTrigger = new BattleTrigger(game),
+  art: MonsterArtSource = battleArt): Promise<boolean> {
   const enemies = enemiesOf(data, config);
   if (enemies.length === 0) {
     console.error('Debug sandbox: no enemies to fight');
     return false;
   }
+  if (!(await formationOk(game, enemies, art))) return false;
   applySandboxParty(game, data, config, kits);
   const key = configKey(data, config);
   const onEnd = (end: BattleOutcomeData): void => {

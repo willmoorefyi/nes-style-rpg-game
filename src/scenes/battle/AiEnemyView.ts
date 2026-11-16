@@ -1,8 +1,9 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import type { EnemyData } from '../../types/index.js';
 import { battleArt, monsterSpriteKey, type MonsterFrames } from '../../rendering/BattleArt.js';
-import { enemyBoxInput, travelTopOf } from '../../rendering/monsterAnchors.js';
-import { computeEnemyLayoutAi, layoutSizeOf, type EnemyBox, type EnemySizeClass } from './EnemyLayoutAi.js';
+import { travelTopOf } from '../../rendering/monsterAnchors.js';
+import { computeEnemyLayoutAi, formationFits, layoutSizeOf, type EnemyBox } from './EnemyLayoutAi.js';
+import { boxInputOf, formationWarning } from './formationCheck.js';
 import { EnemyPoseController, type AttackPlan, type Posture, type PoseCue } from './EnemyPoseController.js';
 import { ENEMY_COLORS, DEFAULT_ENEMY_COLOR } from './BattleLayoutEngine.js';
 import { TRAVEL_HOP, enemyReach } from './enemyReach.js';
@@ -19,9 +20,6 @@ import { readPixels, type Pixels } from './fx/texturePixels.js';
 export const HOLD_PULSE_TINT = 0xffb0b0;
 export const pulseTintOf = (e: Pick<EnemyData, 'pulseTint'> | undefined): number =>
   e?.pulseTint ? parseInt(e.pulseTint.slice(1), 16) : HOLD_PULSE_TINT;
-
-/** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
-const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 
 /** Where monster frames come from (the shared atlas; tests inject their own). */
 export interface MonsterArtSource {
@@ -47,6 +45,8 @@ export class AiEnemyView {
   private base: { x: number; y: number }[] = [];
   private boxes: EnemyBox[] = [];
   private raised = -1;
+  /** F8: the refused-formation warning was logged (once per view). */
+  private warned = false;
   /** D5': the child slots the enemy sprites held before a travelling attacker was put on top (null: D5 or none). */
   private homeSlots: number[] | null = null;
   /** The sprites of the last update, so a pose cue can name the sprite it belongs to. */
@@ -111,11 +111,12 @@ export class AiEnemyView {
     const holds = this.enemies.flatMap((e, i) => (this.frames[i] && this.art.hold ? [this.art.hold(monsterSpriteKey(e))] : []));
     this.release();
     this.holds = holds;
-    const boxes = computeEnemyLayoutAi(this.enemies.map((e, i) => {
-      const f = this.frames[i];
-      const size = layoutSizeOf(e.size, f?.scale);
-      return f ? enemyBoxInput(size, f) : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
-    }));
+    const inputs = this.enemies.map((e, i) => boxInputOf(e, this.frames[i]));
+    if (!this.warned && !formationFits(inputs)) {
+      this.warned = true;
+      console.warn(formationWarning(this.enemies.map((e) => e.id)));
+    }
+    const boxes = computeEnemyLayoutAi(inputs);
     this.base = [];
     this.boxes = boxes;
     return this.enemies.map((e, i) => {

@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { atlasArt, enemyById } from '../../helpers/atlasFrames.js';
 import { Container, Graphics, Sprite, Texture } from 'pixi.js';
 import { AiEnemyView, HOLD_PULSE_TINT, pulseTintOf, type MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
 import { postureOf } from '../../../src/scenes/battle/fx/statusRules.js';
@@ -284,5 +285,27 @@ describe('AiEnemyView.attackPlan reads the layer\'s current transform', () => {
     };
     expect(plan(-199)).toEqual(plan(0));
     expect(plan(0).travel).toBeGreaterThan(0);
+  });
+});
+
+describe('V8 F8: a battle that lays out a refused formation warns once', () => {
+  const ids = (n: number) => ['hill_gigas', 'fire_gigas', 'ice_gigas', 'minotaur', 'ochu', 'hydra', 'earth_elemental',
+    'fire_elemental', 'water_elemental'].slice(0, n);
+
+  it('9 tier-H: one warning naming the ids, however often the view is built', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const view = new AiEnemyView(ids(9).map(enemyById), atlasArt);
+    view.build();
+    view.build();
+    const ours = warn.mock.calls.filter((c) => String(c[0]).startsWith('sandbox:'));
+    expect(ours).toEqual([[`sandbox: formation does not fit at an integer scale >= 2: ${ids(9).join(', ')}`]]);
+    warn.mockRestore();
+  });
+
+  it.each([[1], [3], [6]])('%i tier-H: no warning', (n) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    new AiEnemyView(ids(n).map(enemyById), atlasArt).build();
+    expect(warn.mock.calls.filter((c) => String(c[0]).startsWith('sandbox:'))).toEqual([]);
+    warn.mockRestore();
   });
 });

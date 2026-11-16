@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { startSandboxBattle, SANDBOX_SCENE } from '../../src/scenes/debugSandbox/sandboxBattle.js';
-import { configKey, defaultConfig, type SandboxConfig, type SandboxData } from '../../src/scenes/debugSandbox/sandboxModel.js';
+import { configKey, CUSTOM, defaultConfig, type SandboxConfig, type SandboxData } from '../../src/scenes/debugSandbox/sandboxModel.js';
+import { atlasArt, enemyData } from '../helpers/atlasFrames.js';
 import { SandboxSession } from '../../src/scenes/debugSandbox/sandboxSession.js';
 import { BattleTrigger, type BattleOutcomeData, type TriggerOptions } from '../../src/systems/BattleTrigger.js';
 import type { Kits } from '../../src/systems/debugParty.js';
@@ -120,5 +121,42 @@ describe('Fg: BattleTrigger onEnd (a caller-ended battle)', () => {
     await new BattleTrigger(game as unknown as Game).triggerBattle(['goblin']);
     game.events.emit('battleEnd', { victory: false, xpReward: 0, goldReward: 0 });
     expect(game.scenes.switchTo).not.toHaveBeenCalled();   // the field's own listener (none here) ends it
+  });
+});
+
+describe('V8 F8: the sandbox refuses a formation that does not fit at an integer scale >= 2', () => {
+  beforeAll(async () => { await loadRealRegistries(); });
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  const TIER_H = ['hill_gigas', 'fire_gigas', 'ice_gigas', 'minotaur', 'ochu', 'hydra', 'earth_elemental', 'fire_elemental',
+    'water_elemental'];
+  const custom = (ids: string[]): SandboxConfig => ({ ...defaultConfig(DATA), level: 'l30_lich', formation: CUSTOM, custom: ids });
+  async function start(ids: string[]) {
+    const game = fakeGame();
+    game.data.loadEnemies = vi.fn().mockResolvedValue(enemyData);
+    const t = fakeTrigger();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const ok = await startSandboxBattle(game as unknown as Game, DATA, custom(ids), KITS, new SandboxSession(), t.trigger, atlasArt);
+    return { ok, warn, t, game };
+  }
+
+  it('9 tier-H: warned with the ids, false, no battle pushed, the party untouched', async () => {
+    const r = await start(TIER_H);
+    expect(r.ok).toBe(false);
+    expect(r.warn).toHaveBeenCalledWith(`sandbox: formation does not fit at an integer scale >= 2: ${TIER_H.join(', ')}`);
+    expect(r.t.triggerBattle).not.toHaveBeenCalled();
+    expect(r.game.scenes.push).not.toHaveBeenCalled();
+    expect(r.game.resetState).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['6 tier-H (pass 3, screen scale 2 by design)', TIER_H.slice(0, 6)],
+    ['the 3-huge formation (anim_pass_v_huge)', ['dragon', 'hill_gigas', 'green_dragon']],
+    ['the mixed formation (anim_pass_v_mixed)', ['ogre', 'guardian', 'shark', 'goblin', 'black_knight', 'vampire']],
+  ])('%s starts without a warning', async (_, ids) => {
+    const r = await start(ids);
+    expect(r.ok).toBe(true);
+    expect(r.t.triggerBattle.mock.calls[0][0]).toEqual(ids);
+    expect(r.warn.mock.calls.filter((c) => String(c[0]).startsWith('sandbox:'))).toEqual([]);
   });
 });

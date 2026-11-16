@@ -9,6 +9,8 @@ import { MAX_FORMATION } from '../../src/systems/EncounterTable.js';
 import { validateEnemyData } from '../../src/core/schemaValidation.js';
 import { validateBestiary } from '../../src/core/bestiaryValidation.js';
 import type { EnemyData } from '../../src/types/index.js';
+import { monsterSpriteKey } from '../../src/rendering/BattleArt.js';
+import { layoutInput } from '../helpers/atlasFrames.js';
 
 // Load all YAML data files using readFileSync (asset files, not modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -86,7 +88,8 @@ function maxRoll(enc: EncounterFile): string[] {
   return enc.groups.flatMap((g) => Array<string>(g.max ?? g.min).fill(g.id));
 }
 
-// battle boxes as AiEnemyView sizes them: the monster atlas cell at its scale, else the placeholder box
+// battle boxes as AiEnemyView sizes them (V8 F8: scale-aware): the monster atlas cell at the sheet's own scale with its
+// home extent and the titan class for a scale-3 boss (layoutInput), else the placeholder box
 const monsterAtlas = JSON.parse(readFileSync(resolve(__dirname, '../../assets/sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number; sheets: Record<string, { cell: [number, number] }>;
 };
@@ -94,10 +97,8 @@ const PLACEHOLDER_BOX: Record<EnemySizeClass, number> = { small: 160, large: 256
 function enemyBox(id: string): EnemyBoxInput {
   const e = enemies.find((x) => x.id === id);
   const size = e?.size ?? 'small';
-  const sheet = monsterAtlas.sheets[(e?.sprite || id).replace(/\.png$/i, '')];
-  return sheet
-    ? { size, w: sheet.cell[0] * monsterAtlas.scale, h: sheet.cell[1] * monsterAtlas.scale }
-    : { size, w: PLACEHOLDER_BOX[size], h: PLACEHOLDER_BOX[size] };
+  const sheet = e ? monsterAtlas.sheets[monsterSpriteKey(e)] : undefined;
+  return sheet ? layoutInput(id) : { size, w: PLACEHOLDER_BOX[size], h: PLACEHOLDER_BOX[size] };
 }
 
 // Base classes are those without upgradeFrom
