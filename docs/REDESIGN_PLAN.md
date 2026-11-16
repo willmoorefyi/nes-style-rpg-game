@@ -1118,13 +1118,13 @@ switches chaos to C2 before its first image).
 ```markdown
 ## TODOs
 - [x] V0: momus review (APPROVE WITH REVISIONS); 17 revisions applied (rev 2); D-V1..D-V18 and the rev 1(c)/8/9/15 rulings recorded (2026-11-16)
-- [ ] V1 FW-V0: budget.json pass V (literal N_V0, append-only history, pass R fix closed, only_ids, only_sheets, consistency guard); selftest_passv.py pins; selftest_roster.py rewrite (fix slice ends at gemini_end); selftest_daze.py:130 narrowed (high, 2.5h)
-- [ ] V1 FW-RT: retire.py (+ --prune, --move-rig, --revive), approve.py gate (monster_/boss_ only, byte-identical rewrite ok, _v2 / _v2_partial), selftest_retire.py (exclusion proof, static rglob check, revive fixture, git-tracked cache files) (high, 4h)
-- [ ] V1 pinned selftests (9.5): _fields, run_halo_brighten, FX_PENDING, selftest_pages ANCHORS / raise tip / seraph padding, selftest_fixmeasure black_knight, all on archive-or-live fixtures (high, 2h)
-- [ ] V1: re-measure npx vitest run; record durations and N_V0 in ROSTER_LOG 'Pass V' (low, 0.5h)
-- [ ] V1 FW-S: monster_scale.yaml -> atlas sheet `scale`; selftest_pages byte-identity (high, 1.5h)
-- [ ] V1 FW-A2: atlas idleBox anchor (medium, 0.5h)
-- [ ] V1 FW-T: titan band 300/292 fail-closed (scale 1.0, grid mode), guide, approve, anim padding, caps at 300, size-keyed `titan` page group, --titan-probe; selftest_titan.py RED cases (high, 1d)
+- [x] V1 FW-V0: budget.json pass V (literal N_V0, append-only history, pass R fix closed, only_ids, only_sheets, consistency guard); selftest_passv.py pins; selftest_roster.py rewrite (fix slice ends at gemini_end); selftest_daze.py:130 narrowed (high, 2.5h)
+- [x] V1 FW-RT: retire.py (+ --prune, --move-rig, --revive), approve.py gate (monster_/boss_ only, byte-identical rewrite ok, _v2 / _v2_partial), selftest_retire.py (exclusion proof, static rglob check, revive fixture, git-tracked cache files) (high, 4h)
+- [x] V1 pinned selftests (9.5): _fields, run_halo_brighten, FX_PENDING, selftest_pages ANCHORS / raise tip / seraph padding, selftest_fixmeasure black_knight, all on archive-or-live fixtures (high, 2h)
+- [x] V1: re-measure npx vitest run; record durations and N_V0 in ROSTER_LOG 'Pass V' (low, 0.5h)
+- [x] V1 FW-S: monster_scale.yaml -> atlas sheet `scale`; selftest_pages byte-identity (high, 1.5h)
+- [x] V1 FW-A2: atlas idleBox anchor (medium, 0.5h)
+- [x] V1 FW-T: titan band 300/292 fail-closed (scale 1.0, grid mode), guide, approve, anim padding, caps at 300, size-keyed `titan` page group, --titan-probe; selftest_titan.py RED cases (high, 1d)
 - [ ] V-gen: FW-V0 + FW-RT merged, selftests ALL PASSED; main checkout fast-forwards roster (high, 0.5h)
 - [ ] V1 exit check -> V-base (rigs/sheets unchanged, pages byte-identical, check --all 123 OK, selftests) (high, 1h)
 - [ ] V2 TS-1: bestiary centring + backdrop; bestiaryCentre.test RED -> GREEN; browser check (high, 3h)
@@ -1132,7 +1132,7 @@ switches chaos to C2 before its first image).
 - [ ] V3 archive: retire.py for the 7 ids; docs/RETIRED_SPRITES.md rows; commit before each first paid request (high, 1h)
 - [ ] V3 generate crazy_horse, piscodemon, black_knight, guardian, vampire (<= 3 each), log rows, approvals (high, 0.5d)
 - [ ] V3 generate hollow_seraph idle -> attack -> cast -> hurt (<= 3 each); --prune old poses with the new idle; piece comparison per pose (high, 0.5d)
-- [ ] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator; D-V6 re-confirmed (high, 1h)
+- [x] V3 G-T0: offline titan cut over the ~80 cached boss renders; numbers to the orchestrator (0 of 80, section 17); D-V6 re-confirm pending (orchestrator) (high, 1h)
 - [ ] V3 generate chaos idle (<= 2 at the titan band, 3rd reserved for C2) -> attack -> cast -> hurt -> raise (<= 3 each); piece comparison per pose (high, 0.5d)
 - [ ] V4 rescale: monster_scale.yaml 23 entries + TS-3 sizes in one commit; rebuild; block test; image-only rescale review (high, 0.5d)
 - [ ] V5 wave 1 rigs: crazy_horse, piscodemon, black_knight, guardian (<= 4 iter each) (medium, 2d)
@@ -1174,10 +1174,10 @@ orchestrator's rulings on the open choices are in section 15.
 
 | Quantity | Planned (this plan) | Measured (filled at G-T0 / integration) |
 |---|---|---|
-| Titan cell, feet row, top-row floor | 300x300, 292, 15 | |
-| Chaos idle height range at scale 2 (C1) | 258-278 art px (516-556 screen px) | |
-| Cached boss renders reaching >= 258 native at scale 1.0, grid mode | 0 of about 80 expected (momus: max 255) | |
-| Titan guide box | <= 914 guide px today (`monster.py:214`) | |
+| Titan cell, feet row, top-row floor | 300x300, 292, 15 | 300x300, 292, 15 (FW-T, `spec.TITAN_POSE_GEOM`, `TITAN_TOP_MIN`) |
+| Chaos idle height range at scale 2 (C1) | 258-278 art px (516-556 screen px) | G-T0: not reached by any cached render (max cut figure 215 native) |
+| Cached boss renders reaching >= 258 native at scale 1.0, grid mode | 0 of about 80 expected (momus: max 255) | **0 of 80** (every ledger boss render in the main-checkout cache; `out/gemini` held only duplicates). 75 grid mode, 5 no grid; 0 accepted by the fail-closed titan cut. Native figure height (the cut's mask) max 215 (hollow_seraph boss_cast, pitch 4.26), then 205, 202, 197, 193; chaos 165-181 (idle 173), lich 149-188 (idle 183), all chaos / lich at pitch 5.12. Pitches: 5.12 x63, 4.26 x6, 4.0 x3, 5.7-5.8 x4, 4.7, 3.42, 3.2, 3.04; the 3 renders finer than 3.5 px had no detectable grid (conf 0.10-0.39) |
+| Titan guide box | <= 914 guide px today (`monster.py:214`) | 914 guide px (capped; 278 x 5.33 = 1482 asked); = 178.5 art px at pitch 5.12, 214.6 at 4.26, 228.5 at 4.0, 267-301 at 3.0-3.4. Figures fill about 97 % of the box (chaos idle 173 of 178.5), so at the common pitch 5.12 a 258 figure needs a 1321 px box, larger than the 1024 guide |
 | Chaos box on screen, cell top with feet at 745 | 600x600, y 159 | |
 | Chaos bestiary plain-clamp shift | -6 px for h = 278 (0 for h <= 272); C2 about -2 px | |
 | Atlas page count after pass V | 10 planned under C1 | |

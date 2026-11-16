@@ -1,8 +1,17 @@
 {
-  "note": "User 2026-11-15 (roster pass R, docs/ROSTER_PLAN.md 6): up to 300 Gemini images for building every enemy; the earlier 100-image cap is retired. 285 for building, the last 15 only for fix-pass regenerations of approved sprites. At most 3 attempts (1 + 2 retries) per sheet. Bedrock is not counted (user, 2026-11-13).",
-  "attempts_before": 100,
-  "cap": 300,
+  "note": "User 2026-11-16 (pass V, docs/REDESIGN_PLAN.md 6): up to 50 Gemini images for the 7 redesigned sprites, fresh per-sheet counts, at most 3 attempts per sheet, on top of the 267 pass-R images. Bedrock is not counted (user, 2026-11-13). The guard never reads `history` (documentation, append-only; pinned by selftest_passv.py).",
+  "attempts_before": 367,
+  "cap": 50,
   "max_attempts_per_sheet": 3,
+  "history": [
+    {
+      "name": "pass R",
+      "attempts_before": 100,
+      "cap": 300,
+      "gemini_end": 367,
+      "max_attempts_per_sheet": 3
+    }
+  ],
   "passes": [
     {
       "name": "pass F (FB-8)",
@@ -22,11 +31,58 @@
     },
     {
       "name": "pass R fix",
-      "note": "docs/ROSTER_PLAN.md 11.4, docs/ROSTER_FIX_PLAN.md 5 (plan caps itself at 5); opened 2026-11-15 after the build run ended at N1 = 363",
+      "note": "docs/ROSTER_PLAN.md 11.4, docs/ROSTER_FIX_PLAN.md 5 (plan caps itself at 5); opened 2026-11-15 after the build run ended at N1 = 363; closed 2026-11-16 at pass V (docs/REDESIGN_PLAN.md 6)",
       "gemini_before": 363,
       "max_new": 37,
       "max_per_sheet": 3,
-      "only_approved": true
+      "only_approved": true,
+      "gemini_end": 367
+    },
+    {
+      "name": "pass V",
+      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy)",
+      "gemini_before": 367,
+      "max_new": 50,
+      "max_per_sheet": 3,
+      "only_ids": [
+        "crazy_horse",
+        "piscodemon",
+        "black_knight",
+        "guardian",
+        "vampire",
+        "hollow_seraph",
+        "chaos"
+      ],
+      "only_sheets": {
+        "crazy_horse": [
+          "monster_large"
+        ],
+        "piscodemon": [
+          "monster_small"
+        ],
+        "black_knight": [
+          "monster_small"
+        ],
+        "guardian": [
+          "monster_large"
+        ],
+        "vampire": [
+          "monster_small"
+        ],
+        "hollow_seraph": [
+          "boss_idle",
+          "boss_attack",
+          "boss_cast",
+          "boss_hurt"
+        ],
+        "chaos": [
+          "boss_idle",
+          "boss_attack",
+          "boss_cast",
+          "boss_hurt",
+          "boss_attack_raise"
+        ]
+      }
     }
   ]
 }

@@ -1,0 +1,6 @@
+# FW-S (docs/REDESIGN_PLAN.md 2.2, D-V1 S1): per-sheet integer display scale, screen px per art px, written into the
+# atlas sheet's `scale` field (BattleArt uses entry.scale ?? meta.scale). Approved PNGs, rigs and locks are untouched:
+# frames are generated, checked and locked at native size; the GPU draws each art px as a scale x scale block.
+# Format: {<sprite id>: 3}. Allowed values 2 and 3; an id that is not an atlas sheet is refused (monster_atlas.load_scale).
+# Empty: every sheet at the atlas scale 2 (the JSON has no `scale` field per sheet). The integrator fills the entries (V4).
+{}

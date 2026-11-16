@@ -670,3 +670,29 @@ black_knight drops its generated frames (the sheet is rigged now; need 0.462, d 
 
 The three small brown puffs on the ground between warmech's feet at contact are the runtime impact dust
 (`AiEnemyView` contact cue), not sprite pixels (the approved `boss_attack.png` has none).
+
+## Pass V (docs/REDESIGN_PLAN.md, opened 2026-11-16)
+
+**N_V0 = 367** (Gemini attempts, Bedrock excluded, in the main-checkout ledger at V1; re-counted, equal to the plan's
+number). Written as a literal into `budget.json` `attempts_before`, `pass R fix.gemini_end` and `pass V.gemini_before`;
+pinned by `selftest_passv.py`. Pass V: 50 images, only the 7 redesigned ids and their `only_sheets`, at most 3 per
+sheet (fresh counts from 367).
+
+Images used: 0 of 50 (ledger guard: 367 - 367).
+
+### V1 framework (framework owner, `v-fw`, 2026-11-16, 0 images)
+
+FW-V0 (budget + guard), FW-RT (`retire.py`, approve gate, `selftest_retire.py`, `docs/RETIRED_SPRITES.md`), the 9.5
+pinned selftests on archive-or-live fixtures (+ `FX_PENDING` vampire/slash, hollow_seraph/halo), FW-S
+(`monster_scale.yaml`, empty), FW-A2 (`idleBox`), FW-T (titan band, fail-closed cut, `--titan-probe`, `titan` page
+group). G-T0: 0 of 80 cached boss renders reach the titan band (`REDESIGN_PLAN.md` 17).
+
+| Gate | Result |
+|---|---|
+| Rigs, locks, approved sheets | unchanged (`git diff --exit-code 9fe129c -- assets-src/gen/anim/monsters/ assets-src/gen/approved/`) |
+| `build_assets.py monsters_ai` | 9 pages byte-identical to 9fe129c; JSON differs only by `idleBox` on the 123 sheets |
+| `monster_anim.py check --all` | 123 `OK` (4 FWQ `aliased:` notes), nothing else; 163 s |
+| `selftest.py --anim` (worktree) | ALL PASSED, 646 ok checks; 506 s |
+| `selftest.py` (worktree, with gen/refs) | ALL PASSED, 1022 ok checks; 535 s (the main-checkout run follows the fast-forward) |
+| `npx vitest run` (re-measured at V1) | 220 files, 4171 tests passed; 9.5 s wall (10 s with npx start-up) |
+| Archive fixtures (scratch worktree, never committed) | with chaos, hollow_seraph, black_knight, vampire archived and seraph in state C (`--move-rig`, `--prune`), the pinned selftests (`selftest_pages`, `run_halo_brighten`, `run_fx_allowlist`, `run_fwq_allowlist`, fixmeasure, `_fields`, `selftest_passv`) pass on the archives; `selftest_retire` fails only its "archived files git-tracked" check (uncommitted archive: the gate works) |

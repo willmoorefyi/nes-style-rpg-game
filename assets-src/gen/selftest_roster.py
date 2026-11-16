@@ -119,30 +119,36 @@ def run_roster(check: Callable[[bool, str], None]) -> None:
         vb = _verdict(at_r0, base, "rs_unbuilt", "monster", approved)
         check(vb == "", f"pass R build (no only_approved) allows an unbuilt id ({vb[:60]!r})")
 
-    # the real budget.json entries (FW-0) and the real ledger
+    # the real budget.json entries and the real ledger. Since pass V (docs/REDESIGN_PLAN.md 6, FW-V0) the top level is
+    # pass V's; pass R's bounds are read from `history["pass R"]` and the closed `pass R build` / `pass R fix` entries
     if build is None:
         return
+    hist = next((h for h in real.get("history", []) if isinstance(h, dict) and h.get("name") == "pass R"), {})
+    end = hist.get("gemini_end")                         # N_V0: pass R ends where pass V opens
     f = next((p for p in real["passes"] if p["name"] == "pass F (FB-8)"), {})
-    check(real["attempts_before"] == n0 and real["cap"] == TOTAL_CAP and real["max_attempts_per_sheet"] == PER_SHEET
+    check(hist.get("attempts_before") == n0 and hist.get("cap") == TOTAL_CAP
+          and hist.get("max_attempts_per_sheet") == PER_SHEET and isinstance(end, int)
           and f.get("gemini_end") == n0 and build["max_new"] == BUILD_MAX and build["max_per_sheet"] == PER_SHEET,
-          f"budget.json: attempts_before = N0 = {n0}, cap {TOTAL_CAP}, 3 per sheet; pass F closed at N0; pass R build "
-          f"{BUILD_MAX}")
+          f"budget.json history 'pass R': attempts_before = N0 = {n0}, cap {TOTAL_CAP}, 3 per sheet, ended at {end}; "
+          f"pass F closed at N0; pass R build {BUILD_MAX}")
     fix = next((p for p in real["passes"] if p["name"] == "pass R fix"), None)
-    if fix is not None:
-        n1 = build.get("gemini_end")
-        check(n1 == fix["gemini_before"] and fix["max_new"] == TOTAL_CAP - (n1 - n0) and fix.get("only_approved") is True,
-              f"budget.json: pass R build closed at N1 = {n1}, pass R fix opens there with {TOTAL_CAP} - (N1 - N0)")
-    run = gem[n0:]
+    n1 = build.get("gemini_end")
+    check(fix is not None and n1 == fix["gemini_before"] and fix["max_new"] == TOTAL_CAP - (n1 - n0)
+          and fix.get("only_approved") is True and fix.get("gemini_end") == end,
+          f"budget.json: pass R build closed at N1 = {n1}, pass R fix opens there with {TOTAL_CAP} - (N1 - N0) and is "
+          f"closed at the pass-R end {end}")
+    run = gem[n0:end]
     per: dict = {}
     for e in run:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1
-    built = gem[n0:build.get("gemini_end", len(gem))]
+    built = gem[n0:n1]
     check(len(run) <= TOTAL_CAP and len(built) <= BUILD_MAX and all(n <= PER_SHEET for n in per.values()),
           f"ledger: pass R used {len(run)} of {TOTAL_CAP} (build {len(built)} of {BUILD_MAX}), max per sheet "
           f"{max(per.values(), default=0)} <= {PER_SHEET}")
     if fix is not None:
         root = GEN.HERE / "approved"
-        bad = [e["character"] for e in gem[fix["gemini_before"]:] if not (root / e["character"]).is_dir()]
+        bad = [e["character"] for e in gem[fix["gemini_before"]:fix.get("gemini_end", end)]
+               if not (root / e["character"]).is_dir()]
         check(not bad, f"ledger: every pass R fix attempt has an approved id ({bad[:3]})")
 
 
@@ -151,14 +157,32 @@ def run_roster(check: Callable[[bool, str], None]) -> None:
 FIENDS = ("ashen_queen", "drowned_sovereign", "hollow_seraph")
 
 
+def approved_metas(root: Path) -> list[Path]:
+    """The approved jsons, one level deep (approved/<id>/*.json): approved/_retired/<id>_vN/ is never listed."""
+    return sorted(root.glob("*/*.json"))
+
+
+def revived_ok(meta: dict, cache: Path) -> bool:
+    """FW-RT revival (docs/REDESIGN_PLAN.md 5): a json with `revived_from` was approved under the old id and prompt, so
+    it is checked against the archived key's committed cache file instead of a re-plan."""
+    key = meta.get("cache_key")
+    return bool(key) and (cache / f"{key}.png").is_file() and (cache / f"{key}.json").is_file()
+
+
 def _approved_keys(check: Callable[[bool, str], None]) -> None:
     """Every approved request (approved/*/*.json) re-planned from today's code and yaml reproduces its cache key."""
     from gen import generate as GEN
     have_style = GEN.STYLE_REF.exists()       # character sheets send the style reference (gen/refs, not committed)
-    metas = [json.loads(p.read_text()) for p in sorted((GEN.HERE / "approved").glob("*/*.json"))]
+    metas = [json.loads(p.read_text()) for p in approved_metas(GEN.HERE / "approved")]
     bad, done, skipped = [], 0, 0
     for meta in metas:
         cid = meta.get("character") or meta.get("kit")
+        if meta.get("revived_from"):
+            done += 1
+            if not revived_ok(meta, GEN.CACHE):
+                bad.append(f"{cid} {meta['sheet']}: revived from {meta['revived_from']}, cache/{meta.get('cache_key')} "
+                           "missing")
+            continue
         char = GEN.load_character(cid)
         if not (GEN.is_monster(char) or GEN.is_kit(char)) and not have_style:
             skipped += 1
@@ -271,8 +295,9 @@ def _fields(check: Callable[[bool, str], None]) -> None:
     check(base in M.base_sentence({"base": base}, "pose") and M.base_sentence({}, "pose") == "",
           "FW-9: the base sentence names the base and is empty without the field")
 
-    # the G1 fiend entries carry the fields the plan gives them (4.1)
-    q, d, h = (GEN.load_character(c) for c in FIENDS)
+    # the G1 fiend entries carry the fields the plan gives them (4.1). docs/REDESIGN_PLAN.md 9.5: for a redesigned id
+    # these pass-R pins read its archived entry (retired/monsters_v1.yaml), still true of the archived design
+    q, d, h = (pass_r_entry(c) for c in FIENDS)
     check(q.get("body") == "naga" and "altar" in (q.get("base") or "") and d.get("body") == "robed"
           and "tentacles" in (d.get("idle_negative") or "") and h.get("body") == "floating" and h.get("floating") is True
           and all(c.get("per_pose") and c.get("size") == "boss" and c.get("design_ref") is False for c in (q, d, h)),
@@ -292,6 +317,41 @@ def _fields(check: Callable[[bool, str], None]) -> None:
           and all(M.BODY_LINES["floating"][1] not in pp(h, p) and hm[p].strip() in pp(h, p) for p in hm)
           and all(M.BODY_LINES["floating"][1] in pp(h, p) for p in ("attack", "cast")),
           "FW-9: hollow_seraph motion (six wings visible) only in hurt and attack_raise; approved attack/cast keep the line")
+    c = pass_r_entry("chaos")
+    check(all("exactly four" in pp(c, p) for p in S.BOSS_POSES) and "four arms" in str((c.get("motion") or {}).get("cast")),
+          "FW-9: chaos (pass R) has four arms in words in every pose and in its motion line")
+    _pass_v_fields(check, pp)
+
+
+# docs/REDESIGN_PLAN.md 9.5 / 4: once a redesigned boss's live entry differs from its archived one (state B on), the
+# pass-V pins apply to the live entry: the count words in every pose it may generate, motion keys among those poses
+PASS_V_COUNTS = {"hollow_seraph": "exactly four", "chaos": "exactly two"}
+
+
+def pass_r_entry(cid: str) -> dict:
+    """The archived pass-R entry of a redesigned id (retired/monsters_v1.yaml, `retired_as: <id>_v1`) when it exists,
+    else the live monsters.yaml entry."""
+    from gen import generate as GEN
+    from gen import retire as RT
+    block = RT.retired_block(RT.Tree(), f"{cid}_v1")
+    if block is None:
+        return GEN.load_character(cid)
+    return {**{k: v for k, v in RT._parse_one(block).items() if k != "retired_as"}, "kind": "monster"}
+
+
+def _pass_v_fields(check: Callable[[bool, str], None], pp: Callable[[dict, str], str]) -> None:
+    from gen import generate as GEN
+    from gen.selftest_passv import ONLY_SHEETS
+    for cid, words in PASS_V_COUNTS.items():
+        live, old = GEN.load_character(cid), pass_r_entry(cid)
+        if live == old:
+            print(f"  info {cid}: live entry is the pass-R design (no pass-V text yet)")
+            continue
+        poses = [sh.removeprefix("boss_") for sh in ONLY_SHEETS[cid]]
+        motion = live.get("motion") or {}
+        keys = set(motion) if isinstance(motion, dict) else set(poses) - {"idle"}
+        check(all(words in pp(live, p) for p in poses) and keys <= set(poses) - {"idle"},
+              f"pass V: {cid} has '{words}' in every pose it may generate ({poses}), motion keys {sorted(keys)} among them")
 
 
 def run_prompts(check: Callable[[bool, str], None]) -> None:

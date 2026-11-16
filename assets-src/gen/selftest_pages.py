@@ -73,8 +73,45 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
           f"check prints the stable line '<id>: no rig' for an unrigged sheet and exits 0 ({buf.getvalue().strip()!r})")
     run_wide_cells(check)
     run_anchors(check)
+    run_scale(check)
     run_raise_off(check)
     run_alias(check)
+
+
+def run_scale(check: Callable[[bool, str], None]) -> None:
+    """FW-S (docs/REDESIGN_PLAN.md 2.2, 7): gen/monster_scale.yaml -> the atlas sheet field `scale`, nothing else. On a
+    two-sprite fixture build: the real table (empty at V1), an explicit {} and a missing file give byte-identical pages
+    and JSON; {goblin: 3} keeps every page byte-identical and adds only `"scale": 3` to goblin's JSON; a value of 4 or
+    an unknown sprite is refused."""
+    import tempfile
+    from gen import monster_atlas as MAT
+    from gen import retire as RT
+    real = MAT.load_scale(set(json.loads(ATLAS_JSON.read_text())["sheets"]))
+    check(all(v in MAT.DISPLAY_SCALES for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
+                                                                 f"({len(real)} entries)")
+    with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):
+        t = Path(tmp)
+
+        def build(name: str, text: str | None) -> dict[str, bytes]:
+            table = t / f"{name}.yaml"
+            if text is not None:
+                table.write_text(text)
+            out = t / name
+            with contextlib.redirect_stdout(io.StringIO()):
+                MAT.build(out, table if name != "real" else None)
+            return {p.name: p.read_bytes() for p in sorted(out.iterdir())}
+        base = build("real", None)
+        same = [build("empty", "{}\n"), build("missing", None), build("comments", "# nothing\n")]
+        check(bool(base) and all(b == base for b in same) and "scale" not in json.loads(base["monsters-ai.json"])
+              ["sheets"]["goblin"], "FW-S: an empty, missing or comment-only table gives byte-identical pages and JSON")
+        one = build("one", "goblin: 3\n")
+        pages = [n for n in base if n.endswith(".png")]
+        a, b = json.loads(base["monsters-ai.json"]), json.loads(one["monsters-ai.json"])
+        got = b["sheets"]["goblin"].pop("scale", None)
+        check(all(one[n] == base[n] for n in pages) and got == 3 and a == b,
+              f"FW-S: {{goblin: 3}} keeps the pages byte-identical and adds only goblin's \"scale\": 3 ({got})")
+        for text, word in (("goblin: 4\n", "goblin"), ("nosuch: 3\n", "nosuch"), ("goblin: true\n", "goblin")):
+            check(word in _raises(lambda: build("bad", text)), f"FW-S: the table {text.strip()!r} is refused")
 
 
 def run_alias(check: Callable[[bool, str], None]) -> None:
@@ -174,6 +211,9 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
     names = MA.frames_for(False)                                   # every other name resolves to a key or wind1
     a = MAT.travel_anchors(ims, names)
     check(a == {"travelTop": 3, "lungeRight": 28, "homeX": [5, 20]}, f"FW-A: inclusive extents over the frame lists {a}")
+    fr["idle"][14, 9] = 255                                        # idle: columns 5-20, rows 10-14
+    box = MAT.anchors(Image.fromarray(fr["idle"]))["idleBox"]
+    check(box == [5, 10, 20, 14], f"FW-A2: idleBox is the idle frame's opaque box [l, t, r, b], inclusive {box}")
     r = MAT.travel_anchors(ims, names, ranged=True)
     check(r["homeX"] == [2, 28] and r["travelTop"] == 3, f"FW-A: a ranged sheet's homeX includes its attack frames {r}")
     check(MAT.ranged_sheets() == {"dragon"}, f"FW-A: the ranged sheets are the dragon's ({sorted(MAT.ranged_sheets())})")
@@ -184,14 +224,26 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
     sheets = meta["sheets"]
     missing = [s for s, v in sheets.items() if not all(k in v for k in ("travelTop", "lungeRight", "homeX"))]
     check(not missing, f"FW-A: every sheet has travelTop, lungeRight and homeX {missing[:5]}")
-    bad = {s: {k: (sheets.get(s, {}).get(k), v) for k, v in want.items() if sheets.get(s, {}).get(k) != v}
-           for s, want in ANCHORS.items()}
+    # docs/REDESIGN_PLAN.md 9.5: a sprite with a v1 archive (chaos) is measured from the archived keys and rig, which
+    # are the pixels these constants were measured on; the committed index then holds the redesigned sheet
+    from gen import retire as RT
+    archived = {s for s in ANCHORS if RT.fixture_source(RT.Tree(), s)[3]}
+    have = {s: sheets.get(s, {}) for s in ANCHORS if s not in archived}
+    for s in sorted(archived):
+        with RT.fixture_tree((s,)):
+            _, m, k = next(e for e in MA.load_entries() if e[0] == s)
+            with contextlib.redirect_stdout(io.StringIO()):
+                frames = MAT.sprite_frames(s, m, k)[0]
+        names = MA.frames_for("cast" in frames, "attack_raise" in frames)
+        have[s] = {**MAT.anchors(frames["idle"]), **MAT.travel_anchors(frames, names, s in MAT.ranged_sheets())}
+    bad = {s: {k: (have[s].get(k), v) for k, v in want.items() if have[s].get(k) != v} for s, want in ANCHORS.items()}
     bad = {s: d for s, d in bad.items() if d}
-    check(not bad, f"FW-A: the anchors match the constants measured at 95b31e2 / F5 {bad}")
+    check(not bad, f"FW-A: the anchors match the constants measured at 95b31e2 / F5 {bad} (from the archive: "
+                   f"{sorted(archived) or 'none'})")
     el = sheets.get("earth_elemental", {})
     check(el.get("lungeRight", 999) < el.get("opaqueRight", 0), "FW-A: earth_elemental lunges inside its idle edge (109 < 110)")
     pages = [Image.open(ATLAS_JSON.parent / p["file"]).convert("RGBA") for p in meta["pages"]]
-    ranged, off = MAT.ranged_sheets(), []
+    ranged, off, boxes = MAT.ranged_sheets(), [], []
     for sid, v in sorted(sheets.items()):
         if "travelTop" not in v:
             continue
@@ -200,7 +252,14 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
         got = MAT.travel_anchors(crops, list(v["frames"]), sid in ranged)
         if any(got[k] != v[k] for k in got):
             off.append(sid)
+        if v.get("idleBox") != MAT.anchors(crops["idle"])["idleBox"]:
+            boxes.append(sid)
     check(not off, f"FW-A: every sheet's anchors agree with its own frames on the committed pages {off[:5]}")
+    check(not boxes, f"FW-A2: every sheet's idleBox is its idle frame's opaque box on the committed pages "
+                     f"({len(boxes)} off: {boxes[:5]})")
+
+
+CHAOS_TIP = [116, 12]        # the chaos attack_raise tip at 9fe129c (docs/REDESIGN_PLAN.md 9.5: the chaos_v1 archive)
 
 
 def run_raise_off(check: Callable[[bool, str], None]) -> None:
@@ -212,24 +271,28 @@ def run_raise_off(check: Callable[[bool, str], None]) -> None:
     from gen import monster_anim as MA
     from gen import monster_atlas as MAT
     from gen import monster_keys as MK
-    real = MA.load_rig
-    cfg = copy.deepcopy(real("hollow_seraph"))
-    cfg["raise"] = False
-    before = {e[0]: e for e in MA.load_entries()}
-    MA.load_rig = lambda s: cfg if s == "hollow_seraph" else real(s)
-    try:
-        after = {e[0]: e for e in MA.load_entries()}
-        _, meta, kfs = after["hollow_seraph"]
-        check("attack_raise" not in kfs and meta.get("raise_off") is True and kfs["idle"].size == (218, 200)
-              and "attack_raise" not in meta["poses"], f"FW-R: no attack_raise key, the 218x200 cell kept ({sorted(kfs)})")
-        same = all(sid == "hollow_seraph" or (set(e[2]) == set(before[sid][2]) and all(
-            np.array_equal(np.asarray(e[2][k]), np.asarray(before[sid][2][k])) for k in e[2])) for sid, e in after.items())
-        check(same and set(after) == set(before), "FW-R: every other sheet's keys are unchanged")
-        buf = io.StringIO()
-        with contextlib.redirect_stdout(buf):
-            frames, holds, anim = MAT.sprite_frames("hollow_seraph", meta, kfs)
-    finally:
-        MA.load_rig = real
+    from gen import retire as RT
+    with RT.fixture_tree(("hollow_seraph", "chaos"), full=True) as archived:   # 9.5: the v1 archives when present
+        real = MA.load_rig
+        cfg = copy.deepcopy(real("hollow_seraph"))
+        cfg["raise"] = False
+        before = {e[0]: e for e in MA.load_entries()}
+        MA.load_rig = lambda s: cfg if s == "hollow_seraph" else real(s)
+        try:
+            after = {e[0]: e for e in MA.load_entries()}
+            _, meta, kfs = after["hollow_seraph"]
+            check("attack_raise" not in kfs and meta.get("raise_off") is True and kfs["idle"].size == (218, 200)
+                  and "attack_raise" not in meta["poses"],
+                  f"FW-R: no attack_raise key, the 218x200 cell kept ({sorted(kfs)}; archive: {archived})")
+            same = all(sid == "hollow_seraph" or (set(e[2]) == set(before[sid][2]) and all(
+                np.array_equal(np.asarray(e[2][k]), np.asarray(before[sid][2][k])) for k in e[2]))
+                for sid, e in after.items())
+            check(same and set(after) == set(before), "FW-R: every other sheet's keys are unchanged")
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                frames, holds, anim = MAT.sprite_frames("hollow_seraph", meta, kfs)
+        finally:
+            MA.load_rig = real
     names = MA.frames_for("cast" in frames, "attack_raise" in frames)
     raise_names = [n for n in MA.RAISE_FRAMES if n in frames or n in names]
     sheet = MAT.sheet_meta(meta, frames, names, {}, holds, anim, MA.lunge_px(frames["idle"]), 0, False)
@@ -240,8 +303,10 @@ def run_raise_off(check: Callable[[bool, str], None]) -> None:
           f"FW-R: the tip {sheet.get('tip')} is on atk_wind2's topmost opaque row")
     _, cmeta, ckfs = before["chaos"]
     committed = json.loads(ATLAS_JSON.read_text())["sheets"]["chaos"]
-    check(MAT.tip(ckfs["attack_raise"])["tip"] == committed.get("tip") and not cmeta.get("raise_off"),
-          "FW-R: a sheet with a raise keeps its attack_raise tip")
+    tip = MAT.tip(ckfs["attack_raise"])["tip"]
+    check(tip == CHAOS_TIP and (archived["chaos"] or committed.get("tip") == tip) and not cmeta.get("raise_off"),
+          f"FW-R: a sheet with a raise keeps its attack_raise tip (chaos {tip} == {CHAOS_TIP}"
+          f"{', from the chaos_v1 archive' if archived['chaos'] else ', as committed'})")
     try:
         MK.raise_off("x", {"raise": "no"})
         refused = False
@@ -274,13 +339,15 @@ def run_wide_cells(check: Callable[[bool, str], None]) -> None:
     same = {"idle": idle, "hurt": idle.copy()}
     k2, _ = pad(same, {"bottom_row": 192})
     check(all(k2[k] is same[k] for k in same), "a uniform sheet's keyframes come back untouched (same objects)")
+    from gen import retire as RT
     raw = {}
-    for sid in ("hollow_seraph", "warmech"):
-        for p in ("idle", "attack", "hurt", "cast", "attack_raise"):
-            f = MA.APPROVED / sid / f"boss_{p}.png"
-            if f.exists():
-                raw[(sid, p)] = Image.open(f).convert("RGBA")
-    entries = {e[0]: e for e in MA.load_entries()}
+    with RT.fixture_tree(("hollow_seraph", "warmech")):        # 9.5: the seraph's v1 archive when present
+        for sid in ("hollow_seraph", "warmech"):
+            for p in ("idle", "attack", "hurt", "cast", "attack_raise"):
+                f = MA.APPROVED / sid / f"boss_{p}.png"
+                if f.exists():
+                    raw[(sid, p)] = Image.open(f).convert("RGBA")
+        entries = {e[0]: e for e in MA.load_entries()}
     for sid in ("hollow_seraph", "warmech"):
         if sid not in entries:
             continue

@@ -157,9 +157,15 @@ def test_budget_guard() -> None:
             return True
         return False
     a, b = _req("selftest-a"), _req("selftest-b")
-    check(refused(lambda: GEN.check_budget([a, b], paid=True, max_paid=1, retry=False, ledger=[])), "2 misses > max-paid 1 refused")
-    check(refused(lambda: GEN.check_budget([a], paid=False, max_paid=1, retry=False, ledger=[])), "uncached without --paid refused")
-    check(GEN.check_budget([a], paid=True, max_paid=1, retry=False, ledger=[]) == [a], "1 miss with --paid allowed")
+    # a permissive synthetic budget for the generic rules (the real budget.json, pass V, refuses the fake 'knight'
+    # requests by only_ids and an empty ledger by its consistency guard; selftest_passv.py tests the real budget)
+    loose = {"attempts_before": 0, "cap": 10, "max_attempts_per_sheet": 3, "passes": []}
+    check(refused(lambda: GEN.check_budget([a, b], paid=True, max_paid=1, retry=False, ledger=[], budget=loose)),
+          "2 misses > max-paid 1 refused")
+    check(refused(lambda: GEN.check_budget([a], paid=False, max_paid=1, retry=False, ledger=[], budget=loose)),
+          "uncached without --paid refused")
+    check(GEN.check_budget([a], paid=True, max_paid=1, retry=False, ledger=[], budget=loose) == [a],
+          "1 miss with --paid allowed")
     if GEN.BUDGET.exists():
         b = json.loads(GEN.BUDGET.read_text())
         full = [{"event": "attempt", "character": "x", "sheet": "y"}] * (b["attempts_before"] + b["cap"])
@@ -179,11 +185,13 @@ def test_budget_guard() -> None:
         check([e["event"] for e in entries] == ["attempt", "result"] and entries[1]["ok"] is False,
               "failed call is ledgered before and after (counts as spent)")
         edited = _req("selftest-edited-prompt")
-        check(refused(lambda: GEN.check_budget([edited], paid=True, max_paid=1, retry=False, ledger=entries)),
+        check(refused(lambda: GEN.check_budget([edited], paid=True, max_paid=1, retry=False, ledger=entries,
+                                               budget=loose)),
               "earlier attempt at the same checkpoint blocks a new key without --retry")
-        check(GEN.check_budget([edited], paid=True, max_paid=1, retry=True, ledger=entries) == [edited], "--retry allows it")
+        check(GEN.check_budget([edited], paid=True, max_paid=1, retry=True, ledger=entries, budget=loose) == [edited],
+              "--retry allows it")
         other = _req("selftest-other", sheet="field_down")
-        check(GEN.check_budget([other], paid=True, max_paid=1, retry=False, ledger=entries) == [other],
+        check(GEN.check_budget([other], paid=True, max_paid=1, retry=False, ledger=entries, budget=loose) == [other],
               "a different checkpoint is not blocked")
 
 
@@ -241,6 +249,11 @@ def test_style_lock() -> None:
     for path in sorted((HERE / "approved").glob("*/*.json")):
         meta = json.loads(path.read_text())
         meta.setdefault("character", meta.get("kit"))       # kit sheets are keyed by kit id
+        if meta.get("revived_from"):                         # FW-RT revival: the archived key's committed cache file
+            from gen import selftest_roster as SRo
+            check(SRo.revived_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: revived from "
+                                                   f"{meta['revived_from']}, cache/{meta['cache_key']} present")
+            continue
         char = GEN.load_character(meta["character"])
         req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
         check(req.key == meta["cache_key"] and req.cached,
@@ -429,6 +442,12 @@ def test_monster_anim() -> None:
     print("roster pass R budget guard (285 build + 15 fix, 3 per sheet, closed passes, only_approved)")
     from gen import selftest_roster as SRo
     SRo.run_roster(check)
+    print("pass V budget guard (FW-V0: 50 new, 3 per sheet, only_ids, only_sheets, consistency, history never read)")
+    from gen import selftest_passv as SPV
+    SPV.run_passv(check)
+    print("retired sprites (FW-RT: retire.py archive / prune / move-rig / revive, approve gate, exclusion proof)")
+    from gen import selftest_retire as SRt
+    SRt.run_retire(check)
     print("roster pass R prompt fields (FW-9: idle_negative, body, base; every approved key unchanged)")
     SRo.run_prompts(check)
     print("FW-5 templates (biped wings, extra arm pairs, multi-head necks, preset mechanical)")
@@ -437,7 +456,11 @@ def test_monster_anim() -> None:
     print("roster fix pass measurements (FW-M: fixmeasure.py reproduces the fix plan's RED numbers)")
     from gen import selftest_fixmeasure as SFM
     SFM.run_fixmeasure(check)
-    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false)")
+    print("titan band (FW-T: 300 cell / feet 292, fail-closed cut, probe, approve, titan page group)")
+    from gen import selftest_titan as STi
+    STi.run_titan(check)
+    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
+          "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
     print("monster atlas build locks")

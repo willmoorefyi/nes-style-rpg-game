@@ -295,11 +295,14 @@ MONSTER_BANDS = {
     "small": MonsterBand("small", 80, (56, 72), 76),
     "large": MonsterBand("large", 128, (96, 120), 122),
     "boss": MonsterBand("boss", 176, (140, 168), 168),
+    # FW-T (docs/REDESIGN_PLAN.md 4.2, D-V6 C1): the titan band, per-pose only (chaos): a 300 px cell, feet row 292,
+    # top row >= 15, so the figure is 258 (1.4 x the lich's 184) to 278 art px, cut 1:1 from Gemini's pixel grid
+    "titan": MonsterBand("titan", 300, (258, 278), 292),
 }
 MONSTER_GEOMS = {
     b.size: SheetGeom(f"monster_{b.size}", grid=(b.cell, b.cell), cell_px=MONSTER_GUIDE_CELL, layout=(3, 1),
                       px_per_unit=1.0, bottom_row=b.foot_row, aspect_override="21:9")
-    for b in MONSTER_BANDS.values()
+    for b in MONSTER_BANDS.values() if b.size != "titan"          # titans are per-pose sheets only
 }
 MONSTER_NEGATIVE = (
     "two creatures in one cell, different creatures in different cells, background scenery, floor tiles, shadows on the "
@@ -313,6 +316,16 @@ MONSTER_POSE_GUIDE = (1024, 1024)
 # never shrunk to fit (that drops pixel rows).
 BOSS_POSE_GEOM = SheetGeom("boss_pose", grid=(200, 200), cell_px=MONSTER_POSE_GUIDE, layout=(1, 1), px_per_unit=1.0,
                            bottom_row=192)
+# FW-T: the titan's per-pose cell (the same 1024^2 guide and request aspect as every boss pose; the band box is capped
+# by the guide, monster.pose_guide). A titan cut is fail-closed: scale 1.0 in grid mode or it raises (monster.cut).
+TITAN_POSE_GEOM = SheetGeom("titan_pose", grid=(300, 300), cell_px=MONSTER_POSE_GUIDE, layout=(1, 1), px_per_unit=1.0,
+                            bottom_row=292)
+TITAN_TOP_MIN = 15                 # review headroom: the approved keys' top opaque row (overshoot frames go 10 % past)
+
+
+def pose_geom(size: str | None) -> SheetGeom:
+    """The per-pose cell of a boss of this size: the titan cell for `size: titan`, else the 200 px boss cell."""
+    return TITAN_POSE_GEOM if size == "titan" else BOSS_POSE_GEOM
 
 
 # Tile-kit sheets (docs/ART_TILES_PLAN.md rev 2.1): 48x48 native tiles, 240 guide px per tile on a 1280x1024 (5:4)

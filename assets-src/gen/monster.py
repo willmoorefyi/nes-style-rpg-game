@@ -7,10 +7,18 @@ Kept apart from the character code so character prompts, guides and cache keys c
                                `idle_negative`, `motion` change the text only when set
   cut(raw, band, floating)     raw render -> three frames in the band's square output cell
   recolor(frame, variant)      palette-swap variant of an approved frame (no extra images)
+
+  python3 -I assets-src/gen/monster.py --titan-probe <raw.png ...>   # FW-T / G-T0: the titan cut, offline, per render
 """
 from __future__ import annotations
 
 import colorsys
+import json
+import sys
+from pathlib import Path
+
+if __name__ == "__main__" and str(Path(__file__).resolve().parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))     # run as a script: make `gen` importable
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -469,6 +477,14 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     # single pixel rows); far outside, nearest-neighbour scale to the band edge
     f = hi / tallest if tallest > hi * (1 + HEIGHT_TOLERANCE) else lo / tallest if tallest < lo * (1 - HEIGHT_TOLERANCE) else 1.0
     info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / n_cells, 1), h)})
+    if band.size == "titan" and (info["scale"] != 1.0 or info.get("mode") != "grid"):
+        # FW-T fail-closed (docs/REDESIGN_PLAN.md 4.2): never resample the titan (a non-integer nearest scale is S4's
+        # stair-step artefact; an area-averaged render is blurred); the attempt counts as rejected
+        err = ValueError(f"cut: titan band refuses this render: scale {info['scale']} (needs 1.0), mode "
+                         f"{info.get('mode')!r} (needs 'grid'), native figure height {tallest} (band {lo}-"
+                         f"{band.height[1]}), pitch {info.get('pitch')}")
+        err.info = info                                   # read by titan_probe
+        raise err
 
     if f < 1.0:
         # shrinking: re-pixelize from the full-resolution render (block vote with facial-detail protection) instead of
@@ -611,3 +627,44 @@ def recolor(frame: Image.Image, variant: dict) -> Image.Image:
         m = sel.reshape(-1)
         flat[m] = np.array([lut[tuple(c)] for c in flat[m].tolist()], np.uint8)
     return Image.fromarray(a, "RGBA")
+
+
+# ───────────────────────────── FW-T / G-T0: offline titan probe ─────────────────────────────
+
+def titan_guide_box() -> int:
+    """The titan pose guide's size box side in guide px (pose_guide caps it at the guide height - 110)."""
+    band = S.MONSTER_BANDS["titan"]
+    return int(min(band.height[1] * S.MONSTER_EXPECTED_PITCH, S.MONSTER_POSE_GUIDE[1] - 110))
+
+
+def titan_probe(raw: Image.Image, floating: bool = False) -> dict:
+    """The titan cut of one render (no files written): pitch, confidence, mode, scale, native figure height and the
+    verdict (accepted = cut at scale 1.0 in grid mode; else the fail-closed refusal), plus the guide box in art px at
+    this render's pitch, and for an accepted cut the frame's top and lowest opaque rows."""
+    band, geom = S.MONSTER_BANDS["titan"], S.TITAN_POSE_GEOM
+    try:
+        frames, info = cut(raw, band, floating, n_cells=1, cell=geom.grid[0], foot_row=geom.bottom_row)
+        ok, why = True, ""
+    except ValueError as e:
+        frames, info, ok, why = [], getattr(e, "info", {}), False, str(e)
+    pitch = info.get("pitch") or 0.0
+    out = {"size": list(raw.size), "pitch": pitch, "confidence": info.get("confidence"), "mode": info.get("mode"),
+           "scale": info.get("scale"), "native_height": max(info.get("native_heights") or [0]), "accepted": ok,
+           "guide_box_px": titan_guide_box(),
+           "guide_box_art_px": round(titan_guide_box() / pitch, 1) if pitch else None}
+    if ok:
+        ys = np.where(np.asarray(frames[0])[..., 3].any(1))[0]
+        out.update({"top_row": int(ys.min()), "lowest_row": int(ys.max()), "cell": list(frames[0].size),
+                    "in_band": band.height[0] <= int(ys.max() - ys.min() + 1) <= band.height[1]})
+    elif why and "titan band refuses" not in why:
+        out["error"] = why
+    return out
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if not args or args[0] != "--titan-probe" or len(args) < 2:
+        print(__doc__)
+        sys.exit(2)
+    for path in args[1:]:
+        print(json.dumps({"raw": path, **titan_probe(Image.open(path))}))
