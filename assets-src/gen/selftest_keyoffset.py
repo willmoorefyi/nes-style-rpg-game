@@ -100,9 +100,11 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     check(np.array_equal(np.asarray(bk["hurt"].convert("RGBA")), _shift(np.asarray(pk["hurt"].convert("RGBA")), dx, dy))
           and bmeta.get("kf_painted") == ["hurt"],
           "FW-O: keyframe paint is translated with its key (offset + paint = the painted key moved)")
-    ib = {**copy.deepcopy(off), "paint": [{"frame": "hurt_in2", "xy": [[40, 40]], "rgb": list(pal[2])}]}
+    # an attack in-between: the live chimera rig aliases its hurt sequence since G3b round 2 (FW-Q), so it generates
+    # no hurt_in2
+    ib = {**copy.deepcopy(off), "paint": [{"frame": "atk_mid", "xy": [[40, 40]], "rgb": list(pal[2])}]}
     _, imeta, ik = _entries(sid, ib)
-    ig = MA.generate(sid, MK.offset_cfg(sid, ib), ik, imeta)["hurt_in2"]["img"]
+    ig = MA.generate(sid, MK.offset_cfg(sid, ib), ik, imeta)["atk_mid"]["img"]
     check(tuple(ig[40, 40]) == (*pal[2], 255), "FW-O: in-between paint stays at its written xy (the rig agent re-derives it)")
 
     lock = MC.lock_frames(MA.generate(sid, ocfg, okfs, ometa), okfs, ometa)

@@ -563,14 +563,14 @@ the measured result (plan 1 section 7 rule).
 - [x] G2: Dark Fighter cur3 -> cure3, ai rate 0.5, spellNames cleanup, name-based cross-file test RED -> GREEN, AI unit test (high, 2h) (2026-11-15)
 - [x] G2: water_elemental bestiary background -> shoreline (low, 0.5h) (2026-11-15)
 - [x] G3a: king_mummy staff, clay_golem rune, sea_troll seams, stone_golem seams + spike, ice_gigas strand (medium, 3 iter each) (2026-11-15, merged 01fa607)
-- [ ] G3b: chimera erase (B; fallback D + escalate), basilisk notch, crocodile 18 px + tip strand (high, 3 iter each); done: chimera attack, basilisk, crocodile (merged 6b2c41e); open: chimera hurt (`fix2-rig-chimera`, cap 720 at 5aaf0ca)
+- [x] G3b: chimera erase (B; fallback D + escalate), basilisk notch, crocodile 18 px + tip strand (high, 3 iter each); chimera attack, basilisk, crocodile (merged 6b2c41e); chimera hurt (key paint 719 <= 720, hurt aliased under FW-Q, merged 5c114c8) (2026-11-15)
 - [x] G3c: sand_worm fold, air_elemental crease, earth_medusa rectangle + arm, ashen_queen key_offset re-check (medium, 3 iter each) (2026-11-15, merged 7f0eee4)
-- [ ] G3d: red_piranha (and white_shark if it fits) re-cut, review, approve; after G4 rebuild: data entries, rigs (medium, 1d); done: re-cuts R288 / R289 approved, data entries and atlas (G4); open: rigs "float2"
+- [x] G3d: red_piranha (and white_shark if it fits) re-cut, review, approve; after G4 rebuild: data entries, rigs (medium, 1d); re-cuts R288 / R289 approved, data entries and atlas (G4); rigs "float2" (both ship, merged b3517c5) (2026-11-15)
 - [x] G4: integrate, rebuild, section 9 validation, frame-rect diff == section 9 list, page count, AGENTS.md, docs (high, 4h) (2026-11-15; 123 sheets, 9 pages; ROSTER_LOG "Fix pass 2: G4 integration")
-- [ ] G5 wave 1: warmech (+ daze), water_elemental, horned_devil, black_knight (medium, 3 iter each)
-- [ ] G5 wave 2: scorpion, hydra, black_widow, crawler (medium, 3 iter each)
-- [ ] G5 wave 3: astos (+ daze) (medium, 3 iter)
-- [ ] G6: integrate T-K, rebuild, validation, remove unused FWQ_ALLOW entries (high, 4h)
+- [x] G5 wave 1: warmech (+ daze), water_elemental, horned_devil, black_knight (medium, 3 iter each) (2026-11-15, merged 02c4060, 9b45c35, d344411, 5e03c86; no alias)
+- [x] G5 wave 2: scorpion, hydra, black_widow, crawler (medium, 3 iter each) (2026-11-15, merged 1c10217, 5987b2e, 9b7e6d3, 38febb0; black_widow hurt and crawler attack aliased under FW-Q)
+- [x] G5 wave 3: astos (+ daze) (medium, 3 iter) (2026-11-15, merged e76c9dd; attack aliased under FW-Q, hurt and cast bridged)
+- [x] G6: integrate T-K, rebuild, validation, remove unused FWQ_ALLOW entries (high, 4h) (2026-11-15; 123 sheets, all rigged, 9 pages; FWQ_ALLOW = the 4 used entries; ROSTER_LOG "Fix pass 2: G6 integration")
 - [ ] G7: fresh adversarial re-test + regression sample + sweep top 10 + FPS; rows in ROSTER_PLAYTEST.md (high, 4h)
 ```
 

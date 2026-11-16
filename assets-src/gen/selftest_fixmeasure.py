@@ -147,7 +147,10 @@ def run_m2_red(check: Callable[[bool, str], None]) -> None:
     check(em == {"idle": 19}, f"P2-8: earth_medusa chest-rectangle ink 19 ({em})")
     aq = FE.rowspan(FM.Sprite("ashen_queen", _fixture2("ashen_queen")), ["idle", "attack", "hurt", "cast"], (170, 200))
     check([v[0] for v in aq.values()] == [28, 25, 20, 25], f"N-4: ashen_queen coil base left edges 28 / 25 / 20 / 25 ({aq})")
-    sw = FE.switch(FM.Sprite("black_knight"), "attack")
+    # black_knight is rigged since T-K (G5): drop its generated frames so `switch` runs the keyframe-only pre-check
+    bk = FM.Sprite("black_knight")
+    bk.gen = {}
+    sw = FE.switch(bk, "attack")
     check(round(sw["need"], 2) == 0.46 and sw["d"] is not None, f"T-K: switch black_knight attack need 0.46 ({sw['need']:.3f}, d {sw['d']})")
 
 

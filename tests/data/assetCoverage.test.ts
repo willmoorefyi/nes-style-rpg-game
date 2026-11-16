@@ -32,6 +32,18 @@ const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.j
     anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number] }>;
 };
 /** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
+// FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens
+// aliased to their source keys (monster_anim.ALIAS_FRAMES); since G6 chimera / black_widow hurt, crawler / astos attack.
+const FWQ_FRAMES: Record<string, MonsterFrame[]> = {
+  hurt: ['hurt_in1', 'hurt_in2'], attack: ['atk_wind1', 'atk_wind2', 'atk_mid', 'atk_follow', 'atk_recover'],
+};
+const fwqAliased = (sprite: string): Set<MonsterFrame> => {
+  const rig = resolve(__dirname, '../../assets-src/gen/anim/monsters', `${sprite}.yaml`);
+  // the top-level `alias:` line only (some rigs repeat keys, which PyYAML allows and the strict yaml parser refuses)
+  const m = existsSync(rig) ? /^alias:\s*\[([^\]]*)\]/m.exec(readFileSync(rig, 'utf-8')) : null;
+  const seqs = m ? m[1].split(',').map((q) => q.trim()).filter(Boolean) : [];
+  return new Set(seqs.flatMap((q) => FWQ_FRAMES[q] ?? []));
+};
 const RAISE_FRAMES = new Set<MonsterFrame>(['attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2']);
 const classes = readYaml<Array<{ id: string }>>('data/classes.yaml');
 const enemies = readYaml<Array<{ id: string; sprite?: string }>>('data/enemies.yaml');
@@ -186,11 +198,16 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       }
     });
 
-    it('generated frames: their own rects when animated (except held frames), else aliased to the source keyframe', () => {
+    it('generated frames: their own rects when animated (except held and FW-Q aliased frames), else aliased to the source keyframe', () => {
       for (const [id, e] of Object.entries(monsterAtlas.sheets)) {
         const holds = e.holds ?? [];
+        const aliased = fwqAliased(id);
         for (const n of Object.keys(e.frames) as MonsterFrame[]) {
           if (FRAME_SOURCE[n] === n) continue;
+          if (aliased.has(n)) {                    // FW-Q partial rig: that sequence resolves to its keys
+            expect(e.frames[n].join(), `${id} ${n} (FW-Q aliased)`).toBe(e.frames[FRAME_SOURCE[n]].join());
+            continue;
+          }
           if (holds.includes(n)) {                 // a held frame shows its fallback (e.g. atk_raise_in -> atk_wind1)
             expect(e.frames[n].join(), `${id} ${n}`).toBe(e.frames[FRAME_FALLBACK[n]].join());
             continue;

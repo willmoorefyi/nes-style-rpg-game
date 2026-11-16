@@ -641,3 +641,32 @@ Notes for G3d / G7: white_shark's level 57 px idle reads no bigger than a small 
 its 95-98 px arched attack / hurt keys pops without in-betweens (R289 nit; the rig decides). `tests/integration/
 battle.test.ts` "command selection" failed once under full CPU load (an unseeded 300-tick fight that did not end) and
 passed 3 of 3 alone; unrelated to this change.
+
+### Fix pass 2: G6 integration (integrator, `roster-int`, 2026-11-15)
+
+Integrated at e76c9dd: chimera hurt (round 2: hurt key's second dragon head erased by key paint 719 <= 720, hurt
+aliased under FW-Q; merged 5c114c8), the G3d "float2" swimmer rigs red_piranha and white_shark (both ship, merged
+b3517c5) and all 9 T-K rigs (warmech, water_elemental, black_knight, horned_devil, scorpion, hydra, black_widow, crawler,
+astos). **All 123 sheets are rigged and locked**; 4 rigs are partial under FW-Q.
+
+| Gate | Result |
+|---|---|
+| Images | 0 (pass R fix stays at 33 remaining) |
+| FW-Q cleanup | `FWQ_ALLOW` (`monster_anim.py`) and its pin in `selftest_efix.py` cut from 7 to the 4 used entries: chimera / hurt, black_widow / hurt, crawler / attack, astos / attack (removed: scorpion / hurt, hydra / attack, black_knight / hurt, whose rigs bridge every sequence). `selftest_efix` now checks both directions: every live alias is allowlisted and every allowlist entry is used |
+| `build_assets.py monsters_ai battle_ai field_ai` | **123 sheets, 123 animated, 9 pages**: 2040x1872, 2048x1856, 2032x1200, 2048x1536, 2048x2000, 2008x768, 2048x2032, 2048x1152, 2048x1696 (all <= 2048; pages 0 and 6 byte-identical to G4); identical for PYTHONHASHSEED 0 and 1 (10 files `shasum -c` OK); party atlases byte-identical; 166 s per build |
+| `monster_anim.py check --all` | **123 `OK`, 0 `no rig`**, nothing else; `aliased:` notes only on the 4 FW-Q rigs (black_widow hurt, chimera hurt, crawler attack, astos attack); 165 s |
+| Frame-rect diff vs a693971 (G4, by sheet and frame name) | changed exactly the 12 expected sheets, nothing removed, every other sheet `same`: chimera hurt_in1, hurt_in2, hurt (the painted hurt key; its in-betweens now alias idle / hurt); red_piranha, white_shark, black_knight, horned_devil, hydra, scorpion, water_elemental: all 10 in-betweens (idle_b, atk_*, hurt_in1/2, daze, daze_b); warmech the same 10 plus cast_gather, cast_release (cast_rise unchanged); astos idle_b, hurt_in1/2, daze, daze_b, cast_gather/rise/release (attack aliased); black_widow idle_b, atk_*, daze, daze_b (hurt aliased); crawler idle_b, hurt_in1, daze, daze_b (attack aliased; hurt_in2 a hold) |
+| `selftest.py --anim`, `selftest.py` | ALL PASSED (557 / 933 ok checks; one more than G4: the new "every allowlist entry is used" FW-Q check) after the by-design updates below; the first runs failed only on them |
+| `npx tsc --noEmit`, `npm run build`, `npx vitest run` | clean; 220 files, 4171 tests |
+| Browser (headless Chromium, dev server on 127.0.0.1, `mute=1`) | bestiary `enemyAnim=loop` and `battleStep=1` (`.` x 6 per shot, 8-9 distinct frames of 12) for astos, warmech, hydra, chimera, black_widow, crawler, white_shark: every sequence plays, no placeholder boxes; chimera shows lion, goat and one dragon head in every shot; sandbox `l30_lich` + warmech (`enemyAnim=loop`): the boss's lunge top stays about 10 px below the top message window (screen y ~88 vs window bottom ~78) and reaches the warrior; sandbox 9-crowd (scorpion, crawler, black_widow, horned_devil, black_knight, red_piranha, water_elemental, hydra, white_shark): all nine laid out on the plain without overlap at rest, every one cycling. No console errors (only the headless GL "GPU stall due to ReadPixels" performance warning). Screenshots and contact sheets in `/tmp/g6/` |
+
+By-design updates (each with a comment): `selftest_pages.py` FW-A warmech `travelTop` 5 -> 2 (rigged since T-K; its
+translated travel frames reach 3 px higher than the keys) and the FW-Q test docstring; `selftest_fw5.py` PROTOTYPES +
+horned_devil (optional wing parts `uwing_f` / `fwing_f`); `selftest_fixmeasure.py` the T-K `switch` pre-check on
+black_knight drops its generated frames (the sheet is rigged now; need 0.462, d (4, -1) as before);
+`selftest_keyoffset.py` the in-between paint case paints chimera `atk_mid` (its hurt is aliased, so there is no
+`hurt_in2`); `tests/data/assetCoverage.test.ts` an animated sheet's FW-Q aliased frames (read from the rig's top-level
+`alias:` line) must resolve to their source keys, all other generated frames to their own rects.
+
+The three small brown puffs on the ground between warmech's feet at contact are the runtime impact dust
+(`AiEnemyView` contact cue), not sprite pixels (the approved `boss_attack.png` has none).

@@ -337,6 +337,15 @@ python3 -I assets-src/gen/monster_anim.py check --all --calibrate   # keyframe-p
 - **Variants inherit** every frame (recoloured); check them in the browser (`anim_goblin`, `anim_beasts`): CLI ids
   are base sprites only.
 - **Holds:** ≤ 1 per sequence, proven legal by `check` (continuity still passes), with a `reason`. Act 1 shipped none.
+- **Hard sheets (T-K, fix pass 2: warmech, hydra, scorpion, black_knight, horned_devil, water_elemental, the
+  swimmers ...):** when the keys are too far apart for rotations under the cap, make every in-between a
+  **translation-only** copy of its source key (`moves: []`, the upper body / heads / necks as one group, feet pinned)
+  and bridge the key switch with the shift; measure it first with `fixmeasure.py switch <id> <seq> --rig <rig>`.
+- **Pin every leg tip, including the undrawn ones** (a leg hidden behind the body in one key still has a tip joint):
+  an unpinned tip lets the ground clamp or a group move drag a leg off the plain.
+- **One sequence that cannot bridge** (continuity below the need in 3 iterations): alias it per key with FW-Q
+  (`alias: [hurt]` or `[attack]`, an `FWQ_ALLOW` entry approved by the orchestrator) and keep the other sequences
+  rigged; G6 shipped chimera / hurt, black_widow / hurt, crawler / attack and astos / attack.
 
 ## 3. Validation
 

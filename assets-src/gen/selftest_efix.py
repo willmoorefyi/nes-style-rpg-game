@@ -14,9 +14,9 @@ import yaml
 BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # revision 3: no new kind fx without orchestrator approval; G1 turns lich crystal into fx (E4); FW-7 (pass R,
 # orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
-# FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the pre-allowlisted partial-rig aliases; G6 removes the unused ones
-FWQ_ALLOW = {("chimera", "hurt"), ("scorpion", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("hydra", "attack"),
-             ("black_knight", "hurt"), ("astos", "attack")}
+# FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the partial-rig aliases in use; G6 removed the unused pre-allowlisted
+# ones (scorpion/hurt, hydra/attack, black_knight/hurt), so this set equals the live rigs' aliases exactly
+FWQ_ALLOW = {("chimera", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
 FX_PENDING: set[tuple[str, str]] = set()
 
@@ -220,10 +220,11 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
 def run_fwq_allowlist(check: Callable[[bool, str], None]) -> None:
     """FW-Q: the code's allowlist is exactly this one, and every live rig's alias is on it (at most one per rig)."""
     from gen import monster_anim as MA
-    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the pre-allowlisted entries (6 + chimera/hurt) "
+    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the used entries (4) "
           f"({sorted(getattr(MA, 'FWQ_ALLOW', set()))})")
     live = {(p.stem, a) for p in sorted(MA.RIGS.glob("*.yaml")) for a in (yaml.safe_load(p.read_text()) or {}).get("alias") or []}
     check(live <= FWQ_ALLOW, f"FW-Q: every live rig alias is allowlisted ({sorted(live)})")
+    check(FWQ_ALLOW <= live, f"FW-Q: every allowlist entry is used by a live rig (unused: {sorted(FWQ_ALLOW - live)})")
 
 
 def lich_crystal_ratio(cfg: dict | None = None) -> tuple[int, int]:

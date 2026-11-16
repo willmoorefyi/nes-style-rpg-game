@@ -246,7 +246,7 @@ Body = the rig recipe (section 5). Base imgs = Gemini images without retries. Th
 | 049 | Rime Sovereign | `lich` | boss | biped | - | 0 | existing: frost knight-king, ice glaive (records 049 and 124) |
 | 050 | Ankheg | `ankheg` | large | arthropod | B | 1 | armoured rust-brown centipede rearing up, huge mandibles, dripping venom |
 | 051 | Piranha | `piranha` | small | swimmer | B | 1 | **cut (user, 2026-11-15):** no sprite, enemy or bestiary entry for now. Was: small silver-green piranha, underbite of needle teeth |
-| 052 | Red Piranha | `red_piranha` | small | swimmer | B | 1 | larger blood-red armour-plated piranha, bony head plate, spiny fins. **Approved R288** (fix pass 2: FW-C re-cut of the R282 raw, hurt lifted 8 px, 0 images); in the atlas and `enemies.yaml` (num 52, bestiary `ocean`, not placed) since G4, keyframes only until the G3d rig |
+| 052 | Red Piranha | `red_piranha` | small | swimmer | B | 1 | larger blood-red armour-plated piranha, bony head plate, spiny fins. **Approved R288** (fix pass 2: FW-C re-cut of the R282 raw, hurt lifted 8 px, 0 images); in the atlas and `enemies.yaml` (num 52, bestiary `ocean`, not placed) since G4; rigged and locked in G3d ("float2", SHIP WITH NITS), in the atlas since G6 |
 | 053 | Crocodile | `crocodile` | large | quadruped | B | 1 | dark green crocodile, open jaws, ridged back, low sprawl |
 | 054 | White Crocodile | `white_crocodile` | large | quadruped | B | 1 | pale albino crocodile, pink eyes, barnacle-crusted back, larger |
 | 055 | Ochu | `ochu` | large | rooted | B | 1 | carnivorous green plant: bulb with a toothy maw on a root mass, four lashing vine tentacles |
@@ -288,7 +288,7 @@ Body = the rig recipe (section 5). Base imgs = Gemini images without retries. Th
 | 091 | Nightmare | `nightmare` | large | quadruped | C | 1 | black horse with a flaming violet mane and smouldering hooves |
 | 092 | Dragon Zombie | `dragon_zombie` | large | quadruped | G2 | 1 | rotting dragon, torn wing membranes, exposed bone, ghost-green glow |
 | 093 | Sahagin Prince | `sahagin_prince` | small | biped | C | 1 | tall regal fish-man, flowing fin cape, twin coral blades, pearl circlet |
-| 094 | White Shark | `white_shark` | large | swimmer | C | 1 | great white shark, scarred, wider and paler than the shark. **Approved with nits R289** (fix pass 2: FW-C re-cut of the R280 raw, attack / hurt lifted 34 / 36 px, 0 images; small level idle vs arched 95-98 px actions); in the atlas and `enemies.yaml` (num 94, bestiary `ocean`, not placed) since G4, keyframes only until the G3d rig (deferred again if check 8 fails) |
+| 094 | White Shark | `white_shark` | large | swimmer | C | 1 | great white shark, scarred, wider and paler than the shark. **Approved with nits R289** (fix pass 2: FW-C re-cut of the R280 raw, attack / hurt lifted 34 / 36 px, 0 images; small level idle vs arched 95-98 px actions); in the atlas and `enemies.yaml` (num 94, bestiary `ocean`, not placed) since G4; rigged and locked in G3d ("float2", SHIP WITH NITS: ships, not deferred), in the atlas since G6 |
 | 095 | Deepeyes | `deepeyes` | large | floating | C | 1 | bulbous abyssal eye with dangling luminous tentacles beneath |
 | 096 | Sea Snake | `sea_snake` | large | serpent | C | 1 | banded blue and white sea serpent with a paddle tail and fin crest |
 | 097 | Sea Scorpion | `sea_scorpion` | small | arthropod | C | 1 | red armoured lobster-scorpion with big crusher claws |
@@ -1117,7 +1117,7 @@ EOF
 - [ ] Rigs A (25), B (27), C (32), D (18): per-sprite checklist, image-only review, lock (high, ~45 agent-days)
 - [ ] Boss rigs: 3 fiends + 4 bosses (high, ~10 agent-days)
 - [ ] Data: one enemies.yaml + description + background key per approved sheet; sandbox levels and anim_roster scenarios per batch (high, rolling)
-- [x] INT: rolling atlas pages and rolling gate; final full validation (section 12 incl. 12.2); docs: AGENTS.md art table, NEW_MONSTER_GUIDE 2.2 templates, gen/README.md (high, 1d) (F5, 2026-11-15: ROSTER_LOG.md "Fix pass result"; 9 keyframe-only sheets left, so `check --all` is the rolling form)
+- [x] INT: rolling atlas pages and rolling gate; final full validation (section 12 incl. 12.2); docs: AGENTS.md art table, NEW_MONSTER_GUIDE 2.2 templates, gen/README.md (high, 1d) (F5, 2026-11-15: ROSTER_LOG.md "Fix pass result"; 9 keyframe-only sheets left, so `check --all` is the rolling form; fix pass 2 G6 rigged the last 11, so `check --all` is the full form: 123 OK, no `no rig`)
 - [ ] PT: contact sheet + distinctness report (calibrated thresholds); image-only adversarial review; browser play test; ROSTER_PLAYTEST.md (high, 1-2d)
 - [ ] FIX: close pass R build, open pass R fix; ROSTER_FIX_PLAN.md -> momus OKAY -> fixes -> re-test until no P0/P1 (high, 2-4d)
 - [ ] Final report: images used vs 300 (build/fix split), built / deferred sprites, open P2s, act-1 balance changes, follow-ups (high, 1h)

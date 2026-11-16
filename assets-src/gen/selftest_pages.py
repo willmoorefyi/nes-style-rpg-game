@@ -81,8 +81,8 @@ def run_alias(check: Callable[[bool, str], None]) -> None:
     """FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a rig `alias: [hurt]` (or [attack]) leaves that sequence's in-betweens out
     of generate, so the atlas aliases them to their source keys as on a keyframe-only sheet; idle_b, daze / daze_b and
     the other sequences are still generated, byte-identical to the same rig without the alias; `check` prints
-    `OK (aliased: hurt; ...)`. Only MA.FWQ_ALLOW entries (selftest_efix pins the list), one per rig. The live
-    allowlist has no rigged sheet yet, so a goblin entry is added for the test only."""
+    `OK (aliased: hurt; ...)`. Only MA.FWQ_ALLOW entries (selftest_efix pins the list), one per rig. Goblin is
+    not on the live allowlist, so a goblin entry is added for the test only."""
     import copy
     import tempfile
     import numpy as np
@@ -148,8 +148,10 @@ def _raises_value(fn: Callable[[], object], *words: str) -> bool:
 # includes the attack frames: home only it is [18, 110]). Re-measured at F5 (roster-int, after the F3/F4 rig fixes):
 # only ogre's lungeRight moved, 125 -> 110, because 125 was its old atk_recover (the club thrown out past the attack
 # key; F3b pulled the recover back toward idle, recover->idle 3.6 px), so its lunge frames now reach 110.
+# Re-measured at fix pass 2 G6: warmech travelTop 5 -> 2, because the sheet is rigged since T-K (its in-betweens are
+# translations of the keys, and the attack's d (-23, -4/-5) lifts the travel frames 3 px above the keyframe-only top).
 ANCHORS = {"garland": {"travelTop": 2}, "lich": {"travelTop": 9}, "death_eye": {"travelTop": 42, "lungeRight": 179},
-           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 5}, "ogre": {"homeX": [10, 113], "lungeRight": 110},
+           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 2}, "ogre": {"homeX": [10, 113], "lungeRight": 110},
            "troll": {"homeX": [24, 122]}, "dragon": {"homeX": [4, 118]},
            "earth_elemental": {"lungeRight": 109, "opaqueRight": 110}}
 
