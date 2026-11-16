@@ -1,0 +1,143 @@
+# Hollow Seraph (pass V redesign, R313 idle, R316 attack, R318 cast, R319 hurt; D-V9: four blade wings, no raise).
+# A floating steampunk angel of separate hovering pieces (helm, halo, plate shell, four blade-of-light wings).
+# body: floating (rig_floating.py): no feet, the float band judges every frame. Coordinates are the 218 px boss cell
+# (the attack, cast and hurt keys are padded 9 px each side to the wide idle cell).
+# The keys differ hugely (the wings swing in the attack, the helm is knocked off the shell in the hurt), so every
+# in-between is a translation of its source key (moves: [], whole-figure dx / dy; the chaos recipe), placed where the
+# key switch overlaps best (fixmeasure switch: attack d (-10, 0) IoU 0.51, hurt (-7, 0) 0.73, cast (6, 0) 0.67).
+# The whole cell is one rigid `body` per key, so no piece is resampled, fused or torn. In the idle-sourced frames
+# only the two upper blade wings (separate pieces, own parentless roots, masks = their convex hulls) lift by whole-px
+# translations: the pieces hover apart. The halo is the allowlisted fx part (FW-7): it brightens one / two steps up its
+# own ramp in cast_gather / cast_release only.
+sprite: hollow_seraph
+body: floating
+facing: right
+sampler: nearest
+breath: true
+raise: false                   # D-V9, FW-R: no attack_raise key; the heavy glint tip comes from atk_wind2
+keyframes:
+  idle:
+    core: [112, 90]
+    base: [114, 188]
+    neck: [118, 62]
+    crown: [118, 44]
+    halo: [118, 28]
+    wul_r: [76, 62]
+    wul_t: [28, 14]
+    wur_r: [148, 62]
+    wur_t: [196, 13]
+  attack:
+    core: [118, 95]
+    base: [108, 188]
+    neck: [126, 62]
+    crown: [126, 45]
+    halo: [127, 30]
+  hurt:
+    core: [118, 95]
+    base: [120, 188]
+    neck: [118, 62]
+    crown: [118, 45]
+    halo: [116, 30]
+  cast:
+    core: [108, 90]
+    base: [108, 188]
+    neck: [112, 62]
+    crown: [112, 45]
+    halo: [112, 30]
+parts:
+  weapon: {remove: true}
+  tail: {remove: true}
+  wing_n: {remove: true}
+  wing_f: {remove: true}
+  halo: {bone: [crown, halo], radius: 6.0, kind: fx, in: [idle, cast]}
+  w_ul: {bone: {idle: [wul_r, wul_t]}, radius: 8.0}       # upper-left blade wing (idle only)
+  w_ur: {bone: {idle: [wur_r, wur_t]}, radius: 8.0}       # upper-right blade wing (idle only)
+masks:
+  body:
+    idle: [[0, 0], [217, 0], [217, 199], [0, 199]]
+    attack: [[0, 0], [217, 0], [217, 199], [0, 199]]
+    hurt: [[0, 0], [217, 0], [217, 199], [0, 199]]
+    cast: [[0, 0], [217, 0], [217, 199], [0, 199]]
+  w_ul:
+    idle: [[24, 18], [25, 15], [27, 11], [28, 11], [34, 14], [77, 48], [79, 50], [81, 62], [81, 64], [80, 65], [68, 67],
+           [65, 67], [34, 34], [28, 27], [24, 19]]
+  w_ur:
+    idle: [[143, 62], [144, 50], [146, 48], [191, 14], [196, 11], [198, 10], [199, 10], [200, 11], [200, 12], [199, 19],
+           [197, 27], [161, 66], [160, 67], [144, 67], [143, 66]]
+  halo:
+    idle: [[96, 33], [99, 25], [100, 24], [109, 20], [116, 18], [122, 18], [132, 20], [140, 22], [141, 23], [141, 30],
+           [139, 35], [138, 36], [136, 37], [131, 39], [128, 40], [112, 42], [108, 42], [102, 40], [100, 39], [96, 35]]
+    cast: [[91, 32], [94, 25], [95, 24], [104, 19], [111, 18], [116, 18], [126, 20], [134, 23], [134, 30], [132, 35],
+           [130, 37], [125, 39], [122, 40], [107, 42], [103, 42], [95, 40], [94, 39], [91, 35]]
+z:
+  idle: [body, w_ul, w_ur, halo]
+  cast: [body, halo]
+frames:
+  atk_wind1:                   # the coil starts: she rises 2 and draws back 1, the upper blades lift 2 more
+    moves: []
+    dx: -1
+    dy: -2
+    tweaks: {wul_r: [0, -2], wul_t: [0, -2], wur_r: [0, -2], wur_t: [0, -2]}
+  atk_wind2:                   # coiled: risen 4, back 2 (the cell edge allows 2), the upper blades 4 higher
+    moves: []
+    dx: -2
+    dy: -4
+    tweaks: {wul_r: [-1, -4], wul_t: [-1, -4], wur_r: [1, -4], wur_t: [1, -4]}
+  atk_mid:                     # the cut arriving: the attack key 8 back and 2 high
+    moves: []
+    t: 0.0
+    dx: -8
+    dy: -2
+  atk_follow:                  # after the cut she sinks 2 and starts back (3), toward the idle overlap
+    moves: []
+    t: 1.0
+    dx: -3
+    dy: 2
+  atk_recover:                 # floats back up: the idle 1 forward and 1 low
+    moves: []
+    t: 0.0
+    dx: 1
+    dy: 1
+  hurt_in1:                    # the jolt: knocked back 2 and down 1, the upper blades falter 2 down
+    moves: []
+    t: 0.0
+    dx: -2
+    dy: 1
+    tweaks: {wul_r: [0, 2], wul_t: [0, 2], wur_r: [0, 2], wur_t: [0, 2]}
+  hurt_in2:                    # the hurt key 7 back (where it overlaps the knocked-back idle), 1 high
+    moves: []
+    t: 0.0
+    dx: -7
+    dy: -1
+  cast_gather:                 # power gathers: she rises 2, the upper blades lift 2 more, the halo kindles (FW-7)
+    moves: []
+    t: 0.0
+    dy: -2
+    brighten: {halo: 1}
+    tweaks: {wul_r: [0, -2], wul_t: [0, -2], wur_r: [0, -2], wur_t: [0, -2]}
+  cast_rise:                   # the cast key 3 back toward the idle, 1 high
+    moves: []
+    t: 0.0
+    dx: 3
+    dy: -1
+  cast_release:                # the release: risen 2 more, the halo flares two steps
+    moves: []
+    t: 1.0
+    dy: -2
+    brighten: {halo: 2}
+  daze:                        # sleep / stun: sinks 1, the upper blades droop 1 (crown / neck cancel the recipe head [3, 3])
+    moves: []
+    dy: 1
+    tweaks: {crown: [-3, -3], neck: [-3, -3], wul_r: [0, 1], wul_t: [0, 1], wur_r: [0, 1], wur_t: [0, 1]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [-3, -3], neck: [-3, -3], wul_r: [0, 1], wul_t: [0, 1], wur_r: [0, 1], wur_t: [0, 1]}
+holds: []
+paint:                         # FW-P keyframe paint (ROSTER_LOG R319 nit): the stray 39 px pale dash left of the hurt
+                               # key's lower-left blade erased (padded-cell xy; 39 of 160 px)
+  - {frame: hurt, rgb: null, xy: [[41, 122], [42, 122], [43, 122], [44, 122], [45, 122], [38, 123], [39, 123], [40, 123],
+     [41, 123], [42, 123], [43, 123], [44, 123], [45, 123], [46, 123], [37, 124], [38, 124], [39, 124], [40, 124],
+     [41, 124], [42, 124], [43, 124], [44, 124], [45, 124], [46, 124], [37, 125], [38, 125], [39, 125], [40, 125],
+     [41, 125], [42, 125], [43, 125], [44, 125], [45, 125], [38, 126], [39, 126], [40, 126], [41, 126], [42, 126],
+     [43, 126]]}
