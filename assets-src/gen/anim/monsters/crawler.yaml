@@ -1,0 +1,35 @@
+sprite: crawler
+body: arthropod
+facing: right
+sampler: nearest
+breath: true
+alias: [attack]
+# A carrion grub curled in a C: the thorax is the upper arc with the feeler ring (body -> head), the abdomen the lower
+# arc lying on the ground with the stub legs (abd -> abd_end); no leg chains (the stubs ride their arc). The attack key
+# switch fails by translation (centroid jump (3, 10) vs cap 6.0, ROSTER_FIX_PLAN_2 5), so attack is aliased (FW-Q).
+# hurt_in1 drops the upper arc 7 px onto the lower one (the front end curls down), hurt_in2 is held (the hurt key);
+# daze sinks the upper arc 1 / 2 px. Every in-between is a pure translation of the upper part; the ground band never
+# moves.
+# fixmeasure.py switch --rig (IoU / step vs need / cap): hurt idle->hurt_in1 0.792 / 3.8, hurt_in1->hurt_in2 (held =
+# hurt) 0.633 / 4.9 vs 0.531 / 6.0; daze idle->daze 0.956 / 0.5, daze->daze_b 0.956 / 0.5; attack aliased (no pairs).
+keyframes:
+  idle:   {body: [55, 25], head: [78, 25], abd: [35, 60], abd_end: [75, 66]}
+  attack: {body: [65, 45], head: [92, 42], abd: [45, 55], abd_end: [8, 70]}
+  hurt:   {body: [50, 40], head: [80, 55], abd: [35, 72], abd_end: [65, 72]}
+masks:
+  abdomen:
+    idle: [[0, 50], [108, 50], [108, 80], [0, 80]]
+    attack: [[0, 0], [62, 0], [62, 80], [0, 80]]
+    hurt: [[0, 70], [108, 70], [108, 80], [0, 80]]
+  thorax:
+    idle: [[0, 0], [108, 0], [108, 50], [0, 50]]
+    attack: [[62, 0], [108, 0], [108, 80], [62, 80]]
+    hurt: [[0, 0], [108, 0], [108, 70], [0, 70]]
+frames:
+  hurt_in1: {moves: [], dy: 0, tweaks: {body: [0, 7], head: [0, 7]}}
+  daze: {moves: [], dy: 0, tweaks: {body: [0, 1], head: [-1, 0]}}
+  daze_b: {moves: [], dy: 0, tweaks: {body: [0, 2], head: [-1, 1]}}
+holds:
+  - {frame: hurt_in2, reason: "the hurt dome cannot rise toward the idle height (bbox 53 vs lerp 59) without lifting off the ground band or opening a gap above it; hurt_in1 bridges idle -> hurt alone"}
+paint:                          # 1 px pockets where the dropped upper arc's stub legs meet the lower arc: inked shut
+  - {frame: hurt_in1, xy: [[58, 45], [56, 46], [52, 48], [55, 51], [56, 41], [57, 41], [57, 42]], rgb: [6, 4, 10]}
