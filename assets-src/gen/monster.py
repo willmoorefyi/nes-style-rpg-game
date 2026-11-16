@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import colorsys
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -330,6 +331,14 @@ KEEP_MIN_PX = 24                # all_in_cell: a piece under this many native px
 FITS = ("headroom",)            # monsters.yaml `cut: {fit: headroom, top_margin: N}` (V3, R309 / R310-R312)
 TOP_MARGIN_MAX = 32             # headroom: the largest allowed top margin (rows)
 HEADROOM_TRIES = 4              # headroom: the target is lowered by a row at most this many times minus one
+# monsters.yaml `cut: {match_height: idle | <px>, tolerance: t}` (user ruling 2026-11-16: a pose is never rejected only for
+# its size, the pipeline resizes it; hollow_seraph R327 / R328): per-pose sprites only
+MATCH_REFS = ("idle",)
+MATCH_TOLERANCE = 0.10          # match_height: the default tolerance band (+- fraction of the reference)
+MATCH_TOL_MAX = 0.5
+MATCH_PX = (16, 300)            # match_height: an explicit reference in px (the titan cell is 300)
+MATCH_TRIES = 4                 # match_height: the target moves into the band by a row at most this many times minus one
+CUT_KEYS = {"keep_pieces", "fit", "top_margin", "match_height", "tolerance"}
 
 
 def cut_options(char: dict) -> str | None:
@@ -338,12 +347,14 @@ def cut_options(char: dict) -> str | None:
     opts = char.get("cut")
     if opts is None:
         return None
-    if not isinstance(opts, dict) or set(opts) - {"keep_pieces", "fit", "top_margin"}:
-        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces, fit and top_margin ({opts!r})")
+    if not isinstance(opts, dict) or set(opts) - CUT_KEYS:
+        raise ValueError(f"{char.get('id')}: `cut` takes only {', '.join(sorted(CUT_KEYS))} ({opts!r})")
     kp = opts.get("keep_pieces")
     if kp is not None and kp not in KEEP_PIECES:
         raise ValueError(f"{char.get('id')}: cut.keep_pieces must be one of {', '.join(KEEP_PIECES)} ({kp!r})")
     cut_fit(char)
+    if "match_height" in opts or "tolerance" in opts:
+        cut_match(char)
     return kp
 
 
@@ -354,8 +365,8 @@ def cut_fit(char: dict) -> int | None:
     opts = char.get("cut")
     if opts is None:
         return None
-    if not isinstance(opts, dict) or set(opts) - {"keep_pieces", "fit", "top_margin"}:
-        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces, fit and top_margin ({opts!r})")
+    if not isinstance(opts, dict) or set(opts) - CUT_KEYS:
+        raise ValueError(f"{char.get('id')}: `cut` takes only {', '.join(sorted(CUT_KEYS))} ({opts!r})")
     fit, n = opts.get("fit"), opts.get("top_margin")
     if fit is None and n is None:
         return None
@@ -364,6 +375,32 @@ def cut_fit(char: dict) -> int | None:
     if type(n) is not int or not 1 <= n <= TOP_MARGIN_MAX:
         raise ValueError(f"{char.get('id')}: cut.fit headroom needs an integer top_margin 1-{TOP_MARGIN_MAX} ({n!r})")
     return n
+
+
+def cut_match(char: dict) -> tuple[str | int, float] | None:
+    """(reference, tolerance) of a monsters.yaml entry's `cut: {match_height: idle | <px>, tolerance: t}` (None without
+    `match_height`): an action pose whose figure height falls outside reference +- t is scaled to the nearest edge of
+    that band (`cut`). The reference is `idle` (the sprite's approved boss_idle figure height, `generate.match_ref`) or
+    an integer px MATCH_PX; t is a number in (0, MATCH_TOL_MAX], default MATCH_TOLERANCE. Per-pose sprites only (a
+    three-cell monster sheet shares one scale across its cells); anything else is refused naming the sprite."""
+    opts = char.get("cut")
+    if opts is None:
+        return None
+    if not isinstance(opts, dict) or set(opts) - CUT_KEYS:
+        raise ValueError(f"{char.get('id')}: `cut` takes only {', '.join(sorted(CUT_KEYS))} ({opts!r})")
+    ref, tol = opts.get("match_height"), opts.get("tolerance", MATCH_TOLERANCE)
+    if ref is None:
+        if "tolerance" in opts:
+            raise ValueError(f"{char.get('id')}: cut.tolerance needs match_height ({opts!r})")
+        return None
+    if not (ref in MATCH_REFS or (type(ref) is int and MATCH_PX[0] <= ref <= MATCH_PX[1])):
+        raise ValueError(f"{char.get('id')}: cut.match_height must be {' or '.join(MATCH_REFS)} or an integer "
+                         f"{MATCH_PX[0]}-{MATCH_PX[1]} px ({ref!r})")
+    if type(tol) not in (int, float) or not 0 < tol <= MATCH_TOL_MAX:
+        raise ValueError(f"{char.get('id')}: cut.tolerance must be a number in (0, {MATCH_TOL_MAX}] ({tol!r})")
+    if not char.get("per_pose"):
+        raise ValueError(f"{char.get('id')}: cut.match_height needs per_pose: true (one pose per sheet)")
+    return ref, float(tol)
 
 
 def _all_in_cell(fg: np.ndarray, lab: np.ndarray, n: int) -> np.ndarray:
@@ -521,7 +558,8 @@ def flat_edges(frame: Image.Image, run: int = 3) -> list[tuple[int, int, int]]:
 def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: int = 16,
         seed: int = 0, n_cells: int = 3, cell: int | None = None,
         foot_row: int | None = None, haze: bool = False, split: str = "gaps",
-        keep_pieces: str | None = None, top_margin: int | None = None) -> tuple[list[Image.Image], dict]:
+        keep_pieces: str | None = None, top_margin: int | None = None,
+        match: tuple[int, float] | None = None) -> tuple[list[Image.Image], dict]:
     """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
     splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
     approved sheets are never re-cut). A floating cell drawn so low that the shared offset would put it below the cell's
@@ -533,7 +571,14 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     cells' shared offset from the idle's bottom) is shrunk through the shrink path below to fit rows N..feet row, the
     target lowered a row at a time (at most HEADROOM_TRIES) if the re-pixelized figure still reaches above row N;
     info["fit"] records the margin, the need, the target and the result. A figure that already leaves N rows free is
-    cut exactly as without the option; None is the cutter before the option."""
+    cut exactly as without the option; None is the cutter before the option. `match` (ref px, tolerance) (monsters.yaml
+    `cut: {match_height: idle | px, tolerance: t}`, `cut_match`, resolved by `generate.match_ref`; one-cell per-pose
+    sheets): a figure whose height after the band / headroom scale falls outside [ceil(ref (1 - t)), floor(ref (1 + t))]
+    is scaled nearest-neighbour (the headroom path; a non-integer nearest scale drops or doubles single rows and
+    columns, stair-stepping diagonals, more visibly when upscaling) to the nearer band edge, capped by the headroom
+    rows, feet on the feet row, the target moved a row at a time (at most MATCH_TRIES) until the cut lands in the band;
+    info["match"] records ref, tolerance, band, the target and the cut height. A figure inside the band is cut exactly
+    as without the option."""
     native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
@@ -565,6 +610,22 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         if need * f > avail:
             f = avail / need
             fit["target"] = avail
+    mt = None
+    if match is not None:
+        if n_cells != 1:
+            raise ValueError("cut: match_height needs a one-pose sheet (per_pose)")
+        ref, tol = match
+        lo_m, hi_m = math.ceil(ref * (1 - tol)), math.floor(ref * (1 + tol))
+        mt = {"ref": ref, "tolerance": tol, "band": [lo_m, hi_m], "native": tallest}
+        est = tallest * f
+        if not lo_m <= est <= hi_m:
+            target = hi_m if est > hi_m else lo_m
+            if fit is not None and target > fit["avail"]:
+                target = fit["avail"]                     # the headroom rows cap an upscale
+            elif fit is not None and "target" in fit:
+                del fit["target"]                         # the match shrink is binding, not the headroom
+            f = target / tallest
+            mt["target"] = target
     info.update({"native_heights": heights, "scale": round(f, 3), "art_cell": (round(w / n_cells, 1), h)})
     if band.size == "titan" and (info["scale"] != 1.0 or info.get("mode") != "grid"):
         # FW-T fail-closed (docs/REDESIGN_PLAN.md 4.2): never resample the titan (a non-integer nearest scale is S4's
@@ -576,11 +637,13 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         raise err
 
     headroom = fit is not None and "target" in fit
+    matched = mt is not None and "target" in mt
+    nearest = headroom or matched
 
     def place(f: float) -> tuple[list[Image.Image], list[str], dict]:
         # a headroom shrink takes the nearest-neighbour path below (orchestrator ruling (b); R309: every render piece
         # survives at top_margin 10, the block vote here closes one 1 px gap between plates)
-        if f < 1.0 and not headroom:
+        if f < 1.0 and not nearest:
             # shrinking: re-pixelize from the full-resolution render (block vote with facial-detail protection) instead of
             # dropping whole sprite pixels, as the character resample path does
             rgb_raw = np.asarray(raw.convert("RGB"))
@@ -616,7 +679,9 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
                 fig, _ = PX.pixelize_native(Image.fromarray(art), m, (art.shape[1], art.shape[0]), colors=colors,
                                             seed=seed, palette=palette)
                 figs.append(np.asarray(fig))
-            if headroom:
+            if matched:
+                info["shrink"] = "nearest-neighbour (match_height)"
+            elif headroom:
                 info["shrink"] = "nearest-neighbour (headroom)"
 
         def bbox(fig: np.ndarray) -> tuple[int, int, int, int]:
@@ -666,8 +731,22 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
             frames.append(Image.fromarray(out, "RGBA"))
         return frames, clipped, lifted
 
+    def span(frs: list[Image.Image]) -> tuple[int, int]:
+        rows = [np.where(np.asarray(fr)[..., 3].any(1))[0] for fr in frs]
+        return min(int(r.min()) for r in rows), max(int(r.max()) - int(r.min()) + 1 for r in rows)
+
     frames, clipped, lifted = place(f)
-    if fit is not None and "target" in fit:
+    if matched:
+        for k in range(1, MATCH_TRIES):
+            top, hh = span(frames)
+            high = fit is not None and top < top_margin
+            if lo_m <= hh <= hi_m and not high:
+                break
+            mt["target"] += -1 if hh > hi_m or high else 1   # rounding in the nearest scale left a row too many / few
+            f = mt["target"] / tallest
+            frames, clipped, lifted = place(f)
+        info["scale"] = round(f, 3)
+    elif fit is not None and "target" in fit:
         for k in range(1, HEADROOM_TRIES):
             top = min(int(np.where(np.asarray(fr)[..., 3].any(1))[0].min()) for fr in frames)
             if top >= top_margin:
@@ -676,6 +755,9 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
             fit["target"] = fit["avail"] - k
             frames, clipped, lifted = place(f)
         info["scale"] = round(f, 3)
+    if mt is not None:
+        mt["top_row"], mt["height"] = span(frames)
+        info["match"] = mt
     if fit is not None:
         fit["top_row"] = min(int(np.where(np.asarray(fr)[..., 3].any(1))[0].min()) for fr in frames)
         info["fit"] = fit

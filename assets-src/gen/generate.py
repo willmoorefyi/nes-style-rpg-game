@@ -496,6 +496,25 @@ def execute(req: Request, ledger_path: Path = LEDGER) -> Image.Image:
 LAST_RESAMPLE: dict = {}
 
 
+def match_ref(char: dict, sheet_name: str, approved: Path | None = None) -> tuple[int, float] | None:
+    """(reference px, tolerance) for `monster.cut(match=...)` from the entry's `cut: {match_height, tolerance}`
+    (`monster.cut_match`): None without the option and for the boss_idle sheet itself when the reference is the idle;
+    `idle` is the opaque row span of the approved approved/<id>/boss_idle.png (refused when there is none yet)."""
+    m = M.cut_match(char)
+    if m is None:
+        return None
+    ref, tol = m
+    if ref == "idle":
+        if sheet_name == "boss_idle":
+            return None
+        png = (approved or APPROVED) / char["id"] / "boss_idle.png"
+        if not png.exists():
+            raise ValueError(f"{char['id']}: cut.match_height idle needs an approved boss_idle ({png} is missing)")
+        ys = np.where(np.asarray(Image.open(png).convert("RGBA"))[..., 3].any(1))[0]
+        ref = int(ys.max() - ys.min() + 1)
+    return ref, tol
+
+
 def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, seed: int) -> list[Image.Image]:
     """Pixel-perfect path when the render has a detectable pixel grid whose cell size matches the sheet grid;
     otherwise fall back to block resampling (with a warning in the review stats)."""
@@ -507,7 +526,7 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
                              cell=pg.grid[0] if sheet.name.startswith("boss_") else None,
                              foot_row=pg.bottom_row if sheet.name.startswith("boss_") else None,
                              haze=bool(char.get("haze")), keep_pieces=M.cut_options(char),
-                             top_margin=M.cut_fit(char))
+                             top_margin=M.cut_fit(char), match=match_ref(char, sheet.name))
         info["report"] = M.frame_report(frames, monster_band(char))
         LAST_RESAMPLE[sheet.name] = info
         return frames
@@ -755,7 +774,8 @@ def repixelize(outdir: Path, only: list[str] | None = None) -> None:
                 else ("", False, f"{char_id} has no {name} sheet")
             info = LAST_RESAMPLE[name]
             print(f"{name}: scale {info.get('scale')}, heights {info['report']['heights']}, clipped "
-                  f"{info.get('clipped')}{', fit ' + json.dumps(info['fit']) if 'fit' in info else ''}; "
+                  f"{info.get('clipped')}{', fit ' + json.dumps(info['fit']) if 'fit' in info else ''}"
+                  f"{', match ' + json.dumps(info['match']) if 'match' in info else ''}; "
                   f"{'approvable' if ok else 'NOT approvable'}: {why}")
             continue
         guide = G.sheet(sheet.poses, sheet.order, sheet.geom)

@@ -144,10 +144,11 @@ def painted_key_checks(meta: dict, arrs: dict[str, np.ndarray], allowed: set) ->
 
 def lock_frames(gen: dict[str, dict], keyframes: dict[str, Image.Image] | None = None,
                 meta: dict | None = None) -> dict[str, np.ndarray]:
-    """The arrays a lock file hashes: every generated frame, plus `kf:<name>` for each painted (FW-P) or offset (FW-O)
-    key only."""
+    """The arrays a lock file hashes: every generated frame, plus `kf:<name>` for each painted (FW-P), offset (FW-O) or
+    derived (FW-H) key only."""
     out = {n: f["img"] for n, f in gen.items()}
-    for k in sorted(set((meta or {}).get("kf_painted", [])) | set((meta or {}).get("kf_offset", []))):
+    m = meta or {}
+    for k in sorted(set(m.get("kf_painted", [])) | set(m.get("kf_offset", [])) | set(m.get("kf_derived", {}))):
         out[f"kf:{k}"] = np.asarray(keyframes[k].convert("RGBA"))
     return out
 

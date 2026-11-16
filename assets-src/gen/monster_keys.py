@@ -16,6 +16,10 @@ edited.
   every coordinate a rig writes for the key is in its unmoved art; in-between paint is not moved (the rig agent
   re-derives it). Refused: |dx| or |dy| > KEY_OFFSET_MAX, a non-integer, a key the sheet does not have, an opaque px
   leaving the cell. An offset key is locked as `kf:<name>`.
+- FW-H (orchestrator ruling for hollow_seraph after R329 / R330): a per-pose boss rig with `hurt_from: idle` (only the
+  sprites in HURT_FROM_ALLOW) has no approved boss_hurt; monster_anim.load_entries derives the hurt key from the padded
+  idle key (meta `kf_derived: {hurt: idle}`), before FW-R / FW-O / FW-P, so `key_offset` and keyframe `paint` on `hurt`
+  make the recoil. The derived key is locked as `kf:hurt`. Refused: another sprite, another source, an approved hurt.
 """
 from __future__ import annotations
 
@@ -35,6 +39,9 @@ KF_PAINT_ALLOW = {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300
 KF_REMAP_ONLY = {("drowned_sovereign", "cast")}
 OUTLINE = (6, 4, 10)
 KEY_OFFSET_MAX = 12
+# FW-H: the sprites whose rig may build the hurt key from the idle (orchestrator ruling, V8 F4); a new entry needs approval
+HURT_FROM_ALLOW = {"hollow_seraph"}
+HURT_SOURCES = ("idle",)
 _OFFSET_DONE = "_key_offset_applied"      # offset_cfg's marker: the translation is applied once
 
 
@@ -45,6 +52,19 @@ def approved_palette(kfs: dict[str, Image.Image]) -> set[tuple[int, int, int]]:
         a = np.asarray(im.convert("RGBA"))
         cols |= {tuple(int(v) for v in c) for c in np.unique(a[a[..., 3] > 0][:, :3], axis=0)}
     return cols
+
+
+def hurt_from(sid: str, cfg: dict | None) -> str | None:
+    """FW-H: the source key of a rig's `hurt_from` (None when absent); a ValueError naming the rig for a sprite not in
+    HURT_FROM_ALLOW or a source other than HURT_SOURCES."""
+    v = (cfg or {}).get("hurt_from")
+    if v is None:
+        return None
+    if sid not in HURT_FROM_ALLOW:
+        raise ValueError(f"rig {sid}: hurt_from is only for HURT_FROM_ALLOW ({', '.join(sorted(HURT_FROM_ALLOW))})")
+    if v not in HURT_SOURCES:
+        raise ValueError(f"rig {sid}: hurt_from must be {' or '.join(HURT_SOURCES)}, not {v!r}")
+    return v
 
 
 def raise_off(sid: str, cfg: dict | None) -> bool:
