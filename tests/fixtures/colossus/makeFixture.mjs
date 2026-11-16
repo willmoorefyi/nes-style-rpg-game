@@ -5,6 +5,8 @@
 //   (texScale 2), an additive corona patch, core patches `crack` / `open` (its `base` is empty: the body carries it).
 // - fixture_orrery: the rev-3 layered puppet (limbs, moons; flat boxes at scale 3), still supported by the view.
 // - fixture_wide: one 2600 px body (two tiles).
+// - chaos_orrery / chaos_horizon / chaos_horizon_core: the real ids on those tiles for `?colossus=fixture` (F4 an `art`
+//   entry at (-527, -285)).
 // Run: node tests/fixtures/colossus/makeFixture.mjs (deterministic; no dependencies).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -144,7 +146,10 @@ const wide = {
   layers: [layer(W, 'body', 'body', [['base', [0, 0], [2600, 300], 0x182030]])],
 };
 
-const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide } };
+// The browser check (`?colossus=fixture`): the real form ids on the fixture tiles. F3 is the horizon stand-in, F4 an `art`
+// entry at its own rest (D-U13), F2 the rev-3 puppet.
+const browser = { chaos_orrery: orrery, chaos_horizon: horizon, chaos_horizon_core: { art: 'chaos_horizon', place: [-527, -285] } };
+const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide, ...browser } };
 const tiles = new Map(files);
 files.clear();
 const contract = { version: 1, forms: { contract_form: horizonForm('contract_form') } };   // its tiles are not written

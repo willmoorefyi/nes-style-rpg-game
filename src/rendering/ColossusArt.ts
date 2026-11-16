@@ -26,13 +26,10 @@ export interface ColossusIo {
   unload(file: string, texture: Texture): void;
 }
 
-/** RGBA bytes of every tile in the index (the 24 MB criterion). */
+/** RGBA bytes of every tile file in the index (the 24 MB criterion), each file once (an `art` entry shares its form's). */
 export function textureBytes(index: ColossusIndex): number {
-  let n = 0;
-  for (const f of Object.values(index.forms)) for (const l of f.layers) for (const fr of Object.values(l.frames)) {
-    for (const t of fr.tiles) n += t.w * t.h * 4;
-  }
-  return n;
+  const files = new Map(Object.values(index.forms).flatMap((f) => tilesOf(f)).map((t) => [t.file, t.w * t.h * 4]));
+  return [...files.values()].reduce((n, b) => n + b, 0);
 }
 
 function browserIo(dir: string): ColossusIo {

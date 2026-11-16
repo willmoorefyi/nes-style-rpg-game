@@ -13,7 +13,7 @@ import type { EnemyData } from '../../../src/types/index.js';
 import type { ActionResult } from '../../../src/battle/BattleStateMachine.js';
 import { borderProblems, readColossusIndex, type ColossusFormSpec } from '../../../src/scenes/battle/colossus/colossusIndex.js';
 import { artIdOf, entryIdFor, previewFileOf } from '../../../src/scenes/battle/colossus/colossusEntries.js';
-import { colossusArt } from '../../../src/rendering/ColossusArt.js';
+import { colossusArt, textureBytes } from '../../../src/rendering/ColossusArt.js';
 import { FormChangeView, type FormChangeDeps } from '../../../src/scenes/battle/formChangeView.js';
 import type { InterludeStep } from '../../../src/scenes/battle/formInterlude.js';
 import { colossusBattle, colossusEnemy, fixtureIo, fixtureRaw, HORIZON } from '../../helpers/colossusFixture.js';
@@ -63,6 +63,12 @@ describe('colossus.json: an `art` entry (F4 at its own rest, D-U13)', () => {
     expect(idx.forms.chained).toBeUndefined();
     expect(idx.forms.full.place).toEqual([-527, -200]);
     expect(err.mock.calls.map((c) => String(c[0])).join('\n')).toMatch(/bad: art nope[\s\S]*chained: art chaos_horizon_core/);
+  });
+
+  it('the RGBA byte count (the 24 MB criterion, 18.6) counts a tile shared by an `art` entry once', () => {
+    const one = readColossusIndex({ forms: { chaos_horizon: (fixtureRaw() as Raw).forms[HORIZON] } });
+    expect(textureBytes(readColossusIndex(chainRaw()))).toBe(textureBytes(readColossusIndex(fixtureRaw())));
+    expect(textureBytes(one)).toBeGreaterThan(0);
   });
 
   it('a record draws its own entry when it shares the record\'s art, else its art\'s', () => {
