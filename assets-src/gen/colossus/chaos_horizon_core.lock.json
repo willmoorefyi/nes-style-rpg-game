@@ -1,0 +1,10 @@
+{
+  "form": "chaos_horizon_core",
+  "frames": {
+    "colossus/chaos_horizon/body_base_0.png": "86d94607000d3478613b3d7cac333ae36d51b0c78f46482401ad4b59b179581b",
+    "colossus/chaos_horizon/body_base_1.png": "1faa7080bf8e9ef173e9ad31e7ff6d657379aa0c540915126df4e22f9fee5e55",
+    "colossus/chaos_horizon/core_crack.png": "35d633f9ceebe0a94f7a17408a41c5ad6cd9def15b3abfa9624006184a6213ff",
+    "colossus/chaos_horizon/core_open.png": "3301379f30af9663155156ec3b3bd87bf53f9cd420a1b2b7c139bdc433e7a8a9",
+    "colossus/chaos_horizon/glow_base.png": "8fbfc6f4217101ed9d1b1501907930831c6465e1944358c49e8334e15a8ca2ac"
+  }
+}

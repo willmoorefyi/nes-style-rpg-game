@@ -1,0 +1,39 @@
+# F4 "the Core Laid Bare" (D-U13; docs/CHAOS_FORMS_PLAN.md 3.4, 18.3-18.5): F3's approved art (`art: chaos_horizon`;
+# the build reuses F3's tile files, stored and counted once) with the core layer's `open` frame, at F4's own rest
+# (orchestrator ruling, C3': (-527, -285), the cavity at screen 415-765 above the strip; canvas bottom 795 >= 786).
+# Anchors (canvas art px, every point on opaque body):
+#   target / core = the open cavity (screen 823, 555): the weak point; the number spot, below the status row
+#   head = the disc (screen 820, 195): the status icon row above it, under the message window's edge clamp
+#   melee = the right forearm (screen 1220, 305): hero travel from the party (x 1380) 160 >= 150
+#   hands as F3 (screen 120, 395 / 1260, 345); feet = the torso just above the strip (screen 820, 775)
+# target_rect: disc + cavity, screen x 643-1003, y 135-675.
+# The layers must match chaos_horizon.yaml exactly (same boxes), else the shared files would differ (the build refuses).
+form: chaos_horizon_core
+art: chaos_horizon
+variant: {core: open}
+canvas: [2700, 1080]
+scale: 1
+place: [-527, -285]
+sky_dim: 0.6
+anchors:
+  target: [1350, 840]
+  core: [1350, 840]
+  head: [1347, 480]
+  hands: [[647, 680], [1787, 630]]
+  melee: [1747, 590]
+  feet: [1347, 1060]
+target_rect: [1170, 420, 360, 540]
+layers:
+  - name: body
+    kind: body
+    box: [0, 312, 2700, 1080]
+    frames: {base: master.png}
+  - name: core
+    kind: core
+    frames: {base: null, crack: core_crack.png, open: core_open.png}
+  - name: glow
+    kind: glow
+    blend: add
+    alpha: 1.0
+    tex_scale: 2
+    frames: {base: glow.png}
