@@ -1,0 +1,185 @@
+# Astos (T-K, docs/ROSTER_FIX_PLAN_2.md 5): the boss dark-elf king, per-pose (200 x 200 cell). Partial rig: FW-Q
+# `alias: [attack]` (allowlisted; the attack key's centroid jumps (-9, 27) against a 15.0 cap, no translation bridges it),
+# so the attack in-betweens resolve to the keys. Hurt and cast are translation-only (`moves: []`): the upper body moves
+# as one piece over pinned knees and feet, the staff foot (`st_b`) planted where it stands on the ground. The flung cape
+# (hurt `flare`) and the spread mantle (cast `spread`) are rigid parts on their own roots, folded in behind the robe in
+# the key-sourced frame (16 / 26 px; the cast fold must clear the shaft, or the mantle pixels hidden under it open a
+# strip). Daze: the default recipe slump (dy, head tweak; translations only, legs and staff pinned, the staff fist held
+# on the shaft). `fixmeasure.py switch astos <seq> --rig` (IoU / step vs need / cap):
+#   hurt:  idle->in1 0.874 / 1.7, in1->in2 0.507 / 3.1, in2->hurt 0.820 / 7.4 (vs 0.486 / 15.0)
+#   cast:  idle->gather 0.904 / 0.7, gather->rise 0.590 / 4.3, rise->cast 0.751 / 8.0, cast->release 0.960 / 0.5 (vs 0.518 / 15.0)
+#   daze:  idle->daze 0.899 / 2.8, daze->daze_b 0.933 / 1.7 (vs 0.486 / 15.0)
+#   attack: aliased (pre-check: no translation within the cap)
+sprite: astos
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+attack_hand: n
+cast_hand: n
+alias: [attack]
+keyframes:
+  idle:
+    crown: [112, 14]
+    neck: [113, 54]
+    chest: [115, 72]
+    hip: [114, 108]
+    sh_n: [130, 62]
+    el_n: [135, 95]
+    hand_n: [143, 118]
+    sh_f: [92, 62]
+    el_f: [82, 82]
+    hand_f: [70, 91]
+    hip_n: [122, 112]
+    knee_n: [124, 150]
+    foot_n: [126, 182]
+    toe_n: [140, 190]
+    hip_f: [105, 112]
+    knee_f: [98, 150]
+    foot_f: [90, 182]
+    toe_f: [86, 190]
+    st_b: [69, 192]
+    st: [66, 24]
+  attack:
+    crown: [122, 70]
+    neck: [122, 100]
+    chest: [118, 112]
+    hip: [112, 140]
+    sh_n: [128, 108]
+    el_n: [138, 118]
+    hand_n: [150, 122]
+    sh_f: [100, 102]
+    el_f: [85, 105]
+    hand_f: [71, 112]
+    hip_n: [120, 145]
+    knee_n: [130, 160]
+    foot_n: [130, 183]
+    toe_n: [143, 190]
+    hip_f: [100, 145]
+    knee_f: [70, 165]
+    foot_f: [50, 183]
+    toe_f: [45, 190]
+  hurt:
+    crown: [127, 22]
+    neck: [124, 70]
+    chest: [118, 92]
+    hip: [112, 125]
+    sh_n: [130, 78]
+    el_n: [138, 52]
+    hand_n: [150, 38]
+    sh_f: [105, 80]
+    el_f: [112, 92]
+    hand_f: [130, 97]
+    hip_n: [118, 130]
+    knee_n: [122, 160]
+    foot_n: [126, 182]
+    toe_n: [138, 190]
+    hip_f: [100, 130]
+    knee_f: [85, 160]
+    foot_f: [74, 182]
+    toe_f: [70, 190]
+    st: [154, 70]
+    fh_0: [98, 100]
+    fh_1: [55, 110]
+    fh_2: [18, 108]
+  cast:
+    crown: [110, 36]
+    neck: [112, 72]
+    chest: [113, 88]
+    hip: [113, 120]
+    sh_n: [128, 76]
+    el_n: [140, 74]
+    hand_n: [157, 65]
+    sh_f: [95, 72]
+    el_f: [85, 80]
+    hand_f: [72, 88]
+    hip_n: [120, 122]
+    knee_n: [132, 138]
+    foot_n: [134, 180]
+    toe_n: [148, 190]
+    hip_f: [100, 122]
+    knee_f: [86, 150]
+    foot_f: [74, 182]
+    toe_f: [70, 190]
+    st_b: [72, 192]
+    st: [70, 26]
+    sw: [180, 70]
+    fc_0: [92, 110]
+    fc_1: [55, 120]
+    fc_2: [14, 142]
+parts:
+  weapon: {remove: true}
+  staff: {bone: {idle: [st_b, st], hurt: [hand_f, st], cast: [st_b, st]}, radius: 1.5, in: [idle, hurt, cast]}
+  flare: {bone: {hurt: [fh_0, fh_2]}, radius: 6.0}   # rigid (a chain warp only maps its band)
+  spread: {bone: {cast: [fc_0, fc_2]}, radius: 6.0}
+  swirl: {bone: {cast: [hand_n, sw]}, radius: 1.0, in: [cast]}      # the spell tendrils at the hand
+  swirl_o: {bone: {cast: [hand_n, sw]}, radius: 1.0, in: [cast]}    # their outer half (forms at the key)
+  ft_n: {bone: [foot_n, toe_n], radius: 6.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 6.0}
+z:
+  hurt: [flare, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, uarm_f, farm_f, head, uarm_n, farm_n, staff]
+  cast: [spread, thigh_f, shin_f, ft_f, torso, uarm_f, farm_f, staff, thigh_n, shin_n, ft_n, head, uarm_n, farm_n, swirl, swirl_o]
+masks:
+  flare:
+    hurt: [[2, 82], [99, 82], [99, 177], [81, 177], [81, 165], [65, 165], [65, 177], [2, 177]]
+  spread:
+    cast: [[2, 80], [62, 80], [62, 96], [92, 96], [92, 168], [2, 168]]
+  staff:
+    idle: [[50, 18], [81, 18], [81, 52], [78, 84], [78, 99], [74, 100], [74, 194], [63, 194], [63, 100], [62, 84], [64, 52], [50, 52]]
+    cast: [[50, 20], [82, 20], [82, 50], [79, 82], [80, 95], [74, 96], [74, 175], [69, 175], [69, 96], [64, 95], [63, 82], [64, 50], [50, 50]]
+    hurt: [[150, 52], [188, 52], [188, 84], [160, 86], [142, 96], [77, 172], [70, 171], [132, 94], [148, 72]]
+  swirl:
+    cast: [[164, 46], [180, 46], [180, 96], [164, 96]]
+  swirl_o:
+    cast: [[180, 46], [194, 46], [194, 96], [180, 96]]
+  ft_f:
+    idle: [[82, 178], [99, 178], [99, 194], [82, 194]]
+    hurt: [[64, 178], [81, 178], [81, 194], [64, 194]]
+    cast: [[64, 176], [88, 176], [88, 194], [64, 194]]
+  ft_n:
+    idle: [[118, 178], [146, 178], [146, 194], [118, 194]]
+    hurt: [[115, 177], [142, 177], [142, 194], [115, 194]]
+    cast: [[122, 176], [154, 176], [154, 194], [122, 194]]
+frames:
+  hurt_in1:   # the flinch back: the idle upper body 2 px back and 1 down, the head 4 back, the free fist 2 up; staff foot planted
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b]
+    tweaks: {crown: [-4, 1], neck: [-4, 1], chest: [-2, 1], hip: [-2, 1], sh_n: [-2, 1], el_n: [-2, 1], hand_n: [-2, -1], sh_f: [-2, 1], el_f: [-2, 1], hand_f: [-2, 1], hip_n: [-2, 1], hip_f: [-2, 1], st: [-2, 1]}
+  hurt_in2:   # the hurt upper body 1 px toward idle, the flung cape 16 px folded in behind the robe
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [1, 0], neck: [1, 0], chest: [1, 0], hip: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0], hip_n: [1, 0], hip_f: [1, 0], st: [1, 0], fh_0: [16, 0], fh_1: [16, 0], fh_2: [16, 0]}
+  cast_gather:   # anticipation: the body sinks 1 px, the head bows, the free hand draws up toward the cast; the staff fist holds the shaft
+    moves: []
+    dy: 1
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b, st]
+    tweaks: {crown: [1, 1], neck: [1, 1], el_n: [4, -5], hand_n: [8, -12], el_f: [0, -1], hand_f: [0, -1]}
+  cast_rise:   # the cast upper body 3 px right (toward idle), the spread mantle 26 px folded in, the casting hand 8 back and 8 down (only the inner tendrils yet);
+               # the far arm stays on the planted staff
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b]
+    tweaks: {crown: [3, 0], neck: [3, 0], chest: [3, 0], hip: [3, 0], sh_n: [3, 0], el_n: [0, 3], hand_n: [-8, 8], sh_f: [3, 0], el_f: [1, 0], hand_f: [0, 0], hip_n: [3, 0], hip_f: [3, 0], fc_0: [26, 0], fc_1: [26, 0], fc_2: [26, 0], sw: [-8, 8]}
+    drop: [swirl_o]            # the outer tendrils form at the cast key
+  cast_release:   # the casting hand and the swirl 2 px higher
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b]
+    tweaks: {hand_n: [1, -2], sw: [1, -2]}
+  daze:   # the default recipe slump; the staff stays planted and the staff fist stays on it (the far arm takes back the drop)
+    moves: []                  # translations only: the shared toward-hurt move drags the staff fist toward the hurt grip
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b, st]
+    tweaks: {crown: [3, 3], neck: [2, 2], el_f: [0, -2], hand_f: [0, -3]}   # the head droops forward
+  daze_b:
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f, st_b, st]
+    tweaks: {crown: [4, 4], neck: [3, 3], el_f: [0, -4], hand_f: [0, -6]}
+holds: []
+paint:                         # outline ink in the 1-2 px cracks the translations open
+  - {frame: hurt_in1, rgb: [24, 24, 41], xy: [[130, 114], [130, 115], [130, 116], [130, 117]]}
+  - {frame: cast_rise, rgb: [6, 4, 10], xy: [[79, 74]]}
+  - {frame: cast_rise, rgb: [24, 24, 41], xy: [[75, 167], [76, 167], [75, 168], [76, 168], [77, 168], [78, 168]]}
+  - {frame: daze, rgb: [24, 24, 41], xy: [[89, 94], [90, 94], [83, 101], [82, 102], [83, 102], [82, 103], [83, 103], [81, 104], [82, 104], [80, 105], [81, 105], [82, 105], [79, 106], [80, 106], [81, 106], [79, 107], [80, 107], [78, 108], [79, 108], [78, 109], [79, 109]]}
+  - {frame: daze, rgb: [33, 24, 57], xy: [[92, 90], [88, 94], [89, 95]]}
+  - {frame: daze, rgb: [49, 24, 82], xy: [[91, 92], [90, 93], [88, 95], [88, 96], [87, 97], [86, 98]]}
+  - {frame: daze, rgb: [156, 156, 173], xy: [[85, 99], [84, 100], [84, 101], [84, 102]]}
