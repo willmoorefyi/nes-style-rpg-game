@@ -1039,3 +1039,79 @@ Bedrock calls: **2 of 80** (V0 2 of 12; V0-a 2 of its 3). Cost so far about $0.1
   mock needs the overhang hand drawn in front of the floor (the rigger's layer) to judge the planned composition.
 
 **FW-C follow-up (worktree `c2-fw`, 0 Bedrock calls).** `bedrock.MODELS["outpaint"]` = `us.stability.stable-outpaint-v1:0`; `colossus.py outpaint | search_replace | structure` (`colossus_edit.py`, Stability Bedrock schemas, local input / range checks, per-subcommand 5.6 purposes, all through `bedrock.invoke`); `selftest_colossus.py` 34 RED -> GREEN on a mocked client. V0-e and V0-d are unblocked on the tooling side; the R30 credential ruling is still open.
+
+### C2 structure-guided route for F3 (generator, main checkout `roster`, 2026-11-16)
+
+**User ruling (2026-11-16, relayed by the coordinator): F3 "Last Horizon" is generated guided by a silhouette.**
+Text-only V0-a failed twice (C1, C2 above), so the user changed the route; there is still no Gemini path. This route
+may use up to ~10 more Bedrock calls from the 80, including one prompt-only retry.
+
+**Control image (0 calls).** `assets-src/gen/colossus/chaos_horizon_control.py` (PIL) writes
+`chaos_horizon_control.png` (1800x1040 = 2x the 900x520 art canvas), `_art.png` and `_hand.png`, drawn in screen px at
+the rest placement (scale 3, place (-390, -300)). It has an eclipse disc at screen (960, 205) r 150, a corona fan
+filling the sky, two jagged shoulder ranges with a planet-limb fall past both edges, the fissure, four moons, a left
+forearm off the left edge, and the right hand gripping the rim left of the party. There are no legs and no face (the
+3.0 star points are left out, because two dots in a disc read as eyes). The `--mock` true-size check
+(`gen/out/colossus/review/chaos_horizon_control_mock.png`) gave: field above the horizon covered 100 %, visible
+fraction 35.6 %, hand box x 1050-1367 y 318-500 (party x 1380+), and a party-band luma std of 66 (41 on the rim
+alone). The structure call takes at most 2.5:1, so the call uses the control's top 720 rows (art rows 0..360, which
+holds everything the rest view and the pan reach).
+
+**Pixel scale.** I measured the SD 3.5 "pixel art" render C2: its blocks are 7-10 render px (~190 across 1536).
+Making 1 block = 1 art px would cap F3 at ~190 art px wide, against the 900 it needs at scale 3, and the Stability
+outputs are fixed at about 1-2 MP. So the route prompts a clean hard-edged illustration with no pixel-art words, and
+`pix` makes the art pixels. The structure output equals the input size (measured: 1800x1040 and 1800x720), so the
+1800x720 render becomes 900x360 art px at exactly 2 render px per art px (`pix --canvas 900x360` exit 0, palette OK).
+
+| # | Call | Source / settings | Key | Result |
+|---|---|---|---|---|
+| C3 | structure (v0) | full control 1800x1040, strength 0.65, seed 4101, prompt s1 (`gen/colossus/chaos_horizon.structure.prompt.md` history) | `c66d2aa48874ac05bc4ea234` | **reject**: a full-figure golem with legs, a lit sun head and a halo ring; clouds, mountains, a tiny figure; 3D look; no moons. The layout was mostly ignored |
+| C4 | structure (v0) | top 1800x720, strength 0.85, seed 4102, prompt s2 (half-length bust) | `d95ade61d71a34a63f132b44` | **best composition**: eclipse disc + corona + halo, one being, rocky arms and shoulders spanning both edges; but **a demon face inside the disc**, no moons, no fissure, monochrome brown |
+| C5 | structure (v0) | same, strength 0.95, prompt s3 ("featureless empty disc", face words negated) | (ledger) | **reject**: the same face again; the body under the arms turned into sky; no moons or fissure. Higher strength did not help |
+| C6 | search_replace (v0) | C4, search "the stone face with glowing eyes inside the black disc", seed 4201 | (ledger) | **pass**: the face is replaced by a clean pitch-black disc. The edit is local and the rest of the image is identical |
+| C7 | remove_bg (v0) = **V0-b** | C6 | (ledger) | **pass on pieces**: body, both arms, both hands and the disc are whole; the corona and halo glow are stripped (expected, 5.3). No moons to test |
+| C8 | search_replace (v0) | C6, search "the stone plates in the middle of the chest below the black disc", seed 4202 | (ledger) | **no-op**: the output is byte-identical to the input (no match), so the call was wasted |
+| C9 | search_replace (v0) | C6, search "chest", seed 4203 | (ledger) | **reject for F3**: it matched the eclipse disc and filled it with a molten sun core (2.5 % of px changed, all inside the disc's box, the rest identical). V0-d data: search_replace edits are local, and this result is a possible F4 "core ignites" variant |
+
+Bedrock calls: **9 of 80** (V0 9 of 12; this route 7 of its ~10); about $0.5 at list prices. `budget --check` OK
+after every call; Gemini 405 = N_C0.
+
+**V0-c (offline, 0 calls).** C7's cut, a levels stretch (2-99.5 %, gamma 0.8), `pix --canvas 900x360` padded to
+900x520, a stepped corona glow rebuilt from C6's raw (4 levels, ember / gold / white, additive), and an
+offline-painted fissure and four moons (a proposal). Built with `gen/colossus/chaos_horizon_v0c_mock.py`; mocks in
+`gen/out/colossus/review/`:
+- `chaos_horizon_v0c_st_b.png`, plan placement (-390, -300) behind floorFront: covered 92 %, edge contrast 101, party
+  readable. It **reads as a mountain silhouette with a black sun**, not a being.
+- `chaos_horizon_v0c_st_b_c_lev.png`, placement (-390, -180) drawn over the floor (no floorFront): it **reads as one
+  vast eclipse-headed being** whose arms run off both edges; covered 76 %, edge contrast 97; the warrior and thief
+  stand over the dark right arm.
+- `chaos_horizon_v0c_st_art_2x.png`: the art canvas.
+
+**Fresh image-only review (multimodal-looker; given only the image paths): ITERATE.**
+- What works: one being, an eclipse head, no face, none of the 3.5 look-alikes. Of the five features, 2 are drawn by
+  the model (eclipse head, two arms) and the shoulders count partly (ridge-lit masonry, not black mountains). The
+  fissure and the moons are missing from the render.
+- Placement A reads as a landscape. Placement C reads as the largest thing on screen but only partly as planet-sized.
+- Top fixes:
+  - the painted fissure looks like a vector line: give it a tapered glow;
+  - the moons look pasted on and too clean: use the stone's own ramp, place them in front of the chest, and move the
+    grey moon away from the backdrop's planet and the party;
+  - separate the arms with rim light, show a hand, lift the darks off pure black, keep the right arm off the front
+    heroes, and fix the notched cut-out edge at the eclipse and the smeared fill below the torso.
+
+**G-C0 for this route: not passed. The generator stopped before C3**, which the coordinator's ruling only allows on a
+pass.
+- V0-a: 2 of 5 features from the model, 1 partial.
+- V0-b: pass.
+- V0-c: fail at the plan placement; partial at placement C, which needs a ruling because it changes the 3.0 / 4.2
+  floorFront composition.
+- V0-d: data only.
+- V0-e: not run.
+
+**Recommendation (orchestrator / user).**
+1. Treat C6 as the F3 base and finish it offline (0 calls): a painted glowing fissure and moons in the stone ramp, as
+   their own layers (the plan already makes the moons and the core separate layers), and rim-lit arm edges. Rule on
+   placement C, or a middle ground with the arms and the hand as overhang layers over the far floor.
+2. If more calls are allowed: one outpaint down/right to give the right arm a hand that reaches the rim (f3_gen,
+   1-2 calls), and one search_replace with a simple search ("right hand") if needed.
+3. The face problem is solved by search_replace, not by prompts.

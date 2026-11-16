@@ -12,7 +12,8 @@ greyscale shapes on a plain ground:
   - the left forearm lying along the horizon off the left edge, and the right arm reaching down to a continental hand
     whose claws grip the arena rim left of the party (the overhang part, drawn in front of floorFront).
 No legs, no face. Writes, next to this script:
-  chaos_horizon_control.png       1800x1040 (2x the art canvas), the image handed to the structure call
+  chaos_horizon_control.png       1800x1040 (2x the art canvas); its top 720 rows (art rows 0..360, screen y -300..780,
+                                  aspect 2.5:1, the most the structure call takes) are the image handed to the call
   chaos_horizon_control_art.png   900x520 RGBA art-px silhouette (ground transparent), for the stage mock
   chaos_horizon_control_hand.png  900x520 RGBA: the overhang (hand) only
 With --mock: gen/out/colossus/review/chaos_horizon_control_mock.png, the silhouette at true size on the staged rim
@@ -99,6 +100,9 @@ def draw(k: int = K) -> tuple[Image.Image, Image.Image, Image.Image]:
         poly([(x0, y0), (x1, y1), (x1, y1 + 10), (x0, y0 + 10)], RIDGE)
     for x0, y0, x1, y1 in ((-200, 300, 640, 262), (1290, 262, 2150, 300), (-200, 352, 560, 330), (1400, 322, 2150, 352)):
         poly([(x0, y0), (x1, y1), (x1, y1 + 7), (x0, y0 + 7)], RIDGE)   # tectonic plate seams on the shoulders
+    for i, y in enumerate(range(420, 1260, 70)):            # crust plates below the shoulders (edges for structure)
+        sh = 40 if i % 2 else -40
+        poly([(-390, y + sh), (960, y - 20), (2310, y - sh), (2310, y - sh + 6), (960, y - 14), (-390, y + sh + 6)], RIDGE)
     # arms: the left runs down off the left edge; the right reaches down and left to the hand on the rim
     poly([(150, 250), (330, 300), (40, 470), (-260, 420)], ARM, edge=RIDGE)
     poly([(1660, 250), (1820, 300), (1350, 380), (1150, 352)], ARM, edge=RIDGE)
@@ -116,6 +120,7 @@ def draw(k: int = K) -> tuple[Image.Image, Image.Image, Image.Image]:
     poly([(1060, 352), (1110, 340), (1112, 420), (1080, 460), (1050, 440)], HAND, hand=True, edge=CLAW)   # thumb
     # four moons in front of the chest, each about the party's size
     for mx, my, r in ((470, 235, 62), (705, 318, 50), (1215, 262, 56), (1590, 200, 48)):
+        circ(mx, my, r + 6, CLAW)                          # a dark rim so each moon reads as its own piece
         circ(mx, my, r, MOON)
         poly([(mx + r * 0.2, my - r * 0.95), (mx + r, my), (mx + r * 0.2, my + r * 0.95), (mx + r * 0.55, my)],
              MOON_DARK)
