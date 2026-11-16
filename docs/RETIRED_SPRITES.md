@@ -21,6 +21,11 @@ The archive is never built or checked: every build and gate globs one level deep
 - `retire.py --prune <id> boss_attack boss_cast boss_hurt boss_attack_raise`: removes the old poses, in the commit that
   approves a boss's new `boss_idle`. Both refuse unless byte-identical archive copies exist.
 - `approve.py` refuses to overwrite `approved/<id>/monster_*.png` / `boss_*.png` unless a byte-identical copy is archived.
+- Colossus forms (`docs/CHAOS_FORMS_PLAN.md` 5.5): `retire.py --colossus <form> [--as <form>_vN]` archives
+  `approved/chaos_forms/<form>/*` (master, `meta.json`, variants), `gen/colossus/<form>.yaml` + `.lock.json` and the
+  cache files of `meta.json`'s `cache_keys` into `approved/_retired/<form>_vN/` (form ids carry the `chaos_` prefix,
+  e.g. `chaos_horizon_v1`); `colossus.py approve` refuses to overwrite a master without a byte-identical archive copy.
+  No rows are planned (F1 is kept).
 
 **Reviving a retired sprite as a new enemy:** `python3 -I assets-src/gen/retire.py --revive <id>_vN --as <new_id>`
 copies the archive to `approved/<new_id>/` (json `character: <new_id>`, `revived_from: <id>_vN`, `cache_key` kept as

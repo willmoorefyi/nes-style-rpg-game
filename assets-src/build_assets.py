@@ -1,6 +1,7 @@
 """Build all game art/audio from assets-src into assets/.
 
-Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle_ai|field_ai|monsters_ai|audio ...]
+Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle_ai|field_ai|monsters_ai|maps|audio|fx|colossus ...]
+                         python3 -I assets-src/build_assets.py colossus --out DIR   # scratch build + manifest.sha256
 With no arguments every stage runs. Sprites are authored at native SNES resolution and
 upscaled with nearest-neighbour: x3 for the legacy field/terrain art (TILE_SIZE=48 in LayoutConstants.ts).
 Battle art (party, monsters) is the AI-generated 2x art built from assets-src/gen/ (docs/ART_2X_PLAN.md,
@@ -280,6 +281,16 @@ def build_monsters_ai() -> None:
     monster_atlas.build(ASSETS / "sprites")
 
 
+def build_colossus(out: Path | None = None) -> None:
+    """Chaos colossus forms (docs/CHAOS_FORMS_PLAN.md 4.6): approved/chaos_forms/<form>/master.png + gen/colossus/<form>.yaml
+    -> assets/sprites/colossus/ + colossus.json (gen/colossus_build.py). No approved master: writes and prints nothing."""
+    from gen import colossus_build
+    try:
+        colossus_build.build(out)
+    except ValueError as e:
+        raise SystemExit(f"colossus error: {e}")
+
+
 def build_optional(module_name: str) -> None:
     mod = __import__(module_name)
     mod.build(ASSETS)
@@ -305,17 +316,25 @@ STAGES = {
     "maps": build_maps,
     "audio": lambda: build_optional("audio"),
     "fx": lambda: __import__("importlib").import_module("fx.build_fx").build(ASSETS),  # battle-fx atlas (assets-src/fx)
+    "colossus": build_colossus,
 }
 
 
 def main() -> None:
     PREVIEW.mkdir(exist_ok=True)
-    wanted = sys.argv[1:] or list(STAGES)
+    args = sys.argv[1:]
+    out = None
+    if "--out" in args:                    # colossus only: a scratch dir for the determinism check (R26)
+        i = args.index("--out")
+        if i + 1 >= len(args) or args[:i] + args[i + 2:] != ["colossus"]:
+            raise SystemExit("--out DIR is only for the colossus stage: build_assets.py colossus --out DIR")
+        out, args = Path(args[i + 1]).resolve(), ["colossus"]
+    wanted = args or list(STAGES)
     unknown = [w for w in wanted if w not in STAGES]
     if unknown:
         raise SystemExit(f"unknown stage(s) {unknown}; choose from {list(STAGES)}")
     for name in wanted:
-        STAGES[name]()
+        STAGES[name](out) if name == "colossus" else STAGES[name]()
 
 
 if __name__ == "__main__":

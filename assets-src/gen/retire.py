@@ -7,6 +7,7 @@ approved/<id>/..., anim/monsters/<id>.*; the archive is approved/_retired/<id>_v
   python3 -I assets-src/gen/retire.py --move-rig <id>                 # remove the live rig + lock (archived copies needed)
   python3 -I assets-src/gen/retire.py --prune <id> <sheet> [<sheet>]  # remove stale approved/<id>/<sheet>.* (archived)
   python3 -I assets-src/gen/retire.py --revive <id>_vN --as <new_id>  # copy an archive back as a new sprite
+  python3 -I assets-src/gen/retire.py --colossus <form> [--as <form>_vN]  # archive a colossus form (CHAOS_FORMS_PLAN 5.5)
 
 Archive layout: approved/_retired/<id>_vN/* (byte copies), anim/monsters/_retired/<id>_vN.yaml + .lock.json, and the
 monsters.yaml entry verbatim in retired/monsters_vN.yaml (`id` kept, plus `retired_as: <id>_vN`; never read by the
@@ -193,6 +194,49 @@ def index_row(tree: Tree, sid: str, rid: str) -> str:
             f"`retire.py --revive {rid} --as <new_id>` |")
 
 
+# ───────── colossus forms (docs/CHAOS_FORMS_PLAN.md 5.5) ─────────
+def colossus_archives(tree: Tree, form: str) -> list[Path]:
+    """approved/_retired/<form>_v*/ directories of a colossus form (form ids carry the chaos_ prefix)."""
+    return archives_of(tree, form)
+
+
+def retire_colossus(tree: Tree, form: str, rid: str | None = None) -> str:
+    """Archive a colossus form before its master is replaced: approved/chaos_forms/<form>/* (master.png, meta.json,
+    variants), gen/colossus/<form>.yaml + .lock.json and the cache files of meta.json's cache_keys, all under
+    approved/_retired/<rid>/ (default the next free <form>_vN, or the one holding these exact bytes). Idempotent;
+    refuses (before writing) if a target exists with different bytes. Returns rid."""
+    src = tree.approved / "chaos_forms" / form
+    files = sorted(p for p in src.iterdir() if p.is_file()) if src.is_dir() else []
+    if not files:
+        _refuse(f"{src} has no approved colossus files to archive")
+    if rid is None:
+        same = [d for d in colossus_archives(tree, form) if (d / "master.png").is_file()
+                and (d / "master.png").read_bytes() == (src / "master.png").read_bytes()]
+        n = 1 + max([int(m.group(1)) for d in colossus_archives(tree, form)
+                     if (m := re.fullmatch(re.escape(form) + r"_v([0-9]+)", d.name))] or [0])
+        rid = same[0].name if same else f"{form}_v{n}"
+    if not retired_id_ok(form, rid):
+        _refuse(f"--as {rid}: a retired colossus id is {form}_vN")
+    plan: list[tuple[Path, Path]] = []
+    for p in files:
+        _plan_copy(p, tree.archive / rid / p.name, plan)
+    for ext in (".yaml", ".lock.json"):
+        live = tree.gen / "colossus" / f"{form}{ext}"
+        if live.exists():
+            _plan_copy(live, tree.archive / rid / live.name, plan)
+    meta = json.loads((src / "meta.json").read_text()) if (src / "meta.json").exists() else {}
+    for key in meta.get("cache_keys", []):
+        for ext in ("png", "json"):
+            c = tree.cache / f"{key}.{ext}"
+            if c.exists():
+                _plan_copy(c, tree.archive / rid / "cache" / c.name, plan)
+    for a, b in plan:
+        b.parent.mkdir(parents=True, exist_ok=True)
+        if not b.exists():
+            shutil.copy2(a, b)
+    return rid
+
+
 # ───────── after the first new approval: move the rig, prune stale poses ─────────
 def move_rig(tree: Tree, sid: str) -> list[Path]:
     """Remove anim/monsters/<sid>.yaml and .lock.json, only when byte-identical archive copies exist."""
@@ -340,9 +384,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--move-rig", metavar="ID")
     ap.add_argument("--prune", action="store_true")
     ap.add_argument("--revive", metavar="ID_vN")
+    ap.add_argument("--colossus", metavar="FORM", help="archive a colossus form (approved/chaos_forms/<form>) as <form>_vN")
     a = ap.parse_args(argv)
     tree = Tree()
-    if a.revive:
+    if a.colossus:
+        rid = retire_colossus(tree, a.colossus, a.as_id)
+        print(f"archived {a.colossus} as {rid}; add a docs/RETIRED_SPRITES.md row and commit it with the archive")
+    elif a.revive:
         if not a.as_id:
             _refuse("--revive needs --as <new_id>")
         for step in revive(tree, a.revive, a.as_id):

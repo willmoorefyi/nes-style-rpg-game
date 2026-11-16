@@ -282,7 +282,11 @@ class Request:
         return (CACHE / f"{self.key}.png").exists()
 
 
-def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str | None) -> Request:
+BEDROCK_PURPOSE = "character_sheet"    # not a pass-C purpose: bedrock.invoke refuses it under pass C (A6)
+
+
+def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str | None, *, paid: bool = False) -> Request:
+    """`paid` (the --paid flag) only reaches the Bedrock path: bedrock.invoke gates it with BEDROCK_PURPOSE (5.1)."""
     if sheet.name not in allowed_sheets(char):
         raise SystemExit(f"refused: {char['id']} has no '{sheet.name}' sheet (sheets: {allowed_sheets(char)})")
     if is_kit(char):
@@ -354,7 +358,7 @@ def plan_request(char: dict, sheet: Sheet, seed: int, backend: str, model: str |
             "control_strength": S.CONTROL_STRENGTH, "seed": seed, "output_format": "png"}
     key = B.cache_key("structure", body)
     return Request(char["id"], sheet, seed, backend, "stable-image-control-structure", guide, key, prompt, [guide],
-                   lambda: B.invoke("structure", body))
+                   lambda: B.invoke("structure", body, paid=paid, purpose=BEDROCK_PURPOSE))
 
 
 def read_ledger(path: Path = LEDGER) -> list[dict]:
@@ -901,10 +905,11 @@ def main(argv: list[str] | None = None) -> None:
         ap.error(f"unknown sheets {unknown}; choose from {list(SHEETS)}")
 
     if args.seeds:
-        plan = [(seed, plan_request(char, SHEETS[n], seed, args.backend, args.model)) for seed in seeds for n in names]
+        plan = [(seed, plan_request(char, SHEETS[n], seed, args.backend, args.model, paid=args.paid))
+                for seed in seeds for n in names]
     else:
-        plan = [(seed_for(char, n), plan_request(char, SHEETS[n], seed_for(char, n), args.backend, args.model))
-                for n in names]
+        plan = [(seed_for(char, n), plan_request(char, SHEETS[n], seed_for(char, n), args.backend, args.model,
+                                                 paid=args.paid)) for n in names]
     paid_count = sum(not r.cached for _, r in plan)
     if args.dry_run:
         for seed, r in plan:
