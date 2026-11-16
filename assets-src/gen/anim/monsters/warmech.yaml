@@ -1,0 +1,177 @@
+# Warmech (T-K, docs/ROSTER_FIX_PLAN_2.md 5): the boss war machine, per-pose (232 x 200 padded cell). Preset mechanical,
+# translation-first: in every in-between the hull, head, both arms and both thighs move as one rigid unit (`tweaks`,
+# `moves: []`) over planted clawed feet (`ft_*` masks, pinned), and only the shins turn (<= 14 deg) to reach the knees.
+# The 40 px lunge stride lives in the key switches (a key-switch offset d = (-23, -4) to (-24, -5): idle-sourced frames
+# forward 11-12 px and 2 down, attack-sourced ones 12 px back and 2-3 up). The claw rides 3 px higher than the hull in
+# the forward frames (it would close the pocket on the far shin). Daze: the default recipe slump (legs pinned), the
+# claw lifted 3 px in daze_b for the same pocket. `fixmeasure.py switch warmech <seq> --rig` (IoU / step vs need / cap):
+#   attack: idle->wind1 0.804 / 5.4, wind1->wind2 0.827 / 4.6, wind2->mid 0.447 / 17.7, mid->attack 0.740 / 10.6,
+#           attack->follow 0.742 / 10.9, follow->recover 0.444 / 18.0, recover->idle 0.702 / 9.8 (vs 0.333 / 19.1)
+#   hurt:   idle->in1 0.771 / 6.8, in1->in2 0.535 / 10.4, in2->hurt 0.730 / 6.6 (vs 0.436 / 15.0)
+#   cast:   gather->rise 0.761 / 6.2, the rest >= 0.96 / <= 0.7 (vs 0.550 / 15.0)
+#   daze:   idle->daze 0.895 / 3.1, daze->daze_b 0.917 / 1.8 (vs 0.436 / 15.0)
+sprite: warmech
+body: biped
+preset: mechanical             # riveted bronze plates: rigid parts, nearest sampling, every bone turns <= 15 deg
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+attack_hand: n                 # the cannon arm (the claw swings under only in the approved attack key)
+cast_hand: n
+keyframes:
+  idle:
+    crown: [108, 12]
+    neck: [105, 42]
+    chest: [105, 60]
+    hip: [100, 95]
+    sh_n: [140, 62]
+    el_n: [150, 74]
+    hand_n: [200, 74]
+    sh_f: [55, 45]
+    el_f: [42, 82]
+    hand_f: [40, 125]
+    hip_n: [115, 100]
+    knee_n: [130, 130]
+    foot_n: [128, 178]
+    toe_n: [145, 188]
+    hip_f: [80, 100]
+    knee_f: [70, 135]
+    foot_f: [60, 178]
+    toe_f: [78, 188]
+  attack:
+    crown: [150, 25]
+    neck: [140, 50]
+    chest: [135, 65]
+    hip: [125, 108]
+    sh_n: [165, 85]
+    el_n: [180, 100]
+    hand_n: [225, 122]
+    sh_f: [105, 45]
+    el_f: [130, 120]
+    hand_f: [185, 170]
+    hip_n: [130, 115]
+    knee_n: [138, 148]
+    foot_n: [145, 178]
+    toe_n: [160, 188]
+    hip_f: [100, 100]
+    knee_f: [72, 130]
+    foot_f: [35, 178]
+    toe_f: [15, 186]
+  hurt:
+    crown: [125, 30]
+    neck: [120, 48]
+    chest: [120, 65]
+    hip: [118, 100]
+    sh_n: [150, 68]
+    el_n: [160, 72]
+    hand_n: [205, 72]
+    sh_f: [80, 50]
+    el_f: [60, 65]
+    hand_f: [35, 85]
+    hip_n: [135, 110]
+    knee_n: [158, 133]
+    foot_n: [145, 178]
+    toe_n: [160, 188]
+    hip_f: [100, 110]
+    knee_f: [88, 140]
+    foot_f: [75, 178]
+    toe_f: [85, 188]
+  cast:
+    crown: [108, 12]
+    neck: [105, 42]
+    chest: [105, 60]
+    hip: [100, 95]
+    sh_n: [140, 62]
+    el_n: [150, 74]
+    hand_n: [200, 74]
+    sh_f: [55, 45]
+    el_f: [42, 82]
+    hand_f: [40, 125]
+    hip_n: [115, 100]
+    knee_n: [145, 128]
+    foot_n: [170, 176]
+    toe_n: [190, 188]
+    hip_f: [80, 100]
+    knee_f: [70, 135]
+    foot_f: [60, 178]
+    toe_f: [78, 188]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 6.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 6.0}
+frames:
+  atk_wind1:   # the hull, head and both arms 6 px toward the switch and 1 down, the knees 5; feet planted
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [6, 1], neck: [6, 1], chest: [6, 1], hip: [6, 1], sh_n: [6, 1], el_n: [6, 1], hand_n: [6, 1], sh_f: [6, 1], el_f: [6, 0], hand_f: [6, 0], hip_n: [6, 1], hip_f: [6, 1], knee_n: [6, 1], knee_f: [6, 1]}
+  atk_wind2:   # the coil: the hull 12 px forward and 3 down, the knees 10 (shins keep their length)
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [11, 2], neck: [11, 2], chest: [11, 2], hip: [11, 2], sh_n: [11, 2], el_n: [11, 2], hand_n: [11, 2], sh_f: [11, 2], el_f: [11, -1], hand_f: [11, -1], hip_n: [11, 2], hip_f: [11, 2], knee_n: [11, 2], knee_f: [11, 2]}
+  atk_mid:   # the attack 12 px back toward the wind and 2 up over the planted lunge
+    t: 0
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-12, -2], neck: [-12, -2], chest: [-12, -2], hip: [-12, -2], sh_n: [-12, -2], el_n: [-12, -2], hand_n: [-12, -2], sh_f: [-12, -2], el_f: [-12, -2], hand_f: [-12, -2], hip_n: [-12, -2], hip_f: [-12, -2], knee_f: [-3, -2], knee_n: [-6, 1]}
+  atk_follow:   # the attack hull 12 px back and 3 up (1 above the mid)
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-12, -3], neck: [-12, -3], chest: [-12, -3], hip: [-12, -3], sh_n: [-12, -3], el_n: [-12, -3], hand_n: [-12, -3], sh_f: [-12, -3], el_f: [-12, -3], hand_f: [-12, -3], hip_n: [-12, -3], hip_f: [-12, -3], knee_f: [-3, -2], knee_n: [-6, 1]}
+  atk_recover:   # the idle hull 12 px forward and 3 down
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [11, 2], neck: [11, 2], chest: [11, 2], hip: [11, 2], sh_n: [11, 2], el_n: [11, 2], hand_n: [11, 2], sh_f: [11, 2], el_f: [11, -1], hand_f: [11, -1], hip_n: [11, 2], hip_f: [11, 2], knee_n: [11, 2], knee_f: [11, 2]}
+  hurt_in1:   # the idle hull 8 px toward the hurt
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [8, 0], neck: [8, 0], chest: [8, 0], hip: [8, 0], sh_n: [8, 0], el_n: [8, 0], hand_n: [8, 0], sh_f: [8, 0], el_f: [8, 0], hand_f: [8, 0], hip_n: [8, 0], hip_f: [8, 0], knee_n: [7, 0], knee_f: [7, 1]}
+  hurt_in2:   # the hurt hull 8 px back toward idle
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [-8, 0], neck: [-8, 0], chest: [-8, 0], hip: [-8, 0], sh_n: [-8, 0], el_n: [-8, 0], hand_n: [-8, 0], sh_f: [-8, 0], el_f: [-8, 0], hand_f: [-8, 0], hip_n: [-8, 0], hip_f: [-8, 0], knee_n: [-8, -2], knee_f: [-8, -2]}
+  cast_gather:
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [0, 0], neck: [0, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], hip_f: [0, 0]}
+  cast_rise:
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [0, 0], neck: [0, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], hip_f: [0, 0]}
+  cast_release:
+    moves: []
+    pins: [knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {crown: [0, 0], neck: [0, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], hip_f: [0, 0]}
+  daze_b:
+    tweaks: {el_f: [0, -3], hand_f: [0, -3]}
+masks:                         # applied in order, later masks win
+  torso:                       # the far pauldron rides the hull (the arm split it in the daze slump)
+    idle: [[34, 30], [82, 28], [84, 62], [62, 66], [36, 58]]
+  shin_n:                      # the near lower leg under the lunge, off the claw arm
+    attack: [[124, 140], [168, 136], [170, 178], [124, 178]]
+  farm_f:                      # the attack claw on the ground beside the near foot
+    attack: [[160, 140], [214, 140], [214, 192], [168, 192], [160, 176]]
+  ft_f:                        # the clawed feet (bottom band) as their own pinned parts
+    idle: [[35, 177], [92, 177], [92, 194], [35, 194]]
+    attack: [[1, 172], [62, 172], [62, 194], [1, 194]]
+    hurt: [[50, 177], [98, 177], [98, 194], [50, 194]]
+    cast: [[35, 177], [92, 177], [92, 194], [35, 194]]
+  ft_n:
+    idle: [[106, 177], [162, 177], [162, 194], [106, 194]]
+    attack: [[124, 178], [166, 178], [166, 194], [124, 194]]
+    hurt: [[120, 177], [176, 177], [176, 194], [120, 194]]
+    cast: [[150, 176], [210, 176], [210, 194], [150, 194]]
+  thigh_n:                     # the hurt crotch plate stays on the near thigh (the hull radius took it)
+    hurt: [[128, 136], [136, 136], [136, 148], [128, 148]]
+holds: []
+paint:                         # pockets and 1 px cracks between the claw arm and the near leg the shifted attack hull opens
+                               # (fixmeasure select --holes 2, the 4-neighbour mode colour), 1 px seams inked
+  - {frame: atk_mid, rgb: [41, 49, 57], xy: [[155, 137], [156, 137], [130, 138], [130, 139], [131, 139]]}
+  - {frame: atk_mid, rgb: [57, 66, 74], xy: [[128, 137], [129, 137], [129, 138]]}
+  - {frame: atk_mid, rgb: [74, 49, 41], xy: [[131, 138], [132, 139]]}
+  - {frame: atk_mid, rgb: [99, 66, 49], xy: [[135, 136], [130, 137], [134, 137], [135, 137], [136, 137], [137, 137]]}
+  - {frame: atk_mid, rgb: [115, 74, 57], xy: [[136, 136], [156, 136]]}
+  - {frame: atk_mid, rgb: [6, 4, 10], xy: [[93, 117]]}
+  - {frame: atk_follow, rgb: [6, 4, 10], xy: [[93, 116], [94, 116], [95, 116], [109, 121], [110, 121]]}
+  - {frame: hurt_in2, rgb: [6, 4, 10], xy: [[135, 131]]}
+
