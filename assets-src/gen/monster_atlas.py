@@ -158,7 +158,7 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
                 raise SystemExit("monsters_ai: variant checks failed\n  " + "\n  ".join(bad))
             sprites[v["id"]] = (meta, vf, holds, anim, L)
     scales = load_scale(set(sprites), scale_table)
-    groups = MP.group_order(sorted(sprites))
+    groups = MP.group_order(sorted(sprites), {s for s, v in sprites.items() if v[0].get("size") == "titan"})
     order = [sid for _, ids in groups for sid in ids]
     names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
     items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}

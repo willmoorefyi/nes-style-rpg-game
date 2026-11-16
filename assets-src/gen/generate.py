@@ -473,11 +473,12 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
     """Pixel-perfect path when the render has a detectable pixel grid whose cell size matches the sheet grid;
     otherwise fall back to block resampling (with a warning in the review stats)."""
     if sheet.name.startswith(("monster_", "boss_")):
+        pg = S.pose_geom(char.get("size"))            # FW-T: the titan cell for size: titan, else the boss cell
         frames, info = M.cut(raw, monster_band(char), bool(char.get("floating")),
                              colors=char.get("palette_size", 16), seed=seed,
                              n_cells=1 if sheet.name.startswith("boss_") else 3,
-                             cell=sheet.geom.grid[0] if sheet.name.startswith("boss_") else None,
-                             foot_row=sheet.geom.bottom_row if sheet.name.startswith("boss_") else None,
+                             cell=pg.grid[0] if sheet.name.startswith("boss_") else None,
+                             foot_row=pg.bottom_row if sheet.name.startswith("boss_") else None,
                              haze=bool(char.get("haze")))
         info["report"] = M.frame_report(frames, monster_band(char))
         LAST_RESAMPLE[sheet.name] = info

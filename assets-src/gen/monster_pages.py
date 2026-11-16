@@ -5,7 +5,8 @@ entry loads only the pages its sprites live on (src/rendering/MonsterPages.ts). 
 
 - **Groups** (`PAGE_GROUPS`, in order): page 0 holds the act-1 sheets of the R0 commit (in their R0 order, so page 0 is
   the R0 atlas cell for cell), then the fiends and bosses (G1 + G2), then roster batches A-D (docs/ROSTER_PLAN.md 3.2),
-  then any approved sprite no group lists (sorted by id). Within a group sprites keep the listed order.
+  then the `titan` group (FW-T: any sheet whose approved json has `size: titan`, taken out of its listed group), then
+  any approved sprite no group lists (sorted by id). Within a group sprites keep the listed order.
 - **Every group starts on a new page** and spills onto further pages when full, so adding a sprite to a later group
   never moves a cell on an earlier group's pages.
 - **A sheet never straddles pages**: when its frames would cross the page's bottom edge it starts the next page.
@@ -40,15 +41,18 @@ PAGE_GROUPS: list[tuple[str, list[str]]] = [
 ]
 
 
-def group_order(sprites: list[str]) -> list[tuple[str, list[str]]]:
-    """The present sprites as (group, ids) in page order; unlisted ids go to a last group `other`, sorted."""
+def group_order(sprites: list[str], titans: set[str] | frozenset[str] = frozenset()) -> list[tuple[str, list[str]]]:
+    """The present sprites as (group, ids) in page order; unlisted ids go to a last group `other`, sorted. FW-T
+    (docs/REDESIGN_PLAN.md 4.2): `titans` (the sheets whose approved json has `size: titan`) are taken out of their
+    listed group into a group `titan` after D (sorted), so an old `size: boss` sheet keeps its page until then."""
     have = set(sprites)
     listed = [i for _, ids in PAGE_GROUPS for i in ids]
     dup = sorted({i for i in listed if listed.count(i) > 1})
     if dup:
         raise SystemExit(f"monsters_ai: sprites listed in more than one page group: {dup}")
-    out = [(name, [i for i in ids if i in have]) for name, ids in PAGE_GROUPS]
-    out.append(("other", sorted(have - set(listed))))
+    out = [(name, [i for i in ids if i in have and i not in titans]) for name, ids in PAGE_GROUPS]
+    out.append(("titan", sorted(have & set(titans))))
+    out.append(("other", sorted(have - set(listed) - set(titans))))
     return [(name, ids) for name, ids in out if ids]
 
 

@@ -456,7 +456,11 @@ def test_monster_anim() -> None:
     print("roster fix pass measurements (FW-M: fixmeasure.py reproduces the fix plan's RED numbers)")
     from gen import selftest_fixmeasure as SFM
     SFM.run_fixmeasure(check)
-    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false)")
+    print("titan band (FW-T: 300 cell / feet 292, fail-closed cut, probe, approve, titan page group)")
+    from gen import selftest_titan as STi
+    STi.run_titan(check)
+    print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
+          "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
     print("monster atlas build locks")

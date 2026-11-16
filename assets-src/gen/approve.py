@@ -97,7 +97,7 @@ def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",
     # only the cut sheet: the raw render is the committed cache entry (cache/<key>.png) and the prompt is
     # reproducible with --dry-run
     shutil.copy2(src / f"{sheet_name}.png", dst / f"{sheet_name}.png")
-    g = sheet.geom
+    g = S.pose_geom(char.get("size")) if sheet_name.startswith("boss_") else sheet.geom   # FW-T: titan feet row 292
     meta = {"character": cid, "sheet": sheet_name, "backend": "gemini", "model": req.model, "seed": seed,
             "cache_key": req.key, "approved": time.strftime("%Y-%m-%d"),
             "grid": list(_monster_cell(dst / f"{sheet_name}.png", g) if sheet_name.startswith(("monster_", "boss_"))
