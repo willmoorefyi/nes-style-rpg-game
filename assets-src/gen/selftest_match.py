@@ -141,6 +141,8 @@ def run_match(check: Callable[[bool, str], None]) -> None:
 
     # the reference: the approved idle's figure height; the idle itself has no reference (it is the reference)
     sera = GEN.load_character("hollow_seraph")
+    # the plain entry: the live one minus match_height / tolerance (the live seraph now opts in, R331)
+    sera = {**sera, "cut": {k: v for k, v in (sera.get("cut") or {}).items() if k not in ("match_height", "tolerance")}}
     opt = _with(sera, match_height="idle")
     try:
         ref_cast = GEN.match_ref(opt, "boss_cast")
