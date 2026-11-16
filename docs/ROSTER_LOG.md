@@ -841,3 +841,18 @@ clamp, dy -8.5; the plan's C2 estimate was -2 for 183 art px); the C1 titan fixt
   overlap; hill_gigas' lunge top 130.
 - The red dragon (ranged): its breath plays in place (x 559-896 over the loop, home 566-827).
 - No page errors or console errors in any run.
+
+## Pass V fix round (V8) (docs/REDESIGN_FIX_PLAN.md, generator, main checkout `roster`, 2026-11-16)
+
+**G-0:** `roster` == `roster-int` (a372661; `git merge --ff-only roster-int`: already up to date); `cmp` of every
+`approved/<id>/*` and `anim/monsters/<id>.{yaml,lock.json}` of crazy_horse, piscodemon and hollow_seraph against
+`git show roster-int:<path>`: all identical. Every paid request below is `--paid --retry` under the user's pass-V
+approval (2026-11-16, `REDESIGN_PLAN.md` 6); attempts over 3 on a sheet cite D-U1 / D-U2. G1a counts "bright" as
+HLS L >= 0.55 and S >= 0.40 (strict) and, as the plan's "the new cut's equivalent", any glow colour with S >= 0.40 and a
+relative luminance >= that of R290's accepted (173, 189, 99) (Y 179); both numbers are given.
+
+Images used: 29 of 50 (ledger guard: 396 - 367; V8 halt 47).
+
+| # | Sheet (seed) | n | Measured result | Decision |
+|---|---|---|---|---|
+| R321 | crazy_horse/monster_large (1235, key `c27aaedec151d608f5e3c33f`, `--retry`, pass-V attempt 2 of 5 (`sheet_caps` 5 pending FW-V8; within the default 3), V8 attempt 1; archive `crazy_horse_v2` 089adcc, `selftest_retire.py` PASSED) | 1 | The F1 text: an otherworldly beast with a **bare pale horse-skull head** (empty sockets, a large glowing yellow-green eye), **the ribs showing through the ash-grey hide**, a **tall ridge of long bone spines** along neck and back, wide jagged cracks blazing yellow-green on neck, flanks and legs **in all three poses**, a thick curling smoke mane and tail with embers inside the smoke, and **the lower legs dissolving into curling black smoke instead of hooves**, the smoke on the ground; facing right in every cell. Heights 97 / 73 / 89 (large band 96-120), feet on row 122, 132 px cells (widened), x 17-125 / 3-129 / 2-121, no border pixels, binary alpha, 16 colours with the outline ink, `pose_diff` 0.88 / 0.65, `edges_ok`, no grid (area-averaged, scale 1.157), `clipped []`. **G1a** glow px idle / attack / hurt: strict 15 / 30 / 15; with the cut's main glow colour (198, 214, 57) (HLS L 0.53, Y 199 > 179) **65 / 84 / 89** (R290: 2 / 8 strict). **G1b** eye (one visible in side view): idle 6 px, attack 8 px of (198, 214, 57) / (222, 214, 74). **G1c** non-equine at 1x in all 3 keys: the bare skull, the smoke legs, the tall spine ridge, the ribs. **G1d** roster scores vs `nightmare` silhouette 0.66 / edge 0.26 (flag >= 0.85 and >= 0.60), vs `crazy_horse_v1` 0.68 / 0.41, vs `crazy_horse_v2` 0.66 / 0.40; side by side (1x and 2x): bone-white skull and ash hide vs nightmare's glossy black and blue flame. Attack = a low lunge with the skull jaw open; hurt = knocked back onto its haunches, a foreleg buckling. Nits: the attack is low (73 px, `height_ok` false, as R290's 69); the hurt sinks onto the hind legs (a sit-back rather than a stagger); the strict HLS glow count is below 60 (the cut's glow ramp is a saturated yellow-green with low blue, so its HLS L is 0.53); a few raw embers in open air are dropped | **self-approved with nits**; `retire.py --move-rig crazy_horse` in the same commit (state C) |

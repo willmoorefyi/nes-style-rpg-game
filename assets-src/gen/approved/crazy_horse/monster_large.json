@@ -3,11 +3,11 @@
   "sheet": "monster_large",
   "backend": "gemini",
   "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "8bc875977bdf6a8fbe2280ad",
+  "seed": 1235,
+  "cache_key": "c27aaedec151d608f5e3c33f",
   "approved": "2026-11-16",
   "grid": [
-    128,
+    132,
     128
   ],
   "bottom_row": 122,
@@ -23,5 +23,5 @@
   "size": "large",
   "floating": false,
   "flip_frames": [],
-  "note": "pass V R290: self-approved with nits (attack 69 px low lunge; hurt forelegs lifted, no height gain)"
+  "note": "V8 F1 attempt 1 (seed 1235): R321"
 }
