@@ -1,0 +1,35 @@
+# Water elemental (T-K, floating): a cresting wave with a scowling face and two watery arms. body: floating
+# (rig_floating.py), judged by the float band. Every in-between is a pure translation of its pixel-source key
+# (moves: [], the ROSTER_FIX_PLAN_2 section 5 table): any part move (crest, arms, crown/neck) inked a doubled outline
+# on the flank or the shoulder (draft iterations 1-4). The poses change only at the key switches. Accepted nits
+# (D-R6): the size jump between the idle and the action keys, the small idle.
+# fixmeasure.py switch --rig (this file):
+#   attack d (11, 5): wind2->mid and follow->recover IoU 0.656 / step 9.2 vs need 0.498 / cap 9.6
+#   hurt d (2, 3): in1->in2 IoU 0.622 / step 6.5 vs need 0.550 / cap 9.6
+# Review (T-K iteration 1, image-only): SHIP WITH NITS; no doubled outline or crease (every in-between is the key
+# shifted, 0 px differ). Nits: atk_mid / atk_follow sit (5, 3) off the contact key, so the reach steps back 5 px on
+# the contact frame (forced: d - round(d/2) is what keeps wind2->mid under the 9.6 px cap); the wind and recover
+# are glides of the idle, not poses; the hurt in-betweens are 1-2 px nudges; daze_b clears the bottom by 1 row.
+sprite: water_elemental
+body: floating
+facing: right
+sampler: nearest
+breath: true
+keyframes:
+  idle:   {core: [64, 95], base: [64, 120], neck: [70, 85], crown: [68, 47],
+           sh_n: [80, 80], el_n: [92, 88], hand_n: [90, 98], sh_f: [48, 75], el_f: [40, 88], hand_f: [50, 100]}
+  attack: {core: [58, 95], base: [58, 118], neck: [62, 82], crown: [64, 30],
+           sh_n: [75, 72], el_n: [88, 66], hand_n: [101, 66], sh_f: [36, 64], el_f: [28, 75], hand_f: [30, 85]}
+  hurt:   {core: [60, 95], base: [60, 118], neck: [62, 82], crown: [57, 38],
+           sh_n: [72, 68], el_n: [88, 62], hand_n: [93, 50], sh_f: [42, 72], el_f: [30, 68], hand_f: [25, 55]}
+frames:                         # idle-sourced frames shift by -round(d/2), key-sourced ones by d - round(d/2)
+  atk_wind1: {moves: [], t: 0.0, dx: -3, dy: -1}   # draws back and up
+  atk_wind2: {moves: [], t: 0.0, dx: -6, dy: -2}
+  atk_mid: {moves: [], t: 0.0, dx: 5, dy: 3}       # the attack crest surging forward and down onto the key
+  atk_follow: {moves: [], t: 1.0, dx: 5, dy: 3}
+  atk_recover: {moves: [], t: 0.0, dx: -6, dy: -2}
+  hurt_in1: {moves: [], t: 0.0, dx: -1, dy: -2}
+  hurt_in2: {moves: [], t: 0.0, dx: 1, dy: 1}
+  daze: {moves: [], t: 0.0, dy: 3, tweaks: {crown: [-2, -2], neck: [-2, -2]}}   # sinks 3 / 4 (the tweaks cancel the
+  daze_b: {moves: [], t: 0.0, dy: 4, tweaks: {crown: [-2, -2], neck: [-2, -2]}} # recipe's head droop: it creased)
+holds: []
