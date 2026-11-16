@@ -2,8 +2,10 @@
 also --anim). Part 1 (this file): the BR ledger, cap and paid / purpose / linked-worktree gate inside
 `bedrock.invoke` (R23, A6) on a mocked client (no request ever leaves the machine), `colossus.py budget --check` (R24),
 the budget.json `bedrock` block, the Gemini guard and generate.py's Bedrock paths, and the approve overwrite gate with
-`retire.py --colossus`. Part 2 (selftest_colossus_art.py): pix, the layer split, glow, bake, locks, the `colossus`
-build stage (R25, R26) and tools/stage_rim.py.
+`retire.py --colossus`. Part 2 (selftest_colossus_art.py): the `colossus` build stage and its TS contract (18.5, R25,
+R26), locks and tools/stage_rim.py; selftest_colossus_up / _ip (upscale, inpaint); selftest_colossus_paint (rev 4: the
+painted pipeline, 18.2 / 18.7 / B1) and selftest_colossus_gate (rev 4: upscale --form, the reserve cost rule B7, the
+v1 archive and approve).
 
   python3 -I assets-src/gen/selftest_colossus.py
 """
@@ -25,8 +27,11 @@ HERE = Path(__file__).resolve().parent
 # literals (pass C, docs/CHAOS_FORMS_PLAN.md 5.6 / 6): never computed from the ledgers
 N_C0 = 405                      # Gemini attempts in the main-checkout ledger at C1 (counted 2026-11-16)
 CAP_C = 80                      # D-U5 (user)
-PURPOSE_CAPS = {"v0": 12, "f3_gen": 24, "f3_nobg": 10, "f2_gen": 8, "f2_nobg": 4, "f4_variant": 4, "reserve": 16,
-                "rim_upscale": 2}   # rim_upscale: 2 of the reserve's 18 (orchestrator, FW-C rim fix, 2026-11-16)
+PURPOSE_CAPS = {"v0": 9, "f3_gen": 12, "f3_upscale": 6, "f3_nobg": 4, "f2_gen": 2, "f2_upscale": 2, "f2_nobg": 4,
+                "f4_variant": 2, "f4_inpaint": 8, "rim_upscale": 2, "reserve": 29}
+# rev 4 (18.9, B7), re-tabled at 17 of 80 used: v0 and f4_variant closed at their use; rim_upscale 2 (7.3) stays, so the
+# reserve is 18.9's 31 less those 2; the reserve only takes calls <= $0.08 (RESERVE_MAX_USD)
+RESERVE_MAX_USD = 0.08
 
 
 def _refused(fn: Callable[[], object], *words: str) -> str:
@@ -116,17 +121,21 @@ def run_colossus(check: Callable[[bool, str], None]) -> None:
     sections(check, _pinned, _guard, _generate_paths, _budget_check, _approve, _edit_models, _edit_bodies,
              _edit_gate, _edit_cache)
     from gen import selftest_colossus_art as SCA
+    from gen import selftest_colossus_gate as SCG
     from gen import selftest_colossus_ip as SCI
+    from gen import selftest_colossus_paint as SCP
     from gen import selftest_colossus_up as SCU
     SCA.run_art(check)
     SCU.run_up(check)
     SCI.run_ip(check)
+    SCP.run_paint(check)
+    SCG.run_gate(check)
 
 
 def _pinned(check) -> None:
     br = _budget().get("bedrock") or {}
     check((br.get("pass"), br.get("cap"), br.get("per_purpose_caps"), br.get("gemini_before")) ==
-          ("C", CAP_C, PURPOSE_CAPS, N_C0),
+          ("C", CAP_C, PURPOSE_CAPS, N_C0) and br.get("reserve_max_usd") == RESERVE_MAX_USD,
           f"budget.json bedrock block: pass C, cap {CAP_C}, the 5.6 per-purpose caps, gemini_before N_C0 = {N_C0} "
           f"({ {k: br.get(k) for k in ('pass', 'cap', 'gemini_before')} })")
     check(sum(PURPOSE_CAPS.values()) == CAP_C, f"the 5.6 per-purpose caps sum to the cap {CAP_C}")

@@ -12,7 +12,10 @@ The gate lives inside `invoke` itself (docs/CHAOS_FORMS_PLAN.md 5.1, R23, A6), s
   - one row per logical request, {event: request, ts, tool, model, purpose, seed, key, pass}, is appended to the BR
     ledger cache/bedrock_ledger.jsonl (tracked in git) **before the first try**; a {event: result, key, ok, served |
     error} record follows it (`served` = the model id that answered, with or without the `us.` prefix). A failure
-    counts as spent.
+    counts as spent;
+  - B7 (docs/CHAOS_FORMS_PLAN.md 18.9): the `reserve` only takes calls costing <= budget.json's `reserve_max_usd`
+    ($0.08) by the COST_USD estimate of the model, so no upscale comes from the reserve; a model without an estimate
+    is refused for the reserve (fail-closed).
 """
 from __future__ import annotations
 
@@ -49,6 +52,13 @@ MODELS = {
     "upscale_creative": "us.stability.stable-creative-upscale-v1:0",
     "upscale_fast": "us.stability.stable-fast-upscale-v1:0",
 }
+
+# USD per call (estimates, docs/CHAOS_FORMS_PLAN.md 5.6 / 18.9; Bedrock pricing confirmed at the first call). Only the
+# reserve rule reads them (B7: reserve calls <= $0.08, so every upscale is priced above that).
+COST_USD = {"core": 0.04, "sd35": 0.08, "ultra": 0.14, "structure": 0.07, "style_guide": 0.07, "remove_bg": 0.07,
+            "search_replace": 0.07, "inpaint": 0.07, "outpaint": 0.07,
+            "upscale_conservative": 0.40, "upscale_creative": 0.60, "upscale_fast": 0.25}
+RESERVE_MAX_USD = 0.08          # used when budget.json has no reserve_max_usd
 
 _client = None
 
@@ -119,6 +129,15 @@ def purpose_key(purpose: str) -> str:
     return purpose.split(":", 1)[0]
 
 
+def reserve_max(br: dict) -> float:
+    return float(br.get("reserve_max_usd", RESERVE_MAX_USD))
+
+
+def reserve_cost_breach(model: str, br: dict) -> bool:
+    """True when `model` may not be paid from the reserve (no estimate, or above reserve_max_usd)."""
+    return COST_USD.get(model, float("inf")) > reserve_max(br)
+
+
 def gate(model: str, body: dict, key: str, *, paid: bool, purpose: str) -> dict:
     """Refuse (SystemExit 'refused: ...') or return the ledger row for one uncached logical request."""
     if not paid:
@@ -133,6 +152,9 @@ def gate(model: str, body: dict, key: str, *, paid: bool, purpose: str) -> dict:
                          f"({', '.join(caps)})")
     if pkey == "reserve" and not purpose.partition(":")[2].strip():
         raise SystemExit("refused: the reserve purpose needs an orchestrator note: reserve:<reason>")
+    if pkey == "reserve" and reserve_cost_breach(model, br):
+        raise SystemExit(f"refused: the reserve only takes calls <= ${reserve_max(br):.2f} (B7); {model} is about "
+                         f"${COST_USD.get(model, float('nan')):.2f}: use its own purpose (e.g. f3_upscale)")
     rows = [r for r in read_br_ledger() if r.get("event") == "request" and r.get("pass") == br["pass"]]
     if len(rows) >= br["cap"]:
         raise SystemExit(f"refused: pass {br['pass']} reached its cap of {br['cap']} Bedrock calls ({len(rows)} used); "

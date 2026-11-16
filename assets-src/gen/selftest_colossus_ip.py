@@ -1,6 +1,6 @@
-"""Pass C inpaint self-tests (docs/CHAOS_FORMS_PLAN.md 5.6 `f4_variant`; FW-C, F4 "Core Laid Bare"), run from
+"""Pass C inpaint self-tests (docs/CHAOS_FORMS_PLAN.md 5.6, 18.2 `f4_inpaint`; FW-C, F4 "Core Laid Bare"), run from
 selftest_colossus.py on a mocked client (0 paid calls): `colossus.py inpaint` (Stability inpaint on Bedrock: body
-shape, the local image / mask checks, purposes and the f4_variant cap, BR ledger rows, the cache) and the offline
+shape, the local image / mask checks, purposes and the f4_inpaint cap (f4_variant closed), BR ledger rows, the cache) and the offline
 `colossus.py inpaint_merge` (the result is composited onto the source only inside the mask; every pixel outside it,
 and the source's alpha everywhere, stays byte-identical; 0 calls).
 
@@ -78,7 +78,7 @@ def _ip_bodies(check) -> None:
               f"the mask as an L PNG, sent to {INPAINT_ID} ({code}, {sorted(b)}, {cl.calls})")
         dst = [p for p in tmp.glob("*_raw.png")]
         side = json.loads(dst[0].with_suffix(".json").read_text()) if len(dst) == 1 else {}
-        check(len(dst) == 1 and side.get("model") == "inpaint" and side.get("purpose") == "f4_variant"
+        check(len(dst) == 1 and side.get("model") == "inpaint" and side.get("purpose") == "f4_inpaint"
               and side.get("source") == str(src) and side.get("mask") == str(mask)
               and side.get("cache_keys", [None])[0] == "k0" and len(side.get("cache_keys", [])) == 2,
               f"inpaint: one *_raw.png next to the source with a sidecar (model, purpose, source, mask, cache keys) "
@@ -136,11 +136,11 @@ def _ip_gate(check) -> None:
         src, mask = _fixture(tmp)
         _main(C, _argv(src, mask, "--paid"))
         rows = _rows(B)
-        check([r["event"] for r in rows] == ["request", "result"] and rows[0]["purpose"] == "f4_variant"
+        check([r["event"] for r in rows] == ["request", "result"] and rows[0]["purpose"] == "f4_inpaint"
               and rows[0]["model"] == "inpaint" and rows[0]["pass"] == "C" and rows[0]["seed"] == 31
               and rows[0]["key"] == B.cache_key("inpaint", cl.bodies[0]) and rows[1]["ok"] is True
               and rows[1]["served"] == INPAINT_ID,
-              f"inpaint: default purpose f4_variant; one request row (model inpaint, pass C) before the call and one "
+              f"inpaint: default purpose f4_inpaint (rev 4); one request row (model inpaint, pass C) before the call and one "
               f"result row naming the serving id ({rows})")
     for purpose, allowed in (("v0", True), ("reserve:F4 core, orchestrator", True), ("f3_gen", False),
                              ("rim_upscale", False), ("reserve", False)):
@@ -153,10 +153,15 @@ def _ip_gate(check) -> None:
                       f"({out.strip()[-70:]!r})")
     with sandbox(real) as (B, tmp, cl):
         src, mask = _fixture(tmp)
-        _seed_ledger(B, _fake_rows("f4_variant", PURPOSE_CAPS["f4_variant"]))
+        _seed_ledger(B, _fake_rows("f4_inpaint", PURPOSE_CAPS["f4_inpaint"]))
         code, out = _main(C, _argv(src, mask, "--paid"))
+        check(code is None and "cap" in out and "f4_inpaint" in out and not cl.calls,
+              f"inpaint: refused at the f4_inpaint cap ({PURPOSE_CAPS['f4_inpaint']}: open + crack) "
+              f"({out.strip()[-70:]!r})")
+        _seed_ledger(B, _fake_rows("f4_variant", PURPOSE_CAPS["f4_variant"]))
+        code, out = _main(C, _argv(src, mask, "--purpose", "f4_variant", "--paid"))
         check(code is None and "cap" in out and "f4_variant" in out and not cl.calls,
-              f"inpaint: refused at the f4_variant cap ({PURPOSE_CAPS['f4_variant']}; shared with search_replace) "
+              f"inpaint: the closed f4_variant route is refused at its cap ({PURPOSE_CAPS['f4_variant']}, used) "
               f"({out.strip()[-70:]!r})")
     with sandbox(real, linked=True) as (B, tmp, cl):
         src, mask = _fixture(tmp)

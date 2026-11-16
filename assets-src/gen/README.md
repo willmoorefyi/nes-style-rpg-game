@@ -24,11 +24,18 @@ worktree (paid calls only from the main checkout), without the `bedrock` block i
 per logical request (`{event: request, ts, tool, model, purpose, seed, key, pass}`) is appended to the BR ledger
 `cache/bedrock_ledger.jsonl` (tracked in git) **before the first try**, then a `{event: result, key, ok, served | error}`
 record (`served` = the model id that answered). `generate.py --backend bedrock` passes `paid` and the purpose
-`character_sheet`, which pass C refuses. The colossus forms' tool is `colossus.py` (gen / nobg / pix / glow / bake /
-mock / review / check / approve / lock, the edits outpaint / search_replace / structure in `colossus_edit.py`, and
-`budget --check`: pass C <= 80, each purpose <= its cap, `gem[N_C0:] == 0`); its build stage is `build_assets.py colossus [--out DIR]` (`colossus_build.py`: no approved master
-writes and prints nothing; `--out` writes a scratch copy plus `manifest.sha256`). Self-tests: `selftest_colossus.py`
-(also in `selftest.py --anim`).
+`character_sheet`, which pass C refuses. The reserve only takes calls costing <= `reserve_max_usd` ($0.08, by the
+`bedrock.COST_USD` estimates), so no upscale comes from it (B7). The colossus forms' tool is `colossus.py` (gen / nobg /
+upscale [`--form`: f3_upscale / f2_upscale, then the fit to the canvas] / upfit / glow / mock / review / check / approve
+[`--extra glow=...`] / lock, the edits outpaint / search_replace / structure in `colossus_edit.py`, inpaint /
+inpaint_merge in `colossus_inpaint.py`, and `budget --check`: pass C <= 80, each purpose <= its cap, no reserve row over
+$0.08, `gem[N_C0:] == 0`). Rev 4 (docs/CHAOS_FORMS_PLAN.md 18, D-U10): the colossus forms are painted art at scale 1
+(`colossus_paint.py`: sky_base, despill, glow G1 / G2, the upscale fit; `colossus_paintcheck.py`: the 18.7 checks); no
+`pix`, palette lock, binary alpha or glow levels (`colossus_layers.py` stays only for the rev-3 scripts in
+`gen/colossus/`). Its build stage is `build_assets.py colossus [--out DIR]` (`colossus_build.py`: the TS contract shape of
+`colossusIndex.ts`, a bestiary still per form; no approved master writes and prints nothing; `--out` writes a scratch
+copy plus `manifest.sha256`; `--contract` diffs it against the TS side's `tests/fixtures/colossus/contract.json`). Self-tests:
+`selftest_colossus.py` (also in `selftest.py --anim`).
 
 ```bash
 python3 -I assets-src/gen/selftest.py                                                    # offline checks

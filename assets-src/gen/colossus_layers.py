@@ -1,4 +1,6 @@
-"""Colossus forms' pixel work (docs/CHAOS_FORMS_PLAN.md 4.3, 5.3, 5.4): `pix` (render -> palette-locked pixel art),
+"""Rev 3 only (superseded by D-U10, docs/CHAOS_FORMS_PLAN.md 18): no colossus tool or build step uses this module any more;
+it stays for the rev-3 scripts in gen/colossus/ (painted art: colossus_paint.py).
+Colossus forms' pixel work (docs/CHAOS_FORMS_PLAN.md 4.3, 5.3, 5.4): `pix` (render -> palette-locked pixel art),
 the layer split of an approved master by its layer yaml, the offline glow bake and the limb bake, plus the checks the
 build and colossus.py run (binary alpha outside glow, the 4 glow levels, the palette lock, masks covering the master
 exactly once). No network, no backend.

@@ -1,8 +1,8 @@
-"""colossus.py's masked inpaint and its offline merge (docs/CHAOS_FORMS_PLAN.md 5.6 `f4_variant`; FW-C, F4 "Core Laid
+"""colossus.py's masked inpaint and its offline merge (docs/CHAOS_FORMS_PLAN.md 5.6, 18.2 `f4_inpaint`; FW-C, F4 "Core Laid
 Bare"). Separate from colossus_edit.py (file size).
 
   python3 -I assets-src/gen/colossus.py inpaint <src.png> --mask <mask.png> --prompt P [--negative N] [--grow-mask N]
-                                        --seed N [--purpose f4_variant|v0|reserve:<reason>] [--out F] [--paid]
+                                        --seed N [--purpose f4_inpaint|reserve:<reason>] [--out F] [--paid]
   python3 -I assets-src/gen/colossus.py inpaint_merge <src.png> <raw.png> --mask <mask.png> [--out F]     # 0 calls
 
 inpaint is one call through bedrock.invoke (paid, purpose caps, BR ledger, main checkout only; cached by request hash)
@@ -27,7 +27,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-PURPOSES = ("f4_variant", "v0")
+PURPOSES = ("f4_inpaint", "f4_variant", "v0")   # f4_inpaint: rev 4 open + crack (cap 8); f4_variant is closed
 
 
 def _refuse(msg: str):
@@ -121,7 +121,7 @@ def cmd_merge(a) -> int:
 
 
 def add_parsers(sub: argparse._SubParsersAction) -> None:
-    p = sub.add_parser("inpaint", help="Stability masked inpaint of one image (purpose f4_variant)")
+    p = sub.add_parser("inpaint", help="Stability masked inpaint of one image (purpose f4_inpaint)")
     p.add_argument("src", help="the source image (PNG; sent as RGB)")
     p.add_argument("--mask", help="L / black-and-white PNG, the source's size; white = inpaint")
     p.add_argument("--prompt"); p.add_argument("--negative")

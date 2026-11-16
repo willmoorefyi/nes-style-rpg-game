@@ -1,9 +1,12 @@
-"""Pass C framework self-tests, part 2 (docs/CHAOS_FORMS_PLAN.md 4.6, 5.3, 5.4, 7.2, 9.3; FW-C), run by
-selftest_colossus.run_colossus: `colossus.py pix` (base palette lock, binary alpha, specks, determinism), the layer
-split (masks cover the master exactly once except declared fills), binary alpha outside `glow`, the 4 glow levels, the
-bake rotation cap, the lock mismatch, the `colossus` build stage (no-op without approved masters, R25; tiles <= 2048;
-deterministic under PYTHONHASHSEED 0 / 1 with `--out` and its sha256 manifest, R26) and tools/stage_rim.py (the rim
-staging, pad_bottom, the floor-front cut, the `rim` check profile, the 1-line hook in stage_backgrounds.py).
+"""Pass C framework self-tests, part 2 (docs/CHAOS_FORMS_PLAN.md 18.5, 18.6, 7.2; rev 4; FW-C), run by
+selftest_colossus.run_colossus: the `colossus` build stage on the painted contract form (colossus_fixture.py): the TS
+contract shape (frames.base with at / size / frame-relative tiles, targetRect [x, y, w, h], blend, alpha, the glow at
+texScale 2, no image / variants), soft alpha and full colour kept, the empty core base, the bestiary still, the spec
+refusals, the 24 MB budget, the lock mismatch, no-op without approved masters (R25), tiles <= 2048, deterministic under
+PYTHONHASHSEED 0 / 1 with `--out` and its sha256 manifest (R26); the TS side's committed
+tests/fixtures/colossus/contract.json against the Python build of the same form (parsed); and tools/stage_rim.py (the
+rim staging, pad_bottom, the floor-front cut, the `rim` check profile, the 1-line hook in stage_backgrounds.py). The rev-3 pixel rules (pix, palette
+lock, binary alpha, the 4 glow levels, the limb bake) are gone with D-U10.
 """
 from __future__ import annotations
 
@@ -18,52 +21,12 @@ from pathlib import Path
 from typing import Callable
 
 import numpy as np
-import yaml
-from PIL import Image, ImageDraw
+from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 TOOLS = HERE.parent / "tools"
 ACCEPTED = (Path("/tmp/stab2/sd35_v3_raw.png"), Path("/tmp/stab2/sd35_v3_bg.webp"))   # user-accepted (7.1), volatile
-
-DARK, GOLD, WHITE = (24, 24, 33), (222, 165, 82), (231, 239, 222)
-W, H = 120, 80
-ARM = [[70, 30], [110, 30], [110, 44], [70, 44]]
-CORE = [[40, 30], [52, 30], [52, 42], [40, 42]]
-
-
-def fixture_master() -> Image.Image:
-    """A 120x80 test master: a dark body block, a gold right arm (x 70-110) and a white core square."""
-    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    d.rectangle((20, 20, 100, 70), fill=DARK + (255,))
-    d.rectangle((70, 30, 109, 43), fill=GOLD + (255,))
-    d.rectangle((40, 30, 51, 41), fill=WHITE + (255,))
-    return im
-
-
-def fixture_spec(**over) -> dict:
-    spec = {"form": "fx_test", "canvas": [W, H], "scale": 3, "place": [-60, -30],
-            "anchors": {"target": [60, 40], "core": [46, 36], "head": [60, 22], "hands": [[22, 60], [108, 36]],
-                        "melee": [100, 50], "feet": [60, 70]},
-            "target_rect": [30, 22, 100, 68],
-            "layers": [{"name": "body", "kind": "body"},
-                       {"name": "arm_r", "kind": "limb", "mask": ARM, "pivot": [72, 37], "fill": ARM,
-                        "frames": {"raise": -12, "slam": 15, "recoil": 4}},
-                       {"name": "core", "kind": "core", "mask": CORE},
-                       {"name": "glow", "kind": "glow", "sources": {"core": 6}}]}
-    spec.update(over)
-    return spec
-
-
-def write_fixture(root: Path, spec: dict | None = None, master: Image.Image | None = None) -> tuple[Path, Path]:
-    """approved/chaos_forms/fx_test/master.png + colossus/fx_test.yaml under root; returns (approved root, spec root)."""
-    app, specs = root / "approved" / "chaos_forms", root / "colossus"
-    (app / "fx_test").mkdir(parents=True)
-    specs.mkdir(parents=True)
-    (master or fixture_master()).save(app / "fx_test" / "master.png")
-    (specs / "fx_test.yaml").write_text(yaml.safe_dump(spec or fixture_spec(), sort_keys=False))
-    return app, specs
 
 
 def _raises(fn: Callable[[], object], *words: str) -> str:
@@ -76,110 +39,29 @@ def _raises(fn: Callable[[], object], *words: str) -> str:
 
 def run_art(check: Callable[[bool, str], None]) -> None:
     from gen.selftest_colossus import sections
-    sections(check, _pix, _layers, _build, _stage_rim)
+    sections(check, _build, _contract, _stage_rim)
 
 
-def _nobg() -> Image.Image:
-    """A soft-edged 'remove_bg' result: near-gold and near-dark ellipses, partial alpha at the rim, a 2 px speck."""
-    im = Image.new("RGBA", (600, 400), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    d.ellipse((40, 60, 560, 380), fill=(30, 28, 40, 255))
-    d.ellipse((200, 120, 420, 300), fill=(219, 161, 86, 255))
-    d.ellipse((260, 160, 330, 230), fill=(120, 200, 90, 255))           # a free colour
-    d.rectangle((5, 5, 6, 6), fill=(219, 161, 86, 255))                 # speck < 0.2 % of the blob
-    a = np.asarray(im).copy()
-    edge = (a[..., 3] > 0) & (np.arange(600)[None, :] < 60)
-    a[edge, 3] = 90                                                     # partial alpha (dropped below 128)
-    return Image.fromarray(a)
+FORM_KEYS = {"canvas", "scale", "place", "anchors", "targetRect", "skyDim", "layers"}   # visibleBox / coverBox: defaults
+LAYER_KEYS = {"name", "kind", "over", "blend", "alpha", "frames"}
 
 
-def _pix(check) -> None:
-    from gen import colossus_layers as CL
-    from gen import pixelize as PX
-    base = list(CL.BASE_PALETTE.values())
-    f1 = set()
-    for p in sorted((HERE / "approved" / "chaos").glob("boss_*.png")):
-        a = np.asarray(Image.open(p).convert("RGBA"))
-        f1 |= set(map(tuple, a[a[..., 3] > 0][:, :3].tolist()))
-    check(len(base) >= 8 and all(c in f1 for c in base)
-          and all(tuple(PX.snap15(np.array(c, float)).tolist()) == c for c in base if c != PX.OUTLINE),
-          f"base palette: {len(base)} colours, each in F1's approved sheets and an exact 15-bit value ({CL.BASE_PALETTE})")
-    out = CL.pix(_nobg(), (W, H), colors=8)
-    a = np.asarray(out)
-    cols = set(map(tuple, a[a[..., 3] > 0][:, :3].tolist()))
-    near = [c for c in cols if c not in base and c != PX.OUTLINE and
-            min(sum((x - y) ** 2 for x, y in zip(c, b)) for b in base) < CL.NEAR ** 2]
-    check(out.size == (W, H) and set(np.unique(a[..., 3]).tolist()) <= {0, 255} and GOLD in cols and not near
-          and CL.palette_problems(out) == [],
-          f"pix: canvas {W}x{H}, binary alpha, near-gold snapped to the exact base gold, no free colour within "
-          f"{CL.NEAR} of a base colour ({len(cols)} colours; near {near})")
-    check(a[:8, :8, 3].max() == 0, "pix: specks under 0.2 % of the largest blob are dropped")
-    bad = out.copy()
-    bad.putpixel((60, 40), (220, 160, 80, 255))
-    check(any("near" in x for x in CL.palette_problems(bad)), "pix: palette_problems flags a colour near a base colour")
-    with tempfile.TemporaryDirectory() as t:
-        src = Path(t) / "nobg.png"
-        _nobg().save(src)
-        outs = []
-        for seed in ("0", "1"):
-            dst = Path(t) / f"pix{seed}.png"
-            r = subprocess.run([sys.executable, "-I", str(HERE / "colossus.py"), "pix", "chaos_horizon", str(src),
-                                "--colors", "8", "--canvas", f"{W}x{H}", "--out", str(dst)],
-                               env={**os.environ, "PYTHONHASHSEED": seed}, capture_output=True, text=True)
-            outs.append(dst.read_bytes() if r.returncode == 0 and dst.exists() else r.stderr[-200:].encode())
-        check(outs[0] == outs[1] and outs[0][:4] == b"\x89PNG", f"pix: byte-identical under PYTHONHASHSEED 0 and 1 "
-                                                                 f"({outs[0][:60]!r})")
-
-
-def _layers(check) -> None:
-    from gen import colossus_layers as CL
-    m, spec = fixture_master(), fixture_spec()
-    layers = CL.split(m, spec)
-    ma = np.asarray(m)[..., 3] > 0
-    union = np.zeros_like(ma)
-    for name, img in layers.items():
-        if name != "glow":
-            union |= np.asarray(img)[..., 3] > 0
-    check(set(layers) == {"body", "arm_r", "core", "glow"} and (union == ma).all() and CL.cover_problems(m, spec) == [],
-          "split: body + layers cover the master's opaque pixels exactly (no gap)")
-    body = np.asarray(layers["body"])
-    check(body[37, 90, 3] == 255 and tuple(body[37, 90, :3]) == DARK,
-          "split: a declared fill paints the body under the limb with the nearest body colour")
-    bad = fixture_spec(layers=[*fixture_spec()["layers"][:3],
-                               {"name": "core2", "kind": "core", "mask": [[45, 30], [80, 30], [80, 40], [45, 40]]}])
-    probs = CL.cover_problems(m, bad)
-    check(any("overlap" in p for p in probs), f"split: two layers over the same pixel are refused ({probs[:1]})")
-    nofill = fixture_spec(layers=[{**L, "fill": None} if L["name"] == "arm_r" else L for L in fixture_spec()["layers"]])
-    check(CL.cover_problems(m, nofill) == [], "split: a limb without a fill is fine (the body keeps a hole behind it)")
-    g = np.asarray(layers["glow"])[..., 3]
-    lv = set(np.unique(g).tolist())
-    check(lv == {0, *CL.GLOW_LEVELS} and len(CL.GLOW_LEVELS) == 4 and (g[np.asarray(layers["core"])[..., 3] > 0] == 0).all(),
-          f"glow: exactly the 4 stepped levels {CL.GLOW_LEVELS} outside the source mask ({sorted(lv)})")
-    check(CL.alpha_problems("glow", "glow", layers["glow"]) == [] and CL.alpha_problems("arm_r", "limb", layers["arm_r"]) == [],
-          "alpha: glow's 4 levels and a binary limb pass")
-    soft = np.asarray(layers["arm_r"]).copy()
-    soft[35, 80, 3] = 100
-    check(any("binary" in p for p in CL.alpha_problems("arm_r", "limb", Image.fromarray(soft))),
-          "alpha: a partial alpha outside glow is refused")
-    g2 = np.asarray(layers["glow"]).copy()
-    g2[g2[..., 3] == 64, 3] = 70
-    check(any("level" in p for p in CL.alpha_problems("glow", "glow", Image.fromarray(g2))), "alpha: a 5th glow level is refused")
-    arm = layers["arm_r"]
-    f20 = CL.bake(arm, (72, 37), 20)
-    fa = np.asarray(f20)
-    src_cols = set(map(tuple, np.asarray(arm)[np.asarray(arm)[..., 3] > 0][:, :3].tolist()))
-    out_cols = set(map(tuple, fa[fa[..., 3] > 0][:, :3].tolist()))
-    check(f20.size == arm.size and set(np.unique(fa[..., 3]).tolist()) <= {0, 255} and out_cols <= src_cols,
-          "bake: a 20 degree limb frame keeps the canvas, binary alpha and only the limb's colours")
-    r = _raises(lambda: CL.bake(arm, (72, 37), 21), "20")
-    check(bool(r), f"bake: a rotation over the 20 degree cap is refused ({r[:70]!r})")
-    r = _raises(lambda: CL.split(m, fixture_spec(layers=[*fixture_spec()["layers"][:1],
-                                                         {**fixture_spec()["layers"][1], "frames": {"slam": 25}}])), "20")
-    check(bool(r), f"bake: a spec frame over the cap is refused at split ({r[:70]!r})")
+def frame_problems(fr: dict) -> list[str]:
+    """colossusIndex.ts formProblems for one frame with the B3 texScale rule: tiles in texture px, inside and covering
+    exactly ceil(size / texScale)."""
+    ts = fr.get("texScale", 1)
+    tw, th = -(-fr["size"][0] // ts), -(-fr["size"][1] // ts)
+    out = [f"tile {t['file']} over 2048" for t in fr["tiles"] if t["w"] > 2048 or t["h"] > 2048]
+    out += [f"tile {t['file']} leaves its frame" for t in fr["tiles"]
+            if t["x"] < 0 or t["y"] < 0 or t["x"] + t["w"] > tw or t["y"] + t["h"] > th]
+    if fr["tiles"] and sum(t["w"] * t["h"] for t in fr["tiles"]) != tw * th:
+        out.append("tiles do not cover the frame exactly")
+    return out
 
 
 def _build(check) -> None:
     from gen import colossus_build as CB
+    from gen import colossus_fixture as FX
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
         out = tmp / "out"
@@ -187,25 +69,66 @@ def _build(check) -> None:
         check(res is None and not out.exists(), "build: no approved master -> nothing written, no output dir (R25)")
         r = subprocess.run([sys.executable, "-I", str(HERE.parent / "build_assets.py"), "colossus", "--out", str(out)],
                            capture_output=True, text=True, cwd=ROOT)
-        real = list((HERE / "approved" / "chaos_forms").glob("*/master.png"))
-        check(real or (r.returncode == 0 and r.stdout.strip() == "" and not out.exists()),
-              f"build_assets.py colossus with no approved master: exit 0, silent, no output ({r.returncode}, "
-              f"{(r.stdout + r.stderr).strip()[-120:]!r})")
-        app, specs = write_fixture(tmp / "fx")
+        real = [p for p in (HERE / "approved" / "chaos_forms").glob("*/master.png")
+                if (HERE / "colossus" / f"{p.parent.name}.yaml").exists()]
+        check(r.returncode == 0 and (real or not out.exists()),
+              f"build_assets.py colossus: exit 0; an approved master without a layer yaml is skipped, nothing written "
+              f"({r.returncode}, {(r.stdout + r.stderr).strip()[-120:]!r})")
+        app, specs = FX.write(tmp / "fx")
+        bg = tmp / "rim.png"
+        Image.new("RGB", (1920, 1080), (180, 190, 200)).save(bg)
         with contextlib.redirect_stdout(io.StringIO()):
-            res = CB.build(out, approved=app, specs=specs)
+            res = CB.build(out, approved=app, specs=specs, bg=bg)
         meta = json.loads((out / "colossus.json").read_text())
-        form = meta["forms"]["fx_test"]
-        names = [L["name"] for L in form["layers"]]
-        files = [tl["file"] for L in form["layers"] for tl in L["image"] + [x for f in L.get("frames", {}).values() for x in f]]
+        form = meta["forms"][FX.FORM]
+        L = {x["name"]: x for x in form["layers"]}
+        # 18.5 / selftest lines 200-204 (rev 4): the TS shape, no rev-3 keys
+        check(set(form) == FORM_KEYS and all(set(x) <= LAYER_KEYS and "base" in x["frames"] for x in form["layers"])
+              and not any(k in x for x in form["layers"] for k in ("image", "variants", "z", "pivot"))
+              and form["targetRect"] == [1170, 345, 360, 495] and form["canvas"] == [2700, 1080] and form["scale"] == 1
+              and form["skyDim"] == 0.6,
+              f"build: the TS shape: form {sorted(form)}, every layer frames.base, targetRect [x, y, w, h], skyDim 0.6, "
+              f"no image / variants / z")
+        check(L["glow"]["blend"] == "add" and L["glow"]["alpha"] == 1.0 and L["corona"]["blend"] == "add"
+              and "blend" not in L["body"] and "alpha" not in L["body"] and L["glow"]["frames"]["base"].get("texScale") == 2
+              and "texScale" not in L["body"]["frames"]["base"],
+              "build: glow blend add, alpha 1.0, texScale 2 (half res); corona add; body at the reader's defaults "
+              "(no blend / alpha key) and texScale 1")
+        probs = [f"{x['name']}/{n}: {p}" for x in form["layers"] for n, fr in x["frames"].items() for p in frame_problems(fr)]
+        bt = [(t["file"].rsplit("/", 1)[1], t["x"], t["w"]) for t in L["body"]["frames"]["base"]["tiles"]]
+        check(not probs and bt == [("body_base_0.png", 0, 2048), ("body_base_1.png", 2048, 652)],
+              f"build: frame-relative tiles abut and cover ceil(size / texScale) exactly; the 2700 px body in 2048 + 652 "
+              f"(body_base_0 / _1) ({probs[:2]}, {bt})")
+        g = L["glow"]["frames"]["base"]
+        gpx = Image.open(out / g["tiles"][0]["file"])
+        check(g["at"][0] % 2 == 0 and g["at"][1] % 2 == 0 and g["tiles"][0]["w"] == gpx.width
+              and sum(t["w"] for t in g["tiles"] if t["y"] == 0) == -(-g["size"][0] // 2),
+              f"build: the glow frame sits on the 2 px texture grid, stored at half res ({g['at']}, {g['size']})")
+        b = L["body"]["frames"]["base"]
+        src = Image.open(app / FX.FORM / "master.png").convert("RGBA")
+        t0 = b["tiles"][0]
+        tex = np.asarray(Image.open(out / t0["file"]).convert("RGBA"))
+        want = np.asarray(src.crop((b["at"][0] + t0["x"], b["at"][1] + t0["y"], b["at"][0] + t0["x"] + t0["w"],
+                                    b["at"][1] + t0["y"] + t0["h"])))
+        check((tex == want).all() and len(np.unique(tex[..., 3])) > 8 and len(np.unique(tex[..., :3].reshape(-1, 3), axis=0)) > 64,
+              "build: the body tiles are the approved pixels as is: soft 8-bit alpha, full colour (no quantize, no "
+              "binary alpha)")
+        core = L["core"]["frames"]
+        check(set(core) == {"base", "crack", "open"} and core["base"]["tiles"] == [] and core["crack"]["tiles"]
+              and core["base"]["at"] == core["crack"]["at"],
+              f"build: core base is an empty frame (the body carries it) at the patches' box; crack / open are frames "
+              f"({core['base']})")
+        cb = L["corona"]["frames"]["base"]
+        check(cb["at"] == [997, 160] and cb["size"] == [700, 700] and "texScale" not in cb,
+              f"build: the corona is the glow file cut to its box at full res ({cb['at']}, {cb['size']})")
+        pv = Image.open(out / "colossus" / FX.FORM / "preview.png")
+        check(pv.width <= 940 and pv.height <= 720 and (pv.width == 940 or pv.height == 720)
+              and np.asarray(pv)[..., 3].min() == 255,
+              f"build: the bestiary still preview.png fits 940x720 and is opaque ({pv.size})")
+        files = [x["file"] for y in form["layers"] for fr in y["frames"].values() for x in fr["tiles"]]
         man = (out / "manifest.sha256").read_text().splitlines()
-        check(res is not None and names == ["body", "arm_r", "core", "glow"] and all((out / f).exists() for f in files)
-              and {L["name"]: L.get("blend") for L in form["layers"]}["glow"] == "add"
-              and set(form["layers"][1]["frames"]) == {"raise", "slam", "recoil"}
-              and form["canvas"] == [W, H] and form["scale"] == 3 and form["targetRect"] == [30, 22, 100, 68]
-              and meta["bytes"] > 0 and len(man) == len(files) + 1,
-              f"build: fixture -> colossus.json (layers, limb frames, glow blend add, canvas, scale, targetRect, bytes) and "
-              f"a sha256 manifest of every file ({len(files)} files)")
+        check(res is not None and meta["bytes"] > 0 and len(man) == len(files) + 2 and all((out / f).exists() for f in files),
+              f"build: every texture, the still and colossus.json in the sha256 manifest ({len(man)} lines)")
         runs = []
         for seed in ("0", "1"):
             o = tmp / f"col{seed}"
@@ -218,18 +141,39 @@ def _build(check) -> None:
         boxes = sorted((x, y, im.width, im.height) for x, y, im in tiles)
         check(boxes == [(0, 0, 2048, 2048), (0, 2048, 2048, 2), (2048, 0, 52, 2048), (2048, 2048, 52, 2)],
               f"build: a layer over 2048 px is split into abutting tiles <= 2048 ({boxes})")
-        soft = np.asarray(fixture_master()).copy()
-        soft[25, 25, 3] = 120
-        app2, specs2 = write_fixture(tmp / "fx2", master=Image.fromarray(soft))
-        r = _raises(lambda: CB.build(tmp / "o2", approved=app2, specs=specs2), "binary")
-        check(bool(r), f"build: a master with partial alpha (outside glow) is refused ({r[:80]!r})")
-        lock = CB.lock(app, specs, "fx_test")
-        check(lock.exists() and CB.lock_problems(app, specs, "fx_test") == [], "lock: written, and a fresh build matches it")
-        m2 = fixture_master()
-        m2.putpixel((30, 30), GOLD + (255,))
-        m2.save(app / "fx_test" / "master.png")
-        probs = CB.lock_problems(app, specs, "fx_test")
+        for label, over, word in (("a targetRect with w 0", {"target_rect": [1170, 345, 0, 495]}, "target_rect"),
+                                  ("a targetRect outside the canvas", {"target_rect": [2500, 345, 360, 495]},
+                                   "target_rect"),
+                                  ("an anchor outside the canvas", {"anchors": {**FX.spec()["anchors"], "core": [9999, 9]}},
+                                   "anchors"),
+                                  ("a blend other than normal | add",
+                                   {"layers": [{**FX.spec()["layers"][1], "blend": "x"}]}, "blend")):
+            a2, s2 = FX.write(tmp / f"bad{len(word)}{label[:4]}", over)
+            r = _raises(lambda: CB.build(tmp / "o2", approved=a2, specs=s2, bg=None), word)
+            check(bool(r), f"build: {label} is refused ({r[:80]!r})")
+        r = _raises(lambda: CB.build(tmp / "o3", approved=app, specs=specs, bg=None, max_bytes=1000), "budget")
+        check(bool(r) and not (tmp / "o3").exists(), f"build: over the 24 MB texture budget is refused, nothing written "
+                                                      f"({r[:70]!r})")
+        lock = CB.lock(app, specs, FX.FORM)
+        check(lock.exists() and CB.lock_problems(app, specs, FX.FORM) == [], "lock: written, and a fresh build matches it")
+        m2 = np.asarray(src).copy()
+        m2[900, 1350, :3] = (1, 2, 3)
+        Image.fromarray(m2).save(app / FX.FORM / "master.png")
+        probs = CB.lock_problems(app, specs, FX.FORM)
         check(any("hash differs" in p and "body" in p for p in probs), f"lock: a changed layer is reported ({probs[:1]})")
+
+
+def _contract(check) -> None:
+    """18.5: the TS side's committed tests/fixtures/colossus/contract.json (makeFixture.mjs) is exactly what
+    colossus_build.py writes for colossus_fixture's form (parsed json: Python's 1.0 equals JS's 1)."""
+    from gen import colossus_build as CB
+    want = json.loads(CB.CONTRACT.read_text()) if CB.CONTRACT.exists() else {}
+    have = CB.contract_forms()
+    diff = sorted({L["name"] for L in want.get("forms", {}).get("contract_form", {}).get("layers", [])} ^
+                  {L["name"] for L in have["contract_form"]["layers"]})
+    check(want.get("version") == 1 and want.get("forms") == have,
+          f"contract: colossus_build.py writes exactly the committed {CB.CONTRACT.relative_to(ROOT)} form (parsed; "
+          f"layer-name diff {diff}; `colossus_build.py --contract` prints the Python side)")
 
 
 def _stage_rim(check) -> None:

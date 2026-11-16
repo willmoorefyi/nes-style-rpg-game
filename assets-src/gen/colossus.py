@@ -10,12 +10,18 @@ main checkout only) cannot be bypassed. One call per command (R29): run each in 
                                                     [--out F] [--paid]   # 7.3 rim fix, purpose rim_upscale (cap 2)
   python3 -I assets-src/gen/colossus.py inpaint <src> --mask M --prompt P --seed N [--paid]; inpaint_merge <src> <raw>
                                         --mask M      # F4 masked edit (colossus_inpaint.py; merge is offline)
-  python3 -I assets-src/gen/colossus.py pix <form> <nobg.png> [--scale 2|3] [--colors N] [--canvas WxH] [--out F]
-  python3 -I assets-src/gen/colossus.py glow|bake|review|check|lock <form>                  # after the layer yaml
-  python3 -I assets-src/gen/colossus.py mock <form> [--image F] [--bg F] [--floor F]       # stage mock on rim
-  python3 -I assets-src/gen/colossus.py approve <form> <pix.png>     # -> approved/chaos_forms/<form>/master.png
+  python3 -I assets-src/gen/colossus.py upscale <src.png> --model conservative --form F ...  # F3 / F2 (f3_upscale,
+                                    f2_upscale): the call, then upfit to the form canvas (refused when narrower)
+  python3 -I assets-src/gen/colossus.py upfit <form> <upscaled.png> --raw R      # offline fit + new-blob check
+  python3 -I assets-src/gen/colossus.py glow <form> --raw R --cut C [--method diff|lum] [--sky open|fit] ...
+                                    # offline: sky_base, despill, glow + the 18.7 checks (colossus_glowcmd.py)
+  python3 -I assets-src/gen/colossus.py mock <form> [--body B --glow G --raw ORIG --sky SKY]   # rim mock + side by side
+  python3 -I assets-src/gen/colossus.py review|check|lock <form>                 # after the layer yaml
+  python3 -I assets-src/gen/colossus.py approve <form> <body.png> [--extra glow=glow.png ...]
+                                    # -> approved/chaos_forms/<form>/ (master.png + extras + meta.json)
   python3 -I assets-src/gen/colossus.py budget --check               # pass C <= 80, each purpose <= cap, gem[N_C0:] == 0
 
+Rev 4 (D-U10): the colossus forms are painted art at scale 1 (colossus_paint.py); the rev-3 `pix` step is gone.
 Without --paid, gen / nobg only print the request (a cached one is written, it is free). The prompt is
 gen/colossus/<form>.prompt.md ("## prompt" and "## negative_prompt" sections, written by the generator). Outputs go to
 gen/out/colossus/<form>/ (each with a .json sidecar: model, seed, cache keys, prompt hash) and gen/out/colossus/review/.
@@ -39,12 +45,15 @@ OUT = HERE / "out" / "colossus"
 REVIEW = OUT / "review"
 GEM_LEDGER = HERE / "cache" / "ledger.jsonl"
 GITIGNORE = HERE.parent.parent / ".gitignore"
-# the art forms (3.2, 3.3, 4.2 planned geometry at scale 3; scale 2 multiplies the canvas by 3/2). F4 reuses F3's art.
+# the painted forms (rev 4, 18.4): canvas = screen px at scale 1, the rest place, the purposes, and for F3 the halo
+# geometry (estimates at 2700 wide: ring centre, radius, band width; the corona disc) the glow checks default to.
+# F4 (chaos_horizon_core) reuses F3's art.
 FORMS = {
-    "chaos_orrery": {"aspect": "16:9", "canvas": (440, 300), "colors": 20, "place": (-60, 60),
-                     "gen": "f2_gen", "nobg": "f2_nobg"},
-    "chaos_horizon": {"aspect": "21:9", "canvas": (900, 520), "colors": 24, "place": (-390, -300),
-                      "gen": "f3_gen", "nobg": "f3_nobg"},
+    "chaos_orrery": {"aspect": "16:9", "canvas": (1320, 900), "place": (40, -20), "sky_dim": 1.0,
+                     "gen": "f2_gen", "nobg": "f2_nobg", "upscale": "f2_upscale"},
+    "chaos_horizon": {"aspect": "21:9", "canvas": (2700, 1080), "place": (-527, -210), "sky_dim": 0.6,
+                      "gen": "f3_gen", "nobg": "f3_nobg", "upscale": "f3_upscale",
+                      "ring": (1350.0, 570.0, 562.0, 75.0), "corona": (1347.0, 510.0, 260.0)},
 }
 
 
@@ -108,49 +117,47 @@ def cmd_nobg(a) -> int:
                  meta)
 
 
-def cmd_pix(a) -> int:
-    from gen import colossus_layers as CL
-    f, src = _form(a.form), Path(a.nobg)
-    canvas = tuple(int(v) for v in a.canvas.split("x")) if a.canvas else \
-        tuple(c * 3 // a.scale for c in f["canvas"])
-    out = CL.pix(Image.open(src), canvas, a.colors or f["colors"], seed=a.seed)
-    dst = Path(a.out) if a.out else src.with_name(f"{src.stem}_pix_s{a.scale}.png")
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    out.save(dst)
-    _sidecar(dst, {**_read_sidecar(src), "nobg": str(src), "scale": a.scale, "canvas": list(canvas),
-                   "colors": a.colors or f["colors"]})
-    probs = CL.palette_problems(out)
-    print(f"wrote {dst} {out.size}" + ("" if not probs else f"; {probs}"))
-    return 1 if probs else 0
-
-
-def approve(form: str, pix: Path, meta: dict, tree=None, gitignore: Path = GITIGNORE) -> Path:
-    """Copy pix to approved/chaos_forms/<form>/master.png + meta.json and un-ignore its cache files. Refuses to replace
-    a different master unless a byte-identical copy is archived (retire.py --colossus, 5.5)."""
+def approve(form: str, master: Path, meta: dict, tree=None, gitignore: Path = GITIGNORE,
+            extras: dict[str, Path] | None = None) -> Path:
+    """Copy the body to approved/chaos_forms/<form>/master.png, each extra (name -> file, e.g. glow -> glow.png) to
+    <name>.png, write meta.json and un-ignore its cache files. A file that would be replaced or dropped (the rev-3 glow,
+    variant_crack*) must have a byte-identical copy in an archive (retire.py --colossus, 5.5), else it refuses before
+    writing; archived stale files are removed so the stage only sees the new approval."""
     from gen import retire as RT
     tree = tree or RT.Tree()
-    dst = tree.approved / "chaos_forms" / form / "master.png"
-    data = pix.read_bytes()
-    if dst.exists() and dst.read_bytes() != data and not any(
-            (d / "master.png").is_file() and (d / "master.png").read_bytes() == dst.read_bytes()
-            for d in RT.colossus_archives(tree, form)):
-        raise SystemExit(f"refused: {dst} exists with different bytes and has no byte-identical archive copy; run "
-                         f"retire.py --colossus {form} first")
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_bytes(data)
-    (dst.parent / "meta.json").write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
+    root = tree.approved / "chaos_forms" / form
+    new = {"master.png": master.read_bytes(),
+           **{(n if n.endswith(".png") else f"{n}.png"): Path(p).read_bytes() for n, p in (extras or {}).items()}}
+
+    def archived(p: Path) -> bool:
+        return any((d / p.name).is_file() and (d / p.name).read_bytes() == p.read_bytes()
+                   for d in RT.colossus_archives(tree, form))
+    live = sorted(p for p in root.iterdir() if p.is_file() and p.name != "meta.json") if root.is_dir() else []
+    for p in live:
+        if new.get(p.name) != p.read_bytes() and not archived(p):
+            raise SystemExit(f"refused: {p} exists with different bytes and has no byte-identical archive copy; run "
+                             f"retire.py --colossus {form} first")
+    root.mkdir(parents=True, exist_ok=True)
+    for p in live:
+        if p.name not in new:
+            p.unlink()
+    for name, data in new.items():
+        (root / name).write_bytes(data)
+    (root / "meta.json").write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n")
     lines = gitignore.read_text().splitlines() if gitignore.exists() else []
-    new = [f"!assets-src/gen/cache/{k}.{e}" for k in meta.get("cache_keys", []) for e in ("png", "json")]
-    add = [n for n in new if n not in lines]
+    add = [n for n in (f"!assets-src/gen/cache/{k}.{e}" for k in meta.get("cache_keys", []) for e in ("png", "json"))
+           if n not in lines]
     if add:
         gitignore.write_text("\n".join(lines + add) + "\n")
-    return dst
+    return root / "master.png"
 
 
 def cmd_approve(a) -> int:
     _form(a.form)
-    pix = Path(a.pix)
-    print(f"approved {approve(a.form, pix, {**_read_sidecar(pix), 'pix': str(pix)})}")
+    body = Path(a.body)
+    extras = dict(e.split("=", 1) for e in a.extra or [])
+    meta = {**_read_sidecar(body), "body": str(body), **({"extras": extras} if extras else {})}
+    print(f"approved {approve(a.form, body, meta, extras=extras)} (+ {', '.join(extras) or 'no extras'})")
     return 0
 
 
@@ -175,6 +182,9 @@ def budget_breaches(budget: dict, rows: list[dict], gem_count: int) -> list[str]
             out.append(f"unknown purpose {p!r} ({n} calls)")
         elif n > caps[p]:
             out.append(f"{p}: {n} calls > cap {caps[p]}")
+    for r in run:
+        if B.purpose_key(r.get("purpose", "")) == "reserve" and B.reserve_cost_breach(r.get("model", ""), br):
+            out.append(f"reserve row {r.get('key')}: {r.get('model')} costs more than ${B.reserve_max(br):.2f} (B7)")
     n0 = br.get("gemini_before")
     if not isinstance(n0, int) or gem_count < n0:
         out.append(f"Gemini ledger inconsistent: {gem_count} attempts < gemini_before (N_C0) {n0}")
@@ -206,6 +216,7 @@ def cmd_budget(a, gem_ledger: Path | None = None, gem_count: int | None = None) 
 
 def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_count: int | None = None) -> int:
     from gen import colossus_edit as CE
+    from gen import colossus_glowcmd as CG
     from gen import colossus_inpaint as CI
     from gen import colossus_review as CR
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -218,16 +229,11 @@ def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_coun
     for p in (g, n):
         p.add_argument("--purpose", help="a budget.json bedrock purpose (default: the form's gen / nobg purpose)")
         p.add_argument("--paid", action="store_true")
-    x = sub.add_parser("pix")
-    x.add_argument("form"); x.add_argument("nobg"); x.add_argument("--scale", type=int, choices=[2, 3], default=3)
-    x.add_argument("--colors", type=int); x.add_argument("--canvas", help="WxH override (fixtures)")
-    x.add_argument("--seed", type=int, default=0); x.add_argument("--out")
     ap_ = sub.add_parser("approve")
-    ap_.add_argument("form"); ap_.add_argument("pix")
-    for name in ("glow", "bake", "review", "check", "lock"):
-        sub.add_parser(name).add_argument("form")
-    m = sub.add_parser("mock")
-    m.add_argument("form"); m.add_argument("--image"); m.add_argument("--bg"); m.add_argument("--floor")
+    ap_.add_argument("form"); ap_.add_argument("body")
+    ap_.add_argument("--extra", action="append", metavar="NAME=FILE", help="another approved layer file (glow=...)")
+    CG.add_parsers(sub)
+    CR.add_parsers(sub)
     CE.add_parsers(sub)
     CI.add_parsers(sub)
     b = sub.add_parser("budget")
@@ -235,8 +241,8 @@ def main(argv: list[str] | None = None, gem_ledger: Path | None = None, gem_coun
     a = ap.parse_args(argv)
     if a.cmd == "budget":
         return cmd_budget(a, gem_ledger, gem_count)
-    cmds = {"gen": cmd_gen, "nobg": cmd_nobg, "pix": cmd_pix, "approve": cmd_approve, "glow": CR.cmd_glow,
-            "bake": CR.cmd_bake, "review": CR.cmd_review, "check": CR.cmd_check, "lock": CR.cmd_lock, "mock": CR.cmd_mock,
+    cmds = {"gen": cmd_gen, "nobg": cmd_nobg, "approve": cmd_approve, "glow": CG.cmd_glow, "upfit": CG.cmd_upfit,
+            "review": CR.cmd_review, "check": CR.cmd_check, "lock": CR.cmd_lock, "mock": CR.cmd_mock,
             "upscale": CE.cmd_upscale, "inpaint": CI.cmd_inpaint, "inpaint_merge": CI.cmd_merge,
             **{k: CE.cmd_edit for k in CE.PURPOSES}}
     return cmds[a.cmd](a)

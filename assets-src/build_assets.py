@@ -282,7 +282,7 @@ def build_monsters_ai() -> None:
 
 
 def build_colossus(out: Path | None = None) -> None:
-    """Chaos colossus forms (docs/CHAOS_FORMS_PLAN.md 4.6): approved/chaos_forms/<form>/master.png + gen/colossus/<form>.yaml
+    """Chaos colossus forms (docs/CHAOS_FORMS_PLAN.md 18.5): approved/chaos_forms/<form>/*.png + gen/colossus/<form>.yaml
     -> assets/sprites/colossus/ + colossus.json (gen/colossus_build.py). No approved master: writes and prints nothing."""
     from gen import colossus_build
     try:

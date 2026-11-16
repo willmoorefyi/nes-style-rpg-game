@@ -158,9 +158,10 @@ def _up_gate(check) -> None:
             check(code is None and "refused" in out and purpose in out and not cl.calls and not _rows(B),
                   f"upscale: purpose {purpose} is not an upscale purpose, refused before invoke ({out.strip()[-80:]!r})")
     with sandbox(real) as (B, tmp, cl):
-        code, _ = _main(C, _argv(_src(tmp), "conservative", "--purpose", "reserve:rim retry, orchestrator", "--paid"))
-        check(code == 0 and _rows(B)[0]["purpose"] == "reserve:rim retry, orchestrator",
-              "upscale: reserve:<reason> passes through to the ledger row")
+        code, out = _main(C, _argv(_src(tmp), "conservative", "--purpose", "reserve:rim retry, orchestrator", "--paid"))
+        check(code is None and "0.08" in out and not cl.calls and not _rows(B),
+              f"upscale: the reserve takes no upscale (B7: reserve calls <= $0.08), refused by invoke, nothing sent or "
+              f"logged ({out.strip()[-80:]!r})")
     with sandbox(real) as (B, tmp, cl):
         _seed_ledger(B, _fake_rows("rim_upscale", RIM_UPSCALE_CAP))
         code, out = _main(C, _argv(_src(tmp), "conservative", "--paid"))
@@ -194,7 +195,7 @@ def _up_cache(check) -> None:
               and (B.CACHE / f"{key}.png").exists(),
               "upscale: the same request again is a cache hit (free without --paid, no row, no call)")
         _main(C, _argv(src)[:-1] + ["22", "--paid"])                       # the 2nd and last rim_upscale call
-        _main(C, _argv(src, "conservative", "--creativity", "0.3", "--purpose", "reserve:selftest", "--paid"))
+        _main(C, _argv(src, "conservative", "--creativity", "0.3", "--purpose", "f3_upscale", "--paid"))
         keys = [r["key"] for r in _rows(B) if r["event"] == "request"]
         check(len(cl.calls) == n_calls + 2 and len(set(keys)) == 3,
               f"upscale: another seed or another creativity is a new request (new key, new row) ({keys})")

@@ -13,8 +13,10 @@ means random and could not be repeated), so a malformed request never spends a c
 reserve:<reason>); the cap check stays in invoke. The output is `<source stem>_<tag>_raw.png` next to the source, with
 a sidecar holding the source's cache keys plus this one.
 
-`upscale <src> --model conservative|creative|fast` (7.3, the rim backdrop fix; purpose `rim_upscale`, cap 2, or
-reserve:<reason>) takes no form. Its bodies and local input limits (AWS Bedrock Stability Image Services, Upscale):
+`upscale <src> --model conservative|creative|fast [--form F]` (7.3, the rim backdrop fix, purpose `rim_upscale`; with
+--form, 18.2 step 2: purpose `f3_upscale` / `f2_upscale`, then the offline upfit to the form canvas, refused when the
+output is narrower; a source over the 2.5:1 aspect gets 4 edge rows top and bottom, cropped after). The reserve takes
+no upscale (B7: the gate refuses reserve calls over $0.08). Its bodies and local input limits (AWS Bedrock Stability Image Services, Upscale):
   conservative  {image, prompt, [negative_prompt], creativity 0.2-0.5 (default 0.35), seed, output_format}
                 every side >= 64 px, <= 9,437,184 px, aspect 1:2.5..2.5:1 (the model is meant for <= 1 MP inputs)
   creative      {image, prompt, [negative_prompt], creativity 0.1-0.5 (default 0.3), seed, output_format}
@@ -107,7 +109,7 @@ def cmd_edit(a) -> int:
     return C._call(kind, body, purpose, a.paid, dst, meta)
 
 
-UPSCALE_PURPOSES = ("rim_upscale",)
+UPSCALE_PURPOSES = ("rim_upscale", "f3_upscale", "f2_upscale")
 # model: (min side, max side, min px, max px, max aspect, creativity range, default creativity); None = no limit
 UPSCALE = {"conservative": (64, None, 0, MAX_PX, MAX_ASPECT, (0.2, 0.5), 0.35),
            "creative": (64, None, 4_096, 1_048_576, None, (0.1, 0.5), 0.3),
@@ -153,17 +155,26 @@ def upscale_body(a, image_b64: str) -> tuple[dict, str]:
 def cmd_upscale(a) -> int:
     from gen import bedrock as B
     from gen import colossus as C
-    purpose = a.purpose or UPSCALE_PURPOSES[0]
+    from gen import colossus_paint as P
+    form = C._form(a.form) if a.form else None
+    purpose = a.purpose or (form["upscale"] if form else UPSCALE_PURPOSES[0])
     if B.purpose_key(purpose) not in (*UPSCALE_PURPOSES, "reserve"):
         _refuse(f"purpose {purpose!r} is not an upscale purpose ({', '.join(UPSCALE_PURPOSES)}, reserve:<reason>)")
     src = Path(a.src)
     body, tag = upscale_body(a, "")
-    img = Image.open(src)
+    img = Image.open(src).convert("RGB")
+    pad = P.pad_rows_for(img.size, UPSCALE[a.model][4] or 1e9) if form else 0
+    img = P.pad(img, pad)
     check_upscale_input(a.model, img)
-    body["image"] = B.png_b64(img.convert("RGB"))
-    meta = {"source": str(src), "upscale": {k: v for k, v in body.items() if k != "image"}, "src_size": list(img.size)}
+    body["image"] = B.png_b64(img)
+    meta = {"source": str(src), "upscale": {k: v for k, v in body.items() if k != "image"}, "src_size": list(img.size),
+            **({"form": a.form, "pad_rows": pad} if form else {})}
     dst = Path(a.out) if a.out else src.with_name(f"{src.stem}_{tag}.png")
-    return C._call(f"upscale_{a.model}", body, purpose, a.paid, dst, meta)
+    code = C._call(f"upscale_{a.model}", body, purpose, a.paid, dst, meta)
+    if form and dst.exists():
+        from gen import colossus_glowcmd as CG
+        return CG.upfit(a.form, dst, src, tuple(form["canvas"]), pad, dst.with_name(f"{dst.stem}_fit.png"))
+    return code
 
 
 def add_upscale_parser(sub: argparse._SubParsersAction) -> None:
@@ -172,7 +183,8 @@ def add_upscale_parser(sub: argparse._SubParsersAction) -> None:
     p.add_argument("--model", required=True, help=f"one of {', '.join(UPSCALE)}")
     p.add_argument("--prompt"); p.add_argument("--negative")
     p.add_argument("--creativity", type=float); p.add_argument("--seed", type=int)
-    p.add_argument("--purpose", help=f"{', '.join(UPSCALE_PURPOSES)} (default) or reserve:<reason>")
+    p.add_argument("--form", help="a colossus form: purpose f3_upscale / f2_upscale and the fit to its canvas (18.2)")
+    p.add_argument("--purpose", help=f"{', '.join(UPSCALE_PURPOSES)} (default rim_upscale, or the form's)")
     p.add_argument("--out", help="output PNG (default: <src stem>_up_<model>_<seed>.png next to the source)")
     p.add_argument("--paid", action="store_true")
 
