@@ -148,3 +148,9 @@ paint:                         # atk_mid: the crease pocket where the cocked for
   - {frame: atk_follow, rgb: [156, 66, 66], xy: [[88, 63], [87, 64]]}
   - {frame: atk_follow, rgb: [198, 107, 90], xy: [[92, 61]]}
   - {frame: atk_wind1, rgb: [115, 49, 49], xy: [[49, 93], [48, 93], [49, 94], [48, 95], [49, 95], [48, 96], [47, 96], [47, 97], [48, 97], [51, 91], [50, 92], [51, 92], [50, 93], [51, 93], [52, 93], [50, 94], [51, 94], [51, 90], [50, 95], [50, 96], [49, 96], [49, 97], [46, 98], [47, 98], [48, 98], [45, 99], [46, 99], [47, 99], [48, 99]]}
+  # P2-4 (ROSTER_FIX_PLAN_2): FW-P on the approved attack: the forehead rune is redrawn as the idle's glyph (the idle
+  # rune px in box 73 12 85 23 moved by (+9, +12), where the attack draws its rune); the old glyph px go to the head's
+  # clay by 4-neighbour mode. Gate: match idle attack --box 73 12 85 23 --to 82 24 94 35: RED 43 -> 0. 39 px.
+  - {frame: attack, xy: [[87, 25], [87, 27], [89, 27], [84, 28], [88, 28], [84, 29], [86, 29], [87, 29], [83, 30], [84, 30], [86, 30], [87, 30], [84, 31], [84, 32], [87, 32], [89, 32], [86, 33], [90, 33], [85, 34], [90, 34]], rgb: [231, 165, 132]}
+  - {frame: attack, xy: [[84, 26], [83, 27], [84, 27], [83, 28], [83, 29], [89, 30], [89, 31], [88, 33], [84, 34], [86, 34], [88, 34], [89, 34]], rgb: [198, 107, 90]}
+  - {frame: attack, xy: [[85, 28], [85, 29], [88, 30], [87, 31], [85, 32], [88, 32], [85, 33]], rgb: [255, 239, 198]}

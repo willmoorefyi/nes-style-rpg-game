@@ -124,3 +124,8 @@ masks:
 holds: []
 paint:                         # 1 px crack between the shins the bent near knee opens, outline ink
   - {frame: atk_wind1, xy: [[39, 60]], rgb: [6, 4, 10]}
+  # P2-3 (ROSTER_FIX_PLAN_2): FW-P on the approved hurt: its sceptre shaft below and above the fist is drawn all in
+  # outline ink; recolour the 1 px core column (x 50, y 21-27 and 34-47) to the idle shaft's gold, lit (222, 198, 99)
+  # at the top of each run. RED colours --box 49 20 53 48: hurt 7, hurt_in2 5. 21 px.
+  - {frame: hurt, xy: [[50, 21], [50, 34], [50, 40]], rgb: [222, 198, 99]}
+  - {frame: hurt, xy: [[50, 22], [50, 23], [50, 24], [50, 25], [50, 26], [50, 27], [50, 35], [50, 36], [50, 37], [50, 38], [50, 39], [50, 41], [50, 42], [50, 43], [50, 44], [50, 45], [50, 46], [50, 47]], rgb: [156, 115, 41]}
