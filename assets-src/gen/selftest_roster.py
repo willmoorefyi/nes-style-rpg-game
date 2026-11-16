@@ -295,8 +295,9 @@ def _fields(check: Callable[[bool, str], None]) -> None:
     check(base in M.base_sentence({"base": base}, "pose") and M.base_sentence({}, "pose") == "",
           "FW-9: the base sentence names the base and is empty without the field")
 
-    # the G1 fiend entries carry the fields the plan gives them (4.1)
-    q, d, h = (GEN.load_character(c) for c in FIENDS)
+    # the G1 fiend entries carry the fields the plan gives them (4.1). docs/REDESIGN_PLAN.md 9.5: for a redesigned id
+    # these pass-R pins read its archived entry (retired/monsters_v1.yaml), still true of the archived design
+    q, d, h = (pass_r_entry(c) for c in FIENDS)
     check(q.get("body") == "naga" and "altar" in (q.get("base") or "") and d.get("body") == "robed"
           and "tentacles" in (d.get("idle_negative") or "") and h.get("body") == "floating" and h.get("floating") is True
           and all(c.get("per_pose") and c.get("size") == "boss" and c.get("design_ref") is False for c in (q, d, h)),
@@ -316,6 +317,41 @@ def _fields(check: Callable[[bool, str], None]) -> None:
           and all(M.BODY_LINES["floating"][1] not in pp(h, p) and hm[p].strip() in pp(h, p) for p in hm)
           and all(M.BODY_LINES["floating"][1] in pp(h, p) for p in ("attack", "cast")),
           "FW-9: hollow_seraph motion (six wings visible) only in hurt and attack_raise; approved attack/cast keep the line")
+    c = pass_r_entry("chaos")
+    check(all("exactly four" in pp(c, p) for p in S.BOSS_POSES) and "four arms" in str((c.get("motion") or {}).get("cast")),
+          "FW-9: chaos (pass R) has four arms in words in every pose and in its motion line")
+    _pass_v_fields(check, pp)
+
+
+# docs/REDESIGN_PLAN.md 9.5 / 4: once a redesigned boss's live entry differs from its archived one (state B on), the
+# pass-V pins apply to the live entry: the count words in every pose it may generate, motion keys among those poses
+PASS_V_COUNTS = {"hollow_seraph": "exactly four", "chaos": "exactly two"}
+
+
+def pass_r_entry(cid: str) -> dict:
+    """The archived pass-R entry of a redesigned id (retired/monsters_v1.yaml, `retired_as: <id>_v1`) when it exists,
+    else the live monsters.yaml entry."""
+    from gen import generate as GEN
+    from gen import retire as RT
+    block = RT.retired_block(RT.Tree(), f"{cid}_v1")
+    if block is None:
+        return GEN.load_character(cid)
+    return {**{k: v for k, v in RT._parse_one(block).items() if k != "retired_as"}, "kind": "monster"}
+
+
+def _pass_v_fields(check: Callable[[bool, str], None], pp: Callable[[dict, str], str]) -> None:
+    from gen import generate as GEN
+    from gen.selftest_passv import ONLY_SHEETS
+    for cid, words in PASS_V_COUNTS.items():
+        live, old = GEN.load_character(cid), pass_r_entry(cid)
+        if live == old:
+            print(f"  info {cid}: live entry is the pass-R design (no pass-V text yet)")
+            continue
+        poses = [sh.removeprefix("boss_") for sh in ONLY_SHEETS[cid]]
+        motion = live.get("motion") or {}
+        keys = set(motion) if isinstance(motion, dict) else set(poses) - {"idle"}
+        check(all(words in pp(live, p) for p in poses) and keys <= set(poses) - {"idle"},
+              f"pass V: {cid} has '{words}' in every pose it may generate ({poses}), motion keys {sorted(keys)} among them")
 
 
 def run_prompts(check: Callable[[bool, str], None]) -> None:

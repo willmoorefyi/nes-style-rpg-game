@@ -18,7 +18,9 @@ BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # ones (scorpion/hurt, hydra/attack, black_knight/hurt), so this set equals the live rigs' aliases exactly
 FWQ_ALLOW = {("chimera", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "vampire": {"slash"}, "hollow_seraph": {"halo"}}
-FX_PENDING: set[tuple[str, str]] = set()
+# FW-FX (docs/REDESIGN_PLAN.md 7, 9.5): the vampire and hollow_seraph rigs are retired in pass V; a pending entry
+# tolerates the missing part until the new rig re-confirms it (back to FX_ALLOWED only) or drops it (from both)
+FX_PENDING: set[tuple[str, str]] = {("vampire", "slash"), ("hollow_seraph", "halo")}
 
 
 def _canvas() -> tuple[np.ndarray, np.ndarray]:
@@ -247,14 +249,18 @@ def run_lich_crystal(check: Callable[[bool, str], None]) -> None:
     check(cast > 0 and rise <= 0.4 * cast, f"E4: lich crystal in cast_rise is at most 40 % of cast ({rise} / {cast} px)")
 
 
-def run_halo_brighten(check: Callable[[bool, str], None]) -> None:
+def run_halo_brighten(check: Callable[[bool, str], None], cfg: dict | None = None, entry: tuple | None = None) -> None:
     """FW-7 (ROSTER_PLAN 5.3): on the real hollow_seraph the fx halo brightens only where the rig says (cast_gather 1
     step, cast_release 2), only to approved colours of the halo, and every other frame is byte-identical to the rig
     without `brighten` (RED: with brighten stripped, the halo in cast_gather is not brighter). brighten on a non-fx
     part, or a step outside 1..3, is an error naming the rig."""
     from gen import monster_anim as MA, monster_render as MR, pixelize as PX, rig as R
-    cfg = MA.load_rig("hollow_seraph")
-    _, meta, kfs = next(e for e in MA.load_entries() if e[0] == "hollow_seraph")
+    if cfg is None or entry is None:              # 9.5: the hollow_seraph_v1 archive (rig + keys) when present
+        from gen import retire as RT
+        with RT.fixture_tree(("hollow_seraph",)):
+            cfg = MA.load_rig("hollow_seraph")
+            entry = next(e for e in MA.load_entries() if e[0] == "hollow_seraph")
+    _, meta, kfs = entry
     plain = copy.deepcopy(cfg)
     for f in (plain.get("frames") or {}).values():
         f.pop("brighten", None)

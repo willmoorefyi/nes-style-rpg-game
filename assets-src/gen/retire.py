@@ -17,10 +17,12 @@ generator, in the main checkout; --move-rig and --prune in the commit that appro
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import re
 import shutil
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -284,6 +286,51 @@ def revive(tree: Tree, rid: str, new_id: str) -> list[str]:
     return [f"add {new_id} to a group in gen/monster_pages.py (else it packs in the last group, 'other')",
             f"add the enemy to assets/data/enemies.yaml (sprite: {new_id}) and its bestiary data",
             f"run monster_anim.py check {new_id} (expect OK with the archived lock) and rebuild monsters_ai"]
+
+
+# ───────── selftest fixtures (docs/REDESIGN_PLAN.md 9.5): the archived sprite when present, else the live one ─────────
+def fixture_source(tree: Tree, sid: str) -> tuple[Path, Path | None, Path | None, bool]:
+    """(approved dir, rig, lock, archived) of `sid` for the pinned selftests: approved/_retired/<sid>_v1/ and its
+    archived rig and lock when the v1 archive exists (byte-identical to the live files until the redesign), else live."""
+    arch = tree.archive / f"{sid}_v1"
+    if arch.is_dir():
+        rig, lock = tree.rig_archive / f"{sid}_v1.yaml", tree.rig_archive / f"{sid}_v1.lock.json"
+        return arch, rig if rig.exists() else None, lock if lock.exists() else None, True
+    rig, lock = tree.rigs / f"{sid}.yaml", tree.rigs / f"{sid}.lock.json"
+    return tree.approved / sid, rig if rig.exists() else None, lock if lock.exists() else None, False
+
+
+@contextlib.contextmanager
+def fixture_tree(sids: tuple[str, ...] | list[str], full: bool = False, tree: Tree | None = None):
+    """Point monster_anim's APPROVED / RIGS at a temp tree (symlinks) where each of `sids` is its fixture_source; with
+    full=True every other live sprite is there too (unchanged). Yields {sid: archived?}."""
+    from gen import monster_anim as MA
+    tree = tree or Tree(MA.HERE)
+    real = MA.APPROVED, MA.RIGS
+    with tempfile.TemporaryDirectory() as tmp:
+        appr, rigs = Path(tmp) / "approved", Path(tmp) / "rigs"
+        appr.mkdir()
+        rigs.mkdir()
+        if full:
+            for d in sorted(real[0].iterdir()):
+                if d.is_dir() and not d.name.startswith("_") and d.name not in sids:
+                    (appr / d.name).symlink_to(d)
+            for f in sorted(real[1].iterdir()):
+                if f.is_file() and f.name.split(".", 1)[0] not in sids:
+                    (rigs / f.name).symlink_to(f)
+        archived = {}
+        for sid in sids:
+            src, rig, lock, archived[sid] = fixture_source(tree, sid)
+            if src.is_dir():
+                (appr / sid).symlink_to(src)
+            for p, ext in ((rig, ".yaml"), (lock, ".lock.json")):
+                if p is not None:
+                    (rigs / f"{sid}{ext}").symlink_to(p)
+        MA.APPROVED, MA.RIGS = appr, rigs
+        try:
+            yield archived
+        finally:
+            MA.APPROVED, MA.RIGS = real
 
 
 def main(argv: list[str] | None = None) -> int:
