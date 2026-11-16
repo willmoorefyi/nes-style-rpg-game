@@ -108,8 +108,59 @@ def problems(form: str) -> list[str]:
     return CB.lock_problems(CB.APPROVED, CB.SPECS, form)
 
 
+def _layer_canvas(fr: dict, imgs: dict, canvas) -> Image.Image:
+    """One exported frame back on a canvas-sized RGBA, as the game draws it: tiles at their texture px, scaled by
+    texScale with linear filtering, at the frame's `at`."""
+    ts = fr.get("texScale", 1)
+    tex = Image.new("RGBA", (-(-fr["size"][0] // ts), -(-fr["size"][1] // ts)))
+    for t in fr["tiles"]:
+        tex.paste(imgs[t["file"]], (t["x"], t["y"]))
+    if ts != 1:
+        tex = tex.resize(tuple(fr["size"]), Image.Resampling.BILINEAR)
+    out = Image.new("RGBA", tuple(canvas))
+    out.paste(tex, tuple(fr["at"]))
+    return out
+
+
+def rest_view(entry: dict, imgs: dict, spec: dict, dy: float = 0, glow: float = 1.0, frames: dict | None = None,
+              party: bool = True) -> Image.Image:
+    """The form on rim with its sky dim from the exported textures (each layer's base or `frames` / the yaml's
+    `variant` frame, its blend and rest alpha x `glow` for the light layers), shifted dy (whole px), with the party
+    and the strip line."""
+    bg_p = ROOT / "assets" / "backgrounds" / "rim.webp"
+    bg = np.asarray(Image.open(bg_p).convert("RGB").resize((1920, 1080), Image.Resampling.LANCZOS)).astype(float)
+    out = bg * float(entry.get("skyDim", 1.0))
+    pick = {**(spec.get("variant") or {}), **(frames or {})}
+    for L in entry["layers"]:
+        fr = L["frames"].get(pick.get(L["name"], "base"))
+        if not fr or not fr["tiles"]:
+            continue
+        al = L.get("alpha", 1.0) * (glow if L["kind"] in ("glow", "corona") else 1.0)
+        out = P.place_layer(out, _layer_canvas(fr, imgs, entry["canvas"]),
+                            (entry["place"][0], entry["place"][1] + round(dy)), L.get("blend", "normal"), al)
+    shot = _rgb(out).convert("RGBA")
+    if party:
+        _party(shot)
+    ImageDraw.Draw(shot).line((0, STRIP_Y, 1919, STRIP_Y), fill=(0, 255, 255, 255), width=2)
+    ImageDraw.Draw(shot).line((0, 120, 1919, 120), fill=(0, 255, 255, 255), width=2)
+    return shot
+
+
 def cmd_review(a) -> int:
-    entry, imgs, _ = CB.export_form(a.form, CB.APPROVED, CB.SPECS)
+    entry, imgs, spec = CB.export_form(a.form, CB.APPROVED, CB.SPECS)
+    _save(rest_view(entry, imgs, spec), a.form, "rest")
+    crop = (0, 100, 1920, 800)                  # breathing (0 / -4 px) and the glow pulse floor (0.85), side by side
+    tiles = [("rest", rest_view(entry, imgs, spec, party=False)), ("breath -4 px", rest_view(entry, imgs, spec, -4, party=False)),
+             ("glow pulse 0.85", rest_view(entry, imgs, spec, 0, 0.85, party=False))]
+    tiles += [(f"core {f}", rest_view(entry, imgs, spec, frames={"core": f}, party=False))
+              for L in entry["layers"] if L["kind"] == "core" for f in L["frames"] if f != "base"]
+    w, h = 960, 350
+    strip = Image.new("RGB", (w, len(tiles) * (h + 18)), (24, 24, 28))
+    d = ImageDraw.Draw(strip)
+    for i, (label, im) in enumerate(tiles):
+        d.text((4, i * (h + 18) + 3), label, fill=(255, 255, 255))
+        strip.paste(im.crop(crop).convert("RGB").resize((w, h), Image.Resampling.LANCZOS), (0, i * (h + 18) + 18))
+    _save(strip, a.form, "motion")
     thumbs = [(rel.split("/")[-1], im) for rel, im in sorted(imgs.items())]
     th = [im.copy() for _, im in thumbs]
     for im in th:

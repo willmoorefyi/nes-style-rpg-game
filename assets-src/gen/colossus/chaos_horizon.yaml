@@ -1,0 +1,44 @@
+# F3 "Chaos, the Last Horizon", painted (rev 4, D-U10; docs/CHAOS_FORMS_PLAN.md 18.3-18.5). Layer yaml for
+# colossus_build.py. Art px = screen px at scale 1; place = the rest (user ruling D-U11: (-527, -60)).
+# Anchors measured on approved/chaos_forms/chaos_horizon/master.png (every point on opaque body, alpha 254):
+#   target / core = the eclipse disc (screen 820, 450): the number spot, below the status row
+#   head = the disc's upper half (screen 820, 300): the status icon row above it clears the message window
+#   melee = the right forearm (screen 1220, 530): hero travel from the party (x 1380) 160 >= 150
+#   hands = the on-screen forearm points (screen 120, 620 / 1260, 570; the hands are off-screen)
+#   feet = the torso just above the strip (screen 820, 740)
+# target_rect: disc + chest, screen x 643-1003, y 285-765 (above the strip).
+# Layer order (bottom first) as approved in the mock: body, the core patch, then the additive glow over both.
+# No corona layer: the corona is part of glow.png, so a corona patch cut from it would add it twice at rest.
+form: chaos_horizon
+canvas: [2700, 1080]
+scale: 1
+place: [-527, -60]
+sky_dim: 0.6
+anchors:
+  target: [1347, 510]
+  core: [1347, 510]
+  head: [1347, 360]
+  hands: [[647, 680], [1787, 630]]
+  melee: [1747, 590]
+  feet: [1347, 800]
+target_rect: [1170, 345, 360, 480]
+layers:
+  # body: the frame drops only the invisible residue above canvas row 312 (alpha <= 4); the arms reach the left and
+  # right borders and the torso the bottom one (the 18.4 border rules)
+  - name: body
+    kind: body
+    box: [0, 312, 2700, 1080]
+    frames: {base: master.png}
+  # core: base empty (the body carries it); crack = F3 below 0.25 (chaos_crack), open = F4's cavity (shared with
+  # chaos_horizon_core, so a record that keeps colossus: chaos_horizon with colossusVariant core: open also works)
+  - name: core
+    kind: core
+    frames: {base: null, crack: core_crack.png, open: core_open.png}
+  # glow: the halo ring, rays and corona, additive, stored at half res (texScale 2), rest alpha 1; the whole canvas
+  # (its 120 px feathered top is the top border, behind the message window)
+  - name: glow
+    kind: glow
+    blend: add
+    alpha: 1.0
+    tex_scale: 2
+    frames: {base: glow.png}

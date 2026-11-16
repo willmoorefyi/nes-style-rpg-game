@@ -69,8 +69,9 @@ def visible_box_of(entry: dict) -> list[int]:
 
 
 def preview(entry: dict, spec: dict, approved: Path, form: str, bg_path: Path | None) -> Image.Image | None:
-    """18.8: the rest view (base frames, glow added) over rim with the sky dim, cropped to the visible box, fit into
-    940x720, opaque. None without a backdrop."""
+    """18.8: the rest view (base frames, or the yaml's `variant` {layer: frame}, e.g. F4's core: open; glow added) over
+    rim with the sky dim, cropped to the visible box, fit into 940x720, opaque. `form` is the art dir. None without a
+    backdrop."""
     from gen import colossus_paint as P
     if bg_path is None or not bg_path.exists():
         return None
@@ -78,7 +79,7 @@ def preview(entry: dict, spec: dict, approved: Path, form: str, bg_path: Path | 
     out = bg * float(spec.get("sky_dim", 1.0))
     px, py = entry["place"]
     for L, e in zip(spec["layers"], entry["layers"]):
-        src, box = L["frames"].get("base"), L.get("box")
+        src, box = L["frames"].get((spec.get("variant") or {}).get(L["name"], "base")), L.get("box")
         if src is None:
             continue
         img = Image.open(approved / form / src).convert("RGBA")

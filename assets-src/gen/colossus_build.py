@@ -58,6 +58,17 @@ def masters(approved: Path = APPROVED) -> list[str]:
     return sorted(p.parent.name for p in approved.glob("*/master.png")) if approved.is_dir() else []
 
 
+def aliases(approved: Path = APPROVED, specs: Path = SPECS) -> list[str]:
+    """Forms drawn from another form's approved art (`art: <form>` in the yaml; F4 chaos_horizon_core): own place and
+    anchors, the same tile files (sorted)."""
+    out = []
+    for p in sorted(specs.glob("*.yaml")) if specs.is_dir() else []:
+        art = (yaml.safe_load(p.read_text()) or {}).get("art")
+        if art and art != p.stem and art in masters(approved):
+            out.append(p.stem)
+    return out
+
+
 def tiles(img: Image.Image, max_side: int = MAX_SIDE) -> list[tuple[int, int, Image.Image]]:
     """(x, y, tile) pieces of <= max_side px that abut with no gap or overlap, column-major."""
     return [(x, y, img.crop((x, y, min(x + max_side, img.width), min(y + max_side, img.height))))
@@ -101,7 +112,7 @@ def export_form(form: str, approved: Path = APPROVED, specs: Path = SPECS, max_s
     probs = spec_problems(spec)
     if probs:
         raise ValueError("; ".join(probs))
-    canvas = tuple(spec["canvas"])
+    canvas, art = tuple(spec["canvas"]), spec.get("art", form)          # an alias form reads (and shares) art's files
     files: dict[str, Image.Image] = {}
     layers = []
     for L in spec["layers"]:
@@ -110,7 +121,7 @@ def export_form(form: str, approved: Path = APPROVED, specs: Path = SPECS, max_s
         for fname, src in L["frames"].items():
             if src is None:
                 continue
-            path = approved / form / src
+            path = approved / art / src
             if not path.is_file():
                 raise ValueError(f"colossus {form}: layer {name}/{fname}: {path.name} is missing")
             img = Image.open(path).convert("RGBA")
@@ -137,7 +148,7 @@ def export_form(form: str, approved: Path = APPROVED, specs: Path = SPECS, max_s
                 fr["texScale"] = ts
             cut = tiles(tex, max_side)
             for i, (tx, ty, t) in enumerate(cut):
-                rel = f"{prefix}{form}/{name}_{fname}{f'_{i}' if len(cut) > 1 else ''}.png"
+                rel = f"{prefix}{art}/{name}_{fname}{f'_{i}' if len(cut) > 1 else ''}.png"
                 files[rel] = t
                 fr["tiles"].append({"file": rel, "x": tx, "y": ty, "w": t.width, "h": t.height})
             frames[fname] = fr
@@ -175,16 +186,21 @@ def build(out: Path | None = None, approved: Path = APPROVED, specs: Path = SPEC
             print(f"colossus: {f} skipped (approved master, no layer yaml {f}.yaml yet)")
     if not forms:
         return None
+    forms = sorted(forms + aliases(approved, specs))
     out = out or OUT
     meta: dict = {"version": 1, "bytes": 0, "forms": {}}
     files: dict[str, bytes] = {}
     for form in forms:
         entry, imgs, spec = export_form(form, approved, specs, max_side)
         meta["forms"][form] = entry
-        for rel, img in imgs.items():
-            files[rel] = _png(img)
-            meta["bytes"] += img.width * img.height * 4
-        still = preview(entry, spec, approved, form, bg)
+        for rel, img in imgs.items():                  # a file shared by an alias form is stored and counted once
+            png = _png(img)
+            if rel in files and files[rel] != png:
+                raise ValueError(f"colossus {form}: {rel} differs from the same file of another form (alias box?)")
+            if rel not in files:
+                meta["bytes"] += img.width * img.height * 4
+            files[rel] = png
+        still = preview(entry, spec, approved, spec.get("art", form), bg)
         if still is not None:
             files[f"colossus/{form}/preview.png"] = _png(still)
     if meta["bytes"] > max_bytes:
