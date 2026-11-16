@@ -14,7 +14,8 @@ import type { EnemyData, SpellData } from '../../src/types/index.js';
 
 const ENEMIES = parse(readFileSync('assets/data/enemies.yaml', 'utf-8')) as EnemyData[];
 const SPELLS = parse(readFileSync('assets/data/spells.yaml', 'utf-8')) as SpellData[];
-const INTERLUDES = new Set((parse(readFileSync('assets/data/battle-interludes.yaml', 'utf-8')) as Array<{ id: string }>).map((s) => s.id));
+const INTERLUDE_SCRIPTS = (parse(readFileSync('assets/data/battle-interludes.yaml', 'utf-8')) as { interludes: Array<{ id: string; steps: Array<{ type: string; text?: string }> }> }).interludes;
+const INTERLUDES = new Set(INTERLUDE_SCRIPTS.map((s) => s.id));
 const byId = (id: string): EnemyData => ENEMIES.find((e) => e.id === id)!;
 const FORM_IDS = ['chaos_orrery', 'chaos_horizon', 'chaos_horizon_core'];
 const formPhase = (e: EnemyData) => (e.bossPhases ?? []).find((p) => p.form);
@@ -91,10 +92,25 @@ describe('the Chaos form chain', () => {
     for (const id of ['chaos_horizon', 'chaos_horizon_core']) expect([byId(id).resist, byId(id).elementalProfile], id).toEqual(['earth', undefined]);
   });
 
-  it('F3\'s phase at 0.25: the groan line and hits 4 (3.3)', () => {
+  it('F3\'s phase at 0.25: the groan line and hits 4 (3.3), played by chaos_crack, which shows the line (18.8 row 2c, B5)', () => {
     const p = (byId('chaos_horizon').bossPhases ?? []).find((x) => !x.form);
-    expect(p).toMatchObject({ hpThreshold: 0.25, hits: 4 });
+    expect(p).toMatchObject({ hpThreshold: 0.25, hits: 4, interlude: 'chaos_crack' });
     expect(p?.message).toBe('The horizon groans; core revealed!');
+    // the phase does not say its line itself, so the interlude must carry it as a message step
+    const crack = INTERLUDE_SCRIPTS.find((s) => s.id === 'chaos_crack');
+    expect(crack?.steps.filter((s) => s.type === 'message').map((s) => s.text)).toEqual([p?.message]);
+  });
+
+  it('every phase that names an interlude and has a message shows that message in its script (B5)', () => {
+    for (const e of ENEMIES) for (const p of e.bossPhases ?? []) {
+      if (!p.interlude || !p.message) continue;
+      const steps = INTERLUDE_SCRIPTS.find((s) => s.id === p.interlude)?.steps ?? [];
+      expect(steps.some((s) => s.type === 'message' && s.text === p.message), `${e.id}: ${p.interlude}`).toBe(true);
+    }
+  });
+
+  it('rev 4 (18.0): F3 / F4 name no gripping hand, no rim grip and no moons (the picked render has none)', () => {
+    for (const id of ['chaos_horizon', 'chaos_horizon_core']) expect(byId(id).description ?? '', id).not.toMatch(/grip|rim|moon/i);
   });
 
   it('the beam (2.4) is ice, the strongest single-target black damage spell, and F3 / F4 cast it', () => {

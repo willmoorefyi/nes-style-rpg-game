@@ -4,7 +4,8 @@ import { ValidationError } from '../core/schemaValidation.js';
 /**
  * The transformation interlude scripts (assets/data/battle-interludes.yaml; docs/CHAOS_FORMS_PLAN.md 2.3): the step
  * types, the validator a registry runs per script (a bad script throws `ValidationError`), the unskipped time (R18, A1)
- * and the per-form-pair rules (R13, R19, A2). Pure: no PixiJS. The player (`formInterlude.ts`) and the registry
+ * and the per-phase rules (R19; rev 4: the B4 pan limits and a `rise` ending at the next `pan`'s `from`, 18.4). A
+ * non-form phase may name a script too (B5, 18.8 row 2c: F3's 0.25 phase plays `chaos_crack`). Pure: no PixiJS. The player (`formInterlude.ts`) and the registry
  * (`InterludeRegistry`) are the view's.
  */
 
@@ -17,8 +18,11 @@ export const INTERLUDE_CAP_FRAMES = 480;
 const CAP_OVERRIDES: Readonly<Record<string, number>> = { chaos_i2: 600 };
 /** The colossus pose timelines a `pose` step plays once (4.3), with their lengths in frames. */
 export const POSE_FRAMES: Readonly<Record<string, number>> = { attack: 44, cast: 40, hurt: 20, roar: 60 };
-/** The pan start rule (A2): dy in [-70, 0] art px, dx <= 0. */
-export const PAN_START_DY: readonly [number, number] = [-70, 0];
+/**
+ * The motion envelope of the layers that move during a pan (B4), screen px: the body's breathing (18.3: dy 0 -> -4)
+ * lifts the bottom border, nothing moves sideways, and the slam dip never runs in an interlude.
+ */
+export const PAN_ENVELOPE: Readonly<PanEnvelope> = { up: 4, down: 0, left: 0, right: 0 };
 
 type Hex = `#${string}`;
 interface Concurrent { with?: 'previous' }
@@ -38,8 +42,12 @@ export type InterludeStep = Concurrent & (
   | { type: 'music'; id: string }
 );
 export interface InterludeScript { id: string; steps: InterludeStep[] }
-/** The allowed pan offsets in art px (R13): the canvas still covers the field at every offset. */
+/** The allowed pan offsets, screen px from rest (B4): every opaque border stays off-screen at every offset. */
 export interface PanLimits { dx: [number, number]; dy: [number, number] }
+/** How far (screen px, >= 0) the moving layers can carry the art up, down, left and right of the pan offset. */
+export interface PanEnvelope { up: number; down: number; left: number; right: number }
+/** A colossus form's geometry as colossus.json writes it (18.5): canvas [w, h] art px, scale, rest place [x, y] screen px. */
+export interface PanGeometry { canvas: [number, number]; scale: number; place: [number, number] }
 
 const FIELDS: Readonly<Record<InterludeStep['type'], readonly string[]>> = {
   message: ['text'], wait: ['frames'], flash: ['color', 'frames', 'alpha'], shake: ['times'], tint: ['color', 'alpha', 'frames'],
@@ -128,24 +136,43 @@ export function validateInterludeScript(script: InterludeScript): void {
 }
 
 /**
- * The pan limits that keep the field covered (R13): the canvas placed at `place` (screen px, its top-left), `size`
- * screen px, `scale` screen px per art px. Sideways and above, a 6 px shake margin stays covered; below, the bottom
- * strip covers y >= 780. For the planned F3 ((-390, -300), 2700 x 1560, scale 3): dx [-128, 128], dy [-160, 138].
+ * The pan limits (B4, 18.4): the border rule minus the motion envelope, per axis, in screen px from rest. The canvas's
+ * left, right and bottom borders carry opaque body pixels, so they stay off-screen (left <= -margin, right >= w +
+ * margin) or behind the bottom strip (bottom >= 780 + margin); the top border is glow only and stays behind the message
+ * window (top <= 120 - margin). For the planned F3 ((-527, -210), 2700 x 1080 at scale 1, the 4 px breathing):
+ * dx [-247, +521], dy [-80, +324].
  */
-export function panLimits(place: { x: number; y: number }, size: { w: number; h: number }, scale: number,
+export function panLimits(g: PanGeometry, env: PanEnvelope = PAN_ENVELOPE,
   field = { w: 1920, top: 120, bottom: 780 }, margin = 6): PanLimits {
+  const [x, y] = g.place;
+  const w = g.canvas[0] * g.scale;
+  const h = g.canvas[1] * g.scale;
   return {
-    dx: [Math.ceil((field.w + margin - (place.x + size.w)) / scale), Math.floor((-margin - place.x) / scale)],
-    dy: [Math.ceil((field.bottom - (place.y + size.h)) / scale), Math.floor((field.top - margin - place.y) / scale)],
+    dx: [Math.ceil(field.w + margin + env.left - (x + w)), Math.floor(-margin - env.right - x)],
+    dy: [Math.ceil(field.bottom + margin + env.up - (y + h)), Math.floor(field.top - margin - env.down - y)],
   };
+}
+
+/**
+ * Where a `rise` (step `i`) carries the canvas, screen px from rest: it ends at the `from` of the next `pan` (18.4, so
+ * the pan starts without a jump), or at rest when no pan follows, and starts `from_dy` below its end.
+ */
+export function riseSpan(steps: readonly InterludeStep[], i: number): { from: [number, number]; to: [number, number] } {
+  const rise = steps[i];
+  if (rise?.type !== 'rise') throw new Error(`riseSpan: step ${i} is not a rise`);
+  const pan = steps.slice(i + 1).find((s) => s.type === 'pan');
+  const to: [number, number] = pan?.type === 'pan' ? [pan.from[0], pan.from[1]] : [0, 0];
+  return { from: [to[0], to[1] + rise.from_dy], to };
 }
 
 const artOf = (e: EnemyData): string => e.colossus ?? e.sprite;
 
 /**
- * The rules for the script that plays when `from` changes into `to` (R19, R13, A2): exactly one `swap` when the art id
- * changes and none when it does not (F3 -> F4); `rise` only after the swap and only into a colossus; `variant` and
- * `pan` only on a colossus form, each pan inside `limits` (when known) and the start rule.
+ * The rules for the script that plays when `from` changes into `to` (R19, B4; `from === to` for a non-form phase):
+ * exactly one `swap` when the art id changes and none when it does not (F3 -> F4, chaos_crack); `rise` only after the
+ * swap and only into a colossus; `variant` and `pan` only on a colossus form, each pan inside `limits` (when known);
+ * a rise ends at the next pan's `from` (`riseSpan`), so that pan may not run `with: previous` beside the rise, and no
+ * swap or other rise may come between them.
  */
 export function interludeFormErrors(script: InterludeScript, from: EnemyData, to: EnemyData, limits?: PanLimits): string[] {
   const errors: string[] = [];
@@ -157,13 +184,20 @@ export function interludeFormErrors(script: InterludeScript, from: EnemyData, to
   script.steps.forEach((s, i) => {
     if (s.type === 'rise' && (swapAt < 0 || i < swapAt || !to.colossus)) errors.push(`${script.id}: rise only after the swap, into a colossus form`);
     if (s.type === 'variant' && !to.colossus) errors.push(`${script.id}: variant only on a colossus form`);
+    if (s.type === 'rise') {
+      const next = script.steps.findIndex((x, j) => j > i && x.type === 'pan');
+      if (next > 0 && script.steps.slice(i + 1, next).some((x) => x.type === 'swap' || x.type === 'rise')) {
+        errors.push(`${script.id}: a swap or a rise between the rise and the pan it ends at`);
+      }
+      const after = script.steps.slice(i + 1).findIndex((x) => x.with !== 'previous');
+      const group = script.steps.slice(i + 1, after < 0 ? undefined : i + 1 + after);
+      if (group.some((x) => x.type === 'pan')) errors.push(`${script.id}: a pan alongside the rise (the rise ends where the pan starts)`);
+    }
     if (s.type !== 'pan') return;
     if (!to.colossus) { errors.push(`${script.id}: pan only on a colossus form`); return; }
     const [dx, dy] = s.from;
-    if (dx > 0) errors.push(`${script.id}: pan start dx ${dx} must be <= 0 (A2)`);
-    if (dy < PAN_START_DY[0] || dy > PAN_START_DY[1]) errors.push(`${script.id}: pan start dy ${dy} outside [${PAN_START_DY.join(', ')}] (A2)`);
     if (limits && (dx < limits.dx[0] || dx > limits.dx[1] || dy < limits.dy[0] || dy > limits.dy[1])) {
-      errors.push(`${script.id}: pan offset (${dx}, ${dy}) outside the coverage limits dx [${limits.dx.join(', ')}] dy [${limits.dy.join(', ')}] (R13)`);
+      errors.push(`${script.id}: pan offset (${dx}, ${dy}) outside the border limits dx [${limits.dx.join(', ')}] dy [${limits.dy.join(', ')}] (B4)`);
     }
   });
   return errors;
