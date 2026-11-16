@@ -1317,3 +1317,21 @@ archive copies are in `chaos_horizon_v1`.
 - `selftest_colossus_gate` re-pinned (selftest_colossus ALL PASSED). The approved `meta.json` is updated.
 - Mock: `gen/out/colossus/review/chaos_horizon_c3p_mock.png`.
 - **TS owner files that pin the old placement are listed in plan 15.1 D-U11; they are not edited here.**
+
+**D-U12 F4 retry: both failed, stopped (f4_inpaint 4 of 8 used).**
+- C24 (seed 4603): the reworded prompt and a medium chest-band mask (canvas rows 700-1050). A real cavity with
+  broken edges turned outward and a molten core, no face. But at the new rest place (y -60) it sits at screen
+  740-940, mostly behind the bottom strip, so it was not used.
+- C25 (seed 4604): the mask moved into the visible chest band (canvas rows 662-880). `inpaint_merge` changed 0 px
+  outside the grown mask.
+- Fresh side-by-side review: **ITERATE**. It is the same being, with no face, eye or mask, but:
+  - a thin vertical beam joins the disc to a flame-shaped burst (it reads as a vented crack or a flare, not a
+    cavity);
+  - there are no dark inner walls or depth, and little light spill;
+  - a horizontal inpaint seam runs just under the disc (crop y ~482);
+  - the core's brightest part is cut by the strip at screen y ~778.
+- Per the ruling, **F4 is stopped**. Candidates are kept in `gen/out/colossus/chaos_horizon/f4/` (`open_ip_4603_raw`,
+  `open_ip_4604_raw`, `core_open.png`) and are not approved.
+- **Note for the orchestrator:** at the lowered place (-527, -60) the chest (canvas rows 650-1080) mostly falls
+  behind the bottom strip. The approved `core_crack` patch (canvas rows ~686-1000) shows only its upper part at rest
+  (screen 626-780). A chest variant needs either a pan / `place` change when it is shown, or a higher patch.
