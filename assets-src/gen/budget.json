@@ -40,7 +40,7 @@
     },
     {
       "name": "pass V",
-      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy)",
+      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy); dragon (red) added 2026-11-16 by the orchestrator (its low, wide approved pose cannot reach the size step by rescale: a redesign within the same 50, monster_large only)",
       "gemini_before": 367,
       "max_new": 50,
       "max_per_sheet": 3,
@@ -51,7 +51,8 @@
         "guardian",
         "vampire",
         "hollow_seraph",
-        "chaos"
+        "chaos",
+        "dragon"
       ],
       "only_sheets": {
         "crazy_horse": [
@@ -81,6 +82,9 @@
           "boss_cast",
           "boss_hurt",
           "boss_attack_raise"
+        ],
+        "dragon": [
+          "monster_large"
         ]
       }
     }

@@ -22,11 +22,15 @@ N_V0 = 367                      # Gemini attempts in the main-checkout ledger wh
 PASS_R = (100, 300)             # pass R: attempts_before, cap
 R_FIX = (363, 37)               # pass R fix: gemini_before, max_new
 CAP_V, PER_SHEET = 50, 3
-ONLY_IDS = ["crazy_horse", "piscodemon", "black_knight", "guardian", "vampire", "hollow_seraph", "chaos"]
+ONLY_IDS_V1 = ["crazy_horse", "piscodemon", "black_knight", "guardian", "vampire", "hollow_seraph", "chaos"]
+# the orchestrator's V3 addition (2026-11-16): the red dragon's low, wide approved pose cannot reach the size step
+# by rescale, so it is redesigned within the same 50 (monster_large only); later additions append after it
+ONLY_IDS = ONLY_IDS_V1 + ["dragon"]
 ONLY_SHEETS = {"crazy_horse": ["monster_large"], "piscodemon": ["monster_small"], "black_knight": ["monster_small"],
                "guardian": ["monster_large"], "vampire": ["monster_small"],
                "hollow_seraph": ["boss_idle", "boss_attack", "boss_cast", "boss_hurt"],
-               "chaos": ["boss_idle", "boss_attack", "boss_cast", "boss_hurt", "boss_attack_raise"]}
+               "chaos": ["boss_idle", "boss_attack", "boss_cast", "boss_hurt", "boss_attack_raise"],
+               "dragon": ["monster_large"]}
 # append-only: later passes may add entries after this prefix, never change it
 HISTORY_PREFIX = [{"name": "pass R", "attempts_before": PASS_R[0], "cap": PASS_R[1], "gemini_end": N_V0,
                    "max_attempts_per_sheet": 3}]
@@ -58,7 +62,11 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
           f"budget.json: pass R fix ({R_FIX[0]}, {R_FIX[1]}) closed at gemini_end {N_V0} ({fix})")
     check(pv.get("gemini_before") == N_V0 and pv.get("max_new") == CAP_V and pv.get("max_per_sheet") == PER_SHEET
           and "gemini_end" not in pv and pv.get("only_ids") == ONLY_IDS and pv.get("only_sheets") == ONLY_SHEETS,
-          f"budget.json: pass V open at {N_V0}, {CAP_V} new, {PER_SHEET} per sheet, only the 7 ids and their sheets")
+          f"budget.json: pass V open at {N_V0}, {CAP_V} new, {PER_SHEET} per sheet, only the {len(ONLY_IDS)} ids and their "
+          f"sheets ({pv.get('only_ids')})")
+    ids = pv.get("only_ids") or []
+    check(ids[:len(ONLY_IDS_V1)] == ONLY_IDS_V1 and len(ONLY_IDS) == 8,
+          f"budget.json: pass V only_ids keeps the V1 seven first, in order; additions only append ({ids})")
 
     gem = _gemini(GEN.read_ledger())
     base = gem[:N_V0]
@@ -94,6 +102,10 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
           f"pass V: hollow_seraph/boss_attack_raise is refused by only_sheets (D-V9) ({vr[:100]!r})")
     vs = v(real, base, "crazy_horse", "monster_small")
     check(_refused(vs) and "only_sheets" in vs, f"pass V: a sheet not listed for a listed id is refused ({vs[:90]!r})")
+    vd, vds = v(real, base, "dragon", "monster_large"), v(real, base, "dragon", "monster_small")
+    check(vd == "" and _refused(vds) and "only_sheets" in vds,
+          f"pass V: dragon/monster_large is allowed (the V3 addition), dragon/monster_small refused ({vd[:60]!r}; "
+          f"{vds[:80]!r})")
     vc = v(real, base, "chaos", "boss_attack_raise")
     check(vc == "", f"pass V: chaos/boss_attack_raise is allowed ({vc[:70]!r})")
 
