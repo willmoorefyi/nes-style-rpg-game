@@ -999,3 +999,5 @@ size.
 **G-C0 report: not reached.** V0-a..e: not run (0 of 12 calls; budget --check OK, Bedrock 0 of 80, Gemini 405 =
 N_C0). No mocks. Recommendation: resolve the credential question first; then add the outpaint model id and the
 outpaint / search_replace / structure subcommands (FW-C, 0 paid) and run V0 as planned.
+
+**FW-C follow-up (worktree `c2-fw`, 0 Bedrock calls).** `bedrock.MODELS["outpaint"]` = `us.stability.stable-outpaint-v1:0`; `colossus.py outpaint | search_replace | structure` (`colossus_edit.py`, Stability Bedrock schemas, local input / range checks, per-subcommand 5.6 purposes, all through `bedrock.invoke`); `selftest_colossus.py` 34 RED -> GREEN on a mocked client. V0-e and V0-d are unblocked on the tooling side; the R30 credential ruling is still open.

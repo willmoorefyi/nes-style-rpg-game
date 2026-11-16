@@ -25,8 +25,8 @@ per logical request (`{event: request, ts, tool, model, purpose, seed, key, pass
 `cache/bedrock_ledger.jsonl` (tracked in git) **before the first try**, then a `{event: result, key, ok, served | error}`
 record (`served` = the model id that answered). `generate.py --backend bedrock` passes `paid` and the purpose
 `character_sheet`, which pass C refuses. The colossus forms' tool is `colossus.py` (gen / nobg / pix / glow / bake /
-mock / review / check / approve / lock, and `budget --check`: pass C <= 80, each purpose <= its cap,
-`gem[N_C0:] == 0`); its build stage is `build_assets.py colossus [--out DIR]` (`colossus_build.py`: no approved master
+mock / review / check / approve / lock, the edits outpaint / search_replace / structure in `colossus_edit.py`, and
+`budget --check`: pass C <= 80, each purpose <= its cap, `gem[N_C0:] == 0`); its build stage is `build_assets.py colossus [--out DIR]` (`colossus_build.py`: no approved master
 writes and prints nothing; `--out` writes a scratch copy plus `manifest.sha256`). Self-tests: `selftest_colossus.py`
 (also in `selftest.py --anim`).
 

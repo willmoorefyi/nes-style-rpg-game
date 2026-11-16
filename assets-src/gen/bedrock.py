@@ -42,6 +42,7 @@ MODELS = {
     "style_guide": "us.stability.stable-image-style-guide-v1:0",
     "remove_bg": "us.stability.stable-image-remove-background-v1:0",
     "search_replace": "us.stability.stable-image-search-replace-v1:0",
+    "outpaint": "us.stability.stable-outpaint-v1:0",      # inference profile only (us-west-2, ROSTER_LOG Pass C - C2)
 }
 
 _client = None
