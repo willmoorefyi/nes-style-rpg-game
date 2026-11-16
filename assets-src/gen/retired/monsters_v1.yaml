@@ -1,0 +1,18 @@
+# Retired monsters.yaml entries (v1), written by retire.py (docs/REDESIGN_PLAN.md 5). Not read by the generator.
+- id: crazy_horse
+  # "Crazy Horse" (004): a wild horse with two hits
+  size: large
+  body: quadruped
+  prompt: >-
+    a wild-eyed piebald horse, white with large dark brown patches, seen from the side, a matted tangled black mane and
+    tail, flared nostrils, rolling white-rimmed eyes, a broken leather bridle with a snapped rein trailing from its
+    muzzle, muscular legs with dark hooves
+  attack: >-
+    a wild bucking strike toward the heroes: the forelegs lifted only a little off the ground and kicking forward, the
+    head thrust forward with the teeth bared, the mane and the broken rein flying; the hind hooves on the ground; no
+    rearing up tall
+  hurt: knocked back, the head tossed up and back, the eyes rolling, one foreleg buckling, the mane flying
+  face: the horse's head with the wild white-rimmed eye and flared nostrils is readable
+  extra_negative: a rider, a saddle, a horn, wings
+  seeds: [1234]
+  retired_as: crazy_horse_v1
