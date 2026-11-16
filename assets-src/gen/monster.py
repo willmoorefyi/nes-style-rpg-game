@@ -323,13 +323,55 @@ def _foreground(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
     return fg
 
 
-def _figure_mask(rgb: np.ndarray, haze: bool = False) -> np.ndarray:
+KEEP_PIECES = ("all_in_cell",)  # monsters.yaml `cut: {keep_pieces: all_in_cell}` (V3, hollow_seraph R298)
+KEEP_MIN_PX = 24                # all_in_cell: a piece under this many native px is a speck and is dropped
+
+
+def cut_options(char: dict) -> str | None:
+    """The `keep_pieces` value of a monsters.yaml entry's `cut:` block (None when absent); anything else is refused."""
+    opts = char.get("cut")
+    if opts is None:
+        return None
+    if not isinstance(opts, dict) or set(opts) - {"keep_pieces"}:
+        raise ValueError(f"{char.get('id')}: `cut` takes only keep_pieces ({opts!r})")
+    kp = opts.get("keep_pieces")
+    if kp is not None and kp not in KEEP_PIECES:
+        raise ValueError(f"{char.get('id')}: cut.keep_pieces must be one of {', '.join(KEEP_PIECES)} ({kp!r})")
+    return kp
+
+
+def _all_in_cell(fg: np.ndarray, lab: np.ndarray, n: int) -> np.ndarray:
+    """keep_pieces all_in_cell: every foreground piece of the cell (a figure built of deliberately separate floating
+    parts), except specks under KEEP_MIN_PX, thin guide / divider lines, and any piece touching the cell's border (bleed
+    from a neighbouring cell, a painted guide frame)."""
+    h, w = fg.shape
+    sizes = np.bincount(lab.ravel())[1:]
+    keep = []
+    for i in range(1, n + 1):
+        if sizes[i - 1] < KEEP_MIN_PX:
+            continue
+        cy, cx = np.where(lab == i)
+        bw, bh = cx.max() - cx.min() + 1, cy.max() - cy.min() + 1
+        if min(bw, bh) <= 2 and max(bw, bh) >= 6:
+            continue
+        if cx.min() == 0 or cx.max() == w - 1 or cy.min() == 0 or cy.max() == h - 1:
+            continue
+        keep.append(i)
+    return np.isin(lab, keep)
+
+
+def _figure_mask(rgb: np.ndarray, haze: bool = False, keep_pieces: str | None = None) -> np.ndarray:
     """Foreground of one cell (`_foreground`), then keep the main figure: the largest blob and any blob overlapping
-    its bounding box (staffs, held items); drop stray blobs outside it (shadows)."""
+    its bounding box (staffs, held items); drop stray blobs outside it (shadows). `keep_pieces="all_in_cell"` (opt-in)
+    keeps every in-cell piece instead (`_all_in_cell`)."""
     fg = _foreground(rgb, haze)
     lab, n = PX.components(fg)
     if n == 0:
         return fg
+    if keep_pieces is not None:
+        if keep_pieces not in KEEP_PIECES:
+            raise ValueError(f"cut: unknown keep_pieces {keep_pieces!r} (one of {', '.join(KEEP_PIECES)})")
+        return _all_in_cell(fg, lab, n)
     sizes = np.bincount(lab.ravel())[1:]
     main = int(sizes.argmax()) + 1
     ys, xs = np.where(lab == main)
@@ -452,19 +494,24 @@ def flat_edges(frame: Image.Image, run: int = 3) -> list[tuple[int, int, int]]:
 
 def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: int = 16,
         seed: int = 0, n_cells: int = 3, cell: int | None = None,
-        foot_row: int | None = None, haze: bool = False, split: str = "gaps") -> tuple[list[Image.Image], dict]:
+        foot_row: int | None = None, haze: bool = False, split: str = "gaps",
+        keep_pieces: str | None = None) -> tuple[list[Image.Image], dict]:
     """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
     splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
     approved sheets are never re-cut). A floating cell drawn so low that the shared offset would put it below the cell's
     2 px bottom margin is lifted by that overflow alone (FW-C, new cuts only; info["lifted"] = {pose: px}); a lift over
-    LIFT_MAX, or a lifted figure above row 2, refuses the cut (ValueError naming the pose)."""
+    LIFT_MAX, or a lifted figure above row 2, refuses the cut (ValueError naming the pose). `keep_pieces` (monsters.yaml
+    `cut: {keep_pieces: all_in_cell}`, `cut_options`) keeps every in-cell piece (`_all_in_cell`); None is the default
+    figure mask, byte-identical to the cutter before the option."""
     native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
     cells, offs, lines = split_cells(a, n_cells, haze, split)
     if any(offs) or any(c.shape[1] != round((i + 1) * w / n_cells) - round(i * w / n_cells) for i, c in enumerate(cells)):
         info["split"] = lines
-    masks = [_figure_mask(c, haze) for c in cells]
+    masks = [_figure_mask(c, haze, keep_pieces) for c in cells]
+    if keep_pieces is not None:
+        info["keep_pieces"] = keep_pieces
     heights = []
     for m in masks:
         ys = np.where(m.any(1))[0]

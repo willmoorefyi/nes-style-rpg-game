@@ -44,6 +44,9 @@ frames](#2-animation-frames-rig) · [3 Validation](#3-validation) · [4 Troubles
 - **Bosses** add `size: boss`, `per_pose: true`, `design_ref: false`, `action_prompt` and `cast`: one request per pose,
   200x200 cell, feet on row 192. Optional: `extra_negative`, `haze: true` (mist keyed out), `sheet_seeds: {boss_attack:
   1235}` (redraw one pose, other cache keys unchanged). `floating: true` = one shared offset, no ground line.
+- **Separate floating pieces** (any sheet): `cut: {keep_pieces: all_in_cell}` keeps every piece inside the figure's
+  own cell (the default keeps only the largest blob and blobs near its box; specks under 24 native px, thin guide lines
+  and pieces touching the cell border are still dropped); no cache key changes (`selftest_pieces.py`).
 - **Titan** (`size: titan`, FW-T, chaos only): per-pose, 300x300 cell, feet row 292, figure 258-278 art px (top row
   >= 15). The cut is fail-closed: a render that would need a rescale (`info["scale"] != 1.0`) or has no detectable pixel
   grid (mode not `grid`) raises, and the attempt counts as rejected. Check cached renders offline first:

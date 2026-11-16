@@ -479,7 +479,7 @@ def cut_frames(raw: Image.Image, guide: Image.Image, sheet: Sheet, char: dict, s
                              n_cells=1 if sheet.name.startswith("boss_") else 3,
                              cell=pg.grid[0] if sheet.name.startswith("boss_") else None,
                              foot_row=pg.bottom_row if sheet.name.startswith("boss_") else None,
-                             haze=bool(char.get("haze")))
+                             haze=bool(char.get("haze")), keep_pieces=M.cut_options(char))
         info["report"] = M.frame_report(frames, monster_band(char))
         LAST_RESAMPLE[sheet.name] = info
         return frames

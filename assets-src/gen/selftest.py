@@ -459,6 +459,9 @@ def test_monster_anim() -> None:
     print("titan band (FW-T: 300 cell / feet 292, fail-closed cut, probe, approve, titan page group)")
     from gen import selftest_titan as STi
     STi.run_titan(check)
+    print("cutter option keep_pieces (cut: {keep_pieces: all_in_cell}: every in-cell piece kept; R298; default unchanged)")
+    from gen import selftest_pieces as SPc
+    SPc.run_pieces(check)
     print("monster atlas pages (FW-8: page groups, MAX_PAGE 2048, check's no-rig line; FW-A anchors, FW-R raise: false; "
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP
