@@ -83,6 +83,24 @@ describe('battle-interludes.yaml', () => {
     expect(['chaos_i1', 'chaos_i2', 'chaos_i3', 'chaos_crack'].map(swaps)).toEqual([1, 1, 0, 0]);
   });
 
+  it('the core variant steps (F3\'s crack, F4\'s open) and F4\'s colossusVariant name frames of the core layer (the built json, else the contract form)', () => {
+    type Layered = { layers?: { name: string; frames: Record<string, unknown> }[]; art?: string };
+    const contract = (JSON.parse(readFileSync('tests/fixtures/colossus/contract.json', 'utf-8')) as { forms: Record<string, Layered> }).forms.contract_form;
+    const layersOf = (e: EnemyData): Layered['layers'] => {
+      const own = JSON_FORMS[e.id] as Layered | undefined;
+      const art = (own?.art ? JSON_FORMS[own.art] : JSON_FORMS[e.colossus ?? '']) as Layered | undefined;
+      return own?.layers ?? art?.layers ?? contract.layers;
+    };
+    const wants: Array<[EnemyData, string, string]> = [];
+    for (const [id, , to] of PAIRS) for (const s of script(id).steps) if (s.type === 'variant') wants.push([to, s.layer, s.frame]);
+    for (const [layer, frame] of Object.entries(byId('chaos_horizon_core').colossusVariant ?? {})) wants.push([byId('chaos_horizon_core'), layer, frame]);
+    expect(wants.map(([e, l, f]) => `${e.id}:${l}/${f}`)).toEqual(['chaos_horizon:core/crack', 'chaos_horizon_core:core/open', 'chaos_horizon_core:core/open']);
+    for (const [e, layer, frame] of wants) {
+      const l = layersOf(e)?.find((x) => x.name === layer);
+      expect(l?.frames[frame], `${e.id} ${layer}/${frame}`).toBeDefined();
+    }
+  });
+
   it('chaos_crack: shake x1, flash white 4, the core\'s crack frame, then the phase message (18.8 row 2c)', () => {
     expect(script('chaos_crack').steps).toEqual([
       { type: 'shake', times: 1 },

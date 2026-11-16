@@ -143,6 +143,7 @@ export class BestiaryPreview {
     this.art.keepOnly(entry?.seen ? [monsterSpriteKey(entry.enemy)] : []);   // FW-8: release the last entry's page
     if (backgroundId) this.backdrop.set(backgroundId);
     void this.colossus.show(entry?.seen ? entry.enemy : null);   // releases a shown colossus; draws a colossus form
+    this.actors.position.set(0, 0);                             // a colossus (still or live) is placed in panel space
     if (!entry || !entry.seen || colossusOf(entry.enemy)) { this.caption.text = ''; return; }
     const e = entry.enemy;
     this.view = new AiEnemyView([e], this.art);
@@ -151,7 +152,6 @@ export class BestiaryPreview {
     this.actors.addChildAt(sprite, 0);
     const f = this.art.getMonsterFrames(monsterSpriteKey(e));
     this.noArt = !f;
-    this.actors.position.set(0, 0);
     this.fit = null;
     if (f) {
       const feetY = sprite.y + (f.footRow + 1) * f.scale;
