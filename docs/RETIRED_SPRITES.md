@@ -36,3 +36,4 @@ One row per retired sprite (the generator adds each row, from the line `retire.p
 | Retired id | Original id | Sheets | Cache keys (R-rows) | Reason | Rig / lock | Revive |
 |---|---|---|---|---|---|---|
 | `crazy_horse_v1` | `crazy_horse` | monster_large | monster_large `39b9a7e6c503037dd8dbe059` (R82) | pass V redesign (REDESIGN_PLAN 3: an otherworldly horse, distinct from `nightmare`; the piebald wild horse is replaced) | rig + lock (locked) | `retire.py --revive crazy_horse_v1 --as <new_id>` |
+| `piscodemon_v1` | `piscodemon` | monster_small | monster_small `a6f48aea1aa31985939c381c` (R60) | pass V redesign (REDESIGN_PLAN 3: a squat young deep-sea psychic horror; the anglerfish demon is replaced) | rig + lock (locked) | `retire.py --revive piscodemon_v1 --as <new_id>` |

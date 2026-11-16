@@ -16,3 +16,17 @@
   extra_negative: a rider, a saddle, a horn, wings
   seeds: [1234]
   retired_as: crazy_horse_v1
+- id: piscodemon
+  # "Piscodemon" (032), the tentacled demon miniboss: two physical hits, no spells
+  size: small
+  body: biped
+  prompt: >-
+    a demon with the head of a deep-sea anglerfish on a hunched humanoid body: a huge underbitten jaw full of needle
+    teeth, small pale eyes, a glowing yellow-green lure dangling on a stalk from its brow, short fleshy tentacles
+    hanging from the chin like a beard, dark blue-green scale armour plates over the chest and shoulders, a ragged dark
+    purple loincloth, two muscular arms ending in webbed clawed hands, standing on two webbed feet
+  attack: lunging forward and raking both webbed claws at the heroes, the jaws gaping wide, the lure swinging
+  hurt: knocked back, jaws clamped shut, the clawed hands thrown up, the lure and chin tentacles whipping back
+  face: the anglerfish face (small pale eyes, the gaping toothy jaw and the glowing lure) is readable in every cell
+  seeds: [1234]
+  retired_as: piscodemon_v1
