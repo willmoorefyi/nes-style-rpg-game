@@ -30,3 +30,27 @@
   face: the anglerfish face (small pale eyes, the gaping toothy jaw and the glowing lure) is readable in every cell
   seeds: [1234]
   retired_as: piscodemon_v1
+- id: black_knight
+  # "Black Knight" (104): plain black plate, closed helm, a two-handed sword (distinct from death knight, dark fighter)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so the sword stays well inside its own cell. Draw only the parts named in the
+    description, the same in every cell: no cape, cloak, tabard or extra cloth, and no slash trail, smear or motion
+    lines.
+  prompt: >-
+    a knight in plain smooth black plate armour with dull grey edges, a closed black great helm with one narrow
+    visor slit, no crest or plume, holding one long two-handed sword with both hands; in the idle cell the sword is
+    held upright in front of the body, its point well below the top of the grey box; centred in its own cell with
+    empty space on both sides
+  attack: >-
+    stepping forward toward the heroes at the end of a downward cut: the sword in both hands, its blade angled down in
+    front of him with the point at knee height just ahead of his front foot, the whole sword well inside the middle
+    cell (not raised overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, staggering, the helm tipped back, the sword held upright across the chest in both hands
+  face: a closed black great helm with a narrow visor slit
+  extra_negative: a cape, a cloak, a shield, spikes, a skull, a plume, horns, gold trim, a second sword, a face
+  seeds: [1234]
+  retired_as: black_knight_v1
