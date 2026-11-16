@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { computeEnemyLayoutAi, formationFits, ENEMY_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { computeEnemyLayoutAi, formationFits, ENEMY_AREA, TITAN_AREA, type EnemyBoxInput, type EnemyBox, type EnemySizeClass } from '../../../src/scenes/battle/EnemyLayoutAi.js';
+import { seededRng } from '../../../src/scenes/battle/fx/emitterCore.js';
+import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
 import { atlas, enemyData, frameBox, layoutInput } from '../../helpers/atlasFrames.js';
 
-const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
+const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
 
 function rect(b: EnemyBox) {
@@ -152,5 +154,115 @@ describe('large crowds pack by their home art (defect 2)', () => {
       { cases: { source: string; inputs: EnemyBoxInput[]; out: EnemyBox[] }[] };
     expect(golden.cases.length).toBe(33);
     for (const c of golden.cases) expect(computeEnemyLayoutAi(c.inputs), c.source).toEqual(c.out);
+  });
+});
+
+/**
+ * TS-2 (docs/REDESIGN_PLAN.md 2.5, 2.6, 4.2), on fixtures until the FW-S atlas lands: the 23 rescaled sheets as the
+ * layout will see them (tier H `huge` at the sheet scale 3, bigeyes `large` at scale 3), the titan alone in TITAN_AREA.
+ */
+describe('integer screen scales, tier H and the titan (TS-2)', () => {
+  const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
+    'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
+    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
+  /** An enemy's layout input with the rescale applied (cell x 3 instead of x 2). */
+  const rescaled = (id: string): EnemyBoxInput => {
+    const b = layoutInput(id);
+    const big = TIER_H.includes(id) || id === 'bigeyes';
+    if (!big) return { ...b, scale: 2 };
+    const k = 3 / 2;
+    return { size: id === 'bigeyes' ? 'large' : 'huge', w: b.w * k, h: b.h * k, scale: 3,
+      ...(b.ox0 !== undefined ? { ox0: b.ox0 * k, ox1: b.ox1! * k } : {}) };
+  };
+  const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
+  const screenScales = (inputs: EnemyBoxInput[]) =>
+    computeEnemyLayoutAi(inputs).map((b, i) => (inputs[i].scale ?? 2) * b.scaleFactor);
+  const H = (): EnemyBoxInput => ({ size: 'huge', w: 384, h: 384, scale: 3 });
+  const TITAN: EnemyBoxInput = { size: 'titan', w: 600, h: 600, scale: 2 };
+
+  it('the 22 tier-H fixtures exist in the atlas at 128-144 px cells (384-432 px boxes at scale 3)', () => {
+    for (const id of TIER_H) {
+      const b = rescaled(id);
+      expect(b.h, id).toBe(384);
+      expect(b.w, id).toBeGreaterThanOrEqual(384);
+      expect(b.w, id).toBeLessThanOrEqual(432);
+    }
+  });
+
+  it('every box of every real formation (golden and rescaled) and of 1,000 seeded random formations has a whole screen scale', () => {
+    const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '__golden__/layout_f1.json'), 'utf-8')) as
+      { cases: { enemies: string[]; inputs: EnemyBoxInput[] }[] };
+    const formations: EnemyBoxInput[][] = golden.cases.flatMap((c) => [c.inputs, c.enemies.map(rescaled)]);
+    const pool = [...new Set(enemyData.map((e) => e.id))].filter((id) => atlas.sheets[monsterSpriteKey(enemyData.find((e) => e.id === id)!)]);
+    const rng = seededRng(20261116);
+    for (let k = 0; k < 1000; k++) {
+      if (k % 50 === 0) { formations.push([TITAN]); continue; }
+      const n = 1 + Math.floor(rng() * 9);
+      formations.push(Array.from({ length: n }, () => rescaled(pool[Math.floor(rng() * pool.length)])));
+    }
+    let boxes = 0;
+    for (const f of formations) {
+      for (const s of screenScales(f)) { expect(whole(s), `${s} in ${f.map((b) => b.size).join(',')}`).toBe(true); boxes++; }
+    }
+    expect(boxes).toBeGreaterThan(4000);
+  });
+
+  it('3 tier-H sheets lay out side by side at factor 1 (3 x 384 + 2 x 24 = 1200 <= 1260)', () => {
+    const out = check([rescaled('shark'), rescaled('minotaur'), rescaled('hydra')]);
+    expect(out.map((b) => b.scaleFactor)).toEqual([1, 1, 1]);
+    expect(formationFits([rescaled('shark'), rescaled('minotaur'), rescaled('hydra')])).toBe(true);
+  });
+
+  it('3 green_dragons (432 px cells) fit at factor 1 only by opaque packing', () => {
+    const g = Array.from({ length: 3 }, () => rescaled('green_dragon'));
+    expect(computeEnemyLayoutAi(g).map((b) => b.scaleFactor)).toEqual([1, 1, 1]);
+    expect(formationFits(g)).toBe(true);
+  });
+
+  it('the play-test crowd with dragon, shark and minotaur rescaled: whole scales, no overlap; the 6 tier-L at factor 1 alone', () => {
+    const crowd = ['ogre', 'troll', 'dragon', 'crazy_horse', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
+    const inputs = crowd.map(rescaled);
+    expect(screenScales(inputs).every(whole)).toBe(true);
+    expect(formationFits(inputs)).toBe(true);
+    const large = crowd.filter((id) => !TIER_H.includes(id));
+    expect(large).toHaveLength(6);
+    expect(check(large.map(rescaled)).every((b) => b.scaleFactor === 1)).toBe(true);
+  });
+
+  it('pass 3: a tier-H mix that overflows full size shows the scale-3 boxes at screen scale 2, the rest at full size', () => {
+    const mix = [H(), H(), H(), box('small'), box('small'), box('small')];
+    expect(screenScales(mix)).toEqual([2, 2, 2, 2, 2, 2]);
+    expect(computeEnemyLayoutAi(mix).slice(0, 3).map((b) => b.w)).toEqual([256, 256, 256]);
+    expect(formationFits(mix)).toBe(true);
+  });
+
+  it('pass 4 with a scale-3 sheet is refused: 5 full-width tier-H boxes (4 still fit at screen scale 2)', () => {
+    expect(formationFits(Array.from({ length: 4 }, H))).toBe(true);
+    const five = Array.from({ length: 5 }, H);
+    expect(screenScales(five)).toEqual([1, 1, 1, 1, 1]);
+    expect(formationFits(five)).toBe(false);
+  });
+
+  it('formations without a scale-3 sheet keep the old passes: 9 large still at half size', () => {
+    expect(computeEnemyLayoutAi(Array.from({ length: 9 }, () => ({ ...box('large'), scale: 2 }))).every((b) => b.scaleFactor === 0.5)).toBe(true);
+  });
+
+  it('the titan stands alone in TITAN_AREA, its top under the message window; never with another enemy', () => {
+    const [b] = computeEnemyLayoutAi([TITAN]);
+    expect(b.scaleFactor).toBe(1);
+    expect(b.feetY).toBeLessThanOrEqual(TITAN_AREA.y1);
+    expect(b.feetY - b.h).toBeGreaterThanOrEqual(TITAN_AREA.y0);
+    expect(TITAN_AREA.y0).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
+    expect(formationFits([TITAN])).toBe(true);
+    expect(formationFits([TITAN, box('small')])).toBe(false);
+  });
+
+  it('layout_f1.json is byte-identical when recomputed (none of its formations has a scale-3 sheet)', () => {
+    const file = join(dirname(fileURLToPath(import.meta.url)), '__golden__/layout_f1.json');
+    const text = readFileSync(file, 'utf-8');
+    const golden = JSON.parse(text) as { note: string; cases: { inputs: EnemyBoxInput[]; out: EnemyBox[] }[] };
+    expect(golden.cases.every((c) => c.inputs.every((i) => (i.scale ?? 2) !== 3))).toBe(true);
+    const again = { ...golden, cases: golden.cases.map((c) => ({ ...c, out: computeEnemyLayoutAi(c.inputs) })) };
+    expect(`${JSON.stringify(again, null, 1)}\n`).toBe(text);
   });
 });

@@ -5,7 +5,7 @@ import { STRIP_Y } from '../../../src/scenes/battle/BattleSceneTypes.js';
 
 /** docs/ART_BATTLE_PLAN.md: every actor's feet on the battle plain (y 360-745, B13); tops below the message window (120). */
 const FIELD_TOP = 120;
-const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
+const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 
 describe('battle stage rules', () => {
   it('party feet stand on the plain and heads stay below the message window', () => {

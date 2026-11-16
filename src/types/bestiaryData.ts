@@ -15,7 +15,7 @@ export const BESTIARY_LABEL_KEYS = ['title', 'boss', 'hp', 'attack', 'hits', 'da
 export type BestiaryLabelKey = (typeof BESTIARY_LABEL_KEYS)[number];
 
 export type BestiaryLabels = Record<BestiaryLabelKey, string> & {
-  sizes: Record<'small' | 'large' | 'boss', string>;
+  sizes: Record<'small' | 'large' | 'huge' | 'boss' | 'titan', string>;
   attackKinds: Record<BestiaryAttackKind, string>;
   anim: Record<BestiaryAnimLabel, string>;
 };

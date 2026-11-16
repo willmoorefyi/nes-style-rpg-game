@@ -49,7 +49,7 @@ describe('roster data: coverage and numbering', () => {
   it('every entry has an ASCII description, a size and a melee or ranged attack', () => {
     for (const e of enemies) {
       expect(e.description, e.id).toMatch(/^[\x20-\x7e]+$/);
-      expect(['small', 'large', 'boss'].includes(e.size ?? 'small'), e.id).toBe(true);
+      expect(['small', 'large', 'huge', 'boss', 'titan'].includes(e.size ?? 'small'), e.id).toBe(true);
       expect(['melee', 'ranged']).toContain(e.attack);
     }
   });

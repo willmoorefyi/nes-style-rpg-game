@@ -49,10 +49,10 @@ export function lungeOvershoot(f: AnchoredFrames): number {
   return f.lungeRight === undefined ? 0 : Math.max(0, f.lungeRight - (f.opaqueRight ?? f.cell[0]));
 }
 
-/** The layout box of a sprite with art: its cell at the art's screen scale, with the home art's opaque extent
- *  (`ox0` inclusive, `ox1` exclusive, box px) when the atlas has it. */
+/** The layout box of a sprite with art: its cell at the art's screen scale (which the layout keeps whole), with the
+ *  home art's opaque extent (`ox0` inclusive, `ox1` exclusive, box px) when the atlas has it. */
 export function enemyBoxInput(size: EnemySizeClass, f: AnchoredFrames): EnemyBoxInput {
-  const box: EnemyBoxInput = { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale };
+  const box: EnemyBoxInput = { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale, scale: f.scale };
   if (f.homeX) { box.ox0 = f.homeX[0] * f.scale; box.ox1 = (f.homeX[1] + 1) * f.scale; }
   return box;
 }

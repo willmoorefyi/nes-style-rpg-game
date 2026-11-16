@@ -34,9 +34,9 @@ export function fill(data: BestiaryData, key: BestiaryTemplateKey, vars: Record<
   return data.templates[key].replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''));
 }
 
-/** Boss tag: boss phases, `size: boss`, or a scripted isBoss encounter names it. */
+/** Boss tag: boss phases, `size: boss` or `titan`, or a scripted isBoss encounter names it. */
 export function bossTag(enemy: EnemyData, habitats: readonly Habitat[] = []): boolean {
-  return (enemy.bossPhases?.length ?? 0) > 0 || enemy.size === 'boss' || habitats.some((h) => h.boss);
+  return (enemy.bossPhases?.length ?? 0) > 0 || enemy.size === 'boss' || enemy.size === 'titan' || habitats.some((h) => h.boss);
 }
 
 /** The bestiary number: the spec's `num`, else the 1-based place in enemies.yaml. */

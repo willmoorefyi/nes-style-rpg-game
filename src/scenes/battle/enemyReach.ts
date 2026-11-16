@@ -16,8 +16,8 @@ export const MAX_ENEMY_TRAVEL = 1500;
 export const MAX_ENEMY_RISE = 400;
 /** The lunge share of the contact frame (enemyAttackTables: the first `attack` frame). */
 export const CONTACT_LUNGE = 0.75;
-/** Travel hop per size class, px at scale factor 1. */
-export const TRAVEL_HOP: Record<EnemySizeClass, number> = { small: 10, large: 6, boss: 3 };
+/** Travel hop per size class, px at scale factor 1 (a titan attacks in place, docs/REDESIGN_PLAN.md 4.2). */
+export const TRAVEL_HOP: Record<EnemySizeClass, number> = { small: 10, large: 6, huge: 4, boss: 3, titan: 0 };
 /** The highest a travelling enemy's art may reach: 4 px under the message window. */
 export const TRAVEL_CLEAR_Y = BATTLE_MESSAGE_HEIGHT + 4;
 

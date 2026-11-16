@@ -90,7 +90,7 @@ function maxRoll(enc: EncounterFile): string[] {
 const monsterAtlas = JSON.parse(readFileSync(resolve(__dirname, '../../assets/sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number; sheets: Record<string, { cell: [number, number] }>;
 };
-const PLACEHOLDER_BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
+const PLACEHOLDER_BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 function enemyBox(id: string): EnemyBoxInput {
   const e = enemies.find((x) => x.id === id);
   const size = e?.size ?? 'small';

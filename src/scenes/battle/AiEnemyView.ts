@@ -21,7 +21,7 @@ export const pulseTintOf = (e: Pick<EnemyData, 'pulseTint'> | undefined): number
   e?.pulseTint ? parseInt(e.pulseTint.slice(1), 16) : HOLD_PULSE_TINT;
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
-const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, boss: 400 };
+const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
 
 /** Where monster frames come from (the shared atlas; tests inject their own). */
 export interface MonsterArtSource {
@@ -80,12 +80,13 @@ export class AiEnemyView {
     this.poses.playAttack(i, this.attackPlan(i, target));
   }
 
-  /** The travel to `target` (0 for a ranged enemy, a placeholder box or no target), measured from home. */
+  /** The travel to `target` (0 for a ranged enemy, a titan, a placeholder box or no target), measured from home. */
   attackPlan(i: number, target: Container | null): AttackPlan {
     const f = this.frames[i];
     const box = this.boxes[i];
     const b = this.base[i];
-    if (!target || !f || !box || !b || this.enemies[i]?.attack === 'ranged') return { travel: 0, rise: 0 };
+    const e = this.enemies[i];
+    if (!target || !f || !box || !b || e?.attack === 'ranged' || e?.size === 'titan') return { travel: 0, rise: 0 };
     const t = target.getBounds();
     // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions)
     const origin = target.parent?.worldTransform ?? { tx: 0, ty: 0 };

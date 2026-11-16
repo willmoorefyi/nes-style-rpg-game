@@ -22,7 +22,9 @@ import { BestiaryPreview, CachedArt, PREVIEW_INNER } from '../../../src/scenes/b
 import { BESTIARY_PLAIN, fitShift, panelCentre } from '../../../src/scenes/bestiary/bestiaryFit.js';
 import { validateBestiary } from '../../../src/core/bestiaryValidation.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, atlasArt, atlasFrames, enemyById, enemyData, idleBoxOf } from '../../helpers/atlasFrames.js';
+import { atlas, atlasArt, atlasFrames, enemyById, enemyData, frameBox, idleBoxOf } from '../../helpers/atlasFrames.js';
+import type { MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
+import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -107,5 +109,64 @@ describe('fitShift clamps', () => {
   it('without an idle box: the old placement (no centring, only the reach clamp)', () => {
     expect(fitShift({ footRow: 76 }, PREVIEW_INNER, { x: 0, y: 0, scale: 2, inPlaceRight: 980, limitRight: 970 }))
       .toEqual({ dx: -10, dy: 0, bound: ['reach'] });
+  });
+});
+
+/**
+ * TS-2 fixtures until FW-S and TS-3 land: the 22 tier-H sheets at their scale 3 (lungePx x 1.5, as BattleArt scales
+ * it) are centred and keep the 12d reach rule over a full loop; a titan of the C1 maximum (300 cell, feet row 292,
+ * idle 278 art px tall at scale 2) is clamped by the plain: feet at 770, 6 px above centre (REDESIGN_PLAN 4.2).
+ */
+describe('tier H and the titan in the bestiary (TS-2 fixtures)', () => {
+  const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
+    'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
+    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
+  const scaled = (sheet: string): MonsterFrames | null => {
+    const f = atlasFrames(sheet);
+    return f && TIER_H.includes(sheet) ? { ...f, scale: 3, artScale: 3, lungePx: (f.lungePx * 3) / 2 } : f;
+  };
+  const art: MonsterArtSource = { getMonsterFrames: scaled };
+
+  it.each(TIER_H)('%s at scale 3: centred within 1 px, every frame of a full loop <= the inner right - 8', (id) => {
+    const e = { ...enemyById(id), size: 'huge' as const };
+    const sheet = monsterSpriteKey(e);
+    const preview = new BestiaryPreview(new Container(), new CachedArt(art), never, data);
+    preview.show({ enemy: e, seen: true, hasSpells: false }, null);
+    preview.update(0);
+    const s = preview.enemySprite!;
+    expect(s.scale.x).toBe(3);
+    const [l, t, r, b] = idleBoxOf(sheet);
+    const g = s.getGlobalPosition();
+    expect(Math.abs(g.x + ((l + r + 1) / 2) * 3 - CX)).toBeLessThanOrEqual(1);
+    expect(Math.abs(g.y + ((t + b + 1) / 2) * 3 - CY)).toBeLessThanOrEqual(1);
+    expect(preview.lastFit!.bound).toEqual([]);
+    let attacks = 0;
+    let last = '';
+    let maxRight = -Infinity;
+    for (let k = 0; k < 3000 && attacks < 2; k++) {
+      preview.update(1);
+      const step = preview.loopStep;
+      if (step === 'attack' && last !== 'attack') attacks++;
+      last = step;
+      maxRight = Math.max(maxRight, s.getGlobalPosition().x + frameBox(sheet, preview.poses!.state(0).pose)[2] * 3);
+    }
+    expect(attacks).toBe(2);
+    expect(maxRight).toBeLessThanOrEqual(PREVIEW_INNER.right - 8);
+    preview.destroy();
+  });
+
+  it('a titan of the C1 maximum (278 art px) is clamped by the plain: feet at 770, shift -6', () => {
+    const base = atlasFrames('chaos')!;
+    const titan: MonsterFrames = { ...base, cell: [300, 300], footRow: 292, idleBox: [21, 15, 278, 292], opaqueRight: 279,
+      homeX: [21, 278], travelTop: 15, lungeRight: 280 };
+    const e = { ...enemyById('chaos'), size: 'titan' as const };
+    const preview = new BestiaryPreview(new Container(), new CachedArt({ getMonsterFrames: () => titan }), never, data);
+    preview.show({ enemy: e, seen: true, hasSpells: false }, null);
+    const g = preview.enemySprite!.getGlobalPosition();
+    expect(g.y + 293 * 2).toBe(BESTIARY_PLAIN.max);
+    expect(g.y + 15 * 2).toBeGreaterThanOrEqual(PREVIEW_INNER.top);
+    expect(g.y + ((15 + 293) / 2) * 2 - CY).toBe(-6);
+    expect(preview.lastFit!.bound).toEqual(['plain']);
+    preview.destroy();
   });
 });

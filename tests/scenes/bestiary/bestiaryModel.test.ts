@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import type { EnemyData } from '../../../src/types/index.js';
 import { validateBestiary } from '../../../src/core/bestiaryValidation.js';
-import { buildEntries, statLines, titleCount, elementSummary, COLUMN_CHARS, FULL_CHARS, STAT_LINES,
+import { bossTag, buildEntries, statLines, titleCount, elementSummary, COLUMN_CHARS, FULL_CHARS, STAT_LINES,
   type BestiaryEntry } from '../../../src/scenes/bestiary/bestiaryModel.js';
 import type { Habitat } from '../../../src/scenes/bestiary/bestiaryHabitats.js';
 import { statusChance, statusHits } from '../../../src/battle/DamageFormula.js';
@@ -196,5 +196,20 @@ describe('bestiary model: mode seen', () => {
     for (const e of entries) {
       for (const s of [e.label, titleCount(e, entries.length, data), ...flat(e)]) expect(s).toMatch(/^[\x20-\x7e]*$/);
     }
+  });
+});
+
+describe('bestiary model: the boss tag of the new size classes (TS-2, REDESIGN_PLAN 2.6 rev 11)', () => {
+  const chaos = enemies.find((e) => e.id === 'chaos')!;
+  it('chaos keeps its boss tag as a titan through its bossPhases', () => {
+    expect(chaos.bossPhases?.length).toBeGreaterThan(0);
+    expect(bossTag({ ...chaos, size: 'titan' })).toBe(true);
+  });
+  it('a titan without phases is still a boss; a huge sheet is not', () => {
+    expect(bossTag({ ...chaos, size: 'titan', bossPhases: undefined })).toBe(true);
+    expect(bossTag({ ...chaos, size: 'huge', bossPhases: undefined })).toBe(false);
+  });
+  it('the size labels name the new classes (D-V5)', () => {
+    expect([data.labels.sizes.huge, data.labels.sizes.titan]).toEqual(['Huge', 'Titan']);
   });
 });

@@ -27,6 +27,8 @@ export interface MonsterAtlasMeta {
   sheets: Record<string, MonsterAnchors & {
     /** Index into `pages` (0 when missing). */
     page?: number;
+    /** The sheet's own screen px per art px (FW-S: 3 for the rescaled sheets); missing: the atlas `scale`. */
+    scale?: number;
     cell: [number, number];
     footRow: number;
     floating: boolean;
@@ -175,10 +177,12 @@ export class BattleArt {
     const measured = entry.opaqueRight === undefined || !anchors.idleBox
       ? this.measureIdle(sprite, tex, entry.frames.idle, entry.cell, ts) : null;
     const idleBox = anchors.idleBox ?? measured ?? undefined;
-    const s = this.meta.scale;
+    // TS-2: the sheet's own screen scale (FW-S `scale: 3`, docs/REDESIGN_PLAN.md 2.4); its lunge (screen px at the
+    // atlas scale) is scaled here once, so the attack plan, the pose controller and the bestiary read the same value
+    const s = entry.scale ?? this.meta.scale;
     return { textures, idle: key('idle'), attack: key('attack'), cast: key('cast'), hurt: key('hurt'), scale: s,
       artScale: s / ts, cell: [w, h], footRow: entry.footRow, floating: entry.floating, hasCast: !!entry.frames.cast,
-      hasRaise: !!entry.frames.attack_raise, lungePx: lungePx(entry), anim: !!entry.anim,
+      hasRaise: !!entry.frames.attack_raise, lungePx: (lungePx(entry) * s) / this.meta.scale, anim: !!entry.anim,
       opaqueRight: entry.opaqueRight ?? (measured ? measured[2] + 1 : w),
       ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...anchors,
       ...(idleBox ? { idleBox } : {}) };

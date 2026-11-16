@@ -73,5 +73,11 @@ export function fadeTail(age: number, life: number, tail = 4): number {
 
 export const lerp = (a: number, b: number, u: number): number => a + (b - a) * u;
 
+/** The highest an effect point may be drawn, below the screen top: 4 px under the message window (TRAVEL_CLEAR_Y).
+ *  A tall box (tier H 384 px, the titan's 600) would put shard starts and spiral accents above it (REDESIGN_PLAN 2.5). */
+export const FX_CLEAR_TOP = 124;
+/** `y` kept at or below the clear top of the geometry's screen. */
+export const clampTop = (y: number, o: Pick<EmitterOptions, 'geom'>): number => Math.max(o.geom.screenTop + FX_CLEAR_TOP, y);
+
 
 export type Kind = (e: FxEffect, o: EmitterOptions, key: (glyph: string | undefined, ramp?: string) => string) => Emitter;

@@ -7,7 +7,7 @@
  * alpha is stepped (0, .25, .5, .75, 1) and every position is snapped to the 2-px grid by the renderer.
  */
 import type { FxEffect } from './fxDefs.js';
-import { anchor, fadeTail, lerp, stepAlpha, type EmitterOptions, type Emitter, type FxDraw, type Kind } from './emitterCore.js';
+import { anchor, clampTop, fadeTail, lerp, stepAlpha, type EmitterOptions, type Emitter, type FxDraw, type Kind } from './emitterCore.js';
 import { burst, beam, cone, projectile, chevrons } from './emittersMore.js';
 
 export * from './emitterCore.js';
@@ -62,7 +62,7 @@ const fall: Kind = (e, o, key) => {
   const main = key(e.glyph);
   const ps = Array.from({ length: n }, (_, i) => {
     const side = (i / Math.max(1, n - 1)) * 2 - 1;
-    return { x0: c.x + side * b.w * 0.7, y0: c.y - b.h * (0.9 + o.rng() * 0.4), birth: Math.round(i * 2 + o.rng() * 3),
+    return { x0: c.x + side * b.w * 0.7, y0: clampTop(c.y - b.h * (0.9 + o.rng() * 0.4), o), birth: Math.round(i * 2 + o.rng() * 3),
       x1: c.x + side * b.w * 0.12, y1: c.y + (o.rng() - 0.5) * b.h * 0.2, big: e.scale === 2 && i % 2 === 1 };
   });
   const arrive = e.impact - 1;
@@ -164,9 +164,19 @@ const orbit: Kind = (e, o, key) => {
 
 const KINDS: Record<FxEffect['kind'], Kind> = { rise, fall, bolt, ring, orbit, burst, beam, cone, projectile, chevrons };
 
-/** The emitter for one target of an effect. */
+/** Kinds that start at the screen top by design (a strike from the sky): not clamped. */
+const SKY_KINDS: ReadonlySet<FxEffect['kind']> = new Set(['bolt', 'beam']);
+
+/** The emitter for one target of an effect. On a sprite box every other kind's points stay under the message window
+ *  (clampTop); a cue at a point (an empty box: the glint at a weapon tip) is placed by its caller (glintTip). */
 export function createEmitter(e: FxEffect, o: EmitterOptions): Emitter {
   const key = (glyph: string | undefined, ramp?: string): string => `${glyph ?? 'spark'}.${ramp ?? e.ramp ?? 'holy'}`;
-  return KINDS[e.kind](e, o, key);
+  const emit = KINDS[e.kind](e, o, key);
+  if (SKY_KINDS.has(e.kind) || o.geom.target.h === 0) return emit;
+  return (t) => {
+    const f = emit(t);
+    for (const d of f.draws) d.y = clampTop(d.y, o);
+    return f;
+  };
 }
 

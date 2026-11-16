@@ -21,7 +21,7 @@ export const DEFAULT_BESTIARY: BestiaryData = {
     actions: 'Actions', spells: 'Spells', habitat: 'Habitat', none: 'None', unknown: '???', blank: '-', paused: 'Paused',
     noArt: 'No art yet', noData: 'No bestiary data', info: 'Info', specials: 'Specials', onHit: 'On hit',
     noDescription: 'No description yet',
-    sizes: { small: 'Small', large: 'Large', boss: 'Boss' },
+    sizes: { small: 'Small', large: 'Large', huge: 'Huge', boss: 'Boss', titan: 'Titan' },
     attackKinds: { melee: 'Melee', heavy: 'Melee (heavy)', ranged: 'Ranged' },
     anim: { attack: 'Attack', heavy: 'Attack (heavy)', ranged: 'Attack (ranged)', hurt: 'Hurt', cast: 'Cast', daze: 'Dazed' },
   },
