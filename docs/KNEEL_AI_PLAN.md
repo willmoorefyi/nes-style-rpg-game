@@ -1,12 +1,21 @@
-# AI kneel keyframe plan (pass KA), rev 3
+# AI kneel keyframe plan (pass KA), rev 4
 
-Status: rev 3, a plan only. It answers the narrow momus rejection of rev 2; the direction is unchanged. Nothing is
+Status: rev 4, a plan only. It answers the text-only momus rejection of rev 3; the direction is unchanged. Nothing is
 implemented. No paid or AI call was made to write it; the Bedrock facts in section 1 come from read-only listing calls.
 
 **User directive (2026-11-17):** "Use an AI image generation model to build the 'kneeling' frame for each sprite, and
 then use the rigging to let the sprites move between the two. The current approach of using rigging to move the
 sprites wastes a ton of compute and doesn't produce good results. Use one or more of the Stability AI models to
 transform each sprite into a 'kneeling, head down' pose."
+
+**Rev 4 changes (momus review of rev 3; text fixes):**
+
+| # | Finding | Resolution |
+|---|---|---|
+| r4-1 (P1) | The cut window was undefined: `pixelize` block-averages its whole input into `grid` (`pixelize.py:187-188`), so a non-square cell scaled unevenly, and steps 2 and 4 read as two scalings | `kneel_ai_guide.py` writes the guide window `{x0, y0, k*w, k*h}` into the guide json. Measurement, the width shrink and a <= 2 px height correction are one uniform scale on the full canvas. Then the window is cropped and `pixelize` is called once at `grid=(w, h)`, with no earlier resample. Arm (d) gets a k_d*w x k_d*h window on its figure base after its scale s. A **round-trip selftest** (idle x k -> guide placement -> cut, >= 99 % equal pixels) runs at 80x80, 110x80, 218x128 and hero cells (D-KA6) |
+| r4-2 (P1) | The head-colour region is not a head (cobra 73 px against a 23 px head part; rhyos 84 against 77) | A-scale moves to **J1**, measured on the marked head part (its bone, or the `part:label` mask polygon for a sub-part head). J0 keeps only a loose figure-area ratio (A-area), calibrated on idle-vs-hurt pairs and reported against the band. Arm (d) is scaled from figure height and the band midpoint and flagged for J1 A-scale |
+| r4-3 (P2) | K-height with a fixed k: white_mage's 3 px band (55-58) would fail every time | One uniform correction of up to 2 px inside the tolerance before K-height (D-KA6.4). The KNEEL_PLAN 4 per-class band override (section 13 entry) stays the route for a band that is systematically too narrow |
+| r4-4 (P3) | Calibration included non-approved hurts; the pixelize outline ring doubles an AI outline | Calibration excludes chimera and black_widow (FW-Q aliases), hollow_seraph (FW-H `hurt_from`) and any painted or offset `kf:hurt`; the list is pinned. A one-pass outline peel (D-KA6.6); A-outline also checks the thickness against the idle; K-height allows 1 px for any ring left; a doubled-ring fixture |
 
 **Rev 3 changes (momus review of rev 2):**
 
@@ -153,7 +162,7 @@ never confounded.
 - **Machine score:** for each output, after D-KA6, the **J0** checks of section 6 (no joints exist at the probe), plus
   the review agent's R1 (with counts), R2, R2b, R3 and R5. R4 is not scored: there is no in-between yet.
 - **`probe_sheet.png` goes to the user before any pick.** Rows are the sprites; the columns are idle, derived kneel,
-  G-sil, then (a), (b), (c), (d) x 2 seeds, and (b2), at native x4. The J0 and review verdicts, the A-scale and
+  G-sil, then (a), (b), (c), (d) x 2 seeds, and (b2), at native x4. The J0 and review verdicts, the A-area and
   A-width values and the IoU against the derived kneel are printed under each image.
 - **Pick rule:**
   1. The **user** names the primary arm and the fallback arm from (b), (b2), (c) and (d), and may fix the per-arm
@@ -191,25 +200,41 @@ never confounded.
   1. **Mask:** flood the key colour from the border at full resolution with `pixelize.flood_bg(rgb, tol)` (`tol` 40).
      The key is `{bg}`, so white-key sprites flood white. Keep the largest component, plus pieces inside its bounding
      box (the `_figure_mask` rule), and `keep_pieces: all_in_cell` sprites keep every piece.
-  2. **Scale:**
-     - Arms (a), (b), (b2), (c): the guide's k is known, so the raw is resampled to native by exactly 1 / k. No band
-       scaling; the band is only checked (K-height).
-     - Arm (d), which has no guide: one uniform Lanczos scale s at full resolution, set so the reference part (the
-       head-colour region, below) is as tall as in the idle. If no head region is found, s comes from the figure
-       height and the band midpoint, and is reported.
-  3. **Width rule:** if the figure is wider than the idle cell's width minus 2 px, shrink it uniformly at full
-     resolution, by at most **8 %**. Over 8 % is an **A-width FAIL**: the pose is too wide, so the sprite retries with
-     the compact wording. The cell is never widened, so atlas rects, anchors and pages stay as they are (page impact
-     0). Every shrunk id is listed as `width-limited` with its shrink % and shown at U1-KA.
-  4. **Pixelize:** `pixelize.pixelize(cell, mask, grid=(idle w, idle h), palette=<ndarray>, bottom_row=<foot row>)`.
-     The ndarray is N x 3 uint8 from `monster_keys.approved_palette` (heroes: `battle.png`'s colours), so every pixel
-     is an approved colour.
-  5. **Placement (the foot row):**
+  2. **The cut window, one scaling only.** `pixelize` block-averages its whole input into `grid`
+     (`pixelize.py:187-188`: `by, bx = h / gh, w / gw`). So the input must be **exactly k*w x k*h** for an even scale:
+     a full 1024x1024 canvas into a 110x80 grid would scale 1024/110 across and 1024/80 down.
+     - Arms (a), (b), (b2), (c): `kneel_ai_guide.py` writes the guide window `{x0, y0, w: k*w, h: k*h, k}` (the
+       cell's place on the canvas, ground row included) into the guide json. The cut reads it from there.
+     - Arm (d), which has no guide: measure the raw figure height H on the full canvas. Then s = (band midpoint x idle
+       height x k_d) / H, with k_d = floor(1024 / max(w, h)): one uniform Lanczos scale of the whole canvas by s. The
+       window is k_d*w x k_d*h, placed with its foot row on the figure's base row and its centre x on the base
+       centroid. These keys are **flagged** for the J1 A-scale check (section 6).
+  3. **Width rule (on the full canvas, before the crop):** measure the figure's width on the canvas. If it is more
+     than (w - 2) x k, shrink the whole canvas uniformly about the base centre by at most **8 %**, at full resolution.
+     Over 8 % is an **A-width FAIL**: the pose is too wide, so the sprite retries with the compact wording. The cell is
+     never widened, so atlas rects, anchors and pages stay as they are (page impact 0). Every shrunk id is listed as
+     `width-limited` with its shrink % and shown at U1-KA.
+  4. **Height correction (inside the tolerance only):** if the figure height on the canvas puts the native height up
+     to **2 px** outside the band (heroes: the class band, for example white_mage's 3 px band of 55-58), shrink or grow
+     the canvas uniformly about the base by that amount, once. More than 2 px outside is a K-height pose fail. A
+     per-class band override (KNEEL_PLAN 4, logged in section 13) stays the route for a band that is systematically
+     too narrow.
+  5. **Crop the window, then pixelize once:** `pixelize.pixelize(window, mask_window, grid=(w, h),
+     palette=<ndarray>, bottom_row=<foot row>)`, with **no earlier resample** (steps 2-4 are at most one combined
+     uniform canvas scale, done before the crop). The ndarray is N x 3 uint8 from `monster_keys.approved_palette`
+     (heroes: `battle.png`'s colours), so every pixel is an approved colour.
+  6. **Outline peel:** `pixelize` adds a 1 px outline ring (`pixelize.py:216-221`), so an AI output that already has a
+     black outline ends up 2 px thick and up to 2 px taller. Where the outer boundary pixel and the pixel inside it
+     are both the outline colour, and the idle's outline at that boundary is 1 px, the outer pixel is removed (one
+     pass). A-outline then checks the thickness (section 6).
+  7. **Placement (the foot row):**
      - grounded: the foot row is the idle's `bottom_row`, and the base centroid x sits on the idle's;
      - floaters and swimmers: the foot row is **the idle's lowest opaque row**, and the figure centroid x sits on the
        idle's. The guide has no sink; the only drop is the runtime `kneelSink` (D-K9).
-  6. A selftest pins the output size to the idle's `grid` for cells of 80x80, 110x80, 218x128 and the hero 80x80, and
-     pins the floater foot row.
+  8. **Round-trip selftest** (replaces the size-only test). For idle cells of 80x80, 110x80, 218x128 and the hero
+     80x80 (ready): upscale the idle by k with nearest neighbour, place it on the canvas the way the guide is placed,
+     run steps 1-7 with the guide window, and require **>= 99 %** of the cell's pixels (colour and alpha) to equal the
+     idle's. The output size is the idle's `grid`. The floater foot row is pinned the same way.
 - **D-KA7 Joints on the key: hand-marked** (as the approved hurt keys were).
   1. First guess (`kneel_ai_joints.py`): the template targets, then a one-pass per-part fit (dx, dy in [-4, 4];
      dtheta in {-10, -5, 0, 5, 10}).
@@ -245,7 +270,7 @@ never confounded.
 | `gen/selftest_colossus.py` `_pinned` (:135-141) | the pass-C pins read `bedrock_history[pass == "C"]` | +<= 6 |
 | `gen/selftest_colossus_up.py` (:59) | `rim_upscale` read from pass C in `bedrock_history` | +<= 3 |
 | `gen/kneel_ai.py` (new) | CLI: `guide`, `gen <id> --arm A --seed N [--paid]` (one call, or 2 for (c), per command), `cut`, `gate`, `joints`, `review`, `approve`, `converted [--check-archive]`, `bodies`, `calibrate`, `budget --check` | <= 250 |
-| `gen/kneel_ai_guide.py` (new) | D-KA1 / D-KA2 | <= 200 |
+| `gen/kneel_ai_guide.py` (new) | D-KA1 / D-KA2; writes the guide json with the window `{x0, y0, w, h, k}` (D-KA6.2) | <= 200 |
 | `gen/kneel_ai_cut.py` (new) | D-KA6 | <= 150 |
 | `gen/kneel_ai_gates.py` (new) | section 6 A-checks | <= 220 |
 | `gen/kneel_ai_joints.py` (new) | D-KA7 first guess and IoU | <= 150 |
@@ -258,7 +283,7 @@ never confounded.
 | `gen/retire_kneel.py` (new) | section 5 | <= 120 |
 | `gen/kneel_review.py` | probe sheet, compare sheet, side-by-side GIF | +<= 40 |
 | `gen/kneel_tools.py` | `coverage` in the G3 format | +<= 8 |
-| `gen/selftest_kneel_ai.py` (new) + 1 line in `selftest.py` | fake `invoke`; an approved key without `source: ai` changes nothing; `source: derived` byte-identical; request-body keys; the guides use no source pixels; failure fixtures (section 6); the cut sizes and the width rule (D-KA6.6); the floater foot row; every rig with a `kind: prop` or weapon-named part (`weapon\|sword\|axe\|club\|spear\|staff\|dagger\|blade\|mace\|hammer\|scythe\|trident\|whip\|bow\|rod`) has a `weapons` entry, and every rig has a `heads` entry (`[]` only with `heads_none`); retire_kneel (`<id>` and `--key`) | <= 250 |
+| `gen/selftest_kneel_ai.py` (new) + 1 line in `selftest.py` | fake `invoke`; an approved key without `source: ai` changes nothing; `source: derived` byte-identical; request-body keys; the guides use no source pixels; failure fixtures (section 6); the cut round trip (D-KA6.8), the width rule, the <= 2 px height correction and the outline peel; the calibration exclusion list; the floater foot row; every rig with a `kind: prop` or weapon-named part (`weapon\|sword\|axe\|club\|spear\|staff\|dagger\|blade\|mace\|hammer\|scythe\|trident\|whip\|bow\|rod`) has a `weapons` entry, and every rig has a `heads` entry (`[]` only with `heads_none`); retire_kneel (`<id>` and `--key`) | <= 250 |
 | `assets/data/debug-scenarios.yaml` | `ka_pilot` | data |
 | `src/` (TS) | **none** | 0 |
 
@@ -330,13 +355,13 @@ The automated checks come in two groups, by whether they need joints.
 | A-grey (raw) | <= 3 % of figure pixels with chroma C* < 6 and farther than dE 10 from every approved neutral |
 | A-hist | L1 between the kneel and idle colour-area histograms <= T_hist |
 | A-adj | Jaccard of the 4-adjacent colour-pair sets >= T_adj |
-| A-outline | boundary share in the outline colour >= the idle's - 0.08 |
+| A-outline | after the D-KA6.6 peel: boundary share in the outline colour >= the idle's - 0.08, **and** outline thickness (the median run of outline-colour pixels inward from the boundary, along 4-neighbour normals) <= the idle's median |
 | A-pieces | components <= the idle's (`keep_pieces` sprites <= +1); no detached pixels |
 | A-base | base (or, for floaters, figure) centroid x within +-0.10 x idle width |
-| A-scale | the reference part, the **head-colour region**, is within +-10 % of the idle's height. The region is the largest 8-connected component of the colours that make up >= 60 % of the idle's `heads` parts' pixels (from `kneel_ai.yaml`; rigs with `heads_none` use the largest feature-colour component). This needs no joints |
+| A-area (loose) | the figure's opaque pixel count / the idle's is in [T_area_lo, T_area_hi] (calibrated, below). It catches a grossly mis-scaled or fragmented key only. The value is also **reported** against the band's area expectation (band midpoint x idle area) |
 | A-width | the D-KA6 shrink <= 8 % |
 | K-ground, K-fit | existing (floaters: the lowest row = the idle's lowest opaque row) |
-| K-height | the body band (heroes: the class band); a FAIL is a pose fail |
+| K-height | the body band (heroes: the class band), after the D-KA6.4 correction (<= 2 px) and the D-KA6.6 peel; any ring the peel left is allowed for with +1 px. A FAIL is a pose fail |
 | R1 counts | from the review agent (below): weapons, hands, heads and eyes, key / idle |
 | A-agree (report) | guide-colour agreement, kept for the record only |
 | IoU-derived (report) | silhouette IoU against the derived kneel (mainline, or the untuned template derive), as evidence for R2b; no threshold |
@@ -349,10 +374,17 @@ The automated checks come in two groups, by whether they need joints.
 | A-prop | for each `weapons` part: alpha IoU (the idle part's pixels posed on the marked bone vs the key) >= T_prop_iou; pixels of that part's colours outside the fitted part, dilated by 2 px, <= T_outside x the idle part's pixel count (catches a 2nd weapon) |
 | A-headdup | the same for each `heads` part, with T_head_iou and T_head_outside (catches an extra head, as on rhyos) |
 | A-head | the marked crown or head joint is lower than the idle's by >= 0.15 x idle height |
+| A-scale | the **marked head part** (its bone from the joints; for a sub-part head such as rhyos `body:lion`, the `masks.<part>.kneel` polygon) is within **+-10 %** of the idle's head part in its larger dimension. This replaces rev 3's head-colour region, which tracks the pose rather than the scale (it measured 73 px against a 23 px head part on cobra, and 84 against 77 on rhyos). Arm (d) keys are flagged for it (D-KA6.2). Rigs with `heads_none` use their largest `weapons` or body part named in `kneel_ai.yaml` `scale_part` |
 
 **Calibration** (`kneel_ai.py calibrate`, KA0b, offline):
 
-- T_hist and T_adj: the 95th / 5th percentile over the approved idle-vs-hurt pairs (123 sheets plus 12 heroes).
+- **Excluded from every calibration:** hurt keys that are not approved art. These are the FW-Q aliased hurts
+  (chimera, black_widow) and the FW-H derived hurt (hollow_seraph, `hurt_from: idle`), plus any id whose
+  `kf:hurt` comes from keyframe paint or an offset. `calibrate` prints the excluded list, and a selftest pins it.
+- T_hist and T_adj: the 95th / 5th percentile over the remaining approved idle-vs-hurt pairs (heroes: ready vs
+  hurt).
+- T_area_lo / T_area_hi: the 1st / 99th percentile of hurt area / idle area over the same pairs, widened by the
+  band's ratio (x band lo, x band hi), since a kneel is lower than a hurt.
 - T_prop_iou / T_head_iou: the 5th percentile of the same measures on the approved **hurt keys**, posed by their
   marked hurt joints. T_outside / T_head_outside: the 95th percentile there.
 - T_pal: the hero `battle_raw.png` -> `battle.png` pairs.
@@ -363,7 +395,8 @@ The automated checks come in two groups, by whether they need joints.
     count in the reviewer dry run;
   - a warrior `ready` with a second sword and hand pasted (the R3 variant-B failure): A-prop (J1);
   - a wolf stretched to 112 % of its cell width: A-width;
-  - a goblin scaled to 125 %: A-scale;
+  - a goblin scaled to 125 % about its feet, marked with its scaled joints: A-scale (J1);
+  - a goblin with a doubled outer outline ring: A-outline thickness;
   - goblin with a foreign colour and a grey fill: A-pal / A-grey;
   - a 2 px lift: K-ground.
 
@@ -564,7 +597,7 @@ python3 -I assets-src/gen/colossus.py budget --check
 | **Palette breaks** | the snap makes a foreign colour impossible; A-pal rejects a raw too far off |
 | **Unpainted grey silhouette (arm b)** | A-grey; `change_strength` 0.8 / 0.9 at the probe |
 | **Variants** | the recoloured kneel key is now palette-checked (finding 14) |
-| **Size / width / anchor** | known-k downscale or reference-part scale; the compact wording; A-scale +-10 %; A-width <= 8 % shrink (the cell never widened, page impact 0), the width-limited list shown at U1-KA; A-base; floater y rule; K-anchor and G5 |
+| **Size / width / anchor** | one uniform canvas scale, then one pixelize of the guide window (round-trip selftest); the compact wording; A-area (J0) and A-scale +-10 % on the marked head (J1); A-width <= 8 % shrink (the cell never widened, page impact 0), the width-limited list shown at U1-KA; A-base; floater y rule; K-anchor and G5 |
 | **Atlas pages** | the cell count and sizes are unchanged, so the KNEEL_PLAN 1 projection holds (<= 12 pages); G5 |
 | **Hand-marking time** | the estimate of 15 agent-min per sprite is unmeasured; the pilot reports the median; stop rule over 30 min |
 | **A J1 failure after approval** | the key is archived (`retire_kneel.py --key`), and the sprite retries; it costs a try, not a gap in the game (the derived kneel or the alias stays live meanwhile) |
@@ -615,6 +648,7 @@ python3 -I assets-src/gen/colossus.py budget --check
 | 2026-11-17 | directive | an AI kneel key per sprite via Stability, with the rig doing the in-betweens (user) |
 | 2026-11-17 | rev 2 | momus rejection of rev 1 resolved (table at the top) |
 | 2026-11-17 | rev 3 | the narrow momus rejection of rev 2 resolved (table at the top) |
+| 2026-11-17 | rev 4 | the cut window, A-scale on the marked head, the height correction, calibration exclusions and the outline peel (table at the top) |
 
 ## TODOs
 
