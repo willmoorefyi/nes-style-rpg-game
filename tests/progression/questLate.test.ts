@@ -140,7 +140,9 @@ describe('questLate: the repository', () => {
   it('(d) Garland in his band; (e) and (f) wait for the towns', () => {
     for (const p of late) expect(p.failures, p.line).toEqual([]);
     expect(late[0].line).toMatch(/garland L2\.\d \[2,3\]/);
-    expect(late[1].line).toBe('(e) early shops: OK  (0 towns, 8 pending)');
+    // ERT-O: every town with a keeper on a built map is checked (the dwarf hall), the rest are pending
+    const built = ctx.world.quest.towns.filter((t) => t.status === 'built').length;
+    expect(late[1].line).toBe(`(e) early shops: OK  (${built} towns, ${8 - built} pending)`);
   });
 
   it('the price walls are exactly crescent and gaia (WORLD 3.5)', () => {

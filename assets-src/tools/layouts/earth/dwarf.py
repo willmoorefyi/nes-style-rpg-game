@@ -26,8 +26,9 @@ MATS = {"floor_stone": CAVE, "rubble": {**remap("cave", "temple_rubble"), "shade
         "in_wall_face": {**remap("cave", "temple_wall_face"), "shade": 1.1}, "floor": {"from": "floor", "shade": 0.8}}
 NOTE = ("Concept: the dwarves' hall hewn under the isthmus, a working mine town in one cave: a long hall, the forge, "
         "the drafting room and the store off its north wall.\n"
-        "Distinct: the canal plans spread on the drafting table where the foreman paces; the store sells across a "
-        "wall-to-wall counter cut from the living rock; ore carts and slag heaps line the hall's south wall.\n"
+        "Distinct: the canal plans spread on the drafting table where the foreman keeps watch over them; the store "
+        "sells across a wall-to-wall counter cut from the living rock; crates of ore stand along the hall's south "
+        "wall, with a heap of sorted ore and a slag pile at either end.\n"
         "Topology: one map, no stairs: overworld (ert_dwarf) -> hall -> forge | drafting room | store; exit south.")
 DWARF = "#b08860"                                        # the dwarves' ruddy tint on the human field sheets
 OPEN = "CANAL_OPEN"

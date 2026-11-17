@@ -16,6 +16,7 @@ import { closure, fail, result, without, type QuestContext } from './questProofs
 import { saturate } from './questSaturate.js';
 import { curveOf } from './questCurve.js';
 import { kitPrice, lateOf } from './questLateData.js';
+import { ancestorsOf } from './questData.js';
 
 export const WALL_SHARE = 0.4;
 export const BAND_GOLD_SHARE = 0.5;
@@ -48,7 +49,8 @@ export function proofEarlyShops(ctx: QuestContext): ProofResult {
     }
     for (const p of town.opensAfter) {
       const stage = ctx.world.stages.get(p);
-      if (!stage) continue;
+      // ERT-O: in --stage mode an ancestor's grants (the ship) are assumed at the entry and can't be withheld
+      if (!stage || (ctx.stage && ancestorsOf(ctx.world.stages, ctx.stage).has(p))) continue;
       const sat = saturate(ctx, ctx.start, without(ctx, stage), (s) => ids.some((id) => s.availableEver.has(id)));
       if (ids.some((id) => sat.availableEver.has(id))) {
         failures.push(fail('e', 'EARLY', `EARLY ${town.id} talkable before ${p}`, sat.path()));

@@ -17,8 +17,9 @@ from common import Room  # noqa: E402
 
 NOTE = ("Concept: a raw tunnel bored straight through the western range, two caverns joined by a gallery that "
         "narrows to a single throat where a hungry giant has wedged himself.\n"
-        "Distinct: the mouths open on the map's flanks, not a stair; the giant lies across the throat itself, so "
-        "the tunnel is shut by a body, not a door; a niche off the west gallery is where he squeezes in once fed.\n"
+        "Distinct: two caverns joined by a gallery that narrows to a one-cell throat; once fed, the giant sleeps on in "
+        "a niche off the west gallery (he is there, snoring, after TITAN_FED); a prospector camps by the east mouth; "
+        "a dead-end pocket with a chest off the west cavern.\n"
         "Topology: one map, no stairs: east mouth (ert_giant) -> east cavern -> throat (the giant) -> west gallery "
         "-> west cavern -> west mouth (ert_giant_west); a dead-end pocket with a chest off the west cavern.")
 NECK = [(15, 10), (16, 10)]                              # the throat: the only cells joining the two halves
@@ -55,6 +56,8 @@ def build() -> Path:
                            "The giant's nostrils flare. \"That smell... a fire-stone! Give it! GIVE IT!\""]},
                        {"text": ["A giant lies wedged in the throat of the tunnel like a stopper in a bottle.",
                                  "\"HUNGRY. Rock is cold. Rock is dull. Bring a stone that tastes of fire, then I move.\""]}]})
+    r.npcs.append({"id": "ert_giant_asleep", "sprite": "monk", "tint": "#8c7a62", "x": 14, "y": 6, "showIf": "TITAN_FED",
+                   "dialog": ["The giant is curled up in his niche, snoring like a rockslide. A red glow fades on his lips."]})
     r.npcs.append({"id": "ert_tunnel_prospector", "sprite": "farmer", "tint": "#b08860", "x": 27, "y": 9, "dialog": [
         {"condition": "TITAN_FED", "text": ["He's gone into his hole, snoring. The coast beyond the range is yours."]},
         {"text": ["Don't wake him, friend. He only eats stones, but he likes the burning kind best.",

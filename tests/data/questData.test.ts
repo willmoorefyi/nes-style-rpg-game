@@ -50,7 +50,7 @@ describe('quest.yaml', () => {
       else expect(['pending', 'built'], s.id).toContain(s.status);
     }
     expect(quest.stages.filter((s) => s.optional).map((s) => s.id).sort()).toEqual(['S19', 'S31']);
-    for (const t of quest.towns) expect(t.status).toBe('pending');
+    for (const t of quest.towns) expect(['pending', 'built'], t.id).toContain(t.status);   // ERT-O: the dwarf hall is built
   });
 
   it('every stage and town sits between its owner\'s anchors (S0 outside them)', () => {
