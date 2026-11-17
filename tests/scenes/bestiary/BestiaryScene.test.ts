@@ -88,6 +88,9 @@ const statsText = (scene: BestiaryScene): string => scene.stats!.shown.join('\n'
 const ORDER = read<Array<{ id: string; num: number; formOf?: string }>>('assets/data/enemies.yaml').filter((e) => !e.formOf)
   .sort((a, b) => a.num - b.num).map((e) => e.id);
 const place = (id: string): number => ORDER.indexOf(id);
+/** The list's length: ORDER plus one sub-entry per form art (CHAOS_FIX_PLAN 3: Chaos (Orrery), Chaos (Horizon); F4 is a page). */
+const LISTED = ORDER.length + new Set(read<Array<{ formOf?: string; colossus?: string }>>('assets/data/enemies.yaml')
+  .filter((e) => e.formOf).map((e) => e.colossus)).size;
 /** Down `n` times from the current entry. */
 const downs = (tap: (a: InputAction) => void, n: number): void => { for (let i = 0; i < n; i++) tap('down'); };
 const descendants = (c: Container): number => c.children.reduce((n, ch) => n + 1 + descendants(ch), 0);
@@ -114,7 +117,7 @@ describe('BestiaryScene', () => {
     await scene.enter();
     tap('right');
     expect(scene.selectedIndex).toBe(6);
-    const last = ORDER.length - 1;
+    const last = LISTED - 1;
     for (let i = 0; i < Math.ceil(last / 6); i++) tap('right');
     expect(scene.selectedIndex).toBe(last);
     tap('right');
@@ -177,7 +180,7 @@ describe('BestiaryScene', () => {
     await Promise.resolve();
     const before = descendants(scene.container);
     for (let walk = 0; walk < 2; walk++) {
-      for (let i = 0; i < ORDER.length; i++) { tap('down'); frame(PREVIEW_DEBOUNCE_FRAMES + 2); }
+      for (let i = 0; i < LISTED; i++) { tap('down'); frame(PREVIEW_DEBOUNCE_FRAMES + 2); }
       for (const r of requests) r.resolve(r.texture);
       await new Promise((res) => setTimeout(res, 0));
     }

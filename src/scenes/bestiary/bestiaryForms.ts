@@ -48,18 +48,37 @@ export function formPages(formId: string, enemies: readonly EnemyData[]): EnemyD
   return out;
 }
 
+/** One form as an entry under `root`: "<num> <name> (<title>)", or the unknown label while unseen in `mode: seen`. */
+function formEntry(root: BestiaryEntry, enemy: EnemyData, data: BestiaryData, isSeen: (id: string) => boolean,
+  title: (id: string) => string): BestiaryEntry {
+  const seen = data.mode === 'all' || isSeen(enemy.id);
+  const name = seen ? `${enemy.name} (${title(enemy.id)})` : data.labels.unknown;
+  return { id: enemy.id, enemy, index: root.index, seen, boss: seen && bossTag(enemy), habitats: root.habitats,
+    label: fill(data, 'entry', { num: root.label.split(' ')[0], name }) };
+}
+
 /** The sub-entries under a root entry: one per art form after the root, labelled "<num> <name> (<title>)". */
 export function formSubEntries(root: BestiaryEntry, enemies: readonly EnemyData[], data: BestiaryData,
   isSeen: (id: string) => boolean, title: (id: string) => string): BestiaryEntry[] {
   const chain = formChain(root.id, enemies);
-  const num = root.label.split(' ')[0];
-  const out: BestiaryEntry[] = [];
-  chain.forEach((enemy, k) => {
-    if (k === 0 || artOf(enemy) === artOf(chain[k - 1])) return;
-    const seen = data.mode === 'all' || isSeen(enemy.id);
-    const name = seen ? `${enemy.name} (${title(enemy.id)})` : data.labels.unknown;
-    out.push({ id: enemy.id, enemy, index: root.index, seen, boss: seen && bossTag(enemy), habitats: root.habitats,
-      label: fill(data, 'entry', { num, name }) });
-  });
-  return out;
+  return chain.filter((enemy, k) => k > 0 && artOf(enemy) !== artOf(chain[k - 1]))
+    .map((enemy) => formEntry(root, enemy, data, isSeen, title));
 }
+
+/**
+ * The scene's list (CHAOS_FIX_PLAN 3, C6-3): each root followed by its form sub-entries in chain order; an entry whose
+ * next data forms reuse its art (F4 on F3's colossus) carries them as `pages` ("128 Chaos (Core)"). Titles come from
+ * bestiary.yaml `formTitles` (missing: the id). A sub-entry shares its root's number and list place (D-C7-10).
+ */
+export function withFormSubEntries(entries: readonly BestiaryEntry[], enemies: readonly EnemyData[], data: BestiaryData,
+  isSeen: (id: string) => boolean): BestiaryEntry[] {
+  const title = (id: string): string => data.formTitles[id] ?? id;
+  const paged = (root: BestiaryEntry, e: BestiaryEntry): BestiaryEntry => {
+    const more = formPages(e.id, enemies).slice(1).map((f) => formEntry(root, f, data, isSeen, title));
+    return more.length > 0 ? { ...e, pages: more } : e;
+  };
+  return entries.flatMap((root) => [paged(root, root), ...formSubEntries(root, enemies, data, isSeen, title).map((s) => paged(root, s))]);
+}
+
+/** The title bar's total: the top-level entries only (127, not 129; D-C7-10). */
+export const listedCount = (entries: readonly BestiaryEntry[]): number => entries.filter((e) => formOfId(e.enemy) === null).length;

@@ -32,6 +32,7 @@ export const TEMPLATE_PLACEHOLDERS = {
   phaseHits: ['hits'],
   phaseAttack: ['attack'],
   phaseMessage: ['message'],
+  phaseForm: ['form'],
   habitatMain: ['map'],
   habitatZone: ['map', 'zones'],
   habitatBoss: ['map'],
@@ -81,6 +82,8 @@ export interface BestiaryData {
   spellNames: Record<string, string>;
   /** Special ability id -> display name (missing: the id, capitalised). */
   specialNames: Record<string, string>;
+  /** Form record id -> its title in the sub-entry and page labels ("Chaos (Orrery)"; missing: the id). */
+  formTitles: Record<string, string>;
   /** Enemy id -> lore pages (ASCII; a rematch shows its first battle's). */
   lore: Record<string, string[]>;
   help: string;
