@@ -161,7 +161,8 @@ def run_alias(check: Callable[[bool, str], None]) -> None:
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             frames, _, anim = MAT.sprite_frames(sid, meta, kfs)
-        lock = {n: C.frame_hash(f["img"]) for n, f in gh.items()}
+        from gen import monster_check as MC                # pass K: the lock holds kf:kneel too (goblin kneels)
+        lock = {n: C.frame_hash(a) for n, a in MC.lock_frames(gh, kfs, meta).items()}
         with tempfile.TemporaryDirectory() as d:
             lp = Path(d) / f"{sid}.lock.json"
             lp.write_text(json.dumps(lock))
