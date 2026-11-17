@@ -499,6 +499,406 @@
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # Each tranche adds its records only between its own pair of lines, so the merges never conflict. W1-F adds the key items and the late gear.
 # === W1-F (pass W: owned by W1-F) ===
+# Gear by band (docs/WORLD_PLAN.md 3.6; caps: weapon atk / body / shield / helm def). B3 Elfheim: 23 / 24 / 4 / 3
+- id: silver_armlet
+  name: Silver Armlet
+  description: "A silver band worn in place of armour. DEF 10, evade -1."
+  type: armor
+  stats:
+    defense: 10
+  price: 1200
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
+  slot: armor
+  weight: 1
+# B4 Melmond: 23 / 34 / 8 / 6
+- id: scimitar
+  name: Scimitar
+  description: "A curved desert blade. ATK 20, hit +5."
+  type: weapon
+  stats:
+    attack: 20
+  price: 3000
+  usableBy:
+  - warrior
+  - thief
+  - red_mage
+  hit: 5
+  crit: 10
+- id: gold_armlet
+  name: Gold Armlet
+  description: "A gold band set with wards. DEF 16, evade -1."
+  type: armor
+  stats:
+    defense: 16
+  price: 4000
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
+  slot: armor
+  weight: 1
+# B5 Crescent Lake: 26 / 34 / 8 / 6
+- id: falchion
+  name: Falchion
+  description: "A broad, quick blade. ATK 24, hit +10."
+  type: weapon
+  stats:
+    attack: 24
+  price: 8000
+  usableBy:
+  - warrior
+  - thief
+  - red_mage
+  hit: 10
+  crit: 14
+- id: cat_claw
+  name: Cat Claw
+  description: "Monk claws of tempered steel. ATK 22, hit +10."
+  type: weapon
+  stats:
+    attack: 22
+  price: 6500
+  usableBy:
+  - monk
+  hit: 10
+  crit: 16
+- id: wizard_staff
+  name: Wizard Staff
+  description: "A staff that hums with power. ATK 18, hit +5."
+  type: weapon
+  stats:
+    attack: 18
+  price: 5000
+  usableBy:
+  - black_mage
+  - red_mage
+  hit: 5
+  crit: 10
+- id: white_robe
+  name: White Robe
+  description: "A robe woven with white wards. DEF 24, evade -2."
+  type: armor
+  stats:
+    defense: 24
+  price: 9000
+  usableBy:
+  - white_mage
+  slot: armor
+  weight: 2
+- id: black_robe
+  name: Black Robe
+  description: "A robe woven with black wards. DEF 24, evade -2."
+  type: armor
+  stats:
+    defense: 24
+  price: 9000
+  usableBy:
+  - black_mage
+  slot: armor
+  weight: 2
+# B6 Onrac: 30 / 38 / 12 / 8
+- id: sun_blade
+  name: Sun Blade
+  description: "A blade that shines like noon. ATK 30, hit +10."
+  type: weapon
+  stats:
+    attack: 30
+  price: 15000
+  usableBy:
+  - warrior
+  - red_mage
+  hit: 10
+  crit: 16
+- id: thor_hammer
+  name: Thor Hammer
+  description: "A lightning hammer. ATK 24, hit +10."
+  type: weapon
+  stats:
+    attack: 24
+  price: 14000
+  usableBy:
+  - warrior
+  - white_mage
+  element: lightning
+  hit: 10
+  crit: 14
+- id: rune_knife
+  name: Rune Knife
+  plural: Rune Knives
+  description: "A knife cut with runes. ATK 26, hit +10."
+  type: weapon
+  stats:
+    attack: 26
+  price: 12000
+  usableBy:
+  - thief
+  - black_mage
+  - red_mage
+  hit: 10
+  crit: 18
+- id: opal_armor
+  name: Opal Armor
+  description: "Plate set with opals. DEF 38, heavy: evade -30."
+  type: armor
+  stats:
+    defense: 38
+  price: 20000
+  usableBy:
+  - warrior
+  slot: armor
+  weight: 30
+- id: opal_armlet
+  name: Opal Armlet
+  description: "An opal band of strong wards. DEF 22, evade -1."
+  type: armor
+  stats:
+    defense: 22
+  price: 15000
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
+  slot: armor
+  weight: 1
+- id: aegis_shield
+  name: Aegis Shield
+  description: "A shield of polished bronze. DEF 12."
+  type: armor
+  slot: shield
+  stats:
+    defense: 12
+  price: 16000
+  usableBy:
+  - warrior
+  weight: 0
+- id: opal_helm
+  name: Opal Helm
+  description: "A helmet set with opals. DEF 8, evade -3."
+  type: armor
+  slot: helmet
+  stats:
+    defense: 8
+  price: 9000
+  usableBy:
+  - warrior
+  weight: 3
+# B7 Gaia: 34 / 42 / 14 / 10
+- id: defender
+  name: Defender
+  description: "A guardian's sword. ATK 34, hit +10."
+  type: weapon
+  stats:
+    attack: 34
+  price: 30000
+  usableBy:
+  - warrior
+  - red_mage
+  hit: 10
+  crit: 18
+- id: vorpal_sword
+  name: Vorpal Sword
+  description: "A keen sword that finds the gaps. ATK 32, hit +10."
+  type: weapon
+  stats:
+    attack: 32
+  price: 28000
+  usableBy:
+  - warrior
+  - thief
+  hit: 10
+  crit: 24
+- id: dragon_claw
+  name: Dragon Claw
+  description: "Monk claws of dragon bone. ATK 30, hit +10."
+  type: weapon
+  stats:
+    attack: 30
+  price: 26000
+  usableBy:
+  - monk
+  hit: 10
+  crit: 20
+- id: diamond_armor
+  name: Diamond Armor
+  description: "Plate of diamond. DEF 40, heavy: evade -28."
+  type: armor
+  stats:
+    defense: 40
+  price: 40000
+  usableBy:
+  - warrior
+  slot: armor
+  weight: 28
+- id: diamond_armlet
+  name: Diamond Armlet
+  description: "A diamond band of great wards. DEF 30, evade -1."
+  type: armor
+  stats:
+    defense: 30
+  price: 30000
+  usableBy:
+  - warrior
+  - thief
+  - monk
+  - white_mage
+  - black_mage
+  - red_mage
+  slot: armor
+  weight: 1
+- id: diamond_shield
+  name: Diamond Shield
+  description: "A shield faced with diamond. DEF 14."
+  type: armor
+  slot: shield
+  stats:
+    defense: 14
+  price: 25000
+  usableBy:
+  - warrior
+  - red_mage
+  weight: 0
+- id: diamond_helm
+  name: Diamond Helm
+  description: "A helmet of diamond. DEF 10, evade -3."
+  type: armor
+  slot: helmet
+  stats:
+    defense: 10
+  price: 20000
+  usableBy:
+  - warrior
+  weight: 3
+# Found: the optional S31, Smyth forges the adamant (WORLD_PLAN 3.1, open question 8)
+- id: excalibur
+  name: Excalibur
+  description: "The holy sword, forged of adamant. ATK 45, hit +15."
+  type: weapon
+  stats:
+    attack: 45
+  price: 0
+  usableBy:
+  - warrior
+  element: holy
+  hit: 15
+  crit: 20
+# The key items of WORLD_PLAN 3.1 in stage order (lute and mystic_key are above)
+- id: crown
+  name: Crown
+  description: "A jewelled crown, stolen from a king."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: crystal_eye
+  name: Crystal Eye
+  description: "Matoya's eye of crystal. She is blind without it."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: herb
+  name: Herb
+  description: "A bitter herb from Matoya. It wakes a cursed sleeper."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: tnt
+  name: TNT
+  description: "A cask of blasting powder for the dwarves."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: ruby
+  name: Ruby
+  description: "A great red ruby. A hungry giant may want it."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: rod
+  name: Rod
+  description: "Sarda's rod. It can break the earth's seal."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: canoe
+  name: Canoe
+  description: "A light canoe for rivers and lakes."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: levistone
+  name: Levistone
+  description: "A stone that floats. It could lift a buried hull."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: ordeal_seal
+  name: Ordeal Seal
+  description: "Proof that you passed the Citadel of Trials."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: cube
+  name: Warp Cube
+  description: "A humming cube of old make. A tower will know it."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: fairy_bottle
+  name: Bottle
+  description: "A sealed bottle. Something small glows inside."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: oxyale
+  name: Oxyale
+  description: "Fairy air in a flask: breathe under the sea."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: slab
+  name: Slab
+  description: "A stone slab carved in the lost Lufenian script."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: chime
+  name: Chime
+  description: "A Lufenian bell. Its note opens the Mirage Tower."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
+- id: adamant
+  name: Adamant
+  description: "A lump of the hardest ore. A smith could forge it."
+  type: key
+  stats: {}
+  price: 0
+  usableBy: []
 # === end W1-F ===
 # === A1-O (pass W: owned by A1-O) ===
 # === end A1-O ===

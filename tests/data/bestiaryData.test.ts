@@ -13,7 +13,7 @@ import { placeholdersOf } from '../../src/core/bestiaryValidation.js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const read = <T>(f: string): T => parse(readFileSync(join(root, f), 'utf-8')) as T;
 interface RawBestiary {
-  habitats: { maps: string[]; zones: Record<string, string> };
+  habitats: { maps: string[] | 'manifest'; zones: Record<string, string> };
   backgrounds: { default: string; enemies: Record<string, string> };
   anim: { order: string[] };
   labels: Record<string, unknown>;
@@ -48,14 +48,19 @@ describe('bestiary.yaml', () => {
     }
   });
 
-  it('zone labels name encounterZones of scanned maps; every compiled map with encounters is scanned', () => {
-    const zoneIds = new Set(b.habitats.maps.flatMap((id) => (mapOf(id).encounterZones ?? []).map((z) => z.id)));
-    for (const k of Object.keys(b.habitats.zones)) expect(zoneIds.has(k), k).toBe(true);
+  it('zone labels name unnamed encounterZones of scanned maps; every compiled map with encounters is scanned', () => {
+    const scanned = b.habitats.maps === 'manifest' ? compiled : b.habitats.maps;
+    const unnamed = new Set(scanned.flatMap((id) => (mapOf(id).encounterZones ?? []).filter((z) => !z.name).map((z) => z.id)));
+    for (const k of Object.keys(b.habitats.zones)) expect(unnamed.has(k), k).toBe(true);
     for (const id of compiled) {
       const m = mapOf(id);
       const has = (m.encounters?.length ?? 0) > 0 || (m.encounterZones?.length ?? 0) > 0 || (m.scriptedEncounters?.length ?? 0) > 0;
-      if (has) expect(b.habitats.maps, id).toContain(id);
+      if (has) expect(scanned, id).toContain(id);
     }
+  });
+
+  it('QUEST 4.4: habitats come from the manifest, and a zone\'s own name is its label', () => {
+    expect(b.habitats.maps).toBe('manifest');
   });
 
   it('anim.order names only known steps', () => {

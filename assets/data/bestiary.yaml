@@ -4,7 +4,8 @@ mode: all                    # all | seen (seen: enemies not met yet list as "??
 order: data                  # data: by the spec number `num` (enemies.yaml order without one); hook for name | level later
 listRows: 6
 habitats:
-  maps: [overworld, temple-of-fiends]     # compiled map ids scanned (every map with encounters must be listed)
+  maps: manifest             # every compiled map of assets/maps/ai/index.yaml is scanned (QUEST_PLAN 4.4)
+  # labels of the zones with no `name` of their own; a zone's `name` is its habitat label (WORLD_PLAN 4.0.3)
   zones: {east_pocket: East pocket, temple_approach: Temple approach}
 backgrounds:
   default: grassland

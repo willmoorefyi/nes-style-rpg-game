@@ -1880,6 +1880,65 @@ world constants).
 <!-- === W1-E FOUNDATION (pass W: owned by W1-E) === -->
 <!-- === end W1-E === -->
 <!-- === W1-F FOUNDATION (pass W: owned by W1-F) === -->
+### W1-F result: items, kits, shops (branch `w-w1-f` from `mainline` f2f2383)
+
+No AI or paid calls.
+
+**Files:**
+
+- `items.yaml` (W1-F anchor, 38 records; 81 items in all): the 15 new key items of 3.1 (`crown`, `crystal_eye`,
+  `herb`, `tnt`, `ruby`, `rod`, `canoe`, `levistone`, `ordeal_seal`, `cube` "Warp Cube", `fairy_bottle` "Bottle",
+  `oxyale`, `slab`, `chime`, `adamant`; all `type: key`, price 0), `excalibur` (found, ATK 45, holy, warrior and so the
+  knight), and 22 band items: B3 `silver_armlet`; B4 `scimitar`, `gold_armlet`; B5 `falchion`, `cat_claw`,
+  `wizard_staff`, `white_robe`, `black_robe`; B6 `sun_blade`, `thor_hammer` (lightning), `rune_knife`, `opal_armor`,
+  `opal_armlet`, `aegis_shield`, `opal_helm`; B7 `defender`, `vorpal_sword`, `dragon_claw`, `diamond_armor`,
+  `diamond_armlet`, `diamond_shield`, `diamond_helm`. The armlets (body slot, every class) give the light classes a
+  body upgrade at the bands where they get no weapon.
+- `shops.yaml`: records `<town>_{weapon,armor,item,white,black,inn}` seeded inside each town owner's anchor (A1-T
+  `pravoka_*`, ELF-T `elfheim_*` moved with ids unchanged, ERT-O `dwarf_item`, ERT-T `melmond_*` moved with ids
+  unchanged and re-tiered to B4, FIR-T `crescent_*`, WAT-T `onrac_*`, WND-O `lufenia_{white,black,inn}`, WND-T
+  `gaia_*`), stocked per 3.6, inns at the band price.
+- `kits.yaml` (W1-F anchor): one tier per band town (`w_s1` B1, `w_pravoka`, `w_elfheim`, `w_melmond`, `w_crescent`,
+  `w_onrac`, `w_gaia`), every other `w_s<n>` and `w_dwarf` / `w_lufenia` a YAML alias of its tier (S2-S3 B2,
+  S4-S10 B3, S11-S13 B4, S14-S17 B5, S18-S22 B6, S23-S30 B7). From B6 on the kits also carry the 6 upgraded classes.
+  4-member gear price (W/T/WM/BM): 520 / 1725 / 12940 / 35040 / 60240 / 131240 / 259240 G.
+- `bestiary.yaml`: `habitats.maps: manifest` (every compiled map of `index.yaml` is scanned) and a zone's `name` is its
+  habitat label (`habitats.zones` stays the fallback for the act-1 zones). Code: `bestiaryHabitats.ts`
+  (`habitatMapIds`, `Habitat.zoneNames`), `BestiaryScene.ts` (+0 lines), `bestiaryValidation.ts`, `bestiaryData.ts`.
+- `tests/helpers/balanceData.ts`: `bossWinRate(ids, level, kit, policy, seeds, opts?)`, `floorRun(zoneTable, fights,
+  level, kit, opts?)` (both shares 0-1), `rollFrom`, `UPGRADED_PARTY`; `makeParty` takes any kit name.
+- `scripts/check-bounds.ts` (G9; not in `tsconfig` `include`, type-checked through its test).
+- Tests: `tests/data/gearBands.test.ts` (caps, upgrades per band, no early item, found gear unsold, the quest.yaml
+  kits, the key items), `tests/data/rosterCoverage.test.ts` (reports; `QUEST_STRICT=1` fails), `tests/scripts/
+  checkBounds.test.ts`; additions to `kitsYaml`, `bestiaryData`, `bestiaryHabitats`; the item count in
+  `descriptions.test.ts` (43 -> 81) and the shop plurals in `pickupText.test.ts`.
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/data/gearBands.test.ts tests/data/crossFileValidation.test.ts tests/scenes/MagicShopScene.test.ts` | all passed (gearBands 25 tests; RED-checked by a scratch shop edit: 4 failures) |
+| `npx vite-node scripts/check-bounds.ts "tests/balance/w_*.test.ts"` | `check-bounds: OK (0 tests)` |
+| `npm run build` | exit 0 |
+| `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 272 passed (272)`, `Tests 5370 passed (5370)` |
+
+`rosterCoverage` at W1: 106 of 127 enemies are in no stage roster yet (the regions' zones are empty).
+
+**Deviations:**
+
+- 3.6's magic levels L5 (black) to L8 are W1-G's spells, not on this branch: `crescent_black`, `onrac_*` and `gaia_*`
+  magic shops and `lufenia_white` / `_black` are seeded with empty inventories, and no kit holds those spells.
+  `crescent_white` sells the existing L5 `cure3` and `life`. After the W1-G merge the town owner (or INT) fills them;
+  `gearBands.test.ts` already checks their levels.
+- The shop records carry W1-F's tiered stock (not empty inventories), so `gearBands.test.ts`'s upgrade rule has data;
+  the town owners may change the stock within the test's rules.
+- The B4 weapon cap equals B3's (23), so Melmond's upgrades are armour (and the Scimitar for the Thief).
+- G9 under zsh: an unmatched `w_*.test.ts` glob is a shell error before the script runs; quote it (the script
+  expands it itself).
+
+**AGENTS.md delta (for INT):** "Data Files" gains `kits.yaml`'s `w_*` tiers and aliases; "Balance bounds" names
+`bossWinRate` / `floorRun` and `scripts/check-bounds.ts` (`(measured N)` tags, 3 points / 2 rounds, `invariant`
+exempt); the bestiary scans the manifest and uses `EncounterZone.name`.
 <!-- === end W1-F === -->
 <!-- === W1-G FOUNDATION (pass W: owned by W1-G) === -->
 <!-- === end W1-G === -->

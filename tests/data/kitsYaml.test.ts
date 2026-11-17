@@ -3,7 +3,7 @@
  * assets/data/kits.yaml. The old keys must equal the old literals, so the move is neutral; later tranches may add keys.
  */
 import { describe, it, expect } from 'vitest';
-import { FULL_KIT, KITS, START_KIT, makeMember } from '../helpers/balanceData.js';
+import { FULL_KIT, KITS, START_KIT, UPGRADED_PARTY, ZONE_TABLES, bossWinRate, floorRun, makeMember, makeParty } from '../helpers/balanceData.js';
 
 /** The literals balanceData.ts held before F0. */
 const OLD_START = {
@@ -39,5 +39,26 @@ describe('kits.yaml', () => {
     for (const [name, kit] of Object.entries(KITS)) {
       for (const [cls, k] of Object.entries(kit)) expect(() => makeMember(cls, 1, k), `${name}.${cls}`).not.toThrow();
     }
+  });
+});
+
+describe('pass W balance helpers (QUEST_PLAN 4.4: bossWinRate, floorRun)', () => {
+  it('bossWinRate: a share in [0, 1], seeded (the same call gives the same value), stronger kits win more', () => {
+    const a = bossWinRate(['garland'], 2, 'naked', 'sensible', 30);
+    expect(a).toBe(bossWinRate(['garland'], 2, 'naked', 'sensible', 30));
+    expect(bossWinRate(['garland'], 3, 'w_s1', 'sensible', 30)).toBeGreaterThan(a);
+    expect(bossWinRate(['goblin', 'goblin'], 30, 'w_s20', 'careless', 10, { comp: UPGRADED_PARTY })).toBe(1);
+  });
+
+  it('floorRun: the survival share of a run of fights with shared potions, fewer with more fights', () => {
+    const one = floorRun(ZONE_TABLES.temple, 1, 1, 'naked', { seeds: 40 });
+    const many = floorRun(ZONE_TABLES.temple, 8, 1, 'naked', { seeds: 40 });
+    expect(one).toBeGreaterThanOrEqual(many);
+    expect(floorRun(ZONE_TABLES.temple, 3, 20, 'w_s11', { seeds: 10 })).toBe(1);
+  });
+
+  it('the upgraded party equips the late kits', () => {
+    expect(makeParty(30, 'w_s28', true, UPGRADED_PARTY).map((c) => c.getEquipped('weapon')?.id))
+      .toEqual(['defender', 'vorpal_sword', 'thor_hammer', 'rune_knife']);
   });
 });

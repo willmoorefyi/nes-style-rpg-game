@@ -8,6 +8,7 @@ import { parse } from 'yaml';
 import { Character } from '../../src/entities/Character.js';
 import { slotOf } from '../../src/entities/EquipmentRules.js';
 import { EncounterTable } from '../../src/systems/EncounterTable.js';
+import { runBattle, mulberry32, type Policy } from './battlePolicies.js';
 import type { CharacterClassData, EncounterEntry, EnemyData, ItemData, MapData, ShopData, SpellData } from '../../src/types/index.js';
 
 const dataDir = resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/data');
@@ -73,8 +74,11 @@ export type KitName = 'start' | 'lv2' | 'arrive' | 'full' | 'naked';
  * spells per class only, so its every entry stays a class kit (the sandbox gives its levels their own `items`).
  */
 export const KIT_POTIONS: Record<KitName, number> = { start: 0, lv2: 2, arrive: 2, full: 3, naked: 0 };
-/** The plan's party (or `comp`) at `level` with a kit; careless play knows no spells (the simulation's rule). */
-export function makeParty(level: number, kit: KitName, withSpells: boolean, comp: string[] = PARTY): Character[] {
+/**
+ * The plan's party (or `comp`) at `level` with a kit (any kits.yaml name, e.g. `full` or a pass W `w_s5`); careless
+ * play knows no spells (the simulation's rule).
+ */
+export function makeParty(level: number, kit: KitName | string, withSpells: boolean, comp: string[] = PARTY): Character[] {
   return comp.map((cls, i) => {
     const k = KITS[kit]?.[cls];
     if (!k) throw new Error(`kits.yaml has no ${kit}.${cls}`);
@@ -108,7 +112,67 @@ export type Zone = keyof typeof ZONE_TABLES;
 
 /** A formation rolled by the real EncounterTable on the battle's RNG stream. */
 export function rollFormation(zone: Zone, rng: () => number): EnemyData[] {
-  const table = new EncounterTable(rng);
-  table.setEntries(ZONE_TABLES[zone]);
-  return table.selectEnemies().map(enemyCopy);
+  return rollFrom(ZONE_TABLES[zone], rng);
+}
+
+/** A formation rolled from any encounter table (e.g. a compiled zone's `encounters`) on the battle's RNG stream. */
+export function rollFrom(table: EncounterEntry[], rng: () => number): EnemyData[] {
+  const t = new EncounterTable(rng);
+  t.setEntries(table);
+  return t.selectEnemies().map(enemyCopy);
+}
+
+// ── pass W helpers (docs/QUEST_PLAN.md 4.4, 6.2, 6.3; docs/WORLD_PLAN.md 3.7) ──
+
+/** The upgraded party the boss tests use from S20 on (QUEST open question 3): Knight / Ninja / W.Wiz / B.Wiz. */
+export const UPGRADED_PARTY = ['knight', 'ninja', 'white_wizard', 'black_wizard'];
+
+export interface SimOptions {
+  /** The party's classes (default `PARTY`; `UPGRADED_PARTY` from S20 on). */
+  comp?: string[];
+  /** Potions the policy may use (default 3; a floor run shares them over its fights). */
+  potions?: number;
+  /** A boss form chain (`formChain`), for a fight with forms. */
+  forms?: EnemyData[];
+  /** Added to every seed, so two cases of one test need not share a stream. */
+  salt?: number;
+}
+
+const seedOf = (s: number, level: number, salt: number): number => s * 7919 + level * 131 + salt * 104729;
+
+/**
+ * The share (0-1) of `seeds` seeded battles that a party at `level` with the kits.yaml `kit` wins against the enemy
+ * `ids` (a fresh copy each), on the real `BattleStateMachine` with `policy` (QUEST 6.2: 400 seeds per policy).
+ */
+export function bossWinRate(ids: string[], level: number, kit: string, policy: Policy, seeds: number,
+  opts: SimOptions = {}): number {
+  let wins = 0;
+  for (let s = 1; s <= seeds; s++) {
+    const rng = mulberry32(seedOf(s, level, opts.salt ?? 0));
+    const party = makeParty(level, kit, policy !== 'careless', opts.comp);
+    const r = runBattle(party, ids.map(enemyCopy), SPELLS, policy, rng, { potions: { n: opts.potions ?? 3 }, forms: opts.forms });
+    if (r.outcome === 'victory') wins++;
+  }
+  return wins / seeds;
+}
+
+/**
+ * QUEST 6.3's floor run: the share (0-1) of `seeds` runs (default 200) in which a sensible party at `level` with `kit`
+ * survives `fights` battles in a row rolled from `zoneTable`, with no inn and the potions shared (default 3).
+ */
+export function floorRun(zoneTable: EncounterEntry[], fights: number, level: number, kit: string,
+  opts: SimOptions & { seeds?: number } = {}): number {
+  const seeds = opts.seeds ?? 200;
+  let survived = 0;
+  for (let s = 1; s <= seeds; s++) {
+    const rng = mulberry32(seedOf(s, level, (opts.salt ?? 0) + fights));
+    const party = makeParty(level, kit, true, opts.comp);
+    const shared = { n: opts.potions ?? 3 };
+    let alive = true;
+    for (let f = 0; f < fights && alive; f++) {
+      alive = runBattle(party, rollFrom(zoneTable, rng), SPELLS, 'sensible', rng, { potions: shared }).outcome === 'victory';
+    }
+    if (alive) survived++;
+  }
+  return survived / seeds;
 }

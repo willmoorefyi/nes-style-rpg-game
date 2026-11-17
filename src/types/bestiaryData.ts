@@ -51,9 +51,9 @@ export interface BestiaryData {
   order: 'data';
   listRows: number;
   habitats: {
-    /** Compiled map ids scanned for encounter tables. */
-    maps: string[];
-    /** Display names of encounterZones ids. */
+    /** Compiled map ids scanned for encounter tables; `manifest`: every id of assets/maps/ai/index.yaml (QUEST 4.4). */
+    maps: string[] | 'manifest';
+    /** Display names of encounterZones ids that have no `name` of their own (a zone's `name` wins). */
     zones: Record<string, string>;
   };
   backgrounds: {
