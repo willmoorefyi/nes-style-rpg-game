@@ -55,8 +55,11 @@ VARIANTS = {
     ("biped", "blade_planted"): {"down": {"tip": None}, "ground": {"tip": -3.0}},
     # K2-0 (garland): long legs: the hip goes back over the far knee so the planted near shin stands about
     # vertical, its knee bent forward (in the key and its in-betweens)
-    ("biped", "knee_forward"): {"knee_fwd": ["knee_n"], "free_in": ["foot_n"], "back": ("L_thigh", 1.05),
+    ("biped", "knee_forward"): {"knee_fwd": ["knee_n"], "free_in": ["foot_n"], "back": ("L_thigh", 0.8),
                                 "drop": ("L_thigh", 1.0), "fit": "ground"},
+    # K2-0 iteration 2 (garland), after knee_forward: the hips go further back (1.05 L_thigh) so a near knee pinned
+    # at the idle key (block `pins`) keeps its shin upright and its thigh level
+    ("biped", "knee_back"): {"back": ("L_thigh", 1.05)},
     # K2-0 iteration 2 (garland), with knee_forward: the far fist is not lowered, so the greatsword turns only a few
     # degrees to rest tip-down on the ground in front as a crutch; the far shin lies flat back along the ground with
     # the toes down; the ground line 2 px (per 80) low so the knee and the point touch the plain
@@ -89,9 +92,14 @@ VARIANTS = {
                          "pins": [], "down": {"tip": None},
                          "rel": {"chest": None, "crown": 14.0},
                          "lower": {"sh_f": ("L_neck", 0.12), "hand_f": ("L_neck", 0.15), "hand_n": None}},
-    # K2-0 (hydra), after crouch: a low body on stub legs sinks to the belly line (its feet planted, the knees and
-    # elbows folding by IK); no neck sag or snout turn: the rig's `aim` droops each neck to its own low place
-    ("quadruped", "settle"): {"drop": ("L_hindthigh", 0.85), "lower": {"chest": None}, "sag": None},
+    # K2-0 (hydra iteration 1), with crouch, a low body on stub legs: the legs stay where they stand (folding them
+    # smears them), the body, tail and necks sink between them by the belly's clearance (`slump`, no bone turns); no
+    # neck sag (three crossing neck chains tear when they turn), only the heads bow; the rig's tweaks lower the heads
+    ("quadruped", "settle"): {"slump": 0.08, "drop": None, "lower": {"chest": None}, "sag": None,
+                              "rel": {"snout": 12.0}},
+    # K2-0 iteration 2 (hydra), after crouch instead of settle: the low body sinks to the belly line with its feet
+    # planted (the knees and elbows folding by IK); no neck sag: the rig's `turn` droops each neck its own way
+    ("quadruped", "settle2"): {"drop": ("L_hindthigh", 0.85), "lower": {"chest": None}, "sag": None},
 }
 
 

@@ -157,7 +157,7 @@ paint:                         # atk_wind1: the left head's chin line over the m
 # apart: the right head's chin down by the forefoot, the top head bowed 15 px lower, the left neck slumped back over
 # the tail; each head in its own place with background between them
 kneel:
-  variant: [crouch, settle, multihead]
+  variant: [crouch, settle2, multihead]
   tweaks: {neck: [2, 6], head: [3, 8], snout: [3, 8], neck2: [-1, 5], head2: [-3, 10], snout2: [-3, 10]}
   turn: {neck: 6, head: 14, snout: 28, neck2: 12, head2: 13, snout2: 16, neck3: -23, head3: 24, snout3: 24}
   paint:

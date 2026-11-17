@@ -334,7 +334,7 @@ paint:
 # shin flat behind; the near foot planted with the shin upright and the knee forward; the greatsword at its idle angle
 # planted tip-down in front, drawn behind the near leg; the cape carried down with the shoulders, its hem on the plain
 kneel:
-  variant: [knee_forward, blade_kept, deep_bow]
+  variant: [knee_forward, knee_back, blade_kept, deep_bow]
   pins: [ci_1, knee_n]
   tweaks: {ci_0: [20, 0], ci_m: [22, -14], tip: [6, 22]}
   erase:                       # the cape seen between the legs and right of the near leg: it would tear into shards
