@@ -1,0 +1,12 @@
+# RED for (c): a thief in town trades the key away for a trinket; after that the gate never opens again.
+extends: clean
+items:
+  - {id: key1, type: key}
+  - {id: orb, type: key, consumed: true}
+  - {id: trinket, type: key}
+maps:
+  - id: town
+    npcs:
+      - {id: elder, x: 1, y: 1, dialog: ["Take this key."], giftItem: key1, giftFlag: ELDER_GIFT}
+      - {id: sage, x: 4, y: 1, showIf: BOSS_DONE, cutscene: {id: crystal_scene, requiredFlag: BOSS_DONE, onceFlag: CAVE_LIT}}
+      - {id: thief, x: 4, y: 3, dialog: ["A fine key. Mine now."], requiredItem: key1, takeItem: true, giftItem: trinket, giftFlag: THIEF_DEAL}

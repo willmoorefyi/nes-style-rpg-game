@@ -1,0 +1,5 @@
+# RED for (b): the gate is gone, so the ogre (S1's boss) is reachable without S0's key1.
+extends: clean
+maps:
+  - id: overworld
+    keyItemGates: []

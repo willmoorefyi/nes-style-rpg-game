@@ -1,0 +1,16 @@
+# RED for (a): S0 also grants the relic, which a priest gives only once the cave is lit, so S1's grants hold before
+# S0 completes (the order is not a linear extension of `after`).
+extends: clean
+items:
+  - {id: key1, type: key}
+  - {id: orb, type: key, consumed: true}
+  - {id: relic, type: key}
+quest:
+  stages:
+    - {id: S0, grants: {items: [key1, relic]}}
+maps:
+  - id: town
+    npcs:
+      - {id: elder, x: 1, y: 1, dialog: ["Take this key."], giftItem: key1, giftFlag: ELDER_GIFT}
+      - {id: sage, x: 4, y: 1, showIf: BOSS_DONE, cutscene: {id: crystal_scene, requiredFlag: BOSS_DONE, onceFlag: CAVE_LIT}}
+      - {id: priest, x: 4, y: 3, showIf: CAVE_LIT, dialog: ["A relic for you."], giftItem: relic, giftFlag: GOT_RELIC}

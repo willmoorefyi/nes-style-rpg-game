@@ -1,0 +1,6 @@
+# RED for (c): a door in the cave waits on a flag nothing ever sets.
+extends: clean
+maps:
+  - id: cave
+    keyItemGates:
+      - {x: 1, y: 2, requiredFlag: NEVER_SET, message: "Sealed.", permanent: false}

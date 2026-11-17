@@ -1,0 +1,5 @@
+# RED for (a): the goal stage S2 also comes after the optional S3, so the optional stage is required.
+extends: clean
+quest:
+  stages:
+    - {id: S2, after: [S1, S3]}

@@ -1,0 +1,7 @@
+# RED for (b): the sage lights the cave without the ogre, so the milestone CAVE_LIT comes without BOSS_DONE.
+extends: clean
+maps:
+  - id: town
+    npcs:
+      - {id: elder, x: 1, y: 1, dialog: ["Take this key."], giftItem: key1, giftFlag: ELDER_GIFT}
+      - {id: sage, x: 4, y: 1, cutscene: {id: crystal_scene, onceFlag: CAVE_LIT}}

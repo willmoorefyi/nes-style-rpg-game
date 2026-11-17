@@ -1,0 +1,5 @@
+# RED for (a): S1's declared walk names a step that does not exist.
+extends: clean
+quest:
+  stages:
+    - {id: S1, walk: [overworld:warp:cave, cave:battle:boss, cave:npc:hermit]}

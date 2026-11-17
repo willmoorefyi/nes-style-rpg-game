@@ -1,0 +1,97 @@
+# The clean fixture: every proof (a)-(c) passes on it. A town, a world map and a cave.
+# S0 (built): the elder in town gives key1. S1 (built): key1 opens the world map's gate to the cave; the ogre there
+# (assumed won) gives the orb and warps the party home; then the sage lights the cave (milestones BOSS_DONE ->
+# CAVE_LIT). S2 (pending) consumes the orb and grants the goal. S3 is declared optional; S4 is optional by derivation
+# (off the goal's path, only the optional S5 depends on it), like S18 in quest.yaml.
+start: {map: town, x: 2, y: 2}
+worldMap: overworld
+items:
+  - {id: key1, type: key}
+  - {id: orb, type: key, consumed: true}
+  - {id: potion, type: consumable}
+cutscenes:
+  - id: boss_won
+    steps:
+      - {type: dialog, text: "The ogre falls."}
+      - {type: give_item, item: orb}
+      - {type: warp, map: town, entrance: gate}
+  - id: crystal_scene
+    steps:
+      - {type: set_flag, flag: CAVE_LIT}
+quest:
+  goal: GOAL_DONE
+  stages:
+    - id: S0
+      tranche: "-"
+      grants: {items: [key1]}
+      maps: [town]
+      status: built
+    - id: S1
+      tranche: T1
+      after: [S0]
+      requires: {items: [key1]}
+      grants: {flags: [BOSS_DONE, CAVE_LIT], items: [orb]}
+      boss: [ogre]
+      maps: [cave]
+      milestones: [BOSS_DONE, CAVE_LIT]
+      walk: [overworld:warp:cave, cave:battle:boss, town:npc:sage]
+      status: built
+    - id: S2
+      after: [S1]
+      requires: {items: [orb]}
+      grants: {flags: [GOAL_DONE]}
+    - id: S3
+      after: [S1]
+      grants: {flags: [SIDE_DONE]}
+      optional: true
+    - id: S4
+      after: [S1]
+      grants: {flags: [EXTRA_DONE]}
+    - id: S5
+      after: [S4]
+      requires: {flags: [EXTRA_DONE]}
+      grants: {flags: [EXTRA2_DONE]}
+      optional: true
+  towns:
+    - {id: hamlet, owner: T1, maps: [town], opensAfter: [S0], bandStage: S1, kit: k_hamlet, status: pending}
+maps:
+  - id: overworld
+    grid:
+      - "############"
+      - "#..........#"
+      - "############"
+    entrances: {town: [2, 1], cave: [9, 1]}
+    transitions:
+      - {x: 1, y: 1, targetMap: town, targetEntrance: gate}
+      - {x: 10, y: 1, targetMap: cave, targetEntrance: entry}
+    keyItemGates:
+      - {x: 6, y: 1, requiredItem: key1, message: "The gate is locked.", permanent: false}
+  - id: town
+    grid:
+      - "######"
+      - "#....#"
+      - "#....#"
+      - "#....#"
+      - "###.##"
+    entrances: {gate: [3, 3]}
+    transitions:
+      - {x: 3, y: 4, targetMap: overworld, targetEntrance: town}
+    npcs:
+      - {id: elder, x: 1, y: 1, dialog: ["Take this key."], giftItem: key1, giftFlag: ELDER_GIFT}
+      - {id: sage, x: 4, y: 1, showIf: BOSS_DONE, cutscene: {id: crystal_scene, requiredFlag: BOSS_DONE, onceFlag: CAVE_LIT}}
+      - {id: merchant, x: 1, y: 3, shopId: hamlet_items}
+      - {id: chest_potion, x: 4, y: 3, sprite: chest, chestItem: potion, chestFlag: CHEST_T1_POTION}
+  - id: cave
+    grid:
+      - "######"
+      - "#....#"
+      - "#....#"
+      - "#....#"
+      - "###.##"
+    entrances: {entry: [3, 3]}
+    transitions:
+      - {x: 3, y: 4, targetMap: overworld, targetEntrance: cave}
+    npcs:
+      - {id: boss, x: 3, y: 1, sprite: ogre}
+    scriptedEncounters:
+      - {x: 3, y: 1, npc: boss, enemyIds: [ogre], flag: BOSS_DONE, isBoss: true, postVictoryCutscene: boss_won}

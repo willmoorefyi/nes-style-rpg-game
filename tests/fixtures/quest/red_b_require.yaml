@@ -1,0 +1,22 @@
+# RED for (b): S1 declares a requirement (the greeter's blessing) that its content does not need.
+extends: clean
+cutscenes:
+  - id: boss_won
+    steps:
+      - {type: give_item, item: orb}
+      - {type: warp, map: town, entrance: gate}
+  - id: crystal_scene
+    steps:
+      - {type: set_flag, flag: CAVE_LIT}
+  - id: blessing
+    steps:
+      - {type: set_flag, flag: BLESSED}
+quest:
+  stages:
+    - {id: S1, requires: {items: [key1], flags: [BLESSED]}}
+maps:
+  - id: town
+    npcs:
+      - {id: elder, x: 1, y: 1, dialog: ["Take this key."], giftItem: key1, giftFlag: ELDER_GIFT}
+      - {id: sage, x: 4, y: 1, showIf: BOSS_DONE, cutscene: {id: crystal_scene, requiredFlag: BOSS_DONE, onceFlag: CAVE_LIT}}
+      - {id: greeter, x: 4, y: 3, cutscene: {id: blessing, onceFlag: BLESSED}}
