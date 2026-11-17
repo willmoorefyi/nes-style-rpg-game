@@ -3,7 +3,8 @@
 Every table entry has a weight and exactly one of `enemies` (ids) or `groups` ({id, min, max?} with
 0 <= min <= max); a formation's largest roll is at most MAX_FORMATION enemies; every id is in
 assets/data/enemies.yaml. A zone has a unique id, inclusive [x0, y0, x1, y1] rects inside the map that cover at
-least one walkable cell, its own table and an optional encounterRate.
+least one walkable cell (unless its `modes` leave out walking: a ship or canoe zone), its own table and an
+optional encounterRate, `modes` and bestiary `name` (pass W).
 """
 from __future__ import annotations
 
@@ -17,6 +18,9 @@ from map_graph import walkable
 
 MAX_FORMATION = 9                                   # EncounterTable.MAX_FORMATION (src/systems/EncounterTable.ts)
 ENEMIES_FILE = Path(__file__).resolve().parents[2] / "assets" / "data" / "enemies.yaml"
+# pass W (QUEST 3.4, WORLD 4.0.3; types/quest.ts EncounterZoneQuestFields): `modes` and the bestiary `name`
+ZONE_KEYS = {"id", "rects", "encounters", "encounterRate", "modes", "name"}
+FIELD_MODES = ("walking", "canoe", "ship", "airship")
 
 
 @lru_cache(maxsize=1)
@@ -95,8 +99,14 @@ def encounter_errors(src: dict, c) -> list[str]:
         if z["id"] in ids:
             errors.append(f"{p}: duplicate zone id")
         ids.add(z["id"])
-        if set(z) - {"id", "rects", "encounters", "encounterRate"}:
-            errors.append(f"{p}: unknown keys {sorted(set(z) - {'id', 'rects', 'encounters', 'encounterRate'})}")
+        if set(z) - ZONE_KEYS:
+            errors.append(f"{p}: unknown keys {sorted(set(z) - ZONE_KEYS)}")
+        modes = z.get("modes", ["walking", "canoe"])
+        if not (isinstance(modes, list) and modes and set(modes) <= set(FIELD_MODES)):
+            errors.append(f"{p}: modes must be a non-empty list of {', '.join(FIELD_MODES)}")
+            modes = []
+        if "name" in z and not (isinstance(z["name"], str) and z["name"]):
+            errors.append(f"{p}: name must be a non-empty string")
         rects = z.get("rects")
         if not isinstance(rects, list) or not rects:
             errors.append(f"{p}: rects must be a non-empty list of [x0, y0, x1, y1]")
@@ -111,7 +121,7 @@ def encounter_errors(src: dict, c) -> list[str]:
                 errors.append(f"{p}.rects[{j}]: {r} is not an inclusive rect inside the {c.width}x{c.height} map")
                 continue
             walk += sum(walkable(c.collision, x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1))
-        if rects and not walk:
+        if rects and not walk and "walking" in modes:      # a ship or canoe zone covers water, not land
             errors.append(f"{p}: covers no walkable cell")
         errors += table_errors(f"{p}.encounters", z.get("encounters"), enemies)
         rate = z.get("encounterRate")
