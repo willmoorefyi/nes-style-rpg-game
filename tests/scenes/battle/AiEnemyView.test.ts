@@ -84,20 +84,23 @@ describe('AiEnemyView frames, freeze (D6) and scale', () => {
     expect((sprites[0] as Sprite).texture).toBe(textures.atk_wind1);
   });
 
-  it('pass F 5a: a sleeping or stunned enemy sways daze / daze_b (old: idle), recoils when hit and returns to daze', () => {
-    const { view, sprites, textures } = stage(1);
+  it('pass K: a sleeping or stunned enemy kneels (in 8 frames, then kneel / kneel_b; old: the daze sway) and a hit shakes the kneel', () => {
     for (const status of ['sleep', 'stun']) {
+      const { view, sprites, textures } = stage(1);
+      view.update(0, sprites);
+      const home = sprites[0].x;
       const dazed = [postureOf([status], VISUALS)];
       expect(dazed[0]).toBe('daze');
-      const seen = new Set<Texture>();
-      for (let t = 0; t < 100; t++) { view.update(1, sprites, dazed); seen.add((sprites[0] as Sprite).texture); }
-      expect([...seen].sort()).toEqual([textures.daze, textures.daze_b].sort());
-      expect(seen.has(textures.idle)).toBe(false);
+      const seen: Texture[] = [];
+      for (let t = 0; t < 100; t++) { view.update(1, sprites, dazed); seen.push((sprites[0] as Sprite).texture); }
+      expect(seen.slice(0, 7)).toEqual([...Array(3).fill(textures.kneel_in1), ...Array(4).fill(textures.kneel_in2)]);
+      expect(new Set(seen.slice(7))).toEqual(new Set([textures.kneel, textures.kneel_b]));
       view.poses.playHurt(0);
       view.update(1, sprites, dazed);
-      expect((sprites[0] as Sprite).texture).toBe(textures.hurt_in1);
+      expect([textures.kneel, textures.kneel_b]).toContain((sprites[0] as Sprite).texture);   // no hurt frames
+      expect(Math.abs(sprites[0].x - home)).toBe(3);
       for (let t = 0; t < HURT_FRAMES; t++) view.update(1, sprites, dazed);
-      expect([textures.daze, textures.daze_b]).toContain((sprites[0] as Sprite).texture);
+      expect(sprites[0].x).toBe(home);
     }
   });
 

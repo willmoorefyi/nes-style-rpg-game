@@ -15,10 +15,11 @@ import { BattleLayers } from './BattleLayers.js';
 import { setTint } from './actorTint.js';
 import { applyHolds, captureState, type PresentHold, type PresentedState } from './presentedState.js';
 import { trembleDx, type Posture } from './enemyChoreography.js';
-import { postureOf, type StatusVisuals } from './fx/statusRules.js';
+import { postureOf, trembleOn, trembles, withKneel, type StatusVisuals } from './fx/statusRules.js';
 import { stoneTextures } from './fx/stoneTextures.js';
+import { PartyKneel, hpLosses } from './partyPose.js';
+import { REST_TEXTURES } from './ActiveHeroMarker.js';
 
-const HURT_FRAMES = 24;
 const PLACEHOLDER_DEAD_TINT = 0x666666;
 export { PARTY_FEET_Y, PARTY_X, partySpritePosition } from './partySprites.js';
 
@@ -34,7 +35,10 @@ export class BattleDisplayManager {
   private poseOverride = new Map<number, BattlePose>();
   /** Frames elapsed, for the breathing idle (attackChoreography.idlePose). */
   private idleClock = 0;
-  private hurtTimers = new Map<number, number>();
+  /** Pass K (docs/KNEEL_PLAN.md D-K2): the kneel tracks, the override's rise, the hurt flash and the kneeler's shake. */
+  private readonly kneel = new PartyKneel();
+  /** The dev `?kneel=` preview: true forces a kneel on that actor (kneelPreview.ts). */
+  kneelForce: ((side: 'party' | 'enemy', i: number) => boolean) | null = null;
   private victory = false;
   /** BA-8: the compact party HP panel in the bottom strip (replaces the four status boxes). */
   readonly partyPanel: BattlePartyPanel;
@@ -78,7 +82,12 @@ export class BattleDisplayManager {
 
   /** Take the live hp and statuses as the presented state (an action's impact, statusFx.sync, round resolution). */
   capturePresented(): void {
+    const before = this.presented;
     this.presented = applyHolds(captureState(this.battle), this.holds);
+    // D-K17: an HP loss presented with no hit (the end-of-turn poison line) shakes a kneeler or an override pose
+    for (const i of hpLosses(before.party, this.presented.party)) this.kneel.hit(i, false);
+    const poses = this.enemyView?.poses;
+    for (const i of hpLosses(before.enemies, this.presented.enemies)) if (!this.colossus.has(i) && poses?.kneeling(i)) poses.playHurt(i);
   }
 
   createEnemySprites(): void {
@@ -141,9 +150,15 @@ export class BattleDisplayManager {
     this.refreshPoses();
   }
 
-  /** Brief recoil when a party member takes damage. */
+  /** D-K3: the member's current action rises from an acting kneel (the choreography holds its motion for 6 frames). */
+  isRising(sprite: Container | null): boolean {
+    const i = sprite ? this.partySprites.indexOf(sprite) : -1;
+    return i >= 0 && this.kneel.isRising(i);
+  }
+
+  /** Brief recoil when a party member takes damage (a kneeler shakes instead). */
   flashHurt(partyIndex: number): void {
-    this.hurtTimers.set(partyIndex, HURT_FRAMES);
+    this.kneel.hit(partyIndex);
     this.refreshPoses();
   }
 
@@ -154,46 +169,48 @@ export class BattleDisplayManager {
 
   update(dt: number): void {
     const visuals = this.statusVisuals();
-    this.enemyView?.update(dt, this.colossus.atlasSprites(this.enemySprites), this.battle.allEnemies.map((_, i) => postureOf(this.presented.enemies[i]?.statuses ?? [], visuals)));
+    const st = this.battle.allEnemies.map((_, i) => this.presented.enemies[i]?.statuses ?? []);
+    this.enemyView?.update(dt, this.colossus.atlasSprites(this.enemySprites), st.map((s, i) => this.forced('enemy', i, postureOf(s, visuals))),
+      st.map((s) => trembles(s, visuals)));
     this.colossus.update(dt);
-    const before = this.idleClock;
     this.idleClock += dt;
-    // fear: ±1 px through the pivot, so the position (lunge step, active step) is never touched and nothing drifts
-    this.partySprites.forEach((sp, i) => { sp.pivot.x = this.partyPosture(i) === 'tremble' ? -trembleDx(this.idleClock) / (sp.scale.x || 1) || 0 : 0; });
-    if (this.partySprites.some((_, i) => idlePose(before, i) !== idlePose(this.idleClock, i))) this.refreshPoses();
-    if (this.hurtTimers.size === 0) return;
-    for (const [i, t] of this.hurtTimers) {
-      if (t - dt <= 0) this.hurtTimers.delete(i); else this.hurtTimers.set(i, t - dt);
-    }
+    this.kneel.tick(dt);
+    // fear (D-K16) plus a kneeler's shake, one sum through the pivot: the position (lunge, active step) never drifts
+    this.partySprites.forEach((sp, i) => {
+      const tremble = trembleOn(this.partyPosture(i), this.presented.party[i]?.statuses ?? [], visuals) ? trembleDx(this.idleClock) : 0;
+      sp.pivot.x = -(tremble + this.kneel.shakeDx(i)) / (sp.scale.x || 1) || 0;
+    });
     this.refreshPoses();
   }
 
-  /** The pose party member i shows now (from the presented state: a KO'd member goes `down` only at the impact). */
+  /** The pose party member i shows now (the presented state, D-K2 in partyPose.ts: `down` only at the impact). */
   partyPose(i: number): BattlePose {
-    if ((this.presented.party[i]?.hp ?? this.battle.allParty[i]?.currentHp) <= 0) return 'down';
-    // FB-7: sleep and stun hold `ready` with no breathing (and still flinch); stone holds it through hits
-    const posture = this.partyPosture(i);
-    if (posture === 'stone' || posture === 'still') return 'ready';
-    if (posture === 'daze') return this.hurtTimers.has(i) ? 'hurt' : 'ready';
-    if (this.victory) return 'victory';
-    const forced = this.poseOverride.get(i);
-    if (forced) return forced;
-    return this.hurtTimers.has(i) ? 'hurt' : idlePose(this.idleClock, i);
+    const hp = this.presented.party[i]?.hp ?? this.battle.allParty[i]?.currentHp ?? 0;
+    const facts = { hp, maxHp: this.battle.allParty[i]?.maxHp ?? hp, posture: this.partyPosture(i), victory: this.victory };
+    return this.kneel.pose(i, facts, idlePose(this.idleClock, i), this.poseOverride.get(i) ?? null);
   }
 
+  partyPoseT(i: number): number { return this.kneel.localT(i); }   // the kneel phase's (or override's) frames: dev label
+
   private refreshPoses(): void {
+    if (this.kneel.start(Object.keys(this.statusVisuals()).length > 0)) this.enemyView?.poses.snapKneel();   // D-K2 row (a)
     for (let i = 0; i < this.partySprites.length; i++) {
       const frames = this.partyFrames[i];
       const sprite = this.partySprites[i];
       if (!frames || !(sprite instanceof Sprite)) continue;
-      const tex = frames[BATTLE_POSES.indexOf(this.partyPose(i))];
+      const tex = frames[BATTLE_POSES.indexOf(this.partyPose(i))] ?? frames[0];
+      REST_TEXTURES.set(sprite, frames[0]);
       sprite.texture = this.partyPosture(i) === 'stone' ? stoneTextures.of(tex) : tex;
     }
   }
 
   /** Party member i's status posture, from the presented snapshot. */
   partyPosture(i: number): Posture {
-    return postureOf(this.presented.party[i]?.statuses ?? [], this.statusVisuals());
+    return this.forced('party', i, postureOf(this.presented.party[i]?.statuses ?? [], this.statusVisuals()));
+  }
+
+  private forced(side: 'party' | 'enemy', i: number, p: Posture): Posture {
+    return this.kneelForce?.(side, i) ? withKneel(p) : p;
   }
 
   updatePartyDisplay(): void {

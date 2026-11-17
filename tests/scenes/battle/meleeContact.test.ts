@@ -42,7 +42,7 @@ function setup(style: AttackStyle, messages: string[], events: DamageEvent[], en
   main.addChild(hero, hero2, ...goblins);
   const display = {
     enemySprites: goblins, partySprites: [hero, hero2], enemyView: null,
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
     updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   const enemies = [{ displayName: 'Goblin A', currentHp: 10 }, { displayName: 'Goblin B', currentHp: 10 }];
@@ -259,7 +259,7 @@ describe('B11: the lunge reaches a back-column target on the real layout', () =>
     let queued = 1;
     const display = {
       enemySprites: sprites, partySprites: [box(PARTY_X[0], 300, 160, 160), thief], enemyView: null,
-      setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+      setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
     } as unknown as BattleDisplayManager;
     const battle = {
       allEnemies: layout.map((_, i) => ({ displayName: i === front ? 'Gr.Imp B' : `E${i}`, currentHp: 10 })), allParty: [], livingParty: [{}], isOver: false,
@@ -298,7 +298,7 @@ describe('U3: the melee advance meets a top-row target on its own row', () => {
     let queued = 1;
     const display = {
       enemySprites: sprites, partySprites: party, enemyView: null,
-      setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+      setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
     } as unknown as BattleDisplayManager;
     const battle = {
       allEnemies: layout.map((_, i) => ({ displayName: `Goblin ${i}`, currentHp: 10 })), allParty: [], livingParty: [{}], isOver: false,

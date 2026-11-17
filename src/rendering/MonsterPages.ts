@@ -21,6 +21,7 @@ export const PAGE_CACHE = 2;
  *   the bestiary's cached frames); it returns the release.
  * - The LRU keeps at most `capacity` loaded pages with no holds; it never frees a held page or a page the latest
  *   `ensure` asked for (so a battle's pages survive until its view holds them).
+ * - `pin(pages)` (docs/KNEEL_PLAN.md D-K13: the act-1 pages): pinned pages are never freed and not counted by the LRU.
  */
 export class MonsterPages {
   private pages: MonsterAtlasPage[] = [];
@@ -31,6 +32,7 @@ export class MonsterPages {
   private readonly refs = new Map<number, number>();
   private readonly lastUse = new Map<number, number>();
   private recent = new Set<number>();
+  private readonly pinned = new Set<number>();
   private clock = 0;
 
   constructor(private readonly dir: string, private readonly io: PageIo, private readonly capacity = PAGE_CACHE) {}
@@ -42,6 +44,13 @@ export class MonsterPages {
   }
 
   get pageCount(): number { return this.pages.length; }
+
+  /** Keep these pages loaded for the session: never evicted, outside the `capacity` count (unknown pages are ignored). */
+  pin(pages: readonly number[]): void {
+    for (const p of pages) if (Number.isInteger(p) && p >= 0 && p < this.pages.length) this.pinned.add(p);
+  }
+
+  isPinned(page: number): boolean { return this.pinned.has(page); }
 
   /** The page a sprite lives on, or undefined when the index lacks it. */
   pageOf(sprite: string): number | undefined {
@@ -128,9 +137,10 @@ export class MonsterPages {
     return job;
   }
 
-  /** Free the least recently used unheld pages beyond `capacity` (never a held page or one `ensure` just asked for). */
+  /** Free the least recently used unheld, unpinned pages beyond `capacity` (never a held or pinned page or one `ensure`
+   *  just asked for). */
   private trim(): void {
-    const free = [...this.loaded.keys()].filter((p) => !this.refCount(p));
+    const free = [...this.loaded.keys()].filter((p) => !this.refCount(p) && !this.pinned.has(p));
     let extra = free.length - this.capacity;
     const victims = free.filter((p) => !this.recent.has(p)).sort((a, b) => (this.lastUse.get(a) ?? 0) - (this.lastUse.get(b) ?? 0));
     for (const p of victims) {

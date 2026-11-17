@@ -145,7 +145,8 @@ export class BattleAnimationController {
         const frames = melee ? advanceFrames(this.attackStyle) : CAST_FRAMES;
         this.animTimer += dt;
         if (confirmSkip) this.animTimer = frames;
-        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, { dx: this.attackReachPx, dy: this.attackRisePx }) : castAt(this.animTimer));
+        const rise = { rise: this.display.isRising(this.animActorSprite) };   // D-K3: an acting kneeler rises first
+        this.placeActor(melee ? advanceAt(this.attackStyle, this.animTimer, { dx: this.attackReachPx, dy: this.attackRisePx }, rise) : castAt(this.animTimer, rise));
         // BA-9: the action resolves on the contact frame itself, so the number and the result line meet the blow
         if (this.animTimer >= frames) this.resolveAction();
         break;

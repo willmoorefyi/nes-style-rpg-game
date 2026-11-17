@@ -34,7 +34,7 @@ function play(party: Character[], commands: BattleCommand[], inventory?: Invento
   const main = new Container();
   const display = {
     enemySprites: [box(400)], partySprites: party.map((_, i) => box(1400 + i * 40)), enemyView: null,
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   const win = { contentX: 0, contentY: 0, contentWidth: 292, contentHeight: 252, addChild: vi.fn(), removeChild: vi.fn() } as unknown as Window;
   const lines: string[] = [];

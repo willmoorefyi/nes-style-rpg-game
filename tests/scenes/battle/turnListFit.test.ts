@@ -52,7 +52,7 @@ function run(actorName: string, targetName: string, messages: string[], extra: E
   } as unknown as BattleStateMachine;
   const display = {
     enemySprites: [new Container()], partySprites: [new Container()], enemyView: null,
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
     updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   const input = { isJustPressed: () => false } as unknown as InputManager;

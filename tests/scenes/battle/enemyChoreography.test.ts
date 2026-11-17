@@ -104,9 +104,9 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     for (const n of used) expect(MONSTER_FRAMES, n).toContain(n);
     for (const n of names(frames((t) => castAt(t, true), 35))) expect(BOSS_FRAMES, n).toContain(n);
     for (const n of BOSS_FRAMES) expect(['idle', 'attack', 'hurt', 'cast']).toContain(FRAME_SOURCE[n]);
-    // F0 (pass F): + daze, daze_b for every sheet; + attack_raise and its four in-betweens for bosses
-    expect(MONSTER_FRAMES).toHaveLength(13);
-    expect(BOSS_FRAMES).toHaveLength(22);
+    // F0 (pass F): + daze, daze_b for every sheet; + attack_raise and its four in-betweens for bosses; pass K: + 4 kneel
+    expect(MONSTER_FRAMES).toHaveLength(17);
+    expect(BOSS_FRAMES).toHaveLength(26);
   });
 
   it('lungePx: the D2 formula at w = 55, 93, 185 and beyond the clamps; 24 when the atlas has none', () => {
@@ -123,8 +123,8 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(idleFrame(40, 0, true, 'stone')).toBe('idle');
     expect(idleFrame(40, 0, true, 'still')).toBe('idle');
     expect(idleFrame(40, 0, false, 'none')).toBe('idle');
-    // pass F 5a: daze / daze_b alternate every 48 frames (old: idle); fear breathes as normal
-    expect([0, 47, 48, 95, 96].map((c) => idleFrame(c, 0, true, 'daze'))).toEqual(['daze', 'daze', 'daze_b', 'daze_b', 'daze']);
+    // pass K (D-K7): the daze sway is gone from the idle (a kneeler shows its KneelTrack); fear breathes as normal
+    expect([0, 36].map((c) => idleFrame(c, 0, true, 'daze'))).toEqual(['idle', 'idle_b']);
     expect(idleFrame(36, 0, true, 'tremble')).toBe('idle_b');
     expect([0, 4, 8, 12, 16].map(trembleDx)).toEqual([0, 1, 0, -1, 0]);
   });

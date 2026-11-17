@@ -21,6 +21,7 @@ import { GAME_WIDTH, GAME_HEIGHT, SCREEN_MARGIN } from '../core/LayoutConstants.
 import { createPromptIndicator, destroyPromptIndicator } from './battle/battleMessageUtils.js';
 import { ActiveHeroMarker } from './battle/ActiveHeroMarker.js';
 import { enemyAnimPreview } from './battle/enemyAnimPreview.js';
+import { kneelPreview } from './battle/kneelPreview.js';
 import { FormChangeView } from './battle/formChangeView.js';
 import { BATTLE_MESSAGE_FONT, BATTLE_MESSAGE_LINE, BATTLE_MESSAGE_HEIGHT, STRIP_Y, STRIP_HEIGHT, ENEMY_WINDOW, COMMAND_WINDOW,
   FLOAT_OUTLINE } from './battle/BattleSceneTypes.js';
@@ -202,6 +203,7 @@ export class BattleScene implements Scene {
   update(dt: number): void {
     dt = this.devClock?.frameDt(dt) ?? dt;  // dev ?battleStep= / ?enemyAnim= / &slow=: before anything else
     enemyAnimPreview.tick(this.display, this.battle.allEnemies.map(e => e.displayName), this.layers.hud, dt, this.devClock?.stepping);
+    kneelPreview.tick(this.display, this.battle, this.layers.hud, dt);   // dev ?kneel= / &poseLabel=1 (docs/KNEEL_PLAN.md 8)
     this.messageText.update(dt);
     this.layers.update(dt);
     this.display.update(dt);

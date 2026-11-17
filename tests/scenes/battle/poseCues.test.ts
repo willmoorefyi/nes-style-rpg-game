@@ -92,13 +92,23 @@ describe('AiEnemyView: playAttack(i, target) and the cue hand-off', () => {
 });
 
 describe('monster frame names and the fallback chain', () => {
-  it('daze / daze_b join MONSTER_FRAMES; the raise and its in-betweens join BOSS_FRAMES; all seven are LATE_FRAMES', () => {
-    for (const n of ['daze', 'daze_b'] as const) expect(MONSTER_FRAMES).toContain(n);
+  it('daze / daze_b and the 4 kneel names join MONSTER_FRAMES; the raise joins BOSS_FRAMES; LATE_FRAMES: the raise and the kneel (pass K: not daze)', () => {
+    for (const n of ['daze', 'daze_b', 'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b'] as const) expect(MONSTER_FRAMES).toContain(n);
     for (const n of ['attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2'] as const) {
       expect(BOSS_FRAMES).toContain(n);
       expect(MONSTER_FRAMES).not.toContain(n);
     }
-    expect([...LATE_FRAMES].sort()).toEqual(['atk_raise_b', 'atk_raise_in', 'atk_swing', 'atk_swing2', 'attack_raise', 'daze', 'daze_b']);
+    expect([...LATE_FRAMES].sort()).toEqual(['atk_raise_b', 'atk_raise_in', 'atk_swing', 'atk_swing2', 'attack_raise', 'kneel', 'kneel_b',
+      'kneel_in1', 'kneel_in2']);
+  });
+
+  it('D-K7: an atlas without kneel frames shows the daze look on the kneel names (kneel -> daze, kneel_b -> daze_b, kneel_in2 -> daze, kneel_in1 -> idle)', () => {
+    const today = new Set<MonsterFrame>(['idle', 'attack', 'hurt', 'hurt_in1', 'daze', 'daze_b']);
+    const on = (f: MonsterFrame) => today.has(f);
+    expect(['kneel', 'kneel_b', 'kneel_in2', 'kneel_in1'].map((n) => resolveFrame(n as MonsterFrame, on))).toEqual(['daze', 'daze_b', 'daze', 'idle']);
+    const opted = new Set<MonsterFrame>([...today, 'kneel', 'kneel_b', 'kneel_in1', 'kneel_in2']);
+    expect(resolveFrame('kneel_in2', (f) => opted.has(f))).toBe('kneel_in2');
+    for (const n of ['kneel', 'kneel_b', 'kneel_in1', 'kneel_in2'] as const) expect(FRAME_FALLBACK[n]).not.toBe(n);
   });
 
   it('a missing frame resolves along the chain to the first frame the atlas has', () => {

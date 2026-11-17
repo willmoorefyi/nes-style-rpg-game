@@ -1,5 +1,10 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import { setTint } from './actorTint.js';
+import { headOf } from './fx/texturePixels.js';
+import { stoneTextures } from './fx/stoneTextures.js';
+
+/** Each party sprite's standing (`ready`) texture, registered by BattleDisplayManager: the arrow's reference head. */
+export const REST_TEXTURES = new WeakMap<Container, Texture>();
 
 /** BA-8: the hero whose command is being chosen steps this far toward the enemies. */
 export const ACTIVE_STEP = 24;
@@ -15,12 +20,16 @@ export function pulseTint(k: number): number {
 /**
  * BA-8: marks the active hero during the command phase. The sprite stays fully opaque (the old alpha pulse made it
  * vanish); it steps ACTIVE_STEP px forward, pulses its tint between white and pale yellow, and has an arrow above.
+ * D-K20: the arrow moves down with a kneeling head (headOf(current).y - headOf(ready).y, x the sprite's scale).
  */
 export class ActiveHeroMarker {
   private sprite: Container | null = null;
   private homeX = 0;
   private arrow: Graphics | null = null;
+  private arrowY = 0;
   private clock = 0;
+  /** The topmost opaque row of a texture (tests inject one). */
+  head: (t: Texture) => { y: number } | null = (t) => headOf(t);
 
   constructor(private readonly parent: Container) {}
 
@@ -36,7 +45,8 @@ export class ActiveHeroMarker {
     sprite.alpha = 1;
     const arrow = new Graphics();
     arrow.moveTo(0, 0).lineTo(16, 0).lineTo(8, 16).lineTo(0, 0).fill(0xffffff);
-    arrow.position.set(sprite.x + (sprite.width - 16) / 2, sprite.y - 20);
+    this.arrowY = sprite.y - 20;
+    arrow.position.set(sprite.x + (sprite.width - 16) / 2, this.arrowY + this.sink());
     this.parent.addChild(arrow);
     this.arrow = arrow;
   }
@@ -61,8 +71,19 @@ export class ActiveHeroMarker {
   update(dt: number): void {
     if (!this.sprite) return;
     this.clock += dt;
+    if (this.arrow) this.arrow.y = this.arrowY + this.sink();
     this.sprite.alpha = 1;
     setTint(this.sprite, 'hero', pulseTint(0.5 - 0.5 * Math.cos(this.clock * PULSE_SPEED)));
+  }
+
+  /** How far below its standing place the marked hero's head is now (screen px; 0 standing or unknown). */
+  sink(): number {
+    const s = this.sprite;
+    const rest = s ? REST_TEXTURES.get(s) : undefined;
+    if (!(s instanceof Sprite) || !rest) return 0;
+    const now = this.head(stoneTextures.coloured(s.texture));
+    const up = this.head(rest);
+    return now && up ? (now.y - up.y) * s.scale.y : 0;
   }
 
   /** Put the sprite back in line, without the pulse (other tint sources stay), and remove the arrow. */

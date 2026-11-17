@@ -18,7 +18,7 @@ function setup(lost: boolean) {
   hero.position.set(100, 200);
   const display = {
     enemySprites: [new Sprite()], partySprites: [hero], enemyView: null,
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   let queued = 1;
   const battle = {

@@ -2,7 +2,11 @@
 # Loaded by DataLoader.loadStatusVisuals; bad entries are logged and dropped (src/core/schemaValidationFx.ts).
 #
 # statuses: status -> {
-#   posture?: none | daze | stone | tremble | still   (an enemy's pose; party: daze / stone / still hold `ready`)
+#   posture?: none | daze | kneel | stone | tremble | still   (the pose, both sides; docs/KNEEL_PLAN.md D-K16)
+#             daze (sleep, stun): a disabled kneel, never acts; kneel (poison): an acting kneel, rises to act;
+#             stone: grey `ready` / idle; still: no breathing; tremble (fear): +-1 px on top of any posture but
+#             stone and daze. The strongest wins: stone > daze > still > kneel > tremble. Heroes also kneel at
+#             25 % HP or less.
 #   overlay?: an overlay loop in src/scenes/battle/fx/statusEmitters.ts (zzz, stars, bubbles, ink, mute, sweat,
 #             frost, confuse)
 #   tint?: 0xRRGGBB, multiplied into the sprite (actorTint source `status`)
@@ -44,6 +48,7 @@ statuses:
     icon: icon_blind
     tag: BLND
   poison:
+    posture: kneel
     overlay: bubbles
     tint: 0xc8ffc8
     pulse: [6, 60]

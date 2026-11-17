@@ -11,8 +11,9 @@ export type StatusVisuals = Readonly<Record<string, StatusVisual>>;
 /** At most this many icons per actor. */
 export const MAX_ICONS = 3;
 
-/** Posture strength: the strongest posture among the statuses wins (a sleeping, feared enemy is dazed). */
-const POSTURE_RANK: Record<StatusPosture, number> = { stone: 4, daze: 3, still: 2, tremble: 1, none: 0 };
+/** Posture strength: the strongest posture among the statuses wins (D-K16: sleep plus poison is a disabled kneel,
+ *  frozen plus poison holds `ready`). */
+export const POSTURE_RANK: Record<StatusPosture, number> = { stone: 5, daze: 4, still: 3, kneel: 2, tremble: 1, none: 0 };
 
 /** The statuses in priority order (the order of status-visuals.yaml); unknown ones last, in their own order. */
 export function byPriority(statuses: readonly string[], visuals: StatusVisuals): string[] {
@@ -30,6 +31,18 @@ export function postureOf(statuses: readonly string[], visuals: StatusVisuals): 
   }
   return best;
 }
+
+/** D-K16: fear is additive: true when any status trembles (the offset applies on any posture but stone and daze). */
+export function trembles(statuses: readonly string[], visuals: StatusVisuals): boolean {
+  return statuses.some((s) => visuals[s]?.posture === 'tremble');
+}
+
+/** The tremble offset shows: a status trembles and the posture is not stone or daze. */
+export const trembleOn = (posture: StatusPosture, statuses: readonly string[], visuals: StatusVisuals): boolean =>
+  posture !== 'stone' && posture !== 'daze' && trembles(statuses, visuals);
+
+/** The posture with a forced kneel on top (the dev `?kneel=` preview): anything weaker than `kneel` becomes it. */
+export const withKneel = (p: StatusPosture): StatusPosture => (POSTURE_RANK[p] < POSTURE_RANK.kneel ? 'kneel' : p);
 
 /** The icon glyphs to show, highest priority first, at most MAX_ICONS. */
 export function iconsFor(statuses: readonly string[], visuals: StatusVisuals, max = MAX_ICONS): string[] {

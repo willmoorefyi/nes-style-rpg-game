@@ -38,10 +38,14 @@ const PHANTOM = { w: 48, h: 160 };
 const ART_MARGIN = 12;
 
 /**
- * R2 / BS-7, the one place the daze step touches the pose API: Fe's 'daze' posture (daze / daze_b, falling back to
- * hurt_in1 until a sheet has daze frames).
+ * R2 / BS-7, the one place the daze step touches the pose API: the 'daze' posture, which plays the kneel track (in,
+ * hold, out; D-K15). A sheet with its own kneel frames (`hasKneel`: texture identity, kneel !== daze) shows them;
+ * otherwise the same track shows the daze frames they alias to.
  */
 const DAZE_POSTURE: Posture = 'daze';
+
+/** D-K15: the sheet has its own kneel frames (by texture identity; no json field). */
+export const hasKneel = (f: Pick<MonsterFrames, 'textures'>): boolean => f.textures.kneel !== f.textures.daze;
 
 /** What the preview shows for an entry. */
 export interface PreviewEntry { enemy: EnemyData; seen: boolean; hasSpells: boolean }
@@ -165,7 +169,7 @@ export class BestiaryPreview {
       this.actors.position.set(this.fit.dx, this.fit.dy);
     }
     const label: BestiaryAnimLabel = e.attack === 'ranged' ? 'ranged' : e.attackAnim === 'heavy' ? 'heavy' : 'attack';
-    this.loop.start({ hasCast: this.view.hasCast(0), hasDaze: !!f && f.textures.daze !== f.textures.hurt_in1,
+    this.loop.start({ hasCast: this.view.hasCast(0), hasDaze: !!f && (hasKneel(f) || f.textures.daze !== f.textures.hurt_in1),
       hasSpells: entry.hasSpells }, label);
     this.view.update(0, [sprite], [this.posture]);
     this.refreshCaption();

@@ -34,9 +34,10 @@ export interface SpellEffectsData {
   byEffect?: Record<string, string>;
 }
 
-/** An actor's pose while a status lasts: `daze` (sleep, stun: the dazed frames), `stone` (grey, no breathing, no recoil),
- *  `tremble` (fear: ±1 px), `still` (no breathing; the reserved frozen). */
-export const STATUS_POSTURES = ['none', 'daze', 'stone', 'tremble', 'still'] as const;
+/** An actor's pose while a status lasts: `daze` (sleep, stun: a disabled kneel), `kneel` (poison: an acting kneel, it
+ *  rises to act; docs/KNEEL_PLAN.md D-K16), `stone` (grey, no breathing, no recoil), `tremble` (fear: ±1 px, additive),
+ *  `still` (no breathing; the reserved frozen). */
+export const STATUS_POSTURES = ['none', 'daze', 'kneel', 'stone', 'tremble', 'still'] as const;
 export type StatusPosture = typeof STATUS_POSTURES[number];
 
 /** How one status shows on an actor (assets/data/status-visuals.yaml). */
