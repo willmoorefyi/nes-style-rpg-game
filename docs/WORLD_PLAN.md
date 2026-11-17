@@ -2334,6 +2334,90 @@ file.
 legend).
 <!-- === end W1-H === -->
 <!-- === W1-I FOUNDATION (pass W: owned by W1-I) === -->
+### W1-I result: verifier proofs and tests (branch `w-w1-i` from `mainline` d72e369)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-w1-i/`.
+
+**Files** (`src/progression`, every file under 250 lines):
+
+- `questProofsLate.ts` (`runLateProofs`, proof (d) with (d3)), `questCurve.ts` (the curve model: replays (a)'s witness
+  event by event and walks a cell route to each), `questRoute.ts` (cross-map BFS on `fieldStep`, transitions and the
+  component exits), `questLateData.ts` (enemies, item prices, kits, `world-anchors.yaml`, travel rows, allowed docks;
+  `attachLate` / `lateOf`), `questShops.ts` ((e), (f)), `questGeo.ts` ((g)), `questTravel.ts` + `questTravelRows.ts`
+  ((h) and the 2.6 dock rule).
+- `questMutate.ts` (`runMutations`), `questMutateRows.ts` (GT-1 to GT-37 with GT-5b as data), `questMutateFind.ts`
+  (locators by what an element does: an NPC needing the crown, the patch `canal`, the composer cut `W_isthmus`, the
+  0-1 BFS canoe cut between two anchors), `questMutateOps.ts` (copy-on-write edits), `questMutateCheck.ts` (catch
+  rules and baseline), `questMutateGeneric.ts` (QUEST 5.4's element list).
+- Tests: `tests/progression/{questMutate (42), questLate (14), macroGeography (10), travelMatrix (11)}.test.ts`,
+  `miniWorld.ts`; `tests/quest/{designNotes, originality, townStandard, bossItems}.test.ts` with `questMaps.ts` and
+  `originalityChecks.ts`; fixtures `tests/fixtures/quest/{mini, late_clean, geo_detour}.yaml`. `mini.yaml` builds the
+  whole S0-S30 chain in miniature (48x32 world map and 9 rooms) so every gate-table row has its element.
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/progression/ tests/quest/` | 11 files, 181 passed, 8 skipped (the 8 towns of townStandard, pending stubs) |
+| `npm run quest -- --mutate` | `(d) bands: OK  garland L2.0 [2,3]  (31 pending)  prices: OK (0 takeGold)`, `(e) early shops: OK  (0 towns, 8 pending)`, `(f) price walls: OK  crescent pending  gaia pending`, `(g) geography: OK  s*=0.735 (31 pairs; 22 assumed)`, `(h) travel matrix: OK  (12 rows, 2 basin rows; 1 checked, 13 pending)`, `mutations: OK  (41 gate rows; 44 elements, each removal reported)`, `quest-verify: OK` (about 4 s) |
+| `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 284 passed (284)`, `Tests 5656 passed, 8 skipped (5664)` |
+
+RED fixtures (each proof fails on its own first): (d) band, grind, kit gold, (d3) price, (e) early, shopless, (f)
+wall (`questLate.test.ts` on `late_clean`); (g) moved anchor, Onrac-Gaia swap, x1.5 scale, a stretched pair, detour
+(`geo_detour`); (h) each row of the mini world with one wall, gate crossing or dock removed, and a dock not allowed;
+mutations: an uncaught element without its `nonLoadBearing` entry; designNotes, originality (equal or mirrored
+grounds, a classic line), townStandard and bossItems on synthetic maps.
+
+**How pending rows are handled.** On this head only S0 is built and every region is a stub, so a gate-table row whose
+element is not built yet, or whose stages are pending and which is not caught, is reported with `nonLoadBearing:
+"pending: ..."` (the CLI counts it as reported; `--strict` turns each into a failure). Of the 38 rows, GT-1 runs on
+the act-1 bridge gates (non-load-bearing by S0's entries) and GT-18 is pending; the rest wait for their regions. All
+38 rows are caught (or carry their reason) on the mini world, asserted by name in `questMutate.test.ts`. The generic
+list (QUEST 5.4) on act 1: the King's and the princess's PRINCESS_RESCUED conditions are caught (the boss check
+below), the ship spawn's flag is caught by (c) (the ship can't be left), the canoe spawn is pending (S13), and
+Garland's `hideIf` is non-load-bearing by a new S0 entry.
+
+**Deviations / hand-offs:**
+
+- **quest.yaml S0** (the integrator's): added one `nonLoadBearing` entry, Garland's `hideIf` at temple-of-fiends
+  (11, 6), as QUEST 4.5 had the verifier tranche add the bridge entries.
+- **questChecks.ts** (W1-H's): (b) skips an ancestor that is built and grants nothing (S3, S4, S20 once built):
+  there is nothing to withhold, and every later stage was reported as reachable "without" it.
+- **Mutation catch rules** (questMutateCheck.ts): a catch is a failure the unmutated world lacks. The suite's (b) is
+  stage-scoped and adds three runs to W1-H's: an ancestor's flags and items withheld with its vehicles kept (GT-3:
+  the ship before the pirates), each requirement withheld alone with every event still firing (GT-7: Astos without
+  the crown while the guard's victory still sets the flag), and a stage's grants with its boss events off (act 1:
+  the King waits for Garland). A stage with no boss and no grants is reached by reaching one of its maps.
+- **Plan rows that cannot be caught as written** (each is reported, none hidden):
+  - GT-2: `north_bridge` forced on is caught only if the patch covers every cell gated by BRIDGE_BUILT; the act-1
+    gates (93, 96), (94, 96) sit outside the gap, so A1-O must put those cells in the patch or drop the gates.
+    "Forced on" = the patch's terrain applied for good and any gate on its cells removed.
+  - GT-25: with the classic chain the canoe is held before the airship, so (b) can't see a walkable waterfall
+    river; the row also accepts (h)'s `TRAVEL T6b reaches wat_waterfall`.
+  - GT-33: EARTH_CRYSTAL_LIT on the time gate is redundant (it gates the canoe, which every later stage needs); PST
+    needs a `nonLoadBearing` entry for the gate. The lute part is reported with the plan's reason.
+  - GT-6 and GT-16 may be caught (the requirement-alone run) instead of being non-load-bearing; both count as OK.
+- **Price rules:** a kit's price is W1-F's 4-member gear price (W/T/WM/BM; w_s1 520, w_pravoka 1725; spells not
+  counted). A town is walled when its kit costs more than the kit of every stage right after its `opensAfter`; on
+  quest.yaml that is exactly crescent and gaia (tested). (d)'s gold rule: gold at the start of the town's `bandStage`
+  >= 50 %; (f): gold when a keeper first becomes talkable < 40 %. A pending stage raises the party to its band's low
+  level and marks the gold after it assumed (those gold checks wait).
+- **`--stage S<n> --mutate`** runs that stage's gate rows and only the generic elements on its maps (or world-map elements that read its grants).
+- **(h) rows** are data (`DEFAULT_TRAVEL_ROWS`); T6 starts the party at the airship in the desert. The dock-presence
+  check of GT-5b is not built: (h) only refuses a dock that is not allowed or is in the wrong basin.
+- **Engine stand-ins in mini.yaml** (no patches, canoe ability or airship landing in fieldRules yet): a patch's
+  crossing is also gated on its cells, a river is a Bridge cell gated by the `canoe` item, flight is a transition
+  gated by AIRSHIP_RAISED. A trade NPC is an event only when its gift is a key item (`questEvents.npcRelevant`); an
+  NPC that gives a plain item and sets a milestone with `giftFlag` is invisible to the verifier (hand-off to W1-H's
+  owner / INT).
+- **Real-world reads:** `world.cuts` (wall and barrier cuts) are read from the compiled world map's `world` field;
+  the legacy 72x72 world map is read at the A1 origin (64, 64) for (g), (h) and the `nonLoadBearing` cells.
+
+**AGENTS.md delta (for INT):** under the verifier, the late proofs (d)-(h) and `--mutate` (gate table GT-1 to GT-37 in
+`questMutateRows.ts`, pending rows reported, `--strict` fails them); `tests/fixtures/quest/mini.yaml` (the whole chain
+in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townStandard, bossItems}.test.ts` with
+`QUEST_STRICT=1` for INT.
 <!-- === end W1-I === -->
 <!-- === A1-O A1 (pass W: owned by A1-O) === -->
 <!-- === end A1-O === -->

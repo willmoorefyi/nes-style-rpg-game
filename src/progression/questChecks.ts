@@ -47,6 +47,8 @@ export function proofSkips(ctx: QuestContext): ProofResult {
     } else {
       for (const p of [...ancestorsOf(world.stages, s.id)].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)))) {
         const ps = world.stages.get(p)!;
+        // a built stage that grants nothing (S3, S4, S20 once built) has nothing to withhold; (a) checks its order
+        if (ps.status === 'built' && grantsText(ps) === 'no grants') continue;
         check(s, without(ctx, ps), `${p} (${grantsText(ps)})`);
       }
       const needs: Array<{ flags?: string[]; items?: string[]; vehicles?: string[] }> = [
