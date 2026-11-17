@@ -69,6 +69,10 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
+  kneel_in1:
+    tweaks: {tip: [2, 0]}
+  kneel_in2:
+    tweaks: {tip: [1, 0]}
   # The trident flips ~130 deg between idle (upright) and attack (thrust down-forward), over the 30 deg cap, so it never
   # turns: idle-sourced frames keep it upright, attack-sourced ones keep the thrust angle, and it only translates with the
   # fist. The 2-3 px channel between the near leg and the shaft is open in idle: the shaft never moves left or down in
@@ -117,4 +121,18 @@ masks:
     attack: [[6, 69], [16, 69], [16, 79], [6, 79]]
     hurt: [[31, 71], [41, 71], [41, 79], [31, 79]]
 holds: []
-paint: []
+paint:
+  # pass K (K2-B): kneel frames: the pocket the lowered arm closes against the trident shaft filled with outline ink, 1 px cracks closed, the far toe below the feet row cleared (kneel_in1); the trident butt kept on the ground through the breath (kneel_b)
+  - {frame: kneel_in1, xy: [[27, 30], [29, 31], [42, 45], [43, 46], [44, 46], [46, 46], [43, 47], [44, 47], [45, 47], [46, 47], [43, 48], [44, 48], [46, 48], [47, 48], [48, 48], [49, 48], [44, 49], [49, 49], [50, 49], [44, 50], [45, 50], [50, 50], [45, 51], [50, 51], [51, 51], [45, 52], [46, 52], [47, 52], [50, 52], [51, 52], [47, 53], [48, 53], [50, 53], [48, 54], [49, 54], [50, 54], [50, 55], [25, 56], [50, 61], [50, 62], [50, 63], [49, 64], [50, 64], [49, 65], [50, 65], [49, 66], [50, 66], [49, 67], [49, 68], [18, 69], [45, 48], [45, 49], [46, 49], [47, 49], [48, 49], [46, 50], [48, 50], [49, 50], [46, 51], [47, 51], [48, 51], [49, 51], [48, 52], [49, 52], [49, 53], [47, 50]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[25, 77], [26, 77]], rgb: null}
+  - {frame: kneel_in2, xy: [[48, 39], [44, 52], [44, 53], [45, 53], [45, 54], [46, 54], [43, 55], [44, 55], [45, 55], [46, 55], [45, 56], [47, 56], [48, 57], [48, 58], [48, 59], [26, 35], [26, 36], [24, 37]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[45, 75], [48, 75], [45, 76], [47, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[46, 75], [46, 76]], rgb: [206, 222, 198]}
+  - {frame: kneel_b, xy: [[47, 75]], rgb: [156, 165, 148]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); the trident kept upright and leaned on as a crutch, its butt on the ground; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {tip: [-24, -25], foot_f: [3, 2], toe_f: [3, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[44, 20], [28, 40], [45, 44], [43, 45], [44, 45], [45, 45], [46, 45], [43, 46], [44, 46], [45, 46], [43, 47], [44, 47], [42, 48], [43, 48], [44, 48], [23, 53], [23, 55], [38, 55], [37, 56], [38, 56], [38, 57], [6, 69]], rgb: [6, 4, 10]}
+    - {xy: [[45, 77], [46, 77], [47, 77], [45, 78], [46, 78], [47, 78], [45, 79], [46, 79], [47, 79]], rgb: null}
