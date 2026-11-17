@@ -1874,6 +1874,63 @@ world constants).
 <!-- === W1-C1 FOUNDATION (pass W: owned by W1-C1) === -->
 <!-- === end W1-C1 === -->
 <!-- === W1-C2 FOUNDATION (pass W: owned by W1-C2) === -->
+### W1-C2 result: composer and world (branch `w-w1-c2` from `mainline` f2f2383; not yet rebased on W1-C1)
+
+No AI or paid calls. Scratch in `/tmp/w-w1-c2/`.
+
+**Files:**
+
+- `layouts/world.py` (the composer: REGIONS, compose, the source writer, `--check-bands`, `--owned-chunks <r>`),
+  `layouts/world_checks.py` (checks 1-7 of 2.9, the basins and docks of 2.6, the wall and barrier minimal cuts),
+  `layouts/world_geom.py` (owner grid, bands, chunk ownership, floods, the 0-1 minimal cut, the act-1 translation,
+  `stub_region`), `layouts/world_a1.py` (the act-1 document moved out of `overworld.py main()`, translated by
+  A1_ORIGIN; the canoe spawn removed), the stubs `world_{elf,earth,fire,ordeal,water,wind}.py` (EARTH's stub
+  declares a placeholder `canal` patch over the W_isthmus placeholder, x 48-61, y 88-92, so check 2 holds).
+- `layouts/overworld.py` is the shim (202 lines; `build()`, `objects()`, `check()` unchanged, `main()` runs
+  `world.main`).
+- `map_checks_region.py` (new): a region's own `road_check` / `river_check` / `min_blob` / `warp_leaves` on its cells
+  only (composer cells, i.e. seams and a stub's placeholder walls, read as ocean); `map_checks_util._unreachable`
+  takes `no_unreachable_walkable: {reach_roots: [...]}`.
+- `build_hooks.py` bodies: `passthrough` (docks, hazards, exit, world; source patches `{id, flag, cells, ground}`
+  become `{..., terrain}`; `art.patches` lists `patch_<pid>.png`), `bake_patches` (a cropped compile of the patched
+  ground; the PNG covers the bounding box of the patch cells from its top-left cell, opaque exactly on the cells;
+  call it after `build_map.write`, which clears the folder), `patch_errors`, `region_checks` (a region's checks;
+  `None`: the basin and dock checks on the source), `owned_chunks`.
+- World source (`assets-src/maps/overworld.yaml`, 192x192): top level `sealed_edges`, `art_coverage`,
+  `no_unreachable_walkable.reach_roots`, `unreachable_ok` (act-1's `north_shore` plus the composer's unreached grass
+  cells of `seam_n` and its placeholder rows); `regions.<r>.{stub, checks}`; `world.frames.a1` and `world.cuts`
+  (the minimal cuts for 6.3: W_west 7, W_isthmus 14, W_arm 2, W_south 2, W_east 3 cells on the stub world).
+- Tests: `tests/quest/a1/frozenCore.test.ts` (6 tests; fixtures `act1Overworld.fixture.yaml` and
+  `act1Collision.fixture.json`, the mainline act-1 source and compiled collision); `overworldLayout.test.ts` reads
+  the frame, offsets its hard-coded cells, clips its scans to the frame and finds the jetty from the pier's inspect
+  cell.
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `python3 -I assets-src/tools/layouts/world.py` | `bands: OK`, `basins: OK (aldi 2781 cells, ocean 29870 cells; canal joins)`, `cuts: ...`; rerun byte-identical |
+| `world.py --check-bands` | `bands: OK` |
+| `build_map.py --check-determinism overworld` | `overworld: deterministic` (130.6 s) |
+| `build_map.py overworld` (stub world, scratch, not committed) | exit 0, 192x192, 75 s, max RSS 9.9 GB (11.5 GB on a failing earlier run) |
+| `npx vitest run tests/data/overworldLayout.test.ts tests/quest/a1/frozenCore.test.ts tests/data/act1Flow.test.ts` | 3 files, 46 passed (also 38 passed for the first two against the compiled world) |
+| `build_map.py --selftest` | `build_map selftest: 99 checks passed` |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | `Test Files 270 passed`, `Tests 5134 passed` |
+| `npm run build` | exit 0 |
+
+**Deviations / hand-offs:**
+
+- **The compiled world is not committed.** `assets/maps/ai/overworld.*` is still the act-1 build. Compiled now, it
+  would lack `world.frames.a1` (the passthrough call is W1-C1's), and two tests outside this tranche hard-code act-1
+  cells on the compiled map: `tests/systems/fieldRules.test.ts` (the bridge cases, 5 fail) and
+  `DebugScenarioField.test.ts` (the 3 raw spawns, GAP-18, W1-B). After the W1-C1 rebase the world is compiled and
+  committed (G1-G3 re-baseline), together with W1-B's `frame: a1` handling of those tests. Until then the tests read
+  the source in the compiled map's frame, and frozenCore's compiled-collision case runs only on a 192-wide map.
+- The `canal` patch id has no `ert_` prefix (world_api's `CANAL_PATCH`); check 3 exempts it, and the act-1 legacy ids.
+- Check 6 requires an anchor when it is `built: true`, or its region is not a stub and does not list it in
+  `checks.anchors_pending`. Check 7 is grid-level (objects ignored); the object-aware unreachable check is the compiler's.
+- Region checks read the collision from the source (`collide: alpha` approximated: a named part blocks).
+<!-- === end W1-C2 === -->
 <!-- === end W1-C2 === -->
 <!-- === W1-D FOUNDATION (pass W: owned by W1-D) === -->
 <!-- === end W1-D === -->

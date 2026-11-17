@@ -25,9 +25,14 @@ def _is_int(v) -> bool:
 
 
 def _unreachable(src: dict, c, seen: set[Cell]) -> list[str]:
-    """Walkable cells reached neither from the first entrance nor from an `unreachable_ok` entrance (or cell)."""
+    """Walkable cells reached neither from the first entrance, nor from an `unreachable_ok` entrance (or cell), nor
+    from a reach root (`no_unreachable_walkable: {reach_roots: [...]}`, entrance names or [x, y] cells: the world map,
+    where every region names the entrances its land is walked from)."""
     allowed = src.get("unreachable_ok") or []
-    later = [c.entrances[e] for e in allowed if isinstance(e, str) and e in c.entrances]
+    spec = src.get("no_unreachable_walkable")
+    roots = (spec.get("reach_roots") or []) if isinstance(spec, dict) else []
+    later = [c.entrances[e] for e in [*allowed, *roots] if isinstance(e, str) and e in c.entrances]
+    later += [e for e in roots if not isinstance(e, str)]
     cells = {(int(e[0]), int(e[1])) for e in allowed if not isinstance(e, str)}
     ok = seen | reach(c.collision, later) | cells
     lost = [(x, y) for y in range(c.height) for x in range(c.width) if walkable(c.collision, x, y) and (x, y) not in ok]

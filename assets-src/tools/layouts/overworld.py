@@ -1,6 +1,11 @@
-"""The act-1 overworld -> assets-src/maps/overworld.yaml.
+"""The act-1 overworld: the library behind region A1 of the world map (layouts/world_a1.py).
 
   python3 -I assets-src/tools/layouts/overworld.py && python3 -I assets-src/tools/build_map.py overworld
+
+Running it is the same as running layouts/world.py (QUEST 3.5 shim): the composer writes
+assets-src/maps/overworld.yaml, the 192x192 world with this act-1 block at A1_ORIGIN. `build()`, `objects()` and
+`check()` stay here and still enforce the act-1 promises on the local 72x72 grid; the act-1 map document is
+`world_a1.act1()`.
 
 An original layout on the classic idea (docs/FIX_PLAN_PENINSULA.md, T3c and the T3 review fixes). The Cornelia peninsula
 hangs south-west from a larger landmass: the mainland, DY rows deeper than the T3c map, has more walkable cells than the
@@ -22,17 +27,16 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import Grid, write_map  # noqa: E402
+from common import Grid  # noqa: E402
 from overworld_consts import (ARRIVE, BEACHES, BOULDERS, BRIDGE_FOOT, BROKEN_BRIDGE, BX, CX, CY, E_WARP,  # noqa: E402
-                              FOOT_ROAD, FOOTBRIDGE, FOREST_ADD, FOREST_CUT, FOREST_ZONES, GATE_MESSAGE, GULF, H, HEADER,
-                              JETTY, LAND, MOUNTAIN_BLOBS, N_STUB, N_WARP, NORTH_LAKE, NORTH_SHORE, PIER_TEXT, PONDS,
+                              FOOT_ROAD, FOOTBRIDGE, FOREST_ADD, FOREST_CUT, FOREST_ZONES, GULF, H,
+                              JETTY, LAND, MOUNTAIN_BLOBS, N_STUB, N_WARP, NORTH_LAKE, NORTH_SHORE, PONDS,
                               RIVER, ROADS, RX, RY, S_STUB, S_WARP, SEED, SHORE_LAND, SHORE_SEA, SOUND, SOUTH_BAY, SPINE,
-                              SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_OBJECT, TEMPLE_ROCK, TEMPLE_WARP, TOMB,
-                              TOMB_CHEST, TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP, BRIDGE_WORKERS)
+                              SPUR, STREAM, TARN, TEMPLE_DOOR, TEMPLE_GRASS, TEMPLE_OBJECT, TEMPLE_ROCK, TOMB,
+                              TOMB_END, TOMB_OBJECTS, TOMB_ROCK, TX, TY, UNDER_TOWN, W, W_WARP)
 from overworld_grid import (bfs, clear_disc, clear_rect, extend_to_sea, fill_unreachable, near, tidy_blobs,  # noqa: E402
                             tidy_land, walk_grid)
 from overworld_noise import blob, fbm, polyline_distance, signed_distance  # noqa: E402
-from overworld_zones import FIELDS, ZONE_BACKDROPS, encounter_zones  # noqa: E402
 
 
 def build() -> tuple[Grid, list[str]]:
@@ -189,60 +193,9 @@ def objects() -> list[dict]:
 
 
 def main() -> None:
-    g, notes = build()
-    for x, y in BOULDERS:
-        if g[x, y] != ".":
-            raise SystemExit(f"boulder at ({x}, {y}) is on {g[x, y]!r}, not grass")
-    # the canoe: on the east river below the bridge (the river cell of that row nearest the bridge, not the stream)
-    canoe = (min((x for x in range(W) if g[x, RY + 5] == "r"), key=lambda x: (abs(x - RX), x)), RY + 5)
-    doc = {
-        "id": "overworld",
-        "name": "World Map",
-        "camp": True,                     # MS-8: Tent and Cabin work on the world map only (FF1)
-        "kits": ["overworld", "town", "temple"],
-        "music": "overworld",
-        "terrain": "organic",
-        "sealed_edges": True,
-        "road_check": {"materials": ["dirt"], "ends": [list(TOMB_END)], "check_under": True},
-        "warp_leaves": True,
-        "min_blob": {"mountain": 3, "sand": 3, "forest": 3, "ocean_inlet": 2},
-        "river_check": True,
-        "art_coverage": True,
-        "no_unreachable_walkable": True,
-        "unreachable_ok": ["north_shore"],
-        # `cornelia` first: safeSpawn moves old saves that are cut off from it (the act-1 component)
-        "entrances": {**{k: list(v) for k, v in ARRIVE.items()}, "castle": list(ARRIVE["cornelia_north"]),
-                      "north_shore": list(NORTH_SHORE), "temple": list(TEMPLE_DOOR)},
-        "objects": objects(),
-        "inspect": [{"x": TOMB[0], "y": TOMB[1], "text": ["Here lies Erdrick."]},
-                    {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]},
-                    {"x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "text": list(PIER_TEXT)}],
-        "npcs": [dict(TOMB_CHEST), *(dict(n) for n in BRIDGE_WORKERS)],
-        "keyItemGates": [{"x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT", "message": [dict(m) for m in GATE_MESSAGE],
-                          "permanent": False} for x in (BX, BX + 1)],
-        "encounterRate": {"min": 10, "max": 22},       # W4: the W / N gate -> temple walk (16 steps) sees a battle
-        # T4 §1.6: FF1-style formations; no pirates in act 1 (EB-1). The first zone holding the cell wins.
-        "encounters": FIELDS,
-        "encounterZones": encounter_zones(g),
-        # BA-12: sand compiles to TerrainType.Desert, so the beaches are keyed `desert` (keys are TerrainType names)
-        "battleBackgrounds": {"default": "grassland", "terrain": {"forest": "forest", "desert": "shoreline",
-                                                                  "swamp": "swamp", "water": "ocean", "river": "river"},
-                              "zones": ZONE_BACKDROPS},
-        # OW-10 stays open: the ship waits off the jetty, the canoe on the east river
-        "vehicles": [{"type": "ship", "x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "requiredFlag": "BIKKE_DEFEATED"},
-                     {"type": "canoe", "x": canoe[0], "y": canoe[1], "requiredFlag": "EARTH_CAVE_COMPLETE"}],
-        "transitions": [{"x": p[0], "y": p[1], "targetMap": "cornelia", "targetEntrance": e} for p, e in
-                        ((N_WARP, "castle"), (W_WARP, "west_gate"), (E_WARP, "east_gate"), (S_WARP, "south_gate"))]
-        + [dict(TEMPLE_WARP)],
-    }
-    for v in doc["vehicles"]:
-        assert g[v["x"], v["y"]] in "or", f"vehicle {v['type']} at ({v['x']}, {v['y']}) is on {g[v['x'], v['y']]!r}"
-    print(write_map("overworld", HEADER, doc, g.text()))
-    for n in notes:
-        print("  " + n)
-    errs = check(g)
-    if errs:
-        raise SystemExit("overworld layout: " + "; ".join(errs))
+    """The QUEST 3.5 shim: the world composer writes assets-src/maps/overworld.yaml (act 1 is its region A1)."""
+    import world  # noqa: PLC0415
+    sys.exit(world.main([]))
 
 
 if __name__ == "__main__":

@@ -21,9 +21,12 @@ reachable exit. Opt-in per source map:
                                              on both sides of each bridge
   art_coverage: true | {min: 0.25}           every blocked cell on open ground has at least that share of object art
   no_static_chokepoints: true                static NPCs (no `wander`) cut off no entrance or transition
-  no_unreachable_walkable: true              every walkable cell can be reached from the first entrance, or from an
+  no_unreachable_walkable: true | {reach_roots: [name | [x, y], ...]}
+                                             every walkable cell can be reached from the first entrance, from an
                                              entrance named in `unreachable_ok` (a region opened later, e.g. the
-                                             north shore); `unreachable_ok` may also list [x, y] cells
+                                             north shore), or from a reach root (the world map: each region names
+                                             the entrances its land is walked from); `unreachable_ok` may also list
+                                             [x, y] cells
   contrast: [{a: W, b: "-", min: 0.2}]       ground cells drawn with legend char `a` next to (4-neighbour) cells of
                                              char `b` read apart: the mean Rec. 601 luma (0-1) of the centre 8x8 px of
                                              `c.below` differs by at least `min` between the two sets (cells under
@@ -37,7 +40,8 @@ least one walkable cell, its own table and an optional encounterRate.
 Collision values are TerrainType (src/types/index.ts); BLOCKED is what blocks on foot. This module is the façade that
 build_map.py, map_report.py and map_selftest.py import: the helpers live in map_graph.py (walk graph),
 map_checks_terrain.py (roads, blobs, rivers, contrast), map_checks_encounters.py (encounter tables and zones) and
-map_checks_util.py, and are re-exported here.
+map_checks_util.py, and are re-exported here. The world map's per-region options (road_check, river_check,
+min_blob, warp_leaves per `regions.<r>.checks`) run in map_checks_region.py.
 """
 from __future__ import annotations
 
