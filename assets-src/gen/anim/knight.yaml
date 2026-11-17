@@ -17,3 +17,7 @@ battle:
     {neck: [42, 34], crown: [37, 6], chest: [41, 40], hip: [43, 54],
      sh_n: [32, 40], el_n: [27, 46], hand_n: [21, 45], sh_f: [49, 36], el_f: [56, 33], hand_f: [63, 28],
      hip_n: [37, 55], knee_n: [28, 61], foot_n: [30, 72], hip_f: [48, 55], knee_f: [51, 62], foot_f: [55, 73]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; the head 1 px lower (neck / crown tweak) so the plume stays inside the band. No
+# chest lean: any lean pushes kneel_in2's outline ring past ready's + 0.08.
+kneel: {lean: 0, bow: 6, arms: [n], tweaks: {neck: [0, 1], crown: [0, 1]}}
