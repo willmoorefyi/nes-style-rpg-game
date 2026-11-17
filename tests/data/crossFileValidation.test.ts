@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { STORY_FLAGS } from '../../src/core/GameFlags.js';
+import { isKnownFlag } from '../../src/core/GameFlags.js';
 import { formationFits, type EnemyBoxInput, type EnemySizeClass } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import { MAX_FORMATION } from '../../src/systems/EncounterTable.js';
 import { validateEnemyData } from '../../src/core/schemaValidation.js';
@@ -45,7 +45,7 @@ interface MapFile {
   npcs?: Array<{ id: string; dialog: string[] | Array<{ condition?: string; text: string[] }>; shopId?: string; chestItem?: string;
     chestFlag?: string; cutscene?: { id: string } }>;
   scriptedEncounters?: Array<{ enemyIds: string[]; flag: string; postVictoryCutscene?: string }>;
-  keyItemGates?: Array<{ requiredItem?: string; requiredFlag?: string; x: number; y: number }>;
+  keyItemGates?: Array<{ requiredItem?: string; requiredFlag?: string; requiredFlags?: string[]; x: number; y: number }>;
   battleBackgrounds?: { default?: string; terrain?: Record<string, string> };
 }
 const mapFileNames = readdirSync(mapsDir)
@@ -333,10 +333,13 @@ describe('Cross-file data validation', () => {
   describe('Key item gates → Items', () => {
     refMaps.forEach((map) => {
       (map.keyItemGates ?? []).forEach((gate, i) => {
-        // a gate opens on an item or on a story flag (requiredFlag, e.g. the north bridge) that GameFlags names
-        it(`map "${map.id}" (${map.variant}) keyItemGate[${i}] needs an existing item or a story flag`, () => {
+        // a gate opens on an item, or on story flags (requiredFlag / requiredFlags, e.g. the north bridge) that
+        // GameFlags names or that carry a region prefix (WORLD_PLAN 3.1)
+        it(`map "${map.id}" (${map.variant}) keyItemGate[${i}] needs an existing item or known flags`, () => {
           if (gate.requiredItem !== undefined) expect(itemIds.has(gate.requiredItem)).toBe(true);
-          else expect(Object.values(STORY_FLAGS), `requiredFlag ${gate.requiredFlag}`).toContain(gate.requiredFlag);
+          const flags = [...(gate.requiredFlag !== undefined ? [gate.requiredFlag] : []), ...(gate.requiredFlags ?? [])];
+          if (gate.requiredItem === undefined) expect(flags.length, 'a gate needs an item or a flag').toBeGreaterThan(0);
+          for (const f of flags) expect(isKnownFlag(f), `required flag ${f}`).toBe(true);
         });
       });
     });

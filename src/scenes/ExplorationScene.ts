@@ -2,7 +2,7 @@ import { Container } from 'pixi.js';
 import { battleBackgroundPath } from '../rendering/BattleBackground.js';
 import { battleBackdropId } from './exploration/BattleBackdrop.js';
 import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
-import { resolveNPCDialog, TerrainType } from '../types/index.js';
+import { TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import type { PlayerController } from '../entities/PlayerController.js';
@@ -16,10 +16,7 @@ import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
 import { DialogManager, DIALOG_CLOSE_HOLDOFF_FRAMES } from '../systems/DialogManager.js';
 import { BattleTrigger, type BattleEndData } from '../systems/BattleTrigger.js';
-import { KeyItemGateSystem } from '../systems/KeyItemGateSystem.js';
-import { VehicleManager } from '../systems/VehicleManager.js';
-import { ClassRegistry } from '../data/ClassRegistry.js';
-import { upgradeParty } from '../systems/ClassUpgradeSystem.js';
+import { fieldStep } from '../systems/fieldRules.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
@@ -27,12 +24,12 @@ import { FieldHUD, HUD_BOTTOM_BAND } from '../ui/FieldHUD.js';
 import { FieldTransition } from './exploration/FieldTransition.js';
 import { applyPendingFacing, createFieldPlayer, leaderClassId, recordPlayer, type FieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
-import { foundText, leftBehindText, receivedText, cantCarryText } from '../systems/pickupText.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
 import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { inspectAt } from './exploration/FieldInspect.js';
-import { createFieldStateSystems, openShopScene } from './exploration/FieldSystems.js';
-import { playFieldCutscene, npcCutsceneDue, npcsToRemove } from './exploration/ExplorationCutscenes.js';
+import { FieldVehicles, fieldModeOf } from './exploration/FieldVehicles.js';
+import { FieldNpcActions } from './exploration/FieldNpcActions.js';
+import { playFieldCutscene, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
 
@@ -62,14 +59,13 @@ export class ExplorationScene implements Scene {
   private dialogManager: DialogManager;
   private battleTrigger: BattleTrigger;
   private paused = false;
-  private keyItemGateSystem!: KeyItemGateSystem;
   /** Where the current step began (a blocked key-item gate sends the player back here). */
   private stepOrigin = { x: 0, y: 0 };
-  private vehicleManager!: VehicleManager;
+  private vehicles: FieldVehicles;
+  private npcActions: FieldNpcActions;
   private walkingMode: MovementMode = new WalkingMode();
   /** NPC in conversation (faces the heroes until the dialog closes). */
   private talkingNpc: NPC | null = null;
-  private pendingNpcAction: NPC | null = null;
   private fieldHUD: FieldHUD;
   private controlsHint: ControlsHint;
   private battleFlash = new BattleFlashEffect(this.container);
@@ -97,6 +93,9 @@ export class ExplorationScene implements Scene {
     dialogBox.visible = false;
     this.dialogManager = new DialogManager(dialogBox, { closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES });
     this.mapLoader = new MapLoader(game.data, this.placeholders);
+    this.vehicles = new FieldVehicles(game);
+    this.npcActions = new FieldNpcActions({ game, dialog: this.dialogManager, map: () => this.currentMapData,
+      playCutscene: (id) => this.playCutscene(id), startEncounter: (e) => this.triggerScriptedEncounter(e) });
     this.battleTrigger = new BattleTrigger(game);
     this.battleTrigger.setCutscenePlayer((id) => this.playCutscene(id));
     this.battleTrigger.setOnBattleTriggered(() => {
@@ -125,12 +124,9 @@ export class ExplorationScene implements Scene {
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
   }
 
-  /**
-   * Systems that hold the game's inventory and flags. Game.restoreState / resetState replace those objects (load,
-   * retry, new game), so these are rebuilt on every enter, before loadMap hands them the map's gates and vehicles.
-   */
+  /** Game.restoreState / resetState replace the flags (load, retry, new game): the vehicles rebind on every enter. */
   private bindGameState(): void {
-    ({ gates: this.keyItemGateSystem, vehicles: this.vehicleManager } = createFieldStateSystems(this.game));
+    this.vehicles.rebind();
   }
 
   /**
@@ -149,7 +145,7 @@ export class ExplorationScene implements Scene {
     this.battleFlash.finish();
     this.dialogManager.clear();
     this.talkingNpc = null;
-    this.pendingNpcAction = null;
+    this.npcActions.clear();
     this.game.events.off('battleEnd', this.handleBattleEnd);
     this.game.events.off('showDialog', this.handleShowDialog);
     this.game.events.on('battleEnd', this.handleBattleEnd);
@@ -276,10 +272,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setInspectCheck((x, y) => inspectAt(mapData, x, y, (f) => this.game.gameFlags.has(f)));
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
-    // Wire key item gates
-    this.keyItemGateSystem.setGates(mapData.keyItemGates ?? []);
-    // Wire vehicle spawns
-    this.vehicleManager.setSpawns(mapData.vehicles ?? []);
+    this.vehicles.setSpawns(mapId, mapData.vehicles ?? []);
     this.camera.update();
     tilemap.render();
     // B5: Update HUD with map name and gold
@@ -345,11 +338,7 @@ export class ExplorationScene implements Scene {
       this.talkingNpc = null;
     }
     // Handle pending NPC actions after dialog completes
-    if (this.pendingNpcAction) {
-      this.handleNpcPostDialog(this.pendingNpcAction);
-      this.pendingNpcAction = null;
-      return;
-    }
+    if (this.npcActions.runPending()) return;
     if (this.game.input.isJustPressed('cancel')) {
       this.game.scenes.push('fieldMenu');
       return;
@@ -358,15 +347,8 @@ export class ExplorationScene implements Scene {
 
     // Sync encounter rate multiplier from movement mode
     this.encounterSystem.setRateMultiplier(this.player.encounterRateMultiplier);
-
     // Check vehicle boarding on confirm key (when not moving)
-    if (!this.player.isMoving && this.game.input.isJustPressed('confirm')) {
-      const vehicleMode = this.vehicleManager.checkBoarding(this.player.gridX, this.player.gridY);
-      if (vehicleMode) {
-        this.player.currentMode = vehicleMode;
-        return;
-      }
-    }
+    if (this.vehicles.tryBoard(this.player)) return;
 
     const wasMoving = this.player.isMoving;
     if (!wasMoving) this.stepOrigin = { x: this.player.gridX, y: this.player.gridY };
@@ -390,118 +372,31 @@ export class ExplorationScene implements Scene {
       // the NPC turns to face the heroes and keeps facing them until the conversation box is dismissed
       npc.faceToward(this.player.gridX, this.player.gridY);
       this.talkingNpc = npc;
-      // C2: Chest interaction — add item to inventory, set flag
-      if (npc.chestItem && npc.chestFlag) {
-        if (this.game.gameFlags.has(npc.chestFlag)) {
-          this.dialogManager.start(['Already opened.']);
-        } else if (!this.game.inventory.canAdd(npc.chestItem)) {
-          // E1: a full bag leaves the chest closed for later
-          this.dialogManager.start([foundText(npc.chestItem), leftBehindText(npc.chestItem)]);
-        } else {
-          this.game.inventory.add(npc.chestItem, 1);
-          this.game.gameFlags.set(npc.chestFlag);
-          npc.setOpened();
-          // the chest's own line ("You found a Potion!", U9), else the shared wording
-          const own = resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag));
-          this.dialogManager.start(own.length > 0 ? [...own] : [foundText(npc.chestItem)]);
-        }
-        return;
-      }
-      if (npc.dialog.length > 0) {
-        const lines = [...resolveNPCDialog(npc.dialog, (flag) => this.game.gameFlags.has(flag))];
-        if (npc.giftItem && npc.giftFlag && !this.game.gameFlags.has(npc.giftFlag)) {
-          if (this.game.inventory.canAdd(npc.giftItem)) {
-            this.game.inventory.add(npc.giftItem, 1);
-            this.game.gameFlags.set(npc.giftFlag);
-            lines.push(receivedText(npc.giftItem));
-          } else lines.push(cantCarryText(npc.giftItem));
-        }
-        if (lines.length > 0) {
-          // Store NPC for post-dialog action (shop, class upgrade, cutscene, a fight it starts (B1), etc.)
-          if (npc.shopId || npc.action || npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f)) || this.npcFight(npc)) {
-            this.pendingNpcAction = npc;
-          }
-          this.dialogManager.start(lines);
-          return;
-        }
-      }
-      // an NPC with nothing to say who starts a fight (B1)
-      const fight = this.npcFight(npc);
-      if (fight) {
-        this.triggerScriptedEncounter(fight);
-        return;
-      }
+      if (this.npcActions.talk(npc)) return;
     }
-    if (wasMoving && !this.player.isMoving) {
-      // Check key item gates at new position
-      const gateResult = this.keyItemGateSystem.check(this.player.gridX, this.player.gridY);
-      if (gateResult.blocked) {
-        // the gate cell cannot be entered: step back to where the move started
+    if (wasMoving && !this.player.isMoving && this.currentMapData) {
+      // the field rules decide the step just taken: a gate, a transition, a scripted encounter (fieldRules.fieldStep)
+      const here = { x: this.player.gridX, y: this.player.gridY };
+      const step = fieldStep(this.currentMapData, this.stepOrigin, here,
+        this.vehicles.fieldState(fieldModeOf(this.player.currentMode)));
+      for (const flag of step.setFlags) this.game.gameFlags.set(flag);
+      if (!step.ok) {
+        // the cell cannot be entered (a shut gate): step back to where the move started
         this.player.setPosition(this.stepOrigin.x, this.stepOrigin.y);
-        this.dialogManager.start([gateResult.message ?? 'The way is blocked.']);
+        if (step.message !== undefined) this.dialogManager.start([step.message]);
         return;
       }
-
-      const transition = this.mapTransition.getTransitionAt(this.player.gridX, this.player.gridY);
-      // a transition that needs a story flag stays shut without it
-      if (transition && (!transition.requiredFlag || this.game.gameFlags.has(transition.requiredFlag))) {
-        this.fieldTransition.run(transition).catch((e) => console.error('Map transition failed:', e));
+      if (step.transition) {
+        this.fieldTransition.run(step.transition).catch((e) => console.error('Map transition failed:', e));
         return;
       }
-      // Check for scripted encounters at new position
-      const encounter = this.getScriptedEncounterAt(this.player.gridX, this.player.gridY);
-      if (encounter) {
-        this.triggerScriptedEncounter(encounter);
+      if (step.encounter) {
+        this.triggerScriptedEncounter(step.encounter);
         return;
       }
     }
     this.camera.update();
     this.tilemap?.render();
-  }
-
-  /** Handle NPC post-dialog actions (shop, class upgrade) */
-  private handleNpcPostDialog(npc: NPC): void {
-    const fight = this.npcFight(npc);
-    if (fight) {
-      this.triggerScriptedEncounter(fight);
-      return;
-    }
-    const cutscene = npcCutsceneDue(npc, (f) => this.game.gameFlags.has(f));
-    if (cutscene) {
-      this.playCutscene(cutscene).catch((e) => console.error(`Cutscene ${cutscene} failed:`, e));
-      return;
-    }
-    if (npc.action === 'classUpgrade') {
-      const messages = upgradeParty(
-        [...this.game.party.all],
-        this.game.gameFlags,
-        ClassRegistry.getAllClasses(),
-      );
-      if (messages.length > 0) {
-        this.dialogManager.start(messages);
-      } else {
-        this.dialogManager.start(['You are not yet ready for this.']);
-      }
-      return;
-    }
-    if (npc.shopId) {
-      openShopScene(this.game, npc.shopId);
-    }
-  }
-
-  /** The first scripted encounter matching `where` that is still due: its flag unset (one-time), requiredFlag met. */
-  private dueEncounter(where: (enc: ScriptedEncounter) => boolean): ScriptedEncounter | null {
-    const has = (f: string) => this.game.gameFlags.has(f);
-    return this.currentMapData?.scriptedEncounters?.find((e) => where(e) && !has(e.flag) && (!e.requiredFlag || has(e.requiredFlag))) ?? null;
-  }
-
-  private getScriptedEncounterAt(x: number, y: number): ScriptedEncounter | null {
-    return this.dueEncounter((e) => e.x === x && e.y === y);
-  }
-
-  /** The due encounter that talking to `npc` starts (`ScriptedEncounter.npc`, B1). */
-  private npcFight(npc: NPC): ScriptedEncounter | null {
-    return this.dueEncounter((e) => e.npc === npc.id);
   }
 
   /** Backdrop for a battle here (see BattleBackdrop.ts). */

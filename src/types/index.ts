@@ -1,4 +1,7 @@
 import { Container } from 'pixi.js';
+import type { BakedMapArtQuestFields, EncounterZoneQuestFields, MapDataQuestFields, MapNPCQuestFields, RequiredFlagsField,
+  SaveDataQuestFields } from './quest.js';
+export * from './quest.js';
 
 export interface Scene {
   readonly container: Container;
@@ -186,11 +189,11 @@ export interface SpellData {
 
 /** Flag-conditional dialog entry: shows text when condition flag is set (or as default if no condition) */
 export interface ConditionalDialog {
-  condition?: string;  // GameFlag name — if set, show this dialog
+  condition?: string;  // GameFlag name, or `item:<id>` (an item held; W1-B) — if set, show this dialog
   text: string[];
 }
 
-export interface MapNPC {
+export interface MapNPC extends MapNPCQuestFields {
   id: string;
   x: number;
   y: number;
@@ -212,7 +215,7 @@ export interface MapNPC {
   cutscene?: NPCCutscene;
 }
 
-export interface NPCCutscene {
+export interface NPCCutscene extends RequiredFlagsField {
   /** Id in assets/data/cutscenes.yaml. */
   id: string;
   requiredFlag?: string;
@@ -254,6 +257,7 @@ export type MapTransition = {
   y: number;
   targetMap: string;
   requiredFlag?: string;  // story flag required to use this transition
+  requiredFlags?: string[];  // every one of these flags is required too
   /** Screen effect when taking this transition: a door opening, or the plain fade. */
   effect?: 'door' | 'fade';
 } & ({ targetX: number; targetY: number; targetEntrance?: undefined }
@@ -277,7 +281,7 @@ export interface EncounterRate {
 }
 
 /** A region of a map with its own table (and optionally rate); rects are inclusive [x0, y0, x1, y1]. */
-export interface EncounterZone {
+export interface EncounterZone extends EncounterZoneQuestFields {
   id: string;
   rects: [number, number, number, number][];
   encounters: EncounterEntry[];
@@ -285,7 +289,7 @@ export interface EncounterZone {
 }
 
 /** A one-time scripted encounter placed at a specific map tile */
-export interface ScriptedEncounter {
+export interface ScriptedEncounter extends RequiredFlagsField {
   x: number;
   y: number;
   enemyIds: string[];
@@ -298,7 +302,7 @@ export interface ScriptedEncounter {
   npc?: string;
 }
 
-export interface MapData {
+export interface MapData extends MapDataQuestFields {
   id: string;
   /** Display name for the field HUD (no label when missing). */
   name?: string;
@@ -345,7 +349,7 @@ export interface MapInspectCell {
 }
 
 /** Baked map chunks: `chunk` x `chunk` tiles of `tile` native px each, row-major; `above` is null where empty. */
-export interface BakedMapArt {
+export interface BakedMapArt extends BakedMapArtQuestFields {
   tile: number;
   chunk: number;
   below: string[];
@@ -363,12 +367,13 @@ export enum TerrainType {
   River = 7,
   Road = 8,
   Bridge = 9,
+  Lake = 11, // 10 stays the compiler's counter value
 }
 
 export type VehicleType = 'canoe' | 'ship' | 'airship';
 
 /** Vehicle spawn point on a map */
-export interface VehicleSpawn {
+export interface VehicleSpawn extends RequiredFlagsField {
   type: VehicleType;
   x: number;
   y: number;
@@ -376,7 +381,7 @@ export interface VehicleSpawn {
 }
 
 /** Key item gate that blocks passage until the player has a required item */
-export interface KeyItemGate {
+export interface KeyItemGate extends RequiredFlagsField {
   x: number;
   y: number;
   /** Item that opens the gate; omit when the gate opens on a story flag (`requiredFlag`). */
@@ -404,7 +409,7 @@ export interface CharacterSaveData {
   statusEffects?: Array<{ effect: string; duration: number }>;
 }
 
-export interface SaveData {
+export interface SaveData extends SaveDataQuestFields {
   version: number;
   party: { members: CharacterSaveData[]; gold: number };
   inventory: Array<{ itemId: string; quantity: number }>;

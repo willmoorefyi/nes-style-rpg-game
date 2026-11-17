@@ -3,6 +3,7 @@ import { BattleTrigger, type BattleEndData } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { applyDebugParty, isStatus, type DebugMember } from './debugParty.js';
+import type { FieldMode, VehicleState } from '../types/index.js';
 
 export interface DebugScenario {
   id: string;
@@ -25,6 +26,11 @@ export interface DebugScenario {
   map?: string;
   spawn?: [number, number];
   entrance?: string;
+  /** `a1`: `spawn` is an act-1 cell, translated by the loaded map's `world.frames.a1.origin` (GAP-18; W1-B). */
+  frame?: 'a1';
+  /** Parked vehicles and the party's field mode at the start (QUEST 4.1; W1-A). */
+  vehicles?: VehicleState[];
+  fieldMode?: FieldMode;
 }
 
 /** Choose a scenario by `?scenario=<id>` (dev URLs); falls back to the first scenario. */

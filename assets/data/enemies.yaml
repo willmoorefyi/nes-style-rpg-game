@@ -113,6 +113,7 @@
   weakness: fire
   resist: ice
   family: undead
+# === A1-T pirate (pass W: owned by A1-T; only its bossPhases, ai and specials) ===
 - id: pirate
   name: Pirate
   num: 17
@@ -135,6 +136,7 @@
   sprite: pirate
   attack: melee
   weakness: lightning
+# === end A1-T pirate ===
 - id: ogre
   name: Ogre
   num: 14
@@ -226,6 +228,7 @@
   attack: melee
   weakness: ice
   family: magical
+# === ERT-D vampire (pass W: owned by ERT-D; only its bossPhases, ai and specials) ===
 - id: vampire
   name: Vampire
   num: 46
@@ -251,6 +254,7 @@
   weakness: fire
   resist: dark
   family: undead
+# === end ERT-D vampire ===
 - id: dragon
   name: Red Dragon
   num: 66
@@ -307,6 +311,7 @@
     message: Garland's attacks grow fiercer!
     hits: 3
   size: large
+# === ERT-D lich (pass W: owned by ERT-D; only its bossPhases, ai and specials) ===
 - id: lich
   name: Rime Sovereign
   num: 49
@@ -350,6 +355,7 @@
     message: The Rime Sovereign's skull fractures!
   family: undead
   size: boss
+# === end ERT-D lich ===
 # Roster pass R (docs/ROSTER_PLAN.md 7.1-7.3), one entry per approved sheet, by spec number: the spec's NES numbers by
 # the 7.1 rules (agility = 5 + round(evade / 6); strength, vitality, intelligence, luck derived), `ai` from the
 # spells.yaml spells only (other codes display-only), several specials split the spec's shared use rate. The rematches
@@ -898,6 +904,7 @@
   resist: ice
   family: undead
   size: small
+# === ELF-D piscodemon (pass W: owned by ELF-D; only its bossPhases, ai and specials) ===
 - id: piscodemon
   name: Piscodemon
   num: 32
@@ -923,6 +930,8 @@
   elementalProfile: {weaknesses: [], resistances: [fire, ice], immunities: [], absorbs: []}
   family: aquatic
   size: small
+# === end ELF-D piscodemon ===
+# === ELF-O astos (pass W: owned by ELF-O; only its bossPhases, ai and specials) ===
 - id: astos
   name: Astos
   num: 33
@@ -958,6 +967,7 @@
     patternId: aggressive
     message: "Astos drops his royal disguise!"
   size: boss
+# === end ELF-O astos ===
 - id: wraith
   name: Wraith
   num: 35
@@ -1596,6 +1606,7 @@
   resist: fire
   family: giant
   size: huge
+# === FIR-D1 ashen_queen (pass W: owned by FIR-D1; only its bossPhases, ai and specials) ===
 - id: ashen_queen
   name: Ashen Queen
   num: 67
@@ -1633,6 +1644,7 @@
     message: "The Ashen Queen's rite turns to inferno!"
     attackAnim: heavy
   size: boss
+# === end FIR-D1 ashen_queen ===
 - id: white_dragon
   name: White Dragon
   num: 68
@@ -1803,6 +1815,7 @@
   attack: melee
   family: magical
   size: small
+# === FIR-D2 evil_eye (pass W: owned by FIR-D2; only its bossPhases, ai and specials) ===
 - id: evil_eye
   name: Evil Eye
   num: 75
@@ -1836,6 +1849,7 @@
   attack: melee
   family: magical
   size: huge
+# === end FIR-D2 evil_eye ===
 - id: desert_baretta
   name: Desert Baretta
   num: 76
@@ -2233,6 +2247,7 @@
   resist: fire
   family: magical
   size: large
+# === ORD-O dragon_zombie (pass W: owned by ORD-O; only its bossPhases, ai and specials) ===
 - id: dragon_zombie
   name: Dragon Zombie
   num: 92
@@ -2259,6 +2274,7 @@
   resist: ice
   family: undead
   size: huge
+# === end ORD-O dragon_zombie ===
 - id: sahagin_prince
   name: Sahagin Prince
   num: 93
@@ -2501,6 +2517,7 @@
   resist: fire
   family: aquatic
   size: large
+# === WAT-D drowned_sovereign (pass W: owned by WAT-D; only its bossPhases, ai and specials) ===
 - id: drowned_sovereign
   name: Drowned Sovereign
   num: 102
@@ -2533,6 +2550,7 @@
     attackAnim: heavy
   family: aquatic
   size: boss
+# === end WAT-D drowned_sovereign ===
 - id: tyrannosaur
   name: Tyrannosaur
   num: 103
@@ -2928,6 +2946,7 @@
   sprite: dark_fighter
   attack: melee
   size: small
+# === WND-D2 warmech (pass W: owned by WND-D2; only its bossPhases, ai and specials) ===
 - id: warmech
   name: Warmech
   num: 118
@@ -2957,6 +2976,8 @@
     patternId: aggressive
     message: "Warmech's core burns red hot!"
   size: boss
+# === end WND-D2 warmech ===
+# === WND-D2 hollow_seraph (pass W: owned by WND-D2; only its bossPhases, ai and specials) ===
 - id: hollow_seraph
   name: Hollow Seraph
   num: 119
@@ -2988,6 +3009,7 @@
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"
   size: boss
+# === end WND-D2 hollow_seraph ===
 - id: rhyos
   name: Rhyos
   num: 120
@@ -3014,6 +3036,7 @@
   weakness: ice
   resist: fire
   size: large
+# === PST death_eye (pass W: owned by PST; only its bossPhases, ai and specials) ===
 - id: death_eye
   name: Death Eye
   num: 121
@@ -3053,6 +3076,8 @@
     message: "The Death Eye's grave cloth unravels!"
   family: undead
   size: boss
+# === end PST death_eye ===
+# === PST lich_2 (pass W: owned by PST; only its bossPhases, ai and specials) ===
 - id: lich_2
   name: Rime Sovereign II
   num: 124
@@ -3084,6 +3109,7 @@
     message: "The Rime Sovereign's skull fractures!"
   family: undead
   size: boss
+# === end PST lich_2 ===
 - id: purple_worm
   name: Purple Worm
   num: 122
@@ -3132,6 +3158,7 @@
   elementalProfile: {weaknesses: [], resistances: [fire, ice], immunities: [], absorbs: []}
   family: magical
   size: large
+# === PST ashen_queen_2 (pass W: owned by PST; only its bossPhases, ai and specials) ===
 - id: ashen_queen_2
   name: Ashen Queen II
   num: 125
@@ -3163,6 +3190,8 @@
     message: "The Ashen Queen's rite turns to inferno!"
     attackAnim: heavy
   size: boss
+# === end PST ashen_queen_2 ===
+# === PST drowned_sovereign_2 (pass W: owned by PST; only its bossPhases, ai and specials) ===
 - id: drowned_sovereign_2
   name: Drowned Sovereign II
   num: 126
@@ -3200,6 +3229,8 @@
     attackAnim: heavy
   family: aquatic
   size: boss
+# === end PST drowned_sovereign_2 ===
+# === PST hollow_seraph_2 (pass W: owned by PST; only its bossPhases, ai and specials) ===
 - id: hollow_seraph_2
   name: Hollow Seraph II
   num: 127
@@ -3238,6 +3269,7 @@
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"
   size: boss
+# === end PST hollow_seraph_2 ===
 - id: chaos
   name: Chaos
   num: 128

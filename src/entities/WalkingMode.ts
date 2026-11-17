@@ -1,22 +1,14 @@
 import { TerrainType } from '../types/index.js';
 import type { MovementMode } from './MovementMode.js';
+import { terrainAllows } from '../systems/fieldRules.js';
 
 /** Default on-foot movement. Walkable on land terrain only. */
 export class WalkingMode implements MovementMode {
   readonly id = 'walking';
 
+  /** The field rules decide (fieldRules.terrainAllows), shared with the progression verifier. */
   canMove(terrain: TerrainType): boolean {
-    switch (terrain) {
-      case TerrainType.Grass:
-      case TerrainType.Forest:
-      case TerrainType.Desert:
-      case TerrainType.Swamp:
-      case TerrainType.Road:
-      case TerrainType.Bridge:
-        return true;
-      default:
-        return false;
-    }
+    return terrainAllows('walking', terrain);
   }
 
   getSpeedMultiplier(terrain: TerrainType): number {
