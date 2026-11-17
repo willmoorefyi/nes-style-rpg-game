@@ -88,6 +88,8 @@ export interface RunOptions {
   /** Called at the start of every command phase (e.g. to refill charges for a stress case). */
   beforeCommands?: (bsm: BattleStateMachine) => void;
   maxRounds?: number;
+  /** A boss form chain (`formChain`), for a fight with forms. */
+  forms?: EnemyData[];
 }
 
 /**
@@ -99,7 +101,7 @@ export function runBattle(party: Character[], enemies: EnemyData[], spells: Spel
   const potions = opts.potions ?? { n: 0 };
   const inventory = new Inventory();
   if (potions.n > 0) inventory.add('potion', potions.n);
-  const bsm = new BattleStateMachine({ party, enemies, spells, inventory, canRun: false }, rng);
+  const bsm = new BattleStateMachine({ party, enemies, spells, inventory, canRun: false, forms: opts.forms }, rng);
   bsm.startBattle();
   bsm.advanceFromIntro();
   const enemyTurns = new Map<string, number>();
