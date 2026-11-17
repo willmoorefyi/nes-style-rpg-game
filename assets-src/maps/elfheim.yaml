@@ -5,7 +5,7 @@
 # a stream that ends in a lily pond; an inner hedge with topiary guards between the town and the castle rise; a herb
 # garden by the herbalist's house.
 # Topology: one outdoor map, the south gate -> the high street -> the north gate (elfheim-castle); 6 houses, 5 shops
-# and the inn open off the high street and three lanes; no stairs.
+# and the inn open off the high street and five lanes; no stairs.
 # ground legend: . grass  : cobble  , dirt  ~ water  = bridge
 id: elfheim
 name: Elfheim
@@ -252,6 +252,7 @@ objects:
   storeys: 1
   roof: elf
   wall: stone
+  chimney: 3
   enter: {map: elfheim-house-warden, entrance: door}
 - type: prefab
   prefab: inn
@@ -3436,7 +3437,7 @@ npcs:
   dialog:
   - condition: PRINCE_AWAKE
     text: [A witch's herb! Mother was right. I'm going to be a witch when I grow up.]
-  - text: ['Mother says a witch could wake the prince. I think a kiss would do it, like in the stories.']
+  - text: [Mother says a witch could wake the prince. I say a trumpet would. A big one.]
   tint: '#cfe8c2'
 - id: elfheim_watcher
   sprite: white_mage

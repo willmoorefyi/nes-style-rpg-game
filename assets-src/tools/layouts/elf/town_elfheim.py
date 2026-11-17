@@ -29,7 +29,7 @@ Distinct: a hedge ring bent into green bastions with a single south gate; a spri
 a stream that ends in a lily pond; an inner hedge with topiary guards between the town and the castle rise; a herb
 garden by the herbalist's house.
 Topology: one outdoor map, the south gate -> the high street -> the north gate (elfheim-castle); 6 houses, 5 shops
-and the inn open off the high street and three lanes; no stairs."""
+and the inn open off the high street and five lanes; no stairs."""
 
 g = Grid(W, H, ".")
 RING = [(5, 2), (46, 2), (49, 5), (49, 20), (46, 24), (49, 28), (49, 43), (45, 47), (6, 47), (2, 43), (2, 28),
@@ -84,7 +84,7 @@ for (name, mid, x, y, h, st, roof, wall, sign) in SHOPS:
         enter={"map": mid, "entrance": "door"})
 HOMES = [("herbalist", 13, 19, 4, 1, "elf", "rose", 1), ("bowyer", 34, 19, 4, 1, "green", "ochre", 3),
          ("scribe", 40, 18, 5, 2, "elf", "white", None), ("healer", 8, 30, 4, 1, "elf", "white", 3),
-         ("bard", 13, 33, 4, 1, "green", "rose", 1), ("warden", 42, 28, 4, 1, "elf", "stone", None)]
+         ("bard", 13, 33, 4, 1, "green", "rose", 1), ("warden", 42, 28, 4, 1, "elf", "stone", 3)]
 for (name, x, y, h, st, roof, wall, ch) in HOMES:
     obj(**HOUSE, name=f"house_{name}", x=x, y=y, h=h, storeys=st, roof=roof, wall=wall,
         **({"sign": "shrine"} if name == "healer" else {}), **({"chimney": ch} if ch is not None else {}),

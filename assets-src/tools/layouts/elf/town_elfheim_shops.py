@@ -79,7 +79,7 @@ def build() -> list[Path]:
     keeper(r, "item", "vendor_f", 2, 4, "Potions brewed in the spring's own water. Tents that pitch themselves, nearly.",
            "Business is brisk! Everyone's going on journeys now the prince is up.", "elfheim_item")
     out.append(r.save(note("the item shop, a corner counter boxing the keeper into the north-west",
-                           "an L-shaped counter; three shelves of bottles on the east wall"),
+                           "an L-shaped counter; three shelves of bottles at the east end of the back wall"),
                       {"floor": wood(1.1), **LEAF}, [180, 150, 90], music=SHOP))
 
     # white magic: a round-cornered room, a font of light behind the counter

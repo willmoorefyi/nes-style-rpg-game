@@ -23,6 +23,11 @@ materials:
   in_wall_top:
     from: slate
     shade: 0.6
+  carpet:
+    from: carpet
+    hue: 120
+    sat: 0.7
+    shade: 0.85
 ground: |
   WWWWWWWWWWWW
   WFFFFFFFFFFW

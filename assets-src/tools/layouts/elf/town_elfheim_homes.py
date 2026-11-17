@@ -17,7 +17,8 @@ from interiors_common import Town, wood  # noqa: E402
 from town_elfheim_people import ELDER, ELF, talk  # noqa: E402
 
 ELFHEIM = Town("elfheim", script="elf/town_elfheim_rooms.py")
-LEAF = {"in_wall_face": {"from": "in_wall_face", "shade": 0.85}, "in_wall_top": {"from": "slate", "shade": 0.6}}
+LEAF = {"in_wall_face": {"from": "in_wall_face", "shade": 0.85}, "in_wall_top": {"from": "slate", "shade": 0.6},
+        "carpet": {"from": "carpet", "hue": 120, "sat": 0.7, "shade": 0.85}}      # leaf-green rugs
 CLINIC_PRICE = 20
 
 
@@ -47,7 +48,7 @@ def build() -> list[Path]:
         awake=["He's awake, and on Matoya's herb, not mine. I'll be humble about it. Eventually."]), tint=ELF)
     r.npc("elfheim_herb_apprentice", "villager", 3, 6, talk(
         ["I chop, I dry, I label. Mistress says in a hundred years I may be allowed to mix."]), tint=ELF)
-    out.append(r.save(note("the herbalist's drying room, shelves of jars on every wall and a work table",
+    out.append(r.save(note("the herbalist's drying room, shelves of jars along the back wall and a work table",
                            "four jar shelves along the back wall; a green rug where the herbs are sorted"),
                       {"floor": wood(1.05), **LEAF}, [110, 150, 90]))
 
@@ -115,7 +116,7 @@ def build() -> list[Path]:
     for x in (6, 8, 10):
         r.tall("bed", x, 3)
     r.wall([["potion_shelf"]], 2, 1)
-    r.one("orb_white", 1, 3)
+    r.one("orb_white", 1, 7)
     r.one("table", 3, 3)
     r.one("plant", 10, 7)
     r.npc("elfheim-healer-keeper", "white_mage", 3, 5,
@@ -124,8 +125,8 @@ def build() -> list[Path]:
     r.npc("elfheim_ward_patient", "villager", 7, 6, talk(
         ["I tried to cut through the ring hedge on a dare. The hedge cut back."],
         awake=["The healer says I can go home now that the prince is up. I think she just wants the cot."]), tint=ELF)
-    out.append(r.save(note("the healer's ward, three cots and a white orb by the hearth wall",
-                           "a white orb the healer calls on beside the door; a green rug running between the cots"),
+    out.append(r.save(note("the healer's ward, three cots and a shelf of salves",
+                           "a white orb the healer calls on beside the door; a green rug at the cots' feet"),
                       {"floor_stone": "marble", **LEAF}, [160, 200, 150]))
 
     # the bard: a music room round a small stage

@@ -106,7 +106,7 @@ def outdoor() -> list[dict]:
             ["I made a song about the sleeping prince. It's very sad. Nobody wants to hear it any more."],
             awake=["I made a new song: The Prince Who Woke. It's very short, but it ends well."]), wander=True),
         npc("elfheim_herb_girl", "villager_f", 40, 44, talk(
-            ["Mother says a witch could wake the prince. I think a kiss would do it, like in the stories."],
+            ["Mother says a witch could wake the prince. I say a trumpet would. A big one."],
             awake=["A witch's herb! Mother was right. I'm going to be a witch when I grow up."])),
         npc("elfheim_watcher", "white_mage", 16, 15, talk(
             ["I come every morning to see if a light is lit in the prince's window. Not yet. Not yet."],

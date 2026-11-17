@@ -22,7 +22,8 @@ from town_elfheim_people import AWAKE, ELDER, ELF, HERB, talk  # noqa: E402
 
 KITS = ["castle", "interior", "town"]
 MATS = {"floor_stone": {"from": "marble", "shade": 0.9}, "in_wall_face": {"from": "castle_wall_in", "shade": 0.9},
-        "in_wall_top": {"from": "slate", "shade": 0.5}, "floor": {"from": "floor", "shade": 0.85}}
+        "in_wall_top": {"from": "slate", "shade": 0.5}, "floor": {"from": "floor", "shade": 0.85},
+        "carpet": {"from": "carpet", "hue": 120, "sat": 0.7, "shade": 0.85}}      # the green runner
 TRIM = [120, 170, 110]                           # leaf green and silver
 LEGEND = "legend: W wall top  F wall face  - marble  _ wood floor  + green runner"
 QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": [], "no_static_chokepoints": True,
@@ -63,7 +64,7 @@ def hall() -> Path:
     r.wall([["tapestry"]], 20, 2)
     for x, y in ((6, 8), (19, 8), (6, 13), (19, 13)):
         r.pillar(x, y)
-    for x, y in ((3, 16), (22, 4), (9, 4), (16, 4)):
+    for x, y in ((3, 16), (22, 4), (11, 4), (14, 4)):
         r.deco([["plant"]], x, y)
     r.transitions += [{"x": x, "y": 19, "targetMap": "elfheim", "targetEntrance": "north_gate"} for x in (12, 13)]
     r.npcs += [
@@ -89,8 +90,8 @@ def hall() -> Path:
         {"text": ["A gate of living wood is grown across the stair down. Its lock is a knot shaped like a leaf."]}]}
     keys = [{"x": x, "y": 14, **gate} for x in (20, 21)]
     return r.write(note("the elven castle's hall on the rise: an empty throne, a stair up and a stair down",
-                        "a gate of living wood grown over the vault stair; four pillars and a green runner to the "
-                        "prince's empty throne",
+                        "the prince's throne left empty at the head of a green runner, potted ferns at its sides; the "
+                        "stair down to a vault beneath the hall, sunk in the floor beside the south-east pillar",
                         "the hall -> the chamber (stair up, north-west) and the vault (stair down, south-east, behind "
                         "the Mystic Key gate); the door is the way out"),
                    {"gate": [12, 18], "chamber": [4, 4], "vault": [20, 13]}, extra={"keyItemGates": keys})

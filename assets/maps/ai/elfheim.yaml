@@ -241,7 +241,7 @@ npcs:
   dialog:
   - condition: PRINCE_AWAKE
     text: [A witch's herb! Mother was right. I'm going to be a witch when I grow up.]
-  - text: ['Mother says a witch could wake the prince. I think a kiss would do it, like in the stories.']
+  - text: [Mother says a witch could wake the prince. I say a trumpet would. A big one.]
   tint: '#cfe8c2'
 - id: elfheim_watcher
   sprite: white_mage
