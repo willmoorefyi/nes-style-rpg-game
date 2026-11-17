@@ -15,43 +15,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cornelia_gates  # noqa: E402
 from common import Grid, polygon_mask, ring, write_map  # noqa: E402
+from town_common import TURRET, Outdoor, flag, win  # noqa: E402
 
 W, H = 62, 72
 CX = 30                                          # the castle door column: the grand axis of the city
 
 g = Grid(W, H, ".")
-objects: list[dict] = []
-
-
-def obj(**o):
-    objects.append(o)
-
-
-def deco(parts, x, y, **kw):
-    obj(type="deco", parts=parts, x=x, y=y, **kw)
-
-
-def oak(x, y):                                   # 2x3 broadleaf tree; (x, y) is its top-left (crown row walkable)
-    deco([["oak_0_0", "oak_0_1"], ["oak_1_0", "oak_1_1"], ["oak_2_0", "oak_2_1"]], x, y, above_rows=1)
-
-
-def lamp(x, y):                                  # (x, y) is the lamp head (walkable, drawn over characters)
-    deco([["lamp_top"], ["lamp_bottom"]], x, y, above_rows=1)
-
-
-def fir(x, y):                                   # (x, y) is the trunk; the crown is the cell above
-    obj(type="tree", x=x, y=y)
-
-
-def win(x, y):
-    return {"parts": [["arch_window_top"], ["arch_window_bottom"]], "x": x, "y": y}
-
-
-def flag(x, y):
-    return {"parts": [["flag_top"], ["flag_bottom"]], "x": x, "y": y}
-
-
-TURRET = [["tower_0_0", "tower_0_1"], ["tower_1_0", "tower_1_1"], ["tower_2_0", "tower_2_1"]]
+town = Outdoor()                                 # oak / fir / lamp / win / flag: layouts/town_common.py
+objects, obj, deco, oak, lamp, fir = town.objects, town.obj, town.deco, town.oak, town.lamp, town.fir
 
 # ── outer wall: a bent ring with bastions, 2 cells thick ──
 OUTLINE = [(5, 2), (54, 2), (58, 6), (58, 27), (55, 30), (55, 35), (58, 38), (58, 54), (54, 60), (47, 65), (35, 68),
