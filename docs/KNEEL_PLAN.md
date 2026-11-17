@@ -724,6 +724,7 @@ Ruled: **R1 = no** (enemies never kneel at low HP), **R2 = yes** (poison kneels,
 | 2026-11-17 | K1 | merged (eca44a9); atlases rebuilt: 9 pages, preload [0]; 5063 tests (the G10 floor); lockdiff accepts the hero lock names |
 | 2026-11-17 | D-K11 / D-K19 amended | kneeling mechanicals use `mech_kneel`: the legs follow the biped limb cap and band (0.68-0.85), the arms, torso and head stay <= 15 deg; the reviewer asked for the knee on the ground (orchestrator) |
 | 2026-11-17 | review loop | an independent image reviewer judges every tranche; max 3 iterations per sprite, the best iteration is kept and the 3-iteration hits are reported to the user (user) |
+| 2026-11-17 | K2-0 | 5 probes locked at it3 (iron_golem, blue_dragon, hydra, garland, green_dragon). Rulings: hydra `tall_necks` band 0.60-0.90 (full-width necks over the ratio); garland cape kept at 60 % of idle red, not 70 %, to avoid shards. `samplers` key allows rotsprite per part on mechanical kneels. D-K18 proof: 63 branch rigs byte-identical (orchestrator) |
 
 ## TODOs
 
