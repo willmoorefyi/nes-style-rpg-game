@@ -70,6 +70,10 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
+  kneel_in1:
+    tweaks: {foot_f: [0, 1], toe_f: [0, 1]}
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], foot_f: [0, 2], toe_f: [0, 2]}
   atk_wind1:                   # half of wind2: the crouch starts (coil forward), knees give, claw drawn back
     t: 0.15
     dy: 2
@@ -125,4 +129,25 @@ masks:
     attack: [[6, 67], [18, 67], [18, 78], [6, 78]]
     hurt: [[17, 68], [30, 68], [30, 78], [17, 78]]
 holds: []
-paint: []
+paint:
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[33, 19], [46, 41], [45, 42], [46, 42], [46, 44], [50, 48]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[45, 41], [40, 60], [40, 61], [39, 63], [39, 64]], rgb: [57, 16, 24]}
+  - {frame: kneel_in1, xy: [[45, 43], [46, 43], [46, 45]], rgb: [156, 82, 41]}
+  - {frame: kneel_in1, xy: [[47, 44]], rgb: [115, 66, 41]}
+  - {frame: kneel_in1, xy: [[47, 45], [48, 46], [49, 48]], rgb: [90, 24, 24]}
+  - {frame: kneel_in1, xy: [[47, 46], [48, 47], [49, 47]], rgb: [239, 165, 82]}
+  - {frame: kneel_in2, xy: [[44, 28], [44, 50], [46, 58], [45, 59], [37, 62], [20, 52], [19, 55], [17, 57], [18, 57]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[45, 28]], rgb: [156, 82, 41]}
+  - {frame: kneel_in2, xy: [[43, 49], [35, 62]], rgb: [239, 165, 82]}
+  - {frame: kneel_b, xy: [[48, 56], [25, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[24, 77], [25, 77], [26, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); the far leg and robe hem drawn in off the cell edge and onto the feet row; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {el_f: [4, 0], hand_f: [3, 0], knee_f: [6, -1], foot_f: [10, 3], toe_f: [10, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[31, 31], [32, 31], [16, 76], [25, 76]], rgb: [6, 4, 10]}
+    - {xy: [[21, 46]], rgb: [57, 16, 24]}
+    - {xy: [[16, 77], [25, 77]], rgb: null}
+    - {xy: [[44, 21], [46, 22], [34, 26], [49, 27], [45, 38], [22, 47], [49, 49], [21, 51], [51, 55], [19, 56], [50, 56], [49, 57]], rgb: [6, 4, 10]}
