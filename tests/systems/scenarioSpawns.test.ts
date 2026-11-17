@@ -37,7 +37,10 @@ describe('scenarioSpawns: overworld field scenarios', () => {
     const [w, h] = map.world?.frames.a1?.size ?? [map.width, map.height];
     for (const s of onOverworld) {
       const [x, y] = s.entrance ? map.entrances![s.entrance] : scenarioSpawn(s, map);
-      expect(x >= ox && x < ox + w && y >= oy && y < oy + h, `${s.id} at (${x}, ${y}) inside the a1 frame`).toBe(true);
+      // pass W's w_* stage starts stand at their region's entrance (WORLD 6.5), outside the act-1 frame
+      if (!s.id.startsWith('w_')) {
+        expect(x >= ox && x < ox + w && y >= oy && y < oy + h, `${s.id} at (${x}, ${y}) inside the a1 frame`).toBe(true);
+      }
       const state = { flags: new Set(s.flags ?? []), items: new Set<string>(), mode: 'walking' as const, vehicles: [] };
       expect(canEnter(map, { x, y }, 'walking', state), `${s.id} at (${x}, ${y})`).toBe(true);
     }

@@ -315,10 +315,12 @@ stages:
     maps: []
     zones: [overworld:fir_desert]
     grind: 2.0
-    walk: []
+    # the hatch of the buried hull (overworld (143, 159)) takes the stone and plays fir_airship_rises
+    walk: ["overworld:cutscene:fir_hull_hatch"]
+    entry: {map: overworld, x: 143, y: 160, mode: walking}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end FIR-O ===
   # === FIR-T (pass W: owned by FIR-T) ===
   - id: S14

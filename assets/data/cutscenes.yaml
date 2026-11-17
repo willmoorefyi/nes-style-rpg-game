@@ -170,6 +170,35 @@
 # === ERT-D (pass W: owned by ERT-D) ===
 # === end ERT-D ===
 # === FIR-O (pass W: owned by FIR-O) ===
+# S17 (WORLD 4.4): the buried hull's hatch takes the levistone; the dune pours off the hull, the ship lifts clear and
+# settles on the grass at the desert's edge (world (149, 162)), where it waits as the party's airship.
+- id: fir_airship_rises
+  steps:
+    - type: dialog
+      text: "The levistone slips into its socket. For a breath nothing happens; then the whole dune starts to slide."
+    - type: fade_out
+      duration: 700
+    - type: take_item
+      item: levistone
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "Sand pours off a long brass keel in hissing sheets. Ribbed sails unfold that were never meant for wind."
+    - type: dialog
+      text: "The hull shrugs off a thousand years of desert and rises, light as a leaf, into the open sky."
+    - type: fade_out
+      duration: 700
+    - type: set_flag
+      flag: AIRSHIP_RAISED
+    - type: set_vehicle
+      vehicle: airship
+      map: overworld
+      x: 149
+      y: 162
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "The airship settles on the grass at the desert's edge. Step aboard and press to rise; it lands only on open grass."
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
 # === end FIR-T ===

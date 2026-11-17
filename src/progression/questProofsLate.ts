@@ -39,6 +39,8 @@ export function proofBands(ctx: QuestContext): ProofResult {
     }
     const lv = Math.floor(p.level);
     const text = `${name} L${p.level.toFixed(1)} [${s.band[0]},${s.band[1]}]`;
+    // below the band only because a pending ancestor was assumed at its band low: it waits for that stage
+    if (lv < s.band[0] && !ctx.strict && curve.assumedGold.has(s.id)) { pending++; continue; }
     if (lv < s.band[0] || lv > s.band[1]) failures.push(fail('d', 'BAND', `BAND ${s.id} ${name} L${p.level.toFixed(1)} outside [${s.band[0]},${s.band[1]}]`));
     shown.push(text);
   }
