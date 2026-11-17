@@ -1,6 +1,16 @@
-# AI kneel keyframe plan (pass KA), rev 6: Gemini nano-banana-2.1, pilot and batch
+# AI kneel keyframe plan (pass KA), rev 7: Gemini nano-banana-2.1, pilot and batch
 
-Status: rev 6, a plan only. It answers the momus review of rev 5. No paid or AI call was made to write it.
+Status: rev 7, a plan only. It answers the momus review of rev 6 (OKAY once items 1 and 2 are fixed). No paid or AI call was made to write it.
+
+**Rev 7 changes (momus review of rev 6):**
+
+| # | Finding | Resolution |
+|---|---|---|
+| n1 (P1) | Cutting at the measured pitch p made A-scale fail by construction, since the guide fixes the figure's size at k | **The cut stays at k.** Size comes only from the figure against the silhouette (the 10 % height check and its arm-(d) path). The pitch only **aligns** the window's phase to Gemini's grid. \|p - k\| / k is reported as an R3 note and in the pilot distribution. A cut at p happens only when the figure itself is off by about k / p, which is the arm-(d) path's case (section 2) |
+| n2 (P2) | With `void_ok` false, an expired sprite lost a try, and its reserve try was refused | Option 1: `ka_g_expiry` rows are **excluded** from the per-sheet count and from the "4th try must be `ka_g_reserve`" rule; they count only against the purpose cap and the run cap. New selftest walk: expired -> re-send -> round 2 -> round 3 -> reserve, all accepted (section 5) |
+| n3 (P3) | A cancelled duplicate may already have billed requests | At cancel, the duplicate's processed count is written as that many `attempt` rows with purpose `ka_g_expiry` and `reason: duplicate` |
+| n4 (P3) | Tranche T fallback | Only the **round-1b** sprites of a failing body get the revised prompt. The T sprites are not re-sent in round 1; they move on to round 2 like any other failure |
+| n5 (P3) | `max_paid` | `gemini_batch.py submit` passes `max_paid` = n for the round, capped by the purpose's remaining budget (refused if n exceeds it). Round 1b needs >= 115 |
 
 **Rev 6 changes (momus review of rev 5):**
 
@@ -125,10 +135,17 @@ types.GenerateContentConfig(response_modalities=["IMAGE"],
   (Lanczos) before the cut, and recorded. A non-square output is a J0 `size` fail.
 - **Pixel grid (J0, reported for every raw):** `pixelize.detect_pitch(raw)` gives (pitch, confidence). Gemini does
   not reliably keep the grid.
-  - If confidence >= 0.5 and |pitch - k| / k > 0.15, the cut runs at the measured pitch: the window is w x pitch by
-    h x pitch, centred on the figure base, then one `pixelize(grid=(w, h))`. The key is flagged for J1 A-scale.
-  - If confidence < 0.5 (no grid), the cut uses k, and `no grid` is reported.
-  - The pilot reports the pitch / k distribution over all its raws; `pilot_numbers.txt` lists it.
+  - **The cut always runs at k** (the window is w x k by h x k), because the guide fixes the figure's size at k. A cut
+    at p would make A-scale fail by construction.
+  - If confidence >= 0.5, the measured phase (phase_x, phase_y) **only aligns** the window to Gemini's grid: the
+    window origin moves by at most k / 2 px to the nearest grid line, so each block covers whole Gemini pixels. The
+    window's size does not change.
+  - \|p - k\| / k is reported for every raw, as an R3 note on the review sheet and in the pilot's distribution
+    (`pilot_numbers.txt`). It never fails J0 by itself.
+  - If confidence < 0.5 (no grid), there is no alignment, and `no grid` is reported.
+  - A cut at p happens only through the arm-(d) path below: when the figure's height against the silhouette is off by
+    more than 10 %, and that ratio is close to k / p (within 5 %), the uniform scale is s = k / p, and the key is
+    flagged for J1 A-scale.
 - **Scale:** the cut uses the guide window (known k) first. If the figure's bounding-box height differs from the
   silhouette's by more than 10 %, the cut uses rev-4 arm (d)'s path (one uniform scale from the figure height and the
   band midpoint, re-centred on the base), and the key is **flagged** for J1 A-scale.
@@ -185,7 +202,8 @@ row and the runtime sink), scorpion (arthropod), hollow_seraph (per-pose boss, b
 black_mage (robed hero with a hat). Tranche T is a batch job of its own (`gemini_batch.py prepare --round 1a`). Round 1b
 (the other 115) is prepared only after T is fetched and its J0 + review results are recorded. If fewer than 6 of 10
 pass, the per-body prompts of the failing bodies are revised (still round 1, so seed 1234), and that is recorded in
-section 10 before 1b.
+section 10 before 1b. The revised prompt reaches **only the round-1b sprites** of those bodies. The T sprites are
+**not** re-sent in round 1; their failures go to round 2 (seed 1235) like any other.
 
 **Rounds** (one batch job per round; round 1 is 1a + 1b):
 
@@ -240,6 +258,12 @@ passes from history.
     are re-pinned to pass V closed at 405.
   - New: `only_sheet_names` refuses any other sheet in pass KA-G; `purpose_caps` counts the attempt rows of the pass
     per `purpose`; per sheet the limit is 4, but the 4th must carry `ka_g_reserve`.
+  - **Expiry rows and the per-sheet count (n2):** `attempt` rows with purpose `ka_g_expiry` (the re-send of an expired
+    job's keys, and the `reason: duplicate` rows of n3) are **excluded** from the per-sheet count and from the
+    "4th must be `ka_g_reserve`" rule. They count only against `ka_g_expiry` (125), `max_new` and the run cap. So an
+    expired sprite keeps its 3 tries and its reserve try. `max_per_sheet` stays 4.
+  - **`max_paid` (n5):** `submit` passes `max_paid` = n, the round's request count, which must be <= the purpose's
+    remaining cap (refused otherwise). Round 1b needs >= 115 remaining in `ka_g_batch`.
   - **Batch rows count:** every request is an `event: attempt` row with `backend: gemini_batch` (not `bedrock`), so the
     run cap and the per-sheet counts include them with no other change.
   - **No crash on the pass loop:** `check_budget` reads `cap["gemini_before"]`, `cap["max_new"]` and
@@ -265,7 +289,9 @@ passes from history.
   - `void` {key, req, job, reason: expired | failed_no_response | not_created} per key of a job that returned
     nothing (`JOB_STATE_EXPIRED`, or `JOB_STATE_FAILED` with 0 responses), or of a `batch_submit` that `--recover`
     finds NOT FOUND;
-  - `batch_cancel` {round, job} for a duplicate job cancelled by `--recover`.
+  - `batch_cancel` {round, job, processed} for a duplicate job cancelled by `--recover`. Its processed count (from the
+    job's `batchStats` at cancel) is written as that many `attempt` rows with purpose `ka_g_expiry` and `reason:
+    duplicate` (keys from the duplicate's JSONL, in order), so any billed request is counted.
 
 ## 6. New tooling (0 paid calls to build)
 
@@ -278,7 +304,7 @@ passes from history.
 | `gen/generate.py` | `budget_consistency` generalised; `only_sheet_names`, `purpose_caps` and the reserve-only 4th try in `check_budget` | +<= 25 |
 | `gen/budget.json` | pass V closed at 405; pass KA-G; pass KA (Bedrock) into `bedrock_history` | data |
 | `gen/selftest_passv.py`, `gen/selftest_colossus.py` | re-pinned: pass V closed at 405; pass C and pass KA in history | +<= 10 |
-| `gen/selftest_gemini_batch.py` (new) + 1 line in `selftest.py` | a fake client (files, batches create / get / list / cancel, a results file with one failed line). The cases: rows before create; **a 2nd `submit --paid` of a round is refused without calling create** (the fake counts create calls: 0), and `--check` prints the same refusal; `--recover` with 1 SUCCEEDED job records it with 0 creates; with 2 active jobs it cancels the later one; with none it prints `NOT FOUND` and exits 1; `--recreate` writes a new `batch_submit`; the cap refusals (the 666th image, a 5th try, a 4th without `ka_g_reserve`, a non-kneel sheet, try 2 without `retry`); `check_budget` on the real budget.json does not raise KeyError; a partial failure routed to the next round; **`EXPIRED` with 0 responses writes void rows and re-queues every key**, and the counts are unchanged with `void_ok: false` and reduced with `true`; the JSONL schema; an unchanged cache key without `image_size` | <= 250 |
+| `gen/selftest_gemini_batch.py` (new) + 1 line in `selftest.py` | a fake client (files, batches create / get / list / cancel, a results file with one failed line). The cases: rows before create; **a 2nd `submit --paid` of a round is refused without calling create** (the fake counts create calls: 0), and `--check` prints the same refusal; `--recover` with 1 SUCCEEDED job records it with 0 creates; with 2 active jobs it cancels the later one; with none it prints `NOT FOUND` and exits 1; `--recreate` writes a new `batch_submit`; the cap refusals (the 666th image, a 5th try, a 4th without `ka_g_reserve`, a non-kneel sheet, try 2 without `retry`); `check_budget` on the real budget.json does not raise KeyError; a partial failure routed to the next round; **`EXPIRED` with 0 responses writes void rows and re-queues every key**, and the counts are unchanged with `void_ok: false` and reduced with `true`; **the n2 walk**: a sprite whose round-1 job expired is re-sent (`ka_g_expiry`), then fails rounds 2 and 3, then takes its reserve try, and every step is accepted (the per-sheet count reads 1, 2, 3, then the reserve 4th); a cancelled duplicate with processed 3 writes 3 `reason: duplicate` rows; `submit` refuses when n exceeds the purpose's remaining cap; the JSONL schema; an unchanged cache key without `image_size` | <= 250 |
 
 ## 7. Gates
 
@@ -322,7 +348,7 @@ Per sprite, as in rev 4: J0 `PASS` before `approve`; J1 `PASS` and `monster_anim
 | **Batch delay or expiry** (target 24 h, expires at 48 h) | poll with Monitor. An expired job returns no results: `void` rows per key, and every key is re-sent once from `ka_g_expiry` (counted until `void_ok`, section 10). A second expiry of the same keys stops KA-G for a user ruling |
 | **Partial batch failures** | `failedRequestCount` and per-line errors go to `result` rows; missing or failed keys go to the next round; KG4 requires ok + failed = n |
 | **Non-idempotent create** (duplicate job and cost) | rows before create; a 2nd submit refused, proven by the selftest with the fake client and checked by KG6 `--check`; `--recover` lists every `ka-g-r<R>-*` job, refuses to create while one is active, cancels duplicates, and needs `--recreate` after NOT FOUND |
-| **Pixel grid lost** | `detect_pitch` in J0; a cut at the measured pitch when it differs from k by more than 15 %; J1 A-scale flag; the pilot distribution |
+| **Pixel grid lost** | `detect_pitch` in J0 aligns the window's phase only; the cut stays at k; \|p - k\| / k is an R3 note and in the pilot distribution; a cut at p only on the arm-(d) path |
 | **The hurt reference pulls the pose** | not sent on try 1 (m8) |
 | **Cost tracking** (batch billing lags) | `est_usd` per row; KG1 after every step; the purpose caps; the run cap of 540 |
 | **Image size or aspect** | `aspect_ratio` 1:1 and `image_size` 1K; a non-square output is a J0 `size` fail; a scale off by > 10 % takes the measured path and the J1 A-scale flag |
@@ -348,6 +374,7 @@ Per sprite, as in rev 4: J0 `PASS` before `approve`; J1 `PASS` and `monster_anim
 | 2026-11-17 | KA1-P | the Stability probe (54 calls) was rejected by the user: "vastly different than the reference images" |
 | 2026-11-17 | rev 5 | Gemini `gemini-nano-banana-2.1`: 10 pilot sprites interactive, the rest through the Batch API (user) |
 | 2026-11-17 | rev 6 | momus review of rev 5 resolved (table at the top). Pilot: ghost out, garland and rhyos in; tranche T in round 1a |
+| 2026-11-17 | rev 7 | momus review of rev 6 resolved (n1-n5); momus: OKAY with n1 and n2 fixed |
 | (open) | expired-batch billing | **one-time check, before relying on void rows:** read the Batch API docs and billing FAQ, and, after the first fetched job, the Cloud billing report. If expired requests are documented or observed as not billed, set `void_ok: true` and lower `cap` / `max_new` to 540 (`ka_g_expiry` 0); record the source here. Otherwise keep the allowance |
 | (open) | retry authorisation | tries 2-3 and the reserve try use `retry=True` under the user's pass approval: the pilot (2026-11-17 ruling) and the batch (Q-G2 at the pilot review) |
 
