@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (2718 tests, 163 files, Vitest)
+npm test             # Run all tests (4962 tests, 258 files, Vitest)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
@@ -121,8 +121,8 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- Known exceptions being monitored (current lines / ceiling): `ExplorationScene.ts` 601 / 601, `BattleStateMachine.ts` 562 / 592, `BattleScene.ts` 533 / 594, `SpellExecutor.ts` 309 / 314, `BattleAnimationController.ts` 303 / 308 (measured at pass C C5), `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 352 / 355. `layouts/overworld.py` (249) stays under 250: its new data goes in `overworld_consts.py` or `overworld_zones.py`. `ExplorationScene.ts` and `castle.py` are at their ceilings, so a change there must extract code first (into `src/scenes/exploration/`) or be line-neutral.
-- Also over 250 and not split: `src/types/index.ts` (392), `src/core/schemaValidation.ts` (374), and the tools `build_map.py`, `kit.py` and `map_selftest.py`.
+- Known exceptions being monitored (current lines / ceiling): `ExplorationScene.ts` 601 / 601, `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 539 / 594, `SpellExecutor.ts` 309 / 314, `BattleAnimationController.ts` 303 / 308 (measured at pass C C5; BattleStateMachine and BattleScene at C7), `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 352 / 355. `layouts/overworld.py` (249) stays under 250: its new data goes in `overworld_consts.py` or `overworld_zones.py`. `ExplorationScene.ts` and `castle.py` are at their ceilings, so a change there must extract code first (into `src/scenes/exploration/`) or be line-neutral.
+- Also over 250 and not split: `src/types/index.ts` (419), `src/core/schemaValidation.ts` (378), and the tools `build_map.py`, `kit.py` and `map_selftest.py`.
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
 
 ---
@@ -199,7 +199,8 @@ Some tests are co-located with source:
 
 - **Injectable RNG**: Battle tests pass deterministic RNG functions. Use `() => 0.5` or similar for predictable results.
 - **Shared mocks**: `tests/helpers/testUtils.ts` exports `createMockGame()` and `createMapData()`. Use these instead of creating ad-hoc mocks. Their input mocks have `holdOff: vi.fn()`.
-- **Balance bounds**: `tests/balance/` (`garland.test.ts`, `zones.test.ts`, `fieldPacing.test.ts`) drive the real `BattleStateMachine` over seeded runs (`tests/helpers/battlePolicies.ts`, `balanceData.ts`). Each bound sits at least 3 points from its measured value, given in the test name; re-measure after any enemy, item or formula change.
+- **Balance bounds**: `tests/balance/` (`garland.test.ts`, `zones.test.ts`, `fieldPacing.test.ts`, `chaos.test.ts`) drive the real `BattleStateMachine` over seeded runs (`tests/helpers/battlePolicies.ts`, `balanceData.ts`; Chaos: `tests/helpers/chaosBattle.ts`, 400 seeds per policy, the level-40 `chaos_forms` party asserted first). Each bound sits at least 3 points from its measured value, given in the test name; re-measure after any enemy, item or formula change. **D-C7-19:** a round-count bound keeps a margin of at least 2 rounds instead (the 3-point rule cannot apply when the bound is the target itself, e.g. Chaos's median rounds in [10, 15] at 12). Invariants are asserted exactly and labelled "invariant" in the test name.
+- **Scratch code stays out of the repo**: measurement sims, probes and browser scripts run from a copy outside the worktree (e.g. `/tmp/<agent>/sim/`, a copy of `src/` with symlinks to `node_modules` and `assets`, run with `vite-node`); `git status` must show no scratch file before a commit.
 - **No private member access**: Don't use `as unknown as` to access private fields. Test through public API.
 - **Schema validation tests**: `tests/core/schemaValidation.test.ts` tests the data validators.
 
@@ -281,16 +282,43 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 
 ### Boss Forms and the Chaos Fight (pass C)
 
-Chaos is a four-form fight (`docs/CHAOS_FORMS_PLAN.md`, rulings D-U2/D-U3): one shared HP pool (6000) with form swaps at
+Chaos is a four-form fight (`docs/CHAOS_FORMS_PLAN.md`, rulings D-U2/D-U3; C7 fix round `docs/CHAOS_FIX_PLAN.md`):
+one shared HP pool (**20000**, user ruling U-3, which overrides D-U3's 6000 and U-1's 12000) with form swaps at
 0.70 / 0.40 / 0.15, F1 the Sovereign (`chaos`, the atlas sprite), F2 the Orrery (`chaos_orrery`), F3 the Last Horizon
 (`chaos_horizon`) and F4 the Core Laid Bare (`chaos_horizon_core`, F3's art with `colossusVariant: {core: open}`).
 - **Data:** `BossPhase.form` (the record to become) and `BossPhase.interlude` (a script id in
   `assets/data/battle-interludes.yaml`; a non-form phase may name one too: F3's 0.25 phase plays `chaos_crack`). Form
   records have `formOf: chaos` and no `num` (the bestiary lists them as sub-entries of Chaos), `colossus: <art id>`
   and, for F3 only, `slam: {targets: 2}` (one physical attack on two heroes; the `slam` AI action). Logic in
-  `src/battle/bossForms.ts` (an HP floor at `ceil(t * pool)` so no form is skipped, pending swaps resolved before the
-  next round, phase buffs removed, the queued Chaos command re-chosen), the single HP write path `enemyHp.ts`, and
-  `slamAttack.ts`. A scenario `enemyAi` override is dropped at the first form change. Retry restarts at F1 (D-U8).
+  `src/battle/bossForms.ts` (phase buffs removed, the queued Chaos command re-chosen), the single HP write path
+  `enemyHp.ts`, and `slamAttack.ts`. A scenario `enemyAi` override is dropped at the first form change. Retry restarts
+  at F1 (D-U8).
+- **Floors and gated phases (C7, `CHAOS_FIX_PLAN.md` 2.4 M1-M3):** a boss phase is **gated** when it has `form` or
+  `interlude`. Every gated phase has one rounding rule: its floor and its reach are both `f = ceil(t x pool)`, at
+  t = 0.70 / 0.40 / 0.25 (F3's crack) / 0.15; at pool 20000 that is 14000 / 8000 / 5000 / 3000 (the current example
+  only; the formula is the rule). While a gated phase is uncrossed, HP never drops below the floor of the highest one;
+  the phase is reached at `hp <= f`. A reached form phase changes the form right after the action; a reached non-form
+  gated phase (the crack) is crossed by `checkBossPhases` at the **next round start**, and only then does the 0.15
+  floor apply, so the crack always plays before F4. Phases without an interlude keep `hp / pool <= t` (Garland, the
+  Seraph unchanged).
+- **Arrival turn (M6):** a form phase with `arrivalTurn: true` (only allowed together with `form`; F2-F4 set it) puts
+  the new form's action at the front of the queue right after the change (re-chosen queued slots draw the RNG first),
+  if a hero lives. So every form acts at once, even when it appears late in a round.
+- **Round-start change (M4):** a form reached by a direct HP write is changed by `prepareRound` (no arrival); the
+  result is the public getter `BattleStateMachine.roundFormChange` (cleared at the next `prepareRound`), and
+  `BattleScene.executeRound` plays its interlude before the round's first announcement.
+- **HP writes (M5 and 2.4):** `setEnemyHp` writes `max(hp, min(floor, currentHp))`: damage from above a floor stops
+  at it, but a write never lifts HP up to a floor (C7-N1). Two semantics for probes: (a) a direct write
+  `enemy.currentHp = n` (stress case: writing 1 at the command phase gives i1 at that round's start, i2 and the F3
+  arrival after the first action, the crack at the next round start, then i3 and the F4 arrival, each once); (b)
+  `setEnemyHp(enemy, n)` clamps at the current floor, so each nudge moves **one form**. Use (b) to step through the forms.
+- **Run:** `canRun` is false for a battle with a form chain unless its `bossConfig.canRun` says otherwise
+  (`BattleTrigger`, D-C7-6).
+- **Stats (B3-20k, tuned by `tests/balance/chaos.test.ts`):** all four records hp 20000; defense 100 / 160 / 140 / 110,
+  agility 22 (roster rule) / 160 / 160 / 160, attack 50 / 50 / 35 / 45 (F1 / F2 / F3 / F4; strength and vitality
+  derived by the rosterData rule). Measured at level 40 (typical / aggressive policy): win 96.5 / 91.8 %, median 12
+  rounds, every form acts >= 2 times in 99.5 % of wins, median party hit 577 / 568 (U-3 target >= 500). The level cliff
+  (35 / 38 / 42 / 45) is reported, not pinned: at 42+ F1 mostly acts once.
 - **View:** a colossus form bypasses the layout engine and draws in the `colossus` layer (between `bg` and `ui`,
   `BattleLayers`) through `ColossusView` / `ColossusPoseController` (`src/scenes/battle/colossus/`; timelines in
   `colossusChoreography.ts`: breathing, glow pulse 1 <-> 0.7, slam, beam, cast, hurt flash, dying). An invisible proxy
@@ -299,9 +327,31 @@ Chaos is a four-form fight (`docs/CHAOS_FORMS_PLAN.md`, rulings D-U2/D-U3): one 
   change; while F3 / F4 show, the `bg` is dimmed to 0.6 (reset on victory, defeat, retry and the next battle).
   Textures load at battle start (`ColossusArt`, F2 released after its swap) and are destroyed at battle end.
 - **Arena:** `assets/backgrounds/rim.webp` (staged by `tools/stage_rim.py`; `rim_floor.webp` is committed but unused).
-- **Scenarios:** `chaos_forms` (F1 -> F4), `chaos_final` (F3 alone, poison + blind preset for the status row; with
-  `&enemyAnim=loop | step`), `chaos_interlude_1..3` (start on the form before interlude N; `&slow=N`). Bestiary:
-  `?bestiary=chaos | chaos_orrery | chaos_horizon` shows the form's pre-composited still.
+- **Scenarios:** `chaos_forms` (F1 -> F4; the `&chaos_party` anchor is a **level-40** party, user ruling U-2:
+  KNGT / NINJ / MSTR / WWIZ, max HP 666 / 420 / 586 / 303), `chaos_final` (F3 alone, poison + blind preset for the
+  status row; with `&enemyAnim=loop | step`), `chaos_interlude_1..3` (start on the form before interlude N; `&slow=N`).
+  The debug key `enemyHp: {<index>: <fraction>}` starts an enemy at `ceil(fraction x stats.hp)`, a fraction of its own
+  pool (an unknown index or a fraction outside (0, 1] logs `console.error` and is dropped). Presets, each just above
+  the next floor at any pool: `chaos_interlude_1` F1 at 0.705, `_2` F2 at 0.405, `_3` F3 at 0.155 (the crack plays at
+  the first round start, then the next hit reaches i3), `chaos_final` F3 at 0.26; each reaches its interlude within 2
+  rounds.
+- **Bestiary:** the three form records are sub-entries listed right after "128 Chaos", in chain order ("128 Chaos
+  (Orrery)", "128 Chaos (Horizon)"), sharing number 128; the title total counts top-level entries only (127). F4 is not an
+  entry: it is the Horizon entry's last pages (F3 stats, info, lore, then F4 stats and info, title "128 Chaos (Core)",
+  preview `colossus/chaos_horizon_core/preview.png`). In `mode: seen` a sub-entry and the F4 pages show `???` until
+  `SEEN:<id>` is set at the swap. All four stand on the `rim` background, and a form phase's line reads "At 70% HP
+  becomes the Orrery" (`templates.phaseForm`, `formTitles`). Deep links: `?bestiary=chaos | chaos_orrery |
+  chaos_horizon | chaos_horizon_core` (the last opens the Horizon entry on F4's first page).
+- **Tests:** `tests/battle/bossForms.test.ts` (synthetic pool 6000 / 6001 by design), `tests/balance/chaos.test.ts`
+  (22 tests: the 2.5 bounds for both policies plus two invariants, the crack before F4 and the chain order), and the
+  C7 scene tests (`roundFormChange`, `colossusNumbers`, `colossusSlamMotion`, `colossusStatusRow`,
+  `colossusTargetLabel`, `spawnOverlap`, `enemyAnimPreviewColossus`, `bestiarySceneForms`). Full suite at C7: 258
+  files, 4962 tests.
+- **View fixes (C7):** numbers on a colossus use a light outline (`FLOAT_OUTLINE_LIGHT` 0xf8f8f8, crit
+  `FLOAT_CRIT_ON_DARK`); the slam dips 48 / drops 40 px (clamped per form by the border rule: F4 dip 5) and says
+  "Chaos slams down!"; colossus status icons are 36 px on a dark plated 44 px row; the colossus target label has a dark
+  plate; the i2 fade covers the field rect only; numbers of one `spawn` call never overlap; `&enemyAnim=loop` moves a
+  colossus whose view became ready late; i1 reads "The Sovereign's robe flares and burns away!" with two orange flashes.
 
 ### Shared helpers (U)
 

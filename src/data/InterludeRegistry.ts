@@ -7,7 +7,7 @@
  *   interludes:
  *     - id: chaos_i1
  *       steps:
- *         - { type: message, text: "The Sovereign's robe catches fire!" }
+ *         - { type: message, text: "The Sovereign's robe flares and burns away!" }
  *         - { type: flash, color: "#ffffff", frames: 6, alpha: 1 }
  */
 import { AssetLoader } from '../core/AssetLoader.js';

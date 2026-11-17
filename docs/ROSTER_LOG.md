@@ -1448,3 +1448,63 @@ Other reviewer notes: F2's ring bottom and teal orb sit under the command window
 (P2). In an F4 round frame the active-hero marker sits between the ninja and the monk (P2).
 **Not every answer is yes**, so the 11.3 review gate is **open**. With the bestiary P1, C5 is not closed: these go
 to C6 / C7.
+
+
+## Pass C: C7 (integrator F3, `roster-int`, 2026-11-16, 0 Bedrock calls, 0 Gemini calls)
+
+TS-B, TS-V and TS-BST merged at F2, TS-BAL at 5d6b473 (B3-20k data, pool 20000, level-40 party, `chaos.test.ts`
+green). Plan: `docs/CHAOS_FIX_PLAN.md` rev 3, sections 7-8.
+
+**Gate (plan 7), all green:**
+
+| Check | Result |
+|---|---|
+| `npx tsc --noEmit`, `npm run build` | EXIT 0, EXIT 0 |
+| `npx vitest run` | 258 files, 4962 tests passed |
+| `npx vitest run tests/balance/chaos.test.ts` | 22 passed |
+| R28: `git diff --exit-code 7c86057` on the 8 files | EXIT 0 (all 8 paths exist) |
+| No art changed: `assets/sprites`, `gen/approved`, `gen/anim` since 7c86057 | EXIT 0 |
+| `colossus.py budget --check` (main checkout, read-only) | OK; Bedrock 25 of 80, Gemini 405 = N_C0 |
+| `monster_anim.py check --all` | 123 `OK` lines, nothing else |
+| Scratch files | none tracked or modified; `tests/balance` holds only committed files |
+
+**Browser (127.0.0.1, `&mute=1`, headless Chromium; scripts and shots in `/tmp/c7-int/`):**
+- `chaos_forms`, two natural runs, no HP hooks (Fight with everyone, WWIZ heals under 55 %): both **won in 12
+  rounds**. Chaos actions per form 2 / 7 / 3 / 2 and 2 / 6 / 4 / 3 (F2's arrival plus its slot in round 3); a command
+  phase on every form; i1 (7.5 s), i2 (9.6 s), the crack at round 10's start, then i3, in chain order, each once.
+  Run is greyed in the command menu. Console clean. Headless rAF 120 fps.
+- `chaos_final&enemyAnim=loop`: the colossus moves (frame-to-frame changed pixels up to 195k in the field; sheet
+  `sheet_loop.png`).
+- `chaos_interlude_1` (14100 HP) and `_2` (8101 HP) reach their interlude in round 1; `_3` (3100) plays the crack
+  and i3 in round 1; `chaos_final` (5200) reaches the crack floor in round 1 and plays the crack at round 2's start.
+- Bestiary deep links `chaos`, `chaos_orrery`, `chaos_horizon`, `chaos_horizon_core`: each opens its entry; the
+  last opens "128 Chaos (Core)" on the Horizon entry's F4 page with F4's still and stats; rim background; the phase
+  line "At 70% HP becomes the Orrery"; 129 rows, total 127.
+- `mode: seen` (bestiary.yaml routed to `seen`): before the fight the three Chaos rows read "128 ???"; after a fight
+  stepped with `setEnemyHp(e, 1)` (one form per nudge: 14000, 8000, 5000, 3000) they read Chaos / (Orrery) /
+  (Horizon), and all four SEEN flags are set.
+- Crops: C6-4 `crop_C6-4_disc_number.png` (light-outlined 663 on the disc), C6-6 `crop_C6-6_status.png` (36 px
+  icons on the dark plate above the disc, the blind cloud beside it), C6-8 `crop_C6-8_f4_target_label.png` (the
+  F4 label on its dark plate over the flame). Slam: "Chaos slams down!", two numbers apart (`sheet_slam.png`).
+
+**Defect found (not fixed by INT; for TST / F5):**
+- **C7-INT-1, P2: a round-start form change before the interlude scripts have loaded skips i1.** Repro:
+  `?mute=1&scenario=chaos_forms`, at the first command phase write `currentHp = 1` (re-test 9.3a) or call
+  `setEnemyHp(enemy, 1)` (9.3b). Console: `Form change chaos -> chaos_orrery: no interlude "chaos_i1"; swapping at
+  once`, and F2 appears with no i1 (i2, the crack and i3 then play). Cause: `formChangeView.queue` starts the lazy
+  `sharedInterludes.load()` (`formChangeView.ts:100`), and the M4 path queues and starts in the same frame
+  (`BattleScene.ts:410-414`), so `start()` finds no script. The constructor preload (`formChangeView.ts:91-93`) only
+  covers bosses with a non-form interlude phase, which F1 lacks. Natural play is not affected (an action-triggered
+  change shows its result lines while the file loads; both natural runs played i1). Both section 9.3 probes hit it.
+  Possible fix: preload when any phase names an interlude (form phases too), or wait for the load in the M4 path.
+- Note (no defect): `chaos_interlude_2` starts at 8101, not 8100: `Math.ceil(0.405 * 20000)` is 8101 in floating
+  point. Still just above the 8000 floor.
+- Process note: the first browser pass was invalidated by a Vite reload when INT edited a comment in
+  `src/data/InterludeRegistry.ts`; every check above is from the clean re-run.
+
+**Docs (plan 8):** AGENTS.md "Boss Forms" (pool, floors as `ceil(t x pool)`, gated phases, arrival turn, round-start
+change, M5 and the two HP-write semantics, `canRun`, `enemyHp`, level-40 party, bestiary sub-entries and F4 page,
+B3-20k, view fixes, test count) and "Test Patterns" (`chaos.test.ts`, out-of-repo scratch, D-C7-19); line counts;
+`CHAOS_FORMS_PLAN.md` 15.1 (U-1..U-3), 15.2 (D-C7), 2.2 item 9 and 15.3 R9 (D-C7-1), "C7 results"; `BESTIARY_PLAN.md`
+10a; stale text fixed (`InterludeRegistry.ts` header, `CHAOS_FORMS_PLAN.md` i1 line, `debugScenarioEnemyHp.test.ts`
+header).

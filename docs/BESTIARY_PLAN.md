@@ -600,6 +600,22 @@ git diff --name-only "$FH_BASE"                                                 
 
 ---
 
+## 10a. Boss forms (pass C, C7 note, 2026-11-16; `docs/CHAOS_FIX_PLAN.md` 3)
+
+- **Sub-entries.** A record with `formOf` (the Chaos forms) has no `num` and is not a top-level entry.
+  `withFormSubEntries` (`bestiaryForms.ts`) lists each art form right after its root, in chain order, as
+  "128 Chaos (Orrery)" and "128 Chaos (Horizon)" (`formTitles` in `bestiary.yaml`). The title total counts top-level
+  entries only (127); a sub-entry shows its root's number (D-C7-10).
+- **The F4 page.** F4 (`chaos_horizon_core`) is not an entry: the Horizon entry's pages are F3 stats, info and lore,
+  then F4 stats and info. On an F4 page the preview is `colossus/chaos_horizon_core/preview.png`, the stats come from
+  the F4 record and the title reads "128 Chaos (Core)". The fallback (a third sub-entry, D-C7-10b) was not needed.
+- **Deep links.** `?bestiary=chaos | chaos_orrery | chaos_horizon | chaos_horizon_core`; the last opens the Horizon
+  entry on F4's first page.
+- **Seen.** In `mode: seen`, a sub-entry and the F4 pages show `???` with no preview until `SEEN:<id>` is set (at the
+  battle's swap step).
+- **Background and phase line.** All four Chaos ids stand on `rim`; a form phase writes `templates.phaseForm`
+  ("At 70% HP becomes the Orrery").
+
 ## 11. Follow-ups (not in this tranche)
 
 - **BS-F1:** effects in the preview (dragon breath, the heavy glint, shake and impact dust) through Fd's

@@ -357,6 +357,9 @@ i.e. 4200, 2400 and 900.
    - Line budget: in `src/battle/slamAttack.ts` (new), dispatched from `physicalHit.ts` (A3).
    - No other new mechanic. F2 and F4 use only the existing knobs: `ai.rate`, spell weights, `hits`, `attack` and
      `elementalProfile`.
+   - **C7 re-ruling (D-C7-1, orchestrator):** the arrival turn (`BossPhase.arrivalTurn`, `CHAOS_FIX_PLAN.md` 2.4 M6) is
+     added for F2-F4: the new form acts right after its change. Without it every form acts twice in only 57 / 60 %
+     of won runs (typical / aggressive, B3-20k).
 
 ### 2.3 Transformation interludes (TS owner, view)
 
@@ -533,7 +536,8 @@ C7). Spells use only ids that exist in `spells.yaml` (D-O9).
     rosterStats rule, R11).
 - **Phase within the form:** none.
 - **Interlude `chaos_i1` (F1 -> F2), about 6.5 s:**
-  1. message "The Sovereign's robe catches fire!"
+  1. message "The Sovereign's robe flares and burns away!" (C7, D-C7-8: then two orange `#ff7020` flashes, the
+     second with a shake; total 450 frames)
   2. flash white 6 frames
   3. F1 `dissolve` flicker 24 frames, then fade 30 frames
   4. tint ember 0.35, 30 frames
@@ -1402,6 +1406,9 @@ Every answer must be yes.
 | D-U11 | F3 placement (2026-11-16, C3') | **lower F3 a bit** so the halo ring's top arc clears the message window: rest place **(-527, -60)** (was (-527, -210)). Border rules hold (top -60 <= 114, glow only; bottom 1020 >= 786; left -527, right 2173). Visible ring arc **23.6 %** of the circle (pin **>= 20.6 %**); the top-half arc in the field rises from 21 % to 42 %. The ring's very top is cut by the source render (ring top at render y about -15) and the glow's 120 px top feather, so it stays under the window at any place_y <= 0. B4 pan limits at this rest: **dx [-247, +521], dy [-230, +174]**; chaos_i2's pan start (+480, +120) stays inside. TS owner: `src/data/interludeScripts.ts:143-144` (comment), `tests/scenes/battle/colossusContract.test.ts:30`, `colossusWorld.test.ts:27`, `ColossusView.test.ts:51-65,148-153`, `formInterlude.test.ts:97-102` and the fixtures `tests/fixtures/colossus/{colossus.json,contract.json,makeFixture.mjs}` (plus `assets-src/gen/colossus_fixture.py:51`) pin (-527, -210) and dy [-80, +324] |
 | D-U12 | F4 retry (2026-11-16, C3') | up to **2 more masked inpaints** (f4_inpaint) with the reworded prompt (a deep jagged cavity split open down the centre of the stone chest, broken edges curling outward, a molten core deep inside, light spilling across the rock; negative face, eyes, mouth, teeth, skull, mask, head, figure); mask the chest band; `inpaint_merge`; review side by side with F3; stop if both fail |
 | D-U13 | F4 approval (2026-11-16, C3') | **approve F4 "Core Laid Bare" as is**: the C24 cavity candidate (`core_open_fix.png`) as the `core` layer's `open` frame, at F4's rest (-527, -285); the reviewer's remaining nits (bonfire-like flame rather than a molten mass, little cavity depth, little light on the pectorals, teardrop outline) are accepted |
+| U-1 | Pool (2026-11-16, C7 rev 2) | **B3: pool 12000** (overrides D-U3's 6000); thresholds 0.70 / 0.40 / 0.15 and the crack at 0.25 kept. **Superseded by U-3** |
+| U-2 | Target party level (2026-11-16, C7) | **level 40** (closer to FF1 end-game): the `chaos_forms` party (`&chaos_party`) is level 40 |
+| U-3 | Pool (2026-11-16, C7 rev 3) | **pool 20000** (overrides U-1), so party hits stay near the ~555 of the old fight at level 40; targets unchanged, plus **median party hit >= 500** (measured 577 / 568 with B3-20k, `CHAOS_FIX_PLAN.md` 2.3.1, 2.5) |
 
 **Note (rev 4, B2).** At the user-picked composition and scale 1, the halo ring's top arc lies under the message
 window and its lower half behind the shoulders. The plan pins the visible arc it measures (about 20 %) and does not
@@ -1440,6 +1447,21 @@ factor, a lower placement that covers more of the party, or a different composit
 | B3 (rev 4) | Glow at half res | a per-frame `texScale` field (`formProblems`, the build, the contract fixture and test) |
 | B7 (rev 4) | Budget | `f4_variant` cap 2 (used), 2 freed to `reserve` (31); the reserve only for calls <= $0.08; the true worst case for the remaining calls is $7.60; pinned thresholds may only tighten the floors |
 | Superseded (rev 4) | D-O2 (scale 3, nearest), D-O3 (palette colours), D-O14 (outpaint strategy) | replaced by D-O17 and 18.1 for colossus forms; D-O4 (light layered animation) and D-O11 (additive glow) stand |
+| D-C7-1 (C7) | Arrival turn | `BossPhase.arrivalTurn` on F2-F4: the new form acts right after the change. **Re-rules R9 (15.3) and 2.2 item 9**; an orchestrator ruling, no user ruling needed |
+| D-C7-2 (C7) | Gated phases | a phase with `form` or `interlude` is gated (M1); one rounding rule `ceil(t x pool)` for floor and reach (M2); the crack is crossed at the next round start and holds the F4 floor back (M3) |
+| D-C7-3 (C7) | Chaos stats | B3-20k: defense 100 / 160 / 140 / 110, F2-F4 agility 160, attack 50 / 50 / 35 / 45 |
+| D-C7-4 / 5 (C7) | "A form change ends the round" / a per-round damage cap | no |
+| D-C7-6 (C7) | `canRun` | false by default for a form chain |
+| D-C7-7 (C7) | Slam line | "Chaos slams down!" |
+| D-C7-8 (C7) | i1 | the line "The Sovereign's robe flares and burns away!" plus two orange flashes (0 art) |
+| D-C7-9 (C7) | i2 fade | the field rect only |
+| D-C7-10 (C7) | Bestiary forms | sub-entries share 128; the title total is 127; F4 is a page of the Horizon entry (10b fallback, a third sub-entry, not needed) |
+| D-C7-11 / 12 / 13 (C7) | Colossus status row / numbers / slam | 36 px icons on a 44 px plated row; light outline and brighter crit; dip 48 / drop 40 with the per-form clamp (F4 dip 5) |
+| D-C7-14 (C7) | Agents per tranche | 4 |
+| D-C7-16 (C7) | Number overlap shift | every multi-number spawn |
+| D-C7-17 (C7) | M5 | a write never raises HP to a floor |
+| D-C7-18 (C7) | Debug `enemyHp` key | fractions of the pool, with the four presets |
+| D-C7-19 (C7) | Round-count bounds | a margin of >= 2 rounds instead of 3 points (AGENTS.md "Test Patterns") |
 
 ### 15.3 Orchestrator rulings on momus's open points (2026-11-16)
 
@@ -1447,7 +1469,7 @@ factor, a lower placement that covers more of the party, or a different composit
 |---|---|
 | R6 | Spell buffs persist across a form change. Phase deltas are tracked in `phaseBuffs` and subtracted on the change (2.2 item 3). |
 | R7 | A scenario `enemyAi` override is dropped at the first form change, and this is documented (2.2 item 3, 2.4, 13). |
-| R9 | F2 and F4 use existing knobs only (`ai.rate`, spell weights, `hits`, `attack`, `elementalProfile`). The beam is a named existing single-target black spell, and the view picks the beam timeline for single-target black damage spells. **F3 may have one scoped new mechanic: the multi-target physical slam (2 heroes)**, with its type, validator, tests and line budget (2.2 item 9). The colossus timelines are keyed by the presence of `colossus:`, not by `attackAnim`. |
+| R9 | F2 and F4 use existing knobs only (`ai.rate`, spell weights, `hits`, `attack`, `elementalProfile`). The beam is a named existing single-target black spell, and the view picks the beam timeline for single-target black damage spells. **F3 may have one scoped new mechanic: the multi-target physical slam (2 heroes)**, with its type, validator, tests and line budget (2.2 item 9). The colossus timelines are keyed by the presence of `colossus:`, not by `attackAnim`. **Re-ruled at C7 (D-C7-1, orchestrator):** F2-F4 also get the arrival turn (`BossPhase.arrivalTurn`, `CHAOS_FIX_PLAN.md` 2.4 M6), a second scoped mechanic shared by the form chain. |
 | R11 | Records with `formOf` have no `num`. The listed tests exempt them through explicit `formOf` filters (updated, not deleted), and they are filtered from the top-level bestiary list from C1. |
 | R15 | An invisible proxy Container sits at `targetRect` after the swap; the white flash is per layer (no `generateTexture` of the composite); `upgradeToArt` is guarded. |
 | R17 | `enemyAnimPreview` gains colossus support; the loop / step rows are kept. |
@@ -1910,3 +1932,20 @@ it.**
 | Bedrock calls / cost | 25 of 80 (BR ledger); about $0.9 spent before C3' (18.9), C3' calls in ROSTER_LOG |
 | Gemini | 405 = N_C0 (no pass-C Gemini call) |
 | Tests | 249 files, 4871 tests |
+
+
+## C7 results (measured at C7 F3, 2026-11-16; `docs/CHAOS_FIX_PLAN.md`)
+
+| Item | Value |
+|---|---|
+| Pool | 20000 (U-3); floors `ceil(t x pool)` = 14000 / 8000 / 5000 (crack) / 3000 |
+| Party | `chaos_forms` level 40 (U-2): max HP 666 / 420 / 586 / 303, agility 45 / 213 / 88 / 49 |
+| Stats (B3-20k) | defense 100 / 160 / 140 / 110, agility 22 / 160 / 160 / 160, attack 50 / 50 / 35 / 45 |
+| `chaos.test.ts` (400 seeds per policy, typical / aggressive) | win 96.5 / 91.8 %, median 12 rounds, rounds in 10-16 100 / 100 %, every form >= 2 actions 99.5 / 99.5 % of wins, command phase 100 %, median party hit 577 / 568; both invariants hold |
+| Browser, `chaos_forms` x2 (no HP hooks) | both won in 12 rounds; actions per form F1 / F2 / F3 / F4 = 2 / 7 / 3 / 2 and 2 / 6 / 4 / 3; a command phase on every form; the crack at round 10's start before F4 in both; console clean |
+| Interlude scenarios | `chaos_interlude_1`, `_2`: interlude in round 1; `_3`: crack and i3 in round 1; `chaos_final`: crack at round 2's start |
+| Bestiary | 129 list rows, title total 127; the four deep links open their entry (F4 on the Horizon entry's page 2, "128 Chaos (Core)"); rim background; "At 70% HP becomes the Orrery"; `mode: seen` hides all three Chaos rows until their SEEN flags |
+| Line counts | `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 539 / 594, `bossForms.ts` 147, `BestiaryScene.ts` 234, `BattleFieldTargeting.ts` 241, `ColossusView.ts` 248, `src/types/index.ts` 419 |
+| Bedrock / Gemini | 25 of 80 / 405 = N_C0 (no call in C7) |
+| Tests | 258 files, 4962 tests |
+| Open | C7-INT-1 (P2): a round-start form change before the interlude scripts have loaded skips i1 (ROSTER_LOG "Pass C: C7") |

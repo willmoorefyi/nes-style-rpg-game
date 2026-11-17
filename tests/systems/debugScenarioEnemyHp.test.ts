@@ -1,7 +1,7 @@
 /**
  * CHAOS_FIX_PLAN C6-12b (D-C7-18), 5.2b: the debug scenario key `enemyHp: {<index>: <fraction>}` starts an enemy at
- * `ceil(fraction * stats.hp)`, a fraction of its own pool, so the presets hold at any pool (6000 today, 20000 after
- * TS-BAL). Each preset sits just above the next floor: `chaos_interlude_1` F1 at 0.705 (floor 0.70), `_2` F2 at 0.405
+ * `ceil(fraction * stats.hp)`, a fraction of its own pool, so the presets hold at any pool (20000 since C7 TS-BAL,
+ * U-3; 6000 before). Each preset sits just above the next floor: `chaos_interlude_1` F1 at 0.705 (floor 0.70), `_2` F2 at 0.405
  * (0.40), `_3` F3 at 0.155 (the crack plays at the first round start, then 0.15), `chaos_final` F3 at 0.26 (one hit to
  * the crack floor 0.25). Validated like `enemyStatus`: an unknown index or a fraction outside (0, 1] logs
  * `console.error` and is dropped.
