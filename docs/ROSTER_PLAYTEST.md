@@ -335,3 +335,80 @@ Nits (not filed): seraph hurt has no flinch pose (lights dim plus shake only); b
 - 9 V7 items re-tested (P1-1, P2-1 .. P2-8): **9 FIXED**, 0 NOT FIXED, 0 REGRESSED. No-status numbers unchanged. Regression sample clean.
 - No P0, no P1. New: one P2 (N-1, hollow_seraph about 25 % smaller than in V7) and one P3 observation (N-2).
 - Goals 2, 4 and 6: MET (4 with nits, 6 with N-1). Plan 4.3 done criterion (P1-1 FIXED, every P2 FIXED or a decided nit, no new P0 / P1): **met**.
+
+## Chaos play test (C6), 2026-11-16
+
+Fresh adversarial tester, `roster-int` at f85bde0, 0 image calls. Own dev server (127.0.0.1:5291), headless Chromium
+with ANGLE Metal (Apple M4 Pro; real GPU, not software GL), every URL `mute=1`, 1920x1080. Evidence and scripts in
+`/tmp/c6/` (`scripts/*.mjs`, logs `*.log`, contact sheets `sheet_*.png`). Judged against the user-picked render
+`assets-src/gen/out/colossus/chaos_horizon/s2_st_4102_sr_4201_raw.png` by eye.
+
+### A. Runs
+
+| Run | How | Result |
+|---|---|---|
+| w1 | `chaos_forms`, played as a player: Fight with everyone, WWIZ casts HEAL under 55 % HP, confirm only on message lines, **no HP hooks** | Victory in 77 s, 4 rounds. F1 1 round (Chaos never acted), F2 1 round (cast FAST), F3 1 round (cast LIT2, ~45 dmg each), crack played at the round end (998 HP), F4 0 turns (fell in the round it appeared) |
+| m1 | `chaos_forms`, confirm mashed every 60 ms, interludes included, no hooks | Victory in 49 s. F1 no action, F2 ICE2, **F3 had no command phase** (2400 -> 900 floor on the first hit after i2), crack skipped, F4 ICE once |
+| l1 | `chaos_forms`, whole party set to 1 HP at F2 | Still won: Chaos killed only the knight in 2 rounds. F3 no command phase, crack skipped |
+| l2 / rt | loss: debug battles end in Game Over with Load / Title only (by design, S6); so `rt` started the fight from the field (`r_ow_temple`, `BattleTrigger.triggerBattle(['chaos'], {isBoss, canRun: false}, rim)`), reached F3, then the party fell | Game Over offers Retry Battle; **Retry restarts at F1** (enemy `chaos`, 6000 HP, F1 sprite, sky not dimmed, party restored) `rt_after.png` |
+| o1 | overkill: Chaos HP written to 1 at each command (debug hook) | Floors held against real hits in every run, but see C6-7 (a direct HP write skips F2) |
+| fin | `chaos_final` (F3 alone, poison + blind preset), plus `&enemyAnim=loop` | crack skipped again (1728 -> 900); F4 no action; dying fade fine |
+| slam | `chaos_final` with `enemyAi: {chaos_horizon: [slam]}` | slam hit KNGT 324 (3 hits) and NINJ 165 |
+| seen | `bestiary.yaml` served with `mode: seen` (Playwright route, file untouched), before and after a `chaos_forms` win | before: 001-128 all `???`; after: only `128 Chaos` seen, though `SEEN:chaos_orrery / chaos_horizon / chaos_horizon_core` are set |
+| reg | 6 normal battles (`basic_battle`, `anim_boss_garland`, `ai_monsters_nine`, `anim_boss_lich`, `anim_pass_v_chaos`, `f_status_enemies`) and 5 bestiary entries (goblin, garland, lich, hollow_seraph, chaos) | all normal: art, numbers, cursor, lists, info page (`sheet_reg.png`, `sheet_best.png`); `ai_monsters_nine` is a level-1 loss as expected |
+
+Form chain: in 7 fights no form was doubled; with player damage no form was skipped (the floors 4200 / 2400 / 900
+held against 2000+ hits). Interlude lengths without input: i1 7.3 s, i2 9.6-9.7 s, i3 3.1-3.2 s; mashed 4.7 / 7.0 /
+1.8 s. No interlude stuck, none ate input (the next command menu took its first press), no console error or warning
+in any Chaos run.
+
+Performance: rAF 120 fps (display cap), Pixi ticker min 96 / avg 121 at F1, F2 and F3 rest and over the F3
+`enemyAnim=loop` (>= 55: met). Textures: colossus tiles 5 live at F3/F4 and 0 after every battle; live GPU textures
+3 at the title, 7 after the first Chaos fight (shared atlas pages, `rim.webp`, `battle-fx.png`) and **still 7 after
+two more Chaos fights** (uid diff: nothing new, nothing kept). The raw `managedTextures.length` grows by 6-7 per fight
+but only with null slots; it is not a leak. JS heap 29 MB after 5 battles.
+
+### B. The user's goals
+
+| # | Goal | Verdict | Evidence |
+|---|---|---|---|
+| 1 | Chaos is a multi-form final battle | **PARTLY** | 4 forms, each swapped once with its interlude, never skipped by damage. But with the level-50 party the fight is 3-4 rounds: F1 never acted in any natural run (0 of 4), F3 got a command phase in 1 of 3 `chaos_forms` runs, F4 acted in 2 of 4 (a single-target ICE). See C6-1 |
+| 2 | The final form takes the whole battlefield, planet-sized, far more imposing than any other enemy | **MET** | F3 spans every column, arms past both edges, eclipse disc ~290 px, party on its arm (`w1_cmd_chaos_horizon.png`); nothing in the regression sample is close |
+| 3 | Colossus forms are full-resolution painted art, keeping the halo ring and rays of the picked render | **MET** (nits) | F2/F3/F4 linear, full colour, no pixel stepping; F3 keeps the black disc, flame corona, rays and the ring arcs (left and right); the ring's top is under the message window (ruled, 15.1) and on the light rim sky the ring and rays are weaker than on the render's dark sky (expected with the rim ruling) |
+| 4 | The body splits open toward the end: crack, then F4's open core | **PARTLY** | F4's open core with spill light shows every time (`crop_f4_target.png`). The crack was seen in 1 of 5 F3 -> F4 transitions (C6-2), and when seen it is a thin line under the disc |
+| 5 | Arena backdrop is the "edge of the universe" rim | **MET** | rim in every Chaos frame; dimmed under F3/F4, reset on retry |
+| - | Windows never covered | **MET** | every frame: art under the four windows; F2's waist and F4's disc top go under the windows (ruled) |
+| - | Retry restarts from F1 | **MET** | `rt` run, field-started (debug battles have no Retry by design) |
+| - | Bestiary | **NOT MET** | forms not listed or reachable (C6-3) |
+| - | Performance / textures / console | **MET** | see A |
+| - | Regression sample | **MET** | no regression |
+
+### C. Findings
+
+| # | Sev | Finding | Repro (`http://127.0.0.1:<port>/?mute=1&...`) | Evidence |
+|---|---|---|---|---|
+| C6-1 | **P1** | **The forms barely get to act; the final battle is over in 3-4 rounds.** Pool 6000 vs a level-50 party dealing ~3500-4300 per round (MSTR 2000-2650, KNGT 900-1600, NINJ 400-700): every form is crossed in about one round. F1 never acted (0/4 natural runs: the party's NINJ and MSTR act first and swap it out), F3 (the centrepiece) had no command phase in 2 of 3 runs (2400 -> 900 floor on one MSTR or KNGT hit), F4 acted in 2 of 4 runs with a single-target ICE. Chaos's damage is low too: a party at 1 HP survived F2-F4 and lost one member. Not a skip (the floors hold), but the "each form gets to act" goal is not met | `scenario=chaos_forms`, Fight with everyone, confirm through | `w1.log`, `m1.log`, `l1.log` MSGS |
+| C6-2 | **P1** (C5 rated P2) | **The crack interlude is skipped in most fights.** When F3's HP goes from above 1500 (0.25) to the 900 floor in one hit, `chaos_crack` and its line never play and the core goes base -> open. Seen in 4 of 5 F3 -> F4 transitions (m1, l1, fin, slam; it played only in w1, where the round started at 998). With C6-1's damage this is the usual case, so the "crack, then open core" progression the user asked for is mostly not shown | `scenario=chaos_final` (Fight x4 twice) or `chaos_forms` | `m1.log`, `l1.log`, `fin.log`, `slam.log`; `w1_ev05_chaos_horizon_crack.png` (the one time) |
+| C6-3 | **P1** (C5 known) | **Bestiary form entries not wired.** List ends at `128 Chaos` (127 entries), Down wraps to 001; F2/F3/F4 have no entry and their `preview.png` stills are never shown, though the seen flags are set after the fight; `?bestiary=chaos_orrery / chaos_horizon / chaos_horizon_core` warns `no enemy ...; opening on 001`. AGENTS.md ("Boss Forms") says `?bestiary=chaos_orrery` shows the form still, which is not true | `bestiary=chaos_horizon`; or `mode: seen` and a `chaos_forms` win | `sheet_seen.png`, `best_chaos_orrery.png`, `reg.log` |
+| C6-4 | P2 | Damage numbers on F3's black disc are dark red on black with no visible outline ("653" crit, `crop_disc_num.png`); white non-crit numbers read. The disc is the anchor of every F3/F4 hit | `scenario=chaos_final`, Fight until a crit | `w1_hit_chaos_horizon_core_1.png` |
+| C6-5 | P2 | F3's slam has no readable motion: the whole body moves about 16 px on a 1080 screen (disc top 313-329 px over the action), so the planet-sized being's strongest attack looks like the party just takes damage; the message reads "Chaos acts!" while the turn list says `Chaos slam>KNGT` | `chaos_final` with `enemyAi: {chaos_horizon: [{type: slam}]}` | `sheet_slam.png`, `slam.log` |
+| C6-6 | P2 | Status icons on F3 are ~16 px over the bright corona; the blind icon (white) nearly vanishes against the white-hot corona; the dark blind cloud overlaps the disc top | `scenario=chaos_final` | `crop_status.png` |
+| C6-7 | P3 | Robustness: when Chaos's HP is written directly below two thresholds (debug hook; every battle damage path goes through `enemyHp.ts`, so not a player path), F2 is skipped entirely and `chaos_i2` ("The rings shatter!") plays over the F1 sprite, which has no rings. Two pending form swaps collapse into one. Matters for scripted HP changes and for the HP-nudge test method | `scenario=chaos_forms`, set `battle.allEnemies[0].currentHp = 1` at the first command | `sheet_o1.png`, `o1.log` |
+| C6-8 | P3 | F4's yellow target label sits on the yellow-white flame of the open core; readable at 1:1 but low contrast | `chaos_forms` to F4, Fight | `crop_f4_target.png` |
+| C6-9 | P3 | i1 shows "The Sovereign's robe catches fire!" for the whole interlude, but no fire is drawn: a white flash and fade, then the Orrery rises under the same line | `chaos_interlude_1` | `sheet_w1_i1i3.png` |
+| C6-10 | P3 | The i2 `fade` dims the three bottom windows but not the message window (C5 known, reproduced) | `chaos_interlude_2` | `w1_i_chaos_horizon_05.png` |
+| C6-11 | P3 | Slam numbers on two adjacent heroes overlap (324 on KNGT and 165 on NINJ drawn 20 px apart) | slam repro | `slam_004.png` |
+| C6-12 | P3 | `enemyAnim=loop` on `chaos_final` shows no colossus motion over 7 s (the dev loop drives atlas enemies only) | `scenario=chaos_final&enemyAnim=loop` | `sheet_loop.png` |
+| C6-13 | P3 | Bestiary Chaos entry: the preview stands on a castle-hall background, not the rim, and the phase line reads "At 70% HP Fight x2" instead of naming the form change | `bestiary=chaos` | `best_chaos.png` |
+| C6-14 | P3 | The debug Chaos scenarios have Run enabled (no `bossConfig`); the real encounter must pass `canRun: false` when it is placed (none is placed yet) | `scenario=chaos_forms`, command menu | `w1_cmd_chaos_horizon.png` |
+
+Not filed (ruled or by design): F4's disc top under the message window (D-U13 / D-O24); bonfire-like core (D-U13);
+F2 cut at the waist by the windows; 0 XP / 0 Gold (classic Chaos); debug battles have no Retry (S6).
+
+### Status
+
+- **No P0. Three P1:** C6-1 (forms get almost no turns; balance), C6-2 (crack skipped in 4 of 5 fights), C6-3
+  (bestiary forms not wired, C5 known).
+- P2: C6-4, C6-5, C6-6. P3: C6-7 .. C6-14.
+- Goals: 2, 3, 5 MET; 1 and 4 PARTLY; bestiary NOT MET. Windows, retry, performance, textures, console and the
+  regression sample: MET. These go to the C7 fix round (plan 12).
