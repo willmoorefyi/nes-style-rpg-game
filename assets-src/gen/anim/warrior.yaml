@@ -24,3 +24,6 @@ tweaks:
   atk_mid: {neck: [0.1, 0.1], crown: [0.1, -0.35], chest: [0.45, 0], hip: [-0.1, 0.1], sh_n: [-0.45, 0.2], el_n: [0.25, 0.15], hand_n: [-0.1, 0.15], sh_f: [0, 0.2], el_f: [0.9, -0.25], hand_f: [5.85, 1.55], hip_n: [0.45, 0.1], knee_n: [-0.1, 0.1], foot_n: [0.35, 0], hip_f: [0.35, 0.1], knee_f: [0.05, -0.45], foot_f: [0.4, 0], tip: [-0.1, 0.15]}
   atk_follow: {crown: [0, -0.25], chest: [-0.25, 0.5], sh_n: [0.25, 0.5], sh_f: [0.5, 0.5], el_f: [1, 0.25], hand_f: [3.75, 1.25], hip_n: [-0.25, 0], knee_n: [0.5, 0], foot_n: [-0.25, 0], hip_f: [0.25, 0], knee_f: [0.5, 0.25]}
   cast_rise: {neck: [1, -0.5], crown: [2, -2.5], chest: [0.5, 0], hip: [0, -1], sh_n: [-2, -2.5], el_n: [-3.41, -6.49], hand_n: [-4.88, -5.67], sh_f: [1, 0], el_f: [0, -0.5], hand_f: [7.5, -0.5], hip_n: [0, -0.5], knee_n: [0.5, 0], foot_n: [-0.5, 0], hip_f: [0.5, -0.5], knee_f: [1.5, -0.5], foot_f: [-1, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; frames locked in warrior.lock.json.
+kneel: {lean: 8, bow: 12, arms: [n]}

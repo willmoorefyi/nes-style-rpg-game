@@ -100,12 +100,12 @@ def build_battle_ai() -> None:
     if not entries:
         print("battle_ai: no approved sheets")
         return
-    from gen import puppet as PU
+    from gen import puppet as PU, puppet_kneel as PK
     gw, gh = entries[0][0]["grid"]
     poses = entries[0][0]["poses"]
     cols = entries[0][0]["layout"][0]
     # in-between poses (puppet.py, from gen/anim/<id>.yaml); a class without joints repeats its nearest keyframe
-    all_poses = poses + PU.INBETWEENS
+    all_poses = poses + PU.INBETWEENS + PK.KNEEL_POSES     # pass K kneel columns (docs/KNEEL_PLAN.md D-K7)
     atlas = Image.new("RGBA", (gw * len(all_poses), gh * len(entries)), (0, 0, 0, 0))
     sheets = {}
     for row, (meta, sheet) in enumerate(entries):
@@ -119,6 +119,9 @@ def build_battle_ai() -> None:
         tween = PU.battle_inbetweens(meta["character"])
         for pose in PU.INBETWEENS:
             frames[pose] = tween.get(pose, frames[PU.SOURCE[pose]])
+        kneel = PK.kneel_frames(meta["character"])                 # {} without a kneel: block -> ready
+        for pose in PK.KNEEL_POSES:
+            frames[pose] = kneel.get(pose, frames["ready"])
         for i, pose in enumerate(all_poses):
             atlas.paste(frames[pose], (i * gw, row * gh))
         sheets[meta["character"]] = {"row": row, "inbetweens": bool(tween)}
