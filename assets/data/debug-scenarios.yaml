@@ -1432,6 +1432,43 @@
 # === ERT-D (pass W: owned by ERT-D) ===
 # === end ERT-D ===
 # === FIR-O (pass W: owned by FIR-O) ===
+# S17 (WORLD 6.5): the party stands before the buried hull's hatch in the airship desert (entrance fir_desert) at the
+# band's low level 22 with the B5 kit (w_s16), every flag through S16, the canoe and the lute; the ship waits at the
+# fir_crescent dock. `_start` holds the levistone; `_neg_nostone` is the same start without it.
+- id: w_s17_start
+  name: FIR-O - S17 the buried hull (levistone held)
+  mode: field
+  map: overworld
+  entrance: fir_desert
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 146, y: 124 }
+  flags: &w_s17_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED]
+  party: &w_s17_party
+    - { class: warrior, name: WAR, level: 22, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 22, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 22, equipment: [mythril_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_mage, name: BLM, level: 22, equipment: [wizard_staff, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }, { id: ice2, level: 4 }] }
+  items: { potion: 6, levistone: 1, canoe: 1, lute: 1 }
+  gold: 4000
+  enemies: []
+- id: w_s17_neg_nostone
+  name: FIR-O - S17 negative (no levistone)
+  mode: field
+  map: overworld
+  entrance: fir_desert
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 146, y: 124 }
+  flags: *w_s17_flags
+  party: *w_s17_party
+  items: { potion: 6, canoe: 1, lute: 1 }
+  gold: 4000
+  enemies: []
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
 # === end FIR-T ===

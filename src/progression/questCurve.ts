@@ -117,7 +117,10 @@ export function curveOf(ctx: QuestContext): CurveResult {
     points: new Map(), stageStartGold: new Map(), townFirstGold: new Map(), assumedGold: new Set(),
     assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0,
   };
-  let tainted = false;
+  // `--stage` (assume mode): the party arrives at the stage's band low, as its `w_s<n>_start` scenario does
+  const own = ctx.stage ? world.stages.get(ctx.stage)?.band : null;
+  if (own) out.xp = 4 * xpToReach(own[0]);
+  let tainted = !!own;
   const fightsBy = new Map<string, number>();
   const sat = new Saturator(ctx, ctx.start);
   let pos: QuestPlace = { ...ctx.start.place };

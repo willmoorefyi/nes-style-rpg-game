@@ -44,8 +44,11 @@ describe('quest.yaml', () => {
       .toEqual(['crescent', 'dwarf', 'elfheim', 'gaia', 'lufenia', 'melmond', 'onrac', 'pravoka']);
   });
 
-  it('S0 is built and every other stage pending; S19 and S31 are optional', () => {
-    for (const s of quest.stages) expect(s.status, s.id).toBe(s.id === 'S0' ? 'built' : 'pending');
+  it('S0 is built and every other stage pending or built by its tranche; S19 and S31 are optional', () => {
+    for (const s of quest.stages) {
+      if (s.id === 'S0') expect(s.status).toBe('built');
+      else expect(['pending', 'built'], s.id).toContain(s.status);
+    }
     expect(quest.stages.filter((s) => s.optional).map((s) => s.id).sort()).toEqual(['S19', 'S31']);
     for (const t of quest.towns) expect(t.status).toBe('pending');
   });

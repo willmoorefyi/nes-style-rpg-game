@@ -1096,7 +1096,11 @@ def validate(src: dict, c: Compiled) -> None:
     if not c.entrances:
         errors.append("map has no entrances")
     else:
-        seen = MC.reach(c.collision, [next(iter(c.entrances.values()))])
+        # pass W: the world map's regions are walked from their own reach roots (no_unreachable_walkable)
+        spec = src.get("no_unreachable_walkable")
+        roots = [c.entrances[e] for e in (spec.get("reach_roots") or [])
+                 if isinstance(e, str) and e in c.entrances] if isinstance(spec, dict) else []
+        seen = MC.reach(c.collision, [next(iter(c.entrances.values())), *roots])
         for name, pos in c.entrances.items():
             if tuple(pos) not in seen and name not in (src.get("unreachable_ok") or []):
                 errors.append(f"entrance {name} at {tuple(pos)} is not reachable from the first entrance")
