@@ -6,10 +6,12 @@
  * Bounds are tied to the plan's targets (section 0) and sit at least 3 points (round counts: 2 rounds) from the
  * measured value given in each test name. The invariants are exact.
  *
- * F2 (TS-BAL): the values in MEASURED are the plan's out-of-repo B3-20k sim (2.5), not yet this engine. After TS-B's
- * mechanism and the 2.5 data land, re-measure here, put the engine's numbers in MEASURED and check every margin
- * (re-tune rules in 2.5). On 7c86057 (pool 6000, no arrival turn, no gated crack) this file is RED by design: the
- * baseline of 2.2 is 4 rounds, no form acts twice in every win, and the crack is skipped.
+ * MEASURED is this engine at F2 (C7, B3-20k data of 2.5, pool 20000, TS-B's mechanism M1-M6): identical to the plan's
+ * out-of-repo sim (2.3.1). Margins: all >= 2 9.5 / 9.5, in 10-16 9 / 9, median 12 (2 rounds above 10, 3 below 15),
+ * win 3.0 to the 99.5 cap (typical) and 5.2 to the 97 cap (aggressive), KO 17.5 / 23.5, F1 >= 1 and command phase 3
+ * (ceiling-limited at 100), hit 77 / 68. Re-measure after any Chaos, item or formula change (2.5 re-tune rules). On
+ * 7c86057 (pool 6000, no arrival turn, no gated crack) this file was RED: 4 rounds, no form acted twice in every win,
+ * and the crack was skipped in 363 / 362 of the runs that reached F4 (2.2).
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { loadRealRegistries } from '../helpers/realData.js';
@@ -23,7 +25,7 @@ const POLICIES: ChaosPolicy[] = ['typical', 'aggressive'];
 const PARTY_MAX_HP = [666, 420, 586, 303];
 const PARTY_AGILITY = [45, 213, 88, 49];
 
-// F2-DATA: measured values (2.5, B3-20k sim). Replace with the engine's numbers in F2.
+// Measured on this engine at C7 F2 (400 seeds per policy); equal to the plan's B3-20k sim (2.3.1).
 const MEASURED: Record<ChaosPolicy, { all2: number; in10_16: number; median: number; win: number; ko: number;
   f1: number; cmd: number; hit: number }> = {
   typical: { all2: 99.5, in10_16: 100, median: 12, win: 96.5, ko: 87.5, f1: 100, cmd: 100, hit: 577 },

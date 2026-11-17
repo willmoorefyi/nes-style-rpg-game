@@ -3247,13 +3247,13 @@
   spells: [ice3, lit3, slo2, cur4, fir3, ice2, fast, nuke]
   specials: [{id: crack, rate: 0.0625}, {id: inferno, rate: 0.0625}, {id: swirl, rate: 0.0625}, {id: tornado, rate: 0.0625}]
   stats:
-    hp: 6000
-    strength: 80
+    hp: 20000
+    strength: 40
     agility: 22
     intelligence: 25
     vitality: 52
     luck: 5
-    attack: 100
+    attack: 50
     defense: 100
     magicDefense: 200
     accuracy: 198
@@ -3270,8 +3270,8 @@
   attack: melee
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
-  # CHAOS_FORMS_PLAN 3.1 (D-U2, D-U3): one 6000 HP pool shared by the four form records; at 0.70 the Sovereign
-  # becomes the Orrery (the HP floor 4200 means no hit can skip it)
+  # CHAOS_FORMS_PLAN 3.1 (D-U2), CHAOS_FIX_PLAN 2.5 (U-3, B3-20k): one 20000 HP pool shared by the four form records;
+  # at 0.70 the Sovereign becomes the Orrery (the HP floor ceil(0.70 x 20000) = 14000 means no hit can skip it)
   bossPhases:
   - hpThreshold: 0.70
     patternId: aggressive
@@ -3280,10 +3280,10 @@
     arrivalTurn: true   # CHAOS_FIX_PLAN 2.4 M6: the new form acts at once after the change
   size: boss
 # ═══ CHAOS FORMS (docs/CHAOS_FORMS_PLAN.md 3.2-3.6) ═══
-# Form records of the final battle: `formOf: chaos`, no `num` (the bestiary lists them under Chaos), the same 6000 HP
-# pool, and every field written out (3.6: nothing is inherited). Planning stats (the secondary stats and agility follow
-# the 7.1 rules: strength 0.8 x attack, vitality defense / 2 + 2, intelligence 1 + 3 per spell, agility 5 + evade / 6),
-# tuned by tests/balance at C7. Until a
+# Form records of the final battle: `formOf: chaos`, no `num` (the bestiary lists them under Chaos), the same 20000 HP
+# pool (U-3), and every field written out (3.6: nothing is inherited). Stats: CHAOS_FIX_PLAN 2.5 B3-20k, pinned by
+# tests/balance/chaos.test.ts (strength 0.8 x attack, vitality defense / 2 + 2, intelligence 1 + 3 per spell; F2-F4
+# agility 160, D-C7-3, not the 5 + evade / 6 rule, which applies to numbered records only). Until a
 # colossus master is approved the records keep F1's sprite as the art fallback; `colossus:` names the art id.
 - id: chaos_orrery
   name: Chaos
@@ -3294,14 +3294,14 @@
   spells: [fir2, ice2, lit2, fast]
   specials: []
   stats:
-    hp: 6000
-    strength: 72
-    agility: 24
+    hp: 20000
+    strength: 40
+    agility: 160
     intelligence: 13
-    vitality: 72
+    vitality: 82
     luck: 5
-    attack: 90
-    defense: 140
+    attack: 50
+    defense: 160
     magicDefense: 220
     accuracy: 198
     hits: 1
@@ -3335,14 +3335,14 @@
   spells: [ice, fir2, ice2, lit2]
   specials: []
   stats:
-    hp: 6000
-    strength: 96
-    agility: 18
+    hp: 20000
+    strength: 28
+    agility: 160
     intelligence: 13
-    vitality: 62
+    vitality: 72
     luck: 5
-    attack: 120
-    defense: 120
+    attack: 35
+    defense: 140
     magicDefense: 240
     accuracy: 198
     hits: 3
@@ -3387,14 +3387,14 @@
   spells: [ice, fir2, ice2, lit2]
   specials: []
   stats:
-    hp: 6000
-    strength: 104
-    agility: 18
+    hp: 20000
+    strength: 36
+    agility: 160
     intelligence: 13
-    vitality: 47
+    vitality: 57
     luck: 5
-    attack: 130
-    defense: 90
+    attack: 45
+    defense: 110
     magicDefense: 240
     accuracy: 198
     hits: 4

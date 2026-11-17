@@ -115,12 +115,13 @@ describe('C7 5.4: the bestiary scene wires the Chaos forms', () => {
     const { scene, frame, tap } = setup({ link: 'chaos_horizon' });
     await scene.enter();
     await settle(frame);
-    expect(scene.stats!.shown.join('\n')).toContain('Attack     120');
+    // F3 / F4 attack 35 / 45: the B3-20k data (CHAOS_FIX_PLAN 2.5)
+    expect(scene.stats!.shown.join('\n')).toContain('Attack     35');
     tap('start');
     tap('start');
     expect(scene.panelPage).toBe(2);
     expect(labels(scene)).toContain('128 Chaos (Core)  127/127');
-    expect(scene.stats!.shown.join('\n')).toContain('Attack     130');
+    expect(scene.stats!.shown.join('\n')).toContain('Attack     45');
     await settle(frame);
     expect(stills()[stills().length - 1]).toBe('colossus/chaos_horizon_core/preview.png');
     tap('start');

@@ -82,8 +82,8 @@ describe('roster data: the 7.1 conversion', () => {
     expect([byId('crawler').stats.attack, byId('crawler').stats.hits]).toEqual([1, 8]);
     expect([byId('green_slime').stats.defense, byId('green_slime').stats.vitality]).toEqual([255, 99]);
     const chaos = byId('chaos');
-    // CHAOS_FORMS_PLAN D-U3: the spec's 2000 HP became the 6000 HP pool shared by the four forms
-    expect([chaos.stats.hp, chaos.stats.magicDefense, chaos.stats.accuracy, chaos.xpReward, chaos.goldReward]).toEqual([6000, 200, 198, 0, 0]);
+    // CHAOS_FORMS_PLAN D-U3 made the spec's 2000 HP a 6000 HP pool shared by the four forms; CHAOS_FIX_PLAN U-3: 20000
+    expect([chaos.stats.hp, chaos.stats.magicDefense, chaos.stats.accuracy, chaos.xpReward, chaos.goldReward]).toEqual([20000, 200, 198, 0, 0]);
     const eye = byId('death_eye');
     expect([eye.xpReward, eye.goldReward, eye.stats.crit]).toEqual([1, 1, 40]);
     expect(byId('desert_baretta').goldReward).toBe(1);

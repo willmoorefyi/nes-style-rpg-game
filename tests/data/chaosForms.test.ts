@@ -23,7 +23,7 @@ const FORM_IDS = ['chaos_orrery', 'chaos_horizon', 'chaos_horizon_core'];
 const formPhase = (e: EnemyData) => (e.bossPhases ?? []).find((p) => p.form);
 
 describe('the Chaos form chain', () => {
-  it('chaos -> chaos_orrery -> chaos_horizon -> chaos_horizon_core at 0.70 / 0.40 / 0.15, pool 6000 (D-U3)', () => {
+  it('chaos -> chaos_orrery -> chaos_horizon -> chaos_horizon_core at 0.70 / 0.40 / 0.15, pool 20000 (CHAOS_FIX_PLAN U-3; was 6000 under D-U3)', () => {
     const chain: string[] = ['chaos'];
     const thresholds: number[] = [];
     for (let p = formPhase(byId('chaos')); p; p = formPhase(byId(chain[chain.length - 1]))) {
@@ -32,7 +32,7 @@ describe('the Chaos form chain', () => {
     }
     expect(chain).toEqual(['chaos', ...FORM_IDS]);
     expect(thresholds).toEqual([0.7, 0.4, 0.15]);
-    expect(chain.map((id) => byId(id).stats.hp)).toEqual([6000, 6000, 6000, 6000]);
+    expect(chain.map((id) => byId(id).stats.hp)).toEqual([20000, 20000, 20000, 20000]);
   });
 
   it('the cross-file form rules hold for the real data', () => {
@@ -46,7 +46,7 @@ describe('the Chaos form chain', () => {
     const errs = (es: EnemyData[], il = INTERLUDES) => formChainErrors(es, il).join('; ');
     expect(errs([root([{ hpThreshold: 0.7, patternId: 'p', form: 'nope' }]), f2, ...rest])).toMatch(/nope/);
     expect(errs([...ENEMIES], new Set(['chaos_i1']))).toMatch(/chaos_i2/);
-    expect(errs([byId('chaos'), { ...f2, stats: { ...f2.stats, hp: 5999 } }, ...rest])).toMatch(/hp/);
+    expect(errs([byId('chaos'), { ...f2, stats: { ...f2.stats, hp: 19999 } }, ...rest])).toMatch(/hp/);
     expect(errs([byId('chaos'), { ...f2, bossPhases: [{ hpThreshold: 0.3, patternId: 'p', form: 'chaos' }] }, ...rest])).toMatch(/cycle|formOf/);
     expect(errs([byId('chaos'), { ...f2, bossPhases: [{ hpThreshold: 0.8, patternId: 'p', form: 'chaos_horizon' }] }, ...rest])).toMatch(/descending/);
     expect(errs([byId('chaos'), { ...f2, num: 129 }, ...rest])).toMatch(/num/);
