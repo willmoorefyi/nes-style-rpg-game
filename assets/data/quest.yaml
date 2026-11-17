@@ -130,7 +130,9 @@ stages:
     grind: 2.0
     # the crown trade (it sets ELF_O_CROWN_GIVEN and pays an Ether), then the fight it opens; the cutscene gives the eye
     walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
-    entry: {map: overworld, x: 60, y: 125}
+    # INT-W2b: the ship moored at Elfheim's harbour (the `elf_port` dock), as the party came; without it the assumed
+    # start parks S2's ship at Pravoka (its spawn), and the party on the moor is cut off from the mainland
+    entry: {map: overworld, x: 60, y: 125, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
     basins: {}
     nonLoadBearing:
       # GT-6 and the generic NPC elements at Astos's cell: MARSH_GUARD_DEFEATED is redundant with the crown, which only

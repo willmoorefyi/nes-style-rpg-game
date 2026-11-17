@@ -22,6 +22,8 @@ describe('proof (e) in --stage mode', () => {
     expect(alone.failures).toEqual([]);
   });
 
+  // INT-W2b: and no built town is SHOPLESS from the entry (S6's entry moors the ship at elf_port, so Pravoka is
+  // reachable again; with the ship at its Pravoka spawn the moor was cut off)
   it('S6 and S10: the dwarves (opensAfter S2) are not talkable before S2 from the stage entry', () => {
     for (const stage of ['S6', 'S10']) {
       expect(proofEarlyShops(createQuestContext(world, { stage })).failures, stage).toEqual([]);
