@@ -289,8 +289,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
         img, labels = RR.composite(layers, size, pairs)
         img, labels, squashed = MR.post_squash(rig, name, r, over, img, labels, J, arrs[r["src"]],
                                                out[r["toward"]]["img"] if r["toward"] in out else arrs[r["toward"]], u)
-        if kseg:                                          # docs/KNEEL_PLAN.md K2-0: the robed variant's robe fit
-            img, labels = KN.robe_frame(rig, KN.template_of(rig, cfg), name, img, labels, J, segs["idle"][0])
+        if kseg:                                          # docs/KNEEL_PLAN.md K2-0: robe fit and glow remap
+            img, labels = KN.post_frame(rig, KN.template_of(rig, cfg), name, img, labels, J, segs["idle"][0])
         if name == "idle_b":
             img, labels = MR.breath(rig, img, labels, floating)
             dy = 1

@@ -85,6 +85,18 @@ def run_failures(check: Callable[[bool, str], None]) -> None:
         check(False, "an unknown kneel key is refused")
     except ValueError:
         check(True, "an unknown kneel key is refused")
+    from gen import kneel_ops as KO
+    g = KO.glow_apply({"kneel": [[[90, 170, 80], [6, 4, 10]]]}, "kneel", key, "x")
+    check(not (g[..., :3] == (90, 170, 80)).all(2).any() and KO.glow_apply({}, "kneel", key) is key,
+          "K2-0b glow: a listed colour is remapped on its frame; no spec leaves the frame as it is")
+    check(bool(KC.rot({"blade": (45.0, "prop")}, set(), 100.0)) and not KC.rot({"blade": (45.0, "prop")}, set(), 100.0,
+                                                                                prop_cap=60.0),
+          "K2-0b prop_cap: a 45 deg prop fails ROT_CAP's 30 and passes a 60 deg prop_cap")
+    try:
+        KN.block({"sprite": "x", "kneel": {"prop_cap": 61}})
+        check(False, "a prop_cap over 60 is refused")
+    except ValueError:
+        check(True, "a prop_cap over 60 is refused")
 
 
 def run_variant(check: Callable[[bool, str], None]) -> None:
