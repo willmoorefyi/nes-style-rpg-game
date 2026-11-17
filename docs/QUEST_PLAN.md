@@ -1,12 +1,28 @@
-# Main quest build-out plan (pass Q), rev 2
+# Main quest build-out plan (pass Q), rev 3
 
-Status: rev 2. It answers the momus review of rev 1, and the user accepted the defaults of open questions 1-5.
+Status: rev 3. It answers the second momus review (rev 2 was rejected by a narrow margin), on top of the rev 2
+answers to the first review. The user accepted the defaults of open questions 1-5.
 Nothing is implemented. Pass Q starts only after the kneel pass (`docs/KNEEL_PLAN.md`) has merged into `mainline`
 and `npm test` is green at that head. Every Q branch is created from, or rebased on, that merge (4.0). Q1-0 is the
 first step. Facts in section 1 were checked at `b236b79`.
 
 Naming: engine gaps are **GAP-n** (1.8) and tranche gates are **Gn** (section 7). The review's "gaps G11-G13" are
 GAP-11 to GAP-13.
+
+**Rev 3 changes (momus review of rev 2):**
+
+| # | Finding | Resolution |
+|---|---|---|
+| 1 | P1 The fieldRules contract | `fieldStep`, `transitionOpen` and `dueEncounter` are declared too. Q1-0 implements today's act-1 behaviour with no throwing stubs and moves `ExplorationScene` onto it; Q1a only extends it. Q1d therefore runs on real rules in W1 (4.1, 4.2) |
+| 2 | P1 Region G5 | G5 for Q2-Q8 is `npm run quest -- --mutate --stage <S>` for each of the tranche's stages. The 2.1 consumption rule also applies to assumed grants. In `--stage` mode, proof (b) removes each assumed grant from the start state in turn (5.1, 5.2, G5) |
+| 3 | P1 Originality metric | The floor-count / boss-floor item is dropped, so the classic floor counts may stay. Originality is judged by layout topology: the stair graph, the branch count, the boss-room position, the floor shape, and the design note. The compass item is information only (4.6) |
+| 4 | P1 Basins | Membership is computed with every patch on. A new check: FIRE's inner water joins EARTH's only when `strait_thaw` is on. Q1-0 pre-seeds both seeds, `outer` in S2 and `inner` in S10 (3.5, 4.1) |
+| 5 | P2 The lock | Only the top-level CLI takes it. `--check-determinism` children skip it through `FFG_WORLD_LOCK_HELD=1`. The wait times out after 30 min, fails loudly and exits 3 (3.5) |
+| 6 | P2 `--region` values for the other boxes | `collide: alpha` footprints, `art_coverage` and the `above` nulls outside the rasterised set are copied from the existing compiled `overworld.yaml`, and the job fails if they are stale. The selftest compares the region YAML with the full-compile YAML (3.5, 4.3) |
+| 7 | P2 Opening patches in mutation | An opening patch (`canal`, `strait_thaw`, `wnd_calm`, `north_bridge`) is mutated by forcing it on from the start. Proof (e) must fail for `strait_thaw` and for `wnd_calm` when each is forced on (5.4) |
+| 8 | P2 An 8 h session | W1 starts with the work that decides the risks: Q1-0, then Q1b's locality selftest and memory probe. At the end of the session every W1 tranche commits its work in progress with a result draft. The tonight scope is narrowed and stated (4.0a) |
+| 9 | P2 Q1a's browser fixture | `assets/maps/test-dock.yaml`, a docked variant of `test-overworld.yaml`, plus the scenario `q1a_ship_dock` (4.2) |
+| 10 | P3 Small items | Q1b is exempt from G3 (its locality selftest and `frozenCore` cover it). Q1d lists the act-1 bridge gates in S0's `nonLoadBearing`, and Q2 removes them. R8 now names `fieldRules.ts` (4.3, 4.5, 4.7, G3, R8) |
 
 **Rev 2 changes (momus review of rev 1):**
 
@@ -443,19 +459,33 @@ danger, not a skip (risk R5).
   Box edges are 2-cell ocean rings, so that blend never crosses a box. This changes every existing chunk once, in
   Q1b; that one-off churn is accepted, and the act-1 chunk images are re-baselined in that commit.
 - **Region compiles.** `build_map.py overworld --region <r>` composes the whole source but rasterises only the
-  box's chunks plus a 1-chunk padding ring. It writes only the box's chunk files, plus the full
-  `overworld.yaml`, whose collision and lists are cheap. The ring is read, never written. Per-chunk seeding makes
-  the result byte-equal to a full compile.
-- **The compile lock.** Every `overworld` compile, full or `--region`, takes an exclusive
-  `fcntl.flock("/tmp/ff-game-world-compile.lock")`. It waits and prints `waiting for the world-compile lock`, so
-  only one world compile runs at a time across all worktrees. Full-world compiles and full determinism checks are
-  run only by Q1b and the integrator; region tranches use `--region`.
+  box's chunks plus a 1-chunk padding ring. It writes only the box's chunk files, plus the full `overworld.yaml`,
+  whose collision and lists are cheap. The ring is read, never written. Per-chunk seeding makes the chunks
+  byte-equal to a full compile.
+  - **Values for the other boxes.** Three compiled values depend on art pixels outside the rasterised set: the
+    `collide: alpha` footprints (`ALPHA_MIN`), the `art_coverage` result, and the `above` list (null where a chunk
+    is empty). For chunks outside the set they are copied from the existing compiled `assets/maps/ai/overworld.yaml`.
+  - **Staleness.** The job fails with `--region: stale base, run a full compile` when the source of any other box,
+    or the compiler version recorded in that file, differs from the base.
+  - **Selftest.** It compiles a synthetic map in full and by region, and requires the two `overworld.yaml` files to
+    be equal.
+- **The compile lock.** Only the top-level `build_map.py` CLI takes it, for any `overworld` compile, full or
+  `--region`. It is an exclusive `fcntl.flock("/tmp/ff-game-world-compile.lock")`.
+  - **Children:** the `--check-determinism` subprocesses run with `FFG_WORLD_LOCK_HELD=1` and skip it, so the check
+    can't deadlock on its own lock.
+  - **Waiting:** a waiter prints `waiting for the world-compile lock` and polls. After 30 min it fails loudly
+    (`world-compile lock timeout after 30 min; holder pid <n>`) and exits 3.
+  - **Scope:** only one world compile runs at a time across all worktrees. Full-world compiles and full determinism
+    checks are run only by Q1b and the integrator; region tranches use `--region`.
 - **`layouts/world.py`** is the only writer of `assets-src/maps/overworld.yaml`. It runs `REGIONS = [a1, elf, wind,
   water, earth, fire]` (pre-seeded; no tranche edits the list) and then the global checks, in this order:
   1. every module stays in its box and every ring is ocean (except J1 and J2);
   2. ids are unique and prefixed;
   3. the Inner Sea is cut off from the Outer Sea with every patch off, and joined to it with `canal` on;
-  4. every dock lies in its declared basin.
+  4. FIRE's inner water joins EARTH's inner water only when `strait_thaw` is on (with it off they are two separate
+     components);
+  5. basin membership is computed with **every patch on**: each ocean cell belongs to the component of its seed
+     (`outer` from S2, `inner` from S10), and every dock lies in its declared basin.
 - **`world.py --owned-chunks <region>`** prints the repo-relative paths a region may change: its
   `assets/maps/ai/overworld/{below,above}_<r>_<c>.png` and its `patch_<pid>.png`. The composer-owned patches
   (`strait_thaw`, and the canal's art when it straddles a ring) are listed under the region that declares them:
@@ -548,7 +578,7 @@ K (kneel) merged -> Q1-0 contract (serial) -> Q1a | Q1b | Q1c | Q1d (parallel) -
 
 ### 4.0a Waves, checkpoints, resume and the "tonight" scope
 
-The total effort is about 169 agent-hours; the critical path is about 53 h (3 + 14 + 2 merge + 16 + 8 + 10). Pass Q
+The total effort is about 170 agent-hours; the critical path is about 54 h (4 + 14 + 2 merge + 16 + 8 + 10). Pass Q
 is a multi-session pass.
 
 | Wave | Tranches | Checkpoint (all must hold) | Stop condition |
@@ -566,18 +596,32 @@ is a multi-session pass.
 
   A tranche with a result section is done. A tranche with a branch but no result restarts from the last commit on
   that branch whose gates pass (its result draft lists them). Otherwise it starts fresh in the current wave.
-- **Tonight scope (unattended).** W0 plus W1 must finish, ending with the Q1 merge commit and every gate green. If
-  more than 10 h of the session remain after that, Q2 runs next (the first region; 10 h). Nothing else starts
-  tonight.
+- **W1 order (risk first).** Q1-0 runs first. Q1b then starts with GAP-14 (the per-chunk RNG), the locality
+  selftest and the memory probe (`/usr/bin/time -l` on a full world built from stubs), before anything else in
+  Q1b. These decide the W1 stop condition. Q1a, Q1c and Q1d start as soon as Q1-0 is merged, in parallel with Q1b.
+- **End of session.** When the session is about to end (30 min left), every running W1 tranche commits its work in
+  progress on its own branch (`Q1x: WIP`, owned paths only). It also writes a result draft in its anchor that lists
+  each gate it has run, as pass or fail, and its next step. A WIP commit never merges to `mainline`.
+- **Tonight scope (about 8 h unattended; the work that fits):**
+  1. Q1-0, merged to `mainline` with G4 and G7 green (about 4 h);
+  2. Q1b's first slice on its branch: the per-chunk RNG, `--selftest` printing `locality: OK`, and the measured peak
+     memory of the full world and of a `--region` compile, recorded in its draft (about 4 h). This decides go or
+     stop for the pass (the W1 stop condition);
+  3. Q1a, Q1c and Q1d started in parallel after step 1, and committed as WIP with result drafts at the end.
 
-### 4.1 Q1-0 Contract (integrator, serial, effort 3 h)
+  The Q1 merge and every region tranche (Q2 included) are **not** in tonight's scope. They start in the next
+  session under the resume rule.
+
+### 4.1 Q1-0 Contract (integrator, serial, effort 4 h: the act-1 `fieldRules` implementation included)
 
 **Owns:**
 
 - `src/types/quest.ts` (new) and the `src/types/index.ts` changes listed below;
 - `src/core/schemaValidationQuest.ts`, which `schemaValidation.ts` calls (+2 lines);
 - `src/core/GameFlags.ts`;
-- `src/systems/fieldRules.ts`: declarations, with stubs that throw `not implemented`;
+- `src/systems/fieldRules.ts`: the declarations **and today's act-1 behaviour** (walking terrain, gates with
+  `requiredFlag` / `requiredItem`, NPC blocking, `npcPresent`, transitions, scripted encounters), with no throwing
+  stubs. `ExplorationScene` and `PlayerController` call it for every step, line-neutral or better;
 - `assets/data/quest.yaml`;
 - the anchors;
 - `assets-src/tools/layouts/world_api.py` (`BOXES`, `J1`, `J2`, the floe and landing-field cells, and the
@@ -628,7 +672,23 @@ export function dockFor(map: MapData, cell: { x: number; y: number }): Dock | nu
 export interface NpcOutcome { present: boolean; dialog: string[]; take?: string; give?: string; setFlags: string[];
   cutscene?: string; battle?: string; action?: string }
 export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedEncounter[]): NpcOutcome;
+/** Whether a transition can be taken now (requiredFlag / requiredFlags). */
+export function transitionOpen(t: MapTransition, state: FieldState): boolean;
+/** The scripted encounter due at a cell (flag unset, requiredFlag(s) met), or null. */
+export function dueEncounter(map: MapData, cell: { x: number; y: number }, state: FieldState): ScriptedEncounter | null;
+export interface StepResult { ok: boolean; mode: FieldMode; setFlags: string[]; message?: string;
+  transition?: MapTransition; encounter?: ScriptedEncounter }
+/** One step from `from` to the 4-neighbour `to`: canEnter, gate messages, permanent gates' flags, mode changes
+ *  (canoe on and off, ship disembark at a dock, boarding a parked vehicle), the transition taken, the encounter due.
+ *  The single entry point the game and the verifier share. */
+export function fieldStep(map: MapData, from: { x: number; y: number }, to: { x: number; y: number },
+  state: FieldState): StepResult;
 ```
+
+In Q1-0, `fieldStep` covers walking only: the `mode` result is always `walking`, and the vehicle branches return
+`ok: false`. `tests/systems/fieldRules.test.ts` (Q1-0) pins the act-1 behaviour: the bridge gates and their
+message, the temple's Garland cells, the castle doors, and NPC blocking. Q1a's extensions must keep these tests
+unchanged.
 
 **Done when:**
 
@@ -637,7 +697,11 @@ export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedE
   `src/systems/fieldRules.ts`, `assets-src/tools/layouts/world*.py` and the region layout directories has fewer
   than 250 lines, apart from the AGENTS.md exceptions;
 - `fileCeilings.test.ts` adds `src/types/index.ts` at 440 and `src/scenes/ExplorationScene.ts` at 590. The second
-  entry goes in skipped and is enabled by Q1a; until then the existing AGENTS rule (601) holds.
+  entry goes in skipped and is enabled by Q1a; until then the existing AGENTS rule (601) holds;
+- `quest.yaml` pre-seeds the basin seeds: `basins: {outer: <seed>}` on S2 and `basins: {inner: <seed>}` on S10
+  (the seed cells come from `world_api.BOXES`: `outer` (76, 40) in the A1/ELF channel, `inner` (120, 120) in the
+  EARTH gulf). Q4 may move `inner` within its box;
+- `npx vitest run tests/systems/fieldRules.test.ts` passes, and so do the existing exploration tests.
 
 ### 4.2 Q1a Field engine (TS, effort 14 h)
 
@@ -645,8 +709,12 @@ export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedE
 
 - `src/scenes/ExplorationScene.ts`: **extract first** into `src/scenes/exploration/FieldVehicles.ts` and
   `FieldNpcActions.ts`, and end at 590 lines or fewer;
-- `src/systems/fieldRules.ts`: the implementation. `ExplorationScene`, `PlayerController` movement and
-  `NPCInteraction` call it, and keep no rule of their own;
+- `src/systems/fieldRules.ts`: it **extends** Q1-0's working implementation with vehicles, patches, docks, landing,
+  `requiredFlags`, item conditions and trades. `ExplorationScene`, `PlayerController` movement and `NPCInteraction`
+  keep calling it and hold no rule of their own;
+- `assets/maps/test-dock.yaml` (new): a docked variant of `test-overworld.yaml`, adding a dock, a parked-ship
+  spawn without `requiredFlag`, a grass landing patch and a river, plus the debug scenario `q1a_ship_dock` (field
+  mode, `map: test-dock`);
 - `src/scenes/exploration/**`, `src/entities/*Mode.ts`;
 - `src/systems/{VehicleManager, KeyItemGateSystem, NPCInteraction, CutsceneManager, CutsceneRegistry,
   ClassUpgradeSystem, SaveManager, DebugScenarioLoader, FieldSpellEffects, EncounterSystem, MapTransition,
@@ -692,7 +760,7 @@ export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedE
 | `wc -l < src/scenes/ExplorationScene.ts` | at most 590; the ceiling test entry is enabled |
 | `grep -n "isWalkable\|keyItemGateSystem.check" src/scenes/ExplorationScene.ts src/entities/PlayerController.ts` | only calls that go through `fieldRules` (listed in the result) |
 | `npm run build && npm test` | exit 0; 0 failed |
-| browser, `http://127.0.0.1:5211/?mute=1&scenario=q1a_ship_dock` | the ship sprite is at the dock; stepping onto it sets `__game` mode `ship`; stepping onto the dock's land cell disembarks the party, and the ship stays parked |
+| browser, `http://127.0.0.1:5211/?mute=1&scenario=q1a_ship_dock` (the `test-dock` fixture map) | the ship sprite is at the dock; stepping onto it sets `__game` mode `ship`; stepping onto the dock's land cell disembarks the party, and the ship stays parked |
 
 ### 4.3 Q1b Map toolchain and streaming (Python and renderer, effort 14 h)
 
@@ -737,11 +805,14 @@ export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedE
     texture replaces it when it loads. Each miss logs once.
   - **First frame:** the first frame waits for the visible set, as today.
 
+Q1b is **exempt from G3**: it re-baselines every chunk on purpose (3.5). Its locality selftest and
+`frozenCore.test.ts` cover the same risk.
+
 **Done when:**
 
 | Command | Expected |
 |---|---|
-| `python3 -I assets-src/tools/build_map.py --selftest` | exit 0; prints `locality: OK` (a synthetic 2-box map: editing box X changes only X's chunk files, byte for byte) and `region checks: OK (2 stub regions with roads)` |
+| `python3 -I assets-src/tools/build_map.py --selftest` | exit 0; prints `region yaml: OK` (a region compile's `overworld.yaml` equals the full compile's), `locality: OK` (a synthetic 2-box map: editing box X changes only X's chunk files, byte for byte) and `region checks: OK (2 stub regions with roads)` |
 | `python3 -I assets-src/tools/layouts/world.py && python3 -I assets-src/tools/build_map.py --check-determinism overworld` | `overworld: deterministic` |
 | `/usr/bin/time -l python3 -I assets-src/tools/build_map.py overworld --region elf` | exit 0; maximum resident set at most 10 GB; the output chunks are byte-equal to a full compile's (selftest) |
 | `/usr/bin/time -l python3 -I assets-src/tools/build_map.py overworld` | exit 0; maximum resident set at most 26 GB (the measured value goes in the result) |
@@ -798,7 +869,7 @@ export function npcOutcome(npc: MapNPC, state: FieldState, encounters: ScriptedE
 | Command | Expected |
 |---|---|
 | `npx vitest run tests/progression/` | all passed: each proof (a)-(e) fails on a fixture built to break it (RED first), and passes on a clean fixture |
-| `npm run quest -- --mutate` (on the Q1 head: S0 built, the rest pending) | ends with `quest-verify: OK`; exit 0 |
+| `npm run quest -- --mutate` (on the Q1 head: S0 built, the rest pending) | ends with `quest-verify: OK`; exit 0. While the bridge has no patch, the two act-1 bridge gate cells (`overworld` (29, 32) and (30, 32)) block nothing extra: the gap is ocean. Q1d therefore lists them in S0's `nonLoadBearing` with that reason, and Q2 removes the entries when `north_bridge` makes them load-bearing |
 | `npm run build` | exit 0 (covers `scripts/quest-verify.ts`) |
 
 ### 4.6 Region tranche template (Q2-Q8)
@@ -833,14 +904,23 @@ Every region tranche follows this template:
      features that no classic version of the place has) and `Topology:` (the stair and boss graph, e.g.
      `B1 -> B2 (2 stairs) -> B3 boss, one-way pit B2 -> B1`). `tests/quest/designNotes.test.ts` (Q1d) fails on a
      region map without all 3.
-  2. **Self-check list.** The tranche answers each item with a number in its result. The items:
-     - the floor count and boss floor of each dungeon, with at least one of the two differing from the classic
-       dungeon it stands in for (the reviewer is given the classic table);
-     - the stair topology isn't a straight line on at least half of the dungeons;
-     - no two maps' `ground` grids are equal, or equal after a mirror or transpose (checked by the test);
-     - the compass bearing of each place from Cornelia, which `tests/quest/originality.test.ts` compares with the
-       classic bearings (Pravoka E, Elfheim S, Melmond W, Crescent Lake SE, Onrac NW, Gaia NE, the trial keep N);
-       at least 4 of the 7 must differ.
+  2. **Self-check list, by layout topology.** Classic floor counts may stay. The tranche reports these numbers per
+     dungeon in its result; `tests/quest/originality.test.ts` computes them from the compiled maps and checks the
+     thresholds:
+     - **stair graph:** the floors and their links (stairs, one-way pits, teleports) as an edge list. At least half
+       of the tranche's dungeons are not a simple chain (some floor has 2 or more links out, or there is a loop or a
+       one-way edge);
+     - **branch count:** the dead-end side branches per floor, from `map_report.py`'s chokepoint graph. Each floor
+       of 24x24 cells or more has at least 2;
+     - **boss-room position:** the boss cell's position relative to the floor's arrival, as a compass octant and a
+       path length. No two of the tranche's boss floors share both;
+     - **floor shape:** the walkable mask's bounding-box aspect ratio and fill ratio. No two floors of a dungeon
+       match within 5 %, and no two maps' `ground` grids are equal, or equal after a mirror or transpose;
+     - **design note:** present and consistent. The `Topology:` line's floor list and boss floor match the stair
+       graph.
+
+     The compass bearing of each place from Cornelia, compared with the classic bearings, is reported **for
+     information only**; it has no threshold.
   3. **Phrase test.** `tests/quest/originality.test.ts` greps the dialogue of every region map and of every new
      cutscene for a list of about 20 famous lines and names from the classic script, which Q1d curates in the test.
      The act-1 maps are exempt, since they keep their existing lines.
@@ -866,6 +946,8 @@ Every region tranche follows this template:
   - Patch `north_bridge` turns the two gap rows and the stubs into Bridge, and its built span covers the debris.
   - The workers' lines change on BRIDGE_BUILT.
   - The act-1 tests that assert the old ending are updated, not deleted.
+  - Q2 removes the two bridge gate entries from S0's `nonLoadBearing` (4.5); with the patch they become
+    load-bearing.
 - **Pravoka:**
   - the town sits in the Pravoka rect (x 54-66, y 5-13, the mainland's NE coast; 3.2), with its `outer` dock on the
     rect's east side, in the ocean column x 65-66;
@@ -1051,11 +1133,13 @@ Only key items and the flags that something reads count as state (a relevance pa
 **Pending stages (assume mode):**
 
 - A pending stage's synthetic grant event fires only once its `after` stages are complete **and** its `requires`
-  (flags, items and vehicles) all hold in the current state. Its `grants` are then added; any consumed item named in
-  `requires` that the canon (2.1) marks as consumed is removed, and its vehicles are placed at the `entry`.
+  (flags, items and vehicles) all hold in the current state. Its `grants` are then added. The 2.1 consumption rule
+  applies exactly as for real events: an item in `requires` that 2.1 marks as consumed is removed. Its vehicles are
+  placed at the `entry`.
 - `--stage S<n>` runs the proofs for one tranche's stages. It starts from that stage's `entry`
-  (`{map, x, y, mode, vehicles}`), with the grants of every ancestor stage assumed. This is how a region tranche
-  verifies itself before the stages before it are built.
+  (`{map, x, y, mode, vehicles}`). The assumed start state holds the grants of every ancestor stage, after the 2.1
+  consumption rule: items consumed by an earlier stage are absent, as they would be in play. This is how a region
+  tranche verifies itself before the stages before it are built.
 - With `--strict`, a pending stage is an error.
 
 ### 5.2 Proofs
@@ -1065,7 +1149,10 @@ Only key items and the flags that something reads count as state (a relevance pa
   the `after` DAG, and the declared `walk` of each stage must run step by step from that state.
 - **(b) No skip.** For every stage S and every ancestor P of S, the verifier disables the events that give P's
   grants and computes the closure again. Neither S's `boss` encounter nor any of S's grants may be reachable. It
-  then does the same for each declared requirement r of S, so each requirement is shown to be necessary.
+  then does the same for each declared requirement r of S, so each requirement is shown to be necessary. In
+  `--stage` mode the ancestors are assumed, not built, so (b) removes **each assumed grant from the start state in
+  turn** (one flag, item or vehicle at a time). Each removal must leave S's boss and grants unreachable, unless the
+  removed grant is not in the transitive `requires` of S (it is then reported as `not required`, not as an error).
 - **(c) No soft-lock.** BFS over states (5.1) covers trades that consume items and one-way transitions. From every
   reachable state, the goal must stay reachable.
   - If it is not, the verifier reports the state and the shortest path into it.
@@ -1120,7 +1207,13 @@ removed dock that strands the ship). The elements are:
 - a basin wall cell (J1 strip, J2 walls, the J2 floe);
 - a landing-field patch (`wnd_calm`).
 
-An element that changes nothing must be listed in `nonLoadBearing` with a reason; otherwise the run fails.
+- **Opening patches** (`north_bridge`, `canal`, `strait_thaw`, `wnd_calm`) open terrain, so removing one only
+  closes a path. Their mutation instead **forces the patch on from the start**. Forcing `north_bridge` or `canal` on
+  must fail (b). Forcing `strait_thaw` on must fail (e) (Crescent Lake's shops become reachable before S13), and so
+  must forcing `wnd_calm` on (Gaia's shops before S21). `questMutate.test.ts` asserts both (e) failures by name.
+
+An element that changes nothing must be listed in its stage's `nonLoadBearing` with a reason; otherwise the run
+fails.
 `tests/progression/questMutate.test.ts` runs the mutations on the fixtures and, from Q9 on, on the real world.
 
 ### 5.5 Scripted walk-throughs per region
@@ -1223,7 +1316,7 @@ It asserts:
 ## 7. Gates per tranche
 
 The `<owned ids>` are the tranche's map ids; `<region>` is its `world_api` region id. Q1 tranches run the parts that
-apply to them: G3 is for Q1b and the regions, and G5 runs in assume mode until Q9.
+apply to them: G3 is for the regions only (Q1b is exempt, 4.3), and G5 runs in assume mode until Q9.
 
 | Gate | Command | Expected |
 |---|---|---|
@@ -1231,7 +1324,7 @@ apply to them: G3 is for Q1b and the regions, and G5 runs in assume mode until Q
 | G2 compile and determinism | regions: `python3 -I assets-src/tools/build_map.py overworld --region <region> <owned ids>` then `python3 -I assets-src/tools/build_map.py --check-determinism --region <region> overworld <owned ids>`. Q1b and the integrator run the full world without `--region`. All of it runs under the compile lock | each id prints `<id>: WxH -> assets/maps/ai/<id>.yaml`, then `<id>: deterministic`; exit 0 |
 | G3 chunk locality | `python3 -I assets-src/tools/layouts/world.py --owned-chunks <region> > /tmp/<t>/owned.txt; git diff --name-only "$(git merge-base mainline HEAD)" HEAD -- assets/maps/ai/overworld/ \| grep -vxFf /tmp/<t>/owned.txt` (`--owned-chunks` prints repo-relative paths, including the region's `patch_*.png`) | no output (grep exits 1) |
 | G4 build and tests | `npm run build && npm test` | build exits 0; Vitest reports 0 failed |
-| G5 gap verifier | `npm run quest -- --mutate` (Q9: `-- --strict --mutate`) | the last line is `quest-verify: OK`; exit 0 |
+| G5 gap verifier | Q1: `npm run quest -- --mutate`. Q2-Q8: `for s in <the tranche's stages>; do npm run quest -- --mutate --stage "$s" \|\| exit 1; done` (for example Q4: S10 S11 S12 S13). Q9: `npm run quest -- --strict --mutate` | every run ends with `quest-verify: OK`; exit 0 |
 | G6 asset coverage | `npx vitest run tests/data/assetCoverage.test.ts` | all passed |
 | G7 file-size ceilings | `npx vitest run tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed |
 | G8 compiler self-test (Q1b, or after any compiler change) | `python3 -I assets-src/tools/build_map.py --selftest` | exit 0 |
@@ -1251,7 +1344,7 @@ apply to them: G3 is for Q1b and the regions, and G5 runs in assume mode until Q
 | R5 | A basin leaks (the ship reaches the Inner Sea before CANAL_OPEN), or late seas are met early | composer basin checks; the verifier's (b); mutation of the J1 and J2 walls. Early late-tier seas are accepted (no landing) |
 | R6 | Chaos is tuned for level 40, and the classic curve arrives lower | the curve model (5.2 d) and `questCurve.test.ts`; Open question 1 |
 | R7 | Placeholder icons, recoloured caves and tinted NPCs look rough | accepted for pass Q; an optional later art pass (Open question 2) |
-| R8 | The verifier drifts from runtime behaviour | it imports the runtime modules, has its own fixtures, and the browser checkpoints test the same gates in the game |
+| R8 | The verifier drifts from runtime behaviour | the game and the verifier both call `src/systems/fieldRules.ts` (`fieldStep` and friends) and no other field rule; the verifier has its own fixtures, and the browser checkpoints test the same gates in the game |
 | R9 | New spell effects (death, stone) shift existing balance | early shops can't sell them; all of `tests/balance/` stays green (G9) |
 | R10 | The world compile (about 90 s, x2 for determinism) slows iteration | iterate with plain compiles; run determinism at the gate only |
 | R11 | Classic layouts get copied | the design notes, the self-checks, the phrase test, and a reviewer sign-off on every tranche (4.6, G12) |
@@ -1282,7 +1375,7 @@ The user accepted defaults 1-5 as written (rev 2).
 
 ## 10. TODOs
 
-- [ ] W0: Q1-0 contract: types, schema, flags, `quest.yaml`, anchors, `world_api` boxes, `questCeilings` (priority: high, effort: 3h)
+- [ ] W0: Q1-0 contract: types, schema, flags, `quest.yaml`, anchors, `world_api` boxes, `questCeilings`, the act-1 `fieldRules` (priority: high, effort: 4h)
 - [ ] W1: Q1a field engine: vehicles, patches, trades, item conditions, hazards, EXIT/WARP, zone modes, save v2 (priority: high, effort: 14h)
 - [ ] W1: Q1b toolchain, with per-chunk RNG, `--region`, the compile lock and per-region checks: legend, Lake, patch art, remaps, placeholder landmarks, composer, streaming (priority: high, effort: 14h)
 - [ ] W1: Q1c data canon: key items, band gear, L5-L8 spells, kits, shop sections, bestiary habitats, helpers (priority: high, effort: 10h)
