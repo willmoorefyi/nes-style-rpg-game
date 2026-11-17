@@ -88,8 +88,9 @@ export class FormChangeView implements FormChangeHook {
 
   constructor(private readonly deps: FormChangeDeps) {
     this.source = deps.interludes ?? sharedInterludes;
-    // a battle whose boss names an interlude on a non-form phase (B5) needs the scripts before its first form change
-    const named = deps.battle.allEnemies.some((e) => e.data.bossPhases?.some((p) => p.interlude && !p.form));
+    // a battle whose boss names any interlude needs the scripts before its first change: a round-start change (a direct
+    // HP write, C7-INT-1) queues and starts in one frame, so a lazy load would miss it
+    const named = deps.battle.allEnemies.some((e) => e.data.bossPhases?.some((p) => p.interlude));
     if (named && !deps.interludes && typeof document !== 'undefined') void sharedInterludes.load();
   }
 
