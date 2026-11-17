@@ -196,6 +196,18 @@ def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | Non
     X0, Y0 = int(round(cx_c - k * cx_n)), foot + 1 - k * (sp.foot_row + 1)
     X0, Y0 = (PT.align(X0, pad, s, pm, k, 0), PT.align(Y0, pad, s, pm, k, 1)) if arm == "g" else \
         (_snap(X0, big, k, 1), _snap(Y0, big, k, 0))
+    # pilot (user 2026-11-17, relaxed review): a long low pose centred on its base can spill one side while it fits
+    # the window's width; slide the window by whole native pixels to fit it (recorded, reviewed by eye)
+    bx = np.nonzero(bm.any(0))[0]
+    lo_x, hi_x = int(bx.min()), int(bx.max())
+    if hi_x - lo_x + 1 <= k * w - 2 * k:
+        nx = 0
+        if lo_x <= X0:
+            nx = -((X0 - lo_x) // k + 1)
+        elif hi_x >= X0 + k * w - 1:
+            nx = (hi_x - (X0 + k * w - 1)) // k + 1
+        X0 += nx * k
+        info["x_shift_px"] = nx
     inner = np.zeros(bm.shape, bool)
     inner[Y0 + 1:Y0 + k * h - 1, X0 + 1:X0 + k * w - 1] = True
     if (bm & ~inner).any():

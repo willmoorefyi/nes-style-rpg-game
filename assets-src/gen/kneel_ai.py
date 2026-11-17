@@ -103,6 +103,9 @@ def cmd_gate(a) -> int:
     from gen import kneel_ai_gates as GT
     from gen import kneel_ai_review as RV
     sp, d, t = D.load(a.id), _dir(a.id), _tag(a)
+    if not (d / f"key_{t}.png").exists():
+        print(f"{a.id} try {a.n_try} ({t}): no key_{t}.png (gen or cut did not finish); run cut first")
+        return 2
     key = np.asarray(Image.open(d / f"key_{t}.png").convert("RGBA"))
     raw = np.asarray(Image.open(d / f"rawn_{t}.png").convert("RGBA"))
     info = json.loads((d / f"cut_{t}.json").read_text())
