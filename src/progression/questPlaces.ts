@@ -94,7 +94,11 @@ export class PlaceIndex {
     return this.flood(map, place, state, sig, lab);
   }
 
-  private flood(map: MapData, place: QuestPlace, state: QuestState, sig: string, lab: Labelling): PlaceComponent {
+  private flood(map: MapData, place: QuestPlace, held: QuestState, sig: string, lab: Labelling): PlaceComponent {
+    // INT-W2a: the cache key has no vehicles, so the flood must not read them: a walking step onto a parked ship
+    // would otherwise cache a `step ...:ship` exit that a later state without the ship reuses. Boarding a parked
+    // vehicle is the state's own exit (`stateExits`).
+    const state: QuestState = { ...held, vehicles: [] };
     const w = map.width;
     const id = lab.comps.length;
     const comp: PlaceComponent = {
