@@ -356,10 +356,18 @@ stages:
     maps: [crescent, crescent-*]
     zones: [overworld:fir_lakeshore, overworld:fir_rivers, overworld:fir_aldi, overworld:fir_sea]
     grind: 2.0
-    walk: []
+    # into Crescent by its land gate, south over the causeway to the Circle, and the elder (crescent-circle (13, 8)),
+    # whose cutscene fir_sages_canoe (requiredFlags EARTH_CRYSTAL_LIT, onceFlag CANOE_GIVEN) gives the canoe
+    walk: ["overworld:board:ship", "overworld:warp:crescent", "crescent:warp:crescent-circle", "crescent-circle:npc:sage_elder"]
+    # on foot by Melmond's harbour after the Cavern of Earth (S13), the ship moored at the ert_melmond dock: the ship
+    # (S14's vehicle requirement) carries the party round to the fir_crescent dock
+    entry: {map: overworld, x: 42, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-20 in --stage S14 only: before S13 the stage scope starts at the new game's place with the ship moored at
+      # Melmond, out of reach, so no early keeper can be seen; the full run catches GT-20 as EARLY crescent before S13
+      - {map: quest, kind: quest, at: [0, 0], reason: "stage scope: before S13 the ship is moored out of reach of the new game's start; the full run catches GT-20 as EARLY crescent talkable before S13"}
+    status: built
   # === end FIR-T ===
   # === FIR-D1 (pass W: owned by FIR-D1) ===
   - id: S15
@@ -675,7 +683,7 @@ towns:
     opensAfter: [S10]
     bandStage: S14
     kit: w_crescent
-    status: pending
+    status: built
   # === end FIR-T town ===
   # === WAT-T town (pass W: owned by WAT-T) ===
   - id: onrac

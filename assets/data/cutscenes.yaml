@@ -308,6 +308,24 @@
       text: "The airship settles on the grass at the desert's edge. Step aboard and press to rise; it lands only on open grass."
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
+# S14: the elder of the Circle (crescent-circle, npc sage_elder; requiredFlags EARTH_CRYSTAL_LIT, onceFlag
+# CANOE_GIVEN) gives the sages' canoe once the earth crystal shines again.
+- id: fir_sages_canoe
+  steps:
+    - type: dialog
+      text: "The elder lifts his staff. Around the ring the sages rise, one by one, until all twelve stand."
+    - type: dialog
+      text: "Elder: \"Two rivers leave this lake, and no road crosses the mountains that ring it. Our fathers kept a boat for the day the rivers would be needed.\""
+    - type: dialog
+      text: "Two novices carry a slim canoe of pale wood up from the islet's shore and lay it at your feet."
+    - type: give_item
+      item: canoe
+    - type: set_flag
+      flag: CANOE_GIVEN
+    - type: dialog
+      text: "You received the Canoe! Step onto a river or the lake and you will paddle."
+    - type: dialog
+      text: "Elder: \"South of the ring the fire mountain wakes, and beside it a hollow of ice keeps its own secret. The rivers will take you to both.\""
 # === end FIR-T ===
 # === FIR-D1 (pass W: owned by FIR-D1) ===
 # === end FIR-D1 ===

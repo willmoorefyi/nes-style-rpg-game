@@ -3112,6 +3112,163 @@ and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescen
 `modes` and `name`. The debug scenarios gain `w_s17_start` and `w_s17_neg_nostone`.
 <!-- === end FIR-O === -->
 <!-- === FIR-T FIRE (pass W: owned by FIR-T) === -->
+### FIR-T result: Crescent Lake and the Circle of Sages (branch `w-fir-t` from `mainline` 1e2fdfc1)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-t/`.
+
+**Files:**
+
+- `layouts/fire/town_crescent.py` writes `crescent` (54x46, kits town + castle + overworld), with the design note in
+  its header.
+  - The plan: a headland whose inner shore bends round in a crescent. The lake wraps the east and the south of the
+    map, and its far bank shows in the south-east corner. Three terraces step down to the water. Each is held up by
+    a 2-row band of rock, and stone stairs cut through it (x 21-22 and 45-46 in the upper band, x 9-10 and 29-30 in
+    the lower).
+  - The Star Terrace holds the tutor's school, the archive, a shuttered reading room, the astronomer's house, and
+    the observatory hall with a telescope tower (the approved castle turret).
+  - On the Market Terrace, the Sea Road runs from the west land gate to a landing stage on the lake. The five shops,
+    the Fountain Court and the inn line its north side. The healer (the clinic), the potter, a scriptorium, a flower
+    garden and the pilgrims' hostel line its south side.
+  - The Lakeside is a lawn in the bowl of the shore, with a statue of the first sage, the boatwright's yard, two
+    boathouses on piles and a dirt path along the shore. From its southern tip, the causeway leaves by the south
+    edge to `crescent-circle:arrival` (entrance `circle`).
+  - 17 `type: house` objects: 6 homes, 5 shops, and 6 without a way in (the reading room, the observatory, the
+    scriptorium, the hostel and the two boathouses). The inn is the `inn` prefab. There are three inspect cells
+    (the signpost, the observatory, the scriptorium), and the west edge exits to `overworld:fir_crescent`.
+- `layouts/fire/town_crescent_people.py`: the 19 outdoor NPCs and `NO_WANDER`. Nearly every line has three steps:
+  CANOE_GIVEN, then EARTH_CRYSTAL_LIT, then the default (the rot in the earth). `ferryman_hint` names the sages and
+  `geologist_hint` names the volcano, at every step.
+- `layouts/fire/town_crescent_circle.py` writes `crescent-circle` (27x21), an islet in the lake.
+  - The causeway arrives from the north edge, and the north edge exits to `crescent:circle`. Ten standing stones
+    (castle `pillar`s) make a ring that is open toward the causeway, with an urn at its heart.
+  - There are 12 sages: 8 inside the ring and 4 at the islet's edges.
+  - `sage_elder` (13, 8) has the cutscene `{id: fir_sages_canoe, requiredFlags: [EARTH_CRYSTAL_LIT], onceFlag:
+    CANOE_GIVEN}`. Before the flag, he says: "Heal the earth first."
+  - `sage_lukahn` speaks the prophecy in new words. The other ten sages speak of the rotting earth before S13, of fire
+    and frost after it, and of the canoe last.
+  - The map has `exit: {map: crescent, entrance: circle}`.
+- `layouts/fire/town_crescent_rooms.py` is the runner for the interiors. `town_crescent_homes.py` writes the six
+  `crescent-house-*` maps, and `town_crescent_shops.py` writes the five shops and `crescent-inn`. They use W1-D's
+  `Town("crescent")`. Each room has its own plan and a design note:
+  - healer: the clinic, `clinicPrice: 60`, an infirmary of cots;
+  - astronomer: a study and a bedchamber through an arch, chest `ether`;
+  - boatwright: a hull on the stocks, chest `hi_potion`;
+  - archivist: a hall of shelves, chest `phoenix_down`;
+  - potter: a wheel room and a kiln room, chest `soft`;
+  - tutor: the school;
+  - the shops: each keeper stands in a closed bay. The inn has a dormitory behind a partition.
+  - Chest flags are `CHEST_FIR_T_*`.
+- `layouts/fire/town_crescent_site.py` is **unchanged**. FIR-O's world already reads W1-0b's defaults: the gate
+  (148, 124), the door (149, 124) and the `fir_crescent` dock (146, 124). So there was no world regeneration and no
+  chunk change (G3 n/a).
+- Data:
+  - `cutscenes.yaml` (FIR-T anchor): `fir_sages_canoe`. It plays dialog, then `give_item canoe`, then `set_flag
+    CANOE_GIVEN`, then the closing lines.
+  - `quest.yaml` (FIR-T anchors):
+    - S14 is `status: built`.
+    - Its walk is `overworld:board:ship`, `overworld:warp:crescent`, `crescent:warp:crescent-circle`,
+      `crescent-circle:npc:sage_elder`.
+    - Its entry is on foot at Melmond's harbour, overworld (42, 112), with the ship at the `ert_melmond` dock
+      (43, 113). See the deviations for why.
+    - It has one stage-scope `nonLoadBearing` entry, for GT-20.
+    - The town `crescent` is `built`.
+  - `debug-scenarios.yaml` (FIR-T anchor): `w_s14_start` (level 17, B4 kit, flags through S13) and `w_s14_early`
+    (level 13, B3 kit, flags through S10). Both start at `overworld:fir_crescent`, with the ship at the dock.
+  - `shops.yaml`: the seeded `crescent_*` records are kept unchanged (B5 stock, L5 magic, inn 300).
+- Tests:
+  - `tests/quest/fire/fir_t_town.test.ts` (13 tests) covers:
+    - the canon door links both ways;
+    - the causeway links both ways;
+    - the gate edge exits;
+    - EXIT-safety for the town, the Circle and every room;
+    - the elder's gated cutscene, and that the canoe has no other source;
+    - the 12 sages and their three-step lines, and the hints;
+    - the clinic and inn prices and the six keepers;
+    - the `CHEST_FIR_T_` flags;
+    - the site file against the compiled overworld.
+  - `tests/quest/fire/fir_t_walk.test.ts` (3 tests): the S14 walk and entry, (a) in assume mode, the town entry, and
+    the full-run order S13 < S14 < S15, S16.
+
+**Town standard (G15):** `crescent: houses 17/9 interiors 6/6 outdoor 19/16 interior 18/12 hints 2/2 reactive 44/4
+shops 5/5 inn 300/300 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G16 | `stubs.py --check fir-t`: `stubs: 0 left for FIR-T`, exit 0 |
+| G2 | `build_map.py` for the 14 ids, under the lock: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 14 ids: 14 lines `<id>: deterministic`, exit 0. There was no overworld compile, because the site file is unchanged |
+| G1 | the 5 FIR-T layout scripts, `stubs.py` (`kept 47 real maps`) and `world.py`, then `git diff --exit-code assets-src/maps`: clean (after the commit) |
+| G5 | `npm run quest -- --mutate --stage S14`: (a) OK S14; (b) OK (18 withheld runs, 16 not required); (c) OK (67784 states); (d) `S14 L17.3 [17,20]`; (e) to (h) OK; `mutations: OK (2 gate rows; 2 elements, each removal reported)`; `quest-verify: OK` |
+| G5, full run | `npm run quest -- --mutate`: `quest-verify: OK` (45 gate rows; 57 elements). On the full world, GT-19 is caught (`SKIP S14 CANOE_GIVEN reachable without its requirement EARTH_CRYSTAL_LIT`, and without S11-S13). GT-20 is caught (`EARLY crescent talkable before S13`). GT-21 and GT-37 are pending until S15 and S16 are built |
+| 5.4 proof (f) | `(f) price walls: OK  crescent pending`. Crescent is built, but its first-arrival gold is tainted by the pending stages before it (S4, S5, S8, S9, S11, S13), so the curve marks it assumed. It goes live at INT |
+| G13, G14 | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G6, G7, G12, G15 | `assetCoverage`, `crossFileValidation`, `designNotes`, `originality`, `townStandard` and `tests/quest/fire/`: 9 files, 2903 passed, 4 skipped |
+| G4 | see below |
+| G10 | Port 5230, `mute=1`, my own headless Chromium (`/tmp/w-fir-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s14_early`:
+
+- The party entered Crescent from `overworld` (148, 124).
+- It bought a Potion at the item shop (`_shop_crescent_item`; 1500 -> 1440 G, potions 6 -> 7).
+- Over the causeway the map was `crescent-circle`. The elder said "...while it rots we can give you nothing. | Heal
+  the earth first...". CANOE_GIVEN stayed unset, and there was no canoe.
+- Screenshots: `/tmp/w-fir-t/s14_early_gate.png`, `s14_early_shop.png`, `s14_early_buy.png`, `s14_early_elder.png`.
+
+G10, `w_s14_start`:
+
+- The party reached the Circle, talked to the elder, and `fir_sages_canoe` played. CANOE_GIVEN was set and the canoe
+  held.
+- Back out by the causeway and the gate to `overworld` (148, 124). A step east from (153, 124) onto the lake gave
+  (154, 124) with mode `canoe`.
+- Screenshots: `/tmp/w-fir-t/s14_circle.png`, `s14_canoe.png`, `s14_lake.png`.
+
+**Originality:**
+
+- A fresh reviewer read the six scripts, the 14 generated sources, the cutscene and the previews. It found no copied
+  classic line, and Lukahn's prophecy is fully reworded. Every Topology line is accurate, and every Distinct line
+  has at least 2 true features.
+- Its five factual remarks are fixed:
+  - the boatwright's and the potter's floors are earth, not stone;
+  - the inn's tables now stand on its carpet;
+  - the item shop's barrel and crate now flank the door;
+  - the healer's window now stands over the herb tables.
+- `originality review: PASS crescent crescent-circle crescent-house-healer crescent-house-astronomer
+  crescent-house-boatwright crescent-house-archivist crescent-house-potter crescent-house-tutor crescent-weapon-shop
+  crescent-armor-shop crescent-item-shop crescent-white-magic crescent-black-magic crescent-inn`.
+
+**Deviations / hand-offs:**
+
+- **The S14 entry is at Melmond, not at Crescent's gate.**
+  - S14 `requires` the ship. In assume mode, proof (b) withholds each required grant from the entry. An entry at the
+    gate reached the elder without the ship (`SKIP S14 CANOE_GIVEN reachable without ship`).
+  - The entry is now where S13 leaves the party: by Melmond's harbour with the ship moored, as S12 does.
+  - The debug scenarios still start at Crescent's gate, because 6.5's steps begin in the town.
+- **GT-20 in `--stage S14` cannot be seen.**
+  - Proof (e) starts "before S13" from the new game's place, and the ship is moored at Melmond, out of reach. So no
+    early keeper shows in the stage scope.
+  - The full run catches GT-20. I added one stage-scope `nonLoadBearing` entry to S14, matching A1-T's GT-4 entry:
+    `{map: quest, kind: quest, at: [0, 0]}`. A caught row never reads it.
+  - Note for INT: the entry matches any uncaught `quest`-kind element of any stage run. Today only the town
+    `opensAfter` rows produce that kind.
+- **The gift is a cutscene, not `giftItem` / `giftFlag`.** 4.4 asks for `giftFlag: CANOE_GIVEN` with `requiredFlags:
+  [EARTH_CRYSTAL_LIT]`, but `npcOutcome` ignores `requiredFlags` on a plain gift. The elder therefore uses Sarda's
+  pattern: a cutscene with `requiredFlags` and `onceFlag: CANOE_GIVEN` that gives the item and sets the flag. GT-19
+  finds it through `npcFlags`, which reads the cutscene's flags, and it is caught.
+- **Shared files.** No shared-file edits outside my anchors. Edited inside them: `quest.yaml` (S14 and the town
+  entry), `cutscenes.yaml`, `debug-scenarios.yaml`.
+- **Art.** The dock posts are W1-D `dock_post` placeholders ("DP" labels). Every other part is approved art.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains three rows:
+  - `layouts/fire/town_crescent.py` (+ `town_crescent_people.py`) -> `crescent.yaml`;
+  - `layouts/fire/town_crescent_circle.py` -> `crescent-circle.yaml`;
+  - `layouts/fire/town_crescent_rooms.py` (+ `town_crescent_homes.py`, `town_crescent_shops.py`) -> the six
+    `crescent-house-*` maps, the five shops and `crescent-inn`.
+- Debug scenarios gain `w_s14_start` and `w_s14_early`.
+- An NPC gift that needs a flag is written as a cutscene with `requiredFlags` and an `onceFlag` (the canoe, the rod).
+  A plain `giftItem` ignores `requiredFlags`.
 <!-- === end FIR-T === -->
 <!-- === FIR-D1 FIRE (pass W: owned by FIR-D1) === -->
 <!-- === end FIR-D1 === -->
