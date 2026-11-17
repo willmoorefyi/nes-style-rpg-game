@@ -12,7 +12,7 @@
 import type { MutationResult, ProofFailure } from './questTypes.js';
 import { createQuestContext, type QuestContext } from './questProofs.js';
 import { attachLate, lateOf } from './questLateData.js';
-import { globMatch, type QuestWorld } from './questData.js';
+import { ancestorsOf, globMatch, type QuestWorld } from './questData.js';
 import { Baseline, prefixStage, stageSkips, type CheckKey } from './questMutateCheck.js';
 import { GATE_ROWS, type GateRow } from './questMutateRows.js';
 import type { MutElement } from './questMutateOps.js';
@@ -49,6 +49,15 @@ function probe(ctx: QuestContext, row: GateRow): MutationResult {
   return { ...base, caught: false, failures };
 }
 
+/**
+ * A row a --stage run can't catch: it expects only another stage's SKIP ((b) is the stage's own: GT-23 in S17), or its
+ * element is an earlier stage's whose grants the stage's assumed start already holds (GT-23 in S18).
+ */
+function stageBlind(ctx: QuestContext, row: GateRow, stage: string): boolean {
+  const otherSkips = row.expect.length > 0 && row.expect.every((e) => e.proof === 'b' && prefixStage(e.prefix) !== stage);
+  return otherSkips || (row.stages[0] !== stage && ancestorsOf(ctx.world.stages, stage).has(row.stages[0]));
+}
+
 function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement): MutationResult {
   const mctx = mutatedContext(ctx, el.apply(ctx.world));
   const stages = rowStages(row);
@@ -63,7 +72,9 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement)
   }
   const hit = row.expect.filter((e) => fresh.some((f) => f.message.startsWith(e.prefix)));
   out.caught = row.anyOf ? hit.length > 0 : hit.length === row.expect.length;
-  if (!out.caught && !builtStages(ctx, stages)) {
+  if (!out.caught && ctx.stage && stageBlind(ctx, row, ctx.stage)) {
+    out.nonLoadBearing = `pending: the full run checks it (--stage ${ctx.stage} can't see it)`;
+  } else if (!out.caught && !builtStages(ctx, stages)) {
     out.nonLoadBearing = `pending: ${stages.filter((s) => ctx.world.stages.get(s)?.status !== 'built').join(' ')} not built`;
   } else if (!out.caught) {
     const reason = nonLoadBearingFor(ctx, el);

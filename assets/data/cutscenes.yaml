@@ -134,6 +134,53 @@
 # === FIR-D2 (pass W: owned by FIR-D2) ===
 # === end FIR-D2 ===
 # === ORD-O (pass W: owned by ORD-O) ===
+# S18 (WORLD 4.5): the stone steward of citadel-1f holds the empty throne's crown; setting it back on the throne opens
+# the arch to the west wing (the gate cells want ORD_O_THRONE).
+- id: ord_throne_wakes
+  steps:
+    - type: dialog
+      text: "You lift the stone crown from the steward's hands. It is heavier than it looks. You set it on the empty seat."
+    - type: dialog
+      text: "For a moment the whole court seems to lean toward the throne, as if a king had just sat down."
+    - type: fade_out
+      duration: 500
+    - type: set_flag
+      flag: ORD_O_THRONE
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "Grit trickles from the steward's shoulders as it turns its head toward the west arch, and the grey light there thins to nothing."
+# S18: the guardian of citadel-3f falls; its seal is the proof Bahamut asks for (D-W14: the boss cutscene gives it).
+- id: ord_seal_won
+  steps:
+    - type: dialog
+      text: "The carcass folds in on itself and settles, a heap of old bone at last. Something rings against the dais."
+    - type: set_flag
+      flag: ORDEALS_GUARD_DEFEATED
+    - type: give_item
+      item: ordeal_seal
+    - type: dialog
+      text: "A disc of black stone lies where its heart was, cut with the citadel's sign. It is warm in your hand."
+    - type: dialog
+      text: "Behind the dais, a stair has opened in the floor. Far to the east, out over the isles, something vast answers with a roar."
+# S19 (optional): Bahamut takes the seal and names the party anew (the NPC's action, classUpgrade on CLASS_UPGRADED,
+# follows the cutscene).
+- id: ord_bahamut_trial
+  steps:
+    - type: dialog
+      text: "You lay the seal on the gold cloth. Bahamut turns it over once with a claw that was a finger a moment ago."
+    - type: take_item
+      item: ordeal_seal
+    - type: fade_out
+      duration: 600
+    - type: dialog
+      text: "Bahamut: The citadel asked for courage and you paid it. I ask for nothing more. Stand, and be named."
+    - type: set_flag
+      flag: CLASS_UPGRADED
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "Heat rolls through the hall like a tide. When it passes, your hands, your gear, even your breath feel new."
 # === end ORD-O ===
 # === WAT-O (pass W: owned by WAT-O) ===
 # === end WAT-O ===

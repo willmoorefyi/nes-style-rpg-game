@@ -136,15 +136,16 @@ export class FieldNpcActions {
       return true;
     }
     const cutscene = this.outcome(npc).cutscene;
+    const def = this.def(npc);
     if (cutscene) {
-      this.host.playCutscene(cutscene).catch((e) => console.error(`Cutscene ${cutscene} failed:`, e));
+      // a class-upgrade NPC whose cutscene sets its actionFlag (Bahamut takes the seal) upgrades once it ends
+      this.host.playCutscene(cutscene).then(() => {
+        if (npc.action === 'classUpgrade') this.upgrade(def);
+      }).catch((e) => console.error(`Cutscene ${cutscene} failed:`, e));
       return true;
     }
-    const def = this.def(npc);
     if (npc.action === 'classUpgrade') {
-      const game = this.host.game;
-      const messages = upgradeParty([...game.party.all], game.gameFlags, ClassRegistry.getAllClasses(), def.actionFlag);
-      this.host.dialog.start(messages.length > 0 ? messages : ['You are not yet ready for this.']);
+      this.upgrade(def);
       return true;
     }
     if (npc.action === 'clinic') {
@@ -153,6 +154,13 @@ export class FieldNpcActions {
     }
     if (npc.shopId) openShopScene(this.host.game, npc.shopId);
     return true;
+  }
+
+  /** The class upgrade on the NPC's `actionFlag` (GAP-8), and its messages in the dialog box. */
+  private upgrade(def: MapNPC): void {
+    const game = this.host.game;
+    const messages = upgradeParty([...game.party.all], game.gameFlags, ClassRegistry.getAllClasses(), def.actionFlag);
+    this.host.dialog.start(messages.length > 0 ? messages : ['You are not yet ready for this.']);
   }
 
   /** GAP-16: nobody fallen, a line; else the clinic's Yes / No over the town, and its result in the dialog box. */
