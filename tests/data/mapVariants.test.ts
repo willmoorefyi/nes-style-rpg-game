@@ -62,10 +62,10 @@ describe('map variants (legacy and compiled 2x)', () => {
 
   it('every transition lands on a walkable cell of every variant of its target', () => {
     for (const m of all) {
-      // a map new in 2x (pass W: no legacy variant) is played only compiled, so it leads only into compiled maps
-      const only2x = !legacy.has(m.id);
       for (const t of m.transitions) {
-        for (const target of only2x ? [compiled.get(t.targetMap)!].filter(Boolean) : variants(t.targetMap)) {
+        // a map new in 2x (pass W) is only played with the compiled world, so it lands on compiled targets only
+        const targets = legacy.has(m.id) ? variants(t.targetMap) : [compiled.get(t.targetMap)].filter((x): x is MapData => !!x);
+        for (const target of targets) {
           const at = arrivalFor(t, target);
           expect(walkable(target, at.x, at.y), `${m.id} (${t.x},${t.y}) -> ${target.id} (${at.x},${at.y})`).toBe(true);
         }

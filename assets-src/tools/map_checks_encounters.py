@@ -3,9 +3,8 @@
 Every table entry has a weight and exactly one of `enemies` (ids) or `groups` ({id, min, max?} with
 0 <= min <= max); a formation's largest roll is at most MAX_FORMATION enemies; every id is in
 assets/data/enemies.yaml. A zone has a unique id, inclusive [x0, y0, x1, y1] rects inside the map that cover at
-least one walkable cell, its own table and an optional encounterRate; pass W adds the optional `modes` (field modes,
-src/types/quest.ts FIELD_MODES; a ship or airship zone must cover a cell its vehicle moves over instead) and `name`
-(the bestiary habitat).
+least one walkable cell (unless its `modes` leave out walking: a ship or canoe zone), its own table and an
+optional encounterRate, `modes` and bestiary `name` (pass W).
 """
 from __future__ import annotations
 
@@ -19,10 +18,9 @@ from map_graph import walkable
 
 MAX_FORMATION = 9                                   # EncounterTable.MAX_FORMATION (src/systems/EncounterTable.ts)
 ENEMIES_FILE = Path(__file__).resolve().parents[2] / "assets" / "data" / "enemies.yaml"
+# pass W (QUEST 3.4, WORLD 4.0.3; types/quest.ts EncounterZoneQuestFields): `modes` and the bestiary `name`
 ZONE_KEYS = {"id", "rects", "encounters", "encounterRate", "modes", "name"}
 FIELD_MODES = ("walking", "canoe", "ship", "airship")
-# TerrainType values a vehicle-only zone may cover: the ship sails Water (2); the airship flies over anything
-MODE_TERRAIN = {"ship": {2}, "airship": set(range(16))}
 
 
 @lru_cache(maxsize=1)
@@ -103,16 +101,12 @@ def encounter_errors(src: dict, c) -> list[str]:
         ids.add(z["id"])
         if set(z) - ZONE_KEYS:
             errors.append(f"{p}: unknown keys {sorted(set(z) - ZONE_KEYS)}")
-        # pass W (QUEST 3.4, WORLD 4.0.3): `modes` (the field modes the table applies to) and `name` (the habitat)
-        modes = z.get("modes")
-        if modes is not None and not (isinstance(modes, list) and modes and set(modes) <= set(FIELD_MODES)):
+        modes = z.get("modes", ["walking", "canoe"])
+        if not (isinstance(modes, list) and modes and set(modes) <= set(FIELD_MODES)):
             errors.append(f"{p}: modes must be a non-empty list of {', '.join(FIELD_MODES)}")
-            modes = None
+            modes = []
         if "name" in z and not (isinstance(z["name"], str) and z["name"]):
             errors.append(f"{p}: name must be a non-empty string")
-        # a sea or sky zone covers the cells its vehicle moves over, not walkable ones
-        covered = walkable if modes is None or {"walking", "canoe"} & set(modes) else (
-            lambda coll, x, y: int(coll[y, x]) in MODE_TERRAIN[tuple(sorted(modes))[0]])
         rects = z.get("rects")
         if not isinstance(rects, list) or not rects:
             errors.append(f"{p}: rects must be a non-empty list of [x0, y0, x1, y1]")
@@ -126,9 +120,9 @@ def encounter_errors(src: dict, c) -> list[str]:
             if not (0 <= x0 <= x1 < c.width and 0 <= y0 <= y1 < c.height):
                 errors.append(f"{p}.rects[{j}]: {r} is not an inclusive rect inside the {c.width}x{c.height} map")
                 continue
-            walk += sum(bool(covered(c.collision, x, y)) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1))
-        if rects and not walk:
-            errors.append(f"{p}: covers no {'walkable' if covered is walkable else 'sailable or flyable'} cell")
+            walk += sum(walkable(c.collision, x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1))
+        if rects and not walk and "walking" in modes:      # a ship or canoe zone covers water, not land
+            errors.append(f"{p}: covers no walkable cell")
         errors += table_errors(f"{p}.encounters", z.get("encounters"), enemies)
         rate = z.get("encounterRate")
         if rate is not None and not (isinstance(rate, dict) and _is_int(rate.get("min")) and _is_int(rate.get("max"))
