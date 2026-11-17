@@ -12,7 +12,7 @@
 import type { MutationResult, ProofFailure } from './questTypes.js';
 import { createQuestContext, type QuestContext } from './questProofs.js';
 import { attachLate, lateOf } from './questLateData.js';
-import type { QuestWorld } from './questData.js';
+import { globMatch, type QuestWorld } from './questData.js';
 import { Baseline, prefixStage, stageSkips, type CheckKey } from './questMutateCheck.js';
 import { GATE_ROWS, type GateRow } from './questMutateRows.js';
 import type { MutElement } from './questMutateOps.js';
@@ -101,8 +101,12 @@ export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>): Mutat
   const scope = ctx.checked.filter((s) => built.has(s.id) || s.after.some((a) => built.has(a)));
   const keys: CheckKey[] = [{ proof: 'a' }, ...scope.map((s) => ({ proof: 'b' as const, stage: s.id })), { proof: 'c' }, { proof: 'e' }];
   const out: MutationResult[] = [];
+  // --stage: only the stage's own elements (its maps, and world-map elements that read its grants)
+  const own = ctx.stage ? ctx.world.stages.get(ctx.stage)! : null;
+  const mine = (el: MutElement): boolean => !own || own.maps.some((g) => globMatch(el.map, g))
+    || (el.map === ctx.world.worldMap && (el.reads ?? []).some((r) => [...own.grants.flags, ...own.grants.items].includes(r)));
   for (const el of genericElements(ctx)) {
-    if (named.has(spot(el))) continue;
+    if (named.has(spot(el)) || !mine(el)) continue;
     const fresh: ProofFailure[] = base.fresh(mutatedContext(ctx, el.apply(ctx.world)), keys);
     const r: MutationResult = { row: `G ${el.map}`, element: el.label, mutation: 'remove', caught: fresh.length > 0, failures: fresh };
     if (!r.caught) {
