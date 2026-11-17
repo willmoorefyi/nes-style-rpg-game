@@ -13,7 +13,7 @@ kneel files. Facts in 1.4 were checked at `4ade849`.
 | 1 | P2 The heavy-job rule stalls W1 | W1-C1 and W1-C2 start with at most 2 other W1 tranches running; the rest are admitted once both have passed their memory probe. "Active" means a worktree whose branch is not merged into `mainline`, checked with a given command. The W1 step gets about 4 h more (2.3, 5.0) |
 | 2 | P2 The GT-35 and GT-37 barriers | `RegionOut.barriers: {name: (cells, side_a_seed, side_b_seed)}`, declared by W1-0b and implemented by W1-C2. ERT-O fills `western_range` and FIR-O fills `crescent_ring`; the composer exports their minimal cuts (2.9, 5.1, 5.2, 6.3) |
 | 3 | P2 The ice anchor | `fir_ice` moves to (136, 148), below the forbidden rows 146-147; the mouth's arrival cell is south of the cliff rows (2.2, 4.4) |
-| 4 | P2 Worktree memory | W1-0a records `/usr/bin/time -l npx vitest run --maxWorkers=2` and lowers the "3 others" limit if one worktree's peak exceeds about 2 GB (2.3, 5.1) |
+| 4 | P2 Worktree memory | W1-0a records `/usr/bin/time -l npx vitest run --maxWorkers=2 --minWorkers=1` and lowers the "3 others" limit if one worktree's peak exceeds about 2 GB (2.3, 5.1) |
 | 5 | P3 dwarf-melmond | `ert_dwarf` moves 1 cell to (54, 106). Re-measured: 2 failures in 20,000 random ±2 placements (0.01 %, both crescent-ice). That residual risk is noted; the macro test is the authority (2.2) |
 | 6 | P3 The GT-5b fixture; site files | GT-5b's fixture keeps the removed dwarves' landing out of the `DOCKS_ALLOWED` check, so the row fails only on (a). QUEST 4.0's "regenerate, never hand-merge" rule covers every `town_*_site.py` change (5.3, 6.3) |
 | 7 | P3 R26 | the kneel pass has merged (88f8ad7); R26 now only says pass W branches from a head at or after it |
@@ -24,7 +24,7 @@ kneel files. Facts in 1.4 were checked at `4ade849`.
 |---|---|---|
 | 1 | P1 GT-5: Elfland is also reachable from the dwarves' landing over `seam_n` | GT-5 is non-load-bearing with that reason; the new row GT-5b removes both `elf_port` and `ert_dwarf` and must make the goal unreachable (6.3) |
 | 2 | P1 No owner for the town tooling | W1-D (now 7 h) generalises `interiors_common.py` with a `town` parameter and extracts the outdoor helpers into `layouts/town_common.py`; `cornelia.py` and the Cornelia maps stay byte-equal (G1). Both files are in 5.5 (5.2, 5.5) |
-| 3 | P1 Memory outside the lock | `--region` takes the lock (2.3, G2). Heavy-job rule: a full-world compile runs only while at most 3 other tranches are active; every worktree runs Vitest with `--maxWorkers=2` (G4). W1-C1 also measures a land-filled synthetic world. The `--region` limit is 10 GB everywhere (estimate about 8 GB) (2.3, 5.0, 5.2, G2, G4) |
+| 3 | P1 Memory outside the lock | `--region` takes the lock (2.3, G2). Heavy-job rule: a full-world compile runs only while at most 3 other tranches are active; every worktree runs Vitest with `--maxWorkers=2 --minWorkers=1` (G4). W1-C1 also measures a land-filled synthetic world. The `--region` limit is 10 GB everywhere (estimate about 8 GB) (2.3, 5.0, 5.2, G2, G4) |
 | 4 | P1 Act-1 raw spawns; jetty facts | `r_ow_temple`, `r_ow_bridge` and `r_ow_east` all get `frame: a1`. 1.4 is corrected: the jetty is on rows 54-56 and the ship spawn is (28, 57). The `aldi` seed is now the ship spawn's cell, world (92, 121). New test `tests/data/scenarioSpawns.test.ts` (W1-B) (1.4, 1.5, 2.6, 5.1) |
 | 5 | P2 Missing GT rows | GT-35 (the western range), GT-36 (the giant's cell) and GT-37 (Crescent's ring) (6.3) |
 | 6 | P2 Anchor placement | `elf_keep` (61, 126), `fir_volcano` (120, 151), `fir_ice` (135, 147), `fir_desert` (143, 160); the pair giant-sarda becomes melmond-sarda. Re-measured: s* = 0.735, ratios 0.86-1.10, 0 failures in 6000 random ±2 placements. T tranches own the anchors in their site files. The bearing difference is min(\|Δ\|, 360 - \|Δ\|). The detour hops are listed with their factors (2.2, 5.3, 6.1) |
@@ -345,8 +345,8 @@ memory. So:
   checks this before starting the job);
 - **in W1**, W1-C1 and W1-C2 start with at most 2 other W1 tranches running. The remaining W1 tranches are admitted
   once both have recorded their full-world memory probe. This adds about 4 h to the W1 step (5.0);
-- every worktree runs Vitest with `--maxWorkers=2` (G4). W1-0a records `/usr/bin/time -l npx vitest run
-  --maxWorkers=2` in its result. If one worktree's peak is above about 2 GB, the "3 others" limit is lowered to
+- every worktree runs Vitest with `--maxWorkers=2 --minWorkers=1` (G4). W1-0a records `/usr/bin/time -l npx vitest run
+  --maxWorkers=2 --minWorkers=1` in its result. If one worktree's peak is above about 2 GB, the "3 others" limit is lowered to
   `floor((48 - 26 - 4) / peak)` (4 GB of headroom), and the region concurrency to `floor((48 - 10 - 4) / (peak + 0.5))`
   (0.5 GB per dev server), whichever is smaller than today's 3 and 6;
 - the budget is then 26 GB (full) + 3 x about 2 GB, or 10 GB (`--region`) + 6 x about 2 GB, both under the 48 GiB
@@ -1283,7 +1283,7 @@ K (kneel) merged -> W1-0a | W1-0b contract (parallel)
 
 | Command | Expected |
 |---|---|
-| `npm run build && npx vitest run --maxWorkers=2` | exit 0; 0 failed |
+| `npm run build && npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; 0 failed |
 | `python3 -I assets-src/tools/layouts/stubs.py && python3 -I assets-src/tools/layouts/stubs.py --count all` | the first writes every canon stub; the second prints `stubs: <n> left` with n equal to the number of canon ids |
 | `python3 -I assets-src/tools/layouts/world.py --check-bands` | `bands: OK` (with the composer skeleton: rects tile the world; stubs write no band cell) |
 | `npx vitest run tests/systems/fieldRules.test.ts tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed, with the 590 entry for `ExplorationScene.ts` enabled |
@@ -1649,7 +1649,7 @@ command changes and the new gates:
 | G1 layouts are deterministic | `for s in <owned layout scripts>; do python3 -I "$s" \|\| exit 1; done; python3 -I assets-src/tools/layouts/stubs.py && python3 -I assets-src/tools/layouts/world.py && git diff --exit-code assets-src/maps` (after committing) | exit 0, no diff |
 | G2 compile and determinism | Every `overworld` compile, full or `--region`, takes the world-compile lock; a full compile also obeys the heavy-job rule (2.3). O tranches: `python3 -I assets-src/tools/build_map.py overworld --region <region> <owned ids>`, then `... --check-determinism --region <region> overworld <owned ids>`. T and D tranches: `build_map.py <owned ids>` and `--check-determinism <owned ids>`, plus the O command only if they changed a `town_*_site.py`. W1-C1, W1-C2 and INT: the full world | each id prints `<id>: WxH -> assets/maps/ai/<id>.yaml`, then `<id>: deterministic`; exit 0 |
 | G3 chunk locality | `python3 -I assets-src/tools/layouts/world.py --owned-chunks <region> > /tmp/w-<id>/owned.txt; git diff --name-only "$(git merge-base mainline HEAD)" HEAD -- assets/maps/ai/overworld/ \| grep -vxFf /tmp/w-<id>/owned.txt` | no output (grep exits 1). W1-C1 and W1-C2 are exempt: they re-baseline every chunk on purpose |
-| G4 build and tests | `npm run build && npx vitest run --maxWorkers=2` (worktrees; INT on `mainline` may run `npm test`) | exit 0; 0 failed |
+| G4 build and tests | `npm run build && npx vitest run --maxWorkers=2 --minWorkers=1` (worktrees; INT on `mainline` may run `npm test`) | exit 0; 0 failed |
 | G5 gap verifier | W1: `npm run quest -- --mutate`. Regions: `for s in <the tranche's stages>; do npm run quest -- --mutate --stage "$s" \|\| exit 1; done`. INT: `npm run quest -- --strict --mutate` | every run ends with `quest-verify: OK`; exit 0 |
 | G6 asset coverage | `npx vitest run tests/data/assetCoverage.test.ts` | all passed |
 | G7 file-size ceilings | `npx vitest run tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed |
@@ -1715,7 +1715,7 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 ## 10. TODOs
 
 - [x] W0: this plan, rev 1 (20f32de), rev 2 (6f4f731, momus OKAY), rev 3 folds in the remaining items; then the user's evaluation and momus review to PASS (priority: high, effort: 2h)
-- [ ] W1-0a: TS contract: QUEST Q1-0, quest.yaml with anchors, the ExplorationScene extraction to 590, anchors in shared YAML and enemies.yaml (priority: high, effort: 8h)
+- [x] W1-0a: TS contract: QUEST Q1-0, quest.yaml with anchors, the ExplorationScene extraction to 590, anchors in shared YAML and enemies.yaml (priority: high, effort: 8h)
 - [ ] W1-0b: world data: world_api, build_hooks signatures, canon, stubs, site defaults, anchors file, town targets (priority: high, effort: 6h)
 - [ ] W1-A: vehicles and save, with the origin shift (priority: high, effort: 8h)
 - [ ] W1-B: NPC and field rules, takeGold, clinic, debug frame (priority: high, effort: 8h)
@@ -1742,6 +1742,80 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 
 <!-- Each tranche appends its result between its own pair of anchors; the integrator writes INT and PLAY. -->
 <!-- === W1-0a FOUNDATION (pass W: owned by W1-0a) === -->
+### W1-0a result: the TS contract (branch `w-w1-0a`, rebased on `mainline` after the W1-0b merge d8cdf2c)
+
+**Files:**
+
+- Types: `src/types/quest.ts` (new: `FIELD_MODES` / `FieldMode`, `MapPatch`, `Dock`, `Hazard`, `MapExit`
+  `{map, entrance}` (the shape W1-0b's canon uses), `VehicleState`, `MapWorld` (GAP-17), the `*QuestFields`
+  interfaces, `QuestStage`, `QuestTown`, `QuestData`). `src/types/index.ts` re-exports it; `MapNPC`, `MapData`,
+  `EncounterZone`, `SaveData`, `BakedMapArt`, `KeyItemGate`, `ScriptedEncounter`, `VehicleSpawn` and `NPCCutscene`
+  extend those interfaces, and `TerrainType.Lake = 11` and `MapTransition.requiredFlags` change in place.
+  `MapNPC` also declares `takeGold` (GAP-15) and `clinicPrice` (GAP-16) for W1-B.
+- Schema: `src/core/schemaValidationQuest.ts` (`validateQuestMapFields`, called from `validateMapData` (+2 lines),
+  and `validateQuestData`: ids, `after`, no cycle, towns, milestones granted).
+- Flags: `STORY_FLAGS` has every milestone of 3.1; `LOCAL_FLAG_PREFIXES` and `isKnownFlag` (a story flag or a
+  region-prefixed local flag). `crossFileValidation.test.ts` (gates) accepts `requiredFlags` and local flags.
+- Field rules: `src/systems/fieldRules.ts` (`fieldStep`, `canEnter`, `canLand`, `dockFor`, `npcOutcome`,
+  `transitionOpen`, `dueEncounter`, `patchedTerrain`, plus `terrainAllows`, `gateCheck`, `flagsMet`) with today's act-1
+  behaviour; `src/systems/fieldRulesVehicles.ts` (the vehicle branches: a vehicle moves only over its own terrain, no
+  boarding or disembarking by a step, no landing). The movement modes' `canMove` / `canLand` and
+  `KeyItemGateSystem.check` now call these, so `PlayerController` (unchanged, via `CollisionMap.isWalkable(x, y,
+  mode)`) and `ExplorationScene` (`fieldStep` on each finished step) use one rule source.
+- Extraction: `src/scenes/exploration/FieldVehicles.ts` (spawns, boarding, the field-rule state) and
+  `FieldNpcActions.ts` (chests, gifts, the post-dialog actions, on `npcOutcome`). `FieldSystems.createFieldStateSystems`
+  and `ExplorationCutscenes.npcCutsceneDue` are gone (replaced by these and `fieldRules.npcCutsceneFor`).
+- Declarations: cutscene steps `give_item`, `take_item`, `set_vehicle`, `end_game` (accepted by the registry; the
+  manager logs that they are not played yet); `DebugScenario.frame`, `vehicles`, `fieldMode`;
+  `BattleRetrySnapshot.mode` and `vehicles`; `safeSpawn(map, pos, mode?, vehicles?)`; `FIELD_TRAVEL_EFFECTS`
+  (`field_exit`, `field_warp`).
+- Verifier types: `src/progression/questTypes.ts` (`QuestPlace`, `QuestEvent`, `QuestState`, `ProofResult`,
+  `ProofFailure`, `MutationResult`, `VerifyReport`).
+- Data: `assets/data/quest.yaml` (S0 built, S1-S31 pending, 8 towns, each between its owner's anchors; S0's
+  `nonLoadBearing` holds GT-1's two gate cells in world coordinates (93, 96), (94, 96)); anchor pairs in `shops.yaml`
+  and `items.yaml` (W1-F + the 21 region tranches), `cutscenes.yaml` (W1-B + 21), `debug-scenarios.yaml` (W1-A, W1-B
+  + 21), `kits.yaml` (W1-F), and 16 pairs around the owned boss records in `enemies.yaml` (3.7's list, in place);
+  `frame: a1` on `r_ow_temple`, `r_ow_bridge`, `r_ow_east`.
+- Tests: `tests/systems/fieldRules.test.ts` (25: the bridge gates and both messages, the temple's Garland cells and
+  NPC, a chest, the castle doors and stairs, static vs wandering NPCs, the lute gift, the King's cutscene, AND gates,
+  vehicles), `tests/data/questData.test.ts`, `tests/data/passWAnchors.test.ts`, `tests/data/questCeilings.test.ts`;
+  `fileCeilings.test.ts` adds `src/types/index.ts` 442 and `src/scenes/ExplorationScene.ts` 590 (enabled).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npm run build` | exit 0 |
+| `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 269 passed (269)`, `Tests 5119 passed (5119)` |
+| `npx vitest run tests/systems/fieldRules.test.ts tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | 3 files, 62 tests passed (590 entry enabled) |
+| `wc -l < src/types/index.ts` | 424 (ceiling 442) |
+| `wc -l < src/scenes/ExplorationScene.ts` | 496 (ceiling 590) |
+| `python3 -I -c "import sys; sys.path.insert(0, 'assets-src/tools'); import build_hooks"` | exit 0 |
+
+Other line counts: `fieldRules.ts` 212, `fieldRulesVehicles.ts` 43, `FieldVehicles.ts` 76, `FieldNpcActions.ts` 122,
+`types/quest.ts` 182, `questTypes.ts` 98, `schemaValidationQuest.ts` 185, `schemaValidation.ts` 380 (+2),
+`PlayerController.ts` 183 (unchanged).
+
+**Worktree memory:** `/usr/bin/time -l npx vitest run --maxWorkers=2 --minWorkers=1`: 50.5 s, maximum resident set
+size 742 MB. That is under about 2 GB, so the "3 others" and the region concurrency limits stay as written (2.3).
+
+**Deviations:**
+
+- `fieldStep` in a vehicle mode keeps today's sailing (the ship moves over Water, `ok: true, mode: ship`) rather than
+  refusing every vehicle step; only a step that would change the mode (boarding, disembarking) is refused, and a
+  walking step's mode is always `walking`. Gates are skipped while flying (QUEST's "everything is open").
+- `DebugScenario` already has `mode: 'battle' | 'field'`, so the field mode is declared as `fieldMode`.
+- The G4 command (and 5.1, 2.3) now read `--maxWorkers=2 --minWorkers=1` (Vitest 1.6.1; found by W1-0b).
+- Stage kits are named `w_s<n>` and town kits `w_<town>` in `quest.yaml` (W1-F creates them); `grind` is 2.0 for a
+  stage with a roster or boss and 1.0 otherwise (INT tunes it).
+- 3.3 leaves S18 (the Citadel) off the goal's path without `optional`; `questData.test.ts` pins that S18, S19 and S31
+  are the stages outside S30's `after` closure.
+
+**AGENTS.md delta (for INT):** "Key Interfaces" gains `types/quest.ts` (the pass W fields) and
+`src/systems/fieldRules.ts` (the one source of field rules: the movement modes, `KeyItemGateSystem` and
+`ExplorationScene` call it); "File Size Guidelines" lists `ExplorationScene.ts` 496 / 590 and `types/index.ts`
+424 / 442; "Data Files" gains `assets/data/quest.yaml`; the shared YAML files carry `# === <id> (pass W: owned by
+<id>) ===` anchors.
 <!-- === end W1-0a === -->
 <!-- === W1-0b FOUNDATION (pass W: owned by W1-0b) === -->
 ### W1-0b result (world data)

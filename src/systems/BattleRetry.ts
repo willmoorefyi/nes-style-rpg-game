@@ -1,4 +1,4 @@
-import type { SaveData } from '../types/index.js';
+import type { FieldMode, SaveData, VehicleState } from '../types/index.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { Direction } from '../rendering/SpriteAnimation.js';
 import { PartyManager } from '../entities/PartyManager.js';
@@ -31,6 +31,9 @@ export interface BattleRetrySnapshot {
   /** The way the hero faced when the battle began (e.g. toward Garland); missing means the default facing. */
   facing?: Direction;
   battle: BattleRequest;
+  /** The party's field mode and the parked vehicles when the battle began (GAP-12; restored by W1-A). */
+  mode?: FieldMode;
+  vehicles?: VehicleState[];
 }
 
 /** The parts of Game the snapshot reads and writes. */

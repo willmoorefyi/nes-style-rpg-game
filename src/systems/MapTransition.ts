@@ -1,4 +1,4 @@
-import type { MapData, MapTransition as TransitionData } from '../types/index.js';
+import type { FieldMode, MapData, MapTransition as TransitionData, VehicleState } from '../types/index.js';
 import type { DataLoader } from '../core/DataLoader.js';
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
@@ -47,8 +47,10 @@ function reachableOnFoot(map: MapData, col: CollisionMap, starts: ReadonlyArray<
  *  (e.g. the north shore of the overworld counts, though the first entrance cannot reach it). A spawn on a warp
  *  steps off it onto a good neighbouring cell (the doorway in front of it), so loading a save never fires the warp;
  *  anything else (blocked, cut off, a save from the other map variant or from before the map was redrawn) moves to
- *  the first entrance. Maps without entrances keep the position. */
-export function safeSpawn(map: MapData, pos: { x: number; y: number }): { x: number; y: number } {
+ *  the first entrance. Maps without entrances keep the position. `_mode` and `_vehicles` are declared for GAP-11
+ *  (W1-A keeps a position valid in the saved mode or on a parked vehicle); today the check is on foot only. */
+export function safeSpawn(map: MapData, pos: { x: number; y: number }, _mode?: FieldMode,
+  _vehicles?: readonly VehicleState[]): { x: number; y: number } {
   const entrances = map.entrances ? Object.values(map.entrances) : [];
   if (!entrances.length) return pos;
   const col = new CollisionMap(map);

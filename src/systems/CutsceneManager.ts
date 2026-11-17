@@ -1,5 +1,6 @@
 import type { GameFlags } from '../core/GameFlags.js';
 import type { Character } from '../entities/Character.js';
+import type { VehicleType } from '../types/index.js';
 
 /** Where a `warp` step sends the party: `map` and either a named `entrance` or both `x` and `y` (T2). */
 export interface CutsceneWarp {
@@ -12,7 +13,8 @@ export interface CutsceneWarp {
 
 /** A single step in a cutscene script */
 export interface CutsceneStep {
-  type: 'dialog' | 'fade_out' | 'fade_in' | 'wait' | 'set_flag' | 'heal_party' | 'warp' | 'backdrop';
+  type: 'dialog' | 'fade_out' | 'fade_in' | 'wait' | 'set_flag' | 'heal_party' | 'warp' | 'backdrop'
+    | QuestStepType;
   text?: string;       // for dialog
   duration?: number;   // for fade/wait (ms)
   flag?: string;       // for set_flag
@@ -26,7 +28,16 @@ export interface CutsceneStep {
   image?: string | null;
   /** For backdrop: a brightness multiplier in (0, 1]; missing means 1 (U16). */
   dim?: number;
+  /** For give_item / take_item (QUEST 4.1). */
+  item?: string;
+  /** For set_vehicle: the vehicle placed at `map`, `x`, `y`. */
+  vehicle?: VehicleType;
 }
+
+/** Pass W steps (QUEST 4.1; declared by W1-0a, played from W1-A / W1-B on): give_item {item}, take_item {item},
+ *  set_vehicle {vehicle, map, x, y}, end_game {text?} (GAP-13). */
+export type QuestStepType = 'give_item' | 'take_item' | 'set_vehicle' | 'end_game';
+const QUEST_STEP_TYPES: readonly QuestStepType[] = ['give_item', 'take_item', 'set_vehicle', 'end_game'];
 
 export type CutsceneScript = CutsceneStep[];
 
@@ -65,7 +76,7 @@ export interface CutsceneDeps {
 
 /** The step types CutsceneManager plays. */
 export const CUTSCENE_STEP_TYPES: readonly CutsceneStep['type'][] =
-  ['dialog', 'fade_out', 'fade_in', 'wait', 'set_flag', 'heal_party', 'warp', 'backdrop'];
+  ['dialog', 'fade_out', 'fade_in', 'wait', 'set_flag', 'heal_party', 'warp', 'backdrop', ...QUEST_STEP_TYPES];
 
 /**
  * Lightweight cutscene system: executes a sequence of steps.
@@ -137,6 +148,10 @@ export class CutsceneManager {
           this.backdropWarned = true;
           console.error('Cutscene backdrop step skipped: this host shows no backdrops');
         }
+        break;
+
+      case 'give_item': case 'take_item': case 'set_vehicle': case 'end_game':
+        console.error(`Cutscene step ${step.type} is declared but not played yet (W1-A / W1-B)`);
         break;
 
       default:

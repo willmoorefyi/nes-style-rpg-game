@@ -45,15 +45,6 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
   return true;
 }
 
-/** The cutscene an NPC plays after talking, if its flags allow it now. */
-export function npcCutsceneDue(npc: Pick<NPC, 'cutscene'>, hasFlag: (flag: string) => boolean): string | null {
-  const c = npc.cutscene;
-  if (!c) return null;
-  if (c.requiredFlag && !hasFlag(c.requiredFlag)) return null;
-  if (hasFlag(c.onceFlag)) return null;
-  return c.id;
-}
-
 /**
  * NPCs whose `showIf` / `hideIf` no longer pass after a flag change (e.g. Garland and the captive princess once
  * the battle and its cutscene are over). Callers remove these from the map.

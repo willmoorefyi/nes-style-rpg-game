@@ -5,6 +5,8 @@ import { healAmount } from '../battle/DamageFormula.js';
 
 /** Spell effects usable from the field menu */
 export const FIELD_VALID_EFFECTS = ['heal', 'cure_poison', 'cure_blind', 'cure_silence', 'revive'];
+/** The travel spells' effects (QUEST 4.1: spell ids `exit` and `warp`; W1-G adds the records, W1-B plays them). */
+export const FIELD_TRAVEL_EFFECTS = ['field_exit', 'field_warp'] as const;
 
 export interface FieldSpellResult {
   /** True if the spell did something; only then is a charge spent. */

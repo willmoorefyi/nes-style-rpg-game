@@ -75,3 +75,50 @@
       flag: INTRO_COMPLETE
     - type: fade_in
       duration: 800
+
+# ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
+# Each tranche adds its records only between its own pair of lines, so the merges never conflict.
+# === W1-B (pass W: owned by W1-B) ===
+# === end W1-B ===
+# === A1-O (pass W: owned by A1-O) ===
+# === end A1-O ===
+# === A1-T (pass W: owned by A1-T) ===
+# === end A1-T ===
+# === ELF-O (pass W: owned by ELF-O) ===
+# === end ELF-O ===
+# === ELF-T (pass W: owned by ELF-T) ===
+# === end ELF-T ===
+# === ELF-D (pass W: owned by ELF-D) ===
+# === end ELF-D ===
+# === ERT-O (pass W: owned by ERT-O) ===
+# === end ERT-O ===
+# === ERT-T (pass W: owned by ERT-T) ===
+# === end ERT-T ===
+# === ERT-D (pass W: owned by ERT-D) ===
+# === end ERT-D ===
+# === FIR-O (pass W: owned by FIR-O) ===
+# === end FIR-O ===
+# === FIR-T (pass W: owned by FIR-T) ===
+# === end FIR-T ===
+# === FIR-D1 (pass W: owned by FIR-D1) ===
+# === end FIR-D1 ===
+# === FIR-D2 (pass W: owned by FIR-D2) ===
+# === end FIR-D2 ===
+# === ORD-O (pass W: owned by ORD-O) ===
+# === end ORD-O ===
+# === WAT-O (pass W: owned by WAT-O) ===
+# === end WAT-O ===
+# === WAT-T (pass W: owned by WAT-T) ===
+# === end WAT-T ===
+# === WAT-D (pass W: owned by WAT-D) ===
+# === end WAT-D ===
+# === WND-O (pass W: owned by WND-O) ===
+# === end WND-O ===
+# === WND-T (pass W: owned by WND-T) ===
+# === end WND-T ===
+# === WND-D1 (pass W: owned by WND-D1) ===
+# === end WND-D1 ===
+# === WND-D2 (pass W: owned by WND-D2) ===
+# === end WND-D2 ===
+# === PST (pass W: owned by PST) ===
+# === end PST ===

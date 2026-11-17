@@ -3,6 +3,7 @@ import { validateEncounterEntries, validateEncounterZones } from './encounterVal
 import { validateBossPhases, validateKeyItemGates, validateScriptedEncounters } from './mapValidators.js';
 import { validateEnemyAttack } from './schemaValidationFx.js';
 import { validateEnemyRoster } from './enemyRosterValidation.js';
+import { validateQuestMapFields } from './schemaValidationQuest.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -270,6 +271,7 @@ export function validateMapData(data: unknown): MapData {
   if (data.scriptedEncounters !== undefined) {
     validateScriptedEncounters(data.scriptedEncounters, (data.npcs as Record<string, unknown>[]).map((n) => String(n.id)));
   }
+  validateQuestMapFields(data);
   
   return data as unknown as MapData;
 }

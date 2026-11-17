@@ -1,0 +1,650 @@
+# The declared progression DAG of pass W (docs/WORLD_PLAN.md 3.2-3.5; schema QUEST_PLAN 2.4 with WORLD 3.4's
+# `optional`, `milestones` and `towns:`). The progression verifier (`npm run quest`) reads it; it is validated by
+# src/core/schemaValidationQuest.ts (tests/data/questData.test.ts).
+#
+# Ownership: each tranche edits only between its own anchors, `# === <id> (pass W: owned by <id>) ===` and
+# `# === end <id> ===` (its stages: `entry`, `walk`, `nonLoadBearing`, `milestones`, `status`), and between its
+# `town` anchors in `towns:`. S0 (act 1, built) and the goal belong to the integrator.
+# Stage fields: after (stage ids), requires / grants {flags, items, vehicles}, boss (enemy ids), band [low, high]
+# (whole-party level), kit (a kits.yaml id; the `w_s<n>` and `w_<town>` kits are W1-F's), maps (map-id globs the
+# stage owns), zones (`<map>:<zone id>`), grind (1.0-3.0, the curve model's fight multiplier; INT tunes it), walk
+# (event ids), entry (the assume-mode start, set by the owner), basins ({}: the only basin seeds are
+# world_api.BASIN_SEEDS, WORLD 3.4), nonLoadBearing ([{map, kind, at, reason}]), optional, milestones (an ordered
+# list of the stage's own flags).
+goal: CHAOS_DEFEATED
+stages:
+  # Act 1 (built; the integrator's)
+  - id: S0
+    title: "Act 1"
+    tranche: "-"
+    after: []
+    requires: {flags: [], items: [], vehicles: []}
+    grants: {flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE], items: [lute], vehicles: []}
+    boss: [garland]
+    band: [2, 3]
+    kit: arrive
+    maps: [cornelia, cornelia-*, temple-of-fiends]
+    zones: [overworld:temple_approach, overworld:east_pocket]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing:
+      # GT-1, D-W13: world cells (act-1 (29, 32) and (30, 32) at the A1 origin (64, 64))
+      - {map: overworld, kind: gate, at: [93, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
+      - {map: overworld, kind: gate, at: [94, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
+    status: built
+  # === A1-O (pass W: owned by A1-O) ===
+  - id: S1
+    title: "The north bridge"
+    tranche: A1-O
+    after: [S0]
+    requires: {flags: [INTRO_COMPLETE], items: [], vehicles: []}
+    grants: {flags: [BRIDGE_BUILT], items: [], vehicles: []}
+    boss: []
+    band: [2, 3]
+    kit: w_s1
+    maps: []
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S3
+    title: "Matoya's cave (visit)"
+    tranche: A1-O
+    after: [S1]
+    requires: {flags: [BRIDGE_BUILT], items: [], vehicles: []}
+    grants: {flags: [], items: [], vehicles: []}
+    boss: []
+    band: [3, 6]
+    kit: w_s3
+    maps: [matoya-cave]
+    zones: [overworld:a1_mainland]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S7
+    title: "Matoya's herb"
+    tranche: A1-O
+    after: [S6, S3]
+    requires: {flags: [], items: [crystal_eye], vehicles: []}
+    grants: {flags: [], items: [herb], vehicles: []}
+    boss: []
+    band: [10, 13]
+    kit: w_s7
+    maps: []
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end A1-O ===
+  # === A1-T (pass W: owned by A1-T) ===
+  - id: S2
+    title: "Pravoka and the pirates"
+    tranche: A1-T
+    after: [S1]
+    requires: {flags: [BRIDGE_BUILT], items: [], vehicles: []}
+    grants: {flags: [BIKKE_DEFEATED], items: [], vehicles: [ship]}
+    boss: [pirate]
+    band: [3, 6]
+    kit: w_s2
+    maps: [pravoka, pravoka-*]
+    zones: [overworld:a1_mainland]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end A1-T ===
+  # === ELF-O (pass W: owned by ELF-O) ===
+  - id: S6
+    title: "The Western Keep"
+    tranche: ELF-O
+    after: [S5]
+    requires: {flags: [MARSH_GUARD_DEFEATED], items: [crown], vehicles: []}
+    grants: {flags: [ASTOS_DEFEATED], items: [crystal_eye], vehicles: []}
+    boss: [astos]
+    band: [10, 13]
+    kit: w_s6
+    maps: [western-keep-*]
+    zones: [overworld:elf_keep_moor]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end ELF-O ===
+  # === ELF-T (pass W: owned by ELF-T) ===
+  - id: S4
+    title: "The Aldi Sea and Elfheim"
+    tranche: ELF-T
+    after: [S2]
+    requires: {flags: [], items: [], vehicles: [ship]}
+    grants: {flags: [], items: [], vehicles: []}
+    boss: []
+    band: [5, 9]
+    kit: w_s4
+    maps: [elfheim, elfheim-house-*, elfheim-*-shop, elfheim-*-magic, elfheim-inn]
+    zones: [overworld:elf_fields, overworld:a1_aldi, overworld:elf_aldi]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S8
+    title: "The prince wakes"
+    tranche: ELF-T
+    after: [S7]
+    requires: {flags: [], items: [herb], vehicles: []}
+    grants: {flags: [PRINCE_AWAKE], items: [mystic_key], vehicles: []}
+    boss: []
+    band: [10, 13]
+    kit: w_s8
+    maps: [elfheim-castle, elfheim-castle-chamber]
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S9
+    title: "The Elfheim vault"
+    tranche: ELF-T
+    after: [S8]
+    requires: {flags: [], items: [mystic_key], vehicles: []}
+    grants: {flags: [], items: [tnt], vehicles: []}
+    boss: []
+    band: [10, 13]
+    kit: w_s9
+    maps: [elfheim-vault]
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end ELF-T ===
+  # === ELF-D (pass W: owned by ELF-D) ===
+  - id: S5
+    title: "The Marsh Cave B1-B3"
+    tranche: ELF-D
+    after: [S4]
+    requires: {flags: [], items: [], vehicles: [ship]}
+    grants: {flags: [MARSH_GUARD_DEFEATED], items: [crown], vehicles: []}
+    boss: [piscodemon]
+    band: [8, 11]
+    kit: w_s5
+    maps: [marsh-cave-*]
+    zones: [overworld:elf_fen]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end ELF-D ===
+  # === ERT-O (pass W: owned by ERT-O) ===
+  - id: S10
+    title: "The dwarves' canal"
+    tranche: ERT-O
+    after: [S9]
+    requires: {flags: [], items: [tnt], vehicles: []}
+    grants: {flags: [CANAL_OPEN], items: [], vehicles: []}
+    boss: []
+    band: [11, 14]
+    kit: w_s10
+    maps: [dwarf-hall]
+    zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S12
+    title: "The giant's tunnel and Sarda"
+    tranche: ERT-O
+    after: [S11]
+    requires: {flags: [], items: [ruby], vehicles: []}
+    grants: {flags: [TITAN_FED], items: [rod], vehicles: []}
+    boss: []
+    band: [15, 17]
+    kit: w_s12
+    maps: [giant-tunnel, sage-cave]
+    zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S31
+    title: "Excalibur"
+    tranche: ERT-O
+    after: [S28]
+    requires: {flags: [], items: [adamant], vehicles: []}
+    grants: {flags: [], items: [excalibur], vehicles: []}
+    boss: []
+    band: null
+    kit: null
+    maps: []
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    optional: true
+    status: pending
+  # === end ERT-O ===
+  # === ERT-T (pass W: owned by ERT-T) ===
+  - id: S25
+    title: "Dr. Unne's lesson"
+    tranche: ERT-T
+    after: [S24]
+    requires: {flags: [], items: [slab], vehicles: []}
+    grants: {flags: [LUFENIAN_LEARNED], items: [], vehicles: []}
+    boss: []
+    band: [28, 31]
+    kit: w_s25
+    maps: [melmond, melmond-*]
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end ERT-T ===
+  # === ERT-D (pass W: owned by ERT-D) ===
+  - id: S11
+    title: "Melmond, Cavern of Earth B1-B3"
+    tranche: ERT-D
+    after: [S10]
+    requires: {flags: [CANAL_OPEN], items: [], vehicles: []}
+    grants: {flags: [VAMPIRE_DEFEATED], items: [ruby], vehicles: []}
+    boss: [vampire]
+    band: [13, 16]
+    kit: w_s11
+    maps: [cavern-earth-b1, cavern-earth-b2, cavern-earth-b3]
+    zones: [overworld:ert_plain]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S13
+    title: "Cavern of Earth B4-B5"
+    tranche: ERT-D
+    after: [S12]
+    requires: {flags: [], items: [rod], vehicles: []}
+    grants: {flags: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT], items: [], vehicles: []}
+    boss: [lich]
+    band: [16, 19]
+    kit: w_s13
+    maps: [cavern-earth-b4, cavern-earth-b5]
+    zones: [overworld:ert_badlands]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    milestones: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT]
+    status: pending
+  # === end ERT-D ===
+  # === FIR-O (pass W: owned by FIR-O) ===
+  - id: S17
+    title: "The airship"
+    tranche: FIR-O
+    after: [S16]
+    requires: {flags: [], items: [levistone], vehicles: []}
+    grants: {flags: [AIRSHIP_RAISED], items: [], vehicles: [airship]}
+    boss: []
+    band: [22, 25]
+    kit: w_s17
+    maps: []
+    zones: [overworld:fir_desert]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end FIR-O ===
+  # === FIR-T (pass W: owned by FIR-T) ===
+  - id: S14
+    title: "Crescent Lake and the canoe"
+    tranche: FIR-T
+    after: [S13]
+    requires: {flags: [EARTH_CRYSTAL_LIT], items: [], vehicles: [ship]}
+    grants: {flags: [CANOE_GIVEN], items: [canoe], vehicles: []}
+    boss: []
+    band: [17, 20]
+    kit: w_s14
+    maps: [crescent, crescent-*]
+    zones: [overworld:fir_lakeshore, overworld:fir_rivers, overworld:fir_aldi, overworld:fir_sea]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end FIR-T ===
+  # === FIR-D1 (pass W: owned by FIR-D1) ===
+  - id: S15
+    title: "Gurgu Volcano B1-B5"
+    tranche: FIR-D1
+    after: [S14]
+    requires: {flags: [], items: [canoe], vehicles: []}
+    grants: {flags: [FIRE_CRYSTAL_LIT], items: [], vehicles: []}
+    boss: [ashen_queen]
+    band: [21, 24]
+    kit: w_s15
+    maps: [gurgu-*]
+    zones: [overworld:fir_ashlands]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end FIR-D1 ===
+  # === FIR-D2 (pass W: owned by FIR-D2) ===
+  - id: S16
+    title: "The Ice Cavern B1-B3"
+    tranche: FIR-D2
+    after: [S14]
+    requires: {flags: [], items: [canoe], vehicles: []}
+    grants: {flags: [EVIL_EYE_DEFEATED], items: [levistone], vehicles: []}
+    boss: [evil_eye]
+    band: [21, 24]
+    kit: w_s16
+    maps: [ice-cavern-*]
+    zones: [overworld:fir_tundra]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end FIR-D2 ===
+  # === ORD-O (pass W: owned by ORD-O) ===
+  - id: S18
+    title: "The Citadel of Trials 1F-3F"
+    tranche: ORD-O
+    after: [S17]
+    requires: {flags: [], items: [], vehicles: [airship]}
+    grants: {flags: [ORDEALS_GUARD_DEFEATED], items: [ordeal_seal], vehicles: []}
+    boss: [dragon_zombie]
+    band: [24, 27]
+    kit: w_s18
+    maps: [citadel-*]
+    zones: [overworld:ord_heath]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S19
+    title: "Bahamut (class change)"
+    tranche: ORD-O
+    after: [S18]
+    requires: {flags: [], items: [ordeal_seal], vehicles: []}
+    grants: {flags: [CLASS_UPGRADED], items: [], vehicles: []}
+    boss: []
+    band: [24, 27]
+    kit: w_s19
+    maps: [bahamut-cave, bahamut-lair]
+    zones: [overworld:ord_isles]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    optional: true
+    status: pending
+  # === end ORD-O ===
+  # === WAT-O (pass W: owned by WAT-O) ===
+  - id: S21
+    title: "The waterfall"
+    tranche: WAT-O
+    after: [S20, S14]
+    requires: {flags: [], items: [canoe], vehicles: [airship]}
+    grants: {flags: [CUBE_GIVEN], items: [cube], vehicles: []}
+    boss: []
+    band: [25, 28]
+    kit: w_s21
+    maps: [waterfall-cave]
+    zones: [overworld:wat_streams]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S22
+    title: "The caravan"
+    tranche: WAT-O
+    after: [S17]
+    requires: {flags: [], items: [], vehicles: [airship]}
+    grants: {flags: [], items: [fairy_bottle], vehicles: []}
+    boss: []
+    band: [25, 28]
+    kit: w_s22
+    maps: [caravan-camp]
+    zones: [overworld:wat_dunes]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WAT-O ===
+  # === WAT-T (pass W: owned by WAT-T) ===
+  - id: S20
+    title: "Onrac"
+    tranche: WAT-T
+    after: [S17]
+    requires: {flags: [], items: [], vehicles: [airship]}
+    grants: {flags: [], items: [], vehicles: []}
+    boss: []
+    band: [25, 28]
+    kit: w_s20
+    maps: [onrac, onrac-*]
+    zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WAT-T ===
+  # === WAT-D (pass W: owned by WAT-D) ===
+  - id: S24
+    title: "The Sea Shrine B1-B5"
+    tranche: WAT-D
+    after: [S23, S20]
+    requires: {flags: [], items: [oxyale], vehicles: []}
+    grants: {flags: [WATER_CRYSTAL_LIT], items: [slab], vehicles: []}
+    boss: [drowned_sovereign]
+    band: [27, 30]
+    kit: w_s24
+    maps: [sea-shrine-*]
+    zones: []
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WAT-D ===
+  # === WND-O (pass W: owned by WND-O) ===
+  - id: S26
+    title: "Lufenia's chime"
+    tranche: WND-O
+    after: [S25]
+    requires: {flags: [LUFENIAN_LEARNED], items: [], vehicles: [airship]}
+    grants: {flags: [CHIME_GIVEN], items: [chime], vehicles: []}
+    boss: []
+    band: [28, 31]
+    kit: w_s26
+    maps: [lufenia, lufenia-*]
+    zones: [overworld:wnd_lufen_moor]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WND-O ===
+  # === WND-T (pass W: owned by WND-T) ===
+  - id: S23
+    title: "Gaia's fairy"
+    tranche: WND-T
+    after: [S22]
+    requires: {flags: [], items: [fairy_bottle], vehicles: []}
+    grants: {flags: [FAIRY_FREED], items: [oxyale], vehicles: []}
+    boss: []
+    band: [26, 29]
+    kit: w_s23
+    maps: [gaia, gaia-*]
+    zones: [overworld:wnd_highlands]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WND-T ===
+  # === WND-D1 (pass W: owned by WND-D1) ===
+  - id: S27
+    title: "The Mirage Tower 1F-3F"
+    tranche: WND-D1
+    after: [S26, S21]
+    requires: {flags: [], items: [chime, cube], vehicles: []}
+    grants: {flags: [SKY_FORTRESS_OPEN], items: [], vehicles: []}
+    boss: []
+    band: [29, 32]
+    kit: w_s27
+    maps: [mirage-*]
+    zones: [overworld:wnd_mirage_sands]
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WND-D1 ===
+  # === WND-D2 (pass W: owned by WND-D2) ===
+  - id: S28
+    title: "The sky castle 1F-5F"
+    tranche: WND-D2
+    after: [S27]
+    requires: {flags: [SKY_FORTRESS_OPEN], items: [], vehicles: []}
+    grants: {flags: [WIND_CRYSTAL_LIT], items: [], vehicles: []}
+    boss: [hollow_seraph]
+    band: [31, 34]
+    kit: w_s28
+    maps: [sky-castle-*]
+    zones: []
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  # === end WND-D2 ===
+  # === PST (pass W: owned by PST) ===
+  - id: S29
+    title: "The time gate"
+    tranche: PST
+    after: [S13, S15, S24, S28]
+    requires: {flags: [EARTH_CRYSTAL_LIT, FIRE_CRYSTAL_LIT, WATER_CRYSTAL_LIT, WIND_CRYSTAL_LIT], items: [lute], vehicles: []}
+    grants: {flags: [TIME_GATE_OPEN], items: [], vehicles: []}
+    boss: []
+    band: [33, 35]
+    kit: w_s29
+    maps: []
+    zones: []
+    grind: 1.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    status: pending
+  - id: S30
+    title: "The temple of the past 1-5"
+    tranche: PST
+    after: [S29]
+    requires: {flags: [TIME_GATE_OPEN], items: [], vehicles: []}
+    grants: {flags: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED, CHAOS_DEFEATED], items: [], vehicles: []}
+    boss: [lich_2, ashen_queen_2, drowned_sovereign_2, hollow_seraph_2, death_eye, chaos]
+    band: [34, 41]
+    kit: w_s30
+    maps: [past-temple-*, past-chaos]
+    zones: []
+    grind: 2.0
+    walk: []
+    basins: {}
+    nonLoadBearing: []
+    milestones: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED, CHAOS_DEFEATED]
+    status: pending
+  # === end PST ===
+towns:
+  # === A1-T town (pass W: owned by A1-T) ===
+  - id: pravoka
+    owner: A1-T
+    maps: [pravoka, pravoka-*]
+    opensAfter: [S1]
+    bandStage: S2
+    kit: w_pravoka
+    status: pending
+  # === end A1-T town ===
+  # === ELF-T town (pass W: owned by ELF-T) ===
+  - id: elfheim
+    owner: ELF-T
+    maps: [elfheim, elfheim-*]
+    opensAfter: [S2]
+    bandStage: S4
+    kit: w_elfheim
+    status: pending
+  # === end ELF-T town ===
+  # === ERT-O town (pass W: owned by ERT-O) ===
+  - id: dwarf
+    owner: ERT-O
+    maps: [dwarf-hall]
+    opensAfter: [S2]
+    bandStage: S10
+    kit: w_dwarf
+    status: pending
+  # === end ERT-O town ===
+  # === ERT-T town (pass W: owned by ERT-T) ===
+  - id: melmond
+    owner: ERT-T
+    maps: [melmond, melmond-*]
+    opensAfter: [S10]
+    bandStage: S11
+    kit: w_melmond
+    status: pending
+  # === end ERT-T town ===
+  # === FIR-T town (pass W: owned by FIR-T) ===
+  - id: crescent
+    owner: FIR-T
+    maps: [crescent, crescent-*]
+    opensAfter: [S10]
+    bandStage: S14
+    kit: w_crescent
+    status: pending
+  # === end FIR-T town ===
+  # === WAT-T town (pass W: owned by WAT-T) ===
+  - id: onrac
+    owner: WAT-T
+    maps: [onrac, onrac-*]
+    opensAfter: [S17]
+    bandStage: S20
+    kit: w_onrac
+    status: pending
+  # === end WAT-T town ===
+  # === WND-O town (pass W: owned by WND-O) ===
+  - id: lufenia
+    owner: WND-O
+    maps: [lufenia, lufenia-*]
+    opensAfter: [S25]
+    bandStage: S26
+    kit: w_lufenia
+    status: pending
+  # === end WND-O town ===
+  # === WND-T town (pass W: owned by WND-T) ===
+  - id: gaia
+    owner: WND-T
+    maps: [gaia, gaia-*]
+    opensAfter: [S17]
+    bandStage: S23
+    kit: w_gaia
+    status: pending
+  # === end WND-T town ===

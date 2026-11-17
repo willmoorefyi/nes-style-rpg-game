@@ -13,6 +13,10 @@ const CEILINGS: [string, number][] = [
   ['src/scenes/battle/BattleAnimationController.ts', 308],
   ['src/scenes/battle/BattleDisplayManager.ts', 249],
   ['src/scenes/battle/EnemyPoseController.ts', 249],
+  // pass W (docs/WORLD_PLAN.md 5.1 W1-0a): the contract's growth, and ExplorationScene after the extraction of
+  // FieldVehicles.ts and FieldNpcActions.ts (W1-A and W1-B never edit it)
+  ['src/types/index.ts', 442],
+  ['src/scenes/ExplorationScene.ts', 590],
 ];
 
 const NEW_FILES = [

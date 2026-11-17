@@ -45,3 +45,8 @@ naked:
   white_mage: { gear: [], spells: [] }
   black_mage: { gear: [], spells: [] }
   red_mage: { gear: [], spells: [] }
+
+# ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
+# W1-F owns every `w_*` town and stage kit; others send a kit change to the integrator.
+# === W1-F (pass W: owned by W1-F) ===
+# === end W1-F ===
