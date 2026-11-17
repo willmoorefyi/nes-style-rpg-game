@@ -117,8 +117,9 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
                 continue
             deg = R.part_rotation(rig, part, "idle", S, J)
             mech = getattr(rig, "preset", None) == "mechanical"           # FW-5: the preset is nearest only
-            sampler = rig.sampler if mech else (b.get("samplers") or {}).get(part) or b.get("sampler") or (
-                "rotsprite" if abs(deg) > ROTSPRITE_ABOVE else rig.sampler)               # K2-0 `samplers`: per part
+            own = (b.get("samplers") or {}).get(part)                         # K2-0 `samplers`: per part (a
+            sampler = own or (rig.sampler if mech else b.get("sampler") or (    # mechanical key part too, ruling)
+                "rotsprite" if abs(deg) > ROTSPRITE_ABOVE else rig.sampler))
             rgba, hit, emp, rots[part] = MR.render_part(rig, part, "idle", arr, mask, J, size, gaps, False, 1.0, sampler)
             layers.append((list(rig.parts).index(part), rgba, hit, emp))
         img, labels = robe_fit(rig, tpl, *RR.composite(layers, size, pairs), S, J, hem_row(rig, lab))   # K2-0 robed
