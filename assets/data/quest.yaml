@@ -195,10 +195,17 @@ stages:
     maps: [marsh-cave-*]
     zones: [overworld:elf_fen]
     grind: 2.0
-    walk: []
+    # S5 needs the ship (it is what carries the party to Elfland), so the proofs start where S2 leaves it: on foot on
+    # Pravoka's quay, the ship at the `a1_pravoka` dock (withheld, Elfland is out of reach). Then across the Aldi, down
+    # B1's west stair and B2's stair to the barrow, and the bier (the guard's fight; `elf_d_crown` gives the crown)
+    entry: {map: overworld, x: 131, y: 101, mode: walking, vehicles: [{type: ship, map: overworld, x: 132, y: 102}]}
+    walk: [overworld:warp:marsh-cave-b1, marsh-cave-b1:warp:marsh-cave-b2, marsh-cave-b2:warp:marsh-cave-b3,
+      marsh-cave-b3:battle:MARSH_GUARD_DEFEATED]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the bier's hideIf only clears the taken crown off the bier; the fight itself is once (its flag)
+      - {map: marsh-cave-b3, kind: npc, at: [7, 4], reason: "hideIf only clears the taken crown off the bier; the guard's fight is once by its flag MARSH_GUARD_DEFEATED"}
+    status: built
   # === end ELF-D ===
   # === ERT-O (pass W: owned by ERT-O) ===
   - id: S10

@@ -1466,6 +1466,53 @@
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
+# S5 (docs/WORLD_PLAN.md 5.3, 6.5): the party at the Marsh Cave's mouth in the fens (overworld `elf_marsh`) with the
+# band-low level (8), the B3 kit (w_s4 = w_s5), the S0-S4 flags, and the ship parked at Elfheim's harbour
+# (elf_port). `w_boss_piscodemon` is the guard's battle at the test level (9) with the stage kit and 3 potions.
+- id: w_s5_start
+  name: W ELF-D - S5 start at the Marsh Cave
+  mode: field
+  map: overworld
+  entrance: elf_marsh
+  fieldMode: walking
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED]
+  vehicles:
+    - { type: ship, map: overworld, x: 84, y: 147 }
+  party:
+    - { class: warrior, name: WAR, level: 8, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 8, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 8
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 8
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { potion: 5, hi_potion: 2, antidote: 2 }
+  gold: 1200
+  enemies: []
+- id: w_boss_piscodemon
+  name: W ELF-D - the Marsh Cave's three keepers (piscodemon x3, test level 9, kit w_s5)
+  background: assets/backgrounds/swamp_cave.webp
+  party:
+    - { class: warrior, name: WAR, level: 9, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 9, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 9
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 9
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { potion: 3 }
+  gold: 0
+  enemies: [piscodemon, piscodemon, piscodemon]
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
 # WORLD_PLAN 6.5. S10: on foot at the dwarf hall's mouth (overworld `ert_dwarf`), the ship moored at the landing cove

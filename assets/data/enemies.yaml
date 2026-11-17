@@ -930,6 +930,14 @@
   elementalProfile: {weaknesses: [], resistances: [fire, ice], immunities: [], absorbs: []}
   family: aquatic
   size: small
+  # ELF-D (WORLD 3.7: piscodemon x3, L9 sensible 75-95 %, L7 <= 60 %): with the roster's numbers the three fall at L7
+  # 87 % of the time; as the barrow's keepers they wake already roused (a phase from full HP: attack 36, 2 hits)
+  bossPhases:
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 2
+    attack: 36
+    message: "The keepers' tentacles coil and lash!"
 # === end ELF-D piscodemon ===
 # === ELF-O astos (pass W: owned by ELF-O; only its bossPhases, ai and specials) ===
 - id: astos
