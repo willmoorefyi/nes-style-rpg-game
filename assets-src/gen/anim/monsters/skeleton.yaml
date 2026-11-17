@@ -120,3 +120,23 @@ masks:
 holds: []
 paint:                       # a 1 px shoulder crack the wind2 motion opens, outline ink
   - {frame: atk_wind2, xy: [[42, 23]], rgb: [6, 4, 10]}
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[41, 56], [42, 56], [42, 57]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[29, 58]], rgb: [123, 99, 74]}
+  - {frame: kneel_in1, xy: [[44, 59], [45, 59], [45, 60], [46, 60]], rgb: [156, 132, 90]}
+  - {frame: kneel_in2, xy: [[33, 59]], rgb: [222, 206, 140]}
+  - {frame: kneel_in2, xy: [[49, 62], [47, 63], [48, 63], [50, 63], [48, 64], [50, 64], [51, 64], [49, 65], [51, 65]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[49, 63], [49, 64]], rgb: [222, 206, 140]}
+  - {frame: kneel_in2, xy: [[30, 66], [29, 67], [30, 67], [28, 68], [29, 68], [31, 68], [28, 69], [30, 69], [31, 69], [29, 70], [30, 70], [29, 71]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[30, 68], [29, 69]], rgb: [82, 66, 49]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); sword tip toward the ground
+kneel:
+  variant: [blade_planted, knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [18, 0], foot_f: [18, 0], toe_f: [18, 0], sh_n: [0, 2], sh_f: [0, 2], neck: [0, 2], crown: [0, 2]}
+  paint:
+    - {xy: [[23, 47], [22, 48], [23, 48], [21, 49], [22, 49], [21, 50], [23, 51], [34, 53]], rgb: [6, 4, 10]}
+    - {xy: [[24, 48], [24, 49], [25, 49], [25, 50], [26, 50], [24, 51], [25, 51], [23, 52], [23, 49], [22, 50], [23, 50], [24, 50], [22, 51]], rgb: [123, 99, 74]}
+    - {xy: [[20, 51], [21, 51], [21, 52], [22, 52], [38, 53], [36, 54], [37, 54], [38, 54], [37, 55]], rgb: [189, 173, 115]}
+    - {xy: [[35, 67], [36, 67], [37, 67], [36, 68]], rgb: [74, 74, 90]}
+    - {xy: [[47, 74], [48, 74], [49, 74], [51, 74], [52, 74], [56, 74], [44, 50]], rgb: [6, 4, 10]}
+    - {xy: [[33, 74], [33, 75], [33, 76]], rgb: null}
