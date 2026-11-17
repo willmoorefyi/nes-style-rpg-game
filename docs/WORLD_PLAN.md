@@ -2534,7 +2534,7 @@ the take must be a cutscene (an NPC whose gift is a plain item drops out of the 
 | G1 | `world.py`, `keep.py`, `stubs.py` re-run after the commit: `git diff --exit-code assets-src/maps` clean |
 | G2 | `build_map.py overworld --region elf western-keep-1f western-keep-2f` (lock): `overworld: region elf of 192x192`, both floors compiled, exit 0, max RSS 5.3 GB; `--check-determinism --region elf overworld western-keep-1f western-keep-2f`: all three `deterministic` |
 | G3 | `world.py --owned-chunks elf`, then the diff against the merge base: no output (only `below_7_3`, `below_8_3`, rows 9-11 cols 0-6 change) |
-| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1` 0 failed (see the last run below) |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 305 passed (305)`, `Tests 6194 passed | 8 skipped (6202)` (on the head merged with WAT-O) |
 | G5 | `npm run quest -- --mutate --stage S6`: (a)-(h) OK, `(d) bands: OK  astos L10.1 [10,13]`, `mutations: OK (2 gate rows)`, `quest-verify: OK`; full `npm run quest -- --mutate`: `quest-verify: OK`, `mutations: OK` (GT-7 caught: `SKIP S6 astos reachable without its requirement crown`; GT-6 by the S6 entry; GT-5 caught) |
 | G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings` passed; every ELF-O file under 250 lines (`keep.py` 194) |
 | G9 | `w_elf_o.test.ts` 3 passed; `check-bounds: OK (3 tests)` |
