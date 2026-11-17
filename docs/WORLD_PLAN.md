@@ -1,10 +1,22 @@
-# World build-out plan (pass W), rev 2
+# World build-out plan (pass W), rev 3
 
-Status: rev 2. It answers the momus review of rev 1 (REJECT, "close") with targeted fixes. Nothing is implemented. Pass W replaces the
+Status: rev 3. Momus passed rev 2 (OKAY); rev 3 folds in its 7 remaining items. Rev 2 answered the review of rev 1. Nothing is implemented. Pass W replaces the
 geography and the tranche split of `docs/QUEST_PLAN.md` rev 3 (pass Q). It reuses that plan's engine and toolchain
 groundwork by reference (section 1). Like pass Q, pass W starts only after the kneel pass (`docs/KNEEL_PLAN.md`,
 `docs/KNEEL_AI_PLAN.md`) has merged into `mainline` and `npm test` is green at that head. Pass W never touches the
 kneel files. Facts in 1.4 were checked at `4ade849`.
+
+**Rev 3 changes (momus's remaining items on rev 2):**
+
+| # | Item | Resolution |
+|---|---|---|
+| 1 | P2 The heavy-job rule stalls W1 | W1-C1 and W1-C2 start with at most 2 other W1 tranches running; the rest are admitted once both have passed their memory probe. "Active" means a worktree whose branch is not merged into `mainline`, checked with a given command. The W1 step gets about 4 h more (2.3, 5.0) |
+| 2 | P2 The GT-35 and GT-37 barriers | `RegionOut.barriers: {name: (cells, side_a_seed, side_b_seed)}`, declared by W1-0b and implemented by W1-C2. ERT-O fills `western_range` and FIR-O fills `crescent_ring`; the composer exports their minimal cuts (2.9, 5.1, 5.2, 6.3) |
+| 3 | P2 The ice anchor | `fir_ice` moves to (136, 148), below the forbidden rows 146-147; the mouth's arrival cell is south of the cliff rows (2.2, 4.4) |
+| 4 | P2 Worktree memory | W1-0a records `/usr/bin/time -l npx vitest run --maxWorkers=2` and lowers the "3 others" limit if one worktree's peak exceeds about 2 GB (2.3, 5.1) |
+| 5 | P3 dwarf-melmond | `ert_dwarf` moves 1 cell to (54, 106). Re-measured: 2 failures in 20,000 random ±2 placements (0.01 %, both crescent-ice). That residual risk is noted; the macro test is the authority (2.2) |
+| 6 | P3 The GT-5b fixture; site files | GT-5b's fixture keeps the removed dwarves' landing out of the `DOCKS_ALLOWED` check, so the row fails only on (a). QUEST 4.0's "regenerate, never hand-merge" rule covers every `town_*_site.py` change (5.3, 6.3) |
+| 7 | P3 R26 | the kneel pass has merged (88f8ad7); R26 now only says pass W branches from a head at or after it |
 
 **Rev 2 changes (momus review of rev 1):**
 
@@ -270,7 +282,8 @@ east is +x and south is +y.
 `assets/data/world-anchors.yaml` (W1-0) holds this table, and the macro test (6.1) reads it. Each anchor is a named
 entrance in the compiled `overworld`; the owning tranche creates it at its place, and the place must be within
 **±2 cells per axis** of the target. The targets satisfy every pair band below: script-checked, s* = 0.735, 0 fails,
-and 0 failures over 6000 random ±2 placements (3 seeds). A town's land-gate anchor is placed by its site file
+and 2 failures in 20,000 random ±2 placements (10 seeds; 0.01 %, both on crescent-ice). That residual risk is accepted:
+the macro test (6.1) is the authority, and a tranche that hits it moves its anchor toward the target. A town's land-gate anchor is placed by its site file
 (`layouts/<region>/town_<town>_site.py`), so the T tranche owns it; every other anchor is the O tranche's.
 
 | Anchor (entrance) | Place | Region | Ref offset (classic tiles) | World target | Note |
@@ -279,7 +292,7 @@ and 0 failures over 6000 random ±2 placements (3 seeds). A town's land-gate anc
 | `temple` | Temple of Fiends door | A1 (built) | (-20, -36) | (79, 103) | distance exempt (act-1 compression); bearing checked |
 | `a1_matoya` | Matoya's cave | A1 | (-40, -36) | (74, 76) | in the act-1 Matoya rect |
 | `a1_pravoka` | Pravoka's land gate | A1 | (56, -12) | (131, 101) | in the act-1 Pravoka rect |
-| `ert_dwarf` | Dwarf hall (Mount Duergar) | EARTH | (-56, -4) | (53, 106) | on the isthmus, south of the canal |
+| `ert_dwarf` | Dwarf hall (Mount Duergar) | EARTH | (-56, -4) | (54, 106) | on the isthmus, south of the canal |
 | `elf_keep` | Western Keep | ELF | (-48, 24) | (61, 126) | on Elfland's north arm |
 | `elf_elfheim` | Elfheim's land gate | ELF | (-16, 48) | (82, 150) | |
 | `elf_marsh` | Marsh Cave mouth | ELF | (-56, 76) | (53, 162) | |
@@ -289,7 +302,7 @@ and 0 failures over 6000 random ±2 placements (3 seeds). A town's land-gate anc
 | `ert_sarda` | Sarda's cave | EARTH | (-104, 0) | (19, 109) | |
 | `fir_crescent` | Crescent Lake's land gate | FIRE | (68, 20) | (148, 124) | |
 | `fir_volcano` | Gurgu Volcano mouth | FIRE | (36, 56) | (120, 151) | its mouth opens south, off the W_south cliffs |
-| `fir_ice` | Ice Cavern mouth | FIRE | (44, 44) | (135, 147) | its mouth opens south |
+| `fir_ice` | Ice Cavern mouth | FIRE | (44, 44) | (136, 148) | its mouth opens south; the arrival cell is south of the cliff rows 146-147 |
 | `fir_desert` | Buried hull, airship desert | FIRE | (56, 60) | (143, 160) | |
 | `ord_citadel` | Citadel of Trials gate | ORDEAL | (-24, -116) | (75, 28) | |
 | `ord_bahamut` | Bahamut's cave | ORDEAL | (20, -80) | (106, 53) | |
@@ -326,9 +339,16 @@ world/reference ratio after the fit is in [0.86, 1.10] at the targets.
 **Heavy-job rule.** The lock serialises world compiles, but the other tranches' Vitest and dev servers still use
 memory. So:
 
-- a full-world compile (W1-C1, W1-C2, INT) starts only while at most 3 other tranches are active (`git worktree list`
-  minus the finished ones; the orchestrator checks it before starting the job);
-- every worktree runs Vitest with `--maxWorkers=2` (G4);
+- **"active"** means a worktree whose branch is not merged into `mainline`. The orchestrator counts them with
+  `git worktree list --porcelain | awk '/^branch /{sub("refs/heads/","",$2); print $2}' | while read b; do git merge-base --is-ancestor "$b" mainline || echo "$b"; done | grep -v '^mainline$' | wc -l`;
+- a full-world compile (W1-C1, W1-C2, INT) starts only while at most 3 other tranches are active (the orchestrator
+  checks this before starting the job);
+- **in W1**, W1-C1 and W1-C2 start with at most 2 other W1 tranches running. The remaining W1 tranches are admitted
+  once both have recorded their full-world memory probe. This adds about 4 h to the W1 step (5.0);
+- every worktree runs Vitest with `--maxWorkers=2` (G4). W1-0a records `/usr/bin/time -l npx vitest run
+  --maxWorkers=2` in its result. If one worktree's peak is above about 2 GB, the "3 others" limit is lowered to
+  `floor((48 - 26 - 4) / peak)` (4 GB of headroom), and the region concurrency to `floor((48 - 10 - 4) / (peak + 0.5))`
+  (0.5 GB per dev server), whichever is smaller than today's 3 and 6;
 - the budget is then 26 GB (full) + 3 x about 2 GB, or 10 GB (`--region`) + 6 x about 2 GB, both under the 48 GiB
   machine.
 
@@ -483,7 +503,12 @@ checks this (6.2, row T6). The ship may still sail their seas and meet late-tier
   - `BOXES: dict[str, list[Rect]]` (2.4), `SEAMS` (2.5), `FROZEN_EXCEPTIONS` (2.5);
   - `BASIN_SEEDS = {"aldi": (92, 121), "ocean": (2, 2)}`, `DOCKS_ALLOWED` (2.6), `WALLS` (2.6, named cell sets that
     the composer exports for the mutations);
-  - `Region(id, prefix, rects)`. `RegionOut` is unchanged from QUEST 3.5; its coordinates are world coordinates
+  - `RegionOut.barriers: dict[str, tuple[set[Cell], Cell, Cell]]` (new): `{name: (cells, side_a_seed, side_b_seed)}`,
+    a named land barrier and one walkable seed cell on each side. The composer checks that the seeds are walkable
+    and not joined on foot with the barrier in place, and exports the barrier's minimal walkable cut (the fewest
+    barrier cells whose opening joins the two seeds) for the mutations. ERT-O fills `western_range` (Melmond's plain
+    to Sarda's coast); FIR-O fills `crescent_ring` (Crescent's shore to the south lands).
+  - `Region(id, prefix, rects)`. `RegionOut` is otherwise unchanged from QUEST 3.5; its coordinates are world coordinates
     inside the region's rects and outside its bands.
 - **`world.py`**:
   - `REGIONS = [a1, elf, earth, fire, ordeal, water, wind]`, pre-seeded; no tranche edits the list;
@@ -948,7 +973,7 @@ classic version of the region has.
     (Lake terrain, about x 155-170, y 112-138).
   - FIRE's south rect (x 112-191, y 144-191) holds the south half:
     - the Gurgu lava fields with the volcano (120, 151) in the west;
-    - the Ice Cavern's frozen hollow (135, 147) just east of them;
+    - the Ice Cavern's frozen hollow (136, 148) just east of them, its arrival cell below the cliff rows;
     - the airship desert (143, 160) south of the ice.
   - **Row budget in the north-west** (it is tight): rows 146-147 are W_south's cliffs facing the Aldi; both cavern
     mouths open south; R-volcano reaches the volcano from the east on rows 150 or below, and R-ice reaches the ice
@@ -1188,12 +1213,13 @@ K (kneel) merged -> W1-0a | W1-0b contract (parallel)
   - W1-0a 8 h and W1-0b 6 h; W1 (A-I) 73 h; W2 156 h; INT 8 h; PLAY 10 h; about 261 agent-hours in all.
   - **Wall-clock critical path, with throughput:**
     1. W1-0a (8 h; W1-0b runs beside it);
-    2. W1 (the longest tranche, 8 h) plus the 10 serial W1 merges (about 3 h);
+    2. W1 (the longest tranche, 8 h), plus about 4 h for the staggered admission of the heavy-job rule (2.3), plus the
+       10 serial W1 merges (about 3 h);
     3. W2: 156 h over 6 slots is at least 26 h, and the 21 serial merges with their world regenerations add about
        0.5 h each where they don't overlap: about 30 h;
     4. INT (8 h), then PLAY (10 h).
 
-    That is about 67 h, and never less than 60 h.
+    That is about 71 h, and never less than 64 h.
   - Pass W is a multi-session pass.
 
 ### 5.1 W1-0a and W1-0b: the contract (integrator, in parallel)
@@ -1227,6 +1253,7 @@ K (kneel) merged -> W1-0a | W1-0b contract (parallel)
     `world_api.PLACEHOLDER_WALLS`. A region's module replaces its placeholder wall when it is built.
   - The composer fails when a built region doesn't return a wall that closes the basin, so the basin check is
     meaningful from the start.
+- **`RegionOut.barriers`** (2.9) declared in `world_api.py`, with an empty default.
 - **`build_hooks.py` signatures** (no-op bodies with docstrings; W1-C1 calls them, W1-C2 fills them):
 
   ```python
@@ -1273,7 +1300,7 @@ its part, plus its own rows below, and runs G4, G7 and G11 (G8 for compiler tran
 | W1-A Vehicles and save | QUEST 4.2: vehicles, save v2, GAP-11, GAP-12, `vehicles.py` and its build stage, `test-dock.yaml`, scenario `q1a_ship_dock` renamed `w1a_ship_dock` | `src/entities/*Mode.ts`, `VehicleManager.ts`, `FieldVehicles.ts`, `fieldRulesVehicles.ts`, `SaveManager.ts`, `MapTransition.ts`, `BattleRetry.ts`, `assets-src/vehicles.py`, `assets/maps/test-dock.yaml` | GAP-17's save half: a version-1 save on `overworld` loaded against a map with `world.frames.a1` is translated by the origin | 8 h | `npx vitest run tests/systems/vehicles.test.ts tests/systems/safeSpawnModes.test.ts tests/systems/battleRetryVehicles.test.ts tests/systems/saveOriginShift.test.ts` all pass; browser `http://127.0.0.1:5211/?mute=1&scenario=w1a_ship_dock` as QUEST 4.2's row |
 | W1-B NPC and field rules | QUEST 4.2: patches, AND gates, item conditions, trades, tint, class upgrade `actionFlag`, hazards, EXIT/WARP, zone modes, `end_game`, cutscene steps, asset coverage | `fieldRules.ts`, `FieldNpcActions.ts`, `NPCInteraction.ts`, `CutsceneManager.ts`, `CutsceneRegistry.ts`, `KeyItemGateSystem.ts`, `ClassUpgradeSystem.ts`, `FieldSpellEffects.ts`, `EncounterSystem.ts`, `CollisionMap.ts`, `DebugScenarioLoader.ts`, `tests/data/assetCoverage.test.ts` | GAP-15 (`takeGold`), GAP-16 (clinic), GAP-18 (`frame: a1`) | 8 h | `npx vitest run tests/systems/patches.test.ts tests/systems/npcTrade.test.ts tests/systems/npcTakeGold.test.ts tests/systems/clinic.test.ts tests/systems/hazards.test.ts tests/systems/endGame.test.ts tests/systems/fieldRules.test.ts tests/systems/debugFrame.test.ts` all pass; `fieldRules.test.ts`'s act-1 cases unchanged |
 | W1-C1 Compiler core | QUEST 4.3: per-chunk RNG (GAP-14), `--region` (it takes the lock), the lock, the memory probe (stub world **and** a land-filled synthetic world), the legend (`w`, Lake = 11, `BLOCKED` adds 11), material remaps with `hue` and `sat` | `build_map.py`, `terrain/**` | multi-rect `--region` (GAP-19); hook calls into `build_hooks.py` (passthrough, patch art, per-region checks), whose bodies are W1-C2's | 8 h | `build_map.py --selftest` prints `region yaml: OK`, `locality: OK` and `region multi-rect: OK` (a synthetic 2-rect region compiled by region equals the full compile); `/usr/bin/time -l` of the land-filled synthetic world at most 26 GB, and `--region fire` at most 10 GB (both measured values, and the stub world's, in the result) |
-| W1-C2 Composer and world | QUEST 4.3: `world.py`, `world_api.py` logic, `world_a1.py`, the `world_<r>.py` stubs, the `overworld.py` shim, map checks with `reach_roots`, the canoe spawn removal, `frozenCore.test.ts`, the `overworldLayout.test.ts` clip | `layouts/world*.py`, `overworld.py` (shim), `map_checks*.py`, `map_graph.py`, `build_hooks.py`, `tests/data/overworldLayout.test.ts`, `tests/quest/a1/frozenCore.test.ts` | the act-1 translation (2.9, GAP-17 compiler half); bands, seams and placeholder walls; the basin checks of 2.6; `--owned-chunks` over unions; `overworldLayout.test.ts` reads `world.frames.a1.origin` and offsets its cells | 8 h | `python3 -I assets-src/tools/layouts/world.py` prints `bands: OK` and `basins: OK (aldi ..., ocean ...; canal joins)` on the stub world; `build_map.py --check-determinism overworld` prints `overworld: deterministic`; `npx vitest run tests/data/overworldLayout.test.ts tests/quest/a1/frozenCore.test.ts tests/data/act1Flow.test.ts` all pass |
+| W1-C2 Composer and world | QUEST 4.3: `world.py`, `world_api.py` logic, `world_a1.py`, the `world_<r>.py` stubs, the `overworld.py` shim, map checks with `reach_roots`, the canoe spawn removal, `frozenCore.test.ts`, the `overworldLayout.test.ts` clip | `layouts/world*.py`, `overworld.py` (shim), `map_checks*.py`, `map_graph.py`, `build_hooks.py`, `tests/data/overworldLayout.test.ts`, `tests/quest/a1/frozenCore.test.ts` | the act-1 translation (2.9, GAP-17 compiler half); bands, seams and placeholder walls; the basin checks of 2.6; `RegionOut.barriers` and their minimal cuts; `--owned-chunks` over unions; `overworldLayout.test.ts` reads `world.frames.a1.origin` and offsets its cells | 8 h | `python3 -I assets-src/tools/layouts/world.py` prints `bands: OK` and `basins: OK (aldi ..., ocean ...; canal joins)` on the stub world; `build_map.py --check-determinism overworld` prints `overworld: deterministic`; `npx vitest run tests/data/overworldLayout.test.ts tests/quest/a1/frozenCore.test.ts tests/data/act1Flow.test.ts` all pass |
 | W1-D Kit and town tooling | QUEST 4.3: placeholder landmarks and the remap presets | `kit.py`, `layouts/interiors_common.py`, `layouts/town_common.py` (new), the helper imports in `cornelia.py` | extra placeholders `waterfall`, `tent`, `windmill`, `dome`, `buried_hull`; recolours `elf`, `snow`, `dune`, `pale_dune`; the `w` swamp material; `interiors_common.py` takes a `town` parameter (map-id prefix, exits, keeper and house helpers) instead of the hard-coded `TOWN = "cornelia"`; the outdoor helpers (`obj`, `deco`, `oak`, `lamp`, `fir`, `win`, `flag`) move from `cornelia.py` into `town_common.py`, and `cornelia.py` imports them (it shrinks) | 7 h | `python3 -I assets-src/tools/kit.py --selftest` (new) prints one `OK <name>` line per placeholder and preset; G8; re-running `cornelia.py`, `interiors.py` and `castle.py` leaves `git diff --exit-code assets-src/maps` clean (G1), and `build_map.py --check-determinism cornelia` passes |
 | W1-E Streaming | QUEST 4.3: streaming | `BakedMapRenderer.ts`, `MapLoader.ts`, `tests/rendering/bakedStreaming.test.ts` | the sweep covers the 192x192 world | 6 h | `npx vitest run tests/rendering/bakedStreaming.test.ts` passes (at most 60 resident textures in an airship sweep; a miss holds at most 6 frames; `Assets.unload` is used) |
 | W1-F Items and shops | QUEST 4.4: items, kits, bestiary habitats, shop sections, `gearBands.test.ts`, `rosterCoverage.test.ts`, `balanceData` helpers, `check-bounds.ts` | `items.yaml`, `kits.yaml`, `bestiary.yaml`, the shop sections of `shops.yaml` (records seeded empty inside each town's anchor), `tests/helpers/balanceData.ts`, `scripts/check-bounds.ts` | the key items of 3.1; `excalibur` and `adamant`; the `w_<town>` kits; town tiers per 3.6 | 6 h | `npx vitest run tests/data/gearBands.test.ts tests/data/crossFileValidation.test.ts tests/scenes/MagicShopScene.test.ts` pass; every key item of 3.1 exists with `type: key` |
@@ -1301,7 +1328,10 @@ Every region tranche:
   place of its placeholder wall. They compile with `--region <region>` and G3.
 - **T and D tranches** never edit `world_<region>.py`. The T tranche exports its town's site (icon cells, gate,
   dock, spawn, land-gate anchor) by editing `layouts/<region>/town_<town>_site.py`. W1-0b created that file with
-  defaults, and the O module imports it whichever tranche merges first.
+  defaults, and the O module imports it whichever tranche merges first. A `town_*_site.py` change changes the
+  generated world files, so QUEST 4.0's rule applies: on a conflict the integrator regenerates `overworld.yaml` and
+  the region's chunks under the lock (`world.py`, then `build_map.py overworld --region <region>`); they are never
+  hand-merged.
 - **Backgrounds:** a tranche that stages a background runs `python3 -I assets-src/tools/stage_backgrounds.py <ids>`
   and `python3 -I assets-src/tools/stage_backgrounds.py --check <ids>` (each id prints its checks and the command exits
   0). The hand-made sources live in `~/temp/ffgame-assets`, outside the worktree, and are read only.
@@ -1315,10 +1345,10 @@ Every region tranche:
 | ELF-O | S6 | `western-keep-1f`, `-2f`; `world_elf.py` | `cutscenes.yaml` (`elf_astos_unmasked`), `debug-scenarios.yaml` | 8 h | `w_elf_o.test.ts` (astos); checkpoints S6 and `w_s6_neg_nocrown` |
 | ELF-T | S4, S8, S9; town `elfheim` | `elfheim`, `elfheim-house-*` (6+), shops, `elfheim-inn`, `elfheim-castle`, `elfheim-castle-chamber`, `elfheim-vault` | `shops.yaml` (the existing `elfheim_*` ids move here, W1-F), `cutscenes.yaml` (`elf_prince_wakes`) | 8 h | checkpoints S4, S8, S9 |
 | ELF-D | S5 | `marsh-cave-b1..b3` | `cutscenes.yaml` (`elf_d_crown`), `debug-scenarios.yaml` | 6 h | `w_elf_d.test.ts` (piscodemon x3); `hazardPath.test.ts`; checkpoint S5 |
-| ERT-O | S10, S12, S31; town `dwarf` | `dwarf-hall`, `giant-tunnel`, `sage-cave`; `world_earth.py`; the patch `canal` | `cutscenes.yaml` (`ert_canal_blast`, `ert_giant_feast`), `shops.yaml` (`dwarf_item`), `debug-scenarios.yaml` | 8 h | `world.py` prints `basins: OK` with the real isthmus wall (no EARTH placeholder wall); checkpoints S10, `w_s10_neg_notnt`, S12, `w_s12_neg_noruby` |
+| ERT-O | S10, S12, S31; town `dwarf` | `dwarf-hall`, `giant-tunnel`, `sage-cave`; `world_earth.py`; the patch `canal` | `cutscenes.yaml` (`ert_canal_blast`, `ert_giant_feast`), `shops.yaml` (`dwarf_item`), `debug-scenarios.yaml` | 8 h | `world.py` prints `basins: OK` with the real isthmus wall (no EARTH placeholder wall) and `barriers: OK (western_range)`; checkpoints S10, `w_s10_neg_notnt`, S12, `w_s12_neg_noruby` |
 | ERT-T | S25; town `melmond` | `melmond`, `melmond-house-*` (5+, one is `-unne`), shops, `melmond-inn`; the patch `ert_melmond_bloom` | `shops.yaml` (the existing `melmond_*`), `cutscenes.yaml` (`ert_unne_lesson`) | 7 h | checkpoint S25; the bloom patch test (before and after EARTH_CRYSTAL_LIT) |
 | ERT-D | S11, S13 | `cavern-earth-b1..b5` | `cutscenes.yaml` (`ert_vampire_falls`, `ert_lich_falls`, `ert_earth_crystal`) | 8 h | `w_ert_d.test.ts` (vampire, lich); checkpoints S11, S13 |
-| FIR-O | S17 | `world_fire.py` (continent, lake, rivers, ash hazards, desert, the buried hull) | `cutscenes.yaml` (`fir_airship_rises`), `debug-scenarios.yaml` | 7 h | `basins: OK` with the real W_south and W_east south parts; checkpoints S17 and `w_s17_neg_nostone` |
+| FIR-O | S17 | `world_fire.py` (continent, lake, rivers, ash hazards, desert, the buried hull) | `cutscenes.yaml` (`fir_airship_rises`), `debug-scenarios.yaml` | 7 h | `basins: OK` with the real W_south and W_east south parts, and `barriers: OK (crescent_ring)`; checkpoints S17 and `w_s17_neg_nostone` |
 | FIR-T | S14; town `crescent` | `crescent`, `crescent-house-*` (6+), shops, `crescent-inn`, `crescent-circle` | `shops.yaml`, `cutscenes.yaml` (`fir_sages_canoe`) | 8 h | proof (f) for `crescent` OK; checkpoints S14 and `w_s14_early` |
 | FIR-D1 | S15 | `gurgu-b1..b5` | `cutscenes.yaml` (`fir_ashen_falls`) | 8 h | `w_fir_d1.test.ts` (ashen_queen); `hazardPath.test.ts`; checkpoint S15 |
 | FIR-D2 | S16 | `ice-cavern-b1..b3` | `cutscenes.yaml` (`fir_evil_eye_falls`, `fir_d2_shelf`) | 6 h | `w_fir_d2.test.ts` (evil_eye); checkpoint S16 |
@@ -1501,7 +1531,7 @@ given here.
 | GT-3 | S2 | the ship spawn `requiredFlag: BIKKE_DEFEATED` | remove | (b) `SKIP S4` |
 | GT-4 | S2 | the dock `a1_pravoka` | remove | (c) `SOFTLOCK` or the goal unreachable (the ship can't be boarded or left) |
 | GT-5 | S4 | the dock `elf_port` | remove | non-load-bearing: "Elfland is also reachable on foot from the `ert_dwarf` landing over `seam_n`" |
-| GT-5b | S4 | both Aldi docks of Elfland's coast, `elf_port` and `ert_dwarf` | remove both | (a) the goal unreachable (Elfland and the dwarves cut off; `tnt` and `crown` unobtainable) |
+| GT-5b | S4 | both Aldi docks of Elfland's coast, `elf_port` and `ert_dwarf` | remove both | (a) the goal unreachable (Elfland and the dwarves cut off; `tnt` and `crown` unobtainable). The fixture also drops `ert_dwarf` from the `DOCKS_ALLOWED` presence check, so the row fails only on (a), never on a missing-dock error |
 | GT-6 | S6 | Astos's `requiredFlags: [MARSH_GUARD_DEFEATED]` | remove | non-load-bearing: "the crown, which Astos also requires, is given only by the guard's victory (D-W14)". D-W14 itself is checked statically: `tests/quest/bossItems.test.ts` (W1-I) fails when a key item that 3.1 lists as a boss-cutscene gift is also in a chest or a non-boss NPC gift |
 | GT-7 | S6 | Astos's `requiredItem: crown` | remove | (b) `SKIP S6` without S5 |
 | GT-8 | S7 | Matoya's `requiredItem: crystal_eye` | remove | (b) `SKIP S7` |
@@ -1531,9 +1561,9 @@ given here.
 | GT-32 | S27 | the console's `requiredItem: cube` | remove | (b) `SKIP S27` without S21 |
 | GT-33 | S29 | the time gate's `requiredItem: lute` and `requiredFlags` (each of the 5 separately) | remove one at a time | (b) `SKIP S29` for each of the 4 crystal flags; the lute is never consumed, so removing it is non-load-bearing ("the lute is held from S0 and never consumed"), reported as such |
 | GT-34 | S30 | each refight stair's `requiredFlags` | remove one at a time | (b) milestone failure naming the next PAST_* flag |
-| GT-35 | S12 | the western range (EARTH) | open its minimal walkable cut outside the tunnel (the shortest grass path from Melmond's plain to Sarda's coast through the range's cells, exported by the composer like the wall cuts) | (b) `SKIP S12` (Sarda without TITAN_FED) |
+| GT-35 | S12 | the western range (EARTH) | open its minimal walkable cut outside the tunnel (the shortest grass path from Melmond's plain to Sarda's coast through the range's cells, exported by the composer like the wall cuts) | (b) `SKIP S12` (Sarda without TITAN_FED). The cut is the composer's export for the barrier `western_range` (2.9) |
 | GT-36 | S12 | the giant NPC on the tunnel's chokepoint | remove the NPC | (b) `SKIP S12` |
-| GT-37 | S15/S16 | Crescent's mountain ring (FIRE) | open its minimal walkable cut from Crescent's shore to the south lands | (b) `SKIP S15` and `SKIP S16` (no canoe needed) |
+| GT-37 | S15/S16 | Crescent's mountain ring (FIRE) | open its minimal walkable cut from Crescent's shore to the south lands (the barrier `crescent_ring`) | (b) `SKIP S15` and `SKIP S16` (no canoe needed) |
 
 Every row except GT-1, GT-5, GT-6, GT-14, GT-16 and the lute part of GT-33 must be caught. `questMutate.test.ts` asserts each
 row's expected proof and message prefix by name, on fixtures in W1-I and on the real world at INT.
@@ -1653,7 +1683,7 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 | R23 | Cramped spots: ELF's 16-cell-wide arm and EARTH's isthmus (the bands take 4 cells); FIRE's north-west, where W_south, R-volcano, R-ice and the two cavern mouths meet near rows 146-150; Pravoka's fjord between the quay and the range | the arm carries only the keep and a road, the isthmus only the dwarf hall, the canal and a landing; FIRE's row budget and `northWest.test.ts` (4.4); the range at x 138-141 and `pravokaChannel.test.ts` (4.1); a tranche raises `BLOCKED` early if its budget can't be met |
 | R24 | Cross-region hand-offs (S22 to S23 to S24 to S25 to S26) stall when one tranche lags | assume mode; the matrix uses synthetic states; the stubs keep transitions valid |
 | R25 | `takeGold` and the clinic make gold scarce in the curve model | (d3); INT tunes the bottle price and the clinic rates in one place (`shops.yaml` anchors and NPC data) |
-| R26 | The kneel pass is still in flight (14 worktrees at 4ade849) | pass W starts only from the kneel merge head and never touches the kneel files |
+| R26 | Pass W branches from a head before the kneel merge | the kneel pass has merged (88f8ad7, "Merge KA0b"); every pass W branch starts from `mainline` at or after it (`git merge-base --is-ancestor 88f8ad7 HEAD` exits 0), and pass W never touches the kneel files |
 
 ## 9. Open questions (each has a default the orchestrator applies)
 
@@ -1684,7 +1714,7 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 
 ## 10. TODOs
 
-- [x] W0: this plan, rev 1 (20f32de); rev 2 answers momus; then the user's evaluation and momus review to PASS (priority: high, effort: 2h)
+- [x] W0: this plan, rev 1 (20f32de), rev 2 (6f4f731, momus OKAY), rev 3 folds in the remaining items; then the user's evaluation and momus review to PASS (priority: high, effort: 2h)
 - [ ] W1-0a: TS contract: QUEST Q1-0, quest.yaml with anchors, the ExplorationScene extraction to 590, anchors in shared YAML and enemies.yaml (priority: high, effort: 8h)
 - [ ] W1-0b: world data: world_api, build_hooks signatures, canon, stubs, site defaults, anchors file, town targets (priority: high, effort: 6h)
 - [ ] W1-A: vehicles and save, with the origin shift (priority: high, effort: 8h)
