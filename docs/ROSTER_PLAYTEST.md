@@ -412,3 +412,86 @@ F2 cut at the waist by the windows; 0 XP / 0 Gold (classic Chaos); debug battles
 - P2: C6-4, C6-5, C6-6. P3: C6-7 .. C6-14.
 - Goals: 2, 3, 5 MET; 1 and 4 PARTLY; bestiary NOT MET. Windows, retry, performance, textures, console and the
   regression sample: MET. These go to the C7 fix round (plan 12).
+
+## Chaos re-test (C8), 2026-11-16
+
+Fresh adversarial tester, `roster-int` at 72607e2, no code changes, 0 image calls. Own dev server (127.0.0.1:5391),
+Playwright browser tools (scripted through `browser_run_code`), 1920x1080, every URL `mute=1`. Screenshots and contact
+sheets are in `/tmp/c8/shots/`. The fix plan was not read: this checks the result only.
+
+### A. Natural runs (`chaos_forms`, no HP hooks)
+
+Policy: everyone Fights; on WWIZ's turn, if anyone is under 55 % HP, WWIZ heals (w1 and w2: HEAL, the first L3
+spell; w3 and m1: CUR3 on the most hurt hero). Confirm only on message lines, except m1, which mashes confirm every
+60 ms, interludes included.
+
+| Run | Result | Rounds | Chaos actions F1 / F2 / F3 / F4 | Command phase F1-F4 | Crack before F4 | Run |
+|---|---|---|---|---|---|---|
+| w1 | **won** | 13 | 2 / 7 / 4 / 2 | yes / yes / yes / yes | yes (round 10 start) | greyed out |
+| w2 | lost: round 12, F4 (WWIZ fell in round 5 to ICE2, then no heals) | 12 | 2 / 6 / 4 / 3 | yes x4 | yes (round 10) | greyed out |
+| w3 | **won** (the replay of w2) | 12 | 2+ / 5 / 4 / 3 | yes x4 | yes (round 10) | greyed out |
+| m1 | **won**, confirm mashed | 12 | 2 / 6 / 4 / 3 | yes x4 | yes (round 10) | greyed out |
+
+4 attempts, 3 wins. Form changes in every run: F1 to F2 in round 3, F2 to F3 in round 7 or 8, the crack at the start of
+round 10, F4 in round 10 or 11. Every form acts as soon as it appears (arrival). Interlude lengths with no input:
+i1 7.5-7.6 s, i2 9.7 s, i3 3.2-3.3 s; with mashing 4.9 / 6.9 / 1.9 s. The crack is a round-start message line ("The
+horizon groans; core revealed!") with the fissure drawn on the body (`w1_ev_04_chaos_horizon_crack.png`). No console
+error or warning in any run. No interlude got stuck, and none ate input: each next command menu took its first press.
+
+### B. Checks
+
+| # | Check | Verdict | Evidence |
+|---|---|---|---|
+| 1 | 3 natural wins, rounds within 10-16, at least 2 actions per form, a command phase per form, the crack, no Run | **PASS** | A; `w1_*`, `w3_*`, `m1_*` |
+| 2 | Field start (`r_ow_temple`, then `BattleTrigger.triggerBattle(['chaos'], {isBoss: true}, rim)` with **no** `canRun`), lose, Retry | **PASS**: `canRun` false by itself; the party was set to 1 HP at F3 and fell in round 10; Game Over offers Retry Battle first; Retry restarts at F1 (`chaos`, 20000 HP, full party, bg alpha 1, Run greyed out) | `rt_gameover.png`, `rt_after_retry.png` |
+| 3a | `battle.allEnemies[0].currentHp = 1` at the first command | **PASS**: i1 at the start of round 1, i2 and the F3 arrival (LIT2) after NINJ's hit, the crack at the start of round 2, then i3 and the F4 arrival (slam): each once, in order, no console error. F2 gets no action in this stress case (by design, M4) | `o1_ev_*` |
+| 3b | One big hit (masamune attack set to 4000 in memory: hits of 24659-44588) | **PASS**: each hit stops at the next floor (14000 / 8000 / 5000 / 3000), one form per hit, the crack at the next round start, then F4. Won in 3 rounds | `o2_ev_*` |
+| 4 | `chaos_interlude_1` / `_2` / `_3` with `&slow=1`; `chaos_final`; `chaos_final&enemyAnim=loop` | **PASS**: i1 and i2 in round 1; `_3` plays the crack at the start of round 1 and i3 in round 1; `chaos_final` plays the crack at the start of round 2. The loop moves the colossus (disc top y 313-366, mean frame difference up to 18); F4 moves too | `sheet_i1.png`, `sheet_i1_fast.png`, `sheet_i2.png`, `i3_int_*`, `sheet_loop.png`, `sheet_f4loop.png` |
+| 5 | C6 findings | see C | |
+| 6 | Bestiary: deep links, `mode: seen`, background, phase line, count | **PASS** (one P2, C8-1): all four deep links open the right page (`chaos_horizon_core` opens "128 Chaos (Core)"); every title reads 127/127; rim background; "At 70% HP becomes the Orrery", "At 40% HP becomes the Horizon", "At 15% HP becomes the Core". With `mode: seen` (served through a Playwright route, file untouched) every entry, the three sub-entries included, shows `???` before the fight; after a win all four `SEEN:` flags are set, the three sub-entries are listed, and the C key reaches the Core pages | `best_*.png`, `sheet_seen.png`, `seen_after_hz_c*.png` |
+| 7a | Interludes stuck or eating input | **PASS** | A |
+| 7b | Hidden damage numbers or cursor | **PASS**: numbers on the disc are outlined (the crit "258" reads); cursor and target label sit on dark plates | `crop_c6_4_6_num_status.png`, `fin_target_0.png`, `fin_target_17.png` |
+| 7c | Exposed art edges | **FAIL** in the bestiary only (C8-1); in battle none apart from the ruled window cuts | `crop_best_preview_seams.png` |
+| 7d | Party readability | **PASS** (nit): the party stands on F3/F4's arm; the black-clad NINJ on the dark-brown arm has the least contrast, but it reads | `w1_cmd_chaos_horizon.png` |
+| 7e | fps >= 55 over the final-form loop | **PASS**: F3 loop rAF 120, ticker min 96 / avg 121; F4 loop rAF 120, ticker min 106 / avg 120 | |
+| 7f | Textures released after battle | **PASS**: 5 colossus tiles live at F4; after the win, back at the title: 0 colossus tiles, no loaded forms, 7 live GPU textures (C6 baseline 7) | |
+| 7g | Final form feels biggest | **PASS**: F3 and F4 span every column, the arms run past both edges, and F4 heaves the body up to fill the field | `fin_target_17.png` |
+| 7h | Regression: `anim_goblin`, `anim_large`, `anim_boss_garland`, `anim_boss_lich`, `anim_crowd`, `ai_monsters_nine` | **PASS**: art, numbers, turn list and menus are normal; Run is enabled in ordinary battles; no console output | `sheet_reg.png` |
+
+### C. The C6 findings
+
+| # | C6 issue | Verdict | Evidence |
+|---|---|---|---|
+| C6-1 | Forms barely act; 3-4 rounds | **FIXED**: 12-13 rounds, every form acts 2-7 times, every form gets a command phase | A |
+| C6-2 | Crack skipped | **FIXED**: played before F4 in all 9 fights that reached F4 (w1-w3, m1, o1, o2, `_3`, `chaos_final`, the seen fight) | `w1_ev_04_chaos_horizon_crack.png` |
+| C6-3 | Bestiary forms not wired | **FIXED** | B6 |
+| C6-4 | Crit numbers dark on the disc | **FIXED**: light outline, the crit "258" reads | `crop_c6_4_6_num_status.png` |
+| C6-5 | Slam has no readable motion | **FIXED**: the line reads "Chaos slams down!" and the disc rises about 50 px (top y 327 to 276) and comes back down | `sheet_slam.png` |
+| C6-6 | Status icons lost on the corona | **FIXED**: blind and poison icons on a dark plate above the disc | `crop_c6_4_6_num_status.png`, `fin_target_0.png` |
+| C6-7 | HP write skips F2 | **FIXED**: i1 (F2) and i2 each play once | 3a |
+| C6-8 | F4 target label low contrast | **FIXED**: dark plate | `fin_target_17.png` |
+| C6-9 | i1 says fire, no fire drawn | **PARTIAL**: the line now reads "The Sovereign's robe flares and burns away!", with one full-field white flash, an orange sky tint and a dissolve. But no flame is drawn on the robe, and the sampled flash is white, not orange | `sheet_i1_fast.png` (frame 7 white flash, frames 16-18 orange tint) |
+| C6-10 | i2 fade misses the message window | **FIXED**: the fade now dims the field only, and every window stays bright | `sheet_i2.png` row 2 |
+| C6-11 | Slam numbers overlap | **FIXED (not reproduced)**: both numbers show apart on KNGT and MSTR or WWIZ; no adjacent pair came up | `sheet_slamhit.png` |
+| C6-12 | `enemyAnim=loop` does not move the colossus | **FIXED** | `sheet_loop.png` |
+| C6-13 | Bestiary Chaos on a castle hall; "Fight x2" phase line | **FIXED**: rim background, "becomes the Orrery" | `best_chaos.png` |
+| C6-14 | Run enabled | **FIXED**: greyed out in the debug scenarios, and `canRun` is false from a field trigger without `canRun` | B2 |
+
+### D. New findings
+
+| # | Sev | Finding | Repro (`http://127.0.0.1:<port>/?mute=1&...`) | Evidence |
+|---|---|---|---|---|
+| C8-1 | P2 | **Bestiary colossus previews show hard seams.** The Orrery, Horizon and Core previews are opaque pre-composited rectangles with their own staged sky, drawn over the rim backdrop at a different scale. Hard horizontal edges show at the top and bottom of the image (Orrery y ~228 / ~767, Horizon and Core y ~305 / ~690 on a 1080 screen), with mismatched sky above and below | `bestiary=chaos_orrery`, `chaos_horizon`, `chaos_horizon_core` | `crop_best_preview_seams.png`, `best_chaos_orrery.png`, `best_chaos_horizon.png` |
+| C8-2 | P3 | The turn list shows only the slam's first target, e.g. `Chaos slam>NINJ 59`, though the message lines show a second hit ("Chaos hits KNGT for 5!"). The second target's damage is easy to miss | `chaos_forms` to F3, or `chaos_final` with `enemyAi: {chaos_horizon: [{type: slam}]}` | w3 round 8, m1 round 10 (log) |
+| C8-3 | P3 | Bestiary Horizon phase line "At 25% HP  Fight x4 "The horizon groans; core revealed!"" reads like a raw action count. The slam is never mentioned: Horizon and Core both list "Attacks Melee" and "Actions Fight x3 / x4" | `bestiary=chaos_horizon` | `best_chaos_horizon.png`, `best_chaos_horizon_core.png` |
+| C8-4 | P3 | Doc mismatch: AGENTS.md ("Boss Forms") says `slam: {targets: 2}` is "for F3 only", but `chaos_horizon_core` also has `slam: {targets: 2}` (AI weight 0.7) and uses it (m1 round 10; o1 round 2, twice) | `enemies.yaml` `chaos_horizon_core` | m1 / o1 logs |
+| C8-5 | P3 | The final forms hit softly in feel. The slam does 4-25 per hit on the armoured KNGT (WWIZ takes 140-168), and F4's most-weighted action is a single-target ICE for 25-34. The danger comes from the all-party spells on the 303-HP wizard (w2 was lost that way), so F4 "Strike now!" feels less dangerous than F2. Balance is within the pinned bounds, so this is a note on feel only | any natural run | w1 / w3 / m1 logs |
+
+Not filed: F4's disc top and F2's waist under the windows (ruled, D-U13 / D-O24); 0 XP / 0 Gold; HP writes leave HP
+at 1 under each floor and show damage numbers that do not lower it (C7-N1, by design); "127/127" on every sub-entry
+(the list place of a shared 128).
+
+### Status
+
+- **PASS: no P0, no P1.** P2: C8-1 (bestiary preview seams). P3: C8-2 .. C8-5, and C6-9 PARTIAL.
+- C6-1 .. C6-8 and C6-10 .. C6-14 FIXED; C6-9 PARTIAL.
