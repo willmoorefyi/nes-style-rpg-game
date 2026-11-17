@@ -10,12 +10,34 @@ art:
   below: [assets/maps/ai/elfheim-vault/below_0_0.png]
   above: [null]
 entrances:
-  door: [5, 8]
-collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1]
-npcs: []
+  door: [5, 4]
+collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+npcs:
+- id: chest_elf_t_tnt
+  sprite: chest
+  x: 8
+  y: 6
+  chestItem: tnt
+  chestFlag: CHEST_ELF_T_TNT
+  dialog: [You found the TNT!]
+- id: chest_elf_t_ether
+  sprite: chest
+  x: 2
+  y: 6
+  chestItem: ether
+  chestFlag: CHEST_ELF_T_ETHER
+  dialog: [You found an Ether!]
+- id: chest_elf_t_phoenix
+  sprite: chest
+  x: 9
+  y: 8
+  chestItem: phoenix_down
+  chestFlag: CHEST_ELF_T_PHOENIX
+  dialog: [You found a Phoenix Down!]
 transitions:
-- {x: 5, y: 9, targetMap: elfheim-castle, targetEntrance: vault}
+- {x: 5, y: 3, targetMap: elfheim-castle, targetEntrance: vault}
+- {x: 6, y: 3, targetMap: elfheim-castle, targetEntrance: vault}
 name: Elfheim Vault
 music: town
 encounterRate: {min: 999, max: 999}
