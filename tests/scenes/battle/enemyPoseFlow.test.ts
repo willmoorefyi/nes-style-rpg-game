@@ -26,7 +26,7 @@ function setup(action: Action, events: DamageEvent[], enemyHpAfter = 5, preview 
   const display = {
     enemySprites, partySprites,
     enemyView: preview ? { poses, playAttack: (i: number) => poses.playAttack(i, plan) } : null,
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(),
     updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   const enemies = [{ displayName: 'Goblin A', currentHp: 10 }, { displayName: 'Goblin B', currentHp: 10 }];

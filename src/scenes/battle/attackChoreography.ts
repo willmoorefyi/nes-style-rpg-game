@@ -1,4 +1,5 @@
 import type { BattlePose } from '../../rendering/CharacterAtlas.js';
+import { riseEnd, riseTime } from './kneelChoreography.js';
 
 /**
  * Party melee attack choreography: where the attacker is and which battle pose it shows at each frame of the
@@ -78,7 +79,16 @@ export function advanceFrames(style: AttackStyle): number {
  * U3: the attacker also moves `reach.dy` toward the target's row in step with its horizontal progress (its share of
  * the advance, 0 to 1), on top of the style's hop, so the contact frame lands at (-dx, dy). A number is a flat reach.
  */
-export function advanceAt(style: AttackStyle, t: number, reach: number | AttackReach = MIN_ATTACK_REACH): AttackFrame {
+export function advanceAt(style: AttackStyle, t: number, reach: number | AttackReach = MIN_ATTACK_REACH,
+  opts: { rise?: boolean } = {}): AttackFrame {
+  const f = reachedAt(style, t, reach);
+  // D-K3: a kneeler rising to act holds its frame-0 offset for 6 frames, then the motion is compressed into [6, E)
+  if (!opts.rise) return f;
+  const end = riseEnd(segments(MIN_ATTACK_REACH)[style].map((s) => s.frames));
+  return { ...reachedAt(style, riseTime(t, end), reach), pose: f.pose };
+}
+
+function reachedAt(style: AttackStyle, t: number, reach: number | AttackReach): AttackFrame {
   const { dx: D, dy: rise } = typeof reach === 'number' ? { dx: reach, dy: 0 } : reach;
   const f = baseAdvanceAt(style, t, D);
   return rise === 0 ? f : { ...f, dy: f.dy + rise * clamp01(-f.dx / D) };
@@ -108,10 +118,15 @@ export function returnAt(from: AttackFrame, t: number, style: AttackStyle): Atta
 export const CAST_FRAMES = 24;
 const CAST_STEP = 36;
 
-export function castAt(t: number): AttackFrame {
+/** The cast step's last frame (the D-K3 rise window E; the effect starts at CAST_FRAMES). */
+export const CAST_STEP_FRAMES = 14;
+
+/** `rise` (D-K3): the step holds for 6 frames, then is compressed into [6, 14); poses on raw t. */
+export function castAt(t: number, opts: { rise?: boolean } = {}): AttackFrame {
   const p = clamp01(t / CAST_FRAMES);
-  const pose = t < 7 ? 'cast_gather' : t < 14 ? 'cast_rise' : 'cast';
-  return { dx: -CAST_STEP * easeOut(clamp01(t / 14)), dy: 0, pose: p >= 1 ? 'cast' : pose };
+  const pose = t < 7 ? 'cast_gather' : t < CAST_STEP_FRAMES ? 'cast_rise' : 'cast';
+  const m = opts.rise ? riseTime(t, CAST_STEP_FRAMES) : t;
+  return { dx: -CAST_STEP * easeOut(clamp01(m / CAST_STEP_FRAMES)), dy: 0, pose: p >= 1 ? 'cast' : pose };
 }
 
 /** After the spell resolves: the release (palm flung open), then back into line. */

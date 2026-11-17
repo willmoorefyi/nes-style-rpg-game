@@ -15,6 +15,7 @@ import { stoneTextures } from './fx/stoneTextures.js';
 import type { FxCuePoint } from './fx/index.js';
 import { glintTip } from './glintPoint.js';
 import { readPixels, type Pixels } from './fx/texturePixels.js';
+import { kneelSinkPx } from './enemyOffsets.js';
 
 /** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4; an enemy's
  *  `pulseTint` replaces it (the pale lich takes a lighter one, so it does not turn muddy). */
@@ -164,10 +165,10 @@ export class AiEnemyView {
   }
 
   /** Advance pose timers and apply each sprite's frame texture (a stoned enemy's grey copy, stoneTextures), integer
-   *  offset, status posture (pass F item 5a: daze, stone, tremble) and draw order (D5). */
-  update(dt: number, sprites: Container[], postures: readonly Posture[] = []): void {
+   *  offset, status posture (daze / kneel kneel, stone, D-K16 `trembles`), a floater's kneel sink and draw order (D5). */
+  update(dt: number, sprites: Container[], postures: readonly Posture[] = [], trembles: readonly boolean[] = []): void {
     this.sprites = sprites;
-    for (let i = 0; i < sprites.length; i++) this.poses.setPosture(i, postures[i] ?? 'none');
+    for (let i = 0; i < sprites.length; i++) this.poses.setPosture(i, postures[i] ?? 'none', trembles[i] ?? postures[i] === 'tremble');
     this.poses.update(dt);
     for (let i = 0; i < sprites.length; i++) {
       const sprite = sprites[i];
@@ -179,7 +180,8 @@ export class AiEnemyView {
         const tex = f.textures[st.pose];
         sprite.texture = postures[i] === 'stone' ? stoneTextures.of(tex) : tex;
       }
-      sprite.position.set(b.x + st.dx + (st.travelDx ?? 0), b.y + st.dy + (st.travelDy ?? 0));
+      const sink = f ? kneelSinkPx(f.kneelSink, this.poses.kneelAmount(i), f.scale * (this.boxes[i]?.scaleFactor ?? 1)) : 0;
+      sprite.position.set(b.x + st.dx + (st.travelDx ?? 0), b.y + st.dy + (st.travelDy ?? 0) + sink);
       const hold = this.poses.holdFrame(i);
       const pulse = hold !== null && Math.floor(hold / 4) % 2 === 0 ? pulseTintOf(this.enemies[i]) : null;
       if (tintOf(sprite, 'pulse') !== pulse) setTint(sprite, 'pulse', pulse);

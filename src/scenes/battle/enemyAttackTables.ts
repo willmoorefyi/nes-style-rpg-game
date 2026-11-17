@@ -3,6 +3,7 @@
  * in-place tables in enemyChoreography.ts (the in-place ATTACK stays the ranged / no-target table).
  */
 import { ATTACK_CONTACT, ATTACK_FRAMES, attackAt, ease, type Ease, type FrameAt, type MonsterFrame } from './enemyChoreography.js';
+import { riseEnd, riseTime } from './kneelChoreography.js';
 
 /**
  * Travelling attacks (pass F item 3, item 7). A frame gives the lunge part in fractions of L (`lunge`), the travel
@@ -74,18 +75,26 @@ export function attackTable(kind: AttackKind, travel: number): { n: number; cont
   return kind === 'melee' ? { n, contactAt: 14 + n, holdAt: null, total: 47 + n } : { n, contactAt: n + 29, holdAt: n + 6, total: n + 69 };
 }
 
-/** Frame, lunge (dx in px of L, unscaled), hop (dy, unscaled) and travel progress t frames into an attack. */
-export function travelAttackAt(kind: AttackKind, t: number, o: { lunge: number; travel: number; hop: number; hasRaise: boolean }): TravelFrameAt {
-  if (kind === 'inplace') return { ...attackAt(t, o.lunge), k: 0 };
+/** Frame, lunge (dx in px of L, unscaled), hop (dy, unscaled) and travel progress t frames into an attack. `rise`
+ *  (D-K3): a kneeler rising to act; dx, dy and k hold their frame-0 value for t < 6 and are compressed into the window
+ *  [6, E) (E: the first phase boundary at or after frame 12); frame names and every boundary run on raw t. */
+export function travelAttackAt(kind: AttackKind, t: number,
+  o: { lunge: number; travel: number; hop: number; hasRaise: boolean; rise?: boolean }): TravelFrameAt {
+  if (kind === 'inplace') return { ...attackAt(t, o.lunge, { rise: o.rise }), k: 0 };
   const { n } = attackTable(kind, o.travel);
   const phases = kind === 'melee' ? meleePhases(n, o.hop) : heavyPhases(n, o.hasRaise);
+  const f = phaseAt(phases, t, o.lunge);
+  return o.rise ? { ...phaseAt(phases, riseTime(t, riseEnd(phases.map((p) => p.len))), o.lunge), frame: f.frame } : f;
+}
+
+function phaseAt(phases: Phase[], t: number, lunge: number): TravelFrameAt {
   let start = 0;
   for (const ph of phases) {
     if (ph.len > 0 && t < start + ph.len) {
       const local = Math.max(0, t - start);
       const p = local / ph.len;
       const [a, b, e] = ph.lunge;
-      return { frame: ph.frame(local), dx: (a + (b - a) * ease(p, e)) * o.lunge, dy: ph.hop?.(local, p) ?? 0, k: ph.k(p) };
+      return { frame: ph.frame(local), dx: (a + (b - a) * ease(p, e)) * lunge, dy: ph.hop?.(local, p) ?? 0, k: ph.k(p) };
     }
     start += ph.len;
   }

@@ -67,15 +67,18 @@ export interface FieldArt {
   ai: boolean;
 }
 
-/** Keyframe poses, then the in-betweens (assets-src/gen/puppet.py) that smooth idle, melee and casting. */
+/** Keyframe poses, then the in-betweens (assets-src/gen/puppet.py) that smooth idle, melee and casting, then the pass K
+ *  kneel columns (docs/KNEEL_PLAN.md 3: an unopted class repeats `ready` there). */
 export const BATTLE_POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory',
-  'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'atk_follow', 'cast_gather', 'cast_rise', 'cast_release'] as const;
+  'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'atk_follow', 'cast_gather', 'cast_rise', 'cast_release',
+  'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b'] as const;
 export type BattlePose = typeof BATTLE_POSES[number];
 
-/** The keyframe an in-between falls back to when an atlas does not carry it (older builds). */
+/** The keyframe an in-between falls back to when an atlas does not carry it (older builds; no kneel columns: `ready`). */
 export const POSE_FALLBACK: Partial<Record<BattlePose, BattlePose>> = {
   idle_b: 'ready', atk_wind1: 'ready', atk_wind2: 'ready', atk_mid: 'attack', atk_follow: 'attack',
   cast_gather: 'ready', cast_rise: 'cast', cast_release: 'cast',
+  kneel_in1: 'ready', kneel_in2: 'ready', kneel: 'ready', kneel_b: 'ready',
 };
 
 const LEGACY_WALK = [1, 0, 2, 0];

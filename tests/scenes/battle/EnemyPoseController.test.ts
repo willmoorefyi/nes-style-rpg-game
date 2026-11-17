@@ -228,16 +228,20 @@ describe('EnemyPoseController (ENEMY_ANIM_PLAN 3.2)', () => {
     expect(c.state(0).pose).toBe('idle');
   });
 
-  it('idle breathes out of phase per enemy; dazed enemies sway daze / daze_b; stone ignores hits', () => {
+  it('idle breathes out of phase per enemy; dazed enemies kneel (pass K; old: daze sway) and shake when hit; stone ignores hits', () => {
     const c = new EnemyPoseController(2);
     run(c, 20);                                      // phase index * 17: enemy 1 is 17 frames ahead
     expect([c.state(0).pose, c.state(1).pose]).toEqual(['idle', 'idle_b']);
     run(c, 16);
     expect(c.state(0).pose).toBe('idle_b');
     c.setPosture(0, 'daze');
-    expect(['daze', 'daze_b']).toContain(c.state(0).pose);
+    expect(c.state(0).pose).toBe('kneel_in1');
+    run(c, 8);
+    expect(['kneel', 'kneel_b']).toContain(c.state(0).pose);
     c.playHurt(0);
-    expect(c.state(0).pose).toBe('hurt_in1');        // asleep / stunned enemies still recoil
+    c.update(1);
+    expect(['kneel', 'kneel_b']).toContain(c.state(0).pose);   // asleep / stunned enemies shake on the kneel (old: recoil)
+    expect(Math.abs(c.state(0).dx)).toBe(3);
     c.setPosture(1, 'stone');
     c.playHurt(1);
     expect(c.state(1)).toEqual({ pose: 'idle', dx: 0, dy: 0 });

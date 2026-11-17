@@ -49,6 +49,13 @@ export interface PreviewTarget {
   label?(i: number): string | null;
 }
 
+/** One label line per actor, `<name>: <frame> / <t>` (or the actor's own label, e.g. a colossus timeline). Pure; the
+ *  step label here and the `&poseLabel=1` label (kneelPreview.ts) share it. */
+export function poseLabelLines(poses: { state(i: number): { pose: string }; debug(i: number): { t: number } },
+  names: (i: number) => string, count: number, label?: (i: number) => string | null): string[] {
+  return Array.from({ length: count }, (_, i) => `${names(i)}: ${label?.(i) ?? `${poses.state(i).pose} / ${Math.floor(poses.debug(i).t)}`}`);
+}
+
 type Action = 'attack' | 'hurt' | 'cast' | 'beam';
 interface KeySource {
   addEventListener(type: 'keydown', fn: (e: { key: string }) => void): void;
@@ -135,10 +142,7 @@ export class EnemyAnimPreview {
   }
 
   labelText(): string {
-    return Array.from({ length: this.target.count }, (_, i) => {
-      const st = this.target.poses.state(i);
-      return `${this.target.name(i)}: ${this.target.label?.(i) ?? `${st.pose} / ${Math.floor(this.target.poses.debug(i).t)}`}`;
-    }).join('\n');
+    return poseLabelLines(this.target.poses, (i) => this.target.name(i), this.target.count, this.target.label).join('\n');
   }
 
   /** Corner label (step mode, or `force` while the scene-wide dev clock steps). */

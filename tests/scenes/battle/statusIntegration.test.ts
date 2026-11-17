@@ -32,7 +32,8 @@ const VISUALS = loadStatusVisuals();
 const IMPACT = 18;
 const POSES = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory', 'idle_b'];
 
-function setup(partyStatus: StatusEffect[] = []) {
+/** `poisonTick`: the action ends with the end-of-turn poison on the actor (its own line, a hold: D-K17). */
+function setup(partyStatus: StatusEffect[] = [], opts: { poisonTick?: boolean } = {}) {
   vi.spyOn(battleArt, 'isLoaded', 'get').mockReturnValue(true);
   vi.spyOn(battleArt, 'getMonsterFrames').mockReturnValue(null);
   vi.spyOn(characterAtlas, 'hasBattleArt', 'get').mockReturnValue(true);
@@ -57,7 +58,12 @@ function setup(partyStatus: StatusEffect[] = []) {
     executeNextAction: () => {
       queued = 0;
       enemies[0].status.apply('sleep');
-      return { done: true, damageEvents: [], messages: [{ text: 'Goblin B falls asleep!' }], missed: false, spellId: 'slep' };
+      const messages = [{ text: 'Goblin B falls asleep!' }];
+      if (!opts.poisonTick) return { done: true, damageEvents: [], messages, missed: false, spellId: 'slep' };
+      const mid = { actorId: 'party_0', hp: party[0].currentHp, statuses: party[0].statusTracker.getAll().map((e) => e.effect) };
+      party[0].currentHp -= 2;
+      const line = { text: 'BLM is hurt by poison!' };
+      return { done: true, damageEvents: [], messages: [...messages, line], missed: false, spellId: 'slep', holds: [{ line, ...mid }] };
     },
     skipRemainingActions: vi.fn(),
   } as unknown as BattleStateMachine;
@@ -88,25 +94,92 @@ describe('status visuals in the battle', () => {
     for (let k = 1; k < IMPACT; k++) {
       s.frame();
       expect(s.statusFx.overlaysOn('enemy_0'), `frame ${k}`).toEqual([]);
-      expect(s.display.enemyView!.poses.state(0).pose, `frame ${k}`).not.toMatch(/^daze/);
+      expect(s.display.enemyView!.poses.state(0).pose, `frame ${k}`).not.toMatch(/^kneel/);
     }
     s.frame();
     expect(s.statusFx.overlaysOn('enemy_0')).toEqual(['zzz']);
     expect(s.statusFx.iconsOn('enemy_0')).toEqual(['icon_sleep']);
     s.frame();
-    expect(['daze', 'daze_b']).toContain(s.display.enemyView!.poses.state(0).pose);
+    expect(s.display.enemyView!.poses.state(0).pose).toBe('kneel_in1');   // pass K: the kneel's `in` (old: the daze sway)
   });
 
-  it('FB-7: a sleeping or stunned hero holds `ready` with no breathing (old: idle_b), and still flinches', () => {
+  it('pass K (old FB-7: held `ready`): a sleeping or stunned hero kneels in hold from the battle start; a hit shakes it +-2 px', () => {
     for (const st of ['sleep', 'stun'] as const) {
       const s = setup([st]);
       const seen = new Set<string>();
       for (let t = 0; t < 120; t++) { s.frame(); seen.add(s.display.partyPose(0)); }
-      expect([...seen]).toEqual(['ready']);
+      expect([...seen].sort()).toEqual(['kneel', 'kneel_b']);              // row (a): no `in` at the start
       expect(s.statusFx.iconsOn('party_0')).toEqual([VISUALS[st].icon]);
       s.display.flashHurt(0);
-      expect(s.display.partyPose(0)).toBe('hurt');
+      expect(s.display.partyPose(0)).toMatch(/^kneel/);                    // no `hurt` on a kneeler
+      const sp = s.display.partySprites[0];
+      s.frame();
+      expect(Math.abs(sp.pivot.x * sp.scale.x)).toBe(2);
     }
+  });
+
+  it('D-K17: a poisoned hero acts (its turn is not lost): it rises, then holds the override while the poison line shakes it; `in` starts after completeAction', () => {
+    const s = setup(['poison'], { poisonTick: true });
+    s.display.updatePartySprites();
+    expect(s.display.partyPose(0)).toMatch(/^kneel(_b)?$/);                // poison kneels (row a: in hold)
+    const log: { phase: string; pose: string; dx: number }[] = [];
+    const sp = s.display.partySprites[0];
+    for (let t = 0; t < 400 && s.ctrl.animPhase !== 'round_end'; t++) {
+      s.frame();
+      log.push({ phase: s.ctrl.animPhase, pose: s.display.partyPose(0), dx: Math.round(-sp.pivot.x * sp.scale.x) });
+    }
+    expect(s.play).toHaveBeenCalled();                                     // the action ran
+    // the override starts at the announce (cast_gather): the rise is its first 6 frames, then the override pose
+    expect(log.slice(0, 7).map((f) => f.pose)).toEqual(['kneel_in2', 'kneel_in2', 'kneel_in2', 'kneel_in1', 'kneel_in1', 'kneel_in1',
+      'cast_gather']);
+    const shaken = log.filter((f) => f.phase === 'result' && f.dx !== 0);
+    expect(shaken.length).toBe(12);                                        // the poison line: 12 frames of +-2 px
+    expect(shaken.every((f) => Math.abs(f.dx) === 2 && !/^kneel|hurt/.test(f.pose))).toBe(true);
+    expect(log.some((f) => f.pose === 'hurt')).toBe(false);
+    expect(log.filter((f) => f.phase === 'step_back').every((f) => !f.pose.startsWith('kneel'))).toBe(true);
+    const back = log.findIndex((f) => f.phase !== 'step_back' && log[log.indexOf(f) - 1]?.phase === 'step_back');
+    expect(log[back].pose).toBe('kneel_in1');                              // `in` on the first frame after completeAction
+  });
+
+  it('row (e): a status-only poison (no damage, no flash) starts `in` on the frame it is presented, for a hero and an enemy', () => {
+    const s = setup();
+    s.display.update(1);
+    expect(s.display.partyPose(0)).not.toMatch(/^kneel|hurt/);
+    s.party[0].statusTracker.apply('poison');
+    s.display.updatePartySprites();
+    expect(s.display.partyPose(0)).toBe('kneel_in1');
+    s.enemies[0].status.apply('poison');
+    s.display.updateEnemySprites(new Map());
+    s.display.update(1);
+    expect(s.display.enemyView!.poses.state(0).pose).toBe('kneel_in1');
+    expect(s.display.enemyView!.poses.state(0).dx).toBe(0);               // no shake
+  });
+
+  it('D-K17: a poison line for an enemy whose attack has ended shakes its kneel frame (no hurt frames, `in` not restarted)', () => {
+    const s = setup();
+    s.enemies[0].status.apply('poison');
+    s.display.capturePresented();
+    for (let t = 0; t < 20; t++) s.display.update(1);
+    const poses = s.display.enemyView!.poses;
+    expect(poses.state(0).pose).toMatch(/^kneel(_b)?$/);
+    s.enemies[0].currentHp -= 2;
+    s.display.updateEnemySprites(new Map());
+    s.display.update(1);
+    expect(poses.state(0).pose).toMatch(/^kneel(_b)?$/);
+    expect(Math.abs(poses.state(0).dx)).toBe(3);
+  });
+
+  it('poison plus fear: the hero kneels and trembles (D-K16); sleep plus poison is a disabled kneel with no tremble', () => {
+    const s = setup(['poison', 'fear']);
+    const sp = s.display.partySprites[0];
+    const seen = new Set<number>();
+    for (let t = 0; t < 40; t++) { s.display.update(1); seen.add(Math.round(-sp.pivot.x * sp.scale.x)); }
+    expect(s.display.partyPose(0)).toMatch(/^kneel/);
+    expect([...seen].sort()).toEqual([-1, 0, 1]);
+    const z = setup(['poison', 'sleep', 'fear']);
+    for (let t = 0; t < 40; t++) z.display.update(1);
+    expect(z.display.partyPosture(0)).toBe('daze');
+    expect(z.display.partySprites[0].pivot.x).toBe(0);
   });
 
   it('a stoned hero holds `ready`, through hits, as its grey copy', () => {

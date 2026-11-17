@@ -36,7 +36,7 @@ function setup(action: Action, lines = 1) {
   const display = {
     enemySprites: [goblin], partySprites: [hero],
     enemyView: { poses, playAttack: (i: number) => poses.playAttack(i) },
-    setActorPose: vi.fn(), flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
+    setActorPose: vi.fn(), isRising: () => false, flashHurt: vi.fn(), updatePartyDisplay: vi.fn(), updateEnemySprites: vi.fn(), updatePartySprites: vi.fn(),
   } as unknown as BattleDisplayManager;
   const enemies = [{ displayName: 'Goblin', currentHp: 30 }];
   let queued = 2;

@@ -23,6 +23,8 @@ export interface MonsterAtlasMeta {
   texScale?: number;
   /** The atlas pages (PNG files next to the JSON); missing: one page, monsters-ai.png. */
   pages?: MonsterAtlasPage[];
+  /** D-K13: the pages holding an act-1 sheet, loaded by `load()` and pinned for the session; missing: page 0, unpinned. */
+  preload?: number[];
   /** Plus the FW-A anchors `travelTop`, `lungeRight` and `homeX` (monsterAnchors.ts). */
   sheets: Record<string, MonsterAnchors & {
     /** Index into `pages` (0 when missing). */
@@ -43,6 +45,8 @@ export interface MonsterAtlasMeta {
     head?: [number, number];
     /** The weapon tip in `attack_raise` (art px in the cell): the heavy attack's glint. Sheets with a raise only. */
     tip?: [number, number];
+    /** D-K9: a floater's kneel drop in native px (floating / swimmer sheets only). */
+    kneelSink?: number;
   }>;
 }
 
@@ -76,6 +80,8 @@ export interface MonsterFrames extends MonsterAnchors {
   head?: [number, number];
   /** The raised weapon's tip in art px (the glint), when the atlas has it. */
   tip?: [number, number];
+  /** D-K9: the kneel drop in art px (a floater sinks as it kneels), when the atlas has it. */
+  kneelSink?: number;
 }
 
 /** Art id for an enemy: its `sprite` (palette-swap variants share code but not art), without a file extension. */
@@ -185,6 +191,7 @@ export class BattleArt {
       hasRaise: !!entry.frames.attack_raise, lungePx: (lungePx(entry) * s) / this.meta.scale, anim: !!entry.anim,
       opaqueRight: entry.opaqueRight ?? (measured ? measured[2] + 1 : w),
       ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...anchors,
+      ...(typeof entry.kneelSink === 'number' && entry.kneelSink > 0 ? { kneelSink: entry.kneelSink } : {}),
       ...(idleBox ? { idleBox } : {}) };
   }
 
@@ -195,8 +202,9 @@ export class BattleArt {
     return this.opaque.get(sprite) ?? null;
   }
 
-  /** The character atlas, the monster index and page 0 (act 1) on the first call, plus the pages of sprites asked
-   *  for meanwhile; later calls resolve once no page load is in flight. */
+  /** The character atlas, the monster index and its act-1 pages on the first call (the index's `preload`, pinned for
+   *  the session; page 0 unpinned without it, D-K13), plus the pages of sprites asked for meanwhile; later calls
+   *  resolve once no page load is in flight. */
   load(): Promise<void> {
     if (!this.loading) this.loading = this.fetchAll();
     return this.loading.then(() => this.pages.settled());
@@ -208,7 +216,9 @@ export class BattleArt {
       const meta = await fetchJson<MonsterAtlasMeta>(`${MONSTER_ATLAS}.json`);
       const pages = meta.pages ?? [{ file: 'monsters-ai.png', w: 0, h: 0 }];
       this.pages.setIndex(pages, (s) => (meta.sheets[s] ? meta.sheets[s].page ?? 0 : undefined));
-      await this.pages.ensurePages([0, ...this.takeWanted()]);
+      const preload = Array.isArray(meta.preload) ? meta.preload.filter((p) => Number.isInteger(p)) : [];
+      this.pages.pin(preload);
+      await this.pages.ensurePages([0, ...preload, ...this.takeWanted()]);
       this.meta = meta;
       const more = this.takeWanted();                  // asked for while page 0 loaded (started before `done`)
       if (more.length) void this.pages.ensurePages([0, ...more]);

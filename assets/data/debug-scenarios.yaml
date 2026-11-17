@@ -1301,3 +1301,19 @@
   enemies: [chaos_horizon]
   enemyHp: { 0: 0.155 }
   background: assets/backgrounds/rim.webp
+# Pass K (docs/KNEEL_PLAN.md 8): the kneel pilot. WAR is weak (HP <= 25 %), WHM asleep, WHM2 poisoned, WAR2 the standing
+# control; goblin 0 asleep, goblin 1 poisoned (it rises to attack and kneels again), wolf 2 stunned, wolf 3 the control.
+# Capture: ?mute=1&scenario=kneel_pilot&battleStep=1&poseLabel=1 (`.` steps a frame); round 1: WAR and WAR2 FIGHT wolf 3,
+# WHM2 uses a Potion on WAR2. Loop: &kneel=loop.
+- id: kneel_pilot
+  name: Kneel pilot - weak, asleep and poisoned heroes; asleep, poisoned and stunned enemies
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: white_mage, name: WHM, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [sleep] }
+    - { class: white_mage, name: WHM2, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [poison] }
+    - { class: warrior, name: WAR2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf, wolf]
+  enemyStatus: { 0: [sleep], 1: [poison], 2: [stun] }
+  background: assets/backgrounds/grassland.webp

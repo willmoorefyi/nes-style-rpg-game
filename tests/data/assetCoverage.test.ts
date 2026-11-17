@@ -1,5 +1,6 @@
 import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
-import { BOSS_FRAMES, FRAME_FALLBACK, FRAME_SOURCE, MONSTER_FRAMES, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { BOSS_FRAMES, FRAME_FALLBACK, FRAME_SOURCE, MONSTER_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { KNEEL_FRAMES, isKneelFrame } from '../../src/scenes/battle/kneelChoreography.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -96,7 +97,11 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       expect(battleAtlas.scale).toBe(2);
       expect(battleAtlas.cell[1] * battleAtlas.scale).toBe(160);
       expect(battleAtlas.footRow).toBeLessThan(battleAtlas.cell[1]);
-      expect(battleAtlas.poses).toEqual([...BATTLE_POSES]);
+      // pass K (docs/KNEEL_PLAN.md 3): the 14 old columns in order, then the 4 kneel columns once the atlas has them
+      // (an older atlas without them: CharacterAtlas.POSE_FALLBACK maps them to `ready`)
+      const old = BATTLE_POSES.filter((p) => !isKneelFrame(p));
+      expect(battleAtlas.poses.slice(0, old.length)).toEqual(old);
+      expect([[], [...KNEEL_FRAMES]]).toContainEqual(battleAtlas.poses.slice(old.length).filter((p) => isKneelFrame(p)));
     });
 
     it('only lists known classes, and the image matches cell x scale x poses by rows', () => {
@@ -188,7 +193,10 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         expect(page, `${id} page ${e.page}`).toBeDefined();
         const [w, h] = [page.w * ts, page.h * ts];
         // every sheet has daze / daze_b (pass F 5a); the heavy raise frames only with hasRaise (pass F 7)
-        const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n));
+        // pass K: the 4 kneel names come all together (own rects or aliased per D-K7) or not at all (an atlas before K1)
+        const kneel = 'kneel' in e.frames;
+        const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n))
+          .filter((n) => kneel || !isKneelFrame(n));
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
         for (const [x, y] of Object.values(e.frames)) {
           expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);
@@ -204,6 +212,12 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         const aliased = fwqAliased(id);
         for (const n of Object.keys(e.frames) as MonsterFrame[]) {
           if (FRAME_SOURCE[n] === n) continue;
+          if (isKneelFrame(n)) {                   // D-K7: an own rect (opted in) or the fallback chain's (kneel -> daze ...)
+            const alias = e.frames[resolveFrame(FRAME_FALLBACK[n], (f) => f in e.frames && !isKneelFrame(f)) ?? 'idle'];
+            const own = !Object.entries(e.frames).some(([k, r]) => !isKneelFrame(k) && r.join() === e.frames[n].join());
+            expect(own || e.frames[n].join() === alias.join(), `${id} ${n}`).toBe(true);
+            continue;
+          }
           if (aliased.has(n)) {                    // FW-Q partial rig: that sequence resolves to its keys
             expect(e.frames[n].join(), `${id} ${n} (FW-Q aliased)`).toBe(e.frames[FRAME_SOURCE[n]].join());
             continue;

@@ -4,28 +4,30 @@
  * factor 1 (EnemyPoseController scales and rounds them once).
  */
 import type { StatusPosture } from '../../types/fxData.js';
+import { riseEnd, riseTime, type KneelFrame } from './kneelChoreography.js';
 
 /** Approved keyframes in monsters-ai.json (bosses add `cast`; pass F's bosses add `attack_raise`). */
 export type MonsterKeyframe = 'idle' | 'attack' | 'hurt' | 'cast' | 'attack_raise';
 export type MonsterFrame = MonsterKeyframe | 'idle_b' | 'atk_wind1' | 'atk_wind2' | 'atk_mid' | 'atk_follow'
   | 'atk_recover' | 'hurt_in1' | 'hurt_in2' | 'cast_gather' | 'cast_rise' | 'cast_release'
-  | 'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2';
+  | 'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2' | KneelFrame;
 
 export const MONSTER_FRAMES: readonly MonsterFrame[] = ['idle', 'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'attack',
-  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt', 'daze', 'daze_b'];
+  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt', 'daze', 'daze_b', 'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b'];
 export const BOSS_FRAMES: readonly MonsterFrame[] = [...MONSTER_FRAMES, 'cast_gather', 'cast_rise', 'cast', 'cast_release',
   'attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2'];
-/** Pass F frames no atlas has yet (the dazed pose and the heavy raise); the per-sheet key check skips them until the
- *  atlas that draws them lands. */
-export const LATE_FRAMES: ReadonlySet<MonsterFrame> = new Set<MonsterFrame>(['daze', 'daze_b', 'attack_raise',
-  'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2']);
+/** Frames a sheet may lack (the heavy raise without an `attack_raise` key; the pass K kneel until K4, docs/KNEEL_PLAN.md
+ *  3): the per-sheet key check skips them. Every sheet has its own daze / daze_b cells. */
+export const LATE_FRAMES: ReadonlySet<MonsterFrame> = new Set<MonsterFrame>(['attack_raise', 'atk_raise_in', 'atk_raise_b',
+  'atk_swing', 'atk_swing2', 'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b']);
 
 /** The keyframe each frame is cut from in the end (where FRAME_FALLBACK finally lands on an old atlas). */
 export const FRAME_SOURCE: Record<MonsterFrame, MonsterKeyframe> = {
   idle: 'idle', attack: 'attack', hurt: 'hurt', cast: 'cast', idle_b: 'idle', atk_wind1: 'idle', atk_wind2: 'idle',
   atk_mid: 'attack', atk_follow: 'attack', atk_recover: 'idle', hurt_in1: 'idle', hurt_in2: 'hurt', cast_gather: 'idle',
   cast_rise: 'cast', cast_release: 'cast', daze: 'idle', daze_b: 'idle', attack_raise: 'idle', atk_raise_in: 'idle',
-  atk_raise_b: 'idle', atk_swing: 'attack', atk_swing2: 'attack',
+  atk_raise_b: 'idle', atk_swing: 'attack', atk_swing2: 'attack', kneel_in1: 'idle', kneel_in2: 'idle', kneel: 'idle',
+  kneel_b: 'idle',
 };
 
 /** What an atlas without a frame shows instead, resolved step by step until a key exists (a keyframe maps to itself,
@@ -33,6 +35,8 @@ export const FRAME_SOURCE: Record<MonsterFrame, MonsterKeyframe> = {
 export const FRAME_FALLBACK: Record<MonsterFrame, MonsterFrame> = {
   ...FRAME_SOURCE, cast: 'attack', daze: 'hurt_in1', daze_b: 'daze', atk_raise_in: 'atk_wind1',
   attack_raise: 'atk_wind2', atk_raise_b: 'atk_wind2', atk_swing: 'atk_mid', atk_swing2: 'atk_mid',
+  // D-K7: an unopted sheet shows today's daze look on the kneel timing
+  kneel: 'daze', kneel_b: 'daze_b', kneel_in2: 'daze', kneel_in1: 'idle',
 };
 
 /** The first frame along the fallback chain from `name` that `has` an atlas key; null when none does. */
@@ -131,9 +135,14 @@ function sample(segs: Seg[], t: number): { frame: MonsterFrame; v: number } {
   return { frame: last.frame, v: last.to };
 }
 
-export function attackAt(t: number, lunge: number): FrameAt {
+/** D-K3: the in-place attack's motion window (14, its contact). */
+export const ATTACK_RISE_END = riseEnd(ATTACK.map((s) => s.len));
+
+/** `rise`: a kneeler rising to act (motion held, then compressed; frame names on raw t). */
+export function attackAt(t: number, lunge: number, opts: { rise?: boolean } = {}): FrameAt {
   const s = sample(ATTACK, t);
-  return { frame: s.frame, dx: s.v * lunge, dy: 0 };
+  const v = opts.rise ? sample(ATTACK, riseTime(t, ATTACK_RISE_END)).v : s.v;
+  return { frame: s.frame, dx: v * lunge, dy: 0 };
 }
 
 export function hurtAt(t: number): FrameAt {
@@ -155,21 +164,19 @@ export function dyingAt(t: number, from: { dx: number; dy: number }, start = 0):
   return { frame: hurtAt(t).frame, dx: from.dx + (DYING_DX - from.dx) * k, dy: from.dy * (1 - k) };
 }
 
-/** Frames each dazed frame holds (daze, daze_b, daze, ...: a slow sway). */
-export const DAZE_PERIOD = 48;
 /** Fear's tremble, ±1 screen px by the clock: [0, 1, 0, -1] every 4 frames. A pure function of the clock, added on
  *  top of the position each frame and never accumulated, so it averages 0 and is 0 when fear ends. */
 export const TREMBLE_STEPS = [0, 1, 0, -1] as const;
 export const trembleDx = (clock: number): number => TREMBLE_STEPS[Math.floor(clock / 4) % 4];
 
-/** What a status does to the idle (status-visuals.yaml `posture`): `daze` (sleep, stun) sways daze / daze_b, `stone`
- *  and `still` hold idle (no breathing), `tremble` (fear) breathes as normal (the tremble is an offset). */
+/** What a status does to the idle (status-visuals.yaml `posture`): `daze` (sleep, stun) and `kneel` (poison) kneel
+ *  (the KneelTrack, kneelChoreography.ts), `stone` and `still` hold idle (no breathing), `tremble` (fear) breathes as
+ *  normal (the tremble is an additive offset, statusRules.trembles). */
 export type Posture = StatusPosture;
 
-/** The idle frame: dazed enemies alternate daze / daze_b every DAZE_PERIOD; stone and still ones (and sheets without
- *  breathing) hold idle; the rest breathe (idle / idle_b every half period, out of phase per enemy). */
+/** The standing idle frame: stone and still enemies (and sheets without breathing) hold idle; the rest breathe (idle /
+ *  idle_b every half period, out of phase per enemy). A kneeler shows its KneelTrack frame instead. */
 export function idleFrame(clock: number, index: number, breath: boolean, posture: Posture = 'none'): MonsterFrame {
-  if (posture === 'daze') return Math.floor(clock / DAZE_PERIOD) % 2 === 0 ? 'daze' : 'daze_b';
   if (posture === 'stone' || posture === 'still' || !breath) return 'idle';
   return Math.floor((clock + index * 17) / (IDLE_PERIOD / 2)) % 2 === 0 ? 'idle' : 'idle_b';
 }
