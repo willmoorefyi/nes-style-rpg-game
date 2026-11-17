@@ -10,8 +10,8 @@ generator, so a chunk's pixels depend only on its own cells plus at most about o
 - `lattice(...)`: the value-noise lattices. Lattice point (i, j) sits at global pixel (i * cy, j * cx); its value is
   drawn from the rng of the chunk that contains that pixel.
 
-Window origins are whole chunks, so every pattern that repeats with the cell (T px) or the Bayer matrix (4 px) is
-the same in every window.
+Window origins are whole cells, so every pattern that repeats with the cell (T px) or the Bayer matrix (4 px; T is
+a multiple of 4) is the same in every window.
 """
 from __future__ import annotations
 
@@ -43,9 +43,9 @@ CTX = Frame()
 @contextmanager
 def frame(map_id: str, oy: int = 0, ox: int = 0, mh: int = 0, mw: int = 0):
     """Paint inside the window whose top-left pixel is global (ox, oy) of map `map_id`, a map of mw x mh px
-    (origins are whole chunks)."""
-    if oy % CPX or ox % CPX:
-        raise ValueError(f"frame origin ({ox}, {oy}) is not chunk-aligned")
+    (origins are whole cells)."""
+    if oy % T or ox % T:
+        raise ValueError(f"frame origin ({ox}, {oy}) is not cell-aligned")
     saved = (CTX.map_id, CTX.oy, CTX.ox, CTX.mh, CTX.mw)
     CTX.map_id, CTX.oy, CTX.ox, CTX.mh, CTX.mw = map_id, oy, ox, mh, mw
     try:

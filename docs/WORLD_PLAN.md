@@ -1719,7 +1719,7 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 - [ ] W1-0b: world data: world_api, build_hooks signatures, canon, stubs, site defaults, anchors file, town targets (priority: high, effort: 6h)
 - [ ] W1-A: vehicles and save, with the origin shift (priority: high, effort: 8h)
 - [ ] W1-B: NPC and field rules, takeGold, clinic, debug frame (priority: high, effort: 8h)
-- [ ] W1-C1: compiler core, per-chunk RNG, multi-rect --region, lock, memory probe (priority: high, effort: 8h)
+- [x] W1-C1: compiler core, per-chunk RNG, multi-rect --region, lock, memory probe (priority: high, effort: 8h)
 - [ ] W1-C2: composer, bands, seams, basins, act-1 translation, frozen core (priority: high, effort: 8h)
 - [ ] W1-D: kit placeholders and recolours; interiors_common town parameter; town_common.py extraction (priority: high, effort: 7h)
 - [ ] W1-E: chunk streaming (priority: high, effort: 6h)
@@ -1872,6 +1872,92 @@ world constants).
 <!-- === W1-B FOUNDATION (pass W: owned by W1-B) === -->
 <!-- === end W1-B === -->
 <!-- === W1-C1 FOUNDATION (pass W: owned by W1-C1) === -->
+### W1-C1 result: compiler core (branch `w-w1-c1`, rebased on `mainline` d72e369, after the W1-C2 and W1-H merges)
+
+No AI or paid calls. Scratch in `/tmp/w-w1-c1/`: the memory probes, the land-filled world generator and the
+previews.
+
+**Files:** `build_map.py`; `terrain/frame.py` (new: the raster frame, `chunk_rng`, the per-chunk noise lattice,
+`tile_at`), `terrain/region.py` (new: regions of a source, build digests, the stale-base check, the world-compile
+lock), `terrain/region_selftest.py` (new); `terrain/{__init__, base, outline, peaks, roads, selftest}.py`. Outside
+the owned set, two lines each: `map_graph.py` (`LAKE = 11` in `BLOCKED`) and `map_selftest.py` (its Lake and BLOCKED
+asserts).
+
+**What changed:**
+
+- **Per-chunk RNG (GAP-14).** Every draw uses `default_rng(crc32(f"{map_id}:{col}:{row}:{purpose}"))`: tufts, classic
+  and organic peaks, foothill rocks and forest clumps are placed chunk by chunk, each chunk walking its own cells.
+  Peaks, rocks and clumps keep their anchors half their spacing inside the chunk's border, so neighbouring chunks
+  keep the spacing without reading each other, and a clump's bulge test reads only its own chunk's clumps. The value
+  noise (`_noise`, `_vnoise`) is a lattice on global pixels whose points are drawn by the chunk that holds them. The
+  meander's knots are drawn per 768 px strip, with an even count per strip so that the signs alternate across strips.
+  Textures tile in their global phase. The partition samples in global low-res coordinates. Road curves are computed
+  relative to their cell. The peak spacing bins are global. A bridge chooses its deck from its own run, not from the
+  whole row.
+- **Raster windows.** `compile_map` does the cell work (collision, objects, entrances, transitions, checks) once over
+  the whole map. It paints the pixels window by window: the whole map is one window, and a `--region` rect gets a
+  window with a 1-chunk ring plus 4 cells (RING_PAD). The 4 cells are what a ring chunk's placements read. Objects
+  within 3 cells of a window are moved into it. One `_objects` walk serves both passes.
+- **`--region <r>` (multi-rect, GAP-19).** It reads the regions from `regions:`. For the world, `{stub, checks}` maps
+  to `world_api.BOXES`. A synthetic source may give `[[x0, y0, x1, y1], ...]` or `{rects: [...]}`. The command paints
+  each rect of the union, writes only the union's chunk files, takes the other chunks' `above` entries from the
+  base, and writes the whole yaml. A map with regions records `build: {compiler, boxes}`: a digest of the compiler
+  (its code and kit art) and one digest per region (its ground cells, its anchored objects and the map-wide paint
+  keys). A base that differs fails with `--region: stale base, run a full compile (<why>)`. `--check-determinism
+  --region <r>` works, as do `--src-dir DIR` and `--out DIR`.
+- **The world-compile lock.** It is an exclusive `fcntl.flock` on `/tmp/ff-game-world-compile.lock`, taken by the
+  CLI for every compile of `overworld` or of a source with regions: build, `--region` and `--check-determinism`. A
+  waiter prints `waiting for the world-compile lock`. At 30 min (`FFG_WORLD_LOCK_TIMEOUT`) it prints `world-compile
+  lock timeout after 30 min; holder pid <n>` and exits 3. The `--hash` children run with `FFG_WORLD_LOCK_HELD=1`.
+- **Legend.**
+  - `w` is swamp: TerrainType 6, a soft and wild material at the end of SOFT and WILD. Until W1-D adds the kit
+    texture, the fallback is a recoloured grass (`FALLBACK_MATERIALS`).
+  - Lake compiles to 11, and `BLOCKED` adds 11. The act-1 moat and tarn are now 11; the runtime CollisionMap already
+    reads 11 as Wall.
+- **Material remaps:** `materials: {name: {from, shade?, hue?, sat?}}` (HSV hue shift and saturation, then the RGB
+  shade); any other key is an error.
+- **Hooks:**
+  - `write()` calls `bake_patches` after it clears the folder and writes the chunks. In a region compile it deletes
+    only the region's chunk files.
+  - It then calls `passthrough` on the finished document.
+  - `validate()` calls `region_checks(src, grid, None)` and then once per region, for maps with regions. `grid` is
+    parse_ground's material names.
+- **`index.yaml`** lists only the sources that have a compiled map. Before this change, a partial build added the
+  137 uncompiled W1-0b stubs.
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `build_map.py --selftest` | `region yaml: OK`, `region multi-rect: OK` (two 2-rect regions, organic and classic), `locality: OK`, `region stale: OK`, `lock: OK`; `build_map selftest: 104 checks passed` (75 s, 2.0 GB) |
+| `/usr/bin/time -l build_map.py overworld --src-dir <land-filled> --out <scratch>` | exit 0, 87.6 s, max RSS **11.26 GB** (target 26 GB) |
+| `/usr/bin/time -l build_map.py overworld --region fire` (land-filled, over that base) | exit 0, 29.2 s, max RSS **5.10 GB** (target 10 GB); the output tree is byte-identical to the full compile's |
+| the same on the stub world (`assets-src/maps/overworld.yaml`) | full: 72.0 s, **11.77 GB**; `--region fire`: 21.9 s, **4.82 GB**, byte-identical to the full compile |
+| `build_map.py --check-determinism <the 22 act-1 maps> overworld` | every id `deterministic` (136.9 s, 11.5 GB) |
+| `cornelia.py`, `interiors.py`, `castle.py`, `world.py`, then `git diff --exit-code assets-src/maps` | clean (exit 0) |
+| `build_map.py <the 22 act-1 maps>` (not the world) | re-baseline: only `assets/maps/ai/cornelia/below_*.png` (all 20) change; every other chunk and every map yaml is byte-identical |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` (after the rebase on d72e369) | `Test Files 276 passed`, `Tests 5549 passed`. One earlier run had 1 failure in `tests/integration/battle.test.ts` ("command selection"). That file has nothing to do with maps. It passed alone twice, and the next full run was green |
+| `npm run build` | exit 0 |
+
+The land-filled world fills every non-A1 region outside its bands with the act-1 block's inner 60x60, tiled. That
+gives 12,951 grass, 4,302 forest, 3,850 mountain, 741 road, 547 river and 404 sand cells, against 13,842 ocean
+cells with the bands. It drops the world-only checks (basins, docks, unreachable cells). Its peak is close to the
+stub world's because the full-size output buffers and the per-material partition fields dominate; the materials
+add little. W1-C2 measured 9.9 GB with the old compiler.
+
+**Deviations / hand-offs:**
+
+- **Fixed while measuring.** `--region fire` first differed from the full compile on 2 chunks. The cause was the
+  peak spacing bins, which were taken in window coordinates. After that fix, a 1-chunk ring alone was not exact: a
+  ring chunk's peak order reads its range depth up to 3 cells past the chunk. RING_PAD fixes this. The selftest now
+  uses windows that start off the map origin and dense ranges, and it fails on both bugs.
+- **Lake = 11** needed `map_graph.BLOCKED` (owned by W1-C2) to include 11. Without it, the act-1 moat was walkable for
+  the checks.
+- **The compiled world is not committed** (W1-C2 commits it after this merge). `overworld --region <r>` on the repo
+  says `stale base` until that full compile lands.
+- **The patch crop.** `bake_patches` compiles its crop as its own map id at origin 0. Its noise and texture phase
+  therefore do not line up with the world around the patch. Frames now only need a cell-aligned origin, so a later
+  change could paint the crop in the world's frame.
 <!-- === end W1-C1 === -->
 <!-- === W1-C2 FOUNDATION (pass W: owned by W1-C2) === -->
 ### W1-C2 result: composer and world (branch `w-w1-c2` from `mainline` f2f2383; not yet rebased on W1-C1)

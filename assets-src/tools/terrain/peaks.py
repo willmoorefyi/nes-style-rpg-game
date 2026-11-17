@@ -157,7 +157,7 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
                 snow = s >= 1.0 and dcell >= 2 and rng.random() < 0.75
                 name = f"peak_{s}{'m' if rng.random() < 0.5 else ''}{'_snow' if snow else ''}"
                 img, (ax, ay) = var[name]
-                gy, gx = y // 40, x // 40
+                gy, gx = (y + CTX.oy) // 40, (x + CTX.ox) // 40     # global bins: the same in every window
                 near = [placed[j] for a in (-1, 0, 1) for b in (-1, 0, 1) for j in grid.get((gy + a, gx + b), [])]
                 if any((py - y) ** 2 + (px - x) ** 2 < (PEAK_SPACING * (s + ps) / 2) ** 2 for py, px, ps in near):
                     continue

@@ -83,6 +83,7 @@ BLOCKED = MC.BLOCKED
 # materials a kit may not have yet: (base material, hue shift, saturation factor, value factor) of a recoloured copy
 FALLBACK_MATERIALS = {"swamp": ("grass", 25, 0.55, 0.7)}
 OBJ_REACH = 3            # cells: an object's art reaches at most this far outside its footprint (raster windows)
+RING_PAD = 4             # cells beyond a raster window's 1-chunk ring (what a ring chunk's placements read)
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
 # rows of the approved castle_face texture (castle/masonry): two courses of plain ashlar that repeat vertically, and
@@ -387,7 +388,7 @@ def _recolor_rgb(tex: np.ndarray, hue: float, sat: float, val: float) -> np.ndar
 
 def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True, raster: list | None = None) -> Compiled:
     """Compile a map source. `raster` (a `--region` compile) lists the cell rects (x0, y0, x1, y1, inclusive,
-    chunk-aligned) whose pixels are painted, each in a window with a 1-chunk ring; the rest of `below` / `above`
+    chunk-aligned) whose pixels are painted, each in a window with a 1-chunk ring (raster_windows); the rest of `below` / `above`
     stays empty and `Compiled.known` marks the painted cells. Collision, entrances, transitions and the checks always
     cover the whole map."""
     mid = src["id"]
@@ -448,14 +449,18 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True, raster: lis
 
 def raster_windows(raster: list | None, wid: int, hgt: int):
     """((x0, y0, x1, y1) painted, (x0, y0, x1, y1) window) per rect: the whole map in one window, or each `raster`
-    rect (inclusive cells, chunk-aligned) in a window with a 1-chunk ring, clipped to the map."""
+    rect (inclusive cells, chunk-aligned) in a window with a 1-chunk ring plus RING_PAD cells, clipped to the map.
+    A chunk's placements (peaks, rocks, clumps, tufts) read its cells and up to about 3 cells round it, and its art
+    reaches about 2 cells into its neighbours: so the ring chunks are painted exactly (their surroundings are in the
+    window), and only they reach into the rect."""
     if raster is None:
         yield (0, 0, wid - 1, hgt - 1), (0, 0, wid - 1, hgt - 1)
         return
     for x0, y0, x1, y1 in raster:
         if x0 % CHUNK or y0 % CHUNK or not (0 <= x0 <= x1 < wid and 0 <= y0 <= y1 < hgt):
             raise MapError(f"raster rect {(x0, y0, x1, y1)} is not a chunk-aligned rect inside the {wid}x{hgt} map")
-        yield (x0, y0, x1, y1), (max(0, x0 - CHUNK), max(0, y0 - CHUNK), min(wid - 1, x1 + CHUNK), min(hgt - 1, y1 + CHUNK))
+        m = CHUNK + RING_PAD
+        yield (x0, y0, x1, y1), (max(0, x0 - m), max(0, y0 - m), min(wid - 1, x1 + m), min(hgt - 1, y1 + m))
 
 
 def _cell_tex(kit: K.Kit, name: str, x: int, y: int) -> np.ndarray:
@@ -465,7 +470,7 @@ def _cell_tex(kit: K.Kit, name: str, x: int, y: int) -> np.ndarray:
 
 def _raster(src: dict, kit: K.Kit, grid, owner: dict, objects: list[dict], seed: int,
             win: tuple[int, int, int, int]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Paint the window of cells win = (x0, y0, x1, y1) (inclusive; chunk-aligned origin): (below RGB, above RGBA,
+    """Paint the window of cells win = (x0, y0, x1, y1) (inclusive): (below RGB, above RGBA,
     the share of each cell's pixels drawn by objects)."""
     wx0, wy0, wx1, wy1 = win
     full_h, full_w = len(grid), len(grid[0])

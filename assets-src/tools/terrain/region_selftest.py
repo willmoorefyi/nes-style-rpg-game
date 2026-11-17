@@ -1,8 +1,9 @@
-"""Region selftests (build_map.py --selftest): a synthetic 3x2-chunk world with three regions compiled in full and by
+"""Region selftests (build_map.py --selftest): a synthetic 4x3-chunk world with four regions compiled in full and by
 region (docs/QUEST_PLAN.md 3.5, docs/WORLD_PLAN.md 2.9 and 5.2 W1-C1).
 
-  region yaml: OK        a region compile's map yaml and chunk files equal the full compile's
-  region multi-rect: OK  the same for a region of two rects (an L), with organic and classic terrain
+  region yaml: OK        a region compile's map yaml and chunk files equal the full compile's (a window that does not
+                         start at the map's origin)
+  region multi-rect: OK  the same for regions of two rects (an L), with organic and classic terrain
   locality: OK           editing one region (cells and objects) changes only that region's chunk files, byte for byte
   region stale: OK       a region compile over a base whose other regions changed fails; the edited region's own
                          compile equals the full compile of the edited source
@@ -20,8 +21,12 @@ from pathlib import Path
 
 from .region import LOCK_PATH, RegionError, region_chunks, world_lock
 
-CW, CH = 48, 32                                    # cells: 3 x 2 chunks
-REGIONS = {"a": [[0, 0, 15, 31]], "b": [[16, 0, 47, 15], [32, 16, 47, 31]], "c": [[16, 16, 31, 31]]}
+CW, CH = 64, 48                                    # cells: 4 x 3 chunks
+# d's window (its ring) starts at (16, 16) and b's second rect's at (32, 0): windows off the map's origin
+REGIONS = {"a": [[0, 0, 15, 47]], "b": [[16, 0, 63, 15], [48, 16, 63, 47]], "c": [[16, 16, 31, 47], [32, 16, 47, 31]],
+           "d": [[32, 32, 47, 47]]}
+# the source names them as world regions (so build_hooks.region_checks finds them; they declare no checks)
+NAMES = {"a": "water", "b": "ordeal", "c": "wind", "d": "fire"}
 BAND = 2
 
 
@@ -44,15 +49,15 @@ def _band(x: int, y: int) -> bool:
 
 def world(edit: bool = False, organic: bool = True) -> dict:
     """The synthetic source: per region, blobs of every wild material, a road, a river, trees and a boulder deco,
-    with 2-cell ocean bands on every region edge and the map edge. `edit` changes region c only."""
+    with 2-cell ocean bands on every region edge and the map edge. `edit` changes region d only."""
     g = [["." for _ in range(CW)] for _ in range(CH)]
     objects, entrances = [], {}
     for name in REGIONS:
-        rng = random.Random(f"{name}{'+' if edit and name == 'c' else ''}")
+        rng = random.Random(f"{name}{'+' if edit and name == 'd' else ''}")
         cells = [(x, y) for y in range(CH) for x in range(CW) if _owner(x, y) == name and not _band(x, y)]
-        for m in "ffmmsw≈o" * 2:
+        for m in "ffmmmsw≈o" * 2:
             cx, cy = rng.choice(cells)
-            rad = rng.uniform(1.2, 2.8)
+            rad = rng.uniform(1.2, 2.8) * (1.6 if m == "m" else 1)       # wide ranges: many peaks per chunk
             for x, y in cells:
                 if (x - cx) ** 2 + (y - cy) ** 2 <= rad * rad:
                     g[y][x] = m
@@ -77,7 +82,7 @@ def world(edit: bool = False, organic: bool = True) -> dict:
                 g[y][x] = "o"
     src = {"id": "rworld", "kits": ["overworld", "town"], "ground": "\n".join("".join(r) for r in g),
            "entrances": entrances, "objects": objects, "unreachable_ok": [k for k in entrances][1:],
-           "regions": REGIONS}
+           "regions": {NAMES[k]: {"rects": v, "checks": {}} for k, v in REGIONS.items()}}
     if organic:
         src["terrain"] = "organic"
     return src
@@ -109,19 +114,21 @@ def selftest() -> int:
             B.write(src, c, d, kit=kit)
             full = _snapshot(d)
             assert all(f in full for f in _chunk_files(d, "rworld", "a") if "below" in f), "full compile wrote no chunks"
-            for region in ("a", "b"):
+            for region in ("d", "b", "c"):
                 for f in _chunk_files(d, "rworld", region):
                     (d / f).unlink(missing_ok=True)
-                B.build_region(src, region, d)
+                B.build_region(src, NAMES[region], d)
                 diff = _diff(full, _snapshot(d))
                 assert not diff, f"region {region} ({'organic' if organic else 'classic'}) differs from full: {diff}"
             if organic:
-                print("region yaml: OK (region a: rworld.yaml and its chunks equal the full compile's)")
+                print("region yaml: OK (region d, a window off the map origin: rworld.yaml and its chunks equal "
+                      "the full compile's)")
                 ok += 1
-        print("region multi-rect: OK (region b, two rects, equals the full compile, organic and classic terrain)")
+        print("region multi-rect: OK (regions b and c, two rects each, equal the full compile, organic and classic "
+              "terrain)")
         ok += 1
 
-        # locality: edit region c; a full compile changes only c's chunk files (and c's digest)
+        # locality: edit region d; a full compile changes only d's chunk files (and d's digest)
         src = world()
         c, kit = B.compile_source(src)
         B.write(src, c, d, kit=kit)
@@ -134,29 +141,29 @@ def selftest() -> int:
             shutil.copytree(d, d2, dirs_exist_ok=True)
             B.write(edited, ce, d2, kit=kit)
             after = _snapshot(d2)
-            mine = set(_chunk_files(d, "rworld", "c"))
+            mine = set(_chunk_files(d, "rworld", "d"))
             changed = _diff(before, after)
             chunk_changes = [f for f in changed if f.endswith(".png")]
-            assert chunk_changes and set(chunk_changes) <= mine, f"locality: edit of c changed {chunk_changes}"
+            assert chunk_changes and set(chunk_changes) <= mine, f"locality: edit of d changed {chunk_changes}"
             assert changed == sorted(chunk_changes + ["rworld.yaml"]), changed
             import yaml  # noqa: PLC0415
             b0 = yaml.safe_load(before["rworld.yaml"])["build"]["boxes"]
             b1 = yaml.safe_load(after["rworld.yaml"])["build"]["boxes"]
-            assert [k for k in b0 if b0[k] != b1[k]] == ["c"], (b0, b1)
-            print(f"locality: OK (editing region c changed {len(chunk_changes)} of its {len(mine)} chunk files, "
+            assert [k for k in b0 if b0[k] != b1[k]] == [NAMES["d"]], (b0, b1)
+            print(f"locality: OK (editing region d changed {len(chunk_changes)} of its {len(mine)} chunk files, "
                   "nothing else)")
             ok += 1
             # stale: d holds the base of the unedited source; a region a compile of the edited source must fail
             try:
-                B.build_region(edited, "a", d)
-                raise AssertionError("--region over a base whose region c changed must fail")
+                B.build_region(edited, NAMES["a"], d)
+                raise AssertionError("--region over a base whose region d changed must fail")
             except RegionError as e:
                 assert "stale base, run a full compile" in str(e), e
-            B.build_region(edited, "c", d)
+            B.build_region(edited, NAMES["d"], d)
             after["rworld.yaml"] = after["rworld.yaml"].replace(str(d2.resolve()).encode(), str(d.resolve()).encode())
             diff = _diff(after, _snapshot(d))
-            assert not diff, f"region c of the edited source differs from its full compile: {diff}"
-            print("region stale: OK (a over a changed c fails; c's own compile equals the full compile)")
+            assert not diff, f"region d of the edited source differs from its full compile: {diff}"
+            print("region stale: OK (a over a changed d fails; d's own compile equals the full compile)")
             ok += 1
     ok += _lock_case()
     return ok
