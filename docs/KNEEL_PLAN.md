@@ -722,6 +722,8 @@ Ruled: **R1 = no** (enemies never kneel at low HP), **R2 = yes** (poison kneels,
 | 2026-11-17 | U1 / R7 | the user handed the monster pilot and the U2 body review to the orchestrator, with a review agent; max 3 iterations per monster; report limit hits (user) |
 | 2026-11-17 | R4 / R5 / R6 | defaults: keep daze, exempt colossus F2-F4, accept pages (orchestrator, user unattended) |
 | 2026-11-17 | K1 | merged (eca44a9); atlases rebuilt: 9 pages, preload [0]; 5063 tests (the G10 floor); lockdiff accepts the hero lock names |
+| 2026-11-17 | D-K11 / D-K19 amended | kneeling mechanicals use `mech_kneel`: the legs follow the biped limb cap and band (0.68-0.85), the arms, torso and head stay <= 15 deg; the reviewer asked for the knee on the ground (orchestrator) |
+| 2026-11-17 | review loop | an independent image reviewer judges every tranche; max 3 iterations per sprite, the best iteration is kept and the 3-iteration hits are reported to the user (user) |
 
 ## TODOs
 
