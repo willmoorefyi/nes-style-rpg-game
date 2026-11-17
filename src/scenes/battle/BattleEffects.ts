@@ -39,7 +39,7 @@ export class BattleEffects {
     // a colossus (its proxy) takes the number at its core anchor, kept inside the field (docs/CHAOS_FORMS_PLAN.md 4.4)
     const core = colossusAt(sprite)?.anchors().core;
     const { y, minY } = floatPlacement(core?.y ?? sprite.y, iconRowBottom);
-    const text = createFloatingNumber(label, kind, core ? { x: core.x, width: 0 } : sprite, y);
+    const text = createFloatingNumber(label, kind, core ? { x: core.x, width: 0 } : sprite, y, core !== undefined);
     this.layers.fx.numbers.addChild(text);
     this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES, minY });
   }

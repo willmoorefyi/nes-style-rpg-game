@@ -20,7 +20,8 @@ import { resolveMapPath } from '../../systems/MapLoader.js';
 import { BestiaryPreview, CachedArt } from './BestiaryPreview.js';
 import { BestiaryStatsPanel } from './BestiaryStatsPanel.js';
 import { buildEntries, seenFlag, spellIdsOf, statLines, titleCount, type BestiaryEntry } from './bestiaryModel.js';
-import { pageCount, pageLines } from './bestiaryInfo.js';
+import { linkTarget, pageCount, pageEntry, pageLines } from './bestiaryInfo.js';
+import { listedCount, withFormSubEntries } from './bestiaryForms.js';
 import { backgroundFor, habitatsOf, type Habitat } from './bestiaryHabitats.js';
 import { takeBestiaryStartEntry } from './bestiaryLink.js';
 import { neighbourSprites, showWhenReady } from './bestiaryPages.js';
@@ -102,7 +103,8 @@ export class BestiaryScene implements Scene {
 
   private build(book: Book): void {
     const { data } = book;
-    const entries = buildEntries(book.enemies, data, book.habitats, (id) => this.game.gameFlags.has(seenFlag(id)));
+    const isSeen = (id: string): boolean => this.game.gameFlags.has(seenFlag(id));
+    const entries = withFormSubEntries(buildEntries(book.enemies, data, book.habitats, isSeen), book.enemies, data, isSeen);
     const titleWin = new Window({ ...TITLE_RECT });
     const title = text(data.labels.title);
     const count = text();
@@ -118,14 +120,14 @@ export class BestiaryScene implements Scene {
       this.deps.loadTexture ?? ((path) => Assets.load<Texture>(path)), data);
 
     const start = takeBestiaryStartEntry();
-    let initialIndex = start ? entries.findIndex((e) => e.id === start) : 0;
-    if (initialIndex < 0) {
+    let at = start ? linkTarget(entries, start, data) : { index: 0, page: 0 };   // a form id opens its entry or F4's page
+    if (!at) {
       console.warn(`Bestiary: no enemy "${start}"; opening on 001`);
-      initialIndex = 0;
+      at = { index: 0, page: 0 };
     }
     const listWin = new Window({ ...LIST_RECT });
     const menu = new Menu({ items: entries.map((e) => ({ label: e.label, value: e.id, enabled: e.seen })),
-      x: listWin.contentX, y: listWin.contentY, maxVisible: data.listRows, initialIndex,
+      x: listWin.contentX, y: listWin.contentY, maxVisible: data.listRows, initialIndex: at.index,
       onSelect: () => preview.skip(), onCancel: () => this.close() });
     listWin.addChild(menu);
     this.container.addChild(listWin);
@@ -137,7 +139,7 @@ export class BestiaryScene implements Scene {
 
     this.ui = { book, entries, menu, preview, stats, count, boss };
     this.statsIndex = -1;
-    this.page = 0;
+    this.page = at.page;
     this.previewIndex = -1;
     this.showStats(menu.selectedIndex);
     this.showPreview(menu.selectedIndex);
@@ -163,7 +165,10 @@ export class BestiaryScene implements Scene {
       ui.preview.togglePause();
     } else if (input.isJustPressed('start')) {
       const entry = ui.entries[ui.menu.selectedIndex];
+      const form = (): BestiaryEntry | undefined => entry && pageEntry(entry, ui.book.data, this.page).entry;
+      const was = form();
       if (entry) this.page = (this.page + 1) % pageCount(entry, ui.book.data);
+      if (form() !== was) this.previewIndex = -1;     // F3's pages <-> F4's: the preview rebuilds (debounced)
       this.statsIndex = -1;
     }
     ui.menu.update(input);
@@ -187,17 +192,19 @@ export class BestiaryScene implements Scene {
     const { data, spellNames } = ui.book;
     this.page = Math.min(this.page, pageCount(entry, data) - 1);
     const spellName = (id: string): string => spellNames.get(id) ?? data.spellNames[id] ?? id.toUpperCase();
-    ui.stats.setLines(pageLines(entry, data, this.page, () => statLines(entry, data, spellName)));
-    ui.count.text = titleCount(entry, ui.entries.length, data);
-    ui.boss.text = entry.boss ? data.labels.boss : '';
+    const { entry: shown, page } = pageEntry(entry, data, this.page);   // F4's pages show the Core record
+    ui.stats.setLines(pageLines(shown, data, page, () => statLines(shown, data, spellName)));
+    ui.count.text = titleCount(shown, listedCount(ui.entries), data);
+    ui.boss.text = shown.boss ? data.labels.boss : '';
   }
 
   private showPreview(i: number): void {
     const ui = this.ui;
-    const entry = ui?.entries[i];
-    if (!ui || !entry) return;
+    const listed = ui?.entries[i];
+    if (!ui || !listed) return;
     this.previewIndex = i;
     const data = ui.book.data;
+    const entry = pageEntry(listed, data, this.page).entry;
     const bg = entry.seen ? backgroundFor(entry.id, entry.habitats, data) : data.backgrounds.default;
     const show = (): void => ui.preview.show({ enemy: entry.enemy, seen: entry.seen, hasSpells: spellIdsOf(entry.enemy).length > 0 }, bg);
     showWhenReady(this.deps.art ?? battleArt, entry.seen ? monsterSpriteKey(entry.enemy) : null, neighbourSprites(ui.entries, i),

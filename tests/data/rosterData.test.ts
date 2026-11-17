@@ -194,7 +194,7 @@ describe('roster data: bestiary lore and backgrounds', () => {
 
   it('every background override is a committed staged id', () => {
     const staged = ['abandoned_castle', 'cave', 'dark_forest', 'desert', 'evil_temple', 'forest', 'grassland', 'marsh', 'ocean',
-      'river', 'ruined_forest', 'shoreline', 'swamp', 'temple', 'waterfall'];
+      'river', 'rim', 'ruined_forest', 'shoreline', 'swamp', 'temple', 'waterfall'];   // rim: Chaos's arena (C6-13)
     for (const [id, bg] of Object.entries(bestiary.backgrounds.enemies)) expect(staged, id).toContain(bg);
   });
 

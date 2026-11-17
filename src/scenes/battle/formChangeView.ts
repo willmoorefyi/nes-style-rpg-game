@@ -9,7 +9,8 @@
  * B5 (18.8 row 2c): a round-start line that names an interlude (a non-form phase: chaos_crack on F3's 0.25) plays that
  * script in place of the line (`startLine`, from BattleScene.showMessages); without the script the line's text shows.
  * At an interlude's end the backdrop takes the forms' sky dim (D-O19: set at the end of chaos_i2), and a `tint` step
- * multiplies with the dim in force.
+ * multiplies with the dim in force. A `fade` dims the field only (C6-10, D-C7-9: between the message window and the
+ * bottom windows, inset by the shake's 3 px so a shake never carries it onto a window); a `flash` stays full screen.
  */
 import { Graphics } from 'pixi.js';
 import type { ActionResult } from '../../battle/BattleStateMachine.js';
@@ -20,6 +21,8 @@ import { colossusArt } from '../../rendering/ColossusArt.js';
 import { interludes as sharedInterludes, type InterludeSource } from '../../data/InterludeRegistry.js';
 import type { BattleDisplayManager } from './BattleDisplayManager.js';
 import { BATTLE_MESSAGE_FRAMES, holdFrames } from './battleTiming.js';
+import { BATTLE_MESSAGE_HEIGHT, STRIP_Y } from './BattleSceneTypes.js';
+import { SHAKE_PX } from './screenShake.js';
 import { colossusOf, variantOf } from './colossus/colossusIndex.js';
 import { greyTint } from './colossus/colossusSprites.js';
 import { END_HOLDOFF, type DissolveStyle, type InterludePose, type InterludeStep } from './formInterlude.js';
@@ -152,7 +155,9 @@ export class FormChangeView implements FormChangeHook {
       this.deps.display.layers.fx.flash.addChild(g);
     }
     g.clear();
-    if (alpha > 0) g.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill({ color, alpha });
+    if (alpha <= 0) return;
+    if (which === 'flashG') g.rect(0, 0, GAME_WIDTH, GAME_HEIGHT).fill({ color, alpha });
+    else g.rect(-SHAKE_PX, BATTLE_MESSAGE_HEIGHT + SHAKE_PX / 2, GAME_WIDTH + 2 * SHAKE_PX, STRIP_Y - BATTLE_MESSAGE_HEIGHT - SHAKE_PX).fill({ color, alpha });
   }
 
   private host(fc: FormChange): InterludeHost {

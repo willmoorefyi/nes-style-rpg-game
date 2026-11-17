@@ -6,8 +6,9 @@
 import { fadeTail, stepAlpha, type FxBox, type FxDraw } from './emitterCore.js';
 
 /** Where an overlay plays: the head (topmost opaque row's centre), the body box, and which way the actor faces
- *  (1: right, the enemies; -1: left, the party). */
-export interface StatusAnchor { head: { x: number; y: number }; box: FxBox; facing: 1 | -1 }
+ *  (1: right, the enemies; -1: left, the party). `beside` (a colossus, C6-6): the icon row's centre row and the core
+ *  box's left and right edges, where the blind cloud sits instead of round the head. */
+export interface StatusAnchor { head: { x: number; y: number }; box: FxBox; facing: 1 | -1; beside?: { y: number; left: number; right: number } }
 
 export type StatusOverlay = (t: number, a: StatusAnchor) => FxDraw[];
 
@@ -50,8 +51,13 @@ const bubbles: StatusOverlay = (t, a) => [0, 1, 2].flatMap((k) => {
   return [draw('bubble.poison', age < 30 ? 0 : 1, x, y)];
 });
 
-/** BLIND: 2 dark ink puffs drifting slowly round the head. */
+/** Screen px from the core box's edge to an ink puff's centre on a colossus (half the 32 px puff plus 8). */
+const INK_BESIDE = 24;
+/** BLIND: 2 dark ink puffs drifting slowly round the head; on a colossus one each side of the core box, level with the
+ *  icon row, bobbing 2 px (never over the disc). */
 const ink: StatusOverlay = (t, a) => [0, 1].map((k) => {
+  const b = a.beside;
+  if (b) return draw('ink.blind', Math.floor(t / 20 + k) % 2, k === 0 ? b.left - INK_BESIDE : b.right + INK_BESIDE, b.y + (Math.floor(t / 30 + k) % 2) * 2, 0.75);
   const p = orbit(t, a, k, 2, 120, Math.max(18, a.box.w * 0.3), 6);
   return draw('ink.blind', Math.floor(t / 20 + k) % 2, p.x, p.y + 4, 0.75);
 });

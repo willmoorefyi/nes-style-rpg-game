@@ -12,7 +12,7 @@ import { checkBossPhases, reservedItems, resolveActionTarget, type BattleMessage
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { executeFight, type PhysicalHitDeps } from './physicalHit.js';
 import { resolvePendingForms, type FormChangeResult, type FormContext, type FormState } from './bossForms.js';
-import { setEnemyHp } from './enemyHp.js';
+import { applyStartHp, setEnemyHp } from './enemyHp.js';
 import { losesTurn, type PresentHold, type TickSubject } from './StatusTick.js';
 import { runTurn } from './turnTick.js';
 import { xpShare } from './Rewards.js';
@@ -50,6 +50,7 @@ export interface BattleConfig {
   bossPatterns?: Map<string, BossPattern>;
   /** The form records the enemies can change into (CHAOS_FORMS_PLAN 2.2; `formChain`). */
   forms?: EnemyData[];
+  enemyHp?: Record<number, number>; // debug scenarios: start HP per enemy index, fractions of the pool (applyStartHp)
 }
 
 export interface BattleResult {
@@ -141,6 +142,7 @@ export class BattleStateMachine {
     this.party = config.party;
     this.partyById = new Map(config.party.map((c, i) => [`party_${i}`, c]));
     this.enemies = makeEnemyInstances(config.enemies);
+    applyStartHp(this.enemies, config.enemyHp);
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
@@ -269,13 +271,15 @@ export class BattleStateMachine {
   /** B5: how many of `itemId` the party's commands this round already use (undo releases them). */
   reservedItems(itemId: string): number { return reservedItems(this.commands, itemId); }
 
+  private _roundFormChange: FormChangeResult | null = null;   // M4 (CHAOS_FIX_PLAN 2.4): the view plays it first
+  /** The form change the last `prepareRound` made, else null. */ get roundFormChange(): FormChangeResult | null { return this._roundFormChange; }
   prepareRound(): void {
     if (this._state !== 'execution') return;
     this.messages = [];
     this.turnNumber++;
 
-    // Check boss phase transitions before generating enemy commands (a reached form floor first: R5)
-    resolvePendingForms(this.formCtx, text => this.messages.push({ text }));
+    // Check boss phase transitions before generating enemy commands (a reached form floor first, no arrival: R5, M4)
+    this._roundFormChange = resolvePendingForms(this.formCtx, text => this.messages.push({ text }), false);
     for (const enemy of this.livingEnemies) {
       checkBossPhases(enemy, this.bossPatterns, line => this.messages.push(line));
     }

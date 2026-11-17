@@ -47,6 +47,9 @@ export const BATTLE_MESSAGE_HEIGHT = 120;
 export const FLOAT_FONT = 48;
 export const FLOAT_OUTLINE = 0x101018;
 export const FLOAT_COLORS = { hit: 0xffffff, crit: 0xff4444, heal: 0x44ff44, miss: 0xa0a0a0 } as const;
+/** C6-4 (D-C7-12): on a colossus (the black disc) a number takes a light outline and a brighter crit red. */
+export const FLOAT_OUTLINE_LIGHT = 0xf8f8f8;
+export const FLOAT_CRIT_ON_DARK = 0xff6a6a;
 /** The party HP panel rows. */
 export const PANEL_FONT = 32;
 

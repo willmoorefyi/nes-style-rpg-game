@@ -3,7 +3,7 @@ import type { DamageEvent } from '../../battle/BattleStateMachine.js';
 import { OutlinedText } from '../../ui/NESFont.js';
 import { getSettings, type MessageSpeed } from '../../core/Settings.js';
 import { SPEED_MULTIPLIER } from './battleTiming.js';
-import { FLOAT_COLORS, FLOAT_FONT, FLOAT_OUTLINE } from './BattleSceneTypes.js';
+import { FLOAT_COLORS, FLOAT_CRIT_ON_DARK, FLOAT_FONT, FLOAT_OUTLINE, FLOAT_OUTLINE_LIGHT } from './BattleSceneTypes.js';
 
 export type FloatKind = keyof typeof FLOAT_COLORS;
 
@@ -40,9 +40,11 @@ export function floatPlacement(top: number, iconRowBottom: number | null): { y: 
   return { y: Math.max(Math.round(top), minY + RISE_MIN), minY };
 }
 
-/** BA-8: a 48 px number with a dark outline, centred over the top of `sprite` (below its icon row, F6). */
-export function createFloatingNumber(label: string, kind: FloatKind, sprite: Pick<Container, 'x' | 'width'> & { y?: number }, y = Math.round(sprite.y ?? 0)): OutlinedText {
-  const text = new OutlinedText({ text: label, fontSize: FLOAT_FONT, fill: FLOAT_COLORS[kind], outline: FLOAT_OUTLINE, outlineWidth: 3 });
+/** BA-8: a 48 px number with a dark outline, centred over the top of `sprite` (below its icon row, F6). `onDark` (a
+ *  colossus target, C6-4): a light outline and the brighter crit red, so the number reads on the black disc. */
+export function createFloatingNumber(label: string, kind: FloatKind, sprite: Pick<Container, 'x' | 'width'> & { y?: number }, y = Math.round(sprite.y ?? 0), onDark = false): OutlinedText {
+  const fill = onDark && kind === 'crit' ? FLOAT_CRIT_ON_DARK : FLOAT_COLORS[kind];
+  const text = new OutlinedText({ text: label, fontSize: FLOAT_FONT, fill, outline: onDark ? FLOAT_OUTLINE_LIGHT : FLOAT_OUTLINE, outlineWidth: 3 });
   // the NES font is monospace at about 0.6 em per glyph
   const approxWidth = label.length * FLOAT_FONT * 0.6;
   text.position.set(Math.round(sprite.x + sprite.width / 2 - approxWidth / 2), y);

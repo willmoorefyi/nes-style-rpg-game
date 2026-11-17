@@ -28,7 +28,7 @@ export const DEFAULT_BESTIARY: BestiaryData = {
   templates: {
     entry: '{num} {name}', titleCount: '{entry}  {index}/{total}', damage: '{min}-{max}', hits: 'x{hits}',
     fight: 'Fight x{hits}', statusHit: '{pct}% (spell accuracy {acc})', phase: 'At {pct}% HP', phaseHits: 'Fight x{hits}',
-    phaseAttack: 'Attack {attack}', phaseMessage: '"{message}"', habitatMain: '{map}', habitatZone: '{map} ({zones})',
+    phaseAttack: 'Attack {attack}', phaseMessage: '"{message}"', phaseForm: 'becomes the {form}', habitatMain: '{map}', habitatZone: '{map} ({zones})',
     habitatBoss: '{map} (boss)', notPlaced: 'Not placed yet', list: ', ', special: '{name} {pct}%',
     loreTitle: 'Lore {page}/{pages}',
   },
@@ -38,6 +38,7 @@ export const DEFAULT_BESTIARY: BestiaryData = {
   statuses: { poison: 'Poison', stun: 'Paralysis', sleep: 'Sleep', blind: 'Blind', stone: 'Stone', death: 'Death' },
   spellNames: {},
   specialNames: {},
+  formTitles: {},
   lore: {},
   help: 'Up/Down: scroll   Left/Right: page   Z: next move   C: info/lore   Shift: pause   X: close',
 };
@@ -155,6 +156,7 @@ export function validateBestiary(raw: unknown, path = 'bestiary.yaml'): Bestiary
     statuses: c.record(src.statuses, d.statuses, 'statuses'),
     spellNames: c.record(src.spellNames, d.spellNames, 'spellNames'),
     specialNames: c.record(src.specialNames, d.specialNames, 'specialNames'),
+    formTitles: src.formTitles === undefined ? {} : c.record(src.formTitles, d.formTitles, 'formTitles'),
     lore: lore(c, src.lore),
     help: c.value(src, 'help', d.help, isStr),
   };

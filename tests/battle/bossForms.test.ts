@@ -12,7 +12,7 @@ import { formChain, formFloor } from '../../src/battle/bossForms.js';
 import { setEnemyHp } from '../../src/battle/enemyHp.js';
 import { Character } from '../../src/entities/Character.js';
 import type { EnemyData, SpellData } from '../../src/types/index.js';
-import { testClass, testEnemy } from '../helpers/testUtils.js';
+import { mulberry32, testClass, testEnemy } from '../helpers/testUtils.js';
 
 const POOL = 6000;
 const SPELLS: SpellData[] = [
@@ -285,5 +285,213 @@ describe('an interlude on a non-form phase (CHAOS_FORMS_PLAN 18.8 row 2c, B5)', 
     setEnemyHp(boss(bsm), 1400);
     const rs = round(bsm, idle);
     expect(rs[0].messages).toEqual([{ text: 'The horizon groans!' }]);
+  });
+});
+
+/*
+ * CHAOS_FIX_PLAN rev 3, 2.4 (M1-M6) and 5.1a-e: the gated phases (a phase with `form` or `interlude` holds the HP floor
+ * while uncrossed), the one rounding rule `hp <= ceil(t * pool)`, the reach that respects the gated floor (the crack
+ * crosses at the next round start), the round-start change (`roundFormChange`, no arrival), the arrival turn
+ * (`arrivalTurn`) and M5 (a write never raises HP to a floor). Synthetic chain g1 -> g4, POOL = 6000; every
+ * expectation is written as `Math.ceil(t * POOL)`.
+ */
+const CRACK_LINE = 'The horizon groans!';
+const gform = (id: string, extra: Partial<EnemyData>, stats: Partial<EnemyData['stats']> = {}, pool = POOL): EnemyData =>
+  testEnemy({ id, name: 'Chaos', sprite: 'chaos', size: 'boss', ...(id === 'g1' ? {} : { formOf: 'g1' }), ...extra,
+    stats: { hp: pool, agility: 1, attack: 10, defense: 0, magicDefense: 0, evade: 0, accuracy: 0, hits: 1, ...stats } });
+const G1 = gform('g1', {
+  ai: { rate: 1, actions: [{ type: 'magic', spellId: 'fast', weight: 1 }] },
+  bossPhases: [{ hpThreshold: 0.7, patternId: 'p', form: 'g2', interlude: 'i1', arrivalTurn: true }],
+});
+const G1_FIRST = { ...G1, stats: { ...G1.stats, agility: 250 } };
+const G2 = gform('g2', {
+  ai: { rate: 1, actions: [{ type: 'magic', spellId: 'fir2', weight: 1 }, { type: 'magic', spellId: 'fast', weight: 1 }] },
+  bossPhases: [{ hpThreshold: 0.4, patternId: 'p', form: 'g3', interlude: 'i2', arrivalTurn: true }],
+});
+const G3 = gform('g3', { bossPhases: [
+  { hpThreshold: 0.25, patternId: 'p', message: CRACK_LINE, hits: 4, interlude: 'chaos_crack' },
+  { hpThreshold: 0.15, patternId: 'p', form: 'g4', interlude: 'i3', arrivalTurn: true },
+] }, { hits: 3 });
+const G4 = gform('g4', {}, { hits: 2 });
+const GFORMS = [G2, G3, G4];
+/** The spells the re-chosen slot and the arrival pick with mulberry32(1) (measured; the order is what is pinned). */
+const SEED1_ORDER = ['fir2', 'fast'];
+
+function gbattle(party: Character[], rng: () => number, enemies: EnemyData[], forms: EnemyData[] = GFORMS): BattleStateMachine {
+  const bsm = new BattleStateMachine({ party, enemies, spells: SPELLS, canRun: false, forms }, rng);
+  for (const [i, e] of enemies.entries()) if (e.ai) bsm.setEnemyAI(i, new BossAI({ actions: e.ai.actions.map((a) => ({ ...a })) }, SPELLS));
+  bsm.startBattle();
+  bsm.advanceFromIntro();
+  return bsm;
+}
+
+interface Played {
+  start: ActionResult['messages'];
+  startChange: ActionResult['formChange'] | null;
+  acts: { actor: string | undefined; form: string; r: ActionResult }[];
+}
+/** One round with the actor (peeked) and the boss's form before each action. */
+function play(bsm: BattleStateMachine, cmd: (id: string) => Parameters<BattleStateMachine['submitCommand']>[0]): Played {
+  while (bsm.state === 'command_select') bsm.submitCommand(cmd(bsm.currentCommandActorId!));
+  bsm.prepareRound();
+  const out: Played = { start: [...bsm.currentMessages], startChange: bsm.roundFormChange ?? null, acts: [] };
+  for (;;) {
+    const actor = bsm.peekNextAction()?.actorId;
+    const formId = boss(bsm).data.id;
+    const r = bsm.executeNextAction();
+    out.acts.push({ actor, form: formId, r });
+    if (r.done) break;
+  }
+  bsm.resolveRound();
+  return out;
+}
+const chaosActs = (p: Played): number => p.acts.filter((a) => a.actor === 'enemy_0').length;
+/** The chain's events in order: round-start changes, round-start interlude lines, and action changes. */
+function events(p: Played): string[] {
+  const out: string[] = [];
+  if (p.startChange) out.push(`start:${p.startChange.from}>${p.startChange.to}:${p.startChange.interlude}`);
+  for (const m of p.start) if (m.interlude) out.push(`line:${m.interlude}`);
+  for (const a of p.acts) if (a.r.formChange) out.push(`act:${a.r.formChange.from}>${a.r.formChange.to}:${a.r.formChange.interlude}`);
+  return out;
+}
+
+describe('5.1a: the gated crack floor (M1-M3)', () => {
+  it('F3 at ceil(0.30 * POOL): one 9999 hit leaves ceil(0.25 * POOL); the crack plays at the next round start; F4 only after a later hit', () => {
+    const bsm = gbattle([hero(9999)], () => 0.5, [G3]);
+    boss(bsm).currentHp = Math.ceil(0.30 * POOL);
+    const r1 = play(bsm, fight);
+    expect(boss(bsm).currentHp).toBe(Math.ceil(0.25 * POOL));
+    expect([boss(bsm).data.id, events(r1)]).toEqual(['g3', []]);
+    const r2 = play(bsm, fight);
+    expect(r2.start).toEqual([{ text: CRACK_LINE, interlude: 'chaos_crack' }]);
+    expect(events(r2)).toEqual(['line:chaos_crack', 'act:g3>g4:i3']);
+    expect(boss(bsm).currentHp).toBe(Math.ceil(0.15 * POOL));
+  });
+});
+
+describe('5.1b: the arrival turn (M6), the six cases of 2.4', () => {
+  it('a hero reaches the floor while Chaos still has a queued slot: the arrival runs next, then the re-chosen slot (2 Chaos actions)', () => {
+    const p = play(gbattle([hero(9999)], () => 0.5, [G1]), fight);
+    expect(p.acts.map((a) => [a.actor, a.form])).toEqual([['party_0', 'g1'], ['enemy_0', 'g2'], ['enemy_0', 'g2']]);
+    expect(chaosActs(p)).toBe(2);
+  });
+
+  it('Chaos already acted this round: the arrival is its only further action (2 in total)', () => {
+    const p = play(gbattle([hero(9999, 1)], () => 0.5, [G1_FIRST]), fight);
+    expect(p.acts.map((a) => [a.actor, a.form])).toEqual([['enemy_0', 'g1'], ['party_0', 'g1'], ['enemy_0', 'g2']]);
+    expect(chaosActs(p)).toBe(2);
+  });
+
+  it('Chaos\'s own end-of-turn poison tick reaches the floor: the arrival runs right after (twice in a row, old form then new)', () => {
+    const bsm = gbattle([hero(20, 1)], () => 0.5, [G1_FIRST]);
+    boss(bsm).status.apply('poison', 99);
+    boss(bsm).currentHp = Math.ceil(0.7 * POOL) + 1;
+    const p = play(bsm, idle);
+    expect(p.acts.map((a) => [a.actor, a.form])).toEqual([['enemy_0', 'g1'], ['enemy_0', 'g2'], ['party_0', 'g2']]);
+    expect(p.acts[0].r.formChange?.to).toBe('g2');
+  });
+
+  it('the change happens at prepareRound: no arrival; the round has exactly one Chaos command', () => {
+    const bsm = gbattle([hero()], () => 0.5, [G1]);
+    boss(bsm).currentHp = Math.ceil(0.7 * POOL);
+    const p = play(bsm, idle);
+    expect(p.startChange).toEqual({ enemyIndex: 0, from: 'g1', to: 'g2', interlude: 'i1' });
+    expect(chaosActs(p)).toBe(1);
+    expect(p.acts).toHaveLength(2);
+  });
+
+  it('no hero alive after the action: no arrival is queued (done stays true)', () => {
+    const last = hero(9999, 1);
+    last.currentHp = 1;
+    last.statusTracker.apply('poison', 99);
+    const bsm = gbattle([last], () => 0.5, [G1_FIRST]);
+    const p = play(bsm, fight);
+    const end = p.acts[p.acts.length - 1];
+    expect([end.actor, end.r.done, end.r.formChange?.to]).toEqual(['party_0', true, 'g2']);
+    expect(last.currentHp).toBe(0);
+    expect(bsm.actionQueueLength).toBe(0);
+  });
+
+  it('seeded order (mulberry32(1)): the re-chosen slot draws first, the arrival second', () => {
+    const mage = new Character({ name: 'Mage', classData: testClass('black_mage', {
+      baseStats: { hp: 999, strength: 1, agility: 99, intelligence: 50, vitality: 99, luck: 5 }, spellLevels: { white: 0, black: 8 },
+      spellCharges: [[1, [9]]] }) });
+    const bsm = gbattle([mage], mulberry32(1), [G1]);
+    boss(bsm).currentHp = Math.ceil(0.7 * POOL) + 1;   // FIRE (a sure hit) reaches the floor
+    while (bsm.state === 'command_select') bsm.submitCommand({ type: 'magic', actorId: bsm.currentCommandActorId!, targetId: 'enemy_0', spellId: 'fire' });
+    bsm.prepareRound();
+    const spy = vi.spyOn(BossAI.prototype, 'selectAction');
+    expect(bsm.executeNextAction().formChange?.to).toBe('g2');
+    const [slot, arrival] = spy.mock.results.map((r) => r.value as { type: string; spellId?: string });
+    expect(spy).toHaveBeenCalledTimes(2);   // the change's only choices: the re-chosen slot, then the arrival
+    spy.mockRestore();
+    const seen: Array<[string | undefined, string | undefined]> = [];
+    for (let i = 0; i < 2; i++) { const n = bsm.peekNextAction(); seen.push([n?.actorId, n?.spellId]); bsm.executeNextAction(); }
+    expect(seen).toEqual([['enemy_0', arrival.spellId], ['enemy_0', slot.spellId]]);
+    expect([slot.spellId, arrival.spellId]).toEqual(SEED1_ORDER);
+  });
+});
+
+describe('5.1c: HP writes walk the chain in order, each form once', () => {
+  it('(a) a direct write currentHp = 1 at the command phase: i1 at the round start, i2 after the first action, the crack at the next round start, then i3', () => {
+    const bsm = gbattle([hero()], () => 0.5, [G1]);
+    boss(bsm).currentHp = 1;
+    const all = [play(bsm, idle), play(bsm, idle), play(bsm, idle)].flatMap(events);
+    expect(all).toEqual(['start:g1>g2:i1', 'act:g2>g3:i2', 'line:chaos_crack', 'act:g3>g4:i3']);
+  });
+
+  it('(b) setEnemyHp(e, 1) moves one form per nudge (it clamps at the current gated floor)', () => {
+    const bsm = gbattle([hero()], () => 0.5, [G1]);
+    const per: string[][] = [];
+    for (let n = 0; n < 4; n++) { setEnemyHp(boss(bsm), 1); per.push(events(play(bsm, idle))); }
+    expect(per).toEqual([['start:g1>g2:i1'], ['start:g2>g3:i2'], ['line:chaos_crack'], ['start:g3>g4:i3']]);
+  });
+});
+
+describe('5.1d: one rounding rule (M2), POOL = 6001', () => {
+  const P = 6001;
+  const H3 = gform('h3', { bossPhases: [
+    { hpThreshold: 0.25, patternId: 'p', message: CRACK_LINE, interlude: 'chaos_crack' },
+    { hpThreshold: 0.15, patternId: 'p', form: 'h4', interlude: 'i3' },
+  ] }, {}, P);
+  const H4 = gform('h4', {}, {}, P);
+
+  it('the crack floor is 1501; HP held at 1501 crosses at the next round start, and the boss can then fall (no softlock)', () => {
+    const bsm = gbattle([hero(9999)], () => 0.5, [H3], [H4]);
+    boss(bsm).currentHp = 1800;
+    play(bsm, fight);
+    expect(boss(bsm).currentHp).toBe(Math.ceil(0.25 * P));
+    expect(Math.ceil(0.25 * P)).toBe(1501);
+    expect(play(bsm, fight).start).toEqual([{ text: CRACK_LINE, interlude: 'chaos_crack' }]);
+    for (let n = 0; n < 4 && !bsm.isOver; n++) play(bsm, fight);
+    expect(bsm.outcome).toBe('victory');
+  });
+});
+
+describe('5.1e: M5, a write never raises HP to a floor (C7-N1)', () => {
+  it('currentHp = 1 under the floor: a hit leaves HP <= 1', () => {
+    const bsm = gbattle([hero(9999)], () => 0.5, [G2]);
+    boss(bsm).currentHp = 1;
+    const p = play(bsm, fight);
+    expect(p.acts[0].actor).toBe('party_0');
+    expect(boss(bsm).currentHp).toBeLessThanOrEqual(1);
+  });
+
+  it('at F2, damage from ceil(0.45 * POOL) still stops at ceil(0.40 * POOL)', () => {
+    const bsm = gbattle([hero(9999)], () => 0.5, [G2]);
+    boss(bsm).currentHp = Math.ceil(0.45 * POOL);
+    const p = play(bsm, fight);
+    expect(p.acts[0].r.formChange?.to).toBe('g3');
+    expect(boss(bsm).currentHp).toBe(Math.ceil(0.40 * POOL));
+  });
+
+  it('a heal and a revive from 0 are unchanged', () => {
+    const e = boss(gbattle([hero()], () => 0.5, [G1]));
+    e.currentHp = 5000;
+    setEnemyHp(e, POOL);
+    expect(e.currentHp).toBe(POOL);
+    e.currentHp = 0;
+    setEnemyHp(e, 4500);
+    expect(e.currentHp).toBe(4500);
   });
 });

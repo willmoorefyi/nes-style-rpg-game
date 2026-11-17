@@ -3277,6 +3277,7 @@
     patternId: aggressive
     form: chaos_orrery
     interlude: chaos_i1
+    arrivalTurn: true   # CHAOS_FIX_PLAN 2.4 M6: the new form acts at once after the change
   size: boss
 # ═══ CHAOS FORMS (docs/CHAOS_FORMS_PLAN.md 3.2-3.6) ═══
 # Form records of the final battle: `formOf: chaos`, no `num` (the bestiary lists them under Chaos), the same 6000 HP
@@ -3323,6 +3324,7 @@
     patternId: aggressive
     form: chaos_horizon
     interlude: chaos_i2
+    arrivalTurn: true   # CHAOS_FIX_PLAN 2.4 M6: the new form acts at once after the change
   size: boss
 - id: chaos_horizon
   name: Chaos
@@ -3374,6 +3376,7 @@
     patternId: aggressive
     form: chaos_horizon_core
     interlude: chaos_i3
+    arrivalTurn: true   # CHAOS_FIX_PLAN 2.4 M6: the new form acts at once after the change
   size: boss
 - id: chaos_horizon_core
   name: Chaos

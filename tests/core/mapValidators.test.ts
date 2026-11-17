@@ -91,6 +91,15 @@ describe('R0 shared contract: validators', () => {
       const data = { ...enemy, bossPhases: [{ ...phase, interlude: 'chaos_crack' }] };
       expect(validateEnemyData(data).bossPhases![0]).toEqual({ ...phase, interlude: 'chaos_crack' });
     });
+
+    // CHAOS_FIX_PLAN 2.4 M6: `arrivalTurn: true`, only together with `form`
+    it('accepts arrivalTurn: true on a form phase; refuses it without form or with another value', () => {
+      const data = { ...enemy, bossPhases: [{ ...phase, form: 'chaos_orrery', arrivalTurn: true }] };
+      expect(validateEnemyData(data).bossPhases![0]).toEqual({ ...phase, form: 'chaos_orrery', arrivalTurn: true });
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, interlude: 'chaos_crack', arrivalTurn: true }] }))
+        .toThrow('bossPhases[0].arrivalTurn');
+      expect(() => validateEnemyData({ ...enemy, bossPhases: [{ ...phase, form: 'x', arrivalTurn: 'yes' }] })).toThrow('bossPhases[0].arrivalTurn');
+    });
   });
 
   it('every shipped map and enemy passes the new checks', () => {

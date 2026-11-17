@@ -3,11 +3,12 @@
  * corner bracket frames the target rect (an outline of the whole form would be off-screen), the icon row sits at the
  * `head` anchor and the label stays below the message window (y >= 124). BattleFieldTargeting branches here. The
  * bracket is clamped into the field (x 0..1900, y 140..760): the rev-4 F3 target rect starts at y 135, under the
- * message window's edge (18.4).
+ * message window's edge (18.4). The label gets a dark plate on a colossus (C6-8: F4's open core is yellow-white).
  */
-import type { Container, Graphics } from 'pixi.js';
-import { enemyIconRowTop } from '../fx/statusIcons.js';
+import { Graphics, type BitmapText, type Container } from 'pixi.js';
+import { colossusRowTop } from '../fx/statusIcons.js';
 import { colossusAt } from './colossusProxy.js';
+import { glyphWidth } from '../battleMessageUtils.js';
 
 /** The label's top row on a colossus: 4 px under the message window. */
 export const LABEL_MIN_Y = 124;
@@ -22,13 +23,31 @@ export function colossusArrowAt(sprite: Container): [number, number] | null {
   return t ? [t.x - ARROW_TIP[0], t.y - ARROW_TIP[1] - 4] : null;
 }
 
+/** C6-8: the target label's plate on a colossus. */
+export const LABEL_PLATE = { color: 0x101018, alpha: 0.75, pad: 3 } as const;
+
+/** Put a dark plate behind `label` (already placed in its parent) when it names a colossus, sized from the monospace
+ *  glyph width (no text measure); it is destroyed with the label. Returns the plate, or null for an ordinary sprite. */
+export function plateColossusLabel(label: BitmapText, sprite: Container): Graphics | null {
+  const parent = label.parent;
+  if (!colossusAt(sprite) || !parent) return null;
+  const { pad, color, alpha } = LABEL_PLATE;
+  const size = label.style.fontSize;
+  const w = Math.ceil(label.text.length * glyphWidth(size));
+  const g = new Graphics().rect(label.x - pad, label.y - pad, w + 2 * pad, size + 2 * pad).fill({ color, alpha });
+  g.label = 'colossus.labelPlate';
+  parent.addChildAt(g, parent.getChildIndex(label));
+  label.once('destroyed', () => g.destroy());
+  return g;
+}
+
 /** The highest the target label may go: below the message window on a colossus, the screen top otherwise. */
 export const labelFloor = (sprite: Container): number => (colossusAt(sprite) ? LABEL_MIN_Y : 0);
 
-/** The icon row's top at the head anchor, or null for an ordinary sprite. */
+/** The plated icon row's top at the head anchor (44 px, C6-6), or null for an ordinary sprite. */
 export function colossusIconRowTop(sprite: Container): number | null {
   const c = colossusAt(sprite);
-  return c ? enemyIconRowTop(c.anchors().head.y) : null;
+  return c ? colossusRowTop(c.anchors().head.y) : null;
 }
 
 /** Draw the corner bracket around a colossus's target rect into `g` (true), or leave `g` alone (false). */

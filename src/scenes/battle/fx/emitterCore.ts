@@ -16,7 +16,8 @@ export interface FxGeom {
 }
 
 /** One glyph to draw: its atlas key (`glyph.ramp`), frame, centre, integer scale, stepped alpha and mirror. */
-export interface FxDraw { key: string; frame: number; x: number; y: number; scale: 1 | 2; alpha: number; flipX: boolean }
+/** `scale` 1.5 only for a colossus's status icons (3x native, C6-6). */
+export interface FxDraw { key: string; frame: number; x: number; y: number; scale: 1 | 1.5 | 2; alpha: number; flipX: boolean }
 
 export interface FxFrame {
   draws: FxDraw[];

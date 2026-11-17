@@ -8,6 +8,7 @@ import { captureBattleSnapshot, type BossBattleConfig } from './BattleRetry.js';
 import { seenFlag } from '../scenes/bestiary/bestiaryModel.js';
 import { battleArt, monsterSpriteKey } from '../rendering/BattleArt.js';
 import { formChain } from '../battle/bossForms.js';
+import type { BattleConfig } from '../battle/BattleStateMachine.js';
 
 /** Loads the monster atlas pages a formation needs (BattleArt; tests inject their own). Never rejects. */
 export interface MonsterArtPreload {
@@ -36,6 +37,8 @@ export interface TriggerOptions {
    * with no rewards, no Game Over and no retry snapshot. The callback moves on to the next scene.
    */
   onEnd?: (data: BattleOutcomeData) => void;
+  /** Debug scenarios (CHAOS_FIX_PLAN C6-12b): start HP per enemy index, as fractions of the pool. */
+  enemyHp?: Record<number, number>;
 }
 
 /** A battle scene that counts the rounds that reached execution (for `TriggerOptions.onEnd`). */
@@ -83,7 +86,7 @@ export class BattleTrigger {
     const forms = formChain(enemies, [...this.enemyDataCache.values()]);
     this.watchForms();
 
-    const { onEnd } = options;
+    const { onEnd, enemyHp } = options;
     // Game Over > Retry Battle puts the game back exactly as it is now (a caller-ended battle never retries)
     this.game.battleRetry = onEnd ? null : captureBattleSnapshot(this.game, { enemyIds, bossConfig, background, enemyAi });
     this.onBattleTriggered?.();
@@ -95,17 +98,18 @@ export class BattleTrigger {
     await this.art.ensure(enemies.map(monsterSpriteKey));
     // audio: the battle scene plays the battle and victory tracks itself (IN-1)
     const deps: BattleSceneDeps = { input: this.game.input, events: this.game.events, audio: this.game.audio };
-    const sceneConfig: BattleSceneConfig = {
+    const sceneConfig: BattleSceneConfig & Pick<BattleConfig, 'enemyHp'> = {
       party,
       enemies,
       inventory: this.game.inventory,
-      canRun: bossConfig?.canRun ?? true,
+      canRun: bossConfig?.canRun ?? forms.length === 0,   // no Run from a form chain (CHAOS_FIX_PLAN C6-14, D-C7-6)
       spells,
       background,
       enemyAi,
       enemyStatus,
       music: bossConfig?.isBoss ? 'boss' : undefined,
       ...(forms.length > 0 ? { forms } : {}),
+      ...(enemyHp ? { enemyHp } : {}),
     };
     const counting = onEnd ? new RoundCountingBattleScene(deps, sceneConfig) : null;
     const battleScene = counting ?? new BattleScene(deps, sceneConfig);

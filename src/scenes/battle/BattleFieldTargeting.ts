@@ -10,7 +10,7 @@ import { iconsFor, tagsFor, type StatusVisuals } from './fx/statusRules.js';
 import { enemyIconRowTop } from './fx/statusIcons.js';
 import { headOf } from './fx/texturePixels.js';
 import { stoneTextures } from './fx/stoneTextures.js';
-import { colossusArrowAt, colossusIconRowTop, drawColossusBracket, labelFloor } from './colossus/colossusCursor.js';
+import { colossusArrowAt, colossusIconRowTop, drawColossusBracket, labelFloor, plateColossusLabel } from './colossus/colossusCursor.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
 const TARGET_ARROW = 0xffff00;
@@ -155,6 +155,7 @@ export class BattleFieldTargeting {
     arrow.y = labelY + 10;
     label.position.set(Math.round(arrow.x + 24), labelY);
     this.mainContainer.addChild(label);
+    plateColossusLabel(label, sprite);   // C6-8: a dark plate on a colossus
     this.targetLabel = label;
   }
 

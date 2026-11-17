@@ -66,7 +66,7 @@ describe('battle-interludes.yaml', () => {
 
   it('each script\'s unskipped total at message speed 3 is pinned and within its cap (480; 600 for chaos_i2)', () => {
     const totals = Object.fromEntries(SCRIPTS.map((s) => [s.id, interludeFrames(s)]));
-    expect(totals).toEqual({ chaos_crack: 102, chaos_i1: 436, chaos_i2: 577, chaos_i3: 190 });
+    expect(totals).toEqual({ chaos_crack: 102, chaos_i1: 450, chaos_i2: 577, chaos_i3: 190 });   // C7 pin: i1 436 -> 450 (C6-9)
     for (const s of SCRIPTS) expect(interludeFrames(s), s.id).toBeLessThanOrEqual(interludeCap(s.id));
     expect([interludeCap('chaos_i1'), interludeCap('chaos_i2'), interludeCap('chaos_i3'), interludeCap('chaos_crack')])
       .toEqual([INTERLUDE_CAP_FRAMES, 600, 480, 480]);
@@ -99,6 +99,16 @@ describe('battle-interludes.yaml', () => {
       const l = layersOf(e)?.find((x) => x.name === layer);
       expect(l?.frames[frame], `${e.id} ${layer}/${frame}`).toBeDefined();
     }
+  });
+
+  it('chaos_i1 (C6-9, D-C7-8): the robe flares and burns away, two orange flashes, a shake on the second', () => {
+    const steps = script('chaos_i1').steps;
+    expect(steps[0]).toEqual({ type: 'message', text: "The Sovereign's robe flares and burns away!" });
+    const orange = steps.flatMap((st, i) => (st.type === 'flash' && st.color === '#ff7020' ? [i] : []));
+    expect(orange).toHaveLength(2);
+    for (const i of orange) expect(steps[i]).toEqual({ type: 'flash', color: '#ff7020', frames: 6, alpha: 0.6 });
+    expect(steps[orange[1] + 1]).toEqual({ type: 'shake', times: 1, with: 'previous' });
+    expect(interludeFrames(script('chaos_i1'))).toBeLessThanOrEqual(480);
   });
 
   it('chaos_crack: shake x1, flash white 4, the core\'s crack frame, then the phase message (18.8 row 2c)', () => {

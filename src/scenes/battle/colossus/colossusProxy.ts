@@ -9,6 +9,7 @@
 import type { Container } from 'pixi.js';
 import { bodyBox } from '../fx/emitterCore.js';
 import type { StatusAnchor } from '../fx/statusEmitters.js';
+import { COLOSSUS_ROW_PX, colossusRowTop } from '../fx/statusIcons.js';
 import type { Offset } from './colossusIndex.js';
 
 export interface Rect { x: number; y: number; width: number; height: number }
@@ -40,7 +41,10 @@ export function colossusAt(sprite: Container | null | undefined): ColossusAnchor
 export const EFFECT_BOX = { w: 420, h: 360 } as const;
 export const SLASH_BOX = 360;
 
-/** The status overlays' anchor on a colossus: the head anchor and the effect box's body (statusFx's anchorOf). */
+/** The status overlays' anchor on a colossus: the head anchor and the effect box's body (statusFx's anchorOf); the
+ *  blind cloud goes beside the plated icon row, outside the core (effect) box (C6-6). */
 export function colossusStatusAnchor(c: ColossusAnchorSource): StatusAnchor {
-  return { head: c.anchors().head, box: bodyBox(c.effectBox()), facing: 1 };
+  const head = c.anchors().head;
+  const e = c.effectBox();
+  return { head, box: bodyBox(e), facing: 1, beside: { y: colossusRowTop(head.y) + COLOSSUS_ROW_PX / 2, left: e.x, right: e.x + e.width } };
 }

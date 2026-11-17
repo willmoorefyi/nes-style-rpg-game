@@ -11,6 +11,7 @@ export function formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): strin
     case 'magic': return `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
     case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
     case 'run': return `${info.actorName} tries to run!`;
+    case 'slam': return `${info.actorName} slams down!`;
     default: return `${info.actorName} acts!`;
   }
 }
