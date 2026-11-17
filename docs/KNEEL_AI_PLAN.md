@@ -1,12 +1,28 @@
-# AI kneel keyframe plan (pass KA), rev 2
+# AI kneel keyframe plan (pass KA), rev 3
 
-Status: rev 2, a plan only, answering the momus rejection of rev 1. Nothing is implemented. No paid or AI call was made
-to write it; the Bedrock facts in section 1 come from read-only listing calls.
+Status: rev 3, a plan only. It answers the narrow momus rejection of rev 2; the direction is unchanged. Nothing is
+implemented. No paid or AI call was made to write it; the Bedrock facts in section 1 come from read-only listing calls.
 
 **User directive (2026-11-17):** "Use an AI image generation model to build the 'kneeling' frame for each sprite, and
 then use the rigging to let the sprites move between the two. The current approach of using rigging to move the
 sprites wastes a ton of compute and doesn't produce good results. Use one or more of the Stability AI models to
 transform each sprite into a 'kneeling, head down' pose."
+
+**Rev 3 changes (momus review of rev 2):**
+
+| # | Finding | Resolution |
+|---|---|---|
+| r3-1 (P1) | The joint-based gates ran before any joints existed | The gates are split into two groups (section 6). **Group J0 (joint-free, before approval):** A-pal, A-grey, A-hist, A-adj, A-outline, A-pieces, A-base, A-scale, A-width, K-ground, K-height, plus the R1 counts. **Group J1 (after marking, before lock):** A-prop, A-headdup, A-head. A J1 failure archives the key and sends the sprite to its next try. The probe shows J0 only |
+| r3-2 (P1) | The `monster.cut` call was wrong: `cell` is the output height and minimum width; the cutter widens itself (`monster.py:702`); the standing band scales kneels up (`:601`) and `match` stair-steps them back | **`monster.cut` is not used for the kneel key.** Cut: a key-colour flood mask at full resolution, then `pixelize.pixelize(cell, mask, grid=(idle w, idle h), palette=<ndarray>, bottom_row=<foot row>)` at the known k (D-KA6). A selftest pins the output size to the idle's `grid` for 80x80, 110x80, 218x128 and the hero 80x80 |
+| r3-3 (P1) | Prop and head parts are not defined per rig: 10 rigs have `kind: prop`, 56 have weapon-named parts, and goblin has both `weapon` and a `dagger` prop; rhyos has lizard, ram_n and ram_f plus a lion head | Explicit `kneel_ai.yaml` entries `sprites.<id>.{weapons: [parts], heads: [parts]}`, written at KA0b by `kneel_ai.py bodies --write` and reviewed. A selftest checks that every rig with a `kind: prop` part or a weapon-named part has a `weapons` entry, and that every rig has a `heads` entry (`[]` only with a `heads_none:` reason). The prompt counts use these lists |
+| r3-4 (P1) | "Never widen" would visibly shrink full-width idles (quadrupeds: median 85 % of the cell width, up to 97 %; arthropods 85-92 %) | The quadruped and arthropod prompts ask for a compact pose. **A-scale:** the reference part (the head-colour region) is within +-10 % of the idle's height. **A-width:** at most an 8 % shrink to fit; more is a FAIL and a retry with the compact wording, then the Q3 ruling. The width-limited ids are listed at U1-KA |
+| r3-5 (P2) | Every key was forced to the band midpoint | Arms (a), (b) and (c) have a known k: downscale by k, with the band as a check only. Arm (d) is scaled so its head-colour region matches the idle's height (D-KA6) |
+| r3-6 (P2) | Arm (b) confounded seed and setting | (b) uses `change_strength` 0.85 with both seeds. New arm **(b2)**, seed 1234 only: `style_strength` 0.6, to show the effect of `style_strength` (D-KA4). The probe has 55 calls |
+| r3-7 (P2) | The 15 agent-min per sprite was unmeasured (hurt keys average 18.5 joints and 2.4 mask polygons) | Marking minutes per sprite are logged; the **median** is reported at the pilot. **Stop rule:** a pilot median above 30 min stops KA for a rev before stage 2. The agent-hours (about 34 h marking + about 19 h review) enter the comparison with pass K (section 7) |
+| r3-8 (P2) | The A-prop IoU and the 0.15 outside share were guesses | Both are calibrated on the approved hurt keys (their marked joints), like T_hist / T_adj: T_prop_iou = 5th percentile, T_outside = 95th percentile; the same for heads |
+| r3-9 (P3) | Reserve sizing; the price check | The reserve is **20 x c**. The price confirmation of every used model is part of the KA0b hard stop |
+| r3-10 (P3) | Request settings | `style_strength` 1.0 is unverified; (b2) shows it. `style_preset: pixel-art` on Control Sketch (c1) and Style Guide (d). `aspect_ratio` is dropped from Style Guide |
+| r3-11 (P3) | Gates and prompts | G1b skips an empty `$IDS`, and the new G1h runs heroes through `puppet_kneel.py check`. Floaters: the foot row is the idle's lowest opaque row. White-key sprites: `{bg}` drives the style suffix, the negative and the cut mask. Q1 notes that arm (a) spends 10 of the 55 probe calls (about $0.80) on the rejected baseline |
 
 **Rev 2 changes (momus review of rev 1):**
 
@@ -46,14 +62,14 @@ The Chaos colossus forms F2-F4 are exempt (D-K12); Chaos F1 is included.
 - **What stays the same:** the frame names, the TS runtime (`src/` untouched), the timing and the atlas cell count.
 - **Order:**
   1. KA0b: tooling and price confirmation, 0 calls.
-  2. KA1-P: a 4-arm probe, 50 calls, and **the user picks the arm**.
+  2. KA1-P: a 5-arm probe, 55 calls, and **the user picks the arm**.
   3. KA1: a pilot of 6 sprites, then **U1-KA**, the user's review.
   4. KA2 / KA3: rollout batches.
   5. KA4: integration.
 - **Budget**, in two stages, both for the user to approve:
-  - Stage 1 (probe and pilot): <= 86 requests, about $7 at worst.
+  - Stage 1 (probe and pilot): <= 91 requests, about $7.28 at worst.
   - Stage 2 (rollout): sized by the picked arm. At 1 call per try it is <= 407 requests (about $33); at 2 calls per
-    try, <= 794 (about $64).
+    try, <= 814 (about $65).
   - 0 Gemini.
 
 ## 1. Verified facts (2026-11-17, mainline 24c4236)
@@ -76,7 +92,9 @@ The Chaos colossus forms F2-F4 are exempt (D-K12); Chaos F1 is included.
 | Templates on mainline: biped, quadruped, mechanical. The other bodies are only on `kneel-k3-0` | `kneel_templates.py:71` |
 | Rig bodies: biped 49, quadruped 28, floating 14, serpent 8, arthropod 7, bird 5, naga 5, blob 4, rooted 2, swimmer 1 (= 123). Mechanical: iron_golem, soldier, warmech (bipeds), guardian (quadruped) | `body:` in `anim/monsters/*.yaml` |
 | Monster cells are not square: 80 high, 80-122 wide; 128 high, 128-218 wide | `grid` in `approved/*/monster_*.json` |
-| `monster.cut(raw, band, floating, colors, seed, n_cells=3, cell=None, foot_row=None, haze, split, keep_pieces, top_margin, match=None)`; `match` scales nearest-neighbour after pixelizing (stair-steps); there is no palette argument. `pixelize.pixelize(..., palette: np.ndarray \| None)` | `monster.py:558-576`; `pixelize.py:164-167` |
+| `monster.cut(raw, band, floating, colors, seed, n_cells=3, cell=None, foot_row=None, haze, split, keep_pieces, top_margin, match=None)` does not fit the kneel key: `cell` is the output height and the minimum width; it widens the cell itself (`cw = max(c, width + 4)`, `:702`); the standing band scales a short figure up (`f = lo / tallest`, `:601`); `match` scales nearest-neighbour after pixelizing (stair-steps, `:570-576`); it has no palette argument. `pixelize.pixelize(cell, guide_mask, grid, ..., bottom_row, palette: np.ndarray \| None)` does | `monster.py:558-702`; `pixelize.py:164-167` |
+| Prop and head parts: 10 rigs have a `kind: prop` part; 56 have a weapon-named part (`weapon`, `sword`, `axe`, ...); goblin has both `weapon` (`remove: true`) and a `dagger` prop. Head parts have no common name (rhyos: `lizard`, `ram_n`, `ram_f` and a lion head inside `body`) | `grep` over `anim/monsters/*.yaml`; `rhyos.yaml` parts |
+| Quadruped idles fill a median 85 % of their cell width (up to 97 %); arthropods 85-92 % | momus measurement of rev 2, to be re-measured by `kneel_ai.py bodies` at KA0b |
 | `approve.overwrite_gate` returns early unless the sheet name starts with `monster_` or `boss_` | `approve.py:50-55` |
 | Variant palette lock: `allowed` is built from every key's recoloured pixels, and only non-keys are checked. `monsters.yaml` has 0 `variants` today | `monster_atlas.py:154-161` |
 | `lockdiff --relock <ids>` accepts changed kneel entries of the listed ids (`KNEEL_LOCK` = `kf:kneel`, `kneel_in1`, `kneel_in2`, `kneel_b`; heroes: the 4 frame names) | `kneel_tools.py:27-73` |
@@ -118,65 +136,80 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 | Arm | Calls per image | Request |
 |---|---|---|
 | **(a) control** | 1 | sd35 `mode: image-to-image`, `image` = the **derived** kneel (mainline; cobra and green_slime rendered read-only from the `kneel-k3-0` tag), `strength` 0.40. Baseline only, never pickable |
-| **(b)** | 1 | `style_transfer`: `init_image` = G-sil, `style_image` = reference, `change_strength` 0.8 (seed 1234) / 0.9 (seed 1235), `style_strength` 1.0, `composition_fidelity` 0.5, prompt + negative |
-| **(c) hybrid** | 2 | (c1) `control_sketch` on G-skel, `control_strength` 0.7, prompt + negative; then (c2) `style_transfer` with `init_image` = c1's output, `style_image` = reference, `change_strength` 0.4, `composition_fidelity` 0.9. If KA0b finds Sketch unpriced or failing, Structure replaces it, recorded |
-| **(d)** | 1 | `style_guide`: `image` = reference, `fidelity` 0.7, `aspect_ratio` 1:1, prompt = subject + pose text (no pose image) + negative |
+| **(b)** | 1 | `style_transfer`: `init_image` = G-sil, `style_image` = reference, `change_strength` 0.85 (both seeds), `style_strength` 1.0, `composition_fidelity` 0.5, prompt + negative |
+| **(b2)** | 1 | as (b), but `style_strength` 0.6; seed 1234 only. It shows the effect of `style_strength`, since 1.0 is unverified |
+| **(c) hybrid** | 2 | (c1) `control_sketch` on G-skel, `control_strength` 0.7, `style_preset: pixel-art`, prompt + negative; then (c2) `style_transfer` with `init_image` = c1's output, `style_image` = reference, `change_strength` 0.4, `composition_fidelity` 0.9. If KA0b finds Sketch unpriced or failing, Structure replaces it, recorded |
+| **(d)** | 1 | `style_guide`: `image` = reference, `fidelity` 0.7, `style_preset: pixel-art`, prompt = subject + pose text (no pose image) + negative; no `aspect_ratio` |
 
-**KA1-P probe (purpose `ka_probe`, 50 calls).**
+All other parameters are left at the API defaults. Each arm keeps one setting for both seeds, so seed and setting are
+never confounded.
+
+**KA1-P probe (purpose `ka_probe`, 55 calls).**
 
 - **Sprites:** goblin (biped with a prop), wolf (quadruped), white_mage (robed hero), cobra (serpent) and
   green_slime (blob).
-- **Calls:** 2 seeds (1234, 1235) x (a 1 + b 1 + c 2 + d 1) = **10 calls per sprite at most**, x 5 = 50.
-- **Machine score:** for each output, after D-KA6, every A-check of section 6, plus the review agent's R1, R2, R2b,
-  R3 and R5 (not R4: there is no in-between yet).
+- **Calls:** 2 seeds (1234, 1235) x (a 1 + b 1 + c 2 + d 1), plus (b2) x 1 = **11 calls per sprite at most**, x 5 = 55.
+  Arm (a), the rejected baseline, spends 10 of them (about $0.80).
+- **Machine score:** for each output, after D-KA6, the **J0** checks of section 6 (no joints exist at the probe), plus
+  the review agent's R1 (with counts), R2, R2b, R3 and R5. R4 is not scored: there is no in-between yet.
 - **`probe_sheet.png` goes to the user before any pick.** Rows are the sprites; the columns are idle, derived kneel,
-  G-sil, then (a), (b), (c), (d) x 2 seeds at native x4. The A-check and review verdicts and the IoU against the
-  derived kneel are printed under each image.
+  G-sil, then (a), (b), (c), (d) x 2 seeds, and (b2), at native x4. The J0 and review verdicts, the A-scale and
+  A-width values and the IoU against the derived kneel are printed under each image.
 - **Pick rule:**
-  1. The **user** names the primary arm and the fallback arm from (b), (c) and (d), and may also fix the per-arm
-     settings (for example (b) at 0.9).
-  2. The orchestrator's proposal on the sheet is the arm with the most sprites at "all A-checks plus R1 / R2 / R2b /
+  1. The **user** names the primary arm and the fallback arm from (b), (b2), (c) and (d), and may fix the per-arm
+     settings (for example (b) with (b2)'s `style_strength`).
+  2. The orchestrator's proposal on the sheet is the arm with the most sprites at "all J0 checks plus R1 / R2 / R2b /
      R3 / R5 pass" on at least one seed, with a tie going to the fewer calls per image. It is advice only.
   3. If the user picks no arm, or no arm passes on >= 3 of 5 sprites and the user does not override, KA stops and
-     goes to rev 3. No pilot calls are made.
+     goes to a new rev. No pilot calls are made.
 - **Try schedule after the pick** (deterministic, never a sweep):
   - try 1: the primary arm, seed 1234;
   - try 2: the primary arm, seed 1235, with the one setting the user fixed for retries (default: +0.1
-    `change_strength` for a pose fail, -0.1 for an identity fail);
+    `change_strength` for a pose fail, -0.1 for an identity fail; the compact wording of section 5b for an A-width
+    fail);
   - try 3: the fallback arm, seed 1236.
 
   A prompt changes only through `gen/kneel_ai.yaml` `sprites.<id>.{extra, negative_extra}`, and only for a reason the
-  reviewer named. Size is never a reason to retry (D-KA6).
+  reviewer or a J0 / J1 check named. Scale is never a reason to retry: the known k or the reference part fixes it
+  (D-KA6). A-width and K-height failures are **pose** failures (the figure is not compact or not low enough).
 
 ## 4. Asset model and code changes
 
-- **D-KA5 The AI kneel is an approved key** (generate -> cut -> gates -> review -> approve).
+- **D-KA5 The AI kneel is an approved key** (generate -> cut -> J0 gates -> review -> approve -> marking -> J1 gates
+  -> lock).
+  - **A J1 failure** (A-prop, A-headdup, A-head) archives the key with `retire_kneel.py --key <id>` to
+    `approved/_retired/<id>_kneel_try<N>/`, which also satisfies the overwrite gate, and sends the sprite to its next
+    try. After try 3, the Q3 ruling applies.
   - Monsters and bosses: `approved/<id>/kneel.png` + `kneel.json`, one cell of the idle's exact `grid` (w, h). The
     name is outside the `monster_*` and `boss_*` loaders, so the approved file alone changes nothing.
   - Heroes: `approved/<class>/battle_kneel.png` + `.json`, one 80x80 cell facing left.
   - The json records: arm, model ids, seeds, settings, guide hash, BR cache keys, try, `approved` date.
   - **One approve path:** `kneel_ai.py approve` calls `approve.py`. Its `overwrite_gate` now also gates `kneel` and
     `battle_kneel`: an overwrite needs identical bytes or an archive copy.
-- **D-KA6 Cut** (`kneel_ai_cut.py`, offline):
-  1. **Pre-scale at full resolution.** Measure the raw figure height; Lanczos-scale the raw so the height lands on
-     `ref` = band midpoint x idle height (KNEEL_PLAN 4 band; heroes per class). Then `match` rarely fires, and the
-     nearest-neighbour stair-steps (`monster.py:570-576`) are avoided. The share of keys where `match` still fired is
-     reported.
-  2. **Width rule:** if the figure would be wider than the idle cell's width minus 2 px, scale it down uniformly at
-     full resolution until it fits. **The cell is never widened**: the in-betweens render in the idle's cell, and the
-     atlas rects, anchors and pages stay as they are (page impact 0). Each id that is width-limited and therefore
-     below its band's lower bound is listed as `width-limited`, and K-height is reported, not failed, for it.
-  3. `monster.cut(raw, band, floating=<idle floating>, n_cells=1, cell=<idle grid w>, foot_row=<idle bottom_row>,
-     match=(ref, tol))`, where `band` is the sprite's `S.MonsterBand` and `tol` = (band width / 2) / midpoint.
-     KA0b verifies a one-cell cut at the idle's (w, h). If the cutter's cell height differs, the wrapper pads to it,
-     and a selftest pins that.
-  4. **Palette snap:** each opaque pixel goes to the nearest approved colour in CIELAB, with `palette` = an
-     `np.ndarray` (N x 3, uint8) from `monster_keys.approved_palette` (heroes: `battle.png`). `pixelize.pixelize`'s
-     `palette` argument is the same ndarray where it is used.
-  5. **x and y rules:**
-     - grounded: the base centroid x on the idle's, the feet on `bottom_row`;
-     - floaters and swimmers: the figure centroid x on the idle's, the **lowest opaque row = the idle's lowest
-       row**. The droop comes from the image, and the only drop is the runtime `kneelSink` (D-K9).
+- **D-KA6 Cut** (`kneel_ai_cut.py`, offline). **`monster.cut` is not used**: it widens cells (`:702`), applies the
+  standing band (`:601`) and stair-steps through `match` (`:570-576`).
+  1. **Mask:** flood the key colour from the border at full resolution with `pixelize.flood_bg(rgb, tol)` (`tol` 40).
+     The key is `{bg}`, so white-key sprites flood white. Keep the largest component, plus pieces inside its bounding
+     box (the `_figure_mask` rule), and `keep_pieces: all_in_cell` sprites keep every piece.
+  2. **Scale:**
+     - Arms (a), (b), (b2), (c): the guide's k is known, so the raw is resampled to native by exactly 1 / k. No band
+       scaling; the band is only checked (K-height).
+     - Arm (d), which has no guide: one uniform Lanczos scale s at full resolution, set so the reference part (the
+       head-colour region, below) is as tall as in the idle. If no head region is found, s comes from the figure
+       height and the band midpoint, and is reported.
+  3. **Width rule:** if the figure is wider than the idle cell's width minus 2 px, shrink it uniformly at full
+     resolution, by at most **8 %**. Over 8 % is an **A-width FAIL**: the pose is too wide, so the sprite retries with
+     the compact wording. The cell is never widened, so atlas rects, anchors and pages stay as they are (page impact
+     0). Every shrunk id is listed as `width-limited` with its shrink % and shown at U1-KA.
+  4. **Pixelize:** `pixelize.pixelize(cell, mask, grid=(idle w, idle h), palette=<ndarray>, bottom_row=<foot row>)`.
+     The ndarray is N x 3 uint8 from `monster_keys.approved_palette` (heroes: `battle.png`'s colours), so every pixel
+     is an approved colour.
+  5. **Placement (the foot row):**
+     - grounded: the foot row is the idle's `bottom_row`, and the base centroid x sits on the idle's;
+     - floaters and swimmers: the foot row is **the idle's lowest opaque row**, and the figure centroid x sits on the
+       idle's. The guide has no sink; the only drop is the runtime `kneelSink` (D-K9).
+  6. A selftest pins the output size to the idle's `grid` for cells of 80x80, 110x80, 218x128 and the hero 80x80, and
+     pins the floater foot row.
 - **D-KA7 Joints on the key: hand-marked** (as the approved hurt keys were).
   1. First guess (`kneel_ai_joints.py`): the template targets, then a one-pass per-part fit (dx, dy in [-4, 4];
      dtheta in {-10, -5, 0, 5, 10}).
@@ -185,9 +218,12 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
   3. The rig agent marks from `python3 -I assets-src/gen/monster_anim.py mark <id>` (heroes: `puppet_kneel.py review
      <class>`). It writes `keyframes.kneel` and any `masks.<part>.kneel` polygons, re-renders `mark`, and repeats
      until every joint sits on its part.
-  - **Time:** about 15 agent-min per sprite (about 34 agent-hours for 135, about 17 h of wall clock with 2 rig
-    agents), plus <= 30 s of CPU for the fit. KA0b measures the fit on goblin; above 30 s the search is narrowed,
-    recorded in section 13.
+  - **Time (unmeasured estimate):** about 15 agent-min per sprite (about 34 agent-hours for 135, about 17 h of wall
+    clock with 2 rig agents), plus <= 30 s of CPU for the fit. Approved hurt keys average 18.5 joints and 2.4 mask
+    polygons, and kneels should need more.
+    - KA0b measures the fit on goblin; above 30 s the search is narrowed, recorded in section 13.
+    - The pilot logs marking minutes per sprite and reports the **median**. **Stop rule:** a pilot median over **30
+      min** stops KA for a rev before stage 2.
 - **D-KA8 In-betweens** (existing machinery and rules):
   - `kneel_in1` is idle toward kneel at t 0.33; `kneel_in2` is kneel toward idle at t 0.33; `kneel_b` is the breath op
     on the key.
@@ -213,7 +249,7 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 | `gen/kneel_ai_cut.py` (new) | D-KA6 | <= 150 |
 | `gen/kneel_ai_gates.py` (new) | section 6 A-checks | <= 220 |
 | `gen/kneel_ai_joints.py` (new) | D-KA7 first guess and IoU | <= 150 |
-| `gen/kneel_ai.yaml`, `gen/kneel_ai_thresholds.json` (new) | prompts, arm settings, overrides; calibrated thresholds | data |
+| `gen/kneel_ai.yaml`, `gen/kneel_ai_thresholds.json` (new) | prompts, arm settings, overrides, and per sprite `sprites.<id>.{weapons: [parts], heads: [parts], heads_none?: reason}` (written by `kneel_ai.py bodies --write` at KA0b, then reviewed; for example `rhyos: {heads: [lizard, ram_n, ram_f, body:lion]}`, where `part:label` marks a head drawn inside a larger part, located by a mask polygon); calibrated thresholds | data |
 | `gen/kneel.py` | `source: ai` (load the key, `keyframes.kneel` from the rig, validation) | 233 -> <= 250 |
 | `gen/monster_keys.py` | `kf:kneel` lock and paint for an approved key | +<= 8 |
 | `gen/puppet_kneel_ai.py` (new) + `puppet_kneel.py` dispatch | heroes with `source: ai` (`battle_kneel.png`, `battle.kneel` joints, `_tween`, `bob`) | <= 150; +<= 4 |
@@ -222,7 +258,7 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 | `gen/retire_kneel.py` (new) | section 5 | <= 120 |
 | `gen/kneel_review.py` | probe sheet, compare sheet, side-by-side GIF | +<= 40 |
 | `gen/kneel_tools.py` | `coverage` in the G3 format | +<= 8 |
-| `gen/selftest_kneel_ai.py` (new) + 1 line in `selftest.py` | fake `invoke`; an approved key without `source: ai` changes nothing; `source: derived` byte-identical; request-body keys; the guides use no source pixels; failure fixtures (section 6); the width rule; the floater y rule; retire_kneel | <= 250 |
+| `gen/selftest_kneel_ai.py` (new) + 1 line in `selftest.py` | fake `invoke`; an approved key without `source: ai` changes nothing; `source: derived` byte-identical; request-body keys; the guides use no source pixels; failure fixtures (section 6); the cut sizes and the width rule (D-KA6.6); the floater foot row; every rig with a `kind: prop` or weapon-named part (`weapon\|sword\|axe\|club\|spear\|staff\|dagger\|blade\|mace\|hammer\|scythe\|trident\|whip\|bow\|rod`) has a `weapons` entry, and every rig has a `heads` entry (`[]` only with `heads_none`); retire_kneel (`<id>` and `--key`) | <= 250 |
 | `assets/data/debug-scenarios.yaml` | `ka_pilot` | data |
 | `src/` (TS) | **none** | 0 |
 
@@ -244,7 +280,7 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 
 `{subject}` is the `monsters.yaml` `prompt` (heroes: the `characters.yaml` `prompt` + `battle_gear`). `{facing}` is
 "facing right" for monsters and "facing left" for heroes; `{opposite}` is the other side. `{bg}` is "magenta" or
-"white", following the guide key.
+"white", following the guide key. One value drives the guide key, the reference canvas, the prompt and the cut mask.
 
 - **Style suffix:** "16-bit SNES JRPG battle sprite of exactly this character, crisp pixel art, bold black outline
   between every part, flat cel shading with three tones per colour, the same limited palette as the reference, light
@@ -252,31 +288,40 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 - **Negative:** "standing upright, attacking, jumping, lying dead, knocked out, extra limbs, extra heads, extra hands,
   extra weapons, duplicate weapon, missing weapon, second character, different character, new colours, gradient, soft
   shading, blur, anti-aliasing, 3d render, photo, text, watermark, ground, floor, shadow on ground, scenery, cropped,
-  {opposite}".
-- **Counts in the prompt:** "holding exactly {n_weapons} {weapon}", "{n_heads} head(s)". The counts are read from the
-  rig (prop parts, head parts), so they are not invented.
+  {opposite}, {not_bg}".
+  - `{not_bg}` is "{other} background, background gradient", where `{other}` is the colour that is not the key (white
+    for a magenta key, magenta for a white key).
+  - For a white key it also adds "white outline glow, white halo". The negative never names the key colour itself.
+- **Counts in the prompt:** "holding exactly {n_weapons} {weapon}" and "exactly {n_heads} head(s)". They come from
+  `kneel_ai.yaml` `sprites.<id>.weapons` / `heads` (r3-3), not from part-name guessing. With 0 weapons the phrase is
+  "empty-handed".
 
 | Body (count) | Pose text: "{subject}, ..." | Extra negative |
 |---|---|---|
 | biped (46, without the 3 mechanical bipeds) | kneeling on one knee, the far knee on the ground, the near foot planted, torso bent forward, head bowed low looking at the ground, arms hanging, the weapon held low with its tip toward the ground, exhausted | sitting, both knees up |
 | mechanical (iron_golem, soldier, warmech, guardian) | a heavy machine powered down, kneeling on one knee, armoured torso slumped forward, head lowered, arms hanging heavily, the same plating and joints | broken apart, sparks, smoke |
 | robed (5 hero classes; monster rigs with a `cloth` part or a robe in their prompt, `kneel_ai.py bodies`) | kneeling on one knee, the robe pooled on the ground around the legs, torso bent forward, head or hood bowed low, hands resting on the knee, staff or rod held low | legs showing through the robe |
-| quadruped (27, without guardian) | lying down on its belly with the legs folded under the body, head lowered to the ground between the forepaws, tail lying flat, wings folded (if any), exhausted | standing on four legs, on its back |
+| quadruped (27, without guardian) | lying down on its belly in a compact pose, forelegs tucked under the chest, hind legs folded under the body, head lowered to the ground in front of the chest, tail curled along the body, wings folded tight (if any), exhausted | standing on four legs, on its back, stretched out, legs extended forward, tail stretched out behind |
 | bird (5) | crouching low on the ground, legs folded, wings drooping to the ground, neck bent and head lowered, beak near the ground | flying, spread wings |
 | floating (12; red_piranha and white_shark use swimmer) | sagging lower in the air, the body drooping, head and eyes turned down, arms, tendrils or fins hanging limp | touching the ground |
 | swimmer (shark, red_piranha, white_shark) | listing nose-down and sinking, fins hanging limp, tail drooping | upside down |
 | serpent (8) | coiled low and flat on the ground, the coils pressed down, head lowered to rest on the coils, mouth closed | rearing up, striking |
 | naga (5) | slumped forward onto its coiled tail, upper body bent low, head bowed, arms hanging | rearing up |
-| arthropod (7) | legs splayed flat, body lowered onto the ground, head, pincers and stinger drooping down | on its back |
+| arthropod (7) | body lowered onto the ground in a compact pose, legs bent and drawn in close under the body, head, pincers and stinger drooping down and tucked in | on its back, legs splayed wide, legs stretched out |
 | blob (4) | slumped and flattened into a wide low mound, sagging, eyes looking down | splitting into pieces |
 | rooted (2) | wilting, stalks and vines drooping toward the ground, head bowed, the root mass slightly sagged | uprooted |
 
 - **Seeds:** 1234 / 1235 / 1236.
 - **Aspect:** 1:1 (1024x1024). The framing comes from the guide canvas, or for (d) from the reference's canvas.
+- **Compact wording** (the try-2 change after an A-width fail, other bodies): "{subject}, ..., in a compact pose, limbs
+  drawn in close to the body, nothing stretched out", plus "stretched out, sprawling" in the negative.
 
 ## 6. Identity and quality gates (in order; all binary unless marked "report")
 
-**Automated A-checks** (`kneel_ai.py gate <id>`, < 10 s; on the cut key unless marked "raw"):
+The automated checks come in two groups, by whether they need joints.
+
+**Group J0: joint-free, before approval** (`kneel_ai.py gate <id> --try N`, < 10 s; on the cut key unless marked
+"raw"). This is the only group shown at the probe.
 
 | Check | Rule |
 |---|---|
@@ -285,24 +330,40 @@ rejected. Arm (a) measures H1 as a baseline and **cannot be picked** for the rol
 | A-grey (raw) | <= 3 % of figure pixels with chroma C* < 6 and farther than dE 10 from every approved neutral |
 | A-hist | L1 between the kneel and idle colour-area histograms <= T_hist |
 | A-adj | Jaccard of the 4-adjacent colour-pair sets >= T_adj |
-| A-prop | after D-KA7: each prop part's alpha IoU (the idle prop pixels posed on the marked bone vs the key) >= 0.50; and the pixels of that prop's colours outside the fitted prop dilated by 2 px <= 0.15 x the idle prop's pixel count (catches a 2nd weapon) |
-| A-headdup | the same for the head parts (`head`, `lizard`, `ram_*`, ... per the rig): each IoU >= 0.40, and head-colour pixels outside the fitted heads <= 0.15 x the idle head pixels (catches an extra head) |
 | A-outline | boundary share in the outline colour >= the idle's - 0.08 |
 | A-pieces | components <= the idle's (`keep_pieces` sprites <= +1); no detached pixels |
 | A-base | base (or, for floaters, figure) centroid x within +-0.10 x idle width |
-| A-head | the marked crown or head joint is lower than the idle's by >= 0.15 x idle height |
-| K-ground, K-fit | existing (floaters: the lowest row = the idle's) |
-| K-height | the band; **report** for `width-limited` ids |
+| A-scale | the reference part, the **head-colour region**, is within +-10 % of the idle's height. The region is the largest 8-connected component of the colours that make up >= 60 % of the idle's `heads` parts' pixels (from `kneel_ai.yaml`; rigs with `heads_none` use the largest feature-colour component). This needs no joints |
+| A-width | the D-KA6 shrink <= 8 % |
+| K-ground, K-fit | existing (floaters: the lowest row = the idle's lowest opaque row) |
+| K-height | the body band (heroes: the class band); a FAIL is a pose fail |
+| R1 counts | from the review agent (below): weapons, hands, heads and eyes, key / idle |
 | A-agree (report) | guide-colour agreement, kept for the record only |
-| IoU-derived (report) | silhouette IoU against the derived kneel (mainline, or the untuned template derive). Printed on every sheet as evidence for R2b; no threshold |
+| IoU-derived (report) | silhouette IoU against the derived kneel (mainline, or the untuned template derive), as evidence for R2b; no threshold |
 
-- **Calibration** (`kneel_ai.py calibrate`, KA0b): T_hist and T_adj are the 95th / 5th percentile over the approved
-  idle-vs-hurt pairs (123 sheets plus 12 heroes). T_pal comes from the hero `battle_raw.png` -> `battle.png` pairs.
-  The values are pinned in `kneel_ai_thresholds.json` and section 13 before any paid call, and may only tighten after
+**Group J1: after marking (D-KA7), before lock.** A failure archives the key and sends the sprite to its next try
+(D-KA5).
+
+| Check | Rule |
+|---|---|
+| A-prop | for each `weapons` part: alpha IoU (the idle part's pixels posed on the marked bone vs the key) >= T_prop_iou; pixels of that part's colours outside the fitted part, dilated by 2 px, <= T_outside x the idle part's pixel count (catches a 2nd weapon) |
+| A-headdup | the same for each `heads` part, with T_head_iou and T_head_outside (catches an extra head, as on rhyos) |
+| A-head | the marked crown or head joint is lower than the idle's by >= 0.15 x idle height |
+
+**Calibration** (`kneel_ai.py calibrate`, KA0b, offline):
+
+- T_hist and T_adj: the 95th / 5th percentile over the approved idle-vs-hurt pairs (123 sheets plus 12 heroes).
+- T_prop_iou / T_head_iou: the 5th percentile of the same measures on the approved **hurt keys**, posed by their
+  marked hurt joints. T_outside / T_head_outside: the 95th percentile there.
+- T_pal: the hero `battle_raw.png` -> `battle.png` pairs.
+- The values are pinned in `kneel_ai_thresholds.json` and section 13 before any paid call, and may only tighten after
   KA1-P.
 - **Failure fixtures** (selftest, offline, must FAIL):
-  - rhyos idle with a 4th head (a ram head pasted at +20 px): A-headdup;
-  - a warrior `ready` with a second sword and hand pasted (the R3 variant-B failure): A-prop;
+  - rhyos idle with a 4th head (a ram head pasted at +20 px), marked with its idle joints: A-headdup (J1), and R1's
+    count in the reviewer dry run;
+  - a warrior `ready` with a second sword and hand pasted (the R3 variant-B failure): A-prop (J1);
+  - a wolf stretched to 112 % of its cell width: A-width;
+  - a goblin scaled to 125 %: A-scale;
   - goblin with a foreign colour and a grey fill: A-pal / A-grey;
   - a 2 px lift: K-ground.
 
@@ -323,19 +384,19 @@ rubric):
 - **Verdict:** `<id> try N: PASS` or `<id> try N: FAIL R<k>: <reason>`.
 - At most 3 tries per sprite, then D-KA14.
 
-**Animation and lock gates:** `python3 -I assets-src/gen/monster_anim.py check <id>` -> `<id>: OK` (heroes:
-`puppet_kneel.py check <class>` -> `<class>: OK`), then `lock`, then commit. At most 3 offline rig iterations; they
+**Animation and lock gates:** J1 passes, then `python3 -I assets-src/gen/monster_anim.py check <id>` -> `<id>: OK`
+(heroes: `python3 -I assets-src/gen/puppet_kneel.py check <class>` -> `<class>: OK`), then `lock`, then commit. At most 3 offline rig iterations; they
 never trigger a new image.
 
 **D-KA14 After 3 failed tries:** the Q3 ruling applies.
 
 ## 7. Budget, cost and compute (user approval: Q1)
 
-**Stage 1 (approve now), at most 86 requests:**
+**Stage 1 (approve now), at most 91 requests:**
 
 | Purpose | Scope | Cap |
 |---|---|---|
-| `ka_probe` | 5 sprites x 10 | 50 |
+| `ka_probe` | 5 sprites x 11 (arm (a) = 10 of them, about $0.80, on the rejected baseline) | 55 |
 | `ka_pilot` | 6 sprites x 3 tries x 2 calls (the worst case, if hybrid (c) is picked) | 36 |
 
 **Stage 2 (asked at U1-KA, sized by the picked arm's calls per try, c):**
@@ -345,22 +406,24 @@ never trigger a new image.
 | `ka_bodyprobe` | 6 | 18 c |
 | `ka_monsters` | 113 | 339 c |
 | `ka_heroes` | 10 | 30 c |
-| `reserve:<reason>` | a 4th try, only if Q3 = regenerate | 20 |
+| `reserve:<reason>` | a 4th try, only if Q3 = regenerate | 20 c |
 
-That is 387 c + 20 = **407 at c = 1, 794 at c = 2**.
+That is 407 c: **407 at c = 1, 814 at c = 2**.
 
 - **Price** (estimates, `bedrock.COST_USD` / CHAOS_FORMS_PLAN 5.6): sd35 $0.08; structure and inpaint about $0.07.
   Style Transfer, Style Guide and Control Sketch have **no estimate on record**.
-  - **KA0b exit criterion (hard stop):** every price used is read from the Bedrock pricing page for us-west-2, written
-    into `COST_USD`, and recorded in section 13 **before KA1-P**.
+  - **KA0b exit criterion (hard stop, with the thresholds and the selftests):** the price of every model a probe arm
+    uses (sd35, style_transfer, control_sketch or structure, style_guide) is read from the Bedrock pricing page for
+    us-west-2, written into `COST_USD`, and recorded in section 13 **before KA1-P**. Without it, `kneel_ai.py gen`
+    refuses (an arm whose model has no `COST_USD` entry is refused).
   - The figures below assume <= $0.08 per call. If a used model costs more than $0.10, the budget goes back to the
     user.
-- **Worst case:** stage 1 86 x $0.08 = **$6.88**. Stage 2 is $32.56 (c = 1) or $63.52 (c = 2).
-- **Expected:** stage 1 about 70 requests. Stage 2 at 1.7 tries is about 219 c requests (about $18 at c = 1, $35 at
+- **Worst case:** stage 1 91 x $0.08 = **$7.28**. Stage 2 is $32.56 (c = 1) or $65.12 (c = 2).
+- **Expected:** stage 1 about 75 requests. Stage 2 at 1.7 tries is about 219 c requests (about $18 at c = 1, $35 at
   c = 2). The 1.7 is an assumption that the pilot measures; caps may then be lowered without the user, never raised.
 - **Gemini: 0.** `cache/ledger.jsonl` is unchanged (G12).
 - **Budget block** (`budget.json` `bedrock`):
-  - `{pass: "KA", cap: 86, per_purpose_caps: {ka_probe: 50, ka_pilot: 36}, gemini_before: <N at KA0b>,
+  - `{pass: "KA", cap: 91, per_purpose_caps: {ka_probe: 55, ka_pilot: 36}, gemini_before: <N at KA0b>,
     reserve_max_usd: 0.08}`. Stage 2 raises `cap` and adds its purposes after its own approval.
   - Pass C (25 / 80) moves to `bedrock_history`, which the two colossus selftests and `colossus.py budget --check`
     read.
@@ -376,8 +439,13 @@ That is 387 c + 20 = **407 at c = 1, 794 at c = 2**.
   | KA4: one `check --all` | 1 | 2.8 CPU-h |
   | **total** | | **about 16 CPU-h** |
 
-  There is no parameter search anywhere. Pass K by comparison: about 9 h of wall clock for 43 of 135, plus the
-  reported CPU hours of search per batch. A sprite over 10 CPU-min is reported.
+  There is no parameter search anywhere. A sprite over 10 CPU-min is reported.
+- **Agent time (estimates; the pilot measures them):** marking about 34 agent-hours (15 min x 135; stop rule at a
+  pilot median over 30 min), plus review about 19 agent-hours (about 5 min per try x 1.7 tries x 135). That is about
+  **53 agent-hours**, about 27 h of wall clock with 2 rig agents and a serial generator.
+- **Pass K for comparison:** about 9 h of wall clock for 43 of 135 locked, so about 28 h at that pace for all 135,
+  plus the reported CPU hours of parameter search per batch. Pass KA is not expected to be faster in agent-hours. Its
+  gain is that no CPU goes to parameter search and that the pose comes from the model, not from warping.
 
 ## 8. Pilot (KA1)
 
@@ -393,7 +461,7 @@ with their best probe output of the picked arm as try 1; warrior starts at try 1
 | `<id>_side.gif` | the old and AI sequences side by side: in 8 f, 2 sway cycles (period 48), out 6 f, stand 24 f, 16.7 ms per frame |
 | `goblin_rise_ai.gif` | kneel -> rise 6 f -> attack -> kneel_in 8 f -> hold |
 | `pilot_stage_ai.png` | all 6 kneeling at game scale on `grassland.webp` |
-| `pilot_numbers.txt` | calls, tries, A-check values, CPU seconds, joint-marking minutes per sprite |
+| `pilot_numbers.txt` | calls, tries, J0 / J1 values, the `width-limited` ids with their shrink %, CPU seconds, joint-marking minutes per sprite and their **median** (stop rule: over 30 min) |
 | browser | `http://localhost:5173/?mute=1&scenario=ka_pilot&battleStep=1&poseLabel=1` -> `/tmp/ka1/pilot_battle_{1,2,3}.png`, the KNEEL_PLAN 8 scripted capture. `ka_pilot` = the `kneel_pilot` party; enemies `[goblin, wolf, cobra, green_slime]`, `enemyStatus {0: [poison], 1: [sleep], 2: [stun]}`, green_slime the control; a test checks `formationFits` |
 
 - **KA1 commits:** tooling, 6 keys, rigs, locks, archives and the rebuilt atlases.
@@ -430,15 +498,17 @@ Totals: monsters 4 + 24 + 24 + 27 + 6 + 13 + 12 + 13 = **123**; heroes 2 + 10 = 
   `python3 -s assets-src/build_assets.py monsters_ai battle_ai` and the gates below, and commits `KA2: atlases
   (<batches>)`.
 
-**Gates.** `IDS` = the batch's changed sprite ids (from the merge diff). Every batch merge runs G1b and G2-G16; KA4
-runs G1 and G2-G16.
+**Gates.** `IDS` = the batch's changed sprite ids (from the merge diff). Every batch merge runs G1b, G1h and G2-G16; KA4
+runs G1, G1h (all 12 classes) and G2-G16.
 
 ```bash
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 # G1  (KA4 only, about 2.8 CPU-h): expect "0", and 123 OK lines
 python3 -I assets-src/gen/monster_anim.py check --all | grep -vc ': OK'
-# G1b (batch merges): expect "0"
-python3 -I assets-src/gen/monster_anim.py check $IDS | grep -vc ': OK'
+# G1b (batch merges; IDS = changed monster ids, HEROES = changed hero classes): expect "0" each
+if [ -n "$IDS" ]; then python3 -I assets-src/gen/monster_anim.py check $IDS | grep -vc ': OK'; else echo 0; fi
+# G1h: heroes go through puppet_kneel.py
+if [ -n "$HEROES" ]; then python3 -I assets-src/gen/puppet_kneel.py check $HEROES | grep -vc ': OK'; else echo 0; fi
 # G2: last line "<n> added, 0 changed, 0 removed", no FAIL line, exit 0
 python3 -I assets-src/gen/kneel_tools.py lockdiff --base 24c4236 --relock $(python3 -I assets-src/gen/kneel_ai.py converted)
 # G3: "monsters ai A, derived D, alias F (= 123)" and "heroes ai A, derived D, alias F (= 12)", A + D + F as printed;
@@ -494,17 +564,19 @@ python3 -I assets-src/gen/colossus.py budget --check
 | **Palette breaks** | the snap makes a foreign colour impossible; A-pal rejects a raw too far off |
 | **Unpainted grey silhouette (arm b)** | A-grey; `change_strength` 0.8 / 0.9 at the probe |
 | **Variants** | the recoloured kneel key is now palette-checked (finding 14) |
-| **Size / width / anchor** | full-resolution pre-scale; the width rule (cell never widened, page impact 0); A-base; floater y rule; K-anchor and G5 |
+| **Size / width / anchor** | known-k downscale or reference-part scale; the compact wording; A-scale +-10 %; A-width <= 8 % shrink (the cell never widened, page impact 0), the width-limited list shown at U1-KA; A-base; floater y rule; K-anchor and G5 |
 | **Atlas pages** | the cell count and sizes are unchanged, so the KNEEL_PLAN 1 projection holds (<= 12 pages); G5 |
-| **Hand-marking time** | about 15 agent-min per sprite; logged in `pilot_numbers.txt`, so the pilot measures it |
+| **Hand-marking time** | the estimate of 15 agent-min per sprite is unmeasured; the pilot reports the median; stop rule over 30 min |
+| **A J1 failure after approval** | the key is archived (`retire_kneel.py --key`), and the sprite retries; it costs a try, not a gap in the game (the derived kneel or the alias stays live meanwhile) |
 | **API error or content filter** | counted as spent; the next seed |
 | **Cost** | staged approval; caps in the gate; `budget --check` after each call |
 
 ## 11. Open questions for the user
 
-1. **Q1 Budget stage 1:** approve 86 Bedrock requests (the 50-call probe plus the pilot; about $6.88 at worst, at
+1. **Q1 Budget stage 1:** approve 91 Bedrock requests (the 55-call probe plus the pilot; about $7.28 at worst, at
    <= $0.08 per call once confirmed), with pass C closed into history at 25 of 80, and 0 Gemini? Stage 2 is asked at
-   U1-KA, sized by the picked arm (407 or 794 requests). Default: **approve 86**.
+   U1-KA, sized by the picked arm (407 or 814 requests). Arm (a) spends 10 of the 55 probe calls (about $0.80) on the rejected baseline, to
+   measure H1; drop it to save that. Default: **approve 91, with arm (a)**.
 2. **Q2 Review:** you pick the arm at the probe and review at U1-KA and the KA4 sheet; the rest goes to the
    orchestrator plus the independent review agent, with every limit hit reported? Default: **yes**.
 3. **Q3 After 3 failed tries,** choose one: (i) keep the derived kneel (only for the 43 that have one), (ii) alias to
@@ -530,7 +602,7 @@ python3 -I assets-src/gen/colossus.py budget --check
   "pass_fail": [
     "G1 / G1b and G2-G16 as in section 9",
     "kneel_ai.py budget --check prints OK pass KA <used>/<cap>",
-    "every approved key passes all binary A-checks and R1, R2, R2b, R3, R4, R5",
+    "every approved key passes J0 and R1, R2, R2b, R3, R5 before approve, and J1 and R4 before lock",
     "the selftest failure fixtures (rhyos 4th head, second weapon, grey fill, foreign colour, 2 px lift) fail their checks"
   ]
 }
@@ -542,6 +614,7 @@ python3 -I assets-src/gen/colossus.py budget --check
 |---|---|---|
 | 2026-11-17 | directive | an AI kneel key per sprite via Stability, with the rig doing the in-betweens (user) |
 | 2026-11-17 | rev 2 | momus rejection of rev 1 resolved (table at the top) |
+| 2026-11-17 | rev 3 | the narrow momus rejection of rev 2 resolved (table at the top) |
 
 ## TODOs
 
@@ -549,8 +622,8 @@ python3 -I assets-src/gen/colossus.py budget --check
 - [ ] KA0b `bedrock.py` models; **confirmed prices for every used model (hard stop before KA1-P)**; `budget.json` stage 1; `bedrock_history`; the 2 colossus selftests and the budget check (high, 2h)
 - [ ] KA0b `kneel_ai.py`, `_guide`, `_cut`, `_gates`, `_joints`, `kneel_ai.yaml` (high, 9h)
 - [ ] KA0b `source: ai` in `kneel.py` / `monster_keys.py` / `monster_anim`; `puppet_kneel_ai.py`; `approve.py` gate; `monster_atlas.py` variant lock; `retire_kneel.py` (high, 6h)
-- [ ] KA0b `selftest_kneel_ai.py` with the failure fixtures; `calibrate` -> thresholds pinned; fit time on goblin; G1b-G16 green with byte-identical atlases (high, 4h)
-- [ ] KA1-P probe, 50 calls; `probe_sheet.png` to the user; the user's arm pick recorded (high, 3h)
+- [ ] KA0b `selftest_kneel_ai.py` with the failure fixtures; `calibrate` -> thresholds (incl. T_prop_iou / T_outside) pinned; `bodies --write` -> weapons / heads entries reviewed; fit time on goblin; G1b-G16 green with byte-identical atlases (high, 4h)
+- [ ] KA1-P probe, 55 calls; `probe_sheet.png` to the user; the user's arm pick recorded (high, 3h)
 - [ ] KA1 pilot of 6 sprites; artefacts; `ka_pilot`; atlases committed (high, 8h)
 - [ ] U1-KA user review and the stage-2 budget (blocking)
 - [ ] KA2-1 / 2-2 / 2-3 / 2-4 (75 monsters + 10 heroes), integrator per batch (medium, about 7h each, including hand marks)
