@@ -15,18 +15,17 @@ bone that points up, as monsters face right). Template keys (all optional per te
 - `dir`:      {joint: deg} the bone into the joint points this absolute way (0 = forward, 90 = down, 180 = back).
 - `keep`:     joints whose bone keeps the idle key's absolute angle (a planted foot stays flat).
 - `pins`:     joints held at the idle key (with the IK knee); also the kneel in-betweens' pins.
-- `squat`:    the mechanical power-down: the root drops until a leg bone turns `squat` degrees (every foot pinned).
+- `squat`:    mechanical: the root drops until a leg bone turns `squat` degrees (every foot pinned; K2-0: 0).
 - `band`:     (lo, hi) the kneel / idle opaque-height ratio (K-height).
 - `limb_cap`: K-rot's cap on limb parts in the kneel key (in-betweens: kneel.IN_LIMB_CAP).
+- K2-0 keys (`back`, `sag`, `slump`, `fit`, `knee_fwd`, `free_in`): kneel_variants.py.
 
-A rig's `kneel:` block adds `tweaks: {joint: [dx, dy]}` (after the template, px per 80 px of cell are NOT scaled: native
-px), `paint: [...]` (<= monster_keys.KF_PAINT_CAP px, approved palette or null), `sink: n` (floaters, runtime only) and
-`variant: name`. Variants are additive (D-K18): a variant only adds keys or overrides them, and the default template
-never changes once a rig is locked on it.
+A rig's `kneel:` block adds `tweaks: {joint: [dx, dy]}` (native px), `paint: [...]` (<= monster_keys.KF_PAINT_CAP px),
+`sink: n` (floaters), `pins`, `sampler` and `variant: name` or a list of names (kneel_variants.py). Variants are additive
+(D-K18): the default template never changes once a rig is locked on it.
 """
 from __future__ import annotations
 
-import copy
 import math
 
 # biped (46 rigs): far knee down, near foot planted, torso low, head bowed, weapon low; band 0.68-0.85
@@ -43,11 +42,13 @@ BIPED = {
     "limb_cap": 100.0,
 }
 
-# preset mechanical (iron_golem, soldier, warmech; guardian as a quadruped): power-down squat, every bone <= 15 deg
+# preset mechanical (iron_golem, soldier, warmech; guardian as a quadruped): power-down, every bone <= 15 deg. K2-0:
+# a 13 deg leg squat lowered short legs about 1 px (0.98 of the idle height, over the band), so the legs stay
+# straight and the body sinks between them rigidly (`slump`); the forearm droop is gone (it tore the plated arms)
 MECHANICAL = {
-    "squat": 13.0,
+    "squat": 0.0,
+    "slump": 0.09,                                 # K2-0: the upper body sinks 9 % of the idle height between the legs
     "rel": {"crown": 13.0, "head": 13.0, "snout": 13.0},
-    "down": {"el_n": 13.0, "el_f": 13.0},          # the forearms ride the upper arms (a second turn passed 15)
     "band": (0.85, 0.95),
     "limb_cap": 15.0,
 }
@@ -65,13 +66,7 @@ QUADRUPED = {
     "limb_cap": 100.0,
 }
 
-# additive variants (D-K18): a rig opts in with kneel: {variant: <name>}
-VARIANTS = {
-    # K1 pilot (goblin): a short-legged biped whose 0.8 L_thigh drop leaves the kneel above the band
-    ("biped", "short_legs"): {"drop": ("L_thigh", 1.15)},
-    ("quadruped", "winged"): {"rel": {"wel_n": 20.0, "wel_f": 20.0, "wtip_n": 10.0, "wtip_f": 10.0}},
-    ("quadruped", "multihead"): {"multihead": True},
-}
+from gen.kneel_variants import VARIANTS, _heads, knees_forward  # noqa: E402,F401  (K2-0 split)
 
 TEMPLATES = {"biped": BIPED, "quadruped": QUADRUPED}
 # limb chains per body for K-rot: the joints after each limb root, plus the toes hanging from the last one
@@ -80,10 +75,16 @@ TOES = {"biped": {"foot_n": "toe_n", "foot_f": "toe_f"},
 
 
 def merge(base: dict, add: dict) -> dict:
-    """base with add's keys (dict values merged one level deep, others replaced)."""
+    """base with add's keys (dict values merged one level deep, others replaced; a None value, at either level, drops
+    the key: a variant can take a default target away)."""
     out = dict(base)
     for k, v in add.items():
-        out[k] = {**base.get(k, {}), **v} if isinstance(v, dict) and isinstance(base.get(k), dict) else v
+        if v is None:
+            out.pop(k, None)
+        elif isinstance(v, dict) and isinstance(base.get(k), dict):
+            out[k] = {j: w for j, w in {**base[k], **v}.items() if w is not None}
+        else:
+            out[k] = v
     return out
 
 
@@ -97,11 +98,11 @@ def template(body: str, preset: str | None = None, variant: str | None = None, s
         t = {**MECHANICAL, "pins": [], "body": body}
     elif preset is not None:
         raise ValueError(f"rig {sprite}: no kneel template for preset {preset!r}")
-    if variant is not None:
-        if (body, variant) not in VARIANTS:
-            raise ValueError(f"rig {sprite}: kneel variant {variant!r} is not one of "
-                             f"{sorted(v for b, v in VARIANTS if b == body)} (body {body})")
-        t = merge(t, VARIANTS[(body, variant)])
+    for v in ([] if variant is None else [variant] if isinstance(variant, str) else list(variant)):
+        if (body, v) not in VARIANTS:                # K2-0: a list of variants merges in order
+            raise ValueError(f"rig {sprite}: kneel variant {v!r} is not one of "
+                             f"{sorted(n for b, n in VARIANTS if b == body)} (body {body})")
+        t = merge(t, VARIANTS[(body, v)])
     return t
 
 
@@ -134,13 +135,15 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
     or aimed at pos[j]; bone lengths from S. Angles are forward-positive degrees (mirrored for a left-facing rig)."""
     f, pos = rig.fwd, pos or {}
     rel, down, keep, dirs = spec.get("rel", {}), spec.get("down", {}), set(spec.get("keep", [])), spec.get("dir", {})
+    sag, turn, droop = spec.get("sag", {}), spec.get("turn", {}), spec.get("droop", {})
+    bx = units(S)[spec["back"][0]] * spec["back"][1] if spec.get("back") else 0.0
     T, acc = {}, {}
     for j in rig.order:
         if j not in S:
             continue
         p = rig.parent.get(j)
         if p is None or p not in T:
-            T[j], acc[j] = (S[j][0], S[j][1] + dy), 0.0
+            T[j], acc[j] = (S[j][0] - f * bx, S[j][1] + dy), 0.0
             continue
         a0 = _ang(S[p], S[j])
         if j in pos:
@@ -150,6 +153,14 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
             a = math.atan2(math.sin(d), f * math.cos(d))
         elif j in keep:
             a = a0
+        elif j in turn:                              # K2-0: the idle angle plus deg (forward-positive), whatever
+            a = a0 + f * math.radians(turn[j])       # the parents did
+        elif j in droop:                             # K2-0: toward straight down on its own side, by at most deg
+            cap = math.radians(droop[j])
+            a = a0 + max(-cap, min(cap, _wrap(math.pi / 2 - a0)))
+        elif j in sag:                               # K2-0: the idle angle toward down by deg, whatever the parent did
+            cap = math.radians(sag[j]) if f * math.cos(a0) > 0 else 0.0
+            a = a0 + max(-cap, min(cap, _wrap(math.pi / 2 - a0)))
         else:
             a = a0 + acc[p] + f * math.radians(rel.get(j, 0.0))
             if j in down:
@@ -161,19 +172,6 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
     return T
 
 
-def _heads(rig, tpl: dict) -> dict:
-    """The multihead variant: every extra neck / head copies the first one's targets."""
-    if not tpl.get("multihead"):
-        return tpl
-    t = copy.deepcopy(tpl)
-    for i in (2, 3, 4, 5):
-        if f"neck{i}" in rig.parent:
-            for key, src in (("lower", "neck"), ("rel", "snout")):
-                if src in t.get(key, {}):
-                    t[key][f"{src}{i}"] = t[key][src]
-    return t
-
-
 def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
     """Target joints of the kneel key (before rig.solve), `lift` px raising the ground line."""
     tpl = _heads(rig, tpl)
@@ -182,7 +180,11 @@ def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
     dy = U[unit] * k
     first = fk(rig, S, dy, tpl)
     ground = max((S[f][1] for f in rig.feet if f in S), default=0.0) - lift
+    ground += tpl.get("ground_dy", 0.0) * rig.cell[1] / 80
     pos = {j: (first[j][0], first[j][1] + U[u] * k) for j, (u, k) in tpl.get("lower", {}).items() if j in first}
+    pos.update({j: (float(v[0]), float(v[1])) for j, v in tpl.get("aim", {}).items() if j in S})   # K2-0 block aim
+    if tpl.get("ground_late"):                       # K2-0: the ground joints hang from their lowered parents
+        first = fk(rig, S, dy, tpl, dict(pos))
     for j, back in tpl.get("ground", {}).items():   # on the ground line at bone length, the side nearest `back` x L
         p = rig.parent.get(j)                        # behind the parent (the hip socket, the shoulder)
         if j not in S or p not in first:

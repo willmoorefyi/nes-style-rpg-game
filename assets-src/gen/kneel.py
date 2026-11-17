@@ -1,6 +1,7 @@
 """Derived kneel key and its in-betweens (docs/KNEEL_PLAN.md 3-5, D-K4 / D-K5 / D-K7 / D-K9 / D-K10).
 
-A rig opts in with a `kneel:` block (`tweaks`, `paint`, `sink`, `variant`; kneel_templates.py has the reference). Then:
+A rig opts in with a `kneel:` block (`tweaks`, `paint`, `sink`, `variant`, `sampler`, `pins`, `aim`; kneel_templates.py
+has the reference). Then:
 
 - `kneel` is a derived key: the idle key re-posed by the body template's joint targets (forward kinematics from the idle
   joints, bone lengths kept), solved by rig.solve at t 1 with the template's pins (a planted foot keeps its IK knee),
@@ -22,6 +23,7 @@ import numpy as np
 from PIL import Image
 
 from gen import kneel_templates as KT
+from gen.kneel_ops import erase, fit_mask, hem_row, robe_fit, robe_frame, slump_px, slump_roots  # noqa: F401
 from gen.kneel_templates import _ang, _wrap, fk, targets, units  # noqa: F401  (the target math, section 4)
 from gen.monster_recipes import KNEEL_FRAMES
 
@@ -47,13 +49,20 @@ def block(cfg: dict) -> dict:
     return b
 
 
+# `pins` (K2-0): extra joints held at the idle key in the kneel key and its in-betweens (garland's cape hem).
 # `sampler` (K1 addition): one sampler for every part of the kneel key instead of the D-K19 rotsprite-above-30 rule
 # (the wolf's folded legs double their outlines under rotsprite: second ring 0.30 against the idle's 0.21)
-BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler")
+BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler", "pins", "aim", "samplers", "turn", "z", "erase")
 
 
 def template_of(rig, cfg: dict) -> dict:
-    return KT.template(rig.body, getattr(rig, "preset", None), block(cfg).get("variant"), cfg.get("sprite", "?"))
+    """The rig's template; the block's `pins` (K2-0: e.g. a cape hem on the plain) join the template's, its `aim`
+    ({joint: [x, y]}, native px: the bone into the joint points there, length kept) joins the template's targets."""
+    b = block(cfg)
+    t = KT.template(rig.body, getattr(rig, "preset", None), b.get("variant"), cfg.get("sprite", "?"))
+    t = {**t, "pins": [*t.get("pins", []), *b["pins"]]} if b.get("pins") else t
+    t = {**t, "turn": {**t.get("turn", {}), **b["turn"]}} if b.get("turn") else t
+    return {**t, "aim": {**t.get("aim", {}), **b["aim"]}} if b.get("aim") else t
 
 
 def squat(rig, tpl: dict, S: dict) -> tuple[dict, list[str]]:
@@ -90,29 +99,31 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
     rig = R.Rig(cfg, cell)
     tpl, b = template_of(rig, cfg), block(cfg)
     S = rig.keyframes["idle"]
-    arr = np.asarray(kfs["idle"].convert("RGBA")).copy()
+    arr = erase(np.asarray(kfs["idle"].convert("RGBA")).copy(), b.get("erase"))
     lab, names = R.segment(rig, "idle", arr)
     pairs = rig.joined_pairs()
     gaps = RR.source_gaps(lab, pairs)
     size, bottom = (cell[1], cell[0]), int(meta["bottom_row"])
     tweaks = {j: [float(v[0]), float(v[1])] for j, v in (b.get("tweaks") or {}).items()}
+    dy = slump_px(tpl, arr)
     tried = []                                       # (low row, render) per ground-line lift 0, 1, 2 ... px
     for lift in map(float, range(FIT_ROUNDS)):
         T, pins = squat(rig, tpl, S) if "squat" in tpl else (targets(rig, tpl, S, lift), list(tpl.get("pins", [])))
-        J = R.solve(rig, S, T, 1.0, "all", pins, 0, tweaks, False)
+        J = KT.knees_forward(rig, tpl, R.solve(rig, S, T, 1.0, "all", pins + slump_roots(rig, tpl), dy, tweaks, False))
         layers, rots = [], {}
-        for part in rig.z_for("idle"):
+        for part in (b.get("z") or rig.z_for("idle")):                    # K2-0 block `z`: the kneel key's order
             mask = lab == names.index(part)
             if not rig.present(part, "idle") or not mask.any():
                 continue
             deg = R.part_rotation(rig, part, "idle", S, J)
             mech = getattr(rig, "preset", None) == "mechanical"           # FW-5: the preset is nearest only
-            sampler = rig.sampler if mech else b.get("sampler") or ("rotsprite" if abs(deg) > ROTSPRITE_ABOVE
-                                                                    else rig.sampler)
+            own = (b.get("samplers") or {}).get(part)                         # K2-0 `samplers`: per part (a
+            sampler = own or (rig.sampler if mech else b.get("sampler") or (    # mechanical key part too, ruling)
+                "rotsprite" if abs(deg) > ROTSPRITE_ABOVE else rig.sampler))
             rgba, hit, emp, rots[part] = MR.render_part(rig, part, "idle", arr, mask, J, size, gaps, False, 1.0, sampler)
             layers.append((list(rig.parts).index(part), rgba, hit, emp))
-        img, labels = RR.composite(layers, size, pairs)
-        rows = np.nonzero((img[..., 3] > 0).any(1))[0]
+        img, labels = robe_fit(rig, tpl, *RR.composite(layers, size, pairs), S, J, hem_row(rig, lab))   # K2-0 robed
+        rows = np.nonzero(((img[..., 3] > 0) & fit_mask(rig, tpl, labels)).any(1))[0]
         tried.append((int(rows.max()) if len(rows) else bottom, (img, labels, J, rots, lift)))
         if tried[-1][0] == bottom or not tpl.get("ground"):
             break
@@ -146,6 +157,8 @@ def extend_cfg(cfg: dict, joints: dict, pins: list[str]) -> dict:
             p["in"] = [*p["in"], "kneel"]
     if "idle" in (c.get("z") or {}):
         c["z"]["kneel"] = c["z"]["idle"]
+    if (c.get("kneel") or {}).get("z"):
+        c.setdefault("z", {})["kneel"] = list(c["kneel"]["z"])
     if c.get("frames") is None:
         c["frames"] = {}
     frames = c["frames"]
@@ -186,6 +199,7 @@ def prepare(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> tup
     rig0 = R.Rig(cfg, kfs["idle"].size)
     tpl = template_of(rig0, cfg)
     pins = [f for f in rig0.feet if f in rig0.keyframes["idle"]] if "squat" in tpl else list(tpl.get("pins", []))
+    pins = [p for p in pins if p not in tpl.get("free_in", [])] + slump_roots(rig0, tpl)
     c = extend_cfg(cfg, d["joints"], pins)
     rig = R.Rig(c, kfs["idle"].size)
     for n in ("kneel_in1", "kneel_in2"):
