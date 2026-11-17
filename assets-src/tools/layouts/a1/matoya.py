@@ -23,7 +23,7 @@ MATS = {"floor_stone": remap("cave"), "in_wall_top": remap("cave", "temple_wall_
 QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": []}
 LEGEND = "legend: W wall top  F wall face  - stone / earth floor  + carpet"
 NOTE = """Concept: a witch's burrow scooped out of a mossy hillock: one lopsided chamber round a hearth, jars to the roof, a bed in a bay.
-Distinct: the door is a crack in the hill's south face, not a cave on a cliff; a reading nook dug under the hearth wall; three brooms who sweep and gossip on their own
+Distinct: a lit hearth between two torches as the room's heart, with a nook dug in under its wall; a sleeping bay off the east side with her bed; a lopsided, stepped chamber with two side bays instead of a square room
 Topology: one floor; the door passage opens into the chamber, a north nook, a west bay and an east sleeping bay"""
 SEEN = "A1_O_HERB_GIVEN"
 EYE = "item:crystal_eye"
