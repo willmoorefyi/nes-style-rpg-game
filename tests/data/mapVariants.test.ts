@@ -78,7 +78,7 @@ describe('map variants (legacy and compiled 2x)', () => {
     // plus the pass W dungeon floors of the canon (layouts/world_canon.py kind `floor`)
     const battleMaps = new Set(['overworld', 'temple-of-fiends', ...canonRows().filter((r) => r.kind === 'floor').map((r) => r.id)]);
     for (const m of compiled.values()) {
-      if (battleMaps.has(m.id)) continue;
+      if (battleMaps.has(m.id) || m.exit) continue;           // pass W: a dungeon floor has MapData.exit (EXIT)
       expect(m.encounters ?? [], `${m.id} encounters`).toEqual([]);
     }
   });

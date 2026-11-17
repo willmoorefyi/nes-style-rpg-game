@@ -87,7 +87,8 @@ describe('originality: the pass W dungeons', () => {
   const rows = canonRows().filter((r) => r.kind === 'floor');
   const dungeons = new Map<string, typeof rows>();
   for (const r of rows) {
-    const d = floorOf(r.id)?.dungeon ?? r.id;
+    // floors without a floor label are named sites of one dungeon by their stem (`bahamut-cave`, `bahamut-lair`)
+    const d = floorOf(r.id)?.dungeon ?? r.id.replace(/-[a-z]+$/, '');
     dungeons.set(d, [...(dungeons.get(d) ?? []), r]);
   }
   const built = [...dungeons].filter(([, fs]) => fs.every((f) => isBuilt(f.id) && compiledMap(f.id)));
@@ -122,8 +123,10 @@ describe('originality: the pass W dungeons', () => {
       const named = topologyLine(note);
       const labels = fs.map((f) => floorOf(f.id)?.label ?? f.id);
       const bossFloor = maps.find((m) => (m.scriptedEncounters ?? []).some((e) => e.isBoss));
-      if (named.floors.join() !== labels.join()) errors.push(`${d}: Topology names ${named.floors.join(' ')}, the floors are ${labels.join(' ')}`);
-      if (bossFloor && named.boss !== floorOf(bossFloor.id)?.label) errors.push(`${d}: Topology's boss floor ${named.boss} is not ${bossFloor.id}`);
+      // the Topology line names B<n> / <n>F floors; a dungeon of named sites has none to match
+      const labelled = fs.every((f) => floorOf(f.id));
+      if (labelled && named.floors.join() !== labels.join()) errors.push(`${d}: Topology names ${named.floors.join(' ')}, the floors are ${labels.join(' ')}`);
+      if (labelled && bossFloor && named.boss !== floorOf(bossFloor.id)?.label) errors.push(`${d}: Topology's boss floor ${named.boss} is not ${bossFloor.id}`);
       console.log(`${d}: ${g.branching ? 'branching' : 'chain'} [${g.edges.map((e) => e.join('>')).join(' ')}]`);
     }
     for (const [owner, tr] of byTranche) if (tr.branching * 2 < tr.total) errors.push(`${owner}: ${tr.branching} of ${tr.total} dungeons branch`);

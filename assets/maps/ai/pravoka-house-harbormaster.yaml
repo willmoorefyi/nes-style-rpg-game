@@ -10,13 +10,30 @@ art:
   below: [assets/maps/ai/pravoka-house-harbormaster/below_0_0.png]
   above: [null]
 entrances:
-  door: [5, 8]
-collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1]
-npcs: []
+  door: [3, 8]
+collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1]
+npcs:
+- id: harbormaster
+  sprite: old_man
+  x: 5
+  y: 4
+  dialog:
+  - condition: BIKKE_DEFEATED
+    text: ['The harbour books are open again. Your brig is entered as ''ship of the Warriors, dues waived for ever''.', South down the channel lies the Aldi Sea. Every port of the old trade is on it.]
+  - text: ['Harbourmaster, of a harbour that sails nowhere. The Captain tore my charts and kept the pieces.']
+- id: harbor_clerk
+  sprite: mage
+  x: 9
+  y: 6
+  dialog:
+  - condition: BIKKE_DEFEATED
+    text: ['Forty ledgers, and I''m writing the first good page in a month.']
+  - text: ['I keep two ledgers now: what the pirates took, and what they think they took. The second is shorter.']
+  tint: '#b4b4c8'
 transitions:
-- {x: 5, y: 9, targetMap: pravoka, targetEntrance: house_harbormaster}
-name: Pravoka Harbormaster House
+- {x: 3, y: 9, targetMap: pravoka, targetEntrance: house_harbormaster}
+name: Harbourmaster's House
 music: town
 encounterRate: {min: 999, max: 999}
 encounters: []
