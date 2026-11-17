@@ -124,3 +124,16 @@ masks:
 holds: []
 paint:                         # a sliver of the back of the head dragged up over the far shoulder in follow, cleared
   - {frame: atk_follow, xy: [[35, 14], [36, 14], [37, 14], [38, 14], [37, 15], [38, 15], [39, 15], [37, 16], [38, 16], [39, 16]], rgb: null}
+  # pass K (K2-B): kneel frames: 1 px cracks closed with outline ink and outline ink where the folded stripes lost it (kneel_in1, kneel_in2); the tail curl rejoined to its base (kneel_in2) and closed (kneel_b)
+  - {frame: kneel_in1, xy: [[33, 22], [34, 22], [54, 33], [31, 41], [51, 48], [52, 48], [51, 49], [52, 49], [53, 49], [54, 50], [54, 51]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[13, 65], [14, 65], [14, 66], [13, 66]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[12, 64], [12, 65], [29, 26], [34, 26], [26, 50], [25, 51], [26, 51], [49, 51], [43, 62], [44, 62], [25, 71], [24, 73], [30, 27], [58, 50], [60, 56], [22, 61], [50, 66], [51, 66], [52, 66], [53, 66], [19, 44], [7, 59], [22, 59], [42, 59], [46, 59], [23, 60], [40, 61], [23, 62], [41, 62], [17, 64], [18, 64], [20, 64], [21, 64], [13, 67], [25, 69], [59, 70], [52, 32], [49, 49], [50, 18], [51, 18]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[42, 61], [43, 61]], rgb: [57, 24, 33]}
+  - {frame: kneel_b, xy: [[10, 62], [9, 63], [10, 63], [8, 64], [9, 64], [8, 65], [9, 65]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[11, 64], [10, 65]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs); the far knee and shin flat on the ground row (its knee outline carried down to the feet row), the foot and tail tip drawn in; shoulders slumped; outline ink where the folded stripes lost it
+kneel:
+  variant: [knee_forward, short_legs]
+  tweaks: {knee_f: [0, 2], foot_f: [3, 2], toe_f: [3, 1], tail_tip: [3, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[23, 45], [24, 45], [25, 45], [26, 45], [23, 46], [24, 46], [25, 46], [25, 47], [47, 22], [48, 22], [40, 24], [53, 26], [34, 28], [28, 30], [27, 31], [54, 31], [33, 32], [21, 46], [22, 47], [23, 48], [51, 51], [52, 53], [53, 54], [57, 54], [55, 61], [27, 71], [26, 72], [23, 74], [24, 74], [22, 44], [51, 70], [49, 23], [26, 31], [21, 33], [22, 33], [53, 33], [15, 38], [50, 42], [15, 44], [21, 45], [17, 48], [17, 51], [17, 52], [18, 52], [57, 55], [57, 56], [17, 57], [23, 57], [20, 59], [21, 75], [22, 75], [24, 75], [25, 75], [22, 76], [24, 76]], rgb: [6, 4, 10]}
