@@ -132,3 +132,16 @@ paint:                         # pockets the translations close off, filled with
   - {frame: atk_mid, rgb: [49, 8, 49], xy: [[41, 66]]}
   - {frame: atk_mid, rgb: [49, 57, 66], xy: [[41, 68]]}
   - {frame: hurt_in2, rgb: [33, 24, 41], xy: [[73, 101]]}
+
+# pass K (docs/KNEEL_PLAN.md K2-0): the mechanical power-down. The body sinks 9 % of the idle height between the held
+# legs (template `slump`; no bone turns), the head settles 2 px into the collar instead of the template's 13 deg bow
+# (a turned block head steps its outline under nearest sampling), and the glow dims a step: eyes to the ember
+# brown, the furnace grille one ramp step down (62 px of keyframe paint, sheet palette only)
+kneel:
+  tweaks: {neck: [1, 2], crown: [-1, 2]}
+  paint:
+    - {xy: [[67, 52], [67, 53]], rgb: [123, 66, 41]}
+    - {xy: [[67, 78], [70, 78], [67, 79], [70, 79], [74, 79], [67, 80], [70, 80], [73, 80], [74, 80], [64, 81], [67, 81], [70, 81], [73, 81], [74, 81], [64, 82], [67, 82], [70, 82], [73, 82], [74, 82], [67, 83], [70, 83], [67, 84], [70, 84]], rgb: [165, 115, 49]}
+    - {xy: [[73, 53], [67, 77], [70, 77], [71, 78], [74, 78], [71, 80], [76, 80], [71, 81], [76, 81], [64, 83], [73, 83], [74, 83], [73, 84], [67, 85], [70, 85]], rgb: [123, 66, 41]}
+    - {xy: [[71, 79]], rgb: [123, 66, 41]}
+    - {xy: [[66, 52], [73, 52], [66, 53], [68, 53], [74, 77], [76, 77], [76, 78], [64, 79], [65, 79], [73, 79], [76, 79], [64, 80], [65, 80], [65, 81], [65, 82], [71, 82], [76, 82], [65, 83], [76, 83], [74, 84], [73, 85]], rgb: [123, 66, 41]}

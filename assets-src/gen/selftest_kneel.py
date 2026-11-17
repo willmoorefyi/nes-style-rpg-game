@@ -116,7 +116,12 @@ def run_variant(check: Callable[[bool, str], None]) -> None:
     gen, m, k = _gen(mech, SR.keyframes(), SR.META)
     worst = max(abs(d) for d, _ in m["kneel"]["rots"].values())
     check(worst <= 15.0 + 1e-9, f"mechanical: the power-down squat turns no part over 15 deg ({worst:.1f})")
-    check(KC.ratio(np.asarray(k["kneel"]), np.asarray(k["idle"])) < 1.0, "mechanical: the squat lowers the figure")
+    r = KC.ratio(np.asarray(k["kneel"]), np.asarray(k["idle"]))
+    lo, hi = KT.template("biped", "mechanical")["band"]
+    check(lo <= r <= hi, f"mechanical: the power-down lands in its band {lo}-{hi} ({r:.3f}; K1 measured 0.98)")
+    t = KT.template("quadruped", None, ["crouch", "multihead"])
+    check(t.get("multihead") and "ground" not in t and "neck" not in t["lower"] and t["sag"]["neck"] > 0,
+          "a variant list merges in order, and a None value drops a default key")
 
 
 def _ts_list(src: str, name: str) -> list[str] | None:
@@ -138,7 +143,7 @@ def run_tables(check: Callable[[bool, str], None]) -> None:
         return
     check(ts == RC.MONSTER_FRAMES, f"MONSTER_FRAMES match the TS list ({ts})")
     for n, want in (("kneel", "daze"), ("kneel_b", "daze_b"), ("kneel_in2", "daze"), ("kneel_in1", "idle")):
-        m = re.search(rf"FRAME_FALLBACK[\s\S]*?\b{n}:\s*'(\w+)'", src)
+        m = re.search(rf"const FRAME_FALLBACK[\s\S]*?\b{n}:\s*'(\w+)'", src)
         check(bool(m) and m.group(1) == want, f"TS FRAME_FALLBACK {n} -> {want} ({m.group(1) if m else None})")
 
 
