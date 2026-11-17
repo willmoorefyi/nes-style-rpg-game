@@ -1,12 +1,63 @@
-import type { SaveData } from '../types/index.js';
+import type { FieldMode, SaveData, VehicleState } from '../types/index.js';
+import { FIELD_MODES } from '../types/index.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
-/** Unchanged by T4: old saves load through `Character.fromJSON`, which clamps charges and recomputes the level. */
-export const SAVE_VERSION = 1;
+/**
+ * Version 2 (pass W, W1-A) adds the party's field `mode` and the parked `vehicles`; a version-1 save loads on foot
+ * with no vehicles, and its overworld position is an act-1 cell (GAP-17: `frame: 'a1'`, translated by the world's
+ * `world.frames.a1.origin` on the next field enter). Old saves load through `Character.fromJSON`, which clamps
+ * charges and recomputes the level (T4).
+ */
+export const SAVE_VERSION = 2;
+
+/** The field part of a save (v2): the party's mode and the parked vehicles of every map. */
+export interface SaveField {
+  mode: FieldMode;
+  vehicles: VehicleState[];
+}
+
+/** What `SaveManager.load` returns (the shape `Game.restoreState` takes). */
+export interface LoadedSave {
+  party: PartyManager;
+  inventory: Inventory;
+  flags: GameFlags;
+  currentMap: string;
+  playerPosition: { x: number; y: number };
+  playTime: number;
+  fieldMode: FieldMode;
+  vehicles: VehicleState[];
+  /** `a1`: a version-1 save on `overworld`, whose position is an act-1 cell (GAP-17). */
+  frame: 'a1' | null;
+}
+
+const VEHICLE_TYPES = ['canoe', 'ship', 'airship'];
+
+/** The saved vehicles that are well formed (a bad entry is logged and dropped). */
+function savedVehicles(raw: unknown): VehicleState[] {
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) {
+    console.error('Save: vehicles is not a list; loading with no vehicles', raw);
+    return [];
+  }
+  return raw.filter((v): v is VehicleState => {
+    const ok = typeof v === 'object' && v !== null && VEHICLE_TYPES.includes(v.type) && typeof v.map === 'string'
+      && Number.isInteger(v.x) && Number.isInteger(v.y);
+    if (!ok) console.error('Save: dropping a malformed vehicle', v);
+    return ok;
+  }).map((v) => ({ type: v.type, map: v.map, x: v.x, y: v.y }));
+}
+
+/** The saved mode; a missing one (version 1) is walking, an unknown one is logged and walking. */
+function savedMode(raw: unknown): FieldMode {
+  if (raw === undefined) return 'walking';
+  const mode = FIELD_MODES.find((m) => m === raw);
+  if (!mode) console.error(`Save: unknown field mode ${String(raw)}; loading on foot`);
+  return mode ?? 'walking';
+}
 
 export interface SlotSummary {
   level: number;
@@ -35,7 +86,8 @@ export class SaveManager {
     currentMap: string,
     playerPosition: { x: number; y: number },
     playTime: number,
-    location?: string
+    location?: string,
+    field: Partial<SaveField> = {},
   ): boolean {
     if (slotId < 0 || slotId >= MAX_SLOTS) return false;
     
@@ -49,6 +101,8 @@ export class SaveManager {
       playTime,
       saveDate: new Date().toISOString(),
       slotId,
+      mode: field.mode ?? 'walking',
+      vehicles: (field.vehicles ?? []).map((v) => ({ ...v })),
     };
     if (location !== undefined) data.location = location;
     
@@ -61,14 +115,7 @@ export class SaveManager {
     }
   }
 
-  static load(slotId: number): {
-    party: PartyManager;
-    inventory: Inventory;
-    flags: GameFlags;
-    currentMap: string;
-    playerPosition: { x: number; y: number };
-    playTime: number;
-  } | null {
+  static load(slotId: number): LoadedSave | null {
     if (slotId < 0 || slotId >= MAX_SLOTS) return null;
     
     try {
@@ -76,7 +123,8 @@ export class SaveManager {
       if (!raw) return null;
       
       const data: SaveData = JSON.parse(raw);
-      if (data.version !== SAVE_VERSION) {
+      const v1 = data.version === 1;
+      if (!v1 && data.version !== SAVE_VERSION) {
         console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${data.version}`);
       }
       return {
@@ -86,6 +134,9 @@ export class SaveManager {
         currentMap: data.currentMap,
         playerPosition: data.playerPosition,
         playTime: data.playTime,
+        fieldMode: v1 ? 'walking' : savedMode(data.mode),
+        vehicles: v1 ? [] : savedVehicles(data.vehicles),
+        frame: v1 && data.currentMap === 'overworld' ? 'a1' : null,
       };
     } catch (e) {
       console.error(`Failed to load save slot ${slotId}:`, e);

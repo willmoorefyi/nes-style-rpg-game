@@ -1868,6 +1868,72 @@ opening any one of the 4 seams, makes the skeleton print `basins: LEAK`. All 137
 world constants).
 <!-- === end W1-0b === -->
 <!-- === W1-A FOUNDATION (pass W: owned by W1-A) === -->
+### W1-A result: vehicles and save (branch `w-w1-a` from `mainline` 3831329)
+
+No AI or paid calls. Scratch in `/tmp/w-w1-a/`.
+
+**Files:**
+
+- Rules: `fieldRulesVehicles.ts` (`stepMode`: boarding a parked ship or spawned canoe by a walking step, the canoe item
+  on River and Lake, the ship on Water only and its disembark only from a dock onto adjacent land, the airship
+  anywhere; `vehicleCanLand`: grass, no transition, gate or static NPC; `vehiclesAfterStep`: the left vehicle parks
+  where the step began, the boarded one is parked nowhere, the canoe item leaves nothing). `fieldRules.ts` gets
+  `cellReader`, `modeAfterStep`, a real `canLand`, `fieldStep` on `modeAfterStep`, no transition or scripted
+  encounter while flying, and `baseTerrain` reading 11 as Lake.
+- Modes: `MovementMode.canMoveAt?` (used by `CollisionMap.isWalkable` when present, 1 line); CanoeMode River and
+  Lake only; ShipMode encounter multiplier 1 (sea zones decide).
+- Field: `FieldVehicles.ts` (bound modes that ask `modeAfterStep`, so PlayerController moves where `fieldStep`
+  lets the step stand; the saved mode applied on the first frame after an enter; `afterStep`; airship take-off and
+  landing on confirm, "The airship can't land here." through `showDialog`; `setVehicle` for the cutscene step;
+  a vehicle ridden through a map change is parked where it was last ridden) and `FieldVehicleSprites.ts` (parked
+  sprites, the ridden one follows the hero at render time; ship and airship hide the hero, the canoe draws under it).
+- State: `Game.fieldMode`, `Game.vehicles` (parked only; the ridden vehicle is implied by the mode), `Game.pendingFrame`;
+  `restoreState` takes them. `VehicleManager.parkedVehicles` (a known position wins over the spawn, on any map;
+  spawns honour `requiredFlags`).
+- Save v2 (`SaveManager.ts`): `SAVE_VERSION = 2`, `mode` and `vehicles` (malformed ones logged and dropped); a v1 save
+  loads on foot with none, and a v1 save on `overworld` loads with `frame: 'a1'`.
+- `MapTransition.ts`: mode-aware `safeSpawn` (GAP-11: a vehicle position valid in its mode is kept; on foot, land
+  reachable from a vehicle parked on the map counts like an entrance); `shiftA1` and `restoredSpawn` (GAP-17 save
+  half: translate a v1 overworld cell by `world.frames.a1.origin` once, then `safeSpawn`; a moved position is on foot).
+- `BattleRetry.ts` (GAP-12): the snapshot records and restores `mode` and `vehicles` (missing: on foot, none).
+- Art: `assets-src/vehicles.py` (code-drawn ship, airship, canoe, 24 px cells) and the `vehicles` stage in
+  `build_assets.py` (one line; the kneel imports untouched), output `assets/sprites/vehicles.{png,json}`
+  (byte-identical on rerun).
+- Fixture `assets/maps/test-dock.yaml` (ship parked on the jetty dock with no flag, an island dock, a lake, a river,
+  a forest cell on the island) and scenario `w1a_ship_dock` (W1-A anchor; an airship from `vehicles`, the canoe item).
+- Tests: `vehicles`, `safeSpawnModes`, `battleRetryVehicles`, `saveOriginShift` (new).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/systems/vehicles.test.ts tests/systems/safeSpawnModes.test.ts tests/systems/battleRetryVehicles.test.ts tests/systems/saveOriginShift.test.ts` | 4 files, 34 tests passed |
+| `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 289 passed (289)`, `Tests 5684 passed (5684)` |
+| `npm run quest` | `quest-verify: OK` |
+| `python3 -I assets-src/build_assets.py vehicles` (twice) | `vehicles: 3 frames, sheet 72x24 native`; same md5 |
+| browser `http://127.0.0.1:5211/?mute=1&scenario=w1a_ship_dock` (Title > Debug) | ship and airship sprites parked; jetty tip (9, 6) walking, step east: (10, 6) `__game.fieldMode` `ship`; sailed to (14, 6); (14, 7) -> (15, 7) refused (not a dock); island dock (14, 8) -> (15, 8) walking, `vehicles` has the ship at (14, 8), still drawn; re-boarded, back to the jetty dock, disembarked; airship: confirm takes off, confirm over the sea shows "The airship can't land here.", confirm over island grass lands and parks it; 0 console errors |
+
+**Deviations / hand-offs:**
+
+- Edits outside the ownership list, all small and vehicle-only: `fieldRules.ts` (the vehicle hooks above; W1-B's
+  file), `CollisionMap.ts` (1 line, `canMoveAt`), `Game.ts` (the 3 fields), `ExplorationScene.ts` (6 one-line
+  wirings: `restoredSpawn`, `setMap`, `afterStep`, `setVehicle` on the cutscene host, the container for the sprites;
+  502 / 590), `SaveScene.ts` (passes mode and vehicles), `DebugScenarioLoader.ts` (2 lines: the scenario's
+  `vehicles` and `fieldMode`, W1-B's hand-off), `PlaceholderTextures.ts` (a Lake colour).
+- Updated pins that encoded the pre-W1-A vehicle behaviour: `fieldRules.test.ts` (the canoe's terrain is River and
+  Lake; collision 11 reads Lake; one test title), `MovementModes.test.ts` (canoe, ship rate 1), `SaveManager.test.ts`
+  and `SaveCompatT4.test.ts` (saves write version 2).
+- W1-H hand-off: `questPlaces` turns a step that changes the mode into a `step` exit without `park`. Now that
+  `fieldStep` disembarks the ship at a dock, that exit loses the ship; the verifier's own `dock` exit (with `park`)
+  covers the same move. `npm run quest` is OK today (no ship stage is built). A fix would skip ship -> walking steps
+  there, or read `vehiclesAfterStep`.
+- Vehicles while flying ignore transitions and scripted encounters in `fieldStep` (QUEST 3.3); a transition taken from
+  a vehicle (not reachable today) still puts the party on foot, and the vehicle parks where it was last ridden.
+
+**AGENTS.md delta (for INT):** "Key Interfaces" gains `fieldRulesVehicles.ts` (the vehicle rules), `Game.fieldMode` /
+`Game.vehicles` (save v2, the retry snapshot), `restoredSpawn` (GAP-11, GAP-17); the art table gains the `vehicles`
+stage (`assets-src/vehicles.py` -> `assets/sprites/vehicles.*`); the debug scenarios gain `w1a_ship_dock`.
 <!-- === end W1-A === -->
 <!-- === W1-B FOUNDATION (pass W: owned by W1-B) === -->
 ### W1-B result: NPC and field rules (branch `w-w1-b` from `mainline` e5433ff)

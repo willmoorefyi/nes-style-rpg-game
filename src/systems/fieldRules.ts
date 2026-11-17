@@ -13,7 +13,7 @@ import { npcPresent, resolveNPCDialog, TerrainType } from '../types/index.js';
 import type {
   Dock, FieldMode, Hazard, KeyItemGate, MapData, MapNPC, MapTransition, ScriptedEncounter, VehicleState,
 } from '../types/index.js';
-import { vehicleCanLand, vehicleMove, vehicleTerrainAllows } from './fieldRulesVehicles.js';
+import { stepMode, vehicleCanLand, vehicleTerrainAllows, type CellReader } from './fieldRulesVehicles.js';
 import { conditionMet, dueEncounterWhere, flagsMet } from './fieldRulesNpc.js';
 
 export type { FieldMode } from '../types/index.js';
@@ -36,11 +36,12 @@ function inBounds(map: MapData, x: number, y: number): boolean {
   return x >= 0 && x < map.width && y >= 0 && y < map.height;
 }
 
-/** The compiled terrain of a cell, as CollisionMap reads it (outside the map, or an unknown value: Wall). */
+/** The compiled terrain of a cell, as CollisionMap reads it (outside the map, or an unknown value: Wall; the counter
+ *  value 10 is Wall; 11 is Lake, the canoe's, W1-A). */
 export function baseTerrain(map: MapData, x: number, y: number): TerrainType {
   if (!inBounds(map, x, y)) return TerrainType.Wall;
   const v = map.collision[y * map.width + x];
-  return v >= 0 && v <= 9 ? (v as TerrainType) : TerrainType.Wall;
+  return (v >= 0 && v <= 9) || v === TerrainType.Lake ? (v as TerrainType) : TerrainType.Wall;
 }
 
 /**
@@ -126,9 +127,25 @@ export function canEnter(map: MapData, cell: Cell, mode: FieldMode, state: Field
   return gate === null || gateCheck(gate, state).open;
 }
 
-/** Whether the airship may land on the cell (no landing at W1-0a; fieldRulesVehicles.ts). */
-export function canLand(_map: MapData, _cell: Cell, state: FieldState): boolean {
-  return state.mode === 'airship' && vehicleCanLand();
+/** The cell reads the vehicle rules need (fieldRulesVehicles.ts, W1-A). */
+export function cellReader(map: MapData, state: FieldState): CellReader {
+  return {
+    mapId: map.id, inBounds: (c) => inBounds(map, c.x, c.y), terrain: (c) => patchedTerrain(map, c.x, c.y, state.flags),
+    walkable: (t) => terrainAllows('walking', t), staticNpc: (c) => staticNpcAt(map, c, state) !== null,
+    dock: (c) => dockFor(map, c) !== null, gate: (c) => gateAt(map, c) !== null,
+    transition: (c) => map.transitions.some((t) => t.x === c.x && t.y === c.y),
+  };
+}
+
+/** The party's mode after a step to the 4-neighbour `to`, or null when its terrain refuses it (gates not looked at):
+ *  boarding a parked ship, the canoe on and off, the ship's dock disembark (fieldRulesVehicles.stepMode). */
+export function modeAfterStep(map: MapData, from: Cell, to: Cell, state: FieldState): FieldMode | null {
+  return stepMode(cellReader(map, state), state, from, to);
+}
+
+/** Whether the airship may land on the cell: grass, not a transition, gate or NPC cell (fieldRulesVehicles.ts). */
+export function canLand(map: MapData, cell: Cell, state: FieldState): boolean {
+  return state.mode === 'airship' && vehicleCanLand(cellReader(map, state), cell);
 }
 
 /** The dock on the cell, or null (docks are W1-A's; act 1 has none). */
@@ -160,20 +177,14 @@ export interface StepResult {
 /**
  * One step from `from` to the 4-neighbour `to`: canEnter, gate messages, permanent gates' flags, the transition taken,
  * the encounter due, the hazard damage of a walking step. The single entry point the game and the verifier share.
- * A walking step stays walking; the vehicle steps are fieldRulesVehicles.ts's (W1-A).
+ * The mode a step leads to (boarding, the canoe, a dock disembark) is fieldRulesVehicles.ts's (W1-A).
  */
 export function fieldStep(map: MapData, from: Cell, to: Cell, state: FieldState): StepResult {
   const refused: StepResult = { ok: false, mode: state.mode, setFlags: [] };
   if (Math.abs(to.x - from.x) + Math.abs(to.y - from.y) !== 1) return refused;
-  let mode: FieldMode = 'walking';
-  if (state.mode === 'walking') {
-    if (!standable(map, to, 'walking', state)) return refused;
-  } else {
-    // the vehicle branch (fieldRulesVehicles.ts): today a vehicle only moves over its own terrain
-    const mv = vehicleMove(state.mode, patchedTerrain(map, to.x, to.y, state.flags));
-    if (!inBounds(map, to.x, to.y) || !mv.ok || (state.mode !== 'airship' && staticNpcAt(map, to, state))) return refused;
-    mode = mv.mode;
-  }
+  // terrain and mode changes (fieldRulesVehicles.stepMode, W1-A): on foot, boarding, the canoe, the ship's docks
+  const mode = modeAfterStep(map, from, to, state);
+  if (mode === null) return refused;
   let setFlags: string[] = [];
   const gate = state.mode === 'airship' ? null : gateAt(map, to);
   if (gate) {
@@ -184,6 +195,7 @@ export function fieldStep(map: MapData, from: Cell, to: Cell, state: FieldState)
   const ok: StepResult = { ok: true, mode, setFlags };
   const hazard = state.mode === 'walking' ? hazardAt(map, to) : null;
   if (hazard && hazard.damage > 0) ok.hazard = hazard.damage;
+  if (mode === 'airship') return ok; // transitions and scripted encounters are ignored while flying (QUEST 3.3)
   const transition = map.transitions.find((t) => t.x === to.x && t.y === to.y && transitionOpen(t, state));
   if (transition) return { ...ok, transition };
   const encounter = dueEncounter(map, to, state) ?? undefined;

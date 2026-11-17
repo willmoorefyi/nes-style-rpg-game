@@ -2,7 +2,7 @@ import { TerrainType } from '../types/index.js';
 import type { MovementMode } from './MovementMode.js';
 import { vehicleTerrainAllows } from '../systems/fieldRulesVehicles.js';
 
-/** Ship mode: traverses water only. No encounters. */
+/** Ship mode: sails Water only. Sea battles come from the zones with `modes: [ship]` (QUEST 3.3), so the rate is 1. */
 export class ShipMode implements MovementMode {
   readonly id = 'ship';
 
@@ -15,6 +15,6 @@ export class ShipMode implements MovementMode {
   }
 
   getEncounterRateMultiplier(): number {
-    return 0;
+    return 1;
   }
 }

@@ -57,14 +57,16 @@ describe('T4 save compatibility (revision 16): a pre-T4 save', () => {
     expect(slot.members[0]).toEqual({ name: 'FGHTR', classId: 'warrior', level: 5, currentHp: 20 });
   });
 
-  it('loads without a version warning, and saves back as version 1', () => {
+  it('loads without a version warning, on foot with no vehicles, and saves back as version 2 (W1-A save v2)', () => {
     const warn = vi.spyOn(console, 'warn');
     const loaded = SaveManager.load(0)!;
     expect(loaded).not.toBeNull();
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('version'));
-    expect(SAVE_VERSION).toBe(1);
+    expect(loaded.fieldMode).toBe('walking');
+    expect(loaded.vehicles).toEqual([]);
+    expect(SAVE_VERSION).toBe(2);
     SaveManager.save(1, loaded.party, new Inventory(), new GameFlags(), 'cornelia', { x: 0, y: 0 }, 0);
-    expect(JSON.parse(store.ff1_save_1).version).toBe(1);
+    expect(JSON.parse(store.ff1_save_1).version).toBe(2);
     warn.mockRestore();
   });
 

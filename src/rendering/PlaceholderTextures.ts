@@ -20,6 +20,7 @@ const TILE_COLORS: Record<number, number> = {
   8: 0xc2b280, // Road - tan
   9: 0x8b4513, // Bridge - wood brown
   10: 0xdeb887, // Counter - burlywood
+  11: 0x2f6fb8, // Lake - deep blue (no row in the legacy terrain sheet)
 };
 const DEFAULT_TILE_COLOR = 0x555555;
 

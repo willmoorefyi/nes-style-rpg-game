@@ -16,6 +16,7 @@ import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 import type { BattleRequest, BattleRetrySnapshot } from '../systems/BattleRetry.js';
 import type { Direction } from '../rendering/SpriteAnimation.js';
+import type { FieldMode, VehicleState } from '../types/index.js';
 import { installNESFont } from '../ui/NESFont.js';
 import { setUiEventBus } from '../ui/uiSounds.js';
 import { wireAudioEvents } from './audioEvents.js';
@@ -50,6 +51,11 @@ export class Game {
   battleRetry: BattleRetrySnapshot | null = null;
   /** A battle the exploration scene starts as soon as it has entered (set by Retry Battle). */
   pendingBattle: BattleRequest | null = null;
+  /** The party's field mode and the parked vehicles of every map (save v2, the retry snapshot; FieldVehicles). */
+  fieldMode: FieldMode = 'walking';
+  vehicles: VehicleState[] = [];
+  /** `a1`: `playerPosition` is an act-1 overworld cell from a version-1 save, translated on the next field enter. */
+  pendingFrame: 'a1' | null = null;
 
   constructor() {
     this.app = new Application();
@@ -148,6 +154,9 @@ export class Game {
     currentMap: string;
     playerPosition: { x: number; y: number };
     playTime: number;
+    fieldMode?: FieldMode;
+    vehicles?: VehicleState[];
+    frame?: 'a1' | null;
   }): void {
     (this as { party: PartyManager }).party = data.party;
     (this as { inventory: Inventory }).inventory = data.inventory;
@@ -155,6 +164,9 @@ export class Game {
     this.currentMapId = data.currentMap;
     this.playerPosition = data.playerPosition;
     this.playTime = data.playTime;
+    this.fieldMode = data.fieldMode ?? 'walking';
+    this.vehicles = data.vehicles ?? [];
+    this.pendingFrame = data.frame ?? null;
   }
 
   /** A brand-new game: empty party, no gold, items or flags, no map yet, play time 0. */

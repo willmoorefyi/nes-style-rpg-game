@@ -45,7 +45,7 @@ export class CollisionMap {
     }
     const terrain = this.getTerrainType(tileX, tileY);
     if (mode) {
-      return mode.canMove(terrain);
+      return mode.canMoveAt ? mode.canMoveAt(tileX, tileY, terrain) : mode.canMove(terrain);
     }
     // Legacy behavior: 1 (Wall) is not walkable, everything else is
     return terrain !== TerrainType.Wall;

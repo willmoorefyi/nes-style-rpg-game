@@ -41,17 +41,18 @@ describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMod
   it.each([
     ['walking', [TerrainType.Grass, TerrainType.Forest, TerrainType.Desert, TerrainType.Swamp, TerrainType.Road, TerrainType.Bridge]],
     ['ship', [TerrainType.Water]],
-    ['canoe', [TerrainType.River, TerrainType.Water]],
+    ['canoe', [TerrainType.River, TerrainType.Lake]], // W1-A: the canoe never touches Water (QUEST 3.3)
     ['airship', all],
   ] as [FieldMode, TerrainType[]][])('%s may stand on exactly its terrain', (mode, allowed) => {
     for (const t of all) expect(terrainAllows(mode, t), `${mode} on ${TerrainType[t]}`).toBe(allowed.includes(t));
   });
 
-  it('reads the compiled terrain; outside the map and unknown values are Wall; no patches in act 1', () => {
-    const map = createMapData({ width: 3, height: 1, collision: [0, 10, 11] });
+  it('reads the compiled terrain; outside the map and unknown values are Wall, 11 is Lake; no patches in act 1', () => {
+    const map = createMapData({ width: 4, height: 1, collision: [0, 10, 11, 12] });
     expect(patchedTerrain(map, 0, 0, new Set())).toBe(TerrainType.Grass);
     expect(patchedTerrain(map, 1, 0, new Set())).toBe(TerrainType.Wall);
-    expect(patchedTerrain(map, 2, 0, new Set())).toBe(TerrainType.Wall);
+    expect(patchedTerrain(map, 2, 0, new Set())).toBe(TerrainType.Lake); // W1-A: the canoe's lakes
+    expect(patchedTerrain(map, 3, 0, new Set())).toBe(TerrainType.Wall);
     expect(patchedTerrain(map, -1, 0, new Set())).toBe(TerrainType.Wall);
   });
 
@@ -198,7 +199,7 @@ describe('fieldRules: gates, transitions and encounters on synthetic maps', () =
     expect(fieldStep(map, { x: 0, y: 0 }, { x: 1, y: 0 }, state()).encounter).toBeUndefined();
   });
 
-  it('a vehicle moves only over its own terrain and keeps its mode; nothing boards or disembarks by a step', () => {
+  it('a vehicle moves only over its own terrain; off a dock the ship cannot land, the sea refuses a walker (W1-A)', () => {
     const map = createMapData({ width: 3, height: 1, collision: [TerrainType.Grass, TerrainType.Water, TerrainType.Water] });
     expect(fieldStep(map, { x: 1, y: 0 }, { x: 2, y: 0 }, state([], [], 'ship'))).toEqual({ ok: true, mode: 'ship', setFlags: [] });
     expect(fieldStep(map, { x: 1, y: 0 }, { x: 0, y: 0 }, state([], [], 'ship')).ok).toBe(false);

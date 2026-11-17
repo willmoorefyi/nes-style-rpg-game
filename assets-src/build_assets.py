@@ -1,6 +1,6 @@
 """Build all game art/audio from assets-src into assets/.
 
-Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle_ai|field_ai|monsters_ai|maps|audio|fx|colossus ...]
+Usage (from repo root):  python3 -I assets-src/build_assets.py [terrain|characters|battle_ai|field_ai|monsters_ai|maps|audio|fx|colossus|vehicles ...]
                          python3 -I assets-src/build_assets.py colossus --out DIR   # scratch build + manifest.sha256
 With no arguments every stage runs. Sprites are authored at native SNES resolution and
 upscaled with nearest-neighbour: x3 for the legacy field/terrain art (TILE_SIZE=48 in LayoutConstants.ts).
@@ -320,6 +320,7 @@ STAGES = {
     "audio": lambda: build_optional("audio"),
     "fx": lambda: __import__("importlib").import_module("fx.build_fx").build(ASSETS),  # battle-fx atlas (assets-src/fx)
     "colossus": build_colossus,
+    "vehicles": lambda: __import__("vehicles").build(ASSETS),  # code-drawn ship / airship / canoe (pass W, W1-A)
 }
 
 

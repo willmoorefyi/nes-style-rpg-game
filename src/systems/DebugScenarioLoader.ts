@@ -108,6 +108,8 @@ export class DebugScenarioLoader {
     this.applyParty(scenario);
     this.game.currentMapId = scenario.map;
     this.game.pendingEntrance = scenario.entrance ?? null;
+    this.game.vehicles = (scenario.vehicles ?? []).map((v) => ({ ...v })); // W1-A: parked vehicles, the field mode
+    this.game.fieldMode = scenario.fieldMode ?? 'walking';
     if (scenario.spawn) {
       const [x, y] = scenario.frame ? await this.framedSpawn(scenario) : scenario.spawn;
       this.game.playerPosition = { x, y };
