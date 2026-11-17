@@ -4,12 +4,13 @@
 
 - prints `<id>: OK` or `<id>: FAIL <check> ...` (monsters: monster_check + K-checks with the lock; heroes per variant,
   `warrior[A]`, through puppet_kneel.py when it is importable, else a `skipped` note);
-- pilot_sheet.png: a row per sprite / hero variant (idle or ready, kneel_in1, kneel_in2, kneel, kneel_b, then hurt or
+- <tag>_sheet.png (tag `pilot` unless `--tag NAME` comes first): a row per sprite / hero variant (idle or ready,
+  kneel_in1, kneel_in2, kneel, kneel_b, then hurt or
   down) at 4x, the ground line, and the kneel / idle height with the band;
 - <id>[_A|_B]_kneel.gif: in 8f, 2 sway cycles, out 6f, stand 24f (60 fps);
 - goblin_rise.gif: kneel, the 6-frame rise into the in-place attack table (D-K3: motion held for t < 6, then remapped
   into [6, 14)), kneel_in 8f, hold;
-- pilot_stage.png: every pilot kneeling at game scale on grassland.webp (enemy slots left, heroes right).
+- <tag>_stage.png: every sprite kneeling at game scale on grassland.webp (enemy slots left, heroes right).
 """
 from __future__ import annotations
 
@@ -162,7 +163,7 @@ def stage(mons: list[tuple[str, dict, int]], heros: list[tuple[str, dict]], path
     bg.convert("RGB").save(path)
 
 
-def main(ids: list[str]) -> int:
+def main(ids: list[str], tag: str = "pilot") -> int:
     from gen import monster_anim as MA
     from gen import kneel as KN
     from gen import rig as R
@@ -197,11 +198,14 @@ def main(ids: list[str]) -> int:
             print(f"{label}: OK" if not fails else f"{label}: FAIL " + "; ".join(fails[:6]))
             bad += bool(fails)
     if rows:
-        sheet(rows, OUT / "pilot_sheet.png")
-        stage(mons, heros, OUT / "pilot_stage.png")
+        sheet(rows, OUT / f"{tag}_sheet.png")
+        stage(mons, heros, OUT / f"{tag}_stage.png")
     print(f"-> {OUT}")
     return 1 if bad else 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]) if sys.argv[1:] else (print(__doc__) or 2))
+    a = sys.argv[1:]
+    tag = a[1] if a[:1] == ["--tag"] and len(a) > 1 else "pilot"
+    a = a[2:] if a[:1] == ["--tag"] else a
+    sys.exit(main(a, tag) if a else (print(__doc__) or 2))

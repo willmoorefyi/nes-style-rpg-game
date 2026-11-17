@@ -122,10 +122,9 @@ frames:
   hurt_in2: {moves: [], dy: 0, tweaks: {tail1: [-2, 0], tail2: [-3, 1], tail_tip: [-3, 1], neck: [-3, 1], head: [-3, 1], snout: [-3, 1], neck2: [-3, 1], head2: [-3, 1], snout2: [-3, 1], neck3: [-3, 1], head3: [-3, 1], snout3: [-3, 1]}}
   daze: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], neck2: [0, 2], head2: [0, 2], snout2: [0, 2], neck3: [0, 2], head3: [0, 2], snout3: [0, 2]}}
   daze_b: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [1, 3], head: [1, 3], snout: [1, 3], neck2: [1, 3], head2: [1, 3], snout2: [1, 3], neck3: [1, 3], head3: [1, 3], snout3: [1, 3]}}
-  # pass K: the tail tip drops with the left neck so the pocket between them stays open; the kneel breath bobs the
-  # heads, not the body (the settled belly is on the feet row, a body dy would push it below)
-  kneel_in1: {tweaks: {tail_tip: [-1, 3]}}
-  kneel_b: {dy: 0, tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1], neck2: [0, 1], head2: [0, 1], snout2: [0, 1], neck3: [0, 1], head3: [0, 1], snout3: [0, 1]}}
+  # belly is on the feet row, a body dy would push it below)
+  kneel_in1: {tweaks: {tail2: [-1, 1], tail_tip: [-3, 3]}}   # pass K: the tail tip drops clear of the slumping left neck
+  kneel_b: {dy: 0, tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1], head3: [0, 1], snout3: [0, 1]}}
 masks:
   tail:
     idle: [[26, 68], [33, 68], [39, 71], [41, 74], [43, 76], [43, 80], [41, 89], [36, 92], [36, 95], [40, 97], [40, 101], [33, 103], [21, 103], [20, 100], [20, 80], [30, 76], [26, 72]]
@@ -146,11 +145,24 @@ holds: []
 paint:                         # atk_wind1: the left head's chin line over the middle neck closed with outline ink
   - {frame: atk_wind1, xy: [[54, 73], [55, 73]], rgb: [6, 4, 10]}
 
+  # pass K: kneel_in1 / kneel_in2: cracks where the necks bend closed, pockets filled, the folding feet's px under the feet row cleared
+  - {frame: kneel_in2, xy: [[62, 74], [37, 88], [61, 113], [67, 115], [78, 117]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[63, 74], [68, 116]], rgb: [57, 90, 66]}
+  - {frame: kneel_in2, xy: [[41, 91], [42, 91], [42, 92], [43, 92]], rgb: [74, 107, 74]}
+  - {frame: kneel_in2, xy: [[63, 112], [62, 113], [63, 113], [64, 113], [65, 114]], rgb: [156, 156, 115]}
+  - {frame: kneel_b, xy: [[27, 115]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[48, 69], [47, 70], [48, 70], [49, 70], [50, 70], [46, 71], [47, 71], [48, 71], [49, 71], [50, 71], [51, 71], [45, 72], [46, 72], [47, 72], [48, 72], [49, 72], [50, 72], [51, 72], [52, 72], [46, 73], [47, 73], [48, 73], [49, 73], [50, 73], [51, 73], [52, 73], [53, 73], [47, 74], [48, 74], [49, 74], [50, 74], [51, 74], [52, 74], [51, 75]], rgb: [49, 66, 57]}
+  - {frame: kneel_in1, xy: [[32, 123], [57, 123], [58, 123], [85, 123], [86, 123], [88, 123]], rgb: null}
+# pass K (docs/KNEEL_PLAN.md K2-0, iteration 2): the hydra sinks to its belly (legs folding) and its three necks droop
+# apart: the right head's chin down by the forefoot, the top head bowed 15 px lower, the left neck slumped back over
+# the tail; each head in its own place with background between them
 kneel:
   variant: [crouch, settle, multihead]
-  tweaks: {neck: [0, 5], head: [0, 7], snout: [0, 7], neck2: [0, 5], head2: [0, 8], snout2: [0, 8], neck3: [0, 5], head3: [0, 7], snout3: [0, 7], tail2: [0, 2], tail_tip: [-1, 5]}
+  tweaks: {neck: [2, 6], head: [3, 8], snout: [3, 8], neck2: [-1, 5], head2: [-3, 10], snout2: [-3, 10]}
+  turn: {neck: 6, head: 14, snout: 28, neck2: 12, head2: 13, snout2: 16, neck3: -23, head3: 24, snout3: 24}
   paint:
-    # 1 px cracks where the lowered necks cross closed with the neck colour; the light edge pixels the slump bares inked
-    - {xy: [[63, 69], [51, 79]], rgb: [206, 206, 165]}
-    - {xy: [[60, 81], [65, 113], [41, 114], [65, 114], [41, 115], [66, 115]], rgb: [6, 4, 10]}
-    - {xy: [[29, 114]], rgb: [156, 156, 115]}
+    # the pocket between the tail and the haunch closed with the hide colours; the folded feet's 3 px under the feet row cleared (their new bottom edge inked)
+    - {xy: [[35, 79], [38, 96], [37, 97], [35, 98], [34, 99], [35, 99], [36, 99], [34, 100], [35, 100], [47, 122], [59, 122], [60, 122], [61, 122], [82, 122], [83, 122], [84, 122], [85, 122], [86, 122], [87, 122]], rgb: [6, 4, 10]}
+    - {xy: [[30, 89], [33, 101], [34, 101], [32, 102], [33, 102], [34, 102], [35, 102], [33, 103], [34, 103], [35, 103]], rgb: [57, 90, 66]}
+    - {xy: [[39, 96], [38, 97], [39, 97], [40, 97], [38, 98], [39, 98], [40, 98], [41, 98], [37, 99], [38, 99], [39, 99], [36, 100], [37, 100], [35, 101], [36, 101], [36, 102]], rgb: [74, 107, 74]}
+    - {xy: [[31, 123], [32, 123], [33, 123], [34, 123], [45, 123], [46, 123], [47, 123], [48, 123], [59, 123], [60, 123], [61, 123], [62, 123], [63, 123], [82, 123], [83, 123], [84, 123], [85, 123], [86, 123], [87, 123], [88, 123], [89, 123], [46, 124], [47, 124], [48, 124], [60, 124], [61, 124], [62, 124], [82, 124], [83, 124], [84, 124], [85, 124], [86, 124], [87, 124], [88, 124], [47, 125], [83, 125]], rgb: null}

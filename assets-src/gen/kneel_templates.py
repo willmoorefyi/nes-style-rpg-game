@@ -26,7 +26,6 @@ A rig's `kneel:` block adds `tweaks: {joint: [dx, dy]}` (native px), `paint: [..
 """
 from __future__ import annotations
 
-import copy
 import math
 
 # biped (46 rigs): far knee down, near foot planted, torso low, head bowed, weapon low; band 0.68-0.85
@@ -67,7 +66,7 @@ QUADRUPED = {
     "limb_cap": 100.0,
 }
 
-from gen.kneel_variants import VARIANTS, knees_forward  # noqa: E402,F401  (K2-0 split)
+from gen.kneel_variants import VARIANTS, _heads, knees_forward  # noqa: E402,F401  (K2-0 split)
 
 TEMPLATES = {"biped": BIPED, "quadruped": QUADRUPED}
 # limb chains per body for K-rot: the joints after each limb root, plus the toes hanging from the last one
@@ -136,7 +135,7 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
     or aimed at pos[j]; bone lengths from S. Angles are forward-positive degrees (mirrored for a left-facing rig)."""
     f, pos = rig.fwd, pos or {}
     rel, down, keep, dirs = spec.get("rel", {}), spec.get("down", {}), set(spec.get("keep", [])), spec.get("dir", {})
-    sag = spec.get("sag", {})
+    sag, turn, droop = spec.get("sag", {}), spec.get("turn", {}), spec.get("droop", {})
     bx = units(S)[spec["back"][0]] * spec["back"][1] if spec.get("back") else 0.0
     T, acc = {}, {}
     for j in rig.order:
@@ -154,6 +153,11 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
             a = math.atan2(math.sin(d), f * math.cos(d))
         elif j in keep:
             a = a0
+        elif j in turn:                              # K2-0: the idle angle plus deg (forward-positive), whatever
+            a = a0 + f * math.radians(turn[j])       # the parents did
+        elif j in droop:                             # K2-0: toward straight down on its own side, by at most deg
+            cap = math.radians(droop[j])
+            a = a0 + max(-cap, min(cap, _wrap(math.pi / 2 - a0)))
         elif j in sag:                               # K2-0: the idle angle toward down by deg, whatever the parent did
             cap = math.radians(sag[j]) if f * math.cos(a0) > 0 else 0.0
             a = a0 + max(-cap, min(cap, _wrap(math.pi / 2 - a0)))
@@ -168,19 +172,6 @@ def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
     return T
 
 
-def _heads(rig, tpl: dict) -> dict:
-    """The multihead variant: every extra neck / head copies the first one's targets."""
-    if not tpl.get("multihead"):
-        return tpl
-    t = copy.deepcopy(tpl)
-    for i in (2, 3, 4, 5):
-        if f"neck{i}" in rig.parent:
-            for key, src in (("lower", "neck"), ("rel", "snout"), ("sag", "neck"), ("sag", "head"), ("sag", "snout")):
-                if src in t.get(key, {}):
-                    t[key][f"{src}{i}"] = t[key][src]
-    return t
-
-
 def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
     """Target joints of the kneel key (before rig.solve), `lift` px raising the ground line."""
     tpl = _heads(rig, tpl)
@@ -189,7 +180,11 @@ def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
     dy = U[unit] * k
     first = fk(rig, S, dy, tpl)
     ground = max((S[f][1] for f in rig.feet if f in S), default=0.0) - lift
+    ground += tpl.get("ground_dy", 0.0) * rig.cell[1] / 80
     pos = {j: (first[j][0], first[j][1] + U[u] * k) for j, (u, k) in tpl.get("lower", {}).items() if j in first}
+    pos.update({j: (float(v[0]), float(v[1])) for j, v in tpl.get("aim", {}).items() if j in S})   # K2-0 block aim
+    if tpl.get("ground_late"):                       # K2-0: the ground joints hang from their lowered parents
+        first = fk(rig, S, dy, tpl, dict(pos))
     for j, back in tpl.get("ground", {}).items():   # on the ground line at bone length, the side nearest `back` x L
         p = rig.parent.get(j)                        # behind the parent (the hip socket, the shoulder)
         if j not in S or p not in first:

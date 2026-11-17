@@ -13,16 +13,32 @@ added in K2-0 (of the defaults only the mechanical preset uses one, `slump`):
               near-straight idle leg gives the IK no side; garland's planted knee bent backward).
 - `free_in`:  (K2-0) pins the in-betweens drop: those joints follow the position lerp (kneel.leg_lerp) instead of the
               IK, which would bend the knee back to the idle's side.
+- `legs_free`: (K2-0) K-rot gives limb parts the template's limb cap even under a preset cap (mech_kneel).
+- `aim`:      (K2-0, also a kneel block key) {joint: [x, y]} native px: the bone into the joint points there.
+- `ground_dy`: (K2-0) the ground line this many px (per 80 px of cell) below the feet joints' row: a forearm laid
+              flat has its bone, not its underside, on that line.
+- `ground_late`: (K2-0) the `ground` joints are placed from their parents after `lower` / `aim` (by default from
+              the plain forward-kinematics place: a lowered chest left the elbows hanging above the ground).
+- `turn`:     (K2-0, also a kneel block key) {joint: deg}: the bone into the joint ends deg off its idle angle
+              (forward-positive) whatever its parents turned, so its part turns exactly deg.
+- `droop`:    (K2-0) {joint: deg} like `sag` but on either side: the bone ends at most deg off its idle angle,
+              turned toward straight down the short way, whatever its parents did (wings).
 - `fit`:      (K2-0) "ground": kneel.derive raises the ground line until the parts holding a `ground` joint fit
               (by default until every pixel does: garland's low armour skirt left the far knee floating 11 px up).
 """
 from __future__ import annotations
 
+import copy
+
 # additive variants (D-K18): a rig opts in with kneel: {variant: <name>}
 VARIANTS = {
     # K1 pilot (goblin): a short-legged biped whose 0.8 L_thigh drop leaves the kneel above the band
     ("biped", "short_legs"): {"drop": ("L_thigh", 1.15)},
-    ("quadruped", "winged"): {"rel": {"wel_n": 20.0, "wel_f": 20.0, "wtip_n": 10.0, "wtip_f": 10.0}},
+    # K2-0 iteration 2 (white_dragon; no rig used the K1 draft): wings fold and droop down along the body, each wing
+    # bone toward the ground on the side it leans (a raised wing leaning back sinks back over the haunch), under the
+    # 30 deg rigid cap: the template wing joints and the one-piece folded wings (wtip_i, wt_*)
+    ("quadruped", "winged"): {"droop": {j: 26.0 for j in ("wel_n", "wel_f", "wtip_n", "wtip_f", "wtip_i", "wt_n",
+                                                           "wt_f", "wt")}},
     ("quadruped", "multihead"): {"multihead": True},
     # K2-0 (blue_dragon): a long low body on short legs; folding them to the ground smears them, so it crouches: feet
     # planted (IK knees and elbows), body and chest a little down, the neck bowed forward and the head hung (the neck
@@ -37,15 +53,34 @@ VARIANTS = {
     ("biped", "blade_planted"): {"down": {"tip": None}, "ground": {"tip": -3.0}},
     # K2-0 (garland): long legs: the hip goes back over the far knee so the planted near shin stands about
     # vertical, its knee bent forward (in the key and its in-betweens)
-    ("biped", "knee_forward"): {"knee_fwd": ["knee_n"], "free_in": ["foot_n"], "back": ("L_thigh", 0.8),
+    ("biped", "knee_forward"): {"knee_fwd": ["knee_n"], "free_in": ["foot_n"], "back": ("L_thigh", 1.05),
                                 "drop": ("L_thigh", 1.0), "fit": "ground"},
+    # K2-0 iteration 2 (garland), with knee_forward: the far fist is not lowered, so the greatsword turns only a few
+    # degrees to rest tip-down on the ground in front as a crutch; the far shin lies flat back along the ground with
+    # the toes down; the ground line 2 px (per 80) low so the knee and the point touch the plain
+    ("biped", "blade_kept"): {"down": {"tip": None}, "ground": {"tip": -3.0}, "lower": {"hand_f": None},
+                              "dir": {"foot_f": 180.0, "toe_f": 100.0}, "ground_dy": 2.0},
     # K2-0 (garland): the upper body bowed further (torso and head at their 20 / 30 deg caps with whole-pixel slack)
     ("biped", "deep_bow"): {"rel": {"chest": 17.0, "crown": 11.0}},
-    # K2-0 (hydra): with crouch, a low body on stub legs: the legs stay where they stand (folding them smears them),
-    # the body, tail and necks sink between them by the belly's clearance (`slump`, no bone turns); no neck sag (three
-    # crossing neck chains tear when they turn), only the heads bow; the rig's tweaks lower the head groups
-    ("quadruped", "settle"): {"slump": 0.08, "drop": None, "lower": {"chest": None}, "sag": None,
-                              "rel": {"snout": 12.0}},
+    # K2-0 iteration 2 (iron_golem; needs a section 13 ruling, it departs from D-K11 / D-K19): the mechanical preset
+    # kneels like a biped instead of the power-down squat: the far knee on the ground with its shin folded back flat,
+    # the near foot planted with its knee forward; leg parts take the biped 100 deg limb cap while every other part
+    # keeps the preset's 15 (nearest sampling throughout); the biped band
+    ("biped", "mech_kneel"): {"squat": None, "slump": None, "drop": ("L_thigh", 1.4), "ground": {"knee_f": 0.3},
+                              "dir": {"foot_f": 180.0}, "rel": {"crown": None, "head": None, "snout": None},
+                              "pins": ["foot_n"], "knee_fwd": ["knee_n"],
+                              "free_in": ["foot_n"], "legs_free": True, "limb_cap": 100.0, "band": (0.68, 0.85)},
+    # K2-0 iteration 2 (blue_dragon), after crouch: lying sphinx-like: the chest low enough for the elbows to reach the
+    # ground in front of the shoulders, the forearms and toes flat forward along it; only the hind feet planted; the
+    # head turned 13 deg (its antlers stay clean), the droop comes from the neck
+    ("quadruped", "sphinx"): {"drop": ("L_hindthigh", 0.5), "lower": {"chest": ("L_upperfore", 0.85)},
+                              "ground": {"el_n": -0.3, "el_f": -0.3},
+                              "dir": {"paw_n": 0.0, "paw_f": 0.0, "ftoe_n": 0.0, "ftoe_f": 0.0},
+                              "pins": ["foot_n", "foot_f", "toe_n", "toe_f"], "fit": "ground", "sag": {"snout": 13.0},
+                              "ground_dy": 2.5, "ground_late": True},
+    # K2-0 (hydra), after crouch: a low body on stub legs sinks to the belly line (its feet planted, the knees and
+    # elbows folding by IK); no neck sag or snout turn: the rig's `aim` droops each neck to its own low place
+    ("quadruped", "settle"): {"drop": ("L_hindthigh", 0.85), "lower": {"chest": None}, "sag": None},
 }
 
 
@@ -63,3 +98,16 @@ def knees_forward(rig, tpl: dict, J: dict) -> dict:
         if (kx - px) * rig.fwd < 0:
             out[k] = (float(round(2 * px - kx)), float(round(2 * py - ky)))
     return out
+
+
+def _heads(rig, tpl: dict) -> dict:
+    """The multihead variant: every extra neck / head copies the first one's targets."""
+    if not tpl.get("multihead"):
+        return tpl
+    t = copy.deepcopy(tpl)
+    for i in (2, 3, 4, 5):
+        if f"neck{i}" in rig.parent:
+            for key, src in (("lower", "neck"), ("rel", "snout"), ("sag", "neck"), ("sag", "head"), ("sag", "snout")):
+                if src in t.get(key, {}):
+                    t[key][f"{src}{i}"] = t[key][src]
+    return t

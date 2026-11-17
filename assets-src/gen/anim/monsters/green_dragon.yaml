@@ -169,3 +169,23 @@ paint:
   - {frame: atk_wind2, xy: [[61, 102], [62, 104]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
   - {frame: hurt_in2, xy: [[85, 70], [85, 71], [85, 72], [84, 73], [85, 73], [85, 74], [85, 75], [85, 76], [85, 77], [85, 78], [85, 79]], rgb: [6, 4, 10]}   # 11 px pocket between parts filled
   - {frame: hurt_in2, xy: [[81, 60]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
+
+  # pass K: kneel_in1 / kneel_in2: pockets the folding forelegs close filled with their shade, cracks closed, the px under the feet row cleared
+  - {frame: kneel_in2, xy: [[94, 58], [94, 59], [94, 63], [95, 63]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[95, 59], [94, 60], [95, 60], [94, 61], [95, 61], [96, 61], [94, 62], [95, 62], [96, 62], [96, 63]], rgb: [115, 107, 74]}
+  - {frame: kneel_in2, xy: [[59, 72], [58, 73], [59, 73], [60, 73], [59, 74], [60, 74], [61, 74], [72, 74], [60, 75]], rgb: [57, 66, 57]}
+  - {frame: kneel_in2, xy: [[84, 72]], rgb: [74, 115, 74]}
+  - {frame: kneel_in2, xy: [[57, 73], [61, 73], [56, 74], [57, 74], [58, 74], [62, 74], [57, 75], [58, 75], [59, 75], [63, 75]], rgb: [90, 82, 57]}
+  - {frame: kneel_in2, xy: [[72, 110], [72, 111], [72, 112], [73, 112], [73, 113]], rgb: [66, 99, 66]}
+  - {frame: kneel_in2, xy: [[113, 123], [114, 123], [115, 123], [116, 123], [113, 124]], rgb: null}
+  - {frame: kneel_in1, xy: [[61, 100], [62, 100], [60, 101], [61, 101], [62, 101], [63, 101], [60, 102], [61, 102], [59, 103], [60, 103], [73, 106], [72, 107], [73, 107], [72, 108], [73, 108], [72, 109], [72, 110], [90, 109], [91, 109], [92, 109], [93, 109], [94, 109], [90, 110], [91, 110], [92, 110], [93, 110], [94, 110], [95, 110], [92, 111], [93, 111], [94, 111], [95, 111], [96, 111], [92, 112], [93, 112], [94, 112], [95, 112], [96, 112], [97, 112], [94, 113], [95, 113], [96, 113]], rgb: [66, 99, 66]}
+  - {frame: kneel_in1, xy: [[107, 123]], rgb: null}
+# pass K (docs/KNEEL_PLAN.md K2-0, iteration 2: the winged probe): lying sphinx-like like blue_dragon, the folded
+# wing drooping back down along the body toward the ground (variant winged)
+kneel:
+  variant: [crouch, sphinx, winged]
+  samplers: {head: rotsprite}
+  paint:
+    # the outline the turned head, lowered chest and flat forelegs thinned, thickened inward; a 1 px crack closed
+    - {xy: [[113, 52], [122, 54], [123, 55], [92, 60], [19, 63], [92, 66], [130, 68], [130, 71], [97, 73], [81, 74], [19, 76], [88, 78], [137, 78], [137, 80], [137, 82], [35, 85], [93, 92], [20, 98], [106, 108], [72, 109], [73, 110], [73, 111], [79, 118], [48, 119], [49, 119], [81, 119]], rgb: [6, 4, 10]}
+    - {xy: [[71, 110]], rgb: [66, 99, 66]}
