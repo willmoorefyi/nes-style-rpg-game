@@ -51,6 +51,13 @@ def leg_parts(rig) -> list[int]:
             if (js := {j for kf in rig.keyframes for j in rig.joints_of(p, kf)}) and js <= legs]
 
 
+def foot_parts(rig) -> list[int]:
+    """Indices of the foot parts (every joint a foot or a toe: ft_n, ft_f, hpaw_*)."""
+    feet = set(rig.feet) | {f"toe_{s}" for s in "nf"}
+    return [i for i, p in enumerate(rig.parts)
+            if (js := {j for kf in rig.keyframes for j in rig.joints_of(p, kf)}) and js <= feet]
+
+
 def hem_row(rig, labels: np.ndarray) -> int | None:
     """The lowest row of the body's pixels (every part but the legs: the robe, a staff)."""
     rows = np.nonzero((~np.isin(labels, leg_parts(rig)) & (labels >= 0)).any(1))[0]
@@ -62,7 +69,9 @@ def robe_fit(rig, tpl: dict, img: np.ndarray, labels: np.ndarray | None, S: dict
     hip, carried with the chest) down to the body's lowest row (the robe's hem, a staff's foot) is resampled row by
     row (nearest) so that row lands back on its idle row `hem0`: a robe the sunk body pushed toward the plain is
     compressed, one the rising body lifted is stretched. Rows above the band are kept; below the idle hem only the
-    legs stay, and they show through where the resampled robe is empty."""
+    legs stay, and they show through where the resampled robe is empty. `robe_legs: feet` (K2-0b, variant
+    robed_feet) leaves the foot parts out of the resampling: they keep their rendered rows behind the robe (a far
+    foot squeezed into the band creased, F4); thighs and shins, which share the robe's rows, are resampled with it."""
     f = tpl.get("robe")
     if f is None or labels is None or hem0 is None or "chest" not in S or "hip" not in S:
         return img, labels
@@ -71,9 +80,14 @@ def robe_fit(rig, tpl: dict, img: np.ndarray, labels: np.ndarray | None, S: dict
     if hem1 is None or hem1 == hem0 or top >= min(hem0, hem1):
         return img, labels
     src = np.round(np.linspace(top, hem1, hem0 - top + 1)).astype(int)
-    out, lab = img.copy(), labels.copy()
-    out[top:hem0 + 1], lab[top:hem0 + 1] = img[src], labels[src]
     legs = np.isin(labels, leg_parts(rig))
+    body, blab = img, labels
+    if tpl.get("robe_legs") == "feet":               # K2-0b: the feet are not resampled, they stay as rendered
+        feet = np.isin(labels, foot_parts(rig))
+        body, blab = img.copy(), labels.copy()
+        body[feet], blab[feet] = 0, -1
+    out, lab = img.copy(), labels.copy()
+    out[top:hem0 + 1], lab[top:hem0 + 1] = body[src], blab[src]
     low = np.zeros(labels.shape, bool)
     low[hem0 + 1:] = True
     out[low & ~legs], lab[low & ~legs] = 0, -1
@@ -82,6 +96,44 @@ def robe_fit(rig, tpl: dict, img: np.ndarray, labels: np.ndarray | None, S: dict
     show = back & (out[..., 3] == 0) & legs & (img[..., 3] > 0)   # the feet show through where the robe is empty
     out[show], lab[show] = img[show], labels[show]
     return out, lab
+
+
+GLOW_FRAMES = ("kneel_in1", "kneel_in2", "kneel", "kneel_b")
+
+
+def glow_apply(spec: dict | None, name: str, img: np.ndarray, sid: str = "?") -> np.ndarray:
+    """K2-0b block key `glow: {box: [x0, y0, x1, y1] (optional), kneel_in1 / kneel_in2 / kneel / kneel_b: [[from, to],
+    ...]}`: a per-frame colour remap of glow pixels (palette to palette; the palette lock still checks the result), so a
+    glow can fade over the kneel without the keyframe paint cap. kneel_in2 and kneel_b are cut from the kneel key, so
+    their maps act on the key's already remapped colours."""
+    if not spec or name not in spec:
+        return img
+    bad = sorted(set(spec) - {"box", *GLOW_FRAMES})
+    if bad:
+        raise ValueError(f"rig {sid}: kneel glow keys {bad} are not box or {', '.join(GLOW_FRAMES)}")
+    out = img.copy()
+    box = np.ones(img.shape[:2], bool)
+    if spec.get("box"):
+        x0, y0, x1, y1 = (int(v) for v in spec["box"])
+        box[:] = False
+        box[y0:y1 + 1, x0:x1 + 1] = True
+    c = img[..., :3]
+    for pair in spec[name]:
+        if len(pair) != 2 or any(len(v) != 3 for v in pair):
+            raise ValueError(f"rig {sid}: kneel glow {name} entry {pair!r} is not [[r, g, b], [r, g, b]]")
+        m = box & (img[..., 3] > 0) & (c == np.array(pair[0], np.uint8)).all(2)
+        out[m, :3] = pair[1]
+    return out
+
+
+def post_frame(rig, tpl: dict, name: str, img: np.ndarray, labels: np.ndarray | None, J: dict,
+               idle_labels: np.ndarray):
+    """The generate hook on a kneel in-between (kneel_in1 / kneel_in2 / kneel_b): the robe fit, then the block's
+    glow remap; any other frame comes back unchanged."""
+    if name not in ("kneel_in1", "kneel_in2", "kneel_b"):
+        return img, labels
+    img, labels = robe_frame(rig, tpl, name, img, labels, J, idle_labels)
+    return glow_apply((rig.cfg.get("kneel") or {}).get("glow"), name, img, rig.cfg.get("sprite", "?")), labels
 
 
 def robe_frame(rig, tpl: dict, name: str, img: np.ndarray, labels: np.ndarray | None, J: dict,

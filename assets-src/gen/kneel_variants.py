@@ -97,6 +97,9 @@ VARIANTS = {
     # neck sag (three crossing neck chains tear when they turn), only the heads bow; the rig's tweaks lower the heads
     ("quadruped", "settle"): {"slump": 0.08, "drop": None, "lower": {"chest": None}, "sag": None,
                               "rel": {"snout": 12.0}},
+    # K2-0b (ogre_mage), after robed: the feet are kept out of the robe's row compression (they stay as rendered,
+    # behind the robe), so a foot inside the compressed band does not fold into a crease
+    ("biped", "robed_feet"): {"robe_legs": "feet"},
     # K2-0 iteration 3 (hydra; needs a section 13 ruling): heads that bow on full-width necks (the reviewer's ask: no
     # translated, pinched necks; the column drops only with the body) leave the tall top head near 0.88 of the idle
     # height, so a multi-head kneel takes the band 0.60-0.90
