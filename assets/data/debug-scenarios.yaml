@@ -1403,6 +1403,46 @@
   enemies: []
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
+# S2 (WORLD_PLAN 6.5): Pravoka's land gate with the S0 and S1 grants (the span built, the lute held), at the band's
+# low level 3 with the previous band's kit (w_s1, B1). `_start`: walk to the brig pier's end, talk to Bikke, win
+# (pirate x9), then leave by the gate and step onto the brig at the a1_pravoka dock (mode ship).
+# `_neg_noboss` is the same start; its run skips the fight: no ship at the dock, and the party can't step onto water.
+- id: w_s2_start
+  name: W A1-T - S2 Pravoka and the pirates (talk to Bikke)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: &a1t_s2_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT]
+  party: &a1t_b1_party
+    - { class: warrior, name: WAR, level: 3, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THF, level: 3, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 3, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 3, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }] }
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+- id: w_s2_neg_noboss
+  name: W A1-T - S2 negative (walk to the quay without the fight)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: *a1t_s2_flags
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+# Bikke's nine at the band's test level 4 with the stage kit w_s2 (B2; WORLD_PLAN 3.7, tests/balance/w_a1_t.test.ts).
+- id: w_boss_pirate
+  name: W A1-T - Bikke's nine pirates (band level 4, kit w_s2)
+  background: assets/backgrounds/shoreline.webp
+  party:
+    - { class: warrior, name: WAR, level: 4, equipment: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 4, equipment: [short_sword, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 4, equipment: [hammer, robe, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }] }
+    - { class: black_mage, name: BLM, level: 4, equipment: [staff, robe, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [pirate, pirate, pirate, pirate, pirate, pirate, pirate, pirate, pirate]
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
 # S6 (docs/WORLD_PLAN.md 5.3, 6.5): the party at the Western Keep's door on the arm with the band-low level (10), the

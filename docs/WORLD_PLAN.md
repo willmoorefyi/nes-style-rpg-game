@@ -2630,6 +2630,141 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-o/`.
 - The debug scenarios gain `w_s1_start`, `w_s3_start` and `w_s7_start`.
 <!-- === end A1-O === -->
 <!-- === A1-T A1 (pass W: owned by A1-T) === -->
+### A1-T result: Pravoka and the pirates (branch `w-a1-t` from `mainline` f825a6f, merged with `mainline` aa75df87 after A1-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-t/`.
+
+**Files:**
+
+- `layouts/a1/town_pravoka.py` writes `pravoka` (48x44, kits town + overworld), with the design note in its header.
+  - The plan: a shelf between the cliffs and the fjord. Three streets fall from the west cliff to a quay that runs the
+    length of the town: Rope Walk (y 14-15), Cooper's Row (y 24-25) and the high street (y 34-35). The high street
+    leaves by the west land gate.
+  - Lantern Street runs north to a cliff path, which rounds the fjord's head to the lighthouse shelf at the range's
+    foot. The shelf holds the keeper's house (the clinic) and the tower (the `tower` placeholder).
+  - Two warehouses stand on piles over the water beside a plank landing, with a boardwalk behind them. There is a
+    fishers' pier, and the brig's pier with the brig moored at it (the `buried_hull` placeholder, brown). A fish
+    market lies between the streets and the quay, and the pirates' den is boarded up.
+  - 15 `type: house` objects: 6 homes, 5 shops, and 4 without a door (the sail loft, the den, a boarded cottage and
+    the old warehouse). The inn is the `inn` prefab.
+  - Three inspect cells (the signpost, the lighthouse door, the brig), `battleBackgrounds.default: shoreline` for
+    the captain's fight, and the west edge exits to `overworld:a1_pravoka`.
+- `layouts/a1/town_pravoka_people.py`: the 19 outdoor NPCs, the captain's fight and `NO_WANDER`.
+  - 7 pirates: tinted `guard` and `villager`, `hideIf: BIKKE_DEFEATED`.
+  - Bikke: a tinted `warrior` at the brig pier's end (40, 33).
+  - The scripted encounter: `npc: bikke`, `pirate` x9, `isBoss`, flag BIKKE_DEFEATED, `postVictoryCutscene:
+    a1_bikke_yields`.
+  - The beaten captain and two dockhands: `showIf: BIKKE_DEFEATED`.
+  - `old_sailor_hint` names Elfheim, and `herbwife_hint` names Matoya.
+  - Every townsperson has a line that changes on BIKKE_DEFEATED.
+- `layouts/a1/town_pravoka_rooms.py` is the runner for the interiors. `town_pravoka_homes.py` writes the six
+  `pravoka-house-*` maps, and `town_pravoka_shops.py` writes the five shops and `pravoka-inn`. They use W1-D's
+  `Town("pravoka")` and its `house`, `shop` and `keeper` helpers. Each room has its own original plan and its design
+  note in its header:
+  - lighthouse: the clinic. The keeper (`action: clinic`, `clinicPrice: 10`), the keeper's daughter and a hurt sailor;
+  - warehouse: aisles of crates, Hennick, a stowaway, and a chest (`tent`);
+  - netmaker: two NPCs;
+  - chandler: two rooms, two NPCs and a chest (`antidote`);
+  - cooper: two NPCs and a chest (`potion`);
+  - harbourmaster: an office and a record room, two NPCs;
+  - the shops: each keeper stands behind a counter whose ends are closed, so the keeper's side is unreachable. The
+    inn has a taproom, a bunk room and a patron.
+- `layouts/a1/town_pravoka_site.py` is **unchanged** (W1-0b's defaults, which A1-O's world reads). The world needs no
+  regeneration for A1-T.
+- Data:
+  - `cutscenes.yaml` (A1-T anchor): `a1_bikke_yields` (Bikke yields the brig, his crew leaves over a fade, `set_flag
+    BIKKE_DEFEATED`, then a `warp` back into `pravoka` (26, 35) behind the fade). The warp reloads the town, so the
+    `showIf` people appear; the engine only removes NPCs on a flag, it never adds them.
+  - `quest.yaml` (A1-T anchors): S2 `status: built` with its walk, its entry (the bridge's south stub foot, overworld
+    (93, 97)) and two `nonLoadBearing` entries (see the deviations). The town `pravoka` is `built`.
+  - `debug-scenarios.yaml` (A1-T anchor): `w_s2_start`, `w_s2_neg_noboss` (both at `pravoka:gate`, level 3, B1 kit,
+    the S0 and S1 flags and the lute) and `w_boss_pirate` (pirate x9, level 4, kit w_s2).
+  - `shops.yaml`: W1-F's seeded `pravoka_*` records are kept unchanged (B2 stock, inn 50).
+- Tests:
+  - `tests/quest/a1/a1_t_town.test.ts` (10 tests): the canon links both ways, the gate's edge exits, EXIT-safe
+    rooms and town, Bikke's fight and cutscene, the pirates and dockhands on the flag, the hints, the clinic and inn
+    prices, the CHEST_A1_T_ flags, and the site file against the compiled overworld (door, gate, dock, brig);
+  - `tests/quest/a1/a1_t_walk.test.ts` (3 tests): the S2 walk, (a) in assume mode, and the town entry;
+  - `tests/balance/w_a1_t.test.ts` (3 tests).
+
+**Town standard (G15):** `pravoka: houses 15/8 interiors 6/6 outdoor 19/14 interior 16/10 hints 2/2 reactive 21/4
+shops 5/5 inn 50/50 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when | `w_a1_t.test.ts` passes. Pirate x9 is trivial at the band, as in the classic: sensible L4 100.0 % (>= 95), careless L4 100.0 % (>= 85), sensible L3 100.0 % (>= 95). `check-bounds: OK (6 tests)` |
+| G1 | `town_pravoka.py`, `town_pravoka_rooms.py`, `stubs.py` and `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py` for the 13 ids under the lock: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 13 ids: each prints `<id>: deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G5 | `npm run quest -- --mutate --stage S2`: (a) OK S2; (b) OK (5 withheld runs); (c) OK (10302 states); (d) `pirate L3.5 [3,6]`; (e) to (h) OK; `mutations: OK (3 gate rows; 3 elements, each removal reported)`; `quest-verify: OK`. The full `npm run quest -- --mutate` is OK: (c) 5266 states; `mutations: OK (43 gate rows; 52 elements)`. In the full run GT-2 is caught (`SKIP S2 ... without S1 (BRIDGE_BUILT)`), GT-3 is caught (`SKIP S4 map elfheim reachable without S2`), and GT-4 is caught (`SOFTLOCK ...`) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 317 files, 6794 passed, **1 failed**, `wnd_o_walk` (e). That failure is on `mainline` too, see below |
+| G6, G7, G12, G13, G14, G15 | `tests/quest/`, `tests/data/`, `tests/progression/`: all pass apart from that one. `(g) geography: OK  s*=0.736 (31 pairs; 2 assumed)`. `(h) travel matrix: OK  (12 rows, 2 basin rows; 8 checked, 6 pending)`: T2-T5 and both basin rows are now checked |
+| G16 | `stubs.py --check a1-t`: `stubs: 0 left for A1-T` |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 13810 cells; canal joins)` |
+| G10 | Port 5222, `mute=1`, my own headless Chromium (`/tmp/w-a1-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s2_start`:
+
+- Shop: bought a Potion at the item shop (600 -> 540 G, potions 5 -> 6). Inn: 540 -> 490 G. Clinic: BLM felled by
+  debug, revived for 30 G (level 3 x 10), HP 1.
+- Bikke: talked to him from (39, 33); the battle started, the party won, and `a1_bikke_yields` played. BIKKE_DEFEATED
+  is set. The reloaded town shows `bikke_after`, `dockhand_a` and `dockhand_b`, and no pirate.
+- The brig: out through the west gate to `overworld` (131, 101). The brig sprite stands at the `a1_pravoka` dock
+  (132, 102). Stepping east from (131, 102) gives mode `ship` at (132, 102).
+- Screenshots: `/tmp/w-a1-t/s2_gate.png`, `s2_shop.png`, `s2_inn.png`, `s2_clinic.png`, `s2_pier.png`,
+  `s2_battle.png`, `s2_after.png`, `s2_quay.png`, `s2_ship.png`.
+
+G10, `w_s2_neg_noboss`: out through the gate without the fight. There is no brig sprite at the dock. The step east
+from (131, 102) is refused, and the mode stays `walking`. Screenshot: `/tmp/w-a1-t/s2_neg.png`.
+
+**Cross-tranche: the ship and its docks.** A1-O's merge already moved the brig from Cornelia's jetty to the
+`a1_pravoka` dock, reading this site file. So no reachable ship has only one dock. `npm run quest -- --stage S21`:
+`(c) soft-locks: OK  (62820 states, every one reaches @S21)` (S22 the same).
+
+**Originality:**
+
+- The town and its 12 rooms have their design notes. A fresh reviewer read the sources, the notes, the dialogue and
+  the cutscene: no classic line is copied, and every Distinct: line has at least 2 true features.
+- Its three factual remarks are fixed: the weapon shop's stands, the cooper's earthen floor, and the two-room
+  Topology lines of the chandler and the harbourmaster.
+- `originality review: PASS pravoka pravoka-house-chandler pravoka-house-cooper pravoka-house-harbormaster
+  pravoka-house-lighthouse pravoka-house-netmaker pravoka-house-warehouse pravoka-weapon-shop pravoka-armor-shop
+  pravoka-item-shop pravoka-white-magic pravoka-black-magic pravoka-inn`.
+
+**Deviations / hand-offs (shared-file edits, each small):**
+
+- `src/progression/questMutate.ts` (W1-I), two rule fixes:
+  - A non-load-bearing (`nlb: entry`) row whose stage is pending now reports `pending: ... not built` instead of
+    UNCAUGHT. With the brig built, GT-5 (`elf_port`, S4, ELF-T) went live with no entry yet.
+  - In `--stage` mode, a row's (b) expectation on another stage is left to the full run. GT-2 in `--stage S1` needs
+    `SKIP S2`, which the S1 scope cannot produce; it is still caught there by its `EARLY pravoka`, and fully in the
+    full run.
+- `tests/progression/travelMatrix.test.ts`: a repository-state pin updated. T2-T5 and B1/B2 are now `ok`, and the
+  strict pending example is T6. It already failed on `mainline` after A1-O.
+- `quest.yaml` S2 `nonLoadBearing`:
+  - Bikke's `hideIf` (as Garland's at S0).
+  - GT-4's dock, for the stage scope only. In `--stage S2` the goal @S2 holds as soon as the brig spawns, and boarding
+    needs no dock (W1-A), so the removal cannot fail there. The full run catches GT-4 as SOFTLOCK, and a caught row
+    never reads this entry.
+- **Open for INT, not mine:** proof (e) in `--stage` mode for a stage whose entry already lies past an ancestor's
+  barrier. This fails on `mainline` today: `EARLY dwarf talkable before S2` in `--stage S3`, `S21`, `S22`, `S26`,
+  and in `wnd_o_walk.test.ts`. Pravoka is now built, so `EARLY pravoka talkable before S1` joins it in those runs.
+  `startWithout` removes the ancestor's grants, but the start place, and vehicles such as the airship, are already
+  beyond them. `--stage S2` itself is clean.
+- Art: the brig (`buried_hull`), the lighthouse (`tower`) and the piles (`dock_post`) are W1-D placeholders, so the
+  brig shows its "BH" label. A brig sheet is an art need (4.9).
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains two rows:
+  - `layouts/a1/town_pravoka.py` (+ `town_pravoka_people.py`) -> `pravoka.yaml`;
+  - `layouts/a1/town_pravoka_rooms.py` (+ `town_pravoka_homes.py`, `town_pravoka_shops.py`) -> the six
+    `pravoka-house-*` maps, the five shops and `pravoka-inn`.
+- Debug scenarios gain `w_s2_start`, `w_s2_neg_noboss` and `w_boss_pirate`.
+- A cutscene that sets a flag on which `showIf` NPCs appear should `warp` onto the same map behind a fade: the field
+  only removes NPCs on a flag change.
 <!-- === end A1-T === -->
 <!-- === ELF-O ELF (pass W: owned by ELF-O) === -->
 ### ELF-O result: Elfland overworld, the Western Keep, S6 (branch `w-elf-o` from `mainline` 81e93d4, merged with mainline after FIR-O and WAT-O)
