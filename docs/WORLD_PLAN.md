@@ -1884,6 +1884,71 @@ world constants).
 <!-- === W1-G FOUNDATION (pass W: owned by W1-G) === -->
 <!-- === end W1-G === -->
 <!-- === W1-H FOUNDATION (pass W: owned by W1-H) === -->
+### W1-H result: verifier core (branch `w-w1-h` from `mainline` f2f2383)
+
+No AI or paid calls. No kneel files.
+
+**Files:** `src/progression/` `questData` (input, loaders, `optional` derivation), `questCatalog` (event catalog,
+relevance pass, read flags and items, `towns:` lookups, `arrivalOf`, `flagsSetByMap`), `questEvents` (event effects
+through `npcOutcome`, `gateCheck`, `dueEncounterWhere`, `flagsMet`; cutscene steps), `questStates` (markers `@S<n>`,
+relevance filter, exact apply), `questPlaces` (components on `fieldStep`, cached by map, mode, read flags and items),
+`questExits` (docks, banks, landings, EXIT, boarding), `questSearch` (new game, assume-mode start, exact BFS,
+`cellPath`), `questSaturate` (saturation closure), `questProofs` (context, (a)), `questChecks` ((b), (c)),
+`questReport` (args, report, `runCoreProofs`, W1-I module contract); `scripts/quest-verify.ts` (in the tsconfig
+`include`); `package.json` `quest`; `tests/fixtures/quest/` (loader, `clean`, 10 RED, `flags_red`);
+`tests/progression/questGraph.test.ts` (27), `questFlags.test.ts` (4).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/progression/questGraph.test.ts tests/progression/questFlags.test.ts` | 2 files, 31 tests passed |
+| `npm run quest` | `(a) order: OK ... optional: S19 S18* reachable, not required ...; pending: S31 waits for adamant (granted by no stage)`, `(b) skips: OK  (485 withheld runs, 0 reach a later stage; 7 milestone runs)`, `(c) soft-locks: OK  (118 states, every one reaches CHAOS_DEFEATED)`, `quest-verify: OK` (about 7 s) |
+| `npm run quest -- --stage S11` / `--stage S30` | `quest-verify: OK` |
+| `npm run build` | exit 0 |
+| `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; 271 files, 5161 tests passed |
+| `npx vitest run tests/data/questCeilings.test.ts` | 28 passed (every new file under 250 lines) |
+
+RED fixtures, one or more per proof: (a) `red_a_goal`, `red_a_order`, `red_a_optional`, `red_a_walk`; (b) `red_b_skip`
+(also in `--stage`), `red_b_milestone`, `red_b_require`; (c) `red_c_softlock`, `red_c_stranded`, `red_c_deadgate`.
+`clean` passes all three.
+
+**Deviations:**
+
+- **Extra files.** The 250-line ceiling (`questCeilings.test.ts` covers all of `src/progression`) forced 5 files
+  beyond the owned 6: `questCatalog`, `questStates`, `questExits`, `questSaturate`, `questChecks`. None clash with
+  W1-I's names.
+- **S18 is optional by derivation**, not in `quest.yaml`. A stage off the goal's `after` closure whose dependants are
+  all optional is optional (only S18 qualifies). (a) prints it as `S18*`.
+- **S31 is unreachable on this head.** It requires `adamant`, and no stage grants it: WORLD 3.1 puts it in S28's sky
+  castle, but S28's `grants` leave it out. A pending optional stage whose requirement nothing grants is a note in
+  (a). It is a failure under `--strict`. Fix for INT or WND-D2: add `adamant` to S28's `grants`, or grant it from
+  the real chest.
+- **Consumption table.** `CONSUMED_KEY_ITEMS` in `questData.ts` mirrors WORLD 3.1. An `items.yaml` `consumed` field
+  overrides it (W1-F may move the column into the item records).
+- **Model choices.**
+  - Auto events (pending stages, vehicle spawns) fire eagerly in stage order.
+  - Gold is not modelled: `takeGold` is recorded, and (d3) is W1-I's.
+  - The EXIT edge is always allowed.
+  - Transitions are not taken while flying.
+  - A spawned canoe parks at the bank; the `canoe` item leaves nothing.
+  - `canoe` is in every place key (W1-B's ability).
+  - The trade fallback (`requiredItem` and `takeItem`) applies until `npcOutcome` reports a take.
+  - In `--stage` mode, (b)'s "transitive requires" is the stage's own `requires`.
+- **Missing late modules fail closed.** `--mutate` and `--only <d-h>` fail without W1-I's modules. A default run
+  reports (a)-(c) only.
+
+**Hooks for W1-I:** `createQuestContext(world, {stage, strict})`, `closure(ctx)` (a `Saturator` with `fired[].at`),
+`stateGraph(ctx)`, `saturate(ctx, start, {disabled, withhold})`, `eventsGranting`, `bossEvents`, `exploreStates`,
+`canReach`, `pathTo`, `cellPath(world, from, goals, state)`, `townMapIds`, `townKeepers`, `ctx.cat` (events with
+static requires and grants, `readFlags`, `readItems`). The CLI loads `src/progression/questProofsLate.ts`
+(`runLateProofs(ctx, only?): ProofResult[]`) and `questMutate.ts` (`runMutations(ctx): MutationResult[]`) when they
+exist (`LateProofModule`, `MutateModule` in `questReport.ts`). The import-rule test covers every `src/progression`
+file.
+
+**AGENTS.md delta (for INT):** under "Running Tests", add `npm run quest -- [--strict] [--mutate] [--stage S<n>]
+[--only abc] [--json FILE]`; under Testing, add `tests/fixtures/quest/` (YAML worlds with `extends:` and a `grid`
+legend).
 <!-- === end W1-H === -->
 <!-- === W1-I FOUNDATION (pass W: owned by W1-I) === -->
 <!-- === end W1-I === -->

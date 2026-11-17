@@ -1,0 +1,14 @@
+# RED for (c): a hole on the world map drops into a pit with no way out.
+extends: clean
+maps:
+  - id: overworld
+    transitions:
+      - {x: 1, y: 1, targetMap: town, targetEntrance: gate}
+      - {x: 10, y: 1, targetMap: cave, targetEntrance: entry}
+      - {x: 4, y: 1, targetMap: pit, targetEntrance: bottom}
+  - id: pit
+    grid:
+      - "#####"
+      - "#...#"
+      - "#####"
+    entrances: {bottom: [2, 1]}

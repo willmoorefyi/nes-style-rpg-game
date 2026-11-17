@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "validate": "npx tsx scripts/validate-content.ts",
+    "quest": "vite-node scripts/quest-verify.ts",
     "assets": "python3 -I assets-src/build_assets.py"
   },
   "dependencies": {
