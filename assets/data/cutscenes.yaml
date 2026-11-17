@@ -196,6 +196,20 @@
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
+# S5: the postVictoryCutscene of the Marsh Cave guard (marsh-cave-b3, npc elf_d_bier, piscodemon x3); it gives the
+# crown (D-W14) and points the party at the Western Keep on the arm.
+- id: elf_d_crown
+  steps:
+    - type: dialog
+      text: "The last keeper sinks back into the fog and does not rise. The braziers catch again, one by one."
+    - type: set_flag
+      flag: MARSH_GUARD_DEFEATED
+    - type: give_item
+      item: crown
+    - type: dialog
+      text: "The crown is light, cold, and furred with marsh-rot. Under the green, the silver is worked with reeds."
+    - type: dialog
+      text: "The bier's carving says it belongs to whoever rules the keep. The keep on the northern arm waits for one."
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
 # S10: Nerrick takes the TNT (dwarf-hall, npc ert_nerrick, requiredItem tnt) and blasts the isthmus saddle; the patch
