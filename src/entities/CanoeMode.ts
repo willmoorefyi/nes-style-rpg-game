@@ -2,7 +2,7 @@ import { TerrainType } from '../types/index.js';
 import type { MovementMode } from './MovementMode.js';
 import { vehicleTerrainAllows } from '../systems/fieldRulesVehicles.js';
 
-/** Canoe mode: traverses rivers and water. Reduced encounters. */
+/** Canoe mode (the `canoe` item's ability): River and Lake only, never the sea. Reduced encounters. */
 export class CanoeMode implements MovementMode {
   readonly id = 'canoe';
 

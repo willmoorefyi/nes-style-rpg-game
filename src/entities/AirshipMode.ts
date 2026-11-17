@@ -2,7 +2,7 @@ import { TerrainType } from '../types/index.js';
 import type { MovementMode } from './MovementMode.js';
 import { airshipTerrainLands } from '../systems/fieldRulesVehicles.js';
 
-/** Airship mode: flies over all terrain. No encounters. Can only land on grass. */
+/** Airship mode: flies over all terrain. No encounters. Lands on grass only (fieldRules.canLand adds the cell rules). */
 export class AirshipMode implements MovementMode {
   readonly id = 'airship';
 

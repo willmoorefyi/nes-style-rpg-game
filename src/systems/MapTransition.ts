@@ -2,6 +2,7 @@ import type { FieldMode, MapData, MapTransition as TransitionData, VehicleState 
 import type { DataLoader } from '../core/DataLoader.js';
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
+import { terrainAllows } from './fieldRules.js';
 
 const walking = new WalkingMode();
 
@@ -43,18 +44,28 @@ function reachableOnFoot(map: MapData, col: CollisionMap, starts: ReadonlyArray<
   return seen;
 }
 
-/** Where a restored position may stand: walkable, not a warp, and reachable on foot from one of the map's entrances
- *  (e.g. the north shore of the overworld counts, though the first entrance cannot reach it). A spawn on a warp
- *  steps off it onto a good neighbouring cell (the doorway in front of it), so loading a save never fires the warp;
- *  anything else (blocked, cut off, a save from the other map variant or from before the map was redrawn) moves to
- *  the first entrance. Maps without entrances keep the position. `_mode` and `_vehicles` are declared for GAP-11
- *  (W1-A keeps a position valid in the saved mode or on a parked vehicle); today the check is on foot only. */
-export function safeSpawn(map: MapData, pos: { x: number; y: number }, _mode?: FieldMode,
-  _vehicles?: readonly VehicleState[]): { x: number; y: number } {
+/** Whether a party in `mode` may stay on the cell: in the map, and (but for the airship) on its mode's terrain. */
+function validInMode(map: MapData, col: CollisionMap, pos: { x: number; y: number }, mode: FieldMode): boolean {
+  if (pos.x < 0 || pos.y < 0 || pos.x >= map.width || pos.y >= map.height) return false;
+  return mode === 'airship' || terrainAllows(mode, col.getTerrainType(pos.x, pos.y));
+}
+
+/** Where a restored position may stand (GAP-11, mode-aware). A party in a vehicle keeps a position that is valid in
+ *  that mode (the ship on Water, the canoe on River or Lake, the airship anywhere on the map). On foot it must be
+ *  walkable, not a warp, and reachable on foot from one of the map's entrances or from a vehicle parked on this map
+ *  (e.g. the north shore of the overworld, or land the ship docked at, though the first entrance cannot reach it). A
+ *  spawn on a warp steps off it onto a good neighbouring cell (the doorway in front of it), so loading a save never
+ *  fires the warp; anything else (blocked, cut off, a save from the other map variant or from before the map was
+ *  redrawn) moves to the first entrance, on foot. Maps without entrances keep the position. */
+export function safeSpawn(map: MapData, pos: { x: number; y: number }, mode: FieldMode = 'walking',
+  vehicles: readonly VehicleState[] = []): { x: number; y: number } {
   const entrances = map.entrances ? Object.values(map.entrances) : [];
   if (!entrances.length) return pos;
   const col = new CollisionMap(map);
-  const seen = reachableOnFoot(map, col, entrances);
+  if (mode !== 'walking' && validInMode(map, col, pos, mode)) return pos;
+  const parked = vehicles.filter((v) => v.map === map.id)
+    .flatMap((v) => [[v.x, v.y] as const, ...DIRS.map(([dx, dy]) => [v.x + dx, v.y + dy] as const)]);
+  const seen = reachableOnFoot(map, col, [...entrances, ...parked]);
   const warps = new Set(map.transitions.map((t) => t.y * map.width + t.x));
   const inside = (x: number, y: number) => x >= 0 && y >= 0 && x < map.width && y < map.height;
   const good = (x: number, y: number) => inside(x, y) && seen.has(y * map.width + x) && !warps.has(y * map.width + x);
@@ -66,10 +77,39 @@ export function safeSpawn(map: MapData, pos: { x: number; y: number }, _mode?: F
       return off;
     }
   }
-  const why = !inside(pos.x, pos.y) || !col.isWalkable(pos.x, pos.y, walking) ? 'blocked'
-    : warps.has(pos.y * map.width + pos.x) ? 'on a warp' : 'cut off from every entrance';
+  const why = mode !== 'walking' ? `no place for the ${mode}`
+    : !inside(pos.x, pos.y) || !col.isWalkable(pos.x, pos.y, walking) ? 'blocked'
+      : warps.has(pos.y * map.width + pos.x) ? 'on a warp' : 'cut off from every entrance';
   console.warn(`spawn (${pos.x}, ${pos.y}) is ${why} in ${map.id}; using its first entrance`);
   return { x: entrances[0][0], y: entrances[0][1] };
+}
+
+/** The part of Game a restored field position reads and writes (load, retry, a debug scenario). */
+export interface RestoredField {
+  playerPosition: { x: number; y: number };
+  fieldMode: FieldMode;
+  vehicles: VehicleState[];
+  pendingFrame: 'a1' | null;
+}
+
+/** An act-1 overworld cell in the map's frame: moved by `overworld`'s `world.frames.a1.origin` (GAP-17), else kept. */
+export function shiftA1(map: Pick<MapData, 'id' | 'world'>, pos: { x: number; y: number }): { x: number; y: number } {
+  const o = map.id === 'overworld' ? map.world?.frames.a1?.origin : undefined;
+  return o ? { x: pos.x + o[0], y: pos.y + o[1] } : pos;
+}
+
+/**
+ * Where the party stands on entering `map` after a load, a retry or a scenario: a version-1 overworld position is
+ * first translated into the world frame (GAP-17's save half; once), then `safeSpawn` checks it in the saved mode
+ * with the parked vehicles (GAP-11). A position moved elsewhere is on foot.
+ */
+export function restoredSpawn(map: MapData, game: RestoredField): { x: number; y: number } {
+  if (game.pendingFrame === 'a1') game.playerPosition = shiftA1(map, game.playerPosition);
+  game.pendingFrame = null;
+  const pos = safeSpawn(map, game.playerPosition, game.fieldMode, game.vehicles);
+  const moved = pos.x !== game.playerPosition.x || pos.y !== game.playerPosition.y;
+  if (moved || !validInMode(map, new CollisionMap(map), pos, game.fieldMode)) game.fieldMode = 'walking';
+  return pos;
 }
 
 export interface TransitionResult {

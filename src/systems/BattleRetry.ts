@@ -31,7 +31,8 @@ export interface BattleRetrySnapshot {
   /** The way the hero faced when the battle began (e.g. toward Garland); missing means the default facing. */
   facing?: Direction;
   battle: BattleRequest;
-  /** The party's field mode and the parked vehicles when the battle began (GAP-12; restored by W1-A). */
+  /** The party's field mode and the parked vehicles when the battle began (GAP-12): a retry after a sea battle puts
+   *  the party back on its ship. Missing (an older snapshot) means on foot with no vehicles. */
   mode?: FieldMode;
   vehicles?: VehicleState[];
 }
@@ -48,9 +49,13 @@ export interface RetryState {
   pendingFacing?: Direction | null;
   playTime: number;
   pendingEntrance: string | null;
+  /** The party's field mode and the parked vehicles of every map (GAP-12; missing: on foot, none). */
+  fieldMode?: FieldMode;
+  vehicles?: VehicleState[];
   restoreState(data: {
     party: PartyManager; inventory: Inventory; flags: GameFlags;
     currentMap: string; playerPosition: { x: number; y: number }; playTime: number;
+    fieldMode?: FieldMode; vehicles?: VehicleState[];
   }): void;
 }
 
@@ -65,12 +70,14 @@ export function captureBattleSnapshot(game: RetryState, battle: BattleRequest): 
     position: { ...game.playerPosition },
     facing: game.playerFacing,
     battle,
+    mode: game.fieldMode ?? 'walking',
+    vehicles: game.vehicles ?? [],
   });
 }
 
 /**
  * Put the game back as the snapshot recorded it (play time keeps running; the hero's facing is applied on the next
- * field enter) and return the battle to start again.
+ * field enter; the mode and the vehicles too, GAP-12) and return the battle to start again.
  */
 export function restoreBattleSnapshot(game: RetryState, snap: BattleRetrySnapshot): BattleRequest {
   const copy = structuredClone(snap);
@@ -81,6 +88,8 @@ export function restoreBattleSnapshot(game: RetryState, snap: BattleRetrySnapsho
     currentMap: copy.mapId,
     playerPosition: copy.position,
     playTime: game.playTime,
+    fieldMode: copy.mode ?? 'walking',
+    vehicles: copy.vehicles ?? [],
   });
   game.pendingEntrance = null;
   game.pendingFacing = copy.facing ?? null;

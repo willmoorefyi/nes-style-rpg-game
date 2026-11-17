@@ -6,7 +6,7 @@ import { TerrainType } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import type { PlayerController } from '../entities/PlayerController.js';
-import { MapTransitionSystem, entrancePosition, safeSpawn } from '../systems/MapTransition.js';
+import { MapTransitionSystem, entrancePosition, restoredSpawn } from '../systems/MapTransition.js';
 import { NPCInteractionSystem } from '../systems/NPCInteraction.js';
 import { EncounterSystem } from '../systems/EncounterSystem.js';
 import { DialogBox } from '../ui/DialogBox.js';
@@ -94,7 +94,7 @@ export class ExplorationScene implements Scene {
     dialogBox.visible = false;
     this.dialogManager = new DialogManager(dialogBox, { closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES });
     this.mapLoader = new MapLoader(game.data, this.placeholders);
-    this.vehicles = new FieldVehicles(game);
+    this.vehicles = new FieldVehicles(game, this.worldContainer);
     this.npcActions = new FieldNpcActions({ game, dialog: this.dialogManager, map: () => this.currentMapData,
       playCutscene: (id) => this.playCutscene(id), startEncounter: (e) => this.triggerScriptedEncounter(e) });
     this.battleTrigger = new BattleTrigger(game);
@@ -170,7 +170,7 @@ export class ExplorationScene implements Scene {
       const map = this.currentMapData;
       const hasEntrance = entrance !== null && map.entrances?.[entrance] !== undefined;
       if (entrance !== null && !hasEntrance) console.warn(`map ${map.id} has no entrance '${entrance}'; using the saved position`);
-      const pos = hasEntrance ? entrancePosition(map, entrance) : safeSpawn(map, this.game.playerPosition);
+      const pos = hasEntrance ? entrancePosition(map, entrance) : restoredSpawn(map, this.game); // mode, a1 (W1-A)
       this.player?.setPosition(pos.x, pos.y);
       applyPendingFacing(this.game, this.player); // Retry / Return to Field: facing as when the battle began
       this.redraw();
@@ -210,6 +210,7 @@ export class ExplorationScene implements Scene {
         warp: (w) => this.fieldTransition.warp(w),
         onHeal: () => this.game.events.emit('partyHealed', {}),
         inventory: this.game.inventory, endGame: () => this.game.scenes.switchTo('title'), // W1-B (GAP-13)
+        setVehicle: (v) => this.vehicles.setVehicle(v), // W1-A
       });
     } finally {
       this.cutsceneRunning = false;
@@ -274,7 +275,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setInspectCheck((x, y) => inspectAt(mapData, x, y, (f) => this.game.gameFlags.has(f)));
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
-    this.vehicles.setSpawns(mapId, mapData.vehicles ?? []);
+    this.vehicles.setMap(mapData);
     this.camera.update();
     tilemap.render();
     // B5: Update HUD with map name and gold
@@ -389,6 +390,7 @@ export class ExplorationScene implements Scene {
         if (step.message !== undefined) this.dialogManager.start([step.message]);
         return;
       }
+      this.vehicles.afterStep(this.player, this.stepOrigin, step); // boarding, canoe, docks (W1-A)
       if (step.hazard) hazardStep(this.container, this.game.party.all, step.hazard); // lava, peat (W1-B)
       if (step.transition) {
         this.fieldTransition.run(step.transition).catch((e) => console.error('Map transition failed:', e));

@@ -54,9 +54,10 @@ describe('CanoeMode', () => {
     expect(mode.id).toBe('canoe');
   });
 
-  it('can move on river and water', () => {
+  it('can move on river and lake, never the sea (W1-A, QUEST 3.3)', () => {
     expect(mode.canMove(TerrainType.River)).toBe(true);
-    expect(mode.canMove(TerrainType.Water)).toBe(true);
+    expect(mode.canMove(TerrainType.Lake)).toBe(true);
+    expect(mode.canMove(TerrainType.Water)).toBe(false);
   });
 
   it('cannot move on land or walls', () => {
@@ -102,8 +103,8 @@ describe('ShipMode', () => {
     expect(mode.getSpeedMultiplier(TerrainType.Water)).toBe(1.5);
   });
 
-  it('has 0 encounter rate', () => {
-    expect(mode.getEncounterRateMultiplier()).toBe(0);
+  it('has the full encounter rate (sea battles come from `modes: [ship]` zones, W1-A)', () => {
+    expect(mode.getEncounterRateMultiplier()).toBe(1);
   });
 });
 
