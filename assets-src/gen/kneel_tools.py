@@ -45,10 +45,12 @@ def _yaml(p: Path) -> dict:
 def coverage() -> int:
     rigs = sorted(RIGS.glob("*.yaml"))
     heroes = sorted(p for p in ANIM.glob("*.yaml"))
-    m = [p.stem for p in rigs if "kneel" in _yaml(p)]
-    h = [p.stem for p in heroes if "kneel" in _yaml(p)]
-    print(f"monsters {len(m)}/{len(rigs)}, heroes {len(h)}/{len(heroes)}")
-    print(f"  monsters: {' '.join(m) or '-'}\n  heroes: {' '.join(h) or '-'}")
+    for label, files in (("monsters", rigs), ("heroes", heroes)):      # KA G3: ai (`kneel.source: ai`), derived, alias
+        b = {p.stem: _yaml(p).get("kneel") for p in files}
+        ai = [s for s, v in b.items() if isinstance(v, dict) and v.get("source") == "ai"]
+        der = [s for s, v in b.items() if v is not None and s not in ai]
+        print(f"{label} {len(files)}/{len(files)} (ai {len(ai)}, derived {len(der)}, alias {len(files) - len(ai) - len(der)})")
+        print(f"  ai: {' '.join(ai) or '-'}\n  derived: {' '.join(der) or '-'}")
     return 0
 
 

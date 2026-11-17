@@ -48,11 +48,12 @@ def _monster_cell(png: Path, geom) -> tuple[int, int]:
 
 
 def overwrite_gate(cid: str, sheet_name: str, new_png: Path, approved: Path | None = None) -> None:
-    """FW-RT (docs/REDESIGN_PLAN.md 5): a monster sheet or boss pose (`monster_*`, `boss_*`; party, field and kit sheets
-    are not gated) may replace approved/<id>/<sheet>.png only when the new bytes are identical, or a byte-identical copy
+    """FW-RT (docs/REDESIGN_PLAN.md 5): a monster sheet or boss pose (`monster_*`, `boss_*`), or (pass KA) an AI kneel
+    key (`kneel`, `battle_kneel`: also accepted with a copy under _retired/<id>_kneel_v<N>/ or _kneel_try<N>/; party,
+    field and kit sheets are not gated) may replace approved/<id>/<sheet>.png only when the new bytes are identical, or a byte-identical copy
     of the old file exists under approved/_retired/<id>_vN/ (retire.py; a sheet approved in pass V needs
     `retire.py <id> --as <id>_v2` first)."""
-    if not sheet_name.startswith(("monster_", "boss_")):
+    if not sheet_name.startswith(("monster_", "boss_")) and sheet_name not in KNEEL_SHEETS:
         return
     root = approved or APPROVED
     old = root / cid / f"{sheet_name}.png"
@@ -60,9 +61,35 @@ def overwrite_gate(cid: str, sheet_name: str, new_png: Path, approved: Path | No
         return
     if RT.has_archived_copy(RT.Tree(root.parent), cid, old.name, old.read_bytes()):
         return
+    if sheet_name in KNEEL_SHEETS and any((d / old.name).read_bytes() == old.read_bytes() for d in kneel_archives(root, cid)
+                                          if (d / old.name).is_file()):
+        return
     raise SystemExit(f"refused: approved/{cid}/{old.name} would be overwritten and has no byte-identical copy under "
                      f"{root / '_retired'}/{cid}_vN/; run retire.py {cid} first (a sheet approved in pass V: "
                      f"retire.py {cid} --as {cid}_v2)")
+
+
+KNEEL_SHEETS = ("kneel", "battle_kneel")   # pass KA (docs/KNEEL_AI_PLAN.md D-KA5): the approved AI kneel keys
+
+
+def kneel_archives(root: Path, cid: str) -> list[Path]:
+    """approved/_retired/<cid>_kneel_v<N>/ and <cid>_kneel_try<N>/ (retire_kneel.py) of this id."""
+    import re
+    arc = root / "_retired"
+    return sorted(d for d in arc.iterdir() if d.is_dir() and re.fullmatch(re.escape(cid) + r"_kneel_(v|try)[1-9][0-9]*",
+                                                                         d.name)) if arc.is_dir() else []
+
+
+def approve_kneel(cid: str, sheet_name: str, png: Path, meta: dict, approved: Path | None = None) -> Path:
+    """kneel_ai.py approve: approved/<cid>/<kneel | battle_kneel>.png + .json behind the overwrite gate (D-KA5)."""
+    if sheet_name not in KNEEL_SHEETS:
+        raise SystemExit(f"approve_kneel: {sheet_name!r} is not one of {KNEEL_SHEETS}")
+    overwrite_gate(cid, sheet_name, png, approved)
+    dst = (approved or APPROVED) / cid
+    dst.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(png, dst / f"{sheet_name}.png")
+    (dst / f"{sheet_name}.json").write_text(json.dumps({**meta, "approved": time.strftime("%Y-%m-%d")}, indent=2) + "\n")
+    return dst / f"{sheet_name}.json"
 
 
 def approve(cid: str, sheet_name: str, flip: list[str], note: str = "",

@@ -201,7 +201,7 @@ def budget_breaches(budget: dict, rows: list[dict], gem_count: int) -> list[str]
 
 def cmd_budget(a, gem_ledger: Path | None = None, gem_count: int | None = None) -> int:
     from gen import bedrock as B
-    budget = json.loads(B.BUDGET.read_text())
+    budget = B.pass_view(json.loads(B.BUDGET.read_text()), "C")          # pass C (closed into bedrock_history at KA)
     rows = B.read_br_ledger()
     if gem_count is None:
         led = gem_ledger or GEM_LEDGER

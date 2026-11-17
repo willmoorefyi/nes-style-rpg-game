@@ -55,7 +55,7 @@ def _up_models(check) -> None:
     from gen import bedrock as B
     got = {k: B.MODELS.get(f"upscale_{k}") for k in UPSCALE_IDS}
     check(got == UPSCALE_IDS, f"bedrock.MODELS: upscale_conservative / _creative / _fast are the us. profile ids ({got})")
-    real = _budget()["bedrock"]["per_purpose_caps"]
+    real = _budget()["bedrock"]["per_purpose_caps"]          # pass C, read from bedrock_history since KA0b
     check(real.get("rim_upscale") == RIM_UPSCALE_CAP, f"budget.json: purpose rim_upscale has a cap of {RIM_UPSCALE_CAP} "
                                                       f"({real.get('rim_upscale')})")
 

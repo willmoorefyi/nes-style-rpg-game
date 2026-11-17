@@ -369,5 +369,6 @@ def run_wide_cells(check: Callable[[bool, str], None]) -> None:
         kf = entries[sid][2]
         w = max(raw[(s, p)].size[0] for (s, p) in raw if s == sid)
         ok = all(im.size == (w, 200) and np.array_equal(np.asarray(im)[:, (w - raw[(sid, p)].size[0]) // 2:][:, :raw[(sid, p)].size[0]],
-                                                         np.asarray(raw[(sid, p)])) for p, im in kf.items())
+                                                         np.asarray(raw[(sid, p)])) for p, im in kf.items()
+                 if (sid, p) in raw)                    # approved poses only (warmech's derived `kneel` key, pass K)
         check(ok, f"{sid}: every keyframe padded to the {w} px cell, approved pixels intact")
