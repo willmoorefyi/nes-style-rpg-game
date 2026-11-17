@@ -1,7 +1,19 @@
-# Kneel / dazed pose plan (pass K), rev 2
+# Kneel / dazed pose plan (pass K), rev 3
 
-Status: rev 2. It answers the momus review of rev 1 (REJECT) and the user rulings R1 and R2; the next step is the
-momus re-review. Nothing here is implemented yet.
+Status: rev 3. Rev 2 answered the momus review of rev 1 and the user rulings R1 and R2. Rev 3 answers the narrow
+momus rejection of rev 2 with text edits only. The next step is the momus re-review. Nothing here is implemented yet.
+
+**Rev 3 changes (momus review of rev 2):**
+
+| Finding | Resolution |
+|---|---|
+| r3-1 (P1) | D-K17 now follows the real party action order: step_forward, effect, every result line including the poison line, step_back (16 frames), then completeAction clears the override. The poison damage on an override pose gets a pivot shake summed with the tremble, with no flash. `in` starts after the walk back. `BattleAnimationController` is untouched, and the statusIntegration test is rewritten to match. |
+| r3-2 (P2) | Option 1 is chosen (D-K3): the movement is held at 0 for the 6 rise frames, then remapped into the rest of the motion window, which ends at or before contact. This is done in the pure tables (`attackChoreography.ts`, `enemyAttackTables.ts`), so every contact frame stays where it is. |
+| r3-3 (P2) | The act-1 pages are pinned in `MonsterPages`: they do not count against `PAGE_CACHE` and are never evicted. Their resident cost is 19.8 MB. The peak is restated as pinned + (h + 2) x 16.4 MB and compared with today. The "never stream" claim and R6 are corrected. |
+| r3-4 (P3) | D-K18: a change to `kneel.py`, `kneel_checks.py` or `puppet_kneel.py` re-runs `check --all` plus `puppet_kneel.py check` on every locked class. `puppet_kneel.py` is added to the template-owner files. |
+| r3-5 (P3) | New D-K2 row (e): a status-only poison (no damage, so no flash) starts `in` at its impact, with a test. |
+| r3-6 (P3) | The pilot and K4 screenshots are deterministic: round-1 commands are scripted to target the control enemy, and mid-attack captures use `&enemyAnim=step` frame stepping. |
+| r3-7 (P3) | Section 6: `trembles` flags for `AiEnemyView.update` / `setPosture` and `EnemyPoseController.state`; shake plus tremble summed in pivot.x; an enemy action with no pose (`startEnemyLunge` false, e.g. items) stays kneeling, accepted. |
 
 Budget: **0 paid images**. No Gemini, no Bedrock and no other AI image call anywhere in pass K. Every new frame is a
 cut-out re-pose of approved pixels, like the existing in-betweens.
@@ -66,6 +78,10 @@ in-betweens between `idle` and `kneel` then follow the normal rules.
 | Command input snaps the active hero `ACTIVE_STEP` = 24 px forward (`sprite.x = homeX - 24`); its arrow is placed once at `sprite.y - 20` (the cell top) | `ActiveHeroMarker.ts:5,35,39` |
 | Status icons and overlays anchor on `headOf(current texture)`, the first opaque row, read every frame, so they already follow whatever frame is shown | `fx/statusFx.ts:200-208` |
 | Poison hurts at the **end** of the actor's turn, after its action, shown with its own line (a hold) | `src/battle/turnTick.ts:1-36` |
+| **Party action order:** announce -> `step_forward` (the advance, posed frame by frame) -> `effect` -> `result`, where every result line is shown and its holds are presented, the end-of-turn poison line included -> `step_back` (`RETURN_FRAMES` 16) -> `completeAction`, which is the only place the pose override is cleared. Enemies skip `step_forward` / `step_back`, and their action completes when `enemyStillAttacking()` is false. | `BattleAnimationController.ts:136-192,245-258,293` |
+| An enemy action without a pose (`startEnemyLunge()` false, e.g. an item) goes straight to `execute` | `BattleAnimationController.ts:138,273` |
+| Movement from frame 0: the heavy attack's travel phase moves and hops from frame 0, and the hero `dash`, `leap` and `classic` styles move from frame 0 (`lunge` steps back from frame 0) | `enemyAttackTables.ts:37-60`; `attackChoreography.ts:46-68` |
+| There is no Defend command; dev frame stepping exists: `?battleStep=1` or `?enemyAnim=step` freezes time and `.` advances one frame (scene-wide); `enemyAnim=step` adds the `enemy: frame / t` label | `battleDevClock.ts:5-42`; `enemyAnimPreview.ts:1-12` |
 | Battle HP colour: red at `ratio <= 0.25`; the number and bar **roll** over `HP_ROLL_FRAMES` toward the presented HP | `BattlePartyPanel.ts:17,33-34` |
 | Hero atlas: 12 rows x 14 columns, 2240x1920 px; all 12 classes have joint files (ready / attack / cast); 5 are `robed` (no leg parts) | `battle-characters-ai.json`; `anim/*.yaml`; `build_assets.py:88-129` |
 | The approved hero `down` is a collapsed crouch at 0.63 to 0.77 of `ready` height (warrior 44/68, white_mage 51/66) | measured; section 4 |
@@ -85,16 +101,23 @@ in-betweens between `idle` and `kneel` then follow the normal rules.
 | 2 (R4: daze retired, +4 kneel -2 daze) | 10 | **vampire, wolf** -> page 1 | 16.3 + 1.3 | 16.4 |
 | 4 (this plan) | 12 | **skeleton, troll, vampire, wolf** -> page 1 | 16.4 + 3.4 | 16.4 |
 
-So under this plan the pilot wolf, plus skeleton, troll and vampire, live on page 1. Today such a battle would
-stream page 1 at `ensure`. D-K13 preloads it.
+So under this plan the pilot wolf, plus skeleton, troll and vampire, live on page 1. Without a change, a battle
+with them would stream page 1 at `ensure`. D-K13 **pins** pages 0 and 1.
 
-**Peak resident monster-atlas memory**, with page 0 and page 1 resident, the h pages held by the current battle,
-and the 2 LRU pages; every page is <= 16.4 MB:
+**Peak resident monster-atlas memory**, where h = the pages held by the current battle that are not pinned, and the
+LRU holds 2 unheld, unpinned pages; every page is <= 16.4 MB (today <= 16.6):
 
-- **plan:** 19.8 + (h + 2) x 16.4 MB, so **69.0 MB** for h = 1 and 85.4 MB for h = 2;
-- **today:** 15.3 + (h + 2) x 16.6 MB, so 65.1 MB for h = 1 and 81.7 MB for h = 2.
+- **Plan:** pinned 19.8 + (h + 2) x 16.4 MB.
+  - An act-1 battle (h = 0) peaks at **52.6 MB**.
+  - A battle on one other page (h = 1) peaks at **69.0 MB**; h = 2 gives 85.4 MB.
+- **Today** (page 0 is not pinned, so it is one of the held or LRU pages): (h + 2) x 16.6 MB, with h counting
+  page 0 when held.
+  - An act-1 battle (h = 1, page 0) peaks at 49.8 MB.
+  - A battle on one other page peaks at 49.8 MB; h = 2 gives 66.4 MB.
+- **Difference:** +2.8 MB for an act-1 battle, and +19.2 MB for a battle elsewhere (the pinned pages stay resident
+  next to the LRU).
 
-The difference is +3.9 MB at any h. The "all pages" sum (146 MB) is never resident, because the LRU caps it.
+The "all pages" sum (146 MB) is never resident.
 
 ## 2. Decisions
 
@@ -138,6 +161,8 @@ R = the user's ruling. Defaults hold until the user rules.
     rise (`kneel_in2` 3, `kneel_in1` 3) from `down` to `ready`.
   - **(d) A hit that makes a standing hero weak (or poisons one):** the 24-frame `hurt` flash plays first; `in`
     starts on the frame the flash ends. If the hero is already kneeling, only the shake plays.
+  - **(e) A status-only poison** (a spell or effect with no damage, so no `flashHurt`): `in` starts on the frame its
+    impact is presented, for heroes and enemies alike. There is no flash and no shake.
 
   Enemies:
 
@@ -154,20 +179,68 @@ R = the user's ruling. Defaults hold until the user rules.
   in hold; there is no enemy revive.
 - **D-K3 Rising to act** (heroes and enemies, the same mechanism). For the first `KNEEL_OUT_FRAMES` = 6 frames of an
   action on an acting kneeler, the frame name is replaced by `kneel_in2` (3), then `kneel_in1` (3).
-  - The offsets and contact timing are unchanged. That works because every contact frame is after frame 6: in-place
-    attack 14, melee 14 + N, heavy N + 29, boss cast 10, plain cast 11.
-  - Heroes: in `partyPose.ts` (override age < 6). Enemies: in `EnemyPoseController.raw()`, for the in-place, melee,
-    heavy and both cast tables.
-  - When the action ends (override cleared or mode back to idle) and the trigger still holds, `in` starts at once.
-  - `BattleAnimationController.ts` and `enemyAttackTables.ts` are unchanged.
-- **D-K17 Poison timing.** `turnTick` keeps poison damage at the end of the turn, after the action.
-  1. The action ends, and `in` (8 frames) starts at once.
-  2. The poison line and its damage are presented later, through their hold, as a shake on whatever kneel frame is
-     showing. The shake never restarts `in`.
-  3. A poison KO dies from the current kneel frame.
-  4. Poison applied by an action is presented at that action's impact. The target then goes through row (d), and an
-     enemy starts `in` (no flash).
-  5. A cure is presented when its line shows, and the rise plays then.
+  - **Movement during the rise: option 1 (hold, then compress) is chosen**, because every table has room for it
+    before contact, so contact timing is exactly kept. The knee-slide (option 2) is the fallback only for a table
+    that cannot fit.
+  - For a rising actor, the table's motion (dx, dy, travel progress k, hop) is held at its frame-0 value for t < 6.
+  - The motion window is [0, E), where E is the first segment / phase boundary at or after frame 12, and E must be
+    <= the contact frame. Over [6, E) the table is sampled at the remapped time t' = (t - 6) x E / (E - 6). From E
+    on, everything is unchanged.
+  - Measured E against contact:
+
+    | Table | E | contact |
+    |---|---|---|
+    | hero `lunge` (segments 9 / 9 / 6) | 18 | 24 |
+    | hero `dash` (10 / 5) | 15 | 15 |
+    | hero `leap` (6 / 16 / 6) | 22 | 28 |
+    | hero `classic` (15) | 15 | 15 |
+    | enemy in-place (5 / 6 / 3) | 14 | 14 |
+    | enemy melee | wind + N | 14 + N |
+    | enemy heavy (N >= 10) | N, or N + the raise-in when N < 12 | N + 29 |
+
+    The boss and plain casts have no motion (dy 0), so nothing is remapped; the hero cast gather is in place.
+  - Where it lives: in the pure tables. `advanceAt(t, style, reach, {rise: true})` in `attackChoreography.ts`, and
+    `travelAttackAt(kind, t, {..., rise: true})` / `attackAt` in `enemyAttackTables.ts` / `enemyChoreography.ts`. The
+    frame-name swap is in `partyPose.ts` (override age < 6) and in `EnemyPoseController.raw()`.
+    `BattleAnimationController.ts` is untouched.
+  - The tests assert, for every style and table, that contact frame indices are equal with and without `rise`.
+  - If a table cannot meet E - 6 >= 6 and E <= contact, the knee-slide is accepted for it and verified in
+    `goblin_rise.gif` (K1) and with garland (K2-0). None is expected.
+  - When the action ends (override cleared in `completeAction`, or the enemy mode back to idle) and the trigger still
+    holds, `in` starts at once.
+  - An enemy action with no pose (`startEnemyLunge()` false, e.g. an item) **stays kneeling**, with no rise. This is
+    accepted.
+- **D-K17 Poison timing** (real order, `BattleAnimationController.ts:136-192,293`). `turnTick` keeps poison damage at
+  the end of the turn.
+
+  **Hero:**
+
+  1. `step_forward` with the rise and the action poses.
+  2. `effect`.
+  3. `result`: every result line in order. The end-of-turn poison line is one of them; it is presented through its
+     hold **while the hero is still at the target holding the override pose**.
+  4. `step_back` (16 frames).
+  5. `completeAction` clears the override, and `in` (8 frames) starts then.
+
+  The poison damage on an override pose gets the small **pivot shake** (+-2 px, 12 frames, the same shake as the
+  enemy poison tick). It is summed into `pivot.x` with the tremble (D-K16). There is no `hurt` flash: `partyPose`
+  turns a hurt timer into the shake while an override is active. `BattleAnimationController` is untouched.
+
+  **Enemy:**
+
+  1. The attack (or cast) table plays.
+  2. When its mode returns to idle, `in` starts.
+  3. The poison line is presented in `result` and shakes whatever frame is showing: a kneel frame shakes as in the
+     hurt row. A poison line that lands while the attack is still playing gets no shake (`playHurt` never
+     interrupts an attack, as today).
+  4. The action completes when `enemyStillAttacking()` is false.
+
+  **Both sides:**
+
+  - The shake never restarts `in`.
+  - A poison KO dies from the frame on screen (a kneel frame, or the override pose for a hero).
+  - Poison applied by an action is presented at that action's impact: with damage, row (d); status only, row (e).
+  - A cure is presented when its line shows, and the rise plays then.
 - **D-K4 Derived kneel key.**
   - Monsters: `kneel` is made from `idle` by body-template joint targets (section 4) plus the rig's
     `kneel: {tweaks, sink, paint}`. It follows the FW-H pattern: paint <= 160 px, locked as `kf:kneel`.
@@ -204,24 +277,30 @@ R = the user's ruling. Defaults hold until the user rules.
   kneeling status shows its icon and overlay only. Chaos F1 (`chaos`, an atlas biped) kneels.
 - **D-K13 Atlas growth and preload (R6).**
   - Accept 12 pages (each <= 2048x2048), with the act-1 group on pages 0 and 1.
-  - `BattleArt.load()` preloads **every page that holds an act-1 sheet** (pages 0 and 1, 19.8 MB), so act-1
-    battles never stream. This is computed from the index (the pages of the `act1` group's ids, listed as a new
-    optional index field `preload: [0, 1]` written by `monster_atlas.py`), not hard-coded.
-  - Peak resident memory: section 1.
-  - R6 asks the user to accept 12 pages, the act-1 preload of 19.8 MB (+4.5 MB over today's page 0) and a peak of
-    +3.9 MB.
+  - `BattleArt.load()` loads **every page that holds an act-1 sheet** (pages 0 and 1), computed from a new optional
+    index field `preload: [0, 1]` written by `monster_atlas.py` from the `act1` group's ids (not hard-coded).
+  - **These pages are pinned** in `MonsterPages` (a new `pin(pages)`): they do not count against `PAGE_CACHE` (2),
+    and they are never evicted. Their resident cost is 19.8 MB (16.4 + 3.4), from the first `load()` to the end of
+    the session.
+  - Claim: once `BattleArt.load()` has finished (the first battle awaits it), **act-1 sheets never stream**. Every
+    other page still streams at `ensure` as today.
+  - Peak resident memory: pinned 19.8 + (h + 2) x 16.4 MB (section 1). That is +2.8 MB against today for an act-1
+    battle, and +19.2 MB for a battle elsewhere.
+  - **R6** asks the user to accept 12 pages, 19.8 MB pinned for the session, and these peaks.
 - **D-K14 U2 (R7 default: hold).** After K3-0, a second user review of one contact sheet.
 - **D-K15 Bestiary.** The `daze` step plays kneel in, hold (`dazeHold` 144) and out when
   `textures.kneel !== textures.daze` (texture identity; no json field). Otherwise it plays the same track, whose
   textures alias to daze.
 - **D-K18 Template-fix path during the rollout.**
   1. Only the **template owner** (the orchestrator, or one agent it names, working on `mainline` serially) edits the
-     shared `kneel_templates.py`, `kneel.py` or `kneel_checks.py`.
+     shared `kneel_templates.py`, `kneel.py`, `kneel_checks.py` or `puppet_kneel.py`.
   2. A rollout agent that needs a change reports `BLOCKED: <id> template <body>: <what>` and moves on.
   3. Template fixes must be **additive**: a new named variant, e.g. `kneel: {variant: winged}`, or a new key with
      the old default. That way every locked id stays byte-identical.
-  4. After a template commit the owner runs `monster_anim.py check <every locked id of that body>`, which must
-     print `: OK` for all (an unchanged lock hash means unchanged frames), plus G2.
+  4. After a commit to `kneel_templates.py` the owner runs `monster_anim.py check <every locked id of that body>`.
+     After a commit to `kneel.py`, `kneel_checks.py` or `puppet_kneel.py` (shared by every body), the owner runs
+     `monster_anim.py check --all` (G1) **and** `puppet_kneel.py check <every locked class>`. Either way every line
+     must print `: OK` (an unchanged lock hash means unchanged frames), and G2 must pass.
   5. Worktrees rebase on it before using the variant.
   6. If a fix cannot be additive, the affected locked ids are listed, re-reviewed and re-locked, with
      `lockdiff --relock <ids>` showing changes **only** in kneel entries of those ids, logged in section 13.
@@ -321,12 +400,14 @@ All bands are tuning targets until U1, changed only with a section 13 entry; aft
 | `kneelChoreography.ts` (new, pure) | section 3 tables; `KneelTrack { set(on, clock, {hold?}), frame(clock), rising(age) }`; `isWeak` | <= 150 |
 | `partyPose.ts` (new, pure) | `partyPoseOf(input)`: the D-K2 hero table including rows a to d | <= 130 |
 | `enemyPoseTypes.ts` (new) | `EnemyState`, `EnemyAnimConfig`, `PoseState`, `DEFAULTS` moved out | about 50 |
-| `EnemyPoseController.ts` | KneelTrack per enemy via `setPosture`; D-K3 rise in `raw()`; kneel-again on action end; the daze sway removed | 248 - 50 + 25 = **about 223** |
-| `BattleDisplayManager.ts` | delegates to `partyPose.ts` (-11 lines), KneelTrack per member (+12), `maxHp` from `battle.allParty[i].maxHp` | 231 - 11 + 12 = **about 232** |
+| `EnemyPoseController.ts` | KneelTrack per enemy via `setPosture(i, posture, trembles)`; `state()` adds the tremble from that flag (not from the posture, D-K16) on top of the hurt / poison shake, one summed dx; D-K3 rise in `raw()` (calls the tables with `rise`); kneel-again on action end; the daze sway removed | 248 - 50 + 28 = **about 226** |
+| `BattleDisplayManager.ts` | delegates to `partyPose.ts` (-11 lines), KneelTrack per member (+12), `maxHp` from `battle.allParty[i].maxHp`; `pivot.x` = -(tremble + shake) / scale, one sum (the existing tremble line is extended, not duplicated) | 231 - 11 + 13 = **about 233** |
+| `attackChoreography.ts`, `enemyAttackTables.ts` | the D-K3 `rise` option (hold, then remap to E) | +15 / +12 |
 | `enemyChoreography.ts` | names, fallbacks; `idleFrame` loses its daze branch | about 185 |
 | `fx/statusRules.ts`, `types/fxData.ts`, `core/schemaValidationFx.ts` | `kneel` posture, rank, `trembles()` | +8 total |
-| `AiEnemyView.ts` | applies `kneelSink` through a new pure helper `enemyOffsets.ts` (the sink easing), so the file grows <= 3 lines | **<= 245** |
-| `BattleArt.ts` | reads `kneelSink`; `load()` preloads the index's `preload` pages | <= 240 |
+| `AiEnemyView.ts` | `update(dt, sprites, postures, trembles)` passes the `trembles` flags to `setPosture`; applies `kneelSink` through a new pure helper `enemyOffsets.ts` (the sink easing), so the file grows <= 4 lines | **<= 246** |
+| `BattleArt.ts` | reads `kneelSink`; `load()` loads the index's `preload` pages and pins them | <= 240 |
+| `MonsterPages.ts` | `pin(pages)`: pinned pages are skipped by the LRU count and by eviction | +8 |
 | `CharacterAtlas.ts` | the 4 names; `POSE_FALLBACK` | <= 240 |
 | `ActiveHeroMarker.ts` | arrow follows the sink (D-K20) | about 85 |
 | `kneelPreview.ts` (new, dev) | `?kneel=on` (every actor on both sides kneels), `?kneel=loop` (toggle every 150 frames, staggered 20), `&kneelVariant=A\|B` until U1 | <= 80 |
@@ -387,7 +468,17 @@ the hero versions run in `puppet_kneel.py check` and `battle_ai`.
   - a poison tick is a shake that does not restart `in`; a poison KO dies from the kneel frame; a wake rises;
     stone cuts the kneel.
 - `statusRules.test.ts` / `statusVisuals.test.ts`: the rank table, `poison -> kneel`, `trembles`.
-- `statusIntegration.test.ts`: a poisoned hero acts (turn not lost), kneels again, then the poison line shakes it.
+- `statusIntegration.test.ts` (rewritten to the real order, D-K17): a poisoned hero acts (turn not lost). During
+  `result`, the poison line is presented while the override pose is still held: the pose is unchanged, `pivot.x`
+  shakes for 12 frames (summed with a tremble when feared), and there is no `hurt` pose. `in` starts on the first
+  frame after `completeAction`, never before `step_back` ends. A poison line for an enemy whose attack has ended
+  shakes its kneel frame.
+- row (e): a status-only poison (no damage event, so no `flashHurt`) starts `in` on the presented frame, for a hero
+  and an enemy.
+- the tables: for every hero style and enemy table, with `rise`, the offset is the frame-0 value for t < 6, the
+  contact frame index is equal to the run without `rise`, and every frame from E on is identical.
+- `MonsterPages.test.ts`: pinned pages are never evicted and are not counted in `PAGE_CACHE`; unpinned LRU behaviour
+  is unchanged.
 - `BattleDisplayManager.test.ts`: FB-7 "sleep holds ready" becomes kneel; `ActiveHeroMarker` arrow sink.
 - `poseCues.test.ts`, `assetCoverage.test.ts`, `CharacterAtlas.test.ts`: the frame lists. Kneel frames are own
   rects when opted in, otherwise aliased per D-K7; from K4, own rects for all 123 / 12.
@@ -429,6 +520,13 @@ npm run dev   # Playwright, always with mute=1
 - enemies `[goblin, goblin, wolf, wolf]` with `enemyStatus: {0: [sleep], 1: [poison], 2: [stun]}`; wolf 3 is the
   control;
 - grassland.
+
+**Deterministic capture.** The driver opens `...&scenario=kneel_pilot&enemyAnim=step` (time frozen; `.` advances
+one frame scene-wide; the `enemy: frame / t` label is shown) and scripts round 1: WAR and WAR2 FIGHT wolf 3 (the
+control), and WHM2 uses a Potion on WAR2 (no damage, no status), so goblin 0, goblin 1 and wolf 2 keep their
+statuses. WHM is asleep and loses its turn. The driver then presses `.` until the label for goblin 1 reads
+`atk_mid` (screenshot 2), then until its poison line has shown and the label reads `kneel` (screenshot 3). Enemy
+targets stay random; only the frame at the capture is fixed.
 
 Screenshot 1 (the start) shows WAR, WHM, WHM2, goblin 0, goblin 1 and wolf 2 already kneeling (row a), with WAR2
 and wolf 3 standing.
@@ -512,13 +610,16 @@ Every tranche merge (and K4) runs these, with the expected results:
 
 Formations, checked by `formationFits` in a scenario test:
 
-- **`kneel_grounded`:** `[goblin, wolf, cockatrice, scorpion, green_slime, soldier]` (biped, quadruped, bird,
-  arthropod, blob, mechanical) with `enemyStatus {0: [sleep], 1: [poison], 2: [stun], 3: [poison], 4: [sleep],
-  5: [stun]}`.
-- **`kneel_other`:** `[ghost, cobra, shark, ochu, water_naga]` (floating, serpent, swimmer, rooted, naga) with
-  `{0: [poison], 1: [sleep], 2: [stun], 3: [poison], 4: [sleep]}`.
+- **`kneel_grounded`:** `[goblin, wolf, cockatrice, scorpion, green_slime, soldier, goblin]` (biped, quadruped,
+  bird, arthropod, blob, mechanical, plus a status-free control goblin at index 6) with
+  `enemyStatus {0: [sleep], 1: [poison], 2: [stun], 3: [poison], 4: [sleep], 5: [stun]}`.
+- **`kneel_other`:** `[ghost, cobra, shark, ochu, water_naga, ghost]` (floating, serpent, swimmer, rooted, naga,
+  plus a status-free control ghost at index 5) with `{0: [poison], 1: [sleep], 2: [stun], 3: [poison], 4: [sleep]}`.
 
-Scenarios. In every one, member 1 is weak, member 2 poisoned, member 3 asleep and member 4 stunned.
+Scenarios. In every one, member 1 is weak, member 2 poisoned, member 3 asleep and member 4 stunned. Capture works as
+in the pilot: `&enemyAnim=step` frame stepping; round-1 commands are scripted so the acting heroes FIGHT the
+formation's status-free control enemy (the last index), or use a Potion on a full-HP member. Mid-attack shots step
+until the acting enemy's label reads `atk_mid`, and the after-shots until it reads `kneel`.
 
 | Scenario | Party | Formation | Screenshot 1 (start) must show | Screenshot 2 must show |
 |---|---|---|---|---|
@@ -554,7 +655,7 @@ Also, with no console errors:
 | Large leg rotations look broken (90 deg thighs) | rotsprite above 30 deg; keyframe paint <= 160 px; hero variant B; the pilot and K2-0 judge this |
 | A hero kneel reads as `down` | band lower bound `H_down + 4` (override >= `H_down + 2`); head-up / weapon-held targets; U1 compares side by side |
 | The robe squash smears the hem | variant B at U1 |
-| Atlas growth (12 pages; act-1 on 2 pages) | the act-1 preload (19.8 MB); peak +3.9 MB (section 1); R4 retirement as a fallback |
+| Atlas growth (12 pages; act-1 on 2 pages) | act-1 pages pinned (19.8 MB); peak +2.8 MB for act 1, +19.2 MB elsewhere (section 1); R4 retirement as a fallback |
 | A risky body breaks after the rollout starts | K2-0 probes; D-K18 additive template variants with re-check; G2 |
 | The rise looks rushed inside the wind-up | `KNEEL_OUT_FRAMES` tunable in K1; `goblin_rise.gif` and screenshot 2 at U1 |
 | Poison is very common, so kneeling enemies are everywhere | that is the user's ruling R2; poison keeps its tint, so it is distinguishable from sleep |
@@ -566,7 +667,8 @@ Also, with no console errors:
 2. R4: keep `daze` / `daze_b` (12 pages, wolf, skeleton, troll and vampire on page 1), or retire them (10 pages,
    vampire and wolf still on page 1, 246 lock entries removed)? Default keep.
 3. R5: exempt the Chaos colossus forms F2-F4 from the kneel? Default exempt.
-4. R6: accept 12 pages with act-1 preloaded on pages 0 and 1 (19.8 MB, +4.5 MB) and a peak of +3.9 MB? Default
+4. R6: accept 12 pages with act-1 pages 0 and 1 pinned for the session (19.8 MB), a peak of pinned + (h + 2) x
+   16.4 MB (+2.8 MB for an act-1 battle, +19.2 MB for a battle elsewhere), and other pages still streaming? Default
    accept.
 5. R7: hold U2 for the new body templates, or orchestrator self-review? Default hold U2.
 
