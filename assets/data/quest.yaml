@@ -116,10 +116,15 @@ stages:
     maps: [western-keep-*]
     zones: [overworld:elf_keep_moor]
     grind: 2.0
-    walk: []
+    # the crown trade (it sets ELF_O_CROWN_GIVEN and pays an Ether), then the fight it opens; the cutscene gives the eye
+    walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
+    entry: {map: overworld, x: 60, y: 125}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-6 and the generic NPC elements at Astos's cell: MARSH_GUARD_DEFEATED is redundant with the crown, which only
+      # the Marsh Cave guard's victory gives (D-W14); his hideIf only clears the beaten boss off the dais
+      - {map: western-keep-2f, kind: npc, at: [14, 7], reason: "the crown, which Astos also requires, is given only by the guard's victory (D-W14); hideIf only clears the beaten boss off his dais"}
+    status: built
   # === end ELF-O ===
   # === ELF-T (pass W: owned by ELF-T) ===
   - id: S4

@@ -8,6 +8,7 @@ import { arrivalFor } from '../../src/systems/MapTransition.js';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
 import type { MapData } from '../../src/types/index.js';
+import { canonRows } from '../quest/questMaps.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const load = (rel: string): MapData => validateMapData(parse(readFileSync(resolve(root, rel), 'utf-8')));
@@ -74,7 +75,8 @@ describe('map variants (legacy and compiled 2x)', () => {
   });
 
   it('random battles only happen on the overworld and in dungeons (never in towns, castles or interiors)', () => {
-    const battleMaps = new Set(['overworld', 'temple-of-fiends']);
+    // plus the pass W dungeon floors of the canon (layouts/world_canon.py kind `floor`)
+    const battleMaps = new Set(['overworld', 'temple-of-fiends', ...canonRows().filter((r) => r.kind === 'floor').map((r) => r.id)]);
     for (const m of compiled.values()) {
       if (battleMaps.has(m.id)) continue;
       expect(m.encounters ?? [], `${m.id} encounters`).toEqual([]);

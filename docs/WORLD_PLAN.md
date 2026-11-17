@@ -2490,6 +2490,87 @@ in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townSta
 <!-- === A1-T A1 (pass W: owned by A1-T) === -->
 <!-- === end A1-T === -->
 <!-- === ELF-O ELF (pass W: owned by ELF-O) === -->
+### ELF-O result: Elfland overworld, the Western Keep, S6 (branch `w-elf-o` from `mainline` 81e93d4, merged with mainline after FIR-O and WAT-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-elf-o/`.
+
+**Files:**
+
+- World: `layouts/world_elf.py` (the RegionOut: ground, sites, zones, checks, `walls: {W_arm}`; the stub and its
+  placeholder wall are gone), `layouts/elf/world_land.py` (the arm, the continent, the fens, the tarns, the Greyfells,
+  the east fells, beaches, the min_blob tidy), `layouts/elf/world_sites.py` (the keep, its watchtower, the Marsh Cave
+  mouth, Elfheim's icon / gate / `elf_port` dock read from ELF-T's `town_elfheim_site.py`, the waystone inspect cell,
+  the fens' dead trees, the road), `layouts/elf/world_zones.py`. `layouts/elf/` is imported as a namespace package
+  (`from elf import ...`), so other regions' same-named helpers can't clash in the composer's process.
+- Keep: `layouts/elf/keep.py` -> `western-keep-1f` (36x31) and `-2f` (34x26), compiled; both `canSave: false`, `exit`
+  to `overworld:elf_keep`, encounters gargoyle / bloodbones / ghast / ogre_chief, background `palace` (staged).
+- Data: `cutscenes.yaml` (ELF-O anchor: `elf_o_crown_taken`, `elf_astos_unmasked`), `debug-scenarios.yaml`
+  (`w_s6_start`, `w_s6_neg_nocrown`, `w_boss_astos`), `enemies.yaml` (astos `bossPhases` only), `quest.yaml` S6
+  (`walk`, `entry`, `nonLoadBearing`, `status: built`), `assets/backgrounds/palace.webp`.
+- Compiled stubs (so the overworld's transitions resolve; ELF-T and ELF-D replace them): `elfheim` and its 15 linked
+  maps, `marsh-cave-b1..b3`.
+- Tests: `tests/quest/elf/elf_o_world.test.ts` (anchors, dock, zone coverage, the arm to `seam_n`, the 2.5x hops,
+  W_arm), `tests/quest/elf/elf_o_keep.test.ts` (the crown flow, D-W14, twin stairs, S6 (a)-(c) in assume mode),
+  `tests/balance/w_elf_o.test.ts`.
+
+**The region (world cells).** The arm x 50-61, y 114-145, with a broken tor ridge on its ocean side, the road on its
+Aldi side and grass to `seam_n`; the keep `elf_keep` (60, 125) (target (61, 126)); the Marsh Cave `elf_marsh`
+(53, 162) (target exact) in the fens with four tarns; `elf_elfheim` (82, 150) from the site file, the `elf_port` dock
+(84, 147) in a two-row harbour bay; the east fells wall the Aldi against `seam_s`. Zones: `elf_keep_moor`, `elf_fen`,
+`elf_fields` (walking), `elf_aldi` and `elf_sea` (ship; every Water cell of the box, bands included, in exactly one).
+
+**S6 design.** The false king (`false_king`, `showIf: MARSH_GUARD_DEFEATED`) asks for the crown; his cutscene
+`elf_o_crown_taken` (behind `requiredItem: crown`) takes it, gives an Ether, sets `ELF_O_CROWN_GIVEN`, and warps the
+party to the `boss` cell so the floor reloads with `astos` (`showIf: ELF_O_CROWN_GIVEN`) on the same cell; talking to
+him starts `[astos, gargoyle x3]` (`requiredFlags: [MARSH_GUARD_DEFEATED, ELF_O_CROWN_GIVEN]`), and
+`elf_astos_unmasked` gives `crystal_eye` (D-W14). Why two NPCs and a cutscene: proof (b) counts a talkable boss NPC as
+"reached", so the boss must be absent until the stage's needs hold; and GT-7 removes `requiredItem` + `takeItem`, so
+the take must be a cutscene (an NPC whose gift is a plain item drops out of the event catalog).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `world.py`, `keep.py`, `stubs.py` re-run after the commit: `git diff --exit-code assets-src/maps` clean |
+| G2 | `build_map.py overworld --region elf western-keep-1f western-keep-2f` (lock): `overworld: region elf of 192x192`, both floors compiled, exit 0, max RSS 5.3 GB; `--check-determinism --region elf overworld western-keep-1f western-keep-2f`: all three `deterministic` |
+| G3 | `world.py --owned-chunks elf`, then the diff against the merge base: no output (only `below_7_3`, `below_8_3`, rows 9-11 cols 0-6 change) |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 305 passed (305)`, `Tests 6194 passed | 8 skipped (6202)` (on the head merged with WAT-O) |
+| G5 | `npm run quest -- --mutate --stage S6`: (a)-(h) OK, `(d) bands: OK  astos L10.1 [10,13]`, `mutations: OK (2 gate rows)`, `quest-verify: OK`; full `npm run quest -- --mutate`: `quest-verify: OK`, `mutations: OK` (GT-7 caught: `SKIP S6 astos reachable without its requirement crown`; GT-6 by the S6 entry; GT-5 caught) |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings` passed; every ELF-O file under 250 lines (`keep.py` 194) |
+| G9 | `w_elf_o.test.ts` 3 passed; `check-bounds: OK (3 tests)` |
+| G10 | browser, port 5223, `mute=1`, own headless Chromium: `w_s6_start` walked overworld -> 1F -> west stair -> 2F, the crown taken (crown 0, ether 1), the battle `Astos, 3x Gargoyle` on `palace`, then ASTOS_DEFEATED and `crystal_eye` held (screens `/tmp/w-elf-o/s6_battle.png`, `s6_end.png`); `w_s6_neg_nocrown`: "King: You come before your king with empty hands?", no battle, no flag (`/tmp/w-elf-o/s6neg_line.png`); 0 console errors |
+| G12 | designNotes, originality passed (`western-keep: branching`); reviewer: `originality review: PASS western-keep-1f western-keep-2f overworld(elf)` |
+| G13, G14 | macroGeography, travelMatrix passed; `(g) geography: OK s*=0.735`; `(h) travel matrix: OK` (T2 pending until `a1_pravoka` exists; probed with a temporary anchor: T2 reaches all three ELF anchors) |
+| G16 | `stubs.py --check ELF-O`: `stubs: 0 left for ELF-O` |
+| G17 | `bands: OK`, `basins: OK (aldi 2810 cells, ...; canal joins)`, cuts `W_arm 10` |
+
+**Balance (S6, `[astos, gargoyle x3]`, kit `w_s6`, 400 seeds):** sensible L11 78.5 %, L9 27.3 %, L13 95.0 %; careless
+L11 76.8 %. Astos alone with the roster stats (168 HP) won 100 % at L3-L13, and AI changes alone could not move it;
+the fix is in-bounds: a `bossPhases` entry at 0.99 (3 hits, attack 42) and his three gargoyle sentinels in the
+battle (the map's encounter). Alone with the phase: L9 91 %.
+
+**Originality numbers:** `western-keep` stair graph 1F <-> 2F by twin stairs (two entrance pairs: `up`/`arrival`,
+`up_east`/`arrival_east`); 1F has the courtyard / wings / mirror-hall loop and 2 dead-end store passages, 2F 3 dead
+ends (two niches, the antechamber); the boss on 2F north-east of the arrival.
+
+**Deviations and hand-offs:**
+
+- The brief said ELF-D builds the Keep; 4.2 and 5.4 give `western-keep-*` and S6 to ELF-O, so ELF-O built it.
+- Shared files I edited (for the integrator): `tests/quest/originalityChecks.ts` (`stairGraph` counts twin stairs,
+  i.e. two distinct arrival entrances between the same two floors, as a loop; without it a 2-floor dungeon can never
+  branch) and `tests/data/mapVariants.test.ts` (canon `floor` maps may have random battles). My earlier versions of
+  the FIR-O fixes were dropped for FIR-O's.
+- `assets-src/tools/layouts/elf/town_elfheim_site.py` is unchanged (ELF-T's); its ICON is drawn as the town icon's
+  left column and bottom row ringed by hedge clumps, because the icon's top-right part has too little art for a wall.
+- The keep icon and its tower stand on two crag cells (mountain ground under the castle's top row, for art coverage);
+  the tower and the Marsh Cave mouth use W1-D's placeholder landmarks.
+- Two new local flags/cutscenes beyond 4.2's list: `ELF_O_CROWN_GIVEN`, `elf_o_crown_taken`.
+- In the shared Playwright browser I once pressed ArrowDown in WAT-O's tab (port 5234) before noticing it was shared;
+  the checkpoints were then run in a separate headless Chromium.
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/world_elf.py` + `layouts/elf/world_{land,sites,zones}.py`
+(Elfland; `from elf import ...`) and `layouts/elf/keep.py` (`western-keep-1f`, `-2f`); a boss NPC that needs a key item
+is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the keep.
 <!-- === end ELF-O === -->
 <!-- === ELF-T ELF (pass W: owned by ELF-T) === -->
 <!-- === end ELF-T === -->

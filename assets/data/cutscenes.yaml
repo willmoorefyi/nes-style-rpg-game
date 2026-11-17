@@ -85,6 +85,46 @@
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
+# S6 (docs/WORLD_PLAN.md 4.2, D-W14): Astos's postVictoryCutscene on western-keep-2f. The battle's flag sets
+# ASTOS_DEFEATED; the crystal eye comes only from here, and its last line points the party to Matoya (S7).
+# S6: the false king takes the crown (western-keep-2f's `false_king`, behind the crown); ELF_O_CROWN_GIVEN hides him
+# and shows Astos on the same cell (the warp reloads the floor so he stands there), whom the party then talks to.
+- id: elf_o_crown_taken
+  steps:
+    - type: take_item
+      item: crown
+    - type: dialog
+      text: "He sets the crown on his brow, and his smile grows too wide for his face."
+    - type: dialog
+      text: "King: Such service deserves a reward. Here, drink to your king."
+    - type: give_item
+      item: ether
+    - type: set_flag
+      flag: ELF_O_CROWN_GIVEN
+    - type: fade_out
+      duration: 500
+    - type: warp
+      map: western-keep-2f
+      entrance: boss
+      facing: up
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "The candles gutter. When they steady, the man on the throne is no longer quite a man."
+- id: elf_astos_unmasked
+  steps:
+    - type: dialog
+      text: "The false king's borrowed face slides off like a wet mask. Beneath it, a dark elf crumbles into ash."
+    - type: dialog
+      text: "The stone sentinels fall still, and the second throne's glass shows only an empty chair."
+    - type: set_flag
+      flag: ASTOS_DEFEATED
+    - type: give_item
+      item: crystal_eye
+    - type: dialog
+      text: "In the ash lies a crystal, cold and clear as an eye. Whoever it was stolen from must be blind without it."
+    - type: dialog
+      text: "A witch keeps a cave in the forests north of Cornelia's bridge. Her stolen sight may be what this is."
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===

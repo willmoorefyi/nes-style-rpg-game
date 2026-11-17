@@ -1363,6 +1363,63 @@
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
+# S6 (docs/WORLD_PLAN.md 5.3, 6.5): the party at the Western Keep's door on the arm with the band-low level (10), the
+# B3 kit (w_s6), the S0-S5 flags and the crown, and the ship parked at Elfheim's harbour (elf_port). The `_neg_nocrown`
+# start is the same without the crown; `w_boss_astos` is the battle at the band level (11) with the stage kit.
+- id: w_s6_start
+  name: W ELF-O - S6 start at the Western Keep (crown held)
+  mode: field
+  map: overworld
+  entrance: elf_keep
+  flags: &elf_o_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED]
+  vehicles: &elf_o_ship
+    - { type: ship, map: overworld, x: 84, y: 147 }
+  party: &elf_o_party
+    - { class: warrior, name: WAR, level: 10, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 10
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 10
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { crown: 1, potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
+- id: w_s6_neg_nocrown
+  name: W ELF-O - S6 negative, no crown (the false king only asks for it)
+  mode: field
+  map: overworld
+  entrance: elf_keep
+  flags: *elf_o_flags
+  vehicles: *elf_o_ship
+  party: *elf_o_party
+  items: { potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
+- id: w_boss_astos
+  name: W ELF-O - Astos and his three gargoyle sentinels (band level 11, kit w_s6)
+  background: assets/backgrounds/palace.webp
+  party:
+    - { class: warrior, name: WAR, level: 11, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 11, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 11
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 11
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { potion: 3 }
+  gold: 0
+  enemies: [astos, gargoyle, gargoyle, gargoyle]
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===
