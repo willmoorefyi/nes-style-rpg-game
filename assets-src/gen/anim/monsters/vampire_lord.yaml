@@ -123,3 +123,20 @@ paint:                         # 1 px notches the moved head opens over the near
   - {frame: hurt_in1, xy: [[47, 28], [47, 29]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[46, 28]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[32, 41], [32, 42], [32, 43], [32, 44], [32, 45]], rgb: [6, 4, 10]}   # the 1 px slit the shifted hip opens in the coat
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[30, 45], [47, 45], [30, 46], [47, 46], [30, 47], [47, 47], [30, 48], [48, 49], [48, 52], [48, 53], [52, 55], [21, 66], [20, 67], [19, 68]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[19, 69]], rgb: [41, 41, 49]}
+  - {frame: kneel_in2, xy: [[44, 52], [43, 54], [44, 54], [43, 55], [44, 55], [25, 57], [22, 59], [47, 59], [48, 59], [45, 62], [46, 62], [16, 63], [15, 64]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[47, 60]], rgb: [99, 99, 107]}
+  - {frame: kneel_in2, xy: [[47, 61], [48, 62], [49, 62], [48, 63]], rgb: [148, 156, 156]}
+  - {frame: kneel_in2, xy: [[48, 61], [47, 62], [47, 63], [47, 64]], rgb: [41, 41, 49]}
+  - {frame: kneel_b, xy: [[42, 59], [11, 60], [13, 60], [14, 60], [10, 61], [15, 61], [49, 61], [45, 66], [25, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[25, 77], [26, 77], [27, 77], [28, 77], [29, 77], [30, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); the far shin flat behind; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {foot_f: [3, 2], toe_f: [3, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[44, 46], [43, 48], [27, 52], [14, 53], [26, 55], [23, 60], [11, 64], [9, 65], [10, 65], [25, 72], [47, 46]], rgb: [6, 4, 10]}
+    - {xy: [[25, 77], [26, 77], [27, 77], [28, 77], [25, 78]], rgb: null}
+    - {xy: [[36, 67], [34, 68], [34, 69]], rgb: [6, 4, 10]}
