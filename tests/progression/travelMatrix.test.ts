@@ -1,7 +1,7 @@
 /**
  * Proof (h), the travel-requirement matrix (docs/WORLD_PLAN.md 6.2): the mini world's rows pass; each row's RED
  * fixture removes one wall, gate or patch crossing and that row fails; the dock rule of 2.6; the default rows of the
- * plan; and the repository (T0 checked, the rest pending until their regions are built).
+ * plan; and the repository (T0-T5, B1 and B2 checked, the rest pending until their regions are built).
  */
 import { describe, expect, it } from 'vitest';
 import { TerrainType } from '../../src/types/index.js';
@@ -85,15 +85,20 @@ describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => 
     expect(DEFAULT_TRAVEL_ROWS.find((r) => r.id === 'B2')!.docks).toHaveLength(5);
   });
 
-  it('the repository: T0 holds on the act-1 map, the other rows wait for their regions (failures with --strict)', () => {
+  it('the repository: T0-T5 and both basin rows hold with the W2 regions built, the rest wait (failures with --strict)', () => {
     const ctx = createQuestContext(loadQuestWorld());
     const r = proofTravel(ctx);
     expect(r.failures).toEqual([]);
     expect(r.line).toMatch(/^\(h\) travel matrix: OK {2}\(12 rows, 2 basin rows; \d+ checked, \d+ pending\)$/);
-    expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS[0]).status).toBe('ok');
-    // A1-O: T1 (the bridge built: Pravoka's gate and Matoya's cave, nothing past the Aldi) is checked too
-    expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS[1]).status).toBe('ok');
+    // INT-W2a: after the six region-overworld merges T0-T5, B1 and B2 are checked (not pending) and pass
+    for (const id of ['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'B1', 'B2']) {
+      expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === id)!), id)
+        .toEqual({ row: id, status: 'ok', failures: [], missing: [] });
+    }
+    // T6 needs the Ordeals and the Mirage (pending tranches): pending, a failure with --strict
+    expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === 'T6')!).status).toBe('pending');
     const strict = proofTravel(createQuestContext(ctx.world, { strict: true }));
-    expect(strict.failures.some((f) => /^TRAVEL T2 pending: /.test(f.message))).toBe(true);
+    expect(strict.failures.some((f) => /^TRAVEL T6 pending: /.test(f.message))).toBe(true);
+    expect(strict.failures.some((f) => /^TRAVEL T[0-5] /.test(f.message))).toBe(false);
   });
 });
