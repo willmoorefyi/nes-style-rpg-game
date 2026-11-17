@@ -81,7 +81,7 @@ def _gate(check) -> None:
     from gen import bedrock as B
     from gen import kneel_ai_req as RQ
     from gen.selftest_colossus import _refused, _rows, sandbox
-    real = json.loads((HERE / "budget.json").read_text())
+    real = B.pass_view(json.loads((HERE / "budget.json").read_text()), "KA")    # pass KA as it ran (now closed)
     with tempfile.TemporaryDirectory() as t:
         sp, gd = _guide(Path(t))
         with sandbox(real) as (BB, tmp, cl):
@@ -112,29 +112,22 @@ def _gate(check) -> None:
 
 def _budget(check) -> None:
     from gen import bedrock as B
-    from gen import kneel_ai_req as RQ
-    from gen.selftest_colossus import _fake_rows
+    from gen import kneel_ai_budget as KB
     real = json.loads((HERE / "budget.json").read_text())
-    br = real["bedrock"]
-    check((br["pass"], br["cap"], br["per_purpose_caps"]) == ("KA", 91, {"ka_probe": 55, "ka_pilot": 36}),
-          "budget.json: pass KA stage 1, cap 91 = ka_probe 55 + ka_pilot 36 (user ruling Q1)")
-    c = [h for h in real.get("bedrock_history") or [] if h.get("pass") == "C"]
-    check(len(c) == 1 and c[0]["cap"] == 80 and c[0].get("used") == 25, "pass C closed into bedrock_history at 25 / 80")
-    rc, gem = _fake_rows("v0", 25), br["gemini_before"]
-    ok, used = RQ.budget_breaches(real, rc + _fake_rows("ka_probe", 55, "KA") + _fake_rows("ka_pilot", 36, "KA"), gem)
-    check(ok == [] and used == 91, f"budget --check: a full stage 1 passes ({ok})")
-    for rows, g, word, what in ((rc + _fake_rows("ka_probe", 56, "KA"), gem, "ka_probe", "a 56th probe call"),
-                                (rc + _fake_rows("reserve:x", 1, "KA"), gem, "unknown", "an unlisted purpose"),
-                                (rc, gem + 1, "Gemini", "one Gemini attempt"),
-                                (rc + _fake_rows("v0", 1), gem, "pass C", "a new pass-C row")):
-        bad, _ = RQ.budget_breaches(real, rows, g)
-        check(any(word in x for x in bad), f"budget --check: {what} breaches ({bad[:1]})")
+    hist = {h.get("pass"): h for h in real.get("bedrock_history") or []}
+    ka, c = hist.get("KA") or {}, hist.get("C") or {}
+    check("bedrock" not in real and (ka.get("cap"), ka.get("per_purpose_caps"), ka.get("used")) ==
+          (91, {"ka_probe": 55, "ka_pilot": 36}, 54) and bool(ka.get("closed")),
+          "budget.json: pass KA closed into bedrock_history at 54 / 91 (rev 5); no live bedrock block")
+    check(c.get("cap") == 80 and c.get("used") == 25, "pass C closed into bedrock_history at 25 / 80")
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
-        code = RQ.budget_check(True)
-    check(code == 0 and re.search(r"OK pass KA \d+/91", out.getvalue()) is not None,
-          f"kneel_ai.py budget --check on the real ledgers: {out.getvalue().strip()[-40:]!r}")
-    check(B.pass_view(real, "C")["bedrock"]["pass"] == "C", "bedrock.pass_view reads pass C from bedrock_history")
+        code = KB.check(True)
+    check(code == 0 and "closed pass C 25/80, closed pass KA 54/91" in out.getvalue()
+          and re.search(r"OK pass KA-G pilot \d+/30", out.getvalue()) is not None,
+          f"kneel_ai.py budget --check on the real ledgers: {out.getvalue().strip()[-60:]!r}")
+    check(B.pass_view(real, "C")["bedrock"]["pass"] == "C" and B.pass_view(real, "KA")["bedrock"]["pass"] == "KA",
+          "bedrock.pass_view reads passes C and KA from bedrock_history")
 
 
 def _guides(check) -> None:

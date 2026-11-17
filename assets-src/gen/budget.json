@@ -1,14 +1,21 @@
 {
-  "note": "User 2026-11-16 (pass V, docs/REDESIGN_PLAN.md 6): up to 50 Gemini images for the 7 redesigned sprites, fresh per-sheet counts, at most 3 attempts per sheet, on top of the 267 pass-R images. Bedrock is not counted (user, 2026-11-13). The guard never reads `history` (documentation, append-only; pinned by selftest_passv.py).",
-  "attempts_before": 367,
-  "cap": 50,
-  "max_attempts_per_sheet": 3,
+  "note": "User 2026-11-17 (pass KA-G, docs/KNEEL_AI_PLAN.md rev 7 section 5): Gemini gemini-nano-banana-2.1 kneel keys, the 10-sprite interactive pilot then the Batch API; cap 665 = 540 + the 125-image expiry allowance (it drops to 540 when void_ok is set after the section 10 billing check), at most 4 attempts per sheet (the 4th must be ka_g_reserve; ka_g_expiry rows are left out of the per-sheet counts). Pass V closed at 405. Bedrock is not counted (user, 2026-11-13). The guard never reads `history` (documentation, append-only; pinned by selftest_passv.py).",
+  "attempts_before": 405,
+  "cap": 665,
+  "max_attempts_per_sheet": 4,
   "history": [
     {
       "name": "pass R",
       "attempts_before": 100,
       "cap": 300,
       "gemini_end": 367,
+      "max_attempts_per_sheet": 3
+    },
+    {
+      "name": "pass V",
+      "attempts_before": 367,
+      "cap": 50,
+      "gemini_end": 405,
       "max_attempts_per_sheet": 3
     }
   ],
@@ -40,7 +47,7 @@
     },
     {
       "name": "pass V",
-      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy); dragon (red) added 2026-11-16 by the orchestrator (its low, wide approved pose cannot reach the size step by rescale: a redesign within the same 50, monster_large only); FW-V8 (docs/REDESIGN_FIX_PLAN.md 1, rev 5; user D-U1 = b, D-U2 = b, 2026-11-16): sheet_caps raise these sheets above 3 (every other sheet stays 3), read by both per-sheet rules; crazy_horse's 4th and 5th only after its regular 2 fail review; V8 halt: this round stops generating at 47 pass-V images (by procedure and selftest_passv.py's ledger check; the guard's cap stays 50)",
+      "note": "docs/REDESIGN_PLAN.md 6 (FW-V0): the 7 redesigned sprites only, at most 3 attempts per sheet; hollow_seraph has no boss_attack_raise (D-V9); chaos/boss_idle at most 2 at the titan band, the 3rd for the C2 fallback (rev 1(c), by policy); dragon (red) added 2026-11-16 by the orchestrator (its low, wide approved pose cannot reach the size step by rescale: a redesign within the same 50, monster_large only); FW-V8 (docs/REDESIGN_FIX_PLAN.md 1, rev 5; user D-U1 = b, D-U2 = b, 2026-11-16): sheet_caps raise these sheets above 3 (every other sheet stays 3), read by both per-sheet rules; crazy_horse's 4th and 5th only after its regular 2 fail review; V8 halt: this round stops generating at 47 pass-V images (by procedure and selftest_passv.py's ledger check; the guard's cap stays 50); closed 2026-11-17 at 405 (38 of 50) when pass KA-G opened (docs/KNEEL_AI_PLAN.md rev 7 section 5)",
       "gemini_before": 367,
       "max_new": 50,
       "max_per_sheet": 3,
@@ -93,20 +100,29 @@
         "hollow_seraph/boss_cast": 5,
         "hollow_seraph/boss_hurt": 4,
         "crazy_horse/monster_large": 5
+      },
+      "gemini_end": 405
+    },
+    {
+      "name": "pass KA-G",
+      "note": "docs/KNEEL_AI_PLAN.md rev 7 section 5: kneel / battle_kneel only, model gemini-nano-banana-2.1; purpose caps pilot 30 (10 x 3, interactive), batch 375 (125 x 3 rounds), reserve 135 (the Q3 iii try), expiry 125 (one re-sent round while void_ok is false); ka_g_expiry rows are excluded from the per-sheet count and the reserve-4th rule; voided attempts leave every count only with void_ok true",
+      "gemini_before": 405,
+      "model": "gemini-nano-banana-2.1",
+      "max_new": 665,
+      "max_per_sheet": 4,
+      "only_sheet_names": [
+        "kneel",
+        "battle_kneel"
+      ],
+      "void_ok": false,
+      "purpose_caps": {
+        "ka_g_pilot": 30,
+        "ka_g_batch": 375,
+        "ka_g_reserve": 135,
+        "ka_g_expiry": 125
       }
     }
   ],
-  "bedrock": {
-    "note": "Pass KA (docs/KNEEL_AI_PLAN.md 7; user ruling Q1, 2026-11-17): stage 1 only, the KA1-P probe (ka_probe 55: 5 sprites x 11) and the KA1 pilot (ka_pilot 36: 6 sprites x 3 tries x 2 calls); stage 2 raises cap and adds its purposes only after its own approval at U1-KA. Read by bedrock.invoke (the gate) and kneel_ai.py budget --check; colossus.py budget --check reads pass C from bedrock_history (closed, documentation; the gate never reads it). No reserve purpose in stage 1. gemini_before = the main-checkout Gemini attempts at KA0b: pass KA makes no Gemini call. reserve_max_usd 0.08 as in pass C (B7).",
-    "pass": "KA",
-    "cap": 91,
-    "per_purpose_caps": {
-      "ka_probe": 55,
-      "ka_pilot": 36
-    },
-    "gemini_before": 405,
-    "reserve_max_usd": 0.08
-  },
   "bedrock_history": [
     {
       "note": "Pass C (docs/CHAOS_FORMS_PLAN.md 5.1, 5.6, 6; user D-U5, D-U6, 2026-11-16): Stability-on-Bedrock calls, read only by bedrock.invoke (the BR ledger cache/bedrock_ledger.jsonl, one row per logical request) and colossus.py budget --check. cap 80 = the sum of per_purpose_caps; any purpose not listed is refused under pass C (A6), reserve needs reserve:<reason>. rim_upscale (2, colossus.py upscale of the rim backdrop source, docs/CHAOS_FORMS_PLAN.md 7.3) was taken from the reserve's 18 by the orchestrator (2026-11-16), so the cap stays 80. gemini_before = N_C0, the main-checkout Gemini attempts at C1: pass C makes no Gemini call (gem[N_C0:] == 0, no fallback). The Gemini guard (generate.check_budget) never reads this block. Rev 4 (docs/CHAOS_FORMS_PLAN.md 18.9, B7; 2026-11-16, at 17 of 80 used): caps re-tabled with the total kept at 80: v0 closed at 9, f3_gen 12, f3_upscale 6 and f2_upscale 2 (new: Conservative Upscale), f3_nobg 4, f2_gen 2, f2_nobg 4, f4_variant closed at 2, f4_inpaint 8 (new: open + crack), rim_upscale 2 (kept, 7.3), reserve 29 (18.9's 31 less the 2 rim_upscale already moved out of it). reserve_max_usd 0.08: bedrock.invoke refuses a reserve call whose model costs more (bedrock.COST_USD estimates), so no upscale comes from the reserve; budget --check flags any such row.",
@@ -129,6 +145,19 @@
       "reserve_max_usd": 0.08,
       "used": 25,
       "closed": "2026-11-17 at 25 of 80 (user ruling Q1, docs/KNEEL_AI_PLAN.md 'User rulings'; KA0b)"
+    },
+    {
+      "note": "Pass KA (docs/KNEEL_AI_PLAN.md 7; user ruling Q1, 2026-11-17): stage 1 only, the KA1-P probe (ka_probe 55: 5 sprites x 11) and the KA1 pilot (ka_pilot 36: 6 sprites x 3 tries x 2 calls); stage 2 raises cap and adds its purposes only after its own approval at U1-KA. Read by bedrock.invoke (the gate) and kneel_ai.py budget --check; colossus.py budget --check reads pass C from bedrock_history (closed, documentation; the gate never reads it). No reserve purpose in stage 1. gemini_before = the main-checkout Gemini attempts at KA0b: pass KA makes no Gemini call. reserve_max_usd 0.08 as in pass C (B7).",
+      "pass": "KA",
+      "cap": 91,
+      "per_purpose_caps": {
+        "ka_probe": 55,
+        "ka_pilot": 36
+      },
+      "gemini_before": 405,
+      "reserve_max_usd": 0.08,
+      "used": 54,
+      "closed": "2026-11-17, 54 of 91, rev 5 (the Stability probe KA1-P was rejected by the user; docs/KNEEL_AI_PLAN.md rev 7 section 5)"
     }
   ]
 }

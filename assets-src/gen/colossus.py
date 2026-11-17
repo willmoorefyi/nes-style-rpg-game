@@ -201,12 +201,12 @@ def budget_breaches(budget: dict, rows: list[dict], gem_count: int) -> list[str]
 
 def cmd_budget(a, gem_ledger: Path | None = None, gem_count: int | None = None) -> int:
     from gen import bedrock as B
-    budget = B.pass_view(json.loads(B.BUDGET.read_text()), "C")          # pass C (closed into bedrock_history at KA)
-    rows = B.read_br_ledger()
+    budget, rows = B.pass_view(json.loads(B.BUDGET.read_text()), "C"), B.read_br_ledger()   # pass C: bedrock_history
     if gem_count is None:
         led = gem_ledger or GEM_LEDGER
         lines = [json.loads(x) for x in led.read_text().splitlines() if x.strip()] if led.exists() else []
-        gem_count = sum(e.get("event") == "attempt" and e.get("backend") != "bedrock" for e in lines)
+        gem_count = sum(e.get("event") == "attempt" and e.get("backend") != "bedrock" and e.get("pass") != "KA-G"
+                        for e in lines)         # pass KA-G's own rows (docs/KNEEL_AI_PLAN.md rev 7) follow pass C
     br = budget.get("bedrock") or {}
     used = sum(r.get("event") == "request" and r.get("pass") == br.get("pass") for r in rows)
     print(f"Bedrock calls: {used} of {br.get('cap')} (pass {br.get('pass')}); Gemini attempts {gem_count}, "

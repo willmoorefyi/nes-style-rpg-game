@@ -60,6 +60,28 @@ arms:
   c: {model: control_sketch, image: skel, control_strength: 0.7, style_preset: pixel-art,
       then: {model: style_transfer, change_strength: 0.4, composition_fidelity: 0.9}}
   d: {model: style_guide, fidelity: 0.7, style_preset: pixel-art}
+# Pass KA-G (docs/KNEEL_AI_PLAN.md rev 7 sections 2-5): arm g, read by kneel_ai_gem.py and gemini_batch*.py.
+# `poses` holds a round-1b revision of a failing body's pose text (section 4; default: the rev-4 text above);
+# per sprite, tries 2-3 add `g_lines: {2: {extra, avoid}, 3: {...}}` and an R1 identity flag adds `refs: [idle, hurt]`.
+gemini:
+  model: gemini-nano-banana-2.1
+  aspect_ratio: "1:1"
+  image_size: 1K
+  seed_base: 1234
+  usd: {interactive: 0.0351, batch: 0.0176}
+  usage_prompt_max: 1100
+  key_hex: {magenta: "#FF00FF", white: "#FFFFFF"}
+  ident: Image 1 shows one character.
+  ident_hurt: Image 1 and image 3 show one character.
+  template: >-
+    {ident} Redraw this exact character in the pose of the grey silhouette in image 2: {pose}. Keep exactly the same
+    design, colours, face, armour, clothing, {weapon} and proportions as image 1, with {heads}. Same 16-bit pixel-art
+    style, same palette, bold outline, light from the upper left. Side view {facing}. Full body, centred on the
+    silhouette, the same size as the silhouette. Plain flat {bg} background, no ground, no shadow, no text.
+  negatives: "Do not add: {negatives}."
+  poses: {}
+  pilot: [goblin, wolf, warrior, white_mage, cobra, green_slime, blue_dragon, iron_golem, garland, rhyos]
+  tranche_t: [water_naga, cockatrice, ochu, shark, chaos, hydra, ghost, scorpion, hollow_seraph, black_mage]
 probe:
   sprites: [goblin, wolf, white_mage, cobra, green_slime]
   calls: [[a, 1234], [a, 1235], [b, 1234], [b, 1235], [b2, 1234], [c, 1234], [c, 1235], [d, 1234], [d, 1235]]

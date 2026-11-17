@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
+from types import SimpleNamespace
 
 from PIL import Image
 
@@ -142,46 +144,28 @@ def send(sp: D.Sprite, arm: str, seed: int, purpose: str, paid: bool, compact: b
     return out
 
 
-# ───────── pass KA budget (section 7) ─────────
-def budget_breaches(budget: dict, rows: list[dict], gem_count: int) -> tuple[list[str], int]:
-    """(every breach of the pass-KA block, KA calls used): the cap and purpose caps (they sum to the cap), unknown
-    purposes, reserve rows above reserve_max_usd, any Gemini attempt past gemini_before, and pass C closed intact in
-    bedrock_history (its ledger rows equal its recorded `used`)."""
-    br, out = budget.get("bedrock") or {}, []
-    if br.get("pass") != "KA":
-        return [f"budget.json bedrock block is pass {br.get('pass')!r}, not KA"], 0
-    caps = br.get("per_purpose_caps") or {}
-    if sum(caps.values()) != br.get("cap"):
-        out.append(f"per_purpose_caps sum {sum(caps.values())} != cap {br.get('cap')}")
-    run = [r for r in rows if r.get("event") == "request" and r.get("pass") == "KA"]
-    if len(run) > br.get("cap", 0):
-        out.append(f"pass KA: {len(run)} Bedrock calls > cap {br.get('cap')}")
-    per: dict[str, int] = {}
-    for r in run:
-        k = B.purpose_key(r.get("purpose", ""))
-        per[k] = per.get(k, 0) + 1
-        if k == "reserve" and B.reserve_cost_breach(r.get("model", ""), br):
-            out.append(f"reserve row {r.get('key')}: {r.get('model')} above ${B.reserve_max(br):.2f}")
-    out += [f"unknown purpose {p!r} ({n} calls)" if p not in caps else f"{p}: {n} calls > cap {caps[p]}"
-            for p, n in sorted(per.items()) if p not in caps or n > caps[p]]
-    n0 = br.get("gemini_before")
-    if not isinstance(n0, int) or gem_count != n0:
-        out.append(f"Gemini attempts {gem_count} != gemini_before {n0} (pass KA makes no Gemini call)")
-    hist = [h for h in budget.get("bedrock_history") or [] if h.get("pass") == "C"]
-    used_c = sum(r.get("event") == "request" and r.get("pass") == "C" for r in rows)
-    if not hist or hist[-1].get("used") != used_c:
-        out.append(f"pass C history: {'missing' if not hist else hist[-1].get('used')} != {used_c} pass-C ledger rows")
-    return out, len(run)
+# ───────── pass KA-G request adapter (docs/KNEEL_AI_PLAN.md rev 7 section 5) ─────────
+@dataclass(frozen=True)
+class KneelRequest:
+    """One Gemini kneel request as `generate.check_budget` reads it (.cached, .character, .sheet.name), plus .seed,
+    .key (the Gemini cache key), .purpose (a pass KA-G purpose), the try and round; kneel_ai_gem.request builds it.
+    Pass KA's Bedrock budget check (closed into bedrock_history) moved to kneel_ai_budget.py."""
+    character: str
+    sheet: SimpleNamespace = field(compare=False)
+    seed: int
+    key: str
+    purpose: str
+    n_try: int = 1
+    round: str = "pilot"
+    prompt: str = field(default="", compare=False, repr=False)
+    images: tuple = field(default=(), compare=False, repr=False)
+    refs: tuple = ("idle", "pose")
 
+    @property
+    def cached(self) -> bool:
+        from gen import gemini as GM
+        return GM.is_cached(self.key)
 
-def budget_check(check: bool = True, gem_ledger: Path | None = None) -> int:
-    led = gem_ledger or D.HERE / "cache" / "ledger.jsonl"
-    lines = [json.loads(x) for x in led.read_text().splitlines() if x.strip()] if led.exists() else []
-    gem = sum(e.get("event") == "attempt" and e.get("backend") != "bedrock" for e in lines)
-    budget = json.loads(B.BUDGET.read_text())
-    bad, used = budget_breaches(budget, B.read_br_ledger(), gem)
-    for b in bad:
-        print(f"  BREACH {b}")
-    cap = (budget.get("bedrock") or {}).get("cap")
-    print(f"OK pass KA {used}/{cap}" if not bad else f"budget --check: {len(bad)} breach(es), pass KA {used}/{cap}")
-    return 1 if bad and check else 0
+    @property
+    def req(self) -> str:
+        return f"{self.character}:{self.n_try}"

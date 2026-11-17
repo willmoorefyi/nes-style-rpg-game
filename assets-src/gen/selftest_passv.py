@@ -4,7 +4,9 @@ budget over fake ledgers (the real ledger's first N_V0 Gemini attempts plus fake
 4th attempt at one sheet, fresh per-sheet counts at N_V0, `only_ids`, `only_sheets` (hollow_seraph/boss_attack_raise
 under D-V9), the consistency guard, and that `history` is never read. FW-V8 (docs/REDESIGN_FIX_PLAN.md 1, rev 5):
 the pass-V `sheet_caps` map, read by both per-sheet rules of `check_budget` and checked by `budget_consistency`.
-Last, the real ledger's pass-V slice (within the caps and the V8 halt of 47).
+Last, the real ledger's pass-V slice (within the caps and the V8 halt of 47). Since pass KA-G (docs/KNEEL_AI_PLAN.md
+rev 7 section 5) pass V is closed at N_V_END = 405: the real budget.json is pinned to the closed pass V and the KA-G top
+level, and the pass-V guard cases run on `pv_open(real)`, the real budget as it stood while pass V was open.
 
   python3 -I assets-src/gen/selftest_passv.py
 """
@@ -37,6 +39,10 @@ ONLY_SHEETS = {"crazy_horse": ["monster_large"], "piscodemon": ["monster_small"]
 SHEET_CAPS = {"hollow_seraph/boss_idle": 6, "hollow_seraph/boss_attack": 6, "hollow_seraph/boss_cast": 5,
               "hollow_seraph/boss_hurt": 4, "crazy_horse/monster_large": 5}
 V8_HALT = 47                    # this round stops generating at 47 pass-V images (the guard's cap stays CAP_V)
+N_V_END = 405                   # pass V closed here when pass KA-G opened (38 of 50 used)
+KAG_TOP = (405, 665, 4)         # the top level since pass KA-G: attempts_before, cap, max attempts per sheet
+PASS_V_HISTORY = {"name": "pass V", "attempts_before": N_V0, "cap": CAP_V, "gemini_end": N_V_END,
+                  "max_attempts_per_sheet": PER_SHEET}
 # append-only: later passes may add entries after this prefix, never change it
 HISTORY_PREFIX = [{"name": "pass R", "attempts_before": PASS_R[0], "cap": PASS_R[1], "gemini_end": N_V0,
                    "max_attempts_per_sheet": 3}]
@@ -46,20 +52,38 @@ def _passes(b: dict) -> dict[str, dict]:
     return {p["name"]: p for p in b.get("passes", [])}
 
 
+def pv_open(b: dict) -> dict:
+    """The real budget as it stood while pass V was open: the pass-V top level, pass V without gemini_end, no later
+    pass, the history up to the pass-R entry."""
+    o = copy.deepcopy(b)
+    o.update(attempts_before=N_V0, cap=CAP_V, max_attempts_per_sheet=PER_SHEET,
+             history=o["history"][:len(HISTORY_PREFIX)])
+    names = [x["name"] for x in o["passes"]]
+    o["passes"] = o["passes"][:names.index("pass V") + 1]
+    o["passes"][-1].pop("gemini_end", None)
+    return o
+
+
 def run_passv(check: Callable[[bool, str], None]) -> None:
     from gen import generate as GEN
     from gen.selftest_roster import _fake, _gemini, _refused, _verdict
-    real = json.loads(GEN.BUDGET.read_text())
+    closed = json.loads(GEN.BUDGET.read_text())
+    pvc = _passes(closed).get("pass V", {})
+    check((closed.get("attempts_before"), closed.get("cap"), closed.get("max_attempts_per_sheet")) == KAG_TOP
+          and pvc.get("gemini_end") == N_V_END,
+          f"budget.json top level: pass KA-G's {KAG_TOP}; pass V closed at gemini_end {N_V_END} "
+          f"({closed.get('attempts_before')}, {closed.get('cap')}, {pvc.get('gemini_end')})")
+    hist = closed.get("history")
+    check(isinstance(hist, list) and hist[:len(HISTORY_PREFIX)] == HISTORY_PREFIX
+          and hist[len(HISTORY_PREFIX):len(HISTORY_PREFIX) + 1] == [PASS_V_HISTORY],
+          f"budget.json history: the pinned pass-R entry, then pass V closed at {N_V_END} (append-only): {hist}")
+    real = pv_open(closed)
     p = _passes(real)
     pv, fix, build, pf = (p.get(n, {}) for n in ("pass V", "pass R fix", "pass R build", "pass F (FB-8)"))
 
-    # pinned literals
+    # pinned literals (pass V's own fields are unchanged by its close)
     check((real.get("attempts_before"), real.get("cap"), real.get("max_attempts_per_sheet")) == (N_V0, CAP_V, PER_SHEET),
-          f"budget.json top level: attempts_before {N_V0} (literal N_V0), cap {CAP_V}, {PER_SHEET} per sheet "
-          f"({real.get('attempts_before')}, {real.get('cap')}, {real.get('max_attempts_per_sheet')})")
-    hist = real.get("history")
-    check(isinstance(hist, list) and hist[:len(HISTORY_PREFIX)] == HISTORY_PREFIX,
-          f"budget.json history starts with the pinned pass-R entry (append-only): {hist}")
+          f"pv_open: the pass-V top level attempts_before {N_V0} (literal N_V0), cap {CAP_V}, {PER_SHEET} per sheet")
     check((pf.get("gemini_before"), pf.get("gemini_end"), build.get("gemini_before"), build.get("gemini_end"),
            build.get("max_new")) == (95, PASS_R[0], PASS_R[0], R_FIX[0], 285),
           "budget.json: pass F (95..100) and pass R build (100..363, 285) unchanged and closed")
@@ -181,7 +205,7 @@ def run_passv(check: Callable[[bool, str], None]) -> None:
     check(same, "the guard never reads history (no history, or a junk history, gives the same verdicts)")
 
     # the real ledger's pass-V slice
-    run = gem[N_V0:]
+    run = gem[N_V0:N_V_END]
     per: dict = {}
     for e in run:
         per[(e["character"], e["sheet"])] = per.get((e["character"], e["sheet"]), 0) + 1

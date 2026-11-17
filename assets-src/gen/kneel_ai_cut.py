@@ -142,14 +142,21 @@ def _scaled(rgb: np.ndarray, m: np.ndarray, s: float, key) -> tuple[np.ndarray, 
     return r2, m2
 
 
-def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b") -> dict:
-    """{key: native RGBA, raw: block-averaged raw RGBA (A-pal / A-grey), info}; CutFail on a window-edge touch."""
+def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | None = None) -> dict:
+    """{key: native RGBA, raw: block-averaged raw RGBA (A-pal / A-grey), info}; CutFail on a window-edge touch.
+    Arm g (rev 7 section 2): a non-square raw fails (J0 size); the J0 pitch is measured and only aligns the window's
+    phase; the scale comes from the figure against the silhouette height `sil_h` (kneel_ai_pitch)."""
+    from gen import kneel_ai_pitch as PT
     key = np.array(sp.key_rgb, np.uint8)
     im = raw.convert("RGB")
-    if im.size != (D.CANVAS, D.CANVAS):          # a non-1024 output is scaled uniformly onto the 1024 key canvas
+    if arm == "g" and im.size[0] != im.size[1]:
+        raise CutFail(f"size: non-square output {im.size[0]}x{im.size[1]} (expected 1:1)")
+    resized = list(im.size) if im.size != (D.CANVAS, D.CANVAS) else None
+    if resized:                                  # a non-1024 output is scaled uniformly onto the 1024 key canvas
         f = D.CANVAS / max(im.size)
         im = im.resize((round(im.size[0] * f), round(im.size[1] * f)), Image.Resampling.LANCZOS)
     rgb = np.asarray(im).copy()
+    pm = PT.measure(rgb, k) if arm == "g" else None
     m = figure_mask(rgb, sp.keep_all)
     if not m.any():
         raise CutFail("empty figure (nothing but the key)")
@@ -158,8 +165,11 @@ def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b") -> dict:
     (w, h), lo, hi = sp.cell, *sp.band_px
     ys, xs = np.nonzero(m)
     Hc, Wc = ys.max() - ys.min() + 1, xs.max() - xs.min() + 1
-    info = {"arm": arm, "k": k, "fails": [], "flag_scale": arm == "d"}
+    info = {"arm": arm, "k": k, "fails": [], "flag_scale": arm == "d", **({"resized_from": resized} if resized else {})}
     s = (lo + hi) / 2 * k / Hc if arm == "d" else 1.0
+    if arm == "g":
+        s, path = PT.scale(int(Hc), sil_h, k, pm, (lo + hi) / 2)
+        info.update(pitch=pm, scale_path=path, flag_scale=path is not None)
     limit = (w - 2) * k
     shrink = max(0.0, 1 - limit / (Wc * s))
     if shrink > 0:
@@ -184,7 +194,8 @@ def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b") -> dict:
     foot, rows = int(np.nonzero(bm.any(1))[0].max()), D.base_rows(D.height(sp.idle))
     cx_c, cx_n = D.base_cx(bm, rows * k, sp.floating), D.base_cx(sp.idle[..., 3] > 0, rows, sp.floating)
     X0, Y0 = int(round(cx_c - k * cx_n)), foot + 1 - k * (sp.foot_row + 1)
-    X0, Y0 = _snap(X0, big, k, 1), _snap(Y0, big, k, 0)
+    X0, Y0 = (PT.align(X0, pad, s, pm, k, 0), PT.align(Y0, pad, s, pm, k, 1)) if arm == "g" else \
+        (_snap(X0, big, k, 1), _snap(Y0, big, k, 0))
     inner = np.zeros(bm.shape, bool)
     inner[Y0 + 1:Y0 + k * h - 1, X0 + 1:X0 + k * w - 1] = True
     if (bm & ~inner).any():
