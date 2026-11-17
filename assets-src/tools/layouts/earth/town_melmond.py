@@ -4,10 +4,10 @@ assets-src/maps/melmond.yaml.
   python3 -I assets-src/tools/layouts/earth/town_melmond.py && python3 -I assets-src/tools/build_map.py melmond
 
 An original layout. The town lies in a fold of grey hills that runs down to the strait; the harbour road comes in over
-the stone quay on the east shore and crosses the town through the green, where the great dead oak stands by the dry
+the stone quay on the east shore and crosses the town through the green, where the great dead oak stands over the dry
 well. The shops line the harbour road; the homes stand on the hill lane (north) and the field lane (south). Fenced
 plots of withered crops fill the west and south, a vineyard of grey vines climbs the north-west slope, the crooked
-windmill leans on its mound in the north-east and the millpond has shrunk to a puddle in its basin. The patch
+windmill leans on its mound in the north-east and the millpond has shrunk to a small pool. The patch
 `ert_melmond_bloom` (flag EARTH_CRYSTAL_LIT) turns the plots and the green's lawn to grass, with fresh crops and
 flowers, once the Earth crystal is lit (art only: those cells walk before and after).
 """
@@ -37,11 +37,11 @@ VINE_ROWS, VINE_X = (3, 5), (4, 15)              # the vineyard on the north-wes
 DEAD = "stone"                                   # the grey recolour of the dying plants (build_map.RECOLOR)
 NOTE = """Concept: a farming town dying from the root up, in a fold of grey hills on the strait: the harbour road from the
 quay through a cracked green, fenced plots of withered crops, a vineyard of grey vines, a crooked windmill.
-Distinct: a stone quay running out into the strait as the only way in; the great dead oak on the green beside a
-dry well; the millpond shrunk to a puddle in its basin; grey vine rows on the north-west slope; a boarded-up
-farmstead with a note on its door; the plots and the green turn green with fresh crops when the Earth crystal is lit.
+Distinct: a stone quay running out into the strait as the only way in; the great dead oak on the green with the
+dry well at its foot; the millpond shrunk to a small pool among withered reeds; grey vine rows on the north-west
+slope; a shut-up farmstead with a farewell note tacked to its wall; the plots and the green turn green with fresh crops when the Earth crystal is lit.
 Topology: one outdoor map, the quay (gate) in the east -> harbour road -> green; 5 houses with interiors (unne,
-miller, vintner, ploughman, healer), the boarded farmstead, 5 shops and the inn open off three lanes; no stairs."""
+miller, vintner, ploughman, healer), the shut-up farmstead, 5 shops and the inn open off three lanes; no stairs."""
 
 g = Grid(W, H, ",")                              # cracked dirt everywhere: the town's dead ground
 
@@ -79,7 +79,7 @@ g.rect(22, y1, 23, FIELD_LANE - 1, ":")          # green -> field lane
 g.rect(3, HILL_LANE, 3, FIELD_LANE, ":")         # the west lane joins the three
 g.rect(37, 6, 37, HILL_LANE - 1, ":")            # the mill track up to the windmill's mound
 g.rect(14, 31, 14, 32, ":")                      # the field gate between the south plots
-# the millpond: a basin of dry mud, a puddle left in its middle
+# the millpond, shrunk to a small pool
 g.rect(24, 34, 26, 36, "~")
 LAWN = [(x, y) for y in range(y0 + 1, y1) for x in range(x0 + 1, x1) if g[x, y] == ","]
 
@@ -123,18 +123,18 @@ for (slug, x, y, h, st, roof, wall, ch, sign) in HOMES:
     obj(**HOUSE, name=f"house_{slug}", x=x, y=y, h=h, storeys=st, roof=roof, wall=wall,
         **({"sign": sign} if sign else {}), **({"chimney": ch} if ch is not None else {}),
         enter={"map": f"melmond-house-{slug}", "entrance": "door"})
-BOARDED = dict(x=12, y=8, h=4)                   # the boarded-up farmstead: no door, an inspect cell on its front
+BOARDED = dict(x=12, y=8, h=4)                   # the shut-up farmstead: no door, a note (inspect) on its front
 obj(type="house", w=5, windows=[1, 3], roof="brown", wall="rose", **BOARDED)
 
 # ── the green: the great dead oak, the dry well, an empty stall, benches, the signpost ──
 dead_oak(19, 15)
-obj(type="well", x=25, y=16)
+obj(type="well", x=21, y=17)
 deco([["stall_0_0", "stall_0_1"], ["stall_1_0", "stall_1_1"]], 25, 21, style=DEAD)
-for x in (19, 20):
-    obj(type="bench", x=x, y=22)
+for x in (31, 32):
+    obj(type="bench", x=x, y=23)
 SIGNPOST = (27, 18)
 obj(type="signpost", x=SIGNPOST[0], y=SIGNPOST[1])
-for (x, y, t) in [(18, 17, "barrel"), (18, 18, "crate"), (27, 23, "barrel")]:
+for (x, y, t) in [(29, 17, "barrel"), (29, 18, "crate"), (24, 25, "barrel")]:
     obj(type=t, x=x, y=y)
 for (x, y) in [(8, 21), (16, 21), (29, 21), (35, 21)]:         # lamps along the harbour road's south side
     deco([["lamp_top"], ["lamp_bottom"]], x, y, above_rows=1)

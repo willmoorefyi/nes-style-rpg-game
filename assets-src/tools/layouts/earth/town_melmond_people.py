@@ -12,7 +12,7 @@ LIT, VAMP, LEARNED = "EARTH_CRYSTAL_LIT", "VAMPIRE_DEFEATED", "LUFENIAN_LEARNED"
 DWARF = "#b08860"                                # the dwarves' ruddy tint (as in the dwarf hall)
 
 BOARDED_TEXT = [
-    "The door is nailed shut. A note is tacked to the planks, its ink run by the rain.",
+    "The farmstead is shut up, its shutters nailed. A note is tacked to the wall, its ink run by the rain.",
     "\"Gone to my sister's on the isthmus. The ground here won't take a seed. Feed the cat if you see her. - Orla\"",
 ]
 SIGNPOST_TEXT = [
@@ -50,7 +50,7 @@ def outdoor() -> list[dict]:
             default=["West of town the range is a wall, with one tunnel through it. A giant lies across the tunnel "
                      "and won't budge.", "He grumbles about his stomach. I'd say a giant that size only eats stones, "
                      "and only the red, shiny kind."])),
-        npc("melmond_well_keeper", "villager_f", 26, 18, when(
+        npc("melmond_well_keeper", "villager_f", 22, 17, when(
             (LIT, ["Hear that? Water, down the well again! Sweet, too. I'd almost forgotten the taste."]),
             default=["Thirty fathoms of rope, and the bucket comes up full of grey sand. My grandfather dug this well.",
                      "He said it would never run dry. He also said the moon was a turnip, mind."])),

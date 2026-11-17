@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   8, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: ert_unne
-  sprite: master
+  sprite: old_man
   x: 6
   y: 4
   dialog:

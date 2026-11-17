@@ -42,8 +42,8 @@ def build() -> list[Path]:
     g.carve(5, 4, 9, 4, "c")
     r.open_exit()
     g.faces(2)
-    r.wall([["banner"]], 2, 1)
-    r.wall([["window_in"]], 4, 1)
+    r.wall([["window_in"]], 2, 1)
+    r.wall([["banner"]], 6, 1)
     r.wall([["tapestry"]], 8, 1)
     for (x, y) in [(1, 3), (3, 3), (1, 5)]:
         r.one("armor_stand", x, y)
@@ -53,7 +53,7 @@ def build() -> list[Path]:
     MEL.keeper(r, "armor-shop", "merchant", 7, 3, ["Mail and plate, oiled against the dust. Try it on; the mirror's "
                "honest."], "melmond_armor")
     out.append(r.save(note("an armour shop with its counter across the back of the east half", "armour stands "
-                           "lined up against the bare west wall; a banner and a tapestry over the keeper"),
+                           "on the west side of the floor; a banner and a tapestry over the keeper's counter"),
                       {"floor": wood(0.85), "in_wall_face": STONE_FACE}, music=SHOP))
 
     # items: a counter wall to wall in front of jars of salves and dried roots
@@ -71,8 +71,8 @@ def build() -> list[Path]:
     r.thing("crate", 6, 6)
     MEL.keeper(r, "item-shop", "merchant", 4, 3, ["Tonics and remedies. The herbs come from the dwarves now; ours "
                "won't grow."], "melmond_item")
-    out.append(r.save(note("an item shop with a counter from wall to wall before shelves of jars", "the dwarves' "
-                           "sealed crates of herbs by the door; a single potted plant on the keeper's side"),
+    out.append(r.save(note("an item shop with a counter from wall to wall before shelves of jars", "a barrel "
+                           "and a crate side by side by the east wall; a single potted plant on the keeper's side"),
                       {"floor": wood(1.05), "in_wall_face": {"from": STONE_FACE, "shade": 1.05}}, music=SHOP))
 
     # white magic: a quiet chapel room, the counter before an alcove with a white orb

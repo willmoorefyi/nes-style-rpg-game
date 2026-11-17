@@ -49,7 +49,7 @@ def unne(out: list[Path]) -> None:
     r.one("globe", 1, 8)
     r.one("desk", 9, 8)
     r.tall("bed", 12, 4)
-    r.npc("ert_unne", "master", 6, 4, [
+    r.npc("ert_unne", "old_man", 6, 4, [
         {"condition": LEARNED, "text": [
             "Now you can read the sky-folk's letters as well as I can. Lufenia is on a mesa in the far north-east.",
             "No road climbs to it and no ship can reach it. You will have to fly. Ask their elder about the Mirage."]},
@@ -77,11 +77,11 @@ def unne(out: list[Path]) -> None:
 
 
 def miller(out: list[Path]) -> None:
-    """The mill house: sacks and barrels round an idle millstone, the hearth at the back."""
+    """The mill house: crates and barrels round an idle millstone, the hearth at the back."""
     r = MEL.house("miller", "Mill House", 11, 9, [3])
     g = r.g
     g.carve(1, 3, 9, 7, "-")
-    g.carve(6, 2, 9, 2, "-")                          # the loft stair's alcove
+    g.carve(6, 2, 9, 2, "-")                          # the store alcove
     r.open_exit("-")
     g.faces(1)
     r.fireplace(2, 1)
@@ -100,8 +100,8 @@ def miller(out: list[Path]) -> None:
     r.npc("melmond_miller_wife", "villager_f", 4, 6, when(
         (LIT, ["Bake day tomorrow. Real bread! I'll save you a loaf if you're in town."]),
         default=["We're living on last year's flour. I stretch it with bark. Don't tell Hobb."]))
-    out.append(r.save(note("a miller's house of sacks and barrels round a hand millstone", "a millstone where the "
-                           "table would stand; a raised alcove for the loft stair at the back"),
+    out.append(r.save(note("a miller's house of crates and barrels round a hand millstone", "a hand millstone "
+                           "near the east wall; crates and barrels heaped in an alcove at the back"),
                       {"floor_stone": {"from": "floor_stone", "sat": 0.5, "shade": 0.95},
                        "in_wall_face": {"from": "in_wall_face", "shade": 0.85}}))
 
@@ -131,14 +131,14 @@ def vintner(out: list[Path]) -> None:
         (VAMP, ["Father let me ride to the badlands' edge with the carter. The grey there is thinner, I think."]),
         default=["I'm meant to learn the vines from Father. All I've learned is how to sweep up dead leaves."]))
     out.append(r.save(note("a vintner's house, a front room and a room of casks off its east side", "the last "
-                           "casks kept for the vines' return; the cask room set a step lower beyond an inner "
+                           "casks kept for the vines' return; the cask room on a stone floor beyond an inner "
                            "doorway", "two rooms joined by an inner doorway; the door is the only way in or out"),
                       {"floor": wood(0.9), **EARTH, "in_wall_face": {"from": "in_wall_face", "shade": 0.8}},
                       [140, 50, 70]))
 
 
 def ploughman(out: list[Path]) -> None:
-    """The ploughman's cottage: one long room, a bed alcove, the plough hung up for good."""
+    """The ploughman's cottage: one long room, two box beds, the family table."""
     r = MEL.house("ploughman", "Ploughman's Cottage", 10, 8, [6])
     g = r.g
     g.carve(1, 2, 8, 6, "-")
@@ -146,14 +146,14 @@ def ploughman(out: list[Path]) -> None:
     g.faces(1)
     r.tall("bed", 1, 2)
     r.tall("bed", 2, 2)
-    r.wall([["weapon_rack"]], 5, 1)                   # the plough and tools on their hooks
+    r.wall([["window_in"]], 4, 1)
     r.wall([["window_in"]], 7, 1)
     r.one("table", 4, 4)
     r.thing("crate", 8, 2)
     r.thing("barrel", 8, 6)
     r.npc("melmond_ploughman", "farmer", 5, 3, when(
         (LIT, ["My plough's back in the furrow! Funny how a man misses blisters."]),
-        default=["I've hung the plough on the wall. There's no use dragging it through dust.",
+        default=["I've put the plough away in the shed. There's no use dragging it through dust.",
                  "My father ploughed these fields, and his. I'll be the one who stopped."]))
     r.npc("melmond_plough_son", "villager", 3, 5, when(
         (LIT, ["Father let me drive the ox today! It sat down. But still!"]),
@@ -161,8 +161,8 @@ def ploughman(out: list[Path]) -> None:
     r.npc("melmond_plough_gran", "villager_f", 7, 4, when(
         (VAMP, ["So the cold thing in the Cavern is gone. I felt my knees stop aching. That's how I knew."]),
         default=["In my day the soil was black as a crow's wing. You could eat it with a spoon. We didn't, mind."]))
-    out.append(r.save(note("a ploughman's long one-room cottage with two beds against the back wall", "the plough "
-                           "and tools hung on the wall for good; two box beds side by side in the west corner"),
+    out.append(r.save(note("a ploughman's long one-room cottage with two beds against the back wall", "two box "
+                           "beds side by side in the west corner; the family table alone in the middle of the room"),
                       {**EARTH, "in_wall_face": {"from": "in_wall_face", "shade": 0.75}}))
 
 
