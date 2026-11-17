@@ -48,3 +48,111 @@
 {"event": "result", "key": "df6cc9445260912ff1926c11", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
 {"event": "request", "ts": "2026-11-16T17:07:24", "tool": "colossus.py", "model": "inpaint", "purpose": "f4_inpaint", "seed": 4604, "key": "4deaf6ec1ed57fb746b4c1d9", "pass": "C"}
 {"event": "result", "key": "4deaf6ec1ed57fb746b4c1d9", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:11:28", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1234, "key": "0a4a04981eaee39c91f4510e", "pass": "KA"}
+{"event": "result", "key": "0a4a04981eaee39c91f4510e", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:11:51", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1235, "key": "5cb33e32e5aafe9d0c900dd7", "pass": "KA"}
+{"event": "result", "key": "5cb33e32e5aafe9d0c900dd7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:12:05", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "6a268b76a38129dc178aa345", "pass": "KA"}
+{"event": "result", "key": "6a268b76a38129dc178aa345", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:12:20", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "7c0096e373193339282f021d", "pass": "KA"}
+{"event": "result", "key": "7c0096e373193339282f021d", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:12:35", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "58631a1b1d8eea88fc3d8f8d", "pass": "KA"}
+{"event": "result", "key": "58631a1b1d8eea88fc3d8f8d", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:12:50", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1234, "key": "1a55b6087821e84140390596", "pass": "KA"}
+{"event": "result", "key": "1a55b6087821e84140390596", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:15:18", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "11486d51ba99360731ce858d", "pass": "KA"}
+{"event": "result", "key": "11486d51ba99360731ce858d", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:15:36", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1235, "key": "b4196346c411e76ee475f457", "pass": "KA"}
+{"event": "result", "key": "b4196346c411e76ee475f457", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:15:59", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "06f1d5f5cfd6db06a4c341cd", "pass": "KA"}
+{"event": "result", "key": "06f1d5f5cfd6db06a4c341cd", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:16:12", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1234, "key": "b722a4e57a0cca98a1ff447d", "pass": "KA"}
+{"event": "result", "key": "b722a4e57a0cca98a1ff447d", "ok": false, "error": "An error occurred (ServiceUnavailableException) when calling the InvokeModel operation (reached max retries: 4): Bedrock is unable to process your request."}
+{"event": "request", "ts": "2026-11-17T13:18:26", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "66d77fb4d998eb3a05efd838", "pass": "KA"}
+{"event": "result", "key": "66d77fb4d998eb3a05efd838", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:19:06", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1234, "key": "9d9a2cf2fb8471041e5fc0be", "pass": "KA"}
+{"event": "result", "key": "9d9a2cf2fb8471041e5fc0be", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:19:18", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1235, "key": "4dc01783b6722a13fdbbf3d2", "pass": "KA"}
+{"event": "result", "key": "4dc01783b6722a13fdbbf3d2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:19:29", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "b6043a06c88f68a6a0858a21", "pass": "KA"}
+{"event": "result", "key": "b6043a06c88f68a6a0858a21", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:19:42", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "e5730266df39ebdef2810bf2", "pass": "KA"}
+{"event": "result", "key": "e5730266df39ebdef2810bf2", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:19:56", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "965ccd959845cb53b129ce98", "pass": "KA"}
+{"event": "result", "key": "965ccd959845cb53b129ce98", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:20:09", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1234, "key": "4313fc445b80514a54413a2a", "pass": "KA"}
+{"event": "result", "key": "4313fc445b80514a54413a2a", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:20:50", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "a2f9a8be3f1580ea2aeb1e0f", "pass": "KA"}
+{"event": "result", "key": "a2f9a8be3f1580ea2aeb1e0f", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:21:01", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1235, "key": "0fbce03b3f5e38540e74ef59", "pass": "KA"}
+{"event": "result", "key": "0fbce03b3f5e38540e74ef59", "ok": false, "error": "An error occurred (ServiceUnavailableException) when calling the InvokeModel operation (reached max retries: 4): Bedrock is unable to process your request."}
+{"event": "request", "ts": "2026-11-17T13:21:11", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1234, "key": "e2fb8d2adbcc28d279b66546", "pass": "KA"}
+{"event": "result", "key": "e2fb8d2adbcc28d279b66546", "ok": false, "error": "An error occurred (ServiceUnavailableException) when calling the InvokeModel operation (reached max retries: 4): Bedrock is unable to process your request."}
+{"event": "request", "ts": "2026-11-17T13:21:23", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "a2f910d950ca2e523a3be586", "pass": "KA"}
+{"event": "result", "key": "a2f910d950ca2e523a3be586", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:22:22", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1234, "key": "c6f5f99a480a1a844a63ebe2", "pass": "KA"}
+{"event": "result", "key": "c6f5f99a480a1a844a63ebe2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:22:37", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1235, "key": "16841f26143b6c7c5148b003", "pass": "KA"}
+{"event": "result", "key": "16841f26143b6c7c5148b003", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:22:48", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "8a6c1c35b80f3826d7880413", "pass": "KA"}
+{"event": "result", "key": "8a6c1c35b80f3826d7880413", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:23:04", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "e810ba6d4e1fed8d8922c207", "pass": "KA"}
+{"event": "result", "key": "e810ba6d4e1fed8d8922c207", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:23:19", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "c9fa4a46a416357e33451f05", "pass": "KA"}
+{"event": "result", "key": "c9fa4a46a416357e33451f05", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:23:34", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1234, "key": "1962697717def9b2815fee7a", "pass": "KA"}
+{"event": "result", "key": "1962697717def9b2815fee7a", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:27:22", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "e51b2c9db5ec9b3d034ffb6d", "pass": "KA"}
+{"event": "result", "key": "e51b2c9db5ec9b3d034ffb6d", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:27:36", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1235, "key": "be508130758903110b37d6e8", "pass": "KA"}
+{"event": "result", "key": "be508130758903110b37d6e8", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:30:09", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "35bae98dfa59bbaf73d9e4a2", "pass": "KA"}
+{"event": "result", "key": "35bae98dfa59bbaf73d9e4a2", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:30:23", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1234, "key": "17b75bb97f883db86e7c81d9", "pass": "KA"}
+{"event": "result", "key": "17b75bb97f883db86e7c81d9", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:31:03", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "0bc3706420de5951f5bc6257", "pass": "KA"}
+{"event": "result", "key": "0bc3706420de5951f5bc6257", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:31:44", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1234, "key": "5aec5ae893ebb3dd82f9db95", "pass": "KA"}
+{"event": "result", "key": "5aec5ae893ebb3dd82f9db95", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:31:57", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1235, "key": "9ac86a753f7ca2d83da24dc2", "pass": "KA"}
+{"event": "result", "key": "9ac86a753f7ca2d83da24dc2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:32:08", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "1811e70c963be5396da58ef0", "pass": "KA"}
+{"event": "result", "key": "1811e70c963be5396da58ef0", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:32:23", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "7c132a606f523a7f3fad7bcd", "pass": "KA"}
+{"event": "result", "key": "7c132a606f523a7f3fad7bcd", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:32:38", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "06b594e88f81a5b7f0d711c5", "pass": "KA"}
+{"event": "result", "key": "06b594e88f81a5b7f0d711c5", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:32:54", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1234, "key": "114e0a98b1039c039f19f55d", "pass": "KA"}
+{"event": "result", "key": "114e0a98b1039c039f19f55d", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:33:07", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "3170f026ba88263351258c3b", "pass": "KA"}
+{"event": "result", "key": "3170f026ba88263351258c3b", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:33:21", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1235, "key": "7df4e565f3bdf566d2f17ae2", "pass": "KA"}
+{"event": "result", "key": "7df4e565f3bdf566d2f17ae2", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:33:36", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "c30cc7d6f940fb2c2ad624e2", "pass": "KA"}
+{"event": "result", "key": "c30cc7d6f940fb2c2ad624e2", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:33:49", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1234, "key": "d082ecb854705d756541e704", "pass": "KA"}
+{"event": "result", "key": "d082ecb854705d756541e704", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:34:04", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "3b6efaea4a3ec0342b2f4347", "pass": "KA"}
+{"event": "result", "key": "3b6efaea4a3ec0342b2f4347", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:34:21", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1234, "key": "c183c9825048742f394e970b", "pass": "KA"}
+{"event": "result", "key": "c183c9825048742f394e970b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:34:31", "tool": "kneel_ai.py", "model": "sd35", "purpose": "ka_probe", "seed": 1235, "key": "d0000ccb2e9d1ea49f0432ce", "pass": "KA"}
+{"event": "result", "key": "d0000ccb2e9d1ea49f0432ce", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:34:41", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "861c0c95cb8e937da3c77872", "pass": "KA"}
+{"event": "result", "key": "861c0c95cb8e937da3c77872", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:34:55", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "fda95b21c6344414ec90316d", "pass": "KA"}
+{"event": "result", "key": "fda95b21c6344414ec90316d", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:35:08", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "844243e5067c7cf6a0c71ed7", "pass": "KA"}
+{"event": "result", "key": "844243e5067c7cf6a0c71ed7", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:35:21", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1234, "key": "1b7fef8d14c9df8121d9ca94", "pass": "KA"}
+{"event": "result", "key": "1b7fef8d14c9df8121d9ca94", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:35:49", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1234, "key": "59e17c651f345e2d68ab329c", "pass": "KA"}
+{"event": "result", "key": "59e17c651f345e2d68ab329c", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:36:03", "tool": "kneel_ai.py", "model": "control_sketch", "purpose": "ka_probe", "seed": 1235, "key": "c2064f58e81e56985ebe37fe", "pass": "KA"}
+{"event": "result", "key": "c2064f58e81e56985ebe37fe", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:36:37", "tool": "kneel_ai.py", "model": "style_transfer", "purpose": "ka_probe", "seed": 1235, "key": "9a708ec5951f9d33e142dd00", "pass": "KA"}
+{"event": "result", "key": "9a708ec5951f9d33e142dd00", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:36:49", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1234, "key": "918c952905f3292391006bf5", "pass": "KA"}
+{"event": "result", "key": "918c952905f3292391006bf5", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T13:37:16", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "08d82f155443587361552536", "pass": "KA"}
+{"event": "result", "key": "08d82f155443587361552536", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
