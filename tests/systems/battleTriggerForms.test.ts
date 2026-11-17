@@ -10,10 +10,10 @@ import type { Game } from '../../src/core/Game.js';
 import type { EnemyData } from '../../src/types/index.js';
 import { createMockGame, testEnemy } from '../helpers/testUtils.js';
 
-const made = vi.hoisted(() => [] as Array<{ enemies: EnemyData[]; forms?: EnemyData[] }>);
+const made = vi.hoisted(() => [] as Array<{ enemies: EnemyData[]; forms?: EnemyData[]; canRun?: boolean }>);
 vi.mock('../../src/scenes/BattleScene.js', () => ({
   BattleScene: class {
-    constructor(_deps: unknown, config: { enemies: EnemyData[]; forms?: EnemyData[] }) { made.push(config); }
+    constructor(_deps: unknown, config: { enemies: EnemyData[]; forms?: EnemyData[]; canRun?: boolean }) { made.push(config); }
   },
 }));
 
@@ -51,6 +51,15 @@ describe('BattleTrigger and boss forms', () => {
     game.events.emit('battleEnd', { victory: false, xpReward: 0, goldReward: 0 });
     game.events.emit('battle:formChange', { from: 'chaos_orrery', to: 'chaos_horizon' });
     expect(game.gameFlags.has('SEEN:chaos_horizon')).toBe(false);
+  });
+
+  // CHAOS_FIX_PLAN C6-14 (D-C7-6), 5.2: Run is disabled for a form chain unless its bossConfig says otherwise
+  it('canRun: false for a form chain, true for a plain battle; an explicit bossConfig.canRun: true wins', async () => {
+    const { trigger } = setup();
+    await trigger.triggerBattle(['chaos']);
+    await trigger.triggerBattle(['goblin']);
+    await trigger.triggerBattle(['chaos'], { canRun: true, isBoss: true });
+    expect(made.map((c) => c.canRun)).toEqual([false, true, true]);
   });
 
   it('a battle with no form phases gets no form records', async () => {

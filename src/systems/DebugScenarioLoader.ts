@@ -18,6 +18,8 @@ export interface DebugScenario {
   enemyAi?: EnemyAiPatterns;
   /** Optional starting statuses per enemy index, e.g. `{ 0: [sleep], 1: [poison] }` (unknown ones are logged). */
   enemyStatus?: Record<number, string[]>;
+  /** Optional start HP per enemy index as a fraction of its pool in (0, 1], e.g. `{ 0: 0.405 }` (CHAOS_FIX_PLAN C6-12b). */
+  enemyHp?: Record<number, number>;
   /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `entrance` (or the `spawn` cell). */
   mode?: 'battle' | 'field';
   map?: string;
@@ -44,6 +46,21 @@ export function enemyStatusOf(scenario: Pick<DebugScenario, 'id' | 'enemyStatus'
     out[Number(index)] = known;
   }
   return out;
+}
+
+/** The scenario's `enemyHp` with only valid entries: an index outside `enemies` or a fraction outside (0, 1] logs
+ *  `console.error` and is dropped; undefined when none is left. */
+export function enemyHpOf(scenario: Pick<DebugScenario, 'id' | 'enemies' | 'enemyHp'>): Record<number, number> | undefined {
+  const out: Record<number, number> = {};
+  for (const [index, f] of Object.entries(scenario.enemyHp ?? {})) {
+    const i = Number(index);
+    if (!Number.isInteger(i) || i < 0 || i >= scenario.enemies.length) {
+      console.error(`Debug scenario ${scenario.id}: enemyHp for enemy ${index}, but there are ${scenario.enemies.length}`);
+    } else if (typeof f !== 'number' || !(f > 0 && f <= 1)) {
+      console.error(`Debug scenario ${scenario.id}: enemyHp ${String(f)} for enemy ${index} is not a fraction in (0, 1]`);
+    } else out[i] = f;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 export class DebugScenarioLoader {
@@ -86,8 +103,9 @@ export class DebugScenarioLoader {
     };
     events.on('battleEnd', onEnd);
     try {
+      const enemyHp = enemyHpOf(scenario);
       await trigger.triggerBattle(scenario.enemies, undefined, scenario.background, scenario.enemyAi,
-        enemyStatusOf(scenario));
+        enemyStatusOf(scenario), enemyHp ? { enemyHp } : {});
     } catch (e) {
       events.off('battleEnd', onEnd);
       throw e;
