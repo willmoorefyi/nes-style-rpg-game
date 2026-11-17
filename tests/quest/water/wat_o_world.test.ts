@@ -125,10 +125,8 @@ describe('WAT-O: the encounter zones (4.0.3)', () => {
     }
   });
 
-  // BLOCKED (WAT-O result): the compiler refuses zone `modes` / `name` and a water-only zone, so `wat_sea` is
-  // written only once map_checks_encounters.py takes them (world_water_zones.zone_keys_accepted)
-  const shipZones = zones.filter((z) => z.modes?.includes('ship'));
-  it.skipIf(shipZones.length === 0)('every Water cell of the box is in exactly one ship zone', () => {
+  it('every Water cell of the box is in exactly one ship zone (wat_sea)', () => {
+    expect(zones.map((z) => z.id)).toEqual(['wat_streams', 'wat_dunes', 'wat_isles', 'wat_sea']);
     const bad: string[] = [];
     for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
       if (t(x, y) !== TerrainType.Water) continue;

@@ -2502,6 +2502,108 @@ in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townSta
 <!-- === ERT-D EARTH (pass W: owned by ERT-D) === -->
 <!-- === end ERT-D === -->
 <!-- === FIR-O FIRE (pass W: owned by FIR-O) === -->
+### FIR-O result: the south-east continent (branch `w-fir-o` from `mainline` 81e93d4)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-o/`.
+
+**Files:**
+
+- `layouts/world_fire.py` (92 lines): FIRE's RegionOut. It imports FIR-T's `fire/town_crescent_site.py` unchanged
+  (gate (148, 124), icon x 149-151 y 123-125, door (149, 124), dock `fir_crescent` (146, 124); an optional
+  `ICON_PARTS` in the site file restyles the icon). It fills land no entrance reaches with rock, zones every FIRE cell
+  (band water included), and returns `walls` (W_south: x 114-137, y 146-147; W_east: x 138-145, y 146-147) and
+  `barriers.crescent_ring` (the ring's 411 mountain cells, seeds (152, 130) and (143, 161)).
+- `layouts/fire/world_fire_ground.py` (191): the ground, with the design note in its docstring. Crescent's shore and
+  downs fill the north rect. The crescent lake (Lake) lies at x 154-180, y 111-137, with the Circle's stone islet
+  (159-160, 123-124). The ring is a mountain fold on rows 138-147/148, from the outer channel to the east coast. R-volcano
+  (lake (159, 134) -> x 151 -> row 150 west, sink at (132, 150)) and R-ice (lake (167, 137) -> x 165 -> row 153 west,
+  sink at (140, 153)) are 1-cell, 4-connected rivers. In the south lands there are W_south's cliffs, a 2-cell western
+  sea lane (x 114-115; its 2-cell water cut makes W_south's minimal cut), the Ashlands (x 116-131), the Frost Hollow
+  (x 132-141, rows 148-152), the Hull Desert dunes and the eastern woods.
+- `layouts/fire/world_fire_data.py` (121): the zone tables and assignment, hazards `fir_ash_vents` (open-ash cells
+  only, off the sink-to-mouth path), the landmarks (the volcano 3x2 at (119, 149), door (120, 150); the cave mouth
+  2x2 `snow` at (135, 147), door (136, 148); an `ice_floe`; the `buried_hull` 3x2 `dune` at (142, 157); the `shrine`
+  stones on the islet; boulders), and the hatch NPC `fir_hull_hatch` (143, 159) (`chest` sprite tinted, `requiredItem:
+  levistone`, `hideIf: AIRSHIP_RAISED`, cutscene `fir_airship_rises` with `onceFlag: AIRSHIP_RAISED`, dialog on
+  `item:levistone`).
+- Anchors (entrances): `fir_volcano` (120, 151), `fir_ice` (136, 149), `fir_desert` (143, 160), and FIR-T's
+  `fir_crescent` (148, 124). Transitions: `crescent:gate`, `gurgu-b1:arrival`, `ice-cavern-b1:arrival`.
+- Zones (all with `modes` and `name`): `fir_lakeshore` "Crescent Shore", `fir_ashlands` "Ashlands", `fir_tundra`
+  "Frost Hollow", `fir_desert` "Hull Desert", `fir_rivers` "Crescent Waters" (canoe), `fir_aldi` "Aldi Sea" (ship;
+  the band strip y 144-145, x 112-137), `fir_sea` "Southern Seas" (ship).
+- `cutscenes.yaml` (FIR-O anchor): `fir_airship_rises`: dialog, fade, `take_item levistone`, the rise, `set_flag
+  AIRSHIP_RAISED`, `set_vehicle airship overworld (149, 162)` (a grass cell at the desert's edge), and the closing line.
+- `quest.yaml` S17: `status: built`, `entry` overworld (143, 160) on foot, `walk:
+  [overworld:cutscene:fir_hull_hatch]`.
+- `debug-scenarios.yaml`: `w_s17_start` and `w_s17_neg_nostone` (entrance `fir_desert`, level 22, B5 gear, the flags
+  through S16, the canoe and the lute, the ship at the `fir_crescent` dock; `_neg` withholds only the levistone).
+- Tests: `tests/quest/fire/northWest.test.ts` (rows 146-147, x 114-141 are rock; both mouths open south; R-volcano meets
+  the volcano from the east on row 150) and `tests/quest/fire/fir_o_world.test.ts` (anchors within ±2; no land path
+  from the shore to the south lands, the canoe reaches all three; the detours; the south lands are one land; opening
+  the composer's `crescent_ring` cut joins them; the dock; the zone cover; the hatch and the cutscene).
+- Generated: `assets-src/maps/overworld.yaml`, `assets/maps/ai/overworld.yaml` and FIRE's 30 changed chunks. FIRE's
+  22 canon stubs (`crescent*`, `gurgu-b1..b5`, `ice-cavern-b1..b3`) are compiled into `assets/maps/ai` + `index.yaml`
+  (stubs as D-W8 means them: the overworld doors now lead somewhere; FIR-T, FIR-D1 and FIR-D2 overwrite them).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2781 cells, ocean 23814 cells; canal joins)`; `cuts: W_west 7, W_isthmus 14, W_arm 2, W_south 2, W_east 4, crescent_ring 9` (real W_south and W_east south parts; FIRE's placeholders gone; `barriers: OK (crescent_ring)` = no barrier error) |
+| G2 `build_map.py overworld --region fire` | `overworld: region fire of 192x192 -> assets/maps/ai/overworld.yaml (158 approved parts, 94 placeholders)`; about 30 s, max RSS 4.61 GB |
+| G2 `--check-determinism --region fire overworld` | `overworld: deterministic`; exit 0 |
+| G1 `world.py` (PYTHONHASHSEED 1) and `stubs.py`, then compare | the world source is byte-identical; `stubs: wrote 137`; no source diff besides `overworld.yaml` |
+| G3 owned chunks | `grep -vxFf owned.txt` prints nothing (exit 1); 30 chunk files changed, all FIRE's |
+| G5 `npm run quest -- --mutate --stage S17` | (a) OK S17; (b) OK; (c) OK (253 states); (d) `S17 L22.0 [22,25]`; (e), (f) OK; (g) `s*=0.735 (31 pairs; 18 assumed)`; (h) OK (1 checked, 13 pending); `mutations: OK (2 gate rows ...)`; `quest-verify: OK`. GT-22 is caught (`SKIP S17 AIRSHIP_RAISED reachable without levistone`); GT-23 is reported pending (S18 not built) |
+| `npm run quest -- --mutate` (all stages) | `quest-verify: OK` (41 gate rows; 49 elements). GT-21 (2 canoe cuts of 13 cells) and GT-37 (the ring cut, 9 cells) are found and reported pending until S15 and S16 are built. `tests/quest/fire/fir_o_world.test.ts` checks the GT-37 opening directly |
+| G13 / G14 `--only g`, `--only h` and their vitest files | `(g) geography: OK s*=0.735`; `(h) travel matrix: OK`; tests passed |
+| G4 `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 300 passed (300)`, `Tests 5921 passed, 8 skipped (5929)` |
+| G6, G7, G12 (`assetCoverage`, `fileCeilings`, `questCeilings`, `designNotes`, `originality`, `townStandard`) | 8 files, 344 passed, 8 skipped |
+| G8 `build_map.py --selftest` | `terrain selftest: 45 checks passed`, `region yaml / multi-rect / locality / stale / lock: OK`, `build_map selftest: 104 checks passed` |
+| G16 | n/a: FIR-O owns no canon map id (`stubs.py --check FIR-O`: unknown tranche) |
+| G10 browser, port 5229, `mute=1` | `w_s17_neg_nostone`: the hatch's line asks for the stone; no airship in `__game.vehicles`; AIRSHIP_RAISED unset. `w_s17_start`: talking plays `fir_airship_rises`; AIRSHIP_RAISED set, levistone gone, airship at (149, 162); walked on board, confirm: mode `airship`; over forest (175, 160) confirm: "The airship can't land here."; over grass (165, 160) confirm: mode `walking`, airship parked at (165, 160). Screenshots: `/tmp/w-fir-o/fir-o-neg-hatch.png`, `fir-o-start1.png`, `fir-o-forest2.png`, `fir-o-landed.png` |
+
+**Travel rows and GTs (own):** T3 to T5's FIRE targets are pending in the CLI until A1-T's ship dock exists. On the
+compiled map (`fir_o_world.test.ts`), the shore doesn't reach `fir_volcano`, `fir_ice` or `fir_desert` on foot
+(T3, T4), and the canoe reaches all three (T5). Measured steps (BFS on the compiled collision) against the 2.5x bounds: crescent-volcano 75 / 97.2 and
+crescent-ice 57 / 69.3 by canoe; ice-desert 28 / 32.6 on foot. GT-21: canoe cuts found,
+pending S15 and S16. GT-37: cut found (9 cells), pending S15 and S16; the test shows that opening it joins the shore to
+all three anchors. GT-22: caught. GT-23: pending S18.
+
+**Deviations / hand-offs (all small, outside the owned files; the integrator should review them):**
+
+- **Compiler gaps (W1-C1 / W1-C2 files).** Every pass W region that is reached by ship hits both.
+  - `build_map.py` validate: the "reachable from the first entrance" flood now also starts at the world's
+    `no_unreachable_walkable.reach_roots`. Before, every transition outside act 1 failed `transition ... is not
+    reachable on foot`. The change only affects validation. Because `build_map.py` is part of the compiler digest, I
+    rewrote the base's `build.compiler` digest in `assets/maps/ai/overworld.yaml` to the new one (345e4c2f6c0caf43)
+    instead of running a full-world compile, since no pixel depends on the change. INT's full recompile confirms it.
+  - `map_checks_encounters.py`: zones may carry `modes` and `name` (QUEST 3.4 and WORLD 4.0.3 need them). A zone whose
+    modes leave out walking (ship, canoe) need not cover a walkable cell.
+- **Verifier gaps (W1-I files).** In `questCurve.ts`, `--stage` starts the party at the stage's band low and marks the
+  gold as assumed; before, every no-boss stage read L1. In `questProofsLate.ts`, (d) counts a built stage below its
+  band as pending when it is below only because a pending ancestor was assumed at its band low; `--strict` still
+  fails it. In `questTravel.ts`, a row whose vehicle place is not built yet reports its unreached targets as pending,
+  not failed (T3 and T5 until A1-T's dock exists).
+- **Repository-state pins updated** (each kept to act 1's data): `questData.test.ts` (other stages may be built),
+  `questGraph.test.ts` (act 1's events filtered by map; the PENDING count read from quest.yaml),
+  `overworldLayout.test.ts` (only the act-1 zones), `DebugScenarioField.test.ts` (`w_*` flags use `isKnownFlag`),
+  `scenarioSpawns.test.ts` (`w_*` entrance starts are exempt from the act-1 frame), `mapVariants.test.ts` (a map new
+  in 2x lands only on compiled targets).
+- **Rivers end inland** ("sinks"): `river_check` is not in FIRE's region checks. A river that reached the sea would cut
+  the south lands into parts, and GT-37 needs one land.
+- **No smoke-column deco** (no part exists). The hatch NPC uses the `chest` sheet, tinted; the town icon's top row is
+  `tree_clump`, `bush`, `tree_clump` (the approved `town_icon_0_*` cells are empty).
+- **Originality:** a fresh reviewer, given the ASCII crop of the region, the design note and every line, returned
+  `originality review: PASS fire-overworld`. Its one remark, that the "frozen stream" claim was loose, is fixed: the
+  Distinct line now says the volcano's river runs past the ice cavern's door.
+- `.playwright-mcp/` in the main checkout was in use by another tranche's browser (port 5226) while I worked. I
+  removed only my own files; the folder and `playwright-responses/` are left for the last user.
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/world_fire.py` with `layouts/fire/world_fire_ground.py`
+and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescent_site.py`). The zone check accepts
+`modes` and `name`. The debug scenarios gain `w_s17_start` and `w_s17_neg_nostone`.
 <!-- === end FIR-O === -->
 <!-- === FIR-T FIRE (pass W: owned by FIR-T) === -->
 <!-- === end FIR-T === -->
@@ -2512,6 +2614,101 @@ in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townSta
 <!-- === ORD-O ORDEAL (pass W: owned by ORD-O) === -->
 <!-- === end ORD-O === -->
 <!-- === WAT-O WATER (pass W: owned by WAT-O) === -->
+### WAT-O result: Onrac's coast, the waterfall and the caravan (branch `w-wat-o` from `mainline` 81e93d4, merged with `mainline` 62033ba (FIR-O))
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
+
+**Files:**
+
+- `layouts/world_water.py` (the RegionOut, with the design note) and `layouts/water/world_water_land.py` (ground),
+  `world_water_sites.py` (icons, doors, anchors, inspect cells), `world_water_zones.py` (zones). The helper modules carry
+  `world_water_` in their names, so they never clash with another region's helpers on `sys.path`.
+- `layouts/water/waterfall.py` -> `waterfall-cave` (30x22) and `layouts/water/caravan.py` -> `caravan-camp` (26x18),
+  both with design notes.
+- Data: `cutscenes.yaml` `wat_cube_given`; `quest.yaml` S21 and S22 (`walk`, `entry`, one `nonLoadBearing`,
+  `status: built`); `debug-scenarios.yaml` `w_s21_start`, `w_s21_neg_nocanoe`, `w_s22_start`.
+- Tests: `tests/quest/water/wat_o_world.test.ts` (13) and `wat_o_sites.test.ts` (9).
+- Generated: `assets-src/maps/overworld.yaml`, the WATER chunks `assets/maps/ai/overworld/below_{0..3}_{0..3}`
+  (`below_3_3` is unchanged: open sea), `overworld.yaml`, `index.yaml`, and both compiled sites.
+
+**The region (4.6):**
+
+- A long cold coast (x 3-53, y 3-57) under a wall of northern peaks.
+- **R-waterfall:** a spill tarn in the peaks feeds the falls at (30, 8-10). The river (x 31-32) runs down a sheer
+  gorge (walls x 28-30 and x 33+) to y 27, then winds south-east past Onrac's meadow into the bay at (43, 40).
+- **The cave:** its door is the falls' bottom-left cell (30, 10). It stands on a 3-cell **sand** ledge (28-30, 11)
+  that touches only rock, the falls and the river. The canoe is the only way in, and the airship cannot land on the
+  ledge.
+- Onrac's icon is a 3x3 house from WAT-T's site file, gate (28, 39). Its door transition and door cell open only once
+  `onrac.yaml` is no longer a stub, because a stub is never compiled and the cross-file test would fail.
+- **Caravan:** the tent stands on a rock outcrop in the western dunes, arrival (8, 28). An oasis meadow lies 5 cells
+  away, with a signpost.
+- Other features: sea-stacks across the bay mouth; an upland tarn wood; the snow firs; a cairn at the gorge's mouth
+  that hints at the canoe.
+- Anchors at their targets exactly: `wat_onrac` (28, 39), `wat_waterfall` (30, 11), `wat_caravan` (8, 28). Each has
+  grass within 8 steps. There is no dock, wall, patch or barrier.
+- Zones: `wat_streams` (canoe: the river; S21), `wat_dunes` (S22), `wat_isles` ("Onrac Coast", S20 land) and `wat_sea`
+  (ship; every Water cell of the box, band cells included). Neighbouring zones share no species.
+- The region's checks are `river_check`, `warp_leaves` and `min_blob` (mountain / sand / forest 3).
+
+**Sites:**
+
+- `waterfall-cave`, on one floor:
+  - an entry ramp, then a spray hall split by a falls channel (Lake) with one footbridge, a passage, and the vault;
+  - two dead-end galleries, each with a chest (`ether` and `hi_potion`; flags `CHEST_WAT_O_FALLS_*`);
+  - the automaton (a tinted `knight`) with `giftItem: cube`, `giftFlag: CUBE_GIVEN`, and the cutscene
+    `wat_cube_given`, which tells of its war-made twin in the sky castle and sets `WAT_O_TWIN_TOLD`;
+  - `exit` to `wat_waterfall`, and an inspect statue.
+- `caravan-camp`: a rock ring with three tents, a cook fire, a spring pool and the trader's awning. It holds 5 NPCs:
+  - the trader (`takeGold: 5000`, `giftItem: fairy_bottle`, `giftFlag: WAT_O_BOTTLE_BOUGHT`);
+  - the master, whose hint names Gaia;
+  - a scout, whose hint is the waterfall and the boat;
+  - a drover (wandering) and a cook.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when, proof (d3) | `(d) bands: OK  ... S21 L28.1 [25,28]  S22 L25.2 [25,28]  (29 pending)  prices: OK (1 takeGold)`. The bottle's stage start is assumed: its ancestors are pending, so the 80 % rule waits for INT, which tunes the price |
+| G1 | `world.py`, `waterfall.py`, `caravan.py` and `stubs.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py overworld --region water waterfall-cave caravan-camp`: 3 maps, 17-39 s, max RSS 3.97 GB. `--check-determinism --region water overworld waterfall-cave caravan-camp`: all 3 `deterministic` |
+| G3 | `world.py --owned-chunks water`, then the merge-base diff of `assets/maps/ai/overworld/` filtered by it: no output |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 302 files, 6020 tests, **1 failed** (`questGraph` "passes (a), (b) and (c)": the full run's (b), see below) |
+| G5 S21 | (a) OK, (b) OK (26 withheld runs), (d) OK, (e)-(h) OK, `mutations: OK (2 gate rows)`. GT-25 is caught as `SKIP S21 CUBE_GIVEN reachable without canoe`. **(c) FAIL**: 6 SOFTLOCKs, every one through the act-1 jetty ship, see below |
+| G5 S22 | the same: (a), (b), (d)-(h) and mutations OK; **(c) FAIL**, the same jetty ship |
+| full `npm run quest -- --mutate` | (a) OK (S21 and S22 reached on the witness), (c) OK (753 states), (d)-(h) OK, `mutations: OK (42 gate rows; 50 elements)`. **(b) FAIL**: `SKIP S21 CUBE_GIVEN reachable without S20 (no grants)` |
+| G6 G7 G12 G13 G14 G15, `tests/quest/water/` | 10 files, 371 passed, 9 skipped. `(g) geography: OK  s*=0.735 (31 pairs; 15 assumed)` and `(h) travel matrix: OK  (12 rows, 2 basin rows; 1 checked, 13 pending)` |
+| G8 | `build_map selftest: 104 checks passed` |
+| G10 browser (port 5234, `mute=1`; screenshots `/tmp/w-wat-o/b_*.png`) | `w_s21_start`: walked to the gorge's mouth, stepped east (mode `canoe`), paddled 17 cells north through river fights, stepped onto the ledge (`walking`) and into the cave, and talked to the automaton. `cube` held, CUBE_GIVEN and WAT_O_TWIN_TOLD set. `w_s21_neg_nocanoe`: the step east from (30, 28) is refused, mode `walking`. `w_s22_start`: into the camp, talked to the trader; `fairy_bottle` held, gold 6000 -> 1000. 0 console errors |
+| G11 | only WAT-O's paths changed |
+| G16 | `stubs: 0 left for WAT-O` |
+| G17 | `bands: OK`, `basins: OK (aldi 2781 cells, ocean 21882 cells; canal joins)` |
+| originality | a fresh reviewer read the crops, notes and dialogue. Every `Distinct:` line names at least 3 features: `originality review: PASS overworld(water) waterfall-cave caravan-camp` |
+
+**Open failures (integrator):**
+
+- **Stage-mode (c): the act-1 jetty ship.** The ship spawn (BIKKE_DEFEATED) still waits off Cornelia's jetty, and
+  `a1_pravoka` has no dock yet. With the airship landed in act 1, boarding that ship strands the party: the only dock it
+  reaches is `fir_crescent`, and the airship stays behind. A1-T's quay dock (or the ship's move to it) clears this.
+  Every airship stage started from act 1 will see it.
+- **Full (b): `SKIP S21 ... without S20 (no grants)`.** S20 (Onrac, WAT-T) is pending and grants nothing, so
+  withholding it withholds nothing. `questChecks` already skips a *built* ancestor without grants; the same rule for a
+  pending one, or WAT-T building S20, clears it. This is also the one G4 failure (`questGraph`).
+
+**Deviations:**
+
+- Scenarios set no story flags. The field rules on this way read none (the canoe item and the airship decide), and
+  `DebugScenarioField`'s flag list is act 1's.
+- Before the FIR-O merge, my compiles used a scratch copy of the compiler with the reach-root fix that FIR-O then
+  shipped. After the merge everything was recompiled with the repo's compiler: the digest `5be1e6592dc4f9bf` is
+  unchanged and only the `water` box digest changed.
+- The overworld design note lives in the `world_water.py` docstring, because the world source is generated.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains the row `layouts/world_water.py` (+ `layouts/water/world_water_*.py`) -> the WATER box of
+  `overworld.yaml`, and `layouts/water/waterfall.py` / `caravan.py` -> `waterfall-cave` / `caravan-camp`.
+- Debug scenarios gain `w_s21_start`, `w_s21_neg_nocanoe` and `w_s22_start`.
 <!-- === end WAT-O === -->
 <!-- === WAT-T WATER (pass W: owned by WAT-T) === -->
 <!-- === end WAT-T === -->

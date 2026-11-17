@@ -321,7 +321,8 @@ describe('overworld layout (T3c)', () => {
 });
 
 describe('overworld encounter zones (T4e, §1.6)', () => {
-  const zones = map.encounterZones ?? [];
+  // the act-1 zones only: pass W's region zones carry their region prefix (WORLD 4.0.3) and include sea zones
+  const zones = (map.encounterZones ?? []).filter((z) => !/^(a1|elf|ert|fir|ord|wat|wnd|pst)_/.test(z.id));
   const inRect = (x: number, y: number, [x0, y0, x1, y1]: [number, number, number, number]) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
   /** The zone the runtime picks for a cell (the first whose rects hold it), or null for the fields. */
   const zoneAt = (x: number, y: number) => zones.find((z) => z.rects.some((r) => inRect(x, y, r)))?.id ?? null;

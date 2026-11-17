@@ -57,14 +57,13 @@ describe('WAT-O: the caravan camp', () => {
   });
 });
 
-// The model walks (6.4) in assume mode. quest.yaml keeps S21 / S22 pending with empty walks until S17's airship has a
-// cell in the full run (WAT-O result); the walks are replayed here on the stages as they will be built.
+// The model walks (6.4) in assume mode, as quest.yaml declares them.
 const WALKS: Record<string, string[]> = { S21: ['waterfall-cave:gift:cube'], S22: ['caravan-camp:gift:fairy_bottle'] };
 
 describe.each(Object.entries(WALKS))('WAT-O: the %s walk (assume mode)', (id, walk) => {
   const world = loadQuestWorld();
   const stage = world.stages.get(id)!;
-  Object.assign(stage, { walk, status: 'built' });
+  expect(stage.walk).toEqual(walk);
   const ctx = createQuestContext(world, { stage: id });
 
   it('replays to the stage\'s grants (proof (a), walk included)', () => {

@@ -12,11 +12,9 @@ party's mode):
 So every walkable cell is in a walking zone and every Water cell in exactly one ship zone. Neighbouring zones share
 no species (the W5 rule).
 
-BLOCKED (for the integrator): the compiler's zone check (`map_checks_encounters.py`, W1-C2's) accepts only the keys
-`id, rects, encounters, encounterRate` and needs a walkable cell in every zone, so it refuses `modes`, `name` and a
-ship zone over water. `zone_keys_accepted()` asks the check itself: until it accepts them, the zones are written
-without `modes` and `name` and `wat_sea` is left out (no fights at sea in this box yet). Once the check is extended
-the full zones are written with no change here.
+`zone_keys_accepted()` asks the compiler's zone check (`map_checks_encounters.py`) whether it takes `modes`,
+`name` and a water-only ship zone (it does since the FIR-O merge); on an older check the zones fall back to
+the plain keys and `wat_sea` is left out.
 """
 from __future__ import annotations
 
