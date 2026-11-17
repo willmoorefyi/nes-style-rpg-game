@@ -16,13 +16,13 @@ import { NES_FONT } from '../../ui/NESFont.js';
 import { CHAR_WIDTH, FONT_SIZE } from '../../core/LayoutConstants.js';
 import type { MonsterArtSource } from '../battle/AiEnemyView.js';
 import { createBattleDevClock, type BattleDevClock } from '../battle/battleDevClock.js';
-import { resolveMapPath } from '../../systems/MapLoader.js';
+import { COMPILED_MANIFEST, resolveMapPath } from '../../systems/MapLoader.js';
 import { BestiaryPreview, CachedArt } from './BestiaryPreview.js';
 import { BestiaryStatsPanel } from './BestiaryStatsPanel.js';
 import { buildEntries, seenFlag, spellIdsOf, statLines, titleCount, type BestiaryEntry } from './bestiaryModel.js';
 import { linkTarget, pageCount, pageEntry, pageLines } from './bestiaryInfo.js';
 import { listedCount, withFormSubEntries } from './bestiaryForms.js';
-import { backgroundFor, habitatsOf, type Habitat } from './bestiaryHabitats.js';
+import { backgroundFor, habitatMapIds, habitatsOf, type Habitat } from './bestiaryHabitats.js';
 import { takeBestiaryStartEntry } from './bestiaryLink.js';
 import { neighbourSprites, showWhenReady } from './bestiaryPages.js';
 import { battleArt, monsterSpriteKey } from '../../rendering/BattleArt.js';
@@ -86,7 +86,7 @@ export class BestiaryScene implements Scene {
       const [enemies, spells] = await Promise.all([d.loadEnemies('assets/data/enemies.yaml'),
         d.loadSpells('assets/data/spells.yaml').catch((err: unknown) => { console.error('Bestiary: spells.yaml failed', err); return []; })]);
       const maps: MapData[] = [];
-      for (const id of data.habitats.maps) {
+      for (const id of await habitatMapIds(data, () => d.loadMapManifest(COMPILED_MANIFEST))) {
         try {
           maps.push(await d.loadMap(await resolveMapPath(d, id, true)));
         } catch (err) {

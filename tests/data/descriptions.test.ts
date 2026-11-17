@@ -10,7 +10,7 @@ const items = parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url))
 
 describe('MS-7: every item has a real description', () => {
   it('covers all 43 items', () => {
-    expect(items).toHaveLength(43);
+    expect(items).toHaveLength(81);
   });
 
   it.each(items.map((i) => [i.id, i] as const))('%s: a non-empty description that is not its name', (_id, item) => {

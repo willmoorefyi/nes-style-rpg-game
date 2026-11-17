@@ -10,7 +10,7 @@ import { parse } from 'yaml';
 import type { MapData } from '../../../src/types/index.js';
 import { validateBestiary } from '../../../src/core/bestiaryValidation.js';
 import { resolveMapPath } from '../../../src/systems/MapLoader.js';
-import { backgroundFor, habitatText, habitatsOf } from '../../../src/scenes/bestiary/bestiaryHabitats.js';
+import { backgroundFor, habitatMapIds, habitatText, habitatsOf } from '../../../src/scenes/bestiary/bestiaryHabitats.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = <T>(f: string): T => parse(readFileSync(join(root, f), 'utf-8')) as T;
@@ -19,7 +19,7 @@ const loader = { loadMapManifest: async (p: string) => read<string[]>(p) };
 
 async function realHabitats() {
   const maps: MapData[] = [];
-  for (const id of data.habitats.maps) maps.push(read<MapData>(await resolveMapPath(loader, id, true)));
+  for (const id of await habitatMapIds(data, () => loader.loadMapManifest('assets/maps/ai/index.yaml'))) maps.push(read<MapData>(await resolveMapPath(loader, id, true)));
   return habitatsOf(maps);
 }
 
@@ -67,5 +67,13 @@ describe('bestiary habitats (synthetic maps)', () => {
     expect(habitatText(h.get('troll'), data)).toBe('Map');
     expect(habitatText(h.get('lich'), data)).toBe('Map (boss)');
     expect(h.get('lich')).toHaveLength(1);
+  });
+
+  it('QUEST 4.4: a zone\'s own name is its label (else bestiary.yaml\'s, else the id); `manifest` scans the manifest', async () => {
+    const zone = (id: string, name?: string) => ({ id, name, rects: [], encounters: [{ weight: 1, groups: [{ id: 'ogre', min: 1, max: 1 }] }] });
+    const h = habitatsOf([map({ encounterZones: [zone('elf_bog', 'Elf bog'), zone('east_pocket'), zone('x_raw')] })]);
+    expect(habitatText(h.get('ogre'), data)).toBe('Map (Elf bog, East pocket, x_raw)');
+    expect(await habitatMapIds({ ...data, habitats: { maps: 'manifest', zones: {} } }, async () => ['a', 'b'])).toEqual(['a', 'b']);
+    expect(await habitatMapIds({ ...data, habitats: { maps: ['c'], zones: {} } }, async () => ['a'])).toEqual(['c']);
   });
 });

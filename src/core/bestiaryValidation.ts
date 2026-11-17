@@ -135,7 +135,7 @@ export function validateBestiary(raw: unknown, path = 'bestiary.yaml'): Bestiary
     order: c.value(src, 'order', d.order, (v) => v === 'data'),
     listRows: c.value(src, 'listRows', d.listRows, (v) => isCount(v) && v > 0),
     habitats: {
-      maps: c.value(hab, 'maps', d.habitats.maps, (v) => Array.isArray(v) && v.every(isStr), 'habitats.maps'),
+      maps: c.value(hab, 'maps', d.habitats.maps, (v) => v === 'manifest' || (Array.isArray(v) && v.every(isStr)), 'habitats.maps'),
       zones: c.record(hab.zones, d.habitats.zones, 'habitats.zones'),
     },
     backgrounds: {

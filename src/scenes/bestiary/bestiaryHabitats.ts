@@ -15,6 +15,8 @@ export interface Habitat {
   main: boolean;
   /** encounterZones ids it appears in, in map order (used only when not `main`). */
   zones: string[];
+  /** The `name` of those zones that have one (the habitat label, QUEST_PLAN 3.4); others use bestiary.yaml's. */
+  zoneNames?: Record<string, string>;
   /** A scripted isBoss encounter names it. */
   boss: boolean;
   /** The background its first table there would use. */
@@ -29,6 +31,11 @@ const idsOf = (entries: readonly EncounterEntry[] | undefined): Set<string> => {
   }
   return out;
 };
+
+/** The map ids the habitat scan reads: `habitats.maps`, or every compiled map when it is `manifest` (QUEST_PLAN 4.4). */
+export async function habitatMapIds(data: BestiaryData, manifest: () => Promise<string[]>): Promise<string[]> {
+  return data.habitats.maps === 'manifest' ? manifest() : data.habitats.maps;
+}
 
 /** Every enemy's habitats, per map in `maps` order. */
 export function habitatsOf(maps: readonly MapData[]): Map<string, Habitat[]> {
@@ -49,6 +56,7 @@ export function habitatsOf(maps: readonly MapData[]): Map<string, Habitat[]> {
       for (const id of idsOf(z.encounters)) {
         const h = get(id);
         if (!h.zones.includes(z.id)) h.zones.push(z.id);
+        if (z.name) h.zoneNames = { ...h.zoneNames, [z.id]: z.name };
       }
     }
     for (const s of m.scriptedEncounters ?? []) {
@@ -76,7 +84,7 @@ export function habitatText(habitats: readonly Habitat[] | undefined, data: Best
   for (const h of habitats ?? []) {
     if (h.main) parts.push(fill(t.habitatMain, { map: h.map }));
     else if (h.zones.length > 0) {
-      const zones = h.zones.map((z) => data.habitats.zones[z] ?? z).join(t.list);
+      const zones = h.zones.map((z) => h.zoneNames?.[z] ?? data.habitats.zones[z] ?? z).join(t.list);
       parts.push(fill(t.habitatZone, { map: h.map, zones }));
     }
     if (h.boss) parts.push(fill(t.habitatBoss, { map: h.map }));

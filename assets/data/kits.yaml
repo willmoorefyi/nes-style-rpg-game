@@ -49,4 +49,107 @@ naked:
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # W1-F owns every `w_*` town and stage kit; others send a kit change to the integrator.
 # === W1-F (pass W: owned by W1-F) ===
+# Pass W kits (docs/WORLD_PLAN.md 3.4-3.6, QUEST_PLAN 4.4): one tier per band town (`w_<town>`: what the party
+# buys there, with the spells sold up to that band), and the stage kits `w_s<n>` as aliases of the tier their
+# band shops at (the stage at its boss, or at its end). L5 black and L6-L8 spells come with W1-G and are not in
+# any kit yet. The 4-member price of a town kit drives proof (f). INT may tune the kits (5.5).
+# B1 Cornelia: the act-1 shops (the `full` gear with a Cap each)
+w_s1:
+  warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+  thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
+  white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
+  black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
+  red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
+# B2 Pravoka
+w_pravoka: &w_t2
+  warrior: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
+  thief: { gear: [short_sword, leather_armor, cap], spells: [] }
+  monk: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
+  white_mage: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
+  black_mage: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
+  red_mage: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
+w_s2: *w_t2
+w_s3: *w_t2
+# B3 Elfheim (the dwarf hall sells items only)
+w_elfheim: &w_t3
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+  thief: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
+  monk: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
+w_dwarf: *w_t3
+w_s4: *w_t3
+w_s5: *w_t3
+w_s6: *w_t3
+w_s7: *w_t3
+w_s8: *w_t3
+w_s9: *w_t3
+w_s10: *w_t3
+# B4 Melmond
+w_melmond: &w_t4
+  warrior: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+  thief: { gear: [scimitar, gold_armlet, cap], spells: [] }
+  monk: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
+w_s11: *w_t4
+w_s12: *w_t4
+w_s13: *w_t4
+# B5 Crescent Lake
+w_crescent: &w_t5
+  warrior: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+  thief: { gear: [falchion, gold_armlet, cap], spells: [] }
+  monk: { gear: [cat_claw, gold_armlet, cap], spells: [] }
+  white_mage: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s14: *w_t5
+w_s15: *w_t5
+w_s16: *w_t5
+w_s17: *w_t5
+# B6 Onrac; with the upgraded classes from here on (S19 and later)
+w_onrac: &w_t6
+  warrior: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
+  thief: { gear: [rune_knife, opal_armlet, cap], spells: [] }
+  monk: { gear: [cat_claw, opal_armlet, cap], spells: [] }
+  white_mage: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
+  ninja: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
+  master: { gear: [cat_claw, opal_armlet, cap], spells: [] }
+  white_wizard: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s18: *w_t6
+w_s19: *w_t6
+w_s20: *w_t6
+w_s21: *w_t6
+w_s22: *w_t6
+# B7 Gaia (Lufenia sells magic only)
+w_gaia: &w_t7
+  warrior: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
+  thief: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
+  monk: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
+  white_mage: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
+  master: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
+  white_wizard: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_lufenia: *w_t7
+w_s23: *w_t7
+w_s24: *w_t7
+w_s25: *w_t7
+w_s26: *w_t7
+w_s27: *w_t7
+w_s28: *w_t7
+w_s29: *w_t7
+w_s30: *w_t7
 # === end W1-F ===

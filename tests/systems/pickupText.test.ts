@@ -63,6 +63,15 @@ describe('pickupText (U9)', () => {
         iron_armor: 'Iron Armor', mythril_mail: 'Mythril Mail', iron_shield: 'Iron Shields', iron_helm: 'Iron Helms',
         hi_potion: 'Hi-Potions', soft: 'Softs', cabin: 'Cabins', phoenix_down: 'Phoenix Downs',
         iron_sword: 'Iron Swords', hand_axe: 'Hand Axes',
+        // pass W shops (W1-F)
+        short_sword: 'Short Swords', robe: 'Robes', ether: 'Ethers', silver_armlet: 'Silver Armlets', scimitar: 'Scimitars',
+        gold_armlet: 'Gold Armlets', mythril_armor: 'Mythril Armor', mythril_shield: 'Mythril Shields',
+        mythril_helm: 'Mythril Helms', flame_sword: 'Flame Swords', ice_brand: 'Ice Brands', coral_sword: 'Coral Swords',
+        falchion: 'Falchions', cat_claw: 'Cat Claws', wizard_staff: 'Wizard Staffs', white_robe: 'White Robes',
+        black_robe: 'Black Robes', sun_blade: 'Sun Blades', thor_hammer: 'Thor Hammers', rune_knife: 'Rune Knives',
+        opal_armor: 'Opal Armor', opal_armlet: 'Opal Armlets', aegis_shield: 'Aegis Shields', opal_helm: 'Opal Helms',
+        defender: 'Defenders', vorpal_sword: 'Vorpal Swords', dragon_claw: 'Dragon Claws', diamond_armor: 'Diamond Armor',
+        diamond_armlet: 'Diamond Armlets', diamond_shield: 'Diamond Shields', diamond_helm: 'Diamond Helms',
       };
       const sold = new Set(SHOPS.filter((s) => s.type !== 'magic').flatMap((s) => s.inventory));
       expect([...sold].sort()).toEqual(Object.keys(expected).sort());
