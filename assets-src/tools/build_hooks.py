@@ -80,8 +80,10 @@ def bake_patches(map_id: str, src: dict, grid: "Grid", kit: "Kit", out_dir: Path
         g = [list(r) for r in rows]
         for x, y in cells:
             g[y][x] = ch
-        psrc = {**src, "ground": "\n".join("".join(r) for r in g) + "\n",
-                "objects": list(src.get("objects") or []) + list(p.get("objects") or [])}
+        # the patch replaces what stands on its cells: a base object touching them (the north bridge's debris over
+        # the gap) is left out of the patched compile (A1-O), so the overlay shows the patched ground instead
+        keep = [o for o in src.get("objects") or [] if not set(BM.footprint(o)) & set(cells)]
+        psrc = {**src, "ground": "\n".join("".join(r) for r in g) + "\n", "objects": keep + list(p.get("objects") or [])}
         c0, r0 = x0 // BM.CHUNK * BM.CHUNK, y0 // BM.CHUNK * BM.CHUNK
         c1, r1 = min(wid, (x1 // BM.CHUNK + 1) * BM.CHUNK) - 1, min(hgt, (y1 // BM.CHUNK + 1) * BM.CHUNK) - 1
         validate, BM.validate = BM.validate, (lambda s, c: None)    # art only: the base compile ran the checks

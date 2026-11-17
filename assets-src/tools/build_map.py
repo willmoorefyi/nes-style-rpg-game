@@ -1096,7 +1096,12 @@ def validate(src: dict, c: Compiled) -> None:
     if not c.entrances:
         errors.append("map has no entrances")
     else:
-        seen = MC.reach(c.collision, [next(iter(c.entrances.values()))])
+        # pass W: reached with every patch on (a span or canal that opens later; world check 7, A1-O)
+        coll = c.collision.copy()
+        for p in src.get("patches") or []:
+            for x, y in p["cells"]:
+                coll[y, x] = p["terrain"] if "terrain" in p else TERRAIN[LEGEND[p["ground"]]]
+        seen = MC.reach(coll, [next(iter(c.entrances.values()))])
         for name, pos in c.entrances.items():
             if tuple(pos) not in seen and name not in (src.get("unreachable_ok") or []):
                 errors.append(f"entrance {name} at {tuple(pos)} is not reachable from the first entrance")

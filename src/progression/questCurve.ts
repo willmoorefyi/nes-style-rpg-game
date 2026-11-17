@@ -11,7 +11,7 @@
 import { levelForXp, xpToReach } from '../entities/ExperienceTable.js';
 import type { EncounterEntry, EncounterRate, FieldMode, MapData, QuestStage } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
-import { globMatch, stageOrder } from './questData.js';
+import { ancestorsOf, globMatch, stageOrder } from './questData.js';
 import { stageOfMap, townKeepers } from './questCatalog.js';
 import type { QuestEventSpec } from './questEvents.js';
 import { stageMark } from './questStates.js';
@@ -117,7 +117,14 @@ export function curveOf(ctx: QuestContext): CurveResult {
     points: new Map(), stageStartGold: new Map(), townFirstGold: new Map(), assumedGold: new Set(),
     assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0,
   };
+  // assume mode (--stage): each assumed ancestor raised the party to its band's low level, as a pending stage does
   let tainted = false;
+  const assumed = ctx.stage ? ancestorsOf(world.stages, ctx.stage) : new Set<string>();
+  for (const s of world.quest.stages) {
+    if (!s.band || !assumed.has(s.id) || !ctx.start.flags.has(stageMark(s.id))) continue;
+    out.xp = Math.max(out.xp, 4 * xpToReach(s.band[0]));
+    tainted = true;
+  }
   const fightsBy = new Map<string, number>();
   const sat = new Saturator(ctx, ctx.start);
   let pos: QuestPlace = { ...ctx.start.place };

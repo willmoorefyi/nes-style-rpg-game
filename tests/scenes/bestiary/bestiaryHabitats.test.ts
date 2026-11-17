@@ -39,7 +39,7 @@ describe('bestiary habitats (compiled maps)', () => {
     expect(text('wolf')).toBe('World Map');
     expect(text('gr_imp')).toBe('World Map, Temple of Fiends');
     expect(text('skeleton')).toBe('World Map (Temple approach), Temple of Fiends');
-    expect(text('gr_wolf')).toBe('World Map (East pocket)');
+    expect(text('gr_wolf')).toBe('World Map (East pocket, Northern Mainland)');   // A1-O: the mainland zone
     expect(text('garland')).toBe('Temple of Fiends (boss)');
     for (const id of ['vampire', 'dragon', 'lich']) expect(text(id)).toBe('Not placed yet');
   });

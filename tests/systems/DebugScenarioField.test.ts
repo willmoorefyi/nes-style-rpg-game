@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { DebugScenarioLoader, scenarioSpawn, type DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
 import type { Game } from '../../src/core/Game.js';
+import { STORY_FLAGS } from '../../src/core/GameFlags.js';
 import type { MapData } from '../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -112,7 +113,8 @@ describe('DebugScenarioLoader field mode', () => {
 
   it('R0: every r_* scenario flag and status is a known name', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
-    const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE'];
+    // the act-1 flags, plus the pass W story flags the w_* stage starts hold (STORY_FLAGS)
+    const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE', ...Object.values(STORY_FLAGS)];
     for (const s of scenarios) {
       for (const f of s.flags ?? []) expect(known, `${s.id} flag ${f}`).toContain(f);
       // pass F's f_* scenarios also start members stoned and afraid

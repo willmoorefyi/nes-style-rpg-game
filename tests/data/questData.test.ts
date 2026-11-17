@@ -44,8 +44,10 @@ describe('quest.yaml', () => {
       .toEqual(['crescent', 'dwarf', 'elfheim', 'gaia', 'lufenia', 'melmond', 'onrac', 'pravoka']);
   });
 
-  it('S0 is built and every other stage pending; S19 and S31 are optional', () => {
-    for (const s of quest.stages) expect(s.status, s.id).toBe(s.id === 'S0' ? 'built' : 'pending');
+  // the region tranches flip their own stages to built as they merge (A1-O: S1, S3, S7)
+  const BUILT = new Set(['S0', 'S1', 'S3', 'S7']);
+  it('S0 and the merged tranches\' stages are built, every other stage pending; S19 and S31 are optional', () => {
+    for (const s of quest.stages) expect(s.status, s.id).toBe(BUILT.has(s.id) ? 'built' : 'pending');
     expect(quest.stages.filter((s) => s.optional).map((s) => s.id).sort()).toEqual(['S19', 'S31']);
     for (const t of quest.towns) expect(t.status).toBe('pending');
   });

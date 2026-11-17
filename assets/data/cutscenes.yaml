@@ -59,28 +59,68 @@
     - type: dialog
       text: "Princess Liora is home at last. Speak to the King."
 
-# The end of act 1: played once when the King is told of the rescue (BRIDGE_BUILT stays unset until the
-# bridge-building scene exists).
-- id: act1_complete
-  steps:
-    - type: fade_out
-      duration: 800
-    - type: dialog
-      text: "The King's builders set to work on the bridge to the north."
-    - type: dialog
-      text: "Congratulations! You have completed the introduction."
-    - type: dialog
-      text: "Your journey will continue once the bridge to the north is rebuilt..."
-    - type: set_flag
-      flag: INTRO_COMPLETE
-    - type: fade_in
-      duration: 800
-
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # Each tranche adds its records only between its own pair of lines, so the merges never conflict.
 # === W1-B (pass W: owned by W1-B) ===
 # === end W1-B ===
 # === A1-O (pass W: owned by A1-O) ===
+# The end of act 1 (rewritten by A1-O, WORLD_PLAN 4.1): played once when the King is told of the rescue. He orders the
+# north bridge rebuilt, and ox-carts of stone set out over a fade (INTRO_COMPLETE). The builders lay the last span
+# when the party reaches the strait (a1_bridge_finished).
+- id: act1_complete
+  steps:
+    - type: dialog
+      text: "King: Summon the masons! The north bridge shall stand again before these warriors need it."
+    - type: fade_out
+      duration: 800
+    - type: dialog
+      text: "Through the night, ox-carts of cut stone rumble down the north road toward the strait."
+    - type: set_flag
+      flag: INTRO_COMPLETE
+    - type: fade_in
+      duration: 800
+    - type: dialog
+      text: "King: Take what my daughter would give you, then go to the strait. My builders will be waiting."
+# S1: the foreman at the south stub (overworld_consts.BRIDGE_WORKERS) lays the last span once the party carries the
+# princess's lute: the hammers ring over a fade, then BRIDGE_BUILT (the patch north_bridge lays the deck over the gap).
+- id: a1_bridge_finished
+  steps:
+    - type: dialog
+      text: "Foreman: Right, lads, the King's warriors are here! Last span, and lively!"
+    - type: fade_out
+      duration: 600
+    - type: dialog
+      text: "Hammers ring out over the strait. Planks swing down on ropes, and the masons wedge the last stone home."
+    - type: set_flag
+      flag: BRIDGE_BUILT
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "Foreman: There she stands, shore to shore. Mind the fresh mortar on the north end."
+# S7: Matoya sets the crystal back in its socket, sees her cave again, and pays for it with the herb that wakes the
+# elf prince (matoya-cave; the NPC needs crystal_eye, this script takes it and gives the herb).
+- id: a1_matoya_sight
+  steps:
+    - type: dialog
+      text: "Matoya: Give it here, quick! ... Mm. Cold as a well-stone, and just as clear."
+    - type: take_item
+      item: crystal_eye
+    - type: fade_out
+      duration: 400
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 400
+    - type: dialog
+      text: "Matoya: Shelves! Jars! And the dust on them, shameful. Brooms, you heard nothing."
+    - type: give_item
+      item: herb
+    - type: set_flag
+      flag: A1_O_HERB_GIVEN
+    - type: dialog
+      text: "Matoya: Here, for your trouble: the Herb. Crush it under a sleeper's nose and no curse holds them. Received the Herb."
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===

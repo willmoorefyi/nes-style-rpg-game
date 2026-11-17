@@ -48,10 +48,10 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    walk: [overworld:npc:bridge_worker_w]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   - id: S3
     title: "Matoya's cave (visit)"
     tranche: A1-O
@@ -59,15 +59,18 @@ stages:
     requires: {flags: [BRIDGE_BUILT], items: [], vehicles: []}
     grants: {flags: [], items: [], vehicles: []}
     boss: []
-    band: [3, 6]
+    # A1-O: low 2, not 3 (WORLD 3.2): the grove opens straight off the bridge (S1, band 2-3); a visit has no event
+    # the curve model could walk to, so --stage S3 sees the S1 level
+    band: [2, 6]
     kit: w_s3
     maps: [matoya-cave]
     zones: [overworld:a1_mainland]
     grind: 2.0
     walk: []
+    entry: {map: overworld, x: 93, y: 92}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   - id: S7
     title: "Matoya's herb"
     tranche: A1-O
@@ -80,10 +83,11 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    walk: [matoya-cave:npc:matoya]
+    entry: {map: overworld, x: 74, y: 76}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end A1-O ===
   # === A1-T (pass W: owned by A1-T) ===
   - id: S2

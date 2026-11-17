@@ -136,7 +136,9 @@ const jettyCells = (): Cell[] => {
   for (let y = py - 1; terrain(px, y) === BRIDGE; y--) cells.push([px, y]);
   return cells;
 };
-const roadComps = components(roadCell).filter((c) => !c.every(([x, y]) => terrain(x, y) === BRIDGE));   // not the far stub
+const doorCell = (c: Cell[]) => c.length === 1 && map.transitions.some((t) => t.x === c[0][0] && t.y === c[0][1]);
+// not the far stub, nor a lone door cell (the compiler makes an icon's door a road cell: A1-O's Matoya and Pravoka)
+const roadComps = components(roadCell).filter((c) => !c.every(([x, y]) => terrain(x, y) === BRIDGE) && !doorCell(c));
 
 describe('overworld layout (T3c)', () => {
   it('cornelia is the first entrance (safeSpawn falls back to it) and the entrance contract holds', () => {
@@ -321,7 +323,8 @@ describe('overworld layout (T3c)', () => {
 });
 
 describe('overworld encounter zones (T4e, §1.6)', () => {
-  const zones = map.encounterZones ?? [];
+  // the act-1 zones (no region prefix); the A1 region's own zones (a1_*, A1-O) are tests/quest/a1's
+  const zones = (map.encounterZones ?? []).filter((z) => !z.id.startsWith('a1_'));
   const inRect = (x: number, y: number, [x0, y0, x1, y1]: [number, number, number, number]) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
   /** The zone the runtime picks for a cell (the first whose rects hold it), or null for the fields. */
   const zoneAt = (x: number, y: number) => zones.find((z) => z.rects.some((r) => inRect(x, y, r)))?.id ?? null;
