@@ -28,8 +28,29 @@ export function lorePages(entry: BestiaryEntry, data: BestiaryData): string[] {
   return data.lore[entry.enemy.id] ?? (entry.enemy.rematchOf ? data.lore[entry.enemy.rematchOf] : undefined) ?? [];
 }
 
-/** Stats, Info, then one page per lore page. */
-export const pageCount = (entry: BestiaryEntry, data: BestiaryData): number => 2 + lorePages(entry, data).length;
+/** The entry's own pages: Stats, Info, then one page per lore page. */
+const ownPages = (entry: BestiaryEntry, data: BestiaryData): number => 2 + lorePages(entry, data).length;
+
+/** Its own pages, then a Stats and an Info page per data form on its art (F4 on the Horizon entry, CHAOS_FIX_PLAN 3). */
+export const pageCount = (entry: BestiaryEntry, data: BestiaryData): number => ownPages(entry, data) + 2 * (entry.pages?.length ?? 0);
+
+/** The entry a panel page shows (the entry itself, or a form of its `pages`) and the page within it. */
+export function pageEntry(entry: BestiaryEntry, data: BestiaryData, page: number): { entry: BestiaryEntry; page: number } {
+  const k = page - ownPages(entry, data);
+  const form = k >= 0 ? entry.pages?.[Math.floor(k / 2)] : undefined;
+  return form ? { entry: form, page: k % 2 } : { entry, page };
+}
+
+/** A deep link's list place and page: an entry's own id, else the form page that shows it (`chaos_horizon_core`). */
+export function linkTarget(entries: readonly BestiaryEntry[], id: string, data: BestiaryData): { index: number; page: number } | null {
+  const index = entries.findIndex((e) => e.id === id);
+  if (index >= 0) return { index, page: 0 };
+  for (const [i, e] of entries.entries()) {
+    const k = e.pages?.findIndex((p) => p.id === id) ?? -1;
+    if (k >= 0) return { index: i, page: ownPages(e, data) + 2 * k };
+  }
+  return null;
+}
 
 const row = (label: string, value: string): StatLine[] =>
   wrapText(value, FULL_CHARS - LABEL_CHARS).map((l, i) => ({ left: `${(i === 0 ? label : '').padEnd(LABEL_CHARS)}${l}` }));

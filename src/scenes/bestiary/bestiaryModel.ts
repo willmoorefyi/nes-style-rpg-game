@@ -25,6 +25,8 @@ export interface BestiaryEntry {
   seen: boolean;
   boss: boolean;
   habitats: Habitat[];
+  /** The data forms after it that reuse its art (F4 on the Horizon entry): each a Stats and an Info page (bestiaryForms). */
+  pages?: BestiaryEntry[];
 }
 
 /** The game flag a battle sets for each enemy it shows. */
@@ -188,10 +190,11 @@ export function statLines(entry: BestiaryEntry, data: BestiaryData, spellName: (
   for (const [i, p] of phases.entries()) {
     const room = STAT_LINES - lines.length - 1 - (phases.length - 1 - i);
     if (room < 1) { warnOnce(`${e.id}:phases`, `Bestiary: ${e.id} has more boss phases than the panel shows`); break; }
-    // what the phase changes: its hits and attack (when overridden), then its line; "Fight xN" alone if nothing else
+    // what the phase changes: its hits and attack (when overridden), its line, the form; "Fight xN" alone if nothing else
     const changes = [...(p.hits !== undefined ? [fill(data, 'phaseHits', { hits: p.hits })] : []),
       ...(p.attack !== undefined ? [fill(data, 'phaseAttack', { attack: p.attack })] : []),
-      ...(p.message ? [fill(data, 'phaseMessage', { message: p.message })] : [])];
+      ...(p.message ? [fill(data, 'phaseMessage', { message: p.message })] : []),
+      ...(p.form ? [fill(data, 'phaseForm', { form: data.formTitles[p.form] ?? p.form })] : [])];   // C6-13
     const parts = changes.length > 0 ? changes : [fill(data, 'phaseHits', { hits })];
     lines.push(...wrapped(fill(data, 'phase', { pct: Math.round(p.hpThreshold * 100) }), parts.join(' '), room, `${e.id}:phase${i}`));
   }

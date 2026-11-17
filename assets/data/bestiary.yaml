@@ -21,7 +21,7 @@ backgrounds:
     fire_lizard: cave, fire_gigas: cave, ashen_queen: evil_temple, white_dragon: cave, winter_wolf: cave,
     mindflayer: cave, ice_gigas: cave, specter: cave, remorazz: cave, dark_wizard: cave, evil_eye: cave,
     desert_baretta: desert, sabertooth: forest, wyrm: cave, manticore: desert, dragon_zombie: abandoned_castle,
-    drowned_sovereign: ocean, warmech: abandoned_castle, hollow_seraph: temple, death_eye: temple, chaos: evil_temple,
+    drowned_sovereign: ocean, warmech: abandoned_castle, hollow_seraph: temple, death_eye: temple, chaos: rim,
     baretta: desert, basilisk: cave, allosaurus: forest, weretiger: forest, sand_worm: desert, minotaur_zombie: cave,
     king_mummy: temple, medusa: ocean, rakshasa: cave, clay_golem: cave, nightmare: dark_forest,
     sahagin_prince: ocean, deepeyes: ocean, sea_snake: ocean, sea_scorpion: shoreline, sea_troll: shoreline,
@@ -30,7 +30,9 @@ backgrounds:
     stone_golem: temple, air_elemental: temple, spirit_naga: temple, death_knight: evil_temple, earth_medusa: cave,
     black_flan: marsh, soldier: temple, vampire_lord: abandoned_castle, dark_fighter: evil_temple, rhyos: cave,
     purple_worm: cave, iron_golem: temple,
-    lich_2: evil_temple, ashen_queen_2: evil_temple, drowned_sovereign_2: evil_temple, hollow_seraph_2: evil_temple}
+    lich_2: evil_temple, ashen_queen_2: evil_temple, drowned_sovereign_2: evil_temple, hollow_seraph_2: evil_temple,
+    # pass C (CHAOS_FIX_PLAN C6-13): Chaos and its forms stand on the rim, the arena of the fight
+    chaos_orrery: rim, chaos_horizon: rim, chaos_horizon_core: rim}
 anim:
   order: [attack, hurt, cast, daze]
   firstBreak: 30
@@ -89,6 +91,7 @@ templates:                   # {name} placeholders, filled by the model
   phaseHits: "Fight x{hits}"
   phaseAttack: "Attack {attack}"
   phaseMessage: '"{message}"'
+  phaseForm: "becomes the {form}"            # a form phase: "At 70% HP becomes the Orrery"
   habitatMain: "{map}"                       # in the map's main table
   habitatZone: "{map} ({zones})"             # only in zones: "World Map (East pocket, Temple approach)"
   habitatBoss: "{map} (boss)"                # a scripted isBoss encounter
@@ -110,6 +113,8 @@ specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: 
   stinger: Poison Stinger, crack: Earthquake, thunder: Thunder Breath, poison: Poison Breath, nuclear: Nuclear,
   glare: Time Gaze, inferno: Inferno, swirl: Tsunami, tornado: Tornado, snorting: Snort, flash: Flash,
   toxic: Toxic, stone_breath: Petrifying Breath}
+# a boss form record (formOf) -> its title: sub-entry "128 Chaos (Orrery)", F4's page "128 Chaos (Core)"
+formTitles: {chaos_orrery: Orrery, chaos_horizon: Horizon, chaos_horizon_core: Core}
 lore:                        # enemy id -> pages (ASCII); a rematch shows its first battle's
   lich:
   - "Once a mortal knight-king, he swore that no enemy would ever take his people while he still stood to defend them. When famine weakened his kingdom and an invading army crossed its borders, he went down beneath his ancestral fortress to the ancient source of life buried in the earth. There he bound his crown, his bloodline and every soul sworn to his protection to a single command: his kingdom would endure."

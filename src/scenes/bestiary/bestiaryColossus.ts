@@ -57,10 +57,12 @@ export class BestiaryColossus {
     const id = enemy && colossusOf(enemy) ? this.art.entryFor(enemy) : null;
     this.art.release(this.art.loadedForms().filter((f) => f !== id));
     if (!id || !enemy) return;
-    const tex = await this.art.preview(id);
+    await this.art.ensure([]);            // the index: before it, `entryFor` names the art (F3's), not F4's own entry
+    if (token !== this.token) return;
+    const entry = this.art.entryFor(enemy) ?? id;
+    const tex = await this.art.preview(entry);
     if (token !== this.token) return;
     if (tex) { this.showStill(tex); return; }
-    const entry = this.art.entryFor(enemy) ?? id;
     await this.art.ensure([entry]);
     if (token !== this.token) return;
     const spec = this.art.isReady(entry) ? this.art.form(entry) : null;
