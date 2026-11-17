@@ -330,13 +330,13 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     pa = np.asarray(pkfs["idle"].convert("RGBA"))
     check(pmeta.get("kf_painted") == ["idle"] and tuple(pa[45, 44, :3]) == new and int((pa != idle).any(2).sum()) == 1,
           f"FW-P: load_entries paints the idle key at (44, 45) only ({pmeta.get('kf_painted')})")
-    check(all(np.array_equal(np.asarray(pkfs[k]), np.asarray(kfs[k])) for k in kfs if k != "idle"),
-          "FW-P: the other keys are the approved ones")
+    check(all(np.array_equal(np.asarray(pkfs[k]), np.asarray(kfs[k])) for k in kfs if k not in ("idle", "kneel")),
+          "FW-P: the other keys are the approved ones (pass K: the kneel key is derived from idle)")
     base, gen = MA.generate("goblin", cfg, kfs, meta), MA.generate("goblin", painted_cfg, pkfs, pmeta)
-    from_idle = [n for n in gen if gen[n]["src"] == "idle"]
+    from_idle = [n for n in gen if gen[n]["src"] in ("idle", "kneel")]   # pass K: the kneel key is cut from idle
     check(bool(from_idle) and all(not np.array_equal(gen[n]["img"], base[n]["img"]) for n in from_idle),
           f"FW-P: every frame cut from the painted key changes ({len(from_idle)} frames)")
-    check(all(np.array_equal(gen[n]["img"], base[n]["img"]) for n in gen if gen[n]["src"] != "idle"),
+    check(all(np.array_equal(gen[n]["img"], base[n]["img"]) for n in gen if n not in from_idle),
           "FW-P: every frame cut from another key is byte-identical")
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
@@ -346,7 +346,8 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     rep = MC.painted_key_checks(pmeta, {k: np.asarray(v.convert("RGBA")) for k, v in pkfs.items()}, set(pal))
     check(rep == {"kf:idle": []}, f"FW-P: the painted key passes its palette, pieces and outline checks {rep}")
     lock = MC.lock_frames(gen, pkfs, pmeta)
-    check("kf:idle" in lock and not [n for n in MC.lock_frames(base, kfs, meta) if n.startswith("kf:")],
+    check("kf:idle" in lock and not [n for n in MC.lock_frames(base, kfs, meta)
+                                     if n.startswith("kf:") and n != "kf:kneel"],   # pass K: the derived kneel key
           "FW-P: a painted key is locked as kf:idle; an unpainted sheet's lock has no kf: entry")
     from gen import anim_checks as C
     stale = {**{n: C.frame_hash(a) for n, a in lock.items()}, "kf:idle": "0" * 64}
@@ -404,7 +405,8 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
         check(_refused(lambda: MK.paint_keys("drowned_sovereign", {"kf_paint_cap": {"cast": 300}, "paint": [bad_p]}, dk),
                        "remap only"), f"FW-P: drowned_sovereign/cast is a remap only ({why} refused)")
     kf_rigs = [p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if MK.kf_patches(yaml.safe_load(p.read_text()) or {})
-               or (yaml.safe_load(p.read_text()) or {}).get("key_offset")]            # FW-O: an offset key is locked too
+               or (yaml.safe_load(p.read_text()) or {}).get("key_offset")            # FW-O: an offset key is locked too
+               or "kneel" in (yaml.safe_load(p.read_text()) or {})]                  # pass K: kf:kneel (D-K10)
     kf_locks = [p.name for p in sorted(MA.RIGS.glob("*.lock.json")) if any(k.startswith("kf:") for k in json.loads(p.read_text()))]
     check(len(list(MA.RIGS.glob("*.lock.json"))) >= 77 and kf_locks == sorted(f"{s}.lock.json" for s in kf_rigs),
           f"FW-P / FW-O: kf: lock entries exactly for the rigs with keyframe paint or key_offset (rigs {kf_rigs}, locks {kf_locks})")
