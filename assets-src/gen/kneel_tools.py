@@ -25,6 +25,7 @@ from gen.monster_recipes import KNEEL_FRAMES  # noqa: E402
 
 ANIM, RIGS, SPRITES = HERE / "anim", HERE / "anim" / "monsters", ROOT / "assets" / "sprites"
 KNEEL_LOCK = {"kf:kneel", *[n for n in KNEEL_FRAMES if n != "kneel"]}
+HERO_KNEEL_LOCK = set(KNEEL_FRAMES)  # hero locks (puppet_kneel.py) hash the four frames; no derived kf: key
 ANCHOR_KEYS = ("homeX", "idleBox", "travelTop", "lungeRight", "head", "lungePx", "opaqueRight")
 MAX_PAGES, MAX_PRELOAD = 12, 2
 
@@ -58,13 +59,14 @@ def lockdiff(base: str, relock: list[str]) -> int:
         old = json.loads(git_show(base, p) or b"{}")
         a, c, r = KC.lock_delta(old, json.loads(p.read_text()))
         sid = p.name.removesuffix(".lock.json")
-        ok_c = [n for n in c if sid in relock and n in KNEEL_LOCK]          # D-K18 step 6: a listed re-lock
+        allowed = HERO_KNEEL_LOCK if p.parent == ANIM else KNEEL_LOCK
+        ok_c = [n for n in c if sid in relock and n in allowed]          # D-K18 step 6: a listed re-lock
         c = [n for n in c if n not in ok_c]
         added, changed, removed = added + len(a), changed + len(c), removed + len(r)
         if a or c or r or ok_c:
             print(f"{sid}: +{len(a)} {a}" + (f" changed {c}" if c else "") + (f" removed {r}" if r else "")
                   + (f" relocked {ok_c}" if ok_c else ""))
-        bad += [f"{sid}: {n}" for n in c + r] + [f"{sid}: {n} is not a kneel entry" for n in a if n not in KNEEL_LOCK]
+        bad += [f"{sid}: {n}" for n in c + r] + [f"{sid}: {n} is not a kneel entry" for n in a if n not in allowed]
     print(f"{added} added, {changed} changed, {removed} removed")
     for b in bad:
         print(f"  FAIL {b}")

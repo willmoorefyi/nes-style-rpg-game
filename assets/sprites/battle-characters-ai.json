@@ -19,7 +19,11 @@
     "atk_follow",
     "cast_gather",
     "cast_rise",
-    "cast_release"
+    "cast_release",
+    "kneel_in1",
+    "kneel_in2",
+    "kneel",
+    "kneel_b"
   ],
   "sheets": {
     "black_mage": {

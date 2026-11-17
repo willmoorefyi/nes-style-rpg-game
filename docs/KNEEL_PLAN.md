@@ -718,6 +718,10 @@ Ruled: **R1 = no** (enemies never kneel at low HP), **R2 = yes** (poison kneels,
 |---|---|---|
 | 2026-11-16 | R1 | no: enemies kneel only from status (user) |
 | 2026-11-16 | R2 | yes: poison kneels, heroes and enemies; acting kneelers rise to act (user) |
+| 2026-11-17 | R3 | variant **A** for all 12 classes; B rejected for its extra hands and weapons (user) |
+| 2026-11-17 | U1 / R7 | the user handed the monster pilot and the U2 body review to the orchestrator, with a review agent; max 3 iterations per monster; report limit hits (user) |
+| 2026-11-17 | R4 / R5 / R6 | defaults: keep daze, exempt colossus F2-F4, accept pages (orchestrator, user unattended) |
+| 2026-11-17 | K1 | merged (eca44a9); atlases rebuilt: 9 pages, preload [0]; 5063 tests (the G10 floor); lockdiff accepts the hero lock names |
 
 ## TODOs
 
