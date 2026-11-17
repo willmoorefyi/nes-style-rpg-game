@@ -22,6 +22,7 @@ import numpy as np
 from PIL import Image
 
 from gen import kneel_templates as KT
+from gen.kneel_templates import _ang, _wrap, fk, targets, units  # noqa: F401  (the target math, section 4)
 from gen.monster_recipes import KNEEL_FRAMES
 
 ROTSPRITE_ABOVE = 30.0           # D-K19: a part turned more than this is sampled with rotsprite
@@ -55,113 +56,27 @@ def template_of(rig, cfg: dict) -> dict:
     return KT.template(rig.body, getattr(rig, "preset", None), block(cfg).get("variant"), cfg.get("sprite", "?"))
 
 
-# ───────── targets ─────────
-def _d(a, b) -> float:
-    return math.hypot(b[0] - a[0], b[1] - a[1])
-
-
-def _ang(a, b) -> float:
-    return math.atan2(b[1] - a[1], b[0] - a[0])
-
-
-def _wrap(a: float) -> float:
-    return (a + math.pi) % (2 * math.pi) - math.pi
-
-
-def units(S: dict) -> dict[str, float]:
-    """The template's length units, measured on the idle joints (mean of near and far where both exist)."""
-    def mean(pairs):
-        ls = [_d(S[a], S[b]) for a, b in pairs if a in S and b in S]
-        return sum(ls) / len(ls) if ls else 0.0
-    return {"L_thigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
-            "L_hindthigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
-            "L_upperfore": mean([("sh_n", "el_n"), ("sh_f", "el_f")]),
-            "L_neck": mean([("chest", "neck")]) + mean([("neck", "head")])}
-
-
-def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
-    """Forward kinematics from the idle joints: roots down by dy, each bone turned per the spec (rel / down / keep / dir)
-    or aimed at pos[j]; bone lengths from S. Angles are forward-positive degrees (mirrored for a left-facing rig)."""
-    f, pos = rig.fwd, pos or {}
-    rel, down, keep, dirs = spec.get("rel", {}), spec.get("down", {}), set(spec.get("keep", [])), spec.get("dir", {})
-    T, acc = {}, {}
-    for j in rig.order:
-        if j not in S:
-            continue
-        p = rig.parent.get(j)
-        if p is None or p not in T:
-            T[j], acc[j] = (S[j][0], S[j][1] + dy), 0.0
-            continue
-        a0 = _ang(S[p], S[j])
-        if j in pos:
-            a = _ang(T[p], pos[j])
-        elif j in dirs:
-            d = math.radians(dirs[j])
-            a = math.atan2(math.sin(d), f * math.cos(d))
-        elif j in keep:
-            a = a0
-        else:
-            a = a0 + acc[p] + f * math.radians(rel.get(j, 0.0))
-            if j in down:
-                cap = math.radians(down[j])
-                a += max(-cap, min(cap, _wrap(math.pi / 2 - a)))
-        acc[j] = _wrap(a - a0)
-        L = _d(S[p], S[j])
-        T[j] = (T[p][0] + L * math.cos(a), T[p][1] + L * math.sin(a))
-    return T
-
-
-def _heads(rig, tpl: dict) -> dict:
-    """The multihead variant: every extra neck / head copies the first one's targets."""
-    if not tpl.get("multihead"):
-        return tpl
-    t = copy.deepcopy(tpl)
-    for i in (2, 3, 4, 5):
-        if f"neck{i}" in rig.parent:
-            for key, src in (("lower", "neck"), ("rel", "snout")):
-                if src in t.get(key, {}):
-                    t[key][f"{src}{i}"] = t[key][src]
-    return t
-
-
-def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
-    """Target joints of the kneel key (before rig.solve), `lift` px raising the ground line."""
-    tpl = _heads(rig, tpl)
-    U = units(S)
-    unit, k = tpl.get("drop", ("L_thigh", 0.0))
-    dy = U[unit] * k
-    first = fk(rig, S, dy, tpl)
-    ground = max((S[f][1] for f in rig.feet if f in S), default=0.0) - lift
-    pos = {j: (first[j][0], first[j][1] + U[u] * k) for j, (u, k) in tpl.get("lower", {}).items() if j in first}
-    for j, back in tpl.get("ground", {}).items():   # on the ground line at bone length, the side nearest `back` x L
-        p = rig.parent.get(j)                        # behind the parent (the hip socket, the shoulder)
-        if j not in S or p not in first:
-            continue
-        L, h = _d(S[p], S[j]), ground - first[p][1]
-        want = first[p][0] - rig.fwd * back * L
-        if abs(h) >= L:
-            pos[j] = (first[p][0], first[p][1] + math.copysign(L, h))
-            continue
-        w = math.sqrt(L * L - h * h)
-        pos[j] = (min((first[p][0] - w, first[p][0] + w), key=lambda x: abs(x - want)), ground)
-    return fk(rig, S, dy, tpl, pos)
-
-
 def squat(rig, tpl: dict, S: dict) -> tuple[dict, list[str]]:
     """Mechanical power-down (D-K11): the deepest root drop with every foot pinned whose leg bones turn at most
-    tpl['squat'] degrees (bisection, 14 steps)."""
+    tpl['squat'] degrees (bisection, 14 steps); the head / arm droop is scaled down (1, 0.75 ... 0) until no bone of
+    the whole-pixel pose turns more than the preset's 15 deg (rounding turns a short bone a few degrees more)."""
     from gen import rig as R
     pins = [f for f in rig.feet if f in S]
     legs = [(a, b) for h, k, f in rig.limbs for a, b in ((h, k), (k, f)) if a in S and b in S]
+    bones = [(rig.parent[j], j) for j in S if rig.parent.get(j) in S]
 
-    def worst(dy: float) -> float:
-        J = R.solve(rig, S, fk(rig, S, dy, tpl), 1.0, "all", pins, 0, None, True)
-        return max((abs(math.degrees(_wrap(_ang(J[a], J[b]) - _ang(S[a], S[b])))) for a, b in legs), default=0.0)
-    lo, hi = 0.0, max(units(S).values()) or 1.0
-    for _ in range(14):
-        mid = (lo + hi) / 2
-        lo, hi = (mid, hi) if worst(mid) <= tpl["squat"] else (lo, mid)
-    return fk(rig, S, lo, tpl), pins
+    def worst(t: dict, dy: float, pairs) -> float:
+        J = R.solve(rig, S, fk(rig, S, dy, t), 1.0, "all", pins, 0, None, True)
+        return max((abs(math.degrees(_wrap(_ang(J[a], J[b]) - _ang(S[a], S[b])))) for a, b in pairs), default=0.0)
+    for k in (1.0, 0.75, 0.5, 0.25, 0.0):
+        t = {**tpl, **{key: {j: v * k for j, v in tpl.get(key, {}).items()} for key in ("rel", "down")}}
+        lo, hi = 0.0, max(units(S).values()) or 1.0
+        for _ in range(14):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if worst(t, mid, legs) <= tpl["squat"] else (lo, mid)
+        if worst(t, lo, bones) <= R.MECH_CAP:
+            break
+    return fk(rig, S, lo, t), pins
 
 
 # ───────── the derived key ─────────

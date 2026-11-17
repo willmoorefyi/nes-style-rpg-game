@@ -1,6 +1,6 @@
 """Kneel templates (docs/KNEEL_PLAN.md 4, D-K4 / D-K11 / D-K18): the joint targets of the derived `kneel` key, per body,
-preset and variant. Pure data; kneel.py turns it into target joints (forward kinematics from the idle key, bone lengths
-kept) and solves them with rig.solve.
+preset and variant, and the target math that reads it (`targets`: forward kinematics from the idle key, bone lengths
+kept; kneel.py solves the targets with rig.solve and renders the key).
 
 Lengths are in units of a measured bone of the rig's idle key (`L_thigh`, `L_hindthigh`, `L_upperfore`, `L_neck`, the
 mean of the near and far bone where there are two); angles are degrees, `+` = toward the facing (forward / down for a
@@ -26,6 +26,9 @@ never changes once a rig is locked on it.
 """
 from __future__ import annotations
 
+import copy
+import math
+
 # biped (46 rigs): far knee down, near foot planted, torso low, head bowed, weapon low; band 0.68-0.85
 BIPED = {
     "drop": ("L_thigh", 0.8),
@@ -44,7 +47,7 @@ BIPED = {
 MECHANICAL = {
     "squat": 13.0,
     "rel": {"crown": 13.0, "head": 13.0, "snout": 13.0},
-    "down": {"el_n": 13.0, "el_f": 13.0, "hand_n": 13.0, "hand_f": 13.0},
+    "down": {"el_n": 13.0, "el_f": 13.0},          # the forearms ride the upper arms (a second turn passed 15)
     "band": (0.85, 0.95),
     "limb_cap": 15.0,
 }
@@ -100,3 +103,95 @@ def template(body: str, preset: str | None = None, variant: str | None = None, s
                              f"{sorted(v for b, v in VARIANTS if b == body)} (body {body})")
         t = merge(t, VARIANTS[(body, variant)])
     return t
+
+
+# ───────── targets ─────────
+def _d(a, b) -> float:
+    return math.hypot(b[0] - a[0], b[1] - a[1])
+
+
+def _ang(a, b) -> float:
+    return math.atan2(b[1] - a[1], b[0] - a[0])
+
+
+def _wrap(a: float) -> float:
+    return (a + math.pi) % (2 * math.pi) - math.pi
+
+
+def units(S: dict) -> dict[str, float]:
+    """The template's length units, measured on the idle joints (mean of near and far where both exist)."""
+    def mean(pairs):
+        ls = [_d(S[a], S[b]) for a, b in pairs if a in S and b in S]
+        return sum(ls) / len(ls) if ls else 0.0
+    return {"L_thigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
+            "L_hindthigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
+            "L_upperfore": mean([("sh_n", "el_n"), ("sh_f", "el_f")]),
+            "L_neck": mean([("chest", "neck")]) + mean([("neck", "head")])}
+
+
+def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
+    """Forward kinematics from the idle joints: roots down by dy, each bone turned per the spec (rel / down / keep / dir)
+    or aimed at pos[j]; bone lengths from S. Angles are forward-positive degrees (mirrored for a left-facing rig)."""
+    f, pos = rig.fwd, pos or {}
+    rel, down, keep, dirs = spec.get("rel", {}), spec.get("down", {}), set(spec.get("keep", [])), spec.get("dir", {})
+    T, acc = {}, {}
+    for j in rig.order:
+        if j not in S:
+            continue
+        p = rig.parent.get(j)
+        if p is None or p not in T:
+            T[j], acc[j] = (S[j][0], S[j][1] + dy), 0.0
+            continue
+        a0 = _ang(S[p], S[j])
+        if j in pos:
+            a = _ang(T[p], pos[j])
+        elif j in dirs:
+            d = math.radians(dirs[j])
+            a = math.atan2(math.sin(d), f * math.cos(d))
+        elif j in keep:
+            a = a0
+        else:
+            a = a0 + acc[p] + f * math.radians(rel.get(j, 0.0))
+            if j in down:
+                cap = math.radians(down[j])
+                a += max(-cap, min(cap, _wrap(math.pi / 2 - a)))
+        acc[j] = _wrap(a - a0)
+        L = _d(S[p], S[j])
+        T[j] = (T[p][0] + L * math.cos(a), T[p][1] + L * math.sin(a))
+    return T
+
+
+def _heads(rig, tpl: dict) -> dict:
+    """The multihead variant: every extra neck / head copies the first one's targets."""
+    if not tpl.get("multihead"):
+        return tpl
+    t = copy.deepcopy(tpl)
+    for i in (2, 3, 4, 5):
+        if f"neck{i}" in rig.parent:
+            for key, src in (("lower", "neck"), ("rel", "snout")):
+                if src in t.get(key, {}):
+                    t[key][f"{src}{i}"] = t[key][src]
+    return t
+
+
+def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
+    """Target joints of the kneel key (before rig.solve), `lift` px raising the ground line."""
+    tpl = _heads(rig, tpl)
+    U = units(S)
+    unit, k = tpl.get("drop", ("L_thigh", 0.0))
+    dy = U[unit] * k
+    first = fk(rig, S, dy, tpl)
+    ground = max((S[f][1] for f in rig.feet if f in S), default=0.0) - lift
+    pos = {j: (first[j][0], first[j][1] + U[u] * k) for j, (u, k) in tpl.get("lower", {}).items() if j in first}
+    for j, back in tpl.get("ground", {}).items():   # on the ground line at bone length, the side nearest `back` x L
+        p = rig.parent.get(j)                        # behind the parent (the hip socket, the shoulder)
+        if j not in S or p not in first:
+            continue
+        L, h = _d(S[p], S[j]), ground - first[p][1]
+        want = first[p][0] - rig.fwd * back * L
+        if abs(h) >= L:
+            pos[j] = (first[p][0], first[p][1] + math.copysign(L, h))
+            continue
+        w = math.sqrt(L * L - h * h)
+        pos[j] = (min((first[p][0] - w, first[p][0] + w), key=lambda x: abs(x - want)), ground)
+    return fk(rig, S, dy, tpl, pos)
