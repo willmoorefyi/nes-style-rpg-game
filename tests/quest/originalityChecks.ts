@@ -29,14 +29,22 @@ export interface StairGraph {
 export function stairGraph(floors: MapData[]): StairGraph {
   const ids = new Set(floors.map((f) => f.id));
   const edges = new Set<string>();
-  for (const f of floors) for (const t of f.transitions ?? []) if (ids.has(t.targetMap) && t.targetMap !== f.id) edges.add(`${f.id}>${t.targetMap}`);
+  const ways = new Map<string, Set<string>>();       // the distinct arrival entrances of each floor-to-floor edge
+  for (const f of floors) for (const t of f.transitions ?? []) if (ids.has(t.targetMap) && t.targetMap !== f.id) {
+    edges.add(`${f.id}>${t.targetMap}`);
+    const w = ways.get(`${f.id}>${t.targetMap}`) ?? new Set<string>();
+    w.add(t.targetEntrance ?? `${t.targetX},${t.targetY}`);
+    ways.set(`${f.id}>${t.targetMap}`, w);
+  }
   const list = [...edges].map((e) => e.split('>') as [string, string]).sort();
   const oneWay = list.some(([a, b]) => !edges.has(`${b}>${a}`));
   const undirected = new Set(list.map(([a, b]) => [a, b].sort().join('|')));
   const degree = new Map<string, number>();
   for (const e of undirected) for (const f of e.split('|')) degree.set(f, (degree.get(f) ?? 0) + 1);
   // a simple chain: two-way stairs only, floors - 1 links, no floor linked to more than two others
-  const chain = !oneWay && undirected.size === floors.length - 1 && [...degree.values()].every((d) => d <= 2);
+  // twin stairs (two stairs joining the same two floors at different places) close a loop (ELF-O's keep)
+  const twin = [...ways.values()].some((w) => w.size > 1);
+  const chain = !oneWay && !twin && undirected.size === floors.length - 1 && [...degree.values()].every((d) => d <= 2);
   return { floors: floors.map((f) => f.id), edges: list, branching: !chain };
 }
 
