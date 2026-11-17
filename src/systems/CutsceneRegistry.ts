@@ -1,4 +1,4 @@
-import { CUTSCENE_STEP_TYPES, cutsceneWarp, type CutsceneScript, type CutsceneStep } from './CutsceneManager.js';
+import { CUTSCENE_STEP_TYPES, cutsceneVehicle, cutsceneWarp, type CutsceneScript, type CutsceneStep } from './CutsceneManager.js';
 import type { AssetLoader } from '../core/AssetLoader.js';
 
 /** A backdrop brightness multiplier in (0, 1] (U16). */
@@ -6,11 +6,22 @@ function validDim(dim: unknown): boolean {
   return typeof dim === 'number' && Number.isFinite(dim) && dim > 0 && dim <= 1;
 }
 
-/** Why a script can't be played (an unknown step type, a warp without a map and place, or a `dim` outside (0, 1]), or null (T2). */
+/**
+ * Why a script can't be played, or null (T2): an unknown step type, a warp without a map and place, a `dim` outside
+ * (0, 1], a give_item / take_item without an item, a set_vehicle without vehicle, map and x / y, an end_game whose
+ * `text` is not a string.
+ */
 export function scriptProblem(steps: readonly CutsceneStep[]): string | null {
   for (const [i, step] of steps.entries()) {
     if (!CUTSCENE_STEP_TYPES.includes(step?.type)) return `step ${i} has unknown type '${String(step?.type)}'`;
     if (step.type === 'warp' && !cutsceneWarp(step)) return `step ${i} is a warp without map and an entrance or x and y`;
+    if ((step.type === 'give_item' || step.type === 'take_item') && (typeof step.item !== 'string' || !step.item)) {
+      return `step ${i} is a ${step.type} without an item`;
+    }
+    if (step.type === 'set_vehicle' && !cutsceneVehicle(step)) return `step ${i} is a set_vehicle without vehicle, map, x and y`;
+    if (step.type === 'end_game' && step.text !== undefined && typeof step.text !== 'string') {
+      return `step ${i} is an end_game whose text is not a string`;
+    }
     if (step.dim !== undefined && !validDim(step.dim)) return `step ${i} has dim ${String(step.dim)}, not a number in (0, 1]`;
   }
   return null;

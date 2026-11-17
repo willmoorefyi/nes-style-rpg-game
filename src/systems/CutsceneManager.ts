@@ -1,6 +1,8 @@
 import type { GameFlags } from '../core/GameFlags.js';
 import type { Character } from '../entities/Character.js';
-import type { VehicleType } from '../types/index.js';
+import type { Inventory } from '../entities/Inventory.js';
+import type { VehicleState, VehicleType } from '../types/index.js';
+import { cantCarryText } from './pickupText.js';
 
 /** Where a `warp` step sends the party: `map` and either a named `entrance` or both `x` and `y` (T2). */
 export interface CutsceneWarp {
@@ -34,8 +36,8 @@ export interface CutsceneStep {
   vehicle?: VehicleType;
 }
 
-/** Pass W steps (QUEST 4.1; declared by W1-0a, played from W1-A / W1-B on): give_item {item}, take_item {item},
- *  set_vehicle {vehicle, map, x, y}, end_game {text?} (GAP-13). */
+/** Pass W steps (QUEST 4.1-4.2; W1-B plays them): give_item {item}, take_item {item}, set_vehicle {vehicle, map, x, y}
+ *  (through the host's `setVehicle`, W1-A's vehicle state), end_game {text?} (GAP-13: the card, then the title). */
 export type QuestStepType = 'give_item' | 'take_item' | 'set_vehicle' | 'end_game';
 const QUEST_STEP_TYPES: readonly QuestStepType[] = ['give_item', 'take_item', 'set_vehicle', 'end_game'];
 
@@ -52,6 +54,15 @@ export function cutsceneWarp(step: CutsceneStep): CutsceneWarp | null {
   if (hasCell) { warp.x = step.x; warp.y = step.y; }
   if (step.facing) warp.facing = step.facing;
   return warp;
+}
+
+const VEHICLES: readonly VehicleType[] = ['canoe', 'ship', 'airship'];
+
+/** The vehicle a `set_vehicle` step places, or null when it lacks a known vehicle, a map or an x/y pair. */
+export function cutsceneVehicle(step: CutsceneStep): VehicleState | null {
+  if (step.type !== 'set_vehicle' || !step.vehicle || !VEHICLES.includes(step.vehicle)) return null;
+  if (typeof step.map !== 'string' || !step.map || typeof step.x !== 'number' || typeof step.y !== 'number') return null;
+  return { type: step.vehicle, map: step.map, x: step.x, y: step.y };
 }
 
 /** Dependencies injected into CutsceneManager to avoid PixiJS coupling */
@@ -72,7 +83,16 @@ export interface CutsceneDeps {
    * `opts.dim` is the step's brightness multiplier in (0, 1] (U16; undefined means 1).
    */
   backdrop?: (image: string | null, opts?: { dim?: number }) => void | Promise<void>;
+  /** The bag give_item / take_item use; a host without it logs and the cutscene goes on. */
+  inventory?: Pick<Inventory, 'add' | 'remove' | 'canAdd'>;
+  /** set_vehicle: park a vehicle (W1-A's vehicle state); a host without it logs and the cutscene goes on. */
+  setVehicle?: (vehicle: VehicleState) => void;
+  /** end_game, after its card was confirmed: leave for the title (no save). A host without it logs. */
+  endGame?: () => void | Promise<void>;
 }
+
+/** The end card end_game shows when its step has no `text`. */
+export const END_GAME_TEXT = 'The End';
 
 /** The step types CutsceneManager plays. */
 export const CUTSCENE_STEP_TYPES: readonly CutsceneStep['type'][] =
@@ -91,10 +111,11 @@ export class CutsceneManager {
     this.deps = deps;
   }
 
-  /** Execute a cutscene script sequentially */
+  /** Execute a cutscene script sequentially; end_game ends it (the steps after it never play). */
   async play(script: CutsceneScript): Promise<void> {
     for (const step of script) {
       await this.executeStep(step);
+      if (step.type === 'end_game') return;
     }
   }
 
@@ -150,8 +171,19 @@ export class CutsceneManager {
         }
         break;
 
-      case 'give_item': case 'take_item': case 'set_vehicle': case 'end_game':
-        console.error(`Cutscene step ${step.type} is declared but not played yet (W1-A / W1-B)`);
+      case 'give_item': case 'take_item':
+        await this.itemStep(step);
+        break;
+
+      case 'set_vehicle':
+        this.setVehicle(step);
+        break;
+
+      case 'end_game':
+        // GAP-13: the end card waits for confirm, then the title; nothing is saved
+        await this.deps.showDialog(step.text ?? END_GAME_TEXT);
+        if (this.deps.endGame) await this.deps.endGame();
+        else console.error('Cutscene end_game: this host cannot return to the title');
         break;
 
       default:
@@ -170,6 +202,27 @@ export class CutsceneManager {
       return;
     }
     await this.deps.warp(warp);
+  }
+
+  /** give_item adds one `item` (a full bag says so and keeps nothing); take_item removes one. */
+  private async itemStep(step: CutsceneStep): Promise<void> {
+    const inv = this.deps.inventory;
+    const item = step.item;
+    if (!item) { console.error(`Cutscene ${step.type} step needs an item:`, step); return; }
+    if (!inv) { console.error(`Cutscene ${step.type} ${item} skipped: this host has no inventory`); return; }
+    if (step.type === 'take_item') {
+      if (!inv.remove(item, 1)) console.error(`Cutscene take_item: the party holds no ${item}`);
+      return;
+    }
+    if (inv.canAdd(item)) inv.add(item, 1);
+    else await this.deps.showDialog(cantCarryText(item));
+  }
+
+  private setVehicle(step: CutsceneStep): void {
+    const v = cutsceneVehicle(step);
+    if (!v) { console.error('Cutscene set_vehicle step needs vehicle, map, x and y:', step); return; }
+    if (!this.deps.setVehicle) { console.error(`Cutscene set_vehicle ${v.type} skipped: this host has no vehicles`); return; }
+    this.deps.setVehicle(v);
   }
 
   private wait(ms: number): Promise<void> {

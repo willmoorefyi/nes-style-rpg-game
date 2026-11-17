@@ -1,6 +1,14 @@
 import type { EventBus } from '../core/EventBus.js';
-import type { EncounterRate, EncounterEntry, EncounterZone } from '../types/index.js';
+import type { EncounterRate, EncounterEntry, EncounterZone, FieldMode } from '../types/index.js';
 import { EncounterTable } from './EncounterTable.js';
+
+/** The modes a zone (or the map's own table) applies to when it names none (QUEST 3.4: walking and canoe). */
+export const DEFAULT_ZONE_MODES: readonly FieldMode[] = ['walking', 'canoe'];
+
+/** Whether a zone's table applies to a party in `mode` (`EncounterZone.modes`, GAP-6). */
+export function zoneAppliesTo(zone: Pick<EncounterZone, 'modes'>, mode: FieldMode): boolean {
+  return (zone.modes ?? DEFAULT_ZONE_MODES).includes(mode);
+}
 
 interface ZoneTable { zone: EncounterZone; table: EncounterTable }
 
@@ -18,6 +26,8 @@ export class EncounterSystem {
   private rateSet = false;
   /** Tiles where a step is not a step (warps, gates, scripted battles): no countdown and no battle there. */
   private stepFilter: ((x: number, y: number) => boolean) | null = null;
+  /** The party's field mode: zones apply by their `modes`; the map's own table on foot and by canoe. */
+  private mode: FieldMode = 'walking';
 
   constructor(events: EventBus, rng: () => number = Math.random) {
     this.events = events;
@@ -64,7 +74,12 @@ export class EncounterSystem {
     });
   }
 
-  /** The zone containing (x, y), or null for the map's own table. */
+  /** The party's field mode now (the exploration scene sets it every frame, beside the rate multiplier). */
+  setMode(mode: FieldMode): void {
+    this.mode = mode;
+  }
+
+  /** The zone containing (x, y) for the current mode, or null for the map's own table. */
   zoneAt(x: number, y: number): EncounterZone | null {
     return this.zoneTableAt(x, y)?.zone ?? null;
   }
@@ -88,9 +103,10 @@ export class EncounterSystem {
 
   private handleMove = (pos: { x: number; y: number }): void => {
     const zone = this.zoneTableAt(pos.x, pos.y);
-    const table = zone?.table ?? this.table;
+    // outside every zone of this mode: the map's own table, which only applies on foot and by canoe
+    const table = zone?.table ?? (DEFAULT_ZONE_MODES.includes(this.mode) ? this.table : null);
     // no table where the player stands (a map or zone without encounters): steps don't count there
-    if (table.isEmpty) return;
+    if (!table || table.isEmpty) return;
     if (this.stepFilter && !this.stepFilter(pos.x, pos.y)) return;
     // Rate multiplier of 0 means no encounters
     if (this.rateMultiplier <= 0) return;
@@ -106,6 +122,7 @@ export class EncounterSystem {
 
   private zoneTableAt(x: number, y: number): ZoneTable | null {
     for (const zt of this.zones) {
+      if (!zoneAppliesTo(zt.zone, this.mode)) continue;
       if (zt.zone.rects.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1)) return zt;
     }
     return null;

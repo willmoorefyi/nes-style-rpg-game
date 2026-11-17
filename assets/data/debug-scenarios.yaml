@@ -1326,6 +1326,19 @@
 # === W1-A (pass W: owned by W1-A) ===
 # === end W1-A ===
 # === W1-B (pass W: owned by W1-B) ===
+# The field rules fixture (assets/maps/test-field-rules.yaml): the clinic revives WHM (fallen, level 6: 60 G), the
+# tinted trader sells a bottle for 100 G and lays the plank over the channel (a patch), row 6 is an ember hazard.
+- id: w1b_field_rules
+  name: W1-B - clinic, takeGold trade, patch and hazard
+  mode: field
+  map: test-field-rules
+  entrance: start
+  party:
+    - { class: warrior, name: WAR, level: 6, equipment: [rapier, leather_armor], spells: [] }
+    - { class: white_mage, name: WHM, level: 6, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 0 }
+  items: { potion: 2 }
+  gold: 500
+  enemies: []
 # === end W1-B ===
 # === A1-O (pass W: owned by A1-O) ===
 # === end A1-O ===

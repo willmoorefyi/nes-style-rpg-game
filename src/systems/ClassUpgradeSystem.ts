@@ -1,6 +1,5 @@
 import type { Character } from '../entities/Character.js';
 import type { GameFlags } from '../core/GameFlags.js';
-import { STORY_FLAGS } from '../core/GameFlags.js';
 import type { CharacterClassData } from '../types/index.js';
 
 /** Base class → upgraded class mapping (FF1 class upgrades) */
@@ -16,9 +15,12 @@ export const CLASS_UPGRADES: Record<string, string> = {
 /** Set of upgraded class IDs for quick lookup */
 const UPGRADED_CLASSES = new Set(Object.values(CLASS_UPGRADES));
 
-/** Check if a character is eligible for class upgrade */
-export function canUpgrade(character: Character, flags: GameFlags): boolean {
-  if (!flags.has(STORY_FLAGS.EARTH_CRYSTAL_LIT)) return false;
+/**
+ * Check if a character is eligible for class upgrade: a base class, and the upgrading NPC's `actionFlag` set (GAP-8:
+ * the flag is data, e.g. the Ordeal's seal; an NPC without one upgrades at once).
+ */
+export function canUpgrade(character: Character, flags: GameFlags, actionFlag?: string): boolean {
+  if (actionFlag !== undefined && !flags.has(actionFlag)) return false;
   const classId = character.classData.id;
   return classId in CLASS_UPGRADES && !UPGRADED_CLASSES.has(classId);
 }
@@ -36,15 +38,16 @@ export function performUpgrade(
   return newClass.name;
 }
 
-/** Upgrade all eligible party members. Returns a message per upgraded character. */
+/** Upgrade all eligible party members (see canUpgrade for `actionFlag`). Returns a message per upgraded character. */
 export function upgradeParty(
   party: Character[],
   flags: GameFlags,
   classRegistry: Map<string, CharacterClassData>,
+  actionFlag?: string,
 ): string[] {
   const messages: string[] = [];
   for (const member of party) {
-    if (canUpgrade(member, flags)) {
+    if (canUpgrade(member, flags, actionFlag)) {
       const oldName = member.classData.name;
       const newName = performUpgrade(member, classRegistry);
       if (newName) {

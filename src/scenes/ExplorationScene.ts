@@ -29,6 +29,7 @@ import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { inspectAt } from './exploration/FieldInspect.js';
 import { FieldVehicles, fieldModeOf } from './exploration/FieldVehicles.js';
 import { FieldNpcActions } from './exploration/FieldNpcActions.js';
+import { hazardStep } from './exploration/FieldHazard.js';
 import { playFieldCutscene, npcsToRemove } from './exploration/ExplorationCutscenes.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
@@ -208,6 +209,7 @@ export class ExplorationScene implements Scene {
         onFlagSet: () => this.refreshNpcPresence(),
         warp: (w) => this.fieldTransition.warp(w),
         onHeal: () => this.game.events.emit('partyHealed', {}),
+        inventory: this.game.inventory, endGame: () => this.game.scenes.switchTo('title'), // W1-B (GAP-13)
       });
     } finally {
       this.cutsceneRunning = false;
@@ -347,6 +349,7 @@ export class ExplorationScene implements Scene {
 
     // Sync encounter rate multiplier from movement mode
     this.encounterSystem.setRateMultiplier(this.player.encounterRateMultiplier);
+    this.encounterSystem.setMode(fieldModeOf(this.player.currentMode)); // zone `modes` (W1-B)
     // Check vehicle boarding on confirm key (when not moving)
     if (this.vehicles.tryBoard(this.player)) return;
 
@@ -386,6 +389,7 @@ export class ExplorationScene implements Scene {
         if (step.message !== undefined) this.dialogManager.start([step.message]);
         return;
       }
+      if (step.hazard) hazardStep(this.container, this.game.party.all, step.hazard); // lava, peat (W1-B)
       if (step.transition) {
         this.fieldTransition.run(step.transition).catch((e) => console.error('Map transition failed:', e));
         return;

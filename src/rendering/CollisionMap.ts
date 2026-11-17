@@ -1,29 +1,37 @@
 import type { MapData } from '../types/index.js';
 import { TerrainType } from '../types/index.js';
 import type { MovementMode } from '../entities/MovementMode.js';
+import { baseTerrain, patchedTerrain } from '../systems/fieldRules.js';
 
 export class CollisionMap {
   private collision: number[];
   private width: number;
   private height: number;
+  private readonly map: MapData;
 
-  constructor(mapData: MapData) {
+  /**
+   * `hasFlag` reads the live story flags: a map patch (GAP-2: the north bridge, the canal) overrides its cells'
+   * terrain while its flag is set (fieldRules.patchedTerrain). Without it no patch applies.
+   */
+  constructor(mapData: MapData, private readonly hasFlag?: (flag: string) => boolean) {
+    this.map = mapData;
     this.collision = mapData.collision;
     this.width = mapData.width;
     this.height = mapData.height;
   }
 
-  /** Get the terrain type at the given tile coordinates */
+  /** The flags the map's patches name that are set now (only these can change a cell). */
+  private patchFlags(): ReadonlySet<string> {
+    const set = new Set<string>();
+    if (!this.hasFlag) return set;
+    for (const p of this.map.patches ?? []) if (this.hasFlag(p.flag)) set.add(p.flag);
+    return set;
+  }
+
+  /** Get the terrain type at the given tile coordinates (after the patches whose flag is set; unknown values: Wall) */
   getTerrainType(tileX: number, tileY: number): TerrainType {
-    if (tileX < 0 || tileX >= this.width || tileY < 0 || tileY >= this.height) {
-      return TerrainType.Wall;
-    }
-    const index = tileY * this.width + tileX;
-    const value = this.collision[index];
-    // Values map directly to TerrainType enum (0=Grass, 1=Wall, etc.)
-    // Unknown values treated as Wall for safety
-    if (value >= 0 && value <= 9) return value as TerrainType;
-    return TerrainType.Wall;
+    if (!this.map.patches?.length) return baseTerrain(this.map, tileX, tileY);
+    return patchedTerrain(this.map, tileX, tileY, this.patchFlags());
   }
 
   /**

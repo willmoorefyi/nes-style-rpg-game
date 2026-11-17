@@ -50,7 +50,7 @@ export class MapLoader {
   async loadMap(mapId: string, hasFlag?: (flag: string) => boolean): Promise<MapLoadResult> {
     const loaded = await this.dataLoader.loadMap(await this.mapPath(mapId));
     const mapData = hasFlag ? { ...loaded, npcs: loaded.npcs.filter((n) => npcPresent(n, hasFlag)) } : loaded;
-    const collisionMap = new CollisionMap(mapData);
+    const collisionMap = new CollisionMap(mapData, hasFlag); // live flags: patches (GAP-2, W1-B)
     const tilemap: MapRenderer = mapData.art
       ? new BakedMapRenderer(mapData, await this.loadTextures(mapData.art))
       : new TilemapRenderer(mapData, null, 16, this.placeholders);

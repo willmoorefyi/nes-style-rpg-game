@@ -3,7 +3,8 @@ import { BattleTrigger, type BattleEndData } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { applyDebugParty, isStatus, type DebugMember } from './debugParty.js';
-import type { FieldMode, VehicleState } from '../types/index.js';
+import type { FieldMode, MapData, VehicleState } from '../types/index.js';
+import { fieldMapLoader } from './fieldTravel.js';
 
 export interface DebugScenario {
   id: string;
@@ -69,6 +70,20 @@ export function enemyHpOf(scenario: Pick<DebugScenario, 'id' | 'enemies' | 'enem
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+/** The origin of a map's act-1 frame (`world.frames.a1.origin`, GAP-17), or [0, 0] on the act-1 map itself. */
+export function a1Origin(map: Pick<MapData, 'world'>): [number, number] {
+  const o = map.world?.frames.a1?.origin;
+  return o ? [o[0], o[1]] : [0, 0];
+}
+
+/** A scenario's spawn cell on `map`: a `frame: a1` spawn is an act-1 cell, moved by the map's a1 origin (GAP-18). */
+export function scenarioSpawn(scenario: Pick<DebugScenario, 'spawn' | 'frame'>, map: Pick<MapData, 'world'>): [number, number] {
+  const [x, y] = scenario.spawn ?? [0, 0];
+  if (scenario.frame !== 'a1') return [x, y];
+  const [ox, oy] = a1Origin(map);
+  return [x + ox, y + oy];
+}
+
 export class DebugScenarioLoader {
   private game: Game;
 
@@ -93,8 +108,22 @@ export class DebugScenarioLoader {
     this.applyParty(scenario);
     this.game.currentMapId = scenario.map;
     this.game.pendingEntrance = scenario.entrance ?? null;
-    if (scenario.spawn) this.game.playerPosition = { x: scenario.spawn[0], y: scenario.spawn[1] };
+    if (scenario.spawn) {
+      const [x, y] = scenario.frame ? await this.framedSpawn(scenario) : scenario.spawn;
+      this.game.playerPosition = { x, y };
+    }
     this.game.scenes.switchTo('exploration');
+  }
+
+  /** A `frame: a1` spawn on the map the field will load (GAP-18); a map that fails to load keeps the raw cell. */
+  private async framedSpawn(scenario: DebugScenario): Promise<[number, number]> {
+    try {
+      const map = await fieldMapLoader(this.game.data)(scenario.map ?? '');
+      return scenarioSpawn(scenario, map);
+    } catch (e) {
+      console.error(`Debug scenario ${scenario.id}: could not read ${scenario.map}'s world frame`, e);
+      return scenario.spawn ?? [0, 0];
+    }
   }
 
   async applyAndBattle(scenario: DebugScenario): Promise<void> {

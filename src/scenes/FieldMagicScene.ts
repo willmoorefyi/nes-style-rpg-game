@@ -7,7 +7,8 @@ import { Menu, type MenuItem } from '../ui/Menu.js';
 import { SpellRegistry } from '../data/SpellRegistry.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import { HelpWindow, HELP_RECT } from '../ui/HelpWindow.js';
-import { castFieldSpell, isFallen, isFieldSpell } from '../systems/FieldSpellEffects.js';
+import { castFieldSpell, isFallen, isFieldSpell, isTravelSpell, type FieldTravelEffect } from '../systems/FieldSpellEffects.js';
+import { fieldMapLoader, travelTarget, travelTo } from '../systems/fieldTravel.js';
 import { GAME_WIDTH, SCREEN_MARGIN, FONT_SIZE } from '../core/LayoutConstants.js';
 import { initialTargetIndex } from '../entities/partyTargets.js';
 import { targetRows } from '../ui/partyTargetLabel.js';
@@ -20,7 +21,7 @@ const SPELL_CURES: Readonly<Record<string, StatusEffect>> = { cure_poison: 'pois
 
 /** Where a field spell's target cursor starts (U8): CURE on the most hurt, LIFE on the fallen, PURE on the poisoned. */
 export function spellTargetIndex(party: readonly Character[], spell: SpellData): number {
-  if (spell.effect === 'heal') return initialTargetIndex(party, 'heal');
+  if (spell.effect === 'heal' || spell.effect === 'heal_full') return initialTargetIndex(party, 'heal');
   if (spell.effect === 'revive') return initialTargetIndex(party, 'revive');
   const status = SPELL_CURES[spell.effect];
   return initialTargetIndex(party, status ? 'cure_status' : 'other', status);
@@ -41,6 +42,8 @@ export class FieldMagicScene implements Scene {
   private selectedCasterIdx = 0;
   private spells: FieldSpell[] = [];
   private selected: FieldSpell | null = null;
+  /** A travel spell is looking up its target or moving the party: no input meanwhile. */
+  private travelling = false;
 
   constructor(game: Game) {
     this.game = game;
@@ -67,6 +70,7 @@ export class FieldMagicScene implements Scene {
   get helpText(): string { return this.help.visible ? this.help.text : ''; }
 
   enter(): void {
+    this.travelling = false;
     this.phase = 'selectCaster';
     this.spellWindow.visible = false;
     this.targetWindow.visible = false;
@@ -144,6 +148,10 @@ export class FieldMagicScene implements Scene {
   private onSpellSelect(i: number): void {
     this.selected = this.spells[i] ?? null;
     if (!this.selected) return;
+    if (isTravelSpell(this.selected.spell)) {
+      this.castTravel(this.selected);
+      return;
+    }
     if (this.selected.spell.targeting === 'all_allies') {
       // party-wide spells need no target pick
       this.cast([...this.game.party.all]);
@@ -203,7 +211,31 @@ export class FieldMagicScene implements Scene {
     this.buildPartyMenu();
   }
 
+  /** EXIT / WARP (W1-B): where it leads from here, then the party goes there; "No effect." spends no charge. */
+  private castTravel({ spell, level }: FieldSpell): void {
+    const caster = this.game.party.get(this.selectedCasterIdx);
+    if (!caster) return;
+    if (!caster.hasCharges(level)) { this.showMessage('No charges left.'); return; }
+    this.travelling = true;
+    travelTarget(spell.effect as FieldTravelEffect, this.game.currentMapId, fieldMapLoader(this.game.data))
+      .then((target) => {
+        if (!target) {
+          this.travelling = false;
+          this.showMessage('No effect.');
+          return undefined;
+        }
+        if (!caster.useCharge(level)) console.error(`FieldMagicScene: ${caster.name} had no charge for ${spell.id}`);
+        return travelTo(this.game, target);
+      })
+      .catch((e) => {
+        this.travelling = false;
+        console.error(`Travel spell ${spell.id} failed:`, e);
+        this.showMessage('No effect.');
+      });
+  }
+
   update(_dt: number): void {
+    if (this.travelling) return;
     if (this.phase === 'selectCaster') this.partyMenu.update(this.game.input);
     else if (this.phase === 'selectSpell' && this.spellMenu) {
       const prev = this.spellMenu.selectedIndex;
