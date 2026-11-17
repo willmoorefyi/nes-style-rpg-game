@@ -28,7 +28,9 @@ describe('ERT-O: the stage walks', () => {
       expect(closure(ctx).view(ctx.start.place).flags.has(grant), `${id} with ${item}`).toBe(true);
       const items = new Set([...ctx.start.items].filter((i) => i !== item));
       const bare = createQuestContext(world, { stage: id });
-      const sat = closure({ ...bare, start: { ...bare.start, items } });
+      // ELF-T: the TNT came out of the Elfheim vault (S9), so its chest is already open; else the closure re-opens it
+      const flags = new Set([...bare.start.flags, 'CHEST_ELF_T_TNT']);
+      const sat = closure({ ...bare, start: { ...bare.start, items, flags } });
       expect(sat.view(bare.start.place).flags.has(grant), `${id} without ${item}`).toBe(false);
     }
   });

@@ -1504,6 +1504,63 @@
   enemies: [astos, gargoyle, gargoyle, gargoyle]
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
+# S4 (docs/WORLD_PLAN.md 5.3, 6.5): the party on the quay road at Pravoka (a1_pravoka) with the brig at its dock, the
+# band-low level 5, the previous band's kit (B2, w_pravoka) and the S0-S2 flags. S8 and S9 start at Elfheim's land
+# gate (elf_elfheim) with the brig at elf_port, the band-low level 10 and the B3 kit: S8 with Matoya's herb and the
+# S0-S7 flags, S9 with the Mystic Key and PRINCE_AWAKE.
+- id: w_s4_start
+  name: W ELF-T - S4 start at Pravoka's quay (sail to Elfheim)
+  mode: field
+  map: overworld
+  entrance: a1_pravoka
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED]
+  vehicles:
+    - { type: ship, map: overworld, x: 132, y: 102 }
+  party:
+    - { class: warrior, name: WAR, level: 5, equipment: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 5, equipment: [short_sword, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 5, equipment: [hammer, robe, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }] }
+    - { class: black_mage, name: BLM, level: 5, equipment: [staff, robe, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }] }
+  items: { lute: 1, potion: 5 }
+  gold: 1500
+  enemies: []
+- id: w_s8_start
+  name: W ELF-T - S8 start at Elfheim's gate (Matoya's herb held)
+  mode: field
+  map: overworld
+  entrance: elf_elfheim
+  flags: &elf_t_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+                       MARSH_GUARD_DEFEATED, ASTOS_DEFEATED]
+  vehicles: &elf_t_ship
+    - { type: ship, map: overworld, x: 84, y: 147 }
+  party: &elf_t_party
+    - { class: warrior, name: WAR, level: 10, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 10
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 10
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { lute: 1, herb: 1, potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
+- id: w_s9_start
+  name: W ELF-T - S9 start at Elfheim's gate (the Mystic Key held)
+  mode: field
+  map: overworld
+  entrance: elf_elfheim
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+          MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE]
+  vehicles: *elf_t_ship
+  party: *elf_t_party
+  items: { lute: 1, mystic_key: 1, potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
 # S5 (docs/WORLD_PLAN.md 5.3, 6.5): the party at the Marsh Cave's mouth in the fens (overworld `elf_marsh`) with the

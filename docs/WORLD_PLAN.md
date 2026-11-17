@@ -2850,6 +2850,119 @@ ends (two niches, the antechamber); the boss on 2F north-east of the arrival.
 is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the keep.
 <!-- === end ELF-O === -->
 <!-- === ELF-T ELF (pass W: owned by ELF-T) === -->
+### ELF-T result: Elfheim, the prince and the vault (branch `w-elf-t` from `mainline` 3a549665, merged with `mainline` 4015c773 after ORD-O and A1-T)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-elf-t/`.
+
+**Files:**
+
+- `layouts/elf/town_elfheim.py` writes `elfheim` (52x50, kits town + castle). The plan:
+  - a ring of living hedges (every cell outside the ring polygon is a `hedge` deco, round bushes on its bastion bends)
+    with one south gate; the high street (x 25-26) runs from the gate to the castle door on the rise;
+  - a spring pool under the rise (north-west) feeds a stream through the middle of the town to a lily pond in the
+    south-east; the high street and two lanes cross it by bridges;
+  - north, west, south, magic and east lanes; a herb garden by the herbalist's; oaks and firs among green-roofed
+    houses (the `elf` roof style); an inner hedge with topiary guards between the town and the wooded rise;
+  - the castle front (a facade, `name: north_gate`) whose door leads to `elfheim-castle:gate`; a signpost inspect cell;
+  - 11 `type: house` objects (6 homes, 5 shops) plus the `inn` prefab.
+- `layouts/elf/town_elfheim_people.py`: the 19 outdoor townsfolk (`talk()`: PRINCE_AWAKE, `item:herb`,
+  `item:crystal_eye`, ASTOS_DEFEATED, MARSH_GUARD_DEFEATED, then the default); `elfheim_matoya_hint` names Matoya,
+  `elfheim_marsh_hint` the Marsh Cave; a dwarf peddler points at Nerrick and the vault's powder (S10).
+- `layouts/elf/town_elfheim_rooms.py` is the runner for the rooms: `town_elfheim_homes.py` (herbalist, bowyer,
+  scribe, healer = the clinic, `clinicPrice: 20`, bard, warden), `town_elfheim_shops.py` (the five shops and the inn,
+  each keeper boxed behind a counter; greetings change on PRINCE_AWAKE) and `town_elfheim_castle.py`:
+  - `elfheim-castle` (26x20): the hall, the prince's empty throne, the stair up to the chamber (north-west), the stair
+    down to the vault (south-east) behind two `keyItemGates` cells (`requiredItem: mystic_key`, permanent,
+    ELF_T_VAULT_OPEN; the message is conditional on PRINCE_AWAKE);
+  - `elfheim-castle-chamber` (14x10): `elfheim_prince` (`requiredItem: herb`, `hideIf: PRINCE_AWAKE`, cutscene
+    `elf_prince_wakes` with `onceFlag: PRINCE_AWAKE`) and, on the same cell, `elfheim_prince_awake`
+    (`showIf: PRINCE_AWAKE`);
+  - `elfheim-vault` (12x10): `tnt` (CHEST_ELF_T_TNT), `ether` and `phoenix_down` (CHEST_ELF_T_ETHER, _PHOENIX).
+- `layouts/elf/town_elfheim_site.py` is **unchanged**, so no world regeneration is needed.
+- Data:
+  - `cutscenes.yaml` (ELF-T anchor): `elf_prince_wakes` (the herb taken; over a fade, PRINCE_AWAKE, `give_item
+    mystic_key` and a `warp` into the chamber, so the woken prince appears; then his lines);
+  - `quest.yaml` (ELF-T anchors): S4, S8 and S9 `built`, with their walks and entries; INT-W2a's GT-5 entry is kept;
+    the town `elfheim` is `built`;
+  - `debug-scenarios.yaml` (ELF-T anchor): `w_s4_start` (Pravoka's quay, the brig at its dock, level 5, B2 kit),
+    `w_s8_start` (Elfheim's gate, the brig at `elf_port`, level 10, B3 kit, the herb), `w_s9_start` (the same with
+    the Mystic Key and PRINCE_AWAKE). There is no `w_boss_*`: the three stages have no boss;
+  - `shops.yaml`: W1-F's `elfheim_*` records are kept unchanged (B3 stock, inn 100).
+- Tests: `tests/quest/elf/elf_t_town.test.ts` (12 tests: the canon links both ways, the south gate, EXIT-safe maps,
+  the prince's trade and cutscene, the living gate, the vault chests, the hints, 12 or more reactive people, the clinic
+  and inn prices, ELF-T's flag prefixes, the site file) and `tests/quest/elf/elf_t_walk.test.ts` (5 tests: the three
+  walks and (a)-(c) in assume mode, PRINCE_AWAKE only with the herb, the TNT only with the key, the town entry).
+
+**Stage design.** S4: walk `overworld:board:ship`, `overworld:dock:elf_port`, `overworld:warp:elfheim`, from the
+`a1_pravoka` land cell with the brig at its dock. S8: walk `elfheim-castle-chamber:npc:elfheim_prince` (Matoya's
+pattern: `requiredItem` plus a cutscene that takes and gives). S9: walk `elfheim-vault:chest:tnt`. The gate step is
+not in S9's walk: the gate lies on S8's map, so the replay settles it before the walk starts. S8 and S9 start at
+`elf_elfheim` with the brig at `elf_port`. Without the ship in the entry, Pravoka is out of reach from Elfland, and
+(e) reported `SHOPLESS pravoka`.
+
+**Town standard (G15):** `elfheim: houses 11/9 interiors 6/6 outdoor 19/16 interior 13/12 hints 2/2 reactive 36/4
+shops 5/5 inn 100/100 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `town_elfheim.py`, `town_elfheim_rooms.py`, `stubs.py` and `world.py` (`bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)`), then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py` for the 16 ids, one process: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`; `--check-determinism` for the 16 ids: each `<id>: deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G5 | `npm run quest -- --mutate --stage S4`: (a) OK S4, (b) OK (7 withheld runs), (c) OK (35812 states), (d) `S4 L8.0 [5,9]`, (e)-(h) OK, `mutations: OK (3 gate rows; 3 elements)`, `quest-verify: OK`. `--stage S8`: (d) `S8 L10.2 [10,13]`, `mutations: OK (1 gate rows; 1 elements)` (GT-9), OK. `--stage S9`: (d) `S9 L10.1 [10,13]`, `mutations: OK (1 gate rows; 2 elements)` (GT-10, both gate cells), OK. Full `npm run quest -- --mutate`: (a), (b) (424 runs), (c) (18094 states), (e)-(h) and `mutations: OK (45 gate rows; 58 elements)` all OK; **(d) FAIL** `BAND elfheim gold 1615 at S4 below 50 % of 12940` (BLOCKED, see below) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 323 files, 7171 passed, **2 failed**: `questLate.test.ts` (the same BAND line) and `stageEarlyShops.test.ts` (fails on `mainline` 4015c773 too) |
+| G6, G7, G12, G15 | `tests/quest/` (with `elf/elf_t_*`, `townStandard`, `designNotes`, `originality`), `assetCoverage`, `questCeilings`: 513 passed. Every ELF-T layout file is under 250 lines |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G13, G14 | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G16 | `stubs.py --check elf-t`: `stubs: 0 left for ELF-T`, exit 0 |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G10 | Port 5224, `mute=1`, my own headless Chromium (`/tmp/w-elf-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s4_start`:
+
+- Sailing: boarded the brig at (132, 102) (mode `ship`) and sailed to the `elf_port` dock (84, 147). Stepped ashore to
+  (84, 148) on foot, then entered by the overworld door (82, 151): the map is `elfheim` at its gate (25, 46).
+- In town: talked to the gate warden ("A ship out of the Aldi, and humans on it...").
+- Services: bought a Potion at the item shop (1500 -> 1440 G, potions 5 -> 6). The inn cost 1440 -> 1340 G. At the
+  clinic, BLM was felled by debug and revived for 100 G (level 5 x 20), HP 1.
+- Screenshots: `/tmp/w-elf-t/s4_dock.png`, `s4_gate.png`, `s4_talk.png`, `s4_shop.png`, `s4_inn.png`,
+  `s4_clinic.png`.
+
+G10, `w_s8_start`: gate -> `elfheim` -> north gate -> `elfheim-castle` -> the west stair -> the chamber. Talking to
+the prince with the herb played `elf_prince_wakes`. Afterwards PRINCE_AWAKE is set, `mystic_key` is 1 and `herb` is
+0. The reloaded chamber shows `elfheim_prince_awake`, the nurse and the guard. Screenshots: `s8_hall.png`,
+`s8_prince.png`, `s8_awake.png`.
+
+G10, `w_s9_start`: the hall's vault stair (20, 14) with the key: ELF_T_VAULT_OPEN is set and the map is
+`elfheim-vault`. The chest gave `tnt` 1 (CHEST_ELF_T_TNT). Screenshot: `s9_tnt.png`.
+
+**Originality:** every one of the 16 maps has its design note. The reviewer's first pass failed six notes as
+untrue: the carpets drew red, there was no hearth or chimney, a shelf was on another wall, and the town has five
+lanes, not three. A remake-like line ("a kiss would wake him") was replaced. All six were fixed: the carpets are now
+remapped green, and the notes are reworded or the layouts changed. On the re-review the castle's note needed one more
+correction (the stair stands beside the pillar, not between two), and then:
+`originality review: PASS elfheim elfheim-house-herbalist elfheim-house-bowyer elfheim-house-scribe
+elfheim-house-healer elfheim-house-bard elfheim-house-warden elfheim-weapon-shop elfheim-armor-shop elfheim-item-shop
+elfheim-white-magic elfheim-black-magic elfheim-inn elfheim-castle elfheim-castle-chamber elfheim-vault`.
+
+**Deviations / hand-offs:**
+
+- **BLOCKED (INT, kits / curve):** the full `npm run quest -- --mutate` passes every proof except (d)'s town gold rule,
+  `BAND elfheim gold 1615 at S4 below 50 % of 12940` (W1-F's `w_elfheim` 4-member price). The gold at S4's start
+  comes from S2 and S3 (A1-T, A1-O grind) and the kit is W1-F's, so none of it is ELF-T's to tune. The check counts
+  only once the town is built, so it shows up now. `tests/progression/questLate.test.ts` fails on the same line.
+- `tests/progression/stageEarlyShops.test.ts` (`SHOPLESS pravoka` from S6's entry) already fails on `mainline`
+  4015c773 with the stub Elfheim maps. It is not caused by ELF-T.
+- Shared-file edit: `tests/quest/earth/ert_o_walk.test.ts`. Its "S10 without the TNT" closure could now re-open the
+  real vault chest, so the test starts with CHEST_ELF_T_TNT set (the TNT came from the vault).
+- Two vault chest items, `ether` and `phoenix_down`, stand in for 4.2's "2 B3 chests": they are consumables, not gear.
+- The prince is a tinted `knight` standing on a carpeted bier. No field sheet lies down.
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/elf/town_elfheim.py` (Elfheim) and
+`layouts/elf/town_elfheim_rooms.py` (its 15 rooms, from `town_elfheim_{homes,shops,castle}.py`). A sleeping NPC who
+wakes on a trade is two NPCs on one cell (`hideIf` / `showIf` on the flag), plus a `warp` into the same room behind
+the cutscene's fade, so that the new NPC appears.
 <!-- === end ELF-T === -->
 <!-- === ELF-D ELF (pass W: owned by ELF-D) === -->
 ### ELF-D result: the Marsh Cave B1-B3, S5 (branch `w-elf-d` from `mainline` 3a54966)
