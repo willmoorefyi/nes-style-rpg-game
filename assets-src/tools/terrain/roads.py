@@ -23,8 +23,9 @@ OPEN_GROUND = ("grass", "sand", "forest") + ROADS     # the track may spill a fe
 DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 
-def centre_line(mat: np.ndarray) -> tuple[list[np.ndarray], list[tuple[float, float, float]]]:
-    """The road network's centre line in px: polylines (N x 2 arrays of x, y) and discs (x, y, radius)."""
+def centre_line(mat: np.ndarray) -> tuple[list[tuple[int, int, np.ndarray]], list[tuple[float, float, float]]]:
+    """The road network's centre line in px: polylines (the cell's top-left px x, y and an N x 2 array of x, y
+    relative to it, so the curve's float arithmetic is the same in every window) and discs (x, y, radius)."""
     hgt, wid = mat.shape
     road = np.isin(mat, ROADS)
     node = road | (mat == "bridge")
@@ -40,26 +41,27 @@ def centre_line(mat: np.ndarray) -> tuple[list[np.ndarray], list[tuple[float, fl
             if not road[y, x]:
                 continue
             ds = nbrs[(x, y)]
-            cx, cy = x * T + h, y * T + h
+            cx, cy = h, h                                    # relative to the cell's top-left px
+            add = lambda pts: lines.append((x * T, y * T, pts))  # noqa: E731
             mid = lambda d: np.array([cx + d[0] * h, cy + d[1] * h])  # noqa: E731
             if not ds:
-                discs.append((cx, cy, ROAD_HALF + JUNCTION))
+                discs.append((x * T + h, y * T + h, ROAD_HALF + JUNCTION))
             elif len(ds) == 1:                               # a dead end: on to the far edge (round cap at the edge)
                 d = ds[0]
                 far = np.array([cx - d[0] * (h - ROAD_HALF), cy - d[1] * (h - ROAD_HALF)])
-                lines.append(_segment(far, mid(d)))
+                add(_segment(far, mid(d)))
             elif is_l((x, y)) and not _in_block(at, x, y, ds):
                 a, b = ds
                 m1, m2 = mid(a), mid(b)
                 c = np.array([cx, cy])
                 if _stair(nbrs, is_l, (x, y), a, b):
                     c = c + STAIR_PULL * ((m1 + m2) / 2 - c)
-                lines.append(_bezier(m1, c, m2))
+                add(_bezier(m1, c, m2))
             else:                                            # straight on, a junction or a 2x2 block: spokes
                 for d in ds:
-                    lines.append(_segment(np.array([cx, cy]), mid(d)))
+                    add(_segment(np.array([cx, cy]), mid(d)))
                 if len(ds) > 2:
-                    discs.append((cx, cy, ROAD_HALF + JUNCTION))
+                    discs.append((x * T + h, y * T + h, ROAD_HALF + JUNCTION))
             if at(x + 1, y) and at(x, y + 1) and at(x + 1, y + 1):  # the middle of a 2x2 block of road cells
                 discs.append(((x + 1) * T, (y + 1) * T, h))
     return lines, discs
@@ -105,9 +107,9 @@ def paint_roads(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> No
         y0, y1 = max(0, ys.min() * T - T), min(H, (ys.max() + 2) * T)
         x0, x1 = max(0, xs.min() * T - T), min(W, (xs.max() + 2) * T)
         line = np.zeros((y1 - y0, x1 - x0), bool)
-        for pts in lines:
-            px = np.clip(np.round(pts[:, 0]).astype(int) - x0, 0, x1 - x0 - 1)
-            py = np.clip(np.round(pts[:, 1]).astype(int) - y0, 0, y1 - y0 - 1)
+        for ox, oy, pts in lines:
+            px = np.clip(np.round(pts[:, 0]).astype(int) + ox - x0, 0, x1 - x0 - 1)
+            py = np.clip(np.round(pts[:, 1]).astype(int) + oy - y0, 0, y1 - y0 - 1)
             line[py, px] = True
         d = _dist(line, reach)
         yy, xx = np.mgrid[y0:y1, x0:x1]

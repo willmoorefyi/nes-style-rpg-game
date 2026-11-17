@@ -7,9 +7,11 @@ import numpy as np
 from PIL import Image
 
 import kit as K
+from .frame import CPX, CTX, chunk_rng, lattice, tile_at
 
 T = K.T
-WILD = ["grass", "sand", "forest", "mountain", "river", "ocean", "lake"]   # organic partition; ties: earlier wins
+# organic partition; ties: earlier wins (new materials go at the end)
+WILD = ["grass", "sand", "forest", "mountain", "river", "ocean", "lake", "swamp"]
 ROADS = ("dirt", "cobble")                         # painted over the partition with a small ragged edge
 WATERS = ("river", "ocean", "lake")
 TEX = {"river": "water", "lake": "water"}          # texture of each material
@@ -65,8 +67,8 @@ def _up(cells: np.ndarray, f: int = T) -> np.ndarray:
 
 
 def _tile(tex: np.ndarray, h: int, w: int) -> np.ndarray:
-    th, tw = tex.shape[:2]
-    return np.tile(tex, (h // th + 1, w // tw + 1, 1))[:h, :w]
+    """The texture over the current frame's window (global phase, terrain.frame)."""
+    return tile_at(tex, h, w)
 
 
 def _blur(a: np.ndarray, r: int) -> np.ndarray:
@@ -82,31 +84,53 @@ def _blur(a: np.ndarray, r: int) -> np.ndarray:
 
 
 def _vnoise(h: int, w: int, cell: int, seed: int, cell_x: int | None = None) -> np.ndarray:
-    """Smooth value noise in -1..1 (smoothstep interpolation) on global pixel coordinates; `cell_x` makes it
-    anisotropic (cell px along y, cell_x px along x)."""
+    """Smooth value noise in -1..1 (smoothstep interpolation) on global pixel coordinates (the frame's window);
+    `cell_x` makes it anisotropic (cell px along y, cell_x px along x). The lattice is per chunk (terrain.frame)."""
+    return _vnoise_at(CTX.oy, CTX.ox, h, w, cell, seed, cell_x)
+
+
+def _vnoise_at(oy: int, ox: int, h: int, w: int, cell: int, seed: int, cell_x: int | None = None) -> np.ndarray:
     cy, cx = cell, cell_x or cell
-    g = np.random.default_rng(seed).random((h // cy + 3, w // cx + 3)).astype(np.float32) * 2 - 1
-    fy, fx = np.arange(h, dtype=np.float32) / cy, np.arange(w, dtype=np.float32) / cx
+    fy = np.arange(oy, oy + h, dtype=np.float32) / cy
+    fx = np.arange(ox, ox + w, dtype=np.float32) / cx
     y0, x0 = fy.astype(np.int32), fx.astype(np.int32)
+    i0, j0 = int(y0[0]), int(x0[0])
+    g = (lattice(f"vnoise{seed}:{cy}:{cx}", i0, int(y0[-1]) + 1, j0, int(x0[-1]) + 1, cy, cx)
+         .astype(np.float32) * 2 - 1)
     ty, tx = fy - y0, fx - x0
     ty, tx = (ty * ty * (3 - 2 * ty))[:, None], (tx * tx * (3 - 2 * tx))[None, :]
-    top = g[np.ix_(y0, x0)] * (1 - tx) + g[np.ix_(y0, x0 + 1)] * tx
-    bot = g[np.ix_(y0 + 1, x0)] * (1 - tx) + g[np.ix_(y0 + 1, x0 + 1)] * tx
+    ly, lx = y0 - i0, x0 - j0
+    top = g[np.ix_(ly, lx)] * (1 - tx) + g[np.ix_(ly, lx + 1)] * tx
+    bot = g[np.ix_(ly + 1, lx)] * (1 - tx) + g[np.ix_(ly + 1, lx + 1)] * tx
     return top * (1 - ty) + bot * ty
 
 
+def _knots(cell: int, lo: float, seed: int, s0: int, s1: int) -> tuple[np.ndarray, np.ndarray]:
+    """The meander's knots in strips s0..s1 of CPX px along its axis: (positions px, values). Each strip holds an
+    even number of knots, spaced 0.6-1.2 x 0.9 `cell` px and rescaled to fill the strip exactly, the first one at
+    the strip's start and positive, so the signs alternate across strips too; each strip draws from its own rng."""
+    n = 2 * max(1, round(CPX / (0.9 * cell) / 2))
+    pos, val = [], []
+    for s in range(s0, s1 + 1):
+        r = chunk_rng(f"meander{seed}:{cell}", s, -1)
+        inc = 0.6 + 0.6 * r.random(n)
+        inc *= CPX / inc.sum()
+        pos.append(s * CPX + np.concatenate([[0.0], np.cumsum(inc)[:-1]]))
+        val.append((lo + (1 - lo) * r.random(n)) * np.where(np.arange(n) % 2 == 0, 1, -1))
+    return np.concatenate(pos).astype(np.float32), np.concatenate(val).astype(np.float32)
+
+
 def _meander(h: int, w: int, cell: int, lo: float, seed: int, along_x: bool) -> np.ndarray:
-    """A wave in -1..1 along one axis whose knots alternate in sign (spaced 0.6-1.2 x `cell` px, each of size
+    """A wave in -1..1 along one axis whose knots alternate in sign (spaced about 0.6-1.2 x `cell` px, each of size
     lo..1), so any stretch of about 2 cells swings both ways, without a fixed period. The knot coordinate is shifted
-    by slow noise along the other axis, so each row has its own phase (and rows never cancel each other out)."""
+    by slow noise along the other axis, so each row has its own phase (and rows never cancel each other out). Global
+    pixel coordinates (the frame's window)."""
     n_along, n_across = (w, h) if along_x else (h, w)
-    r = np.random.default_rng(seed)
-    k = int(n_along / (0.6 * cell)) + 8
-    size = lo + (1 - lo) * r.random(k)
-    knots = (size * np.where(np.arange(k) % 2 == 0, 1, -1)).astype(np.float32)
-    pos = np.concatenate([[0.0], np.cumsum(cell * (0.6 + 0.6 * r.random(k - 1)))]).astype(np.float32)
-    phase = (_vnoise(n_across, 1, 4 * cell, seed + 1)[:, 0] * 0.5 + 0.5) * 2 * cell        # per row, 0..2 cells
-    u = np.arange(n_along, dtype=np.float32)[None, :] + phase[:, None] + 2 * cell
+    o_along, o_across = (CTX.ox, CTX.oy) if along_x else (CTX.oy, CTX.ox)
+    phase = (_vnoise_at(o_across, 0, n_across, 1, 4 * cell, seed + 1)[:, 0] * 0.5 + 0.5) * 2 * cell  # 0..2 cells
+    u = np.arange(o_along, o_along + n_along, dtype=np.float32)[None, :] + phase[:, None] + 2 * cell
+    pos, knots = _knots(cell, lo, seed, int(u.min()) // CPX, int(u.max()) // CPX + 1)
+    k = len(pos)
     i = np.clip(np.searchsorted(pos, u, side="right") - 1, 0, k - 2)
     t = np.clip((u - pos[i]) / (pos[i + 1] - pos[i]), 0, 1)
     t = t * t * (3 - 2 * t)

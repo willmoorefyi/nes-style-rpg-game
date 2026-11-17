@@ -78,7 +78,7 @@ def selftest() -> int:
             "ground": "\n".join(["......", ".≈≈≈..", ".≈≈≈≈.", "..≈≈..", "......"]), "entrances": {"a": [0, 0]}}
     c = B.compile_map(lake, kit, check_interiors=False)
     rim = _tile(kit.material("rim"), *c.below.shape[:2])
-    assert not np.all(c.below == rim, axis=2).any() and c.collision[2, 2] == B.WATER
+    assert not np.all(c.below == rim, axis=2).any() and c.collision[2, 2] == B.LAKE
     ok += 1
     ok += _road_case(B, kit)
     ok += _foothill_dark_case(kit)

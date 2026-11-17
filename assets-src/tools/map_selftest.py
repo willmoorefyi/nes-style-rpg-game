@@ -40,7 +40,7 @@ def run(B) -> int:
     def grass_map(rows, cols, **kw):
         return {"id": "t", "ground": "\n".join(["." * cols] * rows), "entrances": {"a": [0, rows - 1]}, **kw}
 
-    assert MC.BLOCKED == {B.WALL, B.WATER, B.COUNTER, B.TERRAIN["mountain"], B.TERRAIN["river"]}
+    assert MC.BLOCKED == {B.WALL, B.WATER, B.COUNTER, B.TERRAIN["mountain"], B.TERRAIN["river"], B.TERRAIN["lake"]}
     assert MC.COUNTER == B.COUNTER and MC.WALL == B.WALL
 
     # ── 1. determinism: a water cell outside the canal outline between 3 grass and 3 cobble cells
@@ -281,7 +281,7 @@ def run(B) -> int:
         except ValueError as e:
             assert "outside" in str(e)
     lake = comp({"id": "lk", "ground": "....\n.≈≈.\n....", "entrances": {"a": [0, 0]}})
-    assert lake.collision[1, 1] == B.WATER and lake.mat[1, 2] == "lake"
+    assert lake.collision[1, 1] == B.LAKE and lake.mat[1, 2] == "lake"          # pass W: Lake = 11 (blocked on foot)
     if not __import__("importlib").util.find_spec("terrain"):
         expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain/")
     ok += 2

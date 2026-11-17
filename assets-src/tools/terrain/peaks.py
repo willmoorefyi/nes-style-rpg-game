@@ -9,6 +9,7 @@ import kit as K
 from .base import (BAYER4, FOOT, FOOT_COVER, FOOT_FADE, FOOT_FLOOR, FOOT_FLOOR_R, FOOT_PATCH, FOOT_RISE, FOOT_SCALES,
                    OVERHANG, PEAK_SCALES, PEAK_SPACING, ROCK_CORE, SNOW, T, _blur, _core, _dist, _low_dist, _luma,
                    _poisson, _resized, _shade, _up, _vnoise)
+from .frame import CPX, CTX, chunk_rng, window_chunks
 from .outline import _cached_partition
 
 _VARIANTS: dict[bytes, dict[str, tuple[np.ndarray, tuple[int, int]]]] = {}   # peak art -> variants
@@ -128,7 +129,6 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
     var = variants(kit)
     hgt, wid = mat.shape
     H, W = hgt * T, wid * T
-    rng = np.random.default_rng(seed + 31)
     free = np.ones((hgt, wid), bool)
     for (x, y) in owner:
         free[y, x] = False
@@ -137,8 +137,14 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
     allowed = _dist(_up(mat == "mountain"), OVERHANG) <= OVERHANG
     depth = _low_dist(~_up(mat == "mountain"), 3 * T)              # px from the range's edge
     plan: list[tuple[float, str, int, int]] = []
-    pts = np.argwhere(mpx)
-    if len(pts):
+    # chunk by chunk (GAP-14): each chunk draws from its own rng and keeps its anchors half the widest spacing inside
+    # its border, so two chunks' peaks keep the spacing without looking at each other
+    margin = int(np.ceil(PEAK_SPACING * max(PEAK_SCALES) / 2))
+    for col, row, (ay0, ay1, ax0, ax1) in _inner_boxes(H, W, margin):
+        pts = np.argwhere(mpx[ay0:ay1, ax0:ax1]) + (ay0, ax0)
+        if not len(pts):
+            continue
+        rng = chunk_rng("peaks", col, row)
         pts = pts[rng.choice(len(pts), size=min(len(pts), max(64, len(pts) // 60)), replace=False)]
         key = depth[pts[:, 0], pts[:, 1]] + rng.random(len(pts)) * 30
         pts = pts[np.argsort(-key, kind="stable")]
@@ -151,7 +157,7 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
                 snow = s >= 1.0 and dcell >= 2 and rng.random() < 0.75
                 name = f"peak_{s}{'m' if rng.random() < 0.5 else ''}{'_snow' if snow else ''}"
                 img, (ax, ay) = var[name]
-                gy, gx = y // 40, x // 40
+                gy, gx = (y + CTX.oy) // 40, (x + CTX.ox) // 40     # global bins: the same in every window
                 near = [placed[j] for a in (-1, 0, 1) for b in (-1, 0, 1) for j in grid.get((gy + a, gx + b), [])]
                 if any((py - y) ** 2 + (px - x) ** 2 < (PEAK_SPACING * (s + ps) / 2) ** 2 for py, px, ps in near):
                     continue
@@ -161,9 +167,19 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
                 placed.append((y, x, s))
                 plan.append((y, name, x, y))
                 break
-    plan += _foothill_rocks(mat, label, names, free, var, rng, H, W)
+    plan += _foothill_rocks(mat, label, names, free, var, H, W)
     plan.sort(key=lambda p: (p[0], p[2]))
     return [(n, x, y) for _, n, x, y in plan]
+
+
+def _inner_boxes(H: int, W: int, margin: int):
+    """(col, row, box) per chunk of the window: the chunk's px (window coordinates) shrunk by `margin` on every side
+    (global chunk borders, so the same in every window), clipped to the window; empty boxes are skipped."""
+    for col, row, _ in window_chunks(H, W):
+        gy, gx = row * CPX - CTX.oy, col * CPX - CTX.ox
+        box = (max(0, gy + margin), min(H, gy + CPX - margin), max(0, gx + margin), min(W, gx + CPX - margin))
+        if box[0] < box[1] and box[2] < box[3]:
+            yield col, row, box
 
 
 def _fits(img: np.ndarray, px: int, py: int, allowed: np.ndarray) -> bool:
@@ -186,8 +202,9 @@ def _overlap(img: np.ndarray, px: int, py: int, mask: np.ndarray) -> int:
     return int(((img[y0 - py:y1 - py, x0 - px:x1 - px, 3] > 127) & mask[y0:y1, x0:x1]).sum())
 
 
-def _foothill_rocks(mat, label, names, free, var, rng, H, W) -> list[tuple[float, str, int, int]]:
-    """Small peaks (0.5-0.6x) and boulders scattered by Poisson disc on the grass of the foothills."""
+def _foothill_rocks(mat, label, names, free, var, H, W) -> list[tuple[float, str, int, int]]:
+    """Small peaks (0.5-0.6x) and boulders scattered by Poisson disc on the grass of the foothills, chunk by chunk
+    (each chunk its own rng; anchors half the spacing inside the chunk's border)."""
     grass_cells = (mat == "grass") & free
     if "grass" not in names or not grass_cells.any():
         return []
@@ -195,21 +212,23 @@ def _foothill_rocks(mat, label, names, free, var, rng, H, W) -> list[tuple[float
     core = _core(H, W)
     d = _low_dist(label == names.index("mountain"), FOOT + 8)
     zone = ok & (d >= 6) & (d <= FOOT * 0.8)
-    pts = np.argwhere(zone)
-    if not len(pts):
-        return []
-    pts = pts[rng.permutation(len(pts))[:max(32, len(pts) // 200)]]
     rocks = [n for n in var if n.startswith(("boulder_", "foot_"))]
     plan = []
-    for i in _poisson(pts, 2.2 * T, rng):
-        if rng.random() < 0.35:
+    for col, row, (ay0, ay1, ax0, ax1) in _inner_boxes(H, W, int(np.ceil(2.2 * T / 2))):
+        pts = np.argwhere(zone[ay0:ay1, ax0:ax1]) + (ay0, ax0)
+        if not len(pts):
             continue
-        y, x = pts[i]
-        name = rocks[int(rng.integers(len(rocks)))]
-        img, (ax, ay) = var[name]
-        px, py = int(x - ax), int(y - ay)
-        if _fits(img, px, py, ok) and _overlap(img, px, py, core) <= ROCK_CORE:
-            plan.append((float(y), name, int(x), int(y)))
+        rng = chunk_rng("rocks", col, row)
+        pts = pts[rng.permutation(len(pts))[:max(32, len(pts) // 200)]]
+        for i in _poisson(pts, 2.2 * T, rng):
+            if rng.random() < 0.35:
+                continue
+            y, x = pts[i]
+            name = rocks[int(rng.integers(len(rocks)))]
+            img, (ax, ay) = var[name]
+            px, py = int(x - ax), int(y - ay)
+            if _fits(img, px, py, ok) and _overlap(img, px, py, core) <= ROCK_CORE:
+                plan.append((float(y), name, int(x), int(y)))
     return plan
 
 
