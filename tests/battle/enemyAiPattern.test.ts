@@ -13,15 +13,15 @@ import { mulberry32 } from '../helpers/battlePolicies.js';
 describe('data-driven enemy ai', () => {
   it('splits the turns: Fight 1 - rate, each spell rate x its weight share; unknown spells are dropped', () => {
     const p = dataAiPattern({ rate: 0.75, actions: [{ type: 'magic', spellId: 'fir2', weight: 2 }, { type: 'magic', spellId: 'ice2', weight: 1 },
-      { type: 'magic', spellId: 'nuke', weight: 5 }] }, SPELLS)!;
+      { type: 'magic', spellId: 'no_such_spell', weight: 5 }] }, SPELLS)!;
     expect(p.actions.map((a) => [a.type, a.spellId, a.weight])).toEqual([['fight', undefined, 0.25], ['magic', 'fir2', 0.5], ['magic', 'ice2', 0.25]]);
     expect(dataAiPattern({ rate: 1, actions: [{ type: 'magic', spellId: 'fire', weight: 1 }] }, SPELLS)!.actions).toHaveLength(1);
   });
 
   it('no known spell (or rate 0): no ai, the enemy keeps the default Fight', () => {
-    expect(dataAiPattern({ rate: 0.5, actions: [{ type: 'magic', spellId: 'nuke', weight: 1 }] }, SPELLS)).toBeNull();
+    expect(dataAiPattern({ rate: 0.5, actions: [{ type: 'magic', spellId: 'no_such_spell', weight: 1 }] }, SPELLS)).toBeNull();
     expect(dataAiPattern({ rate: 0, actions: [{ type: 'magic', spellId: 'fire', weight: 1 }] }, SPELLS)).toBeNull();
-    expect(dataDrivenAI({ rate: 0.5, actions: [{ type: 'magic', spellId: 'nuke', weight: 1 }] }, SPELLS)).toBeNull();
+    expect(dataDrivenAI({ rate: 0.5, actions: [{ type: 'magic', spellId: 'no_such_spell', weight: 1 }] }, SPELLS)).toBeNull();
   });
 
   it('the lich (Rime Sovereign) casts about 75 % of its turns over its 8 spells, FAST on its own side', () => {
