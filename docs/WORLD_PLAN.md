@@ -2142,8 +2142,6 @@ per-chunk sprites, the window, the miss rule). Test: `tests/rendering/bakedStrea
   `noWanderTiles` runs before the camera is set and is unaffected.
 - The patch overlays are not counted in the 60-texture cap (a few small PNGs per map).
 <!-- === end W1-E === -->
-<!-- === end W1-E (kept: original closing anchor follows) === -->
-<!-- === end W1-E === -->
 <!-- === W1-F FOUNDATION (pass W: owned by W1-F) === -->
 ### W1-F result: items, kits, shops (branch `w-w1-f` from `mainline` f2f2383)
 
