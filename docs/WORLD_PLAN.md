@@ -1,15 +1,36 @@
-# World build-out plan (pass W), rev 1
+# World build-out plan (pass W), rev 2
 
-Status: rev 1, for the user's evaluation and then momus review. Nothing is implemented. Pass W replaces the
+Status: rev 2. It answers the momus review of rev 1 (REJECT, "close") with targeted fixes. Nothing is implemented. Pass W replaces the
 geography and the tranche split of `docs/QUEST_PLAN.md` rev 3 (pass Q). It reuses that plan's engine and toolchain
 groundwork by reference (section 1). Like pass Q, pass W starts only after the kneel pass (`docs/KNEEL_PLAN.md`,
 `docs/KNEEL_AI_PLAN.md`) has merged into `mainline` and `npm test` is green at that head. Pass W never touches the
 kneel files. Facts in 1.4 were checked at `4ade849`.
 
+**Rev 2 changes (momus review of rev 1):**
+
+| # | Finding | Resolution |
+|---|---|---|
+| 1 | P1 GT-5: Elfland is also reachable from the dwarves' landing over `seam_n` | GT-5 is non-load-bearing with that reason; the new row GT-5b removes both `elf_port` and `ert_dwarf` and must make the goal unreachable (6.3) |
+| 2 | P1 No owner for the town tooling | W1-D (now 7 h) generalises `interiors_common.py` with a `town` parameter and extracts the outdoor helpers into `layouts/town_common.py`; `cornelia.py` and the Cornelia maps stay byte-equal (G1). Both files are in 5.5 (5.2, 5.5) |
+| 3 | P1 Memory outside the lock | `--region` takes the lock (2.3, G2). Heavy-job rule: a full-world compile runs only while at most 3 other tranches are active; every worktree runs Vitest with `--maxWorkers=2` (G4). W1-C1 also measures a land-filled synthetic world. The `--region` limit is 10 GB everywhere (estimate about 8 GB) (2.3, 5.0, 5.2, G2, G4) |
+| 4 | P1 Act-1 raw spawns; jetty facts | `r_ow_temple`, `r_ow_bridge` and `r_ow_east` all get `frame: a1`. 1.4 is corrected: the jetty is on rows 54-56 and the ship spawn is (28, 57). The `aldi` seed is now the ship spawn's cell, world (92, 121). New test `tests/data/scenarioSpawns.test.ts` (W1-B) (1.4, 1.5, 2.6, 5.1) |
+| 5 | P2 Missing GT rows | GT-35 (the western range), GT-36 (the giant's cell) and GT-37 (Crescent's ring) (6.3) |
+| 6 | P2 Anchor placement | `elf_keep` (61, 126), `fir_volcano` (120, 151), `fir_ice` (135, 147), `fir_desert` (143, 160); the pair giant-sarda becomes melmond-sarda. Re-measured: s* = 0.735, ratios 0.86-1.10, 0 failures in 6000 random ±2 placements. T tranches own the anchors in their site files. The bearing difference is min(\|Δ\|, 360 - \|Δ\|). The detour hops are listed with their factors (2.2, 5.3, 6.1) |
+| 7 | P2 5.3 was backwards | the O module imports the site file; W1-0b creates every default `town_<town>_site.py`; the T tranche edits it (5.1, 5.3) |
+| 8 | P2 The W1-C1 / C2 interface | W1-0b declares the `build_hooks.py` signatures with no-op bodies; C1 calls them, C2 fills them (5.1) |
+| 9 | P2 5.0 consistency | WND-O is in the first wave (ORD-O leads the queue). The efforts are re-added (foundation 87 h, total 261 h). The wall-clock critical path is about 67 h, with 6 slots and the serial merges (5.0) |
+| 10 | P2 6.5 checkpoints | every row has its own scenario id, owned by the tranche that runs it; each negative row withholds exactly one prerequisite (6.5) |
+| 11 | P2 House counts | houses come from the source YAML's `type: house` objects; interiors are distinct door transitions to `<town>-house-*` on the compiled map (4.0.1) |
+| 12 | P2 Conflict hot spots | per-tranche comment anchors in `quest.yaml`, and around the owned boss records in `enemies.yaml`; W1-F is the only owner of every `w_*` kit (5.1, 5.4, 5.5) |
+| 13 | P2 The Mirage chime gate | moved inside `mirage-1f` (a vestibule door), so WND-D1 owns it; the matrix uses `mirage-1f:inner` (4.7, 6.2, 6.3) |
+| 14 | P2 W1-0 was over-scoped | split into W1-0a (the QUEST Q1-0 contract plus the extraction, 8 h) and W1-0b (world data, canon, stubs, sites, hooks, 6 h), in parallel (5.1) |
+| 15 | P3 Small items | the `ExplorationScene.ts` ceiling is 590 after W1-0a's extraction; each tranche stages and checks its backgrounds from `~/temp/ffgame-assets`; `stubs.py --check` always fails on a remaining stub and `--count` only counts; `?art=legacy` stays act-1 only (5.1, 5.3, 6.6, R17) |
+| 16 | P3 Cramped spots | FIRE's north-west: the volcano and ice targets moved; rows 146-147 are W_south's cliffs and both mouths open south. Pravoka: the range moves to x 138-141, and a channel test asks for at least 6 water cells between the quay and the range (2.5, 2.6, 4.1, 4.4, R23) |
+
 **Naming.**
 
 - **Stages** are S0-S31 (3.2). They replace pass Q's S0-S26 entirely, so a pass Q stage number means nothing here.
-- **Tranches** are `W1-0` (the contract), `W1-A` to `W1-I` (the foundation), the 21 region tranches `<REG>-<O|T|D>`
+- **Tranches** are `W1-0a` and `W1-0b` (the contract, together "W1-0"), `W1-A` to `W1-I` (the foundation), the 21 region tranches `<REG>-<O|T|D>`
   (O = overworld module plus small sites, T = town, D = dungeon) and `INT`, `PLAY` (5.0).
 - **Engine gaps** are GAP-n: GAP-1 to GAP-14 are pass Q's (QUEST 1.8), and GAP-15 to GAP-19 are new (1.5).
 - **Gates** are G1-G17 (section 7). Decisions are D-W1 to D-W14 (1.3). Mutation gates are GT-n (6.3).
@@ -51,8 +72,8 @@ Every coastline, landmass shape, tile position, town plan, dungeon floor, NPC li
   - a no-skip mutation suite with one named row per gate (6.3);
   - walkthroughs and browser checkpoints for every stage (6.4, 6.5);
   - a town-standard test (6.6).
-- **34 tranches** (5.0), each sized for one session of at most 8 agent-hours: W1-0, 10 foundation tranches, 21
-  region tranches, INT and PLAY. At most 6 region tranches run at once.
+- **35 tranches** (5.0), each sized for one session of at most 8 agent-hours: W1-0a, W1-0b, 10 foundation
+  tranches, 21 region tranches, INT and PLAY. At most 6 region tranches run at once.
 
 ### 0.1 Success criteria (defined before implementation)
 
@@ -70,7 +91,7 @@ Every coastline, landmass shape, tile position, town plan, dungeon floor, NPC li
     "`npm run quest -- --strict --mutate` prints `quest-verify: OK` and each proof (a)-(h) OK",
     "`(g) geography: OK` reports a fitted scale s* in [0.60, 0.80], and every pair of 2.2 is inside its band",
     "Every row of the travel matrix (6.2) holds",
-    "Every gate row GT-1 to GT-34 of 6.3 is caught by the named proof, or is listed non-load-bearing with its reason",
+    "Every gate row GT-1 to GT-37 of 6.3 is caught by the named proof, or is listed non-load-bearing with its reason",
     "Every boss of 3.7 has a seeded balance test whose bound sits 3 points from its measured value",
     "The browser checkpoints of 6.5 pass with `mute=1` on every URL"
   ],
@@ -178,14 +199,15 @@ These parts of `docs/QUEST_PLAN.md` rev 3 hold for pass W unchanged, unless 1.2 
 - **Act-1 overworld** (`overworld_consts.py`): 72x72, with a 4-6 cell ocean border.
   - Cornelia's icon is at local (26, 43), and its `cornelia` entrance (the south-gate arrival) at (28, 47).
   - The temple door is at (15, 39), the north bridge stubs in columns 29-30 (rows 29 and 32), and the jetty in column
-    28, rows 68-70.
-  - The ship spawn is (28, 71), and the canoe spawn is on the east river.
+    28, rows 54-56 (rev 1 said 68-70).
+  - The ship spawn is (28, 57) (rev 1 said (28, 71)), and the canoe spawn is (45, 50) on the east river.
   - The mainland's west coast is column 6 for rows 8-26. The sound opens west on rows 27-39. The east coast is column
     62-65 for rows 8-40.
 - **Hard-coded act-1 overworld coordinates outside the layout:**
   - `tests/data/overworldLayout.test.ts` lines 451, 498 and 516 (the cells (24, 47), (29, 32), (30, 32), (29, 33));
-  - the debug scenario `r_ow_temple` (`spawn: [15, 42]`, `assets/data/debug-scenarios.yaml:715`);
-  - all other scenarios use entrances.
+  - the debug scenarios `r_ow_temple` (`spawn: [15, 42]`, `assets/data/debug-scenarios.yaml:715`), `r_ow_bridge`
+    (`[29, 34]`, :725) and `r_ow_east` (`[48, 46]`, :735);
+  - all other `map: overworld` scenarios use entrances.
 - **Cornelia, the town standard:**
   - `cornelia.yaml` is 62x72, with 16 outdoor NPCs and 15 house objects;
   - 10 house interiors (8x8 to 14x10) hold 18 NPCs, and the 6 shop and inn maps 1 keeper each;
@@ -207,7 +229,7 @@ These parts of `docs/QUEST_PLAN.md` rev 3 hold for pass W unchanged, unless 1.2 
 | GAP-15 | NPC `takeGold: n`: the trade needs gold of at least n and takes it. Through `npcOutcome` (`take.gold`) | W1-B |
 | GAP-16 | NPC `action: clinic`, `clinicPrice: n`: it revives each fallen member to 1 HP for n x level gold, after a confirm. Through `FieldNpcActions` | W1-B |
 | GAP-17 | `MapData.world?: {frames: {a1: {origin, size}}}`, passed through to the compiled `overworld`. A version-1 save on `overworld`, loaded against a map with `world.frames.a1`, gets its position translated by the origin | W1-C2 (compiler), W1-A (save) |
-| GAP-18 | `DebugScenario.frame: a1` makes the loader translate `spawn` by `world.frames.a1.origin` when the loaded overworld has one. W1-0 adds `frame: a1` to `r_ow_temple` | W1-B |
+| GAP-18 | `DebugScenario.frame: a1` makes the loader translate `spawn` by `world.frames.a1.origin` when the loaded overworld has one. W1-0a adds `frame: a1` to `r_ow_temple`, `r_ow_bridge` and `r_ow_east`. `tests/data/scenarioSpawns.test.ts` (W1-B) asserts that every `map: overworld` scenario either uses an entrance or has `frame: a1`, and that its translated spawn is a walkable cell inside the A1 frame | W1-B |
 | GAP-19 | Region boxes made of several rectangles, edge bands and seams in `world_api`, `--region` and `--owned-chunks` | W1-C1 (rasterisation), W1-C2 (composer) |
 
 ## 2. Macro world
@@ -247,8 +269,9 @@ east is +x and south is +y.
 
 `assets/data/world-anchors.yaml` (W1-0) holds this table, and the macro test (6.1) reads it. Each anchor is a named
 entrance in the compiled `overworld`; the owning tranche creates it at its place, and the place must be within
-**±2 cells per axis** of the target. The targets satisfy every pair band below: script-checked, s* = 0.731, 0 fails,
-1.8 % failures over 2000 random ±2 placements.
+**±2 cells per axis** of the target. The targets satisfy every pair band below: script-checked, s* = 0.735, 0 fails,
+and 0 failures over 6000 random ±2 placements (3 seeds). A town's land-gate anchor is placed by its site file
+(`layouts/<region>/town_<town>_site.py`), so the T tranche owns it; every other anchor is the O tranche's.
 
 | Anchor (entrance) | Place | Region | Ref offset (classic tiles) | World target | Note |
 |---|---|---|---|---|---|
@@ -257,7 +280,7 @@ entrance in the compiled `overworld`; the owning tranche creates it at its place
 | `a1_matoya` | Matoya's cave | A1 | (-40, -36) | (74, 76) | in the act-1 Matoya rect |
 | `a1_pravoka` | Pravoka's land gate | A1 | (56, -12) | (131, 101) | in the act-1 Pravoka rect |
 | `ert_dwarf` | Dwarf hall (Mount Duergar) | EARTH | (-56, -4) | (53, 106) | on the isthmus, south of the canal |
-| `elf_keep` | Western Keep | ELF | (-48, 24) | (60, 125) | on Elfland's north arm |
+| `elf_keep` | Western Keep | ELF | (-48, 24) | (61, 126) | on Elfland's north arm |
 | `elf_elfheim` | Elfheim's land gate | ELF | (-16, 48) | (82, 150) | |
 | `elf_marsh` | Marsh Cave mouth | ELF | (-56, 76) | (53, 162) | |
 | `ert_melmond` | Melmond's land gate | EARTH | (-72, 4) | (42, 112) | |
@@ -265,9 +288,9 @@ entrance in the compiled `overworld`; the owning tranche creates it at its place
 | `ert_giant` | Giant's tunnel, east mouth | EARTH | (-92, 4) | (28, 112) | |
 | `ert_sarda` | Sarda's cave | EARTH | (-104, 0) | (19, 109) | |
 | `fir_crescent` | Crescent Lake's land gate | FIRE | (68, 20) | (148, 124) | |
-| `fir_volcano` | Gurgu Volcano mouth | FIRE | (36, 56) | (119, 148) | |
-| `fir_ice` | Ice Cavern mouth | FIRE | (44, 44) | (133, 147) | |
-| `fir_desert` | Buried hull, airship desert | FIRE | (56, 60) | (141, 158) | |
+| `fir_volcano` | Gurgu Volcano mouth | FIRE | (36, 56) | (120, 151) | its mouth opens south, off the W_south cliffs |
+| `fir_ice` | Ice Cavern mouth | FIRE | (44, 44) | (135, 147) | its mouth opens south |
+| `fir_desert` | Buried hull, airship desert | FIRE | (56, 60) | (143, 160) | |
 | `ord_citadel` | Citadel of Trials gate | ORDEAL | (-24, -116) | (75, 28) | |
 | `ord_bahamut` | Bahamut's cave | ORDEAL | (20, -80) | (106, 53) | |
 | `wat_onrac` | Onrac's land gate | WATER | (-92, -100) | (28, 39) | the Sea Shrine is entered from Onrac's pier |
@@ -278,14 +301,14 @@ entrance in the compiled `overworld`; the owning tranche creates it at its place
 | `wnd_lufenia` | Lufenia's land gate | WIND | (84, -92) | (152, 46) | |
 
 **Pairs** (31): cornelia-pravoka, cornelia-matoya, cornelia-temple, pravoka-elfheim, elfheim-marsh, elfheim-keep,
-keep-dwarf, dwarf-melmond, melmond-earth_cave, melmond-giant, giant-sarda, melmond-crescent, cornelia-crescent,
+keep-dwarf, dwarf-melmond, melmond-earth_cave, melmond-giant, melmond-sarda, melmond-crescent, cornelia-crescent,
 crescent-volcano, crescent-ice, ice-desert, desert-citadel, citadel-bahamut, desert-onrac, onrac-waterfall,
 onrac-caravan, caravan-gaia, gaia-mirage, gaia-lufenia, lufenia-melmond, cornelia-onrac, cornelia-gaia,
 cornelia-marsh, cornelia-sarda, cornelia-citadel, pravoka-matoya.
 
-**Preserved ratios** (examples, world/classic at s* = 0.73): Cornelia-Pravoka 40 cells, Pravoka-Elfheim 69,
+**Preserved ratios** (examples, world/classic at s* = 0.735): Cornelia-Pravoka 40 cells, Pravoka-Elfheim 69,
 Elfheim-Marsh 31, Dwarf-Melmond 13, Melmond-Crescent 107, Cornelia-Onrac 96, Cornelia-Gaia 113. Every pair's
-world/reference ratio after the fit is in [0.86, 1.14] at the targets.
+world/reference ratio after the fit is in [0.86, 1.10] at the targets.
 
 ### 2.3 World size and cost
 
@@ -295,10 +318,23 @@ world/reference ratio after the fit is in [0.86, 1.14] at the targets.
 | Chunks (below) | 165 | **144** (12x12) | 16-cell chunks |
 | Disk, world chunks | about 27 MB | **about 24 MB** (upper bound) | 164 KB per chunk measured; ocean chunks are smaller |
 | Peak compile memory, full world | 21-25 GB estimated | **about 22 GB** (3.08 GB x 7.11, linear) | 3.08 GB RSS measured for 72x72; target at most 26 GB (unchanged); the W1 stop condition is reused |
-| `--region` compile | about 7 GB | **at most 8 GB**: the largest union plus its ring is FIRE, about 52 chunks | measured by W1-C1 |
+| `--region` compile | about 7 GB | **at most 10 GB** (estimate about 8 GB: the largest union plus its ring is FIRE, about 52 chunks) | measured by W1-C1; like every `overworld` compile it takes the world-compile lock |
 | Full compile time | about 90 s | **about 75 s**; determinism about 2.5 min | 10.5 s x 7.11 |
 | Resident GPU | at most 60 textures with streaming | unchanged (view-based cap) | QUEST 4.3 |
 | All new maps | about 30 MB | **about 50 MB** | 7 towns x about 1.6 MB, about 60 interiors x 80 KB, about 47 dungeon floors x 0.5 MB, 8 castle-size maps x 1.1 MB |
+
+**Heavy-job rule.** The lock serialises world compiles, but the other tranches' Vitest and dev servers still use
+memory. So:
+
+- a full-world compile (W1-C1, W1-C2, INT) starts only while at most 3 other tranches are active (`git worktree list`
+  minus the finished ones; the orchestrator checks it before starting the job);
+- every worktree runs Vitest with `--maxWorkers=2` (G4);
+- the budget is then 26 GB (full) + 3 x about 2 GB, or 10 GB (`--region`) + 6 x about 2 GB, both under the 48 GiB
+  machine.
+
+The stub world is mostly ocean, so its measured peak understates the real one. W1-C1 therefore also measures a
+**land-filled synthetic world**: every region filled with `organic` land, forests and mountains at act-1 density.
+That figure is the one the 26 GB target applies to.
 
 The world is smaller than pass Q's in area, chunk count and memory. It is still big enough for the classic layout at
 s ≈ 0.73: the classic content spans about 192x217 tiles, which is 140x158 cells plus margins.
@@ -348,7 +384,7 @@ The rects tile the 192x192 world exactly: 144 chunks, each in exactly one region
 | `seam_w` | x 62-65, y 78-84 | mountain | EARTH's isthmus stub and the act-1 mainland's west coast | the Aldi's north-west wall |
 | `seam_n` | x 48-61, y 110-113 | grass | EARTH's isthmus (dwarves) and ELF's north arm | the dwarf hall can be walked to from Elfland |
 | `seam_s` | x 110-113, y 146-165 | mountain | Elfland's east end and the south-east continent | the Aldi's south wall |
-| `seam_se` | x 136-141, y 142-145 | mountain | Pravoka's range and the south-east continent | the Aldi's east wall |
+| `seam_se` | x 138-141, y 142-145 | mountain | Pravoka's range and the south-east continent | the Aldi's east wall |
 
   `world.py` checks each seam. A mountain seam must touch a wall cell of the region on both sides. A grass seam must
   have a walkable cell of each side's region next to it.
@@ -371,13 +407,13 @@ The rects tile the 192x192 world exactly: 144 chunks, each in exactly one region
 
 ### 2.6 Seas, basins and docks
 
-- **`aldi`**, the Aldi Sea (seed: world (94, 135), the water below Cornelia's jetty). It is enclosed by five walls; the
+- **`aldi`**, the Aldi Sea (seed: world (92, 121), the ship spawn's cell below Cornelia's jetty). It is enclosed by five walls; the
   closure check and the mutations (6.3) refer to them by name:
   1. **W_west:** X_west, `seam_w` and EARTH's isthmus stub (y 76-87, mountain);
   2. **W_isthmus:** the isthmus from the canal strip south to `seam_n`;
   3. **W_arm:** ELF's north arm and Elfland's north coast;
   4. **W_south:** `seam_s` and the north-west cliffs of the south-east continent;
-  5. **W_east:** `seam_se`, Pravoka's range (A1 cells x 136-141, y 76-141) and X_east.
+  5. **W_east:** `seam_se`, Pravoka's range (A1 cells x 138-141, y 76-141), the A1 cells that join X_east to it (x 136-137, y 76-82), and X_east.
 
   The act-1 peninsula and mainland close the north.
 - **`ocean`**: every other Water cell (seed: world (2, 2)). It must be one connected component.
@@ -445,7 +481,7 @@ checks this (6.2, row T6). The ship may still sail their seas and meet late-tier
 - **`world_api.py`** (W1-0 declares, W1-C2 implements):
   - `WORLD_W = WORLD_H = 192`, `A1_ORIGIN = (64, 64)`, `EDGE = 2`;
   - `BOXES: dict[str, list[Rect]]` (2.4), `SEAMS` (2.5), `FROZEN_EXCEPTIONS` (2.5);
-  - `BASIN_SEEDS = {"aldi": (94, 135), "ocean": (2, 2)}`, `DOCKS_ALLOWED` (2.6), `WALLS` (2.6, named cell sets that
+  - `BASIN_SEEDS = {"aldi": (92, 121), "ocean": (2, 2)}`, `DOCKS_ALLOWED` (2.6), `WALLS` (2.6, named cell sets that
     the composer exports for the mutations);
   - `Region(id, prefix, rects)`. `RegionOut` is unchanged from QUEST 3.5; its coordinates are world coordinates
     inside the region's rects and outside its bands.
@@ -678,7 +714,7 @@ inn; NPCs whose lines change as the story moves on. Every new town meets its row
 
 | Column | Counted as |
 |---|---|
-| Houses / interiors | house objects with a door transition into a `<town>-house-*` map / distinct linked house maps |
+| Houses / interiors | `type: house` objects in the town's **source** YAML (`assets-src/maps/<town>.yaml`; the compiled map drops `objects`) / distinct `<town>-house-*` targets of the compiled town map's transitions |
 | Outdoor NPCs | NPCs on the town map, keepers excluded |
 | Interior NPCs | NPCs in the linked house maps |
 | Hint NPCs | NPCs whose id ends in `_hint`; each has a line that contains one of its keywords |
@@ -764,8 +800,10 @@ classic version of the region has.
 - **Shape and placement.**
   - The act-1 block is frozen at the origin (64, 64) (2.5).
   - Pravoka stands in X_pravoka on the mainland's east coast. Its quay faces a narrow fjord, the act-1 east ring
-    (world x 129-135), whose far side is **Pravoka's range**: a mountain wall A1 builds in the east strip (x 136-141,
+    (world x 129-135), whose far side is **Pravoka's range**: a mountain wall A1 builds in the east strip (x 138-141, joined to X_east by x 136-137;
     y 76-141). The range starts at X_east and ends at `seam_se`.
+  - **Pravoka's channel:** between the quay and the range there are at least 6 Water cells on every row y 92-110
+    (`tests/quest/a1/pravokaChannel.test.ts`, A1-O). The town may move the coast west inside X_pravoka to make room.
   - Matoya's grove is in X_matoya, in the north-west mainland forest.
   - X_west's mountains close the mainland's west coast north of the sound.
   - The A1 south strip (y 136-143) is Aldi water.
@@ -814,7 +852,7 @@ classic version of the region has.
   - Elfland fills ELF's main rect (x 0-111, y 144-191): a broad, forested continent with its north coast on the Aldi
     (Elfheim's harbour at about (84, 147)) and its south and west coasts on the ocean.
   - A long **north arm** climbs ELF's narrow rect (x 48-61, y 114-143) between the western strait and the Aldi. The
-    Western Keep stands on it at (60, 125), and it ends at `seam_n`.
+    Western Keep stands on it at (61, 126), and it ends at `seam_n`.
   - The south-west is **the fens**, swamp terrain (`w`, W1-D) around the Marsh Cave at (53, 162).
   - The east end meets `seam_s` (mountains) at x 108-109.
 - **Towns:** Elfheim (4.0.1).
@@ -909,9 +947,13 @@ classic version of the region has.
     at (148, 124), with the `fir_crescent` dock on the outer channel. East of the town lies the crescent-shaped lake
     (Lake terrain, about x 155-170, y 112-138).
   - FIRE's south rect (x 112-191, y 144-191) holds the south half:
-    - the Gurgu lava fields with the volcano (119, 148) in the west;
-    - the Ice Cavern's frozen hollow (133, 147) just east of them, behind the north-west cliffs on the Aldi;
-    - the airship desert (141, 158) south of the ice.
+    - the Gurgu lava fields with the volcano (120, 151) in the west;
+    - the Ice Cavern's frozen hollow (135, 147) just east of them;
+    - the airship desert (143, 160) south of the ice.
+  - **Row budget in the north-west** (it is tight): rows 146-147 are W_south's cliffs facing the Aldi; both cavern
+    mouths open south; R-volcano reaches the volcano from the east on rows 150 or below, and R-ice reaches the ice
+    hollow from the south-east. `tests/quest/fire/northWest.test.ts` (FIR-O) asserts that rows 146-147 hold no
+    walkable or river cell for x 114-141.
   - Rivers R-volcano and R-ice run from the lake's outlets (2.7). A mountain ring keeps Crescent's land from the
     south lands on foot.
 - **Towns:** Crescent Lake (4.0.1).
@@ -1029,7 +1071,7 @@ classic version of the region has.
 
 | Dungeon | Floors | Topology brief (original) | Chests | Boss | Gimmicks |
 |---|---|---|---|---|---|
-| Mirage Tower (`mirage-1f..3f`), WND-D1 | 3 | The door is a `chime` gate. 1F, a spiral gallery with a central shaft. 2F, two half-floors joined by a bridge over the shaft. 3F, the console room: the console NPC with `requiredItem: cube` plays `mirage_ascent` (`onceFlag: SKY_FORTRESS_OPEN`), which sets the flag and warps to `sky-castle-1f` entrance `arrival` | 3 / 3 / 2 | - | the shaft; the console |
+| Mirage Tower (`mirage-1f..3f`), WND-D1 | 3 | The overworld door is an open transition to `mirage-1f` entrance `arrival`, a vestibule; the vestibule's inner door is a `keyItemGates requiredItem: chime` (WND-D1), beyond which is the entrance `inner`. 1F, a spiral gallery with a central shaft. 2F, two half-floors joined by a bridge over the shaft. 3F, the console room: the console NPC with `requiredItem: cube` plays `mirage_ascent` (`onceFlag: SKY_FORTRESS_OPEN`), which sets the flag and warps to `sky-castle-1f` entrance `arrival` | 3 / 3 / 2 | - | the shaft; the console |
 | Sky castle (`sky-castle-1f..5f`), WND-D2 | 5 | 1F, the dock ring with four spokes. 2F, a maze of light-bridges with one-way conveyors (one-way transitions). 3F, the archive (`adamant` chest `CHEST_WND_D2_ADAMANT`). 4F, the engine halls, where `warmech` is a rare formation in the zone `wnd_d2_engine`. 5F, the seraph's spire (boss straight up from the arrival) | 3 / 3 / 4 / 3 / 2 | hollow_seraph (5F; `wnd_seraph_falls` sets WIND_CRYSTAL_LIT) | the conveyors; Warmech |
 
 - **Encounter zones:**
@@ -1094,31 +1136,31 @@ not used in pass W, and its ledger guard is untouched.
 ### 5.0 Waves, concurrency, ports, merge order, resume
 
 ```
-K (kneel) merged -> W1-0 contract (serial)
+K (kneel) merged -> W1-0a | W1-0b contract (parallel)
   -> W1-A | W1-B | W1-C1 | W1-C2 | W1-D | W1-E | W1-F | W1-G | W1-H | W1-I (parallel) -> W1 merge ("W1: foundation merged")
   -> 21 region tranches (at most 6 running at once; one world compile at a time, by the lock) -> INT -> PLAY
 ```
 
 | Wave | Tranches | Checkpoint (all must hold) | Stop condition |
 |---|---|---|---|
-| W1-0 | W1-0 | the W1-0 commit on `mainline`; G4, G7 green; `stubs.py` writes every stub; `world.py` composes the act-1 world with `bands: OK` and `basins: OK` (the walls are stubbed by the composer's placeholder walls, 5.1) | a gate still fails after 2 fix attempts |
+| W1-0 | W1-0a, W1-0b (parallel) | both merged on `mainline`; G4, G7 green; `stubs.py` writes every stub; `world.py` composes the act-1 world with `bands: OK` and `basins: OK` (the walls are stubbed by the composer's placeholder walls, 5.1) | a gate still fails after 2 fix attempts |
 | W1 | W1-A to W1-I | each done-when (5.2); the W1 merge; `npm run quest -- --mutate` prints `quest-verify: OK` on `mainline` | the locality selftest or the 26 GB memory target fails: **stop the pass** (QUEST's rule) |
 | W2 | 21 region tranches | each merged with its result, G1-G17 green, its stages and town `built` | a SKIP or SOFTLOCK across 2 tranches: the integrator decides. More than 3 tranches blocked at once: stop the wave |
 | INT | INT | `npm run quest -- --strict --mutate` OK; `questCurve.test.ts` green; `stubs.py --check all` prints `stubs: 0 left` | the QUEST open-question-1 fallback |
 | PLAY | PLAY | the fix list closed; all gates green | a P0 not fixed in 2 attempts |
 
 - **Concurrency in W2: at most 6 region tranches at once** (open question 11).
-  - Start order: A1-O, ELF-O, ERT-O, FIR-O, ORD-O, WAT-O. Then each finishing tranche frees a slot for the next in
-    this order: A1-T, ELF-T, ELF-D, ERT-T, ERT-D, FIR-T, FIR-D1, FIR-D2, WAT-T, WAT-D, WND-O, WND-T, WND-D1, WND-D2,
-    PST.
-  - Every O tranche is in the first wave, because O tranches own the world modules and compile the world most often.
+  - Start order: A1-O, ELF-O, ERT-O, FIR-O, WAT-O, WND-O (the six O tranches whose regions carry an Aldi wall or a
+    cross-region hand-off). Then each finishing tranche frees a slot for the next in this order: ORD-O, A1-T, ELF-T,
+    ELF-D, ERT-T, ERT-D, FIR-T, FIR-D1, FIR-D2, WAT-T, WAT-D, WND-T, WND-D1, WND-D2, PST.
+  - O tranches go first because they own the world modules and compile the world most often.
 - **Merge order:** a region's O tranche merges first. Its T and D tranches then rebase on `mainline` and merge in any
   order. Stubs (D-W8) make every order legal; the rule only cuts down world recompiles.
 - **Ports** (`npm run dev -- --host 127.0.0.1 --port <p> --strictPort`; `mute=1` on every URL):
 
 | Tranche | Port | Tranche | Port | Tranche | Port |
 |---|---|---|---|---|---|
-| W1-0 | 5210 | ELF-O | 5223 | FIR-D2 | 5232 |
+| W1-0a, W1-0b | 5210, 5209 | ELF-O | 5223 | FIR-D2 | 5232 |
 | W1-A | 5211 | ELF-T | 5224 | ORD-O | 5233 |
 | W1-B | 5212 | ELF-D | 5225 | WAT-O | 5234 |
 | W1-C1 | 5213 | ERT-O | 5226 | WAT-T | 5235 |
@@ -1143,14 +1185,40 @@ K (kneel) merged -> W1-0 contract (serial)
 - **End of session:** QUEST 4.0a. A running tranche commits `<id>: WIP` on its own branch with a result draft that
   lists every gate run, as pass or fail, and its next step. A WIP commit never merges.
 - **Effort:**
-  - W1-0 is 6 h, W1 76 h in total, W2 156 h in total, INT 8 h and PLAY 10 h, about 256 agent-hours in all.
-  - The critical path is W1-0 (6) + W1-C2 (8) + merge (2) + the longest region chain (ERT-O 8, then ERT-D 8) + INT
-    (8) + PLAY (10), about 50 h.
+  - W1-0a 8 h and W1-0b 6 h; W1 (A-I) 73 h; W2 156 h; INT 8 h; PLAY 10 h; about 261 agent-hours in all.
+  - **Wall-clock critical path, with throughput:**
+    1. W1-0a (8 h; W1-0b runs beside it);
+    2. W1 (the longest tranche, 8 h) plus the 10 serial W1 merges (about 3 h);
+    3. W2: 156 h over 6 slots is at least 26 h, and the 21 serial merges with their world regenerations add about
+       0.5 h each where they don't overlap: about 30 h;
+    4. INT (8 h), then PLAY (10 h).
+
+    That is about 67 h, and never less than 60 h.
   - Pass W is a multi-session pass.
 
-### 5.1 W1-0 Contract (integrator, serial, effort 6 h)
+### 5.1 W1-0a and W1-0b: the contract (integrator, in parallel)
 
-It is QUEST 4.1 (Q1-0) in full, with these deltas.
+**W1-0a, the TS contract (8 h).** It is QUEST 4.1 (Q1-0) in full, with these deltas:
+
+- **`quest.yaml`**: all stages S0-S31 and the `towns:` list, `status: pending` (S0 `built`). Each tranche's stages
+  and its town entry sit between that tranche's comment anchors (`# === <id> (pass W: owned by <id>) ===` and
+  `# === end <id> ===`), so every hunk merges cleanly.
+- **`ExplorationScene.ts` extraction:** the vehicle code moves into `src/scenes/exploration/FieldVehicles.ts` and
+  the NPC-action code into `FieldNpcActions.ts`, ending at **590 lines or fewer**. QUEST 4.1's skipped 590 entry in
+  `fileCeilings.test.ts` is enabled here. W1-A and W1-B then never edit `ExplorationScene.ts`.
+- **`src/systems/fieldRulesVehicles.ts`:** the vehicle branches of `fieldStep` and `canLand` with today's behaviour
+  (walking only), imported by `fieldRules.ts`. W1-A owns it from then on; W1-B owns `fieldRules.ts`.
+- **`src/progression/questTypes.ts`:** the verifier's shared types (place, event, state, proof result), so W1-H and
+  W1-I can work in parallel.
+- **Anchors**, one pair per tranche, in `shops.yaml`, `cutscenes.yaml`, `debug-scenarios.yaml`, `items.yaml`,
+  `quest.yaml` and this document's Results. In `enemies.yaml`, each boss record a tranche owns (3.7, plus the
+  pass Q list) gets its owner's anchor pair around it in place, with no reordering. `kits.yaml` has a single W1-F
+  anchor (5.5).
+- **`types/index.ts`** gets QUEST 4.1's changes plus `MapData.world?` (GAP-17; +1 line). The ceiling goes from 440 to
+  **442** in `fileCeilings.test.ts`.
+- **`frame: a1`** on `r_ow_temple`, `r_ow_bridge` and `r_ow_east` (GAP-18 declared; W1-B implements it).
+
+**W1-0b, the world data (6 h):**
 
 - **`world_api.py` (declarations):** the constants and dataclasses of 2.9, including `Rect`, `BOXES`, `SEAMS`,
   `FROZEN_EXCEPTIONS`, `BASIN_SEEDS`, `DOCKS_ALLOWED`, `WALLS` and `A1_ORIGIN`.
@@ -1158,40 +1226,42 @@ It is QUEST 4.1 (Q1-0) in full, with these deltas.
     composer-owned placeholder walls, a mountain fill of the region's cells along the wall's planned path, listed in
     `world_api.PLACEHOLDER_WALLS`. A region's module replaces its placeholder wall when it is built.
   - The composer fails when a built region doesn't return a wall that closes the basin, so the basin check is
-    meaningful from W1-0 on.
+    meaningful from the start.
+- **`build_hooks.py` signatures** (no-op bodies with docstrings; W1-C1 calls them, W1-C2 fills them):
+
+  ```python
+  def passthrough(src: dict, out: dict) -> None: ...          # docks, patches, hazards, exit, world -> compiled map
+  def bake_patches(map_id: str, src: dict, grid: "Grid", kit: "Kit", out_dir: Path) -> list[str]: ...  # patch PNG paths
+  def region_checks(src: dict, grid: "Grid", region: str | None) -> list[str]: ...   # error strings; [] = OK
+  def owned_chunks(region: str) -> set[tuple[int, int]]: ...   # (col, row) of the region's rect union
+  ```
+
 - **`layouts/world_canon.py`:** the table of every pass W map id. Each row has the owner tranche, the kind (`town`,
-  `house`, `shop`, `inn`, `castle`, `site`, `floor`), the entrances (name: purpose), the `exit`, and its links (stairs
-  between floors, by entrance name). The ids and entrance names are those of section 4; floor entrances are
-  `arrival`, `up`, `down`, `boss`.
+  `house`, `shop`, `inn`, `castle`, `site`, `floor`), the entrances (name: purpose), the `exit`, and its links
+  (stairs between floors, by entrance name). The ids and entrance names are those of section 4; floor entrances are
+  `arrival`, `up`, `down`, `boss`, plus `inner` for `mirage-1f`.
 - **`layouts/stubs.py`:** it writes a stub source (`assets-src/maps/<id>.yaml`, header `STUB generated by
   stubs.py`, a 12x10 room with each canon entrance, its links and its exit) for every canon id whose source is
-  missing or is itself a stub. It never overwrites a real map. `stubs.py --check <tranche|all>` prints
-  `stubs: <n> left for <tranche>`, and exits 1 when n > 0 and the tranche's result is final.
-- **`assets/data/world-anchors.yaml`** (2.2), **`quest.yaml`** (all stages S0-S31 and towns, `status: pending`;
-  S0 `built`), and **`tests/quest/townTargets.ts`** (4.0.1).
-- **`ExplorationScene.ts` extraction:** W1-0 moves the vehicle code into `src/scenes/exploration/FieldVehicles.ts` and
-  the NPC-action code into `FieldNpcActions.ts`, line-neutral or better. W1-A and W1-B then never edit
-  `ExplorationScene.ts`.
-- **`src/systems/fieldRulesVehicles.ts`:** the vehicle branches of `fieldStep` and `canLand` with today's behaviour
-  (walking only), imported by `fieldRules.ts`. W1-A owns it from then on; W1-B owns `fieldRules.ts`.
-- **`src/progression/questTypes.ts`:** the verifier's shared types (place, event, state, proof result), so W1-H and
-  W1-I can work in parallel.
-- **Anchors** in `shops.yaml`, `cutscenes.yaml`, `debug-scenarios.yaml`, `kits.yaml`, `items.yaml` and this
-  document's Results: one pair per tranche, `# === <id> <REGION> (pass W: owned by <id>) ===` and
-  `# === end <id> ===`.
-- **`types/index.ts`** gets QUEST 4.1's changes plus `MapData.world?` (GAP-17; +1 line). The ceiling goes from 440 to
-  **442** in `fileCeilings.test.ts`.
-- **`r_ow_temple` gets `frame: a1`** (GAP-18 declared; W1-B implements it).
+  missing or is itself a stub. It never overwrites a real map.
+  - `stubs.py --count <tranche|all>` prints `stubs: <n> left for <tranche>` and always exits 0.
+  - `stubs.py --check <tranche|all>` prints the same and exits 1 when n > 0. It is a final gate (G16, INT), so it
+    needs no notion of a "final" result.
+- **Default site files**, one per T-tranche town: `layouts/a1/town_pravoka_site.py`, `layouts/elf/town_elfheim_site.py`,
+  `layouts/earth/town_melmond_site.py`, `layouts/fire/town_crescent_site.py`, `layouts/water/town_onrac_site.py`,
+  `layouts/wind/town_gaia_site.py`. Each holds the icon cells, the land-gate anchor (its 2.2 target), the dock and
+  the spawn as plain constants.
+- **`assets/data/world-anchors.yaml`** (2.2) and **`tests/quest/townTargets.ts`** (4.0.1).
 
-**Done when:**
+**Done when (both):**
 
 | Command | Expected |
 |---|---|
-| `npm run build && npm test` | exit 0; 0 failed |
-| `python3 -I assets-src/tools/layouts/stubs.py && python3 -I assets-src/tools/layouts/stubs.py --check all` | the first writes every canon stub; the second prints `stubs: <n> left` with n equal to the number of canon ids, and exits 0 because no result is final yet |
-| `python3 -I assets-src/tools/layouts/world.py --check-bands` | `bands: OK` (with the W1-0 composer skeleton: rects tile the world; stubs write no band cell) |
-| `npx vitest run tests/systems/fieldRules.test.ts tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed; `ExplorationScene.ts` at or under 601 |
+| `npm run build && npx vitest run --maxWorkers=2` | exit 0; 0 failed |
+| `python3 -I assets-src/tools/layouts/stubs.py && python3 -I assets-src/tools/layouts/stubs.py --count all` | the first writes every canon stub; the second prints `stubs: <n> left` with n equal to the number of canon ids |
+| `python3 -I assets-src/tools/layouts/world.py --check-bands` | `bands: OK` (with the composer skeleton: rects tile the world; stubs write no band cell) |
+| `npx vitest run tests/systems/fieldRules.test.ts tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed, with the 590 entry for `ExplorationScene.ts` enabled |
 | `wc -l < src/types/index.ts` | at most 442 |
+| `python3 -I -c "import sys; sys.path.insert(0, 'assets-src/tools'); import build_hooks"` | exit 0 (the signatures import) |
 
 ### 5.2 W1 foundation tranches
 
@@ -1202,9 +1272,9 @@ its part, plus its own rows below, and runs G4, G7 and G11 (G8 for compiler tran
 |---|---|---|---|---|---|
 | W1-A Vehicles and save | QUEST 4.2: vehicles, save v2, GAP-11, GAP-12, `vehicles.py` and its build stage, `test-dock.yaml`, scenario `q1a_ship_dock` renamed `w1a_ship_dock` | `src/entities/*Mode.ts`, `VehicleManager.ts`, `FieldVehicles.ts`, `fieldRulesVehicles.ts`, `SaveManager.ts`, `MapTransition.ts`, `BattleRetry.ts`, `assets-src/vehicles.py`, `assets/maps/test-dock.yaml` | GAP-17's save half: a version-1 save on `overworld` loaded against a map with `world.frames.a1` is translated by the origin | 8 h | `npx vitest run tests/systems/vehicles.test.ts tests/systems/safeSpawnModes.test.ts tests/systems/battleRetryVehicles.test.ts tests/systems/saveOriginShift.test.ts` all pass; browser `http://127.0.0.1:5211/?mute=1&scenario=w1a_ship_dock` as QUEST 4.2's row |
 | W1-B NPC and field rules | QUEST 4.2: patches, AND gates, item conditions, trades, tint, class upgrade `actionFlag`, hazards, EXIT/WARP, zone modes, `end_game`, cutscene steps, asset coverage | `fieldRules.ts`, `FieldNpcActions.ts`, `NPCInteraction.ts`, `CutsceneManager.ts`, `CutsceneRegistry.ts`, `KeyItemGateSystem.ts`, `ClassUpgradeSystem.ts`, `FieldSpellEffects.ts`, `EncounterSystem.ts`, `CollisionMap.ts`, `DebugScenarioLoader.ts`, `tests/data/assetCoverage.test.ts` | GAP-15 (`takeGold`), GAP-16 (clinic), GAP-18 (`frame: a1`) | 8 h | `npx vitest run tests/systems/patches.test.ts tests/systems/npcTrade.test.ts tests/systems/npcTakeGold.test.ts tests/systems/clinic.test.ts tests/systems/hazards.test.ts tests/systems/endGame.test.ts tests/systems/fieldRules.test.ts tests/systems/debugFrame.test.ts` all pass; `fieldRules.test.ts`'s act-1 cases unchanged |
-| W1-C1 Compiler core | QUEST 4.3: per-chunk RNG (GAP-14), `--region`, the lock, the memory probe, the legend (`w`, Lake = 11, `BLOCKED` adds 11), material remaps with `hue` and `sat` | `build_map.py`, `terrain/**` | multi-rect `--region` (GAP-19); hook calls into `build_hooks.py` (passthrough, patch art, per-region checks), whose bodies are W1-C2's | 8 h | `build_map.py --selftest` prints `region yaml: OK`, `locality: OK` and `region multi-rect: OK` (a synthetic 2-rect region compiled by region equals the full compile); `/usr/bin/time -l` of the full world from stubs at most 26 GB, and `--region fire` at most 10 GB (measured values in the result) |
+| W1-C1 Compiler core | QUEST 4.3: per-chunk RNG (GAP-14), `--region` (it takes the lock), the lock, the memory probe (stub world **and** a land-filled synthetic world), the legend (`w`, Lake = 11, `BLOCKED` adds 11), material remaps with `hue` and `sat` | `build_map.py`, `terrain/**` | multi-rect `--region` (GAP-19); hook calls into `build_hooks.py` (passthrough, patch art, per-region checks), whose bodies are W1-C2's | 8 h | `build_map.py --selftest` prints `region yaml: OK`, `locality: OK` and `region multi-rect: OK` (a synthetic 2-rect region compiled by region equals the full compile); `/usr/bin/time -l` of the land-filled synthetic world at most 26 GB, and `--region fire` at most 10 GB (both measured values, and the stub world's, in the result) |
 | W1-C2 Composer and world | QUEST 4.3: `world.py`, `world_api.py` logic, `world_a1.py`, the `world_<r>.py` stubs, the `overworld.py` shim, map checks with `reach_roots`, the canoe spawn removal, `frozenCore.test.ts`, the `overworldLayout.test.ts` clip | `layouts/world*.py`, `overworld.py` (shim), `map_checks*.py`, `map_graph.py`, `build_hooks.py`, `tests/data/overworldLayout.test.ts`, `tests/quest/a1/frozenCore.test.ts` | the act-1 translation (2.9, GAP-17 compiler half); bands, seams and placeholder walls; the basin checks of 2.6; `--owned-chunks` over unions; `overworldLayout.test.ts` reads `world.frames.a1.origin` and offsets its cells | 8 h | `python3 -I assets-src/tools/layouts/world.py` prints `bands: OK` and `basins: OK (aldi ..., ocean ...; canal joins)` on the stub world; `build_map.py --check-determinism overworld` prints `overworld: deterministic`; `npx vitest run tests/data/overworldLayout.test.ts tests/quest/a1/frozenCore.test.ts tests/data/act1Flow.test.ts` all pass |
-| W1-D Kit placeholders | QUEST 4.3: placeholder landmarks and the remap presets | `kit.py` | extra placeholders `waterfall`, `tent`, `windmill`, `dome`, `buried_hull`; recolours `elf`, `snow`, `dune`, `pale_dune`; the `w` swamp material | 4 h | `python3 -I assets-src/tools/kit.py --selftest` (new) prints one `OK <name>` line per placeholder and preset; G8 |
+| W1-D Kit and town tooling | QUEST 4.3: placeholder landmarks and the remap presets | `kit.py`, `layouts/interiors_common.py`, `layouts/town_common.py` (new), the helper imports in `cornelia.py` | extra placeholders `waterfall`, `tent`, `windmill`, `dome`, `buried_hull`; recolours `elf`, `snow`, `dune`, `pale_dune`; the `w` swamp material; `interiors_common.py` takes a `town` parameter (map-id prefix, exits, keeper and house helpers) instead of the hard-coded `TOWN = "cornelia"`; the outdoor helpers (`obj`, `deco`, `oak`, `lamp`, `fir`, `win`, `flag`) move from `cornelia.py` into `town_common.py`, and `cornelia.py` imports them (it shrinks) | 7 h | `python3 -I assets-src/tools/kit.py --selftest` (new) prints one `OK <name>` line per placeholder and preset; G8; re-running `cornelia.py`, `interiors.py` and `castle.py` leaves `git diff --exit-code assets-src/maps` clean (G1), and `build_map.py --check-determinism cornelia` passes |
 | W1-E Streaming | QUEST 4.3: streaming | `BakedMapRenderer.ts`, `MapLoader.ts`, `tests/rendering/bakedStreaming.test.ts` | the sweep covers the 192x192 world | 6 h | `npx vitest run tests/rendering/bakedStreaming.test.ts` passes (at most 60 resident textures in an airship sweep; a miss holds at most 6 frames; `Assets.unload` is used) |
 | W1-F Items and shops | QUEST 4.4: items, kits, bestiary habitats, shop sections, `gearBands.test.ts`, `rosterCoverage.test.ts`, `balanceData` helpers, `check-bounds.ts` | `items.yaml`, `kits.yaml`, `bestiary.yaml`, the shop sections of `shops.yaml` (records seeded empty inside each town's anchor), `tests/helpers/balanceData.ts`, `scripts/check-bounds.ts` | the key items of 3.1; `excalibur` and `adamant`; the `w_<town>` kits; town tiers per 3.6 | 6 h | `npx vitest run tests/data/gearBands.test.ts tests/data/crossFileValidation.test.ts tests/scenes/MagicShopScene.test.ts` pass; every key item of 3.1 exists with `type: key` |
 | W1-G Spells L5-L8 | QUEST 4.4: spells L5-L8, `spellEffectsLate.ts`, the 20 enemy spell ids kept exactly | `spells.yaml`, `src/battle/spellEffectsLate.ts` (`SpellExecutor.ts` at most +2 lines) | none | 6 h | `npx vitest run tests/battle/ tests/balance/` pass; the cross-file test shows that every enemy spell id resolves |
@@ -1230,32 +1300,35 @@ Every region tranche:
 - **O tranches only:** they own `world_<region>.py` and must return the region's Aldi wall (2.6), if it has one, in
   place of its placeholder wall. They compile with `--region <region>` and G3.
 - **T and D tranches** never edit `world_<region>.py`. The T tranche exports its town's site (icon cells, gate,
-  dock, spawn) in `layouts/<region>/town_<town>_site.py`, which the O module imports. If the T tranche merges first,
-  the O module imports the site's default values, which W1-0's canon provides.
+  dock, spawn, land-gate anchor) by editing `layouts/<region>/town_<town>_site.py`. W1-0b created that file with
+  defaults, and the O module imports it whichever tranche merges first.
+- **Backgrounds:** a tranche that stages a background runs `python3 -I assets-src/tools/stage_backgrounds.py <ids>`
+  and `python3 -I assets-src/tools/stage_backgrounds.py --check <ids>` (each id prints its checks and the command exits
+  0). The hand-made sources live in `~/temp/ffgame-assets`, outside the worktree, and are read only.
 
 ### 5.4 Region tranches
 
 | Tranche | Stages (owner) | Maps (canon ids) | Shared-file anchors it appends to | Effort | Specific done-when (beyond G1-G17) |
 |---|---|---|---|---|---|
 | A1-O | S1, S3, S7 | `matoya-cave`; the `world_a1.py` region part | `cutscenes.yaml` (`act1_complete`, `a1_matoya_sight`), `debug-scenarios.yaml` | 7 h | `npx vitest run tests/quest/a1/` passes, including the bridge-patch and frozen-core tests; checkpoints S1 and S3 (6.5) |
-| A1-T | S2; town `pravoka` | `pravoka`, `pravoka-house-*` (6+), the 5 shops and `pravoka-inn` | `shops.yaml`, `cutscenes.yaml` (`a1_bikke_yields`), `debug-scenarios.yaml`, `kits.yaml` (`w_pravoka`) | 8 h | `w_a1_t.test.ts` (pirate x9) passes; checkpoint S2 and S2-negative |
-| ELF-O | S6 | `western-keep-1f`, `-2f`; `world_elf.py` | `cutscenes.yaml` (`elf_astos_unmasked`), `debug-scenarios.yaml` | 8 h | `w_elf_o.test.ts` (astos); checkpoint S6 |
-| ELF-T | S4, S8, S9; town `elfheim` | `elfheim`, `elfheim-house-*` (6+), shops, `elfheim-inn`, `elfheim-castle`, `elfheim-castle-chamber`, `elfheim-vault` | `shops.yaml` (the existing `elfheim_*` ids move here, W1-F), `cutscenes.yaml` (`elf_prince_wakes`), `kits.yaml` (`w_elfheim`) | 8 h | checkpoints S4, S8, S9 |
+| A1-T | S2; town `pravoka` | `pravoka`, `pravoka-house-*` (6+), the 5 shops and `pravoka-inn` | `shops.yaml`, `cutscenes.yaml` (`a1_bikke_yields`), `debug-scenarios.yaml` | 8 h | `w_a1_t.test.ts` (pirate x9) passes; checkpoints S2 and S2 `_neg_noboss` |
+| ELF-O | S6 | `western-keep-1f`, `-2f`; `world_elf.py` | `cutscenes.yaml` (`elf_astos_unmasked`), `debug-scenarios.yaml` | 8 h | `w_elf_o.test.ts` (astos); checkpoints S6 and `w_s6_neg_nocrown` |
+| ELF-T | S4, S8, S9; town `elfheim` | `elfheim`, `elfheim-house-*` (6+), shops, `elfheim-inn`, `elfheim-castle`, `elfheim-castle-chamber`, `elfheim-vault` | `shops.yaml` (the existing `elfheim_*` ids move here, W1-F), `cutscenes.yaml` (`elf_prince_wakes`) | 8 h | checkpoints S4, S8, S9 |
 | ELF-D | S5 | `marsh-cave-b1..b3` | `cutscenes.yaml` (`elf_d_crown`), `debug-scenarios.yaml` | 6 h | `w_elf_d.test.ts` (piscodemon x3); `hazardPath.test.ts`; checkpoint S5 |
-| ERT-O | S10, S12, S31; town `dwarf` | `dwarf-hall`, `giant-tunnel`, `sage-cave`; `world_earth.py`; the patch `canal` | `cutscenes.yaml` (`ert_canal_blast`, `ert_giant_feast`), `shops.yaml` (`dwarf_item`), `debug-scenarios.yaml` | 8 h | `world.py` prints `basins: OK` with the real isthmus wall (no EARTH placeholder wall); checkpoints S10, S10-negative, S12 |
-| ERT-T | S25; town `melmond` | `melmond`, `melmond-house-*` (5+, one is `-unne`), shops, `melmond-inn`; the patch `ert_melmond_bloom` | `shops.yaml` (the existing `melmond_*`), `cutscenes.yaml` (`ert_unne_lesson`), `kits.yaml` (`w_melmond`) | 7 h | checkpoint S25; the bloom patch test (before and after EARTH_CRYSTAL_LIT) |
+| ERT-O | S10, S12, S31; town `dwarf` | `dwarf-hall`, `giant-tunnel`, `sage-cave`; `world_earth.py`; the patch `canal` | `cutscenes.yaml` (`ert_canal_blast`, `ert_giant_feast`), `shops.yaml` (`dwarf_item`), `debug-scenarios.yaml` | 8 h | `world.py` prints `basins: OK` with the real isthmus wall (no EARTH placeholder wall); checkpoints S10, `w_s10_neg_notnt`, S12, `w_s12_neg_noruby` |
+| ERT-T | S25; town `melmond` | `melmond`, `melmond-house-*` (5+, one is `-unne`), shops, `melmond-inn`; the patch `ert_melmond_bloom` | `shops.yaml` (the existing `melmond_*`), `cutscenes.yaml` (`ert_unne_lesson`) | 7 h | checkpoint S25; the bloom patch test (before and after EARTH_CRYSTAL_LIT) |
 | ERT-D | S11, S13 | `cavern-earth-b1..b5` | `cutscenes.yaml` (`ert_vampire_falls`, `ert_lich_falls`, `ert_earth_crystal`) | 8 h | `w_ert_d.test.ts` (vampire, lich); checkpoints S11, S13 |
-| FIR-O | S17 | `world_fire.py` (continent, lake, rivers, ash hazards, desert, the buried hull) | `cutscenes.yaml` (`fir_airship_rises`), `debug-scenarios.yaml` | 7 h | `basins: OK` with the real W_south and W_east south parts; checkpoint S17 and S17-negative |
-| FIR-T | S14; town `crescent` | `crescent`, `crescent-house-*` (6+), shops, `crescent-inn`, `crescent-circle` | `shops.yaml`, `cutscenes.yaml` (`fir_sages_canoe`), `kits.yaml` (`w_crescent`) | 8 h | proof (f) for `crescent` OK; checkpoints S14 and S14-early (shops at S10) |
+| FIR-O | S17 | `world_fire.py` (continent, lake, rivers, ash hazards, desert, the buried hull) | `cutscenes.yaml` (`fir_airship_rises`), `debug-scenarios.yaml` | 7 h | `basins: OK` with the real W_south and W_east south parts; checkpoints S17 and `w_s17_neg_nostone` |
+| FIR-T | S14; town `crescent` | `crescent`, `crescent-house-*` (6+), shops, `crescent-inn`, `crescent-circle` | `shops.yaml`, `cutscenes.yaml` (`fir_sages_canoe`) | 8 h | proof (f) for `crescent` OK; checkpoints S14 and `w_s14_early` |
 | FIR-D1 | S15 | `gurgu-b1..b5` | `cutscenes.yaml` (`fir_ashen_falls`) | 8 h | `w_fir_d1.test.ts` (ashen_queen); `hazardPath.test.ts`; checkpoint S15 |
 | FIR-D2 | S16 | `ice-cavern-b1..b3` | `cutscenes.yaml` (`fir_evil_eye_falls`, `fir_d2_shelf`) | 6 h | `w_fir_d2.test.ts` (evil_eye); checkpoint S16 |
 | ORD-O | S18, S19 | `citadel-1f..3f`, `bahamut-cave`, `bahamut-lair`; `world_ordeal.py` | `cutscenes.yaml` (`ord_throne_wakes`, `ord_seal_won`, `ord_bahamut_trial`) | 8 h | `w_ord_o.test.ts` (dragon_zombie); checkpoints S18, S19 |
-| WAT-O | S21, S22 | `waterfall-cave`, `caravan-camp`; `world_water.py` | `cutscenes.yaml` (`wat_cube_given`), `debug-scenarios.yaml` | 7 h | proof (d3) for the bottle's price; checkpoints S21, S21-negative (no canoe), S22 |
-| WAT-T | S20; town `onrac` | `onrac`, `onrac-house-*` (6+), shops, `onrac-inn` (the submarine cell is in `onrac`) | `shops.yaml`, `kits.yaml` (`w_onrac`) | 7 h | checkpoints S20, S24-negative (the submarine without oxyale) |
+| WAT-O | S21, S22 | `waterfall-cave`, `caravan-camp`; `world_water.py` | `cutscenes.yaml` (`wat_cube_given`), `debug-scenarios.yaml` | 7 h | proof (d3) for the bottle's price; checkpoints S21, `w_s21_neg_nocanoe`, S22 |
+| WAT-T | S20; town `onrac` | `onrac`, `onrac-house-*` (6+), shops, `onrac-inn` (the submarine cell is in `onrac`) | `shops.yaml` | 7 h | checkpoints S20 and `w_s24_neg_nooxyale` |
 | WAT-D | S24 | `sea-shrine-b1..b5` | `cutscenes.yaml` (`wat_drowned_falls`) | 8 h | `w_wat_d.test.ts` (drowned_sovereign); checkpoint S24 |
-| WND-O | S26; town `lufenia` | `lufenia`, `lufenia-house-*` (3+), `lufenia-white-magic`, `lufenia-black-magic`, `lufenia-inn`; `world_wind.py` | `shops.yaml`, `cutscenes.yaml` (`wnd_chime_given`), `kits.yaml` (`w_lufenia`) | 8 h | checkpoints S26 and S26-negative (unreadable speech, no keepers) |
-| WND-T | S23; town `gaia` | `gaia`, `gaia-house-*` (6+), shops, `gaia-inn`, `gaia-spring` | `shops.yaml`, `cutscenes.yaml` (`wnd_fairy_freed`), `kits.yaml` (`w_gaia`) | 8 h | proof (f) for `gaia`; checkpoint S23 |
-| WND-D1 | S27 | `mirage-1f..3f` | `cutscenes.yaml` (`mirage_ascent`) | 5 h | checkpoint S27 and S27-negative (the chime door) |
+| WND-O | S26; town `lufenia` | `lufenia`, `lufenia-house-*` (3+), `lufenia-white-magic`, `lufenia-black-magic`, `lufenia-inn`; `world_wind.py` | `shops.yaml`, `cutscenes.yaml` (`wnd_chime_given`) | 8 h | checkpoints S26 and `w_s26_neg_untaught` |
+| WND-T | S23; town `gaia` | `gaia`, `gaia-house-*` (6+), shops, `gaia-inn`, `gaia-spring` | `shops.yaml`, `cutscenes.yaml` (`wnd_fairy_freed`) | 8 h | proof (f) for `gaia`; checkpoint S23 |
+| WND-D1 | S27 | `mirage-1f..3f` (including the chime door in the vestibule) | `cutscenes.yaml` (`mirage_ascent`) | 5 h | checkpoints S27 and S27-neg |
 | WND-D2 | S28 | `sky-castle-1f..5f` | `cutscenes.yaml` (`wnd_seraph_falls`) | 8 h | `w_wnd_d2.test.ts` (hollow_seraph, warmech); checkpoint S28 |
 | PST | S29, S30 | `temple-of-fiends` (edits), `past-temple-1..5`, `past-chaos` | `cutscenes.yaml` (`pst_time_gate`, `pst_*`, `ending`) | 8 h | `w_pst.test.ts` (the refight run, death_eye); `templeLayout` and Garland tests unchanged; checkpoints S29, S30 |
 
@@ -1266,13 +1339,15 @@ Every region tranche:
 | `world_api.py` (constants), `world_canon.py`, `world-anchors.yaml`, `townTargets.ts`, `questTypes.ts` | W1-0 | read only; a needed change goes to the integrator |
 | `world.py`, `world_api.py` (logic), `build_hooks.py`, `map_checks*.py`, `map_graph.py` | W1-C2 | none |
 | `build_map.py`, `terrain/**` | W1-C1 | none |
-| `kit.py` | W1-D | none |
+| `kit.py`, `layouts/interiors_common.py`, `layouts/town_common.py` | W1-D | read and import only |
 | `layouts/world_<region>.py`, `layouts/<region>/world_*.py` | the region's O tranche | its T tranche writes only `layouts/<region>/town_<town>_site.py` |
-| `quest.yaml` | W1-0 creates it | each tranche edits only its stages and its town |
-| `shops.yaml`, `cutscenes.yaml`, `debug-scenarios.yaml`, `kits.yaml`, `items.yaml` | anchors from W1-0 | each tranche writes only inside its anchor; ELF-T and ERT-T take over the `elfheim_*` and `melmond_*` records W1-F placed in their anchors |
-| `enemies.yaml` | nobody by default | a tranche edits only its own bosses' `bossPhases`, `ai` and `specials`; only INT changes `xpReward` and `goldReward` |
+| `quest.yaml` | W1-0a creates it, with per-tranche anchors | each tranche edits only inside its anchor (its stages and its town) |
+| `shops.yaml`, `cutscenes.yaml`, `debug-scenarios.yaml`, `items.yaml` | anchors from W1-0a | each tranche writes only inside its anchor; ELF-T and ERT-T take over the `elfheim_*` and `melmond_*` records W1-F placed in their anchors |
+| `kits.yaml` | W1-F (every `w_*` town and stage kit) | read only; a kit change goes to the integrator as `BLOCKED: <need>`, and INT may tune kits |
+| `enemies.yaml` | nobody by default; W1-0a puts anchors around the owned boss records | a tranche edits only inside its anchors, only its own bosses' `bossPhases`, `ai` and `specials`; only INT changes `xpReward` and `goldReward` |
 | `overworld_consts.py`, `overworld_zones.py` | the act-1 data | A1-O edits only `BRIDGE_WORKERS` and `GATE_MESSAGE` |
-| `castle.py` (360 / 360), `cornelia.py` (352 / 355) | nobody | not edited in pass W |
+| `castle.py` (360 / 360) | nobody | not edited in pass W |
+| `cornelia.py` (352 / 355) | W1-D, only to import the extracted helpers (output byte-equal) | not edited otherwise |
 | `assets-src/maps/temple-of-fiends.yaml` | PST | none |
 | The act-1 tests (QUEST 4.0's list) | frozen after W1 | A1-O may update only the `act1_complete` and bridge assertions; PST may only add temple assertions |
 | `AGENTS.md` | INT | each tranche writes an AGENTS.md delta in its result |
@@ -1335,7 +1410,7 @@ quest-verify: 32 stages (S0 built, 31 pending), 1180 places, 96 events
 (f) price walls: OK  crescent 1240/9600  gaia 6100/21000
 (g) geography: OK  s*=0.73 (31 pairs; 0 assumed)
 (h) travel matrix: OK  (12 rows, 2 basin rows)
-mutations: OK  (34 gate rows; 112 elements, each removal reported)
+mutations: OK  (38 gate rows; 112 elements, each removal reported)
 quest-verify: OK
 ```
 
@@ -1354,15 +1429,34 @@ The numbers are only an example.
      (cornelia-temple). It must be in [0.60, 0.80].
   4. **Distance bands.** For each pair, r = d_w / (s* x d_r) must be in [0.70, 1.30] when s* x d_r >= 20, and in
      [0.55, 1.60] for shorter pairs. Cornelia-temple is exempt.
-  5. **Bearing bands.** The bearing error, |bearing(world) - bearing(ref)| with compass bearings, must be at most 40°
+  5. **Bearing bands.** The bearing error, min(|Δ|, 360 - |Δ|) with Δ = bearing(world) - bearing(ref) in compass
+     degrees, must be at most 40°
      for pairs with s* x d_r >= 20, and at most 60° otherwise. Every pair is checked, cornelia-temple included.
-  6. **Detour bound.** For each travel hop of 6.2 (consecutive gated places, in its mode), the path length must be at
-     most 2.5x the Euclidean distance. A failure reads `GEO detour <a>-<b> <path> > 2.5 x <euclid>`.
+  6. **Detour bound.** For each hop below, the path length in the hop's mode (from the verifier's BFS, between the two
+     anchors' cells, docks included) must be at most the factor times the Euclidean distance. A failure reads
+     `GEO detour <a>-<b> <path> > <factor> x <euclid>`.
+
+     | Hop | Mode | Factor |
+     |---|---|---|
+     | cornelia-pravoka | walking (over the bridge) | 2.5 |
+     | cornelia-matoya | walking | 2.5 |
+     | pravoka-elfheim | ship (dock to dock) plus walking | 2.5 |
+     | pravoka-dwarf | ship plus walking | 2.5 |
+     | elfheim-keep, elfheim-marsh | walking | 2.5 |
+     | dwarf-melmond | ship through the canal plus walking | 4.5 (the canal lies north of the dwarves) |
+     | melmond-earth_cave, melmond-giant | walking | 2.5 |
+     | melmond-sarda | walking through the tunnel | 3.0 |
+     | melmond-crescent | ship plus walking | 2.5 |
+     | crescent-volcano, crescent-ice | canoe plus walking | 2.5 |
+     | ice-desert | walking | 2.5 |
+     | onrac-waterfall | canoe plus walking | 2.5 |
+
+     Airship hops are straight lines and have no detour check.
   7. **RED fixtures.** These cases must fail: an anchor moved 10 cells off its target; two anchors swapped (Onrac and
      Gaia, so the bearing flips); every anchor scaled by 1.5 about Cornelia (the distance band catches it, the
      placement too); a detour fixture.
-- **Expected output:** `(g) geography: OK  s*=<value> (31 pairs; <n> assumed)`. At the targets, s* = 0.731 and every
-  ratio is in [0.86, 1.14].
+- **Expected output:** `(g) geography: OK  s*=<value> (31 pairs; <n> assumed)`. At the targets, s* = 0.735 and every
+  ratio is in [0.86, 1.10].
 
 ### 6.2 Travel-requirement matrix
 
@@ -1378,10 +1472,10 @@ row's own flags.
 | T3 | + CANAL_OPEN | `ert_melmond`, `ert_earth_cave`, `ert_giant`, `fir_crescent` | `ert_sarda`, `fir_volcano`, `fir_ice`, `fir_desert`, every north anchor |
 | T4 | + TITAN_FED | `ert_sarda` | `fir_volcano`, `fir_ice`, `fir_desert` |
 | T5 | + `canoe` | `fir_volcano`, `fir_ice`, `fir_desert` | `ord_citadel`, `ord_bahamut`, `wat_onrac`, `wat_waterfall`, `wat_caravan`, `wnd_gaia`, `wnd_mirage`, `wnd_lufenia` |
-| T6 | + airship (in the desert) | `ord_citadel`, `ord_bahamut`, `wat_onrac`, `wat_caravan`, `wnd_gaia`, `wnd_mirage` (door cell), `wnd_lufenia`, and `wat_waterfall` (needs the canoe, held); each airship-only anchor has a landing cell within 8 steps | `sea-shrine-*`, `mirage-1f`, `sky-castle-*`, `past-temple-*` |
+| T6 | + airship (in the desert) | `ord_citadel`, `ord_bahamut`, `wat_onrac`, `wat_caravan`, `wnd_gaia`, `wnd_mirage`, `mirage-1f:arrival`, `wnd_lufenia`, and `wat_waterfall` (needs the canoe, held); each airship-only anchor has a landing cell within 8 steps | `sea-shrine-*`, `mirage-1f:inner`, `sky-castle-*`, `past-temple-*` |
 | T6b | T6 without the canoe | as T6 minus `wat_waterfall` | `wat_waterfall` |
-| T7 | + `oxyale` | `sea-shrine-b3` | `mirage-1f`, `sky-castle-*` |
-| T8 | + `chime` | `mirage-1f` | `sky-castle-*` |
+| T7 | + `oxyale` | `sea-shrine-b3` | `mirage-1f:inner`, `sky-castle-*` |
+| T8 | + `chime` | `mirage-1f:inner` | `sky-castle-*` |
 | T9 | + SKY_FORTRESS_OPEN | `sky-castle-1f` | `past-temple-*` |
 | T10 | + the 4 crystal flags, `lute`, TIME_GATE_OPEN | `past-temple-1` | - |
 
@@ -1406,7 +1500,8 @@ given here.
 | GT-2 | S1 | the patch `north_bridge` | force on from the start | (b) `SKIP S2` and (e) `EARLY pravoka` |
 | GT-3 | S2 | the ship spawn `requiredFlag: BIKKE_DEFEATED` | remove | (b) `SKIP S4` |
 | GT-4 | S2 | the dock `a1_pravoka` | remove | (c) `SOFTLOCK` or the goal unreachable (the ship can't be boarded or left) |
-| GT-5 | S4 | the dock `elf_port` | remove | (a) the goal unreachable |
+| GT-5 | S4 | the dock `elf_port` | remove | non-load-bearing: "Elfland is also reachable on foot from the `ert_dwarf` landing over `seam_n`" |
+| GT-5b | S4 | both Aldi docks of Elfland's coast, `elf_port` and `ert_dwarf` | remove both | (a) the goal unreachable (Elfland and the dwarves cut off; `tnt` and `crown` unobtainable) |
 | GT-6 | S6 | Astos's `requiredFlags: [MARSH_GUARD_DEFEATED]` | remove | non-load-bearing: "the crown, which Astos also requires, is given only by the guard's victory (D-W14)". D-W14 itself is checked statically: `tests/quest/bossItems.test.ts` (W1-I) fails when a key item that 3.1 lists as a boss-cutscene gift is also in a chest or a non-boss NPC gift |
 | GT-7 | S6 | Astos's `requiredItem: crown` | remove | (b) `SKIP S6` without S5 |
 | GT-8 | S7 | Matoya's `requiredItem: crystal_eye` | remove | (b) `SKIP S7` |
@@ -1432,12 +1527,15 @@ given here.
 | GT-28 | S25 | Unne's `requiredItem: slab` | remove | (b) `SKIP S25` |
 | GT-29 | S26 | the elder's `requiredFlags: [LUFENIAN_LEARNED]` | remove | (b) `SKIP S26` |
 | GT-30 | S26 | the Lufenia keepers' `showIf: LUFENIAN_LEARNED` | remove | (e) `EARLY lufenia` |
-| GT-31 | S27 | the Mirage door's `requiredItem: chime` | remove | (b) `SKIP S27` without S26 |
+| GT-31 | S27 | the `mirage-1f` vestibule door's `requiredItem: chime` (WND-D1) | remove | (b) `SKIP S27` without S26 |
 | GT-32 | S27 | the console's `requiredItem: cube` | remove | (b) `SKIP S27` without S21 |
 | GT-33 | S29 | the time gate's `requiredItem: lute` and `requiredFlags` (each of the 5 separately) | remove one at a time | (b) `SKIP S29` for each of the 4 crystal flags; the lute is never consumed, so removing it is non-load-bearing ("the lute is held from S0 and never consumed"), reported as such |
 | GT-34 | S30 | each refight stair's `requiredFlags` | remove one at a time | (b) milestone failure naming the next PAST_* flag |
+| GT-35 | S12 | the western range (EARTH) | open its minimal walkable cut outside the tunnel (the shortest grass path from Melmond's plain to Sarda's coast through the range's cells, exported by the composer like the wall cuts) | (b) `SKIP S12` (Sarda without TITAN_FED) |
+| GT-36 | S12 | the giant NPC on the tunnel's chokepoint | remove the NPC | (b) `SKIP S12` |
+| GT-37 | S15/S16 | Crescent's mountain ring (FIRE) | open its minimal walkable cut from Crescent's shore to the south lands | (b) `SKIP S15` and `SKIP S16` (no canoe needed) |
 
-Every row except GT-1, GT-6, GT-14, GT-16 and the lute part of GT-33 must be caught. `questMutate.test.ts` asserts each
+Every row except GT-1, GT-5, GT-6, GT-14, GT-16 and the lute part of GT-33 must be caught. `questMutate.test.ts` asserts each
 row's expected proof and message prefix by name, on fixtures in W1-I and on the real world at INT.
 
 ### 6.4 Scripted walkthroughs per stage
@@ -1456,54 +1554,60 @@ row's expected proof and message prefix by name, on fixtures in W1-I and on the 
 Setup as QUEST 5.6: the tranche's port, `http://127.0.0.1:<port>/?mute=1&scenario=<id>`, assertions on
 `window.__game`, and a screenshot path under `/tmp/w-<id>/` in the result.
 
-| Stage | Scenario | Steps | Pass when |
+Every row has its own scenario id in the owning tranche's `debug-scenarios.yaml` anchor. A `_start` scenario holds
+every prerequisite of its stage. A `_neg_*` scenario is the same start with exactly the one prerequisite in its
+name withheld. No tranche runs another tranche's scenario.
+
+| Stage | Scenario (owner) | Steps | Pass when |
 |---|---|---|---|
-| S1 | `w_s1_start` | talk to the King, walk north over the bridge | `BRIDGE_BUILT` set; the party stands on a former gap cell |
-| S2 | `w_s2_start` | talk to the captain, win, walk to the quay | BIKKE_DEFEATED; the ship sprite is at `a1_pravoka`; stepping onto it gives mode `ship` |
-| S2 (negative) | `w_s2_start` | walk to the quay before the fight | no ship sprite; the party can't step onto water |
-| S3 | `w_s3_start` | walk to Matoya's grove, enter | the map is `matoya-cave` |
-| S4 | `w_s4_start` | sail south and west to Elfheim, disembark | the map is `overworld` at the `elf_port` land cell; then `elfheim` |
-| S5 | `w_s5_start` | descend to B3, win | MARSH_GUARD_DEFEATED; `crown` in the inventory |
-| S6 | `w_s6_start` | give the crown, win | ASTOS_DEFEATED; `crystal_eye` held |
-| S7 | `w_s7_start` | talk to Matoya with the eye | `herb` held; the eye gone |
-| S8 | `w_s8_start` | use the herb on the prince | PRINCE_AWAKE; `mystic_key` held |
-| S9 | `w_s9_start` | open the vault | `tnt` held |
-| S10 | `w_s10_start` | give the TNT, sail west into the canal | CANAL_OPEN; the canal cells are sailable in mode `ship` |
-| S10 (negative) | `w_s10_start` (no TNT given) | sail to the canal strip | the ship stops at the isthmus coast |
-| S11 | `w_s11_start` | reach B3, win | VAMPIRE_DEFEATED; `ruby` held |
-| S12 | `w_s12_start` | feed the giant, walk west to Sarda | TITAN_FED; `rod` held |
-| S13 | `w_s13_start` | use the rod, descend, win, touch the altar | the 3 milestone flags in order |
-| S14 | `w_s14_start` | talk to the elder in the Circle | CANOE_GIVEN; stepping onto the lake gives mode `canoe` |
-| S14 (early) | `w_s10_start` + CANAL_OPEN | sail to Crescent | the shops are open, at B5 prices; the elder says the earth must heal first |
-| S15 | `w_s15_start` | canoe to the volcano, descend to B5, win | FIRE_CRYSTAL_LIT |
-| S16 | `w_s16_start` | canoe to the ice cavern, descend, win | EVIL_EYE_DEFEATED; `levistone` held |
-| S17 | `w_s17_start` | give the stone to the hull, board, fly, land on grass, try a forest | AIRSHIP_RAISED; the landing works; a forest cell says "The airship can't land here." |
-| S17 (negative) | `w_s17_start` (no levistone) | talk to the hull | no airship sprite |
-| S18 | `w_s18_start` | fly to the Citadel, sit on the throne, cross the lattice, win | ORDEALS_GUARD_DEFEATED; `ordeal_seal` held |
-| S19 | `w_s19_start` | give the seal to Bahamut | CLASS_UPGRADED; a warrior's class is its upgrade |
-| S20 | `w_s20_start` | land by Onrac, enter | the map is `onrac` |
-| S21 | `w_s21_start` | canoe up the river, talk to the automaton | `cube` held |
-| S21 (negative) | `w_s21_start` without the canoe | walk to the river | the party can't enter River |
-| S22 | `w_s22_start` | buy the bottle | `fairy_bottle` held; gold reduced by its price |
-| S23 | `w_s23_start` | open the bottle at the spring | FAIRY_FREED; `oxyale` held |
-| S24 | `w_s24_start` | board the submarine, descend to B5, win | WATER_CRYSTAL_LIT; `slab` held |
-| S24 (negative) | `w_s20_start` | step onto the submarine cell | the shipwright's message; the map stays `onrac` |
-| S25 | `w_s25_start` | give the slab to Unne | LUFENIAN_LEARNED |
-| S26 | `w_s26_start` | talk to the elder | `chime` held; the keepers are visible |
-| S26 (negative) | `w_s20_start` + airship | fly to Lufenia, talk to anyone | the lines are unreadable; no keeper is visible |
-| S27 | `w_s27_start` | ring at the door, climb, use the cube | SKY_FORTRESS_OPEN; the map is `sky-castle-1f` |
-| S27 (negative) | `w_s27_start` without the chime | step onto the door | the gate message; no transition |
-| S28 | `w_s28_start` | climb to 5F, win | WIND_CRYSTAL_LIT |
-| S29 | `w_s29_start` | use the stair in the temple | TIME_GATE_OPEN; the map is `past-temple-1` |
-| S30 | `w_s30_chaos_door` | talk to Chaos | the battle starts with `chaos` and the `rim` background |
+| S1 | `w_s1_start` (A1-O) | talk to the King, walk north over the bridge | `BRIDGE_BUILT` set; the party stands on a former gap cell |
+| S2 | `w_s2_start` (A1-T) | talk to the captain, win, walk to the quay | BIKKE_DEFEATED; the ship sprite is at `a1_pravoka`; stepping onto it gives mode `ship` |
+| S2 | `w_s2_neg_noboss` (A1-T) | walk to the quay without the fight | no ship sprite; the party can't step onto water |
+| S3 | `w_s3_start` (A1-O) | walk to Matoya's grove, enter | the map is `matoya-cave` |
+| S4 | `w_s4_start` (ELF-T) | sail south and west to Elfheim, disembark | the map is `overworld` at the `elf_port` land cell; then `elfheim` |
+| S5 | `w_s5_start` (ELF-D) | descend to B3, win | MARSH_GUARD_DEFEATED; `crown` in the inventory |
+| S6 | `w_s6_start` (ELF-O) | give the crown, win | ASTOS_DEFEATED; `crystal_eye` held |
+| S6 | `w_s6_neg_nocrown` (ELF-O) | talk to the false king | no battle; his line asks for the crown |
+| S7 | `w_s7_start` (A1-O) | talk to Matoya with the eye | `herb` held; the eye gone |
+| S8 | `w_s8_start` (ELF-T) | use the herb on the prince | PRINCE_AWAKE; `mystic_key` held |
+| S9 | `w_s9_start` (ELF-T) | open the vault | `tnt` held |
+| S10 | `w_s10_start` (ERT-O) | give the TNT, sail west into the canal | CANAL_OPEN; the canal cells are sailable in mode `ship` |
+| S10 | `w_s10_neg_notnt` (ERT-O) | sail to the canal strip | the ship stops at the isthmus coast |
+| S11 | `w_s11_start` (ERT-D) | reach B3, win | VAMPIRE_DEFEATED; `ruby` held |
+| S12 | `w_s12_start` (ERT-O) | feed the giant, walk west to Sarda | TITAN_FED; `rod` held |
+| S12 | `w_s12_neg_noruby` (ERT-O) | walk into the tunnel | the giant blocks the chokepoint |
+| S13 | `w_s13_start` (ERT-D) | use the rod, descend, win, touch the altar | the 3 milestone flags in order |
+| S14 | `w_s14_start` (FIR-T) | talk to the elder in the Circle | CANOE_GIVEN; stepping onto the lake gives mode `canoe` |
+| S14 | `w_s14_early` (FIR-T: the S10 grants and the ship at `fir_crescent`, no EARTH_CRYSTAL_LIT) | enter Crescent, visit a shop and the Circle | the shops are open at B5 prices; the elder says the earth must heal first; no canoe |
+| S15 | `w_s15_start` (FIR-D1) | canoe to the volcano, descend to B5, win | FIRE_CRYSTAL_LIT |
+| S16 | `w_s16_start` (FIR-D2) | canoe to the ice cavern, descend, win | EVIL_EYE_DEFEATED; `levistone` held |
+| S17 | `w_s17_start` (FIR-O) | give the stone to the hull, board, fly, land on grass, try a forest | AIRSHIP_RAISED; the landing works; a forest cell says "The airship can't land here." |
+| S17 | `w_s17_neg_nostone` (FIR-O) | talk to the hull | no airship sprite; the hull's line asks for the stone |
+| S18 | `w_s18_start` (ORD-O) | fly to the Citadel, sit on the throne, cross the lattice, win | ORDEALS_GUARD_DEFEATED; `ordeal_seal` held |
+| S19 | `w_s19_start` (ORD-O) | give the seal to Bahamut | CLASS_UPGRADED; a warrior's class is its upgrade |
+| S20 | `w_s20_start` (WAT-T) | land by Onrac, enter | the map is `onrac` |
+| S21 | `w_s21_start` (WAT-O) | canoe up the river, talk to the automaton | `cube` held |
+| S21 | `w_s21_neg_nocanoe` (WAT-O) | walk to the river | the party can't enter River |
+| S22 | `w_s22_start` (WAT-O) | buy the bottle | `fairy_bottle` held; gold reduced by its price |
+| S23 | `w_s23_start` (WND-T) | open the bottle at the spring | FAIRY_FREED; `oxyale` held |
+| S24 | `w_s24_start` (WAT-D) | board the submarine, descend to B5, win | WATER_CRYSTAL_LIT; `slab` held |
+| S24 | `w_s24_neg_nooxyale` (WAT-T) | step onto the submarine cell | the shipwright's message; the map stays `onrac` |
+| S25 | `w_s25_start` (ERT-T) | give the slab to Unne | LUFENIAN_LEARNED |
+| S26 | `w_s26_start` (WND-O) | talk to the elder | `chime` held; the keepers are visible |
+| S26 | `w_s26_neg_untaught` (WND-O) | talk to anyone in Lufenia | the lines are unreadable; no keeper is visible |
+| S27 | `w_s27_start` (WND-D1) | ring at the vestibule door, climb, use the cube | SKY_FORTRESS_OPEN; the map is `sky-castle-1f` |
+| S27 | `w_s27_neg_nochime` (WND-D1) | step onto the vestibule door | the gate message; no way to `inner` |
+| S28 | `w_s28_start` (WND-D2) | climb to 5F, win | WIND_CRYSTAL_LIT |
+| S29 | `w_s29_start` (PST) | use the stair in the temple | TIME_GATE_OPEN; the map is `past-temple-1` |
+| S30 | `w_s30_chaos_door` (PST) | talk to Chaos | the battle starts with `chaos` and the `rim` background |
 
 ### 6.6 Town standard and stubs
 
 - **`tests/quest/townStandard.test.ts`** (W1-I) checks each built town against its row of `townTargets.ts`, with the
   counts of 4.0.1. It prints a table of target and actual per column. A pending town is skipped unless
   `QUEST_STRICT=1`.
-- **`stubs.py --check <tranche>`** fails when any canon id the tranche owns is still a stub once its result is final
-  (G16).
+- **`stubs.py --check <tranche>`** fails when any canon id the tranche owns is still a stub (G16). `--count` only
+  reports.
 
 ## 7. Gates
 
@@ -1513,9 +1617,9 @@ command changes and the new gates:
 | Gate | Command | Expected |
 |---|---|---|
 | G1 layouts are deterministic | `for s in <owned layout scripts>; do python3 -I "$s" \|\| exit 1; done; python3 -I assets-src/tools/layouts/stubs.py && python3 -I assets-src/tools/layouts/world.py && git diff --exit-code assets-src/maps` (after committing) | exit 0, no diff |
-| G2 compile and determinism | O tranches: `python3 -I assets-src/tools/build_map.py overworld --region <region> <owned ids>`, then `... --check-determinism --region <region> overworld <owned ids>`. T and D tranches: `build_map.py <owned ids>` and `--check-determinism <owned ids>`, plus the O command only if they changed a `town_*_site.py`. W1-C1, W1-C2 and INT: the full world | each id prints `<id>: WxH -> assets/maps/ai/<id>.yaml`, then `<id>: deterministic`; exit 0 |
+| G2 compile and determinism | Every `overworld` compile, full or `--region`, takes the world-compile lock; a full compile also obeys the heavy-job rule (2.3). O tranches: `python3 -I assets-src/tools/build_map.py overworld --region <region> <owned ids>`, then `... --check-determinism --region <region> overworld <owned ids>`. T and D tranches: `build_map.py <owned ids>` and `--check-determinism <owned ids>`, plus the O command only if they changed a `town_*_site.py`. W1-C1, W1-C2 and INT: the full world | each id prints `<id>: WxH -> assets/maps/ai/<id>.yaml`, then `<id>: deterministic`; exit 0 |
 | G3 chunk locality | `python3 -I assets-src/tools/layouts/world.py --owned-chunks <region> > /tmp/w-<id>/owned.txt; git diff --name-only "$(git merge-base mainline HEAD)" HEAD -- assets/maps/ai/overworld/ \| grep -vxFf /tmp/w-<id>/owned.txt` | no output (grep exits 1). W1-C1 and W1-C2 are exempt: they re-baseline every chunk on purpose |
-| G4 build and tests | `npm run build && npm test` | exit 0; 0 failed |
+| G4 build and tests | `npm run build && npx vitest run --maxWorkers=2` (worktrees; INT on `mainline` may run `npm test`) | exit 0; 0 failed |
 | G5 gap verifier | W1: `npm run quest -- --mutate`. Regions: `for s in <the tranche's stages>; do npm run quest -- --mutate --stage "$s" \|\| exit 1; done`. INT: `npm run quest -- --strict --mutate` | every run ends with `quest-verify: OK`; exit 0 |
 | G6 asset coverage | `npx vitest run tests/data/assetCoverage.test.ts` | all passed |
 | G7 file-size ceilings | `npx vitest run tests/data/fileCeilings.test.ts tests/data/questCeilings.test.ts` | all passed |
@@ -1540,13 +1644,13 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 | # | Risk | Mitigation |
 |---|---|---|
 | R5 (changed) | A basin leaks (the ship reaches the world ocean before CANAL_OPEN), now through any of 5 walls in 4 regions | the placeholder walls from W1-0, so the basin check means something from the start; `basins: LEAK ... region <r>` names the culprit; G17 on every tranche; GT-13 cuts each wall |
-| R17 | Moving act 1 to (64, 64) breaks act-1 tests, saves or scenarios | the legacy 72x72 map is unchanged, and unit tests use it; `frozenCore.test.ts` checks byte-equality under translation; the 3 hard-coded test cells read `world.frames.a1`; `saveOriginShift.test.ts` (GAP-17); `frame: a1` for `r_ow_temple` (GAP-18) |
+| R17 | Moving act 1 to (64, 64) breaks act-1 tests, saves or scenarios | the legacy 72x72 map is unchanged, unit tests use it, and `?art=legacy` stays act-1 only (QUEST 3.1: new maps exist only compiled, and the translation applies only to the compiled world); `scenarioSpawns.test.ts` covers the 3 raw spawns; `frozenCore.test.ts` checks byte-equality under translation; the 3 hard-coded test cells read `world.frames.a1`; `saveOriginShift.test.ts` (GAP-17); `frame: a1` for `r_ow_temple` (GAP-18) |
 | R18 | The reference schematic (2.1, 2.2) is from memory and may be off for some places (Bahamut's isles, the caravan, Matoya's exact bearing) | the bands are loose (±30 %, ±40°); open question 1 lets the user correct the anchor table before W1-0; only `world-anchors.yaml` changes |
 | R19 | Classic early access (Crescent after the canal, Gaia and Onrac with the airship) breaks the level curve | proof (f) price walls; `questCurve.test.ts` at INT; the Lufenia showIf gate; open question 3 offers pass Q's gates back |
-| R20 | 34 tranches overload the integrator and the lock | at most 6 region tranches at once; O tranches first; T and D tranches compile only their own maps (no world compile unless they change a site file) |
+| R20 | 35 tranches overload the integrator and the lock | at most 6 region tranches at once; O tranches first; T and D tranches compile only their own maps (no world compile unless they change a site file) |
 | R21 | Stub churn (about 110 stub sources and compiled maps) | stubs are 1 chunk each (about 30 KB); `stubs.py` writes only missing ids; each tranche removes its own |
 | R22 | Git size: about 50 MB of new maps plus about 24 MB of world chunks | chunk alignment, G3, one world regeneration per merge; open question 12 offers Git LFS for `assets/maps/ai/**/*.png` |
-| R23 | ELF's 16-cell-wide arm and EARTH's isthmus are cramped (the bands take 4 cells) | the arm carries only the keep and a road; the isthmus only the dwarf hall, the canal and a landing; both are named in 2.4, so a tranche can raise `BLOCKED` early |
+| R23 | Cramped spots: ELF's 16-cell-wide arm and EARTH's isthmus (the bands take 4 cells); FIRE's north-west, where W_south, R-volcano, R-ice and the two cavern mouths meet near rows 146-150; Pravoka's fjord between the quay and the range | the arm carries only the keep and a road, the isthmus only the dwarf hall, the canal and a landing; FIRE's row budget and `northWest.test.ts` (4.4); the range at x 138-141 and `pravokaChannel.test.ts` (4.1); a tranche raises `BLOCKED` early if its budget can't be met |
 | R24 | Cross-region hand-offs (S22 to S23 to S24 to S25 to S26) stall when one tranche lags | assume mode; the matrix uses synthetic states; the stubs keep transitions valid |
 | R25 | `takeGold` and the clinic make gold scarce in the curve model | (d3); INT tunes the bottle price and the clinic rates in one place (`shops.yaml` anchors and NPC data) |
 | R26 | The kneel pass is still in flight (14 worktrees at 4ade849) | pass W starts only from the kneel merge head and never touches the kneel files |
@@ -1580,13 +1684,14 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 
 ## 10. TODOs
 
-- [ ] W0: this plan, rev 1; then the user's evaluation and momus review to PASS (priority: high, effort: 2h)
-- [ ] W1-0: contract: world_api, canon, stubs, anchors, quest.yaml, town targets, extractions, anchors in shared YAML (priority: high, effort: 6h)
+- [x] W0: this plan, rev 1 (20f32de); rev 2 answers momus; then the user's evaluation and momus review to PASS (priority: high, effort: 2h)
+- [ ] W1-0a: TS contract: QUEST Q1-0, quest.yaml with anchors, the ExplorationScene extraction to 590, anchors in shared YAML and enemies.yaml (priority: high, effort: 8h)
+- [ ] W1-0b: world data: world_api, build_hooks signatures, canon, stubs, site defaults, anchors file, town targets (priority: high, effort: 6h)
 - [ ] W1-A: vehicles and save, with the origin shift (priority: high, effort: 8h)
 - [ ] W1-B: NPC and field rules, takeGold, clinic, debug frame (priority: high, effort: 8h)
 - [ ] W1-C1: compiler core, per-chunk RNG, multi-rect --region, lock, memory probe (priority: high, effort: 8h)
 - [ ] W1-C2: composer, bands, seams, basins, act-1 translation, frozen core (priority: high, effort: 8h)
-- [ ] W1-D: kit placeholders and recolours (priority: medium, effort: 4h)
+- [ ] W1-D: kit placeholders and recolours; interiors_common town parameter; town_common.py extraction (priority: high, effort: 7h)
 - [ ] W1-E: chunk streaming (priority: high, effort: 6h)
 - [ ] W1-F: items, key items, shops, kits (priority: high, effort: 6h)
 - [ ] W1-G: spells L5-L8 (priority: high, effort: 6h)
@@ -1606,8 +1711,10 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 ## Results
 
 <!-- Each tranche appends its result between its own pair of anchors; the integrator writes INT and PLAY. -->
-<!-- === W1-0 FOUNDATION (pass W: owned by W1-0) === -->
-<!-- === end W1-0 === -->
+<!-- === W1-0a FOUNDATION (pass W: owned by W1-0a) === -->
+<!-- === end W1-0a === -->
+<!-- === W1-0b FOUNDATION (pass W: owned by W1-0b) === -->
+<!-- === end W1-0b === -->
 <!-- === W1-A FOUNDATION (pass W: owned by W1-A) === -->
 <!-- === end W1-A === -->
 <!-- === W1-B FOUNDATION (pass W: owned by W1-B) === -->
