@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { SPELL_PRICE_BY_LEVEL } from '../../src/systems/SpellPurchase.js';
 import { STARTING_GOLD } from '../../src/entities/PartyManager.js';
+import type { MapNPC } from '../../src/types/index.js';
 import type { ProofResult } from '../../src/progression/questTypes.js';
 import { buildQuestWorld, loadQuestWorld } from '../../src/progression/questData.js';
 import { createQuestContext } from '../../src/progression/questProofs.js';
@@ -34,7 +35,7 @@ function ctxOf(edit?: (i: Input) => void, late: LateInput = LATE): ReturnType<ty
 }
 
 const stage = (i: Input, id: string): Obj => ((i.quest as Obj).stages as Obj[]).find((s) => s.id === id)!;
-const npc = (i: Input, map: string, id: string): Obj => (i.maps.find((m) => m.id === map)!.npcs as unknown as Obj[]).find((n) => n.id === id)!;
+const npc = (i: Input, map: string, id: string): MapNPC => i.maps.find((m) => m.id === map)!.npcs.find((n) => n.id === id)!;
 const msgs = (r: ProofResult): string[] => r.failures.map((f) => f.message);
 
 describe('questLate: the constants mirror the game', () => {
@@ -108,7 +109,7 @@ describe('questLate: each proof passes clean and fails on its RED variant', () =
       const ow = i.maps.find((m) => m.id === 'overworld')!;
       ow.collision[2 * ow.width + 8] = 1;
       ow.collision[2 * ow.width + 4] = 0;
-      ow.transitions = [...ow.transitions.filter((t) => t.targetMap !== 'outpost'), { x: 4, y: 2, targetMap: 'outpost', targetEntrance: 'gate', targetX: 0, targetY: 0 }];
+      ow.transitions = [...ow.transitions.filter((t) => t.targetMap !== 'outpost'), { x: 4, y: 2, targetMap: 'outpost', targetEntrance: 'gate' }];
     }));
     expect(msgs(r)).toEqual(['EARLY outpost talkable before S0']);
     expect(r.failures[0].path).not.toContain('cave:battle:boss:3,1');
