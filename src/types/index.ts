@@ -75,6 +75,8 @@ export interface BossPhase {
   form?: string;
   /** The transformation interlude id (battle-interludes.yaml) a form phase plays. */
   interlude?: string;
+  /** A form phase only: the new form acts at once after a change reached by an action (CHAOS_FIX_PLAN 2.4 M6). */
+  arrivalTurn?: true;
 }
 
 /** Enemy combat numbers (FF1). The optional ones default to accuracy 0, evade 0, hits 1, crit 1 (out of 200). */

@@ -6,11 +6,14 @@ import { dataDrivenAI } from './enemyAiPattern.js';
 import { selectTarget } from './EnemyAI.js';
 
 /**
- * Boss forms (docs/CHAOS_FORMS_PLAN.md 2.1-2.2, mechanism M1): one HP pool shared by form records, form-bearing
- * `bossPhases` (`form: <enemy id>`), and the HP floor. While an enemy has an uncrossed form phase its HP never goes
- * below `ceil(threshold * pool)` (`setEnemyHp`); a phase is reached at `hp <= ceil(threshold * pool)`, and the form
- * changes right after the action that reached it (`BattleStateMachine.executeNextAction`; `prepareRound` resolves too,
- * as a safety net). Pure logic on the battle's own objects; no rendering.
+ * Boss forms (docs/CHAOS_FORMS_PLAN.md 2.1-2.2; docs/CHAOS_FIX_PLAN.md 2.4 M1-M6): one HP pool shared by form records,
+ * form-bearing `bossPhases` (`form: <enemy id>`), and the HP floor. A phase is **gated** when it has `form` or
+ * `interlude`; while an enemy has an uncrossed gated phase its HP never goes below `ceil(threshold * pool)` of the
+ * highest one (`setEnemyHp`), and a gated phase is reached at `hp <= ceil(threshold * pool)`. A reached form phase
+ * changes the form right after the action (`BattleStateMachine.executeNextAction`) or at the round start
+ * (`prepareRound`, no arrival); a reached non-form gated phase (F3's crack) is crossed by `checkBossPhases` at the next
+ * round start, and only then does the next floor apply. A form phase with `arrivalTurn` gives the new form one action
+ * right away. Pure logic on the battle's own objects; no rendering.
  */
 
 /** The per-instance form state (EnemyInstance extends it). */
@@ -40,31 +43,38 @@ export interface FormContext {
   rng: () => number;
 }
 
-/** The first uncrossed form phase (the highest threshold), with its index; null when none is left. */
-function nextFormPhase(enemy: EnemyInstance): { index: number; phase: BossPhase } | null {
+/** M1: the uncrossed gated phase (`form` or `interlude`) with the highest threshold, with its index; null when none. */
+function nextGatedPhase(enemy: EnemyInstance): { index: number; phase: BossPhase } | null {
   let best: { index: number; phase: BossPhase } | null = null;
   (enemy.data.bossPhases ?? []).forEach((phase, index) => {
-    if (!phase.form || enemy.crossedPhases?.has(index)) return;
+    if (!(phase.form || phase.interlude) || enemy.crossedPhases?.has(index)) return;
     if (!best || phase.hpThreshold > best.phase.hpThreshold) best = { index, phase };
   });
   return best;
 }
 
-/** The HP floor while a form phase is uncrossed: `ceil(threshold * pool)`; null when none is left. */
+/** M2: a gated phase's floor and reach, `ceil(threshold * pool)`. */
+export function gatedFloor(enemy: EnemyInstance, phase: BossPhase): number {
+  return Math.ceil(phase.hpThreshold * enemy.data.stats.hp);
+}
+
+/** The HP floor while a gated phase is uncrossed: `ceil(threshold * pool)`; null when none is left. */
 export function formFloor(enemy: EnemyInstance): number | null {
-  const next = nextFormPhase(enemy);
-  return next ? Math.ceil(next.phase.hpThreshold * enemy.data.stats.hp) : null;
+  const next = nextGatedPhase(enemy);
+  return next ? gatedFloor(enemy, next.phase) : null;
 }
 
 /**
- * Change the form of the first living enemy that has reached its form floor; one change per call (one per action).
- * `say` gets the phase's message when the phase has no interlude (an interlude carries its own lines).
+ * Change the form of the first living enemy whose next gated phase is a form phase it has reached (M3: a non-form
+ * gated phase in front, the crack, waits for `checkBossPhases`); one change per call (one per action). `say` gets the
+ * phase's message when the phase has no interlude (an interlude carries its own lines). `arrival` false (the round
+ * start) queues no arrival turn (M4).
  */
-export function resolvePendingForms(ctx: FormContext, say: (text: string) => void): FormChangeResult | null {
+export function resolvePendingForms(ctx: FormContext, say: (text: string) => void, arrival = true): FormChangeResult | null {
   for (const [index, enemy] of ctx.enemies.entries()) {
-    const next = enemy.currentHp > 0 ? nextFormPhase(enemy) : null;
-    if (!next || enemy.currentHp > Math.ceil(next.phase.hpThreshold * enemy.data.stats.hp)) continue;
-    const result = applyFormChange(enemy, index, next.index, ctx);
+    const next = enemy.currentHp > 0 ? nextGatedPhase(enemy) : null;
+    if (!next?.phase.form || enemy.currentHp > gatedFloor(enemy, next.phase)) continue;
+    const result = applyFormChange(enemy, index, next.index, ctx, arrival);
     if (!result) continue;
     if (result.message && !result.interlude) say(result.message);
     return result;
@@ -76,9 +86,12 @@ export function resolvePendingForms(ctx: FormContext, say: (text: string) => voi
  * Re-point the instance to the form record (2.2 item 3): HP kept, `crossedPhases` reset (R4), the old form's phase
  * deltas subtracted while spell buffs persist (R6), statuses cleared (D-O5: none kept), the AI rebuilt from the new
  * record's `ai` (a scenario `enemyAi` override is dropped, R7) and a still-queued command re-chosen in place (R7).
- * An unknown form record logs an error and releases the floor (the phase counts as crossed).
+ * M6: with `arrival` and the phase's `arrivalTurn`, and a hero alive, the new form's arrival action goes to the front
+ * of the queue (its choice drawn after the re-choices). An unknown form record logs an error and releases the floor
+ * (the phase counts as crossed).
  */
-export function applyFormChange(enemy: EnemyInstance, enemyIndex: number, phaseIndex: number, ctx: FormContext): FormChangeResult | null {
+export function applyFormChange(enemy: EnemyInstance, enemyIndex: number, phaseIndex: number, ctx: FormContext,
+  arrival = true): FormChangeResult | null {
   const phase = enemy.data.bossPhases![phaseIndex];
   const to = ctx.forms.get(phase.form!);
   if (!to) {
@@ -99,6 +112,9 @@ export function applyFormChange(enemy: EnemyInstance, enemyIndex: number, phaseI
   enemy.aiBehavior = ai ?? undefined;
   for (const queued of ctx.queue()) {
     if (queued.combatantId === enemy.id) queued.command = rechoose(enemy, ctx);
+  }
+  if (arrival && phase.arrivalTurn && ctx.party.some((c) => c.currentHp > 0)) {
+    ctx.queue().unshift({ combatantId: enemy.id, command: rechoose(enemy, ctx), isEnemy: true });
   }
   return { enemyIndex, from, to: to.id, ...(phase.interlude ? { interlude: phase.interlude } : {}),
     ...(phase.message ? { message: phase.message } : {}) };

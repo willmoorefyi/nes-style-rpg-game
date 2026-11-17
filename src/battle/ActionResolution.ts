@@ -4,6 +4,7 @@ import type { BossPattern } from './BossAI.js';
 import type { EnemyInstance, QueuedAction } from './BattleStateMachine.js';
 import { retargetIfDead } from './BattleCommands.js';
 import { retargetEnemyTarget } from './EnemyAI.js';
+import { gatedFloor } from './bossForms.js';
 
 /**
  * Pieces of the round that `BattleStateMachine` delegates (revision 6): target resolution (B2), item reservation
@@ -79,8 +80,10 @@ export function checkBossPhases(enemy: EnemyInstance, bossPatterns: Map<string, 
   if (!phases) return;
   const hpPercent = enemy.currentHp / enemy.data.stats.hp;
   for (let i = 0; i < phases.length; i++) {
-    // a form phase is never a plain phase: bossForms changes the form at its floor (CHAOS_FORMS_PLAN 2.2, R5)
-    if (phases[i].form || enemy.crossedPhases?.has(i) || hpPercent > phases[i].hpThreshold) continue;
+    // a form phase is never a plain phase: bossForms changes the form at its floor (CHAOS_FORMS_PLAN 2.2, R5); a gated
+    // phase (an interlude) is reached at its floor `ceil(t * pool)` (CHAOS_FIX_PLAN 2.4 M2), any other at `hp / pool <= t`
+    const reached = phases[i].interlude ? enemy.currentHp <= gatedFloor(enemy, phases[i]) : hpPercent <= phases[i].hpThreshold;
+    if (phases[i].form || enemy.crossedPhases?.has(i) || !reached) continue;
     enemy.crossedPhases?.add(i);
     applyPhaseOverrides(enemy, phases[i]);
     const ai = enemy.aiBehavior;

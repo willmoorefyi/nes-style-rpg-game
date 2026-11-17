@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, Assets, type BitmapText, type Texture } from 'pixi.js';
 import type { Scene, SpellData } from '../types/index.js';
 import { type BattleSceneDeps, type BattleSceneConfig, type UIState } from './battle/BattleSceneTypes.js';
-import type { BattleMessage, EnemyInstance } from '../battle/BattleStateMachine.js';
+import type { BattleConfig, BattleMessage, EnemyInstance } from '../battle/BattleStateMachine.js';
 import { BattleLayers } from './battle/BattleLayers.js';
 import { BATTLE_MESSAGE_FRAMES, INTRO_FRAMES, NOTICE_FRAMES, holdFrames } from './battle/battleTiming.js';
 import { createBattleDevClock, type BattleDevClock } from './battle/battleDevClock.js';
@@ -66,7 +66,7 @@ export class BattleScene implements Scene {
   // K4: Turn list in commandWindow during execution
   private turnListContainer = new Container();
 
-  constructor(deps: BattleSceneDeps, config: BattleSceneConfig) {
+  constructor(deps: BattleSceneDeps, config: BattleSceneConfig & Pick<BattleConfig, 'enemyHp'>) {
     this.deps = deps;
     this.config = config;
     this.spells = config.spells ?? [];
@@ -405,6 +405,12 @@ export class BattleScene implements Scene {
       mask.position.set(this.commandWindow.contentX, this.commandWindow.contentY);
       this.commandWindow.addChild(mask);
       this.turnListContainer.mask = mask;
+    }
+    // CHAOS_FIX_PLAN 2.4 M4: a round-start form change plays first; its end advances -1 -> 0 (the lines, else the actions)
+    const formChange = this.battle.roundFormChange;
+    if (formChange) this.animation.formView.queue({ done: false, messages: [], damageEvents: [], missed: false, formChange });
+    if (formChange && this.animation.formView.start()) {
+      this.currentMessageIndex = -1; this.lineInterlude = true; this.uiState = 'message'; return;
     }
     // ST-6: round-start lines (a boss phase change) show before the first announcement, on the message timer
     if (this.battle.currentMessages.length > 0) {

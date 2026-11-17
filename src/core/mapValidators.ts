@@ -78,8 +78,9 @@ export function validateScriptedEncounters(value: unknown, npcIds: string[]): vo
 }
 
 /** `bossPhases`: `hpThreshold` in (0, 1], a `patternId`, and the optional `message`, `hits`, `attack` (B1),
- * `attackAnim` (heavy from this phase on, ROSTER_PLAN 7.2), `form` (the next form's enemy id) and `interlude` (its
- * battle-interludes.yaml id; CHAOS_FORMS_PLAN 2.2 item 1, and on a non-form phase too, 18.8 row 2c). */
+ * `attackAnim` (heavy from this phase on, ROSTER_PLAN 7.2), `form` (the next form's enemy id), `interlude` (its
+ * battle-interludes.yaml id; CHAOS_FORMS_PLAN 2.2 item 1, and on a non-form phase too, 18.8 row 2c) and `arrivalTurn`
+ * (`true`, only with `form`; CHAOS_FIX_PLAN 2.4 M6). */
 export function validateBossPhases(value: unknown): void {
   expect('EnemyData.bossPhases', value, 'array');
   (value as unknown[]).forEach((phase, i) => {
@@ -100,6 +101,9 @@ export function validateBossPhases(value: unknown): void {
       if (ph[key] !== undefined && (typeof ph[key] !== 'string' || ph[key] === '')) {
         throw new ValidationError(`${p}.${key}: expected an id, got ${JSON.stringify(ph[key])}`);
       }
+    }
+    if (ph.arrivalTurn !== undefined && (ph.arrivalTurn !== true || ph.form === undefined)) {
+      throw new ValidationError(`${p}.arrivalTurn: expected true on a form phase, got ${JSON.stringify(ph.arrivalTurn)}`);
     }
   });
 }
