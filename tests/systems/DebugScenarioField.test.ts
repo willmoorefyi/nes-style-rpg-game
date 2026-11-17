@@ -117,7 +117,7 @@ describe('DebugScenarioLoader field mode', () => {
     for (const s of scenarios) {
       // pass W's w_* stage starts hold later story flags (WORLD 6.5): any known flag
       for (const f of s.flags ?? []) {
-        if (s.id.startsWith('w_')) expect(isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
+        if (s.id.startsWith('w_')) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
         else expect(known, `${s.id} flag ${f}`).toContain(f);
       }
       // pass F's f_* scenarios also start members stoned and afraid

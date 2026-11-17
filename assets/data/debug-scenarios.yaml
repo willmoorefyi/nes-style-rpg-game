@@ -1359,6 +1359,48 @@
   enemies: []
 # === end W1-B ===
 # === A1-O (pass W: owned by A1-O) ===
+# S1 (WORLD_PLAN 6.5): the throne room after the rescue. Talk to the King (act1_complete lays the north bridge), then
+# walk north from the city onto the former gap cells, world (93, 94) and (93, 95). Band 2-3, the B1 kit.
+- id: w_s1_start
+  name: W A1-O - S1 the north bridge (talk to the King)
+  mode: field
+  map: cornelia-castle-2f
+  entrance: throne_return
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE]
+  party: &a1o_b1_party
+    - { class: warrior, name: WAR, level: 3, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THF, level: 3, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 3, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 3, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: slep, level: 1 }] }
+  items: { lute: 1, potion: 5 }
+  gold: 400
+  enemies: []
+# S3: the mainland's north shore with the span built; walk north-west through the woods to Matoya's grove and enter.
+- id: w_s3_start
+  name: W A1-O - S3 Matoya's cave (visit)
+  mode: field
+  map: overworld
+  entrance: north_shore
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT]
+  party: *a1o_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 400
+  enemies: []
+# S7: in front of Matoya's door with the Crystal Eye (S6 done: the crown spent, Astos beaten). Band 10-13, the B3 kit.
+- id: w_s7_start
+  name: W A1-O - S7 Matoya's herb (the Crystal Eye held)
+  mode: field
+  map: overworld
+  entrance: a1_matoya
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED, ASTOS_DEFEATED]
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 10, equipment: [mythril_hammer, silver_armlet, cap], spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }] }
+  items: { lute: 1, crystal_eye: 1, potion: 5 }
+  gold: 1000
+  enemies: []
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===

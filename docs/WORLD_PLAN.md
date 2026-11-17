@@ -2486,6 +2486,148 @@ in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townSta
 `QUEST_STRICT=1` for INT.
 <!-- === end W1-I === -->
 <!-- === A1-O A1 (pass W: owned by A1-O) === -->
+### A1-O result: Cornelia's continent overworld, the bridge, Matoya (branch `w-a1-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-o/`.
+
+**Files:**
+
+- `layouts/world_a1.py` (region part, 125 lines; `stub=False`, returns its W_west and W_east parts) and
+  `layouts/a1/world_a1_ground.py` (the ground edits):
+  - X_west and X_east: ocean to mountain, except a few sea cells kept so that no 1-cell inlet forms against the
+    frozen coast: (71, 84) and the fjord head x 128-129, y 78-82.
+  - Pravoka's range: x 138-141, y 76-141, joined to X_east by x 136-137, y 76-82, with spurs at x 136-137 outside
+    rows 92-110.
+  - X_pravoka:
+    - Pravoka's grass shelf at x 128-131, y 97-104;
+    - a rock headland behind the town (x 129-131, y 97-99), because the approved `town_icon` art fills only the
+      icon's bottom row;
+    - a saddle pass (x 125-127, y 97) over the coastal knot.
+  - X_matoya: a rock hillock with Matoya's door on its south face, a clearing, and woods to the south.
+- `layouts/a1/world_a1_sites.py`:
+  - Matoya's `cave_mouth` (door (74, 75), anchor `a1_matoya` (74, 76));
+  - Pravoka's icon, door, gate anchor, quay dock and brig, all read from A1-T's `town_pravoka_site.py`. The brig
+    replaces the act-1 ship off Cornelia's jetty;
+  - the lighthouse (a `tower` placeholder) on the range at (138, 98);
+  - the cairn, an inspect cell with original text, at (126, 96);
+  - the patch `north_bridge`: flag BRIDGE_BUILT, `ground: "="`, on the gap rows (93-94, 94-95) **plus the gate
+    cells (93, 96) and (94, 96)** (GT-2).
+- `layouts/a1/world_a1_zones.py`, the zones:
+  - `a1_mainland` (walking; "Northern Mainland", the S2 roster): every walkable cell the north shore reaches on
+    foot;
+  - `a1_aldi` (ship; "Aldi Sea", the S4 sea roster) and `a1_north_sea` (ship; "Northern Sea": sahagin_chief,
+    shark, bigeyes): every Water cell of the A1 box is in exactly one of them.
+- `layouts/a1/matoya.py` writes `matoya-cave`, 18x14:
+  - earthen walls (the `cave` remap) and a design note;
+  - Matoya (`vendor_f`, tinted) with `requiredItem: crystal_eye` and the cutscene `a1_matoya_sight`;
+  - three wandering brooms (`black_wizard`, tinted brown);
+  - `exit` to `overworld:a1_matoya`.
+- `overworld_consts.py`, `BRIDGE_WORKERS` only:
+  - the two workers' lines change on BRIDGE_BUILT;
+  - the foreman (`bridge_worker_w`) gets `requiredItem: lute` and the cutscene `a1_bridge_finished`.
+  - `GATE_MESSAGE` text is unchanged (its comment is updated).
+- `cutscenes.yaml` (A1-O anchor): `act1_complete`, moved here and rewritten (the "completed the introduction" lines
+  are gone), `a1_bridge_finished` and `a1_matoya_sight`.
+- `debug-scenarios.yaml` (A1-O anchor): `w_s1_start`, `w_s3_start`, `w_s7_start`.
+- `quest.yaml` (A1-O anchor):
+  - S1, S3 and S7 are `built`;
+  - walks: S1 `[overworld:npc:bridge_worker_w]`, S7 `[matoya-cave:npc:matoya]`;
+  - entries: S3 at the north shore (93, 92), S7 at (74, 76).
+- Compiled: `overworld` (the A1 chunks, `patch_north_bridge.png`), `matoya-cave`, and the 13 Pravoka canon stubs
+  (`pravoka`, its 6 houses, 5 shops and inn), so that Pravoka's door leads somewhere until A1-T replaces them.
+- Tests in `tests/quest/a1/`:
+  - `pravokaChannel` (4): the range, at least 6 Water cells on rows 92-110, the quay, a RED case;
+  - `bridgePatch` (4): the patch and gates, closed until BRIDGE_BUILT then walked, the opaque overlay, the foreman
+    rule;
+  - `a1_o_sites` (11): the anchors within 2 cells, the doors, the brig, the cairn, Matoya's cave and lines, the
+    zones;
+  - `a1_o_walk` (4): S1, S3 and S7 walks and proof (a) in assume mode, plus the full run;
+  - `frozenCore` updated: the bridge workers' `dialog`, `cutscene` and `requiredItem` may change (4.1).
+
+**Gates:**
+
+| Gate | Command | Output |
+|---|---|---|
+| G5 | `npm run quest -- --mutate --stage S1`, `S3`, `S7` | each run `quest-verify: OK`. Bands: S1 L2.1 [2,3], S3 L2.1 [2,6], S7 L10.0 [10,13]. GT-2 finds the patch: "the patch north_bridge: patch north_bridge forced on", with `nonLoadBearing: pending: S2 not built` (its catch, SKIP S2, needs A1-T) |
+| G5 (full) | `npm run quest -- --mutate` | `(a) order: OK  S0 S1 S3 S2 ...`; `(d) ... S1 L2.3 [2,3]  S3 L3.0 [2,6]  S7 L10.0 [10,13]`; `mutations: OK (41 gate rows; 49 elements)`; `quest-verify: OK` |
+| G4 | `npx vitest run --maxWorkers=2 --minWorkers=1` (after the merge) | exit 0; `Test Files 304 passed (304)`, `Tests 6039 passed, 8 skipped (6047)` |
+| build | `npm run build` | exit 0 |
+| G1 | `matoya.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps` | exit 0 |
+| G2 | `build_map.py overworld --region a1` (under the lock), then `--check-determinism --region a1 overworld matoya-cave pravoka` | `overworld: region a1 of 192x192 -> ...`; `overworld: deterministic`, `matoya-cave: deterministic`, `pravoka: deterministic` |
+| G3 | `world.py --owned-chunks a1` vs `git diff --name-only mainline -- assets/maps/ai/overworld/` | no output (see the deviations) |
+| G6, G7, G12, G13, G14 | `assetCoverage`, `fileCeilings`, `questCeilings`, `tests/quest/`, `macroGeography`, `travelMatrix`; `npm run quest -- --only g` / `--only h` | all passed; `(g) geography: OK  s*=0.735 (31 pairs; 16 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 3 checked, 11 pending)` (T1 is now checked) |
+| G8 | `build_map.py --selftest` (before the merge; my `build_map.py` edit is dropped for FIR-O's) | `build_map selftest: 104 checks passed` |
+| G16 | `stubs.py --check A1-O` | `stubs: 0 left for A1-O` |
+| G17 | `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2741 cells, ocean 23814 cells; canal joins)`; `cuts: W_west 7, ... W_east 2, crescent_ring 9` |
+| G9, G15 | - | n/a (A1-O has no boss and no town) |
+| memory | `/usr/bin/time -l build_map.py overworld` (full, under the lock) | 9.1-10.3 GB peak, about 83 s; `--region a1` 6.7 GB |
+
+**G10, the browser checkpoints:**
+
+- Setup: port 5221, `mute=1`, my own headless Chromium driven by `/tmp/w-a1-o/cp.mjs`.
+- Walking paths come from the live compiled map. Random encounters are stopped while walking.
+- 0 console errors.
+
+| Stage | Scenario | Result | Screenshot |
+|---|---|---|---|
+| S1 | `w_s1_start` | the King, then INTRO_COMPLETE. A debug hop takes the party to the stub foot (93, 97), because the walk from the castle is act 1's and unchanged. The foreman then sets BRIDGE_BUILT, and the party walks onto the former gap cell (93, 95) | `/tmp/w-a1-o/s1_span.png` |
+| S3 | `w_s3_start` | 36 steps from the north shore; the map is `matoya-cave` at (8, 12) | `/tmp/w-a1-o/s3_cave.png` |
+| S7 | `w_s7_start` | talked to Matoya with the eye: herb 1, crystal_eye 0, A1_O_HERB_GIVEN set | `/tmp/w-a1-o/s7_matoya.png` |
+
+**Originality:**
+
+- One map is built, `matoya-cave`: one floor, no stairs; its design note is in the source.
+- Region note for A1, Distinct: a lighthouse range walls Pravoka's fjord from the outer sea; Pravoka stands on a
+  shelf under a rock headland; a cairn marks the saddle pass above the harbour.
+- A fresh reviewer passed the dialogue and the geography. The first Distinct line of `matoya-cave` failed, and it
+  was rewritten, and the reviewer then passed it. `originality review: PASS matoya-cave overworld(A1)`.
+
+**Deviations / hand-offs:**
+
+- **The bridge order (4.1, 6.5 S1, 0.1).** The King's `act1_complete` sets only INTRO_COMPLETE (he orders the span
+  rebuilt; ox-carts over a fade). The foreman at the south stub lays the last span (the hammers over a fade, then
+  BRIDGE_BUILT) once the party holds the lute.
+  - Why: setting BRIDGE_BUILT in the King's scene fails proof (a) with `ORDER S1 (BRIDGE_BUILT) holds before S0
+    completes`. The King needs only PRINCESS_RESCUED, so the span would open before the princess's lute, which is
+    one of S0's grants.
+  - The foreman also serves saves made after the old act-1 ending.
+  - The S1 checkpoint therefore talks to the King, then to the foreman.
+- **S3's band is [2, 6], not [3, 6].** Matoya's grove opens straight off the bridge (S1 is band 2-3). S3 is a visit
+  with no event, so the curve model has nothing to walk to in `--stage S3`, and it reports the S1 level.
+- **Matoya's trade is a cutscene behind `requiredItem`** (take_item crystal_eye, give_item herb, set_flag
+  A1_O_HERB_GIVEN), not `takeItem` + `giftItem` on the NPC.
+  - Why: `npcOutcome` plays an NPC cutscene only while its `requiredItem` is held, so a `takeItem` trade could
+    never also play `a1_matoya_sight`.
+  - GT-8 still applies: removing the `requiredItem` frees the herb.
+- **Outside my files** (each small, and needed by every region; please confirm):
+  - `build_hooks.bake_patches`: base objects touching a patch's cells are left out of the patched compile. Without
+    this, the act-1 bridge debris (`on_water`) fails on the deck, and the overlay would show the debris.
+  - `tests/data/questData`, `questGraph`, `travelMatrix` (T1 checked), `fieldRules` (the gap opens with the patch),
+    `bestiaryHabitats` (gr_wolf also lives on the Northern Mainland), `mapVariants`, `overworldLayout` (a lone door
+    cell is not a road component), `DebugScenarioField` (`w_*` starts may hold act-1 flags such as GOT_LUTE).
+  - `src/progression/questCurve.ts`: FIR-O's version is kept. My `--stage` band seeding is dropped.
+- **Chunk spill outside A1** (G3 is kept clean by leaving these files at `mainline`):
+  - A full compile writes 11 px into EARTH's `below_5_3` at cell (63, 80). This is X_west range art near the seam;
+    the sea cell (71, 84) differs from the placeholder world.
+  - A full compile also writes 6 px and 17 px into ELF's `below_9_6` and `below_10_6` at x 111, y 148-163. This is
+    FIRE's spill from FIR-O, which mainline's ELF chunks lack.
+  - The integrator's full regeneration will write all three.
+- **Ships and docks (WAT-O's finding).** The act-1 jetty ship is gone; the only ship spawns at Pravoka's quay dock
+  `a1_pravoka` (aldi). On this branch `npm run quest -- --stage S21` and `--stage S22` both print `(c) soft-locks:
+  OK`.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains:
+  - `layouts/a1/world_a1_{ground,sites,zones}.py` (A1's region part, imported by `world_a1.py`) and
+    `layouts/a1/matoya.py`, which writes `matoya-cave`;
+  - the patch `north_bridge` (BRIDGE_BUILT; the gap rows and the gate cells);
+  - `bake_patches` leaving out the base objects on a patch.
+- The act-1 ending:
+  - `act1_complete` sets INTRO_COMPLETE;
+  - the foreman (`bridge_worker_w`, `requiredItem: lute`) plays `a1_bridge_finished` (BRIDGE_BUILT);
+  - Matoya's `a1_matoya_sight` trades the eye for the herb.
+- The debug scenarios gain `w_s1_start`, `w_s3_start` and `w_s7_start`.
 <!-- === end A1-O === -->
 <!-- === A1-T A1 (pass W: owned by A1-T) === -->
 <!-- === end A1-T === -->

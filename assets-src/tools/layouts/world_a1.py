@@ -2,10 +2,14 @@
 
 `act1()` is the act-1 map document that `overworld.py main()` used to write (moved here by W1-C2, QUEST 3.5), on the
 local 72x72 grid of `overworld.build()`, unchanged except that the canoe spawn is gone (QUEST 3.3: the canoe is an
-ability). `build()` translates it by A1_ORIGIN into the region's world rect; every A1 cell outside the act-1 block
-(the east strip x 136-143 and the south strip y 136-143) is ocean. The four FROZEN_EXCEPTIONS rects are A1-O's and
-A1-T's to edit; until then the composer's placeholder walls fill X_west and X_east (ocean to mountain only).
-A1-O owns the region part of this file from W2 on (the X rects, Pravoka's range, the zones, the bridge patch).
+ability). `build()` translates it by A1_ORIGIN into the region's world rect; the A1 cells outside the act-1 block
+(the east strip x 136-143 and the south strip y 136-143) start as ocean.
+
+The region part (A1-O, W2; docs/WORLD_PLAN.md 4.1) lives in `layouts/a1/`: `world_a1_ground.py` edits the four
+FROZEN_EXCEPTIONS rects and builds Pravoka's range in the east strip (A1's parts of the walls W_west and W_east),
+`world_a1_sites.py` places Matoya's cave mouth, Pravoka's icon, gate, quay and brig (read from A1-T's
+`town_pravoka_site.py`), the lighthouse, the cairn and the `north_bridge` patch, and `world_a1_zones.py` adds the
+mainland and sea zones.
 """
 from __future__ import annotations
 
@@ -13,6 +17,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(1, str(Path(__file__).resolve().parent / "a1"))
 import overworld  # noqa: E402
 from overworld_consts import (ARRIVE, BOULDERS, BX, E_WARP, GATE_MESSAGE, JETTY, N_WARP, NORTH_SHORE,  # noqa: E402
                               PIER_TEXT, S_STUB, S_WARP, TEMPLE_DOOR, TEMPLE_WARP, TOMB, TOMB_CHEST, TOMB_END, W_WARP,
@@ -20,11 +25,14 @@ from overworld_consts import (ARRIVE, BOULDERS, BX, E_WARP, GATE_MESSAGE, JETTY,
 from overworld_zones import FIELDS, ZONE_BACKDROPS, encounter_zones  # noqa: E402
 from world_api import A1_ORIGIN, A1_SIZE, BOXES, UNSET, WATER, Cell, RegionOut  # noqa: E402
 from world_geom import bbox, translate  # noqa: E402
+import world_a1_ground as A1G  # noqa: E402
+import world_a1_sites as A1S  # noqa: E402
+from world_a1_zones import zones as a1_zones  # noqa: E402
 
 # act-1 ids that predate the region prefixes (world check 3 exempts them)
 LEGACY_IDS = frozenset({"cornelia", "cornelia_west", "cornelia_east", "cornelia_north", "castle", "north_shore",
                         "temple", "east_pocket", "temple_approach", "chest_tomb", "bridge_worker_w",
-                        "bridge_worker_e"})
+                        "bridge_worker_e", "north_bridge"})
 # the map-level keys of the world source (the composer writes them once, from A1)
 MAP_KEYS = ("id", "name", "camp", "kits", "music", "terrain", "encounterRate", "encounters")
 
@@ -95,17 +103,22 @@ def build(band: set[Cell]) -> tuple[RegionOut, dict]:
                     raise SystemExit(f"world_a1: act-1 cell local ({lx}, {ly}) is {g[lx, ly]!r} in a band")
                 continue
             rows[y - b.y0][x - b.x0] = g[lx, ly]
+    walls = A1G.apply(A1G.Ground(rows, b.x0, b.y0), band)
     t = translate(doc, A1_ORIGIN)
+    entrances = {k: [v[0] + ox, v[1] + oy] for k, v in doc["entrances"].items()}
+    ground = {(x, y): rows[y - b.y0][x - b.x0] for y in range(b.y0, b.y1 + 1) for x in range(b.x0, b.x1 + 1)}
     checks = {k: t[k] for k in ("road_check", "warp_leaves", "min_blob", "river_check")}
     checks["unreachable_ok"] = list(doc["unreachable_ok"])
     checks["reach_roots"] = ["cornelia", "north_shore"]
     checks["legacy_ids"] = sorted(LEGACY_IDS)
-    checks["anchors_pending"] = ["a1_matoya", "a1_pravoka"]       # A1-O and A1-T place them (2.2)
     out = RegionOut(
-        ground=["".join(r) for r in rows], objects=t["objects"], npcs=t["npcs"], inspect=t["inspect"],
-        transitions=t["transitions"], entrances={k: [v[0] + ox, v[1] + oy] for k, v in doc["entrances"].items()},
-        keyItemGates=t["keyItemGates"], encounterZones=t["encounterZones"], vehicles=t["vehicles"],
-        battleBackgrounds={"zones": t["battleBackgrounds"]["zones"]}, checks=checks, stub=True)
+        ground=["".join(r) for r in rows], objects=t["objects"] + A1S.objects(), npcs=t["npcs"],
+        inspect=t["inspect"] + A1S.inspect(), transitions=t["transitions"] + A1S.transitions(),
+        entrances={**entrances, **A1S.entrances()}, keyItemGates=t["keyItemGates"],
+        patches=[dict(A1S.NORTH_BRIDGE)], docks=A1S.docks(),
+        encounterZones=t["encounterZones"] + a1_zones(ground, band, tuple(entrances["north_shore"])),
+        vehicles=[A1S.ship()], battleBackgrounds={"zones": t["battleBackgrounds"]["zones"]}, checks=checks,
+        walls=walls)
     keys = {k: t[k] for k in MAP_KEYS}
     keys["battleBackgrounds"] = {k: v for k, v in t["battleBackgrounds"].items() if k != "zones"}
     keys["world"] = {"frames": {"a1": {"origin": list(A1_ORIGIN), "size": list(A1_SIZE)}}}
