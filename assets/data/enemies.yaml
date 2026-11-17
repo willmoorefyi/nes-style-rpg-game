@@ -2278,6 +2278,14 @@
   resist: ice
   family: undead
   size: huge
+  # ORD-O (WORLD 3.7: L25 sensible 75-95 %, tests/balance/w_ord_o.test.ts): its 268 HP fall to one warrior's turn at
+  # the band, so the guardian rises already wrathful (from full HP: 3 hits, attack 95) behind its three king mummies
+  bossPhases:
+  - hpThreshold: 1.0
+    patternId: aggressive
+    message: Grave-light kindles in the carcass's ribs. Its claws rake the air!
+    hits: 3
+    attack: 95
 # === end ORD-O dragon_zombie ===
 - id: sahagin_prince
   name: Sahagin Prince
