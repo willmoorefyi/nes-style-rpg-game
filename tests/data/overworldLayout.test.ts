@@ -9,14 +9,33 @@ import { TerrainType } from '../../src/types/index.js';
 import type { MapData } from '../../src/types/index.js';
 import { backdropTerrain, battleBackdropId } from '../../src/scenes/exploration/BattleBackdrop.js';
 
-/** The generated act-1 overworld (assets-src/tools/layouts/overworld.py, compiled by build_map.py): T3c. */
+/**
+ * The generated act-1 overworld (assets-src/tools/layouts/overworld.py, compiled by build_map.py): T3c. Since pass W
+ * it is region A1 of the 192x192 world (layouts/world.py), translated by `world.frames.a1.origin` (D-W11): every
+ * hard-coded act-1 cell below is offset by the origin, and the whole-map scans are clipped to the act-1 frame
+ * (QUEST 4.3), so other regions' roads, rivers and sand never count here.
+ */
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const map = parse(readFileSync(join(root, 'assets/maps/ai/overworld.yaml'), 'utf-8')) as MapData;
-const source = parse(readFileSync(join(root, 'assets-src/maps/overworld.yaml'), 'utf-8')) as {
+const raw = parse(readFileSync(join(root, 'assets-src/maps/overworld.yaml'), 'utf-8')) as {
   ground: string; objects: Array<{ type: string; x: number; y: number; parts?: Array<Array<string | null>> }>;
+  world?: MapData['world'];
 };
-const ground = source.ground.trimEnd().split('\n');
+const rawRows = raw.ground.trimEnd().split('\n');
+/** The act-1 frame: the compiled map's (GAP-17); a compiled map as wide as the source shares the source's; a map
+ * without one is act 1 alone at (0, 0). */
+const srcFrame = raw.world?.frames.a1 ?? { origin: [0, 0], size: [rawRows[0].length, rawRows.length] };
+const frame = map.world?.frames.a1 ?? (map.width === rawRows[0].length ? srcFrame
+  : { origin: [0, 0] as [number, number], size: [map.width, map.height] as [number, number] });
+const [OX, OY] = frame.origin;
+/** The source, read in the compiled map's cells (they differ while the compiled map is an older act-1 build). */
+const [DX, DY] = [srcFrame.origin[0] - OX, srcFrame.origin[1] - OY];
+const source = { ...raw, objects: raw.objects.map((o) => ({ ...o, x: o.x - DX, y: o.y - DY })) };
+const ground = rawRows.slice(Math.max(0, DY)).map((r) => r.slice(Math.max(0, DX)));
 const ch = (x: number, y: number) => ground[y]?.[x] ?? 'o';
+const inFrame = (x: number, y: number) => x >= OX && y >= OY && x < OX + frame.size[0] && y < OY + frame.size[1];
+/** An act-1 (local) cell in map cells. */
+const at = (x: number, y: number): [number, number] => [x + OX, y + OY];
 
 type Cell = [number, number];
 const key = (x: number, y: number) => `${x},${y}`;
@@ -60,12 +79,13 @@ function steps(from: Cell, to: Cell): number {
   return Infinity;
 }
 
-/** 4-connected components of the cells matching `pred`. */
-function components(pred: (x: number, y: number) => boolean): Cell[][] {
+/** 4-connected components of the act-1 frame's cells matching `pred`. */
+function components(pred0: (x: number, y: number) => boolean): Cell[][] {
+  const pred = (x: number, y: number) => inFrame(x, y) && pred0(x, y);
   const seen = new Set<string>();
   const out: Cell[][] = [];
-  for (let y = 0; y < map.height; y++) {
-    for (let x = 0; x < map.width; x++) {
+  for (let y = OY; y < OY + frame.size[1]; y++) {
+    for (let x = OX; x < OX + frame.size[0]; x++) {
       if (!pred(x, y) || seen.has(key(x, y))) continue;
       const comp: Cell[] = [];
       const queue: Cell[] = [[x, y]];
@@ -101,8 +121,21 @@ const gapOf = (g: { x: number; y: number }) => {
 };
 const gap = gates.flatMap((g) => gapOf(g).cells);
 const eastBridge = Array.from({ length: map.width * map.height }, (_, i): Cell => [i % map.width, Math.floor(i / map.width)])
-  .filter(([x, y]) => terrain(x, y) === BRIDGE && DIRS.some(([dx, dy]) => inside(x + dx, y + dy) && terrain(x + dx, y + dy) === RIVER));
+  .filter(([x, y]) => inFrame(x, y) && terrain(x, y) === BRIDGE && DIRS.some(([dx, dy]) => inside(x + dx, y + dy) && terrain(x + dx, y + dy) === RIVER));
 const roadCell = (x: number, y: number) => terrain(x, y) === ROAD || terrain(x, y) === BRIDGE;
+/** The pier's end: the one inspect cell that talks of the pier (on the water just off the jetty). */
+const pier = (): Cell => {
+  const e = (map.inspect ?? []).filter((i) => (i.text as string[]).some((l) => /pier/i.test(l)));
+  expect(e).toHaveLength(1);
+  return [e[0].x, e[0].y];
+};
+/** The jetty's bridge cells, from the pier's end inland (nearest the pier first). */
+const jettyCells = (): Cell[] => {
+  const [px, py] = pier();
+  const cells: Cell[] = [];
+  for (let y = py - 1; terrain(px, y) === BRIDGE; y--) cells.push([px, y]);
+  return cells;
+};
 const roadComps = components(roadCell).filter((c) => !c.every(([x, y]) => terrain(x, y) === BRIDGE));   // not the far stub
 
 describe('overworld layout (T3c)', () => {
@@ -132,7 +165,7 @@ describe('overworld layout (T3c)', () => {
       .toBeGreaterThan(1.15 * peninsula.size);
     // the isthmus: were the mountains walkable, the north shore could be reached on foot (no water in the way)
     const rock = new Set<string>();
-    for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) if (terrain(x, y) === MOUNTAIN) rock.add(key(x, y));
+    for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) if (inFrame(x, y) && terrain(x, y) === MOUNTAIN) rock.add(key(x, y));
     expect(reach(start, gateCells, rock).has(north)).toBe(true);
   });
 
@@ -209,7 +242,6 @@ describe('overworld layout (T3c)', () => {
   it('OW-1: the roads and bridges form one network linking the gates, the temple, both bridges, the tomb and the jetty', () => {
     expect(roadComps.length).toBe(1);
     const net = new Set(roadComps[0].map((c) => key(...c)));
-    const ship = map.vehicles!.find((v) => v.type === 'ship')!;
     const tomb = map.inspect![0];
     const tombApproach = DIRS.map(([dx, dy]): Cell => [tomb.x + dx, tomb.y + dy]).filter(([x, y]) => terrain(x, y) === ROAD);
     const targets: Array<[string, Cell[]]> = [
@@ -217,7 +249,7 @@ describe('overworld layout (T3c)', () => {
       ['north bridge (gated stub)', gates.map((g): Cell => [g.x, g.y])],
       ['east bridge', eastBridge],
       ['tomb clearing', tombApproach],
-      ['jetty', [[ship.x, ship.y - 1]]],
+      ['jetty', [jettyCells()[0]]],
     ];
     for (const [name, cells] of targets) {
       expect(cells.length, name).toBeGreaterThan(0);
@@ -408,7 +440,7 @@ describe('overworld battle backgrounds (BA-12)', () => {
   });
 
   it('beach sand compiles to Desert, and Desert battles use the shoreline background', () => {
-    const sand = ground.flatMap((row, y) => [...row].map((c, x): Cell | null => (c === 's' ? [x, y] : null)))
+    const sand = ground.flatMap((row, y) => [...row].map((c, x): Cell | null => (c === 's' && inFrame(x, y) ? [x, y] : null)))
       .filter((c): c is Cell => c !== null);
     expect(sand.length).toBeGreaterThan(0);
     for (const [x, y] of sand) expect(terrain(x, y), `sand at (${x},${y})`).toBe(TerrainType.Desert);
@@ -448,17 +480,15 @@ describe('overworld second-pass fixes (R4b)', () => {
   });
 
   it('W6: a footbridge over the city stream: the field west of the stream is a few steps from the south gate', () => {
-    expect(steps(start, [24, 47])).toBeLessThanOrEqual(8);
+    expect(steps(start, at(24, 47))).toBeLessThanOrEqual(8);
   });
 
   it('W9: the jetty runs out between open water, and its end can be inspected', () => {
-    const ship = map.vehicles!.find((v) => v.type === 'ship')!;
-    const jetty: Cell[] = [];
-    for (let y = ship.y - 1; terrain(ship.x, y) === BRIDGE; y--) jetty.push([ship.x, y]);
+    // QUEST 4.3: found from the pier's inspect cell, not the ship spawn (A1-T moves the ship to Pravoka's quay)
+    const jetty = jettyCells();
     expect(jetty.length).toBe(3);
     for (const [x, y] of jetty) expect(isWater(x - 1, y) && isWater(x + 1, y), `jetty (${x},${y})`).toBe(true);
-    const end = (map.inspect ?? []).find((e) => e.x === ship.x && e.y === ship.y);
-    expect((end?.text as string[] | undefined)?.join(' ')).toMatch(/pier/i);
+    expect(isWater(...pier())).toBe(true);
   });
 
   it('W11: no vines hang in mid-air (none on a cell below walkable ground or grass)', () => {
@@ -495,7 +525,7 @@ describe('overworld second-pass fixes (R4b)', () => {
 describe('overworld third-pass fixes (U)', () => {
   it('U17: two builders stand beside the south stub from INTRO_COMPLETE on, on walkable cells off the stub', () => {
     const stub = gates.map((g) => [g.x, g.y] as Cell);
-    expect(stub).toEqual([[29, 32], [30, 32]]);
+    expect(stub).toEqual([at(29, 32), at(30, 32)]);
     const workers = map.npcs.filter((n) => n.showIf === 'INTRO_COMPLETE');
     expect(workers).toHaveLength(2);
     const atlas = JSON.parse(readFileSync(join(root, 'assets/sprites/characters-ai.json'), 'utf-8')) as
@@ -513,7 +543,7 @@ describe('overworld third-pass fixes (U)', () => {
     }
     // the stub's road stays open: the bridge foot is still reachable with the workers standing
     const blocked = new Set(workers.map((w) => key(w.x, w.y)));
-    expect(reach(start, blocked).has(key(29, 33))).toBe(true);
+    expect(reach(start, blocked).has(key(...at(29, 33)))).toBe(true);
   });
 
   it('U19: the temple icon uses the `brighter` recolour (darker than the city at 0.25 scale under `bright`)', () => {
