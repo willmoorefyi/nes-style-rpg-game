@@ -42,6 +42,12 @@ function namedCell(map: MapData, name: string): { x: number; y: number } | null 
 
 type Hit = 'yes' | 'no' | 'missing';
 
+function startOf(rows: readonly TravelRow[], row: TravelRow): string {
+  if (row.start) return row.start;
+  const base = row.from ? rows.find((r) => r.id === row.from) : undefined;
+  return base ? startOf(rows, base) : 'cornelia';
+}
+
 export interface TravelOutcome {
   row: string;
   status: 'ok' | 'fail' | 'pending';
@@ -53,8 +59,9 @@ export function travelRow(ctx: QuestContext, rows: readonly TravelRow[], row: Tr
   const { world } = ctx;
   const map = world.maps.get(world.worldMap);
   const out: TravelOutcome = { row: row.id, status: 'ok', failures: [], missing: [] };
-  const startCell = map ? namedCell(map, 'cornelia') : null;
-  if (!map || !startCell) return { ...out, status: 'pending', missing: ['cornelia'] };
+  const startName = startOf(rows, row);
+  const startCell = map ? namedCell(map, startName) : null;
+  if (!map || !startCell) return { ...out, status: 'pending', missing: [startName] };
   const st = rowState(rows, row);
   const vehicles: VehicleState[] = [];
   for (const v of st.vehicles) {

@@ -202,11 +202,11 @@ export function npcRemoved(ctx: QuestContext, item: string): MutElement[] {
   return out;
 }
 
-/** The trigger of the cutscene that places a vehicle, with every condition removed. */
-export function vehicleTrigger(ctx: QuestContext, vehicle: string): MutElement[] {
+/** The trigger of the cutscene that places a vehicle (or sets its flag), with every condition removed. */
+export function vehicleTrigger(ctx: QuestContext, vehicle: string, flag: string): MutElement[] {
   const out: MutElement[] = [];
   for (const ev of ctx.cat.events) {
-    if (ev.source.type !== 'npc' || !ev.grants.vehicles.includes(vehicle)) continue;
+    if (ev.source.type !== 'npc' || !(ev.grants.vehicles.includes(vehicle) || ev.grants.flags.includes(flag))) continue;
     const n = ev.source.npc;
     const m = ctx.world.maps.get(ev.map)!;
     out.push(el(ctx, m.id, 'npc', n.x, n.y, `npc ${n.id} fires with no conditions`, (w) => editMap(w, m.id, (c) => {

@@ -47,12 +47,11 @@ const item = (row: string, stage: string, what: string, it: string, next: string
   row, stages: [stage], element: `${what}'s requiredItem: ${it}`, mutation: 'remove', find: (c) => itemNeeds(c, it),
   expect: skip(next),
 });
-const bossNeeds = (boss: string) => (c: QuestContext, f: string): MutElement[] => flagNeeds(c, f, (e) => e.boss.includes(boss));
 const grantNeeds = (ids: string[]) => (c: QuestContext, f: string): MutElement[] => flagNeeds(c, f, (e) => grantsAny(e, ids));
 
 export const GATE_ROWS: GateRow[] = [
   { row: 'GT-1', stages: ['S0', 'S1'], element: 'the bridge gate cells', mutation: 'remove', nlb: 'entry', expect: [],
-    find: (c) => gatesRemoved(c, (g, patched) => !g.permanent && flagsOf(g).includes('BRIDGE_BUILT') && !patched) },
+    find: (c) => gatesRemoved(c, (g) => !g.permanent && flagsOf(g).includes('BRIDGE_BUILT')) },
   { row: 'GT-2', stages: ['S1'], element: 'the patch north_bridge', mutation: 'force on from the start',
     find: (c) => patchOn(c, 'north_bridge'), expect: [...skip('S2'), ...early('pravoka')] },
   { row: 'GT-3', stages: ['S2', 'S4'], element: 'the ship spawn requiredFlag: BIKKE_DEFEATED', mutation: 'remove',
@@ -64,7 +63,7 @@ export const GATE_ROWS: GateRow[] = [
   { row: 'GT-5b', stages: ['S4', 'S10'], element: 'both Aldi docks of Elfland\'s coast, elf_port and ert_dwarf',
     mutation: 'remove both', find: (c) => docks(c, ['elf_port', 'ert_dwarf']), expect: [goal] },
   { row: 'GT-6', stages: ['S6'], element: 'Astos\'s requiredFlags: [MARSH_GUARD_DEFEATED]', mutation: 'remove', nlb: 'entry',
-    expect: [], find: (c) => bossNeeds('astos')(c, 'MARSH_GUARD_DEFEATED') },
+    expect: [], find: (c) => grantNeeds(['ASTOS_DEFEATED'])(c, 'MARSH_GUARD_DEFEATED') },
   item('GT-7', 'S6', 'Astos', 'crown', 'S6'),
   item('GT-8', 'S7', 'Matoya', 'crystal_eye', 'S7'),
   item('GT-9', 'S8', 'the prince', 'herb', 'S8'),
@@ -92,10 +91,11 @@ export const GATE_ROWS: GateRow[] = [
     expect: skip('S15', 'S16'), anyOf: true },
   item('GT-22', 'S17', 'the buried hull', 'levistone', 'S17'),
   { row: 'GT-23', stages: ['S17', 'S18'], element: 'the airship\'s set_vehicle cutscene\'s trigger', mutation: 'fire it with no levistone',
-    find: (c) => vehicleTrigger(c, 'airship'), expect: skip('S18') },
+    find: (c) => vehicleTrigger(c, 'airship', 'AIRSHIP_RAISED'), expect: skip('S18') },
   item('GT-24', 'S19', 'Bahamut', 'ordeal_seal', 'S19'),
   { row: 'GT-25', stages: ['S21'], element: 'the waterfall river (R-waterfall)', mutation: 'make the cut walkable',
-    find: (c) => canoeCut(c, 'wat_onrac', 'wat_waterfall'), expect: skip('S21') },
+    find: (c) => canoeCut(c, 'wat_onrac', 'wat_waterfall'), anyOf: true,
+    expect: [...skip('S21'), { proof: 'h', prefix: 'TRAVEL T6b reaches wat_waterfall' }] },
   item('GT-26', 'S23', 'the fairy', 'fairy_bottle', 'S23'),
   item('GT-27', 'S24', 'the submarine gate', 'oxyale', 'S24'),
   item('GT-28', 'S25', 'Unne', 'slab', 'S25'),

@@ -1,0 +1,343 @@
+# The mini world (W1-I): the whole pass-W chain S0-S30 built in miniature on one 48x32 world map and nine rooms, so
+# every gate-table row of docs/WORLD_PLAN.md 6.3 (GT-1 to GT-37, GT-5b) has its element (questMutate.test.ts). The
+# coastlines are topology only. Stand-ins for field rules not in fieldRules.ts yet (W1-A, W1-B):
+# - a patch's crossing (north_bridge, canal) is also gated by its flag on the patch cells; "forced on" clears both;
+# - a river or lake crossing is a Bridge cell gated by the `canoe` item (the canoe cut finds it);
+# - flight is a transition from the desert gated by AIRSHIP_RAISED (no airship spawn: it could not land), so the
+#   stages after S17 need AIRSHIP_RAISED where quest.yaml says `airship`.
+# Regions: P the peninsula (start, Garland, the King, the princess, the builder), the bridge (stub gate (9,3), gap
+# (10-11,3)), M the mainland (Pravoka, Matoya), the Aldi sea (docks a1_pravoka, elf_port, ert_dwarf), S Elfland and
+# the dwarves, the isthmus x 31 (cuts W_west .. W_east, the canal at y 11), the ocean (docks ert_melmond,
+# fir_crescent), CS Crescent's shore and its ring x 37 (cut crescent_ring, river (37,5)), FL the volcano, ice and
+# desert lands, L Melmond's plain, the western range y 17 (cut western_range, the giant's tunnel (42,17)), Sarda's
+# coast, the lich's room, N the north (Citadel, Bahamut, Onrac, the waterfall, the caravan, the fairy, the shrine,
+# Lufenia, the Mirage, the sky castle, the time gate) and the temple of the past.
+start: {map: overworld, x: 2, y: 2}
+worldMap: overworld
+items:
+  - {id: lute, type: key}
+  - {id: crown, type: key}
+  - {id: crystal_eye, type: key}
+  - {id: herb, type: key}
+  - {id: mystic_key, type: key}
+  - {id: tnt, type: key}
+  - {id: ruby, type: key}
+  - {id: rod, type: key}
+  - {id: canoe, type: key}
+  - {id: levistone, type: key}
+  - {id: ordeal_seal, type: key}
+  - {id: cube, type: key}
+  - {id: fairy_bottle, type: key}
+  - {id: oxyale, type: key}
+  - {id: slab, type: key}
+  - {id: chime, type: key}
+  # tokens: a trade's gift must be a key item for the NPC to be an event (questEvents.npcRelevant)
+  - {id: blast_plan, type: key}
+  - {id: giant_meal, type: key}
+  - {id: hull_log, type: key}
+  - {id: dragon_mark, type: key}
+  - {id: unne_notes, type: key}
+  - {id: console_key, type: key}
+  - {id: potion, type: consumable}
+cutscenes:
+  - {id: garland_won, steps: [{type: set_flag, flag: PRINCESS_RESCUED}]}
+  - {id: king_order, steps: [{type: set_flag, flag: INTRO_COMPLETE}]}
+  - {id: build_bridge, steps: [{type: set_flag, flag: BRIDGE_BUILT}]}
+  - {id: guard_won, steps: [{type: give_item, item: crown}]}
+  - {id: vampire_won, steps: [{type: give_item, item: ruby}]}
+  - {id: evil_won, steps: [{type: give_item, item: levistone}]}
+  - {id: zombie_won, steps: [{type: give_item, item: ordeal_seal}]}
+  - {id: drowned_won, steps: [{type: give_item, item: slab}]}
+  - {id: crystal_earth, steps: [{type: set_flag, flag: EARTH_CRYSTAL_LIT}]}
+quest:
+  goal: CHAOS_DEFEATED
+  stages:
+    - {id: S0, tranche: "-", grants: {flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE], items: [lute]},
+       boss: [garland], band: [1, 50], status: built,
+       nonLoadBearing: [{map: overworld, kind: gate, at: [9, 3], reason: "the next gap cell's gate holds the crossing"},
+         {map: overworld, kind: gate, at: [10, 3], reason: "the next gap cell's gate holds the crossing"},
+         {map: overworld, kind: gate, at: [11, 3], reason: "the stub's gate holds the crossing"}]}
+    - {id: S1, after: [S0], requires: {flags: [INTRO_COMPLETE]}, grants: {flags: [BRIDGE_BUILT]}, status: built}
+    - {id: S2, after: [S1], requires: {flags: [BRIDGE_BUILT]}, grants: {flags: [BIKKE_DEFEATED], vehicles: [ship]},
+       boss: [pirate], maps: [pravoka], status: built}
+    - {id: S3, after: [S1], requires: {flags: [BRIDGE_BUILT]}, maps: [matoya-cave], status: built}
+    - {id: S4, after: [S2], requires: {vehicles: [ship]}, maps: [elfheim], status: built,
+       nonLoadBearing: [{map: overworld, kind: dock, at: [12, 13], reason: "Elfland is also reached on foot from ert_dwarf"}]}
+    - {id: S5, after: [S4], requires: {vehicles: [ship]}, grants: {flags: [MARSH_GUARD_DEFEATED], items: [crown]},
+       boss: [piscodemon], status: built}
+    - {id: S6, after: [S5], requires: {flags: [MARSH_GUARD_DEFEATED], items: [crown]},
+       grants: {flags: [ASTOS_DEFEATED], items: [crystal_eye]}, status: built,
+       nonLoadBearing: [{map: overworld, kind: npc, at: [17, 18], reason: "the crown is given only by the guard's victory"}]}
+    - {id: S7, after: [S6, S3], requires: {items: [crystal_eye]}, grants: {items: [herb]}, status: built}
+    - {id: S8, after: [S7], requires: {items: [herb]}, grants: {flags: [PRINCE_AWAKE], items: [mystic_key]}, status: built}
+    - {id: S9, after: [S8], requires: {items: [mystic_key]}, grants: {items: [tnt]}, status: built}
+    - {id: S10, after: [S9], requires: {items: [tnt]}, grants: {flags: [CANAL_OPEN]}, status: built,
+       nonLoadBearing: [{map: overworld, kind: dock, at: [22, 13], reason: "the dwarves are also reached on foot from Elfland"}]}
+    - {id: S11, after: [S10], requires: {flags: [CANAL_OPEN]}, grants: {flags: [VAMPIRE_DEFEATED], items: [ruby]},
+       boss: [vampire], status: built}
+    - {id: S12, after: [S11], requires: {items: [ruby]}, grants: {flags: [TITAN_FED], items: [rod]}, status: built,
+       nonLoadBearing: [{map: overworld, kind: npc, at: [46, 20], reason: "Sarda is behind the giant, who needs the ruby"}]}
+    - {id: S13, after: [S12], requires: {items: [rod]},
+       grants: {flags: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT]}, boss: [lich],
+       milestones: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT], status: built}
+    - {id: S14, after: [S13], requires: {flags: [EARTH_CRYSTAL_LIT], vehicles: [ship]},
+       grants: {flags: [CANOE_GIVEN], items: [canoe]}, status: built}
+    - {id: S15, after: [S14], requires: {items: [canoe]}, grants: {flags: [FIRE_CRYSTAL_LIT]}, boss: [ashen_queen], status: built}
+    - {id: S16, after: [S14], requires: {items: [canoe]}, grants: {flags: [EVIL_EYE_DEFEATED], items: [levistone]},
+       boss: [evil_eye], status: built}
+    - {id: S17, after: [S16], requires: {items: [levistone]}, grants: {flags: [AIRSHIP_RAISED]}, status: built}
+    - {id: S18, after: [S17], requires: {flags: [AIRSHIP_RAISED]}, grants: {flags: [ORDEALS_GUARD_DEFEATED], items: [ordeal_seal]},
+       boss: [dragon_zombie], status: built}
+    - {id: S19, after: [S18], requires: {items: [ordeal_seal]}, grants: {flags: [CLASS_UPGRADED]}, optional: true, status: built}
+    - {id: S20, after: [S17], requires: {flags: [AIRSHIP_RAISED]}, maps: [onrac], status: built}
+    - {id: S21, after: [S20, S14], requires: {flags: [AIRSHIP_RAISED], items: [canoe]}, grants: {flags: [CUBE_GIVEN], items: [cube]},
+       status: built}
+    - {id: S22, after: [S17], requires: {flags: [AIRSHIP_RAISED]}, grants: {items: [fairy_bottle]}, status: built}
+    - {id: S23, after: [S22], requires: {items: [fairy_bottle]}, grants: {flags: [FAIRY_FREED], items: [oxyale]}, status: built}
+    - {id: S24, after: [S23, S20], requires: {items: [oxyale]}, grants: {flags: [WATER_CRYSTAL_LIT], items: [slab]},
+       boss: [drowned_sovereign], status: built}
+    - {id: S25, after: [S24], requires: {items: [slab]}, grants: {flags: [LUFENIAN_LEARNED]}, status: built}
+    - {id: S26, after: [S25], requires: {flags: [LUFENIAN_LEARNED, AIRSHIP_RAISED]}, grants: {flags: [CHIME_GIVEN], items: [chime]},
+       status: built}
+    - {id: S27, after: [S26, S21], requires: {items: [chime, cube]}, grants: {flags: [SKY_FORTRESS_OPEN]}, status: built}
+    - {id: S28, after: [S27], requires: {flags: [SKY_FORTRESS_OPEN]}, grants: {flags: [WIND_CRYSTAL_LIT]}, boss: [hollow_seraph],
+       status: built}
+    - {id: S29, after: [S13, S15, S24, S28], requires: {flags: [EARTH_CRYSTAL_LIT, FIRE_CRYSTAL_LIT, WATER_CRYSTAL_LIT,
+       WIND_CRYSTAL_LIT], items: [lute]}, grants: {flags: [TIME_GATE_OPEN]}, status: built,
+       nonLoadBearing: [{map: overworld, kind: gate, at: [21, 25],
+         reason: "EARTH_CRYSTAL_LIT already gates the canoe (S14), which every later stage needs"}]}
+    - {id: S30, after: [S29], requires: {flags: [TIME_GATE_OPEN]},
+       grants: {flags: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED,
+       DEATH_EYE_DEFEATED, CHAOS_DEFEATED]},
+       boss: [lich_2, ashen_queen_2, drowned_sovereign_2, hollow_seraph_2, death_eye, chaos],
+       milestones: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED,
+       DEATH_EYE_DEFEATED, CHAOS_DEFEATED], status: built}
+  towns:
+    - {id: pravoka, owner: A1-T, maps: [pravoka], opensAfter: [S1], bandStage: S2, kit: k_low, status: built}
+    - {id: melmond, owner: ERT-T, maps: [melmond], opensAfter: [S10], bandStage: S11, kit: k_low, status: built}
+    - {id: crescent, owner: FIR-T, maps: [crescent], opensAfter: [S10], bandStage: S14, kit: k_low, status: built}
+    - {id: lufenia, owner: WND-O, maps: [lufenia], opensAfter: [S25], bandStage: S26, kit: k_low, status: built}
+maps:
+  - id: overworld
+    grid:
+      - "################################################"
+      - "#........###.........############....^.........#"
+      - "#........###.........############....^.........#"
+      - "#.........==.........############....^.........#"
+      - "#........###.........############....^.........#"
+      - "#........###.........############....=.........#"
+      - "#........###.........############....^.........#"
+      - "############.........###########~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
+      - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
+      - "##########..............#########..............#"
+      - "##########..............#########..............#"
+      - "##########..............#########..............#"
+      - "##########...............#########.##^^^^^.^^^^#"
+      - "##########.............#.########....^.........#"
+      - "#################################....^.........#"
+      - "#################################....^.........#"
+      - "#....................#...#######################"
+      - "#....................=...#######################"
+      - "#....................#...#######################"
+      - "#....................###########################"
+      - "#......................#########################"
+      - "#....................###########################"
+      - "#########.#####.###.############################"
+      - "########...###...#...###########################"
+      - "########...###...#...###########################"
+      - "########...###...#...###########################"
+      - "################################################"
+    entrances: {"cornelia": [2, 2], "a1_pravoka": [19, 1], "a1_matoya": [13, 1], "elf_elfheim": [11, 14], "fir_crescent": [34, 6], "fir_volcano": [40, 2], "fir_ice": [44, 2], "fir_desert": [45, 6], "ert_melmond": [34, 14], "wat_onrac": [10, 22], "wat_waterfall": [23, 22], "past": [20, 25], "n_lufenia": [12, 25], "n_arrival": [2, 21]}
+    transitions:
+      - {"x": 20, "y": 1, "targetMap": "pravoka", "targetEntrance": "gate"}
+      - {"x": 12, "y": 1, "targetMap": "matoya-cave", "targetEntrance": "gate"}
+      - {"x": 10, "y": 14, "targetMap": "elfheim", "targetEntrance": "gate"}
+      - {"x": 33, "y": 1, "targetMap": "crescent", "targetEntrance": "gate"}
+      - {"x": 33, "y": 14, "targetMap": "melmond", "targetEntrance": "gate"}
+      - {"x": 46, "y": 1, "targetMap": "overworld", "targetX": 2, "targetY": 21, "requiredFlag": "AIRSHIP_RAISED"}
+      - {"x": 1, "y": 21, "targetMap": "overworld", "targetX": 45, "targetY": 2}
+      - {"x": 10, "y": 21, "targetMap": "onrac", "targetEntrance": "gate"}
+      - {"x": 12, "y": 26, "targetMap": "lufenia", "targetEntrance": "gate"}
+      - {"x": 22, "y": 25, "targetMap": "past-temple-1", "targetEntrance": "gate"}
+    keyItemGates:
+      - {"x": 9, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "Unfinished.", "permanent": false}
+      - {"x": 10, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
+      - {"x": 11, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
+      - {"x": 24, "y": 17, "requiredItem": "mystic_key", "message": "Locked.", "permanent": false}
+      - {"x": 31, "y": 11, "requiredFlag": "CANAL_OPEN", "message": "Rock.", "permanent": false}
+      - {"x": 37, "y": 5, "requiredItem": "canoe", "message": "A river.", "permanent": false}
+      - {"x": 34, "y": 17, "requiredItem": "rod", "flag": "EARTH_SEAL_BROKEN", "message": "Sealed.", "permanent": true}
+      - {"x": 21, "y": 22, "requiredItem": "canoe", "message": "A river.", "permanent": false}
+      - {"x": 9, "y": 27, "requiredItem": "oxyale", "message": "Water.", "permanent": false}
+      - {"x": 15, "y": 27, "requiredItem": "chime", "message": "A door.", "permanent": false}
+      - {"x": 19, "y": 27, "requiredFlag": "SKY_FORTRESS_OPEN", "message": "Sky.", "permanent": false}
+      - {"x": 21, "y": 25, "requiredFlags": ["EARTH_CRYSTAL_LIT", "FIRE_CRYSTAL_LIT", "WATER_CRYSTAL_LIT", "WIND_CRYSTAL_LIT"], "requiredItem": "lute", "flag": "TIME_GATE_OPEN", "message": "Time.", "permanent": true}
+    npcs:
+      - {"id": "king", "x": 1, "y": 6, "cutscene": {"id": "king_order", "requiredFlag": "PRINCESS_RESCUED", "onceFlag": "INTRO_COMPLETE"}}
+      - {"id": "princess", "x": 3, "y": 6, "showIf": "PRINCESS_RESCUED", "dialog": ["Take my lute."], "giftItem": "lute", "giftFlag": "A1_LUTE_GIVEN"}
+      - {"id": "garland", "x": 5, "y": 6, "sprite": "boss"}
+      - {"id": "builder", "x": 7, "y": 6, "cutscene": {"id": "build_bridge", "requiredFlag": "INTRO_COMPLETE", "onceFlag": "BRIDGE_BUILT"}}
+      - {"id": "marsh_guard", "x": 14, "y": 18, "sprite": "boss"}
+      - {"id": "astos", "x": 17, "y": 18, "dialog": ["..."], "requiredItem": "crown", "giftItem": "crystal_eye", "giftFlag": "ASTOS_DEFEATED", "takeItem": true, "showIf": "MARSH_GUARD_DEFEATED"}
+      - {"id": "nerrick", "x": 20, "y": 18, "dialog": ["..."], "requiredItem": "tnt", "giftItem": "blast_plan", "giftFlag": "CANAL_OPEN", "takeItem": true}
+      - {"id": "chest_tnt", "x": 24, "y": 18, "sprite": "chest", "chestItem": "tnt", "chestFlag": "CHEST_ELF_T_TNT"}
+      - {"id": "ashen", "x": 40, "y": 1, "sprite": "boss"}
+      - {"id": "evil_eye", "x": 44, "y": 1, "sprite": "boss"}
+      - {"id": "hull", "x": 46, "y": 6, "dialog": ["..."], "requiredItem": "levistone", "giftItem": "hull_log", "giftFlag": "AIRSHIP_RAISED", "takeItem": true}
+      - {"id": "elder", "x": 36, "y": 1, "showIf": "EARTH_CRYSTAL_LIT", "dialog": ["A canoe."], "giftItem": "canoe", "giftFlag": "CANOE_GIVEN"}
+      - {"id": "vampire", "x": 46, "y": 14, "sprite": "boss"}
+      - {"id": "giant", "x": 42, "y": 17, "dialog": ["..."], "requiredItem": "ruby", "giftItem": "giant_meal", "giftFlag": "TITAN_FED", "takeItem": true, "hideIf": "TITAN_FED"}
+      - {"id": "sarda", "x": 46, "y": 20, "showIf": "VAMPIRE_DEFEATED", "dialog": ["The rod."], "giftItem": "rod", "giftFlag": "ERT_O_ROD_GIVEN"}
+      - {"id": "lich", "x": 33, "y": 20, "sprite": "boss"}
+      - {"id": "crystal", "x": 36, "y": 20, "cutscene": {"id": "crystal_earth", "requiredFlag": "EARTH_CAVE_COMPLETE", "onceFlag": "EARTH_CRYSTAL_LIT"}}
+      - {"id": "zombie", "x": 5, "y": 21, "sprite": "boss"}
+      - {"id": "bahamut", "x": 7, "y": 21, "dialog": ["..."], "requiredItem": "ordeal_seal", "giftItem": "dragon_mark", "giftFlag": "CLASS_UPGRADED", "takeItem": true}
+      - {"id": "automaton", "x": 24, "y": 22, "dialog": ["A cube."], "giftItem": "cube", "giftFlag": "CUBE_GIVEN"}
+      - {"id": "caravan", "x": 3, "y": 26, "dialog": ["A bottle."], "giftItem": "fairy_bottle", "giftFlag": "WAT_O_BOTTLE", "takeGold": 100}
+      - {"id": "fairy", "x": 5, "y": 26, "dialog": ["..."], "requiredItem": "fairy_bottle", "giftItem": "oxyale", "giftFlag": "FAIRY_FREED", "takeItem": true}
+      - {"id": "drowned", "x": 9, "y": 30, "sprite": "boss"}
+      - {"id": "console", "x": 15, "y": 30, "dialog": ["..."], "requiredItem": "cube", "giftItem": "console_key", "giftFlag": "SKY_FORTRESS_OPEN"}
+      - {"id": "seraph", "x": 19, "y": 30, "sprite": "boss"}
+    scriptedEncounters:
+      - {"x": 5, "y": 6, "npc": "garland", "enemyIds": ["garland"], "flag": "GARLAND_DEFEATED", "isBoss": true, "postVictoryCutscene": "garland_won"}
+      - {"x": 14, "y": 18, "npc": "marsh_guard", "enemyIds": ["piscodemon"], "flag": "MARSH_GUARD_DEFEATED", "isBoss": true, "postVictoryCutscene": "guard_won"}
+      - {"x": 40, "y": 1, "npc": "ashen", "enemyIds": ["ashen_queen"], "flag": "FIRE_CRYSTAL_LIT", "isBoss": true}
+      - {"x": 44, "y": 1, "npc": "evil_eye", "enemyIds": ["evil_eye"], "flag": "EVIL_EYE_DEFEATED", "isBoss": true, "postVictoryCutscene": "evil_won"}
+      - {"x": 46, "y": 14, "npc": "vampire", "enemyIds": ["vampire"], "flag": "VAMPIRE_DEFEATED", "isBoss": true, "postVictoryCutscene": "vampire_won"}
+      - {"x": 33, "y": 20, "npc": "lich", "enemyIds": ["lich"], "flag": "EARTH_CAVE_COMPLETE", "isBoss": true, "requiredFlags": ["EARTH_SEAL_BROKEN"]}
+      - {"x": 5, "y": 21, "npc": "zombie", "enemyIds": ["dragon_zombie"], "flag": "ORDEALS_GUARD_DEFEATED", "isBoss": true, "postVictoryCutscene": "zombie_won"}
+      - {"x": 9, "y": 30, "npc": "drowned", "enemyIds": ["drowned_sovereign"], "flag": "WATER_CRYSTAL_LIT", "isBoss": true, "postVictoryCutscene": "drowned_won"}
+      - {"x": 19, "y": 30, "npc": "seraph", "enemyIds": ["hollow_seraph"], "flag": "WIND_CRYSTAL_LIT", "isBoss": true}
+    docks:
+      - {"id": "a1_pravoka", "x": 16, "y": 8, "basin": "aldi"}
+      - {"id": "elf_port", "x": 12, "y": 13, "basin": "aldi"}
+      - {"id": "ert_dwarf", "x": 22, "y": 13, "basin": "aldi"}
+      - {"id": "ert_melmond", "x": 36, "y": 13, "basin": "ocean"}
+      - {"id": "fir_crescent", "x": 34, "y": 7, "basin": "ocean"}
+    vehicles:
+      - {"type": "ship", "x": 16, "y": 8, "requiredFlag": "BIKKE_DEFEATED"}
+    patches:
+      - {"id": "north_bridge", "flag": "BRIDGE_BUILT", "cells": [[9, 3], [10, 3], [11, 3]], "terrain": 9}
+      - {"id": "canal", "flag": "CANAL_OPEN", "cells": [[31, 11]], "terrain": 2}
+    world: {"frames": {}, "cuts": {"W_west": [[31, 8]], "W_isthmus": [[31, 9]], "W_arm": [[31, 10]], "W_south": [[31, 12]], "W_east": [[31, 13]], "western_range": [[40, 17]], "crescent_ring": [[37, 3]]}}
+  - id: pravoka
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "a1_pravoka"}
+    npcs:
+      - {"id": "keeper", "x": 1, "y": 1, "shopId": "pravoka_item"}
+      - {"id": "captain", "x": 3, "y": 1, "sprite": "pirate"}
+    scriptedEncounters:
+      - {"x": 3, "y": 1, "npc": "captain", "enemyIds": ["pirate"], "flag": "BIKKE_DEFEATED", "isBoss": true}
+  - id: matoya-cave
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "a1_matoya"}
+    npcs:
+      - {"id": "matoya", "x": 1, "y": 1, "dialog": ["..."], "requiredItem": "crystal_eye", "takeItem": true, "giftItem": "herb", "giftFlag": "A1_O_HERB_GIVEN"}
+    scriptedEncounters: []
+  - id: elfheim
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "elf_elfheim"}
+    npcs:
+      - {"id": "prince", "x": 1, "y": 1, "dialog": ["..."], "requiredItem": "herb", "takeItem": true, "giftItem": "mystic_key", "giftFlag": "PRINCE_AWAKE"}
+    scriptedEncounters: []
+  - id: melmond
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "ert_melmond"}
+    npcs:
+      - {"id": "keeper", "x": 1, "y": 1, "shopId": "melmond_item"}
+      - {"id": "unne", "x": 3, "y": 1, "dialog": ["..."], "requiredItem": "slab", "takeItem": true, "giftItem": "unne_notes", "giftFlag": "LUFENIAN_LEARNED"}
+    scriptedEncounters: []
+  - id: crescent
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "fir_crescent"}
+    npcs:
+      - {"id": "keeper", "x": 1, "y": 1, "shopId": "crescent_item"}
+    scriptedEncounters: []
+  - id: onrac
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "wat_onrac"}
+    npcs: []
+    scriptedEncounters: []
+  - id: lufenia
+    grid:
+      - "#####"
+      - "#...#"
+      - "#...#"
+      - "##.##"
+    entrances: {"gate": [2, 2]}
+    transitions:
+      - {"x": 2, "y": 3, "targetMap": "overworld", "targetEntrance": "n_lufenia"}
+    npcs:
+      - {"id": "keeper", "x": 1, "y": 1, "shopId": "lufenia_white", "showIf": "LUFENIAN_LEARNED"}
+      - {"id": "elder", "x": 3, "y": 1, "showIf": "LUFENIAN_LEARNED", "dialog": ["A chime."], "giftItem": "chime", "giftFlag": "CHIME_GIVEN"}
+    scriptedEncounters: []
+  - id: past-temple-1
+    grid:
+      - "##############"
+      - ".............."
+      - "#.#.#.#.#.#.##"
+      - "##############"
+    entrances: {"gate": [1, 1]}
+    transitions:
+      - {"x": 0, "y": 1, "targetMap": "overworld", "targetEntrance": "past"}
+    npcs:
+      - {"id": "lich_2", "x": 1, "y": 2, "sprite": "boss"}
+      - {"id": "ashen_queen_2", "x": 3, "y": 2, "sprite": "boss"}
+      - {"id": "drowned_sovereign_2", "x": 5, "y": 2, "sprite": "boss"}
+      - {"id": "hollow_seraph_2", "x": 7, "y": 2, "sprite": "boss"}
+      - {"id": "death_eye", "x": 9, "y": 2, "sprite": "boss"}
+      - {"id": "chaos", "x": 11, "y": 2, "sprite": "boss"}
+    scriptedEncounters:
+      - {"x": 1, "y": 2, "npc": "lich_2", "enemyIds": ["lich_2"], "flag": "PAST_LICH_DEFEATED", "isBoss": true}
+      - {"x": 3, "y": 2, "npc": "ashen_queen_2", "enemyIds": ["ashen_queen_2"], "flag": "PAST_ASHEN_DEFEATED", "isBoss": true}
+      - {"x": 5, "y": 2, "npc": "drowned_sovereign_2", "enemyIds": ["drowned_sovereign_2"], "flag": "PAST_DROWNED_DEFEATED", "isBoss": true}
+      - {"x": 7, "y": 2, "npc": "hollow_seraph_2", "enemyIds": ["hollow_seraph_2"], "flag": "PAST_SERAPH_DEFEATED", "isBoss": true}
+      - {"x": 9, "y": 2, "npc": "death_eye", "enemyIds": ["death_eye"], "flag": "DEATH_EYE_DEFEATED", "isBoss": true}
+      - {"x": 11, "y": 2, "npc": "chaos", "enemyIds": ["chaos"], "flag": "CHAOS_DEFEATED", "isBoss": true}
+    keyItemGates:
+      - {"x": 2, "y": 1, "requiredFlag": "PAST_LICH_DEFEATED", "message": "Sealed.", "permanent": false}
+      - {"x": 4, "y": 1, "requiredFlag": "PAST_ASHEN_DEFEATED", "message": "Sealed.", "permanent": false}
+      - {"x": 6, "y": 1, "requiredFlag": "PAST_DROWNED_DEFEATED", "message": "Sealed.", "permanent": false}
+      - {"x": 8, "y": 1, "requiredFlag": "PAST_SERAPH_DEFEATED", "message": "Sealed.", "permanent": false}
+      - {"x": 10, "y": 1, "requiredFlag": "DEATH_EYE_DEFEATED", "message": "Sealed.", "permanent": false}

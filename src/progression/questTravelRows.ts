@@ -7,6 +7,8 @@ export interface TravelRow {
   id: string;
   /** The row this one adds to. */
   from?: string;
+  /** Where the party starts (an entrance of the world map; default `cornelia`, inherited over `from`). */
+  start?: string;
   flags?: string[];
   items?: string[];
   vehicles?: Array<{ type: 'ship' | 'airship' | 'canoe'; at: string }>;
@@ -44,7 +46,8 @@ export const DEFAULT_TRAVEL_ROWS: TravelRow[] = [
   { id: 'T3', from: 'T2', flags: ['CANAL_OPEN'], reach: WEST, notReach: ['ert_sarda', ...SOUTH, ...NORTH] },
   { id: 'T4', from: 'T3', flags: ['TITAN_FED'], reach: ['ert_sarda'], notReach: SOUTH },
   { id: 'T5', from: 'T4', items: ['canoe'], reach: SOUTH, notReach: NORTH },
-  { id: 'T6', from: 'T5', flags: ['AIRSHIP_RAISED'], vehicles: [{ type: 'airship', at: 'fir_desert' }], landing: true,
+  { id: 'T6', from: 'T5', start: 'fir_desert', flags: ['AIRSHIP_RAISED'], vehicles: [{ type: 'airship', at: 'fir_desert' }],
+    landing: true,
     reach: [...NORTH, 'mirage-1f:arrival'], notReach: ['sea-shrine-*', 'mirage-1f:inner', 'sky-castle-*', 'past-temple-*'] },
   { id: 'T6b', from: 'T6', drop: { items: ['canoe'] }, landing: true, reach: NORTH.filter((a) => a !== 'wat_waterfall'),
     notReach: ['wat_waterfall'] },

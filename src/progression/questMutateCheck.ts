@@ -16,6 +16,7 @@ import { bossEvents, eventsGranting, saturate, type Saturator } from './questSat
 import { fail, grantsText, proofOrder, reachedStage, without, type QuestContext } from './questProofs.js';
 import { proofSkips, proofSoftlocks } from './questChecks.js';
 import { proofEarlyShops } from './questShops.js';
+import { proofTravel } from './questTravel.js';
 
 export function reachedOrVisited(ctx: QuestContext, sat: Saturator, s: QuestStage): string | null {
   const hit = reachedStage(ctx, sat, s);
@@ -39,6 +40,7 @@ export function stageSkips(ctx: QuestContext, s: QuestStage): ProofFailure[] {
   };
   for (const p of [...ancestorsOf(ctx.world.stages, s.id)]) {
     const ps = ctx.world.stages.get(p)!;
+    if (ps.status === 'built' && grantsText(ps) === 'no grants') continue;
     const why = `${p} (${grantsText(ps)})`;
     check(without(ctx, ps), why);
     const fi = { flags: ps.grants.flags, items: ps.grants.items };
@@ -94,6 +96,7 @@ export function runCheck(ctx: QuestContext, k: CheckKey): ProofFailure[] {
     }
     case 'c': return proofSoftlocks(ctx).failures;
     case 'e': return proofEarlyShops(ctx).failures;
+    case 'h': return proofTravel(ctx).failures;
     default: return [];
   }
 }

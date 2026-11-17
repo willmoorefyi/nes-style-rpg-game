@@ -65,6 +65,9 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement)
   out.caught = row.anyOf ? hit.length > 0 : hit.length === row.expect.length;
   if (!out.caught && !builtStages(ctx, stages)) {
     out.nonLoadBearing = `pending: ${stages.filter((s) => ctx.world.stages.get(s)?.status !== 'built').join(' ')} not built`;
+  } else if (!out.caught) {
+    const reason = nonLoadBearingFor(ctx, el);
+    if (reason) out.nonLoadBearing = reason;
   }
   return out;
 }
