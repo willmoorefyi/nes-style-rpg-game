@@ -209,7 +209,9 @@ describe('questGraph: the repository (npm run quest)', () => {
   });
 
   it('act 1 is played, not assumed: Garland, the King, then the princess\'s lute', () => {
-    const fired = closure(ctx).path().filter((id) => !id.startsWith('quest:') && !id.includes(':vehicle:'));
+    // act 1's own events (the pass W regions' built stages fire later, on their own maps)
+    const act1 = /^(cornelia|temple-of-fiends)/;
+    const fired = closure(ctx).path().filter((id) => !id.startsWith('quest:') && !id.includes(':vehicle:') && act1.test(id));
     expect(fired).toEqual(['temple-of-fiends:battle:garland', 'cornelia-castle-2f:cutscene:king',
       'cornelia-castle-2f:gift:princess']);
   });
@@ -218,6 +220,7 @@ describe('questGraph: the repository (npm run quest)', () => {
     expect(proofs[0].line).toContain('S31 waits for adamant');
     const strict = proofOrder(createQuestContext(ctx.world, { strict: true }));
     expect(strict.failures.map((f) => f.code)).toContain('OPTIONAL');
-    expect(strict.failures.filter((f) => f.code === 'PENDING')).toHaveLength(31);
+    const pending = ctx.world.quest.stages.filter((s) => s.status === 'pending').length;
+    expect(strict.failures.filter((f) => f.code === 'PENDING')).toHaveLength(pending);
   });
 });

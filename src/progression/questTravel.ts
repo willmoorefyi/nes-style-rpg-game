@@ -90,9 +90,12 @@ export function travelRow(ctx: QuestContext, rows: readonly TravelRow[], row: Tr
     if (!ids.length) return 'missing';
     return ids.some((id) => sat.reachedMaps.has(id)) ? 'yes' : 'no';
   };
+  // a vehicle whose place is not built yet only removes reach: the row's reach targets wait for it (pending)
+  const placed = out.missing.length === 0;
   for (const t of row.reach) {
     const h = hit(t);
     if (h === 'missing') out.missing.push(t);
+    else if (h === 'no' && !placed) out.missing.push(`${t} (vehicle unplaced)`);
     else if (h === 'no') out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} cannot reach ${t}`));
     else if (row.landing && AIRSHIP_ONLY.includes(t) && !landingNear(ctx, map, t)) {
       out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} ${t} has no landing cell within 8 steps`));

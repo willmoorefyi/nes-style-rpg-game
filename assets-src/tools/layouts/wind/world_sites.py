@@ -19,7 +19,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from overworld_zones import row_rects  # noqa: E402
+from common import MAPS  # noqa: E402
+from stubs import is_stub  # noqa: E402
 from wind import town_gaia_site as GAIA  # noqa: E402
+
+# The Mirage's door opens onto `mirage-1f` (WND-D1) only once that map is built: its stub has no chime door between
+# `arrival` and `inner`, so a door into it would let the party past the chime (travel rows T6-T7). Until then the
+# door is shut (blocked, with an inspect line); the integrator's regeneration at WND-D1's merge opens it.
+MIRAGE_OPEN = not is_stub(MAPS / "mirage-1f.yaml")
 
 WALKABLE = frozenset(".,:fs=%w_+-")
 LAKE, OCEAN = "≈", "o"
@@ -87,7 +94,7 @@ def objects() -> list[dict]:
          "collide": "alpha"},
         # the Mirage Tower, with a fallen block of it beside the door
         {"type": "deco", "name": "mirage", "parts": landmark_parts("tower"), "x": MIRAGE_DOOR[0] - 1,
-         "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]]},
+         "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]] if MIRAGE_OPEN else []},
         {"type": "deco", "parts": [["boulder"]], "x": MIRAGE_DOOR[0] + 1, "y": MIRAGE_DOOR[1]},
         # Lufenia: two pale domes, the door under the east one
         {"type": "deco", "name": "lufenia_west", "parts": landmark_parts("dome"), "x": LUFENIA_DOOR[0] - 2,
@@ -100,7 +107,8 @@ def objects() -> list[dict]:
 
 def transitions() -> list[dict]:
     return [{"x": GAIA_DOOR[0], "y": GAIA_DOOR[1], "targetMap": GAIA.TOWN, "targetEntrance": "gate"},
-            {"x": MIRAGE_DOOR[0], "y": MIRAGE_DOOR[1], "targetMap": "mirage-1f", "targetEntrance": "arrival"},
+            *([{"x": MIRAGE_DOOR[0], "y": MIRAGE_DOOR[1], "targetMap": "mirage-1f", "targetEntrance": "arrival"}]
+              if MIRAGE_OPEN else []),
             {"x": LUFENIA_DOOR[0], "y": LUFENIA_DOOR[1], "targetMap": "lufenia", "targetEntrance": "gate"}]
 
 
@@ -166,5 +174,9 @@ def zones(g: dict) -> tuple[list[dict], dict]:
     return out, backdrops
 
 
+MIRAGE_SHUT = ["A tall door of pale metal, without handle or keyhole. It does not move, and it gives back no echo."]
+
+
 def inspect() -> list[dict]:
-    return [{"x": x, "y": y, "text": list(t)} for x, y, t in INSPECT]
+    shut = [] if MIRAGE_OPEN else [{"x": MIRAGE_DOOR[0], "y": MIRAGE_DOOR[1], "text": list(MIRAGE_SHUT)}]
+    return [{"x": x, "y": y, "text": list(t)} for x, y, t in INSPECT] + shut
