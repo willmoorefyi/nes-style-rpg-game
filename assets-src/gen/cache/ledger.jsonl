@@ -823,3 +823,5 @@
 {"event": "result", "key": "abe719d534443b6a93032420", "ok": true}
 {"event": "attempt", "ts": "2026-11-16T10:03:02", "backend": "gemini", "model": "gemini-3.1-flash-lite-image", "character": "hollow_seraph", "sheet": "boss_hurt", "seed": 1238, "key": "0e29ce3be728ab03dd93fe3d"}
 {"event": "result", "key": "0e29ce3be728ab03dd93fe3d", "ok": true}
+{"event": "attempt", "ts": "2026-11-17T16:51:34", "backend": "gemini", "model": "gemini-nano-banana-2.1", "character": "goblin", "sheet": "kneel", "seed": 1234, "key": "064b9344cc04f7e60595609b", "req": "goblin:1", "pass": "KA-G", "purpose": "ka_g_pilot", "round": "pilot", "refs": ["idle", "pose"], "est_usd": 0.0351}
+{"event": "result", "key": "064b9344cc04f7e60595609b", "req": "goblin:1", "pass": "KA-G", "ok": true, "usage": {"prompt_token_count": 2498, "candidates_token_count": 1554, "thoughts_token_count": 869, "total_token_count": 4921}, "size": [1024, 1024]}
