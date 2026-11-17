@@ -21,6 +21,8 @@ export interface FieldTransitionHost {
   setPaused(paused: boolean): void;
   /** After the player was placed: the game's saved tile, the camera and the tilemap. */
   redraw(): void;
+  /** Resolves once the view around the player has loaded (W1-E streaming; at once for unstreamed maps). */
+  viewReady?(): Promise<void>;
 }
 
 /** A warp or door: fade (or zoom into a door), load the target map, place the player, fade in. */
@@ -76,6 +78,7 @@ export class FieldTransition {
       const at = arrivalFor(transition, map);
       player.setPosition(at.x, at.y);
       host.redraw();
+      await host.viewReady?.();
     }
     await host.fade.fadeIn(300);
   }

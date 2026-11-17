@@ -121,6 +121,7 @@ export class ExplorationScene implements Scene {
       world: this.worldContainer, fade: this.fadeOverlay, walkingMode: this.walkingMode, encounters: this.encounterSystem,
       player: () => this.player, mapData: () => this.currentMapData, loadMap: (id) => this.loadMap(id),
       setPaused: (p) => { this.paused = p; }, redraw: () => this.redraw(),
+      viewReady: () => (this.tilemap as { ready?(): Promise<void> } | null)?.ready?.() ?? Promise.resolve(),
     });
     this.encounterSystem.setOnEncounter((enemies) => this.battleTrigger.triggerBattle(enemies, undefined, this.battleBackground()));
   }
