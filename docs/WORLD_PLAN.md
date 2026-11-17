@@ -1744,6 +1744,54 @@ QUEST's R1-R4 and R6-R16 hold. These are changed or new:
 <!-- === W1-0a FOUNDATION (pass W: owned by W1-0a) === -->
 <!-- === end W1-0a === -->
 <!-- === W1-0b FOUNDATION (pass W: owned by W1-0b) === -->
+### W1-0b result (world data)
+
+Branch `w-w1-0b` from `mainline` 8343b82. No AI or paid calls.
+
+**Files:** `assets-src/tools/layouts/world_api.py` (constants and dataclasses of 2.4-2.9, `PLACEHOLDER_WALLS`,
+`RegionOut.barriers` with an empty default), `assets-src/tools/build_hooks.py` (the 4 signatures, no-op bodies),
+`layouts/world_canon.py` (137 ids, 20 owner tranches), `layouts/stubs.py`, 137 stub sources in `assets-src/maps/`,
+the 6 site files `layouts/{a1,elf,earth,fire,water,wind}/town_<town>_site.py`, `assets/data/world-anchors.yaml`,
+`tests/quest/townTargets.ts`, and a composer skeleton `layouts/world.py` (W1-C2 replaces it).
+
+**Gates (5.1 done-when):**
+
+| Command | Output |
+|---|---|
+| `stubs.py && stubs.py --count all` | `stubs: wrote 137 stub sources, kept 0 real maps (137 canon ids)`, then `stubs: 137 left` |
+| `world.py --check-bands` | `bands: OK` |
+| `world.py` (skeleton, stub world) | `bands: OK`, `basins: OK (aldi 2781 cells, ocean 29870 cells; canal: no patch yet)` |
+| `python3 -I -c "...; import build_hooks"` | exit 0 |
+| `npm run build` | exit 0 |
+| `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 265 passed (265)`, `Tests 5063 passed (5063)` |
+| act-1 layout scripts (`overworld`, `cornelia`, `interiors`, `castle`), then `git diff --exit-code assets-src/maps` | exit 0, no diff |
+
+**Checks beyond the table (scratch, `/tmp/w-w1-0b/`):** at the `world-anchors.yaml` targets s* = 0.735, the ratios
+are 0.86-1.10 and the worst bearing error is 29.3°. Every anchor target and every site-file cell is in its region and
+outside the bands, and each site's `GATE` equals its anchor target. Removing any one of the 5 placeholder walls, or
+opening any one of the 4 seams, makes the skeleton print `basins: LEAK`. All 137 stubs compile with `build_map.py`
+(12x10, one chunk, about 28 KB each). The compiled stubs are not committed and `index.yaml` is unchanged.
+
+**Deviations:**
+
+- `world.py` is a skeleton, written so that `--check-bands` can run. It writes nothing, and `overworld.yaml` stays
+  the act-1 map. W1-C2 owns the file and replaces it.
+- `RegionOut` has two fields beyond 2.9: `walls` (the region's parts of the Aldi walls, by `WALLS` key) and `stub`
+  (when it is set, the composer applies that region's placeholder walls). 5.1 asks for both behaviours but names no
+  field.
+- The placeholder walls fill Water cells only. The two that border `seam_n` (EARTH y 109 and ELF y 114) are grass, so
+  that the grass seam has a walkable cell on each side.
+- The canon invents the house slugs, using the minimum interior counts of 4.0.1, and the `MapData.exit` shape
+  `{map, entrance}` (W1-0a defines `MapExit`). It also invents the town entrance names, on Cornelia's model: `gate`,
+  `house_<slug>`, `weapon_shop` and so on, `inn`, plus `north_gate`, `circle`, `spring` and `dry_dock`. The overworld
+  entrance `ert_giant_west` is added for the tunnel's west mouth. `temple-of-fiends` is not a canon id, because it is
+  a real map that PST edits.
+- The G4 command as written (`--maxWorkers=2` alone) fails under Vitest 1.6.1 with `options.minThreads and
+  options.maxThreads must not conflict`. Adding `--minWorkers=1` fixes it.
+
+**AGENTS.md delta (for INT):** under "Editing a 2x Map", add `layouts/stubs.py`, which writes the canon stubs
+(`--count` and `--check <tranche|all>`), `layouts/world_canon.py` (the map-id canon) and `layouts/world_api.py` (the
+world constants).
 <!-- === end W1-0b === -->
 <!-- === W1-A FOUNDATION (pass W: owned by W1-A) === -->
 <!-- === end W1-A === -->

@@ -1,0 +1,117 @@
+# The macro-geography anchors of pass W (docs/WORLD_PLAN.md 2.2, read by the macro test 6.1 and proof (g)).
+# Owned by W1-0b; read only for every tranche (a change goes to the integrator; open question 1 lets the user correct
+# a reference offset or target, and only this file changes).
+#
+# Each anchor is a named entrance (`entrance`) of the compiled `overworld`. Its owner places it within `tolerance`
+# cells per axis of `target` (world cells; act 1 at origin (64, 64)). `ref` is the classic reference offset from
+# Cornelia in classic tiles (east +x, south +y), rounded to multiples of 4 (2.1). A town's land-gate anchor is placed
+# by its site file (layouts/<region>/town_<town>_site.py), so its T tranche owns it; every other anchor is its O
+# tranche's. At these targets s* = 0.735 and every pair's ratio is in [0.86, 1.10].
+tolerance: 2
+fit:
+  scale: [0.60, 0.80]                   # s* = sum(d_w * d_r) / sum(d_r^2) over the pairs, distance-exempt pairs out
+  longPair: 20                          # a pair is long when s* x d_r >= 20 world cells
+  ratio: {long: [0.70, 1.30], short: [0.55, 1.60]}       # r = d_w / (s* x d_r)
+  bearing: {long: 40, short: 60}        # max error in compass degrees, min(|d|, 360 - |d|); every pair is checked
+anchors:
+  - {name: cornelia, entrance: cornelia, place: "Cornelia, south-gate arrival", region: a1, owner: act1, built: true,
+     ref: [0, 0], target: [92, 111], note: "act 1 at origin (64, 64)"}
+  - {name: temple, entrance: temple, place: "Temple of Fiends door", region: a1, owner: act1, built: true,
+     ref: [-20, -36], target: [79, 103], note: "distance exempt (act-1 compression); bearing checked"}
+  - {name: matoya, entrance: a1_matoya, place: "Matoya's cave", region: a1, owner: A1-O,
+     ref: [-40, -36], target: [74, 76], note: "in the act-1 Matoya rect"}
+  - {name: pravoka, entrance: a1_pravoka, place: "Pravoka's land gate", region: a1, owner: A1-T,
+     ref: [56, -12], target: [131, 101], note: "in the act-1 Pravoka rect"}
+  - {name: dwarf, entrance: ert_dwarf, place: "Dwarf hall (Mount Duergar)", region: earth, owner: ERT-O,
+     ref: [-56, -4], target: [54, 106], note: "on the isthmus, south of the canal"}
+  - {name: keep, entrance: elf_keep, place: "Western Keep", region: elf, owner: ELF-O,
+     ref: [-48, 24], target: [61, 126], note: "on Elfland's north arm"}
+  - {name: elfheim, entrance: elf_elfheim, place: "Elfheim's land gate", region: elf, owner: ELF-T,
+     ref: [-16, 48], target: [82, 150]}
+  - {name: marsh, entrance: elf_marsh, place: "Marsh Cave mouth", region: elf, owner: ELF-O,
+     ref: [-56, 76], target: [53, 162]}
+  - {name: melmond, entrance: ert_melmond, place: "Melmond's land gate", region: earth, owner: ERT-T,
+     ref: [-72, 4], target: [42, 112]}
+  - {name: earth_cave, entrance: ert_earth_cave, place: "Cavern of Earth mouth", region: earth, owner: ERT-O,
+     ref: [-88, 24], target: [30, 126]}
+  - {name: giant, entrance: ert_giant, place: "Giant's tunnel, east mouth", region: earth, owner: ERT-O,
+     ref: [-92, 4], target: [28, 112]}
+  - {name: sarda, entrance: ert_sarda, place: "Sarda's cave", region: earth, owner: ERT-O,
+     ref: [-104, 0], target: [19, 109]}
+  - {name: crescent, entrance: fir_crescent, place: "Crescent Lake's land gate", region: fire, owner: FIR-T,
+     ref: [68, 20], target: [148, 124]}
+  - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: FIR-O,
+     ref: [36, 56], target: [120, 151], note: "its mouth opens south, off the W_south cliffs"}
+  - {name: ice, entrance: fir_ice, place: "Ice Cavern mouth", region: fire, owner: FIR-O,
+     ref: [44, 44], target: [136, 148], note: "its mouth opens south; the arrival cell is south of the cliff rows 146-147"}
+  - {name: desert, entrance: fir_desert, place: "Buried hull, airship desert", region: fire, owner: FIR-O,
+     ref: [56, 60], target: [143, 160]}
+  - {name: citadel, entrance: ord_citadel, place: "Citadel of Trials gate", region: ordeal, owner: ORD-O,
+     ref: [-24, -116], target: [75, 28]}
+  - {name: bahamut, entrance: ord_bahamut, place: "Bahamut's cave", region: ordeal, owner: ORD-O,
+     ref: [20, -80], target: [106, 53]}
+  - {name: onrac, entrance: wat_onrac, place: "Onrac's land gate", region: water, owner: WAT-T,
+     ref: [-92, -100], target: [28, 39], note: "the Sea Shrine is entered from Onrac's pier"}
+  - {name: waterfall, entrance: wat_waterfall, place: "Waterfall cave", region: water, owner: WAT-O,
+     ref: [-88, -140], target: [30, 11]}
+  - {name: caravan, entrance: wat_caravan, place: "Caravan camp", region: water, owner: WAT-O,
+     ref: [-120, -116], target: [8, 28]}
+  - {name: gaia, entrance: wnd_gaia, place: "Gaia's land gate", region: wind, owner: WND-T,
+     ref: [72, -132], target: [150, 14]}
+  - {name: mirage, entrance: wnd_mirage, place: "Mirage Tower door", region: wind, owner: WND-O,
+     ref: [40, -104], target: [132, 36]}
+  - {name: lufenia, entrance: wnd_lufenia, place: "Lufenia's land gate", region: wind, owner: WND-O,
+     ref: [84, -92], target: [152, 46]}
+# the 31 pairs (anchor names); `distanceExempt` pairs skip the fit and the distance band, never the bearing band
+pairs:
+  - [cornelia, pravoka]
+  - [cornelia, matoya]
+  - [cornelia, temple]
+  - [pravoka, elfheim]
+  - [elfheim, marsh]
+  - [elfheim, keep]
+  - [keep, dwarf]
+  - [dwarf, melmond]
+  - [melmond, earth_cave]
+  - [melmond, giant]
+  - [melmond, sarda]
+  - [melmond, crescent]
+  - [cornelia, crescent]
+  - [crescent, volcano]
+  - [crescent, ice]
+  - [ice, desert]
+  - [desert, citadel]
+  - [citadel, bahamut]
+  - [desert, onrac]
+  - [onrac, waterfall]
+  - [onrac, caravan]
+  - [caravan, gaia]
+  - [gaia, mirage]
+  - [gaia, lufenia]
+  - [lufenia, melmond]
+  - [cornelia, onrac]
+  - [cornelia, gaia]
+  - [cornelia, marsh]
+  - [cornelia, sarda]
+  - [cornelia, citadel]
+  - [pravoka, matoya]
+distanceExempt:
+  - [cornelia, temple]
+# 6.1 step 6: path length in the hop's mode (verifier BFS, docks included) <= factor x the Euclidean distance;
+# airship hops are straight lines and have no detour check
+detours:
+  - {pair: [cornelia, pravoka], mode: walking, factor: 2.5, via: "over the bridge"}
+  - {pair: [cornelia, matoya], mode: walking, factor: 2.5}
+  - {pair: [pravoka, elfheim], mode: ship+walking, factor: 2.5, via: "dock to dock"}
+  - {pair: [pravoka, dwarf], mode: ship+walking, factor: 2.5}
+  - {pair: [elfheim, keep], mode: walking, factor: 2.5}
+  - {pair: [elfheim, marsh], mode: walking, factor: 2.5}
+  - {pair: [dwarf, melmond], mode: ship+walking, factor: 4.5, via: "through the canal (it lies north of the dwarves)"}
+  - {pair: [melmond, earth_cave], mode: walking, factor: 2.5}
+  - {pair: [melmond, giant], mode: walking, factor: 2.5}
+  - {pair: [melmond, sarda], mode: walking, factor: 3.0, via: "through the tunnel"}
+  - {pair: [melmond, crescent], mode: ship+walking, factor: 2.5}
+  - {pair: [crescent, volcano], mode: canoe+walking, factor: 2.5}
+  - {pair: [crescent, ice], mode: canoe+walking, factor: 2.5}
+  - {pair: [ice, desert], mode: walking, factor: 2.5}
+  - {pair: [onrac, waterfall], mode: canoe+walking, factor: 2.5}
