@@ -2103,6 +2103,59 @@ compiled-collision case is mandatory and allows exactly one remap since the fixt
 <!-- === W1-D FOUNDATION (pass W: owned by W1-D) === -->
 <!-- === end W1-D === -->
 <!-- === W1-E FOUNDATION (pass W: owned by W1-E) === -->
+### W1-E result: map streaming (branch `w-w1-e` from `mainline` 70bdfd5)
+
+No AI or paid calls. Scratch in `/tmp/w-w1-e/`.
+
+**Files:** `src/rendering/BakedMapRenderer.ts` (155 lines), `src/systems/MapLoader.ts` (86), and two new files:
+`src/rendering/chunkStreaming.ts` (154: constants, `ChunkSource` / `assetChunkSource`, the LRU `ChunkStreamer`,
+the view geometry, the dominant-terrain placeholder colour) and `src/rendering/StreamedChunks.ts` (178: the
+per-chunk sprites, the window, the miss rule). Test: `tests/rendering/bakedStreaming.test.ts` (8 tests).
+
+**Behaviour (QUEST 4.3):**
+
+- A compiled map with more than 64 chunks streams. A smaller map loads every chunk before its first frame, as
+  before. That covers every act-1 map, including today's 72x72 overworld.
+- **The window** is the chunks in view, a 1-chunk ring and 1 chunk ahead on each axis of travel. The direction of
+  travel comes from the camera's motion. The visible chunks load first.
+- **The cap** is 60 resident textures (loaded or loading, both layers), enforced hard. Unwanted chunks are freed
+  least-recently-wanted through `Assets.unload`, after the sprite drawing them is destroyed. A texture freed while
+  still loading is unloaded when it arrives. Leaving the map (the container's `removed` event, sent by
+  `ExplorationScene.loadMap`'s `removeChildren`) frees every chunk. A reload of the same url waits for its pending
+  unload.
+- **A miss:** `MapLoader` returns a `CollisionMap` subclass for a streamed map. Its `isWalkable` refuses a step while
+  `BakedMapRenderer.stepHeld(x, y)` is true: a window chunk that the view at (x, y) needs is missing, and that miss
+  is less than 6 frames old. After 6 frames a chunk in view shows as a flat sprite in its dominant terrain's colour
+  (ocean blue on water). Each miss logs one `console.warn`, and the real texture replaces the placeholder when it
+  loads.
+- **Patch overlays:** `art.patches` loads with the map (eagerly, outside the chunk cap). Each `patch_<pid>.png` is
+  drawn at its cells' top-left cell, scaled from `art.tile`, above the below layer. It is visible while
+  `hasFlag(patch.flag)` is set, and the flag is read live on every render. MapLoader passes the same `hasFlag` it
+  passes to `CollisionMap` (W1-B's line is kept verbatim).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/rendering/bakedStreaming.test.ts` | 8 passed. The airship sweep runs 1/6 tile per frame over the 192x192 world (144 chunks, every one with an above layer), with 12-frame loads. All 144 chunks are seen, max resident is **60**, 1031 unloads, 0 held steps and 0 placeholders. A miss holds exactly 6 frames, then shows placeholders (2 chunks, ocean blue, 2 warns, not repeated). A placeholder is replaced when its chunk loads. `Assets.unload` is called through `assetChunkSource`, and every resident chunk is unloaded on leaving. The patch shows only with its flag. MapLoader refuses a step for 6 frames |
+| mutations | Without the ring and ahead prefetch the sweep fails (115 held steps). Without the unload on eviction the sweep and the `Assets.unload` test fail |
+| `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | `Test Files 286 passed`, `Tests 5656 passed`. The first run had 1 failure in `tests/integration/battle.test.ts` ("command selection"), the flake W1-C1 also saw. It passed alone (8/8), and the re-run was green |
+| browser, port 5216, `mute=1`: `r_ow_temple`, then `r_town_after_intro` | the overworld and Cornelia render and scroll while walking; 0 errors, 0 warnings |
+
+**Deviations / hand-offs:**
+
+- **The compiled 192x192 world is not on `mainline` yet.** `assets/maps/ai/overworld.yaml` is still the 72x72 act-1
+  build (25 chunks), so in the game nothing streams yet. Streaming is covered by the synthetic 192x192 test map.
+- **Two new files** (`chunkStreaming.ts`, `StreamedChunks.ts`) keep `BakedMapRenderer.ts` under 250 lines.
+- **First frame:** a streamed map cannot know the spawn while `MapLoader.loadMap` runs, because the scene places
+  the player afterwards. `BakedMapRenderer.ready()` resolves once the view is loaded. To honour "the first frame
+  waits", the owner of `ExplorationScene` / `FieldTransition` should add `await (tilemap as
+  BakedMapRenderer).ready?.()` after `redraw()`, before the fade-in. That is one line, and not mine. Until then, a
+  slow first view shows placeholders after 6 frames.
+- The hold is applied through `isWalkable`, so a wandering NPC whose next view is missing also waits up to 6 frames.
+  `noWanderTiles` runs before the camera is set and is unaffected.
+- The patch overlays are not counted in the 60-texture cap (a few small PNGs per map).
 <!-- === end W1-E === -->
 <!-- === W1-F FOUNDATION (pass W: owned by W1-F) === -->
 ### W1-F result: items, kits, shops (branch `w-w1-f` from `mainline` f2f2383)
