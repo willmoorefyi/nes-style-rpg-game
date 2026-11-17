@@ -2614,6 +2614,101 @@ and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescen
 <!-- === ORD-O ORDEAL (pass W: owned by ORD-O) === -->
 <!-- === end ORD-O === -->
 <!-- === WAT-O WATER (pass W: owned by WAT-O) === -->
+### WAT-O result: Onrac's coast, the waterfall and the caravan (branch `w-wat-o` from `mainline` 81e93d4, merged with `mainline` 62033ba (FIR-O))
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
+
+**Files:**
+
+- `layouts/world_water.py` (the RegionOut, with the design note) and `layouts/water/world_water_land.py` (ground),
+  `world_water_sites.py` (icons, doors, anchors, inspect cells), `world_water_zones.py` (zones). The helper modules carry
+  `world_water_` in their names, so they never clash with another region's helpers on `sys.path`.
+- `layouts/water/waterfall.py` -> `waterfall-cave` (30x22) and `layouts/water/caravan.py` -> `caravan-camp` (26x18),
+  both with design notes.
+- Data: `cutscenes.yaml` `wat_cube_given`; `quest.yaml` S21 and S22 (`walk`, `entry`, one `nonLoadBearing`,
+  `status: built`); `debug-scenarios.yaml` `w_s21_start`, `w_s21_neg_nocanoe`, `w_s22_start`.
+- Tests: `tests/quest/water/wat_o_world.test.ts` (13) and `wat_o_sites.test.ts` (9).
+- Generated: `assets-src/maps/overworld.yaml`, the WATER chunks `assets/maps/ai/overworld/below_{0..3}_{0..3}`
+  (`below_3_3` is unchanged: open sea), `overworld.yaml`, `index.yaml`, and both compiled sites.
+
+**The region (4.6):**
+
+- A long cold coast (x 3-53, y 3-57) under a wall of northern peaks.
+- **R-waterfall:** a spill tarn in the peaks feeds the falls at (30, 8-10). The river (x 31-32) runs down a sheer
+  gorge (walls x 28-30 and x 33+) to y 27, then winds south-east past Onrac's meadow into the bay at (43, 40).
+- **The cave:** its door is the falls' bottom-left cell (30, 10). It stands on a 3-cell **sand** ledge (28-30, 11)
+  that touches only rock, the falls and the river. The canoe is the only way in, and the airship cannot land on the
+  ledge.
+- Onrac's icon is a 3x3 house from WAT-T's site file, gate (28, 39). Its door transition and door cell open only once
+  `onrac.yaml` is no longer a stub, because a stub is never compiled and the cross-file test would fail.
+- **Caravan:** the tent stands on a rock outcrop in the western dunes, arrival (8, 28). An oasis meadow lies 5 cells
+  away, with a signpost.
+- Other features: sea-stacks across the bay mouth; an upland tarn wood; the snow firs; a cairn at the gorge's mouth
+  that hints at the canoe.
+- Anchors at their targets exactly: `wat_onrac` (28, 39), `wat_waterfall` (30, 11), `wat_caravan` (8, 28). Each has
+  grass within 8 steps. There is no dock, wall, patch or barrier.
+- Zones: `wat_streams` (canoe: the river; S21), `wat_dunes` (S22), `wat_isles` ("Onrac Coast", S20 land) and `wat_sea`
+  (ship; every Water cell of the box, band cells included). Neighbouring zones share no species.
+- The region's checks are `river_check`, `warp_leaves` and `min_blob` (mountain / sand / forest 3).
+
+**Sites:**
+
+- `waterfall-cave`, on one floor:
+  - an entry ramp, then a spray hall split by a falls channel (Lake) with one footbridge, a passage, and the vault;
+  - two dead-end galleries, each with a chest (`ether` and `hi_potion`; flags `CHEST_WAT_O_FALLS_*`);
+  - the automaton (a tinted `knight`) with `giftItem: cube`, `giftFlag: CUBE_GIVEN`, and the cutscene
+    `wat_cube_given`, which tells of its war-made twin in the sky castle and sets `WAT_O_TWIN_TOLD`;
+  - `exit` to `wat_waterfall`, and an inspect statue.
+- `caravan-camp`: a rock ring with three tents, a cook fire, a spring pool and the trader's awning. It holds 5 NPCs:
+  - the trader (`takeGold: 5000`, `giftItem: fairy_bottle`, `giftFlag: WAT_O_BOTTLE_BOUGHT`);
+  - the master, whose hint names Gaia;
+  - a scout, whose hint is the waterfall and the boat;
+  - a drover (wandering) and a cook.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when, proof (d3) | `(d) bands: OK  ... S21 L28.1 [25,28]  S22 L25.2 [25,28]  (29 pending)  prices: OK (1 takeGold)`. The bottle's stage start is assumed: its ancestors are pending, so the 80 % rule waits for INT, which tunes the price |
+| G1 | `world.py`, `waterfall.py`, `caravan.py` and `stubs.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py overworld --region water waterfall-cave caravan-camp`: 3 maps, 17-39 s, max RSS 3.97 GB. `--check-determinism --region water overworld waterfall-cave caravan-camp`: all 3 `deterministic` |
+| G3 | `world.py --owned-chunks water`, then the merge-base diff of `assets/maps/ai/overworld/` filtered by it: no output |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 302 files, 6020 tests, **1 failed** (`questGraph` "passes (a), (b) and (c)": the full run's (b), see below) |
+| G5 S21 | (a) OK, (b) OK (26 withheld runs), (d) OK, (e)-(h) OK, `mutations: OK (2 gate rows)`. GT-25 is caught as `SKIP S21 CUBE_GIVEN reachable without canoe`. **(c) FAIL**: 6 SOFTLOCKs, every one through the act-1 jetty ship, see below |
+| G5 S22 | the same: (a), (b), (d)-(h) and mutations OK; **(c) FAIL**, the same jetty ship |
+| full `npm run quest -- --mutate` | (a) OK (S21 and S22 reached on the witness), (c) OK (753 states), (d)-(h) OK, `mutations: OK (42 gate rows; 50 elements)`. **(b) FAIL**: `SKIP S21 CUBE_GIVEN reachable without S20 (no grants)` |
+| G6 G7 G12 G13 G14 G15, `tests/quest/water/` | 10 files, 371 passed, 9 skipped. `(g) geography: OK  s*=0.735 (31 pairs; 15 assumed)` and `(h) travel matrix: OK  (12 rows, 2 basin rows; 1 checked, 13 pending)` |
+| G8 | `build_map selftest: 104 checks passed` |
+| G10 browser (port 5234, `mute=1`; screenshots `/tmp/w-wat-o/b_*.png`) | `w_s21_start`: walked to the gorge's mouth, stepped east (mode `canoe`), paddled 17 cells north through river fights, stepped onto the ledge (`walking`) and into the cave, and talked to the automaton. `cube` held, CUBE_GIVEN and WAT_O_TWIN_TOLD set. `w_s21_neg_nocanoe`: the step east from (30, 28) is refused, mode `walking`. `w_s22_start`: into the camp, talked to the trader; `fairy_bottle` held, gold 6000 -> 1000. 0 console errors |
+| G11 | only WAT-O's paths changed |
+| G16 | `stubs: 0 left for WAT-O` |
+| G17 | `bands: OK`, `basins: OK (aldi 2781 cells, ocean 21882 cells; canal joins)` |
+| originality | a fresh reviewer read the crops, notes and dialogue. Every `Distinct:` line names at least 3 features: `originality review: PASS overworld(water) waterfall-cave caravan-camp` |
+
+**Open failures (integrator):**
+
+- **Stage-mode (c): the act-1 jetty ship.** The ship spawn (BIKKE_DEFEATED) still waits off Cornelia's jetty, and
+  `a1_pravoka` has no dock yet. With the airship landed in act 1, boarding that ship strands the party: the only dock it
+  reaches is `fir_crescent`, and the airship stays behind. A1-T's quay dock (or the ship's move to it) clears this.
+  Every airship stage started from act 1 will see it.
+- **Full (b): `SKIP S21 ... without S20 (no grants)`.** S20 (Onrac, WAT-T) is pending and grants nothing, so
+  withholding it withholds nothing. `questChecks` already skips a *built* ancestor without grants; the same rule for a
+  pending one, or WAT-T building S20, clears it. This is also the one G4 failure (`questGraph`).
+
+**Deviations:**
+
+- Scenarios set no story flags. The field rules on this way read none (the canoe item and the airship decide), and
+  `DebugScenarioField`'s flag list is act 1's.
+- Before the FIR-O merge, my compiles used a scratch copy of the compiler with the reach-root fix that FIR-O then
+  shipped. After the merge everything was recompiled with the repo's compiler: the digest `5be1e6592dc4f9bf` is
+  unchanged and only the `water` box digest changed.
+- The overworld design note lives in the `world_water.py` docstring, because the world source is generated.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains the row `layouts/world_water.py` (+ `layouts/water/world_water_*.py`) -> the WATER box of
+  `overworld.yaml`, and `layouts/water/waterfall.py` / `caravan.py` -> `waterfall-cave` / `caravan-camp`.
+- Debug scenarios gain `w_s21_start`, `w_s21_neg_nocanoe` and `w_s22_start`.
 <!-- === end WAT-O === -->
 <!-- === WAT-T WATER (pass W: owned by WAT-T) === -->
 <!-- === end WAT-T === -->

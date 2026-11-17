@@ -136,6 +136,20 @@
 # === ORD-O (pass W: owned by ORD-O) ===
 # === end ORD-O ===
 # === WAT-O (pass W: owned by WAT-O) ===
+# S21 (waterfall-cave): played once after the automaton gives the cube (its giftFlag CUBE_GIVEN starts it); the lore
+# of its twin, the war machine of the sky castle (D-W7). The script sets its onceFlag.
+- id: wat_cube_given
+  steps:
+    - type: dialog
+      text: "The cube leaves the brass hands, and the automaton's lamp-eyes flicker."
+    - type: dialog
+      text: "\"We were cast as a pair. I was given a lantern and this door to keep. My twin was given a blade.\""
+    - type: dialog
+      text: "\"It was sent up to walk the halls of the castle in the sky. If it walks there still, it will not know you.\""
+    - type: dialog
+      text: "\"Do not wait for it to be patient. It was never made to be.\""
+    - type: set_flag
+      flag: WAT_O_TWIN_TOLD
 # === end WAT-O ===
 # === WAT-T (pass W: owned by WAT-T) ===
 # === end WAT-T ===
