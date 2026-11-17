@@ -7,28 +7,33 @@ from __future__ import annotations
 # approved keyframes (bosses add `cast` and, pass F, `attack_raise`: the heavy attack's raised hold)
 KEYFRAMES = ("idle", "attack", "hurt", "cast", "attack_raise")
 MONSTER_FRAMES = ["idle", "idle_b", "atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover",
-                  "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b"]
+                  "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b", "kneel_in1", "kneel_in2", "kneel", "kneel_b"]
+# docs/KNEEL_PLAN.md D-K4 / D-K5: the derived `kneel` key (kneel.py, opt-in) and its in-betweens
+KNEEL_FRAMES = ("kneel_in1", "kneel_in2", "kneel", "kneel_b")
 BOSS_FRAMES = MONSTER_FRAMES + ["cast_gather", "cast_rise", "cast", "cast_release"]
 RAISE_FRAMES = ["attack_raise", "atk_raise_in", "atk_raise_b", "atk_swing", "atk_swing2"]
 FRAME_SOURCE = {"idle_b": "idle", "atk_wind1": "idle", "atk_wind2": "idle", "atk_mid": "attack", "atk_follow": "attack",
                 "atk_recover": "idle", "hurt_in1": "idle", "hurt_in2": "hurt", "cast_gather": "idle", "cast_rise": "cast",
                 "cast_release": "cast", "daze": "idle", "daze_b": "idle", "atk_raise_in": "idle",
-                "atk_raise_b": "attack_raise", "atk_swing": "attack_raise", "atk_swing2": "attack"}
+                "atk_raise_b": "attack_raise", "atk_swing": "attack_raise", "atk_swing2": "attack",
+                **{n: "idle" for n in KNEEL_FRAMES}}
 # what a held (or missing) frame shows instead, followed until a frame exists (src/scenes/battle/enemyChoreography.ts
 # FRAME_FALLBACK): a held daze shows the hurt_in1 flinch, daze_b then shows daze
 FALLBACK = {**FRAME_SOURCE, "daze": "hurt_in1", "daze_b": "daze", "atk_raise_in": "atk_wind1", "atk_swing": "atk_mid",
-            "atk_swing2": "atk_mid"}               # a held heavy frame shows the plain attack's (as the TS chain)
+            "atk_swing2": "atk_mid",               # a held heavy frame shows the plain attack's (as the TS chain)
+            "kneel": "daze", "kneel_b": "daze_b", "kneel_in2": "daze", "kneel_in1": "idle"}   # D-K7: unopted sheets
 # runtime orders checked for continuity (monster_check.check_sprite); a pair's span is the keyframes around it
 SEQUENCES = {"attack": ["idle", "atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover", "idle"],
              "hurt": ["idle", "hurt_in1", "hurt_in2", "hurt"],
              "cast": ["idle", "cast_gather", "cast_rise", "cast", "cast_release"],
              "daze": ["idle", "daze", "daze_b"],
              "heavy": ["idle", "atk_raise_in", "attack_raise", "atk_raise_b", "attack_raise", "atk_swing", "atk_swing2",
-                       "attack", "atk_follow", "atk_recover", "idle"]}
+                       "attack", "atk_follow", "atk_recover", "idle"],
+             "kneel": ["idle", "kneel_in1", "kneel_in2", "kneel", "kneel_b"]}
 # keyframe each sequence needs (skipped without it) and its default span
-NEEDS = {"cast": "cast", "heavy": "attack_raise"}
+NEEDS = {"cast": "cast", "heavy": "attack_raise", "kneel": "kneel"}
 SPAN = {"attack": ("idle", "attack"), "hurt": ("idle", "hurt"), "cast": ("idle", "cast"), "daze": ("idle", "hurt"),
-        "heavy": ("idle", "attack_raise")}
+        "heavy": ("idle", "attack_raise"), "kneel": ("idle", "kneel")}
 ARM = ("sh_{h}", "el_{h}", "hand_{h}")
 HEAD = "head"                                              # symbolic recipe joint, resolved per body template
 # frame -> pixel source, toward, t (table 3.1 terms; `over` = overshoot of toward->src), moves, pins, body_dy, tweaks
@@ -60,6 +65,12 @@ RECIPES = {
                     "bob": True},
     "atk_swing": {"src": "attack_raise", "toward": "attack", "t": 0.35, "moves": "all", "pins": "feet"},
     "atk_swing2": {"src": "attack", "toward": "attack_raise", "t": 0.35, "moves": "all", "pins": "planted"},
+    # docs/KNEEL_PLAN.md D-K5 (opt-in, kneel.py; the pins come from the kneel template, kneel.extend_cfg)
+    "kneel_in1": {"src": "idle", "toward": "kneel", "t": 0.33, "moves": "all", "pins": "planted", "free": True},
+    "kneel_in2": {"src": "kneel", "toward": "idle", "t": 0.33, "moves": "all", "pins": "planted", "free": True},
+    # kneel_b: the breath on the kneel key (the body 1 px down, every knee and foot held), cut part by part like
+    # atk_raise_b with bob: false, so the rig's paint and every part check reach it
+    "kneel_b": {"src": "kneel", "toward": "kneel", "t": 0.0, "moves": "all", "pins": "legs", "dy": 1},
 }
 
 # FW-6: a tweaked idle_b (frames.idle_b.tweaks, 1 px cap) is a rig frame at t 0 from idle, then the body's idle_b op

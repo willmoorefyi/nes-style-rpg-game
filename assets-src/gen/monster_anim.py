@@ -76,10 +76,11 @@ def load_entries(paint: bool = True) -> list[tuple[str, dict, dict[str, Image.Im
             frames = {p: frames[p] if p != "hurt" else frames[derive].copy() for p in poses}
             meta = {**meta, "kf_derived": {"hurt": derive}}
         entries.append((metas[0]["character"], meta, frames))
+    from gen import kneel as KN
     out = []
     for sid, meta, frames in entries:
-        cfg = load_rig(sid)
-        out.append((sid, *MK.apply(sid, cfg, meta, frames, paint)) if cfg else (sid, meta, frames))
+        cfg = load_rig(sid)                               # docs/KNEEL_PLAN.md D-K4: + the derived kneel key (opt-in)
+        out.append((sid, *KN.add_key(sid, cfg, *MK.apply(sid, cfg, meta, frames, paint))) if cfg else (sid, meta, frames))
     return out
 
 
@@ -214,12 +215,15 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     from gen import rig as R
     from gen import monster_render as MR
     from gen import rig_render as RR
+    from gen import kneel as KN                           # docs/KNEEL_PLAN.md D-K5: kneel rig keyframe (opt-in)
+    cfg, keyframes, kseg = KN.prepare(sprite, cfg, keyframes, meta)
     cell = keyframes["idle"].size
     rig = R.Rig(cfg, cell)
     size = (cell[1], cell[0])
     arrs = {k: np.asarray(v.convert("RGBA")).copy() for k, v in keyframes.items()}
-    segs = {k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes}
+    segs = {**{k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes and k not in kseg}, **kseg}
     holds, pairs = held(cfg.get("holds")) | aliased(sprite, cfg)[1], rig.joined_pairs()   # FW-Q: aliased = held
+    holds |= KN.skip(keyframes)                           # no kneel key: no kneel in-betweens
     gaps = {k: RR.source_gaps(s[0], pairs) for k, s in segs.items()}     # the approved art's own part gaps
     foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
                   for ft in rig.feet}
@@ -261,7 +265,8 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
             dy, dx = (0 if "dy" in over else int(r.get("dy", 0) * k)), (0 if "dx" in over else int(r.get("dx", 0)))
             tx, ty = out[r["toward"]].get("shift", (0, 0)) if r["toward"] in out else (0, 0)
             T = {j: (v[0] - tx, v[1] - ty) for j, v in T.items()}   # a moved target pulls the pose, not the mass
-        J = R.solve(rig, S, T, u, moves, pins, dy, tweaks, not floating, half_joints(rig, name, cfg), dx, shift)
+        J = R.solve(rig, S, T, u, moves, pins, dy, tweaks, not (floating or r.get("free")),   # kneel: no ground clamp
+                    half_joints(rig, name, cfg), dx, shift)
         layers, rots, prop_px = [], {}, {}
         lab, names = segs[r["src"]]
         drop = set(over.get("drop") or [])

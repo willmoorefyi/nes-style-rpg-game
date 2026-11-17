@@ -10,7 +10,9 @@ hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: th
 opaque row), idleBox ([l, t, r, b]: the idle key's opaque box, inclusive; FW-A2), scale (only for a sheet listed in
 gen/monster_scale.yaml: its integer display scale, FW-S), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
 attack_raise only, or atk_wind2's for a rig with `raise: false`, FW-R), travelTop / lungeRight / homeX (FW-A, below),
-sequence_version, page (index into pages)}}}.
+sequence_version, page (index into pages), kneelSink (floaters with a kneel key, docs/KNEEL_PLAN.md D-K9)}},
+preload: [the pages holding an act-1 sheet] (D-K13; BattleArt loads and pins them)}. Kneel frames are packed like any
+frame but stay out of every anchor list (D-K8); a sheet without a kneel key aliases them (monster_recipes.FALLBACK).
 
 FW-A anchors (docs/ROSTER_FIX_PLAN.md 3; metadata only, no frame changes), native px in the cell, every extent
 inclusive (int(xs.max()), as opaqueRight), frames resolved through MA.resolve: travelTop = the min opaque row over
@@ -191,6 +193,7 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
         sheets[sid] = sheet_meta(meta, frames, names, fr, holds, anim, L, pg, sid in ranged)
         if sid in scales:                            # FW-S: the sheet's own display scale (BattleArt: entry.scale ?? scale)
             sheets[sid]["scale"] = scales[sid]
+        sheets[sid].update(kneel_sink(sid, meta, frames))   # D-K9: floaters with a kneel key only
     out.mkdir(parents=True, exist_ok=True)
     files = [page_file(i) for i in range(len(atlases))]
     for stale in sorted(out.glob("monsters-ai*.png")):   # the R0 single page and pages past the last one
@@ -199,12 +202,23 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
     for a, f in zip(atlases, files):
         a.save(out / f)
     meta_json = {"scale": SCALE, "texScale": TEX_SCALE,
-                 "pages": [{"file": f, "w": w, "h": h} for f, (w, h) in zip(files, sizes)], "sheets": sheets}
+                 "pages": [{"file": f, "w": w, "h": h} for f, (w, h) in zip(files, sizes)], "sheets": sheets,
+                 "preload": sorted({placed[s][0] for g, ids in groups if g == "act1" for s in ids})}   # D-K13
     (out / "monsters-ai.json").write_text(json.dumps(meta_json, indent=2) + "\n")
     print(f"monsters_ai: {len(sheets)} sheets on {len(files)} page(s) "
           f"{', '.join(f'{w}x{h}' for w, h in sizes)} native (texScale {TEX_SCALE}, max {C.MAX_PAGE}); "
           f"animated {[s for s in sorted(order) if sheets[s]['anim']]}")
     return meta_json
+
+
+def kneel_sink(sid: str, meta: dict, frames: dict) -> dict:
+    """docs/KNEEL_PLAN.md D-K9: {kneelSink: native px} for a floating / swimmer sheet with a kneel key, else {}."""
+    from gen import kneel as KN
+    from gen import rig as R
+    cfg = MA.load_rig(meta.get("character", sid)) if "kneel" in frames else None
+    if not KN.opted(cfg) or not (meta.get("floating") or R.BODY.get(cfg.get("body", "biped"), {}).get("floating")):
+        return {}
+    return {"kneelSink": KN.sink_px(cfg, frames["idle"].size[1])}
 
 
 def page_file(i: int) -> str:

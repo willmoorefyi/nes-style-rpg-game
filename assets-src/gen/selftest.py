@@ -481,6 +481,7 @@ def test_monster_anim() -> None:
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
+    print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("monster atlas build locks")
     SA.run_build_locks(check)
 
