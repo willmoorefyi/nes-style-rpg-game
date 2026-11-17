@@ -32,6 +32,8 @@ stages:
       # GT-1, D-W13: world cells (act-1 (29, 32) and (30, 32) at the A1 origin (64, 64))
       - {map: overworld, kind: gate, at: [93, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
       - {map: overworld, kind: gate, at: [94, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), added by W1-I like QUEST 4.5's bridge entries
+      - {map: temple-of-fiends, kind: npc, at: [11, 6], reason: "Garland's hideIf only clears the beaten boss off his dais, a dead end"}
     status: built
   # === A1-O (pass W: owned by A1-O) ===
   - id: S1
