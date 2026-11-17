@@ -2715,6 +2715,83 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
 <!-- === end WAT-D === -->
 <!-- === WND-O WIND (pass W: owned by WND-O) === -->
+### WND-O result: the Wind region and Lufenia (branch `w-wnd-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-o/`.
+
+**Files:**
+
+- Region: `layouts/world_wind.py` (the RegionOut; design note in its docstring), `layouts/wind/world_ground.py` (the
+  ground from shapes, no RNG: land defaults to mountain, three basins carved out; `_tidy` keeps the organic minimum
+  sizes), `layouts/wind/world_sites.py` (icons, doors, anchors, inspect cells, zones). Gaia's door, gate and icon are
+  read from WND-T's `wind/town_gaia_site.py` (not edited).
+- Lufenia: `layouts/wind/lufenia_town.py` (36x32), `lufenia_interiors.py` (houses stargazer, elder, healer; the two
+  magic shops; the inn; `interiors_common.Town("lufenia")`), `lufenia_people.py` (every line; the old tongue).
+- Data: `cutscenes.yaml` `wnd_chime_given` (dialog, `give_item chime`, `set_flag CHIME_GIVEN`); `quest.yaml` S26
+  `built` (entry, walk) and town `lufenia` `built`; `debug-scenarios.yaml` `w_s26_start`, `w_s26_neg_untaught`. The
+  `lufenia_*` shop records W1-F/W1-G seeded are kept as they are (L8 magic, inn 900).
+- Tests: `tests/quest/wind/wnd_o_world.test.ts` (9), `wnd_o_lufenia.test.ts` (7), `wnd_o_walk.test.ts` (4).
+- Compiled: the WIND chunks of `overworld` (16 files, `--region wind` under the lock), the 7 Lufenia maps, and the
+  stubs Gaia's door links to (`gaia`, its 6 houses, 5 shops, inn and `gaia-spring`; R21, WND-T replaces them).
+
+**The region (4.7).** One rugged continent of ranges with three walkable basins, never joined on foot (checked by
+`world_sites.zones` and `wnd_o_world.test.ts`), each with a grass airship meadow within 8 steps of its anchor:
+Gaia's bowl (grass floor, a crater tarn, a pine grove, a stilled second windmill, a knoll behind the town door) with
+a wind-gap east onto the Pinewold upland and its two sea lochs; the Mirage sands (a broken stone spine, a salt pan,
+the oasis meadow, the tower on the west spit with a fallen block, a buried bronze dial); Lufenia's cliff-ringed mesa
+(grass, moor, a copse), split from the sands by the Sundering fjord. No dock. Anchors: `wnd_gaia` (150, 14),
+`wnd_mirage` (132, 37), `wnd_lufenia` (152, 46). Zones: `wnd_highlands` "Gaia Highlands" (tyrannosaur, chimera,
+green_dragon), `wnd_mirage_sands` "Mirage Sands" (sand_worm, stone_golem, chimera), `wnd_lufen_moor` "Lufenian
+Mesa" (medusa, chimera, green_dragon), `wnd_sea` "North Seas", `modes: [ship]` (sahagin_prince, sea_snake,
+white_shark, deepeyes), over every Water cell of the box, bands included; every walkable cell of the box is in
+exactly one walking zone (lake cells too, for the canoe).
+
+**Lufenia (4.0.1, 4.7).** Every outdoor Lufenian (12) and every house dweller speaks a fixed phrase of an invented
+old tongue until LUFENIAN_LEARNED, then plain speech (17 NPCs reactive on the flag). The keepers (white and black
+magic, the inn with `action: inn`, the healer's clinic at 150 G a level) have `showIf: LUFENIAN_LEARNED`. The elder
+plays `wnd_chime_given` (NPC cutscene `requiredFlags: [LUFENIAN_LEARNED]`, `onceFlag: CHIME_GIVEN`). Hints:
+`lufenia_mirage_hint` (Mirage), `lufenia_cube_hint` (cube). Town standard: houses 5/4, interiors 3/3, outdoor 12/10,
+interior 6/5, hints 2/2, reactive 17/6, shops 2/2, inn 900/900, clinic yes.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `lufenia_town.py`, `lufenia_interiors.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps`: exit 0 |
+| G2 | `build_map.py overworld --region wind` (merged compiler): exit 0, 20.3 s, max RSS 3.97 GB; `--check-determinism --region wind overworld lufenia lufenia-house-{stargazer,elder,healer} lufenia-{white,black}-magic lufenia-inn`: every id `deterministic` |
+| G3 | `world.py --owned-chunks wind` vs the 16 changed `assets/maps/ai/overworld/` files since the merge base: no output (grep exit 1) |
+| G4 | after the merge: `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1` exit 0, `Test Files 303 passed (303)`, `Tests 6098 passed, 7 skipped` |
+| G5 | `npm run quest -- --mutate --stage S26`: (a) OK S26, (b) OK (32 withheld runs), (c) OK (452 states), (d) OK `S26 L28.0 [28,31]`, (e) OK (1 towns, 7 pending), (f)-(h) OK, `mutations: OK (2 gate rows; 2 elements, each removal reported)` (GT-29, GT-30 caught), `quest-verify: OK`. The full `npm run quest -- --mutate`: `quest-verify: OK` (`S26 L28.1 [28,31]`, 41 gate rows, 49 elements) |
+| G6, G7 | `assetCoverage` 242 passed; `fileCeilings` 20, `questCeilings` 58 passed |
+| G8 | `build_map.py --selftest`: 104 checks passed (before the merge; this branch no longer changes the compiler) |
+| G12 | `designNotes`, `originality` passed; reviewer: `originality review: PASS overworld-WIND lufenia lufenia-house-stargazer lufenia-house-elder lufenia-house-healer lufenia-white-magic lufenia-black-magic lufenia-inn` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.735 (31 pairs; 15 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 1 checked, 13 pending)`. T6-T8 stay pending on `mirage-1f:arrival` / `:inner` (WND-D1). Scratch rows on the real world (`/tmp/w-wnd-o/travel.ts`, started at Cornelia): without the airship no WIND anchor is reached; with it (canoe held or not) all three are, each with a landing cell within 8 steps |
+| G15 | `townStandard`: the lufenia row above, every column at or over target |
+| G16 | `stubs.py --check WND-O`: `stubs: 0 left for WND-O` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `bands: OK`, `basins: OK (aldi 2781 cells, ocean 21099 cells; canal joins)` |
+| G10 (6.5) | headless Chromium on 5237, `mute=1` (`/tmp/w-wnd-o/pw/checkpoint.mjs`): `w_s26_start`: overworld (152, 46) -> `lufenia`, the elder's hall, talk: CHIME_GIVEN set, chime 1; the healer's house holds `lufenia-healer-keeper`; 0 console errors (`/tmp/w-wnd-o/w_s26_start.png`, `_dialog.png`). `w_s26_neg_untaught`: the elder says "Sae'qat, ven doloth. Lun... thrim?", no flag, no chime; the healer's house holds only the patient (no keeper; checked before the merge, after it a wandering townsman blocked the scripted walk there); 0 errors (`/tmp/w-wnd-o/w_s26_neg_untaught.png`, `_dialog.png`). Run with a scratch `playwright-core` in `/tmp/w-wnd-o/pw/` because the shared Playwright MCP browser was being driven by another tranche |
+
+**Deviations / hand-offs:**
+
+- **The Mirage door is shut until WND-D1 builds `mirage-1f`.** The stub has no chime door, so a door into it reached
+  `mirage-1f:inner` with no chime (T6, T7 failed). `world_sites.MIRAGE_OPEN` reads whether `mirage-1f` is still a
+  stub: while it is, the tower's door cell is blocked with an inspect line and there is no transition (and no compiled
+  mirage stubs). The integrator's world regeneration at WND-D1's merge opens it (one transition to `mirage-1f`
+  `arrival`).
+- **Shared fixes, in their own commit for the orchestrator** (FIR-O's merge covered the rest; my overlapping edits
+  were dropped for FIR-O's): `src/progression/questShops.ts` (proof (e) in `--stage` mode removes the `opensAfter`
+  stage's grants from the assumed start, as (b) does; without it a town opening after an ancestor is always `EARLY`
+  and GT-30 is never caught); `tests/data/questData.test.ts` and `tests/progression/questLate.test.ts` allow a built
+  town (lufenia is the first).
+- S26's `entry` starts at Cornelia's gate with the airship on the grass beside it and the ship (S2) at anchor off the
+  mesa, out of reach of any shore, so no pending dock strands the party in assume mode.
+- Gaia's icon sits on a 4-cell knoll (mountain) so the door keeps one way out; WND-T's site file is unchanged.
+
+**AGENTS.md delta (for INT):** the map table gains `layouts/world_wind.py` + `layouts/wind/world_*.py` (WIND) and
+`layouts/wind/lufenia_*.py` (`lufenia`, `lufenia-house-*`, the magic shops, the inn); a town whose speech is gated
+writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`; the Mirage door opens when
+`mirage-1f` stops being a stub; debug scenarios `w_s26_start`, `w_s26_neg_untaught`.
 <!-- === end WND-O === -->
 <!-- === WND-T WIND (pass W: owned by WND-T) === -->
 <!-- === end WND-T === -->

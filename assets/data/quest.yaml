@@ -492,10 +492,15 @@ stages:
     maps: [lufenia, lufenia-*]
     zones: [overworld:wnd_lufen_moor]
     grind: 2.0
-    walk: []
+    # WND-O: the assumed start is Cornelia's south gate with the airship on the grass below it (S26 needs the flight
+    # to the mesa); the ship (S2) rides at anchor off the mesa, out of reach of any shore, so no ancestor's pending
+    # dock can strand the party in assume mode
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
+                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [lufenia-house-elder:npc:lufenia_elder]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end WND-O ===
   # === WND-T (pass W: owned by WND-T) ===
   - id: S23
@@ -648,7 +653,7 @@ towns:
     opensAfter: [S25]
     bandStage: S26
     kit: w_lufenia
-    status: pending
+    status: built
   # === end WND-O town ===
   # === WND-T town (pass W: owned by WND-T) ===
   - id: gaia

@@ -9,8 +9,9 @@
  * `opensAfter` (crescent and gaia on quest.yaml). Its cumulative gold when a keeper first becomes talkable must be
  * below 40 % of its kit's 4-member price: `PRICEWALL <town> <gold> vs <price>`.
  */
-import type { QuestTown } from '../types/index.js';
-import type { ProofFailure, ProofResult } from './questTypes.js';
+import type { QuestStage, QuestTown } from '../types/index.js';
+import type { ProofFailure, ProofResult, QuestState } from './questTypes.js';
+import { stageMark } from './questStates.js';
 import { townKeepers, townMapIds } from './questCatalog.js';
 import { closure, fail, result, without, type QuestContext } from './questProofs.js';
 import { saturate } from './questSaturate.js';
@@ -49,7 +50,7 @@ export function proofEarlyShops(ctx: QuestContext): ProofResult {
     for (const p of town.opensAfter) {
       const stage = ctx.world.stages.get(p);
       if (!stage) continue;
-      const sat = saturate(ctx, ctx.start, without(ctx, stage), (s) => ids.some((id) => s.availableEver.has(id)));
+      const sat = saturate(ctx, startWithout(ctx, stage), without(ctx, stage), (s) => ids.some((id) => s.availableEver.has(id)));
       if (ids.some((id) => sat.availableEver.has(id))) {
         failures.push(fail('e', 'EARLY', `EARLY ${town.id} talkable before ${p}`, sat.path()));
       }
@@ -57,6 +58,18 @@ export function proofEarlyShops(ctx: QuestContext): ProofResult {
   }
   const extra = pending ? `, ${pending} pending` : '';
   return result('e', 'early shops', failures, `(${checked} towns${extra})`);
+}
+
+/** The start with a stage's grants taken away: in assume mode (`--stage`) the start already holds every ancestor's
+ *  grants, so withholding the events that give them is not enough (as proof (b) does in assume mode). */
+export function startWithout(ctx: QuestContext, s: QuestStage): QuestState {
+  const st = ctx.start;
+  if (!ctx.stage) return st;
+  const gone = new Set(s.grants.vehicles);
+  const flags = new Set([...st.flags].filter((f) => !s.grants.flags.includes(f) && f !== stageMark(s.id)));
+  const place = gone.has(st.place.mode) ? { ...st.place, mode: 'walking' as const } : st.place;
+  return { ...st, flags, items: new Set([...st.items].filter((i) => !s.grants.items.includes(i))), place,
+    vehicles: st.vehicles.filter((v) => !gone.has(v.type)) };
 }
 
 /** Whether a town gets a price wall: its kit costs more than every kit of the stages right after `opensAfter`. */

@@ -1477,6 +1477,54 @@
 # === WAT-D (pass W: owned by WAT-D) ===
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
+# S26 (docs/WORLD_PLAN.md 6.5): the field start at Lufenia's land gate on the mesa, the airship parked on the mesa
+# meadow, the band-low party (L28, upgraded classes from S20 on) with the B7 kit (w_gaia) and every grant up to S25.
+# Walk north into Lufenia, into the elder's hall (the slate-roofed hall at the head of the court) and talk to the
+# elder: CHIME_GIVEN and the chime held; the keepers (the magic shops, the inn, the healer's clinic) are there.
+- id: w_s26_start
+  name: WND-O - S26 Lufenia's chime (start)
+  mode: field
+  map: overworld
+  entrance: wnd_lufenia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 155, y: 48 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED]
+  party: &w_s26_party
+    - { class: knight, name: KNGT, level: 28, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 28, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 28, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 28, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: &w_s26_items { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1 }
+  gold: 20000
+  enemies: []
+# The same start with exactly one prerequisite withheld, LUFENIAN_LEARNED: every Lufenian speaks the old tongue and
+# no keeper is in town (the shops, the inn and the clinic are empty); the elder gives nothing.
+- id: w_s26_neg_untaught
+  name: WND-O - S26 without LUFENIAN_LEARNED (negative)
+  mode: field
+  map: overworld
+  entrance: wnd_lufenia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 155, y: 48 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT]
+  party: *w_s26_party
+  items: *w_s26_items
+  gold: 20000
+  enemies: []
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
 # === end WND-T ===
