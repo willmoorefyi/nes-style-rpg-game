@@ -135,6 +135,8 @@ export class PlaceIndex {
           continue;
         }
         if (r.mode !== place.mode) {
+          // W1-A hand-off: a dock disembark is modeExits' dock exit (which parks the ship); a raw step would drop it
+          if (place.mode === 'ship' && r.mode === 'walking') continue;
           const exId = `${map.id}:step:${to.x},${to.y}:${r.mode}`;
           if (!seenExit.has(exId)) {
             seenExit.add(exId);
