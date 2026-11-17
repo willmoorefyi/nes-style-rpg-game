@@ -113,6 +113,22 @@
 # === WAT-D (pass W: owned by WAT-D) ===
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
+# S26 (docs/WORLD_PLAN.md 4.7): Lufenia's elder hands over the chime once the party can read Lufenian (his NPC's
+# cutscene: requiredFlags [LUFENIAN_LEARNED], onceFlag CHIME_GIVEN). The chime opens the Mirage's inner door (S27).
+- id: wnd_chime_given
+  steps:
+    - type: dialog
+      text: "The elder lifts a small bronze bell down from the dais. It hums in his hand, though nobody has struck it."
+    - type: dialog
+      text: "\"Our makers left it with us when they went up. It is tuned to one door only: the Mirage's inner door.\""
+    - type: give_item
+      item: chime
+    - type: dialog
+      text: "You received the Chime."
+    - type: set_flag
+      flag: CHIME_GIVEN
+    - type: dialog
+      text: "\"Climb, and if the one up there still listens to anything, let it hear that the wind is missed.\""
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
 # === end WND-T ===
