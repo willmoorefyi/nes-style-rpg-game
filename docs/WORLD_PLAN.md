@@ -2016,7 +2016,22 @@ No AI or paid calls. Scratch in `/tmp/w-w1-c2/`.
 - Check 6 requires an anchor when it is `built: true`, or its region is not a stub and does not list it in
   `checks.anchors_pending`. Check 7 is grid-level (objects ignored); the object-aware unreachable check is the compiler's.
 - Region checks read the collision from the source (`collide: alpha` approximated: a named part blocks).
-<!-- === end W1-C2 === -->
+
+**Follow-up after the W1-C1 merge (rebased on `mainline` 1c0d38e):** the compiled 192x192 world is committed
+(`assets/maps/ai/overworld.yaml` with `world.frames.a1`, `patches`, `art.patches`, 144 below chunks and
+`patch_canal.png`), compiled under W1-C1's lock. `bake_patches` now paints each patch in the map's own frame (a
+`raster` compile of the patched map round the patch), so its pixels meet the base art without a seam. frozenCore's
+compiled-collision case is mandatory and allows exactly one remap since the fixture: the 20 act-1 lake cells, Water
+(2) to Lake (11) (W1-C1's legend).
+
+| Command | Output |
+|---|---|
+| `world.py` | `bands: OK`, `basins: OK (aldi 2781 cells, ocean 29870 cells; canal joins)` |
+| `build_map.py overworld` | exit 0, 77.5 s, max RSS 10.4 GB |
+| `build_map.py --check-determinism overworld` | `overworld: deterministic` (126.7 s, max RSS 11.6 GB) |
+| overworldLayout, frozenCore, act1Flow | 46 passed |
+| `npm run build` | exit 0 |
+| G4 | 274 passed, 2 failed files (6 tests), all W1-B's: `fieldRules.test.ts` 5 north-bridge cases (act-1 cells (29, 32), (30, 32), (28, 47) on the translated map) and `DebugScenarioField.test.ts` 1 (raw spawn of `r_ow_temple` lands on ocean without GAP-18's `frame: a1` translation) |
 <!-- === end W1-C2 === -->
 <!-- === W1-D FOUNDATION (pass W: owned by W1-D) === -->
 <!-- === end W1-D === -->

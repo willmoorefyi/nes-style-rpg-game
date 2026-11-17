@@ -95,15 +95,19 @@ describe('the frozen act-1 core (WORLD_PLAN 2.5)', () => {
     expect((world.vehicles ?? []).filter((v) => v.type === 'ship')).toHaveLength(1);
   });
 
-  it('the compiled world keeps the act-1 collision under the translation (when it is the world)', () => {
-    if (compiled.width !== 192) return;          // the compiled map still holds act 1 alone: nothing to compare
+  it('the compiled world keeps the act-1 collision under the translation (Lake: Water -> Lake, W1-C1)', () => {
+    expect([compiled.width, compiled.height]).toEqual([192, 192]);
+    expect(compiled.world?.frames.a1).toEqual(world.world!.frames.a1);
+    const a = rows(act1);
     const changed: string[] = [];
     for (let y = 0; y < act1Coll.height; y++) {
       for (let x = 0; x < act1Coll.width; x++) {
         const was = act1Coll.collision.charCodeAt(y * act1Coll.width + x) - 48;
         const now = compiled.collision[(y + OY) * compiled.width + x + OX];
         const ex = exceptionAt(x, y);
-        if (was === now || (ex && !ex.oToM) || (ex?.oToM && was === 2 && now === 3)) continue;
+        // the one planned remap since the fixture: a lake cell (≈) compiles to TerrainType.Lake (11), not Water (2)
+        const lake = a[y][x] === '≈' && was === 2 && now === 11;
+        if (was === now || lake || (ex && !ex.oToM) || (ex?.oToM && was === 2 && now === 3)) continue;
         changed.push(`(${x}, ${y}) ${was} -> ${now}`);
       }
     }
