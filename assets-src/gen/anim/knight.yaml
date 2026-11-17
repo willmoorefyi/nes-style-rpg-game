@@ -17,3 +17,66 @@ battle:
     {neck: [42, 34], crown: [37, 6], chest: [41, 40], hip: [43, 54],
      sh_n: [32, 40], el_n: [27, 46], hand_n: [21, 45], sh_f: [49, 36], el_f: [56, 33], hand_f: [63, 28],
      hip_n: [37, 55], knee_n: [28, 61], foot_n: [30, 72], hip_f: [48, 55], knee_f: [51, 62], foot_f: [55, 73]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py), iteration 2: re-posed from ready,
+# chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
+# (puppet_kneel_paint.py, <= 160 px per frame, approved palette): both knee plates cut with their thigh / the front plate with its shin so they move whole; the
+# rear thigh's upper plate recoloured to tabard navy (one knee plate at the ground), the front plate 2 px
+# down-right onto the bent knee, two strays cleared.
+# Iteration 3: the 1 px pinhole at the tabard / thigh seam inked.
+kneel:
+  lean: 0
+  bow: 6
+  arms: [n]
+  tweaks:
+    neck: [0, 1]
+    crown: [0, 1]
+  labels:
+  - part: thigh_f
+    box: [45, 55, 55, 64]
+  - part: thigh_n
+    box: [24, 55, 34, 64]
+  paint:
+  - frame: kneel
+    move: [24, 58, 32, 64]
+    by: [2, 2]
+  - frame: kneel
+    rect: [45, 59, 54, 66]
+    only: [214, 214, 222]
+    rgb: [24, 99, 173]
+  - frame: kneel
+    rect: [45, 59, 54, 66]
+    only: [156, 165, 173]
+    rgb: [24, 99, 173]
+  - frame: kneel
+    rect: [45, 59, 54, 66]
+    only: [99, 115, 132]
+    rgb: [16, 49, 99]
+  - frame: kneel
+    rect: [45, 59, 54, 66]
+    only: [66, 74, 82]
+    rgb: [16, 49, 99]
+  - frame: kneel
+    xy:
+    - [23, 60]
+    - [23, 62]
+    rgb: null
+  - frame: kneel_in2
+    rect: [46, 55, 55, 63]
+    only: [214, 214, 222]
+    rgb: [24, 99, 173]
+  - frame: kneel_in2
+    rect: [46, 55, 55, 63]
+    only: [156, 165, 173]
+    rgb: [24, 99, 173]
+  - frame: kneel_in2
+    rect: [46, 55, 55, 63]
+    only: [99, 115, 132]
+    rgb: [16, 49, 99]
+  - frame: kneel_in2
+    rect: [46, 55, 55, 63]
+    only: [66, 74, 82]
+    rgb: [16, 49, 99]
+  - frame: kneel
+    xy:
+    - [36, 68]
+    rgb: [6, 4, 10]

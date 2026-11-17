@@ -7,7 +7,8 @@ Variant A (D-K4; R3 = A for every class, user ruling, so variant B is not built)
   behind the hip, back shin along the ground), front foot planted with the knee forward (2-bone IK), chest `lean`,
   head `bow`, the `arms` hands down 0.5 L_thigh; a leg reaching into the bottom margin is lifted out of it, then a
   rear knee pad 1-2 px above the ground row is lowered onto it (`knee_down`, default on).
-- robed: rows below `hip` squashed to sy 0.55 about the foot row (plan section 4), then the head `bow`.
+- robed: rows below `hip` squashed to sy 0.55 (or the class's `squash`) about the foot row (plan section 4), then
+  the head `bow`. `reoutline: true` re-inks the class's 2 px outline afterwards (puppet_kneel_outline.py).
 In-betweens: kneel_in1 is cut from ready, kneel_in2 from the derived key (near-keyframe, t 0.33 each); kneel_b is the
 key with idle_b's 1 px bob.
 """
@@ -19,6 +20,8 @@ import numpy as np
 from PIL import Image
 
 from gen import puppet as PU
+from gen import puppet_kneel_outline as KO
+from gen import puppet_kneel_paint as KP
 from gen.puppet_kneel_rot import LIMBS, NAMES, _dist, _rot_about, ik, render  # noqa: F401 - LIMBS re-exported
 
 ROBE_SY = 0.55
@@ -122,15 +125,17 @@ def ground_fix(img: Image.Image, bottom: int) -> Image.Image:
 
 
 def _robed_a(frames: dict, R: dict, kn: dict, z: list[str], bottom: int, t: float):
-    sq, drop = squash(frames["ready"], int(R["hip"][1]), 1 - t * (1 - ROBE_SY), bottom)
+    sy = float(kn.get("squash", ROBE_SY))               # per-class squash (D-K18 additive; default ROBE_SY)
+    sq, drop = squash(frames["ready"], int(R["hip"][1]), 1 - t * (1 - sy), bottom)
     J = PU._moved(R, 0, drop)
     tgt = solve(_lerp(J, target_a(J, kn, True, bottom), t), J, True, J)
     img, _, rots = render(tgt, {"sq": (sq, J, None)}, "sq", z, True)
     return ground_fix(img, bottom), rots, int(J["hip"][1])
 
 
-def _grounded(T: dict, sources: dict, default: str, z: list[str], bottom: int):
-    """Render; while a leg reaches into the bottom margin, lift that leg's knee and foot by the overflow."""
+def _grounded(T: dict, sources: dict, default: str, z: list[str], bottom: int, per_leg: bool = False):
+    """Render; while a leg reaches into the bottom margin, lift that leg's knee and foot by the overflow (the frame's,
+    or with `per_leg` (opt-in `kneel: {per_leg_lift: true}`) that leg's own, so a planted foot is not lifted with it)."""
     T = dict(T)
     for _ in range(4):
         img, lab, rots = render(T, sources, default, z, False)
@@ -140,8 +145,10 @@ def _grounded(T: dict, sources: dict, default: str, z: list[str], bottom: int):
         if over <= 0 or not legs:
             break
         for sd in legs:
+            own = np.isin(lab, [NAMES.index(f"thigh_{sd}"), NAMES.index(f"shin_{sd}")]) & solid
+            lift = int(np.where(own.any(1))[0].max()) - bottom if per_leg else over
             for j in (f"knee_{sd}", f"foot_{sd}"):
-                T[j] = PU._add(T[j], (0, -over))
+                T[j] = PU._add(T[j], (0, -lift))
     return img, lab, rots, T
 
 
@@ -164,11 +171,11 @@ def _knee_down(R: dict, K: dict, key, klab, src: dict, z: list[str], bottom: int
     return img, lab, rots, K2
 
 
-def _tween(a: dict, b: dict, sources: dict, default: str, z: list[str], bottom: int):
+def _tween(a: dict, b: dict, sources: dict, default: str, z: list[str], bottom: int, per_leg: bool = False):
     """The IK in-between a -> b at T_IN (a = the pixel source); fk_lerp if it turns a limb past the in-between cap."""
-    out = _grounded(solve(_lerp(a, b, T_IN), a, False, _lerp(a, b, T_IN)), sources, default, z, bottom)
+    out = _grounded(solve(_lerp(a, b, T_IN), a, False, _lerp(a, b, T_IN)), sources, default, z, bottom, per_leg)
     if max([abs(d) for p, d in out[2].items() if p in LIMBS] or [0]) > TWEEN_LIMB_DEG:
-        out = _grounded(fk_lerp(a, b, T_IN), sources, default, z, bottom)
+        out = _grounded(fk_lerp(a, b, T_IN), sources, default, z, bottom, per_leg)
     return out
 
 
@@ -181,14 +188,27 @@ def variant_a(frames: dict, R: dict, kn: dict, robed: bool, z: list[str], bottom
         hip_row = made["kneel"][2]
     else:
         ground = float(R["foot_n"][1] + R["foot_f"][1]) / 2
-        src_r = {"ready": (frames["ready"], R, None)}
-        key, klab, krot, K = _grounded(target_a(R, kn, False, ground), src_r, "ready", z, bottom)
+        lab = KP.relabel(PU.segment(frames["ready"], R, False), frames["ready"], kn["labels"]) if kn.get("labels") \
+            else None                                    # opt-in: boxes cut with one part (puppet_kneel_paint)
+        src_r = {"ready": (frames["ready"], R, lab)}
+        pl = bool(kn.get("per_leg_lift"))
+        key, klab, krot, K = _grounded(target_a(R, kn, False, ground), src_r, "ready", z, bottom, pl)
         if kn.get("knee_down", True):
             key, klab, rot2, K = _knee_down(R, K, key, klab, src_r, z, bottom)
             krot = rot2 or krot
-        img1, _, rot1, _ = _tween(R, K, src_r, "ready", z, bottom)
-        img2, _, rot2, _ = _tween(K, R, {"key": (key, K, klab)}, "key", z, bottom)
+        img1, _, rot1, _ = _tween(R, K, src_r, "ready", z, bottom, pl)
+        img2, _, rot2, _ = _tween(K, R, {"key": (key, K, klab)}, "key", z, bottom, pl)
+        if kn.get("ground_tweens"):                      # opt-in: an in-between left above the ground row drops to it
+            img1, img2 = ground_fix(img1, bottom), ground_fix(img2, bottom)
         out = {"kneel_in1": (img1, rot1, "ready"), "kneel_in2": (img2, rot2, "kneel"), "kneel": (key, krot, "ready")}
         hip_row = int(round(K["hip"][1]))
+    if kn.get("paint"):                                  # opt-in per-frame paint / stamps (puppet_kneel_paint)
+        out = {n: (KP.paint(img, n, kn["paint"], frames), rots, src) for n, (img, rots, src) in out.items()}
+    if kn.get("reoutline"):                              # opt-in: the class's own 2 px outline (puppet_kneel_outline)
+        out = KO.apply(out, frames["ready"])
     out["kneel_b"] = (PU.bob(out["kneel"][0], hip_row, 1), {}, "kneel")     # idle_b's 1 px bob, on the kneel
+    if kn.get("paint"):
+        out["kneel_b"] = (KP.paint(out["kneel_b"][0], "kneel_b", kn["paint"], frames), {}, "kneel")
+    if kn.get("reoutline"):
+        out["kneel_b"] = (KO.reoutline(out["kneel_b"][0], frames["ready"]), {}, "kneel")
     return out

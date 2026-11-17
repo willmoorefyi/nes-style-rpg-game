@@ -28,3 +28,36 @@ tweaks:
   atk_follow: {neck: [0, 0.5], crown: [0, 0.5], chest: [0, 0.5], hip: [0, 0.5], sh_n: [0.5, 0], sh_f: [0, 0.5], hip_n: [0.5, 0.5], hip_f: [0.5, 0.5]}
   cast_gather: {el_n: [-1, -2], el_f: [2, -2], hand_f: [3, -2], hip_n: [0, -1], hip_f: [0, -1]}
   cast_rise: {crown: [0.5, 0], chest: [0, 1], hip: [0, 0.5], sh_n: [0.5, 0.5], el_n: [0.5, -2], hand_n: [0.5, 6], sh_f: [-1.5, 1], knee_n: [-0.5, 1], knee_f: [-0.5, 1], foot_n: [-3, 1], foot_f: [-4.5, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py), iteration 2: re-posed from ready,
+# chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
+# (puppet_kneel_paint.py, <= 160 px per frame, approved palette): head bow -8 cancels the 8 deg lean, so the masked face is ready's pixels (two eyes);
+# the rear shin wraps (kneel) reduced to 3 clean bands; per_leg_lift / ground_tweens / foot_n keep the
+# planted front foot on the ground row.
+kneel:
+  lean: 8
+  bow: -8
+  arms: [n]
+  reoutline: true
+  per_leg_lift: true
+  ground_tweens: true
+  tweaks:
+    foot_n: [0, 3]
+  paint:
+  - frame: kneel
+    rect: [56, 66, 72, 74]
+    only: [57, 66, 74]
+    rgb: [6, 4, 10]
+  - frame: kneel
+    xy:
+    - [60, 68]
+    - [60, 69]
+    - [60, 70]
+    - [60, 71]
+    - [65, 68]
+    - [65, 69]
+    - [65, 70]
+    - [65, 71]
+    - [69, 68]
+    - [69, 69]
+    - [69, 70]
+    rgb: [57, 66, 74]

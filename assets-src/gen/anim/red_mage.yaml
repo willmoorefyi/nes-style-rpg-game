@@ -21,3 +21,61 @@ tweaks:
   atk_mid: {sh_n: [0, -3], el_f: [1, 0], el_n: [2, 0]}
   cast_gather: {el_n: [-2, 0], hand_n: [0, 1], el_f: [-2, 0]}
   cast_rise: {sh_n: [0, 2], el_n: [0, -2], hand_n: [0, -1], crown: [-1, 0], neck: [0, 2], el_f: [2, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py), iteration 2: re-posed from ready,
+# chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
+# (puppet_kneel_paint.py, <= 160 px per frame, approved palette): the rear trouser's thin white diagonal (kneel, kneel_in2) tucked under the coat tail
+# (recoloured to the coat's dark red), so no second-sword line; no bow, head 4 px lower for the band.
+# Iteration 3: the black spur behind the coat tail trimmed; two grey strays on the trouser band inked.
+kneel:
+  lean: 8
+  bow: 0
+  arms: [n]
+  reoutline: true
+  tweaks:
+    neck: [0, 4]
+    crown: [0, 4]
+  paint:
+  - frame: kneel
+    rect: [42, 61, 51, 73]
+    only: [214, 214, 214]
+    rgb: [132, 24, 49]
+  - frame: kneel
+    rect: [42, 61, 51, 73]
+    only: [115, 123, 132]
+    rgb: [132, 24, 49]
+  - frame: kneel
+    rect: [42, 61, 51, 73]
+    only: [189, 165, 156]
+    rgb: [132, 24, 49]
+  - frame: kneel
+    rect: [42, 61, 51, 73]
+    only: [66, 41, 74]
+    rgb: [132, 24, 49]
+  - frame: kneel_in2
+    rect: [42, 60, 53, 73]
+    only: [214, 214, 214]
+    rgb: [132, 24, 49]
+  - frame: kneel_in2
+    rect: [42, 60, 53, 73]
+    only: [115, 123, 132]
+    rgb: [132, 24, 49]
+  - frame: kneel_in2
+    rect: [42, 60, 53, 73]
+    only: [189, 165, 156]
+    rgb: [132, 24, 49]
+  - frame: kneel_in2
+    rect: [42, 60, 53, 73]
+    only: [66, 41, 74]
+    rgb: [132, 24, 49]
+  - frame: kneel
+    xy:
+    - [57, 63]
+    - [58, 63]
+    - [59, 63]
+    - [58, 62]
+    rgb: null
+  - frame: kneel
+    xy:
+    - [23, 62]
+    - [24, 59]
+    rgb: [6, 4, 10]

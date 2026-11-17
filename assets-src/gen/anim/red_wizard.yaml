@@ -29,3 +29,7 @@ tweaks:
   cast_gather: {el_n: [1, 0], hand_n: [-8, -6], el_f: [2, -2], hand_f: [0, -5]}
   cast_rise: {el_f: [1.5, -4], hand_f: [8, -2.5], neck: [0, -0.5], crown: [0.5, -0.5], chest: [0.5, -0.5], sh_n: [0.5, -1.5], el_n: [3.5, 0], hand_n: [3, 4.5], sh_f: [0.5, -1]}
   cast_release: {neck: [1, 0], crown: [1, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
+# sy 0.55, head bow in deg, both hands kept; reoutline: the 2 px outline the squash exposes re-inked
+# (puppet_kneel_outline.py).
+kneel: {bow: 10, arms: [], reoutline: true}

@@ -29,3 +29,55 @@ tweaks:
   cast_rise: {neck: [0.5, 0.5], crown: [0.5, 0.5], chest: [0.5, 0], hip: [0.5, 0], sh_n: [0, -0.5], sh_f: [-0.5, 1],
               el_f: [-3, 1], hand_f: [3, 1], hip_n: [0, -1], hip_f: [0.5, -1], knee_n: [2, 0], knee_f: [-1.5, 0],
               foot_n: [1.5, 0.5], foot_f: [-2, -0.5]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py), iteration 2: re-posed from ready,
+# chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
+# (puppet_kneel_paint.py, <= 160 px per frame, approved palette): the sash knot cut with the torso; no fist lowered (the near fist stays clear of the thigh); the
+# rear shoe moved 5 px down onto the ground against the shin; the kneel_in2 thigh spike rounded; head 2 px
+# lower for the band.
+# Iteration 3: kneel_in2's pinholes inked and the black void between the front thigh and the sash filled
+# with the thigh's gold-brown (1 px outline kept), its rear shoe 2 px down; kneel's 4 rear-thigh pinholes inked.
+kneel:
+  lean: 8
+  bow: 12
+  arms: []
+  reoutline: true
+  per_leg_lift: true
+  tweaks:
+    neck: [0, 2]
+    crown: [0, 2]
+  labels:
+  - part: torso
+    box: [33, 43, 47, 56]
+  paint:
+  - frame: kneel
+    move: [60, 61, 68, 71]
+    by: [0, 5]
+  - frame: kneel_in2
+    xy:
+    - [18, 53]
+    - [16, 54]
+    rgb: null
+  - frame: kneel_in2
+    xy:
+    - [32, 51]
+    - [32, 52]
+    - [28, 54]
+    - [32, 63]
+    - [33, 63]
+    - [49, 53]
+    - [50, 53]
+    - [53, 53]
+    rgb: &id001 [6, 4, 10]
+  - frame: kneel_in2
+    rect: [29, 57, 34, 62]
+    rgb: [148, 99, 24]
+  - frame: kneel_in2
+    move: [59, 62, 70, 73]
+    by: [0, 2]
+  - frame: kneel
+    xy:
+    - [49, 55]
+    - [50, 55]
+    - [53, 55]
+    - [52, 58]
+    rgb: *id001

@@ -22,3 +22,7 @@ tweaks:
   atk_wind2: {el_n: [-10, 0], hand_n: [-6, -9], tip: [5, -17]}
   cast_rise: {el_n: [-1, -6], hand_n: [-1, -5]}
   cast_gather: {hand_f: [9, -6], el_f: [2, -3]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
+# sy 0.55, both hands kept, the head (hat) 2 px lower for the band. No bow: a tilted hat pushes the kneel's outline
+# ring past ready's - 0.08.
+kneel: {bow: 0, arms: [], tweaks: {neck: [0, 2], crown: [0, 2]}}
