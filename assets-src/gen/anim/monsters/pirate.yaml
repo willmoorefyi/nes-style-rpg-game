@@ -127,14 +127,21 @@ paint:                       # cracks the moved parts opened (not art gaps): the
   - {frame: daze, xy: [[70, 29]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[72, 31], [72, 32]], rgb: null}
   - {frame: daze_b, xy: [[70, 31]], rgb: [6, 4, 10]}
-  # pass K (K2-B): kneel in-betweens: 1 px cracks closed with outline ink, the far boot below the feet row cleared
-  - {frame: kneel_in1, xy: [[24, 33], [45, 36], [24, 52], [49, 40], [51, 42]], rgb: [6, 4, 10]}
-  - {frame: kneel_in1, xy: [[22, 77], [24, 77]], rgb: null}
-  - {frame: kneel_in2, xy: [[40, 56], [30, 65]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[16, 77]], rgb: null}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs); the cutlass held low in front, turned under the 30 deg prop cap; shoulders slumped
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[24, 52]], rgb: [132, 82, 66]}
+  - {frame: kneel_in1, xy: [[49, 40], [51, 42]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[41, 54]], rgb: [33, 8, 57]}
+  - {frame: kneel_in2, xy: [[42, 54], [25, 63], [26, 63]], rgb: [66, 99, 148]}
+  - {frame: kneel_in2, xy: [[44, 60]], rgb: [132, 82, 66]}
+  - {frame: kneel_in2, xy: [[31, 64]], rgb: [41, 41, 74]}
+  - {frame: kneel_in2, xy: [[38, 67], [29, 67], [30, 67]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[38, 22], [62, 34], [43, 53], [44, 54], [28, 63], [27, 64], [43, 38], [18, 67], [44, 68], [45, 68], [46, 68], [48, 68], [19, 69], [47, 69], [19, 70], [20, 71], [21, 72], [30, 72], [21, 73], [30, 73], [31, 73], [22, 74], [23, 74], [40, 55]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed
 kneel:
-  variant: [knee_forward, short_legs]
-  tweaks: {tip: [-8, -16], foot_f: [2, 2], toe_f: [2, 1], crown: [0, 2], neck: [0, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [15, 0], foot_f: [15, 0], toe_f: [15, 0], sh_n: [0, 2], sh_f: [0, 2], tip: [-8, -16], neck: [0, 3], crown: [0, 3]}
   paint:
-    - {xy: [[61, 40], [60, 41], [20, 42], [33, 67], [34, 67], [35, 67], [36, 67], [37, 67], [38, 67], [31, 68], [32, 68], [41, 37], [41, 38], [41, 39], [40, 40], [4, 68], [4, 69]], rgb: [6, 4, 10]}
+    - {xy: [[26, 39]], rgb: [140, 156, 189]}
+    - {xy: [[21, 60], [20, 61], [21, 61]], rgb: [6, 4, 10]}
+    - {xy: [[19, 62], [20, 62], [21, 62]], rgb: [189, 140, 99]}
+    - {xy: [[24, 41], [18, 44], [62, 44], [33, 67], [35, 67], [36, 67], [37, 67], [38, 67], [31, 68], [30, 71], [30, 72], [30, 73], [30, 74], [44, 43], [43, 44], [42, 46], [49, 55]], rgb: [6, 4, 10]}

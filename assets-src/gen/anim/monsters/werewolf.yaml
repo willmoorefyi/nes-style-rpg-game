@@ -121,13 +121,17 @@ masks:
 holds: []
 paint:                         # 1 px crotch seam the shifted legs open, outline ink
   - {frame: atk_mid, xy: [[37, 53]], rgb: [6, 4, 10]}
-  # pass K (K2-B): the trailing far toe below the feet row cleared (kneel_in1, kneel_in2); the knee crack closed with outline ink (kneel_in2)
-  - {frame: kneel_in1, xy: [[21, 77]], rgb: null}
-  - {frame: kneel_in2, xy: [[19, 71], [21, 71]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[12, 77], [13, 77]], rgb: null}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs); the far knee and shin flat on the ground row, the foot drawn in off the cell edge; shoulders slumped
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[30, 29], [31, 29]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[29, 59], [32, 59], [29, 60], [31, 60], [32, 60], [33, 60], [31, 61], [29, 62], [31, 62], [30, 63]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[18, 76], [19, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[17, 75]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[16, 75], [16, 76], [17, 75], [17, 76], [20, 75]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); snout bowed, shoulders dropped
 kneel:
   variant: [knee_forward, short_legs]
-  tweaks: {knee_f: [0, 2], foot_f: [3, 4], toe_f: [3, 2], tail_tip: [4, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  tweaks: {knee_f: [12, 2], foot_f: [12, 1], toe_f: [12, 0], sh_n: [0, 4], sh_f: [0, 4], neck: [1, 3], crown: [4, 5]}
   paint:
-    - {xy: [[23, 37], [26, 37], [25, 38], [26, 38], [27, 38], [42, 44], [45, 46], [23, 56], [21, 48], [22, 48], [22, 50], [23, 50], [22, 52]], rgb: [6, 4, 10]}
+    - {xy: [[27, 39]], rgb: [140, 90, 66]}
+    - {xy: [[24, 38], [25, 38], [26, 38]], rgb: [6, 4, 10]}
+    - {xy: [[39, 28], [52, 30], [25, 36], [26, 36], [27, 37], [25, 40], [28, 40], [20, 56], [18, 57], [48, 64], [45, 65], [49, 65]], rgb: [6, 4, 10]}
