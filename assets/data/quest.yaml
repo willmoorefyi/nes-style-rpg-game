@@ -202,10 +202,13 @@ stages:
     maps: [dwarf-hall]
     zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
     grind: 2.0
-    walk: []
+    # on foot at the hall's mouth, the ship moored at the dwarves' landing cove (the `ert_dwarf` dock)
+    entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
+    walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      - {map: overworld, kind: dock, at: [59, 104], reason: "the dwarf hall is also reachable on foot from Elfland over seam_n"}
+    status: built
   - id: S12
     title: "The giant's tunnel and Sarda"
     tranche: ERT-O
@@ -218,10 +221,14 @@ stages:
     maps: [giant-tunnel, sage-cave]
     zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
     grind: 2.0
-    walk: []
+    # on foot at the tunnel's east mouth, the ship moored at Melmond's harbour (the `ert_melmond` dock)
+    entry: {map: overworld, x: 28, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    walk: [overworld:warp:giant-tunnel, giant-tunnel:npc:ert_giant, giant-tunnel:warp:ert_giant_west,
+      overworld:warp:sage-cave, sage-cave:npc:ert_sarda]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      - {map: sage-cave, kind: npc, at: [7, 5], reason: "Sarda is behind the giant, who needs the ruby, which needs the vampire"}
+    status: built
   - id: S31
     title: "Excalibur"
     tranche: ERT-O
@@ -234,6 +241,8 @@ stages:
     maps: []
     zones: []
     grind: 1.0
+    # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge);
+    # pending until WND-D2 builds the sky castle's adamant (S28 does not grant it yet)
     walk: []
     basins: {}
     nonLoadBearing: []
@@ -603,7 +612,7 @@ towns:
     opensAfter: [S2]
     bandStage: S10
     kit: w_dwarf
-    status: pending
+    status: built
   # === end ERT-O town ===
   # === ERT-T town (pass W: owned by ERT-T) ===
   - id: melmond
