@@ -246,6 +246,31 @@
       text: "Smyth: \"There. Swing it once and you'll know. I'll not make its like again.\""
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
+# S25: Dr. Unne (melmond-house-unne, npc ert_unne, requiredItem slab, onceFlag LUFENIAN_LEARNED) reads the slab back
+# from the sea and teaches the party the Lufenians' letters. The slab is taken by the take_item step (an NPC takeItem
+# would take it before the cutscene could check for it, as with ERT-O's Nerrick).
+- id: ert_unne_lesson
+  steps:
+    - type: dialog
+      text: "Dr. Unne lays the tablet on his reading table and brushes the sea-salt out of the letters with a feather."
+    - type: take_item
+      item: slab
+    - type: dialog
+      text: "Unne: \"Every stroke is still there. Sit, all of you. Today you learn to read like a Lufenian.\""
+    - type: fade_out
+      duration: 500
+    - type: dialog
+      text: "Hours go by. Unne traces each sign, sounds it out and makes you say it back until your tongues ache."
+    - type: set_flag
+      flag: LUFENIAN_LEARNED
+    - type: wait
+      duration: 400
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "Unne: \"There. You could read their elder's letters now, or argue with him. Mind you only read them.\""
+    - type: dialog
+      text: "Unne: \"Their village is on a mesa in the far north-east. Only something that flies will get you there.\""
 # === end ERT-T ===
 # === ERT-D (pass W: owned by ERT-D) ===
 # === end ERT-D ===

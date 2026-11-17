@@ -273,10 +273,15 @@ stages:
     maps: [melmond, melmond-*]
     zones: []
     grind: 1.0
-    walk: []
+    # ERT-T: on foot at Melmond's land gate, the airship on the plain's grass beside it (S17); the ship (S2) rides at
+    # anchor far out at sea, out of reach of any shore, so no ancestor's pending dock can strand the party in assume
+    # mode (WND-O's S26 practice)
+    entry: {map: overworld, x: 42, y: 112, mode: walking, vehicles: [{type: airship, map: overworld, x: 40, y: 109},
+                                                                      {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [overworld:warp:melmond, melmond:warp:melmond-house-unne, melmond-house-unne:npc:ert_unne]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end ERT-T ===
   # === ERT-D (pass W: owned by ERT-D) ===
   - id: S11
@@ -646,7 +651,7 @@ towns:
     opensAfter: [S10]
     bandStage: S11
     kit: w_melmond
-    status: pending
+    status: built
   # === end ERT-T town ===
   # === FIR-T town (pass W: owned by FIR-T) ===
   - id: crescent
