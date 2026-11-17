@@ -9,8 +9,8 @@ from typing import Iterable
 
 import numpy as np
 
-WALL, WATER, MOUNTAIN, RIVER, COUNTER = 1, 2, 3, 7, 10
-BLOCKED = frozenset({WALL, WATER, COUNTER, MOUNTAIN, RIVER})
+WALL, WATER, MOUNTAIN, RIVER, COUNTER, LAKE = 1, 2, 3, 7, 10, 11
+BLOCKED = frozenset({WALL, WATER, COUNTER, MOUNTAIN, RIVER, LAKE})       # LAKE: pass W, the legend of W1-C1
 DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 Cell = tuple[int, int]

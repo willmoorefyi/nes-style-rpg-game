@@ -5,12 +5,13 @@ from __future__ import annotations
 import numpy as np
 
 import kit as K
+from .frame import CPX, CTX, chunk_rng, map_px, window_chunks
 from .base import (BLUR_R, CLUMP_BULGE, CLUMP_OUT, CLUMP_STEP, CORE, CORE_PULL, CORE_REACH, LOW, MARGIN, NEAR_LINE,
                    ROADS, SAND_BAND, T, WARP_COARSE, WARP_EPS, WARP_FINE, WARP_GAP, WARP_MEANDER, WARP_STRETCH, WATERS,
                    WILD, _blur, _core, _dist, _edge, _inner_depth, _key, _meander, _poisson, _resized, _shade, _stamp,
                    _up, _vnoise)
 
-_PARTITION: dict[int, tuple[int, list[str], np.ndarray]] = {}   # mat key -> (seed, names, label), set by paint_soft
+_PARTITION: dict[tuple, tuple[int, list[str], np.ndarray]] = {}   # (mat, frame) -> (seed, names, label), by paint_soft
 
 
 def sand_band(below: np.ndarray, grass: np.ndarray, sand: np.ndarray, core: np.ndarray, bayer: np.ndarray,
@@ -84,10 +85,16 @@ def partition(mat: np.ndarray, seed: int) -> tuple[list[str], np.ndarray]:
     lo, r = T // LOW, BLUR_R // LOW
     wy, wx = _warp(H, W, seed)
     h, w = hgt * lo, wid * lo
-    sy = np.clip((np.arange(H, dtype=np.float32)[:, None] + wy) / LOW - 0.5, 0, h - 1.001)
-    sx = np.clip((np.arange(W, dtype=np.float32)[None, :] + wx) / LOW - 0.5, 0, w - 1.001)
-    y0, x0 = sy.astype(np.int32), sx.astype(np.int32)
-    fy, fx = sy - y0, sx - x0
+    # sample in global low-res coordinates (the same float arithmetic in every window), then index the window's
+    # fields; the clamp is the whole map's edge (a window edge inside the map only matters in its ring)
+    mh, mw = map_px(H, W)
+    sy = np.clip((np.arange(CTX.oy, CTX.oy + H, dtype=np.float32)[:, None] + wy) / LOW - 0.5, 0, mh // LOW - 1.001)
+    sx = np.clip((np.arange(CTX.ox, CTX.ox + W, dtype=np.float32)[None, :] + wx) / LOW - 0.5, 0, mw // LOW - 1.001)
+    gy0, gx0 = sy.astype(np.int32), sx.astype(np.int32)
+    fy, fx = sy - gy0, sx - gx0
+    y0 = np.clip(gy0 - CTX.oy // LOW, 0, h - 2)
+    x0 = np.clip(gx0 - CTX.ox // LOW, 0, w - 2)
+    del gy0, gx0, sy, sx
     i00 = y0 * w + x0
     best = np.full((H, W), -1.0, np.float32)
     label = np.zeros((H, W), np.uint8)
@@ -116,14 +123,15 @@ def partition(mat: np.ndarray, seed: int) -> tuple[list[str], np.ndarray]:
 
 def _cached_partition(mat: np.ndarray, seed: int | None = None) -> tuple[int, list[str], np.ndarray]:
     k = _key(mat)
-    if k in _PARTITION and (seed is None or _PARTITION[k][0] == seed):
-        return _PARTITION[k]
+    key = (k, CTX.map_id, CTX.oy, CTX.ox, CTX.mh, CTX.mw)    # the same cells in another window are another partition
+    if key in _PARTITION and (seed is None or _PARTITION[key][0] == seed):
+        return _PARTITION[key]
     seed = k % 100000 if seed is None else seed
     names, label = partition(mat, seed)
     if len(_PARTITION) > 3:
         _PARTITION.pop(next(iter(_PARTITION)))
-    _PARTITION[k] = (seed, names, label)
-    return _PARTITION[k]
+    _PARTITION[key] = (seed, names, label)
+    return _PARTITION[key]
 
 
 def _line_edges(mask: np.ndarray, y0: int, x0: int) -> tuple[int, int]:
@@ -146,10 +154,11 @@ def _clumps(kit: K.Kit) -> list[tuple[np.ndarray, int, int]]:
     return out
 
 
-def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit: K.Kit,
-            rng: np.random.Generator) -> None:
+def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit: K.Kit) -> None:
     """Forest edges: tree_clump stamps about every 40 px along the outline (sticking out at most 14 px, only onto
-    open grass or sand outside other cells' centres), a 1 px canopy rim and a 3 px shadow cast to the south-east."""
+    open grass or sand outside other cells' centres), a 1 px canopy rim and a 3 px shadow cast to the south-east.
+    The clumps are placed chunk by chunk (GAP-14): each chunk draws from its own rng, keeps its anchors CLUMP_STEP / 2
+    px inside its border (so two chunks' clumps keep the spacing) and tests a bulge against its own clumps only."""
     if not forest.any():
         return
     H, W = forest.shape
@@ -158,28 +167,42 @@ def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit:
         clumps = _clumps(kit)
         out_d = _dist(forest, CLUMP_OUT + 1)
         inner = _inner_depth(forest, 13)
-        cand = np.argwhere(forest & (inner >= 3) & (inner <= 12))
+        cand_px = forest & (inner >= 3) & (inner <= 12)
         land = forest | open_ground
+        m, pad = CLUMP_STEP // 2, 2 * T
+        for col, row, _ in window_chunks(H, W):
+            gy, gx = row * CPX - CTX.oy, col * CPX - CTX.ox        # the chunk's top-left in window px
+            ay0, ay1, ax0, ax1 = max(0, gy + m), min(H, gy + CPX - m), max(0, gx + m), min(W, gx + CPX - m)
+            if ay0 >= ay1 or ax0 >= ax1:
+                continue
+            cand = np.argwhere(cand_px[ay0:ay1, ax0:ax1]) + (ay0, ax0)
+            if not len(cand):
+                continue
+            rng = chunk_rng("clumps", col, row)
+            by0, by1, bx0, bx1 = max(0, ay0 - pad), min(H, ay1 + pad), max(0, ax0 - pad), min(W, ax1 + pad)
+            own = forest[by0:by1, bx0:bx1].copy()             # the forest plus this chunk's clumps
 
-        def fits(i: int) -> bool:
-            # a clump bulges 2-14 px past the outline, onto open ground, and its new edge does not run along a
-            # cell line (the partition keeps the outline off them; a bulge must not bring it back)
-            y, x = cand[i]
-            part, cy, cx = clumps[int(rng.integers(len(clumps)))]
-            py, px = int(y - cy), int(x - cx)
-            y0, x0, y1, x1 = max(0, py), max(0, px), min(H, py + part.shape[0]), min(W, px + part.shape[1])
-            sub = part[y0 - py:y1 - py, x0 - px:x1 - px, 3] > 127
-            stick = out_d[y0:y1, x0:x1][sub]
-            if not stick.size or not CLUMP_BULGE[0] <= stick.max() <= CLUMP_BULGE[1] or (sub & ~land[y0:y1, x0:x1]).any():
-                return False
-            n0, l0 = _line_edges(canopy[y0:y1, x0:x1], y0, x0)
-            n1, l1 = _line_edges(canopy[y0:y1, x0:x1] | sub, y0, x0)
-            if l1 - l0 > 0.05 * n1:
-                return False
-            canopy[:] |= _stamp(below, part, px, py)
-            return True
+            def fits(i: int) -> bool:
+                # a clump bulges 2-14 px past the outline, onto open ground, and its new edge does not run along a
+                # cell line (the partition keeps the outline off them; a bulge must not bring it back)
+                y, x = cand[i]
+                part, cy, cx = clumps[int(rng.integers(len(clumps)))]
+                py, px = int(y - cy), int(x - cx)
+                y0, x0, y1, x1 = max(by0, py), max(bx0, px), min(by1, py + part.shape[0]), min(bx1, px + part.shape[1])
+                sub = part[y0 - py:y1 - py, x0 - px:x1 - px, 3] > 127
+                stick = out_d[y0:y1, x0:x1][sub]
+                if not stick.size or not CLUMP_BULGE[0] <= stick.max() <= CLUMP_BULGE[1] or (sub & ~land[y0:y1, x0:x1]).any():
+                    return False
+                cur = own[y0 - by0:y1 - by0, x0 - bx0:x1 - bx0]
+                n0, l0 = _line_edges(cur, y0, x0)
+                n1, l1 = _line_edges(cur | sub, y0, x0)
+                if l1 - l0 > 0.05 * n1:
+                    return False
+                stamped = _stamp(below[y0:y1, x0:x1], part[y0 - py:y1 - py, x0 - px:x1 - px], 0, 0)
+                cur |= stamped
+                canopy[y0:y1, x0:x1] |= stamped
+                return True
 
-        if len(cand):
             cand = cand[rng.permutation(len(cand))[:max(1, len(cand) // 3)]]
             _poisson(cand, CLUMP_STEP, rng, ok=fits)
     rim = _edge(forest) & ~(canopy & ~forest)

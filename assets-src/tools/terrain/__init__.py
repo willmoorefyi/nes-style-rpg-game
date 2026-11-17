@@ -11,7 +11,10 @@ Only the approved kit art is used: the overworld textures and the `peak`, `tree_
 Modules: base (constants, pixel helpers), outline (the material partition, sand band, forest edges), water (beach,
 banks, shallows, foam), peaks (foothills, peak variants and placement), roads, metrics, selftest.
 
-Determinism: every random choice comes from numpy generators seeded by the map seed; nothing iterates a set.
+Determinism and locality (GAP-14): every random choice comes from a per-chunk numpy generator (terrain.frame:
+the map id, the chunk and a purpose), and the noise is defined on global pixels, so a chunk's pixels depend only on
+its own cells plus about one cell of blend, in a full compile and in a `--region` window alike. Nothing iterates a
+set.
 """
 from __future__ import annotations
 
@@ -37,7 +40,6 @@ def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> Non
     tex = {m: _tile(kit.material(TEX.get(m, m)), H, W) for m in names}
     for m in names:
         below[lab[m]] = tex[m][lab[m]]
-    rng = np.random.default_rng(seed + 7)
     bayer, core = _bayer(H, W), _core(H, W)
     road_cells = _up(np.isin(mat, ROADS))
     grass, sand = get("grass").copy(), get("sand").copy()
@@ -50,5 +52,5 @@ def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> Non
     grass = banks(below, get("river") | get("lake"), grass, sand, core, bayer, soil)
     foothills(below, get("mountain"), grass, ocean, core, bayer, tex.get("mountain"), seed)
     paint_roads(below, mat, kit, seed)
-    _forest(below, get("forest"), (grass | sand) & ~road_cells & ~core, kit, rng)
+    _forest(below, get("forest"), (grass | sand) & ~road_cells & ~core, kit)
     shallows(below, [get(m) for m in WATERS], {m: get(m) for m in WATERS}, bayer, seed)
