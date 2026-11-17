@@ -663,3 +663,14 @@ python3 -I assets-src/gen/colossus.py budget --check
 - [ ] KA2-1 / 2-2 / 2-3 / 2-4 (75 monsters + 10 heroes), integrator per batch (medium, about 7h each, including hand marks)
 - [ ] KA3-0 body probes, then KA3-1 / 3-2 / 3-3 (38 monsters) (medium, about 5h each)
 - [ ] KA4 play test, contact sheet, docs, `check --all`, branch tags (high, 6h)
+
+## User rulings (2026-11-17, U0)
+
+| Q | Ruling |
+|---|---|
+| Q1 | Stage 1 approved: at most 91 requests, arm (a) kept. The Chaos-forms pass C is closed at 25 of 80 into `bedrock_history`. |
+| Q2 | The user reviews the probe sheet (and picks the arm), the pilot, and the final 135-kneel sheet. The orchestrator and review agent handle the rest and report every sprite that hits the limit. |
+| Q3 | (iii): after 3 failed tries, one more try from the reserve with the fallback arm, then the daze alias (F2). |
+| Q4 | `kneel-k2-a`, `kneel-k2-c` and `kneel-k3-0` are tagged under `archive/`, never merged, nothing deleted. |
+| Prices | Checked on the AWS Bedrock pricing page (us-west-2/us-east): Style Transfer $0.08; Style Guide, Control Sketch, Control Structure and Inpaint $0.07. SD3.5 Large is not listed there (it is billed via Marketplace) and is still to be confirmed at KA0b. |
+| Momus rev-4 P2 | Fold into KA0b: re-centre the cut window on the figure's base before the crop, fail on "figure touches the window edge", and add the +15 % offset case to the round-trip selftest. |
