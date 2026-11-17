@@ -2630,6 +2630,141 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-o/`.
 - The debug scenarios gain `w_s1_start`, `w_s3_start` and `w_s7_start`.
 <!-- === end A1-O === -->
 <!-- === A1-T A1 (pass W: owned by A1-T) === -->
+### A1-T result: Pravoka and the pirates (branch `w-a1-t` from `mainline` f825a6f, merged with `mainline` aa75df87 after A1-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-t/`.
+
+**Files:**
+
+- `layouts/a1/town_pravoka.py` writes `pravoka` (48x44, kits town + overworld), with the design note in its header.
+  - The plan: a shelf between the cliffs and the fjord. Three streets fall from the west cliff to a quay that runs the
+    length of the town: Rope Walk (y 14-15), Cooper's Row (y 24-25) and the high street (y 34-35). The high street
+    leaves by the west land gate.
+  - Lantern Street runs north to a cliff path, which rounds the fjord's head to the lighthouse shelf at the range's
+    foot. The shelf holds the keeper's house (the clinic) and the tower (the `tower` placeholder).
+  - Two warehouses stand on piles over the water beside a plank landing, with a boardwalk behind them. There is a
+    fishers' pier, and the brig's pier with the brig moored at it (the `buried_hull` placeholder, brown). A fish
+    market lies between the streets and the quay, and the pirates' den is boarded up.
+  - 15 `type: house` objects: 6 homes, 5 shops, and 4 without a door (the sail loft, the den, a boarded cottage and
+    the old warehouse). The inn is the `inn` prefab.
+  - Three inspect cells (the signpost, the lighthouse door, the brig), `battleBackgrounds.default: shoreline` for
+    the captain's fight, and the west edge exits to `overworld:a1_pravoka`.
+- `layouts/a1/town_pravoka_people.py`: the 19 outdoor NPCs, the captain's fight and `NO_WANDER`.
+  - 7 pirates: tinted `guard` and `villager`, `hideIf: BIKKE_DEFEATED`.
+  - Bikke: a tinted `warrior` at the brig pier's end (40, 33).
+  - The scripted encounter: `npc: bikke`, `pirate` x9, `isBoss`, flag BIKKE_DEFEATED, `postVictoryCutscene:
+    a1_bikke_yields`.
+  - The beaten captain and two dockhands: `showIf: BIKKE_DEFEATED`.
+  - `old_sailor_hint` names Elfheim, and `herbwife_hint` names Matoya.
+  - Every townsperson has a line that changes on BIKKE_DEFEATED.
+- `layouts/a1/town_pravoka_rooms.py` is the runner for the interiors. `town_pravoka_homes.py` writes the six
+  `pravoka-house-*` maps, and `town_pravoka_shops.py` writes the five shops and `pravoka-inn`. They use W1-D's
+  `Town("pravoka")` and its `house`, `shop` and `keeper` helpers. Each room has its own original plan and its design
+  note in its header:
+  - lighthouse: the clinic. The keeper (`action: clinic`, `clinicPrice: 10`), the keeper's daughter and a hurt sailor;
+  - warehouse: aisles of crates, Hennick, a stowaway, and a chest (`tent`);
+  - netmaker: two NPCs;
+  - chandler: two rooms, two NPCs and a chest (`antidote`);
+  - cooper: two NPCs and a chest (`potion`);
+  - harbourmaster: an office and a record room, two NPCs;
+  - the shops: each keeper stands behind a counter whose ends are closed, so the keeper's side is unreachable. The
+    inn has a taproom, a bunk room and a patron.
+- `layouts/a1/town_pravoka_site.py` is **unchanged** (W1-0b's defaults, which A1-O's world reads). The world needs no
+  regeneration for A1-T.
+- Data:
+  - `cutscenes.yaml` (A1-T anchor): `a1_bikke_yields` (Bikke yields the brig, his crew leaves over a fade, `set_flag
+    BIKKE_DEFEATED`, then a `warp` back into `pravoka` (26, 35) behind the fade). The warp reloads the town, so the
+    `showIf` people appear; the engine only removes NPCs on a flag, it never adds them.
+  - `quest.yaml` (A1-T anchors): S2 `status: built` with its walk, its entry (the bridge's south stub foot, overworld
+    (93, 97)) and two `nonLoadBearing` entries (see the deviations). The town `pravoka` is `built`.
+  - `debug-scenarios.yaml` (A1-T anchor): `w_s2_start`, `w_s2_neg_noboss` (both at `pravoka:gate`, level 3, B1 kit,
+    the S0 and S1 flags and the lute) and `w_boss_pirate` (pirate x9, level 4, kit w_s2).
+  - `shops.yaml`: W1-F's seeded `pravoka_*` records are kept unchanged (B2 stock, inn 50).
+- Tests:
+  - `tests/quest/a1/a1_t_town.test.ts` (10 tests): the canon links both ways, the gate's edge exits, EXIT-safe
+    rooms and town, Bikke's fight and cutscene, the pirates and dockhands on the flag, the hints, the clinic and inn
+    prices, the CHEST_A1_T_ flags, and the site file against the compiled overworld (door, gate, dock, brig);
+  - `tests/quest/a1/a1_t_walk.test.ts` (3 tests): the S2 walk, (a) in assume mode, and the town entry;
+  - `tests/balance/w_a1_t.test.ts` (3 tests).
+
+**Town standard (G15):** `pravoka: houses 15/8 interiors 6/6 outdoor 19/14 interior 16/10 hints 2/2 reactive 21/4
+shops 5/5 inn 50/50 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when | `w_a1_t.test.ts` passes. Pirate x9 is trivial at the band, as in the classic: sensible L4 100.0 % (>= 95), careless L4 100.0 % (>= 85), sensible L3 100.0 % (>= 95). `check-bounds: OK (6 tests)` |
+| G1 | `town_pravoka.py`, `town_pravoka_rooms.py`, `stubs.py` and `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py` for the 13 ids under the lock: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 13 ids: each prints `<id>: deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G5 | `npm run quest -- --mutate --stage S2`: (a) OK S2; (b) OK (5 withheld runs); (c) OK (10302 states); (d) `pirate L3.5 [3,6]`; (e) to (h) OK; `mutations: OK (3 gate rows; 3 elements, each removal reported)`; `quest-verify: OK`. The full `npm run quest -- --mutate` is OK: (c) 5266 states; `mutations: OK (43 gate rows; 52 elements)`. In the full run GT-2 is caught (`SKIP S2 ... without S1 (BRIDGE_BUILT)`), GT-3 is caught (`SKIP S4 map elfheim reachable without S2`), and GT-4 is caught (`SOFTLOCK ...`) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 317 files, 6794 passed, **1 failed**, `wnd_o_walk` (e). That failure is on `mainline` too, see below |
+| G6, G7, G12, G13, G14, G15 | `tests/quest/`, `tests/data/`, `tests/progression/`: all pass apart from that one. `(g) geography: OK  s*=0.736 (31 pairs; 2 assumed)`. `(h) travel matrix: OK  (12 rows, 2 basin rows; 8 checked, 6 pending)`: T2-T5 and both basin rows are now checked |
+| G16 | `stubs.py --check a1-t`: `stubs: 0 left for A1-T` |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 13810 cells; canal joins)` |
+| G10 | Port 5222, `mute=1`, my own headless Chromium (`/tmp/w-a1-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s2_start`:
+
+- Shop: bought a Potion at the item shop (600 -> 540 G, potions 5 -> 6). Inn: 540 -> 490 G. Clinic: BLM felled by
+  debug, revived for 30 G (level 3 x 10), HP 1.
+- Bikke: talked to him from (39, 33); the battle started, the party won, and `a1_bikke_yields` played. BIKKE_DEFEATED
+  is set. The reloaded town shows `bikke_after`, `dockhand_a` and `dockhand_b`, and no pirate.
+- The brig: out through the west gate to `overworld` (131, 101). The brig sprite stands at the `a1_pravoka` dock
+  (132, 102). Stepping east from (131, 102) gives mode `ship` at (132, 102).
+- Screenshots: `/tmp/w-a1-t/s2_gate.png`, `s2_shop.png`, `s2_inn.png`, `s2_clinic.png`, `s2_pier.png`,
+  `s2_battle.png`, `s2_after.png`, `s2_quay.png`, `s2_ship.png`.
+
+G10, `w_s2_neg_noboss`: out through the gate without the fight. There is no brig sprite at the dock. The step east
+from (131, 102) is refused, and the mode stays `walking`. Screenshot: `/tmp/w-a1-t/s2_neg.png`.
+
+**Cross-tranche: the ship and its docks.** A1-O's merge already moved the brig from Cornelia's jetty to the
+`a1_pravoka` dock, reading this site file. So no reachable ship has only one dock. `npm run quest -- --stage S21`:
+`(c) soft-locks: OK  (62820 states, every one reaches @S21)` (S22 the same).
+
+**Originality:**
+
+- The town and its 12 rooms have their design notes. A fresh reviewer read the sources, the notes, the dialogue and
+  the cutscene: no classic line is copied, and every Distinct: line has at least 2 true features.
+- Its three factual remarks are fixed: the weapon shop's stands, the cooper's earthen floor, and the two-room
+  Topology lines of the chandler and the harbourmaster.
+- `originality review: PASS pravoka pravoka-house-chandler pravoka-house-cooper pravoka-house-harbormaster
+  pravoka-house-lighthouse pravoka-house-netmaker pravoka-house-warehouse pravoka-weapon-shop pravoka-armor-shop
+  pravoka-item-shop pravoka-white-magic pravoka-black-magic pravoka-inn`.
+
+**Deviations / hand-offs (shared-file edits, each small):**
+
+- `src/progression/questMutate.ts` (W1-I), two rule fixes:
+  - A non-load-bearing (`nlb: entry`) row whose stage is pending now reports `pending: ... not built` instead of
+    UNCAUGHT. With the brig built, GT-5 (`elf_port`, S4, ELF-T) went live with no entry yet.
+  - In `--stage` mode, a row's (b) expectation on another stage is left to the full run. GT-2 in `--stage S1` needs
+    `SKIP S2`, which the S1 scope cannot produce; it is still caught there by its `EARLY pravoka`, and fully in the
+    full run.
+- `tests/progression/travelMatrix.test.ts`: a repository-state pin updated. T2-T5 and B1/B2 are now `ok`, and the
+  strict pending example is T6. It already failed on `mainline` after A1-O.
+- `quest.yaml` S2 `nonLoadBearing`:
+  - Bikke's `hideIf` (as Garland's at S0).
+  - GT-4's dock, for the stage scope only. In `--stage S2` the goal @S2 holds as soon as the brig spawns, and boarding
+    needs no dock (W1-A), so the removal cannot fail there. The full run catches GT-4 as SOFTLOCK, and a caught row
+    never reads this entry.
+- **Open for INT, not mine:** proof (e) in `--stage` mode for a stage whose entry already lies past an ancestor's
+  barrier. This fails on `mainline` today: `EARLY dwarf talkable before S2` in `--stage S3`, `S21`, `S22`, `S26`,
+  and in `wnd_o_walk.test.ts`. Pravoka is now built, so `EARLY pravoka talkable before S1` joins it in those runs.
+  `startWithout` removes the ancestor's grants, but the start place, and vehicles such as the airship, are already
+  beyond them. `--stage S2` itself is clean.
+- Art: the brig (`buried_hull`), the lighthouse (`tower`) and the piles (`dock_post`) are W1-D placeholders, so the
+  brig shows its "BH" label. A brig sheet is an art need (4.9).
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains two rows:
+  - `layouts/a1/town_pravoka.py` (+ `town_pravoka_people.py`) -> `pravoka.yaml`;
+  - `layouts/a1/town_pravoka_rooms.py` (+ `town_pravoka_homes.py`, `town_pravoka_shops.py`) -> the six
+    `pravoka-house-*` maps, the five shops and `pravoka-inn`.
+- Debug scenarios gain `w_s2_start`, `w_s2_neg_noboss` and `w_boss_pirate`.
+- A cutscene that sets a flag on which `showIf` NPCs appear should `warp` onto the same map behind a fade: the field
+  only removes NPCs on a flag change.
 <!-- === end A1-T === -->
 <!-- === ELF-O ELF (pass W: owned by ELF-O) === -->
 ### ELF-O result: Elfland overworld, the Western Keep, S6 (branch `w-elf-o` from `mainline` 81e93d4, merged with mainline after FIR-O and WAT-O)
@@ -2983,6 +3118,185 @@ and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescen
 <!-- === FIR-D2 FIRE (pass W: owned by FIR-D2) === -->
 <!-- === end FIR-D2 === -->
 <!-- === ORD-O ORDEAL (pass W: owned by ORD-O) === -->
+### ORD-O result: the Citadel of Trials and Bahamut (branch `w-ord-o` from `mainline` 62033ba)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-ord-o/`.
+
+**Files:**
+
+- `layouts/world_ordeal.py` (75 lines): ORDEAL's RegionOut, airship-only (no dock). Land no landing reaches becomes
+  rock. Every walkable cell is zoned, and so is every water cell of the box, band water included. The reach roots are
+  the entrances.
+- `layouts/ordeal/world_ordeal_ground.py` (178): the ground. Its docstring is the design note.
+  - The plateau is an ellipse about x 66-96, y 10-46, bent by seeded noise. It has a 2-cell rim of peaks and the crag
+    the citadel is cut into, and it holds a heath. A knife ridge runs from the north-east rim to the centre and splits
+    off a glen, and there is a forested sink south of the ridge's end.
+  - The landing meadow lies at x 71-80, y 28-34.
+  - The six Cardia isles: Bahamut's horseshoe (107, 52), whose bay opens east; the hermit's isle (119, 39); and the
+    north, east, stack and west isles.
+- `layouts/ordeal/world_ordeal_data.py` (91): zones, landmarks, entrances, doors and the hermit's inspect cell.
+  - Zones, all with `modes` and `name`: `ord_heath` "Citadel Heath" (weretiger, nightmare, rakshasa); `ord_isles`
+    "Cardia Isles" (wyvern, wyrm, basilisk); `ord_sea` "Cardia Sound" (ship; sahagin_prince, white_shark, deepeyes,
+    sea_snake).
+  - Landmarks: the citadel (`castle_icon`, style `stone`, between two broken temple pillars; its top row stands on the
+    crag), Bahamut's `cave_mouth`, the hermit's `tent` (`collide: alpha`, inspect cell (119, 39)) and 3 boulders.
+  - Entrances: `ord_citadel` (75, 28) with its door (75, 27) to `citadel-1f:arrival`; `ord_bahamut` (106, 53) with its
+    door (106, 52) to `bahamut-cave:arrival`; `ord_meadow` (75, 32); and one landing per isle, `ord_isle_{hermit,
+    north, east, stack, west}`.
+- `layouts/ordeal/citadel.py` (191) writes `citadel-1f` (36x30), `-2f` (40x32) and `-3f` (34x22).
+  - 1F: the court. The stone steward holds the empty throne's crown. Talking to it plays `ord_throne_wakes`, which sets
+    ORD_O_THRONE, and that opens the arch's two `keyItemGates` to the west wing and the stair. There is also an east
+    hall with two store nooks, a cistern spur and a lamp niche.
+  - 2F: a start ring round a lattice. The 6 pads are transitions within the map, each in a blind stub. 4 return to
+    `ring` and 2 lead to `hall_west` / `hall_east` of the north hall, which holds the stair up and has a return pad. The
+    hall is a `reach_roots` entry, and the chokepoint check is off on this floor (it floods from the arrival only).
+  - 3F: the trial hall, `canSave: false`. You arrive in the east. The keeper NPC sits in the west inside a ring of 8
+    statues, and talking to it starts `[dragon_zombie, king_mummy x3]`, whose `postVictoryCutscene` is `ord_seal_won`.
+    The stair behind the dais is one-way down to 1F `chute` and needs ORDEALS_GUARD_DEFEATED.
+  - Chests 3 / 4 / 3 (`CHEST_ORD_O_*`): cabin, opal_helm, hi_potion; ether, phoenix_down, opal_armlet, hi_potion;
+    hi_potion, ether, aegis_shield. Every floor has `exit` to `ord_citadel`.
+- `layouts/ordeal/bahamut.py` (131) writes `bahamut-cave` (28x26) and `bahamut-lair` (32x22).
+  - The cave: a winding throat, a tide grotto with 1 chest (diamond_armlet), two blind spurs, and the stair down.
+  - The lair: an antechamber and the hall with 6 dragon NPCs, existing sheets tinted.
+  - Bahamut has `requiredItem: ordeal_seal`, cutscene `ord_bahamut_trial` (`onceFlag` CLASS_UPGRADED) and `action:
+    classUpgrade` (`actionFlag` CLASS_UPGRADED). A second Bahamut, `showIf` CLASS_UPGRADED, stands on the same cell.
+- `cutscenes.yaml` (ORD-O anchor):
+  - `ord_throne_wakes` (set_flag ORD_O_THRONE);
+  - `ord_seal_won` (set_flag ORDEALS_GUARD_DEFEATED, give_item ordeal_seal; D-W14);
+  - `ord_bahamut_trial` (take_item ordeal_seal, set_flag CLASS_UPGRADED).
+- `enemies.yaml` (dragon_zombie anchor, `bossPhases` only): one phase from full HP (`hpThreshold: 1.0`), hits 3, attack
+  95, with a message.
+- `quest.yaml`:
+  - S18 is `status: built`. `walk: [citadel-1f:cutscene:stone_steward, citadel-3f:battle:trial_guardian]`. `entry` is
+    overworld (149, 163) on foot, with the airship at (149, 162) and the ship at the `fir_crescent` dock (146, 124).
+  - S18's `nonLoadBearing` has 5 entries: the 2 arch gates and the 2 chute cells (S18's own puzzle, which guards no
+    grant) and the keeper's `hideIf`.
+  - S19 is `status: built`, `walk: [bahamut-lair:cutscene:bahamut]`. `entry` is the meadow (75, 31), with the airship
+    at (75, 32) and the ship at the dock.
+- `debug-scenarios.yaml`:
+  - `w_s18_start`: entrance `ord_meadow` in the airship, L24, B5 kit, flags through S17;
+  - `w_s19_start`: entrance `ord_bahamut`, L25, B6 kit, the seal held, the airship parked at (106, 55);
+  - `w_boss_dragon_zombie`: L25, B6 kit, the `abandoned_castle` background.
+- Tests:
+  - `tests/quest/ordeal/ord_o_world.test.ts` (6): the anchors within ±2; no dock in the box; no walk leaves the plateau
+    or an isle, or joins two of them; a grass landing within 8 steps of each anchor and isle; the doors; the zones'
+    cover; the hermit's slate.
+  - `tests/quest/ordeal/ord_o_sites.test.ts` (8): chests and EXIT; the arch gate; the lattice; the boss, its place and
+    the seal; the one-way stair; the lair; Bahamut's one-talk upgrade through `FieldNpcActions`.
+  - `tests/balance/w_ord_o.test.ts` (3).
+- Generated: `assets-src/maps/overworld.yaml`, the 5 map sources, `assets/maps/ai/{overworld.yaml, index.yaml}`,
+  ORDEAL's 13 changed chunks and the 5 compiled maps.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2781 cells, ocean 22696 cells; canal joins)`; cuts unchanged (`W_west 7, W_isthmus 14, W_arm 2, W_south 2, W_east 4, crescent_ring 9`) |
+| G2 `build_map.py overworld --region ordeal` | `overworld: region ordeal of 192x192 -> assets/maps/ai/overworld.yaml (158 approved parts, 94 placeholders)`, max RSS 5.4 GB |
+| G2 `--check-determinism --region ordeal overworld` | `overworld: deterministic` (27 s, max RSS 5.9 GB) |
+| G2 `build_map.py` and `--check-determinism` on the 5 ids | each `<id>: WxH -> ...`, then `<id>: deterministic` |
+| G1 layout scripts, `stubs.py`, `world.py` (PYTHONHASHSEED 0 / 1), `git diff --exit-code assets-src/maps` | clean (byte-identical sources) |
+| G3 owned chunks | `grep -vxFf owned.txt` prints nothing (exit 1) |
+| G16 `stubs.py --check ORD-O` | `stubs: 0 left for ORD-O` |
+| G5 `npm run quest -- --mutate --stage S18` | (a) OK S18; (b) OK (41 withheld runs); (c) OK (826 states); (d) `dragon_zombie L24.2 [24,27]`; (g) `s*=0.735 (31 pairs; 16 assumed)`; (h) OK; `mutations: OK (3 gate rows; 6 elements, each removal reported)`; `quest-verify: OK` |
+| G5 `--stage S19` | (a)-(h) OK, (d) `S19 L24.1 [24,27]`; `mutations: OK (1 gate rows; 1 elements)`; GT-24 caught (`SKIP S19 CLASS_UPGRADED reachable without ordeal_seal`); `quest-verify: OK` |
+| `--stage S17` (FIR-O's, re-run) and the full `npm run quest -- --mutate` | both `quest-verify: OK`; full run: `(a) ... optional: S19 S18* reachable`, `(c) 566 states`, `mutations: OK (43 gate rows; 54 elements, each removal reported)` |
+| G4 `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 303 passed (303)`, `Tests 6106 passed, 8 skipped (6114)` |
+| G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
+| G9 `tests/balance/w_ord_o.test.ts`, `check-bounds "tests/balance/w_*.test.ts"` | 3 passed; `check-bounds: OK (3 tests)` |
+| G12 `designNotes`, `originality` | passed; `citadel: branching`, `bahamut: chain` (ORD-O: 1 of 2 dungeons branch) |
+| G10 browser, port 5233, `mute=1` | see below |
+
+**Balance (S18, 400 seeds, kit `w_s18`, 3 potions):** before this pass dragon_zombie won 100 % at L21-L27, alone or
+with any escort set. Its 268 HP falls to one warrior's turn and it never acts. After the phase and the keepers:
+L25 sensible **86.5 %** (target 75-95), L27 99.0 %, L23 74.5 %. Careless wins 99.8 % at L25: careless casts nothing,
+while sensible spends turns on RUSE and LIT.
+
+**Topology:**
+
+| Floor | Size | Dead ends | Aspect / fill | Boss |
+|---|---|---|---|---|
+| citadel-1f | 36x30 | 4 | 1.28 / 0.51 | - |
+| citadel-2f | 40x32 | 2 | 1.14 / 0.60 | - |
+| citadel-3f | 34x22 | 2 | 2.07 / 0.72 | W, 23 |
+| bahamut-cave | 28x26 | 2 | 1.00 / 0.33 | - |
+| bahamut-lair | 32x22 | 1 | 1.87 / 0.84 | - |
+
+The stair graphs: the citadel is 1F <-> 2F <-> 3F plus the one-way 3F -> 1F, so it branches. Bahamut is cave <-> lair,
+a chain.
+
+**Originality:** a fresh reviewer got the previews, the ASCII grounds, the notes and every line. Its first pass flagged
+two things. Sitting on the throne staged the classic's own trick, so the steward now holds the throne's crown and you
+set it back. Two Distinct claims were the classic's (the throne, the send-back pads) and one was not visible (claw
+grooves); the claims are rewritten. The re-review returned `originality review: PASS citadel-1f citadel-2f citadel-3f
+bahamut-cave bahamut-lair ordeal-overworld`.
+
+**Travel rows and GTs (own):**
+
+- T6's ORDEAL part, checked on the compiled map by `ord_o_world.test.ts`: `ord_citadel` and `ord_bahamut` each have a
+  grass landing within 8 steps, and the isles are airship-only. The CLI row T6 stays pending until WATER and WIND are
+  built.
+- GT-23 is caught in the full run (`SKIP S18`). In `--stage` runs it is reported `pending: the full run checks it`;
+  see the verifier change below.
+- GT-24 is caught in `--stage S19` and in the full run.
+
+**Browser (G10, port 5233, `mute=1`, Title > Debug):**
+
+- `w_s18_start`: the party starts in the airship at (75, 32). Confirm lands it: mode `walking`, the airship parked at
+  (75, 32). North through the gate leads into `citadel-1f`, after one random battle.
+- Talking to the steward sets ORD_O_THRONE. You walk through the arch (7, 14) to the west stair, which leads to
+  `citadel-2f` (19, 28).
+- On 2F, the pad (25, 23) returns you to the ring (21, 28), and the pad (19, 24) takes you to the hall (6, 10). The
+  stair leads to `citadel-3f` (30, 11).
+- Talking to the keeper starts the battle: Dragon Zombie + 3x King Mummy on the `abandoned_castle` stage. The party won,
+  and then ORDEALS_GUARD_DEFEATED was set and 1 `ordeal_seal` was held.
+- `w_s19_start`: the party enters `bahamut-cave` and goes down to `bahamut-lair`. One talk with Bahamut ends with
+  CLASS_UPGRADED set, the seal gone, and the classes `knight, ninja, white_wizard, black_wizard`.
+- Screenshots: `/tmp/w-ord-o/shots/ord-o-s18-air.png`, `ord-o-s18-westwing.png`, `ord-o-s18-hall.png`,
+  `ord-o-s18-guardian.png`, `ord-o-s18-battle.png`, `ord-o-s18-won.png`, `ord-o-s19-bahamut.png`,
+  `ord-o-s19-upgraded.png`.
+
+**Deviations / shared-file edits (each small; the integrator should review them):**
+
+- `src/scenes/exploration/FieldNpcActions.ts` (W1-B's; +7 lines, 176). `runPending` runs a `classUpgrade` NPC's upgrade
+  after its cutscene resolves, so Bahamut takes the seal and upgrades the party in one talk. Before, the cutscene
+  played and the upgrade waited for a second talk. The upgrade is extracted into `upgrade(def)`. An NPC with no
+  cutscene behaves as before.
+- `src/progression/questMutate.ts` (W1-I's; +10). In `--stage` mode, an uncaught gate row is `pending: the full run
+  checks it` in two cases: it expects only another stage's SKIP, which (b) can't produce in a stage run (GT-23 in S17),
+  or its element is an earlier stage's whose grants the assumed start already holds (GT-23 in S18). Without this,
+  building S18 turned FIR-O's `--stage S17` red. The full run and `--strict` are unchanged, and GT-23 is caught there.
+- `src/progression/questProofsLate.ts` (W1-I's; 1 line). FIR-O's "pending, not failed" rule for a built stage outside
+  its band because of assumed pending stages now also covers above the band. The off-path S18 and S19 are walked after
+  the pending S20-S30 at their band lows (L34). `--strict` still fails it.
+- `tests/quest/originality.test.ts` (W1-I's; +4).
+  - Floors without a floor label are grouped by their stem: `bahamut-cave` and `bahamut-lair` become the dungeon
+    `bahamut`.
+  - The Topology-line floor and boss check runs only on labelled floors. Before, any `<name>-cave` site failed it
+    (`Topology names , the floors are bahamut-cave`), and PST's `past-chaos` would have too.
+- `tests/data/mapVariants.test.ts`: maps with `MapData.exit` (pass W dungeon floors) may have random battles.
+- Flags carry the sub-letter (questFlags rule 3.1): `ORD_O_THRONE` instead of 4.5's `ORD_THRONE`, and `CHEST_ORD_O_*`.
+- **The throne trigger.** 4.5 says an inspect cell, but inspect cells take text only. The trigger is the stone steward
+  NPC beside the throne, which carries the cutscene.
+- **The keepers.** The boss battle adds 3 king_mummy keepers. The roster dragon_zombie can't reach the 3.7 band
+  through `bossPhases` alone.
+- **Sprites.** The NPCs use tinted existing sheets: the steward is `king` and the keeper `old_man`; Bahamut is
+  `garland_npc`; the dragons are knight, mage, old_man, monk, white_mage and black_mage. In the 2x field art the steward's
+  grey `tint` did not visibly apply (it drew in the king's colours). That is an engine observation, not changed here.
+- On 1F, a broken pillar beside the arch blocks row 14, so the way into the west wing is row 15. It is reachable;
+  the cell is cosmetic.
+- `.playwright-mcp/` and `playwright-responses/` in the main checkout: only my own files were removed.
+
+**AGENTS.md delta (for INT):**
+
+- In "Editing a 2x Map", add `layouts/world_ordeal.py` with `layouts/ordeal/world_ordeal_{ground,data}.py` (ORDEAL,
+  airship-only), and `layouts/ordeal/citadel.py` / `bahamut.py`, which write `citadel-1f..3f` and `bahamut-cave` /
+  `-lair`.
+- A within-map transition (a pad) is allowed, and a floor reached only by pad names its entrance in
+  `no_unreachable_walkable.reach_roots`.
+- The debug scenarios gain `w_s18_start`, `w_s19_start` and `w_boss_dragon_zombie`.
+- The `classUpgrade` action follows its NPC's cutscene.
 <!-- === end ORD-O === -->
 <!-- === WAT-O WATER (pass W: owned by WAT-O) === -->
 ### WAT-O result: Onrac's coast, the waterfall and the caravan (branch `w-wat-o` from `mainline` 81e93d4, merged with `mainline` 62033ba (FIR-O))

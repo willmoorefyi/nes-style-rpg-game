@@ -102,10 +102,18 @@ stages:
     maps: [pravoka, pravoka-*]
     zones: [overworld:a1_mainland]
     grind: 2.0
-    walk: []
+    # Bikke at the brig pier's end (pravoka (40, 33)) starts pirate x9; a1_bikke_yields sets BIKKE_DEFEATED, and the
+    # brig appears at the a1_pravoka dock (overworld (132, 102)), boarded from the land gate (131, 101)
+    walk: ["pravoka:battle:bikke", "overworld:vehicle:ship", "overworld:board:ship"]
+    # the bridge's south stub foot: the span (BRIDGE_BUILT) is the way north to Pravoka
+    entry: {map: overworld, x: 93, y: 97, mode: walking}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: pravoka, kind: npc, at: [40, 33], reason: "Bikke's hideIf only clears the beaten captain off the brig pier's end, a dead end"}
+      # GT-4 in --stage S2 only: the full run catches the dock's removal as (c) SOFTLOCK (a caught row never reads this)
+      - {map: overworld, kind: dock, at: [132, 102], reason: "stage scope: @S2 holds once the brig spawns, and boarding needs no dock (W1-A); the full run catches GT-4 as SOFTLOCK"}
+    status: built
   # === end A1-T ===
   # === ELF-O (pass W: owned by ELF-O) ===
   - id: S6
@@ -400,10 +408,18 @@ stages:
     maps: [citadel-*]
     zones: [overworld:ord_heath]
     grind: 2.0
-    walk: []
+    # fly from the desert to the plateau's meadow; take the throne (1F), cross the pad lattice (2F), win (3F)
+    walk: ["citadel-1f:cutscene:stone_steward", "citadel-3f:battle:trial_guardian"]
+    entry: {map: overworld, x: 149, y: 163, mode: walking, vehicles: [{type: airship, map: overworld, x: 149, y: 162}, {type: ship, map: overworld, x: 146, y: 124}]}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4) on the Citadel's own puzzles: none of them guards a stage grant
+      - {map: citadel-1f, kind: gate, at: [7, 14], reason: "the throne's arch is S18's own puzzle; the stage needs only the airship, and the guardian's win is its grant"}
+      - {map: citadel-1f, kind: gate, at: [7, 15], reason: "the throne's arch is S18's own puzzle; the stage needs only the airship, and the guardian's win is its grant"}
+      - {map: citadel-3f, kind: transition, at: [2, 10], reason: "the stair behind the dais only leads back down to 1F's court"}
+      - {map: citadel-3f, kind: transition, at: [3, 10], reason: "the stair behind the dais only leads back down to 1F's court"}
+      - {map: citadel-3f, kind: npc, at: [8, 10], reason: "the guardian's hideIf only clears the beaten boss off its dais"}
+    status: built
   - id: S19
     title: "Bahamut (class change)"
     tranche: ORD-O
@@ -416,11 +432,13 @@ stages:
     maps: [bahamut-cave, bahamut-lair]
     zones: [overworld:ord_isles]
     grind: 2.0
-    walk: []
+    # fly from the citadel's meadow to Bahamut's isle; down the cave; lay the seal before Bahamut
+    walk: ["bahamut-lair:cutscene:bahamut"]
+    entry: {map: overworld, x: 75, y: 31, mode: walking, vehicles: [{type: airship, map: overworld, x: 75, y: 32}, {type: ship, map: overworld, x: 146, y: 124}]}
     basins: {}
     nonLoadBearing: []
     optional: true
-    status: pending
+    status: built
   # === end ORD-O ===
   # === WAT-O (pass W: owned by WAT-O) ===
   - id: S21
@@ -619,7 +637,7 @@ towns:
     opensAfter: [S1]
     bandStage: S2
     kit: w_pravoka
-    status: pending
+    status: built
   # === end A1-T town ===
   # === ELF-T town (pass W: owned by ELF-T) ===
   - id: elfheim

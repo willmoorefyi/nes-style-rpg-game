@@ -39,8 +39,9 @@ export function proofBands(ctx: QuestContext): ProofResult {
     }
     const lv = Math.floor(p.level);
     const text = `${name} L${p.level.toFixed(1)} [${s.band[0]},${s.band[1]}]`;
-    // below the band only because a pending ancestor was assumed at its band low: it waits for that stage
-    if (lv < s.band[0] && !ctx.strict && curve.assumedGold.has(s.id)) { pending++; continue; }
+    // outside the band only because pending stages were assumed at their band lows (a pending ancestor: below; pending
+    // stages the witness fires first, e.g. S20-S30 before the off-path S18): it waits for them
+    if ((lv < s.band[0] || lv > s.band[1]) && !ctx.strict && curve.assumedGold.has(s.id)) { pending++; continue; }
     if (lv < s.band[0] || lv > s.band[1]) failures.push(fail('d', 'BAND', `BAND ${s.id} ${name} L${p.level.toFixed(1)} outside [${s.band[0]},${s.band[1]}]`));
     shown.push(text);
   }

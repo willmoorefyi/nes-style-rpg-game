@@ -114,6 +114,8 @@ describe('macroGeography: the repository', () => {
     expect(r.line).toMatch(/^\(g\) geography: OK {2}s\*=0\.73\d \(31 pairs; \d+ assumed\)$/);
     const strict = proofGeo(createQuestContext(ctx.world, { strict: true }));
     expect(strict.failures.every((f) => f.message.startsWith('GEO assumed '))).toBe(true);
-    expect(strict.failures.length).toBeGreaterThan(0);
+    // one strict failure per assumed anchor; 0 once every region has placed its anchors
+    const assumed = Number(/; (\d+) assumed\)/.exec(r.line)?.[1] ?? '0');
+    expect(strict.failures.length).toBe(assumed);
   });
 });
