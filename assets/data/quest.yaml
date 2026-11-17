@@ -420,10 +420,15 @@ stages:
     maps: [waterfall-cave]
     zones: [overworld:wat_streams]
     grind: 2.0
-    walk: []
+    walk: [waterfall-cave:gift:cube]
+    # Cornelia's south gate, the airship landed beside it: WATER is airship-only (2.8), so (b) sees the airship's part
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic list (QUEST 5.4): the cube comes from the automaton's gift; the requiredFlag only plays the
+      # twin's lore (wat_cube_given) after it
+      - {map: waterfall-cave, kind: npc, at: [14, 4], reason: "the cutscene's requiredFlag only orders the twin's lore after the gift; the cube is the gift's"}
+    status: built
   - id: S22
     title: "The caravan"
     tranche: WAT-O
@@ -436,10 +441,12 @@ stages:
     maps: [caravan-camp]
     zones: [overworld:wat_dunes]
     grind: 2.0
-    walk: []
+    walk: [caravan-camp:gift:fairy_bottle]
+    # Cornelia's south gate, the airship landed beside it (as S21)
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end WAT-O ===
   # === WAT-T (pass W: owned by WAT-T) ===
   - id: S20
