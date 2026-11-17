@@ -1,388 +1,548 @@
-# Kneel / dazed pose plan (pass K), rev 1
+# Kneel / dazed pose plan (pass K), rev 2
 
-Status: rev 1, written by the planner; next step is the momus review. Nothing here is implemented yet.
+Status: rev 2. It answers the momus review of rev 1 (REJECT) and the user rulings R1 and R2; the next step is the
+momus re-review. Nothing here is implemented yet.
+
 Budget: **0 paid images**. No Gemini, no Bedrock and no other AI image call anywhere in pass K. Every new frame is a
 cut-out re-pose of approved pixels, like the existing in-betweens.
+
+**Rev 2 changes:**
+
+| Finding / ruling | Resolution |
+|---|---|
+| R1 = no (enemies never kneel at low HP) | enemy low-HP path deleted; enemies kneel from status only (D-K1) |
+| R2 = yes (poison kneels, both sides) | new posture `kneel` for poison, new rank, additive tremble (D-K1, D-K16); acting kneelers rise to act on both sides, so the enemy attack / cast / travel tables get the rise (D-K3); poison tick timing (D-K17); tests (section 7); a poisoned goblin attacks in the pilot (section 8) |
+| #1 | moot under R1 (enemy low-HP kneel removed) |
+| #2 | K2-0 probe round (iron_golem, blue_dragon, hydra, garland) reviewed by the orchestrator before K2; template-fix path (D-K18, section 9) |
+| #3 | K4 uses 3 named party scenarios x 2 named enemy formations, each with what its screenshot must show (section 10) |
+| #4 | D-K2 rows (a) to (d): battle start / retry already kneeling, the ACTIVE_STEP, revive into weak HP, a hit to weak; partyPose tests for each |
+| #5 | one cap for `kneel_in1` / `kneel_in2`: limb parts <= 40 deg; `ROT_CAP` kept unchanged (D-K19) |
+| #6 | hero CLI, lock verb and rotsprite renderer all live in `puppet_kneel.py` with its own `__main__`; `puppet.py` is unchanged (0 lines) |
+| #7 | page cost restated: which act-1 sheets spill, preloading of act-1 pages, peak resident memory; R4 / R6 rewritten (section 1, D-K13) |
+| #8 | per-class hero bands printed; per-class override logged in section 13 (section 4) |
+| #9 | one runtime fallback path; `hasKneel` from texture identity (D-K7, D-K15) |
+| #10 | K1 commits the atlases; rollout agents never do; only the integrator rebuilds them (section 9) |
+| #11 | BattlePartyPanel reference and the HP-roll note; the stale stoneTextures note removed; icons, overlays and the active-hero arrow follow the kneeling head; `drop` renamed `sink`, in-between tweaks allowed; line projections; the 2880 px hero atlas accepted; G10 and G12 concrete; victory rise length |
 
 ## 0. Summary
 
 In FF1 a weakened or disabled actor shows a **kneel** pose. This game shows something else: a dazed enemy plays a
-small slump (`daze` / `daze_b`), and a dazed hero just holds `ready`. Pass K adds one kneel state, with
-transition-in, a held kneel with a small breath and transition-out, for **all 123 rigged monster sheets** and **all
-12 hero classes**. The Chaos colossus forms F2 to F4 are exempt (D-K12).
+small slump (`daze` / `daze_b`), and a dazed hero holds `ready`. Pass K adds one kneel state, with transition-in,
+a held kneel with a small breath and transition-out, for **all 123 rigged monster sheets** and **all 12 hero
+classes**. The Chaos colossus forms F2 to F4 are exempt.
 
-- **K1:** the shared tooling (Python kneel key and in-betweens, hero puppet kneel, checks, review sheets), the TS
-  runtime (pose selection, timing, fallbacks, debug keys, scenario) and a **pilot**: goblin and wolf (enemies),
-  warrior and white_mage (heroes).
-- **U1:** the user reviews the pilot (still sheets, GIFs, an in-battle composite and the browser scenario).
-- **K2 / K3:** the rollout in parallel worktrees, batched by body type: K2 covers the bodies the pilot proved
-  (biped, quadruped, heroes) and K3 the new body templates, after a probe round.
-- **K4:** integration, the atlas build, the play test and the docs.
+Who kneels:
 
-The key design choice is D-K4. A kneel is too far from any approved keyframe for the existing in-between rules
-(the 35 % near-keyframe rule and the 30 deg rotation cap). So each sheet gets a **derived `kneel` key**, built from
-the idle key by joint targets and locked as `kf:kneel` (the FW-H precedent). The in-betweens between `idle` and
-`kneel` then follow the normal rules.
+- **Heroes:** sleep, stun, poison, or weak HP (25 % or less).
+- **Enemies:** sleep, stun or poison.
+- **Acting kneelers** (poison, and weak heroes) rise to act and then kneel again.
+- **Disabled kneelers** (sleep, stun) never act.
+
+Tranches:
+
+- **K1:** the shared tooling, the TS runtime and a pilot (goblin, wolf, warrior, white_mage).
+- **U1:** the user reviews the pilot.
+- **K2-0:** the orchestrator reviews the risky-body probes.
+- **K2:** the rollout of the bodies the pilot proved.
+- **K3-0 / U2:** probes of the new body templates, then a second user review.
+- **K3:** the rest of the rollout.
+- **K4:** integration and the play test.
+
+The key design choice is D-K4. A kneel is too far from any approved key for the existing in-between rules. So each
+sheet gets a **derived `kneel` key**, built from the idle key by joint targets and locked as `kf:kneel`. The
+in-betweens between `idle` and `kneel` then follow the normal rules.
 
 ## 1. Current state (verified at a97ae69)
 
 | Fact | Where |
 |---|---|
-| `sleep` and `stun` have `posture: daze`; `stone` is `stone`, `fear` is `tremble`, `frozen` (reserved) is `still` | `assets/data/status-visuals.yaml:23,28` |
-| Posture rank: stone 4 > daze 3 > still 2 > tremble 1 | `src/scenes/battle/fx/statusRules.ts:15` |
-| A dazed enemy sways `daze` / `daze_b` every `DAZE_PERIOD` 48 frames | `src/scenes/battle/enemyChoreography.ts:158-175` |
-| **Correction to the brief:** every one of the 123 sheets in `assets/sprites/monsters-ai.json` has its **own** `daze` / `daze_b` cells, generated since pass F by the recipe `monster_recipes.py:51-54` (t 0.15 toward `hurt`, legs pinned, head 1 px down). So today's dazed enemy shows a slight slump, not `hurt_in1`. `FRAME_FALLBACK daze -> hurt_in1` (`enemyChoreography.ts:34`) applies only to an old atlas or a held frame. The `LATE_FRAMES` comment ("no atlas has yet", `:18-21`) is stale. | atlas json; `selftest_daze.py` |
-| Why the daze is so small: the plan's t 0.25 draft failed 9 of 12 rigs (arm swings over the 30 deg cap, bent shins, a drop out of the bbox band) | `monster_recipes.py:47-50` |
-| Enemy poses: idle / attack / cast / hurt / dying cursor per enemy; `setPosture` comes from the presented snapshot each frame | `EnemyPoseController.ts:105-110,211-221`; `BattleDisplayManager.ts:157` |
-| Hero: hp <= 0 shows `down`; stone or still shows `ready`; daze shows `ready` (`hurt` while flashing); then victory, override, hurt and idle breath | `BattleDisplayManager.ts:172-182` |
-| Hero atlas: 12 rows x 14 columns (6 approved + 8 puppet in-betweens), 2240x1920 px; every class has `inbetweens: true` | `assets/sprites/battle-characters-ai.json`; `build_assets.py:88-129` |
-| **All 12 classes have joint files** (`assets-src/gen/anim/<class>.yaml`, with ready / attack / cast joints). 5 are `robed: true` (black_mage, black_wizard, red_wizard, white_mage, white_wizard), and the puppet skips their leg parts. No class lacks joints. | `anim/*.yaml`; `puppet.py:208-237` |
-| The approved hero `down` is a **collapsed crouch**, not a lying pose: 0.63 to 0.77 of the `ready` height (measured: warrior 44/68, white_mage 51/66, master 45/71) | `approved/<class>/battle.png` |
-| Heroes have no lock files and no anim checks beyond `puppet.check` (ring, px 0.88-1.12, height +-4, pieces <= 2) | `puppet.py:441-452` |
-| Rig bodies (from `anim/monsters/*.yaml`): biped 49, quadruped 28, floating 14, serpent 8, arthropod 7, bird 5, naga 5, blob 4, rooted 2, swimmer 1 = 123 rigs, 123 lock files | section 9 lists |
-| Presets and kinds that need care: `preset: mechanical` (rotation cap 15) guardian, iron_golem, soldier, warmech; `kind: cloth` garland, lich, mummy; `kind: fx` garland, lich, hollow_seraph; FW-Q partial rigs astos, black_widow, chimera, crawler | rig files |
-| Locks: `lock_match` fails a generated frame with no lock entry (`hash differs`) and a lock entry with no frame (`locked but not generated`). So any **new** generated frame on an unlocked rig makes `check --all` fail. | `anim_rules.py:56-60` |
-| Atlas: 9 pages, each <= 2048 a side; every page group starts a new page; a sheet never straddles pages | `monster_pages.py`; atlas json |
-| Anchors `homeX` are measured over `HOME_FRAMES`, which include `daze` / `daze_b` | `monster_atlas.py:39` |
-| Weak-HP conventions: the panel turns red at `hp / max <= 0.25` (`src/ui/PartyPanel.ts:103`); `retryAdvice` uses `< 0.25` (`BattleRetry.ts:88-96`) | |
-| Colossus forms F2-F4 draw through `ColossusView` and have no posture handling | `src/scenes/battle/colossus/` (no `posture`) |
-| Line counts (AGENTS ceiling: 250 unless listed): `EnemyPoseController.ts` 248, `AiEnemyView.ts` 242, `BattleDisplayManager.ts` 231, `CharacterAtlas.ts` 237, `BattleArt.ts` 228, `BestiaryPreview.ts` 230, `enemyChoreography.ts` 180, `BattleAnimationController.ts` 303 / 308, `BattleScene.ts` 539 / 594. Python: `monster_anim.py` 326, `rig.py` 337, `puppet.py` 540 (already over; add no lines beyond the hooks) | `wc -l` |
+| `sleep` and `stun` have `posture: daze`; `stone` is `stone`, `fear` is `tremble`, `frozen` (reserved) is `still`; `poison` has no posture (tint, bubbles, icon) | `assets/data/status-visuals.yaml:23,28,46-51` |
+| Posture rank: stone 4 > daze 3 > still 2 > tremble 1, strongest only. A slept, feared actor does **not** tremble today. | `src/scenes/battle/fx/statusRules.ts:15-30` |
+| A dazed enemy sways `daze` / `daze_b` every `DAZE_PERIOD` 48 | `enemyChoreography.ts:158-175` |
+| **Every one of the 123 sheets has its own `daze` / `daze_b` cells** (pass F recipe: t 0.15 toward `hurt`, legs pinned, head 1 px down). The `FRAME_FALLBACK daze -> hurt_in1` (`:34`) applies only to an old atlas or a held frame; the `LATE_FRAMES` comment (`:18-21`) is stale. | atlas json; `monster_recipes.py:51-54` |
+| Why the daze is small: the t 0.25 draft failed 9 of 12 rigs (30 deg cap, bent shins, the bbox band) | `monster_recipes.py:47-50` |
+| Enemy pose cursor per enemy; `setPosture` comes from the presented snapshot every frame; contact frames: in-place attack 14, plain cast 11, boss cast 10 (all > 6) | `EnemyPoseController.ts:105-110,211-221`; `enemyChoreography.ts:52-107` |
+| Hero pose: hp <= 0 shows `down`; stone or still `ready`; daze `ready` (`hurt` while flashing); then victory, override, hurt, breath | `BattleDisplayManager.ts:172-182` |
+| Command input snaps the active hero `ACTIVE_STEP` = 24 px forward (`sprite.x = homeX - 24`); its arrow is placed once at `sprite.y - 20` (the cell top) | `ActiveHeroMarker.ts:5,35,39` |
+| Status icons and overlays anchor on `headOf(current texture)`, the first opaque row, read every frame, so they already follow whatever frame is shown | `fx/statusFx.ts:200-208` |
+| Poison hurts at the **end** of the actor's turn, after its action, shown with its own line (a hold) | `src/battle/turnTick.ts:1-36` |
+| Battle HP colour: red at `ratio <= 0.25`; the number and bar **roll** over `HP_ROLL_FRAMES` toward the presented HP | `BattlePartyPanel.ts:17,33-34` |
+| Hero atlas: 12 rows x 14 columns, 2240x1920 px; all 12 classes have joint files (ready / attack / cast); 5 are `robed` (no leg parts) | `battle-characters-ai.json`; `anim/*.yaml`; `build_assets.py:88-129` |
+| The approved hero `down` is a collapsed crouch at 0.63 to 0.77 of `ready` height (warrior 44/68, white_mage 51/66) | measured; section 4 |
+| Heroes have no lock files and only `puppet.check` | `puppet.py:441-452` |
+| Rigs: biped 49, quadruped 28, floating 14, serpent 8, arthropod 7, bird 5, naga 5, blob 4, rooted 2, swimmer 1 = 123. Mechanical preset (cap 15): iron_golem, soldier, warmech (bipeds) and guardian (quadruped). Cloth: garland, lich, mummy. fx: garland, lich, hollow_seraph. FW-Q partial: astos, black_widow, chimera, crawler. 25 sheets at display scale 3. | rig files; atlas json |
+| `lock_match` fails a new unlocked frame and a lock entry with no frame | `anim_rules.py:56-60` |
+| Anchors `homeX` are measured over `HOME_FRAMES`, which include `daze` | `monster_atlas.py:39` |
+| **Page loading:** `BattleArt.load()` loads the index and **page 0 only**; other pages load on `ensure(formation)` (awaited by `BattleTrigger`) and are held while in use; `MonsterPages` keeps at most `PAGE_CACHE` = 2 **unheld** pages (LRU) | `BattleArt.ts:198-215`; `MonsterPages.ts:13,16-23` |
+| Line counts: `EnemyPoseController.ts` 248, `AiEnemyView.ts` 242, `CharacterAtlas.ts` 237, `BattleDisplayManager.ts` 231, `BestiaryPreview.ts` 230, `BattleArt.ts` 228, `statusFx.ts` 214, `enemyChoreography.ts` 180, `ActiveHeroMarker.ts` 81, `BattleAnimationController.ts` 303 / 308; Python `monster_anim.py` 326, `puppet.py` 540 | `wc -l` |
+| Test baseline: `npm test`: 258 files, **4962 tests**, all passed (run 2026-11-16) | |
 
-**Measured atlas cost** (the real `monster_pages.pack_pages`, with k extra cells per sheet and today's group order):
+**Measured page cost** (the real `monster_pages.pack_pages`, today's group order, k extra cells per sheet):
 
-| extra cells / sheet | pages | page sizes (act-1 group first) | RGBA bytes if every page is loaded |
-|---|---|---|---|
-| 0 (today) | 9 | 2040x1872, ... | 114.8 MB |
-| 2 | 10 | act-1: 2048x1992 + 1970x160 | 129.8 MB |
-| 4 (this plan) | 12 | act-1: 2032x2016 + 2016x416 | 146.3 MB |
+| k | pages | act-1 sheets off page 0 | act-1 pages (RGBA MB) | largest page (MB) |
+|---|---|---|---|---|
+| 0 (today) | 9 | none | page 0: 15.3 | 16.6 |
+| 2 (R4: daze retired, +4 kneel -2 daze) | 10 | **vampire, wolf** -> page 1 | 16.3 + 1.3 | 16.4 |
+| 4 (this plan) | 12 | **skeleton, troll, vampire, wolf** -> page 1 | 16.4 + 3.4 | 16.4 |
 
-With +4 cells the act-1 group **spills onto a second page**. Pass V's "act-1 sheets on page 0" no longer holds
-(D-K13).
+So under this plan the pilot wolf, plus skeleton, troll and vampire, live on page 1. Today such a battle would
+stream page 1 at `ensure`. D-K13 preloads it.
+
+**Peak resident monster-atlas memory**, with page 0 and page 1 resident, the h pages held by the current battle,
+and the 2 LRU pages; every page is <= 16.4 MB:
+
+- **plan:** 19.8 + (h + 2) x 16.4 MB, so **69.0 MB** for h = 1 and 85.4 MB for h = 2;
+- **today:** 15.3 + (h + 2) x 16.6 MB, so 65.1 MB for h = 1 and 81.7 MB for h = 2.
+
+The difference is +3.9 MB at any h. The "all pages" sum (146 MB) is never resident, because the LRU caps it.
 
 ## 2. Decisions
 
-R = needs the user's ruling (the recommended default is used until the user rules); otherwise planner default,
-open to momus.
+R = the user's ruling. Defaults hold until the user rules.
 
-- **D-K1 Triggers.** Heroes kneel when `hp > 0 && hp * 4 <= maxHp` (weak; the same 25 % as the red panel), or when
-  the posture is `daze` (sleep, stun). Enemies kneel when the posture is `daze`. All values come from the presented
-  snapshot. **R1:** do enemies also kneel at low HP (FF1 monsters had no poses)? Default **no**. If the ruling is
-  yes, enemies use the hero rule and rise to act (D-K3). **R2:** does poison make an actor kneel? Default **no**
-  (poison keeps its tint and bubbles).
-- **D-K2 Priority, heroes, first match wins:** `down` (hp <= 0) > stone / still (`ready`, grey for stone; the kneel
-  is cut at once, with no transition) > **daze kneel** (it never acts; a hit shakes the kneel and never shows
-  `hurt`; victory does not lift it) > victory (a weak hero rises, then shows `victory`) > action override (a weak
-  hero rises inside the action, D-K3) > `hurt` flash (standing heroes only; a kneeling weak hero shakes instead) >
-  **weak kneel** > breathing idle. Fear's tremble is a pivot offset on top of any of these, as today.
-  **Enemies:** dying (from a kneel it keeps the current kneel frame while it eases and fades; no `hurt` frames) >
-  stone (cut at once) > attack / cast > hurt (a kneeling enemy shakes +-3 px for 14 frames on its kneel frame) >
-  daze kneel > tremble > breathing.
-- **D-K3 Rising to act.** A weak hero (and an enemy under R1) does not add time. The rise is folded into the action:
-  for the first `KNEEL_OUT_FRAMES` (6) after a pose override starts on a kneeling actor, the sprite shows
-  `kneel_in2`, then `kneel_in1`, while the override's offsets play as usual. Then the override poses take over. When
-  the override clears and the actor is still weak, `kneel_in` plays again. `BattleAnimationController.ts` (at its
-  ceiling) is not changed.
-- **D-K4 Derived kneel key.** Monsters: `kneel` is a new **derived keyframe** made from `idle` by body-template joint
-  targets (section 4) plus per-rig `kneel:` overrides. It follows the FW-H pattern: optional keyframe paint (FW-P,
-  <= 160 px) and locked as `kf:kneel`. Heroes: `kneel` is made from `ready` joints (variant A), or from `ready`'s
-  upper body over the approved `down` key's lower body (variant B: needs `battle.down` joints for hip, knees and
-  feet, or the robe hem). The pilot renders both and **R3 / U1** picks one per hero group (armoured / robed).
-- **D-K5 Frames.** Four new frames per sheet / class: `kneel_in1` (from idle toward kneel, t 0.33), `kneel_in2`
-  (from kneel toward idle, t 0.33), `kneel` (held), `kneel_b` (the breath: the body's `idle_b` operation applied to
-  `kneel`). The rise reuses `kneel_in2` and `kneel_in1` in reverse. No `kneel_out` frame.
-- **D-K6 Keep `daze` / `daze_b`.** They stay generated, locked and in the atlas, byte-identical. The runtime stops
-  drawing them once a sheet has `kneel` (they remain the fallback for a sheet without one). This is the only option
-  with zero lock churn. **R4:** retire them later to save 2 cells per sheet (10 pages instead of 12). Default
-  **keep**.
-- **D-K7 Opt-in per rig.** Kneel frames are generated only for a rig or hero file with a `kneel:` block, so
-  `check --all` stays green while the rollout is in progress. A sheet without the block lists the kneel names in
-  the atlas, aliased along the fallback chain (no extra cells). K4's gate requires all 123 + 12.
-- **D-K8 Anchors unchanged.** Kneel frames are **not** added to `HOME_FRAMES`, `RANGED_FRAMES`, `travelTop`,
-  `lungeRight` or `idleBox`, so every sheet's layout and attack geometry stays byte-identical. A kneel frame must
-  still fit inside its cell (the clipping check).
-- **D-K9 Floating drop.** Floating and swimmer figures sit on the 2 px bottom margin (the FW-C lift), so they cannot
-  sink inside their cell. Their kneel frames droop in place, and the sink is a runtime offset, `kneelDrop` (native
-  px, a new optional atlas field, 6 px per 80 px of cell height). It is eased over the in / out frames and applied
-  by `AiEnemyView`.
-- **D-K10 Locks extend only.** Each opted-in rig's lock gains exactly `kf:kneel`, `kneel_in1`, `kneel_in2` and
-  `kneel_b`, and no existing entry changes. Hero kneel frames get a new lock file,
-  `assets-src/gen/anim/<class>.lock.json`, with only the 4 kneel hashes; the existing hero in-betweens stay
-  unlocked, as today. The 14 existing hero atlas columns must stay byte-identical.
-- **D-K11 Mechanical preset.** guardian, iron_golem, soldier and warmech keep their 15 deg cap. Their kneel is a
-  "power-down squat": each leg bone moves <= 15 deg, the torso sinks and the head and arms droop. They get their own
-  height band (section 4).
-- **D-K12 Colossus exempt.** chaos_orrery, chaos_horizon and chaos_horizon_core (full-res painted art outside the
-  rig pipeline) do not kneel. A dazed colossus shows its status icon and overlay only, as today. Chaos F1 (`chaos`,
-  an atlas biped) kneels like any boss. **R5:** confirm the exemption. Default **exempt**.
-- **D-K13 Atlas growth.** Accept up to 12 pages (each <= 2048x2048) and the act-1 group on 2 pages. **R6:** accept
-  this, or rule D-K6 retirement. Default **accept**.
-- **D-K14 Review gate for new bodies.** After the K3-0 probes (one sprite per new body template), a **second user
-  review U2** of one contact sheet. **R7:** hold U2, or let the orchestrator self-review against the U1 bar. Default
-  **hold U2**.
-- **D-K15 Bestiary.** The bestiary's `daze` step plays kneel in, hold (`dazeHold` 144) and out when the sheet has
-  `kneel` (`hasKneel = textures.kneel !== textures.daze`); otherwise it plays today's daze. The label "Dazed" stays.
+- **D-K1 Triggers (R1, R2 ruled).** These use the presented snapshot.
+  - Heroes kneel at posture `daze` (sleep, stun: disabled), posture `kneel` (poison: acting) or weak HP
+    `hp > 0 && hp * 4 <= maxHp` (acting).
+  - Enemies kneel at posture `daze` or `kneel` only. There is no enemy HP path.
+  - An actor is **disabled** if it has a `daze` status, otherwise **acting** if it kneels at all.
+- **D-K16 Posture data (R2).** `STATUS_POSTURES` gains `kneel` (`types/fxData.ts`, `schemaValidationFx.ts`), and
+  `status-visuals.yaml` gives `poison: {posture: kneel}`, keeping its overlay, tint, pulse, icon and tag.
+  - New rank: stone 5 > daze 4 > still 3 > **kneel 2** > tremble 1 > none. So sleep plus poison is a disabled kneel,
+    and frozen plus poison holds `ready`.
+  - Fear becomes **additive**: a new `trembles(statuses, visuals)` in `statusRules.ts` is true when any status has
+    `posture: tremble`, and the tremble offset applies whenever the posture is not stone or daze (a poisoned, feared
+    actor kneels and trembles).
+- **D-K2 Priority (first match wins).**
+
+  Heroes:
+
+  | # | Condition | Shows |
+  |---|---|---|
+  | 1 | hp <= 0 | `down` |
+  | 2 | stone / still | `ready` (grey for stone); the kneel is cut at once |
+  | 3 | disabled kneel (daze) | kneel track; never acts; a hit shakes the kneel (no `hurt`); victory does not lift it |
+  | 4 | victory | an acting kneeler rises (`kneel_in2` 3, `kneel_in1` 3 = 6 frames), then `victory` |
+  | 5 | action override | an acting kneeler rises inside the first 6 override frames (D-K3) |
+  | 6 | `hurt` flash | standing heroes only; a kneeler shakes +-2 px for 12 frames instead |
+  | 7 | acting kneel (poison / weak) | kneel track |
+  | 8 | otherwise | breathing idle |
+
+  Added rows (momus #4):
+
+  - **(a) Battle start or retry with a kneeler:** the track is created **in hold**. No `in` plays during the intro,
+    and a retry restores the snapshot the same way.
+  - **(b) Command input:** a kneeler **stays kneeling** and snaps the 24 px `ACTIVE_STEP` forward as today. It does
+    not rise and does not slide (the step is a snap, not a motion). The arrow follows the head (D-K20).
+  - **(c) Revive:** from `down` into a kneel trigger (revived to weak HP, or still poisoned), go to `kneel` in hold
+    directly, with no `ready` frame and no `in` (`down` is already a crouch). Revived above the trigger, play the
+    rise (`kneel_in2` 3, `kneel_in1` 3) from `down` to `ready`.
+  - **(d) A hit that makes a standing hero weak (or poisons one):** the 24-frame `hurt` flash plays first; `in`
+    starts on the frame the flash ends. If the hero is already kneeling, only the shake plays.
+
+  Enemies:
+
+  | # | Condition | Shows |
+  |---|---|---|
+  | 1 | dying | keeps the kneel frame on screen while it eases and fades; no `hurt` frames |
+  | 2 | stone | cut at once |
+  | 3 | attack / cast | an acting kneeler rises inside the first 6 frames (D-K3) |
+  | 4 | hurt | a kneeler shakes +-3 px for 14 frames on its kneel frame |
+  | 5 | kneel (daze or poison) | kneel track |
+  | 6 | otherwise | breathing idle |
+
+  The tremble offset is applied per D-K16. Rows (a) and (c) apply to enemies too: an `enemyStatus` preset starts
+  in hold; there is no enemy revive.
+- **D-K3 Rising to act** (heroes and enemies, the same mechanism). For the first `KNEEL_OUT_FRAMES` = 6 frames of an
+  action on an acting kneeler, the frame name is replaced by `kneel_in2` (3), then `kneel_in1` (3).
+  - The offsets and contact timing are unchanged. That works because every contact frame is after frame 6: in-place
+    attack 14, melee 14 + N, heavy N + 29, boss cast 10, plain cast 11.
+  - Heroes: in `partyPose.ts` (override age < 6). Enemies: in `EnemyPoseController.raw()`, for the in-place, melee,
+    heavy and both cast tables.
+  - When the action ends (override cleared or mode back to idle) and the trigger still holds, `in` starts at once.
+  - `BattleAnimationController.ts` and `enemyAttackTables.ts` are unchanged.
+- **D-K17 Poison timing.** `turnTick` keeps poison damage at the end of the turn, after the action.
+  1. The action ends, and `in` (8 frames) starts at once.
+  2. The poison line and its damage are presented later, through their hold, as a shake on whatever kneel frame is
+     showing. The shake never restarts `in`.
+  3. A poison KO dies from the current kneel frame.
+  4. Poison applied by an action is presented at that action's impact. The target then goes through row (d), and an
+     enemy starts `in` (no flash).
+  5. A cure is presented when its line shows, and the rise plays then.
+- **D-K4 Derived kneel key.**
+  - Monsters: `kneel` is made from `idle` by body-template joint targets (section 4) plus the rig's
+    `kneel: {tweaks, sink, paint}`. It follows the FW-H pattern: paint <= 160 px, locked as `kf:kneel`.
+  - Heroes, variant A: re-posed from `ready` (robed: rows below `hip` squashed to sy 0.55 about the foot row).
+  - Heroes, variant B: `ready`'s upper body over the approved `down` lower body (needs `battle.down` joints: hip,
+    knees, feet, or the hem).
+  - **R3** picks A or B at U1, separately for armoured and robed classes.
+- **D-K5 Frames.** Four new frames per sheet / class: `kneel_in1` (idle toward kneel, t 0.33), `kneel_in2` (kneel
+  toward idle, t 0.33), `kneel` (held), `kneel_b` (the body's `idle_b` operation applied to `kneel`). The rise is
+  `kneel_in2`, `kneel_in1`. In-between tweaks `frames.kneel_in1.tweaks` / `frames.kneel_in2.tweaks` are allowed,
+  under the existing in-between rules (near-keyframe, D-K19).
+- **D-K6 Keep `daze` / `daze_b`.** They stay generated, locked and in the atlas, byte-identical (zero lock churn).
+  **R4** (revisit after the restated cost): retiring them means 10 pages instead of 12, but vampire and wolf still
+  leave page 0, and 123 x 2 lock entries are removed. Default **keep**.
+- **D-K7 Opt-in, one fallback path.** Kneel frames are generated only for a rig or hero file with a `kneel:` block.
+  - For a sheet without one, the atlas lists the kneel names aliased along the fallback chain: `kneel -> daze`,
+    `kneel_b -> daze_b`, `kneel_in2 -> daze`, `kneel_in1 -> idle`, at 0 extra cells.
+  - The runtime **always** runs the kneel track and draws whatever texture each name resolves to. There is no
+    separate daze branch: the old `idleFrame` daze sway is removed. An unopted sheet then shows today's daze look
+    on the kneel timing.
+  - Heroes: an unopted class's kneel columns repeat `ready` in the atlas, and `POSE_FALLBACK` maps the names to
+    `ready` for an old atlas.
+- **D-K8 Anchors unchanged.** Kneel frames stay out of `HOME_FRAMES`, `RANGED_FRAMES`, `travelTop`, `lungeRight` and
+  `idleBox`.
+- **D-K9 Floating sink.** Floating and swimmer figures already sit on the 2 px bottom margin, so they droop in place.
+  The sink is a runtime offset, `kneelSink` (native px; a new optional atlas field, written only for floating /
+  swimmer sheets; template 6 px per 80 px of cell), eased over `in` / `out` and applied by `AiEnemyView`.
+- **D-K10 Locks extend only.** Each opted-in rig gains exactly `kf:kneel`, `kneel_in1`, `kneel_in2`, `kneel_b`.
+  Heroes get a new `assets-src/gen/anim/<class>.lock.json` holding only those 4. The 14 existing hero atlas columns
+  stay byte-identical.
+- **D-K11 Mechanical preset.** iron_golem, soldier, warmech and guardian keep their 15 deg cap. Their kneel is a
+  power-down squat, with its own band.
+- **D-K12 Colossus exempt (R5 default).** chaos_orrery, chaos_horizon and chaos_horizon_core do not kneel; a
+  kneeling status shows its icon and overlay only. Chaos F1 (`chaos`, an atlas biped) kneels.
+- **D-K13 Atlas growth and preload (R6).**
+  - Accept 12 pages (each <= 2048x2048), with the act-1 group on pages 0 and 1.
+  - `BattleArt.load()` preloads **every page that holds an act-1 sheet** (pages 0 and 1, 19.8 MB), so act-1
+    battles never stream. This is computed from the index (the pages of the `act1` group's ids, listed as a new
+    optional index field `preload: [0, 1]` written by `monster_atlas.py`), not hard-coded.
+  - Peak resident memory: section 1.
+  - R6 asks the user to accept 12 pages, the act-1 preload of 19.8 MB (+4.5 MB over today's page 0) and a peak of
+    +3.9 MB.
+- **D-K14 U2 (R7 default: hold).** After K3-0, a second user review of one contact sheet.
+- **D-K15 Bestiary.** The `daze` step plays kneel in, hold (`dazeHold` 144) and out when
+  `textures.kneel !== textures.daze` (texture identity; no json field). Otherwise it plays the same track, whose
+  textures alias to daze.
+- **D-K18 Template-fix path during the rollout.**
+  1. Only the **template owner** (the orchestrator, or one agent it names, working on `mainline` serially) edits the
+     shared `kneel_templates.py`, `kneel.py` or `kneel_checks.py`.
+  2. A rollout agent that needs a change reports `BLOCKED: <id> template <body>: <what>` and moves on.
+  3. Template fixes must be **additive**: a new named variant, e.g. `kneel: {variant: winged}`, or a new key with
+     the old default. That way every locked id stays byte-identical.
+  4. After a template commit the owner runs `monster_anim.py check <every locked id of that body>`, which must
+     print `: OK` for all (an unchanged lock hash means unchanged frames), plus G2.
+  5. Worktrees rebase on it before using the variant.
+  6. If a fix cannot be additive, the affected locked ids are listed, re-reviewed and re-locked, with
+     `lockdiff --relock <ids>` showing changes **only** in kneel entries of those ids, logged in section 13.
+- **D-K19 Rotation caps.** `ROT_CAP` in `anim_rules.py` is **kept unchanged**. The K-checks add two caps for kneel
+  frames only:
+  - the derived `kneel` key: limb parts <= 100 deg (mechanical <= 15), other parts <= `ROT_CAP`;
+  - `kneel_in1` / `kneel_in2`: limb parts **<= 40 deg** relative to their pixel source, other parts <= `ROT_CAP`.
+
+  Any part turned more than 30 deg is sampled with rotsprite.
+- **D-K20 Anchors for icons, overlays and the arrow.** Status icons and overlays already re-read the head every frame
+  (`statusFx.ts:206`), so they sit on the kneeling head, and on the sunk sprite for floaters, with no change. The
+  active-hero arrow is moved down by the sink, `headOf(current).y - headOf(ready).y` (x scale), in
+  `ActiveHeroMarker` (about +4 lines).
+- **HP roll note.** The kneel starts at the presented impact (or after the flash, row d), **before** the rolling HP
+  number and bar in `BattlePartyPanel` reach red. That is accepted: the panel's red at `ratio <= 0.25`
+  (`BattlePartyPanel.ts:34`) uses the same threshold as `isWeak`.
 
 ## 3. Frame and timing spec (60 fps frames; pure tables)
 
-| Sequence | Frames (length) | Notes |
-|---|---|---|
-| in | `kneel_in1` 4, `kneel_in2` 4, then hold | starts when the presented trigger turns on (`KNEEL_IN_FRAMES` 8) |
-| hold | `kneel` / `kneel_b`, alternating every `KNEEL_PERIOD` 48, offset `index * 17` per actor | replaces `DAZE_PERIOD` for kneeling sheets |
-| out | `kneel_in2` 3, `kneel_in1` 3, then idle | starts when the trigger turns off (`KNEEL_OUT_FRAMES` 6) |
-| reversal | a trigger flip mid-transition continues from the frame on screen (time mirrored), never a jump | unit-tested |
-| hit while kneeling | kneel frame held; hero pivot shake +-2 px, 12 frames; enemy dx shake +-3, 14 frames | no `hurt` pose |
-| rise to act (D-K3) | first 6 override frames show `kneel_in2` 3, `kneel_in1` 3 | offsets of the override unchanged |
-| floating `kneelDrop` | dy 0 -> drop over `in`, held, drop -> 0 over `out` (ease out / in) | D-K9 |
+| Sequence | Frames (length) |
+|---|---|
+| in | `kneel_in1` 4, `kneel_in2` 4, then hold (`KNEEL_IN_FRAMES` 8) |
+| hold | `kneel` / `kneel_b` alternating every `KNEEL_PERIOD` 48, offset `index * 17` |
+| out / rise / victory rise | `kneel_in2` 3, `kneel_in1` 3 (`KNEEL_OUT_FRAMES` 6), then idle / the action / `victory` |
+| reversal | a mid-transition flip continues from the frame on screen (time mirrored) |
+| hit on a kneeler | hero +-2 px pivot shake 12 frames; enemy dx +-3 shake 14 frames |
+| floating `kneelSink` | 0 -> sink over `in` (ease out), held, sink -> 0 over `out` (ease in) |
 
-**TS contract.** `MonsterFrame` and `MONSTER_FRAMES` gain `kneel_in1 | kneel_in2 | kneel | kneel_b`. `FRAME_SOURCE`
-maps them to `idle`. `FRAME_FALLBACK`: `kneel -> daze`, `kneel_b -> daze_b`, `kneel_in2 -> daze`,
-`kneel_in1 -> idle`, so an old atlas shows today's daze. `LATE_FRAMES` drops `daze` / `daze_b` (stale) and holds
-the four kneel names until K4, then the kneel names leave it. Hero `BATTLE_POSES` appends the same four names and
-`POSE_FALLBACK` maps them to `ready` (today's dazed look). The Python `monster_recipes` (`MONSTER_FRAMES`,
-`FRAME_SOURCE`, `FALLBACK`, `SEQUENCES["kneel"] = [idle, kneel_in1, kneel_in2, kneel, kneel_b]`, `SPAN["kneel"] =
-(idle, kneel)`) mirrors it, and `selftest_kneel.py` checks that the two tables match.
+**TS / Python contract.**
 
-## 4. Per-body kneel spec (joint targets; lengths L are measured on the rig's own idle key; px are per 80 px of cell)
+- TS: `MonsterFrame` / `MONSTER_FRAMES` gain the 4 names, `FRAME_SOURCE` maps them to `idle`, and `FRAME_FALLBACK`
+  gets the D-K7 chain. `LATE_FRAMES` loses `daze` / `daze_b`, holds the kneel names until K4, then drops them.
+- Hero: `BATTLE_POSES` appends the 4 names; `POSE_FALLBACK` maps them to `ready`.
+- Python: `monster_recipes` mirrors this (`SEQUENCES["kneel"] = [idle, kneel_in1, kneel_in2, kneel, kneel_b]`,
+  `SPAN["kneel"] = (idle, kneel)`); `selftest_kneel.py` checks that both sides match.
 
-The targets are data in a new `gen/kneel_templates.py`, keyed by body (and preset). A rig's
-`kneel: {tweaks: {joint: [dx, dy]}, drop: n, paint: [...]}` adds to them. The derived key is rendered by the rig
-renderer from the `idle` pixels; any part turned more than 30 deg uses the rotsprite sampler (`rig_rotsprite.py`).
+## 4. Kneel spec per body (L measured on the rig's idle key; px per 80 px of cell)
 
-Monsters face right and heroes face left; `n` = near, `f` = far.
+Templates live in `gen/kneel_templates.py`, keyed by body, preset and variant. A rig adds
+`kneel: {tweaks: {joint: [dx, dy]}, sink: n, paint: [...], variant: name}`, where `sink` is the floaters' runtime
+drop and `drop` is not a key. Monsters face right and heroes face left.
 
-| Body (count) | Kneel | Joint targets (template) | Height band (kneel / idle opaque height) |
+| Body | Kneel | Template targets | Band (kneel / idle height) |
 |---|---|---|---|
-| biped (46 + 3 mechanical) | far knee down, near foot planted, torso low, head bowed, weapon lowered | hip down 0.8 L_thigh; `foot_n`, `toe_n` pinned, `knee_n` IK (near shin about vertical); `knee_f` on the ground row, 0.3 L_thigh behind the hip, `foot_f` / `toe_f` back along the ground (far shin horizontal); chest +10 deg forward lean; crown 15 deg down about the neck; hands down 0.5 L_thigh; weapon tip <= 30 deg toward the ground; cloth (cape, robe) follows its bone; fx parts follow their bone | 0.68-0.85 |
-| mechanical preset (iron_golem, soldier, warmech; quadruped guardian likewise) | power-down squat (D-K11) | hip down by the IK reach with every bone <= 15 deg; head / arms droop <= 15 deg | 0.85-0.95 |
-| quadruped (28) | haunches and forelegs folded, belly low, head low | hip down 0.6 L_hindthigh; chest down 0.6 L_upperfore; elbows to the ground, forearms forward along the ground; hocks to the ground; neck down 0.5 L_neck; snout 15 deg down; tail tip to the ground row; wings (dragons) folded, <= 30 deg | 0.60-0.85 |
-| bird (5; includes allosaurus and tyrannosaur) | grounded crouch, wings drooped | hip down to 0.35 L_leg above the ground; knees fold forward; feet pinned; wing tips 30 deg down; neck low, head 15 deg down; tail to the ground | 0.60-0.85 |
-| floating (14) | droops and sinks (no ground) | squash sy 0.90 about the bottom row; head / eye 2 px down; arms, fins and wings hang 20 deg; `kneelDrop` 6 px (D-K9) | 0.86-0.95 (frame only) |
-| swimmer (1) | as floating | as floating, on the `core` root | 0.86-0.95 |
-| serpent (8) | coil compressed, head lowered | every chain joint above the ground lowered by 40 % of its height; head to 2 head radii above the ground; maw 20 deg down; ground joints pinned | 0.55-0.85 |
-| rooted (2) | stalks droop | lead and stalk joints lowered by 40 %; root mass squash sy 0.94; root pinned | 0.80-0.95 |
-| naga (5) | upper body slumps into the coils | torso forward 20 deg, down 0.3 L_torso; coils sy 0.90 about the ground; arms hang | 0.65-0.85 |
-| arthropod (7) | legs splay, body on the ground | root down to 2 px above the ground with leg tips pinned (IK splay); head and pincers / stinger 20 deg down | 0.60-0.85 |
-| blob (4) | squash | `squash: {sx: 1.12, sy: 0.80}` about the bottom centre (anim_squash) | 0.75-0.85 |
-| heroes (12) | one knee down, torso low, head bowed, weapon held low (must not read as the `down` slump) | A: as the biped, from `ready` (robed: rows below `hip` squashed to sy 0.55 about the foot row, upper body moved down by the same amount); B: `ready` upper body over `down`'s lower body (`battle.down` joints) | `[max(0.72 H_ready, H_down + 4), 0.88 H_ready]` |
+| biped (46) | far knee down, near foot planted, torso low, head bowed, weapon low | hip down 0.8 L_thigh; `foot_n` / `toe_n` pinned, `knee_n` IK (near shin about vertical); `knee_f` on the ground row 0.3 L_thigh behind the hip, `foot_f` / `toe_f` back along the ground; chest +10 deg lean; crown 15 deg down; hands down 0.5 L_thigh; weapon tip <= 30 deg toward the ground; cloth and fx follow their bones | 0.68-0.85 |
+| mechanical (iron_golem, soldier, warmech, guardian) | power-down squat | hip down by IK with every bone <= 15 deg; head and arms droop <= 15 deg | 0.85-0.95 |
+| quadruped (27) | haunches and forelegs folded, belly low | hip down 0.6 L_hindthigh; chest down 0.6 L_upperfore; elbows and hocks to the ground; forearms forward; neck down 0.5 L_neck; snout 15 deg down; tail tip to the ground; wings folded <= 30 deg (variant `winged`); extra heads follow the neck chain (variant `multihead`) | 0.60-0.85 |
+| bird (5, incl. allosaurus, tyrannosaur) | grounded crouch | hip to 0.35 L_leg above the ground; knees forward; feet pinned; wing tips 30 deg down; head 15 deg down; tail down | 0.60-0.85 |
+| floating (14) / swimmer (1) | droop and sink | squash sy 0.90 about the bottom; head / eye 2 px down; arms, fins and wings hang 20 deg; `sink` 6 | 0.86-0.95 (frame) |
+| serpent (8) | coil compressed | chain joints above the ground lowered by 40 % of their height; head to 2 head radii above the ground; maw 20 deg down | 0.55-0.85 |
+| rooted (2) | stalks droop | stalks lowered 40 %; root mass sy 0.94 | 0.80-0.95 |
+| naga (5) | slump into the coils | torso 20 deg forward, down 0.3 L_torso; coils sy 0.90; arms hang | 0.65-0.85 |
+| arthropod (7) | legs splay | root to 2 px above the ground with tips pinned (IK); head, pincers and stinger 20 deg down | 0.60-0.85 |
+| blob (4) | squash | sx 1.12, sy 0.80 about the bottom centre | 0.75-0.85 |
 
-The bands are first guesses. They may change **only in K1**, logged in section 13; after U1 they are frozen.
+**Hero bands**, from `[max(0.72 H_ready, H_down + 4), 0.88 H_ready]` with the lower bound rounded up and the upper
+rounded down (measured px):
+
+| class | ready | down | band | class | ready | down | band |
+|---|---|---|---|---|---|---|---|
+| black_mage | 74 | 54 | 58-65 | ninja | 73 | 53 | 57-64 |
+| black_wizard | 74 | 54 | 58-65 | red_mage | 72 | 55 | 59-63 |
+| knight | 72 | 52 | 56-63 | red_wizard | 71 | 51 | 55-62 |
+| master | 71 | 45 | 52-62 | thief | 72 | 48 | 52-63 |
+| monk | 71 | 52 | 56-62 | warrior | 68 | 44 | 49-59 |
+| white_wizard | 65 | 48 | 52-57 | **white_mage** | 66 | 51 | **55-58** (3 px) |
+
+**Per-class override.** `kneel: {band: [lo, hi]}` in `anim/<class>.yaml` is allowed only with a section 13 entry
+(class, old band, new band, reason). The lower bound may never drop below `H_down + 2`, so a kneel always stands
+above the KO slump. White_mage is the expected first user.
+
+All bands are tuning targets until U1, changed only with a section 13 entry; after U1 they are frozen.
 
 ## 5. Pipeline changes (Python)
 
 | File | Change | Limit |
 |---|---|---|
-| `gen/kneel_templates.py` (new) | section 4 data per body / preset | <= 200 lines |
-| `gen/kneel.py` (new) | `kneel_key(sprite, rig, keys, meta)` builds the derived key (opt-in `kneel:` block), applies the paint, returns the image and joints; the recipes for `kneel_in1` / `kneel_in2` / `kneel_b` | <= 250 |
-| `gen/monster_recipes.py` | the frame names, `FRAME_SOURCE`, `FALLBACK`, `SEQUENCES`, `SPAN` (section 3) | +12 lines |
-| `gen/monster_anim.py` | 1 hook in `load_entries` (add the `kneel` key when opted in) and 1 in `generate` (the kneel recipes) | <= +10 lines |
-| `gen/monster_keys.py` | `kf:kneel` joins the derived keys for lock and paint (as `kf:hurt` for FW-H) | <= +10 |
-| `gen/kneel_checks.py` (new) | K-checks (section 7) | <= 200 |
-| `gen/monster_check.py` | call the K-checks for kneel frames; kneel frames skip the per-foot x check and F5 in favour of K-ground | <= +10 |
-| `gen/monster_atlas.py` | the new names; `kneelDrop` written for floating / swimmer sheets; anchors untouched (D-K8) | <= +8 |
-| `gen/puppet_kneel.py` (new) | hero variants A / B, `battle.down` joint loading, hero K-checks, hero lock read / write | <= 250 |
-| `gen/puppet.py` | 1 hook: `battle_inbetweens` also returns the kneel frames for an opted-in class | <= +4 (file is already 540) |
-| `build_assets.py` | `all_poses` gains the 4 kneel columns; an unopted class repeats `ready` | <= +3 |
-| `gen/kneel_review.py` (new) | review sheets, GIFs, stage composite, pilot sheet (section 8) | <= 250 |
-| `gen/kneel_tools.py` (new) | `coverage`, `lockdiff --base REV`, `party-diff --base REV`, `pages` | <= 200 |
+| `gen/kneel_templates.py` (new) | section 4 data, with variants | <= 200 lines |
+| `gen/kneel.py` (new) | the derived key (opt-in), its paint, the `kneel_in*` / `kneel_b` recipes | <= 250 |
+| `gen/kneel_checks.py` (new) | the K-checks (section 7) | <= 200 |
+| `gen/monster_recipes.py` | names, `FRAME_SOURCE`, `FALLBACK`, `SEQUENCES`, `SPAN` | +12 |
+| `gen/monster_anim.py` | 1 hook in `load_entries`, 1 in `generate` | <= +10 |
+| `gen/monster_keys.py` | `kf:kneel` as a derived key (lock, paint) | <= +10 |
+| `gen/monster_check.py` | the K-checks for kneel frames (they replace the per-foot x check and F5 there) | <= +10 |
+| `gen/monster_atlas.py` | names; `kneelSink`; the `preload` list (D-K13); anchors untouched | <= +12 |
+| `gen/puppet_kneel.py` (new) | hero variants A / B, `battle.down` joints, a rotsprite renderer for hero parts (reusing `rig_rotsprite`), hero K-checks, lock read / write, and its own `__main__`: `python3 -I assets-src/gen/puppet_kneel.py {review\|check\|lock} <class ...>` | <= 250 |
+| `gen/puppet.py` | **unchanged (0 lines)** | 0 |
+| `build_assets.py` | `build_battle_ai` appends the 4 kneel columns from `puppet_kneel.kneel_frames(cid)` (`ready` for unopted classes) | <= +5 |
+| `gen/kneel_review.py` (new) | review sheets, GIFs, stage composite, pilot sheet | <= 250 |
+| `gen/kneel_tools.py` (new) | `coverage`, `lockdiff --base REV [--relock ids]`, `party-diff --base REV`, `pages --base REV` | <= 200 |
 | `gen/selftest_kneel.py` (new) + 1 line in `selftest.py` | section 7 | <= 250 |
-| `anim/monsters/<id>.yaml`, `anim/<class>.yaml` | `kneel:` block per sprite / class (data only) | rollout |
-
-Commands added: `python3 -I assets-src/gen/kneel_review.py <ids...>`, `python3 -I assets-src/gen/kneel_tools.py
-{coverage|lockdiff|party-diff|pages}`, and `python3 -I assets-src/gen/puppet.py lock <class>` (kneel frames only).
 
 ## 6. Runtime changes (TS)
 
-| File | Change |
-|---|---|
-| `src/scenes/battle/kneelChoreography.ts` (new, pure, <= 150 lines) | tables of section 3; `class KneelTrack { set(on, clock); frame(clock): KneelFrame \| null; rising(clock) }`; `isWeak(hp, maxHp)`; the fallback names |
-| `src/scenes/battle/partyPose.ts` (new, pure, <= 120) | `partyPoseOf({hp, maxHp, posture, victory, override, overrideAge, hurt, kneel})` returns the pose and the shake: the D-K2 table. `BattleDisplayManager.partyPose` delegates to it, so that file shrinks. |
-| `src/scenes/battle/enemyPoseTypes.ts` (new) | `EnemyState`, `EnemyAnimConfig`, `PoseState`, `DEFAULTS` moved out of `EnemyPoseController.ts` (248), which gains a `KneelTrack` per enemy driven by `setPosture` (and `setWeak` under R1) and must end <= 250 |
-| `enemyChoreography.ts` | the frame names and fallbacks (section 3); `idleFrame` keeps `daze` only for sheets without kneel |
-| `AiEnemyView.ts` (242) | applies `kneelDrop` (<= +5 lines; extract the stone texture swap into `fx/stoneTextures.ts` if it would pass 250) |
-| `BattleArt.ts` | reads the optional `kneelDrop` and `hasKneel` per sheet |
-| `CharacterAtlas.ts` | the 4 names in `BATTLE_POSES`; `POSE_FALLBACK` -> `ready` |
-| `BattleDisplayManager.ts` | per-member `KneelTrack`; `maxHp` from `battle.allParty[i].maxHp`; the rise folded into overrides (D-K3) |
-| `src/scenes/battle/kneelPreview.ts` (new, dev only) | `?kneel=on` forces every actor on both sides to kneel; `?kneel=loop` toggles each actor every 150 frames, staggered 20; works with `&slow=N` and `?enemyAnim=step` |
-| `BestiaryPreview.ts`, `bestiaryAnim.ts` | D-K15 |
-| `assets/data/status-visuals.yaml` | header comment: `daze` is the kneel on both sides |
-| `assets/data/debug-scenarios.yaml` | `kneel_pilot` (K1) and `kneel_all` (K4), section 8 |
+| File | Change | Lines after (projection) |
+|---|---|---|
+| `kneelChoreography.ts` (new, pure) | section 3 tables; `KneelTrack { set(on, clock, {hold?}), frame(clock), rising(age) }`; `isWeak` | <= 150 |
+| `partyPose.ts` (new, pure) | `partyPoseOf(input)`: the D-K2 hero table including rows a to d | <= 130 |
+| `enemyPoseTypes.ts` (new) | `EnemyState`, `EnemyAnimConfig`, `PoseState`, `DEFAULTS` moved out | about 50 |
+| `EnemyPoseController.ts` | KneelTrack per enemy via `setPosture`; D-K3 rise in `raw()`; kneel-again on action end; the daze sway removed | 248 - 50 + 25 = **about 223** |
+| `BattleDisplayManager.ts` | delegates to `partyPose.ts` (-11 lines), KneelTrack per member (+12), `maxHp` from `battle.allParty[i].maxHp` | 231 - 11 + 12 = **about 232** |
+| `enemyChoreography.ts` | names, fallbacks; `idleFrame` loses its daze branch | about 185 |
+| `fx/statusRules.ts`, `types/fxData.ts`, `core/schemaValidationFx.ts` | `kneel` posture, rank, `trembles()` | +8 total |
+| `AiEnemyView.ts` | applies `kneelSink` through a new pure helper `enemyOffsets.ts` (the sink easing), so the file grows <= 3 lines | **<= 245** |
+| `BattleArt.ts` | reads `kneelSink`; `load()` preloads the index's `preload` pages | <= 240 |
+| `CharacterAtlas.ts` | the 4 names; `POSE_FALLBACK` | <= 240 |
+| `ActiveHeroMarker.ts` | arrow follows the sink (D-K20) | about 85 |
+| `kneelPreview.ts` (new, dev) | `?kneel=on` (every actor on both sides kneels), `?kneel=loop` (toggle every 150 frames, staggered 20), `&kneelVariant=A\|B` until U1 | <= 80 |
+| `BestiaryPreview.ts`, `bestiaryAnim.ts` | D-K15 | <= 235 |
+| `status-visuals.yaml` | `poison: posture: kneel`; header comment | |
+| `debug-scenarios.yaml` | `kneel_pilot` (K1) and the K4 scenarios (section 10) | |
 
-`src/battle/` is not touched. The new modules import nothing from `pixi.js` (asserted by a test).
+`src/battle/` is not touched. The new pure modules import nothing from `pixi.js` (a test asserts it).
+
+**The 2880 px hero atlas is accepted:** 18 columns x 160 = 2880 x 1920. That is under the 4096 WebGL texture size
+the game already assumes for its 2048 pages, and 22 MB RGBA against 17.2 MB today.
 
 ## 7. Checks and tests
 
-**K-checks** (`kneel_checks.py`; binary; they run in `monster_anim.py check`, `review` and the `monsters_ai` build,
-and the hero versions in `puppet.py review` and `battle_ai`):
+**K-checks** (`kneel_checks.py`, binary). They run in `monster_anim.py check`, `review` and the `monsters_ai` build;
+the hero versions run in `puppet_kneel.py check` and `battle_ai`.
 
-- **K-ground** (replaces check 8 for kneel frames on grounded bodies): the lowest opaque row equals `bottom_row` in
-  `kneel_in1`, `kneel_in2`, `kneel` and `kneel_b`, and the bottom 2 rows hold >= 0.5 x the idle's count there.
-  Floating / swimmer: the lowest row equals the idle's (the drop is runtime).
-- **K-height:** kneel opaque height / idle opaque height is inside the body's band (section 4); heroes use their
-  formula.
-- **K-rot:** the derived key turns limb parts <= 100 deg (mechanical <= 15) and other parts <= `ROT_CAP`;
-  `kneel_in1` / `kneel_in2` turn limb parts <= 40 deg relative to their pixel source; every part over 30 deg is
-  sampled with rotsprite.
-- **K-fit:** no opaque pixel in the cell's 2 px bottom margin below `bottom_row`, none outside the cell (existing
-  clipping check).
-- **K-anchor:** the atlas json per-sheet fields `homeX`, `idleBox`, `travelTop`, `lungeRight`, `head`, `lungePx`
-  and `opaqueRight` are identical to the base revision (`kneel_tools.py pages --base`).
-- **K-lock** (D-K10): `kneel_tools.py lockdiff --base <K0 commit>` reports 0 changed or removed entries; the added
-  entries are exactly the 4 kneel names per opted-in rig.
-- **Existing checks that apply unchanged to kneel frames:** binary alpha, palette lock, no magenta, no detached
-  pixels, seams, new holes, outline kept, silhouette continuity along `SEQUENCES["kneel"]` (span idle -> kneel),
-  near-keyframe (|u| <= 0.35 for the in-betweens; `kneel` is a key), whole-pixel joints, F3, F4, F7, atlas
-  exactness, determinism. The heroes get the same set through `puppet_kneel.check`, plus `pieces <= 2` and
-  `ring` within 0.08 of `ready`.
+- **K-ground:** for grounded bodies, the lowest opaque row equals `bottom_row` in all 4 kneel frames, and the bottom
+  2 rows hold >= 0.5 x the idle's pixels there. Floating / swimmer: the lowest row equals the idle's.
+- **K-height:** the body band (section 4), or the hero class band / override.
+- **K-rot:** D-K19.
+- **K-fit:** nothing in the 2 px bottom margin or outside the cell.
+- **K-anchor:** the per-sheet `homeX`, `idleBox`, `travelTop`, `lungeRight`, `head`, `lungePx` and `opaqueRight`
+  are identical to base.
+- **K-lock:** D-K10 / D-K18 via `lockdiff`.
+- **Unchanged checks that also apply to kneel frames:** binary alpha, palette lock, magenta, detached pixels, seams,
+  holes, outline, silhouette continuity along `SEQUENCES["kneel"]`, near-keyframe |u| <= 0.35, whole pixels, F3, F4,
+  F7, atlas exactness, determinism. Heroes also check `pieces <= 2` and `ring` within 0.08 of `ready`.
 
-**Python selftests** (`selftest_kneel.py`, on the synthetic biped of `selftest_rig.py` and the beasts of
-`selftest_beasts.py`):
+**Python selftests** (`selftest_kneel.py`, on the synthetic rigs of `selftest_rig.py` / `selftest_beasts.py`):
 
-- opt-in only: a rig without `kneel:` generates no kneel frames;
-- old frames byte-identical with and without the block;
-- the 4 names generated;
-- K-ground fails a 1 px lifted kneel, K-height fails a frame outside its band, K-rot fails 101 deg, K-lock fails a
-  changed `daze` hash;
-- the fallback chain, and the Python vs TS tables match;
-- heroes: variant A on a synthetic robed and unrobed puppet; the 14 old columns identical.
+- opt-in only, and old frames byte-identical with and without the block;
+- the 4 names are generated;
+- the failure cases: K-ground fails a 1 px lift, K-height fails a frame outside its band, K-rot fails a 101 deg key
+  and a 41 deg in-between, K-lock fails a changed `daze` hash;
+- an additive template variant leaves the locked frames unchanged;
+- the Python and TS tables match;
+- `kneelSink` is written only for floaters, and the `preload` list equals the act-1 pages;
+- heroes: variant A on synthetic robed and unrobed puppets, the 14 old columns identical, and a band override with
+  no section 13 entry refused (`puppet_kneel.py check` reads section 13's table).
 
 **TS tests** (Vitest; existing tests are updated to the new spec, never deleted):
 
-- `tests/scenes/battle/kneelChoreography.test.ts`: in 8 / out 6 frame by frame; hold period 48 with the per-actor
-  offset; mid-transition reversal; `isWeak(25, 100)` is true, `isWeak(26, 100)` false, `isWeak(0, 100)` false.
-- `tests/scenes/battle/partyPose.test.ts`: one case per D-K2 row, including stone cutting a kneel, victory raising
-  a weak hero but not a sleeper, the rise inside the first 6 override frames, and a hit on a kneeler showing no
-  `hurt`.
-- `EnemyPoseController.test.ts` plus `enemyPoseFlow.test.ts`: daze -> `kneel_in1` at t 0-3, `kneel_in2` at 4-7,
-  `kneel` / `kneel_b` from 8; wake -> out; dying from a kneel; hurt as a shake.
-- `BattleDisplayManager.test.ts` and `statusIntegration.test.ts`: the FB-7 "sleep holds ready" cases become kneel
-  cases.
-- `poseCues.test.ts`, `assetCoverage.test.ts` and `CharacterAtlas.test.ts`: the frame lists; per sheet the kneel
-  frames are their own rects when opted in, otherwise aliased along `FRAME_FALLBACK`; from K4, own rects on all 123
-  sheets and all 12 rows.
-- the bestiary tests for D-K15;
-- a scenario test: `kneel_pilot` resolves, and its weak members have `hp * 4 <= maxHp`;
-- an import test: no `pixi.js` in `kneelChoreography.ts` or `partyPose.ts`.
+- `kneelChoreography.test.ts`:
+  - in 8 / out 6 frame by frame; hold period 48 with the per-actor offset; reversal;
+  - `set(on, {hold: true})` starts in hold;
+  - `isWeak(25,100)` is true, `isWeak(26,100)` false, `isWeak(0,100)` false.
+- `partyPose.test.ts`, one case each:
+  - the 8 D-K2 rows, and rows (a) start / retry in hold, (b) the step without a rise, (c) a revive into weak (no
+    `ready` frame) and above it (the rise), (d) the hurt flash then `in` at frame 24;
+  - victory: the rise is 6 frames for weak or poisoned heroes, none for a sleeper;
+  - poison plus sleep is disabled; poison plus fear kneels and trembles.
+- `EnemyPoseController.test.ts` / `enemyPoseFlow.test.ts`:
+  - posture `kneel` or `daze`: `kneel_in1` at t 0-3, `kneel_in2` at 4-7, hold from 8;
+  - a poisoned enemy's attack shows `kneel_in2` at 0-2 and `kneel_in1` at 3-5, then the table frame. The contact
+    frame is unchanged (14 in place; melee and heavy per their tables); same for the boss and plain casts;
+  - `in` restarts when the attack ends;
+  - a poison tick is a shake that does not restart `in`; a poison KO dies from the kneel frame; a wake rises;
+    stone cuts the kneel.
+- `statusRules.test.ts` / `statusVisuals.test.ts`: the rank table, `poison -> kneel`, `trembles`.
+- `statusIntegration.test.ts`: a poisoned hero acts (turn not lost), kneels again, then the poison line shakes it.
+- `BattleDisplayManager.test.ts`: FB-7 "sleep holds ready" becomes kneel; `ActiveHeroMarker` arrow sink.
+- `poseCues.test.ts`, `assetCoverage.test.ts`, `CharacterAtlas.test.ts`: the frame lists. Kneel frames are own
+  rects when opted in, otherwise aliased per D-K7; from K4, own rects for all 123 / 12.
+- the bestiary tests (D-K15, texture identity);
+- scenario tests: every `kneel_*` scenario resolves; weak members have `hp * 4 <= maxHp`; each K4 formation passes
+  `formationFits`;
+- an import test: no `pixi.js` in the new pure modules.
 
 ## 8. Review tooling and pilot (K1)
 
 **Pilot:**
 
-| Sprite | Why it is the risk case |
+| Sprite | Risk it covers |
 |---|---|
-| `goblin` (biped, small, act 1) | the most common act-1 enemy, a clean rig with a `prop` dagger carried to `dag_h` (prop carry under a big re-pose) and foot parts with masks; existing `daze` paint |
-| `wolf` (quadruped, small, act 1) | every leg folds at once (4 IK chains, two of them long rotations), plus the tail and the head |
-| `warrior` (hero, armoured, unrobed, shield) | real leg parts rotate about 90 deg with the puppet's nearest rigid rotation; the shield on the far arm; `down` is close in height (44 vs 68 px) |
-| `white_mage` (hero, robed, staff, zigzag hem) | no leg parts: the robe squash (A) or the `down` hem (B) is the riskiest pixel path; the hem pattern shows any stretch |
+| `goblin` (biped, small, act 1) | a prop dagger carried to `dag_h` under a big re-pose; foot masks; existing daze paint; **poisoned: rises to attack and kneels again** |
+| `wolf` (quadruped, act 1, now on page 1) | 4 IK leg chains fold at once, plus tail and head; checks the act-1 page-1 preload |
+| `warrior` (armoured, unrobed, shield) | about 90 deg leg rotations; the far-arm shield; `down` close in height |
+| `white_mage` (robed, zigzag hem) | the robe squash (A) or the `down` hem (B); a 3 px band |
 
-**Commands and artefacts** (all under `assets-src/gen/out/anim/review/kneel/`, untracked):
+**Commands and artefacts** (untracked, under `assets-src/gen/out/anim/review/kneel/`):
 
 ```bash
 python3 -I assets-src/gen/kneel_review.py goblin wolf warrior white_mage
-#  -> prints one "<id>: OK" or "<id>: FAIL <check> ..." line per pilot (hero ids once per variant: warrior[A], warrior[B], ...)
-#  writes pilot_sheet.png       rows goblin, wolf, warrior A, warrior B, white_mage A, white_mage B; columns idle/ready,
-#                               kneel_in1, kneel_in2, kneel, kneel_b, plus hurt (monsters) / down (heroes) for contrast;
-#                               4x, ground line drawn, height ratio printed per row
-#         <id>[_A|_B]_kneel.gif in 8f, hold 2 sway cycles, out 6f, stand 24f (16.7 ms per game frame)
-#         pilot_stage.png       all pilots kneeling at game scale on grassland.webp at their battle slots
-npm run dev   # then (Playwright; never without mute=1)
-#   http://localhost:5173/?mute=1&scenario=kneel_pilot              -> /tmp/kneel/pilot_battle_1.png
-#   http://localhost:5173/?mute=1&scenario=kneel_pilot&kneel=loop   -> /tmp/kneel/pilot_battle_loop_{1..4}.png
+#  prints "<id>: OK" or "<id>: FAIL <check> ..." (heroes per variant: warrior[A], warrior[B], ...)
+#  pilot_sheet.png : rows goblin, wolf, warrior A/B, white_mage A/B; columns idle/ready, kneel_in1, kneel_in2, kneel,
+#                    kneel_b, plus hurt (monsters) / down (heroes); 4x; ground line; height and band per row
+#  <id>[_A|_B]_kneel.gif : in 8f, 2 sway cycles, out 6f, stand 24f (16.7 ms per frame)
+#  goblin_rise.gif : kneel -> rise (6f) -> attack table -> kneel_in (8f) -> hold, at game timing
+#  pilot_stage.png : all pilots kneeling at game scale on grassland.webp at their battle slots
+npm run dev   # Playwright, always with mute=1
+#  http://localhost:5173/?mute=1&scenario=kneel_pilot             -> /tmp/kneel/pilot_battle_{1,2,3}.png
+#  http://localhost:5173/?mute=1&scenario=kneel_pilot&kneel=loop  -> /tmp/kneel/pilot_loop_{1..4}.png
 ```
 
-`kneel_pilot` (debug-scenarios.yaml):
+`kneel_pilot`:
 
-- party: `WAR` warrior Lv 10 at weak HP, `WHM` white_mage Lv 10 `status: [sleep]`, `WHM2` white_mage Lv 10 at weak
-  HP, `WAR2` warrior Lv 10 at full HP (the control);
-- enemies `[goblin, goblin, wolf, wolf]` with `enemyStatus: {0: [sleep], 2: [stun]}`; 1 and 3 are the controls;
-- background grassland.
+- party: `WAR` warrior Lv 10 weak HP; `WHM` white_mage Lv 10 `status: [sleep]`; `WHM2` white_mage Lv 10
+  `status: [poison]`; `WAR2` warrior Lv 10 full HP (the control);
+- enemies `[goblin, goblin, wolf, wolf]` with `enemyStatus: {0: [sleep], 1: [poison], 2: [stun]}`; wolf 3 is the
+  control;
+- grassland.
 
-Playing one round shows a weak hero rising to attack and kneeling again, a hit on a kneeler, and a waking enemy
-rising. The hero rendering variant is a dev query, `&kneelVariant=A|B`, until U1 decides.
+Screenshot 1 (the start) shows WAR, WHM, WHM2, goblin 0, goblin 1 and wolf 2 already kneeling (row a), with WAR2
+and wolf 3 standing.
 
-**U1 gate (user):** the user gets `pilot_sheet.png`, the 6 GIFs, `pilot_stage.png` and the browser screenshots,
-and rules:
+Screenshot 2 is taken during goblin 1's attack and shows it standing mid-attack.
+
+Screenshot 3 is taken after its poison line and shows it kneeling again.
+
+**K1 commits.** The K1 agent commits the code, the pilot rigs and locks, **and the rebuilt atlases**
+(`monsters-ai*`, `battle-characters-ai*`), so the user sees the pilot in the browser.
+
+**U1 (user gate).** The user gets `pilot_sheet.png`, the GIFs, `pilot_stage.png` and the screenshots, and rules:
 
 1. approve or reject each pilot's look;
-2. pick hero variant A or B, separately for armoured and robed classes (R3);
-3. R1, R2, R4-R7.
+2. R3: pick hero variant A or B, for armoured and for robed classes;
+3. R4 to R7.
 
-The rulings and any tuning are written into section 13 of this file (commit "K1-U1: pilot rulings"). No K2 / K3 work
-starts before that commit.
+The rulings are recorded in section 13 ("K1-U1: pilot rulings"). No K2 work starts before that commit.
 
-## 9. Rollout tranches (sprite lists generated from the rig files' `body:`)
+## 9. Rollout (sprite lists from the rig files' `body:`)
 
 | Tranche | Owner | Sprites |
 |---|---|---|
-| **K1** pilot | 1 agent, serial | goblin, wolf, warrior, white_mage |
-| **K2-A** biped 1 (24) | worktree agent A | astos black_knight bloodbones buccaneer chaos clay_golem dark_fighter dark_wizard death_knight drowned_sovereign earth_elemental fire_gigas gargoyle garland ghast ghoul gr_imp hill_gigas horned_devil ice_gigas iron_golem(mech) king_mummy lich mindflayer |
-| **K2-B** biped 2 (24) | agent B | minotaur minotaur_zombie mummy ogre ogre_chief ogre_mage pirate piscodemon rakshasa sahagin sahagin_chief sahagin_prince sea_troll skeleton soldier(mech) stone_golem troll vampire vampire_lord warmech(mech) weretiger werewolf wight zombie |
-| **K2-C** quadruped (27) | agent C | baretta basilisk blue_dragon chimera crazy_horse crocodile desert_baretta dragon dragon_zombie fire_hydra fire_lizard gr_wolf green_dragon guardian(mech) hellhound hydra hyenadon lesser_tiger lizard manticore nightmare rhyos sabertooth sphinx white_crocodile white_dragon winter_wolf |
+| **K1** pilot | 1 agent | goblin, wolf, warrior, white_mage |
+| **K2-0** risky-body probes (4) | template owner, serial; **orchestrator review** (the same artefacts as section 8) before K2 | iron_golem (mechanical squat), blue_dragon (winged quadruped, scale 3), hydra (multi-head quadruped, scale 3), garland (per-pose boss, cloth, fx, raise) |
+| **K2-A** biped 1 (22) | worktree agent A | astos black_knight bloodbones buccaneer chaos clay_golem dark_fighter dark_wizard death_knight drowned_sovereign earth_elemental fire_gigas gargoyle ghast ghoul gr_imp hill_gigas horned_devil ice_gigas king_mummy lich mindflayer |
+| **K2-B** biped 2 (24) | agent B | minotaur minotaur_zombie mummy ogre ogre_chief ogre_mage pirate piscodemon rakshasa sahagin sahagin_chief sahagin_prince sea_troll skeleton soldier stone_golem troll vampire vampire_lord warmech weretiger werewolf wight zombie |
+| **K2-C** quadruped (25) | agent C | baretta basilisk chimera crazy_horse crocodile desert_baretta dragon dragon_zombie fire_hydra fire_lizard gr_wolf green_dragon guardian hellhound hyenadon lesser_tiger lizard manticore nightmare rhyos sabertooth sphinx white_crocodile white_dragon winter_wolf |
 | **K2-D** heroes (10) | agent D | unrobed: knight thief ninja monk master red_mage; robed: black_mage black_wizard red_wizard white_wizard |
-| **K3-0** templates and probes (8) | 1 agent, serial, after K2 is merged | cockatrice (bird), ghost (floating), shark (swimmer), cobra (serpent), ochu (rooted), water_naga (naga), scorpion (arthropod), green_slime (blob); then **U2** (D-K14) |
+| **K3-0** new-body probes (8) | template owner, serial; then **U2** | cockatrice (bird), ghost (floating), shark (swimmer), cobra (serpent), ochu (rooted), water_naga (naga), scorpion (arthropod), green_slime (blob) |
 | **K3-A** floating (13) | agent A | air_elemental bigeyes death_eye deepeyes evil_eye fire_elemental hollow_seraph red_piranha shadow specter water_elemental white_shark wraith |
 | **K3-B** serpent / rooted / naga (12) | agent B | anaconda gigas_worm lava_worm purple_worm sand_worm sea_snake wyrm; neochu; ashen_queen earth_medusa medusa spirit_naga |
 | **K3-C** bird / arthropod / blob (13) | agent C | allosaurus pyrolisk tyrannosaur wyvern; ankheg black_widow crawler remorazz sea_scorpion tarantula; black_flan gray_ooze ochre_jelly |
-| **K4** integration | 1 agent | full build, gates, play test, docs |
+| **K4** integration | 1 agent | section 10 |
 
-Total: 2 + 24 + 24 + 27 + 8 + 13 + 12 + 13 = **123 sheets**; 2 + 10 = **12 heroes**.
+Totals: 2 + 4 + 22 + 24 + 25 + 8 + 13 + 12 + 13 = **123 sheets**, and 2 + 10 = **12 heroes**.
 
-The tranches with known extra risk get a per-sprite review note in their agent brief:
+The K2-0 review checks the variants the risky bodies need: mechanical, `winged`, `multihead`, cloth and fx on a
+per-pose boss cell, and scale-3 paint in native px. Its result is recorded in section 13 before the K2 worktrees
+start. The K2 agent briefs repeat the known per-sprite risks:
 
-- the mechanical rigs (D-K11);
-- `kind: cloth` (garland, lich, mummy);
-- `kind: fx` (garland, lich, hollow_seraph): the halo stays dark at kneel, since `brighten` applies only to the cast
-  frames;
-- the FW-Q partial rigs (the kneel comes from `idle`, so it is unaffected);
-- the scale-3 sheets (any paint is in native px);
-- the boss per-pose cells (drowned_sovereign, ashen_queen, piscodemon, chaos `raise: false`).
+- the remaining mechanical rigs (soldier, warmech, guardian);
+- cloth / fx (lich, mummy, hollow_seraph: its halo stays dark, since `brighten` is cast-only);
+- the FW-Q partial rigs (the kneel comes from `idle`, so they are unaffected);
+- the boss cells (drowned_sovereign, ashen_queen, piscodemon, chaos `raise: false`).
 
 **Parallel protocol:**
 
-1. One worktree per agent: `git worktree add /tmp/kneel-wt/<tranche> -b kneel-<tranche> mainline`.
-2. An agent edits only its own `anim/monsters/<id>.yaml`, `<id>.lock.json`, or `anim/<class>.yaml` and
-   `<class>.lock.json`. Shared Python and TS change only in K1, K3-0 and K4.
-3. Per sprite: `kneel:` block -> `kneel_review.py <id>` (self-review against the U1 bar) -> `monster_anim.py check
-   <id>` shows `<id>: OK` -> `monster_anim.py lock <id>` (heroes: `puppet.py lock <class>`) -> **commit at once**
-   (`K2-A: <id> kneel rig + lock`). No `git add -A`; generated `assets/sprites/*` are never committed by a rollout
-   agent.
-4. Retry cap: 2 re-tunes per sprite. After that the agent reports `BLOCKED: <id> <check>` and moves on.
-5. Merge order: K2-A, K2-B, K2-C, K2-D (no shared files, so no conflicts), then one integrator commit "K2: atlases"
-   (`build_assets.py monsters_ai battle_ai`) after the section 10 gates. Then K3-0 -> U2 -> K3-A, K3-B, K3-C in the
-   same way -> "K3: atlases".
+1. `git worktree add /tmp/kneel-wt/<tranche> -b kneel-<tranche> mainline`.
+2. An agent edits only its own `anim/monsters/<id>.yaml` and `.lock.json`, or `anim/<class>.yaml` and
+   `.lock.json`. Shared Python and TS change only in K1, K2-0, K3-0, K4 and template-owner commits (D-K18).
+3. Per sprite: `kneel:` block -> `kneel_review.py <id>` -> `monster_anim.py check <id>` shows `<id>: OK` (heroes:
+   `puppet_kneel.py check <class>`) -> `lock` -> **commit at once** (`K2-A: <id> kneel rig + lock`). Never
+   `git add -A`.
+4. **Rollout agents never commit atlases**, or anything under `assets/`.
+5. Retry cap: 2 re-tunes per sprite, then `BLOCKED: <id> <check>` (or a template ask, D-K18).
+6. Merge order: K2-A, K2-B, K2-C, K2-D (disjoint files), then the **integrator** (the only one who rebuilds and
+   commits atlases) runs `build_assets.py monsters_ai battle_ai`, the section 10 gates and commits "K2: atlases".
+7. K3 follows the same order: K3-0 -> U2 -> K3-A, K3-B, K3-C -> "K3: atlases".
 
-## 10. Gates (every tranche merge and K4; each command has one expected result)
+## 10. Gates and K4
+
+Every tranche merge (and K4) runs these, with the expected results:
 
 | # | Command | Expected |
 |---|---|---|
-| G1 | `python3 -I assets-src/gen/monster_anim.py check --all \| grep -vc ': OK'` | `0` (and `grep -c ': OK'` = `123`) |
-| G2 | `python3 -I assets-src/gen/kneel_tools.py lockdiff --base <K0 commit>` | `0 changed, 0 removed, added = 4 x opted rigs` (K4: `492`); heroes `4 x opted classes` (K4: `48`) |
-| G3 | `python3 -I assets-src/gen/kneel_tools.py coverage` | the tranche's running count; K4: `monsters 123/123, heroes 12/12` |
+| G1 | `python3 -I assets-src/gen/monster_anim.py check --all \| grep -vc ': OK'` | `0`; `grep -c ': OK'` = `123` |
+| G2 | `python3 -I assets-src/gen/kneel_tools.py lockdiff --base 0162f38` | `0 changed, 0 removed`; added = 4 x opted rigs (K4: 492) plus 4 x opted heroes (K4: 48) |
+| G3 | `python3 -I assets-src/gen/kneel_tools.py coverage` | the running count; K4: `monsters 123/123, heroes 12/12` |
 | G4 | `PYTHONHASHSEED=0 python3 -s assets-src/build_assets.py monsters_ai battle_ai && shasum assets/sprites/monsters-ai* assets/sprites/battle-characters-ai* > /tmp/kneel.sha && PYTHONHASHSEED=1 python3 -s assets-src/build_assets.py monsters_ai battle_ai && shasum -c /tmp/kneel.sha` | every line `OK` |
-| G5 | `python3 -I assets-src/gen/kneel_tools.py pages` | every page <= 2048x2048; pages <= 12; act-1 group <= 2 pages; K-anchor fields identical to base |
-| G6 | `python3 -I assets-src/gen/kneel_tools.py party-diff --base <K0 commit>` | `12 rows x 14 old columns identical`; atlas width 18 x 160 = 2880 |
-| G7 | `git diff --stat <base> -- assets/sprites/characters* assets/sprites/colossus*` | empty (field and colossus atlases untouched) |
+| G5 | `python3 -I assets-src/gen/kneel_tools.py pages --base 0162f38` | every page <= 2048x2048; <= 12 pages; `preload` = the act-1 pages (<= 2); K-anchor fields identical |
+| G6 | `python3 -I assets-src/gen/kneel_tools.py party-diff --base 0162f38` | `12 rows x 14 old columns identical; width 2880` |
+| G7 | `git diff --stat 0162f38 -- assets/sprites/characters* assets/sprites/colossus*` | empty |
 | G8 | `python3 -I assets-src/gen/selftest.py` | last line `ALL PASSED` |
 | G9 | `npm run build` | exit 0 |
-| G10 | `npm test` | 0 failed; test count >= 4962 + the new tests |
-| G11 | `git status --short` | no scratch files (scratch stays under `/tmp`) |
-| G12 | grep of the pass's diffs for Gemini / Bedrock calls; `assets-src/gen/cache/ledger.jsonl` and `bedrock_ledger.jsonl` unchanged | no change (0 paid images) |
+| G10 | `npm test` | `Test Files` all passed; `Tests` all passed, **>= 5012** (baseline 4962 + at least 50 new in K1). The K1 count is recorded in section 13 as the floor for every later gate. |
+| G11 | `git status --short` | no scratch files |
+| G12 | `git diff --stat 0162f38 -- assets-src/gen/cache/ledger.jsonl assets-src/gen/cache/bedrock_ledger.jsonl` and `git diff 0162f38 -U0 -- assets-src src \| grep -cE '^\+.*(gemini\|bedrock\.invoke\|generate\.py)'` | empty, and `0` |
 
-**K4 acceptance** (beyond G1-G12):
+**K4 play test** (`?mute=1` always; 0 console errors; screenshots in `/tmp/kneel/k4_<scenario>_<n>.png`).
 
-- browser play test (`?mute=1` always) of `kneel_all` (all 12 classes: 6 weak, 6 asleep / stunned, against one
-  enemy per body type, slept / stunned);
-- `?scenario=anim_status`, `f_status_combo`, `chaos_forms`, `chaos_final` and `?bestiary=goblin`;
-- 0 console errors; screenshots in `/tmp/kneel/k4_*.png`;
-- an adversarial checklist: stone over a kneel, wake mid-in, a heal across 25 % mid-out, a KO from a kneel, victory
-  with a weak member and a sleeper, fear plus weak, and a colossus slept (no pose, no error).
+Formations, checked by `formationFits` in a scenario test:
 
-Docs to update in K4:
+- **`kneel_grounded`:** `[goblin, wolf, cockatrice, scorpion, green_slime, soldier]` (biped, quadruped, bird,
+  arthropod, blob, mechanical) with `enemyStatus {0: [sleep], 1: [poison], 2: [stun], 3: [poison], 4: [sleep],
+  5: [stun]}`.
+- **`kneel_other`:** `[ghost, cobra, shark, ochu, water_naga]` (floating, serpent, swimmer, rooted, naga) with
+  `{0: [poison], 1: [sleep], 2: [stun], 3: [poison], 4: [sleep]}`.
 
-- AGENTS.md: the Art & Audio "Monster animation" bullets (kneel frames, opt-in, K-checks, `kneel_tools.py`), the
-  pipeline table rows battle_ai / monsters_ai (columns, pages and their measured sizes), Key Interfaces (the
-  posture `daze` is the kneel; hero weak rule), the debug keys (`?kneel=`), and the scenario families (`kneel_*`);
+Scenarios. In every one, member 1 is weak, member 2 poisoned, member 3 asleep and member 4 stunned.
+
+| Scenario | Party | Formation | Screenshot 1 (start) must show | Screenshot 2 must show |
+|---|---|---|---|---|
+| `kneel_k4_armour` | warrior knight thief ninja | kneel_grounded | 4 heroes and 6 enemies kneeling, no `in` playing; zzz / stars / bubbles on the kneeling heads | the poisoned wolf mid-attack standing, then (shot 3) kneeling again after its poison line |
+| `kneel_k4_light` | monk master red_mage black_mage | kneel_other | 4 heroes and 5 enemies kneeling; floaters (ghost, shark) sunk; icons on the sunk heads | the weak monk attacking standing (the rise), the active arrow at the kneeling head during its command input |
+| `kneel_k4_robed` | white_mage black_wizard red_wizard white_wizard | kneel_grounded | 4 robed heroes kneeling, each distinct from `down` | after a CURE on white_mage above 25 % HP: it stands; after victory, weak / poisoned heroes in `victory`, the sleeper and the stunned hero still kneeling |
+
+Also, with no console errors:
+
+- `?scenario=anim_status`, `f_status_combo`, `chaos_forms`, `chaos_final` (a slept colossus: no pose, no error);
+- `?bestiary=goblin`;
+- an adversarial checklist: stone over a kneel, a wake mid-`in`, a heal across 25 % mid-`out`, a KO from a kneel, a
+  revive into weak, a retry with a weak member, poison plus fear.
+
+**Docs to update in K4:**
+
+- AGENTS.md:
+  - the "Monster animation" bullets: kneel frames, opt-in, K-checks, `kneel_tools.py`, `puppet_kneel.py`;
+  - the battle_ai / monsters_ai pipeline rows (columns, measured pages, `preload`);
+  - Key Interfaces: postures `daze` / `kneel`, the hero weak rule, additive fear;
+  - the debug keys `?kneel=`;
+  - the `kneel_*` scenario family;
 - `docs/ENEMY_ANIM_PLAN.md` 3.1 / 3.2 / 5.1 (pointer to this plan);
-- `docs/FEEDBACK_PLAN_2026-11-14.md` item 5a (superseded by pass K);
+- `docs/FEEDBACK_PLAN_2026-11-14.md` item 5a (superseded);
 - `assets-src/gen/README.md`;
 - `docs/PROGRESS.md`;
 - the stale `LATE_FRAMES` comment.
@@ -391,42 +551,46 @@ Docs to update in K4:
 
 | Risk | Mitigation |
 |---|---|
-| Large leg rotations look broken in pixel art (90 deg thighs) | rotsprite sampler for > 30 deg parts; keyframe paint <= 160 px on `kneel` only; hero variant B uses approved folded pixels; the pilot exists to judge this |
-| A hero kneel reads like `down` (the KO slump is kneel-height) | K-height lower bound `H_down + 4`; head-up / weapon-held targets; U1 judges warrior and white_mage side by side with `down` |
-| The robe squash smears the white_mage's zigzag hem | variant B (the `down` hem) offered at U1 |
-| The atlas grows to 12 pages / +31.5 MB if every page loads; act-1 needs 2 pages | measured in section 1; G5 cap; D-K6 / R4 retirement fallback (10 pages) |
-| A rollout agent edits a shared file or a lock entry | protocol rule 2; G2 rejects any changed entry |
-| A template change made after the pilot changes pilot frames | templates frozen at U1 (K3-0 adds new bodies only); G2 plus pilot locks |
-| Mechanical rigs cannot kneel within 15 deg | D-K11 squat band 0.85-0.95 |
-| File ceilings (`EnemyPoseController` 248, `AiEnemyView` 242, `puppet.py` 540) | extractions in section 6; a hook-only rule for `puppet.py` / `monster_anim.py` |
-| A rise folded into the wind-up looks rushed | `KNEEL_OUT_FRAMES` tunable in K1; U1 browser check |
+| Large leg rotations look broken (90 deg thighs) | rotsprite above 30 deg; keyframe paint <= 160 px; hero variant B; the pilot and K2-0 judge this |
+| A hero kneel reads as `down` | band lower bound `H_down + 4` (override >= `H_down + 2`); head-up / weapon-held targets; U1 compares side by side |
+| The robe squash smears the hem | variant B at U1 |
+| Atlas growth (12 pages; act-1 on 2 pages) | the act-1 preload (19.8 MB); peak +3.9 MB (section 1); R4 retirement as a fallback |
+| A risky body breaks after the rollout starts | K2-0 probes; D-K18 additive template variants with re-check; G2 |
+| The rise looks rushed inside the wind-up | `KNEEL_OUT_FRAMES` tunable in K1; `goblin_rise.gif` and screenshot 2 at U1 |
+| Poison is very common, so kneeling enemies are everywhere | that is the user's ruling R2; poison keeps its tint, so it is distinguishable from sleep |
+| File ceilings | the projections in section 6; `puppet.py` untouched |
 
 ## 12. Open questions for the user
 
-1. R1: should enemies also kneel at low HP (<= 25 %)? (default no)
-2. R2: does poison make an actor kneel? (default no)
-3. R3: hero kneel variant A (re-posed `ready`) or B (`ready` upper body over the approved `down` lower body), for
-   armoured and for robed classes; decided at U1.
-4. R4: keep `daze` / `daze_b` (12 pages) or retire them (10 pages, lock entries removed)? (default keep)
-5. R5: is exempting the Chaos colossus forms F2-F4 from the kneel acceptable? (default exempt)
-6. R6: is the atlas growth acceptable, with the act-1 group on 2 pages? (default accept)
-7. R7: hold a second user review (U2) for the new body templates, or orchestrator self-review? (default hold U2)
+1. R3: hero variant A or B, for armoured and for robed classes (decided at U1).
+2. R4: keep `daze` / `daze_b` (12 pages, wolf, skeleton, troll and vampire on page 1), or retire them (10 pages,
+   vampire and wolf still on page 1, 246 lock entries removed)? Default keep.
+3. R5: exempt the Chaos colossus forms F2-F4 from the kneel? Default exempt.
+4. R6: accept 12 pages with act-1 preloaded on pages 0 and 1 (19.8 MB, +4.5 MB) and a peak of +3.9 MB? Default
+   accept.
+5. R7: hold U2 for the new body templates, or orchestrator self-review? Default hold U2.
+
+Ruled: **R1 = no** (enemies never kneel at low HP), **R2 = yes** (poison kneels, both sides).
 
 ## 13. Rulings and tuning log
 
-(empty until U1)
+| Date | Item | Ruling / change |
+|---|---|---|
+| 2026-11-16 | R1 | no: enemies kneel only from status (user) |
+| 2026-11-16 | R2 | yes: poison kneels, heroes and enemies; acting kneelers rise to act (user) |
 
 ## TODOs
 
-- [ ] K1a `kneel_templates.py` (biped, quadruped), `kneel.py`, recipes, hooks, K-checks, lock extension (high, 8h)
-- [ ] K1b `puppet_kneel.py` variants A / B, `battle.down` joints for warrior and white_mage, hero lock (high, 5h)
-- [ ] K1c TS: `kneelChoreography.ts`, `partyPose.ts`, `enemyPoseTypes.ts` extraction, frame tables, atlas readers, `kneelPreview.ts`, bestiary (high, 7h)
-- [ ] K1d `kneel_review.py`, `kneel_tools.py`, `selftest_kneel.py`, TS tests (high, 5h)
-- [ ] K1e pilot rigs and locks for goblin, wolf, warrior, white_mage; `kneel_pilot` scenario; artefacts; G1-G12 (high, 4h)
+- [ ] K1a kneel templates (biped, quadruped), `kneel.py`, recipes, hooks, K-checks, lock extension (high, 8h)
+- [ ] K1b `puppet_kneel.py` (A / B, `down` joints, rotsprite, CLI, locks) for warrior and white_mage (high, 6h)
+- [ ] K1c TS: `kneelChoreography`, `partyPose`, `enemyPoseTypes`, the D-K3 enemy rise, posture `kneel` / rank / `trembles`, preload, arrow, preview, bestiary (high, 9h)
+- [ ] K1d `kneel_review.py`, `kneel_tools.py`, `selftest_kneel.py`, TS tests >= 50 (high, 6h)
+- [ ] K1e pilot rigs, locks, `kneel_pilot`, atlases committed, artefacts, G1-G12 (high, 4h)
 - [ ] U1 user review; rulings into section 13 (blocking)
-- [ ] K2-A / B / C / D rollout, 85 sprites and classes in 4 worktrees (medium, about 10h per agent)
-- [ ] K2 integrator atlas commit plus G1-G12 (medium, 1h)
-- [ ] K3-0 six new body templates plus 8 probes; U2 (high, 8h)
-- [ ] K3-A / B / C rollout, 38 sprites (medium, about 6h per agent)
-- [ ] K3 integrator atlas commit plus G1-G12 (medium, 1h)
-- [ ] K4 play test, adversarial checklist, docs, final gates (high, 5h)
+- [ ] K2-0 probes iron_golem, blue_dragon, hydra, garland; template variants; orchestrator review (high, 6h)
+- [ ] K2-A / B / C / D: 81 sprites and classes in 4 worktrees (medium, about 9h each)
+- [ ] K2 integrator: atlases plus G1-G12 (medium, 1h)
+- [ ] K3-0: 6 new templates plus 8 probes; U2 (high, 8h)
+- [ ] K3-A / B / C: 38 sprites (medium, about 6h each)
+- [ ] K3 integrator: atlases plus G1-G12 (medium, 1h)
+- [ ] K4: scenarios, play test, adversarial checklist, docs, final gates (high, 6h)
