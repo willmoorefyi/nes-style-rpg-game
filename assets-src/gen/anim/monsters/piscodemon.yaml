@@ -73,6 +73,10 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
+  kneel_in1:
+    tweaks: {foot_f: [0, 1], toe_f: [0, 1]}
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], toe_f: [0, 1]}
   atk_wind1:                   # half of wind2: head and tentacles drawn back and up 1, the claw pulled in 2, body sinks 1
     moves: []
     dy: 1
@@ -122,18 +126,35 @@ masks:
     hurt: [[22, 70], [40, 70], [40, 78], [22, 78]]
 holds: []
 paint:
-  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
-  - {frame: kneel_in1, xy: [[27, 39], [57, 39], [27, 40], [55, 40], [56, 40], [55, 41], [56, 41], [57, 41], [55, 42], [56, 42], [57, 42], [55, 43], [56, 43], [55, 44], [54, 45], [55, 45], [56, 45], [55, 46], [56, 46], [55, 47], [54, 50], [53, 51], [48, 52], [47, 53], [49, 53]], rgb: [6, 4, 10]}
+  # pass K (K2-B): kneel frames: the eye glow dimmed in steps (kneel_in1, kneel_in2, then the key), 1 px cracks and pockets closed, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[45, 24], [46, 24], [46, 25], [47, 25], [48, 25], [55, 26], [54, 27]], rgb: [107, 115, 107]}
+  - {frame: kneel_in1, xy: [[27, 39], [56, 39], [27, 40], [50, 52], [47, 53], [50, 53], [27, 70]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[57, 39], [56, 40], [56, 41], [57, 41], [56, 42], [57, 42], [56, 43]], rgb: [66, 82, 82]}
+  - {frame: kneel_in1, xy: [[55, 43], [55, 44], [55, 45], [56, 45], [56, 46]], rgb: [99, 140, 132]}
   - {frame: kneel_in1, xy: [[24, 47]], rgb: [107, 115, 107]}
-  - {frame: kneel_in2, xy: [[53, 45], [52, 46], [53, 46], [54, 46], [52, 47], [54, 47], [51, 48], [52, 48], [53, 48], [54, 48], [51, 49], [53, 49], [51, 50], [52, 50], [53, 50], [52, 51], [51, 52], [40, 53], [47, 53], [51, 53], [44, 56], [53, 47], [52, 49], [45, 64], [44, 65], [45, 65], [44, 67]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[42, 51], [47, 51], [41, 52], [47, 52], [41, 53]], rgb: [99, 140, 132]}
-  - {frame: kneel_in2, xy: [[46, 53], [46, 54]], rgb: [66, 99, 99]}
-  - {frame: kneel_in2, xy: [[54, 55]], rgb: [41, 66, 74]}
-  - {frame: kneel_in2, xy: [[49, 56], [49, 57], [49, 58]], rgb: [33, 41, 57]}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs); head bowed, the far shin flat behind; shoulders slumped
+  - {frame: kneel_in1, xy: [[49, 53]], rgb: [66, 99, 99]}
+  - {frame: kneel_in1, xy: [[54, 15], [56, 21], [21, 33], [20, 36], [58, 43], [25, 48], [25, 49], [63, 50], [24, 51], [48, 54]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[45, 28], [46, 28], [46, 29], [47, 30], [48, 30], [53, 31], [54, 31]], rgb: [66, 82, 82]}
+  - {frame: kneel_in2, xy: [[53, 49]], rgb: [66, 99, 99]}
+  - {frame: kneel_in2, xy: [[43, 53]], rgb: [99, 140, 132]}
+  - {frame: kneel_in2, xy: [[48, 53], [25, 59]], rgb: [66, 82, 82]}
+  - {frame: kneel_in2, xy: [[54, 55], [35, 62], [36, 62], [34, 63]], rgb: [41, 66, 74]}
+  - {frame: kneel_in2, xy: [[26, 58], [49, 61], [25, 61]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[35, 63]], rgb: [41, 66, 74]}
+  - {frame: kneel_in2, xy: [[36, 63]], rgb: [33, 41, 57]}
+  - {frame: kneel_in2, xy: [[35, 64], [41, 62], [45, 64], [44, 65], [45, 65], [44, 67]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[34, 63], [35, 62]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[17, 76], [20, 76], [22, 76]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed, tentacles hanging; the eyes dim in steps to the kneel
 kneel:
   variant: [knee_forward, short_legs]
-  tweaks: {crown: [2, 3], foot_f: [3, 2], toe_f: [3, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  tweaks: {knee_f: [14, 2], foot_f: [14, 1], toe_f: [14, 0], sh_n: [0, 2], sh_f: [0, 2]}
   paint:
-    - {xy: [[37, 55], [38, 55], [43, 55], [36, 56], [37, 56], [43, 56], [42, 57], [43, 57], [47, 57], [16, 62], [14, 64]], rgb: [6, 4, 10]}
-    - {xy: [[56, 27], [55, 33], [19, 39], [18, 42], [21, 54], [53, 55], [20, 56], [50, 56], [48, 58]], rgb: [6, 4, 10]}
+    - {xy: [[41, 55]], rgb: [6, 4, 10]}
+    - {xy: [[46, 55], [46, 56], [46, 57], [47, 57]], rgb: [66, 82, 82]}
+    - {xy: [[41, 56]], rgb: [41, 66, 74]}
+    - {xy: [[45, 57]], rgb: [99, 140, 132]}
+    - {xy: [[54, 25], [55, 31], [19, 39], [18, 42], [21, 54], [53, 55], [20, 56], [40, 57]], rgb: [6, 4, 10]}
+    - {xy: [[31, 75], [32, 76], [34, 76]], rgb: [6, 4, 10]}
+    - {xy: [[55, 63], [35, 64], [38, 64], [39, 65], [42, 65]], rgb: [6, 4, 10]}
+    - {xy: [[44, 32], [45, 32], [45, 33], [46, 34], [47, 34], [52, 36], [53, 36]], rgb: [41, 66, 74]}
