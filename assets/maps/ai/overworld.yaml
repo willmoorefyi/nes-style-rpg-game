@@ -886,5 +886,5 @@ patches:
   - [61, 92]
   terrain: 2
 build:
-  compiler: 8df97f91433aaab9
+  compiler: 5be1e6592dc4f9bf
   boxes: {a1: 568fd4b0db8a3f6f, elf: 5578958ab1bf2be0, earth: bd0fd56bb2fda23d, fire: bfa62cdd41ce354f, ordeal: 86cd7d11affafbeb, water: 453a16763738cf49, wind: 2314338d476a5a41}
