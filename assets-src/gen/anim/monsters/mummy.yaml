@@ -92,6 +92,8 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], toe_f: [0, 2]}
   atk_wind1:                   # half of wind2
     moves: []
     tweaks: {crown: [-1, 0], neck: [-1, 0], el_n: [-1, 0], hand_n: [-2, 0]}
@@ -150,3 +152,19 @@ paint:                         # 1 px crack inside the mid streamer root, closed
   - {frame: daze_b, xy: [[31, 36], [32, 36], [36, 36], [30, 37], [34, 37], [37, 37], [30, 38], [34, 38]], rgb: [148, 132, 107]}
   - {frame: daze_b, xy: [[31, 37]], rgb: [198, 181, 156]}
   - {frame: daze_b, xy: [[31, 39], [32, 39], [34, 39]], rgb: [115, 90, 90]}
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[33, 38]], rgb: [198, 181, 156]}
+  - {frame: kneel_in1, xy: [[27, 43]], rgb: [66, 57, 66]}
+  - {frame: kneel_in1, xy: [[16, 62], [17, 62], [15, 63], [16, 63], [17, 63], [17, 64]], rgb: [115, 90, 90]}
+  - {frame: kneel_in1, xy: [[14, 64], [15, 64], [16, 64], [12, 65], [15, 65], [41, 60], [39, 62], [44, 62]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[31, 61], [32, 61], [32, 62], [18, 63], [30, 63], [31, 63], [32, 63], [30, 64], [31, 64], [30, 65]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[12, 76], [13, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[40, 47]], rgb: [148, 132, 107]}
+  - {frame: kneel_in2, xy: [[40, 48], [40, 49], [40, 50], [42, 52]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[41, 51]], rgb: [132, 115, 99]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); the far shin flat behind; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [0, 1], foot_f: [6, 2], toe_f: [6, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[29, 46], [29, 47], [30, 47], [29, 48], [30, 48], [37, 53], [37, 56], [12, 62]], rgb: [6, 4, 10]}
