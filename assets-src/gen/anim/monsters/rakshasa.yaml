@@ -131,28 +131,28 @@ masks:
 holds: []
 paint:
   # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
-  - {frame: kneel_in1, xy: [[35, 37]], rgb: [222, 206, 189]}
-  - {frame: kneel_in1, xy: [[31, 38], [47, 46], [48, 47], [49, 47]], rgb: [239, 165, 82]}
-  - {frame: kneel_in1, xy: [[32, 38]], rgb: [173, 33, 16]}
-  - {frame: kneel_in1, xy: [[47, 38], [47, 39]], rgb: [140, 16, 33]}
-  - {frame: kneel_in1, xy: [[45, 41], [40, 60], [40, 61], [39, 63], [39, 64]], rgb: [57, 16, 24]}
-  - {frame: kneel_in1, xy: [[46, 41], [45, 42], [46, 42], [46, 44], [50, 48]], rgb: [6, 4, 10]}
-  - {frame: kneel_in1, xy: [[45, 43], [46, 43], [46, 45]], rgb: [156, 82, 41]}
-  - {frame: kneel_in1, xy: [[47, 44]], rgb: [115, 66, 41]}
-  - {frame: kneel_in1, xy: [[47, 45], [48, 46], [49, 48]], rgb: [90, 24, 24]}
-  - {frame: kneel_in2, xy: [[43, 49], [35, 62]], rgb: [239, 165, 82]}
-  - {frame: kneel_in2, xy: [[44, 50], [46, 58], [45, 59], [36, 62], [35, 64]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[34, 20], [35, 20], [34, 21], [46, 41], [46, 42], [46, 43], [46, 44], [47, 44], [47, 45], [47, 46], [48, 46], [48, 47], [49, 47], [49, 48]], rgb: [239, 165, 82]}
+  - {frame: kneel_in1, xy: [[35, 37], [32, 38], [45, 43], [46, 45]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[31, 38], [45, 42]], rgb: [90, 24, 24]}
+  - {frame: kneel_in1, xy: [[47, 38], [47, 39], [45, 41]], rgb: [57, 16, 24]}
+  - {frame: kneel_in1, xy: [[50, 48]], rgb: [189, 16, 41]}
+  - {frame: kneel_in1, xy: [[40, 60], [40, 61], [39, 63], [39, 64]], rgb: [140, 16, 33]}
+  - {frame: kneel_in2, xy: [[41, 31]], rgb: [90, 24, 24]}
+  - {frame: kneel_in2, xy: [[43, 49], [37, 59], [35, 62]], rgb: [239, 165, 82]}
+  - {frame: kneel_in2, xy: [[44, 50], [46, 58], [45, 59]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[26, 77], [27, 77]], rgb: null}
   - {frame: kneel_b, xy: [[48, 56]], rgb: [140, 99, 74]}
-  - {frame: kneel_b, xy: [[24, 77], [25, 77], [26, 77]], rgb: null}
-  - {frame: kneel_b, xy: [[25, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[17, 59]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[25, 77]], rgb: null}
 # pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); the robe pooled, head bowed, shoulders dropped
 kneel:
   variant: [knee_forward, short_legs, deep_bow]
-  tweaks: {knee_f: [14, 0], foot_f: [14, 0], toe_f: [14, 0], sh_n: [0, 3], sh_f: [0, 3], neck: [0, 3], crown: [0, 3]}
+  tweaks: {knee_f: [14, 0], foot_f: [18, 0], toe_f: [18, 0], sh_n: [0, 3], sh_f: [0, 3], neck: [0, 6], crown: [0, 6]}
   paint:
-    - {xy: [[30, 45], [19, 56], [20, 56], [19, 57], [20, 57], [21, 57], [22, 57], [25, 76], [21, 76], [23, 76], [20, 76], [22, 76]], rgb: [6, 4, 10]}
     - {xy: [[29, 46], [30, 46]], rgb: [198, 123, 57]}
+    - {xy: [[19, 56], [20, 56], [19, 57], [20, 57], [21, 57], [22, 57], [25, 76], [21, 76], [23, 76], [20, 76], [24, 76], [22, 76]], rgb: [6, 4, 10]}
     - {xy: [[21, 56], [22, 56]], rgb: [57, 16, 24]}
-    - {xy: [[23, 57], [24, 58]], rgb: [189, 16, 41]}
-    - {xy: [[20, 77], [21, 77], [22, 77], [23, 77], [25, 77]], rgb: null}
-    - {xy: [[44, 24], [46, 25], [34, 29], [49, 30], [45, 38], [17, 42], [49, 49], [21, 51]], rgb: [6, 4, 10]}
+    - {xy: [[23, 57], [23, 58], [24, 58]], rgb: [189, 16, 41]}
+    - {xy: [[20, 77], [21, 77], [22, 77], [23, 77], [24, 77], [25, 77], [24, 78]], rgb: null}
+    - {xy: [[20, 76], [21, 76], [22, 76], [23, 76]], rgb: [6, 4, 10]}
+    - {xy: [[20, 75], [21, 75], [22, 75], [23, 75], [25, 75], [53, 73], [54, 73], [56, 73]], rgb: [6, 4, 10]}

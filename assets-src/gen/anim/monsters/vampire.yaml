@@ -148,9 +148,11 @@ masks:
     hurt: [[12, 68], [26, 68], [26, 77], [12, 77]]
 holds: []
 paint:
-  # pass K (K2-B): kneel frames: the eye glow dimmed in steps (kneel_in1, kneel_in2, then the key), 1 px cracks and pockets closed, pixels below the feet row cleared
-  - {frame: kneel_in1, xy: [[40, 19], [41, 19], [41, 20], [42, 20], [42, 21], [48, 21], [49, 22]], rgb: [123, 16, 49]}
-  - {frame: kneel_in2, xy: [[42, 27], [43, 27], [42, 28], [43, 28], [44, 28], [50, 31]], rgb: [82, 16, 41]}
+  # pass K (K2-B): kneel frames: the eye glow dimmed in steps (kneel_in1, kneel_in2, then the key), cracks and pockets closed in the body colour, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[41, 19], [42, 19], [42, 20], [43, 20], [48, 22], [49, 22]], rgb: [123, 16, 49]}
+  - {frame: kneel_in2, xy: [[42, 29], [43, 29], [42, 30], [43, 30], [44, 30], [50, 33]], rgb: [82, 16, 41]}
+  - {frame: kneel_in1, xy: [[51, 29], [52, 29], [53, 29], [50, 30], [51, 30], [53, 30], [51, 31], [52, 31], [53, 31], [52, 32], [52, 33], [52, 30]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[54, 30]], rgb: [115, 140, 148]}
   - {frame: kneel_in1, xy: [[28, 77], [30, 77]], rgb: null}
   - {frame: kneel_in2, xy: [[60, 42]], rgb: [222, 198, 206]}
   - {frame: kneel_in2, xy: [[25, 77], [26, 77], [27, 77], [28, 77], [27, 78]], rgb: null}
@@ -160,10 +162,9 @@ paint:
 # pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); the upper body sunk 3 px more between the short legs, face bowed; the cape full width, its hem on the ground; the eyes dim in steps to the kneel
 kneel:
   variant: [knee_forward, short_legs, deep_bow]
-  tweaks: {knee_f: [16, 0], foot_f: [16, 0], toe_f: [16, 0], sh_n: [0, 5], sh_f: [0, 5], chest: [0, 3], neck: [0, 5], el_n: [0, 3], el_f: [0, 3], hand_n: [0, 3], hand_f: [0, 3], crown: [0, 5]}
+  tweaks: {knee_f: [16, 0], foot_f: [16, 0], toe_f: [16, 0], sh_n: [0, 5], sh_f: [0, 5], chest: [0, 3], neck: [0, 7], el_n: [0, 3], el_f: [0, 3], hand_n: [0, 3], hand_f: [0, 3], crown: [0, 7]}
   paint:
-    - {xy: [[50, 44], [51, 44], [40, 76], [23, 76], [42, 76], [26, 76], [43, 76], [21, 76], [38, 76], [22, 76], [39, 76], [41, 76], [20, 76]], rgb: [6, 4, 10]}
-    - {xy: [[52, 44], [51, 45], [52, 45]], rgb: [222, 198, 206]}
     - {xy: [[16, 77], [17, 77], [18, 77], [19, 77], [20, 77], [21, 77], [22, 77], [23, 77], [24, 77], [25, 77], [26, 77], [27, 77], [28, 77], [29, 77], [30, 77], [31, 77], [32, 77], [33, 77], [34, 77], [35, 77], [36, 77], [37, 77], [38, 77], [39, 77], [40, 77], [41, 77], [42, 77], [43, 77], [44, 77], [45, 77], [19, 78], [20, 78], [21, 78], [22, 78], [23, 78], [24, 78], [25, 78], [26, 78], [27, 78], [28, 78], [29, 78], [30, 78], [31, 78], [32, 78], [33, 78], [34, 78], [35, 78], [36, 78], [37, 78], [38, 78], [39, 78], [40, 78], [41, 78], [42, 78], [43, 78], [44, 78], [22, 79], [23, 79], [24, 79], [25, 79], [26, 79], [27, 79], [28, 79], [29, 79], [30, 79], [31, 79], [32, 79], [33, 79], [34, 79], [35, 79], [36, 79], [37, 79], [38, 79], [39, 79], [40, 79], [41, 79], [42, 79], [43, 79], [44, 79], [45, 79]], rgb: null}
-    - {xy: [[53, 68], [54, 68], [52, 68], [63, 51], [59, 52], [39, 25], [56, 46]], rgb: [6, 4, 10]}
-    - {xy: [[44, 31], [45, 31], [44, 32], [45, 32], [46, 32], [51, 36]], rgb: [57, 8, 41]}
+    - {xy: [[40, 76], [23, 76], [42, 76], [26, 76], [43, 76], [21, 76], [38, 76], [22, 76], [39, 76], [41, 76], [20, 76]], rgb: [6, 4, 10]}
+    - {xy: [[52, 68], [53, 68], [54, 68], [57, 53], [58, 52], [59, 52], [63, 51]], rgb: [6, 4, 10]}
+    - {xy: [[44, 33], [45, 33], [44, 34], [45, 34], [46, 34], [51, 38]], rgb: [57, 8, 41]}
