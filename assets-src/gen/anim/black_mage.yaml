@@ -25,3 +25,8 @@ tweaks:
   atk_mid: {el_n: [2, 0]}
   atk_follow: {sh_n: [0, -2]}
   cast_gather: {el_n: [0, -2], el_f: [-1, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
+# sy 0.55, head bow in deg, both hands kept; reoutline: the 2 px outline the squash exposes re-inked
+# (puppet_kneel_outline.py).
+# The head (hat) 2 px lower for the band.
+kneel: {bow: 10, arms: [], reoutline: true, tweaks: {neck: [0, 2], crown: [0, 2]}}

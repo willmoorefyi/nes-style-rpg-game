@@ -29,3 +29,8 @@ tweaks:
   cast_rise: {neck: [0.5, 0.5], crown: [0.5, 0.5], chest: [0.5, 0], hip: [0.5, 0], sh_n: [0, -0.5], sh_f: [-0.5, 1],
               el_f: [-3, 1], hand_f: [3, 1], hip_n: [0, -1], hip_f: [0.5, -1], knee_n: [2, 0], knee_f: [-1.5, 0],
               foot_n: [1.5, 0.5], foot_f: [-2, -0.5]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; reoutline: the 2 px outline re-inked at the class's own thickness
+# (puppet_kneel_outline.py).
+# The head 2 px lower (neck / crown tweak) for the band.
+kneel: {lean: 8, bow: 12, arms: [n], reoutline: true, tweaks: {neck: [0, 2], crown: [0, 2]}}

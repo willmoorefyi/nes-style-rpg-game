@@ -28,3 +28,9 @@ tweaks:
   atk_follow: {neck: [0, 0.5], crown: [0, 0.5], chest: [0, 0.5], hip: [0, 0.5], sh_n: [0.5, 0], sh_f: [0, 0.5], hip_n: [0.5, 0.5], hip_f: [0.5, 0.5]}
   cast_gather: {el_n: [-1, -2], el_f: [2, -2], hand_f: [3, -2], hip_n: [0, -1], hip_f: [0, -1]}
   cast_rise: {crown: [0.5, 0], chest: [0, 1], hip: [0, 0.5], sh_n: [0.5, 0.5], el_n: [0.5, -2], hand_n: [0.5, 6], sh_f: [-1.5, 1], knee_n: [-0.5, 1], knee_f: [-0.5, 1], foot_n: [-3, 1], foot_f: [-4.5, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; reoutline: the 2 px outline re-inked at the class's own thickness
+# (puppet_kneel_outline.py).
+# per_leg_lift, ground_tweens and foot_n 3 px down keep the planted front foot on the ground row in every frame.
+kneel: {lean: 8, bow: 12, arms: [n], reoutline: true, per_leg_lift: true, ground_tweens: true,
+        tweaks: {foot_n: [0, 3]}}

@@ -103,7 +103,9 @@ def run(check) -> None:
     check(PK.default_band(68, 44) == (49, 59) and PK.default_band(66, 51) == (55, 58),
           "plan section 4 bands: warrior 49-59, white_mage 55-58")
     # opt-in and the old columns
-    check(PK.kneel_frames("knight") == {}, "opt-in: a class without a kneel block gets no kneel frames")
+    unopted = [c for c in sorted(p.stem for p in PU.ANIM.glob("*.yaml")) if not (PU.load_cfg(c) or {}).get("kneel")]
+    check(PK.kneel_frames(unopted[0] if unopted else "no_such_class") == {},
+          "opt-in: a class without a kneel block gets no kneel frames")
     real = PU.load_cfg("warrior")
     if real and real.get("kneel"):
         plain = copy.deepcopy(real)
@@ -112,3 +114,5 @@ def run(check) -> None:
         check(sorted(a) == sorted(b) and all(np.array_equal(np.asarray(a[n]), np.asarray(b[n])) for n in a),
               "warrior: the puppet in-betweens are byte-identical with and without the kneel block")
         check(not PK.old_columns("warrior"), "warrior: the 14 committed atlas columns are identical")
+    from gen.puppet_kneel_selftest_opts import run as run_opts
+    run_opts(check, puppet, BOTTOM)

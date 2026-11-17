@@ -27,3 +27,8 @@ tweaks:
   atk_follow: {neck: [-0.5, 0], crown: [-0.75, 0.25], chest: [-0.25, 0.25], hip: [0.5, -0.25], sh_n: [0, 0.5], sh_f: [0, -0.25], el_f: [1.75, -1.25], hand_f: [0, -0.75], hip_n: [0.75, 0], knee_n: [0.25, 0], foot_n: [-1, 0], hip_f: [0.25, 0], knee_f: [1, 0.25], foot_f: [2.5, -0.75]}
   cast_gather: {hip_n: [0, -1], hip_f: [0, -1]}
   cast_rise: {neck: [1, 0], crown: [1, 0], chest: [0.5, 0.5], hip: [0.5, 0.5], sh_n: [0.5, 0.5], el_n: [-2.54, -4.58], hand_n: [-4.82, -1.83], sh_f: [1, 0.5], el_f: [3, -1.5], hand_f: [5, 1.5], hip_n: [0.5, 1], knee_n: [2, 1], foot_n: [2, 1], hip_f: [1, 1], knee_f: [-0.5, 1], foot_f: [-1, 1]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; reoutline: the 2 px outline re-inked at the class's own thickness
+# (puppet_kneel_outline.py).
+# per_leg_lift: the planted front foot is not lifted with the back leg.
+kneel: {lean: 8, bow: 12, arms: [n], reoutline: true, per_leg_lift: true}

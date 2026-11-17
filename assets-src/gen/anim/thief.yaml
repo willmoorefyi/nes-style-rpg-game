@@ -27,3 +27,7 @@ tweaks:
   atk_mid: {neck: [-1.8, 0.9], crown: [-1.8, 0.9], chest: [0, 0.45], hip: [0, -0.9], sh_n: [-1.35, 0.45], el_n: [-7.32, -0.58], hand_n: [-8.28, 2.77], sh_f: [-1.8, 0], el_f: [0.9, -3.6], hand_f: [4.5, 0.9], hip_n: [0, -0.9], knee_n: [0.9, -0.9], foot_n: [2.25, 0], hip_f: [0.9, 0], knee_f: [3.15, 0], foot_f: [4.95, 0], tip: [-7.06, 8.26]}
   atk_follow: {neck: [-0.5, 0], crown: [-0.5, 0], chest: [0.5, -0.25], hip: [0.5, -1], sh_n: [-0.25, -0.25], sh_f: [-0.5, -0.5], el_f: [1, -2.5], hand_f: [3, 0], hip_n: [0.5, -1], knee_n: [0.5, -1], foot_n: [1.25, -1], hip_f: [1, -0.5], knee_f: [2, -0.5], foot_f: [2.75, -1]}
   cast_rise: {neck: [0, 0.5], crown: [0.5, -1], chest: [0, 0.5], hip: [-0.5, -1], sh_n: [0.5, -0.5], el_n: [-4.46, -4.73], hand_n: [-6.4, -4.63], sh_f: [-2.5, 1], el_f: [-3, 0], hand_f: [5.5, 2.5], hip_n: [-0.5, 0], knee_n: [1, 1], foot_f: [-2.5, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; reoutline: the 2 px outline re-inked at the class's own thickness
+# (puppet_kneel_outline.py).
+kneel: {lean: 8, bow: 12, arms: [n], reoutline: true}

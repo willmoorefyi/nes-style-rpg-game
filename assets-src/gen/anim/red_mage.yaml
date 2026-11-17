@@ -21,3 +21,8 @@ tweaks:
   atk_mid: {sh_n: [0, -3], el_f: [1, 0], el_n: [2, 0]}
   cast_gather: {el_n: [-2, 0], hand_n: [0, 1], el_f: [-2, 0]}
   cast_rise: {sh_n: [0, 2], el_n: [0, -2], hand_n: [0, -1], crown: [-1, 0], neck: [0, 2], el_f: [2, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
+# bow in deg, the near fist lowered; reoutline: the 2 px outline re-inked at the class's own thickness
+# (puppet_kneel_outline.py).
+# No bow (a bowed head lifts the hat feather) and the head 4 px lower (neck / crown tweak) for the band.
+kneel: {lean: 8, bow: 0, arms: [n], reoutline: true, tweaks: {neck: [0, 4], crown: [0, 4]}}
