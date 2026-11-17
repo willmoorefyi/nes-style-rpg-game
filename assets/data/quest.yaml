@@ -48,10 +48,10 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    walk: [overworld:npc:bridge_worker_w]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   - id: S3
     title: "Matoya's cave (visit)"
     tranche: A1-O
@@ -59,15 +59,18 @@ stages:
     requires: {flags: [BRIDGE_BUILT], items: [], vehicles: []}
     grants: {flags: [], items: [], vehicles: []}
     boss: []
-    band: [3, 6]
+    # A1-O: low 2, not 3 (WORLD 3.2): the grove opens straight off the bridge (S1, band 2-3); a visit has no event
+    # the curve model could walk to, so --stage S3 sees the S1 level
+    band: [2, 6]
     kit: w_s3
     maps: [matoya-cave]
     zones: [overworld:a1_mainland]
     grind: 2.0
     walk: []
+    entry: {map: overworld, x: 93, y: 92}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   - id: S7
     title: "Matoya's herb"
     tranche: A1-O
@@ -80,10 +83,11 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    walk: [matoya-cave:npc:matoya]
+    entry: {map: overworld, x: 74, y: 76}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end A1-O ===
   # === A1-T (pass W: owned by A1-T) ===
   - id: S2
@@ -116,10 +120,15 @@ stages:
     maps: [western-keep-*]
     zones: [overworld:elf_keep_moor]
     grind: 2.0
-    walk: []
+    # the crown trade (it sets ELF_O_CROWN_GIVEN and pays an Ether), then the fight it opens; the cutscene gives the eye
+    walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
+    entry: {map: overworld, x: 60, y: 125}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-6 and the generic NPC elements at Astos's cell: MARSH_GUARD_DEFEATED is redundant with the crown, which only
+      # the Marsh Cave guard's victory gives (D-W14); his hideIf only clears the beaten boss off the dais
+      - {map: western-keep-2f, kind: npc, at: [14, 7], reason: "the crown, which Astos also requires, is given only by the guard's victory (D-W14); hideIf only clears the beaten boss off his dais"}
+    status: built
   # === end ELF-O ===
   # === ELF-T (pass W: owned by ELF-T) ===
   - id: S4
@@ -202,10 +211,13 @@ stages:
     maps: [dwarf-hall]
     zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
     grind: 2.0
-    walk: []
+    # on foot at the hall's mouth, the ship moored at the dwarves' landing cove (the `ert_dwarf` dock)
+    entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
+    walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      - {map: overworld, kind: dock, at: [59, 104], reason: "the dwarf hall is also reachable on foot from Elfland over seam_n"}
+    status: built
   - id: S12
     title: "The giant's tunnel and Sarda"
     tranche: ERT-O
@@ -218,10 +230,14 @@ stages:
     maps: [giant-tunnel, sage-cave]
     zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
     grind: 2.0
-    walk: []
+    # on foot at the tunnel's east mouth, the ship moored at Melmond's harbour (the `ert_melmond` dock)
+    entry: {map: overworld, x: 28, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    walk: [overworld:warp:giant-tunnel, giant-tunnel:npc:ert_giant, giant-tunnel:warp:ert_giant_west,
+      overworld:warp:sage-cave, sage-cave:npc:ert_sarda]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      - {map: sage-cave, kind: npc, at: [7, 5], reason: "Sarda is behind the giant, who needs the ruby, which needs the vampire"}
+    status: built
   - id: S31
     title: "Excalibur"
     tranche: ERT-O
@@ -234,6 +250,8 @@ stages:
     maps: []
     zones: []
     grind: 1.0
+    # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge);
+    # pending until WND-D2 builds the sky castle's adamant (S28 does not grant it yet)
     walk: []
     basins: {}
     nonLoadBearing: []
@@ -492,10 +510,15 @@ stages:
     maps: [lufenia, lufenia-*]
     zones: [overworld:wnd_lufen_moor]
     grind: 2.0
-    walk: []
+    # WND-O: the assumed start is Cornelia's south gate with the airship on the grass below it (S26 needs the flight
+    # to the mesa); the ship (S2) rides at anchor off the mesa, out of reach of any shore, so no ancestor's pending
+    # dock can strand the party in assume mode
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
+                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [lufenia-house-elder:npc:lufenia_elder]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end WND-O ===
   # === WND-T (pass W: owned by WND-T) ===
   - id: S23
@@ -612,7 +635,7 @@ towns:
     opensAfter: [S2]
     bandStage: S10
     kit: w_dwarf
-    status: pending
+    status: built
   # === end ERT-O town ===
   # === ERT-T town (pass W: owned by ERT-T) ===
   - id: melmond
@@ -648,7 +671,7 @@ towns:
     opensAfter: [S25]
     bandStage: S26
     kit: w_lufenia
-    status: pending
+    status: built
   # === end WND-O town ===
   # === WND-T town (pass W: owned by WND-T) ===
   - id: gaia

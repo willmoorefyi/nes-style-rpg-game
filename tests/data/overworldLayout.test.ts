@@ -136,7 +136,9 @@ const jettyCells = (): Cell[] => {
   for (let y = py - 1; terrain(px, y) === BRIDGE; y--) cells.push([px, y]);
   return cells;
 };
-const roadComps = components(roadCell).filter((c) => !c.every(([x, y]) => terrain(x, y) === BRIDGE));   // not the far stub
+const doorCell = (c: Cell[]) => c.length === 1 && map.transitions.some((t) => t.x === c[0][0] && t.y === c[0][1]);
+// not the far stub, nor a lone door cell (the compiler makes an icon's door a road cell: A1-O's Matoya and Pravoka)
+const roadComps = components(roadCell).filter((c) => !c.every(([x, y]) => terrain(x, y) === BRIDGE) && !doorCell(c));
 
 describe('overworld layout (T3c)', () => {
   it('cornelia is the first entrance (safeSpawn falls back to it) and the entrance contract holds', () => {

@@ -121,15 +121,27 @@ TOMB_CHEST = {"id": "chest_tomb", "sprite": "chest", "x": TOMB[0] + 3, "y": TOMB
               "chestFlag": "CHEST_ERDRICK_TOMB", "dialog": ["You found an Iron Shield!"]}
 # W9: the pier's end, where the ship would wait (it needs BIKKE_DEFEATED, not in act 1)
 PIER_TEXT = ["The pier runs out into the bay. No ship calls at Cornelia while pirates rule the seas."]
-# T1: the north bridge's gate message, once the King has ordered the repair (INTRO_COMPLETE) and before
+# T1: the north bridge's gate message, once the King has ordered the repair (INTRO_COMPLETE) and before (pass W: the
+# builders are at work until the foreman lays the last span, BRIDGE_BUILT)
 GATE_MESSAGE = [{"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge, but it isn't finished yet."]},
                 {"text": ["The bridge has collapsed into the sea. Only the King's builders could repair it."]}]
-# U17: the builders the gate message names, on the south bank either side of the stub's road (existing sprites)
+# U17: the builders the gate message names, on the south bank either side of the stub's road (existing sprites).
+# Pass W (A1-O, WORLD_PLAN 4.1): their lines change on BRIDGE_BUILT. The foreman (west) lays the last span
+# (a1_bridge_finished, BRIDGE_BUILT) once the party carries the princess's lute: S1 comes after all of act 1, the
+# lute included (proof (a) order)
 BRIDGE_WORKERS = [
     {"id": "bridge_worker_w", "sprite": "farmer", "x": BX - 1, "y": S_STUB + 1, "showIf": "INTRO_COMPLETE",
-     "dialog": ["We're rebuilding the span, stone by stone. Come back when the work is done."]},
+     "dialog": [{"condition": "BRIDGE_BUILT", "text": ["Every stone in that span came off the old quarry road. It'll outlast the lot of us.",
+                                                       "North of the strait the land climbs. Keep to the open ground and you'll see the coast soon enough."]},
+                {"condition": "item:lute", "text": ["The King's own warriors! Then the span's waiting on nobody. Stand back a moment."]},
+                {"text": ["Nearly there. But the princess sent word from the castle: she has a gift for you before you cross.",
+                          "Go and see her, and the span will be ready when you're back."]}],
+     "requiredItem": "lute",
+     "cutscene": {"id": "a1_bridge_finished", "requiredFlag": "INTRO_COMPLETE", "onceFlag": "BRIDGE_BUILT"}},
     {"id": "bridge_worker_e", "sprite": "villager", "x": BX + 2, "y": S_STUB + 1, "showIf": "INTRO_COMPLETE",
-     "dialog": ["The King's orders: the north bridge before the harvest. Mind the scaffolding!"]},
+     "dialog": [{"condition": "BRIDGE_BUILT", "text": ["We worked by lantern three nights running. The King wanted you on your way.",
+                                                       "They say a harbour town lies east of the mainland's hills, under a lighthouse."]},
+                {"text": ["The King's orders: the north bridge before the harvest. Mind the scaffolding!"]}]},
 ]
 
 # OW-9: the snapped ends, pilings and loose planks of the north bridge (overworld/kit_grand `bridge_gap`), drawn over

@@ -85,8 +85,10 @@ describe.each(overworlds)('fieldRules: the north bridge (%s)', (_name, ow) => {
     expect(canEnter(ow, at(29, 32), 'walking', state(['BRIDGE_BUILT']))).toBe(true);
   });
 
-  it('the gap north of the stubs is water, so the bridge flag alone does not cross it in act 1', () => {
-    expect(canEnter(ow, at(29, 31), 'walking', state(['BRIDGE_BUILT']))).toBe(false);
+  it('the gap north of the stubs is water until the north_bridge patch (BRIDGE_BUILT, A1-O) lays the span', () => {
+    expect(canEnter(ow, at(29, 31), 'walking', state(['INTRO_COMPLETE']))).toBe(false);
+    // the legacy 72x72 map has no patch; the compiled world carries north_bridge
+    expect(canEnter(ow, at(29, 31), 'walking', state(['BRIDGE_BUILT']))).toBe((ow.patches ?? []).some((p) => p.id === 'north_bridge'));
   });
 
   it('a step must be to a 4-neighbour; land, sea and the temple door', () => {

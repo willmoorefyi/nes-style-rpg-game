@@ -2486,16 +2486,387 @@ in miniature) and its stand-ins; `tests/quest/{designNotes, originality, townSta
 `QUEST_STRICT=1` for INT.
 <!-- === end W1-I === -->
 <!-- === A1-O A1 (pass W: owned by A1-O) === -->
+### A1-O result: Cornelia's continent overworld, the bridge, Matoya (branch `w-a1-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-a1-o/`.
+
+**Files:**
+
+- `layouts/world_a1.py` (region part, 125 lines; `stub=False`, returns its W_west and W_east parts) and
+  `layouts/a1/world_a1_ground.py` (the ground edits):
+  - X_west and X_east: ocean to mountain, except a few sea cells kept so that no 1-cell inlet forms against the
+    frozen coast: (71, 84) and the fjord head x 128-129, y 78-82.
+  - Pravoka's range: x 138-141, y 76-141, joined to X_east by x 136-137, y 76-82, with spurs at x 136-137 outside
+    rows 92-110.
+  - X_pravoka:
+    - Pravoka's grass shelf at x 128-131, y 97-104;
+    - a rock headland behind the town (x 129-131, y 97-99), because the approved `town_icon` art fills only the
+      icon's bottom row;
+    - a saddle pass (x 125-127, y 97) over the coastal knot.
+  - X_matoya: a rock hillock with Matoya's door on its south face, a clearing, and woods to the south.
+- `layouts/a1/world_a1_sites.py`:
+  - Matoya's `cave_mouth` (door (74, 75), anchor `a1_matoya` (74, 76));
+  - Pravoka's icon, door, gate anchor, quay dock and brig, all read from A1-T's `town_pravoka_site.py`. The brig
+    replaces the act-1 ship off Cornelia's jetty;
+  - the lighthouse (a `tower` placeholder) on the range at (138, 98);
+  - the cairn, an inspect cell with original text, at (126, 96);
+  - the patch `north_bridge`: flag BRIDGE_BUILT, `ground: "="`, on the gap rows (93-94, 94-95) **plus the gate
+    cells (93, 96) and (94, 96)** (GT-2).
+- `layouts/a1/world_a1_zones.py`, the zones:
+  - `a1_mainland` (walking; "Northern Mainland", the S2 roster): every walkable cell the north shore reaches on
+    foot;
+  - `a1_aldi` (ship; "Aldi Sea", the S4 sea roster) and `a1_north_sea` (ship; "Northern Sea": sahagin_chief,
+    shark, bigeyes): every Water cell of the A1 box is in exactly one of them.
+- `layouts/a1/matoya.py` writes `matoya-cave`, 18x14:
+  - earthen walls (the `cave` remap) and a design note;
+  - Matoya (`vendor_f`, tinted) with `requiredItem: crystal_eye` and the cutscene `a1_matoya_sight`;
+  - three wandering brooms (`black_wizard`, tinted brown);
+  - `exit` to `overworld:a1_matoya`.
+- `overworld_consts.py`, `BRIDGE_WORKERS` only:
+  - the two workers' lines change on BRIDGE_BUILT;
+  - the foreman (`bridge_worker_w`) gets `requiredItem: lute` and the cutscene `a1_bridge_finished`.
+  - `GATE_MESSAGE` text is unchanged (its comment is updated).
+- `cutscenes.yaml` (A1-O anchor): `act1_complete`, moved here and rewritten (the "completed the introduction" lines
+  are gone), `a1_bridge_finished` and `a1_matoya_sight`.
+- `debug-scenarios.yaml` (A1-O anchor): `w_s1_start`, `w_s3_start`, `w_s7_start`.
+- `quest.yaml` (A1-O anchor):
+  - S1, S3 and S7 are `built`;
+  - walks: S1 `[overworld:npc:bridge_worker_w]`, S7 `[matoya-cave:npc:matoya]`;
+  - entries: S3 at the north shore (93, 92), S7 at (74, 76).
+- Compiled: `overworld` (the A1 chunks, `patch_north_bridge.png`), `matoya-cave`, and the 13 Pravoka canon stubs
+  (`pravoka`, its 6 houses, 5 shops and inn), so that Pravoka's door leads somewhere until A1-T replaces them.
+- Tests in `tests/quest/a1/`:
+  - `pravokaChannel` (4): the range, at least 6 Water cells on rows 92-110, the quay, a RED case;
+  - `bridgePatch` (4): the patch and gates, closed until BRIDGE_BUILT then walked, the opaque overlay, the foreman
+    rule;
+  - `a1_o_sites` (11): the anchors within 2 cells, the doors, the brig, the cairn, Matoya's cave and lines, the
+    zones;
+  - `a1_o_walk` (4): S1, S3 and S7 walks and proof (a) in assume mode, plus the full run;
+  - `frozenCore` updated: the bridge workers' `dialog`, `cutscene` and `requiredItem` may change (4.1).
+
+**Gates:**
+
+| Gate | Command | Output |
+|---|---|---|
+| G5 | `npm run quest -- --mutate --stage S1`, `S3`, `S7` | each run `quest-verify: OK`. Bands: S1 L2.1 [2,3], S3 L2.1 [2,6], S7 L10.0 [10,13]. GT-2 finds the patch: "the patch north_bridge: patch north_bridge forced on", with `nonLoadBearing: pending: S2 not built` (its catch, SKIP S2, needs A1-T) |
+| G5 (full) | `npm run quest -- --mutate` | `(a) order: OK  S0 S1 S3 S2 ...`; `(d) ... S1 L2.3 [2,3]  S3 L3.0 [2,6]  S7 L10.0 [10,13]`; `mutations: OK (41 gate rows; 49 elements)`; `quest-verify: OK` |
+| G4 | `npx vitest run --maxWorkers=2 --minWorkers=1` (after the merge) | exit 0; `Test Files 304 passed (304)`, `Tests 6039 passed, 8 skipped (6047)` |
+| build | `npm run build` | exit 0 |
+| G1 | `matoya.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps` | exit 0 |
+| G2 | `build_map.py overworld --region a1` (under the lock), then `--check-determinism --region a1 overworld matoya-cave pravoka` | `overworld: region a1 of 192x192 -> ...`; `overworld: deterministic`, `matoya-cave: deterministic`, `pravoka: deterministic` |
+| G3 | `world.py --owned-chunks a1` vs `git diff --name-only mainline -- assets/maps/ai/overworld/` | no output (see the deviations) |
+| G6, G7, G12, G13, G14 | `assetCoverage`, `fileCeilings`, `questCeilings`, `tests/quest/`, `macroGeography`, `travelMatrix`; `npm run quest -- --only g` / `--only h` | all passed; `(g) geography: OK  s*=0.735 (31 pairs; 16 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 3 checked, 11 pending)` (T1 is now checked) |
+| G8 | `build_map.py --selftest` (before the merge; my `build_map.py` edit is dropped for FIR-O's) | `build_map selftest: 104 checks passed` |
+| G16 | `stubs.py --check A1-O` | `stubs: 0 left for A1-O` |
+| G17 | `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2741 cells, ocean 23814 cells; canal joins)`; `cuts: W_west 7, ... W_east 2, crescent_ring 9` |
+| G9, G15 | - | n/a (A1-O has no boss and no town) |
+| memory | `/usr/bin/time -l build_map.py overworld` (full, under the lock) | 9.1-10.3 GB peak, about 83 s; `--region a1` 6.7 GB |
+
+**G10, the browser checkpoints:**
+
+- Setup: port 5221, `mute=1`, my own headless Chromium driven by `/tmp/w-a1-o/cp.mjs`.
+- Walking paths come from the live compiled map. Random encounters are stopped while walking.
+- 0 console errors.
+
+| Stage | Scenario | Result | Screenshot |
+|---|---|---|---|
+| S1 | `w_s1_start` | the King, then INTRO_COMPLETE. A debug hop takes the party to the stub foot (93, 97), because the walk from the castle is act 1's and unchanged. The foreman then sets BRIDGE_BUILT, and the party walks onto the former gap cell (93, 95) | `/tmp/w-a1-o/s1_span.png` |
+| S3 | `w_s3_start` | 36 steps from the north shore; the map is `matoya-cave` at (8, 12) | `/tmp/w-a1-o/s3_cave.png` |
+| S7 | `w_s7_start` | talked to Matoya with the eye: herb 1, crystal_eye 0, A1_O_HERB_GIVEN set | `/tmp/w-a1-o/s7_matoya.png` |
+
+**Originality:**
+
+- One map is built, `matoya-cave`: one floor, no stairs; its design note is in the source.
+- Region note for A1, Distinct: a lighthouse range walls Pravoka's fjord from the outer sea; Pravoka stands on a
+  shelf under a rock headland; a cairn marks the saddle pass above the harbour.
+- A fresh reviewer passed the dialogue and the geography. The first Distinct line of `matoya-cave` failed, and it
+  was rewritten, and the reviewer then passed it. `originality review: PASS matoya-cave overworld(A1)`.
+
+**Deviations / hand-offs:**
+
+- **The bridge order (4.1, 6.5 S1, 0.1).** The King's `act1_complete` sets only INTRO_COMPLETE (he orders the span
+  rebuilt; ox-carts over a fade). The foreman at the south stub lays the last span (the hammers over a fade, then
+  BRIDGE_BUILT) once the party holds the lute.
+  - Why: setting BRIDGE_BUILT in the King's scene fails proof (a) with `ORDER S1 (BRIDGE_BUILT) holds before S0
+    completes`. The King needs only PRINCESS_RESCUED, so the span would open before the princess's lute, which is
+    one of S0's grants.
+  - The foreman also serves saves made after the old act-1 ending.
+  - The S1 checkpoint therefore talks to the King, then to the foreman.
+- **S3's band is [2, 6], not [3, 6].** Matoya's grove opens straight off the bridge (S1 is band 2-3). S3 is a visit
+  with no event, so the curve model has nothing to walk to in `--stage S3`, and it reports the S1 level.
+- **Matoya's trade is a cutscene behind `requiredItem`** (take_item crystal_eye, give_item herb, set_flag
+  A1_O_HERB_GIVEN), not `takeItem` + `giftItem` on the NPC.
+  - Why: `npcOutcome` plays an NPC cutscene only while its `requiredItem` is held, so a `takeItem` trade could
+    never also play `a1_matoya_sight`.
+  - GT-8 still applies: removing the `requiredItem` frees the herb.
+- **Outside my files** (each small, and needed by every region; please confirm):
+  - `build_hooks.bake_patches`: base objects touching a patch's cells are left out of the patched compile. Without
+    this, the act-1 bridge debris (`on_water`) fails on the deck, and the overlay would show the debris.
+  - `tests/data/questData`, `questGraph`, `travelMatrix` (T1 checked), `fieldRules` (the gap opens with the patch),
+    `bestiaryHabitats` (gr_wolf also lives on the Northern Mainland), `mapVariants`, `overworldLayout` (a lone door
+    cell is not a road component), `DebugScenarioField` (`w_*` starts may hold act-1 flags such as GOT_LUTE).
+  - `src/progression/questCurve.ts`: FIR-O's version is kept. My `--stage` band seeding is dropped.
+- **Chunk spill outside A1** (G3 is kept clean by leaving these files at `mainline`):
+  - A full compile writes 11 px into EARTH's `below_5_3` at cell (63, 80). This is X_west range art near the seam;
+    the sea cell (71, 84) differs from the placeholder world.
+  - A full compile also writes 6 px and 17 px into ELF's `below_9_6` and `below_10_6` at x 111, y 148-163. This is
+    FIRE's spill from FIR-O, which mainline's ELF chunks lack.
+  - The integrator's full regeneration will write all three.
+- **Ships and docks (WAT-O's finding).** The act-1 jetty ship is gone; the only ship spawns at Pravoka's quay dock
+  `a1_pravoka` (aldi). On this branch `npm run quest -- --stage S21` and `--stage S22` both print `(c) soft-locks:
+  OK`.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains:
+  - `layouts/a1/world_a1_{ground,sites,zones}.py` (A1's region part, imported by `world_a1.py`) and
+    `layouts/a1/matoya.py`, which writes `matoya-cave`;
+  - the patch `north_bridge` (BRIDGE_BUILT; the gap rows and the gate cells);
+  - `bake_patches` leaving out the base objects on a patch.
+- The act-1 ending:
+  - `act1_complete` sets INTRO_COMPLETE;
+  - the foreman (`bridge_worker_w`, `requiredItem: lute`) plays `a1_bridge_finished` (BRIDGE_BUILT);
+  - Matoya's `a1_matoya_sight` trades the eye for the herb.
+- The debug scenarios gain `w_s1_start`, `w_s3_start` and `w_s7_start`.
 <!-- === end A1-O === -->
 <!-- === A1-T A1 (pass W: owned by A1-T) === -->
 <!-- === end A1-T === -->
 <!-- === ELF-O ELF (pass W: owned by ELF-O) === -->
+### ELF-O result: Elfland overworld, the Western Keep, S6 (branch `w-elf-o` from `mainline` 81e93d4, merged with mainline after FIR-O and WAT-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-elf-o/`.
+
+**Files:**
+
+- World: `layouts/world_elf.py` (the RegionOut: ground, sites, zones, checks, `walls: {W_arm}`; the stub and its
+  placeholder wall are gone), `layouts/elf/world_land.py` (the arm, the continent, the fens, the tarns, the Greyfells,
+  the east fells, beaches, the min_blob tidy), `layouts/elf/world_sites.py` (the keep, its watchtower, the Marsh Cave
+  mouth, Elfheim's icon / gate / `elf_port` dock read from ELF-T's `town_elfheim_site.py`, the waystone inspect cell,
+  the fens' dead trees, the road), `layouts/elf/world_zones.py`. `layouts/elf/` is imported as a namespace package
+  (`from elf import ...`), so other regions' same-named helpers can't clash in the composer's process.
+- Keep: `layouts/elf/keep.py` -> `western-keep-1f` (36x31) and `-2f` (34x26), compiled; both `canSave: false`, `exit`
+  to `overworld:elf_keep`, encounters gargoyle / bloodbones / ghast / ogre_chief, background `palace` (staged).
+- Data: `cutscenes.yaml` (ELF-O anchor: `elf_o_crown_taken`, `elf_astos_unmasked`), `debug-scenarios.yaml`
+  (`w_s6_start`, `w_s6_neg_nocrown`, `w_boss_astos`), `enemies.yaml` (astos `bossPhases` only), `quest.yaml` S6
+  (`walk`, `entry`, `nonLoadBearing`, `status: built`), `assets/backgrounds/palace.webp`.
+- Compiled stubs (so the overworld's transitions resolve; ELF-T and ELF-D replace them): `elfheim` and its 15 linked
+  maps, `marsh-cave-b1..b3`.
+- Tests: `tests/quest/elf/elf_o_world.test.ts` (anchors, dock, zone coverage, the arm to `seam_n`, the 2.5x hops,
+  W_arm), `tests/quest/elf/elf_o_keep.test.ts` (the crown flow, D-W14, twin stairs, S6 (a)-(c) in assume mode),
+  `tests/balance/w_elf_o.test.ts`.
+
+**The region (world cells).** The arm x 50-61, y 114-145, with a broken tor ridge on its ocean side, the road on its
+Aldi side and grass to `seam_n`; the keep `elf_keep` (60, 125) (target (61, 126)); the Marsh Cave `elf_marsh`
+(53, 162) (target exact) in the fens with four tarns; `elf_elfheim` (82, 150) from the site file, the `elf_port` dock
+(84, 147) in a two-row harbour bay; the east fells wall the Aldi against `seam_s`. Zones: `elf_keep_moor`, `elf_fen`,
+`elf_fields` (walking), `elf_aldi` and `elf_sea` (ship; every Water cell of the box, bands included, in exactly one).
+
+**S6 design.** The false king (`false_king`, `showIf: MARSH_GUARD_DEFEATED`) asks for the crown; his cutscene
+`elf_o_crown_taken` (behind `requiredItem: crown`) takes it, gives an Ether, sets `ELF_O_CROWN_GIVEN`, and warps the
+party to the `boss` cell so the floor reloads with `astos` (`showIf: ELF_O_CROWN_GIVEN`) on the same cell; talking to
+him starts `[astos, gargoyle x3]` (`requiredFlags: [MARSH_GUARD_DEFEATED, ELF_O_CROWN_GIVEN]`), and
+`elf_astos_unmasked` gives `crystal_eye` (D-W14). Why two NPCs and a cutscene: proof (b) counts a talkable boss NPC as
+"reached", so the boss must be absent until the stage's needs hold; and GT-7 removes `requiredItem` + `takeItem`, so
+the take must be a cutscene (an NPC whose gift is a plain item drops out of the event catalog).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `world.py`, `keep.py`, `stubs.py` re-run after the commit: `git diff --exit-code assets-src/maps` clean |
+| G2 | `build_map.py overworld --region elf western-keep-1f western-keep-2f` (lock): `overworld: region elf of 192x192`, both floors compiled, exit 0, max RSS 5.3 GB; `--check-determinism --region elf overworld western-keep-1f western-keep-2f`: all three `deterministic` |
+| G3 | `world.py --owned-chunks elf`, then the diff against the merge base: no output (only `below_7_3`, `below_8_3`, rows 9-11 cols 0-6 change) |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 305 passed (305)`, `Tests 6194 passed | 8 skipped (6202)` (on the head merged with WAT-O) |
+| G5 | `npm run quest -- --mutate --stage S6`: (a)-(h) OK, `(d) bands: OK  astos L10.1 [10,13]`, `mutations: OK (2 gate rows)`, `quest-verify: OK`; full `npm run quest -- --mutate`: `quest-verify: OK`, `mutations: OK` (GT-7 caught: `SKIP S6 astos reachable without its requirement crown`; GT-6 by the S6 entry; GT-5 caught) |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings` passed; every ELF-O file under 250 lines (`keep.py` 194) |
+| G9 | `w_elf_o.test.ts` 3 passed; `check-bounds: OK (3 tests)` |
+| G10 | browser, port 5223, `mute=1`, own headless Chromium: `w_s6_start` walked overworld -> 1F -> west stair -> 2F, the crown taken (crown 0, ether 1), the battle `Astos, 3x Gargoyle` on `palace`, then ASTOS_DEFEATED and `crystal_eye` held (screens `/tmp/w-elf-o/s6_battle.png`, `s6_end.png`); `w_s6_neg_nocrown`: "King: You come before your king with empty hands?", no battle, no flag (`/tmp/w-elf-o/s6neg_line.png`); 0 console errors |
+| G12 | designNotes, originality passed (`western-keep: branching`); reviewer: `originality review: PASS western-keep-1f western-keep-2f overworld(elf)` |
+| G13, G14 | macroGeography, travelMatrix passed; `(g) geography: OK s*=0.735`; `(h) travel matrix: OK` (T2 pending until `a1_pravoka` exists; probed with a temporary anchor: T2 reaches all three ELF anchors) |
+| G16 | `stubs.py --check ELF-O`: `stubs: 0 left for ELF-O` |
+| G17 | `bands: OK`, `basins: OK (aldi 2810 cells, ...; canal joins)`, cuts `W_arm 10` |
+
+**Balance (S6, `[astos, gargoyle x3]`, kit `w_s6`, 400 seeds):** sensible L11 78.5 %, L9 27.3 %, L13 95.0 %; careless
+L11 76.8 %. Astos alone with the roster stats (168 HP) won 100 % at L3-L13, and AI changes alone could not move it;
+the fix is in-bounds: a `bossPhases` entry at 0.99 (3 hits, attack 42) and his three gargoyle sentinels in the
+battle (the map's encounter). Alone with the phase: L9 91 %.
+
+**Originality numbers:** `western-keep` stair graph 1F <-> 2F by twin stairs (two entrance pairs: `up`/`arrival`,
+`up_east`/`arrival_east`); 1F has the courtyard / wings / mirror-hall loop and 2 dead-end store passages, 2F 3 dead
+ends (two niches, the antechamber); the boss on 2F north-east of the arrival.
+
+**Deviations and hand-offs:**
+
+- The brief said ELF-D builds the Keep; 4.2 and 5.4 give `western-keep-*` and S6 to ELF-O, so ELF-O built it.
+- Shared files I edited (for the integrator): `tests/quest/originalityChecks.ts` (`stairGraph` counts twin stairs,
+  i.e. two distinct arrival entrances between the same two floors, as a loop; without it a 2-floor dungeon can never
+  branch) and `tests/data/mapVariants.test.ts` (canon `floor` maps may have random battles). My earlier versions of
+  the FIR-O fixes were dropped for FIR-O's.
+- `assets-src/tools/layouts/elf/town_elfheim_site.py` is unchanged (ELF-T's); its ICON is drawn as the town icon's
+  left column and bottom row ringed by hedge clumps, because the icon's top-right part has too little art for a wall.
+- The keep icon and its tower stand on two crag cells (mountain ground under the castle's top row, for art coverage);
+  the tower and the Marsh Cave mouth use W1-D's placeholder landmarks.
+- Two new local flags/cutscenes beyond 4.2's list: `ELF_O_CROWN_GIVEN`, `elf_o_crown_taken`.
+- In the shared Playwright browser I once pressed ArrowDown in WAT-O's tab (port 5234) before noticing it was shared;
+  the checkpoints were then run in a separate headless Chromium.
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/world_elf.py` + `layouts/elf/world_{land,sites,zones}.py`
+(Elfland; `from elf import ...`) and `layouts/elf/keep.py` (`western-keep-1f`, `-2f`); a boss NPC that needs a key item
+is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the keep.
 <!-- === end ELF-O === -->
 <!-- === ELF-T ELF (pass W: owned by ELF-T) === -->
 <!-- === end ELF-T === -->
 <!-- === ELF-D ELF (pass W: owned by ELF-D) === -->
 <!-- === end ELF-D === -->
 <!-- === ERT-O EARTH (pass W: owned by ERT-O) === -->
+### ERT-O result: EARTH overworld and small sites (branch `w-ert-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-ert-o/`.
+
+**Files:**
+
+- The region: `layouts/world_earth.py` (the RegionOut: walls, barrier, checks), `layouts/earth/world_earth_ground.py`
+  (the ground), `layouts/earth/world_earth_sites.py` (objects, entrances, transitions, docks, the canal patch, the
+  inspect cell, zones and tables, walls, barrier). Melmond's icon, gate, door and harbour are read from ERT-T's
+  `town_melmond_site.py`, which is unchanged.
+- The sites: `layouts/earth/dwarf.py` writes `dwarf-hall` (40x30), `giant.py` writes `giant-tunnel` (32x20), and
+  `sage.py` writes `sage-cave` (16x12). All three are compiled.
+- Data:
+  - `cutscenes.yaml` (ERT-O anchor): `ert_canal_blast`, `ert_giant_feast`, `ert_sarda_rod`, `ert_smyth_forge`.
+  - `debug-scenarios.yaml`: `w_s10_start`, `w_s10_neg_notnt`, `w_s12_start`, `w_s12_neg_noruby`.
+  - `quest.yaml`: S10 and S12 are `built`, with `entry`, `walk` and `nonLoadBearing` (GT-14, GT-16); S31 stays
+    pending; the town `dwarf` is `built`.
+  - `assets/backgrounds/cracked_earth.webp`, staged for the `ert_badlands` zone.
+- Tests: `tests/quest/earth/ert_o_world.test.ts` (8 tests) and `ert_o_walk.test.ts` (3 tests).
+- The compiled EARTH stubs (`melmond*`, `cavern-earth-b1..b5`, 17 maps) are committed, because the overworld's
+  transitions now target `melmond` and `cavern-earth-b1`. This follows FIR-O's practice. ERT-T and ERT-D overwrite
+  them.
+
+**Design** (all original; the macro placement follows 2.2):
+
+- **The isthmus (x 49-61).**
+  - A mountain hogback runs from y 76 to 91. It is W_west's stub, against `seam_w`.
+  - The canal saddle is a grass pass at y 92-93. The patch `canal` (CANAL_OPEN) turns its 26 cells to Water.
+  - The dwarves' downs run from y 94 to 109. The hall's ridge holds the cave mouth: the door is at (55, 103) and
+    `ert_dwarf` at (55, 104).
+  - The landing cove sits on the Aldi side: dock `ert_dwarf` at (59, 104), aldi basin. The downs run on to
+    `seam_n`.
+- **The western strait (x 42-48)** runs from sea to sea.
+- **The western continent (x 13-42, y 73-139).**
+  - It is split by the western range (core x 24-27). Sea cliffs close both tips, so nothing can walk round it.
+  - East of the range: Melmond's plain, with copses, the crooked windmill and Melmond's placeholder icon (gate
+    (42, 112), harbour dock (43, 113), ocean basin).
+  - South of y 118: the grey badlands. They hold the Cavern's mesa (`ert_earth_cave` (30, 126)) and the rotted
+    shrine (an inspect cell).
+  - West of the range: Sarda's coast, a sealed sliver with Sarda's knoll (`ert_sarda` (19, 109)).
+  - The tunnel mouths are `ert_giant` (28, 112) and `ert_giant_west` (23, 112).
+- **Encounter zones:** `ert_isthmus`, `ert_plain`, `ert_badlands` (backdrop `cracked_earth`), `ert_sarda_coast`, and
+  the ship-only `ert_aldi` and `ert_sea`. Every walkable cell of the box is in one walking zone, and every Water
+  cell in one ship zone (this is tested).
+- **Walls:** W_west is the hogback (y 76-87); W_isthmus is the isthmus land from y 88 to 109.
+- **Barrier `western_range`:** its cells are the range's core mountains. The seeds are (36, 100) on the plain and
+  (18, 100) on Sarda's coast. The exported cut is 4 cells.
+- **Site maps:**
+  - **`dwarf-hall`** is a long hall with three rooms off its north wall:
+    - Smyth's forge;
+    - the drafting room, where Nerrick (`requiredItem: tnt`, cutscene `ert_canal_blast`, onceFlag CANAL_OPEN)
+      keeps the canal plans;
+    - the store, which sells `dwarf_item` across a wall-to-wall counter.
+  - **`giant-tunnel`** is two caverns joined by a one-cell throat at (15, 10).
+    - The giant lies in the throat: `requiredItem: ruby`, `hideIf: TITAN_FED`, cutscene `ert_giant_feast`.
+    - Once fed, he sleeps in a niche (`showIf: TITAN_FED`).
+    - It also has a prospector, a chest pocket (`hi_potion`) and the mouths on the map's two flanks.
+  - **`sage-cave`** holds Sarda and two pupils. Sarda's cutscene `ert_sarda_rod` (`requiredFlags:
+    [VAMPIRE_DEFEATED]`) gives the `rod`.
+- **Melmond-sarda walk:** its tunnel route is about 58 steps, under the 3.0 x 23.2 detour bound.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 `world.py` | `bands: OK`, `basins: OK (aldi 2790 cells, ocean 22054 cells; canal joins)`, `cuts: W_west 7, W_isthmus 10, W_arm 2, W_south 2, W_east 4, western_range 4, crescent_ring 9`. There is no EARTH placeholder wall (the region is not a stub). The composer exports `barriers: OK (western_range)` as the cut |
+| G1 | `dwarf.py`, `giant.py`, `sage.py`, `stubs.py` and `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py overworld --region earth`: exit 0, 40 s, max RSS 4.47 GB. `--check-determinism --region earth overworld dwarf-hall giant-tunnel sage-cave`: all four `deterministic` (51 s, 4.69 GB) |
+| G3 | `world.py --owned-chunks earth` against `git diff --name-only mainline -- assets/maps/ai/overworld/`: no output (19 owned files changed) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 302 passed (302)`, `Tests 6097 passed, 7 skipped` |
+| G5 | `npm run quest -- --mutate --stage S10`: `quest-verify: OK` (`(d) S10 L11.0 [11,14]`, `mutations: OK (5 gate rows; 9 elements)`). `--stage S12`: OK (`(d) S12 L15.0 [15,17]`, 4 gate rows: GT-15, GT-16, GT-35, GT-36). Full `npm run quest -- --mutate`: OK (41 gate rows, 50 elements; `(g) s*=0.735 (31 pairs; 13 assumed)`). `--stage S31`: **FAIL**, `ORDER S31 unreachable`, because no stage grants `adamant` (W1-H's known note) |
+| G6 | `assetCoverage.test.ts`: passed (tinted NPCs, `cracked_earth`) |
+| G12 | `designNotes` and `originality` tests passed. The fresh reviewer passed the second round (see Originality) |
+| G13 / G14 | `macroGeography` and `travelMatrix` passed. `(g)` OK; `(h)` OK (12 rows, 2 basin rows; T2-T4 are still pending, waiting for `a1_pravoka`) |
+| G15 | `townStandard`: `dwarf: houses 0/0 interiors 0/0 outdoor 13/10 hints 2/2 reactive 9/3 shops 1/1` |
+| G16 | `stubs.py --check ERT-O`: `stubs: 0 left for ERT-O` |
+| G17 | `world.py --check-bands`: `bands: OK`; then `basins: OK` (as above) |
+| `stage_backgrounds.py --check cracked_earth` | exit 1: `no bounds for cracked_earth (known: shoreline)`. The tool has bounds only for `shoreline`. Staging itself succeeded |
+
+**Travel rows and GTs:**
+
+- **Travel rows** (checked in the tests and the verifier):
+  - With the ship and no canal, `ert_dwarf` is reachable by the Aldi dock and `ert_melmond` is not (the strait).
+  - With CANAL_OPEN, the canal joins the Aldi to the strait.
+  - The range separates `ert_sarda` from the plain until TITAN_FED.
+  - T2-T4 report pending in (h) until A1-T places `a1_pravoka`.
+- **Gate rows:**
+
+  | Row | Result |
+  |---|---|
+  | GT-11 (Nerrick's tnt) | caught |
+  | GT-12 (`canal` forced on) | caught |
+  | GT-13 (W_west, W_isthmus cuts) | caught |
+  | GT-14 | non-load-bearing, with an S10 entry |
+  | GT-15 (the giant's ruby) | caught |
+  | GT-16 | non-load-bearing, with an S12 entry |
+  | GT-35 (`western_range` cut, 4 cells) | caught |
+  | GT-36 (the giant removed) | caught |
+
+  Every caught row is reported OK by `--mutate`.
+
+**Browser** (port 5226, `mute=1`). I drove the game from my own headless Chromium, because the shared Playwright MCP
+browser was being navigated and closed by other agents. Screenshots are in `/tmp/w-ert-o/`.
+
+| Row | Result |
+|---|---|
+| `w_s10_start` | Talked to Nerrick: CANAL_OPEN set, `tnt` gone. Boarded at (59, 104) (mode `ship`), sailed to (62, 93), then west through the canal cells to (47, 93) in mode `ship` (`s10_nerrick.png`, `s10_canal.png`) |
+| `w_s10_neg_notnt` | Same route: the ship stops at (62, 93), at the isthmus coast |
+| `w_s12_start` | Fed the giant (TITAN_FED, the ruby gone), walked west through the tunnel to `ert_giant_west` (23, 112) and into `sage-cave`, talked to Sarda: `rod` held, ERT_O_ROD_GIVEN (`s12_sarda.png`) |
+| `w_s12_neg_noruby` | The giant stays on (15, 10); the party cannot pass (16, 10) |
+| all four rows | 0 console errors |
+
+**Deviations and hand-offs:**
+
+- **Shared fixes.** After the FIR-O merge I dropped my own versions of FIR-O's shared fixes. Three more edits were
+  needed beyond FIR-O's; they go to the orchestrator:
+  1. `src/progression/questShops.ts`: in `--stage` mode, proof (e) skips an `opensAfter` stage that is an ancestor
+     of the checked stage. Its grants (the ship) are assumed at the entry and cannot be withheld. Without this,
+     every built town fails `EARLY <town> talkable before S2` in stage mode.
+  2. `tests/data/questData.test.ts`: a town may be `built`.
+  3. `tests/progression/questLate.test.ts`: the `(e)` line counts built towns.
+- **Full-world compile.** Before the merge I ran one full-world compile (11.7 GB, 190 s) under the lock, because my
+  first fix to `build_map.py` changed the compiler digest. FIR-O's version replaces that fix, and the committed
+  world was then rebuilt with `--region earth` only.
+- **S31 stays `pending`.** `adamant` is granted by no stage, so Smyth's trade would be a dead gate (proof (c)
+  DEADGATE). The cutscene `ert_smyth_forge` is written, and Smyth stands in the forge.
+  - Hand-off to WND-D2 / INT: once S28 grants `adamant`, set `SMYTH_TRADE` in `earth/dwarf.py` (1 line, given there)
+    and mark S31 built.
+- **No `shake` cutscene step exists**, so the canal blast is a dialog line over a short black fade.
+- **Sarda's VAMPIRE_DEFEATED gate is the cutscene's `requiredFlags`.** `npcOutcome` has no NPC-level
+  `requiredFlags`, so Sarda gives the rod through `ert_sarda_rod` (`give_item`), not through `giftItem`.
+- **Cutscene trades.** Nerrick and the giant take their item with a `take_item` step, not with `takeItem`. With
+  `takeItem` the item is gone before `npcOutcome` checks it, so the cutscene never plays.
+- **`ert_dwarf` moved +1, -2 to (55, 104)**, within the ±2 tolerance, so the dwarf-melmond hop by canal stays
+  under 4.5x (about 58 steps against 68.7).
+- **The canal saddle is at y 92-93**, not y 88-92, so that it lies nearer the dwarves' landing.
+- **Placeholder art.** Melmond's icon is a town-kit farmhouse; ERT-T may restyle it. The canal has no lock-gate
+  art.
+
+**Originality:** the first review found two problems. The giant tunnel's Distinct line named features the classic also has, and the dwarf hall's line was partly untrue. Both were fixed: the asleep giant was added and the wording rewritten. The re-review passed: `originality review: PASS dwarf-hall giant-tunnel sage-cave overworld(earth)`.
+
+**AGENTS.md delta (for INT):** under "Editing a 2x Map", add these scripts to the table:
+
+- `layouts/world_earth.py` with `layouts/earth/world_earth_ground.py` and `world_earth_sites.py` write the EARTH
+  region of `overworld.yaml`;
+- `layouts/earth/dwarf.py`, `giant.py` and `sage.py` write `dwarf-hall`, `giant-tunnel` and `sage-cave`.
+
+Also note that NPC trades which play a cutscene take their item with a `take_item` step.
 <!-- === end ERT-O === -->
 <!-- === ERT-T EARTH (pass W: owned by ERT-T) === -->
 <!-- === end ERT-T === -->
@@ -2715,6 +3086,83 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
 <!-- === end WAT-D === -->
 <!-- === WND-O WIND (pass W: owned by WND-O) === -->
+### WND-O result: the Wind region and Lufenia (branch `w-wnd-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-o/`.
+
+**Files:**
+
+- Region: `layouts/world_wind.py` (the RegionOut; design note in its docstring), `layouts/wind/world_ground.py` (the
+  ground from shapes, no RNG: land defaults to mountain, three basins carved out; `_tidy` keeps the organic minimum
+  sizes), `layouts/wind/world_sites.py` (icons, doors, anchors, inspect cells, zones). Gaia's door, gate and icon are
+  read from WND-T's `wind/town_gaia_site.py` (not edited).
+- Lufenia: `layouts/wind/lufenia_town.py` (36x32), `lufenia_interiors.py` (houses stargazer, elder, healer; the two
+  magic shops; the inn; `interiors_common.Town("lufenia")`), `lufenia_people.py` (every line; the old tongue).
+- Data: `cutscenes.yaml` `wnd_chime_given` (dialog, `give_item chime`, `set_flag CHIME_GIVEN`); `quest.yaml` S26
+  `built` (entry, walk) and town `lufenia` `built`; `debug-scenarios.yaml` `w_s26_start`, `w_s26_neg_untaught`. The
+  `lufenia_*` shop records W1-F/W1-G seeded are kept as they are (L8 magic, inn 900).
+- Tests: `tests/quest/wind/wnd_o_world.test.ts` (9), `wnd_o_lufenia.test.ts` (7), `wnd_o_walk.test.ts` (4).
+- Compiled: the WIND chunks of `overworld` (16 files, `--region wind` under the lock), the 7 Lufenia maps, and the
+  stubs Gaia's door links to (`gaia`, its 6 houses, 5 shops, inn and `gaia-spring`; R21, WND-T replaces them).
+
+**The region (4.7).** One rugged continent of ranges with three walkable basins, never joined on foot (checked by
+`world_sites.zones` and `wnd_o_world.test.ts`), each with a grass airship meadow within 8 steps of its anchor:
+Gaia's bowl (grass floor, a crater tarn, a pine grove, a stilled second windmill, a knoll behind the town door) with
+a wind-gap east onto the Pinewold upland and its two sea lochs; the Mirage sands (a broken stone spine, a salt pan,
+the oasis meadow, the tower on the west spit with a fallen block, a buried bronze dial); Lufenia's cliff-ringed mesa
+(grass, moor, a copse), split from the sands by the Sundering fjord. No dock. Anchors: `wnd_gaia` (150, 14),
+`wnd_mirage` (132, 37), `wnd_lufenia` (152, 46). Zones: `wnd_highlands` "Gaia Highlands" (tyrannosaur, chimera,
+green_dragon), `wnd_mirage_sands` "Mirage Sands" (sand_worm, stone_golem, chimera), `wnd_lufen_moor` "Lufenian
+Mesa" (medusa, chimera, green_dragon), `wnd_sea` "North Seas", `modes: [ship]` (sahagin_prince, sea_snake,
+white_shark, deepeyes), over every Water cell of the box, bands included; every walkable cell of the box is in
+exactly one walking zone (lake cells too, for the canoe).
+
+**Lufenia (4.0.1, 4.7).** Every outdoor Lufenian (12) and every house dweller speaks a fixed phrase of an invented
+old tongue until LUFENIAN_LEARNED, then plain speech (17 NPCs reactive on the flag). The keepers (white and black
+magic, the inn with `action: inn`, the healer's clinic at 150 G a level) have `showIf: LUFENIAN_LEARNED`. The elder
+plays `wnd_chime_given` (NPC cutscene `requiredFlags: [LUFENIAN_LEARNED]`, `onceFlag: CHIME_GIVEN`). Hints:
+`lufenia_mirage_hint` (Mirage), `lufenia_cube_hint` (cube). Town standard: houses 5/4, interiors 3/3, outdoor 12/10,
+interior 6/5, hints 2/2, reactive 17/6, shops 2/2, inn 900/900, clinic yes.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `lufenia_town.py`, `lufenia_interiors.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps`: exit 0 |
+| G2 | `build_map.py overworld --region wind` (merged compiler): exit 0, 20.3 s, max RSS 3.97 GB; `--check-determinism --region wind overworld lufenia lufenia-house-{stargazer,elder,healer} lufenia-{white,black}-magic lufenia-inn`: every id `deterministic` |
+| G3 | `world.py --owned-chunks wind` vs the 16 changed `assets/maps/ai/overworld/` files since the merge base: no output (grep exit 1) |
+| G4 | after the merge: `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1` exit 0, `Test Files 303 passed (303)`, `Tests 6098 passed, 7 skipped` |
+| G5 | `npm run quest -- --mutate --stage S26`: (a) OK S26, (b) OK (32 withheld runs), (c) OK (452 states), (d) OK `S26 L28.0 [28,31]`, (e) OK (1 towns, 7 pending), (f)-(h) OK, `mutations: OK (2 gate rows; 2 elements, each removal reported)` (GT-29, GT-30 caught), `quest-verify: OK`. The full `npm run quest -- --mutate`: `quest-verify: OK` (`S26 L28.1 [28,31]`, 41 gate rows, 49 elements) |
+| G6, G7 | `assetCoverage` 242 passed; `fileCeilings` 20, `questCeilings` 58 passed |
+| G8 | `build_map.py --selftest`: 104 checks passed (before the merge; this branch no longer changes the compiler) |
+| G12 | `designNotes`, `originality` passed; reviewer: `originality review: PASS overworld-WIND lufenia lufenia-house-stargazer lufenia-house-elder lufenia-house-healer lufenia-white-magic lufenia-black-magic lufenia-inn` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.735 (31 pairs; 15 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 1 checked, 13 pending)`. T6-T8 stay pending on `mirage-1f:arrival` / `:inner` (WND-D1). Scratch rows on the real world (`/tmp/w-wnd-o/travel.ts`, started at Cornelia): without the airship no WIND anchor is reached; with it (canoe held or not) all three are, each with a landing cell within 8 steps |
+| G15 | `townStandard`: the lufenia row above, every column at or over target |
+| G16 | `stubs.py --check WND-O`: `stubs: 0 left for WND-O` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `bands: OK`, `basins: OK (aldi 2781 cells, ocean 21099 cells; canal joins)` |
+| G10 (6.5) | headless Chromium on 5237, `mute=1` (`/tmp/w-wnd-o/pw/checkpoint.mjs`): `w_s26_start`: overworld (152, 46) -> `lufenia`, the elder's hall, talk: CHIME_GIVEN set, chime 1; the healer's house holds `lufenia-healer-keeper`; 0 console errors (`/tmp/w-wnd-o/w_s26_start.png`, `_dialog.png`). `w_s26_neg_untaught`: the elder says "Sae'qat, ven doloth. Lun... thrim?", no flag, no chime; the healer's house holds only the patient (no keeper; checked before the merge, after it a wandering townsman blocked the scripted walk there); 0 errors (`/tmp/w-wnd-o/w_s26_neg_untaught.png`, `_dialog.png`). Run with a scratch `playwright-core` in `/tmp/w-wnd-o/pw/` because the shared Playwright MCP browser was being driven by another tranche |
+
+**Deviations / hand-offs:**
+
+- **The Mirage door is shut until WND-D1 builds `mirage-1f`.** The stub has no chime door, so a door into it reached
+  `mirage-1f:inner` with no chime (T6, T7 failed). `world_sites.MIRAGE_OPEN` reads whether `mirage-1f` is still a
+  stub: while it is, the tower's door cell is blocked with an inspect line and there is no transition (and no compiled
+  mirage stubs). The integrator's world regeneration at WND-D1's merge opens it (one transition to `mirage-1f`
+  `arrival`).
+- **Shared fixes, in their own commit for the orchestrator** (FIR-O's merge covered the rest; my overlapping edits
+  were dropped for FIR-O's): `src/progression/questShops.ts` (proof (e) in `--stage` mode removes the `opensAfter`
+  stage's grants from the assumed start, as (b) does; without it a town opening after an ancestor is always `EARLY`
+  and GT-30 is never caught); `tests/data/questData.test.ts` and `tests/progression/questLate.test.ts` allow a built
+  town (lufenia is the first).
+- S26's `entry` starts at Cornelia's gate with the airship on the grass beside it and the ship (S2) at anchor off the
+  mesa, out of reach of any shore, so no pending dock strands the party in assume mode.
+- Gaia's icon sits on a 4-cell knoll (mountain) so the door keeps one way out; WND-T's site file is unchanged.
+
+**AGENTS.md delta (for INT):** the map table gains `layouts/world_wind.py` + `layouts/wind/world_*.py` (WIND) and
+`layouts/wind/lufenia_*.py` (`lufenia`, `lufenia-house-*`, the magic shops, the inn); a town whose speech is gated
+writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`; the Mirage door opens when
+`mirage-1f` stops being a stub; debug scenarios `w_s26_start`, `w_s26_neg_untaught`.
 <!-- === end WND-O === -->
 <!-- === WND-T WIND (pass W: owned by WND-T) === -->
 <!-- === end WND-T === -->

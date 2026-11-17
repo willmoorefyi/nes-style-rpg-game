@@ -962,10 +962,14 @@
     - {type: magic, spellId: slep, weight: 1}
   sprite: astos
   attack: melee
+  # ELF-O (WORLD 3.7: L11 sensible 65-85 %, L9 <= 50 %): his first wound breaks the king's shape, and from then on he
+  # claws (3 hits, attack 42); his three gargoyle sentinels (western-keep-2f) carry the rest of the fight
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 0.99
     patternId: aggressive
-    message: "Astos drops his royal disguise!"
+    hits: 3
+    attack: 42
+    message: "Astos sheds the king's shape and lashes out with black claws!"
   size: boss
 # === end ELF-O astos ===
 - id: wraith

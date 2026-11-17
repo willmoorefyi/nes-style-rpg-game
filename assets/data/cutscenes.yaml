@@ -59,38 +59,191 @@
     - type: dialog
       text: "Princess Liora is home at last. Speak to the King."
 
-# The end of act 1: played once when the King is told of the rescue (BRIDGE_BUILT stays unset until the
-# bridge-building scene exists).
-- id: act1_complete
-  steps:
-    - type: fade_out
-      duration: 800
-    - type: dialog
-      text: "The King's builders set to work on the bridge to the north."
-    - type: dialog
-      text: "Congratulations! You have completed the introduction."
-    - type: dialog
-      text: "Your journey will continue once the bridge to the north is rebuilt..."
-    - type: set_flag
-      flag: INTRO_COMPLETE
-    - type: fade_in
-      duration: 800
-
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # Each tranche adds its records only between its own pair of lines, so the merges never conflict.
 # === W1-B (pass W: owned by W1-B) ===
 # === end W1-B ===
 # === A1-O (pass W: owned by A1-O) ===
+# The end of act 1 (rewritten by A1-O, WORLD_PLAN 4.1): played once when the King is told of the rescue. He orders the
+# north bridge rebuilt, and ox-carts of stone set out over a fade (INTRO_COMPLETE). The builders lay the last span
+# when the party reaches the strait (a1_bridge_finished).
+- id: act1_complete
+  steps:
+    - type: dialog
+      text: "King: Summon the masons! The north bridge shall stand again before these warriors need it."
+    - type: fade_out
+      duration: 800
+    - type: dialog
+      text: "Through the night, ox-carts of cut stone rumble down the north road toward the strait."
+    - type: set_flag
+      flag: INTRO_COMPLETE
+    - type: fade_in
+      duration: 800
+    - type: dialog
+      text: "King: Take what my daughter would give you, then go to the strait. My builders will be waiting."
+# S1: the foreman at the south stub (overworld_consts.BRIDGE_WORKERS) lays the last span once the party carries the
+# princess's lute: the hammers ring over a fade, then BRIDGE_BUILT (the patch north_bridge lays the deck over the gap).
+- id: a1_bridge_finished
+  steps:
+    - type: dialog
+      text: "Foreman: Right, lads, the King's warriors are here! Last span, and lively!"
+    - type: fade_out
+      duration: 600
+    - type: dialog
+      text: "Hammers ring out over the strait. Planks swing down on ropes, and the masons wedge the last stone home."
+    - type: set_flag
+      flag: BRIDGE_BUILT
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "Foreman: There she stands, shore to shore. Mind the fresh mortar on the north end."
+# S7: Matoya sets the crystal back in its socket, sees her cave again, and pays for it with the herb that wakes the
+# elf prince (matoya-cave; the NPC needs crystal_eye, this script takes it and gives the herb).
+- id: a1_matoya_sight
+  steps:
+    - type: dialog
+      text: "Matoya: Give it here, quick! ... Mm. Cold as a well-stone, and just as clear."
+    - type: take_item
+      item: crystal_eye
+    - type: fade_out
+      duration: 400
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 400
+    - type: dialog
+      text: "Matoya: Shelves! Jars! And the dust on them, shameful. Brooms, you heard nothing."
+    - type: give_item
+      item: herb
+    - type: set_flag
+      flag: A1_O_HERB_GIVEN
+    - type: dialog
+      text: "Matoya: Here, for your trouble: the Herb. Crush it under a sleeper's nose and no curse holds them. Received the Herb."
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
+# S6 (docs/WORLD_PLAN.md 4.2, D-W14): Astos's postVictoryCutscene on western-keep-2f. The battle's flag sets
+# ASTOS_DEFEATED; the crystal eye comes only from here, and its last line points the party to Matoya (S7).
+# S6: the false king takes the crown (western-keep-2f's `false_king`, behind the crown); ELF_O_CROWN_GIVEN hides him
+# and shows Astos on the same cell (the warp reloads the floor so he stands there), whom the party then talks to.
+- id: elf_o_crown_taken
+  steps:
+    - type: take_item
+      item: crown
+    - type: dialog
+      text: "He sets the crown on his brow, and his smile grows too wide for his face."
+    - type: dialog
+      text: "King: Such service deserves a reward. Here, drink to your king."
+    - type: give_item
+      item: ether
+    - type: set_flag
+      flag: ELF_O_CROWN_GIVEN
+    - type: fade_out
+      duration: 500
+    - type: warp
+      map: western-keep-2f
+      entrance: boss
+      facing: up
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "The candles gutter. When they steady, the man on the throne is no longer quite a man."
+- id: elf_astos_unmasked
+  steps:
+    - type: dialog
+      text: "The false king's borrowed face slides off like a wet mask. Beneath it, a dark elf crumbles into ash."
+    - type: dialog
+      text: "The stone sentinels fall still, and the second throne's glass shows only an empty chair."
+    - type: set_flag
+      flag: ASTOS_DEFEATED
+    - type: give_item
+      item: crystal_eye
+    - type: dialog
+      text: "In the ash lies a crystal, cold and clear as an eye. Whoever it was stolen from must be blind without it."
+    - type: dialog
+      text: "A witch keeps a cave in the forests north of Cornelia's bridge. Her stolen sight may be what this is."
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
+# S10: Nerrick takes the TNT (dwarf-hall, npc ert_nerrick, requiredItem tnt) and blasts the isthmus saddle; the patch
+# `canal` opens on CANAL_OPEN. There is no shake step, so the blast is a dialog line over a short black fade.
+- id: ert_canal_blast
+  steps:
+    - type: dialog
+      text: "Nerrick packs the elven powder into the bore holes with his own hands, humming an old digging song."
+    - type: take_item
+      item: tnt
+    - type: dialog
+      text: "Nerrick: \"Out of the saddle, all of you! Hands over your ears!\""
+    - type: fade_out
+      duration: 300
+    - type: dialog
+      text: "A roar rolls through the hall. Dust pours from every beam, and far off, water thunders."
+    - type: set_flag
+      flag: CANAL_OPEN
+    - type: wait
+      duration: 400
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "Nerrick: \"The sea is through! Sail west by the cut and you'll reach the open water, and Melmond past it.\""
+# S12: the giant (giant-tunnel, npc ert_giant, requiredItem ruby, hideIf TITAN_FED) eats the ruby and clears the throat.
+- id: ert_giant_feast
+  steps:
+    - type: dialog
+      text: "You hold out the ruby. The giant pinches it from your palm, as delicately as a man taking a cherry."
+    - type: take_item
+      item: ruby
+    - type: dialog
+      text: "Crunch. A long, warm sigh fills the tunnel. \"Good. GOOD. Now sleep.\""
+    - type: fade_out
+      duration: 500
+    - type: set_flag
+      flag: TITAN_FED
+    - type: wait
+      duration: 400
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "The giant has squeezed himself into a niche in the wall, snoring. The way west is open."
+# S12: Sarda (sage-cave, npc ert_sarda) gives the rod once VAMPIRE_DEFEATED is set.
+- id: ert_sarda_rod
+  steps:
+    - type: dialog
+      text: "Sarda lifts a rod of black, root-twisted wood down from its pegs above his reading floor."
+    - type: dialog
+      text: "Sarda: \"Deep in the Cavern of Earth a seal of stone bars the lower halls. This rod alone will break it.\""
+    - type: give_item
+      item: rod
+    - type: set_flag
+      flag: ERT_O_ROD_GIVEN
+    - type: dialog
+      text: "Sarda: \"Go down past the seal and end what waits in the cold. Then the land may heal.\""
+# S31 (optional): Smyth (dwarf-hall, npc ert_smyth, requiredItem adamant) forges the sword from the sky ore.
+- id: ert_smyth_forge
+  steps:
+    - type: dialog
+      text: "Smyth weighs the ore in both hands, then feeds his forge until the hall glows white."
+    - type: take_item
+      item: adamant
+    - type: fade_out
+      duration: 600
+    - type: dialog
+      text: "All night the anvil rings. No dwarf in the hall sleeps, and none complains."
+    - type: fade_in
+      duration: 600
+    - type: give_item
+      item: excalibur
+    - type: set_flag
+      flag: ERT_O_SWORD_FORGED
+    - type: dialog
+      text: "Smyth: \"There. Swing it once and you'll know. I'll not make its like again.\""
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
 # === end ERT-T ===
@@ -156,6 +309,22 @@
 # === WAT-D (pass W: owned by WAT-D) ===
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
+# S26 (docs/WORLD_PLAN.md 4.7): Lufenia's elder hands over the chime once the party can read Lufenian (his NPC's
+# cutscene: requiredFlags [LUFENIAN_LEARNED], onceFlag CHIME_GIVEN). The chime opens the Mirage's inner door (S27).
+- id: wnd_chime_given
+  steps:
+    - type: dialog
+      text: "The elder lifts a small bronze bell down from the dais. It hums in his hand, though nobody has struck it."
+    - type: dialog
+      text: "\"Our makers left it with us when they went up. It is tuned to one door only: the Mirage's inner door.\""
+    - type: give_item
+      item: chime
+    - type: dialog
+      text: "You received the Chime."
+    - type: set_flag
+      flag: CHIME_GIVEN
+    - type: dialog
+      text: "\"Climb, and if the one up there still listens to anything, let it hear that the wind is missed.\""
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
 # === end WND-T ===

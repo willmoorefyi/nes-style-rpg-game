@@ -1359,16 +1359,188 @@
   enemies: []
 # === end W1-B ===
 # === A1-O (pass W: owned by A1-O) ===
+# S1 (WORLD_PLAN 6.5): the throne room after the rescue. Talk to the King (act1_complete lays the north bridge), then
+# walk north from the city onto the former gap cells, world (93, 94) and (93, 95). Band 2-3, the B1 kit.
+- id: w_s1_start
+  name: W A1-O - S1 the north bridge (talk to the King)
+  mode: field
+  map: cornelia-castle-2f
+  entrance: throne_return
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE]
+  party: &a1o_b1_party
+    - { class: warrior, name: WAR, level: 3, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THF, level: 3, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 3, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 3, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }, { id: slep, level: 1 }] }
+  items: { lute: 1, potion: 5 }
+  gold: 400
+  enemies: []
+# S3: the mainland's north shore with the span built; walk north-west through the woods to Matoya's grove and enter.
+- id: w_s3_start
+  name: W A1-O - S3 Matoya's cave (visit)
+  mode: field
+  map: overworld
+  entrance: north_shore
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT]
+  party: *a1o_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 400
+  enemies: []
+# S7: in front of Matoya's door with the Crystal Eye (S6 done: the crown spent, Astos beaten). Band 10-13, the B3 kit.
+- id: w_s7_start
+  name: W A1-O - S7 Matoya's herb (the Crystal Eye held)
+  mode: field
+  map: overworld
+  entrance: a1_matoya
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED, ASTOS_DEFEATED]
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 10, equipment: [mythril_hammer, silver_armlet, cap], spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }] }
+  items: { lute: 1, crystal_eye: 1, potion: 5 }
+  gold: 1000
+  enemies: []
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
+# S6 (docs/WORLD_PLAN.md 5.3, 6.5): the party at the Western Keep's door on the arm with the band-low level (10), the
+# B3 kit (w_s6), the S0-S5 flags and the crown, and the ship parked at Elfheim's harbour (elf_port). The `_neg_nocrown`
+# start is the same without the crown; `w_boss_astos` is the battle at the band level (11) with the stage kit.
+- id: w_s6_start
+  name: W ELF-O - S6 start at the Western Keep (crown held)
+  mode: field
+  map: overworld
+  entrance: elf_keep
+  flags: &elf_o_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED]
+  vehicles: &elf_o_ship
+    - { type: ship, map: overworld, x: 84, y: 147 }
+  party: &elf_o_party
+    - { class: warrior, name: WAR, level: 10, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 10, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 10
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 10
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { crown: 1, potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
+- id: w_s6_neg_nocrown
+  name: W ELF-O - S6 negative, no crown (the false king only asks for it)
+  mode: field
+  map: overworld
+  entrance: elf_keep
+  flags: *elf_o_flags
+  vehicles: *elf_o_ship
+  party: *elf_o_party
+  items: { potion: 3, hi_potion: 2 }
+  gold: 1200
+  enemies: []
+- id: w_boss_astos
+  name: W ELF-O - Astos and his three gargoyle sentinels (band level 11, kit w_s6)
+  background: assets/backgrounds/palace.webp
+  party:
+    - { class: warrior, name: WAR, level: 11, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 11, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - class: white_mage
+      name: WHM
+      level: 11
+      equipment: [mythril_hammer, silver_armlet, cap]
+      spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }]
+    - class: black_mage
+      name: BLM
+      level: 11
+      equipment: [mythril_knife, silver_armlet, cap]
+      spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }]
+  items: { potion: 3 }
+  gold: 0
+  enemies: [astos, gargoyle, gargoyle, gargoyle]
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
+# WORLD_PLAN 6.5. S10: on foot at the dwarf hall's mouth (overworld `ert_dwarf`), the ship moored at the landing cove
+# (the `ert_dwarf` dock, (59, 104)), band-low level 11 with the B3 kit (w_s9) and every flag and item before S10.
+# `_neg_notnt` withholds the TNT only. S12: at the giant's tunnel's east mouth (`ert_giant`) with the S11 grants
+# (VAMPIRE_DEFEATED, `ruby`), level 15, the B4 kit (w_s11), the ship at Melmond's harbour; `_neg_noruby` withholds
+# the ruby only.
+- id: w_s10_start
+  name: ERT-O - S10 the dwarves' canal (TNT in hand)
+  mode: field
+  map: overworld
+  entrance: ert_dwarf
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 59, y: 104 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE]
+  party: &ert_o_party_b3
+    - { class: warrior, name: WAR, level: 11, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 11, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 11, equipment: [mythril_hammer, silver_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 11, equipment: [mythril_knife, silver_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }] }
+  items: { lute: 1, mystic_key: 1, tnt: 1, potion: 8, hi_potion: 2, antidote: 2 }
+  gold: 1500
+  enemies: []
+- id: w_s10_neg_notnt
+  name: ERT-O - S10 negative (no TNT)
+  mode: field
+  map: overworld
+  entrance: ert_dwarf
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 59, y: 104 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE]
+  party: *ert_o_party_b3
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 2, antidote: 2 }
+  gold: 1500
+  enemies: []
+- id: w_s12_start
+  name: ERT-O - S12 the giant's tunnel and Sarda (ruby in hand)
+  mode: field
+  map: overworld
+  entrance: ert_giant
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED]
+  party: &ert_o_party_b4
+    - { class: warrior, name: WAR, level: 15, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 15, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 15, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 15, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { lute: 1, mystic_key: 1, ruby: 1, potion: 8, hi_potion: 4, antidote: 2 }
+  gold: 3000
+  enemies: []
+- id: w_s12_neg_noruby
+  name: ERT-O - S12 negative (no ruby)
+  mode: field
+  map: overworld
+  entrance: ert_giant
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED]
+  party: *ert_o_party_b4
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 4, antidote: 2 }
+  gold: 3000
+  enemies: []
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
 # === end ERT-T ===
@@ -1477,6 +1649,54 @@
 # === WAT-D (pass W: owned by WAT-D) ===
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
+# S26 (docs/WORLD_PLAN.md 6.5): the field start at Lufenia's land gate on the mesa, the airship parked on the mesa
+# meadow, the band-low party (L28, upgraded classes from S20 on) with the B7 kit (w_gaia) and every grant up to S25.
+# Walk north into Lufenia, into the elder's hall (the slate-roofed hall at the head of the court) and talk to the
+# elder: CHIME_GIVEN and the chime held; the keepers (the magic shops, the inn, the healer's clinic) are there.
+- id: w_s26_start
+  name: WND-O - S26 Lufenia's chime (start)
+  mode: field
+  map: overworld
+  entrance: wnd_lufenia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 155, y: 48 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED]
+  party: &w_s26_party
+    - { class: knight, name: KNGT, level: 28, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 28, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 28, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 28, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: &w_s26_items { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1 }
+  gold: 20000
+  enemies: []
+# The same start with exactly one prerequisite withheld, LUFENIAN_LEARNED: every Lufenian speaks the old tongue and
+# no keeper is in town (the shops, the inn and the clinic are empty); the elder gives nothing.
+- id: w_s26_neg_untaught
+  name: WND-O - S26 without LUFENIAN_LEARNED (negative)
+  mode: field
+  map: overworld
+  entrance: wnd_lufenia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 155, y: 48 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT]
+  party: *w_s26_party
+  items: *w_s26_items
+  gold: 20000
+  enemies: []
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
 # === end WND-T ===
