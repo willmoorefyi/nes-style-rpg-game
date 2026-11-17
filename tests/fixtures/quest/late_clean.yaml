@@ -1,0 +1,41 @@
+# The clean fixture of proofs (d)-(f) (W1-I): `clean` plus goblin fights on the world map (4 steps per fight), a
+# trader in the cave who sells a charm for gold (d3), and a walled outpost behind the key's gate (e), (f): it opens
+# after S0 with an S1-kit party in hand, but serves S2's band with a dearer kit.
+extends: clean
+items:
+  - {id: key1, type: key}
+  - {id: orb, type: key, consumed: true}
+  - {id: charm, type: key}
+  - {id: potion, type: consumable}
+quest:
+  stages:
+    - {id: S1, band: [1, 2], kit: k_low}
+  towns:
+    - {id: hamlet, owner: T1, maps: [town], opensAfter: [], bandStage: S0, kit: k_none, status: built}
+    - {id: outpost, owner: T1, maps: [outpost], opensAfter: [S0], bandStage: S2, kit: k_high, status: built}
+maps:
+  - id: overworld
+    grid:
+      - "############"
+      - "#..........#"
+      - "########.###"
+      - "############"
+    entrances: {town: [2, 1], cave: [9, 1], outpost: [8, 1]}
+    transitions:
+      - {x: 1, y: 1, targetMap: town, targetEntrance: gate}
+      - {x: 10, y: 1, targetMap: cave, targetEntrance: entry}
+      - {x: 8, y: 2, targetMap: outpost, targetEntrance: gate}
+    encounterRate: {min: 4, max: 4}
+    encounters:
+      - {weight: 1, groups: [{id: goblin, min: 2, max: 2}]}
+  - id: cave
+    npcs:
+      - {id: boss, x: 3, y: 1, sprite: ogre}
+      - {id: trader, x: 1, y: 1, dialog: ["A charm, for gold."], giftItem: charm, giftFlag: T1_CHARM, takeGold: 100}
+  - id: outpost
+    grid: ["#####", "#...#", "#...#", "##.##"]
+    entrances: {gate: [2, 2]}
+    transitions:
+      - {x: 2, y: 3, targetMap: overworld, targetEntrance: outpost}
+    npcs:
+      - {id: smith, x: 1, y: 1, shopId: outpost_arms}

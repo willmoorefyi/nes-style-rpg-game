@@ -155,7 +155,8 @@ export function lateOf(ctx: QuestContext): LateData {
   return d;
 }
 
-/** The 4-member price of a kit (gear and spells), or null for an unknown kit. */
+/** The 4-member gear price of a kit (W1-F's figure: w_s1 520, w_pravoka 1725; spells are not counted), or null for
+ *  an unknown kit. */
 export function kitPrice(data: LateData, kit: string | null): number | null {
   const k = kit ? data.kits.get(kit) : undefined;
   if (!k) return null;
@@ -164,7 +165,6 @@ export function kitPrice(data: LateData, kit: string | null): number | null {
     const c = k[cls];
     if (!c) continue;
     for (const g of c.gear ?? []) sum += data.itemPrices.get(g) ?? 0;
-    for (const s of c.spells ?? []) sum += data.itemPrices.get(`spell:${s}`) ?? 0;
   }
   return sum;
 }

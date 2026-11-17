@@ -1,0 +1,19 @@
+# Proof (g)'s detour fixture (W1-I): two anchors two cells apart, a wall between them; the walk goes round (10 steps).
+# The clean variant (geo_detour_open) opens the wall's top cell.
+start: {map: overworld, x: 1, y: 1}
+worldMap: overworld
+quest:
+  goal: GOAL_DONE
+  stages:
+    - {id: S0, tranche: "-", grants: {flags: [GOAL_DONE]}, status: pending}
+maps:
+  - id: overworld
+    grid:
+      - "############"
+      - "#....#.....#"
+      - "#....#.....#"
+      - "#....#.....#"
+      - "#....#.....#"
+      - "#..........#"
+      - "############"
+    entrances: {cornelia: [4, 1], pravoka: [6, 1]}
