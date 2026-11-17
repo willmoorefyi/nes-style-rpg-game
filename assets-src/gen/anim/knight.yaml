@@ -22,6 +22,7 @@ battle:
 # (puppet_kneel_paint.py, <= 160 px per frame, approved palette): both knee plates cut with their thigh / the front plate with its shin so they move whole; the
 # rear thigh's upper plate recoloured to tabard navy (one knee plate at the ground), the front plate 2 px
 # down-right onto the bent knee, two strays cleared.
+# Iteration 3: the 1 px pinhole at the tabard / thigh seam inked.
 kneel:
   lean: 0
   bow: 6
@@ -75,3 +76,7 @@ kneel:
     rect: [46, 55, 55, 63]
     only: [66, 74, 82]
     rgb: [16, 49, 99]
+  - frame: kneel
+    xy:
+    - [36, 68]
+    rgb: [6, 4, 10]

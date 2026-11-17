@@ -25,6 +25,7 @@ tweaks:
 # chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
 # (puppet_kneel_paint.py, <= 160 px per frame, approved palette): the rear trouser's thin white diagonal (kneel, kneel_in2) tucked under the coat tail
 # (recoloured to the coat's dark red), so no second-sword line; no bow, head 4 px lower for the band.
+# Iteration 3: the black spur behind the coat tail trimmed; two grey strays on the trouser band inked.
 kneel:
   lean: 8
   bow: 0
@@ -66,3 +67,15 @@ kneel:
     rect: [42, 60, 53, 73]
     only: [66, 41, 74]
     rgb: [132, 24, 49]
+  - frame: kneel
+    xy:
+    - [57, 63]
+    - [58, 63]
+    - [59, 63]
+    - [58, 62]
+    rgb: null
+  - frame: kneel
+    xy:
+    - [23, 62]
+    - [24, 59]
+    rgb: [6, 4, 10]

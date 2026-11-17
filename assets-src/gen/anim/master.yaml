@@ -34,6 +34,8 @@ tweaks:
 # (puppet_kneel_paint.py, <= 160 px per frame, approved palette): the sash knot cut with the torso; no fist lowered (the near fist stays clear of the thigh); the
 # rear shoe moved 5 px down onto the ground against the shin; the kneel_in2 thigh spike rounded; head 2 px
 # lower for the band.
+# Iteration 3: kneel_in2's pinholes inked and the black void between the front thigh and the sash filled
+# with the thigh's gold-brown (1 px outline kept), its rear shoe 2 px down; kneel's 4 rear-thigh pinholes inked.
 kneel:
   lean: 8
   bow: 12
@@ -55,3 +57,27 @@ kneel:
     - [18, 53]
     - [16, 54]
     rgb: null
+  - frame: kneel_in2
+    xy:
+    - [32, 51]
+    - [32, 52]
+    - [28, 54]
+    - [32, 63]
+    - [33, 63]
+    - [49, 53]
+    - [50, 53]
+    - [53, 53]
+    rgb: &id001 [6, 4, 10]
+  - frame: kneel_in2
+    rect: [29, 57, 34, 62]
+    rgb: [148, 99, 24]
+  - frame: kneel_in2
+    move: [59, 62, 70, 73]
+    by: [0, 2]
+  - frame: kneel
+    xy:
+    - [49, 55]
+    - [50, 55]
+    - [53, 55]
+    - [52, 58]
+    rgb: *id001
