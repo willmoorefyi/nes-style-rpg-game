@@ -1630,6 +1630,82 @@
   enemies: []
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
+# WORLD_PLAN 6.5. S25: on foot at Melmond's land gate (overworld `ert_melmond`), the airship parked on the plain beside
+# it, the band-low party (L28, the upgraded classes) with the B7 kit and every grant up to S24 (the slab held). Walk
+# in over the quay, take the hill lane north to Dr. Unne's house (the grey two-storey house with the slate roof) and
+# talk to him: LUFENIAN_LEARNED is set and the slab is gone. `_neg_noslab` withholds the slab only: Unne asks for it.
+- id: w_s25_start
+  name: ERT-T - S25 Dr. Unne's lesson (slab in hand)
+  mode: field
+  map: overworld
+  entrance: ert_melmond
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 40, y: 109 }
+  flags: &ert_t_s25_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT]
+  party: &ert_t_s25_party
+    - { class: knight, name: KNGT, level: 28, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 28, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 28, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 28, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1, slab: 1 }
+  gold: 20000
+  enemies: []
+- id: w_s25_neg_noslab
+  name: ERT-T - S25 negative (no slab)
+  mode: field
+  map: overworld
+  entrance: ert_melmond
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 40, y: 109 }
+  flags: *ert_t_s25_flags
+  party: *ert_t_s25_party
+  items: { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1 }
+  gold: 20000
+  enemies: []
+# The town before and after the bloom: on the quay at S11 (CANAL_OPEN, the B4 party) without and with
+# EARTH_CRYSTAL_LIT, for the bloom patch (the plots' withered crops, then the green ground with fresh crops).
+- id: w_ert_t_melmond_s11
+  name: ERT-T - Melmond at S11 (the dead fields)
+  mode: field
+  map: melmond
+  entrance: gate
+  fieldMode: walking
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN]
+  party: &ert_t_party_b4
+    - { class: warrior, name: WAR, level: 13, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 13, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 13, equipment: [mythril_hammer, silver_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 13, equipment: [mythril_knife, silver_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 2 }
+  gold: 3000
+  enemies: []
+- id: w_ert_t_melmond_bloom
+  name: ERT-T - Melmond after EARTH_CRYSTAL_LIT (the bloom)
+  mode: field
+  map: melmond
+  entrance: gate
+  fieldMode: walking
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT]
+  party: *ert_t_party_b4
+  items: { lute: 1, mystic_key: 1, rod: 1, potion: 8, hi_potion: 2 }
+  gold: 3000
+  enemies: []
 # === end ERT-T ===
 # === ERT-D (pass W: owned by ERT-D) ===
 # === end ERT-D ===

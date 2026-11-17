@@ -3084,6 +3084,98 @@ browser was being navigated and closed by other agents. Screenshots are in `/tmp
 Also note that NPC trades which play a cutscene take their item with a `take_item` step.
 <!-- === end ERT-O === -->
 <!-- === ERT-T EARTH (pass W: owned by ERT-T) === -->
+### ERT-T result: Melmond, Dr. Unne, S25 (branch `w-ert-t` from `mainline` 3a54966)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-ert-t/`.
+
+**Files:**
+
+- Layouts (all new): `layouts/earth/town_melmond.py` (`melmond`, 46x42, the patch `ert_melmond_bloom`),
+  `town_melmond_people.py` (every outdoor line), `town_melmond_interiors.py` (the script to run) with
+  `town_melmond_homes.py` (houses `unne`, `miller`, `vintner`, `ploughman`, `healer`; `interiors_common.Town("melmond")`)
+  and `town_melmond_shops.py` (the 5 shops and `melmond-inn`). `town_melmond_site.py` is unchanged, so the world
+  files are not regenerated.
+- The 12 compiled maps `melmond*` replace ERT-O's compiled stubs; `index.yaml` is unchanged.
+- Data:
+  - `cutscenes.yaml` (ERT-T anchor): `ert_unne_lesson`;
+  - `quest.yaml`: S25 `built` (entry, walk), town `melmond` `built`;
+  - `debug-scenarios.yaml`: `w_s25_start`, `w_s25_neg_noslab`, `w_ert_t_melmond_s11` and `w_ert_t_melmond_bloom`
+    (the town before and after the bloom);
+  - `shops.yaml`: the `melmond_*` records are kept as W1-F left them (B4, inn 200).
+- Tests: `tests/quest/earth/ert_t_melmond.test.ts` (10: the bloom patch before and after, its overlay, Unne, the
+  doors and exits, EXIT-safety, the clinic, the inn, the shops, the hints) and `ert_t_walk.test.ts` (3).
+
+**Design** (original):
+
+- **The town.** It sits in a fold of grey hills (mountain) on the strait. The only way in is a stone quay from the
+  east shore: the `gate` is at (43, 19), and the quay's end at (45, 19-20) leads to `ert_melmond`.
+- **Lanes.** The harbour road crosses the town to the green, a cobble ring round a lawn of dead ground. The great
+  dead oak stands there, with the dry well at its foot. The hill lane runs north and the field lane south, and a west
+  lane joins all three.
+- **Ground and plants.** The ground is cracked dirt (a desaturated `dirt` remap). Grey (`stone` recolour) oaks,
+  firs, bushes, crops and vine rows stand on it. The windmill's three art rows are offset so it leans.
+- **The fields.** Four fenced plots hold withered crops. There is also a vineyard on the north-west slope, the
+  millpond shrunk to a small pool, and a shut-up farmstead with a note on its wall (an inspect cell). A signpost
+  (also an inspect cell) stands on the green.
+- **The bloom** (`ert_melmond_bloom`, EARTH_CRYSTAL_LIT; 175 cells). The plots and the lawn turn to grass, with fresh
+  crops and flowers in the overlay. It changes the art only: the cells are Road before and Grass after, and they walk
+  both times, because the crops never block.
+- **People.** There are 15 outdoor NPCs. The hint NPCs are `melmond_cavern_hint` (Cavern) and `melmond_giant_hint`
+  (giant). Lines change on VAMPIRE_DEFEATED, EARTH_CRYSTAL_LIT and LUFENIAN_LEARNED.
+- **Dr. Unne** (`melmond-house-unne`, npc `ert_unne`) lost his tablet of the Lufenian alphabet when his ship sank off
+  Onrac. This ties in with Lufenia's archivist (WND-O). His dialog has four states: before, `item:slab`, LIT and
+  LEARNED.
+- **The clinic** is the healer's house (`melmond_healer`, 20 G per level). The inn keeper has `action: inn`. Two chests
+  hold `CHEST_ERT_T_MILLER` (Hi-Potion) and `CHEST_ERT_T_VINTNER` (Soft).
+
+**Town standard (G15):** `melmond: houses 11/7 interiors 5/5 outdoor 15/12 interior 14/10 hints 2/2 reactive 22/4
+shops 5/5 inn 200/200 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `town_melmond.py`, `town_melmond_interiors.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps`: clean (exit 0) |
+| G2 | `build_map.py` on the 12 ids: each `<id>: WxH -> ...`; `--check-determinism` on the 12: all `deterministic`. No `town_*_site.py` change, so no world compile |
+| G3 | no overworld chunk changed (no world compile) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 317 passed (317)`, `Tests 6795 passed, 5 skipped` |
+| G5 | `npm run quest -- --mutate --stage S25`: (a) OK S25; (b) OK (30 withheld runs); (c) OK (14616 states); (d) `S25 L28.2 [28,31]`; (e) OK (3 towns); (g), (h) OK; `mutations: OK (2 gate rows; 2 elements)` (GT-28 caught); `quest-verify: OK`. The full `npm run quest -- --mutate` gives `quest-verify: OK` (43 gate rows, 52 elements) |
+| G6, G7 | `assetCoverage`, `fileCeilings` and `questCeilings` passed; every new script is at most 217 lines |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G12 | `designNotes` and `originality` passed. A fresh reviewer took three rounds: the first two failed on design-note claims that did not match the maps, and the notes and a few props were fixed. Final: `originality review: PASS melmond melmond-house-unne melmond-house-miller melmond-house-vintner melmond-house-ploughman melmond-house-healer melmond-weapon-shop melmond-armor-shop melmond-item-shop melmond-white-magic melmond-black-magic melmond-inn` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.736 (31 pairs; 2 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 8 checked, 6 pending)` |
+| G15 | the row above |
+| G16 | `stubs.py --check ERT-T`: `stubs: 0 left for ERT-T` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 13810 cells; canal joins)` |
+| 5.4 bloom test | `ert_t_melmond.test.ts`: Road before and Grass after, walkable both times, the overlay opaque (`patch_errors` gives `[]`) |
+| G9, G11 | no balance file (S25 has no boss); `git status` shows only owned paths |
+
+**Browser** (G10, port 5227, `mute=1`, own headless Chromium via `/tmp/w-ert-t/drive.cjs`; the server is stopped):
+
+| Row | Result |
+|---|---|
+| `w_s25_start` | overworld (42, 112), then `melmond` gate (43, 19), the hill lane, `melmond-house-unne`, talk to Unne: LUFENIAN_LEARNED set and the slab gone; 0 console errors (`/tmp/w-ert-t/s25_unne_dialog.png`, `s25_after.png`) |
+| `w_s25_neg_noslab` | the same walk: no flag; Unne speaks of the tablet lost off Onrac; 0 errors (`s25neg_unne_dialog.png`) |
+| `w_ert_t_melmond_bloom` / `_s11` | the green lawn and the plots are green with crops after the flag, and dead dirt before it; 0 errors (`bloom_plots.png`, `s11_quay.png`) |
+
+**Deviations:**
+
+- **Unne's trade is done by the cutscene,** the same way as ERT-O's Nerrick. The NPC has `requiredItem: slab` and the
+  cutscene `{id: ert_unne_lesson, onceFlag: LUFENIAN_LEARNED}`, and the cutscene does `take_item slab` and then
+  `set_flag LUFENIAN_LEARNED`. 4.3 asks for `takeItem` + `giftFlag`, but with those the slab is taken before
+  `runPending` re-checks the outcome, so the cutscene would never play. GT-28 is still caught.
+- **The overworld icon is not restyled.** Its art lives in ERT-O's `world_earth_sites.py`, which this tranche does
+  not own, so ERT-O's placeholder farmhouse stays. The site file is unchanged.
+- **The town uses the `overworld` kit as well,** for the hills, the beach and the strait (`kits: [town, castle,
+  overworld]`).
+- **The vine rows do not bloom.** They are blocking hedges, and a patch cell under them would make them walkable.
+
+**AGENTS.md delta (for INT):** add `layouts/earth/town_melmond.py` (`melmond`) and
+`layouts/earth/town_melmond_interiors.py` (with `_homes.py` and `_shops.py`: `melmond-house-*`, the shops and the inn)
+to the map table. Add a note on town patches: a patch may carry its own `objects` (art only), and a base object
+touching a patch cell is dropped from the overlay, so a lawn patch keeps clear of every object footprint. Add the
+debug scenarios `w_s25_start`, `w_s25_neg_noslab`, `w_ert_t_melmond_s11` and `w_ert_t_melmond_bloom`.
 <!-- === end ERT-T === -->
 <!-- === ERT-D EARTH (pass W: owned by ERT-D) === -->
 <!-- === end ERT-D === -->
