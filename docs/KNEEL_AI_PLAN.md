@@ -380,7 +380,7 @@ Per sprite, as in rev 4: J0 `PASS` before `approve`; J1 `PASS` and `monster_anim
 
 ## TODOs
 
-- [ ] KA-G0 tooling: `gemini_batch.py`, arm `g`, `gemini.py` `image_size`, the guard changes, budget.json pass KA-G and the history moves, selftests; KG1, KG3 (on a pilot sprite) and KG5 green; 0 calls (high, 6h)
+- [x] KA-G0 tooling: `gemini_batch.py`, arm `g`, `gemini.py` `image_size`, the guard changes, budget.json pass KA-G and the history moves, selftests; KG1, KG3 (on a pilot sprite) and KG5 green; 0 calls (high, 6h). Branch `kneel-ka-g0`. Split for the 250-line rule: `gemini_batch_rounds.py` / `_jobs.py` / `_fetch.py`, `budget_kag.py` (guard rules), `kneel_ai_gem.py` (arm g request + send), `kneel_ai_pitch.py`, `kneel_ai_budget.py` (KG1), `kneel_ai_pilot.py` (pilot sheet), `kneel_ai_plan.py`. KG3 prints the real image count ("2 images + 1 text" on try 1, m8); KG1 adds `expiry <e>/125` and a `generate.check_budget` probe line
 - [ ] KA-G0b expired-batch billing check (docs and FAQ; the billing report after the first job); `void_ok` decision logged (low, 0.5h)
 - [ ] KA-G1 pilot: 10 sprites x <= 3 tries, interactive; J0, review, approve, marking, J1, lock; pilot sheet, GIFs, screenshots (high, 8h)
 - [ ] U1-G: user review of the pilot and the Q-G2 budget (blocking)

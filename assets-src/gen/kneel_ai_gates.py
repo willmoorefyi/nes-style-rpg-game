@@ -101,6 +101,11 @@ def j0(sp: D.Sprite, key: np.ndarray, raw: np.ndarray, info: dict, T: dict | Non
     add("K-ground", not g, "; ".join(g) or "ok")
     hk, (blo, bhi) = D.height(key), sp.band_px
     add("K-height", blo <= hk <= bhi + 1, f"{hk} px in {blo}-{bhi} (+1)")
+    if info.get("arm") == "g":                   # rev 7 section 2: reported, never a J0 fail by itself
+        from gen import kneel_ai_pitch as PT
+        add("pitch", None, PT.note(info.get("pitch")))
+        add("A-scale flag", None, f"{info.get('scale_path')} (s {info.get('s')}): J1 A-scale" if info.get("flag_scale")
+            else "none")
     if sil is not None:
         op = key[..., 3] > 0
         add("A-agree", None, f"{float((op & sil).sum()) / max(int(op.sum()), 1):.3f} inside G-sil")

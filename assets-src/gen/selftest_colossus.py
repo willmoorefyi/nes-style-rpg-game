@@ -90,7 +90,7 @@ def sandbox(budget: dict | None = None, linked: bool = False, client: _FakeClien
             B.CACHE, B.BR_LEDGER, B.BUDGET, B._client, B.git_dirs = real
 
 
-def _budget() -> dict:          # pass C's block, read from bedrock_history since KA0b (pass KA is live)
+def _budget() -> dict:          # pass C's block, read from bedrock_history (closed at KA0b; pass KA closed too)
     return __import__("gen.bedrock", fromlist=["x"]).pass_view(json.loads((HERE / "budget.json").read_text()), "C")
 
 
@@ -140,8 +140,8 @@ def _pinned(check) -> None:
           f"({ {k: br.get(k) for k in ('pass', 'cap', 'gemini_before')} })")
     check(sum(PURPOSE_CAPS.values()) == CAP_C, f"the 5.6 per-purpose caps sum to the cap {CAP_C}")
     from gen import selftest_passv as SPV
-    check(_budget().get("attempts_before") == SPV.N_V0 and _budget().get("cap") == SPV.CAP_V,
-          "budget.json: the pass-V literals are untouched by the bedrock block")
+    check((_budget().get("attempts_before"), _budget().get("cap")) == SPV.KAG_TOP[:2],
+          "budget.json: the Gemini top level (pass KA-G, 405 / 665) is untouched by the bedrock blocks")
 
 
 def _guard(check) -> None:

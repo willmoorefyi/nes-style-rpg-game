@@ -37,6 +37,7 @@ import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 from PIL import Image, ImageDraw  # noqa: E402
 
+from gen import budget_kag as BK  # noqa: E402
 from gen import guides as G  # noqa: E402
 from gen import kitsheet as KS  # noqa: E402
 from gen import monster as M  # noqa: E402
@@ -399,16 +400,21 @@ def budget_consistency(b: dict, n_attempts: int) -> None:
                 raise SystemExit(f"refused: budget.json is inconsistent: {p.get('name')} sheet_caps entry {key}: {n!r} "
                                  f"(the key must name an only_ids id and one of its only_sheets, the value an integer "
                                  f"in {SHEET_CAP_MIN}..{SHEET_CAP_MAX})")
-    named = {p.get("name"): p for p in b.get("passes", [])}
-    pv = named.get("pass V")
-    if pv is None:
+    passes = b.get("passes", [])
+    if "pass V" not in {p.get("name") for p in passes}:
         return
-    fix = named.get("pass R fix") or {}
-    bounds = {"attempts_before": n0, "pass V.gemini_before": pv.get("gemini_before"),
-              "pass R fix.gemini_end": fix.get("gemini_end")}
-    if len(set(bounds.values())) != 1:
-        raise SystemExit(f"refused: budget.json is inconsistent: {bounds} must all be equal (pass R fix closed where "
-                         "pass V opens)")
+    # KA-G (docs/KNEEL_AI_PLAN.md rev 7 section 5): the last closed pass's gemini_end == every open pass's gemini_before
+    # == attempts_before, and each closed pass ends where the next one opens (pass R fix -> pass V at 367 still holds)
+    closed = [p for p in passes if "gemini_end" in p]
+    bounds = {"attempts_before": n0, **{f"{p.get('name')}.gemini_before": p.get("gemini_before") for p in passes
+                                        if "gemini_end" not in p},
+              **({f"{closed[-1].get('name')}.gemini_end": closed[-1].get("gemini_end")} if closed else {})}
+    chain = [f"{a.get('name')}.gemini_end {a.get('gemini_end')} != {c.get('name')}.gemini_before "
+             f"{c.get('gemini_before')}" for a, c in zip(passes, passes[1:]) if "gemini_end" in a
+             and a["gemini_end"] != c.get("gemini_before")]
+    if len(set(bounds.values())) != 1 or chain:
+        raise SystemExit(f"refused: budget.json is inconsistent: {bounds} must all be equal (the last closed pass ends "
+                         f"where the open pass opens){'; ' + '; '.join(chain) if chain else ''}")
 
 
 def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: bool,
@@ -433,15 +439,16 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
     if budget is not None:                           # the user's run-wide hard cap (budget.json); never reads `history`
         b = budget
         budget_consistency(b, len(attempts))
-        used = len(attempts) - b["attempts_before"]
+        void_ok = any(p.get("void_ok") for p in b.get("passes", []) if "gemini_end" not in p)   # KA-G (BK docstring)
+        run = BK.counted(attempts[b["attempts_before"]:], ledger, void_ok)
+        used = len(run)
         if used + len(misses) > b["cap"]:
             raise SystemExit(f"refused: the run cap of {b['cap']} paid images is reached ({used} used); only the user "
                              "may approve more")
-        run = attempts[b["attempts_before"]:]
         caps = {k: n for p in b.get("passes", []) if "gemini_end" not in p   # FW-V8: the open passes' sheet_caps
                 for k, n in (p.get("sheet_caps") or {}).items()}
-        for r in misses:
-            n = sum(1 for e in run if e.get("character") == r.character and e.get("sheet") == r.sheet.name)
+        for r in BK.per_sheet(misses):
+            n = sum(1 for e in BK.sheet_rows(run) if e.get("character") == r.character and e.get("sheet") == r.sheet.name)
             limit = sheet_limit(caps, r.character, r.sheet.name, b["max_attempts_per_sheet"])
             if n >= limit:
                 raise SystemExit(f"refused: {r.character}/{r.sheet.name} already used {n} attempts this run "
@@ -457,11 +464,12 @@ def check_budget(requests: list[Request], *, paid: bool, max_paid: int, retry: b
                     raise SystemExit(f"refused: {cap['name']} allows {r.character} only "
                                      f"{', '.join(cap['only_sheets'].get(r.character) or []) or 'no sheet'}; "
                                      f"{r.character}/{r.sheet.name} is not listed (only_sheets)")
-            new = attempts[cap["gemini_before"]:]
+            new = BK.counted(attempts[cap["gemini_before"]:], ledger, cap.get("void_ok", False))
+            if BK.is_kag(cap):                       # pass KA-G: sheets, purposes, 4 per sheet with a reserve 4th
+                BK.check_pass(cap, new, misses)
             if len(new) + len(misses) > cap["max_new"] or any(sum(e.get("character") == r.character and e.get(
-                    "sheet") == r.sheet.name for e in new) >= sheet_limit(cap.get("sheet_caps"), r.character,
-                                                                           r.sheet.name, cap["max_per_sheet"])
-                    for r in misses):
+                    "sheet") == r.sheet.name for e in BK.sheet_rows(new)) >= sheet_limit(
+                    cap.get("sheet_caps"), r.character, r.sheet.name, cap["max_per_sheet"]) for r in BK.per_sheet(misses)):
                 raise SystemExit(f"refused: {cap['name']} allows {cap['max_new']} new Gemini attempts "
                                  f"({cap['max_per_sheet']} per sheet, sheet_caps {cap.get('sheet_caps') or {}}); "
                                  f"{len(new)} used")
