@@ -482,6 +482,7 @@ def test_monster_anim() -> None:
     from gen import selftest_pages as SP
     SP.run_pages(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
+    print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

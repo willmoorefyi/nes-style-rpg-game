@@ -1,0 +1,48 @@
+{
+ "thresholds": {
+  "T_hist": 0.3282,
+  "T_adj": 0.6411,
+  "T_area_lo": 0.4145,
+  "T_area_hi": 1.2965,
+  "T_prop_iou": 0.0366,
+  "T_prop_outside": 0.1519,
+  "T_head_iou": 0.3763,
+  "T_head_outside": 0.1294,
+  "T_dup_match": 0.5,
+  "T_pal_mean": 11.99,
+  "T_pal_p95": 21.44
+ },
+ "excluded": {
+  "ashen_queen": "key_offset",
+  "black_knight": "keyframe paint",
+  "black_widow": "FW-Q alias",
+  "chimera": "FW-Q alias",
+  "cobra": "keyframe paint",
+  "crocodile": "keyframe paint",
+  "hollow_seraph": "FW-H hurt_from",
+  "king_mummy": "keyframe paint"
+ },
+ "palette_split": [
+  "astos",
+  "chaos",
+  "death_eye",
+  "drowned_sovereign",
+  "garland",
+  "knight",
+  "lich",
+  "warmech",
+  "warrior",
+  "white_mage",
+  "white_wizard"
+ ],
+ "date": "2026-11-17",
+ "counts": {
+  "pairs": 127,
+  "prop_iou": 27,
+  "prop_out": 27,
+  "head_iou": 117,
+  "head_out": 117,
+  "dup": 154
+ },
+ "source": "kneel_ai.py calibrate (docs/KNEEL_AI_PLAN.md 6)"
+}

@@ -90,8 +90,8 @@ def sandbox(budget: dict | None = None, linked: bool = False, client: _FakeClien
             B.CACHE, B.BR_LEDGER, B.BUDGET, B._client, B.git_dirs = real
 
 
-def _budget() -> dict:
-    return json.loads((HERE / "budget.json").read_text())
+def _budget() -> dict:          # pass C's block, read from bedrock_history since KA0b (pass KA is live)
+    return __import__("gen.bedrock", fromlist=["x"]).pass_view(json.loads((HERE / "budget.json").read_text()), "C")
 
 
 def _rows(B) -> list[dict]:
@@ -135,8 +135,8 @@ def run_colossus(check: Callable[[bool, str], None]) -> None:
 def _pinned(check) -> None:
     br = _budget().get("bedrock") or {}
     check((br.get("pass"), br.get("cap"), br.get("per_purpose_caps"), br.get("gemini_before")) ==
-          ("C", CAP_C, PURPOSE_CAPS, N_C0) and br.get("reserve_max_usd") == RESERVE_MAX_USD,
-          f"budget.json bedrock block: pass C, cap {CAP_C}, the 5.6 per-purpose caps, gemini_before N_C0 = {N_C0} "
+          ("C", CAP_C, PURPOSE_CAPS, N_C0) and br.get("reserve_max_usd") == RESERVE_MAX_USD and br.get("used") == 25,
+          f"budget.json bedrock_history pass C (closed at 25): cap {CAP_C}, the 5.6 caps, gemini_before N_C0 = {N_C0} "
           f"({ {k: br.get(k) for k in ('pass', 'cap', 'gemini_before')} })")
     check(sum(PURPOSE_CAPS.values()) == CAP_C, f"the 5.6 per-purpose caps sum to the cap {CAP_C}")
     from gen import selftest_passv as SPV

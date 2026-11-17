@@ -1,0 +1,632 @@
+# Pass KA prompts, arm settings and per-sprite lists (docs/KNEEL_AI_PLAN.md 3 D-KA4, 5b, r3-3). Read by kneel_ai_req.py
+# (prompts and request bodies) and kneel_ai_j1.py (weapons / heads). `sprites:` is written by `kneel_ai.py bodies
+# --write` and reviewed (kneel_ai_bodies.REVIEWED holds the corrections); a sprite's `extra` / `negative_extra` change
+# its prompt only for a reason a reviewer or a J0 / J1 check named (section 3).
+style: >-
+  16-bit SNES JRPG battle sprite of exactly this character, crisp pixel art, bold black outline between every part,
+  flat cel shading with three tones per colour, the same limited palette as the reference, light from the upper left,
+  {facing}, whole figure in frame, plain flat {bg} background
+negative: >-
+  standing upright, attacking, jumping, lying dead, knocked out, extra limbs, extra heads, extra hands, extra weapons,
+  duplicate weapon, missing weapon, second character, different character, new colours, gradient, soft shading, blur,
+  anti-aliasing, 3d render, photo, text, watermark, ground, floor, shadow on ground, scenery, cropped, {opposite},
+  {not_bg}
+white_negative: white outline glow, white halo
+compact: in a compact pose, limbs drawn in close to the body, nothing stretched out
+compact_negative: stretched out, sprawling
+poses:
+  biped:
+    - kneeling on one knee, the far knee on the ground, the near foot planted, torso bent forward, head bowed low looking at the ground, arms hanging, the weapon held low with its tip toward the ground, exhausted
+    - sitting, both knees up
+  mechanical:
+    - a heavy machine powered down, kneeling on one knee, armoured torso slumped forward, head lowered, arms hanging heavily, the same plating and joints
+    - broken apart, sparks, smoke
+  robed:
+    - kneeling on one knee, the robe pooled on the ground around the legs, torso bent forward, head or hood bowed low, hands resting on the knee, staff or rod held low
+    - legs showing through the robe
+  quadruped:
+    - lying down on its belly in a compact pose, forelegs tucked under the chest, hind legs folded under the body, head lowered to the ground in front of the chest, tail curled along the body, wings folded tight (if any), exhausted
+    - standing on four legs, on its back, stretched out, legs extended forward, tail stretched out behind
+  bird:
+    - crouching low on the ground, legs folded, wings drooping to the ground, neck bent and head lowered, beak near the ground
+    - flying, spread wings
+  floating:
+    - sagging lower in the air, the body drooping, head and eyes turned down, arms, tendrils or fins hanging limp
+    - touching the ground
+  swimmer:
+    - listing nose-down and sinking, fins hanging limp, tail drooping
+    - upside down
+  serpent:
+    - coiled low and flat on the ground, the coils pressed down, head lowered to rest on the coils, mouth closed
+    - rearing up, striking
+  naga:
+    - slumped forward onto its coiled tail, upper body bent low, head bowed, arms hanging
+    - rearing up
+  arthropod:
+    - body lowered onto the ground in a compact pose, legs bent and drawn in close under the body, head, pincers and stinger drooping down and tucked in
+    - on its back, legs splayed wide, legs stretched out
+  blob:
+    - slumped and flattened into a wide low mound, sagging, eyes looking down
+    - splitting into pieces
+  rooted:
+    - wilting, stalks and vines drooping toward the ground, head bowed, the root mass slightly sagged
+    - uprooted
+seeds: [1234, 1235, 1236]
+# D-KA4 arm settings (all other parameters at the API defaults); the user may fix them at the pick (section 3)
+arms:
+  a: {model: sd35, image: derived, strength: 0.40}
+  b: {model: style_transfer, init: sil, change_strength: 0.85, style_strength: 1.0, composition_fidelity: 0.5}
+  b2: {model: style_transfer, init: sil, change_strength: 0.85, style_strength: 0.6, composition_fidelity: 0.5}
+  c: {model: control_sketch, image: skel, control_strength: 0.7, style_preset: pixel-art,
+      then: {model: style_transfer, change_strength: 0.4, composition_fidelity: 0.9}}
+  d: {model: style_guide, fidelity: 0.7, style_preset: pixel-art}
+probe:
+  sprites: [goblin, wolf, white_mage, cobra, green_slime]
+  calls: [[a, 1234], [a, 1235], [b, 1234], [b, 1235], [b2, 1234], [c, 1234], [c, 1235], [d, 1234], [d, 1235]]
+sprites:
+  air_elemental:
+    fill: 0.57
+    heads: [head]
+    weapons: []
+  allosaurus:
+    fill: 0.94
+    heads: [head]
+    weapons: []
+  anaconda:
+    fill: 0.82
+    heads: [head]
+    weapons: []
+  ankheg:
+    fill: 0.773
+    heads: [thorax]
+    weapons: []
+  ashen_queen:
+    fill: 0.755
+    heads: [head]
+    weapons: [weapon]
+  astos:
+    fill: 0.505
+    heads: [head]
+    robed: true
+    weapons: [staff]
+  baretta:
+    fill: 0.86
+    heads: [head]
+    weapons: []
+  basilisk:
+    fill: 0.849
+    heads: [head]
+    weapons: []
+  bigeyes:
+    fill: 0.889
+    heads: [head]
+    weapons: []
+  black_flan:
+    fill: 0.767
+    heads: []
+    heads_none: no head part in the blob rig (the face is drawn on the body)
+    scale_part: body
+    weapons: []
+  black_knight:
+    fill: 0.6
+    heads: [head]
+    weapons: [weapon]
+  black_mage:
+    fill: 0.613
+    heads: [head]
+    robed: true
+    weapons: []
+  black_widow:
+    fill: 0.85
+    heads: [thorax]
+    weapons: []
+  black_wizard:
+    fill: 0.588
+    heads: [head]
+    robed: true
+    weapons: []
+  bloodbones:
+    fill: 0.713
+    heads: [head]
+    weapons: [weapon, blade_f]
+  blue_dragon:
+    fill: 0.891
+    heads: [head]
+    weapons: []
+  buccaneer:
+    fill: 0.725
+    heads: [head]
+    weapons: [weapon]
+  chaos:
+    fill: 0.92
+    heads: [head]
+    robed: true
+    weapons: []
+  chimera:
+    fill: 0.78
+    heads: [head]
+    weapons: []
+  clay_golem:
+    fill: 0.68
+    heads: [head]
+    weapons: []
+  cobra:
+    fill: 0.725
+    heads: [head]
+    weapons: []
+  cockatrice:
+    fill: 0.643
+    heads: [head]
+    weapons: []
+  crawler:
+    fill: 0.63
+    heads: [thorax]
+    weapons: []
+  crazy_horse:
+    fill: 0.826
+    heads: [head]
+    weapons: []
+  crocodile:
+    fill: 0.972
+    heads: [head]
+    weapons: []
+  dark_fighter:
+    fill: 0.55
+    heads: [head]
+    weapons: [weapon]
+  dark_wizard:
+    fill: 0.512
+    heads: [head]
+    robed: true
+    weapons: [weapon]
+  death_eye:
+    fill: 0.47
+    heads: [head]
+    weapons: []
+  death_knight:
+    fill: 0.525
+    heads: [head]
+    weapons: [weapon]
+  deepeyes:
+    fill: 0.445
+    heads: [head]
+    weapons: []
+  desert_baretta:
+    fill: 0.836
+    heads: [head]
+    weapons: []
+  dragon:
+    fill: 0.68
+    heads: [head]
+    weapons: []
+  dragon_zombie:
+    fill: 0.875
+    heads: [head]
+    weapons: []
+  drowned_sovereign:
+    fill: 0.85
+    heads: [head]
+    robed: true
+    weapons: []
+  earth_elemental:
+    fill: 0.734
+    heads: [head]
+    weapons: []
+  earth_medusa:
+    fill: 0.625
+    heads: [head]
+    weapons: []
+  evil_eye:
+    fill: 0.648
+    heads: [head]
+    weapons: []
+  fire_elemental:
+    fill: 0.461
+    heads: [head]
+    weapons: []
+  fire_gigas:
+    fill: 0.633
+    heads: [head]
+    weapons: [hammer]
+  fire_hydra:
+    fill: 0.919
+    heads: [head, head2, head3]
+    weapons: []
+  fire_lizard:
+    fill: 0.945
+    heads: [head]
+    weapons: []
+  gargoyle:
+    fill: 0.675
+    heads: [head]
+    weapons: []
+  garland:
+    fill: 0.84
+    heads: [head]
+    weapons: [sword]
+  ghast:
+    fill: 0.45
+    heads: [head]
+    weapons: []
+  ghost:
+    fill: 0.481
+    heads: [head]
+    weapons: []
+  ghoul:
+    fill: 0.744
+    heads: [head]
+    weapons: []
+  gigas_worm:
+    fill: 0.57
+    heads: [head]
+    weapons: []
+  goblin:
+    fill: 0.688
+    heads: [head]
+    weapons: [dagger]
+  gr_imp:
+    fill: 0.575
+    heads: [head]
+    weapons: [weapon]
+  gr_wolf:
+    fill: 0.86
+    heads: [head]
+    weapons: []
+  gray_ooze:
+    fill: 0.718
+    heads: []
+    heads_none: no head part in the blob rig (the face is drawn on the body)
+    scale_part: body
+    weapons: []
+  green_dragon:
+    fill: 0.868
+    heads: [head]
+    weapons: []
+  green_slime:
+    fill: 0.7
+    heads: []
+    heads_none: no head part in the blob rig (the face is drawn on the body)
+    scale_part: body
+    weapons: []
+  guardian:
+    fill: 0.891
+    heads: [head]
+    weapons: [spear_n, spear_f]
+  hellhound:
+    fill: 0.893
+    heads: [head, head2]
+    weapons: []
+  hill_gigas:
+    fill: 0.531
+    heads: [head]
+    weapons: [club]
+  hollow_seraph:
+    fill: 0.84
+    heads: [head]
+    weapons: []
+  horned_devil:
+    fill: 0.905
+    heads: [head]
+    weapons: [weapon]
+  hydra:
+    fill: 0.672
+    heads: [head, head2, head3]
+    weapons: []
+  hyenadon:
+    fill: 0.75
+    heads: [head]
+    weapons: []
+  ice_gigas:
+    fill: 0.617
+    heads: [head]
+    weapons: [axe]
+  iron_golem:
+    fill: 0.633
+    heads: [head]
+    weapons: []
+  king_mummy:
+    fill: 0.525
+    heads: [head]
+    weapons: [weapon]
+  knight:
+    fill: 0.637
+    heads: [head]
+    weapons: []
+  lava_worm:
+    fill: 0.68
+    heads: [head]
+    weapons: []
+  lesser_tiger:
+    fill: 0.82
+    heads: [head]
+    weapons: []
+  lich:
+    fill: 0.925
+    heads: [head]
+    weapons: []
+  lizard:
+    fill: 0.828
+    heads: [head]
+    weapons: []
+  manticore:
+    fill: 0.812
+    heads: [head]
+    weapons: []
+  master:
+    fill: 0.662
+    heads: [head]
+    weapons: []
+  medusa:
+    fill: 0.625
+    heads: [head]
+    weapons: []
+  mindflayer:
+    fill: 0.388
+    heads: [head]
+    robed: true
+    weapons: []
+  minotaur:
+    fill: 0.602
+    heads: [head]
+    weapons: [axe]
+  minotaur_zombie:
+    fill: 0.555
+    heads: [head]
+    weapons: [cleaver]
+  monk:
+    fill: 0.6
+    heads: [head]
+    weapons: []
+  mummy:
+    fill: 0.613
+    heads: [head]
+    weapons: []
+  neochu:
+    fill: 0.508
+    heads: []
+    heads_none: 'rooted: no head, the root mass is the body'
+    scale_part: mass
+    weapons: []
+  nightmare:
+    fill: 0.811
+    heads: [head]
+    weapons: []
+  ninja:
+    fill: 0.738
+    heads: [head]
+    weapons: []
+  ochre_jelly:
+    fill: 0.671
+    heads: []
+    heads_none: no head part in the blob rig (the face is drawn on the body)
+    scale_part: body
+    weapons: []
+  ochu:
+    fill: 0.719
+    heads: []
+    heads_none: 'rooted: no head, the root mass is the body'
+    scale_part: mass
+    weapons: []
+  ogre:
+    fill: 0.664
+    heads: [head]
+    weapons: [club]
+  ogre_chief:
+    fill: 0.578
+    heads: [head]
+    weapons: [weapon]
+  ogre_mage:
+    fill: 0.586
+    heads: [head]
+    robed: true
+    weapons: [staff_r]
+  pirate:
+    fill: 0.625
+    heads: [head]
+    weapons: [weapon]
+  piscodemon:
+    fill: 0.646
+    heads: [head]
+    weapons: []
+  purple_worm:
+    fill: 0.609
+    heads: [head]
+    weapons: []
+  pyrolisk:
+    fill: 0.692
+    heads: [head]
+    weapons: []
+  rakshasa:
+    fill: 0.525
+    heads: [head]
+    robed: true
+    weapons: []
+  red_mage:
+    fill: 0.613
+    heads: [head]
+    weapons: []
+  red_piranha:
+    fill: 0.886
+    heads: [head]
+    weapons: []
+  red_wizard:
+    fill: 0.575
+    heads: [head]
+    robed: true
+    weapons: []
+  remorazz:
+    fill: 0.886
+    heads: [thorax]
+    weapons: []
+  rhyos:
+    fill: 0.773
+    heads: [head, ram_n, ram_f, lizard]
+    weapons: []
+  sabertooth:
+    fill: 0.896
+    heads: [head]
+    weapons: []
+  sahagin:
+    fill: 0.675
+    heads: [head]
+    weapons: [weapon]
+  sahagin_chief:
+    fill: 0.854
+    heads: [head]
+    weapons: [weapon, spear_b]
+  sahagin_prince:
+    fill: 0.55
+    heads: [head]
+    weapons: []
+  sand_worm:
+    fill: 0.617
+    heads: [head]
+    weapons: []
+  scorpion:
+    fill: 0.915
+    heads: [thorax]
+    weapons: []
+  sea_scorpion:
+    fill: 0.8
+    heads: [thorax]
+    weapons: []
+  sea_snake:
+    fill: 0.578
+    heads: [head]
+    weapons: []
+  sea_troll:
+    fill: 0.578
+    heads: [head]
+    weapons: []
+  shadow:
+    fill: 0.643
+    heads: [head]
+    weapons: []
+  shark:
+    fill: 0.602
+    heads: [head]
+    weapons: []
+  skeleton:
+    fill: 0.562
+    heads: [head]
+    weapons: [weapon]
+  soldier:
+    fill: 0.758
+    heads: [head]
+    weapons: [weapon]
+  specter:
+    fill: 0.468
+    heads: [head]
+    robed: true
+    weapons: []
+  sphinx:
+    fill: 0.703
+    heads: [head]
+    weapons: []
+  spirit_naga:
+    fill: 0.617
+    heads: [head]
+    weapons: [staff]
+  stone_golem:
+    fill: 0.688
+    heads: [head]
+    weapons: []
+  tarantula:
+    fill: 0.923
+    heads: [thorax]
+    weapons: []
+  thief:
+    fill: 0.588
+    heads: [head]
+    weapons: []
+  troll:
+    fill: 0.625
+    heads: [head]
+    weapons: [club, club_s]
+  tyrannosaur:
+    fill: 0.867
+    heads: [head]
+    weapons: []
+  vampire:
+    fill: 0.588
+    heads: [head]
+    weapons: []
+  vampire_lord:
+    fill: 0.525
+    heads: [head]
+    weapons: []
+  warmech:
+    fill: 0.776
+    heads: [head]
+    weapons: []
+  warrior:
+    fill: 0.6
+    heads: [head]
+    weapons: []
+  water_elemental:
+    fill: 0.547
+    heads: [head]
+    weapons: []
+  water_naga:
+    fill: 0.562
+    heads: [head]
+    weapons: [trident]
+  weretiger:
+    fill: 0.725
+    heads: [head]
+    weapons: []
+  werewolf:
+    fill: 0.637
+    heads: [head]
+    weapons: []
+  white_crocodile:
+    fill: 0.954
+    heads: [head]
+    weapons: []
+  white_dragon:
+    fill: 0.828
+    heads: [head]
+    weapons: []
+  white_mage:
+    fill: 0.675
+    heads: [head]
+    robed: true
+    weapons: [weapon]
+  white_shark:
+    fill: 0.828
+    heads: [head]
+    weapons: []
+  white_wizard:
+    fill: 0.688
+    heads: [head]
+    robed: true
+    weapons: [weapon]
+  wight:
+    fill: 0.613
+    heads: [head]
+    weapons: [weapon]
+  winter_wolf:
+    fill: 0.771
+    heads: [head]
+    weapons: []
+  wolf:
+    fill: 0.845
+    heads: [head]
+    weapons: []
+  wraith:
+    fill: 0.438
+    heads: [head]
+    robed: true
+    weapons: []
+  wyrm:
+    fill: 0.602
+    heads: [head]
+    weapons: []
+  wyvern:
+    fill: 0.625
+    heads: [head]
+    weapons: []
+  zombie:
+    fill: 0.45
+    heads: [head]
+    weapons: []

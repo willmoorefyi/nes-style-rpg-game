@@ -51,13 +51,27 @@ MODELS = {
     "upscale_conservative": "us.stability.stable-conservative-upscale-v1:0",
     "upscale_creative": "us.stability.stable-creative-upscale-v1:0",
     "upscale_fast": "us.stability.stable-fast-upscale-v1:0",
+    # pass KA (docs/KNEEL_AI_PLAN.md D-KA4; inference profiles listed read-only in us-west-2, plan section 1)
+    "style_transfer": "us.stability.stable-style-transfer-v1:0",
+    "control_sketch": "us.stability.stable-image-control-sketch-v1:0",
+    "control_structure": "us.stability.stable-image-control-structure-v1:0",     # = structure (the KA fallback of c1)
+    "search_recolor": "us.stability.stable-image-search-recolor-v1:0",
+    "erase_object": "us.stability.stable-image-erase-object-v1:0",
 }
 
-# USD per call (estimates, docs/CHAOS_FORMS_PLAN.md 5.6 / 18.9; Bedrock pricing confirmed at the first call). Only the
-# reserve rule reads them (B7: reserve calls <= $0.08, so every upscale is priced above that).
+# USD per call (docs/CHAOS_FORMS_PLAN.md 5.6 / 18.9 estimates; KA0b confirmations, docs/KNEEL_AI_PLAN.md 13). The
+# reserve rule reads them (B7: reserve calls <= $0.08, so every upscale is priced above that), and kneel_ai.py gen
+# refuses an arm whose model is not in PRICE_CONFIRMED. Confirmed (us-west-2, 2026-11-17): sd35 0.08, core 0.04, ultra
+# 0.14 from the AWS Price List API (`aws pricing get-products --service-code AmazonBedrockFoundationModels`, read-only:
+# "AWS Marketplace software usage|us-west-2|Output image"); style_transfer 0.08, style_guide / control_sketch /
+# structure / inpaint 0.07 from the AWS Bedrock pricing page (user ruling, plan "User rulings"). search_recolor and
+# erase_object have no price on record (unused; refused by the reserve rule, fail-closed).
 COST_USD = {"core": 0.04, "sd35": 0.08, "ultra": 0.14, "structure": 0.07, "style_guide": 0.07, "remove_bg": 0.07,
-            "search_replace": 0.07, "inpaint": 0.07, "outpaint": 0.07,
+            "search_replace": 0.07, "inpaint": 0.07, "outpaint": 0.07, "style_transfer": 0.08, "control_sketch": 0.07,
+            "control_structure": 0.07,
             "upscale_conservative": 0.40, "upscale_creative": 0.60, "upscale_fast": 0.25}
+PRICE_CONFIRMED = {"sd35", "core", "ultra", "style_transfer", "style_guide", "control_sketch", "structure",
+                   "control_structure", "inpaint"}
 RESERVE_MAX_USD = 0.08          # used when budget.json has no reserve_max_usd
 
 _client = None
@@ -122,6 +136,15 @@ def bedrock_block(budget: dict | None = None) -> dict:
         raise SystemExit("refused: budget.json has no bedrock block (pass, cap, per_purpose_caps); every paid Bedrock "
                          "call needs one")
     return br
+
+
+def pass_view(budget: dict, name: str) -> dict:
+    """`budget` with the `bedrock` block of pass `name`: the live block while that pass runs, else its closed entry in
+    `bedrock_history` (documentation that the gate never reads; colossus.py budget --check reads pass C from it)."""
+    if (budget.get("bedrock") or {}).get("pass") == name:
+        return budget
+    h = [x for x in budget.get("bedrock_history") or [] if x.get("pass") == name]
+    return {**budget, "bedrock": h[-1]} if h else budget
 
 
 def purpose_key(purpose: str) -> str:
