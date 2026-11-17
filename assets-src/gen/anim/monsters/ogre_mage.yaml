@@ -132,7 +132,7 @@ paint:                         # small pockets the moves close off (hand / staff
   - {frame: atk_mid, xy: [[59, 107], [60, 106], [60, 107], [60, 108], [61, 107], [62, 106], [62, 107], [63, 107]], rgb: [6, 4, 10]}
   - {frame: atk_follow, xy: [[71, 95], [72, 95], [72, 96], [73, 95], [73, 96], [74, 96], [75, 96]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[77, 65], [77, 66], [78, 66], [79, 66], [79, 67], [80, 52]], rgb: [6, 4, 10]}
-  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  # pass K (K2-B): kneel frames: cracks, pockets and the notch the robe compression cuts through the robe (kneel_in2) closed in the robe colours, outline ink where edges lost it
   - {frame: kneel_in1, xy: [[48, 113]], rgb: [90, 57, 66]}
   - {frame: kneel_in1, xy: [[46, 115]], rgb: [6, 4, 10]}
   - {frame: kneel_in1, xy: [[47, 115], [48, 115]], rgb: [66, 41, 66]}
@@ -143,6 +143,14 @@ paint:                         # small pockets the moves close off (hand / staff
   - {frame: kneel_b, xy: [[83, 113], [83, 114]], rgb: [6, 4, 10]}
   - {frame: kneel_b, xy: [[82, 114], [83, 115]], rgb: [41, 66, 107]}
   - {frame: kneel_b, xy: [[82, 120], [47, 119], [81, 119], [48, 118], [46, 117]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[70, 98], [69, 99], [70, 99], [72, 99], [69, 100], [70, 100], [72, 100], [69, 101], [70, 101], [72, 101], [69, 102], [70, 102], [72, 102], [69, 103], [72, 103]], rgb: [115, 74, 74]}
+  - {frame: kneel_in2, xy: [[71, 98], [68, 99], [71, 99], [68, 100], [71, 100], [80, 100], [68, 101], [71, 101], [80, 101], [68, 102], [71, 102], [80, 102], [68, 103], [80, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[73, 99], [74, 99], [75, 99], [76, 99], [77, 99], [78, 99], [73, 100], [74, 100], [75, 100], [76, 100], [77, 100], [78, 100], [79, 100], [73, 101], [74, 101], [75, 101], [76, 101], [77, 101], [78, 101], [79, 101], [73, 102], [74, 102], [75, 102], [76, 102], [77, 102], [78, 102], [79, 102], [73, 103], [74, 103], [75, 103], [76, 103], [77, 103], [78, 103], [79, 103]], rgb: [132, 90, 90]}
+  - {frame: kneel_in2, xy: [[81, 99], [81, 100], [81, 101], [81, 102], [81, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[80, 105], [81, 105], [79, 103], [80, 103], [81, 103], [81, 102], [81, 101]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[70, 97], [72, 98], [72, 104]], rgb: [115, 74, 74]}
+  - {frame: kneel_in2, xy: [[71, 97], [80, 99], [71, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[73, 98], [74, 98], [75, 98], [76, 98], [77, 98], [78, 98], [79, 99], [73, 104], [74, 104], [75, 104], [76, 104], [78, 104]], rgb: [132, 90, 90]}
 # pass K (K2-B): robed, robed_feet: the hips sit at the robe hem, so the upper body sinks over the robe compressed to its hem, the boots kept whole under it: head bowed, the free shoulder dropped, the staff sliding down through the near hand to its foot on the plain; the orb glow fades (glow remap)
 kneel:
   variant: [robed, robed_feet]
