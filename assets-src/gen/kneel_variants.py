@@ -23,6 +23,8 @@ added in K2-0 (of the defaults only the mechanical preset uses one, `slump`):
               (forward-positive) whatever its parents turned, so its part turns exactly deg.
 - `droop`:    (K2-0) {joint: deg} like `sag` but on either side: the bone ends at most deg off its idle angle,
               turned toward straight down the short way, whatever its parents did (wings).
+- `robe`:     (K2-0) f: kneel_ops.robe_fit resamples the rows from the waist (f of chest -> hip) to the body's
+              lowest row back onto its idle row, in the key and its in-betweens (a robe compressed under a sunk body).
 - `fit`:      (K2-0) "ground": kneel.derive raises the ground line until the parts holding a `ground` joint fit
               (by default until every pixel does: garland's low armour skirt left the far knee floating 11 px up).
 """
@@ -78,6 +80,15 @@ VARIANTS = {
                               "dir": {"paw_n": 0.0, "paw_f": 0.0, "ftoe_n": 0.0, "ftoe_f": 0.0},
                               "pins": ["foot_n", "foot_f", "toe_n", "toe_f"], "fit": "ground", "sag": {"snout": 13.0},
                               "ground_dy": 2.5, "ground_late": True},
+    # K2-0 (K2-B ask, ogre_mage; lich and king_mummy): a robed biped whose hip sits at the hem: the upper body sinks
+    # rigidly (`slump`, legs held) over a robe compressed row by row to its idle hem (`robe`: the band from 0.6 of the
+    # way chest -> hip down to the body's lowest row, a planted staff's foot included); head bowed, shoulders
+    # dropped on the free side and that hand lowered; the staff arm and the chest keep their angles, so the staff
+    # hand stays closed on the staff, which slides down with the body to its foot on the plain
+    ("biped", "robed"): {"drop": None, "slump": 0.16, "robe": 0.6, "ground": None, "dir": None, "keep": None,
+                         "pins": [], "down": {"tip": None},
+                         "rel": {"chest": None, "crown": 14.0},
+                         "lower": {"sh_f": ("L_neck", 0.12), "hand_f": ("L_neck", 0.15), "hand_n": None}},
     # K2-0 (hydra), after crouch: a low body on stub legs sinks to the belly line (its feet planted, the knees and
     # elbows folding by IK); no neck sag or snout turn: the rig's `aim` droops each neck to its own low place
     ("quadruped", "settle"): {"drop": ("L_hindthigh", 0.85), "lower": {"chest": None}, "sag": None},

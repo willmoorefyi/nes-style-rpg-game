@@ -23,7 +23,7 @@ import numpy as np
 from PIL import Image
 
 from gen import kneel_templates as KT
-from gen.kneel_ops import erase, fit_mask, slump_px, slump_roots  # noqa: F401  (K2-0 helpers)
+from gen.kneel_ops import erase, fit_mask, hem_row, robe_fit, robe_frame, slump_px, slump_roots  # noqa: F401
 from gen.kneel_templates import _ang, _wrap, fk, targets, units  # noqa: F401  (the target math, section 4)
 from gen.monster_recipes import KNEEL_FRAMES
 
@@ -121,7 +121,7 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
                 "rotsprite" if abs(deg) > ROTSPRITE_ABOVE else rig.sampler)               # K2-0 `samplers`: per part
             rgba, hit, emp, rots[part] = MR.render_part(rig, part, "idle", arr, mask, J, size, gaps, False, 1.0, sampler)
             layers.append((list(rig.parts).index(part), rgba, hit, emp))
-        img, labels = RR.composite(layers, size, pairs)
+        img, labels = robe_fit(rig, tpl, *RR.composite(layers, size, pairs), S, J, hem_row(rig, lab))   # K2-0 robed
         rows = np.nonzero(((img[..., 3] > 0) & fit_mask(rig, tpl, labels)).any(1))[0]
         tried.append((int(rows.max()) if len(rows) else bottom, (img, labels, J, rots, lift)))
         if tried[-1][0] == bottom or not tpl.get("ground"):
