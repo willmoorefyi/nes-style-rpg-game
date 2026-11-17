@@ -138,6 +138,12 @@
       text: "The pirates gather their bundles and slink off along the cliff path. Behind shutters all over town, people start to cheer."
     - type: set_flag
       flag: BIKKE_DEFEATED
+    # the town reloads behind the fade: the crew is gone, the dockhands are back, and Bikke waits on the high street
+    - type: warp
+      map: pravoka
+      x: 26
+      y: 35
+      facing: down
     - type: wait
       duration: 300
     - type: fade_in

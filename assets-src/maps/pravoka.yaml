@@ -623,6 +623,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [Fresh fish again! The boats went out this morning for the first time in a month.]
   - text: ['Fish? I''ve three herrings and a sorry crab. The boats can''t put out past the pier.']
+  tint: '#a0c0d8'
 - id: fisher
   sprite: villager
   x: 33

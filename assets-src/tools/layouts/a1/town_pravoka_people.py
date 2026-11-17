@@ -81,7 +81,7 @@ def npcs() -> list[dict]:
         # ── the townsfolk ──
         npc("fishwife", "vendor_f", 20, 39, said(
             ["Fresh fish again! The boats went out this morning for the first time in a month."],
-            ["Fish? I've three herrings and a sorry crab. The boats can't put out past the pier."])),
+            ["Fish? I've three herrings and a sorry crab. The boats can't put out past the pier."]), tint="#a0c0d8"),
         npc("fisher", "villager", 33, 27, said(
             ["Listen to that: oars! The whole fleet's out. Pravoka breathes again."],
             ["The pirates let me fish off the pier. Generous. The fish off the pier are this long."])),

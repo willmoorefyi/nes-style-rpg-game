@@ -14,6 +14,8 @@ from interiors_common import STONE_FACE, SLATE_TOP, Place, Town, wood  # noqa: E
 PRAVOKA = Town("pravoka", script="a1/town_pravoka_rooms.py")
 BEATEN = "BIKKE_DEFEATED"
 ONE_ROOM = "Topology: one room, no stairs: the door on the south wall is the only way in or out. No boss."
+TWO_ROOMS = ("Topology: two rooms, no stairs: the door on the south wall into the first room, an open doorway "
+             "to the second. No boss.")
 
 
 def note(concept: str, distinct: str, topology: str = ONE_ROOM) -> str:
@@ -151,10 +153,10 @@ def build() -> list[Path]:
         ["A chandler with no ships to stock. I sell rope to the pirates, and they pay me in promises."]))
     r.npc("chandler_boy", "villager", 4, 6, [
         "I count the rope. Fifty fathoms, fifty-one, fifty... I lost count again."])
-    out.append(r.save(note("the chandler's house: a front room of ship's stores and a rope store up a step behind "
+    out.append(r.save(note("the chandler's house: a front room of ship's stores and a store room up a step behind "
                            "it.",
-                           "two rooms joined by a side doorway; a rope store on a stone step; lamp-oil shelves "
-                           "by the counter desk"),
+                           "two rooms joined by a side doorway; a store of barrels and crates on a stone floor "
+                           "up a step; lamp-oil shelves over the front room's desk", TWO_ROOMS),
                       {"floor": wood(0.9), "floor_stone": "floor_stone",
                        "in_wall_face": {"from": "castle_face", "shade": 0.9}}, [150, 110, 60]))
 
@@ -180,7 +182,7 @@ def build() -> list[Path]:
         "He talks to the staves while he works. Says it makes them sit tighter. Thirty years, and no leaks."])
     out.append(r.save(note("the cooper's house and workshop in one room: staves, hoops and finished barrels "
                            "round a workbench, the family's bed in a boarded corner.",
-                           "a workshop floor of stone with a boarded corner for the bed; barrels stacked by "
+                           "an earthen workshop floor with a boarded corner for the bed; barrels stacked by "
                            "the hearth; a workbench in the middle of the room"),
                       {"floor_stone": "dirt", "floor": wood(1.0), "in_wall_face": STONE_FACE}))
 
@@ -214,7 +216,7 @@ def build() -> list[Path]:
     out.append(r.save(note("the harbourmaster's house: an office round a chart table, and the record room of "
                            "ledgers through an arch.",
                            "a chart table and a globe in the office; a wall of ledgers in the record room; "
-                           "an arch instead of a door between the rooms"),
+                           "an open archway instead of a door between the rooms", TWO_ROOMS),
                       {"floor_stone": "floor_stone", "floor": wood(0.8), "in_wall_face": STONE_FACE,
                        "in_wall_top": SLATE_TOP}, [60, 80, 140]))
     return out

@@ -42,8 +42,8 @@ def build() -> list[Path]:
         "pravoka_weapon")
     out.append(r.save(note("Pravoka's weapon shop: a counter across the east half of the room, racks of blades "
                            "behind it.",
-                           "a counter that closes the east half; a table by the window for testing edges; a "
-                           "lone armour stand by the door", SHOP_ROOM),
+                           "a counter that closes the east half; a table by the window for testing edges; "
+                           "two armour stands that close the keeper's corner", SHOP_ROOM),
                       {"floor_stone": "floor_stone", "in_wall_face": {"from": "castle_face", "shade": 0.75}},
                       music=SHOP))
 
