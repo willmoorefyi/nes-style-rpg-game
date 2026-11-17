@@ -138,7 +138,7 @@ def run_tables(check: Callable[[bool, str], None]) -> None:
         return
     check(ts == RC.MONSTER_FRAMES, f"MONSTER_FRAMES match the TS list ({ts})")
     for n, want in (("kneel", "daze"), ("kneel_b", "daze_b"), ("kneel_in2", "daze"), ("kneel_in1", "idle")):
-        m = re.search(rf"FRAME_FALLBACK[\s\S]*?\b{n}:\s*'(\w+)'", src)
+        m = re.search(rf"FRAME_FALLBACK:[^=]*=[\s\S]*?\b{n}:\s*'(\w+)'", src)
         check(bool(m) and m.group(1) == want, f"TS FRAME_FALLBACK {n} -> {want} ({m.group(1) if m else None})")
 
 
