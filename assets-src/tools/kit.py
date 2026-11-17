@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import json
 import random
+import sys
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -41,7 +43,29 @@ MATERIALS = {
     "mountain": ((125, 110, 95), "stones"),
     "sand": ((215, 195, 140), "speckle"),
     "ocean": ((35, 80, 170), "ripple"),
+    "swamp": ((75, 100, 60), "marsh"),           # W1-D: the `w` fens (was build_map's recoloured-grass fallback)
 }
+# W1-D (QUEST_PLAN 4.3, WORLD_PLAN 4.9): material remap presets, name -> (default base material, hue shift in
+# degrees, saturation factor, value factor). remap() expands one into a map's `materials:` entry
+# {from, hue, sat, shade}; RECOLORS are part styles (deco / house `style`, roof and wall colours, build_map.RECOLOR).
+REMAPS = {
+    "cave": ("temple_floor", -170, 1.3, 1.5),     # brown temple stone (the dwarf hall)
+    "ice": ("floor_stone", 170, 1.8, 1.1),
+    "lava": ("temple_rubble", -180, 2.5, 1.9),    # an orange rubble floor
+    "sky": ("castle_face", 190, 3.0, 0.9),         # slate castle
+    "coral": ("castle_face", 150, 4.0, 0.95),     # teal castle
+    "snow": ("grass", 100, 0.15, 1.55),
+    "dune": ("sand", -12, 1.3, 0.92),             # warm
+    "pale_dune": ("sand", 0, 0.5, 1.05),
+}
+RECOLORS = {"elf": (110, 0.5, 0.75),             # green slate roofs on the town kit
+            **{n: REMAPS[n][1:] for n in ("snow", "dune", "pale_dune")}}
+
+
+def remap(preset: str, base: str | None = None) -> dict:
+    """A `materials:` entry for the preset, recolouring `base` (default: the preset's own base material)."""
+    src, hue, sat, val = REMAPS[preset]
+    return {"from": base or src, "hue": hue, "sat": sat, "shade": val}
 
 ROOF_ROWS = ("ridge", "mid", "eave")
 SIGNS = ("weapon", "armor", "item", "white_magic", "black_magic", "inn", "tavern", "shrine")   # last two: M7
@@ -107,8 +131,27 @@ for r in range(2):
     for c in range(3):
         _PARTS[f"temple_ruin3_{r}_{c}"] = ((95, 95, 105), f"3{r}{c}", "tile")
         _PARTS[f"gate_arch_3_{r}_{c}"] = ((165, 160, 150), f"A{r}{c}", "tile")
+# W1-D (QUEST_PLAN 4.3, WORLD_PLAN 4.9): code-drawn landmark placeholders, drawn whole and cut into cells named
+# <name>_icon_<r>_<c> (the overworld icon convention) until an approved sheet supplies those cells; place one as a
+# deco with `parts: landmark_parts(name)`. name -> (cells wide, cells high, colour, label, shape)
+LANDMARKS = {
+    "cave_mouth": (2, 2, (120, 95, 70), "CM", "cave"), "tower": (2, 3, (150, 140, 125), "TW", "tower"),
+    "volcano": (3, 2, (110, 70, 55), "VO", "volcano"), "shrine": (2, 2, (190, 185, 170), "SH", "shrine"),
+    "dock_post": (1, 1, (130, 95, 60), "DP", "post"), "buried_hull": (3, 2, (125, 85, 50), "BH", "hull"),
+    "sky_ring": (2, 2, (170, 200, 235), "SR", "ring"), "ice_floe": (2, 2, (215, 235, 245), "IF", "floe"),
+    "waterfall": (2, 3, (90, 150, 215), "WF", "fall"), "tent": (2, 2, (200, 170, 110), "TE", "tent"),
+    "windmill": (2, 3, (210, 195, 165), "WM", "windmill"), "dome": (2, 2, (175, 185, 210), "DO", "dome"),
+}
 
-PART_NAMES = tuple(_PARTS)
+
+def landmark_parts(name: str) -> list[list[str]]:
+    w, h = LANDMARKS[name][:2]
+    return [[f"{name}_icon_{r}_{c}" for c in range(w)] for r in range(h)]
+
+
+_LANDMARK_CELL = {p: (n, r, c) for n in LANDMARKS for r, row in enumerate(landmark_parts(n)) for c, p in enumerate(row)}
+
+PART_NAMES = tuple(_PARTS) + tuple(_LANDMARK_CELL)
 
 
 def _font():
@@ -119,7 +162,85 @@ def _dark(c, f=0.55):
     return tuple(int(v * f) for v in c)
 
 
+@lru_cache(maxsize=None)
+def placeholder_landmark(name: str) -> Image.Image:
+    """The whole landmark (w x h cells), transparent around a flat, outlined shape standing on the bottom row."""
+    w, h, col, label, shape = LANDMARKS[name]
+    W, H = w * T, h * T
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    fill, ink, dark = (*col, 255), (*_dark(col, 0.35), 255), (*_dark(col, 0.3), 255)
+    light = (*(min(255, int(v * 1.25) + 30) for v in col), 255)
+    B = H - 3                                                  # the ground line
+    if shape == "cave":
+        d.polygon([(2, B), (W // 5, H * 3 // 10), (W // 2, 4), (W * 4 // 5, H * 3 // 10), (W - 3, B)], fill=fill, outline=ink)
+        d.chord([W * 3 // 10, H * 9 // 20, W * 7 // 10, H * 5 // 4], 180, 360, fill=dark)
+        d.rectangle([W * 3 // 10, H * 17 // 20, W * 7 // 10, B], fill=dark)
+    elif shape == "tower":
+        d.rectangle([W * 3 // 10, H // 5, W * 7 // 10, B], fill=fill, outline=ink)
+        d.polygon([(W // 5, H // 5 + 2), (W // 2, 2), (W * 4 // 5, H // 5 + 2)], fill=dark, outline=ink)
+        for y in (H * 7 // 20, H * 11 // 20):
+            d.rectangle([W // 2 - 4, y, W // 2 + 3, y + 9], fill=dark)
+        d.chord([W // 2 - 8, B - 22, W // 2 + 7, B + 8], 180, 360, fill=dark)
+        d.rectangle([W // 2 - 8, B - 8, W // 2 + 7, B], fill=dark)
+    elif shape == "volcano":
+        d.polygon([(2, B), (W * 2 // 5, H // 5), (W * 3 // 5, H // 5), (W - 3, B)], fill=fill, outline=ink)
+        d.ellipse([W * 2 // 5, H // 5 - 6, W * 3 // 5, H // 5 + 6], fill=(230, 110, 30, 255), outline=ink)
+        for x0, x1 in ((W * 9 // 20, W * 2 // 5), (W * 11 // 20, W * 13 // 20)):
+            d.line([x0, H // 5 + 4, x1, H * 3 // 5], fill=(230, 110, 30, 255), width=3)
+    elif shape == "shrine":
+        d.polygon([(6, H * 2 // 5), (W // 2, 6), (W - 7, H * 2 // 5)], fill=dark, outline=ink)
+        for x in (W // 6, W // 2 - 5, W * 5 // 6 - 10):
+            d.rectangle([x, H * 2 // 5, x + 10, B - 8], fill=fill, outline=ink)
+        d.rectangle([4, B - 8, W - 5, B], fill=fill, outline=ink)
+    elif shape == "post":
+        d.rectangle([W // 2 - 6, 10, W // 2 + 5, B], fill=fill, outline=ink)
+        d.rectangle([W // 2 - 8, 18, W // 2 + 7, 22], fill=light, outline=ink)
+    elif shape == "hull":
+        d.chord([6, H * 7 // 20, W - 7, H * 7 // 5], 180, 360, fill=fill, outline=ink)
+        for x in range(W // 5, W * 4 // 5, 18):
+            d.line([x, H * 9 // 20, x + 4, H * 7 // 10], fill=ink, width=2)
+        d.line([W * 3 // 5, H * 7 // 20 + 4, W * 7 // 10, 8], fill=ink, width=4)       # the broken mast
+        d.chord([0, H * 13 // 20, W - 1, H * 3 // 2], 180, 360, fill=(215, 190, 130, 255), outline=(120, 100, 60, 255))
+    elif shape == "ring":
+        d.ellipse([4, H // 5, W - 5, H * 4 // 5], outline=ink, width=9)
+        d.ellipse([6, H // 5 + 2, W - 7, H * 4 // 5 - 2], outline=fill, width=5)
+        d.rectangle([W // 2 - 3, H * 4 // 5 - 2, W // 2 + 2, B], fill=ink)
+    elif shape == "floe":
+        d.polygon([(6, H // 2), (W // 4, H // 4), (W * 3 // 5, H // 5), (W - 6, H * 2 // 5), (W - 10, B - 10),
+                   (W // 2, B), (W // 6, B - 6)], fill=fill, outline=(70, 120, 170, 255))
+        d.line([W // 4, H // 2, W * 3 // 5, H * 2 // 5], fill=(150, 190, 220, 255), width=2)
+    elif shape == "fall":
+        d.rectangle([0, 0, W // 4, B], fill=(105, 95, 85, 255), outline=(50, 45, 40, 255))
+        d.rectangle([W * 3 // 4, 0, W - 1, B], fill=(105, 95, 85, 255), outline=(50, 45, 40, 255))
+        d.rectangle([W // 4, 0, W * 3 // 4, B - 10], fill=fill, outline=ink)
+        for x in range(W // 4 + 6, W * 3 // 4, 9):
+            d.line([x, 4, x, B - 14], fill=light, width=2)
+        d.ellipse([W // 5, B - 20, W * 4 // 5, B], fill=(235, 245, 250, 255), outline=ink)
+    elif shape == "tent":
+        d.polygon([(4, B), (W // 2, 8), (W - 5, B)], fill=fill, outline=ink)
+        d.polygon([(W // 2 - 12, B), (W // 2, B - 34), (W // 2 + 12, B)], fill=dark)
+        d.line([W // 2, 2, W // 2, 10], fill=ink, width=3)
+    elif shape == "windmill":
+        d.polygon([(W // 3, B), (W * 2 // 5, H * 2 // 5), (W * 3 // 5, H * 2 // 5), (W * 2 // 3, B)], fill=fill, outline=ink)
+        hub = (W // 2, H * 2 // 5)
+        for dx, dy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+            d.line([hub, (hub[0] + dx * W * 2 // 5, hub[1] + dy * H // 3)], fill=(150, 110, 70, 255), width=6)
+        d.ellipse([hub[0] - 5, hub[1] - 5, hub[0] + 5, hub[1] + 5], fill=dark)
+        d.rectangle([W // 2 - 5, B - 14, W // 2 + 4, B], fill=dark)
+    elif shape == "dome":
+        d.chord([4, H // 6, W - 5, H * 7 // 6], 180, 360, fill=fill, outline=ink)
+        d.rectangle([4, H * 2 // 3, W - 5, B], fill=light, outline=ink)
+        d.chord([W // 2 - 9, B - 24, W // 2 + 8, B + 10], 180, 360, fill=dark)
+        d.rectangle([W // 2 - 9, B - 7, W // 2 + 8, B], fill=dark)
+    d.text((3, 2), label, fill=(*_dark(col, 0.2), 255), font=_font())
+    return im
+
+
 def placeholder_part(name: str) -> Image.Image:
+    if name in _LANDMARK_CELL:
+        lm, r, c = _LANDMARK_CELL[name]
+        return placeholder_landmark(lm).crop((c * T, r * T, (c + 1) * T, (r + 1) * T))
     col, label, shape = _PARTS[name]
     im = Image.new("RGBA", (T, T), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -205,6 +326,13 @@ def placeholder_material(name: str, size: int = 96) -> np.ndarray:
     elif style == "speckle":
         dots = rng.random((size, size)) < 0.04
         img[dots] = np.array(col) * 0.75
+    elif style == "marsh":                       # dark pools (whole periods across the tile, so it wraps) and reeds
+        t = 2 * np.pi / size
+        f = np.sin(2 * t * xx + 1.0) * np.cos(3 * t * yy) + 0.6 * np.sin(t * (xx + 2 * yy) + 2.0)
+        img[f > 0.95] = (45, 75, 75)
+        img[(f > 0.8) & (f <= 0.95)] = np.array(col) * 0.7
+        reeds = (rng.random((size, size)) < 0.03) & (f <= 0.8)
+        img[reeds] = (95, 120, 55)
     return np.clip(img, 0, 255).astype(np.uint8)
 
 
@@ -298,3 +426,11 @@ def load_kits(kit_ids: list[str], approved_dir: Path = APPROVED) -> Kit:
         merged.approved |= k.approved
     merged.id = "+".join(kit_ids)
     return merged
+
+
+if __name__ == "__main__":
+    if sys.argv[1:] != ["--selftest"]:
+        sys.exit("usage: python3 -I assets-src/tools/kit.py --selftest")
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import kit_selftest  # noqa: E402
+    sys.exit(kit_selftest.main())
