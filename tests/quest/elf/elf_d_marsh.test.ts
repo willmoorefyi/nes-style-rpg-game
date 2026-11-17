@@ -78,7 +78,7 @@ describe('ELF-D: the Marsh Cave floors', () => {
     const roster = new Set(['ghast', 'scorpion', 'shadow', 'green_slime', 'crawler', 'gray_ooze', 'bloodbones', 'zombie', 'ghoul']);
     for (const m of [b1, b2, b3]) {
       expect(m.exit).toEqual({ map: 'overworld', entrance: 'elf_marsh' });
-      const ids = (m.encounters ?? []).flatMap((e) => e.groups.map((g) => g.id));
+      const ids = (m.encounters ?? []).flatMap((e) => (e.groups ?? []).map((g) => g.id));
       expect(ids.length).toBeGreaterThan(0);
       expect(ids.every((i) => roster.has(i))).toBe(true);
       expect(m.battleBackgrounds?.default).toBe('swamp_cave');
@@ -108,7 +108,7 @@ describe('ELF-D: stage S5 in assume mode', () => {
   it('the walk replays; proofs (a)-(c) hold', () => {
     const s = world.stages.get('S5')!;
     expect(s.status).toBe('built');
-    expect(s.walk.at(-1)).toBe('marsh-cave-b3:battle:MARSH_GUARD_DEFEATED');
+    expect(s.walk[s.walk.length - 1]).toBe('marsh-cave-b3:battle:MARSH_GUARD_DEFEATED');
     const ctx = createQuestContext(world, { stage: 'S5' });
     for (const r of runCoreProofs(ctx, new Set(['a', 'b', 'c']))) expect(r.failures.map((f) => f.message), r.proof).toEqual([]);
   });

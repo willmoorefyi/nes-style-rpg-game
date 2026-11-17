@@ -2717,6 +2717,86 @@ is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the 
 <!-- === ELF-T ELF (pass W: owned by ELF-T) === -->
 <!-- === end ELF-T === -->
 <!-- === ELF-D ELF (pass W: owned by ELF-D) === -->
+### ELF-D result: the Marsh Cave B1-B3, S5 (branch `w-elf-d` from `mainline` 3a54966)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-elf-d/`.
+
+**Files:**
+
+- Layouts: `layouts/elf/marsh_common.py` (materials, the per-floor encounter tables, the peat hazards made from the
+  `w` cells, the floor writer), `marsh_b1.py`, `marsh_b2.py`, `marsh_b3.py` -> `marsh-cave-b1` (40x32), `-b2` (46x30),
+  `-b3` (38x36), compiled (the ELF-O stubs are replaced). Every floor: `exit` to `overworld:elf_marsh`, the `swamp_cave`
+  background (staged; `--check swamp_cave` has no bounds and exits 0), encounters from the S5 roster (B1 the bog's
+  oozes and stingers, B2 ghouls / shadows / scorpions, B3 ghasts / bloodbones). B2 and B3 `canSave: false`.
+- Materials: the `cave` remap; black water (`≈`, the `water` material at shade 0.4); plank boardwalks; brown peat
+  (`w`, swamp recoloured) as `hazards` (damage 1); the fog-dark rooms are the `cave` remap at shade 0.7 (the `+`
+  material).
+- Data: `cutscenes.yaml` (`elf_d_crown`: sets MARSH_GUARD_DEFEATED, `give_item crown`); `enemies.yaml` (piscodemon
+  `bossPhases` only); `quest.yaml` S5 (`entry`, `walk`, `nonLoadBearing`, `status: built`); `debug-scenarios.yaml`
+  (`w_s5_start`, `w_boss_piscodemon`); `assets/backgrounds/swamp_cave.webp`.
+- Tests: `tests/quest/elf/elf_d_marsh.test.ts` (8: the two B1 stairs, the B2 halves are not joined, the one-way pit, the
+  boss NW at path >= 40, chests 2/4/3, no chest cuts a way on from any arrival, exit / roster / background, the crown
+  only from `elf_d_crown` (D-W14), S5 (a)-(c) and the walk), `tests/quest/elf/hazardPath.test.ts` (7, with a RED case),
+  helpers `tests/quest/elf/marshPaths.ts`, `tests/balance/w_elf_d.test.ts`.
+
+**Design.** B1: four mud banks in black water joined by a ring of single-plank boardwalks; the west and east banks
+each have a stair down; peat shoals (one a short cut between the south and west banks), two dead-end boardwalks to
+chests and a rotten pier. B2: two halves split by rock, joined only through B1. The west half runs from the arrival
+hall by a peat neck (or a boardwalk round by the east wall) to the fog-filled eel pool and the stair to B3. The east
+half runs from its arrival room up a gallery to the north ledge, whose collapsed west end is the one-way pit to B3
+(`pit`). B3, the drowned barrow: the antechamber (SE, the stair up), the fallen gallery where the pit lands (NE), the
+long south passage half in peat, the burial gallery with its niches, the fog-dark crypt of pillars, and the bier hall
+(NW). Talking to the bier (`elf_d_bier`, `hideIf: MARSH_GUARD_DEFEATED`) starts `[piscodemon x3]` (`isBoss`,
+postVictoryCutscene `elf_d_crown`).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | the 3 marsh scripts, `stubs.py` (kept 18 real maps) and `world.py` re-run after the commit: `git diff --exit-code assets-src/maps` clean |
+| G2 | `build_map.py marsh-cave-b1 marsh-cave-b2 marsh-cave-b3`: `40x32`, `46x30`, `38x36 -> assets/maps/ai/...`; `--check-determinism`: all three `deterministic` (no site file changed, so no world compile) |
+| G3 | no overworld chunk changed |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 318 passed (318)`, `Tests 6771 passed, 6 skipped (6777)` |
+| G5 | `npm run quest -- --mutate --stage S5`: (a)-(h) OK, `(b) skips: OK (7 withheld runs, 0 reach a later stage, 6 not required)`, `(d) bands: OK piscodemon L8.8 [8,11]`, `mutations: OK (1 gate rows; 1 elements, each removal reported)`, `quest-verify: OK`; full `npm run quest -- --mutate`: `mutations: OK (43 gate rows; 52 elements)`, `quest-verify: OK` |
+| G6, G7 | assetCoverage, fileCeilings, questCeilings pass (in G4); every ELF-D file is under 250 lines (the largest, `marsh_common.py`, has 114) |
+| G8 | `build_map.py --selftest`: `104 checks passed` |
+| G9 | `w_elf_d.test.ts` 3 passed; `check-bounds: OK (6 tests)` |
+| G10 | browser on port 5225 with `mute=1` in my own headless Chromium. `w_s5_start` went overworld `elf_marsh` -> B1 (19, 29) -> west stair -> B2 (3, 5) -> stair -> B3 (30, 27) -> the bier -> the battle `3x Piscodemon` on `swamp_cave`. It ended with MARSH_GUARD_DEFEATED and crown 1. Screens: `/tmp/w-elf-d/s5_start.png`, `s5_b1.png`, `s5_b2.png`, `s5_bier.png`, `s5_battle.png`, `s5_end.png`. 0 console errors. The confirm-mashing driver (Fight only, no healing, at L8 after the walk) lost 7 times before it won through Retry Battle |
+| G12 | designNotes and originality pass (`marsh-cave: branching`); a fresh reviewer gave `originality review: PASS marsh-cave-b1 marsh-cave-b2 marsh-cave-b3` |
+| G13, G14 | `(g) geography: OK s*=0.736`, `(h) travel matrix: OK` (in G5) |
+| G16 | `stubs.py --check ELF-D`: `stubs: 0 left for ELF-D` |
+| G17 | `bands: OK`, `basins: OK (aldi 2779 cells, ocean 13810 cells; canal joins)` |
+
+**Balance (S5, `[piscodemon x3]`, kit `w_s5`, 400 seeds):**
+
+- Before tuning, with the roster's numbers: sensible L5 54.3 %, L7 87.3 %, L9 97.8 %, L11 100 %.
+- A phase after the first wound barely moved this, since a piscodemon often dies to its first hit (at 0.99 with 3 hits and attack 40: L7 72.5 %, L9 84 %). Spells in `ai` changed nothing.
+- The fix is a `bossPhases` entry at hpThreshold 1.0 (crossed at the first round start) with hits 2 and attack 36.
+- Measured with the fix:
+  - sensible: L7 53.5 %, L9 83.5 %, L11 99.8 %;
+  - careless: L7 37.8 %, L9 76.5 %, L11 98.3 %.
+- Bounds: L9 [75, 95], L7 <= 60, L11 >= 90.
+
+**Originality numbers:**
+
+- Stair graph: `b1>b2 b2>b1 b2>b3 b3>b2`. The edges are B1 -> B2 by two stairs (`arrival` / `arrival_east`, back to `down` / `down_east`) and B2 west <-> B3 by stair. The pit B2 east -> B3 `pit` has no link back.
+- Dead ends: B1 5, B2 5, B3 8.
+- Boss: NW of the arrival, path 48. From the pit landing the path is 54.
+- Shapes (aspect / fill): B1 1.214 / 0.417, B2 1.593 / 0.311, B3 1.125 / 0.420.
+- Hazard-free path over shortest: at most 1.21 (B2 arrival -> stair).
+
+**Deviations and hand-offs:**
+
+- B2's halves are joined only through B1, so B2 uses `no_unreachable_walkable: {reach_roots: [arrival_east]}`. It drops the compiler's `no_static_chokepoints`, which walks from the first entrance only (`map_checks.py`, W1-C2's). `elf_d_marsh.test.ts` checks that from every arrival instead.
+- S5's `entry` is Pravoka's quay, with the ship at `a1_pravoka` rather than at the cave mouth. In assume mode a start in Elfland reaches the guard without the ship, and proof (b) flagged it.
+- The bier NPC uses the `chest` field sheet, since no field sheet shows a crown. A `crown_cushion` deco beside the altar stays drawn after the crown is taken, because a static deco has no flag.
+- I edited no shared files outside my anchors. One new local flag pattern: `CHEST_ELF_D_*` (9 chests).
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains `layouts/elf/marsh_b{1,2,3}.py` + `marsh_common.py` (`marsh-cave-b1..b3`).
+- A dungeon can recolour the `water` (for `≈`) and `swamp` materials. Its peat `hazards` come from the `w` cells.
+- A floor whose parts are joined only through another floor needs `reach_roots`. Its chokepoints are then checked in tests.
 <!-- === end ELF-D === -->
 <!-- === ERT-O EARTH (pass W: owned by ERT-O) === -->
 ### ERT-O result: EARTH overworld and small sites (branch `w-ert-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
