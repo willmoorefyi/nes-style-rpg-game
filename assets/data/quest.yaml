@@ -102,10 +102,18 @@ stages:
     maps: [pravoka, pravoka-*]
     zones: [overworld:a1_mainland]
     grind: 2.0
-    walk: []
+    # Bikke at the brig pier's end (pravoka (40, 33)) starts pirate x9; a1_bikke_yields sets BIKKE_DEFEATED, and the
+    # brig appears at the a1_pravoka dock (overworld (132, 102)), boarded from the land gate (131, 101)
+    walk: ["pravoka:battle:bikke", "overworld:vehicle:ship", "overworld:board:ship"]
+    # the bridge's south stub foot: the span (BRIDGE_BUILT) is the way north to Pravoka
+    entry: {map: overworld, x: 93, y: 97, mode: walking}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: pravoka, kind: npc, at: [40, 33], reason: "Bikke's hideIf only clears the beaten captain off the brig pier's end, a dead end"}
+      # GT-4 in --stage S2 only: the full run catches the dock's removal as (c) SOFTLOCK (a caught row never reads this)
+      - {map: overworld, kind: dock, at: [132, 102], reason: "stage scope: @S2 holds once the brig spawns, and boarding needs no dock (W1-A); the full run catches GT-4 as SOFTLOCK"}
+    status: built
   # === end A1-T ===
   # === ELF-O (pass W: owned by ELF-O) ===
   - id: S6
@@ -617,7 +625,7 @@ towns:
     opensAfter: [S1]
     bandStage: S2
     kit: w_pravoka
-    status: pending
+    status: built
   # === end A1-T town ===
   # === ELF-T town (pass W: owned by ELF-T) ===
   - id: elfheim

@@ -13,6 +13,7 @@ from __future__ import annotations
 BEATEN = "BIKKE_DEFEATED"
 RED, TAR, SALT = "#c86450", "#8c7a64", "#b4c8dc"     # pirate tints: red sash, tarred coat, sun-bleached
 CAPTAIN = (40, 33)
+CAPTAIN_AFTER = (26, 36)                             # beaten, he watches his old brig from the high street
 
 CAPTAIN_FIGHT = {
     "x": CAPTAIN[0], "y": CAPTAIN[1], "npc": "bikke", "enemyIds": ["pirate"] * 9, "flag": BEATEN, "isBoss": True,
@@ -62,7 +63,7 @@ def npcs() -> list[dict]:
         {"id": "bikke", "sprite": "warrior", "tint": "#a03c3c", "x": CAPTAIN[0], "y": CAPTAIN[1], "hideIf": BEATEN,
          "dialog": ["Bikke: So you're the ones the town has been whispering about. Warriors, they say.",
                     "I took this harbour with nine blades and a fast hull. If you want it back, you'll pay in blood."]},
-        npc("bikke_after", "warrior", CAPTAIN[0], CAPTAIN[1] + 1, [
+        npc("bikke_after", "warrior", *CAPTAIN_AFTER, [
             "Bikke: The brig is yours, and I keep my word. She's tied at the quay outside the town.",
             "Board her from the land and she'll take you anywhere the sea goes. She won't climb a mountain, mind."],
             tint="#a03c3c", showIf=BEATEN),

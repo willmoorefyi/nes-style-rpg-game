@@ -59,10 +59,17 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement)
   if (row.nlb) {
     if (fresh.length) return { ...out, caught: true };
     const reason = row.nlb === 'entry' ? nonLoadBearingFor(ctx, el) : row.nlb;
-    return reason ? { ...out, nonLoadBearing: reason } : out;
+    if (reason) return { ...out, nonLoadBearing: reason };
+    // the entry waits for its stage's owner while that stage is pending (A1-T: GT-5 goes live with S2's ship)
+    const pend = stages.filter((s) => ctx.world.stages.get(s)?.status !== 'built');
+    return pend.length ? { ...out, nonLoadBearing: `pending: ${pend.join(' ')} not built` } : out;
   }
-  const hit = row.expect.filter((e) => fresh.some((f) => f.message.startsWith(e.prefix)));
-  out.caught = row.anyOf ? hit.length > 0 : hit.length === row.expect.length;
+  // --stage: a (b) expectation on another stage can't fail in this stage's scope (GT-2 in S1: SKIP S2); the full run
+  // checks it, so the stage run needs only the expectations its scope can see
+  const scoped = ctx.stage ? row.expect.filter((e) => e.proof !== 'b' || prefixStage(e.prefix) === ctx.stage) : [];
+  const expect = scoped.length ? scoped : row.expect;
+  const hit = expect.filter((e) => fresh.some((f) => f.message.startsWith(e.prefix)));
+  out.caught = row.anyOf ? hit.length > 0 : hit.length === expect.length;
   if (!out.caught && !builtStages(ctx, stages)) {
     out.nonLoadBearing = `pending: ${stages.filter((s) => ctx.world.stages.get(s)?.status !== 'built').join(' ')} not built`;
   } else if (!out.caught) {

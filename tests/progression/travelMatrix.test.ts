@@ -93,7 +93,11 @@ describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => 
     expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS[0]).status).toBe('ok');
     // A1-O: T1 (the bridge built: Pravoka's gate and Matoya's cave, nothing past the Aldi) is checked too
     expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS[1]).status).toBe('ok');
+    // A1-T: with the brig at the a1_pravoka dock (S2), T2-T5 and both basin rows are checked; T6 waits for ORDEAL
+    for (const id of ['T2', 'T3', 'T4', 'T5', 'B1', 'B2']) {
+      expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((r) => r.id === id)!).status, id).toBe('ok');
+    }
     const strict = proofTravel(createQuestContext(ctx.world, { strict: true }));
-    expect(strict.failures.some((f) => /^TRAVEL T2 pending: /.test(f.message))).toBe(true);
+    expect(strict.failures.some((f) => /^TRAVEL T6 pending: /.test(f.message))).toBe(true);
   });
 });

@@ -123,6 +123,27 @@
       text: "Matoya: Here, for your trouble: the Herb. Crush it under a sleeper's nose and no curse holds them. Received the Herb."
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
+# S2 (WORLD_PLAN 4.1): Bikke's nine are beaten at the brig pier (pravoka, the scripted encounter on the captain). He
+# hands over the brig, his crew rows away over a fade, and BIKKE_DEFEATED is set: the pirates leave the town, the
+# dockhands come back, and the ship spawn at the a1_pravoka dock (the overworld quay) appears.
+- id: a1_bikke_yields
+  steps:
+    - type: dialog
+      text: "Bikke: Enough! Enough. I know when a wind has turned, and this one's blowing straight at me."
+    - type: dialog
+      text: "Bikke: The brig is yours. Fast, dry, and she answers the helm like a dog to a whistle. Treat her better than I did."
+    - type: fade_out
+      duration: 600
+    - type: dialog
+      text: "The pirates gather their bundles and slink off along the cliff path. Behind shutters all over town, people start to cheer."
+    - type: set_flag
+      flag: BIKKE_DEFEATED
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "Bikke: She's moored at the quay outside the gate. Step aboard from the shore and the sea is yours."
 # === end A1-T ===
 # === ELF-O (pass W: owned by ELF-O) ===
 # S6 (docs/WORLD_PLAN.md 4.2, D-W14): Astos's postVictoryCutscene on western-keep-2f. The battle's flag sets

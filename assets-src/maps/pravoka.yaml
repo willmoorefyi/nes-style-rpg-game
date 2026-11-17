@@ -29,8 +29,8 @@ ground: |
   mm............::.............::~~~~~~.......mmmm
   mm............::.............::~~~~~~.......mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
-  mm.::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
-  mm.::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mm...::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mm...::::::::::::::::::::::::::,,,,,,,,,,,~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
@@ -39,8 +39,8 @@ ground: |
   mm............::.............::~~~~~~~~~~~~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
-  mm.::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
-  mm.::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mm...::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mm...::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
   mm............::.............::=======~~~~~~mmmm
   mm............::.............::=======~~~~~~mmmm
   mm............::.............::~~~~~~~~~~~~~mmmm
@@ -55,8 +55,8 @@ ground: |
   mm............::.............::~~~~~~~~~~~~~mmmm
   mmm...........:::::::::::::::::~~~~~~~~~~~~~mmmm
   mmm...........:::::::::::::::::~~~~~~~~~~~~~mmmm
-  mmm::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
-  mmm::::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mmm..::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
+  mmm..::::::::::::::::::::::::::~~~~~~~~~~~~~mmmm
   mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm~~~~~~~~~~~~~mmmm
   mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm~~~~~~~~~~~~~mmmm
 entrances:
@@ -357,19 +357,11 @@ objects:
 - {type: barrel, x: 28, y: 22}
 - {type: barrel, x: 28, y: 27}
 - {type: barrel, x: 28, y: 31}
-- {type: barrel, x: 31, y: 32}
-- {type: barrel, x: 40, y: 19}
-- {type: barrel, x: 31, y: 28}
 - {type: crate, x: 28, y: 17}
 - {type: crate, x: 28, y: 21}
 - {type: crate, x: 28, y: 28}
-- {type: crate, x: 36, y: 32}
-- {type: crate, x: 35, y: 19}
 - {type: crate, x: 28, y: 36}
 - {type: crate, x: 28, y: 37}
-- type: fence
-  from: [33, 25]
-  to: [36, 25]
 - type: deco
   parts: &id002
   - [stall_0_0, stall_0_1]
@@ -490,8 +482,8 @@ objects:
 - {type: flowers, x: 10, y: 16}
 - {type: flowers, x: 21, y: 16}
 - {type: flowers, x: 22, y: 16}
-- {type: flowers, x: 24, y: 28}
-- {type: flowers, x: 25, y: 28}
+- {type: flowers, x: 26, y: 28}
+- {type: flowers, x: 27, y: 28}
 - {type: flowers, x: 9, y: 28}
 - {type: flowers, x: 10, y: 28}
 - type: deco
@@ -597,8 +589,8 @@ npcs:
       hull. If you want it back, you''ll pay in blood.']
 - id: bikke_after
   sprite: warrior
-  x: 40
-  y: 34
+  x: 26
+  y: 36
   dialog: ['Bikke: The brig is yours, and I keep my word. She''s tied at the quay outside the town.', 'Board her from the land and she''ll take
       you anywhere the sea goes. She won''t climb a mountain, mind.']
   tint: '#a03c3c'
@@ -749,7 +741,9 @@ road_check:
   - [42, 7]
   - [24, 5]
   - [13, 41]
+  - [41, 15]
 no_static_chokepoints: true
 no_unreachable_walkable: true
 encounterRate: {min: 999, max: 999}
 encounters: []
+battleBackgrounds: {default: shoreline}
