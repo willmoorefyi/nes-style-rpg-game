@@ -23,7 +23,8 @@ import numpy as np
 from PIL import Image
 
 from gen import kneel_templates as KT
-from gen.kneel_ops import erase, fit_mask, hem_row, robe_fit, robe_frame, slump_px, slump_roots  # noqa: F401
+from gen.kneel_ops import (erase, fit_mask, glow_apply, hem_row, post_frame, robe_fit, robe_frame,  # noqa: F401
+                           slump_px, slump_roots)
 from gen.kneel_templates import _ang, _wrap, fk, targets, units  # noqa: F401  (the target math, section 4)
 from gen.monster_recipes import KNEEL_FRAMES
 
@@ -44,6 +45,8 @@ def block(cfg: dict) -> dict:
     bad = sorted(set(b) - set(BLOCK_KEYS))
     if bad:
         raise ValueError(f"rig {cfg.get('sprite')}: unknown kneel keys {bad} ({', '.join(BLOCK_KEYS)})")
+    if b.get("prop_cap") is not None and not 0 < float(b["prop_cap"]) <= PROP_CAP_MAX:
+        raise ValueError(f"rig {cfg.get('sprite')}: kneel prop_cap {b['prop_cap']!r} is not in (0, {PROP_CAP_MAX:g}]")
     if b.get("sampler", "nearest") not in ("nearest", "rotsprite"):
         raise ValueError(f"rig {cfg.get('sprite')}: kneel sampler {b['sampler']!r} is not nearest or rotsprite")
     return b
@@ -52,7 +55,9 @@ def block(cfg: dict) -> dict:
 # `pins` (K2-0): extra joints held at the idle key in the kneel key and its in-betweens (garland's cape hem).
 # `sampler` (K1 addition): one sampler for every part of the kneel key instead of the D-K19 rotsprite-above-30 rule
 # (the wolf's folded legs double their outlines under rotsprite: second ring 0.30 against the idle's 0.21)
-BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler", "pins", "aim", "samplers", "turn", "z", "erase")
+BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler", "pins", "aim", "samplers", "turn", "z", "erase",
+              "glow", "prop_cap")
+PROP_CAP_MAX = 60.0              # K2-0b: a block's `prop_cap` (kneel frames only) never goes past this
 
 
 def template_of(rig, cfg: dict) -> dict:
@@ -117,7 +122,11 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
                 continue
             deg = R.part_rotation(rig, part, "idle", S, J)
             mech = getattr(rig, "preset", None) == "mechanical"           # FW-5: the preset is nearest only
-            own = (b.get("samplers") or {}).get(part)                         # K2-0 `samplers`: per part (a
+            own = (b.get("samplers") or {}).get(part) or ("rotsprite" if b.get("prop_cap") and        # K2-0b
+                                                          rig.parts[part]["kind"] == "prop" else None)
+            if own and lift == 0 and b.get("prop_cap") and rig.parts[part]["kind"] == "prop" and abs(deg) > 30:
+                print(f"kneel: {sid} prop {part} turns {deg:.1f} deg (prop_cap {b['prop_cap']}, rotsprite)")
+            # K2-0 `samplers`: per part (a
             sampler = own or (rig.sampler if mech else b.get("sampler") or (    # mechanical key part too, ruling)
                 "rotsprite" if abs(deg) > ROTSPRITE_ABOVE else rig.sampler))
             rgba, hit, emp, rots[part] = MR.render_part(rig, part, "idle", arr, mask, J, size, gaps, False, 1.0, sampler)
@@ -130,7 +139,7 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
     # the lowest lift standing on the feet row, else the lowest one above it (K-ground then reports it), else the last
     low, (img, labels, J, rots, lift) = next((t for t in tried if t[0] == bottom), None) or \
         next((t for t in tried if t[0] < bottom), tried[-1])
-    img = MK.kneel_paint(sid, b.get("paint"), img, kfs)
+    img = MK.kneel_paint(sid, b.get("paint"), glow_apply(b.get("glow"), "kneel", img, sid), kfs)   # K2-0b glow
     return {"img": img, "labels": labels, "joints": J, "rots": rots, "lift": lift}
 
 

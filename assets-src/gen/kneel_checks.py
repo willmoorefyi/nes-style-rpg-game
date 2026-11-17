@@ -67,12 +67,15 @@ def limb_parts(rig) -> set[str]:
     return out
 
 
-def rot(rots: dict, limbs: set[str], limb_cap: float, cap: float | None = None, legs_free: bool = False) -> list[str]:
+def rot(rots: dict, limbs: set[str], limb_cap: float, cap: float | None = None, legs_free: bool = False,
+        prop_cap: float | None = None) -> list[str]:
     """K-rot: {part: (deg, kind)} against the limb cap (limb parts) or ROT_CAP (the rest), both <= cap if given
-    (K2-0 `legs_free`, the mech_kneel variant: limb parts take only the limb cap, the rest keeps the preset's)."""
+    (K2-0 `legs_free`, the mech_kneel variant: limb parts take only the limb cap, the rest keeps the preset's;
+    K2-0b `prop_cap`, a kneel block key: prop parts take it instead of ROT_CAP's 30, at most kneel.PROP_CAP_MAX)."""
     bad = []
     for p, (d, k) in sorted(rots.items()):
-        lim = limb_cap if p in limbs else ROT_CAP.get("torso" if p == "torso" else k, 30.0)
+        lim = limb_cap if p in limbs else float(prop_cap) if prop_cap and k == "prop" else \
+            ROT_CAP.get("torso" if p == "torso" else k, 30.0)                     # K2-0b block prop_cap
         lim = min(lim, cap) if cap and not (legs_free and p in limbs) else lim
         if abs(d) > lim + 1e-9:
             bad.append(f"{p} {d:.1f} deg > {lim:g}")
@@ -119,7 +122,7 @@ def check_sprite(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allow
            + C.new_holes(key, idle, 4, d["labels"]) + C.seam_gaps(key, d["labels"], int(cfg.get("seam_tolerance", 0)),
                                                                   rig.joined_pairs())
            + C.outline_kept(key, idle) + C.whole_pixel(d["joints"])
-           + rot(d["rots"], limbs, tpl["limb_cap"], cap, bool(tpl.get("legs_free")))}
+           + rot(d["rots"], limbs, tpl["limb_cap"], cap, bool(tpl.get("legs_free")), KN.block(cfg).get("prop_cap"))}
     for n in ("kneel", *[f for f in KNEEL_FRAMES if f in gen]):
         a = key if n == "kneel" else gen[n]["img"]
         k = "kf:kneel" if n == "kneel" else n
@@ -128,7 +131,8 @@ def check_sprite(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allow
         if n in ("kneel", "kneel_b"):
             out[k] += height(a, idle, tpl["band"])
         if n in IN_BETWEENS:
-            out[k] += rot(gen[n]["rots"], limbs, KN.IN_LIMB_CAP, cap, bool(tpl.get("legs_free")))
+            out[k] += rot(gen[n]["rots"], limbs, KN.IN_LIMB_CAP, cap, bool(tpl.get("legs_free")),
+                          KN.block(cfg).get("prop_cap"))
     frames = {**{n: v for n, v in kfs.items()}, **{n: Image.fromarray(f["img"]) for n, f in gen.items()}}
     out["kneel:anchor"] = anchors(frames, MA.frames_for("cast" in kfs, "attack_raise" in kfs), meta)
     return out
