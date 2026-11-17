@@ -1,0 +1,295 @@
+"""Derived kneel key and its in-betweens (docs/KNEEL_PLAN.md 3-5, D-K4 / D-K5 / D-K7 / D-K9 / D-K10).
+
+A rig opts in with a `kneel:` block (`tweaks`, `paint`, `sink`, `variant`; kneel_templates.py has the reference). Then:
+
+- `kneel` is a derived key: the idle key re-posed by the body template's joint targets (forward kinematics from the idle
+  joints, bone lengths kept), solved by rig.solve at t 1 with the template's pins (a planted foot keeps its IK knee),
+  rendered part by part from the idle pixels (rotsprite for any part turned more than ROTSPRITE_ABOVE deg), composited,
+  then the block's paint (FW-P rules). monster_anim.load_entries adds it to the sheet's keys (meta `kf_derived:
+  {kneel: idle}`, so it is locked as `kf:kneel`); its joints and labels ride in meta["kneel"].
+- `kneel_in1` (idle toward kneel, t 0.33), `kneel_in2` (kneel toward idle, t 0.33) and `kneel_b` (the body's idle_b op
+  on kneel) are ordinary recipes (monster_recipes.RECIPES) that monster_anim.generate runs once `prepare` has given the
+  rig a `kneel` keyframe (joints) and the kneel key's part labels.
+- A rig without the block gets nothing: `prepare` returns the same objects and `skip` holds the 3 names out, so every
+  frame is byte-identical to a build without this module.
+"""
+from __future__ import annotations
+
+import copy
+import math
+
+import numpy as np
+from PIL import Image
+
+from gen import kneel_templates as KT
+from gen.monster_recipes import KNEEL_FRAMES
+
+ROTSPRITE_ABOVE = 30.0           # D-K19: a part turned more than this is sampled with rotsprite
+IN_LIMB_CAP = 40.0               # D-K19: kneel_in1 / kneel_in2 limb parts, relative to their pixel source
+SINK_PER_80 = 6                  # D-K9: the floaters' runtime sink, native px per 80 px of cell
+FIT_ROUNDS = 12                  # ground-line joints are raised until nothing lies below the feet row
+
+
+def opted(cfg: dict | None) -> bool:
+    return isinstance(cfg, dict) and "kneel" in cfg
+
+
+def block(cfg: dict) -> dict:
+    b = cfg.get("kneel") or {}
+    if not isinstance(b, dict):
+        raise ValueError(f"rig {cfg.get('sprite')}: kneel must be a mapping, not {b!r}")
+    bad = sorted(set(b) - set(BLOCK_KEYS))
+    if bad:
+        raise ValueError(f"rig {cfg.get('sprite')}: unknown kneel keys {bad} ({', '.join(BLOCK_KEYS)})")
+    if b.get("sampler", "nearest") not in ("nearest", "rotsprite"):
+        raise ValueError(f"rig {cfg.get('sprite')}: kneel sampler {b['sampler']!r} is not nearest or rotsprite")
+    return b
+
+
+# `sampler` (K1 addition): one sampler for every part of the kneel key instead of the D-K19 rotsprite-above-30 rule
+# (the wolf's folded legs double their outlines under rotsprite: second ring 0.30 against the idle's 0.21)
+BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler")
+
+
+def template_of(rig, cfg: dict) -> dict:
+    return KT.template(rig.body, getattr(rig, "preset", None), block(cfg).get("variant"), cfg.get("sprite", "?"))
+
+
+# ───────── targets ─────────
+def _d(a, b) -> float:
+    return math.hypot(b[0] - a[0], b[1] - a[1])
+
+
+def _ang(a, b) -> float:
+    return math.atan2(b[1] - a[1], b[0] - a[0])
+
+
+def _wrap(a: float) -> float:
+    return (a + math.pi) % (2 * math.pi) - math.pi
+
+
+def units(S: dict) -> dict[str, float]:
+    """The template's length units, measured on the idle joints (mean of near and far where both exist)."""
+    def mean(pairs):
+        ls = [_d(S[a], S[b]) for a, b in pairs if a in S and b in S]
+        return sum(ls) / len(ls) if ls else 0.0
+    return {"L_thigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
+            "L_hindthigh": mean([("hip_n", "knee_n"), ("hip_f", "knee_f")]),
+            "L_upperfore": mean([("sh_n", "el_n"), ("sh_f", "el_f")]),
+            "L_neck": mean([("chest", "neck")]) + mean([("neck", "head")])}
+
+
+def fk(rig, S: dict, dy: float, spec: dict, pos: dict | None = None) -> dict:
+    """Forward kinematics from the idle joints: roots down by dy, each bone turned per the spec (rel / down / keep / dir)
+    or aimed at pos[j]; bone lengths from S. Angles are forward-positive degrees (mirrored for a left-facing rig)."""
+    f, pos = rig.fwd, pos or {}
+    rel, down, keep, dirs = spec.get("rel", {}), spec.get("down", {}), set(spec.get("keep", [])), spec.get("dir", {})
+    T, acc = {}, {}
+    for j in rig.order:
+        if j not in S:
+            continue
+        p = rig.parent.get(j)
+        if p is None or p not in T:
+            T[j], acc[j] = (S[j][0], S[j][1] + dy), 0.0
+            continue
+        a0 = _ang(S[p], S[j])
+        if j in pos:
+            a = _ang(T[p], pos[j])
+        elif j in dirs:
+            d = math.radians(dirs[j])
+            a = math.atan2(math.sin(d), f * math.cos(d))
+        elif j in keep:
+            a = a0
+        else:
+            a = a0 + acc[p] + f * math.radians(rel.get(j, 0.0))
+            if j in down:
+                cap = math.radians(down[j])
+                a += max(-cap, min(cap, _wrap(math.pi / 2 - a)))
+        acc[j] = _wrap(a - a0)
+        L = _d(S[p], S[j])
+        T[j] = (T[p][0] + L * math.cos(a), T[p][1] + L * math.sin(a))
+    return T
+
+
+def _heads(rig, tpl: dict) -> dict:
+    """The multihead variant: every extra neck / head copies the first one's targets."""
+    if not tpl.get("multihead"):
+        return tpl
+    t = copy.deepcopy(tpl)
+    for i in (2, 3, 4, 5):
+        if f"neck{i}" in rig.parent:
+            for key, src in (("lower", "neck"), ("rel", "snout")):
+                if src in t.get(key, {}):
+                    t[key][f"{src}{i}"] = t[key][src]
+    return t
+
+
+def targets(rig, tpl: dict, S: dict, lift: float = 0.0) -> dict:
+    """Target joints of the kneel key (before rig.solve), `lift` px raising the ground line."""
+    tpl = _heads(rig, tpl)
+    U = units(S)
+    unit, k = tpl.get("drop", ("L_thigh", 0.0))
+    dy = U[unit] * k
+    first = fk(rig, S, dy, tpl)
+    ground = max((S[f][1] for f in rig.feet if f in S), default=0.0) - lift
+    pos = {j: (first[j][0], first[j][1] + U[u] * k) for j, (u, k) in tpl.get("lower", {}).items() if j in first}
+    for j, back in tpl.get("ground", {}).items():   # on the ground line at bone length, the side nearest `back` x L
+        p = rig.parent.get(j)                        # behind the parent (the hip socket, the shoulder)
+        if j not in S or p not in first:
+            continue
+        L, h = _d(S[p], S[j]), ground - first[p][1]
+        want = first[p][0] - rig.fwd * back * L
+        if abs(h) >= L:
+            pos[j] = (first[p][0], first[p][1] + math.copysign(L, h))
+            continue
+        w = math.sqrt(L * L - h * h)
+        pos[j] = (min((first[p][0] - w, first[p][0] + w), key=lambda x: abs(x - want)), ground)
+    return fk(rig, S, dy, tpl, pos)
+
+
+def squat(rig, tpl: dict, S: dict) -> tuple[dict, list[str]]:
+    """Mechanical power-down (D-K11): the deepest root drop with every foot pinned whose leg bones turn at most
+    tpl['squat'] degrees (bisection, 14 steps)."""
+    from gen import rig as R
+    pins = [f for f in rig.feet if f in S]
+    legs = [(a, b) for h, k, f in rig.limbs for a, b in ((h, k), (k, f)) if a in S and b in S]
+
+    def worst(dy: float) -> float:
+        J = R.solve(rig, S, fk(rig, S, dy, tpl), 1.0, "all", pins, 0, None, True)
+        return max((abs(math.degrees(_wrap(_ang(J[a], J[b]) - _ang(S[a], S[b])))) for a, b in legs), default=0.0)
+    lo, hi = 0.0, max(units(S).values()) or 1.0
+    for _ in range(14):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if worst(mid) <= tpl["squat"] else (lo, mid)
+    return fk(rig, S, lo, tpl), pins
+
+
+# ───────── the derived key ─────────
+def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict:
+    """{img, labels, joints, rots, lift} of the kneel key, rendered from the idle key."""
+    from gen import monster_keys as MK
+    from gen import monster_render as MR
+    from gen import rig as R
+    from gen import rig_render as RR
+    cell = kfs["idle"].size
+    rig = R.Rig(cfg, cell)
+    tpl, b = template_of(rig, cfg), block(cfg)
+    S = rig.keyframes["idle"]
+    arr = np.asarray(kfs["idle"].convert("RGBA")).copy()
+    lab, names = R.segment(rig, "idle", arr)
+    pairs = rig.joined_pairs()
+    gaps = RR.source_gaps(lab, pairs)
+    size, bottom = (cell[1], cell[0]), int(meta["bottom_row"])
+    tweaks = {j: [float(v[0]), float(v[1])] for j, v in (b.get("tweaks") or {}).items()}
+    tried = []                                       # (low row, render) per ground-line lift 0, 1, 2 ... px
+    for lift in map(float, range(FIT_ROUNDS)):
+        T, pins = squat(rig, tpl, S) if "squat" in tpl else (targets(rig, tpl, S, lift), list(tpl.get("pins", [])))
+        J = R.solve(rig, S, T, 1.0, "all", pins, 0, tweaks, False)
+        layers, rots = [], {}
+        for part in rig.z_for("idle"):
+            mask = lab == names.index(part)
+            if not rig.present(part, "idle") or not mask.any():
+                continue
+            deg = R.part_rotation(rig, part, "idle", S, J)
+            mech = getattr(rig, "preset", None) == "mechanical"           # FW-5: the preset is nearest only
+            sampler = rig.sampler if mech else b.get("sampler") or ("rotsprite" if abs(deg) > ROTSPRITE_ABOVE
+                                                                    else rig.sampler)
+            rgba, hit, emp, rots[part] = MR.render_part(rig, part, "idle", arr, mask, J, size, gaps, False, 1.0, sampler)
+            layers.append((list(rig.parts).index(part), rgba, hit, emp))
+        img, labels = RR.composite(layers, size, pairs)
+        rows = np.nonzero((img[..., 3] > 0).any(1))[0]
+        tried.append((int(rows.max()) if len(rows) else bottom, (img, labels, J, rots, lift)))
+        if tried[-1][0] == bottom or not tpl.get("ground"):
+            break
+    # the lowest lift standing on the feet row, else the lowest one above it (K-ground then reports it), else the last
+    low, (img, labels, J, rots, lift) = next((t for t in tried if t[0] == bottom), None) or \
+        next((t for t in tried if t[0] < bottom), tried[-1])
+    img = MK.kneel_paint(sid, b.get("paint"), img, kfs)
+    return {"img": img, "labels": labels, "joints": J, "rots": rots, "lift": lift}
+
+
+def add_key(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict, dict]:
+    """load_entries hook: an opted rig's sheet gains the `kneel` key (meta kf_derived kneel: idle, meta kneel = the
+    derivation); any other sheet comes back unchanged (the same objects)."""
+    if not opted(cfg):
+        return meta, kfs
+    d = derive(sid, cfg, kfs, meta)
+    return {**meta, "kf_derived": {**meta.get("kf_derived", {}), "kneel": "idle"}, "kneel": d}, \
+        {**kfs, "kneel": Image.fromarray(d["img"], "RGBA")}
+
+
+def extend_cfg(cfg: dict, joints: dict, pins: list[str]) -> dict:
+    """The rig with a `kneel` keyframe: its joints, every per-keyframe part entry and z order copied from idle, and the
+    template pins for the kneel in-betweens (a rig's frames.kneel_in*.pins wins)."""
+    c = copy.deepcopy(cfg)
+    c.setdefault("keyframes", {})["kneel"] = {j: [v[0], v[1]] for j, v in joints.items()}
+    for p in (c.get("parts") or {}).values():
+        for key in ("bone", "chain"):
+            if isinstance(p.get(key), dict) and "idle" in p[key]:
+                p[key]["kneel"] = p[key]["idle"]
+        if isinstance(p.get("in"), list) and "idle" in p["in"]:
+            p["in"] = [*p["in"], "kneel"]
+    if "idle" in (c.get("z") or {}):
+        c["z"]["kneel"] = c["z"]["idle"]
+    if c.get("frames") is None:
+        c["frames"] = {}
+    frames = c["frames"]
+    for n in ("kneel_in1", "kneel_in2"):
+        frames[n] = {"pins": list(pins), **(frames.get(n) or {})}
+    return c
+
+
+def leg_lerp(rig, c: dict, name: str) -> dict:
+    """The frame's tweaks plus, for every unpinned leg joint (knees, feet, toes), the step from its angle-space place to
+    its straight position lerp: an angle lerp swings a folding leg through the ground; a position lerp folds it."""
+    from gen import monster_anim as MA
+    from gen import monster_recipes as MR
+    from gen import rig as R
+    r, over = MR.RECIPES[name], c["frames"][name]
+    S, T, u = rig.keyframes[r["src"]], rig.keyframes[r["toward"]], MA.recipe_u(name, c)
+    own = {j: [float(v[0]), float(v[1])] for j, v in (over.get("tweaks") or {}).items()}
+    pins = set(over.get("pins", []))
+    J = R.solve(rig, S, T, u, "all", list(pins), 0, own, False, MA.half_joints(rig, name, c))
+    toes = KT.TOES.get(rig.body, {})
+    legs = [j for _, k, f in rig.limbs for j in (k, f, toes.get(f)) if j and j in S and j in T and j not in pins]
+    out = dict(own)
+    for j in legs:
+        want = (S[j][0] + (T[j][0] - S[j][0]) * u + own.get(j, [0, 0])[0], S[j][1] + (T[j][1] - S[j][1]) * u
+                + own.get(j, [0, 0])[1])
+        out[j] = [own.get(j, [0, 0])[0] + round(want[0] - J[j][0]), own.get(j, [0, 0])[1] + round(want[1] - J[j][1])]
+    return out
+
+
+def prepare(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> tuple[dict, dict, dict]:
+    """generate hook: (cfg, keys, {kneel: (labels, part names)}); unchanged objects and {} for a rig without the block."""
+    if not opted(cfg):
+        return cfg, kfs, {}
+    from gen import rig as R
+    if "kneel" not in kfs or "kneel" not in meta:
+        meta, kfs = add_key(sid, cfg, {k: v for k, v in meta.items() if k != "kneel"}, kfs)
+    d = meta["kneel"]
+    rig0 = R.Rig(cfg, kfs["idle"].size)
+    tpl = template_of(rig0, cfg)
+    pins = [f for f in rig0.feet if f in rig0.keyframes["idle"]] if "squat" in tpl else list(tpl.get("pins", []))
+    c = extend_cfg(cfg, d["joints"], pins)
+    rig = R.Rig(c, kfs["idle"].size)
+    for n in ("kneel_in1", "kneel_in2"):
+        c["frames"][n]["tweaks"] = leg_lerp(rig, c, n)
+    names = list(rig.parts)
+    lab = d["labels"].copy()
+    near, _ = R.segment(rig, "kneel", d["img"])
+    fix = (d["img"][..., 3] > 0) & (lab < 0)
+    lab[fix] = near[fix]
+    lab[d["img"][..., 3] == 0] = -1
+    return c, kfs, {"kneel": (lab, names)}
+
+
+def skip(kfs: dict) -> set[str]:
+    """The kneel names generate leaves out: `kneel` itself (a key), and all four for a sheet without the kneel key."""
+    return {"kneel"} if "kneel" in kfs else set(KNEEL_FRAMES)
+
+
+def sink_px(cfg: dict, cell_h: int) -> int:
+    """D-K9: a floater's runtime kneelSink (native px): the block's `sink`, else 6 px per 80 px of cell."""
+    v = block(cfg).get("sink")
+    return int(v) if v is not None else max(1, int(SINK_PER_80 * cell_h / 80 + 0.5))

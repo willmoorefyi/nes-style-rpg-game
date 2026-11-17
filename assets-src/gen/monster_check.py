@@ -15,7 +15,9 @@ from PIL import Image
 from gen import anim_checks as C
 from gen import anim_efix as E
 from gen import anim_feet as AF
+from gen import kneel_checks as KC
 from gen import monster_anim as MA
+from gen.monster_recipes import KNEEL_FRAMES
 
 
 def palette(keyframes: dict[str, Image.Image]) -> set:
@@ -73,16 +75,17 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
         out += C.seam_gaps(a, f["labels"], f.get("seam_tolerance", 0), f.get("pairs"))
     out += _silhouette(f, a, S, T, cell_h, efix_gates) + C.outline_kept(a, S)
     floating = bool(meta.get("floating") or f.get("floating"))       # FW-1: the float band replaces the feet check
-    out += C.feet(a0, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
-                  1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"), _per_foot(f),
-                  f.get("squash"))
-    out += C.clipping(a) + C.rotation_cap(f["rots"], f.get("rot_cap")) + C.whole_pixel(f["joints"])
-    if name != "idle_b":
+    kneel = name in KNEEL_FRAMES          # docs/KNEEL_PLAN.md 7: K-ground / K-rot (kneel_checks) replace feet, F5, cap
+    out += [] if kneel else C.feet(a0, S, T, f["u"], meta["bottom_row"], f["pinned"], floating,
+                                   1 if name == "idle_b" else int(f.get("dy", 0)) if floating else 0, f.get("contact"),
+                                   _per_foot(f), f.get("squash"))
+    out += C.clipping(a) + ([] if kneel else C.rotation_cap(f["rots"], f.get("rot_cap"))) + C.whole_pixel(f["joints"])
+    if name not in ("idle_b", "kneel_b"):
         out += C.near_keyframe(f["u"])
     if name == "hurt_in2":
         for p in f.get("carried", []):
             out += C.prop_carry(gen.get("hurt_in1", {}).get("prop_px", {}).get(p, 0), f["prop_px"].get(p, 0))
-    return out + (_efix(name, f, meta) if efix_gates else [])
+    return out + (_efix(name, {**f, "contact": None} if kneel else f, meta) if efix_gates else [])
 
 
 def mask_report(cfg: dict, keyframes: dict[str, Image.Image]) -> tuple[dict[str, list[str]], dict[str, dict]]:
@@ -110,6 +113,8 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
     allowed = palette(keyframes) | {tuple(c) for c in meta.get("kf_palette", ())}   # FW-P: the approved palette
     rep = {n: frame_checks(n, f, arrs, gen, meta, allowed, efix_gates) for n, f in gen.items()}
     rep.update(painted_key_checks(meta, arrs, allowed))
+    for k, v in KC.check_sprite(sprite, cfg, keyframes, meta, gen, allowed).items():   # K-checks (opt-in rigs)
+        rep[k] = rep.get(k, []) + v
     if efix_gates:
         rep.update(mask_report(cfg, keyframes)[0])
     imgs = {**arrs, **{n: f["img"] for n, f in gen.items()}}

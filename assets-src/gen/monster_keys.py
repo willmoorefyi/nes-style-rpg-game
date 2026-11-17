@@ -188,6 +188,16 @@ def paint_keys(sid: str, cfg: dict | None, kfs: dict[str, Image.Image]) -> tuple
     return out, painted
 
 
+def kneel_paint(sid: str, patches: list | None, img: np.ndarray, kfs: dict[str, Image.Image]) -> np.ndarray:
+    """docs/KNEEL_PLAN.md D-K4: the derived `kneel` key's `kneel.paint` under the FW-P rules (KF_PAINT_CAP px, the
+    approved palette or null, inside the cell); it is locked as `kf:kneel` (meta kf_derived, monster_check)."""
+    if not patches:
+        return img
+    key = Image.fromarray(img, "RGBA")
+    out, _ = paint_keys(sid, {"paint": [{**p, "frame": "idle"} for p in patches]}, {**kfs, "idle": key})
+    return np.asarray(out["idle"]).copy()
+
+
 def apply(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Image], paint: bool = True) -> tuple[dict, dict]:
     """FW-R, FW-O, then FW-P (paint=False: the approved keys, offset but unpainted, for fixmeasure's RED states). A
     painted sheet's meta gains `kf_painted` (names), `kf_raw` (the unpainted keys) and `kf_palette` (the approved
