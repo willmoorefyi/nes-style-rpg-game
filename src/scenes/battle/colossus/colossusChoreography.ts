@@ -6,15 +6,16 @@
  *
  *   idle  144 loop  breathing: the canvas dy 0 -> -4 -> 0 px (cosine); glow pulse 1 <-> 0.7 (288 frames), corona
  *                   1 <-> 0.8 (96 frames); moons orbit 1 art px / 4 frames; clouds drift 1 art px / 20 frames
- *   slam   44       the dip dy -12 px (12, the wind-up), hold (8), slam to +8 (4; contact at 24: the shake, the hit and
- *                   a glow flare), back to rest (20); limbs (a layered form) raise / slam / recoil
+ *   slam   44       the dip dy -48 px (12, the wind-up), hold (8), slam to +40 (4; contact at 24: the shake, the hit and
+ *                   a glow flare; a second shake 6 frames on), back to rest (20); dip and drop clamped per form by the
+ *                   border rule (`slamLimitsFor`, C6-5: F3 48 / 40, F4 5 / 40); limbs raise / slam / recoil
  *   beam   40       glow and corona flare to their rest alpha (10), release at 10 (the beam from the core), hold, ease back
  *   cast   40       the flare, moons orbit x2, release at 20
  *   hurt   20       a white flash on the normal layers 2 on / 2 off x2 (the view's additive copy) and a +-3 px shake
  *   roar   60       interlude only: every layer +-1 art px jitter, glow and corona at rest alpha, shake at 0 and 30
  *   dying 150       flare and the core's white (30), sink 2 px / frame while every layer fades (90), white fade (30)
  */
-import type { ColossusLayerKind, XY } from './colossusIndex.js';
+import { BORDER_MARGIN, FIELD, canvasRect, touchedSides, type ColossusFormSpec, type ColossusLayerKind, type XY } from './colossusIndex.js';
 
 export type ColossusTimeline = 'idle' | 'slam' | 'beam' | 'cast' | 'hurt' | 'roar' | 'dying';
 export const TIMELINE_FRAMES: Readonly<Record<ColossusTimeline, number>> = {
@@ -29,16 +30,21 @@ export const DYING_SINK_PX = 2;
 export const HURT_SHAKE: readonly number[] = [3, 3, -3, -3, 2, 2, -2, -2, 1, 1, -1, -1];
 /** The breathing's amplitude (screen px the canvas rises at the top of a breath; the pan limits' envelope, B4). */
 export const BREATH_PX = 4;
-/** The slam's dip (up) and its slam (down) past rest, screen px. */
-export const SLAM_DIP_PX = 12;
-export const SLAM_DROP_PX = 8;
+/** The slam's dip (up) and its slam (down) past rest, screen px, before the per-form clamp (C6-5, D-C7-13). */
+export const SLAM_DIP_PX = 48;
+export const SLAM_DROP_PX = 40;
+/** How far one form's slam may dip and drop (screen px). */
+export interface SlamLimits { dip: number; drop: number }
+export const SLAM_LIMITS: Readonly<SlamLimits> = { dip: SLAM_DIP_PX, drop: SLAM_DROP_PX };
+/** Frames after contact the second shake lands. */
+export const SLAM_SECOND_SHAKE = 6;
 /** Glow and corona pulse floors (18.3), as a fraction of the rest alpha (glow deepened 0.85 -> 0.7 at C5). */
 export const GLOW_PULSE_MIN = 0.7;
 export const CORONA_PULSE_MIN = 0.8;
 
 export type ColossusCue = 'contact' | 'release' | 'shake';
 const CUES: Partial<Record<ColossusTimeline, [number, ColossusCue][]>> = {
-  slam: [[SLAM_CONTACT, 'contact'], [SLAM_CONTACT, 'shake']],
+  slam: [[SLAM_CONTACT, 'contact'], [SLAM_CONTACT, 'shake'], [SLAM_CONTACT + SLAM_SECOND_SHAKE, 'shake']],
   beam: [[BEAM_RELEASE, 'release']],
   cast: [[CAST_RELEASE, 'release']],
   roar: [[0, 'shake'], [30, 'shake']],
@@ -81,12 +87,25 @@ const pulse = (c: number, period: number, min: number): number => min + (1 - min
 /** The breathing at clock c: 0 at rest, -BREATH_PX at the top of the 144-frame loop. */
 export const breathAt = (c: number): number => -BREATH_PX * (0.5 - 0.5 * Math.cos((2 * Math.PI * c) / TIMELINE_FRAMES.idle));
 
-/** The slam's canvas motion at frame t (screen px; negative is up). */
-export function slamAt(t: number): number {
-  if (t < 12) return (-SLAM_DIP_PX * (t + 1)) / 12;
-  if (t < 20) return -SLAM_DIP_PX;
-  if (t < SLAM_CONTACT) return -SLAM_DIP_PX + ((SLAM_DIP_PX + SLAM_DROP_PX) * (t - 19)) / 4;
-  return t < TIMELINE_FRAMES.slam ? SLAM_DROP_PX * (1 - (t - SLAM_CONTACT + 1) / 20) : 0;
+/**
+ * The slam's limits for form `f` (4.2): the dip keeps a cut bottom edge >= 786 (the strip plus BORDER_MARGIN) with the
+ * breathing's BREATH_PX on top, the drop keeps a cut top edge <= 114; each at most SLAM_DIP_PX / SLAM_DROP_PX.
+ */
+export function slamLimitsFor(f: ColossusFormSpec): SlamLimits {
+  const c = canvasRect(f);
+  const sides = touchedSides(f);
+  const dip = sides.includes('bottom') ? c.y + c.h - (FIELD.y1 + BORDER_MARGIN) - BREATH_PX : SLAM_DIP_PX;
+  const drop = sides.includes('top') ? FIELD.y0 - BORDER_MARGIN - c.y : SLAM_DROP_PX;
+  return { dip: Math.max(0, Math.min(SLAM_DIP_PX, dip)), drop: Math.max(0, Math.min(SLAM_DROP_PX, drop)) };
+}
+
+/** The slam's canvas motion at frame t (screen px; negative is up) within `limits`. */
+export function slamAt(t: number, limits: Readonly<SlamLimits> = SLAM_LIMITS): number {
+  const { dip, drop } = limits;
+  if (t < 12) return (-dip * (t + 1)) / 12;
+  if (t < 20) return -dip;
+  if (t < SLAM_CONTACT) return -dip + ((dip + drop) * (t - 19)) / 4;
+  return t < TIMELINE_FRAMES.slam ? drop * (1 - (t - SLAM_CONTACT + 1) / 20) : 0;
 }
 
 /** A point on a diamond orbit of radius r (4r whole-px steps), at step k. */
@@ -136,7 +155,8 @@ function flare(t: number, up: number, down: number, total: number): number {
 }
 
 /** The pose of every layer and the canvas at frame t of `timeline` (ambient clock `clock`). */
-export function poseAt(timeline: ColossusTimeline, t: number, clock: number, layers: readonly LayerInfo[]): ColossusPoseFrame {
+export function poseAt(timeline: ColossusTimeline, t: number, clock: number, layers: readonly LayerInfo[],
+  slam: Readonly<SlamLimits> = SLAM_LIMITS): ColossusPoseFrame {
   const f = Math.max(0, Math.floor(t));
   const c = Math.floor(clock);
   const moonSpeed = timeline === 'cast' ? 2 : 1;
@@ -146,7 +166,7 @@ export function poseAt(timeline: ColossusTimeline, t: number, clock: number, lay
     : timeline === 'slam' ? (f >= SLAM_CONTACT && f < SLAM_CONTACT + 8 ? 1 : 0) : timeline === 'roar' || (timeline === 'dying' && f < DYING_SINK_START) ? 1 : 0;
   const fading = timeline === 'dying' ? clamp01(1 - (f - DYING_SINK_START) / DYING_SINK_FRAMES) : 1;
   let moon = 0;
-  const out: ColossusPoseFrame = { dx: 0, dy: 0, bob: breathAt(c) + (timeline === 'slam' ? slamAt(f) : 0), sink: 0, overlay: 0, layers: [] };
+  const out: ColossusPoseFrame = { dx: 0, dy: 0, bob: breathAt(c) + (timeline === 'slam' ? slamAt(f, slam) : 0), sink: 0, overlay: 0, layers: [] };
   for (const info of layers) {
     const p = ambient(info, c, info.kind === 'moon' ? moon++ : 0, moonSpeed);
     const rest = info.alpha ?? 1;

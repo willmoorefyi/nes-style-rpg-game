@@ -179,3 +179,57 @@ describe('the animation controller waits for the interlude', () => {
     expect(colossusAt(s.display.enemySprites[0])).not.toBeNull();
   });
 });
+
+describe('the i2 fade covers the field only (C6-10, 5.9)', () => {
+  const FADE: InterludeStep[] = [
+    { type: 'fade', alpha: 0.6, frames: 20 },
+    { type: 'shake', times: 3 },
+    { type: 'wait', frames: 4 },
+  ];
+  const fadeG = (main: Container): Graphics | undefined =>
+    (function find(c: Container): Graphics | undefined {
+      for (const k of c.children) {
+        if (k instanceof Graphics && k.label === 'interlude.fade') return k;
+        const f = find(k);
+        if (f) return f;
+      }
+      return undefined;
+    })(main);
+
+  it('the fade lies in the field rect (y 120..780, between the message window and the bottom windows) on every frame, shake included', () => {
+    const s = setup(FADE);
+    s.view.queue(s.change());
+    s.view.start();
+    let seen = 0;
+    for (let f = 0; f < 60 && !s.frame(); f++) {
+      const g = fadeG(s.main);
+      if (!g || g.getBounds().height === 0) continue;
+      seen++;
+      const b = g.getBounds();
+      expect(b.y, `frame ${f}`).toBeGreaterThanOrEqual(120);
+      expect(b.y + b.height, `frame ${f}`).toBeLessThanOrEqual(780);
+      expect(b.x).toBeLessThanOrEqual(0);
+      expect(b.x + b.width).toBeGreaterThanOrEqual(1920);
+      expect(b.height).toBeGreaterThanOrEqual(780 - 120 - 6);
+    }
+    expect(seen).toBeGreaterThan(20);
+  });
+
+  it('the flash stays full screen', () => {
+    const s = setup([{ type: 'flash', color: '#ffffff', frames: 6, alpha: 1 }]);
+    s.view.queue(s.change());
+    s.view.start();
+    s.frame();
+    const flash = (function find(c: Container): Graphics | undefined {
+      for (const k of c.children) {
+        if (k instanceof Graphics && k.label === 'interlude.flash') return k;
+        const f = find(k);
+        if (f) return f;
+      }
+      return undefined;
+    })(s.main)!;
+    const b = flash.getBounds();
+    expect(b.height).toBeGreaterThanOrEqual(1080);
+    expect(b.width).toBeGreaterThanOrEqual(1920);
+  });
+});

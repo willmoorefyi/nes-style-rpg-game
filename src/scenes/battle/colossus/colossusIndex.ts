@@ -7,6 +7,7 @@
  */
 import type { EnemyData } from '../../../types/index.js';
 import { resolveArtEntries } from './colossusEntries.js';
+import { COLOSSUS_ROW_PX, ICON_LIFT } from '../fx/statusIcons.js';
 
 export type XY = [number, number];
 /** [left, top, right, bottom], right / bottom exclusive. */
@@ -64,8 +65,9 @@ export const FIELD = { x0: 0, x1: 1920, y0: 120, y1: 780 } as const;
 export const BORDER_MARGIN = 6;
 /** Damage numbers and icons stay in these rows (plan 4.4). */
 export const NUMBER_Y: XY = [140, 740];
-/** The head anchor's rows: the icon row above it and the target label above that stay below the message window. */
-export const HEAD_Y: XY = [192, 760];
+/** The head anchor's rows: the 44 px plated icon row above it and the target label above that (label top 124, 32 px,
+ *  4 px gap) stay below the message window (C6-6: 212 = 124 + 32 + 4 + 44 + 8). */
+export const HEAD_Y: XY = [124 + 32 + 4 + COLOSSUS_ROW_PX + ICON_LIFT, 760];
 
 /** The colossus form a record draws (`colossus:`, plan 3.6), or null for an atlas enemy. */
 export function colossusOf(data: EnemyData | object | null | undefined): string | null {

@@ -11,7 +11,7 @@ import { measureReach } from '../../../src/scenes/battle/actionHelpers.js';
 import { anchor, bodyBox } from '../../../src/scenes/battle/fx/emitterCore.js';
 import { colossusAt, colossusStatusAnchor } from '../../../src/scenes/battle/colossus/colossusProxy.js';
 import { screenAnchors, type ColossusFormSpec } from '../../../src/scenes/battle/colossus/colossusIndex.js';
-import { ICON_LIFT, ICON_PX } from '../../../src/scenes/battle/fx/statusIcons.js';
+import { COLOSSUS_ROW_PX, ICON_LIFT } from '../../../src/scenes/battle/fx/statusIcons.js';
 import { FLOAT_FONT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import type { InputManager } from '../../../src/core/InputManager.js';
 import { colossusBattle, fixtureIndex, HORIZON, installFixtureArt } from '../../helpers/colossusFixture.js';
@@ -41,7 +41,7 @@ describe('damage numbers', () => {
     f.anchors = { ...f.anchors, core: [1347, 20], head: [1347, 10] };
     const a = screenAnchors(f);
     expect(a.core.y).toBe(140);
-    expect(a.head.y - ICON_LIFT - ICON_PX).toBeGreaterThanOrEqual(140);
+    expect(a.head.y - ICON_LIFT - COLOSSUS_ROW_PX).toBeGreaterThanOrEqual(140);   // C7 pin: the 44 px plated row (C6-6)
     f.anchors = { ...f.anchors, core: [1347, 1060] };
     expect(screenAnchors(f).core.y).toBe(740);
   });
@@ -69,7 +69,7 @@ describe('status icons, effects and the melee point', () => {
   it('the status anchor puts the icon row inside y 140..760', () => {
     const s = colossusBattle();
     const a = colossusStatusAnchor(colossusAt(s.display.enemySprites[0])!);
-    const top = a.head.y - ICON_LIFT - ICON_PX;
+    const top = a.head.y - ICON_LIFT - COLOSSUS_ROW_PX;   // C7 pin: the 44 px plated row (C6-6)
     expect(top).toBeGreaterThanOrEqual(140);
     expect(a.head.y).toBeLessThanOrEqual(760);
   });

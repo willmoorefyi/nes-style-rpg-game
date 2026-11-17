@@ -4,8 +4,8 @@
  * Like an atlas enemy, a hurt never interrupts an attack or a cast; dying holds its last frame.
  */
 import {
-  BEAM_RELEASE, CAST_RELEASE, SLAM_CONTACT, TIMELINE_FRAMES, cuesBetween, poseAt,
-  type ColossusCue, type ColossusPoseFrame, type ColossusTimeline, type LayerInfo,
+  BEAM_RELEASE, CAST_RELEASE, SLAM_CONTACT, SLAM_LIMITS, TIMELINE_FRAMES, cuesBetween, poseAt,
+  type ColossusCue, type ColossusPoseFrame, type ColossusTimeline, type LayerInfo, type SlamLimits,
 } from './colossusChoreography.js';
 
 export type ColossusCastKind = 'beam' | 'cast';
@@ -20,6 +20,8 @@ export class ColossusPoseController {
   private clock = 0;
   /** Raised from `update` on a timeline's cue frames (the slam's contact and shake, a spell's release). */
   onCue: ((cue: ColossusCue) => void) | null = null;
+  /** The drawn form's slam dip and drop (`slamLimitsFor`, set by ColossusSlots at the swap and at a re-base). */
+  slamLimits: Readonly<SlamLimits> = SLAM_LIMITS;
 
   constructor(private readonly layers: readonly LayerInfo[]) {}
 
@@ -89,7 +91,7 @@ export class ColossusPoseController {
 
   /** The pose of every layer now. */
   frame(): ColossusPoseFrame {
-    return poseAt(this.tl, this.tl === 'dying' ? Math.min(this.t, TIMELINE_FRAMES.dying - 1) : this.t, this.clock, this.layers);
+    return poseAt(this.tl, this.tl === 'dying' ? Math.min(this.t, TIMELINE_FRAMES.dying - 1) : this.t, this.clock, this.layers, this.slamLimits);
   }
 
   /** The dev preview's `enemy: frame / t` text. */
