@@ -166,6 +166,138 @@
   description: Revive one fallen ally with 1 HP
   power: 0
   element: none
+- id: hrm3
+  name: HRM3
+  level: 5
+  type: white
+  effect: damage_holy
+  targeting: all
+  description: Deal strong holy damage to all undead
+  power: 60
+  element: holy
+  targetFamily: undead
+  accuracy: 24
+- id: hel2
+  name: HEL2
+  level: 5
+  type: white
+  effect: heal
+  targeting: all_allies
+  description: Restore more HP to all allies
+  power: 24
+  element: none
+- id: soft
+  name: SOFT
+  level: 6
+  type: white
+  effect: cure_stone
+  targeting: single_ally
+  description: Cure stone on one ally
+  power: 0
+  element: none
+- id: exit
+  name: EXIT
+  level: 6
+  type: white
+  effect: field_exit
+  targeting: self
+  description: Escape from a dungeon to its entrance
+  power: 0
+  element: none
+- id: fog2
+  name: FOG2
+  level: 6
+  type: white
+  effect: buff_defense
+  targeting: all_allies
+  description: Raise defense of all allies
+  power: 12
+  element: none
+- id: inv2
+  name: INV2
+  level: 6
+  type: white
+  effect: buff_evade
+  targeting: all_allies
+  description: Raise evasion of all allies
+  power: 40
+  element: none
+- id: cur4
+  name: CUR4
+  level: 7
+  type: white
+  effect: heal_full
+  targeting: single_ally
+  description: Fully restore HP and cure ailments of one ally
+  power: 0
+  element: none
+- id: hrm4
+  name: HRM4
+  level: 7
+  type: white
+  effect: damage_holy
+  targeting: all
+  description: Deal great holy damage to all undead
+  power: 80
+  element: holy
+  targetFamily: undead
+  accuracy: 24
+- id: arub
+  name: ARUB
+  level: 7
+  type: white
+  effect: resist_death
+  targeting: all_allies
+  description: Grant death resistance to all allies
+  power: 0
+  element: none
+- id: hel3
+  name: HEL3
+  level: 7
+  type: white
+  effect: heal
+  targeting: all_allies
+  description: Restore much HP to all allies
+  power: 48
+  element: none
+- id: lif2
+  name: LIF2
+  level: 8
+  type: white
+  effect: revive
+  targeting: single_ally
+  description: Revive one fallen ally with full HP
+  power: 100
+  element: none
+- id: fade
+  name: FADE
+  level: 8
+  type: white
+  effect: damage_holy
+  targeting: all
+  description: Deal holy damage to all enemies
+  power: 80
+  element: holy
+  accuracy: 107
+- id: wall
+  name: WALL
+  level: 8
+  type: white
+  effect: wall
+  targeting: all_allies
+  description: Shield all allies from elements and ailments
+  power: 0
+  element: none
+- id: xfer
+  name: XFER
+  level: 8
+  type: white
+  effect: dispel
+  targeting: single
+  description: Strip the buffs and resistances of one enemy
+  power: 0
+  element: none
+  accuracy: 107
 - id: fire
   name: FIRE
   level: 1
@@ -324,3 +456,161 @@
   power: 40
   element: ice
   accuracy: 24
+- id: fir3
+  name: FIR3
+  level: 5
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal strong fire damage to all enemies
+  power: 50
+  element: fire
+  accuracy: 24
+- id: bane
+  name: BANE
+  level: 5
+  type: black
+  effect: status_death
+  targeting: all
+  description: Poison gas that may kill all enemies
+  power: 0
+  element: none
+  accuracy: 40
+- id: warp
+  name: WARP
+  level: 5
+  type: black
+  effect: field_warp
+  targeting: self
+  description: Return to the previous floor of a dungeon
+  power: 0
+  element: none
+- id: slo2
+  name: SLO2
+  level: 5
+  type: black
+  effect: debuff_speed
+  targeting: all
+  description: Reduce speed of all enemies
+  power: 0
+  element: none
+  accuracy: 64
+- id: lit3
+  name: LIT3
+  level: 6
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal strong lightning damage to all enemies
+  power: 60
+  element: lightning
+  accuracy: 24
+- id: rub
+  name: RUB
+  level: 6
+  type: black
+  effect: status_death
+  targeting: single
+  description: May kill one enemy
+  power: 0
+  element: none
+  accuracy: 24
+- id: qake
+  name: QAKE
+  level: 6
+  type: black
+  effect: status_death
+  targeting: all
+  description: An earthquake that may swallow all grounded enemies
+  power: 0
+  element: earth
+  accuracy: 40
+- id: stun
+  name: STUN
+  level: 6
+  type: black
+  effect: status_stun
+  targeting: single
+  description: Paralyze one enemy (rarely misses)
+  power: 0
+  element: none
+  accuracy: 107
+- id: ice3
+  name: ICE3
+  level: 7
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal strong ice damage to all enemies
+  power: 70
+  element: ice
+  accuracy: 24
+- id: brak
+  name: BRAK
+  level: 7
+  type: black
+  effect: status_stone
+  targeting: single
+  description: Turn one enemy to stone
+  power: 0
+  element: none
+  accuracy: 64
+- id: sabr
+  name: SABR
+  level: 7
+  type: black
+  effect: buff_attack
+  targeting: self
+  description: Greatly raise attack of self
+  power: 16
+  element: none
+- id: blnd
+  name: BLND
+  level: 7
+  type: black
+  effect: status_blind
+  targeting: single
+  description: Blind one enemy (rarely misses)
+  power: 0
+  element: none
+  accuracy: 107
+- id: stop
+  name: STOP
+  level: 8
+  type: black
+  effect: stop
+  targeting: all
+  description: Stop time for all enemies
+  power: 0
+  element: none
+  accuracy: 48
+- id: zap
+  name: "ZAP!"
+  level: 8
+  type: black
+  effect: status_death
+  targeting: all
+  description: Banish all enemies to another dimension
+  power: 0
+  element: none
+  accuracy: 48
+- id: xxxx
+  name: XXXX
+  level: 8
+  type: black
+  effect: status_death
+  targeting: single
+  description: Kill one enemy with under 300 HP
+  power: 300
+  element: none
+  accuracy: 107
+- id: nuke
+  name: NUKE
+  level: 8
+  type: black
+  effect: damage
+  targeting: all
+  description: Deal massive damage to all enemies
+  power: 100
+  element: none
+  accuracy: 107

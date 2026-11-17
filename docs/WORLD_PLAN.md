@@ -1998,6 +1998,52 @@ No AI or paid calls.
 exempt); the bestiary scans the manifest and uses `EncounterZone.name`.
 <!-- === end W1-F === -->
 <!-- === W1-G FOUNDATION (pass W: owned by W1-G) === -->
+### W1-G result: spells L5-L8 (branch `w-w1-g` from `mainline` ebd1cfd)
+
+No AI or paid calls.
+
+**Files:**
+
+- `spells.yaml`: 30 new spells (64 in all; L5-L8 hold 4 white + 4 black each, with the existing `cure3` / `life`).
+  The 20 enemy spell ids are kept exactly; no enemy record is edited (no `ai` action casts a new spell, so no balance
+  moves). White: L5 `hrm3`, `hel2`; L6 `soft`, `exit` (`field_exit`), `fog2`, `inv2`; L7 `cur4` (`heal_full`), `hrm4`,
+  `arub` (`resist_death`), `hel3`; L8 `lif2` (`revive`, power 100 = % HP), `fade`, `wall`, `xfer` (`dispel`). Black:
+  L5 `fir3`, `bane`, `warp` (`field_warp`), `slo2`; L6 `lit3`, `rub`, `qake`, `stun`; L7 `ice3`, `brak`
+  (`status_stone`), `sabr`, `blnd`; L8 `stop` (`stop`), `zap` ("ZAP!"), `xxxx` (death, power 300 = HP limit), `nuke`.
+  Every damage spell of L5+ is all-target, so ICE stays the strongest single-target black damage spell (chaosForms).
+- `src/battle/spellEffectsLate.ts` (228 lines): `castLateSpell` handles `status_death`, `status_stone`, `stop` (the
+  all-target stun, blocked by `time`), `revive` with power > 0, `heal_full` (full HP + every status but death),
+  `cure_stone`, `dispel`, `wall`, and `field_exit` / `field_warp` ("No effect." in battle). Protections: an enemy's
+  `protect`, a hero's temporary resistance of the same category (ARUB `death`, WALL all); BANE is `poison_stone`, QAKE
+  `earth`, ZAP! and STOP `time`. The roll is always drawn; a boss with a form floor pending is never killed outright.
+- `SpellExecutor.ts`: +2 lines (import, dispatch after the cast line), 311 / 314.
+- `shops.yaml` (in the town anchors): `crescent_white` + `hrm3`, `hel2`; `crescent_black` L5; `onrac_*` L6; `gaia_*`
+  L7; `lufenia_*` L8. Each L5-L8 spell is sold in exactly one shop.
+- `spell-effects.yaml`: the 30 spell rows and the byEffect fallbacks, all mapped to existing effects (death: the FEAR
+  skull, stone: `cleanse_stone`, NUKE: `fire_all`, QAKE: `impact_dust`, ARUB: `holy`, WALL: `resist_ice`, XFER:
+  `debuff_evade`, EXIT / WARP: `ether`). New effects were tried and dropped: `fxBigBoxes` / `actionFx` pin every
+  effect's drawing to a baseline, so dedicated L5-L8 visuals are an fx-owner follow-up.
+- `bestiary.yaml`: `spellNames: {}` (all 20 codes are spells now; the cross-file test forbids a duplicate name).
+- Tests: `tests/battle/spellEffectsLate.test.ts` (new); `crossFileValidation.test.ts` + "every enemy spell id
+  resolves"; `enemyAiPattern.test.ts` uses `no_such_spell` as its unknown spell (it used `nuke`).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/battle/ tests/balance/` | `Test Files 34 passed (34)`, `Tests 368 passed (368)` |
+| `npx vitest run tests/data/crossFileValidation.test.ts tests/data/gearBands.test.ts` | `Tests 1417 passed (1417)`, including "every enemy spell id resolves in spells.yaml" and gearBands with the late shops stocked |
+| `npm run build` | exit 0 |
+| `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 273 passed (273)`, `Tests 5492 passed (5492)` |
+
+**Deviations / hand-offs:**
+
+- The field side is W1-B's: `FieldSpellEffects.isFieldSpell` is white-only and has no travel effects, so WARP (black)
+  and EXIT need W1-B's wiring; field LIF2 revives at 1 HP (the field `revive` path) and CUR4 (`heal_full`) is not yet
+  a field spell.
+- WALL's status resistance only guards the late effects; the older status spells (SLEP, HOLD ...) do not check hero
+  resistances.
+- `crescent_white` (not in the list) gained the classic `hrm3` / `hel2` so every L5 spell is sold.
 <!-- === end W1-G === -->
 <!-- === W1-H FOUNDATION (pass W: owned by W1-H) === -->
 <!-- === end W1-H === -->

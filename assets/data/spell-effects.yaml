@@ -84,6 +84,37 @@ spells:
   ice2: ice_all
   lit: lightning
   lit2: lit_all
+  # W1-G (L5-L8): existing effects only (the fx tests pin each effect's drawing)
+  hrm3: holy
+  hel2: heal_all
+  soft: cleanse_stone
+  exit: ether
+  fog2: buff_def
+  inv2: buff_evade
+  cur4: heal
+  hrm4: holy
+  arub: holy
+  hel3: heal_all
+  lif2: revive
+  fade: holy
+  wall: resist_ice
+  xfer: debuff_evade
+  fir3: fire_all
+  bane: debuff_morale
+  warp: ether
+  slo2: debuff_speed
+  lit3: lit_all
+  rub: debuff_morale
+  qake: impact_dust
+  stun: inflict_stun
+  ice3: ice_all
+  brak: cleanse_stone
+  sabr: buff_atk
+  blnd: inflict_blind
+  stop: inflict_stun
+  zap: debuff_morale
+  xxxx: debuff_morale
+  nuke: fire_all
 items:
   potion: heal
   hi_potion: heal
@@ -120,3 +151,13 @@ byEffect:
   cure_silence: cleanse_silence
   cure_stone: cleanse_stone
   drain: drain
+  status_death: debuff_morale
+  status_stone: cleanse_stone
+  stop: inflict_stun
+  heal_full: heal
+  resist_death: holy
+  wall: resist_ice
+  dispel: debuff_evade
+  field_exit: ether
+  field_warp: ether
+  damage.none: fire_all

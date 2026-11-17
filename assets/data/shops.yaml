@@ -159,11 +159,11 @@
 - id: crescent_white
   type: magic
   name: Crescent White Magic
-  inventory: [cure3, life]
+  inventory: [cure3, life, hrm3, hel2]
 - id: crescent_black
   type: magic
   name: Crescent Black Magic
-  inventory: []
+  inventory: [fir3, bane, warp, slo2]
 - id: crescent_inn
   type: inn
   name: Crescent Inn
@@ -195,11 +195,11 @@
 - id: onrac_white
   type: magic
   name: Onrac White Magic
-  inventory: []
+  inventory: [soft, exit, fog2, inv2]
 - id: onrac_black
   type: magic
   name: Onrac Black Magic
-  inventory: []
+  inventory: [lit3, rub, qake, stun]
 - id: onrac_inn
   type: inn
   name: Onrac Inn
@@ -213,11 +213,11 @@
 - id: lufenia_white
   type: magic
   name: Lufenia White Magic
-  inventory: []
+  inventory: [lif2, fade, wall, xfer]
 - id: lufenia_black
   type: magic
   name: Lufenia Black Magic
-  inventory: []
+  inventory: [stop, zap, xxxx, nuke]
 - id: lufenia_inn
   type: inn
   name: Lufenia Inn
@@ -241,11 +241,11 @@
 - id: gaia_white
   type: magic
   name: Gaia White Magic
-  inventory: []
+  inventory: [cur4, hrm4, arub, hel3]
 - id: gaia_black
   type: magic
   name: Gaia Black Magic
-  inventory: []
+  inventory: [ice3, brak, sabr, blnd]
 - id: gaia_inn
   type: inn
   name: Gaia Inn

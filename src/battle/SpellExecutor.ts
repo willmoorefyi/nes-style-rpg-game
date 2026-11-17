@@ -7,6 +7,7 @@ import { healAmount, magicDamage } from './DamageFormula.js';
 import { partyMagicDefense } from './CombatStats.js';
 import { applyDebuffSpell, applyMoraleSpell, applyStatusSpell } from './SpellStatus.js';
 import { setEnemyHp } from './enemyHp.js';
+import { castLateSpell } from './spellEffectsLate.js';
 
 import type { DamageEvent } from './BattleStateMachine.js';
 
@@ -97,6 +98,7 @@ export class SpellExecutor {
     }
 
     this.deps.addMessage(`${casterName} casts ${spell.name}!`);
+    if (castLateSpell(this.deps, cmd, spell, isEnemy)) return; // L5-L8 effects (spellEffectsLate.ts)
 
     // Handle different spell effects
     if (spell.effect === 'heal') {

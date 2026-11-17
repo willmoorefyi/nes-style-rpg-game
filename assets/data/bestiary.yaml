@@ -105,10 +105,8 @@ families: {were: Were, undead: Undead, giant: Giant, magical: Magical, dragon: D
 # protect / statusWeak categories (ROSTER_PLAN 7.2 D5), in display order; the Immune and Weak rows
 protections: {status: Status, poison_stone: Poison/Stone, death: Death, earth: Earth, time: Time}
 statuses: {poison: Poison, stun: Paralysis, sleep: Sleep, blind: Blind, stone: Stone, death: Death}
-# spec spell codes that spells.yaml does not have yet (the spec glossary; E-F3)
-spellNames: {fir3: FIR3, lit3: LIT3, ice3: ICE3, nuke: NUKE, rub: RUB, xxxx: XXXX, brak: BRAK, bane: BANE, stop: STOP,
-  zap: ZAP!, xfer: XFER, wall: WALL, fog2: FOG2, inv2: INV2, hel2: HEL2, hel3: HEL3, cur4: CUR4, stun: STUN, blnd: BLND,
-  slo2: SLO2}
+# spec spell codes that spells.yaml does not have (the spec glossary; E-F3). Empty since W1-G added the 20 L5-L8 ids
+spellNames: {}
 specialNames: {dazzle: Dazzle, blaze: Blaze, gaze: Gaze, cremate: Cremate, ink: Ink, squint: Death Gaze, scorch: Scorch,
   heat: Heat, blizzard: Blizzard Breath, frost: Frost, trance: Mind Blast, glance: Glance, stare: Stare,
   stinger: Poison Stinger, crack: Earthquake, thunder: Thunder Breath, poison: Poison Breath, nuclear: Nuclear,

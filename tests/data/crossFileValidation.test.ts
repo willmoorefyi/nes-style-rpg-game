@@ -528,6 +528,13 @@ describe('Cross-file validation: roster fields (num, protect, spells, ai, rematc
     }
   });
 
+  // QUEST_PLAN 4.4 / WORLD_PLAN 5.2 (W1-G): the 20 enemy spell codes are spells.yaml ids, so none needs spellNames
+  it('every enemy spell id resolves in spells.yaml (no display-only code is left)', () => {
+    const codes = [...new Set(roster.flatMap((e) => e.spells ?? []))];
+    expect(codes.filter((s) => !spellIds.has(s))).toEqual([]);
+    expect(Object.keys(bestiary.spellNames)).toEqual([]);
+  });
+
   it('no spellNames display name is the name of a spells.yaml spell (use the spell id instead)', () => {
     const names = new Map(spells.map((s) => [s.name, s.id]));
     for (const [code, name] of Object.entries(bestiary.spellNames)) {
