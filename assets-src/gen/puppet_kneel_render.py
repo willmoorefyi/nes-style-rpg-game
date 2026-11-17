@@ -21,6 +21,7 @@ from PIL import Image
 
 from gen import puppet as PU
 from gen import puppet_kneel_outline as KO
+from gen import puppet_kneel_paint as KP
 from gen.puppet_kneel_rot import LIMBS, NAMES, _dist, _rot_about, ik, render  # noqa: F401 - LIMBS re-exported
 
 ROBE_SY = 0.55
@@ -187,7 +188,9 @@ def variant_a(frames: dict, R: dict, kn: dict, robed: bool, z: list[str], bottom
         hip_row = made["kneel"][2]
     else:
         ground = float(R["foot_n"][1] + R["foot_f"][1]) / 2
-        src_r = {"ready": (frames["ready"], R, None)}
+        lab = KP.relabel(PU.segment(frames["ready"], R, False), frames["ready"], kn["labels"]) if kn.get("labels") \
+            else None                                    # opt-in: boxes cut with one part (puppet_kneel_paint)
+        src_r = {"ready": (frames["ready"], R, lab)}
         pl = bool(kn.get("per_leg_lift"))
         key, klab, krot, K = _grounded(target_a(R, kn, False, ground), src_r, "ready", z, bottom, pl)
         if kn.get("knee_down", True):
@@ -199,9 +202,13 @@ def variant_a(frames: dict, R: dict, kn: dict, robed: bool, z: list[str], bottom
             img1, img2 = ground_fix(img1, bottom), ground_fix(img2, bottom)
         out = {"kneel_in1": (img1, rot1, "ready"), "kneel_in2": (img2, rot2, "kneel"), "kneel": (key, krot, "ready")}
         hip_row = int(round(K["hip"][1]))
+    if kn.get("paint"):                                  # opt-in per-frame paint / stamps (puppet_kneel_paint)
+        out = {n: (KP.paint(img, n, kn["paint"], frames), rots, src) for n, (img, rots, src) in out.items()}
     if kn.get("reoutline"):                              # opt-in: the class's own 2 px outline (puppet_kneel_outline)
         out = KO.apply(out, frames["ready"])
     out["kneel_b"] = (PU.bob(out["kneel"][0], hip_row, 1), {}, "kneel")     # idle_b's 1 px bob, on the kneel
+    if kn.get("paint"):
+        out["kneel_b"] = (KP.paint(out["kneel_b"][0], "kneel_b", kn["paint"], frames), {}, "kneel")
     if kn.get("reoutline"):
         out["kneel_b"] = (KO.reoutline(out["kneel_b"][0], frames["ready"]), {}, "kneel")
     return out

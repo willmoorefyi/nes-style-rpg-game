@@ -72,3 +72,58 @@ def run(check, puppet, bottom: int) -> None:
     made = PK.make(gt, frames, bottom)
     low = [int(np.where((np.asarray(made[n][0])[..., 3] > 0).any(1))[0].max()) for n in PK.KNEEL_POSES]
     check(low == [bottom] * 4, f"unrobed: per_leg_lift + ground_tweens keep every kneel frame on the ground row {low}")
+    run_paint(check, puppet, bottom)
+
+
+def _raises(fn) -> bool:
+    try:
+        fn()
+    except ValueError:
+        return True
+    return False
+
+
+def run_paint(check, puppet, bottom: int) -> None:
+    """`labels` and `paint` (puppet_kneel_paint.py): opt-in, the ops, the palette and the 160 px cap."""
+    from gen import puppet_kneel_paint as KP
+    cfg, frames = puppet(False)
+    base = PK.make(cfg, frames, bottom)
+    off = copy.deepcopy(cfg)
+    off["kneel"].update({"labels": [], "paint": []})
+    check(_same(base, PK.make(off, frames, bottom)), "paint / labels: empty lists are byte-identical to no key")
+    key = base["kneel"][0]
+    ka = np.asarray(key)
+    ys, xs = np.nonzero(ka[..., 3] > 0)
+    x, y = int(xs[0]), int(ys[0])
+    ink = [int(v) for v in PU.OUTLINE]
+    got = np.asarray(KP.paint(key, "kneel", [{"xy": [[x, y]], "rgb": None}], frames))
+    check(got[y, x, 3] == 0 and int((got != ka).any(2).sum()) == 1, "paint: rgb null clears exactly that pixel")
+    check(_raises(lambda: KP.paint(key, "kneel", [{"xy": [[x, y]], "rgb": [1, 2, 3]}], frames)),
+          "paint: an off-palette colour is refused")
+    check(_raises(lambda: KP.paint(key, "kneel", [{"rect": [0, 0, 12, 12], "rgb": ink}], frames)),
+          "paint: more than 160 changed px in one frame is refused (13 x 13)")
+    check(not _raises(lambda: KP.paint(key, "kneel", [{"rect": [0, 0, 9, 15], "rgb": ink}], frames)),
+          "paint: 160 changed px are allowed (10 x 16)")
+    only = np.asarray(KP.paint(key, "kneel", [{"rect": [0, 0, 79, 79], "only": list(PU.OUTLINE), "rgb": None}], frames)) \
+        if int((np.all(ka[..., :3] == PU.OUTLINE, 2) & (ka[..., 3] > 0)).sum()) <= 160 else None
+    check(only is None or not (np.all(only[..., :3] == PU.OUTLINE, 2) & (only[..., 3] > 0)).any(),
+          "paint: rect with `only` recolours just that colour")
+    r = np.asarray(frames["ready"])
+    st = np.asarray(KP.paint(Image.new("RGBA", (80, 80)), "kneel", [{"stamp": [36, 12, 43, 21], "to": [0, 0], "rot": 90}],
+                             frames))
+    check(np.array_equal(st[:8, :10], np.rot90(r[12:22, 36:44], 1)), "paint: a stamp copies ready's box turned 90 deg")
+    mv = np.asarray(KP.paint(Image.fromarray(st, "RGBA"), "kneel", [{"move": [0, 0, 9, 7], "by": [0, 2]}], frames))
+    check(np.array_equal(mv[2:10, :10], st[:8, :10]) and not mv[:2, :10, 3].any(),
+          "paint: move shifts the box's pixels by whole px and clears where they were")
+    m2 = np.asarray(KP.paint(key, "kneel_b", [{"xy": [[x, y]], "rgb": None}], frames))
+    check(np.array_equal(m2, ka), "paint: entries apply only to their own frame")
+    lab = PU.segment(frames["ready"], cfg["battle"]["ready"], False)
+    rel = KP.relabel(lab, frames["ready"], [{"part": "torso", "box": [30, 40, 50, 60]}])
+    solid = r[..., 3] > 0
+    check((rel[40:61, 30:51][solid[40:61, 30:51]] == list(PU.PARTS).index("torso")).all()
+          and np.array_equal(rel[:40], lab[:40]), "labels: the box's opaque pixels are cut with the named part only")
+    check(_raises(lambda: KP.relabel(lab, frames["ready"], [{"part": "tail", "box": [0, 0, 1, 1]}])),
+          "labels: an unknown part is refused")
+    lb = copy.deepcopy(cfg)
+    lb["kneel"]["labels"] = [{"part": "torso", "box": [30, 40, 50, 60]}]
+    check(not _same(base, PK.make(lb, frames, bottom)), "labels: a relabel changes the re-posed frames")
