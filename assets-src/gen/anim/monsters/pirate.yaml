@@ -127,3 +127,14 @@ paint:                       # cracks the moved parts opened (not art gaps): the
   - {frame: daze, xy: [[70, 29]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[72, 31], [72, 32]], rgb: null}
   - {frame: daze_b, xy: [[70, 31]], rgb: [6, 4, 10]}
+  # pass K (K2-B): kneel in-betweens: 1 px cracks closed with outline ink, the far boot below the feet row cleared
+  - {frame: kneel_in1, xy: [[24, 33], [45, 36], [24, 52], [49, 40], [51, 42]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[22, 77], [24, 77]], rgb: null}
+  - {frame: kneel_in2, xy: [[40, 56], [30, 65]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[16, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs); the cutlass held low in front, turned under the 30 deg prop cap; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs]
+  tweaks: {tip: [-8, -16], foot_f: [2, 2], toe_f: [2, 1], crown: [0, 2], neck: [0, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[61, 40], [60, 41], [20, 42], [33, 67], [34, 67], [35, 67], [36, 67], [37, 67], [38, 67], [31, 68], [32, 68], [41, 37], [41, 38], [41, 39], [40, 40], [4, 68], [4, 69]], rgb: [6, 4, 10]}

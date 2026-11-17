@@ -111,4 +111,11 @@ masks:
     attack: [[5, 70], [18, 70], [18, 79], [5, 79]]
     hurt: [[11, 72], [24, 72], [24, 79], [11, 79]]
 holds: []
-paint: []
+paint:
+  # pass K (K2-B): kneel in-betweens: the cracks the turned plates open, closed with outline ink
+  - {frame: kneel_in1, xy: [[27, 56], [27, 57], [28, 57], [31, 21], [28, 24], [29, 24], [30, 24], [31, 24]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[32, 29], [46, 35], [27, 44], [26, 45], [27, 45], [43, 51], [30, 54], [43, 54], [34, 55], [35, 55], [36, 55], [37, 55], [36, 56], [37, 56], [38, 56], [40, 56], [38, 57], [39, 57], [41, 57], [25, 59], [21, 60], [22, 60], [25, 60], [26, 60], [26, 61], [27, 61], [27, 62], [28, 62], [40, 67], [41, 67]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow), the sword tip planted on the ground (blade_planted); shoulders slumped
+kneel:
+  variant: [blade_planted, knee_forward, short_legs, deep_bow]
+  tweaks: {foot_f: [3, 0], toe_f: [3, 0], sh_n: [0, 2], sh_f: [0, 2]}

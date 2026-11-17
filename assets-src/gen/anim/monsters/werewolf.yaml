@@ -74,6 +74,10 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
+  kneel_in1:
+    tweaks: {toe_f: [0, -1]}
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], foot_f: [0, 1]}
   atk_wind1:                   # half of wind2
     moves: [crown, neck, chest]
     tweaks: {crown: [-1, 0], neck: [-1, 0], sh_f: [-1, 0], el_f: [-1, -1], hand_f: [-1, -1], el_n: [-1, 0], hand_n: [-2, 0]}
@@ -117,3 +121,13 @@ masks:
 holds: []
 paint:                         # 1 px crotch seam the shifted legs open, outline ink
   - {frame: atk_mid, xy: [[37, 53]], rgb: [6, 4, 10]}
+  # pass K (K2-B): the trailing far toe below the feet row cleared (kneel_in1, kneel_in2); the knee crack closed with outline ink (kneel_in2)
+  - {frame: kneel_in1, xy: [[21, 77]], rgb: null}
+  - {frame: kneel_in2, xy: [[19, 71], [21, 71]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[12, 77], [13, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs); the far knee and shin flat on the ground row, the foot drawn in off the cell edge; shoulders slumped
+kneel:
+  variant: [knee_forward, short_legs]
+  tweaks: {knee_f: [0, 2], foot_f: [3, 4], toe_f: [3, 2], tail_tip: [4, 1], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[23, 37], [26, 37], [25, 38], [26, 38], [27, 38], [42, 44], [45, 46], [23, 56], [21, 48], [22, 48], [22, 50], [23, 50], [22, 52]], rgb: [6, 4, 10]}
