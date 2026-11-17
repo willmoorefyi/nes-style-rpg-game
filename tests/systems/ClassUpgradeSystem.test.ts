@@ -122,25 +122,33 @@ describe('ClassUpgradeSystem', () => {
     });
   });
 
+  // GAP-8 (W1-B): the needed flag is the NPC's `actionFlag`; the fixed EARTH_CRYSTAL_LIT rule is gone
   describe('canUpgrade', () => {
-    it('returns false without EARTH_CRYSTAL_LIT flag', () => {
+    it('returns false while the actionFlag is unset', () => {
       const char = makeChar('warrior');
       const flags = new GameFlags();
-      expect(canUpgrade(char, flags)).toBe(false);
+      expect(canUpgrade(char, flags, 'ORDEAL_PASSED')).toBe(false);
     });
 
-    it('returns true with flag for base class', () => {
+    it('returns true with the actionFlag for a base class', () => {
       const char = makeChar('warrior');
       const flags = new GameFlags();
+      flags.set('ORDEAL_PASSED');
+      expect(canUpgrade(char, flags, 'ORDEAL_PASSED')).toBe(true);
+    });
+
+    it('needs no flag when the NPC names none; EARTH_CRYSTAL_LIT alone no longer matters', () => {
+      const flags = new GameFlags();
+      expect(canUpgrade(makeChar('warrior'), flags)).toBe(true);
       flags.set('EARTH_CRYSTAL_LIT');
-      expect(canUpgrade(char, flags)).toBe(true);
+      expect(canUpgrade(makeChar('warrior'), flags, 'ORDEAL_PASSED')).toBe(false);
     });
 
     it('returns false for already-upgraded class', () => {
       const char = new Character({ name: 'Hero', classData: upgradedClasses.knight });
       const flags = new GameFlags();
-      flags.set('EARTH_CRYSTAL_LIT');
-      expect(canUpgrade(char, flags)).toBe(false);
+      flags.set('ORDEAL_PASSED');
+      expect(canUpgrade(char, flags, 'ORDEAL_PASSED')).toBe(false);
     });
   });
 
@@ -174,10 +182,10 @@ describe('ClassUpgradeSystem', () => {
         makeChar('black_mage', 'Dave'),
       ];
       const flags = new GameFlags();
-      flags.set('EARTH_CRYSTAL_LIT');
+      flags.set('ORDEAL_PASSED');
       const registry = buildRegistry();
 
-      const messages = upgradeParty(party, flags, registry);
+      const messages = upgradeParty(party, flags, registry, 'ORDEAL_PASSED');
 
       expect(messages).toHaveLength(4);
       expect(party[0].classData.id).toBe('knight');
@@ -191,7 +199,7 @@ describe('ClassUpgradeSystem', () => {
       const flags = new GameFlags();
       const registry = buildRegistry();
 
-      expect(upgradeParty(party, flags, registry)).toHaveLength(0);
+      expect(upgradeParty(party, flags, registry, 'ORDEAL_PASSED')).toHaveLength(0);
     });
 
     it('skips already-upgraded members', () => {
@@ -200,10 +208,10 @@ describe('ClassUpgradeSystem', () => {
         makeChar('thief', 'Bob'),
       ];
       const flags = new GameFlags();
-      flags.set('EARTH_CRYSTAL_LIT');
+      flags.set('ORDEAL_PASSED');
       const registry = buildRegistry();
 
-      const messages = upgradeParty(party, flags, registry);
+      const messages = upgradeParty(party, flags, registry, 'ORDEAL_PASSED');
 
       expect(messages).toHaveLength(1);
       expect(messages[0]).toContain('Bob');

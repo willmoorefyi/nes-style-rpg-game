@@ -58,6 +58,19 @@ const mapNpcSprites = readdirSync(join(assets, 'maps'))
   .filter((f) => f.endsWith('.yaml'))
   .flatMap((f) => readYaml<{ npcs?: Array<{ sprite: string }> }>(`maps/${f}`).npcs ?? [])
   .map((n) => n.sprite);
+/**
+ * GAP-10 (W1-B): the NPCs of the compiled 2x maps (assets/maps/ai, what the game plays) and of their sources
+ * (assets-src/maps, which the region tranches write). New NPC kinds reuse an existing field sheet plus a `tint`.
+ */
+type MapNpc = { id: string; sprite: string; tint?: unknown };
+const npcsIn = (dir: string): Array<MapNpc & { map: string }> => (existsSync(dir) ? readdirSync(dir) : [])
+  .filter((f) => f.endsWith('.yaml') && f !== 'index.yaml')
+  .flatMap((f) => ((parse(readFileSync(join(dir, f), 'utf-8')) as { npcs?: MapNpc[] } | null)?.npcs ?? [])
+    .map((n) => ({ ...n, map: f })));
+const compiledNpcs = [...npcsIn(join(assets, 'maps/ai')), ...npcsIn(resolve(__dirname, '../../assets-src/maps'))];
+const fieldAiAtlas = JSON.parse(readFileSync(join(assets, 'sprites/characters-ai.json'), 'utf-8')) as {
+  sheets: Record<string, unknown>; fallbacks?: Record<string, string>;
+};
 
 describe('asset coverage (run `npm run assets` after adding content)', () => {
   describe('character sheets', () => {
@@ -67,6 +80,17 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
 
     it.each([...new Set(mapNpcSprites)])('NPC sprite "%s" has a character sheet', (sprite) => {
       expect(atlas.sheets[sprite]).toBeDefined();
+    });
+
+    it.each([...new Set(compiledNpcs.map((n) => n.sprite))])('compiled-map NPC sprite "%s" has a 2x field sheet', (sprite) => {
+      expect(fieldAiAtlas.sheets[sprite] ?? fieldAiAtlas.sheets[fieldAiAtlas.fallbacks?.[sprite] ?? '']).toBeDefined();
+    });
+
+    it('every compiled-map NPC tint is "#rrggbb"', () => {
+      expect(compiledNpcs.length).toBeGreaterThan(0);
+      for (const n of compiledNpcs.filter((x) => x.tint !== undefined)) {
+        expect(n.tint, `${n.map} ${n.id}`).toMatch(/^#[0-9a-fA-F]{6}$/);
+      }
     });
 
     it('is a two-tile (16x32) layout with 6 columns and 5 rows per sheet', () => {

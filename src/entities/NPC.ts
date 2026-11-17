@@ -17,6 +17,13 @@ export interface NPCData {
   giftItem?: string;
   giftFlag?: string;
   cutscene?: NPCCutscene;
+  /** A colour multiplied into the field sprite, "#rrggbb" (QUEST 4.2: new NPC kinds reuse a sheet with a tint). */
+  tint?: string;
+}
+
+/** A valid `tint` ("#rrggbb"), else null (an invalid one is logged by the caller). */
+export function npcTint(tint: string | undefined): string | null {
+  return tint !== undefined && /^#[0-9a-fA-F]{6}$/.test(tint) ? tint : null;
 }
 
 // Direction offsets: up, down, left, right
@@ -95,6 +102,9 @@ export class NPC {
     this.offsetY = art ? TILE_SIZE - art.frameHeight : 0;
     this.sprite = new Sprite(art ? art.frames[FACE_ROW.down][0] : texture);
     if (art?.scale) this.sprite.scale.set(art.scale);
+    const tint = npcTint(data.tint);
+    if (tint) this.sprite.tint = tint;
+    else if (data.tint !== undefined) console.error(`NPC ${data.id}: tint '${data.tint}' is not #rrggbb`);
     this.sprite.x = data.x * TILE_SIZE;
     this.sprite.y = data.y * TILE_SIZE + this.offsetY;
     this.updateDepth();

@@ -3,10 +3,19 @@ import type { SpellData } from '../types/index.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { healAmount } from '../battle/DamageFormula.js';
 
-/** Spell effects usable from the field menu */
-export const FIELD_VALID_EFFECTS = ['heal', 'cure_poison', 'cure_blind', 'cure_silence', 'revive'];
+/** White-magic effects usable from the field menu (CUR4's `heal_full` since W1-B). */
+export const FIELD_VALID_EFFECTS = ['heal', 'cure_poison', 'cure_blind', 'cure_silence', 'revive', 'heal_full'];
 /** The travel spells' effects (QUEST 4.1: spell ids `exit` and `warp`; W1-G adds the records, W1-B plays them). */
 export const FIELD_TRAVEL_EFFECTS = ['field_exit', 'field_warp'] as const;
+export type FieldTravelEffect = (typeof FIELD_TRAVEL_EFFECTS)[number];
+
+/** EXIT (white) and WARP (black): cast from the field menu, they move the party (systems/fieldTravel.ts). */
+export function isTravelSpell(spell: Pick<SpellData, 'effect'>): boolean {
+  return (FIELD_TRAVEL_EFFECTS as readonly string[]).includes(spell.effect);
+}
+
+/** The statuses CUR4 (`heal_full`) cures in the field, as in battle (spellEffectsLate: every status but death). */
+const FULL_CURES: readonly StatusEffect[] = ['poison', 'blind', 'silence', 'sleep', 'stun', 'stone', 'fear'];
 
 export interface FieldSpellResult {
   /** True if the spell did something; only then is a charge spent. */
@@ -27,8 +36,9 @@ export function isFallen(c: Character): boolean {
   return c.currentHp <= 0 || c.statusTracker.has('death');
 }
 
+/** A spell the field menu lists: the white healing and cure effects, plus the travel spells of either school. */
 export function isFieldSpell(spell: SpellData): boolean {
-  return spell.type === 'white' && FIELD_VALID_EFFECTS.includes(spell.effect);
+  return (spell.type === 'white' && FIELD_VALID_EFFECTS.includes(spell.effect)) || isTravelSpell(spell);
 }
 
 /**
@@ -43,12 +53,15 @@ export function castFieldSpell(
   rng: () => number = Math.random,
 ): FieldSpellResult {
   if (spell.effect === 'heal') return heal(spell, targets, rng);
+  if (spell.effect === 'heal_full') return healFull(targets);
   if (spell.effect === 'revive') {
     const fallen = targets.filter(isFallen);
     if (fallen.length === 0) return NO_EFFECT;
     for (const t of fallen) {
       t.statusTracker.remove('death');
-      t.currentHp = 1;
+      // LIFE (power 0) revives at 1 HP; LIF2 (power 100) to power % of max HP, a full revive (W1-G)
+      const power = spell.power ?? 0;
+      t.currentHp = power > 0 ? Math.max(1, Math.floor((t.maxHp * power) / 100)) : 1;
     }
     return { used: true, messages: fallen.map((t) => `${t.name} is revived`) };
   }
@@ -71,4 +84,19 @@ function heal(spell: SpellData, targets: readonly Character[], rng: () => number
     messages.push(`${t.name} recovers ${t.currentHp - before} HP`);
   }
   return { used: true, messages };
+}
+
+/** CUR4: the living targets to full HP and free of every status but death; the fallen are not helped. */
+function healFull(targets: readonly Character[]): FieldSpellResult {
+  const messages: string[] = [];
+  for (const t of targets) {
+    if (isFallen(t)) continue;
+    const cured = FULL_CURES.filter((s) => t.statusTracker.has(s));
+    if (t.currentHp >= t.maxHp && cured.length === 0) continue;
+    const before = t.currentHp;
+    t.currentHp = t.maxHp;
+    for (const s of cured) t.statusTracker.remove(s);
+    messages.push(t.currentHp > before ? `${t.name} recovers ${t.currentHp - before} HP` : `${t.name} is cured`);
+  }
+  return messages.length > 0 ? { used: true, messages } : NO_EFFECT;
 }

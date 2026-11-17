@@ -1,35 +1,36 @@
 /**
- * The field rules (docs/QUEST_PLAN.md 4.1, docs/WORLD_PLAN.md 1.1): the one place that says where the party may step,
- * what a gate, a transition or a scripted encounter does there, and what talking to an NPC yields. The game
- * (ExplorationScene, the movement modes behind PlayerController) and the progression verifier share it.
- * Pure TypeScript: no PixiJS, no game objects; state comes in as plain sets.
+ * The field rules (docs/QUEST_PLAN.md 4.1-4.2, docs/WORLD_PLAN.md 1.1): the one place that says where the party may
+ * step, what a gate, a patch, a hazard, a transition or a scripted encounter does there, and what talking to an NPC
+ * yields (fieldRulesNpc.ts, re-exported here). The game (ExplorationScene, the movement modes behind
+ * PlayerController, CollisionMap) and the progression verifier share it. Pure TypeScript: no PixiJS, no game
+ * objects; state comes in as plain sets.
  *
- * W1-0a implements today's act-1 behaviour: walking terrain, gates with requiredFlag(s) / requiredItem, static NPCs,
- * transitions and scripted encounters. Vehicles keep today's rules (fieldRulesVehicles.ts, W1-A); patches, docks,
- * the canoe ability, item conditions and trades are W1-B's.
+ * W1-0a: walking terrain, gates with requiredFlag(s) / requiredItem, static NPCs, transitions, scripted encounters.
+ * W1-B: patches on flags (GAP-2), item conditions, trades and takeGold (GAP-3, GAP-15), hazards. The vehicle
+ * branches are W1-A's (fieldRulesVehicles.ts).
  */
 import { npcPresent, resolveNPCDialog, TerrainType } from '../types/index.js';
 import type {
-  Dock, FieldMode, KeyItemGate, MapData, MapNPC, MapTransition, ScriptedEncounter, VehicleState,
+  Dock, FieldMode, Hazard, KeyItemGate, MapData, MapNPC, MapTransition, ScriptedEncounter, VehicleState,
 } from '../types/index.js';
 import { vehicleCanLand, vehicleMove, vehicleTerrainAllows } from './fieldRulesVehicles.js';
+import { conditionMet, dueEncounterWhere, flagsMet } from './fieldRulesNpc.js';
 
 export type { FieldMode } from '../types/index.js';
+export {
+  conditionMet, dueEncounterWhere, flagsMet, npcCutsceneFor, npcOutcome, tradeTermsMet, type NpcOutcome, type NpcTake,
+} from './fieldRulesNpc.js';
 
 export interface FieldState {
   flags: ReadonlySet<string>;
   items: ReadonlySet<string>;
   mode: FieldMode;
   vehicles: readonly VehicleState[];
+  /** The party's gold, for `takeGold` trades; missing means not counted here (the verifier counts it itself). */
+  gold?: number;
 }
 
 type Cell = { x: number; y: number };
-
-/** Every flag a `requiredFlag` / `requiredFlags` pair names is set. */
-export function flagsMet(o: { requiredFlag?: string; requiredFlags?: string[] }, flags: ReadonlySet<string>): boolean {
-  if (o.requiredFlag && !flags.has(o.requiredFlag)) return false;
-  return (o.requiredFlags ?? []).every((f) => flags.has(f));
-}
 
 function inBounds(map: MapData, x: number, y: number): boolean {
   return x >= 0 && x < map.width && y >= 0 && y < map.height;
@@ -42,9 +43,24 @@ export function baseTerrain(map: MapData, x: number, y: number): TerrainType {
   return v >= 0 && v <= 9 ? (v as TerrainType) : TerrainType.Wall;
 }
 
-/** The terrain after the map's patches whose flag is set (W1-B adds the overrides; act 1 has no patches). */
-export function patchedTerrain(map: MapData, x: number, y: number, _flags: ReadonlySet<string>): TerrainType {
-  return baseTerrain(map, x, y);
+/**
+ * The terrain after the map's patches whose flag is set (GAP-2: the north bridge, the canal); the last patch in the
+ * list that covers the cell wins. Outside the map it stays Wall.
+ */
+export function patchedTerrain(map: MapData, x: number, y: number, flags: ReadonlySet<string>): TerrainType {
+  const base = baseTerrain(map, x, y);
+  if (!map.patches || !inBounds(map, x, y)) return base;
+  let t = base;
+  for (const p of map.patches) {
+    if (flags.has(p.flag) && p.cells.some(([cx, cy]) => cx === x && cy === y)) t = p.terrain as TerrainType;
+  }
+  return t;
+}
+
+/** The hazard covering a cell (rects inclusive, like encounter zones), or null. */
+export function hazardAt(map: MapData, cell: Cell): Hazard | null {
+  return map.hazards?.find((h) => h.rects.some(([x0, y0, x1, y1]) => cell.x >= x0 && cell.x <= x1
+    && cell.y >= y0 && cell.y <= y1)) ?? null;
 }
 
 /** Whether a party in `mode` may stand on terrain `t` (WalkingMode on foot; the vehicle rules otherwise). */
@@ -69,9 +85,11 @@ export function gateAt(map: MapData, cell: Cell): KeyItemGate | null {
   return map.keyItemGates?.find((g) => g.x === cell.x && g.y === cell.y) ?? null;
 }
 
-/** The gate's message as one line; a conditional message is resolved on the story flags (first match wins, T1). */
-export function gateMessage(gate: KeyItemGate, flags: ReadonlySet<string>): string {
-  return typeof gate.message === 'string' ? gate.message : resolveNPCDialog(gate.message, (f) => flags.has(f)).join(' ');
+/** The gate's message as one line; a conditional message is resolved on the story flags and the held items
+ *  (`item:<id>`; first match wins, T1). */
+export function gateMessage(gate: KeyItemGate, flags: ReadonlySet<string>, items: ReadonlySet<string> = new Set()): string {
+  if (typeof gate.message === 'string') return gate.message;
+  return resolveNPCDialog(gate.message, (c) => conditionMet(c, { flags, items })).join(' ');
 }
 
 export interface GateCheck {
@@ -85,7 +103,9 @@ export interface GateCheck {
 export function gateCheck(gate: KeyItemGate, state: FieldState): GateCheck {
   if (gate.permanent && gate.flag && state.flags.has(gate.flag)) return { open: true, setFlags: [] };
   const itemOk = !gate.requiredItem || state.items.has(gate.requiredItem);
-  if (!flagsMet(gate, state.flags) || !itemOk) return { open: false, setFlags: [], message: gateMessage(gate, state.flags) };
+  if (!flagsMet(gate, state.flags) || !itemOk) {
+    return { open: false, setFlags: [], message: gateMessage(gate, state.flags, state.items) };
+  }
   return { open: true, setFlags: gate.permanent && gate.flag ? [gate.flag] : [] };
 }
 
@@ -98,7 +118,7 @@ function standable(map: MapData, cell: Cell, mode: FieldMode, state: FieldState)
 }
 
 /** Terrain after patches; gates (requiredFlag(s), requiredItem); static (non-wander) NPC cells block; while flying,
- *  everything on the map is open. (The canoe ability on River and Lake is W1-B's.) */
+ *  everything on the map is open. (The canoe ability on River and Lake is a vehicle rule, W1-A's.) */
 export function canEnter(map: MapData, cell: Cell, mode: FieldMode, state: FieldState): boolean {
   if (!standable(map, cell, mode, state)) return false;
   if (mode === 'airship') return true;
@@ -121,55 +141,9 @@ export function transitionOpen(t: MapTransition, state: FieldState): boolean {
   return flagsMet(t, state.flags);
 }
 
-/** The first scripted encounter matching `where` that is still due: its flag unset (one-time), its flags met. */
-export function dueEncounterWhere(encounters: readonly ScriptedEncounter[], where: (e: ScriptedEncounter) => boolean,
-  state: FieldState): ScriptedEncounter | null {
-  return encounters.find((e) => where(e) && !state.flags.has(e.flag) && flagsMet(e, state.flags)) ?? null;
-}
-
 /** The scripted encounter due at a cell (flag unset, requiredFlag(s) met), or null. */
 export function dueEncounter(map: MapData, cell: Cell, state: FieldState): ScriptedEncounter | null {
   return dueEncounterWhere(map.scriptedEncounters ?? [], (e) => e.x === cell.x && e.y === cell.y, state);
-}
-
-export interface NpcOutcome {
-  present: boolean;
-  dialog: string[];
-  take?: string;
-  give?: string;
-  setFlags: string[];
-  cutscene?: string;
-  /** The `flag` of the scripted encounter talking starts (`ScriptedEncounter.npc`, B1). */
-  battle?: string;
-  action?: string;
-}
-
-/** The cutscene an NPC plays after talking, if its flags allow it now (its `onceFlag` unset). */
-export function npcCutsceneFor(npc: Pick<MapNPC, 'cutscene'>, flags: ReadonlySet<string>): string | undefined {
-  const c = npc.cutscene;
-  if (!c || !flagsMet(c, flags) || flags.has(c.onceFlag)) return undefined;
-  return c.id;
-}
-
-/** What talking to an NPC yields now. A chest gives its item once; a gift is given once with the dialog (an NPC
- *  without dialog gives none). The game adds the bag limit (a full bag keeps the chest closed and the gift for later). */
-export function npcOutcome(npc: MapNPC, state: FieldState, encounters: readonly ScriptedEncounter[]): NpcOutcome {
-  const has = (f: string): boolean => state.flags.has(f);
-  if (!npcPresent(npc, has)) return { present: false, dialog: [], setFlags: [] };
-  const dialog = [...resolveNPCDialog(npc.dialog, has)];
-  if (npc.chestItem && npc.chestFlag) {
-    if (has(npc.chestFlag)) return { present: true, dialog: ['Already opened.'], setFlags: [] };
-    return { present: true, dialog, give: npc.chestItem, setFlags: [npc.chestFlag] };
-  }
-  const out: NpcOutcome = { present: true, dialog, setFlags: [] };
-  if (npc.dialog.length > 0 && npc.giftItem && npc.giftFlag && !has(npc.giftFlag)) {
-    out.give = npc.giftItem;
-    out.setFlags.push(npc.giftFlag);
-  }
-  out.cutscene = npcCutsceneFor(npc, state.flags);
-  out.battle = dueEncounterWhere(encounters, (e) => e.npc === npc.id, state)?.flag;
-  out.action = npc.action;
-  return out;
 }
 
 export interface StepResult {
@@ -179,12 +153,14 @@ export interface StepResult {
   message?: string;
   transition?: MapTransition;
   encounter?: ScriptedEncounter;
+  /** HP a walking step onto a hazard cell takes from every living member, never below 1 HP (W1-B). */
+  hazard?: number;
 }
 
 /**
  * One step from `from` to the 4-neighbour `to`: canEnter, gate messages, permanent gates' flags, the transition taken,
- * the encounter due. The single entry point the game and the verifier share. At W1-0a a step never changes the mode
- * (walking stays walking; a vehicle moves only over its own terrain, fieldRulesVehicles.ts).
+ * the encounter due, the hazard damage of a walking step. The single entry point the game and the verifier share.
+ * A walking step stays walking; the vehicle steps are fieldRulesVehicles.ts's (W1-A).
  */
 export function fieldStep(map: MapData, from: Cell, to: Cell, state: FieldState): StepResult {
   const refused: StepResult = { ok: false, mode: state.mode, setFlags: [] };
@@ -205,8 +181,11 @@ export function fieldStep(map: MapData, from: Cell, to: Cell, state: FieldState)
     if (!g.open) return { ...refused, message: g.message };
     setFlags = g.setFlags;
   }
+  const ok: StepResult = { ok: true, mode, setFlags };
+  const hazard = state.mode === 'walking' ? hazardAt(map, to) : null;
+  if (hazard && hazard.damage > 0) ok.hazard = hazard.damage;
   const transition = map.transitions.find((t) => t.x === to.x && t.y === to.y && transitionOpen(t, state));
-  if (transition) return { ok: true, mode, setFlags, transition };
+  if (transition) return { ...ok, transition };
   const encounter = dueEncounter(map, to, state) ?? undefined;
-  return encounter ? { ok: true, mode, setFlags, encounter } : { ok: true, mode, setFlags };
+  return encounter ? { ...ok, encounter } : ok;
 }

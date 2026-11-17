@@ -1,0 +1,70 @@
+id: test-field-rules
+name: Field Rules Test
+width: 12
+height: 9
+tilesets: [town]
+
+# W1-B fixture (docs/WORLD_PLAN.md 5.2): a clinic (GAP-16), a takeGold trader (GAP-15), a tinted NPC, a hazard strip
+# (row 6, x 2-8, damage 1) and a water channel (x 9) with a patch that bridges (9, 4) on GOT_TEST_BOTTLE (GAP-2).
+# Debug scenario: w1b_field_rules (?mute=1&scenario=w1b_field_rules).
+
+# 12x9 tile layers (0=ground, 1=wall)
+layers:
+  - [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1]
+  - [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+# Collision: 0=grass, 1=wall, 2=water (the channel at x 9)
+collision:
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1,
+   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+npcs:
+  - id: healer
+    x: 3
+    y: 2
+    sprite: white_mage
+    dialog: ["The clinic tends the fallen, 10 G for each level."]
+    action: clinic
+    clinicPrice: 10
+  - id: trader
+    x: 6
+    y: 2
+    sprite: merchant
+    tint: "#a0c8ff"
+    dialog:
+      - condition: GOT_TEST_BOTTLE
+        text: ["The bottle is yours. The plank over the channel is down too."]
+      - text: ["A bottle for 100 G. I'll lay a plank over the channel as well."]
+    takeGold: 100
+    giftItem: fairy_bottle
+    giftFlag: GOT_TEST_BOTTLE
+
+transitions: []
+
+hazards:
+  - id: embers
+    rects: [[2, 6, 8, 6]]
+    damage: 1
+
+patches:
+  - id: plank
+    flag: GOT_TEST_BOTTLE
+    cells: [[9, 4]]
+    terrain: 9
+
+entrances:
+  start: [2, 4]

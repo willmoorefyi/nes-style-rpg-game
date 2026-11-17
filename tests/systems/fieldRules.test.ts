@@ -15,8 +15,17 @@ import {
 } from '../../src/systems/fieldRules.js';
 import { validateMapData } from '../../src/core/schemaValidation.js';
 import { createMapData } from '../helpers/testUtils.js';
+import { a1At, translateA1 } from '../helpers/worldFrame.js';
 
 const load = (id: string): MapData => validateMapData(parse(readFileSync(`assets/maps/ai/${id}.yaml`, 'utf-8')));
+
+// W1-B (GAP-17): the compiled overworld is the act-1 map or the 192x192 world with `world.frames.a1`; the act-1 cases
+// run on it and on the act-1 block translated into the world frame (the same map when it already is the world)
+const compiledOverworld = load('overworld');
+const translated = translateA1(compiledOverworld);
+const overworlds: [string, MapData][] = translated === compiledOverworld
+  ? [['the compiled world', compiledOverworld]]
+  : [['the act-1 overworld', compiledOverworld], ['the act-1 block in the world frame', translated]];
 
 const state = (flags: string[] = [], items: string[] = [], mode: FieldMode = 'walking'): FieldState =>
   ({ flags: new Set(flags), items: new Set(items), mode, vehicles: [] });
@@ -46,45 +55,44 @@ describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMod
     expect(patchedTerrain(map, -1, 0, new Set())).toBe(TerrainType.Wall);
   });
 
-  it('has no landing and no docks in act 1', () => {
-    const ow = load('overworld');
-    expect(canLand(ow, { x: 28, y: 47 }, state([], [], 'airship'))).toBe(false);
-    expect(dockFor(ow, { x: 28, y: 57 })).toBeNull();
+  it.each(overworlds)('has no landing and no docks in act 1 (%s)', (_name, ow) => {
+    expect(canLand(ow, a1At(ow, 28, 47), state([], [], 'airship'))).toBe(false);
+    expect(dockFor(ow, a1At(ow, 28, 57))).toBeNull();
   });
 });
 
-describe('fieldRules: the north bridge (overworld)', () => {
-  const ow = load('overworld');
+describe.each(overworlds)('fieldRules: the north bridge (%s)', (_name, ow) => {
+  const at = (x: number, y: number): { x: number; y: number } => a1At(ow, x, y);
   const before = 'The bridge has collapsed into the sea. Only the King\'s builders could repair it.';
   const after = 'The King\'s builders are at work on the bridge, but it isn\'t finished yet.';
 
   it.each([[29], [30]])('the gate at (%i, 32) is shut without BRIDGE_BUILT, with the act-1 message', (x) => {
-    const step = fieldStep(ow, { x, y: 33 }, { x, y: 32 }, state());
+    const step = fieldStep(ow, at(x, 33), at(x, 32), state());
     expect(step).toEqual({ ok: false, mode: 'walking', setFlags: [], message: before });
-    expect(canEnter(ow, { x, y: 32 }, 'walking', state())).toBe(false);
+    expect(canEnter(ow, at(x, 32), 'walking', state())).toBe(false);
   });
 
   it('after the King\'s order (INTRO_COMPLETE) the message changes and the gate stays shut', () => {
-    const step = fieldStep(ow, { x: 29, y: 33 }, { x: 29, y: 32 }, state(['INTRO_COMPLETE']));
+    const step = fieldStep(ow, at(29, 33), at(29, 32), state(['INTRO_COMPLETE']));
     expect(step.ok).toBe(false);
     expect(step.message).toBe(after);
   });
 
   it('BRIDGE_BUILT opens the gate cells (not permanent: no flag is set)', () => {
-    const step = fieldStep(ow, { x: 29, y: 33 }, { x: 29, y: 32 }, state(['BRIDGE_BUILT']));
+    const step = fieldStep(ow, at(29, 33), at(29, 32), state(['BRIDGE_BUILT']));
     expect(step).toEqual({ ok: true, mode: 'walking', setFlags: [] });
-    expect(canEnter(ow, { x: 29, y: 32 }, 'walking', state(['BRIDGE_BUILT']))).toBe(true);
+    expect(canEnter(ow, at(29, 32), 'walking', state(['BRIDGE_BUILT']))).toBe(true);
   });
 
   it('the gap north of the stubs is water, so the bridge flag alone does not cross it in act 1', () => {
-    expect(canEnter(ow, { x: 29, y: 31 }, 'walking', state(['BRIDGE_BUILT']))).toBe(false);
+    expect(canEnter(ow, at(29, 31), 'walking', state(['BRIDGE_BUILT']))).toBe(false);
   });
 
   it('a step must be to a 4-neighbour; land, sea and the temple door', () => {
-    expect(fieldStep(ow, { x: 28, y: 47 }, { x: 30, y: 47 }, state()).ok).toBe(false);
-    expect(canEnter(ow, { x: 28, y: 47 }, 'walking', state())).toBe(true);
-    expect(canEnter(ow, { x: 0, y: 0 }, 'walking', state())).toBe(false);
-    expect(canEnter(ow, { x: 0, y: 0 }, 'ship', state([], [], 'ship'))).toBe(true);
+    expect(fieldStep(ow, at(28, 47), at(30, 47), state()).ok).toBe(false);
+    expect(canEnter(ow, at(28, 47), 'walking', state())).toBe(true);
+    expect(canEnter(ow, at(0, 0), 'walking', state())).toBe(false);
+    expect(canEnter(ow, at(0, 0), 'ship', state([], [], 'ship'))).toBe(true);
     const door = ow.transitions.find((t) => t.targetMap === 'temple-of-fiends');
     expect(door).toBeDefined();
     if (!door) return;

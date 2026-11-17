@@ -19,6 +19,12 @@ export interface CutsceneHost {
   warp?: CutsceneDeps['warp'];
   /** After a `heal_party` step (the partyHealed sound). */
   onHeal?: () => void;
+  /** give_item / take_item (W1-B). */
+  inventory?: CutsceneDeps['inventory'];
+  /** set_vehicle (W1-A's vehicle state). */
+  setVehicle?: CutsceneDeps['setVehicle'];
+  /** end_game: to the title, no save (GAP-13). */
+  endGame?: CutsceneDeps['endGame'];
 }
 
 /** Play cutscene `id` in the field. Resolves false (and logs) when the id is unknown. */
@@ -38,6 +44,9 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
     onFlagSet: host.onFlagSet,
     warp: host.warp,
     onHeal: host.onHeal,
+    inventory: host.inventory,
+    setVehicle: host.setVehicle,
+    endGame: host.endGame,
   });
   await manager.play(script);
   // the press that closed the last line, or a mash after the scene, must not talk to the NPC again

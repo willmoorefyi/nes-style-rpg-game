@@ -3,8 +3,9 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { DebugScenarioLoader, type DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
+import { DebugScenarioLoader, scenarioSpawn, type DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
 import type { Game } from '../../src/core/Game.js';
+import type { MapData } from '../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -57,9 +58,10 @@ describe('DebugScenarioLoader field mode', () => {
       expect(variants.length, `${s.id}: map ${s.map} exists`).toBeGreaterThan(0);
       for (const f of variants) {
         const map = parse(readFileSync(resolve(root, f), 'utf-8')) as
-          { width: number; collision: number[]; entrances?: Record<string, [number, number]> };
+          { width: number; collision: number[]; entrances?: Record<string, [number, number]> } & Pick<MapData, 'world'>;
         if (s.entrance && !map.entrances?.[s.entrance]) throw new Error(`${s.id}: ${f} has no entrance ${s.entrance}`);
-        const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spawn!;
+        // GAP-18 (W1-B): a `frame: a1` spawn is an act-1 cell, moved by the map's world.frames.a1.origin
+        const [x, y] = s.entrance ? map.entrances![s.entrance] : scenarioSpawn(s, map);
         expect([1, 2], `${s.id} spawn in ${f}`).not.toContain(map.collision[y * map.width + x]);
       }
     }
