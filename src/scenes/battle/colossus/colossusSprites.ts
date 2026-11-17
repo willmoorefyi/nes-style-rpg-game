@@ -18,6 +18,7 @@ import { GAME_HEIGHT, GAME_WIDTH } from '../../../core/LayoutConstants.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import { ColossusView, type ColossusTextureSource } from './ColossusView.js';
 import { ColossusPoseController, type ColossusCastKind } from './ColossusPoseController.js';
+import { slamLimitsFor } from './colossusChoreography.js';
 import { colossusOf, placeholderForm, variantOf, type ColossusFormSpec } from './colossusIndex.js';
 import type { EnemyActorPoses } from './enemyActorView.js';
 
@@ -116,6 +117,8 @@ export class ColossusSlots {
     if (old) old.view.destroy(); else prev?.destroy({ children: true });
     this.sprites[i] = view.proxy;
     view.setRise(riseFrom);
+    ctl.slamLimits = slamLimitsFor(view.form);
+    ctl.onCue = (cue) => { if (cue === 'shake') this.layers.shake.start(); };   // the slam's contact and its second shake
     this.slots.set(i, { formId, data, view, ctl, placeholder: !form });
     this.poses?.attach(i, ctl, () => this.castKind(i));
     view.apply(ctl.frame());
@@ -143,6 +146,7 @@ export class ColossusSlots {
     if (id === s.formId) return false;
     s.formId = id;
     s.view.rebase(id, form);
+    s.ctl.slamLimits = slamLimitsFor(form);
     return true;
   }
 

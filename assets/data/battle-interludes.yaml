@@ -10,14 +10,18 @@
 #   next pan's `from` (or at rest); every pan offset stays inside the B4 border limits of the form it reveals
 #   (F3 at (-527, -60): dx [-247, 521], dy [-230, 174]; F4 at (-527, -285): dx [-247, 521], dy [-5, 399]).
 # Unskipped time at message speed 3 (90 frames per message, 8 per shake) is at most 480 frames (600 for chaos_i2,
-# D-O15); each script's total is pinned in the test: chaos_i1 436, chaos_i2 577, chaos_i3 190, chaos_crack 102.
+# D-O15); each script's total is pinned in the test: chaos_i1 450, chaos_i2 577, chaos_i3 190, chaos_crack 102.
 interludes:
 
-# F1 -> F2: the Sovereign's robe burns away and the Orrery rises (3.2)
+# F1 -> F2: the Sovereign's robe burns away and the Orrery rises (3.2); C7 (C6-9, D-C7-8): two orange flashes, the
+# second with a shake, so the fire shows (no art)
 - id: chaos_i1
   steps:
-    - {type: message, text: "The Sovereign's robe catches fire!"}
+    - {type: message, text: "The Sovereign's robe flares and burns away!"}
     - {type: flash, color: "#ffffff", frames: 6, alpha: 1}
+    - {type: flash, color: "#ff7020", frames: 6, alpha: 0.6}
+    - {type: flash, color: "#ff7020", frames: 6, alpha: 0.6}
+    - {type: shake, times: 1, with: previous}
     - {type: dissolve, frames: 24, style: flicker}
     - {type: dissolve, frames: 30, style: fade}
     - {type: tint, color: "#ff7a2a", alpha: 0.35, frames: 30}

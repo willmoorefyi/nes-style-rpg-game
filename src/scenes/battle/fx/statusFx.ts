@@ -8,7 +8,7 @@
  * once a dead enemy's sprite is hidden. Tints go through actorTint's `status` source (multiplied, never overwriting
  * the hero pulse or the heavy-attack pulse). Overlays advance on the layers' update, so the dev step clock steps them.
  */
-import { Sprite, type Container } from 'pixi.js';
+import { Graphics, Sprite, type Container } from 'pixi.js';
 import type { BattleLayers } from '../BattleLayers.js';
 import { setTint, tintOf } from '../actorTint.js';
 import type { PresentedState } from '../presentedState.js';
@@ -16,7 +16,7 @@ import { stepAlpha, type FxBox, type FxDraw } from './emitterCore.js';
 import type { FxAtlas } from './fxAtlas.js';
 import { FxBatch } from './fxRender.js';
 import { STATUS_OVERLAYS, type StatusAnchor } from './statusEmitters.js';
-import { ICON_GAP, ICON_LIFT, ICON_PX, iconDraws } from './statusIcons.js';
+import { COLOSSUS_PLATE, ICON_GAP, ICON_LIFT, ICON_PX, colossusRow, iconDraws } from './statusIcons.js';
 import { iconsFor, shownOn, statusTint, type StatusVisuals } from './statusRules.js';
 import { stoneTextures } from './stoneTextures.js';
 import { headOf } from './texturePixels.js';
@@ -43,6 +43,8 @@ interface ActorFx {
   icons: string[];
   batch: FxBatch;
   sprite: Container | null;
+  /** A colossus's dark icon plate (C6-6), drawn below the batch's sprites. */
+  plate: Graphics | null;
 }
 
 export class BattleStatusFx implements StatusFx {
@@ -142,7 +144,7 @@ export class BattleStatusFx implements StatusFx {
       const batch = new FxBatch(this.atlas);
       batch.container.label = `fx.status.${id}`;
       this.layers.fx.status.addChild(batch.container);
-      a = { side, index, overlays: new Map(), icons: [], batch, sprite: null };
+      a = { side, index, overlays: new Map(), icons: [], batch, sprite: null, plate: null };
       this.actors.set(id, a);
     }
     return a;
@@ -160,7 +162,7 @@ export class BattleStatusFx implements StatusFx {
     for (const a of this.actors.values()) {
       const sprite = a.sprite;
       const c = a.batch.container;
-      if (!sprite || (a.overlays.size === 0 && a.icons.length === 0)) { a.batch.render([]); continue; }
+      if (!sprite || (a.overlays.size === 0 && a.icons.length === 0)) { a.batch.render([]); this.plate(a, null); continue; }
       c.visible = sprite.visible && sprite.alpha > 0;
       c.alpha = sprite.alpha;
       if (!c.visible) continue;
@@ -173,10 +175,25 @@ export class BattleStatusFx implements StatusFx {
       // enemies: a row above the head; party: a row behind the head (the slots overlap diagonally, so a row above
       // would sit on the member in front, and the active-hero arrow is above)
       const row = a.icons.length * ICON_PX + (a.icons.length - 1) * ICON_GAP;
-      if (a.side === 'party') draws.push(...iconDraws(a.icons, anchor.head.x + PARTY_ICON_DX + row / 2, anchor.head.y + ICON_PX + ICON_LIFT));
+      const plated = a.side === 'enemy' && colossusAt(sprite) && a.icons.length > 0 ? colossusRow(a.icons, anchor.head.x, anchor.head.y) : null;
+      this.plate(a, plated?.plate ?? null);
+      if (plated) draws.push(...plated.draws);
+      else if (a.side === 'party') draws.push(...iconDraws(a.icons, anchor.head.x + PARTY_ICON_DX + row / 2, anchor.head.y + ICON_PX + ICON_LIFT));
       else draws.push(...iconDraws(a.icons, anchor.head.x, anchor.head.y - ICON_LIFT));
       a.batch.render(draws);
     }
+  }
+
+  /** Show (or hide, `r` null) the colossus icon plate under the actor's glyphs. */
+  private plate(a: ActorFx, r: { x: number; y: number; w: number; h: number } | null): void {
+    if (!r) { if (a.plate) a.plate.visible = false; return; }
+    if (!a.plate) {
+      a.plate = new Graphics();
+      a.plate.label = 'fx.status.plate';
+      a.batch.container.addChildAt(a.plate, 0);
+    }
+    a.plate.clear().rect(r.x, r.y, r.w, r.h).fill({ color: COLOSSUS_PLATE.color, alpha: COLOSSUS_PLATE.alpha });
+    a.plate.visible = true;
   }
 
   /** The head (the frame's topmost opaque row, else the body box's top-centre) and the body box, in fx.status space. */
