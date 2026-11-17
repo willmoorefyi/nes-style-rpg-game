@@ -1870,6 +1870,73 @@ world constants).
 <!-- === W1-A FOUNDATION (pass W: owned by W1-A) === -->
 <!-- === end W1-A === -->
 <!-- === W1-B FOUNDATION (pass W: owned by W1-B) === -->
+### W1-B result: NPC and field rules (branch `w-w1-b` from `mainline` e5433ff)
+
+No AI or paid calls. Scratch in `/tmp/w-w1-b/`.
+
+**Files:**
+
+- Field rules: `fieldRules.ts` (patches in `patchedTerrain`, the last covering patch wins; `hazardAt` and
+  `StepResult.hazard` on a walking step; item conditions in `gateMessage`; `FieldState.gold?`) and the new
+  `fieldRulesNpc.ts` (re-exported by `fieldRules.ts`: `flagsMet`, `conditionMet` (`item:<id>`), `dueEncounterWhere`,
+  `tradeTermsMet`, `npcOutcome` with trades and `take: {item?, gold?}` (GAP-15), a cutscene behind a `requiredItem`).
+  A state without `gold` (the verifier) passes the gold term.
+- `CollisionMap(map, hasFlag?)` applies the patches on live flags; `MapLoader` passes its `hasFlag` (1 line).
+- `FieldNpcActions.ts`: reads the NPC's map record, applies trades (bag limit first, then the take, the gift, the
+  flags), the class upgrade on `actionFlag`, and `action: clinic` (GAP-16: `systems/clinic.ts`, `scenes/ClinicScene.ts`,
+  a transparent Yes / No; n x level gold per fallen member, all or nothing, to 1 HP).
+- `ClassUpgradeSystem`: `canUpgrade(c, flags, actionFlag?)`, `upgradeParty(..., actionFlag?)`; EARTH_CRYSTAL_LIT
+  removed (tests updated).
+- NPC `tint` ("#rrggbb") on the field sprite (`entities/NPC.ts`, `npcTint`).
+- Hazards: `systems/hazards.ts` (every living member, never below 1 HP) and `scenes/exploration/FieldHazard.ts` (red
+  flash).
+- Zone `modes`: `EncounterSystem.setMode`, `zoneAppliesTo`; the map's own table applies on foot and by canoe only.
+- Cutscene steps: `give_item`, `take_item`, `set_vehicle` (through the host's `setVehicle`), `end_game` (the card,
+  then `endGame`; the steps after it never play); `scriptProblem` checks their fields; the field host passes the
+  inventory and `endGame` (switch to the title).
+- Field spells (W1-G hand-off): `isFieldSpell` also takes the travel spells of either school and CUR4 (`heal_full`);
+  field LIF2 revives to power % of max HP; `systems/fieldTravel.ts` (EXIT to `MapData.exit`; WARP to the map behind
+  the stair back, the transition within 3 cells of `arrival`, at its `arrival`, else where that stair arrives;
+  `travelTo` re-enters the field) wired in `FieldMagicScene` (no target pick; "No effect." spends no charge).
+- `DebugScenarioLoader`: `a1Origin`, `scenarioSpawn` (GAP-18); a `frame: a1` spawn is translated by the loaded map's
+  `world.frames.a1.origin` (the map is read through `fieldMapLoader`, as the field reads it).
+- Fixture `assets/maps/test-field-rules.yaml` and scenario `w1b_field_rules` (W1-B anchor): clinic, tinted takeGold
+  trader, a patch over a channel, an ember hazard.
+- Tests: `patches`, `npcTrade`, `npcTakeGold`, `clinic`, `hazards` (with zone modes), `endGame` (all four steps),
+  `debugFrame`, `scenarioSpawns`, `fieldTravel`; helpers `tests/helpers/worldFrame.ts` (`a1At`, `translateA1`: the
+  act-1 map as the world carries it) and `npcActions.ts`. `fieldRules.test.ts` runs its overworld cases on the
+  compiled overworld and on the act-1 block in the world frame (one map once the world is committed);
+  `DebugScenarioField.test.ts` translates `frame: a1` spawns. `assetCoverage.test.ts` also reads the NPCs of
+  `assets/maps/ai` and `assets-src/maps` (2x field sheet, tint format).
+
+**Gates:**
+
+| Command | Output |
+|---|---|
+| `npx vitest run tests/systems/patches.test.ts ... tests/systems/scenarioSpawns.test.ts` (the 9 done-when files) | all passed |
+| `fieldRules.test.ts` act-1 cases | unchanged assertions, offset by the frame origin (0 on the act-1 map) |
+| `npm run build` | exit 0 |
+| G4 `npx vitest run --maxWorkers=2 --minWorkers=1` | exit 0; `Test Files 283 passed (283)`, `Tests 5606 passed (5606)` |
+| browser `http://127.0.0.1:5212/?mute=1&scenario=r_ow_temple`, then `w1b_field_rules` | overworld spawn (15, 42); trade: gold 500 -> 400, bottle, flag; clinic "Revive WHM for 60 G?" -> 340 G, WHM 1 HP; hazard row: WAR 100 -> 99, the 1-HP member kept; the patched plank (9, 4) walked; 0 console errors |
+
+**Deviations / hand-offs:**
+
+- `ExplorationScene.ts` got 4 one-line wiring edits (the hazard step, `encounterSystem.setMode`, the cutscene host's
+  inventory and `endGame`, an import); 500 / 590. `NPC.ts`, `MapLoader.ts` (1 line), `ExplorationCutscenes.ts` and
+  `FieldMagicScene.ts` are outside the ownership list but owned by nobody else in W1 (MapLoader is W1-E's).
+- `set_vehicle` is played by the manager but the field host has no `setVehicle` yet: W1-A wires it to its vehicle state.
+  `DebugScenario.vehicles` / `fieldMode` are not applied by the loader (W1-A's state).
+- Patch overlay art (`art.patches`) is not drawn: the renderer is W1-E's.
+- The compiled collision value 11 (Lake) still reads as Wall in `baseTerrain` (the W1-0a test pins it); a patch may
+  set Lake.
+- `NpcOutcome.take` is `{item?, gold?}` (it was a string): W1-H's `outcomeTake` reads both shapes.
+- The real compiled world (W1-C2) was not on `w-w1-c2` yet; the frame-aware tests were checked on the synthetic
+  translation (`translateA1`).
+
+**AGENTS.md delta (for INT):** "Key Interfaces" gains `fieldRulesNpc.ts` (trades, `take`, `item:` conditions),
+`MapNPC.takeGold` / `clinicPrice` / `tint` / `actionFlag`, `MapData.patches` / `hazards` / `exit`, the cutscene steps
+`give_item`, `take_item`, `set_vehicle`, `end_game`, the field travel spells (`fieldTravel.ts`) and
+`DebugScenario.frame: a1`; "Test Patterns" names `tests/helpers/worldFrame.ts`.
 <!-- === end W1-B === -->
 <!-- === W1-C1 FOUNDATION (pass W: owned by W1-C1) === -->
 <!-- === end W1-C1 === -->
