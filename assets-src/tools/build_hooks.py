@@ -5,7 +5,8 @@ W1-0b declared the four signatures; W1-C1 calls them from `build_map.py`; W1-C2 
 - `passthrough` copies the quest fields of a source into its compiled map (a source patch names its terrain by a
   legend char, `ground`; the compiled patch carries the TerrainType, `terrain`) and lists the patch overlays in
   `art.patches`;
-- `bake_patches` draws each patch's cells, as the patched ground (plus the patch's own `objects`), into
+- `bake_patches` draws each patch's cells, as the patched ground (plus the patch's own `objects`, map cells), in the
+  map's own pixel frame (a raster compile of the patched map round the patch, so no seam at its edge), into
   `<out_dir>/<map_id>/patch_<pid>.png`. The image covers the bounding box of the patch's cells, from its top-left
   cell, and is opaque exactly on the patch cells. It must run after `build_map.write`, which clears the folder;
 - `region_checks` runs a world region's own map checks (`map_checks_region.py`), or, with `region` None, the
@@ -27,7 +28,6 @@ if TYPE_CHECKING:
 
     Grid = list[list[str]]                   # build_map.parse_ground's ground rows (material names)
 
-MARGIN = 2                                   # cells of ground context compiled round a patch (blends and coasts)
 
 
 def _patch_terrain(p: dict) -> int:
@@ -74,27 +74,28 @@ def bake_patches(map_id: str, src: dict, grid: "Grid", kit: "Kit", out_dir: Path
         ch = p.get("ground") or next(k for k, v in BM.LEGEND.items() if BM.TERRAIN[v] == p["terrain"])
         x0, y0 = min(x for x, _ in cells), min(y for _, y in cells)
         x1, y1 = max(x for x, _ in cells), max(y for _, y in cells)
-        cx0, cy0 = max(0, x0 - MARGIN), max(0, y0 - MARGIN)
-        cx1, cy1 = min(wid - 1, x1 + MARGIN), min(hgt - 1, y1 + MARGIN)
-        sub = [list(r[cx0:cx1 + 1]) for r in rows[cy0:cy1 + 1]]
+        # painted in the map's own frame (W1-C1's global-phase noise and per-chunk seeds): the patched ground of the
+        # whole map, rasterised only in the chunk-aligned rect round the patch, so its pixels meet the base art
+        # seamlessly at the patch's edge
+        g = [list(r) for r in rows]
         for x, y in cells:
-            sub[y - cy0][x - cx0] = ch
-        objs = [{**o, "x": o["x"] - cx0, "y": o["y"] - cy0} for o in p.get("objects") or []]
-        psrc = {k: src[k] for k in ("terrain", "materials", "kits") if k in src}
-        psrc.update({"id": f"{map_id}_patch_{p['id']}", "ground": "\n".join("".join(r) for r in sub) + "\n",
-                     "objects": objs})
-        validate, BM.validate = BM.validate, (lambda s, c: None)    # an art-only crop: no entrances, no checks
+            g[y][x] = ch
+        psrc = {**src, "ground": "\n".join("".join(r) for r in g) + "\n",
+                "objects": list(src.get("objects") or []) + list(p.get("objects") or [])}
+        c0, r0 = x0 // BM.CHUNK * BM.CHUNK, y0 // BM.CHUNK * BM.CHUNK
+        c1, r1 = min(wid, (x1 // BM.CHUNK + 1) * BM.CHUNK) - 1, min(hgt, (y1 // BM.CHUNK + 1) * BM.CHUNK) - 1
+        validate, BM.validate = BM.validate, (lambda s, c: None)    # art only: the base compile ran the checks
         try:
-            c = BM.compile_map(psrc, kit, check_interiors=False)
+            c = BM.compile_map(psrc, kit, check_interiors=False, raster=[(c0, r0, c1, r1)])
         finally:
             BM.validate = validate
         t = BM.T
         img = np.zeros(((y1 - y0 + 1) * t, (x1 - x0 + 1) * t, 4), np.uint8)
-        below = np.asarray(Image.alpha_composite(Image.fromarray(c.below).convert("RGBA"), Image.fromarray(c.above)))
         for x, y in cells:
-            sy, sx = (y - cy0) * t, (x - cx0) * t
-            img[(y - y0) * t:(y - y0 + 1) * t, (x - x0) * t:(x - x0 + 1) * t, :3] = below[sy:sy + t, sx:sx + t, :3]
+            img[(y - y0) * t:(y - y0 + 1) * t, (x - x0) * t:(x - x0 + 1) * t, :3] = c.below[y * t:(y + 1) * t,
+                                                                                            x * t:(x + 1) * t]
             img[(y - y0) * t:(y - y0 + 1) * t, (x - x0) * t:(x - x0 + 1) * t, 3] = 255
+        del c
         path = d / f"patch_{p['id']}.png"
         Image.fromarray(img).save(path, optimize=True)
         written.append(path.resolve().relative_to(BM.ROOT).as_posix() if path.resolve().is_relative_to(BM.ROOT)
