@@ -55,7 +55,7 @@ carpet_trim: [120, 150, 110]
 entrances:
   arrival: [3, 19]
   arrival_east: [29, 19]
-  boss: [14, 9]
+  boss: [14, 8]
 objects:
 - type: deco
   parts:
@@ -212,9 +212,9 @@ npcs:
   y: 20
   dialog:
   - condition: ASTOS_DEFEATED
-    text: [The stone birds are only stone now. I swept the ash from the dais myself.]
-  - text: [The king sits on the left throne. The right one only copies him., He says the stone birds on the plinths are loyal. I think they are
-        listening.]
+    text: [The stone sentinels are only stone now. I swept the ash from the dais myself.]
+  - text: [The king sits on the left throne. The right one only copies him., He says the stone sentinels on the plinths are loyal. I think they
+        are listening.]
 transitions:
 - {x: 3, y: 20, targetMap: western-keep-1f, targetEntrance: up}
 - {x: 4, y: 20, targetMap: western-keep-1f, targetEntrance: up}
@@ -249,5 +249,5 @@ scriptedEncounters:
   requiredFlags: [MARSH_GUARD_DEFEATED, ELF_O_CROWN_GIVEN]
   isBoss: true
   postVictoryCutscene: elf_astos_unmasked
-  message: 'His face runs like wet wax, and the stone birds on the plinths unfold their wings. Astos: The crown, and the keep, and now your lives.
-    A fair trade!'
+  message: 'His face runs like wet wax, and the stone sentinels on the plinths stir and spread wings. Astos: The crown, and the keep, and now
+    your lives. A fair trade!'

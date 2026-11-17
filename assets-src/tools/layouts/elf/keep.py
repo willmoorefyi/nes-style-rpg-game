@@ -177,18 +177,18 @@ f2.npcs += [
                 "It is a pane of old elven glass, set in a throne. There is no one in it."]},
     {"id": "page_ilse", "sprite": "villager_f", "tint": "#c7b28f", "x": 16, "y": 20,
      "dialog": talk(["The king sits on the left throne. The right one only copies him.",
-                     "He says the stone birds on the plinths are loyal. I think they are listening."],
-                    ["The stone birds are only stone now. I swept the ash from the dais myself."])},
+                     "He says the stone sentinels on the plinths are loyal. I think they are listening."],
+                    ["The stone sentinels are only stone now. I swept the ash from the dais myself."])},
 ]
 f2.objects.append({"type": "flowers", "x": 17, "y": 21})
 f2.write("Western Keep 2F: the throne room between the west and east galleries; the false king waits on the left "
          "throne.\n" + NOTE,
-         {"arrival": [3, 19], "arrival_east": [29, 19], "boss": [14, 9]},
+         {"arrival": [3, 19], "arrival_east": [29, 19], "boss": [14, 8]},
          extra={"canSave": False,
                 "scriptedEncounters": [{
                     "x": 14, "y": 7, "npc": "astos", "enemyIds": ["astos", "gargoyle", "gargoyle", "gargoyle"],
                     "flag": "ASTOS_DEFEATED", "requiredFlags": ["MARSH_GUARD_DEFEATED", "ELF_O_CROWN_GIVEN"],
                     "isBoss": True, "postVictoryCutscene": "elf_astos_unmasked",
-                    "message": "His face runs like wet wax, and the stone birds on the plinths unfold their wings. "
+                    "message": "His face runs like wet wax, and the stone sentinels on the plinths stir and spread wings. "
                                "Astos: The crown, and the keep, and now your lives. A fair trade!"}]})
 print("western-keep-1f, western-keep-2f written")

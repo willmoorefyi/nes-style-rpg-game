@@ -88,7 +88,7 @@
 # S6 (docs/WORLD_PLAN.md 4.2, D-W14): Astos's postVictoryCutscene on western-keep-2f. The battle's flag sets
 # ASTOS_DEFEATED; the crystal eye comes only from here, and its last line points the party to Matoya (S7).
 # S6: the false king takes the crown (western-keep-2f's `false_king`, behind the crown); ELF_O_CROWN_GIVEN hides him
-# and shows Astos on the same cell, whom the party then talks to for the fight.
+# and shows Astos on the same cell (the warp reloads the floor so he stands there), whom the party then talks to.
 - id: elf_o_crown_taken
   steps:
     - type: take_item
@@ -101,6 +101,14 @@
       item: ether
     - type: set_flag
       flag: ELF_O_CROWN_GIVEN
+    - type: fade_out
+      duration: 500
+    - type: warp
+      map: western-keep-2f
+      entrance: boss
+      facing: up
+    - type: fade_in
+      duration: 500
     - type: dialog
       text: "The candles gutter. When they steady, the man on the throne is no longer quite a man."
 - id: elf_astos_unmasked
