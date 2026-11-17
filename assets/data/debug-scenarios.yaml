@@ -1426,6 +1426,79 @@
 # === ELF-D (pass W: owned by ELF-D) ===
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
+# WORLD_PLAN 6.5. S10: on foot at the dwarf hall's mouth (overworld `ert_dwarf`), the ship moored at the landing cove
+# (the `ert_dwarf` dock, (59, 104)), band-low level 11 with the B3 kit (w_s9) and every flag and item before S10.
+# `_neg_notnt` withholds the TNT only. S12: at the giant's tunnel's east mouth (`ert_giant`) with the S11 grants
+# (VAMPIRE_DEFEATED, `ruby`), level 15, the B4 kit (w_s11), the ship at Melmond's harbour; `_neg_noruby` withholds
+# the ruby only.
+- id: w_s10_start
+  name: ERT-O - S10 the dwarves' canal (TNT in hand)
+  mode: field
+  map: overworld
+  entrance: ert_dwarf
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 59, y: 104 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE]
+  party: &ert_o_party_b3
+    - { class: warrior, name: WAR, level: 11, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 11, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 11, equipment: [mythril_hammer, silver_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 11, equipment: [mythril_knife, silver_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }] }
+  items: { lute: 1, mystic_key: 1, tnt: 1, potion: 8, hi_potion: 2, antidote: 2 }
+  gold: 1500
+  enemies: []
+- id: w_s10_neg_notnt
+  name: ERT-O - S10 negative (no TNT)
+  mode: field
+  map: overworld
+  entrance: ert_dwarf
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 59, y: 104 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE]
+  party: *ert_o_party_b3
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 2, antidote: 2 }
+  gold: 1500
+  enemies: []
+- id: w_s12_start
+  name: ERT-O - S12 the giant's tunnel and Sarda (ruby in hand)
+  mode: field
+  map: overworld
+  entrance: ert_giant
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED]
+  party: &ert_o_party_b4
+    - { class: warrior, name: WAR, level: 15, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 15, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 15, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 15, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { lute: 1, mystic_key: 1, ruby: 1, potion: 8, hi_potion: 4, antidote: 2 }
+  gold: 3000
+  enemies: []
+- id: w_s12_neg_noruby
+  name: ERT-O - S12 negative (no ruby)
+  mode: field
+  map: overworld
+  entrance: ert_giant
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED]
+  party: *ert_o_party_b4
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 4, antidote: 2 }
+  gold: 3000
+  enemies: []
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
 # === end ERT-T ===

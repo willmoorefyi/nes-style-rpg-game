@@ -2577,6 +2577,154 @@ is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the 
 <!-- === ELF-D ELF (pass W: owned by ELF-D) === -->
 <!-- === end ELF-D === -->
 <!-- === ERT-O EARTH (pass W: owned by ERT-O) === -->
+### ERT-O result: EARTH overworld and small sites (branch `w-ert-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-ert-o/`.
+
+**Files:**
+
+- The region: `layouts/world_earth.py` (the RegionOut: walls, barrier, checks), `layouts/earth/world_earth_ground.py`
+  (the ground), `layouts/earth/world_earth_sites.py` (objects, entrances, transitions, docks, the canal patch, the
+  inspect cell, zones and tables, walls, barrier). Melmond's icon, gate, door and harbour are read from ERT-T's
+  `town_melmond_site.py`, which is unchanged.
+- The sites: `layouts/earth/dwarf.py` writes `dwarf-hall` (40x30), `giant.py` writes `giant-tunnel` (32x20), and
+  `sage.py` writes `sage-cave` (16x12). All three are compiled.
+- Data:
+  - `cutscenes.yaml` (ERT-O anchor): `ert_canal_blast`, `ert_giant_feast`, `ert_sarda_rod`, `ert_smyth_forge`.
+  - `debug-scenarios.yaml`: `w_s10_start`, `w_s10_neg_notnt`, `w_s12_start`, `w_s12_neg_noruby`.
+  - `quest.yaml`: S10 and S12 are `built`, with `entry`, `walk` and `nonLoadBearing` (GT-14, GT-16); S31 stays
+    pending; the town `dwarf` is `built`.
+  - `assets/backgrounds/cracked_earth.webp`, staged for the `ert_badlands` zone.
+- Tests: `tests/quest/earth/ert_o_world.test.ts` (8 tests) and `ert_o_walk.test.ts` (3 tests).
+- The compiled EARTH stubs (`melmond*`, `cavern-earth-b1..b5`, 17 maps) are committed, because the overworld's
+  transitions now target `melmond` and `cavern-earth-b1`. This follows FIR-O's practice. ERT-T and ERT-D overwrite
+  them.
+
+**Design** (all original; the macro placement follows 2.2):
+
+- **The isthmus (x 49-61).**
+  - A mountain hogback runs from y 76 to 91. It is W_west's stub, against `seam_w`.
+  - The canal saddle is a grass pass at y 92-93. The patch `canal` (CANAL_OPEN) turns its 26 cells to Water.
+  - The dwarves' downs run from y 94 to 109. The hall's ridge holds the cave mouth: the door is at (55, 103) and
+    `ert_dwarf` at (55, 104).
+  - The landing cove sits on the Aldi side: dock `ert_dwarf` at (59, 104), aldi basin. The downs run on to
+    `seam_n`.
+- **The western strait (x 42-48)** runs from sea to sea.
+- **The western continent (x 13-42, y 73-139).**
+  - It is split by the western range (core x 24-27). Sea cliffs close both tips, so nothing can walk round it.
+  - East of the range: Melmond's plain, with copses, the crooked windmill and Melmond's placeholder icon (gate
+    (42, 112), harbour dock (43, 113), ocean basin).
+  - South of y 118: the grey badlands. They hold the Cavern's mesa (`ert_earth_cave` (30, 126)) and the rotted
+    shrine (an inspect cell).
+  - West of the range: Sarda's coast, a sealed sliver with Sarda's knoll (`ert_sarda` (19, 109)).
+  - The tunnel mouths are `ert_giant` (28, 112) and `ert_giant_west` (23, 112).
+- **Encounter zones:** `ert_isthmus`, `ert_plain`, `ert_badlands` (backdrop `cracked_earth`), `ert_sarda_coast`, and
+  the ship-only `ert_aldi` and `ert_sea`. Every walkable cell of the box is in one walking zone, and every Water
+  cell in one ship zone (this is tested).
+- **Walls:** W_west is the hogback (y 76-87); W_isthmus is the isthmus land from y 88 to 109.
+- **Barrier `western_range`:** its cells are the range's core mountains. The seeds are (36, 100) on the plain and
+  (18, 100) on Sarda's coast. The exported cut is 4 cells.
+- **Site maps:**
+  - **`dwarf-hall`** is a long hall with three rooms off its north wall:
+    - Smyth's forge;
+    - the drafting room, where Nerrick (`requiredItem: tnt`, cutscene `ert_canal_blast`, onceFlag CANAL_OPEN)
+      keeps the canal plans;
+    - the store, which sells `dwarf_item` across a wall-to-wall counter.
+  - **`giant-tunnel`** is two caverns joined by a one-cell throat at (15, 10).
+    - The giant lies in the throat: `requiredItem: ruby`, `hideIf: TITAN_FED`, cutscene `ert_giant_feast`.
+    - Once fed, he sleeps in a niche (`showIf: TITAN_FED`).
+    - It also has a prospector, a chest pocket (`hi_potion`) and the mouths on the map's two flanks.
+  - **`sage-cave`** holds Sarda and two pupils. Sarda's cutscene `ert_sarda_rod` (`requiredFlags:
+    [VAMPIRE_DEFEATED]`) gives the `rod`.
+- **Melmond-sarda walk:** its tunnel route is about 58 steps, under the 3.0 x 23.2 detour bound.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 `world.py` | `bands: OK`, `basins: OK (aldi 2790 cells, ocean 22054 cells; canal joins)`, `cuts: W_west 7, W_isthmus 10, W_arm 2, W_south 2, W_east 4, western_range 4, crescent_ring 9`. There is no EARTH placeholder wall (the region is not a stub). The composer exports `barriers: OK (western_range)` as the cut |
+| G1 | `dwarf.py`, `giant.py`, `sage.py`, `stubs.py` and `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py overworld --region earth`: exit 0, 40 s, max RSS 4.47 GB. `--check-determinism --region earth overworld dwarf-hall giant-tunnel sage-cave`: all four `deterministic` (51 s, 4.69 GB) |
+| G3 | `world.py --owned-chunks earth` against `git diff --name-only mainline -- assets/maps/ai/overworld/`: no output (19 owned files changed) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 302 passed (302)`, `Tests 6097 passed, 7 skipped` |
+| G5 | `npm run quest -- --mutate --stage S10`: `quest-verify: OK` (`(d) S10 L11.0 [11,14]`, `mutations: OK (5 gate rows; 9 elements)`). `--stage S12`: OK (`(d) S12 L15.0 [15,17]`, 4 gate rows: GT-15, GT-16, GT-35, GT-36). Full `npm run quest -- --mutate`: OK (41 gate rows, 50 elements; `(g) s*=0.735 (31 pairs; 13 assumed)`). `--stage S31`: **FAIL**, `ORDER S31 unreachable`, because no stage grants `adamant` (W1-H's known note) |
+| G6 | `assetCoverage.test.ts`: passed (tinted NPCs, `cracked_earth`) |
+| G12 | `designNotes` and `originality` tests passed. The fresh reviewer passed the second round (see Originality) |
+| G13 / G14 | `macroGeography` and `travelMatrix` passed. `(g)` OK; `(h)` OK (12 rows, 2 basin rows; T2-T4 are still pending, waiting for `a1_pravoka`) |
+| G15 | `townStandard`: `dwarf: houses 0/0 interiors 0/0 outdoor 13/10 hints 2/2 reactive 9/3 shops 1/1` |
+| G16 | `stubs.py --check ERT-O`: `stubs: 0 left for ERT-O` |
+| G17 | `world.py --check-bands`: `bands: OK`; then `basins: OK` (as above) |
+| `stage_backgrounds.py --check cracked_earth` | exit 1: `no bounds for cracked_earth (known: shoreline)`. The tool has bounds only for `shoreline`. Staging itself succeeded |
+
+**Travel rows and GTs:**
+
+- **Travel rows** (checked in the tests and the verifier):
+  - With the ship and no canal, `ert_dwarf` is reachable by the Aldi dock and `ert_melmond` is not (the strait).
+  - With CANAL_OPEN, the canal joins the Aldi to the strait.
+  - The range separates `ert_sarda` from the plain until TITAN_FED.
+  - T2-T4 report pending in (h) until A1-T places `a1_pravoka`.
+- **Gate rows:**
+
+  | Row | Result |
+  |---|---|
+  | GT-11 (Nerrick's tnt) | caught |
+  | GT-12 (`canal` forced on) | caught |
+  | GT-13 (W_west, W_isthmus cuts) | caught |
+  | GT-14 | non-load-bearing, with an S10 entry |
+  | GT-15 (the giant's ruby) | caught |
+  | GT-16 | non-load-bearing, with an S12 entry |
+  | GT-35 (`western_range` cut, 4 cells) | caught |
+  | GT-36 (the giant removed) | caught |
+
+  Every caught row is reported OK by `--mutate`.
+
+**Browser** (port 5226, `mute=1`). I drove the game from my own headless Chromium, because the shared Playwright MCP
+browser was being navigated and closed by other agents. Screenshots are in `/tmp/w-ert-o/`.
+
+| Row | Result |
+|---|---|
+| `w_s10_start` | Talked to Nerrick: CANAL_OPEN set, `tnt` gone. Boarded at (59, 104) (mode `ship`), sailed to (62, 93), then west through the canal cells to (47, 93) in mode `ship` (`s10_nerrick.png`, `s10_canal.png`) |
+| `w_s10_neg_notnt` | Same route: the ship stops at (62, 93), at the isthmus coast |
+| `w_s12_start` | Fed the giant (TITAN_FED, the ruby gone), walked west through the tunnel to `ert_giant_west` (23, 112) and into `sage-cave`, talked to Sarda: `rod` held, ERT_O_ROD_GIVEN (`s12_sarda.png`) |
+| `w_s12_neg_noruby` | The giant stays on (15, 10); the party cannot pass (16, 10) |
+| all four rows | 0 console errors |
+
+**Deviations and hand-offs:**
+
+- **Shared fixes.** After the FIR-O merge I dropped my own versions of FIR-O's shared fixes. Three more edits were
+  needed beyond FIR-O's; they go to the orchestrator:
+  1. `src/progression/questShops.ts`: in `--stage` mode, proof (e) skips an `opensAfter` stage that is an ancestor
+     of the checked stage. Its grants (the ship) are assumed at the entry and cannot be withheld. Without this,
+     every built town fails `EARLY <town> talkable before S2` in stage mode.
+  2. `tests/data/questData.test.ts`: a town may be `built`.
+  3. `tests/progression/questLate.test.ts`: the `(e)` line counts built towns.
+- **Full-world compile.** Before the merge I ran one full-world compile (11.7 GB, 190 s) under the lock, because my
+  first fix to `build_map.py` changed the compiler digest. FIR-O's version replaces that fix, and the committed
+  world was then rebuilt with `--region earth` only.
+- **S31 stays `pending`.** `adamant` is granted by no stage, so Smyth's trade would be a dead gate (proof (c)
+  DEADGATE). The cutscene `ert_smyth_forge` is written, and Smyth stands in the forge.
+  - Hand-off to WND-D2 / INT: once S28 grants `adamant`, set `SMYTH_TRADE` in `earth/dwarf.py` (1 line, given there)
+    and mark S31 built.
+- **No `shake` cutscene step exists**, so the canal blast is a dialog line over a short black fade.
+- **Sarda's VAMPIRE_DEFEATED gate is the cutscene's `requiredFlags`.** `npcOutcome` has no NPC-level
+  `requiredFlags`, so Sarda gives the rod through `ert_sarda_rod` (`give_item`), not through `giftItem`.
+- **Cutscene trades.** Nerrick and the giant take their item with a `take_item` step, not with `takeItem`. With
+  `takeItem` the item is gone before `npcOutcome` checks it, so the cutscene never plays.
+- **`ert_dwarf` moved +1, -2 to (55, 104)**, within the ±2 tolerance, so the dwarf-melmond hop by canal stays
+  under 4.5x (about 58 steps against 68.7).
+- **The canal saddle is at y 92-93**, not y 88-92, so that it lies nearer the dwarves' landing.
+- **Placeholder art.** Melmond's icon is a town-kit farmhouse; ERT-T may restyle it. The canal has no lock-gate
+  art.
+
+**Originality:** the first review found two problems. The giant tunnel's Distinct line named features the classic also has, and the dwarf hall's line was partly untrue. Both were fixed: the asleep giant was added and the wording rewritten. The re-review passed: `originality review: PASS dwarf-hall giant-tunnel sage-cave overworld(earth)`.
+
+**AGENTS.md delta (for INT):** under "Editing a 2x Map", add these scripts to the table:
+
+- `layouts/world_earth.py` with `layouts/earth/world_earth_ground.py` and `world_earth_sites.py` write the EARTH
+  region of `overworld.yaml`;
+- `layouts/earth/dwarf.py`, `giant.py` and `sage.py` write `dwarf-hall`, `giant-tunnel` and `sage-cave`.
+
+Also note that NPC trades which play a cutscene take their item with a `take_item` step.
 <!-- === end ERT-O === -->
 <!-- === ERT-T EARTH (pass W: owned by ERT-T) === -->
 <!-- === end ERT-T === -->
