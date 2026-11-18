@@ -98,6 +98,12 @@ BOTTOM_BAND = (80, 600, 1340, 745)
 # U10 review: a seam is a straight vertical cut, a luma step between neighbouring columns that keeps its sign down a
 # short window of rows (a painted edge wanders across columns, so its mean step over the window is much smaller)
 SEAM_WIN = 60
+# Bounds only for the composite (INT, pass W): the checks guard a pasted layer, and `shoreline` is the one image
+# COMPOSITES patches. On a plain staged image the numbers measure nothing: `is_water` is a blue-hue test, so blue-lit
+# stone and ice read as water (measured at INT: ice_cave 98 % in the enemy band, sky_palace and fiend_hall 99.8 %,
+# temple 41 % / party 64 %, throne_tiamat 100 %), and `seam` reads painted columns and stairs as seams (water_temple
+# 76.5, ocean's mast 56.9). Those images were judged by eye on the stage (docs/ART_BATTLE_PLAN.md); a new composite
+# adds its own row here.
 CHECKS = {"shoreline": {"enemy": 0.15, "party": 0.10, "top_water": 0.15, "top_contrast": 0.8, "seam": 14.0}}
 
 

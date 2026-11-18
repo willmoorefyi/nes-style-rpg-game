@@ -14,7 +14,7 @@
  * and the gold from then on is marked assumed (the gold rules skip it; `--strict` fails pending stages anyway).
  */
 import { levelForXp, xpToReach } from '../entities/ExperienceTable.js';
-import type { FieldMode, QuestStage } from '../types/index.js';
+import type { EncounterEntry, FieldMode, QuestStage } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
 import { globMatch, stageOrder } from './questData.js';
 import { stageOfMap, townKeepers } from './questCatalog.js';
@@ -24,9 +24,9 @@ import { Saturator } from './questSaturate.js';
 import { route } from './questRoute.js';
 import type { QuestContext } from './questProofs.js';
 import { lateOf } from './questLateData.js';
-import { encounterAt, explorationRewards, tableRewards } from './questExplore.js';
+import { encounterAt, explorationTables, tableRewards } from './questExplore.js';
 
-export { encounterAt, explorationRewards, tableRewards };
+export { encounterAt, tableRewards };
 
 export const MODE_RATE: Readonly<Record<FieldMode, number>> = { walking: 1, canoe: 0.5, ship: 1, airship: 0 };
 
@@ -37,6 +37,13 @@ export interface StagePoint {
   at: 'boss' | 'end' | 'assumed';
   boss?: string;
   fights: number;
+}
+
+/** One fired event's share of the walk, in witness order: its expected fights per table, then its battle (if any). */
+export interface CurveSegment {
+  stage: string | null;
+  fights: Array<{ table: readonly EncounterEntry[]; n: number }>;
+  battle?: string[];
 }
 
 export interface CurveResult {
@@ -53,6 +60,8 @@ export interface CurveResult {
   fights: number;
   gold: number;
   xp: number;
+  /** The walk event by event (questCurve.test.ts replays it with seeded battles). */
+  segments: CurveSegment[];
 }
 
 /** Fractional level for a member's xp (L2.9 = level 2, 90 % of the way to 3). */
@@ -93,12 +102,12 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
   const { world } = ctx;
   const out: CurveResult = {
     points: new Map(), stageStartGold: new Map(), townFirstGold: new Map(), assumedGold: new Set(),
-    assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0,
+    assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0, segments: [],
   };
   // `--stage` (assume mode): the party arrives at the stage's band low, as its `w_s<n>_start` scenario does
   const own = ctx.stage ? world.stages.get(ctx.stage)?.band : null;
   if (own) out.xp = 4 * xpToReach(own[0]);
-  let tainted = !!own;
+  let tainted = !!ctx.stage;   // a stage run starts with the new game's gold: every gold figure is assumed (S31: no band)
   const fightsBy = new Map<string, number>();
   const explored = new Set<string>([world.worldMap]);
   const sat = new Saturator(ctx, ctx.start);
@@ -151,26 +160,27 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
       const path = route(ctx, pos, (p) => p.map === at.map && p.x === at.x && p.y === at.y, state)
         ?? sat.roots.map((r) => route(ctx, r, (p) => p.map === at.map && p.x === at.x && p.y === at.y, state)).find((r) => r) ?? [];
       const grind = opts.rush ? 1 : stage?.grind ?? 1;
-      let f = 0;
-      let xp = 0;
-      let gold = 0;
+      const tables = new Map<readonly EncounterEntry[], number>();
+      const add = (t: readonly EncounterEntry[], n: number): void => { tables.set(t, (tables.get(t) ?? 0) + n); };
       for (const c of path) {
         const map = world.maps.get(c.map);
         if (map && !opts.rush && !explored.has(c.map)) {
           explored.add(c.map);
-          const ex = explorationRewards(data, map);
-          f += ex.fights;
-          xp += ex.xp;
-          gold += ex.gold;
+          for (const [t, n] of explorationTables(map)) add(t, n);
         }
         const enc = map ? encounterAt(map, c.x, c.y, c.mode) : null;
-        if (!enc) continue;
-        const per = grind * MODE_RATE[c.mode] / ((enc.rate.min + enc.rate.max) / 2);
-        const r = tableRewards(data, enc.table);
-        f += per;
-        xp += per * r.xp;
-        gold += per * r.gold;
+        if (enc) add(enc.table, grind * MODE_RATE[c.mode] / ((enc.rate.min + enc.rate.max) / 2));
       }
+      let f = 0;
+      let xp = 0;
+      let gold = 0;
+      for (const [t, n] of tables) {
+        const r = tableRewards(data, t);
+        f += n;
+        xp += n * r.xp;
+        gold += n * r.gold;
+      }
+      out.segments.push({ stage: stage?.id ?? null, fights: [...tables].map(([table, n]) => ({ table, n })) });
       out.fights += f;
       out.xp += xp;
       out.gold += gold;
@@ -183,6 +193,7 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
         fights: fightsBy.get(stage.id) ?? 0,
       });
     }
+    if (eff.battle?.length) out.segments.push({ stage: stage?.id ?? null, fights: [], battle: [...eff.battle] });
     for (const id of eff.battle ?? []) {
       const r = data.enemies.get(id);
       out.xp += r?.xp ?? 0;

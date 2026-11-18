@@ -68,10 +68,13 @@ export function genericElements(ctx: QuestContext): MutElement[] {
   return out;
 }
 
-/** The reason of a stage's `nonLoadBearing` entry for the element (same map, kind and cell), or null. */
+/** The reason of a stage's `nonLoadBearing` entry for the element (same map, kind and cell; the same label when the
+ *  entry names one; a `--stage` run of the entry's `stage` when it names one), or null. */
 export function nonLoadBearingFor(ctx: QuestContext, el: MutElement): string | null {
   for (const s of ctx.world.quest.stages) {
     for (const n of s.nonLoadBearing) {
+      if (n.element !== undefined && n.element !== el.label) continue;
+      if (n.stage !== undefined && n.stage !== ctx.stage) continue;
       if (n.map === el.map && n.kind === el.kind && n.at[0] === el.at[0] && n.at[1] === el.at[1]) return n.reason;
     }
   }

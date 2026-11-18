@@ -157,6 +157,16 @@ describe('questGraph: each proof fails on its RED fixture', () => {
     expect(g.nodes.some((n) => n.state.flags.has('@S2') && n.state.flags.has('@S2~'))).toBe(false);
   });
 
+  it('(a) an ordinary gift that sets a quest flag is an event (INT: the W1-I hand-off on non-key gifts)', () => {
+    const ctx = run('a_plain_gift');
+    const ev = ctx.cat.byNpc.get('town\0hermit');
+    expect(ev?.grants).toEqual({ flags: ['HERMIT_MET'], items: [], vehicles: [] });
+    const r = proofOrder(ctx);
+    expect(r.failures, r.line).toEqual([]);
+    // the potion is not state: no reachable state holds it
+    expect(stateGraph(ctx).nodes.some((n) => n.state.items.has('potion'))).toBe(false);
+  });
+
   it('(c) RED stranded: a pit with no way back to the world map', () => {
     const r = proofSoftlocks(run('red_c_stranded'));
     expect(codes(r)).toContain('STRANDED');
@@ -232,11 +242,12 @@ describe('questGraph: the repository (npm run quest)', () => {
       'cornelia-castle-2f:gift:princess']);
   });
 
-  it('S31 is reachable now that the sky castle grants the adamant (WND-D2); it is still pending, an error under --strict', () => {
+  it('S31 is built (INT): Smyth forges Excalibur from the sky castle\'s adamant; optional and reachable; no stage is pending', () => {
     expect(proofs[0].line).not.toContain('S31 waits for adamant');
     expect(proofs[0].line).toMatch(/optional: S31 /);
+    expect(ctx.cat.byNpc.get('dwarf-hall\0ert_smyth')?.grants.items).toContain('excalibur');
+    expect(ctx.world.quest.stages.filter((s) => s.status === 'pending').map((s) => s.id)).toEqual([]);
     const strict = proofOrder(createQuestContext(ctx.world, { strict: true }));
-    const pending = ctx.world.quest.stages.filter((s) => s.status === 'pending').length;
-    expect(strict.failures.filter((f) => f.code === 'PENDING')).toHaveLength(pending);
+    expect(strict.failures, strict.line).toEqual([]);
   });
 });

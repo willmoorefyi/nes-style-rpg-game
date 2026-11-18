@@ -164,12 +164,24 @@ function landingNear(ctx: QuestContext, map: MapData, anchor: string): boolean {
   return false;
 }
 
-/** WORLD 2.6: every dock of the world map is allowed, in its basin. */
+/**
+ * WORLD 2.6: every dock of the world map is allowed, in its basin; with `--strict` (every region built) every allowed
+ * dock is also present (INT). A mutated context is never strict (`mutatedContext`), so a dock-removal row (GT-4,
+ * GT-5, GT-5b, GT-14) is judged on its own proofs, never on this presence error (6.3's GT-5b fixture note).
+ */
 export function dockFailures(ctx: QuestContext): ProofFailure[] {
   const map = ctx.world.maps.get(ctx.world.worldMap);
   const allowed = lateOf(ctx).docksAllowed;
-  return (map?.docks ?? []).filter((d) => allowed[d.id] !== d.basin).map((d) =>
+  const out = (map?.docks ?? []).filter((d) => allowed[d.id] !== d.basin).map((d) =>
     fail('h', 'DOCK', `DOCK ${map!.id} (${d.x},${d.y}) ${d.id} basin ${d.basin} not allowed`));
+  if (ctx.strict && map) {
+    const have = new Set((map.docks ?? []).map((d) => d.id));
+    for (const id of Object.keys(allowed).sort()) {
+      if (!have.has(id)) out.push(fail('h', 'DOCK', `DOCK ${map.id} ${id} missing (basin ${allowed[id]})`));
+    }
+    if (!(map.patches ?? []).some((p) => p.id === 'canal')) out.push(fail('h', 'DOCK', `DOCK ${map.id} canal patch missing`));
+  }
+  return out;
 }
 
 export function proofTravel(ctx: QuestContext): ProofResult {

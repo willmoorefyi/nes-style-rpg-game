@@ -27,9 +27,9 @@ npcs:
   dialog:
   - condition: WAT_O_BOTTLE_BOUGHT
     text: [Mind how you carry it. Whatever sleeps in there has been asleep a long while.]
-  - text: [A bottle stoppered with sea-wax. Shake it and something inside lights up and sulks., 'I won''t haggle: 5000 gil, coin on the crate. Come back when your purse is heavier if it isn''t.']
+  - text: [A bottle stoppered with sea-wax. Shake it and something inside lights up and sulks., 'I won''t haggle: 40000 gil, coin on the crate. Come back when your purse is heavier if it isn''t.']
   tint: '#d8b070'
-  takeGold: 5000
+  takeGold: 40000
   giftItem: fairy_bottle
   giftFlag: WAT_O_BOTTLE_BOUGHT
 - id: caravan_master

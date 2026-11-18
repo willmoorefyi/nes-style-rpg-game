@@ -1,0 +1,64 @@
+# (a) an ordinary gift that sets a quest flag (INT, the W1-I hand-off): the hermit gives a potion (not a key item) and
+# sets HERMIT_MET, the flag S1 grants and the gate to the shrine reads. Before INT the verifier saw no event here (only
+# key items made a gift relevant), so S1 was never done and the goal unreachable.
+start: {map: town, x: 2, y: 2}
+worldMap: overworld
+items:
+  - {id: potion, type: consumable}
+cutscenes:
+  - id: lit
+    steps:
+      - {type: set_flag, flag: GOAL_DONE}
+quest:
+  goal: GOAL_DONE
+  stages:
+    - id: S0
+      tranche: "-"
+      maps: [town]
+      status: built
+    - id: S1
+      tranche: T1
+      after: [S0]
+      grants: {flags: [HERMIT_MET]}
+      maps: []
+      walk: [town:npc:hermit]
+      status: built
+    - id: S2
+      tranche: T1
+      after: [S1]
+      requires: {flags: [HERMIT_MET]}
+      grants: {flags: [GOAL_DONE]}
+      maps: [shrine]
+      status: built
+maps:
+  - id: overworld
+    grid:
+      - "############"
+      - "#..........#"
+      - "############"
+    entrances: {town: [2, 1], shrine: [9, 1]}
+    transitions:
+      - {x: 1, y: 1, targetMap: town, targetEntrance: gate}
+      - {x: 10, y: 1, targetMap: shrine, targetEntrance: entry, requiredFlag: HERMIT_MET}
+  - id: town
+    grid:
+      - "######"
+      - "#....#"
+      - "#....#"
+      - "#....#"
+      - "###.##"
+    entrances: {gate: [3, 3]}
+    transitions:
+      - {x: 3, y: 4, targetMap: overworld, targetEntrance: town}
+    npcs:
+      - {id: hermit, x: 1, y: 1, dialog: ["Take this, for the road."], giftItem: potion, giftFlag: HERMIT_MET}
+  - id: shrine
+    grid:
+      - "#####"
+      - "#...#"
+      - "##.##"
+    entrances: {entry: [2, 1]}
+    transitions:
+      - {x: 2, y: 2, targetMap: overworld, targetEntrance: shrine}
+    npcs:
+      - {id: altar, x: 2, y: 1, dialog: ["The altar glows."], cutscene: {id: lit, onceFlag: GOAL_DONE}}

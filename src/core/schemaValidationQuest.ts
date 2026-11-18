@@ -132,6 +132,8 @@ function validateStage(p: string, s: Obj): void {
   list(`${p}.nonLoadBearing`, s.nonLoadBearing, (q, n) => {
     for (const k of ['map', 'kind', 'reason']) want(`${q}.${k}`, n[k], 'string');
     cell(`${q}.at`, n.at);
+    for (const k of ['element', 'stage']) if (n[k] !== undefined) want(`${q}.${k}`, n[k], 'string');
+    if (n.kind === 'quest' && n.element === undefined) throw new ValidationError(`${q}.element: required for kind quest`);
   });
   want(`${p}.nonLoadBearing`, s.nonLoadBearing, 'array');
   if (s.entry !== undefined) {

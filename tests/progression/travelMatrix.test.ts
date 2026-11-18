@@ -74,6 +74,20 @@ describe('travelMatrix: each row fails on its RED fixture', () => {
     expect(msgs).toEqual(expect.arrayContaining(['DOCK overworld (36,13) ert_melmond basin aldi not allowed',
       'DOCK overworld (20,8) rogue basin aldi not allowed']));
   });
+
+  it('the presence rule (INT, --strict): every allowed dock and the canal patch are on the world map', () => {
+    const strict = (edit: (w: QuestWorld) => QuestWorld): string[] => proofTravel(attachLate(
+      createQuestContext(edit(mini.world), { strict: true }), buildLateData(MINI_LATE))).failures.map((f) => f.message);
+    expect(strict((w) => w).filter((m) => m.startsWith('DOCK'))).toEqual([]);
+    const gone = strict((w) => editMap(w, 'overworld', (m) => {
+      m.docks = (m.docks ?? []).filter((d) => d.id !== 'ert_dwarf');
+      m.patches = (m.patches ?? []).filter((p) => p.id !== 'canal');
+    }));
+    expect(gone).toEqual(expect.arrayContaining(['DOCK overworld ert_dwarf missing (basin aldi)', 'DOCK overworld canal patch missing']));
+    // without --strict the same world reports no presence error (a region tranche may not have placed its dock yet)
+    expect(run((w) => editMap(w, 'overworld', (m) => { m.docks = (m.docks ?? []).filter((d) => d.id !== 'ert_dwarf'); }))
+      .some((m) => m.includes('missing'))).toBe(false);
+  });
 });
 
 describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => {

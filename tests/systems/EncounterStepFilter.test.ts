@@ -125,4 +125,14 @@ describe('ExplorationScene: no battle on warps or blocked gates (EB-2)', () => {
     expect(game.playerPosition).toEqual({ x: 1, y: 2 });
     expect(game.data.loadEnemies).toHaveBeenCalledTimes(1);
   });
+
+  it('a shut gate\'s push-back records the tile at once, while its message shows (WND-D1 engine note, INT)', async () => {
+    const { game, walk } = await fieldWith({
+      keyItemGates: [{ x: 2, y: 1, requiredFlag: 'BRIDGE_BUILT', message: 'The bridge is out.', permanent: false }],
+    });
+    const seen: Array<{ x: number; y: number }> = [];
+    vi.mocked(DialogManager.prototype.start).mockImplementation(() => { seen.push({ ...game.playerPosition }); });
+    walk('right');
+    expect(seen).toEqual([{ x: 1, y: 1 }]);   // not the gate cell (2, 1)
+  });
 });

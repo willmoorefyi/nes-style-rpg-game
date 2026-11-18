@@ -34,6 +34,13 @@ stages:
       - {map: overworld, kind: gate, at: [94, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
       # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), added by W1-I like QUEST 4.5's bridge entries
       - {map: temple-of-fiends, kind: npc, at: [11, 6], reason: "Garland's hideIf only clears the beaten boss off his dais, a dead end"}
+      # INT: the three elements a `--stage S0` run can't see (the run checks only S0's own (b), and S0 has no
+      # ancestors). The full run catches each (none is uncaught in the full `--mutate` run on 0e4007e1): the King's and
+      # the princess's PRINCESS_RESCUED keep S0's lute and S1's order behind the rescue, and the temple's stair to the
+      # past is S29's time gate (TIME_GATE_OPEN)
+      - {map: cornelia-castle-2f, kind: npc, at: [21, 8], stage: S0, element: "cornelia-castle-2f npc king needs PRINCESS_RESCUED removed", reason: "stage scope: the King's line to the builders is S1's; the full run catches it"}
+      - {map: cornelia-castle-2f, kind: npc, at: [22, 8], stage: S0, element: "cornelia-castle-2f npc princess needs PRINCESS_RESCUED removed", reason: "stage scope: the princess's gift waits for S0's own rescue; the full run catches it"}
+      - {map: temple-of-fiends, kind: transition, at: [3, 4], stage: S0, element: "temple-of-fiends transition to past-temple-1 flags removed", reason: "stage scope: the stair to the past is S29's; the full run catches it"}
     status: built
   # === A1-O (pass W: owned by A1-O) ===
   - id: S1
@@ -276,14 +283,17 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge);
-    # stays pending (INT-W2c): S28 grants the adamant now, but `excalibur` is gear, not a key item, so the verifier
-    # tracks no event that gives it and a built S31 could never be marked done (the W1-I hand-off on non-key gifts)
-    walk: []
+    # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge).
+    # INT: built. `excalibur` is gear, but a stage's grants are key items to the verifier (questData.ts), so the
+    # cutscene's give_item is tracked like any key item; the trade is switched on in earth/dwarf.py. Entry: in the hall
+    # with the adamant (S28), the airship by Melmond (S25's cell) and the ship at the dwarves' quay (S10's)
+    entry: {map: dwarf-hall, x: 19, y: 28, mode: walking, vehicles: [{type: airship, map: overworld, x: 40, y: 109},
+                                                                       {type: ship, map: overworld, x: 59, y: 104}]}
+    walk: [dwarf-hall:npc:ert_smyth]
     basins: {}
     nonLoadBearing: []
     optional: true
-    status: pending
+    status: built
   # === end ERT-O ===
   # === ERT-T (pass W: owned by ERT-T) ===
   - id: S25
@@ -372,7 +382,7 @@ stages:
     kit: w_s17
     maps: []
     zones: [overworld:fir_desert]
-    grind: 2.0
+    grind: 4.0
     # the hatch of the buried hull (overworld (143, 159)) takes the stone and plays fir_airship_rises
     walk: ["overworld:cutscene:fir_hull_hatch"]
     entry: {map: overworld, x: 143, y: 160, mode: walking}
@@ -402,8 +412,9 @@ stages:
     basins: {}
     nonLoadBearing:
       # GT-20 in --stage S14 only: before S13 the stage scope starts at the new game's place with the ship moored at
-      # Melmond, out of reach, so no early keeper can be seen; the full run catches GT-20 as EARLY crescent before S13
-      - {map: quest, kind: quest, at: [0, 0], reason: "stage scope: before S13 the ship is moored out of reach of the new game's start; the full run catches GT-20 as EARLY crescent talkable before S13"}
+      # Melmond, out of reach, so no early keeper can be seen; the full run catches GT-20 as EARLY crescent before S13.
+      # INT: scoped to that one element (`element`) and to `--stage S14` runs (`stage`); it excuses nothing else
+      - {map: quest, kind: quest, at: [0, 0], element: "town crescent opensAfter [S13]", stage: S14, reason: "stage scope: before S13 the ship is moored out of reach of the new game's start; the full run catches GT-20 as EARLY crescent talkable before S13"}
     status: built
   # === end FIR-T ===
   # === FIR-D1 (pass W: owned by FIR-D1) ===
@@ -534,7 +545,7 @@ stages:
     kit: w_s22
     maps: [caravan-camp]
     zones: [overworld:wat_dunes]
-    grind: 7.0
+    grind: 2.0
     walk: [caravan-camp:gift:fairy_bottle]
     # Cornelia's south gate, the airship landed beside it (as S21)
     entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
@@ -649,7 +660,7 @@ stages:
     kit: w_s27
     maps: [mirage-*]
     zones: [overworld:wnd_mirage_sands]
-    grind: 2.0
+    grind: 1.0
     # WND-D1: the assumed start is WND-O's for S26 (Cornelia's south gate, the airship on the grass below it, the
     # ship at anchor off the mesa where no shore reaches it); the walk flies to the sands, rings the vestibule door
     # (the chime) and climbs to the console (the cube)
@@ -659,9 +670,9 @@ stages:
     basins: {}
     nonLoadBearing:
       # the four cells of mirage-3f's bronze ring (requiredFlag SKY_FORTRESS_OPEN, the way back up after the console's
-      # first lift): without the flag the ring reaches only the sky castle's stubs, and pending S28's grant itself
-      # needs SKY_FORTRESS_OPEN, so nothing is skipped; once WND-D2 builds S28 the removal is SKIP S28 (strict re-checks)
-      - {map: mirage-3f, kind: transition, at: [13, 9], reason: &wnd_d1_ring "pending: S28 (WND-D2) not built; the ring leads only into the sky castle, whose pending grant needs SKY_FORTRESS_OPEN itself"}
+      # first lift). INT, on WND-D2's text: with S28 built the ring's flag is still not load-bearing, because the sky
+      # castle's 1F berth ward holds the same flag
+      - {map: mirage-3f, kind: transition, at: [13, 9], reason: &wnd_d1_ring "redundant with sky-castle-1f's berth ward (requiredFlag SKY_FORTRESS_OPEN), which holds the same flag; in a stage run of S28 the ward's removal is SKIP S28"}
       - {map: mirage-3f, kind: transition, at: [14, 9], reason: *wnd_d1_ring}
       - {map: mirage-3f, kind: transition, at: [13, 10], reason: *wnd_d1_ring}
       - {map: mirage-3f, kind: transition, at: [14, 10], reason: *wnd_d1_ring}
@@ -680,7 +691,7 @@ stages:
     kit: w_s28
     maps: [sky-castle-*]
     zones: [sky-castle-4f:wnd_d2_engine]
-    grind: 2.0
+    grind: 1.0
     # set down by the Mirage console's beam on 1F's south berth (mirage_ascent warps to sky-castle-1f `arrival`), the
     # airship on the oasis meadow beside the Mirage Tower (the berth's beam drops back to the tower's top); up the hub
     # stair, over 2F's south bridge to the east island, its belts to D and to the stair island, the archive's vault,
@@ -729,7 +740,7 @@ stages:
     kit: w_s30
     maps: [past-temple-*, past-chaos]
     zones: []
-    grind: 2.0
+    grind: 1.0
     # in the act-1 temple's altar room below the time gate (its `time_gate` arrival), the airship parked by the door;
     # down the stair (TIME_GATE_OPEN), each refight opens the stair on, the cross's two wards open its west and north
     # arms, and the shrine's Chaos ends the game
