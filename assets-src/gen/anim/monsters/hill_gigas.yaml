@@ -163,3 +163,7 @@ paint:                         # hurt_in2: 1 px crack-fill specks inside the rot
   - {frame: atk_follow, xy: [[64, 93]], rgb: [239, 148, 123]}
   - {frame: atk_recover, xy: [[67, 74], [69, 70]], rgb: [148, 132, 115]}
   - {frame: hurt_in2, xy: [[44, 52]], rgb: [239, 148, 123]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai

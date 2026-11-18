@@ -111,3 +111,14 @@ art (F5 is the rig's `raise: false`; no archive).
 | `werewolf_kneel_v1` | `werewolf` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `wight_kneel_v1` | `wight` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `zombie_kneel_v1` | `zombie` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `minotaur_kneel_v1` | `minotaur` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `minotaur_zombie_kneel_v1` | `minotaur_zombie` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `ogre_kneel_v1` | `ogre` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `ogre_chief_kneel_v1` | `ogre_chief` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `ogre_mage_kneel_v1` | `ogre_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `sea_troll_kneel_v1` | `sea_troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `stone_golem_kneel_v1` | `stone_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `troll_kneel_v1` | `troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `iron_golem_kneel_v1` | `iron_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `soldier_kneel_v1` | `soldier` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `warmech_kneel_v1` | `warmech` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |

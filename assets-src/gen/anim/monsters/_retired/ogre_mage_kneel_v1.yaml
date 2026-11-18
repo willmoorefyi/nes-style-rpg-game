@@ -1,0 +1,169 @@
+sprite: ogre_mage
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+keyframes:
+  idle:
+    crown: [60, 15]
+    neck: [62, 42]
+    chest: [55, 55]
+    hip: [58, 108]             # low, at the robe hem: robe pixels below the hip would swing the other way
+    sh_n: [78, 45]
+    el_n: [84, 58]
+    hand_n: [90, 60]
+    sh_f: [40, 40]
+    el_f: [34, 58]
+    hand_f: [38, 75]
+    s_top: [93, 20]            # the staff (orb to foot), held in the near hand
+    s_bot: [88, 120]
+    hip_n: [68, 108]
+    knee_n: [72, 112]
+    foot_n: [75, 117]
+    toe_n: [85, 121]
+    hip_f: [45, 108]
+    knee_f: [42, 112]
+    foot_f: [40, 117]
+    toe_f: [45, 121]
+  attack:
+    crown: [65, 20]
+    neck: [62, 42]
+    chest: [50, 58]
+    hip: [45, 100]
+    sh_n: [75, 48]
+    el_n: [88, 45]
+    hand_n: [97, 40]
+    sh_f: [40, 45]
+    el_f: [30, 50]
+    hand_f: [22, 48]
+    s_top: [22, 15]            # the staff, now in the far hand, planted beside the back foot
+    s_bot: [24, 110]
+    hip_n: [60, 98]
+    knee_n: [65, 103]
+    foot_n: [68, 106]
+    toe_n: [78, 108]
+    hip_f: [35, 100]
+    knee_f: [25, 108]
+    foot_f: [22, 114]
+    toe_f: [18, 120]
+  hurt:
+    crown: [30, 30]
+    neck: [48, 42]
+    chest: [55, 58]
+    hip: [58, 104]
+    sh_n: [60, 45]
+    el_n: [63, 35]
+    hand_n: [62, 22]
+    sh_f: [45, 52]
+    el_f: [70, 56]
+    hand_f: [88, 58]
+    s_top: [89, 20]
+    s_bot: [84, 115]
+    hip_n: [66, 106]
+    knee_n: [66, 110]
+    foot_n: [66, 115]
+    toe_n: [70, 121]
+    hip_f: [36, 106]
+    knee_f: [35, 110]
+    foot_f: [34, 115]
+    toe_f: [33, 121]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  staff_r:                     # the staff on the near side (idle, hurt)
+    kind: prop
+    bone: {idle: [s_top, s_bot], hurt: [s_top, s_bot]}
+    radius: 3.0
+    in: [idle, hurt]
+  staff_l:                     # the staff in the far hand (attack): the hands swap at the wind2 -> mid step
+    kind: prop
+    bone: {attack: [s_top, s_bot]}
+    radius: 3.0
+    in: [attack]
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # rigid leans and translations, written as tweaks (moves []); the robe is torso, the hip sits at its hem
+  atk_wind1:                   # draw back: the upper body (staff included) 1 back
+    moves: []
+    t: -0.05
+    dy: 0
+    tweaks: {crown: [-1, 0], neck: [-1, 0], chest: [-1, 0], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0], s_top: [-1, 0], s_bot: [-1, 0]}
+  atk_wind2:                   # coil: the upper body (staff included) 3 back toward the lunge side, the staff foot stays (the staff tilts)
+    moves: []
+    t: -0.1
+    dy: 0
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0], s_top: [-3, 0]}
+  atk_mid:                     # the lunge lands: the attack upper body 3 lower (it drops into the lunge); the back leg and the staff foot 5, the lifted front foot 2 / 4 toward the idle stance
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [0, 3], neck: [0, 3], chest: [0, 3], sh_n: [0, 3], el_n: [0, 3], hand_n: [0, 3], sh_f: [0, 3], el_f: [0, 3], hand_f: [0, 3], s_top: [0, 3], s_bot: [5, 3], hip_f: [3, 0], knee_f: [5, 0], foot_f: [5, 0], knee_n: [2, 4], foot_n: [2, 4]}
+  atk_follow:                  # settle: the attack upper body 2 lower
+    moves: []
+    t: 0.8
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [0, 2], neck: [0, 2], chest: [0, 2], sh_n: [0, 2], el_n: [0, 2], hand_n: [0, 2], sh_f: [0, 2], el_f: [0, 2], hand_f: [0, 2], s_top: [0, 2], s_bot: [0, 2], knee_f: [1, 0], foot_f: [1, 0], knee_n: [2, 4], foot_n: [2, 4]}
+  atk_recover:                 # lean back 2 and 1 back, still on the lunge side
+    moves: []
+    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-3, 0], sh_n: [-3, -1], el_n: [-3, -1], hand_n: [-3, -1], sh_f: [-3, 1], el_f: [-3, 1], hand_f: [-2, 1], s_top: [-4, -1], s_bot: [-1, -1]}
+  hurt_in1:                    # recoil: lean back 8, head 2 further back
+    moves: []
+    tweaks: {crown: [-16, 1], neck: [-12, 0], chest: [-8, 1], sh_n: [-10, -2], el_n: [-8, -3], hand_n: [-8, -4], sh_f: [-10, 3], el_f: [-8, 4], hand_f: [-5, 3], s_top: [-14, -4], s_bot: [0, -4]}
+  hurt_in2:                    # the hurt pose leaned in 8 and 2 forward
+    moves: []
+    tweaks: {crown: [13, -3], neck: [11, -1], chest: [8, 0], sh_n: [10, 1], el_n: [12, 1], hand_n: [13, 1], sh_f: [9, -1], el_f: [9, 2], hand_f: [8, 5], s_top: [13, 5], s_bot: [0, 4]}
+  daze:                        # slump: the body 1 forward and 1 lower and the head 2 lower (the staff stays planted)
+    moves: []
+    dy: 0
+    tweaks: {crown: [-1, 0], neck: [-1, 0], chest: [1, 1], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1], sh_f: [1, 1], el_f: [1, 1], hand_f: [1, 1]}
+  daze_b:                      
+    moves: []
+    dy: 0
+    tweaks: {crown: [-1, 1], neck: [-1, 1], chest: [1, 2], sh_n: [1, 2], el_n: [1, 2], hand_n: [1, 2], sh_f: [1, 2], el_f: [1, 2], hand_f: [1, 2]}
+masks:
+  staff_r:
+    idle: [[83, 11], [102, 11], [102, 30], [93, 31], [92, 123], [84, 123], [85, 31]]
+    hurt: [[80, 13], [99, 13], [99, 30], [90, 31], [89, 119], [81, 119], [83, 31]]
+  staff_l:
+    attack: [[12, 7], [34, 7], [34, 29], [28, 31], [28, 110], [19, 110], [19, 31], [12, 29]]
+holds: []
+paint:                         # small pockets the moves close off (hand / staff, between the legs, robe / arm), outline ink
+  - {frame: atk_wind2, xy: [[82, 63], [82, 64], [82, 65], [82, 66], [82, 67], [82, 68], [82, 69]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[59, 107], [60, 106], [60, 107], [60, 108], [61, 107], [62, 106], [62, 107], [63, 107]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[71, 95], [72, 95], [72, 96], [73, 95], [73, 96], [74, 96], [75, 96]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[77, 65], [77, 66], [78, 66], [79, 66], [79, 67], [80, 52]], rgb: [6, 4, 10]}
+  # pass K (K2-B): kneel frames: cracks, pockets and the notch the robe compression cuts through the robe (kneel_in2) closed in the robe colours, outline ink where edges lost it
+  - {frame: kneel_in1, xy: [[48, 113]], rgb: [90, 57, 66]}
+  - {frame: kneel_in1, xy: [[46, 115]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[47, 115], [48, 115]], rgb: [66, 41, 66]}
+  - {frame: kneel_in1, xy: [[67, 114], [67, 115]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[86, 120], [87, 120], [83, 118], [83, 117], [47, 115]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[44, 112], [45, 112], [44, 113], [45, 113], [42, 114], [43, 114], [44, 114], [45, 114]], rgb: [66, 41, 66]}
+  - {frame: kneel_in2, xy: [[35, 122], [36, 122], [41, 122], [42, 122], [43, 122], [44, 122], [45, 122], [46, 122], [70, 122], [71, 122], [72, 122], [73, 122], [74, 122], [75, 122], [76, 122], [77, 122], [78, 122], [79, 122], [47, 119], [83, 117], [41, 116], [79, 105]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[83, 113], [83, 114]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[82, 114], [83, 115]], rgb: [41, 66, 107]}
+  - {frame: kneel_b, xy: [[82, 120], [47, 119], [81, 119], [48, 118], [46, 117]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[70, 98], [69, 99], [70, 99], [72, 99], [69, 100], [70, 100], [72, 100], [69, 101], [70, 101], [72, 101], [69, 102], [70, 102], [72, 102], [69, 103], [72, 103]], rgb: [115, 74, 74]}
+  - {frame: kneel_in2, xy: [[71, 98], [68, 99], [71, 99], [68, 100], [71, 100], [80, 100], [68, 101], [71, 101], [80, 101], [68, 102], [71, 102], [80, 102], [68, 103], [80, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[73, 99], [74, 99], [75, 99], [76, 99], [77, 99], [78, 99], [73, 100], [74, 100], [75, 100], [76, 100], [77, 100], [78, 100], [79, 100], [73, 101], [74, 101], [75, 101], [76, 101], [77, 101], [78, 101], [79, 101], [73, 102], [74, 102], [75, 102], [76, 102], [77, 102], [78, 102], [79, 102], [73, 103], [74, 103], [75, 103], [76, 103], [77, 103], [78, 103], [79, 103]], rgb: [132, 90, 90]}
+  - {frame: kneel_in2, xy: [[81, 99], [81, 100], [81, 101], [81, 102], [81, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[80, 105], [81, 105], [79, 103], [80, 103], [81, 103], [81, 102], [81, 101]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[70, 97], [72, 98], [72, 104]], rgb: [115, 74, 74]}
+  - {frame: kneel_in2, xy: [[71, 97], [80, 99], [71, 103]], rgb: [90, 57, 66]}
+  - {frame: kneel_in2, xy: [[73, 98], [74, 98], [75, 98], [76, 98], [77, 98], [78, 98], [79, 99], [73, 104], [74, 104], [75, 104], [76, 104], [78, 104]], rgb: [132, 90, 90]}
+# pass K (K2-B): robed, robed_feet: the hips sit at the robe hem, so the upper body sinks over the robe compressed to its hem, the boots kept whole under it: head bowed, the free shoulder dropped, the staff sliding down through the near hand to its foot on the plain; the orb glow fades (glow remap)
+kneel:
+  variant: [robed, robed_feet]
+  glow:
+    box: [80, 5, 105, 50]
+    kneel_in1: [[[189, 214, 222], [132, 181, 198]], [[132, 181, 198], [82, 148, 189]]]
+    kneel: [[[189, 214, 222], [82, 148, 189]], [[132, 181, 198], [57, 107, 148]], [[82, 148, 189], [41, 66, 107]]]
+    kneel_b: [[[82, 148, 189], [57, 107, 148]], [[57, 107, 148], [41, 66, 107]]]
+  paint:
+    - {xy: [[43, 75], [44, 75], [43, 76]], rgb: [6, 4, 10]}
+    - {xy: [[42, 77], [43, 77], [44, 77], [42, 78], [44, 78], [42, 79], [44, 79], [42, 80], [44, 80], [42, 81], [44, 81], [45, 81], [42, 82], [43, 82], [45, 82], [43, 83], [44, 83], [45, 83], [43, 84], [44, 84], [43, 85], [44, 85], [43, 86], [44, 86], [43, 87], [44, 87], [43, 88], [44, 88], [43, 89], [43, 78], [43, 79], [43, 80], [43, 81], [44, 82]], rgb: [66, 41, 66]}
+    - {xy: [[37, 119], [37, 120]], rgb: [82, 148, 189]}
+    - {xy: [[39, 119], [40, 119]], rgb: [57, 107, 148]}
+    - {xy: [[41, 115], [42, 115], [43, 115], [44, 115], [45, 115], [46, 115], [47, 115], [41, 116], [42, 116], [47, 116], [48, 116], [42, 117], [43, 117], [47, 117], [48, 117], [43, 116], [44, 116], [45, 116], [46, 116]], rgb: [66, 41, 66]}
+    - {xy: [[44, 117], [45, 117], [46, 117]], rgb: [57, 107, 148]}
+    - {xy: [[49, 121], [50, 121], [51, 121], [52, 121], [49, 122], [50, 122], [51, 122], [52, 122], [54, 122], [55, 122], [56, 122], [57, 122], [58, 122], [59, 122], [60, 122], [61, 122], [62, 122], [90, 122], [91, 122], [37, 120], [40, 120], [83, 120], [37, 119], [39, 119]], rgb: [6, 4, 10]}

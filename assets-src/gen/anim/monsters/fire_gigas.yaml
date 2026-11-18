@@ -134,3 +134,7 @@ paint:                         # pockets the leans close off between the arms / 
   - {frame: atk_mid, xy: [[66, 81], [67, 81], [67, 82], [68, 81], [68, 82], [68, 83], [69, 82], [69, 83], [70, 83]], rgb: [6, 4, 10]}
   - {frame: atk_mid, xy: [[65, 104], [65, 105], [65, 106], [66, 105], [70, 105], [70, 106], [70, 107], [70, 108], [71, 107]], rgb: [6, 4, 10]}
   - {frame: hurt_in1, xy: [[64, 98], [65, 98], [66, 98], [67, 98]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai

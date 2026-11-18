@@ -1,0 +1,151 @@
+sprite: ogre
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [73, 24]
+    neck: [72, 53]
+    chest: [62, 62]
+    hip: [62, 88]
+    sh_n: [82, 60]
+    el_n: [84, 76]
+    hand_n: [88, 90]
+    tip: [106, 100]
+    club_h: [76, 90]
+    sh_f: [42, 55]
+    el_f: [30, 72]
+    hand_f: [33, 90]
+    hip_n: [70, 92]
+    knee_n: [74, 103]
+    foot_n: [74, 114]
+    toe_n: [86, 120]
+    hip_f: [48, 92]
+    knee_f: [44, 103]
+    foot_f: [38, 114]
+    toe_f: [44, 120]
+  attack:
+    crown: [76, 36]
+    neck: [73, 60]
+    chest: [64, 70]
+    hip: [64, 92]
+    sh_n: [84, 62]
+    el_n: [86, 42]
+    hand_n: [74, 26]
+    tip: [24, 36]
+    sh_f: [52, 65]
+    el_f: [52, 45]
+    hand_f: [56, 30]
+    hip_n: [70, 96]
+    knee_n: [80, 104]
+    foot_n: [75, 115]
+    toe_n: [86, 121]
+    hip_f: [50, 96]
+    knee_f: [36, 104]
+    foot_f: [31, 114]
+    toe_f: [37, 121]
+  hurt:
+    crown: [22, 45]
+    neck: [48, 62]
+    chest: [50, 72]
+    hip: [58, 90]
+    sh_n: [58, 62]
+    el_n: [72, 55]
+    hand_n: [86, 47]
+    club_h: [70, 98]           # E9 / V.1: the dropped club lies behind the near leg (hurt_in2); only its handle shows
+                               # between the legs, the head ends that poked past the shin (a spiked shin guard) are erased
+    hip_n: [68, 95]
+    knee_n: [80, 105]
+    foot_n: [75, 115]
+    toe_n: [86, 121]
+    hip_f: [44, 95]
+    knee_f: [44, 108]
+    foot_f: [38, 115]
+    toe_f: [44, 121]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  club:
+    kind: prop
+    bone: {idle: [hand_n, tip], attack: [hand_n, tip], hurt: [hip, club_h]}
+    radius: 3.0
+    in: [idle, attack]
+    carry_to: club_h
+    carry_mode: behind
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # tweaks from /tmp/t3/pose.py: rigid rotations about the hip / shoulders / neck
+  atk_wind1:                   # lean back 4 about the hip, club arm swings 20 back
+    moves: []
+    tweaks: {crown: [-4, -1], neck: [-2, -1], chest: [-2, 0], sh_n: [-2, -1], el_n: [-6, -1], hand_n: [-11, -1], tip: [-14, 4], sh_f: [-2, 1], el_f: [-1, 2], hand_f: [0, 2]}
+  atk_wind2:                   # coil: lean back 9 (head 6), club arm hangs back along the side (E9: not across the belly), body 2 lower
+    moves: []
+    tweaks: {crown: [-9, -1], neck: [-6, -1], chest: [-4, 0], sh_n: [-5, -3], el_n: [-9, -4], hand_n: [-12, -3], tip: [-17, 2], sh_f: [-5, 4], el_f: [-2, 5], hand_f: [1, 5]}
+  atk_mid:                     # the attack pose leaned back 10 and 1 lower (arms rigid with the body: hands stay on the club)
+    moves: []
+    dy: 1
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-10, -1], neck: [-6, -1], chest: [-4, 0], sh_n: [-6, -3], el_n: [-9, -3], hand_n: [-12, -1], tip: [-9, 8], sh_f: [-5, 2], el_f: [-8, 3], hand_f: [-11, 2]}
+  atk_follow:                  # downswing starts: whole upper body 8 forward (t 0.80 = 20% toward idle)
+    t: 0.80
+    moves: []
+    tweaks: {crown: [8, 2], neck: [4, 2], chest: [3, 0], sh_n: [4, 3], el_n: [7, 4], hand_n: [9, 2], tip: [8, -5], sh_f: [4, -1], el_f: [7, -1], hand_f: [9, -1]}
+  atk_recover:                 # club arm translated 3 forward, 2 up (F3b 12f: recover->idle club step <= 10, no club turn)
+    moves: []
+    tweaks: {el_n: [2, -1], hand_n: [3, -2], tip: [3, -2]}
+  hurt_in1:                    # recoil 3 back, lean back 13, head back 28, club arm lifts
+    moves: []
+    tweaks: {crown: [-25, 2], neck: [-11, -1], chest: [-9, 1], hip: [-1, 0], sh_n: [-10, -3], el_n: [-5, -5], hand_n: [0, -7], tip: [2, -13], sh_f: [-10, 6], el_f: [-4, 9], hand_f: [2, 7]}
+  hurt_in2:                    # 2 forward, lean in 13, head 13 forward (crown 1 px up since the crack-fill fix: IoU), thrown arm 27 down; club dropped behind the near leg (club_h)
+    moves: []
+    tweaks: {crown: [19, -12], neck: [9, -1], chest: [6, -1], hip: [1, 0], sh_n: [8, 1], el_n: [10, 8], hand_n: [12, 15]}
+masks:
+  club:
+    idle: [[87, 86], [108, 84], [108, 112], [94, 112], [87, 100]]
+    attack: [[14, 24], [50, 24], [50, 40], [38, 44], [30, 50], [14, 50]]
+  ft_n:
+    idle: [[64, 114], [92, 114], [92, 123], [64, 123]]
+    attack: [[64, 115], [92, 115], [92, 123], [64, 123]]
+    hurt: [[64, 115], [92, 115], [92, 123], [64, 123]]
+  ft_f:
+    idle: [[26, 114], [52, 114], [52, 123], [26, 123]]
+    attack: [[22, 115], [46, 115], [46, 123], [22, 123]]
+    hurt: [[26, 116], [54, 116], [54, 123], [26, 123]]
+holds: []
+paint:                         # hurt_in1: the far arm / belly slit (open in idle) closed with the arm's dark brown
+  - {frame: hurt_in1, xy: [[36, 81], [36, 82], [36, 83], [37, 84], [38, 84], [37, 85], [36, 86], [37, 86], [37, 87], [38, 87], [37, 88], [38, 88], [37, 89]], rgb: [66, 41, 41]}
+  # hurt_in2 (E9): the leaned torso staircases the back edge where the shoulder fold meets it (y 62-65) and above the
+  # belt (y 79-81); the edge is evened out, the fold kept inside, the 1 px holes closed
+  - {frame: hurt_in2, xy: [[34, 62], [35, 62], [34, 63], [35, 63], [35, 64], [36, 64], [35, 65], [36, 65]], rgb: [181, 123, 90]}
+  - {frame: hurt_in2, xy: [[33, 63], [34, 64], [34, 65], [38, 80], [39, 81], [40, 88]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[39, 79], [39, 80], [40, 80], [40, 81], [41, 81]], rgb: [99, 57, 57]}
+  - {frame: hurt_in2, xy: [[37, 79], [37, 80], [38, 81]], rgb: null}
+  - {frame: hurt_in2, xy: [[87,103], [87,104], [88,104], [87,105], [88,105], [87,106], [86,107], [87,107], [86,108], [85,109], [86,109], [84,110], [85,110], [83,111], [84,111], [85,111], [82,112], [83,112], [84,112], [81,113], [82,113], [83,113], [81,114], [82,114], [83,114], [82,115], [75,122], [76,122], [77,122]], rgb: null}
+  # hurt_in2 (V.1): the broken shoulder-fold ink inside the shoulder blade repainted with the skin around it; the 1 px
+  # outline bump at the back of the shoulder evened out
+  - {frame: hurt_in2, xy: [[36, 63], [38, 63], [37, 64], [38, 64], [40, 64], [37, 65], [38, 65], [40, 65], [41, 65], [44, 65], [36, 66]], rgb: [181, 123, 90]}
+  - {frame: hurt_in2, xy: [[32, 61]], rgb: null}
+  - {frame: hurt_in2, xy: [[33, 61]], rgb: [6, 4, 10]}
+  # zero-nit pass: 1 px background holes enclosed by outline ink (hurt_in1 at the club hand / hip, hurt_in2 by the
+  # tusk / brow and in the armpit), closed with the outline
+  - {frame: hurt_in1, xy: [[77, 83], [79, 86]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[58, 39], [71, 70]], rgb: [6, 4, 10]}
+  # pass F daze_b: the 5 px pocket between the far forearm and thigh the 2 px slump closes off, outline ink
+  - {frame: daze_b, xy: [[42, 90], [41, 91], [42, 91], [41, 92], [42, 92]], rgb: [6, 4, 10]}
+  # 2026-11-15 review 2: 1 px pinholes in the ink between the far arm and the belly (both frames, daze_b 2 px lower)
+  # and, in daze_b, the pinholes the slump leaves in the ink above the far thigh; outline ink
+  - {frame: daze, xy: [[40, 81], [40, 82], [41, 90], [41, 91]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[40, 83], [40, 84], [41, 89], [37, 101], [38, 101], [36, 102], [35, 103]], rgb: [6, 4, 10]}
+  # pass K (K2-B): kneel frames: the pockets the slumped arms close against the belly filled with outline ink, 1 px cracks closed; pixels the breath pushes below the feet row cleared
+  - {frame: kneel_in1, xy: [[39, 89], [39, 91], [39, 92], [81, 108]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[35, 123], [36, 123]], rgb: null}
+  - {frame: kneel_in2, xy: [[80, 71], [77, 74], [38, 80], [36, 82], [37, 82], [38, 82], [36, 83], [37, 84], [36, 85], [35, 86], [36, 86], [35, 87], [35, 88], [36, 97], [63, 106], [66, 109]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[49, 123], [90, 123], [92, 123], [98, 123], [99, 123]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow), the club head planted on the ground (blade_planted); the far shin flat behind; shoulders slumped
+kneel:
+  variant: [blade_planted, knee_forward, short_legs, deep_bow]
+  tweaks: {foot_f: [4, 3], toe_f: [4, 2], sh_n: [0, 3], sh_f: [0, 3]}
+  paint:
+    - {xy: [[79, 78], [81, 78], [82, 78], [77, 79], [78, 79], [80, 79], [81, 79], [76, 80], [77, 80], [75, 81], [76, 81], [36, 83], [34, 84], [35, 84], [34, 85], [34, 86], [33, 87], [34, 87], [35, 87], [32, 88], [33, 88], [34, 88], [32, 89], [33, 89], [34, 89], [32, 90], [33, 90], [35, 97], [34, 98], [33, 99], [34, 99], [32, 100], [34, 100], [31, 102], [30, 103], [27, 105]], rgb: [6, 4, 10]}
