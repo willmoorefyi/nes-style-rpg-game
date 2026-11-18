@@ -121,10 +121,11 @@ describe('questMutate: the real world (npm run quest -- --mutate)', () => {
     expect(mutationLine(all)).toMatch(/^mutations: OK {2}\(/);
   });
 
-  it('GT-1: the act-1 bridge gate cells are S0\'s non-load-bearing entries; the stub regions\' rows are pending', () => {
+  it('GT-1: the act-1 bridge gate cells are S0\'s non-load-bearing entries; GT-12 (the canal) is caught now that EARTH is built', () => {
     expect(all.filter((m) => m.row === 'GT-1').map((m) => m.nonLoadBearing)).toEqual([
       'redundant with north_bridge; the gap is water without the flag', 'redundant with north_bridge; the gap is water without the flag']);
-    expect(all.find((m) => m.row === 'GT-12')?.nonLoadBearing).toMatch(/^pending: /);
+    // INT-W2c: every region is built, so no row is pending any more
+    expect(all.find((m) => m.row === 'GT-12')?.caught).toBe(true);
   });
 
   it('act 1\'s generic elements are caught: the King and the princess wait for Garland, the ship spawn needs its flag', () => {

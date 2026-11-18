@@ -4951,7 +4951,8 @@ already there on a11defa7 (piscodemon L6.5, astos L7.5, S7 L8.1, S10 L10.2), hid
 every later stage assumed. With S4 built they are checked for the first time. No `grind` in [1, 3] reaches the bands
 (at 3.0: piscodemon L6.8, astos L7.9, S10 L9.9). The rulings:
 - "Allow more grinding": the grind maximum is 7.0 for every stage (`schemaValidationQuest.ts`, `GRIND_RANGE`, the RED
-  test now uses 8). The grinds set: S2 7.0, S5 7.0, S6 7.0, S7 4.0, S8 4.0, S10 4.0. S4 stays at 2.0 and S9 at 1.0:
+  test now uses 8). The grinds set then (superseded in the last round below, on the exploring curve): S2 7.0, S5 7.0,
+  S6 7.0, S7 4.0, S8 4.0, S10 4.0. S4 stays at 2.0 and S9 at 1.0:
   the curve charges no walk to either. Enemy rewards, encounter rates and bands are unchanged. Measured: pirate L4.2
   [3,6], S4 L8.6 [5,9], piscodemon L8.6 [8,11], astos L10.2 [10,13], S7 L10.9, S8 and S9 L11.2 [10,13], S10 L11.6
   [11,14]. Astos is the tightest at 0.15 above the floor, and that is the most the cap allows: with S2 and S5-S10 all
@@ -4993,22 +4994,49 @@ not change these counts: they are the same with and without it. Two changes:
 - The `ert_d_walk` test "S11 ... only with CANAL_OPEN" also fails on bff131df. Its closure re-opened ELF-T's TNT chest
   and bought the canal again. The test now starts with CHEST_ELF_T_TNT set, as `ert_o_walk` does.
 - `--stage S15` needs 637968 states and S20 578304, both under MAX_STATES 1,000,000.
-- **BLOCKED, (d) bands S11-S22.** With S11 and S13 built, these stages are no longer assumed, and they fail as S5-S10
-  did: vampire L12.0 [13,16], S12 L12.3, lich L13.0, S14 L13.7, ashen_queen L15.0 [21,24], evil_eye L16.3, S17 L16.9,
-  S20 and S22 L17.3 [25,28]. Even with every grind from S11 to S22 at 7.0 they still fail: vampire L12.9, S12 L13.7,
-  lich L15.5, S14 L16.8, ashen_queen L19.7, S20 and S22 L23.5. The 7.0 cap does not reach these bands, so this needs a
-  new ruling: a higher cap (about 12 or more), more xp in those zones, or lower bands.
-- **BLOCKED, mutations (ERT-D's, also on bff131df without this tranche):** `UNCAUGHT GT-13 ... cut W_isthmus opened`
-  and `UNCAUGHT G melmond patch ert_melmond_bloom forced on`. Both fail `questMutate.test.ts` too. They are for ERT-D
-  or the integrator; they are not caused by INT-W2c.
+- (d) bands S11-S22 and the two mutation rows: see the next section.
 
-**Follow-up (`--stage` scope):** in `--stage` mode, fire only the events of the stage and its ancestors. The full run
-already covers the parallel stages. That would keep S15 and S20 (about 600k states now) well under the cap as more
-regions are built.
+**The last round: the XP comparison and every region built (`mainline` 51102ccd, all region tranches merged).**
+- **The XP comparison** (the user's direction): `/tmp/int-w2c/xp_compare.md` has every S2-S30 roster enemy, every
+  encounter zone and the level table. The level table equals FF1's (L2-L30; L31-L50 may be off by one). About 110
+  roster records copy FF1's xp and gold exactly. Seven pre-pass-W records are materially lower: ogre 120 against FF1's
+  195, troll 100 / 621, mummy 80 / 300, cockatrice 90 / 276, the red dragon 500 / 2904, vampire 400 / 1200 and lich
+  2000 / 2200. They bring the Earth Cave tables down to 34-67 % of FF1's. About 18 records are marked `?`: I am not
+  sure of their FF1 value, or they are original stand-ins.
+- **The decision: both, the model mostly.** The seven records now carry FF1's xp and gold (`enemies.yaml`). Enemy
+  rewards are not used in battle, and the boss balance tests do not change. With those values the S11-S22 curve rose
+  by only 0.2-0.4 levels. So the data is not the cause: our encounter xp is FF1's, and so are the bands, and the model
+  undercounted play. The curve model now explores each map that is not the world map once, the first time the walk
+  enters it: one pass over every walkable cell of its walking encounter zones, at its own rate (`1 / mean steps` a
+  cell), not multiplied by `grind`, charged to the event's stage (`explorationRewards`, the new module
+  `questExplore.ts`). The rushing curve of (f) neither grinds nor explores.
+- **Grinds (all <= 7.0), retuned on the exploring curve:** S2 2.5, S6 4.0, S10 6.0, S11 7.0, S12 7.0, S13 4.0, S14 6.0,
+  S15 3.0, S20 7.0, S22 7.0; every other stage keeps its value from before the ruling (S5 2.0, S7 / S8 / S9 1.0, ...).
+  Every (d) row passes: garland L2.7, pirate L3.6, piscodemon L8.6, astos L10.6, S10 L11.5, vampire L14.5, S12 L15.2
+  [15,17] (the tightest from below), lich L17.2, ashen_queen L22.0, evil_eye L24.6 [21,24] and S17 L24.9 [22,25] (the
+  tightest from above), S20 / S22 L25.5, dragon_zombie L26.6, drowned_sovereign L28.8, hollow_seraph L34.2 [31,34],
+  S29 L34.3, lich_2 L35.7. The price walls are crescent 13082/60240 and gaia 87748/259240.
+- **GT-13 (W_isthmus):** the composer's water cut ran along row 103 through the dwarf hall's door (55, 103). In
+  `world_checks.cuts` a wall's cut now avoids every site transition and arrival cell. The cut is now row 105, and GT-13
+  is caught. `world.py` and `build_map.py overworld` were rerun, and only the `cuts` block of the overworld source and
+  of the compiled map changed.
+- **G melmond `ert_melmond_bloom`:** it was excused as pending until S13 was built. The bloom only turns dirt fields
+  to grass (walkable either way), so S25 (ERT-T, Melmond's maps) now has a `nonLoadBearing` entry with that reason.
+- **`--stage` scope (the follow-up, done):** with every region built, `--stage S15` passed 1,000,000 states. In
+  `--stage` mode the exact search no longer fires events owned by a stage that is neither the stage under test nor
+  one of its ancestors (`outOfScopeEvents`: by the event's stage, a stage grant it gives, or its map; an event with no
+  owner still fires). Those orderings belong to the full run. S15 drops from >1M to 2800 states, S20 to 12128, S28 to
+  106880; S30 (whose ancestors are nearly everything) needs 487872, under the cap.
+- **Tests brought up to date with the merged world:** `wat_d_shrine` asserts the full (c) for S24 again (WAT-D had
+  narrowed it). `questGraph`: S31 is now reachable (WND-D2 grants the adamant) and pending. `questMutate`: GT-12 is
+  caught, no longer pending. `questLate`: (e) prints no `pending` part once all 8 towns are built. `wnd_d1_walk` and
+  `wnd_d2_walk`: their closures re-ran S28's own events (built now) and S27's console. They now disable the
+  out-of-scope events and the grant they withhold. `questCurve.ts` is back under 250 lines (`questExplore.ts`).
+- Not done (optional): WND-D2's suggested reason text for WND-D1's ring `pending:` entries. The verifier no longer
+  needs them.
+- **PLAY/INT follow-up:** the user's planned "cheats" menu (an XP and gold boost, as in the remasters).
 
-Gates on `int-w2c` (f6b3c1e2 plus this commit): `npm run quest -- --mutate`: (a)-(c) and (e)-(h) OK; (d) FAIL on the 9
-S11-S22 lines; mutations FAIL on the 2 ERT-D rows. `tests/progression` and `tests/quest`: 3 failures, all in
-`questLate` (d) and `questMutate` (the 2 rows). Every stage walk passes. `npm run build`: exit 0.
+Gates on `int-w2c` (`mainline` 51102ccd merged): see the commit message of the final INT-W2c commit.
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->

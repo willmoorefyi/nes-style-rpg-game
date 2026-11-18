@@ -14,20 +14,21 @@
  * and the gold from then on is marked assumed (the gold rules skip it; `--strict` fails pending stages anyway).
  */
 import { levelForXp, xpToReach } from '../entities/ExperienceTable.js';
-import type { EncounterEntry, EncounterRate, FieldMode, MapData, QuestStage } from '../types/index.js';
+import type { FieldMode, QuestStage } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
 import { globMatch, stageOrder } from './questData.js';
-import { baseTerrain, terrainAllows } from '../systems/fieldRules.js';
 import { stageOfMap, townKeepers } from './questCatalog.js';
 import type { QuestEventSpec } from './questEvents.js';
 import { stageMark } from './questStates.js';
 import { Saturator } from './questSaturate.js';
 import { route } from './questRoute.js';
 import type { QuestContext } from './questProofs.js';
-import { lateOf, type LateData } from './questLateData.js';
+import { lateOf } from './questLateData.js';
+import { encounterAt, explorationRewards, tableRewards } from './questExplore.js';
+
+export { encounterAt, explorationRewards, tableRewards };
 
 export const MODE_RATE: Readonly<Record<FieldMode, number>> = { walking: 1, canoe: 0.5, ship: 1, airship: 0 };
-const DEFAULT_RATE: EncounterRate = { min: 20, max: 30 };
 
 export interface StagePoint {
   stage: string;
@@ -52,60 +53,6 @@ export interface CurveResult {
   fights: number;
   gold: number;
   xp: number;
-}
-
-/** Expected xp and gold of one fight from a table. */
-export function tableRewards(data: LateData, table: readonly EncounterEntry[]): { xp: number; gold: number } {
-  let w = 0;
-  let xp = 0;
-  let gold = 0;
-  for (const e of table) {
-    let ex = 0;
-    let eg = 0;
-    const add = (id: string, n: number): void => {
-      const r = data.enemies.get(id);
-      ex += n * (r?.xp ?? 0);
-      eg += n * (r?.gold ?? 0);
-    };
-    if (e.groups) for (const g of e.groups) add(g.id, (g.min + (g.max ?? g.min)) / 2);
-    else for (const id of e.enemies ?? []) add(id, 1);
-    w += e.weight;
-    xp += e.weight * ex;
-    gold += e.weight * eg;
-  }
-  return w > 0 ? { xp: xp / w, gold: gold / w } : { xp: 0, gold: 0 };
-}
-
-/** The table and rate in force on a cell in a mode (the first zone whose rects hold it and whose modes allow it). */
-export function encounterAt(map: MapData, x: number, y: number, mode: FieldMode):
-  { table: readonly EncounterEntry[]; rate: EncounterRate } | null {
-  for (const z of map.encounterZones ?? []) {
-    if (!z.rects.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1)) continue;
-    if (!(z.modes ?? ['walking', 'canoe']).includes(mode)) continue;
-    return z.encounters.length ? { table: z.encounters, rate: z.encounterRate ?? map.encounterRate ?? DEFAULT_RATE } : null;
-  }
-  if (mode !== 'walking' && mode !== 'canoe') return null;
-  return map.encounters?.length ? { table: map.encounters, rate: map.encounterRate ?? DEFAULT_RATE } : null;
-}
-
-/** One exploration of a map: a pass over every walkable cell with a walking encounter table (see the header). */
-export function explorationRewards(data: LateData, map: MapData): { fights: number; xp: number; gold: number } {
-  let fights = 0;
-  let xp = 0;
-  let gold = 0;
-  for (let y = 0; y < map.height; y++) {
-    for (let x = 0; x < map.width; x++) {
-      if (!terrainAllows('walking', baseTerrain(map, x, y))) continue;
-      const enc = encounterAt(map, x, y, 'walking');
-      if (!enc) continue;
-      const per = 1 / ((enc.rate.min + enc.rate.max) / 2);
-      const r = tableRewards(data, enc.table);
-      fights += per;
-      xp += per * r.xp;
-      gold += per * r.gold;
-    }
-  }
-  return { fights, xp, gold };
 }
 
 /** Fractional level for a member's xp (L2.9 = level 2, 90 % of the way to 3). */

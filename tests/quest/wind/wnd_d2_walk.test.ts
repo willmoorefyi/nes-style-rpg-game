@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import { loadQuestWorld } from '../../../src/progression/questData.js';
 import { closure, createQuestContext } from '../../../src/progression/questProofs.js';
 import { runCoreProofs } from '../../../src/progression/questReport.js';
+import { eventsGranting, saturate } from '../../../src/progression/questSaturate.js';
 
 const world = loadQuestWorld({ root: process.cwd() });
 
@@ -33,7 +34,8 @@ describe('WND-D2: the S28 walk', () => {
     expect(sat.items.has('adamant')).toBe(true);
     const flags = new Set([...ctx.start.flags].filter((f) => f !== 'SKY_FORTRESS_OPEN'));
     const bare = createQuestContext(world, { stage: 'S28' });
-    const shut = closure({ ...bare, start: { ...bare.start, flags } });
+    // S27's console (cube and chime still held) would raise the fortress again: its grant stays withheld (INT-W2c)
+    const shut = saturate(bare, { ...bare.start, flags }, { disabled: eventsGranting(bare, { flags: ['SKY_FORTRESS_OPEN'] }) });
     expect(shut.view(bare.start.place).flags.has('WIND_CRYSTAL_LIT')).toBe(false);
   });
 });

@@ -232,10 +232,10 @@ describe('questGraph: the repository (npm run quest)', () => {
       'cornelia-castle-2f:gift:princess']);
   });
 
-  it('S31 waits for its adamant, which no stage grants yet (an error under --strict)', () => {
-    expect(proofs[0].line).toContain('S31 waits for adamant');
+  it('S31 is reachable now that the sky castle grants the adamant (WND-D2); it is still pending, an error under --strict', () => {
+    expect(proofs[0].line).not.toContain('S31 waits for adamant');
+    expect(proofs[0].line).toMatch(/optional: S31 /);
     const strict = proofOrder(createQuestContext(ctx.world, { strict: true }));
-    expect(strict.failures.map((f) => f.code)).toContain('OPTIONAL');
     const pending = ctx.world.quest.stages.filter((s) => s.status === 'pending').length;
     expect(strict.failures.filter((f) => f.code === 'PENDING')).toHaveLength(pending);
   });
