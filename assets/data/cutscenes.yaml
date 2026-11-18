@@ -568,6 +568,23 @@
 # === WAT-T (pass W: owned by WAT-T) ===
 # === end WAT-T ===
 # === WAT-D (pass W: owned by WAT-D) ===
+# S24 (docs/WORLD_PLAN.md 4.6): the Drowned Sovereign falls on sea-shrine-b5 (his scripted encounter's
+# postVictoryCutscene); the water crystal in its socket behind the throne is lit, and the sky folk's tablet he wore
+# (the slab, for Dr. Unne in Melmond, S25) is the party's.
+- id: wat_drowned_falls
+  steps:
+    - type: dialog
+      text: "The king folds down onto the steps of his throne. The current in his robes slows, and stops."
+    - type: dialog
+      text: "\"I only wanted them to be safe,\" he says, to no one you can see. Then there is only water where he sat."
+    - type: set_flag
+      flag: WATER_CRYSTAL_LIT
+    - type: dialog
+      text: "Behind the throne the dark crystal takes the light, and burns a clear sea-blue. Far above, the tide turns."
+    - type: give_item
+      item: slab
+    - type: dialog
+      text: "The grey tablet lies on the steps, cut with rows of marks no one here can read. Someone on the land might."
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
 # S26 (docs/WORLD_PLAN.md 4.7): Lufenia's elder hands over the chime once the party can read Lufenian (his NPC's

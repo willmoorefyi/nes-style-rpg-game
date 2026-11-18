@@ -572,10 +572,17 @@ stages:
     maps: [sea-shrine-*]
     zones: []
     grind: 2.0
-    walk: []
+    # at Onrac's gate with the airship landed beside it (as S20 leaves it): into the town, through the dry dock's
+    # oxyale gate (WAT-T's submarine) to the nave's pier on sea-shrine-b3, down the east stairwell to B4, the halls'
+    # stair to B5, and the throne. Withholding the oxyale shuts the gate (proof (b))
+    entry: {map: overworld, x: 28, y: 39, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
+    walk: [overworld:warp:onrac, onrac:warp:sea-shrine-b3, sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5,
+      sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the king's hideIf only clears the beaten boss off the throne steps; the fight is once by its flag
+      - {map: sea-shrine-b5, kind: npc, at: [15, 7], reason: "hideIf only clears the beaten king off the throne steps; the fight is once by its flag WATER_CRYSTAL_LIT"}
+    status: built
   # === end WAT-D ===
   # === WND-O (pass W: owned by WND-O) ===
   - id: S26
