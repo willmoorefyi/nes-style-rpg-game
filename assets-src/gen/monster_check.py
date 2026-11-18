@@ -69,6 +69,8 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     T = gen[f["toward"]]["img"] if f["toward"] in gen else arrs[f["toward"]]
     cell_h = a.shape[0]
     a0 = AF.unshift(a, f.get("shift"))                    # rooted translate: holes and feet judged as if unmoved
+    if f.get("bridge"):                                   # pass KT D-KT4: a bridge frame lies between two drawings
+        return KC.bridge_frame(name, a, S, T, f["u"], cell_h, allowed)
     out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + \
         C.new_holes(a0, S, 4, AF.unshift(f["labels"], f.get("shift")))
     if f["labels"] is not None:

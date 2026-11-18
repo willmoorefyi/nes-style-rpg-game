@@ -47,6 +47,10 @@ def block(cfg: dict) -> dict:
         raise ValueError(f"rig {cfg.get('sprite')}: unknown kneel keys {bad} ({', '.join(BLOCK_KEYS)})")
     if b.get("prop_cap") is not None and not 0 < float(b["prop_cap"]) <= PROP_CAP_MAX:
         raise ValueError(f"rig {cfg.get('sprite')}: kneel prop_cap {b['prop_cap']!r} is not in (0, {PROP_CAP_MAX:g}]")
+    if b.get("source", "derived") not in ("derived", "ai"):
+        raise ValueError(f"rig {cfg.get('sprite')}: kneel source {b['source']!r} is not derived or ai")
+    if b.get("source") == "ai" and set(b) - set(AI_KEYS):
+        raise ValueError(f"rig {cfg.get('sprite')}: kneel source ai refuses {sorted(set(b) - set(AI_KEYS))}")
     if b.get("sampler", "nearest") not in ("nearest", "rotsprite"):
         raise ValueError(f"rig {cfg.get('sprite')}: kneel sampler {b['sampler']!r} is not nearest or rotsprite")
     return b
@@ -56,7 +60,10 @@ def block(cfg: dict) -> dict:
 # `sampler` (K1 addition): one sampler for every part of the kneel key instead of the D-K19 rotsprite-above-30 rule
 # (the wolf's folded legs double their outlines under rotsprite: second ring 0.30 against the idle's 0.21)
 BLOCK_KEYS = ("tweaks", "paint", "sink", "variant", "sampler", "pins", "aim", "samplers", "turn", "z", "erase",
-              "glow", "prop_cap")
+              "glow", "prop_cap", "source", "bridge", "offset")
+# pass KT (docs/KNEEL_TWEEN_PLAN.md D-KT1): `source: ai` takes the approved AI key (approved/<id>/kneel.png) as the
+# kneel key and makes kneel_in1 / kneel_in2 / kneel_b with kneel_bridge.py; only these keys go with it
+AI_KEYS = ("source", "sink", "paint", "bridge", "offset")   # offset: [dx, dy] whole px on the approved key (FW-O)
 PROP_CAP_MAX = 60.0              # K2-0b: a block's `prop_cap` (kneel frames only) never goes past this
 
 
@@ -143,11 +150,24 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
     return {"img": img, "labels": labels, "joints": J, "rots": rots, "lift": lift}
 
 
+def is_ai(cfg: dict | None) -> bool:
+    return opted(cfg) and block(cfg).get("source") == "ai"
+
+
+def ai_key(sid: str, cfg: dict, kfs: dict[str, Image.Image]) -> np.ndarray:
+    """D-KT1: the approved AI kneel key (kneel_source_ai.ai_key)."""
+    from gen import kneel_source_ai as KS
+    return KS.ai_key(sid, cfg, kfs)
+
+
 def add_key(sid: str, cfg: dict | None, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict, dict]:
     """load_entries hook: an opted rig's sheet gains the `kneel` key (meta kf_derived kneel: idle, meta kneel = the
-    derivation); any other sheet comes back unchanged (the same objects)."""
+    derivation; `source: ai`: the approved AI key, kf_derived kneel: ai); any other sheet comes back unchanged."""
     if not opted(cfg):
         return meta, kfs
+    if is_ai(cfg):
+        return {**meta, "kf_derived": {**meta.get("kf_derived", {}), "kneel": "ai"}, "kneel": {"source": "ai"}}, \
+            {**kfs, "kneel": Image.fromarray(ai_key(sid, cfg, kfs), "RGBA")}
     d = derive(sid, cfg, kfs, meta)
     return {**meta, "kf_derived": {**meta.get("kf_derived", {}), "kneel": "idle"}, "kneel": d}, \
         {**kfs, "kneel": Image.fromarray(d["img"], "RGBA")}
@@ -201,6 +221,8 @@ def prepare(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> tup
     """generate hook: (cfg, keys, {kneel: (labels, part names)}); unchanged objects and {} for a rig without the block."""
     if not opted(cfg):
         return cfg, kfs, {}
+    if is_ai(cfg):                                   # D-KT1: no kneel rig keyframe; bridge_frames makes the frames
+        return cfg, kfs if "kneel" in kfs else add_key(sid, cfg, meta, kfs)[1], {}
     from gen import rig as R
     if "kneel" not in kfs or "kneel" not in meta:
         meta, kfs = add_key(sid, cfg, {k: v for k, v in meta.items() if k != "kneel"}, kfs)
@@ -222,9 +244,19 @@ def prepare(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> tup
     return c, kfs, {"kneel": (lab, names)}
 
 
-def skip(kfs: dict) -> set[str]:
-    """The kneel names generate leaves out: `kneel` itself (a key), and all four for a sheet without the kneel key."""
-    return {"kneel"} if "kneel" in kfs else set(KNEEL_FRAMES)
+def skip(kfs: dict, cfg: dict | None = None) -> set[str]:
+    """The kneel names generate's rig loop leaves out: `kneel` itself (a key), all four for a sheet without the kneel
+    key, and all four for `source: ai` (bridge_frames makes them)."""
+    return set(KNEEL_FRAMES) if "kneel" not in kfs or is_ai(cfg) else {"kneel"}
+
+
+def bridge_frames(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict, floating: bool) -> dict[str, dict]:
+    """D-KT2: generate's entries for kneel_in1 / kneel_in2 / kneel_b of a `source: ai` rig ({} otherwise): one-source
+    frames (no labels, joints or rotations), with the recipe's src / toward / u for the plain checks."""
+    if not is_ai(cfg) or "kneel" not in kfs:
+        return {}
+    from gen import kneel_source_ai as KS
+    return KS.bridge_frames(sid, cfg, kfs, meta, floating)
 
 
 def sink_px(cfg: dict, cell_h: int) -> int:

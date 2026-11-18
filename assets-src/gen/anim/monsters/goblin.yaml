@@ -98,10 +98,6 @@ frames:
     tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 1], hand_n: [-1, 6]}
   daze_b:                      # the sway's low point: the torso 1 px lower (recipe dy), the head kept at daze height
     tweaks: {crown: [0, 1], el_n: [0, 1], hand_n: [-1, 6]}
-  kneel_in1:                   # pass K: the trailing far boot 1 px higher, on the feet row (K-ground / K-fit)
-    tweaks: {foot_f: [0, -1], toe_f: [0, -1]}
-  kneel_in2:
-    tweaks: {foot_f: [0, -1], toe_f: [0, -1]}
 z:
   idle: [uarm_f, farm_f, thigh_f, shin_f, uarm_n, farm_n, torso, thigh_n, shin_n, head, dagger, ft_n, ft_f]
 masks:
@@ -126,14 +122,8 @@ paint:                       # 1 px joint cracks (skirt / near thigh, near elbow
   - {frame: daze, xy: [[69, 45]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[70, 46]], rgb: null}
   - {frame: daze_b, xy: [[69, 46]], rgb: [6, 4, 10]}
-  # pass K: the pocket the far arm closed against the vest (kneel_in1) and the near-arm and hip cracks (kneel_in2),
   # closed with outline ink; the breath's 1 px drop pushed two skirt tips below the feet row (kneel_b): cleared
-  - {frame: kneel_in1, xy: [[25, 50], [26, 50], [27, 50], [26, 51]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[54, 44], [51, 59]], rgb: [6, 4, 10]}
-  - {frame: kneel_b, xy: [[36, 77], [38, 77]], rgb: null}
-# pass K (docs/KNEEL_PLAN.md, K1 pilot): the derived kneel key from the biped template (far knee down behind, near
-# foot planted, torso low, head bowed, fists lowered); short legs: the 0.8 L_thigh drop stays above the 0.85 band
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
 kneel:
-  variant: short_legs
-  paint:                       # the 1 px crack between the trailing shin and boot, closed with outline ink
-    - {xy: [[19, 73]], rgb: [6, 4, 10]}
+  source: ai

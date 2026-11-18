@@ -82,6 +82,27 @@ describe('the kneel_pilot scenario (section 8)', () => {
   });
 });
 
+describe('the kt_pilot scenarios (docs/KNEEL_TWEEN_PLAN.md 8)', () => {
+  const scenarios = parse(readFileSync('assets/data/debug-scenarios.yaml', 'utf-8')) as DebugScenario[];
+  const classes = parse(readFileSync('assets/data/classes.yaml', 'utf-8')) as CharacterClassData[];
+  const cases: [string, string[], Record<number, string[]>][] = [
+    ['kt_pilot', ['goblin', 'wolf', 'green_slime', 'cobra'], { 0: ['poison'], 1: ['sleep'], 2: ['stun'], 3: ['poison'] }],
+    ['kt_pilot_big', ['blue_dragon', 'garland'], { 0: ['sleep'], 1: ['poison'] }],
+  ];
+  it.each(cases)('%s: every pilot enemy kneels from a status, the formation fits, WAR weak, WHM poisoned', (id, enemies, st) => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const s = scenarios.find((x) => x.id === id)!;
+    expect(s.enemies).toEqual(enemies);
+    expect(enemyStatusOf(s)).toEqual(st);
+    expect(error).not.toHaveBeenCalled();
+    expect(formationFits(s.enemies.map(layoutInput))).toBe(true);
+    const war = new Character({ name: 'WAR', classData: classes.find((c) => c.id === 'warrior')!, level: s.party[0].level });
+    expect(isWeak(s.party[0].hp!, war.maxHp)).toBe(true);
+    expect(s.party[1].status).toEqual(['poison']);
+    expect(s.party.flatMap((m) => m.status ?? []).every(isStatus)).toBe(true);
+  });
+});
+
 describe('the bestiary daze step (D-K15)', () => {
   it('hasKneel is texture identity: own kneel frames when kneel !== daze', () => {
     const daze = new Texture();

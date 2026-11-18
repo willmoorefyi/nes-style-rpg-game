@@ -333,10 +333,14 @@ def run_kf_paint(check: Callable[[bool, str], None]) -> None:
     check(all(np.array_equal(np.asarray(pkfs[k]), np.asarray(kfs[k])) for k in kfs if k not in ("idle", "kneel")),
           "FW-P: the other keys are the approved ones (pass K: the kneel key is derived from idle)")
     base, gen = MA.generate("goblin", cfg, kfs, meta), MA.generate("goblin", painted_cfg, pkfs, pmeta)
-    from_idle = [n for n in gen if gen[n]["src"] in ("idle", "kneel")]   # pass K: the kneel key is cut from idle
+    from gen import kneel as KN
+    ai = KN.is_ai(cfg)                    # pass K: a derived kneel key is cut from idle; pass KT: an AI key is not
+    from_idle = [n for n in gen if gen[n]["src"] == "idle" and not gen[n].get("bridge") or
+                 gen[n]["src"] == "kneel" and not ai]
+    bridged = [n for n in gen if gen[n].get("bridge") and gen[n]["src"] == "idle"]   # KT: a seam may drop the pixel
     check(bool(from_idle) and all(not np.array_equal(gen[n]["img"], base[n]["img"]) for n in from_idle),
           f"FW-P: every frame cut from the painted key changes ({len(from_idle)} frames)")
-    check(all(np.array_equal(gen[n]["img"], base[n]["img"]) for n in gen if n not in from_idle),
+    check(all(np.array_equal(gen[n]["img"], base[n]["img"]) for n in gen if n not in from_idle + bridged),
           "FW-P: every frame cut from another key is byte-identical")
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):

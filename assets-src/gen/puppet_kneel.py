@@ -44,8 +44,18 @@ def bottom_row(cid: str) -> int:
     return int(json.loads((PU.APPROVED / cid / "battle.json").read_text())["bottom_row"])
 
 
-def make(cfg: dict, frames: dict, bottom: int) -> dict:
-    """{name: (image, rotations relative to the pixel source, source)} for the four kneel frames (variant A)."""
+def is_ai(cfg: dict) -> bool:
+    return isinstance(cfg.get("kneel"), dict) and cfg["kneel"].get("source") == "ai"
+
+
+def make(cfg: dict, frames: dict, bottom: int, cid: str | None = None) -> dict:
+    """{name: (image, rotations relative to the pixel source, source)} for the four kneel frames (variant A, or the
+    AI key and its bridge when the block says `source: ai`)."""
+    if is_ai(cfg):
+        if not cid:
+            raise ValueError("kneel source ai needs the class id")
+        from gen.kneel_source_ai import hero_frames   # pass KT D-KT1 / D-KT2
+        return hero_frames(cid, cfg, frames, bottom)
     front = (cfg.get("front_far_arm") or {}).get("ready", True)
     return KR.variant_a(frames, cfg["battle"]["ready"], cfg.get("kneel") or {}, bool(cfg.get("robed")),
                         PU.Z_FRONT_ARM if front else PU.Z_BACK_ARM, bottom)
@@ -56,7 +66,7 @@ def kneel_frames(cid: str) -> dict[str, Image.Image]:
     cfg = PU.load_cfg(cid)
     if not cfg or not cfg.get("kneel") or "battle" not in cfg:
         return {}
-    made = make(cfg, PU.battle_sheet_frames(cid), bottom_row(cid))
+    made = make(cfg, PU.battle_sheet_frames(cid), bottom_row(cid), cid)
     return {n: made[n][0] for n in KNEEL_POSES}
 
 
@@ -97,7 +107,8 @@ def rot_check(name: str, rots: dict) -> list[str]:
     return [f"{name}: K-rot {', '.join(bad)}"] if bad else []
 
 
-def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, palette: set) -> list[str]:
+def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, palette: set,
+                 ring_ref: Image.Image | None = None) -> list[str]:
     """K-ground, K-fit, binary alpha, palette, magenta, pieces <= 2, ring within 0.08 of ready. The bottom-2-rows
     contact rule applies to the held frames (kneel, kneel_b); the 4-frame transitions only touch the ground row."""
     from gen.pixelize import components
@@ -122,7 +133,7 @@ def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, p
     n = components(solid)[1]
     if n > 2:
         out.append(f"{name}: {n} pieces > 2")
-    ring, ring_r = PU._second_ring(img), PU._second_ring(ready)
+    ring, ring_r = PU._second_ring(img), PU._second_ring(ring_ref or ready)   # KT: a key-drawn frame vs the key
     if abs(ring - ring_r) > 0.08:
         out.append(f"{name}: ring {ring:.2f} not within 0.08 of ready {ring_r:.2f}")
     return out
@@ -148,7 +159,7 @@ def old_columns(cid: str) -> list[str]:
 
 def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str | None = None):
     """(failures, info, made); info has the heights, the ratio and the band."""
-    made = make(cfg, frames, bottom)
+    made = make(cfg, frames, bottom, cid)
     (lo, hi), fails = band_of(cid, cfg, frames, plan_text)
     palette = {tuple(int(v) for v in c) for f in frames.values()
                for c in np.asarray(f)[np.asarray(f)[..., 3] > 0][:, :3]}
@@ -156,9 +167,10 @@ def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str 
     hr, hk = height(frames["ready"]), height(made["kneel"][0])
     for n in KNEEL_POSES:
         img, rots, _ = made[n]
-        fails += frame_checks(n, img, frames["ready"], bottom, palette) + rot_check(n, rots)
+        ref = made["kneel"][0] if is_ai(cfg) and n != "kneel_in1" else None          # D-KT4: drawn from the key
+        fails += frame_checks(n, img, frames["ready"], bottom, palette, ref) + rot_check(n, rots)
         h = height(img)
-        if n in HELD and not lo <= h <= hi:
+        if n in HELD and not lo <= h <= hi and not is_ai(cfg):   # D-KT4: an AI key's band is reported only
             fails.append(f"{n}: K-height {h} outside the band {lo}-{hi}")
         if n not in HELD and not min(hr, hk) - 1 <= h <= max(hr, hk) + 1:
             fails.append(f"{n}: K-height {h} not between kneel {hk} and ready {hr}")

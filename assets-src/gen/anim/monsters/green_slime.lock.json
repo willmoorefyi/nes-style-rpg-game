@@ -8,5 +8,9 @@
   "daze_b": "402ab92291ebd5025081fcd81b73cd494fe1dc86baa66fd2a4e05ad8b9c26614",
   "hurt_in1": "6c1cda814260f56d1afc6c83374f7be4edf09818ac84a6003dd1dce0d34f0a25",
   "hurt_in2": "12d0c49b96d70aae929fd284802707b71ac71c9018ed0a7a091dcd2c1c91fb71",
-  "idle_b": "fdef3f647ca1f9ef2d1d883f22787e4fbf3e6e85a2c9521499b830eccf2f39b6"
+  "idle_b": "fdef3f647ca1f9ef2d1d883f22787e4fbf3e6e85a2c9521499b830eccf2f39b6",
+  "kf:kneel": "58b1e297e0ff0dd9c2c3731c5e0b5f9e964aee3bff6f61f1d0d3082506925c59",
+  "kneel_b": "e0a69ffe84ecac1712c54bf06a44c2999e7c78f7e12b201cdd5147c31c83a64a",
+  "kneel_in1": "36edd09f5fc6ce2c9aaffa0f9a66cc46a0b8dbf3e50fdcb4a191c689e2c4814d",
+  "kneel_in2": "2f48984e2f3d18fb3e5831ff225d0bb1ff0335d821648ebe083ec0dabdea360a"
 }

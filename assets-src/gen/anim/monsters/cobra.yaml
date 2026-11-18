@@ -23,3 +23,7 @@ frames:
   atk_wind1: {dy: 0, tweaks: {body1: [-1, 0], neck: [-1, 0], head: [-2, 1], snout: [-2, 1]}}   # visible draw-back (E12)
   atk_wind2: {t: -0.25, dy: 0, tweaks: {body1: [-2, 1], neck: [-3, 1], head: [-4, 2], snout: [-4, 2]}}  # the head draws back and down; the shared t -0.35 / dy 2 shrank the figure 6 px under the lerp
   atk_mid: {t: 0.20, moves: [neck, head, snout], tweaks: {neck: [0, 2], head: [0, 4], snout: [0, 4]}}           # the attack arch swings 26 deg at 0.35 (chain cap 25) and lifts the head out of the cell
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+kneel:
+  source: ai

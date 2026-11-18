@@ -65,6 +65,8 @@ def make_fixture(gen: Path) -> None:
         shutil.copy2(p, gen / "approved" / "foo" / p.name)
         meta = json.loads(p.with_suffix(".json").read_text())
         (gen / "approved" / "foo" / f"{p.stem}.json").write_text(json.dumps({**meta, "character": "foo"}, indent=2) + "\n")
+    if (src / "kneel.png").exists():      # pass KT: the seed rig's `kneel: {source: ai}` reads approved/<id>/kneel.png
+        shutil.copy2(src / "kneel.png", gen / "approved" / "foo" / "kneel.png")
     rig = (HERE / "anim" / "monsters" / f"{SEED}.yaml").read_text()
     (gen / "anim" / "monsters" / "foo.yaml").write_text(re.sub(r"^sprite: \S+$", "sprite: foo", rig, count=1, flags=re.M))
     shutil.copy2(HERE / "anim" / "monsters" / f"{SEED}.lock.json", gen / "anim" / "monsters" / "foo.lock.json")
@@ -365,7 +367,9 @@ def _real_tree(check) -> None:
     tree = RT.Tree()
     check(list(REDESIGNED) == ONLY_IDS, f"real tree: REDESIGNED is pass V's only_ids ({REDESIGNED})")
     keys = [HERE / "cache" / f"{json.loads(j.read_text())['cache_key']}.{e}"
-            for i in REDESIGNED for j in sorted((HERE / "approved" / i).glob("*.json")) for e in ("png", "json")]
+            for i in REDESIGNED for j in sorted((HERE / "approved" / i).glob("*.json"))
+            if "cache_key" in json.loads(j.read_text())    # pass KA: kneel.json records gemini_cache_keys instead
+            for e in ("png", "json")]
     check(bool(keys) and _tracked(keys), f"real tree: the cache files of the {len(REDESIGNED)} redesigned ids' approved sheets are "
                                          f"git-tracked ({len(keys)} files)")
     done = []
@@ -373,7 +377,8 @@ def _real_tree(check) -> None:
         for arch in RT.archives_of(tree, sid):
             files = sorted(p for p in arch.iterdir() if p.is_file())
             cache = [HERE / "cache" / f"{json.loads(j.read_text())['cache_key']}.{e}"
-                     for j in files if j.suffix == ".json" for e in ("png", "json")]
+                     for j in files if j.suffix == ".json" and "cache_key" in json.loads(j.read_text())
+                     for e in ("png", "json")]
             check(bool(files) and _tracked(files) and _tracked(cache),
                   f"real tree: {arch.name}: every archived file and its cache keys are git-tracked")
             done.append(arch.name)
