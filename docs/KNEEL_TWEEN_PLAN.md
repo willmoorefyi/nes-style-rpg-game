@@ -320,6 +320,44 @@ round 1 judged `it2`, round 2 (a new reviewer) judged blue_dragon's `it3`.
 | T-G8 | Playwright on 127.0.0.1:5242, `?mute=1&scenario=kt_pilot&kneel=loop` and `kt_pilot_big` | 0 console errors each; `/tmp/kneel-kt/pilot/browser_kt_pilot_{0..5}.png`, `browser_kt_pilot_big_{0..5}.png` show the AI kneels in battle and the loop standing them up | pass |
 | T-G9 | ledger / approved diff | no ledger change; `approved/` only `_retired/*_kneel_v1/` additions | pass |
 
+### 12-D. KT2-D result (heroes; branch `kt-d` from `fb5992a0`, 2026-11-18)
+
+All 10 classes were on the coverage `derived:` line and were retired first (`retire_kneel.py`, `<class>_kneel_v1`, 10
+rows appended to `docs/RETIRED_SPRITES.md`); each class file lost its pass-K block (comments, `kneel:` with its
+labels / paint) and gained `kneel: {source: ai}`. No knob and no `offset` was needed. One review round (a fresh
+reviewer, one batch of 10, artefacts `/tmp/kt-d/it1/`), one commit per class (`KT2-D: <class> AI kneel + lock`).
+
+| Class | Review 1 (it1) | Knobs / offset | Iterations | Heights idle / in1 / in2 / kneel |
+|---|---|---|---|---|
+| knight | PASS | - | 1 | 72 / 67 / 64 / 59 |
+| thief | PASS | - | 1 | 72 / 68 / 66 / 62 |
+| ninja | PASS | - | 1 | 73 / 72 / 70 / 69 |
+| monk | PASS | - | 1 | 71 / 67 / 63 / 59 |
+| master | PASS | - | 1 | 71 / 66 / 62 / 57 |
+| red_mage | PASS | - | 1 | 72 / 68 / 66 / 62 |
+| black_mage | PASS | - | 1 | 74 / 70 / 67 / 63 |
+| black_wizard | PASS | - | 1 | 74 / 69 / 66 / 61 |
+| red_wizard | PASS | - | 1 | 71 / 67 / 64 / 60 |
+| white_wizard | PASS | - | 1 | 65 / 62 / 58 / 55 |
+
+- Limit hits: **none** (max 1 iteration). Bridge-pair ruling (kt-a): not hit.
+- Reviewer notes (not failures): white_wizard's kneel_in1 squashes the round staff head into a lopsided crescent
+  with a 1-2 px ragged edge (70 ms, invisible at x2), and its staff turns from upright to diagonal at the swap;
+  knight's open helmet becomes the key's lowered dark helmet at the swap; black_wizard / red_wizard's raised arm
+  appears at the swap (reads as part of going down).
+- Key notes (KA-FIX candidates, not iterated): thief's key has three detached specks (3 px near the hanging hand's
+  fingertips, native about (31-32, 52-54); 1 px each at (48, 61) and (47, 72)), carried into kneel_in2 / kneel_b.
+- Artefacts: `/tmp/kt-d/it1/<class>_{x2,x3,slow}.gif`, `<class>_strip.png`, `contact.gif` / `contact.png`.
+
+| # | Command (KT2-D) | Key output | Result |
+|---|---|---|---|
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 lines `: OK`; no monster touched by this tranche) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (e.g. `knight: OK [kneel 59 / ready 72 = 0.819, ...]`) | pass |
+| T-G3 | `lockdiff --base a7d423f4 --relock` the 8 pilot ids + the 10 classes | no `FAIL`; the 10 classes `relocked ['kneel', 'kneel_b', 'kneel_in1', 'kneel_in2']`; `8 added, 0 changed, 0 removed`; exit 0 | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 6, derived 27, alias 90)` (unchanged here), `heroes 12/12 (ai 12, derived 0, alias 0)` | pass |
+| T-G6 | `selftest.py` | runs to the end: `8 FAILED`, none KT's: 2 from the absent gitignored `gen/refs` (`pr_warrior_1080p.png missing`, `FW-9`), 6 from the live KA-FIX Bedrock block (`budget.json ... no live bedrock block`, `kneel_ai.py budget --check`, `usage: billed thoughts`, `KG1`, `KG2`, `bedrock.invoke refuses`); `pass KT kneel bridge`: 22 ok, 0 FAIL; the 3 `selftest_hurtfrom` failures seen elsewhere did not occur | pass (KT) |
+| T-G9 | ledger / approved diff vs `a7d423f4` | only `approved/_retired/*_kneel_v1/` additions (64 files); no ledger change | pass |
+
 | Date | Item | Ruling / change |
 |---|---|---|
 | 2026-11-17 | rev 1 | momus review 1: REJECT (P1 T-G3 needs `--relock`; P2 gate split, shared files, review batch size, limit-hit handling, pilot -> KT2 gate; P3 counts, exact outputs, hero offset). All resolved in rev 2 |
