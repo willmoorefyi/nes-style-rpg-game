@@ -6,8 +6,8 @@
  *
  * The tuning is WAT-D's (enemies.yaml: only the sovereign's `bossPhases`). With the roster's numbers (800 HP, attack
  * 50 on 8 hits) he fell every time at L26-L30. He now wakes at full strength: a phase at hpThreshold 1.0 (crossed at
- * the first round start) sets attack 75. Targets: L28 sensible 60-80 %, L26 at most 45 %. Each bound sits at least 3
- * points from its measured value, given in the test name.
+ * the first round start) sets attack 75; the 50 % phase (the heavy attack) is unchanged. Targets: L28 sensible
+ * 60-80 %, L26 at most 45 %. Each bound sits at least 3 points from its measured value, given in the test name.
  */
 import { describe, expect, it } from 'vitest';
 import { bossWinRate, UPGRADED_PARTY } from '../helpers/balanceData.js';
