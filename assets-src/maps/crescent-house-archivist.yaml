@@ -131,7 +131,7 @@ npcs:
     text: [I'm copying the prophecy again. My hand shakes now that I know the faces.]
   - condition: EARTH_CRYSTAL_LIT
     text: ['Fire, frost, fire, frost. The sages say nothing else these days. My wrist aches from it.']
-  - text: [Shh. I am copying a treatise on rot. It is extremely long and it smells of the cellar.]
+  - text: ['Quietly, please: I am copying a treatise on rot. It is extremely long and it smells of the cellar.']
 transitions:
 - {x: 3, y: 10, targetMap: crescent, targetEntrance: house_archivist}
 encounterRate: {min: 999, max: 999}

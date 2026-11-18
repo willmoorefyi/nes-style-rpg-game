@@ -154,7 +154,7 @@ def build() -> list[Path]:
     r.npc("copyist", "mage", 3, 8, said(
         ["I'm copying the prophecy again. My hand shakes now that I know the faces."],
         ["Fire, frost, fire, frost. The sages say nothing else these days. My wrist aches from it."],
-        ["Shh. I am copying a treatise on rot. It is extremely long and it smells of the cellar."]))
+        ["Quietly, please: I am copying a treatise on rot. It is extremely long and it smells of the cellar."]))
     out.append(r.save(note("the town's archive on the Star Terrace: one tall hall lined with shelves, a reading "
                            "carpet and the archivist's desk in the middle.",
                            "six bookshelves along the back wall broken by a single window; a reading carpet with "

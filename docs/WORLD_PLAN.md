@@ -3204,7 +3204,9 @@ shops 5/5 inn 300/300 clinic true/true`.
 | 5.4 proof (f) | `(f) price walls: OK  crescent pending`. Crescent is built, but its first-arrival gold is tainted by the pending stages before it (S4, S5, S8, S9, S11, S13), so the curve marks it assumed. It goes live at INT |
 | G13, G14 | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
 | G6, G7, G12, G15 | `assetCoverage`, `crossFileValidation`, `designNotes`, `originality`, `townStandard` and `tests/quest/fire/`: 9 files, 2903 passed, 4 skipped |
-| G4 | see below |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: exit 0; `Test Files 323 passed (323)`, `Tests 7210 passed, 4 skipped (7214)`. The first run caught one duplicate opening sentence ("Shh.") in `actOneDialog.test.ts` (T6); the copyist's line is reworded |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
 | G10 | Port 5230, `mute=1`, my own headless Chromium (`/tmp/w-fir-t/cp.mjs`), 0 console errors. Results below |
 
 G10, `w_s14_early`:
