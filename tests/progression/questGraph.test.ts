@@ -143,6 +143,20 @@ describe('questGraph: each proof fails on its RED fixture', () => {
     expect(r.failures[0].path).toContain('town:trade:thief');
   });
 
+  it('(c) a stage done out of order: its orb is traded away before the visit it comes after (INT-W2c)', () => {
+    const ctx = run('c_visit_order');
+    const g = stateGraph(ctx);
+    const r = proofSoftlocks(ctx);
+    expect(r.failures, r.line).toEqual([]);
+    // the out-of-order run exists: the orb was given away while the shrine visit (S1) was still undone ...
+    const early = g.nodes.find((n) => n.state.flags.has('ORB_GIVEN') && !n.state.flags.has('@S1'));
+    expect(early?.state.flags.has('@S2~')).toBe(true);
+    // ... and once the shrine is visited S2 is done without the orb, its note spent, and the goal follows
+    const done = g.nodes.find((n) => n.state.flags.has('GOAL_DONE') && n.state.items.has('trinket'));
+    expect(done?.state.flags.has('@S2')).toBe(true);
+    expect(g.nodes.some((n) => n.state.flags.has('@S2') && n.state.flags.has('@S2~'))).toBe(false);
+  });
+
   it('(c) RED stranded: a pit with no way back to the world map', () => {
     const r = proofSoftlocks(run('red_c_stranded'));
     expect(codes(r)).toContain('STRANDED');
