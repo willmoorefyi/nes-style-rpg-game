@@ -47,3 +47,7 @@ paint:
   - {frame: attack, xy: [[121, 37], [121, 38], [121, 39], [121, 40], [121, 41], [121, 42], [121, 76], [122, 92], [123, 93]], rgb: [41, 66, 41]}
   - {frame: attack, xy: [[122, 77], [123, 77], [122, 78], [123, 78], [122, 93], [121, 94]], rgb: [57, 99, 57]}
   - {frame: attack, xy: [[123, 92]], rgb: [107, 165, 66]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
