@@ -103,3 +103,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `ogre_chief_kneel_v1` | `ogre_chief` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `ogre_mage_kneel_v1` | `ogre_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `sea_troll_kneel_v1` | `sea_troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `stone_golem_kneel_v1` | `stone_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
