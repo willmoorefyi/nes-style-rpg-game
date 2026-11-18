@@ -137,9 +137,10 @@ describe('ERT-O: the site maps', () => {
     const hall = load('dwarf-hall');
     expect(hall.npcs.find((n) => n.id === 'ert_nerrick')).toMatchObject(
       { requiredItem: 'tnt', cutscene: { id: 'ert_canal_blast', onceFlag: 'CANAL_OPEN' } });
-    expect(hall.npcs.find((n) => n.id === 'ert_smyth')).toMatchObject(   // S31: switched on by INT
-      { requiredItem: 'adamant',
-        cutscene: { id: 'ert_smyth_forge', requiredFlags: ['WIND_CRYSTAL_LIT'], onceFlag: 'ERT_O_SWORD_FORGED' } });
+    // S31: switched on by INT; W-S31 (the classic order): he forges as soon as the adamant comes, no flag gate
+    const smyth = hall.npcs.find((n) => n.id === 'ert_smyth')!;
+    expect(smyth).toMatchObject({ requiredItem: 'adamant' });
+    expect(smyth.cutscene).toEqual({ id: 'ert_smyth_forge', onceFlag: 'ERT_O_SWORD_FORGED' });
     expect(hall.npcs.find((n) => n.shopId)?.shopId).toBe('dwarf_item');
     const sage = load('sage-cave');
     expect(sage.npcs).toHaveLength(3);

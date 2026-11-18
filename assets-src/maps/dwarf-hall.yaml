@@ -237,18 +237,12 @@ npcs:
   dialog:
   - condition: ERT_O_SWORD_FORGED
     text: ['Mind the edge. I''ll never make a keener thing, and I don''t mean to try.']
-  - condition: WIND_CRYSTAL_LIT
-    text: [The wind's dropped at last; my fire draws clean again., 'If you carry ore from the sky, hand it over, and stand well back.']
   - condition: item:adamant
-    text: ['That ore is singing! But hear that wind in the flue? The sky''s gone wild, and my fire won''t hold a forging heat in it.', 'Calm whatever''s
-        stirring the sky, then bring the ore back.']
+    text: ['That ore is singing! Hand it over, and stand well back from the fire.']
   - text: ['Smyth, smith of this hall. My anvil has gone quiet for want of a metal worth hitting.', 'Bring me ore from a place nearer the stars
         than the earth, and I''ll show you what a dwarf can forge.']
   tint: '#b08860'
-  cutscene:
-    id: ert_smyth_forge
-    requiredFlags: [WIND_CRYSTAL_LIT]
-    onceFlag: ERT_O_SWORD_FORGED
+  cutscene: {id: ert_smyth_forge, onceFlag: ERT_O_SWORD_FORGED}
   requiredItem: adamant
 - id: ert_dwarf_bellows
   sprite: thief

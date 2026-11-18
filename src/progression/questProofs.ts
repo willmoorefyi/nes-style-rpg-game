@@ -68,7 +68,8 @@ export function stateGraph(ctx: QuestContext): StateGraph {
  * one of its ancestors (by the event's stage, a stage grant it gives, or its map) do not fire. Those stages run in
  * parallel (the airship era before Gurgu, S15), and their orderings are the full run's to check; without this cut
  * `--stage S15` passed 1,000,000 states once every region was built. An event with no owner (a shop, a world-map
- * vehicle) still fires.
+ * vehicle) still fires, and so does a map event that gives a requirement of the stage that no stage grants (W-S31:
+ * S31's adamant lies in a chest on S28's sky-castle-3f).
  */
 export function outOfScopeEvents(ctx: QuestModel, stageId: string): Set<string> {
   const { world } = ctx;
@@ -76,8 +77,11 @@ export function outOfScopeEvents(ctx: QuestModel, stageId: string): Set<string> 
   keep.add(stageId);
   const byGrant = new Map<string, string>();
   for (const s of world.quest.stages) for (const g of [...s.grants.flags, ...s.grants.items]) byGrant.set(g, s.id);
+  const req = world.stages.get(stageId)!.requires;
+  const needs = new Set([...req.flags, ...req.items].filter((g) => !byGrant.has(g)));
   const out = new Set<string>();
   for (const ev of ctx.cat.events) {
+    if (!ev.stage && [...ev.grants.flags, ...ev.grants.items].some((g) => needs.has(g))) continue;
     const owner = ev.stage ?? [...ev.grants.flags, ...ev.grants.items].map((g) => byGrant.get(g)).find((s) => s)
       ?? stageOfMap(world, ev.map)?.id;
     if (owner && !keep.has(owner)) out.add(ev.id);
@@ -177,8 +181,8 @@ export function proofOrder(ctx: QuestContext): ProofResult {
     for (const [id, why] of world.optional) {
       const s = world.stages.get(id)!;
       if (!sat.stageDone(id)) {
-        // a pending optional stage whose requirement nothing grants yet waits for its source's tranche (S31's
-        // adamant: WORLD 3.1 puts it in S28's sky castle, whose quest.yaml grants don't list it); --strict fails it
+        // a pending optional stage whose requirement no stage or event gives yet waits for its source's tranche
+        // (before WND-D2, S31's adamant had no chest); --strict fails it
         const orphan = ungranted(ctx, s);
         if (s.status === 'pending' && orphan.length && !ctx.strict) notes.push(`${id} waits for ${orphan.join(', ')} (granted by no stage)`);
         else failures.push(fail('a', 'OPTIONAL', `OPTIONAL ${id} is unreachable${orphan.length ? `: ${orphan.join(', ')} is granted by no stage or event` : ''}`));

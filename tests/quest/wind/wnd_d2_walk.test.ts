@@ -27,8 +27,9 @@ describe('WND-D2: the S28 walk', () => {
     for (const r of res) expect(r.failures.map((f) => f.message), `S28 (${r.proof})`).toEqual([]);
   });
 
-  it('S28 grants WIND_CRYSTAL_LIT and the adamant only with SKY_FORTRESS_OPEN', () => {
+  it('S28 grants WIND_CRYSTAL_LIT only with SKY_FORTRESS_OPEN; its 3F chest holds the adamant, which is S31\'s, not a grant', () => {
     const ctx = createQuestContext(world, { stage: 'S28' });
+    expect(world.stages.get('S28')!.grants.items).toEqual([]);
     const sat = closure(ctx).view(ctx.start.place);
     expect(sat.flags.has('WIND_CRYSTAL_LIT')).toBe(true);
     expect(sat.items.has('adamant')).toBe(true);
