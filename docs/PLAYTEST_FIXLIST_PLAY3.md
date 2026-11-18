@@ -11,6 +11,8 @@ Severity: P0 blocks progress or crashes; P1 serious, wrong-side or unfair; P2 no
 |---|---|---|---|---|---|---|---|
 | P3-01 (unconfirmed) | P3 | S24 | `onrac` (37, 27) -> gate (38, 27) | `w_s24_start`, one 90 ms tap of Right at the dry-dock entrance, oxyale held | the submarine boards (map `sea-shrine-b3`, entrance `nave` (21, 28)) | Once it boarded; on a second load of the same scenario the single tap did nothing for 5 s (still `onrac` 37,27, no dialog). Walking to (38, 27) with repeated steps boarded at once. Probably the scene-entry or dialog-close hold-off swallowing the first press, so not a game bug; recheck by hand. | `/tmp` log lost in the reboot |
 
+| P3-02 | P3 | S27-S28 | Mirage Tower and sky castle random fights | `w_s27_start`, walk 1F to 3F, fighting every encounter | gold in step with the band (the party starts S27 with 20000 G) | six fights in the Mirage took the purse from 20000 to about 54000 G (about 5,000 G a fight, mostly one or two black_knight / guardian-type groups). Nothing to buy until the Gaia/Lufenia shops, and S29's 30000 G start in the PST scenarios is already below that. Gold has no use from here on, so this is harmless for progress, but check the `goldReward` of the S27-S28 roster against the shop prices. | `/tmp/w-play3/prog.log` (lost on reboot; re-measure) |
+
 No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading the generated map YAML and
 `cutscenes.yaml`) of S26-S31 found nothing wrong; it still needs the live pass below.
 
@@ -39,6 +41,16 @@ No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading th
   cells); 8 of 12 outdoor NPCs read in plain English, the other four are wanderers my bot missed (not a defect). The
   elder (`lufenia-house-elder`) gives the Chime (`chime` held, CHIME_GIVEN set). Hints chain correctly: Gaia and Unne
   point to Lufenia, Lufenia points to the Mirage and (cube hint) the waterfall in the west.
+- S26 negative `w_s26_neg_untaught`: every outdoor line is in the old tongue, the elder says only "Sae'qat, ven
+  doloth. Lun... thrim?" and gives no chime. With LUFENIAN_LEARNED the three keepers (two magic shops, inn) are present.
+- S27 `w_s27_start`: overworld -> `mirage-1f`; walking onto the vestibule door (18, 31) with the chime passes with no
+  message; 1F -> 2F -> 3F by the stairs; 3F chests (white robe, defender); the console with the cube plays
+  `mirage_ascent`, sets SKY_FORTRESS_OPEN and lands on `sky-castle-1f` (19, 34). Five random fights on the way, all won.
+  Dialog reads well, no console errors.
+- S28 climb (no boss yet): 1F chests (3), 2F (3, all reachable only through the conveyor belts; checked with a
+  reachability search that treats the belt transitions as edges: every chest and every exit is reachable, so the belts
+  are not a trap), 3F `adamant` chest at (4, 26) and 3 more chests, the archivist, 4F chests (3) and the stairs to 5F.
+  Attrition is real: BWIZ was down to 73/240 by 5F at L31 with no healing between fights (fair).
 - Data check: S31 Smyth (`dwarf-hall`, `ert_smyth`): dialog and cutscene `ert_smyth_forge` are gated on WIND_CRYSTAL_LIT
   in the version I tested (the fix agent is changing this; behaviour noted only). Chest `adamant` is on `sky-castle-3f`
   (4, 26).
