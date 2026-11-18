@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (4962 tests, 258 files, Vitest)
+npm test             # Run all tests (9028 tests, 354 files, Vitest; measured at pass W INT; the real-world mutation suite makes a full run take about an hour)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
