@@ -2064,6 +2064,54 @@
 # === WND-D1 (pass W: owned by WND-D1) ===
 # === end WND-D1 ===
 # === WND-D2 (pass W: owned by WND-D2) ===
+# S28 (WORLD 6.5): the party stands on sky-castle-1f's south berth (entrance arrival, where mirage_ascent sets it
+# down) at the band's low level 31 with the B7 kit (w_s27 = w_s28), upgraded classes, every flag through S27 and the
+# airship on the oasis meadow beside the Mirage Tower. Climb the five floors and beat the Hollow Seraph.
+- id: w_s28_start
+  name: WND-D2 - S28 the sky castle (1F south berth)
+  mode: field
+  map: sky-castle-1f
+  entrance: arrival
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 135, y: 38 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED,
+    CHIME_GIVEN, SKY_FORTRESS_OPEN]
+  party:
+    - { class: knight, name: KNGT, level: 31, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 31, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 31, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 31, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 10, hi_potion: 5, ether: 3, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1, chime: 1 }
+  gold: 20000
+  enemies: []
+# the S28 boss at the test level 32 (3.7) with the stage kit (w_s28, the B7 tier), on the spire's throne backdrop
+- id: w_boss_hollow_seraph
+  name: WND-D2 - S28 boss, the Hollow Seraph and her whirlwind
+  party:
+    - { class: knight, name: KNGT, level: 32, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 32, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 32, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 32, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [hollow_seraph, air_elemental]
+  background: assets/backgrounds/throne_tiamat.webp
 # === end WND-D2 ===
 # === PST (pass W: owned by PST) ===
 # === end PST ===
