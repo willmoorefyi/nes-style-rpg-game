@@ -508,10 +508,13 @@ stages:
     maps: [onrac, onrac-*]
     zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
     grind: 2.0
-    walk: []
+    # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
+    # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
+    walk: [overworld:warp:onrac]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end WAT-T ===
   # === WAT-D (pass W: owned by WAT-D) ===
   - id: S24
@@ -696,7 +699,7 @@ towns:
     opensAfter: [S17]
     bandStage: S20
     kit: w_onrac
-    status: pending
+    status: built
   # === end WAT-T town ===
   # === WND-O town (pass W: owned by WND-O) ===
   - id: lufenia
