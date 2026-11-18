@@ -28,7 +28,6 @@ tweaks:
   cast_gather: {hand_f: [19, -3], el_f: [2, -2], tip: [19, -3]}
   cast_rise: {hand_n: [0, -2]}
   cast_release: {hand_n: [0, 3], el_n: [0, 2]}
-# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
-# sy 0.55, head bow in deg, both hands kept (the staff below the fist is cut with the torso); locked in
-# white_mage.lock.json.
-kneel: {bow: 10, arms: []}
+# Pass KT kneel (docs/KNEEL_TWEEN_PLAN.md): the approved AI key approved/white_mage/battle_kneel.png and the bridge
+# frames (puppet_kneel.make_ai); the derived variant-A block is archived as anim/_retired/white_mage_kneel_v1.yaml.
+kneel: {source: ai}

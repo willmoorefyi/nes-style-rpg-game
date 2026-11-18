@@ -26,4 +26,4 @@ tweaks:
   cast_rise: {neck: [1, -0.5], crown: [2, -2.5], chest: [0.5, 0], hip: [0, -1], sh_n: [-2, -2.5], el_n: [-3.41, -6.49], hand_n: [-4.88, -5.67], sh_f: [1, 0], el_f: [0, -0.5], hand_f: [7.5, -0.5], hip_n: [0, -0.5], knee_n: [0.5, 0], foot_n: [-0.5, 0], hip_f: [0.5, -0.5], knee_f: [1.5, -0.5], foot_f: [-1, 0]}
 # Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): re-posed from ready, chest lean and head
 # bow in deg, the near fist lowered; frames locked in warrior.lock.json.
-kneel: {lean: 8, bow: 12, arms: [n]}
+kneel: {source: ai}  # pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI key + the bridge (derived: _retired/warrior_kneel_v1)

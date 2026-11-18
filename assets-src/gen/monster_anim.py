@@ -223,7 +223,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
     arrs = {k: np.asarray(v.convert("RGBA")).copy() for k, v in keyframes.items()}
     segs = {**{k: R.segment(rig, k, arrs[k]) for k in arrs if k in rig.keyframes and k not in kseg}, **kseg}
     holds, pairs = held(cfg.get("holds")) | aliased(sprite, cfg)[1], rig.joined_pairs()   # FW-Q: aliased = held
-    holds |= KN.skip(keyframes)                           # no kneel key: no kneel in-betweens
+    holds |= KN.skip(keyframes, cfg)                      # no kneel key (or source ai): no rig kneel frames
     gaps = {k: RR.source_gaps(s[0], pairs) for k, s in segs.items()}     # the approved art's own part gaps
     foot_parts = {ft: [i for i, p in enumerate(rig.parts) if any(ft in rig.joints_of(p, k) for k in rig.keyframes)]
                   for ft in rig.feet}
@@ -315,7 +315,7 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                      **({"rot_cap": rig.rot_cap} if rig.rot_cap else {}),          # FW-5 mechanical preset
                      **({"shift": shift} if rig.translate else {}),                # rooted whole-figure translate
                      **MR.check_info(rig, r["src"], carried)}
-    return out
+    return {**out, **KN.bridge_frames(sprite, cfg, keyframes, meta, floating)}   # pass KT: the AI kneel bridge
 
 
 def monster_frames(sprite: str, keyframes: dict[str, Image.Image] | None = None, meta: dict | None = None) -> dict[str, Image.Image]:

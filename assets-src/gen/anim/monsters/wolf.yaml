@@ -120,10 +120,6 @@ frames:
     t: 0.0
     moves: [back, chest, neck, head, snout, tail0, tail1, tail2, tail_tip]
     tweaks: {neck: [1, 1], head: [0, 1], snout: [0, 4], tail1: [0, 1], tail2: [0, 3], tail_tip: [1, 2]}
-  kneel_in1:                   # pass K: the near forearm folds 2 px higher so its paw stays on the feet row
-    tweaks: {el_n: [0, -2], paw_n: [0, -2], ftoe_n: [0, -2]}
-  kneel_in2:
-    tweaks: {el_n: [0, -1], paw_n: [0, -1], ftoe_n: [0, -1]}
 masks:
   neck:                        # body/neck boundary off the withers: the neck warp sampled body pixels (E8 crease)
     idle: [[68, 25], [73, 25], [77, 28], [81, 29], [81, 38], [68, 38]]
@@ -139,17 +135,8 @@ paint:                         # build-time patches: open the leg gap the rear c
   - {frame: daze, xy: [[22, 37], [23, 37]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[22, 37], [23, 37], [94, 28], [94, 29]], rgb: null}
   - {frame: daze_b, xy: [[22, 38], [23, 38], [93, 28], [93, 29]], rgb: [6, 4, 10]}
-  # pass K: kneel_in1's doubled outline along the lowered mane and back (1 px inside the edge) takes the fur colour
   # inside it (second ring 0.30 -> within 0.08 of the idle's 0.21)
-  - {frame: kneel_in1, xy: [[80, 25], [28, 45]], rgb: [49, 49, 74]}
-  - {frame: kneel_in1, xy: [[93, 27], [71, 29], [78, 29], [92, 35]], rgb: [115, 107, 115]}
-  - {frame: kneel_in1, xy: [[68, 29]], rgb: [148, 140, 132]}
-  - {frame: kneel_in1, xy: [[63, 30], [62, 31]], rgb: [74, 66, 82]}
-  - {frame: kneel_in1, xy: [[64, 30], [93, 37]], rgb: [132, 123, 123]}
-  - {frame: kneel_in1, xy: [[88, 31], [58, 32]], rgb: [82, 82, 90]}
-  - {frame: kneel_in1, xy: [[15, 34]], rgb: [165, 156, 148]}
-  - {frame: kneel_in1, xy: [[38, 61], [37, 62], [38, 62], [37, 63]], rgb: [6, 4, 10]}   # the 4 px pocket the folding hind legs closed
-# pass K (docs/KNEEL_PLAN.md, K1 pilot): the derived kneel key from the quadruped template (belly low, legs folded)
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
 kneel:
-  sampler: nearest             # rotsprite doubled the folded legs' outlines (second ring 0.30 vs the idle's 0.21)
-  tweaks: {chest: [0, -2], neck: [0, -2], el_n: [0, 1], paw_n: [0, 1], ftoe_n: [0, 1]}   # body and neck under the 25 deg chain cap; the near forearm on the feet row
+  source: ai

@@ -1320,6 +1320,34 @@
   enemies: [goblin, goblin, wolf, wolf]
   enemyStatus: { 0: [sleep], 1: [poison], 2: [stun] }
   background: assets/backgrounds/grassland.webp
+# Pass KT (docs/KNEEL_TWEEN_PLAN.md 8): the AI kneel bridge pilot. Every pilot sprite kneels from a status: goblin
+# poisoned (rises to attack, kneels again), wolf asleep, green_slime stunned, cobra poisoned; WAR weak, WHM poisoned,
+# WAR2 / WHM2 the standing controls. &kneel=loop toggles every actor through in / hold / out; kt_pilot_big has the two
+# scale-3 / boss pilots (blue_dragon asleep, garland poisoned).
+- id: kt_pilot
+  name: Kneel bridge pilot - goblin, wolf, slime, cobra; weak and poisoned heroes
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: white_mage, name: WHM, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [poison] }
+    - { class: warrior, name: WAR2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: white_mage, name: WHM2, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, wolf, green_slime, cobra]
+  enemyStatus: { 0: [poison], 1: [sleep], 2: [stun], 3: [poison] }
+  background: assets/backgrounds/grassland.webp
+- id: kt_pilot_big
+  name: Kneel bridge pilot - blue dragon (scale 3) and Garland (boss)
+  party:
+    - { class: warrior, name: WAR, level: 20, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 40 }
+    - { class: white_mage, name: WHM, level: 20, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], status: [poison] }
+    - { class: warrior, name: WAR2, level: 20, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: white_mage, name: WHM2, level: 20, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [blue_dragon, garland]
+  enemyStatus: { 0: [sleep], 1: [poison] }
+  background: assets/backgrounds/grassland.webp
 
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # Each tranche adds its records only between its own pair of lines, so the merges never conflict. Stage starts are `w_s<n>_start`, bosses `w_boss_<id>`.

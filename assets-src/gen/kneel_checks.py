@@ -113,9 +113,12 @@ def check_sprite(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allow
     from gen import monster_anim as MA
     from gen import rig as R
     rig = R.Rig(cfg, kfs["idle"].size)
-    tpl, bottom = KN.template_of(rig, cfg), int(meta["bottom_row"])
+    bottom = int(meta["bottom_row"])
     floating = bool(meta.get("floating")) or rig.floating
     idle, key = np.asarray(kfs["idle"].convert("RGBA")), np.asarray(kfs["kneel"].convert("RGBA"))
+    if KN.is_ai(cfg):                                 # pass KT: any body (no kneel template needed)
+        return ai_checks(sprite, cfg, kfs, meta, gen, allowed, idle, key, bottom, floating)
+    tpl = KN.template_of(rig, cfg)
     d = meta.get("kneel") or KN.derive(sprite, cfg, kfs, meta)
     limbs, cap = limb_parts(rig), rig.rot_cap
     out = {"kf:kneel": C.binary_alpha(key) + C.palette_lock(key, allowed) + C.magenta(key) + C.detached(key, idle)
@@ -136,3 +139,64 @@ def check_sprite(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allow
     frames = {**{n: v for n, v in kfs.items()}, **{n: Image.fromarray(f["img"]) for n, f in gen.items()}}
     out["kneel:anchor"] = anchors(frames, MA.frames_for("cast" in kfs, "attack_raise" in kfs), meta)
     return out
+
+
+def order(frames: list[np.ndarray]) -> list[str]:
+    """K-order (pass KT, D-KT4): the opaque heights of idle, kneel_in1, kneel_in2, kneel run one way (+-1 px), so the
+    bridge never pops up or down on the way into the kneel."""
+    hs = [int(_rows(a).max() - _rows(a).min() + 1) for a in frames]
+    s = 1 if hs[-1] >= hs[0] else -1
+    bad = [i for i in range(3) if s * (hs[i + 1] - hs[i]) < -1]
+    return [f"K-order: heights {hs} (idle, kneel_in1, kneel_in2, kneel) not monotonic"] if bad else []
+
+
+def ai_checks(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allowed: set, idle: np.ndarray,
+              key: np.ndarray, bottom: int, floating: bool) -> dict[str, list[str]]:
+    """D-KT4: the `source: ai` checks. The approved key gets the plain checks (alpha, palette, magenta, outline) plus
+    K-ground / K-fit; K-height is reported, never a gate (the user's size ruling: the key was approved as drawn). The
+    bridge frames get K-ground / K-fit here and every plain check in monster_check.frame_checks; K-order and K-anchor
+    hold the sequence."""
+    from PIL import Image
+    from gen import monster_anim as MA
+    # the key's outline weight is the approved drawing's own (J0 / the review judged it): not compared with the idle
+    out = {"kf:kneel": C.binary_alpha(key) + C.palette_lock(key, allowed) + C.magenta(key)
+           + ground(key, idle, bottom, floating) + fit(key, bottom)}
+    for n in (f for f in KNEEL_FRAMES if f in gen):
+        out[n] = ground(gen[n]["img"], idle, bottom, floating) + fit(gen[n]["img"], bottom)
+    if all(n in gen for n in IN_BETWEENS):
+        out["kneel:order"] = order([idle, gen["kneel_in1"]["img"], gen["kneel_in2"]["img"], key])
+    frames = {**{n: v for n, v in kfs.items()}, **{n: Image.fromarray(f["img"]) for n, f in gen.items()}}
+    out["kneel:anchor"] = anchors(frames, MA.frames_for("cast" in kfs, "attack_raise" in kfs), meta)
+    return out
+
+
+def bridge_holes(a: np.ndarray, src: np.ndarray, min_px: int = 4) -> list[str]:
+    """A bridge frame resizes its one source, so its holes are the source's holes resized: no more holes of >= min_px
+    than the source has, and their total area within 1.5x the source's (a resize moves and grows a tail loop, so the
+    plain near-and-similar counterpart rule does not apply)."""
+    fh = [h[0] for h in C._holes(a) if h[0] >= min_px]
+    sh = [h[0] for h in C._holes(src) if h[0] >= min_px]
+    if len(fh) > len(sh):
+        return [f"new hole: {len(fh)} holes >= {min_px} px > the source's {len(sh)}"]
+    return [f"holes {sum(fh)} px > 1.5 x the source's {sum(sh)}"] if sum(fh) > 1.5 * sum(sh) + min_px else []
+
+
+def bridge_frame(name: str, a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, cell_h: int,
+                 allowed: set) -> list[str]:
+    """D-KT4: the plain checks of a bridge frame (monster_check.frame_checks hands them here). Alpha, palette, magenta,
+    no new piece and the outline against its one source drawing; holes per bridge_holes; the opaque area within
+    0.85-1.15 of the source's area resized to the frame's bbox (no chunk lost or gained; the plain rule, 0.85-1.15 of
+    the source alone, would refuse any squash) and the bbox height within the cell's tolerance of the src -> toward
+    lerp at u; nothing on the border; |u| <= 0.35 (kneel_b, the breath, is u 0)."""
+    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, src) + C.outline_kept(a, src)
+    out += bridge_holes(a, src)
+    hs, ht, hf = (C._rows(x[..., 3] > 0) for x in (src, toward, a))
+    ws, wf = (C._rows((x[..., 3] > 0).T) for x in (src, a))
+    fa, fs = (int((x[..., 3] > 0).sum()) for x in (a, src))
+    want = fs * (hf / max(hs, 1)) * (wf / max(ws, 1))       # the source's area, resized: no chunk lost or gained
+    if not 0.85 <= fa / max(want, 1) <= 1.15:
+        out.append(f"opaque area {fa / max(want, 1):.2f} of the resized source (0.85-1.15)")
+    tol = 4 if cell_h <= 80 else 6 if cell_h <= 128 else 10
+    if abs(hf - (hs + (ht - hs) * u)) > tol:
+        out.append(f"bbox height {hf} vs lerp {hs + (ht - hs) * u:.1f} (+-{tol})")
+    return out + C.clipping(a) + ([] if name == "kneel_b" else C.near_keyframe(u))

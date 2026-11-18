@@ -12,3 +12,7 @@ frames:
   atk_wind2: {t: 0.25, squash: {sx: 1.06, sy: 0.92}}   # a shallower crouch keeps atk_mid's centroid step <= 6
   atk_follow: {t: 0.80}         # a settle: an overshoot leaves the cell (the crest is at x 107 of 110)
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+kneel:
+  source: ai

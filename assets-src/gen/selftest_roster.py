@@ -184,6 +184,9 @@ def _approved_keys(check: Callable[[bool, str], None]) -> None:
                            "missing")
             continue
         char = GEN.load_character(cid)
+        if meta.get("sheet") in ("kneel", "battle_kneel"):   # pass KA-G keys: kneel_ai_gem's request, not generate's
+            skipped += 1
+            continue
         if not (GEN.is_monster(char) or GEN.is_kit(char)) and not have_style:
             skipped += 1
             continue

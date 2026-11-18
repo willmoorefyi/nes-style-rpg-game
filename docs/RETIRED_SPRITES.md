@@ -84,3 +84,16 @@ the archive copies are untouched and never built.
 
 black_knight was not regenerated (the F3 keyframe paint passed IR; no `black_knight_v2`), and chaos keeps its pass-V
 art (F5 is the rig's `raise: false`; no archive).
+
+## Kneel archives (pass KA)
+
+`retire_kneel.py` (docs/KNEEL_AI_PLAN.md 5); never built or checked.
+
+| Archive | Id | Content |
+|---|---|---|
+| `goblin_kneel_v1` | `goblin` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `wolf_kneel_v1` | `wolf` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `blue_dragon_kneel_v1` | `blue_dragon` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `garland_kneel_v1` | `garland` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `warrior_kneel_v1` | `warrior` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `white_mage_kneel_v1` | `white_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
