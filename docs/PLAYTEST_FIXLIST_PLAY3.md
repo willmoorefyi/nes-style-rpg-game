@@ -18,8 +18,11 @@ Severity: P0 blocks progress or crashes; P1 serious, wrong-side or unfair; P2 no
 | P3-04 | P2 | S30 | `past-temple-1..5`, the four refights and Death Eye | `w_s30_start` (L34 party, stage kit), walk the five floors, talk to each boss, plain Fight mashing, no item used | each refight is a boss in band 34-41 with real pressure | All five fights won. Floor 1 (Rime Sovereign II + 2 death knights) cost almost nothing: KNGT 570 -> 562, nobody else hurt (so the first boss of the endgame is a pushover). Floor 2 (Ashen Queen II + rhyos): KNGT down to 250/570. Floor 4 (Seraph II): WWIZ KO'd, KNGT 179/570. Floor 5 (Death Eye + iron golem) started with KNGT 179/570 and WWIZ KO'd, with no healing in between, and was still won, ending KNGT 161/570. Potions 10, hi-potions 11, ether 7 and phoenix down 6 were never touched. The floors are meant to be a gauntlet but the party can carry a half-dead state through all of them; floor 1 and 5 in particular do not threaten a mashing party at L34. | `/tmp/w-play3/s30.log` (re-run `j_s30.js`-style walk to confirm), `s30_past-temple-*_after.png` |
 | P3-05 | P3 | S30 | `past-temple-2` chests `chest_cross_east`, `chest_cross_east_vestibule` | arrive from the arrival stair (the `arrival` cell) and try to reach the east chests | an east arm the player can find | They are in a closed 92-cell side room whose only exit is floor 1's east stair (39-40, 16 on floor 2, from floor 1 (24-25, 4)); not reachable from the main hub at all. That is by design in the brief ("one open per visit"), but nothing on floor 1 or 2 points the player to the second stair, so the two chests are easy to miss. Reachability itself is fine (checked from the `east` entrance). | reachability dump |
 
-No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading the generated map YAML and
-`cutscenes.yaml`) of S26-S31 found nothing wrong; it still needs the live pass below.
+| P3-06 | P3 | S30 | `cornelia-castle-2f` after `ending` | `w_s30_chaos_door`, beat Chaos, press confirm through the ending | WORLD 4.8: "`end_game` shows the card, then the title" | After the fade the party wakes in the throne room and the final line "The road is closed behind you. The End" is an ordinary dialog box at the bottom of the live throne room (king, princess and guard standing there, no fade to black, no card or credits); one more confirm goes to the title. Works, but it is a flat finish for a 30-hour quest. | `chaos_end_10.png` |
+| P3-07 | P3 | S31 | `dwarf-hall`, Smyth (`ert_smyth`), cutscene `ert_smyth_forge` | Hold `adamant` + WIND_CRYSTAL_LIT, talk to Smyth | an "Excalibur received" line like the Chime and the Oxyale have | The cutscene gives `excalibur` silently (the last line is Smyth's "Swing it once..."), so the player has no confirmation and no pickup text. `wnd_chime_given` and `wnd_fairy_freed` both print "Received ...". Also noted for the fix agent: at this commit Smyth refuses with the ore until WIND_CRYSTAL_LIT ("calm whatever's stirring the sky"), which is the behavior being changed. | `s31_b.png` (lost; trivial to redo) |
+
+No P0, P1 or crash found in S23-S31. The two non-polish findings are P3-04 (the temple-of-the-past refights are
+too soft at L34) and the gold note P3-02; everything else is P3.
 
 ## Checked and fine so far
 
@@ -75,8 +78,24 @@ No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading th
   in the version I tested (the fix agent is changing this; behaviour noted only). Chest `adamant` is on `sky-castle-3f`
   (4, 26).
 
-## Not yet done (continuing after the reboot)
-
-B5 and the Drowned Sovereign, S25 (Unne), S26 (Lufenia), S27 (Mirage Tower), S28 (sky castle + Seraph + Warmech), S29,
-S30 (four refights, Death Eye, Chaos four forms), the ending, S31, the originality spot-check, console and
-performance notes.
+- S30 Chaos `w_s30_chaos_door` (level-40 `chaos_party`): two shrine chests; the talk line and the scripted message
+  play; the fight goes through all four forms (F1 `chaos` 20000 -> F2 `chaos_orrery` at 13008 -> F3 `chaos_horizon` at
+  8000 -> F4 `chaos_horizon_core`) and ends after 135 s and 326 confirm presses. The party finished KNGT 128/666, NINJ
+  44/420, MSTR 238/586, WWIZ KO: a real fight (it matches the balance test's 90-96 % win rate). Art, numbers and
+  the `rim` background render correctly; `ending` sets CHAOS_DEFEATED, fades, warps to `cornelia-castle-2f`, heals,
+  plays the two wake-up lines and the end line, then the title.
+- S31 (current behavior): `dwarf-hall`, Smyth with `adamant` but WIND_CRYSTAL_LIT unset says "...Calm whatever's
+  stirring the sky, then bring the ore back." and keeps the ore; with the flag set he forges (adamant taken,
+  `excalibur` given, ERT_O_SWORD_FORGED), and his later line and the bellows boy read well. I granted `adamant` and
+  moved to the map from the console, because no scenario exists for S31 (nothing else was altered).
+- Originality (QUEST 4.6): all text of this segment (Gaia, spring, Sea Shrine, Unne, Lufenia, Mirage, sky castle, past
+  temple, ending) is original wording; the only classic echoes are names and the "Warriors of Light" prophecy in act 1.
+  A grep for famous FF1 lines found none in the segment.
+- Console and performance: zero `console.error`, page errors or missing-art warnings in the whole run (only the
+  headless GL "GPU stall due to ReadPixels" warning). No visible hitch during the Chaos F3/F4 view or the interludes in
+  headless SwiftShader; real-GPU performance not measured.
+- Not tested: the `w_s23_start`-onward overworld flights (the airship, the submarine ring/beam beyond the dock
+  transition), the waterfall and the caravan (S21/S22 belong to PLAY-2), keyboard-less menus, saving, and the
+  `w_boss_*` battle scenarios for the four refights separately (the fights were played in the field instead).
+- Bot caveats (not game bugs): empty NPC lines in my talk-all runs were wandering NPCs; my first planners treated gate
+  cells and conveyor cells as plain floor.
