@@ -686,4 +686,105 @@
       text: "Far below the castle, sails that have hung slack for years fill all at once, and the windmills of the world creak back to work."
 # === end WND-D2 ===
 # === PST (pass W: owned by PST) ===
+# S29 (WORLD 4.8): the hour keeper in the act-1 temple's altar room, talked to from the time gate's cell (the lute and
+# the four crystal flags). The song and the crystals' light open the stair down (TIME_GATE_OPEN) under the gate cell.
+- id: pst_time_gate
+  steps:
+    - type: dialog
+      text: "You play the princess's song. The keeper listens with his eyes shut, and the notes do not fade: they stay in the air, ringing."
+    - type: dialog
+      text: "Four small lights, earth-brown, flame-red, sea-blue and storm-white, gather on the frets and spill onto the worn ring in the floor."
+    - type: fade_out
+      duration: 500
+    - type: set_flag
+      flag: TIME_GATE_OPEN
+    # the party steps back off the ring (the stair's cell) to the `time_gate` arrival; the next step north goes down
+    - type: warp
+      map: temple-of-fiends
+      entrance: time_gate
+      facing: up
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "The ring under your feet sinks a step, then another. A stair winds down into lamplit stone that is no longer cracked."
+    - type: dialog
+      text: "Keeper: Below is this house as it stood, and its old guests are waiting in it. Step down when you are ready."
+# S30: the four refights, one per floor; each sets its milestone (also the battle's flag) and opens the stair on
+- id: pst_lich_falls
+  steps:
+    - type: dialog
+      text: "The Rime Sovereign's frost runs off him like meltwater, and the knights at his side fall in with it."
+    - type: set_flag
+      flag: PAST_LICH_DEFEATED
+    - type: dialog
+      text: "Both stairs behind the high seat thaw at once, their steps dripping."
+- id: pst_ashen_falls
+  steps:
+    - type: dialog
+      text: "The Ashen Queen sinks into the glowing stone until only her crown of coals is left, and then that goes dark too."
+    - type: set_flag
+      flag: PAST_ASHEN_DEFEATED
+    - type: dialog
+      text: "Cool air breathes up the stair at the end of the north arm."
+- id: pst_drowned_falls
+  steps:
+    - type: dialog
+      text: "The Drowned Sovereign falls back into the flood. The water closes over him and goes perfectly still."
+    - type: set_flag
+      flag: PAST_DROWNED_DEFEATED
+    - type: dialog
+      text: "Behind the apse, the stair that was under the tide line is dry."
+- id: pst_seraph_falls
+  steps:
+    - type: dialog
+      text: "The Hollow Seraph's blades come apart into motes of light and drift down the well like falling snow."
+    - type: set_flag
+      flag: PAST_SERAPH_DEFEATED
+    - type: dialog
+      text: "The stairwell in the middle of the room opens, and a draught rises from it that smells of nothing at all."
+- id: pst_death_eye_falls
+  steps:
+    - type: dialog
+      text: "The Death Eye shuts. Every carved eye in the hall shuts with it, one after another, with a sound like stones settling."
+    - type: set_flag
+      flag: DEATH_EYE_DEFEATED
+    - type: dialog
+      text: "Nothing watches the stair now."
+# S30 floor 2: the ward keepers lift the cross's seals in turn (local flags; WORLD 4.8 floor 2)
+- id: pst_ward_hub
+  steps:
+    - type: dialog
+      text: "At your touch the acolyte's palms come apart with a grinding sigh. Far down the west arm, the light in the doorway thins and goes out."
+    - type: set_flag
+      flag: PST_WARD_HUB
+- id: pst_ward_west
+  steps:
+    - type: dialog
+      text: "The kneeling acolyte lifts its head. Back in the hub, the north arm's ward flickers and is gone, and heat rolls out of it."
+    - type: set_flag
+      flag: PST_WARD_WEST
+# S30, the goal: Chaos falls in past-chaos; CHAOS_DEFEATED; the party wakes in Cornelia's throne room; the end card
+- id: ending
+  steps:
+    - type: dialog
+      text: "The crown of flame gutters out. The four orbs drop from the air and roll away across the sanctum floor, dark as river stones."
+    - type: dialog
+      text: "The empty robe settles on the dais. One by one the shrine's lamps go out, and under your feet the whole stone begins to crack."
+    - type: set_flag
+      flag: CHAOS_DEFEATED
+    - type: fade_out
+      duration: 1200
+    - type: warp
+      map: cornelia-castle-2f
+      entrance: throne_return
+      facing: up
+    - type: heal_party
+    - type: fade_in
+      duration: 1200
+    - type: dialog
+      text: "You wake on the throne room's cool floor with the morning coming through the high windows. The guard at the door asks only whether you slept well."
+    - type: dialog
+      text: "The four crystals burn on in their far places. The lute, when you look, has a new string, and you do not know who strung it."
+    - type: end_game
+      text: "The road is closed behind you. The End"
 # === end PST ===

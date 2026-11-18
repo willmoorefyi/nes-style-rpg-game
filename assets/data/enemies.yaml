@@ -3139,6 +3139,11 @@
   weakness: fire
   resist: ice
   bossPhases:
+  # PST (WORLD 3.7: S30, L37 70-90 %): staring from the first round; an iron golem stands with it (past-temple-5)
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 3
+    attack: 125
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Death Eye's grave cloth unravels!"
@@ -3172,6 +3177,11 @@
   attackAnim: heavy
   resist: ice
   bossPhases:
+  # PST (WORLD 3.7: the four refights in a row at L37): the past's cold strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 3
+    attack: 110
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Rime Sovereign's skull fractures!"
@@ -3253,6 +3263,11 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # PST (WORLD 3.7: the refight run): her six arms burn from the first round (a rhyos fights beside her)
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 80
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Ashen Queen's rite turns to inferno!"
@@ -3291,6 +3306,11 @@
   attack: melee
   resist: fire
   bossPhases:
+  # PST (WORLD 3.7: the refight run): fewer, heavier strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 82
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Drowned Sovereign's robes tear open!"
@@ -3333,6 +3353,11 @@
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # PST (WORLD 3.7: the refight run): five blade strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 5
+    attack: 92
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"

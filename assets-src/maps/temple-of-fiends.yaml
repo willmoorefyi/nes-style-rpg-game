@@ -42,6 +42,8 @@ ground: |
   WWWWWWWWWWW--WWWWWWWWWWW
 entrances:
   entry: [11, 20]
+  # PST (WORLD 4.8, S29): the arrival back up the time gate's stair from past-temple-1, below the gate cell (3, 4)
+  time_gate: [3, 5]
 objects:
 - type: deco
   parts:
@@ -199,9 +201,37 @@ npcs:
   y: 4
   hideIf: PRINCESS_RESCUED
   dialog: [Please... help me! Garland has gone mad!]
+# PST (WORLD 4.8, S29): the time gate. The altar room's north-west corner (3, 3) is walkable floor with one walkable
+# neighbour, (3, 4); the hour keeper stands in the corner once the earth crystal is lit, and (3, 4) is the gate cell
+# (the lute and the four crystal flags) and the stair down (TIME_GATE_OPEN). Talking to the keeper from the gate cell
+# plays pst_time_gate: TIME_GATE_OPEN, the party set back on (3, 5); the next step onto (3, 4) goes down. No ground, deco or
+# act-1 NPC changes: the walkable count (236) and Garland's room are as before (templeLayout.test.ts).
+- id: hour_keeper
+  sprite: old_man
+  tint: "#b9c6d6"
+  x: 3
+  y: 3
+  showIf: EARTH_CRYSTAL_LIT
+  dialog:
+  - condition: TIME_GATE_OPEN
+    text: ["The keeper's outline is fainter than before. 'The stair will hold while the four lights burn. Go down when you are ready.'"]
+  - text: ["A grey old man stands in the corner as if he had always stood there, though no dust has settled on him.",
+           "Keeper: I tended this house before it was a ruin. Your song, and the light of the four crystals, can wind it back to the day I left."]
+  cutscene: {id: pst_time_gate, onceFlag: TIME_GATE_OPEN}
 transitions:
 - {x: 11, y: 21, targetMap: overworld, targetEntrance: temple}
 - {x: 12, y: 21, targetMap: overworld, targetEntrance: temple}
+- {x: 3, y: 4, targetMap: past-temple-1, targetEntrance: arrival, requiredFlags: [TIME_GATE_OPEN]}
+keyItemGates:
+- x: 3
+  y: 4
+  requiredItem: lute
+  requiredFlags: [EARTH_CRYSTAL_LIT, FIRE_CRYSTAL_LIT, WATER_CRYSTAL_LIT, WIND_CRYSTAL_LIT]
+  permanent: false
+  message:
+  - condition: EARTH_CRYSTAL_LIT
+    text: ["The old man in the corner shakes his head. 'Not while any of the four lights is dark, and not without the princess's song.'"]
+  - text: ["The air in this corner is cold and still, and the floor stones are worn into a shallow ring."]
 scriptedEncounters:
 # B1: the doorway row's cells beside Garland; talking to him (the `npc` entry) starts the same battle
 - enemyIds: [garland]
