@@ -154,3 +154,7 @@ paint:                         # atk_mid: the crease pocket where the cocked for
   - {frame: attack, xy: [[87, 25], [87, 27], [89, 27], [84, 28], [88, 28], [84, 29], [86, 29], [87, 29], [83, 30], [84, 30], [86, 30], [87, 30], [84, 31], [84, 32], [87, 32], [89, 32], [86, 33], [90, 33], [85, 34], [90, 34]], rgb: [231, 165, 132]}
   - {frame: attack, xy: [[84, 26], [83, 27], [84, 27], [83, 28], [83, 29], [89, 30], [89, 31], [88, 33], [84, 34], [86, 34], [88, 34], [89, 34]], rgb: [198, 107, 90]}
   - {frame: attack, xy: [[85, 28], [85, 29], [88, 30], [87, 31], [85, 32], [88, 32], [85, 33]], rgb: [255, 239, 198]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai
