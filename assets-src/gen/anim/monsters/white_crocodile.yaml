@@ -164,3 +164,9 @@ paint:
   - {frame: atk_follow, xy: [[115, 102], [116, 103]], rgb: [123, 82, 90]}    # checkered jaw outline
   - {frame: atk_follow, xy: [[32, 106]], rgb: [123, 82, 90]}                 # hind-paw speck
   - {frame: atk_follow, xy: [[63, 99]], rgb: [148, 99, 107]}                 # far leg speck
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  # check: the in1 -> in2 centroid step 10.1 > 9.6; the head half kept whole and the base band free carry the mass
+  bridge: {keep_top: 0.49, keep_bot: 0.0}

@@ -155,3 +155,8 @@ paint:   # a 1 px notch in the near thigh's outline the sunk body opens, outline
   - {frame: atk_wind2, xy: [[101, 67], [105, 67], [100, 68]], rgb: [6, 4, 10]}
   - {frame: atk_wind1, xy: [[79, 94], [79, 95]], rgb: [165, 49, 57]}            # ink specks on the near foreleg
   - {frame: atk_wind2, xy: [[78, 89], [79, 94], [79, 95], [79, 96]], rgb: [165, 49, 57]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)

@@ -138,3 +138,8 @@ paint:                         # the 1 px channel between the forelegs (open to 
   - {frame: atk_mid, xy: [[75, 30], [77, 30], [75, 32]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[59, 65]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[74, 28], [74, 29], [75, 29], [59, 65]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)

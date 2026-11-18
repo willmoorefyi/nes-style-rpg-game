@@ -159,3 +159,9 @@ paint:                         # 1 px elbow crack on the near foreleg's back edg
   - {frame: atk_wind1, xy: [[107, 79]], rgb: [214, 165, 107]}
   - {frame: atk_follow, xy: [[119, 80], [121, 80], [123, 81], [124, 81]], rgb: [156, 140, 115]}   # chest ruff dots
   - {frame: atk_follow, xy: [[124, 36]], rgb: [206, 156, 99]}                        # back speck
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)
+  bridge: {width: false}       # check: the in1 -> in2 centroid step 11.0 > 10.9 with the width remap

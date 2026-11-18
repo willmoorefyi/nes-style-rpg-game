@@ -149,3 +149,8 @@ frames:
     tweaks: {neck: [0, 1], head: [0, 3], snout: [0, 4]}
 holds: []
 paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)

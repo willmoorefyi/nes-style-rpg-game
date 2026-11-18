@@ -122,3 +122,5 @@ art (F5 is the rig's `raise: false`; no archive).
 | `iron_golem_kneel_v1` | `iron_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `soldier_kneel_v1` | `soldier` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `warmech_kneel_v1` | `warmech` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `green_dragon_kneel_v1` | `green_dragon` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `hydra_kneel_v1` | `hydra` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |

@@ -119,3 +119,7 @@ masks:
 holds: []
 paint:                         # build-time patches
   - {frame: atk_follow, xy: [[75, 65]], rgb: null}   # reopen the approved gap under the near elbow
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

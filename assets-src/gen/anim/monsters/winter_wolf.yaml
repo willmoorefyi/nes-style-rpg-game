@@ -126,3 +126,7 @@ masks:
 holds: []
 paint:                         # the gap between the far hind shin and the near forearm stays open to the ground (4-connected)
   - {frame: hurt_in2, xy: [[62, 68], [63, 69]], rgb: null}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

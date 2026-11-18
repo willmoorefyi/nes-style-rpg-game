@@ -182,3 +182,7 @@ paint:
   - {frame: atk_recover, xy: [[99, 87]], rgb: [156, 206, 222]}
   - {frame: hurt_in1, xy: [[99, 84]], rgb: [206, 231, 239]}
   - {frame: hurt_in1, xy: [[99, 85]], rgb: [156, 206, 222]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
