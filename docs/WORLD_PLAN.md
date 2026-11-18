@@ -4130,7 +4130,7 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 <!-- === PST PAST (pass W: owned by PST) === -->
 <!-- === end PST === -->
 <!-- === INT INTEGRATION (pass W: owned by INT) === -->
-### INT-W2c result: after the ELF-T merge (branch `int-w2c` from `mainline` bc43d930) — (c) fixed, (d) BLOCKED
+### INT-W2c result: after the ELF-T merge (branch `int-w2c` from `mainline` bc43d930, merged up to 767dd7e3) — (c), (d) fixed; (f) BLOCKED
 
 **(c) soft-locks: a verifier bug, fixed.** S4 (the Elfheim visit) is now built and grants nothing, so it is done when
 the party stands on an Elfheim map. Nothing in the world makes the party go there before the Marsh Cave (proof (b)
@@ -4145,31 +4145,45 @@ weaker check. A withheld grant is never held, so it is never noted, and (b) and 
 The new fixture `tests/fixtures/quest/c_visit_order.yaml` (the orb is traded before the shrine visit) has a test in
 `questGraph.test.ts` that fails without the fix (`SOFTLOCK town (4,2) walking [trinket]`).
 
-**(d) bands: not a merge bug, and not fixable within the current rules. Needs the user's decision.**
-- The six level failures were already there on a11defa7. They were hidden because S4 was pending: the curve raised the
-  party to L5 at S4 and marked everything after it as assumed, and (d) skips an assumed stage that is below its band.
-  The levels on a11defa7 were piscodemon L6.5, astos L7.5, S7 L8.1 and S10 L10.2, all below their bands and all
-  skipped. With S4 built, nothing before S11 is assumed any more, so the real curve is checked for the first time.
-- Measured with a scratch copy of the curve: with `grind` 3.0 (the schema and GT maximum) on S2 and S4-S10, the levels
-  are piscodemon L6.8, astos L7.9, S7 L8.8, S8/S9 L9.2 and S10 L9.9, so every one still fails. Grind 6.0 still leaves
-  astos at L9.7. The encounter rates are FF1-like (marsh 14-26 steps, overworld 10-22). The gap is the model itself:
-  shortest routes times a grind of at most 3 give about 40-60 fights before piscodemon, while the S5 band (L8 = 5461
-  xp a member) needs about twice the xp of grind 3.
-- Elfheim gold: the gold at S4's start is S2's gold (1615 at grind 2.0, 1776 at 3.0). No S2/S3 grind in [1, 3]
-  reaches 6470 (50 % of `w_elfheim` 12940). The kit can't be made cheaper either, because `w_elfheim` is also
-  `w_s4`-`w_s10`, the gear of the S5/S6 boss tests. That leaves the rule's anchor. B3 serves L5-13, which is S4-S10,
-  and the gold reaches the 50 % share at S6's start (7120 >= 6470). My recommendation: measure Elfheim's gold at the
-  start of the second B3 stage, or change `bandStage` to S6. That changes §3.5, so it waits for the user, together
-  with the band question.
-- Options for the user (any one of them changes the plan): (1) raise the grind maximum (schema and GRIND_RANGE) to
-  about 7 for S4-S10; (2) give more xp and gold in the S4-S6 zones (enemy rewards or encounter rates; the boss tests
-  must be measured again); (3) lower the S4-S10 bands to the measured curve, and test piscodemon and astos at lower
-  levels; (4) keep the bands and count the S4-S10 bands as assumed until PLAY measures real grinding.
+**(d) bands: fixed by the user's ruling (2026-11-17).** The six level failures were not caused by the merge. They were
+already there on a11defa7 (piscodemon L6.5, astos L7.5, S7 L8.1, S10 L10.2), hidden because the pending S4 marked
+every later stage assumed. With S4 built they are checked for the first time. No `grind` in [1, 3] reaches the bands
+(at 3.0: piscodemon L6.8, astos L7.9, S10 L9.9). The rulings:
+- "Allow more grinding": the grind maximum is 7.0 for every stage (`schemaValidationQuest.ts`, `GRIND_RANGE`, the RED
+  test now uses 8). The grinds set: S2 7.0, S5 7.0, S6 7.0, S7 4.0, S8 4.0, S10 4.0. S4 stays at 2.0 and S9 at 1.0:
+  the curve charges no walk to either. Enemy rewards, encounter rates and bands are unchanged. Measured: pirate L4.2
+  [3,6], S4 L8.6 [5,9], piscodemon L8.6 [8,11], astos L10.2 [10,13], S7 L10.9, S8 and S9 L11.2 [10,13], S10 L11.6
+  [11,14]. Astos is the tightest at 0.15 above the floor, and that is the most the cap allows: with S2 and S5-S10 all
+  at 7.0, astos is L10.15.
+- Elfheim's `bandStage` is S6 (§3.5 has a note). The gold at S6's start is 19440 against the 6470 needed.
+- Follow-up for PLAY/INT: the user plans a "cheats" menu (XP and gold boost, as in the remasters). It is not in this
+  tranche.
 
-Gates on `int-w2c`: `npm run quest -- --mutate`: (a)-(c) and (e)-(h) OK, `mutations: OK (47 gate rows; 60 elements)`,
-and (d) FAIL with the 7 lines above. `npx vitest run tests/progression tests/quest`: 1 failure, `questLate.test.ts`
-(the same (d) lines). `questGraph.test.ts` passes. `npm run build`: exit 0. The full G4 was not run, because the (d)
-failure is already known.
+**(f) price walls: BLOCKED, a new conflict caused by the grind ruling.** The grinds that reach the bands bring gold
+with them. Crescent's first keeper is now talkable at 51823 gold, and the wall needs less than 40 % of `w_crescent`
+60240, which is 24096. With the smallest grinds that still pass the bands (S7-S9 at 1.0, S10 at 2.0) it is 41786. By
+S7's start the gold is already 37028. So no grind that passes (d) keeps the wall. Options for the user:
+(1) measure (f) on a grind-1.0 curve, a party that rushes: the wall stops a rushing party, while a party that grinds
+earns its way in; (2) raise the price of `w_crescent` (it would have to be above about 130000, which affects FIR-T's
+balance kits); (3) drop Crescent's wall (§3.5 then lists only gaia). I recommend (1).
+
+**Assume-mode walks (after the FIR-D1 and WAT-T merges): verifier capacity, fixed.** `ert_o_walk` S10 and S12,
+`ert_t_walk` S25, `fir_d1_walk` S15 and `wat_t_walk` S20 failed because the `--stage` search reached the
+200,000-state cap. The LIMIT frontier then showed up as spurious SOFTLOCK and STRANDED lines. The closeMarkers fix does
+not change these counts: they are the same with and without it. Two changes:
+- `exploreStates` takes `stopAt`. Under `--stage`, from a state that holds the stage's marker, only moves are followed
+  and no event fires, so STRANDED still checks the way home. Those states reach the target anyway, and the later
+  stages are covered by their own runs and by the full run. S10: 301k states down to 824; S12 to 1456.
+- The default cap is now `MAX_STATES` = 1,000,000 (questSearch.ts). `--stage S15` needs 609k states (about 2 GB,
+  about 80 s), because the airship stages come before Gurgu in assume mode. S20 needs 274k and S25 188k. **Risk:** each
+  airship-era region adds to S15's count, so FIR-D2 may pass the cap. The next step would be to fire in `--stage` mode
+  only the events of the stage and its ancestors; the full run already covers the concurrent stages.
+- `fir_t_walk.test.ts` required S15 before S16 in (a)'s order line. The two run in parallel (§3.2), so it now accepts
+  either order.
+
+Gates on `int-w2c` 9b2b1ee4 (`mainline` 767dd7e3 merged): `npm run quest -- --mutate`: (a)-(e), (g), (h) OK, (c) 78102
+states, `mutations: OK (48 gate rows; 61 elements)`, **(f) FAIL** `PRICEWALL crescent 51823 vs 60240`. G4: 336 files,
+7954 passed, **2 failed**, both in `questLate.test.ts` and both (f). Every stage walk passes. `npm run build`: exit 0.
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->
