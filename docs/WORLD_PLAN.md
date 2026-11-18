@@ -4420,9 +4420,33 @@ not change these counts: they are the same with and without it. Two changes:
 - `fir_t_walk.test.ts` required S15 before S16 in (a)'s order line. The two run in parallel (§3.2), so it now accepts
   either order.
 
-Gates on `int-w2c` 9b2b1ee4 (`mainline` 767dd7e3 merged): `npm run quest -- --mutate`: (a)-(e), (g), (h) OK, (c) 78102
-states, `mutations: OK (48 gate rows; 61 elements)`, **(f) FAIL** `PRICEWALL crescent 51823 vs 60240`. G4: 336 files,
-7954 passed, **2 failed**, both in `questLate.test.ts` and both (f). Every stage walk passes. `npm run build`: exit 0.
+**(f) price walls: fixed by the integrator's decision.** The walls are measured on a rushing curve, with every
+`grind` at 1.0 (`curveOf(ctx, {rush: true})`; §3.5 has a note). Crescent is now 12661/60240. A new test in
+`questLate.test.ts` checks that (f) uses the rushing curve and (d) the ground curve.
+
+**After the ERT-D merge (`mainline` bff131df, merge f6b3c1e2):**
+- `ert_d_walk` S11 (c) reported `DEADGATE item rod` because of this tranche's `stopAt`: the rod is S12's, so the S11
+  search no longer reaches it. Under `--stage`, the dead-gate check now also counts the saturation closure's flags and
+  items (`questChecks.ts`).
+- The `ert_d_walk` test "S11 ... only with CANAL_OPEN" also fails on bff131df. Its closure re-opened ELF-T's TNT chest
+  and bought the canal again. The test now starts with CHEST_ELF_T_TNT set, as `ert_o_walk` does.
+- `--stage S15` needs 637968 states and S20 578304, both under MAX_STATES 1,000,000.
+- **BLOCKED, (d) bands S11-S22.** With S11 and S13 built, these stages are no longer assumed, and they fail as S5-S10
+  did: vampire L12.0 [13,16], S12 L12.3, lich L13.0, S14 L13.7, ashen_queen L15.0 [21,24], evil_eye L16.3, S17 L16.9,
+  S20 and S22 L17.3 [25,28]. Even with every grind from S11 to S22 at 7.0 they still fail: vampire L12.9, S12 L13.7,
+  lich L15.5, S14 L16.8, ashen_queen L19.7, S20 and S22 L23.5. The 7.0 cap does not reach these bands, so this needs a
+  new ruling: a higher cap (about 12 or more), more xp in those zones, or lower bands.
+- **BLOCKED, mutations (ERT-D's, also on bff131df without this tranche):** `UNCAUGHT GT-13 ... cut W_isthmus opened`
+  and `UNCAUGHT G melmond patch ert_melmond_bloom forced on`. Both fail `questMutate.test.ts` too. They are for ERT-D
+  or the integrator; they are not caused by INT-W2c.
+
+**Follow-up (`--stage` scope):** in `--stage` mode, fire only the events of the stage and its ancestors. The full run
+already covers the parallel stages. That would keep S15 and S20 (about 600k states now) well under the cap as more
+regions are built.
+
+Gates on `int-w2c` (f6b3c1e2 plus this commit): `npm run quest -- --mutate`: (a)-(c) and (e)-(h) OK; (d) FAIL on the 9
+S11-S22 lines; mutations FAIL on the 2 ERT-D rows. `tests/progression` and `tests/quest`: 3 failures, all in
+`questLate` (d) and `questMutate` (the 2 rows). Every stage walk passes. `npm run build`: exit 0.
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->
