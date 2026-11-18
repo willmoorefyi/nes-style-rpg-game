@@ -3027,6 +3027,12 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # WND-D2 (WORLD 3.7): the engines' watchman wakes throttled (2 hits at attack 103, from the roster's 128) and walks
+  # with the whirlwind its fans draw in (the 4F formation [warmech, air_elemental]); tests/balance/w_wnd_d2.test.ts
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 2
+    attack: 103
   - hpThreshold: 0.5
     patternId: aggressive
     message: "Warmech's core burns red hot!"
@@ -3060,6 +3066,13 @@
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # WND-D2 (WORLD 3.7): her roster swing (4 hits at attack 49) never threatened the B7 party (100 % at L30-L34), so
+  # she wakes with the stilled wind behind her blades (6 hits at attack 78) beside a whirlwind from the crystal
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 78
+    message: "The Hollow Seraph's four blades of light spin up to a scream!"
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"

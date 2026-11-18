@@ -669,17 +669,27 @@ stages:
     tranche: WND-D2
     after: [S27]
     requires: {flags: [SKY_FORTRESS_OPEN], items: [], vehicles: []}
-    grants: {flags: [WIND_CRYSTAL_LIT], items: [], vehicles: []}
+    # adamant: the archive vault's chest on 3F (CHEST_WND_D2_ADAMANT), for the optional S31 (WORLD 3.1)
+    grants: {flags: [WIND_CRYSTAL_LIT], items: [adamant], vehicles: []}
     boss: [hollow_seraph]
     band: [31, 34]
     kit: w_s28
     maps: [sky-castle-*]
-    zones: []
+    zones: [sky-castle-4f:wnd_d2_engine]
     grind: 2.0
-    walk: []
+    # set down by the Mirage console's beam on 1F's south berth (mirage_ascent warps to sky-castle-1f `arrival`), the
+    # airship on the oasis meadow beside the Mirage Tower (the berth's beam drops back to the tower's top); up the hub
+    # stair, over 2F's south bridge to the east island, its belts to D and to the stair island, the archive's vault,
+    # then the engine halls and the spire
+    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, x: 135, y: 38}]}
+    walk: [sky-castle-1f:warp:arrival, sky-castle-2f:warp:d_belt, sky-castle-2f:warp:e_belt,
+      sky-castle-2f:warp:sky-castle-3f, sky-castle-3f:chest:chest_adamant, sky-castle-3f:warp:sky-castle-4f,
+      sky-castle-4f:warp:sky-castle-5f, sky-castle-5f:battle:hollow_seraph]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: sky-castle-5f, kind: npc, at: [12, 8], reason: "the seraph's hideIf only clears the beaten boss off the spire's north end, before the altar"}
+    status: built
   # === end WND-D2 ===
   # === PST (pass W: owned by PST) ===
   - id: S29

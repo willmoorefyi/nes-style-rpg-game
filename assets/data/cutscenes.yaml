@@ -666,6 +666,24 @@
       text: "Cold, thin air, and no sound of sand. Through a gap in the wall the desert lies far below, small as a map."
 # === end WND-D1 ===
 # === WND-D2 (pass W: owned by WND-D2) ===
+# S28 (WORLD 4.7): the Hollow Seraph falls in sky-castle-5f's spire; the wind she shut in the crystal on the altar
+# behind her is let out again (WIND_CRYSTAL_LIT, also the battle's flag).
+- id: wnd_seraph_falls
+  steps:
+    - type: dialog
+      text: "The brass plates come apart one by one and ring on the floor like dropped bells. The ticking inside stops."
+    - type: dialog
+      text: "The cloudy crystal on the altar shivers. A crack of light runs down it, and the air in the spire leans."
+    - type: fade_out
+      duration: 600
+    - type: set_flag
+      flag: WIND_CRYSTAL_LIT
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "The crystal clears and begins to turn on its point. A draught pours from it, down the nave and out over the berths."
+    - type: dialog
+      text: "Far below the castle, sails that have hung slack for years fill all at once, and the windmills of the world creak back to work."
 # === end WND-D2 ===
 # === PST (pass W: owned by PST) ===
 # === end PST ===
