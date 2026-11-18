@@ -111,20 +111,7 @@ masks:
     attack: [[5, 70], [18, 70], [18, 79], [5, 79]]
     hurt: [[11, 72], [24, 72], [24, 79], [11, 79]]
 holds: []
-paint:
-  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
-  - {frame: kneel_in1, xy: [[33, 67], [31, 69]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[30, 54], [34, 55], [35, 55], [36, 55], [37, 55], [36, 56], [37, 56]], rgb: [82, 66, 57]}
-  - {frame: kneel_in2, xy: [[38, 56], [40, 56], [38, 57], [39, 57], [41, 57], [40, 67], [41, 67], [40, 69]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[31, 62], [33, 63]], rgb: [82, 90, 99]}
-  - {frame: kneel_b, xy: [[26, 77]], rgb: null}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); hood bowed, the sword tip planted
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
 kneel:
-  variant: [blade_planted, knee_forward, short_legs, deep_bow]
-  tweaks: {knee_f: [16, 0], foot_f: [16, 0], toe_f: [16, 0], sh_n: [0, 2], sh_f: [0, 2], neck: [0, 2], crown: [0, 2]}
-  paint:
-    - {xy: [[29, 32], [30, 32]], rgb: [165, 165, 165]}
-    - {xy: [[25, 47], [41, 57], [40, 59], [34, 67], [52, 72]], rgb: [6, 4, 10]}
-    - {xy: [[24, 48], [25, 48]], rgb: [57, 57, 74]}
-    - {xy: [[40, 60]], rgb: [82, 90, 99]}
-    - {xy: [[54, 73]], rgb: [82, 66, 57]}
+  source: ai
