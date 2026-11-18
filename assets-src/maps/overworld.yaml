@@ -760,7 +760,8 @@ objects:
   - [tower_icon_2_0, tower_icon_2_1]
   x: 131
   y: 34
-  walk_cells: []
+  walk_cells:
+  - [1, 2]
 - type: deco
   parts:
   - [boulder]
@@ -835,9 +836,6 @@ inspect:
 - x: 141
   y: 38
   text: ['Half a bronze dial juts from the sand, its numbers worn smooth.', 'Its shadow-pin points at the tower, though the sun is behind you.']
-- x: 132
-  y: 36
-  text: ['A tall door of pale metal, without handle or keyhole. It does not move, and it gives back no echo.']
 encounterRate: {min: 10, max: 22}
 encounters:
 - groups:
@@ -3782,6 +3780,7 @@ transitions:
 - {x: 30, y: 10, targetMap: waterfall-cave, targetEntrance: arrival}
 - {x: 8, y: 27, targetMap: caravan-camp, targetEntrance: arrival}
 - {x: 150, y: 13, targetMap: gaia, targetEntrance: gate}
+- {x: 132, y: 36, targetMap: mirage-1f, targetEntrance: arrival}
 - {x: 152, y: 45, targetMap: lufenia, targetEntrance: gate}
 patches:
 - id: north_bridge

@@ -600,10 +600,22 @@ stages:
     maps: [mirage-*]
     zones: [overworld:wnd_mirage_sands]
     grind: 2.0
-    walk: []
+    # WND-D1: the assumed start is WND-O's for S26 (Cornelia's south gate, the airship on the grass below it, the
+    # ship at anchor off the mesa where no shore reaches it); the walk flies to the sands, rings the vestibule door
+    # (the chime) and climbs to the console (the cube)
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
+                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [overworld:warp:mirage-1f, mirage-1f:warp:mirage-2f, mirage-2f:warp:mirage-3f, mirage-3f:npc:mirage_console]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the four cells of mirage-3f's bronze ring (requiredFlag SKY_FORTRESS_OPEN, the way back up after the console's
+      # first lift): without the flag the ring reaches only the sky castle's stubs, and pending S28's grant itself
+      # needs SKY_FORTRESS_OPEN, so nothing is skipped; once WND-D2 builds S28 the removal is SKIP S28 (strict re-checks)
+      - {map: mirage-3f, kind: transition, at: [13, 9], reason: &wnd_d1_ring "pending: S28 (WND-D2) not built; the ring leads only into the sky castle, whose pending grant needs SKY_FORTRESS_OPEN itself"}
+      - {map: mirage-3f, kind: transition, at: [14, 9], reason: *wnd_d1_ring}
+      - {map: mirage-3f, kind: transition, at: [13, 10], reason: *wnd_d1_ring}
+      - {map: mirage-3f, kind: transition, at: [14, 10], reason: *wnd_d1_ring}
+    status: built
   # === end WND-D1 ===
   # === WND-D2 (pass W: owned by WND-D2) ===
   - id: S28

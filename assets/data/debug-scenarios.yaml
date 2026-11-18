@@ -2024,6 +2024,53 @@
 # === WND-T (pass W: owned by WND-T) ===
 # === end WND-T ===
 # === WND-D1 (pass W: owned by WND-D1) ===
+# S27 (WORLD 4.7, 6.5): the Mirage Tower's door on the sands, the band-low party (L29) with the B7 kit, the flags
+# through S26, the chime (S26) and the cube (S21), the airship on the oasis meadow. Ring at the vestibule door, climb
+# the spiral and the bridge, use the cube at the console: SKY_FORTRESS_OPEN, and the map is sky-castle-1f.
+- id: w_s27_start
+  name: WND-D1 - S27 the Mirage Tower (start)
+  mode: field
+  map: overworld
+  entrance: wnd_mirage
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 136, y: 38 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED, CHIME_GIVEN]
+  party: &w_s27_party
+    - { class: knight, name: KNGT, level: 29, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 29, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 29, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 29, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1, chime: 1 }
+  gold: 20000
+  enemies: []
+# The same start with exactly one prerequisite withheld, the chime (and with it S26's CHIME_GIVEN, which the elder's
+# onceFlag would otherwise leave unobtainable): the vestibule door gives its message and there is no way to `inner`.
+- id: w_s27_neg_nochime
+  name: WND-D1 - S27 without the chime (negative)
+  mode: field
+  map: overworld
+  entrance: wnd_mirage
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 136, y: 38 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED]
+  party: *w_s27_party
+  items: { potion: 10, hi_potion: 5, lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1 }
+  gold: 20000
+  enemies: []
 # === end WND-D1 ===
 # === WND-D2 (pass W: owned by WND-D2) ===
 # === end WND-D2 ===
