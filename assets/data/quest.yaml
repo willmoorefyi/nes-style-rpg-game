@@ -277,7 +277,8 @@ stages:
     zones: []
     grind: 1.0
     # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge);
-    # pending until WND-D2 builds the sky castle's adamant (S28 does not grant it yet)
+    # stays pending (INT-W2c): S28 grants the adamant now, but `excalibur` is gear, not a key item, so the verifier
+    # tracks no event that gives it and a built S31 could never be marked done (the W1-I hand-off on non-key gifts)
     walk: []
     basins: {}
     nonLoadBearing: []
