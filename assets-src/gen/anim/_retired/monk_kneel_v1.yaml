@@ -1,0 +1,55 @@
+# Puppet animation joints for the monk (assets-src/gen/puppet.py). Native px on approved/monk/battle.png cells
+# (80x80, figure faces left; n = near/viewer-side limb, f = far limb). Unarmed: the near fist strikes.
+robed: false
+attack_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [40, 26], crown: [40, 6], chest: [41, 32], hip: [42, 47],
+     sh_n: [33, 28], el_n: [30, 41], hand_n: [24, 31], sh_f: [50, 29], el_f: [52, 40], hand_f: [46, 40],
+     hip_n: [35, 50], knee_n: [29, 60], foot_n: [28, 73], hip_f: [48, 50], knee_f: [56, 60], foot_f: [61, 73]}
+  attack:
+    {neck: [38, 26], crown: [37, 7], chest: [40, 33], hip: [44, 46],
+     sh_n: [33, 30], el_n: [20, 31], hand_n: [4, 31],
+     sh_f: [50, 28], el_f: [59, 35], hand_f: [46, 37],
+     hip_n: [38, 50], knee_n: [30, 60], foot_n: [24, 73], hip_f: [49, 50], knee_f: [60, 61], foot_f: [71, 70]}
+  cast:
+    {neck: [42, 24], crown: [42, 4], chest: [42, 31], hip: [43, 46],
+     sh_n: [34, 27], el_n: [26, 24], hand_n: [21, 15], sh_f: [52, 28], el_f: [58, 35], hand_f: [56, 41],
+     hip_n: [36, 50], knee_n: [33, 60], foot_n: [32, 73], hip_f: [50, 50], knee_f: [55, 60], foot_f: [59, 73]}
+# tweaks generated: every in-between joint snapped to a whole pixel (half-pixel offsets resample a translated part
+# with duplicated/dropped columns); atk_mid/atk_follow keep the attack pose (torso, head, far arm, legs) with only the
+# punching arm moving (atk_mid: attack arm swung 15 deg lower); cast_rise = cast pose with the raised arm 20 deg lower;
+# idle_b/cast_gather leave the hips on the legs (the 1 px bob otherwise tilts the thighs and shows a seam).
+tweaks:
+  idle_b: {hip_n: [0, -1], hip_f: [0, -1]}
+  atk_mid: {neck: [-0.8, -0.9], crown: [-1.25, -0.45], chest: [-0.35, -0.45], hip: [1, -1.35], sh_n: [0.1, 0], el_n: [-7.75, -0.27], hand_n: [-12.15, 3.42], sh_f: [0.1, -1.35], el_f: [3.25, -3.15], hand_f: [0.1, -2.25], hip_n: [1.45, -0.9], knee_n: [1.45, -0.9], foot_n: [-0.8, 0], hip_f: [0.55, -0.9], knee_f: [2.35, -0.45], foot_f: [5.5, -1.35]}
+  atk_follow: {neck: [-0.5, 0], crown: [-0.75, 0.25], chest: [-0.25, 0.25], hip: [0.5, -0.25], sh_n: [0, 0.5], sh_f: [0, -0.25], el_f: [1.75, -1.25], hand_f: [0, -0.75], hip_n: [0.75, 0], knee_n: [0.25, 0], foot_n: [-1, 0], hip_f: [0.25, 0], knee_f: [1, 0.25], foot_f: [2.5, -0.75]}
+  cast_gather: {hip_n: [0, -1], hip_f: [0, -1]}
+  cast_rise: {neck: [1, 0], crown: [1, 0], chest: [0.5, 0.5], hip: [0.5, 0.5], sh_n: [0.5, 0.5], el_n: [-2.54, -4.58], hand_n: [-4.82, -1.83], sh_f: [1, 0.5], el_f: [3, -1.5], hand_f: [5, 1.5], hip_n: [0.5, 1], knee_n: [2, 1], foot_n: [2, 1], hip_f: [1, 1], knee_f: [-0.5, 1], foot_f: [-1, 1]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py), iteration 2: re-posed from ready,
+# chest lean and head bow in deg; reoutline re-inks the 2 px outline (puppet_kneel_outline.py); labels / paint
+# (puppet_kneel_paint.py, <= 160 px per frame, approved palette): the sash knot cut with the torso (one piece with its tails); the rear sandal moved 2 px down onto the
+# ground, toes down behind the shin; the kneel_in2 front-knee spike rounded.
+kneel:
+  lean: 8
+  bow: 12
+  arms: [n]
+  reoutline: true
+  per_leg_lift: true
+  labels:
+  - part: torso
+    box: [35, 44, 46, 54]
+  paint:
+  - frame: kneel
+    move: [62, 62, 70, 74]
+    by: [0, 2]
+  - frame: kneel_in2
+    xy:
+    - [17, 55]
+    - [16, 56]
+    rgb: null
+  - frame: kneel_in2
+    xy:
+    - [17, 56]
+    rgb: [6, 4, 10]

@@ -1,0 +1,28 @@
+# Puppet animation joints for the black wizard (assets-src/gen/puppet.py). Native px on approved/black_wizard/battle.png
+# cells (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = wand tip, held in hand_<weapon_hand>.
+robed: true
+attack_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {cape_behind: false, neck: [42, 30], crown: [48, 4], chest: [44, 38], hip: [46, 58],
+     sh_n: [36, 36], el_n: [32, 45], hand_n: [28, 34], sh_f: [55, 32], el_f: [61, 44], hand_f: [54, 38],
+     hip_n: [40, 58], knee_n: [34, 66], foot_n: [32, 74], hip_f: [52, 58], knee_f: [58, 66], foot_f: [62, 74]}
+  attack:
+    {cape_behind: false, neck: [42, 30], crown: [47, 5], chest: [45, 40], hip: [48, 58],
+     sh_n: [37, 34], el_n: [27, 35], hand_n: [16, 35], tip: [3, 34], weapon_hand: n,
+     sh_f: [53, 32], el_f: [60, 40], hand_f: [49, 42],
+     hip_n: [40, 58], knee_n: [34, 66], foot_n: [32, 74], hip_f: [56, 58], knee_f: [64, 66], foot_f: [67, 74]}
+  cast:
+    {cape_behind: false, neck: [44, 30], crown: [50, 4], chest: [46, 38], hip: [47, 58],
+     sh_n: [37, 37], el_n: [30, 31], hand_n: [23, 21], sh_f: [54, 32], el_f: [62, 38], hand_f: [61, 45],
+     hip_n: [40, 58], knee_n: [35, 66], foot_n: [34, 74], hip_f: [54, 58], knee_f: [60, 66], foot_f: [63, 74]}
+tweaks:
+  atk_wind1: {el_n: [-8, 0], hand_n: [-4, -8], tip: [7, -13]}
+  atk_wind2: {el_n: [-10, 0], hand_n: [-6, -9], tip: [5, -17]}
+  cast_rise: {el_n: [-1, -6], hand_n: [-1, -5]}
+  cast_gather: {hand_f: [9, -6], el_f: [2, -3]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
+# sy 0.55, both hands kept, the head (hat) 2 px lower for the band. No bow: a tilted hat pushes the kneel's outline
+# ring past ready's - 0.08.
+kneel: {bow: 0, arms: [], tweaks: {neck: [0, 2], crown: [0, 2]}}

@@ -26,6 +26,6 @@ tweaks:
   cast_rise: {hand_f: [-0.5, 2.5], tip: [-0.5, 2.5], el_f: [-0.5, 1.5], sh_f: [0.5, 1], chest: [1, 0], hip: [1, 0]}
   cast_gather: {hand_f: [22, -6], el_f: [2, -3], tip: [22, -6], hand_n: [-9, -8]}
   atk_follow: {el_n: [-1, -3], hand_n: [-2, -6], neck: [0.5, 0], crown: [0.5, 0]}
-# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
-# sy 0.55, head bow in deg, both hands and the staff kept, the head (hood) 2 px lower for the band.
-kneel: {bow: 4, arms: [], tweaks: {neck: [0, 2], crown: [0, 2]}}
+# Pass KT kneel (docs/KNEEL_TWEEN_PLAN.md): the approved AI key approved/white_wizard/battle_kneel.png and the bridge
+# frames (puppet_kneel.make_ai); the derived variant-A block is archived as anim/_retired/white_wizard_kneel_v1.yaml.
+kneel: {source: ai}

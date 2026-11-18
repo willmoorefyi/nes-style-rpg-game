@@ -1,0 +1,31 @@
+# Puppet animation joints for the white wizard (assets-src/gen/puppet.py). Native px on approved/white_wizard/battle.png
+# cells (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = staff head, held in hand_<weapon_hand>.
+robed: true
+attack_hand: n
+cast_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [38, 35], crown: [38, 12], chest: [40, 42], hip: [40, 62],
+     sh_n: [31, 38], el_n: [26, 46], hand_n: [20, 41], sh_f: [47, 38], el_f: [56, 44], hand_f: [63, 42],
+     tip: [65, 14], weapon_hand: f,
+     hip_n: [34, 62], knee_n: [30, 68], foot_n: [26, 74], hip_f: [46, 62], knee_f: [52, 68], foot_f: [57, 74]}
+  attack:
+    {neck: [40, 35], crown: [40, 15], chest: [40, 42], hip: [40, 60],
+     sh_n: [33, 38], el_n: [28, 43], hand_n: [27, 46], sh_f: [47, 38], el_f: [52, 42], hand_f: [58, 41],
+     tip: [79, 26], weapon_hand: f,
+     hip_n: [34, 62], knee_n: [28, 68], foot_n: [22, 72], hip_f: [46, 62], knee_f: [50, 68], foot_f: [50, 73]}
+  cast:
+    {neck: [40, 35], crown: [42, 10], chest: [42, 42], hip: [42, 62],
+     sh_n: [32, 40], el_n: [25, 35], hand_n: [19, 23], sh_f: [48, 40], el_f: [55, 47], hand_f: [62, 47],
+     tip: [69, 17], weapon_hand: f,
+     hip_n: [35, 62], knee_n: [30, 68], foot_n: [26, 74], hip_f: [48, 62], knee_f: [54, 68], foot_f: [58, 74]}
+tweaks:
+  atk_wind1: {el_n: [-9, -1], hand_n: [-6, -9]}
+  atk_wind2: {el_n: [-11, -1], hand_n: [-7, -10]}
+  cast_rise: {hand_f: [-0.5, 2.5], tip: [-0.5, 2.5], el_f: [-0.5, 1.5], sh_f: [0.5, 1], chest: [1, 0], hip: [1, 0]}
+  cast_gather: {hand_f: [22, -6], el_f: [2, -3], tip: [22, -6], hand_n: [-9, -8]}
+  atk_follow: {el_n: [-1, -3], hand_n: [-2, -6], neck: [0.5, 0], crown: [0.5, 0]}
+# Pass K kneel (docs/KNEEL_PLAN.md D-K4 variant A, R3 = A; puppet_kneel.py): the robe below the hip squashed to
+# sy 0.55, head bow in deg, both hands and the staff kept, the head (hood) 2 px lower for the band.
+kneel: {bow: 4, arms: [], tweaks: {neck: [0, 2], crown: [0, 2]}}

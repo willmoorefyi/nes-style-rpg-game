@@ -124,3 +124,13 @@ art (F5 is the rig's `raise: false`; no archive).
 | `warmech_kneel_v1` | `warmech` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `green_dragon_kneel_v1` | `green_dragon` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `hydra_kneel_v1` | `hydra` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `knight_kneel_v1` | `knight` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `thief_kneel_v1` | `thief` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `ninja_kneel_v1` | `ninja` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `monk_kneel_v1` | `monk` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `master_kneel_v1` | `master` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `red_mage_kneel_v1` | `red_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `black_mage_kneel_v1` | `black_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `black_wizard_kneel_v1` | `black_wizard` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `red_wizard_kneel_v1` | `red_wizard` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `white_wizard_kneel_v1` | `white_wizard` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
