@@ -28,6 +28,17 @@ No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading th
   up = counsel, down = the king with the tablet; "either stair at the bottom takes you to the throne" matches two B4->B5
   stairs. Random battles on B3/B4 (sahagin_prince x2, sea_troll x3, water_naga, deepeyes + sea_troll) were all won by
   mashing Fight at L27 with the stage kit; none was a wipe.
+- S24 B5 (`sea-shrine-b5`): two chests, two random fights, then talking to the Sovereign at (15, 8) plays the line, the
+  scripted fight, `wat_drowned_falls`: WATER_CRYSTAL_LIT set, `slab` given, no console errors. Fairness: a Fight-mash
+  party at L27 with the stage kit won, ending with one hero KO'd (KNT 0/458) and one at 57/290: a real fight, not a
+  wipe, not trivial.
+- S25 `w_s25_start`: overworld -> `melmond` -> `melmond-house-unne` (door (21, 11)); Unne's talk takes the slab
+  (1 -> 0), sets LUFENIAN_LEARNED; the cutscene reads well; repeat talk and the housekeeper change as intended.
+  `w_s25_neg_noslab`: Unne tells the story and asks for the tablet; no flag.
+- S26 `w_s26_start`: Lufenia (`lufenia`) has 8 transitions (elder, stargazer, healer, two magic shops, inn, 2 gate
+  cells); 8 of 12 outdoor NPCs read in plain English, the other four are wanderers my bot missed (not a defect). The
+  elder (`lufenia-house-elder`) gives the Chime (`chime` held, CHIME_GIVEN set). Hints chain correctly: Gaia and Unne
+  point to Lufenia, Lufenia points to the Mirage and (cube hint) the waterfall in the west.
 - Data check: S31 Smyth (`dwarf-hall`, `ert_smyth`): dialog and cutscene `ert_smyth_forge` are gated on WIND_CRYSTAL_LIT
   in the version I tested (the fix agent is changing this; behaviour noted only). Chest `adamant` is on `sky-castle-3f`
   (4, 26).
