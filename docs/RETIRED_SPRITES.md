@@ -105,3 +105,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `sea_troll_kneel_v1` | `sea_troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `stone_golem_kneel_v1` | `stone_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `troll_kneel_v1` | `troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `iron_golem_kneel_v1` | `iron_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
