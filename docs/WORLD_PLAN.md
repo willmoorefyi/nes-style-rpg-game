@@ -557,7 +557,7 @@ W1-0 creates these ids (W1-F creates the item records). Display names come from 
 | `oxyale` | S23 the fairy, WND-T | Onrac's submarine (S24) | no |
 | `slab` | S24 drowned-sovereign cutscene, WAT-D | Dr. Unne (S25) | yes |
 | `chime` | S26 Lufenia's elder, WND-O | the Mirage door (S27) | no |
-| `adamant` (optional) | S28 sky-castle chest, WND-D2 | Smyth the smith (S31) | yes |
+| `adamant` (optional) | the sky castle's 3F chest (S28's maps, not an S28 grant), WND-D2 | Smyth the smith (S31) | yes |
 
 **Vehicles:**
 
@@ -616,16 +616,18 @@ rosters use existing enemy ids. The zone ids are in section 4.
 | S25 | Dr. Unne's lesson | ERT-T | S24 | `slab` | LUFENIAN_LEARNED | 28-31 | - | - |
 | S26 | Lufenia's chime | WND-O | S25 | LUFENIAN_LEARNED, airship | CHIME_GIVEN, `chime` | 28-31 | - | chimera, green_dragon, medusa |
 | S27 | The Mirage Tower 1F-3F | WND-D1 | S26, S21 | `chime`, `cube` | SKY_FORTRESS_OPEN | 29-32 | - | black_knight, chimera, guardian, blue_dragon, green_dragon, stone_golem |
-| S28 | The sky castle 1F-5F | WND-D2 | S27 | SKY_FORTRESS_OPEN | WIND_CRYSTAL_LIT | 31-34 | hollow_seraph | air_elemental, spirit_naga, death_knight, earth_medusa, black_flan, soldier, vampire_lord, dark_fighter, warmech (rare, weight 1 in 64) |
+| S28 | The sky castle 1F-5F | WND-D2 | S27 | SKY_FORTRESS_OPEN | WIND_CRYSTAL_LIT (3F's vault chest holds the `adamant`, which is S31's, not a grant) | 31-34 | hollow_seraph | air_elemental, spirit_naga, death_knight, earth_medusa, black_flan, soldier, vampire_lord, dark_fighter, warmech (rare, weight 1 in 64) |
 | S29 | The time gate | PST | S13, S15, S24, S28 | the 4 crystal flags, `lute` | TIME_GATE_OPEN | 33-35 | - | - |
 | S30 | The temple of the past 1-5 | PST | S29 | TIME_GATE_OPEN | PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED, CHAOS_DEFEATED (milestones in this order) | 34-41 | lich_2, ashen_queen_2, drowned_sovereign_2, hollow_seraph_2, death_eye, then chaos (40) | rhyos, purple_worm, iron_golem, plus death_knight, blue_dragon, vampire_lord, dark_fighter |
-| S31 | Excalibur (**optional**) | ERT-O | S28 | `adamant` | `excalibur` (gear) | - | - | - |
+| S31 | Excalibur (**optional**) | ERT-O | S27 | `adamant` (sky-castle-3f's chest) | `excalibur` (gear) | - | - | - |
 
 Notes:
 
 - **S15 and S16 run in parallel**, as in the classic: the airship doesn't need the fire crystal.
 - **S19 and S31 are optional.** The verifier proves they are reachable and that no other stage needs them. The
   balance tests from S20 on use upgraded classes (QUEST open question 3).
+- **Ruling (user, 2026-11-18): Excalibur follows the classic.** Smyth forges as soon as the party brings the
+  `adamant`, with no WIND_CRYSTAL_LIT gate, so the sword may come before the seraph falls; S31 follows S27 (W-S31).
 - **Cross-region hand-offs:**
   - S23 (WND) needs S22's bottle (WAT);
   - S24 (WAT) needs S23's oxyale (WND);
@@ -643,8 +645,9 @@ S0 -> S1 -> S2 -> S4 -> S5 -> S6 -> S7 -> S8 -> S9 -> S10 -> S11 -> S12 -> S13 -
        \-> S3 ---------------------/                                                    +-> S16 -> S17 -+             |
                                                                                                          |             |
   S17 -> S18 -> S19 (optional)                                                                           |             |
+  S27 -> S31 (optional; the adamant is sky-castle-3f's chest)                                            |             |
   S17 -> S20 -+-> S21 (with S14) ------------------------------------------+                             |             |
-              +-------------------------> S24 (with S23) -> S25 -> S26 -> S27 (with S21) -> S28 -> S31 (optional)      |
+              +-------------------------> S24 (with S23) -> S25 -> S26 -> S27 (with S21) -> S28                        |
   S17 -> S22 -> S23 --------------------/                                                     |                        |
                                                                                               v                        v
                                                                   S13 + S15 + S24 + S28 -> S29 -> S30 (goal)
@@ -5135,8 +5138,27 @@ exploring, `--stage` scoping, MAX_STATES, the placeholder list), the ceilings an
   `w_s28_start` (sky-castle-1f 19,34): each ExplorationScene with 0 console errors; screenshots
   `/tmp/w-int/smoke_<id>.png`.
 
-**For PLAY / the user:** Smyth now needs the wind crystal lit before he forges (a small design change, made so that
-S31 stays after S28); the user's planned "cheats" menu (INT-W2c) is still open.
+**For PLAY / the user:** ~~Smyth now needs the wind crystal lit before he forges~~ (reverted by W-S31 below); the
+user's planned "cheats" menu (INT-W2c) is still open.
+
+### W-S31 result: Excalibur follows the classic (user ruling 2026-11-18; branch `w-s31` from 64be8290)
+
+- **Smyth** (`earth/dwarf.py`) forges as soon as the party brings the `adamant`: the cutscene `ert_smyth_forge` has
+  no `requiredFlags`, and his wind / refusal lines are gone (his greeting, the "ore is singing" line with the ore and
+  the line after the forging stay).
+- **Why the checker change is the S28 / S31 data, not a "consumed grant counts as held" rule.** The adamant is not
+  needed by S28 (nothing in the sky castle or later reads it), so listing it as an S28 grant was the hole: (a) wants
+  all of a stage's grants to hold together, and the classic order trades it away before the seraph falls. Remembering
+  consumed grants would need a per-grant note in `closeMarkers` for every stage (more states, a weaker (a) for any
+  stage whose grant is later traded) where this needs none. Now `quest.yaml` S28 grants WIND_CRYSTAL_LIT only; the
+  3F vault chest (CHEST_WND_D2_ADAMANT) is an ordinary key-item event; S31 `after: [S27]` (the castle opens with
+  SKY_FORTRESS_OPEN), requires `adamant`, entry S28's (1F's berth), walk `sky-castle-3f:chest:chest_adamant,
+  dwarf-hall:npc:ert_smyth`.
+- **One verifier change** (`outOfScopeEvents`, questProofs.ts): under `--stage`, an event that gives a requirement of
+  the stage under test which no stage grants stays in scope (the adamant chest is on S28's map, and S28 is no longer an
+  ancestor of S31). Without it `--stage S31` could never get the ore.
+- **Still caught:** removing Smyth's `requiredItem adamant` gives Excalibur at S10 time, before S27 (ORDER) and
+  without its requirement (SKIP); withholding the chest keeps Excalibur out of reach (`questGraph.test.ts` W-S31 test).
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->

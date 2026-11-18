@@ -10,9 +10,11 @@ import { join } from 'node:path';
 import type { ProofResult } from '../../src/progression/questTypes.js';
 import { buildQuestWorld, loadQuestWorld } from '../../src/progression/questData.js';
 import { townKeepers, townMapIds } from '../../src/progression/questCatalog.js';
-import { closure, createQuestContext, proofOrder, stateGraph } from '../../src/progression/questProofs.js';
+import { closure, createQuestContext, outOfScopeEvents, proofOrder, stateGraph } from '../../src/progression/questProofs.js';
 import { proofSkips, proofSoftlocks } from '../../src/progression/questChecks.js';
 import { cellPath } from '../../src/progression/questSearch.js';
+import { eventsGranting, saturate } from '../../src/progression/questSaturate.js';
+import { withheld } from '../../src/progression/questStates.js';
 import { buildReport, formatReport, parseArgs, runCoreProofs } from '../../src/progression/questReport.js';
 import { fixtureInput, loadFixture } from '../fixtures/quest/loadFixture.js';
 
@@ -249,5 +251,23 @@ describe('questGraph: the repository (npm run quest)', () => {
     expect(ctx.world.quest.stages.filter((s) => s.status === 'pending').map((s) => s.id)).toEqual([]);
     const strict = proofOrder(createQuestContext(ctx.world, { strict: true }));
     expect(strict.failures, strict.line).toEqual([]);
+  });
+
+  it('W-S31 (the classic order): Excalibur can be forged before the seraph falls; S31 follows S27, not S28', () => {
+    const s31 = ctx.world.stages.get('S31')!;
+    expect(s31.after).toEqual(['S27']);
+    expect(ctx.world.stages.get('S28')!.grants.items).not.toContain('adamant');
+    const noSeraph = saturate(ctx, ctx.start,
+      { disabled: eventsGranting(ctx, { flags: ['WIND_CRYSTAL_LIT'] }), withhold: withheld({ flags: ['WIND_CRYSTAL_LIT'] }) });
+    expect(noSeraph.items.has('excalibur')).toBe(true);
+    const noChest = saturate(ctx, ctx.start, { disabled: eventsGranting(ctx, { items: ['adamant'] }), withhold: withheld({ items: ['adamant'] }) });
+    expect(noChest.items.has('excalibur')).toBe(false);
+    // --stage S31: the chest (on S28's sky-castle-3f) gives S31's own requirement, so it stays in scope; S28's
+    // other events do not
+    const chest = ctx.cat.events.find((e) => e.grants.items.includes('adamant'))!;
+    expect(chest.map).toBe('sky-castle-3f');
+    const out = outOfScopeEvents(ctx, 'S31');
+    expect(out.has(chest.id)).toBe(false);
+    expect([...out].some((id) => id.startsWith('sky-castle-5f:'))).toBe(true);
   });
 });
