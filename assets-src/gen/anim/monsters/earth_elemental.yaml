@@ -117,3 +117,7 @@ paint:                         # pockets the moves close off, filled with outlin
                                # forearm and the belly, hurt_in2 a 1 px notch at the crotch
   - {frame: hurt_in1, xy: [[81, 80], [78, 81], [79, 81], [80, 81], [81, 81], [80, 82]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[60, 93]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai
