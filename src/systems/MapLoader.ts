@@ -1,4 +1,4 @@
-import { npcPresent, type MapData } from '../types/index.js';
+import { npcPresent, type MapData, type MapNPC } from '../types/index.js';
 import type { DataLoader } from '../core/DataLoader.js';
 import { TilemapRenderer } from '../rendering/TilemapRenderer.js';
 import { BakedMapRenderer, loadBakedTextures, type BakedTextures } from '../rendering/BakedMapRenderer.js';
@@ -17,6 +17,8 @@ export interface MapLoadResult {
   tilemap: MapRenderer;
   collisionMap: CollisionMap;
   npcs: NPC[];
+  /** Every NPC of the map, those a story flag hides included (they appear when the flag changes, P3-03). */
+  npcDefs: MapNPC[];
 }
 
 export interface MapLoaderOptions {
@@ -76,11 +78,16 @@ export class MapLoader {
     // a streamed map holds a step while the view there is not loaded yet (at most MISS_HOLD_FRAMES frames, W1-E)
     const collision = baked && mapData.art && streams(mapData.art)
       ? new StreamedCollisionMap(mapData, hasFlag, (x, y) => baked.stepHeld(x, y)) : collisionMap;
-    const npcs = mapData.npcs.map(
-      npcData => new NPC(npcData as NPCData, this.placeholders.getNPCTexture(npcData.sprite), this.placeholders.getNPCFrames(npcData.sprite) ?? undefined)
-    );
+    const npcs = mapData.npcs.map((npcData) => this.createNpc(npcData, hasFlag));
+    return { mapData, tilemap, collisionMap: collision, npcs, npcDefs: loaded.npcs };
+  }
+
+  /** One NPC from its map def (also for a def a flag change brings into the map); a looted chest shows as opened. */
+  createNpc(def: MapNPC, hasFlag?: (flag: string) => boolean): NPC {
+    const npc = new NPC(def as NPCData, this.placeholders.getNPCTexture(def.sprite),
+      this.placeholders.getNPCFrames(def.sprite) ?? undefined);
     // ST-12: chests looted on an earlier visit show as opened
-    for (const npc of npcs) if (npc.chestFlag && hasFlag?.(npc.chestFlag)) npc.setOpened();
-    return { mapData, tilemap, collisionMap: collision, npcs };
+    if (npc.chestFlag && hasFlag?.(npc.chestFlag)) npc.setOpened();
+    return npc;
   }
 }
