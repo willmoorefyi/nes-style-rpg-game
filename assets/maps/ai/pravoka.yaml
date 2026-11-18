@@ -96,7 +96,7 @@ npcs:
   x: 21
   y: 35
   hideIf: BIKKE_DEFEATED
-  dialog: ['Pirate: Nine of us, and the Captain makes ten. Nobody in this town is fool enough to count higher.']
+  dialog: ['Pirate: Nine of us, the Captain counted. Nobody in this town is fool enough to count higher.']
 - id: pirate_pier
   sprite: villager
   tint: '#b4c8dc'
@@ -118,7 +118,8 @@ npcs:
   x: 40
   y: 33
   hideIf: BIKKE_DEFEATED
-  dialog: ['Bikke: So you''re the ones the town has been whispering about. Warriors, they say.', 'I took this harbour with nine blades and a fast hull. If you want it back, you''ll pay in blood.']
+  dialog: ['Bikke: So you''re the ones the town has been whispering about. Warriors, they say.', 'I took this harbour with eight blades, my own the ninth, and a fast hull. If you want it back, you''ll pay
+      in blood.']
 - id: bikke_after
   sprite: warrior
   x: 26

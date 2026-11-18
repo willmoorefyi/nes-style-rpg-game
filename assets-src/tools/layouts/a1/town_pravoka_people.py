@@ -53,7 +53,7 @@ def npcs() -> list[dict]:
         pirate("pirate_den_a", "villager", RED, 18, 34, [
             "Pirate: That's our den behind me. The door's nailed shut because the last owner kept knocking."]),
         pirate("pirate_den_b", "guard", TAR, 21, 35, [
-            "Pirate: Nine of us, and the Captain makes ten. Nobody in this town is fool enough to count higher."]),
+            "Pirate: Nine of us, the Captain counted. Nobody in this town is fool enough to count higher."]),
         pirate("pirate_pier", "villager", SALT, 33, 33, [
             "Pirate: Off the pier, landlubber. The Captain's at the end of it, and he's in a mood.",
             "Mind you, he's always in a mood."]),
@@ -62,7 +62,7 @@ def npcs() -> list[dict]:
         # ── the captain, and the captain after ──
         {"id": "bikke", "sprite": "warrior", "tint": "#a03c3c", "x": CAPTAIN[0], "y": CAPTAIN[1], "hideIf": BEATEN,
          "dialog": ["Bikke: So you're the ones the town has been whispering about. Warriors, they say.",
-                    "I took this harbour with nine blades and a fast hull. If you want it back, you'll pay in blood."]},
+                    "I took this harbour with eight blades, my own the ninth, and a fast hull. If you want it back, you'll pay in blood."]},
         npc("bikke_after", "warrior", *CAPTAIN_AFTER, [
             "Bikke: The brig is yours, and I keep my word. She's tied at the quay outside the town.",
             "Board her from the land and she'll take you anywhere the sea goes. She won't climb a mountain, mind."],

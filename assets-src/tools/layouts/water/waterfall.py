@@ -38,7 +38,8 @@ AUTOMATON = {
         {"text": ["Brass shutters slide back from two lamp-eyes. A voice like a wound-down music box:",
                   "\"Visitor. Warm hands, at last. I have held this for the sky folk longer than the river has run "
                   "this way.\"",
-                  "\"They are not coming back for it. Take it to a tower that remembers them, and it will open.\""]},
+                  "\"They are not coming back for it. Take it to a tower that remembers them, and it will open.\"",
+                  "The cube leaves the brass hands, and the automaton's lamp-eyes flicker."]},
     ],
     "giftItem": "cube", "giftFlag": "CUBE_GIVEN",
     "cutscene": {"id": "wat_cube_given", "requiredFlag": "CUBE_GIVEN", "onceFlag": "WAT_O_TWIN_TOLD"},

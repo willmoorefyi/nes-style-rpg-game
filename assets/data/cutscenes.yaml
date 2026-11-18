@@ -115,12 +115,13 @@
       duration: 400
     - type: dialog
       text: "Matoya: Shelves! Jars! And the dust on them, shameful. Brooms, you heard nothing."
+    - type: dialog
+      text: "Matoya: Here, for your trouble: the Herb. Crush it under a sleeper's nose and no curse holds them."
     - type: give_item
       item: herb
+      announce: true
     - type: set_flag
       flag: A1_O_HERB_GIVEN
-    - type: dialog
-      text: "Matoya: Here, for your trouble: the Herb. Crush it under a sleeper's nose and no curse holds them. Received the Herb."
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
 # S2 (WORLD_PLAN 4.1): Bikke's nine are beaten at the brig pier (pravoka, the scripted encounter on the captain). He
@@ -199,15 +200,13 @@
 - id: elf_prince_wakes
   steps:
     - type: dialog
-      text: "You crush a leaf of Matoya's herb under the prince's nose. Its smell is sharp as a slap."
+      text: "The leaf of Matoya's herb crumples to green dust, and its smell is sharp as a slap."
     - type: take_item
       item: herb
     - type: fade_out
       duration: 500
     - type: set_flag
       flag: PRINCE_AWAKE
-    - type: give_item
-      item: mystic_key
     # the warp reloads the chamber behind the fade, so the woken prince (showIf PRINCE_AWAKE) stands by his bier
     - type: warp
       map: elfheim-castle-chamber
@@ -223,7 +222,10 @@
     - type: dialog
       text: "Prince: A year? Astos's gift box, then. I remember the lid, and then nothing. You came all this way for me?"
     - type: dialog
-      text: "Prince: Take my key. It opens the living gate to the vault below the hall. Received the Mystic Key."
+      text: "Prince: Take my key. It opens the living gate to the vault below the hall."
+    - type: give_item
+      item: mystic_key
+      announce: true
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
 # S5: the postVictoryCutscene of the Marsh Cave guard (marsh-cave-b3, npc elf_d_bier, piscodemon x3); it gives the
@@ -309,12 +311,13 @@
       text: "All night the anvil rings. No dwarf in the hall sleeps, and none complains."
     - type: fade_in
       duration: 600
-    - type: give_item
-      item: excalibur
-    - type: set_flag
-      flag: ERT_O_SWORD_FORGED
     - type: dialog
       text: "Smyth: \"There. Swing it once and you'll know. I'll not make its like again.\""
+    - type: give_item
+      item: excalibur
+      announce: true
+    - type: set_flag
+      flag: ERT_O_SWORD_FORGED
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
 # S25: Dr. Unne (melmond-house-unne, npc ert_unne, requiredItem slab, onceFlag LUFENIAN_LEARNED) reads the slab back
@@ -441,10 +444,11 @@
       text: "Two novices carry a slim canoe of pale wood up from the islet's shore and lay it at your feet."
     - type: give_item
       item: canoe
+      announce: true
     - type: set_flag
       flag: CANOE_GIVEN
     - type: dialog
-      text: "You received the Canoe! Step onto a river or the lake and you will paddle."
+      text: "Step onto a river or the lake and you will paddle."
     - type: dialog
       text: "Elder: \"South of the ring the fire mountain wakes, and beside it a hollow of ice keeps its own secret. The rivers will take you to both.\""
 # === end FIR-T ===
@@ -555,8 +559,6 @@
 - id: wat_cube_given
   steps:
     - type: dialog
-      text: "The cube leaves the brass hands, and the automaton's lamp-eyes flicker."
-    - type: dialog
       text: "\"We were cast as a pair. I was given a lantern and this door to keep. My twin was given a blade.\""
     - type: dialog
       text: "\"It was sent up to walk the halls of the castle in the sky. If it walks there still, it will not know you.\""
@@ -597,8 +599,7 @@
       text: "\"Our makers left it with us when they went up. It is tuned to one door only: the Mirage's inner door.\""
     - type: give_item
       item: chime
-    - type: dialog
-      text: "You received the Chime."
+      announce: true
     - type: set_flag
       flag: CHIME_GIVEN
     - type: dialog
@@ -621,8 +622,6 @@
       duration: 600
     - type: set_flag
       flag: FAIRY_FREED
-    - type: give_item
-      item: oxyale
     - type: warp
       map: gaia-spring
       x: 10
@@ -637,7 +636,10 @@
     - type: dialog
       text: "Fairy: \"A whole year of glass walls and that trader's snoring! I thought I would be a lamp on a shelf forever.\""
     - type: dialog
-      text: "Fairy: \"Here, a draught from the heart of the spring, the Oxyale. One sip and the deep water lets you breathe.\" Received the Oxyale."
+      text: "Fairy: \"Here, a draught from the heart of the spring, the Oxyale. One sip and the deep water lets you breathe.\""
+    - type: give_item
+      item: oxyale
+      announce: true
     - type: dialog
       text: "Fairy: \"Something is choking the sea off Onrac, the way the glass choked me. Go down and see.\""
 # === end WND-T ===
@@ -785,6 +787,8 @@
       text: "You wake on the throne room's cool floor with the morning coming through the high windows. The guard at the door asks only whether you slept well."
     - type: dialog
       text: "The four crystals burn on in their far places. The lute, when you look, has a new string, and you do not know who strung it."
+    - type: fade_out
+      duration: 1800
     - type: end_game
-      text: "The road is closed behind you. The End"
+      text: "The road is closed behind you.\nThe End"
 # === end PST ===

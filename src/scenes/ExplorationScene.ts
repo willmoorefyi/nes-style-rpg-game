@@ -25,6 +25,7 @@ import { FieldTransition } from './exploration/FieldTransition.js';
 import { applyPendingFacing, createFieldPlayer, leaderClassId, recordPlayer, type FieldPlayer } from './exploration/FieldPlayer.js';
 import { ControlsHint } from '../ui/ControlsHint.js';
 import { FadeOverlay } from '../rendering/FadeOverlay.js';
+import { EndCard } from './exploration/EndCard.js';
 import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { inspectAt } from './exploration/FieldInspect.js';
 import { FieldVehicles, fieldModeOf } from './exploration/FieldVehicles.js';
@@ -71,6 +72,7 @@ export class ExplorationScene implements Scene {
   private controlsHint: ControlsHint;
   private battleFlash = new BattleFlashEffect(this.container);
   private fadeOverlay: FadeOverlay;
+  private endCard = new EndCard();
   private fieldTransition: FieldTransition;
   private npcs: NPC[] = [];
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
@@ -112,6 +114,7 @@ export class ExplorationScene implements Scene {
     this.container.addChild(this.controlsHint.container);
     this.fadeOverlay = new FadeOverlay();
     this.container.addChild(this.fadeOverlay.overlay);
+    this.container.addChild(this.endCard.container);
     // Dialog must be ABOVE fade overlay so cutscene dialog is visible on black screen
     this.container.addChild(dialogBox);
     this.uiContainer.addChild(this.errorDisplay.container);
@@ -210,7 +213,7 @@ export class ExplorationScene implements Scene {
         onFlagSet: () => this.refreshNpcPresence(),
         warp: (w) => this.fieldTransition.warp(w),
         onHeal: () => this.game.events.emit('partyHealed', {}),
-        inventory: this.game.inventory, endGame: () => this.game.scenes.switchTo('title'), // W1-B (GAP-13)
+        inventory: this.game.inventory, showCard: (t) => this.endCard.show(t), endGame: () => this.game.scenes.switchTo('title'), // W1-B (GAP-13)
         setVehicle: (v) => this.vehicles.setVehicle(v), // W1-A
       });
     } finally {
@@ -327,6 +330,7 @@ export class ExplorationScene implements Scene {
       this.controlsHint.update(this.game.input);
       return;
     }
+    if (this.endCard.active) { this.endCard.update(this.game.input); return; }
     // B5: Update HUD each frame
     this.fieldHUD.update(this.game.party);
     if (this.dialogManager.isActive) {
