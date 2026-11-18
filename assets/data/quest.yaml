@@ -374,10 +374,16 @@ stages:
     maps: [gurgu-*]
     zones: [overworld:fir_ashlands]
     grind: 2.0
-    walk: []
+    # on foot on Crescent's shore by the fir_crescent dock, the ship moored there; paddle R-volcano to the mouth,
+    # then down the five floors (B2's east stair to B3's north gallery) to the queen
+    entry: {map: overworld, x: 147, y: 124, mode: walking, vehicles: [{type: ship, map: overworld, x: 146, y: 124}]}
+    walk: [overworld:warp:gurgu-b1, gurgu-b1:warp:gurgu-b2, gurgu-b2:warp:arrival, gurgu-b3:warp:gurgu-b4,
+      gurgu-b4:warp:gurgu-b5, gurgu-b5:battle:ashen_queen]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: gurgu-b5, kind: npc, at: [14, 22], reason: "the queen's hideIf only clears the beaten boss off the court's south end, before the altar"}
+    status: built
   # === end FIR-D1 ===
   # === FIR-D2 (pass W: owned by FIR-D2) ===
   - id: S16

@@ -310,6 +310,24 @@
 # === FIR-T (pass W: owned by FIR-T) ===
 # === end FIR-T ===
 # === FIR-D1 (pass W: owned by FIR-D1) ===
+# S15 (WORLD 4.4): the Ashen Queen falls in gurgu-b5's ash court; the fire she drank goes back into the crystal on the
+# altar behind her (FIRE_CRYSTAL_LIT, also the battle's flag).
+- id: fir_ashen_falls
+  steps:
+    - type: dialog
+      text: "The queen's six arms fold in like a burnt-out wick. Her coil crumbles, and the robe falls empty on the ash."
+    - type: dialog
+      text: "A thread of flame slips from the robe, crosses the court, and runs into the dull crystal on the altar."
+    - type: fade_out
+      duration: 600
+    - type: set_flag
+      flag: FIRE_CRYSTAL_LIT
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "The crystal kindles from the inside out until it glows like a small, steady sun. The ash stops falling."
+    - type: dialog
+      text: "Somewhere far above, the mountain lets out a long breath, and the heat in the stone eases."
 # === end FIR-D1 ===
 # === FIR-D2 (pass W: owned by FIR-D2) ===
 # === end FIR-D2 ===
