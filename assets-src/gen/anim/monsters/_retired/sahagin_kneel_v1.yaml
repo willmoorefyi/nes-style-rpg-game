@@ -1,0 +1,159 @@
+sprite: sahagin
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [40, 8]
+    neck: [40, 26]
+    chest: [40, 33]
+    hip: [39, 47]
+    sh_n: [46, 34]
+    el_n: [52, 38]
+    hand_n: [57, 39]
+    tip: [60, 12]
+    sh_f: [30, 31]
+    el_f: [26, 40]
+    hand_f: [24, 49]
+    hip_n: [44, 51]
+    knee_n: [46, 62]
+    foot_n: [46, 72]
+    toe_n: [53, 75]
+    hip_f: [33, 51]
+    knee_f: [31, 62]
+    foot_f: [29, 72]
+    toe_f: [33, 75]
+  attack:
+    crown: [47, 9]
+    neck: [44, 30]
+    chest: [41, 36]
+    hip: [39, 48]
+    sh_n: [47, 37]
+    el_n: [49, 43]
+    hand_n: [48, 50]
+    tip: [66, 66]
+    sh_f: [36, 25]
+    el_f: [25, 22]
+    hand_f: [13, 26]
+    hip_n: [43, 52]
+    knee_n: [47, 61]
+    foot_n: [46, 72]
+    toe_n: [53, 75]
+    hip_f: [33, 52]
+    knee_f: [22, 62]
+    foot_f: [10, 72]
+    toe_f: [12, 76]
+  hurt:
+    crown: [28, 12]
+    neck: [33, 27]
+    chest: [38, 34]
+    hip: [40, 47]
+    sh_n: [43, 31]
+    el_n: [50, 35]
+    hand_n: [54, 37]
+    tip: [51, 14]
+    sh_f: [26, 33]
+    el_f: [21, 41]
+    hand_f: [24, 50]
+    hip_n: [47, 48]
+    knee_n: [49, 57]
+    foot_n: [49, 66]
+    toe_n: [51, 69]
+    hip_f: [39, 51]
+    knee_f: [36, 62]
+    foot_f: [35, 73]
+    toe_f: [38, 76]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  # The trident flips ~130 deg between idle (upright) and attack (thrust down-forward), over the 30 deg cap, so it never
+  # turns: idle-sourced frames keep it upright, attack-sourced ones keep the thrust angle, and it only translates with the
+  # fist. The 2-3 px channel between the near leg and the shaft is open in idle: the shaft never moves left or down in
+  # idle-sourced frames (any closure is a new enclosed hole).
+  atk_wind1:                   # half of wind2: head back, trident fist hoisted 3 px
+    moves: [crown, neck, chest]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], el_n: [0, -2], hand_n: [0, -3]}
+  atk_wind2:                   # the swing starts (t +0.30 toward the strike, skeleton recipe: idle/attack IoU 0.42 cannot
+    t: 0.30                    # meet wind2->mid from a pull-back): far arm swings up, trident hoisted 4 px
+    moves: [crown, neck, chest, hip, sh_f, el_f, hand_f]
+    tweaks: {sh_n: [0, -1], el_n: [1, -2], hand_n: [1, -4]}
+  atk_mid:                     # both arms and the trident keep the attack grip (the far fist holds the shaft butt); legs
+    t: 0.35                    # pinned and shifted toward idle, not rotated
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [crown, neck, chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [5, 0], foot_f: [6, 0]}
+  atk_follow:                  # a settle (t 0.65); the two-handed grip rides the chest as one piece, head 2 px back
+    t: 0.65
+    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f, knee_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0]}
+  atk_recover:                 # still leaning in (follow->recover IoU): body and far arm toward the strike, head 1 px,
+    t: 0.35                    # far knee free; the upright trident pushed forward clear of the snout and the leg
+    moves: [crown, neck, chest, hip, sh_f, el_f, hand_f, hip_n, hip_f, knee_f]
+    pins: [foot_n, foot_f, knee_n]
+    tweaks: {crown: [-1, 1], neck: [1, 1], chest: [1, 1], el_n: [3, -1], hand_n: [5, -2]}
+  hurt_in1:                    # flinch: head snaps back, fists jerk up (the trident up and forward, off the leg channel)
+    moves: [crown, neck, chest, sh_n, el_n, hand_n, sh_f, el_f, hand_f]
+    tweaks: {crown: [-3, 0], neck: [-1, 0], el_n: [1, -2], hand_n: [2, -3], el_f: [0, -2], hand_f: [0, -3]}
+  hurt_in2:
+    moves: [crown, neck, chest, hip, sh_n, el_n, hand_n, sh_f, el_f, hand_f, hip_n, knee_n, hip_f, knee_f]
+  daze:                        # the trident fist holds its height while the body slumps (leg channel stays open)
+    tweaks: {hand_n: [0, -1]}
+  daze_b:
+    tweaks: {hand_n: [0, -2]}
+masks:
+  weapon:
+    idle: [[53, 8], [64, 8], [67, 18], [62, 26], [60, 68], [53, 68], [56, 40], [58, 26], [55, 20]]
+    attack: [[10, 22], [16, 22], [30, 33], [50, 47], [62, 54], [70, 56], [70, 72], [60, 70], [56, 60], [46, 54], [30, 40], [12, 30]]
+    hurt: [[44, 11], [56, 11], [56, 22], [55, 30], [59, 56], [56, 59], [52, 40], [52, 30], [44, 24]]
+  ft_n:
+    idle: [[41, 71], [58, 71], [58, 78], [41, 78]]
+    attack: [[41, 71], [57, 71], [57, 78], [41, 78]]
+    hurt: [[45, 65], [55, 65], [55, 71], [45, 71]]
+  ft_f:
+    idle: [[24, 71], [36, 71], [36, 79], [24, 79]]
+    attack: [[6, 69], [16, 69], [16, 79], [6, 79]]
+    hurt: [[31, 71], [41, 71], [41, 79], [31, 79]]
+holds: []
+paint:
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in2, xy: [[26, 36], [50, 38], [48, 39], [44, 53], [44, 54], [45, 54], [45, 55], [46, 55], [45, 56], [46, 56], [47, 56], [47, 57]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[43, 55]], rgb: [90, 156, 140]}
+  - {frame: kneel_in2, xy: [[44, 55]], rgb: [33, 49, 49]}
+  - {frame: kneel_in2, xy: [[50, 69]], rgb: [206, 222, 198]}
+  - {frame: kneel_b, xy: [[46, 77], [47, 77], [48, 77]], rgb: null}
+  - {frame: kneel_b, xy: [[46, 76], [47, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[51, 27], [51, 28], [52, 28], [51, 29], [52, 30], [50, 67], [49, 68], [50, 68], [50, 69]], rgb: [181, 198, 173]}
+  - {frame: kneel_in1, xy: [[50, 29], [50, 30], [51, 30], [50, 31], [52, 31], [49, 32], [50, 32], [52, 32], [48, 33], [52, 33], [53, 33], [53, 34], [53, 35], [53, 36], [53, 37], [52, 38], [53, 38], [52, 39], [52, 40], [52, 41], [51, 42], [52, 42], [51, 31], [51, 32], [49, 33], [50, 33], [51, 33], [47, 34], [48, 34], [49, 34], [51, 34], [52, 34], [47, 35], [48, 35], [52, 35], [48, 36], [52, 36], [48, 37], [51, 37], [52, 37], [48, 38], [51, 38], [48, 39], [49, 39], [50, 39], [51, 39], [50, 40], [51, 40], [51, 41], [50, 34], [49, 35], [50, 35], [51, 35], [49, 36], [50, 36], [51, 36], [49, 37], [50, 37], [49, 38], [50, 38]], rgb: [90, 156, 140]}
+  - {frame: kneel_in1, xy: [[48, 32], [46, 33], [47, 33], [46, 34], [46, 35], [46, 36], [47, 36], [47, 37], [47, 38], [47, 39], [47, 40], [48, 40], [49, 40], [49, 41], [50, 41], [50, 42], [50, 61], [50, 62], [50, 63], [49, 64], [50, 64], [49, 65], [50, 65], [49, 66], [50, 66], [49, 67], [24, 69], [24, 70], [23, 71], [25, 57], [26, 57], [26, 59]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[42, 45], [43, 46], [44, 46], [43, 47], [44, 47], [45, 47], [46, 47], [47, 47], [43, 48], [44, 48], [47, 48], [44, 49], [47, 49], [48, 49], [44, 50], [45, 50], [48, 50], [49, 50], [45, 51], [49, 51], [50, 51], [45, 52], [46, 52], [47, 52], [50, 52], [51, 52], [47, 53], [48, 53], [50, 53], [48, 54], [49, 54], [50, 54], [50, 55], [45, 48], [46, 48], [45, 49], [46, 49], [46, 50], [47, 50], [46, 51], [47, 51], [48, 51], [48, 52], [49, 52], [49, 53], [25, 56]], rgb: [66, 115, 107]}
+  - {frame: kneel_in1, xy: [[51, 69], [51, 68], [41, 58]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[26, 36], [50, 38], [48, 39], [44, 53], [44, 54], [45, 54], [45, 55], [46, 55], [45, 56], [46, 56], [47, 56], [47, 57]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[43, 55]], rgb: [90, 156, 140]}
+  - {frame: kneel_in2, xy: [[44, 55]], rgb: [33, 49, 49]}
+  - {frame: kneel_in2, xy: [[50, 69]], rgb: [206, 222, 198]}
+  - {frame: kneel_b, xy: [[46, 77], [47, 77], [48, 77]], rgb: null}
+  - {frame: kneel_b, xy: [[46, 76], [47, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[14, 61], [15, 61], [16, 62], [17, 62], [16, 64], [14, 65], [15, 65], [14, 66]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[16, 63]], rgb: [90, 156, 140]}
+  - {frame: kneel_in1, xy: [[15, 64]], rgb: [66, 115, 107]}
+  - {frame: kneel_in1, xy: [[10, 61], [11, 61], [9, 62], [10, 62], [10, 63], [11, 63], [11, 64], [12, 64], [12, 65], [13, 65], [12, 66]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed, the trident kept upright and leaned on, its butt on the ground; the tail fin (left behind by the folded leg) moved back against the hip
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [17, 0], foot_f: [21, 2], toe_f: [25, 0], sh_n: [0, 2], sh_f: [0, 2], tip: [-24, -25], hand_n: [0, 4], el_n: [0, 2], neck: [0, 2], crown: [0, 2]}
+  paint:
+    - {xy: [[11, 58], [9, 59], [10, 59], [12, 59], [13, 59], [10, 60], [11, 60], [13, 60], [14, 60], [11, 61], [12, 61], [11, 62], [12, 62], [14, 62], [11, 63], [13, 63], [11, 64]], rgb: [6, 4, 10]}
+    - {xy: [[11, 59], [13, 62]], rgb: [66, 115, 107]}
+    - {xy: [[12, 60]], rgb: [33, 49, 49]}
+    - {xy: [[13, 61], [14, 61]], rgb: [90, 156, 140]}
+    - {xy: [[3, 64], [1, 65], [2, 65], [3, 65], [4, 65], [5, 65], [2, 66], [3, 66], [4, 66], [5, 66], [6, 66], [3, 67], [4, 67], [5, 67], [6, 67], [7, 67], [3, 68], [4, 68], [5, 68], [6, 68], [3, 69], [5, 69], [3, 70]], rgb: null}
+    - {xy: [[44, 22]], rgb: [123, 189, 165]}
+    - {xy: [[43, 46], [23, 53], [46, 76], [47, 76]], rgb: [6, 4, 10]}
+    - {xy: [[45, 46], [44, 47], [45, 47]], rgb: [181, 198, 173]}
+    - {xy: [[42, 47], [43, 47], [43, 48], [44, 48], [23, 55]], rgb: [90, 156, 140]}
+    - {xy: [[37, 56], [38, 57]], rgb: [206, 222, 198]}
+    - {xy: [[38, 56]], rgb: [66, 115, 107]}
+    - {xy: [[45, 77], [46, 77], [47, 77], [48, 77], [45, 78], [46, 78], [47, 78], [48, 78], [45, 79], [46, 79], [47, 79], [48, 79]], rgb: null}
