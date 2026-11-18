@@ -326,6 +326,77 @@ round 1 judged `it2`, round 2 (a new reviewer) judged blue_dragon's `it3`.
 | 2026-11-17 | approach | the one-source squash / stretch bridge (section 2), chosen on the experiments; the derived pilot kneels archived as `_kneel_v1` |
 | 2026-11-17 | rev 2 | momus review 2: OKAY with 5 P3 notes (knob count, file references, iteration numbering, one knob per named defect, KT1 TODO and 12a); all applied |
 
+### 12c. KT2-B result (bipeds, large and boss cells + mechanical; branch `kt-b` from `fb5992a0`)
+
+20 ids: **20 locked** on `source: ai`, none BLOCKED, none pending. Retired first, exactly the 11 KT2-B ids on the
+`derived:` line: iron_golem minotaur minotaur_zombie ogre ogre_chief ogre_mage sea_troll soldier stone_golem troll
+warmech (`_kneel_v1`, 11 rows appended to `docs/RETIRED_SPRITES.md`, one per sprite commit). The other 9 (astos chaos
+clay_golem drowned_sovereign earth_elemental fire_gigas hill_gigas ice_gigas lich) were on the D-K7 alias and only gained
+`kneel: {source: ai}`. The integrator ruling commit (KT2-A `9cea4807`: the `kneel_in1 -> kneel_in2` bridge-swap
+centroid cap 0.65 x span) is cherry-picked first on this branch; fire_gigas needed it (`centroid moves 13.6 > 12.6` at
+0.5; passes at 0.65). warmech uses its approved try-2 key (`approved/warmech/kneel.json` `try: 2`); astos keeps its FW-Q
+alias (`OK (aliased: attack)`); chaos's atlas sheet got the kneel (the colossus forms are exempt, D-K12).
+
+Pre-review renders (not counted, section 7), from the first `check`: ogre and troll `offset: [0, 1]` (K-ground: the key
+stands on row 121, feet row 122); ice_gigas `bridge: {breath_at: 0.5}` (kneel_b opened a new 4 px hole); iron_golem
+`bridge: {shear: false, width: false}` (the mechanical row of section 4; kneel_in1's second ring 0.59 vs 0.70: `shear:
+false` alone did not fix it, the width seams also thinned the plates). Review: two new reviewers for it1 (10 / 10 ids),
+all PASS. Artefacts: `/tmp/kt-b/it1/` (20 ids, reviewed), `/tmp/kt-b/final/` (the 20 locked, `contact.gif` /
+`contact.png`), per id `<id>_x2.gif`, `_x3.gif`, `_slow.gif`, `_strip.png`.
+
+| Id | Review 1 (it1) | Knobs / offset | Iterations | Result |
+|---|---|---|---|---|
+| astos | PASS | - | 1 | locked (`OK (aliased: attack)`) |
+| chaos | PASS | - | 1 | locked |
+| clay_golem | PASS | - | 1 | locked |
+| drowned_sovereign | PASS | - | 1 | locked |
+| earth_elemental | PASS | - | 1 | locked |
+| fire_gigas | PASS | - (needs the 0.65 swap cap ruling) | 1 | locked |
+| hill_gigas | PASS | - | 1 | locked |
+| ice_gigas | PASS | `bridge: {breath_at: 0.5}` | 1 | locked |
+| lich | PASS | - | 1 | locked |
+| minotaur | PASS | - | 1 | locked |
+| minotaur_zombie | PASS | - | 1 | locked |
+| ogre | PASS | `offset: [0, 1]` | 1 | locked |
+| ogre_chief | PASS | - | 1 | locked |
+| ogre_mage | PASS | - | 1 | locked |
+| sea_troll | PASS | - | 1 | locked |
+| stone_golem | PASS | - | 1 | locked |
+| troll | PASS | `offset: [0, 1]` | 1 | locked |
+| iron_golem | PASS | `bridge: {shear: false, width: false}` | 1 | locked |
+| soldier | PASS | - | 1 | locked |
+| warmech | PASS | - | 1 | locked |
+
+**Limit-hit table:** none (every id passed at it1; no id reached it2).
+
+**Key notes** (approved-key issues, not iterated, for a possible KA-FIX pass): lich's key has a solid black diagonal bar
+below the glaive blade toward the lower right (kneel_in2 inherits it); clay_golem's forehead rune turns from "R" into a
+"?"-like mark; earth_elemental's key is a different build (slim, segmented, one arm a raised stone slab), so the
+in1 -> in2 swap reads close to a morph; iron_golem's key is shaded near-black against the light-grey idle (a visible
+colour jump at the swap); warmech's key loses the grille glow, hunches, and points the cannon at the ground; troll's
+one club becomes two props (a long stick and an upright mallet); minotaur_zombie's open ribcage is a dark barred slot
+and the cleaver is redrawn larger; ogre_chief's horns are much smaller and the face darker.
+
+Reviewer notes (not failures): the largest drawing swaps at in1 -> in2 are chaos (outstretched to hunched arms, about
+22 % less area), earth_elemental, minotaur_zombie and warmech; props swap from raised to lowered by design on
+drowned_sovereign (sceptre) and fire_gigas (hammer); every id's top steps down evenly with no upward bounce, and kneel_b
+is a 1 px breath.
+
+Measured: a review batch of 10 took 1.6-2.1 min; `monster_anim.py check` of the 20 about 2-3 min; `lock` about 1 min per
+id (20 in about 20 min, one process); the bridge render < 1 s per sprite.
+
+**KT2-B gate outputs** (tranche merge set; T-G5 / T-G7 / T-G8 are KT3's):
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| per-id | `monster_anim.py check <20 ids>` (one call) | 20 lines `<id>: OK (25-36 checks groups)`, astos `OK (aliased: attack; 25 checks groups)` | pass |
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 `: OK` lines) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock` the 8 pilot ids + the 20 KT2-B ids | no `FAIL`; `44 added, 0 changed, 0 removed`; exit 0 (pilot cobra / green_slime 8 + the 9 KT2-B ex-alias ids 36; the 11 ex-derived and 6 pilot ids `relocked` their 4 kneel entries) | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 26, derived 16, alias 81)`, `heroes 12/12 (ai 2, derived 10, alias 0)`; no KT2-B id left on `derived:` or the alias | pass (running count, this branch only) |
+| T-G6 | `selftest.py` | runs to the end: `8 FAILED`, the same 8 as KT1 (12a), none of them KT's: `gen/refs` absent in a worktree (2) and the live Bedrock pass KA-FIX (6); `pass KT kneel bridge`: 24 ok (22 + the 2 swap-cap ruling rows), 0 FAIL | pass (KT) |
+| T-G9 | `git diff --stat a7d423f4 -- <ledgers> assets-src/gen/approved` | 68 files, all `approved/_retired/*_kneel_v1/` (pilot 24 + KT2-B 44); no ledger change | pass |
+
 ## TODOs
 
 - [x] KT0 experiments (cut, squash, dither, rig + stretch) and the choice (section 2)
