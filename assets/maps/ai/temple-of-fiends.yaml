@@ -11,6 +11,7 @@ art:
   above: [null, null, null, null]
 entrances:
   entry: [11, 20]
+  time_gate: [3, 5]
 collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 8, 8, 8, 8, 1, 8, 1, 1, 8, 1, 8, 8, 8, 8, 1, 8, 1, 1, 1, 1, 1, 1, 8, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8,
   8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -60,9 +61,26 @@ npcs:
   y: 4
   hideIf: PRINCESS_RESCUED
   dialog: [Please... help me! Garland has gone mad!]
+- id: hour_keeper
+  sprite: old_man
+  tint: '#b9c6d6'
+  x: 3
+  y: 3
+  showIf: EARTH_CRYSTAL_LIT
+  dialog:
+  - condition: TIME_GATE_OPEN
+    text: [The keeper's outline is fainter than before. 'The stair will hold while the four lights burn. Go down when you are ready.']
+  - text: ['A grey old man stands in the corner as if he had always stood there, though no dust has settled on him.', 'Keeper: I tended this house before it was a ruin. Your song, and the light of the four
+        crystals, can wind it back to the day I left.']
+  cutscene: {id: pst_time_gate, onceFlag: TIME_GATE_OPEN}
 transitions:
 - {x: 11, y: 21, targetMap: overworld, targetEntrance: temple}
 - {x: 12, y: 21, targetMap: overworld, targetEntrance: temple}
+- x: 3
+  y: 4
+  targetMap: past-temple-1
+  targetEntrance: arrival
+  requiredFlags: [TIME_GATE_OPEN]
 name: Temple of Fiends
 music: dungeon
 encounterRate: {max: 22, min: 12}
@@ -105,3 +123,13 @@ scriptedEncounters:
   postVictoryCutscene: garland_defeated
   x: 13
   y: 6
+keyItemGates:
+- x: 3
+  y: 4
+  requiredItem: lute
+  requiredFlags: [EARTH_CRYSTAL_LIT, FIRE_CRYSTAL_LIT, WATER_CRYSTAL_LIT, WIND_CRYSTAL_LIT]
+  permanent: false
+  message:
+  - condition: EARTH_CRYSTAL_LIT
+    text: ['The old man in the corner shakes his head. ''Not while any of the four lights is dark, and not without the princess''s song.''']
+  - text: ['The air in this corner is cold and still, and the floor stones are worn into a shallow ring.']

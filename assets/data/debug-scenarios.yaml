@@ -2066,4 +2066,130 @@
 # === WND-D2 (pass W: owned by WND-D2) ===
 # === end WND-D2 ===
 # === PST (pass W: owned by PST) ===
+# S29 (docs/WORLD_PLAN.md 6.5): the field start at the act-1 temple's door, the airship parked on the grass east of it,
+# the band-low party (L33, upgraded) with the B7 kit (w_s28 = w_s29) and every grant through S28, the four crystals
+# lit and the lute held. Walk in, up the causeway to the altar room's north-west corner, step onto the worn ring
+# (the gate cell) and talk to the hour keeper: TIME_GATE_OPEN; the next step onto the ring goes down to past-temple-1.
+- id: w_s29_start
+  name: PST - S29 the time gate (start)
+  mode: field
+  map: overworld
+  entrance: temple
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 82, y: 104 }
+  flags: &w_s29_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED, CHIME_GIVEN,
+    SKY_FORTRESS_OPEN, WIND_CRYSTAL_LIT]
+  party: &w_s29_party
+    - { class: knight, name: KNGT, level: 33, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 33, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 33, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 33, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: &w_s29_items { potion: 10, hi_potion: 6, ether: 3, phoenix_down: 2, lute: 1, mystic_key: 1, rod: 1, canoe: 1,
+    cube: 1, oxyale: 1, chime: 1 }
+  gold: 30000
+  enemies: []
+# S30: the field start below the time gate (temple-of-fiends `time_gate`, TIME_GATE_OPEN set), L34 with the stage kit
+# (w_s30); step north onto the ring and descend floor by floor (each refight opens the stair on) to Chaos.
+- id: w_s30_start
+  name: PST - S30 the temple of the past (start, below the time gate)
+  mode: field
+  map: temple-of-fiends
+  entrance: time_gate
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 82, y: 104 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED, CHIME_GIVEN,
+    SKY_FORTRESS_OPEN, WIND_CRYSTAL_LIT, TIME_GATE_OPEN]
+  party: &w_s30_party
+    - { class: knight, name: KNGT, level: 34, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 34, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 34, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 34, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: *w_s29_items
+  gold: 30000
+  enemies: []
+# S30 checkpoint (6.5): in the shrine before Chaos with every milestone up to DEATH_EYE_DEFEATED, the level-40 Chaos
+# party (chaos_forms, user ruling U-2); talk to Chaos: the battle is `chaos` (its four forms) on the `rim` background.
+- id: w_s30_chaos_door
+  name: PST - S30 the shrine of Chaos (talk to Chaos)
+  mode: field
+  map: past-chaos
+  entrance: boss
+  fieldMode: walking
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT, LUFENIAN_LEARNED, CHIME_GIVEN,
+    SKY_FORTRESS_OPEN, WIND_CRYSTAL_LIT, TIME_GATE_OPEN, PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED,
+    PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED]
+  party: *chaos_party
+  items: { potion: 9, hi_potion: 9, ether: 5, phoenix_down: 5, lute: 1 }
+  gold: 1000
+  enemies: []
+# the refights and the Death Eye at the test level 37 (3.7) with the stage kit (w_s30) and 4 potions, as the floors
+# start them (WORLD 4.8), on the fiend_hall stage
+- id: w_boss_lich_2
+  name: PST - S30 floor 1, the Rime Sovereign II and two death knights
+  party: &w_boss_pst_party
+    - { class: knight, name: KNGT, level: 37, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 37, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 37, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 37, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 4 }
+  gold: 0
+  enemies: [lich_2, death_knight, death_knight]
+  background: assets/backgrounds/fiend_hall.webp
+- id: w_boss_ashen_queen_2
+  name: PST - S30 floor 2, the Ashen Queen II and a rhyos
+  party: *w_boss_pst_party
+  items: { potion: 4 }
+  gold: 0
+  enemies: [ashen_queen_2, rhyos]
+  background: assets/backgrounds/fiend_hall.webp
+- id: w_boss_drowned_sovereign_2
+  name: PST - S30 floor 3, the Drowned Sovereign II
+  party: *w_boss_pst_party
+  items: { potion: 4 }
+  gold: 0
+  enemies: [drowned_sovereign_2]
+  background: assets/backgrounds/fiend_hall.webp
+- id: w_boss_hollow_seraph_2
+  name: PST - S30 floor 4, the Hollow Seraph II
+  party: *w_boss_pst_party
+  items: { potion: 4 }
+  gold: 0
+  enemies: [hollow_seraph_2]
+  background: assets/backgrounds/fiend_hall.webp
+- id: w_boss_death_eye
+  name: PST - S30 floor 5, the Death Eye and its iron golem
+  party: *w_boss_pst_party
+  items: { potion: 4 }
+  gold: 0
+  enemies: [death_eye, iron_golem]
+  background: assets/backgrounds/fiend_hall.webp
 # === end PST ===

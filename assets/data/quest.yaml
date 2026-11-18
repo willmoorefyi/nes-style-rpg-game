@@ -642,10 +642,16 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    # on foot at the act-1 temple's door (the four crystals lit, the lute held), the airship parked on the grass
+    # east of it; into the temple, up the causeway to the altar room's north-west corner, and the hour keeper
+    entry: {map: overworld, x: 79, y: 103, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    walk: [overworld:warp:temple-of-fiends, temple-of-fiends:cutscene:hour_keeper]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-33 (W1-I, /tmp/world_int_notes.md): EARTH_CRYSTAL_LIT gates the canoe (S14), which FIRE (S15) needs
+      - {map: temple-of-fiends, kind: gate, at: [3, 4], reason: "EARTH_CRYSTAL_LIT is redundant on the time gate: it gates the canoe (S14), which the fire crystal (S15), also required here, needs"}
+      - {map: temple-of-fiends, kind: npc, at: [3, 3], reason: "the hour keeper's showIf EARTH_CRYSTAL_LIT only shows him; he is talked to only from the gate cell (3, 4), which needs all four crystals and the lute"}
+    status: built
   - id: S30
     title: "The temple of the past 1-5"
     tranche: PST
@@ -658,11 +664,35 @@ stages:
     maps: [past-temple-*, past-chaos]
     zones: []
     grind: 2.0
-    walk: []
+    # in the act-1 temple's altar room below the time gate (its `time_gate` arrival), the airship parked by the door;
+    # down the stair (TIME_GATE_OPEN), each refight opens the stair on, the cross's two wards open its west and north
+    # arms, and the shrine's Chaos ends the game
+    entry: {map: temple-of-fiends, x: 3, y: 5, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    walk: [temple-of-fiends:warp:past-temple-1, past-temple-1:battle:past_lich, past-temple-1:warp:past-temple-2, past-temple-2:cutscene:ward_hub,
+      past-temple-2:cutscene:ward_west, past-temple-2:battle:past_ashen_queen, past-temple-2:warp:past-temple-3,
+      past-temple-3:battle:past_drowned_sovereign, past-temple-3:warp:past-temple-4,
+      past-temple-4:battle:past_hollow_seraph, past-temple-4:warp:past-temple-5, past-temple-5:battle:past_death_eye,
+      past-temple-5:warp:past-chaos, past-chaos:battle:past_chaos]
     basins: {}
-    nonLoadBearing: []
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: past-temple-1, kind: npc, at: [19, 5], reason: "the Rime Sovereign's hideIf only clears the beaten boss off the high seat"}
+      - {map: past-temple-2, kind: npc, at: [21, 8], reason: "the Ashen Queen's hideIf only clears the beaten boss off the north arm"}
+      - {map: past-temple-3, kind: npc, at: [15, 6], reason: "the Drowned Sovereign's hideIf only clears the beaten boss out of the apse"}
+      - {map: past-temple-4, kind: npc, at: [16, 19], reason: "the Hollow Seraph's hideIf only clears the beaten boss out of the well room"}
+      - {map: past-temple-5, kind: npc, at: [22, 5], reason: "the Death Eye's hideIf only clears the beaten boss off the landing"}
+      - {map: past-chaos, kind: npc, at: [14, 5], reason: "Chaos's hideIf only clears the beaten boss; the ending leaves the shrine"}
+      # GT-34: the east stair behind the high seat lands in the cross's sealed east arm, a dead end; the west stair
+      # carries PAST_LICH_DEFEATED on
+      - {map: past-temple-1, kind: transition, at: [24, 4], reason: "the east stair lands in floor 2's sealed east arm, a dead end; the west stair carries the milestone"}
+      - {map: past-temple-1, kind: transition, at: [25, 4], reason: "the east stair lands in floor 2's sealed east arm, a dead end; the west stair carries the milestone"}
+      # floor 2's ward puzzle (local flags PST_WARD_HUB, PST_WARD_WEST): the stair on needs PAST_ASHEN_DEFEATED
+      - {map: past-temple-2, kind: gate, at: [16, 21], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [16, 22], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [21, 15], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [22, 15], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
     milestones: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED, CHAOS_DEFEATED]
-    status: pending
+    status: built
   # === end PST ===
 towns:
   # === A1-T town (pass W: owned by A1-T) ===
