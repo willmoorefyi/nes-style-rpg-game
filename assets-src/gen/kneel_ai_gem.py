@@ -106,8 +106,33 @@ def sheet_name(sp: D.Sprite) -> str:
     return "battle_kneel" if sp.hero else "kneel"
 
 
+def edit_of(sp: D.Sprite, n_try: int) -> dict | None:
+    """`sprites.<id>.g_edit.<try>` {src, text}: an in-place edit of an earlier try's raw (user 2026-11-17: strip an
+    unwanted addition instead of regenerating the pose). Images: [the source raw, the idle reference]."""
+    g = _entry(sp).get("g_edit") or {}
+    return g.get(n_try) or g.get(str(n_try))
+
+
+def edit_text(sp: D.Sprite, e: dict) -> str:
+    bg = sp.key_name
+    text = (f"Edit image 1. {e['text']} Keep everything else in image 1 exactly as it is: the same pose, position, "
+            f"size, pixel-art style, palette, outline and the plain flat {bg} {gconf()['key_hex'][bg]} background. "
+            "Image 2 is the same character standing, for reference of its design only; do not copy its pose.")
+    return " ".join(text.split())
+
+
 def request(sp: D.Sprite, n_try: int, purpose: str, round_: str = "pilot", gdir: Path | None = None) -> KneelRequest:
     gc, refs = gconf(), refs_of(sp, n_try)
+    e = edit_of(sp, n_try)
+    if e:
+        gd = gdir or D.OUT / sp.sid
+        refs = (f"edit:raw_g_{e['src']}", "idle")
+        text, seed = edit_text(sp, e), seed_of(n_try)
+        ims = [Image.open(gd / f"raw_g_{e['src']}.png").convert("RGB"), images(sp, ("idle",), gdir)[0]]
+        key = GM.cache_key(text, ims, aspect_ratio=gc["aspect_ratio"], seed=seed, model=gc["model"],
+                           image_size=gc["image_size"])
+        return KneelRequest(sp.sid, SimpleNamespace(name=sheet_name(sp)), seed, key, purpose, n_try, round_, text,
+                            tuple(ims), refs)
     text, ims, seed = prompt(sp, n_try), images(sp, refs, gdir), seed_of(n_try)
     key = GM.cache_key(text, ims, aspect_ratio=gc["aspect_ratio"], seed=seed, model=gc["model"],
                        image_size=gc["image_size"])

@@ -176,6 +176,14 @@ sprites:
     fill: 0.725
     heads: [head]
     weapons: []
+    g_edit:
+      2:
+        src: 1
+        text: >-
+          The cobra's head has come loose: a separate snake head lies on the coils at the right, apart from the hood.
+          Remove that separate head lying on the coils and redraw the coils there as plain continuous coil. Then give
+          the lowered hood its own head attached at its front tip, drooping down and resting on the coils, mouth
+          closed, so the neck, hood and head are one connected piece. Exactly one head.
   cockatrice:
     fill: 0.643
     heads: [head]
@@ -310,6 +318,13 @@ sprites:
     heads_none: no head part in the blob rig (the face is drawn on the body)
     scale_part: body
     weapons: []
+    g_lines:
+      2:
+        extra: >-
+          The slime must look clearly deflated, like a half-emptied balloon: about half the height of image 1 and
+          wider, its top sunken and sagging with soft wrinkles, its rim spreading out flat over the ground, the
+          bubbles squashed. It must be visibly lower and flatter than image 1, not the same shape.
+        avoid: same height as image 1, round full dome, inflated
   guardian:
     fill: 0.891
     heads: [head]
@@ -484,6 +499,15 @@ sprites:
     fill: 0.773
     heads: [head, ram_n, ram_f, lizard]
     weapons: []
+    g_edit:
+      2:
+        src: 1
+        text: >-
+          A small extra animal (a lizard with its own body and legs) is lying on top of the creature's back. Remove its
+          body and legs entirely and redraw the creature's own back there as a smooth rounded hump of the same cracked
+          grey stone hide. Keep only the lizard head itself, on a short neck rising from the shoulders beside the two
+          ram heads, lowered and drooping like the others. The creature has exactly four heads (lion, two rams, lizard)
+          on one body, and no second animal.
   sabertooth:
     fill: 0.896
     heads: [head]

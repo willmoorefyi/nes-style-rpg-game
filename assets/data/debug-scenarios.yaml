@@ -1854,6 +1854,44 @@
   enemies: []
 # === end FIR-T ===
 # === FIR-D1 (pass W: owned by FIR-D1) ===
+# S15 (WORLD 6.5): the party stands on Crescent's shore at the land gate (entrance fir_crescent) at the band's low
+# level 21 with the B5 kit (w_s14 = w_s15), every flag through S14, the canoe and the lute; the ship is moored at the
+# fir_crescent dock. Paddle R-volcano south to the volcano, descend gurgu-b1..b5 and beat the Ashen Queen.
+- id: w_s15_start
+  name: FIR-D1 - S15 Gurgu Volcano (canoe held, Crescent's shore)
+  mode: field
+  map: overworld
+  entrance: fir_crescent
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 146, y: 124 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT, CANOE_GIVEN]
+  party:
+    - { class: warrior, name: WAR, level: 21, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 21, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_mage, name: BLM, level: 21, equipment: [wizard_staff, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: ice2, level: 4 }, { id: fast, level: 4 }] }
+  items: { potion: 8, hi_potion: 4, ether: 2, canoe: 1, lute: 1 }
+  gold: 5000
+  enemies: []
+# the S15 boss at the test level 23 (3.7) with the stage kit (w_s15, the B5 tier), on the queen's throne backdrop
+- id: w_boss_ashen_queen
+  name: FIR-D1 - S15 boss, the Ashen Queen and her salamander
+  party:
+    - { class: warrior, name: WAR, level: 23, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 23, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 23, equipment: [mythril_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_mage, name: BLM, level: 23, equipment: [wizard_staff, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: ice2, level: 4 }, { id: fast, level: 4 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [ashen_queen, fire_lizard]
+  background: assets/backgrounds/throne_kary.webp
 # === end FIR-D1 ===
 # === FIR-D2 (pass W: owned by FIR-D2) ===
 # === end FIR-D2 ===
