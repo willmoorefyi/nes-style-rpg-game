@@ -105,3 +105,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `red_mage_kneel_v1` | `red_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `black_mage_kneel_v1` | `black_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `black_wizard_kneel_v1` | `black_wizard` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `red_wizard_kneel_v1` | `red_wizard` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
