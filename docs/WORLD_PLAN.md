@@ -4354,6 +4354,107 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 `mirage-1f` stops being a stub; debug scenarios `w_s26_start`, `w_s26_neg_untaught`.
 <!-- === end WND-O === -->
 <!-- === WND-T WIND (pass W: owned by WND-T) === -->
+### WND-T result: Gaia and the fairy, S23 (branch `w-wnd-t` from `mainline` bc43d930)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-t/`.
+
+**Files:**
+
+- Layouts (all new, each at most 212 lines): `layouts/wind/town_gaia.py` (`gaia`, 52x46), `town_gaia_people.py` (every
+  outdoor line and the inspect texts), `town_gaia_interiors.py` (the script to run) with `town_gaia_homes.py` (houses
+  `windmiller`, `ropemaker`, `spinner`, `healer`, `beekeeper`, `shepherd`; `interiors_common.Town("gaia")`),
+  `town_gaia_shops.py` (the 5 shops and `gaia-inn`) and `town_gaia_spring.py` (`gaia-spring` and its patch
+  `wnd_spring_flows`). `town_gaia_site.py` is **unchanged**, so the world files are not regenerated (G3 n/a).
+- The 14 compiled maps `gaia*` replace WND-O's compiled stubs; `index.yaml` is unchanged.
+- Data:
+  - `cutscenes.yaml` (WND-T anchor): `wnd_fairy_freed` (dialog, `take_item fairy_bottle`, fade, `set_flag
+    FAIRY_FREED`, `give_item oxyale`, a `warp` into the hollow so the filled basin and the fairy appear, the fairy's
+    lines and a pointer to Onrac's sea);
+  - `quest.yaml` (WND-T anchors): S23 `built` (entry, walk, one `nonLoadBearing` entry), town `gaia` `built`;
+  - `debug-scenarios.yaml` (WND-T anchor): `w_s23_start` (Gaia's land gate, the airship on the bowl's floor at
+    (152, 16), level 26, the B6 kit, the S0-S22 grants with the fairy bottle) and `w_s23_neg_nobottle` (the same
+    without the bottle). There is no `w_boss_*`: S23 has no boss;
+  - `shops.yaml`: the `gaia_*` records are kept as W1-F/W1-G left them (B7 gear, L7 magic, inn 700).
+- Tests: `tests/quest/wind/wnd_t_gaia.test.ts` (12: the warden's trade and cutscene, the fairy's `showIf`, the patch
+  before and after, the spring's links, the gate, the doors and exits, EXIT-safety, the climb needs the footbridges,
+  the clinic, the inn and the shops, the hints and reactive people, the `CHEST_WND_T_` prefix) and
+  `wnd_t_walk.test.ts` (3: the walk with (a) and (b), FAIRY_FREED and the Oxyale only with a bottle, the town entry).
+
+**Design** (original):
+
+- **The town.** A mountain face in four terraces held up by bands of bare rock; a gorge with a snow-melt torrent
+  splits every terrace. The gate road enters from the south. Rock stairs join the gate and mill terraces on both
+  sides of the gorge, then rise on the east (mill to loom) and the west (loom to the court); a plank footbridge
+  crosses the gorge on every terrace, so the climb zig-zags. The gate terrace holds the inn and the item, weapon and
+  armour shops; the mill terrace the windmiller, the ropemaker and the two magic shops; the loom terrace the healer
+  (the clinic, 120 G a level), the spinner, the beekeeper, the shepherd and his empty fold, and a shuttered
+  wind-reader's house with a note (inspect); the top terrace is the dry spring court, with a dry sand channel from the
+  grotto mouth (entrance `spring`, to `gaia-spring`). Six windmills stand still, at least one on every terrace. A
+  well-head on the gorge's lip, where the town hauls its water, and a weather-vane post in the court are inspect cells.
+- **The story.** The bowl's wind was the breath of the spring's fairy. A dune caravan crossed the pass a year ago;
+  the fairy followed the shine of its glass into a bottle, and the spring and the sails stopped. People talk of the
+  calm, the caravan in the western desert, Lufenia (`gaia_lufenia_hint`) and the Mirage Tower (`gaia_mirage_hint`);
+  their lines change on `item:fairy_bottle` and FAIRY_FREED (the wind returns).
+- **The spring** (`gaia-spring`, 22x17): a hollow high in the rock with a dry sand basin under a stone figure. The
+  warden (`gaia_spring_warden`) has `requiredItem: fairy_bottle` and the cutscene `{id: wnd_fairy_freed, onceFlag:
+  FAIRY_FREED}`; the patch `wnd_spring_flows` (FAIRY_FREED) turns the 18 basin cells to Water; the freed fairy
+  (`gaia_fairy`, `showIf: FAIRY_FREED`) stands beside it.
+
+**Town standard (G15):** `gaia: houses 12/9 interiors 6/6 outdoor 19/16 interior 15/12 hints 2/2 reactive 34/4
+shops 5/5 inn 700/700 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when, proof (f) | `(f) price walls: OK  crescent pending  gaia pending`, in `--stage S23` and in the full run. The rule is in place, but (f) counts Gaia as assumed: on the witness, the pending S20 (Onrac, WAT-T) fires before Gaia's keepers first become talkable, so the curve gold there is tainted (`questCurve.assumedTowns`). The wall reads real numbers once WAT-T builds S20 |
+| G1 | `town_gaia.py`, `town_gaia_interiors.py`, `stubs.py` and `world.py` (`bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)`), then `git diff --exit-code assets-src/maps` after the commit: exit 0 |
+| G2 | `build_map.py` for the 14 ids: each `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 14 ids: all 14 `deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 330 files, 7563 passed, 2 skipped, **2 failed**. Both are the known mainline regressions: `questGraph` "(a), (b) and (c)" (the Western Keep SOFTLOCKs) and `questLate` "(d)" (the S5-S10 bands plus ELF-T's `BAND elfheim gold`) |
+| G5 | `npm run quest -- --mutate --stage S23`: (a) OK S23; (b) OK (25 withheld runs); (c) OK (243144 states); (d) `S23 L26.7 [26,29]`; (e) OK (6 towns, 2 pending); (f)-(h) OK; `mutations: OK (2 gate rows; 2 elements, each removal reported)` (GT-26 caught; the forced-on patch is non-load-bearing); `quest-verify: OK`. The full `npm run quest -- --mutate`: (a), (b) (424 runs), (e)-(h) and `mutations: OK (48 gate rows; 61 elements)` are OK. (c) and (d) FAIL only on the known regressions (the Western Keep, S5-S10, the Elfheim gold) |
+| G6, G7 | `assetCoverage`, `fileCeilings` and `questCeilings` passed |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G9, G11 | no balance file (S23 has no boss); `git status` shows only owned paths plus the one shared line below |
+| G12 | `designNotes` and `originality` passed. A fresh reviewer's first pass failed 9 notes: each named a stock prop as something else (crates as sacks or fleeces, a signpost as a vane, a bench as a grindstone). The loom terrace also had no windmill, and the "windlass" stood away from the gorge. The notes were reworded, a windmill was added on the loom terrace and the well-head was moved to the gorge's lip. Re-review: `originality review: PASS gaia gaia-house-windmiller gaia-house-ropemaker gaia-house-spinner gaia-house-healer gaia-house-beekeeper gaia-house-shepherd gaia-weapon-shop gaia-armor-shop gaia-item-shop gaia-white-magic gaia-black-magic gaia-inn gaia-spring` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G15 | the row above |
+| G16 | `stubs.py --check wnd-t`: `stubs: 0 left for WND-T` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Browser** (G10, port 5238, `mute=1`, my own headless Chromium via `/tmp/w-wnd-t/drive.cjs`; the server is stopped):
+
+| Row | Result |
+|---|---|
+| `w_s23_start` | overworld (150, 14), the door, then `gaia` gate (17, 43). The climb: the west stair, the mill lane over the bridge, the east stair, the loom lane over the bridge, the west stair, the court (12, 8), the grotto (24, 3), then `gaia-spring` (10, 14). Talking to the warden from (8, 10) played the cutscene. Afterwards FAIRY_FREED is set, `oxyale` is 1, the bottle is gone, the party stands at (10, 11), the basin is water and the fairy is there. 0 console errors (`/tmp/w-wnd-t/s23_gate.png`, `s23_loom.png`, `s23_court.png`, `s23_spring.png`, `s23_warden_dialog.png`, `s23_after.png`) |
+| `w_s23_neg_nobottle` | the same walk: the warden tells of the caravan; no flag, no Oxyale, the basin stays dry; 0 errors (`neg_warden_dialog.png`, `neg_after.png`) |
+
+**Deviations / hand-offs:**
+
+- **Shared-file edit, in its own commit for the orchestrator:** `src/progression/questProofs.ts`, the default
+  `maxStates` goes from 200000 to 400000 (one line). With the airship parked in the bowl, `--stage S23`'s exact search
+  takes 243144 states and finds no failures, but at 200000 it stopped with `LIMIT` and false SOFTLOCK lines. Every
+  unbuilt stage's events stay open to a flying party, and S22 is already at 168600. An entry without the airship fits
+  in 42 states, but (e) then reports `SHOPLESS` for every other town. INT may prefer another cap or a CLI flag.
+- **The fairy's trade is done by the cutscene,** as Unne's and Nerrick's are. The warden has `requiredItem:
+  fairy_bottle` and `cutscene: {id: wnd_fairy_freed, onceFlag: FAIRY_FREED}`; the cutscene does `take_item`,
+  `set_flag` and `give_item oxyale`. 4.7 asks for `takeItem` and `giftFlag`, but with those the bottle would be taken
+  before the cutscene could check for it. GT-26 is still caught. The NPC who trades is the spring's warden. The fairy
+  is in the bottle until then, so the freed fairy is a second NPC (`showIf: FAIRY_FREED`), a tinted `white_mage`. No
+  field sheet is a fairy.
+- **"Rope bridges between terraces"** is read as plank footbridges across the gorge on each terrace, with rock stairs
+  between the terraces. A bridge cannot join two heights on a flat map.
+- **Placeholder art:** the windmill icons are the kit's code-drawn placeholder and carry its "WM" label. No new art
+  was made in this pass.
+- The extra `type: house` is the shuttered wind-reader's house: no door, a note on the front (inspect).
+- Two chests: `CHEST_WND_T_WINDMILLER` (Ether) and `CHEST_WND_T_SPINNER` (Phoenix Down).
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/wind/town_gaia.py` (`gaia`) and
+`layouts/wind/town_gaia_interiors.py` (the 6 houses, the 5 shops, the inn and `gaia-spring`, from
+`town_gaia_{homes,shops,spring}.py`). A map-local patch can turn walkable ground to Water when the cutscene that sets
+its flag `warp`s the party onto a cell that stays dry. Debug scenarios `w_s23_start` and `w_s23_neg_nobottle`. Proof
+(c)'s default cap is 400000.
 <!-- === end WND-T === -->
 <!-- === WND-D1 WIND (pass W: owned by WND-D1) === -->
 <!-- === end WND-D1 === -->

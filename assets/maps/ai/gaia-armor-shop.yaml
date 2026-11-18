@@ -10,13 +10,19 @@ art:
   below: [assets/maps/ai/gaia-armor-shop/below_0_0.png]
   above: [null]
 entrances:
-  door: [5, 8]
-collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1]
-npcs: []
+  door: [8, 8]
+collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 10,
+  10, 10, 10, 10, 10, 10, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1]
+npcs:
+- id: gaia-armor-shop-keeper
+  x: 5
+  y: 4
+  sprite: merchant
+  dialog: ['Diamond-studded mail, cut by the gem-cutters of the high passes. Light as wool, nearly.']
+  shopId: gaia_armor
 transitions:
-- {x: 5, y: 9, targetMap: gaia, targetEntrance: armor_shop}
-name: Gaia Armor Shop
+- {x: 8, y: 9, targetMap: gaia, targetEntrance: armor_shop}
+name: Armor Shop
 music: shop
 encounterRate: {min: 999, max: 999}
 encounters: []

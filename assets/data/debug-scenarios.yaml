@@ -2240,6 +2240,52 @@
   enemies: []
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
+# S23 (docs/WORLD_PLAN.md 6.5): the field start at Gaia's land gate in the mountain bowl, the airship parked on the
+# bowl's grass floor, the band-low party (L26, upgraded classes from S20 on) with the B6 kit (w_onrac) and every grant
+# up to S22: the fairy bottle from the caravan. Walk north into Gaia, climb the four terraces to the spring court,
+# go through the grotto into gaia-spring and talk to the warden by the dry basin: FAIRY_FREED, the Oxyale held, the
+# bottle gone, the basin full.
+- id: w_s23_start
+  name: WND-T - S23 Gaia's fairy (bottle in hand)
+  mode: field
+  map: overworld
+  entrance: wnd_gaia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 152, y: 16 }
+  flags: &wnd_t_s23_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED]
+  party: &wnd_t_s23_party
+    - { class: knight, name: KNGT, level: 26, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 26, equipment: [rune_knife, opal_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 26, equipment: [thor_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 26, equipment: [rune_knife, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 10, hi_potion: 5, phoenix_down: 2, lute: 1, mystic_key: 1, rod: 1, canoe: 1, fairy_bottle: 1 }
+  gold: 8000
+  enemies: []
+# The same start with exactly one prerequisite withheld, the fairy bottle: the warden tells of the caravan that took
+# the fairy west; no cutscene, no flag, no Oxyale, and the basin stays dry.
+- id: w_s23_neg_nobottle
+  name: WND-T - S23 without the fairy bottle (negative)
+  mode: field
+  map: overworld
+  entrance: wnd_gaia
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 152, y: 16 }
+  flags: *wnd_t_s23_flags
+  party: *wnd_t_s23_party
+  items: { potion: 10, hi_potion: 5, phoenix_down: 2, lute: 1, mystic_key: 1, rod: 1, canoe: 1 }
+  gold: 8000
+  enemies: []
 # === end WND-T ===
 # === WND-D1 (pass W: owned by WND-D1) ===
 # === end WND-D1 ===

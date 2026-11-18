@@ -42,7 +42,7 @@ export function createQuestContext(world: QuestWorld, opts: QuestContextOptions 
   const start = opts.stage ? assumedState(model, opts.stage) : newGameState(model);
   const checked = opts.stage ? [world.stages.get(opts.stage)!]
     : stageOrder(world.quest).map((id) => world.stages.get(id)!);
-  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? 200000, start, checked };
+  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? 400000, start, checked };
 }
 
 /** The saturation closure from the context's start (cached). */
