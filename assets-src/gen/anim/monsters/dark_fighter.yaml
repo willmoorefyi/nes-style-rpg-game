@@ -127,3 +127,7 @@ paint:                         # 1 px slits the moved plates open between dark p
   - {frame: atk_recover, xy: [[47, 41], [47, 42], [47, 43], [47, 44], [47, 45]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[45, 57], [46, 57], [47, 57], [48, 57], [49, 57], [47, 58]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[44, 35], [44, 36], [45, 36], [45, 37]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

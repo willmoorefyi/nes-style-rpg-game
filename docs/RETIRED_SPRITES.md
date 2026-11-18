@@ -97,3 +97,17 @@ art (F5 is the rig's `raise: false`; no archive).
 | `garland_kneel_v1` | `garland` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `warrior_kneel_v1` | `warrior` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `white_mage_kneel_v1` | `white_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `mummy_kneel_v1` | `mummy` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `pirate_kneel_v1` | `pirate` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `piscodemon_kneel_v1` | `piscodemon` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `rakshasa_kneel_v1` | `rakshasa` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `sahagin_kneel_v1` | `sahagin` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `sahagin_chief_kneel_v1` | `sahagin_chief` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `sahagin_prince_kneel_v1` | `sahagin_prince` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `skeleton_kneel_v1` | `skeleton` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `vampire_kneel_v1` | `vampire` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `vampire_lord_kneel_v1` | `vampire_lord` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `weretiger_kneel_v1` | `weretiger` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `werewolf_kneel_v1` | `werewolf` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `wight_kneel_v1` | `wight` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `zombie_kneel_v1` | `zombie` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |

@@ -1,0 +1,149 @@
+sprite: vampire_lord
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# idle: tall, the spiked crown-collar behind the white-haired head, both pale claws hanging at the coat's sides;
+# attack: a deep lunge, the near claw reaching up toward the heroes with the bat-wing cape spread under it; hurt:
+# recoiling, the white hair streaming back, both claws raised (the crown-collar shrinks to a small collar in the
+# approved hurt key). The coat is drawn almost entirely in the outline ink (very dark, 6-9 colours).
+keyframes:
+  idle:
+    crown: [42, 6]
+    neck: [43, 28]
+    chest: [40, 36]
+    hip: [40, 50]
+    sh_n: [48, 30]
+    el_n: [52, 38]
+    hand_n: [56, 47]
+    sh_f: [32, 30]
+    el_f: [28, 40]
+    hand_f: [29, 47]
+    hip_n: [46, 52]
+    knee_n: [49, 62]
+    foot_n: [50, 70]
+    toe_n: [54, 75]
+    hip_f: [34, 52]
+    knee_f: [30, 62]
+    foot_f: [28, 70]
+    toe_f: [28, 75]
+  attack:
+    crown: [39, 8]
+    neck: [42, 27]
+    chest: [40, 34]
+    hip: [36, 48]
+    sh_n: [48, 26]
+    el_n: [56, 22]
+    hand_n: [65, 17]
+    sh_f: [32, 30]
+    el_f: [30, 38]
+    hand_f: [30, 44]
+    hip_n: [42, 52]
+    knee_n: [46, 60]
+    foot_n: [44, 70]
+    toe_n: [48, 75]
+    hip_f: [30, 50]
+    knee_f: [22, 60]
+    foot_f: [16, 70]
+    toe_f: [16, 75]
+  hurt:
+    crown: [34, 15]
+    neck: [38, 30]
+    chest: [38, 38]
+    hip: [38, 50]
+    sh_n: [46, 32]
+    el_n: [50, 28]
+    hand_n: [52, 21]
+    sh_f: [36, 32]
+    el_f: [40, 28]
+    hand_f: [41, 21]
+    hip_n: [44, 52]
+    knee_n: [46, 62]
+    foot_n: [46, 71]
+    toe_n: [50, 75]
+    hip_f: [32, 52]
+    knee_f: [28, 62]
+    foot_f: [22, 71]
+    toe_f: [22, 75]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # half of wind2: the crouch starts (coil forward), knees give, the near claw drawn back
+    t: 0.15
+    dy: 2
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
+    moves: [crown, neck, chest, hip, hip_n, hip_f]
+    tweaks: {crown: [-3, 0], neck: [-2, 0], chest: [-1, 0], sh_n: [-2, -1], el_n: [-3, -2], hand_n: [-4, -3], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0]}
+  atk_wind2:                   # coil forward (t +0.35): crouched 3 on bent knees, head back, the near claw drawn back and up
+    t: 0.35
+    dy: 3
+    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
+    moves: [crown, neck, chest, hip, hip_n, hip_f]
+    tweaks: {crown: [-6, 0], neck: [-5, 0], chest: [-3, 0], sh_n: [-4, -1], el_n: [-6, -4], hand_n: [-8, -6], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_mid:
+    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [3, 0], foot_f: [4, 0], toe_f: [4, 0], knee_n: [1, 0], foot_n: [1, 0], toe_n: [1, 0]}
+    moves: [crown, neck, chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+  atk_follow:                  # overshoot: the claw drives on past the contact
+    t: 1.10
+    moves: [crown, neck, chest, sh_n, el_n, hand_n]
+    tweaks: {hand_n: [3, -1], el_n: [1, 0]}
+  atk_recover:
+    t: 0.35
+    moves: [crown, neck, hip]
+  hurt_in1:                    # flinch: head knocked back (translated), the claws jerk up
+    moves: []
+    tweaks: {crown: [-4, 0], neck: [-2, 0], chest: [-1, 0], el_n: [0, -2], hand_n: [0, -4], el_f: [0, -2], hand_f: [0, -4]}
+  hurt_in2:
+    moves: [crown, neck, chest]
+  daze:                        # slump: head dropped forward, both claws hang lower
+    moves: [crown, neck, chest]
+    tweaks: {crown: [2, 1], neck: [1, 1], el_n: [0, 1], hand_n: [0, 2], el_f: [0, 1], hand_f: [0, 2]}
+  daze_b:
+    moves: [crown, neck, chest]
+    dy: 2
+    tweaks: {crown: [2, 1], neck: [1, 1], el_n: [0, 1], hand_n: [0, 2], el_f: [0, 1], hand_f: [0, 2]}
+masks:
+  torso:
+    attack: [[45, 27], [52, 25], [64, 27], [64, 43], [45, 43]]
+    hurt: [[40, 31], [57, 31], [57, 44], [40, 44]]
+  ft_n:
+    idle: [[44, 68], [59, 68], [59, 78], [44, 78]]
+    attack: [[37, 68], [54, 68], [54, 78], [37, 78]]
+    hurt: [[39, 69], [56, 69], [56, 78], [39, 78]]
+  ft_f:
+    idle: [[20, 68], [35, 68], [35, 78], [20, 78]]
+    attack: [[10, 68], [23, 68], [23, 78], [10, 78]]
+    hurt: [[15, 69], [29, 69], [29, 78], [15, 78]]
+holds: []
+paint:                         # 1 px notches the moved head opens over the near shoulder, outline ink (the coat colour)
+  - {frame: hurt_in1, xy: [[47, 28], [47, 29]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[46, 28]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[32, 41], [32, 42], [32, 43], [32, 44], [32, 45]], rgb: [6, 4, 10]}   # the 1 px slit the shifted hip opens in the coat
+  # pass K (K2-B): kneel frames: the eye glow dimmed in steps (kneel_in1, kneel_in2, then the key), cracks and pockets closed in the body colour, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[36, 19], [36, 20], [37, 22], [37, 23], [44, 23], [45, 23], [51, 24], [51, 25], [38, 26], [38, 27], [44, 27]], rgb: [49, 8, 49]}
+  - {frame: kneel_in2, xy: [[37, 26], [36, 27], [37, 27], [37, 30], [44, 31], [45, 31], [51, 33], [38, 34], [50, 34], [38, 35], [44, 36]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[33, 30], [34, 33], [30, 47], [30, 48], [48, 52], [29, 53], [48, 53], [28, 54], [29, 54], [27, 55], [52, 55], [25, 56], [26, 56], [26, 67], [30, 30]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[30, 45]], rgb: [148, 156, 156]}
+  - {frame: kneel_in1, xy: [[47, 45], [47, 46], [31, 30]], rgb: [41, 41, 49]}
+  - {frame: kneel_in1, xy: [[30, 46]], rgb: [206, 206, 214]}
+  - {frame: kneel_in1, xy: [[47, 47], [48, 49]], rgb: [90, 33, 49]}
+  - {frame: kneel_in2, xy: [[44, 52], [43, 54], [44, 54], [43, 55], [44, 55], [47, 59], [48, 59], [47, 60], [45, 62], [46, 62], [49, 62], [33, 63], [36, 63], [35, 64], [34, 65], [35, 65], [33, 67]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[47, 61], [48, 62], [48, 63]], rgb: [148, 156, 156]}
+  - {frame: kneel_in2, xy: [[48, 61], [47, 62], [47, 63], [30, 64], [47, 64]], rgb: [41, 41, 49]}
+  - {frame: kneel_b, xy: [[42, 59], [49, 61], [45, 66], [30, 69], [31, 69], [29, 71], [25, 74], [26, 74], [27, 74]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[26, 77], [27, 77], [28, 77], [29, 77], [30, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed, the cape full width; the eyes dim in steps to the kneel
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [19, 0], foot_f: [19, 0], toe_f: [19, 0], sh_n: [0, 2], sh_f: [0, 2], neck: [0, 4], crown: [0, 4]}
+  paint:
+    - {xy: [[30, 39], [27, 52], [14, 53], [32, 76]], rgb: [6, 4, 10]}
+    - {xy: [[32, 40]], rgb: [41, 41, 49]}
+    - {xy: [[26, 55]], rgb: [206, 206, 214]}
+    - {xy: [[25, 77], [26, 77], [27, 77], [28, 77], [32, 77], [25, 78]], rgb: null}
+    - {xy: [[32, 76], [25, 75], [25, 74], [49, 62], [20, 60], [21, 60], [47, 60]], rgb: [6, 4, 10]}
+    - {xy: [[39, 30], [38, 31], [39, 31], [38, 34], [45, 37], [46, 37], [38, 38], [38, 39], [51, 40], [44, 41], [50, 41]], rgb: [6, 4, 10]}

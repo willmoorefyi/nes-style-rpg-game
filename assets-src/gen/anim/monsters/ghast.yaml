@@ -114,3 +114,7 @@ masks:
     hurt: [[22, 71], [35, 71], [35, 79], [22, 79]]
 holds: []
 paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

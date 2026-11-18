@@ -1,0 +1,170 @@
+sprite: mummy
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_f
+keyframes:
+  idle:
+    crown: [44, 5]
+    neck: [44, 21]
+    chest: [39, 28]
+    hip: [40, 47]
+    sh_n: [45, 27]
+    el_n: [47, 36]
+    hand_n: [57, 34]
+    sh_f: [32, 26]
+    el_f: [25, 34]
+    hand_f: [36, 35]
+    hip_n: [45, 49]
+    knee_n: [50, 58]
+    foot_n: [51, 70]
+    toe_n: [57, 73]
+    hip_f: [34, 48]
+    knee_f: [28, 60]
+    foot_f: [23, 70]
+    toe_f: [25, 74]
+  attack:
+    crown: [52, 6]
+    neck: [50, 21]
+    chest: [44, 27]
+    hip: [37, 46]
+    sh_n: [50, 24]
+    el_n: [62, 26]
+    hand_n: [74, 27]
+    hip_n: [42, 48]
+    knee_n: [51, 54]
+    foot_n: [44, 68]
+    toe_n: [46, 71]
+    hip_f: [33, 48]
+    knee_f: [23, 58]
+    foot_f: [13, 70]
+    toe_f: [15, 75]
+    sa1_0: [33, 25]
+    sa1_1: [22, 22]
+    sa1_2: [12, 21]
+    sa2_0: [32, 33]
+    sa2_1: [21, 33]
+    sa2_2: [11, 34]
+    sa3_0: [26, 44]
+    sa3_1: [15, 46]
+    sa3_2: [5, 46]
+  hurt:
+    crown: [60, 18]
+    neck: [50, 32]
+    chest: [42, 30]
+    hip: [42, 55]
+    sh_n: [50, 36]
+    el_n: [56, 40]
+    hand_n: [63, 41]
+    hip_n: [50, 52]
+    knee_n: [54, 60]
+    foot_n: [53, 71]
+    toe_n: [58, 73]
+    hip_f: [38, 57]
+    knee_f: [36, 64]
+    foot_f: [35, 71]
+    toe_f: [38, 74]
+    sh1_0: [32, 27]
+    sh1_1: [26, 24]
+    sh1_2: [21, 22]
+    sh2_0: [31, 38]
+    sh2_1: [24, 37]
+    sh2_2: [17, 39]
+    sh3_0: [31, 48]
+    sh3_1: [24, 47]
+    sh3_2: [17, 52]
+    sh4_0: [33, 62]
+    sh4_1: [27, 63]
+    sh4_2: [22, 66]
+parts:
+  weapon: {remove: true}
+  # loose bandage streamers (attack, hurt): mesh-warped strips on their own root joints, hung from the chest / hip by
+  # pixel-less anchor parts, so each streamer joins the torso only (the crack fill never bridges two streamer tips)
+  anc1: {bone: {attack: [chest, sa1_0], hurt: [chest, sh1_0]}, radius: 0.01}
+  anc2: {bone: {attack: [chest, sa2_0], hurt: [chest, sh2_0]}, radius: 0.01}
+  anc3: {bone: {attack: [hip, sa3_0], hurt: [hip, sh3_0]}, radius: 0.01}
+  anc4: {bone: {hurt: [hip, sh4_0]}, radius: 0.01}
+  str1: {kind: cloth, bone: {attack: [sa1_0, sa1_1, sa1_2], hurt: [sh1_0, sh1_1, sh1_2]}, radius: 3.0, width: auto}
+  str2: {kind: cloth, bone: {attack: [sa2_0, sa2_1, sa2_2], hurt: [sh2_0, sh2_1, sh2_2]}, radius: 3.0, width: auto}
+  str3: {kind: cloth, bone: {attack: [sa3_0, sa3_1, sa3_2], hurt: [sh3_0, sh3_1, sh3_2]}, radius: 3.0, width: auto}
+  str4: {kind: cloth, bone: {hurt: [sh4_0, sh4_1, sh4_2]}, radius: 3.0, width: auto}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  kneel_in1:
+    tweaks: {foot_f: [0, 1], toe_f: [0, 1]}
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], toe_f: [0, 1]}
+  atk_wind1:                   # half of wind2
+    moves: []
+    tweaks: {crown: [-1, 0], neck: [-1, 0], el_n: [-1, 0], hand_n: [-2, 0]}
+  atk_wind2:                   # crouch (dy 2) and draw back: head translated back (no head / torso rotation), near arm pulled in
+    moves: []
+    tweaks: {crown: [-2, 0], neck: [-2, 0], el_n: [-2, 0], hand_n: [-4, 1]}
+  atk_mid:                     # legs held at the attack pose and shifted 1/3 back; arms keep their reach angles
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {knee_n: [3, 0], foot_n: [3, 0], knee_f: [3, 0], foot_f: [3, 0]}
+    moves: [neck, chest, hip, crown, hip_n, hip_f, toe_n, toe_f]
+  atk_follow:
+    tweaks: {hand_n: [-2, 0], el_n: [-1, 0]}
+  hurt_in1:                    # flinch: upper body drops 1, head knocked 3 forward / 2 down by translation (no head / torso
+    moves: [sh_n, el_n, hand_n]  # rotation in an idle-sourced frame), near arm 35% toward the hurt guard
+    dy: 1
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [3, 2], neck: [3, 2], chest: [1, 0]}
+  hurt_in2:                    # head tilts back up a little about the neck (the neck stays: lifting it uncovers the back)
+    t: 0.25
+    moves: [crown, sh_n, el_n, hand_n]
+    pins: [knee_n, foot_n, knee_f, foot_f]
+  daze:                        # review fix: the boxing guard drops (near fist 6 px, far fist 4 px down), head 3 px down
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [-1, 2], hand_n: [-2, 6], sh_f: [0, 1], el_f: [0, 2], hand_f: [0, 4]}
+  daze_b:                      # the sway's low point: the torso 1 px lower (recipe dy), the head kept at daze height
+    tweaks: {crown: [0, 1], el_n: [-1, 2], hand_n: [-2, 6], sh_f: [0, 1], el_f: [0, 2], hand_f: [0, 4]}
+z:
+  idle: [uarm_f, farm_f, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
+  attack: [str1, str2, str3, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, head, uarm_n, farm_n]
+  hurt: [str1, str2, str3, str4, thigh_f, shin_f, ft_f, torso, thigh_n, shin_n, ft_n, uarm_n, farm_n, head]
+masks:
+  farm_n:
+    attack: [[55, 23], [79, 18], [79, 37], [66, 37], [60, 42], [51, 42], [51, 30]]
+  ft_n:
+    idle: [[45, 69], [62, 69], [62, 78], [45, 78]]
+    attack: [[38, 66], [50, 66], [50, 74], [38, 74]]
+    hurt: [[47, 69], [63, 69], [63, 78], [47, 78]]
+  ft_f:
+    idle: [[15, 69], [29, 69], [29, 78], [15, 78]]
+    attack: [[6, 68], [19, 68], [19, 78], [6, 78]]
+    hurt: [[29, 69], [43, 69], [43, 78], [29, 78]]
+seam_tolerance: 2              # atk_recover: the approved idle's thigh / torso notch (open in idle) touches two parts
+holds: []
+paint:                         # 1 px crack inside the mid streamer root, closed with outline ink
+  - {frame: atk_mid, xy: [[24, 40]], rgb: [6, 4, 10]}
+  # daze (2026-11-15 review 2, replaces the bandage-tone patch): the lowered far forearm over the belly kept its inner
+  # outlines (the fist's top edge and the old forearm edge) as a dark scribble. One outer outline now (the ink row at
+  # y 34 under the chest), the inside shaded with the wrapping's mid tones; the slit the slump closes off between the
+  # near forearm and the hip (x 44) inked. daze_b is the same 1 px lower.
+  - {frame: daze, xy: [[31, 34], [32, 34], [34, 34], [44, 38], [44, 39], [44, 40], [44, 41], [44, 42]], rgb: [6, 4, 10]}
+  - {frame: daze, xy: [[29, 35], [30, 35], [33, 35], [34, 35], [35, 35], [28, 36], [29, 36], [35, 36], [36, 36], [29, 37], [35, 37], [36, 37], [30, 38], [33, 38], [35, 38]], rgb: [132, 115, 99]}
+  - {frame: daze, xy: [[31, 35], [32, 35], [36, 35], [30, 36], [34, 36], [37, 36], [30, 37], [34, 37]], rgb: [148, 132, 107]}
+  - {frame: daze, xy: [[31, 36]], rgb: [198, 181, 156]}
+  - {frame: daze, xy: [[31, 38], [32, 38], [34, 38]], rgb: [115, 90, 90]}
+  - {frame: daze_b, xy: [[31, 35], [32, 35], [34, 35], [44, 39], [44, 40], [44, 41], [44, 42], [44, 43]], rgb: [6, 4, 10]}
+  - {frame: daze_b, xy: [[29, 36], [30, 36], [33, 36], [34, 36], [35, 36], [28, 37], [29, 37], [35, 37], [36, 37], [29, 38], [35, 38], [36, 38], [30, 39], [33, 39], [35, 39]], rgb: [132, 115, 99]}
+  - {frame: daze_b, xy: [[31, 36], [32, 36], [36, 36], [30, 37], [34, 37], [37, 37], [30, 38], [34, 38]], rgb: [148, 132, 107]}
+  - {frame: daze_b, xy: [[31, 37]], rgb: [198, 181, 156]}
+  - {frame: daze_b, xy: [[31, 39], [32, 39], [34, 39]], rgb: [115, 90, 90]}
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in2, xy: [[40, 47], [23, 60]], rgb: [148, 132, 107]}
+  - {frame: kneel_in2, xy: [[40, 48], [40, 49], [40, 50], [42, 52], [25, 72], [19, 59], [21, 60], [22, 60], [22, 61], [24, 61], [21, 62], [24, 63]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[41, 51]], rgb: [132, 115, 99]}
+  - {frame: kneel_in2, xy: [[20, 59]], rgb: [198, 181, 156]}
+  - {frame: kneel_in2, xy: [[52, 76], [53, 76], [54, 76], [55, 76], [20, 75]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [19, 2], foot_f: [19, 1], toe_f: [19, 0], sh_n: [0, 2], sh_f: [0, 2], neck: [0, 2], crown: [0, 2]}
+  paint:
+    - {xy: [[29, 46], [29, 47], [30, 47], [29, 48], [30, 48]], rgb: [181, 165, 140]}
+    - {xy: [[37, 53], [37, 56], [35, 67]], rgb: [6, 4, 10]}
+    - {xy: [[24, 73]], rgb: [115, 90, 90]}

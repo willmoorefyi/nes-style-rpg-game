@@ -113,3 +113,7 @@ frames:
     tweaks: {crown: [-2, 0], el_n: [0, -2], hand_n: [1, -3]}
   hurt_in2:                    # the hurt pose easing back: arms stay flung, head and chest settle
     moves: [crown, chest]
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
