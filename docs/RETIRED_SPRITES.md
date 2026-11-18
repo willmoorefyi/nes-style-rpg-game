@@ -107,3 +107,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `troll_kneel_v1` | `troll` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `iron_golem_kneel_v1` | `iron_golem` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `soldier_kneel_v1` | `soldier` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `warmech_kneel_v1` | `warmech` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
