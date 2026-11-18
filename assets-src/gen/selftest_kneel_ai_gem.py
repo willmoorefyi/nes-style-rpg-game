@@ -96,7 +96,10 @@ def key_and_request(check) -> None:
 def interactive(check) -> None:
     from gen import kneel_ai_data as D
     from gen import kneel_ai_gem as KG
-    with sandbox() as sb:
+    # the real pass KA-G has recorded usage_recounted: true since its pilot; the usage gate is tested from a fresh pass
+    fresh = real_budget()
+    next(p for p in fresh["passes"] if p.get("name") == "pass KA-G")["usage_recounted"] = False
+    with sandbox(fresh) as sb:
         sp = D.load("goblin")
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
@@ -169,7 +172,7 @@ def kg1_kg2(check) -> None:
     with contextlib.redirect_stdout(out):
         code = KB.check(True)
     text = out.getvalue()
-    check(code == 0 and "closed pass C 25/80, closed pass KA 54/91" in text and re.search(
+    check(code == 0 and "closed pass C 25/80, closed pass KA 54/91, closed pass KA-FIX 2/60" in text and re.search(
         r"OK pass KA-G pilot \d+/30, batch \d+/375, reserve \d+/135, total \d+/540, expiry \d+/125, est \$\d+\.\d\d",
         text) is not None, f"KG1: kneel_ai.py budget --check on the real ledgers ({text.strip()!r})")
     real, br = real_budget(), B.read_br_ledger()
@@ -185,8 +188,10 @@ def kg1_kg2(check) -> None:
         bad, _ = KB.breaches(b, r, g)
         check(any(word in x for x in bad), f"KG1: {label} breaches ({bad[:1]})")
     ka = sum(x.get("event") == "request" and x.get("pass") == "KA" for x in br)
-    other = {x.get("pass") for x in br if x.get("event") == "request"} - {"C", "KA"}
-    check(ka == 54 and not other, f"KG2: the BR ledger holds 54 pass-KA rows and no later pass ({ka}, {other})")
+    fix = sum(x.get("event") == "request" and x.get("pass") == "KA-FIX" for x in br)
+    other = {x.get("pass") for x in br if x.get("event") == "request"} - {"C", "KA", "KA-FIX"}
+    check(ka == 54 and fix == 2 and not other, f"KG2: the BR ledger holds 54 pass-KA rows, the 2 rows of KA-FIX (closed "
+          f"by KT3, 2026-11-18) and no other pass ({ka}, {fix}, {other})")
     with br_sandbox(real) as (BB, tmp, cl):
         r = refused(lambda: BB.invoke("core", {"prompt": "x", "seed": 1}, paid=True, purpose="ka_probe"), "bedrock")
         check(bool(r) and not cl.calls, f"bedrock.invoke refuses every call with no live bedrock block ({r[:60]!r})")

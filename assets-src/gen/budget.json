@@ -159,16 +159,18 @@
       "reserve_max_usd": 0.08,
       "used": 54,
       "closed": "2026-11-17, 54 of 91, rev 5 (the Stability probe KA1-P was rejected by the user; docs/KNEEL_AI_PLAN.md rev 7 section 5)"
-    }
-  ],
-  "bedrock": {
-    "pass": "KA-FIX",
-    "cap": 60,
-    "per_purpose_caps": {
-      "kneel_fix": 50,
-      "reserve": 10
     },
-    "gemini_before": 553,
-    "note": "User 2026-11-17: Bedrock is free for the user, Gemini is paid; spot-fix flaws in approved-quality kneel keys with Stability inpaint / erase / search-replace instead of regenerating on Gemini. One row per logical request in cache/bedrock_ledger.jsonl."
-  }
+    {
+      "pass": "KA-FIX",
+      "cap": 60,
+      "per_purpose_caps": {
+        "kneel_fix": 50,
+        "reserve": 10
+      },
+      "gemini_before": 553,
+      "note": "User 2026-11-17: Bedrock is free for the user, Gemini is paid; spot-fix flaws in approved-quality kneel keys with Stability inpaint / erase / search-replace instead of regenerating on Gemini. One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 2,
+      "closed": "2026-11-18, 2 of 60 (KT3 integrator: the user ruled that no key fixes are needed, so the free KA-FIX fix pass is unused; docs/KNEEL_TWEEN_PLAN.md 12 rulings log)"
+    }
+  ]
 }
