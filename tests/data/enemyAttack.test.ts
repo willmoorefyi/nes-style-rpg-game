@@ -35,7 +35,8 @@ describe('enemy attack kinds', () => {
     for (const id of ['drowned_sovereign', 'drowned_sovereign_2', 'ashen_queen', 'ashen_queen_2']) {
       const e = enemies.find((x) => x.id === id)!;
       expect(e.attackAnim, id).toBeUndefined();
-      expect(e.bossPhases?.map((p) => [p.hpThreshold, p.attackAnim]), id).toEqual([[0.5, 'heavy']]);
+      // only the phases that set an attack animation (FIR-D1's queen also wakes in a full-HP phase without one)
+      expect(e.bossPhases?.filter((p) => p.attackAnim).map((p) => [p.hpThreshold, p.attackAnim]), id).toEqual([[0.5, 'heavy']]);
     }
   });
 });
