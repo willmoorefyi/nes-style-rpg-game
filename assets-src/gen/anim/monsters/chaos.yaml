@@ -190,3 +190,7 @@ paint:                         # FW-P keyframe paint (pass V nits: orb colours i
   - {frame: attack, rgb: [148, 41, 74], xy: [[126, 34], [127, 34], [131, 35], [132, 36], [122, 38], [121, 41], [122, 43], [133, 43], [133, 44], [132, 45], [130, 46], [131, 46], [127, 47], [128, 47]]}
   # the brown abyss orb back to the idle teal (40 px)
   - {frame: cast, rgb: [66, 132, 148], xy: [[120, 18], [121, 18], [119, 19], [120, 19], [121, 19], [122, 19], [118, 20], [119, 20], [120, 20], [121, 20], [122, 20], [123, 20], [117, 21], [118, 21], [119, 21], [120, 21], [121, 21], [122, 21], [123, 21], [124, 21], [117, 22], [118, 22], [119, 22], [120, 22], [121, 22], [122, 22], [123, 22], [124, 22], [118, 23], [119, 23], [120, 23], [121, 23], [122, 23], [123, 23], [119, 24], [120, 24], [121, 24], [122, 24], [120, 25], [121, 25]]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai
