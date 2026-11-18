@@ -4037,6 +4037,144 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 <!-- === WND-D2 WIND (pass W: owned by WND-D2) === -->
 <!-- === end WND-D2 === -->
 <!-- === PST PAST (pass W: owned by PST) === -->
+### PST result: the time gate and the Temple of the Past, S29-S30 (branch `w-pst` from `mainline` 7525dbad)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-pst/` (sims, a `git archive` copy of 7525dbad for the
+baseline, Playwright).
+
+**Files:**
+
+- `assets-src/maps/temple-of-fiends.yaml` (hand-written; additions only): the entrance `time_gate` (3, 5); the NPC
+  `hour_keeper` (`old_man`, tint, `showIf: EARTH_CRYSTAL_LIT`, cutscene `pst_time_gate` with `onceFlag:
+  TIME_GATE_OPEN`) in the altar room's north-west corner (3, 3); one `keyItemGates` entry on (3, 4) (`requiredItem:
+  lute`, the four crystal flags, a conditional message); and a transition on (3, 4) to `past-temple-1:arrival` with
+  `requiredFlags: [TIME_GATE_OPEN]`. (3, 3) is walkable floor whose only walkable neighbour is (3, 4), so the keeper is
+  talked to only from the gate cell. No ground, deco or act-1 NPC changes: the compiled art is byte-identical, the
+  walkable count stays 236, `templeLayout.test.ts` and the Garland tests are unchanged and pass.
+- `layouts/past/past_common.py` (93 lines: materials, the encounter tables, the design notes (shared Concept and
+  Topology, a Distinct line per map), the floor writer, `gated_stairs_down`, `boss`, `chest`, `ward`),
+  `past_upper.py` (175: floors 1-3), `past_lower.py` (140: floors 4, 5 and the shrine).
+  - **floor 1** (`past-temple-1`, 40x40): a cloister ring round an open garth; the west walk has fallen in (two
+    blind stubs); the chapter house north of the ring holds `[lich_2, death_knight x2]` between twin stairs down (west
+    to floor 2's `arrival`, east to its new `east` entrance); 4 one-cell carrels with chests. The time gate's stair
+    arrives in a vestibule south of the ring.
+  - **floor 2** (44x44): a cross. The south arm (arrival) opens onto the hub; the hub's stone acolyte (`ward_hub`,
+    cutscene `pst_ward_hub`, PST_WARD_HUB) lifts the west arm's doorway ward; the west arm's acolyte (`pst_ward_west`,
+    PST_WARD_WEST) lifts the north arm's, where `[ashen_queen_2, rhyos]` stands before the stair down. The east arm
+    never opens onto the hub: it is reached only by floor 1's east stair (a `reach_roots` entry; chokepoint check off).
+  - **floor 3** (32x46): a nave flooded wall to wall (`≈`, Lake, deep); two aisles behind columns and two transepts
+    are the only dry ways; `drowned_sovereign_2` in the apse, the stair down behind him; 3 chapels.
+  - **floor 4** (34x36): a stairwell spiral of three square rings, each plugged where it is entered, round a well room
+    with `hollow_seraph_2` and the stair down (233 steps from the arrival); alcoves in the walls between rings, the
+    Masamune in the deepest.
+  - **floor 5** (46x34): the hall of eyes. Two routes (a colonnade, a chain of three chambers) either side of a wall
+    of carved eyes (4 inspect cells) meet at the north landing, where `[death_eye, iron_golem]` guards the stair down.
+  - **past-chaos** (30x32): the pillared processional ends at a blank wall with a painted shadow (2 inspect cells);
+    side aisles climb to the sanctum, where `chaos` waits (robed, a crown of flame, the four orbs: its F1 art), no
+    random battles, background `rim`. Its fight's flag is CHAOS_DEFEATED, `postVictoryCutscene: ending`.
+  - Every floor: `exit` to `overworld:temple`, `canSave: false`, background `fiend_hall` (staged; `--check fiend_hall`
+    has no bounds and exits 0, as for ERT-O / FIR-D1; `--check rim` OK). Encounters: floors 1-2 death_knight,
+    vampire_lord, dark_fighter; floors 3-5 rhyos, purple_worm, iron_golem, blue_dragon, vampire_lord (rate 16-28).
+  - Each refight's stair on carries its milestone (`requiredFlags`), and nothing else on the floor reads it; the
+    boss NPC has `hideIf` its flag; the battle's flag is the milestone and its cutscene sets it too.
+- `cutscenes.yaml` (PST anchor): `pst_time_gate` (the song, the four lights, set_flag TIME_GATE_OPEN, warp back off
+  the ring onto `time_gate`; the next step north goes down), `pst_lich_falls`, `pst_ashen_falls`,
+  `pst_drowned_falls`, `pst_seraph_falls`, `pst_death_eye_falls`, `pst_ward_hub`, `pst_ward_west`, `ending` (Chaos
+  falls, set_flag CHAOS_DEFEATED, warp to `cornelia-castle-2f:throne_return`, heal, two lines, `end_game` with its
+  card).
+- `enemies.yaml` (PST anchors, `bossPhases` only): a phase from full HP (`hpThreshold: 1.0`, no message, so the
+  bestiary's 1-line phase row fits) on each: lich_2 hits 3 / attack 110, ashen_queen_2 6 / 80, drowned_sovereign_2
+  6 / 82, hollow_seraph_2 5 / 92, death_eye 3 / 125. The existing 0.5 phases are kept.
+- `quest.yaml` (PST anchor): S29 and S30 `built`, with entries, walks and `nonLoadBearing` (below).
+- `debug-scenarios.yaml` (PST anchor): `w_s29_start` (overworld `temple`, L33 upgraded, B7 kit, flags through S28,
+  the lute, the airship at (82, 104)), `w_s30_start` (temple-of-fiends `time_gate`, L34, TIME_GATE_OPEN),
+  `w_s30_chaos_door` (past-chaos `boss`, the level-40 `*chaos_party`), `w_boss_lich_2`, `w_boss_ashen_queen_2`,
+  `w_boss_drowned_sovereign_2`, `w_boss_hollow_seraph_2`, `w_boss_death_eye` (L37, 4 potions, `fiend_hall`).
+- Tests: `tests/quest/past/pst_sites.test.ts` (11: the time gate's cell, stair and keeper; the act-1 room's NPCs and
+  battle unchanged; chests / EXIT / no saving; each boss, its cutscene and its stair; the twin stairs; floor 2's wards
+  and sealed east arm; floor 3's flood; floor 4's spiral and the Masamune; floor 5's two routes; the shrine and the
+  ending), `tests/quest/past/pst_walk.test.ts` (3: S29 and S30 (a)-(b) in assume mode, the walks, the milestone order
+  of the closure), `tests/balance/w_pst.test.ts` (6).
+
+**Balance (S30, 400 seeds, kit `w_s30`, upgraded party, sensible):** before tuning the L37 party won every fight
+98-100 % and the run 100 %; the bosses fell in 1-3 rounds, mostly before acting. With the phases and the two escorts
+(the slow lich and queen otherwise never act): the four refights in a row (HP, deaths and charges carried, no inn, 4
+potions added before each fight) **74.0 %** (target 60-85); alone **100.0 / 100.0 / 97.0 / 99.8 %** (target >= 85);
+the Death Eye with its golem **77.5 %** (target 70-90). Level curve: L35 run 33.8 %, eye 66.0 %; L39 run 95.0 %, eye
+85.0 %. Careless wins more (run 99.8 %, eye 100 %): careless casts nothing, while sensible spends turns on RUSE and
+LIT, as ORD-O found. Chaos is unchanged (`chaos.test.ts`).
+
+**Topology** (`originality.test.ts`: `past-temple: branching`, `past: chain`; PST: 1 of 2 dungeons branch):
+
+| Floor | Size | Chests | Dead ends | Aspect / fill | Boss (octant, path) |
+|---|---|---|---|---|---|
+| past-temple-1 | 40x40 | 4 | 6 | 1.06 / 0.43 | N 42 |
+| past-temple-2 | 44x44 | 4 | 3 | 1.05 / 0.30 | N 33 |
+| past-temple-3 | 32x46 | 3 | 5 | 0.73 / 0.40 | N 53 |
+| past-temple-4 | 34x36 | 4 | 4 | 0.97 / 0.52 | SE 233 |
+| past-temple-5 | 46x34 | 3 | 3 | 1.40 / 0.41 | N 48 |
+| past-chaos | 30x32 | 2 | 4 | 0.96 / 0.52 | N 35 |
+
+Stair graph: 1 <-> 2 by twin stairs (to two different arms), then a chain 2 <-> 3 <-> 4 <-> 5 <-> the shrine.
+
+**GT rows and `nonLoadBearing`:**
+
+- GT-33 (S29): each crystal removed from the gate is caught (`SKIP S29`) except EARTH_CRYSTAL_LIT, which gates the
+  canoe that FIRE needs: entry `{temple-of-fiends, gate, (3, 4)}`. The keeper's `showIf EARTH_CRYSTAL_LIT` gets
+  `{temple-of-fiends, npc, (3, 3)}`. The lute part is reported with the plan's reason.
+- GT-34 (S30): every stair cell's flag is caught as `MILESTONE S30 ...`, except floor 1's east stair, which lands in
+  the sealed east arm (a dead end): entries `{past-temple-1, transition, (24, 4)}`, `(25, 4)`.
+- Generic: the six boss NPCs' `hideIf`; floor 2's four ward gate cells (the floor's own puzzle; the stair needs
+  PAST_ASHEN_DEFEATED).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | both layout scripts, `stubs.py` (`kept 89 real maps`), `world.py --check-bands`, `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py past-temple-1 ... past-chaos temple-of-fiends`: each `<id>: WxH -> assets/maps/ai/<id>.yaml`; `--check-determinism` on the 7 ids: each `deterministic`. No site file changed, so no world compile |
+| G3 | n/a: no overworld chunk changed |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 6 failed \| 331 passed (337)`, `Tests 7 failed \| 7987 passed \| 2 skipped (7996)`; the 7 failures are exactly mainline's (below) |
+| G5 | `--stage S29`: (a) OK; (b) OK (34 withheld runs); (c) FAIL (pre-existing pattern, below); (d) `S29 L33.5 [33,35]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; `mutations: OK (1 gate rows; 7 elements, each removal reported)`. `--stage S30`: (a) OK; (b) OK (35 withheld runs; 5 milestone runs); (c) FAIL (the same); (d) `lich_2 L34.7 [34,41]`; (e)-(h) OK; `mutations: OK (7 gate rows; 22 elements, each removal reported)`. Each ends `quest-verify: FAIL` on (c) only |
+| G8 | `build_map.py --selftest`: `build_map selftest: 104 checks passed` |
+| G9 | `w_pst.test.ts` 6 passed; `check-bounds tests/balance/w_*.test.ts`: `check-bounds: OK (21 tests)` |
+| G10 | browser, port 5241, `mute=1`, headless Chromium (`/tmp/w-pst/pw/pst.mjs`): `w_s29_start` walked from the temple door to the gate cell (3, 4), talked to the keeper, TIME_GATE_OPEN set and the party set back on (3, 5); one step north: map `past-temple-1` at (19, 37). `w_s30_chaos_door`: one step up, talk: `BattleScene` with enemies `[chaos]`, background `assets/backgrounds/rim.webp`, Run greyed. 0 console errors. Screens: `/tmp/w-pst/s29_0_start.png`, `s29_1_keeper.png`, `s29_2_open.png`, `s29_3_past1.png`, `s30_0_chaos.png`, `s30_1_battle.png` |
+| G12 | `designNotes`, `originality` pass; a fresh reviewer's first pass found 4 points (one shared Distinct line; a stock shrine; Chaos staged as the classic knight reveal with the Garland sprite; two wording echoes); all were fixed and the re-review returned `originality review: PASS past-temple-1 past-temple-2 past-temple-3 past-temple-4 past-temple-5 past-chaos temple-of-fiends` |
+| G16 | `stubs.py --check PST`: `stubs: 0 left for PST` |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Pre-existing failures (mainline 7525dbad, measured on a `git archive` copy with the same command):** questGraph
+"(a), (b) and (c)", questLate "(d) Garland ...", ert_o_walk S10 and S12, ert_t_walk S25, fir_d1_walk S15, fir_t_walk
+"S13 before S14" (proof (c) soft-locks from the visit-order bug, and (d) bands / elfheim gold, for INT-W2c). Both
+`--stage` runs fail only on (c) with the same pattern (elfheim-vault, waterfall-cave, cornelia-castle* STRANDED /
+SOFTLOCK, the state LIMIT); before my entries, `--stage S29` on mainline failed (e) `SHOPLESS lufenia`, which the
+airship in the S29 / S30 entries now reaches.
+
+**Deviations / shared-file edits (each small):**
+
+- **The time gate** is the plan's gate (lute + four crystals) on the stair cell itself, and the cutscene
+  `pst_time_gate` comes from talking to the hour keeper in the corner beyond it. The altar is a deco and the temple's
+  walkable count is pinned, so the "altar" became an NPC standing where only the gate cell reaches him. The cutscene
+  does not take the party down (a warp would bypass TIME_GATE_OPEN when proof (b) withholds it); it sets the party
+  back on (3, 5) (standing on the stair after the event read as STRANDED to (c)), and the player steps down.
+- **Escorts**: lich_2 fights with two death knights, ashen_queen_2 with a rhyos, death_eye with an iron golem (all
+  from S30's roster), as FIR-D1, ORD-O and ELF-O added escorts: these bosses are too slow to act before the L37
+  party kills them, so `bossPhases` alone can't reach 3.7's bands.
+- **Floor 2's "one open per visit"** is built as arms opened one at a time by ward acolytes (local flags
+  PST_WARD_HUB, PST_WARD_WEST); a fourth arm stays sealed from the hub and is entered only by floor 1's east stair.
+- **canSave: false** on all six maps (each floor ends at a boss; the run has no rest by design).
+- `tests/quest/originalityChecks.ts` (+3) and `originality.test.ts` (+1 assertion): `topologyLine` also reads
+  `floor <n>` (and `floor <n> boss`), since `past-temple-<n>` floors are labelled by their number alone.
+- `tests/progression/questGraph.test.ts` (+2): the "act 1 is played" path filter leaves out
+  `temple-of-fiends:cutscene:hour_keeper` (S29's event on the act-1 map).
+- Chaos's field sprite is the `king` sheet tinted violet (no field sheet of the colossus exists).
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/past/past_upper.py` (`past-temple-1..3`) and
+`past_lower.py` (`past-temple-4`, `-5`, `past-chaos`) with `past_common.py`; `temple-of-fiends.yaml` (still
+hand-written) gains the time gate (the hour keeper, the gate cell (3, 4), the `time_gate` entrance). The debug
+scenarios gain `w_s29_start`, `w_s30_start`, `w_s30_chaos_door` and `w_boss_{lich_2, ashen_queen_2,
+drowned_sovereign_2, hollow_seraph_2, death_eye}`; the background `fiend_hall` is staged. `topologyLine` reads
+`floor <n>`.
 <!-- === end PST === -->
 <!-- === INT INTEGRATION (pass W: owned by INT) === -->
 <!-- === end INT === -->
