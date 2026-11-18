@@ -107,9 +107,13 @@ const snapshot = (sat: Saturator, place: QuestPlace): QuestState => ({
   place, fired: [],
 });
 
-/** Runs the curve model along the witness of proof (a). Cached on the context. */
-export function curveOf(ctx: QuestContext): CurveResult {
-  const cached = CURVES.get(ctx);
+/**
+ * Runs the curve model along the witness of proof (a). Cached on the context. `rush`: every stage's `grind` is 1.0,
+ * a party that does not grind (proof (f)'s price walls stop a rusher; a grinding party earns its way in; INT-W2c).
+ */
+export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): CurveResult {
+  const cache = opts.rush ? RUSH_CURVES : CURVES;
+  const cached = cache.get(ctx);
   if (cached) return cached;
   const data = lateOf(ctx);
   const { world } = ctx;
@@ -171,7 +175,7 @@ export function curveOf(ctx: QuestContext): CurveResult {
       const state = snapshot(sat, pos);
       const path = route(ctx, pos, (p) => p.map === at.map && p.x === at.x && p.y === at.y, state)
         ?? sat.roots.map((r) => route(ctx, r, (p) => p.map === at.map && p.x === at.x && p.y === at.y, state)).find((r) => r) ?? [];
-      const grind = stage?.grind ?? 1;
+      const grind = opts.rush ? 1 : stage?.grind ?? 1;
       let f = 0;
       let xp = 0;
       let gold = 0;
@@ -206,11 +210,12 @@ export function curveOf(ctx: QuestContext): CurveResult {
     sat.apply(ev.id, eff, at);
     noteStages();
   }
-  CURVES.set(ctx, out);
+  cache.set(ctx, out);
   return out;
 }
 
 const CURVES = new WeakMap<QuestContext, CurveResult>();
+const RUSH_CURVES = new WeakMap<QuestContext, CurveResult>();
 
 /** Whether a map id belongs to the stage (its `maps` globs). */
 export function stageOwnsMap(s: QuestStage, mapId: string): boolean {

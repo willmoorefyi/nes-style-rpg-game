@@ -687,6 +687,11 @@ towns:
 
 Elfheim's `bandStage` is S6, not S4 (user ruling 2026-11-17, INT-W2c). B3 serves S4-S10, and the party buys its gear across several stages, so the 50 % gold rule of (d) is measured at S6's start (the Western Keep).
 
+The price walls of proof (f) (crescent, gaia) are measured on a rushing curve, with every `grind` at 1.0
+(integrator decision, INT-W2c). It follows from the user's grinding ruling of 2026-11-17 (grind cap 7.0): a wall is
+there to stop a party that rushes, and a party that grinds earns its way in. (d)'s bands and gold rule stay on the
+ground curve, which uses the stages' `grind`.
+
 ### 3.6 Level, gear and magic bands (replaces QUEST 6.1)
 
 The caps are the highest stats sold. Found gear may exceed them by at most 1 band, as in pass Q.

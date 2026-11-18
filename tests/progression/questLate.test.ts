@@ -131,6 +131,15 @@ describe('questLate: each proof passes clean and fails on its RED variant', () =
     expect(walled(ctx, ctx.world.quest.towns[1])).toBe(true);
     expect(msgs(proofPriceWalls(ctx))).toEqual(['PRICEWALL outpost 400 vs 900']);
   });
+
+  it('(f) measures a rushing party (every grind 1.0), (d) the grinding one (INT-W2c)', () => {
+    const ctx = ctxOf((i) => { for (const id of ['S0', 'S1', 'S2']) stage(i, id).grind = 5; });
+    const ground = curveOf(ctx);
+    const rush = curveOf(ctx, { rush: true });
+    expect(ground.stageStartGold.get('S2')!).toBeGreaterThan(rush.stageStartGold.get('S2')!);
+    expect(ground.xp).toBeGreaterThan(rush.xp);
+    expect(proofPriceWalls(ctx).line).toBe(`(f) price walls: OK  outpost ${Math.round(rush.townFirstGold.get('outpost')!)}/1800`);
+  });
 });
 
 describe('questLate: the repository', () => {

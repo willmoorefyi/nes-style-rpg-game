@@ -7,7 +7,9 @@
  *
  * (f): a town is walled when its kit costs more than the kit of every stage that opens right after its
  * `opensAfter` (crescent and gaia on quest.yaml). Its cumulative gold when a keeper first becomes talkable must be
- * below 40 % of its kit's 4-member price: `PRICEWALL <town> <gold> vs <price>`.
+ * below 40 % of its kit's 4-member price: `PRICEWALL <town> <gold> vs <price>`. The gold is the rushing curve's
+ * (every `grind` 1.0): the wall stops a party that rushes, and a party that grinds earns its way in (INT-W2c, after
+ * the user's 2026-11-17 grinding ruling; (d)'s bands stay on the ground curve).
  */
 import type { QuestStage, QuestTown } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestState } from './questTypes.js';
@@ -110,7 +112,7 @@ export function proofPriceWalls(ctx: QuestContext): ProofResult {
   const failures: ProofFailure[] = [];
   const shown: string[] = [];
   let pending = 0;
-  const curve = curveOf(ctx);
+  const curve = curveOf(ctx, { rush: true });
   for (const town of ctx.world.quest.towns) {
     if (!walled(ctx, town)) continue;
     const price = kitPrice(data, town.kit)!;
