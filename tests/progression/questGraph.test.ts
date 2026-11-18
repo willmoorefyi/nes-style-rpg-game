@@ -225,7 +225,9 @@ describe('questGraph: the repository (npm run quest)', () => {
   it('act 1 is played, not assumed: Garland, the King, then the princess\'s lute', () => {
     // act 1's own events (the pass W regions' built stages fire later, on their own maps)
     const act1 = /^(cornelia|temple-of-fiends)/;
-    const fired = closure(ctx).path().filter((id) => !id.startsWith('quest:') && !id.includes(':vehicle:') && act1.test(id));
+    // (PST's time gate in the act-1 temple, temple-of-fiends:cutscene:hour_keeper, is S29's, not act 1's)
+    const fired = closure(ctx).path().filter((id) => !id.startsWith('quest:') && !id.includes(':vehicle:') && act1.test(id)
+      && id !== 'temple-of-fiends:cutscene:hour_keeper');
     expect(fired).toEqual(['temple-of-fiends:battle:garland', 'cornelia-castle-2f:cutscene:king',
       'cornelia-castle-2f:gift:princess']);
   });

@@ -156,3 +156,7 @@
 {"event": "result", "key": "918c952905f3292391006bf5", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
 {"event": "request", "ts": "2026-11-17T13:37:16", "tool": "kneel_ai.py", "model": "style_guide", "purpose": "ka_probe", "seed": 1235, "key": "08d82f155443587361552536", "pass": "KA"}
 {"event": "result", "key": "08d82f155443587361552536", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-17T21:18:07", "tool": "inpaint.py", "model": "inpaint", "purpose": "kneel_fix", "seed": 4242, "key": "e7e973aea401f04b3c792de8", "pass": "KA-FIX"}
+{"event": "result", "key": "e7e973aea401f04b3c792de8", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
+{"event": "request", "ts": "2026-11-17T21:18:50", "tool": "sr.py", "model": "search_replace", "purpose": "kneel_fix", "seed": 4242, "key": "bd787fa80301ecc4823df88c", "pass": "KA-FIX"}
+{"event": "result", "key": "bd787fa80301ecc4823df88c", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}

@@ -1,0 +1,37 @@
+{
+  "character": "blue_dragon",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "985dadbe7ae11b38",
+    "skel": "76f11c5c8cf5e71a",
+    "ref": "4129393d51bc4112",
+    "derived": "66938eb0804d5512"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-pal, A-hist, A-outline, K-ground, K-height",
+  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "d5acad8a6cb1f1b4628d1712"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

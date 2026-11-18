@@ -129,8 +129,10 @@ export function equalGrounds(maps: MapData[]): string[] {
 
 /** The floor labels and boss floor a `Topology:` line names (`B1 -> B2 (2 stairs) -> B3 boss`). */
 export function topologyLine(line: string): { floors: string[]; boss: string | null } {
-  const floors = [...new Set([...line.matchAll(/\b(B\d+|\d+F)\b/gi)].map((m) => m[1].toUpperCase()))];
-  const boss = /\b(B\d+|\d+F)\s+boss\b/i.exec(line)?.[1].toUpperCase() ?? null;
+  // `floor <n>` names a floor labelled by its number alone (`past-temple-3` is floor 3; PST)
+  const floors = [...new Set([...line.matchAll(/\b(B\d+|\d+F)\b|\bfloor (\d+)\b/gi)].map((m) => (m[1] ?? m[2]).toUpperCase()))];
+  const b = /\b(?:(B\d+|\d+F)|floor (\d+))\s+boss\b/i.exec(line);
+  const boss = b ? (b[1] ?? b[2]).toUpperCase() : null;
   return { floors, boss };
 }
 

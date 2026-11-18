@@ -572,10 +572,17 @@ stages:
     maps: [sea-shrine-*]
     zones: []
     grind: 2.0
-    walk: []
+    # at Onrac's gate with the airship landed beside it (as S20 leaves it): into the town, through the dry dock's
+    # oxyale gate (WAT-T's submarine) to the nave's pier on sea-shrine-b3, down the east stairwell to B4, the halls'
+    # stair to B5, and the throne. Withholding the oxyale shuts the gate (proof (b))
+    entry: {map: overworld, x: 28, y: 39, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
+    walk: [overworld:warp:onrac, onrac:warp:sea-shrine-b3, sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5,
+      sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the king's hideIf only clears the beaten boss off the throne steps; the fight is once by its flag
+      - {map: sea-shrine-b5, kind: npc, at: [15, 7], reason: "hideIf only clears the beaten king off the throne steps; the fight is once by its flag WATER_CRYSTAL_LIT"}
+    status: built
   # === end WAT-D ===
   # === WND-O (pass W: owned by WND-O) ===
   - id: S26
@@ -613,10 +620,18 @@ stages:
     maps: [gaia, gaia-*]
     zones: [overworld:wnd_highlands]
     grind: 2.0
-    walk: []
+    # WND-T: on foot at Gaia's land gate in the mountain bowl, the airship on the bowl's grass floor beside it (S17);
+    # the ship (S2) rides at anchor far out at sea, out of reach of any shore, so no ancestor's pending dock can strand
+    # the party in assume mode (WND-O's S26 practice). With every unbuilt stage's events open to a flying party, proof
+    # (c) from here explores about 243000 states
+    entry: {map: overworld, x: 150, y: 14, mode: walking, vehicles: [{type: airship, map: overworld, x: 152, y: 16},
+                                                                      {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [overworld:warp:gaia, gaia:warp:gaia-spring, gaia-spring:npc:gaia_spring_warden]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a patch forced on): the spring's water is art and terrain only
+      - {map: gaia-spring, kind: patch, at: [8, 5], reason: "the basin fills with water once the fairy is freed; it is a dead end beside the warden and gates nothing"}
+    status: built
   # === end WND-T ===
   # === WND-D1 (pass W: owned by WND-D1) ===
   - id: S27
@@ -631,10 +646,22 @@ stages:
     maps: [mirage-*]
     zones: [overworld:wnd_mirage_sands]
     grind: 2.0
-    walk: []
+    # WND-D1: the assumed start is WND-O's for S26 (Cornelia's south gate, the airship on the grass below it, the
+    # ship at anchor off the mesa where no shore reaches it); the walk flies to the sands, rings the vestibule door
+    # (the chime) and climbs to the console (the cube)
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
+                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [overworld:warp:mirage-1f, mirage-1f:warp:mirage-2f, mirage-2f:warp:mirage-3f, mirage-3f:npc:mirage_console]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the four cells of mirage-3f's bronze ring (requiredFlag SKY_FORTRESS_OPEN, the way back up after the console's
+      # first lift): without the flag the ring reaches only the sky castle's stubs, and pending S28's grant itself
+      # needs SKY_FORTRESS_OPEN, so nothing is skipped; once WND-D2 builds S28 the removal is SKIP S28 (strict re-checks)
+      - {map: mirage-3f, kind: transition, at: [13, 9], reason: &wnd_d1_ring "pending: S28 (WND-D2) not built; the ring leads only into the sky castle, whose pending grant needs SKY_FORTRESS_OPEN itself"}
+      - {map: mirage-3f, kind: transition, at: [14, 9], reason: *wnd_d1_ring}
+      - {map: mirage-3f, kind: transition, at: [13, 10], reason: *wnd_d1_ring}
+      - {map: mirage-3f, kind: transition, at: [14, 10], reason: *wnd_d1_ring}
+    status: built
   # === end WND-D1 ===
   # === WND-D2 (pass W: owned by WND-D2) ===
   - id: S28
@@ -642,17 +669,27 @@ stages:
     tranche: WND-D2
     after: [S27]
     requires: {flags: [SKY_FORTRESS_OPEN], items: [], vehicles: []}
-    grants: {flags: [WIND_CRYSTAL_LIT], items: [], vehicles: []}
+    # adamant: the archive vault's chest on 3F (CHEST_WND_D2_ADAMANT), for the optional S31 (WORLD 3.1)
+    grants: {flags: [WIND_CRYSTAL_LIT], items: [adamant], vehicles: []}
     boss: [hollow_seraph]
     band: [31, 34]
     kit: w_s28
     maps: [sky-castle-*]
-    zones: []
+    zones: [sky-castle-4f:wnd_d2_engine]
     grind: 2.0
-    walk: []
+    # set down by the Mirage console's beam on 1F's south berth (mirage_ascent warps to sky-castle-1f `arrival`), the
+    # airship on the oasis meadow beside the Mirage Tower (the berth's beam drops back to the tower's top); up the hub
+    # stair, over 2F's south bridge to the east island, its belts to D and to the stair island, the archive's vault,
+    # then the engine halls and the spire
+    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, x: 135, y: 38}]}
+    walk: [sky-castle-1f:warp:arrival, sky-castle-2f:warp:d_belt, sky-castle-2f:warp:e_belt,
+      sky-castle-2f:warp:sky-castle-3f, sky-castle-3f:chest:chest_adamant, sky-castle-3f:warp:sky-castle-4f,
+      sky-castle-4f:warp:sky-castle-5f, sky-castle-5f:battle:hollow_seraph]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: sky-castle-5f, kind: npc, at: [12, 8], reason: "the seraph's hideIf only clears the beaten boss off the spire's north end, before the altar"}
+    status: built
   # === end WND-D2 ===
   # === PST (pass W: owned by PST) ===
   - id: S29
@@ -667,10 +704,16 @@ stages:
     maps: []
     zones: []
     grind: 1.0
-    walk: []
+    # on foot at the act-1 temple's door (the four crystals lit, the lute held), the airship parked on the grass
+    # east of it; into the temple, up the causeway to the altar room's north-west corner, and the hour keeper
+    entry: {map: overworld, x: 79, y: 103, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    walk: [overworld:warp:temple-of-fiends, temple-of-fiends:cutscene:hour_keeper]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-33 (W1-I, /tmp/world_int_notes.md): EARTH_CRYSTAL_LIT gates the canoe (S14), which FIRE (S15) needs
+      - {map: temple-of-fiends, kind: gate, at: [3, 4], reason: "EARTH_CRYSTAL_LIT is redundant on the time gate: it gates the canoe (S14), which the fire crystal (S15), also required here, needs"}
+      - {map: temple-of-fiends, kind: npc, at: [3, 3], reason: "the hour keeper's showIf EARTH_CRYSTAL_LIT only shows him; he is talked to only from the gate cell (3, 4), which needs all four crystals and the lute"}
+    status: built
   - id: S30
     title: "The temple of the past 1-5"
     tranche: PST
@@ -683,11 +726,35 @@ stages:
     maps: [past-temple-*, past-chaos]
     zones: []
     grind: 2.0
-    walk: []
+    # in the act-1 temple's altar room below the time gate (its `time_gate` arrival), the airship parked by the door;
+    # down the stair (TIME_GATE_OPEN), each refight opens the stair on, the cross's two wards open its west and north
+    # arms, and the shrine's Chaos ends the game
+    entry: {map: temple-of-fiends, x: 3, y: 5, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    walk: [temple-of-fiends:warp:past-temple-1, past-temple-1:battle:past_lich, past-temple-1:warp:past-temple-2, past-temple-2:cutscene:ward_hub,
+      past-temple-2:cutscene:ward_west, past-temple-2:battle:past_ashen_queen, past-temple-2:warp:past-temple-3,
+      past-temple-3:battle:past_drowned_sovereign, past-temple-3:warp:past-temple-4,
+      past-temple-4:battle:past_hollow_seraph, past-temple-4:warp:past-temple-5, past-temple-5:battle:past_death_eye,
+      past-temple-5:warp:past-chaos, past-chaos:battle:past_chaos]
     basins: {}
-    nonLoadBearing: []
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: past-temple-1, kind: npc, at: [19, 5], reason: "the Rime Sovereign's hideIf only clears the beaten boss off the high seat"}
+      - {map: past-temple-2, kind: npc, at: [21, 8], reason: "the Ashen Queen's hideIf only clears the beaten boss off the north arm"}
+      - {map: past-temple-3, kind: npc, at: [15, 6], reason: "the Drowned Sovereign's hideIf only clears the beaten boss out of the apse"}
+      - {map: past-temple-4, kind: npc, at: [16, 19], reason: "the Hollow Seraph's hideIf only clears the beaten boss out of the well room"}
+      - {map: past-temple-5, kind: npc, at: [22, 5], reason: "the Death Eye's hideIf only clears the beaten boss off the landing"}
+      - {map: past-chaos, kind: npc, at: [14, 5], reason: "Chaos's hideIf only clears the beaten boss; the ending leaves the shrine"}
+      # GT-34: the east stair behind the high seat lands in the cross's sealed east arm, a dead end; the west stair
+      # carries PAST_LICH_DEFEATED on
+      - {map: past-temple-1, kind: transition, at: [24, 4], reason: "the east stair lands in floor 2's sealed east arm, a dead end; the west stair carries the milestone"}
+      - {map: past-temple-1, kind: transition, at: [25, 4], reason: "the east stair lands in floor 2's sealed east arm, a dead end; the west stair carries the milestone"}
+      # floor 2's ward puzzle (local flags PST_WARD_HUB, PST_WARD_WEST): the stair on needs PAST_ASHEN_DEFEATED
+      - {map: past-temple-2, kind: gate, at: [16, 21], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [16, 22], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [21, 15], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
+      - {map: past-temple-2, kind: gate, at: [22, 15], reason: "the cross's own ward puzzle; it guards no grant (the stair on needs PAST_ASHEN_DEFEATED)"}
     milestones: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED, DEATH_EYE_DEFEATED, CHAOS_DEFEATED]
-    status: pending
+    status: built
   # === end PST ===
 towns:
   # === A1-T town (pass W: owned by A1-T) ===
@@ -761,5 +828,5 @@ towns:
     opensAfter: [S17]
     bandStage: S23
     kit: w_gaia
-    status: pending
+    status: built
   # === end WND-T town ===

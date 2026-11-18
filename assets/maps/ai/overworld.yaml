@@ -184,7 +184,7 @@ collision: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   2, 2, 2, 0, 0, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7,
   7, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 3, 2,
-  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 3, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 3, 1, 8, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 3, 3, 3, 3, 2, 2, 2,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 3, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -700,6 +700,7 @@ transitions:
 - {x: 30, y: 10, targetMap: waterfall-cave, targetEntrance: arrival}
 - {x: 8, y: 27, targetMap: caravan-camp, targetEntrance: arrival}
 - {x: 150, y: 13, targetMap: gaia, targetEntrance: gate}
+- {x: 132, y: 36, targetMap: mirage-1f, targetEntrance: arrival}
 - {x: 152, y: 45, targetMap: lufenia, targetEntrance: gate}
 name: World Map
 music: overworld
@@ -825,9 +826,6 @@ inspect:
 - x: 141
   y: 38
   text: ['Half a bronze dial juts from the sand, its numbers worn smooth.', 'Its shadow-pin points at the tower, though the sun is behind you.']
-- x: 132
-  y: 36
-  text: ['A tall door of pale metal, without handle or keyhole. It does not move, and it gives back no echo.']
 encounterZones:
 - id: east_pocket
   rects:
@@ -3785,4 +3783,4 @@ patches:
   terrain: 2
 build:
   compiler: 345e4c2f6c0caf43
-  boxes: {a1: 8b863dc0a407d083, elf: d243106e9f7f8e6e, earth: 36de8b9ef7365038, fire: 0983fdc782fc7fe1, ordeal: e985a8f284ecfbb6, water: dcd80baa188efac0, wind: c3e21d5dc977ba6c}
+  boxes: {a1: 8b863dc0a407d083, elf: d243106e9f7f8e6e, earth: 36de8b9ef7365038, fire: 0983fdc782fc7fe1, ordeal: e985a8f284ecfbb6, water: dcd80baa188efac0, wind: 232322a46ded4f34}

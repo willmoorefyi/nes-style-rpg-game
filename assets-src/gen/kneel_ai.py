@@ -87,7 +87,8 @@ def cmd_cut(a) -> int:
     from gen import kneel_ai_pitch as PT
     t, rec = _tag(a), {"arm": a.arm, "seed": a.seed, "try": a.n_try}
     try:
-        r = C.cut(Image.open(d / f"raw_{t}.png"), sp, g["window"]["k"], a.arm, PT.sil_height(d))
+        r = C.cut(Image.open(d / f"raw_{t}.png"), sp, g["window"]["k"], a.arm, PT.sil_height(d), fit=a.fit,
+                  crop_ok=a.crop_ok)
     except C.CutFail as e:
         (d / f"cut_{t}.json").write_text(json.dumps({**rec, "fail": str(e)}, indent=1) + "\n")
         print(f"{a.id} ({t}): CUT FAIL {e}")
@@ -153,13 +154,19 @@ def cmd_approve(a) -> int:
     from gen import bedrock as B
     sp, d, t = D.load(a.id), _dir(a.id), _tag(a)
     gate = json.loads((d / f"gate_{t}.json").read_text())
-    if gate["verdict"] != "PASS":
+    if gate["verdict"] != "PASS" and not a.user_review:
         raise SystemExit(f"refused: {a.id} ({t}) has no J0 PASS ({gate['verdict']})")
-    reqs = json.loads((d / f"req_{t}.json").read_text())
+    rq = d / f"req_{t}.json"
+    if not rq.exists() and a.arm == "g":           # a batch try writes no req json: rebuild the same request
+        from gen import kneel_ai_gem as KG
+        rq.write_text(json.dumps(KG.summary(KG.request(sp, a.n_try, KG.BATCH, "batch")), indent=1) + "\n")
+    reqs = json.loads(rq.read_text())
     g = json.loads((d / "guide.json").read_text())
     meta = {"character": a.id, "sheet": "battle_kneel" if sp.hero else "kneel", "arm": a.arm, "seed": a.seed,
             "try": a.n_try, "guide_sha": g["sha"], "grid": list(sp.cell), "bottom_row": sp.bottom,
             "foot_row": sp.foot_row}
+    if gate["verdict"] != "PASS":
+        meta.update(j0=gate["verdict"], user_review=a.user_review)
     if a.arm == "g":
         meta.update(seed=reqs["seed"], models=[reqs["model"]], gemini_cache_keys=[reqs["key"]], refs=reqs["refs"],
                     settings={k: D.conf()["gemini"][k] for k in ("model", "aspect_ratio", "image_size")})
@@ -219,6 +226,11 @@ def main(argv: list[str] | None = None) -> int:
     gen.add_argument("--compact", action="store_true", help="the 5b compact wording (try 2 after an A-width fail)")
     gen.add_argument("--paid", action="store_true")
     sub.choices["gate"].add_argument("--j1", action="store_true")
+    sub.choices["cut"].add_argument("--fit", action="store_true", help="shrink until the figure fits the window")
+    sub.choices["cut"].add_argument("--crop-ok", action="store_true", help="pad a figure the model cropped")
+    sub.choices["approve"].add_argument("--user-review", metavar="NOTE",
+                                        help="approve on the user's sheet review despite a J0 FAIL (KA-G pilot "
+                                             "ruling 2026-11-17: J0 is advisory); NOTE is recorded in the json")
     sub.choices["gate"].add_argument("--joints", help="a yaml {joint: [x, y]} (default: the rig's keyframes.kneel)")
     sub.choices["joints"].add_argument("--key", help="a native key png instead of key_<arm>_<seed>.png")
     r = sub.add_parser("review")

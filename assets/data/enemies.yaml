@@ -2591,7 +2591,14 @@
   attack: melee
   weakness: lightning
   resist: fire
+  # WAT-D (S24, docs/WORLD_PLAN.md 3.7): he wakes at full strength (a phase from full HP, crossed at the first round
+  # start): attack 75 on his 8 hits. With the roster's attack 50 the upgraded L26-L30 party won 100 %. The 50 % phase
+  # (the heavy attack) is kept as it was.
   bossPhases:
+  - hpThreshold: 1.0
+    patternId: aggressive
+    message: "The Drowned Sovereign rises, and the tide rises with him!"
+    attack: 75
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Drowned Sovereign's robes tear open!"
@@ -3020,6 +3027,12 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # WND-D2 (WORLD 3.7): the engines' watchman wakes throttled (2 hits at attack 103, from the roster's 128) and walks
+  # with the whirlwind its fans draw in (the 4F formation [warmech, air_elemental]); tests/balance/w_wnd_d2.test.ts
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 2
+    attack: 103
   - hpThreshold: 0.5
     patternId: aggressive
     message: "Warmech's core burns red hot!"
@@ -3053,6 +3066,13 @@
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # WND-D2 (WORLD 3.7): her roster swing (4 hits at attack 49) never threatened the B7 party (100 % at L30-L34), so
+  # she wakes with the stilled wind behind her blades (6 hits at attack 78) beside a whirlwind from the crystal
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 78
+    message: "The Hollow Seraph's four blades of light spin up to a scream!"
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"
@@ -3119,6 +3139,11 @@
   weakness: fire
   resist: ice
   bossPhases:
+  # PST (WORLD 3.7: S30, L37 70-90 %): staring from the first round; an iron golem stands with it (past-temple-5)
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 3
+    attack: 125
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Death Eye's grave cloth unravels!"
@@ -3152,6 +3177,11 @@
   attackAnim: heavy
   resist: ice
   bossPhases:
+  # PST (WORLD 3.7: the four refights in a row at L37): the past's cold strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 3
+    attack: 110
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Rime Sovereign's skull fractures!"
@@ -3233,6 +3263,11 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # PST (WORLD 3.7: the refight run): her six arms burn from the first round (a rhyos fights beside her)
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 80
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Ashen Queen's rite turns to inferno!"
@@ -3271,6 +3306,11 @@
   attack: melee
   resist: fire
   bossPhases:
+  # PST (WORLD 3.7: the refight run): fewer, heavier strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 82
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Drowned Sovereign's robes tear open!"
@@ -3313,6 +3353,11 @@
   attackAnim: heavy
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
+  # PST (WORLD 3.7: the refight run): five blade strikes from the first round
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 5
+    attack: 92
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Hollow Seraph's armour cracks!"

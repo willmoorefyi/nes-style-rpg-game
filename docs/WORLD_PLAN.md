@@ -4280,6 +4280,108 @@ shops 5/5 inn 500/500 clinic true/true`.
 `w_s24_neg_nooxyale` and `w_wat_t_onrac_lit`.
 <!-- === end WAT-T === -->
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
+### WAT-D result: the Sea Shrine B1-B5, S24 (branch `w-wat-d` from `mainline` a11defa7, merged with `mainline` 767dd7e3 (WAT-T) and 2ab79c11 (FIR-D2))
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-d/`.
+
+**Files:**
+
+- Layouts: `layouts/water/shrine_common.py` (materials, encounter tables, chest and dialog helpers, the shared
+  design note, the floor writer) and `shrine_b1.py` ... `shrine_b5.py`. They write `sea-shrine-b1` (34x26), `-b2`
+  (36x30), `-b3` (44x34), `-b4` (46x36) and `-b5` (32x34), all compiled; the stubs are replaced.
+- Every floor: `exit` to `overworld:wat_onrac`. B1-B4 use the `water_temple` background, B5 `throne_kraken` (both
+  staged). B4 and B5 have `canSave: false`.
+- Materials: the temple stone turned teal (the `coral` look; `hue -35, sat 2.2` on the temple bases, because the
+  preset's +150 turns temple stone crimson), sea-green water (`≈`), wet plank walks (`_`), kelp-dark floors (`+`).
+- Data:
+  - `cutscenes.yaml` `wat_drowned_falls` (sets WATER_CRYSTAL_LIT, `give_item slab`);
+  - `enemies.yaml`: drowned_sovereign `bossPhases` only;
+  - `quest.yaml` S24 (`entry`, `walk`, `nonLoadBearing`, `status: built`);
+  - `debug-scenarios.yaml`: `w_s24_start`, `w_boss_drowned_sovereign`;
+  - `assets/backgrounds/water_temple.webp`, `throne_kraken.webp`.
+- Tests: `tests/quest/water/wat_d_shrine.test.ts` (9) and `tests/balance/w_wat_d.test.ts` (3).
+
+**Design.**
+
+- **B3, the nave (arrival).** The submarine surfaces in the berth pool at the nave's foot and ties up at a plank pier
+  (`nave`). The pier's end sails back to `onrac:dry_dock`. The nave climbs north between pillars and four tide pools
+  to the apse, where a sea priest's echo keeps the font. The west transept holds the stair up; the east transept
+  holds the stairwell down.
+- **Up: B2, the cloister.** A two-wide walk runs round a drowned garth (a sunken kale garden), so the floor is a
+  loop. Three narrow brothers' cells lead off the north walk and the chapter house off the south.
+- **Up: B1, the mermaids' grotto.** A dry dome over a lagoon, with a plank walk to the elder's rock. Five sea folk
+  live here, two of them `_hint` NPCs (the two routes below, and the king's lightning weakness). The floor has no
+  encounters, two chests in sea-cave tunnels, and is a dead end.
+- **Down: B4, the flooded halls.** Two routes leave the stair room and meet only there:
+  - east, the channel hall (a plank bridge) and the long pool hall, to the stairwell `down`;
+  - west, the sunken library (stacks in the tide round a sinkhole, a drowned librarian), then the reading room and
+    the stairwell `down_west`.
+- **Down: B5, the drowned throne.** The south vestibule is `arrival`, the west vestibule `arrival_west`. Two
+  galleries flank a drowned court, joined by a causeway, and lead to the throne terrace in the north.
+  - Talking to the king (`wat_d_sovereign`, `hideIf: WATER_CRYSTAL_LIT`) starts `[drowned_sovereign]` (`isBoss`,
+    flag WATER_CRYSTAL_LIT, postVictoryCutscene `wat_drowned_falls`).
+  - The crystal's socket behind the throne is an inspect cell whose text changes once the crystal is lit.
+- **Chests (CHEST_WAT_D_*):** 2 / 3 / 3 / 4 / 2 (B1 to B5), on target. Each sits at the end of a niche.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | the 5 shrine scripts, `stubs.py` and `world.py` re-run after the last commit: `git diff --exit-code assets-src/maps` clean; `world.py`: `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G2 | `build_map.py sea-shrine-b1 ... -b5`: `34x26`, `36x30`, `44x34`, `46x36`, `32x34 -> assets/maps/ai/...`; `--check-determinism`: all five `deterministic`. No site file changed, so no world compile |
+| G3 | no `assets/maps/ai/overworld/` file changed against the merge base 767dd7e3 |
+| G4 | `npm run build` exit 0. Full `npx vitest run --maxWorkers=2 --minWorkers=1` after the WAT-T merge: `Tests 9 failed, 8083 passed, 1 skipped (8093)`. One of the 9 was mine (the S24 (c) case, since narrowed, below); my files pass after the FIR-D2 merge (`3622 passed`). The other 8 are the known mainline proof (c) state-limit bug (`LIMIT ... 200000 states`, STRANDED in act-1 and Elfheim maps) and the (d) S5-S10 bands, which INT-W2c is fixing. With S24 set back to `pending`, `wat_t_walk` and `fir_d1_walk` fail the same way. `fir_t_walk` fails on its own order regex (S16 before S15), which is FIR's |
+| G5 | `npm run quest -- --mutate --stage S24`: (a) `OK S24`; (b) `OK (25 withheld runs, 0 reach a later stage, 24 not required)`; (c) **FAIL**: only the mainline state-limit bug (LIMIT plus act-1/Elfheim SOFTLOCK/STRANDED lines, none on a shrine floor); (d) `drowned_sovereign L28.3 [27,30]`; (e)-(h) OK; `mutations: OK (2 gate rows; 2 elements)`, so GT-27 (the submarine gate's oxyale) is caught. The verdict is `quest-verify: FAIL` until INT-W2c's (c) fix lands. The full run's (a) orders S24 after S23 and S20 |
+| G6, G7 | assetCoverage, fileCeilings and questCeilings pass. The largest WAT-D file is `shrine_common.py` at 102 lines |
+| G8 | `build_map.py --selftest`: `104 checks passed` |
+| G9 | `w_wat_d.test.ts` 3 passed; `check-bounds: OK (18 tests)` |
+| G10 | Browser on port 5236 with `mute=1`, my own headless Chromium (`/tmp/w-wat-d/pw/drive.mjs`). `w_s24_start`: onrac (37, 27), step east onto the submarine, B3 `nave` (21, 28), east stairwell, B4 (39, 4), halls' stair, B5 (15, 29), up to the king, battle, then `WATER_CRYSTAL_LIT` set and slab 1, 0 retries, 0 console errors. Screens: `/tmp/w-wat-d/s24_start.png`, `s24_b3.png`, `s24_b4.png`, `s24_b5.png`, `s24_king.png`, `s24_battle.png` (the `throne_kraken` stage), `s24_end.png`. The server was stopped afterwards |
+| G12 | designNotes and originality pass (`sea-shrine: branching`). A fresh reviewer gave `originality review: PASS sea-shrine-b1 sea-shrine-b2 sea-shrine-b3 sea-shrine-b4 sea-shrine-b5` |
+| G13, G14 | `(g) geography: OK s*=0.736`, `(h) travel matrix: OK (12 rows, 2 basin rows; 10 checked, 4 pending)` (in G5) |
+| G16 | `stubs.py --check WAT-D`: `stubs: 0 left for WAT-D` |
+| G17 | `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| backgrounds | `stage_backgrounds.py water_temple throne_kraken` staged both (486 / 541 KB). `--check` has no bounds for either id and exits 1 (`swamp_cave` does the same) |
+
+**Balance (S24, `[drowned_sovereign]`, kit `w_s24`, `UPGRADED_PARTY`, 400 seeds):**
+
+- With the roster's numbers (800 HP, attack 50, 8 hits) the boss lost every fight: 100 % at L26, L28 and L30.
+- The fix: a `bossPhases` entry at hpThreshold 1.0 (crossed at the first round start) with attack 75. The 50 % phase
+  (heavy attack, as `enemyAttack.test.ts` requires) is kept.
+- Measured with the fix:
+  - sensible: L24 31.3 %, L26 38.0 %, L28 71.5 %, L30 76.0 %, L32 91.3 %;
+  - careless: L26 95.3 %, L28 99.8 %. Careless means all four Fight, while sensible spends turns on RUSE and L1 LIT.
+- Bounds: L28 [60, 80], L26 <= 45, L32 >= 85.
+
+**Originality numbers:**
+
+- Stair graph: `b1>b2 b2>b1 b2>b3 b3>b2 b3>b4 b4>b3 b4>b5 b5>b4`. It branches because B4 and B5 are joined by twin
+  stairs (`down` / `arrival` and `down_west` / `arrival_west`).
+- Dead ends: B1 7, B2 4, B3 9, B4 7, B5 4.
+- Boss: N of the arrival, path 38.
+- Shapes (aspect / fill): B1 1.429 / 0.316, B2 1.231 / 0.319, B3 1.357 / 0.476, B4 1.344 / 0.439, B5 0.964 / 0.381.
+
+**Deviations and hand-offs:**
+
+- **B3's pier link is conditional.** The pier's `onrac:dry_dock` transition is written only while `onrac.yaml` is not
+  a stub, as WAT-O's world does for Onrac's door. A link into a stub fails the cross-file test. WAT-T is merged, so
+  the link is in.
+- **S24's entry is Onrac's gate** on the overworld (28, 39), with the airship at (26, 39). The walk is
+  `overworld:warp:onrac`, `onrac:warp:sea-shrine-b3`, then down to the battle. An entry in the nave would skip the
+  oxyale gate (proof (b)).
+- **The S24 (c) test case is narrowed.** It asserts (b) and that no (c) failure names a shrine floor. Once INT-W2c
+  fixes (c), it can go back to `toEqual([])`.
+- B4's second stair (`down_west`) and B5's `arrival_west` are extra entrances beyond the canon names. Every canon
+  entrance and link is kept.
+- The mermaids are `villager_f` (the elder `princess`) with tint `#5fb8b0`, and the king is `king` with tint
+  `#3d6f78`. There is no mermaid field sheet.
+- I edited no shared files outside my anchors. One new local flag pattern: `CHEST_WAT_D_*` (14 chests).
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains `layouts/water/shrine_b{1..5}.py` + `shrine_common.py` (`sea-shrine-b1..b5`).
+- A layout may emit a link into another tranche's map only once that map is no stub (`stubs.is_stub`), and the
+  integrator regenerates it after that tranche merges.
+- The `coral` remap preset is for castle_face. On temple bases, use hue -35 for the same teal.
 <!-- === end WAT-D === -->
 <!-- === WND-O WIND (pass W: owned by WND-O) === -->
 ### WND-O result: the Wind region and Lufenia (branch `w-wnd-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
@@ -4361,12 +4463,472 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 `mirage-1f` stops being a stub; debug scenarios `w_s26_start`, `w_s26_neg_untaught`.
 <!-- === end WND-O === -->
 <!-- === WND-T WIND (pass W: owned by WND-T) === -->
+### WND-T result: Gaia and the fairy, S23 (branch `w-wnd-t` from `mainline` bc43d930)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-t/`.
+
+**Files:**
+
+- Layouts (all new, each at most 212 lines): `layouts/wind/town_gaia.py` (`gaia`, 52x46), `town_gaia_people.py` (every
+  outdoor line and the inspect texts), `town_gaia_interiors.py` (the script to run) with `town_gaia_homes.py` (houses
+  `windmiller`, `ropemaker`, `spinner`, `healer`, `beekeeper`, `shepherd`; `interiors_common.Town("gaia")`),
+  `town_gaia_shops.py` (the 5 shops and `gaia-inn`) and `town_gaia_spring.py` (`gaia-spring` and its patch
+  `wnd_spring_flows`). `town_gaia_site.py` is **unchanged**, so the world files are not regenerated (G3 n/a).
+- The 14 compiled maps `gaia*` replace WND-O's compiled stubs; `index.yaml` is unchanged.
+- Data:
+  - `cutscenes.yaml` (WND-T anchor): `wnd_fairy_freed` (dialog, `take_item fairy_bottle`, fade, `set_flag
+    FAIRY_FREED`, `give_item oxyale`, a `warp` into the hollow so the filled basin and the fairy appear, the fairy's
+    lines and a pointer to Onrac's sea);
+  - `quest.yaml` (WND-T anchors): S23 `built` (entry, walk, one `nonLoadBearing` entry), town `gaia` `built`;
+  - `debug-scenarios.yaml` (WND-T anchor): `w_s23_start` (Gaia's land gate, the airship on the bowl's floor at
+    (152, 16), level 26, the B6 kit, the S0-S22 grants with the fairy bottle) and `w_s23_neg_nobottle` (the same
+    without the bottle). There is no `w_boss_*`: S23 has no boss;
+  - `shops.yaml`: the `gaia_*` records are kept as W1-F/W1-G left them (B7 gear, L7 magic, inn 700).
+- Tests: `tests/quest/wind/wnd_t_gaia.test.ts` (12: the warden's trade and cutscene, the fairy's `showIf`, the patch
+  before and after, the spring's links, the gate, the doors and exits, EXIT-safety, the climb needs the footbridges,
+  the clinic, the inn and the shops, the hints and reactive people, the `CHEST_WND_T_` prefix) and
+  `wnd_t_walk.test.ts` (3: the walk with (a) and (b), FAIRY_FREED and the Oxyale only with a bottle, the town entry).
+
+**Design** (original):
+
+- **The town.** A mountain face in four terraces held up by bands of bare rock; a gorge with a snow-melt torrent
+  splits every terrace. The gate road enters from the south. Rock stairs join the gate and mill terraces on both
+  sides of the gorge, then rise on the east (mill to loom) and the west (loom to the court); a plank footbridge
+  crosses the gorge on every terrace, so the climb zig-zags. The gate terrace holds the inn and the item, weapon and
+  armour shops; the mill terrace the windmiller, the ropemaker and the two magic shops; the loom terrace the healer
+  (the clinic, 120 G a level), the spinner, the beekeeper, the shepherd and his empty fold, and a shuttered
+  wind-reader's house with a note (inspect); the top terrace is the dry spring court, with a dry sand channel from the
+  grotto mouth (entrance `spring`, to `gaia-spring`). Six windmills stand still, at least one on every terrace. A
+  well-head on the gorge's lip, where the town hauls its water, and a weather-vane post in the court are inspect cells.
+- **The story.** The bowl's wind was the breath of the spring's fairy. A dune caravan crossed the pass a year ago;
+  the fairy followed the shine of its glass into a bottle, and the spring and the sails stopped. People talk of the
+  calm, the caravan in the western desert, Lufenia (`gaia_lufenia_hint`) and the Mirage Tower (`gaia_mirage_hint`);
+  their lines change on `item:fairy_bottle` and FAIRY_FREED (the wind returns).
+- **The spring** (`gaia-spring`, 22x17): a hollow high in the rock with a dry sand basin under a stone figure. The
+  warden (`gaia_spring_warden`) has `requiredItem: fairy_bottle` and the cutscene `{id: wnd_fairy_freed, onceFlag:
+  FAIRY_FREED}`; the patch `wnd_spring_flows` (FAIRY_FREED) turns the 18 basin cells to Water; the freed fairy
+  (`gaia_fairy`, `showIf: FAIRY_FREED`) stands beside it.
+
+**Town standard (G15):** `gaia: houses 12/9 interiors 6/6 outdoor 19/16 interior 15/12 hints 2/2 reactive 34/4
+shops 5/5 inn 700/700 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when, proof (f) | `(f) price walls: OK  crescent pending  gaia pending`, in `--stage S23` and in the full run. The rule is in place, but (f) counts Gaia as assumed: on the witness, the pending S20 (Onrac, WAT-T) fires before Gaia's keepers first become talkable, so the curve gold there is tainted (`questCurve.assumedTowns`). The wall reads real numbers once WAT-T builds S20 |
+| G1 | `town_gaia.py`, `town_gaia_interiors.py`, `stubs.py` and `world.py` (`bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)`), then `git diff --exit-code assets-src/maps` after the commit: exit 0 |
+| G2 | `build_map.py` for the 14 ids: each `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 14 ids: all 14 `deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 330 files, 7563 passed, 2 skipped, **2 failed**. Both are the known mainline regressions: `questGraph` "(a), (b) and (c)" (the Western Keep SOFTLOCKs) and `questLate` "(d)" (the S5-S10 bands plus ELF-T's `BAND elfheim gold`) |
+| G5 | `npm run quest -- --mutate --stage S23`: (a) OK S23; (b) OK (25 withheld runs); (c) OK (243144 states); (d) `S23 L26.7 [26,29]`; (e) OK (6 towns, 2 pending); (f)-(h) OK; `mutations: OK (2 gate rows; 2 elements, each removal reported)` (GT-26 caught; the forced-on patch is non-load-bearing); `quest-verify: OK`. The full `npm run quest -- --mutate`: (a), (b) (424 runs), (e)-(h) and `mutations: OK (48 gate rows; 61 elements)` are OK. (c) and (d) FAIL only on the known regressions (the Western Keep, S5-S10, the Elfheim gold) |
+| G6, G7 | `assetCoverage`, `fileCeilings` and `questCeilings` passed |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G9, G11 | no balance file (S23 has no boss); `git status` shows only owned paths plus the one shared line below |
+| G12 | `designNotes` and `originality` passed. A fresh reviewer's first pass failed 9 notes: each named a stock prop as something else (crates as sacks or fleeces, a signpost as a vane, a bench as a grindstone). The loom terrace also had no windmill, and the "windlass" stood away from the gorge. The notes were reworded, a windmill was added on the loom terrace and the well-head was moved to the gorge's lip. Re-review: `originality review: PASS gaia gaia-house-windmiller gaia-house-ropemaker gaia-house-spinner gaia-house-healer gaia-house-beekeeper gaia-house-shepherd gaia-weapon-shop gaia-armor-shop gaia-item-shop gaia-white-magic gaia-black-magic gaia-inn gaia-spring` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G15 | the row above |
+| G16 | `stubs.py --check wnd-t`: `stubs: 0 left for WND-T` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Browser** (G10, port 5238, `mute=1`, my own headless Chromium via `/tmp/w-wnd-t/drive.cjs`; the server is stopped):
+
+| Row | Result |
+|---|---|
+| `w_s23_start` | overworld (150, 14), the door, then `gaia` gate (17, 43). The climb: the west stair, the mill lane over the bridge, the east stair, the loom lane over the bridge, the west stair, the court (12, 8), the grotto (24, 3), then `gaia-spring` (10, 14). Talking to the warden from (8, 10) played the cutscene. Afterwards FAIRY_FREED is set, `oxyale` is 1, the bottle is gone, the party stands at (10, 11), the basin is water and the fairy is there. 0 console errors (`/tmp/w-wnd-t/s23_gate.png`, `s23_loom.png`, `s23_court.png`, `s23_spring.png`, `s23_warden_dialog.png`, `s23_after.png`) |
+| `w_s23_neg_nobottle` | the same walk: the warden tells of the caravan; no flag, no Oxyale, the basin stays dry; 0 errors (`neg_warden_dialog.png`, `neg_after.png`) |
+
+**Deviations / hand-offs:**
+
+- **Shared-file edit, in its own commit for the orchestrator:** `src/progression/questProofs.ts`, the default
+  `maxStates` goes from 200000 to 400000 (one line). With the airship parked in the bowl, `--stage S23`'s exact search
+  takes 243144 states and finds no failures, but at 200000 it stopped with `LIMIT` and false SOFTLOCK lines. Every
+  unbuilt stage's events stay open to a flying party, and S22 is already at 168600. An entry without the airship fits
+  in 42 states, but (e) then reports `SHOPLESS` for every other town. INT may prefer another cap or a CLI flag.
+- **The fairy's trade is done by the cutscene,** as Unne's and Nerrick's are. The warden has `requiredItem:
+  fairy_bottle` and `cutscene: {id: wnd_fairy_freed, onceFlag: FAIRY_FREED}`; the cutscene does `take_item`,
+  `set_flag` and `give_item oxyale`. 4.7 asks for `takeItem` and `giftFlag`, but with those the bottle would be taken
+  before the cutscene could check for it. GT-26 is still caught. The NPC who trades is the spring's warden. The fairy
+  is in the bottle until then, so the freed fairy is a second NPC (`showIf: FAIRY_FREED`), a tinted `white_mage`. No
+  field sheet is a fairy.
+- **"Rope bridges between terraces"** is read as plank footbridges across the gorge on each terrace, with rock stairs
+  between the terraces. A bridge cannot join two heights on a flat map.
+- **Placeholder art:** the windmill icons are the kit's code-drawn placeholder and carry its "WM" label. No new art
+  was made in this pass.
+- The extra `type: house` is the shuttered wind-reader's house: no door, a note on the front (inspect).
+- Two chests: `CHEST_WND_T_WINDMILLER` (Ether) and `CHEST_WND_T_SPINNER` (Phoenix Down).
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/wind/town_gaia.py` (`gaia`) and
+`layouts/wind/town_gaia_interiors.py` (the 6 houses, the 5 shops, the inn and `gaia-spring`, from
+`town_gaia_{homes,shops,spring}.py`). A map-local patch can turn walkable ground to Water when the cutscene that sets
+its flag `warp`s the party onto a cell that stays dry. Debug scenarios `w_s23_start` and `w_s23_neg_nobottle`. Proof
+(c)'s default cap is 400000.
 <!-- === end WND-T === -->
 <!-- === WND-D1 WIND (pass W: owned by WND-D1) === -->
+### WND-D1 result: the Mirage Tower, S27 (branch `w-wnd-d1` from `mainline` 66b539e1)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d1/`.
+
+**Files:**
+
+- `layouts/wind/mirage_common.py` (66 lines: the materials, bleached sandstone with bronze inlay; the design note; the
+  per-floor encounter tables; the chest helper; the floor writer) and `layouts/wind/mirage_floors.py` (162) write
+  `mirage-1f` (38x40), `-2f` (40x32) and `-3f` (28x24), compiled (the stubs are replaced). Every floor: `exit` to
+  `overworld:wnd_mirage`, background `tower_of_babel` (staged), encounters from the S27 roster only.
+  - 1F: the vestibule (the overworld door's `arrival`, two statues, an inscription inspect cell, two niches) and its
+    chime door, two `keyItemGates` cells with `requiredItem: chime` (not permanent; the chime is never consumed), beyond
+    which is `inner`. Then the spiral gallery: an outer and an inner ring round the shaft's foot, each walled off just
+    short of where it is entered, so the core's stair up is 150+ steps from the door though it lies within 25 cells of
+    it. The sealed well at the shaft's foot (fallen masonry, a chest) is reached only from 2F (its stair down to 1F
+    `well`, or the fall to 1F `shaft`) and has its own stair back up to 2F `well` (a `reach_roots` entry; chokepoint
+    check off, the chests are in dead ends).
+  - 2F: two half-floors either side of the open shaft (void), joined only by a 2-wide bronze bridge. The west half runs
+    from the arrival hall up a corridor to the north room (the stair down into the well) and the ledge to the bridge;
+    a cracked span off the bridge is a one-way drop into the well. The east half (a pillared hall, a north wing, a
+    south wing) holds the stair up.
+  - 3F: the console room. The console NPC (`chest` sheet tinted bronze, on an inlaid dais between two globes and a
+    lectern) has `requiredItem: cube` and plays `mirage_ascent` (`onceFlag: SKY_FORTRESS_OPEN`). The 2x2 bronze ring
+    before it (`sky_ring` placeholder) is four transitions to `sky-castle-1f` `arrival` with `requiredFlag:
+    SKY_FORTRESS_OPEN`, the way up again after the first lift. An extra entrance `ring` (13, 11) is the return point
+    for a way back down that WND-D2 may add.
+  - Chests 3 / 3 / 2 (`CHEST_WND_D1_*`): cabin, phoenix_down, diamond_helm; ether, diamond_armlet, hi_potion;
+    white_robe, defender (B7 gear at most).
+- `cutscenes.yaml` (WND-D1 anchor): `mirage_ascent` (dialog, `set_flag SKY_FORTRESS_OPEN`, fade, `warp sky-castle-1f
+  arrival`, fade, dialog; the cube is kept).
+- `quest.yaml` S27: `status: built`; `entry` WND-O's S26 start (Cornelia's south gate, the airship at (94, 112), the
+  ship at anchor at (172, 62)); `walk: [overworld:warp:mirage-1f, mirage-1f:warp:mirage-2f, mirage-2f:warp:mirage-3f,
+  mirage-3f:npc:mirage_console]`; `nonLoadBearing`: the 4 ring cells (`pending: S28 (WND-D2) not built`, see below).
+- `debug-scenarios.yaml`: `w_s27_start` (entrance `wnd_mirage`, L29, the B7 kit, flags through CHIME_GIVEN, chime and
+  cube, the airship on the oasis meadow (136, 38)) and `w_s27_neg_nochime` (the same without the chime and
+  CHIME_GIVEN). No boss, so no `w_boss_*`.
+- Tests: `tests/quest/wind/wnd_d1_tower.test.ts` (7), `tests/quest/wind/wnd_d1_walk.test.ts` (3).
+- Generated: `assets-src/maps/overworld.yaml` (`world.py`: WND-O's `MIRAGE_OPEN` now opens the door, one transition
+  to `mirage-1f` `arrival`, the shut-door inspect cell gone), `assets/maps/ai/overworld.yaml` (`--region wind`; no
+  chunk PNG changed), the 3 mirage maps, the 5 `sky-castle-*` stubs compiled (the ascent's warp target; WND-D2
+  replaces them), `index.yaml`; `assets/backgrounds/tower_of_babel.webp`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `mirage_floors.py`, `stubs.py` (`wrote 56 stub sources, kept 81 real maps`), `world.py`, then `git diff --exit-code assets-src/maps` after the commit (8d8f1821): exit 0, no diff; `git status --porcelain` empty |
+| G2 | `build_map.py mirage-1f mirage-2f mirage-3f`: `38x40`, `40x32`, `28x24 -> assets/maps/ai/...`; the 5 sky stubs `12x10`; `--check-determinism` on all 8: `deterministic`. `build_map.py overworld --region wind` (the lock; it waited ~4 min for another holder): exit 0, max RSS 3.98 GB; `--check-determinism --region wind overworld`: `overworld: deterministic` |
+| G3 | no `assets/maps/ai/overworld/` chunk changed (only the yaml) |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 2 failed / 330 passed (332)`, `Tests 2 failed / 7736 passed / 2 skipped`. The 2 failures are pre-existing on mainline: `questGraph.test.ts` (the (c) soft-locks) and `questLate.test.ts` (the (d) bands and elfheim gold) |
+| G5 | `npm run quest -- --mutate --stage S27`: (a) OK S27; (b) OK (32 withheld runs); (c) OK (59328 states); (d) `S27 L30.1 [29,32]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`, (h) `12 checked, 2 pending`; `mutations: OK (3 gate rows; 7 elements, each removal reported)`: GT-31 `SKIP S27 SKY_FORTRESS_OPEN reachable without chime` (both door cells), GT-32 `SKIP S27 ... without cube`; `quest-verify: OK` |
+| G5 full | `npm run quest -- --mutate`: (a), (b), (e)-(h) OK, `mutations: OK (48 gate rows; 65 elements)`; (c) 6 soft-locks at the Western Keep and (d) the S5-S10 bands and elfheim gold FAIL: **pre-existing** (the same (c) failures on mainline 66b539e1's data, run with `--root`); the INT-W2c items |
+| G6, G7 | in G4 |
+| G12 | `designNotes`, `originality` pass (`mirage: branching [mirage-1f>mirage-2f mirage-2f>mirage-1f mirage-2f>mirage-3f mirage-3f>mirage-2f]`); reviewer below |
+| G13, G14 | `npm run quest -- --only gh`: `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`, `(h) travel matrix: OK  (12 rows, 2 basin rows; 12 checked, 2 pending)`; T6, T8 and T9 are now checked and pass |
+| G16 | `stubs.py --check wnd-d1`: `stubs: 0 left for WND-D1` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| backgrounds | `stage_backgrounds.py tower_of_babel` (550 KB); `--check` exits 1 with `no bounds for tower_of_babel (known: shoreline)`, as for ERT-O and FIR-D1 |
+| G10 (6.5) | headless Chromium on 5239, `mute=1` (`/tmp/w-wnd-d1/pw/s27.mjs`, encounters held off by the driver). `w_s27_start`: overworld (132, 37) -> `mirage-1f` (18, 37) -> the chime door (18, 31) passed -> spiral -> `mirage-2f` (4, 26) -> bridge -> `mirage-3f` (12, 20) -> the console -> `mirage_ascent`: SKY_FORTRESS_OPEN set, map `sky-castle-1f` (5, 8), cube still held; 0 console errors (`/tmp/w-wnd-d1/s27_start_{0_sands,1_vestibule,2_door_open,3_bridge,4_console,5_ascent,6_sky}.png`). `w_s27_neg_nochime`: stepping onto the door shows "A tall door of pale metal fills the arch, ... bronze cups ..." and puts the party back on (18, 32); further presses never reach `inner`; 0 errors (`s27_neg_{0_sands,1_vestibule,2_door}.png`) |
+
+**Topology:** 1F 38x40, 8 dead ends, aspect / fill 0.92 / 0.41; 2F 40x32, 5, 1.35 / 0.41; 3F 28x24, 4, 1.26 / 0.63.
+The stair graph has twin stairs 1F <-> 2F (the core and the well) and the one-way fall 2F -> 1F, so it branches
+(WND-D1: 1 of 1 dungeons). No boss.
+
+**Originality:** a first fresh reviewer passed the layouts and the text but failed two `Distinct:` claims (the chime
+door and the cube console are the classic's own functions, re-dressed only in text). The claims now name the
+double spiral, the sealed well, the bridged half-floors with the cracked span, and the console's dais. A second fresh
+reviewer returned `originality review: PASS mirage-1f mirage-2f mirage-3f`.
+
+**Deviations / shared-file edits (small; for the integrator):**
+
+- **The world compile.** A D tranche compiles no world unless it changes a site file (G2), but WND-O's
+  `MIRAGE_OPEN` opens the tower door as soon as `mirage-1f` stops being a stub, so `world.py` (G1) changes
+  `overworld.yaml`, and T6 (`mirage-1f:arrival`) fails on a stale compile. I ran `--region wind` under the lock; on a
+  merge conflict regenerate as usual.
+- **The ring's requiredFlag** is uncaught by the generic mutations while S28 is pending (the stub sky castle holds no
+  real event, and S28's pending grant needs SKY_FORTRESS_OPEN itself), so it has 4 `nonLoadBearing` entries whose
+  reason starts `pending:` (a failure under `--strict`). Once WND-D2 builds S28, removing it is SKIP S28. The ring is
+  what lets T9 (SKY_FORTRESS_OPEN, no events) reach `sky-castle-1f`.
+- `tests/progression/travelMatrix.test.ts` (INT-W2a's): T6 was asserted pending; it is now checked, so the test asserts
+  T6, T8, T9 `ok` and that every still-pending row is a strict failure.
+- `tests/quest/wind/wnd_o_walk.test.ts` (WND-O's): "SKY_FORTRESS_OPEN only by S27's assumed grant" now also holds off
+  the real mirage events (the console is S27's own).
+- Hand-off to WND-D2: the sky-castle stubs have no walking way back down; `mirage-3f` has the entrance `ring` for one.
+- Engine observation (not changed): after a shut gate puts the party back, `game.playerPosition` still reads the gate
+  cell until the next step (the player's grid cell is right).
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/wind/mirage_floors.py` + `mirage_common.py`
+(`mirage-1f..3f`); the debug scenarios gain `w_s27_start`, `w_s27_neg_nochime`; the background `tower_of_babel` is
+staged; a lift after a one-time cutscene is a transition with the cutscene's flag as `requiredFlag`.
 <!-- === end WND-D1 === -->
 <!-- === WND-D2 WIND (pass W: owned by WND-D2) === -->
+### WND-D2 result: the sky castle (branch `w-wnd-d2` from `mainline` 7525dbad, merged with `mainline` bff131df)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d2/`. The canon (4.7, 5.4) assigns WND-D2 the sky castle
+`sky-castle-1f..5f` with the boss `hollow_seraph` and the rare `warmech`, and that is what was built.
+
+**Files:**
+
+- `layouts/wind/sky_common.py` (77 lines): the materials (the open sky as the wall top, a blue recolour of the kit's
+  carpet weave; pale marble walks `-`; light-bridges `+`; amber conveyor belts `%`), the design note, the encounter
+  tables (the 4F zone table holds the Warmech at weight 1 of 64), the chest helper and `Room.belt` (every belt cell
+  is a same-map transition to the belt's far end, so a belt is walked one way).
+- `layouts/wind/sky_lower.py` (111) writes `sky-castle-1f` (40x38) and `-2f` (46x34); `layouts/wind/sky_upper.py`
+  (142) writes `-3f` (36x30), `-4f` (44x30) and `-5f` (26x34).
+  - 1F, the dock ring: an octagonal walk round a well of open sky, four light-bridge spokes to a central hub (berth
+    chart inspect cell); `mirage_ascent` sets the party down on the south berth (entrance `arrival`), behind a ward
+    (`keyItemGates requiredFlag: SKY_FORTRESS_OPEN`, always open in play); the berth's tip is a beam down to
+    `mirage-3f` entrance `ring` (WND-D1's lift back up). Twin stairs up: the hub's to 2F `arrival`, the east berth's
+    to 2F `east` (a new entrance; 1F's `up_east`). Three blind berths hold chests.
+  - 2F, the light-bridge maze: six islands over the sky joined by bridges and four belts (B => D, C => F, D => the
+    stair island E, E => C). The stair up stands on E, reached only by a belt; every island leads back to every
+    other. Three blind bridge stubs hold chests (`reach_roots: [east]`).
+  - 3F, the archive: shelf stacks, lecterns, a globe and a star-chart table (inspect: the hint that the forge's ore
+    is in the vault); a brass archivist (`old_man`, tinted; reactive on WIND_CRYSTAL_LIT); a west door and a narrow
+    passage down to the vault, a dead end holding the adamant (`CHEST_WND_D2_ADAMANT`); three blind niches.
+  - 4F, the engine halls: three halls of pistons and furnaces joined by staggered cross passages; the whole floor is
+    the zone `wnd_d2_engine` ("Sky Castle Engine Halls"): soldier, black_flan, death_knight, air_elemental,
+    dark_fighter, and `[warmech, air_elemental]` at 1 in 64. Three blind bays and a coal chute.
+  - 5F, the seraph's spire, `canSave: false`: a nave due north of the arrival (octant N, path 20) up a light-bridge
+    runner to the seraph (`knight` sheet, tinted brass) before the wind crystal's altar (inspect, turns on
+    WIND_CRYSTAL_LIT). Talking to her starts `[hollow_seraph, air_elemental]` (`flag: WIND_CRYSTAL_LIT`,
+    `postVictoryCutscene: wnd_seraph_falls`).
+  - Chests 3 / 3 / 4 / 3 / 2 (`CHEST_WND_D2_*`): consumables and B7 gear (diamond helm, armlet and shield, a vorpal
+    sword) plus the adamant. Every floor has `exit` to `overworld:wnd_mirage`. Encounters: 1F-2F air_elemental,
+    earth_medusa, black_flan, soldier, spirit_naga; 3F-5F death_knight, vampire_lord, dark_fighter, spirit_naga,
+    soldier (rate 18-30). Backgrounds: 1F-4F `sky_palace`, 5F `throne_tiamat`, staged by `stage_backgrounds.py`.
+- `cutscenes.yaml` (WND-D2 anchor): `wnd_seraph_falls` (the plates fall; the crystal clears and turns; `set_flag
+  WIND_CRYSTAL_LIT` behind a fade; the world's sails and windmills fill).
+- `enemies.yaml` (the two WND-D2 anchors, `bossPhases` only): the seraph gains a full-HP phase (6 hits, attack 78,
+  with a message); the Warmech a full-HP phase (2 hits, attack 103, from 128). Both 0.5 phases are kept.
+- `quest.yaml` S28: `status: built`; `grants` add `adamant` (for S31, /tmp/world_int_notes.md); `zones:
+  [sky-castle-4f:wnd_d2_engine]`; `entry` sky-castle-1f (19, 34) on foot with the airship on the oasis meadow
+  (135, 38) beside the tower; `walk: [sky-castle-1f:warp:arrival, sky-castle-2f:warp:d_belt, sky-castle-2f:warp:e_belt,
+  sky-castle-2f:warp:sky-castle-3f, sky-castle-3f:chest:chest_adamant, sky-castle-3f:warp:sky-castle-4f,
+  sky-castle-4f:warp:sky-castle-5f, sky-castle-5f:battle:hollow_seraph]`; `nonLoadBearing`: the seraph's `hideIf`.
+  No `milestones` (S28 sets one flag).
+- `debug-scenarios.yaml`: `w_s28_start` (sky-castle-1f `arrival`, L31 Knight / Ninja / W.Wiz / B.Wiz in B7 gear, the
+  flags through S27, the airship at (135, 38)) and `w_boss_hollow_seraph` (L32, B7 gear, 3 potions, `throne_tiamat`).
+- Tests: `tests/quest/wind/wnd_d2_sites.test.ts` (8: chests, exits, canon entrances and links, the ward and twin
+  stairs, the belts one way and the stair island behind a belt, the vault, the zone's 1/64, the seraph north, and a
+  castle-wide soft-lock check), `tests/quest/wind/wnd_d2_walk.test.ts` (2), `tests/balance/w_wnd_d2.test.ts` (5).
+
+**Balance (S28, 400 seeds, kit `w_s28`, upgraded party, 3 potions; enemy spells and specials not simulated):** before
+this pass the seraph alone fell 100 % of the time at L30-L34, and the Warmech alone gave a flat curve (L30 53.0 %,
+L32 62.0 %, L34 76.0 %). Phases alone stayed flat (seraph 6x100: L30 45.5, L32 59.5), so each fights beside an
+air_elemental (an S28 roster enemy), which steepens the curve.
+
+| Fight | L30 | L32 | L34 | Targets (3.7) |
+|---|---|---|---|---|
+| `[hollow_seraph, air_elemental]` sensible | **39.5 %** | **69.0 %** | 89.8 % | L32 60-80, L30 <= 45 |
+| `[warmech, air_elemental]` sensible | **36.0 %** | **58.8 %** | 71.5 % | L32 55-80, L30 <= 40 |
+
+The careless policy wins more than the sensible one here (seraph L30 97.5 %, Warmech L30 99.0 %): with B7 gear the
+careless party attacks every turn instead of healing. 3.7 sets no careless row for S28, so it is reported, not
+pinned (INT may want to look at the policy).
+
+**Topology:**
+
+| Floor | Size | Dead ends | Aspect / fill | Notes |
+|---|---|---|---|---|
+| sky-castle-1f | 40x38 | 5 | 1.06 / 0.32 | ring, hub, 4 spokes, 5 berths |
+| sky-castle-2f | 46x34 | 6 | 1.38 / 0.38 | 6 islands, 4 one-way belts |
+| sky-castle-3f | 36x30 | 4 | 1.36 / 0.51 | hall, vault passage |
+| sky-castle-4f | 44x30 | 7 | 1.46 / 0.46 | 3 halls, `wnd_d2_engine` |
+| sky-castle-5f | 26x34 | 2 | 0.74 / 0.47 | boss N, path 20 |
+
+The stair graph: 1F <-> 2F by twin stairs, then a chain to 5F, so it branches (`sky-castle: branching`; WND-D2: 1
+of 1 dungeons branches).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 `sky_lower.py`, `sky_upper.py`, `stubs.py`, `world.py --check-bands`, `world.py`, `git diff --exit-code assets-src/maps` | exit 0, no diff (`stubs: wrote 49 stub sources, kept 88 real maps (137 canon ids)`) |
+| G2 `build_map.py sky-castle-1f ... -5f`, then `--check-determinism` on the 5 ids | each `sky-castle-Nf: WxH -> assets/maps/ai/sky-castle-Nf.yaml`, then `sky-castle-Nf: deterministic`. No world compile (no site file changed) |
+| G3 | n/a: no overworld chunk changed |
+| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` (on the merge with `mainline` bff131df) | build exit 0; vitest `Test Files 15 failed | 329 passed (344)`, `Tests 22 failed | 8393 passed | 1 skipped`. 14 fail on `mainline` bff131df itself (proof (c) soft-locks and (d) bands: `questGraph` (a)-(c), `questLate` (d), `questMutate` x2, the S4 / S10 / S11 / S12 / S13 / S15 / S16 / S20 / S25 walks). The other 8 are the WND-D1 hand-off below: `crossFileValidation` x2 (`mirage-3f` not compiled), `questGraph` S18 and S31, `travelMatrix` (T9), and the A1-O, A1-T, FIR-T full-run walks (goal unreachable: nothing warps into the castle yet) |
+| G5 `npm run quest -- --mutate --stage S28` | (a) OK S28; (b) OK (32 withheld runs); (c) FAIL: with WND-D1 merged (a scratch trial merge) only the mainline STRANDED / SOFTLOCK states of the visit-order bug in cornelia-castle and elfheim-vault remain (`LIMIT` at 200000 states); before it every state outside the castle is SOFTLOCK (no lift back up); (d) `hollow_seraph L32.5 [31,34]`; (e)-(g) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; (h) T9 (see below); `mutations: OK (2 gate rows; 3 elements, each removal reported)` |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings`: passed |
+| G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
+| G9 `w_wnd_d2.test.ts`; `check-bounds "tests/balance/w_*.test.ts"` | 5 passed; `check-bounds: OK (23 tests)` |
+| G10 browser, port 5240, `mute=1` | `w_s28_start` (headless Chromium, `/tmp/w-wnd-d2/pw/s28.mjs`): 1F (19, 34) -> hub stair -> 2F (8, 26), belt B => D to (31, 15), belt D => E to (24, 6), 3F, the vault chest (adamant 1), 4F, 5F; the seraph's talk started `Hollow Seraph, Air Elemental` on `throne_tiamat`; won, WIND_CRYSTAL_LIT set; 0 console errors. Encounters held off by the driver. Screenshots: `/tmp/w-wnd-d2/s28_0_berth.png`, `s28_1_2f.png`, `s28_2_2f_island_e.png`, `s28_3_vault.png`, `s28_4_engine.png`, `s28_5_seraph.png`, `s28_6_battle.png`, `s28_7_end.png` |
+| G12 `designNotes`, `originality` | passed (`sky-castle: branching`) |
+| G16 `stubs.py --check WND-D2` | `stubs: 0 left for WND-D2` |
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| `stage_backgrounds.py sky_palace throne_tiamat` / `--check ...` | staged (306 / 347 KB); `--check` exits 1 with `no bounds for sky_palace (known: shoreline)`, as for ERT-O and FIR-D1 |
+
+**Originality:** a fresh reviewer, given the three scripts, the five sources, the previews and the cutscene, returned
+`originality review: PASS sky-castle-1f sky-castle-2f sky-castle-3f sky-castle-4f sky-castle-5f`. It noted that the
+2F belts echo the classic's teleporter idea without copying it (four visible one-way belts between islands, no grid of
+rooms), and that "sealed" for the vault is flavour (it has no lock; it is reached only by the west passage).
+
+**Hand-offs (merge order):**
+
+- **WND-D1 first.** Until WND-D1's mirage-1f..3f, `mirage_ascent` and the 3F `ring` land, nothing warps into the
+  castle on the full run: (a) fails with `goal unreachable; never completed: S28 S29 S30` (and the A1-O, A1-T, FIR-T
+  full-run walk tests and `questGraph`'s S18 test with it), T9 `cannot reach sky-castle-1f`, and
+  `crossFileValidation` misses `mirage-3f` (the berth beam's target). A scratch trial merge of `w-wnd-d1` into this
+  branch cleared T9, the beam target and the exit SOFTLOCKs; merge WND-D1 before WND-D2.
+- **WND-D1's 4 `pending:` `nonLoadBearing` entries** (S27, the ring's cells): the ring's flag check is still not
+  load-bearing once S28 is built, because sky-castle-1f's berth ward holds the same flag. Replace each reason with
+  "redundant with sky-castle-1f's berth ward (requiredFlag SKY_FORTRESS_OPEN), which holds the same flag; in --stage
+  S28 the ward's removal is SKIP S28".
+- **`questGraph.test.ts` "S31 waits for its adamant, which no stage grants yet"** (W1-H) is no longer true: S28 grants
+  the adamant. ERT-O / INT: set S31 built and `SMYTH_TRADE` in `earth/dwarf.py` (ERT-O's note), and drop or reword the
+  test.
+
+**Deviations / shared-file edits:**
+
+- Both fights add an `air_elemental` escort (an S28 roster enemy), as ELF-O, ORD-O and FIR-D1 add escorts; the
+  Warmech's numbers are throttled (attack 103, from 128) by a full-HP phase, the only lever its anchor allows.
+- 1F has the berth ward (`requiredFlag: SKY_FORTRESS_OPEN`), redundant in play, so S28's requirement stays
+  load-bearing in assume mode (S28's entry is inside the castle: the only way in is WND-D1's warp).
+- The berth beam to `mirage-3f:ring` and 2F's `east` / 1F's `up_east` and the belt entrances are additions to the
+  canon; every canon entrance and link is kept.
+- The castle uses existing art only: sky / marble / light-bridge / belt recolours of the kit materials, and the
+  `knight` and `old_man` sheets tinted.
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/wind/sky_lower.py` (`sky-castle-1f`, `-2f`) and
+`sky_upper.py` (`sky-castle-3f..5f`), with `sky_common.py` (`Room.belt`: a one-way conveyor of same-map transitions;
+the open sky is the wall top). The 4F zone `wnd_d2_engine` holds the Warmech (1 in 64). The debug scenarios gain
+`w_s28_start` and `w_boss_hollow_seraph`; the backgrounds `sky_palace` and `throne_tiamat` are staged.
 <!-- === end WND-D2 === -->
 <!-- === PST PAST (pass W: owned by PST) === -->
+### PST result: the time gate and the Temple of the Past, S29-S30 (branch `w-pst` from `mainline` 7525dbad)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-pst/` (sims, a `git archive` copy of 7525dbad for the
+baseline, Playwright).
+
+**Files:**
+
+- `assets-src/maps/temple-of-fiends.yaml` (hand-written; additions only): the entrance `time_gate` (3, 5); the NPC
+  `hour_keeper` (`old_man`, tint, `showIf: EARTH_CRYSTAL_LIT`, cutscene `pst_time_gate` with `onceFlag:
+  TIME_GATE_OPEN`) in the altar room's north-west corner (3, 3); one `keyItemGates` entry on (3, 4) (`requiredItem:
+  lute`, the four crystal flags, a conditional message); and a transition on (3, 4) to `past-temple-1:arrival` with
+  `requiredFlags: [TIME_GATE_OPEN]`. (3, 3) is walkable floor whose only walkable neighbour is (3, 4), so the keeper is
+  talked to only from the gate cell. No ground, deco or act-1 NPC changes: the compiled art is byte-identical, the
+  walkable count stays 236, `templeLayout.test.ts` and the Garland tests are unchanged and pass.
+- `layouts/past/past_common.py` (93 lines: materials, the encounter tables, the design notes (shared Concept and
+  Topology, a Distinct line per map), the floor writer, `gated_stairs_down`, `boss`, `chest`, `ward`),
+  `past_upper.py` (175: floors 1-3), `past_lower.py` (140: floors 4, 5 and the shrine).
+  - **floor 1** (`past-temple-1`, 40x40): a cloister ring round an open garth; the west walk has fallen in (two
+    blind stubs); the chapter house north of the ring holds `[lich_2, death_knight x2]` between twin stairs down (west
+    to floor 2's `arrival`, east to its new `east` entrance); 4 one-cell carrels with chests. The time gate's stair
+    arrives in a vestibule south of the ring.
+  - **floor 2** (44x44): a cross. The south arm (arrival) opens onto the hub; the hub's stone acolyte (`ward_hub`,
+    cutscene `pst_ward_hub`, PST_WARD_HUB) lifts the west arm's doorway ward; the west arm's acolyte (`pst_ward_west`,
+    PST_WARD_WEST) lifts the north arm's, where `[ashen_queen_2, rhyos]` stands before the stair down. The east arm
+    never opens onto the hub: it is reached only by floor 1's east stair (a `reach_roots` entry; chokepoint check off).
+  - **floor 3** (32x46): a nave flooded wall to wall (`≈`, Lake, deep); two aisles behind columns and two transepts
+    are the only dry ways; `drowned_sovereign_2` in the apse, the stair down behind him; 3 chapels.
+  - **floor 4** (34x36): a stairwell spiral of three square rings, each plugged where it is entered, round a well room
+    with `hollow_seraph_2` and the stair down (233 steps from the arrival); alcoves in the walls between rings, the
+    Masamune in the deepest.
+  - **floor 5** (46x34): the hall of eyes. Two routes (a colonnade, a chain of three chambers) either side of a wall
+    of carved eyes (4 inspect cells) meet at the north landing, where `[death_eye, iron_golem]` guards the stair down.
+  - **past-chaos** (30x32): the pillared processional ends at a blank wall with a painted shadow (2 inspect cells);
+    side aisles climb to the sanctum, where `chaos` waits (robed, a crown of flame, the four orbs: its F1 art), no
+    random battles, background `rim`. Its fight's flag is CHAOS_DEFEATED, `postVictoryCutscene: ending`.
+  - Every floor: `exit` to `overworld:temple`, `canSave: false`, background `fiend_hall` (staged; `--check fiend_hall`
+    has no bounds and exits 0, as for ERT-O / FIR-D1; `--check rim` OK). Encounters: floors 1-2 death_knight,
+    vampire_lord, dark_fighter; floors 3-5 rhyos, purple_worm, iron_golem, blue_dragon, vampire_lord (rate 16-28).
+  - Each refight's stair on carries its milestone (`requiredFlags`), and nothing else on the floor reads it; the
+    boss NPC has `hideIf` its flag; the battle's flag is the milestone and its cutscene sets it too.
+- `cutscenes.yaml` (PST anchor): `pst_time_gate` (the song, the four lights, set_flag TIME_GATE_OPEN, warp back off
+  the ring onto `time_gate`; the next step north goes down), `pst_lich_falls`, `pst_ashen_falls`,
+  `pst_drowned_falls`, `pst_seraph_falls`, `pst_death_eye_falls`, `pst_ward_hub`, `pst_ward_west`, `ending` (Chaos
+  falls, set_flag CHAOS_DEFEATED, warp to `cornelia-castle-2f:throne_return`, heal, two lines, `end_game` with its
+  card).
+- `enemies.yaml` (PST anchors, `bossPhases` only): a phase from full HP (`hpThreshold: 1.0`, no message, so the
+  bestiary's 1-line phase row fits) on each: lich_2 hits 3 / attack 110, ashen_queen_2 6 / 80, drowned_sovereign_2
+  6 / 82, hollow_seraph_2 5 / 92, death_eye 3 / 125. The existing 0.5 phases are kept.
+- `quest.yaml` (PST anchor): S29 and S30 `built`, with entries, walks and `nonLoadBearing` (below).
+- `debug-scenarios.yaml` (PST anchor): `w_s29_start` (overworld `temple`, L33 upgraded, B7 kit, flags through S28,
+  the lute, the airship at (82, 104)), `w_s30_start` (temple-of-fiends `time_gate`, L34, TIME_GATE_OPEN),
+  `w_s30_chaos_door` (past-chaos `boss`, the level-40 `*chaos_party`), `w_boss_lich_2`, `w_boss_ashen_queen_2`,
+  `w_boss_drowned_sovereign_2`, `w_boss_hollow_seraph_2`, `w_boss_death_eye` (L37, 4 potions, `fiend_hall`).
+- Tests: `tests/quest/past/pst_sites.test.ts` (11: the time gate's cell, stair and keeper; the act-1 room's NPCs and
+  battle unchanged; chests / EXIT / no saving; each boss, its cutscene and its stair; the twin stairs; floor 2's wards
+  and sealed east arm; floor 3's flood; floor 4's spiral and the Masamune; floor 5's two routes; the shrine and the
+  ending), `tests/quest/past/pst_walk.test.ts` (3: S29 and S30 (a)-(b) in assume mode, the walks, the milestone order
+  of the closure), `tests/balance/w_pst.test.ts` (6).
+
+**Balance (S30, 400 seeds, kit `w_s30`, upgraded party, sensible):** before tuning the L37 party won every fight
+98-100 % and the run 100 %; the bosses fell in 1-3 rounds, mostly before acting. With the phases and the two escorts
+(the slow lich and queen otherwise never act): the four refights in a row (HP, deaths and charges carried, no inn, 4
+potions added before each fight) **74.0 %** (target 60-85); alone **100.0 / 100.0 / 97.0 / 99.8 %** (target >= 85);
+the Death Eye with its golem **77.5 %** (target 70-90). Level curve: L35 run 33.8 %, eye 66.0 %; L39 run 95.0 %, eye
+85.0 %. Careless wins more (run 99.8 %, eye 100 %): careless casts nothing, while sensible spends turns on RUSE and
+LIT, as ORD-O found. Chaos is unchanged (`chaos.test.ts`).
+
+**Topology** (`originality.test.ts`: `past-temple: branching`, `past: chain`; PST: 1 of 2 dungeons branch):
+
+| Floor | Size | Chests | Dead ends | Aspect / fill | Boss (octant, path) |
+|---|---|---|---|---|---|
+| past-temple-1 | 40x40 | 4 | 6 | 1.06 / 0.43 | N 42 |
+| past-temple-2 | 44x44 | 4 | 3 | 1.05 / 0.30 | N 33 |
+| past-temple-3 | 32x46 | 3 | 5 | 0.73 / 0.40 | N 53 |
+| past-temple-4 | 34x36 | 4 | 4 | 0.97 / 0.52 | SE 233 |
+| past-temple-5 | 46x34 | 3 | 3 | 1.40 / 0.41 | N 48 |
+| past-chaos | 30x32 | 2 | 4 | 0.96 / 0.52 | N 35 |
+
+Stair graph: 1 <-> 2 by twin stairs (to two different arms), then a chain 2 <-> 3 <-> 4 <-> 5 <-> the shrine.
+
+**GT rows and `nonLoadBearing`:**
+
+- GT-33 (S29): each crystal removed from the gate is caught (`SKIP S29`) except EARTH_CRYSTAL_LIT, which gates the
+  canoe that FIRE needs: entry `{temple-of-fiends, gate, (3, 4)}`. The keeper's `showIf EARTH_CRYSTAL_LIT` gets
+  `{temple-of-fiends, npc, (3, 3)}`. The lute part is reported with the plan's reason.
+- GT-34 (S30): every stair cell's flag is caught as `MILESTONE S30 ...`, except floor 1's east stair, which lands in
+  the sealed east arm (a dead end): entries `{past-temple-1, transition, (24, 4)}`, `(25, 4)`.
+- Generic: the six boss NPCs' `hideIf`; floor 2's four ward gate cells (the floor's own puzzle; the stair needs
+  PAST_ASHEN_DEFEATED).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | both layout scripts, `stubs.py` (`kept 89 real maps`), `world.py --check-bands`, `world.py`, then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py past-temple-1 ... past-chaos temple-of-fiends`: each `<id>: WxH -> assets/maps/ai/<id>.yaml`; `--check-determinism` on the 7 ids: each `deterministic`. No site file changed, so no world compile |
+| G3 | n/a: no overworld chunk changed |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 6 failed \| 331 passed (337)`, `Tests 7 failed \| 7987 passed \| 2 skipped (7996)`; the 7 failures are exactly mainline's (below) |
+| G5 | `--stage S29`: (a) OK; (b) OK (34 withheld runs); (c) FAIL (pre-existing pattern, below); (d) `S29 L33.5 [33,35]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; `mutations: OK (1 gate rows; 7 elements, each removal reported)`. `--stage S30`: (a) OK; (b) OK (35 withheld runs; 5 milestone runs); (c) FAIL (the same); (d) `lich_2 L34.7 [34,41]`; (e)-(h) OK; `mutations: OK (7 gate rows; 22 elements, each removal reported)`. Each ends `quest-verify: FAIL` on (c) only |
+| G8 | `build_map.py --selftest`: `build_map selftest: 104 checks passed` |
+| G9 | `w_pst.test.ts` 6 passed; `check-bounds tests/balance/w_*.test.ts`: `check-bounds: OK (21 tests)` |
+| G10 | browser, port 5241, `mute=1`, headless Chromium (`/tmp/w-pst/pw/pst.mjs`): `w_s29_start` walked from the temple door to the gate cell (3, 4), talked to the keeper, TIME_GATE_OPEN set and the party set back on (3, 5); one step north: map `past-temple-1` at (19, 37). `w_s30_chaos_door`: one step up, talk: `BattleScene` with enemies `[chaos]`, background `assets/backgrounds/rim.webp`, Run greyed. 0 console errors. Screens: `/tmp/w-pst/s29_0_start.png`, `s29_1_keeper.png`, `s29_2_open.png`, `s29_3_past1.png`, `s30_0_chaos.png`, `s30_1_battle.png` |
+| G12 | `designNotes`, `originality` pass; a fresh reviewer's first pass found 4 points (one shared Distinct line; a stock shrine; Chaos staged as the classic knight reveal with the Garland sprite; two wording echoes); all were fixed and the re-review returned `originality review: PASS past-temple-1 past-temple-2 past-temple-3 past-temple-4 past-temple-5 past-chaos temple-of-fiends` |
+| G16 | `stubs.py --check PST`: `stubs: 0 left for PST` |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Pre-existing failures (mainline 7525dbad, measured on a `git archive` copy with the same command):** questGraph
+"(a), (b) and (c)", questLate "(d) Garland ...", ert_o_walk S10 and S12, ert_t_walk S25, fir_d1_walk S15, fir_t_walk
+"S13 before S14" (proof (c) soft-locks from the visit-order bug, and (d) bands / elfheim gold, for INT-W2c). Both
+`--stage` runs fail only on (c) with the same pattern (elfheim-vault, waterfall-cave, cornelia-castle* STRANDED /
+SOFTLOCK, the state LIMIT); before my entries, `--stage S29` on mainline failed (e) `SHOPLESS lufenia`, which the
+airship in the S29 / S30 entries now reaches.
+
+**Deviations / shared-file edits (each small):**
+
+- **The time gate** is the plan's gate (lute + four crystals) on the stair cell itself, and the cutscene
+  `pst_time_gate` comes from talking to the hour keeper in the corner beyond it. The altar is a deco and the temple's
+  walkable count is pinned, so the "altar" became an NPC standing where only the gate cell reaches him. The cutscene
+  does not take the party down (a warp would bypass TIME_GATE_OPEN when proof (b) withholds it); it sets the party
+  back on (3, 5) (standing on the stair after the event read as STRANDED to (c)), and the player steps down.
+- **Escorts**: lich_2 fights with two death knights, ashen_queen_2 with a rhyos, death_eye with an iron golem (all
+  from S30's roster), as FIR-D1, ORD-O and ELF-O added escorts: these bosses are too slow to act before the L37
+  party kills them, so `bossPhases` alone can't reach 3.7's bands.
+- **Floor 2's "one open per visit"** is built as arms opened one at a time by ward acolytes (local flags
+  PST_WARD_HUB, PST_WARD_WEST); a fourth arm stays sealed from the hub and is entered only by floor 1's east stair.
+- **canSave: false** on all six maps (each floor ends at a boss; the run has no rest by design).
+- `tests/quest/originalityChecks.ts` (+3) and `originality.test.ts` (+1 assertion): `topologyLine` also reads
+  `floor <n>` (and `floor <n> boss`), since `past-temple-<n>` floors are labelled by their number alone.
+- `tests/progression/questGraph.test.ts` (+2): the "act 1 is played" path filter leaves out
+  `temple-of-fiends:cutscene:hour_keeper` (S29's event on the act-1 map).
+- Chaos's field sprite is the `king` sheet tinted violet (no field sheet of the colossus exists).
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/past/past_upper.py` (`past-temple-1..3`) and
+`past_lower.py` (`past-temple-4`, `-5`, `past-chaos`) with `past_common.py`; `temple-of-fiends.yaml` (still
+hand-written) gains the time gate (the hour keeper, the gate cell (3, 4), the `time_gate` entrance). The debug
+scenarios gain `w_s29_start`, `w_s30_start`, `w_s30_chaos_door` and `w_boss_{lich_2, ashen_queen_2,
+drowned_sovereign_2, hollow_seraph_2, death_eye}`; the background `fiend_hall` is staged. `topologyLine` reads
+`floor <n>`.
 <!-- === end PST === -->
 <!-- === INT INTEGRATION (pass W: owned by INT) === -->
 ### INT-W2c result: after the ELF-T merge (branch `int-w2c` from `mainline` bc43d930, merged up to 767dd7e3) — (c), (d) fixed; (f) BLOCKED

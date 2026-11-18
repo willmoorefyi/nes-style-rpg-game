@@ -27,7 +27,9 @@ describe('WND-O S26: the walk and the language gate', () => {
 
   it('after the walk the chime and CHIME_GIVEN hold, and SKY_FORTRESS_OPEN (S27) only by S27\'s assumed grant', () => {
     expect(closure(ctx).items.has('chime')).toBe(true);
-    const later = new Set(['S27', 'S28', 'S29', 'S30', 'S31'].map((s) => `quest:stage:${s}`));
+    // WND-D1 built S27: its console (the real event on mirage-3f) is S27's too, so it is held off with the markers
+    const later = new Set([...['S27', 'S28', 'S29', 'S30', 'S31'].map((s) => `quest:stage:${s}`),
+      ...ctx.cat.events.filter((e) => e.map.startsWith('mirage-')).map((e) => e.id)]);
     const sat = saturate(ctx, ctx.start, { disabled: later });
     expect(sat.items.has('chime')).toBe(true);
     expect(sat.flags.has('CHIME_GIVEN')).toBe(true);

@@ -62,6 +62,7 @@ describe('originality: the topology numbers', () => {
   it('the Topology line names the floors and the boss floor', () => {
     expect(topologyLine('B1 -> B2 (2 stairs) -> B3 boss, one-way pit B2 -> B1')).toEqual({ floors: ['B1', 'B2', 'B3'], boss: 'B3' });
     expect(topologyLine('1F -> 2F -> 3F boss')).toEqual({ floors: ['1F', '2F', '3F'], boss: '3F' });
+    expect(topologyLine('floor 1 boss -> floor 2 -> the shrine')).toEqual({ floors: ['1', '2'], boss: '1' });
   });
 });
 

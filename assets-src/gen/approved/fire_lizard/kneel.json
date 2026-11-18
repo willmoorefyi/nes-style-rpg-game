@@ -1,0 +1,36 @@
+{
+  "character": "fire_lizard",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "855dd13154a1959f",
+    "skel": "554bf9531a4cf9af",
+    "ref": "d0ec97fde26b224a"
+  },
+  "grid": [
+    218,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-hist, A-adj, A-area",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "f4e02f7af9a509e0b8f68f48"
+  ],
+  "refs": [
+    "edit:raw_g_1",
+    "idle"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}
