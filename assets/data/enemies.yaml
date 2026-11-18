@@ -2563,10 +2563,13 @@
   attack: melee
   weakness: lightning
   resist: fire
+  # WAT-D (S24, docs/WORLD_PLAN.md 3.7): he wakes at full strength (a phase from full HP, crossed at the first round
+  # start): attack 75 on his 8 hits. With the roster's attack 50 the upgraded L26-L30 party won 100 %.
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 1.0
     patternId: aggressive
-    message: "The Drowned Sovereign's robes tear open!"
+    message: "The Drowned Sovereign's robes tear open, and the sea pours out of them!"
+    attack: 75
     attackAnim: heavy
   family: aquatic
   size: boss

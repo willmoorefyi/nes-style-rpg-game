@@ -526,10 +526,15 @@ stages:
     maps: [sea-shrine-*]
     zones: []
     grind: 2.0
-    walk: []
+    # the submarine's arrival: the nave's pier on sea-shrine-b3 (Onrac's dry dock, with the oxyale gate, is WAT-T's;
+    # the nave's pier leads back to it). Then down the east stairwell to B4, the halls' stair to B5, and the throne
+    entry: {map: sea-shrine-b3, x: 21, y: 28, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
+    walk: [sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5, sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the king's hideIf only clears the beaten boss off the throne steps; the fight is once by its flag
+      - {map: sea-shrine-b5, kind: npc, at: [15, 7], reason: "hideIf only clears the beaten king off the throne steps; the fight is once by its flag WATER_CRYSTAL_LIT"}
+    status: built
   # === end WAT-D ===
   # === WND-O (pass W: owned by WND-O) ===
   - id: S26

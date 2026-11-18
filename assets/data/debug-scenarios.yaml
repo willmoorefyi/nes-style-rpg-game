@@ -1867,6 +1867,54 @@
 # === WAT-T (pass W: owned by WAT-T) ===
 # === end WAT-T ===
 # === WAT-D (pass W: owned by WAT-D) ===
+# S24 (docs/WORLD_PLAN.md 5.3, 6.5): the field start where the submarine surfaces, on the pier in sea-shrine-b3's
+# berth pool (entrance `nave`; Onrac's dry dock and its oxyale gate are WAT-T's, and the pier's end sails back to it).
+# The band-low party (Lv 27, upgraded classes: S20 on) in the B6 kit (w_onrac), every flag up to S23, the oxyale held
+# and the airship parked by Onrac. Walk: east stairwell to B4, the halls' stair to B5, north to the throne, win
+# (WATER_CRYSTAL_LIT, slab). w_boss_drowned_sovereign is the fight alone at the test level 28 in the stage kit w_s24.
+- id: w_s24_start
+  name: WAT-D S24 - the Sea Shrine (the submarine's pier in the nave)
+  mode: field
+  map: sea-shrine-b3
+  entrance: nave
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 26, y: 39 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED, ORDEALS_GUARD_DEFEATED,
+          CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED]
+  party:
+    - { class: knight, name: KNT, level: 27, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NIN, level: 27, equipment: [rune_knife, opal_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWZ, level: 27, equipment: [thor_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWZ, level: 27, equipment: [rune_knife, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { oxyale: 1, cube: 1, canoe: 1, lute: 1, hi_potion: 6, ether: 2, phoenix_down: 3 }
+  gold: 8000
+  enemies: []
+- id: w_boss_drowned_sovereign
+  name: WAT-D S24 boss - the Drowned Sovereign (test level 28, kit w_s24)
+  background: assets/backgrounds/throne_kraken.webp
+  party:
+    - { class: knight, name: KNT, level: 28, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NIN, level: 28, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWZ, level: 28, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWZ, level: 28, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [drowned_sovereign]
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
 # S26 (docs/WORLD_PLAN.md 6.5): the field start at Lufenia's land gate on the mesa, the airship parked on the mesa
