@@ -74,6 +74,8 @@ transitions:
 - {x: 6, y: 7, targetMap: sea-shrine-b2, targetEntrance: down}
 - {x: 36, y: 11, targetMap: sea-shrine-b4, targetEntrance: arrival}
 - {x: 37, y: 11, targetMap: sea-shrine-b4, targetEntrance: arrival}
+- {x: 21, y: 30, targetMap: onrac, targetEntrance: dry_dock}
+- {x: 22, y: 30, targetMap: onrac, targetEntrance: dry_dock}
 name: Sea Shrine B3
 music: dungeon
 encounterRate: {min: 16, max: 28}

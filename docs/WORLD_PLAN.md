@@ -3948,6 +3948,95 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
 - Debug scenarios gain `w_s21_start`, `w_s21_neg_nocanoe` and `w_s22_start`.
 <!-- === end WAT-O === -->
 <!-- === WAT-T WATER (pass W: owned by WAT-T) === -->
+### WAT-T result: Onrac, S20 (branch `w-wat-t` from `mainline` a11defa7)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-t/`.
+
+**Files:**
+
+- Layouts (new): `layouts/water/town_onrac.py` (`onrac`, 50x44), `town_onrac_people.py` (every outdoor line, the
+  signpost and bell texts, the gate message), `town_onrac_interiors.py` (the script to run) with `town_onrac_homes.py`
+  (houses `bellringer`, `netmender`, `smoker`, `shipwright`, `healer`, `tanner`; `interiors_common.Town("onrac")`) and
+  `town_onrac_shops.py` (the 5 shops and `onrac-inn`). `town_onrac_site.py`: docstring only (the defaults stand), but
+  the town is no longer a stub, so WAT-O's module now writes the icon's door: the world was regenerated under the lock
+  (`stubs.py`, `world.py`, `build_map.py overworld --region water`).
+- Generated: the 13 `onrac*` sources and compiled maps (`index.yaml` +13), `assets-src/maps/overworld.yaml` and
+  `assets/maps/ai/overworld.yaml` (the door transition (28, 38) -> `onrac` `gate` and its walk cell; no chunk PNG
+  changed). The 5 `sea-shrine-b1..b5` **stubs compiled** (sources untouched, still stubs; `index.yaml` +5) so that the
+  submarine's transition has a compiled target (`crossFileValidation`), as ERT-O did for Melmond and WND-O for Gaia;
+  WAT-D replaces them.
+- Data: `quest.yaml` S20 (`entry`, `walk: [overworld:warp:onrac]`, `status: built`) and town `onrac` `built`;
+  `debug-scenarios.yaml` `w_s20_start`, `w_s24_neg_nooxyale`, `w_wat_t_onrac_lit`; `shops.yaml` unchanged (W1-F/W1-G's
+  `onrac_*`: B6 arms, L6 magic, inn 500).
+- Tests: `tests/quest/water/wat_t_onrac.test.ts` (8: the submarine gate and transition, the three gate outcomes,
+  the doors and exits, the overworld door, EXIT-safety, clinic / inn / shops, hints, reactive) and `wat_t_walk.test.ts`
+  (2).
+
+**Design** (original):
+
+- **The town.** A frosted shelf (a pale `grass` remap) between the northern cliffs and the bay. The land `gate`
+  (23, 2) is in a gap in the cliffs; the gap's mouth (23-24, 0) leads back to `wat_onrac`.
+- **Lanes.** Bell Road runs from the gate down to the quay. Tar Lane (y 13-14) crosses it under the cliffs: the magic
+  shops, the arms, the bell-ringer's and the net-mender's. Salt Row (y 23-24) runs through the middle: the smokehouse,
+  the item shop, the inn. The quay (y 31-32) runs along the shingle: the healer's house (the shrine sign), the tanner's,
+  two shut stores. A west lane joins the three.
+- **Bell Square:** a stone bell tower (an inspect cell: the barnacled bell netted from the sunken city), the well,
+  benches. Between Tar Lane and Salt Row stand two cod racks; in the north yard the tar is boiled among snow firs.
+- **The dry dock** (east): a stone-walled basin (canal water) at the bay's edge, its sea-gate shut, with walkways on three sides and the
+  shipwright's shed at its head. The iron submarine (the `buried_hull` placeholder, `slate`) lies in it. Its gangway
+  plank (38, 27) is a `keyItemGates` cell (`requiredItem: oxyale`, `permanent: false`) and the transition to
+  `sea-shrine-b3` `nave`. The gate's message is the shipwright's, conditional: with the `fairy_bottle` he sends the
+  party to Gaia's spring, otherwise he asks for oxyale. The entrance `dry_dock` (37, 27) is the walkway cell in front.
+- **Two plank piers** run into the bay; a fishing boat is moored at the west one.
+- **People.** 17 outdoor NPCs. The hint NPCs are `onrac_waterfall_hint` (the waterfall, the canoe up the gorge) and
+  `onrac_caravan_hint` (the caravan in the western dunes and its bottle). The oxyale chain is told by the caravan hint,
+  `onrac_fairy_lore` (fairies of Gaia's spring breathe oxyale), the shipwright and his daughter (who reacts to
+  FAIRY_FREED), and `onrac_mermaid_tale` (the sea-folk of the shrine's upper halls, WAT-D's B1). Lines change on
+  WATER_CRYSTAL_LIT (most people), `item:oxyale`, FAIRY_FREED and CUBE_GIVEN.
+- **Clinic:** `onrac_healer` (`action: clinic`, 90 G per level, B6). The inn keeper has `action: inn`. Two chests:
+  `CHEST_WAT_T_NETMENDER` (Phoenix Down) and `CHEST_WAT_T_TANNER` (Ether).
+- No cutscene: the submarine is a plain gated transition, so the `cutscenes.yaml` anchor stays empty.
+
+**Town standard (G15):** `onrac: houses 13/8 interiors 6/6 outdoor 17/14 interior 15/12 hints 2/2 reactive 26/4
+shops 5/5 inn 500/500 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when | checkpoints S20 and `w_s24_neg_nooxyale` pass (G10 below) |
+| G1 | `town_onrac.py`, `town_onrac_interiors.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps` (after the commit): clean, exit 0 |
+| G2 | `build_map.py` on the 13 `onrac*` ids: each `<id>: WxH -> ...`; `--check-determinism` on the 13: all `deterministic`. The site file changed, so also `build_map.py overworld --region water` (under the lock) and `--check-determinism --region water overworld`: `overworld: deterministic` |
+| G3 | `world.py --owned-chunks water`, then the merge-base diff of `assets/maps/ai/overworld/` filtered by it: no output (no chunk PNG changed: the door is collision and data only) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 328 passed (328)`, `Tests 7388 passed, 3 skipped` |
+| G5 | `npm run quest -- --mutate --stage S20`: (a) OK S20; (b) OK (24 withheld runs); (c) OK (102936 states); (d) `S20 L25.1 [25,28]`; (e) OK (5 towns, 3 pending); (f)-(h) OK; `mutations: OK (0 gate rows)`; `quest-verify: OK`. The full `npm run quest -- --mutate`: `quest-verify: OK` (47 gate rows, 59 elements; (b) OK, so WAT-O's open `SKIP S21 ... without S20` is gone) |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings` passed; every new script is at most 212 lines |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G9 | no balance file (S20 has no boss) |
+| G10 browser (port 5235, `mute=1`, own headless Chromium via `/tmp/w-wat-t/drive.cjs`; the server is stopped) | `w_s20_start`: overworld (28, 39), one step north onto the icon door: map `onrac` at the gate (23, 2), then down Bell Road to Bell Square; 0 console errors (`/tmp/w-wat-t/s20_meadow.png`, `s20_onrac_gate.png`, `s20_square.png`). `w_s24_neg_nooxyale`: `onrac` (37, 27), step east onto the gangway: the shipwright's line ("The shipwright bars the gangway ..."), the party stays at (37, 27), map `onrac`; 0 errors (`s24neg_drydock.png`, `s24neg_message.png`). `w_wat_t_onrac_lit`: the square's people speak their lit / cube lines; 0 errors (`lit_waterfall_hint.png`, `lit_fairy_lore.png`) |
+| G11 | `git status --porcelain` shows only WAT-T's paths (plus the compiled sea-shrine stubs, see Deviations); no scratch files |
+| G12 | `designNotes` and `originality` passed. A fresh reviewer took two rounds: the first failed 4 maps on design-note claims that did not match them (the basin "open to the bay", the armour shop's crates, the bell-ringer's tapestry, the healer's cots and carpet); the notes, a dock hand's line and a few props were fixed. Final: `originality review: PASS onrac onrac-armor-shop onrac-black-magic onrac-house-bellringer onrac-house-healer onrac-house-netmender onrac-house-shipwright onrac-house-smoker onrac-house-tanner onrac-inn onrac-item-shop onrac-weapon-shop onrac-white-magic` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 10 checked, 4 pending)` |
+| G15 | the row above |
+| G16 | `stubs.py --check wat-t`: `stubs: 0 left for WAT-T`, exit 0 |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Deviations / hand-offs:**
+
+- The compiled `sea-shrine-b1..b5` stubs are WAT-D's ids (compiled output only; see Files).
+- `npm run quest -- --mutate --stage S24` (WAT-D's stage, pending, no `entry` yet) prints `SHOPLESS onrac` and
+  `SHOPLESS lufenia` in (e): with no entry the stage's start strands the party away from both airship-only towns.
+  GT-27 (the submarine's `requiredItem: oxyale`) is caught there (`mutations: OK (1 gate rows)`). WAT-D's S24 `entry`
+  (the airship beside Onrac, as S20's) should clear the SHOPLESS lines.
+- The bell tower and the submarine are code-drawn placeholders (`tower`, `buried_hull`; 0 paid images, open
+  question 5).
+- `w_s20_start` uses the base classes (S19 is optional); `w_s24_neg_nooxyale` the upgraded B7 party at L27.
+
+**AGENTS.md delta (for INT):** add `layouts/water/town_onrac.py` (`onrac`) and `layouts/water/town_onrac_interiors.py`
+(with `_homes.py` and `_shops.py`: `onrac-house-*`, the shops and the inn) to the map table; note the submarine gate
+(`onrac` (38, 27), `keyItemGates` oxyale, -> `sea-shrine-b3` `nave`); add the debug scenarios `w_s20_start`,
+`w_s24_neg_nooxyale` and `w_wat_t_onrac_lit`.
 <!-- === end WAT-T === -->
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
 <!-- === end WAT-D === -->

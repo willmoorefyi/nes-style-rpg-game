@@ -2006,18 +2006,85 @@
   enemies: []
 # === end WAT-O ===
 # === WAT-T (pass W: owned by WAT-T) ===
+# WORLD_PLAN 6.5. S20: on foot on Onrac's meadow at the land-gate cell (overworld `wat_onrac`, 28, 39), the airship
+# landed beside it, the band-low party (L25) in the previous band's kit (B5, w_crescent) and every grant up to S17.
+# Step north onto the town icon's door: the map is `onrac`. w_s24_neg_nooxyale starts in Onrac at the dry dock's
+# walkway (entrance `dry_dock`) with every grant up to S23 but the oxyale (the B7 party, L27): step east onto the
+# gangway and the shipwright's line bars it; the map stays `onrac`. w_wat_t_onrac_lit is the town after
+# WATER_CRYSTAL_LIT (the people's changed lines), at the cliff gate.
+- id: w_s20_start
+  name: WAT-T - S20 Onrac (land by the town, enter)
+  mode: field
+  map: overworld
+  entrance: wat_onrac
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 26, y: 39 }
+  flags: &wat_t_s20_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED]
+  party:
+    - { class: warrior, name: WAR, level: 25, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 25, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, white_robe, cap],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_mage, name: BLM, level: 25, equipment: [wizard_staff, black_robe, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: ice2, level: 4 }] }
+  items: { lute: 1, mystic_key: 1, rod: 1, canoe: 1, potion: 10, hi_potion: 4, ether: 2, phoenix_down: 2 }
+  gold: 12000
+  enemies: []
+- id: w_s24_neg_nooxyale
+  name: WAT-T - S24 negative (no oxyale at the submarine)
+  mode: field
+  map: onrac
+  entrance: dry_dock
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, x: 26, y: 39 }
+  flags: &wat_t_s23_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED,
+    MARSH_GUARD_DEFEATED, ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN,
+    EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED,
+    ORDEALS_GUARD_DEFEATED, CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED]
+  party: &wat_t_party_b7
+    - { class: knight, name: KNGT, level: 27, equipment: [defender, diamond_armor, diamond_shield, diamond_helm],
+        spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }] }
+    - { class: ninja, name: NINJ, level: 27, equipment: [vorpal_sword, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }] }
+    - { class: white_wizard, name: WWIZ, level: 27, equipment: [thor_hammer, diamond_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 },
+                 { id: heal, level: 3 }, { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
+    - { class: black_wizard, name: BWIZ, level: 27, equipment: [rune_knife, diamond_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 },
+                 { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, potion: 10, hi_potion: 5 }
+  gold: 20000
+  enemies: []
+- id: w_wat_t_onrac_lit
+  name: WAT-T - Onrac after WATER_CRYSTAL_LIT
+  mode: field
+  map: onrac
+  entrance: gate
+  fieldMode: walking
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+    ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+    EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED, ORDEALS_GUARD_DEFEATED,
+    CLASS_UPGRADED, CUBE_GIVEN, FAIRY_FREED, WATER_CRYSTAL_LIT]
+  party: *wat_t_party_b7
+  items: { lute: 1, mystic_key: 1, rod: 1, canoe: 1, cube: 1, oxyale: 1, potion: 10, hi_potion: 5 }
+  gold: 20000
+  enemies: []
 # === end WAT-T ===
 # === WAT-D (pass W: owned by WAT-D) ===
-# S24 (docs/WORLD_PLAN.md 5.3, 6.5): the field start where the submarine surfaces, on the pier in sea-shrine-b3's
-# berth pool (entrance `nave`; Onrac's dry dock and its oxyale gate are WAT-T's, and the pier's end sails back to it).
-# The band-low party (Lv 27, upgraded classes: S20 on) in the B6 kit (w_onrac), every flag up to S23, the oxyale held
-# and the airship parked by Onrac. Walk: east stairwell to B4, the halls' stair to B5, north to the throne, win
-# (WATER_CRYSTAL_LIT, slab). w_boss_drowned_sovereign is the fight alone at the test level 28 in the stage kit w_s24.
+# S24 (docs/WORLD_PLAN.md 5.3, 6.5): the field start on the walkway of Onrac's dry dock (entrance `dry_dock`, WAT-T's
+# map), in front of the submarine (the gated cell east of it, oxyale held). The band-low party (Lv 27, upgraded
+# classes: S20 on) in the B6 kit (w_onrac), every flag up to S23 and the airship parked by Onrac. Walk: board (east),
+# arrive on the nave's pier in sea-shrine-b3, the east stairwell to B4, the halls' stair to B5, north to the throne,
+# win (WATER_CRYSTAL_LIT, slab). w_boss_drowned_sovereign is the fight alone at the test level 28 in the kit w_s24.
 - id: w_s24_start
-  name: WAT-D S24 - the Sea Shrine (the submarine's pier in the nave)
+  name: WAT-D S24 - the Sea Shrine (Onrac's dry dock, the submarine)
   mode: field
-  map: sea-shrine-b3
-  entrance: nave
+  map: onrac
+  entrance: dry_dock
   fieldMode: walking
   vehicles:
     - { type: airship, map: overworld, x: 26, y: 39 }

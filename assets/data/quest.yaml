@@ -529,10 +529,13 @@ stages:
     maps: [onrac, onrac-*]
     zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
     grind: 2.0
-    walk: []
+    # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
+    # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door
+    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
+    walk: [overworld:warp:onrac]
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end WAT-T ===
   # === WAT-D (pass W: owned by WAT-D) ===
   - id: S24
@@ -547,10 +550,12 @@ stages:
     maps: [sea-shrine-*]
     zones: []
     grind: 2.0
-    # the submarine's arrival: the nave's pier on sea-shrine-b3 (Onrac's dry dock, with the oxyale gate, is WAT-T's;
-    # the nave's pier leads back to it). Then down the east stairwell to B4, the halls' stair to B5, and the throne
-    entry: {map: sea-shrine-b3, x: 21, y: 28, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
-    walk: [sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5, sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
+    # at Onrac's gate with the airship landed beside it (as S20 leaves it): into the town, through the dry dock's
+    # oxyale gate (WAT-T's submarine) to the nave's pier on sea-shrine-b3, down the east stairwell to B4, the halls'
+    # stair to B5, and the throne. Withholding the oxyale shuts the gate (proof (b))
+    entry: {map: overworld, x: 28, y: 39, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
+    walk: [overworld:warp:onrac, onrac:warp:sea-shrine-b3, sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5,
+      sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
     basins: {}
     nonLoadBearing:
       # the king's hideIf only clears the beaten boss off the throne steps; the fight is once by its flag
@@ -722,7 +727,7 @@ towns:
     opensAfter: [S17]
     bandStage: S20
     kit: w_onrac
-    status: pending
+    status: built
   # === end WAT-T town ===
   # === WND-O town (pass W: owned by WND-O) ===
   - id: lufenia
