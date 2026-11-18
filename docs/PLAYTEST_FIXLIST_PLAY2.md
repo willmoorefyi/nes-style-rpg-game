@@ -18,13 +18,14 @@ Status key: DONE = played and passed; PART = played in part; TODO = to be played
 | S12 | w_s12_start, _neg_noruby | DONE (giant fed, tunnel, Sarda, rod; neg: giant blocks, west exit unreachable) |
 | S13 | w_s13_start | DONE (seal, B4, B5, lich, altar; flags in order SEAL > CAVE_COMPLETE > CRYSTAL_LIT) |
 | S14 | w_s14_start, w_s14_early | DONE (elder gives canoe; stepping onto the lake gives mode canoe; early visit: elder refuses, no canoe) |
-| S15 | w_s15_start | PART (floors B1-B5 reached; boss not beaten, see notes) |
+| S15 | w_s15_start | DONE with a healing player (Hi-Potions between fights): queen won at full party HP, 0 game overs, FIRE_CRYSTAL_LIT set; the earlier wipes were the bot not healing |
 | S16 | w_s16_start | DONE (pit to B1 pocket, Hesk breaks the shelf, eye won, levistone) |
 | S17 | w_s17_start, _neg_nostone | DONE (hatch, airship, forest/desert refuse landing, grass lands; neg: hatch asks for the stone) |
 | S18 | w_s18_start | PART (1F throne, 2F entered; lattice and 3F boss TODO) |
 | S19 | w_s19_start | DONE (class change applies) |
-| S20 | w_s20_start | PART (onrac entered; shops, gangway TODO) |
-| S21, S22 | w_s21_start, _neg_nocanoe, w_s22_start | TODO |
+| S20 | w_s20_start | DONE (map is onrac at (23,2); inn 500 G, shops, healer, shipwright; the gangway (38,27) is barred without oxyale with the right message) |
+| S21 | w_s21_start, _neg_nocanoe | DONE (east step at (30,28) gives canoe, 17 cells up the gorge, automaton gives the cube; neg: no route onto the river, cave unreachable) |
+| S22 | w_s22_start | DONE (bottle bought, gold 41000 -> 1000, WAT_O_BOTTLE_BOUGHT; see P2-09) |
 
 ## Findings
 
@@ -38,6 +39,9 @@ Status key: DONE = played and passed; PART = played in part; TODO = to be played
 | P3-06 | P3 | S17 | overworld (143,160) | stand under the hull, tap Up briefly (30 ms) then Enter | one tap turns the hero and the talk starts | a 30 ms tap does not turn the hero (facing stays down); only a hold of about 100 ms or more turns it, so a quick tap + confirm does nothing. May be intended input timing; flagging because it looked like a dead hatch to the bot | `hatch.mjs` run: facingTile (143,161) after 30 ms, (143,159) after 120 ms |
 | P3-07 | P3 | all | whole segment | n/a | n/a | on two runs the page fell back to a black screen / the Title scene mid-walk (after a battle in gurgu-b3, and in the citadel), with no console error; runs were unaffected by the reboot at that time. Cause unknown (renderer crash or a dev-server reload); re-check on the re-walk | s15b_fail.png (black) |
 | P3-08 | P3 | S11-S19 originality | Melmond / Cavern of Earth / giant / Sarda; Crescent Circle; Gurgu; Ice Cavern; hull; Citadel; Bahamut; Onrac; waterfall; caravan | read the chain | QUEST 4.6: nothing copied too literally | the chain of items and the order is the classic's: vampire's ruby fed to a giant (Titan), the sage's rod breaks the seal, twelve sages give a canoe, the floatstone raises the airship, a dragon king upgrades classes for a seal, an automaton holds a cube, a caravan sells the bottle, a submarine needs oxyale. Names also match: Dr. Unne, Nerrick, Smyth, Lukahn, Sarda, Bahamut, Lufenia, Gurgu. Prose and maps are original. Per the standing ruling (classic names and lines are not defects) this is reported only | dialog dump of the S11-S22 maps |
+| P2-09 | P2 | S22 | caravan-camp, trader (19,11) | `w_s22_start`, walk in, talk to the trader once with 41,000 G | a price prompt (Yes / No) or at least a line that 40,000 G was paid | talking is the purchase: the lines "I won't haggle: 40000 gil ... Come back when your purse is heavier if it isn't." play (they read as a refusal prompt), then "You received the Bottle!" and the gold drops 41000 -> 1000 with no "paid" line and no way to decline. A player who talks to read the trader with a full purse loses it unrecoverably (the bottle is only needed once, but 40,000 G is most of the gold the later shops want) | s22 log: `BOTTLE ["fairy_bottle:1"] gold 41000 -> 1000` |
+| P3-10 | P3 | S21 | waterfall-cave, automaton (14,4) | `w_s21_start`, talk to the automaton | the cube is handed over after the line that gives it | the order is: three lines about holding the cube, "You received the Warp Cube!", then "The cube leaves the brass hands, and the automaton's lamp-eyes flicker." (the cutscene text describes the hand-over after the pickup line) | s21 log |
+| P3-11 | P3 | S21 | overworld gorge mouth (30,28) | `w_s21_neg_nocanoe`, press right at (30,28) | a hint line, or the hint NPCs are enough | the step into the river is silently refused (position unchanged, no dialog). The Onrac hint NPC and the caravan scout cover it, so only a polish note | s21neg log |
 
 ## Checked and fine (so far)
 
