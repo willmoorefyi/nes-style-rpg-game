@@ -23,6 +23,17 @@ from gen.anim_rules import ROT_CAP
 from gen.monster_recipes import KNEEL_FRAMES
 
 IN_BETWEENS = ("kneel_in1", "kneel_in2")
+# Integrator ruling (KT2-A, 2026-11-18; docs/KNEEL_TWEEN_PLAN.md rev 2 section 7, rulings log in 12): the bridge pair
+# step kneel_in1 -> kneel_in2 of a `source: ai` rig is the deliberate swap between two drawings inside the 133 ms drop,
+# so its `sequence:kneel` centroid cap is 0.65 x the idle-key span; every other step (and the derived path) keeps 0.5.
+BRIDGE_SWAP = ("kneel_in1", "kneel_in2")
+BRIDGE_SWAP_SHARE = 0.65
+
+
+def continuity_share(seq: str, a: str, b: str, gen: dict) -> float:
+    """The centroid cap's span share for the step a -> b of `seq` (anim_checks.continuity)."""
+    swap = seq == "kneel" and (a, b) == BRIDGE_SWAP and all(gen.get(n, {}).get("bridge") for n in BRIDGE_SWAP)
+    return BRIDGE_SWAP_SHARE if swap else 0.5
 
 
 def _rows(a: np.ndarray) -> np.ndarray:

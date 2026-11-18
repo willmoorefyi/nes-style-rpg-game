@@ -162,15 +162,17 @@ def centroid(a: np.ndarray) -> tuple[float, float]:
     return (float(xs.mean()), float(ys.mean())) if len(xs) else (0.0, 0.0)
 
 
-def continuity(prev: np.ndarray, nxt: np.ndarray, span: tuple[np.ndarray, np.ndarray], cell_h: int) -> list[str]:
-    """Adjacent frames of a runtime sequence (same cell, feet aligned) against the keyframe pair they lie between."""
+def continuity(prev: np.ndarray, nxt: np.ndarray, span: tuple[np.ndarray, np.ndarray], cell_h: int,
+               share: float = 0.5) -> list[str]:
+    """Adjacent frames of a runtime sequence (same cell, feet aligned) against the keyframe pair they lie between.
+    `share`: the centroid cap's share of the span (0.5; the pass KT bridge swap passes kneel_checks.BRIDGE_SWAP_SHARE)."""
     out = []
     need = min(0.55, iou(*span) + 0.02)
     if iou(prev, nxt) < need:
         out.append(f"adjacent IoU {iou(prev, nxt):.2f} < {need:.2f}")
     (ax, ay), (bx, by) = centroid(prev), centroid(nxt)
     (kx, ky), (lx, ly) = centroid(span[0]), centroid(span[1])
-    cap = max(6 * cell_h / 80, 0.5 * float(np.hypot(lx - kx, ly - ky)))
+    cap = max(6 * cell_h / 80, share * float(np.hypot(lx - kx, ly - ky)))
     if np.hypot(bx - ax, by - ay) > cap:
         out.append(f"centroid moves {np.hypot(bx - ax, by - ay):.1f} > {cap:.1f}")
     return out
