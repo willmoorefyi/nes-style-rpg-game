@@ -326,6 +326,36 @@
 # === FIR-D1 (pass W: owned by FIR-D1) ===
 # === end FIR-D1 ===
 # === FIR-D2 (pass W: owned by FIR-D2) ===
+# S16: talking to Hesk the ice-cutter by the shelf (ice-cavern-b2, npc fir_d2_hesk) breaks the ice shelf; the patch
+# `fir_d2_shelf` opens the stair hall for good on FIR_D2_SHELF.
+- id: fir_d2_shelf
+  steps:
+    - type: dialog
+      text: "Hesk spits on his palms and sets the pick in your hands. \"Two hand-widths from the floor, where the grey turns white. Swing like you mean it.\""
+    - type: dialog
+      text: "The first blow rings. The second sings. On the third the whole shelf shivers, then slides down in plates as big as doors."
+    - type: fade_out
+      duration: 500
+    - type: set_flag
+      flag: FIR_D2_SHELF
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "Behind the fallen ice a hall of old cut stone breathes out cold air. A stair goes down into the blue dark."
+# S16: the postVictoryCutscene of the eye's vault (ice-cavern-b3, npc fir_d2_stone; evil_eye, ice_gigas, dark_wizard
+# x2); it sets EVIL_EYE_DEFEATED and gives the levistone (D-W14) and points the party at the buried hull in the desert.
+- id: fir_evil_eye_falls
+  steps:
+    - type: dialog
+      text: "The great eye shrinks like a pricked bladder and drops onto the dais. The frost on the walls goes dull and wet."
+    - type: set_flag
+      flag: EVIL_EYE_DEFEATED
+    - type: give_item
+      item: levistone
+    - type: dialog
+      text: "The stone settles into your palm, then tugs upward, light as a held breath. It wants the sky."
+    - type: dialog
+      text: "Somewhere south, under the sand of the desert, an old hull is waiting for exactly this."
 # === end FIR-D2 ===
 # === ORD-O (pass W: owned by ORD-O) ===
 # S18 (WORLD 4.5): the stone steward of citadel-1f holds the empty throne's crown; setting it back on the throne opens
