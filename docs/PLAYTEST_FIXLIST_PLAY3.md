@@ -11,7 +11,9 @@ Severity: P0 blocks progress or crashes; P1 serious, wrong-side or unfair; P2 no
 |---|---|---|---|---|---|---|---|
 | P3-01 (unconfirmed) | P3 | S24 | `onrac` (37, 27) -> gate (38, 27) | `w_s24_start`, one 90 ms tap of Right at the dry-dock entrance, oxyale held | the submarine boards (map `sea-shrine-b3`, entrance `nave` (21, 28)) | Once it boarded; on a second load of the same scenario the single tap did nothing for 5 s (still `onrac` 37,27, no dialog). Walking to (38, 27) with repeated steps boarded at once. Probably the scene-entry or dialog-close hold-off swallowing the first press, so not a game bug; recheck by hand. | `/tmp` log lost in the reboot |
 
-| P3-02 | P3 | S27-S28 | Mirage Tower and sky castle random fights | `w_s27_start`, walk 1F to 3F, fighting every encounter | gold in step with the band (the party starts S27 with 20000 G) | six fights in the Mirage took the purse from 20000 to about 54000 G (about 5,000 G a fight, mostly one or two black_knight / guardian-type groups). Nothing to buy until the Gaia/Lufenia shops, and S29's 30000 G start in the PST scenarios is already below that. Gold has no use from here on, so this is harmless for progress, but check the `goldReward` of the S27-S28 roster against the shop prices. | `/tmp/w-play3/prog.log` (lost on reboot; re-measure) |
+| P3-02 | P3 | S27-S28 | Mirage Tower and sky castle random fights | `w_s27_start`, walk 1F to 3F, fighting every encounter | gold in step with the band (the party starts S27 with 20000 G) | six fights in the Mirage took the purse from 20000 to about 54000 G (about 5,000 G a fight: `goldReward` per enemy is chimera 2500, green_dragon 5000, black_knight 1800 (groups of 2-3), blue_dragon 2000, stone_golem 1000, guardian 400). Nothing to buy until the Gaia/Lufenia shops, and S29's 30000 G start in the PST scenarios is already below that. Gold has no use from here on, so this is harmless for progress, but check the `goldReward` of the S27-S28 roster against the shop prices. | `/tmp/w-play3/prog.log` (lost on reboot; re-measure) |
+
+| P3-03 | P3 | S28 | `sky-castle-4f`, zone `wnd_d2_engine`, formation `warmech` + `air_elemental` (weight 1 in 64) | Forced from the console on `w_s28_start` (`ex.battleTrigger.triggerBattle(['warmech','air_elemental'])`, three times, party L31 in the stage kit, plain Fight mashing) | A rare superboss: its text says "Few who meet it walk away"; expect real danger or a wipe risk | Won 3 of 3 in 24-35 s (59-84 presses) with no hero KO'd (worst: KNGT 299/522, WWIZ 57/240). Soft for a "rare, deadly" formation and a player who meets it at weight 1 in 64 will not feel it. Also it pays `goldReward` 32000. | `warmech_battle.png` (art is fine) |
 
 No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading the generated map YAML and
 `cutscenes.yaml`) of S26-S31 found nothing wrong; it still needs the live pass below.
@@ -51,6 +53,13 @@ No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading th
   reachability search that treats the belt transitions as edges: every chest and every exit is reachable, so the belts
   are not a trap), 3F `adamant` chest at (4, 26) and 3 more chests, the archivist, 4F chests (3) and the stairs to 5F.
   Attrition is real: BWIZ was down to 73/240 by 5F at L31 with no healing between fights (fair).
+- S28 boss (`sky-castle-5f`, talk to the Seraph at (12, 8)): the line, the scripted fight (Seraph + air elemental),
+  `wnd_seraph_falls`, WIND_CRYSTAL_LIT set, no console errors. The party reached 5F already hurt (WWIZ 72/240) and the
+  Fight-mash win cost one KO (WWIZ 0/240): fair, not a wipe. 5F chests: vorpal sword, ether.
+- S28 conveyors: from every belt landing and every entrance of `sky-castle-2f` the same 433 walkable cells, the stair
+  up and both exits to 1F are reachable (no trap). Note for fix agents: a path that treats a belt cell as plain floor
+  loops (my first bot looped for 10 minutes); a player has to learn which belt leads where. No in-game hint says so
+  (the 2F maps has no sign or NPC). This is not a defect by itself but the archivist/steward text could hint.
 - Data check: S31 Smyth (`dwarf-hall`, `ert_smyth`): dialog and cutscene `ert_smyth_forge` are gated on WIND_CRYSTAL_LIT
   in the version I tested (the fix agent is changing this; behaviour noted only). Chest `adamant` is on `sky-castle-3f`
   (4, 26).
