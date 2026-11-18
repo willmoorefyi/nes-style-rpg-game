@@ -3668,6 +3668,114 @@ floor from the `%` cells). A dungeon floor's hazard rule is tested by `tests/que
 `magma_temple` and `throne_kary` are staged.
 <!-- === end FIR-D1 === -->
 <!-- === FIR-D2 FIRE (pass W: owned by FIR-D2) === -->
+### FIR-D2 result: the Ice Cavern B1-B3, S16 (branch `w-fir-d2` from `mainline` bcf6d1b8)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-d2/`.
+
+**Files:**
+
+- Layouts: `layouts/fire/ice_common.py` (materials, the per-floor encounter tables, chests, the floor writer),
+  `ice_b1.py`, `ice_b2.py`, `ice_b3.py` -> `ice-cavern-b1` (40x34), `-b2` (44x38), `-b3` (40x34), compiled (the FIR-O
+  stubs are replaced; canon entrances `arrival` / `down` / `boss` and links kept). Every floor: `exit` to
+  `overworld:fir_ice`, the `ice_cave` background (staged; `--check ice_cave` has no bounds and exits 0), encounters
+  from the S16 roster (B1 wolves / ice_gigas / specters / remorazz, B2 adds dark_wizard and white_dragon, B3
+  mindflayers, white_dragon, dark_wizards). B2 and B3 `canSave: false`.
+- Materials: the `ice` remap on the stone floor; sheet ice (`+`), walls (`W`, `F`) and packed snow (`_`) are the
+  same ice at other shades (the remaps apply in order, so later entries read the recoloured `floor_stone`); cracked
+  ice (`%`) is the temple rubble greyed; meltwater (`≈`). `ice_floe` placeholders (style `snow`) as ice blocks.
+- Data: `cutscenes.yaml` (`fir_d2_shelf`: sets FIR_D2_SHELF; `fir_evil_eye_falls`: sets EVIL_EYE_DEFEATED,
+  `give_item levistone`); `enemies.yaml` (evil_eye `bossPhases` only); `quest.yaml` S16 (`entry`, `walk`,
+  `nonLoadBearing`, `status: built`); `debug-scenarios.yaml` (`w_s16_start`, `w_boss_evil_eye`);
+  `assets/backgrounds/ice_cave.webp`.
+- Tests: `tests/quest/fire/fir_d2_ice.test.ts` (9: B1's pockets cut off from the hall, each with its own stair; every
+  B2 pit lands in a pocket and nothing leads back onto one; the B3 stair is out of reach until FIR_D2_SHELF and a way
+  round the cracks reaches it and Hesk; only `fir_d2_shelf` sets the flag; the vault NE at path >= 40; chests 3/4/3,
+  none cuts a way on from any entrance; exit / roster / background / canSave; the levistone only from
+  `fir_evil_eye_falls` (D-W14); S16 (a)-(c) and the closure), helper `tests/quest/fire/icePaths.ts`,
+  `tests/balance/w_fir_d2.test.ts`.
+
+**Design.** B1: the south mouth opens into a hall of six frost-whitened pillars with three branches: north to the
+stair chamber and the cutters' alcove, west up a gully to a frozen waterfall's grotto (a pool, a chest, a snow spur),
+east to a meltwater pool (a chest, a drain). Two pockets (SW, NE) are walled off from the hall; each has a stair down
+to B2's arrival and is reached only from B2's cracks. B2: three bands of sheet ice split by two ridges with necks;
+the direct necks are cracked, and every cracked cell (19) is a one-way transition (the hot spring under the ice throws
+you up a spout) to `pocket_w` (x < 22) or `pocket_e`. The safe route goes by the south ridge's middle neck and the
+north ridge's side necks. The north band ends at the ice shelf: talking to Hesk the ice-cutter plays `fir_d2_shelf`,
+and the patch `fir_d2_shelf` (4 cells, ground `-`, the first patch on a non-world map) opens the stair hall for good.
+Two inspect cells on the shelf ring hollow. B3: the landing (SW), two ways to the vault (NE): the gallery of frozen
+watchers and its upper passage, or the south gut, the sump hall and the rime stair; the mirror pool chamber joins
+both. Touching the floating stone (`fir_d2_stone`, `hideIf: EVIL_EYE_DEFEATED`) starts
+`[evil_eye, ice_gigas, dark_wizard x2]` (`isBoss`, postVictoryCutscene `fir_evil_eye_falls`).
+
+Chests (`CHEST_FIR_D2_*`): B1 hi_potion, ether, cabin (west pocket); B2 phoenix_down, opal_armlet, hi_potion,
+ice_brand (the stair hall); B3 opal_helm, phoenix_down, hi_potion. The opal pieces are B6, one band over (3.6).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | the 3 ice scripts (PYTHONHASHSEED 1), `stubs.py` (`kept 39 real maps`) and `world.py` re-run after the commit: `git diff --exit-code assets-src/maps` clean |
+| G2 | `build_map.py ice-cavern-b1 ice-cavern-b2 ice-cavern-b3` (under the world-compile lock): `40x34`, `44x38`, `40x34 -> assets/maps/ai/...`; `--check-determinism`: all three `deterministic`. No site file changed, so no world compile |
+| G3 | no overworld chunk changed |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 326 passed (326)`, `Tests 7208 passed, 5 skipped (7213)` |
+| G5 | `npm run quest -- --mutate --stage S16`: (a)-(h) OK, `(b) skips: OK (21 withheld runs, 0 reach a later stage, 20 not required)`, `(c) 77724 states`, `(d) bands: OK evil_eye L21.9 [21,24]`, `mutations: OK (4 gate rows; 5 elements, each removal reported)`, `quest-verify: OK`. GT-21 (both canoe cuts) and GT-37 (the ring cut) are now caught: `SKIP S16 evil_eye reachable without canoe`. Full `npm run quest -- --mutate`: `mutations: OK (48 gate rows; 60 elements)`, `quest-verify: OK` |
+| G6, G7 | assetCoverage, fileCeilings, questCeilings pass (in G4); every FIR-D2 file is under 250 lines (the largest, `ice_common.py`, has 97) |
+| G8 | `build_map.py --selftest`: `terrain selftest: 45 checks passed`, `build_map selftest: 104 checks passed` |
+| G9 | `w_fir_d2.test.ts` 3 passed; `check-bounds: OK (15 tests)` |
+| G10 | browser on port 5232 with `mute=1`, my own headless Chromium (Playwright in `/tmp/w-fir-d2/pw`, a field BFS on the real `fieldRules`). `w_s16_start` (Title > Debug): overworld (148, 124) -> canoe down R-ice -> `ice-cavern-b1` (19, 31) -> stair -> B2 (22, 32); the B3 stair had no path before the shelf -> Hesk -> FIR_D2_SHELF set, the shelf drawn open -> B3 (9, 27) -> the stone -> `Evil Eye, Ice Gigas, 2x Dark Wizard` on `ice_cave`, won on the first try by confirm-mashing; it ended with EVIL_EYE_DEFEATED and `levistone:1` (10 battles in all). 0 console errors. Screens: `/tmp/w-fir-d2/s16_start.png`, `s16_b1.png`, `s16_b2.png`, `s16_shelf.png`, `s16_b3.png`, `s16_battle.png`, `s16_end.png` |
+| G12 | designNotes and originality pass (`ice-cavern: branching`); a fresh reviewer gave `originality review: PASS ice-cavern-b1 ice-cavern-b2 ice-cavern-b3` |
+| G13, G14 | `(g) geography: OK s*=0.736 (31 pairs; 0 assumed)`, `(h) travel matrix: OK` (in G5) |
+| G16 | `stubs.py --check fir-d2`: `stubs: 0 left for FIR-D2` |
+| G17 | `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Balance (S16, `[evil_eye, ice_gigas, dark_wizard x2]`, kit `w_s16`, 400 seeds, 3 potions):**
+
+- With the roster's numbers the eye (162 HP, agility 7) dies before it acts: 100 % at L18-L24 for both policies,
+  alone or with any escort tried (mindflayer x2, white_dragon + specter x2, remorazz x2, dark_wizard x3, ice_gigas,
+  white_dragon x2). A phase alone changes nothing, because the eye is the weakest target and falls first.
+- The fix: a `bossPhases` entry at hpThreshold 1.0 (crossed at the first round start), hits 3, attack 100, plus the
+  formation: its warden (ice_gigas) and two rime-seers (dark_wizard, 105 HP), which the sensible policy strikes first.
+  Without the phase the same formation is 100 %.
+- Measured: sensible L20 60.3 %, **L22 80.0 %**, L24 88.8 %; careless L20 77.8 %, L22 90.5 %, L24 97.3 %.
+- Bounds: L22 [70, 90], L20 <= 64, L24 >= 85.
+
+**Originality numbers:**
+
+- Stair graph: `b1>b2 b2>b1 b2>b3 b3>b2`. B1 -> B2 by the stair and both pocket stairs (all to `arrival`); B2 -> B1
+  only by the stair (`down`) and the one-way pits (`pocket_w`, `pocket_e`); B2 <-> B3 by the stair behind the shelf.
+  Branching (twin ways and one-way edges).
+- Dead ends: B1 5, B2 5, B3 5.
+- Boss: NE of the arrival, path 51.
+- Shapes (aspect / fill): B1 1.125 / 0.475, B2 1.235 / 0.419, B3 (40x34) taller than B2 so the two differ
+  (the first B3 at 40x32 matched B2's shape within 5 %, which `originality.test.ts` caught).
+- The reviewer's remarks, all applied: the eye-and-floating-stone claim left the Distinct line (it is the classic's);
+  the Topology line says "pits, the cracked cells" not "two pits"; the pits now throw you *up* (a hot-spring spout)
+  since B1 lies above; the pocket stairs are stairwells down (they had the stairs-up art).
+
+**Deviations and hand-offs:**
+
+- The shelf trigger is Hesk (an NPC with the cutscene), not an inspect cell: inspect cells take text only (as ORD-O
+  found). The inspect cells on the shelf give the hint ("rings hollow") and, once open, a new line.
+- The shelf is a `patches` entry on a dungeon map (wall to floor on FIR_D2_SHELF) instead of a `keyItemGate`, so the
+  wall is drawn and then drawn open. `bake_patches`, `CollisionMap` and the verifier handled it unchanged.
+- The boss fight adds three escorts (the guardian ice_gigas, two dark_wizard): the roster eye can't reach the 3.7 band
+  through `bossPhases` alone.
+- `w_s16_start` and S16's `entry` start at Crescent's gate with the ship at the `fir_crescent` dock and the canoe held,
+  so (b) withholds the canoe. FIRE_CRYSTAL_LIT is not among the scenario's flags (S15 runs in parallel).
+- The NPCs use tinted existing sheets (Brannoc `farmer`, Hesk `old_man`, the stone `chest`); as ORD-O noted, the
+  tint does not show on the 2x field art.
+- I edited no shared files outside my anchors. New local flags: `FIR_D2_SHELF`, `CHEST_FIR_D2_*` (10 chests).
+- Incident: I ran `build_map.py --selftest` inside my own `flock` wrapper on the world-compile lock. The selftest
+  takes the lock itself, so it waited on my wrapper. For about 20 minutes it held up the other tranches' compiles
+  (2 `--region` compiles and another selftest were waiting) until I killed it. `build_map.py` takes the lock for any
+  map, so no outer wrapper is needed.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains `layouts/fire/ice_b{1,2,3}.py` + `ice_common.py` (`ice-cavern-b1..b3`).
+- A map's `materials` remaps apply in order: an entry `from` a material remapped above it reads the recoloured one.
+- A dungeon floor may carry `patches` (a flag-opened wall: B2's shelf); the compiler bakes `patch_<id>.png`.
+- The debug scenarios gain `w_s16_start` and `w_boss_evil_eye`.
 <!-- === end FIR-D2 === -->
 <!-- === ORD-O ORDEAL (pass W: owned by ORD-O) === -->
 ### ORD-O result: the Citadel of Trials and Bahamut (branch `w-ord-o` from `mainline` 62033ba)
@@ -3948,6 +4056,95 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-o/`.
 - Debug scenarios gain `w_s21_start`, `w_s21_neg_nocanoe` and `w_s22_start`.
 <!-- === end WAT-O === -->
 <!-- === WAT-T WATER (pass W: owned by WAT-T) === -->
+### WAT-T result: Onrac, S20 (branch `w-wat-t` from `mainline` a11defa7)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-t/`.
+
+**Files:**
+
+- Layouts (new): `layouts/water/town_onrac.py` (`onrac`, 50x44), `town_onrac_people.py` (every outdoor line, the
+  signpost and bell texts, the gate message), `town_onrac_interiors.py` (the script to run) with `town_onrac_homes.py`
+  (houses `bellringer`, `netmender`, `smoker`, `shipwright`, `healer`, `tanner`; `interiors_common.Town("onrac")`) and
+  `town_onrac_shops.py` (the 5 shops and `onrac-inn`). `town_onrac_site.py`: docstring only (the defaults stand), but
+  the town is no longer a stub, so WAT-O's module now writes the icon's door: the world was regenerated under the lock
+  (`stubs.py`, `world.py`, `build_map.py overworld --region water`).
+- Generated: the 13 `onrac*` sources and compiled maps (`index.yaml` +13), `assets-src/maps/overworld.yaml` and
+  `assets/maps/ai/overworld.yaml` (the door transition (28, 38) -> `onrac` `gate` and its walk cell; no chunk PNG
+  changed). The 5 `sea-shrine-b1..b5` **stubs compiled** (sources untouched, still stubs; `index.yaml` +5) so that the
+  submarine's transition has a compiled target (`crossFileValidation`), as ERT-O did for Melmond and WND-O for Gaia;
+  WAT-D replaces them.
+- Data: `quest.yaml` S20 (`entry`, `walk: [overworld:warp:onrac]`, `status: built`) and town `onrac` `built`;
+  `debug-scenarios.yaml` `w_s20_start`, `w_s24_neg_nooxyale`, `w_wat_t_onrac_lit`; `shops.yaml` unchanged (W1-F/W1-G's
+  `onrac_*`: B6 arms, L6 magic, inn 500).
+- Tests: `tests/quest/water/wat_t_onrac.test.ts` (8: the submarine gate and transition, the three gate outcomes,
+  the doors and exits, the overworld door, EXIT-safety, clinic / inn / shops, hints, reactive) and `wat_t_walk.test.ts`
+  (2).
+
+**Design** (original):
+
+- **The town.** A frosted shelf (a pale `grass` remap) between the northern cliffs and the bay. The land `gate`
+  (23, 2) is in a gap in the cliffs; the gap's mouth (23-24, 0) leads back to `wat_onrac`.
+- **Lanes.** Bell Road runs from the gate down to the quay. Tar Lane (y 13-14) crosses it under the cliffs: the magic
+  shops, the arms, the bell-ringer's and the net-mender's. Salt Row (y 23-24) runs through the middle: the smokehouse,
+  the item shop, the inn. The quay (y 31-32) runs along the shingle: the healer's house (the shrine sign), the tanner's,
+  two shut stores. A west lane joins the three.
+- **Bell Square:** a stone bell tower (an inspect cell: the barnacled bell netted from the sunken city), the well,
+  benches. Between Tar Lane and Salt Row stand two cod racks; in the north yard the tar is boiled among snow firs.
+- **The dry dock** (east): a stone-walled basin (canal water) at the bay's edge, its sea-gate shut, with walkways on three sides and the
+  shipwright's shed at its head. The iron submarine (the `buried_hull` placeholder, `slate`) lies in it. Its gangway
+  plank (38, 27) is a `keyItemGates` cell (`requiredItem: oxyale`, `permanent: false`) and the transition to
+  `sea-shrine-b3` `nave`. The gate's message is the shipwright's, conditional: with the `fairy_bottle` he sends the
+  party to Gaia's spring, otherwise he asks for oxyale. The entrance `dry_dock` (37, 27) is the walkway cell in front.
+- **Two plank piers** run into the bay; a fishing boat is moored at the west one.
+- **People.** 17 outdoor NPCs. The hint NPCs are `onrac_waterfall_hint` (the waterfall, the canoe up the gorge) and
+  `onrac_caravan_hint` (the caravan in the western dunes and its bottle). The oxyale chain is told by the caravan hint,
+  `onrac_fairy_lore` (fairies of Gaia's spring breathe oxyale), the shipwright and his daughter (who reacts to
+  FAIRY_FREED), and `onrac_mermaid_tale` (the sea-folk of the shrine's upper halls, WAT-D's B1). Lines change on
+  WATER_CRYSTAL_LIT (most people), `item:oxyale`, FAIRY_FREED and CUBE_GIVEN.
+- **Clinic:** `onrac_healer` (`action: clinic`, 90 G per level, B6). The inn keeper has `action: inn`. Two chests:
+  `CHEST_WAT_T_NETMENDER` (Phoenix Down) and `CHEST_WAT_T_TANNER` (Ether).
+- No cutscene: the submarine is a plain gated transition, so the `cutscenes.yaml` anchor stays empty.
+
+**Town standard (G15):** `onrac: houses 13/8 interiors 6/6 outdoor 17/14 interior 15/12 hints 2/2 reactive 26/4
+shops 5/5 inn 500/500 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| 5.4 done-when | checkpoints S20 and `w_s24_neg_nooxyale` pass (G10 below) |
+| G1 | `town_onrac.py`, `town_onrac_interiors.py`, `stubs.py`, `world.py`, then `git diff --exit-code assets-src/maps` (after the commit): clean, exit 0 |
+| G2 | `build_map.py` on the 13 `onrac*` ids: each `<id>: WxH -> ...`; `--check-determinism` on the 13: all `deterministic`. The site file changed, so also `build_map.py overworld --region water` (under the lock) and `--check-determinism --region water overworld`: `overworld: deterministic` |
+| G3 | `world.py --owned-chunks water`, then the merge-base diff of `assets/maps/ai/overworld/` filtered by it: no output (no chunk PNG changed: the door is collision and data only) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 328 passed (328)`, `Tests 7388 passed, 3 skipped` |
+| G5 | `npm run quest -- --mutate --stage S20`: (a) OK S20; (b) OK (24 withheld runs); (c) OK (102936 states); (d) `S20 L25.1 [25,28]`; (e) OK (5 towns, 3 pending); (f)-(h) OK; `mutations: OK (0 gate rows)`; `quest-verify: OK`. The full `npm run quest -- --mutate`: `quest-verify: OK` (47 gate rows, 59 elements; (b) OK, so WAT-O's open `SKIP S21 ... without S20` is gone) |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings` passed; every new script is at most 212 lines |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G9 | no balance file (S20 has no boss) |
+| G10 browser (port 5235, `mute=1`, own headless Chromium via `/tmp/w-wat-t/drive.cjs`; the server is stopped) | `w_s20_start`: overworld (28, 39), one step north onto the icon door: map `onrac` at the gate (23, 2), then down Bell Road to Bell Square; 0 console errors (`/tmp/w-wat-t/s20_meadow.png`, `s20_onrac_gate.png`, `s20_square.png`). `w_s24_neg_nooxyale`: `onrac` (37, 27), step east onto the gangway: the shipwright's line ("The shipwright bars the gangway ..."), the party stays at (37, 27), map `onrac`; 0 errors (`s24neg_drydock.png`, `s24neg_message.png`). `w_wat_t_onrac_lit`: the square's people speak their lit / cube lines; 0 errors (`lit_waterfall_hint.png`, `lit_fairy_lore.png`) |
+| G11 | `git status --porcelain` shows only WAT-T's paths (plus the compiled sea-shrine stubs, see Deviations); no scratch files |
+| G12 | `designNotes` and `originality` passed. A fresh reviewer took two rounds: the first failed 4 maps on design-note claims that did not match them (the basin "open to the bay", the armour shop's crates, the bell-ringer's tapestry, the healer's cots and carpet); the notes, a dock hand's line and a few props were fixed. Final: `originality review: PASS onrac onrac-armor-shop onrac-black-magic onrac-house-bellringer onrac-house-healer onrac-house-netmender onrac-house-shipwright onrac-house-smoker onrac-house-tanner onrac-inn onrac-item-shop onrac-weapon-shop onrac-white-magic` |
+| G13 | `macroGeography` passed; `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)` |
+| G14 | `travelMatrix` passed; `(h) travel matrix: OK  (12 rows, 2 basin rows; 10 checked, 4 pending)` |
+| G15 | the row above |
+| G16 | `stubs.py --check wat-t`: `stubs: 0 left for WAT-T`, exit 0 |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+
+**Deviations / hand-offs:**
+
+- The compiled `sea-shrine-b1..b5` stubs are WAT-D's ids (compiled output only; see Files).
+- `npm run quest -- --mutate --stage S24` (WAT-D's stage, pending, no `entry` yet) prints `SHOPLESS onrac` and
+  `SHOPLESS lufenia` in (e): with no entry the stage's start strands the party away from both airship-only towns.
+  GT-27 (the submarine's `requiredItem: oxyale`) is caught there (`mutations: OK (1 gate rows)`). WAT-D's S24 `entry`
+  (the airship beside Onrac, as S20's) should clear the SHOPLESS lines.
+- The bell tower and the submarine are code-drawn placeholders (`tower`, `buried_hull`; 0 paid images, open
+  question 5).
+- `w_s20_start` uses the base classes (S19 is optional); `w_s24_neg_nooxyale` the upgraded B7 party at L27.
+
+**AGENTS.md delta (for INT):** add `layouts/water/town_onrac.py` (`onrac`) and `layouts/water/town_onrac_interiors.py`
+(with `_homes.py` and `_shops.py`: `onrac-house-*`, the shops and the inn) to the map table; note the submarine gate
+(`onrac` (38, 27), `keyItemGates` oxyale, -> `sea-shrine-b3` `nave`); add the debug scenarios `w_s20_start`,
+`w_s24_neg_nooxyale` and `w_wat_t_onrac_lit`.
 <!-- === end WAT-T === -->
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
 <!-- === end WAT-D === -->
