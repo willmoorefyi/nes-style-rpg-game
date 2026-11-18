@@ -1,0 +1,158 @@
+sprite: piscodemon
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+# V8 redesign (R323, docs/REDESIGN_FIX_PLAN.md F2): a squat deep-sea horror, a dark ridged mantle head with two
+# slanted yellow-orange eyes, six face tentacles. idle: hunched, the tentacles hanging, the near claw held in front;
+# attack: a low lunge, the head pushed out, the tentacles fanned toward the heroes, the far leg stretched back; hurt:
+# the head thrown back, the tentacles spread and curling, a claw up. The keys are far apart, so every in-between is a
+# translation-only copy of its key (moves: []), head + tentacles and the near claw arm moved as rigid groups, feet
+# pinned (structure of the archived piscodemon_v2 rig).
+keyframes:
+  idle:
+    crown: [45, 5]
+    neck: [46, 24]
+    chest: [38, 36]
+    hip: [40, 50]
+    sh_n: [42, 32]
+    el_n: [52, 40]
+    hand_n: [61, 40]
+    sh_f: [30, 24]
+    el_f: [24, 32]
+    hand_f: [25, 40]
+    hip_n: [46, 52]
+    knee_n: [48, 60]
+    foot_n: [50, 70]
+    toe_n: [58, 72]
+    hip_f: [34, 52]
+    knee_f: [27, 60]
+    foot_f: [21, 71]
+    toe_f: [16, 74]
+  attack:
+    crown: [51, 12]
+    neck: [53, 31]
+    chest: [40, 40]
+    hip: [38, 52]
+    sh_n: [46, 38]
+    el_n: [56, 44]
+    hand_n: [65, 46]
+    sh_f: [33, 30]
+    el_f: [27, 40]
+    hand_f: [22, 47]
+    hip_n: [44, 56]
+    knee_n: [42, 63]
+    foot_n: [42, 71]
+    toe_n: [50, 72]
+    hip_f: [30, 55]
+    knee_f: [18, 62]
+    foot_f: [8, 71]
+    toe_f: [4, 74]
+  hurt:
+    crown: [32, 4]
+    neck: [36, 22]
+    chest: [36, 35]
+    hip: [40, 49]
+    sh_n: [44, 28]
+    el_n: [50, 22]
+    hand_n: [52, 10]
+    sh_f: [28, 26]
+    el_f: [18, 28]
+    hand_f: [14, 18]
+    hip_n: [46, 52]
+    knee_n: [50, 61]
+    foot_n: [52, 69]
+    toe_n: [58, 71]
+    hip_f: [34, 52]
+    knee_f: [30, 62]
+    foot_f: [30, 72]
+    toe_f: [27, 74]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  kneel_in1:
+    tweaks: {foot_f: [0, 1], toe_f: [0, 1]}
+  kneel_in2:
+    tweaks: {knee_f: [0, 1], toe_f: [0, 1]}
+  atk_wind1:                   # half of wind2: head and tentacles drawn back and up 1, the claw pulled in 2, body sinks 1
+    moves: []
+    dy: 1
+    tweaks: {crown: [-1, -1], neck: [-1, -1], sh_n: [-1, 0], el_n: [-2, 0], hand_n: [-2, 0]}
+  atk_wind2:                   # coil: head back 2 and up 2, the claw pulled back 4 (translated, crisp), body down 1
+    moves: []
+    dy: 1
+    tweaks: {crown: [-2, -2], neck: [-2, -2], sh_n: [-2, 0], el_n: [-4, 0], hand_n: [-4, 0]}
+  atk_mid:                     # the attack key, head and claw 5 px back toward the coil, the far foot 2 px toward idle
+    t: 0.15
+    moves: []
+    tweaks: {crown: [-5, -1], neck: [-5, -1], sh_n: [-3, 0], el_n: [-5, 0], hand_n: [-5, 0],
+             knee_f: [2, 0], foot_f: [2, 0], toe_f: [2, 0]}
+  atk_follow:                  # settle: head, tentacles and claw ease 2 px back from contact
+    t: 0.80
+    moves: []
+    tweaks: {crown: [-2, 0], neck: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0]}
+  atk_recover:                 # the idle key, head and claw still 1 px forward
+    moves: []
+    tweaks: {crown: [1, 0], neck: [1, 0], sh_n: [0, 0], el_n: [1, 0], hand_n: [1, 0]}
+  hurt_in1:                    # flinch: head and tentacles knocked back 4, the claw jerks up 4
+    moves: []
+    tweaks: {crown: [-4, -1], neck: [-4, -1], sh_n: [-1, -2], el_n: [-1, -3], hand_n: [-1, -4]}
+  hurt_in2:                    # the hurt key, head, tentacles and raised far arm eased 3 back toward the idle
+    moves: []
+    tweaks: {crown: [3, 0], neck: [3, 0], sh_f: [3, 0], el_f: [3, 0], hand_f: [3, 0], sh_n: [1, 1], el_n: [1, 1], hand_n: [1, 1]}
+  daze:                        # head droops 1, the claw hangs 1 lower (translated, crisp claw)
+    moves: []
+    dy: 1
+    tweaks: {crown: [0, 1], neck: [0, 1], el_n: [0, 1], hand_n: [0, 1]}
+  daze_b:
+    moves: []
+    dy: 2
+    tweaks: {crown: [0, 0], neck: [0, 0], el_n: [0, 1], hand_n: [0, 1]}
+masks:
+  head:                        # mantle plus the six face tentacles
+    idle: [[31, 3], [60, 3], [60, 33], [57, 33], [57, 48], [40, 48], [38, 30], [31, 24]]
+    attack: [[37, 10], [66, 10], [66, 30], [81, 30], [81, 60], [56, 60], [54, 40], [46, 34], [37, 27]]
+    hurt: [[18, 2], [45, 2], [45, 21], [58, 21], [58, 9], [68, 9], [68, 34], [46, 34], [40, 30], [28, 25], [18, 23]]
+  ft_n:
+    idle: [[44, 68], [64, 68], [64, 78], [44, 78]]
+    attack: [[35, 69], [56, 69], [56, 78], [35, 78]]
+    hurt: [[43, 66], [62, 66], [62, 78], [43, 78]]
+  ft_f:
+    idle: [[12, 69], [30, 69], [30, 78], [12, 78]]
+    attack: [[1, 69], [15, 69], [15, 78], [1, 78]]
+    hurt: [[22, 70], [40, 70], [40, 78], [22, 78]]
+holds: []
+paint:
+  # pass K (K2-B): kneel frames: the eye glow dimmed in steps (kneel_in1, kneel_in2, then the key), cracks and pockets closed in the body colour, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[54, 27], [55, 26]], rgb: [66, 82, 82]}
+  - {frame: kneel_in1, xy: [[27, 39], [50, 52]], rgb: [33, 41, 57]}
+  - {frame: kneel_in1, xy: [[56, 39], [56, 40], [56, 41]], rgb: [66, 99, 99]}
+  - {frame: kneel_in1, xy: [[57, 39], [56, 42], [56, 43], [55, 44], [56, 45], [56, 46]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[27, 40]], rgb: [66, 82, 82]}
+  - {frame: kneel_in1, xy: [[57, 41], [57, 42], [55, 43], [26, 70]], rgb: [99, 140, 132]}
+  - {frame: kneel_in1, xy: [[55, 45]], rgb: [24, 24, 49]}
+  - {frame: kneel_in1, xy: [[24, 47], [47, 53], [49, 53], [50, 53]], rgb: [41, 66, 74]}
+  - {frame: kneel_in2, xy: [[47, 30], [48, 30], [53, 31], [54, 31]], rgb: [66, 82, 82]}
+  - {frame: kneel_in2, xy: [[53, 49]], rgb: [66, 99, 99]}
+  - {frame: kneel_in2, xy: [[43, 53], [24, 61]], rgb: [99, 140, 132]}
+  - {frame: kneel_in2, xy: [[48, 53]], rgb: [66, 82, 82]}
+  - {frame: kneel_in2, xy: [[54, 55], [35, 62], [36, 62], [35, 63], [35, 64]], rgb: [41, 66, 74]}
+  - {frame: kneel_in2, xy: [[26, 58], [49, 61]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[36, 63]], rgb: [33, 41, 57]}
+  - {frame: kneel_in2, xy: [[15, 76], [17, 76], [20, 76], [22, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[45, 64], [44, 65], [45, 65], [44, 67]], rgb: [6, 4, 10]}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); head bowed, tentacles hanging; the eyes dim in steps to the kneel
+kneel:
+  variant: [knee_forward, short_legs]
+  tweaks: {knee_f: [14, 2], foot_f: [14, 1], toe_f: [14, 0], sh_n: [0, 2], sh_f: [0, 2]}
+  paint:
+    - {xy: [[16, 75]], rgb: [6, 4, 10]}
+    - {xy: [[41, 55]], rgb: [6, 4, 10]}
+    - {xy: [[46, 55], [46, 56], [46, 57], [47, 57]], rgb: [66, 82, 82]}
+    - {xy: [[41, 56]], rgb: [41, 66, 74]}
+    - {xy: [[45, 57]], rgb: [99, 140, 132]}
+    - {xy: [[18, 74], [17, 73], [31, 73], [33, 73], [20, 72], [34, 72], [35, 72], [56, 72]], rgb: [6, 4, 10]}
+    - {xy: [[45, 33], [46, 34], [47, 34], [52, 36], [53, 36]], rgb: [66, 82, 82]}
