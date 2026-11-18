@@ -142,7 +142,8 @@ def _scaled(rgb: np.ndarray, m: np.ndarray, s: float, key) -> tuple[np.ndarray, 
     return r2, m2
 
 
-def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | None = None) -> dict:
+def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | None = None, fit: bool = False,
+        crop_ok: bool = False) -> dict:
     """{key: native RGBA, raw: block-averaged raw RGBA (A-pal / A-grey), info}; CutFail on a window-edge touch.
     Arm g (rev 7 section 2): a non-square raw fails (J0 size); the J0 pitch is measured and only aligns the window's
     phase; the scale comes from the figure against the silhouette height `sil_h` (kneel_ai_pitch)."""
@@ -161,7 +162,17 @@ def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | Non
     if not m.any():
         raise CutFail("empty figure (nothing but the key)")
     if m[0].any() or m[-1].any() or m[:, 0].any() or m[:, -1].any():
-        raise CutFail("figure touches the canvas edge (cropped by the model)")
+        if not crop_ok:
+            raise CutFail("figure touches the canvas edge (cropped by the model)")
+        # batch review (user 2026-11-17): a few cropped pixels are not worth a paid regeneration; pad by whole
+        # grid cells with the key colour (the pitch phase is kept) and record it for the review
+        pp = 2 * k
+        big0 = np.zeros((rgb.shape[0] + 2 * pp, rgb.shape[1] + 2 * pp, 3), np.uint8)
+        big0[:] = key
+        big0[pp:pp + rgb.shape[0], pp:pp + rgb.shape[1]] = rgb
+        m0 = np.zeros(big0.shape[:2], bool)
+        m0[pp:pp + m.shape[0], pp:pp + m.shape[1]] = m
+        rgb, m = big0, m0
     (w, h), lo, hi = sp.cell, *sp.band_px
     ys, xs = np.nonzero(m)
     Hc, Wc = ys.max() - ys.min() + 1, xs.max() - xs.min() + 1
@@ -184,6 +195,19 @@ def cut(raw: Image.Image, sp: D.Sprite, k: int, arm: str = "b", sil_h: int | Non
     if target is not None and abs(round(n) - target) <= HEIGHT_FIX:
         s *= target / n
     info["s"] = round(s, 5)
+    rgb0, m0 = rgb, m
+    for fit_try in range(12 if fit else 1):
+        try:
+            return _place(rgb0, m0, s, key, sp, k, w, h, arm, pm, info)
+        except CutFail:
+            if not fit or fit_try == 11:
+                raise
+            s *= 0.95                            # resize, never regenerate (user rule): shrink until it fits
+            info["fit_scale"] = round(s, 5)
+
+
+def _place(rgb, m, s, key, sp, k, w, h, arm, pm, info) -> dict:
+    from gen import kneel_ai_pitch as PT
     rgb, m = _scaled(rgb, m, s, key)
     pad = max(k * w, k * h)
     big = np.zeros((rgb.shape[0] + 2 * pad, rgb.shape[1] + 2 * pad, 3), np.uint8)

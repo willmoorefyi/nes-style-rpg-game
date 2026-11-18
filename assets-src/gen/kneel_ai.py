@@ -87,7 +87,8 @@ def cmd_cut(a) -> int:
     from gen import kneel_ai_pitch as PT
     t, rec = _tag(a), {"arm": a.arm, "seed": a.seed, "try": a.n_try}
     try:
-        r = C.cut(Image.open(d / f"raw_{t}.png"), sp, g["window"]["k"], a.arm, PT.sil_height(d))
+        r = C.cut(Image.open(d / f"raw_{t}.png"), sp, g["window"]["k"], a.arm, PT.sil_height(d), fit=a.fit,
+                  crop_ok=a.crop_ok)
     except C.CutFail as e:
         (d / f"cut_{t}.json").write_text(json.dumps({**rec, "fail": str(e)}, indent=1) + "\n")
         print(f"{a.id} ({t}): CUT FAIL {e}")
@@ -221,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
     gen.add_argument("--compact", action="store_true", help="the 5b compact wording (try 2 after an A-width fail)")
     gen.add_argument("--paid", action="store_true")
     sub.choices["gate"].add_argument("--j1", action="store_true")
+    sub.choices["cut"].add_argument("--fit", action="store_true", help="shrink until the figure fits the window")
+    sub.choices["cut"].add_argument("--crop-ok", action="store_true", help="pad a figure the model cropped")
     sub.choices["approve"].add_argument("--user-review", metavar="NOTE",
                                         help="approve on the user's sheet review despite a J0 FAIL (KA-G pilot "
                                              "ruling 2026-11-17: J0 is advisory); NOTE is recorded in the json")

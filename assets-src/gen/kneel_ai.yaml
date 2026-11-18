@@ -94,6 +94,11 @@ sprites:
     fill: 0.94
     heads: [head]
     weapons: []
+    g_lines:
+      2:
+        extra: >-
+          The dinosaur must clearly collapse: belly flat on the ground, both legs folded under the body, small arms tucked in, tail lying flat along the ground, head lowered to rest on the ground in front of it, eyes half closed. It must look much lower than image 1, not just crouched.
+        avoid: standing, crouching on its legs, head raised
   anaconda:
     fill: 0.82
     heads: [head]
@@ -229,6 +234,11 @@ sprites:
     fill: 0.68
     heads: [head]
     weapons: []
+    g_lines:
+      2:
+        extra: >-
+          The dragon must clearly collapse: lying on its belly on the ground, all four legs folded under it, wings folded tight against the back, the long neck lowered so the head rests on the ground in front of the chest, eyes half closed. It must look much lower and wider than image 1, not standing or rearing.
+        avoid: standing upright, rearing, sitting up, wings spread, head raised
   dragon_zombie:
     fill: 0.875
     heads: [head]
@@ -605,6 +615,11 @@ sprites:
     fill: 0.776
     heads: [head]
     weapons: []
+    g_lines:
+      2:
+        extra: >-
+          The machine must clearly power down: both legs folded so its body sinks to the ground, kneeling low, the torso tipped forward, the cannon arm lowered with its barrel resting on the ground, lights dimmed. It must look much lower than image 1, not standing.
+        avoid: standing on straight legs, cannon raised level
   warrior:
     fill: 0.6
     heads: [head]
