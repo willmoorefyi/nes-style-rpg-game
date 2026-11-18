@@ -15,6 +15,9 @@ Severity: P0 blocks progress or crashes; P1 serious, wrong-side or unfair; P2 no
 
 | P3-03 | P3 | S28 | `sky-castle-4f`, zone `wnd_d2_engine`, formation `warmech` + `air_elemental` (weight 1 in 64) | Forced from the console on `w_s28_start` (`ex.battleTrigger.triggerBattle(['warmech','air_elemental'])`, three times, party L31 in the stage kit, plain Fight mashing) | A rare superboss: its text says "Few who meet it walk away"; expect real danger or a wipe risk | Won 3 of 3 in 24-35 s (59-84 presses) with no hero KO'd (worst: KNGT 299/522, WWIZ 57/240). Soft for a "rare, deadly" formation and a player who meets it at weight 1 in 64 will not feel it. Also it pays `goldReward` 32000. | `warmech_battle.png` (art is fine) |
 
+| P3-04 | P2 | S30 | `past-temple-1..5`, the four refights and Death Eye | `w_s30_start` (L34 party, stage kit), walk the five floors, talk to each boss, plain Fight mashing, no item used | each refight is a boss in band 34-41 with real pressure | All five fights won. Floor 1 (Rime Sovereign II + 2 death knights) cost almost nothing: KNGT 570 -> 562, nobody else hurt (so the first boss of the endgame is a pushover). Floor 2 (Ashen Queen II + rhyos): KNGT down to 250/570. Floor 4 (Seraph II): WWIZ KO'd, KNGT 179/570. Floor 5 (Death Eye + iron golem) started with KNGT 179/570 and WWIZ KO'd, with no healing in between, and was still won, ending KNGT 161/570. Potions 10, hi-potions 11, ether 7 and phoenix down 6 were never touched. The floors are meant to be a gauntlet but the party can carry a half-dead state through all of them; floor 1 and 5 in particular do not threaten a mashing party at L34. | `/tmp/w-play3/s30.log` (re-run `j_s30.js`-style walk to confirm), `s30_past-temple-*_after.png` |
+| P3-05 | P3 | S30 | `past-temple-2` chests `chest_cross_east`, `chest_cross_east_vestibule` | arrive from the arrival stair (the `arrival` cell) and try to reach the east chests | an east arm the player can find | They are in a closed 92-cell side room whose only exit is floor 1's east stair (39-40, 16 on floor 2, from floor 1 (24-25, 4)); not reachable from the main hub at all. That is by design in the brief ("one open per visit"), but nothing on floor 1 or 2 points the player to the second stair, so the two chests are easy to miss. Reachability itself is fine (checked from the `east` entrance). | reachability dump |
+
 No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading the generated map YAML and
 `cutscenes.yaml`) of S26-S31 found nothing wrong; it still needs the live pass below.
 
@@ -60,6 +63,14 @@ No P0/P1/P2 found yet in S23-S25 or the Sea Shrine. Data-only review (reading th
   up and both exits to 1F are reachable (no trap). Note for fix agents: a path that treats a belt cell as plain floor
   loops (my first bot looped for 10 minutes); a player has to learn which belt leads where. No in-game hint says so
   (the 2F maps has no sign or NPC). This is not a defect by itself but the archivist/steward text could hint.
+- S29 `w_s29_start`: overworld -> `temple-of-fiends` (11, 20); the ring cell (3, 4) is walkable; talking up to the hour
+  keeper at (3, 3) plays `pst_time_gate` (lute + four crystals), TIME_GATE_OPEN set, warp to the `time_gate` arrival
+  (3, 5); stepping north goes down to `past-temple-1` (19, 37). No console errors.
+- S30 floors: every floor's chests give their items, floor 2's two wards work in order (hub, then west; the west door
+  and the north door stay shut until their ward is lifted, with a clear gate message), each boss is a talk-to
+  scripted fight with a message and a post-victory cutscene, each stair opens only after its PAST_* flag, floors
+  1-5 reach `past-chaos`. Boss text is original and consistent (Rime Sovereign, Ashen Queen, Drowned Sovereign,
+  Hollow Seraph and Death Eye lines all fit the earlier encounters).
 - Data check: S31 Smyth (`dwarf-hall`, `ert_smyth`): dialog and cutscene `ert_smyth_forge` are gated on WIND_CRYSTAL_LIT
   in the version I tested (the fix agent is changing this; behaviour noted only). Chest `adamant` is on `sky-castle-3f`
   (4, 26).
