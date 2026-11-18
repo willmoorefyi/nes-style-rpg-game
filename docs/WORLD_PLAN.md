@@ -677,13 +677,15 @@ towns:
 | Town id | Owner | `opensAfter` | `bandStage` | Band | Early-access control |
 |---|---|---|---|---|---|
 | `pravoka` | A1-T | S1 | S2 | B2 | none (it opens at its band) |
-| `elfheim` | ELF-T | S2 | S4 | B3 | none |
+| `elfheim` | ELF-T | S2 | S6 | B3 | none |
 | `dwarf` | ERT-O | S2 | S10 | B3 (item shop only) | walkable from Elfland; its stock is the B3 item list |
 | `melmond` | ERT-T | S10 | S11 | B4 | none |
 | `crescent` | FIR-T | S10 | S14 | B5 | price wall, proof (f) |
 | `onrac` | WAT-T | S17 | S20 | B6 | none (it opens at its band) |
 | `gaia` | WND-T | S17 | S23 | B7 | price wall, proof (f) |
 | `lufenia` | WND-O | S25 | S26 | B8 | its keepers are shown only with LUFENIAN_LEARNED (`showIf`), so proof (e) sees them at S25 |
+
+Elfheim's `bandStage` is S6, not S4 (user ruling 2026-11-17, INT-W2c). B3 serves S4-S10, and the party buys its gear across several stages, so the 50 % gold rule of (d) is measured at S6's start (the Western Keep).
 
 ### 3.6 Level, gear and magic bands (replaces QUEST 6.1)
 

@@ -88,10 +88,10 @@ describe('questLate: each proof passes clean and fails on its RED variant', () =
   });
 
   it('(d) RED grind: a stage cannot declare its way into its band (the schema refuses it too)', () => {
-    expect(() => ctxOf((i) => { stage(i, 'S2').grind = 4; })).toThrow(/grind: expected 1.0-3.0/);
+    expect(() => ctxOf((i) => { stage(i, 'S2').grind = 8; })).toThrow(/grind: expected 1.0-7.0/);
     const ctx = ctxOf();
-    ctx.world.stages.get('S2')!.grind = 4;
-    expect(msgs(proofBands(ctx))).toEqual(['BAND S2 grind 4 outside [1.0, 3.0]']);
+    ctx.world.stages.get('S2')!.grind = 8;
+    expect(msgs(proofBands(ctx))).toEqual(['BAND S2 grind 8 outside [1.0, 7.0]']);
   });
 
   it('(d) RED gold: the outpost\'s band stage starts below half its kit\'s price', () => {

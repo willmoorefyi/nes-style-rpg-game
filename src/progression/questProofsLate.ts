@@ -2,7 +2,7 @@
  * W1-I's proofs (d)-(h) on the core context (docs/WORLD_PLAN.md 6.0; docs/QUEST_PLAN.md 5.2), loaded by the CLI
  * (`LateProofModule`, questReport.ts):
  * (d) bands: the curve model's level at each built stage's boss (or end) is inside its band, each `grind` is in
- *     [1.0, 3.0], the cumulative gold at each built town's `bandStage` start is at least 50 % of its kit's 4-member
+ *     [1.0, 7.0] (raised from 3.0 by the user, 2026-11-17, INT-W2c), the cumulative gold at each built town's `bandStage` start is at least 50 % of its kit's 4-member
  *     price, and (d3) each `takeGold` price is at most 80 % of the gold at its stage's start;
  * (e) early shops and (f) price walls (questShops.ts); (g) geography (questGeo.ts); (h) the travel matrix
  * (questTravel.ts).
@@ -15,7 +15,7 @@ import { BAND_GOLD_SHARE, proofEarlyShops, proofPriceWalls, townBuilt } from './
 import { proofGeo } from './questGeo.js';
 import { proofTravel } from './questTravel.js';
 
-export const GRIND_RANGE: readonly [number, number] = [1.0, 3.0];
+export const GRIND_RANGE: readonly [number, number] = [1.0, 7.0];
 export const TAKE_GOLD_SHARE = 0.8;
 
 export function proofBands(ctx: QuestContext): ProofResult {
