@@ -124,3 +124,12 @@ paint:                         # 1 px cracks (far thigh under the belly, near ar
   - {frame: atk_wind1, xy: [[90, 102]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[90, 102]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[90, 102]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  bridge: {keep_top: 0.35, keep_bot: 0.35, u: [0.35, 0.25]}   # the 87 -> 40 px drop: a narrower middle band keeps in1's
+                                 # outline; it2: u2 0.25, in2 stretched less (it1 T3: the face drawn out into a snout).
+                                 # LIMIT HIT (KNEEL_TWEEN_PLAN 12, KT2-E): it2 FAIL T2 (in2 bloats), it3 (keep_top 0.45)
+                                 # FAIL T1-T3; it2 is the best iteration and is locked. A lower u2 breaks the in1 -> in2
+                                 # centroid-step gate (15.0-16.9 > 14.3): the standing idle vs the lying key
