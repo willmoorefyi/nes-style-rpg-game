@@ -3160,6 +3160,9 @@ encounterZones:
   name: Waterfall River
   modes: [canoe]
   rects:
+  - [29, 4, 33, 4]
+  - [28, 5, 34, 5]
+  - [29, 6, 32, 6]
   - [28, 11, 32, 11]
   - [31, 12, 32, 12]
   - [31, 13, 32, 13]
@@ -3169,7 +3172,9 @@ encounterZones:
   - [31, 17, 32, 17]
   - [31, 18, 32, 18]
   - [31, 19, 32, 19]
+  - [20, 20, 22, 20]
   - [31, 20, 32, 20]
+  - [20, 21, 22, 21]
   - [31, 21, 32, 21]
   - [31, 22, 32, 22]
   - [31, 23, 32, 23]
@@ -3615,6 +3620,18 @@ encounterZones:
     - {id: chimera, min: 1, max: 1}
     - {id: medusa, min: 1, max: 3}
     weight: 2
+- id: wnd_tarns
+  name: Highland Tarns
+  modes: [canoe]
+  rects:
+  - [155, 10, 157, 10]
+  encounters:
+  - groups:
+    - {id: red_piranha, min: 2, max: 4}
+    weight: 4
+  - groups:
+    - {id: crocodile, min: 1, max: 2}
+    weight: 3
 - id: wnd_sea
   name: North Seas
   modes: [ship]
@@ -3893,6 +3910,7 @@ battleBackgrounds:
       terrain: {forest: forest}
     wnd_lufen_moor:
       terrain: {swamp: marsh, forest: forest}
+    wnd_tarns: {default: river}
     wnd_sea: {default: ocean}
 regions:
   a1:

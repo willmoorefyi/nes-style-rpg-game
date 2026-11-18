@@ -3,7 +3,8 @@
 Four zones, region-prefixed, the first that holds a cell wins (the runtime skips a zone whose `modes` exclude the
 party's mode):
 
-- `wat_streams` (canoe; S21: red_piranha, crocodile): the R-waterfall river and the ledge behind the falls;
+- `wat_streams` (canoe; S21: red_piranha, crocodile): the R-waterfall river, its two tarns and the ledge behind the
+  falls (a canoe-reachable Lake cell must not fall through to the act-1 table, FX-C P2-01);
 - `wat_dunes` (S22: sand_worm, desert_baretta, manticore): the dune field, its oasis and the caravan's track;
 - `wat_isles` (S20 land: nightmare, weretiger): every other walkable cell of the box, the ledge and the falls'
   door included;
@@ -91,9 +92,10 @@ def zones(g: Grid) -> list[dict]:
     walk = {(x, y) for y in range(H) for x in range(W) if g[x, y] in WALK}
     dunes = {(x, y) for x, y in walk if dune_mask[y][x] or oasis[y][x]} | set(TRACK)
     coast = (walk - dunes) | {(FALLS[0], FALLS[1] + 2)} | set(LEDGE)    # the cave door is walked onto
+    lakes = {(x, y) for y in range(H) for x in range(W) if g[x, y] == "≈"}    # the spill tarn and the upland tarn
     sea = {(x, y) for y in range(H) for x in range(W) if g[x, y] == "o"}
     out = [
-        {"id": "wat_streams", "name": "Waterfall River", "modes": ["canoe"], "rects": row_rects(river | set(LEDGE)),
+        {"id": "wat_streams", "name": "Waterfall River", "modes": ["canoe"], "rects": row_rects(river | lakes | set(LEDGE)),
          "encounters": STREAMS},
         {"id": "wat_dunes", "name": "Caravan Dunes", "rects": row_rects(dunes), "encounters": DUNE_TABLE},
         {"id": "wat_isles", "name": "Onrac Coast", "rects": row_rects(coast), "encounters": COAST_TABLE},
