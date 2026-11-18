@@ -101,3 +101,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `minotaur_zombie_kneel_v1` | `minotaur_zombie` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `ogre_kneel_v1` | `ogre` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `ogre_chief_kneel_v1` | `ogre_chief` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `ogre_mage_kneel_v1` | `ogre_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
