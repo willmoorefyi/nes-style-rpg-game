@@ -116,8 +116,7 @@ describe('bestiary model: stats', () => {
     expect(lines.length).toBeLessThanOrEqual(STAT_LINES);
     const text = lines.map((l) => l.left).join('\n');
     expect(text).toContain('Spells     ICE2, SLP2, FAST, LIT2, HOLD, FIR2, SLOW,');
-    expect(cellOf(lich, 'At 50% HP')).toBe('"The Rime Sovereign\'s skull fractures!"');
-    expect(cellOf(lich, 'Habitat')).toBe('Not placed yet');
+    expect(cellOf(lich, 'At 99% HP')).toBe('Fight x4 Attack 90 "His skull fractures!"');   // ERT-D's phase (WORLD 3.7)
   });
 
   it('merges the legacy fields and elementalProfile without duplicates; an unlabelled element shows its id once warned', () => {

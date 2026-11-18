@@ -62,7 +62,7 @@ describe('roster stats: the pre-roster entries (D4)', () => {
   it('display names follow the spec: Goblin Guard, Warg Wolf, Red Dragon, Rime Sovereign', () => {
     const name = (id: string): string | undefined => enemies.find((e) => e.id === id)?.name;
     expect([name('gr_imp'), name('gr_wolf'), name('dragon'), name('lich')]).toEqual(['Goblin Guard', 'Warg Wolf', 'Red Dragon', 'Rime Sovereign']);
-    expect(enemies.find((e) => e.id === 'lich')?.bossPhases?.[0].message).toBe("The Rime Sovereign's skull fractures!");
+    expect(enemies.find((e) => e.id === 'lich')?.bossPhases?.[0].message).toBe('His skull fractures!');   // ERT-D's phase (WORLD 3.7)
   });
 
   it('protections from the spec: skeleton, mummy and the lich status/poison_stone/death; vampire also earth', () => {

@@ -254,12 +254,12 @@
   weakness: fire
   resist: dark
   family: undead
-  # ERT-D (WORLD 3.7): he fights with three mummies from his crypt (cavern-earth-b3) and his gaze is up from the first
-  # round (threshold 1): 4 hits at attack 90, measured in tests/balance/w_ert_d.test.ts
+  # ERT-D (WORLD 3.7): he fights with three mummies from his crypt (cavern-earth-b3), and from the first round
+  # (threshold 1) he strikes 4 times at attack 90, measured in tests/balance/w_ert_d.test.ts
   bossPhases:
   - hpThreshold: 1
     patternId: aggressive
-    message: The Vampire's eyes burn red, and his thralls lurch out of their niches!
+    message: His eyes burn red!
     hits: 4
     attack: 90
 # === end ERT-D vampire ===
@@ -357,17 +357,14 @@
   pulseTint: "#ffdcdc" # lighter than the default #ffb0b0: the pale lich turned muddy under it (final play test)
   weakness: fire
   resist: ice
-  # ERT-D (WORLD 3.7): he fights with two earth elementals bound to his throne (cavern-earth-b5); his frost blade is up
-  # from the first round (threshold 1): 3 hits at attack 85, measured in tests/balance/w_ert_d.test.ts
+  # ERT-D (WORLD 3.7): he fights with two earth elementals bound to his throne (cavern-earth-b5); his first wound
+  # cracks his skull and he strikes 4 times at attack 90, measured in tests/balance/w_ert_d.test.ts
   bossPhases:
-  - hpThreshold: 1
+  - hpThreshold: 0.99
     patternId: aggressive
-    message: Frost climbs the Rime Sovereign's blade, and the cavern's stone rises to guard him!
-    hits: 3
-    attack: 85
-  - hpThreshold: 0.5
-    patternId: aggressive
-    message: The Rime Sovereign's skull fractures!
+    message: His skull fractures!
+    hits: 4
+    attack: 90
   family: undead
   size: boss
 # === end ERT-D lich ===

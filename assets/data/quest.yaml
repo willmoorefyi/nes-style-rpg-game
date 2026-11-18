@@ -299,10 +299,17 @@ stages:
     maps: [cavern-earth-b1, cavern-earth-b2, cavern-earth-b3]
     zones: [overworld:ert_plain]
     grind: 2.0
-    walk: []
+    # where S10 ends, on foot at the dwarf hall's mouth with the ship at the landing cove (the `ert_dwarf` dock): the
+    # cavern lies beyond the canal, so withholding CANAL_OPEN strands it (GT-12, GT-13 read S11's SKIP)
+    entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
+    # sail west through the canal to Melmond's harbour, walk to the badlands, down the split gallery and round the lake
+    # to the crypt; the vampire's cutscene gives the ruby
+    walk: [overworld:warp:cavern-earth-b1, cavern-earth-b3:battle:VAMPIRE_DEFEATED]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic NPC element at the vampire's cell (QUEST 5.4): his hideIf only clears the beaten boss off his bier
+      - {map: cavern-earth-b3, kind: npc, at: [34, 14], reason: "the vampire's hideIf only clears the beaten boss off his bier, a dead end"}
+    status: built
   - id: S13
     title: "Cavern of Earth B4-B5"
     tranche: ERT-D
@@ -315,11 +322,18 @@ stages:
     maps: [cavern-earth-b4, cavern-earth-b5]
     zones: [overworld:ert_badlands]
     grind: 2.0
-    walk: []
+    entry: {map: overworld, x: 30, y: 126, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    # the rod breaks B3's seal, the Sovereign falls on B5, his shade at the altar lights the crystal
+    walk: [cavern-earth-b3:gate:EARTH_SEAL_BROKEN, cavern-earth-b5:battle:EARTH_CAVE_COMPLETE,
+      cavern-earth-b5:npc:ert_d_altar_shade]
     basins: {}
-    nonLoadBearing: []
+    nonLoadBearing:
+      # the generic NPC elements (QUEST 5.4): each hideIf only clears a spent NPC off B5 (the beaten Sovereign off his
+      # throne, the shade off the lit altar), dead ends
+      - {map: cavern-earth-b5, kind: npc, at: [15, 6], reason: "the Sovereign's hideIf only clears the beaten boss off his throne, a dead end"}
+      - {map: cavern-earth-b5, kind: npc, at: [24, 6], reason: "the shade's hideIf only clears it off the altar once the crystal is lit; its cutscene is once-only"}
     milestones: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT]
-    status: pending
+    status: built
   # === end ERT-D ===
   # === FIR-O (pass W: owned by FIR-O) ===
   - id: S17

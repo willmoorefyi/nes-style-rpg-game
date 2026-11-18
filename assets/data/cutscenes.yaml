@@ -275,6 +275,58 @@
 # === ERT-T (pass W: owned by ERT-T) ===
 # === end ERT-T ===
 # === ERT-D (pass W: owned by ERT-D) ===
+# S11 (docs/WORLD_PLAN.md 4.3, D-W14): the vampire's postVictoryCutscene on cavern-earth-b3. The battle's flag sets
+# VAMPIRE_DEFEATED; the ruby comes only from here, and the last line points the party to the giant's tunnel (S12).
+- id: ert_vampire_falls
+  steps:
+    - type: dialog
+      text: "The Vampire folds into his cape like a bat into a crack, and the cape settles empty on the bier."
+    - type: set_flag
+      flag: VAMPIRE_DEFEATED
+    - type: give_item
+      item: ruby
+    - type: dialog
+      text: "Among the folds lies a stone as red as an ember. It is warm, and it beats faintly, like something alive."
+    - type: dialog
+      text: "Somewhere in the range west of Melmond, they say, a giant blocks the only road. Giants eat stones."
+# S13: the Rime Sovereign's postVictoryCutscene on cavern-earth-b5 (the battle's flag sets EARTH_CAVE_COMPLETE; the
+# script sets it too). The warp reloads the floor, so his shade (showIf EARTH_CAVE_COMPLETE) kneels at the altar.
+- id: ert_lich_falls
+  steps:
+    - type: dialog
+      text: "The Sovereign's crown cracks across. Frost pours off his plate like smoke and sinks into the floor."
+    - type: set_flag
+      flag: EARTH_CAVE_COMPLETE
+    - type: dialog
+      text: "Rime Sovereign: My kingdom... was it still there? I kept it so long that I forgot to look."
+    - type: fade_out
+      duration: 500
+    - type: warp
+      map: cavern-earth-b5
+      entrance: boss
+      facing: up
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "The bones fall still. By the altar beside the throne, something pale is kneeling."
+# S13: the shade at the altar (cavern-earth-b5, npc ert_d_altar_shade) gives the stolen warmth back to the crystal.
+- id: ert_earth_crystal
+  steps:
+    - type: dialog
+      text: "Shade: I bound the earth's life into this stone so that my walls would never fall. Take it back to the land."
+    - type: fade_out
+      duration: 400
+    - type: set_flag
+      flag: EARTH_CRYSTAL_LIT
+    - type: heal_party
+    - type: wait
+      duration: 300
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "The grey crystal drinks the shade's light and blooms a deep, living brown. The cavern floor grows warm."
+    - type: dialog
+      text: "Far above, the rot in the soil begins to loosen its grip. The sages by the crescent lake will feel it."
 # === end ERT-D ===
 # === FIR-O (pass W: owned by FIR-O) ===
 # S17 (WORLD 4.4): the buried hull's hatch takes the levistone; the dune pours off the hull, the ship lifts clear and

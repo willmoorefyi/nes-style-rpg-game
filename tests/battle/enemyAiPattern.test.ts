@@ -69,7 +69,7 @@ describe('data-driven enemy ai', () => {
     bsm.allEnemies[0].currentHp = 300;
     while (bsm.state === 'command_select') bsm.submitCommand({ type: 'item', actorId: bsm.currentCommandActorId! });
     bsm.executeRound();
-    expect(bsm.currentMessages.map((m) => m.text)).toContain("The Rime Sovereign's skull fractures!");
+    expect(bsm.currentMessages.map((m) => m.text)).toContain('His skull fractures!');   // ERT-D's phase line (WORLD 3.7)
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });

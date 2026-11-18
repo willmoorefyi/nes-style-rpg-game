@@ -3006,6 +3006,132 @@ Also note that NPC trades which play a cutscene take their item with a `take_ite
 <!-- === ERT-T EARTH (pass W: owned by ERT-T) === -->
 <!-- === end ERT-T === -->
 <!-- === ERT-D EARTH (pass W: owned by ERT-D) === -->
+### ERT-D result: the Cavern of Earth B1-B5 (branch `w-ert-d` from `mainline` 3a549665, merged with `mainline` 4015c773)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-ert-d/`.
+
+**Files:**
+
+- Layouts: `layouts/earth/cavern_common.py` (cave and `ice` materials, the shared design note, tables, chests),
+  `cavern_upper.py` (B1-B3, S11) and `cavern_lower.py` (B4-B5, S13). They write `cavern-earth-b1..b5`, which replace
+  ERT-O's compiled stubs.
+- Data:
+  - `enemies.yaml` (ERT-D anchors, `bossPhases` only):
+    - the vampire gets `{1, Fight x4, Attack 90, "His eyes burn red!"}`;
+    - the lich's 0.5 phase becomes `{0.99, Fight x4, Attack 90, "His skull fractures!"}`.
+  - `cutscenes.yaml`: `ert_vampire_falls` (VAMPIRE_DEFEATED, `give_item ruby`), `ert_lich_falls` (EARTH_CAVE_COMPLETE)
+    and `ert_earth_crystal` (EARTH_CRYSTAL_LIT, `heal_party`).
+  - `debug-scenarios.yaml`: `w_s11_start`, `w_s13_start`, `w_boss_vampire` and `w_boss_lich`.
+  - `quest.yaml`: S11 and S13 are `built`, with `entry`, `walk` and `nonLoadBearing` (the bosses' and the shade's
+    `hideIf`).
+  - Background `assets/backgrounds/throne_lich.webp` (staged; B5's default).
+- Tests: `tests/quest/earth/ert_d_cavern.test.ts` (9 tests), `ert_d_walk.test.ts` (4 tests) and
+  `tests/balance/w_ert_d.test.ts` (6 tests).
+
+**Design** (all original; reviewer PASS):
+
+- **B1 (34x28), the split gallery.** From the mouth hall, a west arm leads to the stair down to B2, and an east arm to
+  a second stair into the ore annex. B2's slide lands in a rubble alcove north of the hall.
+- **B2 (38x30), a shore loop round a cave lake.**
+  - The stair to B3 is in a chamber east of the lake.
+  - A rubble slide on the north shore leads one way to B1 (`slide`).
+  - The ore annex (`annex`) is walled off from the rest of B2. Only B1's east stair reaches it, so it is a dead end.
+- **B3 (40x28), the vampire's crypt.**
+  - A hall of burial niches runs east of the arrival to the vampire's bier (E, path 33). He fights with three mummies.
+  - The rod seal stands in the doorway of a north side chamber that holds the stair down: `keyItemGates` (17, 12),
+    `requiredItem: rod`, `permanent`, EARTH_SEAL_BROKEN.
+  - A gravedigger's ghost hints at the ruby, then at the rod.
+- **B4 (40x36, `ice`), the frozen ring round a buried keep.**
+  - The true stairwell is in the north-east room. The north-west one is false: a one-way pit into the keep's sealed
+    pocket (`pocket`, with a chest), whose crack climbs back to the arrival.
+  - A frozen herald warns about the two stairs.
+- **B5 (30x34, `ice`, `throne_lich`), the throne of frost.**
+  - A long approach climbs the west side to the throne hall (boss N, path 43). The Rime Sovereign fights with two
+    earth elementals.
+  - His shade then kneels at the altar beside the throne (`showIf EARTH_CAVE_COMPLETE`); its cutscene lights the
+    crystal.
+- **Chests:** 3 / 4 / 3 / 4 / 2. They hold B4 consumables and gear, plus one found B5 piece each on B3 (`falchion`),
+  B4 (`black_robe`) and B5 (`wizard_staff`).
+- **`canSave: false`** on B3 and B5, the two boss floors. Every floor has `exit` to `ert_earth_cave`.
+- **Encounters:** B1-B3 use the S11 cavern roster, B4-B5 the S13 roster.
+
+**Originality numbers:**
+
+- Stair graph: branching. It has twin B1>B2 stairs, the one-way slide B2>B1 and B4's same-map pit.
+- Dead ends per floor: 5 / 3 / 3 / 2 / 2.
+- Floor shape (aspect, fill): 1.24 / 0.43, 1.30 / 0.37, 1.89 / 0.46, 1.23 / 0.35, 0.83 / 0.37.
+- Bosses: B3 E 33, B5 N 43.
+- `originality review: PASS cavern-earth-b1 cavern-earth-b2 cavern-earth-b3 cavern-earth-b4 cavern-earth-b5`
+
+**Boss balance** (`w_ert_d.test.ts`, 400 seeds, sensible, 3 potions):
+
+| Fight | Level | Win rate | Target |
+|---|---|---|---|
+| vampire + 3 mummies, `w_s11` | L14 | 79.3 % | 75-95 % |
+| | L12 | 50.8 % | <= 60 % |
+| | L16 | 90.5 % | (band top, >= 85 %) |
+| lich + 2 earth elementals, `w_s13` | L17 | 69.8 % | 60-80 % |
+| | L15 | 14.8 % | <= 45 % |
+| | L19 | 91.3 % | (band top, >= 85 %) |
+
+Before the tuning, both tuned records alone fell in 2-3 rounds: 100 % at L12-L19.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `cavern_upper.py`, `cavern_lower.py` and `stubs.py`, then `git diff --exit-code assets-src/maps`: clean (see the G17 row for `world.py`) |
+| G2 | `build_map.py cavern-earth-b1 ... b5`: each `WxH -> assets/maps/ai/...`. `--check-determinism` on the five: all `deterministic`. No `town_*_site.py` change, so no overworld compile |
+| G4 | `npm run build`: exit 0. Vitest (`--maxWorkers=2`): 1 failure, `stageEarlyShops.test.ts` "S6 and S10" (`SHOPLESS pravoka`), which fails the same way on a clean `mainline` 4015c773 (A1-T's). Everything else passed |
+| G5 | `npm run quest -- --mutate --stage S11`: OK (`(d) vampire L13.3 [13,16]`, `mutations: OK (1 gate rows; 1 elements)`). `--stage S13`: OK (`(d) lich L16.3 [16,19]`, `(b)` 2 milestone runs, `mutations: OK (3 gate rows; 5 elements)`) |
+| G6 / G7 / G12 / G13 / G14 / G15 | `assetCoverage`, `fileCeilings`, `questCeilings`, `designNotes`, `originality`, `macroGeography`, `travelMatrix`, `townStandard`, `chestText`: all passed |
+| G9 | `npx vitest run tests/balance/`: 74 passed. `check-bounds`: `check-bounds: OK (15 tests)` |
+| G16 | `stubs.py --check ert-d`: `stubs: 0 left for ERT-D` |
+| `stage_backgrounds.py --check throne_lich` | `no bounds for throne_lich (known: shoreline)`, as for `cracked_earth` (ERT-O). Staging succeeded |
+
+**Browser** (port 5228, `mute=1`, own headless Chromium; screenshots in `/tmp/w-ert-d/`):
+
+| Row | Result |
+|---|---|
+| `w_s11_start` | Walked from the cave mouth (30, 126) down B1 and B2 to B3 (36 random battles fled). Talked to the vampire and won the first try with Fight only: VAMPIRE_DEFEATED, `ruby` held, the bier empty (`s11_vampire.png`, `s11_after.png`) |
+| `w_s13_start` | Walked down B1-B3. The seal at (17, 12) opened with the rod (EARTH_SEAL_BROKEN, `s13_seal.png`). Down the B4 ring's true stairwell to B5. The Rime Sovereign won after 5 Retry Battles (Fight only, L16), and the floor was reloaded at `boss`. Talked to the shade at the altar: EARTH_CRYSTAL_LIT (`s13_lich.png`, `s13_altar.png`). Flag order: EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT |
+| both | 0 console errors; server stopped |
+
+The first S13 run found a bug: the shade (`showIf EARTH_CAVE_COMPLETE`) did not appear until the floor reloaded. `ert_lich_falls` now warps to B5's `boss` behind a fade, as ELF-O's `elf_o_crown_taken` does.
+
+**Deviations and hand-offs:**
+
+- **The vampire has no CANAL_OPEN condition.** S11's `entry` is where S10 ends: the dwarf hall's mouth, with the ship
+  at the landing cove. So in stage mode the cavern is reachable only through the canal. With the entry at the cave
+  mouth, (b) found the vampire reachable without CANAL_OPEN. Putting the flag on the NPC instead hid GT-12 / GT-13's
+  `SKIP S11` in the full run.
+- **Shared verifier edit** (`src/progression/questMutate.ts`, +5 lines). A gate row whose only missed expectations
+  are `EARLY <town>` for a pending town is reported `pending: town <t> not built`, like a pending stage. With S11
+  built, GT-12 and GT-13 catch `SKIP S11`, but `EARLY melmond` / `EARLY crescent` wait for ERT-T and FIR-T.
+- **Hand-off to INT / W1-C2 / ERT-O.** GT-13's exported `W_isthmus` cut is row y 103, x 49-58. It runs through the
+  dwarf hall's door (55, 103), so flooding it also makes S10 unreachable, and the row shows no `SKIP S11` at all. It
+  is reported pending (melmond) now, but it will be uncaught once Melmond is built. The cut should avoid entrance
+  cells.
+- **Shared test pins updated** for the new phases and habitats:
+  - `tests/data/rosterStats.test.ts` (the lich's phase message);
+  - `tests/battle/enemyAiPattern.test.ts` (the phase line);
+  - `tests/scenes/bestiary/bestiaryModel.test.ts` (the `At 99% HP` cell);
+  - `tests/scenes/bestiary/bestiaryHabitats.test.ts` (the vampire's and lich's habitats are now the cavern; the troll's
+    first habitat background is `cave`).
+
+  The phase messages are short so that the bestiary's phase line fits on one row: "Fight x4 Attack 90" plus the
+  message must be at most 45 characters.
+- **Formations** carry the tuning: the boss records' stats are frozen, and the phases alone could not hold either
+  boss past round 2.
+- **No crystal sprite exists.** The altar is an `altar_l`/`altar_r` deco with an `orb_white`, and the party talks to
+  the Sovereign's shade beside it.
+- **`no_static_chokepoints` is off on B2 and B4.** Their sealed regions (the annex, the pocket) are reach roots, and
+  the check counts those regions' transitions as cut off. Neither floor has an NPC in a corridor.
+
+**AGENTS.md delta (for INT):** under "Editing a 2x Map", add `layouts/earth/cavern_upper.py` / `cavern_lower.py`
+(with `cavern_common.py`), which write `cavern-earth-b1..b3` / `-b4..b5`. Under "Balance bounds", add
+`w_ert_d.test.ts`: the vampire and lich formations and their threshold-1 / 0.99 phases. Note that a bestiary phase
+line ("Fight xN Attack N" plus the message) must fit 45 characters.
 <!-- === end ERT-D === -->
 <!-- === FIR-O FIRE (pass W: owned by FIR-O) === -->
 ### FIR-O result: the south-east continent (branch `w-fir-o` from `mainline` 81e93d4)

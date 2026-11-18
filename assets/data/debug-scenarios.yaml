@@ -1585,6 +1585,77 @@
 # === ERT-T (pass W: owned by ERT-T) ===
 # === end ERT-T ===
 # === ERT-D (pass W: owned by ERT-D) ===
+# WORLD_PLAN 5.3, 6.5. S11: on foot at the Cavern of Earth's mouth (overworld `ert_earth_cave`), the ship at Melmond's
+# harbour, band-low level 13 with the B3 kit (w_s10, the band before) and every flag and item before S11. S13: the
+# same mouth with the S11-S12 grants (VAMPIRE_DEFEATED, TITAN_FED, the rod), level 16, the B4 kit (w_s12). The boss
+# battles are at the 3.7 test levels with the stage kits: the vampire and his mummies (L14, w_s11) and the Rime
+# Sovereign with his earth elementals (L17, w_s13, on throne_lich).
+- id: w_s11_start
+  name: ERT-D - S11 the Cavern of Earth B1-B3 (the vampire)
+  mode: field
+  map: overworld
+  entrance: ert_earth_cave
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN]
+  party:
+    - { class: warrior, name: WAR, level: 13, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 13, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 13, equipment: [mythril_hammer, silver_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 13, equipment: [mythril_knife, silver_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }] }
+  items: { lute: 1, mystic_key: 1, potion: 8, hi_potion: 3, antidote: 2 }
+  gold: 3000
+  enemies: []
+- id: w_s13_start
+  name: ERT-D - S13 the Cavern of Earth B4-B5 (the rod seal, the Rime Sovereign, the altar)
+  mode: field
+  map: overworld
+  entrance: ert_earth_cave
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, x: 43, y: 113 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED]
+  party:
+    - { class: warrior, name: WAR, level: 16, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 16, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 16, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 16, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { lute: 1, mystic_key: 1, rod: 1, potion: 8, hi_potion: 4, antidote: 2 }
+  gold: 4000
+  enemies: []
+- id: w_boss_vampire
+  name: ERT-D - the Vampire and three mummies (band level 14, kit w_s11)
+  background: assets/backgrounds/cave.webp
+  party:
+    - { class: warrior, name: WAR, level: 14, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 14, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 14, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 14, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [vampire, mummy, mummy, mummy]
+- id: w_boss_lich
+  name: ERT-D - the Rime Sovereign and two earth elementals (band level 17, kit w_s13)
+  background: assets/backgrounds/throne_lich.webp
+  party:
+    - { class: warrior, name: WAR, level: 17, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 17, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 17, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 17, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [lich, earth_elemental, earth_elemental]
 # === end ERT-D ===
 # === FIR-O (pass W: owned by FIR-O) ===
 # S17 (WORLD 6.5): the party stands before the buried hull's hatch in the airship desert (entrance fir_desert) at the

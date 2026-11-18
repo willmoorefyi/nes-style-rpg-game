@@ -41,7 +41,9 @@ describe('bestiary habitats (compiled maps)', () => {
     expect(text('skeleton')).toBe('World Map (Temple approach), Temple of Fiends');
     expect(text('gr_wolf')).toBe('World Map (East pocket, Northern Mainland)');   // A1-O: the mainland zone
     expect(text('garland')).toBe('Temple of Fiends (boss)');
-    for (const id of ['vampire', 'dragon', 'lich']) expect(text(id)).toBe('Not placed yet');
+    expect(text('dragon')).toBe('Not placed yet');
+    expect(text('vampire')).toBe('Cavern of Earth B3 (boss)');     // ERT-D: the crypt's boss
+    expect(text('lich')).toBe('Cavern of Earth B5 (boss)');
   });
 
   it('backgrounds: overrides, the first habitat, else the default', async () => {
@@ -52,7 +54,7 @@ describe('bestiary habitats (compiled maps)', () => {
     expect(bg('skeleton')).toBe('grassland');
     expect(bg('gr_imp')).toBe('grassland');
     expect(bg('wolf')).toBe('grassland');
-    expect(bg('troll')).toBe('grassland');
+    expect(bg('troll')).toBe('cave');                 // ERT-D: first met in the Cavern of Earth
     expect(bg('gr_wolf')).toBe('ruined_forest');
   });
 });

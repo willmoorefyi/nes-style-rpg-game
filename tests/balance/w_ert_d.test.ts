@@ -6,9 +6,9 @@
  * the real `BattleStateMachine` (400 seeds per policy, `bossWinRate`).
  *
  * The tuning is ERT-D's (enemies.yaml: only the two bosses' `bossPhases`, plus the formations on the maps). Alone,
- * both tuned records fell in two or three rounds at every band level (measured 100 % at L12-L19). Now each has a
- * phase at threshold 1 (crossed at the first round): the Vampire 4 hits at attack 90, the Rime Sovereign 3 hits at
- * attack 85; and the guards draw the party's blows first. Targets: vampire L14 75-95 %, L12 at most 60 %; lich L17
+ * both tuned records fell in two or three rounds at every band level (measured 100 % at L12-L19). Now the Vampire
+ * has a phase at threshold 1 (crossed at the first round: 4 hits at attack 90), the Rime Sovereign one at 0.99 (his
+ * first wound cracks his skull: 4 hits at attack 90), and the guards draw the party's blows first. Targets: vampire L14 75-95 %, L12 at most 60 %; lich L17
  * 60-80 %, L15 at most 45 %. Each bound sits at least 3 points from its measured value, given in the test name.
  */
 import { describe, expect, it } from 'vitest';
@@ -35,17 +35,17 @@ describe('w_ert_d: the Vampire and his mummies (S11, kit w_s11)', () => {
 });
 
 describe('w_ert_d: the Rime Sovereign and the earth elementals (S13, kit w_s13)', () => {
-  it('sensible Lv17 wins 60-80 % (measured 68.5)', () => {
+  it('sensible Lv17 wins 60-80 % (measured 69.8)', () => {
     const r = bossWinRate(LICH, 17, 'w_s13', 'sensible', N);
     expect(r).toBeGreaterThanOrEqual(0.6);
     expect(r).toBeLessThanOrEqual(0.8);
   });
 
-  it('sensible Lv15 wins at most 45 % (measured 19.5)', () => {
+  it('sensible Lv15 wins at most 45 % (measured 14.8)', () => {
     expect(bossWinRate(LICH, 15, 'w_s13', 'sensible', N)).toBeLessThanOrEqual(0.45);
   });
 
-  it('sensible Lv19, the band top, wins >= 85 % (measured 91.0)', () => {
+  it('sensible Lv19, the band top, wins >= 85 % (measured 91.3)', () => {
     expect(bossWinRate(LICH, 19, 'w_s13', 'sensible', N)).toBeGreaterThanOrEqual(0.85);
   });
 });
