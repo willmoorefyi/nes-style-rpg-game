@@ -4147,6 +4147,108 @@ shops 5/5 inn 500/500 clinic true/true`.
 `w_s24_neg_nooxyale` and `w_wat_t_onrac_lit`.
 <!-- === end WAT-T === -->
 <!-- === WAT-D WATER (pass W: owned by WAT-D) === -->
+### WAT-D result: the Sea Shrine B1-B5, S24 (branch `w-wat-d` from `mainline` a11defa7, merged with `mainline` 767dd7e3 (WAT-T) and 2ab79c11 (FIR-D2))
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wat-d/`.
+
+**Files:**
+
+- Layouts: `layouts/water/shrine_common.py` (materials, encounter tables, chest and dialog helpers, the shared
+  design note, the floor writer) and `shrine_b1.py` ... `shrine_b5.py`. They write `sea-shrine-b1` (34x26), `-b2`
+  (36x30), `-b3` (44x34), `-b4` (46x36) and `-b5` (32x34), all compiled; the stubs are replaced.
+- Every floor: `exit` to `overworld:wat_onrac`. B1-B4 use the `water_temple` background, B5 `throne_kraken` (both
+  staged). B4 and B5 have `canSave: false`.
+- Materials: the temple stone turned teal (the `coral` look; `hue -35, sat 2.2` on the temple bases, because the
+  preset's +150 turns temple stone crimson), sea-green water (`≈`), wet plank walks (`_`), kelp-dark floors (`+`).
+- Data:
+  - `cutscenes.yaml` `wat_drowned_falls` (sets WATER_CRYSTAL_LIT, `give_item slab`);
+  - `enemies.yaml`: drowned_sovereign `bossPhases` only;
+  - `quest.yaml` S24 (`entry`, `walk`, `nonLoadBearing`, `status: built`);
+  - `debug-scenarios.yaml`: `w_s24_start`, `w_boss_drowned_sovereign`;
+  - `assets/backgrounds/water_temple.webp`, `throne_kraken.webp`.
+- Tests: `tests/quest/water/wat_d_shrine.test.ts` (9) and `tests/balance/w_wat_d.test.ts` (3).
+
+**Design.**
+
+- **B3, the nave (arrival).** The submarine surfaces in the berth pool at the nave's foot and ties up at a plank pier
+  (`nave`). The pier's end sails back to `onrac:dry_dock`. The nave climbs north between pillars and four tide pools
+  to the apse, where a sea priest's echo keeps the font. The west transept holds the stair up; the east transept
+  holds the stairwell down.
+- **Up: B2, the cloister.** A two-wide walk runs round a drowned garth (a sunken kale garden), so the floor is a
+  loop. Three narrow brothers' cells lead off the north walk and the chapter house off the south.
+- **Up: B1, the mermaids' grotto.** A dry dome over a lagoon, with a plank walk to the elder's rock. Five sea folk
+  live here, two of them `_hint` NPCs (the two routes below, and the king's lightning weakness). The floor has no
+  encounters, two chests in sea-cave tunnels, and is a dead end.
+- **Down: B4, the flooded halls.** Two routes leave the stair room and meet only there:
+  - east, the channel hall (a plank bridge) and the long pool hall, to the stairwell `down`;
+  - west, the sunken library (stacks in the tide round a sinkhole, a drowned librarian), then the reading room and
+    the stairwell `down_west`.
+- **Down: B5, the drowned throne.** The south vestibule is `arrival`, the west vestibule `arrival_west`. Two
+  galleries flank a drowned court, joined by a causeway, and lead to the throne terrace in the north.
+  - Talking to the king (`wat_d_sovereign`, `hideIf: WATER_CRYSTAL_LIT`) starts `[drowned_sovereign]` (`isBoss`,
+    flag WATER_CRYSTAL_LIT, postVictoryCutscene `wat_drowned_falls`).
+  - The crystal's socket behind the throne is an inspect cell whose text changes once the crystal is lit.
+- **Chests (CHEST_WAT_D_*):** 2 / 3 / 3 / 4 / 2 (B1 to B5), on target. Each sits at the end of a niche.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | the 5 shrine scripts, `stubs.py` and `world.py` re-run after the last commit: `git diff --exit-code assets-src/maps` clean; `world.py`: `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G2 | `build_map.py sea-shrine-b1 ... -b5`: `34x26`, `36x30`, `44x34`, `46x36`, `32x34 -> assets/maps/ai/...`; `--check-determinism`: all five `deterministic`. No site file changed, so no world compile |
+| G3 | no `assets/maps/ai/overworld/` file changed against the merge base 767dd7e3 |
+| G4 | `npm run build` exit 0. Full `npx vitest run --maxWorkers=2 --minWorkers=1` after the WAT-T merge: `Tests 9 failed, 8083 passed, 1 skipped (8093)`. One of the 9 was mine (the S24 (c) case, since narrowed, below); my files pass after the FIR-D2 merge (`3622 passed`). The other 8 are the known mainline proof (c) state-limit bug (`LIMIT ... 200000 states`, STRANDED in act-1 and Elfheim maps) and the (d) S5-S10 bands, which INT-W2c is fixing. With S24 set back to `pending`, `wat_t_walk` and `fir_d1_walk` fail the same way. `fir_t_walk` fails on its own order regex (S16 before S15), which is FIR's |
+| G5 | `npm run quest -- --mutate --stage S24`: (a) `OK S24`; (b) `OK (25 withheld runs, 0 reach a later stage, 24 not required)`; (c) **FAIL**: only the mainline state-limit bug (LIMIT plus act-1/Elfheim SOFTLOCK/STRANDED lines, none on a shrine floor); (d) `drowned_sovereign L28.3 [27,30]`; (e)-(h) OK; `mutations: OK (2 gate rows; 2 elements)`, so GT-27 (the submarine gate's oxyale) is caught. The verdict is `quest-verify: FAIL` until INT-W2c's (c) fix lands. The full run's (a) orders S24 after S23 and S20 |
+| G6, G7 | assetCoverage, fileCeilings and questCeilings pass. The largest WAT-D file is `shrine_common.py` at 102 lines |
+| G8 | `build_map.py --selftest`: `104 checks passed` |
+| G9 | `w_wat_d.test.ts` 3 passed; `check-bounds: OK (18 tests)` |
+| G10 | Browser on port 5236 with `mute=1`, my own headless Chromium (`/tmp/w-wat-d/pw/drive.mjs`). `w_s24_start`: onrac (37, 27), step east onto the submarine, B3 `nave` (21, 28), east stairwell, B4 (39, 4), halls' stair, B5 (15, 29), up to the king, battle, then `WATER_CRYSTAL_LIT` set and slab 1, 0 retries, 0 console errors. Screens: `/tmp/w-wat-d/s24_start.png`, `s24_b3.png`, `s24_b4.png`, `s24_b5.png`, `s24_king.png`, `s24_battle.png` (the `throne_kraken` stage), `s24_end.png`. The server was stopped afterwards |
+| G12 | designNotes and originality pass (`sea-shrine: branching`). A fresh reviewer gave `originality review: PASS sea-shrine-b1 sea-shrine-b2 sea-shrine-b3 sea-shrine-b4 sea-shrine-b5` |
+| G13, G14 | `(g) geography: OK s*=0.736`, `(h) travel matrix: OK (12 rows, 2 basin rows; 10 checked, 4 pending)` (in G5) |
+| G16 | `stubs.py --check WAT-D`: `stubs: 0 left for WAT-D` |
+| G17 | `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| backgrounds | `stage_backgrounds.py water_temple throne_kraken` staged both (486 / 541 KB). `--check` has no bounds for either id and exits 1 (`swamp_cave` does the same) |
+
+**Balance (S24, `[drowned_sovereign]`, kit `w_s24`, `UPGRADED_PARTY`, 400 seeds):**
+
+- With the roster's numbers (800 HP, attack 50, 8 hits) the boss lost every fight: 100 % at L26, L28 and L30.
+- The fix: a `bossPhases` entry at hpThreshold 1.0 (crossed at the first round start) with attack 75. The 50 % phase
+  (heavy attack, as `enemyAttack.test.ts` requires) is kept.
+- Measured with the fix:
+  - sensible: L24 31.3 %, L26 38.0 %, L28 71.5 %, L30 76.0 %, L32 91.3 %;
+  - careless: L26 95.3 %, L28 99.8 %. Careless means all four Fight, while sensible spends turns on RUSE and L1 LIT.
+- Bounds: L28 [60, 80], L26 <= 45, L32 >= 85.
+
+**Originality numbers:**
+
+- Stair graph: `b1>b2 b2>b1 b2>b3 b3>b2 b3>b4 b4>b3 b4>b5 b5>b4`. It branches because B4 and B5 are joined by twin
+  stairs (`down` / `arrival` and `down_west` / `arrival_west`).
+- Dead ends: B1 7, B2 4, B3 9, B4 7, B5 4.
+- Boss: N of the arrival, path 38.
+- Shapes (aspect / fill): B1 1.429 / 0.316, B2 1.231 / 0.319, B3 1.357 / 0.476, B4 1.344 / 0.439, B5 0.964 / 0.381.
+
+**Deviations and hand-offs:**
+
+- **B3's pier link is conditional.** The pier's `onrac:dry_dock` transition is written only while `onrac.yaml` is not
+  a stub, as WAT-O's world does for Onrac's door. A link into a stub fails the cross-file test. WAT-T is merged, so
+  the link is in.
+- **S24's entry is Onrac's gate** on the overworld (28, 39), with the airship at (26, 39). The walk is
+  `overworld:warp:onrac`, `onrac:warp:sea-shrine-b3`, then down to the battle. An entry in the nave would skip the
+  oxyale gate (proof (b)).
+- **The S24 (c) test case is narrowed.** It asserts (b) and that no (c) failure names a shrine floor. Once INT-W2c
+  fixes (c), it can go back to `toEqual([])`.
+- B4's second stair (`down_west`) and B5's `arrival_west` are extra entrances beyond the canon names. Every canon
+  entrance and link is kept.
+- The mermaids are `villager_f` (the elder `princess`) with tint `#5fb8b0`, and the king is `king` with tint
+  `#3d6f78`. There is no mermaid field sheet.
+- I edited no shared files outside my anchors. One new local flag pattern: `CHEST_WAT_D_*` (14 chests).
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains `layouts/water/shrine_b{1..5}.py` + `shrine_common.py` (`sea-shrine-b1..b5`).
+- A layout may emit a link into another tranche's map only once that map is no stub (`stubs.is_stub`), and the
+  integrator regenerates it after that tranche merges.
+- The `coral` remap preset is for castle_face. On temple bases, use hue -35 for the same teal.
 <!-- === end WAT-D === -->
 <!-- === WND-O WIND (pass W: owned by WND-O) === -->
 ### WND-O result: the Wind region and Lufenia (branch `w-wnd-o` from `mainline` 81e93d4, merged with `mainline` 62033ba after FIR-O)
