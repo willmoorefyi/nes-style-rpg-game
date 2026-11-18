@@ -16,7 +16,7 @@ import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
 import { DialogManager, DIALOG_CLOSE_HOLDOFF_FRAMES } from '../systems/DialogManager.js';
 import { BattleTrigger, type BattleEndData } from '../systems/BattleTrigger.js';
-import { fieldStep } from '../systems/fieldRules.js';
+import { fieldStep, modeAfterStep } from '../systems/fieldRules.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
@@ -259,6 +259,11 @@ export class ExplorationScene implements Scene {
     this.playMapMusic();
     // no random battle on a warp, gate or scripted-battle tile (EB-2)
     this.encounterSystem.setStepFilter(encounterStepFilter(mapData));
+    // the zone of a step is the one of the mode it ends in (P2-01)
+    this.encounterSystem.setStepModeResolver((x, y) => this.player && this.currentMapData
+      ? modeAfterStep(this.currentMapData, this.stepOrigin, { x, y },
+        this.vehicles.fieldState(fieldModeOf(this.player.currentMode)))
+      : null);
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     // a map without an encounter table has no random battles (towns, castles, interiors); never keep the last map's
     this.encounterSystem.setEncounters(mapData.encounters ?? []);

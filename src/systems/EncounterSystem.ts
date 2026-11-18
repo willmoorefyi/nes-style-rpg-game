@@ -28,6 +28,8 @@ export class EncounterSystem {
   private stepFilter: ((x: number, y: number) => boolean) | null = null;
   /** The party's field mode: zones apply by their `modes`; the map's own table on foot and by canoe. */
   private mode: FieldMode = 'walking';
+  /** The mode the step just taken ends in (the field rules: boarding, the canoe, a dock), or null when unknown. */
+  private stepMode: ((x: number, y: number) => FieldMode | null) | null = null;
 
   constructor(events: EventBus, rng: () => number = Math.random) {
     this.events = events;
@@ -79,6 +81,14 @@ export class EncounterSystem {
     this.mode = mode;
   }
 
+  /**
+   * `playerMove` fires before the scene applies the step's mode change, so the cell is looked up in the mode the step
+   * ends in (P2-01: the step onto a river cell by canoe used the walking zones, where the river is a hole).
+   */
+  setStepModeResolver(resolver: ((x: number, y: number) => FieldMode | null) | null): void {
+    this.stepMode = resolver;
+  }
+
   /** The zone containing (x, y) for the current mode, or null for the map's own table. */
   zoneAt(x: number, y: number): EncounterZone | null {
     return this.zoneTableAt(x, y)?.zone ?? null;
@@ -102,6 +112,8 @@ export class EncounterSystem {
   }
 
   private handleMove = (pos: { x: number; y: number }): void => {
+    const ending = this.stepMode?.(pos.x, pos.y);
+    if (ending) this.mode = ending;
     const zone = this.zoneTableAt(pos.x, pos.y);
     // outside every zone of this mode: the map's own table, which only applies on foot and by canoe
     const table = zone?.table ?? (DEFAULT_ZONE_MODES.includes(this.mode) ? this.table : null);
