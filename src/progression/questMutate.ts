@@ -34,6 +34,9 @@ function builtStages(ctx: QuestContext, ids: string[]): boolean {
   return ids.every((id) => ctx.world.stages.get(id)?.status === 'built');
 }
 
+const pendingTowns = (ctx: QuestContext, expect: GateRow['expect']): string[] => expect.flatMap((e) =>
+  /^EARLY (\S+) /.exec(e.prefix)?.[1] ?? []).filter((t) => ctx.world.quest.towns.find((x) => x.id === t)?.status !== 'built');
+
 function rowStages(row: GateRow): string[] {
   return [...new Set([...row.stages, ...row.expect.flatMap((e) => prefixStage(e.prefix) ?? [])])];
 }
@@ -84,6 +87,9 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement)
     out.nonLoadBearing = `pending: the full run checks it (--stage ${ctx.stage} can't see it)`;
   } else if (!out.caught && !builtStages(ctx, stages)) {
     out.nonLoadBearing = `pending: ${stages.filter((s) => ctx.world.stages.get(s)?.status !== 'built').join(' ')} not built`;
+  } else if (!out.caught && pendingTowns(ctx, expect).length) {
+    // an `EARLY <town>` expectation waits for its town like a (b) one for its stage (ERT-D: GT-12 / GT-13 with S11 built)
+    out.nonLoadBearing = `pending: town ${pendingTowns(ctx, expect).join(' ')} not built`;
   } else if (!out.caught) {
     const reason = nonLoadBearingFor(ctx, el);
     if (reason) out.nonLoadBearing = reason;
