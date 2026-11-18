@@ -326,10 +326,76 @@ round 1 judged `it2`, round 2 (a new reviewer) judged blue_dragon's `it3`.
 | 2026-11-17 | approach | the one-source squash / stretch bridge (section 2), chosen on the experiments; the derived pilot kneels archived as `_kneel_v1` |
 | 2026-11-17 | rev 2 | momus review 2: OKAY with 5 P3 notes (knob count, file references, iteration numbering, one knob per named defect, KT1 TODO and 12a); all applied |
 
+### 12-E. KT2-E result (floating + swimmer + bird, 20 ids; branch `kt-e` from `fb5992a0`)
+
+Retired: none (`kneel_tools.py coverage` listed none of the 20 on its `derived:` line; every rig was a D-K7 alias and
+gained only `kneel: {source: ai}` plus its knobs). An internal render before the first review (not counted) cleared the
+`check` findings: K-ground 1 px on fire_elemental / ghost / wraith / pyrolisk (`offset`), pyrolisk's key on the right
+cell border (`offset` dx -1), the outline ring of bigeyes in2 / allosaurus in1 / pyrolisk in1, and cockatrice in2's area
+(1.19) and centroid step. Review round 1 = 2 reviewers (10 + 10 ids, `it1`), round 2 = 1 reviewer (7 ids, `it2`),
+round 3 = 1 reviewer (allosaurus, `it3`); each a fresh multimodal agent with the section 7 rubric only.
+
+| Id | it1 | it2 | it3 | Knobs / offset (locked) | Iterations |
+|---|---|---|---|---|---|
+| air_elemental | PASS | - | - | - | 1 |
+| bigeyes | FAIL T2: the ball shrinks to ~60 % width in one cut at in1 -> in2 and jumps left (size pop) | PASS | - | `bridge: {u: [0.35, 0.15]}` (it1 had `width: false` for the in2 outline ring; width back on) | 2 |
+| death_eye | PASS | - | - | - | 1 |
+| deepeyes | PASS | - | - | - | 1 |
+| evil_eye | PASS | - | - | - | 1 |
+| fire_elemental | PASS | - | - | `offset: [0, 1]` | 1 |
+| ghost | FAIL T1: in2's column stretch doubled the left outline into a 2 px band, a black wedge by the arm | PASS | - | `offset: [0, 1]`, `bridge: {width: false}` | 2 |
+| hollow_seraph | FAIL T1: in2 1.4x the key's width (emblem, pauldrons, wings blocky, halo flattened); T2: in2's head ~8 px right | PASS | - | `bridge: {shear: false, u: [0.35, 0.2]}`; fx halo, `hurt_from: idle` and its paint untouched | 2 |
+| red_piranha | PASS | - | - | - | 1 |
+| shadow | PASS | - | - | - | 1 |
+| specter | PASS | - | - | - | 1 |
+| water_elemental | PASS | - | - | - | 1 |
+| white_shark | PASS | - | - | - | 1 |
+| wraith | PASS | - | - | `offset: [0, 1]` | 1 |
+| shark | PASS | - | - | - | 1 |
+| allosaurus | FAIL T3: in2 stretched ~1.4x, the face drawn into a horse-like snout | FAIL T2: in2 still a bloated mound (+46 % area over in1): a puff-up then deflate | FAIL T1, T2, T3 (keep_top 0.45: row streaks, bloat, tall head) | **limit hit**, it2 locked: `bridge: {keep_top: 0.35, keep_bot: 0.35, u: [0.35, 0.25]}` | 3 |
+| cockatrice | FAIL T5: the feet skitter (in1 +3 px, in2 back -4) | PASS | - | `bridge: {width: false, shear: false}` | 2 |
+| pyrolisk | FAIL T5: the front foot forward, back, forward (81 -> 84 -> 81 -> 85) | PASS | - | `offset: [-1, 1]`, `bridge: {keep_top: 0.2, u: [0.2, 0.2]}` (front foot 81 -> 83 -> 84 -> 85) | 2 |
+| tyrannosaur | PASS | - | - | - | 1 |
+| wyvern | FAIL T5: the feet jiggle (in1 +3 px, in2 back -4) | PASS | - | `bridge: {shear: false}` | 2 |
+
+**Limit-hit table (KT2-E)**
+
+| Id | Best iteration | Reviewer reasons | Knobs tried | Result |
+|---|---|---|---|---|
+| allosaurus | it2 (1 failed criterion; tie with it1, the latest wins) | it1 T3 face stretched into a snout; it2 T2 in2 bloats (+46 % area) then deflates; it3 T1 / T2 / T3 row streaks, bloat, tall head | pre-review: `keep_top` / `keep_bot` 0.35 (in1 outline ring); it2 `u2` 0.25; it3 `keep_top` 0.45; probed and refused by `check`: `u2` 0.1-0.2 at every band (in1 -> in2 centroid step 14.7-20.6 > 14.3) and `width` / `shear` off | **locked** at it2 (`check` OK). Cause: the standing idle (87 px) vs the flat lying key (40 px); any in2 that the continuity gate allows is a 52-56 px stretch of a lying body. A fix needs a different in2 recipe (e.g. stretch only the hip rows) or a KA-FIX key that is less flat |
+
+- **Key notes** (the approved key, not the bridge; for a possible KA-FIX pass): shark's key has a flat grey smear /
+  water column under the body and tail; wyvern's key (and its idle) carries a 1-2 px detached speck, and the key's belly
+  under the chest is dark and noisy; bigeyes' key is a different, smaller design (tentacles below a small ball, the fins
+  gone) than its idle; ghost's and bigeyes' keys sit ~7 px sideways of the idle base.
+- Reviewer notes (not failures): evil_eye's in2 is almost the key (idle and key nearly the same size); shadow's in1 is
+  almost the idle; white_shark is the most abrupt pass (nearly all of the swim -> curl change at the swap, widths still
+  step 106 -> 89 -> 75 -> 58); red_piranha's in2 sits 2-3 px right of the key (not visible at speed); hollow_seraph's
+  floating gauntlets and blades are separate pieces in the approved idle and stay so in in1.
+- Measured: a reviewer batch of 10 ids took 3.7-3.8 min, 7 ids 2.2 min, 1 id 0.8 min; `check` of the 20 ids about
+  2.5 min wall; `lock` about 1 min per call (one call for many ids); the knob probing used a scratch harness
+  (`/tmp/kt-e/probe.py`: `check_sprite` without the lock on a variant block, plus the feet-row extents per frame).
+- Review artefacts: `/tmp/kt-e/it1/` (20 ids), `/tmp/kt-e/it2/` (bigeyes ghost hollow_seraph allosaurus cockatrice
+  pyrolisk wyvern), `/tmp/kt-e/it3/` (allosaurus); per id `<id>_x2.gif`, `<id>_x3.gif`, `<id>_slow.gif`,
+  `<id>_strip.png`, plus `contact.gif` / `contact.png` per directory (`/tmp/kt-e/it1/contact.gif` shows all 20).
+
+**KT2-E gate outputs**
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 lines `<id>: OK`, exit 0) | pass |
+| T-G1 (ids) | `monster_anim.py check <the 20 ids>` (one call) | 20 lines `<id>: OK (25 checks groups)` (death_eye 30, hollow_seraph 31), exit 0 | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (heroes unchanged by KT2-E), exit 0 | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock <the 8 pilot ids and classes + the 20 KT2-E ids>` | no `FAIL`; `88 added, 0 changed, 0 removed` (8 pilot + 20 x 4); exit 0 | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 26, derived 27, alias 70)`, `heroes 12/12 (ai 2, derived 10, alias 0)` | pass (running count) |
+| T-G6 | `selftest.py` | runs to the end: `12 FAILED`. 8 are KT1's known ones (gen/refs absent in a worktree: `pr_warrior_1080p.png missing`, `FW-9`; the live KA-FIX Bedrock block: `budget.json ... no live bedrock block`, `kneel_ai.py budget --check`, `usage: billed thoughts`, `KG1`, `KG2`, `bedrock.invoke refuses`). `FW-P / FW-O: kf: lock entries exactly ...` was a race (the run read the rigs while the it2 ids were being locked); re-run alone it passes. **3 are KT2-E's and need an integrator fix outside the tranche's files:** `hurt_from: ...` (3 lines, `rig hollow_seraph: kneel source ai but no approved kneel.png`): `selftest_hurtfrom._cfg` builds its fixture from death_eye's rig (`SRC`), which now has `kneel: {source: ai}`, and its `_tree` copies only `boss_*.png`. Fix: `cfg.pop("kneel", None)` in `_cfg` (verified in a scratch monkeypatch run: `run_kf_paint` + `run_hurt_from` 0 FAILED; as is 3 FAILED); `pass KT kneel bridge`: all ok | pass (KT bridge); 3 fixture failures for the integrator |
+| T-G9 | ledger / approved diff against `a7d423f4` | no ledger change; `approved/` only the pilot's `_retired/*_kneel_v1/` additions (KT2-E adds none) | pass |
+
 ## TODOs
 
 - [x] KT0 experiments (cut, squash, dither, rig + stretch) and the choice (section 2)
 - [x] KT1 tooling: `kneel_bridge.py`, the hooks, checks, `kneel_bridge_review.py`, selftest, scenarios
 - [x] KT1 pilot: 8 sprites, review, locks, atlases, browser (section 12, gate outputs in 12a)
 - [ ] KT2-A..F rollout (section 9)
+  - [x] KT2-E (20 ids locked, 1 limit hit: allosaurus locked at it2; section 12-E)
 - [ ] KT3 integration, gates, docs (AGENTS.md "Monster animation", KNEEL_AI_PLAN TODOs, PROGRESS.md)
