@@ -104,11 +104,11 @@
   crit: 9
 - id: iron_sword
   name: Iron Sword
-  description: "A well-forged iron sword. ATK 14, hit +10."
+  description: "A well-forged iron sword. ATK 13, hit +10."
   type: weapon
   stats:
-    attack: 14
-  price: 175
+    attack: 13
+  price: 300
   usableBy:
   - warrior
   - red_mage

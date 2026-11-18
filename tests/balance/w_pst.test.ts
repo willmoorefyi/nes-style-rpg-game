@@ -15,6 +15,11 @@
  * hollow_seraph_2 5 / 92, death_eye 3 / 125), and the slow lich and queen get escorts from the S30 roster, so that the
  * boss acts before it falls. Targets (3.7): the run 60-85 % at L37, each fight alone >= 85 %, the Death Eye 70-90 %.
  * Each bound sits at least 3 points from its measured value, given in the test name.
+ *
+ * FX-B (PLAY-3 P3-04): the tests now use the `fighter` policy (tests/helpers/fighterPolicy.ts): `sensible` makes the
+ * Knight and the Ninja cast FIRE, so a party that only pressed Fight won every fight at 100 % against a run bound that
+ * read 74 %. The five bosses were hardened to match (lich_2 10 hits, ashen_queen_2 14 hits (their HP stays at the roster spec),
+ * drowned_sovereign_2 11 hits, hollow_seraph_2 9 hits, death_eye 600 HP and 8 hits).
  */
 import { describe, expect, it } from 'vitest';
 import { bossWinRate, enemyCopy, makeParty, SPELLS, UPGRADED_PARTY } from '../helpers/balanceData.js';
@@ -43,7 +48,7 @@ function runWinRate(fights: string[][], level: number, seeds: number): number {
     for (const ids of fights) {
       if (!alive) break;
       potions.n += POTIONS;
-      alive = runBattle(party, ids.map(enemyCopy), SPELLS, 'sensible', rng, { potions }).outcome === 'victory';
+      alive = runBattle(party, ids.map(enemyCopy), SPELLS, 'fighter', rng, { potions }).outcome === 'victory';
     }
     if (alive) won++;
   }
@@ -51,13 +56,17 @@ function runWinRate(fights: string[][], level: number, seeds: number): number {
 }
 
 const alone = (ids: string[]): number =>
-  bossWinRate(ids, LEVEL, KIT, 'sensible', N, { comp: UPGRADED_PARTY, potions: POTIONS });
+  bossWinRate(ids, LEVEL, KIT, 'fighter', N, { comp: UPGRADED_PARTY, potions: POTIONS });
 
 describe('w_pst: the Temple of the Past (S30, kit w_s30, upgraded party, L37)', () => {
-  it('the four refights in a row, no inn: sensible wins 60-85 % (measured 74.0)', () => {
+  it('the four refights in a row, no inn: fighter wins 60-85 % (measured 78.5)', () => {
     const r = runWinRate(REFIGHTS, LEVEL, N);
     expect(r).toBeGreaterThanOrEqual(0.6);
     expect(r).toBeLessThanOrEqual(0.85);
+  });
+
+  it('the four refights in a row at L34, the band floor (PLAY-3 played them there): fighter wins at most 40 % (measured 17.8)', () => {
+    expect(runWinRate(REFIGHTS, 34, N)).toBeLessThanOrEqual(0.4);
   });
 
   it('floor 1 alone, the Rime Sovereign and two death knights: >= 85 % (measured 100.0)', () => {
@@ -68,15 +77,15 @@ describe('w_pst: the Temple of the Past (S30, kit w_s30, upgraded party, L37)', 
     expect(alone(REFIGHTS[1])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 3 alone, the Drowned Sovereign: >= 85 % (measured 97.0)', () => {
+  it('floor 3 alone, the Drowned Sovereign: >= 85 % (measured 100.0)', () => {
     expect(alone(REFIGHTS[2])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 4 alone, the Hollow Seraph: >= 85 % (measured 99.8)', () => {
+  it('floor 4 alone, the Hollow Seraph: >= 85 % (measured 100.0)', () => {
     expect(alone(REFIGHTS[3])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 5, the Death Eye and its iron golem: sensible wins 70-90 % (measured 77.5)', () => {
+  it('floor 5, the Death Eye and its iron golem: fighter wins 70-90 % (measured 82.5)', () => {
     const r = alone(DEATH_EYE);
     expect(r).toBeGreaterThanOrEqual(0.7);
     expect(r).toBeLessThanOrEqual(0.9);
