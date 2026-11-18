@@ -50,6 +50,8 @@ def _cfg(**extra) -> dict:
     cfg["keyframes"]["hurt"] = dict(cfg["keyframes"]["idle"])
     for n in ("hurt_in1", "hurt_in2"):              # death_eye's moves are tuned to its own hurt key, not the idle
         cfg["frames"].pop(n, None)
+    # death_eye's rig has `kneel: {source: ai}` since KT2-E, and _tree copies no kneel.png (KT3 ruling, 2026-11-18)
+    cfg.pop("kneel", None)
     cfg.update(copy.deepcopy(extra))
     return cfg
 

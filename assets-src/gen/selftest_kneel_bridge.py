@@ -96,6 +96,14 @@ def run_kneel_bridge(check: Callable[[bool, str], None]) -> None:
           KC.continuity_share("kneel", "kneel_in1", "kneel_in2", {"kneel_in1": {}, "kneel_in2": {}}) == 0.5 and
           KC.continuity_share("daze", "kneel_in1", "kneel_in2", br) == 0.5,
           "continuity_share: 0.65 only for the bridge pair kneel_in1 -> kneel_in2 (derived and other steps 0.5)")
+    # integrator ruling (KT3, 2026-11-18): AI-key-drawn frames skip the K-ground contact share, not the feet row
+    wide, tip = np.zeros((80, 80, 4), np.uint8), np.zeros((80, 80, 4), np.uint8)
+    wide[40:77, 10:70, 3] = 255
+    tip[40:75, 10:70, 3] = 255
+    tip[75:77, 10:14, 3] = 255                                         # thin leg tips on the feet row
+    check(bool(KC.ground(tip, wide, 76)) and not KC.ground(tip, wide, 76, contact=False)
+          and bool(KC.ground(tip[:76], wide, 76, contact=False)) and KC.KEY_DRAWN == ("kneel_in2", "kneel_b"),
+          "K-ground: contact=False drops only the contact share (lowest row still on the feet row)")
     allowed = _cols(idle) | _cols(key)
     plain =KC.bridge_frame("kneel_in1", fr["kneel_in1"], idle, key, 0.35, 80, allowed)
     check(not plain, f"bridge_frame passes the bridge's kneel_in1 ({plain})")
