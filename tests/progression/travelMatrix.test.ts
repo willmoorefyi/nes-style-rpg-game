@@ -95,10 +95,14 @@ describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => 
       expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === id)!), id)
         .toEqual({ row: id, status: 'ok', failures: [], missing: [] });
     }
-    // T6 needs the Ordeals and the Mirage (pending tranches): pending, a failure with --strict
-    expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === 'T6')!).status).toBe('pending');
+    // WND-D1: with the Mirage Tower built (and the sky castle's stubs compiled) T6, T8 and T9 are checked too
+    for (const id of ['T6', 'T8', 'T9']) {
+      expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === id)!).status, id).toBe('ok');
+    }
+    // the rows that still wait for pending tranches are failures with --strict
+    const pending = DEFAULT_TRAVEL_ROWS.filter((x) => travelRow(ctx, DEFAULT_TRAVEL_ROWS, x).status === 'pending');
     const strict = proofTravel(createQuestContext(ctx.world, { strict: true }));
-    expect(strict.failures.some((f) => /^TRAVEL T6 pending: /.test(f.message))).toBe(true);
-    expect(strict.failures.some((f) => /^TRAVEL T[0-5] /.test(f.message))).toBe(false);
+    for (const x of pending) expect(strict.failures.some((f) => f.message.startsWith(`TRAVEL ${x.id} pending: `)), x.id).toBe(true);
+    expect(strict.failures.some((f) => /^TRAVEL T[0-6] /.test(f.message))).toBe(false);
   });
 });

@@ -4559,6 +4559,96 @@ its flag `warp`s the party onto a cell that stays dry. Debug scenarios `w_s23_st
 (c)'s default cap is 400000.
 <!-- === end WND-T === -->
 <!-- === WND-D1 WIND (pass W: owned by WND-D1) === -->
+### WND-D1 result: the Mirage Tower, S27 (branch `w-wnd-d1` from `mainline` 66b539e1)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d1/`.
+
+**Files:**
+
+- `layouts/wind/mirage_common.py` (66 lines: the materials, bleached sandstone with bronze inlay; the design note; the
+  per-floor encounter tables; the chest helper; the floor writer) and `layouts/wind/mirage_floors.py` (162) write
+  `mirage-1f` (38x40), `-2f` (40x32) and `-3f` (28x24), compiled (the stubs are replaced). Every floor: `exit` to
+  `overworld:wnd_mirage`, background `tower_of_babel` (staged), encounters from the S27 roster only.
+  - 1F: the vestibule (the overworld door's `arrival`, two statues, an inscription inspect cell, two niches) and its
+    chime door, two `keyItemGates` cells with `requiredItem: chime` (not permanent; the chime is never consumed), beyond
+    which is `inner`. Then the spiral gallery: an outer and an inner ring round the shaft's foot, each walled off just
+    short of where it is entered, so the core's stair up is 150+ steps from the door though it lies within 25 cells of
+    it. The sealed well at the shaft's foot (fallen masonry, a chest) is reached only from 2F (its stair down to 1F
+    `well`, or the fall to 1F `shaft`) and has its own stair back up to 2F `well` (a `reach_roots` entry; chokepoint
+    check off, the chests are in dead ends).
+  - 2F: two half-floors either side of the open shaft (void), joined only by a 2-wide bronze bridge. The west half runs
+    from the arrival hall up a corridor to the north room (the stair down into the well) and the ledge to the bridge;
+    a cracked span off the bridge is a one-way drop into the well. The east half (a pillared hall, a north wing, a
+    south wing) holds the stair up.
+  - 3F: the console room. The console NPC (`chest` sheet tinted bronze, on an inlaid dais between two globes and a
+    lectern) has `requiredItem: cube` and plays `mirage_ascent` (`onceFlag: SKY_FORTRESS_OPEN`). The 2x2 bronze ring
+    before it (`sky_ring` placeholder) is four transitions to `sky-castle-1f` `arrival` with `requiredFlag:
+    SKY_FORTRESS_OPEN`, the way up again after the first lift. An extra entrance `ring` (13, 11) is the return point
+    for a way back down that WND-D2 may add.
+  - Chests 3 / 3 / 2 (`CHEST_WND_D1_*`): cabin, phoenix_down, diamond_helm; ether, diamond_armlet, hi_potion;
+    white_robe, defender (B7 gear at most).
+- `cutscenes.yaml` (WND-D1 anchor): `mirage_ascent` (dialog, `set_flag SKY_FORTRESS_OPEN`, fade, `warp sky-castle-1f
+  arrival`, fade, dialog; the cube is kept).
+- `quest.yaml` S27: `status: built`; `entry` WND-O's S26 start (Cornelia's south gate, the airship at (94, 112), the
+  ship at anchor at (172, 62)); `walk: [overworld:warp:mirage-1f, mirage-1f:warp:mirage-2f, mirage-2f:warp:mirage-3f,
+  mirage-3f:npc:mirage_console]`; `nonLoadBearing`: the 4 ring cells (`pending: S28 (WND-D2) not built`, see below).
+- `debug-scenarios.yaml`: `w_s27_start` (entrance `wnd_mirage`, L29, the B7 kit, flags through CHIME_GIVEN, chime and
+  cube, the airship on the oasis meadow (136, 38)) and `w_s27_neg_nochime` (the same without the chime and
+  CHIME_GIVEN). No boss, so no `w_boss_*`.
+- Tests: `tests/quest/wind/wnd_d1_tower.test.ts` (7), `tests/quest/wind/wnd_d1_walk.test.ts` (3).
+- Generated: `assets-src/maps/overworld.yaml` (`world.py`: WND-O's `MIRAGE_OPEN` now opens the door, one transition
+  to `mirage-1f` `arrival`, the shut-door inspect cell gone), `assets/maps/ai/overworld.yaml` (`--region wind`; no
+  chunk PNG changed), the 3 mirage maps, the 5 `sky-castle-*` stubs compiled (the ascent's warp target; WND-D2
+  replaces them), `index.yaml`; `assets/backgrounds/tower_of_babel.webp`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `mirage_floors.py`, `stubs.py` (`wrote 56 stub sources, kept 81 real maps`), `world.py`, then `git diff --exit-code assets-src/maps` after the commit (8d8f1821): exit 0, no diff; `git status --porcelain` empty |
+| G2 | `build_map.py mirage-1f mirage-2f mirage-3f`: `38x40`, `40x32`, `28x24 -> assets/maps/ai/...`; the 5 sky stubs `12x10`; `--check-determinism` on all 8: `deterministic`. `build_map.py overworld --region wind` (the lock; it waited ~4 min for another holder): exit 0, max RSS 3.98 GB; `--check-determinism --region wind overworld`: `overworld: deterministic` |
+| G3 | no `assets/maps/ai/overworld/` chunk changed (only the yaml) |
+| G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 2 failed / 330 passed (332)`, `Tests 2 failed / 7736 passed / 2 skipped`. The 2 failures are pre-existing on mainline: `questGraph.test.ts` (the (c) soft-locks) and `questLate.test.ts` (the (d) bands and elfheim gold) |
+| G5 | `npm run quest -- --mutate --stage S27`: (a) OK S27; (b) OK (32 withheld runs); (c) OK (59328 states); (d) `S27 L30.1 [29,32]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`, (h) `12 checked, 2 pending`; `mutations: OK (3 gate rows; 7 elements, each removal reported)`: GT-31 `SKIP S27 SKY_FORTRESS_OPEN reachable without chime` (both door cells), GT-32 `SKIP S27 ... without cube`; `quest-verify: OK` |
+| G5 full | `npm run quest -- --mutate`: (a), (b), (e)-(h) OK, `mutations: OK (48 gate rows; 65 elements)`; (c) 6 soft-locks at the Western Keep and (d) the S5-S10 bands and elfheim gold FAIL: **pre-existing** (the same (c) failures on mainline 66b539e1's data, run with `--root`); the INT-W2c items |
+| G6, G7 | in G4 |
+| G12 | `designNotes`, `originality` pass (`mirage: branching [mirage-1f>mirage-2f mirage-2f>mirage-1f mirage-2f>mirage-3f mirage-3f>mirage-2f]`); reviewer below |
+| G13, G14 | `npm run quest -- --only gh`: `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`, `(h) travel matrix: OK  (12 rows, 2 basin rows; 12 checked, 2 pending)`; T6, T8 and T9 are now checked and pass |
+| G16 | `stubs.py --check wnd-d1`: `stubs: 0 left for WND-D1` |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| backgrounds | `stage_backgrounds.py tower_of_babel` (550 KB); `--check` exits 1 with `no bounds for tower_of_babel (known: shoreline)`, as for ERT-O and FIR-D1 |
+| G10 (6.5) | headless Chromium on 5239, `mute=1` (`/tmp/w-wnd-d1/pw/s27.mjs`, encounters held off by the driver). `w_s27_start`: overworld (132, 37) -> `mirage-1f` (18, 37) -> the chime door (18, 31) passed -> spiral -> `mirage-2f` (4, 26) -> bridge -> `mirage-3f` (12, 20) -> the console -> `mirage_ascent`: SKY_FORTRESS_OPEN set, map `sky-castle-1f` (5, 8), cube still held; 0 console errors (`/tmp/w-wnd-d1/s27_start_{0_sands,1_vestibule,2_door_open,3_bridge,4_console,5_ascent,6_sky}.png`). `w_s27_neg_nochime`: stepping onto the door shows "A tall door of pale metal fills the arch, ... bronze cups ..." and puts the party back on (18, 32); further presses never reach `inner`; 0 errors (`s27_neg_{0_sands,1_vestibule,2_door}.png`) |
+
+**Topology:** 1F 38x40, 8 dead ends, aspect / fill 0.92 / 0.41; 2F 40x32, 5, 1.35 / 0.41; 3F 28x24, 4, 1.26 / 0.63.
+The stair graph has twin stairs 1F <-> 2F (the core and the well) and the one-way fall 2F -> 1F, so it branches
+(WND-D1: 1 of 1 dungeons). No boss.
+
+**Originality:** a first fresh reviewer passed the layouts and the text but failed two `Distinct:` claims (the chime
+door and the cube console are the classic's own functions, re-dressed only in text). The claims now name the
+double spiral, the sealed well, the bridged half-floors with the cracked span, and the console's dais. A second fresh
+reviewer returned `originality review: PASS mirage-1f mirage-2f mirage-3f`.
+
+**Deviations / shared-file edits (small; for the integrator):**
+
+- **The world compile.** A D tranche compiles no world unless it changes a site file (G2), but WND-O's
+  `MIRAGE_OPEN` opens the tower door as soon as `mirage-1f` stops being a stub, so `world.py` (G1) changes
+  `overworld.yaml`, and T6 (`mirage-1f:arrival`) fails on a stale compile. I ran `--region wind` under the lock; on a
+  merge conflict regenerate as usual.
+- **The ring's requiredFlag** is uncaught by the generic mutations while S28 is pending (the stub sky castle holds no
+  real event, and S28's pending grant needs SKY_FORTRESS_OPEN itself), so it has 4 `nonLoadBearing` entries whose
+  reason starts `pending:` (a failure under `--strict`). Once WND-D2 builds S28, removing it is SKIP S28. The ring is
+  what lets T9 (SKY_FORTRESS_OPEN, no events) reach `sky-castle-1f`.
+- `tests/progression/travelMatrix.test.ts` (INT-W2a's): T6 was asserted pending; it is now checked, so the test asserts
+  T6, T8, T9 `ok` and that every still-pending row is a strict failure.
+- `tests/quest/wind/wnd_o_walk.test.ts` (WND-O's): "SKY_FORTRESS_OPEN only by S27's assumed grant" now also holds off
+  the real mirage events (the console is S27's own).
+- Hand-off to WND-D2: the sky-castle stubs have no walking way back down; `mirage-3f` has the entrance `ring` for one.
+- Engine observation (not changed): after a shut gate puts the party back, `game.playerPosition` still reads the gate
+  cell until the next step (the player's grid cell is right).
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/wind/mirage_floors.py` + `mirage_common.py`
+(`mirage-1f..3f`); the debug scenarios gain `w_s27_start`, `w_s27_neg_nochime`; the background `tower_of_babel` is
+staged; a lift after a one-time cutscene is a transition with the cutscene's flag as `requiredFlag`.
 <!-- === end WND-D1 === -->
 <!-- === WND-D2 WIND (pass W: owned by WND-D2) === -->
 <!-- === end WND-D2 === -->

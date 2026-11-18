@@ -642,6 +642,28 @@
       text: "Fairy: \"Something is choking the sea off Onrac, the way the glass choked me. Go down and see.\""
 # === end WND-T ===
 # === WND-D1 (pass W: owned by WND-D1) ===
+# S27 (WORLD 4.7): the console of mirage-3f takes the cube (requiredItem; it is not consumed) and lifts the party to
+# the sky castle. The NPC's onceFlag is SKY_FORTRESS_OPEN, which this script sets; afterwards the bronze ring before
+# the console (a transition with requiredFlag SKY_FORTRESS_OPEN) makes the same climb.
+- id: mirage_ascent
+  steps:
+    - type: dialog
+      text: "You press the cube into the socket. It fits to the last edge, and its warmth runs out into the bronze. When you draw it out again, the console goes on humming."
+    - type: dialog
+      text: "The needles rise from their stops one by one, all of them swinging round to point at the ceiling. The ring in the floor begins to glow."
+    - type: dialog
+      text: "When you step into the ring, the floor stops pushing up against your feet. Far below, the tower's whole length gives a long sigh, like a bellows."
+    - type: set_flag
+      flag: SKY_FORTRESS_OPEN
+    - type: fade_out
+      duration: 700
+    - type: warp
+      map: sky-castle-1f
+      entrance: arrival
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "Cold, thin air, and no sound of sand. Through a gap in the wall the desert lies far below, small as a map."
 # === end WND-D1 ===
 # === WND-D2 (pass W: owned by WND-D2) ===
 # === end WND-D2 ===
