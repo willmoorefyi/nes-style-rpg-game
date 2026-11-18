@@ -4232,6 +4232,137 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 <!-- === WND-D1 WIND (pass W: owned by WND-D1) === -->
 <!-- === end WND-D1 === -->
 <!-- === WND-D2 WIND (pass W: owned by WND-D2) === -->
+### WND-D2 result: the sky castle (branch `w-wnd-d2` from `mainline` 7525dbad, merged with `mainline` 2ab79c11)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d2/`. The canon (4.7, 5.4) assigns WND-D2 the sky castle
+`sky-castle-1f..5f` with the boss `hollow_seraph` and the rare `warmech`, and that is what was built.
+
+**Files:**
+
+- `layouts/wind/sky_common.py` (77 lines): the materials (the open sky as the wall top, a blue recolour of the kit's
+  carpet weave; pale marble walks `-`; light-bridges `+`; amber conveyor belts `%`), the design note, the encounter
+  tables (the 4F zone table holds the Warmech at weight 1 of 64), the chest helper and `Room.belt` (every belt cell
+  is a same-map transition to the belt's far end, so a belt is walked one way).
+- `layouts/wind/sky_lower.py` (111) writes `sky-castle-1f` (40x38) and `-2f` (46x34); `layouts/wind/sky_upper.py`
+  (142) writes `-3f` (36x30), `-4f` (44x30) and `-5f` (26x34).
+  - 1F, the dock ring: an octagonal walk round a well of open sky, four light-bridge spokes to a central hub (berth
+    chart inspect cell); `mirage_ascent` sets the party down on the south berth (entrance `arrival`), behind a ward
+    (`keyItemGates requiredFlag: SKY_FORTRESS_OPEN`, always open in play); the berth's tip is a beam down to
+    `mirage-3f` entrance `ring` (WND-D1's lift back up). Twin stairs up: the hub's to 2F `arrival`, the east berth's
+    to 2F `east` (a new entrance; 1F's `up_east`). Three blind berths hold chests.
+  - 2F, the light-bridge maze: six islands over the sky joined by bridges and four belts (B => D, C => F, D => the
+    stair island E, E => C). The stair up stands on E, reached only by a belt; every island leads back to every
+    other. Three blind bridge stubs hold chests (`reach_roots: [east]`).
+  - 3F, the archive: shelf stacks, lecterns, a globe and a star-chart table (inspect: the hint that the forge's ore
+    is in the vault); a brass archivist (`old_man`, tinted; reactive on WIND_CRYSTAL_LIT); a west door and a narrow
+    passage down to the vault, a dead end holding the adamant (`CHEST_WND_D2_ADAMANT`); three blind niches.
+  - 4F, the engine halls: three halls of pistons and furnaces joined by staggered cross passages; the whole floor is
+    the zone `wnd_d2_engine` ("Sky Castle Engine Halls"): soldier, black_flan, death_knight, air_elemental,
+    dark_fighter, and `[warmech, air_elemental]` at 1 in 64. Three blind bays and a coal chute.
+  - 5F, the seraph's spire, `canSave: false`: a nave due north of the arrival (octant N, path 20) up a light-bridge
+    runner to the seraph (`knight` sheet, tinted brass) before the wind crystal's altar (inspect, turns on
+    WIND_CRYSTAL_LIT). Talking to her starts `[hollow_seraph, air_elemental]` (`flag: WIND_CRYSTAL_LIT`,
+    `postVictoryCutscene: wnd_seraph_falls`).
+  - Chests 3 / 3 / 4 / 3 / 2 (`CHEST_WND_D2_*`): consumables and B7 gear (diamond helm, armlet and shield, a vorpal
+    sword) plus the adamant. Every floor has `exit` to `overworld:wnd_mirage`. Encounters: 1F-2F air_elemental,
+    earth_medusa, black_flan, soldier, spirit_naga; 3F-5F death_knight, vampire_lord, dark_fighter, spirit_naga,
+    soldier (rate 18-30). Backgrounds: 1F-4F `sky_palace`, 5F `throne_tiamat`, staged by `stage_backgrounds.py`.
+- `cutscenes.yaml` (WND-D2 anchor): `wnd_seraph_falls` (the plates fall; the crystal clears and turns; `set_flag
+  WIND_CRYSTAL_LIT` behind a fade; the world's sails and windmills fill).
+- `enemies.yaml` (the two WND-D2 anchors, `bossPhases` only): the seraph gains a full-HP phase (6 hits, attack 78,
+  with a message); the Warmech a full-HP phase (2 hits, attack 103, from 128). Both 0.5 phases are kept.
+- `quest.yaml` S28: `status: built`; `grants` add `adamant` (for S31, /tmp/world_int_notes.md); `zones:
+  [sky-castle-4f:wnd_d2_engine]`; `entry` sky-castle-1f (19, 34) on foot with the airship on the oasis meadow
+  (135, 38) beside the tower; `walk: [sky-castle-1f:warp:arrival, sky-castle-2f:warp:d_belt, sky-castle-2f:warp:e_belt,
+  sky-castle-2f:warp:sky-castle-3f, sky-castle-3f:chest:chest_adamant, sky-castle-3f:warp:sky-castle-4f,
+  sky-castle-4f:warp:sky-castle-5f, sky-castle-5f:battle:hollow_seraph]`; `nonLoadBearing`: the seraph's `hideIf`.
+  No `milestones` (S28 sets one flag).
+- `debug-scenarios.yaml`: `w_s28_start` (sky-castle-1f `arrival`, L31 Knight / Ninja / W.Wiz / B.Wiz in B7 gear, the
+  flags through S27, the airship at (135, 38)) and `w_boss_hollow_seraph` (L32, B7 gear, 3 potions, `throne_tiamat`).
+- Tests: `tests/quest/wind/wnd_d2_sites.test.ts` (8: chests, exits, canon entrances and links, the ward and twin
+  stairs, the belts one way and the stair island behind a belt, the vault, the zone's 1/64, the seraph north, and a
+  castle-wide soft-lock check), `tests/quest/wind/wnd_d2_walk.test.ts` (2), `tests/balance/w_wnd_d2.test.ts` (5).
+
+**Balance (S28, 400 seeds, kit `w_s28`, upgraded party, 3 potions; enemy spells and specials not simulated):** before
+this pass the seraph alone fell 100 % of the time at L30-L34, and the Warmech alone gave a flat curve (L30 53.0 %,
+L32 62.0 %, L34 76.0 %). Phases alone stayed flat (seraph 6x100: L30 45.5, L32 59.5), so each fights beside an
+air_elemental (an S28 roster enemy), which steepens the curve.
+
+| Fight | L30 | L32 | L34 | Targets (3.7) |
+|---|---|---|---|---|
+| `[hollow_seraph, air_elemental]` sensible | **39.5 %** | **69.0 %** | 89.8 % | L32 60-80, L30 <= 45 |
+| `[warmech, air_elemental]` sensible | **36.0 %** | **58.8 %** | 71.5 % | L32 55-80, L30 <= 40 |
+
+The careless policy wins more than the sensible one here (seraph L30 97.5 %, Warmech L30 99.0 %): with B7 gear the
+careless party attacks every turn instead of healing. 3.7 sets no careless row for S28, so it is reported, not
+pinned (INT may want to look at the policy).
+
+**Topology:**
+
+| Floor | Size | Dead ends | Aspect / fill | Notes |
+|---|---|---|---|---|
+| sky-castle-1f | 40x38 | 5 | 1.06 / 0.32 | ring, hub, 4 spokes, 5 berths |
+| sky-castle-2f | 46x34 | 6 | 1.38 / 0.38 | 6 islands, 4 one-way belts |
+| sky-castle-3f | 36x30 | 4 | 1.36 / 0.51 | hall, vault passage |
+| sky-castle-4f | 44x30 | 7 | 1.46 / 0.46 | 3 halls, `wnd_d2_engine` |
+| sky-castle-5f | 26x34 | 2 | 0.74 / 0.47 | boss N, path 20 |
+
+The stair graph: 1F <-> 2F by twin stairs, then a chain to 5F, so it branches (`sky-castle: branching`; WND-D2: 1
+of 1 dungeons branches).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 `sky_lower.py`, `sky_upper.py`, `stubs.py`, `world.py --check-bands`, `world.py`, `git diff --exit-code assets-src/maps` | exit 0, no diff (`stubs: wrote 49 stub sources, kept 88 real maps (137 canon ids)`) |
+| G2 `build_map.py sky-castle-1f ... -5f`, then `--check-determinism` on the 5 ids | each `sky-castle-Nf: WxH -> assets/maps/ai/sky-castle-Nf.yaml`, then `sky-castle-Nf: deterministic`. No world compile (no site file changed) |
+| G3 | n/a: no overworld chunk changed |
+| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` | build exit 0 (after the `e.groups` type fix); vitest: the 6 mainline failures (proof (c) soft-locks and (d) bands: `questGraph` "passes (a), (b) and (c)", `questLate` (d), the S10 / S12 / S25 / S15 walks), plus, until WND-D1 merges, the hand-off failures below |
+| G5 `npm run quest -- --mutate --stage S28` | (a) OK S28; (b) OK (32 withheld runs); (c) FAIL: with WND-D1 merged (a scratch trial merge) only the mainline STRANDED / SOFTLOCK states of the visit-order bug in cornelia-castle and elfheim-vault remain (`LIMIT` at 200000 states); before it every state outside the castle is SOFTLOCK (no lift back up); (d) `hollow_seraph L32.5 [31,34]`; (e)-(g) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; (h) T9 (see below); `mutations: OK (2 gate rows; 3 elements, each removal reported)` |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings`: passed |
+| G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
+| G9 `w_wnd_d2.test.ts`; `check-bounds "tests/balance/w_*.test.ts"` | 5 passed; `check-bounds: OK (23 tests)` |
+| G10 browser, port 5240, `mute=1` | `w_s28_start` (headless Chromium, `/tmp/w-wnd-d2/pw/s28.mjs`): 1F (19, 34) -> hub stair -> 2F (8, 26), belt B => D to (31, 15), belt D => E to (24, 6), 3F, the vault chest (adamant 1), 4F, 5F; the seraph's talk started `Hollow Seraph, Air Elemental` on `throne_tiamat`; won, WIND_CRYSTAL_LIT set; 0 console errors. Encounters held off by the driver. Screenshots: `/tmp/w-wnd-d2/s28_0_berth.png`, `s28_1_2f.png`, `s28_2_2f_island_e.png`, `s28_3_vault.png`, `s28_4_engine.png`, `s28_5_seraph.png`, `s28_6_battle.png`, `s28_7_end.png` |
+| G12 `designNotes`, `originality` | passed (`sky-castle: branching`) |
+| G16 `stubs.py --check WND-D2` | `stubs: 0 left for WND-D2` |
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| `stage_backgrounds.py sky_palace throne_tiamat` / `--check ...` | staged (306 / 347 KB); `--check` exits 1 with `no bounds for sky_palace (known: shoreline)`, as for ERT-O and FIR-D1 |
+
+**Originality:** a fresh reviewer, given the three scripts, the five sources, the previews and the cutscene, returned
+`originality review: PASS sky-castle-1f sky-castle-2f sky-castle-3f sky-castle-4f sky-castle-5f`. It noted that the
+2F belts echo the classic's teleporter idea without copying it (four visible one-way belts between islands, no grid of
+rooms), and that "sealed" for the vault is flavour (it has no lock; it is reached only by the west passage).
+
+**Hand-offs (merge order):**
+
+- **WND-D1 first.** Until WND-D1's mirage-1f..3f, `mirage_ascent` and the 3F `ring` land, nothing warps into the
+  castle on the full run: (a) fails with `goal unreachable; never completed: S28 S29 S30` (and the A1-O, A1-T, FIR-T
+  full-run walk tests and `questGraph`'s S18 test with it), T9 `cannot reach sky-castle-1f`, and
+  `crossFileValidation` misses `mirage-3f` (the berth beam's target). A scratch trial merge of `w-wnd-d1` into this
+  branch cleared T9, the beam target and the exit SOFTLOCKs; merge WND-D1 before WND-D2.
+- **WND-D1's 4 `pending:` `nonLoadBearing` entries** (S27, the ring's cells): the ring's flag check is still not
+  load-bearing once S28 is built, because sky-castle-1f's berth ward holds the same flag. Replace each reason with
+  "redundant with sky-castle-1f's berth ward (requiredFlag SKY_FORTRESS_OPEN), which holds the same flag; in --stage
+  S28 the ward's removal is SKIP S28".
+- **`questGraph.test.ts` "S31 waits for its adamant, which no stage grants yet"** (W1-H) is no longer true: S28 grants
+  the adamant. ERT-O / INT: set S31 built and `SMYTH_TRADE` in `earth/dwarf.py` (ERT-O's note), and drop or reword the
+  test.
+
+**Deviations / shared-file edits:**
+
+- Both fights add an `air_elemental` escort (an S28 roster enemy), as ELF-O, ORD-O and FIR-D1 add escorts; the
+  Warmech's numbers are throttled (attack 103, from 128) by a full-HP phase, the only lever its anchor allows.
+- 1F has the berth ward (`requiredFlag: SKY_FORTRESS_OPEN`), redundant in play, so S28's requirement stays
+  load-bearing in assume mode (S28's entry is inside the castle: the only way in is WND-D1's warp).
+- The berth beam to `mirage-3f:ring` and 2F's `east` / 1F's `up_east` and the belt entrances are additions to the
+  canon; every canon entrance and link is kept.
+- The castle uses existing art only: sky / marble / light-bridge / belt recolours of the kit materials, and the
+  `knight` and `old_man` sheets tinted.
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/wind/sky_lower.py` (`sky-castle-1f`, `-2f`) and
+`sky_upper.py` (`sky-castle-3f..5f`), with `sky_common.py` (`Room.belt`: a one-way conveyor of same-map transitions;
+the open sky is the wall top). The 4F zone `wnd_d2_engine` holds the Warmech (1 in 64). The debug scenarios gain
+`w_s28_start` and `w_boss_hollow_seraph`; the backgrounds `sky_palace` and `throne_tiamat` are staged.
 <!-- === end WND-D2 === -->
 <!-- === PST PAST (pass W: owned by PST) === -->
 <!-- === end PST === -->
