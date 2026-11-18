@@ -254,6 +254,14 @@
   weakness: fire
   resist: dark
   family: undead
+  # ERT-D (WORLD 3.7): he fights with three mummies from his crypt (cavern-earth-b3), and from the first round
+  # (threshold 1) he strikes 4 times at attack 90, measured in tests/balance/w_ert_d.test.ts
+  bossPhases:
+  - hpThreshold: 1
+    patternId: aggressive
+    message: His eyes burn red!
+    hits: 4
+    attack: 90
 # === end ERT-D vampire ===
 - id: dragon
   name: Red Dragon
@@ -349,10 +357,14 @@
   pulseTint: "#ffdcdc" # lighter than the default #ffb0b0: the pale lich turned muddy under it (final play test)
   weakness: fire
   resist: ice
+  # ERT-D (WORLD 3.7): he fights with two earth elementals bound to his throne (cavern-earth-b5); his first wound
+  # cracks his skull and he strikes 4 times at attack 90, measured in tests/balance/w_ert_d.test.ts
   bossPhases:
-  - hpThreshold: 0.5
+  - hpThreshold: 0.99
     patternId: aggressive
-    message: The Rime Sovereign's skull fractures!
+    message: His skull fractures!
+    hits: 4
+    attack: 90
   family: undead
   size: boss
 # === end ERT-D lich ===
