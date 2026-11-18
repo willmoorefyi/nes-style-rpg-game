@@ -41,7 +41,8 @@ describe('bestiary habitats (compiled maps)', () => {
     expect(text('skeleton')).toBe('World Map (Temple approach), Temple of Fiends');
     expect(text('gr_wolf')).toBe('World Map (East pocket, Northern Mainland)');   // A1-O: the mainland zone
     expect(text('garland')).toBe('Temple of Fiends (boss)');
-    for (const id of ['vampire', 'dragon', 'lich']) expect(text(id)).toBe('Not placed yet');
+    expect(text('dragon')).toBe('Gurgu Volcano B3, Gurgu Volcano B4, Gurgu Volcano B5');   // FIR-D1: the lower floors
+    for (const id of ['vampire', 'lich']) expect(text(id)).toBe('Not placed yet');
   });
 
   it('backgrounds: overrides, the first habitat, else the default', async () => {

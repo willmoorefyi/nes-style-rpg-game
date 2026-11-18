@@ -1650,7 +1650,15 @@
   sprite: ashen_queen
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
+  # FIR-D1 (WORLD 3.7: L23 sensible 60-80 %, L21 <= 45 %): her roster stats fall to a B5 party at any band level
+  # (measured 100 % at L21-L25), so she wakes already burning (a phase from full HP: six hits at attack 61) and a fire
+  # lizard (gurgu-b5's battle) fights beside her; the old 0.5 phase keeps its line and heavy attacks
   bossPhases:
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 6
+    attack: 61
+    message: "Flame runs down the Ashen Queen's six arms!"
   - hpThreshold: 0.5
     patternId: aggressive
     message: "The Ashen Queen's rite turns to inferno!"

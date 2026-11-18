@@ -2850,6 +2850,119 @@ ends (two niches, the antechamber); the boss on 2F north-east of the arrival.
 is two NPCs on one cell (a `showIf`-gated boss after a cutscene trade), see the keep.
 <!-- === end ELF-O === -->
 <!-- === ELF-T ELF (pass W: owned by ELF-T) === -->
+### ELF-T result: Elfheim, the prince and the vault (branch `w-elf-t` from `mainline` 3a549665, merged with `mainline` 4015c773 after ORD-O and A1-T)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-elf-t/`.
+
+**Files:**
+
+- `layouts/elf/town_elfheim.py` writes `elfheim` (52x50, kits town + castle). The plan:
+  - a ring of living hedges (every cell outside the ring polygon is a `hedge` deco, round bushes on its bastion bends)
+    with one south gate; the high street (x 25-26) runs from the gate to the castle door on the rise;
+  - a spring pool under the rise (north-west) feeds a stream through the middle of the town to a lily pond in the
+    south-east; the high street and two lanes cross it by bridges;
+  - north, west, south, magic and east lanes; a herb garden by the herbalist's; oaks and firs among green-roofed
+    houses (the `elf` roof style); an inner hedge with topiary guards between the town and the wooded rise;
+  - the castle front (a facade, `name: north_gate`) whose door leads to `elfheim-castle:gate`; a signpost inspect cell;
+  - 11 `type: house` objects (6 homes, 5 shops) plus the `inn` prefab.
+- `layouts/elf/town_elfheim_people.py`: the 19 outdoor townsfolk (`talk()`: PRINCE_AWAKE, `item:herb`,
+  `item:crystal_eye`, ASTOS_DEFEATED, MARSH_GUARD_DEFEATED, then the default); `elfheim_matoya_hint` names Matoya,
+  `elfheim_marsh_hint` the Marsh Cave; a dwarf peddler points at Nerrick and the vault's powder (S10).
+- `layouts/elf/town_elfheim_rooms.py` is the runner for the rooms: `town_elfheim_homes.py` (herbalist, bowyer,
+  scribe, healer = the clinic, `clinicPrice: 20`, bard, warden), `town_elfheim_shops.py` (the five shops and the inn,
+  each keeper boxed behind a counter; greetings change on PRINCE_AWAKE) and `town_elfheim_castle.py`:
+  - `elfheim-castle` (26x20): the hall, the prince's empty throne, the stair up to the chamber (north-west), the stair
+    down to the vault (south-east) behind two `keyItemGates` cells (`requiredItem: mystic_key`, permanent,
+    ELF_T_VAULT_OPEN; the message is conditional on PRINCE_AWAKE);
+  - `elfheim-castle-chamber` (14x10): `elfheim_prince` (`requiredItem: herb`, `hideIf: PRINCE_AWAKE`, cutscene
+    `elf_prince_wakes` with `onceFlag: PRINCE_AWAKE`) and, on the same cell, `elfheim_prince_awake`
+    (`showIf: PRINCE_AWAKE`);
+  - `elfheim-vault` (12x10): `tnt` (CHEST_ELF_T_TNT), `ether` and `phoenix_down` (CHEST_ELF_T_ETHER, _PHOENIX).
+- `layouts/elf/town_elfheim_site.py` is **unchanged**, so no world regeneration is needed.
+- Data:
+  - `cutscenes.yaml` (ELF-T anchor): `elf_prince_wakes` (the herb taken; over a fade, PRINCE_AWAKE, `give_item
+    mystic_key` and a `warp` into the chamber, so the woken prince appears; then his lines);
+  - `quest.yaml` (ELF-T anchors): S4, S8 and S9 `built`, with their walks and entries; INT-W2a's GT-5 entry is kept;
+    the town `elfheim` is `built`;
+  - `debug-scenarios.yaml` (ELF-T anchor): `w_s4_start` (Pravoka's quay, the brig at its dock, level 5, B2 kit),
+    `w_s8_start` (Elfheim's gate, the brig at `elf_port`, level 10, B3 kit, the herb), `w_s9_start` (the same with
+    the Mystic Key and PRINCE_AWAKE). There is no `w_boss_*`: the three stages have no boss;
+  - `shops.yaml`: W1-F's `elfheim_*` records are kept unchanged (B3 stock, inn 100).
+- Tests: `tests/quest/elf/elf_t_town.test.ts` (12 tests: the canon links both ways, the south gate, EXIT-safe maps,
+  the prince's trade and cutscene, the living gate, the vault chests, the hints, 12 or more reactive people, the clinic
+  and inn prices, ELF-T's flag prefixes, the site file) and `tests/quest/elf/elf_t_walk.test.ts` (5 tests: the three
+  walks and (a)-(c) in assume mode, PRINCE_AWAKE only with the herb, the TNT only with the key, the town entry).
+
+**Stage design.** S4: walk `overworld:board:ship`, `overworld:dock:elf_port`, `overworld:warp:elfheim`, from the
+`a1_pravoka` land cell with the brig at its dock. S8: walk `elfheim-castle-chamber:npc:elfheim_prince` (Matoya's
+pattern: `requiredItem` plus a cutscene that takes and gives). S9: walk `elfheim-vault:chest:tnt`. The gate step is
+not in S9's walk: the gate lies on S8's map, so the replay settles it before the walk starts. S8 and S9 start at
+`elf_elfheim` with the brig at `elf_port`. Without the ship in the entry, Pravoka is out of reach from Elfland, and
+(e) reported `SHOPLESS pravoka`.
+
+**Town standard (G15):** `elfheim: houses 11/9 interiors 6/6 outdoor 19/16 interior 13/12 hints 2/2 reactive 36/4
+shops 5/5 inn 100/100 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 | `town_elfheim.py`, `town_elfheim_rooms.py`, `stubs.py` and `world.py` (`bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)`), then `git diff --exit-code assets-src/maps`: clean |
+| G2 | `build_map.py` for the 16 ids, one process: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`; `--check-determinism` for the 16 ids: each `<id>: deterministic`. There is no overworld compile, because the site file is unchanged |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G5 | `npm run quest -- --mutate --stage S4`: (a) OK S4, (b) OK (7 withheld runs), (c) OK (35812 states), (d) `S4 L8.0 [5,9]`, (e)-(h) OK, `mutations: OK (3 gate rows; 3 elements)`, `quest-verify: OK`. `--stage S8`: (d) `S8 L10.2 [10,13]`, `mutations: OK (1 gate rows; 1 elements)` (GT-9), OK. `--stage S9`: (d) `S9 L10.1 [10,13]`, `mutations: OK (1 gate rows; 2 elements)` (GT-10, both gate cells), OK. Full `npm run quest -- --mutate`: (a), (b) (424 runs), (c) (18094 states), (e)-(h) and `mutations: OK (45 gate rows; 58 elements)` all OK; **(d) FAIL** `BAND elfheim gold 1615 at S4 below 50 % of 12940` (BLOCKED, see below) |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: 323 files, 7171 passed, **2 failed**: `questLate.test.ts` (the same BAND line) and `stageEarlyShops.test.ts` (fails on `mainline` 4015c773 too) |
+| G6, G7, G12, G15 | `tests/quest/` (with `elf/elf_t_*`, `townStandard`, `designNotes`, `originality`), `assetCoverage`, `questCeilings`: 513 passed. Every ELF-T layout file is under 250 lines |
+| G8 | `build_map.py --selftest`: 104 checks passed |
+| G13, G14 | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G16 | `stubs.py --check elf-t`: `stubs: 0 left for ELF-T`, exit 0 |
+| G17 | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G10 | Port 5224, `mute=1`, my own headless Chromium (`/tmp/w-elf-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s4_start`:
+
+- Sailing: boarded the brig at (132, 102) (mode `ship`) and sailed to the `elf_port` dock (84, 147). Stepped ashore to
+  (84, 148) on foot, then entered by the overworld door (82, 151): the map is `elfheim` at its gate (25, 46).
+- In town: talked to the gate warden ("A ship out of the Aldi, and humans on it...").
+- Services: bought a Potion at the item shop (1500 -> 1440 G, potions 5 -> 6). The inn cost 1440 -> 1340 G. At the
+  clinic, BLM was felled by debug and revived for 100 G (level 5 x 20), HP 1.
+- Screenshots: `/tmp/w-elf-t/s4_dock.png`, `s4_gate.png`, `s4_talk.png`, `s4_shop.png`, `s4_inn.png`,
+  `s4_clinic.png`.
+
+G10, `w_s8_start`: gate -> `elfheim` -> north gate -> `elfheim-castle` -> the west stair -> the chamber. Talking to
+the prince with the herb played `elf_prince_wakes`. Afterwards PRINCE_AWAKE is set, `mystic_key` is 1 and `herb` is
+0. The reloaded chamber shows `elfheim_prince_awake`, the nurse and the guard. Screenshots: `s8_hall.png`,
+`s8_prince.png`, `s8_awake.png`.
+
+G10, `w_s9_start`: the hall's vault stair (20, 14) with the key: ELF_T_VAULT_OPEN is set and the map is
+`elfheim-vault`. The chest gave `tnt` 1 (CHEST_ELF_T_TNT). Screenshot: `s9_tnt.png`.
+
+**Originality:** every one of the 16 maps has its design note. The reviewer's first pass failed six notes as
+untrue: the carpets drew red, there was no hearth or chimney, a shelf was on another wall, and the town has five
+lanes, not three. A remake-like line ("a kiss would wake him") was replaced. All six were fixed: the carpets are now
+remapped green, and the notes are reworded or the layouts changed. On the re-review the castle's note needed one more
+correction (the stair stands beside the pillar, not between two), and then:
+`originality review: PASS elfheim elfheim-house-herbalist elfheim-house-bowyer elfheim-house-scribe
+elfheim-house-healer elfheim-house-bard elfheim-house-warden elfheim-weapon-shop elfheim-armor-shop elfheim-item-shop
+elfheim-white-magic elfheim-black-magic elfheim-inn elfheim-castle elfheim-castle-chamber elfheim-vault`.
+
+**Deviations / hand-offs:**
+
+- **BLOCKED (INT, kits / curve):** the full `npm run quest -- --mutate` passes every proof except (d)'s town gold rule,
+  `BAND elfheim gold 1615 at S4 below 50 % of 12940` (W1-F's `w_elfheim` 4-member price). The gold at S4's start
+  comes from S2 and S3 (A1-T, A1-O grind) and the kit is W1-F's, so none of it is ELF-T's to tune. The check counts
+  only once the town is built, so it shows up now. `tests/progression/questLate.test.ts` fails on the same line.
+- `tests/progression/stageEarlyShops.test.ts` (`SHOPLESS pravoka` from S6's entry) already fails on `mainline`
+  4015c773 with the stub Elfheim maps. It is not caused by ELF-T.
+- Shared-file edit: `tests/quest/earth/ert_o_walk.test.ts`. Its "S10 without the TNT" closure could now re-open the
+  real vault chest, so the test starts with CHEST_ELF_T_TNT set (the TNT came from the vault).
+- Two vault chest items, `ether` and `phoenix_down`, stand in for 4.2's "2 B3 chests": they are consumables, not gear.
+- The prince is a tinted `knight` standing on a carpeted bier. No field sheet lies down.
+
+**AGENTS.md delta (for INT):** "Editing a 2x Map" gains `layouts/elf/town_elfheim.py` (Elfheim) and
+`layouts/elf/town_elfheim_rooms.py` (its 15 rooms, from `town_elfheim_{homes,shops,castle}.py`). A sleeping NPC who
+wakes on a trade is two NPCs on one cell (`hideIf` / `showIf` on the flag), plus a `warp` into the same room behind
+the cutscene's fade, so that the new NPC appears.
 <!-- === end ELF-T === -->
 <!-- === ELF-D ELF (pass W: owned by ELF-D) === -->
 ### ELF-D result: the Marsh Cave B1-B3, S5 (branch `w-elf-d` from `mainline` 3a54966)
@@ -3284,8 +3397,275 @@ and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescen
 `modes` and `name`. The debug scenarios gain `w_s17_start` and `w_s17_neg_nostone`.
 <!-- === end FIR-O === -->
 <!-- === FIR-T FIRE (pass W: owned by FIR-T) === -->
+### FIR-T result: Crescent Lake and the Circle of Sages (branch `w-fir-t` from `mainline` 1e2fdfc1)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-t/`.
+
+**Files:**
+
+- `layouts/fire/town_crescent.py` writes `crescent` (54x46, kits town + castle + overworld), with the design note in
+  its header.
+  - The plan: a headland whose inner shore bends round in a crescent. The lake wraps the east and the south of the
+    map, and its far bank shows in the south-east corner. Three terraces step down to the water. Each is held up by
+    a 2-row band of rock, and stone stairs cut through it (x 21-22 and 45-46 in the upper band, x 9-10 and 29-30 in
+    the lower).
+  - The Star Terrace holds the tutor's school, the archive, a shuttered reading room, the astronomer's house, and
+    the observatory hall with a telescope tower (the approved castle turret).
+  - On the Market Terrace, the Sea Road runs from the west land gate to a landing stage on the lake. The five shops,
+    the Fountain Court and the inn line its north side. The healer (the clinic), the potter, a scriptorium, a flower
+    garden and the pilgrims' hostel line its south side.
+  - The Lakeside is a lawn in the bowl of the shore, with a statue of the first sage, the boatwright's yard, two
+    boathouses on piles and a dirt path along the shore. From its southern tip, the causeway leaves by the south
+    edge to `crescent-circle:arrival` (entrance `circle`).
+  - 17 `type: house` objects: 6 homes, 5 shops, and 6 without a way in (the reading room, the observatory, the
+    scriptorium, the hostel and the two boathouses). The inn is the `inn` prefab. There are three inspect cells
+    (the signpost, the observatory, the scriptorium), and the west edge exits to `overworld:fir_crescent`.
+- `layouts/fire/town_crescent_people.py`: the 19 outdoor NPCs and `NO_WANDER`. Nearly every line has three steps:
+  CANOE_GIVEN, then EARTH_CRYSTAL_LIT, then the default (the rot in the earth). `ferryman_hint` names the sages and
+  `geologist_hint` names the volcano, at every step.
+- `layouts/fire/town_crescent_circle.py` writes `crescent-circle` (27x21), an islet in the lake.
+  - The causeway arrives from the north edge, and the north edge exits to `crescent:circle`. Ten standing stones
+    (castle `pillar`s) make a ring that is open toward the causeway, with an urn at its heart.
+  - There are 12 sages: 8 inside the ring and 4 at the islet's edges.
+  - `sage_elder` (13, 8) has the cutscene `{id: fir_sages_canoe, requiredFlags: [EARTH_CRYSTAL_LIT], onceFlag:
+    CANOE_GIVEN}`. Before the flag, he says: "Heal the earth first."
+  - `sage_lukahn` speaks the prophecy in new words. The other ten sages speak of the rotting earth before S13, of fire
+    and frost after it, and of the canoe last.
+  - The map has `exit: {map: crescent, entrance: circle}`.
+- `layouts/fire/town_crescent_rooms.py` is the runner for the interiors. `town_crescent_homes.py` writes the six
+  `crescent-house-*` maps, and `town_crescent_shops.py` writes the five shops and `crescent-inn`. They use W1-D's
+  `Town("crescent")`. Each room has its own plan and a design note:
+  - healer: the clinic, `clinicPrice: 60`, an infirmary of cots;
+  - astronomer: a study and a bedchamber through an arch, chest `ether`;
+  - boatwright: a hull on the stocks, chest `hi_potion`;
+  - archivist: a hall of shelves, chest `phoenix_down`;
+  - potter: a wheel room and a kiln room, chest `soft`;
+  - tutor: the school;
+  - the shops: each keeper stands in a closed bay. The inn has a dormitory behind a partition.
+  - Chest flags are `CHEST_FIR_T_*`.
+- `layouts/fire/town_crescent_site.py` is **unchanged**. FIR-O's world already reads W1-0b's defaults: the gate
+  (148, 124), the door (149, 124) and the `fir_crescent` dock (146, 124). So there was no world regeneration and no
+  chunk change (G3 n/a).
+- Data:
+  - `cutscenes.yaml` (FIR-T anchor): `fir_sages_canoe`. It plays dialog, then `give_item canoe`, then `set_flag
+    CANOE_GIVEN`, then the closing lines.
+  - `quest.yaml` (FIR-T anchors):
+    - S14 is `status: built`.
+    - Its walk is `overworld:board:ship`, `overworld:warp:crescent`, `crescent:warp:crescent-circle`,
+      `crescent-circle:npc:sage_elder`.
+    - Its entry is on foot at Melmond's harbour, overworld (42, 112), with the ship at the `ert_melmond` dock
+      (43, 113). See the deviations for why.
+    - It has one stage-scope `nonLoadBearing` entry, for GT-20.
+    - The town `crescent` is `built`.
+  - `debug-scenarios.yaml` (FIR-T anchor): `w_s14_start` (level 17, B4 kit, flags through S13) and `w_s14_early`
+    (level 13, B3 kit, flags through S10). Both start at `overworld:fir_crescent`, with the ship at the dock.
+  - `shops.yaml`: the seeded `crescent_*` records are kept unchanged (B5 stock, L5 magic, inn 300).
+- Tests:
+  - `tests/quest/fire/fir_t_town.test.ts` (13 tests) covers:
+    - the canon door links both ways;
+    - the causeway links both ways;
+    - the gate edge exits;
+    - EXIT-safety for the town, the Circle and every room;
+    - the elder's gated cutscene, and that the canoe has no other source;
+    - the 12 sages and their three-step lines, and the hints;
+    - the clinic and inn prices and the six keepers;
+    - the `CHEST_FIR_T_` flags;
+    - the site file against the compiled overworld.
+  - `tests/quest/fire/fir_t_walk.test.ts` (3 tests): the S14 walk and entry, (a) in assume mode, the town entry, and
+    the full-run order S13 < S14 < S15, S16.
+
+**Town standard (G15):** `crescent: houses 17/9 interiors 6/6 outdoor 19/16 interior 18/12 hints 2/2 reactive 44/4
+shops 5/5 inn 300/300 clinic true/true`.
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G16 | `stubs.py --check fir-t`: `stubs: 0 left for FIR-T`, exit 0 |
+| G2 | `build_map.py` for the 14 ids, under the lock: each prints `<id>: WxH -> assets/maps/ai/<id>.yaml`. `--check-determinism` for the 14 ids: 14 lines `<id>: deterministic`, exit 0. There was no overworld compile, because the site file is unchanged |
+| G1 | the 5 FIR-T layout scripts, `stubs.py` (`kept 47 real maps`) and `world.py`, then `git diff --exit-code assets-src/maps`: clean (after the commit) |
+| G5 | `npm run quest -- --mutate --stage S14`: (a) OK S14; (b) OK (18 withheld runs, 16 not required); (c) OK (67784 states); (d) `S14 L17.3 [17,20]`; (e) to (h) OK; `mutations: OK (2 gate rows; 2 elements, each removal reported)`; `quest-verify: OK` |
+| G5, full run | `npm run quest -- --mutate`: `quest-verify: OK` (45 gate rows; 57 elements). On the full world, GT-19 is caught (`SKIP S14 CANOE_GIVEN reachable without its requirement EARTH_CRYSTAL_LIT`, and without S11-S13). GT-20 is caught (`EARLY crescent talkable before S13`). GT-21 and GT-37 are pending until S15 and S16 are built |
+| 5.4 proof (f) | `(f) price walls: OK  crescent pending`. Crescent is built, but its first-arrival gold is tainted by the pending stages before it (S4, S5, S8, S9, S11, S13), so the curve marks it assumed. It goes live at INT |
+| G13, G14 | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)` |
+| G6, G7, G12, G15 | `assetCoverage`, `crossFileValidation`, `designNotes`, `originality`, `townStandard` and `tests/quest/fire/`: 9 files, 2903 passed, 4 skipped |
+| G4 | `npm run build`: exit 0. `npx vitest run --maxWorkers=2 --minWorkers=1`: exit 0; `Test Files 323 passed (323)`, `Tests 7210 passed, 4 skipped (7214)`. The first run caught one duplicate opening sentence ("Shh.") in `actOneDialog.test.ts` (T6); the copyist's line is reworded |
+| G17 | `world.py --check-bands`: `bands: OK`; `world.py`: `bands: OK`, `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| G3 | n/a: no `town_*_site.py` change, so no overworld chunk changed |
+| G10 | Port 5230, `mute=1`, my own headless Chromium (`/tmp/w-fir-t/cp.mjs`), 0 console errors. Results below |
+
+G10, `w_s14_early`:
+
+- The party entered Crescent from `overworld` (148, 124).
+- It bought a Potion at the item shop (`_shop_crescent_item`; 1500 -> 1440 G, potions 6 -> 7).
+- Over the causeway the map was `crescent-circle`. The elder said "...while it rots we can give you nothing. | Heal
+  the earth first...". CANOE_GIVEN stayed unset, and there was no canoe.
+- Screenshots: `/tmp/w-fir-t/s14_early_gate.png`, `s14_early_shop.png`, `s14_early_buy.png`, `s14_early_elder.png`.
+
+G10, `w_s14_start`:
+
+- The party reached the Circle, talked to the elder, and `fir_sages_canoe` played. CANOE_GIVEN was set and the canoe
+  held.
+- Back out by the causeway and the gate to `overworld` (148, 124). A step east from (153, 124) onto the lake gave
+  (154, 124) with mode `canoe`.
+- Screenshots: `/tmp/w-fir-t/s14_circle.png`, `s14_canoe.png`, `s14_lake.png`.
+
+**Originality:**
+
+- A fresh reviewer read the six scripts, the 14 generated sources, the cutscene and the previews. It found no copied
+  classic line, and Lukahn's prophecy is fully reworded. Every Topology line is accurate, and every Distinct line
+  has at least 2 true features.
+- Its five factual remarks are fixed:
+  - the boatwright's and the potter's floors are earth, not stone;
+  - the inn's tables now stand on its carpet;
+  - the item shop's barrel and crate now flank the door;
+  - the healer's window now stands over the herb tables.
+- `originality review: PASS crescent crescent-circle crescent-house-healer crescent-house-astronomer
+  crescent-house-boatwright crescent-house-archivist crescent-house-potter crescent-house-tutor crescent-weapon-shop
+  crescent-armor-shop crescent-item-shop crescent-white-magic crescent-black-magic crescent-inn`.
+
+**Deviations / hand-offs:**
+
+- **The S14 entry is at Melmond, not at Crescent's gate.**
+  - S14 `requires` the ship. In assume mode, proof (b) withholds each required grant from the entry. An entry at the
+    gate reached the elder without the ship (`SKIP S14 CANOE_GIVEN reachable without ship`).
+  - The entry is now where S13 leaves the party: by Melmond's harbour with the ship moored, as S12 does.
+  - The debug scenarios still start at Crescent's gate, because 6.5's steps begin in the town.
+- **GT-20 in `--stage S14` cannot be seen.**
+  - Proof (e) starts "before S13" from the new game's place, and the ship is moored at Melmond, out of reach. So no
+    early keeper shows in the stage scope.
+  - The full run catches GT-20. I added one stage-scope `nonLoadBearing` entry to S14, matching A1-T's GT-4 entry:
+    `{map: quest, kind: quest, at: [0, 0]}`. A caught row never reads it.
+  - Note for INT: the entry matches any uncaught `quest`-kind element of any stage run. Today only the town
+    `opensAfter` rows produce that kind.
+- **The gift is a cutscene, not `giftItem` / `giftFlag`.** 4.4 asks for `giftFlag: CANOE_GIVEN` with `requiredFlags:
+  [EARTH_CRYSTAL_LIT]`, but `npcOutcome` ignores `requiredFlags` on a plain gift. The elder therefore uses Sarda's
+  pattern: a cutscene with `requiredFlags` and `onceFlag: CANOE_GIVEN` that gives the item and sets the flag. GT-19
+  finds it through `npcFlags`, which reads the cutscene's flags, and it is caught.
+- **Shared files.** No shared-file edits outside my anchors. Edited inside them: `quest.yaml` (S14 and the town
+  entry), `cutscenes.yaml`, `debug-scenarios.yaml`.
+- **Art.** The dock posts are W1-D `dock_post` placeholders ("DP" labels). Every other part is approved art.
+
+**AGENTS.md delta (for INT):**
+
+- "Editing a 2x Map" gains three rows:
+  - `layouts/fire/town_crescent.py` (+ `town_crescent_people.py`) -> `crescent.yaml`;
+  - `layouts/fire/town_crescent_circle.py` -> `crescent-circle.yaml`;
+  - `layouts/fire/town_crescent_rooms.py` (+ `town_crescent_homes.py`, `town_crescent_shops.py`) -> the six
+    `crescent-house-*` maps, the five shops and `crescent-inn`.
+- Debug scenarios gain `w_s14_start` and `w_s14_early`.
+- An NPC gift that needs a flag is written as a cutscene with `requiredFlags` and an `onceFlag` (the canoe, the rod).
+  A plain `giftItem` ignores `requiredFlags`.
 <!-- === end FIR-T === -->
 <!-- === FIR-D1 FIRE (pass W: owned by FIR-D1) === -->
+### FIR-D1 result: Gurgu Volcano (branch `w-fir-d1` from `mainline` 1e2fdfc)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-d1/`. The canon (4.4, 5.4) assigns FIR-D1 Gurgu Volcano
+`gurgu-b1..b5` with the boss `ashen_queen` (the fire fiend, a sun priestess turned six-armed serpent), and that is what
+was built.
+
+**Files:**
+
+- `layouts/fire/gurgu_common.py` (81 lines): the materials (dark basalt `-`, lava `%` as the `lava` remap of the
+  rubble, pale ash `+`), the design note, the encounter tables, the chest helper and the lava hazard (one
+  `MapData.hazards` entry per floor, damage 1, a rect per row run of `%`).
+- `layouts/fire/gurgu_upper.py` (98) writes `gurgu-b1` (40x34) and `-b2` (48x26); `layouts/fire/gurgu_lower.py`
+  (134) writes `-b3` (34x46), `-b4` (40x36) and `-b5` (30x32).
+  - B1, the caldera rim: a ring walk round a sheer rock crater, entered from the south. It has two stairs down on
+    opposite sides: east to B2 `arrival`, west to B2 `west` (a new entrance). A lava seam crosses the north arc, and
+    three blind fumarole spurs hold chests.
+  - B2, the upper gallery, runs west to east. Two lava streams cross it from wall to wall, each with one stone ford.
+    Its east stair leads to B3 `arrival` (the north gallery) and its west stair to B3 `forge` (a new entrance).
+  - B3, the lower gallery, runs north to south in three reaches, each half lava. The sealed forge (hearth, racks,
+    anvil altar) lies west of it, is walled off from it, and is reached only by B2's west stair: a dead end holding
+    `sun_blade` and `opal_armlet` (a `reach_roots` entry; the chokepoint check is off on this floor and the sites test
+    walks both parts instead).
+  - B4, the basalt maze: a lava field broken by pillars runs from the north-west landing to the south-east stair
+    (57 steps, all wading), and a dry corridor round the north and east that doubles back once (74 steps, 1.30x).
+  - B5, the queen's ash court, `canSave: false`. An ash runner leads due south of the arrival (octant S, path 17) to
+    the queen NPC (`princess` sheet, tinted) before the crystal's altar (an inspect cell whose text turns on
+    FIRE_CRYSTAL_LIT). Talking to her starts `[ashen_queen, fire_lizard]` (`flag: FIRE_CRYSTAL_LIT`,
+    `postVictoryCutscene: fir_ashen_falls`).
+  - Chests 3 / 4 / 4 / 4 / 2 (`CHEST_FIR_D1_*`): consumables and B6 found gear (`opal_helm` x2, `sun_blade`,
+    `opal_armlet`, `opal_armor`). Every floor has `exit` to `overworld:fir_volcano`.
+  - Encounters: B1-B2 fire_lizard, hellhound, lava_worm + pyrolisk, pyrolisk, fire_elemental; B3-B5 horned_devil,
+    fire_hydra, fire_gigas + pyrolisk, fire_elemental, dragon (rate 18-30). Backgrounds: B1-B2 `fire_temple`, B3-B4
+    `magma_temple`, B5 `throne_kary`, staged by `stage_backgrounds.py` into `assets/backgrounds/`.
+- `cutscenes.yaml` (FIR-D1 anchor): `fir_ashen_falls` (the robe falls empty; its flame runs into the crystal;
+  `set_flag FIRE_CRYSTAL_LIT` behind a fade).
+- `enemies.yaml` (ashen_queen anchor, `bossPhases` only): a new phase from full HP (hits 6, attack 61, with a
+  message); the old 0.5 phase (inferno, heavy) is kept.
+- `quest.yaml` S15: `status: built`; `entry` overworld (147, 124) on foot with the ship at the `fir_crescent` dock;
+  `walk: [overworld:warp:gurgu-b1, gurgu-b1:warp:gurgu-b2, gurgu-b2:warp:arrival, gurgu-b3:warp:gurgu-b4,
+  gurgu-b4:warp:gurgu-b5, gurgu-b5:battle:ashen_queen]`; `nonLoadBearing`: the queen's `hideIf`. No `milestones`
+  (S15 sets one flag).
+- `debug-scenarios.yaml`: `w_s15_start` (entrance `fir_crescent`, L21, B5 gear, the flags through S14, the canoe and
+  the lute, the ship at the dock) and `w_boss_ashen_queen` (L23, B5 gear, 3 potions, `throne_kary`).
+- Tests: `tests/quest/fire/fir_d1_sites.test.ts` (6), `tests/quest/fire/hazardPath.test.ts` (7),
+  `tests/quest/fire/fir_d1_walk.test.ts` (2), `tests/balance/w_fir_d1.test.ts` (3).
+
+**Balance (S15, 400 seeds, kit `w_s15`, 3 potions, `[ashen_queen, fire_lizard]`):** before this pass the party beat the
+queen alone 100 % of the time at L21-L25, sensible and careless: her 600 HP and six hits at attack 40 never
+threatened the B5 party. The phase alone moved the level curve too little (at attack 72: L21 42.2 %, L23 63.7 %, too
+close to both bounds), and the lizard steepened it. Sensible: L21 **40.8 %** (target <= 45), L22 56.0 %, L23 **64.0 %**
+(target 60-80), L24 70.0 %, L25 78.0 %. Careless: L21 58.0 %, L23 78.5 %. As in every balance test the sim does not
+play enemy spells, so in the game her `ai` (38 % fir2 / dark / hold) trades some of her 6-hit turns for spells.
+
+**Topology:**
+
+| Floor | Size | Dead ends | Aspect / fill | Hazard-free route |
+|---|---|---|---|---|
+| gurgu-b1 | 40x34 | 6 | 1.23 / 0.33 | both stairs dry at the shortest length (30-35) |
+| gurgu-b2 | 48x26 | 4 | 2.33 / 0.39 | east stair 16 / 16; west landing and forge stair 49 / 45 (the fords) |
+| gurgu-b3 | 34x46 | 5 | 0.76 / 0.38 | 37 / 37 |
+| gurgu-b4 | 40x36 | 3 | 1.16 / 0.48 | 74 dry / 57 over lava (1.30x) |
+| gurgu-b5 | 30x32 | 2 | 1.12 / 0.56 | boss approach 16 / 16; boss S, 17 |
+
+The stair graph: B1 <-> B2 by twin stairs, B2 <-> B3 by two stairs (one into the forge), then a chain to B5, so it
+branches (`gurgu: branching`; FIR-D1: 1 of 1 dungeons branches).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 the two layout scripts, `stubs.py`, `world.py --check-bands`, `world.py`, `git diff --exit-code assets-src/maps` | exit 0, no diff (`stubs: wrote 99 stub sources, kept 38 real maps`) |
+| G2 `build_map.py gurgu-b1 ... gurgu-b5`, then `--check-determinism` on the 5 ids | each `gurgu-bN: WxH -> assets/maps/ai/gurgu-bN.yaml`, then `gurgu-bN: deterministic`. No world compile (no site file changed) |
+| G3 | n/a: no overworld chunk changed |
+| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` | build exit 0; vitest exit 0, `Test Files 325 passed (325)`, `Tests 7125 passed, 5 skipped (7130)` |
+| G5 `npm run quest -- --mutate --stage S15` | (a) OK S15; (b) OK (22 withheld runs); (c) OK (135192 states); (d) `ashen_queen L21.9 [21,24]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; `mutations: OK (3 gate rows; 4 elements, each removal reported)`: GT-21 (both canoe cuts) and GT-37 (`crescent_ring`) caught as `SKIP S15 ashen_queen reachable without canoe`; `quest-verify: OK` |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings`: passed |
+| G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
+| G9 `w_fir_d1.test.ts`; `check-bounds "tests/balance/w_*.test.ts"` | 3 passed; `check-bounds: OK (12 tests)` |
+| G10 browser, port 5231, `mute=1` | `w_s15_start` (headless Chromium, `/tmp/w-fir-d1/pw/s15.mjs`): from (148, 124) the canoe down R-volcano into `gurgu-b1`, then B2 (38, 7), B3 (16, 5), B4 (3, 5) (the lava wade cost 35 HP each), B5 (14, 5); the queen's talk started `Ashen Queen, Fire Lizard` on `throne_kary`; won, FIRE_CRYSTAL_LIT set; 0 console errors. The driver held off random encounters (it tops up the encounter counter before each step) so the walk is deterministic. Screenshots: `/tmp/w-fir-d1/s15_0_start.png`, `s15_1_b1.png`, `s15_4_b4.png`, `s15_5_queen.png`, `s15_6_battle.png`, `s15_7_end.png` |
+| G12 `designNotes`, `originality` | passed (`gurgu: branching`) |
+| G13, G14 `npm run quest -- --only gh` (and `macroGeography`, `travelMatrix` in G4) | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)`; `quest-verify: OK` |
+| G16 `stubs.py --check FIR-D1` | `stubs: 0 left for FIR-D1` |
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| `stage_backgrounds.py fire_temple magma_temple throne_kary` / `--check ...` | staged (565 / 594 / 458 KB); `--check` exits 1 with `no bounds for fire_temple (known: shoreline)`, as for ERT-O |
+
+**Originality:** a fresh reviewer, given the five sources (ASCII grounds, objects, lines, the note), the previews and
+the cutscene, returned `originality review: PASS gurgu-b1 gurgu-b2 gurgu-b3 gurgu-b4 gurgu-b5`. It found two Distinct
+claims loose: B2's fords (the streams then covered only part of the gallery, so you walked round them) and B4's
+"maze" (one corridor that doubles back). The streams now cross the gallery wall to wall with one stone ford each, and
+the B4 claim reads "a short wade across open lava and a dry corridor that doubles back round the field".
+
+**Deviations / shared-file edits (each small):**
+
+- `tests/data/enemyAttack.test.ts` (+2): the Drowned Sovereign / Ashen Queen pin now reads only the phases that set an
+  attack animation, since the queen gains a full-HP phase without one. The rule it pins (heavy only at 0.5) holds.
+- `tests/scenes/bestiary/bestiaryHabitats.test.ts` (+1): `dragon` is now placed (B3-B5), so its habitat pin reads
+  "Gurgu Volcano B3, Gurgu Volcano B4, Gurgu Volcano B5". `vampire` and `lich` stay "Not placed yet".
+- 4.4 names the boss battle `ashen_queen`. The roster queen can't reach 3.7's band through `bossPhases` alone (the
+  level curve stays too flat), so a `fire_lizard` (an S15 roster enemy) fights beside her, as ORD-O and ELF-O add
+  escorts.
+- The battle's flag is the milestone FIRE_CRYSTAL_LIT itself (ORD-O's pattern), and `fir_ashen_falls` sets it too.
+- The B5 inspect cell and the queen's sprite (`princess`, tint `#b8573a`) use existing art. No smoke deco (no part).
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/fire/gurgu_upper.py` (`gurgu-b1`, `-b2`) and
+`gurgu_lower.py` (`gurgu-b3..b5`), with `gurgu_common.py` (lava = the `lava` remap on `%`, one `hazards` entry per
+floor from the `%` cells). A dungeon floor's hazard rule is tested by `tests/quest/fire/hazardPath.test.ts` (dry path
+<= 1.5x the shortest). The debug scenarios gain `w_s15_start` and `w_boss_ashen_queen`; the backgrounds `fire_temple`,
+`magma_temple` and `throne_kary` are staged.
 <!-- === end FIR-D1 === -->
 <!-- === FIR-D2 FIRE (pass W: owned by FIR-D2) === -->
 <!-- === end FIR-D2 === -->

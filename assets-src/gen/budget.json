@@ -115,6 +115,7 @@
         "battle_kneel"
       ],
       "void_ok": false,
+      "usage_recounted": true,
       "purpose_caps": {
         "ka_g_pilot": 30,
         "ka_g_batch": 375,

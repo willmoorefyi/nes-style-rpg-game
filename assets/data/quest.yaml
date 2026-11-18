@@ -153,12 +153,14 @@ stages:
     maps: [elfheim, elfheim-house-*, elfheim-*-shop, elfheim-*-magic, elfheim-inn]
     zones: [overworld:elf_fields, overworld:a1_aldi, overworld:elf_aldi]
     grind: 2.0
-    walk: []
+    # board the brig at Pravoka, sail the Aldi south-west, land at Elfheim's harbour and walk in by the south gate
+    walk: ["overworld:board:ship", "overworld:dock:elf_port", "overworld:warp:elfheim"]
+    entry: {map: overworld, x: 131, y: 101, mode: walking, vehicles: [{type: ship, map: overworld, x: 132, y: 102}]}
     basins: {}
     nonLoadBearing:
       # GT-5 (WORLD 6.3, P1), added by INT-W2a: with ERT-O's landing merged, the elf_port dock (ELF-O) is redundant
       - {map: overworld, kind: dock, at: [84, 147], reason: "Elfland is also reachable on foot from ert_dwarf, the dwarves' landing, over seam_n"}
-    status: pending
+    status: built
   - id: S8
     title: "The prince wakes"
     tranche: ELF-T
@@ -171,10 +173,12 @@ stages:
     maps: [elfheim-castle, elfheim-castle-chamber]
     zones: []
     grind: 1.0
-    walk: []
+    # the sleeping prince takes the herb (his cutscene elf_prince_wakes gives the Mystic Key, PRINCE_AWAKE)
+    walk: ["elfheim-castle-chamber:npc:elfheim_prince"]
+    entry: {map: overworld, x: 82, y: 150, mode: walking, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   - id: S9
     title: "The Elfheim vault"
     tranche: ELF-T
@@ -187,10 +191,13 @@ stages:
     maps: [elfheim-vault]
     zones: []
     grind: 1.0
-    walk: []
+    # the vault's chest holds the TNT (the living gate in elfheim-castle, S8's map, opens to the Mystic Key first and
+    # is settled before the walk starts, so it is not a step)
+    walk: ["elfheim-vault:chest:tnt"]
+    entry: {map: overworld, x: 82, y: 150, mode: walking, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
     basins: {}
     nonLoadBearing: []
-    status: pending
+    status: built
   # === end ELF-T ===
   # === ELF-D (pass W: owned by ELF-D) ===
   - id: S5
@@ -368,10 +375,18 @@ stages:
     maps: [crescent, crescent-*]
     zones: [overworld:fir_lakeshore, overworld:fir_rivers, overworld:fir_aldi, overworld:fir_sea]
     grind: 2.0
-    walk: []
+    # into Crescent by its land gate, south over the causeway to the Circle, and the elder (crescent-circle (13, 8)),
+    # whose cutscene fir_sages_canoe (requiredFlags EARTH_CRYSTAL_LIT, onceFlag CANOE_GIVEN) gives the canoe
+    walk: ["overworld:board:ship", "overworld:warp:crescent", "crescent:warp:crescent-circle", "crescent-circle:npc:sage_elder"]
+    # on foot by Melmond's harbour after the Cavern of Earth (S13), the ship moored at the ert_melmond dock: the ship
+    # (S14's vehicle requirement) carries the party round to the fir_crescent dock
+    entry: {map: overworld, x: 42, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # GT-20 in --stage S14 only: before S13 the stage scope starts at the new game's place with the ship moored at
+      # Melmond, out of reach, so no early keeper can be seen; the full run catches GT-20 as EARLY crescent before S13
+      - {map: quest, kind: quest, at: [0, 0], reason: "stage scope: before S13 the ship is moored out of reach of the new game's start; the full run catches GT-20 as EARLY crescent talkable before S13"}
+    status: built
   # === end FIR-T ===
   # === FIR-D1 (pass W: owned by FIR-D1) ===
   - id: S15
@@ -386,10 +401,16 @@ stages:
     maps: [gurgu-*]
     zones: [overworld:fir_ashlands]
     grind: 2.0
-    walk: []
+    # on foot on Crescent's shore by the fir_crescent dock, the ship moored there; paddle R-volcano to the mouth,
+    # then down the five floors (B2's east stair to B3's north gallery) to the queen
+    entry: {map: overworld, x: 147, y: 124, mode: walking, vehicles: [{type: ship, map: overworld, x: 146, y: 124}]}
+    walk: [overworld:warp:gurgu-b1, gurgu-b1:warp:gurgu-b2, gurgu-b2:warp:arrival, gurgu-b3:warp:gurgu-b4,
+      gurgu-b4:warp:gurgu-b5, gurgu-b5:battle:ashen_queen]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
+      - {map: gurgu-b5, kind: npc, at: [14, 22], reason: "the queen's hideIf only clears the beaten boss off the court's south end, before the altar"}
+    status: built
   # === end FIR-D1 ===
   # === FIR-D2 (pass W: owned by FIR-D2) ===
   - id: S16
@@ -665,7 +686,7 @@ towns:
     opensAfter: [S2]
     bandStage: S4
     kit: w_elfheim
-    status: pending
+    status: built
   # === end ELF-T town ===
   # === ERT-O town (pass W: owned by ERT-O) ===
   - id: dwarf
@@ -692,7 +713,7 @@ towns:
     opensAfter: [S10]
     bandStage: S14
     kit: w_crescent
-    status: pending
+    status: built
   # === end FIR-T town ===
   # === WAT-T town (pass W: owned by WAT-T) ===
   - id: onrac

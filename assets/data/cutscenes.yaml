@@ -194,6 +194,36 @@
       text: "A witch keeps a cave in the forests north of Cornelia's bridge. Her stolen sight may be what this is."
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
+# S8 (docs/WORLD_PLAN.md 4.2): the sleeping prince in elfheim-castle-chamber, behind `requiredItem: herb` (GT-9).
+# Matoya's herb is taken, the prince wakes over a fade and gives the Mystic Key; PRINCE_AWAKE is the NPC's onceFlag.
+- id: elf_prince_wakes
+  steps:
+    - type: dialog
+      text: "You crush a leaf of Matoya's herb under the prince's nose. Its smell is sharp as a slap."
+    - type: take_item
+      item: herb
+    - type: fade_out
+      duration: 500
+    - type: set_flag
+      flag: PRINCE_AWAKE
+    - type: give_item
+      item: mystic_key
+    # the warp reloads the chamber behind the fade, so the woken prince (showIf PRINCE_AWAKE) stands by his bier
+    - type: warp
+      map: elfheim-castle-chamber
+      x: 7
+      y: 5
+      facing: up
+    - type: wait
+      duration: 400
+    - type: fade_in
+      duration: 500
+    - type: dialog
+      text: "Prince: ...That smell. Who has been burning nettles in my room? And why is everyone crying?"
+    - type: dialog
+      text: "Prince: A year? Astos's gift box, then. I remember the lid, and then nothing. You came all this way for me?"
+    - type: dialog
+      text: "Prince: Take my key. It opens the living gate to the vault below the hall. Received the Mystic Key."
 # === end ELF-T ===
 # === ELF-D (pass W: owned by ELF-D) ===
 # S5: the postVictoryCutscene of the Marsh Cave guard (marsh-cave-b3, npc elf_d_bier, piscodemon x3); it gives the
@@ -347,8 +377,44 @@
       text: "The airship settles on the grass at the desert's edge. Step aboard and press to rise; it lands only on open grass."
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
+# S14: the elder of the Circle (crescent-circle, npc sage_elder; requiredFlags EARTH_CRYSTAL_LIT, onceFlag
+# CANOE_GIVEN) gives the sages' canoe once the earth crystal shines again.
+- id: fir_sages_canoe
+  steps:
+    - type: dialog
+      text: "The elder lifts his staff. Around the ring the sages rise, one by one, until all twelve stand."
+    - type: dialog
+      text: "Elder: \"Two rivers leave this lake, and no road crosses the mountains that ring it. Our fathers kept a boat for the day the rivers would be needed.\""
+    - type: dialog
+      text: "Two novices carry a slim canoe of pale wood up from the islet's shore and lay it at your feet."
+    - type: give_item
+      item: canoe
+    - type: set_flag
+      flag: CANOE_GIVEN
+    - type: dialog
+      text: "You received the Canoe! Step onto a river or the lake and you will paddle."
+    - type: dialog
+      text: "Elder: \"South of the ring the fire mountain wakes, and beside it a hollow of ice keeps its own secret. The rivers will take you to both.\""
 # === end FIR-T ===
 # === FIR-D1 (pass W: owned by FIR-D1) ===
+# S15 (WORLD 4.4): the Ashen Queen falls in gurgu-b5's ash court; the fire she drank goes back into the crystal on the
+# altar behind her (FIRE_CRYSTAL_LIT, also the battle's flag).
+- id: fir_ashen_falls
+  steps:
+    - type: dialog
+      text: "The queen's six arms fold in like a burnt-out wick. Her coil crumbles, and the robe falls empty on the ash."
+    - type: dialog
+      text: "A thread of flame slips from the robe, crosses the court, and runs into the dull crystal on the altar."
+    - type: fade_out
+      duration: 600
+    - type: set_flag
+      flag: FIRE_CRYSTAL_LIT
+    - type: fade_in
+      duration: 600
+    - type: dialog
+      text: "The crystal kindles from the inside out until it glows like a small, steady sun. The ash stops falling."
+    - type: dialog
+      text: "Somewhere far above, the mountain lets out a long breath, and the heat in the stone eases."
 # === end FIR-D1 ===
 # === FIR-D2 (pass W: owned by FIR-D2) ===
 # === end FIR-D2 ===
