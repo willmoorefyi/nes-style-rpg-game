@@ -1869,6 +1869,14 @@
   attack: melee
   family: magical
   size: huge
+  # FIR-D2 (WORLD 3.7): the eye wakes already glaring (crossed at the first round start); its bite bites three times.
+  # With its warden (ice_gigas) and two rime-seers (dark_wizard) it is the S16 boss fight; w_fir_d2.test.ts
+  bossPhases:
+  - hpThreshold: 1.0
+    patternId: aggressive
+    hits: 3
+    attack: 100
+    message: "The great eye snaps open, glaring!"
 # === end FIR-D2 evil_eye ===
 - id: desert_baretta
   name: Desert Baretta
