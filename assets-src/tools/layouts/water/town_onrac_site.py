@@ -3,6 +3,10 @@
 Defaults from W1-0b. WAT-T owns this file and edits it when it builds the town; WAT-O's `world_water.py` imports it
 (whichever merges first), so the two never edit one file. A change here changes the generated world files: the
 integrator regenerates them under the lock, never hand-merges (QUEST 4.0).
+
+WAT-T (built): the defaults stand. The town map `onrac` (`town_onrac.py`) is no longer a stub, so WAT-O's module now
+compiles the icon's door transition (DOOR -> `onrac` entrance `gate`); leaving the town by its cliff gate arrives at
+GATE, the meadow cell south of the icon. The submarine is inside the town (the dry dock), not on the world map.
 """
 TOWN = "onrac"
 ANCHOR = "wat_onrac"           # the land-gate entrance of the compiled overworld (assets/data/world-anchors.yaml)
