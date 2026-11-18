@@ -6,7 +6,7 @@ import { dueEncounterWhere, npcOutcome, type FieldState, type NpcOutcome } from 
 import { ClassRegistry } from '../../data/ClassRegistry.js';
 import { upgradeParty } from '../../systems/ClassUpgradeSystem.js';
 import { clinicQuote, DEFAULT_CLINIC_PRICE } from '../../systems/clinic.js';
-import { foundText, leftBehindText, receivedText, cantCarryText, pickupName } from '../../systems/pickupText.js';
+import { foundText, leftBehindText, receivedText, cantCarryText, itemPhrase } from '../../systems/pickupText.js';
 import { ClinicScene } from '../ClinicScene.js';
 import { PurchaseScene } from '../PurchaseScene.js';
 import { openShopScene } from './FieldSystems.js';
@@ -170,7 +170,7 @@ export class FieldNpcActions {
     const { game, dialog } = this.host;
     const out = this.outcome(npc);
     const gold = out.take?.gold ?? 0;
-    const what = out.give ? pickupName(out.give) : 'this';
+    const what = out.give ? itemPhrase(out.give) : 'this';
     const pay = (yes: boolean): void => {
       if (!yes) {
         dialog.start(['Another time, then.']);
