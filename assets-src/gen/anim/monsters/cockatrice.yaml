@@ -149,3 +149,9 @@ frames:
 holds: []
 paint:                         # 1 px joint cracks closed with outline ink
   - {frame: hurt_in1, xy: [[39, 67]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  bridge: {width: false, shear: false}   # the column seams grew kneel_in2's area (1.19); it2: no shear (it1 T5: the
+                                 # sheared frames shuffled the feet; now in1 is the idle's feet, in2 the key's)
