@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js';
 import { OutlinedText } from '../../ui/NESFont.js';
-import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, FONT_SIZE_LG } from '../../core/LayoutConstants.js';
+import { GAME_WIDTH, GAME_HEIGHT, FONT_SIZE, FONT_SIZE_LG, CHAR_WIDTH } from '../../core/LayoutConstants.js';
 import type { InputManager } from '../../core/InputManager.js';
 
 /** The ending card (GAP-13, PLAY-3 P3-06): lines centred on the black the cutscene faded to; confirm closes it. */
@@ -26,8 +26,10 @@ export class EndCard {
     let y = Math.round(GAME_HEIGHT / 2 - (lines.length * lh) / 2);
     lines.forEach((line, i) => {
       const last = i === lines.length - 1;
-      const t = new OutlinedText({ text: line, fontSize: last ? FONT_SIZE_LG : FONT_SIZE, fill: last ? 0xffffff : 0xc8c8d8 });
-      t.position.set(Math.round((GAME_WIDTH - t.main.width) / 2), y);
+      const size = last ? FONT_SIZE_LG : FONT_SIZE;
+      const t = new OutlinedText({ text: line, fontSize: size, fill: last ? 0xffffff : 0xc8c8d8 });
+      // the NES font is monospaced: centre by character count, with no text measuring
+      t.position.set(Math.round((GAME_WIDTH - line.length * CHAR_WIDTH * size / FONT_SIZE) / 2), y);
       this.container.addChild(t);
       y += last ? lh : lh - 8;
     });
