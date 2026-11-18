@@ -1,0 +1,37 @@
+{
+  "character": "wolf",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "f670870efec96e70",
+    "skel": "4100a27e4549d55f",
+    "ref": "4c89e538dda86050",
+    "derived": "234a95597cfac44a"
+  },
+  "grid": [
+    110,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-hist, A-outline",
+  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "9c71b80fb6c31c7d1bd5d781"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

@@ -1,0 +1,37 @@
+{
+  "character": "green_slime",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "837715340eca6e93",
+    "skel": "8e762461ab79b381",
+    "ref": "d47dd4b167f46476",
+    "derived": "6a59a349e509fa85"
+  },
+  "grid": [
+    110,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-hist",
+  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "6cd58383633a4536a2e25aa1"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

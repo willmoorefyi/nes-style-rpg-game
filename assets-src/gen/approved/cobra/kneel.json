@@ -1,0 +1,37 @@
+{
+  "character": "cobra",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "0ce3933425749910",
+    "skel": "857bd7344cf2618b",
+    "ref": "58ad98a23899f807",
+    "derived": "6fb1b305069b8b3b"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-grey",
+  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "eadfbf61c8d810093a5e11e6"
+  ],
+  "refs": [
+    "edit:raw_g_1",
+    "idle"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

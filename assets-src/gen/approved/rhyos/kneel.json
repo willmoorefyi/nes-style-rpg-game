@@ -1,0 +1,36 @@
+{
+  "character": "rhyos",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "040375400a647ccd",
+    "skel": "d177a5d85c10c530",
+    "ref": "c94796d61f7b57cd"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-grey, A-hist, A-outline, K-ground",
+  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "5ef4999886c6130e9111c015"
+  ],
+  "refs": [
+    "edit:raw_g_1",
+    "idle"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}
