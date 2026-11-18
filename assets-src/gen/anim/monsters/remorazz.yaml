@@ -109,3 +109,8 @@ paint:                          # 4-6 px pockets that close between legs and the
   - {frame: hurt_in1, xy: [[135, 103], [137, 103]], rgb: [6, 4, 10]}        # mandible underside outline closed
   - {frame: hurt_in1, xy: [[127, 101]], rgb: [49, 41, 74]}                   # 1 px pinhole in the plate underside
   - {frame: daze_b, xy: [[117, 91], [118, 92], [119, 93], [118, 94]], rgb: [82, 90, 115]}   # doubled crease on the cheek
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
+  # KT3: KT2-F it1 (reviewed PASS); the key-drawn frames skip the K-ground contact share (KT3 ruling)

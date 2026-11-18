@@ -164,3 +164,9 @@ paint:                         # 1-2 px notches between parts, closed with outli
   - {frame: atk_wind2, xy: [[35, 75]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[39, 73], [37, 73], [76, 73]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[92, 84]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
+  # KT3: KT2-C best iteration (in1 hole and swap step 14.2 at defaults; 12.4 here, under the 0.65 bridge-swap cap)
+  bridge: {keep_top: 0.49, keep_bot: 0.0, width: false}
