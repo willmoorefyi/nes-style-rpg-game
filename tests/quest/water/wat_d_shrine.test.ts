@@ -139,12 +139,12 @@ describe('WAT-D: stage S24 in assume mode', () => {
     expect([v.flags.has('WATER_CRYSTAL_LIT'), v.items.has('slab')]).toEqual([true, true]);
   });
 
-  it.runIf(onrac)('with Onrac built (WAT-T): proof (b) holds, and (c) names no Sea Shrine floor', () => {
+  it.runIf(onrac)('with Onrac built (WAT-T): proofs (b) and (c) hold', () => {
     const ctx = createQuestContext(world, { stage: 'S24' });
     const res = runCoreProofs(ctx, new Set(['b', 'c']));
     const [b, c] = ['b', 'c'].map((p) => res.find((r) => r.proof === p)!);
     expect(b.failures.map((f) => f.message)).toEqual([]);
-    // (c) still stops at its state limit on mainline (the visit-order bug INT-W2c is fixing); none of it is the shrine's
-    expect(c.failures.filter((f) => /sea-shrine/.test(f.message.split(':')[0])).map((f) => f.message)).toEqual([]);
+    // the full (c) again since INT-W2c (the visit-order fix, the --stage stop at the marker, the 1,000,000-state cap)
+    expect(c.failures.map((f) => f.message)).toEqual([]);
   });
 });

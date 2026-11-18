@@ -57,8 +57,14 @@ export function relevantEffects(world: QuestWorld, cat: QuestCatalog, eff: Quest
   };
 }
 
-/** Built stages whose `after` stages are done and whose grants now hold get their marker (a fixpoint). Returns the
- *  marker flags added. A built stage that grants nothing is done once the party stands on one of its maps. */
+/** The flag noting that a built stage's grants have all held at once while an `after` stage was not yet done. */
+export const grantsSeenMark = (id: string): string => `${stageMark(id)}~`;
+
+/** Built stages whose `after` stages are done and whose grants hold, or have held, get their marker (a fixpoint).
+ *  Returns the marker flags added (and the grants-seen notes). A built stage that grants nothing is done once the
+ *  party stands on one of its maps. Grants held before the `after` stages are done are noted (`grantsSeenMark`): a
+ *  stage done out of order (the Marsh Cave before the Elfheim visit) whose item is later taken (the crown, by Astos)
+ *  is still done once the visit is made. */
 export function closeMarkers(world: QuestWorld, state: QuestState, flags: Set<string>,
   onMap: (glob: string) => boolean): string[] {
   const added: string[] = [];
@@ -68,11 +74,19 @@ export function closeMarkers(world: QuestWorld, state: QuestState, flags: Set<st
     changed = false;
     for (const s of world.quest.stages) {
       if (s.status !== 'built' || flags.has(stageMark(s.id))) continue;
-      if (!s.after.every((a) => flags.has(stageMark(a)))) continue;
       const g = s.grants;
       const emptyGrants = g.flags.length + g.items.length + g.vehicles.length === 0;
-      const ok = emptyGrants ? (s.maps.length === 0 || s.maps.some(onMap)) : needsHeld(view, g);
+      const seen = grantsSeenMark(s.id);
+      if (!s.after.every((a) => flags.has(stageMark(a)))) {
+        if (!emptyGrants && !flags.has(seen) && needsHeld(view, g)) {
+          flags.add(seen);
+          added.push(seen);
+        }
+        continue;
+      }
+      const ok = emptyGrants ? (s.maps.length === 0 || s.maps.some(onMap)) : needsHeld(view, g) || flags.has(seen);
       if (!ok) continue;
+      flags.delete(seen); // done: the note is spent (states that reached the marker either way are one state)
       flags.add(stageMark(s.id));
       added.push(stageMark(s.id));
       changed = true;

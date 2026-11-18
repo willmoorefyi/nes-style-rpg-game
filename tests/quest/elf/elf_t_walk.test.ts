@@ -34,8 +34,8 @@ describe('ELF-T: the stage walks', () => {
     }
   });
 
-  it('the town entry is built, opens after S2 and serves S4', () => {
+  it('the town entry is built, opens after S2; its gold rule is measured at S6 (user ruling, INT-W2c)', () => {
     expect(world.quest.towns.find((t) => t.id === 'elfheim')).toMatchObject({ status: 'built', opensAfter: ['S2'],
-      bandStage: 'S4', kit: 'w_elfheim' });
+      bandStage: 'S6', kit: 'w_elfheim' });
   });
 });

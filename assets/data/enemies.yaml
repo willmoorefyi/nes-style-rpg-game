@@ -152,8 +152,8 @@
     attack: 28
     defense: 10
     magicDefense: 4
-  xpReward: 120
-  goldReward: 80
+  xpReward: 195
+  goldReward: 195
   sprite: ogre
   attack: melee
   weakness: lightning
@@ -174,8 +174,8 @@
     attack: 24
     defense: 12
     magicDefense: 6
-  xpReward: 100
-  goldReward: 60
+  xpReward: 621
+  goldReward: 621
   sprite: troll
   attack: melee
   weakness: fire
@@ -198,8 +198,8 @@
     attack: 20
     defense: 14
     magicDefense: 8
-  xpReward: 80
-  goldReward: 50
+  xpReward: 300
+  goldReward: 300
   sprite: mummy
   attack: melee
   weakness: fire
@@ -222,8 +222,8 @@
     attack: 18
     defense: 10
     magicDefense: 10
-  xpReward: 90
-  goldReward: 70
+  xpReward: 276
+  goldReward: 200
   sprite: cockatrice
   attack: melee
   weakness: ice
@@ -247,8 +247,8 @@
     attack: 42
     defense: 22
     magicDefense: 16
-  xpReward: 400
-  goldReward: 200
+  xpReward: 1200
+  goldReward: 2000
   sprite: vampire
   attack: melee
   weakness: fire
@@ -281,8 +281,8 @@
     attack: 56
     defense: 30
     magicDefense: 18
-  xpReward: 500
-  goldReward: 300
+  xpReward: 2904
+  goldReward: 4000
   sprite: dragon
   attack: ranged
   attackEffect: fire_breath
@@ -338,8 +338,8 @@
     attack: 35
     defense: 20
     magicDefense: 20
-  xpReward: 2000
-  goldReward: 1000
+  xpReward: 2200
+  goldReward: 3000
   ai:                        # the spec's 75 % spell-use rate over its eight spells
     rate: 0.75
     actions:

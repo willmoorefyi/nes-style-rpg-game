@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { loadQuestWorld } from '../../../src/progression/questData.js';
-import { closure, createQuestContext, proofOrder } from '../../../src/progression/questProofs.js';
+import { closure, createQuestContext, outOfScopeEvents, proofOrder } from '../../../src/progression/questProofs.js';
 import { proofSkips } from '../../../src/progression/questChecks.js';
 import { saturate } from '../../../src/progression/questSaturate.js';
 import { withheld } from '../../../src/progression/questStates.js';
@@ -16,7 +16,8 @@ import { attachLate, loadLateData } from '../../../src/progression/questLateData
 const world = loadQuestWorld();
 const ctx = attachLate(createQuestContext(world, { stage: 'S27' }), loadLateData());
 const s27 = world.stages.get('S27')!;
-const LATER = new Set(['S28', 'S29', 'S30', 'S31'].map((s) => `quest:stage:${s}`));
+// the later stages' events (S28 is built since WND-D2: its own events, not only its synthetic grant; INT-W2c)
+const LATER = new Set([...['S28', 'S29', 'S30', 'S31'].map((s) => `quest:stage:${s}`), ...outOfScopeEvents(ctx, 'S27')]);
 
 describe('WND-D1 S27: the walk, the chime door and the console', () => {
   it('S27 is built, its walk climbs to the console, and (a) replays it with no failure', () => {

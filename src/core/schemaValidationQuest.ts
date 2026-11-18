@@ -126,7 +126,7 @@ function validateStage(p: string, s: Obj): void {
   }
   if (s.kit !== null) want(`${p}.kit`, s.kit, 'string');
   want(`${p}.grind`, s.grind, 'number');
-  if ((s.grind as number) < 1 || (s.grind as number) > 3) throw new ValidationError(`${p}.grind: expected 1.0-3.0`);
+  if ((s.grind as number) < 1 || (s.grind as number) > 7) throw new ValidationError(`${p}.grind: expected 1.0-7.0`);
   want(`${p}.basins`, s.basins, 'object');
   for (const [name, c] of Object.entries(s.basins as Obj)) cell(`${p}.basins.${name}`, c);
   list(`${p}.nonLoadBearing`, s.nonLoadBearing, (q, n) => {

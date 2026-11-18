@@ -29,6 +29,8 @@ describe('FIR-T stage walk (WORLD_PLAN 6.4)', () => {
   it('the full run plays S13 before S14, and S14 before S15 and S16: no failure of (a)', () => {
     const r = proofOrder(createQuestContext(world, {}));
     expect(r.failures.map((f) => f.message)).toEqual([]);
-    expect(r.line).toMatch(/S13 S14 .*S15 .*S16/);
+    // S15 and S16 run in parallel (WORLD 3.2): either may come first once both are built (INT-W2c)
+    expect(r.line).toMatch(/S13 S14 .*S15/);
+    expect(r.line).toMatch(/S13 S14 .*S16/);
   });
 });

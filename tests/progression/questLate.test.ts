@@ -88,10 +88,10 @@ describe('questLate: each proof passes clean and fails on its RED variant', () =
   });
 
   it('(d) RED grind: a stage cannot declare its way into its band (the schema refuses it too)', () => {
-    expect(() => ctxOf((i) => { stage(i, 'S2').grind = 4; })).toThrow(/grind: expected 1.0-3.0/);
+    expect(() => ctxOf((i) => { stage(i, 'S2').grind = 8; })).toThrow(/grind: expected 1.0-7.0/);
     const ctx = ctxOf();
-    ctx.world.stages.get('S2')!.grind = 4;
-    expect(msgs(proofBands(ctx))).toEqual(['BAND S2 grind 4 outside [1.0, 3.0]']);
+    ctx.world.stages.get('S2')!.grind = 8;
+    expect(msgs(proofBands(ctx))).toEqual(['BAND S2 grind 8 outside [1.0, 7.0]']);
   });
 
   it('(d) RED gold: the outpost\'s band stage starts below half its kit\'s price', () => {
@@ -131,6 +131,15 @@ describe('questLate: each proof passes clean and fails on its RED variant', () =
     expect(walled(ctx, ctx.world.quest.towns[1])).toBe(true);
     expect(msgs(proofPriceWalls(ctx))).toEqual(['PRICEWALL outpost 400 vs 900']);
   });
+
+  it('(f) measures a rushing party (every grind 1.0), (d) the grinding one (INT-W2c)', () => {
+    const ctx = ctxOf((i) => { for (const id of ['S0', 'S1', 'S2']) stage(i, id).grind = 5; });
+    const ground = curveOf(ctx);
+    const rush = curveOf(ctx, { rush: true });
+    expect(ground.stageStartGold.get('S2')!).toBeGreaterThan(rush.stageStartGold.get('S2')!);
+    expect(ground.xp).toBeGreaterThan(rush.xp);
+    expect(proofPriceWalls(ctx).line).toBe(`(f) price walls: OK  outpost ${Math.round(rush.townFirstGold.get('outpost')!)}/1800`);
+  });
 });
 
 describe('questLate: the repository', () => {
@@ -141,7 +150,8 @@ describe('questLate: the repository', () => {
     for (const p of late) expect(p.failures, p.line).toEqual([]);
     expect(late[0].line).toMatch(/garland L2\.\d \[2,3\]/);
     const built = ctx.world.quest.towns.filter((t) => t.status === 'built').length;     // 0 at W1; WND-O: lufenia
-    expect(late[1].line).toBe(`(e) early shops: OK  (${built} towns, ${8 - built} pending)`);
+    // with every town built the line drops its `pending` part (INT-W2c, after the last region merged)
+    expect(late[1].line).toBe(`(e) early shops: OK  (${built} towns${built < 8 ? `, ${8 - built} pending` : ''})`);
   });
 
   it('the price walls are exactly crescent and gaia (WORLD 3.5)', () => {

@@ -15,7 +15,9 @@ const world = loadQuestWorld({ root: process.cwd() });
 function grantsWithout(id: string, drop: { item?: string; flag?: string }): ReadonlySet<string> {
   const bare = createQuestContext(world, { stage: id });
   const items = new Set([...bare.start.items].filter((i) => i !== drop.item));
-  const flags = new Set([...bare.start.flags].filter((f) => f !== drop.flag));
+  // the TNT came out of the Elfheim vault (S9) and Nerrick took it (S10): the chest is open, else the closure re-opens
+  // it and re-buys the canal (as ert_o_walk.test.ts does; INT-W2c)
+  const flags = new Set([...bare.start.flags, 'CHEST_ELF_T_TNT'].filter((f) => f !== drop.flag));
   return closure({ ...bare, start: { ...bare.start, items, flags } }).view(bare.start.place).flags;
 }
 

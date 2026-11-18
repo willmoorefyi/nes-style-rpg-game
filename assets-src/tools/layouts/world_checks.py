@@ -203,8 +203,12 @@ def cuts(world: World, aldi: set[Cell], ocean: set[Cell], outs: dict[str, Region
     """The minimal water cut of each wall (aldi to ocean through its cells), and the minimal walkable cut of each
     barrier, whose seeds must be walkable and apart with the barrier in place (every patch on but the canal)."""
     errs, res = [], {}
+    # a cut never runs through a site's door or arrival cell (INT-W2c: W_isthmus ran through the dwarf hall's door, so
+    # opening it also flooded the door and the mutation proved nothing about the wall)
+    doors = ({(t["x"], t["y"]) for out in outs.values() for t in out.transitions}
+             | {tuple(e) for out in outs.values() for e in out.entrances.values()})
     for name, cells in walls.items():
-        cut = min_cut(world, aldi, ocean, cells, is_water)
+        cut = min_cut(world, aldi, ocean, cells - doors, is_water)
         if not cut:
             errs.append(f"wall {name}: no water cut through its {len(cells)} cells joins aldi and ocean")
         res[name] = [list(c) for c in cut]

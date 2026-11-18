@@ -7,7 +7,7 @@
 # `town` anchors in `towns:`. S0 (act 1, built) and the goal belong to the integrator.
 # Stage fields: after (stage ids), requires / grants {flags, items, vehicles}, boss (enemy ids), band [low, high]
 # (whole-party level), kit (a kits.yaml id; the `w_s<n>` and `w_<town>` kits are W1-F's), maps (map-id globs the
-# stage owns), zones (`<map>:<zone id>`), grind (1.0-3.0, the curve model's fight multiplier; INT tunes it), walk
+# stage owns), zones (`<map>:<zone id>`), grind (1.0-7.0, the curve model's fight multiplier; INT tunes it), walk
 # (event ids), entry (the assume-mode start, set by the owner), basins ({}: the only basin seeds are
 # world_api.BASIN_SEEDS, WORLD 3.4), nonLoadBearing ([{map, kind, at, reason}]), optional, milestones (an ordered
 # list of the stage's own flags).
@@ -101,7 +101,7 @@ stages:
     kit: w_s2
     maps: [pravoka, pravoka-*]
     zones: [overworld:a1_mainland]
-    grind: 2.0
+    grind: 2.5
     # Bikke at the brig pier's end (pravoka (40, 33)) starts pirate x9; a1_bikke_yields sets BIKKE_DEFEATED, and the
     # brig appears at the a1_pravoka dock (overworld (132, 102)), boarded from the land gate (131, 101)
     walk: ["pravoka:battle:bikke", "overworld:vehicle:ship", "overworld:board:ship"]
@@ -127,7 +127,7 @@ stages:
     kit: w_s6
     maps: [western-keep-*]
     zones: [overworld:elf_keep_moor]
-    grind: 2.0
+    grind: 4.0
     # the crown trade (it sets ELF_O_CROWN_GIVEN and pays an Ether), then the fight it opens; the cutscene gives the eye
     walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
     # INT-W2b: the ship moored at Elfheim's harbour (the `elf_port` dock), as the party came; without it the assumed
@@ -236,7 +236,7 @@ stages:
     kit: w_s10
     maps: [dwarf-hall]
     zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
-    grind: 2.0
+    grind: 6.0
     # on foot at the hall's mouth, the ship moored at the dwarves' landing cove (the `ert_dwarf` dock)
     entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
     walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
@@ -255,7 +255,7 @@ stages:
     kit: w_s12
     maps: [giant-tunnel, sage-cave]
     zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
-    grind: 2.0
+    grind: 7.0
     # on foot at the tunnel's east mouth, the ship moored at Melmond's harbour (the `ert_melmond` dock)
     entry: {map: overworld, x: 28, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
     walk: [overworld:warp:giant-tunnel, giant-tunnel:npc:ert_giant, giant-tunnel:warp:ert_giant_west,
@@ -277,7 +277,8 @@ stages:
     zones: []
     grind: 1.0
     # Smyth forges in the dwarf hall (dwarf-hall, npc ert_smyth: requiredItem adamant, cutscene ert_smyth_forge);
-    # pending until WND-D2 builds the sky castle's adamant (S28 does not grant it yet)
+    # stays pending (INT-W2c): S28 grants the adamant now, but `excalibur` is gear, not a key item, so the verifier
+    # tracks no event that gives it and a built S31 could never be marked done (the W1-I hand-off on non-key gifts)
     walk: []
     basins: {}
     nonLoadBearing: []
@@ -304,7 +305,10 @@ stages:
                                                                       {type: ship, map: overworld, x: 172, y: 62}]}
     walk: [overworld:warp:melmond, melmond:warp:melmond-house-unne, melmond-house-unne:npc:ert_unne]
     basins: {}
-    nonLoadBearing: []
+    nonLoadBearing:
+      # INT-W2c: once S13 was built this element was no longer excused as pending. The bloom is cosmetic: it turns the
+      # dirt plots and the lawn to grass, which is walkable either way, and gates nothing
+      - {map: melmond, kind: patch, at: [4, 33], reason: "the crystal bloom only turns Melmond's dirt fields to grass (walkable either way); it gates nothing"}
     status: built
   # === end ERT-T ===
   # === ERT-D (pass W: owned by ERT-D) ===
@@ -319,7 +323,7 @@ stages:
     kit: w_s11
     maps: [cavern-earth-b1, cavern-earth-b2, cavern-earth-b3]
     zones: [overworld:ert_plain]
-    grind: 2.0
+    grind: 7.0
     # where S10 ends, on foot at the dwarf hall's mouth with the ship at the landing cove (the `ert_dwarf` dock): the
     # cavern lies beyond the canal, so withholding CANAL_OPEN strands it (GT-12, GT-13 read S11's SKIP)
     entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
@@ -342,7 +346,7 @@ stages:
     kit: w_s13
     maps: [cavern-earth-b4, cavern-earth-b5]
     zones: [overworld:ert_badlands]
-    grind: 2.0
+    grind: 4.0
     entry: {map: overworld, x: 30, y: 126, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
     # the rod breaks B3's seal, the Sovereign falls on B5, his shade at the altar lights the crystal
     walk: [cavern-earth-b3:gate:EARTH_SEAL_BROKEN, cavern-earth-b5:battle:EARTH_CAVE_COMPLETE,
@@ -388,7 +392,7 @@ stages:
     kit: w_s14
     maps: [crescent, crescent-*]
     zones: [overworld:fir_lakeshore, overworld:fir_rivers, overworld:fir_aldi, overworld:fir_sea]
-    grind: 2.0
+    grind: 6.0
     # into Crescent by its land gate, south over the causeway to the Circle, and the elder (crescent-circle (13, 8)),
     # whose cutscene fir_sages_canoe (requiredFlags EARTH_CRYSTAL_LIT, onceFlag CANOE_GIVEN) gives the canoe
     walk: ["overworld:board:ship", "overworld:warp:crescent", "crescent:warp:crescent-circle", "crescent-circle:npc:sage_elder"]
@@ -414,7 +418,7 @@ stages:
     kit: w_s15
     maps: [gurgu-*]
     zones: [overworld:fir_ashlands]
-    grind: 2.0
+    grind: 3.0
     # on foot on Crescent's shore by the fir_crescent dock, the ship moored there; paddle R-volcano to the mouth,
     # then down the five floors (B2's east stair to B3's north gallery) to the queen
     entry: {map: overworld, x: 147, y: 124, mode: walking, vehicles: [{type: ship, map: overworld, x: 146, y: 124}]}
@@ -530,7 +534,7 @@ stages:
     kit: w_s22
     maps: [caravan-camp]
     zones: [overworld:wat_dunes]
-    grind: 2.0
+    grind: 7.0
     walk: [caravan-camp:gift:fairy_bottle]
     # Cornelia's south gate, the airship landed beside it (as S21)
     entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
@@ -550,7 +554,7 @@ stages:
     kit: w_s20
     maps: [onrac, onrac-*]
     zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
-    grind: 2.0
+    grind: 7.0
     # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
     # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door
     entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
@@ -771,7 +775,8 @@ towns:
     owner: ELF-T
     maps: [elfheim, elfheim-*]
     opensAfter: [S2]
-    bandStage: S4
+    # user ruling 2026-11-17 (INT-W2c): B3 serves S4-S10; the 50 % gold rule is measured at S6's start (the Western Keep)
+    bandStage: S6
     kit: w_elfheim
     status: built
   # === end ELF-T town ===

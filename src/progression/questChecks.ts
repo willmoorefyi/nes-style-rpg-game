@@ -7,7 +7,7 @@ import { ancestorsOf, globMatch } from './questData.js';
 import { stageMark, withheld, type WithheldGrants } from './questStates.js';
 import type { StateGraph, StateNode } from './questSearch.js';
 import { eventsGranting, saturate } from './questSaturate.js';
-import { fail, grantsText, reachedStage, result, stateGraph, without, type QuestContext } from './questProofs.js';
+import { closure, fail, grantsText, reachedStage, result, stateGraph, without, type QuestContext } from './questProofs.js';
 
 export function proofSkips(ctx: QuestContext): ProofResult {
   const { world } = ctx;
@@ -115,6 +115,13 @@ export function proofSoftlocks(ctx: QuestContext): ProofResult {
   for (const n of g.nodes) {
     n.state.flags.forEach((f) => everFlags.add(f));
     n.state.items.forEach((x) => everItems.add(x));
+  }
+  // --stage: past the stage's marker the exact search fires no events (stateGraph), so a later stage's grant (the rod
+  // that opens the Cavern of Earth's seal, read on S11's map) is taken from the saturation closure instead
+  if (ctx.stage) {
+    const sat = closure(ctx);
+    sat.flags.forEach((f) => everFlags.add(f));
+    sat.items.forEach((x) => everItems.add(x));
   }
   const own = (by: string): boolean => !ctx.stage || ctx.checked[0].maps.some((m) => globMatch(by.split(':')[0], m));
   for (const [f, by] of cat.readFlags) {

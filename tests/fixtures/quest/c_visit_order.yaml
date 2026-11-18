@@ -1,0 +1,90 @@
+# (c) a stage done out of order (INT-W2c): S1 is a visit (the shrine; it grants nothing), S2's boss gives the orb and
+# S3's priest takes it. Nothing in the world makes the party visit the shrine first, so a party can win the orb, trade
+# it away and only then visit the shrine. S2 is done then, though the orb is gone (the Marsh Cave's crown, taken by
+# Astos, before the Elfheim visit S4). Every state reaches the goal; before the fix this was a SOFTLOCK.
+start: {map: town, x: 2, y: 2}
+worldMap: overworld
+items:
+  - {id: orb, type: key, consumed: true}
+  - {id: trinket, type: key}
+cutscenes:
+  - id: boss_won
+    steps:
+      - {type: dialog, text: "The ogre falls."}
+      - {type: give_item, item: orb}
+quest:
+  goal: GOAL_DONE
+  stages:
+    - id: S0
+      tranche: "-"
+      maps: [town]
+      status: built
+    - id: S1
+      tranche: T1
+      after: [S0]
+      maps: [shrine]
+      status: built
+    - id: S2
+      tranche: T1
+      after: [S1]
+      grants: {flags: [BOSS_DONE], items: [orb]}
+      boss: [ogre]
+      maps: [cave]
+      status: built
+    - id: S3
+      tranche: T1
+      after: [S2]
+      requires: {items: [orb]}
+      grants: {flags: [ORB_GIVEN]}
+      maps: []
+      status: built
+    - id: S4
+      after: [S3]
+      requires: {flags: [ORB_GIVEN]}
+      grants: {flags: [GOAL_DONE]}
+maps:
+  - id: overworld
+    grid:
+      - "############"
+      - "#..........#"
+      - "#####.######"
+      - "############"
+    entrances: {town: [2, 1], shrine: [5, 1], cave: [9, 1]}
+    transitions:
+      - {x: 1, y: 1, targetMap: town, targetEntrance: gate}
+      - {x: 5, y: 2, targetMap: shrine, targetEntrance: entry}
+      - {x: 10, y: 1, targetMap: cave, targetEntrance: entry}
+  - id: town
+    grid:
+      - "######"
+      - "#....#"
+      - "#....#"
+      - "#....#"
+      - "###.##"
+    entrances: {gate: [3, 3]}
+    transitions:
+      - {x: 3, y: 4, targetMap: overworld, targetEntrance: town}
+    npcs:
+      - {id: priest, x: 4, y: 3, dialog: ["The orb, at last."], requiredItem: orb, takeItem: true, giftItem: trinket, giftFlag: ORB_GIVEN}
+  - id: shrine
+    grid:
+      - "#####"
+      - "#...#"
+      - "##.##"
+    entrances: {entry: [2, 1]}
+    transitions:
+      - {x: 2, y: 2, targetMap: overworld, targetEntrance: shrine}
+  - id: cave
+    grid:
+      - "######"
+      - "#....#"
+      - "#....#"
+      - "#....#"
+      - "###.##"
+    entrances: {entry: [3, 3]}
+    transitions:
+      - {x: 3, y: 4, targetMap: overworld, targetEntrance: cave}
+    npcs:
+      - {id: boss, x: 3, y: 1, sprite: ogre}
+    scriptedEncounters:
+      - {x: 3, y: 1, npc: boss, enemyIds: [ogre], flag: BOSS_DONE, isBoss: true, postVictoryCutscene: boss_won}

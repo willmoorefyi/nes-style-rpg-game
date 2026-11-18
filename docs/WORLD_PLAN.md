@@ -677,13 +677,20 @@ towns:
 | Town id | Owner | `opensAfter` | `bandStage` | Band | Early-access control |
 |---|---|---|---|---|---|
 | `pravoka` | A1-T | S1 | S2 | B2 | none (it opens at its band) |
-| `elfheim` | ELF-T | S2 | S4 | B3 | none |
+| `elfheim` | ELF-T | S2 | S6 | B3 | none |
 | `dwarf` | ERT-O | S2 | S10 | B3 (item shop only) | walkable from Elfland; its stock is the B3 item list |
 | `melmond` | ERT-T | S10 | S11 | B4 | none |
 | `crescent` | FIR-T | S10 | S14 | B5 | price wall, proof (f) |
 | `onrac` | WAT-T | S17 | S20 | B6 | none (it opens at its band) |
 | `gaia` | WND-T | S17 | S23 | B7 | price wall, proof (f) |
 | `lufenia` | WND-O | S25 | S26 | B8 | its keepers are shown only with LUFENIAN_LEARNED (`showIf`), so proof (e) sees them at S25 |
+
+Elfheim's `bandStage` is S6, not S4 (user ruling 2026-11-17, INT-W2c). B3 serves S4-S10, and the party buys its gear across several stages, so the 50 % gold rule of (d) is measured at S6's start (the Western Keep).
+
+The price walls of proof (f) (crescent, gaia) are measured on a rushing curve, with every `grind` at 1.0
+(integrator decision, INT-W2c). It follows from the user's grinding ruling of 2026-11-17 (grind cap 7.0): a wall is
+there to stop a party that rushes, and a party that grinds earns its way in. (d)'s bands and gold rule stay on the
+ground curve, which uses the stages' `grind`.
 
 ### 3.6 Level, gear and magic bands (replaces QUEST 6.1)
 
@@ -4924,6 +4931,112 @@ drowned_sovereign_2, hollow_seraph_2, death_eye}`; the background `fiend_hall` i
 `floor <n>`.
 <!-- === end PST === -->
 <!-- === INT INTEGRATION (pass W: owned by INT) === -->
+### INT-W2c result: after the ELF-T merge (branch `int-w2c` from `mainline` bc43d930, merged up to 767dd7e3) — (c), (d) fixed; (f) BLOCKED
+
+**(c) soft-locks: a verifier bug, fixed.** S4 (the Elfheim visit) is now built and grants nothing, so it is done when
+the party stands on an Elfheim map. Nothing in the world makes the party go there before the Marsh Cave (proof (b)
+already treats a grant-less stage as skippable). A party could sail to `elf_port`, win the crown at B3 and give it to
+Astos with S4 still undone. `closeMarkers` (questStates.ts) checked S5's grants (`crown`, MARSH_GUARD_DEFEATED) only
+once its `after` (S4) was done, and by then the crown was gone. So `@S5` could never be set and every later stage was
+dead: 979 SOFTLOCK states. The game itself has no soft-lock here, because the party can still walk into Elfheim.
+The fix: when a built stage's grants all hold before its `after` stages are done, `closeMarkers` adds the note
+`@<id>~`. Once the `after` stages are done, the stage is done if its grants hold now or the note is set, and then the
+note is dropped. Dropping it lets both orders end in the same state: 26641 states (26005 on a11defa7). It is not a
+weaker check. A withheld grant is never held, so it is never noted, and (b) and all 47 mutation rows still pass.
+The new fixture `tests/fixtures/quest/c_visit_order.yaml` (the orb is traded before the shrine visit) has a test in
+`questGraph.test.ts` that fails without the fix (`SOFTLOCK town (4,2) walking [trinket]`).
+
+**(d) bands: fixed by the user's ruling (2026-11-17).** The six level failures were not caused by the merge. They were
+already there on a11defa7 (piscodemon L6.5, astos L7.5, S7 L8.1, S10 L10.2), hidden because the pending S4 marked
+every later stage assumed. With S4 built they are checked for the first time. No `grind` in [1, 3] reaches the bands
+(at 3.0: piscodemon L6.8, astos L7.9, S10 L9.9). The rulings:
+- "Allow more grinding": the grind maximum is 7.0 for every stage (`schemaValidationQuest.ts`, `GRIND_RANGE`, the RED
+  test now uses 8). The grinds set then (superseded in the last round below, on the exploring curve): S2 7.0, S5 7.0,
+  S6 7.0, S7 4.0, S8 4.0, S10 4.0. S4 stays at 2.0 and S9 at 1.0:
+  the curve charges no walk to either. Enemy rewards, encounter rates and bands are unchanged. Measured: pirate L4.2
+  [3,6], S4 L8.6 [5,9], piscodemon L8.6 [8,11], astos L10.2 [10,13], S7 L10.9, S8 and S9 L11.2 [10,13], S10 L11.6
+  [11,14]. Astos is the tightest at 0.15 above the floor, and that is the most the cap allows: with S2 and S5-S10 all
+  at 7.0, astos is L10.15.
+- Elfheim's `bandStage` is S6 (§3.5 has a note). The gold at S6's start is 19440 against the 6470 needed.
+- Follow-up for PLAY/INT: the user plans a "cheats" menu (XP and gold boost, as in the remasters). It is not in this
+  tranche.
+
+**(f) price walls: BLOCKED, a new conflict caused by the grind ruling.** The grinds that reach the bands bring gold
+with them. Crescent's first keeper is now talkable at 51823 gold, and the wall needs less than 40 % of `w_crescent`
+60240, which is 24096. With the smallest grinds that still pass the bands (S7-S9 at 1.0, S10 at 2.0) it is 41786. By
+S7's start the gold is already 37028. So no grind that passes (d) keeps the wall. Options for the user:
+(1) measure (f) on a grind-1.0 curve, a party that rushes: the wall stops a rushing party, while a party that grinds
+earns its way in; (2) raise the price of `w_crescent` (it would have to be above about 130000, which affects FIR-T's
+balance kits); (3) drop Crescent's wall (§3.5 then lists only gaia). I recommend (1).
+
+**Assume-mode walks (after the FIR-D1 and WAT-T merges): verifier capacity, fixed.** `ert_o_walk` S10 and S12,
+`ert_t_walk` S25, `fir_d1_walk` S15 and `wat_t_walk` S20 failed because the `--stage` search reached the
+200,000-state cap. The LIMIT frontier then showed up as spurious SOFTLOCK and STRANDED lines. The closeMarkers fix does
+not change these counts: they are the same with and without it. Two changes:
+- `exploreStates` takes `stopAt`. Under `--stage`, from a state that holds the stage's marker, only moves are followed
+  and no event fires, so STRANDED still checks the way home. Those states reach the target anyway, and the later
+  stages are covered by their own runs and by the full run. S10: 301k states down to 824; S12 to 1456.
+- The default cap is now `MAX_STATES` = 1,000,000 (questSearch.ts). `--stage S15` needs 609k states (about 2 GB,
+  about 80 s), because the airship stages come before Gurgu in assume mode. S20 needs 274k and S25 188k. **Risk:** each
+  airship-era region adds to S15's count, so FIR-D2 may pass the cap. The next step would be to fire in `--stage` mode
+  only the events of the stage and its ancestors; the full run already covers the concurrent stages.
+- `fir_t_walk.test.ts` required S15 before S16 in (a)'s order line. The two run in parallel (§3.2), so it now accepts
+  either order.
+
+**(f) price walls: fixed by the integrator's decision.** The walls are measured on a rushing curve, with every
+`grind` at 1.0 (`curveOf(ctx, {rush: true})`; §3.5 has a note). Crescent is now 12661/60240. A new test in
+`questLate.test.ts` checks that (f) uses the rushing curve and (d) the ground curve.
+
+**After the ERT-D merge (`mainline` bff131df, merge f6b3c1e2):**
+- `ert_d_walk` S11 (c) reported `DEADGATE item rod` because of this tranche's `stopAt`: the rod is S12's, so the S11
+  search no longer reaches it. Under `--stage`, the dead-gate check now also counts the saturation closure's flags and
+  items (`questChecks.ts`).
+- The `ert_d_walk` test "S11 ... only with CANAL_OPEN" also fails on bff131df. Its closure re-opened ELF-T's TNT chest
+  and bought the canal again. The test now starts with CHEST_ELF_T_TNT set, as `ert_o_walk` does.
+- `--stage S15` needs 637968 states and S20 578304, both under MAX_STATES 1,000,000.
+- (d) bands S11-S22 and the two mutation rows: see the next section.
+
+**The last round: the XP comparison and every region built (`mainline` 51102ccd, all region tranches merged).**
+- **The XP comparison** (the user's direction): `/tmp/int-w2c/xp_compare.md` has every S2-S30 roster enemy, every
+  encounter zone and the level table. The level table equals FF1's (L2-L30; L31-L50 may be off by one). About 110
+  roster records copy FF1's xp and gold exactly. Seven pre-pass-W records are materially lower: ogre 120 against FF1's
+  195, troll 100 / 621, mummy 80 / 300, cockatrice 90 / 276, the red dragon 500 / 2904, vampire 400 / 1200 and lich
+  2000 / 2200. They bring the Earth Cave tables down to 34-67 % of FF1's. About 18 records are marked `?`: I am not
+  sure of their FF1 value, or they are original stand-ins.
+- **The decision: both, the model mostly.** The seven records now carry FF1's xp and gold (`enemies.yaml`). Enemy
+  rewards are not used in battle, and the boss balance tests do not change. With those values the S11-S22 curve rose
+  by only 0.2-0.4 levels. So the data is not the cause: our encounter xp is FF1's, and so are the bands, and the model
+  undercounted play. The curve model now explores each map that is not the world map once, the first time the walk
+  enters it: one pass over every walkable cell of its walking encounter zones, at its own rate (`1 / mean steps` a
+  cell), not multiplied by `grind`, charged to the event's stage (`explorationRewards`, the new module
+  `questExplore.ts`). The rushing curve of (f) neither grinds nor explores.
+- **Grinds (all <= 7.0), retuned on the exploring curve:** S2 2.5, S6 4.0, S10 6.0, S11 7.0, S12 7.0, S13 4.0, S14 6.0,
+  S15 3.0, S20 7.0, S22 7.0; every other stage keeps its value from before the ruling (S5 2.0, S7 / S8 / S9 1.0, ...).
+  Every (d) row passes: garland L2.7, pirate L3.6, piscodemon L8.6, astos L10.6, S10 L11.5, vampire L14.5, S12 L15.2
+  [15,17] (the tightest from below), lich L17.2, ashen_queen L22.0, evil_eye L24.6 [21,24] and S17 L24.9 [22,25] (the
+  tightest from above), S20 / S22 L25.5, dragon_zombie L26.6, drowned_sovereign L28.8, hollow_seraph L34.2 [31,34],
+  S29 L34.3, lich_2 L35.7. The price walls are crescent 13082/60240 and gaia 87748/259240.
+- **GT-13 (W_isthmus):** the composer's water cut ran along row 103 through the dwarf hall's door (55, 103). In
+  `world_checks.cuts` a wall's cut now avoids every site transition and arrival cell. The cut is now row 105, and GT-13
+  is caught. `world.py` and `build_map.py overworld` were rerun, and only the `cuts` block of the overworld source and
+  of the compiled map changed.
+- **G melmond `ert_melmond_bloom`:** it was excused as pending until S13 was built. The bloom only turns dirt fields
+  to grass (walkable either way), so S25 (ERT-T, Melmond's maps) now has a `nonLoadBearing` entry with that reason.
+- **`--stage` scope (the follow-up, done):** with every region built, `--stage S15` passed 1,000,000 states. In
+  `--stage` mode the exact search no longer fires events owned by a stage that is neither the stage under test nor
+  one of its ancestors (`outOfScopeEvents`: by the event's stage, a stage grant it gives, or its map; an event with no
+  owner still fires). Those orderings belong to the full run. S15 drops from >1M to 2800 states, S20 to 12128, S28 to
+  106880; S30 (whose ancestors are nearly everything) needs 487872, under the cap.
+- **Tests brought up to date with the merged world:** `wat_d_shrine` asserts the full (c) for S24 again (WAT-D had
+  narrowed it). `questGraph`: S31 is now reachable (WND-D2 grants the adamant) and pending. `questMutate`: GT-12 is
+  caught, no longer pending. `questLate`: (e) prints no `pending` part once all 8 towns are built. `wnd_d1_walk` and
+  `wnd_d2_walk`: their closures re-ran S28's own events (built now) and S27's console. They now disable the
+  out-of-scope events and the grant they withhold. `questCurve.ts` is back under 250 lines (`questExplore.ts`).
+- Not done (optional): WND-D2's suggested reason text for WND-D1's ring `pending:` entries. The verifier no longer
+  needs them.
+- **PLAY/INT follow-up:** the user's planned "cheats" menu (an XP and gold boost, as in the remasters).
+
+Gates on `int-w2c` (`mainline` 51102ccd merged): see the commit message of the final INT-W2c commit.
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->

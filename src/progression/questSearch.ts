@@ -34,6 +34,10 @@ export function createModel(world: QuestWorld, cat: QuestCatalog): QuestModel {
   return { world, cat, places: new PlaceIndex(world, cat), order: new Map(cat.events.map((e, i) => [e.id, i])) };
 }
 
+/** The exact search's default cap: 1,000,000 states (INT-W2c; it was 200,000, and `--stage S15`, with the airship
+ *  stages before Gurgu, needs about 400,000 at about 1.2 GB). */
+export const MAX_STATES = 1_000_000;
+
 export interface SearchOptions {
   start?: QuestState;
   /** Event ids that never fire. */
@@ -42,6 +46,8 @@ export interface SearchOptions {
   withhold?: WithheldGrants;
   /** The exact search gives up past this many states (reported as a LIMIT failure). */
   maxStates?: number;
+  /** From a state holding this flag, only exits are followed, no events (`--stage`: the stage's marker; INT-W2c). */
+  stopAt?: string;
 }
 
 /** The new game's state: the start place and flags, with the markers and auto events closed. */
@@ -149,7 +155,7 @@ function stateKey(s: QuestState, comp: PlaceComponent): string {
 /** Breadth-first over exact states from `opts.start` (default: the new game). */
 export function exploreStates(model: QuestModel, opts: SearchOptions = {}): StateGraph {
   const { world, cat, places } = model;
-  const max = opts.maxStates ?? 200000;
+  const max = opts.maxStates ?? MAX_STATES;
   const graph: StateGraph = { nodes: [], edges: [], parent: [], limited: false };
   const index = new Map<string, number>();
   const add = (s: QuestState, parentEdge: number): number => {
@@ -170,6 +176,8 @@ export function exploreStates(model: QuestModel, opts: SearchOptions = {}): Stat
   add(opts.start ?? newGameState(model), -1);
   for (let i = 0; i < graph.nodes.length; i++) {
     const { state, comp } = graph.nodes[i];
+    // past the target only the party's moves are followed (the way home still counts for STRANDED), not events
+    const stopped = !!opts.stopAt && state.flags.has(opts.stopAt);
     const link = (next: QuestState, via: string): void => {
       const settled = settle(model, next, opts);
       const e = graph.edges.length;
@@ -186,7 +194,7 @@ export function exploreStates(model: QuestModel, opts: SearchOptions = {}): Stat
       link({ ...state, vehicles, place: ex.to }, ex.id);
     }
     for (const [id, cell] of comp.triggers) {
-      if (opts.disabled?.has(id)) continue;
+      if (stopped || opts.disabled?.has(id)) continue;
       const ev = cat.byId.get(id)!;
       const at: QuestPlace = { map: comp.map, x: cell.x, y: cell.y, mode: comp.mode };
       const raw = effectsOf(world, ev, { ...state, place: at });

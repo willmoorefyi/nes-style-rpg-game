@@ -5,11 +5,11 @@
  */
 import type { QuestStage } from '../types/index.js';
 import type { ProofFailure, ProofId, ProofResult, QuestState } from './questTypes.js';
-import { globMatch, stageOrder, type QuestWorld } from './questData.js';
-import { buildCatalog } from './questCatalog.js';
+import { ancestorsOf, globMatch, stageOrder, type QuestWorld } from './questData.js';
+import { buildCatalog, stageOfMap } from './questCatalog.js';
 import { stageMark, withheld, type WithheldGrants } from './questStates.js';
 import {
-  assumedState, createModel, exploreStates, newGameState, type QuestModel, type StateGraph,
+  assumedState, createModel, exploreStates, MAX_STATES, newGameState, type QuestModel, type StateGraph,
 } from './questSearch.js';
 import { bossEvents, eventsGranting, saturate, Saturator } from './questSaturate.js';
 
@@ -42,7 +42,7 @@ export function createQuestContext(world: QuestWorld, opts: QuestContextOptions 
   const start = opts.stage ? assumedState(model, opts.stage) : newGameState(model);
   const checked = opts.stage ? [world.stages.get(opts.stage)!]
     : stageOrder(world.quest).map((id) => world.stages.get(id)!);
-  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? 400000, start, checked };
+  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? MAX_STATES, start, checked };
 }
 
 /** The saturation closure from the context's start (cached). */
@@ -51,10 +51,38 @@ export function closure(ctx: QuestContext): Saturator {
   return ctx.sat;
 }
 
-/** The exact state graph from the context's start (cached). */
+/** The exact state graph from the context's start (cached). Under `--stage`, a state that holds the stage's marker
+ *  reaches the target by itself, so no event fires from it, only its moves are followed (the way home, for
+ *  STRANDED): the later stages' events are their own runs' and the full run's to check (INT-W2c; with the
+ *  airship-era stages built, the expansion passed the state cap). */
 export function stateGraph(ctx: QuestContext): StateGraph {
-  ctx.graph ??= exploreStates(ctx, { start: ctx.start, maxStates: ctx.maxStates });
+  ctx.graph ??= exploreStates(ctx, {
+    start: ctx.start, maxStates: ctx.maxStates,
+    ...(ctx.stage ? { stopAt: stageMark(ctx.stage), disabled: outOfScopeEvents(ctx, ctx.stage) } : {}),
+  });
   return ctx.graph;
+}
+
+/**
+ * `--stage` scope of the exact search (INT-W2c): the events owned by a stage that is neither the stage under test nor
+ * one of its ancestors (by the event's stage, a stage grant it gives, or its map) do not fire. Those stages run in
+ * parallel (the airship era before Gurgu, S15), and their orderings are the full run's to check; without this cut
+ * `--stage S15` passed 1,000,000 states once every region was built. An event with no owner (a shop, a world-map
+ * vehicle) still fires.
+ */
+export function outOfScopeEvents(ctx: QuestModel, stageId: string): Set<string> {
+  const { world } = ctx;
+  const keep = ancestorsOf(world.stages, stageId);
+  keep.add(stageId);
+  const byGrant = new Map<string, string>();
+  for (const s of world.quest.stages) for (const g of [...s.grants.flags, ...s.grants.items]) byGrant.set(g, s.id);
+  const out = new Set<string>();
+  for (const ev of ctx.cat.events) {
+    const owner = ev.stage ?? [...ev.grants.flags, ...ev.grants.items].map((g) => byGrant.get(g)).find((s) => s)
+      ?? stageOfMap(world, ev.map)?.id;
+    if (owner && !keep.has(owner)) out.add(ev.id);
+  }
+  return out;
 }
 
 export const fail = (proof: ProofId, code: string, message: string, path?: string[]): ProofFailure =>

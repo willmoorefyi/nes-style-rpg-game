@@ -143,6 +143,20 @@ describe('questGraph: each proof fails on its RED fixture', () => {
     expect(r.failures[0].path).toContain('town:trade:thief');
   });
 
+  it('(c) a stage done out of order: its orb is traded away before the visit it comes after (INT-W2c)', () => {
+    const ctx = run('c_visit_order');
+    const g = stateGraph(ctx);
+    const r = proofSoftlocks(ctx);
+    expect(r.failures, r.line).toEqual([]);
+    // the out-of-order run exists: the orb was given away while the shrine visit (S1) was still undone ...
+    const early = g.nodes.find((n) => n.state.flags.has('ORB_GIVEN') && !n.state.flags.has('@S1'));
+    expect(early?.state.flags.has('@S2~')).toBe(true);
+    // ... and once the shrine is visited S2 is done without the orb, its note spent, and the goal follows
+    const done = g.nodes.find((n) => n.state.flags.has('GOAL_DONE') && n.state.items.has('trinket'));
+    expect(done?.state.flags.has('@S2')).toBe(true);
+    expect(g.nodes.some((n) => n.state.flags.has('@S2') && n.state.flags.has('@S2~'))).toBe(false);
+  });
+
   it('(c) RED stranded: a pit with no way back to the world map', () => {
     const r = proofSoftlocks(run('red_c_stranded'));
     expect(codes(r)).toContain('STRANDED');
@@ -218,10 +232,10 @@ describe('questGraph: the repository (npm run quest)', () => {
       'cornelia-castle-2f:gift:princess']);
   });
 
-  it('S31 waits for its adamant, which no stage grants yet (an error under --strict)', () => {
-    expect(proofs[0].line).toContain('S31 waits for adamant');
+  it('S31 is reachable now that the sky castle grants the adamant (WND-D2); it is still pending, an error under --strict', () => {
+    expect(proofs[0].line).not.toContain('S31 waits for adamant');
+    expect(proofs[0].line).toMatch(/optional: S31 /);
     const strict = proofOrder(createQuestContext(ctx.world, { strict: true }));
-    expect(strict.failures.map((f) => f.code)).toContain('OPTIONAL');
     const pending = ctx.world.quest.stages.filter((s) => s.status === 'pending').length;
     expect(strict.failures.filter((f) => f.code === 'PENDING')).toHaveLength(pending);
   });
