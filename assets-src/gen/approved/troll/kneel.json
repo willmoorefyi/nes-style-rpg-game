@@ -1,0 +1,36 @@
+{
+  "character": "troll",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "2fbd3d5b36dc55ee",
+    "skel": "50dbd4f7b2cc4c94",
+    "ref": "a9ffe3efb6f3a89f"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-hist, A-adj, K-ground",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "db7c4871699bab23a2bd4699"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

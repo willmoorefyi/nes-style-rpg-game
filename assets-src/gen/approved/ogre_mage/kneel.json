@@ -1,0 +1,36 @@
+{
+  "character": "ogre_mage",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "810ee489920a69e9",
+    "skel": "d707a03d1b905629",
+    "ref": "7f134047dc8845f4"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-hist",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "bebba32da5f62a0e3e5f9476"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

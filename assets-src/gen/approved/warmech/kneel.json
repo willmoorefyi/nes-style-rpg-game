@@ -1,0 +1,36 @@
+{
+  "character": "warmech",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "a28fa1f05bab1644",
+    "skel": "6e18fdc59e7d9e27",
+    "ref": "a5e2f32b17dcb414"
+  },
+  "grid": [
+    232,
+    200
+  ],
+  "bottom_row": 192,
+  "foot_row": 192,
+  "j0": "FAIL A-grey, A-hist, A-adj, A-outline",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "aaf836c1b75588803bd8c613"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

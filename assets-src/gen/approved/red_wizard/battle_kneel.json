@@ -1,0 +1,34 @@
+{
+  "character": "red_wizard",
+  "sheet": "battle_kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "87426a12b4a8d9d0",
+    "skel": "789fb80dd3798411",
+    "ref": "79bbafa7fed7d631"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "df0a8db1aa17acc47bb898be"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

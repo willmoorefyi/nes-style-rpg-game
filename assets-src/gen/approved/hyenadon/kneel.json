@@ -1,0 +1,36 @@
+{
+  "character": "hyenadon",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "7ae8c67e4fdd7bd9",
+    "skel": "f3f2198d8b5840b7",
+    "ref": "229f4e995da2a178"
+  },
+  "grid": [
+    116,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-hist, A-adj, A-outline",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "6a1b77a99189ca59a4f01f34"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

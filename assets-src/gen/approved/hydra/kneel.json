@@ -1,0 +1,36 @@
+{
+  "character": "hydra",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "42e2e4c7b6c78a79",
+    "skel": "3dcf27721e81d989",
+    "ref": "9ec67d97e9ccaba8"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-grey, A-hist, A-adj, A-outline, K-ground",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "f25523a1b4684b30ff2521df"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

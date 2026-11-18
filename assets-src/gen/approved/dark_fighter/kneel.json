@@ -1,0 +1,36 @@
+{
+  "character": "dark_fighter",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "58dba6d04301df71",
+    "skel": "01e6eadd81c993de",
+    "ref": "c26df405b1b4465b"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-adj, A-outline",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "cab55f3c4dda2d6567091d8a"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

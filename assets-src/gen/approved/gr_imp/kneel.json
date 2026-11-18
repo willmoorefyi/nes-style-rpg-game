@@ -1,0 +1,36 @@
+{
+  "character": "gr_imp",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "1061cea27f26c8f4",
+    "skel": "2a56a2ff78393967",
+    "ref": "87651aa0227bde05"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-grey, A-adj, A-outline",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "c441c6e0942ab1e0e31f7250"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

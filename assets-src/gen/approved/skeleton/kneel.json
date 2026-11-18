@@ -1,0 +1,36 @@
+{
+  "character": "skeleton",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "fd8143816c0fcc5f",
+    "skel": "ba10c53a315bb33c",
+    "ref": "b3ee696db67e2c5b"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-pal, A-grey, A-hist",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "e6f22b0158802ff10372f693"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

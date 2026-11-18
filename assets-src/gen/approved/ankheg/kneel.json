@@ -1,0 +1,36 @@
+{
+  "character": "ankheg",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "332732af9bf2d3b0",
+    "skel": "95738232fb4807e3",
+    "ref": "ef2f975504853140"
+  },
+  "grid": [
+    154,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-hist, A-adj, A-outline",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "bde4ae8a09dda22b0eef792a"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

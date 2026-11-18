@@ -1,0 +1,36 @@
+{
+  "character": "remorazz",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "8dfe38cc371ff0a2",
+    "skel": "735d06c9e32fff07",
+    "ref": "f636d7535386742e"
+  },
+  "grid": [
+    176,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL K-ground",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "8c38ea448992461fa1bda5d6"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

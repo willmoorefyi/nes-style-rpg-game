@@ -1,0 +1,36 @@
+{
+  "character": "lich",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "0346e61a5737ecc3",
+    "skel": "8d746dc3c2e7f190",
+    "ref": "42dc21e64d4055fb"
+  },
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "foot_row": 192,
+  "j0": "FAIL A-hist, A-adj, A-outline, K-height",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "923218dd20be79c123a91f91"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

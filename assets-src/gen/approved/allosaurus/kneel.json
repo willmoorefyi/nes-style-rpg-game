@@ -1,0 +1,36 @@
+{
+  "character": "allosaurus",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1235,
+  "try": 2,
+  "guide_sha": {
+    "sil": "8bbb62b201c0af3c",
+    "skel": "5bdcbe16df81e001",
+    "ref": "4b2dac943e6bedb9"
+  },
+  "grid": [
+    134,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "j0": "FAIL A-hist, A-outline, A-width, K-height",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "d71324fe507c8fd57d91161e"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

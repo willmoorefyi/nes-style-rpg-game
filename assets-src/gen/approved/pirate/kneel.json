@@ -1,0 +1,36 @@
+{
+  "character": "pirate",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "8d46c3d71a89ad85",
+    "skel": "37de963048258e20",
+    "ref": "88e7c4422a64946d"
+  },
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "foot_row": 76,
+  "j0": "FAIL A-hist, A-adj",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "aed52e52f62bb5e38524d909"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

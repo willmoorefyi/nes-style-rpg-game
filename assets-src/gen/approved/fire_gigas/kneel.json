@@ -1,0 +1,34 @@
+{
+  "character": "fire_gigas",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "6c0ca0647b6d7493",
+    "skel": "af24d5a7de68cb6b",
+    "ref": "d85f8fd88e8bea4e"
+  },
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "foot_row": 122,
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "860567c3d2672adb51c78b6a"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

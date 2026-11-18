@@ -1,0 +1,36 @@
+{
+  "character": "hollow_seraph",
+  "sheet": "kneel",
+  "arm": "g",
+  "seed": 1234,
+  "try": 1,
+  "guide_sha": {
+    "sil": "f7934f2c222fd097",
+    "skel": "a5982da88650cc38",
+    "ref": "90b50ffef5743051"
+  },
+  "grid": [
+    200,
+    200
+  ],
+  "bottom_row": 192,
+  "foot_row": 192,
+  "j0": "FAIL A-grey, A-hist, A-adj",
+  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
+  "models": [
+    "gemini-nano-banana-2.1"
+  ],
+  "gemini_cache_keys": [
+    "39aca2ff6738802150c0fe20"
+  ],
+  "refs": [
+    "idle",
+    "pose"
+  ],
+  "settings": {
+    "model": "gemini-nano-banana-2.1",
+    "aspect_ratio": "1:1",
+    "image_size": "1K"
+  },
+  "approved": "2026-11-17"
+}

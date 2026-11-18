@@ -156,7 +156,11 @@ def cmd_approve(a) -> int:
     gate = json.loads((d / f"gate_{t}.json").read_text())
     if gate["verdict"] != "PASS" and not a.user_review:
         raise SystemExit(f"refused: {a.id} ({t}) has no J0 PASS ({gate['verdict']})")
-    reqs = json.loads((d / f"req_{t}.json").read_text())
+    rq = d / f"req_{t}.json"
+    if not rq.exists() and a.arm == "g":           # a batch try writes no req json: rebuild the same request
+        from gen import kneel_ai_gem as KG
+        rq.write_text(json.dumps(KG.summary(KG.request(sp, a.n_try, KG.BATCH, "batch")), indent=1) + "\n")
+    reqs = json.loads(rq.read_text())
     g = json.loads((d / "guide.json").read_text())
     meta = {"character": a.id, "sheet": "battle_kneel" if sp.hero else "kneel", "arm": a.arm, "seed": a.seed,
             "try": a.n_try, "guide_sha": g["sha"], "grid": list(sp.cell), "bottom_row": sp.bottom,

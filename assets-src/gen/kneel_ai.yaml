@@ -276,6 +276,13 @@ sprites:
     fill: 0.945
     heads: [head]
     weapons: []
+    g_edit:
+      2:
+        src: 1
+        text: >-
+          The lizard's tail is bent into an unnatural square loop behind the body. Redraw only the tail as one
+          long, smooth, tapering tail that comes out of the hip and lies flat along the ground behind the body,
+          curving gently, with the same orange scales and dark outline. No loop, no corners, no hole in the tail.
   gargoyle:
     fill: 0.675
     heads: [head]
