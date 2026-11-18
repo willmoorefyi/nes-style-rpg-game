@@ -9,7 +9,7 @@ import { globMatch, stageOrder, type QuestWorld } from './questData.js';
 import { buildCatalog } from './questCatalog.js';
 import { stageMark, withheld, type WithheldGrants } from './questStates.js';
 import {
-  assumedState, createModel, exploreStates, newGameState, type QuestModel, type StateGraph,
+  assumedState, createModel, exploreStates, MAX_STATES, newGameState, type QuestModel, type StateGraph,
 } from './questSearch.js';
 import { bossEvents, eventsGranting, saturate, Saturator } from './questSaturate.js';
 
@@ -42,7 +42,7 @@ export function createQuestContext(world: QuestWorld, opts: QuestContextOptions 
   const start = opts.stage ? assumedState(model, opts.stage) : newGameState(model);
   const checked = opts.stage ? [world.stages.get(opts.stage)!]
     : stageOrder(world.quest).map((id) => world.stages.get(id)!);
-  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? 200000, start, checked };
+  return { ...model, stage: opts.stage, strict: !!opts.strict, maxStates: opts.maxStates ?? MAX_STATES, start, checked };
 }
 
 /** The saturation closure from the context's start (cached). */
@@ -51,9 +51,14 @@ export function closure(ctx: QuestContext): Saturator {
   return ctx.sat;
 }
 
-/** The exact state graph from the context's start (cached). */
+/** The exact state graph from the context's start (cached). Under `--stage`, a state that holds the stage's marker
+ *  reaches the target by itself, so no event fires from it, only its moves are followed (the way home, for
+ *  STRANDED): the later stages' events are their own runs' and the full run's to check (INT-W2c; with the
+ *  airship-era stages built, the expansion passed the state cap). */
 export function stateGraph(ctx: QuestContext): StateGraph {
-  ctx.graph ??= exploreStates(ctx, { start: ctx.start, maxStates: ctx.maxStates });
+  ctx.graph ??= exploreStates(ctx, {
+    start: ctx.start, maxStates: ctx.maxStates, ...(ctx.stage ? { stopAt: stageMark(ctx.stage) } : {}),
+  });
   return ctx.graph;
 }
 
