@@ -98,3 +98,4 @@ art (F5 is the rig's `raise: false`; no archive).
 | `warrior_kneel_v1` | `warrior` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `white_mage_kneel_v1` | `white_mage` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
 | `green_dragon_kneel_v1` | `green_dragon` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
+| `hydra_kneel_v1` | `hydra` | derived kneel (kneel, kneel_b, kneel_in1, kneel_in2), rig + lock |
