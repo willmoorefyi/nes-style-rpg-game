@@ -17,9 +17,17 @@ export class SceneManager {
   /** Called once each switchTo / push / pop has finished (not for a joined repeat): Game holds input off (U2). */
   private onSettled: (() => void) | undefined;
 
-  constructor(stage: Container, opts: { onSettled?: () => void } = {}) {
+  /** Debug trace of every scene change (`?trace=1`, src/core/diagnostics.ts); undefined = off. */
+  private readonly onTrace: ((line: string) => void) | undefined;
+
+  constructor(stage: Container, opts: { onSettled?: () => void; onTrace?: (line: string) => void } = {}) {
     this.stage = stage;
     this.onSettled = opts.onSettled;
+    this.onTrace = opts.onTrace;
+  }
+
+  private trace(what: string, name?: string): void {
+    this.onTrace?.(`scene ${what}${name ? ` ${name}` : ''} (now ${this.currentName ?? 'none'}, stack ${this.sceneStack.length})`);
   }
 
   register(name: string, scene: Scene): void {
@@ -62,6 +70,9 @@ export class SceneManager {
     const run = (async () => {
       try {
         await change();
+      } catch (e) {
+        this.onTrace?.(`scene change ${key} failed: ${String(e)}`);
+        throw e;
       } finally {
         this.transitions--;
         this.running.delete(key);
@@ -74,6 +85,7 @@ export class SceneManager {
 
   switchTo(name: string): Promise<void> {
     return this.gated(`switch:${name}`, async () => {
+      this.trace('switchTo', name);
       const next = await this.resolve(name);
 
       // Clear the stack - switchTo is a hard transition
@@ -98,6 +110,7 @@ export class SceneManager {
 
   push(name: string): Promise<void> {
     return this.gated(`push:${name}`, async () => {
+      this.trace('push', name);
       const next = await this.resolve(name);
 
       if (this.currentScene && this.currentName) {
@@ -118,6 +131,7 @@ export class SceneManager {
       throw new Error('Scene stack is empty');
     }
     this.transitions++;
+    this.trace('pop');
     try {
       if (this.currentScene) {
         await this.currentScene.exit();

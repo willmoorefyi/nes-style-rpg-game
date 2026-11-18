@@ -1,5 +1,6 @@
 import { Game } from './core/Game.js';
 import { TitleScene } from './scenes/TitleScene.js';
+import { domOverlay, traceWindow, watchContext } from './core/diagnostics.js';
 
 function showError(msg: string): void {
   const el = document.createElement('div');
@@ -19,6 +20,18 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
     (window as unknown as Record<string, unknown>).__game = game;
   }
   document.body.appendChild(game.canvas);
+  // a lost WebGL context or a halted loop says so over the page instead of leaving it black or frozen (P3-07)
+  const overlay = domOverlay(document);
+  game.fatalOverlay = overlay;
+  watchContext(game.canvas, overlay, game.trace);
+  if (game.trace) {
+    traceWindow(window, game.trace);
+    (window as unknown as Record<string, unknown>).__trace = game.trace.lines;
+    const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    game.trace.log('page start', `navigation ${nav?.type ?? 'unknown'}`);
+    // dev server: the file that made Vite reload the whole page, if that is what happened
+    import.meta.hot?.on('vite:beforeFullReload', (p: { path?: string }) => game.trace?.log('vite full reload', String(p?.path)));
+  }
   game.focusCanvas();
   // Click anywhere on the page to ensure canvas gets focus
   document.addEventListener('click', () => game.focusCanvas());

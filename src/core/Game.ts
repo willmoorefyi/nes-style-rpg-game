@@ -21,6 +21,7 @@ import { installNESFont } from '../ui/NESFont.js';
 import { setUiEventBus } from '../ui/uiSounds.js';
 import { wireAudioEvents } from './audioEvents.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
+import { HALTED_TEXT, TraceLog, traceEnabled, type Overlay } from './diagnostics.js';
 
 export const WIDTH = GAME_WIDTH;
 export const HEIGHT = GAME_HEIGHT;
@@ -57,11 +58,19 @@ export class Game {
   /** `a1`: `playerPosition` is an act-1 overworld cell from a version-1 save, translated on the next field enter. */
   pendingFrame: 'a1' | null = null;
 
+  /** The scene / error trace, on with `?trace=1` (off by default; src/core/diagnostics.ts). */
+  readonly trace: TraceLog | null;
+  /** Where a fatal message (the loop halted) is shown; main.ts sets a banner over the page. */
+  fatalOverlay: Overlay | null = null;
+
   constructor() {
+    this.trace = typeof window !== 'undefined' && traceEnabled(window.location.search, window.localStorage)
+      ? new TraceLog() : null;
     this.app = new Application();
     this.input = new InputManager();
     this.scenes = new SceneManager(this.app.stage, {
       onSettled: () => this.input.holdOff(SCENE_ENTRY_HOLDOFF_FRAMES),
+      onTrace: this.trace ? (line) => this.trace?.log(line) : undefined,
     });
     this.assets = new AssetLoader();
     this.events = new EventBus();
@@ -118,6 +127,8 @@ export class Game {
         if (consecutiveErrors >= 3) {
           this.app.ticker.stop();
           console.error('Game halted after 3 consecutive errors.');
+          this.trace?.log('game loop halted', String(e));
+          this.fatalOverlay?.show(HALTED_TEXT);
         }
       }
     });
