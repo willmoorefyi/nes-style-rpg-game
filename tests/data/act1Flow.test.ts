@@ -146,11 +146,12 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
     expect(conditions.indexOf('INTRO_COMPLETE')).toBeLessThan(conditions.indexOf('PRINCESS_RESCUED'));
   });
 
-  it('no NPC promises a finished bridge (ST-4)', () => {
+  it('no NPC promises a finished bridge before BRIDGE_BUILT (ST-4); only lines conditioned on it may (P1-1-02)', () => {
     for (const id of ['cornelia', 'cornelia-castle-2f']) {
       for (const npc of readMap(id).npcs) {
         for (const d of npc.dialog as Array<string | { condition?: string; text: string[] }>) {
-          if (typeof d !== 'string') expect(d.condition, `${id} ${npc.id}`).not.toBe('BRIDGE_BUILT');
+          if (typeof d === 'string' || d.condition === 'BRIDGE_BUILT') continue;
+          expect(d.text.join(' '), `${id} ${npc.id}`).not.toMatch(/bridge[^.]*(stands|finished|is built)|(finished|completed) the bridge/i);
         }
       }
     }

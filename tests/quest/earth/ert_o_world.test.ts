@@ -151,6 +151,6 @@ describe('ERT-O: the site maps', () => {
     expect(steps('ert_canal_blast')).toEqual(expect.arrayContaining([{ type: 'take_item', item: 'tnt' }, { type: 'set_flag', flag: 'CANAL_OPEN' }]));
     expect(steps('ert_giant_feast')).toEqual(expect.arrayContaining([{ type: 'take_item', item: 'ruby' }, { type: 'set_flag', flag: 'TITAN_FED' }]));
     expect(steps('ert_sarda_rod')).toEqual(expect.arrayContaining([{ type: 'give_item', item: 'rod' }]));
-    expect(steps('ert_smyth_forge')).toEqual(expect.arrayContaining([{ type: 'give_item', item: 'excalibur' }]));
+    expect(steps('ert_smyth_forge')).toEqual(expect.arrayContaining([{ type: 'give_item', item: 'excalibur', announce: true }]));
   });
 });
