@@ -134,8 +134,9 @@ describe('questMutate: the real world (npm run quest -- --mutate)', () => {
       expect.stringMatching(/npc princess needs PRINCESS_RESCUED/)]));
   });
 
-  it('--strict turns every pending row into a failure', () => {
+  it('no row is pending any more, so --strict reports every element too (INT)', () => {
+    expect(all.filter((m) => m.nonLoadBearing?.startsWith('pending')).map((m) => `${m.row} ${m.element}`)).toEqual([]);
     const strict = runMutations(createQuestContext(real.world, { strict: true }));
-    expect(strict.some((m) => !m.caught && m.nonLoadBearing === undefined)).toBe(true);
+    expect(strict.filter((m) => !m.caught && m.nonLoadBearing === undefined).map((m) => `${m.row} ${m.element}`)).toEqual([]);
   });
 });

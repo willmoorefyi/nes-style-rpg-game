@@ -388,6 +388,7 @@ export class ExplorationScene implements Scene {
       if (!step.ok) {
         // the cell cannot be entered (a shut gate): step back to where the move started
         this.player.setPosition(this.stepOrigin.x, this.stepOrigin.y);
+        recordPlayer(this.game, this.player); // game.playerPosition was the gate cell until the next step (WND-D1)
         if (step.message !== undefined) this.dialogManager.start([step.message]);
         return;
       }

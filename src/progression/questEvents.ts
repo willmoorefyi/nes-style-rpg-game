@@ -98,8 +98,17 @@ export function npcKind(npc: MapNPC, battle: boolean): QuestEventKind {
 /** A map's NPC is an event when it can change state or is a keeper (proof (e) asks when keepers become talkable). */
 export function npcRelevant(world: QuestWorld, npc: MapNPC, battle: boolean): boolean {
   const keyGift = (it: string | undefined): boolean => it !== undefined && world.keyItems.has(it);
-  return keyGift(npc.chestItem) || keyGift(npc.giftItem) || battle || !!npc.cutscene || !!npc.requiredItem
+  return keyGift(npc.chestItem) || keyGift(npc.giftItem) || questFlag(world, npc.chestItem && npc.chestFlag)
+    || questFlag(world, npc.giftItem && npc.giftFlag) || battle || !!npc.cutscene || !!npc.requiredItem
     || npc.takeGold !== undefined || !!npc.shopId || npc.action === 'inn' || npc.action === 'clinic';
+}
+
+/** A flag quest.yaml names (a stage's grant, requirement or milestone, or the goal): state even when an ordinary
+ *  chest or gift sets it. */
+export function questFlag(world: QuestWorld, f: string | undefined): boolean {
+  if (!f) return false;
+  return f === world.quest.goal || world.quest.stages.some((s) => s.grants.flags.includes(f)
+    || s.requires.flags.includes(f) || (s.milestones ?? []).includes(f));
 }
 
 export function staticNpc(world: QuestWorld, npc: MapNPC, enc: ScriptedEncounter | undefined): {
@@ -115,6 +124,11 @@ export function staticNpc(world: QuestWorld, npc: MapNPC, enc: ScriptedEncounter
   } else if (npc.giftItem && world.keyItems.has(npc.giftItem)) {
     grants.items.push(npc.giftItem);
     if (npc.giftFlag) grants.flags.push(npc.giftFlag);
+  } else if (questFlag(world, npc.chestItem && npc.chestFlag)) {
+    grants.flags.push(npc.chestFlag!);
+  } else if (questFlag(world, npc.giftItem && npc.giftFlag)) {
+    // an ordinary item given while a quest flag is set (W1-I hand-off): the item is not state, the flag is
+    grants.flags.push(npc.giftFlag!);
   }
   const parts: QuestEffects[] = [];
   if (npc.cutscene) {
@@ -201,7 +215,7 @@ export function effectsOf(world: QuestWorld, ev: QuestEventSpec, state: QuestSta
       }
       if (take.item) eff.takes.push(take.item);
       eff.gold += take.gold ?? (npc.takeGold !== undefined && (out.give || out.setFlags.length) ? npc.takeGold : 0);
-      if (out.give) eff.items.push(out.give);
+      if (out.give && world.keyItems.has(out.give)) eff.items.push(out.give);   // an ordinary gift is not state
       eff.flags.push(...out.setFlags);
       if (out.cutscene) eff = merge(eff, cutsceneEffects(world, out.cutscene));
       if (out.battle) {

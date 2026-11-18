@@ -32,10 +32,12 @@ NOTE = ("Concept: the dwarves' hall hewn under the isthmus, a working mine town 
         "Topology: one map, no stairs: overworld (ert_dwarf) -> hall -> forge | drafting room | store; exit south.")
 DWARF = "#b08860"                                        # the dwarves' ruddy tint on the human field sheets
 OPEN = "CANAL_OPEN"
-# S31 (optional): Smyth's forge trade (cutscene `ert_smyth_forge`, written). No stage grants `adamant` yet (WND-D2's
-# sky-castle chest is not in S28's grants), so the trade would be a dead gate (proof (c) DEADGATE). Switch it on then:
-#   SMYTH_TRADE = {"cutscene": {"id": "ert_smyth_forge", "onceFlag": "ERT_O_SWORD_FORGED"}, "requiredItem": "adamant"}
-SMYTH_TRADE: dict = {}
+# S31 (optional, after S28): Smyth's forge trade (cutscene `ert_smyth_forge`): the adamant from S28's sky-castle vault
+# chest (CHEST_WND_D2_ADAMANT) for Excalibur. Switched on by INT; he forges only once the wind crystal is lit (the sky
+# calm again), so the adamant S28 grants is still held when its seraph falls (proof (a): S31 after S28)
+SMYTH_TRADE: dict = {"cutscene": {"id": "ert_smyth_forge", "requiredFlags": ["WIND_CRYSTAL_LIT"],
+                                  "onceFlag": "ERT_O_SWORD_FORGED"}, "requiredItem": "adamant"}
+SMYTH_LIT = "WIND_CRYSTAL_LIT"
 
 
 def say(*lines: str) -> list[str]:
@@ -102,10 +104,15 @@ def build() -> Path:
         say("Every line on that table has been rubbed out and drawn again. The saddle beat us every time.")))
     smyth = say("Smyth, smith of this hall. My anvil has gone quiet for want of a metal worth hitting.",
                 "Bring me ore from a place nearer the stars than the earth, and I'll show you what a dwarf can forge.")
-    npc("ert_smyth", "monk", 7, 6, when(
-        "ERT_O_SWORD_FORGED", say("Mind the edge. I'll never make a keener thing, and I don't mean to try."), smyth,
-        "adamant", say("That ore is singing! Hand it over, and stand well back from the fire."))
-        if SMYTH_TRADE else smyth, **SMYTH_TRADE)
+    npc("ert_smyth", "monk", 7, 6, [
+        {"condition": "ERT_O_SWORD_FORGED",
+         "text": say("Mind the edge. I'll never make a keener thing, and I don't mean to try.")},
+        {"condition": SMYTH_LIT, "text": say("The wind's dropped at last; my fire draws clean again.",
+                                             "If you carry ore from the sky, hand it over, and stand well back.")},
+        {"condition": "item:adamant", "text": say(
+            "That ore is singing! But hear that wind in the flue? The sky's gone wild, and my fire won't hold a "
+            "forging heat in it.", "Calm whatever's stirring the sky, then bring the ore back.")},
+        {"text": smyth}] if SMYTH_TRADE else smyth, **SMYTH_TRADE)
     npc("ert_dwarf_bellows", "thief", 4, 8, say("I work the bellows. Smyth says one day I'll strike, too. One day."))
     npc("ert_dwarf_canal_hint", "farmer", 12, 18, when(
         OPEN, say("The canal's open, and the ships of the Aldi can reach the open sea at last."),

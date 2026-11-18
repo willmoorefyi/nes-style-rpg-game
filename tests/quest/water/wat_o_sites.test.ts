@@ -50,9 +50,9 @@ describe('WAT-O: the caravan camp', () => {
     expect(camp.transitions.every((t) => t.targetMap === 'overworld' && t.targetEntrance === 'wat_caravan')).toBe(true);
   });
 
-  it('the trader sells the bottle for gold (takeGold, GAP-15; 4.6 default 5000)', () => {
+  it('the trader sells the bottle for gold (takeGold, GAP-15; INT tuned it by (d3) to 40000)', () => {
     expect(camp.npcs.find((n) => n.id === 'trader')).toMatchObject({
-      takeGold: 5000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT',
+      takeGold: 40000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT',
     });
   });
 });

@@ -5037,6 +5037,85 @@ not change these counts: they are the same with and without it. Two changes:
 - **PLAY/INT follow-up:** the user's planned "cheats" menu (an XP and gold boost, as in the remasters).
 
 Gates on `int-w2c` (`mainline` 51102ccd merged): see the commit message of the final INT-W2c commit.
+
+### INT result (branch `w-int` from `mainline` 0e4007e1)
+
+**Baseline on 0e4007e1** (23 min per full run): `npm run quest -- --mutate` was OK; `--strict --mutate` failed on
+`PENDING S31` and the 4 mirage-3f ring cells (WND-D1's `pending:` entries, which `--strict` drops); `--stage S0` left
+3 elements uncaught. `stubs.py --check all`: `stubs: 0 left`.
+
+**S31 (Excalibur) is modelled and built.** The verifier already counts a stage's grants as key items
+(`questData.ts`), so `excalibur` is state; what was missing was the trade itself (`SMYTH_TRADE` was off in
+`earth/dwarf.py`). With it on, (a) found a real ordering hole: a party could take the adamant from 3F's vault, fly to
+the dwarves and forge before the seraph fell, so S28's grants (WIND_CRYSTAL_LIT + adamant) never held together
+(`ORDER S31 (excalibur) holds before S28 completes`). Smyth now forges only once the wind crystal is lit (his cutscene
+`requiredFlags: [WIND_CRYSTAL_LIT]`; with the ore and a wild sky he says the wind in his flue won't let the fire hold a
+forging heat), which keeps WORLD 3.2's S31 after S28. S31: `status: built`, entry in the dwarf hall (the airship by
+Melmond, the ship at the dwarves' quay), walk `dwarf-hall:npc:ert_smyth`. No stage is pending.
+
+**Strict.** WND-D1's 4 ring entries carry WND-D2's text ("redundant with sky-castle-1f's berth ward ..."). `--stage S0`'s
+3 blind spots (the King's and the princess's PRINCESS_RESCUED, the temple's stair to the past) get S0 entries scoped
+to the stage run (below); the full run catches all three. (h) under `--strict` now also requires every
+`DOCKS_ALLOWED` dock and the `canal` patch on the world map (the GT-5b presence check); a mutated context is never
+strict, so no dock-removal row can be "caught" by a presence error.
+
+**`nonLoadBearing` tightened.** An entry may name `element: <label>` (only that element; required for `kind: quest`,
+whose cell is always [0, 0]) and `stage: <id>` (only in a `--stage <id>` run). FIR-T's S14 entry now reads
+`{map: quest, kind: quest, at: [0, 0], element: "town crescent opensAfter [S13]", stage: S14, ...}`: it excused any
+uncaught town-opening row in any run before.
+
+**Non-key gifts (the W1-I hand-off).** An ordinary chest or gift whose flag quest.yaml names (a stage's grant,
+requirement or milestone, or the goal) is now an event granting that flag; the item itself is not state. No map has
+one today (scan at INT); the fixture `tests/fixtures/quest/a_plain_gift.yaml` and its `questGraph.test.ts` case pin it.
+
+**The curve (QUEST 6.4).** `curveOf` now records its walk as `segments` (per event: expected fights per table, then
+the battle). `tests/balance/questCurve.test.ts` replays them on the real `BattleStateMachine` (60 seeds, sensible
+policy, the stage kits, the upgrade after S19, fieldCampaign's inn rule, scripted battles assumed won). First run:
+Chaos's door at L42.4 (above [38, 41]) and S22's desert grind wiping 0.28 a run (Desert Barettas, FF1's Ankylo, on a
+L24 base party). Grinds retuned (all <= 7.0): S17 2.0 -> 4.0, S22 7.0 -> 2.0, S27 2.0 -> 1.0, S28 2.0 -> 1.0, S30
+2.0 -> 1.0. Measured (60 seeds): every boss in band (tightest evil_eye L24.6 [21, 24]), Chaos's door L40.4, wipes at
+most 0.10 a run (S31: the Warmech's rare formation in the engine halls on the way back down).
+
+**(d3) the bottle.** 40000 G (FF1's price; was 4.6's 5000): 46 % of the rushing curve's gold at S22's start, under
+7 % of the ground curve's. `w_s22_start` carries 41000 G.
+
+**Engine: `game.playerPosition` after a gate push-back** (WND-D1): the shut gate's step-back now records the tile at
+once, so the position is right while the gate's message shows (a RED-checked case in `EncounterStepFilter.test.ts`).
+
+**Int notes** (`/tmp/world_int_notes.md`), one by one:
+- adamant in S28's grants (W1-H): done by WND-D2. S31: built (above).
+- A1-O, the north_bridge patch and the act-1 gate cells: GT-2 is caught on the real world; nothing to do.
+- PST, GT-33's EARTH_CRYSTAL_LIT: S29's entry exists and `questMutate.test.ts` checks it.
+- non-key gifts with giftFlag: fixed (above).
+- GT-5b dock presence: built (above).
+- `--stage S0`'s uncaught elements: S0 entries, stage-scoped.
+- ELF-T's Elfheim gold at S4 and `questLate.test.ts`: fixed by INT-W2c (bandStage S6).
+- `stageEarlyShops.test.ts` SHOPLESS pravoka: passes on this branch.
+- FIR-T's broad S14 entry: tightened. Proof (f) Crescent: checked (no longer pending).
+- FIR-D1 / WAT-D: `stage_backgrounds.py --check` bounds: **not added, documented** in `CHECKS`: `is_water` is a blue-hue
+  test and `seam` a column-step test, both built for the one pasted composite (`shoreline`); on plain staged images
+  they read blue stone and ice as water (ice_cave 98 %, sky_palace and fiend_hall 99.8 %, throne_tiamat 100 %) and
+  painted columns as seams (water_temple 76.5). Bounds there would be pins on noise.
+- FIR-D1's B3 chokepoint check off (the forge dead end) and ERT-D's `no_static_chokepoints` off on cavern B2/B4:
+  **deferred**, by design (dead ends the tranches reviewed); no verifier proof depends on them.
+- ERT-D's W_isthmus cut through the dwarf door: fixed by INT-W2c.
+- WND-T's state cap: MAX_STATES 1,000,000; the full run's (c) needs 249006 states.
+- WAT-D's S24 (c): restored by INT-W2c.
+- WND-D1: the ring's entries (above); the sky castle's way back down exists (1F `ring` -> mirage-3f, WND-D2); the
+  engine bug: fixed.
+- WAT-T's 'bay' rule in NPC lines: a standing test rule, nothing to resolve.
+- **Placeholder art, for a later art pass** (no art made): the `kit.py` LANDMARKS still drawn by code: `dock_post` "DP"
+  (overworld, pravoka, onrac, crescent), `buried_hull` "BH" (the airship hull; Onrac's submarine and bell tower),
+  `windmill` "WM" (gaia, melmond, overworld), `tower` "TW" (onrac, pravoka, overworld), `cave_mouth` "CM",
+  `volcano` "VO", `shrine` "SH", `waterfall` "WF", `tent` "TE" (caravan-camp, overworld), `dome` "DO" (lufenia),
+  `ice_floe` "IF" (ice-cavern-b1..b3), `sky_ring` "SR" (mirage-3f), the `tuft` part (gaia); ERT-D's altar is a deco
+  (no crystal sprite); the fairy and the mermaids are tinted NPC sheets.
+
+AGENTS.md: the map table (every region's layout scripts), "The world (pass W)" (origin, regions, seas, quest.yaml,
+the proofs (a)-(h), the mutation suite and the new `nonLoadBearing` fields, the curve model with the grind cap 7 and
+exploring, `--stage` scoping, MAX_STATES, the placeholder list), the ceilings and the test counts.
+
+GATES_PLACEHOLDER
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->

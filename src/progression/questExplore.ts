@@ -47,17 +47,24 @@ export function explorationRewards(data: LateData, map: MapData): { fights: numb
   let fights = 0;
   let xp = 0;
   let gold = 0;
+  for (const [table, n] of explorationTables(map)) {
+    const r = tableRewards(data, table);
+    fights += n;
+    xp += n * r.xp;
+    gold += n * r.gold;
+  }
+  return { fights, xp, gold };
+}
+
+/** The fights one exploration of a map expects, per encounter table (questCurve.test.ts rolls them). */
+export function explorationTables(map: MapData): Map<readonly EncounterEntry[], number> {
+  const out = new Map<readonly EncounterEntry[], number>();
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width; x++) {
       if (!terrainAllows('walking', baseTerrain(map, x, y))) continue;
       const enc = encounterAt(map, x, y, 'walking');
-      if (!enc) continue;
-      const per = 1 / ((enc.rate.min + enc.rate.max) / 2);
-      const r = tableRewards(data, enc.table);
-      fights += per;
-      xp += per * r.xp;
-      gold += per * r.gold;
+      if (enc) out.set(enc.table, (out.get(enc.table) ?? 0) + 1 / ((enc.rate.min + enc.rate.max) / 2));
     }
   }
-  return { fights, xp, gold };
+  return out;
 }

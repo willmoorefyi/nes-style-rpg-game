@@ -2143,7 +2143,7 @@
     - { type: airship, map: overworld, x: 12, y: 30 }
   party: *wat_o_party
   items: { canoe: 1, hi_potion: 4, ether: 2, phoenix_down: 2 }
-  gold: 6000
+  gold: 41000   # the bottle's price (40000, INT) and a little over
   enemies: []
 # === end WAT-O ===
 # === WAT-T (pass W: owned by WAT-T) ===

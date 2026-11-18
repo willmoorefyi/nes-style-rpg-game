@@ -125,6 +125,10 @@ export interface QuestNonLoadBearing {
   kind: string;
   at: CellXY;
   reason: string;
+  /** Matches only the element with this exact label (required for `kind: quest`, whose cell is always [0, 0]). */
+  element?: string;
+  /** Excuses the element only in a `--stage <stage>` run (a stage-scope blind spot the full run catches). */
+  stage?: string;
 }
 
 /** Where a stage's proofs start in assume mode (QUEST 5.1). */
