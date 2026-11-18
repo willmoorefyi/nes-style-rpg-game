@@ -63,3 +63,7 @@ paint:                          # 1-4 px cracks and a leg pocket opened by the b
   - {frame: atk_mid, xy: [[22, 50], [23, 50], [21, 51], [22, 51], [71, 45], [77, 57]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[66, 44], [64, 45], [71, 47], [71, 51]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[65, 45], [63, 46], [69, 51]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
