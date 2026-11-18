@@ -21,7 +21,7 @@ Status key: DONE = played and passed; PART = played in part; TODO = to be played
 | S15 | w_s15_start | DONE with a healing player (Hi-Potions between fights): queen won at full party HP, 0 game overs, FIRE_CRYSTAL_LIT set; the earlier wipes were the bot not healing |
 | S16 | w_s16_start | DONE (pit to B1 pocket, Hesk breaks the shelf, eye won, levistone) |
 | S17 | w_s17_start, _neg_nostone | DONE (hatch, airship, forest/desert refuse landing, grass lands; neg: hatch asks for the stone) |
-| S18 | w_s18_start | PART (1F throne, 2F entered; lattice and 3F boss TODO) |
+| S18 | w_s18_start | DONE (land on the meadow, throne opens the arch, 2F: 5 pad hops, 4 return to the ring and the 5th (19,24) leads to the hall, 3F guardian won at L24 with a healing player, seal held, chute back to 1F (21,21)) |
 | S19 | w_s19_start | DONE (class change applies) |
 | S20 | w_s20_start | DONE (map is onrac at (23,2); inn 500 G, shops, healer, shipwright; the gangway (38,27) is barred without oxyale with the right message) |
 | S21 | w_s21_start, _neg_nocanoe | DONE (east step at (30,28) gives canoe, 17 cells up the gorge, automaton gives the cube; neg: no route onto the river, cave unreachable) |
@@ -62,9 +62,22 @@ Status key: DONE = played and passed; PART = played in part; TODO = to be played
 - Console: 0 errors and 0 warnings (besides Chromium GL stall notes) in every run so far.
 - Shop lists (Melmond 8 items, Crescent, Onrac) match WORLD 3.5 tier names; price tables read from `shops.yaml` / `items.yaml`.
 
-## Not yet verified (carry-over to the re-walk)
+## Not verified / limits
 
-S15 boss with a healing player; S18 2F lattice and 3F boss; S20 inn and shops; S21 canoe up the gorge + negative; S22 bottle
-purchase; Melmond pond elder (28,32) and Crescent wanderers could not be reached by the bot; the B2 annex chests (2,26), (6,28)
-(entered from B1's east stair, not walked); whether encounter pace in the dungeons (14-30 steps) feels heavy (37 fights in one pass
-of the Ice Cavern, 32 in Gurgu).
+- Bot-only limits: wandering NPCs (Melmond pond elder (28,32), Crescent pupil_a / student_b / child) were not reached by the path finder;
+  the B2 annex chests (2,26), (6,28) are entered from B1's east stair and were not walked; a second talk to the caravan trader
+  (after the purchase) printed no line in the log (probably the confirm hold-off; the master's changed line did print).
+- Walking blind with a mash-confirm bot is a lower bound for player skill; with Hi-Potions between fights the S15 queen and the S18 guardian were won without a game over.
+- The page fell back to the Title or a black screen twice before the reboot (P3-07) and not again in the later runs (about 14 runs, 0 recurrences).
+
+## Extra findings from the re-walk
+
+| id | sev | stage | where | note |
+|---|---|---|---|---|
+| P3-12 | P3 | S18 | citadel-2f lattice | nothing in the citadel says which pads lead on (no NPC, no inscription on 2F); with 2 of 6 pads right the player hops by trial, each wrong pad is a free return to the ring but the ring walk draws fights. The design brief intends this; a one-line hint on 1F's steward or a floor inscription would make it fair |
+| P3-13 | P3 | S11-S22 | overworld town icons | Melmond's overworld icon is a plain one-house sprite (no sign of a town), Onrac's a white-roofed hall; both read as a single building rather than a town (art only) |
+
+## Console and performance
+
+0 errors, 0 warnings (besides Chromium's GL stall notes) in all runs of S11-S22. Flights and walks ran with no frame hitch seen in the logs; a
+full-map airship walk of 38 cells took about 42 s of wall time in the bot (its step delay, not the game).
