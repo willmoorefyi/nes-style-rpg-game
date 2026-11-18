@@ -33,3 +33,7 @@ holds:
   - {frame: hurt_in2, reason: "the hurt dome cannot rise toward the idle height (bbox 53 vs lerp 59) without lifting off the ground band or opening a gap above it; hurt_in1 bridges idle -> hurt alone"}
 paint:                          # 1 px pockets where the dropped upper arc's stub legs meet the lower arc: inked shut
   - {frame: hurt_in1, xy: [[58, 45], [56, 46], [52, 48], [55, 51], [56, 41], [57, 41], [57, 42]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai

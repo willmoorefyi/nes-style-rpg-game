@@ -137,3 +137,7 @@ frames:                         # legs held whole (coxa, knee and tip pinned); t
 holds: []
 paint:                          # a 6 px pocket between the back leg and the lifted body closes: inked shut (tarantula recipe)
   - {frame: hurt_in2, rgb: [6, 4, 10], xy: [[24, 57], [25, 57], [26, 57], [23, 58], [24, 58], [25, 58]]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai

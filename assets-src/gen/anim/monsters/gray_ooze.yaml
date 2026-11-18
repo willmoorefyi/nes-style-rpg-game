@@ -19,3 +19,7 @@ frames:
   atk_mid: {t: 0.10, moves: [mid, top]}   # the reaching fist sits at the cell edge: the base can't widen further;
                                           # the fist rides the body (turning it opened a 5 px hole between the fingers)
   hurt_in1: {moves: [mid, top]} # the fists ride the flinch; turning the near arm toward the curled hurt arm tore it
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
