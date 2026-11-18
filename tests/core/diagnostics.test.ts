@@ -63,13 +63,13 @@ describe('WebGL context loss', () => {
   it('says so, then asks for a reload when the context is not restored, and clears when it is', () => {
     const canvas = new Target();
     const o = overlay();
-    let fire: (() => void) | null = null;
-    const timers = { setTimeout: (fn: () => void) => { fire = fn; return 1; }, clearTimeout: vi.fn() };
+    const pending: Array<() => void> = [];
+    const timers = { setTimeout: (fn: () => void) => { pending.push(fn); return 1; }, clearTimeout: vi.fn() };
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    watchContext(canvas, o, null, timers, 8000);
+    watchContext(canvas as unknown as EventTarget, o, null, timers, 8000);
     canvas.fire('webglcontextlost');
     expect(o.shown).toEqual([CONTEXT_LOST_TEXT]);
-    fire?.();
+    pending[0]();
     expect(o.shown).toEqual([CONTEXT_LOST_TEXT, CONTEXT_STUCK_TEXT]);
     canvas.fire('webglcontextrestored');
     expect(o.hidden).toBe(1);
@@ -81,7 +81,7 @@ describe('WebGL context loss', () => {
     const o = overlay();
     const timers = { setTimeout: vi.fn(() => 7), clearTimeout: vi.fn() };
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    watchContext(canvas, o, null, timers);
+    watchContext(canvas as unknown as EventTarget, o, null, timers);
     canvas.fire('webglcontextlost');
     canvas.fire('webglcontextrestored');
     expect(timers.clearTimeout).toHaveBeenCalledWith(7);
