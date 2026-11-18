@@ -4358,7 +4358,7 @@ writes each person as `[{condition: LUFENIAN_LEARNED, text}, {text: [tongue]}]`;
 <!-- === WND-D1 WIND (pass W: owned by WND-D1) === -->
 <!-- === end WND-D1 === -->
 <!-- === WND-D2 WIND (pass W: owned by WND-D2) === -->
-### WND-D2 result: the sky castle (branch `w-wnd-d2` from `mainline` 7525dbad, merged with `mainline` 2ab79c11)
+### WND-D2 result: the sky castle (branch `w-wnd-d2` from `mainline` 7525dbad, merged with `mainline` bff131df)
 
 No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d2/`. The canon (4.7, 5.4) assigns WND-D2 the sky castle
 `sky-castle-1f..5f` with the boss `hollow_seraph` and the rare `warmech`, and that is what was built.
@@ -4443,7 +4443,7 @@ of 1 dungeons branches).
 | G1 `sky_lower.py`, `sky_upper.py`, `stubs.py`, `world.py --check-bands`, `world.py`, `git diff --exit-code assets-src/maps` | exit 0, no diff (`stubs: wrote 49 stub sources, kept 88 real maps (137 canon ids)`) |
 | G2 `build_map.py sky-castle-1f ... -5f`, then `--check-determinism` on the 5 ids | each `sky-castle-Nf: WxH -> assets/maps/ai/sky-castle-Nf.yaml`, then `sky-castle-Nf: deterministic`. No world compile (no site file changed) |
 | G3 | n/a: no overworld chunk changed |
-| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` | build exit 0 (after the `e.groups` type fix); vitest: the 6 mainline failures (proof (c) soft-locks and (d) bands: `questGraph` "passes (a), (b) and (c)", `questLate` (d), the S10 / S12 / S25 / S15 walks), plus, until WND-D1 merges, the hand-off failures below |
+| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` (on the merge with `mainline` bff131df) | build exit 0; vitest `Test Files 15 failed | 329 passed (344)`, `Tests 22 failed | 8393 passed | 1 skipped`. 14 fail on `mainline` bff131df itself (proof (c) soft-locks and (d) bands: `questGraph` (a)-(c), `questLate` (d), `questMutate` x2, the S4 / S10 / S11 / S12 / S13 / S15 / S16 / S20 / S25 walks). The other 8 are the WND-D1 hand-off below: `crossFileValidation` x2 (`mirage-3f` not compiled), `questGraph` S18 and S31, `travelMatrix` (T9), and the A1-O, A1-T, FIR-T full-run walks (goal unreachable: nothing warps into the castle yet) |
 | G5 `npm run quest -- --mutate --stage S28` | (a) OK S28; (b) OK (32 withheld runs); (c) FAIL: with WND-D1 merged (a scratch trial merge) only the mainline STRANDED / SOFTLOCK states of the visit-order bug in cornelia-castle and elfheim-vault remain (`LIMIT` at 200000 states); before it every state outside the castle is SOFTLOCK (no lift back up); (d) `hollow_seraph L32.5 [31,34]`; (e)-(g) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; (h) T9 (see below); `mutations: OK (2 gate rows; 3 elements, each removal reported)` |
 | G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings`: passed |
 | G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
