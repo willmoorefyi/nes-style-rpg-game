@@ -15,3 +15,7 @@ frames:
   hurt_in1: {squash: auto}      # the hurt key is 28 px lower: the explicit 0.90 left the flinch 9 px tall
   hurt_in2: {t: 0.20, squash: auto}   # the flattened key re-stretched toward the idle: area 1.20 at 0.35
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
