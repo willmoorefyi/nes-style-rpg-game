@@ -5,6 +5,11 @@
  * (walking 1, canoe 0.5, ship 1, airship 0) and the stage's `grind`; a fight gives the table's expected formation
  * xp and gold, and a scripted battle its enemies' rewards. Each member gets a quarter of the xp.
  *
+ * Exploration (INT-W2c): the first time the walk enters a map other than the world map, the party is taken to explore
+ * it, as a player does a dungeon or a town (chests, dead ends): once over each walkable cell of its encounter zones,
+ * so each such cell adds `1 / mean steps` fights (walking rate, not times `grind`), charged to the event's stage. The
+ * shortest route alone undercounts play: our encounter xp is FF1's (/tmp/int-w2c/xp_compare.md), and so are the bands.
+ *
  * A pending stage has no maps to walk: when its synthetic grant fires the party is raised to its band's low level,
  * and the gold from then on is marked assumed (the gold rules skip it; `--strict` fails pending stages anyway).
  */
@@ -12,6 +17,7 @@ import { levelForXp, xpToReach } from '../entities/ExperienceTable.js';
 import type { EncounterEntry, EncounterRate, FieldMode, MapData, QuestStage } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
 import { globMatch, stageOrder } from './questData.js';
+import { baseTerrain, terrainAllows } from '../systems/fieldRules.js';
 import { stageOfMap, townKeepers } from './questCatalog.js';
 import type { QuestEventSpec } from './questEvents.js';
 import { stageMark } from './questStates.js';
@@ -82,6 +88,26 @@ export function encounterAt(map: MapData, x: number, y: number, mode: FieldMode)
   return map.encounters?.length ? { table: map.encounters, rate: map.encounterRate ?? DEFAULT_RATE } : null;
 }
 
+/** One exploration of a map: a pass over every walkable cell with a walking encounter table (see the header). */
+export function explorationRewards(data: LateData, map: MapData): { fights: number; xp: number; gold: number } {
+  let fights = 0;
+  let xp = 0;
+  let gold = 0;
+  for (let y = 0; y < map.height; y++) {
+    for (let x = 0; x < map.width; x++) {
+      if (!terrainAllows('walking', baseTerrain(map, x, y))) continue;
+      const enc = encounterAt(map, x, y, 'walking');
+      if (!enc) continue;
+      const per = 1 / ((enc.rate.min + enc.rate.max) / 2);
+      const r = tableRewards(data, enc.table);
+      fights += per;
+      xp += per * r.xp;
+      gold += per * r.gold;
+    }
+  }
+  return { fights, xp, gold };
+}
+
 /** Fractional level for a member's xp (L2.9 = level 2, 90 % of the way to 3). */
 export function fractionalLevel(memberXp: number): number {
   const lv = levelForXp(memberXp);
@@ -109,7 +135,8 @@ const snapshot = (sat: Saturator, place: QuestPlace): QuestState => ({
 
 /**
  * Runs the curve model along the witness of proof (a). Cached on the context. `rush`: every stage's `grind` is 1.0,
- * a party that does not grind (proof (f)'s price walls stop a rusher; a grinding party earns its way in; INT-W2c).
+ * and no map explored: a party that rushes (proof (f)'s price walls stop a rusher; a grinding party earns its way in;
+ * INT-W2c).
  */
 export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): CurveResult {
   const cache = opts.rush ? RUSH_CURVES : CURVES;
@@ -126,6 +153,7 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
   if (own) out.xp = 4 * xpToReach(own[0]);
   let tainted = !!own;
   const fightsBy = new Map<string, number>();
+  const explored = new Set<string>([world.worldMap]);
   const sat = new Saturator(ctx, ctx.start);
   let pos: QuestPlace = { ...ctx.start.place };
   const done = (id: string): boolean => sat.flags.has(stageMark(id));
@@ -181,6 +209,13 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
       let gold = 0;
       for (const c of path) {
         const map = world.maps.get(c.map);
+        if (map && !opts.rush && !explored.has(c.map)) {
+          explored.add(c.map);
+          const ex = explorationRewards(data, map);
+          f += ex.fights;
+          xp += ex.xp;
+          gold += ex.gold;
+        }
         const enc = map ? encounterAt(map, c.x, c.y, c.mode) : null;
         if (!enc) continue;
         const per = grind * MODE_RATE[c.mode] / ((enc.rate.min + enc.rate.max) / 2);

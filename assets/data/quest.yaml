@@ -82,7 +82,7 @@ stages:
     kit: w_s7
     maps: []
     zones: []
-    grind: 4.0
+    grind: 1.0
     walk: [matoya-cave:npc:matoya]
     entry: {map: overworld, x: 74, y: 76}
     basins: {}
@@ -101,7 +101,7 @@ stages:
     kit: w_s2
     maps: [pravoka, pravoka-*]
     zones: [overworld:a1_mainland]
-    grind: 7.0
+    grind: 2.0
     # Bikke at the brig pier's end (pravoka (40, 33)) starts pirate x9; a1_bikke_yields sets BIKKE_DEFEATED, and the
     # brig appears at the a1_pravoka dock (overworld (132, 102)), boarded from the land gate (131, 101)
     walk: ["pravoka:battle:bikke", "overworld:vehicle:ship", "overworld:board:ship"]
@@ -127,7 +127,7 @@ stages:
     kit: w_s6
     maps: [western-keep-*]
     zones: [overworld:elf_keep_moor]
-    grind: 7.0
+    grind: 2.0
     # the crown trade (it sets ELF_O_CROWN_GIVEN and pays an Ether), then the fight it opens; the cutscene gives the eye
     walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
     # INT-W2b: the ship moored at Elfheim's harbour (the `elf_port` dock), as the party came; without it the assumed
@@ -172,7 +172,7 @@ stages:
     kit: w_s8
     maps: [elfheim-castle, elfheim-castle-chamber]
     zones: []
-    grind: 4.0
+    grind: 1.0
     # the sleeping prince takes the herb (his cutscene elf_prince_wakes gives the Mystic Key, PRINCE_AWAKE)
     walk: ["elfheim-castle-chamber:npc:elfheim_prince"]
     entry: {map: overworld, x: 82, y: 150, mode: walking, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
@@ -211,7 +211,7 @@ stages:
     kit: w_s5
     maps: [marsh-cave-*]
     zones: [overworld:elf_fen]
-    grind: 7.0
+    grind: 2.0
     # S5 needs the ship (it is what carries the party to Elfland), so the proofs start where S2 leaves it: on foot on
     # Pravoka's quay, the ship at the `a1_pravoka` dock (withheld, Elfland is out of reach). Then across the Aldi, down
     # B1's west stair and B2's stair to the barrow, and the bier (the guard's fight; `elf_d_crown` gives the crown)
@@ -236,7 +236,7 @@ stages:
     kit: w_s10
     maps: [dwarf-hall]
     zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
-    grind: 4.0
+    grind: 2.0
     # on foot at the hall's mouth, the ship moored at the dwarves' landing cove (the `ert_dwarf` dock)
     entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
     walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
