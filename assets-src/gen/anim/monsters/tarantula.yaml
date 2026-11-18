@@ -47,3 +47,7 @@ paint:                          # a 5 px pocket between legs 3f and 2n closes wh
   - {frame: atk_wind2, xy: [[47, 59], [47, 60], [48, 60], [47, 61], [48, 61], [47, 63], [48, 63], [47, 64], [47, 65]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[47, 59], [47, 60], [47, 61], [48, 61], [48, 62], [47, 63], [47, 64], [48, 64], [47, 65]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[47, 59], [47, 60], [47, 61], [48, 61], [48, 62], [47, 63], [47, 64], [48, 64], [47, 65]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
