@@ -43,7 +43,9 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     from gen import monster_keys as MK
     from gen import rig as R
     sid = "chimera"                                      # hurt and attack masks, room in its 128 px cell
-    cfg = MA.load_rig(sid)
+    cfg = copy.deepcopy(MA.load_rig(sid))
+    # chimera's rig has `kneel: {source: ai}` since KT3: the FW-O fixture is the pre-kneel rig (KT3 ruling, 2026-11-18)
+    cfg.pop("kneel", None)
     check("key_offset" not in cfg and MK.offset_cfg(sid, cfg) is cfg,
           "FW-O: a rig without key_offset comes back as the same object (every frame and lock byte-identical)")
     _, meta, kfs = _entries(sid, cfg)

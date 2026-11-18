@@ -132,3 +132,8 @@ masks:
     hurt: [[8, 68], [18, 68], [18, 78], [8, 78]]
 holds: []
 paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+# KT2-A: the kneel_in1 -> kneel_in2 swap passes the 0.65-span centroid cap (integrator ruling 2026-11-18, KNEEL_TWEEN_PLAN 12)
+kneel:
+  source: ai

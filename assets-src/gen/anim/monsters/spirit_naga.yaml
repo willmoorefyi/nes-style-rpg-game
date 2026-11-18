@@ -138,3 +138,7 @@ paint:                         # the far shoulder's crack as the shoulder lifts 
   - {frame: atk_wind2, xy: [[51, 41], [52, 41]], rgb: [132, 66, 99]}
   - {frame: atk_wind2, xy: [[55, 41]], rgb: [99, 49, 82]}
   - {frame: atk_wind2, xy: [[56, 41], [57, 41], [54, 42], [55, 42]], rgb: [82, 41, 66]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai

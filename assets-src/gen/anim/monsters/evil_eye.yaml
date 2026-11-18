@@ -17,3 +17,7 @@ frames:
   atk_wind2: {moves: [], dx: -5, dy: 2}      # 128 px ball)
   hurt_in1: {moves: [], dx: -4}              # knocked back 4
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai

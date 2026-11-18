@@ -325,11 +325,484 @@ round 1 judged `it2`, round 2 (a new reviewer) judged blue_dragon's `it3`.
 | 2026-11-17 | rev 1 | momus review 1: REJECT (P1 T-G3 needs `--relock`; P2 gate split, shared files, review batch size, limit-hit handling, pilot -> KT2 gate; P3 counts, exact outputs, hero offset). All resolved in rev 2 |
 | 2026-11-17 | approach | the one-source squash / stretch bridge (section 2), chosen on the experiments; the derived pilot kneels archived as `_kneel_v1` |
 | 2026-11-17 | rev 2 | momus review 2: OKAY with 5 P3 notes (knob count, file references, iteration numbering, one knob per named defect, KT1 TODO and 12a); all applied |
+| 2026-11-18 | bridge swap continuity (integrator, KT2-A) | the `sequence:kneel` centroid cap of the bridge pair step kneel_in1 -> kneel_in2 (a `source: ai` rig) is 0.65 x the idle-key span; every other step and the derived path keep 0.5 (`kneel_checks.BRIDGE_SWAP_SHARE` / `continuity_share`, `anim_checks.continuity(share=)`, selftest rows). Reason: the step is the deliberate swap between two drawings inside the 133 ms drop, the reviewers passed all four blocked sprites, the user approved the pilot look. Key notes need no key fixes (user ruling) |
+| 2026-11-18 | K-ground contact share (integrator, KT3; remorazz) | the approved AI key (`kf:kneel`) and the frames drawn from it (`kneel_in2`, `kneel_b`) are exempt from the K-ground *contact share* (half the idle's pixels in the bottom 2 rows), as K-height already is; their lowest opaque row must still be the feet row, and `kneel_in1` (drawn from the idle) keeps the full rule (`kneel_checks.ground(contact=)`, `KEY_DRAWN`, a selftest row in `selftest_kneel_bridge`). Reason: the key is approved as drawn; remorazz's crawl touches the ground with thin leg tips |
+| 2026-11-18 | KT2-C / KT2-F blocked ids (integrator, KT3) | chimera (it1 defaults: swap step 11.2 under the 0.65 cap 12.9), dragon_zombie (its best iteration `bridge: {keep_top: 0.49, keep_bot: 0.0, width: false}`: 12.4 under 13.4, no in1 hole) and remorazz (it1 defaults, under the contact-share ruling) re-applied, checked and locked; none BLOCKED |
+| 2026-11-18 | key notes (integrator, KT3) | every key note of KT1 and KT2-A..F stays a note (user ruling: no key fixes needed) |
+| 2026-11-18 | selftest fixtures (integrator, KT3) | `selftest_hurtfrom._cfg` drops death_eye's `kneel` block (KT2-E); `selftest_keyoffset` drops chimera's; `selftest_kneel_ai_io._unread` strips the kneel block from a rig (no rig is unopted any more); the KA-G usage-gate test starts from a fresh pass (`usage_recounted: false`; the real pass has recorded `true`) |
+| 2026-11-18 | Bedrock pass KA-FIX (integrator, KT3) | closed into `bedrock_history` at 2 of 60 (the 2 ledger rows of 2026-11-17): with no key fixes it is unused. `kneel_ai_budget.CLOSED` and the KG1 / KG2 selftests read it as a closed pass; no live `bedrock` block remains, so `bedrock.invoke` refuses every call again |
+
+### 12b. KT2-A result (bipeds, small cells; branch `kt-a` from `fb5992a0`)
+
+27 ids: **27 locked** on `source: ai`. Round 1 locked 23 and BLOCKED 4 on the bridge-swap continuity cap; the
+integrator ruling of 2026-11-18 (cap 0.65 x span for that step, rulings log above) unblocked them, and their it1 frames
+(reviewed PASS, byte-identical re-render) were locked. Retired first, exactly the
+14 KT2-A ids on the `derived:` line: mummy pirate piscodemon rakshasa sahagin sahagin_chief sahagin_prince skeleton
+vampire vampire_lord weretiger werewolf wight zombie (`_kneel_v1`, 14 rows appended to `docs/RETIRED_SPRITES.md`).
+Review: three new reviewers for it1 (10 / 10 / 7 ids), one new reviewer for it2 (4 ids). Artefacts:
+`/tmp/kt-a/it1/` (27 ids, `contact.gif`), `/tmp/kt-a/it2/` (4 ids), `/tmp/kt-a/final/` (the 23 round-1 locks,
+`contact.gif` / `contact.png`), `/tmp/kt-a/it1b/` (the 4 unblocked, re-rendered; strips byte-identical to it1).
+
+| Id | Review 1 (it1) | Review 2 (it2) | Knobs / offset | Iterations | Result |
+|---|---|---|---|---|---|
+| black_knight | PASS | - | - (0.65 swap cap, ruling) | 1 | locked (was BLOCKED) |
+| bloodbones | PASS | - | - (0.65 swap cap, ruling) | 1 | locked (was BLOCKED) |
+| buccaneer | PASS | - | - | 1 | locked |
+| dark_fighter | PASS | - | - | 1 | locked |
+| dark_wizard | PASS | PASS | `offset: [-1, 0]` (K-fit: the key touched the right border, x 79) | 2 | locked |
+| death_knight | PASS | - | - (0.65 swap cap, ruling) | 1 | locked (was BLOCKED) |
+| gargoyle | PASS | - | - | 1 | locked |
+| ghast | PASS | - | - | 1 | locked |
+| ghoul | PASS | - | - | 1 | locked |
+| gr_imp | PASS | - | - | 1 | locked |
+| horned_devil | PASS | - | - (0.65 swap cap, ruling) | 1 | locked (was BLOCKED) |
+| king_mummy | PASS | PASS | `bridge: {width: false}` (check: a new hole in kneel_in1) | 2 | locked |
+| mindflayer | PASS | - | - | 1 | locked |
+| mummy | PASS | - | - | 1 | locked |
+| pirate | PASS | - | - | 1 | locked |
+| piscodemon | PASS | - | - | 1 | locked |
+| rakshasa | PASS | - | - | 1 | locked |
+| sahagin | PASS | - | - | 1 | locked |
+| sahagin_chief | PASS | PASS | `offset: [-1, 0]` (K-fit: the key touched the right border, x 81) | 2 | locked |
+| sahagin_prince | PASS | - | - | 1 | locked |
+| skeleton | PASS | - | - | 1 | locked |
+| vampire | PASS | - | - | 1 | locked |
+| vampire_lord | PASS | - | - | 1 | locked |
+| weretiger | PASS | - | - | 1 | locked |
+| werewolf | PASS | - | - | 1 | locked |
+| wight | PASS | - | - | 1 | locked |
+| zombie | FAIL T1: kneel_in2's rear foot squeezed to a 1-2 px hooked sliver, outline broken | PASS | `bridge: {width: false}` (also check: kneel_in2 area 1.19, second ring 0.82) | 2 | locked |
+
+**Limit-hit / BLOCKED table.** No sprite reached it3. Four sprites PASS the review but no allowed knob passes
+`check`: `sequence:kneel` continuity, `kneel_in1->kneel_in2: centroid moves > cap` (cap = max(6 x cell_h / 80,
+0.5 x the idle-key centroid span), `anim_checks.continuity`). Per section 7 they are restored from git (they had no
+derived block: the D-K7 `daze` alias stays live), nothing is locked, and they are BLOCKED. **Resolved** by the
+2026-11-18 integrator ruling (the swap step's cap 0.65 x span; caps below at 0.5 / 0.65): all four locked at it1 defaults.
+
+| Id | Best iteration | Reviewer | `check` at default | Knobs tried (`/tmp/kt-a/probe.py`, `grid.py`) | Best reached | Result |
+|---|---|---|---|---|---|---|
+| black_knight | it1 | PASS | centroid 9.7 > 8.2 (0.65 cap 10.7) | keep_top {0, 0.15, 0.28, 0.4, 0.45, 0.49} x keep_bot {0, 0.1, 0.25, 0.4, 0.49}, each with width / shear on and off | 9.5 > 8.2 | BLOCKED -> locked (ruling) |
+| bloodbones | it1 | PASS | 6.7 > 6.3 (0.65 cap 8.2) | the same grid | 6.6 > 6.3 | BLOCKED -> locked (ruling) |
+| death_knight | it1 | PASS | 8.7 > 7.0 (0.65 cap 9.1) | the same grid | 8.2 > 7.0 | BLOCKED -> locked (ruling) |
+| horned_devil | it1 | PASS | 8.2 > 7.4 (0.65 cap 9.6) | the same grid | 7.6 > 7.4 | BLOCKED -> locked (ruling) |
+
+Why no knob can fix it (for KT3 / a ruling): the gap is vertical. These keys put their mass much lower than the idle
+(centroid y: black_knight idle 36.7 -> key 52.7, in1 39.7, in2 49.4), while `u` caps at 0.35 and row seams move the
+centroid by only part of the height change, so the in1 -> in2 step is about 0.6 of the span against a 0.5 cap. `u` > 0.35
+is outside D-KT3, and an `offset` that widens the span would be a sideways jump (T2). Options for a ruling: judge a
+`bridge` pair (the designed drawing swap) with a looser continuity cap (e.g. 0.65 of the span), or allow `u` up to
+0.45 for these ids. With either, the it1 frames (reviewed PASS) are ready to lock.
+
+**Key notes** (approved-key issues, not iterated; the user ruled no key fixes are needed, so these stay notes):
+black_knight's key loses the red visor
+and its horns point another way; bloodbones's key is much darker and its skull is in side profile; dark_fighter's
+shield is almost black with no rim detail; gr_imp's spear has no tip and the face is mostly hidden (kneel_in2 inherits
+both); buccaneer's axe head reads as a grey patch by the knee; horned_devil's trident head is a black blob; king_mummy's
+crook is a broken ring like a flail, and the pose is a deep crouch with the back knee up; mummy's and zombie's keys read
+as a stride or lunge (no knee down); pirate's tricorn reads as a cap; sahagin_prince's blades are mostly hidden;
+werewolf's key is a running crouch with the rear foot above the ground line (kneel_in2 / kneel_b inherit it; K-ground
+passes); vampire's face is a hollow skull mask; weretiger's key loses the loincloth; vampire_lord's key is a stooped
+hunch; sahagin_chief's shield is edge-on.
+
+Reviewer notes (not failures): gr_imp kneel_in2 has a 1-2 px kink in the stretched spear shaft; death_knight kneel_in1
+widens the blade slightly; dark_wizard's staff leans about 8 px in kneel_in1; held props swap from upright (in1) to
+lowered (in2) on horned_devil, sahagin, sahagin_chief, pirate, king_mummy, sahagin_prince (by design).
+
+Measured: a review batch of 10 took 1.2-1.5 min, of 4 about 0.9 min; `monster_anim.py check` of the 27 about 2 min,
+`lock` of 19 about 2 min; a single-id probe (`monster_check.check_sprite` without the lock) 0.6-1.4 s.
+
+**KT2-A gate outputs** (tranche merge set; T-G5 / T-G7 / T-G8 are KT3's):
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| per-id | `monster_anim.py check <27 ids>` (one call, after the ruling) | 27 lines `<id>: OK (25-28 checks groups)` | pass |
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 `: OK` lines) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock` the 8 pilot ids + all 27 KT2-A ids | no `FAIL`; `60 added, 0 changed, 0 removed`; exit 0 (pilot cobra / green_slime 8 + the 13 KT2-A ex-alias ids 52; the 14 ex-derived `relocked` their 4 kneel entries). With only the KT2-A ids it exits 1 on the 6 pilot ids' kneel entries (the base predates KT1): the pilot ids must stay in `--relock` | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 33, derived 13, alias 77)`, `heroes 12/12 (ai 2, derived 10, alias 0)`; all 27 KT2-A ids on `ai:` | pass (running count) |
+| T-G6 | `selftest.py` (after the ruling) | runs to the end: `8 FAILED`, the same 8 as KT1 (12a), none of them KT's: `gen/refs` absent in a worktree (2) and the live Bedrock pass KA-FIX (6); `pass KT kneel bridge`: 24 ok (22 + the 2 swap-cap rows), 0 FAIL | pass (KT) |
+| T-G9 | `git diff --stat a7d423f4 -- <ledgers> assets-src/gen/approved` | 80 files, all `approved/_retired/*_kneel_v1/` (pilot 24 + KT2-A 56); no ledger change | pass |
+
+### 12c. KT2-B result (bipeds, large and boss cells + mechanical; branch `kt-b` from `fb5992a0`)
+
+20 ids: **20 locked** on `source: ai`, none BLOCKED, none pending. Retired first, exactly the 11 KT2-B ids on the
+`derived:` line: iron_golem minotaur minotaur_zombie ogre ogre_chief ogre_mage sea_troll soldier stone_golem troll
+warmech (`_kneel_v1`, 11 rows appended to `docs/RETIRED_SPRITES.md`, one per sprite commit). The other 9 (astos chaos
+clay_golem drowned_sovereign earth_elemental fire_gigas hill_gigas ice_gigas lich) were on the D-K7 alias and only gained
+`kneel: {source: ai}`. The integrator ruling commit (KT2-A `9cea4807`: the `kneel_in1 -> kneel_in2` bridge-swap
+centroid cap 0.65 x span) is cherry-picked first on this branch; fire_gigas needed it (`centroid moves 13.6 > 12.6` at
+0.5; passes at 0.65). warmech uses its approved try-2 key (`approved/warmech/kneel.json` `try: 2`); astos keeps its FW-Q
+alias (`OK (aliased: attack)`); chaos's atlas sheet got the kneel (the colossus forms are exempt, D-K12).
+
+Pre-review renders (not counted, section 7), from the first `check`: ogre and troll `offset: [0, 1]` (K-ground: the key
+stands on row 121, feet row 122); ice_gigas `bridge: {breath_at: 0.5}` (kneel_b opened a new 4 px hole); iron_golem
+`bridge: {shear: false, width: false}` (the mechanical row of section 4; kneel_in1's second ring 0.59 vs 0.70: `shear:
+false` alone did not fix it, the width seams also thinned the plates). Review: two new reviewers for it1 (10 / 10 ids),
+all PASS. Artefacts: `/tmp/kt-b/it1/` (20 ids, reviewed), `/tmp/kt-b/final/` (the 20 locked, `contact.gif` /
+`contact.png`), per id `<id>_x2.gif`, `_x3.gif`, `_slow.gif`, `_strip.png`.
+
+| Id | Review 1 (it1) | Knobs / offset | Iterations | Result |
+|---|---|---|---|---|
+| astos | PASS | - | 1 | locked (`OK (aliased: attack)`) |
+| chaos | PASS | - | 1 | locked |
+| clay_golem | PASS | - | 1 | locked |
+| drowned_sovereign | PASS | - | 1 | locked |
+| earth_elemental | PASS | - | 1 | locked |
+| fire_gigas | PASS | - (needs the 0.65 swap cap ruling) | 1 | locked |
+| hill_gigas | PASS | - | 1 | locked |
+| ice_gigas | PASS | `bridge: {breath_at: 0.5}` | 1 | locked |
+| lich | PASS | - | 1 | locked |
+| minotaur | PASS | - | 1 | locked |
+| minotaur_zombie | PASS | - | 1 | locked |
+| ogre | PASS | `offset: [0, 1]` | 1 | locked |
+| ogre_chief | PASS | - | 1 | locked |
+| ogre_mage | PASS | - | 1 | locked |
+| sea_troll | PASS | - | 1 | locked |
+| stone_golem | PASS | - | 1 | locked |
+| troll | PASS | `offset: [0, 1]` | 1 | locked |
+| iron_golem | PASS | `bridge: {shear: false, width: false}` | 1 | locked |
+| soldier | PASS | - | 1 | locked |
+| warmech | PASS | - | 1 | locked |
+
+**Limit-hit table:** none (every id passed at it1; no id reached it2).
+
+**Key notes** (approved-key issues, not iterated, for a possible KA-FIX pass): lich's key has a solid black diagonal bar
+below the glaive blade toward the lower right (kneel_in2 inherits it); clay_golem's forehead rune turns from "R" into a
+"?"-like mark; earth_elemental's key is a different build (slim, segmented, one arm a raised stone slab), so the
+in1 -> in2 swap reads close to a morph; iron_golem's key is shaded near-black against the light-grey idle (a visible
+colour jump at the swap); warmech's key loses the grille glow, hunches, and points the cannon at the ground; troll's
+one club becomes two props (a long stick and an upright mallet); minotaur_zombie's open ribcage is a dark barred slot
+and the cleaver is redrawn larger; ogre_chief's horns are much smaller and the face darker.
+
+Reviewer notes (not failures): the largest drawing swaps at in1 -> in2 are chaos (outstretched to hunched arms, about
+22 % less area), earth_elemental, minotaur_zombie and warmech; props swap from raised to lowered by design on
+drowned_sovereign (sceptre) and fire_gigas (hammer); every id's top steps down evenly with no upward bounce, and kneel_b
+is a 1 px breath.
+
+Measured: a review batch of 10 took 1.6-2.1 min; `monster_anim.py check` of the 20 about 2-3 min; `lock` about 1 min per
+id (20 in about 20 min, one process); the bridge render < 1 s per sprite.
+
+**KT2-B gate outputs** (tranche merge set; T-G5 / T-G7 / T-G8 are KT3's):
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| per-id | `monster_anim.py check <20 ids>` (one call) | 20 lines `<id>: OK (25-36 checks groups)`, astos `OK (aliased: attack; 25 checks groups)` | pass |
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 `: OK` lines) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock` the 8 pilot ids + the 20 KT2-B ids | no `FAIL`; `44 added, 0 changed, 0 removed`; exit 0 (pilot cobra / green_slime 8 + the 9 KT2-B ex-alias ids 36; the 11 ex-derived and 6 pilot ids `relocked` their 4 kneel entries) | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 26, derived 16, alias 81)`, `heroes 12/12 (ai 2, derived 10, alias 0)`; no KT2-B id left on `derived:` or the alias | pass (running count, this branch only) |
+| T-G6 | `selftest.py` | runs to the end: `8 FAILED`, the same 8 as KT1 (12a), none of them KT's: `gen/refs` absent in a worktree (2) and the live Bedrock pass KA-FIX (6); `pass KT kneel bridge`: 24 ok (22 + the 2 swap-cap ruling rows), 0 FAIL | pass (KT) |
+| T-G9 | `git diff --stat a7d423f4 -- <ledgers> assets-src/gen/approved` | 68 files, all `approved/_retired/*_kneel_v1/` (pilot 24 + KT2-B 44); no ledger change | pass |
+
+### 12-KT2-C. Tranche C result (quadrupeds + guardian, branch `kt-c` from `fb5992a0`)
+
+Converted 24 of 26; **chimera and dragon_zombie BLOCKED** (the check, not the review: see the limit-hit table).
+Retired first (the coverage `derived:` line): green_dragon, hydra (`_kneel_v1`, two rows appended to
+`docs/RETIRED_SPRITES.md`). dragon and fire_lizard use their try-2 keys (the approved `kneel.png`).
+
+Iterations. `it1` was rendered for all 26 and reviewed for 20 ids (reviewers 1 and 2, before the round-1 `check` had
+come back); it is counted as review 1 for those 20. The round-1 `check` then failed 15 ids on mechanical rules
+(K-ground, K-fit, a new hole, an outline ring, the `sequence:kneel` in1 -> in2 centroid step / IoU), fixed with one
+offset or knob set per failure and re-rendered as `it2`; the 10 changed ids already reviewed got review 2 (reviewer 3),
+and the 6 ids not yet reviewed got their first review on `it2` (reviewer 4). Four fresh reviewers, at most 10 ids
+each, one after another; no reviewer FAILed any id.
+
+| Id | Review 1 | Review 2 | Knobs / offset (why) | Reviews |
+|---|---|---|---|---|
+| baretta | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground) | 2 |
+| basilisk | it1 PASS | - | - | 1 |
+| crazy_horse | it1 PASS | - | - | 1 |
+| crocodile | it1 PASS | - | - | 1 |
+| desert_baretta | it1 PASS | it2 PASS | `bridge: {keep_top: 0.49, keep_bot: 0.0}` (centroid 10.1 > 9.6) | 2 |
+| dragon | it1 PASS | - | - | 1 |
+| fire_hydra | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground) | 2 |
+| fire_lizard | it1 PASS | - | - | 1 |
+| gr_wolf | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground) | 2 |
+| green_dragon | it1 PASS | it2 PASS | `bridge: {shear: false}` (kneel_in1 second ring 0.58 vs 0.67) | 2 |
+| guardian | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground) | 2 |
+| hellhound | it1 PASS | it2 PASS | `offset: [1, 0]` (K-fit: key on the left border) | 2 |
+| hydra | it1 PASS | it2 PASS | `offset: [1, 1]` (K-ground; in1 -> in2 IoU 0.43 < 0.44) | 2 |
+| hyenadon | it1 PASS | - | - | 1 |
+| lesser_tiger | it1 PASS | it2 PASS | `bridge: {shear: false}` (new 4 px hole in kneel_in1) | 2 |
+| lizard | it1 PASS | - | - | 1 |
+| manticore | it1 PASS | - | - | 1 |
+| nightmare | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground) | 2 |
+| rhyos | it2 PASS | - | `offset: [0, 1]` (K-ground) | 1 |
+| sabertooth | it2 PASS | - | `offset: [0, 1]`, `bridge: {width: false}` (centroid 11.0 > 10.9 after the offset) | 1 |
+| sphinx | it2 PASS | - | `bridge: {keep_top: 0.45, keep_bot: 0.0, width: false}` (centroid 10.0 > 9.6) | 1 |
+| white_crocodile | it2 PASS | - | `bridge: {keep_top: 0.49, keep_bot: 0.0}` (centroid 10.1 > 9.6) | 1 |
+| white_dragon | it2 PASS | - | - | 1 |
+| winter_wolf | it2 PASS | - | - | 1 |
+| chimera | it1 PASS | - | none passes `check` (below) | 1, BLOCKED |
+| dragon_zombie | it1 PASS | - | none passes `check` (below) | 1, BLOCKED |
+
+**Limit-hit table** (BLOCKED: no iteration passes `check`; rig restored from `fb5992a0`, the D-K7 alias stays live,
+nothing locked; restored `check`: `chimera: OK (aliased: hurt; 18 checks groups)`, `dragon_zombie: OK (18 checks groups)`):
+
+| Id | Best iteration | Reason | Knobs tried (scratch harness on the real `check_sprite`) | Result |
+|---|---|---|---|---|
+| chimera | it1 (review PASS) | `sequence:kneel` kneel_in1 -> kneel_in2 centroid moves 11.2 > 9.9: the key's mass sits much lower than the idle's (span dy 19.7 px), and with u at its 0.35 cap the in1 / in2 centroids only travel about 25 % / 10 % of it | `keep_top` 0 / 0.49, `keep_bot` 0, `width` / `shear` false and combinations, `offset` dx -2 / +2 / +4 (best 10.5) | BLOCKED |
+| dragon_zombie | it1 (review PASS) | the same, 14.2 > 10.3 (span dy 19.8), plus a new hole in kneel_in1 at defaults | the same set (best 12.4, `keep_top: 0.49, keep_bot: 0, width: false`) | BLOCKED |
+
+Both need either a looser continuity cap for one-source bridge frames (the swap step) or u above 0.35 for in2: a tool
+or rule change, outside a tranche's rig-only scope; proposed for KT3.
+
+**Key notes** (the approved key, not the bridge; for a possible KA-FIX pass): baretta and fire_hydra keys stood 1 px
+above the feet row (fixed by `offset`); dragon_zombie's key is much darker than the idle (near-black against pale
+bone), so the in1 -> in2 swap flashes; gr_wolf's key loses the grey fur and the red eye (a near-black blob); guardian's
+key has no red eyes (they switch off at the swap); manticore's key draws the tail with orange rings (idle: black
+segments); desert_baretta, fire_lizard, white_crocodile keys are much smaller than the idle (the kneel reads partly as
+shrinking); white_dragon's raised wings make the silhouette top rise slightly during the kneel.
+
+**Reviewer notes** (not failures): green_dragon kneel_in2 1 px row-doubling roughness at the eye and jaw; desert_baretta
+in2 (about 1.25x) doubles a few shell pixels; lizard in2 crest slightly heavier; hyenadon in2 head a little tight;
+hydra / chimera heads re-arrange at the swap (by design).
+
+Gate outputs (tranche merge set, one process at a time):
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| per-id | `monster_anim.py check <26 ids>` after the locks | 26 lines `<id>: OK` (24 converted 25 / 26 groups; chimera `OK (aliased: hurt)`, dragon_zombie `OK`), exit 0 | pass |
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `1`: the only other line is the log's own `exit 0` (123 sheets `: OK`) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (heroes untouched) | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock <the 8 KT1 ids> <the 24 KT2-C ids>` | no `FAIL`; `96 added, 0 changed, 0 removed`; exit 0 (22 aliased ids + cobra / green_slime +4 each; green_dragon, hydra and the pilot `relocked` their 4 kneel entries). With only the 24 KT2-C ids after `--relock`, the 6 KT1-relocked pilot ids show `FAIL` (their KT1 relocks are not named), as expected | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 30, derived 25, alias 68)`, `heroes 12/12 (ai 2, derived 10, alias 0)` | pass (running count) |
+| T-G6 | `selftest.py` | runs to the end: `8 FAILED`, exactly KT1's 8 (12a: 2 from the gitignored `gen/refs` absent in a worktree, 6 from the live Bedrock pass KA-FIX budget state), none KT's; `pass KT kneel bridge`: 22 ok, 0 FAIL | pass (KT; the pre-existing 8) |
+| T-G9 | `git diff --stat a7d423f4 -- ...ledger.jsonl ...bedrock_ledger.jsonl ...approved` | 32 files, all `approved/_retired/*_kneel_v1/` (the 6 KT1 + green_dragon, hydra); no ledger change | pass |
+
+Review artefacts: `/tmp/kt-c/it1/` and `/tmp/kt-c/it2/` (`<id>_x2.gif`, `_x3.gif`, `_slow.gif`, `_strip.png`), the
+final contact sheet `/tmp/kt-c/final/contact.gif` / `contact.png` (24 converted ids, in sync). Measured: a reviewer
+batch of 6-10 ids 2.0-2.6 min; `check` of the 26 ids about 3 min; `lock` about 1 min per id; agent time well under
+the 3.5 h estimate (most ids needed no knob; the check-driven knobs were found with a scratch harness in
+`/tmp/kt-c/sim/` that runs the real `check_sprite` on in-memory rig variants).
+### 12-D. KT2-D result (heroes; branch `kt-d` from `fb5992a0`, 2026-11-18)
+
+All 10 classes were on the coverage `derived:` line and were retired first (`retire_kneel.py`, `<class>_kneel_v1`, 10
+rows appended to `docs/RETIRED_SPRITES.md`); each class file lost its pass-K block (comments, `kneel:` with its
+labels / paint) and gained `kneel: {source: ai}`. No knob and no `offset` was needed. One review round (a fresh
+reviewer, one batch of 10, artefacts `/tmp/kt-d/it1/`), one commit per class (`KT2-D: <class> AI kneel + lock`).
+
+| Class | Review 1 (it1) | Knobs / offset | Iterations | Heights idle / in1 / in2 / kneel |
+|---|---|---|---|---|
+| knight | PASS | - | 1 | 72 / 67 / 64 / 59 |
+| thief | PASS | - | 1 | 72 / 68 / 66 / 62 |
+| ninja | PASS | - | 1 | 73 / 72 / 70 / 69 |
+| monk | PASS | - | 1 | 71 / 67 / 63 / 59 |
+| master | PASS | - | 1 | 71 / 66 / 62 / 57 |
+| red_mage | PASS | - | 1 | 72 / 68 / 66 / 62 |
+| black_mage | PASS | - | 1 | 74 / 70 / 67 / 63 |
+| black_wizard | PASS | - | 1 | 74 / 69 / 66 / 61 |
+| red_wizard | PASS | - | 1 | 71 / 67 / 64 / 60 |
+| white_wizard | PASS | - | 1 | 65 / 62 / 58 / 55 |
+
+- Limit hits: **none** (max 1 iteration). Bridge-pair ruling (kt-a): not hit.
+- Reviewer notes (not failures): white_wizard's kneel_in1 squashes the round staff head into a lopsided crescent
+  with a 1-2 px ragged edge (70 ms, invisible at x2), and its staff turns from upright to diagonal at the swap;
+  knight's open helmet becomes the key's lowered dark helmet at the swap; black_wizard / red_wizard's raised arm
+  appears at the swap (reads as part of going down).
+- Key notes (KA-FIX candidates, not iterated): thief's key has three detached specks (3 px near the hanging hand's
+  fingertips, native about (31-32, 52-54); 1 px each at (48, 61) and (47, 72)), carried into kneel_in2 / kneel_b.
+- Artefacts: `/tmp/kt-d/it1/<class>_{x2,x3,slow}.gif`, `<class>_strip.png`, `contact.gif` / `contact.png`.
+
+| # | Command (KT2-D) | Key output | Result |
+|---|---|---|---|
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 lines `: OK`; no monster touched by this tranche) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (e.g. `knight: OK [kneel 59 / ready 72 = 0.819, ...]`) | pass |
+| T-G3 | `lockdiff --base a7d423f4 --relock` the 8 pilot ids + the 10 classes | no `FAIL`; the 10 classes `relocked ['kneel', 'kneel_b', 'kneel_in1', 'kneel_in2']`; `8 added, 0 changed, 0 removed`; exit 0 | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 6, derived 27, alias 90)` (unchanged here), `heroes 12/12 (ai 12, derived 0, alias 0)` | pass |
+| T-G6 | `selftest.py` | runs to the end: `8 FAILED`, none KT's: 2 from the absent gitignored `gen/refs` (`pr_warrior_1080p.png missing`, `FW-9`), 6 from the live KA-FIX Bedrock block (`budget.json ... no live bedrock block`, `kneel_ai.py budget --check`, `usage: billed thoughts`, `KG1`, `KG2`, `bedrock.invoke refuses`); `pass KT kneel bridge`: 22 ok, 0 FAIL; the 3 `selftest_hurtfrom` failures seen elsewhere did not occur | pass (KT) |
+| T-G9 | ledger / approved diff vs `a7d423f4` | only `approved/_retired/*_kneel_v1/` additions (64 files); no ledger change | pass |
+
+### 12-E. KT2-E result (floating + swimmer + bird, 20 ids; branch `kt-e` from `fb5992a0`)
+
+Retired: none (`kneel_tools.py coverage` listed none of the 20 on its `derived:` line; every rig was a D-K7 alias and
+gained only `kneel: {source: ai}` plus its knobs). An internal render before the first review (not counted) cleared the
+`check` findings: K-ground 1 px on fire_elemental / ghost / wraith / pyrolisk (`offset`), pyrolisk's key on the right
+cell border (`offset` dx -1), the outline ring of bigeyes in2 / allosaurus in1 / pyrolisk in1, and cockatrice in2's area
+(1.19) and centroid step. Review round 1 = 2 reviewers (10 + 10 ids, `it1`), round 2 = 1 reviewer (7 ids, `it2`),
+round 3 = 1 reviewer (allosaurus, `it3`); each a fresh multimodal agent with the section 7 rubric only.
+
+| Id | it1 | it2 | it3 | Knobs / offset (locked) | Iterations |
+|---|---|---|---|---|---|
+| air_elemental | PASS | - | - | - | 1 |
+| bigeyes | FAIL T2: the ball shrinks to ~60 % width in one cut at in1 -> in2 and jumps left (size pop) | PASS | - | `bridge: {u: [0.35, 0.15]}` (it1 had `width: false` for the in2 outline ring; width back on) | 2 |
+| death_eye | PASS | - | - | - | 1 |
+| deepeyes | PASS | - | - | - | 1 |
+| evil_eye | PASS | - | - | - | 1 |
+| fire_elemental | PASS | - | - | `offset: [0, 1]` | 1 |
+| ghost | FAIL T1: in2's column stretch doubled the left outline into a 2 px band, a black wedge by the arm | PASS | - | `offset: [0, 1]`, `bridge: {width: false}` | 2 |
+| hollow_seraph | FAIL T1: in2 1.4x the key's width (emblem, pauldrons, wings blocky, halo flattened); T2: in2's head ~8 px right | PASS | - | `bridge: {shear: false, u: [0.35, 0.2]}`; fx halo, `hurt_from: idle` and its paint untouched | 2 |
+| red_piranha | PASS | - | - | - | 1 |
+| shadow | PASS | - | - | - | 1 |
+| specter | PASS | - | - | - | 1 |
+| water_elemental | PASS | - | - | - | 1 |
+| white_shark | PASS | - | - | - | 1 |
+| wraith | PASS | - | - | `offset: [0, 1]` | 1 |
+| shark | PASS | - | - | - | 1 |
+| allosaurus | FAIL T3: in2 stretched ~1.4x, the face drawn into a horse-like snout | FAIL T2: in2 still a bloated mound (+46 % area over in1): a puff-up then deflate | FAIL T1, T2, T3 (keep_top 0.45: row streaks, bloat, tall head) | **limit hit**, it2 locked: `bridge: {keep_top: 0.35, keep_bot: 0.35, u: [0.35, 0.25]}` | 3 |
+| cockatrice | FAIL T5: the feet skitter (in1 +3 px, in2 back -4) | PASS | - | `bridge: {width: false, shear: false}` | 2 |
+| pyrolisk | FAIL T5: the front foot forward, back, forward (81 -> 84 -> 81 -> 85) | PASS | - | `offset: [-1, 1]`, `bridge: {keep_top: 0.2, u: [0.2, 0.2]}` (front foot 81 -> 83 -> 84 -> 85) | 2 |
+| tyrannosaur | PASS | - | - | - | 1 |
+| wyvern | FAIL T5: the feet jiggle (in1 +3 px, in2 back -4) | PASS | - | `bridge: {shear: false}` | 2 |
+
+**Limit-hit table (KT2-E)**
+
+| Id | Best iteration | Reviewer reasons | Knobs tried | Result |
+|---|---|---|---|---|
+| allosaurus | it2 (1 failed criterion; tie with it1, the latest wins) | it1 T3 face stretched into a snout; it2 T2 in2 bloats (+46 % area) then deflates; it3 T1 / T2 / T3 row streaks, bloat, tall head | pre-review: `keep_top` / `keep_bot` 0.35 (in1 outline ring); it2 `u2` 0.25; it3 `keep_top` 0.45; probed and refused by `check`: `u2` 0.1-0.2 at every band (in1 -> in2 centroid step 14.7-20.6 > 14.3) and `width` / `shear` off | **locked** at it2 (`check` OK). Cause: the standing idle (87 px) vs the flat lying key (40 px); any in2 that the continuity gate allows is a 52-56 px stretch of a lying body. A fix needs a different in2 recipe (e.g. stretch only the hip rows) or a KA-FIX key that is less flat |
+
+- **Key notes** (the approved key, not the bridge; for a possible KA-FIX pass): shark's key has a flat grey smear /
+  water column under the body and tail; wyvern's key (and its idle) carries a 1-2 px detached speck, and the key's belly
+  under the chest is dark and noisy; bigeyes' key is a different, smaller design (tentacles below a small ball, the fins
+  gone) than its idle; ghost's and bigeyes' keys sit ~7 px sideways of the idle base.
+- Reviewer notes (not failures): evil_eye's in2 is almost the key (idle and key nearly the same size); shadow's in1 is
+  almost the idle; white_shark is the most abrupt pass (nearly all of the swim -> curl change at the swap, widths still
+  step 106 -> 89 -> 75 -> 58); red_piranha's in2 sits 2-3 px right of the key (not visible at speed); hollow_seraph's
+  floating gauntlets and blades are separate pieces in the approved idle and stay so in in1.
+- Measured: a reviewer batch of 10 ids took 3.7-3.8 min, 7 ids 2.2 min, 1 id 0.8 min; `check` of the 20 ids about
+  2.5 min wall; `lock` about 1 min per call (one call for many ids); the knob probing used a scratch harness
+  (`/tmp/kt-e/probe.py`: `check_sprite` without the lock on a variant block, plus the feet-row extents per frame).
+- Review artefacts: `/tmp/kt-e/it1/` (20 ids), `/tmp/kt-e/it2/` (bigeyes ghost hollow_seraph allosaurus cockatrice
+  pyrolisk wyvern), `/tmp/kt-e/it3/` (allosaurus); per id `<id>_x2.gif`, `<id>_x3.gif`, `<id>_slow.gif`,
+  `<id>_strip.png`, plus `contact.gif` / `contact.png` per directory (`/tmp/kt-e/it1/contact.gif` shows all 20).
+
+**KT2-E gate outputs**
+
+| # | Command | Key output | Result |
+|---|---|---|---|
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `0` (123 lines `<id>: OK`, exit 0) | pass |
+| T-G1 (ids) | `monster_anim.py check <the 20 ids>` (one call) | 20 lines `<id>: OK (25 checks groups)` (death_eye 30, hollow_seraph 31), exit 0 | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (heroes unchanged by KT2-E), exit 0 | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock <the 8 pilot ids and classes + the 20 KT2-E ids>` | no `FAIL`; `88 added, 0 changed, 0 removed` (8 pilot + 20 x 4); exit 0 | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 26, derived 27, alias 70)`, `heroes 12/12 (ai 2, derived 10, alias 0)` | pass (running count) |
+| T-G6 | `selftest.py` | runs to the end: `12 FAILED`. 8 are KT1's known ones (gen/refs absent in a worktree: `pr_warrior_1080p.png missing`, `FW-9`; the live KA-FIX Bedrock block: `budget.json ... no live bedrock block`, `kneel_ai.py budget --check`, `usage: billed thoughts`, `KG1`, `KG2`, `bedrock.invoke refuses`). `FW-P / FW-O: kf: lock entries exactly ...` was a race (the run read the rigs while the it2 ids were being locked); re-run alone it passes. **3 are KT2-E's and need an integrator fix outside the tranche's files:** `hurt_from: ...` (3 lines, `rig hollow_seraph: kneel source ai but no approved kneel.png`): `selftest_hurtfrom._cfg` builds its fixture from death_eye's rig (`SRC`), which now has `kneel: {source: ai}`, and its `_tree` copies only `boss_*.png`. Fix: `cfg.pop("kneel", None)` in `_cfg` (verified in a scratch monkeypatch run: `run_kf_paint` + `run_hurt_from` 0 FAILED; as is 3 FAILED); `pass KT kneel bridge`: all ok | pass (KT bridge); 3 fixture failures for the integrator |
+| T-G9 | ledger / approved diff against `a7d423f4` | no ledger change; `approved/` only the pilot's `_retired/*_kneel_v1/` additions (KT2-E adds none) | pass |
+
+### 12-F. KT2-F result (serpent, naga, arthropod, blob, rooted, 24 ids; branch `kt-f` from `fb5992a0`)
+
+Converted **23 of 24**; **remorazz BLOCKED** (the `check`, not the review: see the limit-hit table). None of the 24
+was on the coverage `derived:` line, so nothing was retired (no `docs/RETIRED_SPRITES.md` row); each rig only gained
+`kneel: {source: ai}` (+ knobs). black_widow (`alias: [hurt]`) and crawler (`alias: [attack]`) keep their FW-Q
+aliases (`check`: `OK (aliased: ...)`). The 0.65 bridge-swap ruling (`9cea4807`) is **not** needed on this branch:
+sand_worm, the only id near the cap (9.8 > 9.8 at defaults), passes the 0.5 cap with `keep_bot: 0.25` (the section 4
+serpent knob).
+
+Iterations. `it1` was rendered for all 24; reviewers 1 and 2 judged 20 ids on it1. The round-1 `check` failed 7 ids on
+mechanical rules; the 4 not yet reviewed were fixed before their first review (internal renders, not counted) and
+judged with the fixed purple_worm on `it2` by reviewer 3; sand_worm's it2 was judged by reviewer 4. Knob trials ran in
+a scratch harness (`/tmp/kt-f/sim/harness.py`: the bridge frames, `bridge_frame`, K-ground / K-fit and the
+`sequence:kneel` in1 -> in2 continuity, without loading the whole atlas). Four fresh reviewers (10 / 10 / 5 / 1 ids),
+one after another; **no reviewer FAILed any id**.
+
+| Id | Body | Review 1 | Review 2 | Knobs / offset (why) | Reviews | Result |
+|---|---|---|---|---|---|---|
+| anaconda | serpent | it1 PASS | - | - | 1 | locked |
+| gigas_worm | serpent | it1 PASS | - | - | 1 | locked |
+| lava_worm | serpent | it1 PASS | - | - | 1 | locked |
+| purple_worm | serpent | it1 PASS | it2 PASS | `offset: [0, 1]` (K-ground: key row 121 vs feet 122) | 2 | locked |
+| sand_worm | serpent | it1 PASS | it2 PASS | `bridge: {keep_bot: 0.25}` (`sequence:kneel` in1 -> in2 centroid 9.8 > 9.8; 9.5 after) | 2 | locked |
+| sea_snake | serpent | it1 PASS | - | - | 1 | locked |
+| wyrm | serpent | it1 PASS | - | - | 1 | locked |
+| ashen_queen | naga (boss cell) | it1 PASS | - | - | 1 | locked |
+| earth_medusa | naga | it1 PASS | - | - | 1 | locked |
+| medusa | naga | it1 PASS | - | - | 1 | locked |
+| spirit_naga | naga | it1 PASS | - | - | 1 | locked |
+| water_naga | naga | it1 PASS | - | - | 1 | locked |
+| ankheg | arthropod | it1 PASS | - | - | 1 | locked |
+| black_widow | arthropod (FW-Q hurt) | it1 PASS | - | - | 1 | locked |
+| crawler | arthropod (FW-Q attack) | it1 PASS | - | - | 1 | locked |
+| remorazz | arthropod | it1 PASS | - | none possible (see the limit-hit table) | 1 | **BLOCKED** |
+| scorpion | arthropod | it2 PASS | - | `offset: [1, 0]` (K-fit: key on the left border, x 0), `bridge: {breath_at: 0.35}` (kneel_b second ring 0.82 vs 0.92) | 1 | locked |
+| sea_scorpion | arthropod | it1 PASS | - | - | 1 | locked |
+| tarantula | arthropod | it1 PASS | - | - | 1 | locked |
+| black_flan | blob | it2 PASS | - | `offset: [0, 1]` (K-ground: key row 75 vs feet 76) | 1 | locked |
+| gray_ooze | blob | it1 PASS | - | - | 1 | locked |
+| ochre_jelly | blob | it1 PASS | - | - | 1 | locked |
+| neochu | rooted | it2 PASS | - | `offset: [0, 1]` (K-ground: key row 121 vs 122), `bridge: {u: [0.25, 0.35]}` (kneel_in1 new hole 12 > 11; `keep_bot: 0.2` made it 13, `width` / `shear` false and `keep_top` left it at 12) | 1 | locked |
+| ochu | rooted | it2 PASS | - | - | 1 | locked |
+
+**Limit-hit table** (no review limit was hit; one `check` block):
+
+| Id | Best iteration | Reviewer | `check` | Knobs tried | Result |
+|---|---|---|---|---|---|
+| remorazz | it1 | PASS | `kf:kneel`, `kneel_in2`, `kneel_b`: K-ground `44 px in the bottom 2 rows < half the idle's 117` (46 for in2) | none can help: the approved key is a low crawl whose leg tips touch the feet row thinly (bottom rows 26 / 18 px); `offset` moves the lowest row off the feet row (dy +1 leaves the key at row 123) and the bridge knobs do not touch the key or kneel_b. Only key paint (FW-P: trim the 18-px tip row, then `offset: [0, 1]`, giving 61 >= 59) would pass, and that edits the approved drawing (the user ruled no key fixes) | **BLOCKED**: rig restored from git (the D-K7 `daze` alias stays live), nothing locked |
+
+Options for a ruling (for KT3): exempt `kf:kneel` and its key-drawn frames (`kneel_in2`, `kneel_b`) of a `source: ai` rig
+from the K-ground *contact share* (keep "lowest row on the feet row"), as K-height already is; or allow the FW-P trim
+above. With either, remorazz's it1 frames (reviewed PASS) are ready to lock with no other change.
+
+**Key notes** (approved-key issues, not iterated; for a possible KA-FIX pass): lava_worm's key is darker and rougher
+(lava bands become flecks, no glowing maw); wyrm's key head is long and horse-like with black blotches on the neck;
+ashen_queen's key drops the floating fire orb and the stone pillar behind the coil; sand_worm's key loses most of the
+sand mound and adds a coiled tail section; purple_worm's and gigas_worm's keys lose the toothed maw (a plain hole / a
+closed puckered end); tarantula's key head is a dark mass with no eyes or fangs; ankheg's key is a very different
+drawing (a hunched worm, the jaws a small green mark: the largest swap in the tranche, still read as a slump);
+black_flan's key drops the speckled sheen and its eyes are broken rings; neochu's key closes both mouths (red lips) and
+has ragged dark-purple blobs on two stems. Reviewer notes (not failures): anaconda, purple_worm, sand_worm and
+sea_snake's kneel_in2 is visibly taller than the key (a settle, not a pop); water_naga's trident turns dark at the
+in1 -> in2 swap (the key's own colour); the largest sideways centre drifts are remorazz ~9 px, sea_scorpion ~8 px,
+crawler ~5 px, all smooth.
+
+Artefacts: `/tmp/kt-f/it1/` (24 ids) and `/tmp/kt-f/it2/` (purple_worm, black_flan, neochu, scorpion, ochu, sand_worm),
+each with `<id>_x2.gif`, `<id>_x3.gif`, `<id>_slow.gif`, `<id>_strip.png` and `contact.gif` / `contact.png`.
+
+Gates (tranche merge set, one process at a time):
+
+| # | Key output | Result |
+|---|---|---|
+| T-G1 | `check --all`: 123 lines `: OK`, `grep -vc ': OK'` = 0 (my 23 `OK`; black_widow `OK (aliased: hurt)`, crawler `OK (aliased: attack)`, remorazz `OK` on its restored alias rig) | pass |
+| T-G2 | `puppet_kneel.py check`: 12 lines `: OK` | pass |
+| T-G3 | `lockdiff --base a7d423f4 --relock` the 8 pilot ids + my 23: no `FAIL`, `100 added, 0 changed, 0 removed` (pilot 8 + 23 x 4), exit 0 | pass |
+| T-G4 | `coverage`: `monsters 123/123 (ai 29, derived 27, alias 67)`, `heroes 12/12 (ai 2, derived 10, alias 0)` | pass (running count) |
+| T-G6 | `selftest.py`: runs to the end, `8 FAILED`, the same 8 as KT1 (12a) and none of them KT's: 2 from the absent `gen/refs` (worktree) and 6 from the live Bedrock pass KA-FIX; `pass KT kneel bridge`: 22 ok, 0 FAIL (KT2-E's 3 `selftest_hurtfrom` failures do not occur on this branch) | pass (KT) |
+| T-G9 | no ledger change; `approved/` only the pilot's `_retired/*_kneel_v1/` additions (24 files) | pass |
+
+### 12-KT3. KT3 result (integrator; branch `kt3` from `mainline` 0e4007e1, 2026-11-18)
+
+Merged `kt-a`, `kt-b`, `kt-c`, `kt-d`, `kt-e`, `kt-f` one at a time (`--no-ff`). Conflicts only in
+`docs/RETIRED_SPRITES.md` (union of the rows: 43 `_kneel_v1` rows = the 6 KT1 + 14 A + 11 B + 2 C + 10 D, none removed)
+and this plan (the tranche sections kept, ordered 12b, 12c, 12-KT2-C, 12-D, 12-E, 12-F after the rulings log; the TODO
+lines joined). The duplicate `9cea4807` merged cleanly (identical content). No atlas was merged by hand (the tranches
+touched none).
+
+Fixes and rulings (rows in the rulings log above): the K-ground contact-share exemption for AI-key-drawn frames
+(remorazz); chimera (it1 defaults), dragon_zombie (its best iteration `bridge: {keep_top: 0.49, keep_bot: 0.0, width:
+false}`, judged by the integrator on the strip: the same drop as the reviewed it1 with a narrower in2, no new hole) and
+remorazz (it1 defaults) re-applied, checked (`OK`, 25 checks groups each) and locked; the selftest fixtures for
+all-converted rigs; the unused Bedrock pass KA-FIX closed at 2 / 60. Every key note stays a note (user ruling).
+
+**Still BLOCKED: none.** Limit hits carried from the tranches: allosaurus (KT2-E, locked at it2; table in 12-E).
+
+**Atlases** (built once, `build_assets.py monsters_ai battle_ai`): monsters 12 pages (KNEEL_PLAN's prediction; R6
+accepted), 2032x2016, 2016x416, 2020x1800, 2048x1656, 2048x1856, 2048x1952, 2048x1664, 2048x2000, 2048x1952, 2048x256,
+2048x1952, 2048x384 (each <= 2048x2048), `preload [0, 1]` (no page-group change needed); every one of the 123 sheets has
+its own 4 kneel cells and the K-anchor fields are identical to `a7d423f4` (`kneel_tools.py pages`). The party atlas
+changes only in the 48 kneel cells (12 classes x 4; `party-diff`: its FAIL lines are exactly those kneel cells, expected
+after the switch; no other column differs).
+
+| # | Command (KT3) | Key output | Result |
+|---|---|---|---|
+| T-G1 | `monster_anim.py check --all \| grep -vc ': OK'` | `1`: the only other line is the log's own `exit 0`; 123 lines `<id>: OK` (chimera, black_widow, crawler, astos `OK (aliased: ...)` as before) | pass |
+| T-G2 | `puppet_kneel.py check` | 12 lines `: OK` (e.g. `knight: OK [kneel 59 / ready 72 = 0.819, ...]`), exit 0 | pass |
+| T-G3 | `kneel_tools.py lockdiff --base a7d423f4 --relock <all 123 monster ids and 12 classes>` | no `FAIL`; 43 ids `relocked` their 4 kneel entries (31 monsters, 12 heroes); `368 added, 0 changed, 0 removed` (92 aliased rigs x 4); exit 0 | pass |
+| T-G4 | `kneel_tools.py coverage` | `monsters 123/123 (ai 123, derived 0, alias 0)`, `heroes 12/12 (ai 12, derived 0, alias 0)` | pass |
+| T-G5 | two builds, PYTHONHASHSEED 0 / 1, `shasum -c` | 15 lines `OK` (12 pages, `monsters-ai.json`, `battle-characters-ai.png` / `.json`) | pass |
+| T-G6 | `selftest.py` | runs to the end, `2 FAILED`, both worktree-only (the gitignored `gen/refs`: `pr_warrior_1080p.png missing`, `FW-9`); the 6 KA-FIX budget failures of 12a are gone (pass closed; the usage-gate test starts from a fresh pass); `pass KT kneel bridge`: 25 ok, 0 FAIL | pass |
+| T-G7 | `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` | build exit 0; vitest: 351 of 353 files passed (8971 tests, 0 failed, includes `assetCoverage` 271 and every kneel test); the run was stopped after 25 idle min on the last two files: `bestiaryProduction` passes alone (3 tests, 0.8 s), `tests/progression/questMutate` (the world mutation suite) does not finish alone in 15 min. KT3 changes no file under `src/` or `tests/` against mainline, so that file is the world pass's | pass (KT); questMutate reported to INT |
+| T-G8 | Playwright on 127.0.0.1:5243 (`--strictPort`; 5173 is the INT agent's), `?mute=1&scenario=kt_pilot&kneel=loop`, `kt_pilot_big&kneel=loop`, `kneel_pilot`, `anim_status` | 0 console errors each; `/tmp/kt3/browser/browser_<scenario>_{title,0..5}.png` show the AI kneels in battle | pass |
+| T-G9 | ledger / approved diff against `a7d423f4` | no ledger change; `approved/` only `_retired/*_kneel_v1/` additions (172 files) | pass |
+
+Contact GIFs (all 135 sprites at game display scale: monsters at their atlas scale 2 / 3, heroes 2; idle -> kneel_in1
+-> kneel_in2 -> hold -> rise, game timing): `/tmp/kt3/contact_all.gif` (copied to `~/Desktop/kneel_tween_all.gif`) and
+per group `/tmp/kt3/contact_{pilot,A_small_bipeds,B_large_bipeds,C_quadrupeds,D_heroes,E_floaters_birds,F_serpents_bugs_blobs}.gif`.
 
 ## TODOs
 
 - [x] KT0 experiments (cut, squash, dither, rig + stretch) and the choice (section 2)
 - [x] KT1 tooling: `kneel_bridge.py`, the hooks, checks, `kneel_bridge_review.py`, selftest, scenarios
 - [x] KT1 pilot: 8 sprites, review, locks, atlases, browser (section 12, gate outputs in 12a)
-- [ ] KT2-A..F rollout (section 9)
-- [ ] KT3 integration, gates, docs (AGENTS.md "Monster animation", KNEEL_AI_PLAN TODOs, PROGRESS.md)
+- [x] KT2-A..F rollout (section 9): A 27 / 27, B 20 / 20, C 24 / 26, D 10 / 10, E 20 / 20 (allosaurus limit hit, locked at
+  it2), F 23 / 24; chimera, dragon_zombie, remorazz unblocked and locked by KT3 (section 12-KT3)
+- [x] KT3 integration, gates, docs (AGENTS.md "Monster animation", section 12-KT3)
+- [ ] KT4 (proposal): remove the derived kneel path (`source: derived`, D-KT7 / KNEEL_AI_PLAN D-KA10) now that coverage
+  shows `derived 0`; KNEEL_AI_PLAN TODOs and PROGRESS.md are left to that pass

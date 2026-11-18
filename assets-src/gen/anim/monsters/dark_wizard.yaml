@@ -115,3 +115,9 @@ masks:
 holds: []
 paint:                         # 1 px crack the settle opens in the robe under the beard, robe colour
   - {frame: atk_follow, xy: [[44, 32]], rgb: [57, 49, 49]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+# KT2-A: offset [-1, 0]: the approved key touched the right cell border (K-fit at x 79)
+kneel:
+  source: ai
+  offset: [-1, 0]

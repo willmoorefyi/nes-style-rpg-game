@@ -143,3 +143,8 @@ paint:                         # 1 px cracks between the neck chains inked, one 
   - {frame: atk_follow, xy: [[94, 91], [94, 92], [96, 92]], rgb: [140, 33, 49]}   # step on the lead head
   - {frame: atk_follow, xy: [[95, 91]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[92, 53], [97, 54], [96, 55], [96, 56], [89, 54], [91, 56], [92, 57]], rgb: [6, 4, 10]}   # 1 px cracks between the upper necks
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)

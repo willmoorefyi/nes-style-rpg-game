@@ -265,3 +265,7 @@ paint:                         # hurt_in2: the turned far wing's root left a 1 p
   - {frame: daze_b, xy: [[68, 106]], rgb: [198, 123, 74]}
   - {frame: daze_b, xy: [[69, 106]], rgb: [214, 140, 82]}
   - {frame: daze_b, xy: [[18, 113]], rgb: null}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

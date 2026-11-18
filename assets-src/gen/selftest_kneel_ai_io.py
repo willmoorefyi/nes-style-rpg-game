@@ -75,9 +75,10 @@ def _retire(check) -> None:
 def _unread(check) -> None:
     """A sheet whose rig has no kneel block: approved/<id>/kneel.png beside it changes no loaded key or meta."""
     from gen import monster_anim as MA
-    sid = next(p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if "kneel" not in (yaml.safe_load(p.read_text()) or {})
-               and list((MA.APPROVED / p.stem).glob("monster_*.json")))
-    real = MA.APPROVED
+    # since KT3 every rig has `kneel: {source: ai}`, so the fixture is a monster rig with its kneel block dropped
+    sid = next(p.stem for p in sorted(MA.RIGS.glob("*.yaml")) if list((MA.APPROVED / p.stem).glob("monster_*.json")))
+    real, real_rig = MA.APPROVED, MA.load_rig
+    MA.load_rig = lambda s: {k: v for k, v in (real_rig(s) or {}).items() if k != "kneel"} or None
     out = []
     try:
         for with_key in (False, True):
@@ -90,7 +91,7 @@ def _unread(check) -> None:
                 e = MA.load_entries()
                 out.append([(s, sorted(m), {k: v.tobytes() for k, v in kf.items()}) for s, m, kf in e])
     finally:
-        MA.APPROVED = real
+        MA.APPROVED, MA.load_rig = real, real_rig
     check(out[0] == out[1] and len(out[0]) == 1, f"an approved kneel.png without source: ai changes nothing ({sid})")
 
 

@@ -104,11 +104,9 @@ masks:
 holds: []
 paint:                         # 1 px knee seam the shifted legs open, outline ink
   - {frame: atk_mid, xy: [[35, 54]], rgb: [6, 4, 10]}
-  # pass K (K2-B): kneel in-betweens: 1 px cracks closed with outline ink, the far toe below the feet row cleared
-  - {frame: kneel_in1, xy: [[43, 45], [26, 47], [49, 51]], rgb: [6, 4, 10]}
-  - {frame: kneel_in1, xy: [[22, 77]], rgb: null}
-  - {frame: kneel_in2, xy: [[42, 51], [40, 52], [41, 52], [41, 53], [31, 58], [33, 58]], rgb: [6, 4, 10]}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); the far shin flat on the ground, its foot drawn in off the cell edge; shoulders slumped
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+# KT2-A: bridge width false: the width remap squeezed the rear foot to a sliver in kneel_in2 (review it1 T1; area 1.19)
 kneel:
-  variant: [knee_forward, short_legs, deep_bow]
-  tweaks: {knee_f: [3, 1], foot_f: [7, 4], toe_f: [10, 2], sh_n: [0, 2], sh_f: [0, 2]}
+  source: ai
+  bridge: {width: false}

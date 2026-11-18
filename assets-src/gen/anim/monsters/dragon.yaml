@@ -158,3 +158,7 @@ frames:
     tweaks: {hip: [0, 2], back: [0, 2], chest: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], wtip: [0, 2], sh_n: [0, 2], el_n: [0, 2], paw_n: [0, 2], ftoe_n: [0, 2], sh_f: [0, 2], el_f: [0, 2], paw_f: [0, 2], ftoe_f: [0, 2], hip_n: [0, 2], hip_f: [0, 2]}
 holds: []
 paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

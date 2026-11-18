@@ -1,0 +1,176 @@
+# Hydra (roster T-K, ROSTER_FIX_PLAN_2.md 5): a green three-headed hydra on four thick legs, keyframe-only until now.
+# body: quadruped + heads 2 and 3 (FW-5 multi-head prototype). Head 1 = the right head in idle (the middle one in the
+# attack), head 2 = the top head, head 3 = the left head in idle, which swaps to the bottom right in the attack key.
+# Every in-between is translation-only (`moves: []`, `dy: 0`): the three heads and their necks move as one group by
+# tweaks, the body and legs stay put (moving the body over pinned legs rotated the short shins past the caps), feet
+# 1 px only in atk_mid. Masks: the tail (its tip sits next to the left neck; the gap between them must stay open,
+# and the mask follows that gap so no neck pixel rides with the tail) and each head per key, so the jaws travel
+# whole. The tail tip follows the heads where the left neck passes over it (winds, recover, hurt_in2, daze). The
+# plan's whole-figure table missed by 0.002; with the heads translated back and down (wind1 -3/+1, wind2 and the
+# attack-sourced mid/follow -6/+3, recover -4/+2) the switch bridges without the FW-Q alias.
+# fixmeasure.py switch --rig (IoU / centroid step; need 0.550, cap 9.6):
+#   attack: idle->wind1 0.811/1.4, wind1->wind2 0.798/1.9, wind2->mid 0.597/6.7, mid->attack 0.740/3.1,
+#           attack->follow 0.750/3.0, follow->recover 0.582/6.1, recover->idle 0.747/2.3
+#   hurt:   idle->hurt_in1 0.839/1.3, hurt_in1->hurt_in2 0.660/1.4, hurt_in2->hurt 0.833/1.6
+#   daze:   idle->daze 0.843/1.8, daze->daze_b 0.938/0.6 (heads 2 / 3 down)
+# Review (2 iterations, fresh image-only reviewers): iteration 1 ITERATE (a neck shard in hurt_in1: the tail mask
+# took the left neck's edge; weak wind-up); iteration 2 SHIP WITH NITS. Fixed: the atk_wind1 chin line and a stale
+# 1 px paint. Recorded nits: the feet jump at the idle/attack key switches (front foot about 7 px, from the approved
+# keys); 1-2 px foot drift attack-sourced mid vs the key (feet tweak -1, the atk_mid check); the hurt key itself
+# sits forward of the idle (approved art); the daze slump is gentle (heads 2 / 3 px; deeper closed the tail gap).
+sprite: hydra
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+lead_heads: [1]
+keyframes:
+  idle:
+    hip: [48, 98]
+    back: [60, 92]
+    chest: [75, 90]
+    neck: [78, 68]
+    head: [92, 60]
+    snout: [104, 72]
+    neck2: [64, 55]
+    head2: [76, 36]
+    snout2: [86, 45]
+    neck3: [42, 65]
+    head3: [52, 52]
+    snout3: [62, 58]
+    tail0: [38, 100]
+    tail1: [25, 98]
+    tail2: [25, 85]
+    tail_tip: [32, 73]
+    sh_n: [82, 100]
+    el_n: [85, 110]
+    paw_n: [88, 118]
+    ftoe_n: [93, 121]
+    hip_n: [58, 100]
+    knee_n: [57, 110]
+    foot_n: [62, 118]
+    toe_n: [68, 121]
+    hip_f: [38, 105]
+    knee_f: [34, 112]
+    foot_f: [33, 118]
+    toe_f: [38, 121]
+  attack:
+    hip: [45, 100]
+    back: [60, 95]
+    chest: [80, 95]
+    neck: [82, 65]
+    head: [98, 55]
+    snout: [110, 60]
+    neck2: [60, 55]
+    head2: [75, 37]
+    snout2: [88, 40]
+    neck3: [85, 82]
+    head3: [95, 80]
+    snout3: [110, 86]
+    tail0: [35, 98]
+    tail1: [22, 92]
+    tail2: [22, 80]
+    tail_tip: [30, 62]
+    sh_n: [85, 100]
+    el_n: [90, 110]
+    paw_n: [95, 117]
+    ftoe_n: [101, 121]
+    hip_n: [60, 102]
+    knee_n: [58, 112]
+    foot_n: [65, 118]
+    toe_n: [73, 121]
+    hip_f: [38, 105]
+    knee_f: [34, 113]
+    foot_f: [33, 118]
+    toe_f: [40, 121]
+  hurt:
+    hip: [50, 100]
+    back: [62, 95]
+    chest: [78, 90]
+    neck: [78, 70]
+    head: [90, 55]
+    snout: [104, 62]
+    neck2: [72, 55]
+    head2: [78, 36]
+    snout2: [90, 35]
+    neck3: [50, 65]
+    head3: [60, 46]
+    snout3: [72, 50]
+    tail0: [40, 100]
+    tail1: [28, 95]
+    tail2: [28, 82]
+    tail_tip: [35, 72]
+    sh_n: [84, 100]
+    el_n: [88, 110]
+    paw_n: [93, 117]
+    ftoe_n: [99, 121]
+    hip_n: [60, 103]
+    knee_n: [60, 112]
+    foot_n: [66, 118]
+    toe_n: [73, 121]
+    hip_f: [42, 105]
+    knee_f: [38, 113]
+    foot_f: [38, 118]
+    toe_f: [44, 121]
+frames:
+  atk_wind1: {moves: [], dy: 0, tweaks: {tail2: [-3, 1], tail_tip: [-3, 1], neck: [-3, 1], head: [-3, 1], snout: [-3, 1], neck2: [-3, 1], head2: [-3, 1], snout2: [-3, 1], neck3: [-3, 1], head3: [-3, 1], snout3: [-3, 1]}}
+  atk_wind2: {moves: [], dy: 0, tweaks: {tail1: [-2, 1], tail2: [-6, 3], tail_tip: [-6, 3], neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-6, 3], head3: [-6, 3], snout3: [-6, 3]}}
+  atk_mid: {moves: [], dy: 0, tweaks: {neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-4, 2], head3: [-6, 3], snout3: [-6, 3], foot_n: [-1, 0], foot_f: [-1, 0], paw_n: [-1, 0], toe_n: [-1, 0], ftoe_n: [-1, 0]}}
+  atk_follow: {moves: [], dy: 0, tweaks: {neck: [-6, 3], head: [-6, 3], snout: [-6, 3], neck2: [-6, 3], head2: [-6, 3], snout2: [-6, 3], neck3: [-4, 2], head3: [-6, 3], snout3: [-6, 3]}}
+  atk_recover: {moves: [], dy: 0, tweaks: {tail1: [-2, 1], tail2: [-6, 3], tail_tip: [-6, 3], neck: [-4, 2], head: [-4, 2], snout: [-4, 2], neck2: [-4, 2], head2: [-4, 2], snout2: [-4, 2], neck3: [-4, 2], head3: [-4, 2], snout3: [-4, 2]}}
+  hurt_in1: {moves: [], dy: 0, tweaks: {neck: [3, -1], head: [3, -1], snout: [3, -1], neck2: [3, -1], head2: [3, -1], snout2: [3, -1], neck3: [3, -1], head3: [3, -1], snout3: [3, -1]}}
+  hurt_in2: {moves: [], dy: 0, tweaks: {tail1: [-2, 0], tail2: [-3, 1], tail_tip: [-3, 1], neck: [-3, 1], head: [-3, 1], snout: [-3, 1], neck2: [-3, 1], head2: [-3, 1], snout2: [-3, 1], neck3: [-3, 1], head3: [-3, 1], snout3: [-3, 1]}}
+  daze: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], neck2: [0, 2], head2: [0, 2], snout2: [0, 2], neck3: [0, 2], head3: [0, 2], snout3: [0, 2]}}
+  daze_b: {moves: [], dy: 0, tweaks: {tail_tip: [0, 2], neck: [1, 3], head: [1, 3], snout: [1, 3], neck2: [1, 3], head2: [1, 3], snout2: [1, 3], neck3: [1, 3], head3: [1, 3], snout3: [1, 3]}}
+  # belly is on the feet row, a body dy would push it below)
+  kneel_in1: {tweaks: {tail2: [-1, 1], tail_tip: [-3, 3]}}   # pass K: the tail tip drops clear of the slumping left neck
+  kneel_b: {dy: 0, tweaks: {neck: [0, 1], head: [0, 1], snout: [0, 1], head3: [0, 1], snout3: [0, 1]}}
+masks:
+  tail:
+    idle: [[26, 68], [33, 68], [39, 71], [41, 74], [43, 76], [43, 80], [41, 89], [36, 92], [36, 95], [40, 97], [40, 101], [33, 103], [21, 103], [20, 100], [20, 80], [30, 76], [26, 72]]
+    hurt: [[25, 67], [44, 67], [45, 80], [45, 89], [38, 93], [38, 95], [42, 98], [42, 102], [30, 104], [24, 101], [24, 85], [34, 78], [26, 73]]
+  head2:
+    idle: [[66, 27], [82, 27], [87, 40], [87, 49], [78, 49], [68, 42]]
+    attack: [[66, 32], [84, 32], [90, 38], [90, 46], [84, 52], [74, 50], [68, 42]]
+    hurt: [[67, 31], [86, 31], [91, 36], [91, 43], [76, 44], [68, 40]]
+  head3:
+    idle: [[44, 44], [56, 44], [64, 56], [64, 62], [56, 63], [47, 56]]
+    attack: [[88, 72], [100, 72], [113, 80], [113, 88], [104, 93], [94, 92], [88, 84]]
+    hurt: [[52, 38], [62, 38], [72, 46], [75, 54], [66, 56], [56, 52]]
+  head:
+    idle: [[86, 52], [102, 52], [107, 70], [107, 76], [98, 76], [86, 66]]
+    attack: [[89, 49], [100, 49], [112, 56], [112, 64], [104, 70], [92, 68], [89, 60]]
+    hurt: [[84, 49], [96, 49], [106, 58], [106, 65], [96, 66], [86, 62]]
+holds: []
+paint:                         # atk_wind1: the left head's chin line over the middle neck closed with outline ink
+  - {frame: atk_wind1, xy: [[54, 73], [55, 73]], rgb: [6, 4, 10]}
+
+  # pass K: kneel_in1 / kneel_in2 / kneel_b: the small pockets between a bowing head and the column filled with the shade, cracks closed, the folded feet's px under the feet row cleared
+  - {frame: kneel_in1, xy: [[61, 52]], rgb: [99, 148, 82]}
+  - {frame: kneel_in1, xy: [[62, 57], [62, 58], [63, 59]], rgb: [156, 156, 115]}
+  - {frame: kneel_in1, xy: [[61, 58], [61, 59], [62, 59], [61, 60], [62, 60], [63, 60], [61, 61], [62, 61], [63, 61], [62, 62], [63, 62], [62, 63], [63, 63], [62, 64], [63, 64], [39, 79], [38, 80], [39, 80], [38, 81], [39, 81], [40, 81], [38, 82], [39, 82], [40, 82], [41, 82], [38, 83], [39, 83], [40, 83], [41, 83], [42, 83], [39, 84], [40, 84], [41, 84], [42, 84], [43, 84], [39, 85], [40, 85], [41, 85], [42, 85], [43, 85], [44, 85], [39, 86], [40, 86], [41, 86], [42, 86], [43, 86], [44, 86], [45, 86], [39, 87], [40, 87], [41, 87], [42, 87], [43, 87], [44, 87], [45, 87], [46, 87], [40, 88], [41, 88], [42, 88], [43, 88], [44, 88], [45, 88], [46, 88], [47, 88], [41, 89], [42, 89], [43, 89], [44, 89], [45, 89], [46, 89], [47, 89], [48, 89], [42, 90], [43, 90], [44, 90], [45, 90], [46, 90], [47, 90], [43, 91], [44, 91], [66, 114]], rgb: [74, 107, 74]}
+  - {frame: kneel_in1, xy: [[47, 68], [49, 68], [86, 68], [44, 69], [46, 69], [47, 69], [48, 69], [49, 69], [50, 69], [44, 70], [45, 70], [46, 70], [47, 70], [48, 70], [49, 70], [50, 70], [35, 77], [36, 77], [35, 78], [36, 78], [37, 78], [38, 78], [36, 79], [37, 79], [38, 79], [37, 80], [33, 92], [27, 110], [66, 115], [40, 116]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[51, 70], [50, 71], [51, 71], [51, 72], [52, 73]], rgb: [57, 90, 66]}
+  - {frame: kneel_in1, xy: [[44, 71], [45, 71], [46, 71], [47, 71], [48, 71], [49, 71], [45, 72], [46, 72], [47, 72], [48, 72], [49, 72], [50, 72], [46, 73], [47, 73], [48, 73], [49, 73], [50, 73], [51, 73], [47, 74], [48, 74], [49, 74], [50, 74], [51, 74], [49, 75], [50, 75], [41, 81], [42, 82], [43, 83], [44, 84], [45, 84], [45, 85], [46, 85], [47, 85], [46, 86], [47, 86], [48, 86], [38, 87], [47, 87], [48, 87], [49, 87], [50, 87], [37, 88], [38, 88], [39, 88], [48, 88], [49, 88], [37, 89], [38, 89], [39, 89], [40, 89], [49, 89], [50, 89], [51, 89], [36, 90], [37, 90], [38, 90], [39, 90], [40, 90], [41, 90], [35, 91], [36, 91], [37, 91], [38, 91], [39, 91], [40, 91], [41, 91], [42, 91], [34, 92], [35, 92], [36, 92], [37, 92], [38, 92], [39, 92], [40, 92], [41, 92], [42, 92], [33, 93], [34, 93], [35, 93], [36, 93], [37, 93], [38, 93], [39, 93], [40, 93], [41, 93], [32, 94], [33, 94], [34, 94], [35, 94], [36, 94], [37, 94], [38, 94], [39, 94], [32, 95], [33, 95], [34, 95], [35, 95], [36, 95], [37, 95], [32, 96], [33, 96], [34, 96], [35, 96], [36, 96], [32, 97], [33, 97], [34, 97], [35, 97], [36, 97], [33, 98], [34, 98], [35, 98]], rgb: [49, 66, 57]}
+  - {frame: kneel_in1, xy: [[32, 123], [57, 123], [58, 123], [85, 123], [86, 123], [88, 123]], rgb: null}
+  - {frame: kneel_in2, xy: [[56, 68], [56, 69], [37, 88]], rgb: [82, 132, 74]}
+  - {frame: kneel_in2, xy: [[57, 73], [58, 77], [57, 78], [58, 78], [59, 78], [60, 78], [61, 78], [62, 78], [58, 79], [59, 79], [60, 79], [61, 79], [58, 80], [59, 80], [60, 80], [61, 80], [62, 80], [59, 81], [60, 81], [61, 81], [62, 81], [63, 81], [60, 82], [61, 82], [62, 82], [61, 83], [62, 83], [61, 113]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[75, 73], [75, 74], [76, 74], [75, 75], [76, 75], [75, 76], [76, 76], [75, 77], [76, 77], [30, 78], [76, 78], [37, 86]], rgb: [74, 107, 74]}
+  - {frame: kneel_in2, xy: [[63, 112], [62, 113], [63, 113], [64, 113]], rgb: [156, 156, 115]}
+  - {frame: kneel_b, xy: [[27, 115]], rgb: [6, 4, 10]}
+# pass K (docs/KNEEL_PLAN.md K2-0, iteration 3): the hydra sinks to its belly (legs folding, 5 px) and its heads droop
+# on full-width necks: the top head bows nose-down on its column (the head alone turns, rotsprite), the right head's
+# chin sinks toward the forefoot, the left neck slumps down-left toward the tail tip with background kept between it
+# and the column
+kneel:
+  variant: [crouch, settle2, multihead, tall_necks]
+  samplers: {head2: rotsprite}
+  tweaks: {neck: [2, 6], head: [3, 8], snout: [3, 8], neck3: [-2, 1], head3: [-4, 2], snout3: [-4, 2]}
+  turn: {neck: 6, head: 14, snout: 28, neck2: 0, head2: 24, snout2: 26, neck3: -19, head3: 10, snout3: 24}
+  paint:
+    # the pocket the slumped left neck closes over the tail filled with the hide; the folded feet's px under the feet row cleared
+    - {xy: [[39, 95], [38, 96], [39, 96], [40, 96], [41, 96], [37, 97], [38, 97], [39, 97], [40, 97], [41, 97], [35, 98], [38, 98], [39, 98], [40, 98], [41, 98], [34, 99], [35, 99], [36, 99], [37, 99], [38, 99], [39, 99], [34, 100], [35, 100], [36, 100], [37, 100], [33, 101], [34, 101], [35, 101], [36, 101], [32, 102], [33, 102], [34, 102], [35, 102], [36, 102], [33, 103], [34, 103], [35, 103]], rgb: [74, 107, 74]}
+    - {xy: [[31, 123], [32, 123], [33, 123], [34, 123], [45, 123], [46, 123], [47, 123], [48, 123], [59, 123], [60, 123], [61, 123], [62, 123], [63, 123], [82, 123], [83, 123], [84, 123], [85, 123], [86, 123], [87, 123], [88, 123], [89, 123], [46, 124], [47, 124], [48, 124], [60, 124], [61, 124], [62, 124], [82, 124], [83, 124], [84, 124], [85, 124], [86, 124], [87, 124], [88, 124], [47, 125], [83, 125]], rgb: null}
+    - {xy: [[30, 78], [47, 122], [59, 122], [60, 122], [61, 122], [82, 122], [83, 122], [84, 122], [85, 122], [86, 122], [87, 122]], rgb: [6, 4, 10]}
+    - {xy: [[30, 88], [30, 89]], rgb: [57, 90, 66]}
+    - {xy: [[38, 93]], rgb: [49, 66, 57]}

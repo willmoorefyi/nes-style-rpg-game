@@ -130,3 +130,7 @@ paint:                         # 1 px knee crack the breath drop opens, outline 
   - {frame: atk_wind2, xy: [[51, 67]], rgb: [6, 4, 10]}
   - {frame: daze, xy: [[51, 67]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[51, 67]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

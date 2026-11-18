@@ -123,3 +123,7 @@ paint:                         # 1 px joint cracks (throat under the arm, back o
   - {frame: atk_follow, xy: [[85, 97]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[77, 51]], rgb: [6, 4, 10]}
   - {frame: atk_wind2, xy: [[23, 61]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai

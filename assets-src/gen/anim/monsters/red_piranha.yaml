@@ -28,3 +28,7 @@ frames:                         # idle-sourced frames shift by -round(d/2), key-
   daze: {moves: [], t: 0.0, dy: 1}                 # sinks 1 / 2 px (the whole fish; 3 touches the cell floor)
   daze_b: {moves: [], t: 0.0, dy: 2}
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai

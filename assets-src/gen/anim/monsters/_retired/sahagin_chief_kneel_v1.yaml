@@ -1,0 +1,158 @@
+sprite: sahagin_chief
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: f
+keyframes:
+  idle:
+    crown: [48, 6]
+    neck: [47, 27]
+    chest: [45, 35]
+    hip: [44, 50]
+    sh_n: [54, 33]
+    el_n: [58, 41]
+    hand_n: [63, 45]
+    shc: [64, 40]
+    sh_f: [32, 30]
+    el_f: [27, 40]
+    hand_f: [25, 49]
+    tip: [59, 67]
+    hip_n: [52, 55]
+    knee_n: [55, 64]
+    foot_n: [56, 73]
+    toe_n: [63, 76]
+    hip_f: [37, 55]
+    knee_f: [35, 64]
+    foot_f: [31, 73]
+    toe_f: [27, 76]
+  attack:
+    crown: [53, 7]
+    neck: [52, 28]
+    chest: [45, 38]
+    hip: [42, 50]
+    sh_n: [56, 33]
+    el_n: [60, 38]
+    hand_n: [64, 42]
+    shc: [65, 37]
+    sh_f: [33, 25]
+    el_f: [25, 26]
+    hand_f: [27, 33]
+    tip: [78, 44]
+    hip_n: [48, 53]
+    knee_n: [52, 62]
+    foot_n: [50, 73]
+    toe_n: [55, 76]
+    hip_f: [35, 52]
+    knee_f: [22, 62]
+    foot_f: [12, 73]
+    toe_f: [12, 76]
+  hurt:
+    crown: [30, 12]
+    neck: [40, 27]
+    chest: [42, 35]
+    hip: [46, 50]
+    sh_n: [40, 34]
+    el_n: [42, 38]
+    hand_n: [44, 42]
+    shc: [44, 38]
+    sh_f: [47, 30]
+    el_f: [52, 31]
+    hand_f: [59, 28]
+    tip: [78, 9]
+    hip_n: [56, 50]
+    knee_n: [61, 58]
+    foot_n: [58, 71]
+    toe_n: [64, 73]
+    hip_f: [45, 55]
+    knee_f: [40, 63]
+    foot_f: [33, 73]
+    toe_f: [38, 76]
+parts:
+  shield: {bone: [hand_n, shc], radius: 3.0}
+  weapon: {bone: [hand_f, tip], radius: 2.0}
+  spear_b: {bone: [hand_f, tip], radius: 0.01}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  # The spear runs behind the body and across the near shin (idle): turning it opens holes in the leg it covered, so the
+  # spear barely tilts and never leaves its fist. The shield is its own rigid part on the near fist (fist -> centre keeps
+  # one angle), so it only translates between the near side (idle, attack) and the chest (hurt).
+  atk_wind1:                   # half of wind2
+    moves: [crown, neck, chest]
+    tweaks: {crown: [-2, 0], neck: [-1, 0], el_n: [-1, -1], hand_n: [-2, -1], shc: [-2, -1], tip: [0, -1]}
+  atk_wind2:                   # coil: torso down 2, head back, shield drawn up and back 3, spear point tipped up 2 px
+    moves: [crown, neck, chest]
+    tweaks: {crown: [-3, 0], neck: [-2, 0], el_n: [-2, -2], hand_n: [-3, -3], shc: [-3, -3], tip: [0, -2]}
+  atk_mid:                     # head, shield and spear keep the thrust; torso a third back; legs pinned and shifted toward
+    t: 0.35                    # idle (not rotated)
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    moves: [chest, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
+    tweaks: {knee_f: [5, 0], foot_f: [7, 0], knee_n: [2, 0], foot_n: [3, 0]}
+  atk_follow:                  # a settle: the head comes back 28 % (the arms, shield and spear hold the thrust)
+    t: 0.72
+    moves: [crown, neck]
+  atk_recover:                 # head 30 % toward the strike, body at idle
+    t: 0.30
+    moves: [crown, neck]
+  hurt_in1:                    # flinch: head knocked back 4 (translated), shield jerked toward the chest; spear arm held
+    moves: []                  # tweaks only: the torso does not warp (the coral plate keeps its lines)
+    tweaks: {crown: [-4, 1], neck: [-3, 1], sh_n: [-4, -2], el_n: [-6, -2], hand_n: [-7, -3], shc: [-7, -3]}
+  hurt_in2:                    # from hurt: head and shield translated back toward idle (no head turn: the crest and the
+    moves: [chest]             # far pauldron stay whole)
+    tweaks: {crown: [4, -1], neck: [4, -1], sh_n: [5, 1], el_n: [5, 1], hand_n: [5, 1], shc: [5, 1], sh_f: [-1, 1]}
+  daze:                        # head and chest slump only (the spear stays over the shin)
+    moves: [crown, neck, chest]
+  daze_b:
+    moves: [crown, neck, chest]
+masks:
+  shield:                      # the shell shield: rigid on the near fist, it only translates (bone fist -> centre keeps one angle)
+    idle: [[57, 34], [68, 32], [73, 38], [73, 52], [66, 57], [58, 56], [56, 46]]
+    attack: [[59, 30], [68, 31], [71, 38], [71, 52], [62, 53], [57, 45], [57, 35]]
+    hurt: [[31, 30], [45, 30], [53, 36], [53, 50], [44, 53], [32, 50], [29, 40]]
+  weapon:                      # the spear's forward piece (the shaft runs behind the body)
+    idle: [[40, 57], [44, 57], [60, 64], [60, 67], [57, 67], [40, 60]]
+    attack: [[53, 38], [79, 40], [79, 49], [53, 47]]
+    hurt: [[54, 25], [62, 16], [70, 9], [79, 3], [79, 13], [66, 26], [58, 29]]
+  spear_b:                     # the spear's back piece behind the far fist
+    idle: [[2, 38], [12, 38], [22, 44], [22, 50], [16, 50], [2, 45]]
+    attack: [[3, 27], [24, 30], [24, 36], [3, 34]]
+    hurt: [[20, 63], [25, 63], [34, 53], [31, 50]]
+  ft_n:
+    idle: [[52, 72], [70, 72], [70, 79], [52, 79]]
+    attack: [[44, 72], [60, 72], [60, 79], [44, 79]]
+    hurt: [[51, 69], [67, 69], [67, 77], [51, 77]]
+  ft_f:
+    idle: [[22, 72], [38, 72], [38, 79], [22, 79]]
+    attack: [[5, 68], [20, 68], [20, 79], [5, 79]]
+    hurt: [[28, 71], [42, 71], [42, 79], [28, 79]]
+holds: []
+paint:                         # the approved gap under the thrusting arm (attack, x 47-50) that crack fill inks shut
+  - {frame: atk_follow, xy: [[47, 46], [48, 46], [48, 47], [49, 46], [49, 47], [49, 48], [50, 48], [50, 49]], rgb: null}
+  - {frame: hurt_in2, xy: [[45, 60]], rgb: [6, 4, 10]}   # 1 px seam crack between the thighs, outline ink
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[28, 28], [18, 44], [44, 63], [45, 63], [44, 64], [45, 64], [46, 64], [47, 64], [46, 65]], rgb: [49, 74, 99]}
+  - {frame: kneel_in1, xy: [[59, 36], [16, 43], [17, 43], [16, 44], [17, 44], [17, 45], [52, 47], [52, 48], [48, 65], [48, 66], [49, 67], [25, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[18, 45]], rgb: [66, 107, 132]}
+  - {frame: kneel_in1, xy: [[39, 61], [40, 61], [41, 61]], rgb: [231, 140, 123]}
+  - {frame: kneel_in1, xy: [[47, 65]], rgb: [33, 49, 74]}
+  - {frame: kneel_in1, xy: [[49, 66]], rgb: [173, 82, 82]}
+  - {frame: kneel_in1, xy: [[50, 68]], rgb: [156, 57, 57]}
+  - {frame: kneel_in1, xy: [[25, 77]], rgb: null}
+  - {frame: kneel_in2, xy: [[31, 30], [30, 31]], rgb: [231, 140, 123]}
+  - {frame: kneel_in2, xy: [[32, 30], [31, 31], [50, 54], [48, 70]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[52, 64], [53, 65]], rgb: [115, 41, 57]}
+  - {frame: kneel_b, xy: [[30, 73], [37, 75], [35, 76], [33, 76], [36, 76], [31, 76], [34, 76], [32, 76]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[31, 77], [32, 77], [33, 77], [34, 77], [35, 77], [36, 77], [37, 77], [38, 77]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); the spear angled down to the ground, the shield lowered
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [14, 0], foot_f: [14, 0], toe_f: [14, 0], sh_n: [0, 2], sh_f: [0, 2], tip: [6, -4], shc: [0, -2]}
+  paint:
+    - {xy: [[35, 36], [27, 52], [49, 70], [49, 71]], rgb: [156, 57, 57]}
+    - {xy: [[26, 46], [16, 47], [26, 47], [26, 48], [27, 48], [27, 50], [25, 51], [26, 51], [36, 76], [34, 76], [35, 76], [33, 76], [32, 76]], rgb: [6, 4, 10]}
+    - {xy: [[17, 49], [28, 63]], rgb: [49, 74, 99]}
+    - {xy: [[32, 77], [33, 77], [34, 77], [35, 77], [36, 77], [37, 77], [38, 77], [39, 77], [34, 78], [35, 78], [36, 78], [37, 78], [38, 78], [39, 78], [40, 78], [34, 79], [35, 79], [36, 79], [37, 79], [38, 79], [39, 79], [40, 79]], rgb: null}
+    - {xy: [[53, 19], [54, 19], [55, 20], [57, 20], [44, 22], [58, 22], [59, 23], [30, 25], [30, 26], [56, 50], [65, 56], [65, 59], [64, 60], [64, 61], [64, 62], [63, 63], [59, 33], [56, 38], [7, 41], [12, 47], [18, 55], [18, 56], [21, 61]], rgb: [6, 4, 10]}
+    - {xy: [[42, 67], [41, 68], [43, 68], [44, 68], [40, 69], [45, 69], [38, 71], [38, 72], [50, 72], [27, 73], [37, 73], [50, 73], [24, 75], [60, 75], [61, 75], [62, 75], [55, 47], [63, 64]], rgb: [6, 4, 10]}

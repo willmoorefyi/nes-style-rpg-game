@@ -82,8 +82,30 @@ def run_kneel_bridge(check: Callable[[bool, str], None]) -> None:
           "kneel.is_ai")
     check(KN.skip({"kneel": 1}, {"kneel": {"source": "ai"}}) == set(KN.KNEEL_FRAMES) and
           KN.skip({"kneel": 1}, {"kneel": {}}) == {"kneel"}, "kneel.skip: source ai leaves all four to the bridge")
+    # integrator ruling (KT2-A, 2026-11-18; plan rev 2 section 7): the bridge swap step's centroid cap is 0.65 x span
+    from gen import anim_checks as AC
+    s0, s1 = _figure(10, 40, x0=8), _figure(10, 40, x0=58)            # span: centroids 50 px apart
+    p, q = _figure(10, 40, x0=18), _figure(10, 40, x0=48)              # a 30 px step = 0.6 of the span
+    def cen(sh: float) -> list[str]:
+        return [e for e in AC.continuity(p, q, (s0, s1), 80, sh) if "centroid" in e]
+    check(bool(cen(0.5)) and not cen(KC.BRIDGE_SWAP_SHARE), "continuity: a 0.6-span step fails at 0.5, passes at 0.65")
+    br = {"kneel_in1": {"bridge": True}, "kneel_in2": {"bridge": True}}
+    check(KC.continuity_share("kneel", "kneel_in1", "kneel_in2", br) == 0.65 and
+          KC.continuity_share("kneel", "idle", "kneel_in1", br) == 0.5 and
+          KC.continuity_share("kneel", "kneel_in2", "kneel", br) == 0.5 and
+          KC.continuity_share("kneel", "kneel_in1", "kneel_in2", {"kneel_in1": {}, "kneel_in2": {}}) == 0.5 and
+          KC.continuity_share("daze", "kneel_in1", "kneel_in2", br) == 0.5,
+          "continuity_share: 0.65 only for the bridge pair kneel_in1 -> kneel_in2 (derived and other steps 0.5)")
+    # integrator ruling (KT3, 2026-11-18): AI-key-drawn frames skip the K-ground contact share, not the feet row
+    wide, tip = np.zeros((80, 80, 4), np.uint8), np.zeros((80, 80, 4), np.uint8)
+    wide[40:77, 10:70, 3] = 255
+    tip[40:75, 10:70, 3] = 255
+    tip[75:77, 10:14, 3] = 255                                         # thin leg tips on the feet row
+    check(bool(KC.ground(tip, wide, 76)) and not KC.ground(tip, wide, 76, contact=False)
+          and bool(KC.ground(tip[:76], wide, 76, contact=False)) and KC.KEY_DRAWN == ("kneel_in2", "kneel_b"),
+          "K-ground: contact=False drops only the contact share (lowest row still on the feet row)")
     allowed = _cols(idle) | _cols(key)
-    plain = KC.bridge_frame("kneel_in1", fr["kneel_in1"], idle, key, 0.35, 80, allowed)
+    plain =KC.bridge_frame("kneel_in1", fr["kneel_in1"], idle, key, 0.35, 80, allowed)
     check(not plain, f"bridge_frame passes the bridge's kneel_in1 ({plain})")
     check(bool(KC.bridge_frame("kneel_in1", key, idle, key, 0.35, 80, allowed)),
           "bridge_frame fails a frame at the key's size for u 0.35 (height / area off the lerp)")

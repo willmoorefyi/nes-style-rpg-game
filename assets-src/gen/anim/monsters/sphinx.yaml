@@ -176,3 +176,9 @@ paint:
   - {frame: daze, xy: [[88, 49], [87, 50], [88, 50], [85, 51], [86, 51], [87, 51], [84, 52]], rgb: [107, 66, 49]}
   - {frame: daze_b, xy: [[88, 49], [87, 50], [88, 50], [85, 51], [86, 51], [87, 51], [84, 52], [85, 52], [84, 53]], rgb: [107, 66, 49]}
   - {frame: daze, xy: [[82, 53], [83, 53], [80, 54], [81, 54], [79, 55], [80, 55]], rgb: [107, 66, 49]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  # check: the in1 -> in2 centroid step 10.0 > 9.6; the head half kept whole and the base band free carry the mass
+  bridge: {keep_top: 0.45, keep_bot: 0.0, width: false}

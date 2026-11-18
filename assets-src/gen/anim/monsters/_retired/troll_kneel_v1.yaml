@@ -1,0 +1,183 @@
+sprite: troll
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+attack_hand: f
+keyframes:
+  idle:
+    crown: [66, 13]
+    neck: [70, 42]
+    chest: [62, 52]
+    hip: [64, 78]
+    sh_n: [82, 45]
+    el_n: [88, 70]
+    hand_n: [95, 98]
+    sh_f: [44, 32]
+    el_f: [34, 62]
+    hand_f: [40, 90]
+    ctip: [54, 98]
+    chl: [26, 89]
+    cl_h: [51, 88]
+    hip_n: [74, 82]
+    knee_n: [78, 98]
+    foot_n: [77, 113]
+    toe_n: [86, 120]
+    hip_f: [52, 82]
+    knee_f: [46, 100]
+    foot_f: [42, 113]
+    toe_f: [47, 120]
+  attack:
+    crown: [80, 20]
+    neck: [76, 50]
+    chest: [66, 58]
+    hip: [62, 82]
+    sh_n: [82, 56]
+    el_n: [96, 64]
+    hand_n: [110, 72]
+    sh_f: [58, 38]
+    el_f: [40, 32]
+    hand_f: [23, 44]
+    hip_n: [70, 84]
+    knee_n: [82, 96]
+    foot_n: [80, 113]
+    toe_n: [88, 120]
+    hip_f: [48, 84]
+    knee_f: [32, 100]
+    foot_f: [22, 112]
+    toe_f: [20, 120]
+  hurt:
+    crown: [66, 26]
+    neck: [70, 54]
+    chest: [58, 52]
+    hip: [62, 82]
+    sh_f: [44, 34]
+    el_f: [66, 48]
+    hand_f: [96, 36]
+    cl_h: [60, 84]             # V.1: the dropped mallet hangs behind the loincloth (hurt_in2): it showed half, smeared into
+                               # the cloth with no hand; now only a few handle pixels show under the cloth
+    hip_n: [72, 84]
+    knee_n: [78, 98]
+    foot_n: [74, 113]
+    toe_n: [82, 120]
+    hip_f: [48, 84]
+    knee_f: [40, 102]
+    foot_f: [36, 114]
+    toe_f: [40, 120]
+parts:
+  weapon: {remove: true}
+  head: {radius: 13.0}
+  club:
+    kind: prop
+    bone: {idle: [hand_f, ctip], hurt: [hip, cl_h]}
+    radius: 3.0
+    in: [idle]
+    carry_to: cl_h
+    carry_mode: behind
+  club_s:
+    kind: prop
+    bone: {idle: [hand_f, chl], hurt: [hip, cl_h]}
+    radius: 2.0
+    in: [idle]
+    carry_to: cl_h
+    carry_mode: behind
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:                        # tweaks = rigid rotations about the hip / shoulders / neck (all frames: moves [])
+  kneel_in2:
+    tweaks: {knee_f: [0, 2], foot_f: [0, 2]}
+  atk_wind1:                   # head, chest and arms lean back 3, near arm 14 back; the mallet stays put (it hides the far thigh)
+    moves: []
+    tweaks: {crown: [-5, 0], neck: [-2, 0], chest: [-1, 0], sh_n: [-2, -1], el_n: [-7, 0], hand_n: [-12, 1], sh_f: [-2, 1], el_f: [-1, 2]}
+  atk_wind2:                   # coil: lean back 8, near arm 30 back (fist in front of the belly), body 2 lower; mallet stays put
+    moves: []
+    tweaks: {crown: [-8, 0], neck: [-5, 0], chest: [-4, 1], sh_n: [-5, -2], el_n: [-15, -2], hand_n: [-26, -1], sh_f: [-6, 3], el_f: [-2, 4]}
+  atk_mid:                     # attack leaned back 5, 1 lower; stick arm 24 lower, near arm 25 lower, back foot 6 in
+    moves: []
+    dy: 1
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-5, -1], neck: [-3, -1], chest: [-2, 0], sh_n: [-2, -2], el_n: [-3, 0], hand_n: [-5, 2], sh_f: [-4, 1], el_f: [-4, 10], hand_f: [3, 17], knee_f: [6, 0], foot_f: [6, 0]}
+  atk_follow:                  # upper body 7 forward, near arm lowered about the elbow only (E7: the shoulder stays on the
+                               # rigid lean, so no forearm / chest seam), stick arm 28 lower (t 0.80)
+    t: 0.80
+    moves: []
+    tweaks: {crown: [7, 3], neck: [4, 2], chest: [3, 1], sh_n: [3, 2], el_n: [3, 3], hand_n: [-1, 10], sh_f: [5, 0], el_f: [4, 7], hand_f: [10, 12]}
+  atk_recover:                 # head, chest and near arm lean in 4, near arm ~13 forward (F3b 12f: recover->idle farm_n
+    moves: []                  # step <= 10); far arm and mallet as idle
+    tweaks: {crown: [4, 0], neck: [2, 0], chest: [1, 0], sh_n: [2, 1], el_n: [5, -1], hand_n: [11, -3]}
+  hurt_in1:                    # recoil 3, hunch 8 forward, head 6 down, near arm 24 up to guard; the mallet stays put
+    moves: []
+    tweaks: {crown: [9, 1], neck: [2, 1], chest: [1, 0], hip: [-1, 0], sh_n: [1, 3], el_n: [9, -4], hand_n: [20, -9], sh_f: [4, -3]}
+  hurt_in2:                    # 1 forward, hunch 8 less, guard arm 20 down; mallet dropped behind (cl_h)
+    moves: []
+    tweaks: {crown: [-7, 0], neck: [-3, -1], chest: [-3, 1], hip: [1, 0], sh_f: [-6, 3], el_f: [-4, 0], hand_f: [-6, -4]}
+  daze:                       # pass F 5a: head and chest only (the shared move lifts the club over the loincloth and
+    moves: [crown, neck, chest]   # roughens the hump)
+  daze_b:
+    moves: [crown, neck, chest]
+masks:
+  torso:                       # E7: the belly flank beside the near arm is belly, not arm (else it swings out with the arm)
+    idle: [[74, 46], [80, 46], [82, 64], [83, 85], [74, 85]]
+  head:                        # E7: the spiked hump rides with the head (else it shows as a second head in atk_follow)
+    attack: [[53, 24], [69, 22], [70, 42], [57, 45], [51, 36]]
+  club:
+    idle: [[47, 84], [56, 84], [59, 88], [60, 99], [56, 105], [50, 107], [44, 104], [43, 92]]
+  club_s:
+    idle: [[22, 85], [32, 85], [32, 95], [22, 95]]
+  ft_n:
+    idle: [[68, 114], [96, 114], [96, 123], [68, 123]]
+    attack: [[68, 114], [96, 114], [96, 123], [68, 123]]
+    hurt: [[64, 114], [92, 114], [92, 123], [64, 123]]
+  ft_f:
+    idle: [[32, 114], [54, 114], [54, 123], [32, 123]]
+    attack: [[12, 113], [32, 113], [32, 123], [12, 123]]
+    hurt: [[26, 115], [48, 115], [48, 123], [26, 123]]
+seam_tolerance: 2              # the reopened approved far-arm / belly gap in atk_recover (paint below) touches two parts
+holds: []
+paint:                         # 1-2 px joint notches (the knee notch at 83,108 is open in the approved idle) closed with outline ink
+  - {frame: atk_wind1, xy: [[83, 108]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[29, 95], [83, 108]], rgb: [6, 4, 10]}
+  - {frame: atk_mid, xy: [[82, 65]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[83, 108]], rgb: [6, 4, 10]}
+  # the outline seam repair fills the approved far-arm / belly gap although nothing there moved: reopened
+  - {frame: atk_recover, xy: [[44, 57], [43, 58], [44, 58], [43, 59], [44, 59], [43, 60], [44, 60], [43, 61], [44, 61], [44, 62]], rgb: null}
+  - {frame: hurt_in1, xy: [[83, 108]], rgb: [6, 4, 10]}
+  # atk_follow (V.1): the notch and ink line between the hump and the far shoulder closed with the hump's dark green
+  # (it read as a separate block); one outline runs over the top, the armpit outline below is kept
+  - {frame: atk_follow, xy: [[54, 29], [55, 28], [56, 28], [56, 38]], rgb: [6, 4, 10]}
+  - {frame: atk_follow, xy: [[55, 29], [56, 29], [57, 29], [54, 30], [55, 30], [56, 30], [57, 30], [54, 31], [55, 31], [56, 31], [57, 31], [54, 32], [55, 32], [56, 32], [57, 32], [55, 33], [56, 33], [57, 33], [55, 34], [56, 34], [55, 35], [56, 35], [56, 36], [55, 37], [56, 37]], rgb: [57, 74, 57]}
+  - {frame: atk_follow, xy: [[60, 33], [61, 33], [60, 34], [61, 34], [61, 35]], rgb: [66, 90, 66]}
+  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
+  - {frame: kneel_in1, xy: [[61, 22]], rgb: [57, 74, 57]}
+  - {frame: kneel_in1, xy: [[50, 30]], rgb: [99, 132, 82]}
+  - {frame: kneel_in1, xy: [[54, 102], [45, 122], [43, 122], [44, 122]], rgb: [6, 4, 10]}
+  - {frame: kneel_in1, xy: [[54, 103], [54, 104]], rgb: [82, 57, 49]}
+  - {frame: kneel_in1, xy: [[43, 123], [44, 123], [45, 123], [46, 123]], rgb: null}
+  - {frame: kneel_b, xy: [[83, 104], [82, 107], [27, 111], [35, 122], [96, 122], [97, 122], [32, 122]], rgb: [6, 4, 10]}
+  - {frame: kneel_b, xy: [[29, 123], [30, 123], [31, 123], [32, 123], [33, 123], [34, 123], [35, 123], [94, 123], [95, 123], [96, 123], [97, 123], [98, 123], [99, 123], [100, 123], [101, 123]], rgb: null}
+  - {frame: kneel_in2, xy: [[52, 41], [69, 86], [70, 86], [70, 87], [37, 100], [35, 107], [38, 101]], rgb: [132, 165, 107]}
+  - {frame: kneel_in2, xy: [[73, 84], [74, 84], [76, 84], [73, 85], [76, 85], [76, 86], [71, 87], [77, 87], [73, 88], [74, 88], [75, 88], [76, 88], [77, 88], [78, 88], [80, 88], [76, 89], [78, 89], [79, 89], [80, 89], [80, 90], [82, 99], [74, 85], [75, 85], [73, 86], [74, 86], [75, 86], [72, 87], [73, 87], [74, 87], [75, 87], [76, 87]], rgb: [57, 74, 57]}
+  - {frame: kneel_in2, xy: [[75, 84], [77, 86], [84, 92], [81, 93], [84, 93], [85, 93], [81, 94], [82, 94], [84, 94], [82, 95], [84, 95], [81, 96], [82, 96], [83, 96], [84, 96], [82, 97], [83, 97], [39, 100], [93, 108], [83, 94], [83, 95]], rgb: [82, 107, 74]}
+  - {frame: kneel_in2, xy: [[72, 85], [72, 86], [72, 88], [37, 99], [38, 99], [38, 100], [36, 101], [37, 101], [35, 102], [39, 102], [40, 102], [41, 104], [42, 105], [43, 106], [43, 107], [39, 111], [40, 111], [40, 112], [41, 112], [42, 112], [42, 113], [42, 114], [42, 115], [38, 102], [42, 108], [42, 109], [42, 110], [41, 111], [42, 111], [40, 122], [39, 122], [38, 122]], rgb: [6, 4, 10]}
+  - {frame: kneel_in2, xy: [[71, 86], [34, 106]], rgb: [66, 90, 66]}
+  - {frame: kneel_in2, xy: [[71, 88], [81, 90], [81, 91], [82, 91], [83, 91], [82, 92], [83, 92], [82, 93], [82, 98], [39, 101], [83, 93]], rgb: [90, 115, 74]}
+  - {frame: kneel_in2, xy: [[36, 102], [34, 103], [35, 103], [40, 103], [35, 104], [40, 104], [41, 105], [37, 102], [37, 103], [38, 103], [39, 103], [36, 104], [39, 104], [36, 105], [40, 105], [37, 106], [41, 106], [37, 107], [38, 107], [41, 107], [38, 104], [37, 105], [38, 106]], rgb: [165, 132, 107]}
+  - {frame: kneel_in2, xy: [[84, 102]], rgb: [24, 8, 33]}
+  - {frame: kneel_in2, xy: [[34, 104], [35, 105], [42, 106], [36, 107], [44, 107], [36, 108], [37, 108], [44, 108], [37, 109], [43, 109], [44, 109], [39, 110], [43, 110], [52, 110], [51, 111], [52, 111], [43, 112], [41, 113], [36, 103], [39, 105], [40, 106], [42, 107], [39, 108], [39, 109], [37, 104], [38, 105], [39, 106], [39, 107], [40, 107]], rgb: [123, 90, 57]}
+  - {frame: kneel_in2, xy: [[35, 106], [38, 110], [36, 106], [43, 108], [40, 109], [40, 110], [41, 110], [40, 108], [41, 109]], rgb: [82, 57, 49]}
+  - {frame: kneel_in2, xy: [[38, 109], [43, 111], [38, 108], [41, 108]], rgb: [41, 41, 41]}
+  - {frame: kneel_in2, xy: [[37, 123], [38, 123], [39, 123], [40, 123], [38, 124], [39, 124], [40, 124], [39, 125]], rgb: null}
+# pass K (K2-B): biped template, long legs (knee_forward, short_legs), head bowed further (deep_bow); K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); the near fist braced forward
+kneel:
+  variant: [knee_forward, short_legs, deep_bow]
+  tweaks: {knee_f: [28, 0], foot_f: [28, 0], toe_f: [28, 0], sh_n: [0, 2], sh_f: [0, 2], el_n: [4, -4], hand_n: [12, -22]}
+  paint:
+    - {xy: [[31, 85], [31, 86], [29, 88], [30, 88], [29, 89], [29, 90], [83, 104], [83, 105], [84, 105], [83, 106], [84, 106], [55, 107], [82, 107], [83, 107], [84, 107], [29, 122], [97, 122]], rgb: [6, 4, 10]}
+    - {xy: [[28, 91], [28, 92], [28, 93], [28, 94]], rgb: [66, 90, 66]}
+    - {xy: [[35, 92], [34, 93], [35, 93], [36, 93], [34, 94], [36, 94], [37, 94], [34, 95], [37, 95], [38, 95], [34, 96], [36, 96], [37, 96], [34, 97], [35, 97], [36, 97], [35, 94], [35, 95], [36, 95], [35, 96]], rgb: [82, 57, 49]}
+    - {xy: [[56, 107], [55, 108]], rgb: [123, 90, 57]}
+    - {xy: [[82, 108], [83, 108], [84, 108], [83, 109], [85, 109], [83, 110], [84, 110], [85, 110], [84, 111], [85, 111], [86, 111], [87, 111], [86, 112], [87, 112], [84, 109]], rgb: [57, 74, 57]}
+    - {xy: [[85, 108]], rgb: [82, 107, 74]}
+    - {xy: [[88, 115]], rgb: [123, 156, 99]}
+    - {xy: [[29, 123], [31, 123], [32, 123], [96, 123], [97, 123], [99, 123], [100, 123], [101, 123], [101, 124]], rgb: null}

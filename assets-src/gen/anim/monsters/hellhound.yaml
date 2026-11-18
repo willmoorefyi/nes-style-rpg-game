@@ -159,3 +159,8 @@ holds: []
 paint:                         # hurt_in1 joint cracks closed with outline ink: under the tail root (2 px), the near
   # jaw over the far shoulder (2 px), the near hock (1 px)
   - {frame: hurt_in1, xy: [[28, 72], [30, 72], [107, 75], [108, 75], [30, 94]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [1, 0]               # K-fit: the key's tail touches the left cell border (x 0)

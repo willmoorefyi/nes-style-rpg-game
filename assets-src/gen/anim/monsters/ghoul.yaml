@@ -116,3 +116,7 @@ paint:                         # 1 px seams between moved parts (hip / thigh, sh
   - {frame: atk_follow, xy: [[46, 52]], rgb: [6, 4, 10]}
   - {frame: atk_recover, xy: [[55, 36]], rgb: [6, 4, 10]}
   - {frame: hurt_in2, xy: [[43, 38]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

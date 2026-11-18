@@ -132,3 +132,8 @@ holds: []
 paint:                         # reopen the 1 px channel between the far hind paw and the near foreleg (open in idle)
   - {frame: atk_wind1, xy: [[65, 65]], rgb: null}
   - {frame: daze, xy: [[65, 65]], rgb: null}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  bridge: {shear: false}       # check: the shear opened a new 4 px hole in kneel_in1

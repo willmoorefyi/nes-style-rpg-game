@@ -22,3 +22,9 @@ frames:
   daze: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [0, 1], neck: [-1, 0]}}
   daze_b: {moves: [], t: 0.0, dy: 2, tweaks: {crown: [0, 3], neck: [-1, 1]}}
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  offset: [0, 1]                 # K-ground (floating): the key's base 1 px above the idle's lowest row
+  bridge: {width: false}         # it2: kneel_in2's column seams doubled the outline (it1 T1)

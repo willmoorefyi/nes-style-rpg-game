@@ -74,10 +74,6 @@ parts:
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
-  kneel_in1:
-    tweaks: {toe_f: [0, -1]}
-  kneel_in2:
-    tweaks: {knee_f: [0, 1], foot_f: [0, 1]}
   atk_wind1:                   # half of wind2
     moves: [crown, neck, chest]
     tweaks: {crown: [-1, 0], neck: [-1, 0], sh_f: [-1, 0], el_f: [-1, -1], hand_f: [-1, -1], el_n: [-1, 0], hand_n: [-2, 0]}
@@ -121,13 +117,7 @@ masks:
 holds: []
 paint:                         # 1 px crotch seam the shifted legs open, outline ink
   - {frame: atk_mid, xy: [[37, 53]], rgb: [6, 4, 10]}
-  # pass K (K2-B): kneel frames: 1 px cracks and pockets closed with outline ink, outline ink where folded parts lost it, pixels below the feet row cleared
-  - {frame: kneel_in1, xy: [[28, 39]], rgb: [140, 90, 66]}
-  - {frame: kneel_in2, xy: [[51, 43], [29, 59], [32, 59], [29, 60], [31, 60], [32, 60], [33, 60], [31, 61], [29, 62], [30, 63]], rgb: [6, 4, 10]}
-  - {frame: kneel_in2, xy: [[31, 62]], rgb: [82, 82, 82]}
-  - {frame: kneel_in2, xy: [[18, 76], [19, 76], [16, 75], [16, 76], [17, 75], [17, 76], [20, 75]], rgb: [6, 4, 10]}
-  - {frame: kneel_in1, xy: [[17, 75]], rgb: [6, 4, 10]}
-# pass K (K2-B): biped template, long legs (knee_forward, short_legs), K2-B it2: the far knee set down in front of its hip socket so the rear shin folds close under the body (a compact drop, not a stride); snout bowed, shoulders dropped; the far arm tucked in toward the torso
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
 kneel:
-  variant: [knee_forward, short_legs]
-  tweaks: {knee_f: [12, 2], foot_f: [12, 1], toe_f: [12, 0], sh_n: [0, 4], sh_f: [0, 4], neck: [0, 3], crown: [0, 3], el_f: [5, 0], hand_f: [5, 0]}
+  source: ai

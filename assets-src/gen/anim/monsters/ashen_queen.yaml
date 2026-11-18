@@ -277,3 +277,7 @@ paint:                         # (N-4: re-derived after key_offset: atk_mid, cas
   - {frame: cast_rise, xy: [[116, 54]], rgb: [6, 4, 10]}
   - {frame: cast_release, xy: [[77, 86], [78, 86], [75, 87], [76, 87], [77, 87], [73, 88], [75, 88]], rgb: [6, 4, 10]}
   - {frame: cast_release, xy: [[74, 88]], rgb: [49, 41, 49]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai

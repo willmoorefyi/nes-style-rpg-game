@@ -30,3 +30,7 @@ frames:
 holds: []
 paint:                          # 1 px cracks where the sunk body meets the curl's crust, inked
   - {frame: daze_b, xy: [[66, 84], [65, 85], [69, 87], [70, 88]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai

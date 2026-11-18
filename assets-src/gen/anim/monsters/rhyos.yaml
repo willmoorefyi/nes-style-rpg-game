@@ -191,3 +191,8 @@ paint:
   - {frame: daze_b, xy: [[93, 70], [92, 71], [93, 71], [93, 72]], rgb: [6, 4, 10]}   # 4 px pocket between parts filled
   - {frame: daze_b, xy: [[35, 108]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
   - {frame: atk_recover, xy: [[78, 89], [79, 89], [80, 89], [79, 90], [80, 90], [79, 91], [80, 91], [81, 91], [79, 92], [80, 92], [81, 92], [80, 93], [81, 93], [80, 94], [81, 94], [82, 94], [81, 95], [82, 95], [81, 96], [82, 96], [83, 96], [82, 97], [83, 97], [83, 98], [83, 99], [84, 99]], rgb: [6, 4, 10]}   # 26 px pocket between parts filled
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai
+  offset: [0, 1]               # the approved key stands 1 px above the feet row (K-ground)

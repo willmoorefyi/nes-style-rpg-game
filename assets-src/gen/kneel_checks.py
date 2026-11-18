@@ -23,13 +23,30 @@ from gen.anim_rules import ROT_CAP
 from gen.monster_recipes import KNEEL_FRAMES
 
 IN_BETWEENS = ("kneel_in1", "kneel_in2")
+# Integrator ruling (KT2-A, 2026-11-18; docs/KNEEL_TWEEN_PLAN.md rev 2 section 7, rulings log in 12): the bridge pair
+# step kneel_in1 -> kneel_in2 of a `source: ai` rig is the deliberate swap between two drawings inside the 133 ms drop,
+# so its `sequence:kneel` centroid cap is 0.65 x the idle-key span; every other step (and the derived path) keeps 0.5.
+BRIDGE_SWAP = ("kneel_in1", "kneel_in2")
+BRIDGE_SWAP_SHARE = 0.65
+# Integrator ruling (KT3, 2026-11-18; docs/KNEEL_TWEEN_PLAN.md 12 rulings log): the approved AI kneel key and the frames
+# drawn from it (kneel_in2, kneel_b) are exempt from the K-ground *contact share* (half the idle's pixels in the bottom
+# 2 rows), as they are from K-height: the key was approved as drawn (remorazz's crawl touches the ground with thin leg
+# tips). Their lowest opaque row must still be the feet row; kneel_in1 (drawn from the idle) keeps the full rule.
+KEY_DRAWN = ("kneel_in2", "kneel_b")
+
+
+def continuity_share(seq: str, a: str, b: str, gen: dict) -> float:
+    """The centroid cap's span share for the step a -> b of `seq` (anim_checks.continuity)."""
+    swap = seq == "kneel" and (a, b) == BRIDGE_SWAP and all(gen.get(n, {}).get("bridge") for n in BRIDGE_SWAP)
+    return BRIDGE_SWAP_SHARE if swap else 0.5
 
 
 def _rows(a: np.ndarray) -> np.ndarray:
     return np.nonzero((a[..., 3] > 0).any(1))[0]
 
 
-def ground(a: np.ndarray, idle: np.ndarray, bottom: int, floating: bool = False) -> list[str]:
+def ground(a: np.ndarray, idle: np.ndarray, bottom: int, floating: bool = False, contact: bool = True) -> list[str]:
+    """K-ground; `contact=False` keeps only "lowest opaque row on the feet row" (no contact-share rule)."""
     ra, ri = _rows(a), _rows(idle)
     if not len(ra):
         return ["K-ground: empty frame"]
@@ -37,6 +54,8 @@ def ground(a: np.ndarray, idle: np.ndarray, bottom: int, floating: bool = False)
         return [] if ra.max() == ri.max() else [f"K-ground: lowest row {ra.max()} != the idle's {ri.max()} (floating)"]
     if ra.max() != bottom:
         return [f"K-ground: lowest opaque row {ra.max()} != feet row {bottom}"]
+    if not contact:
+        return []
     n, m = int((a[bottom - 1:bottom + 1, :, 3] > 0).sum()), int((idle[bottom - 1:bottom + 1, :, 3] > 0).sum())
     return [] if n >= 0.5 * m else [f"K-ground: {n} px in the bottom 2 rows < half the idle's {m}"]
 
@@ -160,9 +179,9 @@ def ai_checks(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allowed:
     from gen import monster_anim as MA
     # the key's outline weight is the approved drawing's own (J0 / the review judged it): not compared with the idle
     out = {"kf:kneel": C.binary_alpha(key) + C.palette_lock(key, allowed) + C.magenta(key)
-           + ground(key, idle, bottom, floating) + fit(key, bottom)}
+           + ground(key, idle, bottom, floating, contact=False) + fit(key, bottom)}
     for n in (f for f in KNEEL_FRAMES if f in gen):
-        out[n] = ground(gen[n]["img"], idle, bottom, floating) + fit(gen[n]["img"], bottom)
+        out[n] = ground(gen[n]["img"], idle, bottom, floating, contact=n not in KEY_DRAWN) + fit(gen[n]["img"], bottom)
     if all(n in gen for n in IN_BETWEENS):
         out["kneel:order"] = order([idle, gen["kneel_in1"]["img"], gen["kneel_in2"]["img"], key])
     frames = {**{n: v for n, v in kfs.items()}, **{n: Image.fromarray(f["img"]) for n, f in gen.items()}}

@@ -183,3 +183,7 @@ paint:                         # outline ink in the 1-2 px cracks the translatio
   - {frame: daze, rgb: [33, 24, 57], xy: [[92, 90], [88, 94], [89, 95]]}
   - {frame: daze, rgb: [49, 24, 82], xy: [[91, 92], [90, 93], [88, 95], [88, 96], [87, 97], [86, 98]]}
   - {frame: daze, rgb: [156, 156, 173], xy: [[85, 99], [84, 100], [84, 101], [84, 102]]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); before pass KT this rig had no derived kneel (the D-K7 alias to daze)
+kneel:
+  source: ai

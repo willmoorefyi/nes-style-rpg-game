@@ -121,3 +121,8 @@ paint:                         # slits the moved parts open between dark plates,
   - {frame: atk_mid, xy: [[43, 47], [42, 48], [43, 48], [42, 49], [43, 49], [42, 50], [43, 50], [42, 51], [43, 51], [42, 52], [43, 52], [43, 53]], rgb: [6, 4, 10]}
   - {frame: atk_wind1, xy: [[46, 20], [46, 21], [46, 22], [46, 23]], rgb: [6, 4, 10]}
   - {frame: hurt_in1, xy: [[49, 18], [48, 19], [49, 19], [49, 20]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+# KT2-A: the kneel_in1 -> kneel_in2 swap passes the 0.65-span centroid cap (integrator ruling 2026-11-18, KNEEL_TWEEN_PLAN 12)
+kneel:
+  source: ai

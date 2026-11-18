@@ -144,3 +144,8 @@ paint:                         # FW-P (V8 F3): pointed horns and the T visor on 
   - {frame: hurt, xy: [[19, 6], [20, 7], [43, 7], [22, 8], [42, 8], [20, 9], [41, 9], [40, 10]], rgb: [123, 123, 132]}
   - {frame: hurt, xy: [[29, 13], [34, 13], [31, 15], [32, 15]], rgb: [74, 0, 66]}
   - {frame: hurt, xy: [[30, 13], [31, 13], [32, 13], [33, 13], [32, 14]], rgb: [148, 24, 82]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+# KT2-A: the kneel_in1 -> kneel_in2 swap passes the 0.65-span centroid cap (integrator ruling 2026-11-18, KNEEL_TWEEN_PLAN 12)
+kneel:
+  source: ai

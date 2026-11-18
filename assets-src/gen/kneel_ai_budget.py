@@ -1,6 +1,6 @@
 """`kneel_ai.py budget --check` (KG1; docs/KNEEL_AI_PLAN.md rev 7 sections 5, 7). Expected, then exit 0:
 
-  closed pass C 25/80, closed pass KA 54/91
+  closed pass C 25/80, closed pass KA 54/91, closed pass KA-FIX 2/60
   OK pass KA-G pilot <p>/30, batch <b>/375, reserve <r>/135, total <t>/540, expiry <e>/125, est $<x.xx>
 
 Breaches: a live `bedrock` block (pass KA-G makes no Bedrock call); a closed Bedrock pass whose ledger rows differ from
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from gen import budget_kag as BK
 
-PASS, CLOSED = "pass KA-G", ("C", "KA")
+PASS, CLOSED = "pass KA-G", ("C", "KA", "KA-FIX")   # KA-FIX closed by KT3 (2026-11-18) at 2 / 60
 
 
 def breaches(budget: dict, br_rows: list[dict], ledger: list[dict]) -> tuple[list[str], dict]:
