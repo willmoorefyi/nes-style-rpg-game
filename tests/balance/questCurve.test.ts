@@ -121,7 +121,7 @@ const medianBoss = (id: string): number => median(runs.map((r) => r.boss.get(id)
 describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => {
   it('the walk has the curve model\'s fights and every boss battle, Chaos last', () => {
     const battles = curve.segments.filter((s) => s.battle).map((s) => s.battle!);
-    expect(battles.at(-1)).toContain('chaos');
+    expect(battles[battles.length - 1]).toContain('chaos');
     expect(curve.segments.reduce((a, s) => a + s.fights.reduce((b, f) => b + f.n, 0), 0)).toBeCloseTo(curve.fights, 6);
   });
 
@@ -134,8 +134,8 @@ describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => 
       if (!s.band || !s.boss.length || !runs[0].boss.has(s.id)) continue;
       const lv = medianBoss(s.id);
       rows.push(`${s.id} ${s.boss[0]} L${lv.toFixed(1)} [${s.band[0]},${s.band[1]}]`);
-      expect(lv, rows.at(-1)).toBeGreaterThanOrEqual(s.band[0]);
-      expect(lv, rows.at(-1)).toBeLessThanOrEqual(s.band[1] + 1);    // a band's top level, up to its next level
+      expect(lv, rows[rows.length - 1]).toBeGreaterThanOrEqual(s.band[0]);
+      expect(lv, rows[rows.length - 1]).toBeLessThanOrEqual(s.band[1] + 1);    // a band's top level, up to its next level
     }
     expect(rows.length).toBeGreaterThanOrEqual(12);
   });
