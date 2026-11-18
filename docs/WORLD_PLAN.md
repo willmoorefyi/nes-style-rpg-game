@@ -3971,7 +3971,7 @@ No AI or paid calls. No kneel files. Scratch in `/tmp/w-wnd-d1/`.
 
 | Gate | Output |
 |---|---|
-| G1 | `mirage_floors.py`, `stubs.py` (`wrote 56 stub sources, kept 81 real maps`), `world.py`, then `git diff --exit-code assets-src/maps` after the commit: see the final line below |
+| G1 | `mirage_floors.py`, `stubs.py` (`wrote 56 stub sources, kept 81 real maps`), `world.py`, then `git diff --exit-code assets-src/maps` after the commit (8d8f1821): exit 0, no diff; `git status --porcelain` empty |
 | G2 | `build_map.py mirage-1f mirage-2f mirage-3f`: `38x40`, `40x32`, `28x24 -> assets/maps/ai/...`; the 5 sky stubs `12x10`; `--check-determinism` on all 8: `deterministic`. `build_map.py overworld --region wind` (the lock; it waited ~4 min for another holder): exit 0, max RSS 3.98 GB; `--check-determinism --region wind overworld`: `overworld: deterministic` |
 | G3 | no `assets/maps/ai/overworld/` chunk changed (only the yaml) |
 | G4 | `npm run build` exit 0; `npx vitest run --maxWorkers=2 --minWorkers=1`: `Test Files 2 failed / 330 passed (332)`, `Tests 2 failed / 7736 passed / 2 skipped`. The 2 failures are pre-existing on mainline: `questGraph.test.ts` (the (c) soft-locks) and `questLate.test.ts` (the (d) bands and elfheim gold) |
