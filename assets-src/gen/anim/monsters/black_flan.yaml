@@ -14,3 +14,8 @@ frames:
   atk_wind2: {t: 0.25, squash: {sx: 1.06, sy: 0.92}}
   atk_mid: {t: 0.10, moves: [mid, top]}
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+kneel:
+  source: ai
+  offset: [0, 1]
