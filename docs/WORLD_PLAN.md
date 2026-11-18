@@ -3114,6 +3114,114 @@ and `world_fire_data.py` (FIRE's region; Crescent's site from `fire/town_crescen
 <!-- === FIR-T FIRE (pass W: owned by FIR-T) === -->
 <!-- === end FIR-T === -->
 <!-- === FIR-D1 FIRE (pass W: owned by FIR-D1) === -->
+### FIR-D1 result: Gurgu Volcano (branch `w-fir-d1` from `mainline` 1e2fdfc)
+
+No AI or paid calls. No kneel files. Scratch in `/tmp/w-fir-d1/`. The canon (4.4, 5.4) assigns FIR-D1 Gurgu Volcano
+`gurgu-b1..b5` with the boss `ashen_queen` (the fire fiend, a sun priestess turned six-armed serpent), and that is what
+was built.
+
+**Files:**
+
+- `layouts/fire/gurgu_common.py` (81 lines): the materials (dark basalt `-`, lava `%` as the `lava` remap of the
+  rubble, pale ash `+`), the design note, the encounter tables, the chest helper and the lava hazard (one
+  `MapData.hazards` entry per floor, damage 1, a rect per row run of `%`).
+- `layouts/fire/gurgu_upper.py` (98) writes `gurgu-b1` (40x34) and `-b2` (48x26); `layouts/fire/gurgu_lower.py`
+  (134) writes `-b3` (34x46), `-b4` (40x36) and `-b5` (30x32).
+  - B1, the caldera rim: a ring walk round a sheer rock crater, entered from the south. It has two stairs down on
+    opposite sides: east to B2 `arrival`, west to B2 `west` (a new entrance). A lava seam crosses the north arc, and
+    three blind fumarole spurs hold chests.
+  - B2, the upper gallery, runs west to east. Two lava streams cross it from wall to wall, each with one stone ford.
+    Its east stair leads to B3 `arrival` (the north gallery) and its west stair to B3 `forge` (a new entrance).
+  - B3, the lower gallery, runs north to south in three reaches, each half lava. The sealed forge (hearth, racks,
+    anvil altar) lies west of it, is walled off from it, and is reached only by B2's west stair: a dead end holding
+    `sun_blade` and `opal_armlet` (a `reach_roots` entry; the chokepoint check is off on this floor and the sites test
+    walks both parts instead).
+  - B4, the basalt maze: a lava field broken by pillars runs from the north-west landing to the south-east stair
+    (57 steps, all wading), and a dry corridor round the north and east that doubles back once (74 steps, 1.30x).
+  - B5, the queen's ash court, `canSave: false`. An ash runner leads due south of the arrival (octant S, path 17) to
+    the queen NPC (`princess` sheet, tinted) before the crystal's altar (an inspect cell whose text turns on
+    FIRE_CRYSTAL_LIT). Talking to her starts `[ashen_queen, fire_lizard]` (`flag: FIRE_CRYSTAL_LIT`,
+    `postVictoryCutscene: fir_ashen_falls`).
+  - Chests 3 / 4 / 4 / 4 / 2 (`CHEST_FIR_D1_*`): consumables and B6 found gear (`opal_helm` x2, `sun_blade`,
+    `opal_armlet`, `opal_armor`). Every floor has `exit` to `overworld:fir_volcano`.
+  - Encounters: B1-B2 fire_lizard, hellhound, lava_worm + pyrolisk, pyrolisk, fire_elemental; B3-B5 horned_devil,
+    fire_hydra, fire_gigas + pyrolisk, fire_elemental, dragon (rate 18-30). Backgrounds: B1-B2 `fire_temple`, B3-B4
+    `magma_temple`, B5 `throne_kary`, staged by `stage_backgrounds.py` into `assets/backgrounds/`.
+- `cutscenes.yaml` (FIR-D1 anchor): `fir_ashen_falls` (the robe falls empty; its flame runs into the crystal;
+  `set_flag FIRE_CRYSTAL_LIT` behind a fade).
+- `enemies.yaml` (ashen_queen anchor, `bossPhases` only): a new phase from full HP (hits 6, attack 61, with a
+  message); the old 0.5 phase (inferno, heavy) is kept.
+- `quest.yaml` S15: `status: built`; `entry` overworld (147, 124) on foot with the ship at the `fir_crescent` dock;
+  `walk: [overworld:warp:gurgu-b1, gurgu-b1:warp:gurgu-b2, gurgu-b2:warp:arrival, gurgu-b3:warp:gurgu-b4,
+  gurgu-b4:warp:gurgu-b5, gurgu-b5:battle:ashen_queen]`; `nonLoadBearing`: the queen's `hideIf`. No `milestones`
+  (S15 sets one flag).
+- `debug-scenarios.yaml`: `w_s15_start` (entrance `fir_crescent`, L21, B5 gear, the flags through S14, the canoe and
+  the lute, the ship at the dock) and `w_boss_ashen_queen` (L23, B5 gear, 3 potions, `throne_kary`).
+- Tests: `tests/quest/fire/fir_d1_sites.test.ts` (6), `tests/quest/fire/hazardPath.test.ts` (7),
+  `tests/quest/fire/fir_d1_walk.test.ts` (2), `tests/balance/w_fir_d1.test.ts` (3).
+
+**Balance (S15, 400 seeds, kit `w_s15`, 3 potions, `[ashen_queen, fire_lizard]`):** before this pass the party beat the
+queen alone 100 % of the time at L21-L25, sensible and careless: her 600 HP and six hits at attack 40 never
+threatened the B5 party. The phase alone moved the level curve too little (at attack 72: L21 42.2 %, L23 63.7 %, too
+close to both bounds), and the lizard steepened it. Sensible: L21 **40.8 %** (target <= 45), L22 56.0 %, L23 **64.0 %**
+(target 60-80), L24 70.0 %, L25 78.0 %. Careless: L21 58.0 %, L23 78.5 %. As in every balance test the sim does not
+play enemy spells, so in the game her `ai` (38 % fir2 / dark / hold) trades some of her 6-hit turns for spells.
+
+**Topology:**
+
+| Floor | Size | Dead ends | Aspect / fill | Hazard-free route |
+|---|---|---|---|---|
+| gurgu-b1 | 40x34 | 6 | 1.23 / 0.33 | both stairs dry at the shortest length (30-35) |
+| gurgu-b2 | 48x26 | 4 | 2.33 / 0.39 | east stair 16 / 16; west landing and forge stair 49 / 45 (the fords) |
+| gurgu-b3 | 34x46 | 5 | 0.76 / 0.38 | 37 / 37 |
+| gurgu-b4 | 40x36 | 3 | 1.16 / 0.48 | 74 dry / 57 over lava (1.30x) |
+| gurgu-b5 | 30x32 | 2 | 1.12 / 0.56 | boss approach 16 / 16; boss S, 17 |
+
+The stair graph: B1 <-> B2 by twin stairs, B2 <-> B3 by two stairs (one into the forge), then a chain to B5, so it
+branches (`gurgu: branching`; FIR-D1: 1 of 1 dungeons branches).
+
+**Gates:**
+
+| Gate | Output |
+|---|---|
+| G1 the two layout scripts, `stubs.py`, `world.py --check-bands`, `world.py`, `git diff --exit-code assets-src/maps` | exit 0, no diff (`stubs: wrote 99 stub sources, kept 38 real maps`) |
+| G2 `build_map.py gurgu-b1 ... gurgu-b5`, then `--check-determinism` on the 5 ids | each `gurgu-bN: WxH -> assets/maps/ai/gurgu-bN.yaml`, then `gurgu-bN: deterministic`. No world compile (no site file changed) |
+| G3 | n/a: no overworld chunk changed |
+| G4 `npm run build`; `npx vitest run --maxWorkers=2 --minWorkers=1` | build exit 0; vitest exit 0, `Test Files 325 passed (325)`, `Tests 7125 passed, 5 skipped (7130)` |
+| G5 `npm run quest -- --mutate --stage S15` | (a) OK S15; (b) OK (22 withheld runs); (c) OK (135192 states); (d) `ashen_queen L21.9 [21,24]`; (e)-(h) OK, (g) `s*=0.736 (31 pairs; 0 assumed)`; `mutations: OK (3 gate rows; 4 elements, each removal reported)`: GT-21 (both canoe cuts) and GT-37 (`crescent_ring`) caught as `SKIP S15 ashen_queen reachable without canoe`; `quest-verify: OK` |
+| G6, G7 | `assetCoverage`, `fileCeilings`, `questCeilings`: passed |
+| G8 `build_map.py --selftest` | `build_map selftest: 104 checks passed` |
+| G9 `w_fir_d1.test.ts`; `check-bounds "tests/balance/w_*.test.ts"` | 3 passed; `check-bounds: OK (12 tests)` |
+| G10 browser, port 5231, `mute=1` | `w_s15_start` (headless Chromium, `/tmp/w-fir-d1/pw/s15.mjs`): from (148, 124) the canoe down R-volcano into `gurgu-b1`, then B2 (38, 7), B3 (16, 5), B4 (3, 5) (the lava wade cost 35 HP each), B5 (14, 5); the queen's talk started `Ashen Queen, Fire Lizard` on `throne_kary`; won, FIRE_CRYSTAL_LIT set; 0 console errors. The driver held off random encounters (it tops up the encounter counter before each step) so the walk is deterministic. Screenshots: `/tmp/w-fir-d1/s15_0_start.png`, `s15_1_b1.png`, `s15_4_b4.png`, `s15_5_queen.png`, `s15_6_battle.png`, `s15_7_end.png` |
+| G12 `designNotes`, `originality` | passed (`gurgu: branching`) |
+| G13, G14 `npm run quest -- --only gh` (and `macroGeography`, `travelMatrix` in G4) | `(g) geography: OK  s*=0.736 (31 pairs; 0 assumed)`; `(h) travel matrix: OK  (12 rows, 2 basin rows; 9 checked, 5 pending)`; `quest-verify: OK` |
+| G16 `stubs.py --check FIR-D1` | `stubs: 0 left for FIR-D1` |
+| G17 `world.py --check-bands && world.py` | `bands: OK`; `basins: OK (aldi 2779 cells, ocean 12692 cells; canal joins)` |
+| `stage_backgrounds.py fire_temple magma_temple throne_kary` / `--check ...` | staged (565 / 594 / 458 KB); `--check` exits 1 with `no bounds for fire_temple (known: shoreline)`, as for ERT-O |
+
+**Originality:** a fresh reviewer, given the five sources (ASCII grounds, objects, lines, the note), the previews and
+the cutscene, returned `originality review: PASS gurgu-b1 gurgu-b2 gurgu-b3 gurgu-b4 gurgu-b5`. It found two Distinct
+claims loose: B2's fords (the streams then covered only part of the gallery, so you walked round them) and B4's
+"maze" (one corridor that doubles back). The streams now cross the gallery wall to wall with one stone ford each, and
+the B4 claim reads "a short wade across open lava and a dry corridor that doubles back round the field".
+
+**Deviations / shared-file edits (each small):**
+
+- `tests/data/enemyAttack.test.ts` (+2): the Drowned Sovereign / Ashen Queen pin now reads only the phases that set an
+  attack animation, since the queen gains a full-HP phase without one. The rule it pins (heavy only at 0.5) holds.
+- `tests/scenes/bestiary/bestiaryHabitats.test.ts` (+1): `dragon` is now placed (B3-B5), so its habitat pin reads
+  "Gurgu Volcano B3, Gurgu Volcano B4, Gurgu Volcano B5". `vampire` and `lich` stay "Not placed yet".
+- 4.4 names the boss battle `ashen_queen`. The roster queen can't reach 3.7's band through `bossPhases` alone (the
+  level curve stays too flat), so a `fire_lizard` (an S15 roster enemy) fights beside her, as ORD-O and ELF-O add
+  escorts.
+- The battle's flag is the milestone FIRE_CRYSTAL_LIT itself (ORD-O's pattern), and `fir_ashen_falls` sets it too.
+- The B5 inspect cell and the queen's sprite (`princess`, tint `#b8573a`) use existing art. No smoke deco (no part).
+
+**AGENTS.md delta (for INT):** in "Editing a 2x Map", add `layouts/fire/gurgu_upper.py` (`gurgu-b1`, `-b2`) and
+`gurgu_lower.py` (`gurgu-b3..b5`), with `gurgu_common.py` (lava = the `lava` remap on `%`, one `hazards` entry per
+floor from the `%` cells). A dungeon floor's hazard rule is tested by `tests/quest/fire/hazardPath.test.ts` (dry path
+<= 1.5x the shortest). The debug scenarios gain `w_s15_start` and `w_boss_ashen_queen`; the backgrounds `fire_temple`,
+`magma_temple` and `throne_kary` are staged.
 <!-- === end FIR-D1 === -->
 <!-- === FIR-D2 FIRE (pass W: owned by FIR-D2) === -->
 <!-- === end FIR-D2 === -->
