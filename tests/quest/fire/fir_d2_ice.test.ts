@@ -1,7 +1,7 @@
 /**
  * FIR-D2's Ice Cavern and stage S16 (docs/WORLD_PLAN.md 3.2, 4.0.2, 4.4, 6.4, D-W14), on the compiled maps and the
  * real quest data: B1's pillar hall has three branches, its stair down in the north branch; B1's two pockets are cut
- * off from the hall and reached only by B2's cracked ice (one-way pits), each with a stair back up to B2's arrival;
+ * off from the hall and reached only by B2's cracked ice (one-way pits), each with a stair back down to B2's arrival;
  * B2's way down lies behind the ice shelf, which opens (the patch `fir_d2_shelf`) only on FIR_D2_SHELF, the flag Hesk's
  * cutscene sets; a safe way round the cracks reaches the shelf; B3's vault lies north-east of the arrival; chests
  * 3 / 4 / 3 and none cuts off a way on; the levistone comes only from the eye's postVictoryCutscene; then the S16 walk
@@ -28,12 +28,13 @@ const SHELF = new Set(['FIR_D2_SHELF']);
 const reaches = (d: Map<string, number>, cells: string[]): boolean => cells.some((c) => d.has(c));
 
 describe('FIR-D2: the Ice Cavern floors', () => {
-  it('B1: the mouth leads to the stair down; the two pockets are not reached from the hall, and each climbs to B2', () => {
+  it('B1: the mouth leads to the stair down; the two pockets are not reached from the hall, and each has its stair back to B2', () => {
     expect(ents(b1, 'overworld')).toEqual(['fir_ice']);
     expect(ents(b1, 'ice-cavern-b2')).toEqual(['arrival']);
     const hall = distances(b1, at(b1, 'arrival'));
     const stairs = b1.transitions.filter((t) => t.targetMap === 'ice-cavern-b2').map((t) => key(t.x, t.y));
-    const down = stairs.filter((c) => Math.abs(Number(c.split(',')[1]) - at(b1, 'down')[1]) <= 2);
+    const near = (c: string, [x, y]: [number, number]): boolean => Math.abs(Number(c.split(',')[0]) - x) <= 2 && Math.abs(Number(c.split(',')[1]) - y) <= 2;
+    const down = stairs.filter((c) => near(c, at(b1, 'down')));
     expect(down.length).toBe(2);
     expect(down.every((c) => hall.has(c))).toBe(true);
     for (const p of ['pocket_w', 'pocket_e']) {

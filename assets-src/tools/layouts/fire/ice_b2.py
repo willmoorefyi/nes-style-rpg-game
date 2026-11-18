@@ -3,8 +3,9 @@
   python3 -I assets-src/tools/layouts/fire/ice_b2.py && python3 -I assets-src/tools/build_map.py ice-cavern-b2
 
 A field of sheet ice in three bands (south, middle, north), split by two ridges of ice rock with necks between them.
-Cracked ice (`%`) does not hold: every cracked cell is a one-way pit down to a pocket of B1 (west of x 22 the west
-pocket, east of it the north-east one), whose stair comes back up to this floor's arrival. The direct necks are
+Cracked ice (`%`) does not hold: the hot spring under it throws whoever breaks through up a meltwater spout, a
+one-way pit into a pocket of B1 (west of x 22 the west pocket, east of it the north-east one), whose stair comes back
+down to this floor's arrival. The direct necks are
 cracked; the safe ones are far round. The north band ends at the ice shelf, a wall of old ice with the hidden stair
 hall behind it: talking to Hesk the ice-cutter plays `fir_d2_shelf`, which sets FIR_D2_SHELF, and the patch
 `fir_d2_shelf` turns the shelf's cells into floor for good. Four chests: three in the field's blind spurs, one in the

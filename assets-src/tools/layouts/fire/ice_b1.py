@@ -5,8 +5,9 @@
 The mouth opens south (WORLD 4.4: below the cliff rows) into a hall of frozen pillars. Three branches leave it: north
 to the stair chamber (the way down) and its blind cutters' alcove; west up a long gully to the frozen fall's grotto
 (a chest, and a dead-end spur); east to the meltwater pool (a chest, a dead-end drain). Two pockets of the floor are
-cut off from the hall: the west pocket and the north-east pocket are reached only by falling through B2's cracked
-ice, and each has a stair back up to B2's arrival (the west one also holds a chest).
+cut off from the hall: the west pocket and the north-east pocket are reached only by breaking through B2's cracked
+ice (the hot spring under it throws you up a meltwater spout), and each has a stair back down to B2's arrival (the
+west one also holds a chest).
 """
 from __future__ import annotations
 
@@ -19,11 +20,11 @@ from ice_common import DONE, Floor, chest, talk  # noqa: E402
 NOTE = ("Concept: a cavern of blue ice under the Frost Hollow, where meltwater from a hot seam far below freezes again "
         "on the way up, and a guild of ice-cutters once quarried the clear ice for the lake town's cellars.\n"
         "Distinct: a hall of frost-whitened pillars with three branches and a frozen fall at the end of one; "
-        "cracked ice that drops you back to a sealed pocket of the floor above, with a stair as the only way out; "
-        "an old ice-cutter who still works the shelf that hides the true stair; a vault where a great eye keeps a "
-        "stone that floats.\n"
-        "Topology: B1 (stair down) -> B2 (two one-way pits back to B1's two pockets, each with a stair up to B2's "
-        "arrival); B2 -> B3 by the stair behind the ice shelf (opened on FIR_D2_SHELF); B3 boss north-east of the "
+        "cracked ice over a hot spring that, when it gives way, throws you up a meltwater spout into a sealed pocket "
+        "of the floor above, with a stair back down as the only way out; an old ice-cutter who still works the "
+        "shelf that hides the true stair.\n"
+        "Topology: B1 (stair down) -> B2 (one-way pits, the cracked cells, up to B1's two pockets, each with a "
+        "stair down to B2's arrival); B2 -> B3 by the stair behind the ice shelf (opened on FIR_D2_SHELF); B3 boss north-east of the "
         "arrival.")
 W, H = 40, 34
 GATE = (19, 20)                          # the bottom-row exit cells, out of the south mouth to the Frost Hollow
@@ -50,8 +51,8 @@ def build() -> Floor:
     g.rect(30, 3, 37, 9, "+")            # the north-east pocket (the pit from B2's east)
     g.faces(2)
     f.stairs_down(19, 5, "ice-cavern-b2", "arrival")
-    f.stairs_up(3, 24, "ice-cavern-b2", "arrival")           # the west pocket's only way out
-    f.stairs_up(34, 1, "ice-cavern-b2", "arrival")           # the north-east pocket's
+    f.stairs_down(3, 27, "ice-cavern-b2", "arrival")         # the west pocket's only way out, back down
+    f.stairs_down(35, 4, "ice-cavern-b2", "arrival")         # the north-east pocket's
     f.transitions += [{"x": x, "y": H - 1, "targetMap": "overworld", "targetEntrance": "fir_ice"} for x in GATE]
     for x, y in ((14, 17), (24, 17), (14, 21), (24, 21), (17, 19), (22, 19)):
         f.pillar(x, y)
@@ -68,7 +69,8 @@ def build() -> Floor:
             (DONE, ["Ice-cutter Brannoc: The cold has gone out of the deep ice. You did that, didn't you? The whole "
                     "cavern sighed an hour ago, like a sleeper turning over."]),
             (None, ["Ice-cutter Brannoc: Mind the white ice below. Where it is crazed like an old plate, it won't "
-                    "hold a cat. My brother went through it once and came up in a hole he'd never seen.",
+                    "hold a cat. My brother went through it once, and the hot spring under it spat him straight up "
+                    "into a hole on this floor he'd never seen.",
                     "The stair you'll find is not the end of it. My father hid the last stair behind a shelf of ice "
                     "on the lower floor, to keep the quarry to ourselves. Old Hesk still sits by it."]))},
     ]
@@ -81,7 +83,7 @@ def main() -> None:
         "A waterfall hangs frozen from the roof, every ripple stopped. Behind the ice, something pale and round "
         "seems to watch you, then is gone."]}]
     print(f.write("b1", "Ice Cavern B1: a hall of frozen pillars with three branches; two sealed pockets.\n" + NOTE,
-                  {"arrival": [GATE[0], H - 3], "down": [19, 7], "pocket_w": [5, 27], "pocket_e": [33, 5]},
+                  {"arrival": [GATE[0], H - 3], "down": [19, 7], "pocket_w": [6, 27], "pocket_e": [32, 5]},
                   extra={"inspect": inspect}, roots=["pocket_w", "pocket_e"]))
 
 

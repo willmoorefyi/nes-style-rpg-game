@@ -4,9 +4,9 @@ the chests and the floor writer. The floors are `ice_b1.py`, `ice_b2.py` and `ic
   python3 -I assets-src/tools/layouts/fire/ice_b1.py   (and _b2, _b3)
   python3 -I assets-src/tools/build_map.py ice-cavern-b1 ice-cavern-b2 ice-cavern-b3
 
-The cave is the `ice` remap (WORLD 4.9) of the stone floor; its walls are the temple walls in the same blue. Sheet ice
-(`+`) is the ice remap at a brighter shade; cracked ice (`%`, the rubble material in ice blue) marks the pits of B2,
-each a one-way transition down to a pocket of B1. Meltwater pools are `≈` (the water material, dark blue-green).
+The cave is the `ice` remap (WORLD 4.9) of the stone floor; its walls are the same ice, darker. Sheet ice (`+`) is the
+ice remap at a brighter shade; cracked ice (`%`, the temple rubble greyed) marks the pits of B2, each a one-way
+transition (a meltwater spout) up into a pocket of B1. Meltwater pools are `≈` (the water material, dark blue-green).
 Chests use `CHEST_FIR_D2_*`; the shelf on B2 opens on FIR_D2_SHELF (a patch, cutscene `fir_d2_shelf`); the eye's
 fight sets EVIL_EYE_DEFEATED and `fir_evil_eye_falls` gives the levistone.
 """

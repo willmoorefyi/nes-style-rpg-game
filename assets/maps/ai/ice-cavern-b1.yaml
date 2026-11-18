@@ -13,12 +13,12 @@ art:
 entrances:
   arrival: [19, 31]
   down: [19, 7]
-  pocket_w: [5, 27]
-  pocket_e: [33, 5]
+  pocket_w: [6, 27]
+  pocket_e: [32, 5]
 collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8,
-  1, 1, 1, 1, 8, 8, 8, 11, 11, 11, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 11, 11, 11, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8,
+  1, 1, 1, 1, 8, 8, 8, 11, 11, 11, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 1, 1, 8, 1, 1, 1, 1, 8, 8, 8, 11, 11, 11, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8,
   8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 11, 11, 11, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8,
   1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 8, 1, 1, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8,
   8, 8, 1, 1, 1, 1, 8, 1, 1, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1,
@@ -30,8 +30,8 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   11, 11, 11, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 1, 8, 8, 8, 8, 1, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 8, 8, 8, 8,
   8, 8, 8, 8, 8, 1, 8, 8, 8, 1, 1, 8, 1, 1, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 8, 8, 8, 1, 1, 8, 1, 1, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8,
+  1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 1, 1, 8, 8,
   8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 8, 8, 8, 8, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -66,15 +66,16 @@ npcs:
   dialog:
   - condition: EVIL_EYE_DEFEATED
     text: ['Ice-cutter Brannoc: The cold has gone out of the deep ice. You did that, didn''t you? The whole cavern sighed an hour ago, like a sleeper turning over.']
-  - text: ['Ice-cutter Brannoc: Mind the white ice below. Where it is crazed like an old plate, it won''t hold a cat. My brother went through it once and came up in a hole he''d never seen.', 'The stair
-        you''ll find is not the end of it. My father hid the last stair behind a shelf of ice on the lower floor, to keep the quarry to ourselves. Old Hesk still sits by it.']
+  - text: ['Ice-cutter Brannoc: Mind the white ice below. Where it is crazed like an old plate, it won''t hold a cat. My brother went through it once, and the hot spring under it spat him straight up into
+        a hole on this floor he''d never seen.', 'The stair you''ll find is not the end of it. My father hid the last stair behind a shelf of ice on the lower floor, to keep the quarry to ourselves. Old
+        Hesk still sits by it.']
 transitions:
 - {x: 19, y: 5, targetMap: ice-cavern-b2, targetEntrance: arrival}
 - {x: 20, y: 5, targetMap: ice-cavern-b2, targetEntrance: arrival}
-- {x: 3, y: 25, targetMap: ice-cavern-b2, targetEntrance: arrival}
-- {x: 4, y: 25, targetMap: ice-cavern-b2, targetEntrance: arrival}
-- {x: 34, y: 2, targetMap: ice-cavern-b2, targetEntrance: arrival}
-- {x: 35, y: 2, targetMap: ice-cavern-b2, targetEntrance: arrival}
+- {x: 3, y: 27, targetMap: ice-cavern-b2, targetEntrance: arrival}
+- {x: 4, y: 27, targetMap: ice-cavern-b2, targetEntrance: arrival}
+- {x: 35, y: 4, targetMap: ice-cavern-b2, targetEntrance: arrival}
+- {x: 36, y: 4, targetMap: ice-cavern-b2, targetEntrance: arrival}
 - {x: 19, y: 33, targetMap: overworld, targetEntrance: fir_ice}
 - {x: 20, y: 33, targetMap: overworld, targetEntrance: fir_ice}
 name: Ice Cavern B1
