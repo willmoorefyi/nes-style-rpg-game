@@ -150,7 +150,8 @@ describe('questLate: the repository', () => {
     for (const p of late) expect(p.failures, p.line).toEqual([]);
     expect(late[0].line).toMatch(/garland L2\.\d \[2,3\]/);
     const built = ctx.world.quest.towns.filter((t) => t.status === 'built').length;     // 0 at W1; WND-O: lufenia
-    expect(late[1].line).toBe(`(e) early shops: OK  (${built} towns, ${8 - built} pending)`);
+    // with every town built the line drops its `pending` part (INT-W2c, after the last region merged)
+    expect(late[1].line).toBe(`(e) early shops: OK  (${built} towns${built < 8 ? `, ${8 - built} pending` : ''})`);
   });
 
   it('the price walls are exactly crescent and gaia (WORLD 3.5)', () => {
