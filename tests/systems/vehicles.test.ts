@@ -18,7 +18,7 @@ import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { PlayerController } from '../../src/entities/PlayerController.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
 import { Inventory } from '../../src/entities/Inventory.js';
-import { FieldVehicles, CANT_LAND, fieldModeOf } from '../../src/scenes/exploration/FieldVehicles.js';
+import { FieldVehicles, CANT_LAND, NO_CANOE_HINT, fieldModeOf } from '../../src/scenes/exploration/FieldVehicles.js';
 import type { Game } from '../../src/core/Game.js';
 import type { Direction } from '../../src/rendering/SpriteAnimation.js';
 import { createMapData } from '../helpers/testUtils.js';
@@ -195,6 +195,29 @@ describe('vehicles: the field (FieldVehicles, QUEST 4.2 browser row)', () => {
     f.walk('left');                             // the bank (2, 4)
     expect(f.game.fieldMode).toBe('walking');
     expect(f.game.vehicles).toEqual([]);
+  });
+
+  it('P3-11: pressing toward the river without a canoe gives the hint; with a canoe, or elsewhere, nothing', () => {
+    const pressed = (f: ReturnType<typeof field>, dir: string | null): void => {
+      f.game.input.isJustPressed = (a: string) => a === dir;
+    };
+    const f = field();
+    f.walk('left', 2);                          // (4, 6), the river is at x 3
+    expect(f.at()).toEqual([4, 6]);
+    pressed(f, 'left');
+    expect(f.fv.bankHint(f.player)).toBe(NO_CANOE_HINT);
+    pressed(f, 'up');                           // dry land ahead: no line
+    expect(f.fv.bankHint(f.player)).toBeNull();
+    pressed(f, null);                           // no fresh press (a held key does not repeat the line)
+    expect(f.fv.bankHint(f.player)).toBeNull();
+    const withCanoe = field({ items: ['canoe'] });
+    withCanoe.walk('left', 2);
+    pressed(withCanoe, 'left');
+    expect(withCanoe.fv.bankHint(withCanoe.player)).toBeNull();
+    const sea = field();
+    sea.walk('right', 3);                       // the jetty's tip: the sea ahead is the ship's, not the canoe's
+    pressed(sea, 'up');
+    expect(sea.fv.bankHint(sea.player)).toBeNull();
   });
 
   it('confirm on the parked airship takes off; over a forest it can\'t land; over grass it lands and parks', () => {

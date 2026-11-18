@@ -107,5 +107,14 @@ f2.npcs += [
 f2.write("Sky Castle 2F: the light-bridge maze; islands over the sky, joined by bridges and one-way belts.",
          {"arrival": [8, 26], "east": [36, 26], "up": [21, 5], "c_belt": [7, 8], "d_belt": [31, 15],
           "e_belt": [24, 6], "f_belt": [19, 15]}, table=LOWER, bg="sky_palace", script=SCRIPT,
-         extra={"no_unreachable_walkable": {"reach_roots": ["east"]}})
+         extra={"no_unreachable_walkable": {"reach_roots": ["east"]},
+                # a belt carries one way only: chart them before trusting one (no belt is named here)
+                "inspect": [
+                    {"x": 10, "y": 25, "text": [
+                        "Amber light runs along the belts like water in a gutter. The glyphs at this brazier say: "
+                        "\"Each belt carries one way. The stair's island is fed from the east, and the belt that leaves "
+                        "it runs back toward the north-west.\""]},
+                    {"x": 34, "y": 25, "text": [
+                        "Scratched under the brazier's rim: \"A belt does not carry you back. Look for the island "
+                        "that feeds the stair before you trust a bridge.\""]}]})
 print("sky-castle-1f, sky-castle-2f written")

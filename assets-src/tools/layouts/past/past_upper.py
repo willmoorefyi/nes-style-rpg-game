@@ -75,7 +75,11 @@ lich = f1.boss({"id": "past_lich", "sprite": "old_man", "tint": "#9fc4e0", "x": 
                "flank him.")
 f1.write("Temple of the Past 1: a ring of collapsed cloisters; the Rime Sovereign holds the chapter house.",
          {"arrival": [19, 37], "down": [15, 6], "down_east": [24, 6], "boss": [19, 7]}, table=UPPER, script=SCRIPT,
-         extra={"scriptedEncounters": [lich]})
+         extra={"scriptedEncounters": [lich],
+                # P3-05: nothing else says the second stair leads anywhere the first does not
+                "inspect": [{"x": 23, "y": 3, "text": [
+                    "A plaque under the brazier is worn smooth, but two lines can still be read: \"Two stairs, two "
+                    "houses.\" \"What the west stair keeps shut, the east stair opens to those who go down by it.\""]}]})
 
 # ════════════════════════════ floor 2: the sealed cross ════════════════════════════
 f2 = Room("past-temple-2", "Temple of the Past 2", 44, 44)

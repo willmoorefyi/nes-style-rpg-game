@@ -6,8 +6,9 @@ import { dueEncounterWhere, npcOutcome, type FieldState, type NpcOutcome } from 
 import { ClassRegistry } from '../../data/ClassRegistry.js';
 import { upgradeParty } from '../../systems/ClassUpgradeSystem.js';
 import { clinicQuote, DEFAULT_CLINIC_PRICE } from '../../systems/clinic.js';
-import { foundText, leftBehindText, receivedText, cantCarryText } from '../../systems/pickupText.js';
+import { foundText, leftBehindText, receivedText, cantCarryText, pickupName } from '../../systems/pickupText.js';
 import { ClinicScene } from '../ClinicScene.js';
+import { PurchaseScene } from '../PurchaseScene.js';
 import { openShopScene } from './FieldSystems.js';
 import { fieldStateOf } from './FieldVehicles.js';
 
@@ -32,6 +33,8 @@ function npcDef(npc: NPC): MapNPC {
 
 /** The scene name the clinic's question is pushed under (re-registered on every visit). */
 export const CLINIC_SCENE = '_clinic';
+/** The scene name a trader's "Pay N G?" question is pushed under (re-registered on every visit). */
+export const PURCHASE_SCENE = '_purchase';
 
 /**
  * Talking to an NPC in the field (docs/WORLD_PLAN.md 5.1-5.2; W1-B): chests, gifts, trades (`requiredItem`,
@@ -82,6 +85,7 @@ export class FieldNpcActions {
       console.error(`NPC trade: the party can't pay ${out.take.gold} G`);
       return;
     }
+    if (out.take?.gold) lines.push(`You paid ${out.take.gold} G.`);
     if (out.give) {
       game.inventory.add(out.give, 1);
       lines.push(receivedText(out.give));
@@ -109,11 +113,12 @@ export class FieldNpcActions {
     }
     if (npc.dialog.length > 0) {
       const lines = out.dialog;
-      if (out.give || out.setFlags.length > 0) this.applyGift(out, lines);
+      // a sale for gold waits for the player's Yes (after the dialog); every other gift is given at once
+      if ((out.give || out.setFlags.length > 0) && !out.take?.gold) this.applyGift(out, lines);
       if (lines.length > 0) {
         // the post-dialog action: a shop, the class upgrade, the clinic, a cutscene, a fight it starts (B1)
         const after = this.outcome(npc); // on the flags as they are now (a gift's flag may start a cutscene)
-        if (npc.shopId || after.action || after.cutscene || after.battle !== undefined) this.pending = npc;
+        if (npc.shopId || after.take?.gold || after.action || after.cutscene || after.battle !== undefined) this.pending = npc;
         dialog.start(lines);
         return true;
       }
@@ -135,6 +140,10 @@ export class FieldNpcActions {
       this.host.startEncounter(fight);
       return true;
     }
+    if (this.outcome(npc).take?.gold) {
+      this.openPurchase(npc);
+      return true;
+    }
     const cutscene = this.outcome(npc).cutscene;
     const def = this.def(npc);
     if (cutscene) {
@@ -154,6 +163,26 @@ export class FieldNpcActions {
     }
     if (npc.shopId) openShopScene(this.host.game, npc.shopId);
     return true;
+  }
+
+  /** P2-09: a sale for gold asks Yes / No; Yes pays, hands over the gift and says so, No leaves the offer standing. */
+  private openPurchase(npc: NPC): void {
+    const { game, dialog } = this.host;
+    const out = this.outcome(npc);
+    const gold = out.take?.gold ?? 0;
+    const what = out.give ? pickupName(out.give) : 'this';
+    const pay = (yes: boolean): void => {
+      if (!yes) {
+        dialog.start(['Another time, then.']);
+        return;
+      }
+      const lines: string[] = [];
+      const now = this.outcome(npc); // on the state as it is now
+      if (now.take?.gold) this.applyGift(now, lines);
+      if (lines.length > 0) dialog.start(lines);
+    };
+    game.scenes.register(PURCHASE_SCENE, new PurchaseScene(game, `Pay ${gold} G for ${what}?`, pay));
+    game.scenes.push(PURCHASE_SCENE).catch((e) => console.error('Purchase failed to open:', e));
   }
 
   /** The class upgrade on the NPC's `actionFlag` (GAP-8), and its messages in the dialog box. */
