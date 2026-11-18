@@ -146,6 +146,7 @@ describe('questLate: the repository', () => {
 
   it('the price walls are exactly crescent and gaia (WORLD 3.5)', () => {
     expect(ctx.world.quest.towns.filter((t) => walled(ctx, t)).map((t) => t.id)).toEqual(['crescent', 'gaia']);
-    expect(late[2].line).toBe('(f) price walls: OK  crescent pending  gaia pending');
+    // each wall reads `pending` until the stages before its town are built, then `<gold>/<price>` (FIR-T merge)
+    expect(late[2].line).toMatch(/^\(f\) price walls: OK {2}crescent (pending|\d+\/\d+) {2}gaia (pending|\d+\/\d+)$/);
   });
 });

@@ -1806,6 +1806,52 @@
   enemies: []
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
+# S14 (docs/WORLD_PLAN.md 5.3, 6.5): the party at Crescent's land gate (overworld fir_crescent) with the band-low
+# level 17, the previous band's kit (w_s13, B4), every flag through S13 and the lute, and the ship moored at the
+# fir_crescent dock. `_start`: walk the causeway to the Circle and talk to the elder (CANOE_GIVEN, the canoe), then
+# step onto the lake east of the town (mode canoe). `_early` is the classic early visit right after the canal (S10's
+# grants, level 13, the B3 kit w_s10, no EARTH_CRYSTAL_LIT): the shops are open at B5 prices and the elder says the
+# earth must heal first.
+- id: w_s14_start
+  name: W FIR-T - S14 Crescent Lake (the elder's canoe)
+  mode: field
+  map: overworld
+  entrance: fir_crescent
+  fieldMode: walking
+  vehicles: &firt_ship
+    - { type: ship, map: overworld, x: 146, y: 124 }
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT]
+  party:
+    - { class: warrior, name: WAR, level: 17, equipment: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 17, equipment: [scimitar, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 17, equipment: [mythril_hammer, gold_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: pure, level: 4 }] }
+    - { class: black_mage, name: BLM, level: 17, equipment: [mythril_knife, gold_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
+  items: { potion: 6, lute: 1, rod: 1 }
+  gold: 3000
+  enemies: []
+- id: w_s14_early
+  name: W FIR-T - S14 early visit after the canal (no earth crystal)
+  mode: field
+  map: overworld
+  entrance: fir_crescent
+  fieldMode: walking
+  vehicles: *firt_ship
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN]
+  party:
+    - { class: warrior, name: WAR, level: 13, equipment: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+    - { class: thief, name: THF, level: 13, equipment: [mythril_knife, silver_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 13, equipment: [mythril_hammer, silver_armlet, cap],
+        spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 }] }
+    - { class: black_mage, name: BLM, level: 13, equipment: [mythril_knife, silver_armlet, cap],
+        spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }] }
+  items: { potion: 6, lute: 1 }
+  gold: 1500
+  enemies: []
 # === end FIR-T ===
 # === FIR-D1 (pass W: owned by FIR-D1) ===
 # === end FIR-D1 ===

@@ -10,13 +10,37 @@ art:
   below: [assets/maps/ai/crescent-house-astronomer/below_0_0.png]
   above: [null]
 entrances:
-  door: [5, 8]
-collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1]
-npcs: []
+  door: [3, 8]
+collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 1, 1, 1, 8, 1, 1, 1, 8, 8, 1, 1, 8, 8, 8, 1, 8, 8, 1, 1, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 1, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1]
+npcs:
+- id: chest_fir_t_astronomer
+  sprite: chest
+  x: 10
+  y: 6
+  chestItem: ether
+  chestFlag: CHEST_FIR_T_ASTRONOMER
+  dialog: [You found an Ether!]
+- id: astronomer
+  sprite: white_wizard
+  x: 2
+  y: 6
+  dialog:
+  - condition: CANOE_GIVEN
+    text: ['I watched your canoe cross the lake through the small glass. You paddle like scholars: earnestly.', 'The rivers run out of the lake south and south-east. One ends in fire, the other in ice.']
+  - condition: EARTH_CRYSTAL_LIT
+    text: ['The earth crystal''s light reached us on a clear night. A green star, low in the west. It was beautiful.', 'Now two new lights show in the south: a red one that pulses, and a white one that
+        never moves.']
+  - text: ['My charts show the stars dimming at the edges of the sky, one a season. The sages call it the decay.', 'The worst of it lies west, under the land. The earth''s own light is going out.']
+  tint: '#d8c8f0'
+- id: astronomer_son
+  sprite: villager
+  x: 5
+  y: 7
+  dialog: [Mother stays up all night and sleeps all day. I've learned to cook breakfast at sunset.]
 transitions:
-- {x: 5, y: 9, targetMap: crescent, targetEntrance: house_astronomer}
-name: Crescent Lake Astronomer House
+- {x: 3, y: 9, targetMap: crescent, targetEntrance: house_astronomer}
+name: Astronomer's House
 music: town
 encounterRate: {min: 999, max: 999}
 encounters: []
