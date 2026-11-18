@@ -19,3 +19,7 @@ frames:
   hurt_in1: {moves: [crown, neck], dx: -1}   # the hood snaps back, the robe pushed back 1
   hurt_in2: {moves: [], dx: -2}              # the recoil 2 px past the key (idle-hurt overlap peaks 4 px left)
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai

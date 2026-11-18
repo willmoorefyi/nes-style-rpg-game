@@ -132,3 +132,10 @@ frames:
 holds: []
 paint:                         # 1 px joint crack (near thigh under the shifted belly) closed with outline ink
   - {frame: atk_follow, xy: [[43, 64]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  offset: [-1, 1]                # K-ground: the key 1 px above the feet row; K-fit: the beak on the right cell border
+  bridge: {keep_top: 0.2, u: [0.2, 0.2]}   # the lowered head in the middle band (bird row, section 4); it2: u 0.2
+                                 # (it1 T5: the mass move shuffled the front foot; now 81 -> 83 -> 84 -> 85)

@@ -50,3 +50,8 @@ paint:                          # cracks where the dropped face meets the left f
   - {frame: atk_mid, xy: [[41, 61], [42, 61], [43, 61], [44, 61], [45, 61], [47, 61], [42, 62], [43, 62], [44, 62], [45, 62], [46, 62]], rgb: [156, 33, 33]}
   - {frame: atk_mid, xy: [[41, 62]], rgb: [41, 0, 33]}
   - {frame: hurt_in1, xy: [[50, 47], [51, 48], [52, 49], [53, 52]], rgb: [255, 156, 33]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  offset: [0, 1]                 # K-ground (floating): the key's base 1 px above the idle's lowest row

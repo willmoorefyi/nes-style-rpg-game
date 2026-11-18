@@ -20,3 +20,8 @@ frames:
 holds: []
 paint:                          # 1 px crack where the turned robe meets the outstretched sleeve, inked
   - {frame: atk_mid, xy: [[51, 38]], rgb: [6, 4, 10]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  offset: [0, 1]                 # K-ground (floating): the key's base 1 px above the idle's lowest row

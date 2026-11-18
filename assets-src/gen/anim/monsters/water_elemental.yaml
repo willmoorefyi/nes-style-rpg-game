@@ -33,3 +33,7 @@ frames:                         # idle-sourced frames shift by -round(d/2), key-
   daze: {moves: [], t: 0.0, dy: 3, tweaks: {crown: [-2, -2], neck: [-2, -2]}}   # sinks 3 / 4 (the tweaks cancel the
   daze_b: {moves: [], t: 0.0, dy: 4, tweaks: {crown: [-2, -2], neck: [-2, -2]}} # recipe's head droop: it creased)
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai

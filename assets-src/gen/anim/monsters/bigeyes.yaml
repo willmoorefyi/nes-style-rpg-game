@@ -16,3 +16,9 @@ frames:
   atk_wind2: {moves: [], dx: -4, dy: 2}
   hurt_in1: {moves: [], dx: -3}              # knocked back 3
 holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  bridge: {u: [0.35, 0.15]}      # it2: the width remap back on (it1 T2: a size pop at the swap); in2 kept near the key so its
+                                 # column seams do not double the inner outline ring

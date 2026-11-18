@@ -144,3 +144,8 @@ frames:
 seam_tolerance: 2               # the approved sliver between the two spread wings (attack key, x 63-66, y 62-75)
 holds: []
 paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+kneel:
+  source: ai
+  bridge: {shear: false}         # it2: the sheared frames shuffled the feet (it1 T5)
