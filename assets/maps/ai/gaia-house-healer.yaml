@@ -10,13 +10,36 @@ art:
   below: [assets/maps/ai/gaia-house-healer/below_0_0.png]
   above: [null]
 entrances:
-  door: [5, 8]
-collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8,
-  8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1]
-npcs: []
+  door: [3, 8]
+collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 8, 8, 8, 1, 8, 1, 8, 8, 8, 1, 1, 8, 8, 8,
+  8, 8, 8, 1, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1]
+npcs:
+- id: gaia_healer
+  sprite: white_mage
+  x: 3
+  y: 5
+  dialog: ['Bring your fallen here, to the light. I can call them back, for a price that pays for the oil.']
+  action: clinic
+  clinicPrice: 120
+- id: gaia_patient
+  sprite: burgher
+  x: 9
+  y: 4
+  dialog:
+  - condition: FAIRY_FREED
+    text: ['The fever''s breaking, the healer says. It''s the clean air. I could have told her that.']
+  - text: [Dead air sits in the chest. Half the town wheezes. I'm the half that complains.]
+- id: gaia_healer_novice
+  sprite: mage
+  x: 4
+  y: 7
+  dialog:
+  - condition: FAIRY_FREED
+    text: [The healer says I can take the cots outside to air. In the wind! Like we used to!]
+  - text: [We burn sage to keep the air moving in here. It isn't the same as a window and a breeze.]
 transitions:
-- {x: 5, y: 9, targetMap: gaia, targetEntrance: house_healer}
-name: Gaia Healer House
+- {x: 3, y: 9, targetMap: gaia, targetEntrance: house_healer}
+name: Healer's House
 music: town
 encounterRate: {min: 999, max: 999}
 encounters: []

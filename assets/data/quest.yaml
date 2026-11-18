@@ -574,10 +574,18 @@ stages:
     maps: [gaia, gaia-*]
     zones: [overworld:wnd_highlands]
     grind: 2.0
-    walk: []
+    # WND-T: on foot at Gaia's land gate in the mountain bowl, the airship on the bowl's grass floor beside it (S17);
+    # the ship (S2) rides at anchor far out at sea, out of reach of any shore, so no ancestor's pending dock can strand
+    # the party in assume mode (WND-O's S26 practice). With every unbuilt stage's events open to a flying party, proof
+    # (c) from here explores about 243000 states
+    entry: {map: overworld, x: 150, y: 14, mode: walking, vehicles: [{type: airship, map: overworld, x: 152, y: 16},
+                                                                      {type: ship, map: overworld, x: 172, y: 62}]}
+    walk: [overworld:warp:gaia, gaia:warp:gaia-spring, gaia-spring:npc:gaia_spring_warden]
     basins: {}
-    nonLoadBearing: []
-    status: pending
+    nonLoadBearing:
+      # the generic mutation list (QUEST 5.4: a patch forced on): the spring's water is art and terrain only
+      - {map: gaia-spring, kind: patch, at: [8, 5], reason: "the basin fills with water once the fairy is freed; it is a dead end beside the warden and gates nothing"}
+    status: built
   # === end WND-T ===
   # === WND-D1 (pass W: owned by WND-D1) ===
   - id: S27
@@ -721,5 +729,5 @@ towns:
     opensAfter: [S17]
     bandStage: S23
     kit: w_gaia
-    status: pending
+    status: built
   # === end WND-T town ===

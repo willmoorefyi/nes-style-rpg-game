@@ -470,6 +470,41 @@
       text: "\"Climb, and if the one up there still listens to anything, let it hear that the wind is missed.\""
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
+# S23 (docs/WORLD_PLAN.md 4.7): played by the spring warden in gaia-spring (npc gaia_spring_warden, requiredItem
+# fairy_bottle, onceFlag FAIRY_FREED). It takes the bottle, frees the fairy (FAIRY_FREED: the patch wnd_spring_flows
+# fills the basin) and gives the Oxyale; the warp reloads the hollow behind the fade, so the water and the fairy
+# (showIf FAIRY_FREED) are there when it fades back in. Every line is new.
+- id: wnd_fairy_freed
+  steps:
+    - type: dialog
+      text: "You work the wax out of the bottle's neck. The light inside presses against the glass, toward the basin."
+    - type: take_item
+      item: fairy_bottle
+    - type: dialog
+      text: "The stopper comes free. A bead of light no bigger than a thumbnail shoots out and dives into the dry sand."
+    - type: fade_out
+      duration: 600
+    - type: set_flag
+      flag: FAIRY_FREED
+    - type: give_item
+      item: oxyale
+    - type: warp
+      map: gaia-spring
+      x: 10
+      y: 11
+      facing: up
+    - type: wait
+      duration: 500
+    - type: fade_in
+      duration: 700
+    - type: dialog
+      text: "Water wells up over the spring-stone and spills into the basin. A cold gust rolls out of the hollow and down over Gaia."
+    - type: dialog
+      text: "Fairy: \"A whole year of glass walls and that trader's snoring! I thought I would be a lamp on a shelf forever.\""
+    - type: dialog
+      text: "Fairy: \"Here, a draught from the heart of the spring, the Oxyale. One sip and the deep water lets you breathe.\" Received the Oxyale."
+    - type: dialog
+      text: "Fairy: \"Something is choking the sea off Onrac, the way the glass choked me. Go down and see.\""
 # === end WND-T ===
 # === WND-D1 (pass W: owned by WND-D1) ===
 # === end WND-D1 ===
