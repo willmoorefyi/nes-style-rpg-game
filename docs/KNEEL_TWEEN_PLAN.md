@@ -793,7 +793,7 @@ after the switch; no other column differs).
 | T-G9 | ledger / approved diff against `a7d423f4` | no ledger change; `approved/` only `_retired/*_kneel_v1/` additions (172 files) | pass |
 
 Contact GIFs (all 135 sprites at game display scale: monsters at their atlas scale 2 / 3, heroes 2; idle -> kneel_in1
--> kneel_in2 -> hold -> rise, game timing): `/tmp/kt3/contact_all.gif` (copied to `~/Desktop/kneel_tween_all.gif`) and
+-> kneel_in2 -> hold -> rise, game timing): `/tmp/kt3/contact_all.gif` (copied to `~/temp/ff-game/kneel_tween_all.gif`) and
 per group `/tmp/kt3/contact_{pilot,A_small_bipeds,B_large_bipeds,C_quadrupeds,D_heroes,E_floaters_birds,F_serpents_bugs_blobs}.gif`.
 
 ## TODOs

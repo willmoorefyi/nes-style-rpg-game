@@ -3,7 +3,7 @@
 Tester PLAY-R, branch `play-r` from mainline ff48a244 (after the FX-D merge). Dev server 127.0.0.1:5261, own headless
 Chromium (Playwright), keyboard input only, `mute=1&trace=1` on every URL. `window.__game` was only read (dialog text,
 NPC lists, positions, flags); nothing was written to it, so there was no between-fight healing and no forced battles.
-Scratch scripts and logs: `/tmp/play-r/`; screenshots: `~/Desktop/play_r/` (62 files). No game code was changed.
+Scratch scripts and logs: `/tmp/play-r/`; screenshots: `~/temp/ff-game/play_r/` (62 files). No game code was changed.
 
 30 runs in total: 30 with 0 console errors, 0 page errors, 0 crashes, 0 lost WebGL contexts, and no unplanned
 switch to the Title (the only `switchTo title` after the start was the planned one after the end card).
