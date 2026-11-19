@@ -13,12 +13,15 @@ sys.path.insert(1, str(HERE.parents[1]))
 sys.path.insert(0, str(HERE))
 import town_onrac_site as ONRAC  # noqa: E402  (WAT-T's file: icon cells, door, gate)
 from kit import landmark_parts  # noqa: E402
+from world_dress import door_sides, ring_of, scatter  # noqa: E402
 from world_water_land import CRATE, FALLS, LEDGE, TENT  # noqa: E402
 
 WATERFALL_DOOR = (FALLS[0], FALLS[1] + 2)        # the falls' bottom-left cell: behind the curtain of water
 WATERFALL_ARRIVAL = (LEDGE[-1][0], LEDGE[-1][1])   # the ledge cell below the door (anchor wat_waterfall, (30, 11))
 TENT_DOOR = (TENT[0], TENT[1] + 1)               # the tent's bottom-left cell, its flap
 CARAVAN_ARRIVAL = (TENT[0], TENT[1] + 2)         # the anchor wat_caravan, (8, 28)
+DRESS_SEED = 5271                                # Onrac's scattered dressing (world_dress.scatter)
+LANDING = (26, 39)                               # the airship's landing beside the gate (quest.yaml S24's entry)
 CAIRN = (29, 29)                                 # at the meadow's canoe launch, where the gorge opens
 POST = (13, 28)                                  # the oasis signpost
 CAIRN_TEXT = ["A cairn of pale river stones. Scratched into the top one: a small boat nosing up a line of water "
@@ -26,28 +29,28 @@ CAIRN_TEXT = ["A cairn of pale river stones. Scratched into the top one: a small
 POST_TEXT = ["Words burned into the post: SWEET WATER HERE. THE CAMP TRADES FAIR. NO CREDIT."]
 
 
-def _icon(cells: list[tuple[int, int]], door: tuple[int, int]) -> list[dict]:
+def _icon(cells: list[tuple[int, int]], door: tuple[int, int], g) -> list[dict]:
     """Onrac's icon over the site's 3x3 icon cells (FX-D P3-13): the approved walled-town icon (its drawn row,
-    `town_icon_1_*`, 2x1: the top row of the sheet is empty) on the bottom row with the door in its left cell, the
-    other cells the firs and rocks of the cliff top behind it (every cell drawn, so the whole box stays blocked art;
-    decos may not overlap, so the town and its rim are separate decos). The old icon was a snow-roofed house."""
+    `town_icon_1_*`, 2x1: the top row of the sheet is empty) on the bottom row with the door in its left cell, and
+    round it the firs and rocks of the cliff top scattered by a seeded generator (FX-R P3-R4: varied kinds and
+    offsets, with gaps; before, an exact 3x3 ring). The old icon was a snow-roofed house."""
     xs, ys = [c[0] for c in cells], [c[1] for c in cells]
     x0, y0, w, h = min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
     assert (w, h) == (3, 3) and door[1] == y0 + h - 1 and x0 <= door[0] <= x0 + 1, \
         "Onrac's icon: 3x3, the door on its bottom row, left of the right column"
-    side = x0 + 2 if door[0] == x0 else x0            # the bottom-row cell the town icon leaves free
+    gx, gy = ONRAC.GATE
+    taken = {door, (door[0] + 1, door[1]), ONRAC.GATE, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), LANDING}
     return [
         {"type": "deco", "name": "onrac", "x": door[0], "y": door[1], "parts": [["town_icon_1_0", "town_icon_1_1"]],
          **({"walk_cells": [[0, 0]]} if town_built() else {})},        # the door opens once WAT-T builds the town
-        {"type": "deco", "name": "onrac_cliff", "x": x0, "y": y0,
-         "parts": [["tree_clump", "boulder", "tree_clump"], ["boulder", "tree_clump", "tree_clump"]]},
-        {"type": "deco", "name": "onrac_firs", "x": side, "y": door[1], "parts": [["boulder"]]},
+        *scatter(cells, taken, DRESS_SEED, ring_of(cells), lambda c: g.inside(*c) and g[c] == ".",
+                door_sides(door, cells, taken), ONRAC.GATE),
     ]
 
 
-def objects() -> list[dict]:
+def objects(g) -> list[dict]:
     return [
-        *_icon(ONRAC.ICON, ONRAC.DOOR),
+        *_icon(ONRAC.ICON, ONRAC.DOOR, g),
         # the cave lies behind the curtain: the falls' bottom-left cell is the walkable door
         {"type": "deco", "name": "waterfall", "x": FALLS[0], "y": FALLS[1], "parts": landmark_parts("waterfall"),
          "walk_cells": [[0, 2]]},

@@ -17,10 +17,12 @@ ground never depends on PYTHONHASHSEED.
 """
 from __future__ import annotations
 
+from functools import lru_cache
+
 import numpy as np
 
 from world_api import BOXES, GRASS, MOUNTAIN, WATER, WORLD_H, WORLD_W, Cell
-from world_coast import organic, tidy
+from world_coast import organic, tidy, wobble
 
 FOREST, SAND, COBBLE = "f", "s", ":"
 
@@ -66,6 +68,62 @@ COAST_SEED, COAST_AMP = 4303, 16.0
 KEEP_LAND = [(17, 104, 23, 112), (28, 109, 31, 113), (38, 109, 42, 115), (28, 120, 39, 127), (34, 130, 37, 133),
              (34, 102, 37, 106)]
 CONTINENT_X1 = 42                              # the strait (x 43-48) stays open water on every row
+# FX-R (P3-R3): the range meanders (a seeded centre and width per row) instead of holding x 24-27 from coast to
+# coast; it keeps x 24-27 round the giant's tunnel (y 104-116) and stays clear of the copses either side (x 21-30)
+RANGE_SEED, RANGE_SPAN = 4417, (21, 30)
+# FX-R (P3-R3): the isthmus' coasts (isthmus_coasts): a ragged north cape, the downs' coasts wandering
+ISTHMUS_SEED = 4547
+# the hogback's north cape (y 71-77): row -> (first, last) land column; y 76-77 were x 50-61 before
+NORTH_CAPE = {71: (55, 57), 72: (54, 58), 73: (52, 58), 74: (51, 59), 75: (51, 60), 76: (50, 60), 77: (50, 61)}
+
+
+def _no_spikes(xs: list[int], sign: int) -> list[int]:
+    """Remove every one-row step of a coast towards the land (sign +1: a west coast's peak, -1: an east coast's
+    dip), so no water notch is a single row tall (min_blob ocean_inlet 2)."""
+    xs = list(xs)
+    for _ in range(4):
+        for i in range(1, len(xs) - 1):
+            if sign * (xs[i] - xs[i - 1]) > 0 and sign * (xs[i] - xs[i + 1]) > 0:
+                xs[i] = max(xs[i - 1], xs[i + 1]) if sign > 0 else min(xs[i - 1], xs[i + 1])
+    return xs
+
+
+@lru_cache(maxsize=None)
+def _range_noise() -> tuple[list[int], list[int], list[int]]:
+    """The range's per-row centre shift and its west and east width offsets (whole cells)."""
+    shift, lo, hi = (wobble(RANGE_SEED + k, WORLD_H, st, amp) for k, st, amp in ((0, 9, 3.5), (1, 5, 1.5), (2, 6, 1.5)))
+    return shift, lo, hi
+
+
+def range_span(y: int) -> tuple[int, int]:
+    """The western range's core columns on row y (inclusive)."""
+    shift, lo, hi = _range_noise()
+    damp = min(1.0, max(0.0, (abs(y - 110) - 6) / 8))
+    s = int(round(shift[y] * damp))
+    x0, x1 = RANGE_X[0] + s + min(0, lo[y]), RANGE_X[1] + s + max(0, hi[y])
+    if 104 <= y <= 116:
+        x0, x1 = max(x0, RANGE_X[0]), min(x1, RANGE_X[1])
+    if 116 <= y <= 128:
+        x1 = min(x1, RANGE_X[1])
+    x0, x1 = max(x0, RANGE_SPAN[0]), min(x1, RANGE_SPAN[1])
+    return min(x0, x1 - 2), x1
+
+
+def isthmus_coasts() -> dict[int, tuple[int, int]]:
+    """Per row y 71-109, the isthmus' first and last land columns. The hogback's body (y 78-91) keeps its old full
+    width: its peaks are drawn by its chunk (x 48-63, y 80-95), whose rim art reaches A1's chunk at x 64, so any change
+    there repaints a chunk EARTH does not own. Its north end runs out into a ragged cape (y 71-77, NORTH_CAPE), and the
+    downs south of the canal wander between x 49-51 and x 59-61 (full width along the landing cove, y 100-108)."""
+    rows = list(range(96, 110))
+    w = _no_spikes([ISTHMUS_X[0] + 1 + v for v in wobble(ISTHMUS_SEED, len(rows), 3, 2.5)], +1)
+    e = _no_spikes([ISTHMUS_X[1] - 1 + v for v in wobble(ISTHMUS_SEED + 1, len(rows), 3, 2.5)], -1)
+    out = dict(NORTH_CAPE)
+    out.update({y: ISTHMUS_X for y in range(78, 96)})
+    for i, y in enumerate(rows):
+        x0 = min(max(w[i], ISTHMUS_X[0]), ISTHMUS_X[0] + 2)
+        x1 = ISTHMUS_X[1] if 100 <= y <= 108 else max(min(e[i], ISTHMUS_X[1]), ISTHMUS_X[1] - 2)
+        out[y] = (x0, x1)
+    return out
 
 
 def continent(band: set[Cell]) -> np.ndarray:
@@ -110,15 +168,16 @@ def ground(band: set[Cell]) -> dict[Cell, str]:
     cols = {x: [y for y in range(WORLD_H) if land[y, x]] for x in range(20, 32)}
     for x, ys in cols.items():                     # the range's sea-cliffs: both tips are wall from coast to coast
         _blob(g, [(x, y) for y in ys[:2] + ys[-2:]], MOUNTAIN)
-    # the western range: the core columns on every land row, crags spilling one cell either side
+    # the western range: the core columns of every land row (range_span), crags spilling one cell either side
     for y in range(WORLD_H):
-        for x in range(RANGE_X[0], RANGE_X[1] + 1):
+        x0, x1 = range_span(y)
+        for x in range(x0, x1 + 1):
             _blob(g, [(x, y)], MOUNTAIN, land_only=True)
         if not 106 <= y <= 113:
-            if _h(23, y, 4) % 3 == 0:
-                _blob(g, [(23, y)], MOUNTAIN, land_only=True)
-            if _h(28, y, 5) % 3 == 0 and not 121 <= y <= 127:
-                _blob(g, [(28, y)], MOUNTAIN, land_only=True)
+            if _h(x0 - 1, y, 4) % 3 == 0:
+                _blob(g, [(x0 - 1, y)], MOUNTAIN, land_only=True)
+            if _h(x1 + 1, y, 5) % 3 == 0 and not 121 <= y <= 127:
+                _blob(g, [(x1 + 1, y)], MOUNTAIN, land_only=True)
     # the giant's tunnel mouths: the deco cells are crag, the door cells walkable
     _blob(g, _rect(28, 110, 29, 111) + _rect(21, 110, 23, 111), MOUNTAIN)
     for c in (GIANT_EAST_DOOR, GIANT_WEST_DOOR, GIANT_EAST, GIANT_WEST, (29, 112), (22, 112)):
@@ -130,7 +189,7 @@ def ground(band: set[Cell]) -> dict[Cell, str]:
     _blob(g, _wood(31, 114, 34, 117), FOREST, land_only=True)
     # the grey badlands: sand, the Cavern's mesa (its mouth deco on the south face), a second rock table
     for y in range(BADLANDS_Y, WORLD_H):
-        for x in range(28, 43):
+        for x in range(min(28, range_span(y)[1] + 1), 43):
             if g.get((x, y)) == GRASS:
                 g[(x, y)] = SAND
     _blob(g, _rect(28, 121, 33, 123) + _rect(28, 124, 29, 126) + _rect(30, 124, 31, 125), MOUNTAIN)
@@ -142,10 +201,10 @@ def ground(band: set[Cell]) -> dict[Cell, str]:
     _blob(g, _rect(17, 105, 20, 108), MOUNTAIN)
     g[SAGE_DOOR], g[SAGE_GATE] = GRASS, GRASS
     # the isthmus: hogback, saddle, downs, the hall's ridge, the landing cove
-    for y in range(76, 110):
-        for x in range(ISTHMUS_X[0], ISTHMUS_X[1] + 1):
+    for y, (x0, x1) in isthmus_coasts().items():   # FX-R: wandering coasts (isthmus_coasts)
+        for x in range(x0, x1 + 1):
             g[(x, y)] = MOUNTAIN if y < CANAL_ROWS[0] else GRASS
-    for y in (76, 77, 90, 91):                     # the hogback's ends taper on the strait side
+    for y in (90, 91):                             # the hogback's foot tapers on the strait side
         g[(49, y)] = WATER
     # FX-D (P1-1-10 / G-2): the canal is a dug cut, its stone quays along both sides (the north one cut into the
     # hogback's foot); the lock gates at its two mouths are the canal patch's own objects (world_earth_sites.canal)
@@ -156,7 +215,7 @@ def ground(band: set[Cell]) -> dict[Cell, str]:
     _blob(g, _rect(51, 99, 57, 103), MOUNTAIN)
     _blob(g, _rect(52, 96, 56, 98), MOUNTAIN)
     g[HALL_DOOR] = GRASS
-    _blob(g, _wood(50, 105, 52, 108), FOREST)
+    _blob(g, _wood(50, 105, 52, 108), FOREST, land_only=True)
     for c in COVE:
         g[c] = WATER
     tidy(g, GRASS)                                 # FX-D: no crumb of rock on the noisy coast (min_blob)

@@ -40,6 +40,6 @@ def build(band: set[Cell]) -> RegionOut:
     zones = world_zones.zones(g)
     backdrops = {z["id"]: world_zones.BACKDROPS[z["id"]] for z in zones}
     checks = {"river_check": True, "warp_leaves": True, "min_blob": {"mountain": 3, "sand": 3, "forest": 3}}
-    return RegionOut(ground=rows, objects=world_sites.objects(), inspect=world_sites.inspect(),
+    return RegionOut(ground=rows, objects=world_sites.objects(g), inspect=world_sites.inspect(),
                      transitions=world_sites.transitions(), entrances=world_sites.entrances(), encounterZones=zones,
                      battleBackgrounds={"zones": backdrops}, notes=list(NOTES), checks=checks)
