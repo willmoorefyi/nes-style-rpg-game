@@ -198,16 +198,29 @@ Both B and C change the player-facing economy by more than the 25 % limit I was 
 recommendation if the user wants gold to matter: B at x0.5 for S20+ only (Mirage, Sky Castle, past temple, the seas),
 where gold has no use beyond Gaia and Lufenia; it breaks no proof.
 
-### 4.6 Proposed follow-up (not done): the S24 and S28 bosses
+### 4.6 The S24 and S28 bosses (integrator request): done
 
-`drowned_sovereign` (S24) and `hollow_seraph` (S28) are won 98 to 100 % by `fighter` and Fight-only against bounds of
-60-80 %. Harden them the way section 4.4 does (more hits or HP, `fighter` bounds): about the same size of change per
-boss. The pre-S24 bosses (astos to dragon_zombie) agree across policies and are fine; evil_eye and dragon_zombie sit near
-the top of their bands for Fight-only play (90.5, 99.8) and could be nudged.
+Same treatment, `fighter` bounds (400 seeds, test levels as before):
+- **drowned_sovereign** (S24): defense 60 -> 90 (vitality 47 by the roster rule), phase 1 gets 14 hits at attack 75. HP
+  stays 900 because the rematch `drowned_sovereign_2` (900, pinned) may not have fewer. Measured `fighter`: L26 36.3
+  (<= 45), **L28 68.0** (60-80), L32 91.5 (>= 85); Fight-only L28 49.3 (was 99.8). HP and hits alone barely moved it (it
+  dies in two rounds); defense did.
+- **hollow_seraph** (S28): phase 1 from 6 hits at attack 78 to **13 hits at attack 82**. Measured `fighter`: L30 44.3,
+  **L32 65.0** (60-80), L34 85.3; Fight-only L32 65.8 (was 100). The fight climbs 20 points in two levels, so the L30
+  bound is <= 50 % (plan 45) and the band-top bound >= 80 % (plan 85), each at least 3 points from its measured value.
+- Pre-S24 bosses were left (policies agree there). evil_eye (Fight-only 90.5) and dragon_zombie (99.8) sit at the top of
+  their bands for Fight-only play and could be nudged later.
 
 ## 5. Gates
 
-See the bottom of this file (filled in after the runs).
+- `npm run quest -- --mutate`: **OK** (a) to (h) all OK; `mutations: OK (64 gate rows; 105 elements, each removal
+  reported)`; (d) bands unchanged (garland L2.7 ... lich_2 L35.3) and the (d3) bottle row OK; (f) walls unchanged
+  (crescent 13082/60240, gaia 87748/259240). The enemy and item edits do not touch xp, kits or `grind`, so no `grind`
+  was re-tuned. (Run on the first commit's data; the later edits are boss stats only, which the curve model ignores.)
+- `npx vitest run --maxWorkers=2 --minWorkers=1` on the final data: 354 files, 9031 tests; 9030 passed and the one
+  failure, `EquipScene.test.ts` (it hard-coded the Iron Sword's ATK 14), is fixed (ATK 13) and passes alone (18 / 18).
+  The full run takes about an hour.
+- `npm run build`: exit 0.
 
 ## 6. Reproducing
 
