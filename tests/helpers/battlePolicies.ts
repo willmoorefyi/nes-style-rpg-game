@@ -16,8 +16,9 @@ import type { BattleCommand } from '../../src/battle/BattleCommands.js';
 import type { Character } from '../../src/entities/Character.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import type { EnemyData, SpellData } from '../../src/types/index.js';
+import { fighterCommands } from './fighterPolicy.js';
 
-export type Policy = 'careless' | 'sensible' | 'sleep';
+export type Policy = 'careless' | 'sensible' | 'sleep' | 'fighter';
 
 /** Seeded RNG (the simulation's). */
 export function mulberry32(seed: number): () => number {
@@ -111,7 +112,8 @@ export function runBattle(party: Character[], enemies: EnemyData[], spells: Spel
   while (!bsm.isOver && rounds < maxRounds) {
     if (bsm.state === 'command_select') {
       opts.beforeCommands?.(bsm);
-      chooseCommands(bsm, policy, potions, rng);
+      if (policy === 'fighter') fighterCommands(bsm, potions, spells);
+      else chooseCommands(bsm, policy, potions, rng);
     }
     if (bsm.state === 'execution') {
       bsm.prepareRound();

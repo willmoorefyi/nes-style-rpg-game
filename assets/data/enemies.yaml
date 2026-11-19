@@ -2573,14 +2573,14 @@
   protect: [earth]
   specials: [{id: ink, rate: 0.25}]
   stats:
-    hp: 800
+    hp: 900
     strength: 40
     agility: 19
     intelligence: 1
-    vitality: 32
+    vitality: 47
     luck: 5
     attack: 50
-    defense: 60
+    defense: 90
     magicDefense: 160
     accuracy: 88
     hits: 8
@@ -2598,6 +2598,7 @@
   - hpThreshold: 1.0
     patternId: aggressive
     message: "The Drowned Sovereign rises, and the tide rises with him!"
+    hits: 14
     attack: 75
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3009,7 +3010,7 @@
   protect: [status, poison_stone, death, earth]
   specials: [{id: nuclear, rate: 0.25}]
   stats:
-    hp: 1000
+    hp: 1050
     strength: 102
     agility: 21
     intelligence: 1
@@ -3027,12 +3028,12 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
-  # WND-D2 (WORLD 3.7): the engines' watchman wakes throttled (2 hits at attack 103, from the roster's 128) and walks
+  # WND-D2 (WORLD 3.7): the engines' watchman wakes throttled (4 hits at attack 128, from the roster's 2 hits at 128; FX-B) and walks
   # with the whirlwind its fans draw in (the 4F formation [warmech, air_elemental]); tests/balance/w_wnd_d2.test.ts
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 2
-    attack: 103
+    hits: 4
+    attack: 128
   - hpThreshold: 0.5
     patternId: aggressive
     message: "Warmech's core burns red hot!"
@@ -3067,11 +3068,11 @@
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
   # WND-D2 (WORLD 3.7): her roster swing (4 hits at attack 49) never threatened the B7 party (100 % at L30-L34), so
-  # she wakes with the stilled wind behind her blades (6 hits at attack 78) beside a whirlwind from the crystal
+  # she wakes with the stilled wind behind her blades (13 hits at attack 82; FX-B) beside a whirlwind from the crystal
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 6
-    attack: 78
+    hits: 13
+    attack: 82
     message: "The Hollow Seraph's four blades of light spin up to a scream!"
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3114,7 +3115,7 @@
   spells: [stop, zap, xfer, brak, rub, hold, mute, slow]
   specials: [{id: glare, rate: 0.25}]
   stats:
-    hp: 360
+    hp: 600
     strength: 96
     agility: 9
     intelligence: 25
@@ -3142,7 +3143,7 @@
   # PST (WORLD 3.7: S30, L37 70-90 %): staring from the first round; an iron golem stands with it (past-temple-5)
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 3
+    hits: 8
     attack: 125
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3180,7 +3181,7 @@
   # PST (WORLD 3.7: the four refights in a row at L37): the past's cold strikes from the first round
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 3
+    hits: 10
     attack: 110
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3266,7 +3267,7 @@
   # PST (WORLD 3.7: the refight run): her six arms burn from the first round (a rhyos fights beside her)
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 6
+    hits: 14
     attack: 80
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3309,7 +3310,7 @@
   # PST (WORLD 3.7: the refight run): fewer, heavier strikes from the first round
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 6
+    hits: 11
     attack: 82
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3356,7 +3357,7 @@
   # PST (WORLD 3.7: the refight run): five blade strikes from the first round
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 5
+    hits: 9
     attack: 92
   - hpThreshold: 0.5
     patternId: aggressive

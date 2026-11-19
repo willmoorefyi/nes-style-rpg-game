@@ -167,11 +167,11 @@ describe('MS-7: the Equip screen (slot labels, live preview, descriptions)', () 
     tap('confirm'); // Weapon slot: empty, so the cursor opens on the first item, Rapier (ATK 9)
     expect(scene.statsLines).toBe(`ATK ${bare} -> ${bare + 9}  +9\nDEF 0 -> 0`);
     expect(scene.helpText).toBe(ItemRegistry.getItem('rapier')!.description);
-    tap('down'); // Iron Sword (ATK 14)
-    expect(scene.statsLines.split('\n')[0]).toBe(`ATK ${bare} -> ${bare + 14}  +14`);
+    tap('down'); // Iron Sword (ATK 13)
+    expect(scene.statsLines.split('\n')[0]).toBe(`ATK ${bare} -> ${bare + 13}  +13`);
     tap('confirm'); // equip it
     expect(w.getEquipped('weapon')?.id).toBe('iron_sword');
-    expect(scene.statsLines).toBe(`ATK ${bare + 14}\nDEF 0`);
+    expect(scene.statsLines).toBe(`ATK ${bare + 13}\nDEF 0`);
   });
 
   it('an empty slot opens on the first item, not "(Unequip)"; a worn slot still opens on "(Unequip)"', async () => {
