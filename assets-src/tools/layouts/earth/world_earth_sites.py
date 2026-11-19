@@ -10,7 +10,7 @@ import town_melmond_site as MEL
 from world_api import CANAL_PATCH, MOUNTAIN, SEAMS, WATER, Cell
 import world_earth_ground as G
 
-WALKABLE = frozenset(".,fs")
+WALKABLE = frozenset(".,fs:")
 
 
 def _g(enemy: str, lo: int, hi: int | None = None) -> dict:
@@ -49,6 +49,18 @@ def _mouth(at: Cell, door: int, block: bool = True) -> dict:
             "walk_cells": [[door, 1]], **({} if block else {"collide": "alpha"})}
 
 
+def melmond_icon(door: list[int]) -> list[list[str]]:
+    """Melmond's 3x3 icon: the approved walled-town icon (its drawn row, `town_icon_1_*`, 2x1: the top row of the
+    sheet is empty) on the door's row with the door in it, ringed by the fields' copses and stones (every cell drawn,
+    so the whole box stays blocked art as before)."""
+    dx, dy = door
+    assert len(MEL.ICON) == 9, "Melmond's icon: 3x3"
+    ix = dx - 1 if dx >= 1 else dx
+    parts = [["tree_clump", "bush", "tree_clump"], ["boulder", "bush", "boulder"], ["tree_clump", "boulder", "bush"]]
+    parts[dy][ix], parts[dy][ix + 1] = "town_icon_1_0", "town_icon_1_1"
+    return parts
+
+
 def objects() -> list[dict]:
     import kit  # noqa: PLC0415
     icon_x, icon_y = min(MEL.ICON)
@@ -56,11 +68,10 @@ def objects() -> list[dict]:
     return [
         _mouth(G.HALL_MOUTH, 1), _mouth(G.GIANT_EAST_MOUTH, 0), _mouth(G.GIANT_WEST_MOUTH, 1),
         _mouth(G.SAGE_MOUTH, 1), _mouth(G.CAVE_MOUTH, 0),
-        # Melmond's icon: a placeholder farmhouse from the town kit, its door the icon's DOOR cell
-        {"type": "deco", "parts": [["roof_ridge_l", "roof_ridge_m", "roof_ridge_r"],
-                                   ["wall_up_l", "wall_up_window", "wall_door_top"],
-                                   ["wall_lo_l", "wall_lo_plain", "wall_lo_r"]],
-         "x": icon_x, "y": icon_y, "walk_cells": [door]},
+        # Melmond's icon (FX-D P3-13): the approved walled-town icon over the door, ringed by its fields' copses and
+        # field stones, so it reads as a town, not one farmhouse
+        {"type": "deco", "name": "melmond", "parts": melmond_icon(door), "x": icon_x, "y": icon_y,
+         "walk_cells": [door]},
         {"type": "deco", "parts": kit.landmark_parts("windmill"), "x": G.WINDMILL[0], "y": G.WINDMILL[1],
          "style": "pale_dune", "collide": "alpha"},
         {"type": "deco", "parts": kit.landmark_parts("shrine"), "x": G.SHRINE[0], "y": G.SHRINE[1], "style": "snow"},
@@ -87,7 +98,11 @@ def docks() -> list[dict]:
 def canal() -> dict:
     """2.6: the patch `canal` (CANAL_OPEN) turns the saddle into Water, joining the Aldi to the strait."""
     cells = [[x, y] for y in G.CANAL_ROWS for x in range(G.ISTHMUS_X[0], G.ISTHMUS_X[1] + 1)]
-    return {"id": CANAL_PATCH, "flag": "CANAL_OPEN", "ground": WATER, "cells": cells}
+    # FX-D (P1-1-10): a lock gate at each mouth, the approved culvert arch over both rows of the cut (patch art
+    # only: the patch's terrain is Water on every cell, so the ship sails under the arches)
+    gates = [{"type": "deco", "parts": [["culvert"], ["culvert"]], "x": x, "y": G.CANAL_ROWS[0], "collide": "alpha"}
+             for x in G.ISTHMUS_X]
+    return {"id": CANAL_PATCH, "flag": "CANAL_OPEN", "ground": WATER, "cells": cells, "objects": gates}
 
 
 def inspect() -> list[dict]:

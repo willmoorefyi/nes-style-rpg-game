@@ -42,7 +42,7 @@ def build() -> Floor:
     g.rect(28, 17, 33, 18, "-")          # mirror chamber <-> rime stair
     g.rect(26, 2, 37, 10, "-")           # the eye's vault
     g.rect(29, 2, 37, 6, "+")            # its glazed dais
-    g.rect(38, 8, 38, 8, "_")            # a niche in the vault's east wall (a dead end)
+    g.rect(38, 8, 38, 8, "-")            # a niche in the vault's east wall (a dead end; frost floor, FX-D P3-04)
     g.faces(2)
     f.stairs_up(9, 24, "ice-cavern-b2", "down")              # back up to B2's hidden hall
     for y in (11, 14, 20, 23):           # the watchers stand along the gallery's east side
