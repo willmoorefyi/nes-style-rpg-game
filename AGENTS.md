@@ -262,6 +262,9 @@ The `*_common.py`, `*_people.py`, `*_homes.py`, `*_shops.py` and `*_site.py` fil
 `temple-of-fiends.yaml` is still hand-written. Object options added in R and U:
 - deco `passage: true` — the deco's above rows may cover a walkable cell (a gate arch over a road); only the arch's drawn opening is walkable, the jambs block.
 - deco `style` — a `RECOLOR` entry in `build_map.py`, e.g. `pale_stone` (the bridge debris), `bright`, `brighter` (value x1.5, the temple icon).
+- patch `art_ground` (FX-R) — the patch overlay is painted as this legend char instead of `ground` (same terrain only), e.g. the canal's stone-banked `~` over Water `o`.
+- `layouts/world_dress.py` (FX-R) — `scatter()` dresses a town icon with seeded 1x1 copses, bushes and stones (offsets, gaps, `collide: alpha`; the door's sides stay solid, the gate stays reachable): Melmond, Onrac.
+- A peak drawn near a chunk border reaches into the next chunk, so editing mountains in a chunk beside another region's chunk can repaint it (FX-R: EARTH's hogback at x 48-63, y 80-95 touches A1's chunk at x 64). Check the changed chunk files against `world.py --owned-chunks <region>` after a compile.
 
 After an edit:
 
@@ -345,6 +348,7 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 - **scene entry:** `Game` builds `SceneManager` with `onSettled` → `holdOff(SCENE_ENTRY_HOLDOFF_FRAMES)` (8), so one confirm press never reaches the next scene;
 - **dialog close (field only):** `ExplorationScene`'s `DialogManager` gets `closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES` (24, confirm only), so mashing after a talk doesn't restart it;
 - **cutscene end:** field cutscene dialog steps take confirm at once (`holdOff: false`); the 24-frame confirm hold-off comes once when the cutscene ends.
+- **controls hint (FX-R, P3-R1):** the first-run hint over the field (`ControlsHint`, until `ff1_controlsSeen` is stored) is dismissed by any key and the key still acts on that frame; it used to swallow the first press of a fresh browser (the airship did not land on the first confirm).
 
 ### Field engine notes (FX-C)
 

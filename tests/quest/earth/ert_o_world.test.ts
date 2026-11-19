@@ -90,7 +90,7 @@ describe('ERT-O: EARTH on the world map', () => {
     expect(plain.has(world.entrances.ert_sarda.join(','))).toBe(false);
     expect(plain.has(world.entrances.ert_giant_west.join(','))).toBe(false);
     const cut = world.world!.cuts!.western_range;
-    expect(cut.length).toBe(4);
+    expect(cut.length).toBe(3);   // FX-R (P3-R3): the meandering range is 3 cells at its narrowest (4 before)
     const opened = new Set(cut.map(([x, y]) => `${x},${y}`));
     const open = (x: number, y: number) => !BLOCKED.has(at(world, x, y)) || opened.has(`${x},${y}`);
     expect(flood(world, [world.entrances.ert_giant], open).has(world.entrances.ert_sarda.join(','))).toBe(true);
