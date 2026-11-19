@@ -6,7 +6,7 @@ import { ConfirmBox } from '../ui/ConfirmBox.js';
 /**
  * A trader's Yes / No over the visible field (`transparent`): "Pay 40000 G for the Bottle?" with the party's gold.
  * Either answer closes the box and calls `onAnswer` (Yes pays through the field's trade code; No leaves everything
- * as it was, so the offer stands).
+ * as it was, so the offer stands). The cursor starts on No (P3-R2).
  */
 export class PurchaseScene implements Scene {
   readonly container = new Container();
@@ -18,6 +18,7 @@ export class PurchaseScene implements Scene {
     this.box = new ConfirmBox({
       prompt: `${prompt}\nGold: ${game.party.gold} G`,
       eventBus: game.events,
+      defaultNo: true, // P3-R2: the cursor starts on No, so mashing confirm through the pitch never pays
       onAnswer: (yes) => this.answer(yes),
     });
     this.container.addChild(this.box);

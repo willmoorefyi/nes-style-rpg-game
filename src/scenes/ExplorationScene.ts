@@ -352,11 +352,9 @@ export class ExplorationScene implements Scene {
       this.battleFlash.update();
       return;
     }
-    // C1: Controls hint overlay
-    if (!this.controlsHint.isDismissed) {
-      this.controlsHint.update(this.game.input);
-      return;
-    }
+    // C1: the controls hint overlay. Any key (or 5 s) dismisses it, and the key still acts this frame: the hint used
+    // to swallow the first press of a fresh browser, so the first confirm after a load never landed the airship (P3-R1)
+    if (!this.controlsHint.isDismissed) this.controlsHint.update(this.game.input);
     if (this.endCard.active) { this.endCard.update(this.game.input); return; }
     // B5: Update HUD each frame
     this.fieldHUD.update(this.game.party);

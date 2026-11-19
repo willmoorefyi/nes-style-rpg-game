@@ -7,10 +7,13 @@ Melmond's icon, gate, door and harbour come from `town_melmond_site.py` (ERT-T's
 from __future__ import annotations
 
 import town_melmond_site as MEL
-from world_api import CANAL_PATCH, MOUNTAIN, SEAMS, WATER, Cell
+from world_api import CANAL_PATCH, GRASS, MOUNTAIN, SEAMS, WATER, Cell
+from world_dress import door_sides, ring_of, scatter
 import world_earth_ground as G
 
 WALKABLE = frozenset(".,fs:")
+PLAIN_SEED, SARDA_SEED = (36, 100), (18, 100)    # the western range's two sides (barrier seeds)
+DRESS_SEED = 6113                               # Melmond's scattered dressing (world_dress.scatter)
 
 
 def _g(enemy: str, lo: int, hi: int | None = None) -> dict:
@@ -49,29 +52,29 @@ def _mouth(at: Cell, door: int, block: bool = True) -> dict:
             "walk_cells": [[door, 1]], **({} if block else {"collide": "alpha"})}
 
 
-def melmond_icon(door: list[int]) -> list[list[str]]:
-    """Melmond's 3x3 icon: the approved walled-town icon (its drawn row, `town_icon_1_*`, 2x1: the top row of the
-    sheet is empty) on the door's row with the door in it, ringed by the fields' copses and stones (every cell drawn,
-    so the whole box stays blocked art as before)."""
-    dx, dy = door
+def melmond_icon(g: dict[Cell, str]) -> list[dict]:
+    """Melmond's icon: the approved walled-town icon (its drawn row, `town_icon_1_*`, 2x1: the top row of the sheet
+    is empty) on the door's row with the door in it, and round it the fields' copses, bushes and stones scattered by
+    a seeded generator (FX-R P3-R4: varied kinds and offsets, with gaps; before, an exact 3x3 ring)."""
     assert len(MEL.ICON) == 9, "Melmond's icon: 3x3"
-    ix = dx - 1 if dx >= 1 else dx
-    parts = [["tree_clump", "bush", "tree_clump"], ["boulder", "bush", "boulder"], ["tree_clump", "boulder", "bush"]]
-    parts[dy][ix], parts[dy][ix + 1] = "town_icon_1_0", "town_icon_1_1"
-    return parts
+    x0 = min(x for x, _ in MEL.ICON)
+    tx = MEL.DOOR[0] - 1 if MEL.DOOR[0] - 1 >= x0 else MEL.DOOR[0]
+    town = {(tx, MEL.DOOR[1]), (tx + 1, MEL.DOOR[1])}
+    gx, gy = MEL.GATE
+    taken = town | {MEL.GATE, (gx, gy - 1), (gx, gy + 1), (gx + 1, gy), (gx - 1, gy)}
+    walk = lambda c: g.get(c) == GRASS  # noqa: E731
+    return [{"type": "deco", "name": "melmond", "x": tx, "y": MEL.DOOR[1], "parts": [["town_icon_1_0", "town_icon_1_1"]],
+             "walk_cells": [[MEL.DOOR[0] - tx, 0]]},
+            *scatter(list(MEL.ICON), taken, DRESS_SEED, ring_of(list(MEL.ICON)), walk,
+                    door_sides(MEL.DOOR, list(MEL.ICON), taken), MEL.GATE)]
 
 
-def objects() -> list[dict]:
+def objects(g: dict[Cell, str]) -> list[dict]:
     import kit  # noqa: PLC0415
-    icon_x, icon_y = min(MEL.ICON)
-    door = [MEL.DOOR[0] - icon_x, MEL.DOOR[1] - icon_y]
     return [
         _mouth(G.HALL_MOUTH, 1), _mouth(G.GIANT_EAST_MOUTH, 0), _mouth(G.GIANT_WEST_MOUTH, 1),
         _mouth(G.SAGE_MOUTH, 1), _mouth(G.CAVE_MOUTH, 0),
-        # Melmond's icon (FX-D P3-13): the approved walled-town icon over the door, ringed by its fields' copses and
-        # field stones, so it reads as a town, not one farmhouse
-        {"type": "deco", "name": "melmond", "parts": melmond_icon(door), "x": icon_x, "y": icon_y,
-         "walk_cells": [door]},
+        *melmond_icon(g),
         {"type": "deco", "parts": kit.landmark_parts("windmill"), "x": G.WINDMILL[0], "y": G.WINDMILL[1],
          "style": "pale_dune", "collide": "alpha"},
         {"type": "deco", "parts": kit.landmark_parts("shrine"), "x": G.SHRINE[0], "y": G.SHRINE[1], "style": "snow"},
@@ -100,9 +103,13 @@ def canal() -> dict:
     cells = [[x, y] for y in G.CANAL_ROWS for x in range(G.ISTHMUS_X[0], G.ISTHMUS_X[1] + 1)]
     # FX-D (P1-1-10): a lock gate at each mouth, the approved culvert arch over both rows of the cut (patch art
     # only: the patch's terrain is Water on every cell, so the ship sails under the arches)
-    gates = [{"type": "deco", "parts": [["culvert"], ["culvert"]], "x": x, "y": G.CANAL_ROWS[0], "collide": "alpha"}
+    gates = [{"type": "deco", "parts": [["culvert"], ["culvert"]], "x": x, "y": G.CANAL_ROWS[0], "collide": "alpha",
+              "on_water": True}
              for x in G.ISTHMUS_X]
-    return {"id": CANAL_PATCH, "flag": "CANAL_OPEN", "ground": WATER, "cells": cells, "objects": gates}
+    # FX-R (P3-R3): the cut is drawn as stone-banked water (`~`, the same Water terrain), so no beach lines the foot
+    # of its quays
+    return {"id": CANAL_PATCH, "flag": "CANAL_OPEN", "ground": WATER, "art_ground": "~", "cells": cells,
+            "objects": gates}
 
 
 def inspect() -> list[dict]:
@@ -145,7 +152,7 @@ def zones(g: dict[Cell, str], band: set[Cell], box: set[Cell]) -> list[dict]:
     water = {c for c, ch in g.items() if ch == WATER} | {c for c in band if c in box and c not in seam}
     aldi = _flood(water, (62, 100))
     isthmus = {c for c in walk if c[0] >= 48} | seam_walk
-    sarda = {c for c in walk if c[0] <= 23}
+    sarda = _flood(walk, SARDA_SEED)                                   # FX-R: the range meanders, so by flood
     bad = {c for c in walk - isthmus - sarda if c[1] >= G.BADLANDS_Y}
     plain = walk - isthmus - sarda - bad
     sets = [("ert_isthmus", isthmus, None), ("ert_plain", plain, None), ("ert_badlands", bad, None),
@@ -168,5 +175,6 @@ def walls(g: dict[Cell, str]) -> dict[str, set[Cell]]:
 
 def barriers(g: dict[Cell, str]) -> dict[str, tuple[set[Cell], Cell, Cell]]:
     """2.9 / GT-35: the western range, from Melmond's plain (side a) to Sarda's coast (side b)."""
-    cells = {c for c, ch in g.items() if ch == MOUNTAIN and G.RANGE_X[0] <= c[0] <= G.RANGE_X[1]}
-    return {"western_range": (cells, (36, 100), (18, 100))}
+    near = lambda x, y: G.range_span(y)[0] - 1 <= x <= G.range_span(y)[1] + 1  # noqa: E731  (the core and its crags)
+    cells = {c for c, ch in g.items() if ch == MOUNTAIN and near(*c)}
+    return {"western_range": (cells, PLAIN_SEED, SARDA_SEED)}

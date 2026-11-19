@@ -5,8 +5,9 @@ W1-0b declared the four signatures; W1-C1 calls them from `build_map.py`; W1-C2 
 - `passthrough` copies the quest fields of a source into its compiled map (a source patch names its terrain by a
   legend char, `ground`; the compiled patch carries the TerrainType, `terrain`) and lists the patch overlays in
   `art.patches`;
-- `bake_patches` draws each patch's cells, as the patched ground (plus the patch's own `objects`, map cells), in the
-  map's own pixel frame (a raster compile of the patched map round the patch, so no seam at its edge), into
+- `bake_patches` draws each patch's cells, as the patched ground (or its `art_ground`, a legend char of the same
+  terrain; plus the patch's own `objects`, map cells), in the map's own pixel frame (a raster compile of the
+  patched map round the patch, so no seam at its edge), into
   `<out_dir>/<map_id>/patch_<pid>.png`. The image covers the bounding box of the patch's cells, from its top-left
   cell, and is opaque exactly on the patch cells. It must run after `build_map.write`, which clears the folder;
 - `region_checks` runs a world region's own map checks (`map_checks_region.py`), or, with `region` None, the
@@ -71,7 +72,13 @@ def bake_patches(map_id: str, src: dict, grid: "Grid", kit: "Kit", out_dir: Path
     written = []
     for p in patches:
         cells = [tuple(c) for c in p["cells"]]
-        ch = p.get("ground") or next(k for k, v in BM.LEGEND.items() if BM.TERRAIN[v] == p["terrain"])
+        # `art_ground` (optional) paints the patch cells as another legend char of the same terrain: the canal's
+        # stone-rimmed `~` (FX-R P3-R3: a dug cut with straight stone banks, no beach at the foot of its quays)
+        ch = p.get("art_ground") or p.get("ground") or next(k for k, v in BM.LEGEND.items()
+                                                             if BM.TERRAIN[v] == p["terrain"])
+        if p.get("art_ground") and p.get("ground") and \
+                BM.TERRAIN[BM.LEGEND[p["art_ground"]]] != BM.TERRAIN[BM.LEGEND[p["ground"]]]:
+            raise BM.MapError(f"patch {p['id']}: art_ground {p['art_ground']!r} is not the terrain of {p['ground']!r}")
         x0, y0 = min(x for x, _ in cells), min(y for _, y in cells)
         x1, y1 = max(x for x, _ in cells), max(y for _, y in cells)
         # painted in the map's own frame (W1-C1's global-phase noise and per-chunk seeds): the patched ground of the

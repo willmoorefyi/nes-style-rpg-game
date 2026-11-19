@@ -36,7 +36,7 @@ def build(band: set[Cell]) -> RegionOut:
               # Sarda's coast is walked from the tunnel's west mouth (the range parts it from every other root)
               "reach_roots": ["ert_dwarf", "ert_melmond", "ert_giant_west"]}
     return RegionOut(
-        ground=rows, objects=S.objects(), inspect=S.inspect(), transitions=S.transitions(),
+        ground=rows, objects=S.objects(g), inspect=S.inspect(), transitions=S.transitions(),
         entrances={k: list(v) for k, v in S.ENTRANCES.items()}, patches=[S.canal()], docks=S.docks(),
         encounterZones=S.zones(g, band, box), battleBackgrounds={"zones": dict(S.BACKDROPS)}, checks=checks,
         walls=S.walls(g), barriers=S.barriers(g),
