@@ -171,6 +171,20 @@
       "note": "User 2026-11-17: Bedrock is free for the user, Gemini is paid; spot-fix flaws in approved-quality kneel keys with Stability inpaint / erase / search-replace instead of regenerating on Gemini. One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 2,
       "closed": "2026-11-18, 2 of 60 (KT3 integrator: the user ruled that no key fixes are needed, so the free KA-FIX fix pass is unused; docs/KNEEL_TWEEN_PLAN.md 12 rulings log)"
+    },
+    {
+      "pass": "LM",
+      "cap": 80,
+      "per_purpose_caps": {
+        "lm_gen": 50,
+        "lm_nobg": 20,
+        "reserve": 10
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-18: free Bedrock landmark art pilot (generate detailed, cut out, pixelize); no Gemini until the user approves. Pilot LM-P: volcano, windmill, cave_mouth, buried_hull. gemini_before as KA-FIX (the Gemini ledger is unchanged since). One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 41,
+      "closed": "2026-11-18, 41 of 80 (pilot round 1 done: volcano, windmill, cave_mouth, buried_hull; awaiting the user's review; a later round opens a new pass)"
     }
   ]
 }

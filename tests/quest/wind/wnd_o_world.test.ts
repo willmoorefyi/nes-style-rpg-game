@@ -95,8 +95,10 @@ describe('WND-O world: region WIND', () => {
     const walking = ['wnd_highlands', 'wnd_mirage_sands', 'wnd_lufen_moor'];
     const zones = (world.encounterZones ?? []).filter((z) => z.id.startsWith('wnd_'));
     expect(zones.map((z) => [z.id, (z as { name?: string }).name])).toEqual([['wnd_highlands', 'Gaia Highlands'],
-      ['wnd_mirage_sands', 'Mirage Sands'], ['wnd_lufen_moor', 'Lufenian Mesa'], ['wnd_sea', 'North Seas']]);
-    expect((zones[3] as { modes?: string[] }).modes).toEqual(['ship']);
+      ['wnd_mirage_sands', 'Mirage Sands'], ['wnd_lufen_moor', 'Lufenian Mesa'], ['wnd_tarns', 'Highland Tarns'],
+      ['wnd_sea', 'North Seas']]);
+    expect((zones[3] as { modes?: string[] }).modes).toEqual(['canoe']); // FX-C: the canoe-reachable tarns
+    expect((zones[4] as { modes?: string[] }).modes).toEqual(['ship']);
     for (let y = BOX.y0; y <= BOX.y1; y++) {
       for (let x = BOX.x0; x <= BOX.x1; x++) {
         if (walkable(x, y)) expect(walking.filter((z) => zoneHas(z, x, y)), key(x, y)).toHaveLength(1);

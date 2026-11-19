@@ -160,3 +160,85 @@
 {"event": "result", "key": "e7e973aea401f04b3c792de8", "ok": true, "served": "us.stability.stable-image-inpaint-v1:0"}
 {"event": "request", "ts": "2026-11-17T21:18:50", "tool": "sr.py", "model": "search_replace", "purpose": "kneel_fix", "seed": 4242, "key": "bd787fa80301ecc4823df88c", "pass": "KA-FIX"}
 {"event": "result", "key": "bd787fa80301ecc4823df88c", "ok": true, "served": "us.stability.stable-image-search-replace-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:06:27", "tool": "lmgen.py", "model": "core", "purpose": "lm_gen", "seed": 11, "key": "a30a180d3afbf79ff3b7ccbb", "pass": "LM"}
+{"event": "result", "key": "a30a180d3afbf79ff3b7ccbb", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:06:45", "tool": "lmgen.py", "model": "core", "purpose": "lm_gen", "seed": 11, "key": "47faffbf61d81528dbb770e0", "pass": "LM"}
+{"event": "result", "key": "47faffbf61d81528dbb770e0", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:06:50", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 11, "key": "4d17684408cfbeb3933ec5f3", "pass": "LM"}
+{"event": "result", "key": "4d17684408cfbeb3933ec5f3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:07:19", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 12, "key": "637211b737e091ea992976cf", "pass": "LM"}
+{"event": "result", "key": "637211b737e091ea992976cf", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:07:30", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 13, "key": "d70fe46e1ff47165423ce756", "pass": "LM"}
+{"event": "result", "key": "d70fe46e1ff47165423ce756", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:07:39", "tool": "lmgen.py", "model": "style_guide", "purpose": "lm_gen", "seed": 11, "key": "7c215d6d25fb952a890140bf", "pass": "LM"}
+{"event": "result", "key": "7c215d6d25fb952a890140bf", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:07:49", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 11, "key": "1b0cad9ebd9caf49a5232f3d", "pass": "LM"}
+{"event": "result", "key": "1b0cad9ebd9caf49a5232f3d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:07:58", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 12, "key": "99e4ef22c7cd40a9dc253677", "pass": "LM"}
+{"event": "result", "key": "99e4ef22c7cd40a9dc253677", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:08:08", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 13, "key": "dea2cc1542d91963ac1dc564", "pass": "LM"}
+{"event": "result", "key": "dea2cc1542d91963ac1dc564", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:08:18", "tool": "lmgen.py", "model": "style_guide", "purpose": "lm_gen", "seed": 11, "key": "99a06ebe046ac4e9a30a8393", "pass": "LM"}
+{"event": "result", "key": "99a06ebe046ac4e9a30a8393", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:08:28", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 11, "key": "e5eb609ed6ef76a392baced8", "pass": "LM"}
+{"event": "result", "key": "e5eb609ed6ef76a392baced8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:08:38", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 12, "key": "f463c668b21b92774d2feea3", "pass": "LM"}
+{"event": "result", "key": "f463c668b21b92774d2feea3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:08:48", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 13, "key": "f8b8b8c56e67c6928b9f025f", "pass": "LM"}
+{"event": "result", "key": "f8b8b8c56e67c6928b9f025f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:08:58", "tool": "lmgen.py", "model": "style_guide", "purpose": "lm_gen", "seed": 11, "key": "a071097167a4024dfd7a089a", "pass": "LM"}
+{"event": "result", "key": "a071097167a4024dfd7a089a", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:09:17", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 11, "key": "9bae38e3fc9062d9063a2412", "pass": "LM"}
+{"event": "result", "key": "9bae38e3fc9062d9063a2412", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:09:27", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 12, "key": "6ba540a850bfdf0043d93c41", "pass": "LM"}
+{"event": "result", "key": "6ba540a850bfdf0043d93c41", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:09:37", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 13, "key": "77acdfb4394183035c14b667", "pass": "LM"}
+{"event": "result", "key": "77acdfb4394183035c14b667", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:09:47", "tool": "lmgen.py", "model": "style_guide", "purpose": "lm_gen", "seed": 11, "key": "0d938d6d688fdd59baa3e398", "pass": "LM"}
+{"event": "result", "key": "0d938d6d688fdd59baa3e398", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:10:19", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 21, "key": "3a63033a49d65f324f852e74", "pass": "LM"}
+{"event": "result", "key": "3a63033a49d65f324f852e74", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:10:31", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 22, "key": "a1d87f53bfc2dc322dadfba6", "pass": "LM"}
+{"event": "result", "key": "a1d87f53bfc2dc322dadfba6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:10:41", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 21, "key": "5017460aca360a73b1f93a19", "pass": "LM"}
+{"event": "result", "key": "5017460aca360a73b1f93a19", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:10:50", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 22, "key": "c90779efe80e1f6d6ae7f4d2", "pass": "LM"}
+{"event": "result", "key": "c90779efe80e1f6d6ae7f4d2", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:11:01", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 21, "key": "04932fe91906498e1bd39d1b", "pass": "LM"}
+{"event": "result", "key": "04932fe91906498e1bd39d1b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:11:11", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 22, "key": "aa1c4d7090b933f1ec1b4833", "pass": "LM"}
+{"event": "result", "key": "aa1c4d7090b933f1ec1b4833", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:11:22", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 23, "key": "7a833967a3e71b0df0a9796e", "pass": "LM"}
+{"event": "result", "key": "7a833967a3e71b0df0a9796e", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:11:54", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 31, "key": "740d4c687af97919a3e7a512", "pass": "LM"}
+{"event": "result", "key": "740d4c687af97919a3e7a512", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:12:04", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 32, "key": "b081c38c88fe02e18b314808", "pass": "LM"}
+{"event": "result", "key": "b081c38c88fe02e18b314808", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:12:15", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 33, "key": "b62f58cfa0bef353c5da45c1", "pass": "LM"}
+{"event": "result", "key": "b62f58cfa0bef353c5da45c1", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:12:41", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "359deb589cd17610607b8fe8", "pass": "LM"}
+{"event": "result", "key": "359deb589cd17610607b8fe8", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:44", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "ff784f77154911105a6aee4b", "pass": "LM"}
+{"event": "result", "key": "ff784f77154911105a6aee4b", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:46", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "dc870bfdf2a1c4953d5e8bae", "pass": "LM"}
+{"event": "result", "key": "dc870bfdf2a1c4953d5e8bae", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:49", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "efc9242cbbc5d514305de411", "pass": "LM"}
+{"event": "result", "key": "efc9242cbbc5d514305de411", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:51", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "321117058fb19abaace7f1f9", "pass": "LM"}
+{"event": "result", "key": "321117058fb19abaace7f1f9", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:54", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "b8217302f949a63caab9b575", "pass": "LM"}
+{"event": "result", "key": "b8217302f949a63caab9b575", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:57", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "805c62277877ae79faa0649a", "pass": "LM"}
+{"event": "result", "key": "805c62277877ae79faa0649a", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:12:59", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "beac329407f06dbeaa463719", "pass": "LM"}
+{"event": "result", "key": "beac329407f06dbeaa463719", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:13:01", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "5b5fc418a8a0c79d2e47ad50", "pass": "LM"}
+{"event": "result", "key": "5b5fc418a8a0c79d2e47ad50", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:13:03", "tool": "lmgen.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "0caae165189dba212462d836", "pass": "LM"}
+{"event": "result", "key": "0caae165189dba212462d836", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-18T22:14:14", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 41, "key": "ab7e70231f5920c0a7071b26", "pass": "LM"}
+{"event": "result", "key": "ab7e70231f5920c0a7071b26", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:14:26", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 42, "key": "f0dad187220beca2c6552a2a", "pass": "LM"}
+{"event": "result", "key": "f0dad187220beca2c6552a2a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-18T22:14:36", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 43, "key": "fc59da5f589f914f54cd67d7", "pass": "LM"}
+{"event": "result", "key": "fc59da5f589f914f54cd67d7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}

@@ -6,13 +6,14 @@ import type { PlayerController } from '../../entities/PlayerController.js';
 import {
   canLand, modeAfterStep, patchedTerrain, terrainAllows, type FieldState, type StepResult,
 } from '../../systems/fieldRules.js';
-import { vehicleOf, vehiclesAfterStep, vehicleTerrainAllows } from '../../systems/fieldRulesVehicles.js';
+import { vehicleOf, vehiclesAfterStep } from '../../systems/fieldRulesVehicles.js';
 import { VehicleManager, parkedVehicles } from '../../systems/VehicleManager.js';
 import { WalkingMode } from '../../entities/WalkingMode.js';
 import { CanoeMode } from '../../entities/CanoeMode.js';
 import { ShipMode } from '../../entities/ShipMode.js';
 import { AirshipMode } from '../../entities/AirshipMode.js';
 import { FieldVehicleSprites } from './FieldVehicleSprites.js';
+import { bankHintFor } from './FieldBankHint.js';
 
 /** The field-rule mode of a movement mode (an unknown id counts as walking, the rules' strictest). */
 export function fieldModeOf(mode: MovementMode): FieldMode {
@@ -22,8 +23,7 @@ export function fieldModeOf(mode: MovementMode): FieldMode {
 /** The airship's line when confirm is pressed over a cell it may not land on (QUEST 3.3). */
 export const CANT_LAND = "The airship can't land here.";
 
-/** P3-11: the line when a step onto River or Lake is refused for want of a canoe (the hint NPCs say the same). */
-export const NO_CANOE_HINT = 'The water runs too deep to wade. A boat light enough to carry would cross it.';
+export { NO_CANOE_HINT } from './FieldBankHint.js';
 
 /** A movement mode whose steps the field rules decide (`canMoveAt`: boarding, the canoe, docks), so PlayerController
  *  moves exactly where fieldRules.fieldStep will let the step stand. */
@@ -186,24 +186,10 @@ export class FieldVehicles {
     this.changeMode(player, before, step.mode, from, { x: player.gridX, y: player.gridY });
   }
 
-  /**
-   * P3-11: the line for a step the hero just pressed toward River or Lake that is refused because the party holds no
-   * canoe (and none is parked there to board); null for any other press or refusal. The caller shows it.
-   */
+  /** P3-11: the no-canoe line for a step just pressed toward River or Lake on foot, else null (FieldBankHint). */
   bankHint(player: PlayerController): string | null {
-    const map = this.map;
-    if (!map || player.isMoving || fieldModeOf(player.currentMode) !== 'walking') return null;
-    const input = this.game.input;
-    const dir = (['up', 'down', 'left', 'right'] as const).find((d) => input.isJustPressed(d));
-    if (!dir) return null;
-    const from = { x: player.gridX, y: player.gridY };
-    const to = {
-      x: from.x + (dir === 'left' ? -1 : dir === 'right' ? 1 : 0),
-      y: from.y + (dir === 'up' ? -1 : dir === 'down' ? 1 : 0),
-    };
-    const flags = new Set(Object.keys(this.game.gameFlags.getAll()));
-    if (!vehicleTerrainAllows('canoe', patchedTerrain(map, to.x, to.y, flags))) return null;
-    return modeAfterStep(map, from, to, this.fieldState('walking')) === null ? NO_CANOE_HINT : null;
+    if (!this.map || fieldModeOf(player.currentMode) !== 'walking') return null;
+    return bankHintFor(this.game, this.map, player, this.fieldState('walking'));
   }
 
   /** Confirm while idle: take off on a parked airship; while flying, land on a free grass cell or say why not. */
