@@ -353,8 +353,9 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   cell with under 25 % art).
 - **Ambient effects (LM-INT).** A map source's `ambient: [{kind: smoke, x, y, ox, oy}]` (cell, art px 0-47 inside it;
   `build_hooks.ambient` checks and copies it, `schemaValidationAmbient.ts` validates it) is drawn by
-  `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is five grey pixel-art puffs on a
-  3.2 s loop (`smokePuffs`). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut `ambient`).
+  `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is the steam billows of the
+  Field engine notes ("Ambient smoke"). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut
+  `ambient`).
 - Still placeholder: the fairy and the mermaids are tinted NPC sheets.
 
 ### New Cutscene
@@ -377,6 +378,7 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 
 - **Encounter zone of a step:** `playerMove` fires before `FieldVehicles.afterStep` changes the mode, so `EncounterSystem.setStepModeResolver` (set by the exploration scene to `modeAfterStep` from the step origin) makes the lookup use the mode the step ends in. A canoe step onto a river cell rolls the canoe zone, not the walking zones with a hole. `tests/data/overworldZoneCoverage.test.ts` fails when a walking or canoe cell outside act 1 falls through to the act-1 table (the Water and Wind tarns have canoe zones `wat_streams` / `wnd_tarns`).
 - **Flag-driven NPCs:** `ExplorationScene.refreshNpcPresence` follows `showIf` / `hideIf` as flags change (polled each field frame by a cheap signature, plus cutscenes and `onResume`); NPCs leave and arrive (`NpcPresence.ts`, `MapLoader.createNpc`, `MapLoadResult.npcDefs` = the whole NPC list). An NPC never appears on the hero's cell or the one about to be entered.
+- **Ambient smoke (SMOKE):** a map's `ambient: [{kind: smoke, x, y, ox, oy}]` (validated by `schemaValidationAmbient.ts`; the volcano's is `world_fire_data.SMOKE` at (120, 149), art px (26, 12)) is drawn by `FieldAmbient.ts` as `SmokeColumn`s (`src/scenes/exploration/smoke/`) in the style `VOLCANO_SMOKE` (`smokeStyles.ts`; the user's pick, option e of the SMOKE experiment): 7 white cauliflower billows with a dark outline, lit from the top left, r 10 -> 26 art px, rising 110 art px and spreading at the top on a 5.2 s loop, fading by a Bayer dither (binary alpha, 15-bit colours, whole art px). The shapes are `smokeShapes.ts`, the pure motion `smokeMotion.ts`; the bitmaps are shared `GraphicsContext`s built once per art scale, so a frame allocates nothing. Check it with `?mute=1&scenario=smoke_volcano` (Debug on the title screen).
 - **Diagnostics** (`src/core/diagnostics.ts`): `?trace=1` (or `localStorage.ff1_trace = '1'`) logs every scene change, error, rejection, page unload and Vite full reload to the console and `window.__trace`; off by default. A lost WebGL context and a halted game loop always show a banner over the page. The dev server ignores `.claude/` (`vite.config.ts`), which stopped agent worktrees from reloading the page.
 
 ### Game Over

@@ -27,6 +27,9 @@ const NEW_FILES = [
   // LM-INT: the ambient field effects and the landmark re-cut tool
   'src/scenes/exploration/FieldAmbient.ts', 'src/core/schemaValidationAmbient.ts', 'src/types/ambient.ts',
   'assets-src/gen/landmark_cut.py', 'assets-src/gen/landmark_pix.py',
+  // SMOKE: the volcano smoke (option e of the experiment)
+  'src/scenes/exploration/smoke/smokeShapes.ts', 'src/scenes/exploration/smoke/smokeStyles.ts',
+  'src/scenes/exploration/smoke/smokeMotion.ts', 'src/scenes/exploration/smoke/SmokeColumn.ts',
 ];
 
 describe('file-size ceilings', () => {
