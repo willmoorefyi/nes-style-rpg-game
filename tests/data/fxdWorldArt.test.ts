@@ -110,7 +110,8 @@ describe('P3-04: the ice-cavern-b3 niche chest stands on frost floor', () => {
 
 describe('P3-13: Melmond and Onrac read as towns on the world map', () => {
   const icon = (name: string): Deco => world.objects.find((o) => o.name === name)!;
-  // LM-INT: each town's own approved Bedrock icon (2x1) replaced the walled-town icon's drawn row town_icon_1_*
+  // LM-INT: each town's own approved Bedrock icon replaced the walled-town icon's drawn row town_icon_1_* (2x1;
+  // LM4-INT: Melmond 4x3, Onrac 5x3)
   const town = (name: string): string[] => [`town_${name}_icon_0_0`, `town_${name}_icon_0_1`];
 
   it.each([['melmond', 'ert_melmond'], ['onrac', 'wat_onrac']])('%s uses its town icon, its door beside %s', (name, anchor) => {

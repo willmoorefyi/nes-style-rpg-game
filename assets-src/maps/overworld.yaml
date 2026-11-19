@@ -338,20 +338,23 @@ objects:
 - type: deco
   name: pravoka
   parts:
-  - [town_icon_1_0, town_icon_1_1]
+  - [town_pravoka_icon_0_0, town_pravoka_icon_0_1, town_pravoka_icon_0_2]
+  - [town_pravoka_icon_1_0, town_pravoka_icon_1_1, town_pravoka_icon_1_2]
+  - [town_pravoka_icon_2_0, town_pravoka_icon_2_1, town_pravoka_icon_2_2]
   x: 130
-  y: 100
+  y: 98
   walk_cells:
-  - [1, 0]
+  - [1, 2]
+  collide: alpha
+  on_water: true
 - type: deco
   name: lighthouse
   parts:
-  - [tower_icon_0_0, tower_icon_0_1]
-  - [tower_icon_1_0, tower_icon_1_1]
-  - [tower_icon_2_0, tower_icon_2_1]
+  - [lighthouse_icon_0_0, lighthouse_icon_0_1]
+  - [lighthouse_icon_1_0, lighthouse_icon_1_1]
+  - [lighthouse_icon_2_0, lighthouse_icon_2_1]
   x: 138
   y: 98
-  style: bright
   collide: alpha
 - type: deco
   name: cairn
@@ -391,13 +394,13 @@ objects:
   name: elfheim
   x: 81
   y: 151
-  style: elf
   parts:
-  - [tree_clump, town_icon_0_0, tree_clump]
-  - [tree_clump, town_icon_1_0, town_icon_1_1]
-  - [tree_clump, tree_clump, tree_clump]
+  - [tree_clump, town_elfheim_icon_0_1, tree_clump]
+  - [town_elfheim_icon_1_0, town_elfheim_icon_1_1, town_elfheim_icon_1_2]
+  - [town_elfheim_icon_2_0, town_elfheim_icon_2_1, town_elfheim_icon_2_2]
   walk_cells:
   - [1, 0]
+  collide: alpha
 - type: deco
   x: 55
   y: 140
@@ -514,65 +517,56 @@ objects:
   - [0, 1]
 - type: deco
   name: melmond
-  x: 40
-  y: 112
-  parts:
-  - [town_melmond_icon_0_0, town_melmond_icon_0_1]
-  walk_cells:
-  - [1, 0]
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 39
-  y: 110
-  offset: [-8, -4]
-  collide: alpha
-- type: deco
-  parts:
-  - [boulder]
-  x: 40
-  y: 110
-  offset: [10, 10]
-  collide: alpha
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 40
-  y: 111
-  offset: [-7, 7]
-  collide: alpha
-- type: deco
-  parts:
-  - [boulder]
-  x: 41
-  y: 111
-  offset: [3, 0]
-- type: deco
-  parts:
-  - [boulder]
-  x: 39
-  y: 113
-  offset: [9, -11]
-  collide: alpha
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 41
-  y: 113
-  offset: [2, -2]
-- type: deco
-  parts:
-  - [boulder]
   x: 38
-  y: 114
-  offset: [4, 7]
+  y: 111
+  parts:
+  - [town_melmond_icon_0_0, town_melmond_icon_0_1, town_melmond_icon_0_2, tree_clump]
+  - [town_melmond_icon_1_0, town_melmond_icon_1_1, town_melmond_icon_1_2, town_melmond_icon_1_3]
+  - [town_melmond_icon_2_0, town_melmond_icon_2_1, town_melmond_icon_2_2, town_melmond_icon_2_3]
+  walk_cells:
+  - [3, 1]
   collide: alpha
 - type: deco
   parts:
   - [tree_clump]
-  x: 42
+  x: 38
+  y: 110
+  offset: [-4, 10]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 40
+  y: 110
+  offset: [0, 5]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 37
+  y: 111
+  offset: [0, -9]
+  collide: alpha
+- type: deco
+  parts:
+  - [boulder]
+  x: 37
+  y: 113
+  offset: [1, -3]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 37
   y: 114
-  offset: [-1, 0]
+  offset: [-9, -8]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 39
+  y: 114
+  offset: [-4, 10]
   collide: alpha
 - type: deco
   parts:
@@ -598,13 +592,14 @@ objects:
 - type: deco
   name: crescent_icon
   parts:
-  - [tree_clump, bush, tree_clump]
-  - [null, town_icon_1_0, town_icon_1_1]
-  - [tree_clump, boulder, tree_clump]
+  - [town_crescent_icon_0_0, town_crescent_icon_0_1, town_crescent_icon_0_2]
+  - [town_crescent_icon_1_0, town_crescent_icon_1_1, town_crescent_icon_1_2]
+  - [town_crescent_icon_2_0, town_crescent_icon_2_1, town_crescent_icon_2_2]
   x: 149
   y: 123
   walk_cells:
   - [0, 1]
+  collide: alpha
 - type: deco
   name: volcano
   parts:
@@ -642,13 +637,12 @@ objects:
   y: 157
   collide: alpha
 - type: deco
-  name: shrine
+  name: standing_stones
   parts:
-  - [shrine_icon_0_0, shrine_icon_0_1]
-  - [shrine_icon_1_0, shrine_icon_1_1]
+  - [standing_stones_icon_0_0, standing_stones_icon_0_1]
+  - [standing_stones_icon_1_0, standing_stones_icon_1_1]
   x: 159
   y: 123
-  style: pale_stone
   collide: alpha
 - type: deco
   parts:
@@ -706,13 +700,12 @@ objects:
   walk_cells:
   - [1, 1]
 - type: deco
-  name: tent
+  name: hermit_hut
   parts:
-  - [tent_icon_0_0, tent_icon_0_1]
-  - [tent_icon_1_0, tent_icon_1_1]
+  - [hermit_hut_icon_0_0, hermit_hut_icon_0_1]
+  - [hermit_hut_icon_1_0, hermit_hut_icon_1_1]
   x: 118
   y: 38
-  style: dune
   collide: alpha
 - type: deco
   parts:
@@ -734,66 +727,57 @@ objects:
   collide: alpha
 - type: deco
   name: onrac
-  x: 28
-  y: 38
-  parts:
-  - [town_onrac_icon_0_0, town_onrac_icon_0_1]
-  walk_cells:
-  - [0, 0]
-- type: deco
-  parts:
-  - [bush]
   x: 26
-  y: 35
-  offset: [0, -4]
-  collide: alpha
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 29
-  y: 35
-  offset: [8, -4]
-  collide: alpha
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 30
-  y: 35
-  offset: [5, -7]
-  collide: alpha
-- type: deco
-  parts:
-  - [tree_clump]
-  x: 29
   y: 36
-  offset: [7, 8]
+  parts:
+  - [town_onrac_icon_0_0, town_onrac_icon_0_1, town_onrac_icon_0_2, town_onrac_icon_0_3, town_onrac_icon_0_4]
+  - [town_onrac_icon_1_0, town_onrac_icon_1_1, town_onrac_icon_1_2, town_onrac_icon_1_3, town_onrac_icon_1_4]
+  - [town_onrac_icon_2_0, town_onrac_icon_2_1, town_onrac_icon_2_2, town_onrac_icon_2_3, town_onrac_icon_2_4]
   collide: alpha
+  walk_cells:
+  - [2, 2]
 - type: deco
   parts:
   - [tree_clump]
-  x: 28
-  y: 37
-  offset: [-2, -3]
-- type: deco
-  parts:
-  - [bush]
-  x: 29
-  y: 37
+  x: 27
+  y: 35
   offset: [10, -3]
   collide: alpha
 - type: deco
   parts:
-  - [boulder]
-  x: 26
-  y: 38
-  offset: [1, 4]
+  - [bush]
+  x: 28
+  y: 35
+  offset: [0, 0]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 29
+  y: 35
+  offset: [-4, 8]
+  collide: alpha
+- type: deco
+  parts:
+  - [bush]
+  x: 25
+  y: 36
+  offset: [-4, 5]
+  collide: alpha
+- type: deco
+  parts:
+  - [tree_clump]
+  x: 31
+  y: 37
+  offset: [-7, 7]
   collide: alpha
 - type: deco
   parts:
   - [boulder]
-  x: 27
+  x: 25
   y: 38
-  offset: [-3, -3]
+  offset: [8, -6]
+  collide: alpha
 - type: deco
   name: waterfall
   x: 30
@@ -836,8 +820,8 @@ objects:
 - type: deco
   name: gaia
   parts:
-  - [town_icon_0_0, town_icon_0_1]
-  - [town_icon_1_0, town_icon_1_1]
+  - [town_gaia_icon_0_0, town_gaia_icon_0_1, town_gaia_icon_0_2]
+  - [town_gaia_icon_1_0, town_gaia_icon_1_1, town_gaia_icon_1_2]
   x: 150
   y: 12
   walk_cells:
@@ -864,9 +848,9 @@ objects:
 - type: deco
   name: mirage
   parts:
-  - [tower_icon_0_0, tower_icon_0_1]
-  - [tower_icon_1_0, tower_icon_1_1]
-  - [tower_icon_2_0, tower_icon_2_1]
+  - [mirage_tower_icon_0_0, mirage_tower_icon_0_1]
+  - [mirage_tower_icon_1_0, mirage_tower_icon_1_1]
+  - [mirage_tower_icon_2_0, mirage_tower_icon_2_1]
   x: 131
   y: 34
   walk_cells:
@@ -878,25 +862,15 @@ objects:
   x: 133
   y: 36
 - type: deco
-  name: lufenia_west
-  parts:
-  - [dome_icon_0_0, dome_icon_0_1]
-  - [dome_icon_1_0, dome_icon_1_1]
-  x: 150
-  y: 44
-  collide: alpha
-  offset: [0, -6]
-- type: deco
   name: lufenia
   parts:
-  - [dome_icon_0_0, dome_icon_0_1]
-  - [dome_icon_1_0, dome_icon_1_1]
-  x: 152
+  - [lufenia_icon_0_0, lufenia_icon_0_1, lufenia_icon_0_2, lufenia_icon_0_3]
+  - [lufenia_icon_1_0, lufenia_icon_1_1, lufenia_icon_1_2, lufenia_icon_1_3]
+  x: 150
   y: 44
   walk_cells:
-  - [0, 1]
+  - [2, 1]
   collide: alpha
-  offset: [0, -6]
 - type: deco
   parts:
   - [boulder]

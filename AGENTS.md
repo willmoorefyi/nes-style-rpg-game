@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (9028 tests, 354 files, Vitest; measured at pass W INT; the real-world mutation suite makes a full run take about an hour)
+npm test             # Run all tests (9195 tests, 367 files, Vitest; measured at LM4-INT; the real-world mutation suite makes a full run take about an hour)
 ```
 
 **Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
@@ -328,23 +328,34 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   events of the stage and its ancestors, `outOfScopeEvents`, and the full run covers the other orderings), `--only abc`,
   `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes well over
   an hour and a few GB: run it in the background.
-- **Landmark art (LM-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art: the sheet
-  `gen/approved/overworld/landmarks_lm.{png,json}` (cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache
-  key, model, seed, pass LM / LM2 and the cut and pixelize settings), re-cut offline from the render cache by
-  `python3 -I assets-src/gen/landmark_cut.py` (`--check`: the committed sheet rebuilds; `landmark_pix.py` holds the
-  cutter). `kit.load_kit` puts its cells over the code-drawn placeholders in **every** kit; the placeholders remain
-  only as the fallback while the sheet is missing. LM-INT added the 1x1 `tuft` landmark (Gaia's fold; the `tuft`
-  part stays the compiler's grass speckle) and the 2x1 town icons `town_melmond` / `town_onrac`. Recolours kept:
-  tower `bright` / `stone` / `slate` (the Western Keep), buried_hull `slate` (Onrac's submarine), tent `dune`,
-  windmill `stone` (Melmond), shrine `pale_stone`, cave_mouth `snow` (the Ice Cavern); dropped: buried_hull `brown` and
-  `dune`, windmill `pale_dune`, ice_floe and shrine `snow`. The approved icons leave their top rows mostly sky, so tall landmarks use
-  `collide: alpha` (the overworld's `art_coverage` check fails on a blocked cell with under 25 % art).
+- **Landmark art (LM-INT, LM4-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from two sheets
+  (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2) and `landmarks_lm4.*`
+  (pass LM4); cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache key, model, seed, pass and the cut
+  and pixelize settings. Both are re-cut offline from the render cache by `python3 -I assets-src/gen/landmark_cut.py`
+  (`SPEC` / `SPEC4`; `--check`: both committed sheets rebuild; `landmark_pix.py` holds the cutter, with LM4-INT's
+  `sea_y` (the painted sea round a town's walls) and `drop` (fractional rects cut away, Pravoka's pier)). The renders
+  are not tracked: copy `assets-src/gen/cache/<key>.png` from the main checkout into a worktree first.
+  `kit.load_kit` puts their cells over the code-drawn placeholders in **every** kit; the placeholders remain only as
+  the fallback while a sheet is missing. LM-INT added the 1x1 `tuft` (Gaia's fold; the `tuft` part stays the
+  compiler's grass speckle). LM4-INT added the town icons `town_melmond` 4x3 (x 38-41, y 111-113), `town_onrac` 5x3
+  (26-30, 36-38), `town_pravoka` 3x3 (130-132, 98-100; user ruling 2026-11-19, WORLD 2.5), `town_elfheim` 3x3,
+  `town_crescent` 3x3, `town_gaia` 3x2 (150-152, 12-13) and `lufenia` 4x2 (150-153, 44-45; it replaced the two
+  domes), the boats `brig` 4x3 (Pravoka (34, 35)), `fishing_boat` 3x2 and `submarine` 4x2 (Onrac (14, 37), (39, 26)),
+  and `bell_tower` (Onrac), `lighthouse` (the world (138, 98) and Pravoka (41, 10)), `mirage_tower`,
+  `standing_stones` (the Circle's islet) and `hermit_hut`. A town icon covers its whole ICON box with
+  `collide: alpha` and its door as a `walk_cells` cell; where the art's cell beside a door is near-empty sky, a
+  `tree_clump` part stands in it (Elfheim's top corners, Melmond's top-right) so the door keeps one way in (OW-2).
+  The generic `town_icon` is no longer placed anywhere, and `buried_hull` is only FIRE's airship hull. Recolours
+  kept: tower `slate` (the Western Keep), tent `dune` (the caravan camp), windmill `stone` (Melmond), cave_mouth
+  `snow` (the Ice Cavern); LM4-INT dropped tower `bright` / `stone`, buried_hull `slate`, shrine `pale_stone`, the
+  hermit's tent `dune` and Elfheim's `elf` roofs (each item has its own art now). The approved icons leave their top
+  rows mostly sky, so tall landmarks use `collide: alpha` (the overworld's `art_coverage` check fails on a blocked
+  cell with under 25 % art).
 - **Ambient effects (LM-INT).** A map source's `ambient: [{kind: smoke, x, y, ox, oy}]` (cell, art px 0-47 inside it;
   `build_hooks.ambient` checks and copies it, `schemaValidationAmbient.ts` validates it) is drawn by
   `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is five grey pixel-art puffs on a
   3.2 s loop (`smokePuffs`). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut `ambient`).
-- Still placeholder: the fairy and the mermaids are tinted NPC sheets; the buried hull is reused as the Pravoka brig,
-  Onrac's fishing boat and the submarine (a hull on a sand bank, standing in the water).
+- Still placeholder: the fairy and the mermaids are tinted NPC sheets.
 
 ### New Cutscene
 

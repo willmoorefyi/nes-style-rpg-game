@@ -103,6 +103,22 @@ describe('the frozen act-1 core (WORLD_PLAN 2.5)', () => {
     for (const [name, [x, y]] of Object.entries(act1.entrances)) expect(world.entrances[name], name).toEqual([x + OX, y + OY]);
   });
 
+  it('LM4-INT (user ruling 2026-11-19): Pravoka\'s icon grew to exactly 3x3 at x 130-132, y 98-100, inside X_pravoka', () => {
+    type Deco = { name?: string; x: number; y: number; parts: (string | null)[][]; walk_cells?: [number, number][] };
+    const icon = (listOf(world, 'objects') as Deco[]).find((o) => o.name === 'pravoka')!;
+    const cells: string[] = [];
+    icon.parts.forEach((row, j) => row.forEach((_, i) => cells.push(`${icon.x + i},${icon.y + j}`)));
+    const want: string[] = [];
+    for (let y = 98; y <= 100; y++) for (let x = 130; x <= 132; x++) want.push(`${x},${y}`);
+    expect(cells).toEqual(want);
+    for (const c of cells) {
+      const [x, y] = c.split(',').map(Number);
+      expect(exceptionAt(x - OX, y - OY)?.id, c).toBe('X_pravoka');
+    }
+    expect(icon.walk_cells!.map(([i, j]) => [icon.x + i, icon.y + j])).toEqual([[131, 100]]);
+    expect(world.entrances.a1_pravoka).toEqual([131, 101]);
+  });
+
   it('the ship spawn may move; the canoe spawn is removed (the canoe is an ability)', () => {
     expect(act1.vehicles!.map((v) => v.type)).toEqual(['ship', 'canoe']);
     expect((world.vehicles ?? []).filter((v) => v.type === 'canoe')).toEqual([]);

@@ -248,12 +248,11 @@ objects:
   enter: {map: onrac-house-shipwright, entrance: door}
 - type: deco
   parts:
-  - [tower_icon_0_0, tower_icon_0_1]
-  - [tower_icon_1_0, tower_icon_1_1]
-  - [tower_icon_2_0, tower_icon_2_1]
+  - [bell_tower_icon_0_0, bell_tower_icon_0_1]
+  - [bell_tower_icon_1_0, bell_tower_icon_1_1]
+  - [bell_tower_icon_2_0, bell_tower_icon_2_1]
   x: 27
   y: 17
-  style: stone
   collide: alpha
 - {type: well, x: 20, y: 17}
 - {type: bench, x: 19, y: 21}
@@ -444,19 +443,20 @@ objects:
   on_water: true
 - type: deco
   parts:
-  - [buried_hull_icon_0_0, buried_hull_icon_0_1, buried_hull_icon_0_2]
-  - [buried_hull_icon_1_0, buried_hull_icon_1_1, buried_hull_icon_1_2]
+  - [fishing_boat_icon_0_0, fishing_boat_icon_0_1, fishing_boat_icon_0_2]
+  - [fishing_boat_icon_1_0, fishing_boat_icon_1_1, fishing_boat_icon_1_2]
   x: 14
   y: 37
   on_water: true
+  collide: alpha
 - type: deco
   parts:
-  - [buried_hull_icon_0_0, buried_hull_icon_0_1, buried_hull_icon_0_2]
-  - [buried_hull_icon_1_0, buried_hull_icon_1_1, buried_hull_icon_1_2]
+  - [submarine_icon_0_0, submarine_icon_0_1, submarine_icon_0_2, submarine_icon_0_3]
+  - [submarine_icon_1_0, submarine_icon_1_1, submarine_icon_1_2, submarine_icon_1_3]
   x: 39
   y: 26
   on_water: true
-  style: slate
+  collide: alpha
 npcs:
 - id: onrac_gate_watch
   sprite: guard

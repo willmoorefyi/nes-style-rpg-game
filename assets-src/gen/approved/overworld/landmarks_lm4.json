@@ -1,0 +1,746 @@
+{
+  "kit": "overworld",
+  "sheet": "landmarks_lm4",
+  "backend": "bedrock",
+  "tool": "assets-src/gen/landmark_cut.py",
+  "approved": "2026-11-19",
+  "tile": 48,
+  "cells": [
+    [
+      "town_melmond_icon_0_0",
+      "town_melmond_icon_0_1",
+      "town_melmond_icon_0_2",
+      "town_melmond_icon_0_3",
+      "town_onrac_icon_0_0",
+      "town_onrac_icon_0_1",
+      "town_onrac_icon_0_2",
+      "town_onrac_icon_0_3",
+      "town_onrac_icon_0_4",
+      "town_pravoka_icon_0_0",
+      "town_pravoka_icon_0_1",
+      "town_pravoka_icon_0_2",
+      "town_elfheim_icon_0_0",
+      "town_elfheim_icon_0_1",
+      "town_elfheim_icon_0_2",
+      null
+    ],
+    [
+      "town_melmond_icon_1_0",
+      "town_melmond_icon_1_1",
+      "town_melmond_icon_1_2",
+      "town_melmond_icon_1_3",
+      "town_onrac_icon_1_0",
+      "town_onrac_icon_1_1",
+      "town_onrac_icon_1_2",
+      "town_onrac_icon_1_3",
+      "town_onrac_icon_1_4",
+      "town_pravoka_icon_1_0",
+      "town_pravoka_icon_1_1",
+      "town_pravoka_icon_1_2",
+      "town_elfheim_icon_1_0",
+      "town_elfheim_icon_1_1",
+      "town_elfheim_icon_1_2",
+      null
+    ],
+    [
+      "town_melmond_icon_2_0",
+      "town_melmond_icon_2_1",
+      "town_melmond_icon_2_2",
+      "town_melmond_icon_2_3",
+      "town_onrac_icon_2_0",
+      "town_onrac_icon_2_1",
+      "town_onrac_icon_2_2",
+      "town_onrac_icon_2_3",
+      "town_onrac_icon_2_4",
+      "town_pravoka_icon_2_0",
+      "town_pravoka_icon_2_1",
+      "town_pravoka_icon_2_2",
+      "town_elfheim_icon_2_0",
+      "town_elfheim_icon_2_1",
+      "town_elfheim_icon_2_2",
+      null
+    ],
+    [
+      "town_crescent_icon_0_0",
+      "town_crescent_icon_0_1",
+      "town_crescent_icon_0_2",
+      "town_gaia_icon_0_0",
+      "town_gaia_icon_0_1",
+      "town_gaia_icon_0_2",
+      "lufenia_icon_0_0",
+      "lufenia_icon_0_1",
+      "lufenia_icon_0_2",
+      "lufenia_icon_0_3",
+      "brig_icon_0_0",
+      "brig_icon_0_1",
+      "brig_icon_0_2",
+      "brig_icon_0_3",
+      null,
+      null
+    ],
+    [
+      "town_crescent_icon_1_0",
+      "town_crescent_icon_1_1",
+      "town_crescent_icon_1_2",
+      "town_gaia_icon_1_0",
+      "town_gaia_icon_1_1",
+      "town_gaia_icon_1_2",
+      "lufenia_icon_1_0",
+      "lufenia_icon_1_1",
+      "lufenia_icon_1_2",
+      "lufenia_icon_1_3",
+      "brig_icon_1_0",
+      "brig_icon_1_1",
+      "brig_icon_1_2",
+      "brig_icon_1_3",
+      null,
+      null
+    ],
+    [
+      "town_crescent_icon_2_0",
+      "town_crescent_icon_2_1",
+      "town_crescent_icon_2_2",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "brig_icon_2_0",
+      "brig_icon_2_1",
+      "brig_icon_2_2",
+      "brig_icon_2_3",
+      null,
+      null
+    ],
+    [
+      "submarine_icon_0_0",
+      "submarine_icon_0_1",
+      "submarine_icon_0_2",
+      "submarine_icon_0_3",
+      "fishing_boat_icon_0_0",
+      "fishing_boat_icon_0_1",
+      "fishing_boat_icon_0_2",
+      "bell_tower_icon_0_0",
+      "bell_tower_icon_0_1",
+      "lighthouse_icon_0_0",
+      "lighthouse_icon_0_1",
+      "mirage_tower_icon_0_0",
+      "mirage_tower_icon_0_1",
+      "standing_stones_icon_0_0",
+      "standing_stones_icon_0_1",
+      null
+    ],
+    [
+      "submarine_icon_1_0",
+      "submarine_icon_1_1",
+      "submarine_icon_1_2",
+      "submarine_icon_1_3",
+      "fishing_boat_icon_1_0",
+      "fishing_boat_icon_1_1",
+      "fishing_boat_icon_1_2",
+      "bell_tower_icon_1_0",
+      "bell_tower_icon_1_1",
+      "lighthouse_icon_1_0",
+      "lighthouse_icon_1_1",
+      "mirage_tower_icon_1_0",
+      "mirage_tower_icon_1_1",
+      "standing_stones_icon_1_0",
+      "standing_stones_icon_1_1",
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "bell_tower_icon_2_0",
+      "bell_tower_icon_2_1",
+      "lighthouse_icon_2_0",
+      "lighthouse_icon_2_1",
+      "mirage_tower_icon_2_0",
+      "mirage_tower_icon_2_1",
+      null,
+      null,
+      null
+    ],
+    [
+      "hermit_hut_icon_0_0",
+      "hermit_hut_icon_0_1",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "hermit_hut_icon_1_0",
+      "hermit_hut_icon_1_1",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "landmarks": {
+    "town_melmond": {
+      "tag": "town_melmond_ultra_a_1",
+      "cache_key": "709c3c99c3b59268d8f2c9b4",
+      "cells": [
+        4,
+        3
+      ],
+      "model": "ultra",
+      "seed": 1,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.12
+      },
+      "post": null,
+      "fig_px": [
+        186,
+        120
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        0
+      ]
+    },
+    "town_onrac": {
+      "tag": "town_onrac_ultra_a_2",
+      "cache_key": "d495d457c76fb08d332861f9",
+      "cells": [
+        5,
+        3
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        233,
+        130
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        4
+      ]
+    },
+    "town_pravoka": {
+      "tag": "town_pravoka_ultra_a_3",
+      "cache_key": "44ff0df3838561d243ffe09b",
+      "cells": [
+        3,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "sea_y": 0.45,
+        "drop": [
+          [
+            0.0,
+            0.69,
+            0.49,
+            1.0
+          ]
+        ]
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.12
+      },
+      "post": null,
+      "fig_px": [
+        140,
+        105
+      ],
+      "approved": "2026-11-19",
+      "note": "LM4-INT: re-cut bigger (3x3, user ruling 2026-11-19; LM4 reviewed it at 2x2): the painted sea round the walls (sea_y) and the pier with its boat (drop) are cut away, the rock footing kept",
+      "at": [
+        0,
+        9
+      ]
+    },
+    "town_elfheim": {
+      "tag": "town_elfheim_ultra_a_3",
+      "cache_key": "89d203e1f452094af4fde9dc",
+      "cells": [
+        3,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.12
+      },
+      "post": null,
+      "fig_px": [
+        140,
+        129
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        12
+      ]
+    },
+    "town_crescent": {
+      "tag": "town_crescent_ultra_b_4",
+      "cache_key": "62c1d000e031f2dcdca68c18",
+      "cells": [
+        3,
+        3
+      ],
+      "model": "ultra",
+      "seed": 4,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.12
+      },
+      "post": null,
+      "fig_px": [
+        140,
+        131
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        0
+      ]
+    },
+    "town_gaia": {
+      "tag": "town_gaia_ultra_a_3",
+      "cache_key": "47fb9c70bf664d435f608910",
+      "cells": [
+        3,
+        2
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.12
+      },
+      "post": null,
+      "fig_px": [
+        140,
+        80
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        3
+      ]
+    },
+    "lufenia": {
+      "tag": "lufenia_ultra_a_3",
+      "cache_key": "d3fecf9be5789401cb7e4668",
+      "cells": [
+        4,
+        2
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        186,
+        91
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        6
+      ]
+    },
+    "brig": {
+      "tag": "brig_ultra_b_4",
+      "cache_key": "58f156f5112d6d559d3c676c",
+      "cells": [
+        4,
+        3
+      ],
+      "model": "ultra",
+      "seed": 4,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.95,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        182,
+        129
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        10
+      ]
+    },
+    "submarine": {
+      "tag": "submarine_ultra_b_6",
+      "cache_key": "739cea1ec20fc8eb089366ce",
+      "cells": [
+        4,
+        2
+      ],
+      "model": "ultra",
+      "seed": 6,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.95,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        182,
+        85
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        6,
+        0
+      ]
+    },
+    "fishing_boat": {
+      "tag": "fishing_boat_ultra_a_3",
+      "cache_key": "db9e0440ec808448a0ea3778",
+      "cells": [
+        3,
+        2
+      ],
+      "nobg_key": "2597a2c1c2b85771187fce11",
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "remove_bg",
+        "tol": 28
+      },
+      "pixelize": {
+        "fill": 0.95,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        137,
+        85
+      ],
+      "approved": "2026-11-19",
+      "note": "LM4: through remove_bg (it drops the render's white reflection on the water)",
+      "at": [
+        6,
+        4
+      ]
+    },
+    "bell_tower": {
+      "tag": "bell_tower_ultra_a_2",
+      "cache_key": "7427f3aca030b3112ef6454a",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        133
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        6,
+        7
+      ]
+    },
+    "lighthouse": {
+      "tag": "lighthouse_ultra_a_3",
+      "cache_key": "03de232e07f7214f74e33a7e",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        131
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        6,
+        9
+      ]
+    },
+    "mirage_tower": {
+      "tag": "mirage_tower_ultra_a_1",
+      "cache_key": "a3d09bb1fd1c99cb0159a424",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 1,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        121
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        6,
+        11
+      ]
+    },
+    "standing_stones": {
+      "tag": "standing_stones_ultra_a_1",
+      "cache_key": "4dedbe1adec5f94c29966260",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 1,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.2
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        69
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        6,
+        13
+      ]
+    },
+    "hermit_hut": {
+      "tag": "hermit_hut_ultra_a_3",
+      "cache_key": "a6c7cb7e75cc2b60f63cf20e",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM4",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.15
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        76
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        9,
+        0
+      ]
+    }
+  },
+  "note": "LM4-INT: the user's picks of pass LM4 (Stability Ultra renders, the fishing boat through remove_bg), re-cut offline from the render cache: the town icons of Melmond, Onrac, Pravoka, Elfheim, Crescent and Gaia, Lufenia's icon, the brig, submarine and fishing boat, and the bell tower, lighthouse, Mirage Tower, standing stones and hermit's hut"
+}

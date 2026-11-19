@@ -53,19 +53,23 @@ def _mouth(at: Cell, door: int, block: bool = True) -> dict:
 
 
 def melmond_icon(g: dict[Cell, str]) -> list[dict]:
-    """Melmond's icon: the approved Bedrock town icon (`town_melmond`, 2x1, LM-INT; before, the walled-town icon's
-    drawn row `town_icon_1_*`) on the door's row with the door in it, and round it the fields' copses, bushes and stones scattered by
-    a seeded generator (FX-R P3-R4: varied kinds and offsets, with gaps; before, an exact 3x3 ring)."""
+    """Melmond's icon: the approved Bedrock town icon (`town_melmond`, 4x3, LM4-INT; LM-INT's was 2x1 on the door's
+    row) over the whole ICON box, the door its walk cell [3, 1], entered from the gate east of it; round it the fields'
+    copses, bushes and stones scattered by a seeded generator (FX-R P3-R4: varied kinds and offsets, with gaps)."""
     import kit  # noqa: PLC0415
-    assert len(MEL.ICON) == 9, "Melmond's icon: 3x3"
-    x0 = min(x for x, _ in MEL.ICON)
-    tx = MEL.DOOR[0] - 1 if MEL.DOOR[0] - 1 >= x0 else MEL.DOOR[0]
-    town = {(tx, MEL.DOOR[1]), (tx + 1, MEL.DOOR[1])}
+    w, h = kit.LANDMARKS["town_melmond"][:2]
+    assert len(MEL.ICON) == w * h, f"Melmond's icon: {w}x{h}"
+    tx, ty = min(x for x, _ in MEL.ICON), min(y for _, y in MEL.ICON)
+    town = set(MEL.ICON)
     gx, gy = MEL.GATE
     taken = town | {MEL.GATE, (gx, gy - 1), (gx, gy + 1), (gx + 1, gy), (gx - 1, gy)}
     walk = lambda c: g.get(c) == GRASS  # noqa: E731
-    return [{"type": "deco", "name": "melmond", "x": tx, "y": MEL.DOOR[1], "parts": kit.landmark_parts("town_melmond"),
-             "walk_cells": [[MEL.DOOR[0] - tx, 0]]},
+    parts = [list(r) for r in kit.landmark_parts("town_melmond")]
+    # the art's top-right cell over the door is near-empty sky (1 % art): a copse stands in it, so the door is
+    # entered from its gate only (OW-2)
+    parts[MEL.DOOR[1] - ty - 1][MEL.DOOR[0] - tx] = "tree_clump"
+    return [{"type": "deco", "name": "melmond", "x": tx, "y": ty, "parts": parts,
+             "walk_cells": [[MEL.DOOR[0] - tx, MEL.DOOR[1] - ty]], "collide": "alpha"},
             *scatter(list(MEL.ICON), taken, DRESS_SEED, ring_of(list(MEL.ICON)), walk,
                     door_sides(MEL.DOOR, list(MEL.ICON), taken), MEL.GATE)]
 

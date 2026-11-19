@@ -215,6 +215,20 @@
       "note": "User 2026-11-19: airship front and back views to match LM2 b_7; no Gemini. gemini_before as LM2 (the Gemini ledger is unchanged). One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 33,
       "closed": "2026-11-19, 33 of 40 (LM3 done: airship back and front views for LM2 b_7, best by control_sketch from a drawn end-on sketch; awaiting the user's review)"
+    },
+    {
+      "pass": "LM4",
+      "cap": 80,
+      "per_purpose_caps": {
+        "lm4_gen": 60,
+        "lm4_nobg": 10,
+        "reserve": 10
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-19: larger Melmond and Onrac town icons, unique brig / fishing boat / submarine art, the no-reuse audit; no Gemini. gemini_before as LM3 (the Gemini ledger is unchanged). One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 57,
+      "closed": "2026-11-19, 57 of 80 (LM4 done: Melmond, Onrac and four more town icons, brig, fishing boat, submarine, bell tower, lighthouse, Mirage Tower, standing stones, Lufenia, hermit's hut rendered; awaiting the user's review)"
     }
   ]
 }

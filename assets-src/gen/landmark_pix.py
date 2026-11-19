@@ -7,6 +7,8 @@ The LM2 pilot pipeline, kept byte for byte so the approved sheet rebuilds from t
   hue_nudge() cool grey rock -> warm taupe (the cave mouth, to sit with the mountains)
 Added in LM-INT: `smoke_y` (drop the grey smoke over a crater: the engine animates it) and `soft_y` / `soft_alpha`
 (a remove_bg base kept solid: a lower alpha threshold below soft_y, holes closed).
+Added in LM4-INT: `sea_y` (drop the painted sea round a town's walls: water-hued pixels joined to the background,
+below sea_y) and `drop` (fractional rects cut out of the figure: Pravoka's pier).
 """
 from __future__ import annotations
 
@@ -34,7 +36,7 @@ def hsv(rgb):
 
 
 def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, base_y=None, green_y=None,
-          smoke_y=None, smoke_sat=0.3):
+          smoke_y=None, smoke_sat=0.3, sea_y=None, sea_hue=(170, 215), sea_sat=0.25, sea_grow=2, drop=()):
     """rim: peel up to `rim` px of light, low-saturation pixels inward from the background (a sticker rim);
     pocket: erase near-white blobs >= `pocket` px wide trapped inside the figure (background seen through gaps);
     base_y / green_y / smoke_y: fractions of the render height: drop every row from base_y, grass-green pixels from
@@ -65,7 +67,26 @@ def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, b
     if smoke_y is not None:
         band = np.zeros_like(fg); band[:int(smoke_y * H)] = True
         fg = fg & ~(band & (s < smoke_sat))
+    if sea_y is not None:
+        fg = fg & ~sea(rgb, fg, h, s, v, sea_y, sea_hue, sea_sat, sea_grow)
+    for x0, y0, x1, y1 in drop:
+        fg = fg.copy(); W = fg.shape[1]
+        fg[int(y0 * H):int(y1 * H), int(x0 * W):int(x1 * W)] = False
     return fg
+
+
+def sea(rgb, fg, h, s, v, sea_y, hue, sat, grow):
+    """The painted sea round a figure: water-hued pixels (hue in `hue`, saturation > sat) in one region with the
+    background (so a harbour basin inside the walls stays), below row sea_y * H, grown `grow` px into the dark wave
+    ink and the white foam beside it."""
+    water = (h >= hue[0]) & (h <= hue[1]) & (s > sat)
+    lab, _ = components(water | ~fg)
+    border = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
+    out = np.isin(lab, border[border > 0]) & water
+    out[:int(sea_y * len(out))] = False
+    for _ in range(grow):
+        out |= _b(_m(out).filter(ImageFilter.MaxFilter(3))) & ((v < 0.25) | (s < 0.12) & (v > 0.85))
+    return out
 
 
 def solid_base(alpha: np.ndarray, fg: np.ndarray, soft_y: float, soft_alpha: int, light: np.ndarray | None = None,

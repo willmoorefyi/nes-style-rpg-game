@@ -47,19 +47,18 @@ def road_cells() -> list[tuple[int, int]]:
 
 
 def icon_parts() -> tuple[tuple[int, int], list[list[str | None]], list[list[int]]]:
-    """Elfheim's icon over the site's ICON cells: the town icon's left column and bottom row under the door (the
-    top-right part has too little art to stand as a wall), ringed by hedge clumps; returns (top-left, parts,
-    walk_cells)."""
+    """Elfheim's icon over the site's ICON cells: the approved Bedrock town icon `town_elfheim` (3x3, LM4-INT; before,
+    the walled-town icon's cells ringed by hedge clumps), the door its top-middle walk cell, entered from the gate
+    north of it; returns (top-left, parts, walk_cells)."""
+    from kit import landmark_parts  # noqa: PLC0415
     xs, ys = [c[0] for c in SITE.ICON], [c[1] for c in SITE.ICON]
     x0, y0, w, h = min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
-    dx, dy = SITE.DOOR[0] - x0, SITE.DOOR[1] - y0
-    parts: list[list[str | None]] = [["tree_clump"] * w for _ in range(h)]
-    parts[dy][dx] = "town_icon_0_0"
-    if dy + 1 < h:
-        parts[dy + 1][dx] = "town_icon_1_0"
-        if dx + 1 < w:
-            parts[dy + 1][dx + 1] = "town_icon_1_1"
-    return (x0, y0), parts, [[dx, dy]]
+    parts: list[list[str | None]] = [list(r) for r in landmark_parts("town_elfheim")]
+    assert (w, h) == (len(parts[0]), len(parts)), "Elfheim's icon: the ICON box is the art's size"
+    # the art's top corners are near-empty sky (2-3 % art): a hedge clump stands in each, so the door beside them
+    # is entered from its gate only (OW-2)
+    parts[0][0] = parts[0][w - 1] = "tree_clump"
+    return (x0, y0), parts, [[SITE.DOOR[0] - x0, SITE.DOOR[1] - y0]]
 
 
 def objects() -> list[dict]:
@@ -71,7 +70,7 @@ def objects() -> list[dict]:
          "parts": [[f"tower_icon_{r}_{c}" for c in range(2)] for r in range(3)]},
         {"type": "deco", "name": "marsh_cave", "x": MARSH[0], "y": MARSH[1],
          "parts": [[f"cave_mouth_icon_{r}_{c}" for c in range(2)] for r in range(2)], "walk_cells": [[1, 1]]},
-        {"type": "deco", "name": "elfheim", "x": ix, "y": iy, "style": "elf", "parts": parts, "walk_cells": walk},
+        {"type": "deco", "name": "elfheim", "x": ix, "y": iy, "parts": parts, "walk_cells": walk, "collide": "alpha"},
         {"type": "deco", "x": WAYSTONE[0], "y": WAYSTONE[1], "style": "pale_stone",
          "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "collide": "alpha"},
         {"type": "deco", "x": DOCK_POST[0], "y": DOCK_POST[1], "parts": [["dock_post_icon_0_0"]], "collide": "alpha"},

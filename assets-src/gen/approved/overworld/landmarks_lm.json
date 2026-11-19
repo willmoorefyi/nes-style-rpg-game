@@ -72,10 +72,10 @@
       "dome_icon_0_0",
       "dome_icon_0_1",
       "tuft_icon_0_0",
-      "town_melmond_icon_0_0",
-      "town_melmond_icon_0_1",
-      "town_onrac_icon_0_0",
-      "town_onrac_icon_0_1",
+      null,
+      null,
+      null,
+      null,
       null
     ],
     [
@@ -564,72 +564,6 @@
       "at": [
         3,
         10
-      ]
-    },
-    "town_melmond": {
-      "tag": "town_melmond_ultra_a_2",
-      "cache_key": "a915ca48f390b339f9406ba1",
-      "cells": [
-        2,
-        1
-      ],
-      "model": "ultra",
-      "seed": 2,
-      "pass": "LM2",
-      "cut": {
-        "mode": "flood",
-        "tol": 28,
-        "rim": 4
-      },
-      "pixelize": {
-        "fill": 0.9,
-        "colors": 14,
-        "seed": 0,
-        "sharpen": 1.0,
-        "outline": "selective"
-      },
-      "post": null,
-      "fig_px": [
-        70,
-        43
-      ],
-      "approved": "2026-11-19",
-      "at": [
-        3,
-        11
-      ]
-    },
-    "town_onrac": {
-      "tag": "town_onrac_ultra_a_2",
-      "cache_key": "02b2da0c62a0affb86d1ef6c",
-      "cells": [
-        2,
-        1
-      ],
-      "model": "ultra",
-      "seed": 2,
-      "pass": "LM2",
-      "cut": {
-        "mode": "flood",
-        "tol": 28,
-        "rim": 4
-      },
-      "pixelize": {
-        "fill": 0.9,
-        "colors": 14,
-        "seed": 0,
-        "sharpen": 1.0,
-        "outline": "selective"
-      },
-      "post": null,
-      "fig_px": [
-        64,
-        43
-      ],
-      "approved": "2026-11-19",
-      "at": [
-        3,
-        13
       ]
     }
   },

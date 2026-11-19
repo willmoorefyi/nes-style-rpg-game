@@ -97,15 +97,16 @@ def objects(site) -> list[dict]:
     xs, ys = [c[0] for c in site.ICON], [c[1] for c in site.ICON]
     x0, y0 = min(xs), min(ys)
     door = [site.DOOR[0] - x0, site.DOOR[1] - y0]
-    icon = getattr(site, "ICON_PARTS", None) or [["tree_clump", "bush", "tree_clump"],
-                                                   [None, "town_icon_1_0", "town_icon_1_1"],
-                                                   ["tree_clump", "boulder", "tree_clump"]]
-    out = [{"type": "deco", "name": "crescent_icon", "parts": icon, "x": x0, "y": y0, "walk_cells": [door]},
+    # LM4-INT: the approved Bedrock town icon `town_crescent` (3x3) over the whole ICON box, the door in its left
+    # column (before, the walled-town icon's bottom row ringed by copses)
+    icon = getattr(site, "ICON_PARTS", None) or K.landmark_parts("town_crescent")
+    out = [{"type": "deco", "name": "crescent_icon", "parts": icon, "x": x0, "y": y0, "walk_cells": [door],
+            "collide": "alpha"},
            _deco("volcano", *VOLCANO, walk_cells=[[1, 1]], collide="alpha"),
            _deco("cave_mouth", *ICE_MOUTH, walk_cells=[[1, 1]], style="snow"),
            _deco("ice_floe", 132, 151, collide="alpha"),
            _deco("buried_hull", *HULL, collide="alpha"),             # LM-INT: no dune, its sand turns orange
-           _deco("shrine", *ISLET[0], style="pale_stone", collide="alpha")]
+           _deco("standing_stones", *ISLET[0], collide="alpha")]    # LM4-INT: the Circle's stones (was the shrine)
     for x, y in ((124, 155), (128, 161), (121, 167), (152, 166)):
         out.append({"type": "deco", "parts": [["boulder"]], "x": x, "y": y, "collide": "alpha"})
     return out
