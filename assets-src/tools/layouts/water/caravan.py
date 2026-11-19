@@ -38,8 +38,8 @@ NPCS = [
         {"condition": "WAT_O_BOTTLE_BOUGHT",
          "text": ["Mind how you carry it. Whatever sleeps in there has been asleep a long while."]},
         {"text": ["A bottle stoppered with sea-wax. Shake it and something inside lights up and sulks.",
-                  f"I won't haggle: {BOTTLE_PRICE} gil, coin on the crate. Come back when your purse is heavier "
-                  "if it isn't."]}],
+                  f"I won't haggle: {BOTTLE_PRICE} gil, coin on the crate. If your purse is lighter, come back "
+                  "when it is heavier."]}],
         tint="#d8b070", takeGold=BOTTLE_PRICE, giftItem="fairy_bottle", giftFlag="WAT_O_BOTTLE_BOUGHT"),
     npc("caravan_master", "old_man", 12, 7, [
         {"condition": "WAT_O_BOTTLE_BOUGHT",

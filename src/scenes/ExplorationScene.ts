@@ -358,6 +358,11 @@ export class ExplorationScene implements Scene {
     this.encounterSystem.setMode(fieldModeOf(this.player.currentMode)); // zone `modes` (W1-B)
     // Check vehicle boarding on confirm key (when not moving)
     if (this.vehicles.tryBoard(this.player)) return;
+    const bank = this.vehicles.bankHint(this.player); // a step onto River or Lake without a canoe (P3-11)
+    if (bank) {
+      this.dialogManager.start([bank]);
+      return;
+    }
 
     const wasMoving = this.player.isMoving;
     if (!wasMoving) this.stepOrigin = { x: this.player.gridX, y: this.player.gridY };

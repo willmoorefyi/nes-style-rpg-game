@@ -189,9 +189,11 @@ npcs:
   cutscene: {id: ord_throne_wakes, onceFlag: ORD_O_THRONE}
   dialog:
   - condition: ORD_O_THRONE
-    text: ['The steward''s hands are empty now, and turned palm-down toward the arch in the west.']
+    text: ['The steward''s hands are empty now, and turned palm-down toward the arch in the west.', 'Its hem still reads: "Above, most runes only
+        hand you back to the ring. The ones that carry on lie deepest toward the stair you climbed by."']
   - text: ['A steward carved from grey stone kneels beside the empty throne, a stone crown held out in both hands.', 'Words are cut into its sleeve:
-        "No king came back to wear it. Let the one who climbs set it where it belongs."']
+        "No king came back to wear it. Let the one who climbs set it where it belongs."', 'A second line runs down the hem: "Above, most runes
+        only hand you back to the ring. The ones that carry on lie deepest toward the stair you climbed by."']
 transitions:
 - {x: 3, y: 5, targetMap: citadel-2f, targetEntrance: arrival}
 - {x: 4, y: 5, targetMap: citadel-2f, targetEntrance: arrival}

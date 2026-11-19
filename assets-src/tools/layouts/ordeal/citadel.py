@@ -99,11 +99,15 @@ f1.npcs += [
     {"id": "stone_steward", "sprite": "king", "tint": "#9c9a94", "x": 19, "y": 9,
      "cutscene": {"id": "ord_throne_wakes", "onceFlag": "ORD_O_THRONE"},
      "dialog": [{"condition": "ORD_O_THRONE",
-                 "text": ["The steward's hands are empty now, and turned palm-down toward the arch in the west."]},
+                 "text": ["The steward's hands are empty now, and turned palm-down toward the arch in the west.",
+                          "Its hem still reads: \"Above, most runes only hand you back to the ring. The ones that "
+                          "carry on lie deepest toward the stair you climbed by.\""]},
                 {"text": ["A steward carved from grey stone kneels beside the empty throne, a stone crown held out in "
                           "both hands.",
                           "Words are cut into its sleeve: \"No king came back to wear it. Let the one who climbs set it "
-                          "where it belongs.\""]}]},
+                          "where it belongs.\"",
+                          "A second line runs down the hem: \"Above, most runes only hand you back to the ring. The "
+                          "ones that carry on lie deepest toward the stair you climbed by.\""]}]},
 ]
 f1.write("Citadel of Trials 1F: the empty court; the crowned throne opens the arch to the west wing and its stair.\n" + NOTE,
          {"arrival": [17, 27], "up": [3, 6], "chute": [21, 21]},

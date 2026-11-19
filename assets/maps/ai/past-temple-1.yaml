@@ -127,4 +127,8 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: pst_lich_falls
   message: The high seat cracks in two as he stands. Two knights in black plate step out of the walls to flank him.
+inspect:
+- x: 23
+  y: 3
+  text: ['A plaque under the brazier is worn smooth, but two lines can still be read: "Two stairs, two houses." "What the west stair keeps shut, the east stair opens to those who go down by it."']
 exit: {map: overworld, entrance: temple}
