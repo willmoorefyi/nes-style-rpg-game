@@ -57,7 +57,7 @@ def grass_map(mid: str, w: int, h: int, ground: str | None = None, objects: list
 def approved_cells() -> set[str]:
     names = set()
     for meta in sorted(K.APPROVED.glob("*/*.json")):
-        if meta.with_suffix("") == K.LANDMARK_SHEET:     # the landmark sheet is the one meant to fill these cells
+        if meta.with_suffix("") in K.LANDMARK_SHEETS:    # the landmark sheets are the ones meant to fill these cells
             continue
         names |= {c for row in json.loads(meta.read_text()).get("cells", []) for c in row if c}
     return names

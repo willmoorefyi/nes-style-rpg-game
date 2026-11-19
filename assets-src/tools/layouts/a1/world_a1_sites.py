@@ -32,18 +32,18 @@ CAIRN_TEXT = ["Travellers have stacked stones on this saddle, one for each safe 
 
 def objects() -> list[dict]:
     mx, my = MATOYA_DOOR
-    # the approved town icon's art fills only its bottom row: the deco is that row (the top row is the headland rock)
-    iy = max(y for _, y in PRAVOKA.ICON)
-    ix = min(x for x, y in PRAVOKA.ICON if y == iy)
+    # LM4-INT: the approved Bedrock town icon `town_pravoka` (3x3) over the whole ICON box (before, the walled-town
+    # icon's drawn row under the headland rock); the door is the art's gate
+    ix, iy = min(x for x, _ in PRAVOKA.ICON), min(y for _, y in PRAVOKA.ICON)
     door = [PRAVOKA.DOOR[0] - ix, PRAVOKA.DOOR[1] - iy]
     return [
         # Matoya's door: a crack in the hillock's south face, the art centred on the door cell
         {"type": "deco", "name": "matoya_cave", "parts": landmark_parts("cave_mouth"), "x": mx, "y": my - 1,
          "offset": [-24, 0], "walk_cells": [[0, 1]]},
-        {"type": "deco", "name": "pravoka", "parts": [["town_icon_1_0", "town_icon_1_1"]],
-         "x": ix, "y": iy, "walk_cells": [door]},
-        {"type": "deco", "name": "lighthouse", "parts": landmark_parts("tower"), "x": LIGHTHOUSE[0], "y": LIGHTHOUSE[1],
-         "style": "bright", "collide": "alpha"},
+        {"type": "deco", "name": "pravoka", "parts": landmark_parts("town_pravoka"),
+         "x": ix, "y": iy, "walk_cells": [door], "collide": "alpha", "on_water": True},
+        {"type": "deco", "name": "lighthouse", "parts": landmark_parts("lighthouse"), "x": LIGHTHOUSE[0],
+         "y": LIGHTHOUSE[1], "collide": "alpha"},                 # LM4-INT: its own art (was the bright tower)
         {"type": "deco", "name": "cairn", "parts": [["boulder"]], "x": CAIRN[0], "y": CAIRN[1]},
     ]
 

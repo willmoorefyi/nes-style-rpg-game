@@ -33,7 +33,7 @@ EXIT = [(x, 0) for x in ROAD]                    # the gap's mouth: back to the 
 TAR_LANE, SALT_ROW, QUAY = (13, 14), (23, 24), (31, 32)
 SQUARE = (18, 16, 30, 22)                        # Bell Square
 BASIN = (38, 23, 43, 33)                         # the dry dock's stone-walled basin (canal water), its sea-gate shut
-HULL = (39, 26)                                  # the submarine, 3x2 cells on the basin water
+HULL = (39, 26)                                  # the submarine, 4x2 cells on the basin water (LM4-INT)
 GANGWAY = (38, 27)                               # the plank onto the hull: the oxyale gate and the way down
 DRY_DOCK = (37, 27)                              # the walkway cell in front of the gangway (the return point)
 NOTE = """Concept: a cold fishing port of stone and tarred timber on a frosted shelf between the cliffs and the bay: a road
@@ -120,7 +120,7 @@ home("shipwright", 39, 16, 5, 2, "slate", "stone", 3)
 
 # ── Bell Square: the bell tower, the well, benches, the signpost by the gate ──
 TOWER = (27, 17)
-deco(landmark_parts("tower"), *TOWER, style="stone", collide="alpha")
+deco(landmark_parts("bell_tower"), *TOWER, collide="alpha")     # LM4-INT: its own approved art (no stone style)
 obj(type="well", x=20, y=17)
 for x in (19, 20):
     obj(type="bench", x=x, y=21)
@@ -154,8 +154,9 @@ obj(type="bench", x=32, y=30)
 POST = [[landmark_parts("dock_post")[0][0]]]
 for (x, y) in [(11, 35), (11, 38), (14, 35), (28, 36), (28, 39), (31, 36), (31, 39)]:
     deco(POST, x, y, on_water=True)
-deco(landmark_parts("buried_hull"), 14, 37, on_water=True)                     # the fishing boat
-deco(landmark_parts("buried_hull"), *HULL, on_water=True, style="slate")       # the iron submarine
+# LM4-INT: the approved boats (before, both were the buried hull)
+deco(landmark_parts("fishing_boat"), 14, 37, on_water=True, collide="alpha")      # the moored fishing boat, 3x2
+deco(landmark_parts("submarine"), *HULL, on_water=True, collide="alpha")          # the iron submarine, 4x2
 
 INSPECT = [
     {"x": SIGNPOST[0], "y": SIGNPOST[1], "text": P.SIGNPOST_TEXT},

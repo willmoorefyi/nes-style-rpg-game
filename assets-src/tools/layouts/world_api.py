@@ -93,6 +93,12 @@ class FrozenException:
         return self.local.shift(*A1_ORIGIN)
 
 
+# LM4-INT (user ruling 2026-11-19): Pravoka's world icon may grow and break the frozen act-1 core. It grew from 2x1
+# (130-131, 100) to the approved 3x3 icon over PRAVOKA_ICON_CELLS; those cells changed (their objects, collision and
+# art; the ground under them is unchanged: the headland rock at 130-131, 98-99 and the channel water at 132, 98-100).
+# Every one of them already lies in X_pravoka (local x 58-71, y 26-44), so no rect grew; tests/quest/a1/frozenCore
+# pins the icon to exactly these cells.
+PRAVOKA_ICON_CELLS = Rect(130, 98, 132, 100)
 FROZEN_EXCEPTIONS: dict[str, FrozenException] = {
     "X_pravoka": FrozenException(Rect(58, 26, 71, 44), "any", ("A1-T", "A1-O"),
                                  "Pravoka, its dock and its shore (A1-T: town icon and dock; A1-O: ground)"),

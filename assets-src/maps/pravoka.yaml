@@ -261,12 +261,11 @@ objects:
   enter: {map: pravoka-house-lighthouse, entrance: door}
 - type: deco
   parts:
-  - [tower_icon_0_0, tower_icon_0_1]
-  - [tower_icon_1_0, tower_icon_1_1]
-  - [tower_icon_2_0, tower_icon_2_1]
+  - [lighthouse_icon_0_0, lighthouse_icon_0_1]
+  - [lighthouse_icon_1_0, lighthouse_icon_1_1]
+  - [lighthouse_icon_2_0, lighthouse_icon_2_1]
   x: 41
   y: 10
-  style: bright
   collide: alpha
 - type: deco
   parts:
@@ -348,11 +347,13 @@ objects:
   on_water: true
 - type: deco
   parts:
-  - [buried_hull_icon_0_0, buried_hull_icon_0_1, buried_hull_icon_0_2]
-  - [buried_hull_icon_1_0, buried_hull_icon_1_1, buried_hull_icon_1_2]
-  x: 35
+  - [brig_icon_0_0, brig_icon_0_1, brig_icon_0_2, brig_icon_0_3]
+  - [brig_icon_1_0, brig_icon_1_1, brig_icon_1_2, brig_icon_1_3]
+  - [brig_icon_2_0, brig_icon_2_1, brig_icon_2_2, brig_icon_2_3]
+  x: 34
   y: 35
   on_water: true
+  collide: alpha
 - {type: barrel, x: 28, y: 16}
 - {type: barrel, x: 28, y: 22}
 - {type: barrel, x: 28, y: 27}
@@ -686,7 +687,7 @@ inspect:
 - x: 41
   y: 12
   text: [The lighthouse door is barred from inside. Its lamp has been dark for weeks., Through a crack you see the stair wind up into the gloom.]
-- x: 36
+- x: 35
   y: 35
   text:
   - condition: BIKKE_DEFEATED
