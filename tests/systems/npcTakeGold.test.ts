@@ -91,6 +91,20 @@ describe('npcTakeGold: FieldNpcActions (P2-09: a Yes / No before the sale)', () 
     expect(h.lines[1][1]).toMatch(/^You received/);
   });
 
+  it('P3-R2: the box opens on No, so one stray confirm press keeps the gold', async () => {
+    const h = npcHost([caravan], { gold: 5200 });
+    h.actions.talk(h.entity('caravan'));
+    expect(h.actions.runPending()).toBe(true);
+    const scene = h.game.scenes.register.mock.calls[0]?.[1] as PurchaseScene;
+    h.game.input.isJustPressed.mockImplementation((a: string) => a === 'confirm');
+    scene.update(1);
+    h.game.input.isJustPressed.mockReturnValue(false);
+    await new Promise((r) => setTimeout(r, 0)); // the box closes, then answers
+    expect(h.game.party.gold).toBe(5200);
+    expect(h.game.inventory.has('fairy_bottle')).toBe(false);
+    expect(h.lines[1]).toEqual(['Another time, then.']);
+  });
+
   it('one time only: once sold, talking asks nothing', async () => {
     const { h } = await buy(9000, true);
     h.game.scenes.register.mockClear();
