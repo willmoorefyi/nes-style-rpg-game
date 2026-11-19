@@ -68,6 +68,9 @@ SEA = [{"groups": [_g("sahagin_prince", 2, 4)], "weight": 3},
        {"groups": [_g("sea_snake", 1, 2)], "weight": 3},
        {"groups": [_g("white_shark", 1)], "weight": 2},
        {"groups": [_g("deepeyes", 1)], "weight": 1}]
+# the lake cells no walking zone holds (a tarn walled in by mountains, reached by canoe): FX-C P2-01
+TARNS = [{"groups": [_g("red_piranha", 2, 4)], "weight": 4},
+         {"groups": [_g("crocodile", 1, 2)], "weight": 3}]
 ZONES = [  # (id, habitat name, root entrance cell, table, battle backdrop overrides)
     ("wnd_highlands", "Gaia Highlands", GAIA_GATE, HIGHLANDS, {"terrain": {"forest": "forest"}}),
     ("wnd_mirage_sands", "Mirage Sands", MIRAGE_GATE, SANDS, {"default": "desert", "terrain": {"forest": "forest"}}),
@@ -168,6 +171,11 @@ def zones(g: dict) -> tuple[list[dict], dict]:
     loose = sorted(c for c, ch in g.items() if ch in WALKABLE and c not in held and c not in shut)
     if loose:
         raise SystemExit(f"world_wind: {len(loose)} walkable cells in no zone, first {loose[0]}")
+    tarns = {c for c, ch in g.items() if ch == LAKE and c not in held}
+    if tarns:
+        out.append({"id": "wnd_tarns", "name": "Highland Tarns", "modes": ["canoe"], "rects": row_rects(tarns),
+                    "encounters": TARNS})
+        backdrops["wnd_tarns"] = {"default": "river"}
     sea = {c for c, ch in g.items() if ch == OCEAN}
     out.append({"id": "wnd_sea", "name": "North Seas", "modes": ["ship"], "rects": row_rects(sea), "encounters": SEA})
     backdrops["wnd_sea"] = {"default": "ocean"}

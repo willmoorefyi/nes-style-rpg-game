@@ -1,8 +1,8 @@
 import { Container } from 'pixi.js';
 import { battleBackgroundPath } from '../rendering/BattleBackground.js';
 import { battleBackdropId } from './exploration/BattleBackdrop.js';
-import type { MapData, Scene, ScriptedEncounter } from '../types/index.js';
-import { TerrainType } from '../types/index.js';
+import type { MapData, MapNPC, Scene, ScriptedEncounter } from '../types/index.js';
+import { TerrainType, npcPresent } from '../types/index.js';
 import type { Game } from '../core/Game.js';
 import { Camera } from '../rendering/Camera.js';
 import type { PlayerController } from '../entities/PlayerController.js';
@@ -16,7 +16,7 @@ import { battleArt } from '../rendering/BattleArt.js';
 import { MapLoader } from '../systems/MapLoader.js';
 import { DialogManager, DIALOG_CLOSE_HOLDOFF_FRAMES } from '../systems/DialogManager.js';
 import { BattleTrigger, type BattleEndData } from '../systems/BattleTrigger.js';
-import { fieldStep } from '../systems/fieldRules.js';
+import { fieldStep, modeAfterStep } from '../systems/fieldRules.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
 import type { MovementMode } from '../entities/MovementMode.js';
 import type { NPC } from '../entities/NPC.js';
@@ -31,7 +31,8 @@ import { inspectAt } from './exploration/FieldInspect.js';
 import { FieldVehicles, fieldModeOf } from './exploration/FieldVehicles.js';
 import { FieldNpcActions } from './exploration/FieldNpcActions.js';
 import { hazardStep } from './exploration/FieldHazard.js';
-import { playFieldCutscene, npcsToRemove } from './exploration/ExplorationCutscenes.js';
+import { playFieldCutscene } from './exploration/ExplorationCutscenes.js';
+import { npcPresenceChanges } from './exploration/NpcPresence.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
 
@@ -75,6 +76,9 @@ export class ExplorationScene implements Scene {
   private endCard = new EndCard();
   private fieldTransition: FieldTransition;
   private npcs: NPC[] = [];
+  /** Every NPC def of the map (flag-hidden ones too) and which of the flagged ones were present at the last refresh. */
+  private npcDefs: MapNPC[] = [];
+  private npcSignature = '';
   private collisionMap: import('../rendering/CollisionMap.js').CollisionMap | null = null;
   /** Tiles wandering NPCs never enter on this map (doors, warps, gates, entrances, the map's noWander list). */
   private wanderForbidden: ReadonlySet<string> = new Set();
@@ -224,18 +228,34 @@ export class ExplorationScene implements Scene {
     }
   }
 
+  /** The ids of the NPCs on the map now (tests, the browser check). */
+  get npcIds(): string[] {
+    return this.npcs.map((n) => n.id);
+  }
+
   /** How black the field fade is (0 = clear, 1 = black); for tests and debugging. */
   get fadeAlpha(): number {
     return this.fadeOverlay.overlay.alpha;
   }
 
-  /** Drop NPCs whose showIf / hideIf no longer pass (e.g. Garland and the captive princess after the battle). */
+  /** NPCs follow their showIf / hideIf as flags change: those no longer passing leave, those now passing appear (P3-03). */
   private refreshNpcPresence(): void {
-    if (!this.currentMapData) return;
-    const gone = npcsToRemove(this.npcs, this.currentMapData.npcs, (f) => this.game.gameFlags.has(f));
-    if (gone.length === 0) return;
+    const map = this.currentMapData;
+    if (!map) return;
+    const hasFlag = (f: string): boolean => this.game.gameFlags.has(f);
+    const signature = this.npcDefs.map((d) => (d.showIf || d.hideIf ? (npcPresent(d, hasFlag) ? '1' : '0') : '')).join('');
+    if (signature === this.npcSignature) return; // no flagged NPC changed since the last refresh
+    const { gone, appear } = npcPresenceChanges(this.npcs, this.npcDefs, hasFlag);
+    // never drop one onto the hero's cell (or the cell about to be entered): it appears a frame later
+    const free = appear.filter((d) => !this.player || ![{ x: this.player.gridX, y: this.player.gridY }, this.player.targetTile]
+      .some((c) => c.x === d.x && c.y === d.y));
+    if (free.length === appear.length) this.npcSignature = signature;
+    if (gone.length === 0 && free.length === 0) return;
     for (const npc of gone) npc.sprite.parent?.removeChild(npc.sprite);
-    this.npcs = this.npcs.filter((n) => !gone.includes(n));
+    const added = free.map((d) => this.mapLoader.createNpc(d, hasFlag));
+    for (const npc of added) this.worldContainer.addChild(npc.sprite);
+    this.npcs = [...this.npcs.filter((n) => !gone.includes(n)), ...added];
+    map.npcs = this.npcDefs.filter((d) => npcPresent(d, hasFlag)); // the field rules read the present NPCs
     this.npcInteraction.setNPCs(this.npcs);
     this.player?.setNPCPositions(this.npcs.map(n => ({ x: n.tileX, y: n.tileY })));
   }
@@ -256,12 +276,19 @@ export class ExplorationScene implements Scene {
     const { mapData, tilemap, collisionMap, npcs } = result;
     this.currentMapData = mapData;
     this.npcs = npcs;
+    this.npcDefs = result.npcDefs ?? mapData.npcs;
+    this.npcSignature = '';
     this.collisionMap = collisionMap;
     this.battleBackgrounds = mapData.battleBackgrounds;
     this.wanderForbidden = noWanderTiles(mapData, (x, y) => collisionMap.isWalkable(x, y, this.walkingMode));
     this.playMapMusic();
     // no random battle on a warp, gate or scripted-battle tile (EB-2)
     this.encounterSystem.setStepFilter(encounterStepFilter(mapData));
+    // the zone of a step is the one of the mode it ends in (P2-01)
+    this.encounterSystem.setStepModeResolver((x, y) => this.player && this.currentMapData
+      ? modeAfterStep(this.currentMapData, this.stepOrigin, { x, y },
+        this.vehicles.fieldState(fieldModeOf(this.player.currentMode)))
+      : null);
     if (mapData.encounterRate) this.encounterSystem.setRate(mapData.encounterRate);
     // a map without an encounter table has no random battles (towns, castles, interiors); never keep the last map's
     this.encounterSystem.setEncounters(mapData.encounters ?? []);
@@ -353,6 +380,7 @@ export class ExplorationScene implements Scene {
     }
     if (!this.player) return;
 
+    this.refreshNpcPresence(); // a flag set anywhere (an NPC's gift, a step, a battle) shows or hides its NPCs (P3-03)
     // Sync encounter rate multiplier from movement mode
     this.encounterSystem.setRateMultiplier(this.player.encounterRateMultiplier);
     this.encounterSystem.setMode(fieldModeOf(this.player.currentMode)); // zone `modes` (W1-B)

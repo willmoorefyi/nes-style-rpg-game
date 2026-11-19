@@ -346,6 +346,12 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 - **dialog close (field only):** `ExplorationScene`'s `DialogManager` gets `closeHoldOffFrames: DIALOG_CLOSE_HOLDOFF_FRAMES` (24, confirm only), so mashing after a talk doesn't restart it;
 - **cutscene end:** field cutscene dialog steps take confirm at once (`holdOff: false`); the 24-frame confirm hold-off comes once when the cutscene ends.
 
+### Field engine notes (FX-C)
+
+- **Encounter zone of a step:** `playerMove` fires before `FieldVehicles.afterStep` changes the mode, so `EncounterSystem.setStepModeResolver` (set by the exploration scene to `modeAfterStep` from the step origin) makes the lookup use the mode the step ends in. A canoe step onto a river cell rolls the canoe zone, not the walking zones with a hole. `tests/data/overworldZoneCoverage.test.ts` fails when a walking or canoe cell outside act 1 falls through to the act-1 table (the Water and Wind tarns have canoe zones `wat_streams` / `wnd_tarns`).
+- **Flag-driven NPCs:** `ExplorationScene.refreshNpcPresence` follows `showIf` / `hideIf` as flags change (polled each field frame by a cheap signature, plus cutscenes and `onResume`); NPCs leave and arrive (`NpcPresence.ts`, `MapLoader.createNpc`, `MapLoadResult.npcDefs` = the whole NPC list). An NPC never appears on the hero's cell or the one about to be entered.
+- **Diagnostics** (`src/core/diagnostics.ts`): `?trace=1` (or `localStorage.ff1_trace = '1'`) logs every scene change, error, rejection, page unload and Vite full reload to the console and `window.__trace`; off by default. A lost WebGL context and a halted game loop always show a banner over the page. The dev server ignores `.claude/` (`vite.config.ts`), which stopped agent worktrees from reloading the page.
+
 ### Game Over
 
 `GameOverScene` offers **Retry Battle** and **Return to Field** (both restore the pre-battle snapshot `game.battleRetry`; Return to Field puts the party where the fight began with no battle queued), then Load Game and Title. With no snapshot only the last two show. `retryAdvice()` (`src/systems/BattleRetry.ts`) calls the party weak when anyone was fallen or under 25 % HP; then a hint shows and the cursor starts on Return to Field.
