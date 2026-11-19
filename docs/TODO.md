@@ -26,12 +26,14 @@ horizon as you fly, with a sky band above it. Landing returns to the normal top-
 - **Tests:** the pure maths (projection, the inverse for picking the landing cell) without PixiJS, plus browser checks.
 - **Tranches, risks, file-size limits** (`ExplorationScene.ts` is near its ceiling: put this in a new module under `src/scenes/exploration/` or `src/rendering/`).
 
-## T-2: airship front and back views (user, 2026-11-19)
+## T-2: airship front and back views (user, 2026-11-19; on hold)
 
-Flying away from (up) and toward (down) the camera need their own airship art to match the approved side view
-(`assets-src/gen/approved/vehicles/airship.png`, LM2 b_7). They are generated in pass LM3 (free Bedrock) and compared
-with the side view for matching design, colours and size; the user then chooses. Wiring: `FieldVehicleSprites` picks
-the frame by facing (up / down / side mirrored). Mode 7 (T-1) needs the back view most of all.
+Flying away from (up) and toward (down) the camera could use their own airship art to match the approved side view
+(`assets-src/gen/approved/vehicles/airship.png`, LM2 b_7). Pass LM3 (33 free Bedrock calls) tried text prompts,
+style_guide and control_sketch; the best picks (`~/Desktop/landmark_pilot/round3/`, back sketch4_7, front sketch3_5)
+read as round balloons, not an end-on airship. **User ruling 2026-11-19: use b_7's side view for every heading for now;
+revisit after live testing.** If it comes back, the next try is 3/4 views (from above and behind or in front) traced
+from b_7's outline. Mode 7 (T-1) would need the back view most.
 
 ## Deferred, needs the user
 
