@@ -352,6 +352,7 @@ objects:
   x: 138
   y: 98
   style: bright
+  collide: alpha
 - type: deco
   name: cairn
   parts:
@@ -372,6 +373,7 @@ objects:
   x: 57
   y: 121
   style: slate
+  collide: alpha
   parts:
   - [tower_icon_0_0, tower_icon_0_1]
   - [tower_icon_1_0, tower_icon_1_1]
@@ -515,7 +517,7 @@ objects:
   x: 40
   y: 112
   parts:
-  - [town_icon_1_0, town_icon_1_1]
+  - [town_melmond_icon_0_0, town_melmond_icon_0_1]
   walk_cells:
   - [1, 0]
 - type: deco
@@ -579,7 +581,6 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 35
   y: 103
-  style: pale_dune
   collide: alpha
 - type: deco
   parts:
@@ -587,7 +588,7 @@ objects:
   - [shrine_icon_1_0, shrine_icon_1_1]
   x: 35
   y: 131
-  style: snow
+  collide: alpha
 - type: deco
   parts:
   - [dock_post_icon_0_0]
@@ -613,6 +614,7 @@ objects:
   y: 149
   walk_cells:
   - [1, 1]
+  collide: alpha
 - type: deco
   name: cave_mouth
   parts:
@@ -630,7 +632,6 @@ objects:
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 132
   y: 151
-  style: snow
   collide: alpha
 - type: deco
   name: buried_hull
@@ -639,7 +640,6 @@ objects:
   - [buried_hull_icon_1_0, buried_hull_icon_1_1, buried_hull_icon_1_2]
   x: 142
   y: 157
-  style: dune
   collide: alpha
 - type: deco
   name: shrine
@@ -649,6 +649,7 @@ objects:
   x: 159
   y: 123
   style: pale_stone
+  collide: alpha
 - type: deco
   parts:
   - [boulder]
@@ -736,7 +737,7 @@ objects:
   x: 28
   y: 38
   parts:
-  - [town_icon_1_0, town_icon_1_1]
+  - [town_onrac_icon_0_0, town_onrac_icon_0_1]
   walk_cells:
   - [0, 0]
 - type: deco
@@ -803,6 +804,7 @@ objects:
   - [waterfall_icon_2_0, waterfall_icon_2_1]
   walk_cells:
   - [0, 2]
+  collide: alpha
 - type: deco
   name: caravan
   x: 8
@@ -813,6 +815,7 @@ objects:
   walk_cells:
   - [0, 1]
   style: dune
+  collide: alpha
 - type: deco
   parts:
   - [crate]
@@ -868,6 +871,7 @@ objects:
   y: 34
   walk_cells:
   - [1, 2]
+  collide: alpha
 - type: deco
   parts:
   - [boulder]
@@ -880,6 +884,8 @@ objects:
   - [dome_icon_1_0, dome_icon_1_1]
   x: 150
   y: 44
+  collide: alpha
+  offset: [0, -6]
 - type: deco
   name: lufenia
   parts:
@@ -889,6 +895,8 @@ objects:
   y: 44
   walk_cells:
   - [0, 1]
+  collide: alpha
+  offset: [0, -6]
 - type: deco
   parts:
   - [boulder]
@@ -4017,6 +4025,8 @@ hazards:
   - [119, 172, 124, 172]
   - [119, 173, 124, 173]
   - [119, 174, 124, 174]
+ambient:
+- {kind: smoke, x: 120, y: 149, ox: 26, oy: 12}
 battleBackgrounds:
   default: grassland
   terrain: {forest: forest, desert: shoreline, swamp: swamp, water: ocean, river: river}

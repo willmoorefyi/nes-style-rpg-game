@@ -43,7 +43,7 @@ def objects() -> list[dict]:
         {"type": "deco", "name": "pravoka", "parts": [["town_icon_1_0", "town_icon_1_1"]],
          "x": ix, "y": iy, "walk_cells": [door]},
         {"type": "deco", "name": "lighthouse", "parts": landmark_parts("tower"), "x": LIGHTHOUSE[0], "y": LIGHTHOUSE[1],
-         "style": "bright"},
+         "style": "bright", "collide": "alpha"},
         {"type": "deco", "name": "cairn", "parts": [["boulder"]], "x": CAIRN[0], "y": CAIRN[1]},
     ]
 

@@ -234,6 +234,7 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 4
   y: 37
+  collide: alpha
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
@@ -241,6 +242,7 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 33
   y: 36
+  collide: alpha
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
@@ -248,6 +250,7 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 15
   y: 26
+  collide: alpha
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
@@ -255,6 +258,7 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 21
   y: 13
+  collide: alpha
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
@@ -262,6 +266,7 @@ objects:
   - [windmill_icon_2_0, windmill_icon_2_1]
   x: 10
   y: 4
+  collide: alpha
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
@@ -319,19 +324,19 @@ objects:
   to: [46, 17]
 - type: deco
   parts:
-  - [tuft]
+  - [tuft_icon_0_0]
   x: 43
   y: 15
   block: false
 - type: deco
   parts:
-  - [tuft]
+  - [tuft_icon_0_0]
   x: 45
   y: 16
   block: false
 - type: deco
   parts:
-  - [tuft]
+  - [tuft_icon_0_0]
   x: 44
   y: 17
   block: false

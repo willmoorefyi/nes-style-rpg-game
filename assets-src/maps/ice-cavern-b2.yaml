@@ -104,24 +104,18 @@ objects:
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 6
   y: 16
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [ice_floe_icon_0_0, ice_floe_icon_0_1]
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 30
   y: 23
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [ice_floe_icon_0_0, ice_floe_icon_0_1]
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 37
   y: 10
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [tpillar_top]

@@ -97,13 +97,15 @@ def objects() -> list[dict]:
          "collide": "alpha"},
         # the Mirage Tower, with a fallen block of it beside the door
         {"type": "deco", "name": "mirage", "parts": landmark_parts("tower"), "x": MIRAGE_DOOR[0] - 1,
-         "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]] if MIRAGE_OPEN else []},
+         "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]] if MIRAGE_OPEN else [], "collide": "alpha"},
         {"type": "deco", "parts": [["boulder"]], "x": MIRAGE_DOOR[0] + 1, "y": MIRAGE_DOOR[1]},
-        # Lufenia: two pale domes, the door under the east one
+        # Lufenia: two pale domes, the door under the east one (LM-INT: collide alpha on the tower and the domes,
+        # the approved art leaves their top rows mostly sky; both domes 6 px up, so the cell over the door keeps
+        # 30 % art and stays solid: the door has one way in, OW-2)
         {"type": "deco", "name": "lufenia_west", "parts": landmark_parts("dome"), "x": LUFENIA_DOOR[0] - 2,
-         "y": LUFENIA_DOOR[1] - 1},
+         "y": LUFENIA_DOOR[1] - 1, "collide": "alpha", "offset": [0, -6]},
         {"type": "deco", "name": "lufenia", "parts": landmark_parts("dome"), "x": LUFENIA_DOOR[0],
-         "y": LUFENIA_DOOR[1] - 1, "walk_cells": [[0, 1]]},
+         "y": LUFENIA_DOOR[1] - 1, "walk_cells": [[0, 1]], "collide": "alpha", "offset": [0, -6]},
         *({"type": "deco", "parts": [["boulder"]], "x": x, "y": y} for x, y, _ in INSPECT),
     ]
 

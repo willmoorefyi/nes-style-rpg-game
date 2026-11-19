@@ -4,6 +4,7 @@ import { validateBossPhases, validateKeyItemGates, validateScriptedEncounters } 
 import { validateEnemyAttack } from './schemaValidationFx.js';
 import { validateEnemyRoster } from './enemyRosterValidation.js';
 import { validateQuestMapFields } from './schemaValidationQuest.js';
+import { validateAmbient } from './schemaValidationAmbient.js';
 
 export class ValidationError extends Error {
   constructor(message: string) {
@@ -272,6 +273,7 @@ export function validateMapData(data: unknown): MapData {
     validateScriptedEncounters(data.scriptedEncounters, (data.npcs as Record<string, unknown>[]).map((n) => String(n.id)));
   }
   validateQuestMapFields(data);
+  if (data.ambient !== undefined) validateAmbient(data.ambient, data.width as number, data.height as number);
   
   return data as unknown as MapData;
 }

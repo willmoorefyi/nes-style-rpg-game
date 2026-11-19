@@ -30,8 +30,8 @@ POST_TEXT = ["Words burned into the post: SWEET WATER HERE. THE CAMP TRADES FAIR
 
 
 def _icon(cells: list[tuple[int, int]], door: tuple[int, int], g) -> list[dict]:
-    """Onrac's icon over the site's 3x3 icon cells (FX-D P3-13): the approved walled-town icon (its drawn row,
-    `town_icon_1_*`, 2x1: the top row of the sheet is empty) on the bottom row with the door in its left cell, and
+    """Onrac's icon over the site's 3x3 icon cells (FX-D P3-13): the approved Bedrock town icon (`town_onrac`, 2x1,
+    LM-INT; before, the walled-town icon's drawn row `town_icon_1_*`) on the bottom row with the door in its left cell, and
     round it the firs and rocks of the cliff top scattered by a seeded generator (FX-R P3-R4: varied kinds and
     offsets, with gaps; before, an exact 3x3 ring). The old icon was a snow-roofed house."""
     xs, ys = [c[0] for c in cells], [c[1] for c in cells]
@@ -41,7 +41,7 @@ def _icon(cells: list[tuple[int, int]], door: tuple[int, int], g) -> list[dict]:
     gx, gy = ONRAC.GATE
     taken = {door, (door[0] + 1, door[1]), ONRAC.GATE, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), LANDING}
     return [
-        {"type": "deco", "name": "onrac", "x": door[0], "y": door[1], "parts": [["town_icon_1_0", "town_icon_1_1"]],
+        {"type": "deco", "name": "onrac", "x": door[0], "y": door[1], "parts": landmark_parts("town_onrac"),
          **({"walk_cells": [[0, 0]]} if town_built() else {})},        # the door opens once WAT-T builds the town
         *scatter(cells, taken, DRESS_SEED, ring_of(cells), lambda c: g.inside(*c) and g[c] == ".",
                 door_sides(door, cells, taken), ONRAC.GATE),
@@ -53,9 +53,9 @@ def objects(g) -> list[dict]:
         *_icon(ONRAC.ICON, ONRAC.DOOR, g),
         # the cave lies behind the curtain: the falls' bottom-left cell is the walkable door
         {"type": "deco", "name": "waterfall", "x": FALLS[0], "y": FALLS[1], "parts": landmark_parts("waterfall"),
-         "walk_cells": [[0, 2]]},
+         "walk_cells": [[0, 2]], "collide": "alpha"},
         {"type": "deco", "name": "caravan", "x": TENT[0], "y": TENT[1], "parts": landmark_parts("tent"),
-         "walk_cells": [[0, 1]], "style": "dune"},
+         "walk_cells": [[0, 1]], "style": "dune", "collide": "alpha"},
         {"type": "deco", "parts": [["crate"]], "x": CRATE[0], "y": CRATE[1]},
         {"type": "deco", "parts": [["boulder"]], "x": CAIRN[0], "y": CAIRN[1], "collide": "alpha", "style": "bright"},
         {"type": "deco", "parts": [["signpost"]], "x": POST[0], "y": POST[1]},

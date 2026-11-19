@@ -1,0 +1,637 @@
+{
+  "kit": "overworld",
+  "sheet": "landmarks_lm",
+  "backend": "bedrock",
+  "tool": "assets-src/gen/landmark_cut.py",
+  "approved": "2026-11-19",
+  "tile": 48,
+  "cells": [
+    [
+      "volcano_icon_0_0",
+      "volcano_icon_0_1",
+      "volcano_icon_0_2",
+      "buried_hull_icon_0_0",
+      "buried_hull_icon_0_1",
+      "buried_hull_icon_0_2",
+      "windmill_icon_0_0",
+      "windmill_icon_0_1",
+      "cave_mouth_icon_0_0",
+      "cave_mouth_icon_0_1",
+      "tower_icon_0_0",
+      "tower_icon_0_1",
+      "shrine_icon_0_0",
+      "shrine_icon_0_1",
+      "dock_post_icon_0_0",
+      null
+    ],
+    [
+      "volcano_icon_1_0",
+      "volcano_icon_1_1",
+      "volcano_icon_1_2",
+      "buried_hull_icon_1_0",
+      "buried_hull_icon_1_1",
+      "buried_hull_icon_1_2",
+      "windmill_icon_1_0",
+      "windmill_icon_1_1",
+      "cave_mouth_icon_1_0",
+      "cave_mouth_icon_1_1",
+      "tower_icon_1_0",
+      "tower_icon_1_1",
+      "shrine_icon_1_0",
+      "shrine_icon_1_1",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "windmill_icon_2_0",
+      "windmill_icon_2_1",
+      null,
+      null,
+      "tower_icon_2_0",
+      "tower_icon_2_1",
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "sky_ring_icon_0_0",
+      "sky_ring_icon_0_1",
+      "ice_floe_icon_0_0",
+      "ice_floe_icon_0_1",
+      "waterfall_icon_0_0",
+      "waterfall_icon_0_1",
+      "tent_icon_0_0",
+      "tent_icon_0_1",
+      "dome_icon_0_0",
+      "dome_icon_0_1",
+      "tuft_icon_0_0",
+      "town_melmond_icon_0_0",
+      "town_melmond_icon_0_1",
+      "town_onrac_icon_0_0",
+      "town_onrac_icon_0_1",
+      null
+    ],
+    [
+      "sky_ring_icon_1_0",
+      "sky_ring_icon_1_1",
+      "ice_floe_icon_1_0",
+      "ice_floe_icon_1_1",
+      "waterfall_icon_1_0",
+      "waterfall_icon_1_1",
+      "tent_icon_1_0",
+      "tent_icon_1_1",
+      "dome_icon_1_0",
+      "dome_icon_1_1",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      "waterfall_icon_2_0",
+      "waterfall_icon_2_1",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "landmarks": {
+    "volcano": {
+      "tag": "volcano_ultra_b_21",
+      "cache_key": "3a63033a49d65f324f852e74",
+      "cells": [
+        3,
+        2
+      ],
+      "model": "ultra",
+      "seed": 21,
+      "pass": "LM",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 24,
+        "smoke_y": 0.115
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.15
+      },
+      "post": null,
+      "fig_px": [
+        127,
+        88
+      ],
+      "approved": "2026-11-19",
+      "note": "LM-INT: the grey smoke over the crater is cut (smoke_y); the engine draws it (ambient smoke)",
+      "at": [
+        0,
+        0
+      ]
+    },
+    "buried_hull": {
+      "tag": "buried_hull_ultra_d_42",
+      "cache_key": "f0dad187220beca2c6552a2a",
+      "cells": [
+        3,
+        2
+      ],
+      "model": "ultra",
+      "seed": 42,
+      "pass": "LM",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 6,
+        "pocket": 5
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.3
+      },
+      "post": null,
+      "fig_px": [
+        133,
+        80
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        3
+      ]
+    },
+    "windmill": {
+      "tag": "windmill_ultra_a_13",
+      "cache_key": "dea2cc1542d91963ac1dc564",
+      "cells": [
+        2,
+        3
+      ],
+      "nobg_key": "dc870bfdf2a1c4953d5e8bae",
+      "model": "ultra",
+      "seed": 13,
+      "pass": "LM",
+      "cut": {
+        "mode": "remove_bg",
+        "tol": 28,
+        "soft_y": 0.76,
+        "soft_alpha": 24
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 18,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1,
+        "edge_light": 0.2
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        117
+      ],
+      "approved": "2026-11-19",
+      "note": "LM-INT: re-cut with its grass, path and bushes base, kept solid (soft_y alpha > soft_alpha, closed, holes filled); no outline round the bottom apron",
+      "at": [
+        0,
+        6
+      ]
+    },
+    "cave_mouth": {
+      "tag": "cave_mouth_ultra_a_12",
+      "cache_key": "f463c668b21b92774d2feea3",
+      "cells": [
+        2,
+        2
+      ],
+      "nobg_key": "321117058fb19abaace7f1f9",
+      "model": "ultra",
+      "seed": 12,
+      "pass": "LM",
+      "cut": {
+        "mode": "remove_bg",
+        "tol": 28
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.15
+      },
+      "post": "taupe",
+      "fig_px": [
+        88,
+        77
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        8
+      ]
+    },
+    "tower": {
+      "tag": "tower_ultra_a_3",
+      "cache_key": "80b1727353dc2fc7c3af6bf1",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "green_y": 0.85
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        73,
+        133
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        10
+      ]
+    },
+    "shrine": {
+      "tag": "shrine_ultra_a_3",
+      "cache_key": "b3a0652919f92bc6660074d4",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "green_y": 0.6
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.15
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        73
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        12
+      ]
+    },
+    "dock_post": {
+      "tag": "dock_post_ultra_a_3",
+      "cache_key": "bd1f501d587eae6660ade39b",
+      "cells": [
+        1,
+        1
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 3
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.15
+      },
+      "post": null,
+      "fig_px": [
+        28,
+        44
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        0,
+        14
+      ]
+    },
+    "sky_ring": {
+      "tag": "sky_ring_ultra_b_4",
+      "cache_key": "ae6cc0fa83fbbf2a377f630d",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 4,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "pocket": 7,
+        "green_y": 0.7
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        84,
+        88
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        0
+      ]
+    },
+    "ice_floe": {
+      "tag": "ice_floe_ultra_a_1",
+      "cache_key": "eeddd7fe1e2492076ea6636f",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 1,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        69
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        2
+      ]
+    },
+    "waterfall": {
+      "tag": "waterfall_ultra_b_3",
+      "cache_key": "992db99b04bffd7790c25e53",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        114
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        4
+      ]
+    },
+    "tent": {
+      "tag": "tent_ultra_a_1",
+      "cache_key": "9f0bb0baf937c583bd57120c",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 1,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "green_y": 0.8
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        68
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        6
+      ]
+    },
+    "dome": {
+      "tag": "dome_ultra_a_2",
+      "cache_key": "a1c7267523a085f1ec616fa4",
+      "cells": [
+        2,
+        2
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "green_y": 0.78
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        69
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        8
+      ]
+    },
+    "tuft": {
+      "tag": "tuft_ultra_a_2",
+      "cache_key": "e1212c7b0403dcc3b0784843",
+      "cells": [
+        1,
+        1
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 3
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        44,
+        27
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        10
+      ]
+    },
+    "town_melmond": {
+      "tag": "town_melmond_ultra_a_2",
+      "cache_key": "a915ca48f390b339f9406ba1",
+      "cells": [
+        2,
+        1
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        70,
+        43
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        11
+      ]
+    },
+    "town_onrac": {
+      "tag": "town_onrac_ultra_a_2",
+      "cache_key": "02b2da0c62a0affb86d1ef6c",
+      "cells": [
+        2,
+        1
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM2",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective"
+      },
+      "post": null,
+      "fig_px": [
+        64,
+        43
+      ],
+      "approved": "2026-11-19",
+      "at": [
+        3,
+        13
+      ]
+    }
+  },
+  "note": "LM-INT: the user's picks of passes LM / LM2 (Stability Ultra renders, the cave mouth and the windmill through remove_bg), re-cut offline from the render cache"
+}

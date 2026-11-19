@@ -70,7 +70,8 @@ def build() -> tuple[Grid, list[dict]]:
     g.rect(3, 11, 5, 12, "≈")                    # ... and its pool
     objs: list[dict] = []
     for tx, ty in ((3, 3), (9, 2), (15, 3)):
-        objs.append({"type": "deco", "parts": landmark_parts("tent"), "x": tx, "y": ty, "style": "dune"})
+        objs.append({"type": "deco", "parts": landmark_parts("tent"), "x": tx, "y": ty, "style": "dune",
+                     "collide": "alpha"})
     objs.append({"type": "deco", "parts": [["stall_0_0", "stall_0_1"], ["stall_1_0", "stall_1_1"]], "x": 19, "y": 8})
     objs.append({"type": "deco", "parts": [["brazier"]], "x": 12, "y": 9})
     for x, y in ((17, 10), (17, 11), (21, 11), (22, 7)):

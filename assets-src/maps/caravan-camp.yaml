@@ -42,6 +42,7 @@ objects:
   x: 3
   y: 3
   style: dune
+  collide: alpha
 - type: deco
   parts:
   - [tent_icon_0_0, tent_icon_0_1]
@@ -49,6 +50,7 @@ objects:
   x: 9
   y: 2
   style: dune
+  collide: alpha
 - type: deco
   parts:
   - [tent_icon_0_0, tent_icon_0_1]
@@ -56,6 +58,7 @@ objects:
   x: 15
   y: 3
   style: dune
+  collide: alpha
 - type: deco
   parts:
   - [stall_0_0, stall_0_1]

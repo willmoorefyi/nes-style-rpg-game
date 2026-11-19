@@ -88,5 +88,6 @@ def build(band: set[Cell]) -> RegionOut:
         ground=rows, objects=objects, npcs=[dict(D.HULL_NPC)], transitions=[dict(t) for t in TRANSITIONS],
         entrances={k: list(v) for k, v in ENTRANCES.items()}, docks=[dict(site.DOCK)], hazards=D.hazards(g, row_rects),
         encounterZones=D.zones(by_zone, row_rects), battleBackgrounds={"zones": D.backdrops()}, checks=checks,
+        ambient=[dict(a) for a in D.SMOKE],
         barriers={"crescent_ring": (set(cells["ring"]), a, s)}, walls=cells["walls"],
         notes=[f"fire: shore {len(north)} cells, south lands {len(south)} cells, ring {len(cells['ring'])} cells"])

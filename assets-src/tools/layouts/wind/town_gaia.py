@@ -87,8 +87,9 @@ HOUSE = dict(type="house", w=5, door=2, windows=[1, 3])
 SNOW = "snow"                                    # the snow recolour of the trees (build_map.RECOLOR, kit.py)
 
 
-def windmill(x: int, y: int) -> None:            # (x, y) the sails' top-left; 2x3, blocks
-    deco([[f"windmill_icon_{r}_{c}" for c in range(2)] for r in range(3)], x, y)
+def windmill(x: int, y: int, alpha: bool = True) -> None:   # (x, y) the sails' top-left; 2x3, blocks where its
+    # art is (LM-INT: the approved sails leave the top row mostly sky); `alpha` False blocks the whole box
+    deco([[f"windmill_icon_{r}_{c}" for c in range(2)] for r in range(3)], x, y, **({"collide": "alpha"} if alpha else {}))
 
 
 def pine(x: int, y: int) -> None:                # a snowy fir; (x, y) the trunk
@@ -126,8 +127,9 @@ SHUTTERED = dict(x=29, y=14, h=5)                # the wind-reader's tall house,
 obj(type="house", w=4, windows=[1, 2], storeys=2, roof="slate", wall="white", **SHUTTERED)
 
 # ── the stilled windmills: two on the gate terrace, one each on the mill and loom terraces, two in the court ──
-for (x, y) in [(4, 37), (33, 36), (15, 26), (21, 13), (10, 4), (38, 4)]:
+for (x, y) in [(4, 37), (33, 36), (15, 26), (21, 13), (10, 4)]:
     windmill(x, y)
+windmill(38, 4, alpha=False)                     # its sails' row is a pocket against the cliff: keep it solid
 # ── the court: the weather vane, benches, lamps; the grotto mouth in the cliff (the way to the spring) ──
 deco([["cave_mouth_icon_0_0", "cave_mouth_icon_0_1"], ["cave_mouth_icon_1_0", "cave_mouth_icon_1_1"]], *GROTTO,
      walk_cells=[[0, 1]], collide="alpha")
@@ -152,7 +154,7 @@ obj(type="fence", **{"from": [FOLD[0] + 3, FOLD[3] + 1], "to": [FOLD[2] + 1, FOL
 obj(type="fence", **{"from": [FOLD[0] - 1, FOLD[1]], "to": [FOLD[0] - 1, FOLD[3]]})
 obj(type="fence", **{"from": [FOLD[2] + 1, FOLD[1]], "to": [FOLD[2] + 1, FOLD[3]]})
 for (x, y) in [(43, 15), (45, 16), (44, 17)]:
-    deco([["tuft"]], x, y, block=False)
+    deco([["tuft_icon_0_0"]], x, y, block=False)          # LM-INT: the approved grass tuft
 # ── snowy pines, bushes, crates and barrels ──
 for (x, y) in [(5, 43), (11, 43), (24, 43), (41, 43), (46, 41), (4, 29), (31, 27), (44, 26), (7, 21), (20, 21),
                (10, 9), (41, 9), (36, 21)]:

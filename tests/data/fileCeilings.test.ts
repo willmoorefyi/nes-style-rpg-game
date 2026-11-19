@@ -24,6 +24,9 @@ const NEW_FILES = [
   'src/scenes/battle/battleTiming.ts', 'src/scenes/battle/BattleLayers.ts', 'src/scenes/battle/BattleEnemyList.ts',
   'src/scenes/battle/actorTint.ts', 'src/scenes/battle/battleDevClock.ts', 'src/scenes/battle/presentedState.ts',
   'src/scenes/battle/fx/index.ts', 'src/scenes/ConfigScene.ts', 'src/scenes/debugSandbox/DebugSandboxScene.ts',
+  // LM-INT: the ambient field effects and the landmark re-cut tool
+  'src/scenes/exploration/FieldAmbient.ts', 'src/core/schemaValidationAmbient.ts', 'src/types/ambient.ts',
+  'assets-src/gen/landmark_cut.py', 'assets-src/gen/landmark_pix.py',
 ];
 
 describe('file-size ceilings', () => {

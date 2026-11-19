@@ -67,7 +67,7 @@ def objects() -> list[dict]:
     objs = [
         {"type": "deco", "name": "western_keep", "x": KEEP[0], "y": KEEP[1], "style": "slate",
          "parts": [["castle_icon_0_0", "castle_icon_0_1"], ["castle_icon_1_0", "castle_icon_1_1"]], "walk_cells": [[1, 1]]},
-        {"type": "deco", "x": KEEP_TOWER[0], "y": KEEP_TOWER[1], "style": "slate",
+        {"type": "deco", "x": KEEP_TOWER[0], "y": KEEP_TOWER[1], "style": "slate", "collide": "alpha",
          "parts": [[f"tower_icon_{r}_{c}" for c in range(2)] for r in range(3)]},
         {"type": "deco", "name": "marsh_cave", "x": MARSH[0], "y": MARSH[1],
          "parts": [[f"cave_mouth_icon_{r}_{c}" for c in range(2)] for r in range(2)], "walk_cells": [[1, 1]]},

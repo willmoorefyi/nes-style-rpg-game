@@ -141,7 +141,14 @@ LANDMARKS = {
     "sky_ring": (2, 2, (170, 200, 235), "SR", "ring"), "ice_floe": (2, 2, (215, 235, 245), "IF", "floe"),
     "waterfall": (2, 3, (90, 150, 215), "WF", "fall"), "tent": (2, 2, (200, 170, 110), "TE", "tent"),
     "windmill": (2, 3, (210, 195, 165), "WM", "windmill"), "dome": (2, 2, (175, 185, 210), "DO", "dome"),
+    # LM-INT: Gaia's grass tuft (a 1x1 deco; the `tuft` part stays the compiler's grass speckle) and the
+    # Melmond / Onrac town icons (2x1, the door in the left cell)
+    "tuft": (1, 1, (50, 115, 45), "", "tuft"), "town_melmond": (2, 1, (170, 150, 120), "TM", "town"),
+    "town_onrac": (2, 1, (150, 160, 175), "TO", "town"),
 }
+# LM-INT: the approved Bedrock landmark sheet (assets-src/gen/landmark_cut.py); its cells replace the code-drawn
+# landmark placeholders in every kit, not only the overworld kit that holds the file
+LANDMARK_SHEET = APPROVED / "overworld" / "landmarks_lm"
 
 
 def landmark_parts(name: str) -> list[list[str]]:
@@ -228,6 +235,11 @@ def placeholder_landmark(name: str) -> Image.Image:
             d.line([hub, (hub[0] + dx * W * 2 // 5, hub[1] + dy * H // 3)], fill=(150, 110, 70, 255), width=6)
         d.ellipse([hub[0] - 5, hub[1] - 5, hub[0] + 5, hub[1] + 5], fill=dark)
         d.rectangle([W // 2 - 5, B - 14, W // 2 + 4, B], fill=dark)
+    elif shape == "tuft":
+        d.polygon([(8, B), (12, 20), (18, 30), (24, 12), (30, 30), (36, 18), (40, B)], fill=fill, outline=ink)
+    elif shape == "town":
+        d.rectangle([6, 8, W - 7, B], fill=fill, outline=ink)
+        d.rectangle([T // 2 - 7, B - 16, T // 2 + 6, B], fill=dark)
     elif shape == "dome":
         d.chord([4, H // 6, W - 5, H * 7 // 6], 180, 360, fill=fill, outline=ink)
         d.rectangle([4, H * 2 // 3, W - 5, B], fill=light, outline=ink)
@@ -390,12 +402,32 @@ def apply_paint(sheet: Image.Image, ops: list[dict], where: str = "sheet") -> Im
     return out
 
 
+@lru_cache(maxsize=None)
+def approved_landmarks(sheet: Path = LANDMARK_SHEET) -> dict[str, Image.Image]:
+    """The approved landmark cells by part name ({} while the sheet is missing)."""
+    meta_path = sheet.with_suffix(".json")
+    if not meta_path.is_file():
+        return {}
+    meta = json.loads(meta_path.read_text())
+    img = Image.open(sheet.with_suffix(".png")).convert("RGBA")
+    t = meta.get("tile", T)
+    return {n: img.crop((c * t, r * t, (c + 1) * t, (r + 1) * t))
+            for r, row in enumerate(meta["cells"]) for c, n in enumerate(row) if n in _LANDMARK_CELL}
+
+
 def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool = False) -> Kit:
     kit = Kit(kit_id, {n: placeholder_part(n) for n in PART_NAMES}, {n: placeholder_material(n) for n in MATERIALS})
     root = approved_dir / kit_id
-    if placeholders_only or not root.is_dir():
+    if placeholders_only:
+        return kit
+    for name, cell in approved_landmarks(approved_dir / LANDMARK_SHEET.relative_to(APPROVED)).items():
+        kit.parts[name] = cell
+        kit.approved.add(name)
+    if not root.is_dir():
         return kit
     for meta_path in sorted(root.glob("*.json")):
+        if meta_path.stem == LANDMARK_SHEET.name and root.name == LANDMARK_SHEET.parent.name:
+            continue                                   # loaded above, for every kit
         meta = json.loads(meta_path.read_text())
         sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
         sheet = apply_paint(sheet, meta.get("paint") or [], f"{kit_id}/{meta_path.name}")

@@ -120,7 +120,7 @@ home("shipwright", 39, 16, 5, 2, "slate", "stone", 3)
 
 # ── Bell Square: the bell tower, the well, benches, the signpost by the gate ──
 TOWER = (27, 17)
-deco(landmark_parts("tower"), *TOWER, style="stone")
+deco(landmark_parts("tower"), *TOWER, style="stone", collide="alpha")
 obj(type="well", x=20, y=17)
 for x in (19, 20):
     obj(type="bench", x=x, y=21)
@@ -154,7 +154,7 @@ obj(type="bench", x=32, y=30)
 POST = [[landmark_parts("dock_post")[0][0]]]
 for (x, y) in [(11, 35), (11, 38), (14, 35), (28, 36), (28, 39), (31, 36), (31, 39)]:
     deco(POST, x, y, on_water=True)
-deco(landmark_parts("buried_hull"), 14, 37, on_water=True, style="brown")      # the fishing boat
+deco(landmark_parts("buried_hull"), 14, 37, on_water=True)                     # the fishing boat
 deco(landmark_parts("buried_hull"), *HULL, on_water=True, style="slate")       # the iron submarine
 
 INSPECT = [
