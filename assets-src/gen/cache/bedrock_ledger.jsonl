@@ -242,3 +242,127 @@
 {"event": "result", "key": "f0dad187220beca2c6552a2a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
 {"event": "request", "ts": "2026-11-18T22:14:36", "tool": "lmgen.py", "model": "ultra", "purpose": "lm_gen", "seed": 43, "key": "fc59da5f589f914f54cd67d7", "pass": "LM"}
 {"event": "result", "key": "fc59da5f589f914f54cd67d7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:11:10", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "99c6155ad80b5f94f584c367", "pass": "LM2"}
+{"event": "result", "key": "99c6155ad80b5f94f584c367", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:11:58", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "d28c06884e4a71f8def5e2b4", "pass": "LM2"}
+{"event": "result", "key": "d28c06884e4a71f8def5e2b4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:09", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "52578808d92ec1fc28f9bc48", "pass": "LM2"}
+{"event": "result", "key": "52578808d92ec1fc28f9bc48", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:18", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "7dd17c2c44cb536f8ff8a8c2", "pass": "LM2"}
+{"event": "result", "key": "7dd17c2c44cb536f8ff8a8c2", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:28", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "80b1727353dc2fc7c3af6bf1", "pass": "LM2"}
+{"event": "result", "key": "80b1727353dc2fc7c3af6bf1", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:37", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "c1cf5cfba871c81baf5550b6", "pass": "LM2"}
+{"event": "result", "key": "c1cf5cfba871c81baf5550b6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:47", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "295e6c2e07d48978896bdb23", "pass": "LM2"}
+{"event": "result", "key": "295e6c2e07d48978896bdb23", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:12:57", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "b3a0652919f92bc6660074d4", "pass": "LM2"}
+{"event": "result", "key": "b3a0652919f92bc6660074d4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:13:19", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "67429fa8535abd2716520d3f", "pass": "LM2"}
+{"event": "result", "key": "67429fa8535abd2716520d3f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:13:31", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "24d68f864be2312e0956893d", "pass": "LM2"}
+{"event": "result", "key": "24d68f864be2312e0956893d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:13:40", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "bd1f501d587eae6660ade39b", "pass": "LM2"}
+{"event": "result", "key": "bd1f501d587eae6660ade39b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:13:50", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "5ce8b47409940e7e04c21b62", "pass": "LM2"}
+{"event": "result", "key": "5ce8b47409940e7e04c21b62", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:00", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "e5c7aa906577ad3c25fd2b48", "pass": "LM2"}
+{"event": "result", "key": "e5c7aa906577ad3c25fd2b48", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:09", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "8b336fbe62434ea2fd2b6ffe", "pass": "LM2"}
+{"event": "result", "key": "8b336fbe62434ea2fd2b6ffe", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:18", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "eeddd7fe1e2492076ea6636f", "pass": "LM2"}
+{"event": "result", "key": "eeddd7fe1e2492076ea6636f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:28", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "8ceaa0de80348cd171949b02", "pass": "LM2"}
+{"event": "result", "key": "8ceaa0de80348cd171949b02", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:38", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "390ed34fd887d67db1197317", "pass": "LM2"}
+{"event": "result", "key": "390ed34fd887d67db1197317", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:47", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "9f0bb0baf937c583bd57120c", "pass": "LM2"}
+{"event": "result", "key": "9f0bb0baf937c583bd57120c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:14:57", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "0da6afaec2de912bf866246b", "pass": "LM2"}
+{"event": "result", "key": "0da6afaec2de912bf866246b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:15:07", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "aee9bef2833600b9020886e3", "pass": "LM2"}
+{"event": "result", "key": "aee9bef2833600b9020886e3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:15:17", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "7637fafe6ef721aa64c37f81", "pass": "LM2"}
+{"event": "result", "key": "7637fafe6ef721aa64c37f81", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:15:27", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "a1c7267523a085f1ec616fa4", "pass": "LM2"}
+{"event": "result", "key": "a1c7267523a085f1ec616fa4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:15:37", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "c05f27416ea5ca8e2f0be547", "pass": "LM2"}
+{"event": "result", "key": "c05f27416ea5ca8e2f0be547", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:09", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "992db99b04bffd7790c25e53", "pass": "LM2"}
+{"event": "result", "key": "992db99b04bffd7790c25e53", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:19", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 4, "key": "84fb3cd1794dc1e9cde71ad4", "pass": "LM2"}
+{"event": "result", "key": "84fb3cd1794dc1e9cde71ad4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:29", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "59ccb1d394142d86cb3a88f6", "pass": "LM2"}
+{"event": "result", "key": "59ccb1d394142d86cb3a88f6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:39", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "e1212c7b0403dcc3b0784843", "pass": "LM2"}
+{"event": "result", "key": "e1212c7b0403dcc3b0784843", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:49", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "cd7c12ed0f165ba1beefc850", "pass": "LM2"}
+{"event": "result", "key": "cd7c12ed0f165ba1beefc850", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:16:58", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "e587f4dbc31b6ac1257d0af5", "pass": "LM2"}
+{"event": "result", "key": "e587f4dbc31b6ac1257d0af5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:17:08", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "a915ca48f390b339f9406ba1", "pass": "LM2"}
+{"event": "result", "key": "a915ca48f390b339f9406ba1", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:17:17", "tool": "lmgen2.py", "model": "style_guide", "purpose": "lm_gen", "seed": 1, "key": "09162c5ce2f07ffc525006b6", "pass": "LM2"}
+{"event": "result", "key": "09162c5ce2f07ffc525006b6", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T10:17:30", "tool": "lmgen2.py", "model": "style_guide", "purpose": "lm_gen", "seed": 2, "key": "8de12a1dcdd0ccb67bbc669d", "pass": "LM2"}
+{"event": "result", "key": "8de12a1dcdd0ccb67bbc669d", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T10:17:39", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 1, "key": "63c7611c42666f42cc1e2857", "pass": "LM2"}
+{"event": "result", "key": "63c7611c42666f42cc1e2857", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:17:49", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 2, "key": "02b2da0c62a0affb86d1ef6c", "pass": "LM2"}
+{"event": "result", "key": "02b2da0c62a0affb86d1ef6c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:17:59", "tool": "lmgen2.py", "model": "style_guide", "purpose": "lm_gen", "seed": 1, "key": "6b09472e337f56daa2761579", "pass": "LM2"}
+{"event": "result", "key": "6b09472e337f56daa2761579", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T10:18:15", "tool": "lmgen2.py", "model": "style_guide", "purpose": "lm_gen", "seed": 2, "key": "dfaa2d10d62d08fb0ae41805", "pass": "LM2"}
+{"event": "result", "key": "dfaa2d10d62d08fb0ae41805", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T10:19:19", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "7b6785dbcefbc54b9bdaab1b", "pass": "LM2"}
+{"event": "result", "key": "7b6785dbcefbc54b9bdaab1b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:19:30", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 3, "key": "3957c5b8a4d4e9cd453272ba", "pass": "LM2"}
+{"event": "result", "key": "3957c5b8a4d4e9cd453272ba", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:19:39", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 4, "key": "ae6cc0fa83fbbf2a377f630d", "pass": "LM2"}
+{"event": "result", "key": "ae6cc0fa83fbbf2a377f630d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:19:50", "tool": "lmgen2.py", "model": "ultra", "purpose": "lm_gen", "seed": 5, "key": "7a22e3e0c8031f0f9f9c1461", "pass": "LM2"}
+{"event": "result", "key": "7a22e3e0c8031f0f9f9c1461", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:20:01", "tool": "lmgen2.py", "model": "remove_bg", "purpose": "lm_nobg", "seed": null, "key": "34de8ee81df10da985a737bc", "pass": "LM2"}
+{"event": "result", "key": "34de8ee81df10da985a737bc", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-19T10:24:55", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 1, "key": "8255d72ca359e2bf1b8715ae", "pass": "LM2"}
+{"event": "result", "key": "8255d72ca359e2bf1b8715ae", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:25:06", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 2, "key": "976b92af4231cf1718f1fc22", "pass": "LM2"}
+{"event": "result", "key": "976b92af4231cf1718f1fc22", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:25:16", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 3, "key": "0c45a79588aa9d4717fefce8", "pass": "LM2"}
+{"event": "result", "key": "0c45a79588aa9d4717fefce8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:25:27", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 4, "key": "c9ccb5a6d6a0c79329b1d4db", "pass": "LM2"}
+{"event": "result", "key": "c9ccb5a6d6a0c79329b1d4db", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:26:18", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 5, "key": "ed2d6b2ea77559a864d44208", "pass": "LM2"}
+{"event": "result", "key": "ed2d6b2ea77559a864d44208", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:26:28", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 6, "key": "642768ca5ae62d0368ffbb70", "pass": "LM2"}
+{"event": "result", "key": "642768ca5ae62d0368ffbb70", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:26:38", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 7, "key": "69e3567ec103ea54407cc0e7", "pass": "LM2"}
+{"event": "result", "key": "69e3567ec103ea54407cc0e7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:26:48", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 8, "key": "c2d37ceb1d448fe2b0f1366b", "pass": "LM2"}
+{"event": "result", "key": "c2d37ceb1d448fe2b0f1366b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:27:26", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 1, "key": "a95f4b9e7110f4cce45a08f3", "pass": "LM2"}
+{"event": "result", "key": "a95f4b9e7110f4cce45a08f3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:27:37", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 2, "key": "578010e243638b7c0cbe3a2f", "pass": "LM2"}
+{"event": "result", "key": "578010e243638b7c0cbe3a2f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:27:47", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 3, "key": "88a5c9adca9a30c79d3a2069", "pass": "LM2"}
+{"event": "result", "key": "88a5c9adca9a30c79d3a2069", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:27:56", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 4, "key": "eec4bbffe8340734b5778825", "pass": "LM2"}
+{"event": "result", "key": "eec4bbffe8340734b5778825", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:28:07", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 1, "key": "1991d7233c50426eed640aa8", "pass": "LM2"}
+{"event": "result", "key": "1991d7233c50426eed640aa8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:28:16", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 2, "key": "f788aecc576709ffac1d0216", "pass": "LM2"}
+{"event": "result", "key": "f788aecc576709ffac1d0216", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:28:26", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 3, "key": "905415d882528d998b2c55a6", "pass": "LM2"}
+{"event": "result", "key": "905415d882528d998b2c55a6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:06", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 5, "key": "2e8a87339e7ccd181e1ddc4f", "pass": "LM2"}
+{"event": "result", "key": "2e8a87339e7ccd181e1ddc4f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:16", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 6, "key": "d4c20533dba24dd43d416172", "pass": "LM2"}
+{"event": "result", "key": "d4c20533dba24dd43d416172", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:26", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 7, "key": "abb3704ab5ca983f81d96df7", "pass": "LM2"}
+{"event": "result", "key": "abb3704ab5ca983f81d96df7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:37", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 8, "key": "a133f5b8daa2b3cf98e67a9b", "pass": "LM2"}
+{"event": "result", "key": "a133f5b8daa2b3cf98e67a9b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:46", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 4, "key": "9dae1c815452f04ab24401d0", "pass": "LM2"}
+{"event": "result", "key": "9dae1c815452f04ab24401d0", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T10:29:56", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 5, "key": "3665457f2ee3568b38e5819f", "pass": "LM2"}
+{"event": "result", "key": "3665457f2ee3568b38e5819f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}

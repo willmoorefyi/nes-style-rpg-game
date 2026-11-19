@@ -185,6 +185,22 @@
       "note": "User 2026-11-18: free Bedrock landmark art pilot (generate detailed, cut out, pixelize); no Gemini until the user approves. Pilot LM-P: volcano, windmill, cave_mouth, buried_hull. gemini_before as KA-FIX (the Gemini ledger is unchanged since). One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 41,
       "closed": "2026-11-18, 41 of 80 (pilot round 1 done: volcano, windmill, cave_mouth, buried_hull; awaiting the user's review; a later round opens a new pass)"
+    },
+    {
+      "pass": "LM2",
+      "cap": 130,
+      "per_purpose_caps": {
+        "lm_gen": 50,
+        "lm_nobg": 15,
+        "reserve": 10,
+        "vehicle_gen": 40,
+        "vehicle_nobg": 15
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-19: landmark round 2 (re-cut the picks, the remaining landmarks); no Gemini. User 2026-11-19 (same pass): new field vehicle renders (airship, ship, canoe ideas): cap raised 70 -> 130 with vehicle_gen 40 and vehicle_nobg 15 (they replace the airship-only purposes; lm_gen 45 -> 50 so the caps sum to the cap). gemini_before = the Gemini ledger's attempt count, unchanged since KA-FIX. One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 62,
+      "closed": "2026-11-19, 62 of 130 (LM2 round 2 done: the picks re-cut from the cache at 0 calls, the remaining landmarks, airship, ship and canoe ideas rendered; awaiting the user's review)"
     }
   ]
 }
