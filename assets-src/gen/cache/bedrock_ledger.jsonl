@@ -366,3 +366,69 @@
 {"event": "result", "key": "9dae1c815452f04ab24401d0", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
 {"event": "request", "ts": "2026-11-19T10:29:56", "tool": "lmgen2.py", "model": "ultra", "purpose": "vehicle_gen", "seed": 5, "key": "3665457f2ee3568b38e5819f", "pass": "LM2"}
 {"event": "result", "key": "3665457f2ee3568b38e5819f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T11:23:03", "tool": "gen3.py", "model": "ultra", "purpose": "airship_view_gen", "seed": 1, "key": "9ec325e8e751960217d8f280", "pass": "LM3"}
+{"event": "result", "key": "9ec325e8e751960217d8f280", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T11:23:13", "tool": "gen3.py", "model": "ultra", "purpose": "airship_view_gen", "seed": 1, "key": "79291b2d80b448fb68e6ec15", "pass": "LM3"}
+{"event": "result", "key": "79291b2d80b448fb68e6ec15", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T11:23:23", "tool": "gen3.py", "model": "style_guide", "purpose": "airship_view_gen", "seed": 1, "key": "4663a044f775cadeccb1aba5", "pass": "LM3"}
+{"event": "result", "key": "4663a044f775cadeccb1aba5", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:23:34", "tool": "gen3.py", "model": "style_guide", "purpose": "airship_view_gen", "seed": 1, "key": "fb3509736da1f332b071285f", "pass": "LM3"}
+{"event": "result", "key": "fb3509736da1f332b071285f", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:23:44", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 1, "key": "20f095ba5b04307c241a60dd", "pass": "LM3"}
+{"event": "result", "key": "20f095ba5b04307c241a60dd", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:23:55", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 1, "key": "726b73aed1dc36d9fcb5af41", "pass": "LM3"}
+{"event": "result", "key": "726b73aed1dc36d9fcb5af41", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:25:14", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 2, "key": "390d2eb4c623502e26d7ae1c", "pass": "LM3"}
+{"event": "result", "key": "390d2eb4c623502e26d7ae1c", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:25:25", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 2, "key": "d26ab457d1d55a80b821a79f", "pass": "LM3"}
+{"event": "result", "key": "d26ab457d1d55a80b821a79f", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:25:34", "tool": "gen3.py", "model": "ultra", "purpose": "airship_view_gen", "seed": 2, "key": "5dd7c793403c8e1916e62ed7", "pass": "LM3"}
+{"event": "result", "key": "5dd7c793403c8e1916e62ed7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T11:25:44", "tool": "gen3.py", "model": "ultra", "purpose": "airship_view_gen", "seed": 2, "key": "da8d24261448a6cc0a00d85c", "pass": "LM3"}
+{"event": "result", "key": "da8d24261448a6cc0a00d85c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T11:25:53", "tool": "gen3.py", "model": "style_guide", "purpose": "airship_view_gen", "seed": 2, "key": "f7c84ccba1540cafd23a946b", "pass": "LM3"}
+{"event": "result", "key": "f7c84ccba1540cafd23a946b", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:26:04", "tool": "gen3.py", "model": "style_guide", "purpose": "airship_view_gen", "seed": 2, "key": "fd11215ecbbdbe5c30f62597", "pass": "LM3"}
+{"event": "result", "key": "fd11215ecbbdbe5c30f62597", "ok": true, "served": "us.stability.stable-image-style-guide-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:26:56", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 3, "key": "f2f29cb1b5fca2dfb9aa4ee5", "pass": "LM3"}
+{"event": "result", "key": "f2f29cb1b5fca2dfb9aa4ee5", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:27:08", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 4, "key": "ce0915a8d276454a66e80761", "pass": "LM3"}
+{"event": "result", "key": "ce0915a8d276454a66e80761", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:27:18", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 5, "key": "23a8ade261b014872f57732d", "pass": "LM3"}
+{"event": "result", "key": "23a8ade261b014872f57732d", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:27:28", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 3, "key": "c482a95c1d3331bf741500cd", "pass": "LM3"}
+{"event": "result", "key": "c482a95c1d3331bf741500cd", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:27:38", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 4, "key": "87bc77bb342b8ec05ff3b5e5", "pass": "LM3"}
+{"event": "result", "key": "87bc77bb342b8ec05ff3b5e5", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:27:48", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 5, "key": "759f2c7af1f6e6ab036dfd78", "pass": "LM3"}
+{"event": "result", "key": "759f2c7af1f6e6ab036dfd78", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:30:26", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 6, "key": "eca70d3a8f05c39f1e11c425", "pass": "LM3"}
+{"event": "result", "key": "eca70d3a8f05c39f1e11c425", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:30:37", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 7, "key": "616531ba106d5e99c47a817d", "pass": "LM3"}
+{"event": "result", "key": "616531ba106d5e99c47a817d", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:30:47", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 8, "key": "1622f72f19fa407f9fe4f938", "pass": "LM3"}
+{"event": "result", "key": "1622f72f19fa407f9fe4f938", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:31:08", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 6, "key": "571bc82d95884f237aab02a1", "pass": "LM3"}
+{"event": "result", "key": "571bc82d95884f237aab02a1", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:31:17", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 7, "key": "e7afd291e76b7da64a3dde82", "pass": "LM3"}
+{"event": "result", "key": "e7afd291e76b7da64a3dde82", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:31:29", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 8, "key": "bbc157998507e3ec0464f533", "pass": "LM3"}
+{"event": "result", "key": "bbc157998507e3ec0464f533", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:31:55", "tool": "gen3.py", "model": "remove_bg", "purpose": "airship_view_nobg", "seed": null, "key": "6f385ddd057558706022a4f7", "pass": "LM3"}
+{"event": "result", "key": "6f385ddd057558706022a4f7", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:32:46", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 9, "key": "c6a49be697bf3305ce3f4f91", "pass": "LM3"}
+{"event": "result", "key": "c6a49be697bf3305ce3f4f91", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:32:58", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 10, "key": "4ed3b7de8cd9ceeaf7719015", "pass": "LM3"}
+{"event": "result", "key": "4ed3b7de8cd9ceeaf7719015", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:33:08", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 11, "key": "93b141d38283bad03f8ec83e", "pass": "LM3"}
+{"event": "result", "key": "93b141d38283bad03f8ec83e", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:33:19", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 9, "key": "398592a0efd9ab79f03fbef5", "pass": "LM3"}
+{"event": "result", "key": "398592a0efd9ab79f03fbef5", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:33:29", "tool": "gen3.py", "model": "control_sketch", "purpose": "airship_view_gen", "seed": 10, "key": "0d0ef785f96a208b37e6bf38", "pass": "LM3"}
+{"event": "result", "key": "0d0ef785f96a208b37e6bf38", "ok": true, "served": "us.stability.stable-image-control-sketch-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:34:57", "tool": "gen3.py", "model": "remove_bg", "purpose": "airship_view_nobg", "seed": null, "key": "fa761227afb5ad7bab6ad5c2", "pass": "LM3"}
+{"event": "result", "key": "fa761227afb5ad7bab6ad5c2", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:35:00", "tool": "gen3.py", "model": "remove_bg", "purpose": "airship_view_nobg", "seed": null, "key": "0cbe528e0e29d2e082b06ef2", "pass": "LM3"}
+{"event": "result", "key": "0cbe528e0e29d2e082b06ef2", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
+{"event": "request", "ts": "2026-11-19T11:35:02", "tool": "gen3.py", "model": "remove_bg", "purpose": "airship_view_nobg", "seed": null, "key": "9a283aedb47c28f8f0f43648", "pass": "LM3"}
+{"event": "result", "key": "9a283aedb47c28f8f0f43648", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
