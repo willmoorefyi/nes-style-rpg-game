@@ -1,0 +1,39 @@
+{
+  "vehicle": "ship",
+  "pass": "LM2",
+  "source_native": "ship_ultra_b_7_cut.png",
+  "tag": "ship_ultra_b_7",
+  "model": "stability.stable-image-ultra-v1:1",
+  "model_alias": "ultra",
+  "variant": "b",
+  "seed": 7,
+  "cache_key": "abb3704ab5ca983f81d96df7",
+  "purpose": "vehicle_gen",
+  "aspect": "3:2",
+  "prompt": "Single game sprite on a pure white background: pixel art of an original sleek fast three-masted sailing frigate of around 1800, its bow pointing right: a slender dark wooden hull with one single row of small square gun ports on an ochre stripe, three tall masts each with stacked white square sails, a raised quarterdeck at the stern on the left, a long bowsprit with two triangular jib sails at the bow on the right, small red pennants at the mast tops, sitting on a thin line of calm blue water. One isolated vehicle only, like a sticker cut out, nothing around it, empty white space on every side. 16-bit SNES JRPG field vehicle sprite, detailed pixel art, three-quarter side view facing right, light from the top left, dark outline, no people, no flags with symbols",
+  "negative_prompt": "environment, surrounding terrain, other mountains, landscape, scenery, text, letters, label, watermark, signature, multiple objects, horizon, sky, background details, ground plane, frame, border, people, blurry, photo, photorealistic, 3d render, ship of the line, two gun decks, three gun decks, galleon, pirate flag, skull, named ship, characters",
+  "pipeline": "landmark_pilot round2 scripts: lmpix2.cutout (flood background) + lmpix.pix (palette, 48 px per cell)",
+  "cut_settings": {
+    "cut": {
+      "rim": 4,
+      "pocket": 5,
+      "water_y": 0.8
+    },
+    "pix": {
+      "fill": 0.98
+    },
+    "size_cells": [
+      4,
+      2
+    ]
+  },
+  "native_size": [
+    192,
+    96
+  ],
+  "mirrored": true,
+  "facing_found": "native: bowsprit and jibs point left (the prompt asked for right); mirrored to face right",
+  "faces": "right",
+  "approved": "2026-11-19",
+  "user_review": "user pick from the round-2 review sheet (ship.png PICK)"
+}

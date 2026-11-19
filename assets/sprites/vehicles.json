@@ -1,20 +1,71 @@
 {
-  "cell": [
-    24,
-    24
-  ],
+  "version": 2,
+  "native": 48,
   "frames": {
-    "ship": [
-      0,
-      0
-    ],
-    "airship": [
-      24,
-      0
-    ],
-    "canoe": [
-      48,
-      0
-    ]
+    "ship": {
+      "x": 0,
+      "y": 0,
+      "w": 134,
+      "h": 94,
+      "anchor": [
+        0.41,
+        1.0
+      ],
+      "footRow": 93
+    },
+    "airship": {
+      "x": 136,
+      "y": 0,
+      "w": 147,
+      "h": 94,
+      "anchor": [
+        0.4167,
+        1.0
+      ],
+      "footRow": 93
+    },
+    "canoe": {
+      "x": 285,
+      "y": 0,
+      "w": 71,
+      "h": 22,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "footRow": 21
+    },
+    "canoe_front": {
+      "x": 358,
+      "y": 0,
+      "w": 71,
+      "h": 22,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "footRow": 21
+    },
+    "canoe_ripple": {
+      "x": 431,
+      "y": 0,
+      "w": 77,
+      "h": 3,
+      "anchor": [
+        0.5,
+        1.0
+      ],
+      "footRow": 2
+    }
+  },
+  "canoe": {
+    "cutRow": 9,
+    "heroWaist": 56,
+    "heroDrop": 27
+  },
+  "sources": {
+    "ship": "approved",
+    "airship": "approved",
+    "canoe": "approved"
   }
 }
