@@ -9,6 +9,8 @@ import type { MapData } from '../../types/index.js';
 import { AMBIENT_CELL_PX, type AmbientEffect } from '../../types/ambient.js';
 import { aboveZIndex } from '../../rendering/BakedMapRenderer.js';
 import { TILE_SIZE } from '../../core/LayoutConstants.js';
+import { devSmokeStyle, type SmokeStyle } from './smoke/smokeStyles.js';
+import { SmokeColumn } from './smoke/SmokeColumn.js';
 
 export const SMOKE_PERIOD_MS = 3200;
 export const SMOKE_PUFFS = 5;
@@ -75,12 +77,15 @@ function shapeGraphics(rows: string[], px: number): Graphics {
   return g;
 }
 
-interface Source { root: Container; puffs: Graphics[][] }
+interface Source { root: Container; puffs: Graphics[][]; column?: SmokeColumn }
 
 export class FieldAmbient {
   private sources: Source[] = [];
   private ms = 0;
   private pxScale = 1;
+
+  /** `style`: a SMOKE experiment option (smoke/smokeStyles.ts; dev `?smoke=a..f`), null for today's puffs. */
+  constructor(private readonly style: SmokeStyle | null = devSmokeStyle()) {}
 
   /** Build the effects of `map` in `world` (call after the world container was emptied for the map). */
   setMap(map: MapData, world: Container, tilePx: number = TILE_SIZE): void {
@@ -91,17 +96,18 @@ export class FieldAmbient {
         console.error(`FieldAmbient: unknown ambient kind ${String((e as AmbientEffect).kind)}`);
         continue;
       }
-      const root = new Container();
+      const column = this.style ? new SmokeColumn(this.style, px) : undefined;
+      const root = column?.root ?? new Container();
       root.position.set(e.x * tilePx + (e.ox ?? 24) * px, e.y * tilePx + (e.oy ?? 24) * px);
       root.zIndex = aboveZIndex(map) + 1;
       const puffs: Graphics[][] = [];
-      for (let i = 0; i < SMOKE_PUFFS; i++) {
+      for (let i = 0; i < (column ? 0 : SMOKE_PUFFS); i++) {
         const set = SHAPES.map((s) => shapeGraphics(s, px));
         for (const g of set) root.addChild(g);
         puffs.push(set);
       }
       world.addChild(root);
-      this.sources.push({ root, puffs });
+      this.sources.push({ root, puffs, column });
     }
     this.draw(px);
   }
@@ -126,6 +132,7 @@ export class FieldAmbient {
     if (px !== undefined) this.pxScale = px;
     const state = smokePuffs(this.ms);
     for (const s of this.sources) {
+      s.column?.draw(this.ms);
       s.puffs.forEach((set, i) => {
         const p = state[i];
         set.forEach((g, k) => {
