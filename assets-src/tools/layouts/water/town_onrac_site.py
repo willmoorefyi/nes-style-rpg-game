@@ -11,7 +11,8 @@ GATE, the meadow cell south of the icon. The submarine is inside the town (the d
 TOWN = "onrac"
 ANCHOR = "wat_onrac"           # the land-gate entrance of the compiled overworld (assets/data/world-anchors.yaml)
 GATE = (28, 39)                # the anchor's cell, its 2.2 target (+-2 per axis allowed): the arrival on leaving
-ICON = [(x, y) for y in range(36, 39) for x in range(27, 30)]     # the town icon's cells (blocked art), 3x3
+# the town icon's cells (blocked art), 5x3: LM4-INT grew it one column each side for the approved 5x3 icon
+ICON = [(x, y) for y in range(36, 39) for x in range(26, 31)]
 DOOR = (28, 38)                # the icon cell whose transition leads to the town map's `gate` entrance
 DOCK = None                    # airship-only (WATER has no dock, 2.8); the submarine is inside the town map
 SPAWN = None                   # no vehicle starts here

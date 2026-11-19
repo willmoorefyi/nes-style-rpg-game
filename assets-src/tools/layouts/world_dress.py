@@ -49,6 +49,12 @@ def scatter(box: list[Cell], taken: set[Cell], seed: int, ring: list[Cell], walk
     pick = [c for c in outer if rng.random() < 0.3]
     for c in pick:
         out[c] = KINDS[int(rng.choice(len(KINDS), p=(0.5, 0.35, 0.15)))]
+    if not inner and len(pick) > 1:              # LM4-INT: an icon filling its box: the ring holds a copse and a stone
+        kinds = [out[c] for c in pick]
+        if "tree_clump" not in kinds:
+            out[pick[0]] = "tree_clump"
+        if "boulder" not in [out[c] for c in pick]:
+            out[pick[-1]] = "boulder"
     if gate is not None:
         _keep_open(out, box, ring, walkable, gate, set(pick), taken & set(box))
     decos = []

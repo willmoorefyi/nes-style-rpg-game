@@ -85,17 +85,20 @@ describe('P3-R3: the west has no ruler-straight shapes', () => {
 });
 
 describe('P3-R4: Melmond and Onrac are dressed by a scatter, not a stamped 3x3 ring', () => {
-  it.each([['melmond', 39, 111], ['onrac', 27, 36]])('%s: mixed kinds, varied offsets, gaps in its box', (name, x0, y0) => {
-    const near = world.objects.filter((o) => o.type === 'deco' && o.name !== name && o.parts.length === 1
-      && o.parts[0].length === 1 && o.x >= x0 - 1 && o.x <= x0 + 3 && o.y >= y0 - 1 && o.y <= y0 + 3);
-    const kinds = new Set(near.map((o) => o.parts[0][0]));
-    expect(kinds.has('tree_clump') && kinds.has('boulder')).toBe(true);
-    const offsets = new Set(near.map((o) => (o.offset ?? [0, 0]).join(',')));
-    expect(offsets.size).toBeGreaterThanOrEqual(Math.min(near.length, 4));
-    const town = world.objects.find((o) => o.name === name)!;
-    const covered = new Set([...near.map((o) => `${o.x},${o.y}`), `${town.x},${town.y}`, `${town.x + 1},${town.y}`]);
-    let gaps = 0;
-    for (let y = y0; y < y0 + 3; y++) for (let x = x0; x < x0 + 3; x++) if (!covered.has(`${x},${y}`)) gaps++;
-    expect(gaps).toBeGreaterThanOrEqual(2);
-  });
+  // LM4-INT: the approved town icons fill their whole box (Melmond 4x3, Onrac 5x3), so the scatter dresses the ring
+  // round the box: mixed kinds, varied offsets, and gaps in the ring (it never walls the town in)
+  it.each([['melmond', 38, 111, 4, 3], ['onrac', 26, 36, 5, 3]])('%s: mixed kinds, varied offsets, gaps in its ring',
+    (name, x0, y0, w, h) => {
+      const town = world.objects.find((o) => o.name === name)!;
+      expect([town.x, town.y, town.parts[0].length, town.parts.length]).toEqual([x0, y0, w, h]);
+      const ring = (x: number, y: number) => x >= x0 - 1 && x <= x0 + w && y >= y0 - 1 && y <= y0 + h
+        && !(x >= x0 && x < x0 + w && y >= y0 && y < y0 + h);
+      const near = world.objects.filter((o) => o.type === 'deco' && o.name !== name && o.parts.length === 1
+        && o.parts[0].length === 1 && ring(o.x, o.y));
+      const kinds = new Set(near.map((o) => o.parts[0][0]));
+      expect(kinds.has('tree_clump') && kinds.has('boulder')).toBe(true);
+      const offsets = new Set(near.map((o) => (o.offset ?? [0, 0]).join(',')));
+      expect(offsets.size).toBeGreaterThanOrEqual(Math.min(near.length, 4));
+      expect(2 * (w + h) + 4 - near.length).toBeGreaterThanOrEqual(2);
+    });
 });

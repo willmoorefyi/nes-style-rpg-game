@@ -30,7 +30,7 @@ MIRAGE_OPEN = not is_stub(MAPS / "mirage-1f.yaml")
 
 WALKABLE = frozenset(".,:fs=%w_+-")
 LAKE, OCEAN = "≈", "o"
-LANDMARK_SIZE = {"windmill": (2, 3), "tower": (2, 3), "dome": (2, 2)}      # kit.LANDMARKS (cells wide, high)
+LANDMARK_SIZE = {"windmill": (2, 3), "town_gaia": (3, 2), "mirage_tower": (2, 3), "lufenia": (4, 2)}  # kit.LANDMARKS
 
 # a rocky knoll behind Gaia's door: the hall's roof row stands on it, so the door has one way out (south)
 KNOLL = [(GAIA.DOOR[0] + i, GAIA.DOOR[1] - j) for j in (1, 2) for i in (0, 1)]
@@ -87,25 +87,23 @@ INSPECT = [  # (x, y, lines): each on a blocked boulder with a walkable neighbou
 def objects() -> list[dict]:
     dx, dy = GAIA_DOOR
     return [
-        # Gaia: a stilled windmill west of the door, a roofed hall over and east of it
-        # (collide: alpha, the placeholders' top rows are mostly sky: an open cell there is walked behind)
-        {"type": "deco", "name": "gaia", "parts": [["town_icon_0_0", "town_icon_0_1"], ["town_icon_1_0", "town_icon_1_1"]],
+        # Gaia: a stilled windmill west of the door, the approved town icon `town_gaia` (3x2, LM4-INT; before, the
+        # walled-town icon 2x2) over and east of it, the door its bottom-left cell
+        # (collide: alpha, the art's top rows are partly sky: an open cell there is walked behind)
+        {"type": "deco", "name": "gaia", "parts": landmark_parts("town_gaia"),
          "x": dx, "y": dy - 1, "walk_cells": [[0, 1]], "collide": "alpha"},
         {"type": "deco", "name": "gaia_mill", "parts": landmark_parts("windmill"), "x": dx - 2, "y": dy - 2,
          "collide": "alpha"},
         {"type": "deco", "name": "gaia_mill_east", "parts": landmark_parts("windmill"), "x": 146, "y": 8,
          "collide": "alpha"},
-        # the Mirage Tower, with a fallen block of it beside the door
-        {"type": "deco", "name": "mirage", "parts": landmark_parts("tower"), "x": MIRAGE_DOOR[0] - 1,
+        # the Mirage Tower (LM4-INT: its own approved art, was the generic tower), with a fallen block beside the door
+        {"type": "deco", "name": "mirage", "parts": landmark_parts("mirage_tower"), "x": MIRAGE_DOOR[0] - 1,
          "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]] if MIRAGE_OPEN else [], "collide": "alpha"},
         {"type": "deco", "parts": [["boulder"]], "x": MIRAGE_DOOR[0] + 1, "y": MIRAGE_DOOR[1]},
-        # Lufenia: two pale domes, the door under the east one (LM-INT: collide alpha on the tower and the domes,
-        # the approved art leaves their top rows mostly sky; both domes 6 px up, so the cell over the door keeps
-        # 30 % art and stays solid: the door has one way in, OW-2)
-        {"type": "deco", "name": "lufenia_west", "parts": landmark_parts("dome"), "x": LUFENIA_DOOR[0] - 2,
-         "y": LUFENIA_DOOR[1] - 1, "collide": "alpha", "offset": [0, -6]},
-        {"type": "deco", "name": "lufenia", "parts": landmark_parts("dome"), "x": LUFENIA_DOOR[0],
-         "y": LUFENIA_DOOR[1] - 1, "walk_cells": [[0, 1]], "collide": "alpha", "offset": [0, -6]},
+        # Lufenia: the approved town icon `lufenia` (4x2, LM4-INT; it replaces LM-INT's two domes), the door its
+        # walk cell [2, 1], entered from the gate south of it (OW-2: one way in)
+        {"type": "deco", "name": "lufenia", "parts": landmark_parts("lufenia"), "x": LUFENIA_DOOR[0] - 2,
+         "y": LUFENIA_DOOR[1] - 1, "walk_cells": [[2, 1]], "collide": "alpha"},
         *({"type": "deco", "parts": [["boulder"]], "x": x, "y": y} for x, y, _ in INSPECT),
     ]
 

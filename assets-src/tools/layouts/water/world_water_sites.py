@@ -30,19 +30,18 @@ POST_TEXT = ["Words burned into the post: SWEET WATER HERE. THE CAMP TRADES FAIR
 
 
 def _icon(cells: list[tuple[int, int]], door: tuple[int, int], g) -> list[dict]:
-    """Onrac's icon over the site's 3x3 icon cells (FX-D P3-13): the approved Bedrock town icon (`town_onrac`, 2x1,
-    LM-INT; before, the walled-town icon's drawn row `town_icon_1_*`) on the bottom row with the door in its left cell, and
-    round it the firs and rocks of the cliff top scattered by a seeded generator (FX-R P3-R4: varied kinds and
-    offsets, with gaps; before, an exact 3x3 ring). The old icon was a snow-roofed house."""
+    """Onrac's icon over the site's 5x3 icon cells (FX-D P3-13): the approved Bedrock town icon (`town_onrac`, 5x3,
+    LM4-INT; LM-INT's was 2x1 on the bottom row) over the whole box, the door its bottom-middle walk cell [2, 2] above
+    the gate, and round it the firs and rocks of the cliff top scattered by a seeded generator (FX-R P3-R4: varied
+    kinds and offsets, with gaps)."""
     xs, ys = [c[0] for c in cells], [c[1] for c in cells]
     x0, y0, w, h = min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
-    assert (w, h) == (3, 3) and door[1] == y0 + h - 1 and x0 <= door[0] <= x0 + 1, \
-        "Onrac's icon: 3x3, the door on its bottom row, left of the right column"
+    assert (w, h) == (5, 3) and door == (x0 + 2, y0 + 2), "Onrac's icon: 5x3, the door its bottom-middle cell"
     gx, gy = ONRAC.GATE
-    taken = {door, (door[0] + 1, door[1]), ONRAC.GATE, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), LANDING}
+    taken = set(cells) | {ONRAC.GATE, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), LANDING}
     return [
-        {"type": "deco", "name": "onrac", "x": door[0], "y": door[1], "parts": landmark_parts("town_onrac"),
-         **({"walk_cells": [[0, 0]]} if town_built() else {})},        # the door opens once WAT-T builds the town
+        {"type": "deco", "name": "onrac", "x": x0, "y": y0, "parts": landmark_parts("town_onrac"), "collide": "alpha",
+         **({"walk_cells": [[door[0] - x0, door[1] - y0]]} if town_built() else {})},   # the door opens once WAT-T builds the town
         *scatter(cells, taken, DRESS_SEED, ring_of(cells), lambda c: g.inside(*c) and g[c] == ".",
                 door_sides(door, cells, taken), ONRAC.GATE),
     ]

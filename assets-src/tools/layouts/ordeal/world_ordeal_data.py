@@ -85,7 +85,7 @@ def objects() -> list[dict]:
            {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x - 1, "y": y},
            {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x + 2, "y": y},
            _deco("cave_mouth", *CAVE, walk_cells=[[1, 1]]),
-           _deco("tent", *TENT, style="dune", collide="alpha")]
+           _deco("hermit_hut", *TENT, collide="alpha")]             # LM4-INT: the hut's own art (was the tent)
     for bx, by in ((78, 38), (70, 33), (79, 15)):
         out.append({"type": "deco", "parts": [["boulder"]], "x": bx, "y": by, "collide": "alpha"})
     return out

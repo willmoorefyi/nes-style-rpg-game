@@ -7,7 +7,8 @@ integrator regenerates them under the lock, never hand-merges (QUEST 4.0).
 TOWN = "melmond"
 ANCHOR = "ert_melmond"         # the land-gate entrance of the compiled overworld (assets/data/world-anchors.yaml)
 GATE = (42, 112)               # the anchor's cell, its 2.2 target (+-2 per axis allowed): the arrival on leaving
-ICON = [(x, y) for y in range(111, 114) for x in range(39, 42)]   # the town icon's cells (blocked art), 3x3
+# the town icon's cells (blocked art), 4x3: LM4-INT grew it one column west for the approved 4x3 icon
+ICON = [(x, y) for y in range(111, 114) for x in range(38, 42)]
 DOOR = (41, 112)               # the icon cell whose transition leads to the town map's `gate` entrance
 DOCK = {"id": "ert_melmond", "x": 43, "y": 113, "basin": "ocean"}  # the harbour on the western strait
 SPAWN = None                   # no vehicle starts here

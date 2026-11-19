@@ -141,14 +141,24 @@ LANDMARKS = {
     "sky_ring": (2, 2, (170, 200, 235), "SR", "ring"), "ice_floe": (2, 2, (215, 235, 245), "IF", "floe"),
     "waterfall": (2, 3, (90, 150, 215), "WF", "fall"), "tent": (2, 2, (200, 170, 110), "TE", "tent"),
     "windmill": (2, 3, (210, 195, 165), "WM", "windmill"), "dome": (2, 2, (175, 185, 210), "DO", "dome"),
-    # LM-INT: Gaia's grass tuft (a 1x1 deco; the `tuft` part stays the compiler's grass speckle) and the
-    # Melmond / Onrac town icons (2x1, the door in the left cell)
-    "tuft": (1, 1, (50, 115, 45), "", "tuft"), "town_melmond": (2, 1, (170, 150, 120), "TM", "town"),
-    "town_onrac": (2, 1, (150, 160, 175), "TO", "town"),
+    # LM-INT: Gaia's grass tuft (a 1x1 deco; the `tuft` part stays the compiler's grass speckle)
+    "tuft": (1, 1, (50, 115, 45), "", "tuft"),
+    # LM4-INT: the town icons (LM4 picks; Melmond and Onrac grew from LM's 2x1), Lufenia's one icon (it replaces the
+    # two domes), the unique boats (the buried hull stays only as FIRE's airship hull) and the landmarks
+    "town_melmond": (4, 3, (170, 150, 120), "TM", "town"), "town_onrac": (5, 3, (150, 160, 175), "TO", "town"),
+    "town_pravoka": (3, 3, (190, 120, 90), "TP", "town"), "town_elfheim": (3, 3, (120, 160, 110), "TE", "town"),
+    "town_crescent": (3, 3, (200, 180, 140), "TC", "town"), "town_gaia": (3, 2, (160, 140, 170), "TG", "town"),
+    "lufenia": (4, 2, (175, 185, 210), "LU", "dome"),
+    "brig": (4, 3, (110, 75, 45), "BR", "hull"), "submarine": (4, 2, (90, 95, 105), "SU", "hull"),
+    "fishing_boat": (3, 2, (80, 110, 160), "FB", "hull"),
+    "bell_tower": (2, 3, (200, 200, 205), "BT", "tower"), "lighthouse": (2, 3, (235, 235, 230), "LH", "tower"),
+    "mirage_tower": (2, 3, (215, 190, 140), "MT", "tower"),
+    "standing_stones": (2, 2, (150, 150, 150), "SS", "shrine"), "hermit_hut": (2, 2, (165, 130, 90), "HH", "tent"),
 }
-# LM-INT: the approved Bedrock landmark sheet (assets-src/gen/landmark_cut.py); its cells replace the code-drawn
-# landmark placeholders in every kit, not only the overworld kit that holds the file
-LANDMARK_SHEET = APPROVED / "overworld" / "landmarks_lm"
+# LM-INT / LM4-INT: the approved Bedrock landmark sheets (assets-src/gen/landmark_cut.py); their cells replace the
+# code-drawn landmark placeholders in every kit, not only the overworld kit that holds the files
+LANDMARK_SHEETS = (APPROVED / "overworld" / "landmarks_lm", APPROVED / "overworld" / "landmarks_lm4")
+LANDMARK_SHEET = LANDMARK_SHEETS[0]
 
 
 def landmark_parts(name: str) -> list[list[str]]:
@@ -403,16 +413,24 @@ def apply_paint(sheet: Image.Image, ops: list[dict], where: str = "sheet") -> Im
 
 
 @lru_cache(maxsize=None)
-def approved_landmarks(sheet: Path = LANDMARK_SHEET) -> dict[str, Image.Image]:
-    """The approved landmark cells by part name ({} while the sheet is missing)."""
-    meta_path = sheet.with_suffix(".json")
-    if not meta_path.is_file():
-        return {}
-    meta = json.loads(meta_path.read_text())
-    img = Image.open(sheet.with_suffix(".png")).convert("RGBA")
-    t = meta.get("tile", T)
-    return {n: img.crop((c * t, r * t, (c + 1) * t, (r + 1) * t))
-            for r, row in enumerate(meta["cells"]) for c, n in enumerate(row) if n in _LANDMARK_CELL}
+def approved_landmarks(approved_dir: Path = APPROVED) -> dict[str, Image.Image]:
+    """The approved landmark cells by part name, from every landmark sheet (a missing sheet adds nothing; a cell
+    name in two sheets is an error)."""
+    out: dict[str, Image.Image] = {}
+    for sheet in LANDMARK_SHEETS:
+        meta_path = (approved_dir / sheet.relative_to(APPROVED)).with_suffix(".json")
+        if not meta_path.is_file():
+            continue
+        meta = json.loads(meta_path.read_text())
+        img = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
+        t = meta.get("tile", T)
+        for r, row in enumerate(meta["cells"]):
+            for c, n in enumerate(row):
+                if n in _LANDMARK_CELL:
+                    if n in out:
+                        raise ValueError(f"landmark cell {n} is in two sheets ({meta_path.name})")
+                    out[n] = img.crop((c * t, r * t, (c + 1) * t, (r + 1) * t))
+    return out
 
 
 def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool = False) -> Kit:
@@ -420,13 +438,13 @@ def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool
     root = approved_dir / kit_id
     if placeholders_only:
         return kit
-    for name, cell in approved_landmarks(approved_dir / LANDMARK_SHEET.relative_to(APPROVED)).items():
+    for name, cell in approved_landmarks(approved_dir).items():
         kit.parts[name] = cell
         kit.approved.add(name)
     if not root.is_dir():
         return kit
     for meta_path in sorted(root.glob("*.json")):
-        if meta_path.stem == LANDMARK_SHEET.name and root.name == LANDMARK_SHEET.parent.name:
+        if any(meta_path.stem == s.name and root.name == s.parent.name for s in LANDMARK_SHEETS):
             continue                                   # loaded above, for every kit
         meta = json.loads(meta_path.read_text())
         sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")

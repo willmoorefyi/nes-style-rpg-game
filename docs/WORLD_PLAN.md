@@ -422,6 +422,10 @@ The rects tile the 192x192 world exactly: 144 chunks, each in exactly one region
 | X_east | x 64-71, y 12-18 | ocean to mountain only (the north end of Pravoka's range) | A1-O |
 
   The ship spawn moves (A1-T), and the canoe spawn is removed (W1-C2). Patches are overlays and change no ground.
+  **User ruling 2026-11-19 (LM4-INT):** Pravoka's world icon may grow and break the frozen core. It is the approved
+  3x3 icon over world x 130-132, y 98-100 (`world_api.PRAVOKA_ICON_CELLS`; before, 2x1 at x 130-131, y 100), the
+  door (131, 100), the gate (131, 101), the anchor and the dock (132, 102) unchanged. Those 9 cells (local x 66-68,
+  y 34-36) all lie in X_pravoka, so no exception rect grows; `frozenCore.test.ts` pins the icon to exactly them.
   `tests/quest/a1/frozenCore.test.ts` (W1-C2) compares the translated core with a fixture taken from the act-1
   `overworld.py` output, minus the four rects. The X_west and X_east cells may only change from `o` to `m`.
 
@@ -5159,6 +5163,32 @@ user's planned "cheats" menu (INT-W2c) is still open.
   ancestor of S31). Without it `--stage S31` could never get the ore.
 - **Still caught:** removing Smyth's `requiredItem adamant` gives Excalibur at S10 time, before S27 (ORDER) and
   without its requirement (SKIP); withholding the chest keeps Excalibur out of reach (`questGraph.test.ts` W-S31 test).
+### LM4-INT result: the LM4 Bedrock art in the world and the towns (branch `lm4-int` from `mainline` 71b01934)
+
+- **Art.** The user's 15 LM4 picks, re-cut offline from the render cache (no Bedrock or Gemini call) by
+  `gen/landmark_cut.py` (`SPEC4`) into `gen/approved/overworld/landmarks_lm4.{png,json}` (model, seed, cache key, pass
+  LM4, cut settings, approved 2026-11-19); `kit.LANDMARK_SHEETS` loads both sheets into every kit. LM's 2x1 Melmond
+  and Onrac icons left `landmarks_lm` (their renders stay in the cache).
+- **Placed.** World: Melmond 4x3 (38-41, 111-113), Onrac 5x3 (26-30, 36-38), Pravoka 3x3 (130-132, 98-100), Elfheim
+  3x3 (81-83, 151-153), Crescent 3x3 (149-151, 123-125), Gaia 3x2 (150-152, 12-13), Lufenia 4x2 (150-153, 44-45; one
+  icon for the two domes), the lighthouse 2x3 (138, 98), the Mirage Tower 2x3 (131, 34), the standing stones 2x2 on
+  the Circle's islet (159, 123), the hermit's hut 2x2 (118, 38). Pravoka: the brig 4x3 (34, 35; its inspect cell moved
+  with it to (35, 35)), the lighthouse (41, 10). Onrac: the fishing boat 3x2 (14, 37), the submarine 4x2 (39, 26), the
+  bell tower 2x3 (27, 17). No door, gate, anchor or entrance cell moved.
+- **Pravoka (user ruling 2026-11-19).** The icon grew from 2x1 (130-131, 100) to 3x3 (130-132, 98-100), re-cut from
+  `town_pravoka_ultra_a_3` with the painted sea and the pier cut away (`sea_y`, `drop`); the art's gate is the door
+  (131, 100). All 9 cells lie in X_pravoka (2.5), so no exception rect grew; the ground is unchanged (the headland
+  rock behind it, the channel water at x 132 under its rock footing: `pravokaChannel.test.ts` still counts 6 Water
+  cells). `frozenCore.test.ts` pins the icon to exactly these cells.
+- **Doors.** Every town icon has `collide: alpha` and its door as a walk cell; Elfheim's two top corners and
+  Melmond's top-right cell (1-3 % art) hold a `tree_clump` instead, so each door keeps one way in (OW-2).
+  `world_dress.scatter` gives an icon that fills its box a copse and a stone in its ring (Onrac's ring had none).
+- **Gates.** `world.py`: `bands: OK`, `basins: OK (aldi 2783 cells, ocean 12992 cells; canal joins)`; every layout
+  script re-run leaves `assets-src/maps` unchanged; overworld, pravoka and onrac compile and are deterministic;
+  `kit.py --selftest` (38 names), `landmark_cut.py --check` (both sheets), `build_map.py --selftest` (104 checks);
+  vitest 367 files / 9195 tests; `npm run build`; `quest-verify: OK` (`--strict --mutate`, 32 stages built). Browser
+  walk (127.0.0.1, `mute=1`, 0 console errors): each new item seen, and Pravoka, Melmond, Onrac, Elfheim, Crescent,
+  Gaia, Lufenia and the Mirage Tower entered through their doors; screenshots in `~/temp/ff-game/lm4_int/`.
 <!-- === end INT === -->
 <!-- === PLAY PLAY TEST (pass W: owned by PLAY) === -->
 <!-- === end PLAY === -->
