@@ -26,25 +26,28 @@ CAIRN_TEXT = ["A cairn of pale river stones. Scratched into the top one: a small
 POST_TEXT = ["Words burned into the post: SWEET WATER HERE. THE CAMP TRADES FAIR. NO CREDIT."]
 
 
-def _icon_parts(cells: list[tuple[int, int]], door: tuple[int, int]) -> tuple[int, int, list[list[str]], list[int]]:
-    """A town icon over the site's icon cells (any box): roof rows over a wall row with the door, from the town
-    kit's house parts. Returns (x, y, parts, door cell relative to the box)."""
+def _icon(cells: list[tuple[int, int]], door: tuple[int, int]) -> list[dict]:
+    """Onrac's icon over the site's 3x3 icon cells (FX-D P3-13): the approved walled-town icon (its drawn row,
+    `town_icon_1_*`, 2x1: the top row of the sheet is empty) on the bottom row with the door in its left cell, the
+    other cells the firs and rocks of the cliff top behind it (every cell drawn, so the whole box stays blocked art;
+    decos may not overlap, so the town and its rim are separate decos). The old icon was a snow-roofed house."""
     xs, ys = [c[0] for c in cells], [c[1] for c in cells]
     x0, y0, w, h = min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
-    assert w >= 2 and h >= 2 and door == (door[0], y0 + h - 1), "Onrac's icon: 2x2 or more, the door on its bottom row"
-    roofs = ["roof_ridge"] + ["roof_mid"] * (h - 3) + ["roof_eave"] if h >= 3 else ["roof_ridge"]
-    parts = [[f"{k}_l"] + [f"{k}_m"] * (w - 2) + [f"{k}_r"] for k in roofs]
-    parts.append(["wall_lo_l"] + ["wall_lo_plain"] * (w - 2) + ["wall_lo_r"])
-    dx = door[0] - x0
-    parts[-1][dx] = "wall_door_bottom"
-    return x0, y0, parts, [dx, h - 1]
+    assert (w, h) == (3, 3) and door[1] == y0 + h - 1 and x0 <= door[0] <= x0 + 1, \
+        "Onrac's icon: 3x3, the door on its bottom row, left of the right column"
+    side = x0 + 2 if door[0] == x0 else x0            # the bottom-row cell the town icon leaves free
+    return [
+        {"type": "deco", "name": "onrac", "x": door[0], "y": door[1], "parts": [["town_icon_1_0", "town_icon_1_1"]],
+         **({"walk_cells": [[0, 0]]} if town_built() else {})},        # the door opens once WAT-T builds the town
+        {"type": "deco", "name": "onrac_cliff", "x": x0, "y": y0,
+         "parts": [["tree_clump", "boulder", "tree_clump"], ["boulder", "tree_clump", "tree_clump"]]},
+        {"type": "deco", "name": "onrac_firs", "x": side, "y": door[1], "parts": [["boulder"]]},
+    ]
 
 
 def objects() -> list[dict]:
-    ox, oy, parts, door = _icon_parts(ONRAC.ICON, ONRAC.DOOR)
     return [
-        {"type": "deco", "name": "onrac", "x": ox, "y": oy, "parts": parts, "style": "snow",
-         **({"walk_cells": [door]} if town_built() else {})},          # the door opens once WAT-T builds the town
+        *_icon(ONRAC.ICON, ONRAC.DOOR),
         # the cave lies behind the curtain: the falls' bottom-left cell is the walkable door
         {"type": "deco", "name": "waterfall", "x": FALLS[0], "y": FALLS[1], "parts": landmark_parts("waterfall"),
          "walk_cells": [[0, 2]]},

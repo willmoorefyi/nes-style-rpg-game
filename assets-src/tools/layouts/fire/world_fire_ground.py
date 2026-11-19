@@ -19,6 +19,7 @@ from collections import deque
 import numpy as np
 
 from world_api import WORLD_H, WORLD_W, Cell
+from world_coast import fbm as coast_fbm, organic, signed_distance
 
 SEED = 4404
 N_X0, N_X1, N_Y0 = 146, 189, 66          # the north rect's land box (outside the bands)
@@ -75,24 +76,47 @@ def _lake(x: int, y: int) -> bool:
     return bool(out and not inner)
 
 
+# FX-D (G-1): the two coasts are hand-drawn polygons bent by seeded noise (world_coast.organic), not boxes with a
+# 1-3 cell wobble: Crescent's land has bays on its north and east coasts and a ragged outer-channel shore, the south
+# lands a crooked south coast. Clockwise, world cells.
+NORTH_COAST = [(148, 70), (154, 66.5), (162, 68.5), (170, 66.5), (177, 69), (184, 66.5), (189.5, 70), (186, 77),
+               (189, 85), (185, 92), (189, 100), (186.5, 107), (189.5, 115), (186, 123), (189, 131), (187, 138),
+               (190, 144), (190, 148.5), (141.5, 148.5), (141.5, 145.5), (147.5, 139), (146, 133), (146.5, 127),
+               (146.5, 118), (151, 113), (149, 107), (154.5, 101), (150, 95), (148, 89), (153.5, 84), (155, 78.5),
+               (150, 74.5)]
+SOUTH_COAST = [(113.5, 145.5), (190, 145.5), (189, 153), (186, 160), (189, 168), (185.5, 175), (188.5, 182),
+               (183, 186.5), (176, 184), (168, 187.5), (160, 185), (151, 188), (142, 185), (133, 187.5), (125, 184.5),
+               (119, 187), (118, 181), (123, 173), (118.5, 165), (121.5, 157.5), (117, 152), (116.5, 148)]
+COAST_AMP = 12.0
+# kept land: Crescent's shore, the lake and its banks, the river courses, the ring's west end, the volcano's rock
+# and ash, the frost hollow, the vents, the hull's dunes and the airship's grass
+KEEP_LAND = [(147, 118, 153, 130), (152, 109, 182, 138), (150, 133, 168, 155), (142, 146, 145, 147),
+             (117, 148, 131, 152), (132, 148, 141, 153), (122, 157, 127, 159), (124, 164, 130, 167),
+             (119, 171, 124, 174), (140, 155, 146, 162), (147, 160, 151, 164), (123, 154, 129, 162)]
+KEEP_WATER = [(114, 148, 115, 191), (146, 119, 146, 129)]   # the western sea lane, the harbour by Crescent
+# the two deserts (FX-D: noisy outlines, no longer sand boxes parted by a straight column): the Gurgu ash fields and
+# the hull's dunes, a ragged strip of downs between them
+ASH = [(115.5, 148.5), (131.5, 148.5), (130.5, 154), (127.5, 160), (130.5, 167), (126.5, 174), (128.5, 180),
+       (123, 182.5), (118.5, 179)]
+DUNES = [(136.5, 153.5), (145, 152.5), (155, 154.5), (162.5, 158), (159.5, 165), (165, 171), (161.5, 177), (154, 181),
+         (145, 179), (139, 182), (137.5, 175), (139.5, 167), (137, 160)]
+
+
+def _rects(rects) -> np.ndarray:
+    m = np.zeros((WORLD_H, WORLD_W), bool)
+    for x0, y0, x1, y1 in rects:
+        m[y0:y1 + 1, x0:x1 + 1] = True
+    return m
+
+
 def _land(mine: np.ndarray) -> np.ndarray:
-    """True where FIRE has land before the features: noisy coasts on the two land boxes, the cliffs and the ring."""
-    n1, n2 = fbm(SEED), fbm(SEED + 10)
-    land = np.zeros((WORLD_H, WORLD_W), bool)
-    for y in range(N_Y0, BELT_BOT + 1):
-        west = 147 if 119 <= y <= 129 else N_X0 if y >= 132 else N_X0 + int(round(1.4 + 2.6 * n1[y, N_X0]))
-        east = N_X1 - int(round(1.6 + 3.0 * n2[y, N_X1]))
-        for x in range(max(west, N_X0), east + 1):
-            north = N_Y0 + int(round(1.5 + 3.0 * n1[N_Y0, x]))
-            land[y, x] = y >= north
-    for y in range(146, S_Y1 + 1):
-        east = S_X1 - int(round(1.6 + 3.0 * n2[y, S_X1]))
-        for x in range(S_X0, east + 1):
-            south = S_Y1 - int(round(2.0 + 5.0 * (n1[S_Y1, x] + 0.5)))
-            west = 116 if y >= 148 else S_X0
-            land[y, x] = y <= south and x >= west
-    land[146:148, 142:146] = True                    # the ring's west end, against the outer channel
-    return land & mine
+    """True where FIRE has land before the features: the two organic coasts, the cliffs and the ring's west end."""
+    keep, wet = _rects(KEEP_LAND), _rects(KEEP_WATER)
+    north = organic(NORTH_COAST, COAST_AMP, SEED, mine, keep_land=keep, keep_water=wet)
+    south = organic(SOUTH_COAST, COAST_AMP, SEED + 50, mine, keep_land=keep, keep_water=wet)
+    land = north | south
+    land[146:148, 114:146] = True                    # W_south's cliff rows and the ring's west end
+    return land & mine & ~wet
 
 
 def ground(mine: np.ndarray) -> tuple[np.ndarray, dict]:
@@ -122,12 +146,12 @@ def ground(mine: np.ndarray) -> tuple[np.ndarray, dict]:
         g[y, x] = "m"
     g[148, 114:131] = "m"
     g[148:S_Y1 + 1, 114:116] = "o"
-    ash = land & (xx >= 116) & (xx <= 131) & (yy >= 149) & (yy <= 176 + (n3 * 6).astype(int))
+    ash = land & (yy >= 149) & (signed_distance(ASH) + 8 * coast_fbm(SEED + 60) > 0)
     g[ash & (g != "o")] = "s"
     spurs = ash & (n4 > 0.18) & (yy > 156)
     g[spurs] = "m"
     g[148:153, 132:142] = "."                         # the frost hollow below the cliffs
-    dunes = land & (xx >= 133) & (xx <= 160 + (n4 * 6).astype(int)) & (yy >= 154) & (yy <= 177 + (n3 * 5).astype(int))
+    dunes = land & (signed_distance(DUNES) + 8 * coast_fbm(SEED + 70) > 0)
     g[dunes] = "s"
     # the lake, its islet and the two rivers
     for y in range(LAKE_C[1] - LAKE_R - 1, LAKE_C[1] + LAKE_R + 2):
