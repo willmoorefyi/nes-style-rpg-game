@@ -146,10 +146,12 @@ describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => 
     expect(lv).toBeLessThanOrEqual(41);
   });
 
-  it('wipes stay under 0.2 per stage (measured: at most 0.10, S31 (the Warmech of the sky castle\'s engine halls))', () => {
+  // An optional stage may be harder (FX-D integrator ruling, 2026-11-19): S31 holds the Warmech, FF1's optional
+  // terror, toughened in FX-B; the FX-D coasts moved its seeded wipes from 0.18 to 0.22, so optional stages get 0.3.
+  it('wipes stay under 0.2 per required stage, 0.3 per optional one (measured: at most 0.10; optional S31 (the Warmech of the sky castle\'s engine halls) 0.22)', () => {
     for (const s of ctx.world.quest.stages) {
       const w = runs.reduce((a, r) => a + (r.wipes.get(s.id) ?? 0), 0) / runs.length;
-      expect(w, `${s.id} wipes ${w.toFixed(2)} per run`).toBeLessThan(0.2);
+      expect(w, `${s.id} wipes ${w.toFixed(2)} per run`).toBeLessThan(s.optional ? 0.3 : 0.2);
     }
   });
 });
