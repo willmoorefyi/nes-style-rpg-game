@@ -40,6 +40,8 @@ npcs:
   x: 21
   y: 8
   dialog:
+  - condition: BRIDGE_BUILT
+    text: ['The bridge to the north stands, shore to shore. The road beyond is yours.', 'Go with our blessing, and may the crystals guide you.']
   - condition: INTRO_COMPLETE
     text: [My builders are hard at work on the bridge to the north., 'Go with our blessing, and may the crystals guide you.']
   - condition: PRINCESS_RESCUED
@@ -63,6 +65,8 @@ npcs:
   x: 18
   y: 10
   dialog:
+  - condition: BRIDGE_BUILT
+    text: ['The bridge is finished, and the King''s builders have come home.']
   - condition: INTRO_COMPLETE
     text: [The King's builders are at work on the bridge to the north.]
   - condition: PRINCESS_RESCUED

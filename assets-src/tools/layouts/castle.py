@@ -254,7 +254,10 @@ for (x, y) in [(34, 21), (34, 23), (40, 21), (40, 23)]:
 f2.npcs += [
     {"id": "king", "sprite": "king", "x": 21, "y": 8,
      # first match wins: INTRO_COMPLETE must come before PRINCESS_RESCUED
-     "dialog": [{"condition": "INTRO_COMPLETE",
+     "dialog": [{"condition": "BRIDGE_BUILT",
+                 "text": ["The bridge to the north stands, shore to shore. The road beyond is yours.",
+                          "Go with our blessing, and may the crystals guide you."]},
+                {"condition": "INTRO_COMPLETE",
                  "text": ["My builders are hard at work on the bridge to the north.",
                           "Go with our blessing, and may the crystals guide you."]},
                 {"condition": "PRINCESS_RESCUED",
@@ -273,7 +276,8 @@ f2.npcs += [
                           "They say that one day its song will open a sealed way."]}],
      "giftItem": "lute", "giftFlag": "GOT_LUTE"},
     {"id": "chancellor", "sprite": "burgher", "x": 18, "y": 10,
-     "dialog": [{"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge to the north."]},
+     "dialog": [{"condition": "BRIDGE_BUILT", "text": ["The bridge is finished, and the King's builders have come home."]},
+                {"condition": "INTRO_COMPLETE", "text": ["The King's builders are at work on the bridge to the north."]},
                 {"condition": "PRINCESS_RESCUED", "text": ["Her Highness is home! The King wishes to thank you himself."]},
                 {"text": ["Garland is a fearsome swordsman. Buy armour in town before you go.",
                           "And rest at the inn, if you are wounded."]}]},

@@ -45,9 +45,15 @@ class Room(BaseRoom):
                              legend=LEGEND, music="dungeon", extra={"exit": EXIT, **(extra or {})})
 
 
-def talk(before: list[str], after: list[str]) -> list[dict]:
-    """A courtier's lines: `after` once the false king has fallen."""
-    return [{"condition": SUSPECT, "text": after}, {"text": before}]
+def talk(before: list[str], after: list[str], away: list[str] | None = None) -> list[dict]:
+    """A courtier's lines: `after` once the false king has fallen; `before` once he sits the throne (the marsh guard
+    is down and the crown is on its way); `away` (the default) while the throne is still empty."""
+    lines = [{"condition": SUSPECT, "text": after}]
+    if away:
+        lines += [{"condition": "MARSH_GUARD_DEFEATED", "text": before}, {"text": away}]
+    else:
+        lines.append({"text": before})
+    return lines
 
 
 def chest(cid: str, item: str, label: str, x: int, y: int) -> dict:
@@ -105,11 +111,16 @@ f1.npcs += [
     {"id": "gate_warden", "sprite": "guard", "tint": "#8fb08a", "x": 19, "y": 26,
      "dialog": talk(["The keep is open to the king's subjects. Both wings climb to the throne; take whichever stair "
                      "you like.", "The king has not left his chair since he came back from the fens."],
-                    ["I held this gate for a stranger in a borrowed face. I will hold it better for the true heir."])},
+                    ["I held this gate for a stranger in a borrowed face. I will hold it better for the true heir."],
+                    ["The keep is open to the king's subjects. Both wings climb to the throne room; take whichever "
+                     "stair you like.", "You will find the chair empty. The king rode to the fens and has not "
+                     "come back."])},
     {"id": "courtier_vell", "sprite": "burgher", "tint": "#b7a46a", "x": 15, "y": 19,
      "dialog": talk(["The king rode south-west to the fens and came back laughing at nothing.",
                      "He lost his crown there, he says. He will see no one who comes without it."],
-                    ["The man on the throne was never our king. I bowed to him for a season. I won't forget it."])},
+                    ["The man on the throne was never our king. I bowed to him for a season. I won't forget it."],
+                    ["The king rode south-west to the fens and has not been seen since.",
+                     "They say he lost his crown there. Until it is found, the throne upstairs stays empty."])},
     {"id": "chapel_keeper", "sprite": "villager_f", "x": 27, "y": 20,
      "dialog": talk(["The candles bend toward the stairs at night, as if something up there drinks the air.",
                      "If you go to the Marsh Cave, keep to the boardwalks. The peat burns the careless."],
@@ -120,7 +131,8 @@ f1.npcs += [
                     ["The mirrors show only us again. I may even polish them."])},
     {"id": "guard_sorrel", "sprite": "guard", "tint": "#7fa07a", "x": 6, "y": 16,
      "dialog": talk(["We drill for a war the king won't name. He sends no orders, only laughter down the stairs."],
-                    ["No more drills. The elves of Elfheim will want word of this keep."])},
+                    ["No more drills. The elves of Elfheim will want word of this keep."],
+                    ["We drill for a war nobody has named. The king left no orders when he rode out."])},
 ]
 f1.write("Western Keep 1F: the courtyard between the guard hall and the chapel; the hall of mirrors joins the two "
          "stair rooms.\n" + NOTE,

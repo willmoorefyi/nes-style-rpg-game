@@ -54,7 +54,9 @@ npcs:
   dialog:
   - condition: ASTOS_DEFEATED
     text: [I held this gate for a stranger in a borrowed face. I will hold it better for the true heir.]
-  - text: [The keep is open to the king's subjects. Both wings climb to the throne; take whichever stair you like., The king has not left his chair since he came back from the fens.]
+  - condition: MARSH_GUARD_DEFEATED
+    text: [The keep is open to the king's subjects. Both wings climb to the throne; take whichever stair you like., The king has not left his chair since he came back from the fens.]
+  - text: [The keep is open to the king's subjects. Both wings climb to the throne room; take whichever stair you like., You will find the chair empty. The king rode to the fens and has not come back.]
 - id: courtier_vell
   sprite: burgher
   tint: '#b7a46a'
@@ -63,7 +65,9 @@ npcs:
   dialog:
   - condition: ASTOS_DEFEATED
     text: [The man on the throne was never our king. I bowed to him for a season. I won't forget it.]
-  - text: [The king rode south-west to the fens and came back laughing at nothing., 'He lost his crown there, he says. He will see no one who comes without it.']
+  - condition: MARSH_GUARD_DEFEATED
+    text: [The king rode south-west to the fens and came back laughing at nothing., 'He lost his crown there, he says. He will see no one who comes without it.']
+  - text: [The king rode south-west to the fens and has not been seen since., 'They say he lost his crown there. Until it is found, the throne upstairs stays empty.']
 - id: chapel_keeper
   sprite: villager_f
   x: 27
@@ -88,7 +92,9 @@ npcs:
   dialog:
   - condition: ASTOS_DEFEATED
     text: [No more drills. The elves of Elfheim will want word of this keep.]
-  - text: ['We drill for a war the king won''t name. He sends no orders, only laughter down the stairs.']
+  - condition: MARSH_GUARD_DEFEATED
+    text: ['We drill for a war the king won''t name. He sends no orders, only laughter down the stairs.']
+  - text: [We drill for a war nobody has named. The king left no orders when he rode out.]
 transitions:
 - {x: 4, y: 5, targetMap: western-keep-2f, targetEntrance: arrival}
 - {x: 5, y: 5, targetMap: western-keep-2f, targetEntrance: arrival}

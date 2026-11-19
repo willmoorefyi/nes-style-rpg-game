@@ -2,7 +2,7 @@ import type { GameFlags } from '../core/GameFlags.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
 import type { VehicleState, VehicleType } from '../types/index.js';
-import { cantCarryText } from './pickupText.js';
+import { cantCarryText, receivedText } from './pickupText.js';
 
 /** Where a `warp` step sends the party: `map` and either a named `entrance` or both `x` and `y` (T2). */
 export interface CutsceneWarp {
@@ -32,6 +32,8 @@ export interface CutsceneStep {
   dim?: number;
   /** For give_item / take_item (QUEST 4.1). */
   item?: string;
+  /** For give_item: show the shared pickup line (`receivedText`, "You received the Herb!") as its own message. */
+  announce?: boolean;
   /** For set_vehicle: the vehicle placed at `map`, `x`, `y`. */
   vehicle?: VehicleType;
 }
@@ -89,6 +91,8 @@ export interface CutsceneDeps {
   setVehicle?: (vehicle: VehicleState) => void;
   /** end_game, after its card was confirmed: leave for the title (no save). A host without it logs. */
   endGame?: () => void | Promise<void>;
+  /** end_game's card (lines split on \n, the last one the title); without it the text is a dialog line. */
+  showCard?: (text: string) => Promise<void>;
 }
 
 /** The end card end_game shows when its step has no `text`. */
@@ -181,7 +185,7 @@ export class CutsceneManager {
 
       case 'end_game':
         // GAP-13: the end card waits for confirm, then the title; nothing is saved
-        await this.deps.showDialog(step.text ?? END_GAME_TEXT);
+        await (this.deps.showCard ?? this.deps.showDialog)(step.text ?? END_GAME_TEXT);
         if (this.deps.endGame) await this.deps.endGame();
         else console.error('Cutscene end_game: this host cannot return to the title');
         break;
@@ -214,8 +218,10 @@ export class CutsceneManager {
       if (!inv.remove(item, 1)) console.error(`Cutscene take_item: the party holds no ${item}`);
       return;
     }
-    if (inv.canAdd(item)) inv.add(item, 1);
-    else await this.deps.showDialog(cantCarryText(item));
+    if (inv.canAdd(item)) {
+      inv.add(item, 1);
+      if (step.announce) await this.deps.showDialog(receivedText(item));
+    } else await this.deps.showDialog(cantCarryText(item));
   }
 
   private setVehicle(step: CutsceneStep): void {

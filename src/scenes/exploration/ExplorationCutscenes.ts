@@ -25,6 +25,8 @@ export interface CutsceneHost {
   setVehicle?: CutsceneDeps['setVehicle'];
   /** end_game: to the title, no save (GAP-13). */
   endGame?: CutsceneDeps['endGame'];
+  /** end_game's card on black (a host without it shows the text as a dialog line). */
+  showCard?: CutsceneDeps['showCard'];
 }
 
 /** Play cutscene `id` in the field. Resolves false (and logs) when the id is unknown. */
@@ -47,6 +49,7 @@ export async function playFieldCutscene(id: string, host: CutsceneHost): Promise
     inventory: host.inventory,
     setVehicle: host.setVehicle,
     endGame: host.endGame,
+    showCard: host.showCard,
   });
   await manager.play(script);
   // the press that closed the last line, or a mash after the scene, must not talk to the NPC again
