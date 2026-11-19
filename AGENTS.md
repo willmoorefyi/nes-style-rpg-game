@@ -328,11 +328,23 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   events of the stage and its ancestors, `outOfScopeEvents`, and the full run covers the other orderings), `--only abc`,
   `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes well over
   an hour and a few GB: run it in the background.
-- **Placeholder art still in the world** (code-drawn `kit.py` LANDMARKS, for a later art pass): `dock_post` "DP"
-  (overworld, pravoka, onrac, crescent), `buried_hull` "BH" (the airship hull; reused for Onrac's submarine and bell
-  tower), `windmill` "WM" (gaia, melmond, overworld), `tower` "TW", `cave_mouth` "CM", `volcano` "VO", `shrine` "SH",
-  `waterfall` "WF", `tent` "TE", `dome` "DO" (Lufenia), `ice_floe` "IF" (the ice cavern), `sky_ring` "SR" (mirage-3f),
-  and the `tuft` part in Gaia. The fairy and the mermaids are tinted NPC sheets.
+- **Landmark art (LM-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art: the sheet
+  `gen/approved/overworld/landmarks_lm.{png,json}` (cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache
+  key, model, seed, pass LM / LM2 and the cut and pixelize settings), re-cut offline from the render cache by
+  `python3 -I assets-src/gen/landmark_cut.py` (`--check`: the committed sheet rebuilds; `landmark_pix.py` holds the
+  cutter). `kit.load_kit` puts its cells over the code-drawn placeholders in **every** kit; the placeholders remain
+  only as the fallback while the sheet is missing. LM-INT added the 1x1 `tuft` landmark (Gaia's fold; the `tuft`
+  part stays the compiler's grass speckle) and the 2x1 town icons `town_melmond` / `town_onrac`. Recolours kept:
+  tower `bright` / `stone` / `slate` (the Western Keep), buried_hull `slate` (Onrac's submarine), tent `dune`,
+  windmill `stone` (Melmond), shrine `pale_stone`, cave_mouth `snow` (the Ice Cavern); dropped: buried_hull `brown` and
+  `dune`, windmill `pale_dune`, ice_floe and shrine `snow`. The approved icons leave their top rows mostly sky, so tall landmarks use
+  `collide: alpha` (the overworld's `art_coverage` check fails on a blocked cell with under 25 % art).
+- **Ambient effects (LM-INT).** A map source's `ambient: [{kind: smoke, x, y, ox, oy}]` (cell, art px 0-47 inside it;
+  `build_hooks.ambient` checks and copies it, `schemaValidationAmbient.ts` validates it) is drawn by
+  `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is five grey pixel-art puffs on a
+  3.2 s loop (`smokePuffs`). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut `ambient`).
+- Still placeholder: the fairy and the mermaids are tinted NPC sheets; the buried hull is reused as the Pravoka brig,
+  Onrac's fishing boat and the submarine (a hull on a sand bank, standing in the water).
 
 ### New Cutscene
 

@@ -106,7 +106,7 @@ obj(**{**HOUSE, "windows": [1, 3]}, name="old_warehouse", x=37, y=15, h=4, roof=
 # the lighthouse shelf: the keeper's house (the clinic) and the tower on the shelf's tip, at the range's foot
 home("lighthouse", 38, 2, 4, 1, "red", "white", 3)
 LIGHTHOUSE = (41, 10)
-deco(landmark_parts("tower"), *LIGHTHOUSE, style="bright")
+deco(landmark_parts("tower"), *LIGHTHOUSE, style="bright", collide="alpha")
 
 # ── the water side's dressing: piles, the moored brig, nets and cargo ──
 for x in range(31, 42):
@@ -114,7 +114,7 @@ for x in range(31, 42):
 for y in (15, 17):
     deco([[landmark_parts("dock_post")[0][0]]], 42, y, on_water=True)
 BRIG = (35, 35)                                     # the pirates' brig, moored along the south side of its pier
-deco(landmark_parts("buried_hull"), *BRIG, on_water=True, style="brown")
+deco(landmark_parts("buried_hull"), *BRIG, on_water=True)
 for (x, y) in [(28, 16), (28, 22), (28, 27), (28, 31)]:
     obj(type="barrel", x=x, y=y)
 for (x, y) in [(28, 17), (28, 21), (28, 28), (28, 36), (28, 37)]:

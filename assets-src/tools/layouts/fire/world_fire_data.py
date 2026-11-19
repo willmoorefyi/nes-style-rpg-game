@@ -82,6 +82,11 @@ def hazards(g, row_rects) -> list[dict]:
     return [{"id": "fir_ash_vents", "damage": 1, "rects": row_rects(cells)}]
 
 
+# the volcano's smoke (LM-INT): the approved icon has no smoke; the engine loops it from the crater, art px (26, 12)
+# of the icon's top middle cell
+SMOKE = [{"kind": "smoke", "x": VOLCANO[0] + 1, "y": VOLCANO[1], "ox": 26, "oy": 12}]
+
+
 def _deco(name: str, x: int, y: int, **kw) -> dict:
     return {"type": "deco", "name": name, "parts": K.landmark_parts(name), "x": x, "y": y, **kw}
 
@@ -96,11 +101,11 @@ def objects(site) -> list[dict]:
                                                    [None, "town_icon_1_0", "town_icon_1_1"],
                                                    ["tree_clump", "boulder", "tree_clump"]]
     out = [{"type": "deco", "name": "crescent_icon", "parts": icon, "x": x0, "y": y0, "walk_cells": [door]},
-           _deco("volcano", *VOLCANO, walk_cells=[[1, 1]]),
+           _deco("volcano", *VOLCANO, walk_cells=[[1, 1]], collide="alpha"),
            _deco("cave_mouth", *ICE_MOUTH, walk_cells=[[1, 1]], style="snow"),
-           _deco("ice_floe", 132, 151, style="snow", collide="alpha"),
-           _deco("buried_hull", *HULL, style="dune", collide="alpha"),
-           _deco("shrine", *ISLET[0], style="pale_stone")]
+           _deco("ice_floe", 132, 151, collide="alpha"),
+           _deco("buried_hull", *HULL, collide="alpha"),             # LM-INT: no dune, its sand turns orange
+           _deco("shrine", *ISLET[0], style="pale_stone", collide="alpha")]
     for x, y in ((124, 155), (128, 161), (121, 167), (152, 166)):
         out.append({"type": "deco", "parts": [["boulder"]], "x": x, "y": y, "collide": "alpha"})
     return out

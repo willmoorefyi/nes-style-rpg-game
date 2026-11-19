@@ -57,6 +57,8 @@ def grass_map(mid: str, w: int, h: int, ground: str | None = None, objects: list
 def approved_cells() -> set[str]:
     names = set()
     for meta in sorted(K.APPROVED.glob("*/*.json")):
+        if meta.with_suffix("") == K.LANDMARK_SHEET:     # the landmark sheet is the one meant to fill these cells
+            continue
         names |= {c for row in json.loads(meta.read_text()).get("cells", []) for c in row if c}
     return names
 
@@ -142,5 +144,11 @@ def main() -> int:
             print(f"OK {name} ({detail})")
             n += 1
     print(f"OK swamp ({check_swamp(placeholders)})")
+    lm = K.approved_landmarks()
+    for kid in ("overworld", "temple", "town", "castle"):      # every kit takes the approved landmark cells
+        kit = K.load_kit(kid)
+        bad = [p for p in lm if p not in kit.approved or not np.array_equal(np.asarray(kit.part(p)), np.asarray(lm[p]))]
+        assert not bad, f"kit {kid}: approved landmark cells not used: {bad[:4]}"
+    print(f"OK approved landmarks ({len(lm)} cells in every kit)")
     print(f"kit selftest: {n + 1} names OK")
     return 0

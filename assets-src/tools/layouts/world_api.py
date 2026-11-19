@@ -206,6 +206,7 @@ class RegionOut:
     hazards: list[dict] = field(default_factory=list)
     encounterZones: list[dict] = field(default_factory=list)            # noqa: N815
     vehicles: list[dict] = field(default_factory=list)
+    ambient: list[dict] = field(default_factory=list)                   # looping field effects (LM-INT: smoke)
     battleBackgrounds: dict = field(default_factory=dict)               # noqa: N815 ({"zones": {...}})
     notes: list[str] = field(default_factory=list)
     checks: dict = field(default_factory=dict)       # the region's map-check options (road_check, river_check, ...)

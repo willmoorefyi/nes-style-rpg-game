@@ -86,7 +86,7 @@ class Floor(BaseRoom):
         self.deco([["tpillar_top"], ["tpillar_bottom"]], x, y, style=FROST)
 
     def floe(self, x: int, y: int) -> None:
-        self.deco(landmark_parts("ice_floe"), x, y, style=FROST, collide="alpha")
+        self.deco(landmark_parts("ice_floe"), x, y)   # LM-INT: no frost style (the art is ice); solid, as the placeholder
 
     def write(self, table: str, header: str, entrances: dict, extra: dict | None = None, roots: list | None = None):
         quiet = {"encounterRate": RATE, "encounters": TABLES[table], "battleBackgrounds": BACKDROP,

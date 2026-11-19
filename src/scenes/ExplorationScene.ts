@@ -30,6 +30,7 @@ import { BattleFlashEffect } from './exploration/BattleFlashEffect.js';
 import { inspectAt } from './exploration/FieldInspect.js';
 import { FieldVehicles, fieldModeOf } from './exploration/FieldVehicles.js';
 import { FieldNpcActions } from './exploration/FieldNpcActions.js';
+import { FieldAmbient } from './exploration/FieldAmbient.js';
 import { hazardStep } from './exploration/FieldHazard.js';
 import { playFieldCutscene } from './exploration/ExplorationCutscenes.js';
 import { npcPresenceChanges } from './exploration/NpcPresence.js';
@@ -65,6 +66,7 @@ export class ExplorationScene implements Scene {
   /** Where the current step began (a blocked key-item gate sends the player back here). */
   private stepOrigin = { x: 0, y: 0 };
   private vehicles: FieldVehicles;
+  private ambient = new FieldAmbient(); // the volcano's smoke (LM-INT)
   private npcActions: FieldNpcActions;
   private walkingMode: MovementMode = new WalkingMode();
   /** NPC in conversation (faces the heroes until the dialog closes). */
@@ -307,6 +309,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
     this.vehicles.setMap(mapData);
+    this.ambient.setMap(mapData, this.worldContainer);
     this.camera.update();
     tilemap.render();
     // B5: Update HUD with map name and gold
@@ -347,6 +350,7 @@ export class ExplorationScene implements Scene {
 
   update(dt: number): void {
     if (this.paused || this.loading) return;
+    this.ambient.update(dt); // loops under dialogs and the battle flash too
     // C5: Battle flash animation
     if (this.battleFlash.active) {
       this.battleFlash.update();
@@ -475,6 +479,7 @@ export class ExplorationScene implements Scene {
     this.encounterSystem.stop();
     this.game.events.off('battleEnd', this.handleBattleEnd);
     this.game.events.off('showDialog', this.handleShowDialog);
+    this.ambient.clear();
     this.worldContainer.removeChildren();
   }
 

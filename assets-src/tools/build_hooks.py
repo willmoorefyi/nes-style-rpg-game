@@ -44,6 +44,8 @@ def passthrough(src: dict, out: dict) -> None:
     for k in ("docks", "hazards", "exit", "world"):
         if src.get(k) is not None:
             out[k] = src[k]
+    if src.get("ambient"):
+        out["ambient"] = ambient(src["ambient"], out["width"], out["height"])
     patches = src.get("patches") or []
     if not patches:
         return
@@ -53,6 +55,25 @@ def passthrough(src: dict, out: dict) -> None:
     if isinstance(art, dict) and art.get("below"):
         folder = art["below"][0].rsplit("/", 1)[0]
         art["patches"] = {p["id"]: f"{folder}/patch_{p['id']}.png" for p in patches}
+
+
+AMBIENT_KINDS = ("smoke",)                   # LM-INT: looping field effects drawn by src/scenes/exploration/FieldAmbient.ts
+
+
+def ambient(entries: list, width: int, height: int) -> list[dict]:
+    """The checked `ambient` list: {kind, x, y (the map cell), ox, oy (art px inside it, 0-47; default the cell's
+    centre)}; a bad entry fails the compile."""
+    out = []
+    for i, e in enumerate(entries):
+        if not isinstance(e, dict) or set(e) - {"kind", "x", "y", "ox", "oy"} or e.get("kind") not in AMBIENT_KINDS:
+            raise ValueError(f"ambient[{i}]: expected {{kind: {'|'.join(AMBIENT_KINDS)}, x, y, ox?, oy?}}, got {e!r}")
+        x, y, ox, oy = e.get("x"), e.get("y"), e.get("ox", 24), e.get("oy", 24)
+        if not all(isinstance(v, int) for v in (x, y, ox, oy)) or not (0 <= x < width and 0 <= y < height) \
+                or not (0 <= ox < 48 and 0 <= oy < 48):
+            raise ValueError(f"ambient[{i}]: cell ({x}, {y}) off the {width}x{height} map or offset ({ox}, {oy}) "
+                             "outside 0-47")
+        out.append({"kind": e["kind"], "x": x, "y": y, "ox": ox, "oy": oy})
+    return out
 
 
 def bake_patches(map_id: str, src: dict, grid: "Grid", kit: "Kit", out_dir: Path) -> list[str]:

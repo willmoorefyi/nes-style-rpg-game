@@ -254,6 +254,7 @@ objects:
   x: 27
   y: 17
   style: stone
+  collide: alpha
 - {type: well, x: 20, y: 17}
 - {type: bench, x: 19, y: 21}
 - {type: bench, x: 20, y: 21}
@@ -448,7 +449,6 @@ objects:
   x: 14
   y: 37
   on_water: true
-  style: brown
 - type: deco
   parts:
   - [buried_hull_icon_0_0, buried_hull_icon_0_1, buried_hull_icon_0_2]

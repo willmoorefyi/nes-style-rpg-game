@@ -150,24 +150,18 @@ objects:
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 3
   y: 9
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [ice_floe_icon_0_0, ice_floe_icon_0_1]
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 31
   y: 21
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [ice_floe_icon_0_0, ice_floe_icon_0_1]
   - [ice_floe_icon_1_0, ice_floe_icon_1_1]
   x: 6
   y: 29
-  style: snow
-  collide: alpha
 - type: deco
   parts:
   - [skulls]

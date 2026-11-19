@@ -2,6 +2,8 @@ import { Container } from 'pixi.js';
 import type { BakedMapArtQuestFields, EncounterZoneQuestFields, MapDataQuestFields, MapNPCQuestFields, RequiredFlagsField,
   SaveDataQuestFields } from './quest.js';
 export * from './quest.js';
+import type { AmbientEffect } from './ambient.js';
+export * from './ambient.js';
 
 export interface Scene {
   readonly container: Container;
@@ -337,6 +339,8 @@ export interface MapData extends MapDataQuestFields {
   noWander?: [number, number][];
   /** Cells that show text when the player faces one and presses confirm (a tomb, a sign). */
   inspect?: MapInspectCell[];
+  /** Looping field effects (the volcano's smoke; types/ambient.ts). */
+  ambient?: AmbientEffect[];
   /** Baked 2x art from assets-src/tools/build_map.py; when set, `layers` is empty. */
   art?: BakedMapArt;
 }

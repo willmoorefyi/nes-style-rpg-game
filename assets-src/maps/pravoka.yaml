@@ -267,6 +267,7 @@ objects:
   x: 41
   y: 10
   style: bright
+  collide: alpha
 - type: deco
   parts:
   - [dock_post_icon_0_0]
@@ -352,7 +353,6 @@ objects:
   x: 35
   y: 35
   on_water: true
-  style: brown
 - {type: barrel, x: 28, y: 16}
 - {type: barrel, x: 28, y: 22}
 - {type: barrel, x: 28, y: 27}

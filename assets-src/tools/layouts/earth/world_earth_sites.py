@@ -53,9 +53,10 @@ def _mouth(at: Cell, door: int, block: bool = True) -> dict:
 
 
 def melmond_icon(g: dict[Cell, str]) -> list[dict]:
-    """Melmond's icon: the approved walled-town icon (its drawn row, `town_icon_1_*`, 2x1: the top row of the sheet
-    is empty) on the door's row with the door in it, and round it the fields' copses, bushes and stones scattered by
+    """Melmond's icon: the approved Bedrock town icon (`town_melmond`, 2x1, LM-INT; before, the walled-town icon's
+    drawn row `town_icon_1_*`) on the door's row with the door in it, and round it the fields' copses, bushes and stones scattered by
     a seeded generator (FX-R P3-R4: varied kinds and offsets, with gaps; before, an exact 3x3 ring)."""
+    import kit  # noqa: PLC0415
     assert len(MEL.ICON) == 9, "Melmond's icon: 3x3"
     x0 = min(x for x, _ in MEL.ICON)
     tx = MEL.DOOR[0] - 1 if MEL.DOOR[0] - 1 >= x0 else MEL.DOOR[0]
@@ -63,7 +64,7 @@ def melmond_icon(g: dict[Cell, str]) -> list[dict]:
     gx, gy = MEL.GATE
     taken = town | {MEL.GATE, (gx, gy - 1), (gx, gy + 1), (gx + 1, gy), (gx - 1, gy)}
     walk = lambda c: g.get(c) == GRASS  # noqa: E731
-    return [{"type": "deco", "name": "melmond", "x": tx, "y": MEL.DOOR[1], "parts": [["town_icon_1_0", "town_icon_1_1"]],
+    return [{"type": "deco", "name": "melmond", "x": tx, "y": MEL.DOOR[1], "parts": kit.landmark_parts("town_melmond"),
              "walk_cells": [[MEL.DOOR[0] - tx, 0]]},
             *scatter(list(MEL.ICON), taken, DRESS_SEED, ring_of(list(MEL.ICON)), walk,
                     door_sides(MEL.DOOR, list(MEL.ICON), taken), MEL.GATE)]
@@ -76,8 +77,9 @@ def objects(g: dict[Cell, str]) -> list[dict]:
         _mouth(G.SAGE_MOUTH, 1), _mouth(G.CAVE_MOUTH, 0),
         *melmond_icon(g),
         {"type": "deco", "parts": kit.landmark_parts("windmill"), "x": G.WINDMILL[0], "y": G.WINDMILL[1],
-         "style": "pale_dune", "collide": "alpha"},
-        {"type": "deco", "parts": kit.landmark_parts("shrine"), "x": G.SHRINE[0], "y": G.SHRINE[1], "style": "snow"},
+         "collide": "alpha"},                       # LM-INT: no pale_dune, it greys the art's grass base
+        {"type": "deco", "parts": kit.landmark_parts("shrine"), "x": G.SHRINE[0], "y": G.SHRINE[1],
+         "collide": "alpha"},
         {"type": "deco", "parts": kit.landmark_parts("dock_post"), "x": G.DOCK_POST[0], "y": G.DOCK_POST[1],
          "collide": "alpha"},
     ]

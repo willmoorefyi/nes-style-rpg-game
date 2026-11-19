@@ -142,7 +142,8 @@ for (x, y) in [(8, 21), (16, 21), (29, 21), (35, 21)]:         # lamps along the
 # ── the windmill, leaning on its mound (each row of the sails' art set a little further east) ──
 MILL = (37, 3)
 for r in range(3):
-    deco([[f"windmill_icon_{r}_{c}" for c in range(2)]], MILL[0], MILL[1] + r, style=DEAD, offset=[12 - 6 * r, 0])
+    deco([[f"windmill_icon_{r}_{c}" for c in range(2)]], MILL[0], MILL[1] + r, style=DEAD, offset=[12 - 6 * r, 0],
+         collide="alpha")
 for (x, y, t) in [(36, 7, "crate"), (38, 7, "crate"), (38, 8, "barrel"), (34, 13, "crate")]:
     obj(type=t, x=x, y=y)
 
