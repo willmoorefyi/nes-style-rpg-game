@@ -41,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_hooks as HOOKS  # noqa: E402
 import kit as K  # noqa: E402
 import map_checks as MC  # noqa: E402
+import waterline as WL  # noqa: E402
 from terrain import frame as F  # noqa: E402
 from terrain import region as R  # noqa: E402
 
@@ -761,7 +762,8 @@ def _objects(src: dict, objects, kit: K.Kit, grid, coll: np.ndarray | None, entr
             # passage: true lets a walkable cell sit south of the deco's above rows (a gate arch over a road)
             # offset: [dx, dy] native px moves every part (an icon centred on a half cell); style recolours the parts;
             # collide: alpha blocks only the footprint cells (null cells included) whose composited art covers at
-            # least alpha_min of the cell, instead of every cell with a part
+            # least alpha_min of the cell, instead of every cell with a part; waterline: n (WL, on_water) draws the
+            # art below native px row n dithered into the water under it, with a ripple on row n (waterline.py)
             above_rows = o.get("above_rows", len(o["parts"]) if o.get("above") else 0)
             walk_rows = set(o.get("walkable_rows") or [])
             dx, dy = _offset(o, n)
@@ -770,11 +772,17 @@ def _objects(src: dict, objects, kit: K.Kit, grid, coll: np.ndarray | None, entr
             parts = (_fit_parts(kit, o["parts"], get) if o.get("fit") else
                      [[get(nm) if nm else None for nm in row] for row in o["parts"]])
             if paint:
+                if o.get("waterline") is not None:       # WL: a moored boat partly under water (waterline.py)
+                    WL.paint(canvas, parts, x, y, dx, dy, o["waterline"], T)
+                    continue
                 for j, row in enumerate(o["parts"]):
                     for i, name in enumerate(row):
                         if name:
                             _paste(top if j < above_rows else canvas, parts[j][i], x + i, y + j, dx, dy)
                 continue
+            bad = WL.check(o, len(o["parts"]), T)
+            if bad:
+                raise MapError(f"deco {n}: {bad}")
             share = _alpha_share(parts, dx, dy) if _collide_alpha(o, n) else None
             for j, row in enumerate(o["parts"]):
                 for i, name in enumerate(row):
@@ -1475,6 +1483,13 @@ def selftest() -> None:
     ok += 1
     import map_selftest  # noqa: PLC0415  (determinism, objects, edge exits, inspect, map checks, report, preview)
     ok += map_selftest.run(sys.modules[__name__])
+    ok += WL.selftest()                          # WL: the waterline blend (pixels) and its source check
+    wsrc = {"id": "wl_selftest", "ground": "....\n.~~.\n....", "entrances": {"a": [0, 0]}, "objects": [
+        {"type": "deco", "parts": [["bush", "bush"]], "x": 1, "y": 1, "on_water": True, "waterline": 0}]}
+    expect_error(wsrc, "waterline")
+    wsrc["objects"][0]["waterline"] = 24
+    assert compile_map(wsrc, kit, check_interiors=False).below.shape[0] == 3 * T, "waterline deco compiles"
+    ok += 1
     if importlib.util.find_spec("terrain"): __import__("terrain").selftest()   # terrain blending (terrain/)
     from terrain import region_selftest  # noqa: PLC0415  (region yaml, multi-rect, locality, stale base, lock)
     ok += region_selftest.selftest()

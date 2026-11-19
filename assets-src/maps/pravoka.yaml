@@ -354,6 +354,7 @@ objects:
   y: 35
   on_water: true
   collide: alpha
+  waterline: 134
 - {type: barrel, x: 28, y: 16}
 - {type: barrel, x: 28, y: 22}
 - {type: barrel, x: 28, y: 27}

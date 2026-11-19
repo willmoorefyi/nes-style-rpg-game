@@ -27,6 +27,8 @@ const NEW_FILES = [
   // LM-INT: the ambient field effects and the landmark re-cut tool
   'src/scenes/exploration/FieldAmbient.ts', 'src/core/schemaValidationAmbient.ts', 'src/types/ambient.ts',
   'assets-src/gen/landmark_cut.py', 'assets-src/gen/landmark_pix.py',
+  // WL: the boats' waterline blend
+  'assets-src/tools/waterline.py',
 ];
 
 describe('file-size ceilings', () => {

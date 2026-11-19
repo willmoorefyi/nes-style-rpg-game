@@ -449,6 +449,7 @@ objects:
   y: 37
   on_water: true
   collide: alpha
+  waterline: 84
 - type: deco
   parts:
   - [submarine_icon_0_0, submarine_icon_0_1, submarine_icon_0_2, submarine_icon_0_3]
@@ -457,6 +458,7 @@ objects:
   y: 26
   on_water: true
   collide: alpha
+  waterline: 62
 npcs:
 - id: onrac_gate_watch
   sprite: guard
