@@ -2573,14 +2573,14 @@
   protect: [earth]
   specials: [{id: ink, rate: 0.25}]
   stats:
-    hp: 800
+    hp: 900
     strength: 40
     agility: 19
     intelligence: 1
-    vitality: 32
+    vitality: 47
     luck: 5
     attack: 50
-    defense: 60
+    defense: 90
     magicDefense: 160
     accuracy: 88
     hits: 8
@@ -2598,6 +2598,7 @@
   - hpThreshold: 1.0
     patternId: aggressive
     message: "The Drowned Sovereign rises, and the tide rises with him!"
+    hits: 14
     attack: 75
   - hpThreshold: 0.5
     patternId: aggressive
@@ -3067,11 +3068,11 @@
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   bossPhases:
   # WND-D2 (WORLD 3.7): her roster swing (4 hits at attack 49) never threatened the B7 party (100 % at L30-L34), so
-  # she wakes with the stilled wind behind her blades (6 hits at attack 78) beside a whirlwind from the crystal
+  # she wakes with the stilled wind behind her blades (13 hits at attack 82; FX-B) beside a whirlwind from the crystal
   - hpThreshold: 1.0
     patternId: aggressive
-    hits: 6
-    attack: 78
+    hits: 13
+    attack: 82
     message: "The Hollow Seraph's four blades of light spin up to a scream!"
   - hpThreshold: 0.5
     patternId: aggressive
