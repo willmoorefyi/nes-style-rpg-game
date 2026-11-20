@@ -32,4 +32,5 @@ def spec() -> RegionSpec:
                SpotDef("wat_s_onrac_airship", "wat_onrac", (-2, 0), "landing"),
                SpotDef("wat_s_caravan_airship", "wat_caravan", (4, 2), "landing")],
         north=("wat_onrac", "wat_waterfall", "wat_caravan"),
+        ledges=("wat_waterfall",),           # NW-4: the cave mouth is a ledge on R-waterfall, reached by canoe only
     )

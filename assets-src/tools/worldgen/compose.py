@@ -72,6 +72,7 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
     for x, y in t.icons:
         exempt[y, x] = True
     stamps.lakes_routes(g, b, routes)
+    stamps.ledges(g, b, routes, doors)
     canal = stamps.canal_cells(b)
     for x, y in canal:
         g[y, x] = "."
@@ -100,5 +101,5 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
                 region=region, regions=regions, roads_ok=roads_ok, elev=elev, walls=sh["walls"],
                 barriers=sh["barriers"], keep=sh["keep"], wall_masks=sh["wall_masks"], inner=sh["inner"],
                 sealed=sealed, jogs=jogs, tarns=tarns, hard=sh["hard"], seeds={"aldi": t.seed_cell, "ocean": (2, 2)},
-                frozen=frozen, gen_s=time.time() - t0)
+                frozen=frozen, ledges=list(b.ledges), gen_s=time.time() - t0)
     return g, meta

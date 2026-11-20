@@ -1171,7 +1171,7 @@ uses an entrance name.
 - [x] NW-1 contract and spots, with today's world recompiled (2026-11-20; result in 11)
 - [x] NW-2 generator (2026-11-20; result in 12)
 - [x] NW-3 act 1 regenerated and re-pinned (2026-11-20; result in 13)
-- [ ] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (priority: high, effort: 11h)
+- [x] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (2026-11-20; result in 14)
 - [ ] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND (priority: medium, effort: 42h)
 - [ ] M7-5, M7-6, M7-INT merged before NW-5 (priority: medium, effort: external)
 - [ ] NW-5 cutover and balance, the save reset and `--from-reset` (priority: high, effort: 19h)
@@ -1415,6 +1415,80 @@ compose time.
   the pin cell); the tests allow a landing spot within 2 cells of its pin.
 - Not done here (NW-5 or a follow-up): act 1's zone areas and the coverage rule (3.6.4; the NW source still has no
   zones), and the move of `tests/nw/a1/` into `tests/quest/a1/`.
+
+## 14. NW-4 result (the gates and the compiled base)
+
+Branch `nw-4` from `mainline` 4415002d, NW-3 (ca238b66) merged in. Today's world is unchanged (`world.py` re-run:
+`git diff --exit-code assets/maps assets-src/maps` clean).
+
+- **G-NW4.** `world_v2.py` prints one line per check: `world: OK (36 entrances, 41 spots, 5 docks, 2 patches; 7
+  regions, 332 raster chunks over 256)`, `basins: OK (aldi 3177 cells, ocean 33485 cells; canal joins; the canal
+  pass 8 cells long)`, `docks`, `walls: OK (minimal water cuts W_east 3, W_arm 23 (mask grown 2), W_west 10,
+  W_isthmus 4, W_south 19 (mask grown 8))`, `barriers: OK (walk, canoe; cuts spine 2, western_range 1,
+  crescent_ring 4)`, `routes`, `north: OK`, `landings`, `straits`, `prewalk: OK (S0-S14)`, `act1`, `walks`,
+  `detours`, `pins`, then G-NW1-3 and the figures. A failure lists its rule, the owner region and the cells.
+- **Files.** `worldgen/gates.py` (basins with the canal pass, docks against DOCKS_ALLOWED and the owner grid, walls
+  with their minimal water cuts, routes, straits), `gates_reach.py` (barriers on foot and by canoe, `crescent_ring`
+  foot only, the spine's cut, north, landings, detours, the ledge rule), `cuts.py` (the 0-1 minimal cut on numpy
+  grids, the vertex cut), `prewalk.py` (starts from the real exits of the ancestors' map sources, the nearest
+  blocking cell, a lost exit fails), `layouts/world_checks_v2.py` (world_checks on the owner grid: rasters, ids on
+  their regions' cells, docks, the NW anchors, every entrance reachable from an arrival), `terrain/region_chunks.py`
+  and `region_chunk_selftest.py`; `selftest_gates.py` 15 cases; `tests/nw/worldGates.test.ts`.
+- **The owner grid (3.4) was wrong in NW-2**: every landmass went to its majority region, so the whole south
+  continent (A1, ELF, the isthmus) was FIRE's and the north WATER's; ELF's raster was a few islands. `owners.py` now
+  splits a shared landmass along its continent fields (a region with >= 200 cells of it keeps them; fragments go to
+  the strongest of those fields), gives an island to its sites' region (else its majority), and each sea cell to the
+  nearest land cell's region (4-connected layers, ties in REGIONS order). The per-region coast indices (reported,
+  not gated) became a1 13.7, elf 8.1, earth 13.5, fire 11.1, ordeal 13.4, water 11.7, wind 10.1 (`selftest.py`).
+- **The cuts (`world.cuts`).** A wall's cut is the fewest land cells of its mask that, opened to Water, join the
+  Aldi and the ocean (patches off; doors and patch cells never); W_arm and W_south do not touch the Aldi in this
+  world (the Aldi's shore there is other land), so their masks are grown until a cut exists. A barrier's cut is
+  the fewest non-walkable cells across it that, opened, join its seeds. The spine: with the bridge on its minimal
+  vertex cut is 2 cells and one row of the patch cuts it; with it off its cut is the 2 gap cells and any cut avoiding
+  the patch is longer (5). Each cut, opened, opens its leak (selftest and `worldGates.test.ts`).
+- **Chunk-digest `--region` (momus R3-5).** A source with `regions.<r>.raster` records `build.chunks` (per chunk:
+  its cells plus a CHUNK + RING_PAD ring, the objects reaching it, the paint keys); `--region r` paints r's raster
+  plus every chunk whose digest differs from the base's; `check_base` checks the size, the compiler and that the base
+  has chunk digests. Selftest (in `build_map.py --selftest`, 143 checks): an edit in region A that changes 5 chunks
+  outside A's raster, `--region A` equals the full compile; the limit, another compiler and a base without chunk
+  digests refuse. **On the real world** (the 70-chunk limit lifted for the measurement): `--region a1` over the
+  pre-NW-3 base, then `--region water` over two later bases (12 and 9 changed chunks), each equal byte for byte to
+  the full compile of the same source (261 chunk, patch and Mode 7 files). `--region a1` (49 painted chunks): 111 s,
+  6.0 GB peak; `--region water` (51 + 12): 94 s, 4.5 GB.
+- **The first compiled base**: `~/temp/ff-game/worldplan/base/latest/` (read-only; `base.txt` holds the source's
+  sha256 and the commit): 231 s, peak footprint 14.8 GB (max RSS 12.7 GB), 45 MB.
+- **The verifier on the base** (`npm run quest -- --strict --maps <base> --anchors
+  assets-src/maps-nw/world-anchors.yaml`): (b) OK (423 withheld runs), (f) OK, (g) OK (s* 0.851, 31 pairs), (h) OK
+  (12 rows, 2 basin rows). (a), (c), (d), (e) fail, each for content NW-R and NW-5 bring: the order walk completes
+  S0-S16 and stops at S17's `overworld:cutscene:fir_hull_hatch` (FIRE's airship hull is not placed in the rough
+  world), so no stage grants the airship: S17-S31 never complete, the north towns' keepers are never talkable (e),
+  and every later state soft-locks (c) with the north's flags dead; the bands (d) are low or unreached because the
+  NW source has no encounter zones yet (S2 L2.7 ... S15 L20.2, S17-S30 unreached).
+
+**Deviations and findings:**
+
+- **The 70-chunk limit cannot be met as 3.4 counts it.** The rasters hold every chunk with an owner cell, sea
+  included (each sea cell is the nearest coast's): 37-55 chunks per region (332 over 256 chunks), 85-120 with the
+  ring, so every `--region` refuses even with no drift; with land owner cells only they would be 26-38 (51-69 with
+  the ring), still no room for 24 drifted chunks. The measured memory is far under the 10 GB the limit stands for
+  (6.0 GB for 49 painted chunks; a full 256-chunk compile is 14.8 GB). The limit is kept at 70 as written; NW-4 asks
+  the user / plan to choose: count only the painted chunks (no ring) with a limit set from the measurement (about
+  110 chunks for 10 GB), and/or rasters from land owner cells only (the digests repaint any changed sea chunk anyway).
+- **The waterfall was walkable from the snowfield** (the generator's grass clearing; T6b failed: the airship
+  reached `wat_waterfall` without the canoe). `RegionSpec.ledges` (WATER's spec: `wat_waterfall`) and
+  `stamps.ledges` make it today's ledge: the mouth and door sand, a river cell to R-waterfall, rock round it, and a
+  grass bank cell within 8 steps for the airship (grass, not tundra, because the runtime reads tundra as Wall until
+  NW-5's 2.6 rows). `routes` checks the ledge rule (its walk component borders only rock and river, on its route).
+- **`--worst-canoe` (4.3) fails row T2**: with the ship before the canal and an early canoe, a 1-cell river at
+  Elfland's east edge (x 164, y 186-204, beside W_south) and the Crescent ring's river reach `fir_crescent` and the
+  south lands. On foot and in every `--strict` row it holds. A spec fix for ELF / FIRE in NW-R (W_south carried to
+  the coast, or the seam river rerouted).
+- **`western_range` is 1 cell thick** at (64, 157) (its cut is 1 cell): closed on foot and by canoe, but thin; EARTH
+  may thicken it in NW-R.
+- The runtime reads tundra and snow as Wall until NW-5 (2.6), so the verifier's walks on the base treat them so.
+- `world_checks.py` (today's, boxes) is unchanged; its NW counterpart is `world_checks_v2.py`.
+  `map_checks_region.check` takes a region's raster when the source has one and skips a region without options.
+- Not here: the 3.8 `coverage` check (the NW source has no zones; NW-R / NW-5).
 
 ## Appendix A. Coordinate-inventory checklist (gates NW-5, G-NW10)
 

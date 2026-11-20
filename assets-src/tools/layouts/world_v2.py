@@ -23,20 +23,23 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(1, str(HERE.parent))
 import numpy as np  # noqa: E402
 
+import world_checks_v2 as WC2  # noqa: E402
 import world_specs  # noqa: E402
 import world_v2_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
-from world_api_v2 import EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS, REGIONS  # noqa: E402
-from worldgen import bundle, compose, gates, metrics, owners, prewalk, spots  # noqa: E402
+from world_api_v2 import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
+                          REGIONS)
+from worldgen import bundle, compose, gates, gates_reach, metrics, owners, prewalk, spots  # noqa: E402
 from worldgen import spec as S  # noqa: E402
 
-CHECKS = ("basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1", "walks",
-          "detours", "pins")
+CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
+          "walks", "detours", "pins")
 
 
 def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
-    """(ground, meta, the merged spec, the source document, the check results)."""
+    """(ground, meta, the merged spec, the source document, the check results). The document carries each region's
+    raster (`regions.<r>.raster`, 3.4) and the walls' and barriers' minimal cuts (`world.cuts`, 3.8)."""
     b = bundle.merge(world_specs.load())
     door_off, ent_map = SRC.doors()
     g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
@@ -47,22 +50,32 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
     doc = SRC.document(g, meta, trans, objs, insp, sp)
-    ch = run_checks(g, meta, b, ent_map, sp, sp_err, trans)
+    doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
+    ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
+    doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
 
 
-def run_checks(g, meta, b, ent_map, sp, sp_err, trans) -> dict:
+def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
     walk = gates.walk(g)
     pins_bad = list(sp_err)
     pins_bad += [f"entrance {e} at {tuple(c)} is not walkable" for e, c in meta["entrances"].items()
                  if not walk[c[1], c[0]] and e not in P.ENTRANCES]
-    return {"basins": gates.basins(g, meta), "docks": gates.docks(g, meta), "walls": gates.walls(g, meta),
-            "barriers": gates.barriers(g, meta, {"barriers": b.barrier_seeds, "links": b.links}),
-            "routes": gates.routes(g, meta), "north": gates.north(g, meta, NORTH_REGIONS),
-            "landings": gates.landings(g, meta, b.north), "straits": gates.straits(g, meta),
-            "prewalk": prewalk.prewalk(g, meta, ent_map, sp), "act1": A1C.act1(g, meta, trans, SRC.gates()),
-            "walks": A1C.walks(g, meta), "detours": gates.detours(g, meta),
-            "pins": {"ok": not pins_bad, "bad": pins_bad}}
+    doors = np.zeros(g.shape, bool)                    # no cut runs through a door or an arrival (INT-W2c)
+    for x, y in blocked:
+        doors[y, x] = True
+    taken = set(blocked) | {(n["x"], n["y"]) for n in doc.get("npcs") or []}
+    werr, wsum = WC2.check(g, meta, doc, tuple(P.ENTRANCES))
+    return {"world": {"ok": not werr, "why": werr, "summary": wsum},
+            "basins": gates.basins(g, meta), "docks": gates.docks(g, meta, DOCKS_ALLOWED),
+            "walls": gates.walls(g, meta, doors),
+            "barriers": gates_reach.barriers(g, meta, {"barriers": b.barrier_seeds, "links": b.links}, CANOE_BARRIERS,
+                                             doors),
+            "routes": gates_reach.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
+            "landings": gates_reach.landings(g, meta, b.north, sp, taken), "straits": gates.straits(g, meta),
+            "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
+            "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),
+            "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad}}
 
 
 def figures(g, meta, ch) -> dict:
@@ -112,14 +125,33 @@ def gate_lines(fig: dict) -> list[str]:
             f"tarns: {fig['tarns']}; ford cuts: {fig['ford_cuts']}"]
 
 
-def check_lines(ch: dict) -> list[str]:
+def _ok_note(k: str, v: dict) -> str:
+    """The figures after a check's OK (G-NW4's lines: `basins: OK (...)`, `barriers: OK (walk, canoe)`)."""
+    if k == "world":
+        return f" ({v['summary']})"
+    if k == "basins":
+        return (f" (aldi {v['aldi_cells']} cells, ocean {v['ocean_cells']} cells; canal joins; the canal pass "
+                f"{v['canal']['length']} cells long)")
+    if k == "walls":
+        return " (minimal water cuts " + ", ".join(f"{w} {r['cut']}" + (f" (mask grown {r['grown']})" if r["grown"]
+                                                                          else "") for w, r in v["walls"].items()) + ")"
+    if k == "barriers":
+        return " (walk, canoe; cuts " + ", ".join(f"{b} {len(c)}" for b, c in v["cuts"].items()) + ")"
+    if k == "prewalk":
+        return f" ({prewalk.STAGES[0]}-{prewalk.STAGES[-1]})"
+    return ""
+
+
+def check_lines(ch: dict, meta: dict | None = None) -> list[str]:
     out = []
     for k in CHECKS:
         v = ch[k]
-        if k == "prewalk":
-            out.append("prewalk: OK (S0-S14)" if v["ok"] else f"prewalk: FAIL ({', '.join(prewalk.failures(v))})")
+        if v["ok"]:
+            out.append(f"{k}: OK{_ok_note(k, v)}")
+        elif k == "prewalk":
+            out.append(f"prewalk: FAIL ({'; '.join(prewalk.details(v, meta) if meta else prewalk.failures(v))})")
         else:
-            out.append(f"{k}: {'OK' if v['ok'] else 'FAIL'}" + ("" if v["ok"] else f" {_brief(v)}"))
+            out.append(f"{k}: FAIL" + ("\n  " + "\n  ".join(v["why"]) if v.get("why") else f" {_brief(v)}"))
     return out
 
 
@@ -127,18 +159,27 @@ def _brief(v: dict) -> str:
     return json.dumps({a: b for a, b in v.items() if a != "ok"}, default=str)[:400]
 
 
+def owned_files(meta: dict, doc: dict, r: str) -> list[str]:
+    """`--owned-chunks <r>`: the chunk files of r's raster (what `build_map.py --region r` writes, besides the chunks
+    whose digests changed), row-major, then the patch overlays whose first cell r owns (as world.py prints them)."""
+    out = []
+    for cx, cy in owners.owned_chunks(meta["region"], REGIONS.index(r)):
+        out += [f"assets/maps/ai/overworld/below_{cy}_{cx}.png", f"assets/maps/ai/overworld/above_{cy}_{cx}.png"]
+    return out + [f"assets/maps/ai/overworld/patch_{p['id']}.png" for p in doc["patches"]
+                  if gates.owner(meta, *p["cells"][0]) == r]
+
+
 def main(argv: list[str]) -> int:
     if argv[:1] == ["--owned-chunks"]:
         if len(argv) != 2 or argv[1] not in REGIONS:
             print(f"usage: world_v2.py --owned-chunks <{'|'.join(REGIONS)}>", file=sys.stderr)
             return 2
-        _g, meta, *_ = build()
-        for cx, cy in owners.owned_chunks(meta["region"], REGIONS.index(argv[1])):
-            print(f"overworld/below_{cy}_{cx}.png")
+        _g, meta, _b, doc, _ch = build()
+        print("\n".join(owned_files(meta, doc, argv[1])))
         return 0
     g, meta, _b, doc, ch = build()
     fig = figures(g, meta, ch)
-    lines = check_lines(ch) + gate_lines(fig)
+    lines = check_lines(ch, meta) + gate_lines(fig)
     print("\n".join(lines))
     if "--metrics" in argv:
         print(json.dumps({k: v for k, v in fig.items() if k != "checks"}, indent=1, default=_plain))
