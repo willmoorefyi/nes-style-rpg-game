@@ -1185,6 +1185,7 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT, kit: K.Kit | None = None,
             above.append(None)
     if kit is not None:
         HOOKS.bake_patches(c.id, src, c.grid, kit, out_dir)
+        HOOKS.bake_mode7(c.id, src, out_dir, is_world)
     doc = {"id": c.id, "width": c.width, "height": c.height, "layers": [], "tilesets": [],
            "art": {"tile": T, "chunk": CHUNK, "below": below, "above": above},
            "entrances": c.entrances,
