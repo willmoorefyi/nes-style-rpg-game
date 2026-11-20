@@ -16,7 +16,8 @@ describe('FIR-T stage walk (WORLD_PLAN 6.4)', () => {
     expect(s.status).toBe('built');
     expect(s.walk).toEqual(['overworld:board:ship', 'overworld:warp:crescent', 'crescent:warp:crescent-circle',
       'crescent-circle:npc:sage_elder']);
-    expect(s.entry).toMatchObject({ map: 'overworld', x: 42, y: 112, mode: 'walking' });
+    const [ex, ey] = world.maps.get('overworld')!.spots!.ert_s_melmond.at;   // Melmond's harbour (NW-5: by its spot)
+    expect(s.entry).toMatchObject({ map: 'overworld', x: ex, y: ey, mode: 'walking' });
     const r = proofOrder(createQuestContext(world, { stage: 'S14' }));
     expect(r.failures.map((f) => f.message)).toEqual([]);
   });

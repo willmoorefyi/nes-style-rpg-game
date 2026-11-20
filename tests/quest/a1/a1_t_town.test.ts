@@ -150,15 +150,18 @@ describe('Pravoka: services, flags and the site (B2, 4.0.1)', () => {
     }
   });
 
-  it('the site file matches the compiled overworld: the door, the gate, the quay dock and the brig on it', () => {
-    expect(ow.entrances![site.anchor]).toEqual(site.gate);
+  it('the site file matches the compiled overworld: the door, the quay dock and the brig on it, off the gate', () => {
+    // NW-5: the site file keeps pass W's cells; the NW world placed the site at its new gate, so the door (and the
+    // dock) keep their offsets from the gate
+    const [gx, gy] = ow.entrances![site.anchor];
+    const dx = gx - site.gate[0], dy = gy - site.gate[1];
     const door = ow.transitions.find((t) => t.targetMap === 'pravoka')!;
-    expect([door.x, door.y, door.targetEntrance]).toEqual([...site.door, 'gate']);
-    expect((ow.docks ?? []).find((d) => d.id === site.dock.id)).toEqual(site.dock);
+    expect([door.x, door.y, door.targetEntrance]).toEqual([site.door[0] + dx, site.door[1] + dy, 'gate']);
+    const dock = { ...site.dock, x: site.dock.x + dx, y: site.dock.y + dy };
+    expect((ow.docks ?? []).find((d) => d.id === site.dock.id)).toEqual(dock);
     const ship = (ow.vehicles ?? []).find((v) => v.type === 'ship')!;
-    expect(ship).toMatchObject({ x: site.dock.x, y: site.dock.y, requiredFlag: 'BIKKE_DEFEATED' });
+    expect(ship).toMatchObject({ x: dock.x, y: dock.y, requiredFlag: 'BIKKE_DEFEATED' });
     expect(site.spawn).toMatchObject({ x: site.dock.x, y: site.dock.y });
-    const [gx, gy] = site.gate;
-    expect(Math.abs(gx - site.dock.x) + Math.abs(gy - site.dock.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(gx - dock.x) + Math.abs(gy - dock.y)).toBeLessThanOrEqual(2);
   });
 });

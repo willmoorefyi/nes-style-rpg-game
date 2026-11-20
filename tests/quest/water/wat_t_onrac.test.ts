@@ -56,7 +56,8 @@ describe('Onrac: doors, exits, keepers', () => {
     expect(out.every((t) => t.targetEntrance === 'wat_onrac')).toBe(true);
     const world = parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')) as MapData;
     const door = world.transitions.find((t) => t.targetMap === 'onrac')!;
-    expect(door).toMatchObject({ x: 28, y: 38, targetEntrance: 'gate' });
+    const [gx, gy] = world.entrances!.wat_onrac;            // the door is the icon's cell just above the gate
+    expect(door).toMatchObject({ x: gx, y: gy - 1, targetEntrance: 'gate' });
     expect(town.entrances?.gate).toBeDefined();
   });
 

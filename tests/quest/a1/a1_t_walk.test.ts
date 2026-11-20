@@ -15,7 +15,8 @@ describe('A1-T stage walk (WORLD_PLAN 6.4)', () => {
     const s = world.stages.get('S2')!;
     expect(s.status).toBe('built');
     expect(s.walk).toEqual(['pravoka:battle:bikke', 'overworld:vehicle:ship', 'overworld:board:ship']);
-    expect(s.entry).toMatchObject({ map: 'overworld', x: 93, y: 97, mode: 'walking' });
+    const [ex, ey] = world.maps.get('overworld')!.spots!.a1_s_bridge_foot.at;   // the bridge's south stub (NW-5: by its spot)
+    expect(s.entry).toMatchObject({ map: 'overworld', x: ex, y: ey, mode: 'walking' });
     const r = proofOrder(createQuestContext(world, { stage: 'S2' }));
     expect(r.failures.map((f) => f.message)).toEqual([]);
   });

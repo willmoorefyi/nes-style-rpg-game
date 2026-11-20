@@ -163,10 +163,13 @@ describe('Elfheim: the people, services and the site (B3, 4.0.1)', () => {
     for (const g of maps.flatMap((m) => m.keyItemGates ?? [])) expect(g.flag).toMatch(/^ELF_T_/);
   });
 
-  it('the site file matches the compiled overworld: the door, the gate and the harbour dock', () => {
-    expect(ow.entrances![site.anchor]).toEqual(site.gate);
+  it('the site file matches the compiled overworld: the door at its offset from the gate; the harbour dock', () => {
+    // NW-5: the site file keeps pass W's cells; the NW world placed Elfheim at its new gate (the door keeps its offset)
+    // and its harbour on the NW shore (ELF's content), so only the dock's id and basin carry over
+    const [gx, gy] = ow.entrances![site.anchor];
     const door = ow.transitions.find((t) => t.targetMap === 'elfheim')!;
-    expect([door.x, door.y, door.targetEntrance]).toEqual([...site.door, 'gate']);
-    expect((ow.docks ?? []).find((d) => d.id === site.dock.id)).toMatchObject({ x: site.dock.x, y: site.dock.y });
+    expect([door.x, door.y, door.targetEntrance])
+      .toEqual([site.door[0] + gx - site.gate[0], site.door[1] + gy - site.gate[1], 'gate']);
+    expect((ow.docks ?? []).find((d) => d.id === site.dock.id)).toMatchObject({ id: site.dock.id });
   });
 });

@@ -67,14 +67,34 @@ describe('quest places by name (NW-1)', () => {
       reason: 'r' }] })), maps)).toThrow(/has no gate a_quay/);
   });
 
-  it('the real quest.yaml resolves on today\'s world to the cells it named before NW-1', () => {
+  it('the real quest.yaml resolves on the world map to the cells of its spots, docks and gates (NW-5: the NW world)', () => {
     const w = loadQuestWorld();
-    const s = (id: string) => w.stages.get(id)!;
-    expect([s('S3').entry!.x, s('S3').entry!.y]).toEqual([93, 92]);
-    expect(s('S4').entry!.vehicles).toEqual([{ type: 'ship', map: 'overworld', x: 132, y: 102 }]);
-    expect(s('S18').entry!.vehicles![0]).toEqual({ type: 'airship', map: 'overworld', x: 149, y: 162 });
-    expect(s('S0').nonLoadBearing.filter((n) => n.map === 'overworld').map((n) => n.at)).toEqual([[93, 96], [94, 96]]);
-    expect(s('S10').nonLoadBearing.find((n) => n.kind === 'dock')!.at).toEqual([59, 104]);
+    const ow = parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')) as MapData;
+    type Raw = { map: string; at?: string; type?: string };
+    const raw = parse(readFileSync('assets/data/quest.yaml', 'utf-8')) as { stages: Array<{ id: string;
+      entry?: Raw & { vehicles?: Raw[] }; nonLoadBearing: Array<{ map: string; kind: string; ref?: string }> }> };
+    const cell = (name: string): [number, number] => ow.spots![name].at;
+    let n = 0;
+    for (const r of raw.stages) {
+      const s = w.stages.get(r.id)!;
+      if (r.entry?.map === 'overworld' && r.entry.at) {
+        expect([s.entry!.x, s.entry!.y], `${r.id} entry`).toEqual(cell(r.entry.at));
+        n++;
+      }
+      (r.entry?.vehicles ?? []).forEach((v, i) => {
+        if (v.map !== 'overworld' || !v.at) return;
+        const got = s.entry!.vehicles![i];
+        expect([got.type, got.x, got.y], `${r.id} ${v.type}`).toEqual([v.type, ...cell(v.at)]);
+        n++;
+      });
+      r.nonLoadBearing.forEach((e, i) => {
+        if (e.map !== 'overworld' || !e.ref) return;
+        const rec = e.kind === 'dock' ? ow.docks!.find((d) => d.id === e.ref) : ow.keyItemGates!.find((g) => g.id === e.ref);
+        expect(s.nonLoadBearing[i].at, `${r.id} ${e.kind} ${e.ref}`).toEqual([rec!.x, rec!.y]);
+        n++;
+      });
+    }
+    expect(n).toBeGreaterThanOrEqual(27 + 33 + 5);             // NW-1's rewrite: 27 entries, 33 vehicles, 5 refs
   });
 });
 
@@ -97,10 +117,12 @@ describe('the verifier options (NW-1)', () => {
   });
 
   it('--anchors replaces world-anchors.yaml, whose bands are read from the file', () => {
-    expect(loadLateData().geo!.scale).toEqual([0.6, 0.8]);
-    const nw = loadLateData(process.cwd(), { anchors: 'assets-src/maps-nw/world-anchors.yaml' }).geo!;
-    expect(nw.scale).toEqual([0.75, 0.95]);
-    expect(nw.longPair).toBe(23);
+    // NW-5: the default file is the NW world's; pass W's (frozen) is the one passed in
+    expect(loadLateData().geo!.scale).toEqual([0.75, 0.95]);
+    expect(loadLateData().geo!.longPair).toBe(23);
+    const passW = loadLateData(process.cwd(), { anchors: 'tests/fixtures/passW/world-anchors.yaml' }).geo!;
+    expect(passW.scale).toEqual([0.6, 0.8]);
+    expect(passW.longPair).toBe(20);
     expect(() => loadLateData(process.cwd(), { anchors: '/nonexistent.yaml' })).toThrow(/no such file/);
     const dir = mkdtempSync(join(tmpdir(), 'nw1-anchors-'));
     writeFileSync(join(dir, 'a.yaml'), 'tolerance: 2\nfit: {scale: [0.7, 0.9]}\nanchors: []\n');
