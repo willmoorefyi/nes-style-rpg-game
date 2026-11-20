@@ -23,6 +23,9 @@ export interface Src {
   spots: Record<string, { at: XY; kind: string }>;
   road_check?: { materials: string[]; ends: XY[]; no_stubs?: boolean };
   world: { basins: Record<string, XY> };
+  /** NW-R: a region's land on the owner grid as row rects (`regions.<r>.land`, written by the regions that place
+   * content) */
+  regions?: Record<string, { land?: [number, number, number, number][] }>;
 }
 
 export const DELTA: XY = [54, 44];
@@ -37,6 +40,15 @@ export const pin = ([x, y]: XY): XY => [x + DELTA[0], y + DELTA[1]];
 const read = (path: string): Src => parse(readFileSync(path, 'utf-8')) as Src;
 export const today = read('assets-src/maps/overworld.yaml');
 export const nw = read('assets-src/maps-nw/overworld.yaml');
+
+/** NW-RINT: an NW world cell holds act 1's content when it lies in today's act-1 box moved by (54, 44) and on no land
+ * another region's content claims (`regions.<r>.land`, e.g. ELF's Elfheim shore): the other regions' dressing
+ * (boulders, NPCs) is never counted as act 1's. */
+export function act1Cell([x, y]: XY, s: Src = nw): boolean {
+  const other = Object.entries(s.regions ?? {}).some(([r, v]) => r !== 'a1'
+    && (v.land ?? []).some(([a, b, c, d]) => x >= a && x <= c && y >= b && y <= d));
+  return inAct1([x - DELTA[0], y - DELTA[1]]) && !other;
+}
 export const grid = (s: Src): string[][] => s.ground.replace(/\n$/, '').split('\n').map((r) => [...r]);
 
 const BLOCK = new Set(['o', 'm', 'r', '≈']);

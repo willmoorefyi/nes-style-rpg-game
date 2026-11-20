@@ -1172,7 +1172,10 @@ uses an entrance name.
 - [x] NW-2 generator (2026-11-20; result in 12)
 - [x] NW-3 act 1 regenerated and re-pinned (2026-11-20; result in 13)
 - [x] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (2026-11-20; result in 14)
-- [ ] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND (priority: medium, effort: 42h)
+- [x] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND, merged by NW-RINT with act 1's zones and the lighthouse
+  (2026-11-20; result in 15)
+- [ ] The verifier's state cap: on the merged NW world the full graph is 1,348,366 states and `--stage S30`'s
+  2,096,640, over `MAX_STATES` (1,000,000); raise it or shrink the state key (NW-5; priority: high, effort: 1h)
 - [ ] M7-5, M7-6, M7-INT merged before NW-5 (priority: medium, effort: external)
 - [ ] NW-5 cutover and balance, the save reset and `--from-reset` (priority: high, effort: 19h)
 - [ ] NW-INT and the user's play session (priority: high, effort: 5h)
@@ -1524,3 +1527,136 @@ NW-4 measured every region's raster at 37-55 chunks (85-120 with the ring), so t
 and `--region a1` with 49 painted chunks at 6.0 GB, so the limit no longer guards memory, only time. `PAINT_LIMIT` is
 now 160 painted chunks, ring included (`terrain/region_chunks.py`); the 24-chunk total-drift refresh rule stands. World
 compiles stay one at a time under the lock.
+
+## NW-R ORDEAL result
+
+Branch `nw-r-ordeal` from `mainline` 966edbf1. Today's world is unchanged (`world.py` re-run: `git diff --exit-code
+assets/maps assets-src/maps` clean).
+
+- **Spec** (`world_specs/ordeal.py`): the Citadel is a crescent arc (midline knots with an outer and an inner
+  half-width, `_arc`) whose bay opens south-east toward Cardia, held clear of Onrac and Gaia (NW-4's polygon had
+  grown into one landmass with both); the spine along its outer side and a crag spur for the gate; the bay as a sea
+  disc and a mouth line; two `warm` climate hints (the heath and Cardia). Cardia: Bahamut's isle (radius 5.2, a bite
+  for its east bay) and five named islets at fixed cells, plus three look-only islets at fixed cells (no random
+  field): 9 islets, none joined. Pins: `ord_citadel` and `ord_bahamut` at their targets (dx, dy 0).
+- **Content** (`ordeal/world_ordeal_nw.py`, its docstring the design note): the Citadel's 3x3 icon over its door with
+  its top row and the two broken pillars' tops on the crag, the meadow path grass; Bahamut's cave mouth in a notch of
+  rock; the hermit's hut and slate (today's text); 3 heath boulders. Zones `ord_heath` / `ord_isles` (walking and
+  canoe: the arc has streams and a tarn) and `ord_sea` (ship) from the owner grid, today's ids, names and rosters,
+  every walkable and canoe cell covered. Backdrops: heath grassland, isles shoreline, sea ocean; `tundra` grassland,
+  `snow` ice_cave (staged ids; no snow source exists to stage). No dock, NPC, boat or smoke in ORDEAL today.
+- **Metrics**: ORDEAL's coast index 20.1 (NW-4 13.4); world land 27,583 (in band), G2 32.6, G-NW1 / G-NW3 0
+  failing runs, exempt 427, jogs 38; every check line OK. `worldgen/selftest.py`'s B figures updated.
+- **Compile**: `--region ordeal` over a clone of the base: 106 painted chunks, 7.4 GB peak. **Verifier**
+  (`--strict --stage S18 / S19 --maps <compile>`): both `quest-verify: OK` (dragon_zombie L25.1, S19 L24.2).
+
+**Changes outside ORDEAL's files (the integrator's):**
+
+- `worldgen/climate.py`: a `warm` hint kind (cold lowered before the height term, cut at 1.5 radii), and **the forest
+  and sand thresholds fixed** (`Q_FOREST`, `Q_SAND`) at the NW-4 world's quantile values. With global quantiles,
+  ORDEAL's edit moved sand and forest cells in EARTH, FIRE and WIND and made 134 chunks change: `--region` refused
+  (223 painted). With the constants the NW-4 world composes byte-identically and the edit changes 80 chunks.
+- `world_v2.py` / `world_v2_source.py`: the hook `region_content` (each spec module's optional `content(g, meta)`:
+  objects, inspect, NPCs, zones, zone backdrops).
+- `tests/nw/a1/a1Pins.test.ts`: the boulder count limited to act 1's.
+- The base at `base/latest/` is stale against `mainline` (its compiler digest predates 966edbf1's PAINT_LIMIT edit,
+  the only compiler difference): the scratch clone's `build.compiler` was rewritten to today's digest.
+- Still non-local (geography, not thresholds): removing the land bridge wets WIND's west (the westerly sweep), about
+  48 Mirage sand cells become grass; WATER's east coast loses the land NW-4 had joined to ORDEAL.
+
+## 15. NW-RINT result (the six NW-R tranches merged)
+
+Branch `nw-rint` from `mainline` 966edbf1. The six region branches are merged one at a time, each followed by
+`world_v2.py` (every check line OK) and `tests/nw`: `nw-r-water` (20260b04) first, because its separate content
+module became the one hook, then `nw-r-elf` (757732d1), `nw-r-earth` (221f3add), `nw-r-fire` (d2a8ec76),
+`nw-r-ordeal` (91e1b0e5) and `nw-r-wind` (bf38e715); then act 1's zones and Pravoka's lighthouse. The world source
+was never hand-merged: each merge took the integrator's side of `assets-src/maps-nw/overworld.yaml` and regenerated
+it. Today's world is unchanged (`git diff --exit-code mainline -- assets/maps assets-src/maps` clean).
+
+- **One content hook** (`layouts/world_v2_content.py`, from WATER's). A region spec module `world_specs/<r>.py` may
+  define `content(g, meta, ctx)`; `ctx` (`Ctx`) carries the door offsets, the merged spec, the transitions and the
+  taken cells (transitions, gates, entrances, docks), so every region's old signature is served. The composer calls
+  every region in `REGIONS` order after the transitions and before the spots (the regions read nothing those steps
+  write, so each branch's own content is reproduced). The keys: the lists `objects`, `inspect`, `npcs`, `vehicles`,
+  `ambient`, `hazards`, `encounterZones`, `errors` (into `pins`), `road_islands` (`road_check.islands_ok`, ELF's
+  king's road); `backdrops`; `checks` and `region` (into `regions.<r>`: `warp_leaves`, ELF's `land`); `patches`
+  (EARTH's canal dressing); act 1 only, `map` (the map-level `encounters`, `encounterRate`, default backdrops) and
+  `fallback`. Each region's wrapper adapts its module without changing what it places: ELF's `zones` are
+  `encounterZones`, ORDEAL's `battleBackgrounds.zones` are `backdrops`, WIND's `RegionOut` becomes the dict
+  (`world_specs.CONTENT` / `contents` dropped), FIRE's `checks` lost their region key. NPC cells are kept out of the
+  spots (FIRE's hull NPC). Compared cell by cell with each branch's own source, every region's ground edits and
+  content survive, but where two regions' specs meet (below).
+- **One coverage check** (3.8; `world_v2_content.coverage`, one entry per region): every owned walkable cell in a
+  walking zone of the region, every River and Lake cell in a canoe zone, and, for a region with ship zones (FIRE's
+  rule, which used to stop the compose from inside FIRE's module and is folded in here), each owned sea cell in
+  exactly one ship zone. `coverage: OK (a1 7249, elf 9156, earth 9630, fire 11232, ordeal 6155, water 10471, wind
+  7493; zones pending: none)`.
+- **Act 1's zones** (3.6.4; `a1/world_a1_nw.py` through `world_specs/a1.content`): today's ids and tables. The fields
+  are the map default as today (`encounters`: FIELDS, `encounterRate` 10-22, backdrops `grassland` with today's
+  terrain table) and hold the peninsula plus, as today, the A1 cells no zone reaches (the islands kept for the look,
+  the hill pockets: 263 cells); `east_pocket` (82 cells: TOMB_END with the footbridge shut), `temple_approach` (341:
+  nearer the temple than Cornelia's four gates, forests whole), `a1_mainland` (2,564: the north shore's walk, plus
+  the mainland's River and Lake cells, which today fell to the fields' table), `a1_aldi` (2,024) and `a1_north_sea`
+  (1,341) by the Aldi flood on A1's sea. `fallback` gives the coverage check the fields' cells.
+- **Pravoka's lighthouse**: today's LM4 icon (`lighthouse` 2x3, `collide: alpha`) at (194, 140)-(195, 142), on the
+  W_east range's rock with the channel's Water on its west, across the channel from Pravoka's icon (184, 142). Its
+  pinned cell (today + (54, 44) = (192, 142)) is Water on the NW world (the channel is 2 cells wider); the rock there
+  is FIRE-owned (Pravoka's neck), and the object is act 1's content. `a1Pins` tests it.
+- **The frozen thresholds (integrator ruling, approved).** ELF, ORDEAL and WIND each replaced the world-wide forest
+  and sand quantiles with constants, with the same values: `climate.Q_FOREST = 0.8816931895841574` (the 0.72
+  quantile of the forest field over the NW-4 world's land) and `Q_SAND = 0.14384668557967306` (the 0.05 quantile of
+  moisture), exact floats, so the NW-4 world composes unchanged. One pair, those names (WIND's `QF` / `QS` dropped).
+  **Ruling:** fixed thresholds stay; they keep a region's edit local (2.5), which `--region` needs. ORDEAL's `warm`
+  climate hint is kept.
+- **`worldgen/selftest.py` case 8** no longer reproduces NW-0's figures: the region tranches move them on purpose.
+  It asserts NW-0's gates on the world as it is (G-NW1 and G-NW3 no failing run, G-NW2 >= 30, the land band, the
+  exemption cap, no ford cut, every check OK); case 7 (determinism, the committed source) is the exact one. NW-0's B
+  figures stay the record in 12 (land 28,874, coast edges 5,204, index 30.6, jogs 33; shares grass 42.4, forest 16.8,
+  mountain 15.1, snow 9.2, tundra 6.0, sand 4.9, river 2.4, lake 2.4, swamp 0.5 %).
+- **The act-1 tests** count act 1's content by one rule, `nwA1.act1Cell` (today's act-1 box moved by (54, 44), less
+  any land a region claims in `regions.<r>.land`): the boulders, the objects, the NPCs. Other tests that assumed they
+  were alone in the source are scoped to their region: EARTH's mooring post (its raster), FIRE's backdrop ids
+  (`fir_`), ORDEAL's cave mouth (its raster), WIND's cairn (beside its zone; WATER has a cairn too), and WATER's
+  north component, which after ORDEAL's crescent may hold WATER's entrances alone.
+- **Across regions.** ELF's march ridge and FIRE's rock neck both close NW-4's T2 canoe leak at x 164; they compose
+  (FIRE's neck rock lies over 6 cells of ELF's rerouted river, (164-165, 196-200)) and both are kept;
+  `--strict --only h --worst-canoe`: OK (17 rows). ORDEAL's crescent and WIND's re-specced continent meet on the
+  coast round (160-200, 40-70): there the merged ground differs from WIND's branch in 34 cells and from ORDEAL's in 82
+  (mostly shore cells to sea; 10 of ORDEAL's own cells), and every check and both regions' tests pass. Other regions'
+  zones moved with the owner grid (ELF's coast took 8 isthmus and 930 sea cells from EARTH's zones; ORDEAL's crescent
+  re-owned some of WATER's sea); FIRE's ash vents gained one cell (175, 195).
+- **The merged world:** `world: OK (36 entrances, 41 spots, 5 docks, 2 patches; 7 regions, 327 raster chunks over
+  256)`, `basins: OK (aldi 3178 cells, ocean 35511 cells; ...)`, `barriers: OK (walk, canoe; cuts spine 2,
+  western_range 3, crescent_ring 4)` (EARTH's range is 3 thick now), `prewalk: OK (S0-S14)`, every other line OK;
+  land 26,847 (the band is [26,000, 31,800]: 3.3 % above its floor), coast edges 5,584, G-NW2 34.1, longest coast run
+  6, G-NW3 6, exempt 427, jogs 41, tarns 5, no ford cut. Shares: grass 41.9, forest 17.4, mountain 15.5, snow 8.5,
+  sand 6.6, tundra 4.8, river 2.1, lake 1.9, swamp 0.5 %. Coast index by region: a1 13.7, elf 10.5, earth 13.2, fire
+  11.1, ordeal 20.1, water 12.7, wind 12.7. Selftests: `worldgen/selftest.py` 8 of 8, `selftest_gates.py` 15 of 15,
+  `build_map.py --selftest` 144 checks.
+- **The base, refreshed.** `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/nw-rint/base-new`: 241 s,
+  peak memory footprint 14.5 GB (max RSS 11.3 GB), 256 chunks (349 approved parts, 39 placeholders). It replaces
+  `~/temp/ff-game/worldplan/base/latest/` (read-only; `base.txt`: source sha256 22faa886..., commit 86a528af, the
+  compiler digest of 966edbf1); NW-4's base is `base/prev/`. Overview: `~/temp/ff-game/nw_rint/overview.png`.
+- **The verifier on the new base** (`npm run quest -- --strict --maps <base> --anchors
+  assets-src/maps-nw/world-anchors.yaml`): (a) OK (every stage in order, S31, S19 and S18 optional and reachable;
+  NW-4's stop at S17's hatch is gone), (b) OK (423 withheld runs, 7 milestone runs), (e) OK (8 towns), (f) OK
+  (Crescent 13,897 / 60,240, Gaia 94,213 / 259,240), (g) OK (s* 0.851, 31 pairs), (h) OK (12 rows, 2 basin rows).
+  (c) FAILS only on the state cap: `LIMIT the state search stopped at 1000000 states`, and the SOFTLOCK / STRANDED
+  lines that follow are the unexpanded frontier. With the cap at 3,000,000 (a scratch probe calling the same proof)
+  the graph is complete at 1,348,366 states and (c) is OK: no soft-lock, no stranded place, no dead gate (so
+  `adamant` is held: EARTH's S31 dead gate is gone); today's world is 311,272 states. (d) FAILS: S16 evil_eye L25.2
+  over [21, 24], S21 L29.9 over [25, 28].
+- **Per stage** (`--strict --stage S<n> --maps <base>`, all 32): S0-S15, S18-S20, S22, S23 and S31 OK (S10 and S31,
+  EARTH's soft-locks on the old base, are OK). S16, S17, S21, S24-S29 fail (d) only, over their bands, and today's
+  world fails the same stages by the same margin (NW / today: S16 evil_eye 26.8 / 26.5 in [21, 24], S17 26.4 / 26.4
+  in [22, 25], S21 32.6 / 31.7 in [25, 28], S24 drowned_sovereign 33.3 / 33.2 in [27, 30], S25 32.3 / 32.1 and S26
+  32.2 / 32.2 in [28, 31], S27 34.5 / 34.5 in [29, 32], S28 hollow_seraph 40.3 / 40.4 in [31, 34], S29 39.7 / 39.5 in
+  [33, 35]): NW-5's balance. S30 fails (c) on the cap alone (today's passes): at 3,000,000 its graph is 2,096,640
+  states and (c) is OK.
+- **Gates:** `npm run build` OK; `npm run test:fast` 407 files, 9,701 tests passed.
+
+**Left for NW-5:** the verifier's state cap (above); the band failures (the balance, 7 item 7); act 1's zone tables
+still import `overworld_zones.py` and `a1/world_a1_zones.py` (v1's world_api), which NW-5 must keep as data when it
+retires their cell logic; the land figure near its band's floor; the compile's determinism check
+(`build_map.py --check-determinism overworld --src-dir assets-src/maps-nw`, two full compiles), not re-run here; the
+NW-R tranches' results are in their modules' design notes (ORDEAL's in its own section above).
