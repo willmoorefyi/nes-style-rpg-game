@@ -33,17 +33,18 @@ from worldgen.geom import components, pline  # noqa: E402
 SQUARE = ((-60, -60), (20, -60), (20, 20), (-60, 20))
 RIDGE = Ridge(((-50, -20), (10, -24)), 1.0, 3.0, "a test range")
 ROUTE = ((-30, 0), (-10, 4), (8, 10))
-B_FIGURES = {"land": 28874, "coast_edges": 5204, "G2_index": 30.6, "G1_fail_runs_gt6": 0, "G1_longest_nonexempt": 6,
-             "G3_fail_runs_gt6": 0, "G3_longest": 6, "exempt": 427, "jogs": 33, "ford_cuts": 0,
-             # NW-3: act 1's routed road ring (grass B 42.4 -> 42.5); NW-4: the waterfall's ledge, a rock ring on
-             # R-waterfall (B mountain 15.1, tundra 6.0, snow 9.2, grass 42.5)
-             "shares": {"mountain": 15.2, "forest": 16.8, "sand": 4.9, "swamp": 0.5, "tundra": 5.9, "snow": 9.1,
-                        "river": 2.4, "lake": 2.4, "grass": 42.4},
+B_FIGURES = {"land": 27583, "coast_edges": 5422, "G2_index": 32.6, "G1_fail_runs_gt6": 0, "G1_longest_nonexempt": 6,
+             "G3_fail_runs_gt6": 0, "G3_longest": 6, "exempt": 427, "jogs": 38, "ford_cuts": 0,
+             # NW-3: act 1's routed road ring; NW-4: the waterfall's ledge (NW-4: land 28874, 5204 coast edges,
+             # index 30.6, 33 jogs; mountain 15.2, forest 16.8, sand 4.9, tundra 5.9, snow 9.1, lake 2.4, grass
+             # 42.4); NW-R ORDEAL: the Citadel's crescent clear of Onrac and Gaia, Cardia's fixed islets, the warm heath
+             "shares": {"mountain": 15.4, "forest": 16.3, "sand": 5.0, "swamp": 0.5, "tundra": 4.7, "snow": 8.4,
+                        "river": 2.4, "lake": 2.1, "grass": 44.6},
              # the coast index by region on NW-4's owner grid (a landmass shared by regions split along their
              # fields; NW-0 / NW-2 gave each landmass to its majority region: a1 9.2, elf 8.6, earth 10.7, fire 19.4,
-             # ordeal 10.5, water 18.3, wind 5.7). Reported, not gated (0.1.1).
-             "regions": {"a1": 13.7, "elf": 8.1, "earth": 13.5, "fire": 11.1, "ordeal": 13.4, "water": 11.7,
-                         "wind": 10.1}}
+             # ordeal 10.5, water 18.3, wind 5.7; NW-4 ordeal 13.4, water 11.7, wind 10.1). Reported, not gated.
+             "regions": {"a1": 13.7, "elf": 8.1, "earth": 13.5, "fire": 11.1, "ordeal": 20.1, "water": 12.3,
+                         "wind": 11.4}}
 
 
 def synthetic(**kw) -> RegionSpec:

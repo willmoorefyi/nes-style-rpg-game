@@ -76,6 +76,25 @@ def act1_people(g: np.ndarray, keep: np.ndarray) -> tuple[list[dict], list[dict]
     return npcs, ships
 
 
+CONTENT_LISTS = ("objects", "inspect", "npcs", "encounterZones")
+
+
+def region_content(g: np.ndarray, meta: dict) -> dict:
+    """NW-R: each region's own content, from its spec module's `content(g, meta)` when it has one (REGIONS order):
+    the lists of CONTENT_LISTS and `battleBackgrounds` (its `zones`). A region edits only its own cells of `g`."""
+    import importlib
+    out: dict = {k: [] for k in CONTENT_LISTS}
+    out["battleBackgrounds"] = {"zones": {}}
+    for r in meta["regions"]:
+        mod = importlib.import_module(f"world_specs.{r}")
+        if hasattr(mod, "content"):
+            c = mod.content(g, meta)
+            for k in CONTENT_LISTS:
+                out[k] += c.get(k, [])
+            out["battleBackgrounds"]["zones"].update(c.get("battleBackgrounds", {}).get("zones", {}))
+    return out
+
+
 def covered(objs: list[dict]) -> set:
     """Every cell of an object's parts box (no spot is resolved under an icon or a deco)."""
     out = set()
@@ -107,10 +126,20 @@ def reach_roots(g: np.ndarray, ents: dict, cover: set) -> list:
     return roots
 
 
-def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict) -> dict:
+def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict,
+             extra: dict | None = None) -> dict:
+    """`extra`: the regions' own content (`region_content`); its objects and inspect cells are already in `objs` and
+    `insp`, its NPCs, zones and backdrops are added here."""
     ents = dict(meta["entrances"])
     ents = {"cornelia": ents.pop("cornelia"), **ents}       # the first entrance is the reachability root
     npcs, ships = act1_people(g, meta["keep"])
+    extra = extra or {}
+    npcs = npcs + extra.get("npcs", [])
+    more = {}
+    if extra.get("encounterZones"):
+        more["encounterZones"] = extra["encounterZones"]
+    if extra.get("battleBackgrounds", {}).get("zones"):
+        more["battleBackgrounds"] = extra["battleBackgrounds"]
     return {
         "id": "overworld", "name": "World Map", "kits": ["overworld", "town", "temple"], "music": "overworld",
         "camp": True, "terrain": "organic", "sealed_edges": True,
@@ -119,7 +148,7 @@ def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spo
         "road_check": {"materials": ["dirt"], "ends": [list(S.world(P.TOMB_END))], "check_under": True,
                        "no_stubs": True},             # act 1's roads (3.10: no stub by Cornelia's gates)
         "entrances": ents, "transitions": trans, "keyItemGates": gates(), "objects": objs, "inspect": insp,
-        "npcs": npcs, "vehicles": ships,
+        "npcs": npcs, "vehicles": ships, **more,
         "patches": [{"id": "north_bridge", "flag": "BRIDGE_BUILT", "ground": "=",
                      "cells": [list(c) for c in meta["bridge"]]},
                     {"id": "canal", "flag": "CANAL_OPEN", "ground": "o", "cells": [list(c) for c in meta["canal"]]}],

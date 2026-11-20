@@ -107,7 +107,7 @@ class Road:
 
 @dataclass(frozen=True)
 class ClimateHint:
-    """A disc that pushes the climate (2.4 rule 5): `arid`, `wet` or `mild`."""
+    """A disc that pushes the climate (2.4 rule 5): `arid`, `wet`, `mild` or `warm`."""
     kind: str
     centre: Point
     radius: float
