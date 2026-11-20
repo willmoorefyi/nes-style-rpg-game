@@ -1,6 +1,6 @@
-# Natural world plan (pass NW), rev 3
+# Natural world plan (pass NW), rev 3.1
 
-Status: rev 3, planning only. Nothing is implemented. Pass NW replaces the world map's geography and its generator,
+Status: rev 3.1 (momus OKAY on rev 3, 4 of 5; rev 3.1 folds in its last small items), planning only. Nothing is implemented. Pass NW replaces the world map's geography and its generator,
 act 1's overworld included. It keeps the progression of `docs/WORLD_PLAN.md` rev 3 (pass W: stages S0-S31, the
 gates, the verifier proofs) and every site, dungeon, town, interior and landmark. The facts in 1 and 5.1 were checked
 at `150c0138` (M7-4 merged at `065a6474`); rev 3's at `d1a3ca54`.
@@ -15,7 +15,7 @@ at `150c0138` (M7-4 merged at `065a6474`); rev 3's at `d1a3ca54`.
 | R3-4 | The north selftest contradicted the north rule | the river-mouth case is removed (the ship disembarks only at docks, so a river mouth is no canoe start). It is replaced by a river joining a northern island to a southern coast, which the component rule fails (3.2, 3.8) |
 | R3-5 | `--region` over a shared base fails `check_base` | an NW chunk-digest mode: `build.chunks` records a digest per chunk of everything its pixels read; `--region r` repaints r's raster plus every chunk whose digest changed; `check_base` then needs only the size and the compiler. Over 70 changed chunks it refuses: run a full compile (the integrator's). Full compiles are budgeted (3.4) |
 | R3-6 | `questEntries.test.ts` doesn't exist | marked new and renamed `tests/systems/worldReset.test.ts` (5.3). With the flag-keyed rule there is no stage order to check |
-| S | Suggestions | R17's reason is corrected (`worldOffsetOf` only shifts a 72x72 map; it is removed as dead code; `macroGeography.test.ts:105` reads the anchors from spots). `schemaValidationQuest.ts:75-78`: `world.frames` becomes optional, and `world.basins`, `world.cuts` and `spots` are validated. Totals: 13 tranches, 125 h, about 81-88 h of wall clock (7). The inventory adds `tests/data/act1Flow.test.ts` (2 keyItemGates) and `tests/data/actOneBalance.test.ts` (3.6.5) |
+| S | Suggestions | R17's reason is corrected (`worldOffsetOf` only shifts a 72x72 map; it is removed as dead code; `macroGeography.test.ts:105` reads the anchors from spots). `schemaValidationQuest.ts:75-78`: `world.frames` becomes optional, and `world.basins`, `world.cuts` and `spots` are validated. Totals: 13 tranches, 125 h, about 81-88 h of wall clock (7; 81 h in rev 3.1, M7-5 and M7-6 having merged). The inventory adds `tests/data/act1Flow.test.ts` (2 keyItemGates) and `tests/data/actOneBalance.test.ts` (3.6.5) |
 
 **Rev 2 changes** (the user's rulings of 2026-11-20 and momus's review of rev 1, REJECT):
 
@@ -99,7 +99,7 @@ overall map size and the terrain and coastline variability."
 - **Built beside today's world.** The new world is a source under `assets-src/maps-nw/`, compiled only to scratch
   folders. It replaces `overworld` in one cutover tranche (NW-5, cutover and balance), after M7-INT. Old saves on the
   world map reset to Cornelia.
-- **Effort.** About **125 h** over 13 tranches, about 81-88 h of wall clock. The pilot (NW-0) is an offline image for
+- **Effort.** About **125 h** over 13 tranches, about 81 h of wall clock. The pilot (NW-0) is an offline image for
   the user to approve before any generator work.
 
 ### 0.1 Success criteria (defined before implementation)
@@ -504,14 +504,18 @@ continent specs (polygons, ridges, walls, passes, corridors, roads, climate hint
     with its ring. `check_base` checks only the size and the compiler; a changed neighbour is repainted, not
     refused. GAP-14 locality makes the result byte-equal to a full compile, and `build_map.py --selftest` gains the
     case "an edit in region A changes a chunk of region B: the `--region A` result equals the full compile".
-  - Over **70 changed chunks** (the 10 GB `--region` limit) it refuses with "run a full compile"; that is the
+  - **The limit counts everything painted:** r's raster, plus the changed chunks, plus the 1-chunk ring of both.
+    Over **70 painted chunks** (the 10 GB `--region` limit) it refuses with "run a full compile"; that is the
     integrator's job.
   - Owner: NW-4 (`terrain/region.py`, about +40 lines; it is at 189 lines).
 - **The compiled base.** An NW-R agent compiles over a full scratch compile.
   - The **NW integrator** builds it by a full compile under the lock, into `~/temp/ff-game/worldplan/base/latest/`,
     read-only, with its source hash in `base.txt`.
-  - It builds the first one at the end of NW-4, and refreshes it in the merge window after any NW merge whose diff
-    changes more than 70 chunk digests.
+  - It builds the first one at the end of NW-4. It refreshes it in the merge window when the base has **drifted
+    more than 24 chunks in total** from `mainline`'s current world source: chunk digests that differ, summed over
+    every merge since the last refresh. Two merges of 15 chunks each therefore trigger a refresh.
+  - An agent's painted set stays under 70 when its region's raster (at most about 40 chunks with its ring) plus 24
+    drifted chunks fit.
   - An NW-R agent clones the base (`cp -c`, an APFS clone, about 70 MB) into `/tmp/<agent>/nw-out/` and runs
     `--region <r>` over it. The chunk digests repaint whatever differs from its own branch, so any base with the same
     compiler serves. It never full-compiles.
@@ -526,8 +530,9 @@ continent specs (polygons, ridges, walls, passes, corridors, roads, climate hint
 
   - **The rule:** a full compile starts only while at most 6 other worktrees are active, since
     floor((48 - 26 - 4) / 2.5) = 7, with one spare.
-  - While M7-5 and M7-6 run, NW-R therefore runs at most 4 agents at once, plus the integrator; with M7-5 and M7-6
-    merged, all 6.
+  - M7-5 and M7-6 merged at `d5a25b6f`, so all 6 NW-R agents may run at once, with the integrator (7 active
+    worktrees, within the rule). M7-INT's worktree, if active, makes it 8: then a full compile waits for one NW-R
+    agent to finish, and `--region` jobs are unaffected.
   - A `--region` job (10 GB) leaves room for 13 worktrees, so it is never the limit.
   - **Full compiles planned:**
 
@@ -537,7 +542,7 @@ continent specs (polygons, ridges, walls, passes, corridors, roads, climate hint
     | NW-1 | 1 (today's world recompiled with spots, 192²: 11.3 GB) |
     | NW-2 | about 3 |
     | NW-4 | 1 (the first base) |
-    | base refreshes | at most 6 (one per NW-R merge, only when more than 70 digests changed) |
+    | base refreshes | at most 6 (at most one per NW-R merge, when the total drift exceeds 24 chunks) |
     | NW-5 | about 3 |
     | NW-INT | 1 |
 
@@ -844,7 +849,7 @@ uses an entrance name.
      | quest schema | `src/core/schemaValidationQuest.ts` | `entry.at`, vehicle `at`, `nonLoadBearing.ref`; refuses `x, y` on `overworld`; `world.frames` optional (today `:75-78` requires it); validates `world.basins` and `world.cuts` | `tests/data/questData.test.ts` |
      | quest entries | `src/progression/questSearch.ts:81-93` (stage entries and their vehicles), `questEvents.ts:152-154` (a pending stage's synthetic vehicle) | resolve `at` through the map's `spots` / docks | `tests/progression/*` and `tests/fixtures/quest/*.yaml` with `at` |
      | quest events | `src/progression/questEvents.ts:64` | `set_vehicle` with `at:` (today it needs `x` and `y`) | `tests/systems/vehicles.test.ts`, `endGame.test.ts` (their `set_vehicle` cases) |
-     | scenarios | `src/systems/DebugScenarioLoader.ts` | `spot:` spawns (the field position from `map.spots` after the map loads, as `entrance` resolves today); vehicles with `at` | `tests/systems/scenarioSpawns.test.ts`, `DebugScenarioField.test.ts` |
+     | scenarios | `src/systems/DebugScenarioLoader.ts` | `spot:` spawns (the field position from `map.spots` after the map loads, as `entrance` resolves today); vehicles with `at` are **resolved to cells at scenario start**: the loader reads the target map's compiled source (it already awaits the map for `frame` spawns), and an unknown spot throws. `Game.vehicles` and `SaveData` therefore only ever hold cells: `SaveManager.save` refuses a vehicle without `x, y` (`console.error` and no write), and so does `load` | `tests/systems/scenarioSpawns.test.ts`, `DebugScenarioField.test.ts` |
      | runtime vehicles | `src/systems/VehicleManager.ts`, `src/scenes/exploration/FieldVehicles.ts` | a parked vehicle `{type, map, at}` is resolved to its cell when its map loads; a save always stores cells | `tests/systems/VehicleManager.test.ts`, `fieldTravel.test.ts` |
      | cutscenes | `src/scenes/exploration/ExplorationCutscenes.ts`, `src/systems/CutsceneRegistry.ts` | `set_vehicle` with `at:`; the registry accepts `map` + `at` as a place (and still drops a step with neither) | `tests/systems/CutsceneRegistry.test.ts`, `CutsceneManager.test.ts` |
      | data | `quest.yaml` (27 entries, 33 vehicles, 5 `nonLoadBearing`), `debug-scenarios.yaml` (38 vehicles, 3 spawns), `cutscenes.yaml` (1 step) | rewritten to names | `tests/data/crossFileValidation.test.ts` (every `at` / `spot` names a spot of its map) |
@@ -891,8 +896,12 @@ uses an entrance name.
 
   - The two spots are constants in `worldReset.ts` (`RESET_SPOTS`), as names; `VehicleManager` resolves them when the
     overworld loads (5.2).
-  - `tests/systems/worldReset.test.ts` (**new**) asserts that the flags in `RESET_SPOTS` are exactly the vehicle
-    grants' flags in `quest.yaml` (the ship's and the airship's), so a renamed flag fails.
+  - `tests/systems/worldReset.test.ts` (**new**) asserts:
+    - the flags in `RESET_SPOTS` are exactly the vehicle grants' flags in `quest.yaml` (the ship's and the
+      airship's), so a renamed flag fails;
+    - the ship spot of `RESET_SPOTS` and the map spawn of the ship that `BIKKE_DEFEATED` grants (the cutscene's or
+      the map's `vehicles` entry, by spot) are **the same dock**, `a1_pravoka`;
+    - the 3.8 `pins` check asserts the same on the composed world: that dock's cell is the spawn cell of the ship.
 - **Kept:** flags, party, inventory (the canoe item included), gold, play time, `boosts`, and every other field.
 - **The notice.** On the first field frame after a reset, one message line: "The world has changed. You stand
   before Cornelia." It shows once, through `DialogManager`.
@@ -905,6 +914,9 @@ uses an entrance name.
     as `--stage` builds it), with the party at `cornelia` on foot and the vehicles of `resetVehicles(flags)`.
   - From each reset state it runs the search with proof (c): the goal is reachable, and no reachable state is a
     SOFTLOCK, STRANDED or DEADGATE.
+  - **Mid-stage resets.** It also relocates a sample of the main search's reachable states: up to 50 per stage,
+    chosen by a seeded pick over the state list, so a party that saved half-way through a stage is covered. Each is
+    moved to `cornelia` on foot, given the vehicles of `resetVehicles(flags)`, and searched with proof (c) again.
   - It runs in NW-5 and NW-INT, in the background with `--strict`.
   - `tests/progression/resetStates.test.ts` (**new**, fast tier) runs the cheap part on the real data: from each
     reset state, the next stage's required entrances (3.8) are reachable with the stage's vehicles.
@@ -985,9 +997,9 @@ uses an entrance name.
 
 - **Totals.** 13 tranches: NW-0, NW-1, NW-2, NW-3, NW-4, the six NW-R, NW-5 and NW-INT. About **125 h** of work
   (12 + 11 + 16 + 9 + 11 + 6 x 7 + 19 + 5).
-- **Critical path:** NW-0 (12) → the user's review → NW-1 (11) → NW-2 (16) → NW-3 and NW-4 in parallel (11) → NW-R
-  in parallel (7 if all 6 run at once, which needs M7-5 and M7-6 merged; 14 with at most 4 at a time) → NW-5 (19) →
-  NW-INT (5). That is **about 81-88 h** of wall clock, plus the user's two reviews.
+- **Critical path:** NW-0 (12) → the user's review → NW-1 (11) → NW-2 (16) → NW-3 and NW-4 in parallel (11) → NW-R,
+  all 6 in parallel (7; M7-5 and M7-6 merged at `d5a25b6f`) → NW-5 (19) → NW-INT (5). That is **about 81 h** of wall
+  clock, plus the user's two reviews.
 - **Merge order:** NW-1, NW-2, then NW-3 and NW-4 in either order (the second rebases), then the NW-R tranches in
   any order (each re-runs `world.py`; the integrator refreshes the base after each), then NW-5 and NW-INT.
 - **Owners:** the NW integrator owns NW-1, NW-4, NW-5, NW-INT, every merge and the shared constants.
@@ -1004,7 +1016,7 @@ uses an entrance name.
 | R6 | The full compile at 256² exceeds 26 GB | measured in NW-0 (16 px bake) and NW-2 (12 px); fallback: quadrant `--region` compiles under the lock |
 | R7 | Longer walks shift every level band and price wall | the ±10 % fight rule and the step-mean scaling, applied in NW-5 itself; no formula change |
 | R8 | The spot rewrite in NW-1 changes today's verifier result | the gate is "unchanged on today's world"; the spots are at today's cells |
-| R9 | NW-R agents fight over shared chunks or a stale base | the world source is regenerated, never merged; nothing compiled is committed before NW-5; the base is keyed by the source hash (3.4) |
+| R9 | NW-R agents fight over shared chunks or a stale base | the world source is regenerated, never merged; nothing compiled is committed before NW-5; one base at `base/latest/` (its source hash in `base.txt`), refreshed past 24 chunks of total drift; the chunk digests repaint any difference (3.4) |
 | R10 | A 12 px far atlas shows a blur line at the split | `D_SPLIT` tuning (6.1); the Mode 7 checkpoint in NW-INT |
 | R11 | M7-5 / M7-6 / M7-INT slip and block NW-5 | NW-0 to NW-R do not depend on them; NW-5 waits rather than rebasing over half-merged Mode 7 code |
 | R12 | A reset save surprises the player, or soft-locks it | the one-line notice; flags, party, items and gold kept; the vehicles at milestone spots by Cornelia; proof (c) from every stage's reset state (`--from-reset`, 5.3); 8 test cases |
@@ -1022,6 +1034,7 @@ uses an entrance name.
 | Q2 | Size? | **closed 2026-11-20: 256x256 (D-NW1)** |
 | Q3 | How close to the classic arrangement: (a) the same continents and relative positions with original coasts (today's rule), or (b) the same plus closer outlines (the Citadel arc, Lufenia's long tail, the river maze of the south-east)? | open; default (a), with the shape language of (b) where a gate needs it |
 | Q4 | Old saves? | **closed 2026-11-20: reset to Cornelia (D-NW8, 5.3)** |
+| Q4a | D-NW8 also resets a pre-NW save **inside another map** (a town, a dungeon) when it owns a ship or airship, so no party walks out to a vehicle that has moved. Is that acceptable, or should such saves keep their place and have their vehicles' reachability proven instead? | **closed 2026-11-20 (user): yes, reset those to Cornelia too** (D-NW8, 5.3) |
 | Q5 | Coast roughness preset (from the pilot's A / B / C)? | open; default B |
 | Q6 | Snow and tundra; landing on snow? | **closed 2026-11-20: both added; the airship lands on tundra only (D-NW9, 2.6)** |
 | Q7 | Mode 7: the 12 px far atlas (same memory, a little softer far away), or 16 px at 4096² (sharper, +39 MB, more machines fall to `low`)? | open; default 12 px |
