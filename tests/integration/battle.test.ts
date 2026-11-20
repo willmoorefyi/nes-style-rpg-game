@@ -59,7 +59,8 @@ describe('Battle Integration', () => {
 
   it('complete victory flow: intro → command → execute → victory', () => {
     const hero = new Character({ name: 'Hero', classData: mockClassData });
-    const scene = new BattleScene(deps, createConfig([hero], [weakEnemy]));
+    // seeded (it was Math.random and failed now and then): low rolls hit, so the hero's blows land on the weak enemy
+    const scene = new BattleScene(deps, createConfig([hero], [weakEnemy], () => 0.01));
     scene.enter();
 
     // Access internal state for debugging
