@@ -409,7 +409,8 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   at 2/3 scale, about 62 of a hero's 90 px, the down row's step_right = its step_left mirrored; the mermaid's back row
   remapped onto the front rows' teal ramp by nearest value); `gen/anim/mermaid.yaml` skips the puppet walk boxes (a
   tail has no feet). The gen selftests check a `backend: bedrock` (or vehicle) approved json against the BR ledger
-  instead of re-planning a Gemini request.
+  instead of re-planning a Gemini request. Field previews: `?mute=1&scenario=w_lm5_keep | w_lm5_citadel | w_lm5_fairy
+  | w_lm5_mermaids`.
 - No placeholder NPCs left: the fairy (`sprite: fairy`, Gaia's spring) and the sea-shrine mermaids (`sprite:
   mermaid`, all four on `sea-shrine-b1`, the elder included) have their own sheets, untinted.
 
