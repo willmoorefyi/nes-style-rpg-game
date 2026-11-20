@@ -16,7 +16,7 @@ import { GameFlags } from './GameFlags.js';
 import { CutsceneRegistry } from '../systems/CutsceneRegistry.js';
 import type { BattleRequest, BattleRetrySnapshot } from '../systems/BattleRetry.js';
 import type { Direction } from '../rendering/SpriteAnimation.js';
-import type { FieldMode, VehicleState } from '../types/index.js';
+import type { FieldMode, ParkedVehicle } from '../types/index.js';
 import { installNESFont } from '../ui/NESFont.js';
 import { setUiEventBus } from '../ui/uiSounds.js';
 import { wireAudioEvents } from './audioEvents.js';
@@ -55,7 +55,7 @@ export class Game {
   pendingBattle: BattleRequest | null = null;
   /** The party's field mode and the parked vehicles of every map (save v2, the retry snapshot; FieldVehicles). */
   fieldMode: FieldMode = 'walking';
-  vehicles: VehicleState[] = [];
+  vehicles: ParkedVehicle[] = [];
   /** `a1`: `playerPosition` is an act-1 overworld cell from a version-1 save, translated on the next field enter. */
   pendingFrame: 'a1' | null = null;
   /** The playthrough's boosts (src/core/Boosts.ts; save v3): defaults on a new game and for an older save. */
@@ -169,7 +169,7 @@ export class Game {
     playerPosition: { x: number; y: number };
     playTime: number;
     fieldMode?: FieldMode;
-    vehicles?: VehicleState[];
+    vehicles?: ParkedVehicle[];
     frame?: 'a1' | null;
     /** Missing keeps the current boosts (a retry: they cannot change in battle). */
     boosts?: Boosts;

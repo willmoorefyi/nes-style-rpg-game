@@ -38,11 +38,18 @@ export interface VerifyArgs {
   only?: Set<ProofId>;
   /** The repository root (default: the working directory). */
   root?: string;
+  /** NW-1: a folder of compiled maps read before `assets/maps/ai` (a scratch world compile). */
+  maps?: string;
+  /** NW-1: the anchors file of proof (g) (default `assets/data/world-anchors.yaml`). */
+  anchors?: string;
+  /** NW-1 (docs/NATURAL_WORLD_PLAN.md 4.3): rows T0-T4 run again with the canoe, every river and lake passable. */
+  worstCanoe: boolean;
 }
 
-/** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR]`. Throws on a bad argument. */
+/** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR] [--maps DIR] [--anchors FILE]
+ *  [--worst-canoe]`. Throws on a bad argument. */
 export function parseArgs(argv: readonly string[]): VerifyArgs {
-  const out: VerifyArgs = { strict: false, mutate: false };
+  const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = (): string => {
@@ -55,6 +62,9 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     else if (a === '--stage') out.stage = value();
     else if (a === '--json') out.json = value();
     else if (a === '--root') out.root = value();
+    else if (a === '--maps') out.maps = value();
+    else if (a === '--anchors') out.anchors = value();
+    else if (a === '--worst-canoe') out.worstCanoe = true;
     else if (a === '--only') {
       const letters = value();
       const bad = [...letters].filter((c) => !(ALL_PROOFS as readonly string[]).includes(c));

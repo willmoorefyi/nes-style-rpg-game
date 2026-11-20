@@ -154,7 +154,7 @@ function field(opts: { vehicles?: VehicleState[]; items?: string[]; mode?: Field
     for (let i = 0; i < n; i++) { held = dir; frame(); held = null; frame(); }
   };
   const press = (): void => { confirm = true; frame(); confirm = false; };
-  return { game, fv, player, walk, press, at: () => [player.gridX, player.gridY] };
+  return { game, fv, player, walk, press, map, at: () => [player.gridX, player.gridY] };
 }
 
 describe('vehicles: the field (FieldVehicles, QUEST 4.2 browser row)', () => {
@@ -255,5 +255,16 @@ describe('vehicles: the field (FieldVehicles, QUEST 4.2 browser row)', () => {
     f.fv.setVehicle({ type: 'airship', map: 'test-dock', x: 5, y: 2 });
     expect(f.fv.states.map((v) => v.type).sort()).toEqual(['airship', 'ship']);
     expect(f.game.vehicles).toEqual([{ type: 'airship', map: 'test-dock', x: 5, y: 2 }]);
+  });
+
+  it('NW-1: a set_vehicle at a spot of another map waits, then gets its cell when that map loads', () => {
+    const f = field();
+    f.fv.setVehicle({ type: 'airship', map: 'elsewhere', at: 'x_s_field' });
+    expect(f.game.vehicles).toEqual([{ type: 'airship', map: 'elsewhere', at: 'x_s_field' }]);
+    expect(f.fv.states.map((v) => v.type)).toEqual(['ship']);
+    const other = { ...f.map, id: 'elsewhere', vehicles: [], spots: { x_s_field: { at: [5, 2] as [number, number], kind: 'landing' as const } } };
+    f.fv.setMap(other);
+    expect(f.game.vehicles).toEqual([{ type: 'airship', map: 'elsewhere', x: 5, y: 2 }]);
+    expect(f.fv.states).toEqual([{ type: 'airship', map: 'elsewhere', x: 5, y: 2 }]);
   });
 });

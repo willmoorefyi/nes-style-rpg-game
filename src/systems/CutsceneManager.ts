@@ -1,7 +1,7 @@
 import type { GameFlags } from '../core/GameFlags.js';
 import type { Character } from '../entities/Character.js';
 import type { Inventory } from '../entities/Inventory.js';
-import type { VehicleState, VehicleType } from '../types/index.js';
+import type { ParkedVehicle, VehicleType } from '../types/index.js';
 import { cantCarryText, receivedText } from './pickupText.js';
 
 /** Where a `warp` step sends the party: `map` and either a named `entrance` or both `x` and `y` (T2). */
@@ -34,11 +34,13 @@ export interface CutsceneStep {
   item?: string;
   /** For give_item: show the shared pickup line (`receivedText`, "You received the Herb!") as its own message. */
   announce?: boolean;
-  /** For set_vehicle: the vehicle placed at `map`, `x`, `y`. */
+  /** For set_vehicle: the vehicle placed at `map`, `x`, `y`, or at the spot `at` of `map` (NW-1). */
   vehicle?: VehicleType;
+  /** For set_vehicle: a spot of `map` (`MapData.spots`, NW-1), instead of x / y. */
+  at?: string;
 }
 
-/** Pass W steps (QUEST 4.1-4.2; W1-B plays them): give_item {item}, take_item {item}, set_vehicle {vehicle, map, x, y}
+/** Pass W steps (QUEST 4.1-4.2; W1-B plays them): give_item {item}, take_item {item}, set_vehicle {vehicle, map, at | x, y}
  *  (through the host's `setVehicle`, W1-A's vehicle state), end_game {text?} (GAP-13: the card, then the title). */
 export type QuestStepType = 'give_item' | 'take_item' | 'set_vehicle' | 'end_game';
 const QUEST_STEP_TYPES: readonly QuestStepType[] = ['give_item', 'take_item', 'set_vehicle', 'end_game'];
@@ -60,10 +62,13 @@ export function cutsceneWarp(step: CutsceneStep): CutsceneWarp | null {
 
 const VEHICLES: readonly VehicleType[] = ['canoe', 'ship', 'airship'];
 
-/** The vehicle a `set_vehicle` step places, or null when it lacks a known vehicle, a map or an x/y pair. */
-export function cutsceneVehicle(step: CutsceneStep): VehicleState | null {
+/** The vehicle a `set_vehicle` step places, or null when it lacks a known vehicle, a map, or a place: a spot `at`
+ *  of the map (NW-1; the host resolves it when that map is loaded) or an x/y pair. */
+export function cutsceneVehicle(step: CutsceneStep): ParkedVehicle | null {
   if (step.type !== 'set_vehicle' || !step.vehicle || !VEHICLES.includes(step.vehicle)) return null;
-  if (typeof step.map !== 'string' || !step.map || typeof step.x !== 'number' || typeof step.y !== 'number') return null;
+  if (typeof step.map !== 'string' || !step.map) return null;
+  if (typeof step.at === 'string' && step.at) return { type: step.vehicle, map: step.map, at: step.at };
+  if (typeof step.x !== 'number' || typeof step.y !== 'number') return null;
   return { type: step.vehicle, map: step.map, x: step.x, y: step.y };
 }
 
@@ -88,7 +93,7 @@ export interface CutsceneDeps {
   /** The bag give_item / take_item use; a host without it logs and the cutscene goes on. */
   inventory?: Pick<Inventory, 'add' | 'remove' | 'canAdd'>;
   /** set_vehicle: park a vehicle (W1-A's vehicle state); a host without it logs and the cutscene goes on. */
-  setVehicle?: (vehicle: VehicleState) => void;
+  setVehicle?: (vehicle: ParkedVehicle) => void;
   /** end_game, after its card was confirmed: leave for the title (no save). A host without it logs. */
   endGame?: () => void | Promise<void>;
   /** end_game's card (lines split on \n, the last one the title); without it the text is a dialog line. */
@@ -226,7 +231,7 @@ export class CutsceneManager {
 
   private setVehicle(step: CutsceneStep): void {
     const v = cutsceneVehicle(step);
-    if (!v) { console.error('Cutscene set_vehicle step needs vehicle, map, x and y:', step); return; }
+    if (!v) { console.error('Cutscene set_vehicle step needs vehicle, map, and at or x and y:', step); return; }
     if (!this.deps.setVehicle) { console.error(`Cutscene set_vehicle ${v.type} skipped: this host has no vehicles`); return; }
     this.deps.setVehicle(v);
   }

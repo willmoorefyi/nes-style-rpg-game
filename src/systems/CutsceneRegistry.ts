@@ -8,7 +8,8 @@ function validDim(dim: unknown): boolean {
 
 /**
  * Why a script can't be played, or null (T2): an unknown step type, a warp without a map and place, a `dim` outside
- * (0, 1], a give_item / take_item without an item, a set_vehicle without vehicle, map and x / y, an end_game whose
+ * (0, 1], a give_item / take_item without an item, a set_vehicle without vehicle, map and a place (a spot `at`, NW-1,
+ * or x / y), an end_game whose
  * `text` is not a string.
  */
 export function scriptProblem(steps: readonly CutsceneStep[]): string | null {
@@ -18,7 +19,7 @@ export function scriptProblem(steps: readonly CutsceneStep[]): string | null {
     if ((step.type === 'give_item' || step.type === 'take_item') && (typeof step.item !== 'string' || !step.item)) {
       return `step ${i} is a ${step.type} without an item`;
     }
-    if (step.type === 'set_vehicle' && !cutsceneVehicle(step)) return `step ${i} is a set_vehicle without vehicle, map, x and y`;
+    if (step.type === 'set_vehicle' && !cutsceneVehicle(step)) return `step ${i} is a set_vehicle without vehicle, map, and at or x and y`;
     if (step.type === 'end_game' && step.text !== undefined && typeof step.text !== 'string') {
       return `step ${i} is an end_game whose text is not a string`;
     }

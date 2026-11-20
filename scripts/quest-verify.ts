@@ -2,6 +2,7 @@
  * The progression-gap verifier (docs/QUEST_PLAN.md 5, docs/WORLD_PLAN.md 6.0, 7):
  *
  *   npm run quest -- [--strict] [--mutate] [--stage S11] [--json /tmp/<agent>/quest.json] [--only abc] [--root DIR]
+ *     [--maps DIR] [--anchors FILE] [--worst-canoe]   (NW-1: a scratch world compile, its anchors, proof (h)'s worst run)
  *
  * Proofs (a)-(c) are W1-H's (src/progression/questProofs.ts). Proofs (d)-(h) and `--mutate` come from W1-I's
  * questProofsLate.ts and questMutate.ts, loaded when present: without them the default run reports (a)-(c) only,
@@ -12,6 +13,7 @@ import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { loadQuestWorld } from '../src/progression/questData.js';
 import { createQuestContext } from '../src/progression/questProofs.js';
+import { attachLate, loadLateData } from '../src/progression/questLateData.js';
 import {
   buildReport, CORE_PROOFS, formatReport, isLateProofModule, isMutateModule, LATE_PROOFS, missingProof, parseArgs,
   runCoreProofs,
@@ -27,8 +29,9 @@ async function loadModule(root: string, name: string): Promise<unknown> {
 async function main(): Promise<number> {
   const args = parseArgs(process.argv.slice(2));
   const root = resolve(args.root ?? process.cwd());
-  const world = loadQuestWorld({ root });
-  const ctx = createQuestContext(world, { stage: args.stage, strict: args.strict });
+  const world = loadQuestWorld({ root, mapsDir: args.maps ? resolve(args.maps) : undefined });
+  const ctx = attachLate(createQuestContext(world, { stage: args.stage, strict: args.strict }),
+    loadLateData(root, { anchors: args.anchors ? resolve(args.anchors) : undefined, worstCanoe: args.worstCanoe }));
   const wanted = (p: ProofId): boolean => !args.only || args.only.has(p);
   const coreOnly = new Set(CORE_PROOFS.filter(wanted));
   const proofs: ProofResult[] = coreOnly.size ? runCoreProofs(ctx, coreOnly) : [];

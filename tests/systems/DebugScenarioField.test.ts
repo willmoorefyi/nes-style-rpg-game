@@ -47,6 +47,36 @@ describe('DebugScenarioLoader field mode', () => {
     expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
   });
 
+  // NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): a spot spawn and a vehicle's spot become cells when the scenario starts
+  const spotData = {
+    loadMapManifest: vi.fn(async () => [] as string[]),
+    loadMap: vi.fn(async (path: string) => ({ id: path.includes('cave') ? 'cave' : 'overworld',
+      spots: path.includes('cave') ? {} : {
+        t_s_meadow: { at: [5, 6], kind: 'land' }, t_s_quay: { at: [7, 8], kind: 'dock' },
+        t_s_field: { at: [9, 2], kind: 'landing' } } }) as unknown as MapData),
+  };
+  const atSpot: DebugScenario = { ...field, map: 'overworld', spawn: undefined, spot: 't_s_meadow',
+    vehicles: [{ type: 'ship', map: 'overworld', at: 't_s_quay' }, { type: 'airship', map: 'overworld', x: 1, y: 2 }] };
+
+  it('NW-1: a spot spawn and the vehicles\' spots resolve to cells on the maps they name', async () => {
+    const game = { ...fakeGame(), data: spotData, pendingEntrance: null as string | null, vehicles: [] as unknown[] };
+    await new DebugScenarioLoader(game as unknown as Game).run(atSpot);
+    expect(game.playerPosition).toEqual({ x: 5, y: 6 });
+    expect(game.vehicles).toEqual([{ type: 'ship', map: 'overworld', x: 7, y: 8 }, { type: 'airship', map: 'overworld', x: 1, y: 2 }]);
+    expect(spotData.loadMap).toHaveBeenCalledTimes(1);   // each map read once
+    expect(game.scenes.switchTo).toHaveBeenCalledWith('exploration');
+  });
+
+  it('NW-1: an unknown spot throws before the game changes', async () => {
+    const game = { ...fakeGame(), data: spotData, pendingEntrance: null as string | null, vehicles: [] as unknown[] };
+    await expect(new DebugScenarioLoader(game as unknown as Game).run({ ...atSpot, spot: 't_s_nowhere' }))
+      .rejects.toThrow(/map overworld has no spot t_s_nowhere/);
+    await expect(new DebugScenarioLoader(game as unknown as Game).run({ ...atSpot,
+      vehicles: [{ type: 'ship', map: 'cave', at: 't_s_quay' }] })).rejects.toThrow(/map cave has no spot t_s_quay/);
+    expect(game.currentMapId).toBe('');
+    expect(game.scenes.switchTo).not.toHaveBeenCalled();
+  });
+
   it('every field scenario in debug-scenarios.yaml spawns on a walkable tile', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
     const fields = scenarios.filter((s) => s.mode === 'field');
@@ -59,10 +89,11 @@ describe('DebugScenarioLoader field mode', () => {
       expect(variants.length, `${s.id}: map ${s.map} exists`).toBeGreaterThan(0);
       for (const f of variants) {
         const map = parse(readFileSync(resolve(root, f), 'utf-8')) as
-          { width: number; collision: number[]; entrances?: Record<string, [number, number]> } & Pick<MapData, 'world'>;
+          { width: number; collision: number[]; entrances?: Record<string, [number, number]> } & Pick<MapData, 'world' | 'spots'>;
         if (s.entrance && !map.entrances?.[s.entrance]) throw new Error(`${s.id}: ${f} has no entrance ${s.entrance}`);
-        // GAP-18 (W1-B): a `frame: a1` spawn is an act-1 cell, moved by the map's world.frames.a1.origin
-        const [x, y] = s.entrance ? map.entrances![s.entrance] : scenarioSpawn(s, map);
+        if (s.spot && !map.spots?.[s.spot]) throw new Error(`${s.id}: ${f} has no spot ${s.spot}`);
+        // GAP-18 (W1-B): a `frame: a1` spawn is an act-1 cell, moved by the map's world.frames.a1.origin; NW-1: a spot
+        const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spot ? map.spots![s.spot].at : scenarioSpawn(s, map);
         expect([1, 2], `${s.id} spawn in ${f}`).not.toContain(map.collision[y * map.width + x]);
       }
     }

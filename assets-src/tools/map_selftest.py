@@ -286,4 +286,5 @@ def run(B) -> int:
         expect_error({**base, "terrain": "organic"}, "needs assets-src/tools/terrain/")
     ok += 2
     ok += __import__("recolor_selftest").run(B)     # W8: the restyled north-bridge debris matches the stubs
+    ok += __import__("nw1_selftest").run(B)         # NW-1: spots (passthrough, kinds), the atlas cell size
     return ok

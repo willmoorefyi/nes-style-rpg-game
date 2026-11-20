@@ -67,6 +67,8 @@ export interface LateData {
   docksAllowed: Readonly<Record<string, string>>;
   /** World-map coordinates = map coordinates + this offset (the legacy 72x72 act-1 map: the A1 origin). */
   worldOffset?: [number, number];
+  /** NW-1 `--worst-canoe` (docs/NATURAL_WORLD_PLAN.md 4.3): proof (h) runs rows T0-T4 again with the canoe. */
+  worstCanoe?: boolean;
 }
 
 export interface LateInput {
@@ -80,16 +82,22 @@ export interface LateInput {
   docksAllowed?: Record<string, string>;
 }
 
+/** The anchors file's bands (tolerance, fit.scale, longPair, ratio, bearing) come from the file, never from code
+ *  defaults: pass W's file and NW's re-fitted one differ (docs/NATURAL_WORLD_PLAN.md 4.2). A missing band throws. */
 function geoOf(raw: unknown): GeoData | null {
   if (!raw || typeof raw !== 'object') return null;
   const g = raw as Record<string, unknown>;
   const fit = (g.fit ?? {}) as Record<string, unknown>;
+  const need = <T>(v: unknown, key: string): T => {
+    if (v === undefined || v === null) throw new Error(`world-anchors: missing ${key}`);
+    return v as T;
+  };
   return {
-    tolerance: Number(g.tolerance ?? 2),
-    scale: (fit.scale as [number, number]) ?? [0.6, 0.8],
-    longPair: Number(fit.longPair ?? 20),
-    ratio: (fit.ratio as GeoData['ratio']) ?? { long: [0.7, 1.3], short: [0.55, 1.6] },
-    bearing: (fit.bearing as GeoData['bearing']) ?? { long: 40, short: 60 },
+    tolerance: Number(need(g.tolerance, 'tolerance')),
+    scale: need<[number, number]>(fit.scale, 'fit.scale'),
+    longPair: Number(need(fit.longPair, 'fit.longPair')),
+    ratio: need<GeoData['ratio']>(fit.ratio, 'fit.ratio'),
+    bearing: need<GeoData['bearing']>(fit.bearing, 'fit.bearing'),
     anchors: (g.anchors as GeoAnchor[]) ?? [],
     pairs: (g.pairs as Array<[string, string]>) ?? [],
     distanceExempt: (g.distanceExempt as Array<[string, string]>) ?? [],
@@ -121,16 +129,18 @@ function readYaml(path: string): unknown {
   return existsSync(path) ? parse(readFileSync(path, 'utf-8')) : undefined;
 }
 
-/** The repository's late data (assets/data). */
-export function loadLateData(root: string = process.cwd()): LateData {
+/** The repository's late data (assets/data); `anchors` replaces `world-anchors.yaml` (NW-1 `--anchors FILE`). */
+export function loadLateData(root: string = process.cwd(), opts: { anchors?: string; worstCanoe?: boolean } = {}): LateData {
   const d = join(root, 'assets/data');
-  return buildLateData({
+  if (opts.anchors && !existsSync(opts.anchors)) throw new Error(`--anchors ${opts.anchors}: no such file`);
+  const late = buildLateData({
     enemies: readYaml(join(d, 'enemies.yaml')) as LateInput['enemies'],
     items: readYaml(join(d, 'items.yaml')) as LateInput['items'],
     spells: readYaml(join(d, 'spells.yaml')) as LateInput['spells'],
     kits: readYaml(join(d, 'kits.yaml')) as LateInput['kits'],
-    geo: readYaml(join(d, 'world-anchors.yaml')),
+    geo: readYaml(opts.anchors ?? join(d, 'world-anchors.yaml')),
   });
+  return opts.worstCanoe ? { ...late, worstCanoe: true } : late;
 }
 
 const LATE = new WeakMap<QuestContext, LateData>();
@@ -140,16 +150,17 @@ export function attachLate(ctx: QuestContext, data: LateData): QuestContext {
   return ctx;
 }
 
-/** `--root DIR` of the CLI's arguments (the late data is read from the same repository as the world). */
-function argRoot(): string {
-  const i = process.argv.indexOf('--root');
-  return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : process.cwd();
+/** A `--flag VALUE` of the CLI's arguments (the late data is read from the same repository as the world). */
+function argValue(flag: string): string | undefined {
+  const i = process.argv.indexOf(flag);
+  return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : undefined;
 }
 
 export function lateOf(ctx: QuestContext): LateData {
   let d = LATE.get(ctx);
   if (!d) {
-    d = loadLateData(argRoot());
+    d = loadLateData(argValue('--root') ?? process.cwd(),
+      { anchors: argValue('--anchors'), worstCanoe: process.argv.includes('--worst-canoe') });
     LATE.set(ctx, d);
   }
   return d;

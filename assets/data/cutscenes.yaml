@@ -424,8 +424,7 @@
     - type: set_vehicle
       vehicle: airship
       map: overworld
-      x: 149
-      y: 162
+      at: fir_s_airship            # NW-1: a spot of the world map (docs/NATURAL_WORLD_PLAN.md 5.2), today (149, 162)
     - type: fade_in
       duration: 700
     - type: dialog

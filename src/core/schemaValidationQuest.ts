@@ -4,7 +4,7 @@
  * declared progression DAG, `assets/data/quest.yaml`. `validateMapData` calls `validateQuestMapFields`.
  */
 import { ValidationError } from './schemaValidation.js';
-import { FIELD_MODES, type QuestData } from '../types/index.js';
+import { FIELD_MODES, SPOT_KINDS, type QuestData } from '../types/index.js';
 
 type Obj = Record<string, unknown>;
 
@@ -52,6 +52,32 @@ function mode(path: string, value: unknown): void {
   }
 }
 
+/** `MapData.world`: `frames` (optional since NW-1), the composer's `basins` (name -> cell) and `cuts` (name -> cells). */
+function validateWorld(w: unknown): void {
+  want('MapData.world', w, 'object');
+  const world = w as Obj;
+  if (world.frames !== undefined) {
+    want('MapData.world.frames', world.frames, 'object');
+    const a1 = (world.frames as Obj).a1;
+    if (a1 !== undefined) {
+      want('MapData.world.frames.a1', a1, 'object');
+      cell('MapData.world.frames.a1.origin', (a1 as Obj).origin);
+      cell('MapData.world.frames.a1.size', (a1 as Obj).size);
+    }
+  }
+  if (world.basins !== undefined) {
+    want('MapData.world.basins', world.basins, 'object');
+    for (const [k, c] of Object.entries(world.basins as Obj)) cell(`MapData.world.basins.${k}`, c);
+  }
+  if (world.cuts !== undefined) {
+    want('MapData.world.cuts', world.cuts, 'object');
+    for (const [k, cs] of Object.entries(world.cuts as Obj)) {
+      want(`MapData.world.cuts.${k}`, cs, 'array');
+      (cs as unknown[]).forEach((c, i) => cell(`MapData.world.cuts.${k}[${i}]`, c));
+    }
+  }
+}
+
 /** The pass W fields of a map (all optional; their owners implement them). */
 export function validateQuestMapFields(m: Obj): void {
   list('MapData.docks', m.docks, (p, d) => {
@@ -72,14 +98,15 @@ export function validateQuestMapFields(m: Obj): void {
     want('MapData.exit.map', e.map, 'string');
     want('MapData.exit.entrance', e.entrance, 'string');
   }
-  if (m.world !== undefined) {
-    want('MapData.world', m.world, 'object');
-    want('MapData.world.frames', (m.world as Obj).frames, 'object');
-    const a1 = ((m.world as Obj).frames as Obj).a1;
-    if (a1 !== undefined) {
-      want('MapData.world.frames.a1', a1, 'object');
-      cell('MapData.world.frames.a1.origin', (a1 as Obj).origin);
-      cell('MapData.world.frames.a1.size', (a1 as Obj).size);
+  if (m.world !== undefined) validateWorld(m.world);
+  if (m.spots !== undefined) {
+    want('MapData.spots', m.spots, 'object');
+    for (const [name, s] of Object.entries(m.spots as Obj)) {
+      want(`MapData.spots.${name}`, s, 'object');
+      cell(`MapData.spots.${name}.at`, (s as Obj).at);
+      if (!(SPOT_KINDS as readonly unknown[]).includes((s as Obj).kind)) {
+        throw new ValidationError(`MapData.spots.${name}.kind: expected one of ${SPOT_KINDS.join(', ')}`);
+      }
     }
   }
   for (const key of ['keyItemGates', 'transitions', 'scriptedEncounters', 'vehicles'] as const) {
@@ -104,6 +131,22 @@ export function validateQuestMapFields(m: Obj): void {
 }
 
 const STAGE_ID = /^S\d+$/;
+
+/** The world map's id: its places are named (spots, `ref`), never raw cells (NW-1, D-NW10). */
+const WORLD_MAP = 'overworld';
+
+/** A place `{map, at}` (a spot of the map) or `{map, x, y}`; on the world map only `at`. */
+function place(path: string, o: Obj): void {
+  want(`${path}.map`, o.map, 'string');
+  if (o.at !== undefined) {
+    want(`${path}.at`, o.at, 'string');
+    if (o.x !== undefined || o.y !== undefined) throw new ValidationError(`${path}: at or x / y, not both`);
+  } else if (o.map === WORLD_MAP) {
+    throw new ValidationError(`${path}: a place on ${WORLD_MAP} is a spot (at: <name>), not x / y (NW-1)`);
+  } else {
+    want(`${path}.x`, o.x, 'number'); want(`${path}.y`, o.y, 'number');
+  }
+}
 
 function needs(path: string, value: unknown): void {
   want(path, value, 'object');
@@ -131,7 +174,13 @@ function validateStage(p: string, s: Obj): void {
   for (const [name, c] of Object.entries(s.basins as Obj)) cell(`${p}.basins.${name}`, c);
   list(`${p}.nonLoadBearing`, s.nonLoadBearing, (q, n) => {
     for (const k of ['map', 'kind', 'reason']) want(`${q}.${k}`, n[k], 'string');
-    cell(`${q}.at`, n.at);
+    if (n.map === WORLD_MAP) {
+      if (n.at !== undefined) throw new ValidationError(`${q}.at: name the ${WORLD_MAP} element with ref (NW-1)`);
+      want(`${q}.ref`, n.ref, 'string');
+    } else {
+      cell(`${q}.at`, n.at);
+      opt(`${q}.ref`, n.ref, 'string');
+    }
     for (const k of ['element', 'stage']) if (n[k] !== undefined) want(`${q}.${k}`, n[k], 'string');
     if (n.kind === 'quest' && n.element === undefined) throw new ValidationError(`${q}.element: required for kind quest`);
   });
@@ -139,8 +188,9 @@ function validateStage(p: string, s: Obj): void {
   if (s.entry !== undefined) {
     want(`${p}.entry`, s.entry, 'object');
     const e = s.entry as Obj;
-    want(`${p}.entry.map`, e.map, 'string'); want(`${p}.entry.x`, e.x, 'number'); want(`${p}.entry.y`, e.y, 'number');
+    place(`${p}.entry`, e);
     mode(`${p}.entry.mode`, e.mode);
+    list(`${p}.entry.vehicles`, e.vehicles, (q, v) => { want(`${q}.type`, v.type, 'string'); place(q, v); });
   }
   opt(`${p}.optional`, s.optional, 'boolean');
   optStrings(`${p}.milestones`, s.milestones);

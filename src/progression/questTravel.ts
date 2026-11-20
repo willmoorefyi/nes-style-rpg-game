@@ -131,8 +131,11 @@ function basinRow(ctx: QuestContext, map: MapData, row: TravelRow, vehicles: Veh
     }
   }
   const [ox, oy] = worldOffsetOf(map);
+  // the composer writes the seeds into the map (`world.basins`, NW-1); a map without them (a fixture) has pass W's
+  const seeds = map.world?.basins ?? BASIN_SEEDS;
   const inComp = (b: string): boolean => {
-    const [x, y] = BASIN_SEEDS[b];
+    if (!seeds[b]) return false;
+    const [x, y] = seeds[b];
     return comp.cellSet.has((y - oy) * w + (x - ox));
   };
   for (const b of row.basins?.holds ?? []) if (!inComp(b)) out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} the ship's water lacks ${b}`));
@@ -184,8 +187,21 @@ export function dockFailures(ctx: QuestContext): ProofFailure[] {
   return out;
 }
 
+/** The rows `--worst-canoe` adds (docs/NATURAL_WORLD_PLAN.md 4.3): T0-T4 again with the canoe (every river and lake
+ *  passable). Each keeps its row's must-not-reach set, except that from T3 on (the ship past the canal reaches
+ *  Crescent's shore) the south lands may be reached, and none reaches a north anchor. */
+export function worstCanoeRows(rows: readonly TravelRow[]): TravelRow[] {
+  const south = new Set(['fir_volcano', 'fir_ice', 'fir_desert']);
+  return rows.filter((r) => ['T0', 'T1', 'T2', 'T3', 'T4'].includes(r.id)).map((r) => {
+    const keep = r.notReach.filter((t) => !(r.id === 'T3' || r.id === 'T4') || !south.has(t));
+    return { id: `${r.id}+canoe`, from: r.id, items: ['canoe'], reach: [],
+      notReach: [...new Set([...keep, ...AIRSHIP_ONLY])] };
+  });
+}
+
 export function proofTravel(ctx: QuestContext): ProofResult {
-  const rows = lateOf(ctx).travelRows;
+  const late = lateOf(ctx);
+  const rows = late.worstCanoe ? [...late.travelRows, ...worstCanoeRows(late.travelRows)] : late.travelRows;
   const outs = rows.map((r) => travelRow(ctx, rows, r));
   const failures = [...dockFailures(ctx), ...outs.flatMap((o) => o.failures)];
   const pending = outs.filter((o) => o.status === 'pending');

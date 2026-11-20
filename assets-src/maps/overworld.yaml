@@ -980,7 +980,8 @@ npcs:
   - text: ['A brass hatch juts from the dune. Scratched beside the latch: "She sleeps till the floatstone wakes her."', 'There is a socket beside
         it, shaped for a stone that weighs less than nothing.']
 keyItemGates:
-- x: 93
+- id: a1_bridge_gate_w
+  x: 93
   y: 96
   requiredFlag: BRIDGE_BUILT
   message:
@@ -988,7 +989,8 @@ keyItemGates:
     text: ['The King''s builders are at work on the bridge, but it isn''t finished yet.']
   - text: [The bridge has collapsed into the sea. Only the King's builders could repair it.]
   permanent: false
-- x: 94
+- id: a1_bridge_gate_e
+  x: 94
   y: 96
   requiredFlag: BRIDGE_BUILT
   message:
@@ -4094,11 +4096,138 @@ regions:
     checks:
       warp_leaves: true
       min_blob: {mountain: 3, sand: 3, forest: 3, ocean_inlet: 2}
+spots:
+  a1_s_cornelia:
+    at: [92, 111]
+    kind: land
+  a1_s_temple:
+    at: [79, 103]
+    kind: land
+  a1_s_temple_road:
+    at: [79, 106]
+    kind: land
+  a1_s_bridge:
+    at: [93, 98]
+    kind: land
+  a1_s_bridge_foot:
+    at: [93, 97]
+    kind: land
+  a1_s_north_shore:
+    at: [93, 92]
+    kind: land
+  a1_s_east:
+    at: [112, 110]
+    kind: land
+  a1_s_matoya:
+    at: [74, 76]
+    kind: land
+  a1_s_pravoka:
+    at: [131, 101]
+    kind: land
+  a1_s_pravoka_ship:
+    at: [132, 102]
+    kind: dock
+  a1_s_airship:
+    at: [93, 111]
+    kind: landing
+  a1_s_airship_se:
+    at: [94, 112]
+    kind: landing
+  a1_s_temple_airship:
+    at: [82, 104]
+    kind: landing
+  elf_s_keep:
+    at: [60, 125]
+    kind: land
+  elf_s_elfheim:
+    at: [82, 150]
+    kind: land
+  elf_s_port_ship:
+    at: [84, 147]
+    kind: dock
+  ert_s_dwarf:
+    at: [55, 104]
+    kind: land
+  ert_s_melmond:
+    at: [42, 112]
+    kind: land
+  ert_s_giant:
+    at: [28, 112]
+    kind: land
+  ert_s_earth_cave:
+    at: [30, 126]
+    kind: land
+  ert_s_dwarf_ship:
+    at: [59, 104]
+    kind: dock
+  ert_s_melmond_ship:
+    at: [43, 113]
+    kind: dock
+  ert_s_melmond_airship:
+    at: [40, 109]
+    kind: landing
+  fir_s_crescent:
+    at: [148, 124]
+    kind: land
+  fir_s_crescent_road:
+    at: [147, 124]
+    kind: land
+  fir_s_desert:
+    at: [143, 160]
+    kind: land
+  fir_s_hull:
+    at: [149, 163]
+    kind: land
+  fir_s_crescent_ship:
+    at: [146, 124]
+    kind: dock
+  fir_s_airship:
+    at: [149, 162]
+    kind: landing
+  ord_s_citadel:
+    at: [75, 31]
+    kind: land
+  ord_s_citadel_airship:
+    at: [75, 32]
+    kind: landing
+  ord_s_bahamut_airship:
+    at: [106, 55]
+    kind: landing
+  wat_s_onrac:
+    at: [28, 39]
+    kind: land
+  wat_s_onrac_airship:
+    at: [26, 39]
+    kind: landing
+  wat_s_caravan_airship:
+    at: [12, 30]
+    kind: landing
+  wnd_s_gaia:
+    at: [150, 14]
+    kind: land
+  wnd_s_gaia_airship:
+    at: [152, 16]
+    kind: landing
+  wnd_s_sky_airship:
+    at: [135, 38]
+    kind: landing
+  wnd_s_mirage_airship:
+    at: [136, 38]
+    kind: landing
+  wnd_s_lufenia_airship:
+    at: [155, 48]
+    kind: landing
+  wnd_s_ship:
+    at: [172, 62]
+    kind: dock
 world:
   frames:
     a1:
       origin: [64, 64]
       size: [72, 72]
+  basins:
+    aldi: [92, 121]
+    ocean: [2, 2]
   cuts:
     W_west:
     - [62, 84]

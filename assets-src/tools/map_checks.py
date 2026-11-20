@@ -35,7 +35,8 @@ reachable exit. Opt-in per source map:
 Also always on, for `encounters` and `encounterZones`: every table entry has a weight and exactly one of `enemies`
 (ids) or `groups` ({id, min, max?} with 0 <= min <= max); a formation's largest roll is at most 9 enemies; every id is
 in assets/data/enemies.yaml. A zone has a unique id, inclusive [x0, y0, x1, y1] rects inside the map that cover at
-least one walkable cell, its own table and an optional encounterRate.
+least one walkable cell, its own table and an optional encounterRate. And for `spots` (NW-1, map_checks_spots.py):
+every spot lies on the map, on a cell of its kind (land walkable, dock Water, landing a Grass landing cell).
 
 Collision values are TerrainType (src/types/index.ts); BLOCKED is what blocks on foot. This module is the façade that
 build_map.py, map_report.py and map_selftest.py import: the helpers live in map_graph.py (walk graph),
@@ -48,6 +49,7 @@ from __future__ import annotations
 from map_checks_encounters import ENEMIES_FILE, MAX_FORMATION, encounter_errors, known_enemies, table_errors  # noqa: F401
 from map_checks_terrain import (CONTRAST_SAMPLE, LUMA_601, RIVER_SOURCES, _min_blob, _river_check, _road_check,  # noqa: F401
                                 _run, cell_luma, contrast_errors, contrast_pairs, ocean_inlets, road_caps)
+from map_checks_spots import spot_errors  # noqa: F401  (NW-1: spots lie on cells of their kind)
 from map_checks_util import _cells, _is_int, _touches, _unreachable  # noqa: F401
 from map_graph import (BLOCKED, COUNTER, DIRS, MOUNTAIN, RIVER, WALL, WATER, Cell, articulation_points,  # noqa: F401
                        components, distances, edge_cells, reach, static_npc_cells, talkable, walkable)
@@ -149,4 +151,5 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
     if src.get("contrast"):
         errors += contrast_errors(src, c)
     errors += encounter_errors(src, c)                 # encounter tables and zones: always
+    errors += spot_errors(src, c)                      # spots (NW-1): always, when the map has them
     return errors

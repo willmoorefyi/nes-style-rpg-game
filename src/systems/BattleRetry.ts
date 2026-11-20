@@ -1,4 +1,4 @@
-import type { FieldMode, SaveData, VehicleState } from '../types/index.js';
+import type { FieldMode, ParkedVehicle, SaveData } from '../types/index.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { Direction } from '../rendering/SpriteAnimation.js';
 import { PartyManager } from '../entities/PartyManager.js';
@@ -34,7 +34,7 @@ export interface BattleRetrySnapshot {
   /** The party's field mode and the parked vehicles when the battle began (GAP-12): a retry after a sea battle puts
    *  the party back on its ship. Missing (an older snapshot) means on foot with no vehicles. */
   mode?: FieldMode;
-  vehicles?: VehicleState[];
+  vehicles?: ParkedVehicle[];
 }
 
 /** The parts of Game the snapshot reads and writes. */
@@ -51,11 +51,11 @@ export interface RetryState {
   pendingEntrance: string | null;
   /** The party's field mode and the parked vehicles of every map (GAP-12; missing: on foot, none). */
   fieldMode?: FieldMode;
-  vehicles?: VehicleState[];
+  vehicles?: ParkedVehicle[];
   restoreState(data: {
     party: PartyManager; inventory: Inventory; flags: GameFlags;
     currentMap: string; playerPosition: { x: number; y: number }; playTime: number;
-    fieldMode?: FieldMode; vehicles?: VehicleState[];
+    fieldMode?: FieldMode; vehicles?: ParkedVehicle[];
   }): void;
 }
 

@@ -31,6 +31,15 @@ TRANSITIONS = [{"x": site.DOOR[0], "y": site.DOOR[1], "targetMap": site.TOWN, "t
                {"x": G.VOLCANO[0] + 1, "y": G.VOLCANO[1] + 1, "targetMap": "gurgu-b1", "targetEntrance": "arrival"},
                {"x": G.ICE_MOUTH[0] + 1, "y": G.ICE_MOUTH[1] + 1, "targetMap": "ice-cavern-b1",
                 "targetEntrance": "arrival"}]
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the places quest.yaml, the scenarios and the cutscenes name
+SPOTS = {
+    "fir_s_crescent": {"at": [148, 124], "kind": "land"},       # Crescent's land gate: S16
+    "fir_s_crescent_road": {"at": [147, 124], "kind": "land"},  # beside it, off the dock: S15
+    "fir_s_desert": {"at": [143, 160], "kind": "land"},         # below the buried hull's hatch: S17
+    "fir_s_hull": {"at": [149, 163], "kind": "land"},           # by the raised airship: S18
+    "fir_s_crescent_ship": {"at": [146, 124], "kind": "dock"},  # the ship at the fir_crescent dock
+    "fir_s_airship": {"at": [149, 162], "kind": "landing"},     # where fir_airship_rises parks the airship
+}
 
 
 def _mine(band: set[Cell]) -> np.ndarray:
@@ -90,4 +99,5 @@ def build(band: set[Cell]) -> RegionOut:
         encounterZones=D.zones(by_zone, row_rects), battleBackgrounds={"zones": D.backdrops()}, checks=checks,
         ambient=[dict(a) for a in D.SMOKE],
         barriers={"crescent_ring": (set(cells["ring"]), a, s)}, walls=cells["walls"],
+        spots={k: dict(v) for k, v in SPOTS.items()},
         notes=[f"fire: shore {len(north)} cells, south lands {len(south)} cells, ring {len(cells['ring'])} cells"])

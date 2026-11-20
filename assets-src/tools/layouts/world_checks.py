@@ -138,6 +138,9 @@ def ids(outs: dict[str, RegionOut]) -> list[str]:
     for r, out in outs.items():
         legacy = set(out.checks.get("legacy_ids") or [])
         named = [("entrance", e) for e in out.entrances] + [("NPC", n.get("id")) for n in out.npcs]
+        named += [("spot", s) for s in out.spots]                     # NW-1: `<prefix>_s_<name>`
+        errs += [f"{r}: spot id {s!r} is not {PREFIXES[r]}_s_<name>" for s in out.spots
+                 if not s.startswith(PREFIXES[r] + "_s_")]
         for kind, items in (("zone", out.encounterZones), ("patch", out.patches), ("dock", out.docks),
                             ("hazard", out.hazards)):
             named += [(kind, i.get("id")) for i in items]

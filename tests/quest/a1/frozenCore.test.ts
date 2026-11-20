@@ -85,7 +85,8 @@ describe('the frozen act-1 core (WORLD_PLAN 2.5)', () => {
         return rest;
       }
       if (key === 'keyItemGates' && o.requiredFlag === 'BRIDGE_BUILT') {
-        const { message: _m, ...rest } = o;
+        // NW-1: the world's bridge gates are named (`id`, quest.yaml's nonLoadBearing `ref`)
+        const { message: _m, id: _id, ...rest } = o;
         return rest;
       }
       return item;

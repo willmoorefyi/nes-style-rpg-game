@@ -14,8 +14,8 @@ import { zoneAppliesTo } from '../../src/systems/EncounterSystem.js';
  */
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const map = parse(readFileSync(join(root, 'assets/maps/ai/overworld.yaml'), 'utf-8')) as MapData;
-const [OX, OY] = map.world?.frames.a1?.origin ?? [64, 64];
-const [SW, SH] = map.world?.frames.a1?.size ?? [72, 72];
+const [OX, OY] = map.world?.frames?.a1?.origin ?? [64, 64];
+const [SW, SH] = map.world?.frames?.a1?.size ?? [72, 72];
 const inAct1 = (x: number, y: number) => x >= OX && y >= OY && x < OX + SW && y < OY + SH;
 
 function zoneAt(x: number, y: number, mode: FieldMode): string | null {

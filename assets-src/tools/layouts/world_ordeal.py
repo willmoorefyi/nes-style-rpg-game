@@ -22,6 +22,12 @@ from world_api import BOXES, UNSET, Cell, RegionOut  # noqa: E402
 from world_geom import bbox  # noqa: E402
 
 WALK = frozenset(".fs,")
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the places quest.yaml and the scenarios name (a stage entry, the airship)
+SPOTS = {
+    "ord_s_citadel": {"at": [75, 31], "kind": "land"},          # below the Citadel's gate: S19
+    "ord_s_citadel_airship": {"at": [75, 32], "kind": "landing"},   # the meadow below it: S19
+    "ord_s_bahamut_airship": {"at": [106, 55], "kind": "landing"},  # by Bahamut's cave: scenario w_s19_start
+}
 
 
 def _mine(band: set[Cell]) -> np.ndarray:
@@ -72,4 +78,5 @@ def build(band: set[Cell]) -> RegionOut:
     return RegionOut(
         ground=rows, objects=objects, inspect=[dict(i) for i in D.INSPECT], transitions=[dict(t) for t in D.TRANSITIONS],
         entrances={k: list(v) for k, v in D.ENTRANCES.items()}, encounterZones=D.zones(by_zone, row_rects),
-        battleBackgrounds={"zones": D.backdrops()}, checks=checks, notes=[f"ordeal: walkable cells {sizes}"])
+        battleBackgrounds={"zones": D.backdrops()}, checks=checks, notes=[f"ordeal: walkable cells {sizes}"],
+        spots={k: dict(v) for k, v in SPOTS.items()})

@@ -57,6 +57,16 @@ export interface VehicleState {
   y: number;
 }
 
+/** A vehicle parked at a named spot of its map (`MapData.spots`), resolved to a cell when that map loads (NW-1). */
+export interface SpotVehicle {
+  type: VehicleType;
+  map: string;
+  at: string;
+}
+
+/** A parked vehicle as the game holds it: a cell, or a spot not resolved yet. A save stores cells only. */
+export type ParkedVehicle = VehicleState | SpotVehicle;
+
 /** A frame of the compiled world: the act-1 block's origin and size in world cells (GAP-17). */
 export interface MapWorldFrame {
   origin: CellXY;
@@ -65,7 +75,22 @@ export interface MapWorldFrame {
 
 /** `MapData.world` (GAP-17; written by W1-C2's compiler, read by W1-A's save and W1-B's debug loader). */
 export interface MapWorld {
-  frames: { a1?: MapWorldFrame };
+  /** Optional since NW-1: the 256x256 world has no act-1 frame (docs/NATURAL_WORLD_PLAN.md 3.6.5). */
+  frames?: { a1?: MapWorldFrame };
+  /** The basin seeds (`world_api.BASIN_SEEDS`, written by the composer since NW-1): the verifier's proof (h). */
+  basins?: Record<string, CellXY>;
+  /** The composer's wall and barrier cuts by name (the mutation rows GT-13 / GT-35). */
+  cuts?: Record<string, CellXY[]>;
+}
+
+/** The kinds of a spot: a walkable cell, a Water cell (a parked ship), a cell the airship lands on. */
+export const SPOT_KINDS = ['land', 'dock', 'landing'] as const;
+export type SpotKind = (typeof SPOT_KINDS)[number];
+
+/** A named overworld place that quest.yaml, the scenarios and the cutscenes name (`at:`, `spot:`; NW-1, D-NW10). */
+export interface MapSpot {
+  at: CellXY;
+  kind: SpotKind;
 }
 
 /** The fields pass W adds to `MapData`. */
@@ -75,6 +100,8 @@ export interface MapDataQuestFields {
   hazards?: Hazard[];
   exit?: MapExit;
   world?: MapWorld;
+  /** NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): `<prefix>_s_<name>` -> its cell and kind. */
+  spots?: Record<string, MapSpot>;
 }
 
 /** The fields pass W adds to `MapNPC` (trades GAP-3, tint, class upgrade GAP-8, takeGold GAP-15, clinic GAP-16). */
@@ -123,7 +150,10 @@ export interface QuestNeeds {
 export interface QuestNonLoadBearing {
   map: string;
   kind: string;
+  /** The element's cell; on the world map it comes from `ref` (resolved when the verifier loads the maps, NW-1). */
   at: CellXY;
+  /** The element by name (the world map, NW-1): a dock, gate, NPC or patch id of `map`, else a spot. */
+  ref?: string;
   reason: string;
   /** Matches only the element with this exact label (required for `kind: quest`, whose cell is always [0, 0]). */
   element?: string;
@@ -131,13 +161,18 @@ export interface QuestNonLoadBearing {
   stage?: string;
 }
 
-/** Where a stage's proofs start in assume mode (QUEST 5.1). */
+/**
+ * Where a stage's proofs start in assume mode (QUEST 5.1). On the world map the place is a spot (`at`) and so is
+ * each vehicle's (NW-1, D-NW10: x / y are refused there); `resolveQuestPlaces` fills in their cells from the map's
+ * `spots` when the verifier loads the maps, so the proofs only ever read cells.
+ */
 export interface QuestEntry {
   map: string;
+  at?: string;
   x: number;
   y: number;
   mode?: FieldMode;
-  vehicles?: VehicleState[];
+  vehicles?: Array<VehicleState & { at?: string }>;
 }
 
 export type QuestStatus = 'pending' | 'built';

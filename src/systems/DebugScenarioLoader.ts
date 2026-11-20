@@ -3,7 +3,7 @@ import { BattleTrigger, type BattleEndData } from './BattleTrigger.js';
 import type { EnemyAiPatterns } from '../scenes/battle/BattleSceneTypes.js';
 import type { StatusEffect } from '../battle/StatusEffects.js';
 import { applyDebugParty, isStatus, type DebugMember } from './debugParty.js';
-import type { FieldMode, MapData, VehicleState } from '../types/index.js';
+import type { FieldMode, MapData, ParkedVehicle, VehicleState } from '../types/index.js';
 import { fieldMapLoader } from './fieldTravel.js';
 
 export interface DebugScenario {
@@ -22,15 +22,18 @@ export interface DebugScenario {
   enemyStatus?: Record<number, string[]>;
   /** Optional start HP per enemy index as a fraction of its pool in (0, 1], e.g. `{ 0: 0.405 }` (CHAOS_FIX_PLAN C6-12b). */
   enemyHp?: Record<number, number>;
-  /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `entrance` (or the `spawn` cell). */
+  /** 'battle' (default) starts a battle; 'field' drops the party onto `map` at `entrance`, at the spot `spot`
+   *  (NW-1: `MapData.spots`) or at the `spawn` cell. */
   mode?: 'battle' | 'field';
   map?: string;
   spawn?: [number, number];
   entrance?: string;
+  spot?: string;
   /** `a1`: `spawn` is an act-1 cell, translated by the loaded map's `world.frames.a1.origin` (GAP-18; W1-B). */
   frame?: 'a1';
-  /** Parked vehicles and the party's field mode at the start (QUEST 4.1; W1-A). */
-  vehicles?: VehicleState[];
+  /** Parked vehicles and the party's field mode at the start (QUEST 4.1; W1-A); on the world map a vehicle names
+   *  a spot (`at`, NW-1), resolved to its cell when the scenario starts. */
+  vehicles?: ParkedVehicle[];
   fieldMode?: FieldMode;
 }
 
@@ -72,7 +75,7 @@ export function enemyHpOf(scenario: Pick<DebugScenario, 'id' | 'enemies' | 'enem
 
 /** The origin of a map's act-1 frame (`world.frames.a1.origin`, GAP-17), or [0, 0] on the act-1 map itself. */
 export function a1Origin(map: Pick<MapData, 'world'>): [number, number] {
-  const o = map.world?.frames.a1?.origin;
+  const o = map.world?.frames?.a1?.origin;
   return o ? [o[0], o[1]] : [0, 0];
 }
 
@@ -102,19 +105,40 @@ export class DebugScenarioLoader {
   }
 
   async applyAndExplore(scenario: DebugScenario): Promise<void> {
-    if (!scenario.map || (!scenario.spawn && !scenario.entrance)) {
-      throw new Error(`field scenario ${scenario.id} needs map and spawn or entrance`);
+    if (!scenario.map || (!scenario.spawn && !scenario.entrance && !scenario.spot)) {
+      throw new Error(`field scenario ${scenario.id} needs map and spawn, spot or entrance`);
     }
+    const spots = await this.resolveSpots(scenario);    // NW-1: before the game changes, so a bad spot leaves it be
     this.applyParty(scenario);
     this.game.currentMapId = scenario.map;
     this.game.pendingEntrance = scenario.entrance ?? null;
-    this.game.vehicles = (scenario.vehicles ?? []).map((v) => ({ ...v })); // W1-A: parked vehicles, the field mode
+    this.game.vehicles = spots.vehicles; // W1-A: parked vehicles (cells only), the field mode
     this.game.fieldMode = scenario.fieldMode ?? 'walking';
-    if (scenario.spawn) {
+    if (spots.spawn) this.game.playerPosition = { x: spots.spawn[0], y: spots.spawn[1] };
+    else if (scenario.spawn) {
       const [x, y] = scenario.frame ? await this.framedSpawn(scenario) : scenario.spawn;
       this.game.playerPosition = { x, y };
     }
     this.game.scenes.switchTo('exploration');
+  }
+
+  /** NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the `spot` spawn and every vehicle's `at` as cells, read from the maps
+   *  they name (each loaded once); an unknown spot throws. */
+  private async resolveSpots(scenario: DebugScenario): Promise<{ spawn?: [number, number]; vehicles: VehicleState[] }> {
+    const load = fieldMapLoader(this.game.data);
+    const maps = new Map<string, Promise<MapData>>();
+    const cell = async (map: string, name: string): Promise<[number, number]> => {
+      if (!maps.has(map)) maps.set(map, load(map));
+      const s = (await maps.get(map)!).spots?.[name];
+      if (!s) throw new Error(`Debug scenario ${scenario.id}: map ${map} has no spot ${name}`);
+      return [s.at[0], s.at[1]];
+    };
+    const vehicles: VehicleState[] = [];
+    for (const v of scenario.vehicles ?? []) {
+      const [x, y] = 'at' in v ? await cell(v.map, v.at) : [v.x, v.y];
+      vehicles.push({ type: v.type, map: v.map, x, y });
+    }
+    return { spawn: scenario.spot ? await cell(scenario.map ?? '', scenario.spot) : undefined, vehicles };
   }
 
   /** A `frame: a1` spawn on the map the field will load (GAP-18); a map that fails to load keeps the raw cell. */

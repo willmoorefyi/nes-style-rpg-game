@@ -54,29 +54,29 @@ quest:
   stages:
     - {id: S0, tranche: "-", grants: {flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE], items: [lute]},
        boss: [garland], band: [1, 50], status: built,
-       nonLoadBearing: [{map: overworld, kind: gate, at: [9, 3], reason: "the next gap cell's gate holds the crossing"},
-         {map: overworld, kind: gate, at: [10, 3], reason: "the next gap cell's gate holds the crossing"},
-         {map: overworld, kind: gate, at: [11, 3], reason: "the stub's gate holds the crossing"}]}
+       nonLoadBearing: [{map: overworld, kind: gate, ref: gap_w, reason: "the next gap cell's gate holds the crossing"},
+         {map: overworld, kind: gate, ref: gap_m, reason: "the next gap cell's gate holds the crossing"},
+         {map: overworld, kind: gate, ref: gap_e, reason: "the stub's gate holds the crossing"}]}
     - {id: S1, after: [S0], requires: {flags: [INTRO_COMPLETE]}, grants: {flags: [BRIDGE_BUILT]}, status: built}
     - {id: S2, after: [S1], requires: {flags: [BRIDGE_BUILT]}, grants: {flags: [BIKKE_DEFEATED], vehicles: [ship]},
        boss: [pirate], maps: [pravoka], status: built}
     - {id: S3, after: [S1], requires: {flags: [BRIDGE_BUILT]}, maps: [matoya-cave], status: built}
     - {id: S4, after: [S2], requires: {vehicles: [ship]}, maps: [elfheim], status: built,
-       nonLoadBearing: [{map: overworld, kind: dock, at: [12, 13], reason: "Elfland is also reached on foot from ert_dwarf"}]}
+       nonLoadBearing: [{map: overworld, kind: dock, ref: elf_port, reason: "Elfland is also reached on foot from ert_dwarf"}]}
     - {id: S5, after: [S4], requires: {vehicles: [ship]}, grants: {flags: [MARSH_GUARD_DEFEATED], items: [crown]},
        boss: [piscodemon], status: built}
     - {id: S6, after: [S5], requires: {flags: [MARSH_GUARD_DEFEATED], items: [crown]},
        grants: {flags: [ASTOS_DEFEATED], items: [crystal_eye]}, status: built,
-       nonLoadBearing: [{map: overworld, kind: npc, at: [17, 18], reason: "the crown is given only by the guard's victory"}]}
+       nonLoadBearing: [{map: overworld, kind: npc, ref: astos, reason: "the crown is given only by the guard's victory"}]}
     - {id: S7, after: [S6, S3], requires: {items: [crystal_eye]}, grants: {items: [herb]}, status: built}
     - {id: S8, after: [S7], requires: {items: [herb]}, grants: {flags: [PRINCE_AWAKE], items: [mystic_key]}, status: built}
     - {id: S9, after: [S8], requires: {items: [mystic_key]}, grants: {items: [tnt]}, status: built}
     - {id: S10, after: [S9], requires: {items: [tnt]}, grants: {flags: [CANAL_OPEN]}, status: built,
-       nonLoadBearing: [{map: overworld, kind: dock, at: [22, 13], reason: "the dwarves are also reached on foot from Elfland"}]}
+       nonLoadBearing: [{map: overworld, kind: dock, ref: ert_dwarf, reason: "the dwarves are also reached on foot from Elfland"}]}
     - {id: S11, after: [S10], requires: {flags: [CANAL_OPEN]}, grants: {flags: [VAMPIRE_DEFEATED], items: [ruby]},
        boss: [vampire], status: built}
     - {id: S12, after: [S11], requires: {items: [ruby]}, grants: {flags: [TITAN_FED], items: [rod]}, status: built,
-       nonLoadBearing: [{map: overworld, kind: npc, at: [46, 20], reason: "Sarda is behind the giant, who needs the ruby"}]}
+       nonLoadBearing: [{map: overworld, kind: npc, ref: sarda, reason: "Sarda is behind the giant, who needs the ruby"}]}
     - {id: S13, after: [S12], requires: {items: [rod]},
        grants: {flags: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT]}, boss: [lich],
        milestones: [EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE, EARTH_CRYSTAL_LIT], status: built}
@@ -104,7 +104,7 @@ quest:
        status: built}
     - {id: S29, after: [S13, S15, S24, S28], requires: {flags: [EARTH_CRYSTAL_LIT, FIRE_CRYSTAL_LIT, WATER_CRYSTAL_LIT,
        WIND_CRYSTAL_LIT], items: [lute]}, grants: {flags: [TIME_GATE_OPEN]}, status: built,
-       nonLoadBearing: [{map: overworld, kind: gate, at: [21, 25],
+       nonLoadBearing: [{map: overworld, kind: gate, ref: time_gate,
          reason: "EARTH_CRYSTAL_LIT already gates the canoe (S14), which every later stage needs"}]}
     - {id: S30, after: [S29], requires: {flags: [TIME_GATE_OPEN]},
        grants: {flags: [PAST_LICH_DEFEATED, PAST_ASHEN_DEFEATED, PAST_DROWNED_DEFEATED, PAST_SERAPH_DEFEATED,
@@ -165,9 +165,9 @@ maps:
       - {"x": 12, "y": 26, "targetMap": "lufenia", "targetEntrance": "gate"}
       - {"x": 22, "y": 25, "targetMap": "past-temple-1", "targetEntrance": "gate"}
     keyItemGates:
-      - {"x": 9, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "Unfinished.", "permanent": false}
-      - {"x": 10, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
-      - {"x": 11, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
+      - {"id": "gap_w", "x": 9, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "Unfinished.", "permanent": false}
+      - {"id": "gap_m", "x": 10, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
+      - {"id": "gap_e", "x": 11, "y": 3, "requiredFlag": "BRIDGE_BUILT", "message": "A gap.", "permanent": false}
       - {"x": 24, "y": 17, "requiredItem": "mystic_key", "message": "Locked.", "permanent": false}
       - {"x": 31, "y": 11, "requiredFlag": "CANAL_OPEN", "message": "Rock.", "permanent": false}
       - {"x": 37, "y": 5, "requiredItem": "canoe", "message": "A river.", "permanent": false}
@@ -176,7 +176,7 @@ maps:
       - {"x": 9, "y": 27, "requiredItem": "oxyale", "message": "Water.", "permanent": false}
       - {"x": 15, "y": 27, "requiredItem": "chime", "message": "A door.", "permanent": false}
       - {"x": 19, "y": 27, "requiredFlag": "SKY_FORTRESS_OPEN", "message": "Sky.", "permanent": false}
-      - {"x": 21, "y": 25, "requiredFlags": ["EARTH_CRYSTAL_LIT", "FIRE_CRYSTAL_LIT", "WATER_CRYSTAL_LIT", "WIND_CRYSTAL_LIT"], "requiredItem": "lute", "flag": "TIME_GATE_OPEN", "message": "Time.", "permanent": true}
+      - {"id": "time_gate", "x": 21, "y": 25, "requiredFlags": ["EARTH_CRYSTAL_LIT", "FIRE_CRYSTAL_LIT", "WATER_CRYSTAL_LIT", "WIND_CRYSTAL_LIT"], "requiredItem": "lute", "flag": "TIME_GATE_OPEN", "message": "Time.", "permanent": true}
     npcs:
       - {"id": "king", "x": 1, "y": 6, "cutscene": {"id": "king_order", "requiredFlag": "PRINCESS_RESCUED", "onceFlag": "INTRO_COMPLETE"}}
       - {"id": "princess", "x": 3, "y": 6, "showIf": "PRINCESS_RESCUED", "dialog": ["Take my lute."], "giftItem": "lute", "giftFlag": "A1_LUTE_GIVEN"}

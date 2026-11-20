@@ -29,7 +29,13 @@ import world_water_zones as world_zones  # noqa: E402
 from world_api import BOXES, UNSET, Cell, RegionOut  # noqa: E402
 from world_geom import bbox  # noqa: E402
 
-NOTES = ["water: the R-waterfall gorge (x 31-32, y 11-27) has no walkable bank; the ledge behind the falls is sand"]
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the places quest.yaml and the scenarios name (a stage entry, the airship)
+SPOTS = {
+    "wat_s_onrac": {"at": [28, 39], "kind": "land"},            # Onrac's land gate: S24
+    "wat_s_onrac_airship": {"at": [26, 39], "kind": "landing"},     # beside it: S24, scenarios w_s20/21/24
+    "wat_s_caravan_airship": {"at": [12, 30], "kind": "landing"},   # by the caravan: scenario w_s22_start
+}
+NOTES = ["water:the R-waterfall gorge (x 31-32, y 11-27) has no walkable bank; the ledge behind the falls is sand"]
 
 
 def build(band: set[Cell]) -> RegionOut:
@@ -42,4 +48,5 @@ def build(band: set[Cell]) -> RegionOut:
     checks = {"river_check": True, "warp_leaves": True, "min_blob": {"mountain": 3, "sand": 3, "forest": 3}}
     return RegionOut(ground=rows, objects=world_sites.objects(g), inspect=world_sites.inspect(),
                      transitions=world_sites.transitions(), entrances=world_sites.entrances(), encounterZones=zones,
-                     battleBackgrounds={"zones": backdrops}, notes=list(NOTES), checks=checks)
+                     battleBackgrounds={"zones": backdrops}, notes=list(NOTES), checks=checks,
+                     spots={k: dict(v) for k, v in SPOTS.items()})

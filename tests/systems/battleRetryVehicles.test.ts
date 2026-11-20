@@ -12,9 +12,9 @@ import { validateMapData } from '../../src/core/schemaValidation.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { Inventory } from '../../src/entities/Inventory.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
-import type { FieldMode, MapData, VehicleState } from '../../src/types/index.js';
+import type { FieldMode, MapData, ParkedVehicle, VehicleState } from '../../src/types/index.js';
 
-type Retry = RetryState & { fieldMode: FieldMode; vehicles: VehicleState[]; pendingFrame: 'a1' | null };
+type Retry = RetryState & { fieldMode: FieldMode; vehicles: ParkedVehicle[]; pendingFrame: 'a1' | null };
 
 /** The parts of Game the snapshot uses, restoring the way Game.restoreState does (missing mode: on foot). */
 function game(mode: FieldMode, x: number, y: number, vehicles: VehicleState[]): Retry {
@@ -38,7 +38,7 @@ describe('battle retry keeps the mode and the vehicles (GAP-12)', () => {
   it('records the mode and the parked vehicles, as a copy', () => {
     const g = game('ship', 12, 4, [{ ...AIRSHIP }]);
     const snap = captureBattleSnapshot(g, { enemyIds: ['sahagin'] })!;
-    g.vehicles[0].x = 99;
+    (g.vehicles[0] as VehicleState).x = 99;
     g.vehicles.push({ type: 'canoe', map: 'x', x: 0, y: 0 });
     g.fieldMode = 'walking';
     expect(snap.mode).toBe('ship');
@@ -64,7 +64,7 @@ describe('battle retry keeps the mode and the vehicles (GAP-12)', () => {
     const g = game('canoe', 3, 7, [{ ...AIRSHIP }]);
     const snap = captureBattleSnapshot(g, { enemyIds: ['crocodile'] })!;
     restoreBattleSnapshot(g, snap);
-    g.vehicles[0].x = 42;
+    (g.vehicles[0] as VehicleState).x = 42;
     restoreBattleSnapshot(g, snap);
     expect(g.vehicles).toEqual([AIRSHIP]);
     expect(g.fieldMode).toBe('canoe');
