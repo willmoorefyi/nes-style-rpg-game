@@ -30,8 +30,8 @@ stages:
     basins: {}
     nonLoadBearing:
       # GT-1, D-W13: world cells (act-1 (29, 32) and (30, 32) at the A1 origin (64, 64))
-      - {map: overworld, kind: gate, at: [93, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
-      - {map: overworld, kind: gate, at: [94, 96], reason: "redundant with north_bridge; the gap is water without the flag"}
+      - {map: overworld, kind: gate, ref: a1_bridge_gate_w, reason: "redundant with north_bridge; the gap is water without the flag"}
+      - {map: overworld, kind: gate, ref: a1_bridge_gate_e, reason: "redundant with north_bridge; the gap is water without the flag"}
       # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), added by W1-I like QUEST 4.5's bridge entries
       - {map: temple-of-fiends, kind: npc, at: [11, 6], reason: "Garland's hideIf only clears the beaten boss off his dais, a dead end"}
       # INT: the three elements a `--stage S0` run can't see (the run checks only S0's own (b), and S0 has no
@@ -74,7 +74,7 @@ stages:
     zones: [overworld:a1_mainland]
     grind: 2.0
     walk: []
-    entry: {map: overworld, x: 93, y: 92}
+    entry: {map: overworld, at: a1_s_north_shore}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -91,7 +91,7 @@ stages:
     zones: []
     grind: 1.0
     walk: [matoya-cave:npc:matoya]
-    entry: {map: overworld, x: 74, y: 76}
+    entry: {map: overworld, at: a1_s_matoya}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -113,13 +113,13 @@ stages:
     # brig appears at the a1_pravoka dock (overworld (132, 102)), boarded from the land gate (131, 101)
     walk: ["pravoka:battle:bikke", "overworld:vehicle:ship", "overworld:board:ship"]
     # the bridge's south stub foot: the span (BRIDGE_BUILT) is the way north to Pravoka
-    entry: {map: overworld, x: 93, y: 97, mode: walking}
+    entry: {map: overworld, at: a1_s_bridge_foot, mode: walking}
     basins: {}
     nonLoadBearing:
       # the generic mutation list (QUEST 5.4: a boss NPC's hideIf), as for Garland at S0
       - {map: pravoka, kind: npc, at: [40, 33], reason: "Bikke's hideIf only clears the beaten captain off the brig pier's end, a dead end"}
       # GT-4 in --stage S2 only: the full run catches the dock's removal as (c) SOFTLOCK (a caught row never reads this)
-      - {map: overworld, kind: dock, at: [132, 102], reason: "stage scope: @S2 holds once the brig spawns, and boarding needs no dock (W1-A); the full run catches GT-4 as SOFTLOCK"}
+      - {map: overworld, kind: dock, ref: a1_pravoka, reason: "stage scope: @S2 holds once the brig spawns, and boarding needs no dock (W1-A); the full run catches GT-4 as SOFTLOCK"}
     status: built
   # === end A1-T ===
   # === ELF-O (pass W: owned by ELF-O) ===
@@ -139,7 +139,7 @@ stages:
     walk: [western-keep-2f:npc:false_king, western-keep-2f:battle:ASTOS_DEFEATED]
     # INT-W2b: the ship moored at Elfheim's harbour (the `elf_port` dock), as the party came; without it the assumed
     # start parks S2's ship at Pravoka (its spawn), and the party on the moor is cut off from the mainland
-    entry: {map: overworld, x: 60, y: 125, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
+    entry: {map: overworld, at: elf_s_keep, vehicles: [{type: ship, map: overworld, at: elf_s_port_ship}]}
     basins: {}
     nonLoadBearing:
       # GT-6 and the generic NPC elements at Astos's cell: MARSH_GUARD_DEFEATED is redundant with the crown, which only
@@ -162,11 +162,11 @@ stages:
     grind: 2.0
     # board the brig at Pravoka, sail the Aldi south-west, land at Elfheim's harbour and walk in by the south gate
     walk: ["overworld:board:ship", "overworld:dock:elf_port", "overworld:warp:elfheim"]
-    entry: {map: overworld, x: 131, y: 101, mode: walking, vehicles: [{type: ship, map: overworld, x: 132, y: 102}]}
+    entry: {map: overworld, at: a1_s_pravoka, mode: walking, vehicles: [{type: ship, map: overworld, at: a1_s_pravoka_ship}]}
     basins: {}
     nonLoadBearing:
       # GT-5 (WORLD 6.3, P1), added by INT-W2a: with ERT-O's landing merged, the elf_port dock (ELF-O) is redundant
-      - {map: overworld, kind: dock, at: [84, 147], reason: "Elfland is also reachable on foot from ert_dwarf, the dwarves' landing, over seam_n"}
+      - {map: overworld, kind: dock, ref: elf_port, reason: "Elfland is also reachable on foot from ert_dwarf, the dwarves' landing, over seam_n"}
     status: built
   - id: S8
     title: "The prince wakes"
@@ -182,7 +182,7 @@ stages:
     grind: 1.0
     # the sleeping prince takes the herb (his cutscene elf_prince_wakes gives the Mystic Key, PRINCE_AWAKE)
     walk: ["elfheim-castle-chamber:npc:elfheim_prince"]
-    entry: {map: overworld, x: 82, y: 150, mode: walking, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
+    entry: {map: overworld, at: elf_s_elfheim, mode: walking, vehicles: [{type: ship, map: overworld, at: elf_s_port_ship}]}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -201,7 +201,7 @@ stages:
     # the vault's chest holds the TNT (the living gate in elfheim-castle, S8's map, opens to the Mystic Key first and
     # is settled before the walk starts, so it is not a step)
     walk: ["elfheim-vault:chest:tnt"]
-    entry: {map: overworld, x: 82, y: 150, mode: walking, vehicles: [{type: ship, map: overworld, x: 84, y: 147}]}
+    entry: {map: overworld, at: elf_s_elfheim, mode: walking, vehicles: [{type: ship, map: overworld, at: elf_s_port_ship}]}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -222,7 +222,7 @@ stages:
     # S5 needs the ship (it is what carries the party to Elfland), so the proofs start where S2 leaves it: on foot on
     # Pravoka's quay, the ship at the `a1_pravoka` dock (withheld, Elfland is out of reach). Then across the Aldi, down
     # B1's west stair and B2's stair to the barrow, and the bier (the guard's fight; `elf_d_crown` gives the crown)
-    entry: {map: overworld, x: 131, y: 101, mode: walking, vehicles: [{type: ship, map: overworld, x: 132, y: 102}]}
+    entry: {map: overworld, at: a1_s_pravoka, mode: walking, vehicles: [{type: ship, map: overworld, at: a1_s_pravoka_ship}]}
     walk: [overworld:warp:marsh-cave-b1, marsh-cave-b1:warp:marsh-cave-b2, marsh-cave-b2:warp:marsh-cave-b3,
       marsh-cave-b3:battle:MARSH_GUARD_DEFEATED]
     basins: {}
@@ -245,11 +245,11 @@ stages:
     zones: [overworld:ert_isthmus, overworld:ert_aldi, overworld:ert_sea, overworld:a1_north_sea, overworld:elf_sea]
     grind: 6.0
     # on foot at the hall's mouth, the ship moored at the dwarves' landing cove (the `ert_dwarf` dock)
-    entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
+    entry: {map: overworld, at: ert_s_dwarf, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_dwarf_ship}]}
     walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
     basins: {}
     nonLoadBearing:
-      - {map: overworld, kind: dock, at: [59, 104], reason: "the dwarf hall is also reachable on foot from Elfland over seam_n"}
+      - {map: overworld, kind: dock, ref: ert_dwarf, reason: "the dwarf hall is also reachable on foot from Elfland over seam_n"}
     status: built
   - id: S12
     title: "The giant's tunnel and Sarda"
@@ -264,7 +264,7 @@ stages:
     zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
     grind: 7.0
     # on foot at the tunnel's east mouth, the ship moored at Melmond's harbour (the `ert_melmond` dock)
-    entry: {map: overworld, x: 28, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    entry: {map: overworld, at: ert_s_giant, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_melmond_ship}]}
     walk: [overworld:warp:giant-tunnel, giant-tunnel:npc:ert_giant, giant-tunnel:warp:ert_giant_west,
       overworld:warp:sage-cave, sage-cave:npc:ert_sarda]
     basins: {}
@@ -291,8 +291,8 @@ stages:
     # 1F's south berth with the airship on the oasis meadow and the ship at the dwarves' quay (S10's); the walk takes
     # the chest and flies to Smyth. In a --stage S31 run the chest (an S28 map's event) stays in scope because it
     # gives S31's own requirement (outOfScopeEvents)
-    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, x: 135, y: 38},
-                                                                          {type: ship, map: overworld, x: 59, y: 104}]}
+    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, at: wnd_s_sky_airship},
+                                                                          {type: ship, map: overworld, at: ert_s_dwarf_ship}]}
     walk: [sky-castle-3f:chest:chest_adamant, dwarf-hall:npc:ert_smyth]
     basins: {}
     nonLoadBearing: []
@@ -315,8 +315,8 @@ stages:
     # ERT-T: on foot at Melmond's land gate, the airship on the plain's grass beside it (S17); the ship (S2) rides at
     # anchor far out at sea, out of reach of any shore, so no ancestor's pending dock can strand the party in assume
     # mode (WND-O's S26 practice)
-    entry: {map: overworld, x: 42, y: 112, mode: walking, vehicles: [{type: airship, map: overworld, x: 40, y: 109},
-                                                                      {type: ship, map: overworld, x: 172, y: 62}]}
+    entry: {map: overworld, at: ert_s_melmond, mode: walking, vehicles: [{type: airship, map: overworld, at: ert_s_melmond_airship},
+                                                                      {type: ship, map: overworld, at: wnd_s_ship}]}
     walk: [overworld:warp:melmond, melmond:warp:melmond-house-unne, melmond-house-unne:npc:ert_unne]
     basins: {}
     nonLoadBearing:
@@ -340,7 +340,7 @@ stages:
     grind: 7.0
     # where S10 ends, on foot at the dwarf hall's mouth with the ship at the landing cove (the `ert_dwarf` dock): the
     # cavern lies beyond the canal, so withholding CANAL_OPEN strands it (GT-12, GT-13 read S11's SKIP)
-    entry: {map: overworld, x: 55, y: 104, mode: walking, vehicles: [{type: ship, map: overworld, x: 59, y: 104}]}
+    entry: {map: overworld, at: ert_s_dwarf, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_dwarf_ship}]}
     # sail west through the canal to Melmond's harbour, walk to the badlands, down the split gallery and round the lake
     # to the crypt; the vampire's cutscene gives the ruby
     walk: [overworld:warp:cavern-earth-b1, cavern-earth-b3:battle:VAMPIRE_DEFEATED]
@@ -361,7 +361,7 @@ stages:
     maps: [cavern-earth-b4, cavern-earth-b5]
     zones: [overworld:ert_badlands]
     grind: 4.0
-    entry: {map: overworld, x: 30, y: 126, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    entry: {map: overworld, at: ert_s_earth_cave, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_melmond_ship}]}
     # the rod breaks B3's seal, the Sovereign falls on B5, his shade at the altar lights the crystal
     walk: [cavern-earth-b3:gate:EARTH_SEAL_BROKEN, cavern-earth-b5:battle:EARTH_CAVE_COMPLETE,
       cavern-earth-b5:npc:ert_d_altar_shade]
@@ -389,7 +389,7 @@ stages:
     grind: 4.0
     # the hatch of the buried hull (overworld (143, 159)) takes the stone and plays fir_airship_rises
     walk: ["overworld:cutscene:fir_hull_hatch"]
-    entry: {map: overworld, x: 143, y: 160, mode: walking}
+    entry: {map: overworld, at: fir_s_desert, mode: walking}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -412,7 +412,7 @@ stages:
     walk: ["overworld:board:ship", "overworld:warp:crescent", "crescent:warp:crescent-circle", "crescent-circle:npc:sage_elder"]
     # on foot by Melmond's harbour after the Cavern of Earth (S13), the ship moored at the ert_melmond dock: the ship
     # (S14's vehicle requirement) carries the party round to the fir_crescent dock
-    entry: {map: overworld, x: 42, y: 112, mode: walking, vehicles: [{type: ship, map: overworld, x: 43, y: 113}]}
+    entry: {map: overworld, at: ert_s_melmond, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_melmond_ship}]}
     basins: {}
     nonLoadBearing:
       # GT-20 in --stage S14 only: before S13 the stage scope starts at the new game's place with the ship moored at
@@ -436,7 +436,7 @@ stages:
     grind: 3.0
     # on foot on Crescent's shore by the fir_crescent dock, the ship moored there; paddle R-volcano to the mouth,
     # then down the five floors (B2's east stair to B3's north gallery) to the queen
-    entry: {map: overworld, x: 147, y: 124, mode: walking, vehicles: [{type: ship, map: overworld, x: 146, y: 124}]}
+    entry: {map: overworld, at: fir_s_crescent_road, mode: walking, vehicles: [{type: ship, map: overworld, at: fir_s_crescent_ship}]}
     walk: [overworld:warp:gurgu-b1, gurgu-b1:warp:gurgu-b2, gurgu-b2:warp:arrival, gurgu-b3:warp:gurgu-b4,
       gurgu-b4:warp:gurgu-b5, gurgu-b5:battle:ashen_queen]
     basins: {}
@@ -461,7 +461,7 @@ stages:
     # S16 needs the canoe (only a boat reaches the Frost Hollow, by R-ice), so the proofs start on foot at Crescent
     # Lake's gate with the ship at the `fir_crescent` dock; then down R-ice, B1's stair, the shelf (Hesk's cutscene
     # sets FIR_D2_SHELF), the stair behind it, and the eye's vault (its fight; `fir_evil_eye_falls` gives the stone)
-    entry: {map: overworld, x: 148, y: 124, mode: walking, vehicles: [{type: ship, map: overworld, x: 146, y: 124}]}
+    entry: {map: overworld, at: fir_s_crescent, mode: walking, vehicles: [{type: ship, map: overworld, at: fir_s_crescent_ship}]}
     walk: [overworld:warp:ice-cavern-b1, ice-cavern-b1:warp:ice-cavern-b2, ice-cavern-b2:cutscene:fir_d2_hesk,
       ice-cavern-b2:warp:ice-cavern-b3, ice-cavern-b3:battle:EVIL_EYE_DEFEATED]
     basins: {}
@@ -486,7 +486,7 @@ stages:
     grind: 2.0
     # fly from the desert to the plateau's meadow; take the throne (1F), cross the pad lattice (2F), win (3F)
     walk: ["citadel-1f:cutscene:stone_steward", "citadel-3f:battle:trial_guardian"]
-    entry: {map: overworld, x: 149, y: 163, mode: walking, vehicles: [{type: airship, map: overworld, x: 149, y: 162}, {type: ship, map: overworld, x: 146, y: 124}]}
+    entry: {map: overworld, at: fir_s_hull, mode: walking, vehicles: [{type: airship, map: overworld, at: fir_s_airship}, {type: ship, map: overworld, at: fir_s_crescent_ship}]}
     basins: {}
     nonLoadBearing:
       # the generic mutation list (QUEST 5.4) on the Citadel's own puzzles: none of them guards a stage grant
@@ -510,7 +510,7 @@ stages:
     grind: 2.0
     # fly from the citadel's meadow to Bahamut's isle; down the cave; lay the seal before Bahamut
     walk: ["bahamut-lair:cutscene:bahamut"]
-    entry: {map: overworld, x: 75, y: 31, mode: walking, vehicles: [{type: airship, map: overworld, x: 75, y: 32}, {type: ship, map: overworld, x: 146, y: 124}]}
+    entry: {map: overworld, at: ord_s_citadel, mode: walking, vehicles: [{type: airship, map: overworld, at: ord_s_citadel_airship}, {type: ship, map: overworld, at: fir_s_crescent_ship}]}
     basins: {}
     nonLoadBearing: []
     optional: true
@@ -531,7 +531,7 @@ stages:
     grind: 2.0
     walk: [waterfall-cave:gift:cube]
     # Cornelia's south gate, the airship landed beside it: WATER is airship-only (2.8), so (b) sees the airship's part
-    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
+    entry: {map: overworld, at: a1_s_cornelia, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_airship}]}
     basins: {}
     nonLoadBearing:
       # the generic list (QUEST 5.4): the cube comes from the automaton's gift; the requiredFlag only plays the
@@ -552,7 +552,7 @@ stages:
     grind: 2.0
     walk: [caravan-camp:gift:fairy_bottle]
     # Cornelia's south gate, the airship landed beside it (as S21)
-    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
+    entry: {map: overworld, at: a1_s_cornelia, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_airship}]}
     basins: {}
     nonLoadBearing: []
     status: built
@@ -572,7 +572,7 @@ stages:
     grind: 7.0
     # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
     # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door
-    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 93, y: 111}]}
+    entry: {map: overworld, at: a1_s_cornelia, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_airship}]}
     walk: [overworld:warp:onrac]
     basins: {}
     nonLoadBearing: []
@@ -594,7 +594,7 @@ stages:
     # at Onrac's gate with the airship landed beside it (as S20 leaves it): into the town, through the dry dock's
     # oxyale gate (WAT-T's submarine) to the nave's pier on sea-shrine-b3, down the east stairwell to B4, the halls'
     # stair to B5, and the throne. Withholding the oxyale shuts the gate (proof (b))
-    entry: {map: overworld, x: 28, y: 39, mode: walking, vehicles: [{type: airship, map: overworld, x: 26, y: 39}]}
+    entry: {map: overworld, at: wat_s_onrac, mode: walking, vehicles: [{type: airship, map: overworld, at: wat_s_onrac_airship}]}
     walk: [overworld:warp:onrac, onrac:warp:sea-shrine-b3, sea-shrine-b3:warp:sea-shrine-b4, sea-shrine-b4:warp:sea-shrine-b5,
       sea-shrine-b5:battle:WATER_CRYSTAL_LIT]
     basins: {}
@@ -619,8 +619,8 @@ stages:
     # WND-O: the assumed start is Cornelia's south gate with the airship on the grass below it (S26 needs the flight
     # to the mesa); the ship (S2) rides at anchor off the mesa, out of reach of any shore, so no ancestor's pending
     # dock can strand the party in assume mode
-    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
-                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    entry: {map: overworld, at: a1_s_cornelia, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_airship_se},
+                                                                     {type: ship, map: overworld, at: wnd_s_ship}]}
     walk: [lufenia-house-elder:npc:lufenia_elder]
     basins: {}
     nonLoadBearing: []
@@ -643,8 +643,8 @@ stages:
     # the ship (S2) rides at anchor far out at sea, out of reach of any shore, so no ancestor's pending dock can strand
     # the party in assume mode (WND-O's S26 practice). With every unbuilt stage's events open to a flying party, proof
     # (c) from here explores about 243000 states
-    entry: {map: overworld, x: 150, y: 14, mode: walking, vehicles: [{type: airship, map: overworld, x: 152, y: 16},
-                                                                      {type: ship, map: overworld, x: 172, y: 62}]}
+    entry: {map: overworld, at: wnd_s_gaia, mode: walking, vehicles: [{type: airship, map: overworld, at: wnd_s_gaia_airship},
+                                                                      {type: ship, map: overworld, at: wnd_s_ship}]}
     walk: [overworld:warp:gaia, gaia:warp:gaia-spring, gaia-spring:npc:gaia_spring_warden]
     basins: {}
     nonLoadBearing:
@@ -668,8 +668,8 @@ stages:
     # WND-D1: the assumed start is WND-O's for S26 (Cornelia's south gate, the airship on the grass below it, the
     # ship at anchor off the mesa where no shore reaches it); the walk flies to the sands, rings the vestibule door
     # (the chime) and climbs to the console (the cube)
-    entry: {map: overworld, x: 92, y: 111, mode: walking, vehicles: [{type: airship, map: overworld, x: 94, y: 112},
-                                                                     {type: ship, map: overworld, x: 172, y: 62}]}
+    entry: {map: overworld, at: a1_s_cornelia, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_airship_se},
+                                                                     {type: ship, map: overworld, at: wnd_s_ship}]}
     walk: [overworld:warp:mirage-1f, mirage-1f:warp:mirage-2f, mirage-2f:warp:mirage-3f, mirage-3f:npc:mirage_console]
     basins: {}
     nonLoadBearing:
@@ -701,7 +701,7 @@ stages:
     # airship on the oasis meadow beside the Mirage Tower (the berth's beam drops back to the tower's top); up the hub
     # stair, over 2F's south bridge to the east island, its belts to D and to the stair island, the archive's vault,
     # then the engine halls and the spire
-    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, x: 135, y: 38}]}
+    entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, at: wnd_s_sky_airship}]}
     walk: [sky-castle-1f:warp:arrival, sky-castle-2f:warp:d_belt, sky-castle-2f:warp:e_belt,
       sky-castle-2f:warp:sky-castle-3f, sky-castle-3f:chest:chest_adamant, sky-castle-3f:warp:sky-castle-4f,
       sky-castle-4f:warp:sky-castle-5f, sky-castle-5f:battle:hollow_seraph]
@@ -726,7 +726,7 @@ stages:
     grind: 1.0
     # on foot at the act-1 temple's door (the four crystals lit, the lute held), the airship parked on the grass
     # east of it; into the temple, up the causeway to the altar room's north-west corner, and the hour keeper
-    entry: {map: overworld, x: 79, y: 103, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    entry: {map: overworld, at: a1_s_temple, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_temple_airship}]}
     walk: [overworld:warp:temple-of-fiends, temple-of-fiends:cutscene:hour_keeper]
     basins: {}
     nonLoadBearing:
@@ -749,7 +749,7 @@ stages:
     # in the act-1 temple's altar room below the time gate (its `time_gate` arrival), the airship parked by the door;
     # down the stair (TIME_GATE_OPEN), each refight opens the stair on, the cross's two wards open its west and north
     # arms, and the shrine's Chaos ends the game
-    entry: {map: temple-of-fiends, x: 3, y: 5, mode: walking, vehicles: [{type: airship, map: overworld, x: 82, y: 104}]}
+    entry: {map: temple-of-fiends, x: 3, y: 5, mode: walking, vehicles: [{type: airship, map: overworld, at: a1_s_temple_airship}]}
     walk: [temple-of-fiends:warp:past-temple-1, past-temple-1:battle:past_lich, past-temple-1:warp:past-temple-2, past-temple-2:cutscene:ward_hub,
       past-temple-2:cutscene:ward_west, past-temple-2:battle:past_ashen_queen, past-temple-2:warp:past-temple-3,
       past-temple-3:battle:past_drowned_sovereign, past-temple-3:warp:past-temple-4,

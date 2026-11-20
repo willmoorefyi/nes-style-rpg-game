@@ -1,4 +1,4 @@
-import type { FieldMode, SaveData, VehicleState } from '../types/index.js';
+import type { FieldMode, ParkedVehicle, SaveData, VehicleState } from '../types/index.js';
 import { FIELD_MODES } from '../types/index.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
@@ -19,7 +19,8 @@ export const SAVE_VERSION = 3;
 /** The field part of a save (v2): the party's mode and the parked vehicles of every map; the boosts (v3). */
 export interface SaveField {
   mode: FieldMode;
-  vehicles: VehicleState[];
+  /** Cells only: a vehicle still at a spot (`at`, NW-1, not resolved yet) refuses the save. */
+  vehicles: ParkedVehicle[];
   boosts: Boosts;
 }
 
@@ -94,7 +95,13 @@ export class SaveManager {
     field: Partial<SaveField> = {},
   ): boolean {
     if (slotId < 0 || slotId >= MAX_SLOTS) return false;
-    
+    const vehicles = field.vehicles ?? [];
+    const loose = vehicles.find((v) => !Number.isInteger((v as VehicleState).x) || !Number.isInteger((v as VehicleState).y));
+    if (loose) {   // NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): a save stores cells only
+      console.error(`Save to slot ${slotId} refused: the ${loose.type} on ${loose.map} has no cell yet`, loose);
+      return false;
+    }
+
     const data: SaveData = {
       version: SAVE_VERSION,
       party: party.toJSON() as SaveData['party'],
@@ -106,7 +113,7 @@ export class SaveManager {
       saveDate: new Date().toISOString(),
       slotId,
       mode: field.mode ?? 'walking',
-      vehicles: (field.vehicles ?? []).map((v) => ({ ...v })),
+      vehicles: (vehicles as VehicleState[]).map((v) => ({ type: v.type, map: v.map, x: v.x, y: v.y })),
       boosts: parseBoosts(field.boosts),
     };
     if (location !== undefined) data.location = location;

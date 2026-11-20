@@ -4,13 +4,14 @@
  * index, else the legacy `assets/maps/<id>.yaml`), `cutscenes.yaml` and the key items of `items.yaml`.
  * `buildQuestWorld` is pure (the fixtures use it); `loadQuestWorld` reads the repository from disk.
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import { validateQuestData } from '../core/schemaValidationQuest.js';
-import { validateMapData } from '../core/schemaValidation.js';
 import type { MapData, QuestData, QuestStage } from '../types/index.js';
 import type { QuestPlace } from './questTypes.js';
+import { loadMaps } from './questMaps.js';
+import { resolveQuestPlaces } from './questSpots.js';
 
 /** The cutscene step fields the model reads (CutsceneManager's step, as plain data). */
 export interface QuestCutStep {
@@ -22,6 +23,8 @@ export interface QuestCutStep {
   entrance?: string;
   x?: number;
   y?: number;
+  /** `set_vehicle`: a spot of `map` (NW-1), instead of x / y. */
+  at?: string;
 }
 
 export interface QuestItemRecord {
@@ -165,8 +168,8 @@ function referencedMaps(maps: ReadonlyMap<string, MapData>, cutscenes: ReadonlyM
 
 /** The verifier's world from parsed data (pure). */
 export function buildQuestWorld(input: QuestWorldInput): QuestWorld {
-  const quest = validateQuestData(input.quest);
   const maps = new Map(input.maps.map((m) => [m.id, m]));
+  const quest = resolveQuestPlaces(validateQuestData(input.quest), maps);
   const cutscenes = new Map(input.cutscenes.map((c) => [c.id, c.steps ?? []]));
   const keyItems = new Set(input.items.filter((i) => i.type === 'key').map((i) => i.id));
   const consumed = new Set(CONSUMED_KEY_ITEMS);
@@ -197,38 +200,12 @@ export interface LoadOptions {
   root?: string;
   /** Read only the legacy maps (`assets/maps/*.yaml`), not the compiled ones. */
   legacy?: boolean;
+  /** NW-1 `--maps DIR`: a folder of compiled maps (a scratch world compile) read before `assets/maps/ai`. */
+  mapsDir?: string;
 }
 
 function readYaml(path: string): unknown {
   return parse(readFileSync(path, 'utf-8'));
-}
-
-/** Every map id the game can load: the compiled index, then the legacy files. */
-function loadMaps(root: string, legacy: boolean): MapData[] {
-  const out = new Map<string, MapData>();
-  const aiDir = join(root, 'assets/maps/ai');
-  const indexPath = join(aiDir, 'index.yaml');
-  if (!legacy && existsSync(indexPath)) {
-    for (const id of readYaml(indexPath) as string[]) out.set(id, validateMapData(readYaml(join(aiDir, `${id}.yaml`))));
-  }
-  const want = new Set<string>();
-  const queue = [...out.values()];
-  for (let i = 0; i < queue.length; i++) {
-    for (const t of queue[i].transitions) want.add(t.targetMap);
-    if (queue[i].exit) want.add(queue[i].exit!.map);
-  }
-  // legacy maps the compiled set links to (and, with `legacy`, the act-1 set from Cornelia)
-  const pending = legacy ? ['cornelia', 'overworld', 'temple-of-fiends', ...want] : [...want];
-  while (pending.length) {
-    const id = pending.pop()!;
-    if (out.has(id)) continue;
-    const p = join(root, 'assets/maps', `${id}.yaml`);
-    if (!existsSync(p)) continue;
-    const m = validateMapData(readYaml(p));
-    out.set(id, m);
-    for (const t of m.transitions) pending.push(t.targetMap);
-  }
-  return [...out.values()];
 }
 
 /** The repository's world: quest.yaml, the playable maps, cutscenes.yaml and items.yaml. */
@@ -237,7 +214,7 @@ export function loadQuestWorld(opts: LoadOptions = {}): QuestWorld {
   const data = join(root, 'assets/data');
   return buildQuestWorld({
     quest: readYaml(join(data, 'quest.yaml')),
-    maps: loadMaps(root, opts.legacy ?? false),
+    maps: loadMaps(root, opts.legacy ?? false, opts.mapsDir),
     cutscenes: (readYaml(join(data, 'cutscenes.yaml')) as Array<{ id: string; steps: QuestCutStep[] }>) ?? [],
     items: (readYaml(join(data, 'items.yaml')) as QuestItemRecord[]) ?? [],
   });

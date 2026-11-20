@@ -1,13 +1,13 @@
 import type { Container } from 'pixi.js';
 import type { Game } from '../../core/Game.js';
-import { FIELD_MODES, type FieldMode, type MapData, type TerrainType, type VehicleState, type VehicleType } from '../../types/index.js';
+import { FIELD_MODES, type FieldMode, type MapData, type ParkedVehicle, type TerrainType, type VehicleState, type VehicleType } from '../../types/index.js';
 import type { MovementMode } from '../../entities/MovementMode.js';
 import type { PlayerController } from '../../entities/PlayerController.js';
 import {
   canLand, modeAfterStep, patchedTerrain, terrainAllows, type FieldState, type StepResult,
 } from '../../systems/fieldRules.js';
 import { vehicleOf, vehiclesAfterStep } from '../../systems/fieldRulesVehicles.js';
-import { VehicleManager, parkedVehicles } from '../../systems/VehicleManager.js';
+import { VehicleManager, hasCell, keepSpots, parkedVehicles, resolveParked } from '../../systems/VehicleManager.js';
 import { WalkingMode } from '../../entities/WalkingMode.js';
 import { CanoeMode } from '../../entities/CanoeMode.js';
 import { ShipMode } from '../../entities/ShipMode.js';
@@ -88,11 +88,12 @@ export class FieldVehicles {
   setMap(map: MapData): void {
     this.map = map;
     this.mapId = map.id;
+    if ((this.game.vehicles ?? []).some((v) => !hasCell(v))) this.game.vehicles = resolveParked(this.game.vehicles, map); // NW-1
     this.refresh();
   }
 
   private refresh(): void {
-    const parked = parkedVehicles(this.mapId, this.map?.vehicles ?? [], this.known,
+    const parked = parkedVehicles(this.mapId, this.map?.vehicles ?? [], this.game.vehicles ?? [],
       (f) => this.game.gameFlags.has(f), vehicleOf(this.game.fieldMode ?? 'walking'));
     this.manager.setParked(parked);
     this.sprites.showParked(parked);
@@ -149,7 +150,7 @@ export class FieldVehicles {
       const left = this.riding;
       this.game.fieldMode = mode;
       if (left && !(left.type === 'canoe' && this.hasCanoe())) {
-        this.game.vehicles = [...this.known.filter((v) => v.type !== left.type), left];
+        this.game.vehicles = keepSpots(this.game.vehicles ?? [], [...this.known.filter((v) => v.type !== left.type), left]);
       }
       this.refresh();
     }
@@ -158,10 +159,11 @@ export class FieldVehicles {
     this.sprites.ride(type, player);
   }
 
-  /** The game's parked vehicles (a game without them, e.g. a test double, has none). */
+  /** The game's parked vehicles with a cell (a game without them, e.g. a test double, has none). */
   private get known(): VehicleState[] {
-    return this.game.vehicles ?? [];
+    return (this.game.vehicles ?? []).filter(hasCell);
   }
+
 
   private hasCanoe(): boolean {
     return this.game.inventory.getAll().some((i) => i.itemId === 'canoe');
@@ -170,7 +172,7 @@ export class FieldVehicles {
   /** Change the party's mode from `before` at `from` to `after` at `to`, parking and unparking (vehiclesAfterStep). */
   private changeMode(player: PlayerController, before: FieldMode, after: FieldMode,
     from: { x: number; y: number }, to: { x: number; y: number }): void {
-    this.game.vehicles = vehiclesAfterStep(this.known, this.mapId, before, after, from, to, this.hasCanoe());
+    this.game.vehicles = keepSpots(this.game.vehicles ?? [], vehiclesAfterStep(this.known, this.mapId, before, after, from, to, this.hasCanoe()));
     this.game.fieldMode = after;
     player.currentMode = this.modeFor(after);
     const type = vehicleOf(after);
@@ -212,9 +214,9 @@ export class FieldVehicles {
     return false;
   }
 
-  /** A cutscene's `set_vehicle`: the vehicle is parked there from now on (the airship rising, W1-B's step). */
-  setVehicle(v: VehicleState): void {
-    this.game.vehicles = [...this.known.filter((x) => x.type !== v.type), { ...v }];
+  /** A cutscene's `set_vehicle`: parked there from now on (W1-B); a spot of another map waits for it to load (NW-1). */
+  setVehicle(v: ParkedVehicle): void {
+    this.game.vehicles = resolveParked([...(this.game.vehicles ?? []).filter((x) => x.type !== v.type), { ...v }], this.map ?? { id: this.mapId });
     this.refresh();
   }
 

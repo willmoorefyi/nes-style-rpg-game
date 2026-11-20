@@ -386,6 +386,7 @@ export interface VehicleSpawn extends RequiredFlagsField {
 
 /** Key item gate that blocks passage until the player has a required item */
 export interface KeyItemGate extends RequiredFlagsField {
+  id?: string; // NW-1: a name quest.yaml's nonLoadBearing `ref` can use (the bridge gates)
   x: number;
   y: number;
   /** Item that opens the gate; omit when the gate opens on a story flag (`requiredFlag`). */

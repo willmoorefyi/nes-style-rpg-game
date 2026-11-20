@@ -11,6 +11,7 @@ import type {
 } from '../types/index.js';
 import type { QuestEvent, QuestEventKind, QuestPlace, QuestState } from './questTypes.js';
 import type { QuestCutStep, QuestWorld } from './questData.js';
+import { spotCell } from './questSpots.js';
 import { fieldStateOf, needsHeld, stageDone, stageMark } from './questStates.js';
 
 export type EventSource =
@@ -61,7 +62,10 @@ function addStep(world: QuestWorld, out: QuestEffects, s: QuestCutStep): void {
   if (s.type === 'set_flag' && s.flag) out.flags.push(s.flag);
   else if (s.type === 'give_item' && s.item) out.items.push(s.item);
   else if (s.type === 'take_item' && s.item) out.takes.push(s.item);
-  else if (s.type === 'set_vehicle' && s.vehicle && s.map && s.x !== undefined && s.y !== undefined) {
+  else if (s.type === 'set_vehicle' && s.vehicle && s.map && s.at !== undefined) {
+    const [x, y] = spotCell(world.maps, s.map, s.at, `cutscene set_vehicle ${s.vehicle}`);   // NW-1: a spot
+    out.vehicles.push({ type: s.vehicle as VehicleType, map: s.map, x, y });
+  } else if (s.type === 'set_vehicle' && s.vehicle && s.map && s.x !== undefined && s.y !== undefined) {
     out.vehicles.push({ type: s.vehicle as VehicleType, map: s.map, x: s.x, y: s.y });
   } else if (s.type === 'warp' && s.map) {
     const m = world.maps.get(s.map);

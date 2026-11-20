@@ -27,6 +27,12 @@ from world_geom import WALKABLE, bbox  # noqa: E402
 
 ALDI_SEED = (63, 130)                     # a band cell on the arm's Aldi side (aldi water)
 WALL_ROWS = 150                           # W_arm: the arm, its root and the north coast down to this row
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the places quest.yaml and the scenarios name (stage entries, the ship)
+SPOTS = {
+    "elf_s_keep": {"at": [60, 125], "kind": "land"},            # the Western Keep's door: S6
+    "elf_s_elfheim": {"at": [82, 150], "kind": "land"},         # Elfheim's land gate: S8, S9
+    "elf_s_port_ship": {"at": [84, 147], "kind": "dock"},       # the ship at the elf_port dock
+}
 
 
 def _in_box(x: int, y: int) -> bool:
@@ -80,4 +86,4 @@ def build(band: set[Cell]) -> RegionOut:
         checks={"road_check": {"materials": ["dirt"], "check_under": True}, "warp_leaves": True,
                 "min_blob": {"mountain": 3, "forest": 3, "sand": 3, "swamp": 3, "ocean_inlet": 2},
                 "reach_roots": list(SITES.entrances())},
-        walls={"W_arm": wall})
+        walls={"W_arm": wall}, spots={k: dict(v) for k, v in SPOTS.items()})

@@ -118,8 +118,11 @@ describe('FIRE on the world (FIR-O)', () => {
     expect(steps.filter((s) => s.type === 'take_item').map((s) => s.item)).toEqual(['levistone']);
     expect(steps.filter((s) => s.type === 'set_flag').map((s) => s.flag)).toEqual(['AIRSHIP_RAISED']);
     const v = steps.find((s) => s.type === 'set_vehicle')!;
-    expect(v).toMatchObject({ vehicle: 'airship', map: 'overworld' });
-    expect(coll(v.x as number, v.y as number)).toBe(TerrainType.Grass);
-    expect(bfs(world.entrances.fir_desert, false).has(`${v.x},${v.y}`)).toBe(true);
+    expect(v).toMatchObject({ vehicle: 'airship', map: 'overworld', at: 'fir_s_airship' });    // NW-1: a spot
+    const spot = (world as Compiled & { spots: Record<string, { at: [number, number]; kind: string }> }).spots.fir_s_airship;
+    expect(spot).toEqual({ at: [149, 162], kind: 'landing' });
+    const [x, y] = spot.at;
+    expect(coll(x, y)).toBe(TerrainType.Grass);
+    expect(bfs(world.entrances.fir_desert, false).has(`${x},${y}`)).toBe(true);
   });
 });

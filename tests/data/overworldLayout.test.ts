@@ -24,8 +24,8 @@ const raw = parse(readFileSync(join(root, 'assets-src/maps/overworld.yaml'), 'ut
 const rawRows = raw.ground.trimEnd().split('\n');
 /** The act-1 frame: the compiled map's (GAP-17); a compiled map as wide as the source shares the source's; a map
  * without one is act 1 alone at (0, 0). */
-const srcFrame = raw.world?.frames.a1 ?? { origin: [0, 0], size: [rawRows[0].length, rawRows.length] };
-const frame = map.world?.frames.a1 ?? (map.width === rawRows[0].length ? srcFrame
+const srcFrame = raw.world?.frames?.a1 ?? { origin: [0, 0], size: [rawRows[0].length, rawRows.length] };
+const frame = map.world?.frames?.a1 ?? (map.width === rawRows[0].length ? srcFrame
   : { origin: [0, 0] as [number, number], size: [map.width, map.height] as [number, number] });
 const [OX, OY] = frame.origin;
 /** The source, read in the compiled map's cells (they differ while the compiled map is an older act-1 build). */

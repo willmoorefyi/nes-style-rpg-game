@@ -4,8 +4,9 @@
   python3 -I assets-src/tools/mode7_atlas.py --check-determinism overworld
 
 It stitches the compiled `below_<r>_<c>.png` chunks of a map (48 px per cell) and box-downsamples them to two RGB
-atlases with no added border: `mode7.png` at 16 px per cell (3x3 boxes; the 192x192 world gives 3072x3072) and
-`mode7_low.png` at 8 px per cell (6x6 boxes, 1536x1536). Every box average rounds half up in integers, and the
+atlases with no added border: `mode7.png`, always 3072 px square (`ATLAS_PX`), at `3072 // width` px per cell, and
+`mode7_low.png` at half that (`cell_px`, NW-1: the 192x192 world bakes 16 px in 3x3 boxes and 8 px in 6x6 boxes,
+1536x1536; a 256x256 world 12 px in 4x4 and 6 px in 8x8; a size with no whole box is refused). Every box average rounds half up in integers, and the
 PNGs are written by Pillow with fixed options, so the bytes depend only on the chunk files (no randomness, no
 PYTHONHASHSEED). `mode7.json` records the sizes and `inputs`, the sha256 over the chunk files' bytes in row-major
 order (the order of the compiled map's `art.below`); `tests/data/mode7Atlas.test.ts` fails on a stale atlas.
@@ -41,8 +42,7 @@ ROOT = Path(__file__).resolve().parents[2]
 MAPS = ROOT / "assets" / "maps" / "ai"
 SRC = ROOT / "assets-src" / "maps"
 SRC_PX = 48                       # px per cell of the compiled chunks (build_map.T)
-CELL_PX = 16                      # mode7.png
-LOW_CELL_PX = 8                   # mode7_low.png
+ATLAS_PX = 3072                   # mode7.png's side, whatever the world's size (NW-1, docs/NATURAL_WORLD_PLAN.md 6.1)
 VERSION = 1
 FILES = ("mode7.png", "mode7_low.png", "mode7.json")
 CHUNK_RE = re.compile(r"^below_(\d+)_(\d+)\.png$")
@@ -50,6 +50,17 @@ CHUNK_RE = re.compile(r"^below_(\d+)_(\d+)\.png$")
 
 class AtlasError(Exception):
     pass
+
+
+def cell_px(width: int) -> tuple[int, int]:
+    """(CELL_PX, LOW_CELL_PX) for a world `width` cells wide: ATLAS_PX // width and half that (192 -> 16 / 8, as
+    before NW-1; 256 -> 12 / 6). Refuses a size whose boxes are not whole (SRC_PX % CELL_PX != 0, and so on)."""
+    cell = ATLAS_PX // width if width > 0 else 0
+    low = cell // 2
+    if cell < 2 or ATLAS_PX % width or cell % 2 or SRC_PX % cell or SRC_PX % low:
+        raise AtlasError(f"a {width}-cell world has no integral atlas box: {ATLAS_PX} / {width} = "
+                         f"{ATLAS_PX / max(width, 1):g} px per cell (SRC_PX {SRC_PX})")
+    return cell, low
 
 
 def chunk_files(chunk_dir: Path) -> list[list[Path]]:
@@ -108,7 +119,8 @@ def bake(map_id: str, maps_dir: Path = MAPS, out_dir: Path | None = None, src: d
     grid = chunk_files(Path(maps_dir) / map_id)
     out = Path(out_dir) if out_dir is not None else Path(maps_dir) / map_id
     out.mkdir(parents=True, exist_ok=True)
-    k, kl = SRC_PX // CELL_PX, SRC_PX // LOW_CELL_PX
+    cell, low_cell = cell_px(len(src["ground"].rstrip("\n").split("\n")[0]))
+    k, kl = SRC_PX // cell, SRC_PX // low_cell
     far_rows, low_rows = [], []
     for row in grid:
         far, low = [], []
@@ -127,7 +139,7 @@ def bake(map_id: str, maps_dir: Path = MAPS, out_dir: Path | None = None, src: d
     path = out / "mode7.png"
     Image.fromarray(far_img).save(path, optimize=True)
     Image.fromarray(low_img).save(out / "mode7_low.png", optimize=True)
-    meta = {"version": VERSION, "cellPx": CELL_PX, "size": int(far_img.shape[1]), "lowCellPx": LOW_CELL_PX,
+    meta = {"version": VERSION, "cellPx": cell, "size": int(far_img.shape[1]), "lowCellPx": low_cell,
             "lowSize": int(low_img.shape[1]), "inputs": inputs_hash(grid)}
     (out / "mode7.json").write_text(json.dumps(meta, indent=2) + "\n")
     return path

@@ -222,3 +222,6 @@ class RegionOut:
     # this region's parts of the Aldi walls (WALLS keys); a built region must return its parts (5.1)
     walls: dict[str, set[Cell]] = field(default_factory=dict)
     stub: bool = False                       # a stub module: the composer applies the region's PLACEHOLDER_WALLS
+    # NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): named world places for quest.yaml, the scenarios and the cutscenes,
+    # {`<prefix>_s_<name>`: {"at": [x, y], "kind": "land" | "dock" | "landing"}}
+    spots: dict[str, dict] = field(default_factory=dict)

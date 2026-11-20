@@ -350,6 +350,16 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes about half
   an hour and a few GB: run it in the background, and only when world or quest data changed. Its test,
   `tests/progression/questMutateWorld.test.ts`, is the heavy tier (`npm run test:world`, "Test tiers" under Testing).
+  NW-1 adds `--maps DIR` (a scratch compile's maps first), `--anchors FILE` (e.g. `assets-src/maps-nw/world-anchors.yaml`)
+  and `--worst-canoe` (rows T0-T4 again with the canoe).
+- **Spots (NW-1, `docs/NATURAL_WORLD_PLAN.md` 5.2).** World-map places are names, never raw cells: the world source
+  and the compiled map carry `spots: {<prefix>_s_<name>: {at: [x, y], kind: land | dock | landing}}` (each region
+  module's `SPOTS`; `map_checks_spots.py` checks the kind). quest.yaml's `entry` and vehicles on `overworld` use
+  `at: <spot>` (the schema refuses x / y there) and its `nonLoadBearing` there `ref: <dock | gate | npc | patch id>`
+  (`questSpots.resolveQuestPlaces` fills in the cells); scenarios use `spot:` and vehicle `at:` (resolved at scenario
+  start); `set_vehicle` takes `at:` (a spot vehicle in `Game.vehicles` gets its cell when its map loads; a save refuses
+  one without a cell). A new world place needs a spot in its region's `SPOTS`. The NW contract is
+  `layouts/world_api_v2.py` and `tools/worldgen/` (`spec.py`, `noise.py`); nothing of today's world reads them.
 - **Landmark art (LM-INT, LM4-INT, LM5-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from three
   sheets (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2),
   `landmarks_lm4.*` (pass LM4) and `landmarks_lm5.*` (pass LM5: the Western Keep and the Citadel of Trials); cells

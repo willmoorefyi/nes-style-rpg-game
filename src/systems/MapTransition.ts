@@ -1,8 +1,9 @@
-import type { FieldMode, MapData, MapTransition as TransitionData, VehicleState } from '../types/index.js';
+import type { FieldMode, MapData, MapTransition as TransitionData, ParkedVehicle, VehicleState } from '../types/index.js';
 import type { DataLoader } from '../core/DataLoader.js';
 import { CollisionMap } from '../rendering/CollisionMap.js';
 import { WalkingMode } from '../entities/WalkingMode.js';
 import { terrainAllows } from './fieldRules.js';
+import { hasCell, resolveParked } from './VehicleManager.js';
 
 const walking = new WalkingMode();
 
@@ -88,13 +89,13 @@ export function safeSpawn(map: MapData, pos: { x: number; y: number }, mode: Fie
 export interface RestoredField {
   playerPosition: { x: number; y: number };
   fieldMode: FieldMode;
-  vehicles: VehicleState[];
+  vehicles: ParkedVehicle[];
   pendingFrame: 'a1' | null;
 }
 
 /** An act-1 overworld cell in the map's frame: moved by `overworld`'s `world.frames.a1.origin` (GAP-17), else kept. */
 export function shiftA1(map: Pick<MapData, 'id' | 'world'>, pos: { x: number; y: number }): { x: number; y: number } {
-  const o = map.id === 'overworld' ? map.world?.frames.a1?.origin : undefined;
+  const o = map.id === 'overworld' ? map.world?.frames?.a1?.origin : undefined;
   return o ? { x: pos.x + o[0], y: pos.y + o[1] } : pos;
 }
 
@@ -106,7 +107,7 @@ export function shiftA1(map: Pick<MapData, 'id' | 'world'>, pos: { x: number; y:
 export function restoredSpawn(map: MapData, game: RestoredField): { x: number; y: number } {
   if (game.pendingFrame === 'a1') game.playerPosition = shiftA1(map, game.playerPosition);
   game.pendingFrame = null;
-  const pos = safeSpawn(map, game.playerPosition, game.fieldMode, game.vehicles);
+  const pos = safeSpawn(map, game.playerPosition, game.fieldMode, resolveParked(game.vehicles ?? [], map).filter(hasCell));
   const moved = pos.x !== game.playerPosition.x || pos.y !== game.playerPosition.y;
   if (moved || !validInMode(map, new CollisionMap(map), pos, game.fieldMode)) game.fieldMode = 'walking';
   return pos;

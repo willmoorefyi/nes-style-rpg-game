@@ -116,6 +116,16 @@ describe('set_vehicle', () => {
     expect(cutsceneVehicle({ type: 'set_vehicle', vehicle: 'ship', map: 'overworld', x: 1 })).toBeNull();
     expect(cutsceneVehicle({ type: 'set_vehicle', vehicle: 'balloon' as never, map: 'overworld', x: 1, y: 2 })).toBeNull();
   });
+
+  it('NW-1: a step may name a spot of its map instead (`at`); the host resolves it', async () => {
+    expect(cutsceneVehicle({ type: 'set_vehicle', vehicle: 'airship', map: 'overworld', at: 'fir_s_airship' }))
+      .toEqual({ type: 'airship', map: 'overworld', at: 'fir_s_airship' });
+    expect(cutsceneVehicle({ type: 'set_vehicle', vehicle: 'airship', at: 'fir_s_airship' })).toBeNull();
+    const setVehicle = vi.fn();
+    const { d } = deps({ setVehicle });
+    await new CutsceneManager(d).play([{ type: 'set_vehicle', vehicle: 'ship', map: 'overworld', at: 'a1_s_pravoka_ship' }]);
+    expect(setVehicle).toHaveBeenCalledWith({ type: 'ship', map: 'overworld', at: 'a1_s_pravoka_ship' });
+  });
 });
 
 describe('the registry checks the new steps', () => {
@@ -131,5 +141,6 @@ describe('the registry checks the new steps', () => {
   it('well-formed steps pass', () => {
     expect(scriptProblem([{ type: 'give_item', item: 'crown' }, { type: 'take_item', item: 'crown' },
       { type: 'set_vehicle', vehicle: 'canoe', map: 'overworld', x: 1, y: 2 }, { type: 'end_game' }])).toBeNull();
+    expect(scriptProblem([{ type: 'set_vehicle', vehicle: 'airship', map: 'overworld', at: 'fir_s_airship' }])).toBeNull();
   });
 });

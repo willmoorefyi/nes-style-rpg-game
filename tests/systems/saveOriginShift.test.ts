@@ -84,7 +84,7 @@ describe('GAP-17: a version-1 overworld save in the world frame', () => {
       pendingFrame: loaded.frame };
     const pos = restoredSpawn(world, g);
     expect(pos).toEqual(a1At(world, 28, 47));
-    expect(world.world?.frames.a1?.origin).toEqual([64, 64]);
+    expect(world.world?.frames?.a1?.origin).toEqual([64, 64]);
     expect(pos).toEqual({ x: 92, y: 111 });
     expect(g.pendingFrame).toBeNull();
     // once: a second enter (a map change back) does not shift again

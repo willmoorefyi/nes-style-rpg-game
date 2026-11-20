@@ -23,7 +23,8 @@ sys.path.insert(1, str(HERE.parent))
 import world_a1, world_earth, world_elf, world_fire, world_ordeal, world_water, world_wind  # noqa: E401, E402
 import world_checks as WC  # noqa: E402
 from common import write_map  # noqa: E402
-from world_api import (BOXES, PLACEHOLDER_WALLS, SEAMS, UNSET, WATER, WORLD_H, WORLD_W, RegionOut)  # noqa: E402
+from world_api import (BASIN_SEEDS, BOXES, PLACEHOLDER_WALLS, SEAMS, UNSET, WATER, WORLD_H, WORLD_W,  # noqa: E402
+                       RegionOut)
 from world_geom import band_cells, bbox, chunk_files, flood, is_walkable, owned_chunks, owner_grid  # noqa: E402
 
 REGIONS = ["a1", "elf", "earth", "fire", "ordeal", "water", "wind"]      # pre-seeded; no tranche edits the list
@@ -92,7 +93,10 @@ def source(outs: dict[str, RegionOut], keys: dict, world: list[list[str]], cuts:
     doc["regions"] = {r: {"stub": out.stub, "checks": {k: v for k, v in out.checks.items()
                                                         if k not in ("legacy_ids", "anchors_pending")}}
                       for r, out in outs.items()}
-    doc["world"] = {**keys["world"], "cuts": cuts}
+    # NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2, 4.3): the named places quest.yaml, the scenarios and the cutscenes use,
+    # and the basin seeds the verifier reads from the map instead of a copy of BASIN_SEEDS
+    doc["spots"] = {k: {"at": list(v["at"]), "kind": v["kind"]} for out in outs.values() for k, v in out.spots.items()}
+    doc["world"] = {**keys["world"], "basins": {k: list(v) for k, v in BASIN_SEEDS.items()}, "cuts": cuts}
     return doc
 
 

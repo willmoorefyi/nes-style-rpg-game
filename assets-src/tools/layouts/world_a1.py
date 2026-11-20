@@ -33,8 +33,25 @@ from world_a1_zones import zones as a1_zones  # noqa: E402
 LEGACY_IDS = frozenset({"cornelia", "cornelia_west", "cornelia_east", "cornelia_north", "castle", "north_shore",
                         "temple", "east_pocket", "temple_approach", "chest_tomb", "bridge_worker_w",
                         "bridge_worker_e", "north_bridge"})
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): today's cells of the act-1 places quest.yaml, the scenarios and the
+# cutscenes name (stage entries, scenario spawns, parked vehicles); NW-3 re-pins them in the new world
+SPOTS = {
+    "a1_s_cornelia": {"at": [92, 111], "kind": "land"},        # Cornelia's south-gate arrival: S20-S22, S26, S27
+    "a1_s_temple": {"at": [79, 103], "kind": "land"},          # the Temple door: S29
+    "a1_s_temple_road": {"at": [79, 106], "kind": "land"},     # scenario r_ow_temple
+    "a1_s_bridge": {"at": [93, 98], "kind": "land"},           # scenario r_ow_bridge
+    "a1_s_bridge_foot": {"at": [93, 97], "kind": "land"},      # below the bridge gate: S2
+    "a1_s_north_shore": {"at": [93, 92], "kind": "land"},      # past the bridge: S3
+    "a1_s_east": {"at": [112, 110], "kind": "land"},           # scenario r_ow_east
+    "a1_s_matoya": {"at": [74, 76], "kind": "land"},           # Matoya's door: S7
+    "a1_s_pravoka": {"at": [131, 101], "kind": "land"},        # Pravoka's land gate: S4, S5
+    "a1_s_pravoka_ship": {"at": [132, 102], "kind": "dock"},   # the ship at the a1_pravoka dock
+    "a1_s_airship": {"at": [93, 111], "kind": "landing"},      # the airship by Cornelia: S20-S22
+    "a1_s_airship_se": {"at": [94, 112], "kind": "landing"},   # S26, S27
+    "a1_s_temple_airship": {"at": [82, 104], "kind": "landing"},   # by the Temple: S29, S30
+}
 # the map-level keys of the world source (the composer writes them once, from A1)
-MAP_KEYS = ("id", "name", "camp", "kits", "music", "terrain", "encounterRate", "encounters")
+MAP_KEYS =("id", "name", "camp", "kits", "music", "terrain", "encounterRate", "encounters")
 
 
 def act1() -> tuple[object, dict]:
@@ -68,8 +85,10 @@ def act1() -> tuple[object, dict]:
                     {"x": TOMB[0] + 1, "y": TOMB[1], "text": ["Here lies Erdrick."]},
                     {"x": JETTY[-1][0], "y": JETTY[-1][1] + 1, "text": list(PIER_TEXT)}],
         "npcs": [dict(TOMB_CHEST), *(dict(n) for n in BRIDGE_WORKERS)],
-        "keyItemGates": [{"x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT", "message": [dict(m) for m in GATE_MESSAGE],
-                          "permanent": False} for x in (BX, BX + 1)],
+        # NW-1: the gates are named, so quest.yaml's nonLoadBearing names them (`ref`) instead of their cells
+        "keyItemGates": [{"id": f"a1_bridge_gate_{side}", "x": x, "y": S_STUB, "requiredFlag": "BRIDGE_BUILT",
+                          "message": [dict(m) for m in GATE_MESSAGE], "permanent": False}
+                         for side, x in (("w", BX), ("e", BX + 1))],
         "encounterRate": {"min": 10, "max": 22},       # W4: the W / N gate -> temple walk (16 steps) sees a battle
         # T4 §1.6: FF1-style formations; no pirates in act 1 (EB-1). The first zone holding the cell wins.
         "encounters": FIELDS,
@@ -118,7 +137,7 @@ def build(band: set[Cell]) -> tuple[RegionOut, dict]:
         patches=[dict(A1S.NORTH_BRIDGE)], docks=A1S.docks(),
         encounterZones=t["encounterZones"] + a1_zones(ground, band, tuple(entrances["north_shore"])),
         vehicles=[A1S.ship()], battleBackgrounds={"zones": t["battleBackgrounds"]["zones"]}, checks=checks,
-        walls=walls)
+        walls=walls, spots={k: dict(v) for k, v in SPOTS.items()})
     keys = {k: t[k] for k in MAP_KEYS}
     keys["battleBackgrounds"] = {k: v for k, v in t["battleBackgrounds"].items() if k != "zones"}
     keys["world"] = {"frames": {"a1": {"origin": list(A1_ORIGIN), "size": list(A1_SIZE)}}}

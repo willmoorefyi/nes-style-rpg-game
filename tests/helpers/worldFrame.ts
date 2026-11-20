@@ -13,7 +13,7 @@ export const WORLD_SIZE: [number, number] = [192, 192];
 
 /** The map's act-1 origin, or [0, 0] on the act-1 map itself. */
 export function a1OriginOf(map: Pick<MapData, 'world'>): [number, number] {
-  const o = map.world?.frames.a1?.origin;
+  const o = map.world?.frames?.a1?.origin;
   return o ? [o[0], o[1]] : [0, 0];
 }
 
@@ -27,7 +27,7 @@ type Rect = [number, number, number, number];
 
 /** The act-1 map as the world carries it: every cell and placed thing moved by `origin`, ocean outside. */
 export function translateA1(map: MapData, origin: [number, number] = A1_ORIGIN, size: [number, number] = WORLD_SIZE): MapData {
-  if (map.world?.frames.a1) return map;
+  if (map.world?.frames?.a1) return map;
   const [ox, oy] = origin;
   const [w, h] = size;
   const collision = new Array<number>(w * h).fill(TerrainType.Water);

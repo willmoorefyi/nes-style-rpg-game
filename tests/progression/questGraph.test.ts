@@ -184,7 +184,7 @@ describe('questGraph: each proof fails on its RED fixture', () => {
 describe('questGraph: the CLI', () => {
   it('parses its arguments', () => {
     expect(parseArgs(['--strict', '--mutate', '--stage', 'S11', '--json', '/tmp/q.json', '--only', 'ab']))
-      .toEqual({ strict: true, mutate: true, stage: 'S11', json: '/tmp/q.json', only: new Set(['a', 'b']) });
+      .toEqual({ strict: true, mutate: true, stage: 'S11', json: '/tmp/q.json', only: new Set(['a', 'b']), worstCanoe: false });
     expect(() => parseArgs(['--only', 'z'])).toThrow(/unknown proof z/);
     expect(() => parseArgs(['--stage', 'X1'])).toThrow(/S<n>/);
     expect(() => parseArgs(['--bogus'])).toThrow(/unknown argument/);

@@ -35,12 +35,17 @@ const FILES = [
   'src/scenes/exploration/FieldNpcActions.ts',
   ...walk(LAYOUTS, (n) => /^world.*\.py$/.test(n)).filter((p) => !REGION_DIRS.some((d) => p.includes(`/${d}/`))),
   ...REGION_DIRS.flatMap((d) => walk(join(LAYOUTS, d), (n) => n.endsWith('.py'))),
+  // pass NW (docs/NATURAL_WORLD_PLAN.md 3.2): the generator and the continent specs
+  ...walk('assets-src/tools/worldgen', (n) => n.endsWith('.py')),
+  ...walk(join(LAYOUTS, 'world_specs'), (n) => n.endsWith('.py')),
 ];
 
 describe('pass W file-size ceilings', () => {
   it('finds the contract files', () => {
     expect(FILES).toContain('src/progression/questTypes.ts');
     expect(FILES).toContain('src/systems/fieldRules.ts');
+    expect(FILES).toContain('assets-src/tools/worldgen/spec.py');
+    expect(FILES).toContain(`${LAYOUTS}/world_api_v2.py`);
   });
 
   it.each(FILES)('%s is under 250 lines', (path) => {

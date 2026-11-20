@@ -1168,7 +1168,7 @@ uses an entrance name.
 - [x] NW-0 pilot; the user picked preset B (2026-11-20)
 - [x] Rev 3.2: the pilot's results and fixes (2026-11-20)
 - [ ] User answers Q3, Q4a, Q7, Q8, Q9 (priority: medium, effort: 0.5h)
-- [ ] NW-1 contract and spots, with today's world recompiled (priority: high, effort: 11h)
+- [x] NW-1 contract and spots, with today's world recompiled (2026-11-20; result in 11)
 - [ ] NW-2 generator (priority: high, effort: 16h)
 - [ ] NW-3 act 1 regenerated and re-pinned (priority: high, effort: 9h)
 - [ ] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (priority: high, effort: 11h)
@@ -1177,6 +1177,101 @@ uses an entrance name.
 - [ ] NW-5 cutover and balance, the save reset and `--from-reset` (priority: high, effort: 19h)
 - [ ] NW-INT and the user's play session (priority: high, effort: 5h)
 ```
+
+## 11. NW-1 result (contract and spots)
+
+Branch `nw-1` from `mainline` 27aa2b0b. Today's 192x192 world is unchanged: recompiled under the lock (90.9 s, peak
+footprint 21.1 GB, RSS 13.4 GB), every chunk PNG, patch overlay and Mode 7 atlas file is byte-identical (git shows
+only `assets/maps/ai/overworld.yaml` changed: `spots`, `world.basins`, the gate ids). `build_map.py
+--check-determinism overworld` and `mode7_atlas.py --check-determinism overworld` pass; `world.py` prints
+`bands: OK` and `basins: OK (aldi 2783 cells, ocean 12992 cells; canal joins)`; re-running every layout script
+changes only `overworld.yaml`.
+
+- **Contract.** `layouts/world_api_v2.py` beside v1 (WORLD 256, CORNELIA_NW (146, 155), A1_DELTA (+54, +44), S_STAR
+  0.86, `G2_MIN = 30`, EXEMPT_KINDS, DOCKS_ALLOWED, WALLS by id, BASIN_SEEDS with aldi (146, 165), RegionOut v2 with
+  no `ground`). `tools/worldgen/noise.py` (NW-0's math, checked equal to the pilot's at seeds 7 / 11 / 1998, plus
+  `warp`) and `worldgen/spec.py` (the records of 3.2, PRESETS with B as `PRESET`, SEED 1987, `world` / `target` /
+  `a1_pin`; `target` reproduces every NW-0 s\*-target). `questCeilings.test.ts` covers `worldgen/` and `world_specs/`.
+- **Spots (5.2).** 41 spots on today's world, at today's cells (13 a1, 3 elf, 7 ert, 6 fir, 3 ord, 3 wat, 6 wnd):
+  `RegionOut.spots` in v1, each region module's `SPOTS`, the composer's `spots` and `world.basins`, world check 3
+  (`<prefix>_s_<name>`), `build_hooks.passthrough`, `map_checks_spots.py` (kind land / dock / landing, always on),
+  `nw1_selftest.py` in `build_map.py --selftest` (132 checks). The bridge gates got ids (`a1_bridge_gate_w`, `_e`) so
+  `nonLoadBearing` can name them.
+- **Data.** quest.yaml: 27 entries, 33 vehicles (`at:`), 5 `nonLoadBearing` (`ref:` 2 gates, 3 docks);
+  debug-scenarios.yaml: 36 vehicles, the 3 `frame: a1` spawns now `spot:` (`a1_s_temple_road`, `a1_s_bridge`,
+  `a1_s_east`); cutscenes.yaml: `set_vehicle ... at: fir_s_airship`.
+- **Runtime and verifier.** `MapData.spots`, `MapWorld.frames` optional with `basins` / `cuts` (types/quest.ts);
+  the map schema validates spots and world; the quest schema takes `at` / `ref` and refuses raw cells on `overworld`;
+  `questSpots.resolveQuestPlaces` gives every entry, vehicle and ref its cell when the world is built (so the
+  searches read cells only); `questEvents` takes `set_vehicle at`; `DebugScenarioLoader` resolves `spot:` and
+  vehicle spots at scenario start (an unknown spot throws); `Game.vehicles` may hold a spot vehicle until its map
+  loads (`resolveParked` in `FieldVehicles.setMap`, `restoredSpawn`); a save refuses a vehicle without a cell; the
+  cutscene registry and manager take `at`. CLI: `--maps DIR` (`questMaps.ts`), `--anchors FILE`, `--worst-canoe`
+  (rows T0-T4 + canoe; on today's world 17 rows, OK). The anchors file's bands are read from the file (no code
+  defaults); proof (h) reads the seeds from `world.basins`.
+- **Mode 7.** `mode7_atlas.cell_px(width)`: 3072 // width and half that, refused when not whole (192 -> 16 / 8, as
+  before; 256 -> 12 / 6).
+- **Anchors (4.2).** `assets-src/maps-nw/world-anchors.yaml`: act 1's four at today + (54, 44), the other 20 at
+  CORNELIA_NW + 0.86 x ref; `fit.scale` [0.75, 0.95], `longPair` 23, the other bands, pairs, the exemption and the
+  detours unchanged. Fitted s\* = 0.847 at the targets (0.851 at NW-0's pins, Melmond -2 x and Crescent +2 x); every
+  pair in band. pravoka-matoya r = 0.742 (>= 0.72), so no new exemption. 20,000 random +-2 placements of the 20
+  non-act-1 anchors (act 1's pins fixed): 0 fail (0.000 %). With act 1's four moved as well: 11.1 % fail (1,641
+  cornelia-temple bearing, 640 pravoka-matoya distance); today's file measures 8.2 % the same way (all cornelia-temple
+  bearing), so that figure is act 1's compression, not the re-fit. `tests/nw/anchors.test.ts` pins all of this.
+
+| pair | d_w | d_r | long | ratio | band | bearing err | max | detour | ok |
+|---|---|---|---|---|---|---|---|---|---|
+| cornelia-pravoka | 40.3 | 57.3 | long | 0.83 | [0.7, 1.3] | 2.3 | 40 | 2.5 | OK |
+| cornelia-matoya | 39.4 | 53.8 | long | 0.863 | [0.7, 1.3] | 20.8 | 40 | 2.5 | OK |
+| cornelia-temple | 15.3 | 41.2 | long | 0.438 | [0.7, 1.3] exempt | 29.3 | 40 |  | OK |
+| pravoka-elfheim | 73.6 | 93.7 | long | 0.926 | [0.7, 1.3] | 4.1 | 40 | 2.5 | OK |
+| elfheim-marsh | 41.6 | 48.8 | long | 1.006 | [0.7, 1.3] | 0.2 | 40 | 2.5 | OK |
+| elfheim-keep | 33.6 | 40.0 | long | 0.992 | [0.7, 1.3] | 0.3 | 40 | 2.5 | OK |
+| keep-dwarf | 25.0 | 29.1 | long | 1.013 | [0.7, 1.3] | 0.3 | 40 |  | OK |
+| dwarf-melmond | 15.2 | 17.9 | short | 1.005 | [0.55, 1.6] | 3.4 | 60 | 4.5 | OK |
+| melmond-earth_cave | 22.8 | 25.6 | short | 1.051 | [0.55, 1.6] | 0.8 | 60 | 2.5 | OK |
+| melmond-giant | 17.0 | 20.0 | short | 1.003 | [0.55, 1.6] | 0.0 | 60 | 2.5 | OK |
+| melmond-sarda | 27.2 | 32.2 | long | 0.994 | [0.7, 1.3] | 0.8 | 40 | 3.0 | OK |
+| melmond-crescent | 120.8 | 140.9 | long | 1.012 | [0.7, 1.3] | 0.1 | 40 | 2.5 | OK |
+| cornelia-crescent | 60.4 | 70.9 | long | 1.007 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| crescent-volcano | 41.1 | 48.2 | long | 1.007 | [0.7, 1.3] | 0.6 | 40 | 2.5 | OK |
+| crescent-ice | 29.0 | 33.9 | long | 1.009 | [0.7, 1.3] | 1.4 | 40 | 2.5 | OK |
+| ice-desert | 17.2 | 20.0 | short | 1.015 | [0.55, 1.6] | 1.3 | 60 | 2.5 | OK |
+| desert-citadel | 166.9 | 193.3 | long | 1.019 | [0.7, 1.3] | 0.0 | 40 |  | OK |
+| citadel-bahamut | 49.0 | 56.9 | long | 1.018 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| desert-onrac | 187.5 | 218.0 | long | 1.016 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| onrac-waterfall | 34.1 | 40.2 | long | 1.002 | [0.7, 1.3] | 0.7 | 40 | 2.5 | OK |
+| onrac-caravan | 27.8 | 32.2 | long | 1.017 | [0.7, 1.3] | 0.5 | 40 |  | OK |
+| caravan-gaia | 165.6 | 192.7 | long | 1.015 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| gaia-mirage | 37.5 | 42.5 | long | 1.042 | [0.7, 1.3] | 0.6 | 40 |  | OK |
+| gaia-lufenia | 36.4 | 41.8 | long | 1.029 | [0.7, 1.3] | 0.8 | 40 |  | OK |
+| lufenia-melmond | 157.1 | 183.2 | long | 1.012 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| cornelia-onrac | 116.8 | 135.9 | long | 1.014 | [0.7, 1.3] | 0.0 | 40 |  | OK |
+| cornelia-gaia | 129.8 | 150.4 | long | 1.019 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| cornelia-marsh | 80.8 | 94.4 | long | 1.01 | [0.7, 1.3] | 0.1 | 40 |  | OK |
+| cornelia-sarda | 89.0 | 104.0 | long | 1.01 | [0.7, 1.3] | 0.0 | 40 |  | OK |
+| cornelia-citadel | 102.2 | 118.5 | long | 1.018 | [0.7, 1.3] | 0.2 | 40 |  | OK |
+| pravoka-matoya | 62.2 | 99.0 | long | 0.742 | [0.7, 1.3] | 9.6 | 40 |  | OK |
+
+**Gates.** `npm run quest -- --strict` on today's world: its `--json` report is byte-identical to `mainline`'s
+(27aa2b0b), `quest-verify: OK`. `npm run quest -- --strict --mutate`: `mutations: OK (64 gate rows; 105 elements, each removal reported)`, `quest-verify: OK` (28.5 min). `--only h --worst-canoe --strict`: OK (17 rows). `npm run build` OK; `npm run test:fast` 396 files, 9543 tests passed;
+`mode7Atlas.test.ts` unchanged and green.
+
+**Deviations from the plan text** (none changes behaviour):
+
+- `MapData.spots` and the optional `world.frames` / `basins` / `cuts` are typed in `src/types/quest.ts`
+  (`MapDataQuestFields`, `MapWorld`), not as a line of `types/index.ts`; `index.ts` got one line instead,
+  `KeyItemGate.id`. The map schema's `spots` check is in `schemaValidationQuest.validateQuestMapFields`, which
+  `validateMapData` calls (`schemaValidation.ts` is at 380 lines and unchanged).
+- The gates had no ids, so the two bridge gates were named (`a1_bridge_gate_w`, `_e`; frozenCore's comparison ignores
+  the id). The schema also refuses `nonLoadBearing.at` on `overworld` (grep 4 of Appendix A), so the `mini` fixture
+  names its gates, docks and NPCs by `ref` too.
+- Stage entries and their vehicles are resolved once, in `questSpots.resolveQuestPlaces` (called by
+  `buildQuestWorld`), rather than at `questSearch.ts:81-93` and `questEvents.ts:152-154`; those keep reading cells.
+- The data test is `tests/data/worldSpots.test.ts`, beside `crossFileValidation.test.ts` (561 lines).
+- debug-scenarios.yaml has 36 world vehicles, not 38.
+- 4.2's "at most 0.05 % of placements may fail" holds with act 1's pins fixed (0 of 20,000); moving act 1's four too
+  gives 11.1 %, against today's file's 8.2 % by the same measure, all from act 1's compressed pairs.
 
 ## Appendix A. Coordinate-inventory checklist (gates NW-5, G-NW10)
 

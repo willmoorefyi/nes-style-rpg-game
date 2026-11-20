@@ -26,6 +26,17 @@ import world_earth_sites as S  # noqa: E402
 from world_api import BOXES, UNSET, Cell, RegionOut  # noqa: E402
 from world_geom import bbox  # noqa: E402
 
+# NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): the places quest.yaml and the scenarios name (stage entries, parked vehicles)
+SPOTS = {
+    "ert_s_dwarf": {"at": [55, 104], "kind": "land"},           # the dwarf hall's door: S10, S11
+    "ert_s_melmond": {"at": [42, 112], "kind": "land"},         # Melmond's land gate: S14, S25
+    "ert_s_giant": {"at": [28, 112], "kind": "land"},           # the giant's east mouth: S12
+    "ert_s_earth_cave": {"at": [30, 126], "kind": "land"},      # the Cavern of Earth: S13
+    "ert_s_dwarf_ship": {"at": [59, 104], "kind": "dock"},      # the ship at the ert_dwarf dock
+    "ert_s_melmond_ship": {"at": [43, 113], "kind": "dock"},    # the ship at the ert_melmond dock
+    "ert_s_melmond_airship": {"at": [40, 109], "kind": "landing"},  # by Melmond: S25
+}
+
 
 def build(band: set[Cell]) -> RegionOut:
     g = G.ground(band)
@@ -39,5 +50,5 @@ def build(band: set[Cell]) -> RegionOut:
         ground=rows, objects=S.objects(g), inspect=S.inspect(), transitions=S.transitions(),
         entrances={k: list(v) for k, v in S.ENTRANCES.items()}, patches=[S.canal()], docks=S.docks(),
         encounterZones=S.zones(g, band, box), battleBackgrounds={"zones": dict(S.BACKDROPS)}, checks=checks,
-        walls=S.walls(g), barriers=S.barriers(g),
+        walls=S.walls(g), barriers=S.barriers(g), spots={k: dict(v) for k, v in SPOTS.items()},
         notes=["EARTH: the isthmus, the canal saddle, the western range (ERT-O)"])
