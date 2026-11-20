@@ -373,6 +373,8 @@ export class ExplorationScene implements Scene {
     if (this.dialogManager.isActive) {
       this.fieldHUD.container.visible = false;
       this.dialogManager.update(dt, this.game.input);
+      this.camera.update();     // NW-5: the field still draws under a dialog (the reset notice on arrival: the
+      this.tilemap?.render();   // world map streamed in only once it closed)
       return;
     }
     if (this.fieldBusy) return;
