@@ -11,6 +11,8 @@ Added in LM4-INT: `sea_y` (drop the painted sea round a town's walls: water-hued
 below sea_y) and `drop` (fractional rects cut out of the figure: Pravoka's pier).
 Added in WL: `oval` / `oval_top` (the ground outside an ellipse round a walled town, below a row: a render whose ground
 runs off its frame, Melmond and Crescent).
+Added in LM5-INT: `solid_y` (below that row the figure is closed and its holes filled, then cut to the oval again:
+the Western Keep's rock as one solid plinth).
 """
 from __future__ import annotations
 
@@ -39,7 +41,7 @@ def hsv(rgb):
 
 def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, base_y=None, green_y=None,
           smoke_y=None, smoke_sat=0.3, sea_y=None, sea_hue=(170, 215), sea_sat=0.25, sea_grow=2, drop=(),
-          oval=None, oval_top=0.0):
+          oval=None, oval_top=0.0, solid_y=None, solid_close=9):
     """rim: peel up to `rim` px of light, low-saturation pixels inward from the background (a sticker rim);
     pocket: erase near-white blobs >= `pocket` px wide trapped inside the figure (background seen through gaps);
     base_y / green_y / smoke_y: fractions of the render height: drop every row from base_y, grass-green pixels from
@@ -77,6 +79,20 @@ def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, b
         fg[int(y0 * H):int(y1 * H), int(x0 * W):int(x1 * W)] = False
     if oval is not None:
         fg = fg & ~outside_oval(fg.shape, oval, oval_top)
+    if solid_y is not None:
+        fg = solid_footing(fg, solid_y, solid_close, outside_oval(fg.shape, oval, oval_top) if oval is not None else None)
+    return fg
+
+
+def solid_footing(fg, solid_y, close=9, outside=None):
+    """LM5-INT: below row solid_y * H the figure is closed (dilate then erode by `close`) and every enclosed hole
+    filled, then cut to the oval again (`outside`): the rock a keep stands on becomes one solid plinth instead of
+    ragged stair rocks."""
+    y0 = int(solid_y * fg.shape[0]); sub = fg[y0:]
+    sub = _b(_m(sub).filter(ImageFilter.MaxFilter(close)).filter(ImageFilter.MinFilter(close))) | sub
+    lab, _ = components(np.pad(~sub, 1, constant_values=True))
+    sub = sub | (lab != lab[0, 0])[1:-1, 1:-1]
+    fg = fg.copy(); fg[y0:] = sub if outside is None else sub & ~outside[y0:]
     return fg
 
 

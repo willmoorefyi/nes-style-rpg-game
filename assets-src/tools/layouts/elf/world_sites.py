@@ -6,9 +6,11 @@ from __future__ import annotations
 
 from elf import town_elfheim_site as SITE
 
-# the keep: a castle icon on the arm's Aldi shore, its door at (KEEP[0] + 1, KEEP[1] + 1), the anchor below it
-KEEP = (59, 123)
-KEEP_DOOR = (KEEP[0] + 1, KEEP[1] + 1)
+# the keep: the approved `western_keep` icon (2x3, LM5-INT; before, the shared 2x2 castle icon at (59, 123)) on the
+# arm's Aldi shore, on its rock plinth; its door the bottom-right cell (the stair foot), the anchor below it
+KEEP = (59, 122)
+KEEP_W, KEEP_H = 2, 3
+KEEP_DOOR = (KEEP[0] + 1, KEEP[1] + 2)
 KEEP_ARRIVE = (KEEP_DOOR[0], KEEP_DOOR[1] + 1)          # `elf_keep` (target (61, 126))
 KEEP_TOWER = (57, 121)                                  # a watchtower (2x3) beside it
 MARSH = (52, 160)                                       # the cave mouth (2x2); door (53, 161)
@@ -62,10 +64,11 @@ def icon_parts() -> tuple[tuple[int, int], list[list[str | None]], list[list[int
 
 
 def objects() -> list[dict]:
+    from kit import landmark_parts  # noqa: PLC0415
     (ix, iy), parts, walk = icon_parts()
     objs = [
-        {"type": "deco", "name": "western_keep", "x": KEEP[0], "y": KEEP[1], "style": "slate",
-         "parts": [["castle_icon_0_0", "castle_icon_0_1"], ["castle_icon_1_0", "castle_icon_1_1"]], "walk_cells": [[1, 1]]},
+        {"type": "deco", "name": "western_keep", "x": KEEP[0], "y": KEEP[1], "parts": landmark_parts("western_keep"),
+         "walk_cells": [[KEEP_DOOR[0] - KEEP[0], KEEP_DOOR[1] - KEEP[1]]], "collide": "alpha"},
         {"type": "deco", "x": KEEP_TOWER[0], "y": KEEP_TOWER[1], "style": "slate", "collide": "alpha",
          "parts": [[f"tower_icon_{r}_{c}" for c in range(2)] for r in range(3)]},
         {"type": "deco", "name": "marsh_cave", "x": MARSH[0], "y": MARSH[1],
@@ -83,7 +86,7 @@ def blocked_cells() -> set[tuple[int, int]]:
     """Cells the objects block (the region's own walk flood needs them)."""
     (ix, iy), parts, walk = icon_parts()
     out = {(ix + i, iy + j) for j, row in enumerate(parts) for i, p in enumerate(row) if p and [i, j] not in walk}
-    out |= {(KEEP[0] + i, KEEP[1] + j) for i in range(2) for j in range(2)} - {KEEP_DOOR}
+    out |= {(KEEP[0] + i, KEEP[1] + j) for i in range(KEEP_W) for j in range(KEEP_H)} - {KEEP_DOOR}
     out |= {(KEEP_TOWER[0] + i, KEEP_TOWER[1] + j) for i in range(2) for j in range(3)}
     out |= {(MARSH[0] + i, MARSH[1] + j) for i in range(2) for j in range(2)} - {MARSH_DOOR}
     out |= {(WAYSTONE[0], WAYSTONE[1] + 1), *DEAD_TREES}
@@ -114,8 +117,9 @@ def clear_cells() -> dict[tuple[int, int], str]:
     out.update({c: "w" for c in DEAD_TREES})            # the dead trees stand in the fen
     out.update({c: "o" for c in KEEP_MOAT})
     out[DOCK_POST] = "s"                                # the post stands on the quay's sand
-    # the keep and its tower stand on a crag: the castle icon's top row has too little art to be a wall by itself
-    out.update({c: "m" for c in [(KEEP[0], KEEP[1]), (KEEP[0] + 1, KEEP[1])]
+    # the keep and its tower stand on a crag: the keep's top two rows (roofs and tower, sky at their sides) stand on
+    # the watchtower's rock, its plinth on the grass below
+    out.update({c: "m" for c in [(KEEP[0] + i, KEEP[1] + j) for i in range(KEEP_W) for j in range(KEEP_H - 1)]
                 + [(KEEP_TOWER[0] + i, KEEP_TOWER[1] + j) for i in range(2) for j in range(3)]})
     out.update({c: "," for c in road_cells()})
     out[SITE.GATE] = ","

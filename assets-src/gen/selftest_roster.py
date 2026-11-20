@@ -169,6 +169,26 @@ def revived_ok(meta: dict, cache: Path) -> bool:
     return bool(key) and (cache / f"{key}.png").is_file() and (cache / f"{key}.json").is_file()
 
 
+def bedrock_keys(meta: dict) -> list[str]:
+    """The render keys of a Bedrock-cut approved sheet: a landmark sheet's per-landmark keys (and remove_bg keys), or
+    an NPC field sheet's `sources` (npc_field_cut.py)."""
+    keys = [meta["cache_key"]] if meta.get("cache_key") else []
+    for lm in (meta.get("landmarks") or {}).values():
+        keys += [k for k in (lm.get("cache_key"), lm.get("nobg_key")) if k]
+    keys += [s["cache_key"] for s in meta.get("sources") or []]
+    return sorted(set(keys))
+
+
+def bedrock_ok(meta: dict, cache: Path, ledger: list[dict] | None = None) -> bool:
+    """A Bedrock-cut approved sheet (Stability renders re-cut offline: landmark_cut.py, npc_field_cut.py) is not a
+    Gemini request to re-plan: each of its render keys must be a request in the tracked BR ledger and in the cache."""
+    from gen import bedrock as B
+    rows = B.read_br_ledger() if ledger is None else ledger
+    asked = {r.get("key") for r in rows if r.get("event") in ("request", "result")}
+    keys = bedrock_keys(meta)
+    return bool(keys) and all(k in asked and (cache / f"{k}.png").is_file() for k in keys)
+
+
 def _approved_keys(check: Callable[[bool, str], None]) -> None:
     """Every approved request (approved/*/*.json) re-planned from today's code and yaml reproduces its cache key."""
     from gen import generate as GEN
@@ -182,6 +202,11 @@ def _approved_keys(check: Callable[[bool, str], None]) -> None:
             if not revived_ok(meta, GEN.CACHE):
                 bad.append(f"{cid} {meta['sheet']}: revived from {meta['revived_from']}, cache/{meta.get('cache_key')} "
                            "missing")
+            continue
+        if meta.get("backend") == "bedrock" or meta.get("vehicle"):   # LM-INT .. LM5-INT: Bedrock cuts (landmarks, NPCs, vehicles)
+            done += 1
+            if not bedrock_ok(meta, GEN.CACHE):
+                bad.append(f"{cid} {meta['sheet']}: a Bedrock key not in the BR ledger or not cached")
             continue
         char = GEN.load_character(cid)
         if meta.get("sheet") in ("kneel", "battle_kneel"):   # pass KA-G keys: kneel_ai_gem's request, not generate's

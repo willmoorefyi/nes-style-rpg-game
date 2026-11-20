@@ -154,10 +154,13 @@ LANDMARKS = {
     "bell_tower": (2, 3, (200, 200, 205), "BT", "tower"), "lighthouse": (2, 3, (235, 235, 230), "LH", "tower"),
     "mirage_tower": (2, 3, (215, 190, 140), "MT", "tower"),
     "standing_stones": (2, 2, (150, 150, 150), "SS", "shrine"), "hermit_hut": (2, 2, (165, 130, 90), "HH", "tent"),
+    # LM5-INT: the Western Keep and the Citadel of Trials (both were the shared castle icon)
+    "western_keep": (2, 3, (110, 115, 125), "WK", "tower"), "citadel": (3, 3, (225, 220, 205), "CT", "town"),
 }
 # LM-INT / LM4-INT: the approved Bedrock landmark sheets (assets-src/gen/landmark_cut.py); their cells replace the
 # code-drawn landmark placeholders in every kit, not only the overworld kit that holds the files
-LANDMARK_SHEETS = (APPROVED / "overworld" / "landmarks_lm", APPROVED / "overworld" / "landmarks_lm4")
+LANDMARK_SHEETS = (APPROVED / "overworld" / "landmarks_lm", APPROVED / "overworld" / "landmarks_lm4",
+                   APPROVED / "overworld" / "landmarks_lm5")
 LANDMARK_SHEET = LANDMARK_SHEETS[0]
 
 

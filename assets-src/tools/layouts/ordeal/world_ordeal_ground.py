@@ -24,7 +24,8 @@ from world_api import WORLD_H, WORLD_W, Cell
 SEED = 4505
 PLATEAU = (81.0, 28.0, 15.5, 18.0)       # centre x, y and radii of the plateau's outline
 RIM = 2                                  # the rim of peaks: land within this many cells of the coast
-CITADEL = (74, 26)                       # the 2x2 citadel icon's top-left; its door (75, 27), the anchor (75, 28)
+CITADEL = (74, 25)                       # the 3x3 citadel icon's top-left (LM5-INT; was 2x2 at (74, 26)); its door
+                                         # (75, 27) bottom centre, the anchor (75, 28)
 MEADOW = (71, 28, 80, 34)                # the grass landing meadow below the gate (x0, y0, x1, y1)
 CRAG = (69, 19, 81, 25)                  # the crag the citadel is cut into
 RIDGE = [(94, 15), (90, 20), (86, 25), (85, 29)]   # the knife ridge, north-east rim to the plateau's heart
@@ -142,7 +143,8 @@ def ground(mine: np.ndarray) -> tuple[np.ndarray, dict[str, set[Cell]]]:
     mx0, my0, mx1, my1 = MEADOW
     g[my0:my1 + 1, mx0:mx1 + 1] = np.where(plateau[my0:my1 + 1, mx0:mx1 + 1], ".", g[my0:my1 + 1, mx0:mx1 + 1])
     x, y = CITADEL
-    g[y, x - 1:x + 3], g[y + 1, x - 1:x + 3] = "m", "."     # the icon's top row stands against the crag
+    g[y, x - 1:x + 4], g[y + 1:y + 3, x - 1:x + 4] = "m", "."   # the icon's top row stands against the crag, its
+    # body, gate and the two broken pillars (x - 1, x + 3) on the meadow's grass
     # the isles: a crag on each, wood on the larger ones, Bahamut's landing patch before the cave
     for i, (k, m) in enumerate(isles.items()):
         nn = n2 if i % 2 else n3

@@ -36,7 +36,6 @@ DONE = "WATER_CRYSTAL_LIT"
 RATE = {"min": 16, "max": 28}
 SHRINE_BG = {"default": "water_temple"}
 THRONE_BG = {"default": "throne_kraken"}
-MERMAID = "#5fb8b0"                      # the tint of the grotto's sea folk (villager_f)
 NOTE = ("Concept: a temple of the sea folk in a drowned cave under Onrac's bay, sunk with the kingdom whose king "
         "flooded it to save it, where the last mermaids keep the dry grotto at the top.\n"
         "Distinct: the submarine berths in a flooded pool in the middle floor, so the shrine splits up and down from "

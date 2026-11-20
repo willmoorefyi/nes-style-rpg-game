@@ -55,7 +55,7 @@ def backdrops() -> dict:
     return {z: bg for z, (_n, _m, _t, bg) in ZONES.items() if bg}
 
 
-DOOR = (CITADEL[0] + 1, CITADEL[1] + 1)
+DOOR = (CITADEL[0] + 1, CITADEL[1] + 2)               # the 3x3 icon's bottom centre (LM5-INT)
 CAVE_DOOR = (CAVE[0] + 1, CAVE[1] + 1)
 ENTRANCES: dict[str, list[int]] = {
     "ord_citadel": [DOOR[0], DOOR[1] + 1], "ord_bahamut": [CAVE_DOOR[0], CAVE_DOOR[1] + 1],
@@ -79,11 +79,9 @@ def objects() -> list[dict]:
     """The landmarks: the citadel's gate between two broken pillars, Bahamut's cave mouth, the hermit's hut, and a
     few boulders on the heath."""
     x, y = CITADEL
-    out = [{"type": "deco", "name": "citadel", "parts": [["castle_icon_0_0", "castle_icon_0_1"],
-                                                         ["castle_icon_1_0", "castle_icon_1_1"]],
-            "x": x, "y": y, "style": "stone", "walk_cells": [[1, 1]]},
-           {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x - 1, "y": y},
-           {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x + 2, "y": y},
+    out = [_deco("citadel", x, y, walk_cells=[[DOOR[0] - x, DOOR[1] - y]], collide="alpha"),  # LM5-INT: its own art
+           {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x - 1, "y": y + 1},
+           {"type": "deco", "parts": [["tpillar_broken_top"], ["tpillar_broken_bottom"]], "x": x + 3, "y": y + 1},
            _deco("cave_mouth", *CAVE, walk_cells=[[1, 1]]),
            _deco("hermit_hut", *TENT, collide="alpha")]             # LM4-INT: the hut's own art (was the tent)
     for bx, by in ((78, 38), (70, 33), (79, 15)):

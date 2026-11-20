@@ -13,13 +13,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from shrine_common import MERMAID, NOTE, Floor, chest, talk  # noqa: E402
+from shrine_common import NOTE, Floor, chest, talk  # noqa: E402
 
 W, H = 34, 26
 
 
-def mermaid(nid: str, x: int, y: int, before: list[str], after: list[str], sprite: str = "villager_f") -> dict:
-    return {"id": f"wat_d_{nid}", "sprite": sprite, "tint": MERMAID, "x": x, "y": y, "dialog": talk(before, after)}
+def mermaid(nid: str, x: int, y: int, before: list[str], after: list[str], sprite: str = "mermaid") -> dict:
+    return {"id": f"wat_d_{nid}", "sprite": sprite, "x": x, "y": y, "dialog": talk(before, after)}   # LM5-INT: own sheet
 
 
 def build() -> Floor:
