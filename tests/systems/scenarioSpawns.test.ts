@@ -1,7 +1,7 @@
 /**
  * Debug spawns on the overworld (GAP-18; docs/WORLD_PLAN.md 1.5, W1-B; NW-1 and NW-5, docs/NATURAL_WORLD_PLAN.md
  * 5.2, 3.6.5): every `map: overworld` field scenario uses an entrance or a spot (`spot:`, a name of the map's
- * `spots`; the three act-1 spawns that had `frame: a1` before NW-1, whose frame is gone), and its spawn is a walkable
+ * `spots`; the three act-1 spawns that used pass W's act-1 frame before NW-1), and its spawn is a walkable
  * cell of the compiled world.
  */
 import { describe, it, expect } from 'vitest';

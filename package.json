@@ -11,7 +11,7 @@
     "test:full": "vitest run",
     "test:world": "vitest run --project world",
     "validate": "npx tsx scripts/validate-content.ts",
-    "quest": "vite-node scripts/quest-verify.ts",
+    "quest": "NODE_OPTIONS=--max-old-space-size=8192 vite-node scripts/quest-verify.ts",
     "assets": "python3 -I assets-src/build_assets.py"
   },
   "dependencies": {

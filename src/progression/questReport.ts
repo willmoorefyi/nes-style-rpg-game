@@ -44,12 +44,14 @@ export interface VerifyArgs {
   anchors?: string;
   /** NW-1 (docs/NATURAL_WORLD_PLAN.md 4.3): rows T0-T4 run again with the canoe, every river and lake passable. */
   worstCanoe: boolean;
+  /** NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): proof (c) again from every stage's reset state and mid-stage samples. */
+  fromReset: boolean;
 }
 
 /** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR] [--maps DIR] [--anchors FILE]
- *  [--worst-canoe]`. Throws on a bad argument. */
+ *  [--worst-canoe] [--from-reset]`. Throws on a bad argument. */
 export function parseArgs(argv: readonly string[]): VerifyArgs {
-  const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false };
+  const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false, fromReset: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = (): string => {
@@ -65,6 +67,7 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     else if (a === '--maps') out.maps = value();
     else if (a === '--anchors') out.anchors = value();
     else if (a === '--worst-canoe') out.worstCanoe = true;
+    else if (a === '--from-reset') out.fromReset = true;
     else if (a === '--only') {
       const letters = value();
       const bad = [...letters].filter((c) => !(ALL_PROOFS as readonly string[]).includes(c));
@@ -73,6 +76,7 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     } else throw new Error(`unknown argument ${a}`);
   }
   if (out.stage && !/^S\d+$/.test(out.stage)) throw new Error(`--stage: expected S<n>, got ${out.stage}`);
+  if (out.stage && out.fromReset) throw new Error('--from-reset runs every stage: it takes no --stage');
   return out;
 }
 
