@@ -124,7 +124,7 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 504 / 590 (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 424 / 442, `SpellExecutor.ts` 311 / 314, `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `layouts/overworld.py` (202) stays under 250: its new data goes in `overworld_consts.py` or `overworld_zones.py`. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
+- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 504 / 590 (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 424 / 442, `SpellExecutor.ts` 311 / 314, `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
 - Pass W: every file of `src/progression/`, the field rules (`src/systems/fieldRules*.ts`), `src/types/quest.ts`, `src/core/schemaValidationQuest.ts`, `FieldVehicles.ts`, `FieldNpcActions.ts`, the `layouts/world*.py` files and every `.py` under the region directories (`a1`, `elf`, `earth`, `fire`, `ordeal`, `water`, `wind`, `past`) stay under 250 lines, with no exceptions (`tests/data/questCeilings.test.ts`, which finds new files as they land).
 - Also over 250 and not split: `src/core/schemaValidation.ts` (380), and the tools `build_map.py`, `kit.py`, `map_selftest.py` and `stage_backgrounds.py` (255).
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
@@ -262,7 +262,7 @@ Most compiled maps come from Python layout scripts, not hand-written YAML. Each 
 
 | Script (under `assets-src/tools/layouts/`) | Writes |
 |--------|--------|
-| `world.py` | `overworld.yaml`, the whole 192x192 world (see "The world (pass W)" below). It pastes each region module `world_<r>.py` (`world_a1`, `world_elf`, `world_earth`, `world_fire`, `world_ordeal`, `world_water`, `world_wind`, with their data in `<region>/world_*.py`), fills the edge bands and seams, runs `world_checks.py` and is the only writer of the world source. `overworld.py` is a shim that runs it and keeps the act-1 block (`build()`, `objects()`, the act-1 checks; data in `overworld_consts.py`, `overworld_zones.py`) |
+| `world.py` | `overworld.yaml`, the whole 256x256 world (see "The world (pass NW)" below): the region specs `world_specs/<region>.py` (with each region's `content` hook, `world_content.py`) through the generator `tools/worldgen/`, the content and the writer (`world_source.py`), the checks (`world_checks.py`, `worldgen/gates*.py`, `prewalk.py`, `a1/world_a1_checks.py`) and the step-mean scaling (`world_balance.py`); the only writer of the world source. `overworld.py` is a shim that runs it |
 | `cornelia.py` | `cornelia.yaml` (the walled royal city, its gates and edge exits) |
 | `interiors.py` | the ten house interiors `cornelia-house-<name>.yaml` (scholar, fisher, farm, knight, weaver, gardener, family, apprentice, tavern, shrine) and the six shop and inn maps (`cornelia-weapon-shop`, `-armor-shop`, `-item-shop`, `-white-magic`, `-black-magic`, `-inn`) |
 | `castle.py` | `cornelia-castle.yaml`, `-2f`, `-tower`, `-cellar` |
@@ -285,7 +285,7 @@ The `*_common.py`, `*_people.py`, `*_homes.py`, `*_shops.py` and `*_site.py` fil
 - deco `waterline: n` (WL) — a moored boat partly under water: on an `on_water` deco with no above rows, the art below native px row n (from the top of its parts grid) is baked as a 4x4 ordered dither (8 of 16 pixels kept, thinning to 4 of 16 by 24 px down) of the art mixed toward its shape in the water's hue, with a 1 px light ripple on row n; 15-bit colours, binary alpha (`tools/waterline.py`, its selftest also runs in `build_map.py --selftest`). Set on the Onrac submarine (62 of 96: the conning tower and upper hull above), the Onrac fishing boat (84 of 96) and the Pravoka brig (134 of 144); the frigate vehicle is its own sprite.
 - patch `art_ground` (FX-R) — the patch overlay is painted as this legend char instead of `ground` (same terrain only), e.g. the canal's stone-banked `~` over Water `o`.
 - `layouts/world_dress.py` (FX-R) — `scatter()` dresses a town icon with seeded 1x1 copses, bushes and stones (offsets, gaps, `collide: alpha`; the door's sides stay solid, the gate stays reachable): Melmond, Onrac.
-- A peak drawn near a chunk border reaches into the next chunk, so editing mountains in a chunk beside another region's chunk can repaint it (FX-R: EARTH's hogback at x 48-63, y 80-95 touches A1's chunk at x 64). Check the changed chunk files against `world.py --owned-chunks <region>` after a compile.
+- A peak drawn near a chunk border reaches into the next chunk, so editing mountains in a chunk beside another region's chunk can repaint it. Check the changed chunk files against `world.py --owned-chunks <region>` after a compile.
 
 After an edit:
 
@@ -297,101 +297,104 @@ python3 -I assets-src/tools/build_map.py --preview overworld 20 30 40 45 /tmp/cr
 
 Re-running every layout script must leave `git diff --exit-code assets-src/maps` clean (the scripts are deterministic), and `build_map.py --check-determinism` must pass.
 
-### The world (pass W)
+### The world (pass NW)
 
-Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anchor) on `docs/QUEST_PLAN.md`.
+Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in its sections 11-16) on
+`docs/WORLD_PLAN.md` (pass W: the progression S0-S31, the gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
 
-- **Size and origin.** The world map `overworld` is 192x192 cells (`world_api.py`: `WORLD_W`, `WORLD_H`, `CHUNK` 16, so
-  144 chunks). The act-1 72x72 block sits at `A1_ORIGIN` (64, 64): an act-1 cell (x, y) is world (x + 64, y + 64), e.g.
-  the bridge gate (29, 32) is (93, 96). The core x 64-135, y 64-135 is frozen (`FROZEN_CORE`; WORLD 2.5 lists the
-  cells that may change).
-- **Regions** (`BOXES`; prefix): A1 (64, 64)-(143, 143) `a1`; ELF (48, 112)-(63, 143) + (0, 144)-(111, 191) `elf`;
-  EARTH (0, 64)-(63, 111) + (0, 112)-(47, 143) `ert`; FIRE (144, 64)-(191, 143) + (112, 144)-(191, 191) `fir`; ORDEAL
-  (64, 0)-(127, 63) `ord`; WATER (0, 0)-(63, 63) `wat`; WIND (128, 0)-(191, 63) `wnd`. PAST lives under the act-1
-  temple (`past-*` maps). The 2 cells either side of a region edge are the composer's. Two seas: the inland `aldi`
-  (docks `a1_pravoka`, `elf_port`, `ert_dwarf`) and the `ocean` (`ert_melmond`, `fir_crescent`), joined by the `canal`
-  patch (CANAL_OPEN). `world.py --check-bands` prints `bands: OK`, `world.py` then `basins: OK (...)`;
-  `world.py --owned-chunks <region>` lists the chunk files a region may change.
-- **Progression.** `assets/data/quest.yaml`: the goal CHAOS_DEFEATED, stages S0-S31 (S19 and S31 optional; all built
-  since INT), each with `after`, `requires`, `grants`, `boss`, `band`, `kit` (kits.yaml), `maps`, `zones`, `grind`,
-  `walk`, `entry`, `milestones` and `nonLoadBearing`, plus the 8 shop `towns` (`opensAfter`, `bandStage`, `kit`). Each
-  tranche edits only its own anchor (`# === <TRANCHE> ===`).
-- **The verifier** (`src/progression/`, CLI `scripts/quest-verify.ts`): a state search over flags, key items (a stage's
-  grants and requirements count as key items; an ordinary chest or gift is an event only when its flag is one
-  quest.yaml names), vehicles and places, firing the field rules the game runs (`src/systems/fieldRules.ts`). Proofs:
-  - (a) order: the goal is reachable, no stage's grants hold before its `after` stages, every `walk` replays, each
-    optional stage is reachable and not required; with `--strict` a pending stage fails;
-  - (b) no skip: withholding a stage's grants (or one requirement, or its boss) keeps the later stages out of reach;
-    `milestones` must come in order;
-  - (c) no soft-lock: every reachable state can still reach the goal (no SOFTLOCK, STRANDED or DEADGATE);
-  - (d) bands: the curve model's whole-party level at each boss (or stage end) is in its `band` (up to the top level
-    + 1); a stage's kit is affordable; (d3) every `takeGold` price is at most 80 % of the gold at its stage's start
-    (the caravan's bottle: 40000);
-  - (e) early shops: no town's keeper is talkable before its `opensAfter`;
-  - (f) price walls: Crescent and Gaia cost more than 40 % of the gold a party has on arrival, on the rushing curve
-    (every `grind` 1.0, no exploring);
-  - (g) geography: the anchors of `assets/data/world-anchors.yaml` lie at their targets, within the fitted scale,
-    distance, bearing and detour bands of WORLD 6.1;
-  - (h) travel matrix: the rows T0-T10 (+ T6b) and the two basin rows of WORLD 6.2; with `--strict` every allowed dock
-    and the canal patch must be on the world map.
-  `--mutate` adds the no-skip mutation suite: the gate table GT-1 to GT-37 (+ GT-5b, `questMutateRows.ts`) and the
-  generic elements (`questMutateGeneric.ts`). An uncaught element needs a `nonLoadBearing` entry `{map, kind, at,
-  reason}` in its stage; `element: <label>` narrows it to that one element (required for `kind: quest`) and
-  `stage: <id>` to `--stage <id>` runs only. A `pending: ...` reason fails under `--strict`.
+- **Size.** The world map `overworld` is 256x256 cells (`layouts/world_api.py`: `WORLD_W`, `WORLD_H`, `CHUNK` 16, so
+  256 chunks), one whole-world generator, no region boxes and no act-1 frame (NW-5 removed `A1_ORIGIN`,
+  `world.frames`, `shiftA1`, `Game.pendingFrame` and `worldOffsetOf`). Cornelia's south-gate arrival is
+  `CORNELIA_NW` (146, 155); every other anchor's target is `CORNELIA_NW + S_STAR x ref` (s* 0.86, the reference offsets
+  of `assets/data/world-anchors.yaml`).
+- **Act 1** is generated with the rest round its pins: `layouts/a1/world_a1_pins.py` (the source since NW-5; derived
+  by NW-3 from pass W's world) holds every act-1 site, door, gate, patch cell, spot, object, inspect cell and road
+  point **Cornelia-relative** (world = CORNELIA_NW + rel; pass W's cell + (54, 44)), and `a1/world_a1_checks.py` its
+  promises (the bridge the only way off the peninsula, the tomb only over the east footbridge, Pravoka's channel, 2
+  key-item gates, the walks within +-10 % of pass W's: 22 / 23 / 59 / 39). Act 1's encounter tables stay in
+  `overworld_zones.py` (the fields, the map default) and `a1/world_a1_zones.py`; its zones' cells are
+  `a1/world_a1_nw.py`'s.
+- **Regions** (`world_api.REGIONS`; prefix): `a1`, `elf`, `ert` (EARTH), `fir`, `ord`, `wat`, `wnd`. A region owns
+  content, not ground: its spec `world_specs/<region>.py` (continent polygons, ridges, wall lines, passes, corridors,
+  roads, climate hints, islands, pins, spots) and its `content(g, meta, ctx)` hook (objects, inspect, NPCs, zones,
+  backdrops; `world_content.py`). Each land cell belongs to its continent's region, each sea cell to the nearest
+  land's (`worldgen/owners.py`); the source carries `regions.<r>.raster` (the chunks holding r's cells) and
+  `world.py --owned-chunks <r>` lists them. Pass W's door offsets of the regions outside act 1 are frozen in
+  `world_specs/today_doors_data.py`. Two seas: the inland `aldi` (docks `a1_pravoka`, `elf_port`, `ert_dwarf`) and the
+  `ocean` (`ert_melmond`, `fir_crescent`), joined by the `canal` patch (CANAL_OPEN, a saddle across the isthmus).
+- **The composer.** `python3 -I assets-src/tools/layouts/world.py` (`--metrics`, `--json FILE`, `--check`, `--out
+  FILE`, `--owned-chunks <r>`) merges the specs, runs `tools/worldgen/compose.py` (shape, relief, hydro, climate,
+  stamps, roads, finish (seal, jogs), owners) at preset B, seed 1987, places the content, resolves the spots, applies
+  the step-mean scaling (`world_balance.py`, below) and writes `assets-src/maps/overworld.yaml`. It prints one line per
+  check of plan 3.8 and exits 1 on a failure: `world`, `basins` (aldi .., ocean ..; canal joins), `docks`, `walls`
+  (W_west, W_isthmus, W_arm, W_south, W_east with their minimal water cuts), `barriers` (`spine`, `western_range` by
+  foot and canoe, `crescent_ring` by foot), `routes` (the pinned canoe rivers), `north` (the north continents are
+  their own walk+canoe components), `landings`, `straits`, `prewalk` (S0-S14: every required entrance on foot from the
+  stage's starts), `act1`, `walks`, `detours`, `pins`, `coverage` (every walkable / canoe cell in a zone of its owner
+  region; act 1's fields are the map default), then G-NW1 (no straight coast run over 6), G-NW2 (coast index >= 30),
+  G-NW3 (no land-class run over 6 on a chunk line), land (in [26,000, 31,800]; 26,847 at NW-5, near the floor), the
+  exemptions (cap 600) and the jogs. A failure names its rule, region and cells. Selftests: `python3 -I
+  assets-src/tools/worldgen/selftest.py` (synthetic specs, locality, determinism, NW-0's gates on the world) and
+  `selftest_gates.py` (each check fails on its mutated fixture). Snow `n` and tundra `t` (TerrainType 13 / 12, D-NW9):
+  walkable like grass, no ship or canoe, the airship lands on tundra and never on snow (`fieldRulesVehicles.ts`).
+- **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time; NW-5:
+  250 s, peak footprint 14.5 GB) writes the 256 chunks, the patch overlays and the Mode 7 atlas (`mode7.png` 3072x3072
+  at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).
+  A map over 192x192 cells is painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality). Gates:
+  `build_map.py --check-determinism overworld`, `mode7_atlas.py --check-determinism overworld`, and re-running
+  `world.py` leaves `git diff --exit-code assets-src/maps` clean. A source with rasters compiles in **chunk-digest
+  mode** (`terrain/region_chunks.py`): `build.chunks` per chunk; `--region r` repaints r's raster plus every chunk
+  whose digest differs from the base's (at most `PAINT_LIMIT` 160 painted chunks, ring included).
+- **Progression.** `assets/data/quest.yaml`: the goal CHAOS_DEFEATED, stages S0-S31 (S19 and S31 optional), each with
+  `after`, `requires`, `grants`, `boss`, `band`, `kit` (kits.yaml), `maps`, `zones`, `grind`, `walk`, `entry`,
+  `milestones` and `nonLoadBearing`, plus the 8 shop `towns` (`opensAfter`, `bandStage`, `kit`).
+- **Spots (NW-1, plan 5.2).** World-map places are names, never raw cells: the world source and the compiled map
+  carry `spots: {<prefix>_s_<name>: {at: [x, y], kind: land | dock | landing}}` (pins of their regions;
+  `map_checks_spots.py` checks the kind). quest.yaml's `entry` and vehicles on `overworld` use `at: <spot>` (the
+  schema refuses x / y there) and its `nonLoadBearing` there `ref: <dock | gate | npc | patch id>`
+  (`questSpots.resolveQuestPlaces`); scenarios use `spot:` and vehicle `at:`; `set_vehicle` takes `at:`. A new world
+  place needs a spot in its region's spec. Tests read places by spot or record (`tests/helpers/worldSpots.ts`:
+  `spot(map, name)`, `worldSize(map)`), never by a literal world cell.
+- **The step-mean scaling (NW-5, plan 4.4 lever 1).** `layouts/world_balance.py`: one factor per world zone on the
+  map's rate (10-22 steps), fitted from the curve model's witnesses of pass W's world and the NW world so each
+  stage's walk earns pass W's xp again (factors 0.67-2.25; the method and the table in the file and in plan 16). No
+  enemy, table, item, formula or `grind` changed. Re-fit after a change that moves the witness's walks a lot.
+- **The verifier** (`src/progression/`, CLI `scripts/quest-verify.ts`): a state search over flags, key items,
+  vehicles and places, firing the field rules the game runs (`src/systems/fieldRules.ts`). Proofs (a) order, (b) no
+  skip, (c) no soft-lock, (d) bands (the curve model's whole-party level at each boss in its `band`, up to the top
+  level + 1; kits affordable; (d3) every `takeGold` price at most 80 % of the stage's starting gold), (e) early shops,
+  (f) price walls (Crescent, Gaia), (g) geography (the anchors of `assets/data/world-anchors.yaml` within the fitted
+  scale [0.75, 0.95], distance, bearing and detour bands), (h) the travel matrix (rows T0-T10, T6b, the two basin
+  rows; the seeds from the map's `world.basins`). `--mutate` adds the no-skip mutation suite (GT-1 to GT-37 + GT-5b,
+  `questMutateRows.ts`, and the generic elements); an uncaught element needs a `nonLoadBearing` entry.
+  `--from-reset` (NW-5, `questReset.ts`) runs proof (c) again from every stage's save-reset state (the party at
+  `cornelia` on foot, the vehicles of `worldReset.resetVehicles`) and from 50 seeded mid-stage samples per stage.
 - **The curve model** (`questCurve.ts`, `questExplore.ts`): no battles. It walks the witness of (a); each route cell in
-  an encounter zone adds `1 / mean steps` fights times the mode's rate and the stage's `grind` (1.0-7.0: the cap is 7,
-  `GRIND_RANGE` in `schemaValidationQuest.ts`), and the first time the walk enters a map other than the world map it
-  explores it once (every walkable cell of its zones, not times `grind`). Scripted battles are assumed won.
-  `tests/balance/questCurve.test.ts` replays its `segments` with seeded battles (QUEST 6.4: each boss in its band,
-  Chaos's door in [38, 41], wipes under 0.2 per stage).
-- **Commands.** `npm run quest` (assume mode: a pending stage's grants are synthetic), `npm run quest -- --strict
-  --mutate` (INT's gate), `--stage S11` (from the stage's `entry`, with its ancestors' grants; the search fires only the
-  events of the stage and its ancestors, `outOfScopeEvents`, and the full run covers the other orderings), `--only abc`,
-  `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes about half
-  an hour and a few GB: run it in the background, and only when world or quest data changed. Its test,
-  `tests/progression/questMutateWorld.test.ts`, is the heavy tier (`npm run test:world`, "Test tiers" under Testing).
-  NW-1 adds `--maps DIR` (a scratch compile's maps first), `--anchors FILE` (e.g. `assets-src/maps-nw/world-anchors.yaml`)
-  and `--worst-canoe` (rows T0-T4 again with the canoe).
-- **Spots (NW-1, `docs/NATURAL_WORLD_PLAN.md` 5.2).** World-map places are names, never raw cells: the world source
-  and the compiled map carry `spots: {<prefix>_s_<name>: {at: [x, y], kind: land | dock | landing}}` (each region
-  module's `SPOTS`; `map_checks_spots.py` checks the kind). quest.yaml's `entry` and vehicles on `overworld` use
-  `at: <spot>` (the schema refuses x / y there) and its `nonLoadBearing` there `ref: <dock | gate | npc | patch id>`
-  (`questSpots.resolveQuestPlaces` fills in the cells); scenarios use `spot:` and vehicle `at:` (resolved at scenario
-  start); `set_vehicle` takes `at:` (a spot vehicle in `Game.vehicles` gets its cell when its map loads; a save refuses
-  one without a cell). A new world place needs a spot in its region's `SPOTS`. The NW contract is
-  `layouts/world_api_v2.py` and `tools/worldgen/` (`spec.py`, `noise.py`); nothing of today's world reads them.
-- **The NW generator (NW-2, `docs/NATURAL_WORLD_PLAN.md` 3, 12).** `python3 -I assets-src/tools/layouts/world_v2.py`
-  (the composer v2; `--metrics`, `--json FILE`, `--check`, `--out FILE`, `--owned-chunks <r>`) merges the seven
-  region specs `layouts/world_specs/<region>.py` (act 1's pins and template come from `a1/world_a1_pins.py`, NW-3:
-  generated by `python3 -I assets-src/tools/layouts/a1/world_a1_derive.py` from today's source, `--check` when stale;
-  every pin Cornelia-relative, world = CORNELIA_NW + rel; the other regions' doors are read from today's source by
-  `world_specs/today_doors.py` until their NW-R tranches), runs `tools/worldgen/compose.py` (shape, relief, hydro, climate,
-  stamps, roads, finish (seal, jogs), owners) at preset B, seed 1987, checks 3.8 (`gates.py`, `prewalk.py`,
-  `a1/world_a1_checks.py`; one line each) and the metrics (`metrics.py`: G-NW1-3, land, exemptions, jogs, kept
-  rects), and writes `assets-src/maps-nw/overworld.yaml` (256x256, never compiled into `assets/maps/ai/` before
-  NW-5: `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/<agent>/out`, under the lock, one at a time).
-  Selftests: `python3 -I assets-src/tools/worldgen/selftest.py` (synthetic specs, locality, determinism, B's NW-0
-  figures) and `selftest_gates.py` (each check fails on its mutated fixture, the sealed-Elfheim prewalk case);
-  `tests/nw/worldSource.test.ts` reads the source. Tundra `t` / snow `n` (D-NW9) are in the compiler (TerrainType
-  12 / 13, walkable; a `landing` spot on tundra, never snow; fallback textures only on maps that use them) and the
-  legacy tile sheet (rows 11-13, `tiles_cold.py`); the runtime meets them at NW-5. A map over 192x192 cells is
-  painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality), which keeps the 256² compile
-  under G-NW8's 26 GB.
-- **The NW gates and `--region` (NW-4, `docs/NATURAL_WORLD_PLAN.md` 3.4, 3.8, 14).** `world_v2.py` prints one line
-  per check, G-NW4's among them: `world: OK (...)` (`layouts/world_checks_v2.py`: rasters, ids on their owners' cells,
-  docks, anchors, every entrance reachable from an arrival), `basins: OK (aldi .., ocean ..; canal joins; the canal
-  pass ..)`, `barriers: OK (walk, canoe; cuts ..)`, `prewalk: OK (S0-S14)`, `north: OK`; a failure lists its rule,
-  region and cells. `worldgen/gates.py` (basins + canal pass, docks, walls with their minimal water cuts, routes,
-  straits), `gates_reach.py` (barriers by foot and canoe, the spine's cut = a row of the bridge patch, north,
-  landings, detours), `cuts.py` (0-1 min cut, vertex cut), `prewalk.py` (starts from the ancestors' maps' real exits,
-  the nearest blocking cell). The source carries `regions.<r>.raster` (from `owners.py`'s owner grid: a shared
-  landmass split along its continent fields, sea to the nearest land) and `world.cuts`. A source with rasters
-  compiles in **chunk-digest mode** (`terrain/region_chunks.py`): `build.chunks` per chunk; `--region r` repaints r's
-  raster plus every chunk whose digest differs from the base's, refusing over 70 painted chunks (ring included;
-  as 14 records, today's rasters exceed that, an open item).
-  The shared compiled base is `~/temp/ff-game/worldplan/base/latest/` (source hash in `base.txt`, read-only): clone it
-  (`/bin/cp -cR`) to `/tmp/<agent>/nw-out/` and run `build_map.py overworld --src-dir assets-src/maps-nw --out
-  /tmp/<agent>/nw-out --region <r>` there; never full-compile (the integrator refreshes the base).
+  an encounter zone adds `1 / mean steps` fights (the zone's `encounterRate`, else the map's) times the mode's rate and
+  the stage's `grind` (1.0-7.0), and the first time the walk enters a map other than the world map it explores it once.
+  `tests/balance/questCurve.test.ts` replays its `segments` with seeded battles (each boss in its band, Chaos's door
+  in [38, 41], wipes per stage).
+- **Commands.** `npm run quest` (assume mode), `npm run quest -- --strict` (every proof), `--mutate` (the mutation
+  suite: run it in the background, and only when world or quest data changed; its test,
+  `tests/progression/questMutateWorld.test.ts`, is the heavy tier), `--from-reset`, `--stage S11` (from the stage's
+  `entry`, with its ancestors' grants), `--only abc`, `--json FILE`, `--maps DIR` (a scratch compile's maps first),
+  `--anchors FILE`, `--worst-canoe` (rows T0-T4 again with the canoe). The search stops at `MAX_STATES` = 3,000,000
+  (`questSearch.ts`; the state key is compact: flag and item bitsets): the full NW graph is 1,348,366 states, `--stage
+  S30`'s 2,096,640; `npm run quest` runs with an 8 GB heap.
+- **Saves (NW-5, plan 5.3, D-NW8).** `SAVE_VERSION` 4. A v1-v3 save is reset by the pure `resetSave` of
+  `src/systems/worldReset.ts` (`LoadedSave.reset`): on the world map, or owning the ship (`BIKKE_DEFEATED`) or the
+  airship (`AIRSHIP_RAISED`) wherever it is (Q4a), it loads at Cornelia's world entrance on foot (`LoadScene` sets
+  `game.pendingEntrance = 'cornelia'`); its world-map vehicles become `resetVehicles(flags)` (the ship at the
+  `a1_pravoka` dock spot, the airship at `a1_s_airship`); flags, party, items, gold and the rest are kept; the field
+  shows "The world has changed. You stand before Cornelia." once. A save that owns neither and is inside another map
+  keeps its place. Tests: `tests/systems/saveWorldReset.test.ts` (the 8 cases), `worldReset.test.ts`,
+  `tests/progression/resetStates.test.ts`.
+- **Tests of the world.** Act 1: `tests/quest/a1/` (`a1Pins`, `a1Sites`, `a1Walks`, `nwA1.ts`), the regions
+  `tests/quest/<r>/<r>_o_world.test.ts` (FIRE's `fireWorld.test.ts`) on the committed source and its owner grid,
+  `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`. Pass W's world
+  source and anchors are frozen in `tests/fixtures/passW/` (never edit them): the act-1 pins and the regions' kept ids
+  and rosters are compared with them.
+- **Landmark art** below gives pass W's cells for the icons; on the NW world each icon is placed by its door offset.
 - **Landmark art (LM-INT, LM4-INT, LM5-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from three
   sheets (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2),
   `landmarks_lm4.*` (pass LM4) and `landmarks_lm5.*` (pass LM5: the Western Keep and the Citadel of Trials); cells
@@ -424,14 +427,13 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
 - **Ambient effects (LM-INT).** A map source's `ambient: [{kind: smoke, x, y, ox, oy}]` (cell, art px 0-47 inside it;
   `build_hooks.ambient` checks and copies it, `schemaValidationAmbient.ts` validates it) is drawn by
   `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is the steam billows of the
-  Field engine notes ("Ambient smoke"). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut
-  `ambient`).
+  Field engine notes ("Ambient smoke"). X  `ambient`).
 - **Mode 7 far atlas (M7-1, `docs/MODE7_PLAN.md` 3.1).** Every full and `--region` world compile re-bakes
-  `assets/maps/ai/overworld/mode7.png` (3072x3072 RGB, 16 px per cell), `mode7_low.png` (1536x1536, 8 px per cell)
-  and `mode7.json` (`version`, `cellPx`, `size`, `lowCellPx`, `lowSize`, `inputs` = the sha256 over the 144 chunk
+  `assets/maps/ai/overworld/mode7.png` (3072x3072 RGB, 12 px per cell on the 256-cell world since NW-5: `cellPx = 3072 // width`), `mode7_low.png` (1536x1536, 6 px per cell)
+  and `mode7.json` (`version`, `cellPx`, `size`, `lowCellPx`, `lowSize`, `inputs` = the sha256 over the 256 chunk
   files in `art.below` order) through `build_hooks.bake_mode7`, called in `build_map.write()` right after
   `bake_patches` (only for `MODE7_MAPS` = `overworld`, so the selftest worlds bake none). The baker,
-  `assets-src/tools/mode7_atlas.py`, box-averages the below chunks (3x3, 6x6; integers, round half up), adds no
+  `assets-src/tools/mode7_atlas.py`, box-averages the below chunks (4x4, 8x8 at 12 px per cell; integers, round half up), adds no
   border and refuses a world whose 4 edges are not all Water; the patches stay out (the runtime `WorldAtlas`,
   `src/scenes/exploration/mode7/WorldAtlas.ts`, draws them over it while their flags are set, builds the mips with
   WebGL2 only, and frees the source image after the compose). Gates: `mode7_atlas.py --check-determinism overworld`
@@ -532,7 +534,7 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 
 - **Encounter zone of a step:** `playerMove` fires before `FieldVehicles.afterStep` changes the mode, so `EncounterSystem.setStepModeResolver` (set by the exploration scene to `modeAfterStep` from the step origin) makes the lookup use the mode the step ends in. A canoe step onto a river cell rolls the canoe zone, not the walking zones with a hole. `tests/data/overworldZoneCoverage.test.ts` fails when a walking or canoe cell outside act 1 falls through to the act-1 table (the Water and Wind tarns have canoe zones `wat_streams` / `wnd_tarns`).
 - **Flag-driven NPCs:** `ExplorationScene.refreshNpcPresence` follows `showIf` / `hideIf` as flags change (polled each field frame by a cheap signature, plus cutscenes and `onResume`); NPCs leave and arrive (`NpcPresence.ts`, `MapLoader.createNpc`, `MapLoadResult.npcDefs` = the whole NPC list). An NPC never appears on the hero's cell or the one about to be entered.
-- **Ambient smoke (SMOKE):** a map's `ambient: [{kind: smoke, x, y, ox, oy}]` (validated by `schemaValidationAmbient.ts`; the volcano's is `world_fire_data.SMOKE` at (120, 149), art px (26, 12)) is drawn by `FieldAmbient.ts` as `SmokeColumn`s (`src/scenes/exploration/smoke/`) in the style `VOLCANO_SMOKE` (`smokeStyles.ts`; the user's pick, option e of the SMOKE experiment): 7 white cauliflower billows with a dark outline, lit from the top left, r 10 -> 26 art px, rising 110 art px and spreading at the top on a 5.2 s loop, fading by a Bayer dither (binary alpha, 15-bit colours, whole art px). The shapes are `smokeShapes.ts`, the pure motion `smokeMotion.ts`; the bitmaps are shared `GraphicsContext`s built once per art scale, so a frame allocates nothing. Check it with `?mute=1&scenario=smoke_volcano` (Debug on the title screen).
+- **Ambient smoke (SMOKE):** a map's `ambient: [{kind: smoke, x, y, ox, oy}]` (validated by `schemaValidationAmbient.ts`; the volcano's is FIRE's content's, art px (26, 12)) is drawn by `FieldAmbient.ts` as `SmokeColumn`s (`src/scenes/exploration/smoke/`) in the style `VOLCANO_SMOKE` (`smokeStyles.ts`; the user's pick, option e of the SMOKE experiment): 7 white cauliflower billows with a dark outline, lit from the top left, r 10 -> 26 art px, rising 110 art px and spreading at the top on a 5.2 s loop, fading by a Bayer dither (binary alpha, 15-bit colours, whole art px). The shapes are `smokeShapes.ts`, the pure motion `smokeMotion.ts`; the bitmaps are shared `GraphicsContext`s built once per art scale, so a frame allocates nothing. Check it with `?mute=1&scenario=smoke_volcano` (Debug on the title screen).
 - **Diagnostics** (`src/core/diagnostics.ts`): `?trace=1` (or `localStorage.ff1_trace = '1'`) logs every scene change, error, rejection, page unload and Vite full reload to the console and `window.__trace`; off by default. A lost WebGL context and a halted game loop always show a banner over the page. The dev server ignores `.claude/` (`vite.config.ts`), which stopped agent worktrees from reloading the page.
 
 ### Boosts (pass CHT)
@@ -647,7 +649,7 @@ one shared HP pool (**20000**, user ruling U-3, which overrides D-U3's 6000 and 
 
 An inspect cell shows text when the player faces it and presses confirm (a grave, a sign, a statue). No NPC is needed.
 
-1. Add an entry to the map source's `inspect` list (in the layout script for a generated map, e.g. the tomb in `layouts/overworld.py`): `{x, y, text: ["Here lies Erdrick."]}`. `text` is a list of strings, or a list of `{text: [...], condition: FLAG}` entries resolved like NPC dialog (first match wins); no other keys are allowed.
+1. Add an entry to the map source's `inspect` list (in the layout script for a generated map, e.g. the tomb in act 1's pins, `layouts/a1/world_a1_pins.py`): `{x, y, text: ["Here lies Erdrick."]}`. `text` is a list of strings, or a list of `{text: [...], condition: FLAG}` entries resolved like NPC dialog (first match wins); no other keys are allowed.
 2. The cell is usually blocked art (an object); it must be on the map and have a reachable walkable 4-neighbour (the compiler checks both, `map_checks.py`).
 3. At runtime `FieldInspect.inspectAt` returns the lines; an NPC or a shop counter in front of the player wins over an inspect cell.
 4. Compile the map and add a test (e.g. `tests/data/overworldLayout.test.ts` checks the tomb text and that it is reachable only over the east bridge).
